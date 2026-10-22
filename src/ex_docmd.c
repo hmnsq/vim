@@ -11,40 +11,40 @@
  * ex_docmd.c: functions for executing an Ex command line.
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-static int	quitmore = 0;
-static int	ex_pressedreturn = FALSE;
-#ifndef FEAT_PRINTER
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	quitmore = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	ex_pressedreturn = FALSE;
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_PRINTER
 # define ex_hardcopy	ex_ni
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_EVAL
-static char_u	*do_one_cmd(char_u **, int, cstack_T *, char_u *(*fgetline)(int, void *, int, getline_opt_T), void *cookie);
-#else
-static char_u	*do_one_cmd(char_u **, int, char_u *(*fgetline)(int, void *, int, getline_opt_T), void *cookie);
-static int	if_level = 0;		// depth in :if
-#endif
-static void	append_command(char_u *cmd);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+ಸ್ಥಿರ char_u	*do_one_cmd(char_u **, ಪೂರ್ಣಾಂಕ, cstack_T *, char_u *(*fgetline)(ಪೂರ್ಣಾಂಕ, ಶೂನ್ಯ *, ಪೂರ್ಣಾಂಕ, getline_opt_T), ಶೂನ್ಯ *cookie);
+#ಇಲ್ಲದಿದ್ದರೆ
+ಸ್ಥಿರ char_u	*do_one_cmd(char_u **, ಪೂರ್ಣಾಂಕ, char_u *(*fgetline)(ಪೂರ್ಣಾಂಕ, ಶೂನ್ಯ *, ಪೂರ್ಣಾಂಕ, getline_opt_T), ಶೂನ್ಯ *cookie);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	if_level = 0;		// depth in :if
+#ಆದರೆ_ಅಂತ್ಯ
+ಸ್ಥಿರ ಶೂನ್ಯ	append_command(char_u *cmd);
 
-#ifndef FEAT_MENU
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_MENU
 # define ex_emenu		ex_ni
 # define ex_menu		ex_ni
 # define ex_menutranslate	ex_ni
-#endif
-static void	ex_autocmd(exarg_T *eap);
-static void	ex_doautocmd(exarg_T *eap);
-static void	ex_bunload(exarg_T *eap);
-static void	ex_buffer(exarg_T *eap);
-static void	do_exbuffer(exarg_T *eap);
-static void	ex_bmodified(exarg_T *eap);
-static void	ex_bnext(exarg_T *eap);
-static void	ex_bprevious(exarg_T *eap);
-static void	ex_brewind(exarg_T *eap);
-static void	ex_blast(exarg_T *eap);
-static char_u	*getargcmd(char_u **);
-static int	getargopt(exarg_T *eap);
-#ifndef FEAT_QUICKFIX
+#ಆದರೆ_ಅಂತ್ಯ
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_autocmd(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_doautocmd(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_bunload(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_ಬಫರ್(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	do_exbuffer(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_bmodified(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_bnext(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_bprevious(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_brewind(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_blast(exarg_T *eap);
+ಸ್ಥಿರ char_u	*getargcmd(char_u **);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	getargopt(exarg_T *eap);
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_QUICKFIX
 # define ex_make		ex_ni
 # define ex_cbuffer		ex_ni
 # define ex_cc			ex_ni
@@ -60,213 +60,213 @@ static int	getargopt(exarg_T *eap);
 # define ex_copen		ex_ni
 # define ex_cwindow		ex_ni
 # define ex_cbottom		ex_ni
-#endif
-#if !defined(FEAT_QUICKFIX) || !defined(FEAT_EVAL)
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ !defined(FEAT_QUICKFIX) || !defined(FEAT_EVAL)
 # define ex_cexpr		ex_ni
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-static linenr_T default_address(exarg_T *eap);
-static void address_default_all(exarg_T *eap);
-static void	get_flags(exarg_T *eap);
-#if !defined(FEAT_PERL) \
+ಸ್ಥಿರ linenr_T default_ವಿಳಾಸ(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ ವಿಳಾಸ_default_all(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	get_flags(exarg_T *eap);
+#ಆದರೆ !defined(FEAT_PERL) \
 	|| !defined(FEAT_PYTHON) || !defined(FEAT_PYTHON3) \
 	|| !defined(FEAT_TCL) \
 	|| !defined(FEAT_RUBY) \
 	|| !defined(FEAT_LUA) \
 	|| !defined(FEAT_MZSCHEME)
 # define HAVE_EX_SCRIPT_NI
-static void	ex_script_ni(exarg_T *eap);
-#endif
-static char	*invalid_range(exarg_T *eap);
-static void	correct_range(exarg_T *eap);
-#ifdef FEAT_QUICKFIX
-static char_u	*replace_makeprg(exarg_T *eap, char_u *p, char_u **cmdlinep);
-#endif
-static char_u	*repl_cmdline(exarg_T *eap, char_u *src, size_t srclen, char_u *repl, char_u **cmdlinep);
-static void	ex_highlight(exarg_T *eap);
-static void	ex_colorscheme(exarg_T *eap);
-static void	ex_cquit(exarg_T *eap);
-static void	ex_quit_all(exarg_T *eap);
-static void	ex_close(exarg_T *eap);
-static void	ex_win_close(int forceit, win_T *win, tabpage_T *tp);
-static void	ex_only(exarg_T *eap);
-static void	ex_resize(exarg_T *eap);
-static void	ex_stag(exarg_T *eap);
-static void	ex_tabclose(exarg_T *eap);
-static void	ex_tabonly(exarg_T *eap);
-static void	ex_tabnext(exarg_T *eap);
-static void	ex_tabmove(exarg_T *eap);
-static void	ex_tabs(exarg_T *eap);
-#if defined(FEAT_QUICKFIX)
-static void	ex_pclose(exarg_T *eap);
-static void	ex_ptag(exarg_T *eap);
-static void	ex_pedit(exarg_T *eap);
-static void	ex_pbuffer(exarg_T *eap);
-static void	prepare_preview_window(void);
-static void	back_to_current_window(win_T *curwin_save);
-#else
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_script_ni(exarg_T *eap);
+#ಆದರೆ_ಅಂತ್ಯ
+ಸ್ಥಿರ ಅಕ್ಷರ	*invalid_range(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	correct_range(exarg_T *eap);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
+ಸ್ಥಿರ char_u	*replace_makeprg(exarg_T *eap, char_u *p, char_u **cmdlinep);
+#ಆದರೆ_ಅಂತ್ಯ
+ಸ್ಥಿರ char_u	*repl_cmdline(exarg_T *eap, char_u *src, size_t srclen, char_u *repl, char_u **cmdlinep);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_highlight(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_colorscheme(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_cquit(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_quit_all(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_close(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_win_close(ಪೂರ್ಣಾಂಕ forceit, win_T *win, tabpage_T *tp);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_only(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_resize(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_stag(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_tabclose(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_tabonly(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_tabnext(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_tabmove(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_tabs(exarg_T *eap);
+#ಆದರೆ defined(FEAT_QUICKFIX)
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_pclose(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_ptag(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_pedit(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_pbuffer(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	prepare_preview_ಕಿಟಕಿ(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಶೂನ್ಯ	ಹಿಂಭಾಗ_ಗಮ್ಯ_current_ಕಿಟಕಿ(win_T *curwin_save);
+#ಇಲ್ಲದಿದ್ದರೆ
 # define ex_pclose		ex_ni
 # define ex_ptag		ex_ni
 # define ex_pedit		ex_ni
 # define ex_pbuffer		ex_ni
-#endif
-static void	ex_hide(exarg_T *eap);
-static void	ex_exit(exarg_T *eap);
-static void	ex_print(exarg_T *eap);
-#ifdef FEAT_BYTEOFF
-static void	ex_goto(exarg_T *eap);
-#else
+#ಆದರೆ_ಅಂತ್ಯ
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_hide(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_exit(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_print(exarg_T *eap);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_BYTEOFF
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_goto(exarg_T *eap);
+#ಇಲ್ಲದಿದ್ದರೆ
 # define ex_goto		ex_ni
-#endif
-static void	ex_shell(exarg_T *eap);
-static void	ex_preserve(exarg_T *eap);
-static void	ex_recover(exarg_T *eap);
-static void	ex_mode(exarg_T *eap);
-static void	ex_wrongmodifier(exarg_T *eap);
-static void	ex_find(exarg_T *eap);
-static void	ex_open(exarg_T *eap);
-static void	ex_edit(exarg_T *eap);
-#ifndef FEAT_GUI
+#ಆದರೆ_ಅಂತ್ಯ
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_shell(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_preserve(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_recover(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_ಬಹುಲಕ(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_wrongmodifier(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_ಕಂಡುಹಿಡಿ(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_open(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_edit(exarg_T *eap);
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_GUI
 # define ex_gui			ex_nogui
-static void	ex_nogui(exarg_T *eap);
-#endif
-#if defined(FEAT_GUI_MSWIN) && defined(FEAT_MENU) && defined(FEAT_TEAROFF)
-static void	ex_tearoff(exarg_T *eap);
-#else
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_nogui(exarg_T *eap);
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(FEAT_GUI_MSWIN) && defined(FEAT_MENU) && defined(FEAT_TEAROFF)
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_tearoff(exarg_T *eap);
+#ಇಲ್ಲದಿದ್ದರೆ
 # define ex_tearoff		ex_ni
-#endif
-#if (defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK) \
-	|| defined(FEAT_TERM_POPUP_MENU)) && defined(FEAT_MENU)
-static void	ex_popup(exarg_T *eap);
-#else
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ (defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK) \
+	|| defined(FEAT_ಪದ_POPUP_MENU)) && defined(FEAT_MENU)
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_popup(exarg_T *eap);
+#ಇಲ್ಲದಿದ್ದರೆ
 # define ex_popup		ex_ni
-#endif
-#ifndef FEAT_GUI_MSWIN
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_GUI_MSWIN
 # define ex_simalt		ex_ni
-#endif
-#if !defined(FEAT_GUI_MSWIN) && !defined(FEAT_GUI_GTK) && !defined(FEAT_GUI_MOTIF)
-# define gui_mch_find_dialog	ex_ni
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ !defined(FEAT_GUI_MSWIN) && !defined(FEAT_GUI_GTK) && !defined(FEAT_GUI_MOTIF)
+# define gui_mch_ಕಂಡುಹಿಡಿ_dialog	ex_ni
 # define gui_mch_replace_dialog ex_ni
-#endif
-#if !defined(FEAT_GUI_GTK)
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ !defined(FEAT_GUI_GTK)
 # define ex_helpfind		ex_ni
-#endif
-#ifndef FEAT_CSCOPE
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_CSCOPE
 # define ex_cscope		ex_ni
 # define ex_scscope		ex_ni
 # define ex_cstag		ex_ni
-#endif
-#ifndef FEAT_SYN_HL
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_SYN_HL
 # define ex_syntax		ex_ni
 # define ex_ownsyntax		ex_ni
-#endif
-#if !defined(FEAT_SYN_HL) || !defined(FEAT_PROFILE)
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ !defined(FEAT_SYN_HL) || !defined(FEAT_PROFILE)
 # define ex_syntime		ex_ni
-#endif
-#ifndef FEAT_SPELL
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_SPELL
 # define ex_spell		ex_ni
 # define ex_mkspell		ex_ni
 # define ex_spelldump		ex_ni
 # define ex_spellinfo		ex_ni
 # define ex_spellrepall		ex_ni
-#endif
-#ifndef FEAT_PERSISTENT_UNDO
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_PERSISTENT_UNDO
 # define ex_rundo		ex_ni
 # define ex_wundo		ex_ni
-#endif
-#ifndef FEAT_LUA
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_LUA
 # define ex_lua			ex_script_ni
 # define ex_luado		ex_ni
 # define ex_luafile		ex_ni
-#endif
-#ifndef FEAT_MZSCHEME
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_MZSCHEME
 # define ex_mzscheme		ex_script_ni
 # define ex_mzfile		ex_ni
-#endif
-#ifndef FEAT_PERL
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_PERL
 # define ex_perl		ex_script_ni
 # define ex_perldo		ex_ni
-#endif
-#ifndef FEAT_PYTHON
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_PYTHON
 # define ex_python		ex_script_ni
 # define ex_pydo		ex_ni
 # define ex_pyfile		ex_ni
-#endif
-#ifndef FEAT_PYTHON3
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_PYTHON3
 # define ex_py3			ex_script_ni
 # define ex_py3do		ex_ni
 # define ex_py3file		ex_ni
-#endif
-#if !defined(FEAT_PYTHON) && !defined(FEAT_PYTHON3)
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ !defined(FEAT_PYTHON) && !defined(FEAT_PYTHON3)
 # define ex_pyx			ex_script_ni
 # define ex_pyxdo		ex_ni
 # define ex_pyxfile		ex_ni
-#endif
-#ifndef FEAT_TCL
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_TCL
 # define ex_tcl			ex_script_ni
 # define ex_tcldo		ex_ni
 # define ex_tclfile		ex_ni
-#endif
-#ifndef FEAT_RUBY
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_RUBY
 # define ex_ruby		ex_script_ni
 # define ex_rubydo		ex_ni
 # define ex_rubyfile		ex_ni
-#endif
-#ifndef FEAT_KEYMAP
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_KEYMAP
 # define ex_loadkeymap		ex_ni
-#endif
-static void	ex_swapname(exarg_T *eap);
-static void	ex_syncbind(exarg_T *eap);
-static void	ex_read(exarg_T *eap);
-static void	ex_pwd(exarg_T *eap);
-static void	ex_equal(exarg_T *eap);
-static void	ex_sleep(exarg_T *eap);
-static void	ex_winsize(exarg_T *eap);
-static void	ex_wincmd(exarg_T *eap);
-#if defined(FEAT_GUI) || defined(UNIX) || defined(VMS) || defined(MSWIN)
-static void	ex_winpos(exarg_T *eap);
-#else
+#ಆದರೆ_ಅಂತ್ಯ
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_swapname(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_syncbind(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_read(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_pwd(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_equal(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_sleep(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_winsize(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_wincmd(exarg_T *eap);
+#ಆದರೆ defined(FEAT_GUI) || defined(UNIX) || defined(VMS) || defined(MSWIN)
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_winpos(exarg_T *eap);
+#ಇಲ್ಲದಿದ್ದರೆ
 # define ex_winpos	    ex_ni
-#endif
-static void	ex_operators(exarg_T *eap);
-static void	ex_put(exarg_T *eap);
-static void	ex_iput(exarg_T *eap);
-static void	ex_copymove(exarg_T *eap);
-static void	ex_submagic(exarg_T *eap);
-static void	ex_join(exarg_T *eap);
-static void	ex_at(exarg_T *eap);
-static void	ex_bang(exarg_T *eap);
-static void	ex_undo(exarg_T *eap);
-#ifdef FEAT_PERSISTENT_UNDO
-static void	ex_wundo(exarg_T *eap);
-static void	ex_rundo(exarg_T *eap);
-#endif
-static void	ex_redo(exarg_T *eap);
-static void	ex_later(exarg_T *eap);
-static void	ex_redir(exarg_T *eap);
-static void	ex_redrawstatus(exarg_T *eap);
-static void	ex_redrawtabline(exarg_T *eap);
-static void	ex_redrawtabpanel(exarg_T *eap);
-static void	close_redir(void);
-static void	ex_mark(exarg_T *eap);
-static void	ex_startinsert(exarg_T *eap);
-static void	ex_stopinsert(exarg_T *eap);
-#ifdef FEAT_FIND_ID
-static void	ex_checkpath(exarg_T *eap);
-static void	ex_findpat(exarg_T *eap);
-#else
+#ಆದರೆ_ಅಂತ್ಯ
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_operators(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_put(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_iput(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_copymove(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_submagic(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_join(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_at(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_bang(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_undo(exarg_T *eap);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PERSISTENT_UNDO
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_wundo(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_rundo(exarg_T *eap);
+#ಆದರೆ_ಅಂತ್ಯ
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_redo(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_later(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_redir(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_redrawstatus(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_redrawtabline(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_redrawtabpanel(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	close_redir(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_mark(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_startinsert(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_stopinsert(exarg_T *eap);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕಂಡುಹಿಡಿ_ID
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_checkpath(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_findpat(exarg_T *eap);
+#ಇಲ್ಲದಿದ್ದರೆ
 # define ex_findpat		ex_ni
 # define ex_checkpath		ex_ni
-#endif
-#if defined(FEAT_FIND_ID) && defined(FEAT_QUICKFIX)
-static void	ex_psearch(exarg_T *eap);
-#else
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(FEAT_ಕಂಡುಹಿಡಿ_ID) && defined(FEAT_QUICKFIX)
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_psearch(exarg_T *eap);
+#ಇಲ್ಲದಿದ್ದರೆ
 # define ex_psearch		ex_ni
-#endif
-static void	ex_tag(exarg_T *eap);
-static void	ex_tag_cmd(exarg_T *eap, char_u *name);
-#ifndef FEAT_EVAL
-# define ex_block		ex_ni
+#ಆದರೆ_ಅಂತ್ಯ
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_ಟ್ಯಾಗ್(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_ಟ್ಯಾಗ್_cmd(exarg_T *eap, char_u *name);
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_EVAL
+# define ex_ಖಂಡ		ex_ni
 # define ex_break		ex_ni
 # define ex_breakadd		ex_ni
 # define ex_breakdel		ex_ni
@@ -293,7 +293,7 @@ static void	ex_tag_cmd(exarg_T *eap, char_u *name);
 # define ex_execute		ex_ni
 # define ex_finally		ex_ni
 # define ex_incdec		ex_ni
-# define ex_finish		ex_ni
+# define ex_ಮುಕ್ತಾಯ		ex_ni
 # define ex_function		ex_ni
 # define ex_if			ex_ni
 # define ex_let			ex_ni
@@ -312,91 +312,91 @@ static void	ex_tag_cmd(exarg_T *eap, char_u *name);
 # define ex_while		ex_ni
 # define ex_import		ex_ni
 # define ex_export		ex_ni
-#endif
-#ifndef FEAT_SESSION
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_SESSION
 # define ex_loadview		ex_ni
-#endif
-#ifndef FEAT_VIMINFO
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_VIMINFO
 # define ex_viminfo		ex_ni
-#endif
-static void	ex_behave(exarg_T *eap);
-static void	ex_filetype(exarg_T *eap);
-static void	ex_setfiletype(exarg_T *eap);
-#ifndef FEAT_DIFF
+#ಆದರೆ_ಅಂತ್ಯ
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_behave(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_filetype(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_setfiletype(exarg_T *eap);
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_DIFF
 # define ex_diffoff		ex_ni
 # define ex_diffpatch		ex_ni
 # define ex_diffgetput		ex_ni
 # define ex_diffsplit		ex_ni
 # define ex_diffthis		ex_ni
 # define ex_diffupdate		ex_ni
-#endif
-static void	ex_digraphs(exarg_T *eap);
-#ifdef FEAT_SEARCH_EXTRA
-static void	ex_nohlsearch(exarg_T *eap);
-#else
+#ಆದರೆ_ಅಂತ್ಯ
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_digraphs(exarg_T *eap);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಹುಡುಕು_EXTRA
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_nohlsearch(exarg_T *eap);
+#ಇಲ್ಲದಿದ್ದರೆ
 # define ex_nohlsearch		ex_ni
-# define ex_match		ex_ni
-#endif
-#ifdef FEAT_CRYPT
-static void	ex_X(exarg_T *eap);
-#else
+# define ex_ಹೊಂದಿಕೆ		ex_ni
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_X(exarg_T *eap);
+#ಇಲ್ಲದಿದ್ದರೆ
 # define ex_X			ex_ni
-#endif
-#ifdef FEAT_FOLDING
-static void	ex_fold(exarg_T *eap);
-static void	ex_foldopen(exarg_T *eap);
-static void	ex_folddo(exarg_T *eap);
-#else
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_FOLDING
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_fold(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_foldopen(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	ex_folddo(exarg_T *eap);
+#ಇಲ್ಲದಿದ್ದರೆ
 # define ex_fold		ex_ni
 # define ex_foldopen		ex_ni
 # define ex_folddo		ex_ni
-#endif
-#if !(defined(HAVE_LOCALE_H) || defined(X_LOCALE))
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ !(defined(HAVE_LOCALE_H) || defined(X_LOCALE))
 # define ex_language		ex_ni
-#endif
-#ifndef FEAT_SIGNS
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_SIGNS
 # define ex_sign		ex_ni
-#endif
-#ifndef FEAT_NETBEANS_INTG
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_NETBEANS_INTG
 # define ex_nbclose		ex_ni
 # define ex_nbkey		ex_ni
 # define ex_nbstart		ex_ni
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifndef FEAT_PROFILE
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_PROFILE
 # define ex_profile		ex_ni
-#endif
-#ifndef FEAT_TERMINAL
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_TERMINAL
 # define ex_terminal		ex_ni
-#endif
-#if !defined(FEAT_X11) || !defined(FEAT_XCLIPBOARD)
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ !defined(FEAT_X11) || !defined(FEAT_XCLIPBOARD)
 # define ex_xrestore		ex_ni
-#endif
-#if !defined(FEAT_WAYLAND)
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ !defined(FEAT_WAYLAND)
 # define ex_wlrestore		ex_ni
-#endif
-#if !defined(HAVE_CLIPMETHOD)
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ !defined(HAVE_CLIPMETHOD)
 # define ex_clipreset		ex_ni
-#endif
-#if !defined(FEAT_PROP_POPUP)
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ !defined(FEAT_PROP_POPUP)
 # define ex_popupclear		ex_ni
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Declare cmdnames[].
  */
-#define DO_DECLARE_EXCMD
-#include "ex_cmds.h"
-#include "ex_cmdidxs.h"
+#ವ್ಯಾಖ್ಯಾನಿಸು DO_DECLARE_EXCMD
+#ಅನ್ತರ್ಭಾವ "ex_cmds.h"
+#ಅನ್ತರ್ಭಾವ "ex_cmdidxs.h"
 
-static char_u dollar_command[2] = {'$', 0};
+ಸ್ಥಿರ char_u dollar_command[2] = {'$', 0};
 
 
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 // Struct for storing a line inside a while/for loop
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    char_u	*line;		// command line
+    char_u	*ಸಾಲು;		// command line
     linenr_T	lnum;		// sourcing_lnum of the line
 } wcmd_T;
 
@@ -405,44 +405,44 @@ typedef struct
  * This is required, because do_one_cmd() may invoke ex_function(), which
  * reads more lines that may come from the while/for loop.
  */
-struct loop_cookie
+ರಚನೆ loop_cookie
 {
-    garray_T	*lines_gap;		// growarray with line info
-    int		current_line;		// last read line from growarray
-    int		repeating;		// TRUE when looping a second time
+    garray_T	*ಸಾಲುಗಳು_gap;		// growarray with line info
+    ಪೂರ್ಣಾಂಕ		current_ಸಾಲು;		// last read line from growarray
+    ಪೂರ್ಣಾಂಕ		repeating;		// TRUE when looping a second time
     // When "repeating" is FALSE use "getline" and "cookie" to get lines
-    char_u	*(*lc_getline)(int, void *, int, getline_opt_T);
-    void	*cookie;
+    char_u	*(*lc_getline)(ಪೂರ್ಣಾಂಕ, ಶೂನ್ಯ *, ಪೂರ್ಣಾಂಕ, getline_opt_T);
+    ಶೂನ್ಯ	*cookie;
 };
 
-static char_u	*get_loop_line(int c, void *cookie, int indent, getline_opt_T options);
-static int	store_loop_line(garray_T *gap, char_u *line);
-static void	free_cmdlines(garray_T *gap);
+ಸ್ಥಿರ char_u	*get_loop_ಸಾಲು(ಪೂರ್ಣಾಂಕ c, ಶೂನ್ಯ *cookie, ಪೂರ್ಣಾಂಕ indent, getline_opt_T options);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	store_loop_ಸಾಲು(garray_T *gap, char_u *ಸಾಲು);
+ಸ್ಥಿರ ಶೂನ್ಯ	free_cmdlines(garray_T *gap);
 
 // Struct to save a few things while debugging.  Used in do_cmdline() only.
-struct dbg_stuff
+ರಚನೆ dbg_stuff
 {
-    int		trylevel;
-    int		force_abort;
-    except_T	*caught_stack;
+    ಪೂರ್ಣಾಂಕ		trylevel;
+    ಪೂರ್ಣಾಂಕ		force_abort;
+    except_T	*caught_ರಾಶಿ;
     char_u	*vv_exception;
     char_u	*vv_throwpoint;
-    int		did_emsg;
-    int		got_int;
-    int		did_throw;
-    int		need_rethrow;
-    int		check_cstack;
+    ಪೂರ್ಣಾಂಕ		did_emsg;
+    ಪೂರ್ಣಾಂಕ		got_int;
+    ಪೂರ್ಣಾಂಕ		did_throw;
+    ಪೂರ್ಣಾಂಕ		need_rethrow;
+    ಪೂರ್ಣಾಂಕ		check_cstack;
     except_T	*current_exception;
 };
 
-    static void
-save_dbg_stuff(struct dbg_stuff *dsp)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+save_dbg_stuff(ರಚನೆ dbg_stuff *dsp)
 {
     dsp->trylevel	= trylevel;		trylevel = 0;
     dsp->force_abort	= force_abort;		force_abort = FALSE;
-    dsp->caught_stack	= caught_stack;		caught_stack = NULL;
-    dsp->vv_exception	= v_exception(NULL);
-    dsp->vv_throwpoint	= v_throwpoint(NULL);
+    dsp->caught_ರಾಶಿ	= caught_ರಾಶಿ;		caught_ರಾಶಿ = ಖಾಲಿ;
+    dsp->vv_exception	= v_exception(ಖಾಲಿ);
+    dsp->vv_throwpoint	= v_throwpoint(ಖಾಲಿ);
 
     // Necessary for debugging an inactive ":catch", ":finally", ":endtry"
     dsp->did_emsg	= did_emsg;		did_emsg     = FALSE;
@@ -450,18 +450,18 @@ save_dbg_stuff(struct dbg_stuff *dsp)
     dsp->did_throw	= did_throw;		did_throw    = FALSE;
     dsp->need_rethrow	= need_rethrow;		need_rethrow = FALSE;
     dsp->check_cstack	= check_cstack;		check_cstack = FALSE;
-    dsp->current_exception = current_exception;	current_exception = NULL;
+    dsp->current_exception = current_exception;	current_exception = ಖಾಲಿ;
 }
 
-    static void
-restore_dbg_stuff(struct dbg_stuff *dsp)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+restore_dbg_stuff(ರಚನೆ dbg_stuff *dsp)
 {
     suppress_errthrow = FALSE;
     trylevel = dsp->trylevel;
     force_abort = dsp->force_abort;
-    caught_stack = dsp->caught_stack;
-    (void)v_exception(dsp->vv_exception);
-    (void)v_throwpoint(dsp->vv_throwpoint);
+    caught_ರಾಶಿ = dsp->caught_ರಾಶಿ;
+    (ಶೂನ್ಯ)v_exception(dsp->vv_exception);
+    (ಶೂನ್ಯ)v_throwpoint(dsp->vv_throwpoint);
     did_emsg = dsp->did_emsg;
     got_int = dsp->got_int;
     did_throw = dsp->did_throw;
@@ -469,7 +469,7 @@ restore_dbg_stuff(struct dbg_stuff *dsp)
     check_cstack = dsp->check_cstack;
     current_exception = dsp->current_exception;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Check if ffname differs from fnum.
@@ -478,149 +478,149 @@ restore_dbg_stuff(struct dbg_stuff *dsp)
  * ffname is a full path to where a buffer lives on-disk or would live on-disk.
  *
  */
-    static int
-is_other_file(int fnum, char_u *ffname)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+is_other_file(ಪೂರ್ಣಾಂಕ fnum, char_u *ffname)
 {
-    if (fnum != 0)
+    ಆದರೆ (fnum != 0)
     {
-	if (fnum == curbuf->b_fnum)
-	    return FALSE;
+	ಆದರೆ (fnum == curbuf->b_fnum)
+	    ಹಿಂತಿರುಗಿ FALSE;
 
-	return TRUE;
+	ಹಿಂತಿರುಗಿ TRUE;
     }
 
-    if (ffname == NULL)
-	return TRUE;
+    ಆದರೆ (ffname == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ TRUE;
 
-    if (*ffname == NUL)
-	return FALSE;
+    ಆದರೆ (*ffname == NUL)
+	ಹಿಂತಿರುಗಿ FALSE;
 
     // TODO: Need a reliable way to know whether a buffer is meant to live
     // on-disk !curbuf->b_dev_valid is not always available (example: missing
     // on Windows)
-    if (curbuf->b_sfname != NULL
+    ಆದರೆ (curbuf->b_sfname != ಖಾಲಿ
 	    && *curbuf->b_sfname != NUL)
 	// This occurs with unsaved buffers. In which case `ffname` actually
 	// corresponds to curbuf->b_sfname
-	return fnamecmp(ffname, curbuf->b_sfname) != 0;
+	ಹಿಂತಿರುಗಿ fnamecmp(ffname, curbuf->b_sfname) != 0;
 
-    return otherfile(ffname);
+    ಹಿಂತಿರುಗಿ otherfile(ffname);
 }
 
 /*
  * do_exmode(): Repeatedly get commands for the "Ex" mode, until the ":vi"
  * command is given.
  */
-    void
+    ಶೂನ್ಯ
 do_exmode(
-    int		improved)	    // TRUE for "improved Ex" mode
+    ಪೂರ್ಣಾಂಕ		improved)	    // TRUE for "improved Ex" mode
 {
-    int		save_msg_scroll;
-    int		prev_msg_row;
-    linenr_T	prev_line;
+    ಪೂರ್ಣಾಂಕ		save_ಸಂದೇಶ_scroll;
+    ಪೂರ್ಣಾಂಕ		prev_ಸಂದೇಶ_ಅಡ್ಡಸಾಲು;
+    linenr_T	prev_ಸಾಲು;
     varnumber_T	changedtick;
 
-    if (improved)
-	exmode_active = EXMODE_VIM;
-    else
-	exmode_active = EXMODE_NORMAL;
-    State = MODE_NORMAL;
+    ಆದರೆ (improved)
+	exmode_ಸಕ್ರಿಯ = EXMODE_VIM;
+    ಇಲ್ಲದಿದ್ದರೆ
+	exmode_ಸಕ್ರಿಯ = EXMODE_ಸಾಮಾನ್ಯ;
+    State = ಬಹುಲಕ_ಸಾಮಾನ್ಯ;
     may_trigger_modechanged();
 
     // When using ":global /pat/ visual" and then "Q" we return to continue
     // the :global command.
-    if (global_busy)
-	return;
+    ಆದರೆ (global_busy)
+	ಹಿಂತಿರುಗಿ;
 
-    save_msg_scroll = msg_scroll;
+    save_ಸಂದೇಶ_scroll = ಸಂದೇಶ_scroll;
     ++RedrawingDisabled;	    // don't redisplay the window
     ++no_wait_return;		    // don't wait for return
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
     // Ignore scrollbar and mouse events in Ex mode
     ++hold_gui_events;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    msg(_("Entering Ex mode.  Type \"visual\" to go to Normal mode."));
-    while (exmode_active)
+    ಸಂದೇಶ(_("Entering Ex mode.  Type \"visual\" to go to Normal mode."));
+    ಆಗ (exmode_ಸಕ್ರಿಯ)
     {
 	// Check for a ":normal" command and no more characters left.
-	if (ex_normal_busy > 0 && typebuf.tb_len == 0)
+	ಆದರೆ (ex_ಸಾಮಾನ್ಯ_busy > 0 && typebuf.tb_len == 0)
 	{
-	    exmode_active = FALSE;
-	    break;
+	    exmode_ಸಕ್ರಿಯ = FALSE;
+	    ನಿಲ್ಲಿಸು;
 	}
-	msg_scroll = TRUE;
+	ಸಂದೇಶ_scroll = TRUE;
 	need_wait_return = FALSE;
 	ex_pressedreturn = FALSE;
 	ex_no_reprint = FALSE;
 	changedtick = CHANGEDTICK(curbuf);
-	prev_msg_row = msg_row;
-	prev_line = curwin->w_cursor.lnum;
-	if (improved)
+	prev_ಸಂದೇಶ_ಅಡ್ಡಸಾಲು = ಸಂದೇಶ_ಅಡ್ಡಸಾಲು;
+	prev_ಸಾಲು = curwin->w_cursor.lnum;
+	ಆದರೆ (improved)
 	{
-	    cmdline_row = msg_row;
-	    do_cmdline(NULL, getexline, NULL, 0);
+	    cmdline_ಅಡ್ಡಸಾಲು = ಸಂದೇಶ_ಅಡ್ಡಸಾಲು;
+	    do_cmdline(ಖಾಲಿ, getexline, ಖಾಲಿ, 0);
 	}
-	else
-	    do_cmdline(NULL, getexmodeline, NULL, DOCMD_NOWAIT);
-	lines_left = Rows - 1;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    do_cmdline(ಖಾಲಿ, getexmodeline, ಖಾಲಿ, DOCMD_NOWAIT);
+	ಸಾಲುಗಳು_ಎಡ = ಅಡ್ಡಸಾಲುಗಳು - 1;
 
-	if ((prev_line != curwin->w_cursor.lnum
+	ಆದರೆ ((prev_ಸಾಲು != curwin->w_cursor.lnum
 		   || changedtick != CHANGEDTICK(curbuf)) && !ex_no_reprint)
 	{
-	    if (curbuf->b_ml.ml_flags & ML_EMPTY)
-		emsg(_(e_empty_buffer));
-	    else
+	    ಆದರೆ (curbuf->b_ml.ml_flags & ML_ಖಾಲಿಗಳು)
+		emsg(_(e_ಖಾಲಿಗಳು_ಬಫರ್));
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		if (ex_pressedreturn)
+		ಆದರೆ (ex_pressedreturn)
 		{
 		    // go up one line, to overwrite the ":<CR>" line, so the
 		    // output doesn't contain empty lines.
-		    msg_row = prev_msg_row;
-		    if (prev_msg_row == Rows - 1)
-			msg_row--;
+		    ಸಂದೇಶ_ಅಡ್ಡಸಾಲು = prev_ಸಂದೇಶ_ಅಡ್ಡಸಾಲು;
+		    ಆದರೆ (prev_ಸಂದೇಶ_ಅಡ್ಡಸಾಲು == ಅಡ್ಡಸಾಲುಗಳು - 1)
+			ಸಂದೇಶ_ಅಡ್ಡಸಾಲು--;
 		}
-		msg_col = 0;
-		print_line_no_prefix(curwin->w_cursor.lnum, FALSE, FALSE);
-		msg_clr_eos();
+		ಸಂದೇಶ_ಲಂಬಸಾಲು = 0;
+		print_ಸಾಲು_no_ಪೂರ್ವಪ್ರತ್ಯಯ(curwin->w_cursor.lnum, FALSE, FALSE);
+		ಸಂದೇಶ_clr_eos();
 	    }
 	}
-	else if (ex_pressedreturn && !ex_no_reprint)	// must be at EOF
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ex_pressedreturn && !ex_no_reprint)	// must be at EOF
 	{
-	    if (curbuf->b_ml.ml_flags & ML_EMPTY)
-		emsg(_(e_empty_buffer));
-	    else
-		emsg(_(e_at_end_of_file));
+	    ಆದರೆ (curbuf->b_ml.ml_flags & ML_ಖಾಲಿಗಳು)
+		emsg(_(e_ಖಾಲಿಗಳು_ಬಫರ್));
+	    ಇಲ್ಲದಿದ್ದರೆ
+		emsg(_(e_at_ಕೊನೆ_ದ_file));
 	}
     }
 
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
     --hold_gui_events;
-#endif
-    if (RedrawingDisabled > 0)
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (RedrawingDisabled > 0)
 	--RedrawingDisabled;
     --no_wait_return;
     update_screen(UPD_CLEAR);
     need_wait_return = FALSE;
-    msg_scroll = save_msg_scroll;
+    ಸಂದೇಶ_scroll = save_ಸಂದೇಶ_scroll;
 }
 
 /*
  * Print the executed command for when 'verbose' is set.
  * When "lnum" is 0 only print the command.
  */
-    static void
-msg_verbose_cmd(linenr_T lnum, char_u *cmd)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಸಂದೇಶ_verbose_cmd(linenr_T lnum, char_u *cmd)
 {
     ++no_wait_return;
     verbose_enter_scroll();
 
-    if (lnum == 0)
+    ಆದರೆ (lnum == 0)
 	smsg(_("Executing: %s"), cmd);
-    else
-	smsg(_("line %ld: %s"), (long)lnum, cmd);
-    if (msg_silent == 0)
-	msg_puts("\n");   // don't overwrite this
+    ಇಲ್ಲದಿದ್ದರೆ
+	smsg(_("line %ld: %s"), (ದೀರ್ಘ)lnum, cmd);
+    ಆದರೆ (ಸಂದೇಶ_silent == 0)
+	ಸಂದೇಶ_puts("\n");   // don't overwrite this
 
     verbose_leave_scroll();
     --no_wait_return;
@@ -629,10 +629,10 @@ msg_verbose_cmd(linenr_T lnum, char_u *cmd)
 /*
  * Execute a simple command line.  Used for translated commands like "*".
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 do_cmdline_cmd(char_u *cmd)
 {
-    return do_cmdline(cmd, NULL, NULL,
+    ಹಿಂತಿರುಗಿ do_cmdline(cmd, ಖಾಲಿ, ಖಾಲಿ,
 				   DOCMD_VERBOSE|DOCMD_NOWAIT|DOCMD_KEYTYPED);
 }
 
@@ -640,10 +640,10 @@ do_cmdline_cmd(char_u *cmd)
  * Execute the "+cmd" argument of "edit +cmd fname" and the like.
  * This allows for using a range without ":" in Vim9 script.
  */
-    static int
-do_cmd_argument(char_u *cmd)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+do_cmd_ವಾದ(char_u *cmd)
 {
-    return do_cmdline(cmd, NULL, NULL,
+    ಹಿಂತಿರುಗಿ do_cmdline(cmd, ಖಾಲಿ, ಖಾಲಿ,
 		      DOCMD_VERBOSE|DOCMD_NOWAIT|DOCMD_KEYTYPED|DOCMD_RANGEOK);
 }
 
@@ -666,107 +666,107 @@ do_cmd_argument(char_u *cmd)
  *
  * return FAIL if cmdline could not be executed, OK otherwise
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 do_cmdline(
     char_u	*cmdline,
-    char_u	*(*fgetline)(int, void *, int, getline_opt_T),
-    void	*cookie,		// argument for fgetline()
-    int		flags)
+    char_u	*(*fgetline)(ಪೂರ್ಣಾಂಕ, ಶೂನ್ಯ *, ಪೂರ್ಣಾಂಕ, getline_opt_T),
+    ಶೂನ್ಯ	*cookie,		// argument for fgetline()
+    ಪೂರ್ಣಾಂಕ		flags)
 {
-    char_u	*next_cmdline;		// next cmd to execute
-    char_u	*cmdline_copy = NULL;	// copy of cmd line
-    int		used_getline = FALSE;	// used "fgetline" to obtain command
-    static int	recursive = 0;		// recursive depth
-    int		msg_didout_before_start = 0;
-    int		count = 0;		// line number count
-    int		did_inc_RedrawingDisabled = FALSE;
-    int		retval = OK;
-#ifdef FEAT_EVAL
+    char_u	*ಮುಂದಿನ_cmdline;		// next cmd to execute
+    char_u	*cmdline_copy = ಖಾಲಿ;	// copy of cmd line
+    ಪೂರ್ಣಾಂಕ		ಬಳಸಿದ_getline = FALSE;	// used "fgetline" to obtain command
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	recursive = 0;		// recursive depth
+    ಪೂರ್ಣಾಂಕ		ಸಂದೇಶ_didout_before_ಆರಂಭ = 0;
+    ಪೂರ್ಣಾಂಕ		ಎಣಿಕೆ_2 = 0;		// line number count
+    ಪೂರ್ಣಾಂಕ		did_inc_RedrawingDisabled = FALSE;
+    ಪೂರ್ಣಾಂಕ		retval = OK;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     cstack_T	cstack;			// conditional stack
-    garray_T	lines_ga;		// keep lines for ":while"/":for"
-    int		current_line = 0;	// active line in lines_ga
-    int		current_line_before = 0;
-    char_u	*fname = NULL;		// function or script name
-    linenr_T	*breakpoint = NULL;	// ptr to breakpoint field in cookie
-    int		*dbg_tick = NULL;	// ptr to dbg_tick field in cookie
-    struct dbg_stuff debug_saved;	// saved things for debug mode
-    int		initial_trylevel;
-    msglist_T	**saved_msg_list = NULL;
-    msglist_T	*private_msg_list = NULL;
+    garray_T	ಸಾಲುಗಳು_ga;		// keep lines for ":while"/":for"
+    ಪೂರ್ಣಾಂಕ		current_ಸಾಲು = 0;	// active line in lines_ga
+    ಪೂರ್ಣಾಂಕ		current_ಸಾಲು_before = 0;
+    char_u	*fname = ಖಾಲಿ;		// function or script name
+    linenr_T	*breakpoint = ಖಾಲಿ;	// ptr to breakpoint field in cookie
+    ಪೂರ್ಣಾಂಕ		*dbg_tick = ಖಾಲಿ;	// ptr to dbg_tick field in cookie
+    ರಚನೆ dbg_stuff debug_saved;	// saved things for debug mode
+    ಪೂರ್ಣಾಂಕ		initial_trylevel;
+    msglist_T	**saved_ಸಂದೇಶ_list = ಖಾಲಿ;
+    msglist_T	*ಖಾಸಗಿ_ಸಂದೇಶ_list = ಖಾಲಿ;
 
     // "fgetline" and "cookie" passed to do_one_cmd()
-    char_u	*(*cmd_getline)(int, void *, int, getline_opt_T);
-    void	*cmd_cookie;
-    struct loop_cookie cmd_loop_cookie;
-    void	*real_cookie;
-    int		getline_is_func;
-#else
+    char_u	*(*cmd_getline)(ಪೂರ್ಣಾಂಕ, ಶೂನ್ಯ *, ಪೂರ್ಣಾಂಕ, getline_opt_T);
+    ಶೂನ್ಯ	*cmd_cookie;
+    ರಚನೆ loop_cookie cmd_loop_cookie;
+    ಶೂನ್ಯ	*real_cookie;
+    ಪೂರ್ಣಾಂಕ		getline_is_func;
+#ಇಲ್ಲದಿದ್ದರೆ
 # define cmd_getline fgetline
 # define cmd_cookie cookie
-#endif
-    static int	call_depth = 0;		// recursiveness
-#ifdef FEAT_EVAL
+#ಆದರೆ_ಅಂತ್ಯ
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	call_ಆಳ = 0;		// recursiveness
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     // For every pair of do_cmdline()/do_one_cmd() calls, use an extra memory
     // location for storing error messages to be converted to an exception.
     // This ensures that the do_errthrow() call in do_one_cmd() does not
     // combine the messages stored by an earlier invocation of do_one_cmd()
     // with the command name of the later one.  This would happen when
     // BufWritePost autocommands are executed after a write error.
-    saved_msg_list = msg_list;
-    msg_list = &private_msg_list;
-#endif
+    saved_ಸಂದೇಶ_list = ಸಂದೇಶ_list;
+    ಸಂದೇಶ_list = &ಖಾಸಗಿ_ಸಂದೇಶ_list;
+#ಆದರೆ_ಅಂತ್ಯ
 
     // It's possible to create an endless loop with ":execute", catch that
     // here.  The value of 200 allows nested function calls, ":source", etc.
     // Allow 200 or 'maxfuncdepth', whatever is larger.
-    if (call_depth >= 200
-#ifdef FEAT_EVAL
-	    && call_depth >= p_mfd
-#endif
+    ಆದರೆ (call_ಆಳ >= 200
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	    && call_ಆಳ >= p_mfd
+#ಆದರೆ_ಅಂತ್ಯ
 	    )
     {
 	emsg(_(e_command_too_recursive));
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 	// When converting to an exception, we do not include the command name
 	// since this is not an error of the specific command.
-	do_errthrow((cstack_T *)NULL, (char_u *)NULL);
-	msg_list = saved_msg_list;
-#endif
-	return FAIL;
+	do_errthrow((cstack_T *)ಖಾಲಿ, (char_u *)ಖಾಲಿ);
+	ಸಂದೇಶ_list = saved_ಸಂದೇಶ_list;
+#ಆದರೆ_ಅಂತ್ಯ
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-    ++call_depth;
+    ++call_ಆಳ;
 
-#ifdef FEAT_EVAL
-    CLEAR_FIELD(cstack);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    CLEAR_ಕ್ಷೇತ್ರ(cstack);
     cstack.cs_idx = -1;
-    ga_init2(&lines_ga, sizeof(wcmd_T), 10);
+    ga_init2(&ಸಾಲುಗಳು_ga, ಗಾತ್ರ(wcmd_T), 10);
 
     real_cookie = getline_cookie(fgetline, cookie);
 
     // Inside a function use a higher nesting level.
-    getline_is_func = getline_equal(fgetline, cookie, get_func_line);
-    if (getline_is_func && ex_nesting_level == func_level(real_cookie))
+    getline_is_func = getline_equal(fgetline, cookie, get_func_ಸಾಲು);
+    ಆದರೆ (getline_is_func && ex_nesting_level == func_level(real_cookie))
 	++ex_nesting_level;
 
     // Get the function or script name and the address where the next breakpoint
     // line and the debug tick for a function or script are stored.
-    if (getline_is_func)
+    ಆದರೆ (getline_is_func)
     {
 	fname = func_name(real_cookie);
 	breakpoint = func_breakpoint(real_cookie);
 	dbg_tick = func_dbg_tick(real_cookie);
     }
-    else if (getline_equal(fgetline, cookie, getsourceline))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (getline_equal(fgetline, cookie, getsourceline))
     {
 	fname = SOURCING_NAME;
-	breakpoint = source_breakpoint(real_cookie);
-	dbg_tick = source_dbg_tick(real_cookie);
+	breakpoint = ಮೂಲ_breakpoint(real_cookie);
+	dbg_tick = ಮೂಲ_dbg_tick(real_cookie);
     }
 
     /*
      * Initialize "force_abort"  and "suppress_errthrow" at the top level.
      */
-    if (!recursive)
+    ಆದರೆ (!recursive)
     {
 	force_abort = FALSE;
 	suppress_errthrow = FALSE;
@@ -777,10 +777,10 @@ do_cmdline(
      * exception handling (used when debugging).  Otherwise clear it to avoid
      * a bogus compiler warning when the optimizer uses inline functions...
      */
-    if (flags & DOCMD_EXCRESET)
+    ಆದರೆ (flags & DOCMD_EXCRESET)
 	save_dbg_stuff(&debug_saved);
-    else
-	CLEAR_FIELD(debug_saved);
+    ಇಲ್ಲದಿದ್ದರೆ
+	CLEAR_ಕ್ಷೇತ್ರ(debug_saved);
 
     initial_trylevel = trylevel;
 
@@ -788,24 +788,24 @@ do_cmdline(
      * "did_throw" will be set to TRUE when an exception is being thrown.
      */
     did_throw = FALSE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     /*
      * "did_emsg" will be set to TRUE when emsg() is used, in which case we
      * cancel the whole command line, and any if/endif or loop.
      * If force_abort is set, we cancel everything.
      */
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     did_emsg_cumul += did_emsg;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     did_emsg = FALSE;
 
     /*
      * KeyTyped is only set when calling vgetc().  Reset it here when not
      * calling vgetc() (sourced command lines).
      */
-    if (!(flags & DOCMD_KEYTYPED)
+    ಆದರೆ (!(flags & DOCMD_KEYTYPED)
 			       && !getline_equal(fgetline, cookie, getexline))
-	KeyTyped = FALSE;
+	ಕೀಲಿ_Typed = FALSE;
 
     /*
      * Continue executing command lines:
@@ -813,25 +813,25 @@ do_cmdline(
      * - for multiple commands on one line, separated with '|'
      * - when repeating until there are no more lines (for ":source")
      */
-    next_cmdline = cmdline;
-    do
+    ಮುಂದಿನ_cmdline = cmdline;
+    ಮಾಡು
     {
-#ifdef FEAT_EVAL
-	getline_is_func = getline_equal(fgetline, cookie, get_func_line);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	getline_is_func = getline_equal(fgetline, cookie, get_func_ಸಾಲು);
+#ಆದರೆ_ಅಂತ್ಯ
 
 	// stop skipping cmds for an error msg after all endif/while/for
-	if (next_cmdline == NULL
-#ifdef FEAT_EVAL
+	ಆದರೆ (ಮುಂದಿನ_cmdline == ಖಾಲಿ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 		&& !force_abort
 		&& cstack.cs_idx < 0
 		&& !(getline_is_func && func_has_abort(real_cookie))
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 							)
 	{
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 	    did_emsg_cumul += did_emsg;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    did_emsg = FALSE;
 	}
 
@@ -841,9 +841,9 @@ do_cmdline(
 	 * 3. If a line is given: Make a copy, so we can mess with it.
 	 */
 
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 	// 1. If repeating, get a previous line from lines_ga.
-	if (cstack.cs_looplevel > 0 && current_line < lines_ga.ga_len)
+	ಆದರೆ (cstack.cs_looplevel > 0 && current_ಸಾಲು < ಸಾಲುಗಳು_ga.ga_len)
 	{
 	    // Each '|' separated command is stored separately in lines_ga, to
 	    // be able to jump to it.  Don't use next_cmdline now.
@@ -851,122 +851,122 @@ do_cmdline(
 
 	    // Check if a function has returned or, unless it has an unclosed
 	    // try conditional, aborted.
-	    if (getline_is_func)
+	    ಆದರೆ (getline_is_func)
 	    {
 # ifdef FEAT_PROFILE
-		if (do_profiling == PROF_YES)
-		    func_line_end(real_cookie);
+		ಆದರೆ (do_profiling == PROF_YES)
+		    func_ಸಾಲು_ಕೊನೆ(real_cookie);
 # endif
-		if (func_has_ended(real_cookie))
+		ಆದರೆ (func_has_ended(real_cookie))
 		{
 		    retval = FAIL;
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 	    }
 # ifdef FEAT_PROFILE
-	    else if (do_profiling == PROF_YES
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (do_profiling == PROF_YES
 			    && getline_equal(fgetline, cookie, getsourceline))
-		script_line_end();
+		script_ಸಾಲು_ಕೊನೆ();
 # endif
 
 	    // Check if a sourced file hit a ":finish" command.
-	    if (source_finished(fgetline, cookie))
+	    ಆದರೆ (ಮೂಲ_ಪೂರ್ಣಗೊಂಡ(fgetline, cookie))
 	    {
 		retval = FAIL;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 
 	    // If breakpoints have been added/deleted need to check for it.
-	    if (breakpoint != NULL && dbg_tick != NULL
+	    ಆದರೆ (breakpoint != ಖಾಲಿ && dbg_tick != ಖಾಲಿ
 						   && *dbg_tick != debug_tick)
 	    {
-		*breakpoint = dbg_find_breakpoint(
+		*breakpoint = dbg_ಕಂಡುಹಿಡಿ_breakpoint(
 				getline_equal(fgetline, cookie, getsourceline),
 							fname, SOURCING_LNUM);
 		*dbg_tick = debug_tick;
 	    }
 
-	    next_cmdline = ((wcmd_T *)(lines_ga.ga_data))[current_line].line;
-	    SOURCING_LNUM = ((wcmd_T *)(lines_ga.ga_data))[current_line].lnum;
+	    ಮುಂದಿನ_cmdline = ((wcmd_T *)(ಸಾಲುಗಳು_ga.ga_ದತ್ತಾಂಶ))[current_ಸಾಲು].ಸಾಲು;
+	    SOURCING_LNUM = ((wcmd_T *)(ಸಾಲುಗಳು_ga.ga_ದತ್ತಾಂಶ))[current_ಸಾಲು].lnum;
 
 	    // Did we encounter a breakpoint?
-	    if (breakpoint != NULL && *breakpoint != 0
+	    ಆದರೆ (breakpoint != ಖಾಲಿ && *breakpoint != 0
 					      && *breakpoint <= SOURCING_LNUM)
 	    {
 		dbg_breakpoint(fname, SOURCING_LNUM);
 		// Find next breakpoint.
-		*breakpoint = dbg_find_breakpoint(
+		*breakpoint = dbg_ಕಂಡುಹಿಡಿ_breakpoint(
 			       getline_equal(fgetline, cookie, getsourceline),
 							fname, SOURCING_LNUM);
 		*dbg_tick = debug_tick;
 	    }
 # ifdef FEAT_PROFILE
-	    if (do_profiling == PROF_YES)
+	    ಆದರೆ (do_profiling == PROF_YES)
 	    {
-		if (getline_is_func)
-		    func_line_start(real_cookie, SOURCING_LNUM);
-		else if (getline_equal(fgetline, cookie, getsourceline))
-		    script_line_start();
+		ಆದರೆ (getline_is_func)
+		    func_ಸಾಲು_ಆರಂಭ(real_cookie, SOURCING_LNUM);
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (getline_equal(fgetline, cookie, getsourceline))
+		    script_ಸಾಲು_ಆರಂಭ();
 	    }
 # endif
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 	// 2. If no line given, get an allocated line with fgetline().
-	if (next_cmdline == NULL)
+	ಆದರೆ (ಮುಂದಿನ_cmdline == ಖಾಲಿ)
 	{
 	    /*
 	     * Need to set msg_didout for the first line after an ":if",
 	     * otherwise the ":if" will be overwritten.
 	     */
-	    if (count == 1 && getline_equal(fgetline, cookie, getexline))
-		msg_didout = TRUE;
-	    if (fgetline == NULL || (next_cmdline = fgetline(':', cookie,
-#ifdef FEAT_EVAL
+	    ಆದರೆ (ಎಣಿಕೆ_2 == 1 && getline_equal(fgetline, cookie, getexline))
+		ಸಂದೇಶ_didout = TRUE;
+	    ಆದರೆ (fgetline == ಖಾಲಿ || (ಮುಂದಿನ_cmdline = fgetline(':', cookie,
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 		    cstack.cs_idx < 0 ? 0 : (cstack.cs_idx + 1) * 2
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 		    0
-#endif
-		    , in_vim9script() ? GETLINE_CONCAT_CONTBAR
-					       : GETLINE_CONCAT_CONT)) == NULL)
+#ಆದರೆ_ಅಂತ್ಯ
+		    , ಒಳ_vim9script() ? GETLINE_CONCAT_CONTBAR
+					       : GETLINE_CONCAT_CONT)) == ಖಾಲಿ)
 	    {
 		// Don't call wait_return() for aborted command line.  The NULL
 		// returned for the end of a sourced file or executed function
 		// doesn't do this.
-		if (KeyTyped && !(flags & DOCMD_REPEAT))
+		ಆದರೆ (ಕೀಲಿ_Typed && !(flags & DOCMD_REPEAT))
 		    need_wait_return = FALSE;
 		retval = FAIL;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	    used_getline = TRUE;
+	    ಬಳಸಿದ_getline = TRUE;
 
 	    /*
 	     * Keep the first typed line.  Clear it when more lines are typed.
 	     */
-	    if (flags & DOCMD_KEEPLINE)
+	    ಆದರೆ (flags & DOCMD_KEEPLINE)
 	    {
 		vim_free(repeat_cmdline);
-		if (count == 0)
-		    repeat_cmdline = vim_strsave(next_cmdline);
-		else
-		    repeat_cmdline = NULL;
+		ಆದರೆ (ಎಣಿಕೆ_2 == 0)
+		    repeat_cmdline = vim_strsave(ಮುಂದಿನ_cmdline);
+		ಇಲ್ಲದಿದ್ದರೆ
+		    repeat_cmdline = ಖಾಲಿ;
 	    }
 	}
 
 	// 3. Make a copy of the command so we can mess with it.
-	else if (cmdline_copy == NULL)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (cmdline_copy == ಖಾಲಿ)
 	{
-	    next_cmdline = vim_strsave(next_cmdline);
-	    if (next_cmdline == NULL)
+	    ಮುಂದಿನ_cmdline = vim_strsave(ಮುಂದಿನ_cmdline);
+	    ಆದರೆ (ಮುಂದಿನ_cmdline == ಖಾಲಿ)
 	    {
-		emsg(_(e_out_of_memory));
+		emsg(_(e_ಹೊರಹೋಗು_ದ_ಸ್ಮರಣೆ));
 		retval = FAIL;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	}
-	cmdline_copy = next_cmdline;
+	cmdline_copy = ಮುಂದಿನ_cmdline;
 
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 	/*
 	 * Inside a while/for loop, and when the command looks like a ":while"
 	 * or ":for", the line is stored, because we may need it later when
@@ -981,35 +981,35 @@ do_cmdline(
 	 * possible to define a function inside a while/for loop and handles
 	 * line continuation.
 	 */
-	if ((cstack.cs_looplevel > 0 || has_loop_cmd(next_cmdline)))
+	ಆದರೆ ((cstack.cs_looplevel > 0 || has_loop_cmd(ಮುಂದಿನ_cmdline)))
 	{
-	    cmd_getline = get_loop_line;
-	    cmd_cookie = (void *)&cmd_loop_cookie;
-	    cmd_loop_cookie.lines_gap = &lines_ga;
-	    cmd_loop_cookie.current_line = current_line;
+	    cmd_getline = get_loop_ಸಾಲು;
+	    cmd_cookie = (ಶೂನ್ಯ *)&cmd_loop_cookie;
+	    cmd_loop_cookie.ಸಾಲುಗಳು_gap = &ಸಾಲುಗಳು_ga;
+	    cmd_loop_cookie.current_ಸಾಲು = current_ಸಾಲು;
 	    cmd_loop_cookie.lc_getline = fgetline;
 	    cmd_loop_cookie.cookie = cookie;
-	    cmd_loop_cookie.repeating = (current_line < lines_ga.ga_len);
+	    cmd_loop_cookie.repeating = (current_ಸಾಲು < ಸಾಲುಗಳು_ga.ga_len);
 
 	    // Save the current line when encountering it the first time.
-	    if (current_line == lines_ga.ga_len
-		    && store_loop_line(&lines_ga, next_cmdline) == FAIL)
+	    ಆದರೆ (current_ಸಾಲು == ಸಾಲುಗಳು_ga.ga_len
+		    && store_loop_ಸಾಲು(&ಸಾಲುಗಳು_ga, ಮುಂದಿನ_cmdline) == FAIL)
 	    {
 		retval = FAIL;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	    current_line_before = current_line;
+	    current_ಸಾಲು_before = current_ಸಾಲು;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    cmd_getline = fgetline;
 	    cmd_cookie = cookie;
 	}
 
 	did_endif = FALSE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-	if (count++ == 0)
+	ಆದರೆ (ಎಣಿಕೆ_2++ == 0)
 	{
 	    /*
 	     * All output from the commands is put below each other, without
@@ -1017,20 +1017,20 @@ do_cmdline(
 	     * from a script or when being called recursive (e.g. for ":e
 	     * +command file").
 	     */
-	    if (!(flags & DOCMD_NOWAIT) && !recursive)
+	    ಆದರೆ (!(flags & DOCMD_NOWAIT) && !recursive)
 	    {
-		msg_didout_before_start = msg_didout;
-		msg_didany = FALSE; // no output yet
-		msg_start();
-		msg_scroll = TRUE;  // put messages below each other
+		ಸಂದೇಶ_didout_before_ಆರಂಭ = ಸಂದೇಶ_didout;
+		ಸಂದೇಶ_didany = FALSE; // no output yet
+		ಸಂದೇಶ_ಆರಂಭ();
+		ಸಂದೇಶ_scroll = TRUE;  // put messages below each other
 		++no_wait_return;   // don't wait for return until finished
 		++RedrawingDisabled;
 		did_inc_RedrawingDisabled = TRUE;
 	    }
 	}
 
-	if ((p_verbose >= 15 && SOURCING_NAME != NULL) || p_verbose >= 16)
-	    msg_verbose_cmd(SOURCING_LNUM, cmdline_copy);
+	ಆದರೆ ((p_verbose >= 15 && SOURCING_NAME != ಖಾಲಿ) || p_verbose >= 16)
+	    ಸಂದೇಶ_verbose_cmd(SOURCING_LNUM, cmdline_copy);
 
 	/*
 	 * 2. Execute one '|' separated command.
@@ -1038,21 +1038,21 @@ do_cmdline(
 	 *    "cmdline_copy" can change, e.g. for '%' and '#' expansion.
 	 */
 	++recursive;
-	next_cmdline = do_one_cmd(&cmdline_copy, flags,
-#ifdef FEAT_EVAL
+	ಮುಂದಿನ_cmdline = do_one_cmd(&cmdline_copy, flags,
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 				&cstack,
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 				cmd_getline, cmd_cookie);
 	--recursive;
 
-#ifdef FEAT_EVAL
-	if (cmd_cookie == (void *)&cmd_loop_cookie)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	ಆದರೆ (cmd_cookie == (ಶೂನ್ಯ *)&cmd_loop_cookie)
 	    // Use "current_line" from "cmd_loop_cookie", it may have been
 	    // incremented when defining a function.
-	    current_line = cmd_loop_cookie.current_line;
-#endif
+	    current_ಸಾಲು = cmd_loop_cookie.current_ಸಾಲು;
+#ಆದರೆ_ಅಂತ್ಯ
 
-	if (next_cmdline == NULL)
+	ಆದರೆ (ಮುಂದಿನ_cmdline == ಖಾಲಿ)
 	{
 	    VIM_CLEAR(cmdline_copy);
 
@@ -1060,36 +1060,36 @@ do_cmdline(
 	     * If the command was typed, remember it for the ':' register.
 	     * Do this AFTER executing the command to make :@: work.
 	     */
-	    if (getline_equal(fgetline, cookie, getexline)
-						  && new_last_cmdline != NULL)
+	    ಆದರೆ (getline_equal(fgetline, cookie, getexline)
+						  && new_ಕೊನೆಯ_cmdline != ಖಾಲಿ)
 	    {
-		vim_free(last_cmdline);
-		last_cmdline = new_last_cmdline;
-		new_last_cmdline = NULL;
+		vim_free(ಕೊನೆಯ_cmdline);
+		ಕೊನೆಯ_cmdline = new_ಕೊನೆಯ_cmdline;
+		new_ಕೊನೆಯ_cmdline = ಖಾಲಿ;
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // need to copy the command after the '|' to cmdline_copy, for the
 	    // next do_one_cmd()
-	    STRMOVE(cmdline_copy, next_cmdline);
-	    next_cmdline = cmdline_copy;
+	    STRMOVE(cmdline_copy, ಮುಂದಿನ_cmdline);
+	    ಮುಂದಿನ_cmdline = cmdline_copy;
 	}
 
 
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 	// reset did_emsg for a function that is not aborted by an error
-	if (did_emsg && !force_abort
-		&& getline_equal(fgetline, cookie, get_func_line)
+	ಆದರೆ (did_emsg && !force_abort
+		&& getline_equal(fgetline, cookie, get_func_ಸಾಲು)
 					      && !func_has_abort(real_cookie))
 	{
 	    // did_emsg_cumul is not set here
 	    did_emsg = FALSE;
 	}
 
-	if (cstack.cs_looplevel > 0)
+	ಆದರೆ (cstack.cs_looplevel > 0)
 	{
-	    ++current_line;
+	    ++current_ಸಾಲು;
 
 	    /*
 	     * An ":endwhile", ":endfor" and ":continue" is handled here.
@@ -1097,7 +1097,7 @@ do_cmdline(
 	     * ":for".
 	     * If we were not executing commands, decrement cs_looplevel.
 	     */
-	    if (cstack.cs_lflags & (CSL_HAD_CONT | CSL_HAD_ENDLOOP))
+	    ಆದರೆ (cstack.cs_lflags & (CSL_HAD_CONT | CSL_HAD_ENDLOOP))
 	    {
 		cstack.cs_lflags &= ~(CSL_HAD_CONT | CSL_HAD_ENDLOOP);
 
@@ -1105,33 +1105,33 @@ do_cmdline(
 		// not to use a cs_line[] from an entry that isn't a ":while"
 		// or ":for": It would make "current_line" invalid and can
 		// cause a crash.
-		if (!did_emsg && !got_int && !did_throw
+		ಆದರೆ (!did_emsg && !got_int && !did_throw
 			&& cstack.cs_idx >= 0
 			&& (cstack.cs_flags[cstack.cs_idx]
 						      & (CSF_WHILE | CSF_FOR))
-			&& cstack.cs_line[cstack.cs_idx] >= 0
-			&& (cstack.cs_flags[cstack.cs_idx] & CSF_ACTIVE))
+			&& cstack.cs_ಸಾಲು[cstack.cs_idx] >= 0
+			&& (cstack.cs_flags[cstack.cs_idx] & CSF_ಸಕ್ರಿಯ))
 		{
-		    current_line = cstack.cs_line[cstack.cs_idx];
+		    current_ಸಾಲು = cstack.cs_ಸಾಲು[cstack.cs_idx];
 						// remember we jumped there
 		    cstack.cs_lflags |= CSL_HAD_LOOP;
-		    line_breakcheck();		// check if CTRL-C typed
+		    ಸಾಲು_breakcheck();		// check if CTRL-C typed
 
 		    // Check for the next breakpoint at or after the ":while"
 		    // or ":for".
-		    if (breakpoint != NULL && lines_ga.ga_len > current_line)
+		    ಆದರೆ (breakpoint != ಖಾಲಿ && ಸಾಲುಗಳು_ga.ga_len > current_ಸಾಲು)
 		    {
-			*breakpoint = dbg_find_breakpoint(
+			*breakpoint = dbg_ಕಂಡುಹಿಡಿ_breakpoint(
 			       getline_equal(fgetline, cookie, getsourceline),
 									fname,
-			   ((wcmd_T *)lines_ga.ga_data)[current_line].lnum-1);
+			   ((wcmd_T *)ಸಾಲುಗಳು_ga.ga_ದತ್ತಾಂಶ)[current_ಸಾಲು].lnum-1);
 			*dbg_tick = debug_tick;
 		    }
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    // can only get here with ":endwhile" or ":endfor"
-		    if (cstack.cs_idx >= 0)
+		    ಆದರೆ (cstack.cs_idx >= 0)
 			rewind_conditionals(&cstack, cstack.cs_idx - 1,
 				   CSF_WHILE | CSF_FOR, &cstack.cs_looplevel);
 		}
@@ -1140,32 +1140,32 @@ do_cmdline(
 	    /*
 	     * For a ":while" or ":for" we need to remember the line number.
 	     */
-	    else if (cstack.cs_lflags & CSL_HAD_LOOP)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (cstack.cs_lflags & CSL_HAD_LOOP)
 	    {
 		cstack.cs_lflags &= ~CSL_HAD_LOOP;
-		cstack.cs_line[cstack.cs_idx] = current_line_before;
+		cstack.cs_ಸಾಲು[cstack.cs_idx] = current_ಸಾಲು_before;
 	    }
 	}
 
 	// Check for the next breakpoint after a watchexpression
-	if (breakpoint != NULL && has_watchexpr())
+	ಆದರೆ (breakpoint != ಖಾಲಿ && has_watchexpr())
 	{
-	    *breakpoint = dbg_find_breakpoint(FALSE, fname, SOURCING_LNUM);
+	    *breakpoint = dbg_ಕಂಡುಹಿಡಿ_breakpoint(FALSE, fname, SOURCING_LNUM);
 	    *dbg_tick = debug_tick;
 	}
 
 	/*
 	 * When not inside any ":while" loop, clear remembered lines.
 	 */
-	if (cstack.cs_looplevel == 0)
+	ಆದರೆ (cstack.cs_looplevel == 0)
 	{
-	    if (lines_ga.ga_len > 0)
+	    ಆದರೆ (ಸಾಲುಗಳು_ga.ga_len > 0)
 	    {
 		SOURCING_LNUM =
-		       ((wcmd_T *)lines_ga.ga_data)[lines_ga.ga_len - 1].lnum;
-		free_cmdlines(&lines_ga);
+		       ((wcmd_T *)ಸಾಲುಗಳು_ga.ga_ದತ್ತಾಂಶ)[ಸಾಲುಗಳು_ga.ga_len - 1].lnum;
+		free_cmdlines(&ಸಾಲುಗಳು_ga);
 	    }
-	    current_line = 0;
+	    current_ಸಾಲು = 0;
 	}
 
 	/*
@@ -1175,14 +1175,14 @@ do_cmdline(
 	 * This includes the case where a missing ":endif", ":endwhile" or
 	 * ":endfor" was detected by the ":finally" itself.
 	 */
-	if (cstack.cs_lflags & CSL_HAD_FINA)
+	ಆದರೆ (cstack.cs_lflags & CSL_HAD_FINA)
 	{
 	    cstack.cs_lflags &= ~CSL_HAD_FINA;
 	    report_make_pending(cstack.cs_pending[cstack.cs_idx]
-		    & (CSTP_ERROR | CSTP_INTERRUPT | CSTP_THROW),
-		    did_throw ? (void *)current_exception : NULL);
+		    & (CSTP_ERROR | CSTP_ಅಡಚಣೆ | CSTP_THROW),
+		    did_throw ? (ಶೂನ್ಯ *)current_exception : ಖಾಲಿ);
 	    did_emsg = got_int = did_throw = FALSE;
-	    cstack.cs_flags[cstack.cs_idx] |= CSF_ACTIVE | CSF_FINALLY;
+	    cstack.cs_flags[cstack.cs_idx] |= CSF_ಸಕ್ರಿಯ | CSF_FINALLY;
 	}
 
 	// Update global "trylevel" for recursive calls to do_cmdline() from
@@ -1196,12 +1196,12 @@ do_cmdline(
 	 * force_abort to get the non-EH compatible abortion behavior for
 	 * the rest of the script.
 	 */
-	if (trylevel == 0 && !did_emsg && !got_int && !did_throw)
+	ಆದರೆ (trylevel == 0 && !did_emsg && !got_int && !did_throw)
 	    force_abort = FALSE;
 
 	// Convert an interrupt to an exception if appropriate.
-	(void)do_intthrow(&cstack);
-#endif // FEAT_EVAL
+	(ಶೂನ್ಯ)do_intthrow(&cstack);
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_EVAL
 
     }
     /*
@@ -1213,39 +1213,39 @@ do_cmdline(
      * - there is a command after '|', inside a :if, :while, :for or :try, or
      *   looping for ":source" command or function call.
      */
-    while (!((got_int
-#ifdef FEAT_EVAL
-		    || (did_emsg && (force_abort || in_vim9script()))
+    ಆಗ (!((got_int
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+		    || (did_emsg && (force_abort || ಒಳ_vim9script()))
 		    || did_throw
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	     )
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 		&& cstack.cs_trylevel == 0
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    )
 	    && !(did_emsg
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 		// Keep going when inside try/catch, so that the error can be
 		// deal with, except when it is a syntax error, it may cause
 		// the :endtry to be missed.
 		&& (cstack.cs_trylevel == 0 || did_emsg_syntax)
-#endif
-		&& used_getline
+#ಆದರೆ_ಅಂತ್ಯ
+		&& ಬಳಸಿದ_getline
 			    && (getline_equal(fgetline, cookie, getexmodeline)
 			       || getline_equal(fgetline, cookie, getexline)))
-	    && (next_cmdline != NULL
-#ifdef FEAT_EVAL
+	    && (ಮುಂದಿನ_cmdline != ಖಾಲಿ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 			|| cstack.cs_idx >= 0
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 			|| (flags & DOCMD_REPEAT)));
 
     vim_free(cmdline_copy);
     did_emsg_syntax = FALSE;
-#ifdef FEAT_EVAL
-    free_cmdlines(&lines_ga);
-    ga_clear(&lines_ga);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    free_cmdlines(&ಸಾಲುಗಳು_ga);
+    ga_clear(&ಸಾಲುಗಳು_ga);
 
-    if (cstack.cs_idx >= 0)
+    ಆದರೆ (cstack.cs_idx >= 0)
     {
 	/*
 	 * If a sourced file or executed function ran to its end, report the
@@ -1253,20 +1253,20 @@ do_cmdline(
 	 * In Vim9 script do not give a second error, executing aborts after
 	 * the first one.
 	 */
-	if (!got_int && !did_throw && !aborting()
-		&& !(did_emsg && in_vim9script())
+	ಆದರೆ (!got_int && !did_throw && !aborting()
+		&& !(did_emsg && ಒಳ_vim9script())
 		&& ((getline_equal(fgetline, cookie, getsourceline)
-			&& !source_finished(fgetline, cookie))
-		    || (getline_equal(fgetline, cookie, get_func_line)
+			&& !ಮೂಲ_ಪೂರ್ಣಗೊಂಡ(fgetline, cookie))
+		    || (getline_equal(fgetline, cookie, get_func_ಸಾಲು)
 					    && !func_has_ended(real_cookie))))
 	{
-	    if (cstack.cs_flags[cstack.cs_idx] & CSF_TRY)
+	    ಆದರೆ (cstack.cs_flags[cstack.cs_idx] & CSF_TRY)
 		emsg(_(e_missing_endtry));
-	    else if (cstack.cs_flags[cstack.cs_idx] & CSF_WHILE)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (cstack.cs_flags[cstack.cs_idx] & CSF_WHILE)
 		emsg(_(e_missing_endwhile));
-	    else if (cstack.cs_flags[cstack.cs_idx] & CSF_FOR)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (cstack.cs_flags[cstack.cs_idx] & CSF_FOR)
 		emsg(_(e_missing_endfor));
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		emsg(_(e_missing_endif));
 	}
 
@@ -1277,29 +1277,29 @@ do_cmdline(
 	 * If it is in a catch clause, finish the caught exception.
 	 * Also cleanup any "cs_forinfo" structures.
 	 */
-	do
+	ಮಾಡು
 	{
-	    int idx = cleanup_conditionals(&cstack, 0, TRUE);
+	    ಪೂರ್ಣಾಂಕ idx = cleanup_conditionals(&cstack, 0, TRUE);
 
-	    if (idx >= 0)
+	    ಆದರೆ (idx >= 0)
 		--idx;	    // remove try block not in its finally clause
 	    rewind_conditionals(&cstack, idx, CSF_WHILE | CSF_FOR,
 							&cstack.cs_looplevel);
 	}
-	while (cstack.cs_idx >= 0);
+	ಆಗ (cstack.cs_idx >= 0);
 	trylevel = initial_trylevel;
     }
 
     // If a missing ":endtry", ":endwhile", ":endfor", or ":endif" or a memory
     // lack was reported above and the error message is to be converted to an
     // exception, do this now after rewinding the cstack.
-    do_errthrow(&cstack, getline_equal(fgetline, cookie, get_func_line)
-				  ? (char_u *)"endfunction" : (char_u *)NULL);
+    do_errthrow(&cstack, getline_equal(fgetline, cookie, get_func_ಸಾಲು)
+				  ? (char_u *)"endfunction" : (char_u *)ಖಾಲಿ);
 
-    if (trylevel == 0)
+    ಆದರೆ (trylevel == 0)
     {
 	// Just in case did_throw got set but current_exception wasn't.
-	if (current_exception == NULL)
+	ಆದರೆ (current_exception == ಖಾಲಿ)
 	    did_throw = FALSE;
 
 	/*
@@ -1308,7 +1308,7 @@ do_cmdline(
 	 * of interrupts or errors to exceptions, and ensure that no more
 	 * commands are executed.
 	 */
-	if (did_throw)
+	ಆದರೆ (did_throw)
 	    handle_did_throw();
 
 	/*
@@ -1318,7 +1318,7 @@ do_cmdline(
 	 * when force_abort is set and did_emsg unset in case of an interrupt
 	 * from a finally clause after an error.
 	 */
-	else if (got_int || (did_emsg && force_abort))
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (got_int || (did_emsg && force_abort))
 	    suppress_errthrow = TRUE;
     }
 
@@ -1330,27 +1330,27 @@ do_cmdline(
      * will have to be checked for finally clauses to be executed due to the
      * ":return" or ":finish".  This is done in do_one_cmd().
      */
-    if (did_throw)
+    ಆದರೆ (did_throw)
 	need_rethrow = TRUE;
-    if ((getline_equal(fgetline, cookie, getsourceline)
-		&& ex_nesting_level > source_level(real_cookie))
-	    || (getline_equal(fgetline, cookie, get_func_line)
+    ಆದರೆ ((getline_equal(fgetline, cookie, getsourceline)
+		&& ex_nesting_level > ಮೂಲ_level(real_cookie))
+	    || (getline_equal(fgetline, cookie, get_func_ಸಾಲು)
 		&& ex_nesting_level > func_level(real_cookie) + 1))
     {
-	if (!did_throw)
+	ಆದರೆ (!did_throw)
 	    check_cstack = TRUE;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// When leaving a function, reduce nesting level.
-	if (getline_equal(fgetline, cookie, get_func_line))
+	ಆದರೆ (getline_equal(fgetline, cookie, get_func_ಸಾಲು))
 	    --ex_nesting_level;
 	/*
 	 * Go to debug mode when returning from a function in which we are
 	 * single-stepping.
 	 */
-	if ((getline_equal(fgetline, cookie, getsourceline)
-		    || getline_equal(fgetline, cookie, get_func_line))
+	ಆದರೆ ((getline_equal(fgetline, cookie, getsourceline)
+		    || getline_equal(fgetline, cookie, get_func_ಸಾಲು))
 		&& ex_nesting_level + 1 <= debug_break_level)
 	    do_debug(getline_equal(fgetline, cookie, getsourceline)
 		    ? (char_u *)_("End of sourced file")
@@ -1361,84 +1361,84 @@ do_cmdline(
      * Restore the exception environment (done after returning from the
      * debugger).
      */
-    if (flags & DOCMD_EXCRESET)
+    ಆದರೆ (flags & DOCMD_EXCRESET)
 	restore_dbg_stuff(&debug_saved);
 
-    msg_list = saved_msg_list;
+    ಸಂದೇಶ_list = saved_ಸಂದೇಶ_list;
 
     // Cleanup if "cs_emsg_silent_list" remains.
-    if (cstack.cs_emsg_silent_list != NULL)
+    ಆದರೆ (cstack.cs_emsg_silent_list != ಖಾಲಿ)
     {
-	eslist_T *elem, *temp;
+	eslist_T *elem, *ತಾತ್ಕಾಲಿಕ;
 
-	for (elem = cstack.cs_emsg_silent_list; elem != NULL; elem = temp)
+	ಗಾಗಿ (elem = cstack.cs_emsg_silent_list; elem != ಖಾಲಿ; elem = ತಾತ್ಕಾಲಿಕ)
 	{
-	    temp = elem->next;
+	    ತಾತ್ಕಾಲಿಕ = elem->ಮುಂದಿನ;
 	    vim_free(elem);
 	}
     }
-#endif // FEAT_EVAL
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_EVAL
 
     /*
      * If there was too much output to fit on the command line, ask the user to
      * hit return before redrawing the screen. With the ":global" command we do
      * this only once after the command is finished.
      */
-    if (did_inc_RedrawingDisabled)
+    ಆದರೆ (did_inc_RedrawingDisabled)
     {
-	if (RedrawingDisabled > 0)
+	ಆದರೆ (RedrawingDisabled > 0)
 	    --RedrawingDisabled;
 	--no_wait_return;
-	msg_scroll = FALSE;
+	ಸಂದೇಶ_scroll = FALSE;
 
 	/*
 	 * When just finished an ":if"-":else" which was typed, no need to
 	 * wait for hit-return.  Also for an error situation.
 	 */
-	if (retval == FAIL
-#ifdef FEAT_EVAL
-		|| (did_endif && KeyTyped && !did_emsg)
-#endif
+	ಆದರೆ (retval == FAIL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+		|| (did_endif && ಕೀಲಿ_Typed && !did_emsg)
+#ಆದರೆ_ಅಂತ್ಯ
 					    )
 	{
 	    need_wait_return = FALSE;
-	    msg_didany = FALSE;		// don't wait when restarting edit
+	    ಸಂದೇಶ_didany = FALSE;		// don't wait when restarting edit
 	}
-	else if (need_wait_return)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (need_wait_return)
 	{
 	    /*
 	     * The msg_start() above clears msg_didout. The wait_return() we do
 	     * here should not overwrite the command that may be shown before
 	     * doing that.
 	     */
-	    msg_didout |= msg_didout_before_start;
+	    ಸಂದೇಶ_didout |= ಸಂದೇಶ_didout_before_ಆರಂಭ;
 	    wait_return(FALSE);
 	}
     }
 
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     did_endif = FALSE;  // in case do_cmdline used recursively
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
     /*
      * Reset if_level, in case a sourced script file contains more ":if" than
      * ":endif" (could be ":if x | foo | endif").
      */
     if_level = 0;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    --call_depth;
-    return retval;
+    --call_ಆಳ;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * Handle when "did_throw" is set after executing commands.
  */
-    void
-handle_did_throw(void)
+    ಶೂನ್ಯ
+handle_did_throw(ಶೂನ್ಯ)
 {
-    char	*p = NULL;
-    msglist_T	*messages = NULL;
+    ಅಕ್ಷರ	*p = ಖಾಲಿ;
+    msglist_T	*messages = ಖಾಲಿ;
     ESTACK_CHECK_DECLARATION;
 
     /*
@@ -1447,217 +1447,217 @@ handle_did_throw(void)
      * message now.  For an interrupt exception, do nothing; the
      * interrupt message is given elsewhere.
      */
-    switch (current_exception->type)
+    ಆಯ್ಕೆ (current_exception->type)
     {
-	case ET_USER:
-	    vim_snprintf((char *)IObuff, IOSIZE,
+	ಸ್ಥಿತಿ ET_USER:
+	    vim_snprintf((ಅಕ್ಷರ *)IObuff, IOSIZE,
 		    _(e_exception_not_caught_str),
-		    current_exception->value);
-	    p = (char *)vim_strsave(IObuff);
-	    break;
-	case ET_ERROR:
+		    current_exception->ಮೌಲ್ಯ);
+	    p = (ಅಕ್ಷರ *)vim_strsave(IObuff);
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ ET_ERROR:
 	    messages = current_exception->messages;
-	    current_exception->messages = NULL;
-	    break;
-	case ET_INTERRUPT:
-	    break;
+	    current_exception->messages = ಖಾಲಿ;
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ ET_ಅಡಚಣೆ:
+	    ನಿಲ್ಲಿಸು;
     }
 
-    estack_push(ETYPE_EXCEPT, current_exception->throw_name,
+    estack_ತಳ್ಳು(ETYPE_EXCEPT, current_exception->throw_name,
 					current_exception->throw_lnum);
-    ESTACK_CHECK_SETUP;
-    current_exception->throw_name = NULL;
+    ESTACK_CHECK_ಸಿದ್ಧತೆ;
+    current_exception->throw_name = ಖಾಲಿ;
 
     discard_current_exception();	// uses IObuff if 'verbose'
 
     // If "silent!" is active the uncaught exception is not fatal.
-    if (emsg_silent == 0)
+    ಆದರೆ (emsg_silent == 0)
     {
 	suppress_errthrow = TRUE;
 	force_abort = TRUE;
     }
 
-    if (messages != NULL)
+    ಆದರೆ (messages != ಖಾಲಿ)
     {
-	do
+	ಮಾಡು
 	{
-	    msglist_T	*next = messages->next;
-	    int		save_compiling = estack_compiling;
+	    msglist_T	*ಮುಂದಿನ = messages->ಮುಂದಿನ;
+	    ಪೂರ್ಣಾಂಕ		save_compiling = estack_compiling;
 
-	    estack_compiling = messages->msg_compiling;
-	    emsg(messages->msg);
-	    vim_free(messages->msg);
+	    estack_compiling = messages->ಸಂದೇಶ_compiling;
+	    emsg(messages->ಸಂದೇಶ);
+	    vim_free(messages->ಸಂದೇಶ);
 	    vim_free(messages->sfile);
 	    vim_free(messages);
-	    messages = next;
+	    messages = ಮುಂದಿನ;
 	    estack_compiling = save_compiling;
 	}
-	while (messages != NULL);
+	ಆಗ (messages != ಖಾಲಿ);
     }
-    else if (p != NULL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p != ಖಾಲಿ)
     {
 	emsg(p);
 	vim_free(p);
     }
     vim_free(SOURCING_NAME);
     ESTACK_CHECK_NOW;
-    estack_pop();
+    estack_ತೆಗೆ();
 }
 
 /*
  * Obtain a line when inside a ":while" or ":for" loop.
  */
-    static char_u *
-get_loop_line(int c, void *cookie, int indent, getline_opt_T options)
+    ಸ್ಥಿರ char_u *
+get_loop_ಸಾಲು(ಪೂರ್ಣಾಂಕ c, ಶೂನ್ಯ *cookie, ಪೂರ್ಣಾಂಕ indent, getline_opt_T options)
 {
-    struct loop_cookie	*cp = (struct loop_cookie *)cookie;
+    ರಚನೆ loop_cookie	*cp = (ರಚನೆ loop_cookie *)cookie;
     wcmd_T		*wp;
-    char_u		*line;
+    char_u		*ಸಾಲು;
 
-    if (cp->current_line + 1 >= cp->lines_gap->ga_len)
+    ಆದರೆ (cp->current_ಸಾಲು + 1 >= cp->ಸಾಲುಗಳು_gap->ga_len)
     {
-	if (cp->repeating)
-	    return NULL;	// trying to read past ":endwhile"/":endfor"
+	ಆದರೆ (cp->repeating)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;	// trying to read past ":endwhile"/":endfor"
 
 	// First time inside the ":while"/":for": get line normally.
-	if (cp->lc_getline == NULL)
-	    line = getcmdline(c, 0L, indent, 0);
-	else
-	    line = cp->lc_getline(c, cp->cookie, indent, options);
-	if (line != NULL && store_loop_line(cp->lines_gap, line) == OK)
-	    ++cp->current_line;
+	ಆದರೆ (cp->lc_getline == ಖಾಲಿ)
+	    ಸಾಲು = getcmdline(c, 0L, indent, 0);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಸಾಲು = cp->lc_getline(c, cp->cookie, indent, options);
+	ಆದರೆ (ಸಾಲು != ಖಾಲಿ && store_loop_ಸಾಲು(cp->ಸಾಲುಗಳು_gap, ಸಾಲು) == OK)
+	    ++cp->current_ಸಾಲು;
 
-	return line;
+	ಹಿಂತಿರುಗಿ ಸಾಲು;
     }
 
-    KeyTyped = FALSE;
-    ++cp->current_line;
-    wp = (wcmd_T *)(cp->lines_gap->ga_data) + cp->current_line;
+    ಕೀಲಿ_Typed = FALSE;
+    ++cp->current_ಸಾಲು;
+    wp = (wcmd_T *)(cp->ಸಾಲುಗಳು_gap->ga_ದತ್ತಾಂಶ) + cp->current_ಸಾಲು;
     SOURCING_LNUM = wp->lnum;
-    return vim_strsave(wp->line);
+    ಹಿಂತಿರುಗಿ vim_strsave(wp->ಸಾಲು);
 }
 
 /*
  * Store a line in "gap" so that a ":while" loop can execute it again.
  */
-    static int
-store_loop_line(garray_T *gap, char_u *line)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+store_loop_ಸಾಲು(garray_T *gap, char_u *ಸಾಲು)
 {
-    if (ga_grow(gap, 1) == FAIL)
-	return FAIL;
-    ((wcmd_T *)(gap->ga_data))[gap->ga_len].line = vim_strsave(line);
-    ((wcmd_T *)(gap->ga_data))[gap->ga_len].lnum = SOURCING_LNUM;
+    ಆದರೆ (ga_grow(gap, 1) == FAIL)
+	ಹಿಂತಿರುಗಿ FAIL;
+    ((wcmd_T *)(gap->ga_ದತ್ತಾಂಶ))[gap->ga_len].ಸಾಲು = vim_strsave(ಸಾಲು);
+    ((wcmd_T *)(gap->ga_ದತ್ತಾಂಶ))[gap->ga_len].lnum = SOURCING_LNUM;
     ++gap->ga_len;
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Free the lines stored for a ":while" or ":for" loop.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 free_cmdlines(garray_T *gap)
 {
-    while (gap->ga_len > 0)
+    ಆಗ (gap->ga_len > 0)
     {
-	vim_free(((wcmd_T *)(gap->ga_data))[gap->ga_len - 1].line);
+	vim_free(((wcmd_T *)(gap->ga_ದತ್ತಾಂಶ))[gap->ga_len - 1].ಸಾಲು);
 	--gap->ga_len;
     }
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * If "fgetline" is get_loop_line(), return TRUE if the getline it uses equals
  * "func".  * Otherwise return TRUE when "fgetline" equals "func".
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 getline_equal(
-    char_u	*(*fgetline)(int, void *, int, getline_opt_T),
-    void	*cookie UNUSED,		// argument for fgetline()
-    char_u	*(*func)(int, void *, int, getline_opt_T))
+    char_u	*(*fgetline)(ಪೂರ್ಣಾಂಕ, ಶೂನ್ಯ *, ಪೂರ್ಣಾಂಕ, getline_opt_T),
+    ಶೂನ್ಯ	*cookie ಬಳಸದ,		// argument for fgetline()
+    char_u	*(*func)(ಪೂರ್ಣಾಂಕ, ಶೂನ್ಯ *, ಪೂರ್ಣಾಂಕ, getline_opt_T))
 {
-#ifdef FEAT_EVAL
-    char_u		*(*gp)(int, void *, int, getline_opt_T);
-    struct loop_cookie *cp;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    char_u		*(*gp)(ಪೂರ್ಣಾಂಕ, ಶೂನ್ಯ *, ಪೂರ್ಣಾಂಕ, getline_opt_T);
+    ರಚನೆ loop_cookie *cp;
 
     // When "fgetline" is "get_loop_line()" use the "cookie" to find the
     // function that's originally used to obtain the lines.  This may be
     // nested several levels.
     gp = fgetline;
-    cp = (struct loop_cookie *)cookie;
-    while (gp == get_loop_line)
+    cp = (ರಚನೆ loop_cookie *)cookie;
+    ಆಗ (gp == get_loop_ಸಾಲು)
     {
 	gp = cp->lc_getline;
 	cp = cp->cookie;
     }
-    return gp == func;
-#else
-    return fgetline == func;
-#endif
+    ಹಿಂತಿರುಗಿ gp == func;
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಹಿಂತಿರುಗಿ fgetline == func;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * If "fgetline" is get_loop_line(), return the cookie used by the original
  * getline function.  Otherwise return "cookie".
  */
-    void *
+    ಶೂನ್ಯ *
 getline_cookie(
-    char_u	*(*fgetline)(int, void *, int, getline_opt_T) UNUSED,
-    void	*cookie)		// argument for fgetline()
+    char_u	*(*fgetline)(ಪೂರ್ಣಾಂಕ, ಶೂನ್ಯ *, ಪೂರ್ಣಾಂಕ, getline_opt_T) ಬಳಸದ,
+    ಶೂನ್ಯ	*cookie)		// argument for fgetline()
 {
-#ifdef FEAT_EVAL
-    char_u		*(*gp)(int, void *, int, getline_opt_T);
-    struct loop_cookie  *cp;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    char_u		*(*gp)(ಪೂರ್ಣಾಂಕ, ಶೂನ್ಯ *, ಪೂರ್ಣಾಂಕ, getline_opt_T);
+    ರಚನೆ loop_cookie  *cp;
 
     // When "fgetline" is "get_loop_line()" use the "cookie" to find the
     // cookie that's originally used to obtain the lines.  This may be nested
     // several levels.
     gp = fgetline;
-    cp = (struct loop_cookie *)cookie;
-    while (gp == get_loop_line)
+    cp = (ರಚನೆ loop_cookie *)cookie;
+    ಆಗ (gp == get_loop_ಸಾಲು)
     {
 	gp = cp->lc_getline;
 	cp = cp->cookie;
     }
-    return cp;
-#else
-    return cookie;
-#endif
+    ಹಿಂತಿರುಗಿ cp;
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಹಿಂತಿರುಗಿ cookie;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * Get the next line source line without advancing.
  */
     char_u *
 getline_peek(
-    char_u	*(*fgetline)(int, void *, int, getline_opt_T) UNUSED,
-    void	*cookie)		// argument for fgetline()
+    char_u	*(*fgetline)(ಪೂರ್ಣಾಂಕ, ಶೂನ್ಯ *, ಪೂರ್ಣಾಂಕ, getline_opt_T) ಬಳಸದ,
+    ಶೂನ್ಯ	*cookie)		// argument for fgetline()
 {
-    char_u		*(*gp)(int, void *, int, getline_opt_T);
-    struct loop_cookie  *cp;
+    char_u		*(*gp)(ಪೂರ್ಣಾಂಕ, ಶೂನ್ಯ *, ಪೂರ್ಣಾಂಕ, getline_opt_T);
+    ರಚನೆ loop_cookie  *cp;
     wcmd_T		*wp;
 
     // When "fgetline" is "get_loop_line()" use the "cookie" to find the
     // cookie that's originally used to obtain the lines.  This may be nested
     // several levels.
     gp = fgetline;
-    cp = (struct loop_cookie *)cookie;
-    while (gp == get_loop_line)
+    cp = (ರಚನೆ loop_cookie *)cookie;
+    ಆಗ (gp == get_loop_ಸಾಲು)
     {
-	if (cp->current_line + 1 < cp->lines_gap->ga_len)
+	ಆದರೆ (cp->current_ಸಾಲು + 1 < cp->ಸಾಲುಗಳು_gap->ga_len)
 	{
 	    // executing lines a second time, use the stored copy
-	    wp = (wcmd_T *)(cp->lines_gap->ga_data) + cp->current_line + 1;
-	    return wp->line;
+	    wp = (wcmd_T *)(cp->ಸಾಲುಗಳು_gap->ga_ದತ್ತಾಂಶ) + cp->current_ಸಾಲು + 1;
+	    ಹಿಂತಿರುಗಿ wp->ಸಾಲು;
 	}
 	gp = cp->lc_getline;
 	cp = cp->cookie;
     }
-    if (gp == getsourceline)
-	return source_nextline(cp);
-    return NULL;
+    ಆದರೆ (gp == getsourceline)
+	ಹಿಂತಿರುಗಿ ಮೂಲ_nextline(cp);
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 
 /*
@@ -1665,91 +1665,91 @@ getline_peek(
  * ":bwipeout", etc.
  * Returns the buffer number.
  */
-    static int
-compute_buffer_local_count(int addr_type, int lnum, int offset)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+compute_ಬಫರ್_local_ಎಣಿಕೆ(ಪೂರ್ಣಾಂಕ addr_type, ಪೂರ್ಣಾಂಕ lnum, ಪೂರ್ಣಾಂಕ ಸ್ಥಾನಾಂತರ)
 {
     buf_T   *buf;
     buf_T   *nextbuf;
-    int     count = offset;
+    ಪೂರ್ಣಾಂಕ     ಎಣಿಕೆ_2 = ಸ್ಥಾನಾಂತರ;
 
     buf = firstbuf;
-    while (buf->b_next != NULL && buf->b_fnum < lnum)
-	buf = buf->b_next;
-    while (count != 0)
+    ಆಗ (buf->b_ಮುಂದಿನ != ಖಾಲಿ && buf->b_fnum < lnum)
+	buf = buf->b_ಮುಂದಿನ;
+    ಆಗ (ಎಣಿಕೆ_2 != 0)
     {
-	count += (offset < 0) ? 1 : -1;
-	nextbuf = (offset < 0) ? buf->b_prev : buf->b_next;
-	if (nextbuf == NULL)
-	    break;
+	ಎಣಿಕೆ_2 += (ಸ್ಥಾನಾಂತರ < 0) ? 1 : -1;
+	nextbuf = (ಸ್ಥಾನಾಂತರ < 0) ? buf->b_prev : buf->b_ಮುಂದಿನ;
+	ಆದರೆ (nextbuf == ಖಾಲಿ)
+	    ನಿಲ್ಲಿಸು;
 	buf = nextbuf;
-	if (addr_type == ADDR_LOADED_BUFFERS)
+	ಆದರೆ (addr_type == ADDR_LOADED_BUFFERS)
 	    // skip over unloaded buffers
-	    while (buf->b_ml.ml_mfp == NULL)
+	    ಆಗ (buf->b_ml.ml_mfp == ಖಾಲಿ)
 	    {
-		nextbuf = (offset < 0) ? buf->b_prev : buf->b_next;
-		if (nextbuf == NULL)
-		    break;
+		nextbuf = (ಸ್ಥಾನಾಂತರ < 0) ? buf->b_prev : buf->b_ಮುಂದಿನ;
+		ಆದರೆ (nextbuf == ಖಾಲಿ)
+		    ನಿಲ್ಲಿಸು;
 		buf = nextbuf;
 	    }
     }
     // we might have gone too far, last buffer is not loadedd
-    if (addr_type == ADDR_LOADED_BUFFERS)
-	while (buf->b_ml.ml_mfp == NULL)
+    ಆದರೆ (addr_type == ADDR_LOADED_BUFFERS)
+	ಆಗ (buf->b_ml.ml_mfp == ಖಾಲಿ)
 	{
-	    nextbuf = (offset >= 0) ? buf->b_prev : buf->b_next;
-	    if (nextbuf == NULL)
-		break;
+	    nextbuf = (ಸ್ಥಾನಾಂತರ >= 0) ? buf->b_prev : buf->b_ಮುಂದಿನ;
+	    ಆದರೆ (nextbuf == ಖಾಲಿ)
+		ನಿಲ್ಲಿಸು;
 	    buf = nextbuf;
 	}
-    return buf->b_fnum;
+    ಹಿಂತಿರುಗಿ buf->b_fnum;
 }
 
 /*
  * Return the window number of "win".
  * When "win" is NULL return the number of windows.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 current_win_nr(win_T *win)
 {
     win_T	*wp;
-    int		nr = 0;
+    ಪೂರ್ಣಾಂಕ		nr = 0;
 
     FOR_ALL_WINDOWS(wp)
     {
 	++nr;
-	if (wp == win)
-	    break;
+	ಆದರೆ (wp == win)
+	    ನಿಲ್ಲಿಸು;
     }
-    return nr;
+    ಹಿಂತಿರುಗಿ nr;
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 current_tab_nr(tabpage_T *tab)
 {
     tabpage_T	*tp;
-    int		nr = 0;
+    ಪೂರ್ಣಾಂಕ		nr = 0;
 
     FOR_ALL_TABPAGES(tp)
     {
 	++nr;
-	if (tp == tab)
-	    break;
+	ಆದರೆ (tp == tab)
+	    ನಿಲ್ಲಿಸು;
     }
-    return nr;
+    ಹಿಂತಿರುಗಿ nr;
 }
 
-    static int
-comment_start(char_u *p, int starts_with_colon UNUSED)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+comment_ಆರಂಭ(char_u *p, ಪೂರ್ಣಾಂಕ starts_with_colon ಬಳಸದ)
 {
-    if (in_vim9script())
-	return p[0] == '#' && !starts_with_colon;
-    return *p == '"';
+    ಆದರೆ (ಒಳ_vim9script())
+	ಹಿಂತಿರುಗಿ p[0] == '#' && !starts_with_colon;
+    ಹಿಂತಿರುಗಿ *p == '"';
 }
 
-#define CURRENT_WIN_NR current_win_nr(curwin)
-#define LAST_WIN_NR current_win_nr(NULL)
-#define CURRENT_TAB_NR current_tab_nr(curtab)
-#define LAST_TAB_NR current_tab_nr(NULL)
+#ವ್ಯಾಖ್ಯಾನಿಸು CURRENT_WIN_NR current_win_nr(curwin)
+#ವ್ಯಾಖ್ಯಾನಿಸು ಕೊನೆಯ_WIN_NR current_win_nr(ಖಾಲಿ)
+#ವ್ಯಾಖ್ಯಾನಿಸು CURRENT_TAB_NR current_tab_nr(curtab)
+#ವ್ಯಾಖ್ಯಾನಿಸು ಕೊನೆಯ_TAB_NR current_tab_nr(ಖಾಲಿ)
 
 /*
  * Execute one Ex command.
@@ -1769,48 +1769,48 @@ comment_start(char_u *p, int starts_with_colon UNUSED)
  *
  * This function may be called recursively!
  */
-    static char_u *
+    ಸ್ಥಿರ char_u *
 do_one_cmd(
     char_u	**cmdlinep,
-    int		flags,
-#ifdef FEAT_EVAL
+    ಪೂರ್ಣಾಂಕ		flags,
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     cstack_T	*cstack,
-#endif
-    char_u	*(*fgetline)(int, void *, int, getline_opt_T),
-    void	*cookie)		// argument for fgetline()
+#ಆದರೆ_ಅಂತ್ಯ
+    char_u	*(*fgetline)(ಪೂರ್ಣಾಂಕ, ಶೂನ್ಯ *, ಪೂರ್ಣಾಂಕ, getline_opt_T),
+    ಶೂನ್ಯ	*cookie)		// argument for fgetline()
 {
     char_u	*p;
     linenr_T	lnum;
-    long	n;
-    char	*errormsg = NULL;	// error message
-    char_u	*after_modifier = NULL;
+    ದೀರ್ಘ	n;
+    ಅಕ್ಷರ	*errormsg = ಖಾಲಿ;	// error message
+    char_u	*after_modifier = ಖಾಲಿ;
     exarg_T	ea;			// Ex command arguments
     cmdmod_T	save_cmdmod;
-    int		save_reg_executing = reg_executing;
-    int		save_pending_end_reg_executing = pending_end_reg_executing;
-    int		ni;			// set when Not Implemented
+    ಪೂರ್ಣಾಂಕ		save_reg_executing = reg_executing;
+    ಪೂರ್ಣಾಂಕ		save_pending_ಕೊನೆ_reg_executing = pending_ಕೊನೆ_reg_executing;
+    ಪೂರ್ಣಾಂಕ		ni;			// set when Not Implemented
     char_u	*cmd;
-    int		starts_with_colon = FALSE;
-    int		may_have_range;
-#ifdef FEAT_EVAL
-    int		did_set_expr_line = FALSE;
-#endif
-    int		sourcing = flags & DOCMD_VERBOSE;
-    int		did_append_cmd = FALSE;
+    ಪೂರ್ಣಾಂಕ		starts_with_colon = FALSE;
+    ಪೂರ್ಣಾಂಕ		may_have_range;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಪೂರ್ಣಾಂಕ		did_ಗಣ_ಅಭಿವ್ಯಕ್ತಿ_ಸಾಲು = FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಪೂರ್ಣಾಂಕ		sourcing = flags & DOCMD_VERBOSE;
+    ಪೂರ್ಣಾಂಕ		did_append_cmd = FALSE;
 
-    CLEAR_FIELD(ea);
+    CLEAR_ಕ್ಷೇತ್ರ(ea);
     ea.line1 = 1;
     ea.line2 = 1;
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     ++ex_nesting_level;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // When the last file has not been edited :q has to be typed twice.
-    if (quitmore
-#ifdef FEAT_EVAL
+    ಆದರೆ (quitmore
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 	    // avoid that a function call in 'statusline' does this
-	    && !getline_equal(fgetline, cookie, get_func_line)
-#endif
+	    && !getline_equal(fgetline, cookie, get_func_ಸಾಲು)
+#ಆದರೆ_ಅಂತ್ಯ
 	    // avoid that an autocommand, e.g. QuitPre, does this
 	    && !getline_equal(fgetline, cookie, getnextac))
 	--quitmore;
@@ -1822,8 +1822,8 @@ do_one_cmd(
     save_cmdmod = cmdmod;
 
     // "#!anything" is handled like a comment.
-    if ((*cmdlinep)[0] == '#' && (*cmdlinep)[1] == '!')
-	goto doend;
+    ಆದರೆ ((*cmdlinep)[0] == '#' && (*cmdlinep)[1] == '!')
+	ಹೋಗು doend;
 
 /*
  * 1. Skip comment lines and leading white space and colons.
@@ -1834,21 +1834,21 @@ do_one_cmd(
     ea.cmdlinep = cmdlinep;
     ea.ea_getline = fgetline;
     ea.cookie = cookie;
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     ea.cstack = cstack;
     starts_with_colon = *skipwhite(ea.cmd) == ':';
-#endif
-    if (parse_command_modifiers(&ea, &errormsg, &cmdmod, FALSE) == FAIL)
-	goto doend;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (parse_command_modifiers(&ea, &errormsg, &cmdmod, FALSE) == FAIL)
+	ಹೋಗು doend;
     apply_cmdmod(&cmdmod);
     after_modifier = ea.cmd;
 
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     ea.skip = did_emsg || got_int || did_throw || (cstack->cs_idx >= 0
-			 && !(cstack->cs_flags[cstack->cs_idx] & CSF_ACTIVE));
-#else
+			 && !(cstack->cs_flags[cstack->cs_idx] & CSF_ಸಕ್ರಿಯ));
+#ಇಲ್ಲದಿದ್ದರೆ
     ea.skip = (if_level > 0);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * 3. Skip over the range to find the command.  Let "p" point to after it.
@@ -1859,106 +1859,106 @@ do_one_cmd(
 
     // In Vim9 script a colon is required before the range.  This may also be
     // after command modifiers.
-    int vim9script = in_vim9script();
-    if (vim9script && (flags & DOCMD_RANGEOK) == 0)
+    ಪೂರ್ಣಾಂಕ vim9script = ಒಳ_vim9script();
+    ಆದರೆ (vim9script && (flags & DOCMD_RANGEOK) == 0)
     {
 	may_have_range = FALSE;
-	for (p = ea.cmd; p >= *cmdlinep; --p)
+	ಗಾಗಿ (p = ea.cmd; p >= *cmdlinep; --p)
 	{
-	    if (*p == ':')
+	    ಆದರೆ (*p == ':')
 		may_have_range = TRUE;
-	    if (p < ea.cmd && !VIM_ISWHITE(*p))
-		break;
+	    ಆದರೆ (p < ea.cmd && !VIM_ISWHITE(*p))
+		ನಿಲ್ಲಿಸು;
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	may_have_range = TRUE;
-    if (may_have_range)
-	ea.cmd = skip_range(ea.cmd, TRUE, NULL);
+    ಆದರೆ (may_have_range)
+	ea.cmd = skip_range(ea.cmd, TRUE, ಖಾಲಿ);
 
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     // Handle ":export" - it functions almost like a command modifier.
     // ":export var Name: type"
     // ":export def Name(..."
     // etc.
-    if (vim9script && checkforcmd_noparen(&ea.cmd, "export", 6))
+    ಆದರೆ (vim9script && checkforcmd_noparen(&ea.cmd, "export", 6))
 	is_export = TRUE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (vim9script && !may_have_range)
+    ಆದರೆ (vim9script && !may_have_range)
     {
-	if (ea.cmd == cmd + 1 && *cmd == '$')
+	ಆದರೆ (ea.cmd == cmd + 1 && *cmd == '$')
 	    // should be "$VAR = val"
 	    --ea.cmd;
-#ifdef FEAT_EVAL
-	p = find_ex_command(&ea, NULL, lookup_scriptitem, NULL);
-#else
-	p = find_ex_command(&ea, NULL, NULL, NULL);
-#endif
-	if (ea.cmdidx == CMD_SIZE)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	p = ಕಂಡುಹಿಡಿ_ex_command(&ea, ಖಾಲಿ, lookup_scriptitem, ಖಾಲಿ);
+#ಇಲ್ಲದಿದ್ದರೆ
+	p = ಕಂಡುಹಿಡಿ_ex_command(&ea, ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ
+	ಆದರೆ (ea.cmdidx == CMD_ಗಾತ್ರ)
 	{
-	    char_u *ar = skip_range(ea.cmd, TRUE, NULL);
+	    char_u *ar = skip_range(ea.cmd, TRUE, ಖಾಲಿ);
 
 	    // If a ':' before the range is missing, give a clearer error
 	    // message.
-	    if (ar > ea.cmd && !ea.skip)
+	    ಆದರೆ (ar > ea.cmd && !ea.skip)
 	    {
 		semsg(_(e_colon_required_before_range_str), ea.cmd);
-		goto doend;
+		ಹೋಗು doend;
 	    }
 	}
     }
-    else
-	p = find_ex_command(&ea, NULL, NULL, NULL);
+    ಇಲ್ಲದಿದ್ದರೆ
+	p = ಕಂಡುಹಿಡಿ_ex_command(&ea, ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ);
 
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 # ifdef FEAT_PROFILE
     // Count this line for profiling if skip is TRUE.
-    if (do_profiling == PROF_YES
+    ಆದರೆ (do_profiling == PROF_YES
 	    && (!ea.skip || cstack->cs_idx == 0 || (cstack->cs_idx > 0
-		     && (cstack->cs_flags[cstack->cs_idx - 1] & CSF_ACTIVE))))
+		     && (cstack->cs_flags[cstack->cs_idx - 1] & CSF_ಸಕ್ರಿಯ))))
     {
-	int skip = did_emsg || got_int || did_throw;
+	ಪೂರ್ಣಾಂಕ skip = did_emsg || got_int || did_throw;
 
-	if (ea.cmdidx == CMD_catch)
+	ಆದರೆ (ea.cmdidx == CMD_catch)
 	    skip = !skip && !(cstack->cs_idx >= 0
 			  && (cstack->cs_flags[cstack->cs_idx] & CSF_THROWN)
 			  && !(cstack->cs_flags[cstack->cs_idx] & CSF_CAUGHT));
-	else if (ea.cmdidx == CMD_else || ea.cmdidx == CMD_elseif)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ea.cmdidx == CMD_else || ea.cmdidx == CMD_elseif)
 	    skip = skip || !(cstack->cs_idx >= 0
 			  && !(cstack->cs_flags[cstack->cs_idx]
-						  & (CSF_ACTIVE | CSF_TRUE)));
-	else if (ea.cmdidx == CMD_finally)
+						  & (CSF_ಸಕ್ರಿಯ | CSF_TRUE)));
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ea.cmdidx == CMD_finally)
 	    skip = FALSE;
-	else if (ea.cmdidx != CMD_endif
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ea.cmdidx != CMD_endif
 		&& ea.cmdidx != CMD_endfor
 		&& ea.cmdidx != CMD_endtry
 		&& ea.cmdidx != CMD_endwhile)
 	    skip = ea.skip;
 
-	if (!skip)
+	ಆದರೆ (!skip)
 	{
-	    if (getline_equal(fgetline, cookie, get_func_line))
-		func_line_exec(getline_cookie(fgetline, cookie));
-	    else if (getline_equal(fgetline, cookie, getsourceline))
-		script_line_exec();
+	    ಆದರೆ (getline_equal(fgetline, cookie, get_func_ಸಾಲು))
+		func_ಸಾಲು_exec(getline_cookie(fgetline, cookie));
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (getline_equal(fgetline, cookie, getsourceline))
+		script_ಸಾಲು_exec();
 	}
     }
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     ea.cmd = cmd;
 
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     // May go to debug mode.  If this happens and the ">quit" debug command is
     // used, throw an interrupt exception and skip the next command.
     dbg_check_breakpoint(&ea);
-    if (!ea.skip && got_int)
+    ಆದರೆ (!ea.skip && got_int)
     {
 	ea.skip = TRUE;
-	(void)do_intthrow(cstack);
+	(ಶೂನ್ಯ)do_intthrow(cstack);
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * 4. parse a range specifier of the form: addr [,addr] [;addr] ..
@@ -1978,27 +1978,27 @@ do_one_cmd(
  */
 
     // ea.addr_type for user commands is set by find_ucmd
-    if (!IS_USER_CMDIDX(ea.cmdidx))
+    ಆದರೆ (!IS_USER_CMDIDX(ea.cmdidx))
     {
-	if (ea.cmdidx != CMD_SIZE)
-	    ea.addr_type = cmdnames[(int)ea.cmdidx].cmd_addr_type;
-	else
-	    ea.addr_type = ADDR_LINES;
+	ಆದರೆ (ea.cmdidx != CMD_ಗಾತ್ರ)
+	    ea.addr_type = cmdnames[(ಪೂರ್ಣಾಂಕ)ea.cmdidx].cmd_addr_type;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ea.addr_type = ADDR_ಸಾಲುಗಳು;
 
 	// :wincmd range depends on the argument.
-	if (ea.cmdidx == CMD_wincmd && p != NULL)
+	ಆದರೆ (ea.cmdidx == CMD_wincmd && p != ಖಾಲಿ)
 	    get_wincmd_addr_type(skipwhite(p), &ea);
-#ifdef FEAT_QUICKFIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
 	// :.cc in quickfix window uses line number
-	if ((ea.cmdidx == CMD_cc || ea.cmdidx == CMD_ll) && bt_quickfix(curbuf))
+	ಆದರೆ ((ea.cmdidx == CMD_cc || ea.cmdidx == CMD_ll) && bt_quickfix(curbuf))
 	    ea.addr_type = ADDR_OTHER;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
-    if (!may_have_range)
-	ea.line1 = ea.line2 = default_address(&ea);
-    else if (parse_cmd_address(&ea, &errormsg, FALSE) == FAIL)
-	goto doend;
+    ಆದರೆ (!may_have_range)
+	ea.line1 = ea.line2 = default_ವಿಳಾಸ(&ea);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (parse_cmd_ವಿಳಾಸ(&ea, &errormsg, FALSE) == FAIL)
+	ಹೋಗು doend;
 
 /*
  * 5. Parse the command.
@@ -2008,15 +2008,15 @@ do_one_cmd(
      * Skip ':' and any white space
      */
     ea.cmd = skipwhite(ea.cmd);
-    while (*ea.cmd == ':')
+    ಆಗ (*ea.cmd == ':')
 	ea.cmd = skipwhite(ea.cmd + 1);
 
     /*
      * If we got a line, but no command, then go to the line.
      * If we find a '|' or '\n' we set ea.nextcmd.
      */
-    if (*ea.cmd == NUL || comment_start(ea.cmd, starts_with_colon)
-			       || (ea.nextcmd = check_nextcmd(ea.cmd)) != NULL)
+    ಆದರೆ (*ea.cmd == NUL || comment_ಆರಂಭ(ea.cmd, starts_with_colon)
+			       || (ea.nextcmd = check_nextcmd(ea.cmd)) != ಖಾಲಿ)
     {
 	/*
 	 * strange vi behaviour:
@@ -2024,144 +2024,144 @@ do_one_cmd(
 	 * ":3|..."	prints line 3  (not in Vim9 script)
 	 * ":|"		prints current line  (not in Vim9 script)
 	 */
-	if (ea.skip)	    // skip this if inside :if
-	    goto doend;
+	ಆದರೆ (ea.skip)	    // skip this if inside :if
+	    ಹೋಗು doend;
 	errormsg = ex_range_without_command(&ea);
-	goto doend;
+	ಹೋಗು doend;
     }
 
     // If this looks like an undefined user command and there are CmdUndefined
     // autocommands defined, trigger the matching autocommands.
-    if (p != NULL && ea.cmdidx == CMD_SIZE && !ea.skip
+    ಆದರೆ (p != ಖಾಲಿ && ea.cmdidx == CMD_ಗಾತ್ರ && !ea.skip
 	    && ASCII_ISUPPER(*ea.cmd)
 	    && has_cmdundefined())
     {
-	int ret;
+	ಪೂರ್ಣಾಂಕ ret;
 
 	p = ea.cmd;
-	while (ASCII_ISALNUM(*p))
+	ಆಗ (ASCII_ISALNUM(*p))
 	    ++p;
 	p = vim_strnsave(ea.cmd, p - ea.cmd);
-	ret = apply_autocmds(EVENT_CMDUNDEFINED, p, p, TRUE, NULL);
+	ret = apply_autocmds(EVENT_CMDUNDEFINED, p, p, TRUE, ಖಾಲಿ);
 	vim_free(p);
 	// If the autocommands did something and didn't cause an error, try
 	// finding the command again.
 	p = (ret
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 		&& !aborting()
-#endif
-		) ? find_ex_command(&ea, NULL, NULL, NULL) : ea.cmd;
+#ಆದರೆ_ಅಂತ್ಯ
+		) ? ಕಂಡುಹಿಡಿ_ex_command(&ea, ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ) : ea.cmd;
     }
 
-    if (p == NULL)
+    ಆದರೆ (p == ಖಾಲಿ)
     {
-	if (!ea.skip)
-	    errormsg = _(e_ambiguous_use_of_user_defined_command);
-	goto doend;
+	ಆದರೆ (!ea.skip)
+	    errormsg = _(e_ambiguous_use_ದ_user_defined_command);
+	ಹೋಗು doend;
     }
     // Check for wrong commands.
-    if (*p == '!' && ea.cmd[1] == 0151 && ea.cmd[0] == 78
+    ಆದರೆ (*p == '!' && ea.cmd[1] == 0151 && ea.cmd[0] == 78
 	    && !IS_USER_CMDIDX(ea.cmdidx))
     {
 	errormsg = uc_fun_cmd();
-	goto doend;
+	ಹೋಗು doend;
     }
 
-    if (ea.cmdidx == CMD_SIZE)
+    ಆದರೆ (ea.cmdidx == CMD_ಗಾತ್ರ)
     {
-	if (!ea.skip)
+	ಆದರೆ (!ea.skip)
 	{
 	    STRCPY(IObuff, _(e_not_an_editor_command));
-	    if (!sourcing)
+	    ಆದರೆ (!sourcing)
 	    {
 		// If the modifier was parsed OK the error must be in the
 		// following command
-		if (after_modifier != NULL)
+		ಆದರೆ (after_modifier != ಖಾಲಿ)
 		    append_command(after_modifier);
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		    append_command(*cmdlinep);
 		did_append_cmd = TRUE;
 	    }
-	    errormsg = (char *)IObuff;
+	    errormsg = (ಅಕ್ಷರ *)IObuff;
 	    did_emsg_syntax = TRUE;
 	}
-	goto doend;
+	ಹೋಗು doend;
     }
 
     ni = (!IS_USER_CMDIDX(ea.cmdidx)
 	    && (cmdnames[ea.cmdidx].cmd_func == ex_ni
-#ifdef HAVE_EX_SCRIPT_NI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_EX_SCRIPT_NI
 	     || cmdnames[ea.cmdidx].cmd_func == ex_script_ni
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	     ));
 
-#ifndef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_EVAL
     /*
      * When the expression evaluation is disabled, recognize the ":if" and
      * ":endif" commands and ignore everything in between it.
      */
-    if (ea.cmdidx == CMD_if)
+    ಆದರೆ (ea.cmdidx == CMD_if)
 	++if_level;
-    if (if_level)
+    ಆದರೆ (if_level)
     {
-	if (ea.cmdidx == CMD_endif)
+	ಆದರೆ (ea.cmdidx == CMD_endif)
 	    --if_level;
-	goto doend;
+	ಹೋಗು doend;
     }
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // forced commands
-    if (*p == '!' && ea.cmdidx != CMD_substitute
+    ಆದರೆ (*p == '!' && ea.cmdidx != CMD_substitute
 	    && ea.cmdidx != CMD_smagic && ea.cmdidx != CMD_snomagic)
     {
 	++p;
 	ea.forceit = TRUE;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	ea.forceit = FALSE;
 
 /*
  * 6. Parse arguments.  Then check for errors.
  */
-    if (!IS_USER_CMDIDX(ea.cmdidx))
-	ea.argt = (long)cmdnames[(int)ea.cmdidx].cmd_argt;
+    ಆದರೆ (!IS_USER_CMDIDX(ea.cmdidx))
+	ea.argt = (ದೀರ್ಘ)cmdnames[(ಪೂರ್ಣಾಂಕ)ea.cmdidx].cmd_argt;
 
-    if (!ea.skip)
+    ಆದರೆ (!ea.skip)
     {
-#ifdef HAVE_SANDBOX
-	if (sandbox != 0 && !(ea.argt & EX_SBOXOK))
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_SANDBOX
+	ಆದರೆ (sandbox != 0 && !(ea.argt & EX_SBOXOK))
 	{
 	    // Command not allowed in sandbox.
-	    errormsg = _(e_not_allowed_in_sandbox);
-	    goto doend;
+	    errormsg = _(e_not_allowed_ಒಳ_sandbox);
+	    ಹೋಗು doend;
 	}
-#endif
-	if (restricted != 0 && (ea.argt & EX_RESTRICT))
+#ಆದರೆ_ಅಂತ್ಯ
+	ಆದರೆ (restricted != 0 && (ea.argt & EX_RESTRICT))
 	{
-	    errormsg = _(e_command_not_allowed_in_rvim);
-	    goto doend;
+	    errormsg = _(e_command_not_allowed_ಒಳ_rvim);
+	    ಹೋಗು doend;
 	}
-	if (!curbuf->b_p_ma && (ea.argt & EX_MODIFY))
+	ಆದರೆ (!curbuf->b_p_ma && (ea.argt & EX_MODIFY))
 	{
 	    // Command not allowed in non-'modifiable' buffer
 	    errormsg = _(e_cannot_make_changes_modifiable_is_off);
-	    goto doend;
+	    ಹೋಗು doend;
 	}
 
-	if (!IS_USER_CMDIDX(ea.cmdidx))
+	ಆದರೆ (!IS_USER_CMDIDX(ea.cmdidx))
 	{
-	    if (cmdwin_type != 0 && !(ea.argt & EX_CMDWIN))
+	    ಆದರೆ (cmdwin_type != 0 && !(ea.argt & EX_CMDWIN))
 	    {
 		// Command not allowed in the command line window
-		errormsg = _(e_invalid_in_cmdline_window);
-		goto doend;
+		errormsg = _(e_invalid_ಒಳ_cmdline_ಕಿಟಕಿ);
+		ಹೋಗು doend;
 	    }
-	    if (text_locked() && !(ea.argt & EX_LOCK_OK))
+	    ಆದರೆ (ಪಠ್ಯ_locked() && !(ea.argt & EX_ಬೀಗ_OK))
 	    {
 		// Command not allowed when text is locked
-		errormsg = _(get_text_locked_msg());
-		goto doend;
+		errormsg = _(get_ಪಠ್ಯ_locked_ಸಂದೇಶ());
+		ಹೋಗು doend;
 	    }
 	}
 
@@ -2169,148 +2169,148 @@ do_one_cmd(
 	// Do allow ":checktime" (it is postponed).
 	// Do allow ":edit" (check for an argument later).
 	// Do allow ":file" with no arguments (check for an argument later).
-	if (!(ea.argt & (EX_CMDWIN | EX_LOCK_OK))
+	ಆದರೆ (!(ea.argt & (EX_CMDWIN | EX_ಬೀಗ_OK))
 		&& ea.cmdidx != CMD_checktime
 		&& ea.cmdidx != CMD_edit
 		&& ea.cmdidx != CMD_file
 		&& !IS_USER_CMDIDX(ea.cmdidx)
 		&& curbuf_locked())
-	    goto doend;
+	    ಹೋಗು doend;
 
-	if (!ni && !(ea.argt & EX_RANGE) && ea.addr_count > 0)
+	ಆದರೆ (!ni && !(ea.argt & EX_RANGE) && ea.addr_ಎಣಿಕೆ > 0)
 	{
 	    errormsg = _(e_no_range_allowed);
-	    goto doend;
+	    ಹೋಗು doend;
 	}
     }
 
-    if (!ni && !(ea.argt & EX_BANG) && ea.forceit)
+    ಆದರೆ (!ni && !(ea.argt & EX_BANG) && ea.forceit)
     {
 	errormsg = _(e_no_bang_allowed);
-	goto doend;
+	ಹೋಗು doend;
     }
 
     /*
      * Don't complain about the range if it is not used
      * (could happen if line_count is accidentally set to 0).
      */
-    if (!ea.skip && !ni && (ea.argt & EX_RANGE))
+    ಆದರೆ (!ea.skip && !ni && (ea.argt & EX_RANGE))
     {
 	/*
 	 * If the range is backwards, ask for confirmation and, if given, swap
 	 * ea.line1 & ea.line2 so it's forwards again.
 	 * When global command is busy, don't ask, will fail below.
 	 */
-	if (!global_busy && ea.line1 > ea.line2)
+	ಆದರೆ (!global_busy && ea.line1 > ea.line2)
 	{
-	    if (msg_silent == 0)
+	    ಆದರೆ (ಸಂದೇಶ_silent == 0)
 	    {
-		if (sourcing || exmode_active)
+		ಆದರೆ (sourcing || exmode_ಸಕ್ರಿಯ)
 		{
 		    errormsg = _(e_backwards_range_given);
-		    goto doend;
+		    ಹೋಗು doend;
 		}
-		if (ask_yesno((char_u *)
+		ಆದರೆ (ask_yesno((char_u *)
 			_("Backwards range given, OK to swap"), FALSE) != 'y')
-		    goto doend;
+		    ಹೋಗು doend;
 	    }
 	    lnum = ea.line1;
 	    ea.line1 = ea.line2;
 	    ea.line2 = lnum;
 	}
-	if ((errormsg = invalid_range(&ea)) != NULL)
-	    goto doend;
+	ಆದರೆ ((errormsg = invalid_range(&ea)) != ಖಾಲಿ)
+	    ಹೋಗು doend;
     }
 
-    if ((ea.addr_type == ADDR_OTHER) && ea.addr_count == 0)
+    ಆದರೆ ((ea.addr_type == ADDR_OTHER) && ea.addr_ಎಣಿಕೆ == 0)
 	// default is 1, not cursor
 	ea.line2 = 1;
 
     correct_range(&ea);
 
-#ifdef FEAT_FOLDING
-    if (((ea.argt & EX_WHOLEFOLD) || ea.addr_count >= 2) && !global_busy
-	    && ea.addr_type == ADDR_LINES)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_FOLDING
+    ಆದರೆ (((ea.argt & EX_WHOLEFOLD) || ea.addr_ಎಣಿಕೆ >= 2) && !global_busy
+	    && ea.addr_type == ADDR_ಸಾಲುಗಳು)
     {
 	// Put the first line at the start of a closed fold, put the last line
 	// at the end of a closed fold.
-	(void)hasFolding(ea.line1, &ea.line1, NULL);
-	(void)hasFolding(ea.line2, NULL, &ea.line2);
+	(ಶೂನ್ಯ)hasFolding(ea.line1, &ea.line1, ಖಾಲಿ);
+	(ಶೂನ್ಯ)hasFolding(ea.line2, ಖಾಲಿ, &ea.line2);
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_QUICKFIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
     /*
      * For the ":make" and ":grep" commands we insert the 'makeprg'/'grepprg'
      * option here, so things like % get expanded.
      */
     p = replace_makeprg(&ea, p, cmdlinep);
-    if (p == NULL)
-	goto doend;
-#endif
+    ಆದರೆ (p == ಖಾಲಿ)
+	ಹೋಗು doend;
+#ಆದರೆ_ಅಂತ್ಯ
 
     /*
      * Skip to start of argument.
      * Don't do this for the ":!" command, because ":!! -l" needs the space.
      */
-    if (ea.cmdidx == CMD_bang)
+    ಆದರೆ (ea.cmdidx == CMD_bang)
 	ea.arg = p;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	ea.arg = skipwhite(p);
 
     // ":file" cannot be run with an argument when "curbuf_lock" is set
-    if (ea.cmdidx == CMD_file && *ea.arg != NUL && curbuf_locked())
-	goto doend;
+    ಆದರೆ (ea.cmdidx == CMD_file && *ea.arg != NUL && curbuf_locked())
+	ಹೋಗು doend;
 
     /*
      * Check for "++opt=val" argument.
      * Must be first, allow ":w ++enc=utf8 !cmd"
      */
-    if (ea.argt & EX_ARGOPT)
-	while (ea.arg[0] == '+' && ea.arg[1] == '+')
-	    if (getargopt(&ea) == FAIL && !ni)
+    ಆದರೆ (ea.argt & EX_ARGOPT)
+	ಆಗ (ea.arg[0] == '+' && ea.arg[1] == '+')
+	    ಆದರೆ (getargopt(&ea) == FAIL && !ni)
 	    {
-		errormsg = _(e_invalid_argument);
-		goto doend;
+		errormsg = _(e_invalid_ವಾದ);
+		ಹೋಗು doend;
 	    }
 
-    if (ea.cmdidx == CMD_write || ea.cmdidx == CMD_update)
+    ಆದರೆ (ea.cmdidx == CMD_write || ea.cmdidx == CMD_update)
     {
-	if (*ea.arg == '>')			// append
+	ಆದರೆ (*ea.arg == '>')			// append
 	{
-	    if (*++ea.arg != '>')		// typed wrong
+	    ಆದರೆ (*++ea.arg != '>')		// typed wrong
 	    {
 		errormsg = _(e_use_w_or_w_gt_gt);
-		goto doend;
+		ಹೋಗು doend;
 	    }
 	    ea.arg = skipwhite(ea.arg + 1);
 	    ea.append = TRUE;
 	}
-	else if (*ea.arg == '!' && ea.cmdidx == CMD_write)  // :w !filter
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*ea.arg == '!' && ea.cmdidx == CMD_write)  // :w !filter
 	{
 	    ++ea.arg;
 	    ea.usefilter = TRUE;
 	}
     }
 
-    if (ea.cmdidx == CMD_read)
+    ಆದರೆ (ea.cmdidx == CMD_read)
     {
-	if (ea.forceit)
+	ಆದರೆ (ea.forceit)
 	{
 	    ea.usefilter = TRUE;		// :r! filter if ea.forceit
 	    ea.forceit = FALSE;
 	}
-	else if (*ea.arg == '!')		// :r !filter
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*ea.arg == '!')		// :r !filter
 	{
 	    ++ea.arg;
 	    ea.usefilter = TRUE;
 	}
     }
 
-    if (ea.cmdidx == CMD_lshift || ea.cmdidx == CMD_rshift)
+    ಆದರೆ (ea.cmdidx == CMD_lshift || ea.cmdidx == CMD_rshift)
     {
 	ea.amount = 1;
-	while (*ea.arg == *ea.cmd)		// count number of '>' or '<'
+	ಆಗ (*ea.arg == *ea.cmd)		// count number of '>' or '<'
 	{
 	    ++ea.arg;
 	    ++ea.amount;
@@ -2322,7 +2322,7 @@ do_one_cmd(
      * Check for "+command" argument, before checking for next command.
      * Don't do this for ":read !cmd" and ":write !cmd".
      */
-    if ((ea.argt & EX_CMDARG) && !ea.usefilter)
+    ಆದರೆ ((ea.argt & EX_CMDARG) && !ea.usefilter)
 	ea.do_ecmd_cmd = getargcmd(&ea.arg);
 
     /*
@@ -2334,68 +2334,68 @@ do_one_cmd(
      * Also do this inside a { - } block after :command and :autocmd.
      * Any others?
      */
-    if ((ea.argt & EX_TRLBAR) && !ea.usefilter)
+    ಆದರೆ ((ea.argt & EX_TRLBAR) && !ea.usefilter)
     {
 	separate_nextcmd(&ea, FALSE);
     }
-    else if (ea.cmdidx == CMD_bang
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ea.cmdidx == CMD_bang
 	    || ea.cmdidx == CMD_terminal
 	    || ea.cmdidx == CMD_global
 	    || ea.cmdidx == CMD_vglobal
 	    || ea.usefilter
-#ifdef FEAT_EVAL
-	    || inside_block(&ea)
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	    || inside_ಖಂಡ(&ea)
+#ಆದರೆ_ಅಂತ್ಯ
 	    )
     {
-	for (p = ea.arg; *p; ++p)
+	ಗಾಗಿ (p = ea.arg; *p; ++p)
 	{
 	    // Remove one backslash before a newline
-	    if (*p == '\\' && p[1] == '\n')
+	    ಆದರೆ (*p == '\\' && p[1] == '\n')
 		STRMOVE(p, p + 1);
-	    else if (*p == '\n' && !(ea.argt & EX_EXPR_ARG))
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*p == '\n' && !(ea.argt & EX_ಅಭಿವ್ಯಕ್ತಿ_ARG))
 	    {
 		ea.nextcmd = p + 1;
 		*p = NUL;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	}
     }
 
-    if ((ea.argt & EX_DFLALL) && ea.addr_count == 0)
-	address_default_all(&ea);
+    ಆದರೆ ((ea.argt & EX_DFLALL) && ea.addr_ಎಣಿಕೆ == 0)
+	ವಿಳಾಸ_default_all(&ea);
 
     // accept numbered register only when no count allowed (:put)
-    if (       (ea.argt & EX_REGSTR)
+    ಆದರೆ (       (ea.argt & EX_REGSTR)
 	    && *ea.arg != NUL
 	       // Do not allow register = for user commands
 	    && (!IS_USER_CMDIDX(ea.cmdidx) || *ea.arg != '=')
-	    && !((ea.argt & EX_COUNT) && VIM_ISDIGIT(*ea.arg)))
+	    && !((ea.argt & EX_ಎಣಿಕೆ) && VIM_ISDIGIT(*ea.arg)))
     {
-#if !defined(FEAT_CLIPBOARD) && !defined(FEAT_CLIPBOARD_PROVIDER)
+#ಆದರೆ !defined(FEAT_CLIPBOARD) && !defined(FEAT_CLIPBOARD_PROVIDER)
 	// check these explicitly for a more specific error message
-	if (*ea.arg == '*' || *ea.arg == '+')
+	ಆದರೆ (*ea.arg == '*' || *ea.arg == '+')
 	{
-	    errormsg = _(e_invalid_register_name);
-	    goto doend;
+	    errormsg = _(e_invalid_ರಿಜಿಸ್ಟರ್_name);
+	    ಹೋಗು doend;
 	}
-#endif
-	if (valid_yank_reg(*ea.arg, (!IS_USER_CMDIDX(ea.cmdidx)
+#ಆದರೆ_ಅಂತ್ಯ
+	ಆದರೆ (valid_yank_reg(*ea.arg, (!IS_USER_CMDIDX(ea.cmdidx)
 			    && ea.cmdidx != CMD_put && ea.cmdidx != CMD_iput)))
 	{
 	    ea.regname = *ea.arg++;
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 	    // for '=' register: accept the rest of the line as an expression
-	    if (ea.arg[-1] == '=' && ea.arg[0] != NUL)
+	    ಆದರೆ (ea.arg[-1] == '=' && ea.arg[0] != NUL)
 	    {
-		if (!ea.skip)
+		ಆದರೆ (!ea.skip)
 		{
-		    set_expr_line(vim_strsave(ea.arg), &ea);
-		    did_set_expr_line = TRUE;
+		    ಗಣ_ಅಭಿವ್ಯಕ್ತಿ_ಸಾಲು(vim_strsave(ea.arg), &ea);
+		    did_ಗಣ_ಅಭಿವ್ಯಕ್ತಿ_ಸಾಲು = TRUE;
 		}
 		ea.arg += STRLEN(ea.arg);
 	    }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    ea.arg = skipwhite(ea.arg);
 	}
     }
@@ -2404,191 +2404,191 @@ do_one_cmd(
      * Check for a count.  When accepting a EX_BUFNAME, don't use "123foo" as a
      * count, it's a buffer name.
      */
-    if ((ea.argt & EX_COUNT) && VIM_ISDIGIT(*ea.arg)
+    ಆದರೆ ((ea.argt & EX_ಎಣಿಕೆ) && VIM_ISDIGIT(*ea.arg)
 	    && (!(ea.argt & EX_BUFNAME) || *(p = skipdigits(ea.arg + 1)) == NUL
 							  || VIM_ISWHITE(*p)))
     {
 	n = getdigits_quoted(&ea.arg);
 	ea.arg = skipwhite(ea.arg);
-	if (n <= 0 && !ni && (ea.argt & EX_ZEROR) == 0)
+	ಆದರೆ (n <= 0 && !ni && (ea.argt & EX_ZEROR) == 0)
 	{
-	    errormsg = _(e_positive_count_required);
-	    goto doend;
+	    errormsg = _(e_ಧನಾತ್ಮಕ_ಎಣಿಕೆ_required);
+	    ಹೋಗು doend;
 	}
-	if (ea.addr_type != ADDR_LINES)	// e.g. :buffer 2, :sleep 3
+	ಆದರೆ (ea.addr_type != ADDR_ಸಾಲುಗಳು)	// e.g. :buffer 2, :sleep 3
 	{
 	    ea.line2 = n;
-	    if (ea.addr_count == 0)
-		ea.addr_count = 1;
+	    ಆದರೆ (ea.addr_ಎಣಿಕೆ == 0)
+		ea.addr_ಎಣಿಕೆ = 1;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    ea.line1 = ea.line2;
-	    if (ea.line2 >= LONG_MAX - (n - 1))
+	    ಆದರೆ (ea.line2 >= LONG_MAX - (n - 1))
 		ea.line2 = LONG_MAX;  // avoid overflow
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		ea.line2 += n - 1;
-	    ++ea.addr_count;
+	    ++ea.addr_ಎಣಿಕೆ;
 	    /*
 	     * Be vi compatible: no error message for out of range.
 	     */
-	    if (ea.line2 > curbuf->b_ml.ml_line_count)
-		ea.line2 = curbuf->b_ml.ml_line_count;
+	    ಆದರೆ (ea.line2 > curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
+		ea.line2 = curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
 	}
     }
 
     /*
      * Check for flags: 'l', 'p' and '#'.
      */
-    if (ea.argt & EX_FLAGS)
+    ಆದರೆ (ea.argt & EX_FLAGS)
 	get_flags(&ea);
-    if (!ni && !(ea.argt & EX_EXTRA) && *ea.arg != NUL
+    ಆದರೆ (!ni && !(ea.argt & EX_EXTRA) && *ea.arg != NUL
 	    && *ea.arg != '"' && (*ea.arg != '|' || (ea.argt & EX_TRLBAR) == 0))
     {
 	// no arguments allowed but there is something
 	errormsg = ex_errmsg(e_trailing_characters_str, ea.arg);
-	goto doend;
+	ಹೋಗು doend;
     }
 
-    if (!ni && (ea.argt & EX_NEEDARG) && *ea.arg == NUL)
+    ಆದರೆ (!ni && (ea.argt & EX_NEEDARG) && *ea.arg == NUL)
     {
-	errormsg = _(e_argument_required);
-	goto doend;
+	errormsg = _(e_ವಾದ_required);
+	ಹೋಗು doend;
     }
 
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     /*
      * Skip the command when it's not going to be executed.
      * The commands like :if, :endif, etc. always need to be executed.
      * Also make an exception for commands that handle a trailing command
      * themselves.
      */
-    if (ea.skip)
+    ಆದರೆ (ea.skip)
     {
-	switch (ea.cmdidx)
+	ಆಯ್ಕೆ (ea.cmdidx)
 	{
 	    // commands that need evaluation
-	    case CMD_while:
-	    case CMD_endwhile:
-	    case CMD_for:
-	    case CMD_endfor:
-	    case CMD_if:
-	    case CMD_elseif:
-	    case CMD_else:
-	    case CMD_endif:
-	    case CMD_try:
-	    case CMD_catch:
-	    case CMD_finally:
-	    case CMD_endtry:
-	    case CMD_function:
-	    case CMD_def:
-				break;
+	    ಸ್ಥಿತಿ CMD_while:
+	    ಸ್ಥಿತಿ CMD_endwhile:
+	    ಸ್ಥಿತಿ CMD_for:
+	    ಸ್ಥಿತಿ CMD_endfor:
+	    ಸ್ಥಿತಿ CMD_if:
+	    ಸ್ಥಿತಿ CMD_elseif:
+	    ಸ್ಥಿತಿ CMD_else:
+	    ಸ್ಥಿತಿ CMD_endif:
+	    ಸ್ಥಿತಿ CMD_try:
+	    ಸ್ಥಿತಿ CMD_catch:
+	    ಸ್ಥಿತಿ CMD_finally:
+	    ಸ್ಥಿತಿ CMD_endtry:
+	    ಸ್ಥಿತಿ CMD_function:
+	    ಸ್ಥಿತಿ CMD_def:
+				ನಿಲ್ಲಿಸು;
 
 	    // commands that read a block of lines
-	    case CMD_abstract:
-	    case CMD_append:
-	    case CMD_autocmd:
-	    case CMD_change:
-	    case CMD_class:
-	    case CMD_command:
-	    case CMD_enum:
-	    case CMD_insert:
-	    case CMD_interface:
-	    case CMD_loadkeymap:
-				break;
+	    ಸ್ಥಿತಿ CMD_abstract:
+	    ಸ್ಥಿತಿ CMD_append:
+	    ಸ್ಥಿತಿ CMD_autocmd:
+	    ಸ್ಥಿತಿ CMD_change:
+	    ಸ್ಥಿತಿ CMD_class:
+	    ಸ್ಥಿತಿ CMD_command:
+	    ಸ್ಥಿತಿ CMD_enum:
+	    ಸ್ಥಿತಿ CMD_ಸೇರಿಸು:
+	    ಸ್ಥಿತಿ CMD_interface:
+	    ಸ್ಥಿತಿ CMD_loadkeymap:
+				ನಿಲ್ಲಿಸು;
 
 	    // Commands that handle '|' themselves.  Check: A command should
 	    // either have the EX_TRLBAR flag, appear in this list or appear in
 	    // the list at ":help :bar".
-	    case CMD_aboveleft:
-	    case CMD_and:
-	    case CMD_belowright:
-	    case CMD_botright:
-	    case CMD_browse:
-	    case CMD_call:
-	    case CMD_confirm:
-	    case CMD_const:
-	    case CMD_delfunction:
-	    case CMD_djump:
-	    case CMD_dlist:
-	    case CMD_dsearch:
-	    case CMD_dsplit:
-	    case CMD_echo:
-	    case CMD_echoerr:
-	    case CMD_echomsg:
-	    case CMD_echon:
-	    case CMD_eval:
-	    case CMD_execute:
-	    case CMD_filter:
-	    case CMD_final:
-	    case CMD_help:
-	    case CMD_hide:
-	    case CMD_horizontal:
-	    case CMD_ijump:
-	    case CMD_ilist:
-	    case CMD_isearch:
-	    case CMD_isplit:
-	    case CMD_keepalt:
-	    case CMD_keepjumps:
-	    case CMD_keepmarks:
-	    case CMD_keeppatterns:
-	    case CMD_leftabove:
-	    case CMD_let:
-	    case CMD_lockmarks:
-	    case CMD_lockvar:
-	    case CMD_lua:
-	    case CMD_match:
-	    case CMD_mzscheme:
-	    case CMD_noautocmd:
-	    case CMD_noswapfile:
-	    case CMD_perl:
-	    case CMD_psearch:
-	    case CMD_py3:
-	    case CMD_python3:
-	    case CMD_python:
-	    case CMD_return:
-	    case CMD_rightbelow:
-	    case CMD_ruby:
-	    case CMD_silent:
-	    case CMD_smagic:
-	    case CMD_snomagic:
-	    case CMD_substitute:
-	    case CMD_syntax:
-	    case CMD_tab:
-	    case CMD_tcl:
-	    case CMD_throw:
-	    case CMD_tilde:
-	    case CMD_topleft:
-	    case CMD_unlet:
-	    case CMD_unlockvar:
-	    case CMD_var:
-	    case CMD_verbose:
-	    case CMD_vertical:
-	    case CMD_wincmd:
-				break;
+	    ಸ್ಥಿತಿ CMD_aboveleft:
+	    ಸ್ಥಿತಿ CMD_and:
+	    ಸ್ಥಿತಿ CMD_belowright:
+	    ಸ್ಥಿತಿ CMD_botright:
+	    ಸ್ಥಿತಿ CMD_browse:
+	    ಸ್ಥಿತಿ CMD_call:
+	    ಸ್ಥಿತಿ CMD_confirm:
+	    ಸ್ಥಿತಿ CMD_const:
+	    ಸ್ಥಿತಿ CMD_delfunction:
+	    ಸ್ಥಿತಿ CMD_djump:
+	    ಸ್ಥಿತಿ CMD_dlist:
+	    ಸ್ಥಿತಿ CMD_dsearch:
+	    ಸ್ಥಿತಿ CMD_dsplit:
+	    ಸ್ಥಿತಿ CMD_echo:
+	    ಸ್ಥಿತಿ CMD_echoerr:
+	    ಸ್ಥಿತಿ CMD_echomsg:
+	    ಸ್ಥಿತಿ CMD_echon:
+	    ಸ್ಥಿತಿ CMD_eval:
+	    ಸ್ಥಿತಿ CMD_execute:
+	    ಸ್ಥಿತಿ CMD_filter:
+	    ಸ್ಥಿತಿ CMD_final:
+	    ಸ್ಥಿತಿ CMD_help:
+	    ಸ್ಥಿತಿ CMD_hide:
+	    ಸ್ಥಿತಿ CMD_horizontal:
+	    ಸ್ಥಿತಿ CMD_ijump:
+	    ಸ್ಥಿತಿ CMD_ilist:
+	    ಸ್ಥಿತಿ CMD_isearch:
+	    ಸ್ಥಿತಿ CMD_isplit:
+	    ಸ್ಥಿತಿ CMD_keepalt:
+	    ಸ್ಥಿತಿ CMD_keepjumps:
+	    ಸ್ಥಿತಿ CMD_keepmarks:
+	    ಸ್ಥಿತಿ CMD_keeppatterns:
+	    ಸ್ಥಿತಿ CMD_leftabove:
+	    ಸ್ಥಿತಿ CMD_let:
+	    ಸ್ಥಿತಿ CMD_lockmarks:
+	    ಸ್ಥಿತಿ CMD_lockvar:
+	    ಸ್ಥಿತಿ CMD_lua:
+	    ಸ್ಥಿತಿ CMD_ಹೊಂದಿಕೆ:
+	    ಸ್ಥಿತಿ CMD_mzscheme:
+	    ಸ್ಥಿತಿ CMD_noautocmd:
+	    ಸ್ಥಿತಿ CMD_noswapfile:
+	    ಸ್ಥಿತಿ CMD_perl:
+	    ಸ್ಥಿತಿ CMD_psearch:
+	    ಸ್ಥಿತಿ CMD_py3:
+	    ಸ್ಥಿತಿ CMD_python3:
+	    ಸ್ಥಿತಿ CMD_python:
+	    ಸ್ಥಿತಿ CMD_return:
+	    ಸ್ಥಿತಿ CMD_rightbelow:
+	    ಸ್ಥಿತಿ CMD_ruby:
+	    ಸ್ಥಿತಿ CMD_silent:
+	    ಸ್ಥಿತಿ CMD_smagic:
+	    ಸ್ಥಿತಿ CMD_snomagic:
+	    ಸ್ಥಿತಿ CMD_substitute:
+	    ಸ್ಥಿತಿ CMD_syntax:
+	    ಸ್ಥಿತಿ CMD_tab:
+	    ಸ್ಥಿತಿ CMD_tcl:
+	    ಸ್ಥಿತಿ CMD_throw:
+	    ಸ್ಥಿತಿ CMD_tilde:
+	    ಸ್ಥಿತಿ CMD_topleft:
+	    ಸ್ಥಿತಿ CMD_unlet:
+	    ಸ್ಥಿತಿ CMD_unlockvar:
+	    ಸ್ಥಿತಿ CMD_var:
+	    ಸ್ಥಿತಿ CMD_verbose:
+	    ಸ್ಥಿತಿ CMD_vertical:
+	    ಸ್ಥಿತಿ CMD_wincmd:
+				ನಿಲ್ಲಿಸು;
 
-	    default:		goto doend;
+	    ಪೂರ್ವನಿಯೋಜಿತ:		ಹೋಗು doend;
 	}
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if ((ea.argt & EX_XFILE)
+    ಆದರೆ ((ea.argt & EX_XFILE)
 	    && expand_filename(&ea, cmdlinep, &errormsg) == FAIL)
-	goto doend;
+	ಹೋಗು doend;
 
-#ifdef FEAT_EVAL
-    if (is_export && (ea.argt & EX_EXPORT) == 0)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಆದರೆ (is_export && (ea.argt & EX_EXPORT) == 0)
     {
 	emsg(_(e_invalid_command_after_export));
-	goto doend;
+	ಹೋಗು doend;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     /*
      * Accept buffer name.  Cannot be used at the same time with a buffer
      * number.  Don't do this for a user command.
      */
-    if ((ea.argt & EX_BUFNAME) && *ea.arg != NUL && ea.addr_count == 0
+    ಆದರೆ ((ea.argt & EX_BUFNAME) && *ea.arg != NUL && ea.addr_ಎಣಿಕೆ == 0
 	    && !IS_USER_CMDIDX(ea.cmdidx))
     {
 	/*
@@ -2596,29 +2596,29 @@ do_one_cmd(
 	 * by spaces: find next space (skipping over escaped characters).
 	 * The others take one argument: ignore trailing spaces.
 	 */
-	if (ea.cmdidx == CMD_bdelete || ea.cmdidx == CMD_bwipeout
+	ಆದರೆ (ea.cmdidx == CMD_bdelete || ea.cmdidx == CMD_bwipeout
 						  || ea.cmdidx == CMD_bunload)
 	    p = skiptowhite_esc(ea.arg);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    p = ea.arg + STRLEN(ea.arg);
-	    while (p > ea.arg && VIM_ISWHITE(p[-1]))
+	    ಆಗ (p > ea.arg && VIM_ISWHITE(p[-1]))
 		--p;
 	}
 	ea.line2 = buflist_findpat(ea.arg, p, (ea.argt & EX_BUFUNL) != 0,
 								FALSE, FALSE);
-	if (ea.line2 < 0)	    // failed
-	    goto doend;
-	ea.addr_count = 1;
+	ಆದರೆ (ea.line2 < 0)	    // failed
+	    ಹೋಗು doend;
+	ea.addr_ಎಣಿಕೆ = 1;
 	ea.arg = skipwhite(p);
     }
 
     // The :try command saves the emsg_silent flag, reset it here when
     // ":silent! try" was used, it should only apply to :try itself.
-    if (ea.cmdidx == CMD_try && cmdmod.cmod_did_esilent > 0)
+    ಆದರೆ (ea.cmdidx == CMD_try && cmdmod.cmod_did_esilent > 0)
     {
 	emsg_silent -= cmdmod.cmod_did_esilent;
-	if (emsg_silent < 0)
+	ಆದರೆ (emsg_silent < 0)
 	    emsg_silent = 0;
 	cmdmod.cmod_did_esilent = 0;
     }
@@ -2627,41 +2627,41 @@ do_one_cmd(
  * 7. Execute the command.
  */
 
-    if (IS_USER_CMDIDX(ea.cmdidx))
+    ಆದರೆ (IS_USER_CMDIDX(ea.cmdidx))
     {
 	/*
 	 * Execute a user-defined command.
 	 */
 	do_ucmd(&ea);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	/*
 	 * Call the function to execute the builtin command.
 	 */
 	(cmdnames[ea.cmdidx].cmd_func)(&ea);
-	if (ea.errmsg != NULL)
+	ಆದರೆ (ea.errmsg != ಖಾಲಿ)
 	    errormsg = ea.errmsg;
     }
 
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     // A command will reset "is_export" when exporting an item.  If it is still
     // set something went wrong or the command was never executed.
-    if (!ea.skip && is_export)
+    ಆದರೆ (!ea.skip && is_export)
     {
-	if (errormsg == NULL)
-	    errormsg = _(e_export_with_invalid_argument);
+	ಆದರೆ (errormsg == ಖಾಲಿ)
+	    errormsg = _(e_export_with_invalid_ವಾದ);
 	is_export = FALSE;
     }
 
     // Set flag that any command was executed, used by ex_vim9script().
     // Not if this was a command that wasn't executed or :endif.
-    if (sourcing_a_script(&ea)
+    ಆದರೆ (sourcing_a_script(&ea)
 	    && current_sctx.sc_sid > 0
 	    && ea.cmdidx != CMD_endif
 	    && (cstack->cs_idx < 0
-		    || (cstack->cs_flags[cstack->cs_idx] & CSF_ACTIVE)))
-	SCRIPT_ITEM(current_sctx.sc_sid)->sn_state = SN_STATE_HAD_COMMAND;
+		    || (cstack->cs_flags[cstack->cs_idx] & CSF_ಸಕ್ರಿಯ)))
+	SCRIPT_ಅಂಶ(current_sctx.sc_sid)->sn_state = SN_STATE_HAD_COMMAND;
 
     /*
      * If the command just executed called do_cmdline(), any throw or ":return"
@@ -2670,133 +2670,133 @@ do_one_cmd(
      * exception, or reanimate a returned function or finished script file and
      * return or finish it again.
      */
-    if (need_rethrow)
+    ಆದರೆ (need_rethrow)
 	do_throw(cstack);
-    else if (check_cstack)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (check_cstack)
     {
-	if (source_finished(fgetline, cookie))
-	    do_finish(&ea, TRUE);
-	else if (getline_equal(fgetline, cookie, get_func_line)
+	ಆದರೆ (ಮೂಲ_ಪೂರ್ಣಗೊಂಡ(fgetline, cookie))
+	    do_ಮುಕ್ತಾಯ(&ea, TRUE);
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (getline_equal(fgetline, cookie, get_func_ಸಾಲು)
 						   && current_func_returned())
-	    do_return(&ea, TRUE, FALSE, NULL);
+	    do_return(&ea, TRUE, FALSE, ಖಾಲಿ);
     }
     need_rethrow = check_cstack = FALSE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 doend:
-    if (curwin->w_cursor.lnum == 0)	// can happen with zero line number
+    ಆದರೆ (curwin->w_cursor.lnum == 0)	// can happen with zero line number
     {
 	curwin->w_cursor.lnum = 1;
-	curwin->w_cursor.col = 0;
+	curwin->w_cursor.ಲಂಬಸಾಲು = 0;
     }
 
-    if (errormsg != NULL && *errormsg != NUL && !did_emsg)
+    ಆದರೆ (errormsg != ಖಾಲಿ && *errormsg != NUL && !did_emsg)
     {
-	if ((sourcing || !KeyTyped) && !did_append_cmd)
+	ಆದರೆ ((sourcing || !ಕೀಲಿ_Typed) && !did_append_cmd)
 	{
-	    if (errormsg != (char *)IObuff)
+	    ಆದರೆ (errormsg != (ಅಕ್ಷರ *)IObuff)
 	    {
 		STRCPY(IObuff, errormsg);
-		errormsg = (char *)IObuff;
+		errormsg = (ಅಕ್ಷರ *)IObuff;
 	    }
 	    append_command(*cmdlinep);
 	}
 	emsg(errormsg);
     }
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     do_errthrow(cstack,
-	    (ea.cmdidx != CMD_SIZE && !IS_USER_CMDIDX(ea.cmdidx))
-			? cmdnames[(int)ea.cmdidx].cmd_name : (char_u *)NULL);
+	    (ea.cmdidx != CMD_ಗಾತ್ರ && !IS_USER_CMDIDX(ea.cmdidx))
+			? cmdnames[(ಪೂರ್ಣಾಂಕ)ea.cmdidx].cmd_name : (char_u *)ಖಾಲಿ);
 
-    if (did_set_expr_line)
-	set_expr_line(NULL, NULL);
+    ಆದರೆ (did_ಗಣ_ಅಭಿವ್ಯಕ್ತಿ_ಸಾಲು)
+	ಗಣ_ಅಭಿವ್ಯಕ್ತಿ_ಸಾಲು(ಖಾಲಿ, ಖಾಲಿ);
     is_export = FALSE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     undo_cmdmod(&cmdmod);
     cmdmod = save_cmdmod;
     reg_executing = save_reg_executing;
-    pending_end_reg_executing = save_pending_end_reg_executing;
+    pending_ಕೊನೆ_reg_executing = save_pending_ಕೊನೆ_reg_executing;
 
-    if (ea.nextcmd && *ea.nextcmd == NUL)	// not really a next command
-	ea.nextcmd = NULL;
+    ಆದರೆ (ea.nextcmd && *ea.nextcmd == NUL)	// not really a next command
+	ea.nextcmd = ಖಾಲಿ;
 
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     --ex_nesting_level;
     vim_free(ea.cmdline_tofree);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return ea.nextcmd;
+    ಹಿಂತಿರುಗಿ ea.nextcmd;
 }
 
-static char ex_error_buf[MSG_BUF_LEN];
+ಸ್ಥಿರ ಅಕ್ಷರ ex_error_buf[ಸಂದೇಶ_BUF_LEN];
 
 /*
  * Return an error message with argument included.
  * Uses a static buffer, only the last error will be kept.
  * "msg" will be translated, caller should use N_().
  */
-    char *
-ex_errmsg(char *msg, char_u *arg)
+    ಅಕ್ಷರ *
+ex_errmsg(ಅಕ್ಷರ *ಸಂದೇಶ, char_u *arg)
 {
-    vim_snprintf(ex_error_buf, MSG_BUF_LEN, _(msg), arg);
-    return ex_error_buf;
+    vim_snprintf(ex_error_buf, ಸಂದೇಶ_BUF_LEN, _(ಸಂದೇಶ), arg);
+    ಹಿಂತಿರುಗಿ ex_error_buf;
 }
 
 /*
  * The "+" string used in place of an empty command in Ex mode.
  * This string is used in pointer comparison.
  */
-static const char exmode_plus[] = "+";
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ exmode_plus[] = "+";
 
 /*
  * Handle a range without a command.
  * Returns an error message on failure.
  */
-    char *
+    ಅಕ್ಷರ *
 ex_range_without_command(exarg_T *eap)
 {
-    char *errormsg = NULL;
+    ಅಕ್ಷರ *errormsg = ಖಾಲಿ;
 
-    if ((*eap->cmd == '|' ||
-		(exmode_active && eap->cmd != (char_u *)exmode_plus + 1))
-#ifdef FEAT_EVAL
-	    && !in_vim9script()
-#endif
+    ಆದರೆ ((*eap->cmd == '|' ||
+		(exmode_ಸಕ್ರಿಯ && eap->cmd != (char_u *)exmode_plus + 1))
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	    && !ಒಳ_vim9script()
+#ಆದರೆ_ಅಂತ್ಯ
        )
     {
 	eap->cmdidx = CMD_print;
-	eap->argt = EX_RANGE+EX_COUNT+EX_TRLBAR;
-	if ((errormsg = invalid_range(eap)) == NULL)
+	eap->argt = EX_RANGE+EX_ಎಣಿಕೆ+EX_TRLBAR;
+	ಆದರೆ ((errormsg = invalid_range(eap)) == ಖಾಲಿ)
 	{
 	    correct_range(eap);
 	    ex_print(eap);
 	}
     }
-    else if (eap->addr_count != 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (eap->addr_ಎಣಿಕೆ != 0)
     {
-	if (eap->line2 > curbuf->b_ml.ml_line_count)
+	ಆದರೆ (eap->line2 > curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
 	{
 	    // With '-' in 'cpoptions' a line number past the file is an
 	    // error, otherwise put it at the end of the file.
-	    if (vim_strchr(p_cpo, CPO_MINUS) != NULL)
+	    ಆದರೆ (vim_strchr(p_cpo, CPO_MINUS) != ಖಾಲಿ)
 		eap->line2 = -1;
-	    else
-		eap->line2 = curbuf->b_ml.ml_line_count;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		eap->line2 = curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
 	}
 
-	if (eap->line2 < 0)
+	ಆದರೆ (eap->line2 < 0)
 	    errormsg = _(e_invalid_range);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (eap->line2 == 0)
+	    ಆದರೆ (eap->line2 == 0)
 		curwin->w_cursor.lnum = 1;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		curwin->w_cursor.lnum = eap->line2;
 	    beginline(BL_SOL | BL_FIX);
 	}
     }
-    return errormsg;
+    ಹಿಂತಿರುಗಿ errormsg;
 }
 
 /*
@@ -2804,51 +2804,51 @@ ex_range_without_command(exarg_T *eap)
  * If there is a match advance "pp" to the argument and return TRUE.
  * If "noparen" is TRUE do not recognize the command followed by "(" or ".".
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 checkforcmd_opt(
     char_u	**pp,		// start of command
-    char	*cmd,		// name of command
-    int		len,		// required length
-    int		noparen)
+    ಅಕ್ಷರ	*cmd,		// name of command
+    ಪೂರ್ಣಾಂಕ		len,		// required length
+    ಪೂರ್ಣಾಂಕ		noparen)
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
 
-    for (i = 0; cmd[i] != NUL; ++i)
-	if (((char_u *)cmd)[i] != (*pp)[i])
-	    break;
-    if (i >= len && !ASCII_ISALPHA((*pp)[i]) && (*pp)[i] != '_'
+    ಗಾಗಿ (i = 0; cmd[i] != NUL; ++i)
+	ಆದರೆ (((char_u *)cmd)[i] != (*pp)[i])
+	    ನಿಲ್ಲಿಸು;
+    ಆದರೆ (i >= len && !ASCII_ISALPHA((*pp)[i]) && (*pp)[i] != '_'
 			 && (!noparen || ((*pp)[i] != '(' && (*pp)[i] != '.')))
     {
 	*pp = skipwhite(*pp + i);
-	return TRUE;
+	ಹಿಂತಿರುಗಿ TRUE;
     }
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 /*
  * Check for an Ex command with optional tail.
  * If there is a match advance "pp" to the argument and return TRUE.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 checkforcmd(
     char_u	**pp,		// start of command
-    char	*cmd,		// name of command
-    int		len)		// required length
+    ಅಕ್ಷರ	*cmd,		// name of command
+    ಪೂರ್ಣಾಂಕ		len)		// required length
 {
-    return checkforcmd_opt(pp, cmd, len, FALSE);
+    ಹಿಂತಿರುಗಿ checkforcmd_opt(pp, cmd, len, FALSE);
 }
 
 /*
  * Check for an Ex command with optional tail, not followed by "(" or ".".
  * If there is a match advance "pp" to the argument and return TRUE.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 checkforcmd_noparen(
     char_u	**pp,		// start of command
-    char	*cmd,		// name of command
-    int		len)		// required length
+    ಅಕ್ಷರ	*cmd,		// name of command
+    ಪೂರ್ಣಾಂಕ		len)		// required length
 {
-    return checkforcmd_opt(pp, cmd, len, TRUE);
+    ಹಿಂತಿರುಗಿ checkforcmd_opt(pp, cmd, len, TRUE);
 }
 
 /*
@@ -2856,22 +2856,22 @@ checkforcmd_noparen(
  * the command name.  Returns NULL when there is none.  Does not modify "arg"
  * and gives no error messages.
  */
-    static char_u *
-find_ucmd_repl(char_u *arg)
+    ಸ್ಥಿರ char_u *
+ಕಂಡುಹಿಡಿ_ucmd_repl(char_u *arg)
 {
     char_u	*p = arg;
 
     // Skip over the attributes.
-    while (*p == '-')
+    ಆಗ (*p == '-')
 	p = skipwhite(skiptowhite(p));
 
     // Skip over the command name.
-    if (!ASCII_ISALPHA(*p))
-	return NULL;
-    while (ASCII_ISALNUM(*p))
+    ಆದರೆ (!ASCII_ISALPHA(*p))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    ಆಗ (ASCII_ISALNUM(*p))
 	++p;
 
-    return *p == NUL ? NULL : skipwhite(p);
+    ಹಿಂತಿರುಗಿ *p == NUL ? ಖಾಲಿ : skipwhite(p);
 }
 
 /*
@@ -2881,34 +2881,34 @@ find_ucmd_repl(char_u *arg)
  * Returns NULL when the line does not start such a block.
  */
     char_u *
-find_cmd_block_start(char_u *line)
+ಕಂಡುಹಿಡಿ_cmd_ಖಂಡ_ಆರಂಭ(char_u *ಸಾಲು)
 {
-    char_u	*p = skipwhite(line);
+    char_u	*p = skipwhite(ಸಾಲು);
 
-    for (;;)
+    ಗಾಗಿ (;;)
     {
 	char_u	*arg = p;
 
-	if (*p == '{' && ends_excmd2(p, skipwhite(p + 1)))
-	    return p;
+	ಆದರೆ (*p == '{' && ತುದಿಗಳು_excmd2(p, skipwhite(p + 1)))
+	    ಹಿಂತಿರುಗಿ p;
 
-	if (checkforcmd_noparen(&arg, "autocmd", 2))
+	ಆದರೆ (checkforcmd_noparen(&arg, "autocmd", 2))
 	{
-	    if (*arg == '!')
+	    ಆದರೆ (*arg == '!')
 		arg = skipwhite(arg + 1);
-	    p = au_find_cmd_arg(arg);
+	    p = au_ಕಂಡುಹಿಡಿ_cmd_arg(arg);
 	}
-	else if (checkforcmd_noparen(&arg, "command", 3))
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (checkforcmd_noparen(&arg, "command", 3))
 	{
-	    if (*arg == '!')
+	    ಆದರೆ (*arg == '!')
 		arg = skipwhite(arg + 1);
-	    p = find_ucmd_repl(arg);
+	    p = ಕಂಡುಹಿಡಿ_ucmd_repl(arg);
 	}
-	else
-	    return NULL;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-	if (p == NULL)
-	    return NULL;
+	ಆದರೆ (p == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	p = skipwhite(p);
     }
 }
@@ -2930,94 +2930,94 @@ find_cmd_block_start(char_u *line)
  * Return FAIL when the command is not to be executed.
  * May set "errormsg" to an error message.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 parse_command_modifiers(
 	exarg_T	    *eap,
-	char	    **errormsg,
+	ಅಕ್ಷರ	    **errormsg,
 	cmdmod_T    *cmod,
-	int	    skip_only)
+	ಪೂರ್ಣಾಂಕ	    skip_only)
 {
     char_u  *orig_cmd = eap->cmd;
-    char_u  *cmd_start = NULL;
-    int	    use_plus_cmd = FALSE;
-    int	    starts_with_colon = FALSE;
-    int	    vim9script = in_vim9script();
-    int	    has_visual_range = FALSE;
+    char_u  *cmd_ಆರಂಭ = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ	    use_plus_cmd = FALSE;
+    ಪೂರ್ಣಾಂಕ	    starts_with_colon = FALSE;
+    ಪೂರ್ಣಾಂಕ	    vim9script = ಒಳ_vim9script();
+    ಪೂರ್ಣಾಂಕ	    has_visual_range = FALSE;
 
-    CLEAR_POINTER(cmod);
+    CLEAR_ಸೂಚಕ(cmod);
     cmod->cmod_flags = sticky_cmdmod_flags;
 
-    if (STRNCMP(eap->cmd, "'<,'>", 5) == 0)
+    ಆದರೆ (STRNCMP(eap->cmd, "'<,'>", 5) == 0)
     {
 	// The automatically inserted Visual area range is skipped, so that
 	// typing ":cmdmod cmd" in Visual mode works without having to move the
 	// range to after the modifiers. The command will be "'<,'>cmdmod cmd",
 	// parse "cmdmod cmd" and then put back "'<,'>" before "cmd" below.
 	eap->cmd += 5;
-	cmd_start = eap->cmd;
+	cmd_ಆರಂಭ = eap->cmd;
 	has_visual_range = TRUE;
     }
 
     // Repeat until no more command modifiers are found.
-    for (;;)
+    ಗಾಗಿ (;;)
     {
 	char_u  *p;
 
-	while (*eap->cmd == ' ' || *eap->cmd == '\t' || *eap->cmd == ':')
+	ಆಗ (*eap->cmd == ' ' || *eap->cmd == '\t' || *eap->cmd == ':')
 	{
-	    if (*eap->cmd == ':')
+	    ಆದರೆ (*eap->cmd == ':')
 		starts_with_colon = TRUE;
 	    ++eap->cmd;
 	}
 
 	// in ex mode, an empty command (after modifiers) works like :+
-	if (*eap->cmd == NUL && exmode_active
+	ಆದರೆ (*eap->cmd == NUL && exmode_ಸಕ್ರಿಯ
 		   && (getline_equal(eap->ea_getline, eap->cookie, getexmodeline)
 		       || getline_equal(eap->ea_getline, eap->cookie, getexline))
-			&& curwin->w_cursor.lnum < curbuf->b_ml.ml_line_count)
+			&& curwin->w_cursor.lnum < curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
 	{
 	    use_plus_cmd = TRUE;
-	    if (!skip_only)
+	    ಆದರೆ (!skip_only)
 		ex_pressedreturn = TRUE;
-	    break;  // no modifiers following
+	    ನಿಲ್ಲಿಸು;  // no modifiers following
 	}
 
 	// ignore comment and empty lines
-	if (comment_start(eap->cmd, starts_with_colon))
+	ಆದರೆ (comment_ಆರಂಭ(eap->cmd, starts_with_colon))
 	{
 	    // a comment ends at a NL
 	    eap->nextcmd = vim_strchr(eap->cmd, '\n');
-	    if (eap->nextcmd != NULL)
+	    ಆದರೆ (eap->nextcmd != ಖಾಲಿ)
 		++eap->nextcmd;
-	    if (vim9script)
+	    ಆದರೆ (vim9script)
 	    {
-		if (has_cmdmod(cmod, FALSE))
+		ಆದರೆ (has_cmdmod(cmod, FALSE))
 		    *errormsg = _(e_command_modifier_without_command);
-#ifdef FEAT_EVAL
-		if (eap->cmd[0] == '#' && eap->cmd[1] == '{'
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+		ಆದರೆ (eap->cmd[0] == '#' && eap->cmd[1] == '{'
 							 && eap->cmd[2] != '{')
-		    *errormsg = _(e_cannot_use_hash_curly_to_start_comment);
-#endif
+		    *errormsg = _(e_cannot_use_hash_curly_ಗಮ್ಯ_ಆರಂಭ_comment);
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
-	    return FAIL;
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
-	if (*eap->cmd == '\n')
+	ಆದರೆ (*eap->cmd == '\n')
 	{
 	    eap->nextcmd = eap->cmd + 1;
-	    return FAIL;
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
-	if (*eap->cmd == NUL)
+	ಆದರೆ (*eap->cmd == NUL)
 	{
-	    if (!skip_only)
+	    ಆದರೆ (!skip_only)
 	    {
 		ex_pressedreturn = TRUE;
-		if (vim9script && has_cmdmod(cmod, FALSE))
+		ಆದರೆ (vim9script && has_cmdmod(cmod, FALSE))
 		    *errormsg = _(e_command_modifier_without_command);
 	    }
-	    return FAIL;
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
 
-	p = skip_range(eap->cmd, TRUE, NULL);
+	p = skip_range(eap->cmd, TRUE, ಖಾಲಿ);
 
 	// In Vim9 script a variable can shadow a command modifier:
 	//   verbose = 123
@@ -3027,370 +3027,370 @@ parse_command_modifiers(
 	//   verbose[expr] = 2
 	// But not:
 	//   verbose [a, b] = list
-	if (vim9script)
+	ಆದರೆ (vim9script)
 	{
 	    char_u *s, *n;
 
-	    for (s = eap->cmd; ASCII_ISALPHA(*s); ++s)
+	    ಗಾಗಿ (s = eap->cmd; ASCII_ISALPHA(*s); ++s)
 		;
 	    n = skipwhite(s);
-	    if (*n == '.' || *n == '=' || (*n != NUL && n[1] == '=')
+	    ಆದರೆ (*n == '.' || *n == '=' || (*n != NUL && n[1] == '=')
 		    || *s == '[')
-		break;
+		ನಿಲ್ಲಿಸು;
 	}
 
-	switch (*p)
+	ಆಯ್ಕೆ (*p)
 	{
 	    // When adding an entry, also modify cmdmod_info_tab[].
-	    case 'a':	if (!checkforcmd_noparen(&eap->cmd, "aboveleft", 3))
-			    break;
-			cmod->cmod_split |= WSP_ABOVE;
-			continue;
+	    ಸ್ಥಿತಿ 'a':	ಆದರೆ (!checkforcmd_noparen(&eap->cmd, "aboveleft", 3))
+			    ನಿಲ್ಲಿಸು;
+			cmod->cmod_ವಿಭಜಿಸು |= WSP_ABOVE;
+			ಮುಂದುವರಿ;
 
-	    case 'b':	if (checkforcmd_noparen(&eap->cmd, "belowright", 3))
+	    ಸ್ಥಿತಿ 'b':	ಆದರೆ (checkforcmd_noparen(&eap->cmd, "belowright", 3))
 			{
-			    cmod->cmod_split |= WSP_BELOW;
-			    continue;
+			    cmod->cmod_ವಿಭಜಿಸು |= WSP_ಕೆಳಗೆ;
+			    ಮುಂದುವರಿ;
 			}
-			if (checkforcmd_opt(&eap->cmd, "browse", 3, TRUE))
+			ಆದರೆ (checkforcmd_opt(&eap->cmd, "browse", 3, TRUE))
 			{
-#ifdef FEAT_BROWSE_CMD
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_BROWSE_CMD
 			    cmod->cmod_flags |= CMOD_BROWSE;
-#endif
-			    continue;
+#ಆದರೆ_ಅಂತ್ಯ
+			    ಮುಂದುವರಿ;
 			}
-			if (!checkforcmd_noparen(&eap->cmd, "botright", 2))
-			    break;
-			cmod->cmod_split |= WSP_BOT;
-			continue;
+			ಆದರೆ (!checkforcmd_noparen(&eap->cmd, "botright", 2))
+			    ನಿಲ್ಲಿಸು;
+			cmod->cmod_ವಿಭಜಿಸು |= WSP_BOT;
+			ಮುಂದುವರಿ;
 
-	    case 'c':	if (!checkforcmd_opt(&eap->cmd, "confirm", 4, TRUE))
-			    break;
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	    ಸ್ಥಿತಿ 'c':	ಆದರೆ (!checkforcmd_opt(&eap->cmd, "confirm", 4, TRUE))
+			    ನಿಲ್ಲಿಸು;
+#ಆದರೆ defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
 			cmod->cmod_flags |= CMOD_CONFIRM;
-#endif
-			continue;
+#ಆದರೆ_ಅಂತ್ಯ
+			ಮುಂದುವರಿ;
 
-	    case 'k':	if (checkforcmd_noparen(&eap->cmd, "keepmarks", 3))
+	    ಸ್ಥಿತಿ 'k':	ಆದರೆ (checkforcmd_noparen(&eap->cmd, "keepmarks", 3))
 			{
 			    cmod->cmod_flags |= CMOD_KEEPMARKS;
-			    continue;
+			    ಮುಂದುವರಿ;
 			}
-			if (checkforcmd_noparen(&eap->cmd, "keepalt", 5))
+			ಆದರೆ (checkforcmd_noparen(&eap->cmd, "keepalt", 5))
 			{
 			    cmod->cmod_flags |= CMOD_KEEPALT;
-			    continue;
+			    ಮುಂದುವರಿ;
 			}
-			if (checkforcmd_noparen(&eap->cmd, "keeppatterns", 5))
+			ಆದರೆ (checkforcmd_noparen(&eap->cmd, "keeppatterns", 5))
 			{
 			    cmod->cmod_flags |= CMOD_KEEPPATTERNS;
-			    continue;
+			    ಮುಂದುವರಿ;
 			}
-			if (!checkforcmd_noparen(&eap->cmd, "keepjumps", 5))
-			    break;
+			ಆದರೆ (!checkforcmd_noparen(&eap->cmd, "keepjumps", 5))
+			    ನಿಲ್ಲಿಸು;
 			cmod->cmod_flags |= CMOD_KEEPJUMPS;
-			continue;
+			ಮುಂದುವರಿ;
 
-	    case 'f':	// only accept ":filter {pat} cmd"
+	    ಸ್ಥಿತಿ 'f':	// only accept ":filter {pat} cmd"
 			{
 			    char_u  *reg_pat;
-			    char_u  *nulp = NULL;
-			    int	    c = 0;
+			    char_u  *nulp = ಖಾಲಿ;
+			    ಪೂರ್ಣಾಂಕ	    c = 0;
 
-			    if (!checkforcmd_noparen(&p, "filter", 4)
+			    ಆದರೆ (!checkforcmd_noparen(&p, "filter", 4)
 				    || *p == NUL
-				    || (ends_excmd(*p)
-#ifdef FEAT_EVAL
+				    || (ತುದಿಗಳು_excmd(*p)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 					// in ":filter #pat# cmd" # does not
 					// start a comment
 				     && (!vim9script || VIM_ISWHITE(p[1]))
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 				     ))
-				break;
-			    if (*p == '!')
+				ನಿಲ್ಲಿಸು;
+			    ಆದರೆ (*p == '!')
 			    {
 				cmod->cmod_filter_force = TRUE;
 				p = skipwhite(p + 1);
-				if (*p == NUL || ends_excmd(*p))
-				    break;
+				ಆದರೆ (*p == NUL || ತುದಿಗಳು_excmd(*p))
+				    ನಿಲ್ಲಿಸು;
 			    }
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 			    // Avoid that "filter(arg)" is recognized.
-			    if (vim9script && !VIM_ISWHITE(p[-1]))
-				break;
-#endif
-			    if (skip_only)
-				p = skip_vimgrep_pat(p, NULL, NULL);
-			    else
+			    ಆದರೆ (vim9script && !VIM_ISWHITE(p[-1]))
+				ನಿಲ್ಲಿಸು;
+#ಆದರೆ_ಅಂತ್ಯ
+			    ಆದರೆ (skip_only)
+				p = skip_vimgrep_pat(p, ಖಾಲಿ, ಖಾಲಿ);
+			    ಇಲ್ಲದಿದ್ದರೆ
 				// NOTE: This puts a NUL after the pattern.
-				p = skip_vimgrep_pat_ext(p, &reg_pat, NULL,
+				p = skip_vimgrep_pat_ext(p, &reg_pat, ಖಾಲಿ,
 								    &nulp, &c);
-			    if (p == NULL || *p == NUL)
-				break;
-			    if (!skip_only)
+			    ಆದರೆ (p == ಖಾಲಿ || *p == NUL)
+				ನಿಲ್ಲಿಸು;
+			    ಆದರೆ (!skip_only)
 			    {
 				cmod->cmod_filter_regmatch.regprog =
 						vim_regcomp(reg_pat, RE_MAGIC);
-				if (cmod->cmod_filter_regmatch.regprog == NULL)
-				    break;
+				ಆದರೆ (cmod->cmod_filter_regmatch.regprog == ಖಾಲಿ)
+				    ನಿಲ್ಲಿಸು;
 				// restore the character overwritten by NUL
-				if (nulp != NULL)
+				ಆದರೆ (nulp != ಖಾಲಿ)
 				    *nulp = c;
 			    }
 			    eap->cmd = p;
-			    continue;
+			    ಮುಂದುವರಿ;
 			}
 
-	    case 'h':	if (checkforcmd_noparen(&eap->cmd, "horizontal", 3))
+	    ಸ್ಥಿತಿ 'h':	ಆದರೆ (checkforcmd_noparen(&eap->cmd, "horizontal", 3))
 			{
-			    cmod->cmod_split |= WSP_HOR;
-			    continue;
+			    cmod->cmod_ವಿಭಜಿಸು |= WSP_HOR;
+			    ಮುಂದುವರಿ;
 			}
 			// ":hide" and ":hide | cmd" are not modifiers
-			if (p != eap->cmd || !checkforcmd_noparen(&p, "hide", 3)
-					       || *p == NUL || ends_excmd(*p))
-			    break;
+			ಆದರೆ (p != eap->cmd || !checkforcmd_noparen(&p, "hide", 3)
+					       || *p == NUL || ತುದಿಗಳು_excmd(*p))
+			    ನಿಲ್ಲಿಸು;
 			eap->cmd = p;
 			cmod->cmod_flags |= CMOD_HIDE;
-			continue;
+			ಮುಂದುವರಿ;
 
-	    case 'l':	if (checkforcmd_noparen(&eap->cmd, "lockmarks", 3))
+	    ಸ್ಥಿತಿ 'l':	ಆದರೆ (checkforcmd_noparen(&eap->cmd, "lockmarks", 3))
 			{
 			    cmod->cmod_flags |= CMOD_LOCKMARKS;
-			    continue;
+			    ಮುಂದುವರಿ;
 			}
-			if (checkforcmd_noparen(&eap->cmd, "legacy", 3))
+			ಆದರೆ (checkforcmd_noparen(&eap->cmd, "legacy", 3))
 			{
-			    if (ends_excmd2(p, eap->cmd))
+			    ಆದರೆ (ತುದಿಗಳು_excmd2(p, eap->cmd))
 			    {
 				*errormsg =
 				      _(e_legacy_must_be_followed_by_command);
-				return FAIL;
+				ಹಿಂತಿರುಗಿ FAIL;
 			    }
 			    // Make sure we do not have both legacy and Vim9
 			    // flags set at the same time.
 			    cmod->cmod_flags &= ~CMOD_VIM9CMD;
 			    cmod->cmod_flags |= CMOD_LEGACY;
-			    continue;
+			    ಮುಂದುವರಿ;
 			}
 
-			if (!checkforcmd_noparen(&eap->cmd, "leftabove", 5))
-			    break;
-			cmod->cmod_split |= WSP_ABOVE;
-			continue;
+			ಆದರೆ (!checkforcmd_noparen(&eap->cmd, "leftabove", 5))
+			    ನಿಲ್ಲಿಸು;
+			cmod->cmod_ವಿಭಜಿಸು |= WSP_ABOVE;
+			ಮುಂದುವರಿ;
 
-	    case 'n':	if (checkforcmd_noparen(&eap->cmd, "noautocmd", 3))
+	    ಸ್ಥಿತಿ 'n':	ಆದರೆ (checkforcmd_noparen(&eap->cmd, "noautocmd", 3))
 			{
 			    cmod->cmod_flags |= CMOD_NOAUTOCMD;
-			    continue;
+			    ಮುಂದುವರಿ;
 			}
-			if (!checkforcmd_noparen(&eap->cmd, "noswapfile", 3))
-			    break;
+			ಆದರೆ (!checkforcmd_noparen(&eap->cmd, "noswapfile", 3))
+			    ನಿಲ್ಲಿಸು;
 			cmod->cmod_flags |= CMOD_NOSWAPFILE;
-			continue;
+			ಮುಂದುವರಿ;
 
-	    case 'r':	if (!checkforcmd_noparen(&eap->cmd, "rightbelow", 6))
-			    break;
-			cmod->cmod_split |= WSP_BELOW;
-			continue;
+	    ಸ್ಥಿತಿ 'r':	ಆದರೆ (!checkforcmd_noparen(&eap->cmd, "rightbelow", 6))
+			    ನಿಲ್ಲಿಸು;
+			cmod->cmod_ವಿಭಜಿಸು |= WSP_ಕೆಳಗೆ;
+			ಮುಂದುವರಿ;
 
-	    case 's':	if (checkforcmd_noparen(&eap->cmd, "sandbox", 3))
+	    ಸ್ಥಿತಿ 's':	ಆದರೆ (checkforcmd_noparen(&eap->cmd, "sandbox", 3))
 			{
 			    cmod->cmod_flags |= CMOD_SANDBOX;
-			    continue;
+			    ಮುಂದುವರಿ;
 			}
-			if (!checkforcmd_noparen(&eap->cmd, "silent", 3))
-			    break;
+			ಆದರೆ (!checkforcmd_noparen(&eap->cmd, "silent", 3))
+			    ನಿಲ್ಲಿಸು;
 			cmod->cmod_flags |= CMOD_SILENT;
-			if (*eap->cmd == '!' && !VIM_ISWHITE(eap->cmd[-1]))
+			ಆದರೆ (*eap->cmd == '!' && !VIM_ISWHITE(eap->cmd[-1]))
 			{
 			    // ":silent!", but not "silent !cmd"
 			    eap->cmd = skipwhite(eap->cmd + 1);
 			    cmod->cmod_flags |= CMOD_ERRSILENT;
 			}
-			continue;
+			ಮುಂದುವರಿ;
 
-	    case 't':	if (checkforcmd_noparen(&p, "tab", 3))
+	    ಸ್ಥಿತಿ 't':	ಆದರೆ (checkforcmd_noparen(&p, "tab", 3))
 			{
-			    if (!skip_only)
+			    ಆದರೆ (!skip_only)
 			    {
-				long tabnr = get_address(eap, &eap->cmd,
+				ದೀರ್ಘ tabnr = get_ವಿಳಾಸ(eap, &eap->cmd,
 						    ADDR_TABS, eap->skip,
 						    skip_only, FALSE, 1);
-				if (tabnr == MAXLNUM)
-				    cmod->cmod_tab = tabpage_index(curtab) + 1;
-				else
+				ಆದರೆ (tabnr == MAXLNUM)
+				    cmod->cmod_tab = tabpage_ಸೂಚ್ಯಂಕ(curtab) + 1;
+				ಇಲ್ಲದಿದ್ದರೆ
 				{
-				    if (tabnr < 0 || tabnr > LAST_TAB_NR)
+				    ಆದರೆ (tabnr < 0 || tabnr > ಕೊನೆಯ_TAB_NR)
 				    {
 					*errormsg = _(e_invalid_range);
-					return FAIL;
+					ಹಿಂತಿರುಗಿ FAIL;
 				    }
 				    cmod->cmod_tab = tabnr + 1;
 				}
 			    }
 			    eap->cmd = p;
-			    continue;
+			    ಮುಂದುವರಿ;
 			}
-			if (!checkforcmd_noparen(&eap->cmd, "topleft", 2))
-			    break;
-			cmod->cmod_split |= WSP_TOP;
-			continue;
+			ಆದರೆ (!checkforcmd_noparen(&eap->cmd, "topleft", 2))
+			    ನಿಲ್ಲಿಸು;
+			cmod->cmod_ವಿಭಜಿಸು |= WSP_ತುದಿ;
+			ಮುಂದುವರಿ;
 
-	    case 'u':	if (!checkforcmd_noparen(&eap->cmd, "unsilent", 3))
-			    break;
+	    ಸ್ಥಿತಿ 'u':	ಆದರೆ (!checkforcmd_noparen(&eap->cmd, "unsilent", 3))
+			    ನಿಲ್ಲಿಸು;
 			cmod->cmod_flags |= CMOD_UNSILENT;
-			continue;
+			ಮುಂದುವರಿ;
 
-	    case 'v':	if (checkforcmd_noparen(&eap->cmd, "vertical", 4))
+	    ಸ್ಥಿತಿ 'v':	ಆದರೆ (checkforcmd_noparen(&eap->cmd, "vertical", 4))
 			{
-			    cmod->cmod_split |= WSP_VERT;
-			    continue;
+			    cmod->cmod_ವಿಭಜಿಸು |= WSP_VERT;
+			    ಮುಂದುವರಿ;
 			}
-			if (checkforcmd_noparen(&eap->cmd, "vim9cmd", 4))
+			ಆದರೆ (checkforcmd_noparen(&eap->cmd, "vim9cmd", 4))
 			{
-			    if (ends_excmd2(p, eap->cmd))
+			    ಆದರೆ (ತುದಿಗಳು_excmd2(p, eap->cmd))
 			    {
 				*errormsg =
 				      _(e_vim9cmd_must_be_followed_by_command);
-				return FAIL;
+				ಹಿಂತಿರುಗಿ FAIL;
 			    }
 			    // Make sure we do not have both legacy and Vim9
 			    // flags set at the same time.
 			    cmod->cmod_flags &= ~CMOD_LEGACY;
 			    cmod->cmod_flags |= CMOD_VIM9CMD;
-			    continue;
+			    ಮುಂದುವರಿ;
 			}
-			if (!checkforcmd_noparen(&p, "verbose", 4))
-			    break;
-			if (vim_isdigit(*eap->cmd))
+			ಆದರೆ (!checkforcmd_noparen(&p, "verbose", 4))
+			    ನಿಲ್ಲಿಸು;
+			ಆದರೆ (vim_isdigit(*eap->cmd))
 			{
 			    // zero means not set, one is verbose == 0, etc.
-			    cmod->cmod_verbose = atoi((char *)eap->cmd) + 1;
+			    cmod->cmod_verbose = atoi((ಅಕ್ಷರ *)eap->cmd) + 1;
 			}
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			    cmod->cmod_verbose = 2;  // default: verbose == 1
 			eap->cmd = p;
-			continue;
+			ಮುಂದುವರಿ;
 	}
-	break;
+	ನಿಲ್ಲಿಸು;
     }
 
-    if (has_visual_range)
+    ಆದರೆ (has_visual_range)
     {
-	if (eap->cmd > cmd_start)
+	ಆದರೆ (eap->cmd > cmd_ಆರಂಭ)
 	{
 	    // Move the '<,'> range to after the modifiers and insert a colon.
 	    // Since the modifiers have been parsed put the colon on top of the
 	    // space: "'<,'>mod cmd" -> "mod:'<,'>cmd
 	    // Put eap->cmd after the colon.
-	    if (use_plus_cmd)
+	    ಆದರೆ (use_plus_cmd)
 	    {
-		size_t len = STRLEN(cmd_start);
+		size_t len = STRLEN(cmd_ಆರಂಭ);
 
 		// Special case: empty command uses "+":
 		//  "'<,'>mods" -> "mods *+
 		//  Use "*" instead of "'<,'>" to avoid the command getting
 		//  longer, in case it was allocated.
-		mch_memmove(orig_cmd, cmd_start, len);
+		mch_memmove(orig_cmd, cmd_ಆರಂಭ, len);
 		STRCPY(orig_cmd + len, " *+");
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		mch_memmove(cmd_start - 5, cmd_start, eap->cmd - cmd_start);
+		mch_memmove(cmd_ಆರಂಭ - 5, cmd_ಆರಂಭ, eap->cmd - cmd_ಆರಂಭ);
 		eap->cmd -= 5;
 		mch_memmove(eap->cmd - 1, ":'<,'>", 6);
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    // No modifiers, move the pointer back.
 	    // Special case: change empty command to "+".
-	    if (use_plus_cmd)
+	    ಆದರೆ (use_plus_cmd)
 		eap->cmd = (char_u *)"'<,'>+";
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		eap->cmd = orig_cmd;
     }
-    else if (use_plus_cmd)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (use_plus_cmd)
 	eap->cmd = (char_u *)exmode_plus;
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Return TRUE if "cmod" has anything set.
  */
-    int
-has_cmdmod(cmdmod_T *cmod, int ignore_silent)
+    ಪೂರ್ಣಾಂಕ
+has_cmdmod(cmdmod_T *cmod, ಪೂರ್ಣಾಂಕ ignore_silent)
 {
-    return (cmod->cmod_flags != 0 && (!ignore_silent
+    ಹಿಂತಿರುಗಿ (cmod->cmod_flags != 0 && (!ignore_silent
 		|| (cmod->cmod_flags
 		      & ~(CMOD_SILENT | CMOD_ERRSILENT | CMOD_UNSILENT)) != 0))
-	    || cmod->cmod_split != 0
+	    || cmod->cmod_ವಿಭಜಿಸು != 0
 	    || cmod->cmod_verbose > 0
 	    || cmod->cmod_tab != 0
-	    || cmod->cmod_filter_regmatch.regprog != NULL;
+	    || cmod->cmod_filter_regmatch.regprog != ಖಾಲಿ;
 }
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * If Vim9 script and "cmdmod" has anything set give an error and return TRUE.
  */
-    int
-cmdmod_error(int ignore_silent)
+    ಪೂರ್ಣಾಂಕ
+cmdmod_error(ಪೂರ್ಣಾಂಕ ignore_silent)
 {
-    if (in_vim9script() && has_cmdmod(&cmdmod, ignore_silent))
+    ಆದರೆ (ಒಳ_vim9script() && has_cmdmod(&cmdmod, ignore_silent))
     {
 	emsg(_(e_misplaced_command_modifier));
-	return TRUE;
+	ಹಿಂತಿರುಗಿ TRUE;
     }
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Apply the command modifiers.  Saves current state in "cmdmod", call
  * undo_cmdmod() later.
  */
-    void
+    ಶೂನ್ಯ
 apply_cmdmod(cmdmod_T *cmod)
 {
-#ifdef HAVE_SANDBOX
-    if ((cmod->cmod_flags & CMOD_SANDBOX) && !cmod->cmod_did_sandbox)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_SANDBOX
+    ಆದರೆ ((cmod->cmod_flags & CMOD_SANDBOX) && !cmod->cmod_did_sandbox)
     {
 	++sandbox;
 	cmod->cmod_did_sandbox = TRUE;
     }
-#endif
-    if (cmod->cmod_verbose > 0)
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (cmod->cmod_verbose > 0)
     {
-	if (cmod->cmod_verbose_save == 0)
+	ಆದರೆ (cmod->cmod_verbose_save == 0)
 	    cmod->cmod_verbose_save = p_verbose + 1;
 	p_verbose = cmod->cmod_verbose - 1;
     }
 
-    if ((cmod->cmod_flags & (CMOD_SILENT | CMOD_UNSILENT))
-	    && cmod->cmod_save_msg_silent == 0)
+    ಆದರೆ ((cmod->cmod_flags & (CMOD_SILENT | CMOD_UNSILENT))
+	    && cmod->cmod_save_ಸಂದೇಶ_silent == 0)
     {
-	cmod->cmod_save_msg_silent = msg_silent + 1;
-	cmod->cmod_save_msg_scroll = msg_scroll;
+	cmod->cmod_save_ಸಂದೇಶ_silent = ಸಂದೇಶ_silent + 1;
+	cmod->cmod_save_ಸಂದೇಶ_scroll = ಸಂದೇಶ_scroll;
     }
-    if (cmod->cmod_flags & CMOD_SILENT)
-	++msg_silent;
-    if (cmod->cmod_flags & CMOD_UNSILENT)
-	msg_silent = 0;
+    ಆದರೆ (cmod->cmod_flags & CMOD_SILENT)
+	++ಸಂದೇಶ_silent;
+    ಆದರೆ (cmod->cmod_flags & CMOD_UNSILENT)
+	ಸಂದೇಶ_silent = 0;
 
-    if (cmod->cmod_flags & CMOD_ERRSILENT)
+    ಆದರೆ (cmod->cmod_flags & CMOD_ERRSILENT)
     {
 	++emsg_silent;
 	++cmod->cmod_did_esilent;
     }
 
-    if ((cmod->cmod_flags & CMOD_NOAUTOCMD) && cmod->cmod_save_ei == NULL)
+    ಆದರೆ ((cmod->cmod_flags & CMOD_NOAUTOCMD) && cmod->cmod_save_ei == ಖಾಲಿ)
     {
 	// Set 'eventignore' to "all".
 	// First save the existing option value for restoring it later.
 	cmod->cmod_save_ei = vim_strsave(p_ei);
-	set_string_option_direct((char_u *)"ei", -1,
+	ಗಣ_string_option_ನೇರ((char_u *)"ei", -1,
 					  (char_u *)"all", OPT_FREE, SID_NONE);
     }
 }
@@ -3398,53 +3398,53 @@ apply_cmdmod(cmdmod_T *cmod)
 /*
  * Undo and free contents of "cmod".
  */
-    void
+    ಶೂನ್ಯ
 undo_cmdmod(cmdmod_T *cmod)
 {
-    if (cmod->cmod_verbose_save > 0)
+    ಆದರೆ (cmod->cmod_verbose_save > 0)
     {
 	p_verbose = cmod->cmod_verbose_save - 1;
 	cmod->cmod_verbose_save = 0;
     }
 
-#ifdef HAVE_SANDBOX
-    if (cmod->cmod_did_sandbox)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_SANDBOX
+    ಆದರೆ (cmod->cmod_did_sandbox)
     {
 	--sandbox;
 	cmod->cmod_did_sandbox = FALSE;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (cmod->cmod_save_ei != NULL)
+    ಆದರೆ (cmod->cmod_save_ei != ಖಾಲಿ)
     {
 	// Restore 'eventignore' to the value before ":noautocmd".
-	set_string_option_direct((char_u *)"ei", -1, cmod->cmod_save_ei,
+	ಗಣ_string_option_ನೇರ((char_u *)"ei", -1, cmod->cmod_save_ei,
 							   OPT_FREE, SID_NONE);
 	free_string_option(cmod->cmod_save_ei);
-	cmod->cmod_save_ei = NULL;
+	cmod->cmod_save_ei = ಖಾಲಿ;
     }
 
     vim_regfree(cmod->cmod_filter_regmatch.regprog);
 
-    if (cmod->cmod_save_msg_silent > 0)
+    ಆದರೆ (cmod->cmod_save_ಸಂದೇಶ_silent > 0)
     {
 	// messages could be enabled for a serious error, need to check if the
 	// counters don't become negative
-	if (!did_emsg || msg_silent > cmod->cmod_save_msg_silent - 1)
-	    msg_silent = cmod->cmod_save_msg_silent - 1;
+	ಆದರೆ (!did_emsg || ಸಂದೇಶ_silent > cmod->cmod_save_ಸಂದೇಶ_silent - 1)
+	    ಸಂದೇಶ_silent = cmod->cmod_save_ಸಂದೇಶ_silent - 1;
 	emsg_silent -= cmod->cmod_did_esilent;
-	if (emsg_silent < 0)
+	ಆದರೆ (emsg_silent < 0)
 	    emsg_silent = 0;
 	// Restore msg_scroll, it's set by file I/O commands, even when no
 	// message is actually displayed.
-	msg_scroll = cmod->cmod_save_msg_scroll;
+	ಸಂದೇಶ_scroll = cmod->cmod_save_ಸಂದೇಶ_scroll;
 
 	// "silent reg" or "silent echo x" inside "redir" leaves msg_col
 	// somewhere in the line.  Put it back in the first column.
-	if (redirecting())
-	    msg_col = 0;
+	ಆದರೆ (redirecting())
+	    ಸಂದೇಶ_ಲಂಬಸಾಲು = 0;
 
-	cmod->cmod_save_msg_silent = 0;
+	cmod->cmod_save_ಸಂದೇಶ_silent = 0;
 	cmod->cmod_did_esilent = 0;
     }
 }
@@ -3454,132 +3454,132 @@ undo_cmdmod(cmdmod_T *cmod)
  * May set the last search pattern, unless "silent" is TRUE.
  * Return FAIL and set "errormsg" or return OK.
  */
-    int
-parse_cmd_address(exarg_T *eap, char **errormsg, int silent)
+    ಪೂರ್ಣಾಂಕ
+parse_cmd_ವಿಳಾಸ(exarg_T *eap, ಅಕ್ಷರ **errormsg, ಪೂರ್ಣಾಂಕ silent)
 {
-    int		address_count = 1;
+    ಪೂರ್ಣಾಂಕ		ವಿಳಾಸ_ಎಣಿಕೆ = 1;
     linenr_T	lnum;
-    int		need_check_cursor = FALSE;
-    int		ret = FAIL;
+    ಪೂರ್ಣಾಂಕ		need_check_cursor = FALSE;
+    ಪೂರ್ಣಾಂಕ		ret = FAIL;
 
     // Repeat for all ',' or ';' separated addresses.
-    for (;;)
+    ಗಾಗಿ (;;)
     {
 	eap->line1 = eap->line2;
-	eap->line2 = default_address(eap);
+	eap->line2 = default_ವಿಳಾಸ(eap);
 	eap->cmd = skipwhite(eap->cmd);
-	lnum = get_address(eap, &eap->cmd, eap->addr_type, eap->skip, silent,
-					eap->addr_count == 0, address_count++);
-	if (eap->cmd == NULL)	// error detected
-	    goto theend;
-	if (lnum == MAXLNUM)
+	lnum = get_ವಿಳಾಸ(eap, &eap->cmd, eap->addr_type, eap->skip, silent,
+					eap->addr_ಎಣಿಕೆ == 0, ವಿಳಾಸ_ಎಣಿಕೆ++);
+	ಆದರೆ (eap->cmd == ಖಾಲಿ)	// error detected
+	    ಹೋಗು theend;
+	ಆದರೆ (lnum == MAXLNUM)
 	{
-	    if (*eap->cmd == '%')   // '%' - all lines
+	    ಆದರೆ (*eap->cmd == '%')   // '%' - all lines
 	    {
 		++eap->cmd;
-		switch (eap->addr_type)
+		ಆಯ್ಕೆ (eap->addr_type)
 		{
-		    case ADDR_LINES:
-		    case ADDR_OTHER:
+		    ಸ್ಥಿತಿ ADDR_ಸಾಲುಗಳು:
+		    ಸ್ಥಿತಿ ADDR_OTHER:
 			eap->line1 = 1;
-			eap->line2 = curbuf->b_ml.ml_line_count;
-			break;
-		    case ADDR_LOADED_BUFFERS:
+			eap->line2 = curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ ADDR_LOADED_BUFFERS:
 			{
 			    buf_T	*buf = firstbuf;
 
-			    while (buf->b_next != NULL
-						  && buf->b_ml.ml_mfp == NULL)
-				buf = buf->b_next;
+			    ಆಗ (buf->b_ಮುಂದಿನ != ಖಾಲಿ
+						  && buf->b_ml.ml_mfp == ಖಾಲಿ)
+				buf = buf->b_ಮುಂದಿನ;
 			    eap->line1 = buf->b_fnum;
 			    buf = lastbuf;
-			    while (buf->b_prev != NULL
-						  && buf->b_ml.ml_mfp == NULL)
+			    ಆಗ (buf->b_prev != ಖಾಲಿ
+						  && buf->b_ml.ml_mfp == ಖಾಲಿ)
 				buf = buf->b_prev;
 			    eap->line2 = buf->b_fnum;
-			    break;
+			    ನಿಲ್ಲಿಸು;
 			}
-		    case ADDR_BUFFERS:
+		    ಸ್ಥಿತಿ ADDR_BUFFERS:
 			eap->line1 = firstbuf->b_fnum;
 			eap->line2 = lastbuf->b_fnum;
-			break;
-		    case ADDR_WINDOWS:
-		    case ADDR_TABS:
-			if (IS_USER_CMDIDX(eap->cmdidx))
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ ADDR_WINDOWS:
+		    ಸ್ಥಿತಿ ADDR_TABS:
+			ಆದರೆ (IS_USER_CMDIDX(eap->cmdidx))
 			{
 			    eap->line1 = 1;
 			    eap->line2 = eap->addr_type == ADDR_WINDOWS
-						  ? LAST_WIN_NR : LAST_TAB_NR;
+						  ? ಕೊನೆಯ_WIN_NR : ಕೊನೆಯ_TAB_NR;
 			}
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
 			    // there is no Vim command which uses '%' and
 			    // ADDR_WINDOWS or ADDR_TABS
 			    *errormsg = _(e_invalid_range);
-			    goto theend;
+			    ಹೋಗು theend;
 			}
-			break;
-		    case ADDR_TABS_RELATIVE:
-		    case ADDR_UNSIGNED:
-		    case ADDR_QUICKFIX:
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ ADDR_TABS_RELATIVE:
+		    ಸ್ಥಿತಿ ADDR_UNSIGNED:
+		    ಸ್ಥಿತಿ ADDR_QUICKFIX:
 			*errormsg = _(e_invalid_range);
-			goto theend;
-		    case ADDR_ARGUMENTS:
-			if (ARGCOUNT == 0)
+			ಹೋಗು theend;
+		    ಸ್ಥಿತಿ ADDR_ARGUMENTS:
+			ಆದರೆ (ARGCOUNT == 0)
 			    eap->line1 = eap->line2 = 0;
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
 			    eap->line1 = 1;
 			    eap->line2 = ARGCOUNT;
 			}
-			break;
-		    case ADDR_QUICKFIX_VALID:
-#ifdef FEAT_QUICKFIX
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ ADDR_QUICKFIX_VALID:
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
 			eap->line1 = 1;
-			eap->line2 = qf_get_valid_size(eap);
-			if (eap->line2 == 0)
+			eap->line2 = qf_get_valid_ಗಾತ್ರ(eap);
+			ಆದರೆ (eap->line2 == 0)
 			    eap->line2 = 1;
-#endif
-			break;
-		    case ADDR_NONE:
+#ಆದರೆ_ಅಂತ್ಯ
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ ADDR_NONE:
 			// Will give an error later if a range is found.
-			break;
+			ನಿಲ್ಲಿಸು;
 		}
-		++eap->addr_count;
+		++eap->addr_ಎಣಿಕೆ;
 	    }
-	    else if (*eap->cmd == '*' && vim_strchr(p_cpo, CPO_STAR) == NULL)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*eap->cmd == '*' && vim_strchr(p_cpo, CPO_ನಕ್ಷತ್ರ) == ಖಾಲಿ)
 	    {
 		pos_T	    *fp;
 
 		// '*' - visual area
-		if (eap->addr_type != ADDR_LINES)
+		ಆದರೆ (eap->addr_type != ADDR_ಸಾಲುಗಳು)
 		{
 		    *errormsg = _(e_invalid_range);
-		    goto theend;
+		    ಹೋಗು theend;
 		}
 
 		++eap->cmd;
-		if (!eap->skip)
+		ಆದರೆ (!eap->skip)
 		{
 		    fp = getmark('<', FALSE);
-		    if (check_mark(fp) == FAIL)
-			goto theend;
+		    ಆದರೆ (check_mark(fp) == FAIL)
+			ಹೋಗು theend;
 		    eap->line1 = fp->lnum;
 		    fp = getmark('>', FALSE);
-		    if (check_mark(fp) == FAIL)
-			goto theend;
+		    ಆದರೆ (check_mark(fp) == FAIL)
+			ಹೋಗು theend;
 		    eap->line2 = fp->lnum;
-		    ++eap->addr_count;
+		    ++eap->addr_ಎಣಿಕೆ;
 		}
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    eap->line2 = lnum;
-	eap->addr_count++;
+	eap->addr_ಎಣಿಕೆ++;
 
-	if (*eap->cmd == ';')
+	ಆದರೆ (*eap->cmd == ';')
 	{
-	    if (!eap->skip)
+	    ಆದರೆ (!eap->skip)
 	    {
 		curwin->w_cursor.lnum = eap->line2;
 
@@ -3587,32 +3587,32 @@ parse_cmd_address(exarg_T *eap, char **errormsg, int silent)
 		// accept zero as address, so 0;/PATTERN/ works correctly
 		// (where zero usually means to use the first line).
 		// Check the cursor position before returning.
-		if (eap->line2 > 0)
+		ಆದರೆ (eap->line2 > 0)
 		    check_cursor();
-		else
-		    check_cursor_col();
+		ಇಲ್ಲದಿದ್ದರೆ
+		    check_cursor_ಲಂಬಸಾಲು();
 		need_check_cursor = TRUE;
 	    }
 	}
-	else if (*eap->cmd != ',')
-	    break;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*eap->cmd != ',')
+	    ನಿಲ್ಲಿಸು;
 	++eap->cmd;
     }
 
     // One address given: set start and end lines.
-    if (eap->addr_count == 1)
+    ಆದರೆ (eap->addr_ಎಣಿಕೆ == 1)
     {
 	eap->line1 = eap->line2;
 	// ... but only implicit: really no address given
-	if (lnum == MAXLNUM)
-	    eap->addr_count = 0;
+	ಆದರೆ (lnum == MAXLNUM)
+	    eap->addr_ಎಣಿಕೆ = 0;
     }
     ret = OK;
 
 theend:
-    if (need_check_cursor)
+    ಆದರೆ (need_check_cursor)
 	check_cursor();
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
 /*
@@ -3620,60 +3620,60 @@ theend:
  * Takes care of limiting the length and handling 0xa0, which would be
  * invisible otherwise.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 append_command(char_u *cmd)
 {
     size_t  len = STRLEN(IObuff);
     char_u  *s = cmd;
     char_u  *d;
 
-    if (len > IOSIZE - 100)
+    ಆದರೆ (len > IOSIZE - 100)
     {
 	// Not enough space, truncate and put in "...".
 	d = IObuff + IOSIZE - 100;
-	d -= mb_head_off(IObuff, d);
+	d -= mb_ತಲೆ_off(IObuff, d);
 	STRCPY(d, "...");
     }
     STRCAT(IObuff, ": ");
     d = IObuff + STRLEN(IObuff);
-    while (*s != NUL && d - IObuff + 5 < IOSIZE)
+    ಆಗ (*s != NUL && d - IObuff + 5 < IOSIZE)
     {
-	if (enc_utf8 ? (s[0] == 0xc2 && s[1] == 0xa0) : *s == 0xa0)
+	ಆದರೆ (enc_utf8 ? (s[0] == 0xc2 && s[1] == 0xa0) : *s == 0xa0)
 	{
 	    s += enc_utf8 ? 2 : 1;
 	    STRCPY(d, "<a0>");
 	    d += 4;
 	}
-	else if (d - IObuff + (*mb_ptr2len)(s) + 1 >= IOSIZE)
-	    break;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (d - IObuff + (*mb_ptr2len)(s) + 1 >= IOSIZE)
+	    ನಿಲ್ಲಿಸು;
+	ಇಲ್ಲದಿದ್ದರೆ
 	    MB_COPY_CHAR(s, d);
     }
     *d = NUL;
 }
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * If "start" points "&opt", "&l:opt", "&g:opt" or "$ENV" return a pointer to
  * the name.  Otherwise just return "start".
  */
     char_u *
-skip_option_env_lead(char_u *start)
+skip_option_env_lead(char_u *ಆರಂಭ)
 {
-    char_u *name = start;
+    char_u *name = ಆರಂಭ;
 
-    if (*start == '&')
+    ಆದರೆ (*ಆರಂಭ == '&')
     {
-	if ((start[1] == 'l' || start[1] == 'g') && start[2] == ':')
+	ಆದರೆ ((ಆರಂಭ[1] == 'l' || ಆರಂಭ[1] == 'g') && ಆರಂಭ[2] == ':')
 	    name += 3;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    name += 1;
     }
-    else if (*start == '$')
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*ಆರಂಭ == '$')
 	name += 1;
-    return name;
+    ಹಿಂತಿರುಗಿ name;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Return TRUE and set "*idx" if "p" points to a one letter command.
@@ -3685,18 +3685,18 @@ skip_option_env_lead(char_u *start)
  *	    but :sre[wind] is another command, as are :scr[iptnames],
  *	    :scs[cope], :sim[alt], :sig[ns] and :sil[ent].
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 one_letter_cmd(char_u *p, cmdidx_T *idx)
 {
-    if (in_vim9script())
-	return FALSE;
-    if (p[0] == 'k'
+    ಆದರೆ (ಒಳ_vim9script())
+	ಹಿಂತಿರುಗಿ FALSE;
+    ಆದರೆ (p[0] == 'k'
 	    && (p[1] != 'e' || (p[1] == 'e' && p[2] != 'e')))
     {
 	*idx = CMD_k;
-	return TRUE;
+	ಹಿಂತಿರುಗಿ TRUE;
     }
-    if (p[0] == 's'
+    ಆದರೆ (p[0] == 's'
 	    && ((p[1] == 'c' && (p[2] == NUL || (p[2] != 's' && p[2] != 'r'
 			&& (p[3] == NUL || (p[3] != 'i' && p[4] != 'p')))))
 		|| p[1] == 'g'
@@ -3705,24 +3705,24 @@ one_letter_cmd(char_u *p, cmdidx_T *idx)
 		|| (p[1] == 'r' && p[2] != 'e')))
     {
 	*idx = CMD_substitute;
-	return TRUE;
+	ಹಿಂತಿರುಗಿ TRUE;
     }
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * Return TRUE if "cmd" starts with "123->", a number followed by a method
  * call.
  */
-    int
-number_method(char_u *cmd)
+    ಪೂರ್ಣಾಂಕ
+ಸಂಖ್ಯೆ_ವಿಧಾನ(char_u *cmd)
 {
     char_u *p = skipdigits(cmd);
 
-    return p > cmd && (p = skipwhite(p))[0] == '-' && p[1] == '>';
+    ಹಿಂತಿರುಗಿ p > cmd && (p = skipwhite(p))[0] == '-' && p[1] == '>';
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Find an Ex command by its name, either built-in or user.
@@ -3737,78 +3737,78 @@ number_method(char_u *cmd)
  * Returns NULL for an ambiguous user command.
  */
     char_u *
-find_ex_command(
+ಕಂಡುಹಿಡಿ_ex_command(
 	exarg_T *eap,
-	int	*full UNUSED,
-	int	(*lookup)(char_u *, size_t, int cmd, cctx_T *) UNUSED,
-	cctx_T	*cctx UNUSED)
+	ಪೂರ್ಣಾಂಕ	*ತುಂಬಿದ ಬಳಸದ,
+	ಪೂರ್ಣಾಂಕ	(*lookup)(char_u *, size_t, ಪೂರ್ಣಾಂಕ cmd, cctx_T *) ಬಳಸದ,
+	cctx_T	*cctx ಬಳಸದ)
 {
-    int		len;
+    ಪೂರ್ಣಾಂಕ		len;
     char_u	*p;
-    int		i;
-#ifndef FEAT_EVAL
-    int		vim9 = FALSE;
-#else
-    int		vim9 = in_vim9script();
+    ಪೂರ್ಣಾಂಕ		i;
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_EVAL
+    ಪೂರ್ಣಾಂಕ		vim9 = FALSE;
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಪೂರ್ಣಾಂಕ		vim9 = ಒಳ_vim9script();
 
     /*
      * Recognize a Vim9 script function/method call and assignment:
      * "lvar = value", "lvar(arg)", "[1, 2 3]->Func()"
      */
     p = eap->cmd;
-    if (lookup != NULL)
+    ಆದರೆ (lookup != ಖಾಲಿ)
     {
 	char_u *pskip = skip_option_env_lead(eap->cmd);
 
-	if (vim_strchr((char_u *)"{('[\"@&$", *p) != NULL
-	       || ((p = to_name_const_end(pskip)) > eap->cmd && *p != NUL)
+	ಆದರೆ (vim_strchr((char_u *)"{('[\"@&$", *p) != ಖಾಲಿ
+	       || ((p = ಗಮ್ಯ_name_const_ಕೊನೆ(pskip)) > eap->cmd && *p != NUL)
 	       || (p[0] == '0' && p[1] == 'z'))
 	{
-	    int	    oplen;
-	    int	    heredoc;
+	    ಪೂರ್ಣಾಂಕ	    oplen;
+	    ಪೂರ್ಣಾಂಕ	    heredoc;
 	    char_u  *swp;
 
-	    if (*eap->cmd == '&'
+	    ಆದರೆ (*eap->cmd == '&'
 		    || (eap->cmd[0] == '$'
 				  && eap->cmd[1] != '\'' && eap->cmd[1] != '"')
 		    || (eap->cmd[0] == '@'
 					&& (valid_yank_reg(eap->cmd[1], FALSE)
 						       || eap->cmd[1] == '@')))
 	    {
-		if (*eap->cmd == '&')
+		ಆದರೆ (*eap->cmd == '&')
 		{
 		    p = eap->cmd + 1;
-		    if (STRNCMP("l:", p, 2) == 0 || STRNCMP("g:", p, 2) == 0)
+		    ಆದರೆ (STRNCMP("l:", p, 2) == 0 || STRNCMP("g:", p, 2) == 0)
 			p += 2;
-		    p = to_name_end(p, FALSE);
+		    p = ಗಮ್ಯ_name_ಕೊನೆ(p, FALSE);
 		}
-		else if (*eap->cmd == '$')
-		    p = to_name_end(eap->cmd + 1, FALSE);
-		else
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*eap->cmd == '$')
+		    p = ಗಮ್ಯ_name_ಕೊನೆ(eap->cmd + 1, FALSE);
+		ಇಲ್ಲದಿದ್ದರೆ
 		    p = eap->cmd + 2;
-		if (ends_excmd(*skipwhite(p)))
+		ಆದರೆ (ತುದಿಗಳು_excmd(*skipwhite(p)))
 		{
 		    // "&option <NL>", "$ENV <NL>" and "@r <NL>" are the start
 		    // of an expression.
 		    eap->cmdidx = CMD_eval;
-		    return eap->cmd;
+		    ಹಿಂತಿರುಗಿ eap->cmd;
 		}
 		// "&option" can be followed by "->" or "=", check below
 	    }
 
-	    if (vim9 && *p == '<')
+	    ಆದರೆ (vim9 && *p == '<')
 	    {
 		// generic function type args
-		if (skip_generic_func_type_args(&p) == FAIL)
+		ಆದರೆ (skip_generic_func_type_ವಾದಗಳು(&p) == FAIL)
 		{
-		    eap->cmdidx = CMD_SIZE;
-		    return p;
+		    eap->cmdidx = CMD_ಗಾತ್ರ;
+		    ಹಿಂತಿರುಗಿ p;
 		}
 	    }
 
 	    swp = skipwhite(p);
 
-	    if (
+	    ಆದರೆ (
 		// "(..." is an expression.
 		// "funcname(" is always a function call.
 		*p == '('
@@ -3832,17 +3832,17 @@ find_ex_command(
 			    // "varname->func()" is an expression.
 			: (*swp == '-' && swp[1] == '>')))
 	    {
-		if (*eap->cmd == '{' && ends_excmd(*skipwhite(eap->cmd + 1)))
+		ಆದರೆ (*eap->cmd == '{' && ತುದಿಗಳು_excmd(*skipwhite(eap->cmd + 1)))
 		{
 		    // "{" by itself is the start of a block.
-		    eap->cmdidx = CMD_block;
-		    return eap->cmd + 1;
+		    eap->cmdidx = CMD_ಖಂಡ;
+		    ಹಿಂತಿರುಗಿ eap->cmd + 1;
 		}
 		eap->cmdidx = CMD_eval;
-		return eap->cmd;
+		ಹಿಂತಿರುಗಿ eap->cmd;
 	    }
 
-	    if ((p != eap->cmd && (
+	    ಆದರೆ ((p != eap->cmd && (
 			    // "varname[]" is an expression.
 			    *p == '['
 			    // "varname.key" is an expression.
@@ -3862,16 +3862,16 @@ find_ex_command(
 		//	etc.
 		eap->cmdidx = CMD_eval;
 		++emsg_off;
-		if (skip_expr(&after, NULL) == OK)
+		ಆದರೆ (skip_ಅಭಿವ್ಯಕ್ತಿ(&after, ಖಾಲಿ) == OK)
 		{
 		    after = skipwhite(after);
-		    if (*after == '=' || (*after != NUL && after[1] == '=')
+		    ಆದರೆ (*after == '=' || (*after != NUL && after[1] == '=')
 					 || (after[0] == '.' && after[1] == '.'
 							   && after[2] == '='))
 			eap->cmdidx = CMD_var;
 		}
 		--emsg_off;
-		return eap->cmd;
+		ಹಿಂತಿರುಗಿ eap->cmd;
 	    }
 
 	    // "[...]->Method()" is a list expression, but "[a, b] = Func()" is
@@ -3881,38 +3881,38 @@ find_ex_command(
 	    // follows.
 	    // If "[...]" has a line break "p" still points at the "[" and it
 	    // can't be an assignment.
-	    if (*eap->cmd == '[')
+	    ಆದರೆ (*eap->cmd == '[')
 	    {
 		char_u	    *eq;
 
-		p = to_name_const_end(eap->cmd);
-		if (p == eap->cmd && *p == '[')
+		p = ಗಮ್ಯ_name_const_ಕೊನೆ(eap->cmd);
+		ಆದರೆ (p == eap->cmd && *p == '[')
 		{
-		    int count = 0;
-		    int	semicolon = FALSE;
+		    ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_2 = 0;
+		    ಪೂರ್ಣಾಂಕ	semicolon = FALSE;
 
-		    p = skip_var_list(eap->cmd, TRUE, &count, &semicolon, TRUE);
+		    p = skip_var_list(eap->cmd, TRUE, &ಎಣಿಕೆ_2, &semicolon, TRUE);
 		}
 		eq = p;
-		if (eq != NULL)
+		ಆದರೆ (eq != ಖಾಲಿ)
 		{
 		    eq = skipwhite(eq);
-		    if (vim_strchr((char_u *)"+-*/%.", *eq) != NULL)
+		    ಆದರೆ (vim_strchr((char_u *)"+-*/%.", *eq) != ಖಾಲಿ)
 		    {
-			if (eq[0] == '.' && eq[1] == '.')
+			ಆದರೆ (eq[0] == '.' && eq[1] == '.')
 			    ++eq;
 			++eq;
 		    }
 		}
-		if (p == NULL || p == eap->cmd || *eq != '=')
+		ಆದರೆ (p == ಖಾಲಿ || p == eap->cmd || *eq != '=')
 		{
 		    eap->cmdidx = CMD_eval;
-		    return eap->cmd;
+		    ಹಿಂತಿರುಗಿ eap->cmd;
 		}
-		if (p > eap->cmd && *eq == '=')
+		ಆದರೆ (p > eap->cmd && *eq == '=')
 		{
 		    eap->cmdidx = CMD_var;
-		    return eap->cmd;
+		    ಹಿಂತಿರುಗಿ eap->cmd;
 		}
 	    }
 
@@ -3924,9 +3924,9 @@ find_ex_command(
 	    // (variable declaration might have been skipped).
 	    // Not "redir => var" (when skipping).
 	    oplen = assignment_len(skipwhite(p), &heredoc);
-	    if (oplen > 0)
+	    ಆದರೆ (oplen > 0)
 	    {
-		if (((p - eap->cmd) > 2 && eap->cmd[1] == ':')
+		ಆದರೆ (((p - eap->cmd) > 2 && eap->cmd[1] == ':')
 			|| *eap->cmd == '&'
 			|| *eap->cmd == '$'
 			|| *eap->cmd == '@'
@@ -3935,186 +3935,186 @@ find_ex_command(
 			|| lookup(eap->cmd, p - eap->cmd, TRUE, cctx) == OK)
 		{
 		    eap->cmdidx = CMD_var;
-		    return eap->cmd;
+		    ಹಿಂತಿರುಗಿ eap->cmd;
 		}
 	    }
 
 	    // Recognize trying to use a type for a w:, b:, t: or g: variable:
 	    // "w:varname: number = 123".
-	    if (eap->cmd[1] == ':' && *p == ':')
+	    ಆದರೆ (eap->cmd[1] == ':' && *p == ':')
 	    {
 		eap->cmdidx = CMD_var;
-		return eap->cmd;
+		ಹಿಂತಿರುಗಿ eap->cmd;
 	    }
 	}
 
 	// 1234->func() is a method call
-	if (number_method(eap->cmd))
+	ಆದರೆ (ಸಂಖ್ಯೆ_ವಿಧಾನ(eap->cmd))
 	{
 	    eap->cmdidx = CMD_eval;
-	    return eap->cmd;
+	    ಹಿಂತಿರುಗಿ eap->cmd;
 	}
 
 	// "g:", "s:" and "l:" are always assumed to be a variable, thus start
 	// an expression.  A global/substitute/list command needs to use a
 	// longer name.
-	if (vim_strchr((char_u *)"gsl", *p) != NULL && p[1] == ':')
+	ಆದರೆ (vim_strchr((char_u *)"gsl", *p) != ಖಾಲಿ && p[1] == ':')
 	{
 	    eap->cmdidx = CMD_eval;
-	    return eap->cmd;
+	    ಹಿಂತಿರುಗಿ eap->cmd;
 	}
 
 	// If it is an ID it might be a variable with an operator on the next
 	// line, if the variable exists it can't be an Ex command.
-	if (p > eap->cmd && ends_excmd(*skipwhite(p))
+	ಆದರೆ (p > eap->cmd && ತುದಿಗಳು_excmd(*skipwhite(p))
 		&& (lookup(eap->cmd, p - eap->cmd, TRUE, cctx) == OK
 		    || (ASCII_ISALPHA(eap->cmd[0]) && eap->cmd[1] == ':')))
 	{
 	    eap->cmdidx = CMD_eval;
-	    return eap->cmd;
+	    ಹಿಂತಿರುಗಿ eap->cmd;
 	}
 
 	// Check for "++nr" and "--nr".
-	if (p == eap->cmd && p[0] != NUL && p[0] == p[1]
+	ಆದರೆ (p == eap->cmd && p[0] != NUL && p[0] == p[1]
 						   && (*p == '+' || *p == '-'))
 	{
 	    eap->cmdidx = *p == '+' ? CMD_increment : CMD_decrement;
-	    return eap->cmd + 2;
+	    ಹಿಂತಿರುಗಿ eap->cmd + 2;
 	}
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     /*
      * Isolate the command and search for it in the command table.
      */
     p = eap->cmd;
-    if (one_letter_cmd(p, &eap->cmdidx))
+    ಆದರೆ (one_letter_cmd(p, &eap->cmdidx))
     {
 	++p;
-	if (full != NULL)
-	    *full = TRUE;
+	ಆದರೆ (ತುಂಬಿದ != ಖಾಲಿ)
+	    *ತುಂಬಿದ = TRUE;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	while (ASCII_ISALPHA(*p))
+	ಆಗ (ASCII_ISALPHA(*p))
 	    ++p;
 	// for python 3.x support ":py3", ":python3", ":py3file", etc.
-	if (eap->cmd[0] == 'p' && eap->cmd[1] == 'y')
+	ಆದರೆ (eap->cmd[0] == 'p' && eap->cmd[1] == 'y')
 	{
-	    while (ASCII_ISALNUM(*p))
+	    ಆಗ (ASCII_ISALNUM(*p))
 		++p;
 	}
-	else if (*p == '9' && STRNCMP("vim9", eap->cmd, 4) == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*p == '9' && STRNCMP("vim9", eap->cmd, 4) == 0)
 	{
 	    // include "9" for "vim9*" commands; "vim9cmd" and "vim9script".
 	    ++p;
-	    while (ASCII_ISALPHA(*p))
+	    ಆಗ (ASCII_ISALPHA(*p))
 		++p;
 	}
 
 	// check for non-alpha command
-	if (p == eap->cmd && vim_strchr((char_u *)"@*!=><&~#}", *p) != NULL)
+	ಆದರೆ (p == eap->cmd && vim_strchr((char_u *)"@*!=><&~#}", *p) != ಖಾಲಿ)
 	    ++p;
-	len = (int)(p - eap->cmd);
+	len = (ಪೂರ್ಣಾಂಕ)(p - eap->cmd);
 	// The "d" command can directly be followed by 'l' or 'p' flag, when
 	// not in Vim9 script.
-	if (!vim9 && *eap->cmd == 'd' && (p[-1] == 'l' || p[-1] == 'p'))
+	ಆದರೆ (!vim9 && *eap->cmd == 'd' && (p[-1] == 'l' || p[-1] == 'p'))
 	{
 	    // Check for ":dl", ":dell", etc. to ":deletel": that's
 	    // :delete with the 'l' flag.  Same for 'p'.
-	    for (i = 0; i < len; ++i)
-		if (eap->cmd[i] != ((char_u *)"delete")[i])
-		    break;
-	    if (i == len - 1)
+	    ಗಾಗಿ (i = 0; i < len; ++i)
+		ಆದರೆ (eap->cmd[i] != ((char_u *)"delete")[i])
+		    ನಿಲ್ಲಿಸು;
+	    ಆದರೆ (i == len - 1)
 	    {
 		--len;
-		if (p[-1] == 'l')
+		ಆದರೆ (p[-1] == 'l')
 		    eap->flags |= EXFLAG_LIST;
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		    eap->flags |= EXFLAG_PRINT;
 	    }
 	}
 
-	if (ASCII_ISLOWER(eap->cmd[0]))
+	ಆದರೆ (ASCII_ISLOWER(eap->cmd[0]))
 	{
-	    int c1 = eap->cmd[0];
-	    int c2 = len == 1 ? NUL : eap->cmd[1];
+	    ಪೂರ್ಣಾಂಕ c1 = eap->cmd[0];
+	    ಪೂರ್ಣಾಂಕ c2 = len == 1 ? NUL : eap->cmd[1];
 
-	    if (command_count != (int)CMD_SIZE)
+	    ಆದರೆ (command_ಎಣಿಕೆ != (ಪೂರ್ಣಾಂಕ)CMD_ಗಾತ್ರ)
 	    {
-		iemsg(e_command_table_needs_to_be_updated_run_make_cmdidxs);
+		iemsg(e_command_ಕೋಷ್ಟಕ_needs_ಗಮ್ಯ_be_updated_ಸತತ_make_cmdidxs);
 		getout(1);
 	    }
 
 	    // Use a precomputed index for fast look-up in cmdnames[]
 	    // taking into account the first 2 letters of eap->cmd.
-	    eap->cmdidx = cmdidxs1[CharOrdLow(c1)];
-	    if (ASCII_ISLOWER(c2))
-		eap->cmdidx += cmdidxs2[CharOrdLow(c1)][CharOrdLow(c2)];
+	    eap->cmdidx = cmdidxs1[Char_Ord_ಕೆಳಗಿನ(c1)];
+	    ಆದರೆ (ASCII_ISLOWER(c2))
+		eap->cmdidx += cmdidxs2[Char_Ord_ಕೆಳಗಿನ(c1)][Char_Ord_ಕೆಳಗಿನ(c2)];
 	}
-	else if (ASCII_ISUPPER(eap->cmd[0]))
-	    eap->cmdidx = CMD_Next;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ASCII_ISUPPER(eap->cmd[0]))
+	    eap->cmdidx = CMD_ಮುಂದಿನ_3;
+	ಇಲ್ಲದಿದ್ದರೆ
 	    eap->cmdidx = CMD_bang;
 
-	for ( ; (int)eap->cmdidx < (int)CMD_SIZE;
-			       eap->cmdidx = (cmdidx_T)((int)eap->cmdidx + 1))
-	    if (STRNCMP(cmdnames[(int)eap->cmdidx].cmd_name, (char *)eap->cmd,
+	ಗಾಗಿ ( ; (ಪೂರ್ಣಾಂಕ)eap->cmdidx < (ಪೂರ್ಣಾಂಕ)CMD_ಗಾತ್ರ;
+			       eap->cmdidx = (cmdidx_T)((ಪೂರ್ಣಾಂಕ)eap->cmdidx + 1))
+	    ಆದರೆ (STRNCMP(cmdnames[(ಪೂರ್ಣಾಂಕ)eap->cmdidx].cmd_name, (ಅಕ್ಷರ *)eap->cmd,
 							    (size_t)len) == 0)
 	    {
-#ifdef FEAT_EVAL
-		if (full != NULL && cmdnames[eap->cmdidx].cmd_name[len] == NUL)
-		    *full = TRUE;
-#endif
-		break;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+		ಆದರೆ (ತುಂಬಿದ != ಖಾಲಿ && cmdnames[eap->cmdidx].cmd_name[len] == NUL)
+		    *ತುಂಬಿದ = TRUE;
+#ಆದರೆ_ಅಂತ್ಯ
+		ನಿಲ್ಲಿಸು;
 	    }
 
 	// :Print and :mode are not supported in Vim9 script.
 	// Some commands cannot be shortened in Vim9 script.
-	if (vim9 && eap->cmdidx != CMD_SIZE)
+	ಆದರೆ (vim9 && eap->cmdidx != CMD_ಗಾತ್ರ)
 	{
-	    if (eap->cmdidx == CMD_mode || eap->cmdidx == CMD_Print)
-		eap->cmdidx = CMD_SIZE;
-	    else if ((cmdnames[eap->cmdidx].cmd_argt & EX_WHOLE)
-			  && len < (int)cmdnames[eap->cmdidx].cmd_namelen)
+	    ಆದರೆ (eap->cmdidx == CMD_ಬಹುಲಕ || eap->cmdidx == CMD_Print)
+		eap->cmdidx = CMD_ಗಾತ್ರ;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((cmdnames[eap->cmdidx].cmd_argt & EX_ಸಂಪೂರ್ಣ)
+			  && len < (ಪೂರ್ಣಾಂಕ)cmdnames[eap->cmdidx].cmd_namelen)
 	    {
 		semsg(_(e_command_cannot_be_shortened_str), eap->cmd);
-		eap->cmdidx = CMD_SIZE;
+		eap->cmdidx = CMD_ಗಾತ್ರ;
 	    }
 	}
 
 	// Do not recognize ":*" as the star command unless '*' is in
 	// 'cpoptions'.
-	if (eap->cmdidx == CMD_star && vim_strchr(p_cpo, CPO_STAR) == NULL)
+	ಆದರೆ (eap->cmdidx == CMD_ನಕ್ಷತ್ರ && vim_strchr(p_cpo, CPO_ನಕ್ಷತ್ರ) == ಖಾಲಿ)
 	    p = eap->cmd;
 
 	// Look for a user defined command as a last resort.  Let ":Print" be
 	// overruled by a user defined command.
-	if ((eap->cmdidx == CMD_SIZE || eap->cmdidx == CMD_Print)
+	ಆದರೆ ((eap->cmdidx == CMD_ಗಾತ್ರ || eap->cmdidx == CMD_Print)
 		&& *eap->cmd >= 'A' && *eap->cmd <= 'Z')
 	{
 	    // User defined commands may contain digits.
-	    while (ASCII_ISALNUM(*p))
+	    ಆಗ (ASCII_ISALNUM(*p))
 		++p;
-	    p = find_ucmd(eap, p, full, NULL, NULL);
+	    p = ಕಂಡುಹಿಡಿ_ucmd(eap, p, ತುಂಬಿದ, ಖಾಲಿ, ಖಾಲಿ);
 	}
-	if (p == NULL || p == eap->cmd)
-	    eap->cmdidx = CMD_SIZE;
+	ಆದರೆ (p == ಖಾಲಿ || p == eap->cmd)
+	    eap->cmdidx = CMD_ಗಾತ್ರ;
     }
 
     // ":fina" means ":finally" in legacy script, for backwards compatibility.
-    if (eap->cmdidx == CMD_final && p - eap->cmd == 4 && !vim9)
+    ಆದರೆ (eap->cmdidx == CMD_final && p - eap->cmd == 4 && !vim9)
 	eap->cmdidx = CMD_finally;
 
      // Force ":ho" to be unresolved.  Without this, find_ex_command()
      // matches it to CMD_horizontal (the only "ho*" entry), which makes
      // fullcommand("ho") return "horizontal" even though ":ho" cannot be
      // used as the modifier (cmdmods[] requires 3 chars, "hor").
-    if (eap->cmdidx == CMD_horizontal && p - eap->cmd == 2)
-	eap->cmdidx = CMD_SIZE;
+    ಆದರೆ (eap->cmdidx == CMD_horizontal && p - eap->cmd == 2)
+	eap->cmdidx = CMD_ಗಾತ್ರ;
 
-#ifdef FEAT_EVAL
-    if (eap->cmdidx < CMD_SIZE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಆದರೆ (eap->cmdidx < CMD_ಗಾತ್ರ
 	    && vim9
 	    && !IS_WHITE_NL_OR_NUL(*p) && *p != '!' && *p != '|'
 	    && (eap->cmdidx < 0 ||
@@ -4123,7 +4123,7 @@ find_ex_command(
 	// A name that goes on with an underscore is not this command with an
 	// argument: "ch_log" is not ":change".  Leave it to be reported as an
 	// invalid command.
-	if (*p != '_')
+	ಆದರೆ (*p != '_')
 	{
 	    char_u *cmd = vim_strnsave(eap->cmd, p - eap->cmd);
 
@@ -4131,22 +4131,22 @@ find_ex_command(
 								    eap->cmd);
 	    vim_free(cmd);
 	}
-	eap->cmdidx = CMD_SIZE;
+	eap->cmdidx = CMD_ಗಾತ್ರ;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return p;
+    ಹಿಂತಿರುಗಿ p;
 }
 
-#if defined(FEAT_EVAL)
-typedef struct
+#ಆದರೆ defined(FEAT_EVAL)
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    char	*name;
-    int		minlen;
-    int		has_count;  // :123verbose  :3tab
+    ಅಕ್ಷರ	*name;
+    ಪೂರ್ಣಾಂಕ		minlen;
+    ಪೂರ್ಣಾಂಕ		has_ಎಣಿಕೆ;  // :123verbose  :3tab
 } cmdmod_info_T;
 
-static cmdmod_info_T cmdmod_info_tab[] = {
+ಸ್ಥಿರ cmdmod_info_T cmdmod_info_tab[] = {
     {"aboveleft", 3, FALSE},
     {"belowright", 3, FALSE},
     {"botright", 2, FALSE},
@@ -4179,28 +4179,28 @@ static cmdmod_info_T cmdmod_info_tab[] = {
  * Return length of a command modifier (including optional count).
  * Return zero when it's not a modifier.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 modifier_len(char_u *cmd)
 {
-    int		i, j;
+    ಪೂರ್ಣಾಂಕ		i, j;
     char_u	*p = cmd;
 
-    if (VIM_ISDIGIT(*cmd))
+    ಆದರೆ (VIM_ISDIGIT(*cmd))
 	p = skipwhite(skipdigits(cmd + 1));
-    for (i = 0; i < (int)ARRAY_LENGTH(cmdmod_info_tab); ++i)
+    ಗಾಗಿ (i = 0; i < (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(cmdmod_info_tab); ++i)
     {
 	// cmdmod_info_tab[] is sorted by name: once the first letter is past
 	// the command's first letter no later entry can match.
-	if (cmdmod_info_tab[i].name[0] > *p)
-	    break;
-	for (j = 0; p[j] != NUL; ++j)
-	    if (p[j] != cmdmod_info_tab[i].name[j])
-		break;
-	if (!ASCII_ISALPHA(p[j]) && j >= cmdmod_info_tab[i].minlen
-					&& (p == cmd || cmdmod_info_tab[i].has_count))
-	    return j + (int)(p - cmd);
+	ಆದರೆ (cmdmod_info_tab[i].name[0] > *p)
+	    ನಿಲ್ಲಿಸು;
+	ಗಾಗಿ (j = 0; p[j] != NUL; ++j)
+	    ಆದರೆ (p[j] != cmdmod_info_tab[i].name[j])
+		ನಿಲ್ಲಿಸು;
+	ಆದರೆ (!ASCII_ISALPHA(p[j]) && j >= cmdmod_info_tab[i].minlen
+					&& (p == cmd || cmdmod_info_tab[i].has_ಎಣಿಕೆ))
+	    ಹಿಂತಿರುಗಿ j + (ಪೂರ್ಣಾಂಕ)(p - cmd);
     }
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
 /*
@@ -4208,23 +4208,23 @@ modifier_len(char_u *cmd)
  * Return 2 if there is an exact match.
  * Return 3 if there is an ambiguous match.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 cmd_exists(char_u *name)
 {
     exarg_T	ea;
-    int		full = FALSE;
-    int		i;
-    int		j;
+    ಪೂರ್ಣಾಂಕ		ತುಂಬಿದ = FALSE;
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		j;
     char_u	*p;
 
     // Check command modifiers.
-    for (i = 0; i < (int)ARRAY_LENGTH(cmdmod_info_tab); ++i)
+    ಗಾಗಿ (i = 0; i < (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(cmdmod_info_tab); ++i)
     {
-	for (j = 0; name[j] != NUL; ++j)
-	    if (name[j] != cmdmod_info_tab[i].name[j])
-		break;
-	if (name[j] == NUL && j >= cmdmod_info_tab[i].minlen)
-	    return (cmdmod_info_tab[i].name[j] == NUL ? 2 : 1);
+	ಗಾಗಿ (j = 0; name[j] != NUL; ++j)
+	    ಆದರೆ (name[j] != cmdmod_info_tab[i].name[j])
+		ನಿಲ್ಲಿಸು;
+	ಆದರೆ (name[j] == NUL && j >= cmdmod_info_tab[i].minlen)
+	    ಹಿಂತಿರುಗಿ (cmdmod_info_tab[i].name[j] == NUL ? 2 : 1);
     }
 
     // Check built-in commands and user defined commands.
@@ -4232,14 +4232,14 @@ cmd_exists(char_u *name)
     ea.cmd = (*name == '2' || *name == '3') ? name + 1 : name;
     ea.cmdidx = (cmdidx_T)0;
     ea.flags = 0;
-    p = find_ex_command(&ea, &full, NULL, NULL);
-    if (p == NULL)
-	return 3;
-    if (vim_isdigit(*name) && ea.cmdidx != CMD_match)
-	return 0;
-    if (*skipwhite(p) != NUL)
-	return 0;	// trailing garbage
-    return (ea.cmdidx == CMD_SIZE ? 0 : (full ? 2 : 1));
+    p = ಕಂಡುಹಿಡಿ_ex_command(&ea, &ತುಂಬಿದ, ಖಾಲಿ, ಖಾಲಿ);
+    ಆದರೆ (p == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ 3;
+    ಆದರೆ (vim_isdigit(*name) && ea.cmdidx != CMD_ಹೊಂದಿಕೆ)
+	ಹಿಂತಿರುಗಿ 0;
+    ಆದರೆ (*skipwhite(p) != NUL)
+	ಹಿಂತಿರುಗಿ 0;	// trailing garbage
+    ಹಿಂತಿರುಗಿ (ea.cmdidx == CMD_ಗಾತ್ರ ? 0 : (ತುಂಬಿದ ? 2 : 1));
 }
 
 /*
@@ -4247,42 +4247,42 @@ cmd_exists(char_u *name)
  * "argt" are the EX_ flags, "addr_type" the address type and "def" the
  * default for a range or count, -1 when there is none.
  */
-    void
-ex_command_attrs(dict_T *d, long_u argt, cmd_addr_T addr_type, long def)
+    ಶೂನ್ಯ
+ex_command_attrs(dict_T *d, long_u argt, cmd_addr_T addr_type, ದೀರ್ಘ def)
 {
-    static char *addr_names[] = {
+    ಸ್ಥಿರ ಅಕ್ಷರ *addr_ಹೆಸರುಗಳು[] = {
 	"lines", "windows", "arguments", "loaded_buffers", "buffers", "tabs",
 	"tabs_relative", "quickfix_valid", "quickfix", "unsigned", "other",
 	"none"
     };
-    char	*nargs;
+    ಅಕ್ಷರ	*nargs;
 
-    if (!(argt & EX_EXTRA))
+    ಆದರೆ (!(argt & EX_EXTRA))
 	nargs = "0";
-    else if (!(argt & EX_NOSPC))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!(argt & EX_NOSPC))
 	nargs = (argt & EX_NEEDARG) ? "+" : "*";
-    else if (!(argt & EX_NEEDARG))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!(argt & EX_NEEDARG))
 	nargs = "?";
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	nargs = (argt & EX_ARGSPACE) ? "_" : "1";
-    dict_add_string(d, "nargs", (char_u *)nargs);
+    dict_ಕೂಡಿಸು_string(d, "nargs", (char_u *)nargs);
 
-    if (!(argt & EX_RANGE))
-	dict_add_bool(d, "range", FALSE);
-    else if (argt & EX_DFLALL)
-	dict_add_string(d, "range", (char_u *)"%");
-    else if (def >= 0 && !(argt & EX_COUNT))
-	dict_add_number(d, "range", def);
-    else
-	dict_add_string(d, "range", (char_u *)".");
-    if (!(argt & EX_COUNT))
-	dict_add_bool(d, "count", FALSE);
-    else
-	dict_add_number(d, "count", def < 0 ? 0 : def);
-    dict_add_bool(d, "bang", (argt & EX_BANG) != 0);
-    dict_add_bool(d, "bar", (argt & EX_TRLBAR) != 0);
-    dict_add_bool(d, "register", (argt & EX_REGSTR) != 0);
-    dict_add_string(d, "addr", (char_u *)addr_names[addr_type]);
+    ಆದರೆ (!(argt & EX_RANGE))
+	dict_ಕೂಡಿಸು_bool(d, "range", FALSE);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argt & EX_DFLALL)
+	dict_ಕೂಡಿಸು_string(d, "range", (char_u *)"%");
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (def >= 0 && !(argt & EX_ಎಣಿಕೆ))
+	dict_ಕೂಡಿಸು_ಸಂಖ್ಯೆ(d, "range", def);
+    ಇಲ್ಲದಿದ್ದರೆ
+	dict_ಕೂಡಿಸು_string(d, "range", (char_u *)".");
+    ಆದರೆ (!(argt & EX_ಎಣಿಕೆ))
+	dict_ಕೂಡಿಸು_bool(d, "count", FALSE);
+    ಇಲ್ಲದಿದ್ದರೆ
+	dict_ಕೂಡಿಸು_ಸಂಖ್ಯೆ(d, "count", def < 0 ? 0 : def);
+    dict_ಕೂಡಿಸು_bool(d, "bang", (argt & EX_BANG) != 0);
+    dict_ಕೂಡಿಸು_bool(d, "bar", (argt & EX_TRLBAR) != 0);
+    dict_ಕೂಡಿಸು_bool(d, "register", (argt & EX_REGSTR) != 0);
+    dict_ಕೂಡಿಸು_string(d, "addr", (char_u *)addr_ಹೆಸರುಗಳು[addr_type]);
 }
 
 /*
@@ -4292,32 +4292,32 @@ ex_command_attrs(dict_T *d, long_u argt, cmd_addr_T addr_type, long def)
  * Returns FAIL when there is no such command or the abbreviation is
  * ambiguous.
  */
-    int
-ex_command_info(char_u *name, int vim9, dict_T *d)
+    ಪೂರ್ಣಾಂಕ
+ex_command_info(char_u *name, ಪೂರ್ಣಾಂಕ vim9, dict_T *d)
 {
     exarg_T	ea;
     char_u	*p;
-    int		i;
-    int		j;
-    int		save_cmod_flags = cmdmod.cmod_flags;
-    int		ret = OK;
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		j;
+    ಪೂರ್ಣಾಂಕ		save_cmod_flags = cmdmod.cmod_flags;
+    ಪೂರ್ಣಾಂಕ		ret = OK;
 
-    if (vim9 != -1)
+    ಆದರೆ (vim9 != -1)
     {
 	cmdmod.cmod_flags &= ~(CMOD_VIM9CMD | CMOD_LEGACY);
 	cmdmod.cmod_flags |= vim9 ? CMOD_VIM9CMD : CMOD_LEGACY;
     }
 
     // An abbreviation of a command modifier, like ":bo" for ":botright".
-    for (i = 0; i < (int)ARRAY_LENGTH(cmdmod_info_tab); ++i)
+    ಗಾಗಿ (i = 0; i < (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(cmdmod_info_tab); ++i)
     {
-	for (j = 0; name[j] != NUL; ++j)
-	    if (name[j] != cmdmod_info_tab[i].name[j])
-		break;
-	if (name[j] == NUL && j >= cmdmod_info_tab[i].minlen)
+	ಗಾಗಿ (j = 0; name[j] != NUL; ++j)
+	    ಆದರೆ (name[j] != cmdmod_info_tab[i].name[j])
+		ನಿಲ್ಲಿಸು;
+	ಆದರೆ (name[j] == NUL && j >= cmdmod_info_tab[i].minlen)
 	{
 	    name = (char_u *)cmdmod_info_tab[i].name;
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
     }
 
@@ -4325,87 +4325,87 @@ ex_command_info(char_u *name, int vim9, dict_T *d)
     ea.cmd = (*name == '2' || *name == '3') ? name + 1 : name;
     ea.cmdidx = (cmdidx_T)0;
     ea.flags = 0;
-    ea.addr_count = 0;
+    ea.addr_ಎಣಿಕೆ = 0;
     // Don't complain about using "en" or ":let" in Vim9 script.
     ++emsg_silent;
-    p = find_ex_command(&ea, NULL, NULL, NULL);
-    if (p == NULL || ea.cmdidx == CMD_SIZE
-	    || (vim_isdigit(*name) && ea.cmdidx != CMD_match)
+    p = ಕಂಡುಹಿಡಿ_ex_command(&ea, ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ);
+    ಆದರೆ (p == ಖಾಲಿ || ea.cmdidx == CMD_ಗಾತ್ರ
+	    || (vim_isdigit(*name) && ea.cmdidx != CMD_ಹೊಂದಿಕೆ)
 	    || *skipwhite(p) != NUL
-	    || not_in_vim9(&ea, true) == FAIL)
+	    || not_ಒಳ_vim9(&ea, true) == FAIL)
 	ret = FAIL;
     --emsg_silent;
 
-    if (ret == FAIL)
+    ಆದರೆ (ret == FAIL)
 	;
-    else if (IS_USER_CMDIDX(ea.cmdidx))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (IS_USER_CMDIDX(ea.cmdidx))
 	ret = user_command_info(ea.useridx, ea.cmdidx, d);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	int	notimpl = cmdnames[ea.cmdidx].cmd_func == ex_ni
+	ಪೂರ್ಣಾಂಕ	notimpl = cmdnames[ea.cmdidx].cmd_func == ex_ni
 # ifdef HAVE_EX_SCRIPT_NI
 			    || cmdnames[ea.cmdidx].cmd_func == ex_script_ni
 # endif
 			    ;
 
-	dict_add_string(d, "name", cmdnames[ea.cmdidx].cmd_name);
-	dict_add_string(d, "kind", (char_u *)(
+	dict_ಕೂಡಿಸು_string(d, "name", cmdnames[ea.cmdidx].cmd_name);
+	dict_ಕೂಡಿಸು_string(d, "kind", (char_u *)(
 		    cmdnames[ea.cmdidx].cmd_func == ex_wrongmodifier
 						    ? "modifier" : "builtin"));
-	dict_add_bool(d, "available", !notimpl);
+	dict_ಕೂಡಿಸು_bool(d, "available", !notimpl);
 	ex_command_attrs(d, cmdnames[ea.cmdidx].cmd_argt,
 				       cmdnames[ea.cmdidx].cmd_addr_type, -1);
     }
     cmdmod.cmod_flags = save_cmod_flags;
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
 /*
  * "fullcommand" function
  */
-    void
+    ಶೂನ್ಯ
 f_fullcommand(typval_T *argvars, typval_T *rettv)
 {
     exarg_T	ea;
     char_u	*name;
     char_u	*p;
-    int		vim9script = in_vim9script();
-    int		save_cmod_flags = cmdmod.cmod_flags;
+    ಪೂರ್ಣಾಂಕ		vim9script = ಒಳ_vim9script();
+    ಪೂರ್ಣಾಂಕ		save_cmod_flags = cmdmod.cmod_flags;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ಖಾಲಿ;
 
-    if (in_vim9script()
+    ಆದರೆ (ಒಳ_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	ಹಿಂತಿರುಗಿ;
 
     name = tv_get_string(&argvars[0]);
-    if (name == NULL)
-	return;
+    ಆದರೆ (name == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ಆದರೆ (argvars[1].v_type != VAR_UNKNOWN)
     {
 	vim9script = tv_get_bool(&argvars[1]);
 	cmdmod.cmod_flags &= ~(CMOD_VIM9CMD | CMOD_LEGACY);
 	cmdmod.cmod_flags |= vim9script ? CMOD_VIM9CMD : CMOD_LEGACY;
     }
 
-    while (*name == ':')
+    ಆಗ (*name == ':')
 	name++;
-    name = skip_range(name, TRUE, NULL);
+    name = skip_range(name, TRUE, ಖಾಲಿ);
 
     ea.cmd = (*name == '2' || *name == '3') ? name + 1 : name;
     ea.cmdidx = (cmdidx_T)0;
-    ea.addr_count = 0;
+    ea.addr_ಎಣಿಕೆ = 0;
     ++emsg_silent;  // don't complain about using "en" in Vim9 script
-    p = find_ex_command(&ea, NULL, NULL, NULL);
+    p = ಕಂಡುಹಿಡಿ_ex_command(&ea, ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ);
     --emsg_silent;
-    if (p == NULL || ea.cmdidx == CMD_SIZE)
-	goto theend;
+    ಆದರೆ (p == ಖಾಲಿ || ea.cmdidx == CMD_ಗಾತ್ರ)
+	ಹೋಗು theend;
 
-    if (vim9script && not_in_vim9(&ea, true) == FAIL)
-	goto theend;
+    ಆದರೆ (vim9script && not_ಒಳ_vim9(&ea, true) == FAIL)
+	ಹೋಗು theend;
 
     rettv->vval.v_string = vim_strsave(IS_USER_CMDIDX(ea.cmdidx)
 				 ? get_user_command_name(ea.useridx, ea.cmdidx)
@@ -4413,26 +4413,26 @@ f_fullcommand(typval_T *argvars, typval_T *rettv)
 theend:
     cmdmod.cmod_flags = save_cmod_flags;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     cmdidx_T
-excmd_get_cmdidx(char_u *cmd, int len)
+excmd_get_cmdidx(char_u *cmd, ಪೂರ್ಣಾಂಕ len)
 {
     cmdidx_T idx;
 
-    if (!one_letter_cmd(cmd, &idx))
-	for (idx = (cmdidx_T)0; (int)idx < (int)CMD_SIZE;
-		idx = (cmdidx_T)((int)idx + 1))
-	    if (STRNCMP(cmdnames[(int)idx].cmd_name, cmd, (size_t)len) == 0)
-		break;
+    ಆದರೆ (!one_letter_cmd(cmd, &idx))
+	ಗಾಗಿ (idx = (cmdidx_T)0; (ಪೂರ್ಣಾಂಕ)idx < (ಪೂರ್ಣಾಂಕ)CMD_ಗಾತ್ರ;
+		idx = (cmdidx_T)((ಪೂರ್ಣಾಂಕ)idx + 1))
+	    ಆದರೆ (STRNCMP(cmdnames[(ಪೂರ್ಣಾಂಕ)idx].cmd_name, cmd, (size_t)len) == 0)
+		ನಿಲ್ಲಿಸು;
 
-    return idx;
+    ಹಿಂತಿರುಗಿ idx;
 }
 
-    long
+    ದೀರ್ಘ
 excmd_get_argt(cmdidx_T idx)
 {
-    return (long)cmdnames[(int)idx].cmd_argt;
+    ಹಿಂತಿರುಗಿ (ದೀರ್ಘ)cmdnames[(ಪೂರ್ಣಾಂಕ)idx].cmd_argt;
 }
 
 /*
@@ -4446,124 +4446,124 @@ excmd_get_argt(cmdidx_T idx)
  */
     char_u *
 skip_range(
-    char_u	*cmd_start,
-    int		skip_star,	// skip "*" used for Visual range
-    int		*ctx)		// pointer to xp_context or NULL
+    char_u	*cmd_ಆರಂಭ,
+    ಪೂರ್ಣಾಂಕ		skip_ನಕ್ಷತ್ರ,	// skip "*" used for Visual range
+    ಪೂರ್ಣಾಂಕ		*ctx)		// pointer to xp_context or NULL
 {
-    char_u	*cmd = cmd_start;
-    unsigned	delim;
+    char_u	*cmd = cmd_ಆರಂಭ;
+    ಚಿಹ್ನೆರಹಿತ	delim;
 
-    while (vim_strchr((char_u *)" \t0123456789.$%'/?-+,;\\", *cmd) != NULL)
+    ಆಗ (vim_strchr((char_u *)" \t0123456789.$%'/?-+,;\\", *cmd) != ಖಾಲಿ)
     {
-	if (*cmd == '\\')
+	ಆದರೆ (*cmd == '\\')
 	{
-	    if (cmd[1] == '?' || cmd[1] == '/' || cmd[1] == '&')
+	    ಆದರೆ (cmd[1] == '?' || cmd[1] == '/' || cmd[1] == '&')
 		++cmd;
-	    else
-		break;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ನಿಲ್ಲಿಸು;
 	}
-	else if (*cmd == '\'')
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*cmd == '\'')
 	{
 	    char_u *p = cmd;
 
 	    // a quote is only valid at the start or after a separator
-	    while (p > cmd_start)
+	    ಆಗ (p > cmd_ಆರಂಭ)
 	    {
 		--p;
-		if (!VIM_ISWHITE(*p))
-		    break;
+		ಆದರೆ (!VIM_ISWHITE(*p))
+		    ನಿಲ್ಲಿಸು;
 	    }
-	    if (cmd > cmd_start && !VIM_ISWHITE(*p) && *p != ',' && *p != ';')
-		break;
-	    if (*++cmd == NUL && ctx != NULL)
+	    ಆದರೆ (cmd > cmd_ಆರಂಭ && !VIM_ISWHITE(*p) && *p != ',' && *p != ';')
+		ನಿಲ್ಲಿಸು;
+	    ಆದರೆ (*++cmd == NUL && ctx != ಖಾಲಿ)
 		*ctx = EXPAND_NOTHING;
 	}
-	else if (*cmd == '/' || *cmd == '?')
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*cmd == '/' || *cmd == '?')
 	{
 	    delim = *cmd++;
-	    while (*cmd != NUL && *cmd != delim)
-		if (*cmd++ == '\\' && *cmd != NUL)
+	    ಆಗ (*cmd != NUL && *cmd != delim)
+		ಆದರೆ (*cmd++ == '\\' && *cmd != NUL)
 		    ++cmd;
-	    if (*cmd == NUL && ctx != NULL)
+	    ಆದರೆ (*cmd == NUL && ctx != ಖಾಲಿ)
 		*ctx = EXPAND_NOTHING;
 	}
-	if (*cmd != NUL)
+	ಆದರೆ (*cmd != NUL)
 	    ++cmd;
     }
 
     // Skip ":" and white space.
-    while (*cmd == ':')
+    ಆಗ (*cmd == ':')
 	cmd = skipwhite(cmd + 1);
 
     // Skip "*" used for Visual range.
-    if (skip_star && *cmd == '*' && vim_strchr(p_cpo, CPO_STAR) == NULL)
+    ಆದರೆ (skip_ನಕ್ಷತ್ರ && *cmd == '*' && vim_strchr(p_cpo, CPO_ನಕ್ಷತ್ರ) == ಖಾಲಿ)
 	cmd = skipwhite(cmd + 1);
 
-    return cmd;
+    ಹಿಂತಿರುಗಿ cmd;
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 addr_error(cmd_addr_T addr_type)
 {
-    if (addr_type == ADDR_NONE)
+    ಆದರೆ (addr_type == ADDR_NONE)
 	emsg(_(e_no_range_allowed));
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	emsg(_(e_invalid_range));
 }
 
 /*
  * Return the default address for an address type.
  */
-    static linenr_T
-default_address(exarg_T *eap)
+    ಸ್ಥಿರ linenr_T
+default_ವಿಳಾಸ(exarg_T *eap)
 {
     linenr_T lnum = 0;
 
-    switch (eap->addr_type)
+    ಆಯ್ಕೆ (eap->addr_type)
     {
-	case ADDR_LINES:
-	case ADDR_OTHER:
+	ಸ್ಥಿತಿ ADDR_ಸಾಲುಗಳು:
+	ಸ್ಥಿತಿ ADDR_OTHER:
 	    // Default is the cursor line number.  Avoid using an invalid
 	    // line number though.
-	    if (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
-		lnum = curbuf->b_ml.ml_line_count;
-	    else
+	    ಆದರೆ (curwin->w_cursor.lnum > curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
+		lnum = curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		lnum = curwin->w_cursor.lnum;
-	    break;
-	case ADDR_WINDOWS:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ ADDR_WINDOWS:
 	    lnum = CURRENT_WIN_NR;
-	    break;
-	case ADDR_ARGUMENTS:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ ADDR_ARGUMENTS:
 	    lnum = curwin->w_arg_idx + 1;
-	    if (lnum > ARGCOUNT)
+	    ಆದರೆ (lnum > ARGCOUNT)
 		lnum = ARGCOUNT;
-	    break;
-	case ADDR_LOADED_BUFFERS:
-	case ADDR_BUFFERS:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ ADDR_LOADED_BUFFERS:
+	ಸ್ಥಿತಿ ADDR_BUFFERS:
 	    lnum = curbuf->b_fnum;
-	    break;
-	case ADDR_TABS:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ ADDR_TABS:
 	    lnum = CURRENT_TAB_NR;
-	    break;
-	case ADDR_TABS_RELATIVE:
-	case ADDR_UNSIGNED:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ ADDR_TABS_RELATIVE:
+	ಸ್ಥಿತಿ ADDR_UNSIGNED:
 	    lnum = 1;
-	    break;
-	case ADDR_QUICKFIX:
-#ifdef FEAT_QUICKFIX
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ ADDR_QUICKFIX:
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
 	    lnum = qf_get_cur_idx(eap);
-#endif
-	    break;
-	case ADDR_QUICKFIX_VALID:
-#ifdef FEAT_QUICKFIX
+#ಆದರೆ_ಅಂತ್ಯ
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ ADDR_QUICKFIX_VALID:
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
 	    lnum = qf_get_cur_valid_idx(eap);
-#endif
-	    break;
-	case ADDR_NONE:
+#ಆದರೆ_ಅಂತ್ಯ
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ ADDR_NONE:
 	    // Will give an error later if a range is found.
-	    break;
+	    ನಿಲ್ಲಿಸು;
     }
-    return lnum;
+    ಹಿಂತಿರುಗಿ lnum;
 }
 
 /*
@@ -4576,18 +4576,18 @@ default_address(exarg_T *eap)
  * Return MAXLNUM when no Ex address was found.
  */
     linenr_T
-get_address(
-    exarg_T	*eap UNUSED,
+get_ವಿಳಾಸ(
+    exarg_T	*eap ಬಳಸದ,
     char_u	**ptr,
     cmd_addr_T	addr_type,
-    int		skip,		// only skip the address, don't use it
-    int		silent,		// no errors or side effects
-    int		to_other_file,  // flag: may jump to other file
-    int		address_count UNUSED) // 1 for first address, >1 after comma
+    ಪೂರ್ಣಾಂಕ		skip,		// only skip the address, don't use it
+    ಪೂರ್ಣಾಂಕ		silent,		// no errors or side effects
+    ಪೂರ್ಣಾಂಕ		ಗಮ್ಯ_other_file,  // flag: may jump to other file
+    ಪೂರ್ಣಾಂಕ		ವಿಳಾಸ_ಎಣಿಕೆ ಬಳಸದ) // 1 for first address, >1 after comma
 {
-    int		c;
-    int		i;
-    long	n;
+    ಪೂರ್ಣಾಂಕ		c;
+    ಪೂರ್ಣಾಂಕ		i;
+    ದೀರ್ಘ	n;
     char_u	*cmd;
     pos_T	pos;
     pos_T	*fp;
@@ -4596,167 +4596,167 @@ get_address(
 
     cmd = skipwhite(*ptr);
     lnum = MAXLNUM;
-    do
+    ಮಾಡು
     {
-	switch (*cmd)
+	ಆಯ್ಕೆ (*cmd)
 	{
-	    case '.':			    // '.' - Cursor position
+	    ಸ್ಥಿತಿ '.':			    // '.' - Cursor position
 		++cmd;
-		switch (addr_type)
+		ಆಯ್ಕೆ (addr_type)
 		{
-		    case ADDR_LINES:
-		    case ADDR_OTHER:
+		    ಸ್ಥಿತಿ ADDR_ಸಾಲುಗಳು:
+		    ಸ್ಥಿತಿ ADDR_OTHER:
 			lnum = curwin->w_cursor.lnum;
-			break;
-		    case ADDR_WINDOWS:
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ ADDR_WINDOWS:
 			lnum = CURRENT_WIN_NR;
-			break;
-		    case ADDR_ARGUMENTS:
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ ADDR_ARGUMENTS:
 			lnum = curwin->w_arg_idx + 1;
-			break;
-		    case ADDR_LOADED_BUFFERS:
-		    case ADDR_BUFFERS:
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ ADDR_LOADED_BUFFERS:
+		    ಸ್ಥಿತಿ ADDR_BUFFERS:
 			lnum = curbuf->b_fnum;
-			break;
-		    case ADDR_TABS:
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ ADDR_TABS:
 			lnum = CURRENT_TAB_NR;
-			break;
-		    case ADDR_NONE:
-		    case ADDR_TABS_RELATIVE:
-		    case ADDR_UNSIGNED:
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ ADDR_NONE:
+		    ಸ್ಥಿತಿ ADDR_TABS_RELATIVE:
+		    ಸ್ಥಿತಿ ADDR_UNSIGNED:
 			addr_error(addr_type);
-			cmd = NULL;
-			goto error;
-			break;
-		    case ADDR_QUICKFIX:
-#ifdef FEAT_QUICKFIX
+			cmd = ಖಾಲಿ;
+			ಹೋಗು error;
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ ADDR_QUICKFIX:
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
 			lnum = qf_get_cur_idx(eap);
-#endif
-			break;
-		    case ADDR_QUICKFIX_VALID:
-#ifdef FEAT_QUICKFIX
+#ಆದರೆ_ಅಂತ್ಯ
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ ADDR_QUICKFIX_VALID:
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
 			lnum = qf_get_cur_valid_idx(eap);
-#endif
-			break;
+#ಆದರೆ_ಅಂತ್ಯ
+			ನಿಲ್ಲಿಸು;
 		}
-		break;
+		ನಿಲ್ಲಿಸು;
 
-	    case '$':			    // '$' - last line
+	    ಸ್ಥಿತಿ '$':			    // '$' - last line
 		++cmd;
-		switch (addr_type)
+		ಆಯ್ಕೆ (addr_type)
 		{
-		    case ADDR_LINES:
-		    case ADDR_OTHER:
-			lnum = curbuf->b_ml.ml_line_count;
-			break;
-		    case ADDR_WINDOWS:
-			lnum = LAST_WIN_NR;
-			break;
-		    case ADDR_ARGUMENTS:
+		    ಸ್ಥಿತಿ ADDR_ಸಾಲುಗಳು:
+		    ಸ್ಥಿತಿ ADDR_OTHER:
+			lnum = curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ ADDR_WINDOWS:
+			lnum = ಕೊನೆಯ_WIN_NR;
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ ADDR_ARGUMENTS:
 			lnum = ARGCOUNT;
-			break;
-		    case ADDR_LOADED_BUFFERS:
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ ADDR_LOADED_BUFFERS:
 			buf = lastbuf;
-			while (buf->b_ml.ml_mfp == NULL)
+			ಆಗ (buf->b_ml.ml_mfp == ಖಾಲಿ)
 			{
-			    if (buf->b_prev == NULL)
-				break;
+			    ಆದರೆ (buf->b_prev == ಖಾಲಿ)
+				ನಿಲ್ಲಿಸು;
 			    buf = buf->b_prev;
 			}
 			lnum = buf->b_fnum;
-			break;
-		    case ADDR_BUFFERS:
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ ADDR_BUFFERS:
 			lnum = lastbuf->b_fnum;
-			break;
-		    case ADDR_TABS:
-			lnum = LAST_TAB_NR;
-			break;
-		    case ADDR_NONE:
-		    case ADDR_TABS_RELATIVE:
-		    case ADDR_UNSIGNED:
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ ADDR_TABS:
+			lnum = ಕೊನೆಯ_TAB_NR;
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ ADDR_NONE:
+		    ಸ್ಥಿತಿ ADDR_TABS_RELATIVE:
+		    ಸ್ಥಿತಿ ADDR_UNSIGNED:
 			addr_error(addr_type);
-			cmd = NULL;
-			goto error;
-			break;
-		    case ADDR_QUICKFIX:
-#ifdef FEAT_QUICKFIX
-			lnum = qf_get_size(eap);
-			if (lnum == 0)
+			cmd = ಖಾಲಿ;
+			ಹೋಗು error;
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ ADDR_QUICKFIX:
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
+			lnum = qf_get_ಗಾತ್ರ(eap);
+			ಆದರೆ (lnum == 0)
 			    lnum = 1;
-#endif
-			break;
-		    case ADDR_QUICKFIX_VALID:
-#ifdef FEAT_QUICKFIX
-			lnum = qf_get_valid_size(eap);
-			if (lnum == 0)
+#ಆದರೆ_ಅಂತ್ಯ
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ ADDR_QUICKFIX_VALID:
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
+			lnum = qf_get_valid_ಗಾತ್ರ(eap);
+			ಆದರೆ (lnum == 0)
 			    lnum = 1;
-#endif
-			break;
+#ಆದರೆ_ಅಂತ್ಯ
+			ನಿಲ್ಲಿಸು;
 		}
-		break;
+		ನಿಲ್ಲಿಸು;
 
-	    case '\'':			    // ''' - mark
-		if (*++cmd == NUL)
+	    ಸ್ಥಿತಿ '\'':			    // ''' - mark
+		ಆದರೆ (*++cmd == NUL)
 		{
-		    cmd = NULL;
-		    goto error;
+		    cmd = ಖಾಲಿ;
+		    ಹೋಗು error;
 		}
-		if (addr_type != ADDR_LINES)
+		ಆದರೆ (addr_type != ADDR_ಸಾಲುಗಳು)
 		{
 		    addr_error(addr_type);
-		    cmd = NULL;
-		    goto error;
+		    cmd = ಖಾಲಿ;
+		    ಹೋಗು error;
 		}
-		if (skip)
+		ಆದರೆ (skip)
 		    ++cmd;
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    // Only accept a mark in another file when it is
 		    // used by itself: ":'M".
-		    fp = getmark(*cmd, to_other_file && cmd[1] == NUL);
+		    fp = getmark(*cmd, ಗಮ್ಯ_other_file && cmd[1] == NUL);
 		    ++cmd;
-		    if (fp == (pos_T *)-1)
+		    ಆದರೆ (fp == (pos_T *)-1)
 			// Jumped to another file.
 			lnum = curwin->w_cursor.lnum;
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
-			if (check_mark(fp) == FAIL)
+			ಆದರೆ (check_mark(fp) == FAIL)
 			{
-			    cmd = NULL;
-			    goto error;
+			    cmd = ಖಾಲಿ;
+			    ಹೋಗು error;
 			}
 			lnum = fp->lnum;
 		    }
 		}
-		break;
+		ನಿಲ್ಲಿಸು;
 
-	    case '/':
-	    case '?':			// '/' or '?' - search
+	    ಸ್ಥಿತಿ '/':
+	    ಸ್ಥಿತಿ '?':			// '/' or '?' - search
 		c = *cmd++;
-		if (addr_type != ADDR_LINES)
+		ಆದರೆ (addr_type != ADDR_ಸಾಲುಗಳು)
 		{
 		    addr_error(addr_type);
-		    cmd = NULL;
-		    goto error;
+		    cmd = ಖಾಲಿ;
+		    ಹೋಗು error;
 		}
-		if (skip)	// skip "/pat/"
+		ಆದರೆ (skip)	// skip "/pat/"
 		{
 		    cmd = skip_regexp(cmd, c, magic_isset());
-		    if (*cmd == c)
+		    ಆದರೆ (*cmd == c)
 			++cmd;
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    int flags;
+		    ಪೂರ್ಣಾಂಕ flags;
 
 		    pos = curwin->w_cursor; // save curwin->w_cursor
 
 		    // When '/' or '?' follows another address, start from
 		    // there.
-		    if (lnum > 0 && lnum != MAXLNUM)
+		    ಆದರೆ (lnum > 0 && lnum != MAXLNUM)
 			curwin->w_cursor.lnum =
-				lnum > curbuf->b_ml.ml_line_count
-					   ? curbuf->b_ml.ml_line_count : lnum;
+				lnum > curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ
+					   ? curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ : lnum;
 
 		    // Start a forward search at the end of the line (unless
 		    // before the first line).
@@ -4764,246 +4764,246 @@ get_address(
 		    // This makes sure we never match in the current
 		    // line, and can match anywhere in the
 		    // next/previous line.
-		    if (c == '/' && curwin->w_cursor.lnum > 0)
-			curwin->w_cursor.col = MAXCOL;
-		    else
-			curwin->w_cursor.col = 0;
+		    ಆದರೆ (c == '/' && curwin->w_cursor.lnum > 0)
+			curwin->w_cursor.ಲಂಬಸಾಲು = MAXCOL;
+		    ಇಲ್ಲದಿದ್ದರೆ
+			curwin->w_cursor.ಲಂಬಸಾಲು = 0;
 		    searchcmdlen = 0;
-		    flags = silent ? SEARCH_KEEP : SEARCH_HIS | SEARCH_MSG;
-		    if (!do_search(NULL, c, c, cmd, STRLEN(cmd), 1L, flags, NULL))
+		    flags = silent ? ಹುಡುಕು_KEEP : ಹುಡುಕು_HIS | ಹುಡುಕು_ಸಂದೇಶ;
+		    ಆದರೆ (!do_ಹುಡುಕು(ಖಾಲಿ, c, c, cmd, STRLEN(cmd), 1L, flags, ಖಾಲಿ))
 		    {
 			curwin->w_cursor = pos;
-			cmd = NULL;
-			goto error;
+			cmd = ಖಾಲಿ;
+			ಹೋಗು error;
 		    }
 		    lnum = curwin->w_cursor.lnum;
 		    curwin->w_cursor = pos;
 		    // adjust command string pointer
 		    cmd += searchcmdlen;
 		}
-		break;
+		ನಿಲ್ಲಿಸು;
 
-	    case '\\':		    // "\?", "\/" or "\&", repeat search
+	    ಸ್ಥಿತಿ '\\':		    // "\?", "\/" or "\&", repeat search
 		++cmd;
-		if (addr_type != ADDR_LINES)
+		ಆದರೆ (addr_type != ADDR_ಸಾಲುಗಳು)
 		{
 		    addr_error(addr_type);
-		    cmd = NULL;
-		    goto error;
+		    cmd = ಖಾಲಿ;
+		    ಹೋಗು error;
 		}
-		if (*cmd == '&')
+		ಆದರೆ (*cmd == '&')
 		    i = RE_SUBST;
-		else if (*cmd == '?' || *cmd == '/')
-		    i = RE_SEARCH;
-		else
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*cmd == '?' || *cmd == '/')
+		    i = RE_ಹುಡುಕು;
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    emsg(_(e_backslash_should_be_followed_by));
-		    cmd = NULL;
-		    goto error;
+		    cmd = ಖಾಲಿ;
+		    ಹೋಗು error;
 		}
 
-		if (!skip)
+		ಆದರೆ (!skip)
 		{
 		    /*
 		     * When search follows another address, start from
 		     * there.
 		     */
-		    if (lnum != MAXLNUM)
+		    ಆದರೆ (lnum != MAXLNUM)
 			pos.lnum = lnum;
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 			pos.lnum = curwin->w_cursor.lnum;
 
 		    /*
 		     * Start the search just like for the above
 		     * do_search().
 		     */
-		    if (*cmd != '?')
-			pos.col = MAXCOL;
-		    else
-			pos.col = 0;
+		    ಆದರೆ (*cmd != '?')
+			pos.ಲಂಬಸಾಲು = MAXCOL;
+		    ಇಲ್ಲದಿದ್ದರೆ
+			pos.ಲಂಬಸಾಲು = 0;
 		    pos.coladd = 0;
-		    if (searchit(curwin, curbuf, &pos, NULL,
+		    ಆದರೆ (searchit(curwin, curbuf, &pos, ಖಾಲಿ,
 				*cmd == '?' ? BACKWARD : FORWARD,
-				(char_u *)"", 0, 1L, SEARCH_MSG, i, NULL) != FAIL)
+				(char_u *)"", 0, 1L, ಹುಡುಕು_ಸಂದೇಶ, i, ಖಾಲಿ) != FAIL)
 			lnum = pos.lnum;
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
-			cmd = NULL;
-			goto error;
+			cmd = ಖಾಲಿ;
+			ಹೋಗು error;
 		    }
 		}
 		++cmd;
-		break;
+		ನಿಲ್ಲಿಸು;
 
-	    default:
-		if (VIM_ISDIGIT(*cmd))	// absolute line number
+	    ಪೂರ್ವನಿಯೋಜಿತ:
+		ಆದರೆ (VIM_ISDIGIT(*cmd))	// absolute line number
 		    lnum = getdigits(&cmd);
 	}
 
-	for (;;)
+	ಗಾಗಿ (;;)
 	{
 	    cmd = skipwhite(cmd);
-	    if (*cmd != '-' && *cmd != '+' && !VIM_ISDIGIT(*cmd))
-		break;
+	    ಆದರೆ (*cmd != '-' && *cmd != '+' && !VIM_ISDIGIT(*cmd))
+		ನಿಲ್ಲಿಸು;
 
-	    if (lnum == MAXLNUM)
+	    ಆದರೆ (lnum == MAXLNUM)
 	    {
-		switch (addr_type)
+		ಆಯ್ಕೆ (addr_type)
 		{
-		    case ADDR_LINES:
-		    case ADDR_OTHER:
+		    ಸ್ಥಿತಿ ADDR_ಸಾಲುಗಳು:
+		    ಸ್ಥಿತಿ ADDR_OTHER:
 			// "+1" is same as ".+1"
 			lnum = curwin->w_cursor.lnum;
-			break;
-		    case ADDR_WINDOWS:
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ ADDR_WINDOWS:
 			lnum = CURRENT_WIN_NR;
-			break;
-		    case ADDR_ARGUMENTS:
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ ADDR_ARGUMENTS:
 			lnum = curwin->w_arg_idx + 1;
-			break;
-		    case ADDR_LOADED_BUFFERS:
-		    case ADDR_BUFFERS:
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ ADDR_LOADED_BUFFERS:
+		    ಸ್ಥಿತಿ ADDR_BUFFERS:
 			lnum = curbuf->b_fnum;
-			break;
-		    case ADDR_TABS:
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ ADDR_TABS:
 			lnum = CURRENT_TAB_NR;
-			break;
-		    case ADDR_TABS_RELATIVE:
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ ADDR_TABS_RELATIVE:
 			lnum = 1;
-			break;
-		    case ADDR_QUICKFIX:
-#ifdef FEAT_QUICKFIX
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ ADDR_QUICKFIX:
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
 			lnum = qf_get_cur_idx(eap);
-#endif
-			break;
-		    case ADDR_QUICKFIX_VALID:
-#ifdef FEAT_QUICKFIX
+#ಆದರೆ_ಅಂತ್ಯ
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ ADDR_QUICKFIX_VALID:
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
 			lnum = qf_get_cur_valid_idx(eap);
-#endif
-			break;
-		    case ADDR_NONE:
-		    case ADDR_UNSIGNED:
+#ಆದರೆ_ಅಂತ್ಯ
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ ADDR_NONE:
+		    ಸ್ಥಿತಿ ADDR_UNSIGNED:
 			lnum = 0;
-			break;
+			ನಿಲ್ಲಿಸು;
 		}
 	    }
 
-	    if (VIM_ISDIGIT(*cmd))
+	    ಆದರೆ (VIM_ISDIGIT(*cmd))
 		i = '+';		// "number" is same as "+number"
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		i = *cmd++;
-	    if (!VIM_ISDIGIT(*cmd))	// '+' is '+1'
+	    ಆದರೆ (!VIM_ISDIGIT(*cmd))	// '+' is '+1'
 		n = 1;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		// "number", "+number" or "-number"
 		n = getdigits(&cmd);
-		if (n == MAXLNUM)
+		ಆದರೆ (n == MAXLNUM)
 		{
-		    emsg(_(e_line_number_out_of_range));
-		    cmd = NULL;
-		    goto error;
+		    emsg(_(e_ಸಾಲು_ಸಂಖ್ಯೆ_ಹೊರಹೋಗು_ದ_range));
+		    cmd = ಖಾಲಿ;
+		    ಹೋಗು error;
 		}
 	    }
 
-	    if (addr_type == ADDR_TABS_RELATIVE)
+	    ಆದರೆ (addr_type == ADDR_TABS_RELATIVE)
 	    {
 		emsg(_(e_invalid_range));
-		cmd = NULL;
-		goto error;
+		cmd = ಖಾಲಿ;
+		ಹೋಗು error;
 	    }
-	    else if (addr_type == ADDR_LOADED_BUFFERS
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (addr_type == ADDR_LOADED_BUFFERS
 		    || addr_type == ADDR_BUFFERS)
-		lnum = compute_buffer_local_count(
+		lnum = compute_ಬಫರ್_local_ಎಣಿಕೆ(
 				    addr_type, lnum, (i == '-') ? -1 * n : n);
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-#ifdef FEAT_FOLDING
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_FOLDING
 		// Relative line addressing: need to adjust for lines in a
 		// closed fold after the first address.
-		if (addr_type == ADDR_LINES && (i == '-' || i == '+')
-							 && address_count >= 2)
-		    (void)hasFolding(lnum, NULL, &lnum);
-#endif
-		if (i == '-')
+		ಆದರೆ (addr_type == ADDR_ಸಾಲುಗಳು && (i == '-' || i == '+')
+							 && ವಿಳಾಸ_ಎಣಿಕೆ >= 2)
+		    (ಶೂನ್ಯ)hasFolding(lnum, ಖಾಲಿ, &lnum);
+#ಆದರೆ_ಅಂತ್ಯ
+		ಆದರೆ (i == '-')
 		    lnum -= n;
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    if (lnum >= 0 && n >= LONG_MAX - lnum)
+		    ಆದರೆ (lnum >= 0 && n >= LONG_MAX - lnum)
 		    {
-			emsg(_(e_line_number_out_of_range));
-			cmd = NULL;
-			goto error;
+			emsg(_(e_ಸಾಲು_ಸಂಖ್ಯೆ_ಹೊರಹೋಗು_ದ_range));
+			cmd = ಖಾಲಿ;
+			ಹೋಗು error;
 		    }
 		    lnum += n;
 		}
 	    }
 	}
-    } while (*cmd == '/' || *cmd == '?');
+    } ಆಗ (*cmd == '/' || *cmd == '?');
 
 error:
     *ptr = cmd;
-    return lnum;
+    ಹಿಂತಿರುಗಿ lnum;
 }
 
 /*
  * Set eap->line1 and eap->line2 to the whole range.
  * Used for commands with the EX_DFLALL flag and no range given.
  */
-    static void
-address_default_all(exarg_T *eap)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ವಿಳಾಸ_default_all(exarg_T *eap)
 {
     eap->line1 = 1;
-    switch (eap->addr_type)
+    ಆಯ್ಕೆ (eap->addr_type)
     {
-	case ADDR_LINES:
-	case ADDR_OTHER:
-	    eap->line2 = curbuf->b_ml.ml_line_count;
-	    break;
-	case ADDR_LOADED_BUFFERS:
+	ಸ್ಥಿತಿ ADDR_ಸಾಲುಗಳು:
+	ಸ್ಥಿತಿ ADDR_OTHER:
+	    eap->line2 = curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ ADDR_LOADED_BUFFERS:
 	    {
 		buf_T *buf = firstbuf;
 
-		while (buf->b_next != NULL && buf->b_ml.ml_mfp == NULL)
-		    buf = buf->b_next;
+		ಆಗ (buf->b_ಮುಂದಿನ != ಖಾಲಿ && buf->b_ml.ml_mfp == ಖಾಲಿ)
+		    buf = buf->b_ಮುಂದಿನ;
 		eap->line1 = buf->b_fnum;
 		buf = lastbuf;
-		while (buf->b_prev != NULL && buf->b_ml.ml_mfp == NULL)
+		ಆಗ (buf->b_prev != ಖಾಲಿ && buf->b_ml.ml_mfp == ಖಾಲಿ)
 		    buf = buf->b_prev;
 		eap->line2 = buf->b_fnum;
 	    }
-	    break;
-	case ADDR_BUFFERS:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ ADDR_BUFFERS:
 	    eap->line1 = firstbuf->b_fnum;
 	    eap->line2 = lastbuf->b_fnum;
-	    break;
-	case ADDR_WINDOWS:
-	    eap->line2 = LAST_WIN_NR;
-	    break;
-	case ADDR_TABS:
-	    eap->line2 = LAST_TAB_NR;
-	    break;
-	case ADDR_TABS_RELATIVE:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ ADDR_WINDOWS:
+	    eap->line2 = ಕೊನೆಯ_WIN_NR;
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ ADDR_TABS:
+	    eap->line2 = ಕೊನೆಯ_TAB_NR;
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ ADDR_TABS_RELATIVE:
 	    eap->line2 = 1;
-	    break;
-	case ADDR_ARGUMENTS:
-	    if (ARGCOUNT == 0)
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ ADDR_ARGUMENTS:
+	    ಆದರೆ (ARGCOUNT == 0)
 		eap->line1 = eap->line2 = 0;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		eap->line2 = ARGCOUNT;
-	    break;
-	case ADDR_QUICKFIX_VALID:
-#ifdef FEAT_QUICKFIX
-	    eap->line2 = qf_get_valid_size(eap);
-	    if (eap->line2 == 0)
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ ADDR_QUICKFIX_VALID:
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
+	    eap->line2 = qf_get_valid_ಗಾತ್ರ(eap);
+	    ಆದರೆ (eap->line2 == 0)
 		eap->line2 = 1;
-#endif
-	    break;
-	case ADDR_NONE:
-	case ADDR_UNSIGNED:
-	case ADDR_QUICKFIX:
+#ಆದರೆ_ಅಂತ್ಯ
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ ADDR_NONE:
+	ಸ್ಥಿತಿ ADDR_UNSIGNED:
+	ಸ್ಥಿತಿ ADDR_QUICKFIX:
 	    iemsg("Cannot use EX_DFLALL with ADDR_NONE, ADDR_UNSIGNED or ADDR_QUICKFIX");
-	    break;
+	    ನಿಲ್ಲಿಸು;
     }
 }
 
@@ -5011,16 +5011,16 @@ address_default_all(exarg_T *eap)
 /*
  * Get flags from an Ex command argument.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 get_flags(exarg_T *eap)
 {
-    while (vim_strchr((char_u *)"lp#", *eap->arg) != NULL)
+    ಆಗ (vim_strchr((char_u *)"lp#", *eap->arg) != ಖಾಲಿ)
     {
-	if (*eap->arg == 'l')
+	ಆದರೆ (*eap->arg == 'l')
 	    eap->flags |= EXFLAG_LIST;
-	else if (*eap->arg == 'p')
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*eap->arg == 'p')
 	    eap->flags |= EXFLAG_PRINT;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    eap->flags |= EXFLAG_NR;
 	eap->arg = skipwhite(eap->arg + 1);
     }
@@ -5029,271 +5029,271 @@ get_flags(exarg_T *eap)
 /*
  * Function called for command which is Not Implemented.  NI!
  */
-    void
+    ಶೂನ್ಯ
 ex_ni(exarg_T *eap)
 {
-    if (!eap->skip)
+    ಆದರೆ (!eap->skip)
 	eap->errmsg =
-		_(e_sorry_command_is_not_available_in_this_version);
+		_(e_sorry_command_is_not_ಲಭ್ಯ_ಒಳ_this_ಆವೃತ್ತಿ);
 }
 
-#ifdef HAVE_EX_SCRIPT_NI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_EX_SCRIPT_NI
 /*
  * Function called for script command which is Not Implemented.  NI!
  * Skips over ":perl <<EOF" constructs.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_script_ni(exarg_T *eap)
 {
-    if (!eap->skip)
+    ಆದರೆ (!eap->skip)
 	ex_ni(eap);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	vim_free(script_get(eap, eap->arg));
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Check range in Ex command for validity.
  * Return NULL when valid, error message when invalid.
  */
-    static char *
+    ಸ್ಥಿರ ಅಕ್ಷರ *
 invalid_range(exarg_T *eap)
 {
     buf_T	*buf;
 
-    if (       eap->line1 < 0
+    ಆದರೆ (       eap->line1 < 0
 	    || eap->line2 < 0
 	    || eap->line1 > eap->line2)
-	return _(e_invalid_range);
+	ಹಿಂತಿರುಗಿ _(e_invalid_range);
 
-    if (eap->argt & EX_RANGE)
+    ಆದರೆ (eap->argt & EX_RANGE)
     {
-	switch (eap->addr_type)
+	ಆಯ್ಕೆ (eap->addr_type)
 	{
-	    case ADDR_LINES:
-		if (eap->line2 > curbuf->b_ml.ml_line_count
-#ifdef FEAT_DIFF
+	    ಸ್ಥಿತಿ ADDR_ಸಾಲುಗಳು:
+		ಆದರೆ (eap->line2 > curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
 			    + (eap->cmdidx == CMD_diffget ||
 				eap->cmdidx == CMD_diffput)
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		   )
-		    return _(e_invalid_range);
-		break;
-	    case ADDR_ARGUMENTS:
+		    ಹಿಂತಿರುಗಿ _(e_invalid_range);
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ ADDR_ARGUMENTS:
 		// add 1 if ARGCOUNT is 0
-		if (eap->line2 > ARGCOUNT + (!ARGCOUNT))
-		    return _(e_invalid_range);
-		break;
-	    case ADDR_BUFFERS:
+		ಆದರೆ (eap->line2 > ARGCOUNT + (!ARGCOUNT))
+		    ಹಿಂತಿರುಗಿ _(e_invalid_range);
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ ADDR_BUFFERS:
 		// Only a boundary check, not whether the buffers actually
 		// exist.
-		if (eap->line1 < 1 || eap->line2 > get_highest_fnum())
-		    return _(e_invalid_range);
-		break;
-	    case ADDR_LOADED_BUFFERS:
+		ಆದರೆ (eap->line1 < 1 || eap->line2 > get_highest_fnum())
+		    ಹಿಂತಿರುಗಿ _(e_invalid_range);
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ ADDR_LOADED_BUFFERS:
 		buf = firstbuf;
-		while (buf->b_ml.ml_mfp == NULL)
+		ಆಗ (buf->b_ml.ml_mfp == ಖಾಲಿ)
 		{
-		    if (buf->b_next == NULL)
-			return _(e_invalid_range);
-		    buf = buf->b_next;
+		    ಆದರೆ (buf->b_ಮುಂದಿನ == ಖಾಲಿ)
+			ಹಿಂತಿರುಗಿ _(e_invalid_range);
+		    buf = buf->b_ಮುಂದಿನ;
 		}
-		if (eap->line1 < buf->b_fnum)
-		    return _(e_invalid_range);
+		ಆದರೆ (eap->line1 < buf->b_fnum)
+		    ಹಿಂತಿರುಗಿ _(e_invalid_range);
 		buf = lastbuf;
-		while (buf->b_ml.ml_mfp == NULL)
+		ಆಗ (buf->b_ml.ml_mfp == ಖಾಲಿ)
 		{
-		    if (buf->b_prev == NULL)
-			return _(e_invalid_range);
+		    ಆದರೆ (buf->b_prev == ಖಾಲಿ)
+			ಹಿಂತಿರುಗಿ _(e_invalid_range);
 		    buf = buf->b_prev;
 		}
-		if (eap->line2 > buf->b_fnum)
-		    return _(e_invalid_range);
-		break;
-	    case ADDR_WINDOWS:
-		if (eap->line2 > LAST_WIN_NR)
-		    return _(e_invalid_range);
-		break;
-	    case ADDR_TABS:
-		if (eap->line2 > LAST_TAB_NR)
-		    return _(e_invalid_range);
-		break;
-	    case ADDR_TABS_RELATIVE:
-	    case ADDR_OTHER:
+		ಆದರೆ (eap->line2 > buf->b_fnum)
+		    ಹಿಂತಿರುಗಿ _(e_invalid_range);
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ ADDR_WINDOWS:
+		ಆದರೆ (eap->line2 > ಕೊನೆಯ_WIN_NR)
+		    ಹಿಂತಿರುಗಿ _(e_invalid_range);
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ ADDR_TABS:
+		ಆದರೆ (eap->line2 > ಕೊನೆಯ_TAB_NR)
+		    ಹಿಂತಿರುಗಿ _(e_invalid_range);
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ ADDR_TABS_RELATIVE:
+	    ಸ್ಥಿತಿ ADDR_OTHER:
 		// Any range is OK.
-		break;
-	    case ADDR_QUICKFIX:
-#ifdef FEAT_QUICKFIX
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ ADDR_QUICKFIX:
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
 		// No error for value that is too big, will use the last entry.
-		if (eap->line2 <= 0)
+		ಆದರೆ (eap->line2 <= 0)
 		{
-		    if (eap->addr_count == 0)
-			return _(e_no_errors);
-		    return _(e_invalid_range);
+		    ಆದರೆ (eap->addr_ಎಣಿಕೆ == 0)
+			ಹಿಂತಿರುಗಿ _(e_no_errors);
+		    ಹಿಂತಿರುಗಿ _(e_invalid_range);
 		}
-#endif
-		break;
-	    case ADDR_QUICKFIX_VALID:
-#ifdef FEAT_QUICKFIX
-		if ((eap->line2 != 1 && eap->line2 > qf_get_valid_size(eap))
+#ಆದರೆ_ಅಂತ್ಯ
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ ADDR_QUICKFIX_VALID:
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
+		ಆದರೆ ((eap->line2 != 1 && eap->line2 > qf_get_valid_ಗಾತ್ರ(eap))
 			|| eap->line2 < 0)
-		    return _(e_invalid_range);
-#endif
-		break;
-	    case ADDR_UNSIGNED:
-	    case ADDR_NONE:
+		    ಹಿಂತಿರುಗಿ _(e_invalid_range);
+#ಆದರೆ_ಅಂತ್ಯ
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ ADDR_UNSIGNED:
+	    ಸ್ಥಿತಿ ADDR_NONE:
 		// Will give an error elsewhere.
-		break;
+		ನಿಲ್ಲಿಸು;
 	}
     }
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Correct the range for zero line number, if required.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 correct_range(exarg_T *eap)
 {
-    if (!(eap->argt & EX_ZEROR))	    // zero in range not allowed
+    ಆದರೆ (!(eap->argt & EX_ZEROR))	    // zero in range not allowed
     {
-	if (eap->line1 == 0)
+	ಆದರೆ (eap->line1 == 0)
 	    eap->line1 = 1;
-	if (eap->line2 == 0)
+	ಆದರೆ (eap->line2 == 0)
 	    eap->line2 = 1;
     }
 }
 
-#ifdef FEAT_QUICKFIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
 /*
  * For a ":vimgrep" or ":vimgrepadd" command return a pointer past the
  * pattern.  Otherwise return eap->arg.
  */
-    static char_u *
+    ಸ್ಥಿರ char_u *
 skip_grep_pat(exarg_T *eap)
 {
     char_u	*p = eap->arg;
 
-    if (*p != NUL && (eap->cmdidx == CMD_vimgrep || eap->cmdidx == CMD_lvimgrep
+    ಆದರೆ (*p != NUL && (eap->cmdidx == CMD_vimgrep || eap->cmdidx == CMD_lvimgrep
 		|| eap->cmdidx == CMD_vimgrepadd
 		|| eap->cmdidx == CMD_lvimgrepadd
-		|| grep_internal(eap->cmdidx)))
+		|| grep_ಆಂತರಿಕ(eap->cmdidx)))
     {
-	p = skip_vimgrep_pat(p, NULL, NULL);
-	if (p == NULL)
+	p = skip_vimgrep_pat(p, ಖಾಲಿ, ಖಾಲಿ);
+	ಆದರೆ (p == ಖಾಲಿ)
 	    p = eap->arg;
     }
-    return p;
+    ಹಿಂತಿರುಗಿ p;
 }
 
 /*
  * For the ":make" and ":grep" commands insert the 'makeprg'/'grepprg' option
  * in the command line, so that things like % get expanded.
  */
-    static char_u *
+    ಸ್ಥಿರ char_u *
 replace_makeprg(exarg_T *eap, char_u *p, char_u **cmdlinep)
 {
     char_u	*new_cmdline;
-    char_u	*program;
+    char_u	*ಕಾರ್ಯಕ್ರಮ;
     char_u	*pos;
     char_u	*ptr;
-    int		len;
-    int		i;
+    ಪೂರ್ಣಾಂಕ		len;
+    ಪೂರ್ಣಾಂಕ		i;
 
     /*
      * Don't do it when ":vimgrep" is used for ":grep".
      */
-    if ((eap->cmdidx == CMD_make || eap->cmdidx == CMD_lmake
+    ಆದರೆ ((eap->cmdidx == CMD_make || eap->cmdidx == CMD_lmake
 		     || eap->cmdidx == CMD_grep || eap->cmdidx == CMD_lgrep
 		     || eap->cmdidx == CMD_grepadd
 		     || eap->cmdidx == CMD_lgrepadd)
-	    && !grep_internal(eap->cmdidx))
+	    && !grep_ಆಂತರಿಕ(eap->cmdidx))
     {
-	if (eap->cmdidx == CMD_grep || eap->cmdidx == CMD_lgrep
+	ಆದರೆ (eap->cmdidx == CMD_grep || eap->cmdidx == CMD_lgrep
 	    || eap->cmdidx == CMD_grepadd || eap->cmdidx == CMD_lgrepadd)
 	{
-	    if (*curbuf->b_p_gp == NUL)
-		program = p_gp;
-	    else
-		program = curbuf->b_p_gp;
+	    ಆದರೆ (*curbuf->b_p_gp == NUL)
+		ಕಾರ್ಯಕ್ರಮ = p_gp;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ಕಾರ್ಯಕ್ರಮ = curbuf->b_p_gp;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (*curbuf->b_p_mp == NUL)
-		program = p_mp;
-	    else
-		program = curbuf->b_p_mp;
+	    ಆದರೆ (*curbuf->b_p_mp == NUL)
+		ಕಾರ್ಯಕ್ರಮ = p_mp;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ಕಾರ್ಯಕ್ರಮ = curbuf->b_p_mp;
 	}
 
 	p = skipwhite(p);
 
-	if ((pos = (char_u *)strstr((char *)program, "$*")) != NULL)
+	ಆದರೆ ((pos = (char_u *)ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು((ಅಕ್ಷರ *)ಕಾರ್ಯಕ್ರಮ, "$*")) != ಖಾಲಿ)
 	{
 	    // replace $* by given arguments
 	    i = 1;
-	    while ((pos = (char_u *)strstr((char *)pos + 2, "$*")) != NULL)
+	    ಆಗ ((pos = (char_u *)ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು((ಅಕ್ಷರ *)pos + 2, "$*")) != ಖಾಲಿ)
 		++i;
-	    len = (int)STRLEN(p);
-	    new_cmdline = alloc(STRLEN(program) + (size_t)i * (len - 2) + 1);
-	    if (new_cmdline == NULL)
-		return NULL;			// out of memory
+	    len = (ಪೂರ್ಣಾಂಕ)STRLEN(p);
+	    new_cmdline = alloc(STRLEN(ಕಾರ್ಯಕ್ರಮ) + (size_t)i * (len - 2) + 1);
+	    ಆದರೆ (new_cmdline == ಖಾಲಿ)
+		ಹಿಂತಿರುಗಿ ಖಾಲಿ;			// out of memory
 	    ptr = new_cmdline;
-	    while ((pos = (char_u *)strstr((char *)program, "$*")) != NULL)
+	    ಆಗ ((pos = (char_u *)ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು((ಅಕ್ಷರ *)ಕಾರ್ಯಕ್ರಮ, "$*")) != ಖಾಲಿ)
 	    {
-		i = (int)(pos - program);
-		STRNCPY(ptr, program, i);
+		i = (ಪೂರ್ಣಾಂಕ)(pos - ಕಾರ್ಯಕ್ರಮ);
+		STRNCPY(ptr, ಕಾರ್ಯಕ್ರಮ, i);
 		STRCPY(ptr += i, p);
 		ptr += len;
-		program = pos + 2;
+		ಕಾರ್ಯಕ್ರಮ = pos + 2;
 	    }
-	    STRCPY(ptr, program);
+	    STRCPY(ptr, ಕಾರ್ಯಕ್ರಮ);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    size_t program_len = STRLEN(program);
+	    size_t ಕಾರ್ಯಕ್ರಮ_len = STRLEN(ಕಾರ್ಯಕ್ರಮ);
 
-	    new_cmdline = alloc(program_len + STRLEN(p) + 2);
-	    if (new_cmdline == NULL)
-		return NULL;			// out of memory
-	    STRCPY(new_cmdline, program);
-	    STRCPY(new_cmdline + program_len, " ");
-	    STRCPY(new_cmdline + program_len + 1, p);
+	    new_cmdline = alloc(ಕಾರ್ಯಕ್ರಮ_len + STRLEN(p) + 2);
+	    ಆದರೆ (new_cmdline == ಖಾಲಿ)
+		ಹಿಂತಿರುಗಿ ಖಾಲಿ;			// out of memory
+	    STRCPY(new_cmdline, ಕಾರ್ಯಕ್ರಮ);
+	    STRCPY(new_cmdline + ಕಾರ್ಯಕ್ರಮ_len, " ");
+	    STRCPY(new_cmdline + ಕಾರ್ಯಕ್ರಮ_len + 1, p);
 	}
-	msg_make(p);
+	ಸಂದೇಶ_make(p);
 
 	// 'eap->cmd' is not set here, because it is not used at CMD_make
 	vim_free(*cmdlinep);
 	*cmdlinep = new_cmdline;
 	p = new_cmdline;
     }
-    return p;
+    ಹಿಂತಿರುಗಿ p;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Expand file name in Ex command argument.
  * When an error is detected, "errormsgp" is set to a non-NULL pointer.
  * Return FAIL for failure, OK otherwise.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 expand_filename(
     exarg_T	*eap,
     char_u	**cmdlinep,
-    char	**errormsgp)
+    ಅಕ್ಷರ	**errormsgp)
 {
-    int		has_wildcards;	// need to expand wildcards
+    ಪೂರ್ಣಾಂಕ		has_wildcards;	// need to expand wildcards
     char_u	*repl;
     size_t	srclen;
     char_u	*p;
-    int		n;
-    int		escaped;
+    ಪೂರ್ಣಾಂಕ		n;
+    ಪೂರ್ಣಾಂಕ		escaped;
 
-#ifdef FEAT_QUICKFIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
     // Skip a regexp pattern for ":vimgrep[add] pat file..."
     p = skip_grep_pat(eap);
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
     p = eap->arg;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     /*
      * Decide to expand wildcards *before* replacing '%', '#', etc.  If
@@ -5301,27 +5301,27 @@ expand_filename(
      * (it will be expanded anyway if there is a wildcard before replacing).
      */
     has_wildcards = mch_has_wildcard(p);
-    while (*p != NUL)
+    ಆಗ (*p != NUL)
     {
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 	// Skip over `=expr`, wildcards in it are not expanded.
-	if (p[0] == '`' && p[1] == '=')
+	ಆದರೆ (p[0] == '`' && p[1] == '=')
 	{
 	    p += 2;
-	    (void)skip_expr(&p, NULL);
-	    if (*p == '`')
+	    (ಶೂನ್ಯ)skip_ಅಭಿವ್ಯಕ್ತಿ(&p, ಖಾಲಿ);
+	    ಆದರೆ (*p == '`')
 		++p;
-	    continue;
+	    ಮುಂದುವರಿ;
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	/*
 	 * Quick check if this cannot be the start of a special string.
 	 * Also removes backslash before '%', '#' and '<'.
 	 */
-	if (vim_strchr((char_u *)"%#<", *p) == NULL)
+	ಆದರೆ (vim_strchr((char_u *)"%#<", *p) == ಖಾಲಿ)
 	{
 	    ++p;
-	    continue;
+	    ಮುಂದುವರಿ;
 	}
 
 	/*
@@ -5329,17 +5329,17 @@ expand_filename(
 	 */
 	repl = eval_vars(p, eap->arg, &srclen, &(eap->do_ecmd_lnum),
 						    errormsgp, &escaped, TRUE);
-	if (*errormsgp != NULL)		// error detected
-	    return FAIL;
-	if (repl == NULL)		// no match found
+	ಆದರೆ (*errormsgp != ಖಾಲಿ)		// error detected
+	    ಹಿಂತಿರುಗಿ FAIL;
+	ಆದರೆ (repl == ಖಾಲಿ)		// no match found
 	{
 	    p += srclen;
-	    continue;
+	    ಮುಂದುವರಿ;
 	}
 
 	// Wildcards won't be expanded below, the replacement is taken
 	// literally.  But do expand "~/file", "~user/file" and "$HOME/file".
-	if (vim_strchr(repl, '$') != NULL || vim_strchr(repl, '~') != NULL)
+	ಆದರೆ (vim_strchr(repl, '$') != ಖಾಲಿ || vim_strchr(repl, '~') != ಖಾಲಿ)
 	{
 	    char_u *l = repl;
 
@@ -5353,7 +5353,7 @@ expand_filename(
 	// - shell commands (may have to use quotes instead).
 	// - non-unix systems when there is a single argument (spaces don't
 	//   separate arguments then).
-	if (!eap->usefilter
+	ಆದರೆ (!eap->usefilter
 		&& !escaped
 		&& eap->cmdidx != CMD_bang
 		&& eap->cmdidx != CMD_grep
@@ -5364,43 +5364,43 @@ expand_filename(
 		&& eap->cmdidx != CMD_lmake
 		&& eap->cmdidx != CMD_make
 		&& eap->cmdidx != CMD_terminal
-#ifndef UNIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ UNIX
 		&& !(eap->argt & EX_NOSPC)
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		)
 	{
 	    char_u	*l;
-#ifdef BACKSLASH_IN_FILENAME
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ BACKSLASH_ಒಳ_FILENAME
 	    // Don't escape a backslash here, because rem_backslash() doesn't
 	    // remove it later.
-	    static char_u *nobslash = (char_u *)" \t\"|";
+	    ಸ್ಥಿರ char_u *nobslash = (char_u *)" \t\"|";
 # define ESCAPE_CHARS nobslash
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 # define ESCAPE_CHARS escape_chars
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-	    for (l = repl; *l; ++l)
-		if (vim_strchr(ESCAPE_CHARS, *l) != NULL)
+	    ಗಾಗಿ (l = repl; *l; ++l)
+		ಆದರೆ (vim_strchr(ESCAPE_CHARS, *l) != ಖಾಲಿ)
 		{
 		    l = vim_strsave_escaped(repl, ESCAPE_CHARS);
-		    if (l != NULL)
+		    ಆದರೆ (l != ಖಾಲಿ)
 		    {
 			vim_free(repl);
 			repl = l;
 		    }
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 	}
 
 	// For a shell command a '!' must be escaped.
-	if ((eap->usefilter || eap->cmdidx == CMD_bang
+	ಆದರೆ ((eap->usefilter || eap->cmdidx == CMD_bang
 						|| eap->cmdidx == CMD_terminal)
-			    && vim_strpbrk(repl, (char_u *)"!") != NULL)
+			    && vim_strpbrk(repl, (char_u *)"!") != ಖಾಲಿ)
 	{
 	    char_u	*l;
 
 	    l = vim_strsave_escaped(repl, (char_u *)"!");
-	    if (l != NULL)
+	    ಆದರೆ (l != ಖಾಲಿ)
 	    {
 		vim_free(repl);
 		repl = l;
@@ -5409,39 +5409,39 @@ expand_filename(
 
 	p = repl_cmdline(eap, p, srclen, repl, cmdlinep);
 	vim_free(repl);
-	if (p == NULL)
-	    return FAIL;
+	ಆದರೆ (p == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ FAIL;
     }
 
     /*
      * One file argument: Expand wildcards.
      * Don't do this with ":r !command" or ":w !command".
      */
-    if ((eap->argt & EX_NOSPC) && !eap->usefilter)
+    ಆದರೆ ((eap->argt & EX_NOSPC) && !eap->usefilter)
     {
 	/*
 	 * May do this twice:
 	 * 1. Replace environment variables.
 	 * 2. Replace any other wildcards, remove backslashes.
 	 */
-	for (n = 1; n <= 2; ++n)
+	ಗಾಗಿ (n = 1; n <= 2; ++n)
 	{
-	    if (n == 2)
+	    ಆದರೆ (n == 2)
 	    {
 		/*
 		 * Halve the number of backslashes (this is Vi compatible).
 		 * For Unix and OS/2, when wildcards are expanded, this is
 		 * done by ExpandOne() below.
 		 */
-#if defined(UNIX)
-		if (!has_wildcards)
-#endif
+#ಆದರೆ defined(UNIX)
+		ಆದರೆ (!has_wildcards)
+#ಆದರೆ_ಅಂತ್ಯ
 		    backslash_halve(eap->arg);
 	    }
 
-	    if (has_wildcards)
+	    ಆದರೆ (has_wildcards)
 	    {
-		if (n == 1)
+		ಆದರೆ (n == 1)
 		{
 		    /*
 		     * First loop: May expand environment variables.  This
@@ -5450,44 +5450,44 @@ expand_filename(
 		     * After expanding environment variables, check again
 		     * if there are still wildcards present.
 		     */
-		    if (vim_strchr(eap->arg, '$') != NULL
-			    || vim_strchr(eap->arg, '~') != NULL)
+		    ಆದರೆ (vim_strchr(eap->arg, '$') != ಖಾಲಿ
+			    || vim_strchr(eap->arg, '~') != ಖಾಲಿ)
 		    {
 			expand_env_esc(eap->arg, NameBuff, MAXPATHL,
-					(char_u *)(" \t" PATH_ESC_WILDCARDS),
-					TRUE, NULL);
+					(char_u *)(" \t" ಮಾರ್ಗ_ESC_WILDCARDS),
+					TRUE, ಖಾಲಿ);
 			has_wildcards = mch_has_wildcard(NameBuff);
 			p = NameBuff;
 		    }
-		    else
-			p = NULL;
+		    ಇಲ್ಲದಿದ್ದರೆ
+			p = ಖಾಲಿ;
 		}
-		else // n == 2
+		ಇಲ್ಲದಿದ್ದರೆ // n == 2
 		{
 		    expand_T	xpc;
-		    int		options = WILD_LIST_NOTFOUND
-					       | WILD_NOERROR | WILD_ADD_SLASH;
+		    ಪೂರ್ಣಾಂಕ		options = WILD_LIST_NOTFOUND
+					       | WILD_NOERROR | WILD_ಕೂಡಿಸು_SLASH;
 
 		    ExpandInit(&xpc);
 		    xpc.xp_context = EXPAND_FILES;
-		    if (p_wic)
+		    ಆದರೆ (p_wic)
 			options += WILD_ICASE;
-		    p = ExpandOne(&xpc, eap->arg, NULL,
+		    p = ExpandOne(&xpc, eap->arg, ಖಾಲಿ,
 						   options, WILD_EXPAND_FREE);
-		    if (p == NULL)
-			return FAIL;
+		    ಆದರೆ (p == ಖಾಲಿ)
+			ಹಿಂತಿರುಗಿ FAIL;
 		}
-		if (p != NULL)
+		ಆದರೆ (p != ಖಾಲಿ)
 		{
-		    (void)repl_cmdline(eap, eap->arg, STRLEN(eap->arg),
+		    (ಶೂನ್ಯ)repl_cmdline(eap, eap->arg, STRLEN(eap->arg),
 								 p, cmdlinep);
-		    if (n == 2)	// p came from ExpandOne()
+		    ಆದರೆ (n == 2)	// p came from ExpandOne()
 			vim_free(p);
 		}
 	    }
 	}
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
@@ -5498,7 +5498,7 @@ expand_filename(
  * Returns a pointer to the character after the replaced string.
  * Returns NULL for failure.
  */
-    static char_u *
+    ಸ್ಥಿರ char_u *
 repl_cmdline(
     exarg_T	*eap,
     char_u	*src,
@@ -5520,10 +5520,10 @@ repl_cmdline(
     repllen = STRLEN(repl);
     taillen = STRLEN(src + srclen);
     i = (src - *cmdlinep) + repllen + taillen + 3;
-    if (eap->nextcmd != NULL)
+    ಆದರೆ (eap->nextcmd != ಖಾಲಿ)
 	i += STRLEN(eap->nextcmd);	// add space for next command
-    if ((new_cmdline = alloc(i)) == NULL)
-	return NULL;			// out of memory!
+    ಆದರೆ ((new_cmdline = alloc(i)) == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;			// out of memory!
 
     /*
      * Copy the stuff before the expanded part.
@@ -5539,7 +5539,7 @@ repl_cmdline(
     STRCPY(new_cmdline + new_cmdlinelen, src + srclen);
     src = new_cmdline + new_cmdlinelen;	// remember where to continue
 
-    if (eap->nextcmd != NULL)		// append next command
+    ಆದರೆ (eap->nextcmd != ಖಾಲಿ)		// append next command
     {
 	new_cmdlinelen += taillen + 1;
 	STRCPY(new_cmdline + new_cmdlinelen, eap->nextcmd);
@@ -5547,61 +5547,61 @@ repl_cmdline(
     }
     eap->cmd = new_cmdline + (eap->cmd - *cmdlinep);
     eap->arg = new_cmdline + (eap->arg - *cmdlinep);
-    if (eap->do_ecmd_cmd != NULL && eap->do_ecmd_cmd != dollar_command)
+    ಆದರೆ (eap->do_ecmd_cmd != ಖಾಲಿ && eap->do_ecmd_cmd != dollar_command)
 	eap->do_ecmd_cmd = new_cmdline + (eap->do_ecmd_cmd - *cmdlinep);
     vim_free(*cmdlinep);
     *cmdlinep = new_cmdline;
 
-    return src;
+    ಹಿಂತಿರುಗಿ src;
 }
 
 /*
  * Check for '|' to separate commands and '"' to start comments.
  * If "keep_backslash" is TRUE do not remove any backslash.
  */
-    void
-separate_nextcmd(exarg_T *eap, int keep_backslash)
+    ಶೂನ್ಯ
+separate_nextcmd(exarg_T *eap, ಪೂರ್ಣಾಂಕ keep_backslash)
 {
-    int		vim9script = in_vim9script();
+    ಪೂರ್ಣಾಂಕ		vim9script = ಒಳ_vim9script();
     char_u	*p;
 
-#ifdef FEAT_QUICKFIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
     p = skip_grep_pat(eap);
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
     p = eap->arg;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    for ( ; *p; MB_PTR_ADV(p))
+    ಗಾಗಿ ( ; *p; MB_PTR_ADV(p))
     {
-	if (*p == Ctrl_V)
+	ಆದರೆ (*p == Ctrl_V)
 	{
-	    if ((eap->argt & (EX_CTRLV | EX_XFILE)) || keep_backslash)
+	    ಆದರೆ ((eap->argt & (EX_CTRLV | EX_XFILE)) || keep_backslash)
 		++p;		// skip CTRL-V and next char
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 				// remove CTRL-V and skip next char
 		STRMOVE(p, p + 1);
-	    if (*p == NUL)		// stop at NUL after CTRL-V
-		break;
+	    ಆದರೆ (*p == NUL)		// stop at NUL after CTRL-V
+		ನಿಲ್ಲಿಸು;
 	}
 
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 	// Skip over `=expr` when wildcards are expanded.
-	else if (p[0] == '`' && p[1] == '=' && (eap->argt & EX_XFILE))
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p[0] == '`' && p[1] == '=' && (eap->argt & EX_XFILE))
 	{
 	    p += 2;
-	    (void)skip_expr(&p, NULL);
-	    if (*p == NUL)		// stop at NUL after CTRL-V
-		break;
+	    (ಶೂನ್ಯ)skip_ಅಭಿವ್ಯಕ್ತಿ(&p, ಖಾಲಿ);
+	    ಆದರೆ (*p == NUL)		// stop at NUL after CTRL-V
+		ನಿಲ್ಲಿಸು;
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 	// Check for '"'/'#': start of comment or '|': next command
 	// :@" and :*" do not start a comment!
 	// :redir @" doesn't either.
-	else if ((*p == '"'
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((*p == '"'
 		    && !vim9script
 		    && !(eap->argt & EX_NOTRLCOM)
-		    && ((eap->cmdidx != CMD_at && eap->cmdidx != CMD_star)
+		    && ((eap->cmdidx != CMD_at && eap->cmdidx != CMD_ನಕ್ಷತ್ರ)
 							      || p != eap->arg)
 		    && (eap->cmdidx != CMD_redir
 					 || p != eap->arg + 1 || p[-1] != '@'))
@@ -5612,61 +5612,61 @@ separate_nextcmd(exarg_T *eap, int keep_backslash)
 		|| (*p == '|'
 		    && eap->cmdidx != CMD_append
 		    && eap->cmdidx != CMD_change
-		    && eap->cmdidx != CMD_insert)
+		    && eap->cmdidx != CMD_ಸೇರಿಸು)
 		|| *p == '\n')
 	{
 	    /*
 	     * We remove the '\' before the '|', unless EX_CTRLV is used
 	     * AND 'b' is present in 'cpoptions'.
 	     */
-	    if ((vim_strchr(p_cpo, CPO_BAR) == NULL
+	    ಆದರೆ ((vim_strchr(p_cpo, CPO_BAR) == ಖಾಲಿ
 			      || !(eap->argt & EX_CTRLV)) && *(p - 1) == '\\')
 	    {
-		if (!keep_backslash)
+		ಆದರೆ (!keep_backslash)
 		{
 		    STRMOVE(p - 1, p);	// remove the '\'
 		    --p;
 		}
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		set_nextcmd(eap, p);
+		ಗಣ_nextcmd(eap, p);
 		*p = NUL;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	}
     }
 
-    if (!(eap->argt & EX_NOTRLCOM))	// remove trailing spaces
+    ಆದರೆ (!(eap->argt & EX_NOTRLCOM))	// remove trailing spaces
 	del_trailing_spaces(eap->arg);
 }
 
 /*
  * get + command from ex argument
  */
-    static char_u *
+    ಸ್ಥಿರ char_u *
 getargcmd(char_u **argp)
 {
     char_u *arg = *argp;
-    char_u *command = NULL;
+    char_u *command = ಖಾಲಿ;
 
-    if (*arg == '+')	    // +[command]
+    ಆದರೆ (*arg == '+')	    // +[command]
     {
 	++arg;
-	if (vim_isspace(*arg) || *arg == NUL)
+	ಆದರೆ (vim_isspace(*arg) || *arg == NUL)
 	    command = dollar_command;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    command = arg;
 	    arg = skip_cmd_arg(command, TRUE);
-	    if (*arg != NUL)
+	    ಆದರೆ (*arg != NUL)
 		*arg++ = NUL;		// terminate command with NUL
 	}
 
 	arg = skipwhite(arg);	// skip over spaces
 	*argp = arg;
     }
-    return command;
+    ಹಿಂತಿರುಗಿ command;
 }
 
 /*
@@ -5675,158 +5675,158 @@ getargcmd(char_u **argp)
     char_u *
 skip_cmd_arg(
     char_u *p,
-    int	   rembs)	// TRUE to halve the number of backslashes
+    ಪೂರ್ಣಾಂಕ	   rembs)	// TRUE to halve the number of backslashes
 {
-    while (*p && !vim_isspace(*p))
+    ಆಗ (*p && !vim_isspace(*p))
     {
-	if (*p == '\\' && p[1] != NUL)
+	ಆದರೆ (*p == '\\' && p[1] != NUL)
 	{
-	    if (rembs)
+	    ಆದರೆ (rembs)
 		STRMOVE(p, p + 1);
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		++p;
 	}
 	MB_PTR_ADV(p);
     }
-    return p;
+    ಹಿಂತಿರುಗಿ p;
 }
 
-    int
+    ಪೂರ್ಣಾಂಕ
 get_bad_opt(char_u *p, exarg_T *eap)
 {
-    if (STRICMP(p, "keep") == 0)
+    ಆದರೆ (STRICMP(p, "keep") == 0)
 	eap->bad_char = BAD_KEEP;
-    else if (STRICMP(p, "drop") == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRICMP(p, "drop") == 0)
 	eap->bad_char = BAD_DROP;
-    else if (MB_BYTE2LEN(*p) == 1 && p[1] == NUL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (MB_BYTE2LEN(*p) == 1 && p[1] == NUL)
 	eap->bad_char = *p;
-    else
-	return FAIL;
-    return OK;
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಹಿಂತಿರುಗಿ FAIL;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Function given to ExpandGeneric() to obtain the list of bad= names.
  */
-    static char_u *
-get_bad_name(expand_T *xp UNUSED, int idx)
+    ಸ್ಥಿರ char_u *
+get_bad_name(expand_T *xp ಬಳಸದ, ಪೂರ್ಣಾಂಕ idx)
 {
     // Note: Keep this in sync with getargopt.
-    static char *(p_bad_values[]) =
+    ಸ್ಥಿರ ಅಕ್ಷರ *(p_bad_ಮೌಲ್ಯಗಳು[]) =
     {
 	"?",
 	"keep",
 	"drop",
     };
 
-    if (idx < 0 || idx >= (int)ARRAY_LENGTH(p_bad_values))
-	return NULL;
+    ಆದರೆ (idx < 0 || idx >= (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(p_bad_ಮೌಲ್ಯಗಳು))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    return (char_u*)p_bad_values[idx];
+    ಹಿಂತಿರುಗಿ (char_u*)p_bad_ಮೌಲ್ಯಗಳು[idx];
 }
 
 /*
  * Get "++opt=arg" argument.
  * Return FAIL or OK.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 getargopt(exarg_T *eap)
 {
     char_u	*arg = eap->arg + 2;
-    int		*pp = NULL;
-    int		bad_char_idx;
+    ಪೂರ್ಣಾಂಕ		*pp = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		bad_char_idx;
     char_u	*p;
 
     // Note: Keep this in sync with get_argopt_name.
 
     // ":edit ++[no]bin[ary] file"
-    if (STRNCMP(arg, "bin", 3) == 0 || STRNCMP(arg, "nobin", 5) == 0)
+    ಆದರೆ (STRNCMP(arg, "bin", 3) == 0 || STRNCMP(arg, "nobin", 5) == 0)
     {
-	if (*arg == 'n')
+	ಆದರೆ (*arg == 'n')
 	{
 	    arg += 2;
 	    eap->force_bin = FORCE_NOBIN;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    eap->force_bin = FORCE_BIN;
-	if (!checkforcmd(&arg, "binary", 3))
-	    return FAIL;
+	ಆದರೆ (!checkforcmd(&arg, "binary", 3))
+	    ಹಿಂತಿರುಗಿ FAIL;
 	eap->arg = skipwhite(arg);
-	return OK;
+	ಹಿಂತಿರುಗಿ OK;
     }
 
     // ":read ++edit file"
-    if (STRNCMP(arg, "edit", 4) == 0)
+    ಆದರೆ (STRNCMP(arg, "edit", 4) == 0)
     {
 	eap->read_edit = TRUE;
 	eap->arg = skipwhite(arg + 4);
-	return OK;
+	ಹಿಂತಿರುಗಿ OK;
     }
 
-    if (STRNCMP(arg, "ff", 2) == 0)
+    ಆದರೆ (STRNCMP(arg, "ff", 2) == 0)
     {
 	arg += 2;
 	pp = &eap->force_ff;
     }
-    else if (STRNCMP(arg, "fileformat", 10) == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRNCMP(arg, "fileformat", 10) == 0)
     {
 	arg += 10;
 	pp = &eap->force_ff;
     }
-    else if (STRNCMP(arg, "enc", 3) == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRNCMP(arg, "enc", 3) == 0)
     {
-	if (STRNCMP(arg, "encoding", 8) == 0)
+	ಆದರೆ (STRNCMP(arg, "encoding", 8) == 0)
 	    arg += 8;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    arg += 3;
 	pp = &eap->force_enc;
     }
-    else if (STRNCMP(arg, "bad", 3) == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRNCMP(arg, "bad", 3) == 0)
     {
 	arg += 3;
 	pp = &bad_char_idx;
     }
 
-    if (pp == NULL || *arg != '=')
-	return FAIL;
+    ಆದರೆ (pp == ಖಾಲಿ || *arg != '=')
+	ಹಿಂತಿರುಗಿ FAIL;
 
     ++arg;
-    *pp = (int)(arg - eap->cmd);
+    *pp = (ಪೂರ್ಣಾಂಕ)(arg - eap->cmd);
     arg = skip_cmd_arg(arg, FALSE);
     eap->arg = skipwhite(arg);
     *arg = NUL;
 
-    if (pp == &eap->force_ff)
+    ಆದರೆ (pp == &eap->force_ff)
     {
-	if (check_ff_value(eap->cmd + eap->force_ff) == FAIL)
-	    return FAIL;
+	ಆದರೆ (check_ff_ಮೌಲ್ಯ(eap->cmd + eap->force_ff) == FAIL)
+	    ಹಿಂತಿರುಗಿ FAIL;
 	eap->force_ff = eap->cmd[eap->force_ff];
     }
-    else if (pp == &eap->force_enc)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (pp == &eap->force_enc)
     {
 	// Make 'fileencoding' lower case.
-	for (p = eap->cmd + eap->force_enc; *p != NUL; ++p)
+	ಗಾಗಿ (p = eap->cmd + eap->force_enc; *p != NUL; ++p)
 	    *p = TOLOWER_ASC(*p);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Check ++bad= argument.  Must be a single-byte character, "keep" or
 	// "drop".
-	if (get_bad_opt(eap->cmd + bad_char_idx, eap) == FAIL)
-	    return FAIL;
+	ಆದರೆ (get_bad_opt(eap->cmd + bad_char_idx, eap) == FAIL)
+	    ಹಿಂತಿರುಗಿ FAIL;
     }
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Function given to ExpandGeneric() to obtain the list of ++opt names.
  */
-    static char_u *
-get_argopt_name(expand_T *xp UNUSED, int idx)
+    ಸ್ಥಿರ char_u *
+get_argopt_name(expand_T *xp ಬಳಸದ, ಪೂರ್ಣಾಂಕ idx)
 {
     // Note: Keep this in sync with getargopt.
-    static char *(p_opt_values[]) =
+    ಸ್ಥಿರ ಅಕ್ಷರ *(p_opt_ಮೌಲ್ಯಗಳು[]) =
     {
 	"fileformat=",
 	"encoding=",
@@ -5836,119 +5836,119 @@ get_argopt_name(expand_T *xp UNUSED, int idx)
 	"edit",
     };
 
-    if (idx < 0 || idx >= (int)ARRAY_LENGTH(p_opt_values))
-	return NULL;
+    ಆದರೆ (idx < 0 || idx >= (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(p_opt_ಮೌಲ್ಯಗಳು))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    return (char_u*)p_opt_values[idx];
+    ಹಿಂತಿರುಗಿ (char_u*)p_opt_ಮೌಲ್ಯಗಳು[idx];
 }
 
 /*
  * Command-line expansion for ++opt=name.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 expand_argopt(
 	char_u	    *pat,
 	expand_T    *xp,
 	regmatch_T  *rmp,
 	char_u	    ***matches,
-	int	    *numMatches)
+	ಪೂರ್ಣಾಂಕ	    *ಅಂಕೆ_Matches)
 {
-    if (xp->xp_pattern > xp->xp_line && *(xp->xp_pattern-1) == '=')
+    ಆದರೆ (xp->xp_ನಮೂನೆ > xp->xp_ಸಾಲು && *(xp->xp_ನಮೂನೆ-1) == '=')
     {
-	char_u *(*cb)(expand_T *, int) = NULL;
+	char_u *(*cb)(expand_T *, ಪೂರ್ಣಾಂಕ) = ಖಾಲಿ;
 
-	char_u *name_end = xp->xp_pattern - 1;
-	if (name_end - xp->xp_line >= 2
-		&& STRNCMP(name_end - 2, "ff", 2) == 0)
+	char_u *name_ಕೊನೆ = xp->xp_ನಮೂನೆ - 1;
+	ಆದರೆ (name_ಕೊನೆ - xp->xp_ಸಾಲು >= 2
+		&& STRNCMP(name_ಕೊನೆ - 2, "ff", 2) == 0)
 	    cb = get_fileformat_name;
-	else if (name_end - xp->xp_line >= 10
-		&& STRNCMP(name_end - 10, "fileformat", 10) == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (name_ಕೊನೆ - xp->xp_ಸಾಲು >= 10
+		&& STRNCMP(name_ಕೊನೆ - 10, "fileformat", 10) == 0)
 	    cb = get_fileformat_name;
-	else if (name_end - xp->xp_line >= 3
-		&& STRNCMP(name_end - 3, "enc", 3) == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (name_ಕೊನೆ - xp->xp_ಸಾಲು >= 3
+		&& STRNCMP(name_ಕೊನೆ - 3, "enc", 3) == 0)
 	    cb = get_encoding_name;
-	else if (name_end - xp->xp_line >= 8
-		&& STRNCMP(name_end - 8, "encoding", 8) == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (name_ಕೊನೆ - xp->xp_ಸಾಲು >= 8
+		&& STRNCMP(name_ಕೊನೆ - 8, "encoding", 8) == 0)
 	    cb = get_encoding_name;
-	else if (name_end - xp->xp_line >= 3
-		&& STRNCMP(name_end - 3, "bad", 3) == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (name_ಕೊನೆ - xp->xp_ಸಾಲು >= 3
+		&& STRNCMP(name_ಕೊನೆ - 3, "bad", 3) == 0)
 	    cb = get_bad_name;
 
-	if (cb != NULL)
+	ಆದರೆ (cb != ಖಾಲಿ)
 	{
-	    return ExpandGeneric(
+	    ಹಿಂತಿರುಗಿ ExpandGeneric(
 		    pat,
 		    xp,
 		    rmp,
 		    matches,
-		    numMatches,
+		    ಅಂಕೆ_Matches,
 		    cb,
 		    FALSE);
 	}
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
     // Special handling of "ff" which acts as a short form of
     // "fileformat", as "ff" is not a substring of it.
-    if (xp->xp_pattern_len == 2
-	    && STRNCMP(xp->xp_pattern, "ff", xp->xp_pattern_len) == 0)
+    ಆದರೆ (xp->xp_ನಮೂನೆ_len == 2
+	    && STRNCMP(xp->xp_ನಮೂನೆ, "ff", xp->xp_ನಮೂನೆ_len) == 0)
     {
 	*matches = ALLOC_MULT(char_u *, 1);
-	if (*matches == NULL)
-	    return FAIL;
-	*numMatches = 1;
+	ಆದರೆ (*matches == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ FAIL;
+	*ಅಂಕೆ_Matches = 1;
 	(*matches)[0] = vim_strsave((char_u*)"fileformat=");
-	return OK;
+	ಹಿಂತಿರುಗಿ OK;
     }
 
-    return ExpandGeneric(
+    ಹಿಂತಿರುಗಿ ExpandGeneric(
 	    pat,
 	    xp,
 	    rmp,
 	    matches,
-	    numMatches,
+	    ಅಂಕೆ_Matches,
 	    get_argopt_name,
 	    FALSE);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_autocmd(exarg_T *eap)
 {
-    if (eap->skip)
+    ಆದರೆ (eap->skip)
     {
-	skip_cmd_block(eap);
-	return;
+	skip_cmd_ಖಂಡ(eap);
+	ಹಿಂತಿರುಗಿ;
     }
 
     /*
      * Disallow autocommands from .exrc and .vimrc in current
      * directory for security reasons.
      */
-    if (secure)
+    ಆದರೆ (secure)
     {
 	secure = 2;
 	eap->errmsg =
-	      _(e_command_not_allowed_from_vimrc_in_current_dir_or_tag_search);
+	      _(e_command_not_allowed_from_vimrc_ಒಳ_current_dir_or_ಟ್ಯಾಗ್_ಹುಡುಕು);
     }
-    else if (eap->cmdidx == CMD_autocmd)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (eap->cmdidx == CMD_autocmd)
 	do_autocmd(eap, eap->arg, eap->forceit);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	do_augroup(eap->arg, eap->forceit);
 }
 
 /*
  * ":doautocmd": Apply the automatic commands to the current buffer.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_doautocmd(exarg_T *eap)
 {
     char_u	*arg = eap->arg;
-    int		call_do_modelines = check_nomodeline(&arg);
-    int		did_aucmd;
+    ಪೂರ್ಣಾಂಕ		call_do_modelines = check_nomodeline(&arg);
+    ಪೂರ್ಣಾಂಕ		did_aucmd;
 
-    (void)do_doautocmd(arg, TRUE, &did_aucmd);
+    (ಶೂನ್ಯ)do_doautocmd(arg, TRUE, &did_aucmd);
     // Only when there is no <nomodeline>.
-    if (call_do_modelines && did_aucmd)
+    ಆದರೆ (call_do_modelines && did_aucmd)
 	do_modelines(0);
 }
 
@@ -5957,46 +5957,46 @@ ex_doautocmd(exarg_T *eap)
  * :[N]bdelete[!] [N] [bufname] delete buffer from buffer list
  * :[N]bwipeout[!] [N] [bufname] delete buffer really
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_bunload(exarg_T *eap)
 {
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+    ಆದರೆ (ERROR_IF_ANY_POPUP_ಕಿಟಕಿ)
+	ಹಿಂತಿರುಗಿ;
     eap->errmsg = do_bufdel(
 	    eap->cmdidx == CMD_bdelete ? DOBUF_DEL
 		: eap->cmdidx == CMD_bwipeout ? DOBUF_WIPE
 		: DOBUF_UNLOAD, eap->arg,
-	    eap->addr_count, (int)eap->line1, (int)eap->line2, eap->forceit);
+	    eap->addr_ಎಣಿಕೆ, (ಪೂರ್ಣಾಂಕ)eap->line1, (ಪೂರ್ಣಾಂಕ)eap->line2, eap->forceit);
 }
 
 /*
  * :[N]buffer [N]	to buffer N
  * :[N]sbuffer [N]	to buffer N
  */
-    static void
-ex_buffer(exarg_T *eap)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ex_ಬಫರ್(exarg_T *eap)
 {
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+    ಆದರೆ (ERROR_IF_ANY_POPUP_ಕಿಟಕಿ)
+	ಹಿಂತಿರುಗಿ;
     do_exbuffer(eap);
 }
 
 /*
  * ":buffer" command and alike.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 do_exbuffer(exarg_T *eap)
 {
-    if (*eap->arg)
+    ಆದರೆ (*eap->arg)
 	eap->errmsg = ex_errmsg(e_trailing_characters_str, eap->arg);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (eap->addr_count == 0)	// default is current buffer
-	    goto_buffer(eap, DOBUF_CURRENT, FORWARD, 0);
-	else
-	    goto_buffer(eap, DOBUF_FIRST, FORWARD, (int)eap->line2);
-	if (eap->do_ecmd_cmd != NULL)
-	    do_cmd_argument(eap->do_ecmd_cmd);
+	ಆದರೆ (eap->addr_ಎಣಿಕೆ == 0)	// default is current buffer
+	    goto_ಬಫರ್(eap, DOBUF_CURRENT, FORWARD, 0);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    goto_ಬಫರ್(eap, DOBUF_ಮೊದಲ, FORWARD, (ಪೂರ್ಣಾಂಕ)eap->line2);
+	ಆದರೆ (eap->do_ecmd_cmd != ಖಾಲಿ)
+	    do_cmd_ವಾದ(eap->do_ecmd_cmd);
     }
 }
 
@@ -6004,27 +6004,27 @@ do_exbuffer(exarg_T *eap)
  * :[N]bmodified [N]	to next mod. buffer
  * :[N]sbmodified [N]	to next mod. buffer
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_bmodified(exarg_T *eap)
 {
-    goto_buffer(eap, DOBUF_MOD, FORWARD, (int)eap->line2);
-    if (eap->do_ecmd_cmd != NULL)
-	do_cmd_argument(eap->do_ecmd_cmd);
+    goto_ಬಫರ್(eap, DOBUF_MOD, FORWARD, (ಪೂರ್ಣಾಂಕ)eap->line2);
+    ಆದರೆ (eap->do_ecmd_cmd != ಖಾಲಿ)
+	do_cmd_ವಾದ(eap->do_ecmd_cmd);
 }
 
 /*
  * :[N]bnext [N]	to next buffer
  * :[N]sbnext [N]	split and to next buffer
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_bnext(exarg_T *eap)
 {
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+    ಆದರೆ (ERROR_IF_ANY_POPUP_ಕಿಟಕಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    goto_buffer(eap, DOBUF_CURRENT, FORWARD, (int)eap->line2);
-    if (eap->do_ecmd_cmd != NULL)
-	do_cmd_argument(eap->do_ecmd_cmd);
+    goto_ಬಫರ್(eap, DOBUF_CURRENT, FORWARD, (ಪೂರ್ಣಾಂಕ)eap->line2);
+    ಆದರೆ (eap->do_ecmd_cmd != ಖಾಲಿ)
+	do_cmd_ವಾದ(eap->do_ecmd_cmd);
 }
 
 /*
@@ -6033,15 +6033,15 @@ ex_bnext(exarg_T *eap)
  * :[N]sbNext [N]	split and to previous buffer
  * :[N]sbprevious [N]	split and to previous buffer
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_bprevious(exarg_T *eap)
 {
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+    ಆದರೆ (ERROR_IF_ANY_POPUP_ಕಿಟಕಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    goto_buffer(eap, DOBUF_CURRENT, BACKWARD, (int)eap->line2);
-    if (eap->do_ecmd_cmd != NULL)
-	do_cmd_argument(eap->do_ecmd_cmd);
+    goto_ಬಫರ್(eap, DOBUF_CURRENT, BACKWARD, (ಪೂರ್ಣಾಂಕ)eap->line2);
+    ಆದರೆ (eap->do_ecmd_cmd != ಖಾಲಿ)
+	do_cmd_ವಾದ(eap->do_ecmd_cmd);
 }
 
 /*
@@ -6050,81 +6050,81 @@ ex_bprevious(exarg_T *eap)
  * :sbrewind		split and to first buffer
  * :sbfirst		split and to first buffer
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_brewind(exarg_T *eap)
 {
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+    ಆದರೆ (ERROR_IF_ANY_POPUP_ಕಿಟಕಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    goto_buffer(eap, DOBUF_FIRST, FORWARD, 0);
-    if (eap->do_ecmd_cmd != NULL)
-	do_cmd_argument(eap->do_ecmd_cmd);
+    goto_ಬಫರ್(eap, DOBUF_ಮೊದಲ, FORWARD, 0);
+    ಆದರೆ (eap->do_ecmd_cmd != ಖಾಲಿ)
+	do_cmd_ವಾದ(eap->do_ecmd_cmd);
 }
 
 /*
  * :blast		to last buffer
  * :sblast		split and to last buffer
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_blast(exarg_T *eap)
 {
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+    ಆದರೆ (ERROR_IF_ANY_POPUP_ಕಿಟಕಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    goto_buffer(eap, DOBUF_LAST, BACKWARD, 0);
-    if (eap->do_ecmd_cmd != NULL)
-	do_cmd_argument(eap->do_ecmd_cmd);
+    goto_ಬಫರ್(eap, DOBUF_ಕೊನೆಯ, BACKWARD, 0);
+    ಆದರೆ (eap->do_ecmd_cmd != ಖಾಲಿ)
+	do_cmd_ವಾದ(eap->do_ecmd_cmd);
 }
 
 /*
  * Check if "c" ends an Ex command.
  * In Vim9 script does not check for white space before #.
  */
-    int
-ends_excmd(int c)
+    ಪೂರ್ಣಾಂಕ
+ತುದಿಗಳು_excmd(ಪೂರ್ಣಾಂಕ c)
 {
-    int comment_char = '"';
+    ಪೂರ್ಣಾಂಕ comment_char = '"';
 
-    if (in_vim9script())
+    ಆದರೆ (ಒಳ_vim9script())
 	comment_char = '#';
-    return (c == NUL || c == '|' || c == comment_char || c == '\n');
+    ಹಿಂತಿರುಗಿ (c == NUL || c == '|' || c == comment_char || c == '\n');
 }
 
 /*
  * Like ends_excmd() but checks that a # in Vim9 script either has "cmd" equal
  * to "cmd_start" or has a white space character before it.
  */
-    int
-ends_excmd2(char_u *cmd_start UNUSED, char_u *cmd)
+    ಪೂರ್ಣಾಂಕ
+ತುದಿಗಳು_excmd2(char_u *cmd_ಆರಂಭ ಬಳಸದ, char_u *cmd)
 {
-    int c = *cmd;
+    ಪೂರ್ಣಾಂಕ c = *cmd;
 
-    if (c == NUL || c == '|' || c == '\n')
-	return TRUE;
-    if (in_vim9script())
+    ಆದರೆ (c == NUL || c == '|' || c == '\n')
+	ಹಿಂತಿರುಗಿ TRUE;
+    ಆದರೆ (ಒಳ_vim9script())
 	//  # starts a comment, #{ might be a mistake, #{{ can start a fold
-	return c == '#' && (cmd[1] != '{' || cmd[2] == '{')
-				 && (cmd == cmd_start || VIM_ISWHITE(cmd[-1]));
-    return c == '"';
+	ಹಿಂತಿರುಗಿ c == '#' && (cmd[1] != '{' || cmd[2] == '{')
+				 && (cmd == cmd_ಆರಂಭ || VIM_ISWHITE(cmd[-1]));
+    ಹಿಂತಿರುಗಿ c == '"';
 }
 
-#if defined(FEAT_SYN_HL) || defined(FEAT_SEARCH_EXTRA) || defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_SYN_HL) || defined(FEAT_ಹುಡುಕು_EXTRA) || defined(FEAT_EVAL)
 /*
  * Return the next command, after the first '|' or '\n'.
  * Return NULL if not found.
  */
     char_u *
-find_nextcmd(char_u *p)
+ಕಂಡುಹಿಡಿ_nextcmd(char_u *p)
 {
-    while (*p != '|' && *p != '\n')
+    ಆಗ (*p != '|' && *p != '\n')
     {
-	if (*p == NUL)
-	    return NULL;
+	ಆದರೆ (*p == NUL)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	++p;
     }
-    return (p + 1);
+    ಹಿಂತಿರುಗಿ (p + 1);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Check if *p is a separator between Ex commands, skipping over white space.
@@ -6135,34 +6135,34 @@ check_nextcmd(char_u *p)
 {
     char_u *s = skipwhite(p);
 
-    if (*s == '|' || *s == '\n')
-	return (s + 1);
-    else
-	return NULL;
+    ಆದರೆ (*s == '|' || *s == '\n')
+	ಹಿಂತಿರುಗಿ (s + 1);
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * If "eap->nextcmd" is not set, check for a next command at "p".
  */
-    void
-set_nextcmd(exarg_T *eap, char_u *arg)
+    ಶೂನ್ಯ
+ಗಣ_nextcmd(exarg_T *eap, char_u *arg)
 {
     char_u *p = skipwhite(arg);
 
-    if (in_vim9script() && *p == '#')
+    ಆದರೆ (ಒಳ_vim9script() && *p == '#')
     {
 	char_u *nl = vim_strchr(p, NL);
-	if (nl != NULL)
+	ಆದರೆ (nl != ಖಾಲಿ)
 	    p = nl;
     }
 
     p = check_nextcmd(p);
 
-    if (eap->nextcmd == NULL)
+    ಆದರೆ (eap->nextcmd == ಖಾಲಿ)
 	eap->nextcmd = p;
-    else if (p != NULL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p != ಖಾಲಿ)
 	// cannot use "| command" inside a  {} block
-	semsg(_(e_cannot_use_bar_to_separate_commands_here_str), arg);
+	semsg(_(e_cannot_use_bar_ಗಮ್ಯ_separate_commands_ಇಲ್ಲಿ_str), arg);
 }
 
 /*
@@ -6173,101 +6173,101 @@ set_nextcmd(exarg_T *eap, char_u *arg)
  *    return FAIL and give error message if 'message' TRUE
  * return OK otherwise
  */
-    static int
-check_more(
-    int message,	    // when FALSE check only, no messages
-    int forceit)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+check_ಇನ್ನಷ್ಟು(
+    ಪೂರ್ಣಾಂಕ ಸಂದೇಶ_2,	    // when FALSE check only, no messages
+    ಪೂರ್ಣಾಂಕ forceit)
 {
-    int	    n = ARGCOUNT - curwin->w_arg_idx - 1;
+    ಪೂರ್ಣಾಂಕ	    n = ARGCOUNT - curwin->w_arg_idx - 1;
 
-    if (!forceit && only_one_window()
-	    && ARGCOUNT > 1 && !arg_had_last && n > 0 && quitmore == 0)
+    ಆದರೆ (!forceit && only_one_ಕಿಟಕಿ()
+	    && ARGCOUNT > 1 && !arg_had_ಕೊನೆಯ && n > 0 && quitmore == 0)
     {
-	if (message)
+	ಆದರೆ (ಸಂದೇಶ_2)
 	{
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	    if ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM))
-						    && curbuf->b_fname != NULL)
+#ಆದರೆ defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	    ಆದರೆ ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM))
+						    && curbuf->b_fname != ಖಾಲಿ)
 	    {
-		char_u	buff[DIALOG_MSG_SIZE];
+		char_u	buff[DIALOG_ಸಂದೇಶ_ಗಾತ್ರ];
 
-		vim_snprintf((char *)buff, DIALOG_MSG_SIZE,
+		vim_snprintf((ಅಕ್ಷರ *)buff, DIALOG_ಸಂದೇಶ_ಗಾತ್ರ,
 			NGETTEXT("%d more file to edit.  Quit anyway?",
 			    "%d more files to edit.  Quit anyway?", n), n);
-		if (vim_dialog_yesno(VIM_QUESTION, NULL, buff, 1) == VIM_YES)
-		    return OK;
-		return FAIL;
+		ಆದರೆ (vim_dialog_yesno(VIM_QUESTION, ಖಾಲಿ, buff, 1) == VIM_YES)
+		    ಹಿಂತಿರುಗಿ OK;
+		ಹಿಂತಿರುಗಿ FAIL;
 	    }
-#endif
-	    semsg(NGETTEXT(e_nr_more_file_to_edit,
-			   e_nr_more_files_to_edit , n), n);
+#ಆದರೆ_ಅಂತ್ಯ
+	    semsg(NGETTEXT(e_nr_ಇನ್ನಷ್ಟು_file_ಗಮ್ಯ_edit,
+			   e_nr_ಇನ್ನಷ್ಟು_files_ಗಮ್ಯ_edit , n), n);
 	    quitmore = 2;	    // next try to quit is allowed
 	}
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Function given to ExpandGeneric() to obtain the list of command names.
  */
     char_u *
-get_command_name(expand_T *xp UNUSED, int idx)
+get_command_name(expand_T *xp ಬಳಸದ, ಪೂರ್ಣಾಂಕ idx)
 {
-    if (idx >= (int)CMD_SIZE)
-	return expand_user_command_name(idx);
+    ಆದರೆ (idx >= (ಪೂರ್ಣಾಂಕ)CMD_ಗಾತ್ರ)
+	ಹಿಂತಿರುಗಿ expand_user_command_name(idx);
     // the following are no real commands
-    if (STRNCMP(cmdnames[idx].cmd_name, "{", 1) == 0 ||
+    ಆದರೆ (STRNCMP(cmdnames[idx].cmd_name, "{", 1) == 0 ||
 	STRNCMP(cmdnames[idx].cmd_name, "}", 1) == 0)
-	return (char_u *)"";
-    return cmdnames[idx].cmd_name;
+	ಹಿಂತಿರುಗಿ (char_u *)"";
+    ಹಿಂತಿರುಗಿ cmdnames[idx].cmd_name;
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_colorscheme(exarg_T *eap)
 {
-    if (*eap->arg == NUL)
+    ಆದರೆ (*eap->arg == NUL)
     {
-#ifdef FEAT_EVAL
-	char_u *expr = vim_strsave((char_u *)"g:colors_name");
-	char_u *p = NULL;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	char_u *ಅಭಿವ್ಯಕ್ತಿ = vim_strsave((char_u *)"g:colors_name");
+	char_u *p = ಖಾಲಿ;
 
-	if (expr != NULL)
+	ಆದರೆ (ಅಭಿವ್ಯಕ್ತಿ != ಖಾಲಿ)
 	{
 	    ++emsg_off;
-	    p = eval_to_string(expr, FALSE, FALSE);
+	    p = eval_ಗಮ್ಯ_string(ಅಭಿವ್ಯಕ್ತಿ, FALSE, FALSE);
 	    --emsg_off;
-	    vim_free(expr);
+	    vim_free(ಅಭಿವ್ಯಕ್ತಿ);
 	}
-	if (p != NULL)
+	ಆದರೆ (p != ಖಾಲಿ)
 	{
-	    msg((char *)p);
+	    ಸಂದೇಶ((ಅಕ್ಷರ *)p);
 	    vim_free(p);
 	}
-	else
-	    msg("default");
-#else
-	msg(_("unknown"));
-#endif
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಸಂದೇಶ("default");
+#ಇಲ್ಲದಿದ್ದರೆ
+	ಸಂದೇಶ(_("unknown"));
+#ಆದರೆ_ಅಂತ್ಯ
     }
-    else if (load_colors(eap->arg) == FAIL)
-	semsg(_(e_cannot_find_color_scheme_str), eap->arg);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ತುಂಬು_colors(eap->arg) == FAIL)
+	semsg(_(e_cannot_ಕಂಡುಹಿಡಿ_color_scheme_str), eap->arg);
 
-#ifdef FEAT_VTP
-    else if (has_vtp_working())
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VTP
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (has_vtp_working())
     {
 	// background color change requires clear + redraw
 	update_screen(UPD_CLEAR);
 	redrawcmd();
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_highlight(exarg_T *eap)
 {
-    if (*eap->arg == NUL && eap->cmd[2] == '!')
-	msg(_("Greetings, Vim user!"));
+    ಆದರೆ (*eap->arg == NUL && eap->cmd[2] == '!')
+	ಸಂದೇಶ(_("Greetings, Vim user!"));
     do_highlight(eap->arg, eap->forceit, FALSE);
 }
 
@@ -6276,38 +6276,38 @@ ex_highlight(exarg_T *eap)
  * Call this function if we thought we were going to exit, but we won't
  * (because of an error).  May need to restore the terminal mode.
  */
-    void
-not_exiting(int save_exiting)
+    ಶೂನ್ಯ
+not_exiting(ಪೂರ್ಣಾಂಕ save_exiting)
 {
     exiting = save_exiting;
     settmode(TMODE_RAW);
 }
 
-    int
-before_quit_autocmds(win_T *wp, int quit_all, int forceit)
+    ಪೂರ್ಣಾಂಕ
+before_quit_autocmds(win_T *wp, ಪೂರ್ಣಾಂಕ quit_all, ಪೂರ್ಣಾಂಕ forceit)
 {
-    apply_autocmds(EVENT_QUITPRE, NULL, NULL, FALSE, wp->w_buffer);
+    apply_autocmds(EVENT_QUITPRE, ಖಾಲಿ, ಖಾಲಿ, FALSE, wp->w_ಬಫರ್);
 
     // Bail out when autocommands closed the window.
     // Refuse to quit when the buffer in the last window is being closed (can
     // only happen in autocommands).
-    if (!win_valid(wp)
+    ಆದರೆ (!win_valid(wp)
 	    || curbuf_locked()
-	    || (wp->w_buffer->b_nwindows == 1 && wp->w_buffer->b_locked > 0))
-	return TRUE;
+	    || (wp->w_ಬಫರ್->b_nwindows == 1 && wp->w_ಬಫರ್->b_locked > 0))
+	ಹಿಂತಿರುಗಿ TRUE;
 
-    if (quit_all || (check_more(FALSE, forceit) == OK && only_one_window()))
+    ಆದರೆ (quit_all || (check_ಇನ್ನಷ್ಟು(FALSE, forceit) == OK && only_one_ಕಿಟಕಿ()))
     {
-	apply_autocmds(EVENT_EXITPRE, NULL, NULL, FALSE, curbuf);
+	apply_autocmds(EVENT_EXITPRE, ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
 	// Refuse to quit when locked or when the window was closed or the
 	// buffer in the last window is being closed (can only happen in
 	// autocommands).
-	if (!win_valid(wp) || curbuf_locked()
+	ಆದರೆ (!win_valid(wp) || curbuf_locked()
 			  || (curbuf->b_nwindows == 1 && curbuf->b_locked > 0))
-	    return TRUE;
+	    ಹಿಂತಿರುಗಿ TRUE;
     }
 
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 /*
@@ -6315,61 +6315,61 @@ before_quit_autocmds(win_T *wp, int quit_all, int forceit)
  * ":{nr}quit": quit window {nr}
  * Also used when closing a terminal window that's the last one.
  */
-    void
+    ಶೂನ್ಯ
 ex_quit(exarg_T *eap)
 {
     win_T	*wp;
 
-    if (cmdwin_type != 0)
+    ಆದರೆ (cmdwin_type != 0)
     {
-	cmdwin_result = Ctrl_C;
-	return;
+	cmdwin_ಫಲಿತಾಂಶ = Ctrl_C;
+	ಹಿಂತಿರುಗಿ;
     }
     // Don't quit while editing the command line.
-    if (text_locked())
+    ಆದರೆ (ಪಠ್ಯ_locked())
     {
-	text_locked_msg();
-	return;
+	ಪಠ್ಯ_locked_ಸಂದೇಶ();
+	ಹಿಂತಿರುಗಿ;
     }
-    if (eap->addr_count > 0)
+    ಆದರೆ (eap->addr_ಎಣಿಕೆ > 0)
     {
-	int	wnr = eap->line2;
+	ಪೂರ್ಣಾಂಕ	wnr = eap->line2;
 
-	for (wp = firstwin; wp->w_next != NULL; wp = wp->w_next)
-	    if (--wnr <= 0)
-		break;
+	ಗಾಗಿ (wp = firstwin; wp->w_ಮುಂದಿನ != ಖಾಲಿ; wp = wp->w_ಮುಂದಿನ)
+	    ಆದರೆ (--wnr <= 0)
+		ನಿಲ್ಲಿಸು;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	wp = curwin;
 
     // Refuse to quit when locked.
-    if (curbuf_locked())
-	return;
+    ಆದರೆ (curbuf_locked())
+	ಹಿಂತಿರುಗಿ;
 
     // Trigger QuitPre and maybe ExitPre
-    if (before_quit_autocmds(wp, FALSE, eap->forceit))
-	return;
+    ಆದರೆ (before_quit_autocmds(wp, FALSE, eap->forceit))
+	ಹಿಂತಿರುಗಿ;
 
-#ifdef FEAT_NETBEANS_INTG
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_NETBEANS_INTG
     netbeansForcedQuit = eap->forceit;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    int save_exiting = exiting;
+    ಪೂರ್ಣಾಂಕ save_exiting = exiting;
     /*
      * If there is only one relevant window we will exit.
      */
-    if (check_more(FALSE, eap->forceit) == OK && only_one_window())
+    ಆದರೆ (check_ಇನ್ನಷ್ಟು(FALSE, eap->forceit) == OK && only_one_ಕಿಟಕಿ())
 	exiting = TRUE;
-    if ((!buf_hide(wp->w_buffer)
-		&& check_changed(wp->w_buffer, (p_awa ? CCGD_AW : 0)
+    ಆದರೆ ((!buf_hide(wp->w_ಬಫರ್)
+		&& check_ಬದಲಾಯಿತು(wp->w_ಬಫರ್, (p_awa ? CCGD_AW : 0)
 				       | (eap->forceit ? CCGD_FORCEIT : 0)
 				       | CCGD_EXCMD))
-	    || check_more(TRUE, eap->forceit) == FAIL
-	    || (only_one_window() && check_changed_any(eap->forceit, TRUE)))
+	    || check_ಇನ್ನಷ್ಟು(TRUE, eap->forceit) == FAIL
+	    || (only_one_ಕಿಟಕಿ() && check_ಬದಲಾಯಿತು_any(eap->forceit, TRUE)))
     {
 	not_exiting(save_exiting);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// quit last window
 	// Note: only_one_window() returns true, even so a help window is
@@ -6377,67 +6377,67 @@ ex_quit(exarg_T *eap)
 	// specified. Example:
 	// :h|wincmd w|1q     - don't quit
 	// :h|wincmd w|q      - quit
-	if (only_one_window() && (ONE_WINDOW || eap->addr_count == 0))
+	ಆದರೆ (only_one_ಕಿಟಕಿ() && (ONE_ಕಿಟಕಿ || eap->addr_ಎಣಿಕೆ == 0))
 	    getout(0);
 	not_exiting(save_exiting);
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 	need_mouse_correct = TRUE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	// close window; may free buffer
-	win_close(wp, !buf_hide(wp->w_buffer) || eap->forceit);
+	win_close(wp, !buf_hide(wp->w_ಬಫರ್) || eap->forceit);
     }
 }
 
 /*
  * ":cquit".
  */
-    static void
-ex_cquit(exarg_T *eap UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ex_cquit(exarg_T *eap ಬಳಸದ)
 {
     // this does not always pass on the exit code to the Manx compiler. why?
-    getout(eap->addr_count > 0 ? (int)eap->line2 : EXIT_FAILURE);
+    getout(eap->addr_ಎಣಿಕೆ > 0 ? (ಪೂರ್ಣಾಂಕ)eap->line2 : EXIT_FAILURE);
 }
 
 /*
  * Do preparations for "qall" and "wqall".
  * Returns FAIL when quitting should be aborted.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 before_quit_all(exarg_T *eap)
 {
-    if (cmdwin_type != 0)
+    ಆದರೆ (cmdwin_type != 0)
     {
-	if (eap->forceit)
-	    cmdwin_result = K_XF1;	// ex_window() takes care of this
-	else
-	    cmdwin_result = K_XF2;
-	return FAIL;
+	ಆದರೆ (eap->forceit)
+	    cmdwin_ಫಲಿತಾಂಶ = K_XF1;	// ex_window() takes care of this
+	ಇಲ್ಲದಿದ್ದರೆ
+	    cmdwin_ಫಲಿತಾಂಶ = K_XF2;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
     // Don't quit while editing the command line.
-    if (text_locked())
+    ಆದರೆ (ಪಠ್ಯ_locked())
     {
-	text_locked_msg();
-	return FAIL;
+	ಪಠ್ಯ_locked_ಸಂದೇಶ();
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
-    if (before_quit_autocmds(curwin, TRUE, eap->forceit))
-	return FAIL;
+    ಆದರೆ (before_quit_autocmds(curwin, TRUE, eap->forceit))
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * ":qall": try to quit all windows
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_quit_all(exarg_T *eap)
 {
-    if (before_quit_all(eap) == FAIL)
-	return;
-    int save_exiting = exiting;
+    ಆದರೆ (before_quit_all(eap) == FAIL)
+	ಹಿಂತಿರುಗಿ;
+    ಪೂರ್ಣಾಂಕ save_exiting = exiting;
     exiting = TRUE;
-    if (eap->forceit || !check_changed_any(FALSE, FALSE))
+    ಆದರೆ (eap->forceit || !check_ಬದಲಾಯಿತು_any(FALSE, FALSE))
 	getout(0);
     not_exiting(save_exiting);
 }
@@ -6445,122 +6445,122 @@ ex_quit_all(exarg_T *eap)
 /*
  * ":close": close current window, unless it is the last one
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_close(exarg_T *eap)
 {
     win_T	*win;
-    int		winnr = 0;
-    if (cmdwin_type != 0)
-	cmdwin_result = Ctrl_C;
-    else
-	if (!text_locked() && !curbuf_locked())
+    ಪೂರ್ಣಾಂಕ		winnr = 0;
+    ಆದರೆ (cmdwin_type != 0)
+	cmdwin_ಫಲಿತಾಂಶ = Ctrl_C;
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಆದರೆ (!ಪಠ್ಯ_locked() && !curbuf_locked())
 	{
-	    if (eap->addr_count == 0)
-		ex_win_close(eap->forceit, curwin, NULL);
-	    else
+	    ಆದರೆ (eap->addr_ಎಣಿಕೆ == 0)
+		ex_win_close(eap->forceit, curwin, ಖಾಲಿ);
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		FOR_ALL_WINDOWS(win)
 		{
 		    winnr++;
-		    if (winnr == eap->line2)
-			break;
+		    ಆದರೆ (winnr == eap->line2)
+			ನಿಲ್ಲಿಸು;
 		}
-		if (win == NULL)
+		ಆದರೆ (win == ಖಾಲಿ)
 		    win = lastwin;
-		ex_win_close(eap->forceit, win, NULL);
+		ex_win_close(eap->forceit, win, ಖಾಲಿ);
 	    }
 	}
 }
 
-#ifdef FEAT_QUICKFIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
 /*
  * ":pclose": Close any preview window.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_pclose(exarg_T *eap)
 {
     win_T	*win;
 
     // First close any normal window.
     FOR_ALL_WINDOWS(win)
-	if (win->w_p_pvw)
+	ಆದರೆ (win->w_p_pvw)
 	{
-	    ex_win_close(eap->forceit, win, NULL);
-	    return;
+	    ex_win_close(eap->forceit, win, ಖಾಲಿ);
+	    ಹಿಂತಿರುಗಿ;
 	}
 # ifdef FEAT_PROP_POPUP
     // Also when 'previewpopup' is empty, it might have been cleared.
     popup_close_preview();
 # endif
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Close window "win" and take care of handling closing the last window for a
  * modified buffer.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_win_close(
-    int		forceit,
+    ಪೂರ್ಣಾಂಕ		forceit,
     win_T	*win,
     tabpage_T	*tp)		// NULL or the tab page "win" is in
 {
-    int		need_hide;
-    buf_T	*buf = win->w_buffer;
+    ಪೂರ್ಣಾಂಕ		need_hide;
+    buf_T	*buf = win->w_ಬಫರ್;
 
     // Never close the autocommand window.
-    if (is_aucmd_win(win))
+    ಆದರೆ (is_aucmd_win(win))
     {
-	emsg(_(e_cannot_close_autocmd_or_popup_window));
-	return;
+	emsg(_(e_cannot_close_autocmd_or_popup_ಕಿಟಕಿ));
+	ಹಿಂತಿರುಗಿ;
     }
-    if (window_layout_locked(CMD_close))
-	return;
+    ಆದರೆ (ಕಿಟಕಿ_layout_locked(CMD_close))
+	ಹಿಂತಿರುಗಿ;
 
-    need_hide = (bufIsChanged(buf) && buf->b_nwindows <= 1);
-    if (need_hide && !buf_hide(buf) && !forceit)
+    need_hide = (buf_Is_ಬದಲಾಯಿತು(buf) && buf->b_nwindows <= 1);
+    ಆದರೆ (need_hide && !buf_hide(buf) && !forceit)
     {
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	if ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
+#ಆದರೆ defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	ಆದರೆ ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
 	{
 # ifdef FEAT_TERMINAL
-	    if (term_job_running(buf->b_term))
+	    ಆದರೆ (ಪದ_ಕೆಲಸ_running(buf->b_ಪದ))
 	    {
-		if (term_confirm_stop(buf) == FAIL)
-		    return;
+		ಆದರೆ (ಪದ_confirm_stop(buf) == FAIL)
+		    ಹಿಂತಿರುಗಿ;
 		// Manually kill the terminal here because this command will
 		// hide it otherwise.
 		free_terminal(buf);
 		need_hide = FALSE;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 # endif
 	    {
 		bufref_T bufref;
 
-		set_bufref(&bufref, buf);
-		dialog_changed(buf, FALSE);
-		if (bufref_valid(&bufref) && bufIsChanged(buf))
-		    return;
+		ಗಣ_bufref(&bufref, buf);
+		dialog_ಬದಲಾಯಿತು(buf, FALSE);
+		ಆದರೆ (bufref_valid(&bufref) && buf_Is_ಬದಲಾಯಿತು(buf))
+		    ಹಿಂತಿರುಗಿ;
 		need_hide = FALSE;
 	    }
 	}
-	else
-#endif
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 	{
-	    no_write_message();
-	    return;
+	    no_write_ಸಂದೇಶ();
+	    ಹಿಂತಿರುಗಿ;
 	}
     }
 
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
     need_mouse_correct = TRUE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // free buffer when not hiding it or when it's a scratch buffer
-    if (tp == NULL)
+    ಆದರೆ (tp == ಖಾಲಿ)
 	win_close(win, !need_hide && !buf_hide(buf));
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	win_close_othertab(win, !need_hide && !buf_hide(buf), tp);
 }
 
@@ -6569,221 +6569,221 @@ ex_win_close(
  * Returns a tabpage number.
  * When an error is encountered then eap->errmsg is set.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 get_tabpage_arg(exarg_T *eap)
 {
-    int tab_number;
-    int unaccept_arg0 = (eap->cmdidx == CMD_tabmove) ? 0 : 1;
+    ಪೂರ್ಣಾಂಕ tab_ಸಂಖ್ಯೆ;
+    ಪೂರ್ಣಾಂಕ unaccept_arg0 = (eap->cmdidx == CMD_tabmove) ? 0 : 1;
 
-    if (eap->arg && *eap->arg != NUL)
+    ಆದರೆ (eap->arg && *eap->arg != NUL)
     {
 	char_u *p = eap->arg;
 	char_u *p_save;
-	int    relative = 0; // argument +N/-N means: go to N places to the
+	ಪೂರ್ಣಾಂಕ    relative = 0; // argument +N/-N means: go to N places to the
 			     // right/left relative to the current position.
 
-	if (*p == '-')
+	ಆದರೆ (*p == '-')
 	{
 	    relative = -1;
 	    p++;
 	}
-	else if (*p == '+')
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*p == '+')
 	{
 	    relative = 1;
 	    p++;
 	}
 
 	p_save = p;
-	tab_number = getdigits(&p);
+	tab_ಸಂಖ್ಯೆ = getdigits(&p);
 
-	if (relative == 0)
+	ಆದರೆ (relative == 0)
 	{
-	    if (STRCMP(p, "$") == 0)
-		tab_number = LAST_TAB_NR;
-	    else if (STRCMP(p, "#") == 0)
-		if (valid_tabpage(lastused_tabpage))
-		    tab_number = tabpage_index(lastused_tabpage);
-		else
+	    ಆದರೆ (STRCMP(p, "$") == 0)
+		tab_ಸಂಖ್ಯೆ = ಕೊನೆಯ_TAB_NR;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(p, "#") == 0)
+		ಆದರೆ (valid_tabpage(lastused_tabpage))
+		    tab_ಸಂಖ್ಯೆ = tabpage_ಸೂಚ್ಯಂಕ(lastused_tabpage);
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    eap->errmsg = ex_errmsg(e_invalid_value_for_argument_str,
+		    eap->errmsg = ex_errmsg(e_invalid_ಮೌಲ್ಯ_for_ವಾದ_str,
 								     eap->arg);
-		    tab_number = 0;
-		    goto theend;
+		    tab_ಸಂಖ್ಯೆ = 0;
+		    ಹೋಗು theend;
 		}
-	    else if (p == p_save || *p_save == '-' || *p != NUL
-		    || tab_number > LAST_TAB_NR)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p == p_save || *p_save == '-' || *p != NUL
+		    || tab_ಸಂಖ್ಯೆ > ಕೊನೆಯ_TAB_NR)
 	    {
 		// No numbers as argument.
-		eap->errmsg = ex_errmsg(e_invalid_argument_str, eap->arg);
-		goto theend;
+		eap->errmsg = ex_errmsg(e_invalid_ವಾದ_str, eap->arg);
+		ಹೋಗು theend;
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (*p_save == NUL)
-		tab_number = 1;
-	    else if (p == p_save || *p_save == '-' || *p != NUL
-		    || tab_number == 0)
+	    ಆದರೆ (*p_save == NUL)
+		tab_ಸಂಖ್ಯೆ = 1;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p == p_save || *p_save == '-' || *p != NUL
+		    || tab_ಸಂಖ್ಯೆ == 0)
 	    {
 		// No numbers as argument.
-		eap->errmsg = ex_errmsg(e_invalid_argument_str, eap->arg);
-		goto theend;
+		eap->errmsg = ex_errmsg(e_invalid_ವಾದ_str, eap->arg);
+		ಹೋಗು theend;
 	    }
-	    tab_number = tab_number * relative + tabpage_index(curtab);
-	    if (!unaccept_arg0 && relative == -1)
-		--tab_number;
+	    tab_ಸಂಖ್ಯೆ = tab_ಸಂಖ್ಯೆ * relative + tabpage_ಸೂಚ್ಯಂಕ(curtab);
+	    ಆದರೆ (!unaccept_arg0 && relative == -1)
+		--tab_ಸಂಖ್ಯೆ;
 	}
-	if (tab_number < unaccept_arg0 || tab_number > LAST_TAB_NR)
-	    eap->errmsg = ex_errmsg(e_invalid_argument_str, eap->arg);
+	ಆದರೆ (tab_ಸಂಖ್ಯೆ < unaccept_arg0 || tab_ಸಂಖ್ಯೆ > ಕೊನೆಯ_TAB_NR)
+	    eap->errmsg = ex_errmsg(e_invalid_ವಾದ_str, eap->arg);
     }
-    else if (eap->addr_count > 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (eap->addr_ಎಣಿಕೆ > 0)
     {
-	if (unaccept_arg0 && eap->line2 == 0)
+	ಆದರೆ (unaccept_arg0 && eap->line2 == 0)
 	{
 	    eap->errmsg = _(e_invalid_range);
-	    tab_number = 0;
+	    tab_ಸಂಖ್ಯೆ = 0;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    tab_number = eap->line2;
-	    if (!unaccept_arg0)
+	    tab_ಸಂಖ್ಯೆ = eap->line2;
+	    ಆದರೆ (!unaccept_arg0)
 	    {
 		char_u *cmdp = eap->cmd;
 
-		while (--cmdp > *eap->cmdlinep
+		ಆಗ (--cmdp > *eap->cmdlinep
 			&& (VIM_ISWHITE(*cmdp) || VIM_ISDIGIT(*cmdp)))
 		    ;
-		if (*cmdp == '-')
+		ಆದರೆ (*cmdp == '-')
 		{
-		    --tab_number;
-		    if (tab_number < unaccept_arg0)
+		    --tab_ಸಂಖ್ಯೆ;
+		    ಆದರೆ (tab_ಸಂಖ್ಯೆ < unaccept_arg0)
 			eap->errmsg = _(e_invalid_range);
 		}
 	    }
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	switch (eap->cmdidx)
+	ಆಯ್ಕೆ (eap->cmdidx)
 	{
-	case CMD_tabnext:
-	    tab_number = tabpage_index(curtab) + 1;
-	    if (tab_number > LAST_TAB_NR)
-		tab_number = 1;
-	    break;
-	case CMD_tabmove:
-	    tab_number = LAST_TAB_NR;
-	    break;
-	default:
-	    tab_number = tabpage_index(curtab);
+	ಸ್ಥಿತಿ CMD_tabnext:
+	    tab_ಸಂಖ್ಯೆ = tabpage_ಸೂಚ್ಯಂಕ(curtab) + 1;
+	    ಆದರೆ (tab_ಸಂಖ್ಯೆ > ಕೊನೆಯ_TAB_NR)
+		tab_ಸಂಖ್ಯೆ = 1;
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ CMD_tabmove:
+	    tab_ಸಂಖ್ಯೆ = ಕೊನೆಯ_TAB_NR;
+	    ನಿಲ್ಲಿಸು;
+	ಪೂರ್ವನಿಯೋಜಿತ:
+	    tab_ಸಂಖ್ಯೆ = tabpage_ಸೂಚ್ಯಂಕ(curtab);
 	}
     }
 
 theend:
-    return tab_number;
+    ಹಿಂತಿರುಗಿ tab_ಸಂಖ್ಯೆ;
 }
 
 /*
  * ":tabclose": close current tab page, unless it is the last one.
  * ":tabclose N": close tab page N.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_tabclose(exarg_T *eap)
 {
     tabpage_T	*tp;
-    int		tab_number;
+    ಪೂರ್ಣಾಂಕ		tab_ಸಂಖ್ಯೆ;
 
-    if (cmdwin_type != 0)
+    ಆದರೆ (cmdwin_type != 0)
     {
-	cmdwin_result = K_IGNORE;
-	return;
+	cmdwin_ಫಲಿತಾಂಶ = K_IGNORE;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if (first_tabpage->tp_next == NULL)
+    ಆದರೆ (ಮೊದಲ_tabpage->tp_ಮುಂದಿನ == ಖಾಲಿ)
     {
-	emsg(_(e_cannot_close_last_tab_page));
-	return;
+	emsg(_(e_cannot_close_ಕೊನೆಯ_tab_ಪುಟ));
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if (window_layout_locked(CMD_tabclose))
-	return;
+    ಆದರೆ (ಕಿಟಕಿ_layout_locked(CMD_tabclose))
+	ಹಿಂತಿರುಗಿ;
 
-    tab_number = get_tabpage_arg(eap);
-    if (eap->errmsg != NULL)
-	return;
+    tab_ಸಂಖ್ಯೆ = get_tabpage_arg(eap);
+    ಆದರೆ (eap->errmsg != ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    tp = find_tabpage(tab_number);
-    if (tp == NULL)
+    tp = ಕಂಡುಹಿಡಿ_tabpage(tab_ಸಂಖ್ಯೆ);
+    ಆದರೆ (tp == ಖಾಲಿ)
     {
 	beep_flush();
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
-    if (tp != curtab)
+    ಆದರೆ (tp != curtab)
     {
 	tabpage_close_other(tp, eap->forceit);
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
-    else if (!text_locked() && !curbuf_locked())
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!ಪಠ್ಯ_locked() && !curbuf_locked())
 	tabpage_close(eap->forceit);
 }
 
 /*
  * ":tabonly": close all tab pages except the current one
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_tabonly(exarg_T *eap)
 {
     tabpage_T	*tp;
-    int		done;
-    int		tab_number;
+    ಪೂರ್ಣಾಂಕ		ಮುಗಿದ;
+    ಪೂರ್ಣಾಂಕ		tab_ಸಂಖ್ಯೆ;
 
-    if (cmdwin_type != 0)
+    ಆದರೆ (cmdwin_type != 0)
     {
-	cmdwin_result = K_IGNORE;
-	return;
+	cmdwin_ಫಲಿತಾಂಶ = K_IGNORE;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if (first_tabpage->tp_next == NULL)
+    ಆದರೆ (ಮೊದಲ_tabpage->tp_ಮುಂದಿನ == ಖಾಲಿ)
     {
-	msg(_("Already only one tab page"));
-	return;
+	ಸಂದೇಶ(_("Already only one tab page"));
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if (window_layout_locked(CMD_tabonly))
-	return;
+    ಆದರೆ (ಕಿಟಕಿ_layout_locked(CMD_tabonly))
+	ಹಿಂತಿರುಗಿ;
 
-    tab_number = get_tabpage_arg(eap);
-    if (eap->errmsg != NULL)
-	return;
+    tab_ಸಂಖ್ಯೆ = get_tabpage_arg(eap);
+    ಆದರೆ (eap->errmsg != ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    goto_tabpage(tab_number);
+    goto_tabpage(tab_ಸಂಖ್ಯೆ);
     // Repeat this up to a 1000 times, because autocommands may
     // mess up the lists.
-    for (done = 0; done < 1000; ++done)
+    ಗಾಗಿ (ಮುಗಿದ = 0; ಮುಗಿದ < 1000; ++ಮುಗಿದ)
     {
 	FOR_ALL_TABPAGES(tp)
-	    if (tp->tp_topframe != topframe)
+	    ಆದರೆ (tp->tp_topframe != topframe)
 	    {
 		tabpage_close_other(tp, eap->forceit);
 		// if we failed to close it quit
-		if (valid_tabpage(tp))
-		    done = 1000;
+		ಆದರೆ (valid_tabpage(tp))
+		    ಮುಗಿದ = 1000;
 		// start over, "tp" is now invalid
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	if (first_tabpage->tp_next == NULL)
-	    break;
+	ಆದರೆ (ಮೊದಲ_tabpage->tp_ಮುಂದಿನ == ಖಾಲಿ)
+	    ನಿಲ್ಲಿಸು;
     }
 }
 
 /*
  * Close the current tab page.
  */
-    void
-tabpage_close(int forceit)
+    ಶೂನ್ಯ
+tabpage_close(ಪೂರ್ಣಾಂಕ forceit)
 {
-    if (window_layout_locked(CMD_tabclose))
-	return;
+    ಆದರೆ (ಕಿಟಕಿ_layout_locked(CMD_tabclose))
+	ಹಿಂತಿರುಗಿ;
 
     trigger_tabclosedpre(curtab);
     curtab->tp_did_tabclosedpre = TRUE;
@@ -6791,17 +6791,17 @@ tabpage_close(int forceit)
 
     // First close all the windows but the current one.  If that worked then
     // close the last window in this tab, that will close it.
-    if (!ONE_WINDOW)
+    ಆದರೆ (!ONE_ಕಿಟಕಿ)
 	close_others(TRUE, forceit);
-    if (ONE_WINDOW)
-	ex_win_close(forceit, curwin, NULL);
-    if (curtab == save_curtab)
+    ಆದರೆ (ONE_ಕಿಟಕಿ)
+	ex_win_close(forceit, curwin, ಖಾಲಿ);
+    ಆದರೆ (curtab == save_curtab)
 	// When closing the tab page failed, reset tp_did_tabclosedpre so that
 	// TabClosedPre behaves consistently on next :close vs :tabclose.
 	curtab->tp_did_tabclosedpre = FALSE;
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
     need_mouse_correct = TRUE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
@@ -6810,99 +6810,99 @@ tabpage_close(int forceit)
  * Also takes care of the tab pages line disappearing when closing the
  * last-but-one tab page.
  */
-    void
-tabpage_close_other(tabpage_T *tp, int forceit)
+    ಶೂನ್ಯ
+tabpage_close_other(tabpage_T *tp, ಪೂರ್ಣಾಂಕ forceit)
 {
-    int		done = 0;
+    ಪೂರ್ಣಾಂಕ		ಮುಗಿದ = 0;
     win_T	*wp;
 
-    if (window_layout_locked(CMD_SIZE))
-	return;
+    ಆದರೆ (ಕಿಟಕಿ_layout_locked(CMD_ಗಾತ್ರ))
+	ಹಿಂತಿರುಗಿ;
 
     trigger_tabclosedpre(tp);
     tp->tp_did_tabclosedpre = TRUE;
 
     // Limit to 1000 windows, autocommands may add a window while we close
     // one.  OK, so I'm paranoid...
-    while (++done < 1000)
+    ಆಗ (++ಮುಗಿದ < 1000)
     {
 	wp = tp->tp_firstwin;
 	ex_win_close(forceit, wp, tp);
 
 	// Autocommands may delete the tab page under our fingers.
-	if (!valid_tabpage(tp))
-	    break;
+	ಆದರೆ (!valid_tabpage(tp))
+	    ನಿಲ್ಲಿಸು;
 	// We may fail to close a window with a modified buffer.
-	if (tp->tp_firstwin == wp)
+	ಆದರೆ (tp->tp_firstwin == wp)
 	{
-	    done = 1000;
-	    break;
+	    ಮುಗಿದ = 1000;
+	    ನಿಲ್ಲಿಸು;
 	}
     }
-    if (done >= 1000)
+    ಆದರೆ (ಮುಗಿದ >= 1000)
     {
 	// When closing the tab page failed, reset tp_did_tabclosedpre so that
 	// TabClosedPre behaves consistently on next :close vs :tabclose.
 	tp->tp_did_tabclosedpre = FALSE;
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    apply_autocmds(EVENT_TABCLOSED, NULL, NULL, FALSE, curbuf);
+    apply_autocmds(EVENT_TABCLOSED, ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
 }
 
 /*
  * ":only".
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_only(exarg_T *eap)
 {
-    if (window_layout_locked(CMD_only))
-	return;
-#ifdef FEAT_GUI
+    ಆದರೆ (ಕಿಟಕಿ_layout_locked(CMD_only))
+	ಹಿಂತಿರುಗಿ;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
     need_mouse_correct = TRUE;
-#endif
-    if (eap->addr_count > 0)
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (eap->addr_ಎಣಿಕೆ > 0)
     {
 	win_T   *wp;
-	int	wnr = eap->line2;
-	for (wp = firstwin; --wnr > 0; )
+	ಪೂರ್ಣಾಂಕ	wnr = eap->line2;
+	ಗಾಗಿ (wp = firstwin; --wnr > 0; )
 	{
-	    if (wp->w_next == NULL)
-		break;
-	    else
-		wp = wp->w_next;
+	    ಆದರೆ (wp->w_ಮುಂದಿನ == ಖಾಲಿ)
+		ನಿಲ್ಲಿಸು;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		wp = wp->w_ಮುಂದಿನ;
 	}
 	win_goto(wp);
     }
     close_others(TRUE, eap->forceit);
 }
 
-    static void
-ex_hide(exarg_T *eap UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ex_hide(exarg_T *eap ಬಳಸದ)
 {
     // ":hide" or ":hide | cmd": hide current window
-    if (eap->skip)
-	return;
+    ಆದರೆ (eap->skip)
+	ಹಿಂತಿರುಗಿ;
 
-    if (window_layout_locked(CMD_hide))
-	return;
-#ifdef FEAT_GUI
+    ಆದರೆ (ಕಿಟಕಿ_layout_locked(CMD_hide))
+	ಹಿಂತಿರುಗಿ;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
     need_mouse_correct = TRUE;
-#endif
-    if (eap->addr_count == 0)
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (eap->addr_ಎಣಿಕೆ == 0)
 	win_close(curwin, FALSE);	// don't free buffer
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	int	winnr = 0;
+	ಪೂರ್ಣಾಂಕ	winnr = 0;
 	win_T	*win;
 
 	FOR_ALL_WINDOWS(win)
 	{
 	    winnr++;
-	    if (winnr == eap->line2)
-		break;
+	    ಆದರೆ (winnr == eap->line2)
+		ನಿಲ್ಲಿಸು;
 	}
-	if (win == NULL)
+	ಆದರೆ (win == ಖಾಲಿ)
 	    win = lastwin;
 	win_close(win, FALSE);
     }
@@ -6911,105 +6911,105 @@ ex_hide(exarg_T *eap UNUSED)
 /*
  * ":stop" and ":suspend": Suspend Vim.
  */
-    void
+    ಶೂನ್ಯ
 ex_stop(exarg_T *eap)
 {
     /*
      * Disallow suspending for "rvim".
      */
-    if (check_restricted())
-	return;
+    ಆದರೆ (check_restricted())
+	ಹಿಂತಿರುಗಿ;
 
-    if (!eap->forceit)
+    ಆದರೆ (!eap->forceit)
 	autowrite_all();
-    apply_autocmds(EVENT_VIMSUSPEND, NULL, NULL, FALSE, NULL);
-    windgoto((int)Rows - 1, cmdline_col_off);
-    out_char('\n');
-    out_flush();
+    apply_autocmds(EVENT_VIMSUSPEND, ಖಾಲಿ, ಖಾಲಿ, FALSE, ಖಾಲಿ);
+    windgoto((ಪೂರ್ಣಾಂಕ)ಅಡ್ಡಸಾಲುಗಳು - 1, cmdline_ಲಂಬಸಾಲು_off);
+    ಹೊರಹೋಗು_char('\n');
+    ಹೊರಹೋಗು_flush();
     stoptermcap();
-    out_flush();		// needed for SUN to restore xterm buffer
+    ಹೊರಹೋಗು_flush();		// needed for SUN to restore xterm buffer
     mch_restore_title(SAVE_RESTORE_BOTH);	// restore window titles
     ui_suspend();		// call machine specific function
     maketitle();
     resettitle();		// force updating the title
     starttermcap();
-    scroll_start();		// scroll screen before redrawing
+    scroll_ಆರಂಭ();		// scroll screen before redrawing
     redraw_later_clear();
     shell_resized();	// may have resized window
-    apply_autocmds(EVENT_VIMRESUME, NULL, NULL, FALSE, NULL);
+    apply_autocmds(EVENT_VIMRESUME, ಖಾಲಿ, ಖಾಲಿ, FALSE, ಖಾಲಿ);
 }
 
 /*
  * ":exit", ":xit" and ":wq": Write file and quit the current window.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_exit(exarg_T *eap)
 {
-#ifdef FEAT_EVAL
-    if (not_in_vim9(eap, false) == FAIL)
-	return;
-#endif
-    if (cmdwin_type != 0)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಆದರೆ (not_ಒಳ_vim9(eap, false) == FAIL)
+	ಹಿಂತಿರುಗಿ;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (cmdwin_type != 0)
     {
-	cmdwin_result = Ctrl_C;
-	return;
+	cmdwin_ಫಲಿತಾಂಶ = Ctrl_C;
+	ಹಿಂತಿರುಗಿ;
     }
     // Don't quit while editing the command line.
-    if (text_locked())
+    ಆದರೆ (ಪಠ್ಯ_locked())
     {
-	text_locked_msg();
-	return;
+	ಪಠ್ಯ_locked_ಸಂದೇಶ();
+	ಹಿಂತಿರುಗಿ;
     }
 
-    int save_exiting = exiting;
+    ಪೂರ್ಣಾಂಕ save_exiting = exiting;
     /*
      * we plan to exit if there is only one relevant window
      */
-    if (check_more(FALSE, eap->forceit) == OK && only_one_window())
+    ಆದರೆ (check_ಇನ್ನಷ್ಟು(FALSE, eap->forceit) == OK && only_one_ಕಿಟಕಿ())
 	exiting = TRUE;
 
     // Write the buffer for ":wq" or when it was changed.
     // Trigger QuitPre and ExitPre.
     // Check if we can exit now, after autocommands have changed things.
-    if (((eap->cmdidx == CMD_wq || curbufIsChanged()) && do_write(eap) == FAIL)
+    ಆದರೆ (((eap->cmdidx == CMD_wq || curbuf_Is_ಬದಲಾಯಿತು()) && do_write(eap) == FAIL)
 	    || before_quit_autocmds(curwin, FALSE, eap->forceit)
-	    || check_more(TRUE, eap->forceit) == FAIL
-	    || (only_one_window() && check_changed_any(eap->forceit, FALSE)))
+	    || check_ಇನ್ನಷ್ಟು(TRUE, eap->forceit) == FAIL
+	    || (only_one_ಕಿಟಕಿ() && check_ಬದಲಾಯಿತು_any(eap->forceit, FALSE)))
     {
 	not_exiting(save_exiting);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (only_one_window())	    // quit last window, exit Vim
+	ಆದರೆ (only_one_ಕಿಟಕಿ())	    // quit last window, exit Vim
 	    getout(0);
 	not_exiting(save_exiting);
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 	need_mouse_correct = TRUE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	// Quit current window, may free the buffer.
-	win_close(curwin, !buf_hide(curwin->w_buffer));
+	win_close(curwin, !buf_hide(curwin->w_ಬಫರ್));
     }
 }
 
 /*
  * ":print", ":list", ":number".
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_print(exarg_T *eap)
 {
-    if (curbuf->b_ml.ml_flags & ML_EMPTY)
-	emsg(_(e_empty_buffer));
-    else
+    ಆದರೆ (curbuf->b_ml.ml_flags & ML_ಖಾಲಿಗಳು)
+	emsg(_(e_ಖಾಲಿಗಳು_ಬಫರ್));
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	for ( ;!got_int; ui_breakcheck())
+	ಗಾಗಿ ( ;!got_int; ui_breakcheck())
 	{
-	    print_line(eap->line1,
-		    (eap->cmdidx == CMD_number || eap->cmdidx == CMD_pound
+	    print_ಸಾಲು(eap->line1,
+		    (eap->cmdidx == CMD_ಸಂಖ್ಯೆ || eap->cmdidx == CMD_pound
 						 || (eap->flags & EXFLAG_NR)),
 		    eap->cmdidx == CMD_list || (eap->flags & EXFLAG_LIST));
-	    if (++eap->line1 > eap->line2)
-		break;
-	    out_flush();	    // show one line at a time
+	    ಆದರೆ (++eap->line1 > eap->line2)
+		ನಿಲ್ಲಿಸು;
+	    ಹೊರಹೋಗು_flush();	    // show one line at a time
 	}
 	setpcmark();
 	// put cursor at last line
@@ -7020,37 +7020,37 @@ ex_print(exarg_T *eap)
     ex_no_reprint = TRUE;
 }
 
-#ifdef FEAT_BYTEOFF
-    static void
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_BYTEOFF
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_goto(exarg_T *eap)
 {
     goto_byte(eap->line2);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * ":shell".
  */
-    static void
-ex_shell(exarg_T *eap UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ex_shell(exarg_T *eap ಬಳಸದ)
 {
-    do_shell(NULL, 0);
+    do_shell(ಖಾಲಿ, 0);
 }
 
-#if defined(HAVE_DROP_FILE)
+#ಆದರೆ defined(HAVE_DROP_FILE)
 
-static int drop_busy = FALSE;
-static int drop_filec;
-static char_u **drop_filev = NULL;
-static int drop_split;
-static void (*drop_callback)(void *);
-static void *drop_cookie;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ drop_busy = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ drop_filec;
+ಸ್ಥಿರ char_u **drop_filev = ಖಾಲಿ;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ drop_ವಿಭಜಿಸು;
+ಸ್ಥಿರ ಶೂನ್ಯ (*drop_callback)(ಶೂನ್ಯ *);
+ಸ್ಥಿರ ಶೂನ್ಯ *drop_cookie;
 
-    static void
-handle_drop_internal(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+handle_drop_ಆಂತರಿಕ(ಶೂನ್ಯ)
 {
     exarg_T	ea;
-    int		save_msg_scroll = msg_scroll;
+    ಪೂರ್ಣಾಂಕ		save_ಸಂದೇಶ_scroll = ಸಂದೇಶ_scroll;
 
     // Setting the argument list may cause screen updates and being called
     // recursively.  Avoid that by setting drop_busy.
@@ -7060,16 +7060,16 @@ handle_drop_internal(void)
     // to split the current window or data could be lost.
     // We don't need to check if the 'hidden' option is set, as in this
     // case the buffer won't be lost.
-    if (!buf_hide(curbuf) && !drop_split)
+    ಆದರೆ (!buf_hide(curbuf) && !drop_ವಿಭಜಿಸು)
     {
 	++emsg_off;
-	drop_split = check_changed(curbuf, CCGD_AW);
+	drop_ವಿಭಜಿಸು = check_ಬದಲಾಯಿತು(curbuf, CCGD_AW);
 	--emsg_off;
     }
-    if (drop_split)
+    ಆದರೆ (drop_ವಿಭಜಿಸು)
     {
-	if (win_split(0, 0) == FAIL)
-	    return;
+	ಆದರೆ (win_ವಿಭಜಿಸು(0, 0) == FAIL)
+	    ಹಿಂತಿರುಗಿ;
 	RESET_BINDING(curwin);
 
 	// When splitting the window, create a new alist.  Otherwise the
@@ -7081,29 +7081,29 @@ handle_drop_internal(void)
     /*
      * Set up the new argument list.
      */
-    alist_set(ALIST(curwin), drop_filec, drop_filev, FALSE, NULL, 0);
+    alist_ಗಣ(ALIST(curwin), drop_filec, drop_filev, FALSE, ಖಾಲಿ, 0);
 
     /*
      * Move to the first file.
      */
     // Fake up a minimal "next" command for do_argfile()
-    CLEAR_FIELD(ea);
+    CLEAR_ಕ್ಷೇತ್ರ(ea);
     ea.cmd = (char_u *)"next";
     do_argfile(&ea, 0);
 
     // do_ecmd() may set need_start_insertmode, but since we never left Insert
     // mode that is not needed here.
-    need_start_insertmode = FALSE;
+    need_ಆರಂಭ_insertmode = FALSE;
 
     // Restore msg_scroll, otherwise a following command may cause scrolling
     // unexpectedly.  The screen will be redrawn by the caller, thus
     // msg_scroll being set by displaying a message is irrelevant.
-    msg_scroll = save_msg_scroll;
+    ಸಂದೇಶ_scroll = save_ಸಂದೇಶ_scroll;
 
-    if (drop_callback != NULL)
+    ಆದರೆ (drop_callback != ಖಾಲಿ)
 	drop_callback(drop_cookie);
 
-    drop_filev = NULL;
+    drop_filev = ಖಾಲಿ;
     drop_busy = FALSE;
 }
 
@@ -7118,26 +7118,26 @@ handle_drop_internal(void)
  * in the list. This function takes over responsibility for freeing the "filev"
  * list.
  */
-    void
+    ಶೂನ್ಯ
 handle_drop(
-    int		filec,		// the number of files dropped
+    ಪೂರ್ಣಾಂಕ		filec,		// the number of files dropped
     char_u	**filev,	// the list of files dropped
-    int		split,		// force splitting the window
-    void	(*callback)(void *), // to be called after setting the argument
+    ಪೂರ್ಣಾಂಕ		ವಿಭಜಿಸು,		// force splitting the window
+    ಶೂನ್ಯ	(*callback)(ಶೂನ್ಯ *), // to be called after setting the argument
 				     // list
-    void	*cookie)	// argument for "callback" (allocated)
+    ಶೂನ್ಯ	*cookie)	// argument for "callback" (allocated)
 {
     // Cannot handle recursive drops, finish the pending one.
-    if (drop_busy)
+    ಆದರೆ (drop_busy)
     {
 	FreeWild(filec, filev);
 	vim_free(cookie);
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
     // When calling handle_drop() more than once in a row we only use the last
     // one.
-    if (drop_filev != NULL)
+    ಆದರೆ (drop_filev != ಖಾಲಿ)
     {
 	FreeWild(drop_filec, drop_filev);
 	vim_free(drop_cookie);
@@ -7145,7 +7145,7 @@ handle_drop(
 
     drop_filec = filec;
     drop_filev = filev;
-    drop_split = split;
+    drop_ವಿಭಜಿಸು = ವಿಭಜಿಸು;
     drop_callback = callback;
     drop_cookie = cookie;
 
@@ -7155,30 +7155,30 @@ handle_drop(
     // - updating the screen
     // As it may change buffers and window structures that are in use and cause
     // freed memory to be used.
-    if (text_locked() || curbuf_locked() || updating_screen)
-	return;
+    ಆದರೆ (ಪಠ್ಯ_locked() || curbuf_locked() || updating_screen)
+	ಹಿಂತಿರುಗಿ;
 
-    handle_drop_internal();
+    handle_drop_ಆಂತರಿಕ();
 }
 
 /*
  * To be called when text is unlocked, curbuf is unlocked or updating_screen is
  * reset: Handle a postponed drop.
  */
-    void
-handle_any_postponed_drop(void)
+    ಶೂನ್ಯ
+handle_any_postponed_drop(ಶೂನ್ಯ)
 {
-    if (!drop_busy && drop_filev != NULL
-	     && !text_locked() && !curbuf_locked() && !updating_screen)
-	handle_drop_internal();
+    ಆದರೆ (!drop_busy && drop_filev != ಖಾಲಿ
+	     && !ಪಠ್ಯ_locked() && !curbuf_locked() && !updating_screen)
+	handle_drop_ಆಂತರಿಕ();
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * ":preserve".
  */
-    static void
-ex_preserve(exarg_T *eap UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ex_preserve(exarg_T *eap ಬಳಸದ)
 {
     curbuf->b_flags |= BF_PRESERVED;
     ml_preserve(curbuf, TRUE);
@@ -7187,18 +7187,18 @@ ex_preserve(exarg_T *eap UNUSED)
 /*
  * ":recover".
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_recover(exarg_T *eap)
 {
     // Set recoverymode right away to avoid the ATTENTION prompt.
     recoverymode = TRUE;
-    if (!check_changed(curbuf, (p_awa ? CCGD_AW : 0)
+    ಆದರೆ (!check_ಬದಲಾಯಿತು(curbuf, (p_awa ? CCGD_AW : 0)
 			     | CCGD_MULTWIN
 			     | (eap->forceit ? CCGD_FORCEIT : 0)
 			     | CCGD_EXCMD)
 
 	    && (*eap->arg == NUL
-			     || setfname(curbuf, eap->arg, NULL, TRUE) == OK))
+			     || setfname(curbuf, eap->arg, ಖಾಲಿ, TRUE) == OK))
 	ml_recover(TRUE);
     recoverymode = FALSE;
 }
@@ -7207,41 +7207,41 @@ ex_recover(exarg_T *eap)
  * Command modifier used in a wrong way.  Also for other commands that can't
  * appear at the toplevel.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_wrongmodifier(exarg_T *eap)
 {
     eap->errmsg = ex_errmsg(e_invalid_command_str, eap->cmd);
 }
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 
 // callback function for 'findfunc'
-static callback_T ffu_cb;
+ಸ್ಥಿರ callback_T ffu_cb;
 
-    static callback_T *
-get_findfunc_callback(void)
+    ಸ್ಥಿರ callback_T *
+get_findfunc_callback(ಶೂನ್ಯ)
 {
-    return *curbuf->b_p_ffu != NUL ? &curbuf->b_ffu_cb : &ffu_cb;
+    ಹಿಂತಿರುಗಿ *curbuf->b_p_ffu != NUL ? &curbuf->b_ffu_cb : &ffu_cb;
 }
 
 /*
  * Call 'findfunc' to obtain a list of file names.
  */
-    static list_T *
-call_findfunc(char_u *pat, int cmdcomplete)
+    ಸ್ಥಿರ list_T *
+call_findfunc(char_u *pat, ಪೂರ್ಣಾಂಕ cmdcomplete)
 {
-    typval_T	args[3];
+    typval_T	ವಾದಗಳು[3];
     callback_T	*cb;
     typval_T	rettv;
-    int		retval;
+    ಪೂರ್ಣಾಂಕ		retval;
     sctx_T	saved_sctx = current_sctx;
     sctx_T	*ctx;
 
-    args[0].v_type = VAR_STRING;
-    args[0].vval.v_string = pat;
-    args[1].v_type = VAR_BOOL;
-    args[1].vval.v_number = cmdcomplete;
-    args[2].v_type = VAR_UNKNOWN;
+    ವಾದಗಳು[0].v_type = VAR_STRING;
+    ವಾದಗಳು[0].vval.v_string = pat;
+    ವಾದಗಳು[1].v_type = VAR_BOOL;
+    ವಾದಗಳು[1].vval.v_ಸಂಖ್ಯೆ = cmdcomplete;
+    ವಾದಗಳು[2].v_type = VAR_UNKNOWN;
 
     // Lock the text to prevent weird things from happening.  Also disallow
     // switching to another window, it should not be needed and may end up in
@@ -7249,29 +7249,29 @@ call_findfunc(char_u *pat, int cmdcomplete)
     ++textlock;
 
     ctx = get_option_sctx("findfunc");
-    if (ctx != NULL)
+    ಆದರೆ (ctx != ಖಾಲಿ)
 	current_sctx = *ctx;
 
     cb = get_findfunc_callback();
-    retval = call_callback(cb, -1, &rettv, 2, args);
+    retval = call_callback(cb, -1, &rettv, 2, ವಾದಗಳು);
 
     current_sctx = saved_sctx;
 
     --textlock;
 
-    list_T *retlist = NULL;
+    list_T *retlist = ಖಾಲಿ;
 
-    if (retval == OK)
+    ಆದರೆ (retval == OK)
     {
-	if (rettv.v_type == VAR_LIST)
+	ಆದರೆ (rettv.v_type == VAR_LIST)
 	    retlist = list_copy(rettv.vval.v_list, FALSE, FALSE, get_copyID());
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    emsg(_(e_invalid_return_type_from_findfunc));
 
 	clear_tv(&rettv);
     }
 
-    return retlist;
+    ಹಿಂತಿರುಗಿ retlist;
 }
 
 /*
@@ -7279,121 +7279,121 @@ call_findfunc(char_u *pat, int cmdcomplete)
  * Used for expanding the :find, :sfind and :tabfind command argument.
  * Returns OK on success and FAIL otherwise.
  */
-    int
-expand_findfunc(expand_T *xp, char_u *pat, char_u ***files, int *numMatches)
+    ಪೂರ್ಣಾಂಕ
+expand_findfunc(expand_T *xp, char_u *pat, char_u ***files, ಪೂರ್ಣಾಂಕ *ಅಂಕೆ_Matches)
 {
     list_T	*l;
-    int		len;
+    ಪೂರ್ಣಾಂಕ		len;
 
-    *numMatches = 0;
-    *files = NULL;
+    *ಅಂಕೆ_Matches = 0;
+    *files = ಖಾಲಿ;
 
     l = call_findfunc(pat, VVAL_TRUE);
 
-    if (l == NULL)
-	return FAIL;
+    ಆದರೆ (l == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
     len = list_len(l);
-    if (len == 0)	    // empty List
+    ಆದರೆ (len == 0)	    // empty List
     {
 	list_free(l);
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
-    expand_process_user_list(l, files, numMatches, xp);
+    expand_process_user_list(l, files, ಅಂಕೆ_Matches, xp);
     list_free(l);
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Use 'findfunc' to find file 'findarg'.  The 'count' argument is used to find
  * the n'th matching file.
  */
-    static char_u *
-findfunc_find_file(char_u *findarg, int findarg_len, int count)
+    ಸ್ಥಿರ char_u *
+findfunc_ಕಂಡುಹಿಡಿ_file(char_u *findarg, ಪೂರ್ಣಾಂಕ findarg_len, ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_2)
 {
     list_T	*fname_list;
-    char_u	*ret_fname = NULL;
+    char_u	*ret_fname = ಖಾಲಿ;
     char_u	cc;
-    int		fname_count;
+    ಪೂರ್ಣಾಂಕ		fname_ಎಣಿಕೆ;
 
     cc = findarg[findarg_len];
     findarg[findarg_len] = NUL;
 
     fname_list = call_findfunc(findarg, VVAL_FALSE);
-    fname_count = list_len(fname_list);
+    fname_ಎಣಿಕೆ = list_len(fname_list);
 
-    if (fname_count == 0)
-	semsg(_(e_cant_find_file_str_in_path), findarg);
-    else
+    ಆದರೆ (fname_ಎಣಿಕೆ == 0)
+	semsg(_(e_cant_ಕಂಡುಹಿಡಿ_file_str_ಒಳ_ಮಾರ್ಗ), findarg);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (count > fname_count)
-	    semsg(_(e_no_more_file_str_found_in_path), findarg);
-	else
+	ಆದರೆ (ಎಣಿಕೆ_2 > fname_ಎಣಿಕೆ)
+	    semsg(_(e_no_ಇನ್ನಷ್ಟು_file_str_ಸಿಕ್ಕಿತು_ಒಳ_ಮಾರ್ಗ), findarg);
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    listitem_T *li = list_find(fname_list, count - 1);
+	    listitem_T *li = list_ಕಂಡುಹಿಡಿ(fname_list, ಎಣಿಕೆ_2 - 1);
 
-	    if (li != NULL)
+	    ಆದರೆ (li != ಖಾಲಿ)
 	    {
 		typval_T *tv = &li->li_tv;
 
-		if (tv->v_type == VAR_STRING && tv->vval.v_string != NULL)
+		ಆದರೆ (tv->v_type == VAR_STRING && tv->vval.v_string != ಖಾಲಿ)
 		    ret_fname = vim_strsave(tv->vval.v_string);
-		else if (tv->v_type == VAR_DICT && tv->vval.v_dict != NULL)
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (tv->v_type == VAR_DICT && tv->vval.v_dict != ಖಾಲಿ)
 		    ret_fname = dict_get_string(tv->vval.v_dict, "word", TRUE);
 	    }
 	}
     }
 
-    if (fname_list != NULL)
+    ಆದರೆ (fname_list != ಖಾಲಿ)
 	list_free(fname_list);
 
     findarg[findarg_len] = cc;
 
-    return ret_fname;
+    ಹಿಂತಿರುಗಿ ret_fname;
 }
 
 /*
  * Process the 'findfunc' option value.
  * Returns NULL on success and an error message on failure.
  */
-    char *
-did_set_findfunc(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_findfunc(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
-    int	retval;
+    ಪೂರ್ಣಾಂಕ	retval;
 
-    if (args->os_flags & OPT_LOCAL)
+    ಆದರೆ (ವಾದಗಳು->os_flags & OPT_LOCAL)
 	// buffer-local option set
-	retval = option_set_callback_func(curbuf->b_p_ffu, &curbuf->b_ffu_cb);
-    else
+	retval = option_ಗಣ_callback_func(curbuf->b_p_ffu, &curbuf->b_ffu_cb);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// global option set
-	retval = option_set_callback_func(p_ffu, &ffu_cb);
+	retval = option_ಗಣ_callback_func(p_ffu, &ffu_cb);
 	// when using :set, free the local callback
-	if (!(args->os_flags & OPT_GLOBAL))
+	ಆದರೆ (!(ವಾದಗಳು->os_flags & OPT_GLOBAL))
 	    free_callback(&curbuf->b_ffu_cb);
     }
 
-    if (retval == FAIL)
-	return e_invalid_argument;
+    ಆದರೆ (retval == FAIL)
+	ಹಿಂತಿರುಗಿ e_invalid_ವಾದ;
 
     // If the option value starts with <SID> or s:, then replace that with
     // the script identifier.
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ವಾದಗಳು->os_varp;
     char_u	*name = get_scriptlocal_funcname(*varp);
-    if (name != NULL)
+    ಆದರೆ (name != ಖಾಲಿ)
     {
 	free_string_option(*varp);
 	*varp = name;
     }
 
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
-# if defined(EXITFREE)
-    void
-free_findfunc_option(void)
+# ಆದರೆ defined(EXITFREE)
+    ಶೂನ್ಯ
+free_findfunc_option(ಶೂನ್ಯ)
 {
     free_callback(&ffu_cb);
 }
@@ -7403,14 +7403,14 @@ free_findfunc_option(void)
  * Mark the global 'findfunc' callback with "copyID" so that it is not
  * garbage collected.
  */
-    int
-set_ref_in_findfunc(int copyID UNUSED)
+    ಪೂರ್ಣಾಂಕ
+ಗಣ_ref_ಒಳ_findfunc(ಪೂರ್ಣಾಂಕ copyID ಬಳಸದ)
 {
-    int abort = FALSE;
-    abort = set_ref_in_callback(&ffu_cb, copyID);
-    return abort;
+    ಪೂರ್ಣಾಂಕ abort = FALSE;
+    abort = ಗಣ_ref_ಒಳ_callback(&ffu_cb, copyID);
+    ಹಿಂತಿರುಗಿ abort;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * :sview [+command] file	split window with new file, read-only
@@ -7425,126 +7425,126 @@ set_ref_in_findfunc(int copyID UNUSED)
  * :tabnew [[+command] file]	just like :tabedit
  * :tabfind [+command] file	open new Tab page and find "file"
  */
-    void
+    ಶೂನ್ಯ
 ex_splitview(exarg_T *eap)
 {
     win_T	*old_curwin = curwin;
-    char_u	*fname = NULL;
-#ifdef FEAT_BROWSE
-    char_u	dot_path[] = ".";
-    int		save_cmod_flags = cmdmod.cmod_flags;
-#endif
-    int		use_tab = eap->cmdidx == CMD_tabedit
+    char_u	*fname = ಖಾಲಿ;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_BROWSE
+    char_u	dot_ಮಾರ್ಗ[] = ".";
+    ಪೂರ್ಣಾಂಕ		save_cmod_flags = cmdmod.cmod_flags;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಪೂರ್ಣಾಂಕ		use_tab = eap->cmdidx == CMD_tabedit
 		       || eap->cmdidx == CMD_tabfind
 		       || eap->cmdidx == CMD_tabnew;
 
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+    ಆದರೆ (ERROR_IF_ANY_POPUP_ಕಿಟಕಿ)
+	ಹಿಂತಿರುಗಿ;
 
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
     need_mouse_correct = TRUE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_QUICKFIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
     // A ":split" in the quickfix window works like ":new".  Don't want two
     // quickfix windows.  But it's OK when doing ":tab split".
-    if (bt_quickfix(curbuf) && cmdmod.cmod_tab == 0)
+    ಆದರೆ (bt_quickfix(curbuf) && cmdmod.cmod_tab == 0)
     {
-	if (eap->cmdidx == CMD_split)
+	ಆದರೆ (eap->cmdidx == CMD_ವಿಭಜಿಸು)
 	    eap->cmdidx = CMD_new;
-	if (eap->cmdidx == CMD_vsplit)
+	ಆದರೆ (eap->cmdidx == CMD_vsplit)
 	    eap->cmdidx = CMD_vnew;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (eap->cmdidx == CMD_sfind || eap->cmdidx == CMD_tabfind)
+    ಆದರೆ (eap->cmdidx == CMD_sfind || eap->cmdidx == CMD_tabfind)
     {
-	char_u	*file_to_find = NULL;
-	char	*search_ctx = NULL;
+	char_u	*file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ = ಖಾಲಿ;
+	ಅಕ್ಷರ	*ಹುಡುಕು_ctx = ಖಾಲಿ;
 
-	if (*get_findfunc() != NUL)
+	ಆದರೆ (*get_findfunc() != NUL)
 	{
-#ifdef FEAT_EVAL
-	    fname = findfunc_find_file(eap->arg, (int)STRLEN(eap->arg),
-				       eap->addr_count > 0 ? eap->line2 : 1);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	    fname = findfunc_ಕಂಡುಹಿಡಿ_file(eap->arg, (ಪೂರ್ಣಾಂಕ)STRLEN(eap->arg),
+				       eap->addr_ಎಣಿಕೆ > 0 ? eap->line2 : 1);
+#ಆದರೆ_ಅಂತ್ಯ
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    fname = find_file_in_path(eap->arg, (int)STRLEN(eap->arg),
+	    fname = ಕಂಡುಹಿಡಿ_file_ಒಳ_ಮಾರ್ಗ(eap->arg, (ಪೂರ್ಣಾಂಕ)STRLEN(eap->arg),
 					      FNAME_MESS, TRUE, curbuf->b_ffname,
-					      &file_to_find, &search_ctx);
-	    vim_free(file_to_find);
-	    vim_findfile_cleanup(search_ctx);
+					      &file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ, &ಹುಡುಕು_ctx);
+	    vim_free(file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ);
+	    vim_findfile_cleanup(ಹುಡುಕು_ctx);
 	}
-	if (fname == NULL)
-	    goto theend;
+	ಆದರೆ (fname == ಖಾಲಿ)
+	    ಹೋಗು theend;
 	eap->arg = fname;
     }
-#ifdef FEAT_BROWSE
-    else if ((cmdmod.cmod_flags & CMOD_BROWSE)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_BROWSE
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((cmdmod.cmod_flags & CMOD_BROWSE)
 	    && eap->cmdidx != CMD_vnew
 	    && eap->cmdidx != CMD_new)
     {
-	if (
+	ಆದರೆ (
 # ifdef FEAT_GUI
-	    !gui.in_use &&
+	    !gui.ಒಳ_use &&
 # endif
-		au_has_group((char_u *)"FileExplorer"))
+		au_has_ಗುಂಪು((char_u *)"FileExplorer"))
 	{
 	    // No browsing supported but we do have the file explorer:
 	    // Edit the directory.
-	    if (*eap->arg == NUL || !mch_isdir(eap->arg))
-		eap->arg = dot_path;
+	    ಆದರೆ (*eap->arg == NUL || !mch_isdir(eap->arg))
+		eap->arg = dot_ಮಾರ್ಗ;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    fname = do_browse(0, (char_u *)(use_tab
 			? _("Edit File in new tab page")
 			: _("Edit File in new window")),
-					  eap->arg, NULL, NULL, NULL, curbuf);
-	    if (fname == NULL)
-		goto theend;
+					  eap->arg, ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ, curbuf);
+	    ಆದರೆ (fname == ಖಾಲಿ)
+		ಹೋಗು theend;
 	    eap->arg = fname;
 	}
     }
     cmdmod.cmod_flags &= ~CMOD_BROWSE;	// Don't browse again in do_ecmd().
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     /*
      * Either open new tab page or split the window.
      */
-    if (use_tab)
+    ಆದರೆ (use_tab)
     {
-	if (win_new_tabpage(cmdmod.cmod_tab != 0 ? cmdmod.cmod_tab
-			 : eap->addr_count == 0 ? 0
-					       : (int)eap->line2 + 1) != FAIL)
+	ಆದರೆ (win_new_tabpage(cmdmod.cmod_tab != 0 ? cmdmod.cmod_tab
+			 : eap->addr_ಎಣಿಕೆ == 0 ? 0
+					       : (ಪೂರ್ಣಾಂಕ)eap->line2 + 1) != FAIL)
 	{
 	    do_exedit(eap, old_curwin);
 
 	    // set the alternate buffer for the window we came from
-	    if (curwin != old_curwin
+	    ಆದರೆ (curwin != old_curwin
 		    && win_valid(old_curwin)
-		    && old_curwin->w_buffer != curbuf
+		    && old_curwin->w_ಬಫರ್ != curbuf
 		    && (cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
 		old_curwin->w_alt_fnum = curbuf->b_fnum;
 	}
     }
-    else if (win_split(eap->addr_count > 0 ? (int)eap->line2 : 0,
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (win_ವಿಭಜಿಸು(eap->addr_ಎಣಿಕೆ > 0 ? (ಪೂರ್ಣಾಂಕ)eap->line2 : 0,
 				     *eap->cmd == 'v' ? WSP_VERT : 0) != FAIL)
     {
 	// Reset 'scrollbind' when editing another file, but keep it when
 	// doing ":split" without arguments.
-	if (*eap->arg != NUL)
+	ಆದರೆ (*eap->arg != NUL)
 	    RESET_BINDING(curwin);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    do_check_scrollbind(FALSE);
 	do_exedit(eap, old_curwin);
     }
 
-#ifdef FEAT_BROWSE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_BROWSE
     cmdmod.cmod_flags = save_cmod_flags;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 theend:
     vim_free(fname);
@@ -7553,12 +7553,12 @@ theend:
 /*
  * Open a new tab page.
  */
-    void
-tabpage_new(void)
+    ಶೂನ್ಯ
+tabpage_new(ಶೂನ್ಯ)
 {
     exarg_T	ea;
 
-    CLEAR_FIELD(ea);
+    CLEAR_ಕ್ಷೇತ್ರ(ea);
     ea.cmdidx = CMD_tabnew;
     ea.cmd = (char_u *)"tabn";
     ea.arg = (char_u *)"";
@@ -7568,113 +7568,113 @@ tabpage_new(void)
 /*
  * :tabnext command
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_tabnext(exarg_T *eap)
 {
-    int tab_number;
+    ಪೂರ್ಣಾಂಕ tab_ಸಂಖ್ಯೆ;
 
-    if (ERROR_IF_POPUP_WINDOW)
-	return;
-    switch (eap->cmdidx)
+    ಆದರೆ (ERROR_IF_POPUP_ಕಿಟಕಿ)
+	ಹಿಂತಿರುಗಿ;
+    ಆಯ್ಕೆ (eap->cmdidx)
     {
-	case CMD_tabfirst:
-	case CMD_tabrewind:
+	ಸ್ಥಿತಿ CMD_tabfirst:
+	ಸ್ಥಿತಿ CMD_tabrewind:
 	    goto_tabpage(1);
-	    break;
-	case CMD_tablast:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ CMD_tablast:
 	    goto_tabpage(9999);
-	    break;
-	case CMD_tabprevious:
-	case CMD_tabNext:
-	    if (eap->arg && *eap->arg != NUL)
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ CMD_tabprevious:
+	ಸ್ಥಿತಿ CMD_tab_ಮುಂದಿನ:
+	    ಆದರೆ (eap->arg && *eap->arg != NUL)
 	    {
 		char_u *p = eap->arg;
 		char_u *p_save = p;
 
-		tab_number = getdigits(&p);
-		if (p == p_save || *p_save == '-' || *p != NUL
-			    || tab_number == 0)
+		tab_ಸಂಖ್ಯೆ = getdigits(&p);
+		ಆದರೆ (p == p_save || *p_save == '-' || *p != NUL
+			    || tab_ಸಂಖ್ಯೆ == 0)
 		{
 		    // No numbers as argument.
-		    eap->errmsg = ex_errmsg(e_invalid_argument_str, eap->arg);
-		    return;
+		    eap->errmsg = ex_errmsg(e_invalid_ವಾದ_str, eap->arg);
+		    ಹಿಂತಿರುಗಿ;
 		}
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		if (eap->addr_count == 0)
-		    tab_number = 1;
-		else
+		ಆದರೆ (eap->addr_ಎಣಿಕೆ == 0)
+		    tab_ಸಂಖ್ಯೆ = 1;
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    tab_number = eap->line2;
-		    if (tab_number < 1)
+		    tab_ಸಂಖ್ಯೆ = eap->line2;
+		    ಆದರೆ (tab_ಸಂಖ್ಯೆ < 1)
 		    {
 			eap->errmsg = _(e_invalid_range);
-			return;
+			ಹಿಂತಿರುಗಿ;
 		    }
 		}
 	    }
-	    goto_tabpage(-tab_number);
-	    break;
-	default: // CMD_tabnext
-	    tab_number = get_tabpage_arg(eap);
-	    if (eap->errmsg == NULL)
-		goto_tabpage(tab_number);
-	    break;
+	    goto_tabpage(-tab_ಸಂಖ್ಯೆ);
+	    ನಿಲ್ಲಿಸು;
+	ಪೂರ್ವನಿಯೋಜಿತ: // CMD_tabnext
+	    tab_ಸಂಖ್ಯೆ = get_tabpage_arg(eap);
+	    ಆದರೆ (eap->errmsg == ಖಾಲಿ)
+		goto_tabpage(tab_ಸಂಖ್ಯೆ);
+	    ನಿಲ್ಲಿಸು;
     }
 }
 
 /*
  * :tabmove command
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_tabmove(exarg_T *eap)
 {
-    int tab_number;
+    ಪೂರ್ಣಾಂಕ tab_ಸಂಖ್ಯೆ;
 
-    tab_number = get_tabpage_arg(eap);
-    if (eap->errmsg == NULL)
-	tabpage_move(tab_number);
+    tab_ಸಂಖ್ಯೆ = get_tabpage_arg(eap);
+    ಆದರೆ (eap->errmsg == ಖಾಲಿ)
+	tabpage_move(tab_ಸಂಖ್ಯೆ);
 }
 
 /*
  * :tabs command: List tabs and their contents.
  */
-    static void
-ex_tabs(exarg_T *eap UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ex_tabs(exarg_T *eap ಬಳಸದ)
 {
     tabpage_T	*tp;
     win_T	*wp;
-    int		tabcount = 1;
+    ಪೂರ್ಣಾಂಕ		tabcount = 1;
 
-    msg_start();
-    msg_scroll = TRUE;
-    for (tp = first_tabpage; tp != NULL && !got_int; tp = tp->tp_next)
+    ಸಂದೇಶ_ಆರಂಭ();
+    ಸಂದೇಶ_scroll = TRUE;
+    ಗಾಗಿ (tp = ಮೊದಲ_tabpage; tp != ಖಾಲಿ && !got_int; tp = tp->tp_ಮುಂದಿನ)
     {
-	msg_putchar('\n');
-	vim_snprintf((char *)IObuff, IOSIZE, _("Tab page %d"), tabcount++);
-	msg_outtrans_attr(IObuff, HL_ATTR(HLF_T));
-	out_flush();	    // output one line at a time
+	ಸಂದೇಶ_putchar('\n');
+	vim_snprintf((ಅಕ್ಷರ *)IObuff, IOSIZE, _("Tab page %d"), tabcount++);
+	ಸಂದೇಶ_outtrans_attr(IObuff, HL_ATTR(HLF_T));
+	ಹೊರಹೋಗು_flush();	    // output one line at a time
 	ui_breakcheck();
 
-	if (tp  == curtab)
+	ಆದರೆ (tp  == curtab)
 	    wp = firstwin;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    wp = tp->tp_firstwin;
-	for ( ; wp != NULL && !got_int; wp = wp->w_next)
+	ಗಾಗಿ ( ; wp != ಖಾಲಿ && !got_int; wp = wp->w_ಮುಂದಿನ)
 	{
-	    msg_putchar('\n');
-	    msg_putchar(wp == curwin ? '>' : ' ');
-	    msg_putchar(' ');
-	    msg_putchar(bufIsChanged(wp->w_buffer) ? '+' : ' ');
-	    msg_putchar(' ');
-	    if (buf_spname(wp->w_buffer) != NULL)
-		vim_strncpy(IObuff, buf_spname(wp->w_buffer), IOSIZE - 1);
-	    else
-		home_replace(wp->w_buffer, wp->w_buffer->b_fname,
+	    ಸಂದೇಶ_putchar('\n');
+	    ಸಂದೇಶ_putchar(wp == curwin ? '>' : ' ');
+	    ಸಂದೇಶ_putchar(' ');
+	    ಸಂದೇಶ_putchar(buf_Is_ಬದಲಾಯಿತು(wp->w_ಬಫರ್) ? '+' : ' ');
+	    ಸಂದೇಶ_putchar(' ');
+	    ಆದರೆ (buf_spname(wp->w_ಬಫರ್) != ಖಾಲಿ)
+		vim_strncpy(IObuff, buf_spname(wp->w_ಬಫರ್), IOSIZE - 1);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		home_replace(wp->w_ಬಫರ್, wp->w_ಬಫರ್->b_fname,
 							IObuff, IOSIZE, TRUE);
-	    msg_outtrans(IObuff);
-	    out_flush();	    // output one line at a time
+	    ಸಂದೇಶ_outtrans(IObuff);
+	    ಹೊರಹೋಗು_flush();	    // output one line at a time
 	    ui_breakcheck();
 	}
     }
@@ -7684,49 +7684,49 @@ ex_tabs(exarg_T *eap UNUSED)
  * ":mode": Set screen mode.
  * If no argument given, just get the screen size and redraw.
  */
-    static void
-ex_mode(exarg_T *eap)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ex_ಬಹುಲಕ(exarg_T *eap)
 {
-    if (*eap->arg == NUL)
+    ಆದರೆ (*eap->arg == NUL)
 	shell_resized();
-    else
-	emsg(_(e_screen_mode_setting_not_supported));
+    ಇಲ್ಲದಿದ್ದರೆ
+	emsg(_(e_screen_ಬಹುಲಕ_setting_not_supported));
 }
 
 /*
  * ":resize".
  * set, increment or decrement current window height
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_resize(exarg_T *eap)
 {
-    int		n;
+    ಪೂರ್ಣಾಂಕ		n;
     win_T	*wp = curwin;
 
-    if (eap->addr_count > 0)
+    ಆದರೆ (eap->addr_ಎಣಿಕೆ > 0)
     {
 	n = eap->line2;
-	for (wp = firstwin; wp->w_next != NULL && --n > 0; wp = wp->w_next)
+	ಗಾಗಿ (wp = firstwin; wp->w_ಮುಂದಿನ != ಖಾಲಿ && --n > 0; wp = wp->w_ಮುಂದಿನ)
 	    ;
     }
 
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
     need_mouse_correct = TRUE;
-#endif
-    n = atol((char *)eap->arg);
-    if (cmdmod.cmod_split & WSP_VERT)
+#ಆದರೆ_ಅಂತ್ಯ
+    n = atol((ಅಕ್ಷರ *)eap->arg);
+    ಆದರೆ (cmdmod.cmod_ವಿಭಜಿಸು & WSP_VERT)
     {
-	if (*eap->arg == '-' || *eap->arg == '+')
-	    n += wp->w_width;
-	else if (n == 0 && eap->arg[0] == NUL)	// default is very wide
+	ಆದರೆ (*eap->arg == '-' || *eap->arg == '+')
+	    n += wp->w_ಅಗಲ;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (n == 0 && eap->arg[0] == NUL)	// default is very wide
 	    n = 9999;
 	win_setwidth_win(n, wp);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (*eap->arg == '-' || *eap->arg == '+')
-	    n += wp->w_height;
-	else if (n == 0 && eap->arg[0] == NUL)	// default is very high
+	ಆದರೆ (*eap->arg == '-' || *eap->arg == '+')
+	    n += wp->w_ಎತ್ತರ;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (n == 0 && eap->arg[0] == NUL)	// default is very high
 	    n = 9999;
 	win_setheight_win(n, wp);
     }
@@ -7735,87 +7735,87 @@ ex_resize(exarg_T *eap)
 /*
  * ":find [+command] <file>" command.
  */
-    static void
-ex_find(exarg_T *eap)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ex_ಕಂಡುಹಿಡಿ(exarg_T *eap)
 {
-    if (!check_can_set_curbuf_forceit(eap->forceit))
-	return;
+    ಆದರೆ (!check_can_ಗಣ_curbuf_forceit(eap->forceit))
+	ಹಿಂತಿರುಗಿ;
 
-    char_u	*fname = NULL;
-    int		count;
-    char_u	*file_to_find = NULL;
-    char	*search_ctx = NULL;
+    char_u	*fname = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		ಎಣಿಕೆ_2;
+    char_u	*file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ = ಖಾಲಿ;
+    ಅಕ್ಷರ	*ಹುಡುಕು_ctx = ಖಾಲಿ;
 
-    if (*get_findfunc() != NUL)
+    ಆದರೆ (*get_findfunc() != NUL)
     {
-#ifdef FEAT_EVAL
-	fname = findfunc_find_file(eap->arg, (int)STRLEN(eap->arg),
-					eap->addr_count > 0 ? eap->line2 : 1);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	fname = findfunc_ಕಂಡುಹಿಡಿ_file(eap->arg, (ಪೂರ್ಣಾಂಕ)STRLEN(eap->arg),
+					eap->addr_ಎಣಿಕೆ > 0 ? eap->line2 : 1);
+#ಆದರೆ_ಅಂತ್ಯ
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	fname = find_file_in_path(eap->arg, (int)STRLEN(eap->arg), FNAME_MESS,
-			       TRUE, curbuf->b_ffname, &file_to_find, &search_ctx);
-	if (eap->addr_count > 0)
+	fname = ಕಂಡುಹಿಡಿ_file_ಒಳ_ಮಾರ್ಗ(eap->arg, (ಪೂರ್ಣಾಂಕ)STRLEN(eap->arg), FNAME_MESS,
+			       TRUE, curbuf->b_ffname, &file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ, &ಹುಡುಕು_ctx);
+	ಆದರೆ (eap->addr_ಎಣಿಕೆ > 0)
 	{
 	    // Repeat finding the file "count" times.  This matters when it appears
 	    // several times in the path.
-	    count = eap->line2;
-	    while (fname != NULL && --count > 0)
+	    ಎಣಿಕೆ_2 = eap->line2;
+	    ಆಗ (fname != ಖಾಲಿ && --ಎಣಿಕೆ_2 > 0)
 	    {
 		vim_free(fname);
-		fname = find_file_in_path(NULL, 0, FNAME_MESS,
-			      FALSE, curbuf->b_ffname, &file_to_find, &search_ctx);
+		fname = ಕಂಡುಹಿಡಿ_file_ಒಳ_ಮಾರ್ಗ(ಖಾಲಿ, 0, FNAME_MESS,
+			      FALSE, curbuf->b_ffname, &file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ, &ಹುಡುಕು_ctx);
 	    }
 	}
-	VIM_CLEAR(file_to_find);
-	vim_findfile_cleanup(search_ctx);
+	VIM_CLEAR(file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ);
+	vim_findfile_cleanup(ಹುಡುಕು_ctx);
     }
 
-    if (fname == NULL)
-	return;
+    ಆದರೆ (fname == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     eap->arg = fname;
-    do_exedit(eap, NULL);
+    do_exedit(eap, ಖಾಲಿ);
     vim_free(fname);
 }
 
 /*
  * ":open" simulation: for now works just like ":visual".
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_open(exarg_T *eap)
 {
     regmatch_T	regmatch;
     char_u	*p;
 
-#ifdef FEAT_EVAL
-    if (not_in_vim9(eap, false) == FAIL)
-	return;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಆದರೆ (not_ಒಳ_vim9(eap, false) == FAIL)
+	ಹಿಂತಿರುಗಿ;
+#ಆದರೆ_ಅಂತ್ಯ
     curwin->w_cursor.lnum = eap->line2;
     beginline(BL_SOL | BL_FIX);
-    if (*eap->arg == '/')
+    ಆದರೆ (*eap->arg == '/')
     {
 	// ":open /pattern/": put cursor in column found with pattern
 	++eap->arg;
 	p = skip_regexp(eap->arg, '/', magic_isset());
 	*p = NUL;
 	regmatch.regprog = vim_regcomp(eap->arg, magic_isset() ? RE_MAGIC : 0);
-	if (regmatch.regprog != NULL)
+	ಆದರೆ (regmatch.regprog != ಖಾಲಿ)
 	{
 	    // make a copy of the line, when searching for a mark it might be
 	    // flushed
-	    char_u *line = vim_strsave(ml_get_curline());
+	    char_u *ಸಾಲು = vim_strsave(ml_get_curline());
 
 	    regmatch.rm_ic = p_ic;
-	    if (vim_regexec(&regmatch, line, (colnr_T)0))
-		curwin->w_cursor.col = (colnr_T)(regmatch.startp[0] - line);
-	    else
-		emsg(_(e_no_match));
+	    ಆದರೆ (vim_regexec(&regmatch, ಸಾಲು, (colnr_T)0))
+		curwin->w_cursor.ಲಂಬಸಾಲು = (colnr_T)(regmatch.startp[0] - ಸಾಲು);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		emsg(_(e_no_ಹೊಂದಿಕೆ));
 	    vim_regfree(regmatch.regprog);
-	    vim_free(line);
+	    vim_free(ಸಾಲು);
 	}
 	// Move to the NUL, ignore any other arguments.
 	eap->arg += STRLEN(eap->arg);
@@ -7823,167 +7823,167 @@ ex_open(exarg_T *eap)
     check_cursor();
 
     eap->cmdidx = CMD_visual;
-    do_exedit(eap, NULL);
+    do_exedit(eap, ಖಾಲಿ);
 }
 
 /*
  * ":edit", ":badd", ":balt", ":visual".
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_edit(exarg_T *eap)
 {
-    char_u *ffname = eap->cmdidx == CMD_enew ? NULL : eap->arg;
+    char_u *ffname = eap->cmdidx == CMD_enew ? ಖಾಲಿ : eap->arg;
 
     // Exclude commands which keep the window's current buffer
-    if (
+    ಆದರೆ (
 	    eap->cmdidx != CMD_badd
 	    && eap->cmdidx != CMD_balt
 	    // All other commands must obey 'winfixbuf' / ! rules
-	    && (is_other_file(0, ffname) && !check_can_set_curbuf_forceit(eap->forceit))
+	    && (is_other_file(0, ffname) && !check_can_ಗಣ_curbuf_forceit(eap->forceit))
     )
-	return;
+	ಹಿಂತಿರುಗಿ;
 
-    do_exedit(eap, NULL);
+    do_exedit(eap, ಖಾಲಿ);
 }
 
 /*
  * ":edit <file>" command and alike.
  */
-    void
+    ಶೂನ್ಯ
 do_exedit(
     exarg_T	*eap,
     win_T	*old_curwin)	    // curwin before doing a split or NULL
 {
-    int		n;
-    int		need_hide;
-    int		exmode_was = exmode_active;
+    ಪೂರ್ಣಾಂಕ		n;
+    ಪೂರ್ಣಾಂಕ		need_hide;
+    ಪೂರ್ಣಾಂಕ		exmode_was = exmode_ಸಕ್ರಿಯ;
 
-    if ((eap->cmdidx != CMD_pedit && ERROR_IF_POPUP_WINDOW)
-						 || ERROR_IF_TERM_POPUP_WINDOW)
-	return;
+    ಆದರೆ ((eap->cmdidx != CMD_pedit && ERROR_IF_POPUP_ಕಿಟಕಿ)
+						 || ERROR_IF_ಪದ_POPUP_ಕಿಟಕಿ)
+	ಹಿಂತಿರುಗಿ;
     /*
      * ":vi" command ends Ex mode.
      */
-    if (exmode_active && (eap->cmdidx == CMD_visual
+    ಆದರೆ (exmode_ಸಕ್ರಿಯ && (eap->cmdidx == CMD_visual
 						|| eap->cmdidx == CMD_view))
     {
-	exmode_active = FALSE;
+	exmode_ಸಕ್ರಿಯ = FALSE;
 	ex_pressedreturn = FALSE;
-	if (*eap->arg == NUL)
+	ಆದರೆ (*eap->arg == NUL)
 	{
 	    // Special case:  ":global/pat/visual\NLvi-commands"
-	    if (global_busy)
+	    ಆದರೆ (global_busy)
 	    {
-		if (eap->nextcmd != NULL)
+		ಆದರೆ (eap->nextcmd != ಖಾಲಿ)
 		{
 		    stuffReadbuff(eap->nextcmd);
-		    eap->nextcmd = NULL;
+		    eap->nextcmd = ಖಾಲಿ;
 		}
 
-		if (exmode_was != EXMODE_VIM)
+		ಆದರೆ (exmode_was != EXMODE_VIM)
 		    settmode(TMODE_RAW);
-		int save_RedrawingDisabled = RedrawingDisabled;
+		ಪೂರ್ಣಾಂಕ save_RedrawingDisabled = RedrawingDisabled;
 		RedrawingDisabled = 0;
-		int save_nwr = no_wait_return;
+		ಪೂರ್ಣಾಂಕ save_nwr = no_wait_return;
 		no_wait_return = 0;
 		need_wait_return = FALSE;
-		int save_ms = msg_scroll;
-		msg_scroll = 0;
-#ifdef FEAT_GUI
-		int save_he = hold_gui_events;
+		ಪೂರ್ಣಾಂಕ save_ms = ಸಂದೇಶ_scroll;
+		ಸಂದೇಶ_scroll = 0;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+		ಪೂರ್ಣಾಂಕ save_he = hold_gui_events;
 		hold_gui_events = 0;
-#endif
-		set_must_redraw(UPD_CLEAR);
-		pending_exmode_active = TRUE;
+#ಆದರೆ_ಅಂತ್ಯ
+		ಗಣ_must_redraw(UPD_CLEAR);
+		pending_exmode_ಸಕ್ರಿಯ = TRUE;
 
 		main_loop(FALSE, TRUE);
 
-		pending_exmode_active = FALSE;
+		pending_exmode_ಸಕ್ರಿಯ = FALSE;
 		RedrawingDisabled = save_RedrawingDisabled;
 		no_wait_return = save_nwr;
-		msg_scroll = save_ms;
-#ifdef FEAT_GUI
+		ಸಂದೇಶ_scroll = save_ms;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 		hold_gui_events = save_he;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
-	    return;
+	    ಹಿಂತಿರುಗಿ;
 	}
     }
 
-    if ((eap->cmdidx == CMD_new
+    ಆದರೆ ((eap->cmdidx == CMD_new
 		|| eap->cmdidx == CMD_tabnew
 		|| eap->cmdidx == CMD_tabedit
 		|| eap->cmdidx == CMD_vnew) && *eap->arg == NUL)
     {
 	// ":new" or ":tabnew" without argument: edit a new empty buffer
 	setpcmark();
-	(void)do_ecmd(0, NULL, NULL, eap, ECMD_ONE,
+	(ಶೂನ್ಯ)do_ecmd(0, ಖಾಲಿ, ಖಾಲಿ, eap, ECMD_ONE,
 		      ECMD_HIDE + (eap->forceit ? ECMD_FORCEIT : 0),
-		      old_curwin == NULL ? curwin : NULL);
+		      old_curwin == ಖಾಲಿ ? curwin : ಖಾಲಿ);
     }
-    else if ((eap->cmdidx != CMD_split && eap->cmdidx != CMD_vsplit)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((eap->cmdidx != CMD_ವಿಭಜಿಸು && eap->cmdidx != CMD_vsplit)
 	    || *eap->arg != NUL
-#ifdef FEAT_BROWSE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_BROWSE
 	    || (cmdmod.cmod_flags & CMOD_BROWSE)
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    )
     {
 	// Can't edit another file when "textlock" or "curbuf_lock" is set.
 	// Only ":edit" or ":script" can bring us here, others are stopped
 	// earlier.
-	if (*eap->arg != NUL && text_or_buf_locked())
-	    return;
+	ಆದರೆ (*eap->arg != NUL && ಪಠ್ಯ_or_buf_locked())
+	    ಹಿಂತಿರುಗಿ;
 
 	n = readonlymode;
-	if (eap->cmdidx == CMD_view || eap->cmdidx == CMD_sview)
+	ಆದರೆ (eap->cmdidx == CMD_view || eap->cmdidx == CMD_sview)
 	    readonlymode = TRUE;
-	else if (eap->cmdidx == CMD_enew)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (eap->cmdidx == CMD_enew)
 	    readonlymode = FALSE;   // 'readonly' doesn't make sense in an
 				    // empty buffer
-	if (eap->cmdidx != CMD_balt && eap->cmdidx != CMD_badd)
+	ಆದರೆ (eap->cmdidx != CMD_balt && eap->cmdidx != CMD_badd)
 	    setpcmark();
-	if (do_ecmd(0, (eap->cmdidx == CMD_enew ? NULL : eap->arg),
-		    NULL, eap,
+	ಆದರೆ (do_ecmd(0, (eap->cmdidx == CMD_enew ? ಖಾಲಿ : eap->arg),
+		    ಖಾಲಿ, eap,
 		    // ":edit" goes to first line if Vi compatible
 		    (*eap->arg == NUL && eap->do_ecmd_lnum == 0
-				      && vim_strchr(p_cpo, CPO_GOTO1) != NULL)
+				      && vim_strchr(p_cpo, CPO_GOTO1) != ಖಾಲಿ)
 					       ? ECMD_ONE : eap->do_ecmd_lnum,
 		    (buf_hide(curbuf) ? ECMD_HIDE : 0)
 		    + (eap->forceit ? ECMD_FORCEIT : 0)
 		      // after a split we can use an existing buffer
-		    + (old_curwin != NULL ? ECMD_OLDBUF : 0)
+		    + (old_curwin != ಖಾಲಿ ? ECMD_OLDBUF : 0)
 		    + (eap->cmdidx == CMD_badd ? ECMD_ADDBUF : 0)
 		    + (eap->cmdidx == CMD_balt ? ECMD_ALTBUF : 0)
-		    , old_curwin == NULL ? curwin : NULL) == FAIL)
+		    , old_curwin == ಖಾಲಿ ? curwin : ಖಾಲಿ) == FAIL)
 	{
 	    // Editing the file failed.  If the window was split, close it.
-	    if (old_curwin != NULL)
+	    ಆದರೆ (old_curwin != ಖಾಲಿ)
 	    {
-		need_hide = (curbufIsChanged() && curbuf->b_nwindows <= 1);
-		if (!need_hide || buf_hide(curbuf))
+		need_hide = (curbuf_Is_ಬದಲಾಯಿತು() && curbuf->b_nwindows <= 1);
+		ಆದರೆ (!need_hide || buf_hide(curbuf))
 		{
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 		    cleanup_T   cs;
 
 		    // Reset the error/interrupt/exception state here so that
 		    // aborting() returns FALSE when closing a window.
 		    enter_cleanup(&cs);
-#endif
-#ifdef FEAT_GUI
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 		    need_mouse_correct = TRUE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		    win_close(curwin, !need_hide && !buf_hide(curbuf));
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 		    // Restore the error/interrupt/exception state if not
 		    // discarded by a new aborting error, interrupt, or
 		    // uncaught exception.
 		    leave_cleanup(&cs);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		}
 	    }
 	}
-	else if (readonlymode && curbuf->b_nwindows == 1)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (readonlymode && curbuf->b_nwindows == 1)
 	{
 	    // When editing an already visited buffer, 'readonly' won't be set
 	    // but the previous value is kept.  With ":view" and ":sview" we
@@ -7993,13 +7993,13 @@ do_exedit(
 	}
 	readonlymode = n;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (eap->do_ecmd_cmd != NULL)
-	    do_cmd_argument(eap->do_ecmd_cmd);
+	ಆದರೆ (eap->do_ecmd_cmd != ಖಾಲಿ)
+	    do_cmd_ವಾದ(eap->do_ecmd_cmd);
 	n = curwin->w_arg_idx_invalid;
 	check_arg_idx(curwin);
-	if (n != curwin->w_arg_idx_invalid)
+	ಆದರೆ (n != curwin->w_arg_idx_invalid)
 	    maketitle();
     }
 
@@ -8007,61 +8007,61 @@ do_exedit(
      * if ":split file" worked, set alternate file name in old window to new
      * file
      */
-    if (old_curwin != NULL
+    ಆದರೆ (old_curwin != ಖಾಲಿ
 	    && *eap->arg != NUL
 	    && curwin != old_curwin
 	    && win_valid(old_curwin)
-	    && old_curwin->w_buffer != curbuf
+	    && old_curwin->w_ಬಫರ್ != curbuf
 	    && (cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
 	old_curwin->w_alt_fnum = curbuf->b_fnum;
 
     ex_no_reprint = TRUE;
 }
 
-#ifndef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_GUI
 /*
  * ":gui" and ":gvim" when there is no GUI.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_nogui(exarg_T *eap)
 {
-    eap->errmsg = _(e_gui_cannot_be_used_not_enabled_at_compile_time);
+    eap->errmsg = _(e_gui_cannot_be_ಬಳಸಿದ_not_enabled_at_compile_ಸಮಯ);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_GUI_MSWIN) && defined(FEAT_MENU) && defined(FEAT_TEAROFF)
-    static void
+#ಆದರೆ defined(FEAT_GUI_MSWIN) && defined(FEAT_MENU) && defined(FEAT_TEAROFF)
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_tearoff(exarg_T *eap)
 {
     gui_make_tearoff(eap->arg);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if (defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK) \
-	|| defined(FEAT_TERM_POPUP_MENU)) && defined(FEAT_MENU)
-    static void
+#ಆದರೆ (defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK) \
+	|| defined(FEAT_ಪದ_POPUP_MENU)) && defined(FEAT_MENU)
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_popup(exarg_T *eap)
 {
-# if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
-    if (gui.in_use)
+# ಆದರೆ defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
+    ಆದರೆ (gui.ಒಳ_use)
 	gui_make_popup(eap->arg, eap->forceit);
-#  ifdef FEAT_TERM_POPUP_MENU
-    else
+#  ifdef FEAT_ಪದ_POPUP_MENU
+    ಇಲ್ಲದಿದ್ದರೆ
 #  endif
 # endif
-# ifdef FEAT_TERM_POPUP_MENU
+# ifdef FEAT_ಪದ_POPUP_MENU
 	pum_make_popup(eap->arg, eap->forceit);
 # endif
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    static void
-ex_swapname(exarg_T *eap UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ex_swapname(exarg_T *eap ಬಳಸದ)
 {
-    if (curbuf->b_ml.ml_mfp == NULL || curbuf->b_ml.ml_mfp->mf_fname == NULL)
-	msg(_("No swap file"));
-    else
-	msg((char *)curbuf->b_ml.ml_mfp->mf_fname);
+    ಆದರೆ (curbuf->b_ml.ml_mfp == ಖಾಲಿ || curbuf->b_ml.ml_mfp->mf_fname == ಖಾಲಿ)
+	ಸಂದೇಶ(_("No swap file"));
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಸಂದೇಶ((ಅಕ್ಷರ *)curbuf->b_ml.ml_mfp->mf_fname);
 }
 
 /*
@@ -8069,14 +8069,14 @@ ex_swapname(exarg_T *eap UNUSED)
  * offset.
  * (1998-11-02 16:21:01  R. Edward Ralston <eralston@computer.org>)
  */
-    static void
-ex_syncbind(exarg_T *eap UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ex_syncbind(exarg_T *eap ಬಳಸದ)
 {
     win_T	*wp;
     win_T	*save_curwin = curwin;
     buf_T	*save_curbuf = curbuf;
-    long	topline;
-    long	y;
+    ದೀರ್ಘ	topline;
+    ದೀರ್ಘ	y;
     linenr_T	old_linenr = curwin->w_cursor.lnum;
 
     setpcmark();
@@ -8084,22 +8084,22 @@ ex_syncbind(exarg_T *eap UNUSED)
     /*
      * determine max topline
      */
-    if (curwin->w_p_scb)
+    ಆದರೆ (curwin->w_p_scb)
     {
 	topline = curwin->w_topline;
 	FOR_ALL_WINDOWS(wp)
 	{
-	    if (wp->w_p_scb && wp->w_buffer)
+	    ಆದರೆ (wp->w_p_scb && wp->w_ಬಫರ್)
 	    {
-		y = wp->w_buffer->b_ml.ml_line_count - get_scrolloff_value();
-		if (topline > y)
+		y = wp->w_ಬಫರ್->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ - get_scrolloff_ಮೌಲ್ಯ();
+		ಆದರೆ (topline > y)
 		    topline = y;
 	    }
 	}
-	if (topline < 1)
+	ಆದರೆ (topline < 1)
 	    topline = 1;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	topline = 1;
     }
@@ -8110,27 +8110,27 @@ ex_syncbind(exarg_T *eap UNUSED)
      */
     FOR_ALL_WINDOWS(curwin)
     {
-	if (curwin->w_p_scb)
+	ಆದರೆ (curwin->w_p_scb)
 	{
-	    curbuf = curwin->w_buffer;
+	    curbuf = curwin->w_ಬಫರ್;
 	    y = topline - curwin->w_topline;
-	    if (y > 0)
+	    ಆದರೆ (y > 0)
 		scrollup(y, TRUE);
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		scrolldown(-y, TRUE);
 	    curwin->w_scbind_pos = topline;
 	    redraw_later(UPD_VALID);
 	    cursor_correct();
-	    curwin->w_redr_status = true;
+	    curwin->w_redr_ಸ್ಥಿತಿ = true;
 	}
     }
     curwin = save_curwin;
     curbuf = save_curbuf;
-    if (curwin->w_p_scb)
+    ಆದರೆ (curwin->w_p_scb)
     {
 	did_syncbind = TRUE;
 	checkpcmark();
-	if (old_linenr != curwin->w_cursor.lnum)
+	ಆದರೆ (old_linenr != curwin->w_cursor.lnum)
 	{
 	    char_u ctrl_o[2];
 
@@ -8142,107 +8142,107 @@ ex_syncbind(exarg_T *eap UNUSED)
 }
 
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_read(exarg_T *eap)
 {
-    int		i;
-    int		empty = (curbuf->b_ml.ml_flags & ML_EMPTY);
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		ಖಾಲಿಗಳು_2 = (curbuf->b_ml.ml_flags & ML_ಖಾಲಿಗಳು);
     linenr_T	lnum;
 
-    if (eap->usefilter)			// :r!cmd
+    ಆದರೆ (eap->usefilter)			// :r!cmd
     {
 	do_bang(1, eap, FALSE, FALSE, TRUE);
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if (u_save(eap->line2, (linenr_T)(eap->line2 + 1)) == FAIL)
-	return;
+    ಆದರೆ (u_save(eap->line2, (linenr_T)(eap->line2 + 1)) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
-#ifdef FEAT_BROWSE
-    if (cmdmod.cmod_flags & CMOD_BROWSE)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_BROWSE
+    ಆದರೆ (cmdmod.cmod_flags & CMOD_BROWSE)
     {
 	char_u *browseFile;
 
 	browseFile = do_browse(0, (char_u *)_("Append File"), eap->arg,
-		NULL, NULL, NULL, curbuf);
-	if (browseFile != NULL)
+		ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ, curbuf);
+	ಆದರೆ (browseFile != ಖಾಲಿ)
 	{
-	    i = readfile(browseFile, NULL,
+	    i = readfile(browseFile, ಖಾಲಿ,
 		    eap->line2, (linenr_T)0, (linenr_T)MAXLNUM, eap, 0);
 	    vim_free(browseFile);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    i = OK;
     }
-    else
-#endif
-	if (*eap->arg == NUL)
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	ಆದರೆ (*eap->arg == NUL)
 	{
-	    if (check_fname() == FAIL)	// check for no file name
-		return;
+	    ಆದರೆ (check_fname() == FAIL)	// check for no file name
+		ಹಿಂತಿರುಗಿ;
 	    i = readfile(curbuf->b_ffname, curbuf->b_fname,
 		    eap->line2, (linenr_T)0, (linenr_T)MAXLNUM, eap, 0);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (vim_strchr(p_cpo, CPO_ALTREAD) != NULL)
-		(void)setaltfname(eap->arg, eap->arg, (linenr_T)1);
-	    i = readfile(eap->arg, NULL,
+	    ಆದರೆ (vim_strchr(p_cpo, CPO_ALTREAD) != ಖಾಲಿ)
+		(ಶೂನ್ಯ)setaltfname(eap->arg, eap->arg, (linenr_T)1);
+	    i = readfile(eap->arg, ಖಾಲಿ,
 		    eap->line2, (linenr_T)0, (linenr_T)MAXLNUM, eap, 0);
 
 	}
-    if (i != OK)
+    ಆದರೆ (i != OK)
     {
-#if defined(FEAT_EVAL)
-	if (!aborting())
-#endif
+#ಆದರೆ defined(FEAT_EVAL)
+	ಆದರೆ (!aborting())
+#ಆದರೆ_ಅಂತ್ಯ
 	    semsg(_(e_cant_open_file_str), eap->arg);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (empty && exmode_active)
+	ಆದರೆ (ಖಾಲಿಗಳು_2 && exmode_ಸಕ್ರಿಯ)
 	{
 	    // Delete the empty line that remains.  Historically ex does
 	    // this but vi doesn't.
-	    if (eap->line2 == 0)
-		lnum = curbuf->b_ml.ml_line_count;
-	    else
+	    ಆದರೆ (eap->line2 == 0)
+		lnum = curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		lnum = 1;
-	    if (*ml_get(lnum) == NUL && u_savedel(lnum, 1L) == OK)
+	    ಆದರೆ (*ml_get(lnum) == NUL && u_savedel(lnum, 1L) == OK)
 	    {
 		ml_delete(lnum);
-		if (curwin->w_cursor.lnum > 1
+		ಆದರೆ (curwin->w_cursor.lnum > 1
 			&& curwin->w_cursor.lnum >= lnum)
 		    --curwin->w_cursor.lnum;
-		deleted_lines_mark(lnum, 1L);
+		deleted_ಸಾಲುಗಳು_mark(lnum, 1L);
 	    }
 	}
 	redraw_curbuf_later(UPD_VALID);
     }
 }
 
-static char_u	*prev_dir = NULL;
+ಸ್ಥಿರ char_u	*prev_dir = ಖಾಲಿ;
 
-#if defined(EXITFREE)
-    void
-free_cd_dir(void)
+#ಆದರೆ defined(EXITFREE)
+    ಶೂನ್ಯ
+free_cd_dir(ಶೂನ್ಯ)
 {
     VIM_CLEAR(prev_dir);
     VIM_CLEAR(globaldir);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Get the previous directory for the given chdir scope.
  */
-    static char_u *
+    ಸ್ಥಿರ char_u *
 get_prevdir(cdscope_T scope)
 {
-    if (scope == CDSCOPE_WINDOW)
-	return curwin->w_prevdir;
-    else if (scope == CDSCOPE_TABPAGE)
-	return curtab->tp_prevdir;
-    return prev_dir;
+    ಆದರೆ (scope == CDSCOPE_ಕಿಟಕಿ)
+	ಹಿಂತಿರುಗಿ curwin->w_prevdir;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (scope == CDSCOPE_TABPAGE)
+	ಹಿಂತಿರುಗಿ curtab->tp_prevdir;
+    ಹಿಂತಿರುಗಿ prev_dir;
 }
 
 /*
@@ -8250,59 +8250,59 @@ get_prevdir(cdscope_T scope)
  * When 'scope' is CDSCOPE_TABPAGE then this was after an ":tcd" command.
  * When 'scope' is CDSCOPE_WINDOW then this was after an ":lcd" command.
  */
-    void
+    ಶೂನ್ಯ
 post_chdir(cdscope_T scope)
 {
-    if (scope != CDSCOPE_WINDOW)
+    ಆದರೆ (scope != CDSCOPE_ಕಿಟಕಿ)
 	// Clear tab local directory for both :cd and :tcd
 	VIM_CLEAR(curtab->tp_localdir);
     VIM_CLEAR(curwin->w_localdir);
-    if (scope != CDSCOPE_GLOBAL)
+    ಆದರೆ (scope != CDSCOPE_GLOBAL)
     {
 	char_u	*pdir = get_prevdir(scope);
 
 	// If still in the global directory, need to remember current
 	// directory as the global directory.
-	if (globaldir == NULL && pdir != NULL)
+	ಆದರೆ (globaldir == ಖಾಲಿ && pdir != ಖಾಲಿ)
 	    globaldir = vim_strsave(pdir);
 
 	// Remember this local directory for the window.
-	if (mch_dirname(NameBuff, MAXPATHL) == OK)
+	ಆದರೆ (mch_dirname(NameBuff, MAXPATHL) == OK)
 	{
-	    if (scope == CDSCOPE_TABPAGE)
+	    ಆದರೆ (scope == CDSCOPE_TABPAGE)
 		curtab->tp_localdir = vim_strsave(NameBuff);
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		curwin->w_localdir = vim_strsave(NameBuff);
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// We are now in the global directory, no need to remember its name.
 	VIM_CLEAR(globaldir);
     }
 
-    last_chdir_reason = NULL;
-    shorten_fnames(vim_strchr(p_cpo, CPO_NOSYMLINKS) == NULL);
+    ಕೊನೆಯ_chdir_reason = ಖಾಲಿ;
+    shorten_fnames(vim_strchr(p_cpo, CPO_NOSYMLINKS) == ಖಾಲಿ);
 }
 
 /*
  * Trigger DirChangedPre for "acmd_fname" with directory "new_dir".
  */
-    void
-trigger_DirChangedPre(char_u *acmd_fname, char_u *new_dir)
+    ಶೂನ್ಯ
+trigger_Dir_ಬದಲಾಯಿತು_Pre(char_u *acmd_fname, char_u *new_dir)
 {
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     dict_T	    *v_event;
     save_v_event_T  save_v_event;
 
     v_event = get_v_event(&save_v_event);
-    (void)dict_add_string(v_event, "directory", new_dir);
-    dict_set_items_ro(v_event);
-#endif
+    (ಶೂನ್ಯ)dict_ಕೂಡಿಸು_string(v_event, "directory", new_dir);
+    dict_ಗಣ_ವಸ್ತುಗಳು_ro(v_event);
+#ಆದರೆ_ಅಂತ್ಯ
     apply_autocmds(EVENT_DIRCHANGEDPRE, acmd_fname, new_dir, FALSE, curbuf);
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     restore_v_event(v_event, &save_v_event);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
@@ -8313,133 +8313,133 @@ trigger_DirChangedPre(char_u *acmd_fname, char_u *new_dir)
  * Otherwise: changes the global directory
  * Returns TRUE if the directory is successfully changed.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 changedir_func(
 	char_u		*new_dir,
-	int		forceit,
+	ಪೂರ್ಣಾಂಕ		forceit,
 	cdscope_T	scope)
 {
-    char_u	*pdir = NULL;
-    int		dir_differs;
-    char_u	*acmd_fname = NULL;
+    char_u	*pdir = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		dir_differs;
+    char_u	*acmd_fname = ಖಾಲಿ;
     char_u	**pp;
     char_u	*tofree;
 
-    if (new_dir == NULL || allbuf_locked())
-	return FALSE;
+    ಆದರೆ (new_dir == ಖಾಲಿ || allbuf_locked())
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    if (vim_strchr(p_cpo, CPO_CHDIR) != NULL && curbufIsChanged() && !forceit)
+    ಆದರೆ (vim_strchr(p_cpo, CPO_CHDIR) != ಖಾಲಿ && curbuf_Is_ಬದಲಾಯಿತು() && !forceit)
     {
-	emsg(_(e_cannot_change_directory_buffer_is_modified_add_bang_to_override));
-	return FALSE;
+	emsg(_(e_cannot_change_directory_ಬಫರ್_is_modified_ಕೂಡಿಸು_bang_ಗಮ್ಯ_override));
+	ಹಿಂತಿರುಗಿ FALSE;
     }
 
     // ":cd -": Change to previous directory
-    if (STRCMP(new_dir, "-") == 0)
+    ಆದರೆ (STRCMP(new_dir, "-") == 0)
     {
 	pdir = get_prevdir(scope);
-	if (pdir == NULL)
+	ಆದರೆ (pdir == ಖಾಲಿ)
 	{
-	    emsg(_(e_no_previous_directory));
-	    return FALSE;
+	    emsg(_(e_no_ಹಿಂದಿನ_directory));
+	    ಹಿಂತಿರುಗಿ FALSE;
 	}
 	new_dir = pdir;
     }
 
     // Save current directory for next ":cd -"
-    if (mch_dirname(NameBuff, MAXPATHL) == OK)
+    ಆದರೆ (mch_dirname(NameBuff, MAXPATHL) == OK)
 	pdir = vim_strsave(NameBuff);
-    else
-	pdir = NULL;
+    ಇಲ್ಲದಿದ್ದರೆ
+	pdir = ಖಾಲಿ;
 
     // For UNIX ":cd" means: go to home directory.
     // On other systems too if 'cdhome' is set.
-#if defined(UNIX) || defined(VMS)
-    if (*new_dir == NUL)
-#else
-    if (*new_dir == NUL && p_cdh)
-#endif
+#ಆದರೆ defined(UNIX) || defined(VMS)
+    ಆದರೆ (*new_dir == NUL)
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಆದರೆ (*new_dir == NUL && p_cdh)
+#ಆದರೆ_ಅಂತ್ಯ
     {
 	// use NameBuff for home directory name
-#ifdef VMS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VMS
 	char_u	*p;
 
 	p = mch_getenv((char_u *)"SYS$LOGIN");
-	if (p == NULL || *p == NUL)	// empty is the same as not set
+	ಆದರೆ (p == ಖಾಲಿ || *p == NUL)	// empty is the same as not set
 	    NameBuff[0] = NUL;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    vim_strncpy(NameBuff, p, MAXPATHL - 1);
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 	expand_env((char_u *)"$HOME", NameBuff, MAXPATHL);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	new_dir = NameBuff;
     }
-    dir_differs = pdir == NULL
-			    || pathcmp((char *)pdir, (char *)new_dir, -1) != 0;
-    if (dir_differs)
+    dir_differs = pdir == ಖಾಲಿ
+			    || pathcmp((ಅಕ್ಷರ *)pdir, (ಅಕ್ಷರ *)new_dir, -1) != 0;
+    ಆದರೆ (dir_differs)
     {
-	if (scope == CDSCOPE_WINDOW)
+	ಆದರೆ (scope == CDSCOPE_ಕಿಟಕಿ)
 	    acmd_fname = (char_u *)"window";
-	else if (scope == CDSCOPE_TABPAGE)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (scope == CDSCOPE_TABPAGE)
 	    acmd_fname = (char_u *)"tabpage";
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    acmd_fname = (char_u *)"global";
-	trigger_DirChangedPre(acmd_fname, new_dir);
+	trigger_Dir_ಬದಲಾಯಿತು_Pre(acmd_fname, new_dir);
 
-	if (vim_chdir(new_dir))
+	ಆದರೆ (vim_chdir(new_dir))
 	{
 	    emsg(_(e_command_failed));
 	    vim_free(pdir);
-	    return FALSE;
+	    ಹಿಂತಿರುಗಿ FALSE;
 	}
     }
 
-    if (scope == CDSCOPE_WINDOW)
+    ಆದರೆ (scope == CDSCOPE_ಕಿಟಕಿ)
 	pp = &curwin->w_prevdir;
-    else if (scope == CDSCOPE_TABPAGE)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (scope == CDSCOPE_TABPAGE)
 	pp = &curtab->tp_prevdir;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	pp = &prev_dir;
     tofree = *pp;  // new_dir may use this
     *pp = pdir;
 
     post_chdir(scope);
 
-    if (dir_differs)
+    ಆದರೆ (dir_differs)
 	apply_autocmds(EVENT_DIRCHANGED, acmd_fname, new_dir, FALSE, curbuf);
     vim_free(tofree);
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
  * ":cd", ":tcd", ":lcd", ":chdir" ":tchdir" and ":lchdir".
  */
-    void
+    ಶೂನ್ಯ
 ex_cd(exarg_T *eap)
 {
     char_u	*new_dir;
 
     new_dir = eap->arg;
-#if !defined(UNIX) && !defined(VMS)
+#ಆದರೆ !defined(UNIX) && !defined(VMS)
     // for non-UNIX ":cd" means: print current directory unless 'cdhome' is set
-    if (*new_dir == NUL && !p_cdh)
+    ಆದರೆ (*new_dir == NUL && !p_cdh)
     {
-	ex_pwd(NULL);
-	return;
+	ex_pwd(ಖಾಲಿ);
+	ಹಿಂತಿರುಗಿ;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     cdscope_T	scope = CDSCOPE_GLOBAL;
 
-    if (eap->cmdidx == CMD_lcd || eap->cmdidx == CMD_lchdir)
-	scope = CDSCOPE_WINDOW;
-    else if (eap->cmdidx == CMD_tcd || eap->cmdidx == CMD_tchdir)
+    ಆದರೆ (eap->cmdidx == CMD_lcd || eap->cmdidx == CMD_lchdir)
+	scope = CDSCOPE_ಕಿಟಕಿ;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (eap->cmdidx == CMD_tcd || eap->cmdidx == CMD_tchdir)
 	scope = CDSCOPE_TABPAGE;
 
-    if (changedir_func(new_dir, eap->forceit, scope))
+    ಆದರೆ (changedir_func(new_dir, eap->forceit, scope))
     {
 	// Echo the new current directory if the command was typed.
-	if (KeyTyped || p_verbose >= 5)
+	ಆದರೆ (ಕೀಲಿ_Typed || p_verbose >= 5)
 	    ex_pwd(eap);
     }
 }
@@ -8447,62 +8447,62 @@ ex_cd(exarg_T *eap)
 /*
  * ":pwd".
  */
-    static void
-ex_pwd(exarg_T *eap UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ex_pwd(exarg_T *eap ಬಳಸದ)
 {
-    if (mch_dirname(NameBuff, MAXPATHL) == OK)
+    ಆದರೆ (mch_dirname(NameBuff, MAXPATHL) == OK)
     {
-#ifdef BACKSLASH_IN_FILENAME
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ BACKSLASH_ಒಳ_FILENAME
 	slash_adjust(NameBuff);
-#endif
-	if (p_verbose > 0)
+#ಆದರೆ_ಅಂತ್ಯ
+	ಆದರೆ (p_verbose > 0)
 	{
-	    char *context = "global";
+	    ಅಕ್ಷರ *context = "global";
 
-	    if (last_chdir_reason != NULL)
-		context = last_chdir_reason;
-	    else if (curwin->w_localdir != NULL)
+	    ಆದರೆ (ಕೊನೆಯ_chdir_reason != ಖಾಲಿ)
+		context = ಕೊನೆಯ_chdir_reason;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (curwin->w_localdir != ಖಾಲಿ)
 		context = "window";
-	    else if (curtab->tp_localdir != NULL)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (curtab->tp_localdir != ಖಾಲಿ)
 		context = "tabpage";
-	    smsg("[%s] %s", context, (char *)NameBuff);
+	    smsg("[%s] %s", context, (ಅಕ್ಷರ *)NameBuff);
 	}
-	else
-	    msg((char *)NameBuff);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಸಂದೇಶ((ಅಕ್ಷರ *)NameBuff);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	emsg(_(e_directory_unknown));
 }
 
 /*
  * ":=".
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_equal(exarg_T *eap)
 {
-    smsg("%ld", (long)eap->line2);
+    smsg("%ld", (ದೀರ್ಘ)eap->line2);
     ex_may_print(eap);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_sleep(exarg_T *eap)
 {
-    int		n;
-    long	len;
+    ಪೂರ್ಣಾಂಕ		n;
+    ದೀರ್ಘ	len;
 
-    if (cursor_valid())
+    ಆದರೆ (cursor_valid())
     {
-	n = W_WINROW(curwin) + curwin->w_wrow - msg_scrolled;
-	if (n >= 0)
+	n = W_WINROW(curwin) + curwin->w_wrow - ಸಂದೇಶ_scrolled;
+	ಆದರೆ (n >= 0)
 	    windgoto(n, curwin->w_wincol + curwin->w_wcol);
     }
 
     len = eap->line2;
-    switch (*eap->arg)
+    ಆಯ್ಕೆ (*eap->arg)
     {
-	case 'm': break;
-	case NUL: len *= 1000L; break;
-	default: semsg(_(e_invalid_argument_str), eap->arg); return;
+	ಸ್ಥಿತಿ 'm': ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ NUL: len *= 1000L; ನಿಲ್ಲಿಸು;
+	ಪೂರ್ವನಿಯೋಜಿತ: semsg(_(e_invalid_ವಾದ_str), eap->arg); ಹಿಂತಿರುಗಿ;
     }
 
     // Hide the cursor if invoked with !
@@ -8513,257 +8513,257 @@ ex_sleep(exarg_T *eap)
  * Sleep for "msec" milliseconds, but keep checking for a CTRL-C every second.
  * Hide the cursor if "hide_cursor" is TRUE.
  */
-    void
-do_sleep(long msec, int hide_cursor)
+    ಶೂನ್ಯ
+do_sleep(ದೀರ್ಘ msec, ಪೂರ್ಣಾಂಕ hide_cursor)
 {
-    long	done = 0;
-    long	wait_now;
-#ifdef ELAPSED_FUNC
-    elapsed_T	start_tv;
+    ದೀರ್ಘ	ಮುಗಿದ = 0;
+    ದೀರ್ಘ	wait_now;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ELAPSED_FUNC
+    elapsed_T	ಆರಂಭ_tv;
 
     // Remember at what time we started, so that we know how much longer we
     // should wait after waiting for a bit.
-    ELAPSED_INIT(start_tv);
-#endif
+    ELAPSED_INIT(ಆರಂಭ_tv);
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (hide_cursor)
+    ಆದರೆ (hide_cursor)
 	cursor_sleep();
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	cursor_on();
 
-    out_flush_cursor(FALSE, FALSE);
-    while (!got_int && done < msec)
+    ಹೊರಹೋಗು_flush_cursor(FALSE, FALSE);
+    ಆಗ (!got_int && ಮುಗಿದ < msec)
     {
-	wait_now = msec - done > 1000L ? 1000L : msec - done;
-#ifdef FEAT_TIMERS
+	wait_now = msec - ಮುಗಿದ > 1000L ? 1000L : msec - ಮುಗಿದ;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TIMERS
 	{
-	    long    due_time = check_due_timer();
+	    ದೀರ್ಘ    due_ಸಮಯ = check_due_timer();
 
-	    if (due_time > 0 && due_time < wait_now)
-		wait_now = due_time;
+	    ಆದರೆ (due_ಸಮಯ > 0 && due_ಸಮಯ < wait_now)
+		wait_now = due_ಸಮಯ;
 	}
-#endif
-#ifdef FEAT_JOB_CHANNEL
-	if (has_any_channel() && wait_now > 20L)
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕೆಲಸ_CHANNEL
+	ಆದರೆ (has_any_channel() && wait_now > 20L)
 	    wait_now = 20L;
-#endif
-#ifdef FEAT_SOUND
-	if (has_any_sound_callback() && wait_now > 20L)
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SOUND
+	ಆದರೆ (has_any_sound_callback() && wait_now > 20L)
 	    wait_now = 20L;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	ui_delay(wait_now, TRUE);
 
-#ifdef FEAT_JOB_CHANNEL
-	if (has_any_channel())
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕೆಲಸ_CHANNEL
+	ಆದರೆ (has_any_channel())
 	    ui_breakcheck_force(TRUE);
-	else
-#endif
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 	    ui_breakcheck();
-#ifdef MESSAGE_QUEUE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ಸಂದೇಶ_ಸರತಿ
 	// Process the netbeans and clientserver messages that may have been
 	// received in the call to ui_breakcheck() when the GUI is in use. This
 	// may occur when running a test case.
 	parse_queued_messages();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef ELAPSED_FUNC
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ELAPSED_FUNC
 	// actual time passed
-	done = ELAPSED_FUNC(start_tv);
-#else
+	ಮುಗಿದ = ELAPSED_FUNC(ಆರಂಭ_tv);
+#ಇಲ್ಲದಿದ್ದರೆ
 	// guesstimate time passed (will actually be more)
-	done += wait_now;
-#endif
+	ಮುಗಿದ += wait_now;
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
     // If CTRL-C was typed to interrupt the sleep, drop the CTRL-C from the
     // input buffer, otherwise a following call to input() fails.
-    if (got_int)
-	(void)vpeekc();
+    ಆದರೆ (got_int)
+	(ಶೂನ್ಯ)vpeekc();
 
-    if (hide_cursor)
+    ಆದರೆ (hide_cursor)
 	cursor_unsleep();
 }
 
 /*
  * ":winsize" command (obsolete).
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_winsize(exarg_T *eap)
 {
-    int		w, h;
+    ಪೂರ್ಣಾಂಕ		w, h;
     char_u	*arg = eap->arg;
     char_u	*p;
 
-    if (!SAFE_isdigit(*arg))
+    ಆದರೆ (!ಸುರಕ್ಷಿತ_isdigit(*arg))
     {
-	semsg(_(e_invalid_argument_str), arg);
-	return;
+	semsg(_(e_invalid_ವಾದ_str), arg);
+	ಹಿಂತಿರುಗಿ;
     }
     w = getdigits(&arg);
     arg = skipwhite(arg);
     p = arg;
     h = getdigits(&arg);
-    if (*p != NUL && *arg == NUL)
-	set_shellsize(w, h, TRUE);
-    else
-	emsg(_(e_winsize_requires_two_number_arguments));
+    ಆದರೆ (*p != NUL && *arg == NUL)
+	ಗಣ_shellsize(w, h, TRUE);
+    ಇಲ್ಲದಿದ್ದರೆ
+	emsg(_(e_winsize_requires_two_ಸಂಖ್ಯೆ_arguments));
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_wincmd(exarg_T *eap)
 {
-    int		xchar = NUL;
+    ಪೂರ್ಣಾಂಕ		xchar = NUL;
     char_u	*p;
 
-    if (*eap->arg == 'g' || *eap->arg == Ctrl_G)
+    ಆದರೆ (*eap->arg == 'g' || *eap->arg == Ctrl_G)
     {
 	// CTRL-W g and CTRL-W CTRL-G  have an extra command character
-	if (eap->arg[1] == NUL)
+	ಆದರೆ (eap->arg[1] == NUL)
 	{
-	    emsg(_(e_invalid_argument));
-	    return;
+	    emsg(_(e_invalid_ವಾದ));
+	    ಹಿಂತಿರುಗಿ;
 	}
 	xchar = eap->arg[1];
 	p = eap->arg + 2;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	p = eap->arg + 1;
 
-    set_nextcmd(eap, p);
+    ಗಣ_nextcmd(eap, p);
     p = skipwhite(p);
-    if (*p != NUL && *p != (
-#ifdef FEAT_EVAL
-	    in_vim9script() ? '#' :
-#endif
+    ಆದರೆ (*p != NUL && *p != (
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	    ಒಳ_vim9script() ? '#' :
+#ಆದರೆ_ಅಂತ್ಯ
 		'"')
-	    && eap->nextcmd == NULL)
-	emsg(_(e_invalid_argument));
-    else if (!eap->skip)
+	    && eap->nextcmd == ಖಾಲಿ)
+	emsg(_(e_invalid_ವಾದ));
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!eap->skip)
     {
 	// Pass flags on for ":vertical wincmd ]".
-	postponed_split_flags = cmdmod.cmod_split;
-	postponed_split_tab = cmdmod.cmod_tab;
-	do_window(*eap->arg, eap->addr_count > 0 ? eap->line2 : 0L, xchar);
-	postponed_split_flags = 0;
-	postponed_split_tab = 0;
+	postponed_ವಿಭಜಿಸು_flags = cmdmod.cmod_ವಿಭಜಿಸು;
+	postponed_ವಿಭಜಿಸು_tab = cmdmod.cmod_tab;
+	do_ಕಿಟಕಿ(*eap->arg, eap->addr_ಎಣಿಕೆ > 0 ? eap->line2 : 0L, xchar);
+	postponed_ವಿಭಜಿಸು_flags = 0;
+	postponed_ವಿಭಜಿಸು_tab = 0;
     }
 }
 
-#if defined(FEAT_GUI) || defined(UNIX) || defined(VMS) || defined(MSWIN)
+#ಆದರೆ defined(FEAT_GUI) || defined(UNIX) || defined(VMS) || defined(MSWIN)
 /*
  * ":winpos".
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_winpos(exarg_T *eap)
 {
-    int		x, y;
+    ಪೂರ್ಣಾಂಕ		x, y;
     char_u	*arg = eap->arg;
     char_u	*p;
 
-    if (*arg == NUL)
+    ಆದರೆ (*arg == NUL)
     {
-# if defined(FEAT_GUI) || defined(MSWIN)
+# ಆದರೆ defined(FEAT_GUI) || defined(MSWIN)
 #  ifdef VIMDLL
-	if (gui.in_use ? gui_mch_get_winpos(&x, &y) != FAIL :
+	ಆದರೆ (gui.ಒಳ_use ? gui_mch_get_winpos(&x, &y) != FAIL :
 		mch_get_winpos(&x, &y) != FAIL)
 #  elif defined(FEAT_GUI)
-	if (gui.in_use && gui_mch_get_winpos(&x, &y) != FAIL)
-#  else
-	if (mch_get_winpos(&x, &y) != FAIL)
+	ಆದರೆ (gui.ಒಳ_use && gui_mch_get_winpos(&x, &y) != FAIL)
+#  ಇಲ್ಲದಿದ್ದರೆ
+	ಆದರೆ (mch_get_winpos(&x, &y) != FAIL)
 #  endif
 	{
-	    sprintf((char *)IObuff, _("Window position: X %d, Y %d"), x, y);
-	    msg((char *)IObuff);
+	    sprintf((ಅಕ್ಷರ *)IObuff, _("Window position: X %d, Y %d"), x, y);
+	    ಸಂದೇಶ((ಅಕ್ಷರ *)IObuff);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 # endif
-	    emsg(_(e_obtaining_window_position_not_implemented_for_this_platform));
+	    emsg(_(e_obtaining_ಕಿಟಕಿ_position_not_implemented_for_this_platform));
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	x = getdigits(&arg);
 	arg = skipwhite(arg);
 	p = arg;
 	y = getdigits(&arg);
-	if (*p == NUL || *arg != NUL)
+	ಆದರೆ (*p == NUL || *arg != NUL)
 	{
-	    emsg(_(e_winpos_requires_two_number_arguments));
-	    return;
+	    emsg(_(e_winpos_requires_two_ಸಂಖ್ಯೆ_arguments));
+	    ಹಿಂತಿರುಗಿ;
 	}
 # ifdef FEAT_GUI
-	if (gui.in_use)
-	    gui_mch_set_winpos(x, y);
-	else if (gui.starting)
+	ಆದರೆ (gui.ಒಳ_use)
+	    gui_mch_ಗಣ_winpos(x, y);
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (gui.starting)
 	{
 	    // Remember the coordinates for when the window is opened.
 	    gui_win_x = x;
 	    gui_win_y = y;
 	}
-#  if defined(HAVE_TGETENT) || defined(VIMDLL)
-	else
+#  ಆದರೆ defined(HAVE_TGETENT) || defined(VIMDLL)
+	ಇಲ್ಲದಿದ್ದರೆ
 #  endif
 # endif
-# if defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
-	    mch_set_winpos(x, y);
+# ಆದರೆ defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
+	    mch_ಗಣ_winpos(x, y);
 # endif
 # ifdef HAVE_TGETENT
-	if (*T_CWP)
-	    term_set_winpos(x, y);
+	ಆದರೆ (*T_CWP)
+	    ಪದ_ಗಣ_winpos(x, y);
 # endif
     }
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Handle command that work like operators: ":delete", ":yank", ":>" and ":<".
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_operators(exarg_T *eap)
 {
     oparg_T	oa;
 
     clear_oparg(&oa);
     oa.regname = eap->regname;
-    oa.start.lnum = eap->line1;
-    oa.end.lnum = eap->line2;
-    oa.line_count = eap->line2 - eap->line1 + 1;
+    oa.ಆರಂಭ.lnum = eap->line1;
+    oa.ಕೊನೆ.lnum = eap->line2;
+    oa.ಸಾಲು_ಎಣಿಕೆ = eap->line2 - eap->line1 + 1;
     oa.motion_type = MLINE;
     virtual_op = FALSE;
-    if (eap->cmdidx != CMD_yank)	// position cursor for undo
+    ಆದರೆ (eap->cmdidx != CMD_yank)	// position cursor for undo
     {
 	setpcmark();
 	curwin->w_cursor.lnum = eap->line1;
 	beginline(BL_SOL | BL_FIX);
     }
 
-    if (VIsual_active)
-	end_visual_mode();
+    ಆದರೆ (VIsual_ಸಕ್ರಿಯ)
+	ಕೊನೆ_visual_ಬಹುಲಕ();
 
-    switch (eap->cmdidx)
+    ಆಯ್ಕೆ (eap->cmdidx)
     {
-	case CMD_delete:
+	ಸ್ಥಿತಿ CMD_delete:
 	    oa.op_type = OP_DELETE;
 	    op_delete(&oa);
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	case CMD_yank:
+	ಸ್ಥಿತಿ CMD_yank:
 	    oa.op_type = OP_YANK;
-	    (void)op_yank(&oa, FALSE, TRUE);
-	    break;
+	    (ಶೂನ್ಯ)op_yank(&oa, FALSE, TRUE);
+	    ನಿಲ್ಲಿಸು;
 
-	default:    // CMD_rshift or CMD_lshift
-	    if (
-#ifdef FEAT_RIGHTLEFT
+	ಪೂರ್ವನಿಯೋಜಿತ:    // CMD_rshift or CMD_lshift
+	    ಆದರೆ (
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
 		(eap->cmdidx == CMD_rshift) ^ curwin->w_p_rl
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 		eap->cmdidx == CMD_rshift
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 						)
 		oa.op_type = OP_RSHIFT;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		oa.op_type = OP_LSHIFT;
-	    op_shift(&oa, FALSE, eap->amount);
-	    break;
+	    op_ಸರಿಸು(&oa, FALSE, eap->amount);
+	    ನಿಲ್ಲಿಸು;
     }
     virtual_op = MAYBE;
     ex_may_print(eap);
@@ -8772,75 +8772,75 @@ ex_operators(exarg_T *eap)
 /*
  * ":put".
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_put(exarg_T *eap)
 {
     // ":0put" works like ":1put!".
-    if (eap->line2 == 0)
+    ಆದರೆ (eap->line2 == 0)
     {
 	eap->line2 = 1;
 	eap->forceit = TRUE;
     }
     curwin->w_cursor.lnum = eap->line2;
-    check_cursor_col();
-    do_put(eap->regname, NULL, eap->forceit ? BACKWARD : FORWARD, 1L,
-						       PUT_LINE|PUT_CURSLINE);
+    check_cursor_ಲಂಬಸಾಲು();
+    do_put(eap->regname, ಖಾಲಿ, eap->forceit ? BACKWARD : FORWARD, 1L,
+						       PUT_ಸಾಲು|PUT_CURSLINE);
 }
 
 /*
  * ":iput".
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_iput(exarg_T *eap)
 {
     // ":0iput" works like ":1iput!".
-    if (eap->line2 == 0)
+    ಆದರೆ (eap->line2 == 0)
     {
 	eap->line2 = 1;
 	eap->forceit = TRUE;
     }
     curwin->w_cursor.lnum = eap->line2;
-    check_cursor_col();
-    do_put(eap->regname, NULL, eap->forceit ? BACKWARD : FORWARD, 1L,
-						      PUT_LINE|PUT_CURSLINE
+    check_cursor_ಲಂಬಸಾಲು();
+    do_put(eap->regname, ಖಾಲಿ, eap->forceit ? BACKWARD : FORWARD, 1L,
+						      PUT_ಸಾಲು|PUT_CURSLINE
 						      |PUT_FIXINDENT);
 }
 
 /*
  * Handle ":copy" and ":move".
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_copymove(exarg_T *eap)
 {
-    long	n;
+    ದೀರ್ಘ	n;
 
-#ifdef FEAT_EVAL
-    if (not_in_vim9(eap, false) == FAIL)
-	return;
-#endif
-    n = get_address(eap, &eap->arg, eap->addr_type, FALSE, FALSE, FALSE, 1);
-    if (eap->arg == NULL)	    // error detected
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಆದರೆ (not_ಒಳ_vim9(eap, false) == FAIL)
+	ಹಿಂತಿರುಗಿ;
+#ಆದರೆ_ಅಂತ್ಯ
+    n = get_ವಿಳಾಸ(eap, &eap->arg, eap->addr_type, FALSE, FALSE, FALSE, 1);
+    ಆದರೆ (eap->arg == ಖಾಲಿ)	    // error detected
     {
-	eap->nextcmd = NULL;
-	return;
+	eap->nextcmd = ಖಾಲಿ;
+	ಹಿಂತಿರುಗಿ;
     }
     get_flags(eap);
 
     /*
      * move or copy lines from 'eap->line1'-'eap->line2' to below line 'n'
      */
-    if (n == MAXLNUM || n < 0 || n > curbuf->b_ml.ml_line_count)
+    ಆದರೆ (n == MAXLNUM || n < 0 || n > curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
     {
 	emsg(_(e_invalid_range));
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if (eap->cmdidx == CMD_move)
+    ಆದರೆ (eap->cmdidx == CMD_move)
     {
-	if (do_move(eap->line1, eap->line2, n) == FAIL)
-	    return;
+	ಆದರೆ (do_move(eap->line1, eap->line2, n) == FAIL)
+	    ಹಿಂತಿರುಗಿ;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	ex_copy(eap->line1, eap->line2, n);
     u_clearline();
     beginline(BL_SOL | BL_FIX);
@@ -8850,12 +8850,12 @@ ex_copymove(exarg_T *eap)
 /*
  * Print the current line if flags were given to the Ex command.
  */
-    void
+    ಶೂನ್ಯ
 ex_may_print(exarg_T *eap)
 {
-    if (eap->flags != 0)
+    ಆದರೆ (eap->flags != 0)
     {
-	print_line(curwin->w_cursor.lnum, (eap->flags & EXFLAG_NR),
+	print_ಸಾಲು(curwin->w_cursor.lnum, (eap->flags & EXFLAG_NR),
 						  (eap->flags & EXFLAG_LIST));
 	ex_no_reprint = TRUE;
     }
@@ -8864,7 +8864,7 @@ ex_may_print(exarg_T *eap)
 /*
  * ":smagic" and ":snomagic".
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_submagic(exarg_T *eap)
 {
     optmagic_T saved = magic_overruled;
@@ -8878,22 +8878,22 @@ ex_submagic(exarg_T *eap)
 /*
  * ":join".
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_join(exarg_T *eap)
 {
     curwin->w_cursor.lnum = eap->line1;
-    if (eap->line1 == eap->line2)
+    ಆದರೆ (eap->line1 == eap->line2)
     {
-	if (eap->addr_count >= 2)   // :2,2join does nothing
-	    return;
-	if (eap->line2 == curbuf->b_ml.ml_line_count)
+	ಆದರೆ (eap->addr_ಎಣಿಕೆ >= 2)   // :2,2join does nothing
+	    ಹಿಂತಿರುಗಿ;
+	ಆದರೆ (eap->line2 == curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
 	{
 	    beep_flush();
-	    return;
+	    ಹಿಂತಿರುಗಿ;
 	}
 	++eap->line2;
     }
-    (void)do_join(eap->line2 - eap->line1 + 1, !eap->forceit, TRUE, TRUE, TRUE);
+    (ಶೂನ್ಯ)do_join(eap->line2 - eap->line1 + 1, !eap->forceit, TRUE, TRUE, TRUE);
     beginline(BL_WHITE | BL_FIX);
     ex_may_print(eap);
 }
@@ -8901,32 +8901,32 @@ ex_join(exarg_T *eap)
 /*
  * ":[addr]@r" or ":[addr]*r": execute register
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_at(exarg_T *eap)
 {
-    int		c;
-    int		prev_len = typebuf.tb_len;
+    ಪೂರ್ಣಾಂಕ		c;
+    ಪೂರ್ಣಾಂಕ		prev_len = typebuf.tb_len;
 
     curwin->w_cursor.lnum = eap->line2;
-    check_cursor_col();
+    check_cursor_ಲಂಬಸಾಲು();
 
-#ifdef USE_ON_FLY_SCROLL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_ON_FLY_SCROLL
     dont_scroll = TRUE;		// disallow scrolling here
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // get the register name.  No name means to use the previous one
     c = *eap->arg;
-    if (c == NUL || (c == '*' && *eap->cmd == '*'))
+    ಆದರೆ (c == NUL || (c == '*' && *eap->cmd == '*'))
 	c = '@';
     // Put the register in the typeahead buffer with the "silent" flag.
-    if (do_execreg(c, TRUE, vim_strchr(p_cpo, CPO_EXECBUF) != NULL, TRUE)
+    ಆದರೆ (do_execreg(c, TRUE, vim_strchr(p_cpo, CPO_EXECBUF) != ಖಾಲಿ, TRUE)
 								      == FAIL)
     {
 	beep_flush();
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    int	save_efr = exec_from_reg;
+    ಪೂರ್ಣಾಂಕ	save_efr = exec_from_reg;
 
     exec_from_reg = TRUE;
 
@@ -8935,8 +8935,8 @@ ex_at(exarg_T *eap)
      * Continue until the stuff buffer is empty and all added characters
      * have been consumed.
      */
-    while (!stuff_empty() || typebuf.tb_len > prev_len)
-	(void)do_cmdline(NULL, getexline, NULL, DOCMD_NOWAIT|DOCMD_VERBOSE);
+    ಆಗ (!stuff_ಖಾಲಿಗಳು() || typebuf.tb_len > prev_len)
+	(ಶೂನ್ಯ)do_cmdline(ಖಾಲಿ, getexline, ಖಾಲಿ, DOCMD_NOWAIT|DOCMD_VERBOSE);
 
     exec_from_reg = save_efr;
 }
@@ -8944,49 +8944,49 @@ ex_at(exarg_T *eap)
 /*
  * ":!".
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_bang(exarg_T *eap)
 {
-    do_bang(eap->addr_count, eap, eap->forceit, TRUE, TRUE);
+    do_bang(eap->addr_ಎಣಿಕೆ, eap, eap->forceit, TRUE, TRUE);
 }
 
 /*
  * ":undo".
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_undo(exarg_T *eap)
 {
-    if (eap->addr_count == 1)	    // :undo 123
-	undo_time(eap->line2, FALSE, FALSE, TRUE);
-    else
+    ಆದರೆ (eap->addr_ಎಣಿಕೆ == 1)	    // :undo 123
+	undo_ಸಮಯ(eap->line2, FALSE, FALSE, TRUE);
+    ಇಲ್ಲದಿದ್ದರೆ
 	u_undo(1);
 }
 
-#ifdef FEAT_PERSISTENT_UNDO
-    static void
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PERSISTENT_UNDO
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_wundo(exarg_T *eap)
 {
-    char_u hash[UNDO_HASH_SIZE];
+    char_u hash[UNDO_HASH_ಗಾತ್ರ];
 
     u_compute_hash(hash);
     u_write_undo(eap->arg, eap->forceit, curbuf, hash);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_rundo(exarg_T *eap)
 {
-    char_u hash[UNDO_HASH_SIZE];
+    char_u hash[UNDO_HASH_ಗಾತ್ರ];
 
     u_compute_hash(hash);
-    u_read_undo(eap->arg, hash, NULL);
+    u_read_undo(eap->arg, hash, ಖಾಲಿ);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * ":redo".
  */
-    static void
-ex_redo(exarg_T *eap UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ex_redo(exarg_T *eap ಬಳಸದ)
 {
     u_redo(1);
 }
@@ -8994,103 +8994,103 @@ ex_redo(exarg_T *eap UNUSED)
 /*
  * ":earlier" and ":later".
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_later(exarg_T *eap)
 {
-    long	count = 0;
-    int		sec = FALSE;
-    int		file = FALSE;
+    ದೀರ್ಘ	ಎಣಿಕೆ_2 = 0;
+    ಪೂರ್ಣಾಂಕ		sec = FALSE;
+    ಪೂರ್ಣಾಂಕ		file = FALSE;
     char_u	*p = eap->arg;
 
-    if (*p == NUL)
-	count = 1;
-    else if (SAFE_isdigit(*p))
+    ಆದರೆ (*p == NUL)
+	ಎಣಿಕೆ_2 = 1;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಸುರಕ್ಷಿತ_isdigit(*p))
     {
-	count = getdigits(&p);
-	switch (*p)
+	ಎಣಿಕೆ_2 = getdigits(&p);
+	ಆಯ್ಕೆ (*p)
 	{
-	    case 's': ++p; sec = TRUE; break;
-	    case 'm': ++p; sec = TRUE; count *= 60; break;
-	    case 'h': ++p; sec = TRUE; count *= 60 * 60; break;
-	    case 'd': ++p; sec = TRUE; count *= 24 * 60 * 60; break;
-	    case 'f': ++p; file = TRUE; break;
+	    ಸ್ಥಿತಿ 's': ++p; sec = TRUE; ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ 'm': ++p; sec = TRUE; ಎಣಿಕೆ_2 *= 60; ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ 'h': ++p; sec = TRUE; ಎಣಿಕೆ_2 *= 60 * 60; ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ 'd': ++p; sec = TRUE; ಎಣಿಕೆ_2 *= 24 * 60 * 60; ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ 'f': ++p; file = TRUE; ನಿಲ್ಲಿಸು;
 	}
     }
 
-    if (*p != NUL)
-	semsg(_(e_invalid_argument_str), eap->arg);
-    else
-	undo_time(eap->cmdidx == CMD_earlier ? -count : count,
+    ಆದರೆ (*p != NUL)
+	semsg(_(e_invalid_ವಾದ_str), eap->arg);
+    ಇಲ್ಲದಿದ್ದರೆ
+	undo_ಸಮಯ(eap->cmdidx == CMD_earlier ? -ಎಣಿಕೆ_2 : ಎಣಿಕೆ_2,
 							    sec, file, FALSE);
 }
 
 /*
  * ":redir": start/stop redirection.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_redir(exarg_T *eap)
 {
-    char	*mode;
+    ಅಕ್ಷರ	*ಬಹುಲಕ;
     char_u	*fname;
     char_u	*arg = eap->arg;
 
-#ifdef FEAT_EVAL
-    if (redir_execute)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಆದರೆ (redir_execute)
     {
 	emsg(_(e_cannot_use_redir_inside_execute));
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (STRICMP(eap->arg, "END") == 0)
+    ಆದರೆ (STRICMP(eap->arg, "END") == 0)
 	close_redir();
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (*arg == '>')
+	ಆದರೆ (*arg == '>')
 	{
 	    ++arg;
-	    if (*arg == '>')
+	    ಆದರೆ (*arg == '>')
 	    {
 		++arg;
-		mode = "a";
+		ಬಹುಲಕ = "a";
 	    }
-	    else
-		mode = "w";
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ಬಹುಲಕ = "w";
 	    arg = skipwhite(arg);
 
 	    close_redir();
 
 	    // Expand environment variables and "~/".
 	    fname = expand_env_save(arg);
-	    if (fname == NULL)
-		return;
-#ifdef FEAT_BROWSE
-	    if (cmdmod.cmod_flags & CMOD_BROWSE)
+	    ಆದರೆ (fname == ಖಾಲಿ)
+		ಹಿಂತಿರುಗಿ;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_BROWSE
+	    ಆದರೆ (cmdmod.cmod_flags & CMOD_BROWSE)
 	    {
 		char_u	*browseFile;
 
 		browseFile = do_browse(BROWSE_SAVE,
 			(char_u *)_("Save Redirection"),
-			fname, NULL, NULL,
+			fname, ಖಾಲಿ, ಖಾಲಿ,
 			(char_u *)_(BROWSE_FILTER_ALL_FILES), curbuf);
-		if (browseFile == NULL)
-		    return;		// operation cancelled
+		ಆದರೆ (browseFile == ಖಾಲಿ)
+		    ಹಿಂತಿರುಗಿ;		// operation cancelled
 		vim_free(fname);
 		fname = browseFile;
 		eap->forceit = TRUE;	// since dialog already asked
 	    }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-	    redir_fd = open_exfile(fname, eap->forceit, mode);
+	    redir_fd = open_exfile(fname, eap->forceit, ಬಹುಲಕ);
 	    vim_free(fname);
 	}
-#ifdef FEAT_EVAL
-	else if (*arg == '@')
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*arg == '@')
 	{
 	    // redirect to a register a-z (resp. A-Z for appending)
 	    close_redir();
 	    ++arg;
-	    if (ASCII_ISALPHA(*arg)
+	    ಆದರೆ (ASCII_ISALPHA(*arg)
 # ifdef HAVE_CLIPMETHOD
 		    || (clipmethod == CLIPMETHOD_PROVIDER
 			&& (*arg == '*' || *arg == '+'))
@@ -9102,58 +9102,58 @@ ex_redir(exarg_T *eap)
 		    || *arg == '"')
 	    {
 		redir_reg = *arg++;
-		if (*arg == '>' && arg[1] == '>')  // append
+		ಆದರೆ (*arg == '>' && arg[1] == '>')  // append
 		    arg += 2;
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    // Can use both "@a" and "@a>".
-		    if (*arg == '>')
+		    ಆದರೆ (*arg == '>')
 			arg++;
 		    // Make register empty when not using @A-@Z and the
 		    // command is valid.
-		    if (*arg == NUL && !SAFE_isupper(redir_reg))
+		    ಆದರೆ (*arg == NUL && !ಸುರಕ್ಷಿತ_isupper(redir_reg))
 			write_reg_contents(redir_reg, (char_u *)"", -1, FALSE);
 		}
 	    }
-	    if (*arg != NUL)
+	    ಆದರೆ (*arg != NUL)
 	    {
 		redir_reg = 0;
-		semsg(_(e_invalid_argument_str), eap->arg);
+		semsg(_(e_invalid_ವಾದ_str), eap->arg);
 	    }
 	}
-	else if (*arg == '=' && arg[1] == '>')
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*arg == '=' && arg[1] == '>')
 	{
-	    int append;
+	    ಪೂರ್ಣಾಂಕ append;
 
 	    // redirect to a variable
 	    close_redir();
 	    arg += 2;
 
-	    if (*arg == '>')
+	    ಆದರೆ (*arg == '>')
 	    {
 		++arg;
 		append = TRUE;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		append = FALSE;
 
-	    if (var_redir_start(skipwhite(arg), append) == OK)
+	    ಆದರೆ (var_redir_ಆರಂಭ(skipwhite(arg), append) == OK)
 		redir_vname = 1;
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 	// TODO: redirect to a buffer
 
-	else
-	    semsg(_(e_invalid_argument_str), eap->arg);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    semsg(_(e_invalid_ವಾದ_str), eap->arg);
     }
 
     // Make sure redirection is not off.  Can happen for cmdline completion
     // that indirectly invokes a command to catch its output.
-    if (redir_fd != NULL
-#ifdef FEAT_EVAL
+    ಆದರೆ (redir_fd != ಖಾಲಿ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 			  || redir_reg || redir_vname
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 							)
 	redir_off = FALSE;
 }
@@ -9161,7 +9161,7 @@ ex_redir(exarg_T *eap)
 /*
  * ":redraw": force redraw, with clear for ":redraw!".
  */
-    void
+    ಶೂನ್ಯ
 ex_redraw(exarg_T *eap)
 {
     redraw_cmd(eap->forceit);
@@ -9170,28 +9170,28 @@ ex_redraw(exarg_T *eap)
 /*
  * ":redraw": force redraw, with clear if "clear" is TRUE.
  */
-    void
-redraw_cmd(int clear)
+    ಶೂನ್ಯ
+redraw_cmd(ಪೂರ್ಣಾಂಕ clear)
 {
-    int save_RedrawingDisabled = RedrawingDisabled;
+    ಪೂರ್ಣಾಂಕ save_RedrawingDisabled = RedrawingDisabled;
     RedrawingDisabled = 0;
 
-    int save_p_lz = p_lz;
+    ಪೂರ್ಣಾಂಕ save_p_lz = p_lz;
     p_lz = FALSE;
 
     validate_cursor();
     update_topline();
-    update_screen(clear ? UPD_CLEAR : VIsual_active ? UPD_INVERTED : 0);
-    if ((State & MODE_CMDLINE) == 0)
+    update_screen(clear ? UPD_CLEAR : VIsual_ಸಕ್ರಿಯ ? UPD_INVERTED : 0);
+    ಆದರೆ ((State & ಬಹುಲಕ_CMDLINE) == 0)
 	setcursor(); // put cursor back where it belongs
-    if (need_maketitle)
+    ಆದರೆ (need_maketitle)
 	maketitle();
-#if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+#ಆದರೆ defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 # ifdef VIMDLL
-    if (!gui.in_use)
+    ಆದರೆ (!gui.ಒಳ_use)
 # endif
 	resize_console_buf();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     RedrawingDisabled = save_RedrawingDisabled;
     p_lz = save_p_lz;
 
@@ -9199,120 +9199,120 @@ redraw_cmd(int clear)
     screen_stop_highlight();
 
     // Reset msg_didout, so that a message that's there is overwritten.
-    msg_didout = FALSE;
-    msg_col = 0;
+    ಸಂದೇಶ_didout = FALSE;
+    ಸಂದೇಶ_ಲಂಬಸಾಲು = 0;
 
     // No need to wait after an intentional redraw.
     need_wait_return = FALSE;
 
     // When invoked from a callback or autocmd the command line may be active.
-    if (State & MODE_CMDLINE)
+    ಆದರೆ (State & ಬಹುಲಕ_CMDLINE)
 	redrawcmdline();
 
-    out_flush();
+    ಹೊರಹೋಗು_flush();
 }
 
 /*
  * ":redrawstatus": force redraw of status line(s)
  */
-    static void
-ex_redrawstatus(exarg_T *eap UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ex_redrawstatus(exarg_T *eap ಬಳಸದ)
 {
-    if (eap->forceit)
-	status_redraw_all();
-    else
-	status_redraw_curbuf();
+    ಆದರೆ (eap->forceit)
+	ಸ್ಥಿತಿ_redraw_all();
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಸ್ಥಿತಿ_redraw_curbuf();
     redraw_vseps = TRUE;
-    if (msg_scrolled && (State & MODE_CMDLINE))
-	return;  // redraw later
+    ಆದರೆ (ಸಂದೇಶ_scrolled && (State & ಬಹುಲಕ_CMDLINE))
+	ಹಿಂತಿರುಗಿ;  // redraw later
 
-    int save_RedrawingDisabled = RedrawingDisabled;
+    ಪೂರ್ಣಾಂಕ save_RedrawingDisabled = RedrawingDisabled;
     RedrawingDisabled = 0;
 
-    int save_p_lz = p_lz;
+    ಪೂರ್ಣಾಂಕ save_p_lz = p_lz;
     p_lz = FALSE;
 
-    if (State & MODE_CMDLINE)
+    ಆದರೆ (State & ಬಹುಲಕ_CMDLINE)
 	redraw_statuslines();
-    else
-	update_screen(VIsual_active ? UPD_INVERTED : 0);
+    ಇಲ್ಲದಿದ್ದರೆ
+	update_screen(VIsual_ಸಕ್ರಿಯ ? UPD_INVERTED : 0);
     RedrawingDisabled = save_RedrawingDisabled;
     p_lz = save_p_lz;
-    out_flush();
+    ಹೊರಹೋಗು_flush();
 }
 
 /*
  * ":redrawtabline": force redraw of the tabline
  */
-    static void
-ex_redrawtabline(exarg_T *eap UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ex_redrawtabline(exarg_T *eap ಬಳಸದ)
 {
-    int save_RedrawingDisabled = RedrawingDisabled;
+    ಪೂರ್ಣಾಂಕ save_RedrawingDisabled = RedrawingDisabled;
     RedrawingDisabled = 0;
 
-    int save_p_lz = p_lz;
+    ಪೂರ್ಣಾಂಕ save_p_lz = p_lz;
     p_lz = FALSE;
 
     draw_tabline();
 
     RedrawingDisabled = save_RedrawingDisabled;
     p_lz = save_p_lz;
-    out_flush();
+    ಹೊರಹೋಗು_flush();
 }
 
 /*
  * ":redrawtabpanel": force redraw of the tabpanel
  */
-    static void
-ex_redrawtabpanel(exarg_T *eap UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ex_redrawtabpanel(exarg_T *eap ಬಳಸದ)
 {
-    int save_RedrawingDisabled = RedrawingDisabled;
+    ಪೂರ್ಣಾಂಕ save_RedrawingDisabled = RedrawingDisabled;
     RedrawingDisabled = 0;
 
-    int save_p_lz = p_lz;
+    ಪೂರ್ಣಾಂಕ save_p_lz = p_lz;
     p_lz = FALSE;
 
-#if defined(FEAT_TABPANEL)
+#ಆದರೆ defined(FEAT_TABPANEL)
     draw_tabpanel();
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
     emsg(_(e_cannot_not_support_redrawtabpanel));
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     RedrawingDisabled = save_RedrawingDisabled;
     p_lz = save_p_lz;
-    out_flush();
+    ಹೊರಹೋಗು_flush();
 }
 
-    static void
-close_redir(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+close_redir(ಶೂನ್ಯ)
 {
-    if (redir_fd != NULL)
+    ಆದರೆ (redir_fd != ಖಾಲಿ)
     {
 	fclose(redir_fd);
-	redir_fd = NULL;
+	redir_fd = ಖಾಲಿ;
     }
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     redir_reg = 0;
-    if (redir_vname)
+    ಆದರೆ (redir_vname)
     {
 	var_redir_stop();
 	redir_vname = 0;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#if defined(FEAT_SESSION) || defined(FEAT_EVAL)
-    int
-vim_mkdir_emsg(char_u *name, int prot UNUSED)
+#ಆದರೆ defined(FEAT_SESSION) || defined(FEAT_EVAL)
+    ಪೂರ್ಣಾಂಕ
+vim_mkdir_emsg(char_u *name, ಪೂರ್ಣಾಂಕ prot ಬಳಸದ)
 {
-    if (vim_mkdir(name, prot) != 0)
+    ಆದರೆ (vim_mkdir(name, prot) != 0)
     {
 	semsg(_(e_cannot_create_directory_str), name);
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Open a file for writing for an Ex command, with some checks.
@@ -9321,72 +9321,72 @@ vim_mkdir_emsg(char_u *name, int prot UNUSED)
     FILE *
 open_exfile(
     char_u	*fname,
-    int		forceit,
-    char	*mode)	    // "w" for create new file or "a" for append
+    ಪೂರ್ಣಾಂಕ		forceit,
+    ಅಕ್ಷರ	*ಬಹುಲಕ)	    // "w" for create new file or "a" for append
 {
     FILE	*fd;
 
-#ifdef UNIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
     // with Unix it is possible to open a directory
-    if (mch_isdir(fname))
+    ಆದರೆ (mch_isdir(fname))
     {
 	semsg(_(e_str_is_directory), fname);
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
-#endif
-    if (!forceit && *mode != 'a' && vim_fexists(fname))
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (!forceit && *ಬಹುಲಕ != 'a' && vim_fexists(fname))
     {
-	semsg(_(e_str_exists_add_bang_to_override), fname);
-	return NULL;
+	semsg(_(e_str_exists_ಕೂಡಿಸು_bang_ಗಮ್ಯ_override), fname);
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    if ((fd = mch_fopen((char *)fname, mode)) == NULL)
+    ಆದರೆ ((fd = mch_fopen((ಅಕ್ಷರ *)fname, ಬಹುಲಕ)) == ಖಾಲಿ)
 	semsg(_(e_cannot_open_str_for_writing_2), fname);
 
-    return fd;
+    ಹಿಂತಿರುಗಿ fd;
 }
 
 /*
  * ":mark" and ":k".
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_mark(exarg_T *eap)
 {
     pos_T	pos;
 
-#ifdef FEAT_EVAL
-    if (not_in_vim9(eap, false) == FAIL)
-	return;
-#endif
-    if (*eap->arg == NUL)		// No argument?
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಆದರೆ (not_ಒಳ_vim9(eap, false) == FAIL)
+	ಹಿಂತಿರುಗಿ;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (*eap->arg == NUL)		// No argument?
     {
-	emsg(_(e_argument_required));
-	return;
+	emsg(_(e_ವಾದ_required));
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if (eap->arg[1] != NUL)	// more than one character?
+    ಆದರೆ (eap->arg[1] != NUL)	// more than one character?
     {
 	semsg(_(e_trailing_characters_str), eap->arg);
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
     pos = curwin->w_cursor;		// save curwin->w_cursor
     curwin->w_cursor.lnum = eap->line2;
     beginline(BL_WHITE | BL_FIX);
-    if (setmark(*eap->arg) == FAIL)	// set mark
-	emsg(_(e_argument_must_be_letter_or_forward_backward_quote));
+    ಆದರೆ (setmark(*eap->arg) == FAIL)	// set mark
+	emsg(_(e_ವಾದ_must_be_letter_or_forward_backward_quote));
     curwin->w_cursor = pos;		// restore curwin->w_cursor
 }
 
 /*
  * Update w_topline, w_leftcol and the cursor position.
  */
-    void
-update_topline_cursor(void)
+    ಶೂನ್ಯ
+update_topline_cursor(ಶೂನ್ಯ)
 {
     check_cursor();		// put cursor on valid line
     update_topline();
-    if (!curwin->w_p_wrap)
+    ಆದರೆ (!curwin->w_p_wrap)
 	validate_cursor();
     update_curswant();
 }
@@ -9395,25 +9395,25 @@ update_topline_cursor(void)
  * Save the current State and go to Normal mode.
  * Return TRUE if the typeahead could be saved.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 save_current_state(save_state_T *sst)
 {
-    sst->save_msg_scroll = msg_scroll;
+    sst->save_ಸಂದೇಶ_scroll = ಸಂದೇಶ_scroll;
     sst->save_restart_edit = restart_edit;
-    sst->save_msg_didout = msg_didout;
+    sst->save_ಸಂದೇಶ_didout = ಸಂದೇಶ_didout;
     sst->save_State = State;
     sst->save_insertmode = p_im;
-    sst->save_finish_op = finish_op;
+    sst->save_ಮುಕ್ತಾಯ_op = ಮುಕ್ತಾಯ_op;
     sst->save_opcount = opcount;
     sst->save_reg_executing = reg_executing;
-    sst->save_pending_end_reg_executing = pending_end_reg_executing;
+    sst->save_pending_ಕೊನೆ_reg_executing = pending_ಕೊನೆ_reg_executing;
 
-    msg_scroll = FALSE;		    // no msg scrolling in Normal mode
+    ಸಂದೇಶ_scroll = FALSE;		    // no msg scrolling in Normal mode
     restart_edit = 0;		    // don't go to Insert mode
     p_im = FALSE;		    // don't use 'insertmode'
 
-    sst->save_script_version = current_sctx.sc_version;
-    current_sctx.sc_version = 1;    // not in Vim9 script
+    sst->save_script_ಆವೃತ್ತಿ = current_sctx.sc_ಆವೃತ್ತಿ;
+    current_sctx.sc_ಆವೃತ್ತಿ = 1;    // not in Vim9 script
 
     /*
      * Save the current typeahead.  This is required to allow using ":normal"
@@ -9421,53 +9421,53 @@ save_current_state(save_state_T *sst)
      * ends with half a command.
      */
     save_typeahead(&sst->tabuf);
-    return sst->tabuf.typebuf_valid;
+    ಹಿಂತಿರುಗಿ sst->tabuf.typebuf_valid;
 }
 
-    void
+    ಶೂನ್ಯ
 restore_current_state(save_state_T *sst)
 {
     // Restore the previous typeahead.
     restore_typeahead(&sst->tabuf, FALSE);
 
-    msg_scroll = sst->save_msg_scroll;
+    ಸಂದೇಶ_scroll = sst->save_ಸಂದೇಶ_scroll;
     restart_edit = sst->save_restart_edit;
     p_im = sst->save_insertmode;
-    finish_op = sst->save_finish_op;
+    ಮುಕ್ತಾಯ_op = sst->save_ಮುಕ್ತಾಯ_op;
     opcount = sst->save_opcount;
     reg_executing = sst->save_reg_executing;
-    pending_end_reg_executing = sst->save_pending_end_reg_executing;
-    msg_didout |= sst->save_msg_didout;	// don't reset msg_didout now
-    current_sctx.sc_version = sst->save_script_version;
+    pending_ಕೊನೆ_reg_executing = sst->save_pending_ಕೊನೆ_reg_executing;
+    ಸಂದೇಶ_didout |= sst->save_ಸಂದೇಶ_didout;	// don't reset msg_didout now
+    current_sctx.sc_ಆವೃತ್ತಿ = sst->save_script_ಆವೃತ್ತಿ;
 
     // Restore the state (needed when called from a function executed for
     // 'indentexpr'). Update the mouse and cursor, they may have changed.
     State = sst->save_State;
-#ifdef CURSOR_SHAPE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ CURSOR_SHAPE
     ui_cursor_shape();		// may show different cursor shape
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * ":normal[!] {commands}": Execute normal mode commands.
  */
-    void
-ex_normal(exarg_T *eap)
+    ಶೂನ್ಯ
+ex_ಸಾಮಾನ್ಯ(exarg_T *eap)
 {
     save_state_T save_state;
-    char_u	*arg = NULL;
-    int		l;
+    char_u	*arg = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		l;
     char_u	*p;
 
-    if (ex_normal_lock > 0)
+    ಆದರೆ (ex_ಸಾಮಾನ್ಯ_ಬೀಗ > 0)
     {
-	emsg(_(e_not_allowed_here));
-	return;
+	emsg(_(e_not_allowed_ಇಲ್ಲಿ));
+	ಹಿಂತಿರುಗಿ;
     }
-    if (ex_normal_busy >= p_mmd)
+    ಆದರೆ (ex_ಸಾಮಾನ್ಯ_busy >= p_mmd)
     {
-	emsg(_(e_recursive_use_of_normal_too_deep));
-	return;
+	emsg(_(e_recursive_use_ದ_ಸಾಮಾನ್ಯ_too_deep));
+	ಹಿಂತಿರುಗಿ;
     }
 
     /*
@@ -9475,56 +9475,56 @@ ex_normal(exarg_T *eap)
      * this for the K_SPECIAL leading byte, otherwise special keys will not
      * work.
      */
-    if (has_mbyte)
+    ಆದರೆ (has_mbyte)
     {
-	int	len = 0;
+	ಪೂರ್ಣಾಂಕ	len = 0;
 
 	// Count the number of characters to be escaped.
-	for (p = eap->arg; *p != NUL; ++p)
+	ಗಾಗಿ (p = eap->arg; *p != NUL; ++p)
 	{
-#ifdef FEAT_GUI
-	    if (*p == CSI)  // leadbyte CSI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+	    ಆದರೆ (*p == CSI)  // leadbyte CSI
 		len += 2;
-#endif
-	    for (l = (*mb_ptr2len)(p) - 1; l > 0; --l)
-		if (*++p == K_SPECIAL	  // trailbyte K_SPECIAL or CSI
-#ifdef FEAT_GUI
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಗಾಗಿ (l = (*mb_ptr2len)(p) - 1; l > 0; --l)
+		ಆದರೆ (*++p == K_SPECIAL	  // trailbyte K_SPECIAL or CSI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 			|| *p == CSI
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 			)
 		    len += 2;
 	}
-	if (len > 0)
+	ಆದರೆ (len > 0)
 	{
 	    arg = alloc(STRLEN(eap->arg) + len + 1);
-	    if (arg != NULL)
+	    ಆದರೆ (arg != ಖಾಲಿ)
 	    {
 		len = 0;
-		for (p = eap->arg; *p != NUL; ++p)
+		ಗಾಗಿ (p = eap->arg; *p != NUL; ++p)
 		{
 		    arg[len++] = *p;
-#ifdef FEAT_GUI
-		    if (*p == CSI)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+		    ಆದರೆ (*p == CSI)
 		    {
 			arg[len++] = KS_EXTRA;
-			arg[len++] = (int)KE_CSI;
+			arg[len++] = (ಪೂರ್ಣಾಂಕ)KE_CSI;
 		    }
-#endif
-		    for (l = (*mb_ptr2len)(p) - 1; l > 0; --l)
+#ಆದರೆ_ಅಂತ್ಯ
+		    ಗಾಗಿ (l = (*mb_ptr2len)(p) - 1; l > 0; --l)
 		    {
 			arg[len++] = *++p;
-			if (*p == K_SPECIAL)
+			ಆದರೆ (*p == K_SPECIAL)
 			{
 			    arg[len++] = KS_SPECIAL;
 			    arg[len++] = KE_FILLER;
 			}
-#ifdef FEAT_GUI
-			else if (*p == CSI)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+			ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*p == CSI)
 			{
 			    arg[len++] = KS_EXTRA;
-			    arg[len++] = (int)KE_CSI;
+			    arg[len++] = (ಪೂರ್ಣಾಂಕ)KE_CSI;
 			}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		    }
 		    arg[len] = NUL;
 		}
@@ -9532,39 +9532,39 @@ ex_normal(exarg_T *eap)
 	}
     }
 
-    ++ex_normal_busy;
-    if (save_current_state(&save_state))
+    ++ex_ಸಾಮಾನ್ಯ_busy;
+    ಆದರೆ (save_current_state(&save_state))
     {
 	/*
 	 * Repeat the :normal command for each line in the range.  When no
 	 * range given, execute it just once, without positioning the cursor
 	 * first.
 	 */
-	do
+	ಮಾಡು
 	{
-	    if (eap->addr_count != 0)
+	    ಆದರೆ (eap->addr_ಎಣಿಕೆ != 0)
 	    {
 		curwin->w_cursor.lnum = eap->line1++;
-		curwin->w_cursor.col = 0;
+		curwin->w_cursor.ಲಂಬಸಾಲು = 0;
 		check_cursor_moved(curwin);
 	    }
 
-	    exec_normal_cmd(arg != NULL
+	    exec_ಸಾಮಾನ್ಯ_cmd(arg != ಖಾಲಿ
 		     ? arg
 		     : eap->arg, eap->forceit ? REMAP_NONE : REMAP_YES, FALSE);
 	}
-	while (eap->addr_count > 0 && eap->line1 <= eap->line2 && !got_int);
+	ಆಗ (eap->addr_ಎಣಿಕೆ > 0 && eap->line1 <= eap->line2 && !got_int);
     }
 
     // Might not return to the main loop when in an event handler.
     update_topline_cursor();
 
     restore_current_state(&save_state);
-    --ex_normal_busy;
+    --ex_ಸಾಮಾನ್ಯ_busy;
     setmouse();
-#ifdef CURSOR_SHAPE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ CURSOR_SHAPE
     ui_cursor_shape();		// may show different cursor shape
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     vim_free(arg);
 }
@@ -9572,65 +9572,65 @@ ex_normal(exarg_T *eap)
 /*
  * ":startinsert", ":startreplace" and ":startgreplace"
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_startinsert(exarg_T *eap)
 {
-#ifdef FEAT_TERMINAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMINAL
     // Ignore this when running in an active terminal.
-    if (term_job_running(curbuf->b_term))
-	return;
-#endif
-    if (!curbuf->b_p_ma && !p_im)
+    ಆದರೆ (ಪದ_ಕೆಲಸ_running(curbuf->b_ಪದ))
+	ಹಿಂತಿರುಗಿ;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (!curbuf->b_p_ma && !p_im)
     {
 	// Only give this error when 'insertmode' is off.
 	emsg(_(e_cannot_make_changes_modifiable_is_off));
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
-    if (eap->forceit)
+    ಆದರೆ (eap->forceit)
     {
 	// cursor line can be zero on startup
-	if (!curwin->w_cursor.lnum)
+	ಆದರೆ (!curwin->w_cursor.lnum)
 	    curwin->w_cursor.lnum = 1;
-	set_cursor_for_append_to_line();
+	ಗಣ_cursor_for_append_ಗಮ್ಯ_ಸಾಲು();
     }
 
     // Ignore the command when already in Insert mode.  Inserting an
     // expression register that invokes a function can do this.
-    if (State & MODE_INSERT)
-	return;
+    ಆದರೆ (State & ಬಹುಲಕ_ಸೇರಿಸು)
+	ಹಿಂತಿರುಗಿ;
 
-    if (eap->cmdidx == CMD_startinsert)
+    ಆದರೆ (eap->cmdidx == CMD_startinsert)
 	restart_edit = 'a';
-    else if (eap->cmdidx == CMD_startreplace)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (eap->cmdidx == CMD_startreplace)
 	restart_edit = 'R';
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	restart_edit = 'V';
 
-    if (!eap->forceit)
+    ಆದರೆ (!eap->forceit)
     {
-	if (eap->cmdidx == CMD_startinsert)
+	ಆದರೆ (eap->cmdidx == CMD_startinsert)
 	    restart_edit = 'i';
 	curwin->w_curswant = 0;	    // avoid MAXCOL
     }
 
-    if (VIsual_active)
+    ಆದರೆ (VIsual_ಸಕ್ರಿಯ)
 	showmode();
 }
 
 /*
  * ":stopinsert"
  */
-    static void
-ex_stopinsert(exarg_T *eap UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ex_stopinsert(exarg_T *eap ಬಳಸದ)
 {
     restart_edit = 0;
-    stop_insert_mode = TRUE;
-#if defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
+    stop_ಸೇರಿಸು_ಬಹುಲಕ = TRUE;
+#ಆದರೆ defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
     // when called from remote_expr in insert mode, make sure insert mode is
     // ended by adding K_NOP to the typeahead buffer
-    if (vgetc_busy)
+    ಆದರೆ (vgetc_busy)
 	ins_char_typebuf(K_NOP, 0);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     clearmode();
 }
 
@@ -9638,66 +9638,66 @@ ex_stopinsert(exarg_T *eap UNUSED)
  * Execute normal mode command "cmd".
  * "remap" can be REMAP_NONE or REMAP_YES.
  */
-    void
-exec_normal_cmd(char_u *cmd, int remap, int silent)
+    ಶೂನ್ಯ
+exec_ಸಾಮಾನ್ಯ_cmd(char_u *cmd, ಪೂರ್ಣಾಂಕ remap, ಪೂರ್ಣಾಂಕ silent)
 {
     // Stuff the argument into the typeahead buffer.
     ins_typebuf(cmd, remap, 0, TRUE, silent);
-    exec_normal(FALSE, FALSE, FALSE);
+    exec_ಸಾಮಾನ್ಯ(FALSE, FALSE, FALSE);
 }
 
 /*
  * Execute normal_cmd() until there is no typeahead left.
  * When "use_vpeekc" is TRUE use vpeekc() to check for available chars.
  */
-    void
-exec_normal(int was_typed, int use_vpeekc, int may_use_terminal_loop UNUSED)
+    ಶೂನ್ಯ
+exec_ಸಾಮಾನ್ಯ(ಪೂರ್ಣಾಂಕ was_typed, ಪೂರ್ಣಾಂಕ use_vpeekc, ಪೂರ್ಣಾಂಕ may_use_terminal_loop ಬಳಸದ)
 {
     oparg_T	oa;
-    int		c;
+    ಪೂರ್ಣಾಂಕ		c;
 
     // When calling vpeekc() from feedkeys() it will return Ctrl_C when there
     // is nothing to get, so also check for Ctrl_C.
     clear_oparg(&oa);
-    finish_op = FALSE;
-    while ((!stuff_empty()
+    ಮುಕ್ತಾಯ_op = FALSE;
+    ಆಗ ((!stuff_ಖಾಲಿಗಳು()
 		|| ((was_typed || !typebuf_typed()) && typebuf.tb_len > 0)
 		|| (use_vpeekc && (c = vpeekc()) != NUL && c != Ctrl_C))
 	    && !got_int)
     {
 	update_topline_cursor();
-#ifdef FEAT_TERMINAL
-	if (may_use_terminal_loop && term_use_loop()
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMINAL
+	ಆದರೆ (may_use_terminal_loop && ಪದ_use_loop()
 		&& oa.op_type == OP_NOP && oa.regname == NUL
-		&& !VIsual_active)
+		&& !VIsual_ಸಕ್ರಿಯ)
 	{
 	    // If terminal_loop() returns OK we got a key that is handled
 	    // in Normal model.  With FAIL we first need to position the
 	    // cursor and the screen needs to be redrawn.
-	    if (terminal_loop(TRUE) == OK)
-		normal_cmd(&oa, TRUE);
+	    ಆದರೆ (terminal_loop(TRUE) == OK)
+		ಸಾಮಾನ್ಯ_cmd(&oa, TRUE);
 	}
-	else
-#endif
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 	    // execute a Normal mode cmd
-	    normal_cmd(&oa, TRUE);
+	    ಸಾಮಾನ್ಯ_cmd(&oa, TRUE);
     }
 }
 
-#ifdef FEAT_FIND_ID
-    static void
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕಂಡುಹಿಡಿ_ID
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_checkpath(exarg_T *eap)
 {
-    find_pattern_in_path(NULL, 0, 0, FALSE, FALSE, CHECK_PATH, 1L,
+    ಕಂಡುಹಿಡಿ_ನಮೂನೆ_ಒಳ_ಮಾರ್ಗ(ಖಾಲಿ, 0, 0, FALSE, FALSE, CHECK_ಮಾರ್ಗ, 1L,
 	    eap->forceit ? ACTION_SHOW_ALL : ACTION_SHOW,
 	    (linenr_T)1, (linenr_T)MAXLNUM, eap->forceit, FALSE);
 }
 
-# if defined(FEAT_QUICKFIX)
+# ಆದರೆ defined(FEAT_QUICKFIX)
 /*
  * ":psearch"
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_psearch(exarg_T *eap)
 {
     g_do_tagpreview = p_pvh;
@@ -9706,121 +9706,121 @@ ex_psearch(exarg_T *eap)
 }
 # endif
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_findpat(exarg_T *eap)
 {
-    int		whole = TRUE;
-    long	n;
+    ಪೂರ್ಣಾಂಕ		ಸಂಪೂರ್ಣ = TRUE;
+    ದೀರ್ಘ	n;
     char_u	*p;
-    int		action;
+    ಪೂರ್ಣಾಂಕ		action;
 
-    switch (cmdnames[eap->cmdidx].cmd_name[2])
+    ಆಯ್ಕೆ (cmdnames[eap->cmdidx].cmd_name[2])
     {
-	case 'e':	// ":psearch", ":isearch" and ":dsearch"
-		if (cmdnames[eap->cmdidx].cmd_name[0] == 'p')
+	ಸ್ಥಿತಿ 'e':	// ":psearch", ":isearch" and ":dsearch"
+		ಆದರೆ (cmdnames[eap->cmdidx].cmd_name[0] == 'p')
 		    action = ACTION_GOTO;
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		    action = ACTION_SHOW;
-		break;
-	case 'i':	// ":ilist" and ":dlist"
+		ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ 'i':	// ":ilist" and ":dlist"
 		action = ACTION_SHOW_ALL;
-		break;
-	case 'u':	// ":ijump" and ":djump"
+		ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ 'u':	// ":ijump" and ":djump"
 		action = ACTION_GOTO;
-		break;
-	default:	// ":isplit" and ":dsplit"
-		action = ACTION_SPLIT;
-		break;
+		ನಿಲ್ಲಿಸು;
+	ಪೂರ್ವನಿಯೋಜಿತ:	// ":isplit" and ":dsplit"
+		action = ACTION_ವಿಭಜಿಸು;
+		ನಿಲ್ಲಿಸು;
     }
 
     n = 1;
-    if (vim_isdigit(*eap->arg))	// get count
+    ಆದರೆ (vim_isdigit(*eap->arg))	// get count
     {
 	n = getdigits(&eap->arg);
 	eap->arg = skipwhite(eap->arg);
     }
-    if (*eap->arg == '/')   // Match regexp, not just whole words
+    ಆದರೆ (*eap->arg == '/')   // Match regexp, not just whole words
     {
-	whole = FALSE;
+	ಸಂಪೂರ್ಣ = FALSE;
 	++eap->arg;
 	p = skip_regexp(eap->arg, '/', magic_isset());
-	if (*p)
+	ಆದರೆ (*p)
 	{
 	    *p++ = NUL;
 	    p = skipwhite(p);
 
 	    // Check for trailing illegal characters
-	    if (!ends_excmd2(eap->arg, p))
+	    ಆದರೆ (!ತುದಿಗಳು_excmd2(eap->arg, p))
 		eap->errmsg = ex_errmsg(e_trailing_characters_str, p);
-	    else
-		set_nextcmd(eap, p);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ಗಣ_nextcmd(eap, p);
 	}
     }
-    if (!eap->skip)
-	find_pattern_in_path(eap->arg, 0, (int)STRLEN(eap->arg),
-		whole, !eap->forceit,
-		*eap->cmd == 'd' ? FIND_DEFINE : FIND_ANY, n, action,
+    ಆದರೆ (!eap->skip)
+	ಕಂಡುಹಿಡಿ_ನಮೂನೆ_ಒಳ_ಮಾರ್ಗ(eap->arg, 0, (ಪೂರ್ಣಾಂಕ)STRLEN(eap->arg),
+		ಸಂಪೂರ್ಣ, !eap->forceit,
+		*eap->cmd == 'd' ? ಕಂಡುಹಿಡಿ_DEFINE : ಕಂಡುಹಿಡಿ_ANY, n, action,
 		eap->line1, eap->line2, eap->forceit, FALSE);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 
-#ifdef FEAT_QUICKFIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
 /*
  * ":ptag", ":ptselect", ":ptjump", ":ptnext", etc.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_ptag(exarg_T *eap)
 {
     g_do_tagpreview = p_pvh;  // will be reset to 0 in ex_tag_cmd()
-    ex_tag_cmd(eap, cmdnames[eap->cmdidx].cmd_name + 1);
+    ex_ಟ್ಯಾಗ್_cmd(eap, cmdnames[eap->cmdidx].cmd_name + 1);
 }
 
 /*
  * ":pedit"
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_pedit(exarg_T *eap)
 {
     win_T	*curwin_save = curwin;
-    prepare_preview_window();
+    prepare_preview_ಕಿಟಕಿ();
 
     // Edit the file.
-    do_exedit(eap, NULL);
+    do_exedit(eap, ಖಾಲಿ);
 
-    back_to_current_window(curwin_save);
+    ಹಿಂಭಾಗ_ಗಮ್ಯ_current_ಕಿಟಕಿ(curwin_save);
 }
 
 /*
  * ":pbuffer"
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_pbuffer(exarg_T *eap)
 {
     win_T	*curwin_save = curwin;
-    prepare_preview_window();
+    prepare_preview_ಕಿಟಕಿ();
 
     // Go to the buffer.
     do_exbuffer(eap);
 
-    back_to_current_window(curwin_save);
+    ಹಿಂಭಾಗ_ಗಮ್ಯ_current_ಕಿಟಕಿ(curwin_save);
 }
 
-    static void
-prepare_preview_window(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+prepare_preview_ಕಿಟಕಿ(ಶೂನ್ಯ)
 {
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+    ಆದರೆ (ERROR_IF_ANY_POPUP_ಕಿಟಕಿ)
+	ಹಿಂತಿರುಗಿ;
 
     // Open the preview window or popup and make it the current window.
     g_do_tagpreview = p_pvh;
     prepare_tagpreview(TRUE, TRUE, FALSE);
 }
 
-    static void
-back_to_current_window(win_T *curwin_save)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಹಿಂಭಾಗ_ಗಮ್ಯ_current_ಕಿಟಕಿ(win_T *curwin_save)
 {
-    if (curwin != curwin_save && win_valid(curwin_save))
+    ಆದರೆ (curwin != curwin_save && win_valid(curwin_save))
     {
 	// Return cursor to where we were
 	validate_cursor();
@@ -9828,7 +9828,7 @@ back_to_current_window(win_T *curwin_save)
 	win_enter(curwin_save, TRUE);
     }
 # ifdef FEAT_PROP_POPUP
-    else if (WIN_IS_POPUP(curwin))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (WIN_IS_POPUP(curwin))
     {
 	// can't keep focus in popup window
 	win_enter(firstwin, TRUE);
@@ -9836,82 +9836,82 @@ back_to_current_window(win_T *curwin_save)
 # endif
     g_do_tagpreview = 0;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * ":stag", ":stselect" and ":stjump".
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_stag(exarg_T *eap)
 {
-    postponed_split = -1;
-    postponed_split_flags = cmdmod.cmod_split;
-    postponed_split_tab = cmdmod.cmod_tab;
-    ex_tag_cmd(eap, cmdnames[eap->cmdidx].cmd_name + 1);
-    postponed_split_flags = 0;
-    postponed_split_tab = 0;
+    postponed_ವಿಭಜಿಸು = -1;
+    postponed_ವಿಭಜಿಸು_flags = cmdmod.cmod_ವಿಭಜಿಸು;
+    postponed_ವಿಭಜಿಸು_tab = cmdmod.cmod_tab;
+    ex_ಟ್ಯಾಗ್_cmd(eap, cmdnames[eap->cmdidx].cmd_name + 1);
+    postponed_ವಿಭಜಿಸು_flags = 0;
+    postponed_ವಿಭಜಿಸು_tab = 0;
 }
 
 /*
  * ":tag", ":tselect", ":tjump", ":tnext", etc.
  */
-    static void
-ex_tag(exarg_T *eap)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ex_ಟ್ಯಾಗ್(exarg_T *eap)
 {
-    ex_tag_cmd(eap, cmdnames[eap->cmdidx].cmd_name);
+    ex_ಟ್ಯಾಗ್_cmd(eap, cmdnames[eap->cmdidx].cmd_name);
 }
 
-    static void
-ex_tag_cmd(exarg_T *eap, char_u *name)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ex_ಟ್ಯಾಗ್_cmd(exarg_T *eap, char_u *name)
 {
-    int		cmd;
+    ಪೂರ್ಣಾಂಕ		cmd;
 
-    switch (name[1])
+    ಆಯ್ಕೆ (name[1])
     {
-	case 'j': cmd = DT_JUMP;	// ":tjump"
-		  break;
-	case 's': cmd = DT_SELECT;	// ":tselect"
-		  break;
-	case 'p': cmd = DT_PREV;	// ":tprevious"
-		  break;
-	case 'N': cmd = DT_PREV;	// ":tNext"
-		  break;
-	case 'n': cmd = DT_NEXT;	// ":tnext"
-		  break;
-	case 'o': cmd = DT_POP;		// ":pop"
-		  break;
-	case 'f':			// ":tfirst"
-	case 'r': cmd = DT_FIRST;	// ":trewind"
-		  break;
-	case 'l': cmd = DT_LAST;	// ":tlast"
-		  break;
-	default:			// ":tag"
-#ifdef FEAT_CSCOPE
-		  if (p_cst && *eap->arg != NUL)
+	ಸ್ಥಿತಿ 'j': cmd = DT_JUMP;	// ":tjump"
+		  ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ 's': cmd = DT_SELECT;	// ":tselect"
+		  ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ 'p': cmd = DT_PREV;	// ":tprevious"
+		  ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ 'N': cmd = DT_PREV;	// ":tNext"
+		  ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ 'n': cmd = DT_ಮುಂದಿನ;	// ":tnext"
+		  ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ 'o': cmd = DT_ತೆಗೆ;		// ":pop"
+		  ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ 'f':			// ":tfirst"
+	ಸ್ಥಿತಿ 'r': cmd = DT_ಮೊದಲ;	// ":trewind"
+		  ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ 'l': cmd = DT_ಕೊನೆಯ;	// ":tlast"
+		  ನಿಲ್ಲಿಸು;
+	ಪೂರ್ವನಿಯೋಜಿತ:			// ":tag"
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CSCOPE
+		  ಆದರೆ (p_cst && *eap->arg != NUL)
 		  {
 		      ex_cstag(eap);
-		      return;
+		      ಹಿಂತಿರುಗಿ;
 		  }
-#endif
-		  cmd = DT_TAG;
-		  break;
+#ಆದರೆ_ಅಂತ್ಯ
+		  cmd = DT_ಟ್ಯಾಗ್;
+		  ನಿಲ್ಲಿಸು;
     }
 
-    if (name[0] == 'l')
+    ಆದರೆ (name[0] == 'l')
     {
-#ifndef FEAT_QUICKFIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_QUICKFIX
 	ex_ni(eap);
-	return;
-#else
+	ಹಿಂತಿರುಗಿ;
+#ಇಲ್ಲದಿದ್ದರೆ
 	cmd = DT_LTAG;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
-    do_tag(eap->arg, cmd, eap->addr_count > 0 ? (int)eap->line2 : 1,
+    do_ಟ್ಯಾಗ್(eap->arg, cmd, eap->addr_ಎಣಿಕೆ > 0 ? (ಪೂರ್ಣಾಂಕ)eap->line2 : 1,
 							  eap->forceit, TRUE);
 }
 
-enum {
+ಎಣಿಕೆ {
     SPEC_PERC = 0,
     SPEC_HASH,
     SPEC_CWORD,	    // cursor word
@@ -9920,16 +9920,16 @@ enum {
     SPEC_CFILE,	    // cursor path name
     SPEC_SFILE,	    // ":so" file name
     SPEC_SLNUM,	    // ":so" file line number
-    SPEC_STACK,	    // call stack
+    SPEC_ರಾಶಿ,	    // call stack
     SPEC_SCRIPT,    // script file name
     SPEC_AFILE,	    // autocommand file name
     SPEC_ABUF,	    // autocommand buffer number
     SPEC_AMATCH,    // autocommand match name
     SPEC_SFLNUM,    // script file line number
     SPEC_SID	    // script ID: <SNR>123_
-#ifdef FEAT_CLIENTSERVER
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CLIENTSERVER
     , SPEC_CLIENT
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 };
 
 /*
@@ -9937,60 +9937,60 @@ enum {
  * If found return one of the SPEC_ values and set "*usedlen" to the length of
  * the variable.  Otherwise return -1 and "*usedlen" is unchanged.
  */
-    int
-find_cmdline_var(char_u *src, size_t *usedlen)
+    ಪೂರ್ಣಾಂಕ
+ಕಂಡುಹಿಡಿ_cmdline_var(char_u *src, size_t *usedlen)
 {
     // must be sorted by the 'value' field because it is used by bsearch()!
-    static keyvalue_T spec_str_tab[] = {
-	KEYVALUE_ENTRY(SPEC_SID, "SID>"),	    // script ID: <SNR>123_
-	KEYVALUE_ENTRY(SPEC_ABUF, "abuf>"),	    // autocommand buffer number
-	KEYVALUE_ENTRY(SPEC_AFILE, "afile>"),	    // autocommand file name
-	KEYVALUE_ENTRY(SPEC_AMATCH, "amatch>"),	    // autocommand match name
-	KEYVALUE_ENTRY(SPEC_CCWORD, "cWORD>"),	    // cursor WORD
-	KEYVALUE_ENTRY(SPEC_CEXPR, "cexpr>"),	    // expr under cursor
-	KEYVALUE_ENTRY(SPEC_CFILE, "cfile>"),	    // cursor path name
-#ifdef FEAT_CLIENTSERVER
-	KEYVALUE_ENTRY(SPEC_CLIENT, "client>"),
-#endif
-	KEYVALUE_ENTRY(SPEC_CWORD, "cword>"),	    // cursor word
-	KEYVALUE_ENTRY(SPEC_SCRIPT, "script>"),	    // script file name
-	KEYVALUE_ENTRY(SPEC_SFILE, "sfile>"),	    // ":so" file name
-	KEYVALUE_ENTRY(SPEC_SFLNUM, "sflnum>"),	    // script file line number
-	KEYVALUE_ENTRY(SPEC_SLNUM, "slnum>"),	    // ":so" file line number
-	KEYVALUE_ENTRY(SPEC_STACK, "stack>")	    // call stack
+    ಸ್ಥಿರ keyvalue_T spec_str_tab[] = {
+	KEYVALUE_ನಮೂದು(SPEC_SID, "SID>"),	    // script ID: <SNR>123_
+	KEYVALUE_ನಮೂದು(SPEC_ABUF, "abuf>"),	    // autocommand buffer number
+	KEYVALUE_ನಮೂದು(SPEC_AFILE, "afile>"),	    // autocommand file name
+	KEYVALUE_ನಮೂದು(SPEC_AMATCH, "amatch>"),	    // autocommand match name
+	KEYVALUE_ನಮೂದು(SPEC_CCWORD, "cWORD>"),	    // cursor WORD
+	KEYVALUE_ನಮೂದು(SPEC_CEXPR, "cexpr>"),	    // expr under cursor
+	KEYVALUE_ನಮೂದು(SPEC_CFILE, "cfile>"),	    // cursor path name
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CLIENTSERVER
+	KEYVALUE_ನಮೂದು(SPEC_CLIENT, "client>"),
+#ಆದರೆ_ಅಂತ್ಯ
+	KEYVALUE_ನಮೂದು(SPEC_CWORD, "cword>"),	    // cursor word
+	KEYVALUE_ನಮೂದು(SPEC_SCRIPT, "script>"),	    // script file name
+	KEYVALUE_ನಮೂದು(SPEC_SFILE, "sfile>"),	    // ":so" file name
+	KEYVALUE_ನಮೂದು(SPEC_SFLNUM, "sflnum>"),	    // script file line number
+	KEYVALUE_ನಮೂದು(SPEC_SLNUM, "slnum>"),	    // ":so" file line number
+	KEYVALUE_ನಮೂದು(SPEC_ರಾಶಿ, "stack>")	    // call stack
     };
-    keyvalue_T target;
-    keyvalue_T *entry;
+    keyvalue_T ಗುರಿ;
+    keyvalue_T *ನಮೂದು;
 
-    switch (*src)
+    ಆಯ್ಕೆ (*src)
     {
-    case '%':
+    ಸ್ಥಿತಿ '%':
 	*usedlen = 1;
-	return SPEC_PERC;
+	ಹಿಂತಿರುಗಿ SPEC_PERC;
 
-    case '#':
+    ಸ್ಥಿತಿ '#':
 	*usedlen = 1;
-	return SPEC_HASH;
+	ಹಿಂತಿರುಗಿ SPEC_HASH;
 
-    case '<':
-	target.key = 0;
-	target.value.string = src + 1;	    // skip over '<'
-	target.value.length = 0;	    // not used, see cmp_keyvalue_value_n()
+    ಸ್ಥಿತಿ '<':
+	ಗುರಿ.ಕೀಲಿ = 0;
+	ಗುರಿ.ಮೌಲ್ಯ.string = src + 1;	    // skip over '<'
+	ಗುರಿ.ಮೌಲ್ಯ.ಉದ್ದಳತೆ = 0;	    // not used, see cmp_keyvalue_value_n()
 
-	entry = (keyvalue_T *)bsearch(&target, &spec_str_tab,
-		ARRAY_LENGTH(spec_str_tab), sizeof(spec_str_tab[0]),
-		cmp_keyvalue_value_n);
-	if (entry == NULL)
-	    return -1;
+	ನಮೂದು = (keyvalue_T *)bsearch(&ಗುರಿ, &spec_str_tab,
+		ARRAY_ಉದ್ದಳತೆ(spec_str_tab), ಗಾತ್ರ(spec_str_tab[0]),
+		cmp_keyvalue_ಮೌಲ್ಯ_n);
+	ಆದರೆ (ನಮೂದು == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ -1;
 
-	*usedlen = entry->value.length + 1;
-	return entry->key;
+	*usedlen = ನಮೂದು->ಮೌಲ್ಯ.ಉದ್ದಳತೆ + 1;
+	ಹಿಂತಿರುಗಿ ನಮೂದು->ಕೀಲಿ;
 
-    default:
-	break;
+    ಪೂರ್ವನಿಯೋಜಿತ:
+	ನಿಲ್ಲಿಸು;
     }
 
-    return -1;
+    ಹಿಂತಿರುಗಿ -1;
 }
 
 /*
@@ -10023,62 +10023,62 @@ eval_vars(
     char_u	*srcstart,	// beginning of valid memory for src
     size_t	*usedlen,	// characters after src that are used
     linenr_T	*lnump,		// line number for :e command, or NULL
-    char	**errormsg,	// pointer to error message
-    int		*escaped,	// return value has escaped white space (can
+    ಅಕ್ಷರ	**errormsg,	// pointer to error message
+    ಪೂರ್ಣಾಂಕ		*escaped,	// return value has escaped white space (can
 				// be NULL)
-    int		empty_is_error)	// empty result is considered an error
+    ಪೂರ್ಣಾಂಕ		ಖಾಲಿಗಳು_is_error)	// empty result is considered an error
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
     char_u	*s;
-    char_u	*result = (char_u *)"";
-    char_u	*resultbuf = NULL;
+    char_u	*ಫಲಿತಾಂಶ = (char_u *)"";
+    char_u	*resultbuf = ಖಾಲಿ;
     size_t	resultlen;
     buf_T	*buf;
-    int		valid = VALID_HEAD + VALID_PATH;    // assume valid result
-    int		spec_idx;
-    int		tilde_file = FALSE;
-    int		skip_mod = FALSE;
+    ಪೂರ್ಣಾಂಕ		valid = VALID_ತಲೆ + VALID_ಮಾರ್ಗ;    // assume valid result
+    ಪೂರ್ಣಾಂಕ		spec_idx;
+    ಪೂರ್ಣಾಂಕ		tilde_file = FALSE;
+    ಪೂರ್ಣಾಂಕ		skip_mod = FALSE;
     char_u	strbuf[30];
 
-    *errormsg = NULL;
-    if (escaped != NULL)
+    *errormsg = ಖಾಲಿ;
+    ಆದರೆ (escaped != ಖಾಲಿ)
 	*escaped = FALSE;
 
     /*
      * Check if there is something to do.
      */
-    spec_idx = find_cmdline_var(src, usedlen);
-    if (spec_idx < 0)	// no match
+    spec_idx = ಕಂಡುಹಿಡಿ_cmdline_var(src, usedlen);
+    ಆದರೆ (spec_idx < 0)	// no match
     {
 	*usedlen = 1;
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
     /*
      * Skip when preceded with a backslash "\%" and "\#".
      * Note: In "\\%" the % is also not recognized!
      */
-    if (src > srcstart && src[-1] == '\\')
+    ಆದರೆ (src > srcstart && src[-1] == '\\')
     {
 	*usedlen = 0;
 	STRMOVE(src - 1, src);	// remove backslash
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
     /*
      * word or WORD under cursor
      */
-    if (spec_idx == SPEC_CWORD || spec_idx == SPEC_CCWORD
+    ಆದರೆ (spec_idx == SPEC_CWORD || spec_idx == SPEC_CCWORD
 						     || spec_idx == SPEC_CEXPR)
     {
-	resultlen = find_ident_under_cursor(&result,
-		spec_idx == SPEC_CWORD ? (FIND_IDENT | FIND_STRING)
-	      : spec_idx == SPEC_CEXPR ? (FIND_IDENT | FIND_STRING | FIND_EVAL)
-	      : FIND_STRING);
-	if (resultlen == 0)
+	resultlen = ಕಂಡುಹಿಡಿ_ident_under_cursor(&ಫಲಿತಾಂಶ,
+		spec_idx == SPEC_CWORD ? (ಕಂಡುಹಿಡಿ_IDENT | ಕಂಡುಹಿಡಿ_STRING)
+	      : spec_idx == SPEC_CEXPR ? (ಕಂಡುಹಿಡಿ_IDENT | ಕಂಡುಹಿಡಿ_STRING | ಕಂಡುಹಿಡಿ_EVAL)
+	      : ಕಂಡುಹಿಡಿ_STRING);
+	ಆದರೆ (resultlen == 0)
 	{
 	    *errormsg = "";
-	    return NULL;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
     }
 
@@ -10089,274 +10089,274 @@ eval_vars(
      *	    File name for autocommand
      *	and following modifiers
      */
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	size_t off = 0;
 
-	switch (spec_idx)
+	ಆಯ್ಕೆ (spec_idx)
 	{
-	case SPEC_PERC:
-#ifdef FEAT_EVAL
-		if (!in_vim9script() || src[1] != '%')
-#endif
+	ಸ್ಥಿತಿ SPEC_PERC:
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+		ಆದರೆ (!ಒಳ_vim9script() || src[1] != '%')
+#ಆದರೆ_ಅಂತ್ಯ
 		{
 		    // '%': current file
-		    if (curbuf->b_fname == NULL)
+		    ಆದರೆ (curbuf->b_fname == ಖಾಲಿ)
 		    {
-			result = (char_u *)"";
+			ಫಲಿತಾಂಶ = (char_u *)"";
 			valid = 0;	    // Must have ":p:h" to be valid
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
-			result = curbuf->b_fname;
-			tilde_file = STRCMP(result, "~") == 0;
+			ಫಲಿತಾಂಶ = curbuf->b_fname;
+			tilde_file = STRCMP(ಫಲಿತಾಂಶ, "~") == 0;
 		    }
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 		// "%%" alternate file
 		off = 1;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		// FALLTHROUGH
-	case SPEC_HASH:		// '#' or "#99": alternate file
-		if (off == 0 ? src[1] == '#' : src[2] == '%')
+	ಸ್ಥಿತಿ SPEC_HASH:		// '#' or "#99": alternate file
+		ಆದರೆ (off == 0 ? src[1] == '#' : src[2] == '%')
 		{
 		    // "##" or "%%%": the argument list
-		    result = arg_all();
-		    resultbuf = result;
+		    ಫಲಿತಾಂಶ = arg_all();
+		    resultbuf = ಫಲಿತಾಂಶ;
 		    *usedlen = off + 2;
-		    if (escaped != NULL)
+		    ಆದರೆ (escaped != ಖಾಲಿ)
 			*escaped = TRUE;
 		    skip_mod = TRUE;
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 		s = src + off + 1;
-		if (*s == '<')		// "#<99" uses v:oldfiles
+		ಆದರೆ (*s == '<')		// "#<99" uses v:oldfiles
 		    ++s;
-		i = (int)getdigits(&s);
-		if (s == src + off + 2 && src[off + 1] == '-')
+		i = (ಪೂರ್ಣಾಂಕ)getdigits(&s);
+		ಆದರೆ (s == src + off + 2 && src[off + 1] == '-')
 		    // just a minus sign, don't skip over it
 		    s--;
-		*usedlen = (int)(s - src); // length of what we expand
+		*usedlen = (ಪೂರ್ಣಾಂಕ)(s - src); // length of what we expand
 
-		if (src[off + 1] == '<' && i != 0)
+		ಆದರೆ (src[off + 1] == '<' && i != 0)
 		{
-		    if (*usedlen < off + 2)
+		    ಆದರೆ (*usedlen < off + 2)
 		    {
 			// Should we give an error message for #<text?
 			*usedlen = off + 1;
-			return NULL;
+			ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 		    }
-#ifdef FEAT_EVAL
-		    result = list_find_str(get_vim_var_list(VV_OLDFILES),
-								     (long)i);
-		    if (result == NULL)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+		    ಫಲಿತಾಂಶ = list_ಕಂಡುಹಿಡಿ_str(get_vim_var_list(VV_OLDFILES),
+								     (ದೀರ್ಘ)i);
+		    ಆದರೆ (ಫಲಿತಾಂಶ == ಖಾಲಿ)
 		    {
 			*errormsg = "";
-			return NULL;
+			ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 		    }
-#else
-		    *errormsg = _(e_hashsmall_is_not_available_without_the_eval_feature);
-		    return NULL;
-#endif
+#ಇಲ್ಲದಿದ್ದರೆ
+		    *errormsg = _(e_hashsmall_is_not_ಲಭ್ಯ_without_the_eval_feature);
+		    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    if (i == 0 && src[off + 1] == '<' && *usedlen > off + 1)
+		    ಆದರೆ (i == 0 && src[off + 1] == '<' && *usedlen > off + 1)
 			*usedlen = off + 1;
 		    buf = buflist_findnr(i);
-		    if (buf == NULL)
+		    ಆದರೆ (buf == ಖಾಲಿ)
 		    {
-			*errormsg = _(e_no_alternate_file_name_to_substitute_for_hash);
-			return NULL;
+			*errormsg = _(e_no_alternate_file_name_ಗಮ್ಯ_substitute_for_hash);
+			ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 		    }
-		    if (lnump != NULL)
-			*lnump = ECMD_LAST;
-		    if (buf->b_fname == NULL)
+		    ಆದರೆ (lnump != ಖಾಲಿ)
+			*lnump = ECMD_ಕೊನೆಯ;
+		    ಆದರೆ (buf->b_fname == ಖಾಲಿ)
 		    {
-			result = (char_u *)"";
+			ಫಲಿತಾಂಶ = (char_u *)"";
 			valid = 0;	    // Must have ":p:h" to be valid
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
-			result = buf->b_fname;
-			tilde_file = STRCMP(result, "~") == 0;
+			ಫಲಿತಾಂಶ = buf->b_fname;
+			tilde_file = STRCMP(ಫಲಿತಾಂಶ, "~") == 0;
 		    }
 		}
-		break;
+		ನಿಲ್ಲಿಸು;
 
-	case SPEC_CFILE:	// file name under cursor
-		result = file_name_at_cursor(FNAME_MESS|FNAME_HYP, 1L, NULL);
-		if (result == NULL)
+	ಸ್ಥಿತಿ SPEC_CFILE:	// file name under cursor
+		ಫಲಿತಾಂಶ = file_name_at_cursor(FNAME_MESS|FNAME_HYP, 1L, ಖಾಲಿ);
+		ಆದರೆ (ಫಲಿತಾಂಶ == ಖಾಲಿ)
 		{
 		    *errormsg = "";
-		    return NULL;
+		    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 		}
-		resultbuf = result;	    // remember allocated string
-		break;
+		resultbuf = ಫಲಿತಾಂಶ;	    // remember allocated string
+		ನಿಲ್ಲಿಸು;
 
-	case SPEC_AFILE:	// file name for autocommand
-		result = autocmd_fname;
-		if (result != NULL && !autocmd_fname_full)
+	ಸ್ಥಿತಿ SPEC_AFILE:	// file name for autocommand
+		ಫಲಿತಾಂಶ = autocmd_fname;
+		ಆದರೆ (ಫಲಿತಾಂಶ != ಖಾಲಿ && !autocmd_fname_ತುಂಬಿದ)
 		{
 		    // Still need to turn the fname into a full path.  It is
 		    // postponed to avoid a delay when <afile> is not used.
-		    autocmd_fname_full = TRUE;
-		    result = FullName_save(autocmd_fname, FALSE);
+		    autocmd_fname_ತುಂಬಿದ = TRUE;
+		    ಫಲಿತಾಂಶ = ತುಂಬಿದ_Name_save(autocmd_fname, FALSE);
 		    vim_free(autocmd_fname);
-		    autocmd_fname = result;
+		    autocmd_fname = ಫಲಿತಾಂಶ;
 		}
-		if (result == NULL)
+		ಆದರೆ (ಫಲಿತಾಂಶ == ಖಾಲಿ)
 		{
-		    *errormsg = _(e_no_autocommand_file_name_to_substitute_for_afile);
-		    return NULL;
+		    *errormsg = _(e_no_autocommand_file_name_ಗಮ್ಯ_substitute_for_afile);
+		    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 		}
-		result = shorten_fname1(result);
-		break;
+		ಫಲಿತಾಂಶ = shorten_fname1(ಫಲಿತಾಂಶ);
+		ನಿಲ್ಲಿಸು;
 
-	case SPEC_ABUF:		// buffer number for autocommand
-		if (autocmd_bufnr <= 0)
+	ಸ್ಥಿತಿ SPEC_ABUF:		// buffer number for autocommand
+		ಆದರೆ (autocmd_bufnr <= 0)
 		{
-		    *errormsg = _(e_no_autocommand_buffer_number_to_substitute_for_abuf);
-		    return NULL;
+		    *errormsg = _(e_no_autocommand_ಬಫರ್_ಸಂಖ್ಯೆ_ಗಮ್ಯ_substitute_for_abuf);
+		    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 		}
-		sprintf((char *)strbuf, "%d", autocmd_bufnr);
-		result = strbuf;
-		break;
+		sprintf((ಅಕ್ಷರ *)strbuf, "%d", autocmd_bufnr);
+		ಫಲಿತಾಂಶ = strbuf;
+		ನಿಲ್ಲಿಸು;
 
-	case SPEC_AMATCH:	// match name for autocommand
-		result = autocmd_match;
-		if (result == NULL)
+	ಸ್ಥಿತಿ SPEC_AMATCH:	// match name for autocommand
+		ಫಲಿತಾಂಶ = autocmd_ಹೊಂದಿಕೆ;
+		ಆದರೆ (ಫಲಿತಾಂಶ == ಖಾಲಿ)
 		{
-		    *errormsg = _(e_no_autocommand_match_name_to_substitute_for_amatch);
-		    return NULL;
+		    *errormsg = _(e_no_autocommand_ಹೊಂದಿಕೆ_name_ಗಮ್ಯ_substitute_for_amatch);
+		    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 		}
-		break;
+		ನಿಲ್ಲಿಸು;
 
-	case SPEC_SFILE:	// file name for ":so" command
-		result = estack_sfile(ESTACK_SFILE);
-		if (result == NULL)
+	ಸ್ಥಿತಿ SPEC_SFILE:	// file name for ":so" command
+		ಫಲಿತಾಂಶ = estack_sfile(ESTACK_SFILE);
+		ಆದರೆ (ಫಲಿತಾಂಶ == ಖಾಲಿ)
 		{
-		    *errormsg = _(e_no_source_file_name_to_substitute_for_sfile);
-		    return NULL;
+		    *errormsg = _(e_no_ಮೂಲ_file_name_ಗಮ್ಯ_substitute_for_sfile);
+		    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 		}
-		resultbuf = result;	    // remember allocated string
-		break;
-	case SPEC_STACK:	// call stack
-		result = estack_sfile(ESTACK_STACK);
-		if (result == NULL)
+		resultbuf = ಫಲಿತಾಂಶ;	    // remember allocated string
+		ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ SPEC_ರಾಶಿ:	// call stack
+		ಫಲಿತಾಂಶ = estack_sfile(ESTACK_ರಾಶಿ);
+		ಆದರೆ (ಫಲಿತಾಂಶ == ಖಾಲಿ)
 		{
-		    *errormsg = _(e_no_call_stack_to_substitute_for_stack);
-		    return NULL;
+		    *errormsg = _(e_no_call_ರಾಶಿ_ಗಮ್ಯ_substitute_for_ರಾಶಿ);
+		    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 		}
-		resultbuf = result;	    // remember allocated string
-		break;
-	case SPEC_SCRIPT:	// script file name
-		result = estack_sfile(ESTACK_SCRIPT);
-		if (result == NULL)
+		resultbuf = ಫಲಿತಾಂಶ;	    // remember allocated string
+		ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ SPEC_SCRIPT:	// script file name
+		ಫಲಿತಾಂಶ = estack_sfile(ESTACK_SCRIPT);
+		ಆದರೆ (ಫಲಿತಾಂಶ == ಖಾಲಿ)
 		{
-		    *errormsg = _(e_no_script_file_name_to_substitute_for_script);
-		    return NULL;
+		    *errormsg = _(e_no_script_file_name_ಗಮ್ಯ_substitute_for_script);
+		    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 		}
-		resultbuf = result;	    // remember allocated string
-		break;
+		resultbuf = ಫಲಿತಾಂಶ;	    // remember allocated string
+		ನಿಲ್ಲಿಸು;
 
-	case SPEC_SLNUM:	// line in file for ":so" command
-		if (SOURCING_NAME == NULL || SOURCING_LNUM == 0)
+	ಸ್ಥಿತಿ SPEC_SLNUM:	// line in file for ":so" command
+		ಆದರೆ (SOURCING_NAME == ಖಾಲಿ || SOURCING_LNUM == 0)
 		{
-		    *errormsg = _(e_no_line_number_to_use_for_slnum);
-		    return NULL;
+		    *errormsg = _(e_no_ಸಾಲು_ಸಂಖ್ಯೆ_ಗಮ್ಯ_use_for_slnum);
+		    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 		}
-		sprintf((char *)strbuf, "%ld", SOURCING_LNUM);
-		result = strbuf;
-		break;
+		sprintf((ಅಕ್ಷರ *)strbuf, "%ld", SOURCING_LNUM);
+		ಫಲಿತಾಂಶ = strbuf;
+		ನಿಲ್ಲಿಸು;
 
-#ifdef FEAT_EVAL
-	case SPEC_SFLNUM:	// line in script file
-		if (current_sctx.sc_lnum + SOURCING_LNUM == 0)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	ಸ್ಥಿತಿ SPEC_SFLNUM:	// line in script file
+		ಆದರೆ (current_sctx.sc_lnum + SOURCING_LNUM == 0)
 		{
-		    *errormsg = _(e_no_line_number_to_use_for_sflnum);
-		    return NULL;
+		    *errormsg = _(e_no_ಸಾಲು_ಸಂಖ್ಯೆ_ಗಮ್ಯ_use_for_sflnum);
+		    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 		}
-		sprintf((char *)strbuf, "%ld",
-				 (long)(current_sctx.sc_lnum + SOURCING_LNUM));
-		result = strbuf;
-		break;
+		sprintf((ಅಕ್ಷರ *)strbuf, "%ld",
+				 (ದೀರ್ಘ)(current_sctx.sc_lnum + SOURCING_LNUM));
+		ಫಲಿತಾಂಶ = strbuf;
+		ನಿಲ್ಲಿಸು;
 
-	case SPEC_SID:
-		if (current_sctx.sc_sid <= 0)
+	ಸ್ಥಿತಿ SPEC_SID:
+		ಆದರೆ (current_sctx.sc_sid <= 0)
 		{
-		    *errormsg = _(e_using_sid_not_in_script_context);
-		    return NULL;
+		    *errormsg = _(e_using_sid_not_ಒಳ_script_context);
+		    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 		}
-		sprintf((char *)strbuf, "<SNR>%d_", current_sctx.sc_sid);
-		result = strbuf;
-		break;
-#endif
+		sprintf((ಅಕ್ಷರ *)strbuf, "<SNR>%d_", current_sctx.sc_sid);
+		ಫಲಿತಾಂಶ = strbuf;
+		ನಿಲ್ಲಿಸು;
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_CLIENTSERVER
-	case SPEC_CLIENT:	// Source of last submitted input
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CLIENTSERVER
+	ಸ್ಥಿತಿ SPEC_CLIENT:	// Source of last submitted input
 # ifdef MSWIN
-		sprintf((char *)strbuf, PRINTF_HEX_LONG_U,
-							(long_u)clientWindow);
-		result = strbuf;
-# else
+		sprintf((ಅಕ್ಷರ *)strbuf, PRINTF_HEX_LONG_U,
+							(long_u)client_ಕಿಟಕಿ);
+		ಫಲಿತಾಂಶ = strbuf;
+# ಇಲ್ಲದಿದ್ದರೆ
 #  ifdef FEAT_SOCKETSERVER
-		if (clientserver_method == CLIENTSERVER_METHOD_SOCKET)
+		ಆದರೆ (clientserver_ವಿಧಾನ == CLIENTSERVER_ವಿಧಾನ_SOCKET)
 		{
-		    if (client_socket == NULL)
-			result = (char_u *)"";
-		    else
-			result = client_socket;
+		    ಆದರೆ (client_socket == ಖಾಲಿ)
+			ಫಲಿತಾಂಶ = (char_u *)"";
+		    ಇಲ್ಲದಿದ್ದರೆ
+			ಫಲಿತಾಂಶ = client_socket;
 		}
 #  endif
 #  ifdef FEAT_X11
-		if (clientserver_method == CLIENTSERVER_METHOD_X11)
+		ಆದರೆ (clientserver_ವಿಧಾನ == CLIENTSERVER_ವಿಧಾನ_X11)
 		{
-		    sprintf((char *)strbuf, PRINTF_HEX_LONG_U,
-							(long_u)clientWindow);
-		    result = strbuf;
+		    sprintf((ಅಕ್ಷರ *)strbuf, PRINTF_HEX_LONG_U,
+							(long_u)client_ಕಿಟಕಿ);
+		    ಫಲಿತಾಂಶ = strbuf;
 		}
 #  endif
 # endif
-		break;
-#endif
+		ನಿಲ್ಲಿಸು;
+#ಆದರೆ_ಅಂತ್ಯ
 	}
 
-	resultlen = STRLEN(result);	// length of new string
-	if (src[*usedlen] == '<')	// remove the file name extension
+	resultlen = STRLEN(ಫಲಿತಾಂಶ);	// length of new string
+	ಆದರೆ (src[*usedlen] == '<')	// remove the file name extension
 	{
 	    ++*usedlen;
-	    if ((s = vim_strrchr(result, '.')) != NULL && s >= gettail(result))
-		resultlen = s - result;
+	    ಆದರೆ ((s = vim_strrchr(ಫಲಿತಾಂಶ, '.')) != ಖಾಲಿ && s >= gettail(ಫಲಿತಾಂಶ))
+		resultlen = s - ಫಲಿತಾಂಶ;
 	}
-	else if (!skip_mod)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!skip_mod)
 	{
-	    valid |= modify_fname(src, tilde_file, usedlen, &result, &resultbuf,
+	    valid |= modify_fname(src, tilde_file, usedlen, &ಫಲಿತಾಂಶ, &resultbuf,
 								  &resultlen);
-	    if (result == NULL)
+	    ಆದರೆ (ಫಲಿತಾಂಶ == ಖಾಲಿ)
 	    {
 		*errormsg = "";
-		return NULL;
+		ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	    }
 	}
     }
 
-    if (resultlen == 0 || valid != VALID_HEAD + VALID_PATH)
+    ಆದರೆ (resultlen == 0 || valid != VALID_ತಲೆ + VALID_ಮಾರ್ಗ)
     {
-	if (empty_is_error)
+	ಆದರೆ (ಖಾಲಿಗಳು_is_error)
 	{
-	    if (valid != VALID_HEAD + VALID_PATH)
-		*errormsg = _(e_empty_file_name_for_percent_or_hash_only_works_with_ph);
-	    else
-		*errormsg = _(e_evaluates_to_an_empty_string);
+	    ಆದರೆ (valid != VALID_ತಲೆ + VALID_ಮಾರ್ಗ)
+		*errormsg = _(e_ಖಾಲಿಗಳು_file_name_for_percent_or_hash_only_ಕೆಲಸಮಾಡುತ್ತದೆ_with_ph);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		*errormsg = _(e_evaluates_ಗಮ್ಯ_an_ಖಾಲಿಗಳು_string);
 	}
-	result = NULL;
+	ಫಲಿತಾಂಶ = ಖಾಲಿ;
     }
-    else
-	result = vim_strnsave(result, resultlen);
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಫಲಿತಾಂಶ = vim_strnsave(ಫಲಿತಾಂಶ, resultlen);
     vim_free(resultbuf);
-    return result;
+    ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
 }
 
 /*
@@ -10367,8 +10367,8 @@ eval_vars(
     char_u *
 expand_sfile(char_u *arg)
 {
-    char	*errormsg;
-    char_u	*result;
+    ಅಕ್ಷರ	*errormsg;
+    char_u	*ಫಲಿತಾಂಶ;
     size_t	resultlen;
     char_u	*newres;
     size_t	len;
@@ -10378,101 +10378,101 @@ expand_sfile(char_u *arg)
     char_u	*p;
 
     resultlen = STRLEN(arg);
-    result = vim_strnsave(arg, resultlen);
-    if (result == NULL)
-	return NULL;
+    ಫಲಿತಾಂಶ = vim_strnsave(arg, resultlen);
+    ಆದರೆ (ಫಲಿತಾಂಶ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    for (p = result; *p; )
+    ಗಾಗಿ (p = ಫಲಿತಾಂಶ; *p; )
     {
-	if (STRNCMP(p, "<sfile>", 7) != 0)
+	ಆದರೆ (STRNCMP(p, "<sfile>", 7) != 0)
 	    ++p;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // replace "<sfile>" with the sourced file name, and do ":" stuff
-	    repl = eval_vars(p, result, &srclen, NULL, &errormsg, NULL, TRUE);
-	    if (errormsg != NULL)
+	    repl = eval_vars(p, ಫಲಿತಾಂಶ, &srclen, ಖಾಲಿ, &errormsg, ಖಾಲಿ, TRUE);
+	    ಆದರೆ (errormsg != ಖಾಲಿ)
 	    {
-		if (*errormsg)
+		ಆದರೆ (*errormsg)
 		    emsg(errormsg);
-		vim_free(result);
-		return NULL;
+		vim_free(ಫಲಿತಾಂಶ);
+		ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	    }
-	    if (repl == NULL)		// no match (cannot happen)
+	    ಆದರೆ (repl == ಖಾಲಿ)		// no match (cannot happen)
 	    {
 		p += srclen;
-		continue;
+		ಮುಂದುವರಿ;
 	    }
 	    repllen = STRLEN(repl);
 	    resultlen += repllen - srclen;
 	    newres = alloc(resultlen + 1);
-	    if (newres == NULL)
+	    ಆದರೆ (newres == ಖಾಲಿ)
 	    {
 		vim_free(repl);
-		vim_free(result);
-		return NULL;
+		vim_free(ಫಲಿತಾಂಶ);
+		ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	    }
-	    len = p - result;
-	    mch_memmove(newres, result, len);
+	    len = p - ಫಲಿತಾಂಶ;
+	    mch_memmove(newres, ಫಲಿತಾಂಶ, len);
 	    STRCPY(newres + len, repl);
 	    len += repllen;
 	    STRCPY(newres + len, p + srclen);
 	    vim_free(repl);
-	    vim_free(result);
-	    result = newres;
+	    vim_free(ಫಲಿತಾಂಶ);
+	    ಫಲಿತಾಂಶ = newres;
 	    p = newres + len;		// continue after the match
 	}
     }
 
-    return result;
+    ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
 }
 
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+#ಆದರೆ defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
 /*
  * Make a dialog message in "buff[DIALOG_MSG_SIZE]".
  * "format" must contain "%s".
  */
-    void
-dialog_msg(char_u *buff, char *format, char_u *fname)
+    ಶೂನ್ಯ
+dialog_ಸಂದೇಶ(char_u *buff, ಅಕ್ಷರ *format, char_u *fname)
 {
-    if (fname == NULL)
+    ಆದರೆ (fname == ಖಾಲಿ)
 	fname = (char_u *)_("Untitled");
-    vim_snprintf((char *)buff, DIALOG_MSG_SIZE, format, fname);
+    vim_snprintf((ಅಕ್ಷರ *)buff, DIALOG_ಸಂದೇಶ_ಗಾತ್ರ, format, fname);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * ":behave {mswin,xterm}"
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_behave(exarg_T *eap)
 {
-    if (STRCMP(eap->arg, "mswin") == 0)
+    ಆದರೆ (STRCMP(eap->arg, "mswin") == 0)
     {
-	set_option_value_give_err((char_u *)"selection",
+	ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"selection",
 						 0L, (char_u *)"exclusive", 0);
-	set_option_value_give_err((char_u *)"selectmode",
+	ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"selectmode",
 						 0L, (char_u *)"mouse,key", 0);
-	set_option_value_give_err((char_u *)"mousemodel",
+	ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"mousemodel",
 						     0L, (char_u *)"popup", 0);
-	set_option_value_give_err((char_u *)"keymodel",
+	ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"keymodel",
 					  0L, (char_u *)"startsel,stopsel", 0);
     }
-    else if (STRCMP(eap->arg, "xterm") == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(eap->arg, "xterm") == 0)
     {
-	set_option_value_give_err((char_u *)"selection",
+	ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"selection",
 						 0L, (char_u *)"inclusive", 0);
-	set_option_value_give_err((char_u *)"selectmode", 0L, (char_u *)"", 0);
-	set_option_value_give_err((char_u *)"mousemodel",
+	ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"selectmode", 0L, (char_u *)"", 0);
+	ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"mousemodel",
 						    0L, (char_u *)"extend", 0);
-	set_option_value_give_err((char_u *)"keymodel", 0L, (char_u *)"", 0);
+	ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"keymodel", 0L, (char_u *)"", 0);
     }
-    else
-	semsg(_(e_invalid_argument_str), eap->arg);
+    ಇಲ್ಲದಿದ್ದರೆ
+	semsg(_(e_invalid_ವಾದ_str), eap->arg);
 }
 
-static int filetype_detect = FALSE;
-static int filetype_plugin = FALSE;
-static int filetype_indent = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ filetype_detect = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ filetype_plugin = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ filetype_indent = FALSE;
 
 /*
  * ":filetype [plugin] [indent] {on,off,detect}"
@@ -10483,218 +10483,218 @@ static int filetype_indent = FALSE;
  * indent on: load filetype.vim and indent.vim
  * indent off: load indoff.vim
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_filetype(exarg_T *eap)
 {
     char_u	*arg = eap->arg;
-    int		plugin = FALSE;
-    int		indent = FALSE;
+    ಪೂರ್ಣಾಂಕ		plugin = FALSE;
+    ಪೂರ್ಣಾಂಕ		indent = FALSE;
 
-    if (*eap->arg == NUL)
+    ಆದರೆ (*eap->arg == NUL)
     {
 	// Print current status.
 	smsg("filetype detection:%s  plugin:%s  indent:%s",
 		filetype_detect ? "ON" : "OFF",
 		filetype_plugin ? (filetype_detect ? "ON" : "(on)") : "OFF",
 		filetype_indent ? (filetype_detect ? "ON" : "(on)") : "OFF");
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
     // Accept "plugin" and "indent" in any order.
-    for (;;)
+    ಗಾಗಿ (;;)
     {
-	if (STRNCMP(arg, "plugin", 6) == 0)
+	ಆದರೆ (STRNCMP(arg, "plugin", 6) == 0)
 	{
 	    plugin = TRUE;
 	    arg = skipwhite(arg + 6);
-	    continue;
+	    ಮುಂದುವರಿ;
 	}
-	if (STRNCMP(arg, "indent", 6) == 0)
+	ಆದರೆ (STRNCMP(arg, "indent", 6) == 0)
 	{
 	    indent = TRUE;
 	    arg = skipwhite(arg + 6);
-	    continue;
+	    ಮುಂದುವರಿ;
 	}
-	break;
+	ನಿಲ್ಲಿಸು;
     }
-    if (STRCMP(arg, "on") == 0 || STRCMP(arg, "detect") == 0)
+    ಆದರೆ (STRCMP(arg, "on") == 0 || STRCMP(arg, "detect") == 0)
     {
-	if (*arg == 'o' || !filetype_detect)
+	ಆದರೆ (*arg == 'o' || !filetype_detect)
 	{
-	    source_runtime((char_u *)FILETYPE_FILE, DIP_ALL);
+	    ಮೂಲ_runtime((char_u *)FILETYPE_FILE, DIP_ALL);
 	    filetype_detect = TRUE;
-	    if (plugin)
+	    ಆದರೆ (plugin)
 	    {
-		source_runtime((char_u *)FTPLUGIN_FILE, DIP_ALL);
+		ಮೂಲ_runtime((char_u *)FTPLUGIN_FILE, DIP_ALL);
 		filetype_plugin = TRUE;
 	    }
-	    if (indent)
+	    ಆದರೆ (indent)
 	    {
-		source_runtime((char_u *)INDENT_FILE, DIP_ALL);
+		ಮೂಲ_runtime((char_u *)INDENT_FILE, DIP_ALL);
 		filetype_indent = TRUE;
 	    }
 	}
-	if (*arg == 'd')
+	ಆದರೆ (*arg == 'd')
 	{
-	    (void)do_doautocmd((char_u *)"filetypedetect BufRead", TRUE, NULL);
+	    (ಶೂನ್ಯ)do_doautocmd((char_u *)"filetypedetect BufRead", TRUE, ಖಾಲಿ);
 	    do_modelines(0);
 	}
     }
-    else if (STRCMP(arg, "off") == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(arg, "off") == 0)
     {
-	if (plugin || indent)
+	ಆದರೆ (plugin || indent)
 	{
-	    if (plugin)
+	    ಆದರೆ (plugin)
 	    {
-		source_runtime((char_u *)FTPLUGOF_FILE, DIP_ALL);
+		ಮೂಲ_runtime((char_u *)FTPLUGOF_FILE, DIP_ALL);
 		filetype_plugin = FALSE;
 	    }
-	    if (indent)
+	    ಆದರೆ (indent)
 	    {
-		source_runtime((char_u *)INDOFF_FILE, DIP_ALL);
+		ಮೂಲ_runtime((char_u *)INDOFF_FILE, DIP_ALL);
 		filetype_indent = FALSE;
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    source_runtime((char_u *)FTOFF_FILE, DIP_ALL);
+	    ಮೂಲ_runtime((char_u *)FTOFF_FILE, DIP_ALL);
 	    filetype_detect = FALSE;
 	}
     }
-    else
-	semsg(_(e_invalid_argument_str), arg);
+    ಇಲ್ಲದಿದ್ದರೆ
+	semsg(_(e_invalid_ವಾದ_str), arg);
 }
 
 /*
  * ":setfiletype [FALLBACK] {name}"
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_setfiletype(exarg_T *eap)
 {
-    if (curbuf->b_did_filetype)
-	return;
+    ಆದರೆ (curbuf->b_did_filetype)
+	ಹಿಂತಿರುಗಿ;
 
     char_u *arg = eap->arg;
-    if (STRNCMP(arg, "FALLBACK ", 9) == 0)
+    ಆದರೆ (STRNCMP(arg, "FALLBACK ", 9) == 0)
 	arg += 9;
 
-    set_option_value_give_err((char_u *)"filetype", 0L, arg, OPT_LOCAL);
-    if (arg != eap->arg)
+    ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"filetype", 0L, arg, OPT_LOCAL);
+    ಆದರೆ (arg != eap->arg)
 	curbuf->b_did_filetype = false;
 }
 
-    static void
-ex_digraphs(exarg_T *eap UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ex_digraphs(exarg_T *eap ಬಳಸದ)
 {
-#ifdef FEAT_DIGRAPHS
-    if (*eap->arg != NUL)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIGRAPHS
+    ಆದರೆ (*eap->arg != NUL)
 	putdigraph(eap->arg);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	listdigraphs(eap->forceit);
-#else
-    emsg(_(e_no_digraphs_version));
-#endif
+#ಇಲ್ಲದಿದ್ದರೆ
+    emsg(_(e_no_digraphs_ಆವೃತ್ತಿ));
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#if defined(FEAT_SEARCH_EXTRA)
-    void
-set_no_hlsearch(int flag)
+#ಆದರೆ defined(FEAT_ಹುಡುಕು_EXTRA)
+    ಶೂನ್ಯ
+ಗಣ_no_hlsearch(ಪೂರ್ಣಾಂಕ flag)
 {
     no_hlsearch = flag;
 # ifdef FEAT_EVAL
-    set_vim_var_nr(VV_HLSEARCH, !no_hlsearch && p_hls);
+    ಗಣ_vim_var_nr(VV_HLSEARCH, !no_hlsearch && p_hls);
 # endif
 }
 
 /*
  * ":nohlsearch"
  */
-    static void
-ex_nohlsearch(exarg_T *eap UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ex_nohlsearch(exarg_T *eap ಬಳಸದ)
 {
-    set_no_hlsearch(TRUE);
+    ಗಣ_no_hlsearch(TRUE);
     redraw_all_later(UPD_SOME_VALID);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_CRYPT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
 /*
  * ":X": Get crypt key
  */
-    static void
-ex_X(exarg_T *eap UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ex_X(exarg_T *eap ಬಳಸದ)
 {
-    crypt_check_current_method();
-    (void)crypt_get_key(TRUE, TRUE);
+    crypt_check_current_ವಿಧಾನ();
+    (ಶೂನ್ಯ)crypt_get_ಕೀಲಿ(TRUE, TRUE);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_FOLDING
-    static void
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_FOLDING
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_fold(exarg_T *eap)
 {
-    if (foldManualAllowed(TRUE))
+    ಆದರೆ (foldManualAllowed(TRUE))
 	foldCreate(eap->line1, eap->line2);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_foldopen(exarg_T *eap)
 {
     opFoldRange(eap->line1, eap->line2, eap->cmdidx == CMD_foldopen,
 							 eap->forceit, FALSE);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ex_folddo(exarg_T *eap)
 {
     linenr_T	lnum;
 
 # ifdef FEAT_CLIPBOARD
-    start_global_changes();
+    ಆರಂಭ_global_changes();
 # endif
 # ifdef FEAT_CLIPBOARD_PROVIDER
     inc_clip_provider();
 # endif
 
     // First set the marks for all lines closed/open.
-    for (lnum = eap->line1; lnum <= eap->line2; ++lnum)
-	if (hasFolding(lnum, NULL, NULL) == (eap->cmdidx == CMD_folddoclosed))
+    ಗಾಗಿ (lnum = eap->line1; lnum <= eap->line2; ++lnum)
+	ಆದರೆ (hasFolding(lnum, ಖಾಲಿ, ಖಾಲಿ) == (eap->cmdidx == CMD_folddoclosed))
 	    ml_setmarked(lnum);
 
     // Execute the command on the marked lines.
     global_exe(eap->arg);
     ml_clearmarked();	   // clear rest of the marks
 # ifdef FEAT_CLIPBOARD
-    end_global_changes();
+    ಕೊನೆ_global_changes();
 # endif
 # ifdef FEAT_CLIPBOARD_PROVIDER
     dec_clip_provider();
 # endif
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_QUICKFIX)
+#ಆದರೆ defined(FEAT_QUICKFIX)
 /*
  * Returns TRUE if the supplied Ex cmdidx is for a location list command
  * instead of a quickfix command.
  */
-    int
-is_loclist_cmd(int cmdidx)
+    ಪೂರ್ಣಾಂಕ
+is_loclist_cmd(ಪೂರ್ಣಾಂಕ cmdidx)
 {
-    if (cmdidx < 0 || cmdidx >= CMD_SIZE)
-	return FALSE;
-    return cmdnames[cmdidx].cmd_name[0] == 'l';
+    ಆದರೆ (cmdidx < 0 || cmdidx >= CMD_ಗಾತ್ರ)
+	ಹಿಂತಿರುಗಿ FALSE;
+    ಹಿಂತಿರುಗಿ cmdnames[cmdidx].cmd_name[0] == 'l';
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    int
-get_pressedreturn(void)
+    ಪೂರ್ಣಾಂಕ
+get_pressedreturn(ಶೂನ್ಯ)
 {
-    return ex_pressedreturn;
+    ಹಿಂತಿರುಗಿ ex_pressedreturn;
 }
 
-    void
-set_pressedreturn(int val)
+    ಶೂನ್ಯ
+ಗಣ_pressedreturn(ಪೂರ್ಣಾಂಕ val)
 {
     ex_pressedreturn = val;
 }

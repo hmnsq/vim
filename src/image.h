@@ -7,13 +7,13 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#ifdef FEAT_IMAGE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_IMAGE
 
-#include <pixman.h>
+#ಅನ್ತರ್ಭಾವ <pixman.h>
 
-#define PLACEMENT_ID_INC 1000
+#ವ್ಯಾಖ್ಯಾನಿಸು PLACEMENT_ID_INC 1000
 
-typedef enum
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ
 {
     IMAGE_BACKEND_NONE = -1,
     IMAGE_BACKEND_GUI = 0,
@@ -24,16 +24,16 @@ typedef enum
 /*
  * Enum value is the number of bytes a pixel takes up
  */
-typedef enum
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ
 {
     IMAGE_FORMAT_RGB = 3,
     IMAGE_FORMAT_RGBA = 4
 } image_format_T;
 
-typedef enum
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ
 {
-    IMAGE_STATE_PUBLIC,
-    IMAGE_STATE_PRIVATE
+    IMAGE_STATE_ಬಹಿರಂಗ,
+    IMAGE_STATE_ಖಾಸಗಿ
 } image_state_T;
 
 /*
@@ -41,7 +41,7 @@ typedef enum
  * higher values will always be on top of other image placements with a lower
  * use that have the same zindex as the higher use image.
  */
-typedef enum
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ
 {
     // See find_next_popup() for why (global popups are always drawn first,
     // meaning they should be below local tab popups).
@@ -55,46 +55,46 @@ typedef enum
  * Represents image data, that can be referenced by multiple image placements,
  * each with a different view.
  */
-typedef struct image_S image_T;
-struct image_S
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ image_S image_T;
+ರಚನೆ image_S
 {
     int_u id;
-    int refcount;
+    ಪೂರ್ಣಾಂಕ refcount;
 
     // If image state is public, then it can be modified using the builtin
     // functions.
     image_state_T state;
 
-    uint8_t	    *data; // If NULL, then image is invalid and should not be
+    uint8_t	    *ದತ್ತಾಂಶ; // If NULL, then image is invalid and should not be
 			   // used.
-    int		    width;  // In physical pixels
-    int		    height; // In physical pixels
+    ಪೂರ್ಣಾಂಕ		    ಅಗಲ;  // In physical pixels
+    ಪೂರ್ಣಾಂಕ		    ಎತ್ತರ; // In physical pixels
     image_format_T  fmt;
 
     // Incremented every time the image data changes.
     int_u	    ver;
 
     image_backend_T backend;
-    void	    *backend_data;
+    ಶೂನ್ಯ	    *backend_ದತ್ತಾಂಶ;
 
-    image_T *next;
+    image_T *ಮುಂದಿನ;
     image_T *prev;
 };
 
-#define IMAGEPF_DIRTY 1	    // If image positioning/geometry has been modified
-#define IMAGEPF_HIDDEN 2    // If image should not be drawn
-#define IMAGEPF_FORCE 4     // If image backend should not use its cache
+#ವ್ಯಾಖ್ಯಾನಿಸು IMAGEPF_DIRTY 1	    // If image positioning/geometry has been modified
+#ವ್ಯಾಖ್ಯಾನಿಸು IMAGEPF_HIDDEN 2    // If image should not be drawn
+#ವ್ಯಾಖ್ಯಾನಿಸು IMAGEPF_FORCE 4     // If image backend should not use its cache
 			    // (if any)
 
-#define IMAGEPF_VISIBLE_INIT 8  // If "visible" is valid
-#define IMAGEPF_ENABLED 16	// If image should be drawn (not reset across
+#ವ್ಯಾಖ್ಯಾನಿಸು IMAGEPF_VISIBLE_INIT 8  // If "visible" is valid
+#ವ್ಯಾಖ್ಯಾನಿಸು IMAGEPF_ENABLED 16	// If image should be drawn (not reset across
 				// redraws).
 
 /*
  * Represents an image placement, which is a visible view of an image.
  */
-typedef struct image_placement_S image_placement_T;
-struct image_placement_S
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ image_placement_S image_placement_T;
+ರಚನೆ image_placement_S
 {
     int_u   id;
     int_u   gen;    // See image_placement_new(), note that "use" is prioritized
@@ -103,12 +103,12 @@ struct image_placement_S
 		    // (and the position + zindex).
 
     image_backend_T backend;
-    void	    *backend_data;
+    ಶೂನ್ಯ	    *backend_ದತ್ತಾಂಶ;
 
     // Note that positioning uses the top left of the final cropped image
-    linenr_T	row;
-    colnr_T	col;
-    int		zindex;
+    linenr_T	ಅಡ್ಡಸಾಲು;
+    colnr_T	ಲಂಬಸಾಲು;
+    ಪೂರ್ಣಾಂಕ		zindex;
 
     int_u flags;
 
@@ -130,28 +130,28 @@ struct image_placement_S
     int_u img_ver; // Current image version, if it is different from the image,
 		   // then must redraw the image.
 
-    int cell_width; // Cell dimensions used to draw this placement
-    int cell_height;
+    ಪೂರ್ಣಾಂಕ cell_ಅಗಲ; // Cell dimensions used to draw this placement
+    ಪೂರ್ಣಾಂಕ cell_ಎತ್ತರ;
 
-    int row_off;
+    ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು_off;
 
     image_placement_use_T use;
 
-    image_placement_T *next;
+    image_placement_T *ಮುಂದಿನ;
     image_placement_T *prev;
 };
 
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 
 // Dummy structs for .pro files when GUI Vim is compiled without image support
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    int dummy;
+    ಪೂರ್ಣಾಂಕ dummy;
 } image_T;
 
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    int dummy;
+    ಪೂರ್ಣಾಂಕ dummy;
 } image_placement_T;
 
-#endif // FEAT_IMAGE
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_IMAGE

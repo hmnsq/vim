@@ -13,53 +13,53 @@
  * Common code for if_python.c and if_python3.c.
  */
 
-#if PY_VERSION_HEX < 0x02050000
-typedef int Py_ssize_t;  // Python 2.4 and earlier don't have this type.
-#endif
+#ಆದರೆ PY_ಆವೃತ್ತಿ_HEX < 0x02050000
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಪೂರ್ಣಾಂಕ Py_ssize_t;  // Python 2.4 and earlier don't have this type.
+#ಆದರೆ_ಅಂತ್ಯ
 
 // Use values that are known to work, others may make Vim crash.
-#define ENC_OPT (enc_utf8 ? "utf-8" : enc_dbcs ? "euc-jp" : (char *)p_enc)
-#define DOPY_FUNC "_vim_pydo"
+#ವ್ಯಾಖ್ಯಾನಿಸು ENC_OPT (enc_utf8 ? "utf-8" : enc_dbcs ? "euc-jp" : (ಅಕ್ಷರ *)p_enc)
+#ವ್ಯಾಖ್ಯಾನಿಸು DOPY_FUNC "_vim_pydo"
 
-static const char *vim_special_path = "_vim_path_";
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *vim_special_ಮಾರ್ಗ = "_vim_path_";
 
-#define PyErr_SET_STRING(exc, str) PyErr_SetString(exc, _(str))
-#define PyErr_SetVim(str) PyErr_SetString(VimError, str)
-#define PyErr_SET_VIM(str) PyErr_SET_STRING(VimError, str)
-#define PyErr_FORMAT(exc, str, arg) PyErr_Format(exc, _(str), arg)
-#define PyErr_FORMAT2(exc, str, arg1, arg2) PyErr_Format(exc, _(str), arg1,arg2)
-#define PyErr_VIM_FORMAT(str, arg) PyErr_FORMAT(VimError, str, arg)
+#ವ್ಯಾಖ್ಯಾನಿಸು Py_Err_ಗಣ_STRING(exc, str) Py_Err_ಗಣ_String(exc, _(str))
+#ವ್ಯಾಖ್ಯಾನಿಸು Py_Err_ಗಣ_Vim(str) Py_Err_ಗಣ_String(VimError, str)
+#ವ್ಯಾಖ್ಯಾನಿಸು Py_Err_ಗಣ_VIM(str) Py_Err_ಗಣ_STRING(VimError, str)
+#ವ್ಯಾಖ್ಯಾನಿಸು PyErr_FORMAT(exc, str, arg) PyErr_Format(exc, _(str), arg)
+#ವ್ಯಾಖ್ಯಾನಿಸು PyErr_FORMAT2(exc, str, arg1, arg2) PyErr_Format(exc, _(str), arg1,arg2)
+#ವ್ಯಾಖ್ಯಾನಿಸು PyErr_VIM_FORMAT(str, arg) PyErr_FORMAT(VimError, str, arg)
 
-#ifdef USE_LIMITED_API
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_LIMITED_API
 // Limited Python API. Need to call only exposed functions and remap macros.
 // PyTypeObject is an opaque struct.
 
-typedef struct {
-    lenfunc sq_length;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+    lenfunc sq_ಉದ್ದಳತೆ;
     binaryfunc sq_concat;
     ssizeargfunc sq_repeat;
-    ssizeargfunc sq_item;
-    void *was_sq_slice;
-    ssizeobjargproc sq_ass_item;
-    void *was_sq_ass_slice;
-    objobjproc sq_contains;
+    ssizeargfunc sq_ಅಂಶ;
+    ಶೂನ್ಯ *was_sq_ತುಂಡು;
+    ssizeobjargproc sq_ass_ಅಂಶ;
+    ಶೂನ್ಯ *was_sq_ass_ತುಂಡು;
+    objobjproc sq_ಒಳಗೊಂಡಿದೆ;
 
     binaryfunc sq_inplace_concat;
     ssizeargfunc sq_inplace_repeat;
 } PySequenceMethods;
 
-typedef struct {
-    lenfunc mp_length;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+    lenfunc mp_ಉದ್ದಳತೆ;
     binaryfunc mp_subscript;
     objobjargproc mp_ass_subscript;
 } PyMappingMethods;
 
 // This struct emulates the concrete _typeobject struct to allow the code to
 // work the same way in both limited and full Python APIs.
-struct typeobject_wrapper {
-    const char *tp_name;
+ರಚನೆ typeobject_wrapper {
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *tp_name;
     Py_ssize_t tp_basicsize;
-    unsigned long tp_flags;
+    ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ tp_flags;
 
     // When adding new slots below, also need to make sure we add ADD_TP_SLOT
     // call in AddHeapType for it.
@@ -74,7 +74,7 @@ struct typeobject_wrapper {
     getattrofunc tp_getattro;
     setattrofunc tp_setattro;
 
-    const char *tp_doc;
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *tp_doc;
 
     traverseproc tp_traverse;
 
@@ -83,37 +83,37 @@ struct typeobject_wrapper {
     getiterfunc tp_iter;
     iternextfunc tp_iternext;
 
-    struct PyMethodDef *tp_methods;
-    struct _typeobject *tp_base;
+    ರಚನೆ Py_ವಿಧಾನ_Def *tp_methods;
+    ರಚನೆ _typeobject *tp_ತಳ;
     allocfunc tp_alloc;
     newfunc tp_new;
     freefunc tp_free;
 };
 
 # define DEFINE_PY_TYPE_OBJECT(type) \
-    static struct typeobject_wrapper type; \
-    static PyTypeObject* type##Ptr = NULL
+    ಸ್ಥಿರ ರಚನೆ typeobject_wrapper type; \
+    ಸ್ಥಿರ PyTypeObject* type##Ptr = ಖಾಲಿ
 
 // PyObject_HEAD_INIT_TYPE and PyObject_FINISH_INIT_TYPE need to come in pairs
 // We first initialize with NULL because the type is not allocated until
 // init_types() is called later. It's in FINISH_INIT_TYPE where we fill the
 // type in with the newly allocated type.
-# define PyObject_HEAD_INIT_TYPE(type) PyObject_HEAD_INIT(NULL)
-# define PyObject_FINISH_INIT_TYPE(obj, type) obj.ob_base.ob_type = type##Ptr
+# define Py_Object_ತಲೆ_INIT_TYPE(type) Py_Object_ತಲೆ_INIT(ಖಾಲಿ)
+# define Py_Object_ಮುಕ್ತಾಯ_INIT_TYPE(obj, type) obj.ob_ತಳ.ob_type = type##Ptr
 
-# define Py_TYPE_GET_TP_ALLOC(type) ((allocfunc)PyType_GetSlot(type, Py_tp_alloc))
-# define Py_TYPE_GET_TP_METHODS(type) ((PyMethodDef *)PyType_GetSlot(type, Py_tp_methods))
+# define Py_TYPE_GET_TP_ALLOC(type) ((allocfunc)Py_Type_Get_ಸ್ಥಾನ(type, Py_tp_alloc))
+# define Py_TYPE_GET_TP_METHODS(type) ((Py_ವಿಧಾನ_Def *)Py_Type_Get_ಸ್ಥಾನ(type, Py_tp_methods))
 
 // PyObject_NEW is not part of stable ABI, but PyObject_Malloc/Init are.
-static PyObject* Vim_PyObject_New(PyTypeObject *type, size_t objsize)
+ಸ್ಥಿರ PyObject* Vim_PyObject_New(PyTypeObject *type, size_t objsize)
 {
     PyObject *obj = (PyObject *)PyObject_Malloc(objsize);
-    if (obj == NULL)
-	return PyErr_NoMemory();
-    return PyObject_Init(obj, type);
+    ಆದರೆ (obj == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ Py_Err_No_ಸ್ಮರಣೆ();
+    ಹಿಂತಿರುಗಿ PyObject_Init(obj, type);
 }
 # undef PyObject_NEW
-# define PyObject_NEW(type, typeobj) ((type *)Vim_PyObject_New(typeobj, sizeof(type)))
+# define PyObject_NEW(type, typeobj) ((type *)Vim_PyObject_New(typeobj, ಗಾತ್ರ(type)))
 
 // This is a somewhat convoluted because limited API doesn't expose an easy way
 // to get the tp_name field, and so we have to manually reconstruct it as
@@ -122,46 +122,46 @@ static PyObject* Vim_PyObject_New(PyTypeObject *type, size_t objsize)
 // PyUnicode_AsUTF8AndSize and PyType_GetQualName() are not available until
 // late Python 3 versions, and won't be available if you set Py_LIMITED_API too
 // low.
-# define PyErr_FORMAT_TYPE(msg, obj) \
-    do { \
+# define PyErr_FORMAT_TYPE(ಸಂದೇಶ, obj) \
+    ಮಾಡು { \
 	PyObject* qualname = PyObject_GetAttrString((PyObject*)(obj)->ob_type, "__qualname__"); \
-	if (qualname == NULL) \
+	ಆದರೆ (qualname == ಖಾಲಿ) \
 	{ \
-	    PyErr_FORMAT(PyExc_TypeError, msg, "(NULL)"); \
-	    break; \
+	    PyErr_FORMAT(PyExc_TypeError, ಸಂದೇಶ, "(NULL)"); \
+	    ನಿಲ್ಲಿಸು; \
 	} \
 	PyObject* module = PyObject_GetAttrString((PyObject*)(obj)->ob_type, "__module__"); \
-	PyObject* full; \
-	if (module == NULL || PyUnicode_CompareWithASCIIString(module, "builtins") == 0 \
+	PyObject* ತುಂಬಿದ; \
+	ಆದರೆ (module == ಖಾಲಿ || PyUnicode_CompareWithASCIIString(module, "builtins") == 0 \
 		|| PyUnicode_CompareWithASCIIString(module, "__main__") == 0) \
 	{ \
-	    full = qualname; \
-	    Py_INCREF(full); \
+	    ತುಂಬಿದ = qualname; \
+	    Py_INCREF(ತುಂಬಿದ); \
 	} \
-	else \
-	    full = PyUnicode_FromFormat("%U.%U", module, qualname); \
-	PyObject* full_bytes = PyUnicode_AsUTF8String(full); \
-	const char* full_str = PyBytes_AsString(full_bytes); \
-	full_str = full_str == NULL ? "(NULL)" : full_str; \
-	PyErr_FORMAT(PyExc_TypeError, msg, full_str); \
+	ಇಲ್ಲದಿದ್ದರೆ \
+	    ತುಂಬಿದ = PyUnicode_FromFormat("%U.%U", module, qualname); \
+	PyObject* ತುಂಬಿದ_ಬೈಟುಗಳು = PyUnicode_AsUTF8String(ತುಂಬಿದ); \
+	ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* ತುಂಬಿದ_str = Py_ಬೈಟುಗಳು_As_String(ತುಂಬಿದ_ಬೈಟುಗಳು); \
+	ತುಂಬಿದ_str = ತುಂಬಿದ_str == ಖಾಲಿ ? "(NULL)" : ತುಂಬಿದ_str; \
+	PyErr_FORMAT(PyExc_TypeError, ಸಂದೇಶ, ತುಂಬಿದ_str); \
 	Py_DECREF(qualname); \
 	Py_XDECREF(module); \
-	Py_XDECREF(full); \
-	Py_XDECREF(full_bytes); \
-    } while (0)
+	Py_XDECREF(ತುಂಬಿದ); \
+	Py_XDECREF(ತುಂಬಿದ_ಬೈಟುಗಳು); \
+    } ಆಗ (0)
 
-# define PyList_GET_ITEM(list, i) PyList_GetItem(list, i)
-# define PyList_GET_SIZE(o) PyList_Size(o)
+# define Py_List_GET_ಅಂಶ(list, i) Py_List_Get_ಅಂಶ(list, i)
+# define Py_List_GET_ಗಾತ್ರ(o) Py_List_ಗಾತ್ರ(o)
 
 // PyList_SET_ITEM and PyList_SetItem have slightly different behaviors. The
 // former will leave the old item dangling, and the latter will decref on it.
 // Since we only use this on new lists, this difference doesn't matter.
-# define PyList_SET_ITEM(list, i, item) PyList_SetItem(list, i, item)
+# define Py_List_ಗಣ_ಅಂಶ(list, i, ಅಂಶ) Py_List_ಗಣ_ಅಂಶ_2(list, i, ಅಂಶ)
 
-# define PyTuple_GET_ITEM(o, pos) PyTuple_GetItem(o, pos)
-# define PyTuple_GET_SIZE(o) PyTuple_Size(o)
+# define Py_Tuple_GET_ಅಂಶ(o, pos) Py_Tuple_Get_ಅಂಶ(o, pos)
+# define Py_Tuple_GET_ಗಾತ್ರ(o) Py_Tuple_ಗಾತ್ರ(o)
 
-# if Py_LIMITED_API < 0x03080000
+# ಆದರೆ Py_LIMITED_API < 0x03080000
 // PyIter_check only became part of stable ABI in 3.8, and there is no easy way
 // to check for it in the API. We simply return false as a compromise. This
 // does mean we should avoid compiling with stable ABI < 3.8.
@@ -169,7 +169,7 @@ static PyObject* Vim_PyObject_New(PyTypeObject *type, size_t objsize)
 #  define PyIter_Check(obj) (FALSE)
 # endif
 
-static PyTypeObject* AddHeapType(struct typeobject_wrapper* type_object)
+ಸ್ಥಿರ PyTypeObject* ಕೂಡಿಸು_ರಾಶಿ_Type(ರಚನೆ typeobject_wrapper* type_object)
 {
     PyType_Spec type_spec;
     type_spec.name = type_object->tp_name;
@@ -179,61 +179,61 @@ static PyTypeObject* AddHeapType(struct typeobject_wrapper* type_object)
 
     // We just need to statically allocate a large enough buffer that can hold
     // all slots. We need to leave a null-terminated slot at the end.
-    PyType_Slot slots[40] = { {0, NULL} };
-    size_t slot_i = 0;
+    Py_Type_ಸ್ಥಾನ slots[40] = { {0, ಖಾಲಿ} };
+    size_t ಸ್ಥಾನ_i = 0;
 
-# define ADD_TP_SLOT(slot_name) \
-    if (slot_i >= 40) return NULL; /* this should never happen */ \
-    if (type_object->slot_name != NULL) \
+# define ಕೂಡಿಸು_TP_ಸ್ಥಾನ(ಸ್ಥಾನ_name) \
+    ಆದರೆ (ಸ್ಥಾನ_i >= 40) ಹಿಂತಿರುಗಿ ಖಾಲಿ; /* this should never happen */ \
+    ಆದರೆ (type_object->ಸ್ಥಾನ_name != ಖಾಲಿ) \
     { \
-	slots[slot_i].slot = Py_##slot_name; \
-	slots[slot_i].pfunc = (void*)type_object->slot_name; \
-	++slot_i; \
+	slots[ಸ್ಥಾನ_i].ಸ್ಥಾನ = Py_##slot_name; \
+	slots[ಸ್ಥಾನ_i].pfunc = (ಶೂನ್ಯ*)type_object->ಸ್ಥಾನ_name; \
+	++ಸ್ಥಾನ_i; \
     }
-# define ADD_TP_SUB_SLOT(sub_slot, slot_name) \
-    if (slot_i >= 40) return NULL; /* this should never happen */ \
-    if (type_object->sub_slot != NULL && type_object->sub_slot->slot_name != NULL) \
+# define ಕೂಡಿಸು_TP_SUB_ಸ್ಥಾನ(sub_ಸ್ಥಾನ, ಸ್ಥಾನ_name) \
+    ಆದರೆ (ಸ್ಥಾನ_i >= 40) ಹಿಂತಿರುಗಿ ಖಾಲಿ; /* this should never happen */ \
+    ಆದರೆ (type_object->sub_ಸ್ಥಾನ != ಖಾಲಿ && type_object->sub_ಸ್ಥಾನ->ಸ್ಥಾನ_name != ಖಾಲಿ) \
     { \
-	slots[slot_i].slot = Py_##slot_name; \
-	slots[slot_i].pfunc = (void*)type_object->sub_slot->slot_name; \
-	++slot_i; \
+	slots[ಸ್ಥಾನ_i].ಸ್ಥಾನ = Py_##slot_name; \
+	slots[ಸ್ಥಾನ_i].pfunc = (ಶೂನ್ಯ*)type_object->sub_ಸ್ಥಾನ->ಸ್ಥಾನ_name; \
+	++ಸ್ಥಾನ_i; \
     }
 
-    ADD_TP_SLOT(tp_dealloc)
-    ADD_TP_SLOT(tp_repr)
-    ADD_TP_SLOT(tp_call)
-    ADD_TP_SLOT(tp_getattro)
-    ADD_TP_SLOT(tp_setattro)
-    ADD_TP_SLOT(tp_doc)
-    ADD_TP_SLOT(tp_traverse)
-    ADD_TP_SLOT(tp_clear)
-    ADD_TP_SLOT(tp_iter)
-    ADD_TP_SLOT(tp_iternext)
-    ADD_TP_SLOT(tp_methods)
-    ADD_TP_SLOT(tp_base)
-    ADD_TP_SLOT(tp_alloc)
-    ADD_TP_SLOT(tp_new)
-    ADD_TP_SLOT(tp_free)
+    ಕೂಡಿಸು_TP_ಸ್ಥಾನ(tp_dealloc)
+    ಕೂಡಿಸು_TP_ಸ್ಥಾನ(tp_repr)
+    ಕೂಡಿಸು_TP_ಸ್ಥಾನ(tp_call)
+    ಕೂಡಿಸು_TP_ಸ್ಥಾನ(tp_getattro)
+    ಕೂಡಿಸು_TP_ಸ್ಥಾನ(tp_setattro)
+    ಕೂಡಿಸು_TP_ಸ್ಥಾನ(tp_doc)
+    ಕೂಡಿಸು_TP_ಸ್ಥಾನ(tp_traverse)
+    ಕೂಡಿಸು_TP_ಸ್ಥಾನ(tp_clear)
+    ಕೂಡಿಸು_TP_ಸ್ಥಾನ(tp_iter)
+    ಕೂಡಿಸು_TP_ಸ್ಥಾನ(tp_iternext)
+    ಕೂಡಿಸು_TP_ಸ್ಥಾನ(tp_methods)
+    ಕೂಡಿಸು_TP_ಸ್ಥಾನ(tp_ತಳ)
+    ಕೂಡಿಸು_TP_ಸ್ಥಾನ(tp_alloc)
+    ಕೂಡಿಸು_TP_ಸ್ಥಾನ(tp_new)
+    ಕೂಡಿಸು_TP_ಸ್ಥಾನ(tp_free)
 
-    ADD_TP_SUB_SLOT(tp_as_sequence, sq_length)
-    ADD_TP_SUB_SLOT(tp_as_sequence, sq_concat)
-    ADD_TP_SUB_SLOT(tp_as_sequence, sq_repeat)
-    ADD_TP_SUB_SLOT(tp_as_sequence, sq_item)
-    ADD_TP_SUB_SLOT(tp_as_sequence, sq_ass_item)
-    ADD_TP_SUB_SLOT(tp_as_sequence, sq_contains)
-    ADD_TP_SUB_SLOT(tp_as_sequence, sq_inplace_concat)
-    ADD_TP_SUB_SLOT(tp_as_sequence, sq_inplace_repeat)
+    ಕೂಡಿಸು_TP_SUB_ಸ್ಥಾನ(tp_as_sequence, sq_ಉದ್ದಳತೆ)
+    ಕೂಡಿಸು_TP_SUB_ಸ್ಥಾನ(tp_as_sequence, sq_concat)
+    ಕೂಡಿಸು_TP_SUB_ಸ್ಥಾನ(tp_as_sequence, sq_repeat)
+    ಕೂಡಿಸು_TP_SUB_ಸ್ಥಾನ(tp_as_sequence, sq_ಅಂಶ)
+    ಕೂಡಿಸು_TP_SUB_ಸ್ಥಾನ(tp_as_sequence, sq_ass_ಅಂಶ)
+    ಕೂಡಿಸು_TP_SUB_ಸ್ಥಾನ(tp_as_sequence, sq_ಒಳಗೊಂಡಿದೆ)
+    ಕೂಡಿಸು_TP_SUB_ಸ್ಥಾನ(tp_as_sequence, sq_inplace_concat)
+    ಕೂಡಿಸು_TP_SUB_ಸ್ಥಾನ(tp_as_sequence, sq_inplace_repeat)
 
-    ADD_TP_SUB_SLOT(tp_as_mapping, mp_length)
-    ADD_TP_SUB_SLOT(tp_as_mapping, mp_subscript)
-    ADD_TP_SUB_SLOT(tp_as_mapping, mp_ass_subscript)
-# undef ADD_TP_SLOT
-# undef ADD_TP_SUB_SLOT
+    ಕೂಡಿಸು_TP_SUB_ಸ್ಥಾನ(tp_as_mapping, mp_ಉದ್ದಳತೆ)
+    ಕೂಡಿಸು_TP_SUB_ಸ್ಥಾನ(tp_as_mapping, mp_subscript)
+    ಕೂಡಿಸು_TP_SUB_ಸ್ಥಾನ(tp_as_mapping, mp_ass_subscript)
+# undef ಕೂಡಿಸು_TP_ಸ್ಥಾನ
+# undef ಕೂಡಿಸು_TP_SUB_ಸ್ಥಾನ
 
     type_spec.slots = slots;
 
     PyObject* newtype = PyType_FromSpec(&type_spec);
-    return (PyTypeObject*)newtype;
+    ಹಿಂತಿರುಗಿ (PyTypeObject*)newtype;
 }
 
 // Add a heap type, since static types do not work in limited API
@@ -247,137 +247,137 @@ static PyTypeObject* AddHeapType(struct typeobject_wrapper* type_object)
 // version-specific handling. Vim does not re-start the Python runtime so there
 // will be no long-term leak.
 # define PYTYPE_READY(type) \
-    type##Ptr = AddHeapType(&(type)); \
-    if (type##Ptr == NULL) \
-	return -1;
+    type##Ptr = ಕೂಡಿಸು_ರಾಶಿ_Type(&(type)); \
+    ಆದರೆ (type##Ptr == ಖಾಲಿ) \
+	ಹಿಂತಿರುಗಿ -1;
 # define PYTYPE_CLEANUP(type) \
-    type##Ptr = NULL;
+    type##Ptr = ಖಾಲಿ;
 
 // Limited API does not provide PyRun_* functions. Need to implement manually
 // using PyCompile and PyEval.
-static PyObject* Vim_PyRun_String(const char *str, int start, PyObject *globals, PyObject *locals)
+ಸ್ಥಿರ PyObject* Vim_Py_ಸತತ_String(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *str, ಪೂರ್ಣಾಂಕ ಆರಂಭ, PyObject *globals, PyObject *locals)
 {
     // Just pass "" for filename for now.
-    PyObject* compiled = Py_CompileString(str, "", start);
-    if (compiled == NULL)
-	return NULL;
+    PyObject* compiled = Py_CompileString(str, "", ಆರಂಭ);
+    ಆದರೆ (compiled == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    PyObject* eval_result = PyEval_EvalCode(compiled, globals, locals);
+    PyObject* eval_ಫಲಿತಾಂಶ = Py_Eval_Eval_ಸಂಕೇತ(compiled, globals, locals);
     Py_DECREF(compiled);
-    return eval_result;
+    ಹಿಂತಿರುಗಿ eval_ಫಲಿತಾಂಶ;
 }
-static int Vim_PyRun_SimpleString(const char *str)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ Vim_Py_ಸತತ_Simple_String(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *str)
 {
     // This function emulates CPython's implementation.
-    PyObject* m = PyImport_AddModule("__main__");
-    if (m == NULL)
-	return -1;
+    PyObject* m = Py_Import_ಕೂಡಿಸು_Module("__main__");
+    ಆದರೆ (m == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ -1;
     PyObject* d = PyModule_GetDict(m);
-    PyObject* output = Vim_PyRun_String(str, Py_file_input, d, d);
-    if (output == NULL)
+    PyObject* output = Vim_Py_ಸತತ_String(str, Py_file_ಒಳಹರಿವು, d, d);
+    ಆದರೆ (output == ಖಾಲಿ)
     {
 	PyErr_PrintEx(TRUE);
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
     Py_DECREF(output);
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
-# define PyRun_String Vim_PyRun_String
-# define PyRun_SimpleString Vim_PyRun_SimpleString
+# define Py_ಸತತ_String Vim_Py_ಸತತ_String
+# define Py_ಸತತ_Simple_String Vim_Py_ಸತತ_Simple_String
 
-#else // !defined(USE_LIMITED_API)
+#ಇಲ್ಲದಿದ್ದರೆ // !defined(USE_LIMITED_API)
 
 // Full Python API. Can make use of structs and macros directly.
 # define DEFINE_PY_TYPE_OBJECT(type) \
-    static PyTypeObject type; \
-    static PyTypeObject* type##Ptr = &type
-# define PyObject_HEAD_INIT_TYPE(type) PyObject_HEAD_INIT(&type)
+    ಸ್ಥಿರ PyTypeObject type; \
+    ಸ್ಥಿರ PyTypeObject* type##Ptr = &type
+# define Py_Object_ತಲೆ_INIT_TYPE(type) Py_Object_ತಲೆ_INIT(&type)
 
 # define Py_TYPE_GET_TP_ALLOC(type) type->tp_alloc
 # define Py_TYPE_GET_TP_METHODS(type) type->tp_methods
 
-# define Py_TYPE_NAME(obj) ((obj)->ob_type->tp_name == NULL \
+# define Py_TYPE_NAME(obj) ((obj)->ob_type->tp_name == ಖಾಲಿ \
 	? "(NULL)" \
 	: (obj)->ob_type->tp_name)
-# define PyErr_FORMAT_TYPE(msg, obj) \
-    PyErr_FORMAT(PyExc_TypeError, msg, \
+# define PyErr_FORMAT_TYPE(ಸಂದೇಶ, obj) \
+    PyErr_FORMAT(PyExc_TypeError, ಸಂದೇಶ, \
 	    Py_TYPE_NAME(obj))
 
 // Add a static type
 # define PYTYPE_READY(type) \
-    if (PyType_Ready(type##Ptr)) \
-	return -1;
+    ಆದರೆ (PyType_Ready(type##Ptr)) \
+	ಹಿಂತಿರುಗಿ -1;
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 
-#define RAISE_NO_EMPTY_KEYS PyErr_SET_STRING(PyExc_ValueError, \
+#ವ್ಯಾಖ್ಯಾನಿಸು RAISE_NO_ಖಾಲಿಗಳು_ಕೀಲಿಗಳು Py_Err_ಗಣ_STRING(Py_Exc_ಮೌಲ್ಯ_Error, \
 					    N_("empty keys are not allowed"))
-#define RAISE_LOCKED_DICTIONARY PyErr_SET_VIM(N_("dictionary is locked"))
-#define RAISE_LOCKED_LIST PyErr_SET_VIM(N_("list is locked"))
-#define RAISE_UNDO_FAIL PyErr_SET_VIM(N_("cannot save undo information"))
-#define RAISE_DELETE_LINE_FAIL PyErr_SET_VIM(N_("cannot delete line"))
-#define RAISE_INSERT_LINE_FAIL PyErr_SET_VIM(N_("cannot insert line"))
-#define RAISE_REPLACE_LINE_FAIL PyErr_SET_VIM(N_("cannot replace line"))
-#define RAISE_KEY_ADD_FAIL(key) \
-    PyErr_VIM_FORMAT(N_("failed to add key '%s' to dictionary"), key)
-#define RAISE_INVALID_INDEX_TYPE(idx) \
+#ವ್ಯಾಖ್ಯಾನಿಸು RAISE_LOCKED_DICTIONARY Py_Err_ಗಣ_VIM(N_("dictionary is locked"))
+#ವ್ಯಾಖ್ಯಾನಿಸು RAISE_LOCKED_LIST Py_Err_ಗಣ_VIM(N_("list is locked"))
+#ವ್ಯಾಖ್ಯಾನಿಸು RAISE_UNDO_FAIL Py_Err_ಗಣ_VIM(N_("cannot save undo information"))
+#ವ್ಯಾಖ್ಯಾನಿಸು RAISE_DELETE_ಸಾಲು_FAIL Py_Err_ಗಣ_VIM(N_("cannot delete line"))
+#ವ್ಯಾಖ್ಯಾನಿಸು RAISE_ಸೇರಿಸು_ಸಾಲು_FAIL Py_Err_ಗಣ_VIM(N_("cannot insert line"))
+#ವ್ಯಾಖ್ಯಾನಿಸು RAISE_REPLACE_ಸಾಲು_FAIL Py_Err_ಗಣ_VIM(N_("cannot replace line"))
+#ವ್ಯಾಖ್ಯಾನಿಸು RAISE_ಕೀಲಿ_ಕೂಡಿಸು_FAIL(ಕೀಲಿ) \
+    PyErr_VIM_FORMAT(N_("failed to add key '%s' to dictionary"), ಕೀಲಿ)
+#ವ್ಯಾಖ್ಯಾನಿಸು RAISE_INVALID_ಸೂಚ್ಯಂಕ_TYPE(idx) \
     PyErr_FORMAT_TYPE(N_("index must be int or slice, not %s"), idx);
 
-#define INVALID_BUFFER_VALUE ((buf_T *)(-1))
-#define INVALID_WINDOW_VALUE ((win_T *)(-1))
-#define INVALID_TABPAGE_VALUE ((tabpage_T *)(-1))
+#ವ್ಯಾಖ್ಯಾನಿಸು INVALID_ಬಫರ್_ಮೌಲ್ಯ ((buf_T *)(-1))
+#ವ್ಯಾಖ್ಯಾನಿಸು INVALID_ಕಿಟಕಿ_ಮೌಲ್ಯ ((win_T *)(-1))
+#ವ್ಯಾಖ್ಯಾನಿಸು INVALID_TABPAGE_ಮೌಲ್ಯ ((tabpage_T *)(-1))
 
-typedef void (*rangeinitializer)(void *);
-typedef void (*runner)(const char *, dict_T *, void *
-#ifdef PY_CAN_RECURSE
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಶೂನ್ಯ (*rangeinitializer)(ಶೂನ್ಯ *);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಶೂನ್ಯ (*runner)(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *, dict_T *, ಶೂನ್ಯ *
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ PY_CAN_RECURSE
 	, PyGILState_STATE *
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	);
 
-static int ConvertFromPyObject(PyObject *, typval_T *);
-static int _ConvertFromPyObject(PyObject *, typval_T *, PyObject *);
-static int ConvertFromPyMapping(PyObject *, typval_T *);
-static int ConvertFromPySequence(PyObject *, typval_T *);
-static PyObject *WindowNew(win_T *, tabpage_T *);
-static PyObject *BufferNew (buf_T *);
-static PyObject *LineToString(const char *);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ConvertFromPyObject(PyObject *, typval_T *);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ _ConvertFromPyObject(PyObject *, typval_T *, PyObject *);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ConvertFromPyMapping(PyObject *, typval_T *);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ConvertFromPySequence(PyObject *, typval_T *);
+ಸ್ಥಿರ PyObject *ಕಿಟಕಿ_New(win_T *, tabpage_T *);
+ಸ್ಥಿರ PyObject *ಬಫರ್_New (buf_T *);
+ಸ್ಥಿರ PyObject *ಸಾಲು_ಗಮ್ಯ_String(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *);
 
-static PyInt RangeStart;
-static PyInt RangeEnd;
+ಸ್ಥಿರ PyInt Range_ಆರಂಭ;
+ಸ್ಥಿರ PyInt Range_ಕೊನೆ;
 
-static PyObject *globals;
+ಸ್ಥಿರ PyObject *globals;
 
-static PyObject *py_chdir;
-static PyObject *py_fchdir;
-static PyObject *py_getcwd;
-static PyObject *vim_module;
-static PyObject *vim_special_path_object;
+ಸ್ಥಿರ PyObject *py_chdir;
+ಸ್ಥಿರ PyObject *py_fchdir;
+ಸ್ಥಿರ PyObject *py_getcwd;
+ಸ್ಥಿರ PyObject *vim_module;
+ಸ್ಥಿರ PyObject *vim_special_ಮಾರ್ಗ_object;
 
-#if PY_VERSION_HEX >= 0x030700f0
-static PyObject *py_find_spec;
-#else
-static PyObject *py_load_module;
-#endif
-#if PY_VERSION_HEX < 0x30c00a7
-static PyObject *py_find_module;
-#endif
+#ಆದರೆ PY_ಆವೃತ್ತಿ_HEX >= 0x030700f0
+ಸ್ಥಿರ PyObject *py_ಕಂಡುಹಿಡಿ_spec;
+#ಇಲ್ಲದಿದ್ದರೆ
+ಸ್ಥಿರ PyObject *py_ತುಂಬು_module;
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ PY_ಆವೃತ್ತಿ_HEX < 0x30c00a7
+ಸ್ಥಿರ PyObject *py_ಕಂಡುಹಿಡಿ_module;
+#ಆದರೆ_ಅಂತ್ಯ
 
-static PyObject *VimError;
+ಸ್ಥಿರ PyObject *VimError;
 
 /*
  * obtain a lock on the Vim data structures
  */
-    static void
-Python_Lock_Vim(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+Python_ಬೀಗ_Vim(ಶೂನ್ಯ)
 {
 }
 
 /*
  * release a lock on the Vim data structures
  */
-    static void
-Python_Release_Vim(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+Python_Release_Vim(ಶೂನ್ಯ)
 {
 }
 
@@ -388,267 +388,267 @@ Python_Release_Vim(void)
  *
  * Use Py_XDECREF to decrement reference count.
  */
-    static char_u *
-StringToChars(PyObject *obj, PyObject **todecref)
+    ಸ್ಥಿರ char_u *
+String_ಗಮ್ಯ_Chars(PyObject *obj, PyObject **todecref)
 {
     char_u	*str;
 
-    if (PyBytes_Check(obj))
+    ಆದರೆ (Py_ಬೈಟುಗಳು_Check(obj))
     {
 
-	if (PyBytes_AsStringAndSize(obj, (char **) &str, NULL) == -1
-		|| str == NULL)
-	    return NULL;
+	ಆದರೆ (Py_ಬೈಟುಗಳು_As_String_And_ಗಾತ್ರ(obj, (ಅಕ್ಷರ **) &str, ಖಾಲಿ) == -1
+		|| str == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-	*todecref = NULL;
+	*todecref = ಖಾಲಿ;
     }
-    else if (PyUnicode_Check(obj))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (PyUnicode_Check(obj))
     {
-	PyObject	*bytes;
+	PyObject	*ಬೈಟುಗಳು;
 
-	if (!(bytes = PyUnicode_AsEncodedString(obj, ENC_OPT,
+	ಆದರೆ (!(ಬೈಟುಗಳು = PyUnicode_AsEncodedString(obj, ENC_OPT,
 							   ERRORS_ENCODE_ARG)))
-	    return NULL;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-	if (PyBytes_AsStringAndSize(bytes, (char **) &str, NULL) == -1
-		|| str == NULL)
+	ಆದರೆ (Py_ಬೈಟುಗಳು_As_String_And_ಗಾತ್ರ(ಬೈಟುಗಳು, (ಅಕ್ಷರ **) &str, ಖಾಲಿ) == -1
+		|| str == ಖಾಲಿ)
 	{
-	    Py_DECREF(bytes);
-	    return NULL;
+	    Py_DECREF(ಬೈಟುಗಳು);
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
 
-	*todecref = bytes;
+	*todecref = ಬೈಟುಗಳು;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-#if PY_MAJOR_VERSION < 3
+#ಆದರೆ PY_MAJOR_ಆವೃತ್ತಿ < 3
 	PyErr_FORMAT_TYPE(N_("expected str() or unicode() instance, but got %s"),
 		obj);
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 	PyErr_FORMAT_TYPE(N_("expected bytes() or str() instance, but got %s"),
 		obj);
-#endif
-	return NULL;
+#ಆದರೆ_ಅಂತ್ಯ
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    return (char_u *) str;
+    ಹಿಂತಿರುಗಿ (char_u *) str;
 }
 
-#define NUMBER_LONG     1
-#define NUMBER_INT      2
-#define NUMBER_NATURAL  4
-#define NUMBER_UNSIGNED 8
+#ವ್ಯಾಖ್ಯಾನಿಸು ಸಂಖ್ಯೆ_LONG     1
+#ವ್ಯಾಖ್ಯಾನಿಸು ಸಂಖ್ಯೆ_INT      2
+#ವ್ಯಾಖ್ಯಾನಿಸು ಸಂಖ್ಯೆ_NATURAL  4
+#ವ್ಯಾಖ್ಯಾನಿಸು ಸಂಖ್ಯೆ_UNSIGNED 8
 
-    static int
-NumberToLong(PyObject *obj, long *result, int flags)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಸಂಖ್ಯೆ_ಗಮ್ಯ_Long(PyObject *obj, ದೀರ್ಘ *ಫಲಿತಾಂಶ, ಪೂರ್ಣಾಂಕ flags)
 {
-#if PY_MAJOR_VERSION < 3
-    if (PyInt_Check(obj))
+#ಆದರೆ PY_MAJOR_ಆವೃತ್ತಿ < 3
+    ಆದರೆ (PyInt_Check(obj))
     {
-	*result = PyInt_AsLong(obj);
-	if (PyErr_Occurred())
-	    return -1;
+	*ಫಲಿತಾಂಶ = PyInt_AsLong(obj);
+	ಆದರೆ (PyErr_Occurred())
+	    ಹಿಂತಿರುಗಿ -1;
     }
-    else
-#endif
-    if (PyLong_Check(obj))
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (PyLong_Check(obj))
     {
-	*result = PyLong_AsLong(obj);
-	if (PyErr_Occurred())
-	    return -1;
+	*ಫಲಿತಾಂಶ = PyLong_AsLong(obj);
+	ಆದರೆ (PyErr_Occurred())
+	    ಹಿಂತಿರುಗಿ -1;
     }
-    else if (PyNumber_Check(obj))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (Py_ಸಂಖ್ಯೆ_Check(obj))
     {
-	PyObject	*num;
+	PyObject	*ಅಂಕೆ;
 
-	if (!(num = PyNumber_Long(obj)))
-	    return -1;
+	ಆದರೆ (!(ಅಂಕೆ = Py_ಸಂಖ್ಯೆ_Long(obj)))
+	    ಹಿಂತಿರುಗಿ -1;
 
-	*result = PyLong_AsLong(num);
+	*ಫಲಿತಾಂಶ = PyLong_AsLong(ಅಂಕೆ);
 
-	Py_DECREF(num);
+	Py_DECREF(ಅಂಕೆ);
 
-	if (PyErr_Occurred())
-	    return -1;
+	ಆದರೆ (PyErr_Occurred())
+	    ಹಿಂತಿರುಗಿ -1;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-#if PY_MAJOR_VERSION < 3
+#ಆದರೆ PY_MAJOR_ಆವೃತ್ತಿ < 3
 	PyErr_FORMAT_TYPE(
 		N_("expected int(), long() or something supporting "
 		   "coercing to long(), but got %s"),
 		obj);
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 	PyErr_FORMAT_TYPE(
 		N_("expected int() or something supporting coercing to int(), "
 		   "but got %s"),
 		obj);
-#endif
-	return -1;
+#ಆದರೆ_ಅಂತ್ಯ
+	ಹಿಂತಿರುಗಿ -1;
     }
 
-    if (flags & NUMBER_INT)
+    ಆದರೆ (flags & ಸಂಖ್ಯೆ_INT)
     {
-	if (*result > INT_MAX)
+	ಆದರೆ (*ಫಲಿತಾಂಶ > ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ)
 	{
-	    PyErr_SET_STRING(PyExc_OverflowError,
+	    Py_Err_ಗಣ_STRING(Py_Exc_ಅತಿಪ್ರವಾಹ_Error,
 		    N_("value is too large to fit into C int type"));
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
-	else if (*result < INT_MIN)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*ಫಲಿತಾಂಶ < INT_MIN)
 	{
-	    PyErr_SET_STRING(PyExc_OverflowError,
+	    Py_Err_ಗಣ_STRING(Py_Exc_ಅತಿಪ್ರವಾಹ_Error,
 		    N_("value is too small to fit into C int type"));
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
     }
 
-    if (flags & NUMBER_NATURAL)
+    ಆದರೆ (flags & ಸಂಖ್ಯೆ_NATURAL)
     {
-	if (*result <= 0)
+	ಆದರೆ (*ಫಲಿತಾಂಶ <= 0)
 	{
-	    PyErr_SET_STRING(PyExc_ValueError,
+	    Py_Err_ಗಣ_STRING(Py_Exc_ಮೌಲ್ಯ_Error,
 		    N_("number must be greater than zero"));
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
     }
-    else if (flags & NUMBER_UNSIGNED)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (flags & ಸಂಖ್ಯೆ_UNSIGNED)
     {
-	if (*result < 0)
+	ಆದರೆ (*ಫಲಿತಾಂಶ < 0)
 	{
-	    PyErr_SET_STRING(PyExc_ValueError,
+	    Py_Err_ಗಣ_STRING(Py_Exc_ಮೌಲ್ಯ_Error,
 		    N_("number must be greater or equal to zero"));
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
     }
 
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-    static int
-add_string(PyObject *list, char *s)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಕೂಡಿಸು_string(PyObject *list, ಅಕ್ಷರ *s)
 {
     PyObject	*string;
 
-    if (!(string = PyString_FromString(s)))
-	return -1;
+    ಆದರೆ (!(string = PyString_FromString(s)))
+	ಹಿಂತಿರುಗಿ -1;
 
-    if (PyList_Append(list, string))
+    ಆದರೆ (PyList_Append(list, string))
     {
 	Py_DECREF(string);
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 
     Py_DECREF(string);
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-    static PyObject *
-ObjectDir(PyObject *self, char **attributes)
+    ಸ್ಥಿರ PyObject *
+ObjectDir(PyObject *self, ಅಕ್ಷರ **ಗುಣಲಕ್ಷಣಗಳು)
 {
-    PyMethodDef	*method;
-    char	**attr;
+    Py_ವಿಧಾನ_Def	*ವಿಧಾನ;
+    ಅಕ್ಷರ	**attr;
     PyObject	*ret;
 
-    if (!(ret = PyList_New(0)))
-	return NULL;
+    ಆದರೆ (!(ret = PyList_New(0)))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (self)
-	for (method = Py_TYPE_GET_TP_METHODS(self->ob_type) ; method->ml_name != NULL ; ++method)
-	    if (add_string(ret, (char *)method->ml_name))
+    ಆದರೆ (self)
+	ಗಾಗಿ (ವಿಧಾನ = Py_TYPE_GET_TP_METHODS(self->ob_type) ; ವಿಧಾನ->ml_name != ಖಾಲಿ ; ++ವಿಧಾನ)
+	    ಆದರೆ (ಕೂಡಿಸು_string(ret, (ಅಕ್ಷರ *)ವಿಧಾನ->ml_name))
 	    {
 		Py_DECREF(ret);
-		return NULL;
+		ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	    }
 
-    for (attr = attributes ; *attr ; ++attr)
-	if (add_string(ret, *attr))
+    ಗಾಗಿ (attr = ಗುಣಲಕ್ಷಣಗಳು ; *attr ; ++attr)
+	ಆದರೆ (ಕೂಡಿಸು_string(ret, *attr))
 	{
 	    Py_DECREF(ret);
-	    return NULL;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
 
-#if PY_MAJOR_VERSION < 3
-    if (add_string(ret, "__members__"))
+#ಆದರೆ PY_MAJOR_ಆವೃತ್ತಿ < 3
+    ಆದರೆ (ಕೂಡಿಸು_string(ret, "__members__"))
     {
 	Py_DECREF(ret);
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
 // Output buffer management
 
 // Function to write a line, points to either msg() or emsg().
-typedef int (*writefn)(char *);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಪೂರ್ಣಾಂಕ (*writefn)(ಅಕ್ಷರ *);
 
 DEFINE_PY_TYPE_OBJECT(OutputType);
 
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    PyObject_HEAD
-    long softspace;
-    long error;
+    Py_Object_ತಲೆ
+    ದೀರ್ಘ softspace;
+    ದೀರ್ಘ error;
 } OutputObject;
 
-static char *OutputAttrs[] = {
+ಸ್ಥಿರ ಅಕ್ಷರ *OutputAttrs[] = {
     "softspace",
-    NULL
+    ಖಾಲಿ
 };
 
-    static PyObject *
-OutputDir(PyObject *self, PyObject *args UNUSED)
+    ಸ್ಥಿರ PyObject *
+OutputDir(PyObject *self, PyObject *ವಾದಗಳು ಬಳಸದ)
 {
-    return ObjectDir(self, OutputAttrs);
+    ಹಿಂತಿರುಗಿ ObjectDir(self, OutputAttrs);
 }
 
-    static int
-OutputSetattr(PyObject *self_obj, char *name, PyObject *valObject)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+OutputSetattr(PyObject *self_obj, ಅಕ್ಷರ *name, PyObject *valObject)
 {
     OutputObject *self = (OutputObject*)self_obj;
-    if (valObject == NULL)
+    ಆದರೆ (valObject == ಖಾಲಿ)
     {
-	PyErr_SET_STRING(PyExc_AttributeError,
+	Py_Err_ಗಣ_STRING(PyExc_AttributeError,
 		N_("can't delete OutputObject attributes"));
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 
-    if (strcmp(name, "softspace") == 0)
+    ಆದರೆ (strcmp(name, "softspace") == 0)
     {
-	if (NumberToLong(valObject, &(self->softspace), NUMBER_UNSIGNED))
-	    return -1;
-	return 0;
+	ಆದರೆ (ಸಂಖ್ಯೆ_ಗಮ್ಯ_Long(valObject, &(self->softspace), ಸಂಖ್ಯೆ_UNSIGNED))
+	    ಹಿಂತಿರುಗಿ -1;
+	ಹಿಂತಿರುಗಿ 0;
     }
 
     PyErr_FORMAT(PyExc_AttributeError, N_("invalid attribute: %s"), name);
-    return -1;
+    ಹಿಂತಿರುಗಿ -1;
 }
 
 // Buffer IO, we write one whole line at a time.
-static garray_T io_ga = {0, 0, 1, 80, NULL};
-static writefn old_fn = NULL;
+ಸ್ಥಿರ garray_T io_ga = {0, 0, 1, 80, ಖಾಲಿ};
+ಸ್ಥಿರ writefn old_fn = ಖಾಲಿ;
 
-    static void
-PythonIO_Flush(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+PythonIO_Flush(ಶೂನ್ಯ)
 {
-    if (old_fn != NULL && io_ga.ga_len > 0)
+    ಆದರೆ (old_fn != ಖಾಲಿ && io_ga.ga_len > 0)
     {
-	((char *)io_ga.ga_data)[io_ga.ga_len] = NUL;
+	((ಅಕ್ಷರ *)io_ga.ga_ದತ್ತಾಂಶ)[io_ga.ga_len] = NUL;
 	// We don't know what emsg_severe should be here, so ... hope?
-	old_fn((char *)io_ga.ga_data);
+	old_fn((ಅಕ್ಷರ *)io_ga.ga_ದತ್ತಾಂಶ);
     }
     io_ga.ga_len = 0;
 }
 
-    static void
-writer(writefn fn, char_u *str, PyInt n, int severe)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+writer(writefn fn, char_u *str, PyInt n, ಪೂರ್ಣಾಂಕ severe)
 {
     char_u *ptr;
 
     // Flush when switching output function.
-    if (fn != old_fn)
+    ಆದರೆ (fn != old_fn)
 	PythonIO_Flush();
     old_fn = fn;
 
@@ -657,124 +657,124 @@ writer(writefn fn, char_u *str, PyInt n, int severe)
     // For normal messages: Do not output when "got_int" was set.  This avoids
     // a loop gone crazy flooding the terminal with messages.  Also for when
     // "q" is pressed at the more-prompt.
-    while (n > 0 && (ptr = memchr(str, '\n', n)) != NULL
+    ಆಗ (n > 0 && (ptr = memchr(str, '\n', n)) != ಖಾಲಿ
 					  && (fn == (writefn)emsg || !got_int))
     {
 	PyInt len = ptr - str;
 
-	if (ga_grow(&io_ga, (int)(len + 1)) == FAIL)
-	    break;
+	ಆದರೆ (ga_grow(&io_ga, (ಪೂರ್ಣಾಂಕ)(len + 1)) == FAIL)
+	    ನಿಲ್ಲಿಸು;
 
-	mch_memmove(((char *)io_ga.ga_data) + io_ga.ga_len, str, (size_t)len);
-	((char *)io_ga.ga_data)[io_ga.ga_len + len] = NUL;
+	mch_memmove(((ಅಕ್ಷರ *)io_ga.ga_ದತ್ತಾಂಶ) + io_ga.ga_len, str, (size_t)len);
+	((ಅಕ್ಷರ *)io_ga.ga_ದತ್ತಾಂಶ)[io_ga.ga_len + len] = NUL;
 	emsg_severe = severe;
-	fn((char *)io_ga.ga_data);
+	fn((ಅಕ್ಷರ *)io_ga.ga_ದತ್ತಾಂಶ);
 	str = ptr + 1;
 	n -= len + 1;
 	io_ga.ga_len = 0;
     }
 
     // Put the remaining text into io_ga for later printing.
-    if (n > 0 && (fn == (writefn)emsg || !got_int)
-					&& ga_grow(&io_ga, (int)(n + 1)) == OK)
+    ಆದರೆ (n > 0 && (fn == (writefn)emsg || !got_int)
+					&& ga_grow(&io_ga, (ಪೂರ್ಣಾಂಕ)(n + 1)) == OK)
     {
-	mch_memmove(((char *)io_ga.ga_data) + io_ga.ga_len, str, (size_t)n);
-	io_ga.ga_len += (int)n;
+	mch_memmove(((ಅಕ್ಷರ *)io_ga.ga_ದತ್ತಾಂಶ) + io_ga.ga_len, str, (size_t)n);
+	io_ga.ga_len += (ಪೂರ್ಣಾಂಕ)n;
     }
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 write_output(OutputObject *self, PyObject *string)
 {
     Py_ssize_t	len = 0;
-    char	*str = NULL;
-    int		error = self->error;
+    ಅಕ್ಷರ	*str = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		error = self->error;
 
-    if (!PyArg_Parse(string, "et#", ENC_OPT, &str, &len))
-	return -1;
+    ಆದರೆ (!PyArg_Parse(string, "et#", ENC_OPT, &str, &len))
+	ಹಿಂತಿರುಗಿ -1;
 
-    Py_BEGIN_ALLOW_THREADS
-    Python_Lock_Vim();
-    writer((writefn)(error ? emsg : msg), (char_u *)str, len, error);
+    Py_BEGIN_ALLOW_ಎಳೆಗಳು
+    Python_ಬೀಗ_Vim();
+    writer((writefn)(error ? emsg : ಸಂದೇಶ), (char_u *)str, len, error);
     Python_Release_Vim();
-    Py_END_ALLOW_THREADS
+    Py_ಕೊನೆ_ALLOW_ಎಳೆಗಳು
     PyMem_Free(str);
 
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-    static PyObject *
+    ಸ್ಥಿರ PyObject *
 OutputWrite(OutputObject *self, PyObject *string)
 {
-    if (write_output(self, string))
-	return NULL;
+    ಆದರೆ (write_output(self, string))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     Py_INCREF(Py_None);
-    return Py_None;
+    ಹಿಂತಿರುಗಿ Py_None;
 }
 
-    static PyObject *
+    ಸ್ಥಿರ PyObject *
 OutputWritelines(OutputObject *self, PyObject *seq)
 {
     PyObject	*iterator;
-    PyObject	*item;
+    PyObject	*ಅಂಶ;
 
-    if (!(iterator = PyObject_GetIter(seq)))
-	return NULL;
+    ಆದರೆ (!(iterator = PyObject_GetIter(seq)))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    while ((item = PyIter_Next(iterator)))
+    ಆಗ ((ಅಂಶ = Py_Iter_ಮುಂದಿನ(iterator)))
     {
-	if (write_output(self, item))
+	ಆದರೆ (write_output(self, ಅಂಶ))
 	{
 	    Py_DECREF(iterator);
-	    Py_DECREF(item);
-	    return NULL;
+	    Py_DECREF(ಅಂಶ);
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
-	Py_DECREF(item);
+	Py_DECREF(ಅಂಶ);
     }
 
     Py_DECREF(iterator);
 
     // Iterator may have finished due to an exception
-    if (PyErr_Occurred())
-	return NULL;
+    ಆದರೆ (PyErr_Occurred())
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     Py_INCREF(Py_None);
-    return Py_None;
+    ಹಿಂತಿರುಗಿ Py_None;
 }
 
-    static PyObject *
-AlwaysNone(PyObject *self UNUSED, PyObject *args UNUSED)
+    ಸ್ಥಿರ PyObject *
+AlwaysNone(PyObject *self ಬಳಸದ, PyObject *ವಾದಗಳು ಬಳಸದ)
 {
     // do nothing
     Py_INCREF(Py_None);
-    return Py_None;
+    ಹಿಂತಿರುಗಿ Py_None;
 }
-#define ALWAYS_NONE AlwaysNone(NULL, NULL)
+#ವ್ಯಾಖ್ಯಾನಿಸು ALWAYS_NONE AlwaysNone(ಖಾಲಿ, ಖಾಲಿ)
 
-    static PyObject *
-AlwaysFalse(PyObject *self UNUSED, PyObject *args UNUSED)
+    ಸ್ಥಿರ PyObject *
+AlwaysFalse(PyObject *self ಬಳಸದ, PyObject *ವಾದಗಳು ಬಳಸದ)
 {
     // do nothing
     PyObject	*ret = Py_False;
     Py_INCREF(ret);
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
-#define ALWAYS_FALSE AlwaysFalse(NULL, NULL)
+#ವ್ಯಾಖ್ಯಾನಿಸು ALWAYS_FALSE AlwaysFalse(ಖಾಲಿ, ಖಾಲಿ)
 
-    static PyObject *
-AlwaysTrue(PyObject *self UNUSED, PyObject *args UNUSED)
+    ಸ್ಥಿರ PyObject *
+AlwaysTrue(PyObject *self ಬಳಸದ, PyObject *ವಾದಗಳು ಬಳಸದ)
 {
     // do nothing
     PyObject	*ret = Py_True;
     Py_INCREF(ret);
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
-#define ALWAYS_TRUE AlwaysTrue(NULL, NULL)
+#ವ್ಯಾಖ್ಯಾನಿಸು ALWAYS_TRUE AlwaysTrue(ಖಾಲಿ, ಖಾಲಿ)
 
 /***************/
 
-static struct PyMethodDef OutputMethods[] = {
+ಸ್ಥಿರ ರಚನೆ Py_ವಿಧಾನ_Def OutputMethods[] = {
     // name,	    function,				calling,	doc
     {"write",	    (PyCFunction)OutputWrite,		METH_O,		""},
     {"writelines",  (PyCFunction)OutputWritelines,	METH_O,		""},
@@ -786,208 +786,208 @@ static struct PyMethodDef OutputMethods[] = {
     {"writable",    (PyCFunction)AlwaysTrue,		METH_NOARGS,	""},
     {"closed",      (PyCFunction)AlwaysFalse,		METH_NOARGS,	""},
     {"__dir__",	    (PyCFunction)OutputDir,		METH_NOARGS,	""},
-    { NULL,	    NULL,				0,		NULL}
+    { ಖಾಲಿ,	    ಖಾಲಿ,				0,		ಖಾಲಿ}
 };
 
-static OutputObject Output =
+ಸ್ಥಿರ OutputObject Output =
 {
-    PyObject_HEAD_INIT_TYPE(OutputType)
+    Py_Object_ತಲೆ_INIT_TYPE(OutputType)
     0,
     0
 };
 
-static OutputObject Error =
+ಸ್ಥಿರ OutputObject Error =
 {
-    PyObject_HEAD_INIT_TYPE(OutputType)
+    Py_Object_ತಲೆ_INIT_TYPE(OutputType)
     0,
     1
 };
 
-    static int
-PythonIO_Init_io(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+PythonIO_Init_io(ಶೂನ್ಯ)
 {
-    if (PySys_SetObject("stdout", (PyObject *)(void *)&Output))
-	return -1;
-    if (PySys_SetObject("stderr", (PyObject *)(void *)&Error))
-	return -1;
+    ಆದರೆ (Py_Sys_ಗಣ_Object("stdout", (PyObject *)(ಶೂನ್ಯ *)&Output))
+	ಹಿಂತಿರುಗಿ -1;
+    ಆದರೆ (Py_Sys_ಗಣ_Object("stderr", (PyObject *)(ಶೂನ್ಯ *)&Error))
+	ಹಿಂತಿರುಗಿ -1;
 
-    if (PyErr_Occurred())
+    ಆದರೆ (PyErr_Occurred())
     {
 	emsg(_(e_python_error_initialising_io_object));
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-#if PY_VERSION_HEX < 0x030700f0
-static PyObject *call_load_module(char *name, int len, PyObject *find_module_result);
+#ಆದರೆ PY_ಆವೃತ್ತಿ_HEX < 0x030700f0
+ಸ್ಥಿರ PyObject *call_ತುಂಬು_module(ಅಕ್ಷರ *name, ಪೂರ್ಣಾಂಕ len, PyObject *ಕಂಡುಹಿಡಿ_module_ಫಲಿತಾಂಶ);
 
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    PyObject_HEAD
-    char	*fullname;
-    PyObject	*result;
+    Py_Object_ತಲೆ
+    ಅಕ್ಷರ	*fullname;
+    PyObject	*ಫಲಿತಾಂಶ;
 } LoaderObject;
 DEFINE_PY_TYPE_OBJECT(LoaderType);
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 LoaderDestructor(PyObject *self_obj)
 {
     LoaderObject *self = (LoaderObject*)self_obj;
     vim_free(self->fullname);
-    Py_XDECREF(self->result);
-    DESTRUCTOR_FINISH(self);
+    Py_XDECREF(self->ಫಲಿತಾಂಶ);
+    DESTRUCTOR_ಮುಕ್ತಾಯ(self);
 }
 
-    static PyObject *
-LoaderLoadModule(LoaderObject *self, PyObject *args UNUSED)
+    ಸ್ಥಿರ PyObject *
+Loader_ತುಂಬು_Module(LoaderObject *self, PyObject *ವಾದಗಳು ಬಳಸದ)
 {
-    char	*fullname = self->fullname;
-    PyObject	*result = self->result;
+    ಅಕ್ಷರ	*fullname = self->fullname;
+    PyObject	*ಫಲಿತಾಂಶ = self->ಫಲಿತಾಂಶ;
     PyObject	*module;
 
-    if (!fullname)
+    ಆದರೆ (!fullname)
     {
-	module = result ? result : Py_None;
+	module = ಫಲಿತಾಂಶ ? ಫಲಿತಾಂಶ : Py_None;
 	Py_INCREF(module);
-	return module;
+	ಹಿಂತಿರುಗಿ module;
     }
 
-    module = call_load_module(fullname, (int)STRLEN(fullname), result);
+    module = call_ತುಂಬು_module(fullname, (ಪೂರ್ಣಾಂಕ)STRLEN(fullname), ಫಲಿತಾಂಶ);
 
-    self->fullname = NULL;
-    self->result = module;
+    self->fullname = ಖಾಲಿ;
+    self->ಫಲಿತಾಂಶ = module;
 
     vim_free(fullname);
-    Py_DECREF(result);
+    Py_DECREF(ಫಲಿತಾಂಶ);
 
-    if (!module)
+    ಆದರೆ (!module)
     {
-	if (PyErr_Occurred())
-	    return NULL;
+	ಆದರೆ (PyErr_Occurred())
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
 	Py_INCREF(Py_None);
-	return Py_None;
+	ಹಿಂತಿರುಗಿ Py_None;
     }
 
     Py_INCREF(module);
-    return module;
+    ಹಿಂತಿರುಗಿ module;
 }
 
-static struct PyMethodDef LoaderMethods[] = {
+ಸ್ಥಿರ ರಚನೆ Py_ವಿಧಾನ_Def LoaderMethods[] = {
     // name,	    function,				calling,	doc
-    {"load_module", (PyCFunction)LoaderLoadModule,	METH_VARARGS,	""},
-    { NULL,	    NULL,				0,		NULL}
+    {"load_module", (PyCFunction)Loader_ತುಂಬು_Module,	METH_VARARGS,	""},
+    { ಖಾಲಿ,	    ಖಾಲಿ,				0,		ಖಾಲಿ}
 };
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Check to see whether a Vim error has been reported, or a keyboard
  * interrupt has been detected.
  */
-    static void
-VimTryStart(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+Vim_Try_ಆರಂಭ(ಶೂನ್ಯ)
 {
     ++trylevel;
 }
 
-    static int
-VimTryEnd(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+Vim_Try_ಕೊನೆ(ಶೂನ್ಯ)
 {
     --trylevel;
     // Without this it stops processing all subsequent Vim script commands and
     // generates strange error messages if I e.g. try calling Test() in a cycle
     did_emsg = FALSE;
     // Keyboard interrupt should be preferred over anything else
-    if (got_int)
+    ಆದರೆ (got_int)
     {
-	if (did_throw)
+	ಆದರೆ (did_throw)
 	    discard_current_exception();
 	got_int = FALSE;
-	PyErr_SetNone(PyExc_KeyboardInterrupt);
-	return -1;
+	Py_Err_ಗಣ_None(Py_Exc_Keyboard_ಅಡಚಣೆ);
+	ಹಿಂತಿರುಗಿ -1;
     }
-    else if (msg_list != NULL && *msg_list != NULL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಸಂದೇಶ_list != ಖಾಲಿ && *ಸಂದೇಶ_list != ಖಾಲಿ)
     {
-	int	should_free;
-	char	*msg;
+	ಪೂರ್ಣಾಂಕ	should_free;
+	ಅಕ್ಷರ	*ಸಂದೇಶ;
 
-	msg = get_exception_string(*msg_list, ET_ERROR, NULL, &should_free);
+	ಸಂದೇಶ = get_exception_string(*ಸಂದೇಶ_list, ET_ERROR, ಖಾಲಿ, &should_free);
 
-	if (msg == NULL)
+	ಆದರೆ (ಸಂದೇಶ == ಖಾಲಿ)
 	{
-	    PyErr_NoMemory();
-	    return -1;
+	    Py_Err_No_ಸ್ಮರಣೆ();
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 
-	PyErr_SetVim(msg);
+	Py_Err_ಗಣ_Vim(ಸಂದೇಶ);
 
 	free_global_msglist();
 
-	if (should_free)
-	    vim_free(msg);
+	ಆದರೆ (should_free)
+	    vim_free(ಸಂದೇಶ);
 
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
-    else if (!did_throw)
-	return (PyErr_Occurred() ? -1 : 0);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!did_throw)
+	ಹಿಂತಿರುಗಿ (PyErr_Occurred() ? -1 : 0);
     // Python exception is preferred over Vim one; unlikely to occur though
-    else if (PyErr_Occurred())
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (PyErr_Occurred())
     {
 	discard_current_exception();
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
     // Finally transform Vim script exception to python one
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	PyErr_SetVim((char *)current_exception->value);
+	Py_Err_ಗಣ_Vim((ಅಕ್ಷರ *)current_exception->ಮೌಲ್ಯ);
 	discard_current_exception();
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 }
 
-    static int
-VimCheckInterrupt(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+Vim_Check_ಅಡಚಣೆ(ಶೂನ್ಯ)
 {
-    if (got_int)
+    ಆದರೆ (got_int)
     {
-	PyErr_SetNone(PyExc_KeyboardInterrupt);
-	return 1;
+	Py_Err_ಗಣ_None(Py_Exc_Keyboard_ಅಡಚಣೆ);
+	ಹಿಂತಿರುಗಿ 1;
     }
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
 // Vim module - Implementation
 
-    static PyObject *
-VimCommand(PyObject *self UNUSED, PyObject *string)
+    ಸ್ಥಿರ PyObject *
+VimCommand(PyObject *self ಬಳಸದ, PyObject *string)
 {
     char_u	*cmd;
     PyObject	*ret;
     PyObject	*todecref;
 
-    if (!(cmd = StringToChars(string, &todecref)))
-	return NULL;
+    ಆದರೆ (!(cmd = String_ಗಮ್ಯ_Chars(string, &todecref)))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    Py_BEGIN_ALLOW_THREADS
-    Python_Lock_Vim();
+    Py_BEGIN_ALLOW_ಎಳೆಗಳು
+    Python_ಬೀಗ_Vim();
 
-    VimTryStart();
+    Vim_Try_ಆರಂಭ();
     do_cmdline_cmd(cmd);
     update_screen(UPD_VALID);
 
     Python_Release_Vim();
-    Py_END_ALLOW_THREADS
+    Py_ಕೊನೆ_ALLOW_ಎಳೆಗಳು
 
-    if (VimTryEnd())
-	ret = NULL;
-    else
+    ಆದರೆ (Vim_Try_ಕೊನೆ())
+	ret = ಖಾಲಿ;
+    ಇಲ್ಲದಿದ್ದರೆ
 	ret = Py_None;
 
     Py_XINCREF(ret);
     Py_XDECREF(todecref);
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
 /*
@@ -997,126 +997,126 @@ VimCommand(PyObject *self UNUSED, PyObject *string)
  * The depth parameter is to avoid infinite recursion, set it to 1 when
  * you call VimToPython.
  */
-    static PyObject *
-VimToPython(typval_T *our_tv, int depth, PyObject *lookup_dict)
+    ಸ್ಥಿರ PyObject *
+Vim_ಗಮ್ಯ_Python(typval_T *our_tv, ಪೂರ್ಣಾಂಕ ಆಳ, PyObject *lookup_dict)
 {
     PyObject	*ret;
     PyObject	*newObj;
-    char	ptrBuf[sizeof(void *) * 2 + 3];
+    ಅಕ್ಷರ	ptrBuf[ಗಾತ್ರ(ಶೂನ್ಯ *) * 2 + 3];
 
     // Avoid infinite recursion
-    if (depth > 100)
+    ಆದರೆ (ಆಳ > 100)
     {
 	Py_INCREF(Py_None);
 	ret = Py_None;
-	return ret;
+	ಹಿಂತಿರುಗಿ ret;
     }
 
     // Check if we run into a recursive loop.  The item must be in lookup_dict
     // then and we can use it again.
-    if ((our_tv->v_type == VAR_LIST && our_tv->vval.v_list != NULL)
-	    || (our_tv->v_type == VAR_TUPLE && our_tv->vval.v_tuple != NULL)
-	    || (our_tv->v_type == VAR_DICT && our_tv->vval.v_dict != NULL))
+    ಆದರೆ ((our_tv->v_type == VAR_LIST && our_tv->vval.v_list != ಖಾಲಿ)
+	    || (our_tv->v_type == VAR_TUPLE && our_tv->vval.v_tuple != ಖಾಲಿ)
+	    || (our_tv->v_type == VAR_DICT && our_tv->vval.v_dict != ಖಾಲಿ))
     {
 	sprintf(ptrBuf, "%p",
-		our_tv->v_type == VAR_LIST ? (void *)our_tv->vval.v_list
+		our_tv->v_type == VAR_LIST ? (ಶೂನ್ಯ *)our_tv->vval.v_list
 		    : our_tv->v_type == VAR_TUPLE ?
-			(void *)our_tv->vval.v_tuple
-			: (void *)our_tv->vval.v_dict);
+			(ಶೂನ್ಯ *)our_tv->vval.v_tuple
+			: (ಶೂನ್ಯ *)our_tv->vval.v_dict);
 
-	if ((ret = PyDict_GetItemString(lookup_dict, ptrBuf)))
+	ಆದರೆ ((ret = Py_Dict_Get_ಅಂಶ_String(lookup_dict, ptrBuf)))
 	{
 	    Py_INCREF(ret);
-	    return ret;
+	    ಹಿಂತಿರುಗಿ ret;
 	}
     }
 
-    if (our_tv->v_type == VAR_STRING)
-	ret = PyString_FromString(our_tv->vval.v_string == NULL
-					? "" : (char *)our_tv->vval.v_string);
-    else if (our_tv->v_type == VAR_NUMBER)
+    ಆದರೆ (our_tv->v_type == VAR_STRING)
+	ret = PyString_FromString(our_tv->vval.v_string == ಖಾಲಿ
+					? "" : (ಅಕ್ಷರ *)our_tv->vval.v_string);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (our_tv->v_type == VAR_ಸಂಖ್ಯೆ)
     {
-	char buf[NUMBUFLEN];
+	ಅಕ್ಷರ buf[NUMBUFLEN];
 
 	// For backwards compatibility numbers are stored as strings.
-	sprintf(buf, "%lld", (long long)our_tv->vval.v_number);
-	ret = PyString_FromString((char *)buf);
+	sprintf(buf, "%lld", (ದೀರ್ಘ ದೀರ್ಘ)our_tv->vval.v_ಸಂಖ್ಯೆ);
+	ret = PyString_FromString((ಅಕ್ಷರ *)buf);
     }
-    else if (our_tv->v_type == VAR_FLOAT)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (our_tv->v_type == VAR_FLOAT)
     {
-	char buf[NUMBUFLEN];
+	ಅಕ್ಷರ buf[NUMBUFLEN];
 
 	sprintf(buf, "%f", our_tv->vval.v_float);
-	ret = PyString_FromString((char *)buf);
+	ret = PyString_FromString((ಅಕ್ಷರ *)buf);
     }
-    else if (our_tv->v_type == VAR_LIST)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (our_tv->v_type == VAR_LIST)
     {
 	list_T		*list = our_tv->vval.v_list;
 	listitem_T	*curr;
 
-	if (list == NULL)
-	    return NULL;
+	ಆದರೆ (list == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-	if (!(ret = PyList_New(0)))
-	    return NULL;
+	ಆದರೆ (!(ret = PyList_New(0)))
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-	if (PyDict_SetItemString(lookup_dict, ptrBuf, ret))
+	ಆದರೆ (Py_Dict_ಗಣ_ಅಂಶ_String(lookup_dict, ptrBuf, ret))
 	{
 	    Py_DECREF(ret);
-	    return NULL;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
 
 	CHECK_LIST_MATERIALIZE(list);
-	FOR_ALL_LIST_ITEMS(list, curr)
+	FOR_ALL_LIST_ವಸ್ತುಗಳು(list, curr)
 	{
-	    if (!(newObj = VimToPython(&curr->li_tv, depth + 1, lookup_dict)))
+	    ಆದರೆ (!(newObj = Vim_ಗಮ್ಯ_Python(&curr->li_tv, ಆಳ + 1, lookup_dict)))
 	    {
 		Py_DECREF(ret);
-		return NULL;
+		ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	    }
-	    if (PyList_Append(ret, newObj))
+	    ಆದರೆ (PyList_Append(ret, newObj))
 	    {
 		Py_DECREF(newObj);
 		Py_DECREF(ret);
-		return NULL;
+		ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	    }
 	    Py_DECREF(newObj);
 	}
     }
-    else if (our_tv->v_type == VAR_TUPLE)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (our_tv->v_type == VAR_TUPLE)
     {
 	tuple_T	*tuple = our_tv->vval.v_tuple;
-	int	len;
+	ಪೂರ್ಣಾಂಕ	len;
 
-	if (tuple == NULL)
-	    return NULL;
+	ಆದರೆ (tuple == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
 	len = TUPLE_LEN(tuple);
 
 	ret = PyTuple_New(len);
-	if (ret == NULL)
-	    return NULL;
+	ಆದರೆ (ret == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-	for (int idx = 0; idx < len; idx++)
+	ಗಾಗಿ (ಪೂರ್ಣಾಂಕ idx = 0; idx < len; idx++)
 	{
-	    typval_T	*item_tv = TUPLE_ITEM(tuple, idx);
+	    typval_T	*ಅಂಶ_tv = TUPLE_ಅಂಶ(tuple, idx);
 
-	    newObj = VimToPython(item_tv, depth + 1, lookup_dict);
-	    if (!newObj)
+	    newObj = Vim_ಗಮ್ಯ_Python(ಅಂಶ_tv, ಆಳ + 1, lookup_dict);
+	    ಆದರೆ (!newObj)
 	    {
 		Py_DECREF(ret);
-		return NULL;
+		ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	    }
-	    PyTuple_SetItem(ret, idx, newObj);
+	    Py_Tuple_ಗಣ_ಅಂಶ(ret, idx, newObj);
 	}
 
-	if (PyDict_SetItemString(lookup_dict, ptrBuf, ret))
+	ಆದರೆ (Py_Dict_ಗಣ_ಅಂಶ_String(lookup_dict, ptrBuf, ret))
 	{
 	    Py_DECREF(ret);
-	    return NULL;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
     }
-    else if (our_tv->v_type == VAR_DICT)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (our_tv->v_type == VAR_DICT)
     {
 
 	hashtab_T	*ht;
@@ -1124,225 +1124,225 @@ VimToPython(typval_T *our_tv, int depth, PyObject *lookup_dict)
 	hashitem_T	*hi;
 	dictitem_T	*di;
 
-	if (our_tv->vval.v_dict == NULL)
-	    return NULL;
+	ಆದರೆ (our_tv->vval.v_dict == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	ht = &our_tv->vval.v_dict->dv_hashtab;
 
-	if (!(ret = PyDict_New()))
-	    return NULL;
+	ಆದರೆ (!(ret = PyDict_New()))
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-	if (PyDict_SetItemString(lookup_dict, ptrBuf, ret))
+	ಆದರೆ (Py_Dict_ಗಣ_ಅಂಶ_String(lookup_dict, ptrBuf, ret))
 	{
 	    Py_DECREF(ret);
-	    return NULL;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
 
-	todo = ht->ht_used;
-	for (hi = ht->ht_array; todo > 0; ++hi)
+	todo = ht->ht_ಬಳಸಿದ;
+	ಗಾಗಿ (hi = ht->ht_array; todo > 0; ++hi)
 	{
-	    if (!HASHITEM_EMPTY(hi))
+	    ಆದರೆ (!HASHITEM_ಖಾಲಿಗಳು(hi))
 	    {
 		--todo;
 
 		di = dict_lookup(hi);
-		if (!(newObj = VimToPython(&di->di_tv, depth + 1, lookup_dict)))
+		ಆದರೆ (!(newObj = Vim_ಗಮ್ಯ_Python(&di->di_tv, ಆಳ + 1, lookup_dict)))
 		{
 		    Py_DECREF(ret);
-		    return NULL;
+		    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 		}
-		if (PyDict_SetItemString(ret, (char *)hi->hi_key, newObj))
+		ಆದರೆ (Py_Dict_ಗಣ_ಅಂಶ_String(ret, (ಅಕ್ಷರ *)hi->hi_ಕೀಲಿ, newObj))
 		{
 		    Py_DECREF(ret);
 		    Py_DECREF(newObj);
-		    return NULL;
+		    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 		}
 	    }
 	}
     }
-    else if (our_tv->v_type == VAR_BOOL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (our_tv->v_type == VAR_BOOL)
     {
-	if (our_tv->vval.v_number == VVAL_FALSE)
+	ಆದರೆ (our_tv->vval.v_ಸಂಖ್ಯೆ == VVAL_FALSE)
 	{
 	    ret = Py_False;
 	    Py_INCREF(ret);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    ret = Py_True;
 	    Py_INCREF(ret);
 	}
-	return ret;
+	ಹಿಂತಿರುಗಿ ret;
     }
-    else if (our_tv->v_type == VAR_SPECIAL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (our_tv->v_type == VAR_SPECIAL)
     {
 	Py_INCREF(Py_None);
 	ret = Py_None;
-	return ret;
+	ಹಿಂತಿರುಗಿ ret;
     }
-    else if (our_tv->v_type == VAR_BLOB)
-	ret = PyBytes_FromStringAndSize(
-		(char*) our_tv->vval.v_blob->bv_ga.ga_data,
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (our_tv->v_type == VAR_BLOB)
+	ret = Py_ಬೈಟುಗಳು_From_String_And_ಗಾತ್ರ(
+		(ಅಕ್ಷರ*) our_tv->vval.v_blob->bv_ga.ga_ದತ್ತಾಂಶ,
 		(Py_ssize_t) our_tv->vval.v_blob->bv_ga.ga_len);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	Py_INCREF(Py_None);
 	ret = Py_None;
     }
 
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-    static PyObject *
-VimEval(PyObject *self UNUSED, PyObject *args)
+    ಸ್ಥಿರ PyObject *
+VimEval(PyObject *self ಬಳಸದ, PyObject *ವಾದಗಳು)
 {
-    char_u	*expr;
+    char_u	*ಅಭಿವ್ಯಕ್ತಿ;
     typval_T	*our_tv;
     PyObject	*string;
     PyObject	*todecref;
     PyObject	*ret;
     PyObject	*lookup_dict;
 
-    if (!PyArg_ParseTuple(args, "O", &string))
-	return NULL;
+    ಆದರೆ (!PyArg_ParseTuple(ವಾದಗಳು, "O", &string))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (!(expr = StringToChars(string, &todecref)))
-	return NULL;
+    ಆದರೆ (!(ಅಭಿವ್ಯಕ್ತಿ = String_ಗಮ್ಯ_Chars(string, &todecref)))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    Py_BEGIN_ALLOW_THREADS
-    Python_Lock_Vim();
-    VimTryStart();
-    our_tv = eval_expr(expr, NULL);
+    Py_BEGIN_ALLOW_ಎಳೆಗಳು
+    Python_ಬೀಗ_Vim();
+    Vim_Try_ಆರಂಭ();
+    our_tv = eval_ಅಭಿವ್ಯಕ್ತಿ(ಅಭಿವ್ಯಕ್ತಿ, ಖಾಲಿ);
     Python_Release_Vim();
-    Py_END_ALLOW_THREADS
+    Py_ಕೊನೆ_ALLOW_ಎಳೆಗಳು
 
     Py_XDECREF(todecref);
 
-    if (VimTryEnd())
-	return NULL;
+    ಆದರೆ (Vim_Try_ಕೊನೆ())
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (our_tv == NULL)
+    ಆದರೆ (our_tv == ಖಾಲಿ)
     {
-	PyErr_SET_VIM(N_("invalid expression"));
-	return NULL;
+	Py_Err_ಗಣ_VIM(N_("invalid expression"));
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
     // Convert the Vim type into a Python type.  Create a dictionary that's
     // used to check for recursive loops.
-    if (!(lookup_dict = PyDict_New()))
-	ret = NULL;
-    else
+    ಆದರೆ (!(lookup_dict = PyDict_New()))
+	ret = ಖಾಲಿ;
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	ret = VimToPython(our_tv, 1, lookup_dict);
+	ret = Vim_ಗಮ್ಯ_Python(our_tv, 1, lookup_dict);
 	Py_DECREF(lookup_dict);
     }
 
 
-    Py_BEGIN_ALLOW_THREADS
-    Python_Lock_Vim();
+    Py_BEGIN_ALLOW_ಎಳೆಗಳು
+    Python_ಬೀಗ_Vim();
     free_tv(our_tv);
     Python_Release_Vim();
-    Py_END_ALLOW_THREADS
+    Py_ಕೊನೆ_ALLOW_ಎಳೆಗಳು
 
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-static PyObject *ConvertToPyObject(typval_T *);
+ಸ್ಥಿರ PyObject *Convert_ಗಮ್ಯ_Py_Object(typval_T *);
 
-    static PyObject *
-VimEvalPy(PyObject *self UNUSED, PyObject *string)
+    ಸ್ಥಿರ PyObject *
+VimEvalPy(PyObject *self ಬಳಸದ, PyObject *string)
 {
     typval_T	*our_tv;
     PyObject	*ret;
-    char_u	*expr;
+    char_u	*ಅಭಿವ್ಯಕ್ತಿ;
     PyObject	*todecref;
 
-    if (!(expr = StringToChars(string, &todecref)))
-	return NULL;
+    ಆದರೆ (!(ಅಭಿವ್ಯಕ್ತಿ = String_ಗಮ್ಯ_Chars(string, &todecref)))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    Py_BEGIN_ALLOW_THREADS
-    Python_Lock_Vim();
-    VimTryStart();
-    our_tv = eval_expr(expr, NULL);
+    Py_BEGIN_ALLOW_ಎಳೆಗಳು
+    Python_ಬೀಗ_Vim();
+    Vim_Try_ಆರಂಭ();
+    our_tv = eval_ಅಭಿವ್ಯಕ್ತಿ(ಅಭಿವ್ಯಕ್ತಿ, ಖಾಲಿ);
     Python_Release_Vim();
-    Py_END_ALLOW_THREADS
+    Py_ಕೊನೆ_ALLOW_ಎಳೆಗಳು
 
     Py_XDECREF(todecref);
 
-    if (VimTryEnd())
-	return NULL;
+    ಆದರೆ (Vim_Try_ಕೊನೆ())
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (our_tv == NULL)
+    ಆದರೆ (our_tv == ಖಾಲಿ)
     {
-	PyErr_SET_VIM(N_("invalid expression"));
-	return NULL;
+	Py_Err_ಗಣ_VIM(N_("invalid expression"));
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    ret = ConvertToPyObject(our_tv);
-    Py_BEGIN_ALLOW_THREADS
-    Python_Lock_Vim();
+    ret = Convert_ಗಮ್ಯ_Py_Object(our_tv);
+    Py_BEGIN_ALLOW_ಎಳೆಗಳು
+    Python_ಬೀಗ_Vim();
     free_tv(our_tv);
     Python_Release_Vim();
-    Py_END_ALLOW_THREADS
+    Py_ಕೊನೆ_ALLOW_ಎಳೆಗಳು
 
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-    static PyObject *
-VimStrwidth(PyObject *self UNUSED, PyObject *string)
+    ಸ್ಥಿರ PyObject *
+VimStrwidth(PyObject *self ಬಳಸದ, PyObject *string)
 {
     char_u	*str;
     PyObject	*todecref;
-    int		len;
+    ಪೂರ್ಣಾಂಕ		len;
 
-    if (!(str = StringToChars(string, &todecref)))
-	return NULL;
+    ಆದರೆ (!(str = String_ಗಮ್ಯ_Chars(string, &todecref)))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    len = mb_string2cells(str, (int)STRLEN(str));
+    len = mb_string2cells(str, (ಪೂರ್ಣಾಂಕ)STRLEN(str));
 
     Py_XDECREF(todecref);
 
-    return PyLong_FromLong(len);
+    ಹಿಂತಿರುಗಿ PyLong_FromLong(len);
 }
 
-    static PyObject *
-_VimChdir(PyObject *_chdir, PyObject *args, PyObject *kwargs)
+    ಸ್ಥಿರ PyObject *
+_VimChdir(PyObject *_chdir, PyObject *ವಾದಗಳು, PyObject *kwargs)
 {
     PyObject	*ret;
     PyObject	*newwd;
     PyObject	*todecref;
     char_u	*new_dir;
 
-    if (_chdir == NULL)
-	return NULL;
-    if (!(ret = PyObject_Call(_chdir, args, kwargs)))
-	return NULL;
+    ಆದರೆ (_chdir == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    ಆದರೆ (!(ret = PyObject_Call(_chdir, ವಾದಗಳು, kwargs)))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (!(newwd = PyObject_CallFunctionObjArgs(py_getcwd, NULL)))
+    ಆದರೆ (!(newwd = Py_Object_Call_Function_Obj_ವಾದಗಳು(py_getcwd, ಖಾಲಿ)))
     {
 	Py_DECREF(ret);
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    if (!(new_dir = StringToChars(newwd, &todecref)))
+    ಆದರೆ (!(new_dir = String_ಗಮ್ಯ_Chars(newwd, &todecref)))
     {
 	Py_DECREF(ret);
 	Py_DECREF(newwd);
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    VimTryStart();
+    Vim_Try_ಆರಂಭ();
 
-    if (vim_chdir(new_dir))
+    ಆದರೆ (vim_chdir(new_dir))
     {
 	Py_DECREF(ret);
 	Py_DECREF(newwd);
 	Py_XDECREF(todecref);
 
-	if (VimTryEnd())
-	    return NULL;
+	ಆದರೆ (Vim_Try_ಕೊನೆ())
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-	PyErr_SET_VIM(N_("failed to change directory"));
-	return NULL;
+	Py_Err_ಗಣ_VIM(N_("failed to change directory"));
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
     Py_DECREF(newwd);
@@ -1350,388 +1350,388 @@ _VimChdir(PyObject *_chdir, PyObject *args, PyObject *kwargs)
 
     post_chdir(CDSCOPE_GLOBAL);
 
-    if (VimTryEnd())
+    ಆದರೆ (Vim_Try_ಕೊನೆ())
     {
 	Py_DECREF(ret);
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-    static PyObject *
-VimChdir(PyObject *self UNUSED, PyObject *args, PyObject *kwargs)
+    ಸ್ಥಿರ PyObject *
+VimChdir(PyObject *self ಬಳಸದ, PyObject *ವಾದಗಳು, PyObject *kwargs)
 {
-    return _VimChdir(py_chdir, args, kwargs);
+    ಹಿಂತಿರುಗಿ _VimChdir(py_chdir, ವಾದಗಳು, kwargs);
 }
 
-    static PyObject *
-VimFchdir(PyObject *self UNUSED, PyObject *args, PyObject *kwargs)
+    ಸ್ಥಿರ PyObject *
+VimFchdir(PyObject *self ಬಳಸದ, PyObject *ವಾದಗಳು, PyObject *kwargs)
 {
-    return _VimChdir(py_fchdir, args, kwargs);
+    ಹಿಂತಿರುಗಿ _VimChdir(py_fchdir, ವಾದಗಳು, kwargs);
 }
 
-typedef struct {
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
     PyObject	*callable;
-    PyObject	*result;
-} map_rtp_data;
+    PyObject	*ಫಲಿತಾಂಶ;
+} map_rtp_ದತ್ತಾಂಶ;
 
-    static void
-map_rtp_callback(char_u *path, void *_data)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+map_rtp_callback(char_u *ಮಾರ್ಗ, ಶೂನ್ಯ *ದತ್ತಾಂಶ_3)
 {
-    void	**data = (void **) _data;
-    PyObject	*pathObject;
-    map_rtp_data	*mr_data = *((map_rtp_data **) data);
+    ಶೂನ್ಯ	**ದತ್ತಾಂಶ = (ಶೂನ್ಯ **) ದತ್ತಾಂಶ_3;
+    PyObject	*ಮಾರ್ಗ_Object;
+    map_rtp_ದತ್ತಾಂಶ	*mr_ದತ್ತಾಂಶ = *((map_rtp_ದತ್ತಾಂಶ **) ದತ್ತಾಂಶ);
 
-    if (!(pathObject = PyString_FromString((char *)path)))
+    ಆದರೆ (!(ಮಾರ್ಗ_Object = PyString_FromString((ಅಕ್ಷರ *)ಮಾರ್ಗ)))
     {
-	*data = NULL;
-	return;
+	*ದತ್ತಾಂಶ = ಖಾಲಿ;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    mr_data->result = PyObject_CallFunctionObjArgs(mr_data->callable,
-						   pathObject, NULL);
+    mr_ದತ್ತಾಂಶ->ಫಲಿತಾಂಶ = Py_Object_Call_Function_Obj_ವಾದಗಳು(mr_ದತ್ತಾಂಶ->callable,
+						   ಮಾರ್ಗ_Object, ಖಾಲಿ);
 
-    Py_DECREF(pathObject);
+    Py_DECREF(ಮಾರ್ಗ_Object);
 
-    if (!mr_data->result || mr_data->result != Py_None)
-	*data = NULL;
-    else
+    ಆದರೆ (!mr_ದತ್ತಾಂಶ->ಫಲಿತಾಂಶ || mr_ದತ್ತಾಂಶ->ಫಲಿತಾಂಶ != Py_None)
+	*ದತ್ತಾಂಶ = ಖಾಲಿ;
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	Py_DECREF(mr_data->result);
-	mr_data->result = NULL;
+	Py_DECREF(mr_ದತ್ತಾಂಶ->ಫಲಿತಾಂಶ);
+	mr_ದತ್ತಾಂಶ->ಫಲಿತಾಂಶ = ಖಾಲಿ;
     }
 }
 
-    static PyObject *
-VimForeachRTP(PyObject *self UNUSED, PyObject *callable)
+    ಸ್ಥಿರ PyObject *
+VimForeachRTP(PyObject *self ಬಳಸದ, PyObject *callable)
 {
-    map_rtp_data	data;
+    map_rtp_ದತ್ತಾಂಶ	ದತ್ತಾಂಶ;
 
-    data.callable = callable;
-    data.result = NULL;
+    ದತ್ತಾಂಶ.callable = callable;
+    ದತ್ತಾಂಶ.ಫಲಿತಾಂಶ = ಖಾಲಿ;
 
-    do_in_runtimepath(NULL, 0, &map_rtp_callback, &data);
+    do_ಒಳ_runtimepath(ಖಾಲಿ, 0, &map_rtp_callback, &ದತ್ತಾಂಶ);
 
-    if (data.result == NULL)
+    ಆದರೆ (ದತ್ತಾಂಶ.ಫಲಿತಾಂಶ == ಖಾಲಿ)
     {
-	if (PyErr_Occurred())
-	    return NULL;
-	else
+	ಆದರೆ (PyErr_Occurred())
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    Py_INCREF(Py_None);
-	    return Py_None;
+	    ಹಿಂತಿರುಗಿ Py_None;
 	}
     }
-    return data.result;
+    ಹಿಂತಿರುಗಿ ದತ್ತಾಂಶ.ಫಲಿತಾಂಶ;
 }
 
 /*
  * _vim_runtimepath_ special path implementation.
  */
 
-    static void
-map_finder_callback(char_u *path, void *_data)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+map_finder_callback(char_u *ಮಾರ್ಗ, ಶೂನ್ಯ *ದತ್ತಾಂಶ_3)
 {
-    void	**data = (void **) _data;
-    PyObject	*list = *((PyObject **) data);
-    PyObject	*pathObject1, *pathObject2;
-    char	*pathbuf;
+    ಶೂನ್ಯ	**ದತ್ತಾಂಶ = (ಶೂನ್ಯ **) ದತ್ತಾಂಶ_3;
+    PyObject	*list = *((PyObject **) ದತ್ತಾಂಶ);
+    PyObject	*ಮಾರ್ಗ_Object1, *ಮಾರ್ಗ_Object2;
+    ಅಕ್ಷರ	*pathbuf;
     size_t	pathlen;
 
-    pathlen = STRLEN(path);
+    pathlen = STRLEN(ಮಾರ್ಗ);
 
-#if PY_MAJOR_VERSION < 3
+#ಆದರೆ PY_MAJOR_ಆವೃತ್ತಿ < 3
 # define PY_MAIN_DIR_STRING "python2"
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 # define PY_MAIN_DIR_STRING "python3"
-#endif
-#define PY_ALTERNATE_DIR_STRING "pythonx"
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿಸು PY_ALTERNATE_DIR_STRING "pythonx"
 
-#define PYTHONX_STRING_LENGTH 7 // STRLEN("pythonx")
-    if (!(pathbuf = PyMem_New(char,
-		    pathlen + STRLEN(PATHSEPSTR) + PYTHONX_STRING_LENGTH + 1)))
+#ವ್ಯಾಖ್ಯಾನಿಸು PYTHONX_STRING_ಉದ್ದಳತೆ 7 // STRLEN("pythonx")
+    ಆದರೆ (!(pathbuf = PyMem_New(ಅಕ್ಷರ,
+		    pathlen + STRLEN(PATHSEPSTR) + PYTHONX_STRING_ಉದ್ದಳತೆ + 1)))
     {
-	PyErr_NoMemory();
-	*data = NULL;
-	return;
+	Py_Err_No_ಸ್ಮರಣೆ();
+	*ದತ್ತಾಂಶ = ಖಾಲಿ;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    mch_memmove(pathbuf, path, pathlen + 1);
-    add_pathsep((char_u *) pathbuf);
+    mch_memmove(pathbuf, ಮಾರ್ಗ, pathlen + 1);
+    ಕೂಡಿಸು_pathsep((char_u *) pathbuf);
 
     pathlen = STRLEN(pathbuf);
     mch_memmove(pathbuf + pathlen, PY_MAIN_DIR_STRING,
-	    PYTHONX_STRING_LENGTH + 1);
+	    PYTHONX_STRING_ಉದ್ದಳತೆ + 1);
 
-    if (!(pathObject1 = PyString_FromString(pathbuf)))
+    ಆದರೆ (!(ಮಾರ್ಗ_Object1 = PyString_FromString(pathbuf)))
     {
-	*data = NULL;
+	*ದತ್ತಾಂಶ = ಖಾಲಿ;
 	PyMem_Free(pathbuf);
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
     mch_memmove(pathbuf + pathlen, PY_ALTERNATE_DIR_STRING,
-	    PYTHONX_STRING_LENGTH + 1);
+	    PYTHONX_STRING_ಉದ್ದಳತೆ + 1);
 
-    if (!(pathObject2 = PyString_FromString(pathbuf)))
+    ಆದರೆ (!(ಮಾರ್ಗ_Object2 = PyString_FromString(pathbuf)))
     {
-	Py_DECREF(pathObject1);
+	Py_DECREF(ಮಾರ್ಗ_Object1);
 	PyMem_Free(pathbuf);
-	*data = NULL;
-	return;
+	*ದತ್ತಾಂಶ = ಖಾಲಿ;
+	ಹಿಂತಿರುಗಿ;
     }
 
     PyMem_Free(pathbuf);
 
-    if (PyList_Append(list, pathObject1)
-	    || PyList_Append(list, pathObject2))
-	*data = NULL;
+    ಆದರೆ (PyList_Append(list, ಮಾರ್ಗ_Object1)
+	    || PyList_Append(list, ಮಾರ್ಗ_Object2))
+	*ದತ್ತಾಂಶ = ಖಾಲಿ;
 
-    Py_DECREF(pathObject1);
-    Py_DECREF(pathObject2);
+    Py_DECREF(ಮಾರ್ಗ_Object1);
+    Py_DECREF(ಮಾರ್ಗ_Object2);
 }
 
-    static PyObject *
-Vim_GetPaths(PyObject *self UNUSED, PyObject *args UNUSED)
+    ಸ್ಥಿರ PyObject *
+Vim_GetPaths(PyObject *self ಬಳಸದ, PyObject *ವಾದಗಳು ಬಳಸದ)
 {
     PyObject	*ret;
 
-    if (!(ret = PyList_New(0)))
-	return NULL;
+    ಆದರೆ (!(ret = PyList_New(0)))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    do_in_runtimepath(NULL, 0, &map_finder_callback, ret);
+    do_ಒಳ_runtimepath(ಖಾಲಿ, 0, &map_finder_callback, ret);
 
-    if (PyErr_Occurred())
+    ಆದರೆ (PyErr_Occurred())
     {
 	Py_DECREF(ret);
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-#if PY_VERSION_HEX >= 0x030700f0
-    static PyObject *
-FinderFindSpec(PyObject *self, PyObject *args)
+#ಆದರೆ PY_ಆವೃತ್ತಿ_HEX >= 0x030700f0
+    ಸ್ಥಿರ PyObject *
+Finder_ಕಂಡುಹಿಡಿ_Spec(PyObject *self, PyObject *ವಾದಗಳು)
 {
-    char	*fullname;
+    ಅಕ್ಷರ	*fullname;
     PyObject	*paths;
-    PyObject	*target = Py_None;
+    PyObject	*ಗುರಿ = Py_None;
     PyObject	*spec;
 
-    if (!PyArg_ParseTuple(args, "s|O", &fullname, &target))
-	return NULL;
+    ಆದರೆ (!PyArg_ParseTuple(ವಾದಗಳು, "s|O", &fullname, &ಗುರಿ))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (!(paths = Vim_GetPaths(self, NULL)))
-	return NULL;
+    ಆದರೆ (!(paths = Vim_GetPaths(self, ಖಾಲಿ)))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    spec = PyObject_CallFunction(py_find_spec, "sOO", fullname, paths, target);
+    spec = PyObject_CallFunction(py_ಕಂಡುಹಿಡಿ_spec, "sOO", fullname, paths, ಗುರಿ);
 
     Py_DECREF(paths);
 
-    if (!spec)
+    ಆದರೆ (!spec)
     {
-	if (PyErr_Occurred())
-	    return NULL;
+	ಆದರೆ (PyErr_Occurred())
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
 	Py_INCREF(Py_None);
-	return Py_None;
+	ಹಿಂತಿರುಗಿ Py_None;
     }
 
-    return spec;
+    ಹಿಂತಿರುಗಿ spec;
 }
 
-    static PyObject *
-FinderFindModule(PyObject* self UNUSED, PyObject* args UNUSED)
+    ಸ್ಥಿರ PyObject *
+Finder_ಕಂಡುಹಿಡಿ_Module(PyObject* self ಬಳಸದ, PyObject* ವಾದಗಳು ಬಳಸದ)
 {
     // Apparently returning None works.
     Py_INCREF(Py_None);
-    return Py_None;
+    ಹಿಂತಿರುಗಿ Py_None;
 }
-#else
-    static PyObject *
-call_load_module(char *name, int len, PyObject *find_module_result)
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಸ್ಥಿರ PyObject *
+call_ತುಂಬು_module(ಅಕ್ಷರ *name, ಪೂರ್ಣಾಂಕ len, PyObject *ಕಂಡುಹಿಡಿ_module_ಫಲಿತಾಂಶ)
 {
     PyObject	*fd, *pathname, *description;
 
-    if (!PyTuple_Check(find_module_result))
+    ಆದರೆ (!PyTuple_Check(ಕಂಡುಹಿಡಿ_module_ಫಲಿತಾಂಶ))
     {
 	PyErr_FORMAT_TYPE(
 		N_("expected 3-tuple as imp.find_module() result, but got %s"),
-		find_module_result);
-	return NULL;
+		ಕಂಡುಹಿಡಿ_module_ಫಲಿತಾಂಶ);
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
-    if (PyTuple_GET_SIZE(find_module_result) != 3)
+    ಆದರೆ (Py_Tuple_GET_ಗಾತ್ರ(ಕಂಡುಹಿಡಿ_module_ಫಲಿತಾಂಶ) != 3)
     {
 	PyErr_FORMAT(PyExc_TypeError,
 		N_("expected 3-tuple as imp.find_module() result, but got "
 		   "tuple of size %d"),
-		(int) PyTuple_GET_SIZE(find_module_result));
-	return NULL;
+		(ಪೂರ್ಣಾಂಕ) Py_Tuple_GET_ಗಾತ್ರ(ಕಂಡುಹಿಡಿ_module_ಫಲಿತಾಂಶ));
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    if (!(fd = PyTuple_GET_ITEM(find_module_result, 0))
-	    || !(pathname = PyTuple_GET_ITEM(find_module_result, 1))
-	    || !(description = PyTuple_GET_ITEM(find_module_result, 2)))
+    ಆದರೆ (!(fd = Py_Tuple_GET_ಅಂಶ(ಕಂಡುಹಿಡಿ_module_ಫಲಿತಾಂಶ, 0))
+	    || !(pathname = Py_Tuple_GET_ಅಂಶ(ಕಂಡುಹಿಡಿ_module_ಫಲಿತಾಂಶ, 1))
+	    || !(description = Py_Tuple_GET_ಅಂಶ(ಕಂಡುಹಿಡಿ_module_ಫಲಿತಾಂಶ, 2)))
     {
-	PyErr_SET_STRING(PyExc_RuntimeError,
+	Py_Err_ಗಣ_STRING(PyExc_RuntimeError,
 		N_("internal error: imp.find_module returned tuple with NULL"));
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    return PyObject_CallFunction(py_load_module,
+    ಹಿಂತಿರುಗಿ PyObject_CallFunction(py_ತುಂಬು_module,
 	    "s#OOO", name, len, fd, pathname, description);
 }
 
-    static PyObject *
-find_module(char *fullname, char *tail, PyObject *new_path)
+    ಸ್ಥಿರ PyObject *
+ಕಂಡುಹಿಡಿ_module(ಅಕ್ಷರ *fullname, ಅಕ್ಷರ *ಬಾಲ, PyObject *new_ಮಾರ್ಗ)
 {
-    PyObject	*find_module_result;
+    PyObject	*ಕಂಡುಹಿಡಿ_module_ಫಲಿತಾಂಶ;
     PyObject	*module;
-    char	*dot;
+    ಅಕ್ಷರ	*dot;
 
-    if ((dot = (char *)vim_strchr((char_u *) tail, '.')))
+    ಆದರೆ ((dot = (ಅಕ್ಷರ *)vim_strchr((char_u *) ಬಾಲ, '.')))
     {
 	/*
 	 * There is a dot in the name: call find_module recursively without the
 	 * first component
 	 */
-	PyObject	*newest_path;
-	int		partlen = (int) (dot - 1 - tail);
+	PyObject	*newest_ಮಾರ್ಗ;
+	ಪೂರ್ಣಾಂಕ		partlen = (ಪೂರ್ಣಾಂಕ) (dot - 1 - ಬಾಲ);
 
-	if (!(find_module_result = PyObject_CallFunction(py_find_module,
-			"s#O", tail, partlen, new_path)))
+	ಆದರೆ (!(ಕಂಡುಹಿಡಿ_module_ಫಲಿತಾಂಶ = PyObject_CallFunction(py_ಕಂಡುಹಿಡಿ_module,
+			"s#O", ಬಾಲ, partlen, new_ಮಾರ್ಗ)))
 	{
-	    if (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_ImportError))
+	    ಆದರೆ (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_ImportError))
 		PyErr_Clear();
-	    return NULL;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
 
-	if (!(module = call_load_module(
+	ಆದರೆ (!(module = call_ತುಂಬು_module(
 			fullname,
-			((int) (tail - fullname)) + partlen,
-			find_module_result)))
+			((ಪೂರ್ಣಾಂಕ) (ಬಾಲ - fullname)) + partlen,
+			ಕಂಡುಹಿಡಿ_module_ಫಲಿತಾಂಶ)))
 	{
-	    Py_DECREF(find_module_result);
-	    return NULL;
+	    Py_DECREF(ಕಂಡುಹಿಡಿ_module_ಫಲಿತಾಂಶ);
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
 
-	Py_DECREF(find_module_result);
+	Py_DECREF(ಕಂಡುಹಿಡಿ_module_ಫಲಿತಾಂಶ);
 
-	if (!(newest_path = PyObject_GetAttrString(module, "__path__")))
+	ಆದರೆ (!(newest_ಮಾರ್ಗ = PyObject_GetAttrString(module, "__path__")))
 	{
 	    Py_DECREF(module);
-	    return NULL;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
 
 	Py_DECREF(module);
 
-	find_module_result = find_module(fullname, dot + 1, newest_path);
+	ಕಂಡುಹಿಡಿ_module_ಫಲಿತಾಂಶ = ಕಂಡುಹಿಡಿ_module(fullname, dot + 1, newest_ಮಾರ್ಗ);
 
-	Py_DECREF(newest_path);
+	Py_DECREF(newest_ಮಾರ್ಗ);
 
-	return find_module_result;
+	ಹಿಂತಿರುಗಿ ಕಂಡುಹಿಡಿ_module_ಫಲಿತಾಂಶ;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (!(find_module_result = PyObject_CallFunction(py_find_module,
-			"sO", tail, new_path)))
+	ಆದರೆ (!(ಕಂಡುಹಿಡಿ_module_ಫಲಿತಾಂಶ = PyObject_CallFunction(py_ಕಂಡುಹಿಡಿ_module,
+			"sO", ಬಾಲ, new_ಮಾರ್ಗ)))
 	{
-	    if (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_ImportError))
+	    ಆದರೆ (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_ImportError))
 		PyErr_Clear();
-	    return NULL;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
 
-	return find_module_result;
+	ಹಿಂತಿರುಗಿ ಕಂಡುಹಿಡಿ_module_ಫಲಿತಾಂಶ;
     }
 }
 
-    static PyObject *
-FinderFindModule(PyObject *self, PyObject *args)
+    ಸ್ಥಿರ PyObject *
+Finder_ಕಂಡುಹಿಡಿ_Module(PyObject *self, PyObject *ವಾದಗಳು)
 {
-    char	*fullname;
-    PyObject	*result;
-    PyObject	*new_path;
+    ಅಕ್ಷರ	*fullname;
+    PyObject	*ಫಲಿತಾಂಶ;
+    PyObject	*new_ಮಾರ್ಗ;
     LoaderObject	*loader;
 
-    if (!PyArg_ParseTuple(args, "s", &fullname))
-	return NULL;
+    ಆದರೆ (!PyArg_ParseTuple(ವಾದಗಳು, "s", &fullname))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (!(new_path = Vim_GetPaths(self, NULL)))
-	return NULL;
+    ಆದರೆ (!(new_ಮಾರ್ಗ = Vim_GetPaths(self, ಖಾಲಿ)))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    result = find_module(fullname, fullname, new_path);
+    ಫಲಿತಾಂಶ = ಕಂಡುಹಿಡಿ_module(fullname, fullname, new_ಮಾರ್ಗ);
 
-    Py_DECREF(new_path);
+    Py_DECREF(new_ಮಾರ್ಗ);
 
-    if (!result)
+    ಆದರೆ (!ಫಲಿತಾಂಶ)
     {
-	if (PyErr_Occurred())
-	    return NULL;
+	ಆದರೆ (PyErr_Occurred())
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
 	Py_INCREF(Py_None);
-	return Py_None;
+	ಹಿಂತಿರುಗಿ Py_None;
     }
 
-    if (!(fullname = (char *)vim_strsave((char_u *)fullname)))
+    ಆದರೆ (!(fullname = (ಅಕ್ಷರ *)vim_strsave((char_u *)fullname)))
     {
-	Py_DECREF(result);
-	PyErr_NoMemory();
-	return NULL;
+	Py_DECREF(ಫಲಿತಾಂಶ);
+	Py_Err_No_ಸ್ಮರಣೆ();
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    if (!(loader = PyObject_NEW(LoaderObject, LoaderTypePtr)))
+    ಆದರೆ (!(loader = PyObject_NEW(LoaderObject, LoaderTypePtr)))
     {
 	vim_free(fullname);
-	Py_DECREF(result);
-	return NULL;
+	Py_DECREF(ಫಲಿತಾಂಶ);
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
     loader->fullname = fullname;
-    loader->result = result;
+    loader->ಫಲಿತಾಂಶ = ಫಲಿತಾಂಶ;
 
-    return (PyObject *) loader;
+    ಹಿಂತಿರುಗಿ (PyObject *) loader;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    static PyObject *
-VimPathHook(PyObject *self UNUSED, PyObject *args)
+    ಸ್ಥಿರ PyObject *
+Vim_ಮಾರ್ಗ_Hook(PyObject *self ಬಳಸದ, PyObject *ವಾದಗಳು)
 {
-    char	*path;
+    ಅಕ್ಷರ	*ಮಾರ್ಗ;
 
-    if (PyArg_ParseTuple(args, "s", &path)
-	    && STRCMP(path, vim_special_path) == 0)
+    ಆದರೆ (PyArg_ParseTuple(ವಾದಗಳು, "s", &ಮಾರ್ಗ)
+	    && STRCMP(ಮಾರ್ಗ, vim_special_ಮಾರ್ಗ) == 0)
     {
 	Py_INCREF(vim_module);
-	return vim_module;
+	ಹಿಂತಿರುಗಿ vim_module;
     }
 
     PyErr_Clear();
-    PyErr_SetNone(PyExc_ImportError);
-    return NULL;
+    Py_Err_ಗಣ_None(PyExc_ImportError);
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Vim module - Definitions
  */
 
-static struct PyMethodDef VimMethods[] = {
+ಸ್ಥಿರ ರಚನೆ Py_ವಿಧಾನ_Def VimMethods[] = {
     // name,	    function,			calling,			documentation
     {"command",	    VimCommand,			METH_O,				"Execute a Vim ex-mode command" },
     {"eval",	    VimEval,			METH_VARARGS,			"Evaluate an expression using Vim evaluator" },
     {"bindeval",    VimEvalPy,			METH_O,				"Like eval(), but returns objects attached to Vim ones"},
     {"strwidth",    VimStrwidth,		METH_O,				"Screen string width, counts <Tab> as having width 1"},
-    {"chdir",	    (PyCFunction)(void *)VimChdir,	METH_VARARGS|METH_KEYWORDS,	"Change directory"},
-    {"fchdir",	    (PyCFunction)(void *)VimFchdir,	METH_VARARGS|METH_KEYWORDS,	"Change directory"},
+    {"chdir",	    (PyCFunction)(ಶೂನ್ಯ *)VimChdir,	METH_VARARGS|METH_KEYWORDS,	"Change directory"},
+    {"fchdir",	    (PyCFunction)(ಶೂನ್ಯ *)VimFchdir,	METH_VARARGS|METH_KEYWORDS,	"Change directory"},
     {"foreach_rtp", VimForeachRTP,		METH_O,				"Call given callable for each path in &rtp"},
-#if PY_VERSION_HEX >= 0x030700f0
-    {"find_spec",   FinderFindSpec,		METH_VARARGS,			"Internal use only, returns spec object for any input it receives"},
-#endif
-    {"find_module", FinderFindModule,		METH_VARARGS,			"Internal use only, returns loader object for any input it receives"},
-    {"path_hook",   VimPathHook,		METH_VARARGS,			"Hook function to install in sys.path_hooks"},
+#ಆದರೆ PY_ಆವೃತ್ತಿ_HEX >= 0x030700f0
+    {"find_spec",   Finder_ಕಂಡುಹಿಡಿ_Spec,		METH_VARARGS,			"Internal use only, returns spec object for any input it receives"},
+#ಆದರೆ_ಅಂತ್ಯ
+    {"find_module", Finder_ಕಂಡುಹಿಡಿ_Module,		METH_VARARGS,			"Internal use only, returns loader object for any input it receives"},
+    {"path_hook",   Vim_ಮಾರ್ಗ_Hook,		METH_VARARGS,			"Hook function to install in sys.path_hooks"},
     {"_get_paths",  (PyCFunction)Vim_GetPaths,	METH_NOARGS,			"Get &rtp-based additions to sys.path"},
-    { NULL,	    NULL,			0,				NULL}
+    { ಖಾಲಿ,	    ಖಾಲಿ,			0,				ಖಾಲಿ}
 };
 
 /*
@@ -1740,796 +1740,796 @@ static struct PyMethodDef VimMethods[] = {
 
 DEFINE_PY_TYPE_OBJECT(IterType);
 
-typedef PyObject *(*nextfun)(void **);
-typedef void (*destructorfun)(void *);
-typedef int (*traversefun)(void *, visitproc, void *);
-typedef int (*clearfun)(void **);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ PyObject *(*nextfun)(ಶೂನ್ಯ **);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಶೂನ್ಯ (*destructorfun)(ಶೂನ್ಯ *);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಪೂರ್ಣಾಂಕ (*traversefun)(ಶೂನ್ಯ *, visitproc, ಶೂನ್ಯ *);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಪೂರ್ಣಾಂಕ (*clearfun)(ಶೂನ್ಯ **);
 
 // Main purpose of this object is removing the need for do python
 // initialization (i.e. PyType_Ready and setting type attributes) for a big
 // bunch of objects.
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    PyObject_HEAD
-    void *cur;
-    nextfun next;
+    Py_Object_ತಲೆ
+    ಶೂನ್ಯ *cur;
+    nextfun ಮುಂದಿನ;
     destructorfun destruct;
     traversefun traverse;
     clearfun clear;
     PyObject *iter_object;
 } IterObject;
 
-    static PyObject *
-IterNew(void *start, destructorfun destruct, nextfun next, traversefun traverse,
+    ಸ್ಥಿರ PyObject *
+IterNew(ಶೂನ್ಯ *ಆರಂಭ, destructorfun destruct, nextfun ಮುಂದಿನ, traversefun traverse,
 	clearfun clear, PyObject *iter_object)
 {
     IterObject *self;
 
     self = PyObject_GC_New(IterObject, IterTypePtr);
-    self->cur = start;
-    self->next = next;
+    self->cur = ಆರಂಭ;
+    self->ಮುಂದಿನ = ಮುಂದಿನ;
     self->destruct = destruct;
     self->traverse = traverse;
     self->clear = clear;
     self->iter_object = iter_object;
 
-    if (iter_object)
+    ಆದರೆ (iter_object)
 	Py_INCREF(iter_object);
 
-    return (PyObject *)(self);
+    ಹಿಂತಿರುಗಿ (PyObject *)(self);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 IterDestructor(PyObject *self_obj)
 {
     IterObject *self = (IterObject*)self_obj;
-    if (self->iter_object)
+    ಆದರೆ (self->iter_object)
 	Py_DECREF(self->iter_object);
-    PyObject_GC_UnTrack((void *)(self));
+    PyObject_GC_UnTrack((ಶೂನ್ಯ *)(self));
     self->destruct(self->cur);
-    PyObject_GC_Del((void *)(self));
+    PyObject_GC_Del((ಶೂನ್ಯ *)(self));
 }
 
-    static int
-IterTraverse(PyObject *self_obj, visitproc visit, void *arg)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+IterTraverse(PyObject *self_obj, visitproc ಭೇಟಿ, ಶೂನ್ಯ *arg)
 {
     IterObject *self = (IterObject*)self_obj;
-    if (self->traverse != NULL)
-	return self->traverse(self->cur, visit, arg);
-    else
-	return 0;
+    ಆದರೆ (self->traverse != ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ self->traverse(self->cur, ಭೇಟಿ, arg);
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಹಿಂತಿರುಗಿ 0;
 }
 
 // Mac OSX defines clear() somewhere.
-#ifdef clear
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ clear
 # undef clear
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 IterClear(PyObject *self_obj)
 {
     IterObject *self = (IterObject*)self_obj;
-    if (self->clear != NULL)
-	return self->clear(&self->cur);
-    else
-	return 0;
+    ಆದರೆ (self->clear != ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ self->clear(&self->cur);
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಹಿಂತಿರುಗಿ 0;
 }
 
-    static PyObject *
-IterNext(PyObject *self_obj)
+    ಸ್ಥಿರ PyObject *
+Iter_ಮುಂದಿನ(PyObject *self_obj)
 {
     IterObject *self = (IterObject*)self_obj;
-    return self->next(&self->cur);
+    ಹಿಂತಿರುಗಿ self->ಮುಂದಿನ(&self->cur);
 }
 
-    static PyObject *
+    ಸ್ಥಿರ PyObject *
 IterIter(PyObject *self)
 {
     Py_INCREF(self);
-    return self;
+    ಹಿಂತಿರುಗಿ self;
 }
 
-typedef struct pylinkedlist_S {
-    struct pylinkedlist_S	*pll_next;
-    struct pylinkedlist_S	*pll_prev;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ pylinkedlist_S {
+    ರಚನೆ pylinkedlist_S	*pll_ಮುಂದಿನ;
+    ರಚನೆ pylinkedlist_S	*pll_prev;
     PyObject			*pll_obj;
 } pylinkedlist_T;
 
-static pylinkedlist_T *lastdict = NULL;
-static pylinkedlist_T *lastlist = NULL;
-static pylinkedlist_T *lasttuple = NULL;
-static pylinkedlist_T *lastfunc = NULL;
+ಸ್ಥಿರ pylinkedlist_T *lastdict = ಖಾಲಿ;
+ಸ್ಥಿರ pylinkedlist_T *lastlist = ಖಾಲಿ;
+ಸ್ಥಿರ pylinkedlist_T *lasttuple = ಖಾಲಿ;
+ಸ್ಥಿರ pylinkedlist_T *lastfunc = ಖಾಲಿ;
 
-    static void
-pyll_remove(pylinkedlist_T *ref, pylinkedlist_T **last)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+pyll_remove(pylinkedlist_T *ref, pylinkedlist_T **ಕೊನೆಯ)
 {
-    if (ref->pll_prev == NULL)
+    ಆದರೆ (ref->pll_prev == ಖಾಲಿ)
     {
-	if (ref->pll_next == NULL)
+	ಆದರೆ (ref->pll_ಮುಂದಿನ == ಖಾಲಿ)
 	{
-	    *last = NULL;
-	    return;
+	    *ಕೊನೆಯ = ಖಾಲಿ;
+	    ಹಿಂತಿರುಗಿ;
 	}
     }
-    else
-	ref->pll_prev->pll_next = ref->pll_next;
+    ಇಲ್ಲದಿದ್ದರೆ
+	ref->pll_prev->pll_ಮುಂದಿನ = ref->pll_ಮುಂದಿನ;
 
-    if (ref->pll_next == NULL)
-	*last = ref->pll_prev;
-    else
-	ref->pll_next->pll_prev = ref->pll_prev;
+    ಆದರೆ (ref->pll_ಮುಂದಿನ == ಖಾಲಿ)
+	*ಕೊನೆಯ = ref->pll_prev;
+    ಇಲ್ಲದಿದ್ದರೆ
+	ref->pll_ಮುಂದಿನ->pll_prev = ref->pll_prev;
 }
 
-    static void
-pyll_add(PyObject *self, pylinkedlist_T *ref, pylinkedlist_T **last)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+pyll_ಕೂಡಿಸು(PyObject *self, pylinkedlist_T *ref, pylinkedlist_T **ಕೊನೆಯ)
 {
-    if (*last == NULL)
-	ref->pll_prev = NULL;
-    else
+    ಆದರೆ (*ಕೊನೆಯ == ಖಾಲಿ)
+	ref->pll_prev = ಖಾಲಿ;
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	(*last)->pll_next = ref;
-	ref->pll_prev = *last;
+	(*ಕೊನೆಯ)->pll_ಮುಂದಿನ = ref;
+	ref->pll_prev = *ಕೊನೆಯ;
     }
-    ref->pll_next = NULL;
+    ref->pll_ಮುಂದಿನ = ಖಾಲಿ;
     ref->pll_obj = self;
-    *last = ref;
+    *ಕೊನೆಯ = ref;
 }
 
 DEFINE_PY_TYPE_OBJECT(DictionaryType);
 
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    PyObject_HEAD
+    Py_Object_ತಲೆ
     dict_T	*dict;
     pylinkedlist_T	ref;
 } DictionaryObject;
 
-static PyObject *DictionaryUpdate(DictionaryObject *, PyObject *, PyObject *);
+ಸ್ಥಿರ PyObject *DictionaryUpdate(DictionaryObject *, PyObject *, PyObject *);
 
-#define NEW_DICTIONARY(dict) DictionaryNew(DictionaryTypePtr, dict)
+#ವ್ಯಾಖ್ಯಾನಿಸು NEW_DICTIONARY(dict) DictionaryNew(DictionaryTypePtr, dict)
 
-    static PyObject *
+    ಸ್ಥಿರ PyObject *
 DictionaryNew(PyTypeObject *subtype, dict_T *dict)
 {
     DictionaryObject	*self;
 
     self = (DictionaryObject *) Py_TYPE_GET_TP_ALLOC(subtype)(subtype, 0);
-    if (self == NULL)
-	return NULL;
+    ಆದರೆ (self == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     self->dict = dict;
     ++dict->dv_refcount;
 
-    pyll_add((PyObject *)(self), &self->ref, &lastdict);
+    pyll_ಕೂಡಿಸು((PyObject *)(self), &self->ref, &lastdict);
 
-    return (PyObject *)(self);
+    ಹಿಂತಿರುಗಿ (PyObject *)(self);
 }
 
-    static dict_T *
-py_dict_alloc(void)
+    ಸ್ಥಿರ dict_T *
+py_dict_alloc(ಶೂನ್ಯ)
 {
     dict_T	*ret;
 
-    if (!(ret = dict_alloc()))
+    ಆದರೆ (!(ret = dict_alloc()))
     {
-	PyErr_NoMemory();
-	return NULL;
+	Py_Err_No_ಸ್ಮರಣೆ();
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
     ++ret->dv_refcount;
 
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-    static PyObject *
-DictionaryConstructor(PyTypeObject *subtype, PyObject *args, PyObject *kwargs)
+    ಸ್ಥಿರ PyObject *
+DictionaryConstructor(PyTypeObject *subtype, PyObject *ವಾದಗಳು, PyObject *kwargs)
 {
     DictionaryObject	*self;
     dict_T	*dict;
 
-    if (!(dict = py_dict_alloc()))
-	return NULL;
+    ಆದರೆ (!(dict = py_dict_alloc()))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     self = (DictionaryObject *) DictionaryNew(subtype, dict);
 
     --dict->dv_refcount;
 
-    if (kwargs || PyTuple_Size(args))
+    ಆದರೆ (kwargs || Py_Tuple_ಗಾತ್ರ(ವಾದಗಳು))
     {
 	PyObject	*tmp;
-	if (!(tmp = DictionaryUpdate(self, args, kwargs)))
+	ಆದರೆ (!(tmp = DictionaryUpdate(self, ವಾದಗಳು, kwargs)))
 	{
 	    Py_DECREF(self);
-	    return NULL;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
 
 	Py_DECREF(tmp);
     }
 
-    return (PyObject *)(self);
+    ಹಿಂತಿರುಗಿ (PyObject *)(self);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 DictionaryDestructor(PyObject *self_obj)
 {
     DictionaryObject *self = (DictionaryObject*)self_obj;
     pyll_remove(&self->ref, &lastdict);
     dict_unref(self->dict);
 
-    DESTRUCTOR_FINISH(self);
+    DESTRUCTOR_ಮುಕ್ತಾಯ(self);
 }
 
-static char *DictionaryAttrs[] = {
+ಸ್ಥಿರ ಅಕ್ಷರ *DictionaryAttrs[] = {
     "locked", "scope",
-    NULL
+    ಖಾಲಿ
 };
 
-    static PyObject *
-DictionaryDir(PyObject *self, PyObject *args UNUSED)
+    ಸ್ಥಿರ PyObject *
+DictionaryDir(PyObject *self, PyObject *ವಾದಗಳು ಬಳಸದ)
 {
-    return ObjectDir(self, DictionaryAttrs);
+    ಹಿಂತಿರುಗಿ ObjectDir(self, DictionaryAttrs);
 }
 
-    static int
-DictionarySetattr(PyObject *self_obj, char *name, PyObject *valObject)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+DictionarySetattr(PyObject *self_obj, ಅಕ್ಷರ *name, PyObject *valObject)
 {
     DictionaryObject *self = (DictionaryObject*)self_obj;
-    if (valObject == NULL)
+    ಆದರೆ (valObject == ಖಾಲಿ)
     {
-	PyErr_SET_STRING(PyExc_AttributeError,
+	Py_Err_ಗಣ_STRING(PyExc_AttributeError,
 		N_("cannot delete vim.Dictionary attributes"));
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 
-    if (strcmp(name, "locked") == 0)
+    ಆದರೆ (strcmp(name, "locked") == 0)
     {
-	if (self->dict->dv_lock == VAR_FIXED)
+	ಆದರೆ (self->dict->dv_ಬೀಗ == VAR_FIXED)
 	{
-	    PyErr_SET_STRING(PyExc_TypeError,
+	    Py_Err_ಗಣ_STRING(PyExc_TypeError,
 		    N_("cannot modify fixed dictionary"));
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    int		istrue = PyObject_IsTrue(valObject);
-	    if (istrue == -1)
-		return -1;
-	    else if (istrue)
-		self->dict->dv_lock = VAR_LOCKED;
-	    else
-		self->dict->dv_lock = 0;
+	    ಪೂರ್ಣಾಂಕ		istrue = PyObject_IsTrue(valObject);
+	    ಆದರೆ (istrue == -1)
+		ಹಿಂತಿರುಗಿ -1;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (istrue)
+		self->dict->dv_ಬೀಗ = VAR_LOCKED;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		self->dict->dv_ಬೀಗ = 0;
 	}
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	PyErr_FORMAT(PyExc_AttributeError, N_("cannot set attribute %s"), name);
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 }
 
-    static PyInt
-DictionaryLength(DictionaryObject *self)
+    ಸ್ಥಿರ PyInt
+Dictionary_ಉದ್ದಳತೆ(DictionaryObject *self)
 {
-    return ((PyInt) (self->dict->dv_hashtab.ht_used));
+    ಹಿಂತಿರುಗಿ ((PyInt) (self->dict->dv_hashtab.ht_ಬಳಸಿದ));
 }
 
-#define DICT_FLAG_HAS_DEFAULT	0x01
-#define DICT_FLAG_POP		0x02
-#define DICT_FLAG_NONE_DEFAULT	0x04
-#define DICT_FLAG_RETURN_BOOL	0x08 // Incompatible with DICT_FLAG_POP
-#define DICT_FLAG_RETURN_PAIR	0x10
+#ವ್ಯಾಖ್ಯಾನಿಸು DICT_FLAG_HAS_DEFAULT	0x01
+#ವ್ಯಾಖ್ಯಾನಿಸು DICT_FLAG_ತೆಗೆ		0x02
+#ವ್ಯಾಖ್ಯಾನಿಸು DICT_FLAG_NONE_DEFAULT	0x04
+#ವ್ಯಾಖ್ಯಾನಿಸು DICT_FLAG_RETURN_BOOL	0x08 // Incompatible with DICT_FLAG_POP
+#ವ್ಯಾಖ್ಯಾನಿಸು DICT_FLAG_RETURN_PAIR	0x10
 
-    static PyObject *
-_DictionaryItem(DictionaryObject *self, PyObject *args, int flags)
+    ಸ್ಥಿರ PyObject *
+Dictionary_ಅಂಶ(DictionaryObject *self, PyObject *ವಾದಗಳು, ಪೂರ್ಣಾಂಕ flags)
 {
-    PyObject	*keyObject;
-    PyObject	*defObject = ((flags & DICT_FLAG_NONE_DEFAULT)? Py_None : NULL);
+    PyObject	*ಕೀಲಿ_Object;
+    PyObject	*defObject = ((flags & DICT_FLAG_NONE_DEFAULT)? Py_None : ಖಾಲಿ);
     PyObject	*ret;
-    char_u	*key;
+    char_u	*ಕೀಲಿ;
     dictitem_T	*di;
     dict_T	*dict = self->dict;
     hashitem_T	*hi;
     PyObject	*todecref;
 
-    if (flags & DICT_FLAG_HAS_DEFAULT)
+    ಆದರೆ (flags & DICT_FLAG_HAS_DEFAULT)
     {
-	if (!PyArg_ParseTuple(args, "O|O", &keyObject, &defObject))
-	    return NULL;
+	ಆದರೆ (!PyArg_ParseTuple(ವಾದಗಳು, "O|O", &ಕೀಲಿ_Object, &defObject))
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
-    else
-	keyObject = args;
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಕೀಲಿ_Object = ವಾದಗಳು;
 
-    if (flags & DICT_FLAG_RETURN_BOOL)
+    ಆದರೆ (flags & DICT_FLAG_RETURN_BOOL)
 	defObject = Py_False;
 
-    if (!(key = StringToChars(keyObject, &todecref)))
-	return NULL;
+    ಆದರೆ (!(ಕೀಲಿ = String_ಗಮ್ಯ_Chars(ಕೀಲಿ_Object, &todecref)))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (*key == NUL)
+    ಆದರೆ (*ಕೀಲಿ == NUL)
     {
-	RAISE_NO_EMPTY_KEYS;
+	RAISE_NO_ಖಾಲಿಗಳು_ಕೀಲಿಗಳು;
 	Py_XDECREF(todecref);
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    hi = hash_find(&dict->dv_hashtab, key);
+    hi = hash_ಕಂಡುಹಿಡಿ(&dict->dv_hashtab, ಕೀಲಿ);
 
     Py_XDECREF(todecref);
 
-    if (HASHITEM_EMPTY(hi))
+    ಆದರೆ (HASHITEM_ಖಾಲಿಗಳು(hi))
     {
-	if (defObject)
+	ಆದರೆ (defObject)
 	{
 	    Py_INCREF(defObject);
-	    return defObject;
+	    ಹಿಂತಿರುಗಿ defObject;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    PyErr_SetObject(PyExc_KeyError, keyObject);
-	    return NULL;
+	    Py_Err_ಗಣ_Object(Py_Exc_ಕೀಲಿ_Error, ಕೀಲಿ_Object);
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
     }
-    else if (flags & DICT_FLAG_RETURN_BOOL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (flags & DICT_FLAG_RETURN_BOOL)
     {
 	ret = Py_True;
 	Py_INCREF(ret);
-	return ret;
+	ಹಿಂತಿರುಗಿ ret;
     }
 
     di = dict_lookup(hi);
 
-    if (!(ret = ConvertToPyObject(&di->di_tv)))
-	return NULL;
+    ಆದರೆ (!(ret = Convert_ಗಮ್ಯ_Py_Object(&di->di_tv)))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (flags & DICT_FLAG_POP)
+    ಆದರೆ (flags & DICT_FLAG_ತೆಗೆ)
     {
-	if (dict->dv_lock)
+	ಆದರೆ (dict->dv_ಬೀಗ)
 	{
 	    RAISE_LOCKED_DICTIONARY;
 	    Py_DECREF(ret);
-	    return NULL;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
 
 	hash_remove(&dict->dv_hashtab, hi, "Python remove variable");
 	dictitem_free(di);
     }
 
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-    static PyObject *
-DictionaryItem(DictionaryObject *self, PyObject *keyObject)
+    ಸ್ಥಿರ PyObject *
+Dictionary_ಅಂಶ_2(DictionaryObject *self, PyObject *ಕೀಲಿ_Object)
 {
-    return _DictionaryItem(self, keyObject, 0);
+    ಹಿಂತಿರುಗಿ Dictionary_ಅಂಶ(self, ಕೀಲಿ_Object, 0);
 }
 
-    static int
-DictionaryContains(DictionaryObject *self, PyObject *keyObject)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+Dictionary_ಒಳಗೊಂಡಿದೆ(DictionaryObject *self, PyObject *ಕೀಲಿ_Object)
 {
-    PyObject	*rObj = _DictionaryItem(self, keyObject, DICT_FLAG_RETURN_BOOL);
-    int		ret;
+    PyObject	*rObj = Dictionary_ಅಂಶ(self, ಕೀಲಿ_Object, DICT_FLAG_RETURN_BOOL);
+    ಪೂರ್ಣಾಂಕ		ret;
 
-    if (rObj == NULL)
-	return -1;
+    ಆದರೆ (rObj == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ -1;
 
     ret = (rObj == Py_True);
 
     Py_DECREF(rObj);
 
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    int		dii_changed;
+    ಪೂರ್ಣಾಂಕ		dii_ಬದಲಾಯಿತು;
     hashtab_T	*dii_ht;
     hashitem_T	*dii_hi;
     long_u	dii_todo;
 } dictiterinfo_T;
 
-    static PyObject *
-DictionaryIterNext(void **arg)
+    ಸ್ಥಿರ PyObject *
+Dictionary_Iter_ಮುಂದಿನ(ಶೂನ್ಯ **arg)
 {
     PyObject	*ret;
     dictiterinfo_T **dii = (dictiterinfo_T**)arg;
 
-    if (!(*dii)->dii_todo)
-	return NULL;
+    ಆದರೆ (!(*dii)->dii_todo)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if ((*dii)->dii_ht->ht_changed != (*dii)->dii_changed)
+    ಆದರೆ ((*dii)->dii_ht->ht_ಬದಲಾಯಿತು != (*dii)->dii_ಬದಲಾಯಿತು)
     {
-	PyErr_SET_STRING(PyExc_RuntimeError,
+	Py_Err_ಗಣ_STRING(PyExc_RuntimeError,
 		N_("hashtab changed during iteration"));
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    while (((*dii)->dii_todo) && HASHITEM_EMPTY((*dii)->dii_hi))
+    ಆಗ (((*dii)->dii_todo) && HASHITEM_ಖಾಲಿಗಳು((*dii)->dii_hi))
 	++((*dii)->dii_hi);
 
     --((*dii)->dii_todo);
 
-    if (!(ret = PyBytes_FromString((char *)(*dii)->dii_hi->hi_key)))
-	return NULL;
+    ಆದರೆ (!(ret = Py_ಬೈಟುಗಳು_From_String((ಅಕ್ಷರ *)(*dii)->dii_hi->hi_ಕೀಲಿ)))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-    static PyObject *
+    ಸ್ಥಿರ PyObject *
 DictionaryIter(PyObject *self_obj)
 {
     DictionaryObject	*self = (DictionaryObject*)self_obj;
     dictiterinfo_T	*dii;
     hashtab_T		*ht;
 
-    if (!(dii = PyMem_New(dictiterinfo_T, 1)))
+    ಆದರೆ (!(dii = PyMem_New(dictiterinfo_T, 1)))
     {
-	PyErr_NoMemory();
-	return NULL;
+	Py_Err_No_ಸ್ಮರಣೆ();
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
     ht = &self->dict->dv_hashtab;
-    dii->dii_changed = ht->ht_changed;
+    dii->dii_ಬದಲಾಯಿತು = ht->ht_ಬದಲಾಯಿತು;
     dii->dii_ht = ht;
     dii->dii_hi = ht->ht_array;
-    dii->dii_todo = ht->ht_used;
+    dii->dii_todo = ht->ht_ಬಳಸಿದ;
 
-    return IterNew(dii,
-	    PyMem_Free, DictionaryIterNext,
-	    NULL, NULL, (PyObject *)self);
+    ಹಿಂತಿರುಗಿ IterNew(dii,
+	    PyMem_Free, Dictionary_Iter_ಮುಂದಿನ,
+	    ಖಾಲಿ, ಖಾಲಿ, (PyObject *)self);
 }
 
-    static int
-DictionaryAssItem(
-	DictionaryObject *self, PyObject *keyObject, PyObject *valObject)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+Dictionary_Ass_ಅಂಶ(
+	DictionaryObject *self, PyObject *ಕೀಲಿ_Object, PyObject *valObject)
 {
-    char_u	*key;
+    char_u	*ಕೀಲಿ;
     typval_T	tv;
     dict_T	*dict = self->dict;
     dictitem_T	*di;
     PyObject	*todecref;
 
-    if (dict->dv_lock)
+    ಆದರೆ (dict->dv_ಬೀಗ)
     {
 	RAISE_LOCKED_DICTIONARY;
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 
-    if (!(key = StringToChars(keyObject, &todecref)))
-	return -1;
+    ಆದರೆ (!(ಕೀಲಿ = String_ಗಮ್ಯ_Chars(ಕೀಲಿ_Object, &todecref)))
+	ಹಿಂತಿರುಗಿ -1;
 
-    if (*key == NUL)
+    ಆದರೆ (*ಕೀಲಿ == NUL)
     {
-	RAISE_NO_EMPTY_KEYS;
+	RAISE_NO_ಖಾಲಿಗಳು_ಕೀಲಿಗಳು;
 	Py_XDECREF(todecref);
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 
-    di = dict_find(dict, key, -1);
+    di = dict_ಕಂಡುಹಿಡಿ(dict, ಕೀಲಿ, -1);
 
-    if (valObject == NULL)
+    ಆದರೆ (valObject == ಖಾಲಿ)
     {
 	hashitem_T	*hi;
 
-	if (di == NULL)
+	ಆದರೆ (di == ಖಾಲಿ)
 	{
 	    Py_XDECREF(todecref);
-	    PyErr_SetObject(PyExc_KeyError, keyObject);
-	    return -1;
+	    Py_Err_ಗಣ_Object(Py_Exc_ಕೀಲಿ_Error, ಕೀಲಿ_Object);
+	    ಹಿಂತಿರುಗಿ -1;
 	}
-	hi = hash_find(&dict->dv_hashtab, di->di_key);
+	hi = hash_ಕಂಡುಹಿಡಿ(&dict->dv_hashtab, di->di_ಕೀಲಿ);
 	hash_remove(&dict->dv_hashtab, hi, "Python remove item");
 	dictitem_free(di);
 	Py_XDECREF(todecref);
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
     }
 
-    if (ConvertFromPyObject(valObject, &tv) == -1)
+    ಆದರೆ (ConvertFromPyObject(valObject, &tv) == -1)
     {
 	Py_XDECREF(todecref);
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 
-    if (di == NULL)
+    ಆದರೆ (di == ಖಾಲಿ)
     {
-	if (!(di = dictitem_alloc(key)))
+	ಆದರೆ (!(di = dictitem_alloc(ಕೀಲಿ)))
 	{
 	    Py_XDECREF(todecref);
-	    PyErr_NoMemory();
-	    return -1;
+	    Py_Err_No_ಸ್ಮರಣೆ();
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 	di->di_tv.v_type = VAR_UNKNOWN;
 
-	if (dict_add(dict, di) == FAIL)
+	ಆದರೆ (dict_ಕೂಡಿಸು(dict, di) == FAIL)
 	{
 	    dictitem_free(di);
-	    RAISE_KEY_ADD_FAIL(key);
+	    RAISE_ಕೀಲಿ_ಕೂಡಿಸು_FAIL(ಕೀಲಿ);
 	    Py_XDECREF(todecref);
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	clear_tv(&di->di_tv);
 
     Py_XDECREF(todecref);
 
     copy_tv(&tv, &di->di_tv);
     clear_tv(&tv);
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-typedef PyObject *(*hi_to_py)(hashitem_T *);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ PyObject *(*hi_ಗಮ್ಯ_py)(hashitem_T *);
 
-    static PyObject *
-DictionaryListObjects(DictionaryObject *self, hi_to_py hiconvert)
+    ಸ್ಥಿರ PyObject *
+DictionaryListObjects(DictionaryObject *self, hi_ಗಮ್ಯ_py hiconvert)
 {
     dict_T	*dict = self->dict;
-    long_u	todo = dict->dv_hashtab.ht_used;
+    long_u	todo = dict->dv_hashtab.ht_ಬಳಸಿದ;
     Py_ssize_t	i = 0;
     PyObject	*ret;
     hashitem_T	*hi;
     PyObject	*newObj;
 
     ret = PyList_New(todo);
-    for (hi = dict->dv_hashtab.ht_array; todo > 0; ++hi)
+    ಗಾಗಿ (hi = dict->dv_hashtab.ht_array; todo > 0; ++hi)
     {
-	if (!HASHITEM_EMPTY(hi))
+	ಆದರೆ (!HASHITEM_ಖಾಲಿಗಳು(hi))
 	{
-	    if (!(newObj = hiconvert(hi)))
+	    ಆದರೆ (!(newObj = hiconvert(hi)))
 	    {
 		Py_DECREF(ret);
-		return NULL;
+		ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	    }
-	    PyList_SET_ITEM(ret, i, newObj);
+	    Py_List_ಗಣ_ಅಂಶ(ret, i, newObj);
 	    --todo;
 	    ++i;
 	}
     }
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-    static PyObject *
-dict_key(hashitem_T *hi)
+    ಸ್ಥಿರ PyObject *
+dict_ಕೀಲಿ(hashitem_T *hi)
 {
-    return PyBytes_FromString((char *)(hi->hi_key));
+    ಹಿಂತಿರುಗಿ Py_ಬೈಟುಗಳು_From_String((ಅಕ್ಷರ *)(hi->hi_ಕೀಲಿ));
 }
 
-    static PyObject *
-DictionaryListKeys(DictionaryObject *self, PyObject *args UNUSED)
+    ಸ್ಥಿರ PyObject *
+Dictionary_List_ಕೀಲಿಗಳು(DictionaryObject *self, PyObject *ವಾದಗಳು ಬಳಸದ)
 {
-    return DictionaryListObjects(self, dict_key);
+    ಹಿಂತಿರುಗಿ DictionaryListObjects(self, dict_ಕೀಲಿ);
 }
 
-    static PyObject *
+    ಸ್ಥಿರ PyObject *
 dict_val(hashitem_T *hi)
 {
     dictitem_T	*di;
 
     di = dict_lookup(hi);
-    return ConvertToPyObject(&di->di_tv);
+    ಹಿಂತಿರುಗಿ Convert_ಗಮ್ಯ_Py_Object(&di->di_tv);
 }
 
-    static PyObject *
-DictionaryListValues(DictionaryObject *self, PyObject *args UNUSED)
+    ಸ್ಥಿರ PyObject *
+Dictionary_List_ಮೌಲ್ಯಗಳು(DictionaryObject *self, PyObject *ವಾದಗಳು ಬಳಸದ)
 {
-    return DictionaryListObjects(self, dict_val);
+    ಹಿಂತಿರುಗಿ DictionaryListObjects(self, dict_val);
 }
 
-    static PyObject *
-dict_item(hashitem_T *hi)
+    ಸ್ಥಿರ PyObject *
+dict_ಅಂಶ(hashitem_T *hi)
 {
-    PyObject	*keyObject;
+    PyObject	*ಕೀಲಿ_Object;
     PyObject	*valObject;
     PyObject	*ret;
 
-    if (!(keyObject = dict_key(hi)))
-	return NULL;
+    ಆದರೆ (!(ಕೀಲಿ_Object = dict_ಕೀಲಿ(hi)))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (!(valObject = dict_val(hi)))
+    ಆದರೆ (!(valObject = dict_val(hi)))
     {
-	Py_DECREF(keyObject);
-	return NULL;
+	Py_DECREF(ಕೀಲಿ_Object);
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    ret = Py_BuildValue("(OO)", keyObject, valObject);
+    ret = Py_Build_ಮೌಲ್ಯ("(OO)", ಕೀಲಿ_Object, valObject);
 
-    Py_DECREF(keyObject);
+    Py_DECREF(ಕೀಲಿ_Object);
     Py_DECREF(valObject);
 
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-    static PyObject *
-DictionaryListItems(DictionaryObject *self, PyObject *args UNUSED)
+    ಸ್ಥಿರ PyObject *
+Dictionary_List_ವಸ್ತುಗಳು(DictionaryObject *self, PyObject *ವಾದಗಳು ಬಳಸದ)
 {
-    return DictionaryListObjects(self, dict_item);
+    ಹಿಂತಿರುಗಿ DictionaryListObjects(self, dict_ಅಂಶ);
 }
 
-    static PyObject *
-DictionaryUpdate(DictionaryObject *self, PyObject *args, PyObject *kwargs)
+    ಸ್ಥಿರ PyObject *
+DictionaryUpdate(DictionaryObject *self, PyObject *ವಾದಗಳು, PyObject *kwargs)
 {
     dict_T	*dict = self->dict;
 
-    if (dict->dv_lock)
+    ಆದರೆ (dict->dv_ಬೀಗ)
     {
 	RAISE_LOCKED_DICTIONARY;
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    if (kwargs)
+    ಆದರೆ (kwargs)
     {
 	typval_T	tv;
 
-	if (ConvertFromPyMapping(kwargs, &tv) == -1)
-	    return NULL;
+	ಆದರೆ (ConvertFromPyMapping(kwargs, &tv) == -1)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-	VimTryStart();
-	dict_extend(self->dict, tv.vval.v_dict, (char_u *) "force", NULL);
+	Vim_Try_ಆರಂಭ();
+	dict_extend(self->dict, tv.vval.v_dict, (char_u *) "force", ಖಾಲಿ);
 	clear_tv(&tv);
-	if (VimTryEnd())
-	    return NULL;
+	ಆದರೆ (Vim_Try_ಕೊನೆ())
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	PyObject	*obj = NULL;
+	PyObject	*obj = ಖಾಲಿ;
 
-	if (!PyArg_ParseTuple(args, "|O", &obj))
-	    return NULL;
+	ಆದರೆ (!PyArg_ParseTuple(ವಾದಗಳು, "|O", &obj))
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-	if (obj == NULL)
+	ಆದರೆ (obj == ಖಾಲಿ)
 	{
 	    Py_INCREF(Py_None);
-	    return Py_None;
+	    ಹಿಂತಿರುಗಿ Py_None;
 	}
 
-	if (PyObject_HasAttrString(obj, "keys"))
-	    return DictionaryUpdate(self, NULL, obj);
-	else
+	ಆದರೆ (PyObject_HasAttrString(obj, "keys"))
+	    ಹಿಂತಿರುಗಿ DictionaryUpdate(self, ಖಾಲಿ, obj);
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    PyObject	*iterator;
-	    PyObject	*item;
+	    PyObject	*ಅಂಶ;
 
-	    if (!(iterator = PyObject_GetIter(obj)))
-		return NULL;
+	    ಆದರೆ (!(iterator = PyObject_GetIter(obj)))
+		ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-	    while ((item = PyIter_Next(iterator)))
+	    ಆಗ ((ಅಂಶ = Py_Iter_ಮುಂದಿನ(iterator)))
 	    {
 		PyObject	*fast;
-		PyObject	*keyObject;
+		PyObject	*ಕೀಲಿ_Object;
 		PyObject	*valObject;
 		PyObject	*todecref;
-		char_u		*key;
+		char_u		*ಕೀಲಿ;
 		dictitem_T	*di;
 		hashitem_T	*hi;
 
-		if (!(fast = PySequence_Fast(item, "")))
+		ಆದರೆ (!(fast = PySequence_Fast(ಅಂಶ, "")))
 		{
 		    Py_DECREF(iterator);
-		    Py_DECREF(item);
-		    return NULL;
+		    Py_DECREF(ಅಂಶ);
+		    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 		}
 
-		Py_DECREF(item);
+		Py_DECREF(ಅಂಶ);
 
-		if (PySequence_Size(fast) != 2)
+		ಆದರೆ (Py_Sequence_ಗಾತ್ರ(fast) != 2)
 		{
 		    Py_DECREF(iterator);
 		    Py_DECREF(fast);
-		    PyErr_FORMAT(PyExc_ValueError,
+		    PyErr_FORMAT(Py_Exc_ಮೌಲ್ಯ_Error,
 			    N_("expected sequence element of size 2, "
 			    "but got sequence of size %d"),
-			    (int) PySequence_Size(fast));
-		    return NULL;
+			    (ಪೂರ್ಣಾಂಕ) Py_Sequence_ಗಾತ್ರ(fast));
+		    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 		}
 
-		keyObject = PySequence_GetItem(fast, 0);
+		ಕೀಲಿ_Object = Py_Sequence_Get_ಅಂಶ(fast, 0);
 
-		if (!(key = StringToChars(keyObject, &todecref)))
+		ಆದರೆ (!(ಕೀಲಿ = String_ಗಮ್ಯ_Chars(ಕೀಲಿ_Object, &todecref)))
 		{
 		    Py_DECREF(iterator);
 		    Py_DECREF(fast);
-		    return NULL;
+		    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 		}
 
-		di = dictitem_alloc(key);
+		di = dictitem_alloc(ಕೀಲಿ);
 
 		Py_XDECREF(todecref);
 
-		if (di == NULL)
+		ಆದರೆ (di == ಖಾಲಿ)
 		{
 		    Py_DECREF(fast);
 		    Py_DECREF(iterator);
-		    PyErr_NoMemory();
-		    return NULL;
+		    Py_Err_No_ಸ್ಮರಣೆ();
+		    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 		}
 		di->di_tv.v_type = VAR_UNKNOWN;
 
-		valObject = PySequence_GetItem(fast, 1);
+		valObject = Py_Sequence_Get_ಅಂಶ(fast, 1);
 
-		if (ConvertFromPyObject(valObject, &di->di_tv) == -1)
+		ಆದರೆ (ConvertFromPyObject(valObject, &di->di_tv) == -1)
 		{
 		    Py_DECREF(iterator);
 		    Py_DECREF(fast);
 		    dictitem_free(di);
-		    return NULL;
+		    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 		}
 
 		Py_DECREF(fast);
 
-		hi = hash_find(&dict->dv_hashtab, di->di_key);
-		if (!HASHITEM_EMPTY(hi) || dict_add(dict, di) == FAIL)
+		hi = hash_ಕಂಡುಹಿಡಿ(&dict->dv_hashtab, di->di_ಕೀಲಿ);
+		ಆದರೆ (!HASHITEM_ಖಾಲಿಗಳು(hi) || dict_ಕೂಡಿಸು(dict, di) == FAIL)
 		{
-		    RAISE_KEY_ADD_FAIL(di->di_key);
+		    RAISE_ಕೀಲಿ_ಕೂಡಿಸು_FAIL(di->di_ಕೀಲಿ);
 		    Py_DECREF(iterator);
 		    dictitem_free(di);
-		    return NULL;
+		    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 		}
 	    }
 
 	    Py_DECREF(iterator);
 
 	    // Iterator may have finished due to an exception
-	    if (PyErr_Occurred())
-		return NULL;
+	    ಆದರೆ (PyErr_Occurred())
+		ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
     }
     Py_INCREF(Py_None);
-    return Py_None;
+    ಹಿಂತಿರುಗಿ Py_None;
 }
 
-    static PyObject *
-DictionaryGet(DictionaryObject *self, PyObject *args)
+    ಸ್ಥಿರ PyObject *
+DictionaryGet(DictionaryObject *self, PyObject *ವಾದಗಳು)
 {
-    return _DictionaryItem(self, args,
+    ಹಿಂತಿರುಗಿ Dictionary_ಅಂಶ(self, ವಾದಗಳು,
 			    DICT_FLAG_HAS_DEFAULT|DICT_FLAG_NONE_DEFAULT);
 }
 
-    static PyObject *
-DictionaryPop(DictionaryObject *self, PyObject *args)
+    ಸ್ಥಿರ PyObject *
+Dictionary_ತೆಗೆ(DictionaryObject *self, PyObject *ವಾದಗಳು)
 {
-    return _DictionaryItem(self, args, DICT_FLAG_HAS_DEFAULT|DICT_FLAG_POP);
+    ಹಿಂತಿರುಗಿ Dictionary_ಅಂಶ(self, ವಾದಗಳು, DICT_FLAG_HAS_DEFAULT|DICT_FLAG_ತೆಗೆ);
 }
 
-    static PyObject *
-DictionaryPopItem(DictionaryObject *self, PyObject *args UNUSED)
+    ಸ್ಥಿರ PyObject *
+Dictionary_ತೆಗೆ_ಅಂಶ(DictionaryObject *self, PyObject *ವಾದಗಳು ಬಳಸದ)
 {
     hashitem_T	*hi;
     PyObject	*ret;
     PyObject	*valObject;
     dictitem_T	*di;
 
-    if (self->dict->dv_hashtab.ht_used == 0)
+    ಆದರೆ (self->dict->dv_hashtab.ht_ಬಳಸಿದ == 0)
     {
-	PyErr_SetNone(PyExc_KeyError);
-	return NULL;
+	Py_Err_ಗಣ_None(Py_Exc_ಕೀಲಿ_Error);
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
     hi = self->dict->dv_hashtab.ht_array;
-    while (HASHITEM_EMPTY(hi))
+    ಆಗ (HASHITEM_ಖಾಲಿಗಳು(hi))
 	++hi;
 
     di = dict_lookup(hi);
 
-    if (!(valObject = ConvertToPyObject(&di->di_tv)))
-	return NULL;
+    ಆದರೆ (!(valObject = Convert_ಗಮ್ಯ_Py_Object(&di->di_tv)))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (!(ret = Py_BuildValue("(" Py_bytes_fmt "O)", hi->hi_key, valObject)))
+    ಆದರೆ (!(ret = Py_Build_ಮೌಲ್ಯ("(" Py_ಬೈಟುಗಳು_fmt "O)", hi->hi_ಕೀಲಿ, valObject)))
     {
 	Py_DECREF(valObject);
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
     hash_remove(&self->dict->dv_hashtab, hi, "Python pop item");
     dictitem_free(di);
 
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-    static PyObject *
-DictionaryHasKey(DictionaryObject *self, PyObject *keyObject)
+    ಸ್ಥಿರ PyObject *
+Dictionary_Has_ಕೀಲಿ(DictionaryObject *self, PyObject *ಕೀಲಿ_Object)
 {
-    return _DictionaryItem(self, keyObject, DICT_FLAG_RETURN_BOOL);
+    ಹಿಂತಿರುಗಿ Dictionary_ಅಂಶ(self, ಕೀಲಿ_Object, DICT_FLAG_RETURN_BOOL);
 }
 
-static PySequenceMethods DictionaryAsSeq = {
+ಸ್ಥಿರ PySequenceMethods DictionaryAsSeq = {
     0,					// sq_length
     0,					// sq_concat
     0,					// sq_repeat
@@ -2537,107 +2537,107 @@ static PySequenceMethods DictionaryAsSeq = {
     0,					// sq_slice
     0,					// sq_ass_item
     0,					// sq_ass_slice
-    (objobjproc) DictionaryContains,	// sq_contains
+    (objobjproc) Dictionary_ಒಳಗೊಂಡಿದೆ,	// sq_contains
     0,					// sq_inplace_concat
     0,					// sq_inplace_repeat
 };
 
-static PyMappingMethods DictionaryAsMapping = {
-    (lenfunc)       DictionaryLength,
-    (binaryfunc)    DictionaryItem,
-    (objobjargproc) DictionaryAssItem,
+ಸ್ಥಿರ PyMappingMethods DictionaryAsMapping = {
+    (lenfunc)       Dictionary_ಉದ್ದಳತೆ,
+    (binaryfunc)    Dictionary_ಅಂಶ_2,
+    (objobjargproc) Dictionary_Ass_ಅಂಶ,
 };
 
-static struct PyMethodDef DictionaryMethods[] = {
-    {"keys",	(PyCFunction)DictionaryListKeys,	METH_NOARGS,	""},
-    {"values",	(PyCFunction)DictionaryListValues,	METH_NOARGS,	""},
-    {"items",	(PyCFunction)DictionaryListItems,	METH_NOARGS,	""},
-    {"update",	(PyCFunction)(void *)DictionaryUpdate,		METH_VARARGS|METH_KEYWORDS, ""},
+ಸ್ಥಿರ ರಚನೆ Py_ವಿಧಾನ_Def DictionaryMethods[] = {
+    {"keys",	(PyCFunction)Dictionary_List_ಕೀಲಿಗಳು,	METH_NOARGS,	""},
+    {"values",	(PyCFunction)Dictionary_List_ಮೌಲ್ಯಗಳು,	METH_NOARGS,	""},
+    {"items",	(PyCFunction)Dictionary_List_ವಸ್ತುಗಳು,	METH_NOARGS,	""},
+    {"update",	(PyCFunction)(ಶೂನ್ಯ *)DictionaryUpdate,		METH_VARARGS|METH_KEYWORDS, ""},
     {"get",	(PyCFunction)DictionaryGet,		METH_VARARGS,	""},
-    {"pop",	(PyCFunction)DictionaryPop,		METH_VARARGS,	""},
-    {"popitem",	(PyCFunction)DictionaryPopItem,		METH_NOARGS,	""},
-    {"has_key",	(PyCFunction)DictionaryHasKey,		METH_O,		""},
+    {"pop",	(PyCFunction)Dictionary_ತೆಗೆ,		METH_VARARGS,	""},
+    {"popitem",	(PyCFunction)Dictionary_ತೆಗೆ_ಅಂಶ,		METH_NOARGS,	""},
+    {"has_key",	(PyCFunction)Dictionary_Has_ಕೀಲಿ,		METH_O,		""},
     {"__dir__",	(PyCFunction)DictionaryDir,		METH_NOARGS,	""},
-    { NULL,	NULL,					0,		NULL}
+    { ಖಾಲಿ,	ಖಾಲಿ,					0,		ಖಾಲಿ}
 };
 
 DEFINE_PY_TYPE_OBJECT(ListType);
 
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    PyObject_HEAD
+    Py_Object_ತಲೆ
     list_T	*list;
     pylinkedlist_T	ref;
 } ListObject;
 
-#define NEW_LIST(list) ListNew(ListTypePtr, list)
+#ವ್ಯಾಖ್ಯಾನಿಸು NEW_LIST(list) ListNew(ListTypePtr, list)
 
-    static PyObject *
+    ಸ್ಥಿರ PyObject *
 ListNew(PyTypeObject *subtype, list_T *list)
 {
     ListObject	*self;
 
-    if (list == NULL)
-	return NULL;
+    ಆದರೆ (list == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     self = (ListObject *) Py_TYPE_GET_TP_ALLOC(subtype)(subtype, 0);
-    if (self == NULL)
-	return NULL;
+    ಆದರೆ (self == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     self->list = list;
     ++list->lv_refcount;
     CHECK_LIST_MATERIALIZE(list);
 
-    pyll_add((PyObject *)(self), &self->ref, &lastlist);
+    pyll_ಕೂಡಿಸು((PyObject *)(self), &self->ref, &lastlist);
 
-    return (PyObject *)(self);
+    ಹಿಂತಿರುಗಿ (PyObject *)(self);
 }
 
-    static list_T *
-py_list_alloc(void)
+    ಸ್ಥಿರ list_T *
+py_list_alloc(ಶೂನ್ಯ)
 {
     list_T	*ret;
 
-    if (!(ret = list_alloc()))
+    ಆದರೆ (!(ret = list_alloc()))
     {
-	PyErr_NoMemory();
-	return NULL;
+	Py_Err_No_ಸ್ಮರಣೆ();
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
     ++ret->lv_refcount;
 
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 list_py_concat(list_T *l, PyObject *obj, PyObject *lookup_dict)
 {
     PyObject	*iterator;
-    PyObject	*item;
+    PyObject	*ಅಂಶ;
     listitem_T	*li;
 
-    if (!(iterator = PyObject_GetIter(obj)))
-	return -1;
+    ಆದರೆ (!(iterator = PyObject_GetIter(obj)))
+	ಹಿಂತಿರುಗಿ -1;
 
-    while ((item = PyIter_Next(iterator)))
+    ಆಗ ((ಅಂಶ = Py_Iter_ಮುಂದಿನ(iterator)))
     {
-	if (!(li = listitem_alloc()))
+	ಆದರೆ (!(li = listitem_alloc()))
 	{
-	    PyErr_NoMemory();
-	    Py_DECREF(item);
+	    Py_Err_No_ಸ್ಮರಣೆ();
+	    Py_DECREF(ಅಂಶ);
 	    Py_DECREF(iterator);
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
-	li->li_tv.v_lock = 0;
+	li->li_tv.v_ಬೀಗ = 0;
 	li->li_tv.v_type = VAR_UNKNOWN;
 
-	if (_ConvertFromPyObject(item, &li->li_tv, lookup_dict) == -1)
+	ಆದರೆ (_ConvertFromPyObject(ಅಂಶ, &li->li_tv, lookup_dict) == -1)
 	{
-	    Py_DECREF(item);
+	    Py_DECREF(ಅಂಶ);
 	    Py_DECREF(iterator);
 	    listitem_free(l, li);
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 
-	Py_DECREF(item);
+	Py_DECREF(ಅಂಶ);
 
 	list_append(l, li);
     }
@@ -2645,494 +2645,494 @@ list_py_concat(list_T *l, PyObject *obj, PyObject *lookup_dict)
     Py_DECREF(iterator);
 
     // Iterator may have finished due to an exception
-    if (PyErr_Occurred())
-	return -1;
+    ಆದರೆ (PyErr_Occurred())
+	ಹಿಂತಿರುಗಿ -1;
 
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-    static PyObject *
-ListConstructor(PyTypeObject *subtype, PyObject *args, PyObject *kwargs)
+    ಸ್ಥಿರ PyObject *
+ListConstructor(PyTypeObject *subtype, PyObject *ವಾದಗಳು, PyObject *kwargs)
 {
     list_T	*list;
-    PyObject	*obj = NULL;
+    PyObject	*obj = ಖಾಲಿ;
 
-    if (kwargs)
+    ಆದರೆ (kwargs)
     {
-	PyErr_SET_STRING(PyExc_TypeError,
+	Py_Err_ಗಣ_STRING(PyExc_TypeError,
 		N_("list constructor does not accept keyword arguments"));
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    if (!PyArg_ParseTuple(args, "|O", &obj))
-	return NULL;
+    ಆದರೆ (!PyArg_ParseTuple(ವಾದಗಳು, "|O", &obj))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (!(list = py_list_alloc()))
-	return NULL;
+    ಆದರೆ (!(list = py_list_alloc()))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (obj)
+    ಆದರೆ (obj)
     {
 	PyObject	*lookup_dict;
 
-	if (!(lookup_dict = PyDict_New()))
+	ಆದರೆ (!(lookup_dict = PyDict_New()))
 	{
 	    list_unref(list);
-	    return NULL;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
 
-	if (list_py_concat(list, obj, lookup_dict) == -1)
+	ಆದರೆ (list_py_concat(list, obj, lookup_dict) == -1)
 	{
 	    Py_DECREF(lookup_dict);
 	    list_unref(list);
-	    return NULL;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
 
 	Py_DECREF(lookup_dict);
     }
 
-    return ListNew(subtype, list);
+    ಹಿಂತಿರುಗಿ ListNew(subtype, list);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ListDestructor(PyObject *self_obj)
 {
     ListObject *self = (ListObject*)self_obj;
     pyll_remove(&self->ref, &lastlist);
     list_unref(self->list);
 
-    DESTRUCTOR_FINISH(self);
+    DESTRUCTOR_ಮುಕ್ತಾಯ(self);
 }
 
-    static PyInt
-ListLength(ListObject *self)
+    ಸ್ಥಿರ PyInt
+List_ಉದ್ದಳತೆ(ListObject *self)
 {
-    return ((PyInt) (self->list->lv_len));
+    ಹಿಂತಿರುಗಿ ((PyInt) (self->list->lv_len));
 }
 
-    static PyObject *
-ListIndex(ListObject *self, Py_ssize_t index)
+    ಸ್ಥಿರ PyObject *
+List_ಸೂಚ್ಯಂಕ(ListObject *self, Py_ssize_t ಸೂಚ್ಯಂಕ)
 {
     listitem_T	*li;
 
-    if (index >= ListLength(self))
+    ಆದರೆ (ಸೂಚ್ಯಂಕ >= List_ಉದ್ದಳತೆ(self))
     {
-	PyErr_SET_STRING(PyExc_IndexError, N_("list index out of range"));
-	return NULL;
+	Py_Err_ಗಣ_STRING(Py_Exc_ಸೂಚ್ಯಂಕ_Error, N_("list index out of range"));
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
-    li = list_find(self->list, (long) index);
-    if (li == NULL)
+    li = list_ಕಂಡುಹಿಡಿ(self->list, (ದೀರ್ಘ) ಸೂಚ್ಯಂಕ);
+    ಆದರೆ (li == ಖಾಲಿ)
     {
 	// No more suitable format specifications in python-2.3
 	PyErr_VIM_FORMAT(N_("internal error: failed to get Vim list item %d"),
-		(int) index);
-	return NULL;
+		(ಪೂರ್ಣಾಂಕ) ಸೂಚ್ಯಂಕ);
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
-    return ConvertToPyObject(&li->li_tv);
+    ಹಿಂತಿರುಗಿ Convert_ಗಮ್ಯ_Py_Object(&li->li_tv);
 }
 
-    static PyObject *
-ListSlice(ListObject *self, Py_ssize_t first, Py_ssize_t step,
+    ಸ್ಥಿರ PyObject *
+List_ತುಂಡು(ListObject *self, Py_ssize_t ಮೊದಲ, Py_ssize_t ಹೆಜ್ಜೆ,
 	  Py_ssize_t slicelen)
 {
     PyInt	i;
     PyObject	*list;
 
-    if (step == 0)
+    ಆದರೆ (ಹೆಜ್ಜೆ == 0)
     {
-	PyErr_SET_STRING(PyExc_ValueError, N_("slice step cannot be zero"));
-	return NULL;
+	Py_Err_ಗಣ_STRING(Py_Exc_ಮೌಲ್ಯ_Error, N_("slice step cannot be zero"));
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
     list = PyList_New(slicelen);
-    if (list == NULL)
-	return NULL;
+    ಆದರೆ (list == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    for (i = 0; i < slicelen; ++i)
+    ಗಾಗಿ (i = 0; i < slicelen; ++i)
     {
-	PyObject	*item;
+	PyObject	*ಅಂಶ;
 
-	item = ListIndex(self, first + i*step);
-	if (item == NULL)
+	ಅಂಶ = List_ಸೂಚ್ಯಂಕ(self, ಮೊದಲ + i*ಹೆಜ್ಜೆ);
+	ಆದರೆ (ಅಂಶ == ಖಾಲಿ)
 	{
 	    Py_DECREF(list);
-	    return NULL;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
 
-	PyList_SET_ITEM(list, i, item);
+	Py_List_ಗಣ_ಅಂಶ(list, i, ಅಂಶ);
     }
 
-    return list;
+    ಹಿಂತಿರುಗಿ list;
 }
 
-    static PyObject *
-ListItem(ListObject *self, PyObject* idx)
+    ಸ್ಥಿರ PyObject *
+List_ಅಂಶ(ListObject *self, PyObject* idx)
 {
-#if PY_MAJOR_VERSION < 3
-    if (PyInt_Check(idx))
+#ಆದರೆ PY_MAJOR_ಆವೃತ್ತಿ < 3
+    ಆದರೆ (PyInt_Check(idx))
     {
-	long _idx = PyInt_AsLong(idx);
-	return ListIndex(self, _idx);
+	ದೀರ್ಘ _idx = PyInt_AsLong(idx);
+	ಹಿಂತಿರುಗಿ List_ಸೂಚ್ಯಂಕ(self, _idx);
     }
-    else
-#endif
-    if (PyLong_Check(idx))
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (PyLong_Check(idx))
     {
-	long _idx = PyLong_AsLong(idx);
-	return ListIndex(self, _idx);
+	ದೀರ್ಘ _idx = PyLong_AsLong(idx);
+	ಹಿಂತಿರುಗಿ List_ಸೂಚ್ಯಂಕ(self, _idx);
     }
-    else if (PySlice_Check(idx))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (Py_ತುಂಡು_Check(idx))
     {
-	Py_ssize_t start, stop, step, slicelen;
+	Py_ssize_t ಆರಂಭ, stop, ಹೆಜ್ಜೆ, slicelen;
 
-	if (PySlice_GetIndicesEx((PySliceObject_T *)idx, ListLength(self),
-				 &start, &stop, &step, &slicelen) < 0)
-	    return NULL;
-	return ListSlice(self, start, step, slicelen);
+	ಆದರೆ (Py_ತುಂಡು_Get_Indices_Ex((Py_ತುಂಡು_Object_T *)idx, List_ಉದ್ದಳತೆ(self),
+				 &ಆರಂಭ, &stop, &ಹೆಜ್ಜೆ, &slicelen) < 0)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+	ಹಿಂತಿರುಗಿ List_ತುಂಡು(self, ಆರಂಭ, ಹೆಜ್ಜೆ, slicelen);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	RAISE_INVALID_INDEX_TYPE(idx);
-	return NULL;
+	RAISE_INVALID_ಸೂಚ್ಯಂಕ_TYPE(idx);
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 list_restore(Py_ssize_t numadded, Py_ssize_t numreplaced, Py_ssize_t slicelen,
 	list_T *l, listitem_T **lis, listitem_T *lastaddedli)
 {
-    while (numreplaced--)
+    ಆಗ (numreplaced--)
     {
-	list_insert(l, lis[numreplaced], lis[slicelen + numreplaced]);
+	list_ಸೇರಿಸು(l, lis[numreplaced], lis[slicelen + numreplaced]);
 	listitem_remove(l, lis[slicelen + numreplaced]);
     }
-    while (numadded--)
+    ಆಗ (numadded--)
     {
-	listitem_T	*next;
+	listitem_T	*ಮುಂದಿನ;
 
-	next = lastaddedli->li_prev;
+	ಮುಂದಿನ = lastaddedli->li_prev;
 	listitem_remove(l, lastaddedli);
-	lastaddedli = next;
+	lastaddedli = ಮುಂದಿನ;
     }
 }
 
-    static int
-ListAssSlice(ListObject *self, Py_ssize_t first,
-	     Py_ssize_t step, Py_ssize_t slicelen, PyObject *obj)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+List_Ass_ತುಂಡು(ListObject *self, Py_ssize_t ಮೊದಲ,
+	     Py_ssize_t ಹೆಜ್ಜೆ, Py_ssize_t slicelen, PyObject *obj)
 {
     PyObject	*iterator;
-    PyObject	*item;
+    PyObject	*ಅಂಶ;
     listitem_T	*li;
-    listitem_T	*lastaddedli = NULL;
-    listitem_T	*next;
+    listitem_T	*lastaddedli = ಖಾಲಿ;
+    listitem_T	*ಮುಂದಿನ;
     typval_T	v;
     list_T	*l = self->list;
     PyInt	i;
     PyInt	j;
     PyInt	numreplaced = 0;
     PyInt	numadded = 0;
-    PyInt	size;
-    listitem_T	**lis = NULL;
+    PyInt	ಗಾತ್ರ_2;
+    listitem_T	**lis = ಖಾಲಿ;
 
-    size = ListLength(self);
+    ಗಾತ್ರ_2 = List_ಉದ್ದಳತೆ(self);
 
-    if (l->lv_lock)
+    ಆದರೆ (l->lv_ಬೀಗ)
     {
 	RAISE_LOCKED_LIST;
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 
-    if (step == 0)
+    ಆದರೆ (ಹೆಜ್ಜೆ == 0)
     {
-	PyErr_SET_STRING(PyExc_ValueError, N_("slice step cannot be zero"));
-	return -1;
+	Py_Err_ಗಣ_STRING(Py_Exc_ಮೌಲ್ಯ_Error, N_("slice step cannot be zero"));
+	ಹಿಂತಿರುಗಿ -1;
     }
 
-    if (step != 1 && slicelen == 0)
+    ಆದರೆ (ಹೆಜ್ಜೆ != 1 && slicelen == 0)
     {
 	// Nothing to do. Only error out if obj has some items.
-	int		ret = 0;
+	ಪೂರ್ಣಾಂಕ		ret = 0;
 
-	if (obj == NULL)
-	    return 0;
+	ಆದರೆ (obj == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ 0;
 
-	if (!(iterator = PyObject_GetIter(obj)))
-	    return -1;
+	ಆದರೆ (!(iterator = PyObject_GetIter(obj)))
+	    ಹಿಂತಿರುಗಿ -1;
 
-	if ((item = PyIter_Next(iterator)))
+	ಆದರೆ ((ಅಂಶ = Py_Iter_ಮುಂದಿನ(iterator)))
 	{
-	    PyErr_FORMAT(PyExc_ValueError,
+	    PyErr_FORMAT(Py_Exc_ಮೌಲ್ಯ_Error,
 		    N_("attempt to assign sequence of size greater than %d "
 			"to extended slice"), 0);
-	    Py_DECREF(item);
+	    Py_DECREF(ಅಂಶ);
 	    ret = -1;
 	}
 	Py_DECREF(iterator);
-	return ret;
+	ಹಿಂತಿರುಗಿ ret;
     }
 
-    if (obj != NULL)
+    ಆದರೆ (obj != ಖಾಲಿ)
 	// XXX May allocate zero bytes.
-	if (!(lis = PyMem_New(listitem_T *, slicelen * 2)))
+	ಆದರೆ (!(lis = PyMem_New(listitem_T *, slicelen * 2)))
 	{
-	    PyErr_NoMemory();
-	    return -1;
+	    Py_Err_No_ಸ್ಮರಣೆ();
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 
-    if (first == size)
-	li = NULL;
-    else
+    ಆದರೆ (ಮೊದಲ == ಗಾತ್ರ_2)
+	li = ಖಾಲಿ;
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	li = list_find(l, (long) first);
-	if (li == NULL)
+	li = list_ಕಂಡುಹಿಡಿ(l, (ದೀರ್ಘ) ಮೊದಲ);
+	ಆದರೆ (li == ಖಾಲಿ)
 	{
 	    PyErr_VIM_FORMAT(N_("internal error: no Vim list item %d"),
-		    (int)first);
-	    if (obj != NULL)
+		    (ಪೂರ್ಣಾಂಕ)ಮೊದಲ);
+	    ಆದರೆ (obj != ಖಾಲಿ)
 		PyMem_Free(lis);
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 	i = slicelen;
-	while (i-- && li != NULL)
+	ಆಗ (i-- && li != ಖಾಲಿ)
 	{
-	    j = step;
-	    next = li;
-	    if (step > 0)
-		while (next != NULL && ((next = next->li_next) != NULL) && --j);
-	    else
-		while (next != NULL && ((next = next->li_prev) != NULL) && ++j);
+	    j = ಹೆಜ್ಜೆ;
+	    ಮುಂದಿನ = li;
+	    ಆದರೆ (ಹೆಜ್ಜೆ > 0)
+		ಆಗ (ಮುಂದಿನ != ಖಾಲಿ && ((ಮುಂದಿನ = ಮುಂದಿನ->li_ಮುಂದಿನ) != ಖಾಲಿ) && --j);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ಆಗ (ಮುಂದಿನ != ಖಾಲಿ && ((ಮುಂದಿನ = ಮುಂದಿನ->li_prev) != ಖಾಲಿ) && ++j);
 
-	    if (obj == NULL)
+	    ಆದರೆ (obj == ಖಾಲಿ)
 		listitem_remove(l, li);
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		lis[slicelen - i - 1] = li;
 
-	    li = next;
+	    li = ಮುಂದಿನ;
 	}
-	if (li == NULL && i != -1)
+	ಆದರೆ (li == ಖಾಲಿ && i != -1)
 	{
-	    PyErr_SET_VIM(N_("internal error: not enough list items"));
-	    if (obj != NULL)
+	    Py_Err_ಗಣ_VIM(N_("internal error: not enough list items"));
+	    ಆದರೆ (obj != ಖಾಲಿ)
 		PyMem_Free(lis);
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
     }
 
-    if (obj == NULL)
-	return 0;
+    ಆದರೆ (obj == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ 0;
 
-    if (!(iterator = PyObject_GetIter(obj)))
+    ಆದರೆ (!(iterator = PyObject_GetIter(obj)))
     {
 	PyMem_Free(lis);
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 
     i = 0;
-    while ((item = PyIter_Next(iterator)))
+    ಆಗ ((ಅಂಶ = Py_Iter_ಮುಂದಿನ(iterator)))
     {
-	if (ConvertFromPyObject(item, &v) == -1)
+	ಆದರೆ (ConvertFromPyObject(ಅಂಶ, &v) == -1)
 	{
 	    Py_DECREF(iterator);
-	    Py_DECREF(item);
+	    Py_DECREF(ಅಂಶ);
 	    PyMem_Free(lis);
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
-	Py_DECREF(item);
-	if (list_insert_tv(l, &v, numreplaced < slicelen
+	Py_DECREF(ಅಂಶ);
+	ಆದರೆ (list_ಸೇರಿಸು_tv(l, &v, numreplaced < slicelen
 				    ? lis[numreplaced]
 				    : li) == FAIL)
 	{
 	    clear_tv(&v);
-	    PyErr_SET_VIM(N_("internal error: failed to add item to list"));
+	    Py_Err_ಗಣ_VIM(N_("internal error: failed to add item to list"));
 	    list_restore(numadded, numreplaced, slicelen, l, lis, lastaddedli);
 	    PyMem_Free(lis);
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
-	if (numreplaced < slicelen)
+	ಆದರೆ (numreplaced < slicelen)
 	{
 	    lis[slicelen + numreplaced] = lis[numreplaced]->li_prev;
 	    vimlist_remove(l, lis[numreplaced], lis[numreplaced]);
 	    numreplaced++;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (li)
+	    ಆದರೆ (li)
 		lastaddedli = li->li_prev;
-	    else
-		lastaddedli = l->lv_u.mat.lv_last;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		lastaddedli = l->lv_u.mat.lv_ಕೊನೆಯ;
 	    numadded++;
 	}
 	clear_tv(&v);
-	if (step != 1 && i >= slicelen)
+	ಆದರೆ (ಹೆಜ್ಜೆ != 1 && i >= slicelen)
 	{
 	    Py_DECREF(iterator);
-	    PyErr_FORMAT(PyExc_ValueError,
+	    PyErr_FORMAT(Py_Exc_ಮೌಲ್ಯ_Error,
 		    N_("attempt to assign sequence of size greater than %d "
-			"to extended slice"), (int) slicelen);
+			"to extended slice"), (ಪೂರ್ಣಾಂಕ) slicelen);
 	    list_restore(numadded, numreplaced, slicelen, l, lis, lastaddedli);
 	    PyMem_Free(lis);
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 	++i;
     }
     Py_DECREF(iterator);
 
-    if (step != 1 && i != slicelen)
+    ಆದರೆ (ಹೆಜ್ಜೆ != 1 && i != slicelen)
     {
-	PyErr_FORMAT2(PyExc_ValueError,
+	PyErr_FORMAT2(Py_Exc_ಮೌಲ್ಯ_Error,
 		N_("attempt to assign sequence of size %d to extended slice "
-		    "of size %d"), (int) i, (int) slicelen);
+		    "of size %d"), (ಪೂರ್ಣಾಂಕ) i, (ಪೂರ್ಣಾಂಕ) slicelen);
 	list_restore(numadded, numreplaced, slicelen, l, lis, lastaddedli);
 	PyMem_Free(lis);
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 
-    if (PyErr_Occurred())
+    ಆದರೆ (PyErr_Occurred())
     {
 	list_restore(numadded, numreplaced, slicelen, l, lis, lastaddedli);
 	PyMem_Free(lis);
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 
-    for (i = 0; i < numreplaced; i++)
+    ಗಾಗಿ (i = 0; i < numreplaced; i++)
 	listitem_free(l, lis[i]);
-    if (step == 1)
-	for (i = numreplaced; i < slicelen; i++)
+    ಆದರೆ (ಹೆಜ್ಜೆ == 1)
+	ಗಾಗಿ (i = numreplaced; i < slicelen; i++)
 	    listitem_remove(l, lis[i]);
 
     PyMem_Free(lis);
 
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-    static int
-ListAssIndex(ListObject *self, Py_ssize_t index, PyObject *obj)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+List_Ass_ಸೂಚ್ಯಂಕ(ListObject *self, Py_ssize_t ಸೂಚ್ಯಂಕ, PyObject *obj)
 {
     typval_T	tv;
     list_T	*l = self->list;
     listitem_T	*li;
-    Py_ssize_t	length = ListLength(self);
+    Py_ssize_t	ಉದ್ದಳತೆ = List_ಉದ್ದಳತೆ(self);
 
-    if (l->lv_lock)
+    ಆದರೆ (l->lv_ಬೀಗ)
     {
 	RAISE_LOCKED_LIST;
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
-    if (index > length || (index == length && obj == NULL))
+    ಆದರೆ (ಸೂಚ್ಯಂಕ > ಉದ್ದಳತೆ || (ಸೂಚ್ಯಂಕ == ಉದ್ದಳತೆ && obj == ಖಾಲಿ))
     {
-	PyErr_SET_STRING(PyExc_IndexError, N_("list index out of range"));
-	return -1;
+	Py_Err_ಗಣ_STRING(Py_Exc_ಸೂಚ್ಯಂಕ_Error, N_("list index out of range"));
+	ಹಿಂತಿರುಗಿ -1;
     }
 
-    if (obj == NULL)
+    ಆದರೆ (obj == ಖಾಲಿ)
     {
-	li = list_find(l, (long) index);
-	if (li == NULL)
+	li = list_ಕಂಡುಹಿಡಿ(l, (ದೀರ್ಘ) ಸೂಚ್ಯಂಕ);
+	ಆದರೆ (li == ಖಾಲಿ)
 	{
 	    PyErr_VIM_FORMAT(N_("internal error: failed to get Vim "
-			"list item %d"), (int) index);
-	    return -1;
+			"list item %d"), (ಪೂರ್ಣಾಂಕ) ಸೂಚ್ಯಂಕ);
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 	vimlist_remove(l, li, li);
 	clear_tv(&li->li_tv);
 	vim_free(li);
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
     }
 
-    if (ConvertFromPyObject(obj, &tv) == -1)
-	return -1;
+    ಆದರೆ (ConvertFromPyObject(obj, &tv) == -1)
+	ಹಿಂತಿರುಗಿ -1;
 
-    if (index == length)
+    ಆದರೆ (ಸೂಚ್ಯಂಕ == ಉದ್ದಳತೆ)
     {
-	if (list_append_tv(l, &tv) == FAIL)
+	ಆದರೆ (list_append_tv(l, &tv) == FAIL)
 	{
 	    clear_tv(&tv);
-	    PyErr_SET_VIM(N_("failed to add item to list"));
-	    return -1;
+	    Py_Err_ಗಣ_VIM(N_("failed to add item to list"));
+	    ಹಿಂತಿರುಗಿ -1;
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	li = list_find(l, (long) index);
-	if (li == NULL)
+	li = list_ಕಂಡುಹಿಡಿ(l, (ದೀರ್ಘ) ಸೂಚ್ಯಂಕ);
+	ಆದರೆ (li == ಖಾಲಿ)
 	{
 	    PyErr_VIM_FORMAT(N_("internal error: failed to get Vim "
-			"list item %d"), (int) index);
-	    return -1;
+			"list item %d"), (ಪೂರ್ಣಾಂಕ) ಸೂಚ್ಯಂಕ);
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 	clear_tv(&li->li_tv);
 	copy_tv(&tv, &li->li_tv);
 	clear_tv(&tv);
     }
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-    static int
-ListAssItem(ListObject *self, PyObject *idx, PyObject *obj)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+List_Ass_ಅಂಶ(ListObject *self, PyObject *idx, PyObject *obj)
 {
-#if PY_MAJOR_VERSION < 3
-    if (PyInt_Check(idx))
+#ಆದರೆ PY_MAJOR_ಆವೃತ್ತಿ < 3
+    ಆದರೆ (PyInt_Check(idx))
     {
-	long _idx = PyInt_AsLong(idx);
-	return (int)ListAssIndex(self, _idx, obj);
+	ದೀರ್ಘ _idx = PyInt_AsLong(idx);
+	ಹಿಂತಿರುಗಿ (ಪೂರ್ಣಾಂಕ)List_Ass_ಸೂಚ್ಯಂಕ(self, _idx, obj);
     }
-    else
-#endif
-    if (PyLong_Check(idx))
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (PyLong_Check(idx))
     {
-	long _idx = PyLong_AsLong(idx);
-	return (int)ListAssIndex(self, _idx, obj);
+	ದೀರ್ಘ _idx = PyLong_AsLong(idx);
+	ಹಿಂತಿರುಗಿ (ಪೂರ್ಣಾಂಕ)List_Ass_ಸೂಚ್ಯಂಕ(self, _idx, obj);
     }
-    else if (PySlice_Check(idx))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (Py_ತುಂಡು_Check(idx))
     {
-	Py_ssize_t start, stop, step, slicelen;
+	Py_ssize_t ಆರಂಭ, stop, ಹೆಜ್ಜೆ, slicelen;
 
-	if (PySlice_GetIndicesEx((PySliceObject_T *)idx, ListLength(self),
-				 &start, &stop, &step, &slicelen) < 0)
-	    return -1;
-	return (int)ListAssSlice(self, start, step, slicelen,
+	ಆದರೆ (Py_ತುಂಡು_Get_Indices_Ex((Py_ತುಂಡು_Object_T *)idx, List_ಉದ್ದಳತೆ(self),
+				 &ಆರಂಭ, &stop, &ಹೆಜ್ಜೆ, &slicelen) < 0)
+	    ಹಿಂತಿರುಗಿ -1;
+	ಹಿಂತಿರುಗಿ (ಪೂರ್ಣಾಂಕ)List_Ass_ತುಂಡು(self, ಆರಂಭ, ಹೆಜ್ಜೆ, slicelen,
 		obj);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	RAISE_INVALID_INDEX_TYPE(idx);
-	return -1;
+	RAISE_INVALID_ಸೂಚ್ಯಂಕ_TYPE(idx);
+	ಹಿಂತಿರುಗಿ -1;
     }
 }
 
-    static PyObject *
-ListConcatInPlace(ListObject *self, PyObject *obj)
+    ಸ್ಥಿರ PyObject *
+List_Concat_ಒಳ_ಇರಿಸು(ListObject *self, PyObject *obj)
 {
     list_T	*l = self->list;
     PyObject	*lookup_dict;
 
-    if (l->lv_lock)
+    ಆದರೆ (l->lv_ಬೀಗ)
     {
 	RAISE_LOCKED_LIST;
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    if (!(lookup_dict = PyDict_New()))
-	return NULL;
+    ಆದರೆ (!(lookup_dict = PyDict_New()))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (list_py_concat(l, obj, lookup_dict) == -1)
+    ಆದರೆ (list_py_concat(l, obj, lookup_dict) == -1)
     {
 	Py_DECREF(lookup_dict);
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
     Py_DECREF(lookup_dict);
 
     Py_INCREF((PyObject *)self);
-    return (PyObject *)(self);
+    ಹಿಂತಿರುಗಿ (PyObject *)(self);
 }
 
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
     listwatch_T	lw;
     list_T	*list;
 } listiterinfo_T;
 
-    static void
-ListIterDestruct(void *arg)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ListIterDestruct(ಶೂನ್ಯ *arg)
 {
     listiterinfo_T *lii = (listiterinfo_T*)arg;
     list_rem_watch(lii->list, &lii->lw);
@@ -3140,450 +3140,450 @@ ListIterDestruct(void *arg)
     PyMem_Free(lii);
 }
 
-    static PyObject *
-ListIterNext(void **arg)
+    ಸ್ಥಿರ PyObject *
+List_Iter_ಮುಂದಿನ(ಶೂನ್ಯ **arg)
 {
     PyObject	*ret;
     listiterinfo_T **lii = (listiterinfo_T**)arg;
 
-    if (!((*lii)->lw.lw_item))
-	return NULL;
+    ಆದರೆ (!((*lii)->lw.lw_ಅಂಶ))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (!(ret = ConvertToPyObject(&((*lii)->lw.lw_item->li_tv))))
-	return NULL;
+    ಆದರೆ (!(ret = Convert_ಗಮ್ಯ_Py_Object(&((*lii)->lw.lw_ಅಂಶ->li_tv))))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    (*lii)->lw.lw_item = (*lii)->lw.lw_item->li_next;
+    (*lii)->lw.lw_ಅಂಶ = (*lii)->lw.lw_ಅಂಶ->li_ಮುಂದಿನ;
 
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-    static PyObject *
+    ಸ್ಥಿರ PyObject *
 ListIter(PyObject *self_obj)
 {
     ListObject	*self = (ListObject*)self_obj;
     listiterinfo_T	*lii;
     list_T	*l = self->list;
 
-    if (!(lii = PyMem_New(listiterinfo_T, 1)))
+    ಆದರೆ (!(lii = PyMem_New(listiterinfo_T, 1)))
     {
-	PyErr_NoMemory();
-	return NULL;
+	Py_Err_No_ಸ್ಮರಣೆ();
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
     CHECK_LIST_MATERIALIZE(l);
-    list_add_watch(l, &lii->lw);
-    lii->lw.lw_item = l->lv_first;
+    list_ಕೂಡಿಸು_watch(l, &lii->lw);
+    lii->lw.lw_ಅಂಶ = l->lv_ಮೊದಲ;
     lii->list = l;
     ++l->lv_refcount;
 
-    return IterNew(lii,
-	    ListIterDestruct, ListIterNext,
-	    NULL, NULL, (PyObject *)self);
+    ಹಿಂತಿರುಗಿ IterNew(lii,
+	    ListIterDestruct, List_Iter_ಮುಂದಿನ,
+	    ಖಾಲಿ, ಖಾಲಿ, (PyObject *)self);
 }
 
-static char *ListAttrs[] = {
+ಸ್ಥಿರ ಅಕ್ಷರ *ListAttrs[] = {
     "locked",
-    NULL
+    ಖಾಲಿ
 };
 
-    static PyObject *
-ListDir(PyObject *self, PyObject *args UNUSED)
+    ಸ್ಥಿರ PyObject *
+ListDir(PyObject *self, PyObject *ವಾದಗಳು ಬಳಸದ)
 {
-    return ObjectDir(self, ListAttrs);
+    ಹಿಂತಿರುಗಿ ObjectDir(self, ListAttrs);
 }
 
-    static int
-ListSetattr(PyObject *self_obj, char *name, PyObject *valObject)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ListSetattr(PyObject *self_obj, ಅಕ್ಷರ *name, PyObject *valObject)
 {
     ListObject *self = (ListObject*)self_obj;
-    if (valObject == NULL)
+    ಆದರೆ (valObject == ಖಾಲಿ)
     {
-	PyErr_SET_STRING(PyExc_AttributeError,
+	Py_Err_ಗಣ_STRING(PyExc_AttributeError,
 		N_("cannot delete vim.List attributes"));
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 
-    if (strcmp(name, "locked") == 0)
+    ಆದರೆ (strcmp(name, "locked") == 0)
     {
-	if (self->list->lv_lock == VAR_FIXED)
+	ಆದರೆ (self->list->lv_ಬೀಗ == VAR_FIXED)
 	{
-	    PyErr_SET_STRING(PyExc_TypeError, N_("cannot modify fixed list"));
-	    return -1;
+	    Py_Err_ಗಣ_STRING(PyExc_TypeError, N_("cannot modify fixed list"));
+	    ಹಿಂತಿರುಗಿ -1;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    int		istrue = PyObject_IsTrue(valObject);
-	    if (istrue == -1)
-		return -1;
-	    else if (istrue)
-		self->list->lv_lock = VAR_LOCKED;
-	    else
-		self->list->lv_lock = 0;
+	    ಪೂರ್ಣಾಂಕ		istrue = PyObject_IsTrue(valObject);
+	    ಆದರೆ (istrue == -1)
+		ಹಿಂತಿರುಗಿ -1;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (istrue)
+		self->list->lv_ಬೀಗ = VAR_LOCKED;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		self->list->lv_ಬೀಗ = 0;
 	}
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	PyErr_FORMAT(PyExc_AttributeError, N_("cannot set attribute %s"), name);
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 }
 
-static PySequenceMethods ListAsSeq = {
-    (lenfunc)		ListLength,	 // sq_length,	  len(x)
+ಸ್ಥಿರ PySequenceMethods ListAsSeq = {
+    (lenfunc)		List_ಉದ್ದಳತೆ,	 // sq_length,	  len(x)
     (binaryfunc)	0,		 // RangeConcat, sq_concat,  x+y
     0,					 // RangeRepeat, sq_repeat,  x*n
-    (PyIntArgFunc)	ListIndex,	 // sq_item,	  x[i]
+    (PyIntArgFunc)	List_ಸೂಚ್ಯಂಕ,	 // sq_item,	  x[i]
     0,					 // was_sq_slice,     x[i:j]
-    (PyIntObjArgProc)	ListAssIndex,	 // sq_as_item,  x[i]=v
+    (PyIntObjArgProc)	List_Ass_ಸೂಚ್ಯಂಕ,	 // sq_as_item,  x[i]=v
     0,					 // was_sq_ass_slice, x[i:j]=v
     0,					 // sq_contains
-    (binaryfunc)	ListConcatInPlace,// sq_inplace_concat
+    (binaryfunc)	List_Concat_ಒಳ_ಇರಿಸು,// sq_inplace_concat
     0,					 // sq_inplace_repeat
 };
 
-static PyMappingMethods ListAsMapping = {
-    /* mp_length	*/ (lenfunc) ListLength,
-    /* mp_subscript     */ (binaryfunc) ListItem,
-    /* mp_ass_subscript */ (objobjargproc) ListAssItem,
+ಸ್ಥಿರ PyMappingMethods ListAsMapping = {
+    /* mp_length	*/ (lenfunc) List_ಉದ್ದಳತೆ,
+    /* mp_subscript     */ (binaryfunc) List_ಅಂಶ,
+    /* mp_ass_subscript */ (objobjargproc) List_Ass_ಅಂಶ,
 };
 
-static struct PyMethodDef ListMethods[] = {
-    {"extend",	(PyCFunction)ListConcatInPlace,	METH_O,		""},
+ಸ್ಥಿರ ರಚನೆ Py_ವಿಧಾನ_Def ListMethods[] = {
+    {"extend",	(PyCFunction)List_Concat_ಒಳ_ಇರಿಸು,	METH_O,		""},
     {"__dir__",	(PyCFunction)ListDir,		METH_NOARGS,	""},
-    { NULL,	NULL,				0,		NULL}
+    { ಖಾಲಿ,	ಖಾಲಿ,				0,		ಖಾಲಿ}
 };
 
 DEFINE_PY_TYPE_OBJECT(TupleType);
 
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    PyObject_HEAD
+    Py_Object_ತಲೆ
     tuple_T	*tuple;
     pylinkedlist_T	ref;
 } TupleObject;
 
-#define NEW_TUPLE(tuple) TupleNew(TupleTypePtr, tuple)
+#ವ್ಯಾಖ್ಯಾನಿಸು NEW_TUPLE(tuple) TupleNew(TupleTypePtr, tuple)
 
-    static PyObject *
+    ಸ್ಥಿರ PyObject *
 TupleNew(PyTypeObject *subtype, tuple_T *tuple)
 {
     TupleObject	*self;
 
-    if (tuple == NULL)
-	return NULL;
+    ಆದರೆ (tuple == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     self = (TupleObject *) Py_TYPE_GET_TP_ALLOC(subtype)(subtype, 0);
-    if (self == NULL)
-	return NULL;
+    ಆದರೆ (self == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     self->tuple = tuple;
     ++tuple->tv_refcount;
 
-    pyll_add((PyObject *)(self), &self->ref, &lasttuple);
+    pyll_ಕೂಡಿಸು((PyObject *)(self), &self->ref, &lasttuple);
 
-    return (PyObject *)(self);
+    ಹಿಂತಿರುಗಿ (PyObject *)(self);
 }
 
-    static tuple_T *
-py_tuple_alloc(void)
+    ಸ್ಥಿರ tuple_T *
+py_tuple_alloc(ಶೂನ್ಯ)
 {
     tuple_T	*ret;
 
-    if (!(ret = tuple_alloc()))
+    ಆದರೆ (!(ret = tuple_alloc()))
     {
-	PyErr_NoMemory();
-	return NULL;
+	Py_Err_No_ಸ್ಮರಣೆ();
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
     ++ret->tv_refcount;
 
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 tuple_py_concat(tuple_T *t, PyObject *obj, PyObject *lookup_dict)
 {
     PyObject	*iterator;
-    PyObject	*item;
+    PyObject	*ಅಂಶ;
 
-    if (!(iterator = PyObject_GetIter(obj)))
-	return -1;
+    ಆದರೆ (!(iterator = PyObject_GetIter(obj)))
+	ಹಿಂತಿರುಗಿ -1;
 
-    while ((item = PyIter_Next(iterator)))
+    ಆಗ ((ಅಂಶ = Py_Iter_ಮುಂದಿನ(iterator)))
     {
 	typval_T    new_tv;
 
-	if (_ConvertFromPyObject(item, &new_tv, lookup_dict) == -1)
+	ಆದರೆ (_ConvertFromPyObject(ಅಂಶ, &new_tv, lookup_dict) == -1)
 	{
-	    Py_DECREF(item);
+	    Py_DECREF(ಅಂಶ);
 	    Py_DECREF(iterator);
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 
-	Py_DECREF(item);
+	Py_DECREF(ಅಂಶ);
 
-	if (tuple_append_tv(t, &new_tv) == FAIL)
+	ಆದರೆ (tuple_append_tv(t, &new_tv) == FAIL)
 	{
 	    Py_DECREF(iterator);
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
     }
 
     Py_DECREF(iterator);
 
     // Iterator may have finished due to an exception
-    if (PyErr_Occurred())
-	return -1;
+    ಆದರೆ (PyErr_Occurred())
+	ಹಿಂತಿರುಗಿ -1;
 
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-    static PyObject *
-TupleConstructor(PyTypeObject *subtype, PyObject *args, PyObject *kwargs)
+    ಸ್ಥಿರ PyObject *
+TupleConstructor(PyTypeObject *subtype, PyObject *ವಾದಗಳು, PyObject *kwargs)
 {
     tuple_T	*tuple;
-    PyObject	*obj = NULL;
+    PyObject	*obj = ಖಾಲಿ;
 
-    if (kwargs)
+    ಆದರೆ (kwargs)
     {
-	PyErr_SET_STRING(PyExc_TypeError,
+	Py_Err_ಗಣ_STRING(PyExc_TypeError,
 		N_("tuple constructor does not accept keyword arguments"));
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    if (!PyArg_ParseTuple(args, "|O", &obj))
-	return NULL;
+    ಆದರೆ (!PyArg_ParseTuple(ವಾದಗಳು, "|O", &obj))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (!(tuple = py_tuple_alloc()))
-	return NULL;
+    ಆದರೆ (!(tuple = py_tuple_alloc()))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (obj)
+    ಆದರೆ (obj)
     {
 	PyObject	*lookup_dict;
 
-	if (!(lookup_dict = PyDict_New()))
+	ಆದರೆ (!(lookup_dict = PyDict_New()))
 	{
 	    tuple_unref(tuple);
-	    return NULL;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
 
-	if (tuple_py_concat(tuple, obj, lookup_dict) == -1)
+	ಆದರೆ (tuple_py_concat(tuple, obj, lookup_dict) == -1)
 	{
 	    Py_DECREF(lookup_dict);
 	    tuple_unref(tuple);
-	    return NULL;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
 
 	Py_DECREF(lookup_dict);
     }
 
-    return TupleNew(subtype, tuple);
+    ಹಿಂತಿರುಗಿ TupleNew(subtype, tuple);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 TupleDestructor(PyObject *self_obj)
 {
     TupleObject *self = (TupleObject *)self_obj;
     pyll_remove(&self->ref, &lasttuple);
     tuple_unref(self->tuple);
 
-    DESTRUCTOR_FINISH(self);
+    DESTRUCTOR_ಮುಕ್ತಾಯ(self);
 }
 
-    static PyInt
-TupleLength(TupleObject *self)
+    ಸ್ಥಿರ PyInt
+Tuple_ಉದ್ದಳತೆ(TupleObject *self)
 {
-    return ((PyInt)(tuple_len(self->tuple)));
+    ಹಿಂತಿರುಗಿ ((PyInt)(tuple_len(self->tuple)));
 }
 
-    static PyObject *
-TupleIndex(TupleObject *self, Py_ssize_t index)
+    ಸ್ಥಿರ PyObject *
+Tuple_ಸೂಚ್ಯಂಕ(TupleObject *self, Py_ssize_t ಸೂಚ್ಯಂಕ)
 {
-    PyInt	len = TupleLength(self);
+    PyInt	len = Tuple_ಉದ್ದಳತೆ(self);
 
-    if (index < 0)
-	index = len + index;
+    ಆದರೆ (ಸೂಚ್ಯಂಕ < 0)
+	ಸೂಚ್ಯಂಕ = len + ಸೂಚ್ಯಂಕ;
 
-    if (index < 0 || index >= len)
+    ಆದರೆ (ಸೂಚ್ಯಂಕ < 0 || ಸೂಚ್ಯಂಕ >= len)
     {
-	PyErr_SET_STRING(PyExc_IndexError, N_("tuple index out of range"));
-	return NULL;
+	Py_Err_ಗಣ_STRING(Py_Exc_ಸೂಚ್ಯಂಕ_Error, N_("tuple index out of range"));
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
-    return ConvertToPyObject(TUPLE_ITEM(self->tuple, index));
+    ಹಿಂತಿರುಗಿ Convert_ಗಮ್ಯ_Py_Object(TUPLE_ಅಂಶ(self->tuple, ಸೂಚ್ಯಂಕ));
 }
 
 /*
  * Return a new tuple object for the tuple slice starting from the index
  * "first" and of length "slicelen" skipping "step" items.
  */
-    static PyObject *
-TupleSlice(
+    ಸ್ಥಿರ PyObject *
+Tuple_ತುಂಡು(
     TupleObject		*self,
-    Py_ssize_t		first,
-    Py_ssize_t		step,
+    Py_ssize_t		ಮೊದಲ,
+    Py_ssize_t		ಹೆಜ್ಜೆ,
     Py_ssize_t		slicelen)
 {
     PyInt	i;
     PyObject	*tuple;
 
     tuple = PyTuple_New(slicelen);
-    if (tuple == NULL)
-	return NULL;
+    ಆದರೆ (tuple == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    for (i = 0; i < slicelen; ++i)
+    ಗಾಗಿ (i = 0; i < slicelen; ++i)
     {
-	PyObject	*item;
+	PyObject	*ಅಂಶ;
 
-	item = TupleIndex(self, first + i * step);
-	if (item == NULL)
+	ಅಂಶ = Tuple_ಸೂಚ್ಯಂಕ(self, ಮೊದಲ + i * ಹೆಜ್ಜೆ);
+	ಆದರೆ (ಅಂಶ == ಖಾಲಿ)
 	{
 	    Py_DECREF(tuple);
-	    return NULL;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
 
-	PyTuple_SetItem(tuple, i, item);
+	Py_Tuple_ಗಣ_ಅಂಶ(tuple, i, ಅಂಶ);
     }
 
-    return tuple;
+    ಹಿಂತಿರುಗಿ tuple;
 }
 
-    static PyObject *
-TupleItem(TupleObject *self, PyObject* idx)
+    ಸ್ಥಿರ PyObject *
+Tuple_ಅಂಶ(TupleObject *self, PyObject* idx)
 {
-#if PY_MAJOR_VERSION < 3
-    if (PyInt_Check(idx))
+#ಆದರೆ PY_MAJOR_ಆವೃತ್ತಿ < 3
+    ಆದರೆ (PyInt_Check(idx))
     {
-	long _idx = PyInt_AsLong(idx);
-	return TupleIndex(self, _idx);
+	ದೀರ್ಘ _idx = PyInt_AsLong(idx);
+	ಹಿಂತಿರುಗಿ Tuple_ಸೂಚ್ಯಂಕ(self, _idx);
     }
-    else
-#endif
-    if (PyLong_Check(idx))
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (PyLong_Check(idx))
     {
-	long _idx = PyLong_AsLong(idx);
-	return TupleIndex(self, _idx);
+	ದೀರ್ಘ _idx = PyLong_AsLong(idx);
+	ಹಿಂತಿರುಗಿ Tuple_ಸೂಚ್ಯಂಕ(self, _idx);
     }
-    else if (PySlice_Check(idx))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (Py_ತುಂಡು_Check(idx))
     {
-	Py_ssize_t start, stop, step, slicelen;
+	Py_ssize_t ಆರಂಭ, stop, ಹೆಜ್ಜೆ, slicelen;
 
-	if (PySlice_GetIndicesEx((PySliceObject_T *)idx, TupleLength(self),
-				 &start, &stop, &step, &slicelen) < 0)
-	    return NULL;
-	return TupleSlice(self, start, step, slicelen);
+	ಆದರೆ (Py_ತುಂಡು_Get_Indices_Ex((Py_ತುಂಡು_Object_T *)idx, Tuple_ಉದ್ದಳತೆ(self),
+				 &ಆರಂಭ, &stop, &ಹೆಜ್ಜೆ, &slicelen) < 0)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+	ಹಿಂತಿರುಗಿ Tuple_ತುಂಡು(self, ಆರಂಭ, ಹೆಜ್ಜೆ, slicelen);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	RAISE_INVALID_INDEX_TYPE(idx);
-	return NULL;
+	RAISE_INVALID_ಸೂಚ್ಯಂಕ_TYPE(idx);
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 }
 
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
     tuple_T	*tuple;
-    int		index;
+    ಪೂರ್ಣಾಂಕ		ಸೂಚ್ಯಂಕ;
 } tupleiterinfo_T;
 
-    static void
-TupleIterDestruct(void *arg)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+TupleIterDestruct(ಶೂನ್ಯ *arg)
 {
     tupleiterinfo_T *tii = (tupleiterinfo_T*)arg;
     tuple_unref(tii->tuple);
     PyMem_Free(tii);
 }
 
-    static PyObject *
-TupleIterNext(void **arg)
+    ಸ್ಥಿರ PyObject *
+Tuple_Iter_ಮುಂದಿನ(ಶೂನ್ಯ **arg)
 {
     PyObject	*ret;
     tupleiterinfo_T **tii = (tupleiterinfo_T**)arg;
 
-    if ((*tii)->index >= TUPLE_LEN((*tii)->tuple))
-	return NULL;
+    ಆದರೆ ((*tii)->ಸೂಚ್ಯಂಕ >= TUPLE_LEN((*tii)->tuple))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (!(ret = ConvertToPyObject(TUPLE_ITEM((*tii)->tuple, (*tii)->index))))
-	return NULL;
+    ಆದರೆ (!(ret = Convert_ಗಮ್ಯ_Py_Object(TUPLE_ಅಂಶ((*tii)->tuple, (*tii)->ಸೂಚ್ಯಂಕ))))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    (*tii)->index++;
+    (*tii)->ಸೂಚ್ಯಂಕ++;
 
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-    static PyObject *
+    ಸ್ಥಿರ PyObject *
 TupleIter(PyObject *self_obj)
 {
     TupleObject	*self = (TupleObject*)self_obj;
     tupleiterinfo_T	*tii;
     tuple_T	*t = self->tuple;
 
-    if (!(tii = PyMem_New(tupleiterinfo_T, 1)))
+    ಆದರೆ (!(tii = PyMem_New(tupleiterinfo_T, 1)))
     {
-	PyErr_NoMemory();
-	return NULL;
+	Py_Err_No_ಸ್ಮರಣೆ();
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
     tii->tuple = t;
-    tii->index = 0;
+    tii->ಸೂಚ್ಯಂಕ = 0;
     ++t->tv_refcount;
 
-    return IterNew(tii,
-	    TupleIterDestruct, TupleIterNext,
-	    NULL, NULL, (PyObject *)self);
+    ಹಿಂತಿರುಗಿ IterNew(tii,
+	    TupleIterDestruct, Tuple_Iter_ಮುಂದಿನ,
+	    ಖಾಲಿ, ಖಾಲಿ, (PyObject *)self);
 }
 
-static char *TupleAttrs[] = {
+ಸ್ಥಿರ ಅಕ್ಷರ *TupleAttrs[] = {
     "locked",
-    NULL
+    ಖಾಲಿ
 };
 
-    static PyObject *
-TupleDir(PyObject *self, PyObject *args UNUSED)
+    ಸ್ಥಿರ PyObject *
+TupleDir(PyObject *self, PyObject *ವಾದಗಳು ಬಳಸದ)
 {
-    return ObjectDir(self, TupleAttrs);
+    ಹಿಂತಿರುಗಿ ObjectDir(self, TupleAttrs);
 }
 
-    static int
-TupleSetattr(PyObject *self_obj, char *name, PyObject *valObject)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+TupleSetattr(PyObject *self_obj, ಅಕ್ಷರ *name, PyObject *valObject)
 {
     TupleObject *self = (TupleObject*)self_obj;
-    if (valObject == NULL)
+    ಆದರೆ (valObject == ಖಾಲಿ)
     {
-	PyErr_SET_STRING(PyExc_AttributeError,
+	Py_Err_ಗಣ_STRING(PyExc_AttributeError,
 		N_("cannot delete vim.Tuple attributes"));
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 
-    if (strcmp(name, "locked") == 0)
+    ಆದರೆ (strcmp(name, "locked") == 0)
     {
-	if (self->tuple->tv_lock == VAR_FIXED)
+	ಆದರೆ (self->tuple->tv_ಬೀಗ == VAR_FIXED)
 	{
-	    PyErr_SET_STRING(PyExc_TypeError, N_("cannot modify fixed tuple"));
-	    return -1;
+	    Py_Err_ಗಣ_STRING(PyExc_TypeError, N_("cannot modify fixed tuple"));
+	    ಹಿಂತಿರುಗಿ -1;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    int		istrue = PyObject_IsTrue(valObject);
-	    if (istrue == -1)
-		return -1;
-	    else if (istrue)
-		self->tuple->tv_lock = VAR_LOCKED;
-	    else
-		self->tuple->tv_lock = 0;
+	    ಪೂರ್ಣಾಂಕ		istrue = PyObject_IsTrue(valObject);
+	    ಆದರೆ (istrue == -1)
+		ಹಿಂತಿರುಗಿ -1;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (istrue)
+		self->tuple->tv_ಬೀಗ = VAR_LOCKED;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		self->tuple->tv_ಬೀಗ = 0;
 	}
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	PyErr_FORMAT(PyExc_AttributeError, N_("cannot set attribute %s"), name);
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 }
 
-static PySequenceMethods TupleAsSeq = {
-    (lenfunc)		TupleLength,	 // sq_length,	  len(x)
+ಸ್ಥಿರ PySequenceMethods TupleAsSeq = {
+    (lenfunc)		Tuple_ಉದ್ದಳತೆ,	 // sq_length,	  len(x)
     (binaryfunc)	0,		 // RangeConcat, sq_concat,  x+y
     0,					 // RangeRepeat, sq_repeat,  x*n
-    (PyIntArgFunc)	TupleIndex,	 // sq_item,	  x[i]
+    (PyIntArgFunc)	Tuple_ಸೂಚ್ಯಂಕ,	 // sq_item,	  x[i]
     0,					 // was_sq_slice,     x[i:j]
     (PyIntObjArgProc)	0,		 // sq_as_item,  x[i]=v
     0,					 // was_sq_ass_slice, x[i:j]=v
@@ -3592,81 +3592,81 @@ static PySequenceMethods TupleAsSeq = {
     0,					 // sq_inplace_repeat
 };
 
-static PyMappingMethods TupleAsMapping = {
-    /* mp_length	*/ (lenfunc) TupleLength,
-    /* mp_subscript     */ (binaryfunc) TupleItem,
+ಸ್ಥಿರ PyMappingMethods TupleAsMapping = {
+    /* mp_length	*/ (lenfunc) Tuple_ಉದ್ದಳತೆ,
+    /* mp_subscript     */ (binaryfunc) Tuple_ಅಂಶ,
     /* mp_ass_subscript */ (objobjargproc) 0,
 };
 
-static struct PyMethodDef TupleMethods[] = {
+ಸ್ಥಿರ ರಚನೆ Py_ವಿಧಾನ_Def TupleMethods[] = {
     {"__dir__",	(PyCFunction)TupleDir,		METH_NOARGS,	""},
-    { NULL,	NULL,				0,		NULL}
+    { ಖಾಲಿ,	ಖಾಲಿ,				0,		ಖಾಲಿ}
 };
 
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    PyObject_HEAD
+    Py_Object_ತಲೆ
     char_u	*name;
-    int		argc;
+    ಪೂರ್ಣಾಂಕ		argc;
     typval_T	*argv;
     dict_T	*self;
     pylinkedlist_T	ref;
-    int		auto_rebind;
+    ಪೂರ್ಣಾಂಕ		auto_rebind;
 } FunctionObject;
 
 DEFINE_PY_TYPE_OBJECT(FunctionType);
 
-#define NEW_FUNCTION(name, argc, argv, self, pt_auto) \
+#ವ್ಯಾಖ್ಯಾನಿಸು NEW_FUNCTION(name, argc, argv, self, pt_auto) \
     FunctionNew(FunctionTypePtr, (name), (argc), (argv), (self), (pt_auto))
 
-    static PyObject *
-FunctionNew(PyTypeObject *subtype, char_u *name, int argc, typval_T *argv,
-	dict_T *selfdict, int auto_rebind)
+    ಸ್ಥಿರ PyObject *
+FunctionNew(PyTypeObject *subtype, char_u *name, ಪೂರ್ಣಾಂಕ argc, typval_T *argv,
+	dict_T *selfdict, ಪೂರ್ಣಾಂಕ auto_rebind)
 {
     FunctionObject	*self;
 
     self = (FunctionObject *) Py_TYPE_GET_TP_ALLOC(subtype)(subtype, 0);
-    if (self == NULL)
-	return NULL;
+    ಆದರೆ (self == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (isdigit((unsigned char)*name))
+    ಆದರೆ (ಅಂಕಿಯೇ((ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ)*name))
     {
-	if (!translated_function_exists(name, FALSE))
+	ಆದರೆ (!translated_function_exists(name, FALSE))
 	{
-	    PyErr_FORMAT(PyExc_ValueError,
+	    PyErr_FORMAT(Py_Exc_ಮೌಲ್ಯ_Error,
 		    N_("unnamed function %s does not exist"), name);
-	    return NULL;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
 	self->name = vim_strsave(name);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	char_u *p;
 
-	if ((p = get_expanded_name(name,
-			    vim_strchr(name, AUTOLOAD_CHAR) == NULL)) == NULL)
+	ಆದರೆ ((p = get_expanded_name(name,
+			    vim_strchr(name, AUTOLOAD_CHAR) == ಖಾಲಿ)) == ಖಾಲಿ)
 	{
-	    PyErr_FORMAT(PyExc_ValueError,
+	    PyErr_FORMAT(Py_Exc_ಮೌಲ್ಯ_Error,
 		    N_("function %s does not exist"), name);
-	    return NULL;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
 
-	if (p[0] == K_SPECIAL && p[1] == KS_EXTRA && p[2] == (int)KE_SNR)
+	ಆದರೆ (p[0] == K_SPECIAL && p[1] == KS_EXTRA && p[2] == (ಪೂರ್ಣಾಂಕ)KE_SNR)
 	{
 	    char_u *np;
 	    size_t len = STRLEN(p) + 1;
 
-	    if ((np = alloc(len + 2)) == NULL)
+	    ಆದರೆ ((np = alloc(len + 2)) == ಖಾಲಿ)
 	    {
 		vim_free(p);
-		return NULL;
+		ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	    }
 	    mch_memmove(np, "<SNR>", 5);
 	    mch_memmove(np + 5, p + 3, len - 3);
 	    vim_free(p);
 	    self->name = np;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    self->name = p;
     }
 
@@ -3674,157 +3674,157 @@ FunctionNew(PyTypeObject *subtype, char_u *name, int argc, typval_T *argv,
     self->argc = argc;
     self->argv = argv;
     self->self = selfdict;
-    self->auto_rebind = selfdict == NULL ? TRUE : auto_rebind;
+    self->auto_rebind = selfdict == ಖಾಲಿ ? TRUE : auto_rebind;
 
-    if (self->argv || self->self)
-	pyll_add((PyObject *)(self), &self->ref, &lastfunc);
+    ಆದರೆ (self->argv || self->self)
+	pyll_ಕೂಡಿಸು((PyObject *)(self), &self->ref, &lastfunc);
 
-    return (PyObject *)(self);
+    ಹಿಂತಿರುಗಿ (PyObject *)(self);
 }
 
-    static PyObject *
-FunctionConstructor(PyTypeObject *subtype, PyObject *args, PyObject *kwargs)
+    ಸ್ಥಿರ PyObject *
+FunctionConstructor(PyTypeObject *subtype, PyObject *ವಾದಗಳು, PyObject *kwargs)
 {
     PyObject	*self;
     PyObject	*selfdictObject;
     PyObject	*autoRebindObject;
-    PyObject	*argsObject = NULL;
+    PyObject	*ವಾದಗಳು_Object = ಖಾಲಿ;
     char_u	*name;
     typval_T	selfdicttv;
     typval_T	argstv;
-    list_T	*argslist = NULL;
-    dict_T	*selfdict = NULL;
-    int		argc = 0;
-    int		auto_rebind = TRUE;
-    typval_T	*argv = NULL;
+    list_T	*argslist = ಖಾಲಿ;
+    dict_T	*selfdict = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		argc = 0;
+    ಪೂರ್ಣಾಂಕ		auto_rebind = TRUE;
+    typval_T	*argv = ಖಾಲಿ;
     typval_T	*curtv;
     listitem_T	*li;
 
-    if (kwargs != NULL)
+    ಆದರೆ (kwargs != ಖಾಲಿ)
     {
-	selfdictObject = PyDict_GetItemString(kwargs, "self");
-	if (selfdictObject != NULL)
+	selfdictObject = Py_Dict_Get_ಅಂಶ_String(kwargs, "self");
+	ಆದರೆ (selfdictObject != ಖಾಲಿ)
 	{
-	    if (ConvertFromPyMapping(selfdictObject, &selfdicttv) == -1)
-		return NULL;
+	    ಆದರೆ (ConvertFromPyMapping(selfdictObject, &selfdicttv) == -1)
+		ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	    selfdict = selfdicttv.vval.v_dict;
 	}
-	argsObject = PyDict_GetItemString(kwargs, "args");
-	if (argsObject != NULL)
+	ವಾದಗಳು_Object = Py_Dict_Get_ಅಂಶ_String(kwargs, "args");
+	ಆದರೆ (ವಾದಗಳು_Object != ಖಾಲಿ)
 	{
-	    if (ConvertFromPySequence(argsObject, &argstv) == -1)
+	    ಆದರೆ (ConvertFromPySequence(ವಾದಗಳು_Object, &argstv) == -1)
 	    {
 		dict_unref(selfdict);
-		return NULL;
+		ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	    }
 	    argslist = argstv.vval.v_list;
 	    CHECK_LIST_MATERIALIZE(argslist);
 
 	    argc = argslist->lv_len;
-	    if (argc != 0)
+	    ಆದರೆ (argc != 0)
 	    {
 		argv = PyMem_New(typval_T, (size_t) argc);
-		if (argv == NULL)
+		ಆದರೆ (argv == ಖಾಲಿ)
 		{
-		    PyErr_NoMemory();
+		    Py_Err_No_ಸ್ಮರಣೆ();
 		    dict_unref(selfdict);
 		    list_unref(argslist);
-		    return NULL;
+		    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 		}
 		curtv = argv;
-		FOR_ALL_LIST_ITEMS(argslist, li)
+		FOR_ALL_LIST_ವಸ್ತುಗಳು(argslist, li)
 		    copy_tv(&li->li_tv, curtv++);
 	    }
 	    list_unref(argslist);
 	}
-	if (selfdict != NULL)
+	ಆದರೆ (selfdict != ಖಾಲಿ)
 	{
 	    auto_rebind = FALSE;
-	    autoRebindObject = PyDict_GetItemString(kwargs, "auto_rebind");
-	    if (autoRebindObject != NULL)
+	    autoRebindObject = Py_Dict_Get_ಅಂಶ_String(kwargs, "auto_rebind");
+	    ಆದರೆ (autoRebindObject != ಖಾಲಿ)
 	    {
 		auto_rebind = PyObject_IsTrue(autoRebindObject);
-		if (auto_rebind == -1)
+		ಆದರೆ (auto_rebind == -1)
 		{
 		    dict_unref(selfdict);
 		    list_unref(argslist);
-		    return NULL;
+		    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 		}
 	    }
 	}
     }
 
-    if (!PyArg_ParseTuple(args, "et", "ascii", &name))
+    ಆದರೆ (!PyArg_ParseTuple(ವಾದಗಳು, "et", "ascii", &name))
     {
 	dict_unref(selfdict);
-	while (argc--)
+	ಆಗ (argc--)
 	    clear_tv(&argv[argc]);
 	PyMem_Free(argv);
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
     self = FunctionNew(subtype, name, argc, argv, selfdict, auto_rebind);
 
     PyMem_Free(name);
 
-    return self;
+    ಹಿಂತಿರುಗಿ self;
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 FunctionDestructor(PyObject *self_obj)
 {
     FunctionObject *self = (FunctionObject*)self_obj;
-    int i;
+    ಪೂರ್ಣಾಂಕ i;
     func_unref(self->name);
     vim_free(self->name);
-    for (i = 0; i < self->argc; ++i)
+    ಗಾಗಿ (i = 0; i < self->argc; ++i)
 	clear_tv(&self->argv[i]);
     PyMem_Free(self->argv);
     dict_unref(self->self);
-    if (self->argv || self->self)
+    ಆದರೆ (self->argv || self->self)
 	pyll_remove(&self->ref, &lastfunc);
 
-    DESTRUCTOR_FINISH(self);
+    DESTRUCTOR_ಮುಕ್ತಾಯ(self);
 }
 
-static char *FunctionAttrs[] = {
+ಸ್ಥಿರ ಅಕ್ಷರ *FunctionAttrs[] = {
     "softspace", "args", "self", "auto_rebind",
-    NULL
+    ಖಾಲಿ
 };
 
-    static PyObject *
-FunctionDir(PyObject *self, PyObject *args UNUSED)
+    ಸ್ಥಿರ PyObject *
+FunctionDir(PyObject *self, PyObject *ವಾದಗಳು ಬಳಸದ)
 {
-    return ObjectDir(self, FunctionAttrs);
+    ಹಿಂತಿರುಗಿ ObjectDir(self, FunctionAttrs);
 }
 
-    static PyObject *
-FunctionAttr(FunctionObject *self, char *name)
+    ಸ್ಥಿರ PyObject *
+FunctionAttr(FunctionObject *self, ಅಕ್ಷರ *name)
 {
     list_T *list;
-    int i;
-    if (strcmp(name, "name") == 0)
-	return PyString_FromString((char *)(self->name));
-    else if (strcmp(name, "args") == 0)
+    ಪೂರ್ಣಾಂಕ i;
+    ಆದರೆ (strcmp(name, "name") == 0)
+	ಹಿಂತಿರುಗಿ PyString_FromString((ಅಕ್ಷರ *)(self->name));
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "args") == 0)
     {
-	if (self->argv == NULL || (list = list_alloc()) == NULL)
-	    return ALWAYS_NONE;
+	ಆದರೆ (self->argv == ಖಾಲಿ || (list = list_alloc()) == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ ALWAYS_NONE;
 
-	for (i = 0; i < self->argc; ++i)
+	ಗಾಗಿ (i = 0; i < self->argc; ++i)
 	    list_append_tv(list, &self->argv[i]);
-	return NEW_LIST(list);
+	ಹಿಂತಿರುಗಿ NEW_LIST(list);
     }
-    else if (strcmp(name, "self") == 0)
-	return self->self == NULL
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "self") == 0)
+	ಹಿಂತಿರುಗಿ self->self == ಖಾಲಿ
 	    ? ALWAYS_NONE
 	    : NEW_DICTIONARY(self->self);
-    else if (strcmp(name, "auto_rebind") == 0)
-	return self->auto_rebind
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "auto_rebind") == 0)
+	ಹಿಂತಿರುಗಿ self->auto_rebind
 	    ? ALWAYS_TRUE
 	    : ALWAYS_FALSE;
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, FunctionAttrs);
-    return NULL;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "__members__") == 0)
+	ಹಿಂತಿರುಗಿ ObjectDir(ಖಾಲಿ, FunctionAttrs);
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
@@ -3833,129 +3833,129 @@ FunctionAttr(FunctionObject *self, char *name)
  * "exported" should be set to true when it is needed to construct a partial
  * that may be stored in a variable (i.e. may be freed by Vim).
  */
-    static void
-set_partial(FunctionObject *self, partial_T *pt, int exported)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_partial(FunctionObject *self, partial_T *pt, ಪೂರ್ಣಾಂಕ exported)
 {
-    int i;
+    ಪೂರ್ಣಾಂಕ i;
 
     pt->pt_name = self->name;
-    if (self->argv)
+    ಆದರೆ (self->argv)
     {
 	pt->pt_argc = self->argc;
-	if (exported)
+	ಆದರೆ (exported)
 	{
 	    pt->pt_argv = ALLOC_CLEAR_MULT(typval_T, self->argc);
-	    for (i = 0; i < pt->pt_argc; ++i)
+	    ಗಾಗಿ (i = 0; i < pt->pt_argc; ++i)
 		copy_tv(&self->argv[i], &pt->pt_argv[i]);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    pt->pt_argv = self->argv;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	pt->pt_argc = 0;
-	pt->pt_argv = NULL;
+	pt->pt_argv = ಖಾಲಿ;
     }
     pt->pt_auto = self->auto_rebind || !exported;
     pt->pt_dict = self->self;
-    if (exported && self->self)
+    ಆದರೆ (exported && self->self)
 	++pt->pt_dict->dv_refcount;
-    if (exported)
+    ಆದರೆ (exported)
 	pt->pt_name = vim_strsave(pt->pt_name);
     pt->pt_refcount = 1;
 }
 
-    static PyObject *
-FunctionCall(PyObject *self_obj, PyObject *argsObject, PyObject *kwargs)
+    ಸ್ಥಿರ PyObject *
+FunctionCall(PyObject *self_obj, PyObject *ವಾದಗಳು_Object, PyObject *kwargs)
 {
     FunctionObject *self = (FunctionObject*)self_obj;
     char_u	*name = self->name;
-    typval_T	args;
+    typval_T	ವಾದಗಳು;
     typval_T	selfdicttv;
     typval_T	rettv;
-    dict_T	*selfdict = NULL;
+    dict_T	*selfdict = ಖಾಲಿ;
     PyObject	*selfdictObject;
     PyObject	*ret;
-    int		error;
+    ಪೂರ್ಣಾಂಕ		error;
     partial_T	pt;
-    partial_T	*pt_ptr = NULL;
+    partial_T	*pt_ptr = ಖಾಲಿ;
 
-    if (ConvertFromPySequence(argsObject, &args) == -1)
-	return NULL;
+    ಆದರೆ (ConvertFromPySequence(ವಾದಗಳು_Object, &ವಾದಗಳು) == -1)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (kwargs != NULL)
+    ಆದರೆ (kwargs != ಖಾಲಿ)
     {
-	selfdictObject = PyDict_GetItemString(kwargs, "self");
-	if (selfdictObject != NULL)
+	selfdictObject = Py_Dict_Get_ಅಂಶ_String(kwargs, "self");
+	ಆದರೆ (selfdictObject != ಖಾಲಿ)
 	{
-	    if (ConvertFromPyMapping(selfdictObject, &selfdicttv) == -1)
+	    ಆದರೆ (ConvertFromPyMapping(selfdictObject, &selfdicttv) == -1)
 	    {
-		clear_tv(&args);
-		return NULL;
+		clear_tv(&ವಾದಗಳು);
+		ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	    }
 	    selfdict = selfdicttv.vval.v_dict;
 	}
     }
 
-    if (self->argv || self->self)
+    ಆದರೆ (self->argv || self->self)
     {
-	CLEAR_FIELD(pt);
-	set_partial(self, &pt, FALSE);
+	CLEAR_ಕ್ಷೇತ್ರ(pt);
+	ಗಣ_partial(self, &pt, FALSE);
 	pt_ptr = &pt;
     }
 
-    Py_BEGIN_ALLOW_THREADS
-    Python_Lock_Vim();
+    Py_BEGIN_ALLOW_ಎಳೆಗಳು
+    Python_ಬೀಗ_Vim();
 
-    VimTryStart();
-    error = func_call(name, &args, pt_ptr, selfdict, &rettv);
+    Vim_Try_ಆರಂಭ();
+    error = func_call(name, &ವಾದಗಳು, pt_ptr, selfdict, &rettv);
 
     Python_Release_Vim();
-    Py_END_ALLOW_THREADS
+    Py_ಕೊನೆ_ALLOW_ಎಳೆಗಳು
 
-    if (VimTryEnd())
-	ret = NULL;
-    else if (error != OK)
+    ಆದರೆ (Vim_Try_ಕೊನೆ())
+	ret = ಖಾಲಿ;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (error != OK)
     {
-	ret = NULL;
-	PyErr_VIM_FORMAT(N_("failed to run function %s"), (char *)name);
+	ret = ಖಾಲಿ;
+	PyErr_VIM_FORMAT(N_("failed to run function %s"), (ಅಕ್ಷರ *)name);
     }
-    else
-	ret = ConvertToPyObject(&rettv);
+    ಇಲ್ಲದಿದ್ದರೆ
+	ret = Convert_ಗಮ್ಯ_Py_Object(&rettv);
 
-    clear_tv(&args);
+    clear_tv(&ವಾದಗಳು);
     clear_tv(&rettv);
-    if (selfdict != NULL)
+    ಆದರೆ (selfdict != ಖಾಲಿ)
 	clear_tv(&selfdicttv);
 
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-    static PyObject *
+    ಸ್ಥಿರ PyObject *
 FunctionRepr(PyObject *self_obj)
 {
     FunctionObject *self = (FunctionObject*)self_obj;
     PyObject *ret;
     garray_T repr_ga;
-    int i;
-    char_u *tofree = NULL;
+    ಪೂರ್ಣಾಂಕ i;
+    char_u *tofree = ಖಾಲಿ;
     typval_T tv;
     char_u numbuf[NUMBUFLEN];
 
-    ga_init2(&repr_ga, sizeof(char), 70);
+    ga_init2(&repr_ga, ಗಾತ್ರ(ಅಕ್ಷರ), 70);
     ga_concat(&repr_ga, (char_u *)"<vim.Function '");
-    if (self->name)
+    ಆದರೆ (self->name)
 	ga_concat(&repr_ga, self->name);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	ga_concat(&repr_ga, (char_u *)"<NULL>");
     ga_append(&repr_ga, '\'');
-    if (self->argv)
+    ಆದರೆ (self->argv)
     {
 	ga_concat(&repr_ga, (char_u *)", args=[");
 	++emsg_silent;
-	for (i = 0; i < self->argc; i++)
+	ಗಾಗಿ (i = 0; i < self->argc; i++)
 	{
-	    if (i != 0)
+	    ಆದರೆ (i != 0)
 		ga_concat(&repr_ga, (char_u *)", ");
 	    ga_concat(&repr_ga, tv2string(&self->argv[i], &tofree, numbuf,
 			get_copyID()));
@@ -3964,7 +3964,7 @@ FunctionRepr(PyObject *self_obj)
 	--emsg_silent;
 	ga_append(&repr_ga, ']');
     }
-    if (self->self)
+    ಆದರೆ (self->self)
     {
 	ga_concat(&repr_ga, (char_u *)", self=");
 	tv.v_type = VAR_DICT;
@@ -3973,18 +3973,18 @@ FunctionRepr(PyObject *self_obj)
 	ga_concat(&repr_ga, tv2string(&tv, &tofree, numbuf, get_copyID()));
 	--emsg_silent;
 	vim_free(tofree);
-	if (self->auto_rebind)
+	ಆದರೆ (self->auto_rebind)
 	    ga_concat(&repr_ga, (char_u *)", auto_rebind=True");
     }
     ga_append(&repr_ga, '>');
-    ret = PyString_FromString((char *)repr_ga.ga_data);
+    ret = PyString_FromString((ಅಕ್ಷರ *)repr_ga.ga_ದತ್ತಾಂಶ);
     ga_clear(&repr_ga);
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-static struct PyMethodDef FunctionMethods[] = {
+ಸ್ಥಿರ ರಚನೆ Py_ವಿಧಾನ_Def FunctionMethods[] = {
     {"__dir__",	(PyCFunction)FunctionDir,   METH_NOARGS,		""},
-    { NULL,	NULL,			0,				NULL}
+    { ಖಾಲಿ,	ಖಾಲಿ,			0,				ಖಾಲಿ}
 };
 
 /*
@@ -3993,362 +3993,362 @@ static struct PyMethodDef FunctionMethods[] = {
 
 DEFINE_PY_TYPE_OBJECT(OptionsType);
 
-typedef int (*checkfun)(void *);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಪೂರ್ಣಾಂಕ (*checkfun)(ಶೂನ್ಯ *);
 
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    PyObject_HEAD
-    int		opt_type;
-    void	*from;
+    Py_Object_ತಲೆ
+    ಪೂರ್ಣಾಂಕ		opt_type;
+    ಶೂನ್ಯ	*from;
     checkfun	Check;
     PyObject	*fromObj;
 } OptionsObject;
 
-    static int
-dummy_check(void *arg UNUSED)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+dummy_check(ಶೂನ್ಯ *arg ಬಳಸದ)
 {
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-    static PyObject *
-OptionsNew(int opt_type, void *from, checkfun Check, PyObject *fromObj)
+    ಸ್ಥಿರ PyObject *
+OptionsNew(ಪೂರ್ಣಾಂಕ opt_type, ಶೂನ್ಯ *from, checkfun Check, PyObject *fromObj)
 {
     OptionsObject	*self;
 
     self = PyObject_GC_New(OptionsObject, OptionsTypePtr);
-    if (self == NULL)
-	return NULL;
+    ಆದರೆ (self == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     self->opt_type = opt_type;
     self->from = from;
     self->Check = Check;
     self->fromObj = fromObj;
-    if (fromObj)
+    ಆದರೆ (fromObj)
 	Py_INCREF(fromObj);
 
-    return (PyObject *)(self);
+    ಹಿಂತಿರುಗಿ (PyObject *)(self);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 OptionsDestructor(PyObject *self_obj)
 {
     OptionsObject *self = (OptionsObject*)self_obj;
-    PyObject_GC_UnTrack((void *)(self));
+    PyObject_GC_UnTrack((ಶೂನ್ಯ *)(self));
     Py_XDECREF(self->fromObj);
-    PyObject_GC_Del((void *)(self));
+    PyObject_GC_Del((ಶೂನ್ಯ *)(self));
 }
 
-    static int
-OptionsTraverse(PyObject *self_obj, visitproc visit, void *arg)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+OptionsTraverse(PyObject *self_obj, visitproc ಭೇಟಿ, ಶೂನ್ಯ *arg)
 {
     OptionsObject *self = (OptionsObject*)self_obj;
-    Py_VISIT(self->fromObj);
-    return 0;
+    Py_ಭೇಟಿ(self->fromObj);
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 OptionsClear(PyObject *self_obj)
 {
     OptionsObject *self = (OptionsObject*)self_obj;
     Py_CLEAR(self->fromObj);
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-    static PyObject *
-OptionsItem(OptionsObject *self, PyObject *keyObject)
+    ಸ್ಥಿರ PyObject *
+Options_ಅಂಶ(OptionsObject *self, PyObject *ಕೀಲಿ_Object)
 {
-    char_u	*key;
-    int		flags;
-    long	numval;
+    char_u	*ಕೀಲಿ;
+    ಪೂರ್ಣಾಂಕ		flags;
+    ದೀರ್ಘ	numval;
     char_u	*stringval;
     PyObject	*todecref;
 
-    if (self->Check(self->fromObj))
-	return NULL;
+    ಆದರೆ (self->Check(self->fromObj))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (!(key = StringToChars(keyObject, &todecref)))
-	return NULL;
+    ಆದರೆ (!(ಕೀಲಿ = String_ಗಮ್ಯ_Chars(ಕೀಲಿ_Object, &todecref)))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (*key == NUL)
+    ಆದರೆ (*ಕೀಲಿ == NUL)
     {
-	RAISE_NO_EMPTY_KEYS;
+	RAISE_NO_ಖಾಲಿಗಳು_ಕೀಲಿಗಳು;
 	Py_XDECREF(todecref);
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    flags = get_option_value_strict(key, &numval, &stringval,
+    flags = get_option_ಮೌಲ್ಯ_strict(ಕೀಲಿ, &numval, &stringval,
 				    self->opt_type, self->from);
 
     Py_XDECREF(todecref);
 
-    if (flags == 0)
+    ಆದರೆ (flags == 0)
     {
-	PyErr_SetObject(PyExc_KeyError, keyObject);
-	return NULL;
+	Py_Err_ಗಣ_Object(Py_Exc_ಕೀಲಿ_Error, ಕೀಲಿ_Object);
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    if (flags & SOPT_UNSET)
+    ಆದರೆ (flags & SOPT_UNSET)
     {
 	Py_INCREF(Py_None);
-	return Py_None;
+	ಹಿಂತಿರುಗಿ Py_None;
     }
-    else if (flags & SOPT_BOOL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (flags & SOPT_BOOL)
     {
 	PyObject	*ret;
 	ret = numval ? Py_True : Py_False;
 	Py_INCREF(ret);
-	return ret;
+	ಹಿಂತಿರುಗಿ ret;
     }
-    else if (flags & SOPT_NUM)
-	return PyInt_FromLong(numval);
-    else if (flags & SOPT_STRING)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (flags & SOPT_ಅಂಕೆ)
+	ಹಿಂತಿರುಗಿ PyInt_FromLong(numval);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (flags & SOPT_STRING)
     {
-	if (stringval)
+	ಆದರೆ (stringval)
 	{
-	    PyObject	*ret = PyBytes_FromString((char *)stringval);
+	    PyObject	*ret = Py_ಬೈಟುಗಳು_From_String((ಅಕ್ಷರ *)stringval);
 	    vim_free(stringval);
-	    return ret;
+	    ಹಿಂತಿರುಗಿ ret;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    PyErr_SET_STRING(PyExc_RuntimeError,
+	    Py_Err_ಗಣ_STRING(PyExc_RuntimeError,
 		    N_("unable to get option value"));
-	    return NULL;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	PyErr_SET_VIM(N_("internal error: unknown option type"));
-	return NULL;
+	Py_Err_ಗಣ_VIM(N_("internal error: unknown option type"));
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 }
 
-    static int
-OptionsContains(OptionsObject *self, PyObject *keyObject)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+Options_ಒಳಗೊಂಡಿದೆ(OptionsObject *self, PyObject *ಕೀಲಿ_Object)
 {
-    char_u	*key;
+    char_u	*ಕೀಲಿ;
     PyObject	*todecref;
 
-    if (!(key = StringToChars(keyObject, &todecref)))
-	return -1;
+    ಆದರೆ (!(ಕೀಲಿ = String_ಗಮ್ಯ_Chars(ಕೀಲಿ_Object, &todecref)))
+	ಹಿಂತಿರುಗಿ -1;
 
-    if (*key == NUL)
+    ಆದರೆ (*ಕೀಲಿ == NUL)
     {
 	Py_XDECREF(todecref);
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
     }
 
-    if (get_option_value_strict(key, NULL, NULL, self->opt_type, NULL))
+    ಆದರೆ (get_option_ಮೌಲ್ಯ_strict(ಕೀಲಿ, ಖಾಲಿ, ಖಾಲಿ, self->opt_type, ಖಾಲಿ))
     {
 	Py_XDECREF(todecref);
-	return 1;
+	ಹಿಂತಿರುಗಿ 1;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	Py_XDECREF(todecref);
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
     }
 }
 
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    void	*lastoption;
-    int		opt_type;
+    ಶೂನ್ಯ	*lastoption;
+    ಪೂರ್ಣಾಂಕ		opt_type;
 } optiterinfo_T;
 
-    static PyObject *
-OptionsIterNext(void **arg)
+    ಸ್ಥಿರ PyObject *
+Options_Iter_ಮುಂದಿನ(ಶೂನ್ಯ **arg)
 {
     char_u	*name;
     optiterinfo_T **oii = (optiterinfo_T**)arg;
 
-    if ((name = option_iter_next(&((*oii)->lastoption), (*oii)->opt_type)))
-	return PyString_FromString((char *)name);
+    ಆದರೆ ((name = option_iter_ಮುಂದಿನ(&((*oii)->lastoption), (*oii)->opt_type)))
+	ಹಿಂತಿರುಗಿ PyString_FromString((ಅಕ್ಷರ *)name);
 
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
-    static PyObject *
+    ಸ್ಥಿರ PyObject *
 OptionsIter(PyObject *self_obj)
 {
     OptionsObject	*self = (OptionsObject*)self_obj;
     optiterinfo_T	*oii;
 
-    if (!(oii = PyMem_New(optiterinfo_T, 1)))
+    ಆದರೆ (!(oii = PyMem_New(optiterinfo_T, 1)))
     {
-	PyErr_NoMemory();
-	return NULL;
+	Py_Err_No_ಸ್ಮರಣೆ();
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
     oii->opt_type = self->opt_type;
-    oii->lastoption = NULL;
+    oii->lastoption = ಖಾಲಿ;
 
-    return IterNew(oii,
-	    PyMem_Free, OptionsIterNext,
-	    NULL, NULL, (PyObject *)self);
+    ಹಿಂತಿರುಗಿ IterNew(oii,
+	    PyMem_Free, Options_Iter_ಮುಂದಿನ,
+	    ಖಾಲಿ, ಖಾಲಿ, (PyObject *)self);
 }
 
-    static int
-set_option_value_err(char_u *key, int numval, char_u *stringval, int opt_flags)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಗಣ_option_ಮೌಲ್ಯ_err(char_u *ಕೀಲಿ, ಪೂರ್ಣಾಂಕ numval, char_u *stringval, ಪೂರ್ಣಾಂಕ opt_flags)
 {
-    char	*errmsg;
+    ಅಕ್ಷರ	*errmsg;
 
-    if ((errmsg = set_option_value(key, numval, stringval, opt_flags)))
+    ಆದರೆ ((errmsg = ಗಣ_option_ಮೌಲ್ಯ(ಕೀಲಿ, numval, stringval, opt_flags)))
     {
-	if (VimTryEnd())
-	    return FAIL;
-	PyErr_SetVim(errmsg);
-	return FAIL;
+	ಆದರೆ (Vim_Try_ಕೊನೆ())
+	    ಹಿಂತಿರುಗಿ FAIL;
+	Py_Err_ಗಣ_Vim(errmsg);
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-    static int
-set_option_value_for(
-	char_u *key,
-	int numval,
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಗಣ_option_ಮೌಲ್ಯ_for(
+	char_u *ಕೀಲಿ,
+	ಪೂರ್ಣಾಂಕ numval,
 	char_u *stringval,
-	int opt_flags,
-	int opt_type,
-	void *from)
+	ಪೂರ್ಣಾಂಕ opt_flags,
+	ಪೂರ್ಣಾಂಕ opt_type,
+	ಶೂನ್ಯ *from)
 {
     switchwin_T	switchwin;
     bufref_T	save_curbuf;
-    int		set_ret = 0;
+    ಪೂರ್ಣಾಂಕ		ಗಣ_ret = 0;
 
-    VimTryStart();
-    switch (opt_type)
+    Vim_Try_ಆರಂಭ();
+    ಆಯ್ಕೆ (opt_type)
     {
-	case SREQ_WIN:
-	    if (switch_win(&switchwin, (win_T *)from,
-			      win_find_tabpage((win_T *)from), FALSE) == FAIL)
+	ಸ್ಥಿತಿ SREQ_WIN:
+	    ಆದರೆ (switch_win(&switchwin, (win_T *)from,
+			      win_ಕಂಡುಹಿಡಿ_tabpage((win_T *)from), FALSE) == FAIL)
 	    {
 		restore_win(&switchwin, TRUE);
-		if (VimTryEnd())
-		    return -1;
-		PyErr_SET_VIM(N_("problem while switching windows"));
-		return -1;
+		ಆದರೆ (Vim_Try_ಕೊನೆ())
+		    ಹಿಂತಿರುಗಿ -1;
+		Py_Err_ಗಣ_VIM(N_("problem while switching windows"));
+		ಹಿಂತಿರುಗಿ -1;
 	    }
-	    set_ret = set_option_value_err(key, numval, stringval, opt_flags);
+	    ಗಣ_ret = ಗಣ_option_ಮೌಲ್ಯ_err(ಕೀಲಿ, numval, stringval, opt_flags);
 	    restore_win(&switchwin, TRUE);
-	    break;
-	case SREQ_BUF:
-	    switch_buffer(&save_curbuf, (buf_T *)from);
-	    set_ret = set_option_value_err(key, numval, stringval, opt_flags);
-	    restore_buffer(&save_curbuf);
-	    break;
-	case SREQ_GLOBAL:
-	    set_ret = set_option_value_err(key, numval, stringval, opt_flags);
-	    break;
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ SREQ_BUF:
+	    switch_ಬಫರ್(&save_curbuf, (buf_T *)from);
+	    ಗಣ_ret = ಗಣ_option_ಮೌಲ್ಯ_err(ಕೀಲಿ, numval, stringval, opt_flags);
+	    restore_ಬಫರ್(&save_curbuf);
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ SREQ_GLOBAL:
+	    ಗಣ_ret = ಗಣ_option_ಮೌಲ್ಯ_err(ಕೀಲಿ, numval, stringval, opt_flags);
+	    ನಿಲ್ಲಿಸು;
     }
-    if (set_ret == FAIL)
-	return -1;
-    return VimTryEnd();
+    ಆದರೆ (ಗಣ_ret == FAIL)
+	ಹಿಂತಿರುಗಿ -1;
+    ಹಿಂತಿರುಗಿ Vim_Try_ಕೊನೆ();
 }
 
-    static int
-OptionsAssItem(OptionsObject *self, PyObject *keyObject, PyObject *valObject)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+Options_Ass_ಅಂಶ(OptionsObject *self, PyObject *ಕೀಲಿ_Object, PyObject *valObject)
 {
-    char_u	*key;
-    int		flags;
-    int		opt_flags;
-    int		ret = 0;
+    char_u	*ಕೀಲಿ;
+    ಪೂರ್ಣಾಂಕ		flags;
+    ಪೂರ್ಣಾಂಕ		opt_flags;
+    ಪೂರ್ಣಾಂಕ		ret = 0;
     PyObject	*todecref;
 
-    if (self->Check(self->fromObj))
-	return -1;
+    ಆದರೆ (self->Check(self->fromObj))
+	ಹಿಂತಿರುಗಿ -1;
 
-    if (!(key = StringToChars(keyObject, &todecref)))
-	return -1;
+    ಆದರೆ (!(ಕೀಲಿ = String_ಗಮ್ಯ_Chars(ಕೀಲಿ_Object, &todecref)))
+	ಹಿಂತಿರುಗಿ -1;
 
-    if (*key == NUL)
+    ಆದರೆ (*ಕೀಲಿ == NUL)
     {
-	RAISE_NO_EMPTY_KEYS;
+	RAISE_NO_ಖಾಲಿಗಳು_ಕೀಲಿಗಳು;
 	Py_XDECREF(todecref);
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 
-    flags = get_option_value_strict(key, NULL, NULL,
+    flags = get_option_ಮೌಲ್ಯ_strict(ಕೀಲಿ, ಖಾಲಿ, ಖಾಲಿ,
 				    self->opt_type, self->from);
 
-    if (flags == 0)
+    ಆದರೆ (flags == 0)
     {
-	PyErr_SetObject(PyExc_KeyError, keyObject);
+	Py_Err_ಗಣ_Object(Py_Exc_ಕೀಲಿ_Error, ಕೀಲಿ_Object);
 	Py_XDECREF(todecref);
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 
-    if (valObject == NULL)
+    ಆದರೆ (valObject == ಖಾಲಿ)
     {
-	if (self->opt_type == SREQ_GLOBAL)
+	ಆದರೆ (self->opt_type == SREQ_GLOBAL)
 	{
-	    PyErr_FORMAT(PyExc_ValueError,
-		    N_("unable to unset global option %s"), key);
+	    PyErr_FORMAT(Py_Exc_ಮೌಲ್ಯ_Error,
+		    N_("unable to unset global option %s"), ಕೀಲಿ);
 	    Py_XDECREF(todecref);
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
-	else if (!(flags & SOPT_GLOBAL))
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!(flags & SOPT_GLOBAL))
 	{
-	    PyErr_FORMAT(PyExc_ValueError,
+	    PyErr_FORMAT(Py_Exc_ಮೌಲ್ಯ_Error,
 		    N_("unable to unset option %s "
-		       "which does not have global value"), key);
+		       "which does not have global value"), ಕೀಲಿ);
 	    Py_XDECREF(todecref);
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    unset_global_local_option(key, self->from);
+	    unset_global_local_option(ಕೀಲಿ, self->from);
 	    Py_XDECREF(todecref);
-	    return 0;
+	    ಹಿಂತಿರುಗಿ 0;
 	}
     }
 
     opt_flags = (self->opt_type ? OPT_LOCAL : OPT_GLOBAL);
 
-    if (flags & SOPT_BOOL)
+    ಆದರೆ (flags & SOPT_BOOL)
     {
-	int	istrue = PyObject_IsTrue(valObject);
+	ಪೂರ್ಣಾಂಕ	istrue = PyObject_IsTrue(valObject);
 
-	if (istrue == -1)
+	ಆದರೆ (istrue == -1)
 	    ret = -1;
-	else
-	    ret = set_option_value_for(key, istrue, NULL,
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ret = ಗಣ_option_ಮೌಲ್ಯ_for(ಕೀಲಿ, istrue, ಖಾಲಿ,
 				    opt_flags, self->opt_type, self->from);
     }
-    else if (flags & SOPT_NUM)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (flags & SOPT_ಅಂಕೆ)
     {
-	long	val;
+	ದೀರ್ಘ	val;
 
-	if (NumberToLong(valObject, &val, NUMBER_INT))
+	ಆದರೆ (ಸಂಖ್ಯೆ_ಗಮ್ಯ_Long(valObject, &val, ಸಂಖ್ಯೆ_INT))
 	{
 	    Py_XDECREF(todecref);
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 
-	ret = set_option_value_for(key, (int) val, NULL, opt_flags,
+	ret = ಗಣ_option_ಮೌಲ್ಯ_for(ಕೀಲಿ, (ಪೂರ್ಣಾಂಕ) val, ಖಾಲಿ, opt_flags,
 				self->opt_type, self->from);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	char_u		*val;
 	PyObject	*todecref2;
 
-	if ((val = StringToChars(valObject, &todecref2)))
+	ಆದರೆ ((val = String_ಗಮ್ಯ_Chars(valObject, &todecref2)))
 	{
-	    ret = set_option_value_for(key, 0, val, opt_flags,
+	    ret = ಗಣ_option_ಮೌಲ್ಯ_for(ಕೀಲಿ, 0, val, opt_flags,
 				    self->opt_type, self->from);
 	    Py_XDECREF(todecref2);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    ret = -1;
     }
 
     Py_XDECREF(todecref);
 
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-static PySequenceMethods OptionsAsSeq = {
+ಸ್ಥಿರ PySequenceMethods OptionsAsSeq = {
     0,					// sq_length
     0,					// sq_concat
     0,					// sq_repeat
@@ -4356,141 +4356,141 @@ static PySequenceMethods OptionsAsSeq = {
     0,					// sq_slice
     0,					// sq_ass_item
     0,					// sq_ass_slice
-    (objobjproc) OptionsContains,	// sq_contains
+    (objobjproc) Options_ಒಳಗೊಂಡಿದೆ,	// sq_contains
     0,					// sq_inplace_concat
     0,					// sq_inplace_repeat
 };
 
-static PyMappingMethods OptionsAsMapping = {
-    (lenfunc)       NULL,
-    (binaryfunc)    OptionsItem,
-    (objobjargproc) OptionsAssItem,
+ಸ್ಥಿರ PyMappingMethods OptionsAsMapping = {
+    (lenfunc)       ಖಾಲಿ,
+    (binaryfunc)    Options_ಅಂಶ,
+    (objobjargproc) Options_Ass_ಅಂಶ,
 };
 
 // Tabpage object
 
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    PyObject_HEAD
+    Py_Object_ತಲೆ
     tabpage_T	*tab;
-} TabPageObject;
+} Tab_ಪುಟ_Object;
 
-static PyObject *WinListNew(TabPageObject *tabObject);
+ಸ್ಥಿರ PyObject *WinListNew(Tab_ಪುಟ_Object *tabObject);
 
-DEFINE_PY_TYPE_OBJECT(TabPageType);
+DEFINE_PY_TYPE_OBJECT(Tab_ಪುಟ_Type);
 
-    static int
-CheckTabPage(TabPageObject *self)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+Check_Tab_ಪುಟ(Tab_ಪುಟ_Object *self)
 {
-    if (self->tab == INVALID_TABPAGE_VALUE)
+    ಆದರೆ (self->tab == INVALID_TABPAGE_ಮೌಲ್ಯ)
     {
-	PyErr_SET_VIM(N_("attempt to refer to deleted tab page"));
-	return -1;
+	Py_Err_ಗಣ_VIM(N_("attempt to refer to deleted tab page"));
+	ಹಿಂತಿರುಗಿ -1;
     }
 
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-    static PyObject *
-TabPageNew(tabpage_T *tab)
+    ಸ್ಥಿರ PyObject *
+Tab_ಪುಟ_New(tabpage_T *tab)
 {
-    TabPageObject *self;
+    Tab_ಪುಟ_Object *self;
 
-    if (TAB_PYTHON_REF(tab))
+    ಆದರೆ (TAB_PYTHON_REF(tab))
     {
 	self = TAB_PYTHON_REF(tab);
 	Py_INCREF((PyObject *)self);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	self = PyObject_NEW(TabPageObject, TabPageTypePtr);
-	if (self == NULL)
-	    return NULL;
+	self = PyObject_NEW(Tab_ಪುಟ_Object, Tab_ಪುಟ_Type_Ptr);
+	ಆದರೆ (self == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	self->tab = tab;
 	TAB_PYTHON_REF(tab) = self;
     }
 
-    return (PyObject *)(self);
+    ಹಿಂತಿರುಗಿ (PyObject *)(self);
 }
 
-    static void
-TabPageDestructor(PyObject *self_obj)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+Tab_ಪುಟ_Destructor(PyObject *self_obj)
 {
-    TabPageObject *self = (TabPageObject*)self_obj;
-    if (self->tab && self->tab != INVALID_TABPAGE_VALUE)
-	TAB_PYTHON_REF(self->tab) = NULL;
+    Tab_ಪುಟ_Object *self = (Tab_ಪುಟ_Object*)self_obj;
+    ಆದರೆ (self->tab && self->tab != INVALID_TABPAGE_ಮೌಲ್ಯ)
+	TAB_PYTHON_REF(self->tab) = ಖಾಲಿ;
 
-    DESTRUCTOR_FINISH(self);
+    DESTRUCTOR_ಮುಕ್ತಾಯ(self);
 }
 
-static char *TabPageAttrs[] = {
+ಸ್ಥಿರ ಅಕ್ಷರ *Tab_ಪುಟ_Attrs[] = {
     "windows", "number", "vars", "window", "valid",
-    NULL
+    ಖಾಲಿ
 };
 
-    static PyObject *
-TabPageDir(PyObject *self, PyObject *args UNUSED)
+    ಸ್ಥಿರ PyObject *
+Tab_ಪುಟ_Dir(PyObject *self, PyObject *ವಾದಗಳು ಬಳಸದ)
 {
-    return ObjectDir(self, TabPageAttrs);
+    ಹಿಂತಿರುಗಿ ObjectDir(self, Tab_ಪುಟ_Attrs);
 }
 
-    static PyObject *
-TabPageAttrValid(TabPageObject *self, char *name)
+    ಸ್ಥಿರ PyObject *
+Tab_ಪುಟ_Attr_Valid(Tab_ಪುಟ_Object *self, ಅಕ್ಷರ *name)
 {
     PyObject	*ret;
 
-    if (strcmp(name, "valid") != 0)
-	return NULL;
+    ಆದರೆ (strcmp(name, "valid") != 0)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    ret = ((self->tab == INVALID_TABPAGE_VALUE) ? Py_False : Py_True);
+    ret = ((self->tab == INVALID_TABPAGE_ಮೌಲ್ಯ) ? Py_False : Py_True);
     Py_INCREF(ret);
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-    static PyObject *
-TabPageAttr(TabPageObject *self, char *name)
+    ಸ್ಥಿರ PyObject *
+Tab_ಪುಟ_Attr(Tab_ಪುಟ_Object *self, ಅಕ್ಷರ *name)
 {
-    if (strcmp(name, "windows") == 0)
-	return WinListNew(self);
-    else if (strcmp(name, "number") == 0)
-	return PyLong_FromLong((long) get_tab_number(self->tab));
-    else if (strcmp(name, "vars") == 0)
-	return NEW_DICTIONARY(self->tab->tp_vars);
-    else if (strcmp(name, "window") == 0)
+    ಆದರೆ (strcmp(name, "windows") == 0)
+	ಹಿಂತಿರುಗಿ WinListNew(self);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "number") == 0)
+	ಹಿಂತಿರುಗಿ PyLong_FromLong((ದೀರ್ಘ) get_tab_ಸಂಖ್ಯೆ(self->tab));
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "vars") == 0)
+	ಹಿಂತಿರುಗಿ NEW_DICTIONARY(self->tab->tp_vars);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "window") == 0)
     {
 	// For current tab window.c does not bother to set or update tp_curwin
-	if (self->tab == curtab)
-	    return WindowNew(curwin, curtab);
-	else
-	    return WindowNew(self->tab->tp_curwin, self->tab);
+	ಆದರೆ (self->tab == curtab)
+	    ಹಿಂತಿರುಗಿ ಕಿಟಕಿ_New(curwin, curtab);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಹಿಂತಿರುಗಿ ಕಿಟಕಿ_New(self->tab->tp_curwin, self->tab);
     }
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, TabPageAttrs);
-    return NULL;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "__members__") == 0)
+	ಹಿಂತಿರುಗಿ ObjectDir(ಖಾಲಿ, Tab_ಪುಟ_Attrs);
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
-    static PyObject *
-TabPageRepr(PyObject *self_obj)
+    ಸ್ಥಿರ PyObject *
+Tab_ಪುಟ_Repr(PyObject *self_obj)
 {
-    TabPageObject *self = (TabPageObject*)self_obj;
-    if (self->tab == INVALID_TABPAGE_VALUE)
-	return PyString_FromFormat("<tabpage object (deleted) at %p>", (void *)self);
-    else
+    Tab_ಪುಟ_Object *self = (Tab_ಪುಟ_Object*)self_obj;
+    ಆದರೆ (self->tab == INVALID_TABPAGE_ಮೌಲ್ಯ)
+	ಹಿಂತಿರುಗಿ PyString_FromFormat("<tabpage object (deleted) at %p>", (ಶೂನ್ಯ *)self);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	int	t = get_tab_number(self->tab);
+	ಪೂರ್ಣಾಂಕ	t = get_tab_ಸಂಖ್ಯೆ(self->tab);
 
-	if (t == 0)
-	    return PyString_FromFormat("<tabpage object (unknown) at %p>",
-					(void *)self);
-	else
-	    return PyString_FromFormat("<tabpage %d>", t - 1);
+	ಆದರೆ (t == 0)
+	    ಹಿಂತಿರುಗಿ PyString_FromFormat("<tabpage object (unknown) at %p>",
+					(ಶೂನ್ಯ *)self);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಹಿಂತಿರುಗಿ PyString_FromFormat("<tabpage %d>", t - 1);
     }
 }
 
-static struct PyMethodDef TabPageMethods[] = {
+ಸ್ಥಿರ ರಚನೆ Py_ವಿಧಾನ_Def Tab_ಪುಟ_Methods[] = {
     // name,	    function,			calling,	documentation
-    {"__dir__",	    (PyCFunction)TabPageDir,	METH_NOARGS,	""},
-    { NULL,	    NULL,			0,		NULL}
+    {"__dir__",	    (PyCFunction)Tab_ಪುಟ_Dir,	METH_NOARGS,	""},
+    { ಖಾಲಿ,	    ಖಾಲಿ,			0,		ಖಾಲಿ}
 };
 
 /*
@@ -4498,79 +4498,79 @@ static struct PyMethodDef TabPageMethods[] = {
  */
 
 DEFINE_PY_TYPE_OBJECT(TabListType);
-static PySequenceMethods TabListAsSeq;
+ಸ್ಥಿರ PySequenceMethods TabListAsSeq;
 
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    PyObject_HEAD
+    Py_Object_ತಲೆ
 } TabListObject;
 
-static TabListObject TheTabPageList =
+ಸ್ಥಿರ TabListObject The_Tab_ಪುಟ_List =
 {
-    PyObject_HEAD_INIT_TYPE(TabListType)
+    Py_Object_ತಲೆ_INIT_TYPE(TabListType)
 };
 
-    static PyInt
-TabListLength(PyObject *self UNUSED)
+    ಸ್ಥಿರ PyInt
+Tab_List_ಉದ್ದಳತೆ(PyObject *self ಬಳಸದ)
 {
-    tabpage_T	*tp = first_tabpage;
+    tabpage_T	*tp = ಮೊದಲ_tabpage;
     PyInt	n = 0;
 
-    while (tp != NULL)
+    ಆಗ (tp != ಖಾಲಿ)
     {
 	++n;
-	tp = tp->tp_next;
+	tp = tp->tp_ಮುಂದಿನ;
     }
 
-    return n;
+    ಹಿಂತಿರುಗಿ n;
 }
 
-    static PyObject *
-TabListItem(PyObject *self UNUSED, PyInt n)
+    ಸ್ಥಿರ PyObject *
+Tab_List_ಅಂಶ(PyObject *self ಬಳಸದ, PyInt n)
 {
     tabpage_T	*tp;
 
-    for (tp = first_tabpage; tp != NULL; tp = tp->tp_next, --n)
-	if (n == 0)
-	    return TabPageNew(tp);
+    ಗಾಗಿ (tp = ಮೊದಲ_tabpage; tp != ಖಾಲಿ; tp = tp->tp_ಮುಂದಿನ, --n)
+	ಆದರೆ (n == 0)
+	    ಹಿಂತಿರುಗಿ Tab_ಪುಟ_New(tp);
 
-    PyErr_SET_STRING(PyExc_IndexError, N_("no such tab page"));
-    return NULL;
+    Py_Err_ಗಣ_STRING(Py_Exc_ಸೂಚ್ಯಂಕ_Error, N_("no such tab page"));
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Window object
  */
 
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    PyObject_HEAD
+    Py_Object_ತಲೆ
     win_T	*win;
-    TabPageObject	*tabObject;
-} WindowObject;
+    Tab_ಪುಟ_Object	*tabObject;
+} ಕಿಟಕಿ_Object;
 
-DEFINE_PY_TYPE_OBJECT(WindowType);
+DEFINE_PY_TYPE_OBJECT(ಕಿಟಕಿ_Type);
 
-    static int
-CheckWindow(WindowObject *self)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+Check_ಕಿಟಕಿ(ಕಿಟಕಿ_Object *self)
 {
-    if (self->win == INVALID_WINDOW_VALUE)
+    ಆದರೆ (self->win == INVALID_ಕಿಟಕಿ_ಮೌಲ್ಯ)
     {
-	PyErr_SET_VIM(N_("attempt to refer to deleted window"));
-	return -1;
+	Py_Err_ಗಣ_VIM(N_("attempt to refer to deleted window"));
+	ಹಿಂತಿರುಗಿ -1;
     }
 
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-    static int
-CheckWindowCb(void *self)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+Check_ಕಿಟಕಿ_Cb(ಶೂನ್ಯ *self)
 {
-    return CheckWindow((WindowObject*)self);
+    ಹಿಂತಿರುಗಿ Check_ಕಿಟಕಿ((ಕಿಟಕಿ_Object*)self);
 }
 
-    static PyObject *
-WindowNew(win_T *win, tabpage_T *tab)
+    ಸ್ಥಿರ PyObject *
+ಕಿಟಕಿ_New(win_T *win, tabpage_T *tab)
 {
     /*
      * We need to handle deletion of windows underneath us.
@@ -4588,73 +4588,73 @@ WindowNew(win_T *win, tabpage_T *tab)
      * w_python_ref and w_python3_ref fields respectively.
      */
 
-    WindowObject *self;
+    ಕಿಟಕಿ_Object *self;
 
-    if (WIN_PYTHON_REF(win))
+    ಆದರೆ (WIN_PYTHON_REF(win))
     {
 	self = WIN_PYTHON_REF(win);
 	Py_INCREF((PyObject *)self);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	self = PyObject_GC_New(WindowObject, WindowTypePtr);
-	if (self == NULL)
-	    return NULL;
+	self = PyObject_GC_New(ಕಿಟಕಿ_Object, ಕಿಟಕಿ_Type_Ptr);
+	ಆದರೆ (self == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	self->win = win;
 	WIN_PYTHON_REF(win) = self;
     }
 
-    self->tabObject = ((TabPageObject *)(TabPageNew(tab)));
+    self->tabObject = ((Tab_ಪುಟ_Object *)(Tab_ಪುಟ_New(tab)));
 
-    return (PyObject *)(self);
+    ಹಿಂತಿರುಗಿ (PyObject *)(self);
 }
 
-    static void
-WindowDestructor(PyObject *self_obj)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಕಿಟಕಿ_Destructor(PyObject *self_obj)
 {
-    WindowObject *self = (WindowObject*)self_obj;
-    PyObject_GC_UnTrack((void *)(self));
-    if (self->win && self->win != INVALID_WINDOW_VALUE)
-	WIN_PYTHON_REF(self->win) = NULL;
+    ಕಿಟಕಿ_Object *self = (ಕಿಟಕಿ_Object*)self_obj;
+    PyObject_GC_UnTrack((ಶೂನ್ಯ *)(self));
+    ಆದರೆ (self->win && self->win != INVALID_ಕಿಟಕಿ_ಮೌಲ್ಯ)
+	WIN_PYTHON_REF(self->win) = ಖಾಲಿ;
     Py_XDECREF(((PyObject *)(self->tabObject)));
-    PyObject_GC_Del((void *)(self));
+    PyObject_GC_Del((ಶೂನ್ಯ *)(self));
 }
 
-    static int
-WindowTraverse(PyObject *self_obj, visitproc visit, void *arg)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಕಿಟಕಿ_Traverse(PyObject *self_obj, visitproc ಭೇಟಿ, ಶೂನ್ಯ *arg)
 {
-    WindowObject *self = (WindowObject*)self_obj;
-    Py_VISIT(((PyObject *)(self->tabObject)));
-    return 0;
+    ಕಿಟಕಿ_Object *self = (ಕಿಟಕಿ_Object*)self_obj;
+    Py_ಭೇಟಿ(((PyObject *)(self->tabObject)));
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-    static int
-WindowClear(PyObject *self_obj)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಕಿಟಕಿ_Clear(PyObject *self_obj)
 {
-    WindowObject *self = (WindowObject*)self_obj;
+    ಕಿಟಕಿ_Object *self = (ಕಿಟಕಿ_Object*)self_obj;
     Py_CLEAR(self->tabObject);
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-    static win_T *
-get_firstwin(TabPageObject *tabObject)
+    ಸ್ಥಿರ win_T *
+get_firstwin(Tab_ಪುಟ_Object *tabObject)
 {
-    if (tabObject)
+    ಆದರೆ (tabObject)
     {
-	if (CheckTabPage(tabObject))
-	    return NULL;
+	ಆದರೆ (Check_Tab_ಪುಟ(tabObject))
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	// For current tab window.c does not bother to set or update tp_firstwin
-	else if (tabObject->tab == curtab)
-	    return firstwin;
-	else
-	    return tabObject->tab->tp_firstwin;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (tabObject->tab == curtab)
+	    ಹಿಂತಿರುಗಿ firstwin;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಹಿಂತಿರುಗಿ tabObject->tab->tp_firstwin;
     }
-    else
-	return firstwin;
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಹಿಂತಿರುಗಿ firstwin;
 }
 
 // Use the same order as in the WindowAttr() function.
-static char *WindowAttrs[] = {
+ಸ್ಥಿರ ಅಕ್ಷರ *ಕಿಟಕಿ_Attrs[] = {
     "buffer",
     "cursor",
     "height",
@@ -4666,187 +4666,187 @@ static char *WindowAttrs[] = {
     "number",
     "tabpage",
     "valid",
-    NULL
+    ಖಾಲಿ
 };
 
-    static PyObject *
-WindowDir(PyObject *self, PyObject *args UNUSED)
+    ಸ್ಥಿರ PyObject *
+ಕಿಟಕಿ_Dir(PyObject *self, PyObject *ವಾದಗಳು ಬಳಸದ)
 {
-    return ObjectDir(self, WindowAttrs);
+    ಹಿಂತಿರುಗಿ ObjectDir(self, ಕಿಟಕಿ_Attrs);
 }
 
-    static PyObject *
-WindowAttrValid(WindowObject *self, char *name)
+    ಸ್ಥಿರ PyObject *
+ಕಿಟಕಿ_Attr_Valid(ಕಿಟಕಿ_Object *self, ಅಕ್ಷರ *name)
 {
     PyObject	*ret;
 
-    if (strcmp(name, "valid") != 0)
-	return NULL;
+    ಆದರೆ (strcmp(name, "valid") != 0)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    ret = ((self->win == INVALID_WINDOW_VALUE) ? Py_False : Py_True);
+    ret = ((self->win == INVALID_ಕಿಟಕಿ_ಮೌಲ್ಯ) ? Py_False : Py_True);
     Py_INCREF(ret);
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-    static PyObject *
-WindowAttr(WindowObject *self, char *name)
+    ಸ್ಥಿರ PyObject *
+ಕಿಟಕಿ_Attr(ಕಿಟಕಿ_Object *self, ಅಕ್ಷರ *name)
 {
-    if (strcmp(name, "buffer") == 0)
-	return (PyObject *)BufferNew(self->win->w_buffer);
-    else if (strcmp(name, "cursor") == 0)
+    ಆದರೆ (strcmp(name, "buffer") == 0)
+	ಹಿಂತಿರುಗಿ (PyObject *)ಬಫರ್_New(self->win->w_ಬಫರ್);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "cursor") == 0)
     {
 	pos_T *pos = &self->win->w_cursor;
 
-	return Py_BuildValue("(ll)", (long)(pos->lnum), (long)(pos->col));
+	ಹಿಂತಿರುಗಿ Py_Build_ಮೌಲ್ಯ("(ll)", (ದೀರ್ಘ)(pos->lnum), (ದೀರ್ಘ)(pos->ಲಂಬಸಾಲು));
     }
-    else if (strcmp(name, "height") == 0)
-	return PyLong_FromLong((long)(self->win->w_height));
-    else if (strcmp(name, "row") == 0)
-	return PyLong_FromLong((long)(self->win->w_winrow));
-    else if (strcmp(name, "width") == 0)
-	return PyLong_FromLong((long)(self->win->w_width));
-    else if (strcmp(name, "col") == 0)
-	return PyLong_FromLong((long)(self->win->w_wincol));
-    else if (strcmp(name, "vars") == 0)
-	return NEW_DICTIONARY(self->win->w_vars);
-    else if (strcmp(name, "options") == 0)
-	return OptionsNew(SREQ_WIN, self->win, CheckWindowCb,
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "height") == 0)
+	ಹಿಂತಿರುಗಿ PyLong_FromLong((ದೀರ್ಘ)(self->win->w_ಎತ್ತರ));
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "row") == 0)
+	ಹಿಂತಿರುಗಿ PyLong_FromLong((ದೀರ್ಘ)(self->win->w_winrow));
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "width") == 0)
+	ಹಿಂತಿರುಗಿ PyLong_FromLong((ದೀರ್ಘ)(self->win->w_ಅಗಲ));
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "col") == 0)
+	ಹಿಂತಿರುಗಿ PyLong_FromLong((ದೀರ್ಘ)(self->win->w_wincol));
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "vars") == 0)
+	ಹಿಂತಿರುಗಿ NEW_DICTIONARY(self->win->w_vars);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "options") == 0)
+	ಹಿಂತಿರುಗಿ OptionsNew(SREQ_WIN, self->win, Check_ಕಿಟಕಿ_Cb,
 			(PyObject *) self);
-    else if (strcmp(name, "number") == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "number") == 0)
     {
-	if (CheckTabPage(self->tabObject))
-	    return NULL;
-	return PyLong_FromLong((long)
-		get_win_number(self->win, get_firstwin(self->tabObject)));
+	ಆದರೆ (Check_Tab_ಪುಟ(self->tabObject))
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+	ಹಿಂತಿರುಗಿ PyLong_FromLong((ದೀರ್ಘ)
+		get_win_ಸಂಖ್ಯೆ(self->win, get_firstwin(self->tabObject)));
     }
-    else if (strcmp(name, "tabpage") == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "tabpage") == 0)
     {
 	Py_INCREF((PyObject *)self->tabObject);
-	return (PyObject *)(self->tabObject);
+	ಹಿಂತಿರುಗಿ (PyObject *)(self->tabObject);
     }
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, WindowAttrs);
-    else
-	return NULL;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "__members__") == 0)
+	ಹಿಂತಿರುಗಿ ObjectDir(ಖಾಲಿ, ಕಿಟಕಿ_Attrs);
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
-    static int
-WindowSetattr(PyObject *self_obj, char *name, PyObject *valObject)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಕಿಟಕಿ_Setattr(PyObject *self_obj, ಅಕ್ಷರ *name, PyObject *valObject)
 {
-    WindowObject *self = (WindowObject*)self_obj;
-    if (CheckWindow(self))
-	return -1;
+    ಕಿಟಕಿ_Object *self = (ಕಿಟಕಿ_Object*)self_obj;
+    ಆದರೆ (Check_ಕಿಟಕಿ(self))
+	ಹಿಂತಿರುಗಿ -1;
 
-    if (strcmp(name, "buffer") == 0)
+    ಆದರೆ (strcmp(name, "buffer") == 0)
     {
-	PyErr_SET_STRING(PyExc_TypeError, N_("readonly attribute: buffer"));
-	return -1;
+	Py_Err_ಗಣ_STRING(PyExc_TypeError, N_("readonly attribute: buffer"));
+	ಹಿಂತಿರುಗಿ -1;
     }
-    else if (strcmp(name, "cursor") == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "cursor") == 0)
     {
-	long lnum;
-	long col;
+	ದೀರ್ಘ lnum;
+	ದೀರ್ಘ ಲಂಬಸಾಲು;
 
-	if (!PyArg_Parse(valObject, "(ll)", &lnum, &col))
-	    return -1;
+	ಆದರೆ (!PyArg_Parse(valObject, "(ll)", &lnum, &ಲಂಬಸಾಲು))
+	    ಹಿಂತಿರುಗಿ -1;
 
-	if (lnum <= 0 || lnum > self->win->w_buffer->b_ml.ml_line_count)
+	ಆದರೆ (lnum <= 0 || lnum > self->win->w_ಬಫರ್->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
 	{
-	    PyErr_SET_VIM(N_("cursor position outside buffer"));
-	    return -1;
+	    Py_Err_ಗಣ_VIM(N_("cursor position outside buffer"));
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 
 	// Check for keyboard interrupts
-	if (VimCheckInterrupt())
-	    return -1;
+	ಆದರೆ (Vim_Check_ಅಡಚಣೆ())
+	    ಹಿಂತಿರುಗಿ -1;
 
 	self->win->w_cursor.lnum = lnum;
-	self->win->w_cursor.col = col;
-	self->win->w_set_curswant = TRUE;
+	self->win->w_cursor.ಲಂಬಸಾಲು = ಲಂಬಸಾಲು;
+	self->win->w_ಗಣ_curswant = TRUE;
 	self->win->w_cursor.coladd = 0;
 	// When column is out of range silently correct it.
-	check_cursor_col_win(self->win);
+	check_cursor_ಲಂಬಸಾಲು_win(self->win);
 
 	update_screen(UPD_VALID);
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
     }
-    else if (strcmp(name, "height") == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "height") == 0)
     {
-	long	height;
+	ದೀರ್ಘ	ಎತ್ತರ;
 	win_T	*savewin;
 
-	if (NumberToLong(valObject, &height, NUMBER_INT|NUMBER_UNSIGNED))
-	    return -1;
+	ಆದರೆ (ಸಂಖ್ಯೆ_ಗಮ್ಯ_Long(valObject, &ಎತ್ತರ, ಸಂಖ್ಯೆ_INT|ಸಂಖ್ಯೆ_UNSIGNED))
+	    ಹಿಂತಿರುಗಿ -1;
 
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 	need_mouse_correct = TRUE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	savewin = curwin;
 	curwin = self->win;
-	curbuf = curwin->w_buffer;
+	curbuf = curwin->w_ಬಫರ್;
 
-	VimTryStart();
-	win_setheight((int) height);
+	Vim_Try_ಆರಂಭ();
+	win_setheight((ಪೂರ್ಣಾಂಕ) ಎತ್ತರ);
 	curwin = savewin;
-	curbuf = curwin->w_buffer;
-	if (VimTryEnd())
-	    return -1;
+	curbuf = curwin->w_ಬಫರ್;
+	ಆದರೆ (Vim_Try_ಕೊನೆ())
+	    ಹಿಂತಿರುಗಿ -1;
 
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
     }
-    else if (strcmp(name, "width") == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "width") == 0)
     {
-	long	width;
+	ದೀರ್ಘ	ಅಗಲ;
 	win_T	*savewin;
 
-	if (NumberToLong(valObject, &width, NUMBER_INT|NUMBER_UNSIGNED))
-	    return -1;
+	ಆದರೆ (ಸಂಖ್ಯೆ_ಗಮ್ಯ_Long(valObject, &ಅಗಲ, ಸಂಖ್ಯೆ_INT|ಸಂಖ್ಯೆ_UNSIGNED))
+	    ಹಿಂತಿರುಗಿ -1;
 
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 	need_mouse_correct = TRUE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	savewin = curwin;
 	curwin = self->win;
-	curbuf = curwin->w_buffer;
+	curbuf = curwin->w_ಬಫರ್;
 
-	VimTryStart();
-	win_setwidth((int) width);
+	Vim_Try_ಆರಂಭ();
+	win_setwidth((ಪೂರ್ಣಾಂಕ) ಅಗಲ);
 	curwin = savewin;
-	curbuf = curwin->w_buffer;
-	if (VimTryEnd())
-	    return -1;
+	curbuf = curwin->w_ಬಫರ್;
+	ಆದರೆ (Vim_Try_ಕೊನೆ())
+	    ಹಿಂತಿರುಗಿ -1;
 
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	PyErr_SetString(PyExc_AttributeError, name);
-	return -1;
+	Py_Err_ಗಣ_String(PyExc_AttributeError, name);
+	ಹಿಂತಿರುಗಿ -1;
     }
 }
 
-    static PyObject *
-WindowRepr(PyObject *self_obj)
+    ಸ್ಥಿರ PyObject *
+ಕಿಟಕಿ_Repr(PyObject *self_obj)
 {
-    WindowObject *self = (WindowObject*)self_obj;
-    if (self->win == INVALID_WINDOW_VALUE)
-	return PyString_FromFormat("<window object (deleted) at %p>", (void *)self);
-    else
+    ಕಿಟಕಿ_Object *self = (ಕಿಟಕಿ_Object*)self_obj;
+    ಆದರೆ (self->win == INVALID_ಕಿಟಕಿ_ಮೌಲ್ಯ)
+	ಹಿಂತಿರುಗಿ PyString_FromFormat("<window object (deleted) at %p>", (ಶೂನ್ಯ *)self);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	int	w = get_win_number(self->win, firstwin);
+	ಪೂರ್ಣಾಂಕ	w = get_win_ಸಂಖ್ಯೆ(self->win, firstwin);
 
-	if (w == 0)
-	    return PyString_FromFormat("<window object (unknown) at %p>",
-								      (void *)self);
-	else
-	    return PyString_FromFormat("<window %d>", w - 1);
+	ಆದರೆ (w == 0)
+	    ಹಿಂತಿರುಗಿ PyString_FromFormat("<window object (unknown) at %p>",
+								      (ಶೂನ್ಯ *)self);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಹಿಂತಿರುಗಿ PyString_FromFormat("<window %d>", w - 1);
     }
 }
 
-static struct PyMethodDef WindowMethods[] = {
+ಸ್ಥಿರ ರಚನೆ Py_ವಿಧಾನ_Def ಕಿಟಕಿ_Methods[] = {
     // name,	    function,			calling,	documentation
-    {"__dir__",	    (PyCFunction)WindowDir,	METH_NOARGS,	""},
-    { NULL,	    NULL,			0,		NULL}
+    {"__dir__",	    (PyCFunction)ಕಿಟಕಿ_Dir,	METH_NOARGS,	""},
+    { ಖಾಲಿ,	    ಖಾಲಿ,			0,		ಖಾಲಿ}
 };
 
 /*
@@ -4854,22 +4854,22 @@ static struct PyMethodDef WindowMethods[] = {
  */
 
 DEFINE_PY_TYPE_OBJECT(WinListType);
-static PySequenceMethods WinListAsSeq;
+ಸ್ಥಿರ PySequenceMethods WinListAsSeq;
 
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    PyObject_HEAD
-    TabPageObject	*tabObject;
+    Py_Object_ತಲೆ
+    Tab_ಪುಟ_Object	*tabObject;
 } WinListObject;
 
-static WinListObject TheWindowList =
+ಸ್ಥಿರ WinListObject The_ಕಿಟಕಿ_List =
 {
-    PyObject_HEAD_INIT_TYPE(WinListType)
-    NULL
+    Py_Object_ತಲೆ_INIT_TYPE(WinListType)
+    ಖಾಲಿ
 };
 
-    static PyObject *
-WinListNew(TabPageObject *tabObject)
+    ಸ್ಥಿರ PyObject *
+WinListNew(Tab_ಪುಟ_Object *tabObject)
 {
     WinListObject	*self;
 
@@ -4877,54 +4877,54 @@ WinListNew(TabPageObject *tabObject)
     self->tabObject = tabObject;
     Py_INCREF((PyObject *)tabObject);
 
-    return (PyObject *)(self);
+    ಹಿಂತಿರುಗಿ (PyObject *)(self);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 WinListDestructor(WinListObject *self)
 {
-    TabPageObject	*tabObject = self->tabObject;
+    Tab_ಪುಟ_Object	*tabObject = self->tabObject;
 
-    if (tabObject)
+    ಆದರೆ (tabObject)
     {
 	Py_DECREF((PyObject *)(tabObject));
     }
 
-    DESTRUCTOR_FINISH(self);
+    DESTRUCTOR_ಮುಕ್ತಾಯ(self);
 }
 
-    static PyInt
-WinListLength(WinListObject *self)
+    ಸ್ಥಿರ PyInt
+Win_List_ಉದ್ದಳತೆ(WinListObject *self)
 {
     win_T	*w;
     PyInt	n = 0;
 
-    if (!(w = get_firstwin(self->tabObject)))
-	return -1;
+    ಆದರೆ (!(w = get_firstwin(self->tabObject)))
+	ಹಿಂತಿರುಗಿ -1;
 
-    while (w != NULL)
+    ಆಗ (w != ಖಾಲಿ)
     {
 	++n;
-	w = W_NEXT(w);
+	w = W_ಮುಂದಿನ(w);
     }
 
-    return n;
+    ಹಿಂತಿರುಗಿ n;
 }
 
-    static PyObject *
-WinListItem(WinListObject *self, PyInt n)
+    ಸ್ಥಿರ PyObject *
+Win_List_ಅಂಶ(WinListObject *self, PyInt n)
 {
     win_T *w;
 
-    if (!(w = get_firstwin(self->tabObject)))
-	return NULL;
+    ಆದರೆ (!(w = get_firstwin(self->tabObject)))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    for (; w != NULL; w = W_NEXT(w), --n)
-	if (n == 0)
-	    return WindowNew(w, self->tabObject? self->tabObject->tab: curtab);
+    ಗಾಗಿ (; w != ಖಾಲಿ; w = W_ಮುಂದಿನ(w), --n)
+	ಆದರೆ (n == 0)
+	    ಹಿಂತಿರುಗಿ ಕಿಟಕಿ_New(w, self->tabObject? self->tabObject->tab: curtab);
 
-    PyErr_SET_STRING(PyExc_IndexError, N_("no such window"));
-    return NULL;
+    Py_Err_ಗಣ_STRING(Py_Exc_ಸೂಚ್ಯಂಕ_Error, N_("no such window"));
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
@@ -4936,47 +4936,47 @@ WinListItem(WinListObject *self, PyInt n)
  *
  * On errors, the Python exception data is set, and NULL is returned.
  */
-    static char *
-StringToLine(PyObject *obj)
+    ಸ್ಥಿರ ಅಕ್ಷರ *
+String_ಗಮ್ಯ_ಸಾಲು(PyObject *obj)
 {
-    char	*str;
-    char	*save;
-    PyObject	*bytes = NULL;
+    ಅಕ್ಷರ	*str;
+    ಅಕ್ಷರ	*save;
+    PyObject	*ಬೈಟುಗಳು = ಖಾಲಿ;
     Py_ssize_t	len = 0;
     PyInt	i;
-    char	*p;
+    ಅಕ್ಷರ	*p;
 
-    if (PyBytes_Check(obj))
+    ಆದರೆ (Py_ಬೈಟುಗಳು_Check(obj))
     {
-	if (PyBytes_AsStringAndSize(obj, &str, &len) == -1
-		|| str == NULL)
-	    return NULL;
+	ಆದರೆ (Py_ಬೈಟುಗಳು_As_String_And_ಗಾತ್ರ(obj, &str, &len) == -1
+		|| str == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
-    else if (PyUnicode_Check(obj))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (PyUnicode_Check(obj))
     {
-	if (!(bytes = PyUnicode_AsEncodedString(obj, ENC_OPT,
+	ಆದರೆ (!(ಬೈಟುಗಳು = PyUnicode_AsEncodedString(obj, ENC_OPT,
 							   ERRORS_ENCODE_ARG)))
-	    return NULL;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-	if (PyBytes_AsStringAndSize(bytes, &str, &len) == -1
-		|| str == NULL)
+	ಆದರೆ (Py_ಬೈಟುಗಳು_As_String_And_ಗಾತ್ರ(ಬೈಟುಗಳು, &str, &len) == -1
+		|| str == ಖಾಲಿ)
 	{
-	    Py_DECREF(bytes);
-	    return NULL;
+	    Py_DECREF(ಬೈಟುಗಳು);
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-#if PY_MAJOR_VERSION < 3
+#ಆದರೆ PY_MAJOR_ಆವೃತ್ತಿ < 3
 	PyErr_FORMAT_TYPE(
 		N_("expected str() or unicode() instance, but got %s"),
 		obj);
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 	PyErr_FORMAT_TYPE(
 		N_("expected bytes() or str() instance, but got %s"),
 		obj);
-#endif
-	return NULL;
+#ಆದರೆ_ಅಂತ್ಯ
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
     /*
@@ -4986,15 +4986,15 @@ StringToLine(PyObject *obj)
      * A trailing newline is removed, so that append(f.readlines()) works.
      */
     p = memchr(str, '\n', len);
-    if (p != NULL)
+    ಆದರೆ (p != ಖಾಲಿ)
     {
-	if (p == str + len - 1)
+	ಆದರೆ (p == str + len - 1)
 	    --len;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    PyErr_SET_VIM(N_("string cannot contain newlines"));
-	    Py_XDECREF(bytes);
-	    return NULL;
+	    Py_Err_ಗಣ_VIM(N_("string cannot contain newlines"));
+	    Py_XDECREF(ಬೈಟುಗಳು);
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
     }
 
@@ -5003,25 +5003,25 @@ StringToLine(PyObject *obj)
      * newline characters, as is the Vim convention.
      */
     save = alloc(len+1);
-    if (save == NULL)
+    ಆದರೆ (save == ಖಾಲಿ)
     {
-	PyErr_NoMemory();
-	Py_XDECREF(bytes);
-	return NULL;
+	Py_Err_No_ಸ್ಮರಣೆ();
+	Py_XDECREF(ಬೈಟುಗಳು);
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    for (i = 0; i < len; ++i)
+    ಗಾಗಿ (i = 0; i < len; ++i)
     {
-	if (str[i] == '\0')
+	ಆದರೆ (str[i] == '\0')
 	    save[i] = '\n';
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    save[i] = str[i];
     }
 
     save[i] = '\0';
-    Py_XDECREF(bytes);  // Python 2 does nothing here
+    Py_XDECREF(ಬೈಟುಗಳು);  // Python 2 does nothing here
 
-    return save;
+    ಹಿಂತಿರುಗಿ save;
 }
 
 /*
@@ -5029,10 +5029,10 @@ StringToLine(PyObject *obj)
  * in Vim format (1-based). The line is returned as a Python
  * string object.
  */
-    static PyObject *
-GetBufferLine(buf_T *buf, PyInt n)
+    ಸ್ಥಿರ PyObject *
+Get_ಬಫರ್_ಸಾಲು(buf_T *buf, PyInt n)
 {
-    return LineToString((char *)ml_get_buf(buf, (linenr_T)n, FALSE));
+    ಹಿಂತಿರುಗಿ ಸಾಲು_ಗಮ್ಯ_String((ಅಕ್ಷರ *)ml_get_buf(buf, (linenr_T)n, FALSE));
 }
 
 
@@ -5041,41 +5041,41 @@ GetBufferLine(buf_T *buf, PyInt n)
  * are in Vim format (1-based). The range is from lo up to, but not
  * including, hi. The list is returned as a Python list of string objects.
  */
-    static PyObject *
-GetBufferLineList(buf_T *buf, PyInt lo, PyInt hi)
+    ಸ್ಥಿರ PyObject *
+Get_ಬಫರ್_ಸಾಲು_List(buf_T *buf, PyInt lo, PyInt hi)
 {
     PyInt	i;
     PyInt	n = hi - lo;
     PyObject	*list = PyList_New(n);
 
-    if (list == NULL)
-	return NULL;
+    ಆದರೆ (list == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    for (i = 0; i < n; ++i)
+    ಗಾಗಿ (i = 0; i < n; ++i)
     {
 	linenr_T	lnum = (linenr_T)(lo + i);
-	char		*text;
+	ಅಕ್ಷರ		*ಪಠ್ಯ;
 	PyObject	*string;
 
-	if (lnum > buf->b_ml.ml_line_count)
-	    text = "";
-	else
-	    text = (char *)ml_get_buf(buf, lnum, FALSE);
-	string = LineToString(text);
-	if (string == NULL)
+	ಆದರೆ (lnum > buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
+	    ಪಠ್ಯ = "";
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಪಠ್ಯ = (ಅಕ್ಷರ *)ml_get_buf(buf, lnum, FALSE);
+	string = ಸಾಲು_ಗಮ್ಯ_String(ಪಠ್ಯ);
+	ಆದರೆ (string == ಖಾಲಿ)
 	{
 	    Py_DECREF(list);
-	    return NULL;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
 
-	PyList_SET_ITEM(list, i, string);
+	Py_List_ಗಣ_ಅಂಶ(list, i, string);
     }
 
     // The ownership of the Python list is passed to the caller (ie,
     // the caller should Py_DECREF() the object when it is finished
     // with it).
 
-    return list;
+    ಹಿಂತಿರುಗಿ list;
 }
 
 /*
@@ -5083,26 +5083,26 @@ GetBufferLineList(buf_T *buf, PyInt lo, PyInt hi)
  * Changed the lines from "lo" to "hi" and added "extra" lines (negative if
  * deleted).
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 py_fix_cursor(linenr_T lo, linenr_T hi, linenr_T extra)
 {
-    if (curwin->w_cursor.lnum >= lo)
+    ಆದರೆ (curwin->w_cursor.lnum >= lo)
     {
 	// Adjust the cursor position if it's in/after the changed
 	// lines.
-	if (curwin->w_cursor.lnum >= hi)
+	ಆದರೆ (curwin->w_cursor.lnum >= hi)
 	{
 	    curwin->w_cursor.lnum += extra;
-	    check_cursor_col();
+	    check_cursor_ಲಂಬಸಾಲು();
 	}
-	else if (extra < 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (extra < 0)
 	{
 	    curwin->w_cursor.lnum = lo;
 	    check_cursor();
 	}
-	else
-	    check_cursor_col();
-	changed_cline_bef_curs();
+	ಇಲ್ಲದಿದ್ದರೆ
+	    check_cursor_ಲಂಬಸಾಲು();
+	ಬದಲಾಯಿತು_cline_bef_curs();
     }
     invalidate_botline();
 }
@@ -5116,10 +5116,10 @@ py_fix_cursor(linenr_T lo, linenr_T hi, linenr_T extra)
  * If OK is returned and len_change is not NULL, *len_change
  * is set to the change in the buffer length.
  */
-    static int
-SetBufferLine(buf_T *buf, PyInt n, PyObject *line, PyInt *len_change)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಗಣ_ಬಫರ್_ಸಾಲು_2(buf_T *buf, PyInt n, PyObject *ಸಾಲು, PyInt *len_change)
 {
-    bufref_T	save_curbuf = {NULL, 0, 0};
+    bufref_T	save_curbuf = {ಖಾಲಿ, 0, 0};
     switchwin_T	switchwin;
 
     // First of all, we check the type of the supplied Python object.
@@ -5127,85 +5127,85 @@ SetBufferLine(buf_T *buf, PyInt n, PyObject *line, PyInt *len_change)
     //	  1. NULL, or None - this is a deletion.
     //	  2. A string	   - this is a replacement.
     //	  3. Anything else - this is an error.
-    if (line == Py_None || line == NULL)
+    ಆದರೆ (ಸಾಲು == Py_None || ಸಾಲು == ಖಾಲಿ)
     {
 	PyErr_Clear();
-	switchwin.sw_curwin = NULL;
-	switch_to_win_for_buf(buf, &switchwin, &save_curbuf);
+	switchwin.sw_curwin = ಖಾಲಿ;
+	switch_ಗಮ್ಯ_win_for_buf(buf, &switchwin, &save_curbuf);
 
-	VimTryStart();
+	Vim_Try_ಆರಂಭ();
 
-	if (u_savedel((linenr_T)n, 1L) == FAIL)
+	ಆದರೆ (u_savedel((linenr_T)n, 1L) == FAIL)
 	    RAISE_UNDO_FAIL;
-	else if (ml_delete((linenr_T)n) == FAIL)
-	    RAISE_DELETE_LINE_FAIL;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ml_delete((linenr_T)n) == FAIL)
+	    RAISE_DELETE_ಸಾಲು_FAIL;
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (buf == curbuf && (switchwin.sw_curwin != NULL
-					   || save_curbuf.br_buf == NULL))
+	    ಆದರೆ (buf == curbuf && (switchwin.sw_curwin != ಖಾಲಿ
+					   || save_curbuf.br_buf == ಖಾಲಿ))
 		// Using an existing window for the buffer, adjust the cursor
 		// position.
 		py_fix_cursor((linenr_T)n, (linenr_T)n + 1, (linenr_T)-1);
-	    if (save_curbuf.br_buf == NULL)
+	    ಆದರೆ (save_curbuf.br_buf == ಖಾಲಿ)
 		// Only adjust marks if we managed to switch to a window that
 		// holds the buffer, otherwise line numbers will be invalid.
-		deleted_lines_mark((linenr_T)n, 1L);
+		deleted_ಸಾಲುಗಳು_mark((linenr_T)n, 1L);
 	}
 
 	restore_win_for_buf(&switchwin, &save_curbuf);
 
-	if (VimTryEnd())
-	    return FAIL;
+	ಆದರೆ (Vim_Try_ಕೊನೆ())
+	    ಹಿಂತಿರುಗಿ FAIL;
 
-	if (len_change)
+	ಆದರೆ (len_change)
 	    *len_change = -1;
 
-	return OK;
+	ಹಿಂತಿರುಗಿ OK;
     }
-    else if (PyBytes_Check(line) || PyUnicode_Check(line))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (Py_ಬೈಟುಗಳು_Check(ಸಾಲು) || PyUnicode_Check(ಸಾಲು))
     {
-	char	*save = StringToLine(line);
+	ಅಕ್ಷರ	*save = String_ಗಮ್ಯ_ಸಾಲು(ಸಾಲು);
 
-	if (save == NULL)
-	    return FAIL;
+	ಆದರೆ (save == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ FAIL;
 
-	VimTryStart();
+	Vim_Try_ಆರಂಭ();
 
 	// We do not need to free "save" if ml_replace() consumes it.
 	PyErr_Clear();
-	switch_to_win_for_buf(buf, &switchwin, &save_curbuf);
+	switch_ಗಮ್ಯ_win_for_buf(buf, &switchwin, &save_curbuf);
 
-	if (u_savesub((linenr_T)n) == FAIL)
+	ಆದರೆ (u_savesub((linenr_T)n) == FAIL)
 	{
 	    RAISE_UNDO_FAIL;
 	    vim_free(save);
 	}
-	else if (ml_replace((linenr_T)n, (char_u *)save, FALSE) == FAIL)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ml_replace((linenr_T)n, (char_u *)save, FALSE) == FAIL)
 	{
-	    RAISE_REPLACE_LINE_FAIL;
+	    RAISE_REPLACE_ಸಾಲು_FAIL;
 	    vim_free(save);
 	}
-	else
-	    changed_bytes((linenr_T)n, 0);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಬದಲಾಯಿತು_ಬೈಟುಗಳು((linenr_T)n, 0);
 
 	restore_win_for_buf(&switchwin, &save_curbuf);
 
 	// Check that the cursor is not beyond the end of the line now.
-	if (buf == curbuf)
-	    check_cursor_col();
+	ಆದರೆ (buf == curbuf)
+	    check_cursor_ಲಂಬಸಾಲು();
 
-	if (VimTryEnd())
-	    return FAIL;
+	ಆದರೆ (Vim_Try_ಕೊನೆ())
+	    ಹಿಂತಿರುಗಿ FAIL;
 
-	if (len_change)
+	ಆದರೆ (len_change)
 	    *len_change = 0;
 
-	return OK;
+	ಹಿಂತಿರುಗಿ OK;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	PyErr_BadArgument();
-	return FAIL;
+	Py_Err_Bad_ವಾದ();
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 }
 
@@ -5218,15 +5218,15 @@ SetBufferLine(buf_T *buf, PyInt n, PyObject *line, PyInt *len_change)
  * If OK is returned and len_change is not NULL, *len_change
  * is set to the change in the buffer length.
  */
-    static int
-SetBufferLineList(
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಗಣ_ಬಫರ್_ಸಾಲು_List(
 	buf_T *buf,
 	PyInt lo,
 	PyInt hi,
 	PyObject *list,
 	PyInt *len_change)
 {
-    bufref_T	save_curbuf = {NULL, 0, 0};
+    bufref_T	save_curbuf = {ಖಾಲಿ, 0, 0};
     switchwin_T	switchwin;
 
     // First of all, we check the type of the supplied Python object.
@@ -5234,103 +5234,103 @@ SetBufferLineList(
     //	  1. NULL, or None - this is a deletion.
     //	  2. A list	   - this is a replacement.
     //	  3. Anything else - this is an error.
-    if (list == Py_None || list == NULL)
+    ಆದರೆ (list == Py_None || list == ಖಾಲಿ)
     {
 	PyInt	i;
-	PyInt	n = (int)(hi - lo);
+	PyInt	n = (ಪೂರ್ಣಾಂಕ)(hi - lo);
 
 	PyErr_Clear();
-	VimTryStart();
-	switchwin.sw_curwin = NULL;
-	switch_to_win_for_buf(buf, &switchwin, &save_curbuf);
+	Vim_Try_ಆರಂಭ();
+	switchwin.sw_curwin = ಖಾಲಿ;
+	switch_ಗಮ್ಯ_win_for_buf(buf, &switchwin, &save_curbuf);
 
-	if (u_savedel((linenr_T)lo, (long)n) == FAIL)
+	ಆದರೆ (u_savedel((linenr_T)lo, (ದೀರ್ಘ)n) == FAIL)
 	    RAISE_UNDO_FAIL;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    for (i = 0; i < n; ++i)
+	    ಗಾಗಿ (i = 0; i < n; ++i)
 	    {
-		if (ml_delete((linenr_T)lo) == FAIL)
+		ಆದರೆ (ml_delete((linenr_T)lo) == FAIL)
 		{
-		    RAISE_DELETE_LINE_FAIL;
-		    break;
+		    RAISE_DELETE_ಸಾಲು_FAIL;
+		    ನಿಲ್ಲಿಸು;
 		}
 	    }
-	    if (buf == curbuf && (switchwin.sw_curwin != NULL
-					       || save_curbuf.br_buf == NULL))
+	    ಆದರೆ (buf == curbuf && (switchwin.sw_curwin != ಖಾಲಿ
+					       || save_curbuf.br_buf == ಖಾಲಿ))
 		// Using an existing window for the buffer, adjust the cursor
 		// position.
 		py_fix_cursor((linenr_T)lo, (linenr_T)hi, (linenr_T)-n);
-	    if (save_curbuf.br_buf == NULL)
+	    ಆದರೆ (save_curbuf.br_buf == ಖಾಲಿ)
 		// Only adjust marks if we managed to switch to a window that
 		// holds the buffer, otherwise line numbers will be invalid.
-		deleted_lines_mark((linenr_T)lo, (long)i);
+		deleted_ಸಾಲುಗಳು_mark((linenr_T)lo, (ದೀರ್ಘ)i);
 	}
 
 	restore_win_for_buf(&switchwin, &save_curbuf);
 
-	if (VimTryEnd())
-	    return FAIL;
+	ಆದರೆ (Vim_Try_ಕೊನೆ())
+	    ಹಿಂತಿರುಗಿ FAIL;
 
-	if (len_change)
+	ಆದರೆ (len_change)
 	    *len_change = -n;
 
-	return OK;
+	ಹಿಂತಿರುಗಿ OK;
     }
-    else if (PyList_Check(list))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (PyList_Check(list))
     {
 	PyInt	i;
-	PyInt	new_len = PyList_Size(list);
+	PyInt	new_len = Py_List_ಗಾತ್ರ(list);
 	PyInt	old_len = hi - lo;
 	PyInt	extra = 0;	// lines added to text, can be negative
-	char	**array;
+	ಅಕ್ಷರ	**array;
 
-	if (new_len == 0)	// avoid allocating zero bytes
-	    array = NULL;
-	else
+	ಆದರೆ (new_len == 0)	// avoid allocating zero bytes
+	    array = ಖಾಲಿ;
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    array = PyMem_New(char *, new_len);
-	    if (array == NULL)
+	    array = PyMem_New(ಅಕ್ಷರ *, new_len);
+	    ಆದರೆ (array == ಖಾಲಿ)
 	    {
-		PyErr_NoMemory();
-		return FAIL;
+		Py_Err_No_ಸ್ಮರಣೆ();
+		ಹಿಂತಿರುಗಿ FAIL;
 	    }
 	}
 
-	for (i = 0; i < new_len; ++i)
+	ಗಾಗಿ (i = 0; i < new_len; ++i)
 	{
-	    PyObject *line;
+	    PyObject *ಸಾಲು;
 
-	    if (!(line = PyList_GetItem(list, i)) ||
-		!(array[i] = StringToLine(line)))
+	    ಆದರೆ (!(ಸಾಲು = Py_List_Get_ಅಂಶ(list, i)) ||
+		!(array[i] = String_ಗಮ್ಯ_ಸಾಲು(ಸಾಲು)))
 	    {
-		while (i)
+		ಆಗ (i)
 		    vim_free(array[--i]);
 		PyMem_Free(array);
-		return FAIL;
+		ಹಿಂತಿರುಗಿ FAIL;
 	    }
 	}
 
-	VimTryStart();
+	Vim_Try_ಆರಂಭ();
 	PyErr_Clear();
 
 	// START of region without "return".  Must call restore_buffer()!
-	switchwin.sw_curwin = NULL;
-	switch_to_win_for_buf(buf, &switchwin, &save_curbuf);
+	switchwin.sw_curwin = ಖಾಲಿ;
+	switch_ಗಮ್ಯ_win_for_buf(buf, &switchwin, &save_curbuf);
 
-	if (u_save((linenr_T)(lo-1), (linenr_T)hi) == FAIL)
+	ಆದರೆ (u_save((linenr_T)(lo-1), (linenr_T)hi) == FAIL)
 	    RAISE_UNDO_FAIL;
 
 	// If the size of the range is reducing (ie, new_len < old_len) we
 	// need to delete some old_len. We do this at the start, by
 	// repeatedly deleting line "lo".
-	if (!PyErr_Occurred())
+	ಆದರೆ (!PyErr_Occurred())
 	{
-	    for (i = 0; i < old_len - new_len; ++i)
-		if (ml_delete((linenr_T)lo) == FAIL)
+	    ಗಾಗಿ (i = 0; i < old_len - new_len; ++i)
+		ಆದರೆ (ml_delete((linenr_T)lo) == FAIL)
 		{
-		    RAISE_DELETE_LINE_FAIL;
-		    break;
+		    RAISE_DELETE_ಸಾಲು_FAIL;
+		    ನಿಲ್ಲಿಸು;
 		}
 	    extra -= i;
 	}
@@ -5338,31 +5338,31 @@ SetBufferLineList(
 	// For as long as possible, replace the existing old_len with the
 	// new old_len. This is a more efficient operation, as it requires
 	// less memory allocation and freeing.
-	if (!PyErr_Occurred())
+	ಆದರೆ (!PyErr_Occurred())
 	{
-	    for (i = 0; i < old_len && i < new_len; ++i)
-		if (ml_replace((linenr_T)(lo+i), (char_u *)array[i], FALSE)
+	    ಗಾಗಿ (i = 0; i < old_len && i < new_len; ++i)
+		ಆದರೆ (ml_replace((linenr_T)(lo+i), (char_u *)array[i], FALSE)
 								      == FAIL)
 		{
-		    RAISE_REPLACE_LINE_FAIL;
-		    break;
+		    RAISE_REPLACE_ಸಾಲು_FAIL;
+		    ನಿಲ್ಲಿಸು;
 		}
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    i = 0;
 
 	// Now we may need to insert the remaining new old_len. If we do, we
 	// must free the strings as we finish with them (we can't pass the
 	// responsibility to Vim in this case).
-	if (!PyErr_Occurred())
+	ಆದರೆ (!PyErr_Occurred())
 	{
-	    while (i < new_len)
+	    ಆಗ (i < new_len)
 	    {
-		if (ml_append((linenr_T)(lo + i - 1),
+		ಆದರೆ (ml_append((linenr_T)(lo + i - 1),
 					(char_u *)array[i], 0, FALSE) == FAIL)
 		{
-		    RAISE_INSERT_LINE_FAIL;
-		    break;
+		    RAISE_ಸೇರಿಸು_ಸಾಲು_FAIL;
+		    ನಿಲ್ಲಿಸು;
 		}
 		vim_free(array[i]);
 		++i;
@@ -5371,7 +5371,7 @@ SetBufferLineList(
 	}
 
 	// Free any left-over old_len, as a result of an error
-	while (i < new_len)
+	ಆಗ (i < new_len)
 	{
 	    vim_free(array[i]);
 	    ++i;
@@ -5386,15 +5386,15 @@ SetBufferLineList(
 	// changed range, and move any in the remainder of the buffer.
 	// Only adjust marks if we managed to switch to a window that holds
 	// the buffer, otherwise line numbers will be invalid.
-	if (save_curbuf.br_buf == NULL)
+	ಆದರೆ (save_curbuf.br_buf == ಖಾಲಿ)
 	{
 	    mark_adjust((linenr_T)lo, (linenr_T)(hi - 1),
-						  (long)MAXLNUM, (long)extra);
-	    changed_lines((linenr_T)lo, 0, (linenr_T)hi, (long)extra);
+						  (ದೀರ್ಘ)MAXLNUM, (ದೀರ್ಘ)extra);
+	    ಬದಲಾಯಿತು_ಸಾಲುಗಳು((linenr_T)lo, 0, (linenr_T)hi, (ದೀರ್ಘ)extra);
 	}
 
-	if (buf == curbuf && (switchwin.sw_curwin != NULL
-					   || save_curbuf.br_buf == NULL))
+	ಆದರೆ (buf == curbuf && (switchwin.sw_curwin != ಖಾಲಿ
+					   || save_curbuf.br_buf == ಖಾಲಿ))
 	    // Using an existing window for the buffer, adjust the cursor
 	    // position.
 	    py_fix_cursor((linenr_T)lo, (linenr_T)hi, (linenr_T)extra);
@@ -5402,18 +5402,18 @@ SetBufferLineList(
 	// END of region without "return".
 	restore_win_for_buf(&switchwin, &save_curbuf);
 
-	if (VimTryEnd())
-	    return FAIL;
+	ಆದರೆ (Vim_Try_ಕೊನೆ())
+	    ಹಿಂತಿರುಗಿ FAIL;
 
-	if (len_change)
+	ಆದರೆ (len_change)
 	    *len_change = new_len - old_len;
 
-	return OK;
+	ಹಿಂತಿರುಗಿ OK;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	PyErr_BadArgument();
-	return FAIL;
+	Py_Err_Bad_ವಾದ();
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 }
 
@@ -5426,100 +5426,100 @@ SetBufferLineList(
  * If OK is returned and len_change is not NULL, *len_change
  * is set to the change in the buffer length.
  */
-    static int
-InsertBufferLines(buf_T *buf, PyInt n, PyObject *lines, PyInt *len_change)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಸೇರಿಸು_ಬಫರ್_ಸಾಲುಗಳು(buf_T *buf, PyInt n, PyObject *ಸಾಲುಗಳು, PyInt *len_change)
 {
-    bufref_T	save_curbuf = {NULL, 0, 0};
+    bufref_T	save_curbuf = {ಖಾಲಿ, 0, 0};
     switchwin_T	switchwin;
 
     // First of all, we check the type of the supplied Python object.
     // It must be a string or a list, or the call is in error.
-    if (PyBytes_Check(lines) || PyUnicode_Check(lines))
+    ಆದರೆ (Py_ಬೈಟುಗಳು_Check(ಸಾಲುಗಳು) || PyUnicode_Check(ಸಾಲುಗಳು))
     {
-	char		*str = StringToLine(lines);
+	ಅಕ್ಷರ		*str = String_ಗಮ್ಯ_ಸಾಲು(ಸಾಲುಗಳು);
 
-	if (str == NULL)
-	    return FAIL;
+	ಆದರೆ (str == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ FAIL;
 
 	PyErr_Clear();
-	VimTryStart();
-	switch_to_win_for_buf(buf, &switchwin, &save_curbuf);
+	Vim_Try_ಆರಂಭ();
+	switch_ಗಮ್ಯ_win_for_buf(buf, &switchwin, &save_curbuf);
 
-	if (u_save((linenr_T)n, (linenr_T)(n + 1)) == FAIL)
+	ಆದರೆ (u_save((linenr_T)n, (linenr_T)(n + 1)) == FAIL)
 	    RAISE_UNDO_FAIL;
-	else if (ml_append((linenr_T)n, (char_u *)str, 0, FALSE) == FAIL)
-	    RAISE_INSERT_LINE_FAIL;
-	else if (save_curbuf.br_buf == NULL)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ml_append((linenr_T)n, (char_u *)str, 0, FALSE) == FAIL)
+	    RAISE_ಸೇರಿಸು_ಸಾಲು_FAIL;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (save_curbuf.br_buf == ಖಾಲಿ)
 	    // Only adjust marks if we managed to switch to a window that
 	    // holds the buffer, otherwise line numbers will be invalid.
-	    appended_lines_mark((linenr_T)n, 1L);
+	    appended_ಸಾಲುಗಳು_mark((linenr_T)n, 1L);
 
 	vim_free(str);
 	restore_win_for_buf(&switchwin, &save_curbuf);
 	update_screen(UPD_VALID);
 
-	if (VimTryEnd())
-	    return FAIL;
+	ಆದರೆ (Vim_Try_ಕೊನೆ())
+	    ಹಿಂತಿರುಗಿ FAIL;
 
-	if (len_change)
+	ಆದರೆ (len_change)
 	    *len_change = 1;
 
-	return OK;
+	ಹಿಂತಿರುಗಿ OK;
     }
-    else if (PyList_Check(lines))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (PyList_Check(ಸಾಲುಗಳು))
     {
 	PyInt	i;
-	PyInt	size = PyList_Size(lines);
-	char	**array;
+	PyInt	ಗಾತ್ರ_2 = Py_List_ಗಾತ್ರ(ಸಾಲುಗಳು);
+	ಅಕ್ಷರ	**array;
 
-	array = PyMem_New(char *, size);
-	if (array == NULL)
+	array = PyMem_New(ಅಕ್ಷರ *, ಗಾತ್ರ_2);
+	ಆದರೆ (array == ಖಾಲಿ)
 	{
-	    PyErr_NoMemory();
-	    return FAIL;
+	    Py_Err_No_ಸ್ಮರಣೆ();
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
 
-	for (i = 0; i < size; ++i)
+	ಗಾಗಿ (i = 0; i < ಗಾತ್ರ_2; ++i)
 	{
-	    PyObject *line;
+	    PyObject *ಸಾಲು;
 
-	    if (!(line = PyList_GetItem(lines, i)) ||
-		!(array[i] = StringToLine(line)))
+	    ಆದರೆ (!(ಸಾಲು = Py_List_Get_ಅಂಶ(ಸಾಲುಗಳು, i)) ||
+		!(array[i] = String_ಗಮ್ಯ_ಸಾಲು(ಸಾಲು)))
 	    {
-		while (i)
+		ಆಗ (i)
 		    vim_free(array[--i]);
 		PyMem_Free(array);
-		return FAIL;
+		ಹಿಂತಿರುಗಿ FAIL;
 	    }
 	}
 
 	PyErr_Clear();
-	VimTryStart();
-	switch_to_win_for_buf(buf, &switchwin, &save_curbuf);
+	Vim_Try_ಆರಂಭ();
+	switch_ಗಮ್ಯ_win_for_buf(buf, &switchwin, &save_curbuf);
 
-	if (u_save((linenr_T)n, (linenr_T)(n + 1)) == FAIL)
+	ಆದರೆ (u_save((linenr_T)n, (linenr_T)(n + 1)) == FAIL)
 	    RAISE_UNDO_FAIL;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    for (i = 0; i < size; ++i)
+	    ಗಾಗಿ (i = 0; i < ಗಾತ್ರ_2; ++i)
 	    {
-		if (ml_append((linenr_T)(n + i),
+		ಆದರೆ (ml_append((linenr_T)(n + i),
 					(char_u *)array[i], 0, FALSE) == FAIL)
 		{
-		    RAISE_INSERT_LINE_FAIL;
+		    RAISE_ಸೇರಿಸು_ಸಾಲು_FAIL;
 
 		    // Free the rest of the lines
-		    while (i < size)
+		    ಆಗ (i < ಗಾತ್ರ_2)
 			vim_free(array[i++]);
 
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 		vim_free(array[i]);
 	    }
-	    if (i > 0 && save_curbuf.br_buf == NULL)
+	    ಆದರೆ (i > 0 && save_curbuf.br_buf == ಖಾಲಿ)
 		// Only adjust marks if we managed to switch to a window that
 		// holds the buffer, otherwise line numbers will be invalid.
-		appended_lines_mark((linenr_T)n, (long)i);
+		appended_ಸಾಲುಗಳು_mark((linenr_T)n, (ದೀರ್ಘ)i);
 	}
 
 	// Free the array of lines. All of its contents have now
@@ -5529,18 +5529,18 @@ InsertBufferLines(buf_T *buf, PyInt n, PyObject *lines, PyInt *len_change)
 
 	update_screen(UPD_VALID);
 
-	if (VimTryEnd())
-	    return FAIL;
+	ಆದರೆ (Vim_Try_ಕೊನೆ())
+	    ಹಿಂತಿರುಗಿ FAIL;
 
-	if (len_change)
-	    *len_change = size;
+	ಆದರೆ (len_change)
+	    *len_change = ಗಾತ್ರ_2;
 
-	return OK;
+	ಹಿಂತಿರುಗಿ OK;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	PyErr_BadArgument();
-	return FAIL;
+	Py_Err_Bad_ವಾದ();
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 }
 
@@ -5549,332 +5549,332 @@ InsertBufferLines(buf_T *buf, PyInt n, PyObject *lines, PyInt *len_change)
  * -------------------------------------------
  */
 
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    PyObject_HEAD
+    Py_Object_ತಲೆ
     buf_T *buf;
-} BufferObject;
+} ಬಫರ್_Object;
 
-    static int
-CheckBuffer(BufferObject *self)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+Check_ಬಫರ್(ಬಫರ್_Object *self)
 {
-    if (self->buf == INVALID_BUFFER_VALUE)
+    ಆದರೆ (self->buf == INVALID_ಬಫರ್_ಮೌಲ್ಯ)
     {
-	PyErr_SET_VIM(N_("attempt to refer to deleted buffer"));
-	return -1;
+	Py_Err_ಗಣ_VIM(N_("attempt to refer to deleted buffer"));
+	ಹಿಂತಿರುಗಿ -1;
     }
 
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-    static int
-CheckBufferCb(void *self)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+Check_ಬಫರ್_Cb(ಶೂನ್ಯ *self)
 {
-    return CheckBuffer((BufferObject*)self);
+    ಹಿಂತಿರುಗಿ Check_ಬಫರ್((ಬಫರ್_Object*)self);
 }
 
-    static PyObject *
-RBItem(BufferObject *self, PyInt n, PyInt start, PyInt end)
+    ಸ್ಥಿರ PyObject *
+RBItem(ಬಫರ್_Object *self, PyInt n, PyInt ಆರಂಭ, PyInt ಕೊನೆ)
 {
-    if (CheckBuffer(self))
-	return NULL;
+    ಆದರೆ (Check_ಬಫರ್(self))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (end == -1)
-	end = self->buf->b_ml.ml_line_count;
+    ಆದರೆ (ಕೊನೆ == -1)
+	ಕೊನೆ = self->buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
 
-    if (n < 0)
-	n += end - start + 1;
+    ಆದರೆ (n < 0)
+	n += ಕೊನೆ - ಆರಂಭ + 1;
 
-    if (n < 0 || n > end - start)
+    ಆದರೆ (n < 0 || n > ಕೊನೆ - ಆರಂಭ)
     {
-	PyErr_SET_STRING(PyExc_IndexError, N_("line number out of range"));
-	return NULL;
+	Py_Err_ಗಣ_STRING(Py_Exc_ಸೂಚ್ಯಂಕ_Error, N_("line number out of range"));
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    return GetBufferLine(self->buf, n+start);
+    ಹಿಂತಿರುಗಿ Get_ಬಫರ್_ಸಾಲು(self->buf, n+ಆರಂಭ);
 }
 
-    static PyObject *
-RBSlice(BufferObject *self, PyInt lo, PyInt hi, PyInt start, PyInt end)
+    ಸ್ಥಿರ PyObject *
+RBSlice(ಬಫರ್_Object *self, PyInt lo, PyInt hi, PyInt ಆರಂಭ, PyInt ಕೊನೆ)
 {
-    PyInt size;
+    PyInt ಗಾತ್ರ_2;
 
-    if (CheckBuffer(self))
-	return NULL;
+    ಆದರೆ (Check_ಬಫರ್(self))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (end == -1)
-	end = self->buf->b_ml.ml_line_count;
+    ಆದರೆ (ಕೊನೆ == -1)
+	ಕೊನೆ = self->buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
 
-    size = end - start + 1;
+    ಗಾತ್ರ_2 = ಕೊನೆ - ಆರಂಭ + 1;
 
-    if (lo < 0)
+    ಆದರೆ (lo < 0)
 	lo = 0;
-    else if (lo > size)
-	lo = size;
-    if (hi < 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (lo > ಗಾತ್ರ_2)
+	lo = ಗಾತ್ರ_2;
+    ಆದರೆ (hi < 0)
 	hi = 0;
-    if (hi < lo)
+    ಆದರೆ (hi < lo)
 	hi = lo;
-    else if (hi > size)
-	hi = size;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (hi > ಗಾತ್ರ_2)
+	hi = ಗಾತ್ರ_2;
 
-    return GetBufferLineList(self->buf, lo+start, hi+start);
+    ಹಿಂತಿರುಗಿ Get_ಬಫರ್_ಸಾಲು_List(self->buf, lo+ಆರಂಭ, hi+ಆರಂಭ);
 }
 
-    static PyInt
-RBAsItem(
-	BufferObject *self,
+    ಸ್ಥಿರ PyInt
+RBAs_ಅಂಶ(
+	ಬಫರ್_Object *self,
 	PyInt n,
 	PyObject *valObject,
-	PyInt start,
-	PyInt end,
-	PyInt *new_end)
+	PyInt ಆರಂಭ,
+	PyInt ಕೊನೆ,
+	PyInt *new_ಕೊನೆ)
 {
     PyInt len_change;
 
-    if (CheckBuffer(self))
-	return -1;
+    ಆದರೆ (Check_ಬಫರ್(self))
+	ಹಿಂತಿರುಗಿ -1;
 
-    if (end == -1)
-	end = self->buf->b_ml.ml_line_count;
+    ಆದರೆ (ಕೊನೆ == -1)
+	ಕೊನೆ = self->buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
 
-    if (n < 0)
-	n += end - start + 1;
+    ಆದರೆ (n < 0)
+	n += ಕೊನೆ - ಆರಂಭ + 1;
 
-    if (n < 0 || n > end - start)
+    ಆದರೆ (n < 0 || n > ಕೊನೆ - ಆರಂಭ)
     {
-	PyErr_SET_STRING(PyExc_IndexError, N_("line number out of range"));
-	return -1;
+	Py_Err_ಗಣ_STRING(Py_Exc_ಸೂಚ್ಯಂಕ_Error, N_("line number out of range"));
+	ಹಿಂತಿರುಗಿ -1;
     }
 
-    if (SetBufferLine(self->buf, n+start, valObject, &len_change) == FAIL)
-	return -1;
+    ಆದರೆ (ಗಣ_ಬಫರ್_ಸಾಲು_2(self->buf, n+ಆರಂಭ, valObject, &len_change) == FAIL)
+	ಹಿಂತಿರುಗಿ -1;
 
-    if (new_end)
-	*new_end = end + len_change;
+    ಆದರೆ (new_ಕೊನೆ)
+	*new_ಕೊನೆ = ಕೊನೆ + len_change;
 
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-    static PyInt
-RBAsSlice(
-	BufferObject *self,
+    ಸ್ಥಿರ PyInt
+RBAs_ತುಂಡು(
+	ಬಫರ್_Object *self,
 	PyInt lo,
 	PyInt hi,
 	PyObject *valObject,
-	PyInt start,
-	PyInt end,
-	PyInt *new_end)
+	PyInt ಆರಂಭ,
+	PyInt ಕೊನೆ,
+	PyInt *new_ಕೊನೆ)
 {
-    PyInt size;
+    PyInt ಗಾತ್ರ_2;
     PyInt len_change;
 
     // Self must be a valid buffer
-    if (CheckBuffer(self))
-	return -1;
+    ಆದರೆ (Check_ಬಫರ್(self))
+	ಹಿಂತಿರುಗಿ -1;
 
-    if (end == -1)
-	end = self->buf->b_ml.ml_line_count;
+    ಆದರೆ (ಕೊನೆ == -1)
+	ಕೊನೆ = self->buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
 
     // Sort out the slice range
-    size = end - start + 1;
+    ಗಾತ್ರ_2 = ಕೊನೆ - ಆರಂಭ + 1;
 
-    if (lo < 0)
+    ಆದರೆ (lo < 0)
 	lo = 0;
-    else if (lo > size)
-	lo = size;
-    if (hi < 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (lo > ಗಾತ್ರ_2)
+	lo = ಗಾತ್ರ_2;
+    ಆದರೆ (hi < 0)
 	hi = 0;
-    if (hi < lo)
+    ಆದರೆ (hi < lo)
 	hi = lo;
-    else if (hi > size)
-	hi = size;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (hi > ಗಾತ್ರ_2)
+	hi = ಗಾತ್ರ_2;
 
-    if (SetBufferLineList(self->buf, lo + start, hi + start,
+    ಆದರೆ (ಗಣ_ಬಫರ್_ಸಾಲು_List(self->buf, lo + ಆರಂಭ, hi + ಆರಂಭ,
 						valObject, &len_change) == FAIL)
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
 
-    if (new_end)
-	*new_end = end + len_change;
+    ಆದರೆ (new_ಕೊನೆ)
+	*new_ಕೊನೆ = ಕೊನೆ + len_change;
 
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
 
-    static PyObject *
+    ಸ್ಥಿರ PyObject *
 RBAppend(
-	BufferObject *self,
-	PyObject *args,
-	PyInt start,
-	PyInt end,
-	PyInt *new_end)
+	ಬಫರ್_Object *self,
+	PyObject *ವಾದಗಳು,
+	PyInt ಆರಂಭ,
+	PyInt ಕೊನೆ,
+	PyInt *new_ಕೊನೆ)
 {
-    PyObject *lines;
+    PyObject *ಸಾಲುಗಳು;
     PyInt len_change;
     PyInt max;
     PyInt n;
 
-    if (CheckBuffer(self))
-	return NULL;
+    ಆದರೆ (Check_ಬಫರ್(self))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (end == -1)
-	end = self->buf->b_ml.ml_line_count;
+    ಆದರೆ (ಕೊನೆ == -1)
+	ಕೊನೆ = self->buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
 
-    max = n = end - start + 1;
+    max = n = ಕೊನೆ - ಆರಂಭ + 1;
 
-    if (!PyArg_ParseTuple(args, "O|n", &lines, &n))
-	return NULL;
+    ಆದರೆ (!PyArg_ParseTuple(ವಾದಗಳು, "O|n", &ಸಾಲುಗಳು, &n))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (n < 0 || n > max)
+    ಆದರೆ (n < 0 || n > max)
     {
-	PyErr_SET_STRING(PyExc_IndexError, N_("line number out of range"));
-	return NULL;
+	Py_Err_ಗಣ_STRING(Py_Exc_ಸೂಚ್ಯಂಕ_Error, N_("line number out of range"));
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    if (InsertBufferLines(self->buf, n + start - 1, lines, &len_change) == FAIL)
-	return NULL;
+    ಆದರೆ (ಸೇರಿಸು_ಬಫರ್_ಸಾಲುಗಳು(self->buf, n + ಆರಂಭ - 1, ಸಾಲುಗಳು, &len_change) == FAIL)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (new_end)
-	*new_end = end + len_change;
+    ಆದರೆ (new_ಕೊನೆ)
+	*new_ಕೊನೆ = ಕೊನೆ + len_change;
 
     Py_INCREF(Py_None);
-    return Py_None;
+    ಹಿಂತಿರುಗಿ Py_None;
 }
 
 // Range object
 
 DEFINE_PY_TYPE_OBJECT(RangeType);
-static PySequenceMethods RangeAsSeq;
-static PyMappingMethods RangeAsMapping;
+ಸ್ಥಿರ PySequenceMethods RangeAsSeq;
+ಸ್ಥಿರ PyMappingMethods RangeAsMapping;
 
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    PyObject_HEAD
-    BufferObject *buf;
-    PyInt start;
-    PyInt end;
+    Py_Object_ತಲೆ
+    ಬಫರ್_Object *buf;
+    PyInt ಆರಂಭ;
+    PyInt ಕೊನೆ;
 } RangeObject;
 
-    static PyObject *
-RangeNew(buf_T *buf, PyInt start, PyInt end)
+    ಸ್ಥಿರ PyObject *
+RangeNew(buf_T *buf, PyInt ಆರಂಭ, PyInt ಕೊನೆ)
 {
-    BufferObject *bufr;
+    ಬಫರ್_Object *bufr;
     RangeObject *self;
     self = PyObject_GC_New(RangeObject, RangeTypePtr);
-    if (self == NULL)
-	return NULL;
+    ಆದರೆ (self == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    bufr = (BufferObject *)BufferNew(buf);
-    if (bufr == NULL)
+    bufr = (ಬಫರ್_Object *)ಬಫರ್_New(buf);
+    ಆದರೆ (bufr == ಖಾಲಿ)
     {
 	Py_DECREF(self);
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
     Py_INCREF((PyObject *)bufr);
 
     self->buf = bufr;
-    self->start = start;
-    self->end = end;
+    self->ಆರಂಭ = ಆರಂಭ;
+    self->ಕೊನೆ = ಕೊನೆ;
 
-    return (PyObject *)(self);
+    ಹಿಂತಿರುಗಿ (PyObject *)(self);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 RangeDestructor(PyObject *self_obj)
 {
     RangeObject *self = (RangeObject*)self_obj;
-    PyObject_GC_UnTrack((void *)(self));
+    PyObject_GC_UnTrack((ಶೂನ್ಯ *)(self));
     Py_XDECREF(((PyObject *)(self->buf)));
-    PyObject_GC_Del((void *)(self));
+    PyObject_GC_Del((ಶೂನ್ಯ *)(self));
 }
 
-    static int
-RangeTraverse(PyObject *self_obj, visitproc visit, void *arg)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+RangeTraverse(PyObject *self_obj, visitproc ಭೇಟಿ, ಶೂನ್ಯ *arg)
 {
     RangeObject *self = (RangeObject*)self_obj;
-    Py_VISIT(((PyObject *)(self->buf)));
-    return 0;
+    Py_ಭೇಟಿ(((PyObject *)(self->buf)));
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 RangeClear(PyObject *self_obj)
 {
     RangeObject *self = (RangeObject*)self_obj;
     Py_CLEAR(self->buf);
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-    static PyInt
-RangeLength(RangeObject *self)
+    ಸ್ಥಿರ PyInt
+Range_ಉದ್ದಳತೆ(RangeObject *self)
 {
     // HOW DO WE SIGNAL AN ERROR FROM THIS FUNCTION?
-    if (CheckBuffer(self->buf))
-	return -1; // ???
+    ಆದರೆ (Check_ಬಫರ್(self->buf))
+	ಹಿಂತಿರುಗಿ -1; // ???
 
-    return (self->end - self->start + 1);
+    ಹಿಂತಿರುಗಿ (self->ಕೊನೆ - self->ಆರಂಭ + 1);
 }
 
-    static PyObject *
-RangeItem(RangeObject *self, PyInt n)
+    ಸ್ಥಿರ PyObject *
+Range_ಅಂಶ(RangeObject *self, PyInt n)
 {
-    return RBItem(self->buf, n, self->start, self->end);
+    ಹಿಂತಿರುಗಿ RBItem(self->buf, n, self->ಆರಂಭ, self->ಕೊನೆ);
 }
 
-    static PyObject *
-RangeSlice(RangeObject *self, PyInt lo, PyInt hi)
+    ಸ್ಥಿರ PyObject *
+Range_ತುಂಡು(RangeObject *self, PyInt lo, PyInt hi)
 {
-    return RBSlice(self->buf, lo, hi, self->start, self->end);
+    ಹಿಂತಿರುಗಿ RBSlice(self->buf, lo, hi, self->ಆರಂಭ, self->ಕೊನೆ);
 }
 
-static char *RangeAttrs[] = {
+ಸ್ಥಿರ ಅಕ್ಷರ *RangeAttrs[] = {
     "start", "end",
-    NULL
+    ಖಾಲಿ
 };
 
-    static PyObject *
-RangeDir(PyObject *self, PyObject *args UNUSED)
+    ಸ್ಥಿರ PyObject *
+RangeDir(PyObject *self, PyObject *ವಾದಗಳು ಬಳಸದ)
 {
-    return ObjectDir(self, RangeAttrs);
+    ಹಿಂತಿರುಗಿ ObjectDir(self, RangeAttrs);
 }
 
-    static PyObject *
-RangeAppend(RangeObject *self, PyObject *args)
+    ಸ್ಥಿರ PyObject *
+RangeAppend(RangeObject *self, PyObject *ವಾದಗಳು)
 {
-    return RBAppend(self->buf, args, self->start, self->end, &self->end);
+    ಹಿಂತಿರುಗಿ RBAppend(self->buf, ವಾದಗಳು, self->ಆರಂಭ, self->ಕೊನೆ, &self->ಕೊನೆ);
 }
 
-    static PyObject *
+    ಸ್ಥಿರ PyObject *
 RangeRepr(PyObject *self_obj)
 {
     RangeObject *self = (RangeObject*)self_obj;
-    if (self->buf->buf == INVALID_BUFFER_VALUE)
-	return PyString_FromFormat("<range object (for deleted buffer) at %p>",
-				    (void *)self);
-    else
+    ಆದರೆ (self->buf->buf == INVALID_ಬಫರ್_ಮೌಲ್ಯ)
+	ಹಿಂತಿರುಗಿ PyString_FromFormat("<range object (for deleted buffer) at %p>",
+				    (ಶೂನ್ಯ *)self);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	char *name = (char *)self->buf->buf->b_fname;
+	ಅಕ್ಷರ *name = (ಅಕ್ಷರ *)self->buf->buf->b_fname;
 
-	if (name == NULL)
+	ಆದರೆ (name == ಖಾಲಿ)
 	    name = "";
 
-	return PyString_FromFormat("<range %s (%d:%d)>",
-				    name, (int)self->start, (int)self->end);
+	ಹಿಂತಿರುಗಿ PyString_FromFormat("<range %s (%d:%d)>",
+				    name, (ಪೂರ್ಣಾಂಕ)self->ಆರಂಭ, (ಪೂರ್ಣಾಂಕ)self->ಕೊನೆ);
     }
 }
 
-static struct PyMethodDef RangeMethods[] = {
+ಸ್ಥಿರ ರಚನೆ Py_ವಿಧಾನ_Def RangeMethods[] = {
     // name,	function,			calling,	documentation
     {"append",	(PyCFunction)RangeAppend,	METH_VARARGS,	"Append data to the Vim range" },
     {"__dir__",	(PyCFunction)RangeDir,		METH_NOARGS,	""},
-    { NULL,	NULL,				0,		NULL}
+    { ಖಾಲಿ,	ಖಾಲಿ,				0,		ಖಾಲಿ}
 };
 
-DEFINE_PY_TYPE_OBJECT(BufferType);
-static PySequenceMethods BufferAsSeq;
-static PyMappingMethods BufferAsMapping;
+DEFINE_PY_TYPE_OBJECT(ಬಫರ್_Type);
+ಸ್ಥಿರ PySequenceMethods ಬಫರ್_As_Seq;
+ಸ್ಥಿರ PyMappingMethods ಬಫರ್_As_Mapping;
 
-    static PyObject *
-BufferNew(buf_T *buf)
+    ಸ್ಥಿರ PyObject *
+ಬಫರ್_New(buf_T *buf)
 {
     /*
      * We need to handle deletion of buffers underneath us.
@@ -5894,151 +5894,151 @@ BufferNew(buf_T *buf)
      * b_python_ref and b_python3_ref fields respectively.
      */
 
-    BufferObject *self;
+    ಬಫರ್_Object *self;
 
-    if (BUF_PYTHON_REF(buf) != NULL)
+    ಆದರೆ (BUF_PYTHON_REF(buf) != ಖಾಲಿ)
     {
 	self = BUF_PYTHON_REF(buf);
 	Py_INCREF((PyObject *)self);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	self = PyObject_NEW(BufferObject, BufferTypePtr);
-	if (self == NULL)
-	    return NULL;
+	self = PyObject_NEW(ಬಫರ್_Object, ಬಫರ್_Type_Ptr);
+	ಆದರೆ (self == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	self->buf = buf;
 	BUF_PYTHON_REF(buf) = self;
     }
 
-    return (PyObject *)(self);
+    ಹಿಂತಿರುಗಿ (PyObject *)(self);
 }
 
-    static void
-BufferDestructor(PyObject *self_obj)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಬಫರ್_Destructor(PyObject *self_obj)
 {
-    BufferObject *self = (BufferObject*)self_obj;
-    if (self->buf && self->buf != INVALID_BUFFER_VALUE)
-	BUF_PYTHON_REF(self->buf) = NULL;
+    ಬಫರ್_Object *self = (ಬಫರ್_Object*)self_obj;
+    ಆದರೆ (self->buf && self->buf != INVALID_ಬಫರ್_ಮೌಲ್ಯ)
+	BUF_PYTHON_REF(self->buf) = ಖಾಲಿ;
 
-    DESTRUCTOR_FINISH(self);
+    DESTRUCTOR_ಮುಕ್ತಾಯ(self);
 }
 
-    static PyInt
-BufferLength(BufferObject *self)
+    ಸ್ಥಿರ PyInt
+ಬಫರ್_ಉದ್ದಳತೆ(ಬಫರ್_Object *self)
 {
     // HOW DO WE SIGNAL AN ERROR FROM THIS FUNCTION?
-    if (CheckBuffer(self))
-	return -1; // ???
+    ಆದರೆ (Check_ಬಫರ್(self))
+	ಹಿಂತಿರುಗಿ -1; // ???
 
-    return (PyInt)(self->buf->b_ml.ml_line_count);
+    ಹಿಂತಿರುಗಿ (PyInt)(self->buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ);
 }
 
-    static PyObject *
-BufferItem(BufferObject *self, PyInt n)
+    ಸ್ಥಿರ PyObject *
+ಬಫರ್_ಅಂಶ(ಬಫರ್_Object *self, PyInt n)
 {
-    return RBItem(self, n, 1, -1);
+    ಹಿಂತಿರುಗಿ RBItem(self, n, 1, -1);
 }
 
-    static PyObject *
-BufferSlice(BufferObject *self, PyInt lo, PyInt hi)
+    ಸ್ಥಿರ PyObject *
+ಬಫರ್_ತುಂಡು(ಬಫರ್_Object *self, PyInt lo, PyInt hi)
 {
-    return RBSlice(self, lo, hi, 1, -1);
+    ಹಿಂತಿರುಗಿ RBSlice(self, lo, hi, 1, -1);
 }
 
-static char *BufferAttrs[] = {
+ಸ್ಥಿರ ಅಕ್ಷರ *ಬಫರ್_Attrs[] = {
     "name", "number", "vars", "options", "valid",
-    NULL
+    ಖಾಲಿ
 };
 
-    static PyObject *
-BufferDir(PyObject *self, PyObject *args UNUSED)
+    ಸ್ಥಿರ PyObject *
+ಬಫರ್_Dir(PyObject *self, PyObject *ವಾದಗಳು ಬಳಸದ)
 {
-    return ObjectDir(self, BufferAttrs);
+    ಹಿಂತಿರುಗಿ ObjectDir(self, ಬಫರ್_Attrs);
 }
 
-    static PyObject *
-BufferAttrValid(BufferObject *self, char *name)
+    ಸ್ಥಿರ PyObject *
+ಬಫರ್_Attr_Valid(ಬಫರ್_Object *self, ಅಕ್ಷರ *name)
 {
     PyObject	*ret;
 
-    if (strcmp(name, "valid") != 0)
-	return NULL;
+    ಆದರೆ (strcmp(name, "valid") != 0)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    ret = ((self->buf == INVALID_BUFFER_VALUE) ? Py_False : Py_True);
+    ret = ((self->buf == INVALID_ಬಫರ್_ಮೌಲ್ಯ) ? Py_False : Py_True);
     Py_INCREF(ret);
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-    static PyObject *
-BufferAttr(BufferObject *self, char *name)
+    ಸ್ಥಿರ PyObject *
+ಬಫರ್_Attr(ಬಫರ್_Object *self, ಅಕ್ಷರ *name)
 {
-    if (strcmp(name, "name") == 0)
-	return PyString_FromString((self->buf->b_ffname == NULL
-				    ? "" : (char *)self->buf->b_ffname));
-    else if (strcmp(name, "number") == 0)
-	return Py_BuildValue(Py_ssize_t_fmt, self->buf->b_fnum);
-    else if (strcmp(name, "vars") == 0)
-	return NEW_DICTIONARY(self->buf->b_vars);
-    else if (strcmp(name, "options") == 0)
-	return OptionsNew(SREQ_BUF, self->buf, CheckBufferCb,
+    ಆದರೆ (strcmp(name, "name") == 0)
+	ಹಿಂತಿರುಗಿ PyString_FromString((self->buf->b_ffname == ಖಾಲಿ
+				    ? "" : (ಅಕ್ಷರ *)self->buf->b_ffname));
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "number") == 0)
+	ಹಿಂತಿರುಗಿ Py_Build_ಮೌಲ್ಯ(Py_ssize_t_fmt, self->buf->b_fnum);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "vars") == 0)
+	ಹಿಂತಿರುಗಿ NEW_DICTIONARY(self->buf->b_vars);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "options") == 0)
+	ಹಿಂತಿರುಗಿ OptionsNew(SREQ_BUF, self->buf, Check_ಬಫರ್_Cb,
 			(PyObject *) self);
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, BufferAttrs);
-    else
-	return NULL;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "__members__") == 0)
+	ಹಿಂತಿರುಗಿ ObjectDir(ಖಾಲಿ, ಬಫರ್_Attrs);
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
-    static int
-BufferSetattr(PyObject *self_obj, char *name, PyObject *valObject)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಬಫರ್_Setattr(PyObject *self_obj, ಅಕ್ಷರ *name, PyObject *valObject)
 {
-    BufferObject *self = (BufferObject*)self_obj;
-    if (CheckBuffer(self))
-	return -1;
+    ಬಫರ್_Object *self = (ಬಫರ್_Object*)self_obj;
+    ಆದರೆ (Check_ಬಫರ್(self))
+	ಹಿಂತಿರುಗಿ -1;
 
-    if (strcmp(name, "name") == 0)
+    ಆದರೆ (strcmp(name, "name") == 0)
     {
 	char_u		*val;
 	aco_save_T	aco;
-	int		ren_ret = OK;
+	ಪೂರ್ಣಾಂಕ		ren_ret = OK;
 	PyObject	*todecref;
 
-	if (!(val = StringToChars(valObject, &todecref)))
-	    return -1;
+	ಆದರೆ (!(val = String_ಗಮ್ಯ_Chars(valObject, &todecref)))
+	    ಹಿಂತಿರುಗಿ -1;
 
-	VimTryStart();
+	Vim_Try_ಆರಂಭ();
 	// Using aucmd_*: autocommands will be executed by rename_buffer
 	aucmd_prepbuf(&aco, self->buf);
-	if (curbuf == self->buf)
+	ಆದರೆ (curbuf == self->buf)
 	{
-	    ren_ret = rename_buffer(val);
+	    ren_ret = rename_ಬಫರ್(val);
 	    aucmd_restbuf(&aco);
 	}
 	Py_XDECREF(todecref);
-	if (VimTryEnd())
-	    return -1;
+	ಆದರೆ (Vim_Try_ಕೊನೆ())
+	    ಹಿಂತಿರುಗಿ -1;
 
-	if (ren_ret == FAIL)
+	ಆದರೆ (ren_ret == FAIL)
 	{
-	    PyErr_SET_VIM(N_("failed to rename buffer"));
-	    return -1;
+	    Py_Err_ಗಣ_VIM(N_("failed to rename buffer"));
+	    ಹಿಂತಿರುಗಿ -1;
 	}
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	PyErr_SetString(PyExc_AttributeError, name);
-	return -1;
+	Py_Err_ಗಣ_String(PyExc_AttributeError, name);
+	ಹಿಂತಿರುಗಿ -1;
     }
 }
 
-    static PyObject *
-BufferAppend(BufferObject *self, PyObject *args)
+    ಸ್ಥಿರ PyObject *
+ಬಫರ್_Append(ಬಫರ್_Object *self, PyObject *ವಾದಗಳು)
 {
-    return RBAppend(self, args, 1, -1, NULL);
+    ಹಿಂತಿರುಗಿ RBAppend(self, ವಾದಗಳು, 1, -1, ಖಾಲಿ);
 }
 
-    static PyObject *
-BufferMark(BufferObject *self, PyObject *pmarkObject)
+    ಸ್ಥಿರ PyObject *
+ಬಫರ್_Mark(ಬಫರ್_Object *self, PyObject *pmarkObject)
 {
     pos_T	*posp;
     char_u	*pmark;
@@ -6046,86 +6046,86 @@ BufferMark(BufferObject *self, PyObject *pmarkObject)
     bufref_T	savebuf;
     PyObject	*todecref;
 
-    if (CheckBuffer(self))
-	return NULL;
+    ಆದರೆ (Check_ಬಫರ್(self))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (!(pmark = StringToChars(pmarkObject, &todecref)))
-	return NULL;
+    ಆದರೆ (!(pmark = String_ಗಮ್ಯ_Chars(pmarkObject, &todecref)))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (pmark[0] == '\0' || pmark[1] != '\0')
+    ಆದರೆ (pmark[0] == '\0' || pmark[1] != '\0')
     {
-	PyErr_SET_STRING(PyExc_ValueError,
+	Py_Err_ಗಣ_STRING(Py_Exc_ಮೌಲ್ಯ_Error,
 		N_("mark name must be a single character"));
 	Py_XDECREF(todecref);
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
     mark = *pmark;
 
     Py_XDECREF(todecref);
 
-    VimTryStart();
-    switch_buffer(&savebuf, self->buf);
+    Vim_Try_ಆರಂಭ();
+    switch_ಬಫರ್(&savebuf, self->buf);
     posp = getmark(mark, FALSE);
-    restore_buffer(&savebuf);
-    if (VimTryEnd())
-	return NULL;
+    restore_ಬಫರ್(&savebuf);
+    ಆದರೆ (Vim_Try_ಕೊನೆ())
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (posp == NULL)
+    ಆದರೆ (posp == ಖಾಲಿ)
     {
-	PyErr_SET_VIM(N_("invalid mark name"));
-	return NULL;
+	Py_Err_ಗಣ_VIM(N_("invalid mark name"));
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    if (posp->lnum <= 0)
+    ಆದರೆ (posp->lnum <= 0)
     {
 	// Or raise an error?
 	Py_INCREF(Py_None);
-	return Py_None;
+	ಹಿಂತಿರುಗಿ Py_None;
     }
 
-    return Py_BuildValue("(ll)", (long)(posp->lnum), (long)(posp->col));
+    ಹಿಂತಿರುಗಿ Py_Build_ಮೌಲ್ಯ("(ll)", (ದೀರ್ಘ)(posp->lnum), (ದೀರ್ಘ)(posp->ಲಂಬಸಾಲು));
 }
 
-    static PyObject *
-BufferRange(BufferObject *self, PyObject *args)
+    ಸ್ಥಿರ PyObject *
+ಬಫರ್_Range(ಬಫರ್_Object *self, PyObject *ವಾದಗಳು)
 {
-    PyInt start;
-    PyInt end;
+    PyInt ಆರಂಭ;
+    PyInt ಕೊನೆ;
 
-    if (CheckBuffer(self))
-	return NULL;
+    ಆದರೆ (Check_ಬಫರ್(self))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (!PyArg_ParseTuple(args, "nn", &start, &end))
-	return NULL;
+    ಆದರೆ (!PyArg_ParseTuple(ವಾದಗಳು, "nn", &ಆರಂಭ, &ಕೊನೆ))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    return RangeNew(self->buf, start, end);
+    ಹಿಂತಿರುಗಿ RangeNew(self->buf, ಆರಂಭ, ಕೊನೆ);
 }
 
-    static PyObject *
-BufferRepr(PyObject *self_obj)
+    ಸ್ಥಿರ PyObject *
+ಬಫರ್_Repr(PyObject *self_obj)
 {
-    BufferObject *self = (BufferObject*)self_obj;
-    if (self->buf == INVALID_BUFFER_VALUE)
-	return PyString_FromFormat("<buffer object (deleted) at %p>", (void *)self);
-    else
+    ಬಫರ್_Object *self = (ಬಫರ್_Object*)self_obj;
+    ಆದರೆ (self->buf == INVALID_ಬಫರ್_ಮೌಲ್ಯ)
+	ಹಿಂತಿರುಗಿ PyString_FromFormat("<buffer object (deleted) at %p>", (ಶೂನ್ಯ *)self);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	char	*name = (char *)self->buf->b_fname;
+	ಅಕ್ಷರ	*name = (ಅಕ್ಷರ *)self->buf->b_fname;
 
-	if (name == NULL)
+	ಆದರೆ (name == ಖಾಲಿ)
 	    name = "";
 
-	return PyString_FromFormat("<buffer %s>", name);
+	ಹಿಂತಿರುಗಿ PyString_FromFormat("<buffer %s>", name);
     }
 }
 
-static struct PyMethodDef BufferMethods[] = {
+ಸ್ಥಿರ ರಚನೆ Py_ವಿಧಾನ_Def ಬಫರ್_Methods[] = {
     // name,	    function,			calling,	documentation
-    {"append",	    (PyCFunction)BufferAppend,	METH_VARARGS,	"Append data to Vim buffer" },
-    {"mark",	    (PyCFunction)BufferMark,	METH_O,		"Return (row,col) representing position of named mark" },
-    {"range",	    (PyCFunction)BufferRange,	METH_VARARGS,	"Return a range object which represents the part of the given buffer between line numbers s and e" },
-    {"__dir__",	    (PyCFunction)BufferDir,	METH_NOARGS,	""},
-    { NULL,	    NULL,			0,		NULL}
+    {"append",	    (PyCFunction)ಬಫರ್_Append,	METH_VARARGS,	"Append data to Vim buffer" },
+    {"mark",	    (PyCFunction)ಬಫರ್_Mark,	METH_O,		"Return (row,col) representing position of named mark" },
+    {"range",	    (PyCFunction)ಬಫರ್_Range,	METH_VARARGS,	"Return a range object which represents the part of the given buffer between line numbers s and e" },
+    {"__dir__",	    (PyCFunction)ಬಫರ್_Dir,	METH_NOARGS,	""},
+    { ಖಾಲಿ,	    ಖಾಲಿ,			0,		ಖಾಲಿ}
 };
 
 /*
@@ -6134,832 +6134,832 @@ static struct PyMethodDef BufferMethods[] = {
 
 DEFINE_PY_TYPE_OBJECT(BufMapType);
 
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    PyObject_HEAD
+    Py_Object_ತಲೆ
 } BufMapObject;
 
-static BufMapObject TheBufferMap =
+ಸ್ಥಿರ BufMapObject The_ಬಫರ್_Map =
 {
-    PyObject_HEAD_INIT_TYPE(BufMapType)
+    Py_Object_ತಲೆ_INIT_TYPE(BufMapType)
 };
 
-    static PyInt
-BufMapLength(PyObject *self UNUSED)
+    ಸ್ಥಿರ PyInt
+Buf_Map_ಉದ್ದಳತೆ(PyObject *self ಬಳಸದ)
 {
     buf_T	*b = firstbuf;
     PyInt	n = 0;
 
-    while (b)
+    ಆಗ (b)
     {
 	++n;
-	b = b->b_next;
+	b = b->b_ಮುಂದಿನ;
     }
 
-    return n;
+    ಹಿಂತಿರುಗಿ n;
 }
 
-    static PyObject *
-BufMapItem(PyObject *self UNUSED, PyObject *keyObject)
+    ಸ್ಥಿರ PyObject *
+Buf_Map_ಅಂಶ(PyObject *self ಬಳಸದ, PyObject *ಕೀಲಿ_Object)
 {
     buf_T	*b;
-    long	bnr;
+    ದೀರ್ಘ	bnr;
 
-    if (NumberToLong(keyObject, &bnr, NUMBER_INT|NUMBER_NATURAL))
-	return NULL;
+    ಆದರೆ (ಸಂಖ್ಯೆ_ಗಮ್ಯ_Long(ಕೀಲಿ_Object, &bnr, ಸಂಖ್ಯೆ_INT|ಸಂಖ್ಯೆ_NATURAL))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    b = buflist_findnr((int) bnr);
+    b = buflist_findnr((ಪೂರ್ಣಾಂಕ) bnr);
 
-    if (b)
-	return BufferNew(b);
-    else
+    ಆದರೆ (b)
+	ಹಿಂತಿರುಗಿ ಬಫರ್_New(b);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	PyErr_SetObject(PyExc_KeyError, keyObject);
-	return NULL;
+	Py_Err_ಗಣ_Object(Py_Exc_ಕೀಲಿ_Error, ಕೀಲಿ_Object);
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 }
 
-    static void
-BufMapIterDestruct(void* arg)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+BufMapIterDestruct(ಶೂನ್ಯ* arg)
 {
-    PyObject *buffer = (PyObject*)arg;
+    PyObject *ಬಫರ್ = (PyObject*)arg;
     // Iteration was stopped before all buffers were processed
-    if (buffer)
+    ಆದರೆ (ಬಫರ್)
     {
-	Py_DECREF(buffer);
+	Py_DECREF(ಬಫರ್);
     }
 }
 
-    static int
-BufMapIterTraverse(void *iter, visitproc visit, void *arg)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+BufMapIterTraverse(ಶೂನ್ಯ *iter, visitproc ಭೇಟಿ, ಶೂನ್ಯ *arg)
 {
-    PyObject *buffer = (PyObject*)iter;
-    if (buffer)
-	Py_VISIT(buffer);
-    return 0;
+    PyObject *ಬಫರ್ = (PyObject*)iter;
+    ಆದರೆ (ಬಫರ್)
+	Py_ಭೇಟಿ(ಬಫರ್);
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-    static int
-BufMapIterClear(void **iter)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+BufMapIterClear(ಶೂನ್ಯ **iter)
 {
-    PyObject **buffer = (PyObject**)iter;
-    if (*buffer)
-	Py_CLEAR(*buffer);
-    return 0;
+    PyObject **ಬಫರ್ = (PyObject**)iter;
+    ಆದರೆ (*ಬಫರ್)
+	Py_CLEAR(*ಬಫರ್);
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-    static PyObject *
-BufMapIterNext(void **arg)
+    ಸ್ಥಿರ PyObject *
+Buf_Map_Iter_ಮುಂದಿನ(ಶೂನ್ಯ **arg)
 {
-    PyObject	*next;
+    PyObject	*ಮುಂದಿನ;
     PyObject	*ret;
-    PyObject	**buffer = (PyObject**)arg;
+    PyObject	**ಬಫರ್ = (PyObject**)arg;
 
-    if (!*buffer)
-	return NULL;
+    ಆದರೆ (!*ಬಫರ್)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    ret = *buffer;
+    ret = *ಬಫರ್;
 
-    if (CheckBuffer((BufferObject *)(ret)))
+    ಆದರೆ (Check_ಬಫರ್((ಬಫರ್_Object *)(ret)))
     {
-	*buffer = NULL;
-	return NULL;
+	*ಬಫರ್ = ಖಾಲಿ;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    if (!((BufferObject *)(ret))->buf->b_next)
-	next = NULL;
-    else if (!(next = BufferNew(((BufferObject *)(ret))->buf->b_next)))
-	return NULL;
-    *buffer = next;
+    ಆದರೆ (!((ಬಫರ್_Object *)(ret))->buf->b_ಮುಂದಿನ)
+	ಮುಂದಿನ = ಖಾಲಿ;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!(ಮುಂದಿನ = ಬಫರ್_New(((ಬಫರ್_Object *)(ret))->buf->b_ಮುಂದಿನ)))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    *ಬಫರ್ = ಮುಂದಿನ;
     // Do not increment reference: we no longer hold it (decref), but whoever
     // on other side will hold (incref). Decref+incref = nothing.
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-    static PyObject *
+    ಸ್ಥಿರ PyObject *
 BufMapIter(PyObject *self)
 {
-    PyObject *buffer;
+    PyObject *ಬಫರ್;
 
-    buffer = BufferNew(firstbuf);
-    return IterNew(buffer,
-	    BufMapIterDestruct, BufMapIterNext,
+    ಬಫರ್ = ಬಫರ್_New(firstbuf);
+    ಹಿಂತಿರುಗಿ IterNew(ಬಫರ್,
+	    BufMapIterDestruct, Buf_Map_Iter_ಮುಂದಿನ,
 	    BufMapIterTraverse, BufMapIterClear,
 	    self);
 }
 
-static PyMappingMethods BufMapAsMapping = {
-    (lenfunc)       BufMapLength,
-    (binaryfunc)    BufMapItem,
+ಸ್ಥಿರ PyMappingMethods BufMapAsMapping = {
+    (lenfunc)       Buf_Map_ಉದ್ದಳತೆ,
+    (binaryfunc)    Buf_Map_ಅಂಶ,
     (objobjargproc) 0,
 };
 
 // Current items object
 
-static char *CurrentAttrs[] = {
+ಸ್ಥಿರ ಅಕ್ಷರ *CurrentAttrs[] = {
     "buffer", "window", "line", "range", "tabpage",
-    NULL
+    ಖಾಲಿ
 };
 
-    static PyObject *
-CurrentDir(PyObject *self, PyObject *args UNUSED)
+    ಸ್ಥಿರ PyObject *
+CurrentDir(PyObject *self, PyObject *ವಾದಗಳು ಬಳಸದ)
 {
-    return ObjectDir(self, CurrentAttrs);
+    ಹಿಂತಿರುಗಿ ObjectDir(self, CurrentAttrs);
 }
 
-    static PyObject *
-CurrentGetattr(PyObject *self UNUSED, char *name)
+    ಸ್ಥಿರ PyObject *
+CurrentGetattr(PyObject *self ಬಳಸದ, ಅಕ್ಷರ *name)
 {
-    if (strcmp(name, "buffer") == 0)
-	return (PyObject *)BufferNew(curbuf);
-    else if (strcmp(name, "window") == 0)
-	return (PyObject *)WindowNew(curwin, curtab);
-    else if (strcmp(name, "tabpage") == 0)
-	return (PyObject *)TabPageNew(curtab);
-    else if (strcmp(name, "line") == 0)
-	return GetBufferLine(curbuf, (PyInt)curwin->w_cursor.lnum);
-    else if (strcmp(name, "range") == 0)
-	return RangeNew(curbuf, RangeStart, RangeEnd);
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, CurrentAttrs);
-    else
-#if PY_MAJOR_VERSION < 3
-	return Py_FindMethod(WindowMethods, self, name);
-#else
-	return NULL;
-#endif
+    ಆದರೆ (strcmp(name, "buffer") == 0)
+	ಹಿಂತಿರುಗಿ (PyObject *)ಬಫರ್_New(curbuf);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "window") == 0)
+	ಹಿಂತಿರುಗಿ (PyObject *)ಕಿಟಕಿ_New(curwin, curtab);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "tabpage") == 0)
+	ಹಿಂತಿರುಗಿ (PyObject *)Tab_ಪುಟ_New(curtab);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "line") == 0)
+	ಹಿಂತಿರುಗಿ Get_ಬಫರ್_ಸಾಲು(curbuf, (PyInt)curwin->w_cursor.lnum);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "range") == 0)
+	ಹಿಂತಿರುಗಿ RangeNew(curbuf, Range_ಆರಂಭ, Range_ಕೊನೆ);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "__members__") == 0)
+	ಹಿಂತಿರುಗಿ ObjectDir(ಖಾಲಿ, CurrentAttrs);
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ PY_MAJOR_ಆವೃತ್ತಿ < 3
+	ಹಿಂತಿರುಗಿ Py_ಕಂಡುಹಿಡಿ_ವಿಧಾನ(ಕಿಟಕಿ_Methods, self, name);
+#ಇಲ್ಲದಿದ್ದರೆ
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-    static int
-CurrentSetattr(PyObject *self UNUSED, char *name, PyObject *valObject)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+CurrentSetattr(PyObject *self ಬಳಸದ, ಅಕ್ಷರ *name, PyObject *valObject)
 {
-    if (strcmp(name, "line") == 0)
+    ಆದರೆ (strcmp(name, "line") == 0)
     {
-	if (SetBufferLine(curbuf, (PyInt)curwin->w_cursor.lnum, valObject,
-			  NULL) == FAIL)
-	    return -1;
+	ಆದರೆ (ಗಣ_ಬಫರ್_ಸಾಲು_2(curbuf, (PyInt)curwin->w_cursor.lnum, valObject,
+			  ಖಾಲಿ) == FAIL)
+	    ಹಿಂತಿರುಗಿ -1;
 
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
     }
-    else if (strcmp(name, "buffer") == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "buffer") == 0)
     {
-	int count;
+	ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_2;
 
-	if (valObject->ob_type != BufferTypePtr)
+	ಆದರೆ (valObject->ob_type != ಬಫರ್_Type_Ptr)
 	{
 	    PyErr_FORMAT_TYPE(
 		    N_("expected vim.Buffer object, but got %s"),
 		    valObject);
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 
-	if (CheckBuffer((BufferObject *)(valObject)))
-	    return -1;
-	count = ((BufferObject *)(valObject))->buf->b_fnum;
+	ಆದರೆ (Check_ಬಫರ್((ಬಫರ್_Object *)(valObject)))
+	    ಹಿಂತಿರುಗಿ -1;
+	ಎಣಿಕೆ_2 = ((ಬಫರ್_Object *)(valObject))->buf->b_fnum;
 
-	VimTryStart();
-	if (do_buffer(DOBUF_GOTO, DOBUF_FIRST, FORWARD, count, 0) == FAIL)
+	Vim_Try_ಆರಂಭ();
+	ಆದರೆ (do_ಬಫರ್(DOBUF_GOTO, DOBUF_ಮೊದಲ, FORWARD, ಎಣಿಕೆ_2, 0) == FAIL)
 	{
-	    if (VimTryEnd())
-		return -1;
-	    PyErr_VIM_FORMAT(N_("failed to switch to buffer %d"), count);
-	    return -1;
+	    ಆದರೆ (Vim_Try_ಕೊನೆ())
+		ಹಿಂತಿರುಗಿ -1;
+	    PyErr_VIM_FORMAT(N_("failed to switch to buffer %d"), ಎಣಿಕೆ_2);
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 
-	return VimTryEnd();
+	ಹಿಂತಿರುಗಿ Vim_Try_ಕೊನೆ();
     }
-    else if (strcmp(name, "window") == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "window") == 0)
     {
-	int count;
+	ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_2;
 
-	if (valObject->ob_type != WindowTypePtr)
+	ಆದರೆ (valObject->ob_type != ಕಿಟಕಿ_Type_Ptr)
 	{
 	    PyErr_FORMAT_TYPE(
 		    N_("expected vim.Window object, but got %s"),
 		    valObject);
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 
-	if (CheckWindow((WindowObject *)(valObject)))
-	    return -1;
-	count = get_win_number(((WindowObject *)(valObject))->win, firstwin);
+	ಆದರೆ (Check_ಕಿಟಕಿ((ಕಿಟಕಿ_Object *)(valObject)))
+	    ಹಿಂತಿರುಗಿ -1;
+	ಎಣಿಕೆ_2 = get_win_ಸಂಖ್ಯೆ(((ಕಿಟಕಿ_Object *)(valObject))->win, firstwin);
 
-	if (!count)
+	ಆದರೆ (!ಎಣಿಕೆ_2)
 	{
-	    PyErr_SET_STRING(PyExc_ValueError,
+	    Py_Err_ಗಣ_STRING(Py_Exc_ಮೌಲ್ಯ_Error,
 		    N_("failed to find window in the current tab page"));
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 
-	VimTryStart();
-	win_goto(((WindowObject *)(valObject))->win);
-	if (((WindowObject *)(valObject))->win != curwin)
+	Vim_Try_ಆರಂಭ();
+	win_goto(((ಕಿಟಕಿ_Object *)(valObject))->win);
+	ಆದರೆ (((ಕಿಟಕಿ_Object *)(valObject))->win != curwin)
 	{
-	    if (VimTryEnd())
-		return -1;
-	    PyErr_SET_STRING(PyExc_RuntimeError,
+	    ಆದರೆ (Vim_Try_ಕೊನೆ())
+		ಹಿಂತಿರುಗಿ -1;
+	    Py_Err_ಗಣ_STRING(PyExc_RuntimeError,
 		    N_("did not switch to the specified window"));
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 
-	return VimTryEnd();
+	ಹಿಂತಿರುಗಿ Vim_Try_ಕೊನೆ();
     }
-    else if (strcmp(name, "tabpage") == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(name, "tabpage") == 0)
     {
-	if (valObject->ob_type != TabPageTypePtr)
+	ಆದರೆ (valObject->ob_type != Tab_ಪುಟ_Type_Ptr)
 	{
 	    PyErr_FORMAT_TYPE(
 		    N_("expected vim.TabPage object, but got %s"),
 		    valObject);
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 
-	if (CheckTabPage((TabPageObject *)(valObject)))
-	    return -1;
+	ಆದರೆ (Check_Tab_ಪುಟ((Tab_ಪುಟ_Object *)(valObject)))
+	    ಹಿಂತಿರುಗಿ -1;
 
-	VimTryStart();
-	goto_tabpage_tp(((TabPageObject *)(valObject))->tab, TRUE, TRUE);
-	if (((TabPageObject *)(valObject))->tab != curtab)
+	Vim_Try_ಆರಂಭ();
+	goto_tabpage_tp(((Tab_ಪುಟ_Object *)(valObject))->tab, TRUE, TRUE);
+	ಆದರೆ (((Tab_ಪುಟ_Object *)(valObject))->tab != curtab)
 	{
-	    if (VimTryEnd())
-		return -1;
-	    PyErr_SET_STRING(PyExc_RuntimeError,
+	    ಆದರೆ (Vim_Try_ಕೊನೆ())
+		ಹಿಂತಿರುಗಿ -1;
+	    Py_Err_ಗಣ_STRING(PyExc_RuntimeError,
 		    N_("did not switch to the specified tab page"));
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 
-	return VimTryEnd();
+	ಹಿಂತಿರುಗಿ Vim_Try_ಕೊನೆ();
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	PyErr_SetString(PyExc_AttributeError, name);
-	return -1;
+	Py_Err_ಗಣ_String(PyExc_AttributeError, name);
+	ಹಿಂತಿರುಗಿ -1;
     }
 }
 
-static struct PyMethodDef CurrentMethods[] = {
+ಸ್ಥಿರ ರಚನೆ Py_ವಿಧಾನ_Def CurrentMethods[] = {
     // name,	    function,			calling,	documentation
     {"__dir__",	    (PyCFunction)CurrentDir,	METH_NOARGS,	""},
-    { NULL,	    NULL,			0,		NULL}
+    { ಖಾಲಿ,	    ಖಾಲಿ,			0,		ಖಾಲಿ}
 };
 
-    static void
-init_range_cmd(void *arg)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+init_range_cmd(ಶೂನ್ಯ *arg)
 {
     exarg_T *eap = (exarg_T*)arg;
-    RangeStart = eap->line1;
-    RangeEnd = eap->line2;
+    Range_ಆರಂಭ = eap->line1;
+    Range_ಕೊನೆ = eap->line2;
 }
 
-    static void
-init_range_eval(void *rettv UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+init_range_eval(ಶೂನ್ಯ *rettv ಬಳಸದ)
 {
-    RangeStart = (PyInt) curwin->w_cursor.lnum;
-    RangeEnd = RangeStart;
+    Range_ಆರಂಭ = (PyInt) curwin->w_cursor.lnum;
+    Range_ಕೊನೆ = Range_ಆರಂಭ;
 }
 
-    static void
-run_cmd(const char *cmd, dict_T* locals UNUSED, void *arg UNUSED
-#ifdef PY_CAN_RECURSE
-	, PyGILState_STATE *pygilstate UNUSED
-#endif
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಸತತ_cmd(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *cmd, dict_T* locals ಬಳಸದ, ಶೂನ್ಯ *arg ಬಳಸದ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ PY_CAN_RECURSE
+	, PyGILState_STATE *pygilstate ಬಳಸದ
+#ಆದರೆ_ಅಂತ್ಯ
 	)
 {
-    PyObject	*run_ret;
-    run_ret = PyRun_String((char *)cmd, Py_file_input, globals, globals);
-    if (run_ret != NULL)
+    PyObject	*ಸತತ_ret;
+    ಸತತ_ret = Py_ಸತತ_String((ಅಕ್ಷರ *)cmd, Py_file_ಒಳಹರಿವು, globals, globals);
+    ಆದರೆ (ಸತತ_ret != ಖಾಲಿ)
     {
-	Py_DECREF(run_ret);
+	Py_DECREF(ಸತತ_ret);
     }
-    else if (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_SystemExit))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_SystemExit))
     {
-	emsg(_(e_cant_handle_systemexit_of_python_exception_in_vim));
+	emsg(_(e_cant_handle_systemexit_ದ_python_exception_ಒಳ_vim));
 	PyErr_Clear();
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	PyErr_PrintEx(1);
 }
 
-static const char	*code_hdr = "def " DOPY_FUNC "(line, linenr):\n ";
-static int		code_hdr_len = 30;
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ	*ಸಂಕೇತ_hdr = "def " DOPY_FUNC "(line, linenr):\n ";
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ		ಸಂಕೇತ_hdr_len = 30;
 
-    static void
-run_do(const char *cmd, dict_T* locals UNUSED, void *arg UNUSED
-#ifdef PY_CAN_RECURSE
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಸತತ_do(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *cmd, dict_T* locals ಬಳಸದ, ಶೂನ್ಯ *arg ಬಳಸದ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ PY_CAN_RECURSE
 	, PyGILState_STATE *pygilstate
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	)
 {
     PyInt	lnum;
     size_t	len;
-    char	*code;
-    int		status;
+    ಅಕ್ಷರ	*ಸಂಕೇತ_2;
+    ಪೂರ್ಣಾಂಕ		ಸ್ಥಿತಿ_2;
     PyObject	*pyfunc, *pymain;
-    PyObject	*run_ret;
+    PyObject	*ಸತತ_ret;
     buf_T	*was_curbuf = curbuf;
 
-    if (u_save((linenr_T)RangeStart - 1, (linenr_T)RangeEnd + 1) != OK)
+    ಆದರೆ (u_save((linenr_T)Range_ಆರಂಭ - 1, (linenr_T)Range_ಕೊನೆ + 1) != OK)
     {
 	emsg(_("cannot save undo information"));
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    len = code_hdr_len + STRLEN(cmd);
-    code = PyMem_New(char, len + 1);
-    memcpy(code, code_hdr, code_hdr_len);
-    STRCPY(code + code_hdr_len, cmd);
-    run_ret = PyRun_String(code, Py_file_input, globals, globals);
-    status = -1;
-    if (run_ret != NULL)
+    len = ಸಂಕೇತ_hdr_len + STRLEN(cmd);
+    ಸಂಕೇತ_2 = PyMem_New(ಅಕ್ಷರ, len + 1);
+    ಸ್ಮರಣೆ_ನಕಲು(ಸಂಕೇತ_2, ಸಂಕೇತ_hdr, ಸಂಕೇತ_hdr_len);
+    STRCPY(ಸಂಕೇತ_2 + ಸಂಕೇತ_hdr_len, cmd);
+    ಸತತ_ret = Py_ಸತತ_String(ಸಂಕೇತ_2, Py_file_ಒಳಹರಿವು, globals, globals);
+    ಸ್ಥಿತಿ_2 = -1;
+    ಆದರೆ (ಸತತ_ret != ಖಾಲಿ)
     {
-	status = 0;
-	Py_DECREF(run_ret);
+	ಸ್ಥಿತಿ_2 = 0;
+	Py_DECREF(ಸತತ_ret);
     }
-    else if (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_SystemExit))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_SystemExit))
     {
-	PyMem_Free(code);
-	emsg(_(e_cant_handle_systemexit_of_python_exception_in_vim));
+	PyMem_Free(ಸಂಕೇತ_2);
+	emsg(_(e_cant_handle_systemexit_ದ_python_exception_ಒಳ_vim));
 	PyErr_Clear();
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	PyErr_PrintEx(1);
 
-    PyMem_Free(code);
+    PyMem_Free(ಸಂಕೇತ_2);
 
-    if (status)
+    ಆದರೆ (ಸ್ಥಿತಿ_2)
     {
 	emsg(_("failed to run the code"));
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    status = 0;
-    pymain = PyImport_AddModule("__main__");
+    ಸ್ಥಿತಿ_2 = 0;
+    pymain = Py_Import_ಕೂಡಿಸು_Module("__main__");
     pyfunc = PyObject_GetAttrString(pymain, DOPY_FUNC);
-#ifdef PY_CAN_RECURSE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ PY_CAN_RECURSE
     PyGILState_Release(*pygilstate);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    for (lnum = RangeStart; lnum <= RangeEnd; ++lnum)
+    ಗಾಗಿ (lnum = Range_ಆರಂಭ; lnum <= Range_ಕೊನೆ; ++lnum)
     {
-	PyObject	*line;
+	PyObject	*ಸಾಲು;
 	PyObject	*linenr;
 	PyObject	*ret;
 
-#ifdef PY_CAN_RECURSE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ PY_CAN_RECURSE
 	*pygilstate = PyGILState_Ensure();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	// Check the line number, the command my have deleted lines.
-	if (lnum > curbuf->b_ml.ml_line_count
-		|| !(line = GetBufferLine(curbuf, lnum)))
-	    goto err;
-	if (!(linenr = PyInt_FromLong((long) lnum)))
+	ಆದರೆ (lnum > curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ
+		|| !(ಸಾಲು = Get_ಬಫರ್_ಸಾಲು(curbuf, lnum)))
+	    ಹೋಗು err;
+	ಆದರೆ (!(linenr = PyInt_FromLong((ದೀರ್ಘ) lnum)))
 	{
-	    Py_DECREF(line);
-	    goto err;
+	    Py_DECREF(ಸಾಲು);
+	    ಹೋಗು err;
 	}
-	ret = PyObject_CallFunctionObjArgs(pyfunc, line, linenr, NULL);
-	Py_DECREF(line);
+	ret = Py_Object_Call_Function_Obj_ವಾದಗಳು(pyfunc, ಸಾಲು, linenr, ಖಾಲಿ);
+	Py_DECREF(ಸಾಲು);
 	Py_DECREF(linenr);
-	if (!ret)
-	    goto err;
+	ಆದರೆ (!ret)
+	    ಹೋಗು err;
 
 	// Check that the command didn't switch to another buffer.
 	// Check the line number, the command my have deleted lines.
-	if (curbuf != was_curbuf || lnum > curbuf->b_ml.ml_line_count)
+	ಆದರೆ (curbuf != was_curbuf || lnum > curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
 	{
 	    Py_XDECREF(ret);
-	    goto err;
+	    ಹೋಗು err;
 	}
 
-	if (ret != Py_None)
-	    if (SetBufferLine(curbuf, lnum, ret, NULL) == FAIL)
+	ಆದರೆ (ret != Py_None)
+	    ಆದರೆ (ಗಣ_ಬಫರ್_ಸಾಲು_2(curbuf, lnum, ret, ಖಾಲಿ) == FAIL)
 	    {
 		Py_XDECREF(ret);
-		goto err;
+		ಹೋಗು err;
 	    }
 
 	Py_XDECREF(ret);
 	PythonIO_Flush();
-#ifdef PY_CAN_RECURSE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ PY_CAN_RECURSE
 	PyGILState_Release(*pygilstate);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
-    goto out;
+    ಹೋಗು ಹೊರಹೋಗು;
 err:
-#ifdef PY_CAN_RECURSE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ PY_CAN_RECURSE
     *pygilstate = PyGILState_Ensure();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     PyErr_PrintEx(0);
     PythonIO_Flush();
-    status = 1;
-out:
-#ifdef PY_CAN_RECURSE
-    if (!status)
+    ಸ್ಥಿತಿ_2 = 1;
+ಹೊರಹೋಗು:
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ PY_CAN_RECURSE
+    ಆದರೆ (!ಸ್ಥಿತಿ_2)
 	*pygilstate = PyGILState_Ensure();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     Py_DECREF(pyfunc);
-    PyObject_SetAttrString(pymain, DOPY_FUNC, NULL);
-    if (status)
-	return;
+    Py_Object_ಗಣ_Attr_String(pymain, DOPY_FUNC, ಖಾಲಿ);
+    ಆದರೆ (ಸ್ಥಿತಿ_2)
+	ಹಿಂತಿರುಗಿ;
     check_cursor();
     update_curbuf(UPD_NOT_VALID);
 }
 
-    static void
-run_eval(const char *cmd, dict_T *locals, void *arg
-#ifdef PY_CAN_RECURSE
-	, PyGILState_STATE *pygilstate UNUSED
-#endif
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಸತತ_eval(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *cmd, dict_T *locals, ಶೂನ್ಯ *arg
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ PY_CAN_RECURSE
+	, PyGILState_STATE *pygilstate ಬಳಸದ
+#ಆದರೆ_ಅಂತ್ಯ
 	)
 {
-    PyObject	*run_ret;
+    PyObject	*ಸತತ_ret;
     typval_T	*rettv = (typval_T*)arg;
     PyObject	*pylocals = locals ? NEW_DICTIONARY(locals) : globals;
 
-    run_ret = PyRun_String((char *)cmd, Py_eval_input, globals, pylocals);
-    if (run_ret == NULL)
+    ಸತತ_ret = Py_ಸತತ_String((ಅಕ್ಷರ *)cmd, Py_eval_ಒಳಹರಿವು, globals, pylocals);
+    ಆದರೆ (ಸತತ_ret == ಖಾಲಿ)
     {
-	if (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_SystemExit))
+	ಆದರೆ (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_SystemExit))
 	{
-	    emsg(_(e_cant_handle_systemexit_of_python_exception_in_vim));
+	    emsg(_(e_cant_handle_systemexit_ದ_python_exception_ಒಳ_vim));
 	    PyErr_Clear();
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (PyErr_Occurred() && !msg_silent)
+	    ಆದರೆ (PyErr_Occurred() && !ಸಂದೇಶ_silent)
 		PyErr_PrintEx(0);
 	    emsg(_(e_eval_did_not_return_valid_python_object));
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (ConvertFromPyObject(run_ret, rettv) == -1)
-	    emsg(_(e_failed_to_convert_returned_python_object_to_vim_value));
-	Py_DECREF(run_ret);
+	ಆದರೆ (ConvertFromPyObject(ಸತತ_ret, rettv) == -1)
+	    emsg(_(e_failed_ಗಮ್ಯ_convert_returned_python_object_ಗಮ್ಯ_vim_ಮೌಲ್ಯ));
+	Py_DECREF(ಸತತ_ret);
     }
     PyErr_Clear();
 }
 
-    static int
-set_ref_in_py(const int copyID)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಗಣ_ref_ಒಳ_py(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ copyID)
 {
     pylinkedlist_T	*cur;
     list_T		*ll;
     tuple_T		*tt;
-    int			i;
-    int			abort = FALSE;
+    ಪೂರ್ಣಾಂಕ			i;
+    ಪೂರ್ಣಾಂಕ			abort = FALSE;
     FunctionObject	*func;
 
-    if (lastdict != NULL)
+    ಆದರೆ (lastdict != ಖಾಲಿ)
     {
-	for (cur = lastdict ; !abort && cur != NULL ; cur = cur->pll_prev)
-	    abort = set_ref_in_dict(((DictionaryObject *)(cur->pll_obj))->dict,
+	ಗಾಗಿ (cur = lastdict ; !abort && cur != ಖಾಲಿ ; cur = cur->pll_prev)
+	    abort = ಗಣ_ref_ಒಳ_dict(((DictionaryObject *)(cur->pll_obj))->dict,
 								       copyID);
     }
 
-    if (lastlist != NULL)
+    ಆದರೆ (lastlist != ಖಾಲಿ)
     {
-	for (cur = lastlist ; !abort && cur != NULL ; cur = cur->pll_prev)
+	ಗಾಗಿ (cur = lastlist ; !abort && cur != ಖಾಲಿ ; cur = cur->pll_prev)
 	{
 	    ll = ((ListObject *) (cur->pll_obj))->list;
-	    abort = set_ref_in_list(ll, copyID);
+	    abort = ಗಣ_ref_ಒಳ_list(ll, copyID);
 	}
     }
 
-    if (lasttuple != NULL)
+    ಆದರೆ (lasttuple != ಖಾಲಿ)
     {
-	for (cur = lasttuple ; !abort && cur != NULL ; cur = cur->pll_prev)
+	ಗಾಗಿ (cur = lasttuple ; !abort && cur != ಖಾಲಿ ; cur = cur->pll_prev)
 	{
 	    tt = ((TupleObject *) (cur->pll_obj))->tuple;
-	    abort = set_ref_in_tuple(tt, copyID);
+	    abort = ಗಣ_ref_ಒಳ_tuple(tt, copyID);
 	}
     }
 
-    if (lastfunc != NULL)
+    ಆದರೆ (lastfunc != ಖಾಲಿ)
     {
-	for (cur = lastfunc ; !abort && cur != NULL ; cur = cur->pll_prev)
+	ಗಾಗಿ (cur = lastfunc ; !abort && cur != ಖಾಲಿ ; cur = cur->pll_prev)
 	{
 	    func = (FunctionObject *) cur->pll_obj;
-	    abort = set_ref_in_dict(func->self, copyID);
-	    if (func->argc)
-		for (i = 0; !abort && i < func->argc; ++i)
+	    abort = ಗಣ_ref_ಒಳ_dict(func->self, copyID);
+	    ಆದರೆ (func->argc)
+		ಗಾಗಿ (i = 0; !abort && i < func->argc; ++i)
 		    abort = abort
-			|| set_ref_in_item(&func->argv[i], copyID, NULL, NULL, NULL);
+			|| ಗಣ_ref_ಒಳ_ಅಂಶ(&func->argv[i], copyID, ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ);
 	}
     }
 
-    return abort;
+    ಹಿಂತಿರುಗಿ abort;
 }
 
-    static int
-set_string_copy(char_u *str, typval_T *tv)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಗಣ_string_copy(char_u *str, typval_T *tv)
 {
     tv->vval.v_string = vim_strsave(str);
-    if (tv->vval.v_string == NULL)
+    ಆದರೆ (tv->vval.v_string == ಖಾಲಿ)
     {
-	PyErr_NoMemory();
-	return -1;
+	Py_Err_No_ಸ್ಮರಣೆ();
+	ಹಿಂತಿರುಗಿ -1;
     }
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-    static int
-pydict_to_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+pydict_ಗಮ್ಯ_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 {
     dict_T	*dict;
-    char_u	*key;
+    char_u	*ಕೀಲಿ;
     dictitem_T	*di;
-    PyObject	*keyObject;
+    PyObject	*ಕೀಲಿ_Object;
     PyObject	*valObject;
     Py_ssize_t	iter = 0;
 
-    if (!(dict = py_dict_alloc()))
-	return -1;
+    ಆದರೆ (!(dict = py_dict_alloc()))
+	ಹಿಂತಿರುಗಿ -1;
 
     tv->v_type = VAR_DICT;
     tv->vval.v_dict = dict;
 
-    while (PyDict_Next(obj, &iter, &keyObject, &valObject))
+    ಆಗ (Py_Dict_ಮುಂದಿನ(obj, &iter, &ಕೀಲಿ_Object, &valObject))
     {
-	PyObject	*todecref = NULL;
+	PyObject	*todecref = ಖಾಲಿ;
 
-	if (keyObject == NULL || valObject == NULL)
+	ಆದರೆ (ಕೀಲಿ_Object == ಖಾಲಿ || valObject == ಖಾಲಿ)
 	{
 	    dict_unref(dict);
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 
-	if (!(key = StringToChars(keyObject, &todecref)))
+	ಆದರೆ (!(ಕೀಲಿ = String_ಗಮ್ಯ_Chars(ಕೀಲಿ_Object, &todecref)))
 	{
 	    dict_unref(dict);
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 
-	if (*key == NUL)
+	ಆದರೆ (*ಕೀಲಿ == NUL)
 	{
 	    dict_unref(dict);
 	    Py_XDECREF(todecref);
-	    RAISE_NO_EMPTY_KEYS;
-	    return -1;
+	    RAISE_NO_ಖಾಲಿಗಳು_ಕೀಲಿಗಳು;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 
-	di = dictitem_alloc(key);
+	di = dictitem_alloc(ಕೀಲಿ);
 
 	Py_XDECREF(todecref);
 
-	if (di == NULL)
+	ಆದರೆ (di == ಖಾಲಿ)
 	{
-	    PyErr_NoMemory();
+	    Py_Err_No_ಸ್ಮರಣೆ();
 	    dict_unref(dict);
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 
-	if (_ConvertFromPyObject(valObject, &di->di_tv, lookup_dict) == -1)
+	ಆದರೆ (_ConvertFromPyObject(valObject, &di->di_tv, lookup_dict) == -1)
 	{
 	    vim_free(di);
 	    dict_unref(dict);
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 
-	if (dict_add(dict, di) == FAIL)
+	ಆದರೆ (dict_ಕೂಡಿಸು(dict, di) == FAIL)
 	{
-	    RAISE_KEY_ADD_FAIL(di->di_key);
+	    RAISE_ಕೀಲಿ_ಕೂಡಿಸು_FAIL(di->di_ಕೀಲಿ);
 	    clear_tv(&di->di_tv);
 	    vim_free(di);
 	    dict_unref(dict);
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
     }
 
     --dict->dv_refcount;
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-    static int
-pymap_to_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+pymap_ಗಮ್ಯ_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 {
     dict_T	*dict;
-    char_u	*key;
+    char_u	*ಕೀಲಿ;
     dictitem_T	*di;
     PyObject	*list;
     PyObject	*iterator;
-    PyObject	*keyObject;
+    PyObject	*ಕೀಲಿ_Object;
     PyObject	*valObject;
 
-    if (!(dict = py_dict_alloc()))
-	return -1;
+    ಆದರೆ (!(dict = py_dict_alloc()))
+	ಹಿಂತಿರುಗಿ -1;
 
     tv->v_type = VAR_DICT;
     tv->vval.v_dict = dict;
 
-    if (!(list = PyMapping_Keys(obj)))
+    ಆದರೆ (!(list = Py_Mapping_ಕೀಲಿಗಳು(obj)))
     {
 	dict_unref(dict);
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 
-    if (!(iterator = PyObject_GetIter(list)))
+    ಆದರೆ (!(iterator = PyObject_GetIter(list)))
     {
 	dict_unref(dict);
 	Py_DECREF(list);
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
     Py_DECREF(list);
 
-    while ((keyObject = PyIter_Next(iterator)))
+    ಆಗ ((ಕೀಲಿ_Object = Py_Iter_ಮುಂದಿನ(iterator)))
     {
 	PyObject	*todecref;
 
-	if (!(key = StringToChars(keyObject, &todecref)))
+	ಆದರೆ (!(ಕೀಲಿ = String_ಗಮ್ಯ_Chars(ಕೀಲಿ_Object, &todecref)))
 	{
-	    Py_DECREF(keyObject);
+	    Py_DECREF(ಕೀಲಿ_Object);
 	    Py_DECREF(iterator);
 	    dict_unref(dict);
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 
-	if (*key == NUL)
+	ಆದರೆ (*ಕೀಲಿ == NUL)
 	{
-	    Py_DECREF(keyObject);
-	    Py_DECREF(iterator);
-	    Py_XDECREF(todecref);
-	    dict_unref(dict);
-	    RAISE_NO_EMPTY_KEYS;
-	    return -1;
-	}
-
-	if (!(valObject = PyObject_GetItem(obj, keyObject)))
-	{
-	    Py_DECREF(keyObject);
+	    Py_DECREF(ಕೀಲಿ_Object);
 	    Py_DECREF(iterator);
 	    Py_XDECREF(todecref);
 	    dict_unref(dict);
-	    return -1;
+	    RAISE_NO_ಖಾಲಿಗಳು_ಕೀಲಿಗಳು;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 
-	di = dictitem_alloc(key);
+	ಆದರೆ (!(valObject = Py_Object_Get_ಅಂಶ(obj, ಕೀಲಿ_Object)))
+	{
+	    Py_DECREF(ಕೀಲಿ_Object);
+	    Py_DECREF(iterator);
+	    Py_XDECREF(todecref);
+	    dict_unref(dict);
+	    ಹಿಂತಿರುಗಿ -1;
+	}
 
-	Py_DECREF(keyObject);
+	di = dictitem_alloc(ಕೀಲಿ);
+
+	Py_DECREF(ಕೀಲಿ_Object);
 	Py_XDECREF(todecref);
 
-	if (di == NULL)
+	ಆದರೆ (di == ಖಾಲಿ)
 	{
 	    Py_DECREF(iterator);
 	    Py_DECREF(valObject);
 	    dict_unref(dict);
-	    PyErr_NoMemory();
-	    return -1;
+	    Py_Err_No_ಸ್ಮರಣೆ();
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 
-	if (_ConvertFromPyObject(valObject, &di->di_tv, lookup_dict) == -1)
+	ಆದರೆ (_ConvertFromPyObject(valObject, &di->di_tv, lookup_dict) == -1)
 	{
 	    Py_DECREF(iterator);
 	    Py_DECREF(valObject);
 	    vim_free(di);
 	    dict_unref(dict);
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 
 	Py_DECREF(valObject);
 
-	if (dict_add(dict, di) == FAIL)
+	ಆದರೆ (dict_ಕೂಡಿಸು(dict, di) == FAIL)
 	{
-	    RAISE_KEY_ADD_FAIL(di->di_key);
+	    RAISE_ಕೀಲಿ_ಕೂಡಿಸು_FAIL(di->di_ಕೀಲಿ);
 	    Py_DECREF(iterator);
 	    dictitem_free(di);
 	    dict_unref(dict);
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
     }
     Py_DECREF(iterator);
     --dict->dv_refcount;
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-    static int
-pyseq_to_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+pyseq_ಗಮ್ಯ_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 {
     list_T	*l;
 
-    if (!(l = py_list_alloc()))
-	return -1;
+    ಆದರೆ (!(l = py_list_alloc()))
+	ಹಿಂತಿರುಗಿ -1;
 
     tv->v_type = VAR_LIST;
     tv->vval.v_list = l;
 
-    if (list_py_concat(l, obj, lookup_dict) == -1)
+    ಆದರೆ (list_py_concat(l, obj, lookup_dict) == -1)
     {
 	list_unref(l);
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 
     --l->lv_refcount;
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-    static int
-pytuple_to_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+pytuple_ಗಮ್ಯ_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 {
     tuple_T	*t;
 
-    if (!(t = py_tuple_alloc()))
-	return -1;
+    ಆದರೆ (!(t = py_tuple_alloc()))
+	ಹಿಂತಿರುಗಿ -1;
 
     tv->v_type = VAR_TUPLE;
     tv->vval.v_tuple = t;
 
-    if (tuple_py_concat(t, obj, lookup_dict) == -1)
+    ಆದರೆ (tuple_py_concat(t, obj, lookup_dict) == -1)
     {
 	tuple_unref(t);
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 
     --t->tv_refcount;
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-typedef int (*pytotvfunc)(PyObject *, typval_T *, PyObject *);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಪೂರ್ಣಾಂಕ (*pytotvfunc)(PyObject *, typval_T *, PyObject *);
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 convert_dl(PyObject *obj, typval_T *tv,
-				    pytotvfunc py_to_tv, PyObject *lookup_dict)
+				    pytotvfunc py_ಗಮ್ಯ_tv, PyObject *lookup_dict)
 {
     PyObject	*capsule;
-    char	hexBuf[sizeof(void *) * 2 + 3];
+    ಅಕ್ಷರ	hexBuf[ಗಾತ್ರ(ಶೂನ್ಯ *) * 2 + 3];
 
-    sprintf(hexBuf, "%p", (void *)obj);
+    sprintf(hexBuf, "%p", (ಶೂನ್ಯ *)obj);
 
-#ifdef PY_USE_CAPSULE
-    capsule = PyDict_GetItemString(lookup_dict, hexBuf);
-#else
-    capsule = (PyObject *)PyDict_GetItemString(lookup_dict, hexBuf);
-#endif
-    if (capsule == NULL)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ PY_USE_CAPSULE
+    capsule = Py_Dict_Get_ಅಂಶ_String(lookup_dict, hexBuf);
+#ಇಲ್ಲದಿದ್ದರೆ
+    capsule = (PyObject *)Py_Dict_Get_ಅಂಶ_String(lookup_dict, hexBuf);
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (capsule == ಖಾಲಿ)
     {
-#ifdef PY_USE_CAPSULE
-	capsule = PyCapsule_New(tv, NULL, NULL);
-#else
-	capsule = PyCObject_FromVoidPtr(tv, NULL);
-#endif
-	if (PyDict_SetItemString(lookup_dict, hexBuf, capsule))
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ PY_USE_CAPSULE
+	capsule = PyCapsule_New(tv, ಖಾಲಿ, ಖಾಲಿ);
+#ಇಲ್ಲದಿದ್ದರೆ
+	capsule = PyCObject_FromVoidPtr(tv, ಖಾಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ
+	ಆದರೆ (Py_Dict_ಗಣ_ಅಂಶ_String(lookup_dict, hexBuf, capsule))
 	{
 	    Py_DECREF(capsule);
 	    tv->v_type = VAR_UNKNOWN;
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 
 	Py_DECREF(capsule);
 
-	if (py_to_tv(obj, tv, lookup_dict) == -1)
+	ಆದರೆ (py_ಗಮ್ಯ_tv(obj, tv, lookup_dict) == -1)
 	{
 	    tv->v_type = VAR_UNKNOWN;
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 	// As we are not using copy_tv which increments reference count we must
 	// do it ourself.
-	if (tv->v_type == VAR_DICT)
+	ಆದರೆ (tv->v_type == VAR_DICT)
 	    ++tv->vval.v_dict->dv_refcount;
-	else if (tv->v_type == VAR_LIST)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (tv->v_type == VAR_LIST)
 	    ++tv->vval.v_list->lv_refcount;
-	else if (tv->v_type == VAR_TUPLE)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (tv->v_type == VAR_TUPLE)
 	    ++tv->vval.v_tuple->tv_refcount;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	typval_T	*v;
 
-#ifdef PY_USE_CAPSULE
-	v = PyCapsule_GetPointer(capsule, NULL);
-#else
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ PY_USE_CAPSULE
+	v = Py_Capsule_Get_ಸೂಚಕ(capsule, ಖಾಲಿ);
+#ಇಲ್ಲದಿದ್ದರೆ
 	v = PyCObject_AsVoidPtr(capsule);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	copy_tv(v, tv);
     }
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 ConvertFromPyMapping(PyObject *obj, typval_T *tv)
 {
     PyObject	*lookup_dict;
-    int		ret;
+    ಪೂರ್ಣಾಂಕ		ret;
 
-    if (!(lookup_dict = PyDict_New()))
-	return -1;
+    ಆದರೆ (!(lookup_dict = PyDict_New()))
+	ಹಿಂತಿರುಗಿ -1;
 
-    if (PyType_IsSubtype(obj->ob_type, DictionaryTypePtr))
+    ಆದರೆ (PyType_IsSubtype(obj->ob_type, DictionaryTypePtr))
     {
 	tv->v_type = VAR_DICT;
 	tv->vval.v_dict = (((DictionaryObject *)(obj))->dict);
 	++tv->vval.v_dict->dv_refcount;
 	ret = 0;
     }
-    else if (PyDict_Check(obj))
-	ret = convert_dl(obj, tv, pydict_to_tv, lookup_dict);
-    else if (PyMapping_Check(obj))
-	ret = convert_dl(obj, tv, pymap_to_tv, lookup_dict);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (PyDict_Check(obj))
+	ret = convert_dl(obj, tv, pydict_ಗಮ್ಯ_tv, lookup_dict);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (PyMapping_Check(obj))
+	ret = convert_dl(obj, tv, pymap_ಗಮ್ಯ_tv, lookup_dict);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	PyErr_FORMAT_TYPE(
 		N_("unable to convert %s to a Vim dictionary"),
@@ -6967,28 +6967,28 @@ ConvertFromPyMapping(PyObject *obj, typval_T *tv)
 	ret = -1;
     }
     Py_DECREF(lookup_dict);
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 ConvertFromPySequence(PyObject *obj, typval_T *tv)
 {
     PyObject	*lookup_dict;
-    int		ret;
+    ಪೂರ್ಣಾಂಕ		ret;
 
-    if (!(lookup_dict = PyDict_New()))
-	return -1;
+    ಆದರೆ (!(lookup_dict = PyDict_New()))
+	ಹಿಂತಿರುಗಿ -1;
 
-    if (PyType_IsSubtype(obj->ob_type, ListTypePtr))
+    ಆದರೆ (PyType_IsSubtype(obj->ob_type, ListTypePtr))
     {
 	tv->v_type = VAR_LIST;
 	tv->vval.v_list = (((ListObject *)(obj))->list);
 	++tv->vval.v_list->lv_refcount;
 	ret = 0;
     }
-    else if (PyIter_Check(obj) || PySequence_Check(obj))
-	ret = convert_dl(obj, tv, pyseq_to_tv, lookup_dict);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (PyIter_Check(obj) || PySequence_Check(obj))
+	ret = convert_dl(obj, tv, pyseq_ಗಮ್ಯ_tv, lookup_dict);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	PyErr_FORMAT_TYPE(
 		N_("unable to convert %s to a Vim list"),
@@ -6996,256 +6996,256 @@ ConvertFromPySequence(PyObject *obj, typval_T *tv)
 	ret = -1;
     }
     Py_DECREF(lookup_dict);
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 ConvertFromPyObject(PyObject *obj, typval_T *tv)
 {
     PyObject	*lookup_dict;
-    int		ret;
+    ಪೂರ್ಣಾಂಕ		ret;
 
-    if (!(lookup_dict = PyDict_New()))
-	return -1;
+    ಆದರೆ (!(lookup_dict = PyDict_New()))
+	ಹಿಂತಿರುಗಿ -1;
     ret = _ConvertFromPyObject(obj, tv, lookup_dict);
     Py_DECREF(lookup_dict);
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 _ConvertFromPyObject(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 {
-    if (PyType_IsSubtype(obj->ob_type, DictionaryTypePtr))
+    ಆದರೆ (PyType_IsSubtype(obj->ob_type, DictionaryTypePtr))
     {
 	tv->v_type = VAR_DICT;
 	tv->vval.v_dict = (((DictionaryObject *)(obj))->dict);
 	++tv->vval.v_dict->dv_refcount;
     }
-    else if (PyType_IsSubtype(obj->ob_type, ListTypePtr))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (PyType_IsSubtype(obj->ob_type, ListTypePtr))
     {
 	tv->v_type = VAR_LIST;
 	tv->vval.v_list = (((ListObject *)(obj))->list);
 	++tv->vval.v_list->lv_refcount;
     }
-    else if (PyType_IsSubtype(obj->ob_type, TupleTypePtr))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (PyType_IsSubtype(obj->ob_type, TupleTypePtr))
     {
 	tv->v_type = VAR_TUPLE;
 	tv->vval.v_tuple = (((TupleObject *)(obj))->tuple);
 	++tv->vval.v_tuple->tv_refcount;
     }
-    else if (PyType_IsSubtype(obj->ob_type, FunctionTypePtr))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (PyType_IsSubtype(obj->ob_type, FunctionTypePtr))
     {
 	FunctionObject *func = (FunctionObject *) obj;
-	if (func->self != NULL || func->argv != NULL)
+	ಆದರೆ (func->self != ಖಾಲಿ || func->argv != ಖಾಲಿ)
 	{
 	    partial_T *pt = ALLOC_CLEAR_ONE(partial_T);
 
-	    set_partial(func, pt, TRUE);
+	    ಗಣ_partial(func, pt, TRUE);
 	    tv->vval.v_partial = pt;
 	    tv->v_type = VAR_PARTIAL;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (set_string_copy(func->name, tv) == -1)
-		return -1;
+	    ಆದರೆ (ಗಣ_string_copy(func->name, tv) == -1)
+		ಹಿಂತಿರುಗಿ -1;
 
 	    tv->v_type = VAR_FUNC;
 	}
 	func_ref(func->name);
     }
-    else if (PyBytes_Check(obj))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (Py_ಬೈಟುಗಳು_Check(obj))
     {
 	char_u	*str;
 
-	if (PyBytes_AsStringAndSize(obj, (char **) &str, NULL) == -1)
-	    return -1;
-	if (str == NULL)
-	    return -1;
+	ಆದರೆ (Py_ಬೈಟುಗಳು_As_String_And_ಗಾತ್ರ(obj, (ಅಕ್ಷರ **) &str, ಖಾಲಿ) == -1)
+	    ಹಿಂತಿರುಗಿ -1;
+	ಆದರೆ (str == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ -1;
 
-	if (set_string_copy(str, tv) == -1)
-	    return -1;
+	ಆದರೆ (ಗಣ_string_copy(str, tv) == -1)
+	    ಹಿಂತಿರುಗಿ -1;
 
 	tv->v_type = VAR_STRING;
     }
-    else if (PyUnicode_Check(obj))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (PyUnicode_Check(obj))
     {
-	PyObject	*bytes;
+	PyObject	*ಬೈಟುಗಳು;
 	char_u	*str;
 
-	bytes = PyUnicode_AsEncodedString(obj, ENC_OPT, ERRORS_ENCODE_ARG);
-	if (bytes == NULL)
-	    return -1;
+	ಬೈಟುಗಳು = PyUnicode_AsEncodedString(obj, ENC_OPT, ERRORS_ENCODE_ARG);
+	ಆದರೆ (ಬೈಟುಗಳು == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ -1;
 
-	if (PyBytes_AsStringAndSize(bytes, (char **) &str, NULL) == -1)
-	    return -1;
-	if (str == NULL)
-	    return -1;
+	ಆದರೆ (Py_ಬೈಟುಗಳು_As_String_And_ಗಾತ್ರ(ಬೈಟುಗಳು, (ಅಕ್ಷರ **) &str, ಖಾಲಿ) == -1)
+	    ಹಿಂತಿರುಗಿ -1;
+	ಆದರೆ (str == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ -1;
 
-	if (set_string_copy(str, tv))
+	ಆದರೆ (ಗಣ_string_copy(str, tv))
 	{
-	    Py_XDECREF(bytes);
-	    return -1;
+	    Py_XDECREF(ಬೈಟುಗಳು);
+	    ಹಿಂತಿರುಗಿ -1;
 	}
-	Py_XDECREF(bytes);
+	Py_XDECREF(ಬೈಟುಗಳು);
 
 	tv->v_type = VAR_STRING;
     }
-#if PY_MAJOR_VERSION < 3
-    else if (PyInt_Check(obj))
+#ಆದರೆ PY_MAJOR_ಆವೃತ್ತಿ < 3
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (PyInt_Check(obj))
     {
-	tv->v_type = VAR_NUMBER;
-	tv->vval.v_number = (varnumber_T) PyInt_AsLong(obj);
-	if (PyErr_Occurred())
-	    return -1;
+	tv->v_type = VAR_ಸಂಖ್ಯೆ;
+	tv->vval.v_ಸಂಖ್ಯೆ = (varnumber_T) PyInt_AsLong(obj);
+	ಆದರೆ (PyErr_Occurred())
+	    ಹಿಂತಿರುಗಿ -1;
     }
-#endif
-    else if (PyLong_Check(obj))
+#ಆದರೆ_ಅಂತ್ಯ
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (PyLong_Check(obj))
     {
-	tv->v_type = VAR_NUMBER;
-	tv->vval.v_number = (varnumber_T) PyLong_AsLong(obj);
-	if (PyErr_Occurred())
-	    return -1;
+	tv->v_type = VAR_ಸಂಖ್ಯೆ;
+	tv->vval.v_ಸಂಖ್ಯೆ = (varnumber_T) PyLong_AsLong(obj);
+	ಆದರೆ (PyErr_Occurred())
+	    ಹಿಂತಿರುಗಿ -1;
     }
-    else if (PyTuple_Check(obj))
-	return convert_dl(obj, tv, pytuple_to_tv, lookup_dict);
-    else if (PyDict_Check(obj))
-	return convert_dl(obj, tv, pydict_to_tv, lookup_dict);
-    else if (PyFloat_Check(obj))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (PyTuple_Check(obj))
+	ಹಿಂತಿರುಗಿ convert_dl(obj, tv, pytuple_ಗಮ್ಯ_tv, lookup_dict);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (PyDict_Check(obj))
+	ಹಿಂತಿರುಗಿ convert_dl(obj, tv, pydict_ಗಮ್ಯ_tv, lookup_dict);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (PyFloat_Check(obj))
     {
 	tv->v_type = VAR_FLOAT;
 	tv->vval.v_float = (float_T) PyFloat_AsDouble(obj);
     }
-    else if (PyObject_HasAttrString(obj, "keys"))
-	return convert_dl(obj, tv, pymap_to_tv, lookup_dict);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (PyObject_HasAttrString(obj, "keys"))
+	ಹಿಂತಿರುಗಿ convert_dl(obj, tv, pymap_ಗಮ್ಯ_tv, lookup_dict);
     // PyObject_GetIter can create built-in iterator for any sequence object
-    else if (PyIter_Check(obj) || PySequence_Check(obj))
-	return convert_dl(obj, tv, pyseq_to_tv, lookup_dict);
-    else if (PyMapping_Check(obj))
-	return convert_dl(obj, tv, pymap_to_tv, lookup_dict);
-    else if (PyNumber_Check(obj))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (PyIter_Check(obj) || PySequence_Check(obj))
+	ಹಿಂತಿರುಗಿ convert_dl(obj, tv, pyseq_ಗಮ್ಯ_tv, lookup_dict);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (PyMapping_Check(obj))
+	ಹಿಂತಿರುಗಿ convert_dl(obj, tv, pymap_ಗಮ್ಯ_tv, lookup_dict);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (Py_ಸಂಖ್ಯೆ_Check(obj))
     {
-	PyObject	*num;
+	PyObject	*ಅಂಕೆ;
 
-	if (!(num = PyNumber_Long(obj)))
-	    return -1;
+	ಆದರೆ (!(ಅಂಕೆ = Py_ಸಂಖ್ಯೆ_Long(obj)))
+	    ಹಿಂತಿರುಗಿ -1;
 
-	tv->v_type = VAR_NUMBER;
-	tv->vval.v_number = (varnumber_T) PyLong_AsLong(num);
+	tv->v_type = VAR_ಸಂಖ್ಯೆ;
+	tv->vval.v_ಸಂಖ್ಯೆ = (varnumber_T) PyLong_AsLong(ಅಂಕೆ);
 
-	Py_DECREF(num);
+	Py_DECREF(ಅಂಕೆ);
     }
-    else if (obj == Py_None)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (obj == Py_None)
     {
 	tv->v_type = VAR_SPECIAL;
-	tv->vval.v_number = VVAL_NONE;
+	tv->vval.v_ಸಂಖ್ಯೆ = VVAL_NONE;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	PyErr_FORMAT_TYPE(
 		N_("unable to convert %s to a Vim structure"),
 		obj);
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-    static PyObject *
-ConvertToPyObject(typval_T *tv)
+    ಸ್ಥಿರ PyObject *
+Convert_ಗಮ್ಯ_Py_Object(typval_T *tv)
 {
     typval_T *argv;
-    int i;
-    if (tv == NULL)
+    ಪೂರ್ಣಾಂಕ i;
+    ಆದರೆ (tv == ಖಾಲಿ)
     {
-	PyErr_SET_VIM(N_("internal error: NULL reference passed"));
-	return NULL;
+	Py_Err_ಗಣ_VIM(N_("internal error: NULL reference passed"));
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
-    switch (tv->v_type)
+    ಆಯ್ಕೆ (tv->v_type)
     {
-	case VAR_STRING:
-	    return PyBytes_FromString(tv->vval.v_string == NULL
-					    ? "" : (char *)tv->vval.v_string);
-	case VAR_NUMBER:
-	    return PyLong_FromLong((long) tv->vval.v_number);
-	case VAR_FLOAT:
-	    return PyFloat_FromDouble((double) tv->vval.v_float);
-	case VAR_LIST:
-	    return NEW_LIST(tv->vval.v_list);
-	case VAR_TUPLE:
-	    return NEW_TUPLE(tv->vval.v_tuple);
-	case VAR_DICT:
-	    return NEW_DICTIONARY(tv->vval.v_dict);
-	case VAR_FUNC:
-	    return NEW_FUNCTION(tv->vval.v_string == NULL
+	ಸ್ಥಿತಿ VAR_STRING:
+	    ಹಿಂತಿರುಗಿ Py_ಬೈಟುಗಳು_From_String(tv->vval.v_string == ಖಾಲಿ
+					    ? "" : (ಅಕ್ಷರ *)tv->vval.v_string);
+	ಸ್ಥಿತಿ VAR_ಸಂಖ್ಯೆ:
+	    ಹಿಂತಿರುಗಿ PyLong_FromLong((ದೀರ್ಘ) tv->vval.v_ಸಂಖ್ಯೆ);
+	ಸ್ಥಿತಿ VAR_FLOAT:
+	    ಹಿಂತಿರುಗಿ PyFloat_FromDouble((ದ್ವಿಗುಣ) tv->vval.v_float);
+	ಸ್ಥಿತಿ VAR_LIST:
+	    ಹಿಂತಿರುಗಿ NEW_LIST(tv->vval.v_list);
+	ಸ್ಥಿತಿ VAR_TUPLE:
+	    ಹಿಂತಿರುಗಿ NEW_TUPLE(tv->vval.v_tuple);
+	ಸ್ಥಿತಿ VAR_DICT:
+	    ಹಿಂತಿರುಗಿ NEW_DICTIONARY(tv->vval.v_dict);
+	ಸ್ಥಿತಿ VAR_FUNC:
+	    ಹಿಂತಿರುಗಿ NEW_FUNCTION(tv->vval.v_string == ಖಾಲಿ
 					  ? (char_u *)"" : tv->vval.v_string,
-					  0, NULL, NULL, TRUE);
-	case VAR_PARTIAL:
-	    if (tv->vval.v_partial->pt_argc)
+					  0, ಖಾಲಿ, ಖಾಲಿ, TRUE);
+	ಸ್ಥಿತಿ VAR_PARTIAL:
+	    ಆದರೆ (tv->vval.v_partial->pt_argc)
 	    {
 		argv = PyMem_New(typval_T, (size_t)tv->vval.v_partial->pt_argc);
-		for (i = 0; i < tv->vval.v_partial->pt_argc; i++)
+		ಗಾಗಿ (i = 0; i < tv->vval.v_partial->pt_argc; i++)
 		    copy_tv(&tv->vval.v_partial->pt_argv[i], &argv[i]);
 	    }
-	    else
-		argv = NULL;
-	    if (tv->vval.v_partial->pt_dict != NULL)
+	    ಇಲ್ಲದಿದ್ದರೆ
+		argv = ಖಾಲಿ;
+	    ಆದರೆ (tv->vval.v_partial->pt_dict != ಖಾಲಿ)
 		tv->vval.v_partial->pt_dict->dv_refcount++;
-	    return NEW_FUNCTION(tv->vval.v_partial == NULL
+	    ಹಿಂತಿರುಗಿ NEW_FUNCTION(tv->vval.v_partial == ಖಾಲಿ
 			     ? (char_u *)"" : partial_name(tv->vval.v_partial),
 				tv->vval.v_partial->pt_argc, argv,
 				tv->vval.v_partial->pt_dict,
 				tv->vval.v_partial->pt_auto);
-	case VAR_BLOB:
-	    return PyBytes_FromStringAndSize(
-		(char*) tv->vval.v_blob->bv_ga.ga_data,
+	ಸ್ಥಿತಿ VAR_BLOB:
+	    ಹಿಂತಿರುಗಿ Py_ಬೈಟುಗಳು_From_String_And_ಗಾತ್ರ(
+		(ಅಕ್ಷರ*) tv->vval.v_blob->bv_ga.ga_ದತ್ತಾಂಶ,
 		(Py_ssize_t) tv->vval.v_blob->bv_ga.ga_len);
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	case VAR_CHANNEL:
-	case VAR_JOB:
-	case VAR_INSTR:
-	case VAR_CLASS:
-	case VAR_OBJECT:
-	case VAR_TYPEALIAS:
+	ಸ್ಥಿತಿ VAR_UNKNOWN:
+	ಸ್ಥಿತಿ VAR_ANY:
+	ಸ್ಥಿತಿ VAR_VOID:
+	ಸ್ಥಿತಿ VAR_CHANNEL:
+	ಸ್ಥಿತಿ VAR_ಕೆಲಸ:
+	ಸ್ಥಿತಿ VAR_INSTR:
+	ಸ್ಥಿತಿ VAR_CLASS:
+	ಸ್ಥಿತಿ VAR_OBJECT:
+	ಸ್ಥಿತಿ VAR_TYPEALIAS:
 	    Py_INCREF(Py_None);
-	    return Py_None;
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	    switch (tv->vval.v_number)
+	    ಹಿಂತಿರುಗಿ Py_None;
+	ಸ್ಥಿತಿ VAR_BOOL:
+	ಸ್ಥಿತಿ VAR_SPECIAL:
+	    ಆಯ್ಕೆ (tv->vval.v_ಸಂಖ್ಯೆ)
 	    {
-		case VVAL_FALSE: return ALWAYS_FALSE;
-		case VVAL_TRUE:  return ALWAYS_TRUE;
-		case VVAL_NONE:
-		case VVAL_NULL:  return ALWAYS_NONE;
+		ಸ್ಥಿತಿ VVAL_FALSE: ಹಿಂತಿರುಗಿ ALWAYS_FALSE;
+		ಸ್ಥಿತಿ VVAL_TRUE:  ಹಿಂತಿರುಗಿ ALWAYS_TRUE;
+		ಸ್ಥಿತಿ VVAL_NONE:
+		ಸ್ಥಿತಿ VVAL_NULL:  ಹಿಂತಿರುಗಿ ALWAYS_NONE;
 	    }
-	    PyErr_SET_VIM(N_("internal error: invalid value type"));
-	    return NULL;
+	    Py_Err_ಗಣ_VIM(N_("internal error: invalid value type"));
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 DEFINE_PY_TYPE_OBJECT(CurrentType);
 
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    PyObject_HEAD
+    Py_Object_ತಲೆ
 } CurrentObject;
 
-static CurrentObject TheCurrent =
+ಸ್ಥಿರ CurrentObject TheCurrent =
 {
-    PyObject_HEAD_INIT_TYPE(CurrentType)
+    Py_Object_ತಲೆ_INIT_TYPE(CurrentType)
 };
 
-    static void
-init_structs(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+init_structs(ಶೂನ್ಯ)
 {
-    CLEAR_FIELD(OutputType);
+    CLEAR_ಕ್ಷೇತ್ರ(OutputType);
     OutputType.tp_name = "vim.message";
-    OutputType.tp_basicsize = sizeof(OutputObject);
+    OutputType.tp_basicsize = ಗಾತ್ರ(OutputObject);
     OutputType.tp_flags = Py_TPFLAGS_DEFAULT;
     OutputType.tp_doc = "vim message object";
     OutputType.tp_methods = OutputMethods;
-#if PY_MAJOR_VERSION >= 3
+#ಆದರೆ PY_MAJOR_ಆವೃತ್ತಿ >= 3
     OutputType.tp_getattro = OutputGetattro;
     OutputType.tp_setattro = OutputSetattro;
     OutputType.tp_alloc = call_PyType_GenericAlloc;
@@ -7254,111 +7254,111 @@ init_structs(void)
 # ifndef USE_LIMITED_API
     // The std printer type is only exposed in full API. It is not essential
     // anyway and so in limited API we don't set it.
-    OutputType.tp_base = &PyStdPrinter_Type;
+    OutputType.tp_ತಳ = &PyStdPrinter_Type;
 # endif
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
     OutputType.tp_getattr = OutputGetattr;
     OutputType.tp_setattr = OutputSetattr;
     // Disabled, because this causes a crash in test86
     // OutputType.tp_base = &PyFile_Type;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    CLEAR_FIELD(IterType);
+    CLEAR_ಕ್ಷೇತ್ರ(IterType);
     IterType.tp_name = "vim.iter";
-    IterType.tp_basicsize = sizeof(IterObject);
+    IterType.tp_basicsize = ಗಾತ್ರ(IterObject);
     IterType.tp_flags = Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_GC;
     IterType.tp_doc = "generic iterator object";
     IterType.tp_iter = IterIter;
-    IterType.tp_iternext = IterNext;
+    IterType.tp_iternext = Iter_ಮುಂದಿನ;
     IterType.tp_dealloc = IterDestructor;
     IterType.tp_traverse = IterTraverse;
     IterType.tp_clear = IterClear;
 
-    CLEAR_FIELD(BufferType);
-    BufferType.tp_name = "vim.buffer";
-    BufferType.tp_basicsize = sizeof(BufferObject);
-    BufferType.tp_dealloc = BufferDestructor;
-    BufferType.tp_repr = BufferRepr;
-    BufferType.tp_as_sequence = &BufferAsSeq;
-    BufferType.tp_as_mapping = &BufferAsMapping;
-    BufferType.tp_flags = Py_TPFLAGS_DEFAULT;
-    BufferType.tp_doc = "vim buffer object";
-    BufferType.tp_methods = BufferMethods;
-#if PY_MAJOR_VERSION >= 3
-    BufferType.tp_getattro = BufferGetattro;
-    BufferType.tp_setattro = BufferSetattro;
-    BufferType.tp_alloc = call_PyType_GenericAlloc;
-    BufferType.tp_new = call_PyType_GenericNew;
-    BufferType.tp_free = call_PyObject_Free;
-#else
-    BufferType.tp_getattr = BufferGetattr;
-    BufferType.tp_setattr = BufferSetattr;
-#endif
+    CLEAR_ಕ್ಷೇತ್ರ(ಬಫರ್_Type);
+    ಬಫರ್_Type.tp_name = "vim.buffer";
+    ಬಫರ್_Type.tp_basicsize = ಗಾತ್ರ(ಬಫರ್_Object);
+    ಬಫರ್_Type.tp_dealloc = ಬಫರ್_Destructor;
+    ಬಫರ್_Type.tp_repr = ಬಫರ್_Repr;
+    ಬಫರ್_Type.tp_as_sequence = &ಬಫರ್_As_Seq;
+    ಬಫರ್_Type.tp_as_mapping = &ಬಫರ್_As_Mapping;
+    ಬಫರ್_Type.tp_flags = Py_TPFLAGS_DEFAULT;
+    ಬಫರ್_Type.tp_doc = "vim buffer object";
+    ಬಫರ್_Type.tp_methods = ಬಫರ್_Methods;
+#ಆದರೆ PY_MAJOR_ಆವೃತ್ತಿ >= 3
+    ಬಫರ್_Type.tp_getattro = ಬಫರ್_Getattro;
+    ಬಫರ್_Type.tp_setattro = ಬಫರ್_Setattro;
+    ಬಫರ್_Type.tp_alloc = call_PyType_GenericAlloc;
+    ಬಫರ್_Type.tp_new = call_PyType_GenericNew;
+    ಬಫರ್_Type.tp_free = call_PyObject_Free;
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಬಫರ್_Type.tp_getattr = ಬಫರ್_Getattr;
+    ಬಫರ್_Type.tp_setattr = ಬಫರ್_Setattr;
+#ಆದರೆ_ಅಂತ್ಯ
 
-    CLEAR_FIELD(WindowType);
-    WindowType.tp_name = "vim.window";
-    WindowType.tp_basicsize = sizeof(WindowObject);
-    WindowType.tp_dealloc = WindowDestructor;
-    WindowType.tp_repr = WindowRepr;
-    WindowType.tp_flags = Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_GC;
-    WindowType.tp_doc = "vim Window object";
-    WindowType.tp_methods = WindowMethods;
-    WindowType.tp_traverse = WindowTraverse;
-    WindowType.tp_clear = WindowClear;
-#if PY_MAJOR_VERSION >= 3
-    WindowType.tp_getattro = WindowGetattro;
-    WindowType.tp_setattro = WindowSetattro;
-    WindowType.tp_alloc = call_PyType_GenericAlloc;
-    WindowType.tp_new = call_PyType_GenericNew;
-    WindowType.tp_free = call_PyObject_Free;
-#else
-    WindowType.tp_getattr = WindowGetattr;
-    WindowType.tp_setattr = WindowSetattr;
-#endif
+    CLEAR_ಕ್ಷೇತ್ರ(ಕಿಟಕಿ_Type);
+    ಕಿಟಕಿ_Type.tp_name = "vim.window";
+    ಕಿಟಕಿ_Type.tp_basicsize = ಗಾತ್ರ(ಕಿಟಕಿ_Object);
+    ಕಿಟಕಿ_Type.tp_dealloc = ಕಿಟಕಿ_Destructor;
+    ಕಿಟಕಿ_Type.tp_repr = ಕಿಟಕಿ_Repr;
+    ಕಿಟಕಿ_Type.tp_flags = Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_GC;
+    ಕಿಟಕಿ_Type.tp_doc = "vim Window object";
+    ಕಿಟಕಿ_Type.tp_methods = ಕಿಟಕಿ_Methods;
+    ಕಿಟಕಿ_Type.tp_traverse = ಕಿಟಕಿ_Traverse;
+    ಕಿಟಕಿ_Type.tp_clear = ಕಿಟಕಿ_Clear;
+#ಆದರೆ PY_MAJOR_ಆವೃತ್ತಿ >= 3
+    ಕಿಟಕಿ_Type.tp_getattro = ಕಿಟಕಿ_Getattro;
+    ಕಿಟಕಿ_Type.tp_setattro = ಕಿಟಕಿ_Setattro;
+    ಕಿಟಕಿ_Type.tp_alloc = call_PyType_GenericAlloc;
+    ಕಿಟಕಿ_Type.tp_new = call_PyType_GenericNew;
+    ಕಿಟಕಿ_Type.tp_free = call_PyObject_Free;
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಕಿಟಕಿ_Type.tp_getattr = ಕಿಟಕಿ_Getattr;
+    ಕಿಟಕಿ_Type.tp_setattr = ಕಿಟಕಿ_Setattr;
+#ಆದರೆ_ಅಂತ್ಯ
 
-    CLEAR_FIELD(TabPageType);
-    TabPageType.tp_name = "vim.tabpage";
-    TabPageType.tp_basicsize = sizeof(TabPageObject);
-    TabPageType.tp_dealloc = TabPageDestructor;
-    TabPageType.tp_repr = TabPageRepr;
-    TabPageType.tp_flags = Py_TPFLAGS_DEFAULT;
-    TabPageType.tp_doc = "vim tab page object";
-    TabPageType.tp_methods = TabPageMethods;
-#if PY_MAJOR_VERSION >= 3
-    TabPageType.tp_getattro = TabPageGetattro;
-    TabPageType.tp_alloc = call_PyType_GenericAlloc;
-    TabPageType.tp_new = call_PyType_GenericNew;
-    TabPageType.tp_free = call_PyObject_Free;
-#else
-    TabPageType.tp_getattr = TabPageGetattr;
-#endif
+    CLEAR_ಕ್ಷೇತ್ರ(Tab_ಪುಟ_Type);
+    Tab_ಪುಟ_Type.tp_name = "vim.tabpage";
+    Tab_ಪುಟ_Type.tp_basicsize = ಗಾತ್ರ(Tab_ಪುಟ_Object);
+    Tab_ಪುಟ_Type.tp_dealloc = Tab_ಪುಟ_Destructor;
+    Tab_ಪುಟ_Type.tp_repr = Tab_ಪುಟ_Repr;
+    Tab_ಪುಟ_Type.tp_flags = Py_TPFLAGS_DEFAULT;
+    Tab_ಪುಟ_Type.tp_doc = "vim tab page object";
+    Tab_ಪುಟ_Type.tp_methods = Tab_ಪುಟ_Methods;
+#ಆದರೆ PY_MAJOR_ಆವೃತ್ತಿ >= 3
+    Tab_ಪುಟ_Type.tp_getattro = Tab_ಪುಟ_Getattro;
+    Tab_ಪುಟ_Type.tp_alloc = call_PyType_GenericAlloc;
+    Tab_ಪುಟ_Type.tp_new = call_PyType_GenericNew;
+    Tab_ಪುಟ_Type.tp_free = call_PyObject_Free;
+#ಇಲ್ಲದಿದ್ದರೆ
+    Tab_ಪುಟ_Type.tp_getattr = Tab_ಪುಟ_Getattr;
+#ಆದರೆ_ಅಂತ್ಯ
 
-    CLEAR_FIELD(BufMapType);
+    CLEAR_ಕ್ಷೇತ್ರ(BufMapType);
     BufMapType.tp_name = "vim.bufferlist";
-    BufMapType.tp_basicsize = sizeof(BufMapObject);
+    BufMapType.tp_basicsize = ಗಾತ್ರ(BufMapObject);
     BufMapType.tp_as_mapping = &BufMapAsMapping;
     BufMapType.tp_flags = Py_TPFLAGS_DEFAULT;
     BufMapType.tp_iter = BufMapIter;
     BufMapType.tp_doc = "vim buffer list";
 
-    CLEAR_FIELD(WinListType);
+    CLEAR_ಕ್ಷೇತ್ರ(WinListType);
     WinListType.tp_name = "vim.windowlist";
-    WinListType.tp_basicsize = sizeof(WinListObject);
+    WinListType.tp_basicsize = ಗಾತ್ರ(WinListObject);
     WinListType.tp_as_sequence = &WinListAsSeq;
     WinListType.tp_flags = Py_TPFLAGS_DEFAULT;
     WinListType.tp_doc = "vim window list";
     WinListType.tp_dealloc = (destructor)WinListDestructor;
 
-    CLEAR_FIELD(TabListType);
+    CLEAR_ಕ್ಷೇತ್ರ(TabListType);
     TabListType.tp_name = "vim.tabpagelist";
-    TabListType.tp_basicsize = sizeof(TabListObject);
+    TabListType.tp_basicsize = ಗಾತ್ರ(TabListObject);
     TabListType.tp_as_sequence = &TabListAsSeq;
     TabListType.tp_flags = Py_TPFLAGS_DEFAULT;
     TabListType.tp_doc = "vim tab page list";
 
-    CLEAR_FIELD(RangeType);
+    CLEAR_ಕ್ಷೇತ್ರ(RangeType);
     RangeType.tp_name = "vim.range";
-    RangeType.tp_basicsize = sizeof(RangeObject);
+    RangeType.tp_basicsize = ಗಾತ್ರ(RangeObject);
     RangeType.tp_dealloc = RangeDestructor;
     RangeType.tp_repr = RangeRepr;
     RangeType.tp_as_sequence = &RangeAsSeq;
@@ -7368,32 +7368,32 @@ init_structs(void)
     RangeType.tp_methods = RangeMethods;
     RangeType.tp_traverse = RangeTraverse;
     RangeType.tp_clear = RangeClear;
-#if PY_MAJOR_VERSION >= 3
+#ಆದರೆ PY_MAJOR_ಆವೃತ್ತಿ >= 3
     RangeType.tp_getattro = RangeGetattro;
     RangeType.tp_alloc = call_PyType_GenericAlloc;
     RangeType.tp_new = call_PyType_GenericNew;
     RangeType.tp_free = call_PyObject_Free;
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
     RangeType.tp_getattr = RangeGetattr;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    CLEAR_FIELD(CurrentType);
+    CLEAR_ಕ್ಷೇತ್ರ(CurrentType);
     CurrentType.tp_name = "vim.currentdata";
-    CurrentType.tp_basicsize = sizeof(CurrentObject);
+    CurrentType.tp_basicsize = ಗಾತ್ರ(CurrentObject);
     CurrentType.tp_flags = Py_TPFLAGS_DEFAULT;
     CurrentType.tp_doc = "vim current object";
     CurrentType.tp_methods = CurrentMethods;
-#if PY_MAJOR_VERSION >= 3
+#ಆದರೆ PY_MAJOR_ಆವೃತ್ತಿ >= 3
     CurrentType.tp_getattro = CurrentGetattro;
     CurrentType.tp_setattro = CurrentSetattro;
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
     CurrentType.tp_getattr = CurrentGetattr;
     CurrentType.tp_setattr = CurrentSetattr;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    CLEAR_FIELD(DictionaryType);
+    CLEAR_ಕ್ಷೇತ್ರ(DictionaryType);
     DictionaryType.tp_name = "vim.dictionary";
-    DictionaryType.tp_basicsize = sizeof(DictionaryObject);
+    DictionaryType.tp_basicsize = ಗಾತ್ರ(DictionaryObject);
     DictionaryType.tp_dealloc = DictionaryDestructor;
     DictionaryType.tp_as_sequence = &DictionaryAsSeq;
     DictionaryType.tp_as_mapping = &DictionaryAsMapping;
@@ -7403,18 +7403,18 @@ init_structs(void)
     DictionaryType.tp_iter = DictionaryIter;
     DictionaryType.tp_new = DictionaryConstructor;
     DictionaryType.tp_alloc = PyType_GenericAlloc;
-#if PY_MAJOR_VERSION >= 3
+#ಆದರೆ PY_MAJOR_ಆವೃತ್ತಿ >= 3
     DictionaryType.tp_getattro = DictionaryGetattro;
     DictionaryType.tp_setattro = DictionarySetattro;
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
     DictionaryType.tp_getattr = DictionaryGetattr;
     DictionaryType.tp_setattr = DictionarySetattr;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    CLEAR_FIELD(ListType);
+    CLEAR_ಕ್ಷೇತ್ರ(ListType);
     ListType.tp_name = "vim.list";
     ListType.tp_dealloc = ListDestructor;
-    ListType.tp_basicsize = sizeof(ListObject);
+    ListType.tp_basicsize = ಗಾತ್ರ(ListObject);
     ListType.tp_as_sequence = &ListAsSeq;
     ListType.tp_as_mapping = &ListAsMapping;
     ListType.tp_flags = Py_TPFLAGS_DEFAULT|Py_TPFLAGS_BASETYPE;
@@ -7423,19 +7423,19 @@ init_structs(void)
     ListType.tp_iter = ListIter;
     ListType.tp_new = ListConstructor;
     ListType.tp_alloc = PyType_GenericAlloc;
-#if PY_MAJOR_VERSION >= 3
+#ಆದರೆ PY_MAJOR_ಆವೃತ್ತಿ >= 3
     ListType.tp_getattro = ListGetattro;
     ListType.tp_setattro = ListSetattro;
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
     ListType.tp_getattr = ListGetattr;
     ListType.tp_setattr = ListSetattr;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Tuple type
-    CLEAR_FIELD(TupleType);
+    CLEAR_ಕ್ಷೇತ್ರ(TupleType);
     TupleType.tp_name = "vim.tuple";
     TupleType.tp_dealloc = TupleDestructor;
-    TupleType.tp_basicsize = sizeof(TupleObject);
+    TupleType.tp_basicsize = ಗಾತ್ರ(TupleObject);
     TupleType.tp_as_sequence = &TupleAsSeq;
     TupleType.tp_as_mapping = &TupleAsMapping;
     TupleType.tp_flags = Py_TPFLAGS_DEFAULT|Py_TPFLAGS_BASETYPE;
@@ -7444,17 +7444,17 @@ init_structs(void)
     TupleType.tp_iter = TupleIter;
     TupleType.tp_new = TupleConstructor;
     TupleType.tp_alloc = PyType_GenericAlloc;
-#if PY_MAJOR_VERSION >= 3
+#ಆದರೆ PY_MAJOR_ಆವೃತ್ತಿ >= 3
     TupleType.tp_getattro = TupleGetattro;
     TupleType.tp_setattro = TupleSetattro;
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
     TupleType.tp_getattr = TupleGetattr;
     TupleType.tp_setattr = TupleSetattr;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    CLEAR_FIELD(FunctionType);
+    CLEAR_ಕ್ಷೇತ್ರ(FunctionType);
     FunctionType.tp_name = "vim.function";
-    FunctionType.tp_basicsize = sizeof(FunctionObject);
+    FunctionType.tp_basicsize = ಗಾತ್ರ(FunctionObject);
     FunctionType.tp_dealloc = FunctionDestructor;
     FunctionType.tp_call = FunctionCall;
     FunctionType.tp_flags = Py_TPFLAGS_DEFAULT|Py_TPFLAGS_BASETYPE;
@@ -7463,15 +7463,15 @@ init_structs(void)
     FunctionType.tp_repr = FunctionRepr;
     FunctionType.tp_new = FunctionConstructor;
     FunctionType.tp_alloc = PyType_GenericAlloc;
-#if PY_MAJOR_VERSION >= 3
+#ಆದರೆ PY_MAJOR_ಆವೃತ್ತಿ >= 3
     FunctionType.tp_getattro = FunctionGetattro;
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
     FunctionType.tp_getattr = FunctionGetattr;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    CLEAR_FIELD(OptionsType);
+    CLEAR_ಕ್ಷೇತ್ರ(OptionsType);
     OptionsType.tp_name = "vim.options";
-    OptionsType.tp_basicsize = sizeof(OptionsObject);
+    OptionsType.tp_basicsize = ಗಾತ್ರ(OptionsObject);
     OptionsType.tp_as_sequence = &OptionsAsSeq;
     OptionsType.tp_flags = Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_GC;
     OptionsType.tp_doc = "object for manipulating options";
@@ -7481,33 +7481,33 @@ init_structs(void)
     OptionsType.tp_traverse = OptionsTraverse;
     OptionsType.tp_clear = OptionsClear;
 
-#if PY_VERSION_HEX < 0x030700f0
-    CLEAR_FIELD(LoaderType);
+#ಆದರೆ PY_ಆವೃತ್ತಿ_HEX < 0x030700f0
+    CLEAR_ಕ್ಷೇತ್ರ(LoaderType);
     LoaderType.tp_name = "vim.Loader";
-    LoaderType.tp_basicsize = sizeof(LoaderObject);
+    LoaderType.tp_basicsize = ಗಾತ್ರ(LoaderObject);
     LoaderType.tp_flags = Py_TPFLAGS_DEFAULT;
     LoaderType.tp_doc = "vim message object";
     LoaderType.tp_methods = LoaderMethods;
     LoaderType.tp_dealloc = LoaderDestructor;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if PY_MAJOR_VERSION >= 3
-    CLEAR_FIELD(vimmodule);
+#ಆದರೆ PY_MAJOR_ಆವೃತ್ತಿ >= 3
+    CLEAR_ಕ್ಷೇತ್ರ(vimmodule);
     vimmodule.m_name = "vim";
     vimmodule.m_doc = "Vim Python interface\n";
-    vimmodule.m_size = -1;
+    vimmodule.m_ಗಾತ್ರ_2 = -1;
     vimmodule.m_methods = VimMethods;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-    static int
-init_types(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+init_types(ಶೂನ್ಯ)
 {
     PYTYPE_READY(IterType);
-    PYTYPE_READY(BufferType);
+    PYTYPE_READY(ಬಫರ್_Type);
     PYTYPE_READY(RangeType);
-    PYTYPE_READY(WindowType);
-    PYTYPE_READY(TabPageType);
+    PYTYPE_READY(ಕಿಟಕಿ_Type);
+    PYTYPE_READY(Tab_ಪುಟ_Type);
     PYTYPE_READY(BufMapType);
     PYTYPE_READY(WinListType);
     PYTYPE_READY(TabListType);
@@ -7518,34 +7518,34 @@ init_types(void)
     PYTYPE_READY(FunctionType);
     PYTYPE_READY(OptionsType);
     PYTYPE_READY(OutputType);
-#if PY_VERSION_HEX < 0x030700f0
+#ಆದರೆ PY_ಆವೃತ್ತಿ_HEX < 0x030700f0
     PYTYPE_READY(LoaderType);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef USE_LIMITED_API
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_LIMITED_API
     // We need to finish initializing all the static objects because the types
     // are only just allocated on the heap now.
     // Each PyObject_HEAD_INIT_TYPE should correspond to a
     // PyObject_FINISH_INIT_TYPE below.
-    PyObject_FINISH_INIT_TYPE(Output, OutputType);
-    PyObject_FINISH_INIT_TYPE(Error, OutputType);
-    PyObject_FINISH_INIT_TYPE(TheBufferMap, BufMapType);
-    PyObject_FINISH_INIT_TYPE(TheWindowList, WinListType);
-    PyObject_FINISH_INIT_TYPE(TheCurrent, CurrentType);
-    PyObject_FINISH_INIT_TYPE(TheTabPageList, TabListType);
-#endif
-    return 0;
+    Py_Object_ಮುಕ್ತಾಯ_INIT_TYPE(Output, OutputType);
+    Py_Object_ಮುಕ್ತಾಯ_INIT_TYPE(Error, OutputType);
+    Py_Object_ಮುಕ್ತಾಯ_INIT_TYPE(The_ಬಫರ್_Map, BufMapType);
+    Py_Object_ಮುಕ್ತಾಯ_INIT_TYPE(The_ಕಿಟಕಿ_List, WinListType);
+    Py_Object_ಮುಕ್ತಾಯ_INIT_TYPE(TheCurrent, CurrentType);
+    Py_Object_ಮುಕ್ತಾಯ_INIT_TYPE(The_Tab_ಪುಟ_List, TabListType);
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-#ifdef USE_LIMITED_API
-    static void
-shutdown_types(void)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_LIMITED_API
+    ಸ್ಥಿರ ಶೂನ್ಯ
+shutdown_types(ಶೂನ್ಯ)
 {
     PYTYPE_CLEANUP(IterType);
-    PYTYPE_CLEANUP(BufferType);
+    PYTYPE_CLEANUP(ಬಫರ್_Type);
     PYTYPE_CLEANUP(RangeType);
-    PYTYPE_CLEANUP(WindowType);
-    PYTYPE_CLEANUP(TabPageType);
+    PYTYPE_CLEANUP(ಕಿಟಕಿ_Type);
+    PYTYPE_CLEANUP(Tab_ಪುಟ_Type);
     PYTYPE_CLEANUP(BufMapType);
     PYTYPE_CLEANUP(WinListType);
     PYTYPE_CLEANUP(TabListType);
@@ -7556,87 +7556,87 @@ shutdown_types(void)
     PYTYPE_CLEANUP(FunctionType);
     PYTYPE_CLEANUP(OptionsType);
     PYTYPE_CLEANUP(OutputType);
-# if PY_VERSION_HEX < 0x030700f0
+# ಆದರೆ PY_ಆವೃತ್ತಿ_HEX < 0x030700f0
     PYTYPE_CLEANUP(LoaderType);
 # endif
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    static int
-init_sys_path(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+init_sys_ಮಾರ್ಗ(ಶೂನ್ಯ)
 {
-    PyObject	*path;
-    PyObject	*path_hook;
-    PyObject	*path_hooks;
+    PyObject	*ಮಾರ್ಗ;
+    PyObject	*ಮಾರ್ಗ_hook;
+    PyObject	*ಮಾರ್ಗ_hooks;
 
-    if (!(path_hook = PyObject_GetAttrString(vim_module, "path_hook")))
-	return -1;
+    ಆದರೆ (!(ಮಾರ್ಗ_hook = PyObject_GetAttrString(vim_module, "path_hook")))
+	ಹಿಂತಿರುಗಿ -1;
 
-    if (!(path_hooks = PySys_GetObject("path_hooks")))
+    ಆದರೆ (!(ಮಾರ್ಗ_hooks = PySys_GetObject("path_hooks")))
     {
 	PyErr_Clear();
-	path_hooks = PyList_New(1);
-	PyList_SET_ITEM(path_hooks, 0, path_hook);
-	if (PySys_SetObject("path_hooks", path_hooks))
+	ಮಾರ್ಗ_hooks = PyList_New(1);
+	Py_List_ಗಣ_ಅಂಶ(ಮಾರ್ಗ_hooks, 0, ಮಾರ್ಗ_hook);
+	ಆದರೆ (Py_Sys_ಗಣ_Object("path_hooks", ಮಾರ್ಗ_hooks))
 	{
-	    Py_DECREF(path_hooks);
-	    return -1;
+	    Py_DECREF(ಮಾರ್ಗ_hooks);
+	    ಹಿಂತಿರುಗಿ -1;
 	}
-	Py_DECREF(path_hooks);
+	Py_DECREF(ಮಾರ್ಗ_hooks);
     }
-    else if (PyList_Check(path_hooks))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (PyList_Check(ಮಾರ್ಗ_hooks))
     {
-	if (PyList_Append(path_hooks, path_hook))
+	ಆದರೆ (PyList_Append(ಮಾರ್ಗ_hooks, ಮಾರ್ಗ_hook))
 	{
-	    Py_DECREF(path_hook);
-	    return -1;
+	    Py_DECREF(ಮಾರ್ಗ_hook);
+	    ಹಿಂತಿರುಗಿ -1;
 	}
-	Py_DECREF(path_hook);
+	Py_DECREF(ಮಾರ್ಗ_hook);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	VimTryStart();
+	Vim_Try_ಆರಂಭ();
 	emsg(_("Failed to set path hook: sys.path_hooks is not a list\n"
 	       "You should now do the following:\n"
 	       "- append vim.path_hook to sys.path_hooks\n"
 	       "- append vim.VIM_SPECIAL_PATH to sys.path\n"));
-	VimTryEnd(); // Discard the error
-	Py_DECREF(path_hook);
-	return 0;
+	Vim_Try_ಕೊನೆ(); // Discard the error
+	Py_DECREF(ಮಾರ್ಗ_hook);
+	ಹಿಂತಿರುಗಿ 0;
     }
 
-    if (!(path = PySys_GetObject("path")))
+    ಆದರೆ (!(ಮಾರ್ಗ = PySys_GetObject("path")))
     {
 	PyErr_Clear();
-	path = PyList_New(1);
-	Py_INCREF(vim_special_path_object);
-	PyList_SET_ITEM(path, 0, vim_special_path_object);
-	if (PySys_SetObject("path", path))
+	ಮಾರ್ಗ = PyList_New(1);
+	Py_INCREF(vim_special_ಮಾರ್ಗ_object);
+	Py_List_ಗಣ_ಅಂಶ(ಮಾರ್ಗ, 0, vim_special_ಮಾರ್ಗ_object);
+	ಆದರೆ (Py_Sys_ಗಣ_Object("path", ಮಾರ್ಗ))
 	{
-	    Py_DECREF(path);
-	    return -1;
+	    Py_DECREF(ಮಾರ್ಗ);
+	    ಹಿಂತಿರುಗಿ -1;
 	}
-	Py_DECREF(path);
+	Py_DECREF(ಮಾರ್ಗ);
     }
-    else if (PyList_Check(path))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (PyList_Check(ಮಾರ್ಗ))
     {
-	if (PyList_Append(path, vim_special_path_object))
-	    return -1;
+	ಆದರೆ (PyList_Append(ಮಾರ್ಗ, vim_special_ಮಾರ್ಗ_object))
+	    ಹಿಂತಿರುಗಿ -1;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	VimTryStart();
+	Vim_Try_ಆರಂಭ();
 	emsg(_("Failed to set path: sys.path is not a list\n"
 	       "You should now append vim.VIM_SPECIAL_PATH to sys.path"));
-	VimTryEnd(); // Discard the error
+	Vim_Try_ಕೊನೆ(); // Discard the error
     }
 
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-static struct numeric_constant {
-    char	*name;
-    int		val;
+ಸ್ಥಿರ ರಚನೆ numeric_constant {
+    ಅಕ್ಷರ	*name;
+    ಪೂರ್ಣಾಂಕ		val;
 } numeric_constants[] = {
     {"VAR_LOCKED",	VAR_LOCKED},
     {"VAR_FIXED",	VAR_FIXED},
@@ -7644,175 +7644,175 @@ static struct numeric_constant {
     {"VAR_DEF_SCOPE",	VAR_DEF_SCOPE},
 };
 
-struct object_constant {
-    char	*name;
+ರಚನೆ object_constant {
+    ಅಕ್ಷರ	*name;
     PyObject	*valObject;
 };
 
-#define ADD_OBJECT(m, name, obj) \
-    if (PyModule_AddObject(m, name, obj)) \
-	return -1;
+#ವ್ಯಾಖ್ಯಾನಿಸು ಕೂಡಿಸು_OBJECT(m, name, obj) \
+    ಆದರೆ (Py_Module_ಕೂಡಿಸು_Object(m, name, obj)) \
+	ಹಿಂತಿರುಗಿ -1;
 
-#define ADD_CHECKED_OBJECT(m, name, obj) \
+#ವ್ಯಾಖ್ಯಾನಿಸು ಕೂಡಿಸು_CHECKED_OBJECT(m, name, obj) \
     { \
 	PyObject	*valObject = obj; \
-	if (!valObject) \
-	    return -1; \
-	ADD_OBJECT(m, name, valObject); \
+	ಆದರೆ (!valObject) \
+	    ಹಿಂತಿರುಗಿ -1; \
+	ಕೂಡಿಸು_OBJECT(m, name, valObject); \
     }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 populate_module(PyObject *m)
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
     PyObject	*other_module;
     PyObject	*attr;
     PyObject	*imp;
-#if PY_VERSION_HEX >= 0x030700f0
+#ಆದರೆ PY_ಆವೃತ್ತಿ_HEX >= 0x030700f0
     PyObject	*dict;
     PyObject	*cls;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    for (i = 0; i < (int)(sizeof(numeric_constants)
-					   / sizeof(struct numeric_constant));
+    ಗಾಗಿ (i = 0; i < (ಪೂರ್ಣಾಂಕ)(ಗಾತ್ರ(numeric_constants)
+					   / ಗಾತ್ರ(ರಚನೆ numeric_constant));
 	    ++i)
-	ADD_CHECKED_OBJECT(m, numeric_constants[i].name,
+	ಕೂಡಿಸು_CHECKED_OBJECT(m, numeric_constants[i].name,
 		PyInt_FromLong(numeric_constants[i].val));
 
-    struct object_constant object_constants[] = {
-	{"buffers",  (PyObject *)(void *)&TheBufferMap},
-	{"windows",  (PyObject *)(void *)&TheWindowList},
-	{"tabpages", (PyObject *)(void *)&TheTabPageList},
-	{"current",  (PyObject *)(void *)&TheCurrent},
+    ರಚನೆ object_constant object_constants[] = {
+	{"buffers",  (PyObject *)(ಶೂನ್ಯ *)&The_ಬಫರ್_Map},
+	{"windows",  (PyObject *)(ಶೂನ್ಯ *)&The_ಕಿಟಕಿ_List},
+	{"tabpages", (PyObject *)(ಶೂನ್ಯ *)&The_Tab_ಪುಟ_List},
+	{"current",  (PyObject *)(ಶೂನ್ಯ *)&TheCurrent},
 
-	{"Buffer",     (PyObject *)BufferTypePtr},
+	{"Buffer",     (PyObject *)ಬಫರ್_Type_Ptr},
 	{"Range",      (PyObject *)RangeTypePtr},
-	{"Window",     (PyObject *)WindowTypePtr},
-	{"TabPage",    (PyObject *)TabPageTypePtr},
+	{"Window",     (PyObject *)ಕಿಟಕಿ_Type_Ptr},
+	{"TabPage",    (PyObject *)Tab_ಪುಟ_Type_Ptr},
 	{"Dictionary", (PyObject *)DictionaryTypePtr},
 	{"List",       (PyObject *)ListTypePtr},
 	{"Tuple",      (PyObject *)TupleTypePtr},
 	{"Function",   (PyObject *)FunctionTypePtr},
 	{"Options",    (PyObject *)OptionsTypePtr},
-#if PY_VERSION_HEX < 0x030700f0
+#ಆದರೆ PY_ಆವೃತ್ತಿ_HEX < 0x030700f0
 	{"_Loader",    (PyObject *)LoaderTypePtr},
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     };
 
-    for (i = 0; i < (int)(sizeof(object_constants)
-					    / sizeof(struct object_constant));
+    ಗಾಗಿ (i = 0; i < (ಪೂರ್ಣಾಂಕ)(ಗಾತ್ರ(object_constants)
+					    / ಗಾತ್ರ(ರಚನೆ object_constant));
 	    ++i)
     {
 	PyObject	*valObject;
 
 	valObject = object_constants[i].valObject;
 	Py_INCREF(valObject);
-	ADD_OBJECT(m, object_constants[i].name, valObject);
+	ಕೂಡಿಸು_OBJECT(m, object_constants[i].name, valObject);
     }
 
-    if (!(VimError = PyErr_NewException("vim.error", NULL, NULL)))
-	return -1;
-    ADD_OBJECT(m, "error", VimError);
+    ಆದರೆ (!(VimError = PyErr_NewException("vim.error", ಖಾಲಿ, ಖಾಲಿ)))
+	ಹಿಂತಿರುಗಿ -1;
+    ಕೂಡಿಸು_OBJECT(m, "error", VimError);
 
-    ADD_CHECKED_OBJECT(m, "vars",  NEW_DICTIONARY(get_globvar_dict()));
-    ADD_CHECKED_OBJECT(m, "vvars", NEW_DICTIONARY(get_vimvar_dict()));
-    ADD_CHECKED_OBJECT(m, "options",
-	    OptionsNew(SREQ_GLOBAL, NULL, dummy_check, NULL));
+    ಕೂಡಿಸು_CHECKED_OBJECT(m, "vars",  NEW_DICTIONARY(get_globvar_dict()));
+    ಕೂಡಿಸು_CHECKED_OBJECT(m, "vvars", NEW_DICTIONARY(get_vimvar_dict()));
+    ಕೂಡಿಸು_CHECKED_OBJECT(m, "options",
+	    OptionsNew(SREQ_GLOBAL, ಖಾಲಿ, dummy_check, ಖಾಲಿ));
 
-    if (!(other_module = PyImport_ImportModule("os")))
-	return -1;
-    ADD_OBJECT(m, "os", other_module);
+    ಆದರೆ (!(other_module = PyImport_ImportModule("os")))
+	ಹಿಂತಿರುಗಿ -1;
+    ಕೂಡಿಸು_OBJECT(m, "os", other_module);
 
-#if PY_MAJOR_VERSION >= 3
-    if (!(py_getcwd = PyObject_GetAttrString(other_module, "getcwd")))
-	return -1;
-#else
-    if (!(py_getcwd = PyObject_GetAttrString(other_module, "getcwdu")))
-	return -1;
-#endif
-    ADD_OBJECT(m, "_getcwd", py_getcwd)
+#ಆದರೆ PY_MAJOR_ಆವೃತ್ತಿ >= 3
+    ಆದರೆ (!(py_getcwd = PyObject_GetAttrString(other_module, "getcwd")))
+	ಹಿಂತಿರುಗಿ -1;
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಆದರೆ (!(py_getcwd = PyObject_GetAttrString(other_module, "getcwdu")))
+	ಹಿಂತಿರುಗಿ -1;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಕೂಡಿಸು_OBJECT(m, "_getcwd", py_getcwd)
 
-    if (!(py_chdir = PyObject_GetAttrString(other_module, "chdir")))
-	return -1;
-    ADD_OBJECT(m, "_chdir", py_chdir);
-    if (!(attr = PyObject_GetAttrString(m, "chdir")))
-	return -1;
-    if (PyObject_SetAttrString(other_module, "chdir", attr))
+    ಆದರೆ (!(py_chdir = PyObject_GetAttrString(other_module, "chdir")))
+	ಹಿಂತಿರುಗಿ -1;
+    ಕೂಡಿಸು_OBJECT(m, "_chdir", py_chdir);
+    ಆದರೆ (!(attr = PyObject_GetAttrString(m, "chdir")))
+	ಹಿಂತಿರುಗಿ -1;
+    ಆದರೆ (Py_Object_ಗಣ_Attr_String(other_module, "chdir", attr))
     {
 	Py_DECREF(attr);
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
     Py_DECREF(attr);
 
-    if ((py_fchdir = PyObject_GetAttrString(other_module, "fchdir")))
+    ಆದರೆ ((py_fchdir = PyObject_GetAttrString(other_module, "fchdir")))
     {
-	ADD_OBJECT(m, "_fchdir", py_fchdir);
-	if (!(attr = PyObject_GetAttrString(m, "fchdir")))
-	    return -1;
-	if (PyObject_SetAttrString(other_module, "fchdir", attr))
+	ಕೂಡಿಸು_OBJECT(m, "_fchdir", py_fchdir);
+	ಆದರೆ (!(attr = PyObject_GetAttrString(m, "fchdir")))
+	    ಹಿಂತಿರುಗಿ -1;
+	ಆದರೆ (Py_Object_ಗಣ_Attr_String(other_module, "fchdir", attr))
 	{
 	    Py_DECREF(attr);
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 	Py_DECREF(attr);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	PyErr_Clear();
 
-    if (!(vim_special_path_object = PyString_FromString(vim_special_path)))
-	return -1;
+    ಆದರೆ (!(vim_special_ಮಾರ್ಗ_object = PyString_FromString(vim_special_ಮಾರ್ಗ)))
+	ಹಿಂತಿರುಗಿ -1;
 
-    ADD_OBJECT(m, "VIM_SPECIAL_PATH", vim_special_path_object);
+    ಕೂಡಿಸು_OBJECT(m, "VIM_SPECIAL_PATH", vim_special_ಮಾರ್ಗ_object);
 
-#if PY_VERSION_HEX >= 0x030700f0
-    if (!(imp = PyImport_ImportModule("importlib.machinery")))
-	return -1;
+#ಆದರೆ PY_ಆವೃತ್ತಿ_HEX >= 0x030700f0
+    ಆದರೆ (!(imp = PyImport_ImportModule("importlib.machinery")))
+	ಹಿಂತಿರುಗಿ -1;
 
     dict = PyModule_GetDict(imp);
 
-    if (!(cls = PyDict_GetItemString(dict, "PathFinder")))
+    ಆದರೆ (!(cls = Py_Dict_Get_ಅಂಶ_String(dict, "PathFinder")))
     {
 	Py_DECREF(imp);
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 
-    if (!(py_find_spec = PyObject_GetAttrString(cls, "find_spec")))
+    ಆದರೆ (!(py_ಕಂಡುಹಿಡಿ_spec = PyObject_GetAttrString(cls, "find_spec")))
     {
 	Py_DECREF(imp);
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 
-# if PY_VERSION_HEX < 0x30c00a7
+# ಆದರೆ PY_ಆವೃತ್ತಿ_HEX < 0x30c00a7
     // find_module has been removed as of Python 3.12.0a7
-    if ((py_find_module = PyObject_GetAttrString(cls, "find_module")))
-	ADD_OBJECT(m, "_find_module", py_find_module);
+    ಆದರೆ ((py_ಕಂಡುಹಿಡಿ_module = PyObject_GetAttrString(cls, "find_module")))
+	ಕೂಡಿಸು_OBJECT(m, "_find_module", py_ಕಂಡುಹಿಡಿ_module);
 # endif
 
     Py_DECREF(imp);
 
-    ADD_OBJECT(m, "_find_spec", py_find_spec);
-#else
-    if (!(imp = PyImport_ImportModule("imp")))
-	return -1;
+    ಕೂಡಿಸು_OBJECT(m, "_find_spec", py_ಕಂಡುಹಿಡಿ_spec);
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಆದರೆ (!(imp = PyImport_ImportModule("imp")))
+	ಹಿಂತಿರುಗಿ -1;
 
-    if (!(py_find_module = PyObject_GetAttrString(imp, "find_module")))
+    ಆದರೆ (!(py_ಕಂಡುಹಿಡಿ_module = PyObject_GetAttrString(imp, "find_module")))
     {
 	Py_DECREF(imp);
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 
-    if (!(py_load_module = PyObject_GetAttrString(imp, "load_module")))
+    ಆದರೆ (!(py_ತುಂಬು_module = PyObject_GetAttrString(imp, "load_module")))
     {
-	Py_DECREF(py_find_module);
+	Py_DECREF(py_ಕಂಡುಹಿಡಿ_module);
 	Py_DECREF(imp);
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 
     Py_DECREF(imp);
 
-    ADD_OBJECT(m, "_find_module", py_find_module);
-    ADD_OBJECT(m, "_load_module", py_load_module);
-#endif
+    ಕೂಡಿಸು_OBJECT(m, "_find_module", py_ಕಂಡುಹಿಡಿ_module);
+    ಕೂಡಿಸು_OBJECT(m, "_load_module", py_ತುಂಬು_module);
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }

@@ -25,12 +25,12 @@
  * 2016  Kazunobu Kuriyama  <kazunobu.kuriyama@gmail.com>
  */
 
-#include "vim.h"
-#ifdef USE_GRESOURCE
+#ಅನ್ತರ್ಭಾವ "vim.h"
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_GRESOURCE
 # include "auto/gui_gtk_gresources.h"
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_GUI_GNOME
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_GNOME
 // Gnome redefines _() and N_().  Grrr...
 # ifdef _
 #  undef _
@@ -47,129 +47,129 @@
 # ifdef bind_textdomain_codeset
 #  undef bind_textdomain_codeset
 # endif
-# if defined(FEAT_GETTEXT) && !defined(ENABLE_NLS)
+# ಆದರೆ defined(FEAT_GETTEXT) && !defined(ENABLE_NLS)
 #  define ENABLE_NLS	// so the texts in the dialog boxes are translated
 # endif
 # include <gnome.h>
 # include "version.h"
 // missing prototype in bonobo-dock-item.h
-extern void bonobo_dock_item_set_behavior(BonoboDockItem *dock_item, BonoboDockItemBehavior beh);
-#endif
+ಬಾಹ್ಯ ಶೂನ್ಯ bonobo_dock_ಅಂಶ_ಗಣ_behavior(Bonobo_Dock_ಅಂಶ *dock_ಅಂಶ, Bonobo_Dock_ಅಂಶ_Behavior beh);
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_GUI_GTK)
-# if GTK_CHECK_VERSION(3,0,0)
+#ಆದರೆ defined(FEAT_GUI_GTK)
+# ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
 #  include <gdk/gdkkeysyms-compat.h>
 #  ifdef GDK_WINDOWING_WAYLAND
 #   include <gdk/gdkwayland.h>
 #  endif
 #  include <gtk/gtkx.h>
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  include <gdk/gdkkeysyms.h>
 # endif
 # include <gdk/gdk.h>
 # ifdef MSWIN
 #  include <gdk/gdkwin32.h>
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  include <gdk/gdkx.h>
 # endif
 # include <gtk/gtk.h>
 # include "gui_gtk_f.h"
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef HAVE_X11_SUNKEYSYM_H
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_X11_SUNKEYSYM_H
 # include <X11/Sunkeysym.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Easy-to-use macro for multihead support.
  */
-#define GET_X_ATOM(atom)	gdk_x11_atom_to_xatom_for_display( \
+#ವ್ಯಾಖ್ಯಾನಿಸು GET_X_ATOM(atom)	gdk_x11_atom_ಗಮ್ಯ_xatom_for_display( \
 				    gtk_widget_get_display(gui.mainwin), atom)
 
 // Selection type distinguishers
-enum
+ಎಣಿಕೆ
 {
-    TARGET_TYPE_NONE,
-    TARGET_UTF8_STRING,
-    TARGET_STRING,
-    TARGET_COMPOUND_TEXT,
-    TARGET_HTML,
-    TARGET_TEXT,
-    TARGET_TEXT_URI_LIST,
-    TARGET_TEXT_PLAIN,
-    TARGET_TEXT_PLAIN_UTF8,
-    TARGET_VIM_MT,
-    TARGET_VIM,
-    TARGET_VIMENC_MT,
-    TARGET_VIMENC
+    ಗುರಿ_TYPE_NONE,
+    ಗುರಿ_UTF8_STRING,
+    ಗುರಿ_STRING,
+    ಗುರಿ_COMPOUND_ಪಠ್ಯ,
+    ಗುರಿ_HTML,
+    ಗುರಿ_ಪಠ್ಯ,
+    ಗುರಿ_ಪಠ್ಯ_URI_LIST,
+    ಗುರಿ_ಪಠ್ಯ_PLAIN,
+    ಗುರಿ_ಪಠ್ಯ_PLAIN_UTF8,
+    ಗುರಿ_VIM_MT,
+    ಗುರಿ_VIM,
+    ಗುರಿ_VIMENC_MT,
+    ಗುರಿ_VIMENC
 };
 
 /*
  * Table of selection targets supported by Vim.
  * Note: Order matters, preferred types should come first.
  */
-static const GtkTargetEntry selection_targets[] =
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ Gtk_ಗುರಿ_ನಮೂದು selection_targets[] =
 {
-    {VIMENC_ATOM_NAME,	0, TARGET_VIMENC},
-    {VIM_ATOM_NAME,	0, TARGET_VIM},
-    {VIMENC_MIMETYPE_NAME,  0, TARGET_VIMENC_MT},
-    {VIM_MIMETYPE_NAME,	    0, TARGET_VIM_MT},
-    {"text/html",	0, TARGET_HTML},
-    {"UTF8_STRING",	0, TARGET_UTF8_STRING},
-    {"COMPOUND_TEXT",	0, TARGET_COMPOUND_TEXT},
-    {"TEXT",		0, TARGET_TEXT},
-    {"STRING",		0, TARGET_STRING},
-    {"text/plain;charset=utf-8", 0, TARGET_TEXT_PLAIN_UTF8},
-    {"text/plain",	0, TARGET_TEXT_PLAIN}
+    {VIMENC_ATOM_NAME,	0, ಗುರಿ_VIMENC},
+    {VIM_ATOM_NAME,	0, ಗುರಿ_VIM},
+    {VIMENC_MIMETYPE_NAME,  0, ಗುರಿ_VIMENC_MT},
+    {VIM_MIMETYPE_NAME,	    0, ಗುರಿ_VIM_MT},
+    {"text/html",	0, ಗುರಿ_HTML},
+    {"UTF8_STRING",	0, ಗುರಿ_UTF8_STRING},
+    {"COMPOUND_TEXT",	0, ಗುರಿ_COMPOUND_ಪಠ್ಯ},
+    {"TEXT",		0, ಗುರಿ_ಪಠ್ಯ},
+    {"STRING",		0, ಗುರಿ_STRING},
+    {"text/plain;charset=utf-8", 0, ಗುರಿ_ಪಠ್ಯ_PLAIN_UTF8},
+    {"text/plain",	0, ಗುರಿ_ಪಠ್ಯ_PLAIN}
 };
-#define N_SELECTION_TARGETS ARRAY_LENGTH(selection_targets)
+#ವ್ಯಾಖ್ಯಾನಿಸು N_SELECTION_TARGETS ARRAY_ಉದ್ದಳತೆ(selection_targets)
 
-#ifdef FEAT_DND
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DND
 /*
  * Table of DnD targets supported by Vim.
  * Note: Order matters, preferred types should come first.
  */
-static const GtkTargetEntry dnd_targets[] =
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ Gtk_ಗುರಿ_ನಮೂದು dnd_targets[] =
 {
-    {"text/uri-list",	0, TARGET_TEXT_URI_LIST},
-    {"text/html",	0, TARGET_HTML},
-    {"UTF8_STRING",	0, TARGET_UTF8_STRING},
-    {"STRING",		0, TARGET_STRING},
-    {"text/plain",	0, TARGET_TEXT_PLAIN}
+    {"text/uri-list",	0, ಗುರಿ_ಪಠ್ಯ_URI_LIST},
+    {"text/html",	0, ಗುರಿ_HTML},
+    {"UTF8_STRING",	0, ಗುರಿ_UTF8_STRING},
+    {"STRING",		0, ಗುರಿ_STRING},
+    {"text/plain",	0, ಗುರಿ_ಪಠ್ಯ_PLAIN}
 };
-# define N_DND_TARGETS ARRAY_LENGTH(dnd_targets)
-#endif
+# define N_DND_TARGETS ARRAY_ಉದ್ದಳತೆ(dnd_targets)
+#ಆದರೆ_ಅಂತ್ಯ
 
 
 /*
  * "Monospace" is a standard font alias that should be present
  * on all proper Pango/fontconfig installations.
  */
-#define DEFAULT_FONT	"Monospace 12"
+#ವ್ಯಾಖ್ಯಾನಿಸು DEFAULT_FONT	"Monospace 12"
 
-#if defined(FEAT_GUI_GNOME) && defined(FEAT_SESSION)
+#ಆದರೆ defined(FEAT_GUI_GNOME) && defined(FEAT_SESSION)
 # define USE_GNOME_SESSION
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if !defined(FEAT_GUI_GNOME)
+#ಆದರೆ !defined(FEAT_GUI_GNOME)
 /*
  * Atoms used to communicate save-yourself from the X11 session manager. There
  * is no need to move them into the GUI struct, since they should be constant.
  */
-static GdkAtom wm_protocols_atom = GDK_NONE;
-static GdkAtom save_yourself_atom = GDK_NONE;
-#endif
+ಸ್ಥಿರ GdkAtom wm_protocols_atom = GDK_NONE;
+ಸ್ಥಿರ GdkAtom save_yourself_atom = GDK_NONE;
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Atoms used to control/reference X11 selections.
  */
-static GdkAtom html_atom = GDK_NONE;
-static GdkAtom utf8_string_atom = GDK_NONE;
-static GdkAtom vim_atom = GDK_NONE;	// Vim's own special selection format
-static GdkAtom vimenc_atom = GDK_NONE;	// Vim's extended selection format
-static GdkAtom vim_mt_atom = GDK_NONE;	// Vim's own special selection format
+ಸ್ಥಿರ GdkAtom html_atom = GDK_NONE;
+ಸ್ಥಿರ GdkAtom utf8_string_atom = GDK_NONE;
+ಸ್ಥಿರ GdkAtom vim_atom = GDK_NONE;	// Vim's own special selection format
+ಸ್ಥಿರ GdkAtom vimenc_atom = GDK_NONE;	// Vim's extended selection format
+ಸ್ಥಿರ GdkAtom vim_mt_atom = GDK_NONE;	// Vim's own special selection format
 					// (in mime type format)
-static GdkAtom vimenc_mt_atom = GDK_NONE;	// Vim's extended selection
+ಸ್ಥಿರ GdkAtom vimenc_mt_atom = GDK_NONE;	// Vim's extended selection
 						// format (in mime type format)
 
 /*
@@ -177,18 +177,18 @@ static GdkAtom vimenc_mt_atom = GDK_NONE;	// Vim's extended selection
  * NOTE: when changing this, the table in gui_x11.c probably needs the same
  * change!
  */
-static struct special_key
+ಸ್ಥಿರ ರಚನೆ special_ಕೀಲಿ
 {
-    guint key_sym;
+    guint ಕೀಲಿ_sym;
     char_u code0;
     char_u code1;
 }
-const special_keys[] =
+ಸ್ಥಿರಾಂಕ special_ಕೀಲಿಗಳು[] =
 {
-    {GDK_Up,		'k', 'u'},
-    {GDK_Down,		'k', 'd'},
-    {GDK_Left,		'k', 'l'},
-    {GDK_Right,		'k', 'r'},
+    {GDK_ಮೇಲೆ,		'k', 'u'},
+    {GDK_ಕೆಳಕ್ಕೆ,		'k', 'd'},
+    {GDK_ಎಡ,		'k', 'l'},
+    {GDK_ಬಲ,		'k', 'r'},
     {GDK_F1,		'k', '1'},
     {GDK_F2,		'k', '2'},
     {GDK_F3,		'k', '3'},
@@ -225,36 +225,36 @@ const special_keys[] =
     {GDK_F33,		'F', 'N'},
     {GDK_F34,		'F', 'O'},
     {GDK_F35,		'F', 'P'},
-#ifdef SunXK_F36
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SunXK_F36
     {SunXK_F36,		'F', 'Q'},
     {SunXK_F37,		'F', 'R'},
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     {GDK_Help,		'%', '1'},
     {GDK_Undo,		'&', '8'},
-    {GDK_BackSpace,	'k', 'b'},
-    {GDK_Insert,	'k', 'I'},
+    {GDK_ಹಿಂಭಾಗ_Space,	'k', 'b'},
+    {GDK_ಸೇರಿಸು,	'k', 'I'},
     {GDK_Delete,	'k', 'D'},
-    {GDK_3270_BackTab,	'k', 'B'},
+    {GDK_3270_ಹಿಂಭಾಗ_Tab,	'k', 'B'},
     {GDK_Clear,		'k', 'C'},
     {GDK_Home,		'k', 'h'},
-    {GDK_End,		'@', '7'},
-    {GDK_Prior,		'k', 'P'},
-    {GDK_Next,		'k', 'N'},
+    {GDK_ಕೊನೆ,		'@', '7'},
+    {GDK_ಪೂರ್ವ,		'k', 'P'},
+    {GDK_ಮುಂದಿನ,		'k', 'N'},
     {GDK_Print,		'%', '9'},
     // Keypad keys:
-    {GDK_KP_Left,	'k', 'l'},
-    {GDK_KP_Right,	'k', 'r'},
-    {GDK_KP_Up,		'k', 'u'},
-    {GDK_KP_Down,	'k', 'd'},
-    {GDK_KP_Insert,	KS_EXTRA, (char_u)KE_KINS},
+    {GDK_KP_ಎಡ,	'k', 'l'},
+    {GDK_KP_ಬಲ,	'k', 'r'},
+    {GDK_KP_ಮೇಲೆ,		'k', 'u'},
+    {GDK_KP_ಕೆಳಕ್ಕೆ,	'k', 'd'},
+    {GDK_KP_ಸೇರಿಸು,	KS_EXTRA, (char_u)KE_KINS},
     {GDK_KP_Delete,	KS_EXTRA, (char_u)KE_KDEL},
     {GDK_KP_Home,	'K', '1'},
-    {GDK_KP_End,	'K', '4'},
-    {GDK_KP_Prior,	'K', '3'},  // page up
-    {GDK_KP_Next,	'K', '5'},  // page down
+    {GDK_KP_ಕೊನೆ,	'K', '4'},
+    {GDK_KP_ಪೂರ್ವ,	'K', '3'},  // page up
+    {GDK_KP_ಮುಂದಿನ,	'K', '5'},  // page down
 
-    {GDK_KP_Add,	'K', '6'},
-    {GDK_KP_Subtract,	'K', '7'},
+    {GDK_KP_ಕೂಡಿಸು,	'K', '6'},
+    {GDK_KP_ಕಳೆ,	'K', '7'},
     {GDK_KP_Divide,	'K', '8'},
     {GDK_KP_Multiply,	'K', '9'},
     {GDK_KP_Enter,	'K', 'A'},
@@ -278,23 +278,23 @@ const special_keys[] =
 /*
  * Flags for command line options table below.
  */
-#define ARG_FONT	1
-#define ARG_GEOMETRY	2
-#define ARG_REVERSE	3
-#define ARG_NOREVERSE	4
-#define ARG_BACKGROUND	5
-#define ARG_FOREGROUND	6
-#define ARG_ICONIC	7
-#define ARG_ROLE	8
-#define ARG_NETBEANS	9
-#define ARG_XRM		10	// ignored
-#define ARG_MENUFONT	11	// ignored
-#define ARG_INDEX_MASK	0x00ff
-#define ARG_HAS_VALUE	0x0100	// a value is expected after the argument
-#define ARG_NEEDS_GUI	0x0200	// need to initialize the GUI for this
-#define ARG_FOR_GTK	0x0400	// argument is handled by GTK+ or GNOME
-#define ARG_COMPAT_LONG	0x0800	// accept -foo but substitute with --foo
-#define ARG_KEEP	0x1000	// don't remove argument from argv[]
+#ವ್ಯಾಖ್ಯಾನಿಸು ARG_FONT	1
+#ವ್ಯಾಖ್ಯಾನಿಸು ARG_GEOMETRY	2
+#ವ್ಯಾಖ್ಯಾನಿಸು ARG_ಹಿಮ್ಮುಖ	3
+#ವ್ಯಾಖ್ಯಾನಿಸು ARG_NOREVERSE	4
+#ವ್ಯಾಖ್ಯಾನಿಸು ARG_BACKGROUND	5
+#ವ್ಯಾಖ್ಯಾನಿಸು ARG_FOREGROUND	6
+#ವ್ಯಾಖ್ಯಾನಿಸು ARG_ICONIC	7
+#ವ್ಯಾಖ್ಯಾನಿಸು ARG_ROLE	8
+#ವ್ಯಾಖ್ಯಾನಿಸು ARG_NETBEANS	9
+#ವ್ಯಾಖ್ಯಾನಿಸು ARG_XRM		10	// ignored
+#ವ್ಯಾಖ್ಯಾನಿಸು ARG_MENUFONT	11	// ignored
+#ವ್ಯಾಖ್ಯಾನಿಸು ARG_ಸೂಚ್ಯಂಕ_ಮುಖವಾಡ	0x00ff
+#ವ್ಯಾಖ್ಯಾನಿಸು ARG_HAS_ಮೌಲ್ಯ	0x0100	// a value is expected after the argument
+#ವ್ಯಾಖ್ಯಾನಿಸು ARG_NEEDS_GUI	0x0200	// need to initialize the GUI for this
+#ವ್ಯಾಖ್ಯಾನಿಸು ARG_FOR_GTK	0x0400	// argument is handled by GTK+ or GNOME
+#ವ್ಯಾಖ್ಯಾನಿಸು ARG_COMPAT_LONG	0x0800	// accept -foo but substitute with --foo
+#ವ್ಯಾಖ್ಯಾನಿಸು ARG_KEEP	0x1000	// don't remove argument from argv[]
 
 /*
  * This table holds all the X GUI command line options allowed.  This includes
@@ -303,94 +303,94 @@ const special_keys[] =
  *
  * When changing this, also update doc/gui_x11.txt and the usage message!!!
  */
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    const char	    *name;
-    unsigned int    flags;
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ	    *name;
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ    flags;
 }
 cmdline_option_T;
 
-static const cmdline_option_T cmdline_options[] =
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ cmdline_option_T cmdline_options[] =
 {
     // We handle these options ourselves
-    {"-fn",		ARG_FONT|ARG_HAS_VALUE},
-    {"-font",		ARG_FONT|ARG_HAS_VALUE},
-    {"-geom",		ARG_GEOMETRY|ARG_HAS_VALUE},
-    {"-geometry",	ARG_GEOMETRY|ARG_HAS_VALUE},
-    {"-rv",		ARG_REVERSE},
-    {"-reverse",	ARG_REVERSE},
+    {"-fn",		ARG_FONT|ARG_HAS_ಮೌಲ್ಯ},
+    {"-font",		ARG_FONT|ARG_HAS_ಮೌಲ್ಯ},
+    {"-geom",		ARG_GEOMETRY|ARG_HAS_ಮೌಲ್ಯ},
+    {"-geometry",	ARG_GEOMETRY|ARG_HAS_ಮೌಲ್ಯ},
+    {"-rv",		ARG_ಹಿಮ್ಮುಖ},
+    {"-reverse",	ARG_ಹಿಮ್ಮುಖ},
     {"+rv",		ARG_NOREVERSE},
     {"+reverse",	ARG_NOREVERSE},
-    {"-bg",		ARG_BACKGROUND|ARG_HAS_VALUE},
-    {"-background",	ARG_BACKGROUND|ARG_HAS_VALUE},
-    {"-fg",		ARG_FOREGROUND|ARG_HAS_VALUE},
-    {"-foreground",	ARG_FOREGROUND|ARG_HAS_VALUE},
+    {"-bg",		ARG_BACKGROUND|ARG_HAS_ಮೌಲ್ಯ},
+    {"-background",	ARG_BACKGROUND|ARG_HAS_ಮೌಲ್ಯ},
+    {"-fg",		ARG_FOREGROUND|ARG_HAS_ಮೌಲ್ಯ},
+    {"-foreground",	ARG_FOREGROUND|ARG_HAS_ಮೌಲ್ಯ},
     {"-iconic",		ARG_ICONIC},
-    {"--role",		ARG_ROLE|ARG_HAS_VALUE},
-#ifdef FEAT_NETBEANS_INTG
+    {"--role",		ARG_ROLE|ARG_HAS_ಮೌಲ್ಯ},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_NETBEANS_INTG
     {"-nb",		ARG_NETBEANS},	      // non-standard value format
-    {"-xrm",		ARG_XRM|ARG_HAS_VALUE},		// not implemented
-    {"-mf",		ARG_MENUFONT|ARG_HAS_VALUE},	// not implemented
-    {"-menufont",	ARG_MENUFONT|ARG_HAS_VALUE},	// not implemented
-#endif
+    {"-xrm",		ARG_XRM|ARG_HAS_ಮೌಲ್ಯ},		// not implemented
+    {"-mf",		ARG_MENUFONT|ARG_HAS_ಮೌಲ್ಯ},	// not implemented
+    {"-menufont",	ARG_MENUFONT|ARG_HAS_ಮೌಲ್ಯ},	// not implemented
+#ಆದರೆ_ಅಂತ್ಯ
     // Arguments handled by GTK (and GNOME) internally.
     {"--g-fatal-warnings",	ARG_FOR_GTK},
-    {"--gdk-debug",		ARG_FOR_GTK|ARG_HAS_VALUE},
-    {"--gdk-no-debug",		ARG_FOR_GTK|ARG_HAS_VALUE},
-    {"--gtk-debug",		ARG_FOR_GTK|ARG_HAS_VALUE},
-    {"--gtk-no-debug",		ARG_FOR_GTK|ARG_HAS_VALUE},
-    {"--gtk-module",		ARG_FOR_GTK|ARG_HAS_VALUE},
+    {"--gdk-debug",		ARG_FOR_GTK|ARG_HAS_ಮೌಲ್ಯ},
+    {"--gdk-no-debug",		ARG_FOR_GTK|ARG_HAS_ಮೌಲ್ಯ},
+    {"--gtk-debug",		ARG_FOR_GTK|ARG_HAS_ಮೌಲ್ಯ},
+    {"--gtk-no-debug",		ARG_FOR_GTK|ARG_HAS_ಮೌಲ್ಯ},
+    {"--gtk-module",		ARG_FOR_GTK|ARG_HAS_ಮೌಲ್ಯ},
     {"--sync",			ARG_FOR_GTK},
-    {"--display",		ARG_FOR_GTK|ARG_HAS_VALUE|ARG_COMPAT_LONG},
-    {"--name",			ARG_FOR_GTK|ARG_HAS_VALUE|ARG_COMPAT_LONG},
-    {"--class",			ARG_FOR_GTK|ARG_HAS_VALUE|ARG_COMPAT_LONG},
-    {"--screen",		ARG_FOR_GTK|ARG_HAS_VALUE},
-    {"--gxid-host",		ARG_FOR_GTK|ARG_HAS_VALUE},
-    {"--gxid-port",		ARG_FOR_GTK|ARG_HAS_VALUE},
-#ifdef FEAT_GUI_GNOME
-    {"--load-modules",		ARG_FOR_GTK|ARG_HAS_VALUE},
-    {"--sm-client-id",		ARG_FOR_GTK|ARG_HAS_VALUE},
-    {"--sm-config-prefix",	ARG_FOR_GTK|ARG_HAS_VALUE},
+    {"--display",		ARG_FOR_GTK|ARG_HAS_ಮೌಲ್ಯ|ARG_COMPAT_LONG},
+    {"--name",			ARG_FOR_GTK|ARG_HAS_ಮೌಲ್ಯ|ARG_COMPAT_LONG},
+    {"--class",			ARG_FOR_GTK|ARG_HAS_ಮೌಲ್ಯ|ARG_COMPAT_LONG},
+    {"--screen",		ARG_FOR_GTK|ARG_HAS_ಮೌಲ್ಯ},
+    {"--gxid-host",		ARG_FOR_GTK|ARG_HAS_ಮೌಲ್ಯ},
+    {"--gxid-port",		ARG_FOR_GTK|ARG_HAS_ಮೌಲ್ಯ},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_GNOME
+    {"--load-modules",		ARG_FOR_GTK|ARG_HAS_ಮೌಲ್ಯ},
+    {"--sm-client-id",		ARG_FOR_GTK|ARG_HAS_ಮೌಲ್ಯ},
+    {"--sm-config-prefix",	ARG_FOR_GTK|ARG_HAS_ಮೌಲ್ಯ},
     {"--sm-disable",		ARG_FOR_GTK},
-    {"--oaf-ior-fd",		ARG_FOR_GTK|ARG_HAS_VALUE},
-    {"--oaf-activate-iid",	ARG_FOR_GTK|ARG_HAS_VALUE},
+    {"--oaf-ior-fd",		ARG_FOR_GTK|ARG_HAS_ಮೌಲ್ಯ},
+    {"--oaf-activate-iid",	ARG_FOR_GTK|ARG_HAS_ಮೌಲ್ಯ},
     {"--oaf-private",		ARG_FOR_GTK},
     {"--enable-sound",		ARG_FOR_GTK},
     {"--disable-sound",		ARG_FOR_GTK},
-    {"--espeaker",		ARG_FOR_GTK|ARG_HAS_VALUE},
+    {"--espeaker",		ARG_FOR_GTK|ARG_HAS_ಮೌಲ್ಯ},
     {"-?",			ARG_FOR_GTK|ARG_NEEDS_GUI},
     {"--help",			ARG_FOR_GTK|ARG_NEEDS_GUI|ARG_KEEP},
     {"--usage",			ARG_FOR_GTK|ARG_NEEDS_GUI},
-# if 0 // conflicts with Vim's own --version argument
+# ಆದರೆ 0 // conflicts with Vim's own --version argument
     {"--version",		ARG_FOR_GTK|ARG_NEEDS_GUI},
 # endif
     {"--disable-crash-dialog",	ARG_FOR_GTK},
-#endif
-    {NULL, 0}
+#ಆದರೆ_ಅಂತ್ಯ
+    {ಖಾಲಿ, 0}
 };
 
-static int    gui_argc = 0;
-static char **gui_argv = NULL;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ    gui_argc = 0;
+ಸ್ಥಿರ ಅಕ್ಷರ **gui_argv = ಖಾಲಿ;
 
-static const char *role_argument = NULL;
-#if defined(USE_GNOME_SESSION)
-static const char *restart_command = NULL;
-static       char *abs_restart_command = NULL;
-#endif
-static int found_iconic_arg = FALSE;
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *role_ವಾದ = ಖಾಲಿ;
+#ಆದರೆ defined(USE_GNOME_SESSION)
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *restart_command = ಖಾಲಿ;
+ಸ್ಥಿರ       ಅಕ್ಷರ *abs_restart_command = ಖಾಲಿ;
+#ಆದರೆ_ಅಂತ್ಯ
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಸಿಕ್ಕಿತು_iconic_arg = FALSE;
 
-#ifdef FEAT_GUI_GNOME
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_GNOME
 /*
  * Can't use Gnome if --socketid given
  */
-static int using_gnome = 0;
-#else
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ using_gnome = 0;
+#ಇಲ್ಲದಿದ್ದರೆ
 # define using_gnome 0
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // Comment out the following line to ignore code for resize history tracking.
-#define TRACK_RESIZE_HISTORY
-#ifdef TRACK_RESIZE_HISTORY
+#ವ್ಯಾಖ್ಯಾನಿಸು TRACK_RESIZE_HISTORY
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TRACK_RESIZE_HISTORY
 /*
  * Keep a short term resize history so that stale gtk responses can be
  * discarded.
@@ -398,7 +398,7 @@ static int using_gnome = 0;
  * the request is saved. Recent stale requests are kept around in a list.
  * See https://github.com/vim/vim/issues/10123
  */
-# if 0  // Change to 1 to enable ch_log() calls for debugging.
+# ಆದರೆ 0  // Change to 1 to enable ch_log() calls for debugging.
 #  ifdef FEAT_EVAL
 #   define ENABLE_RESIZE_HISTORY_LOG
 #  endif
@@ -408,35 +408,35 @@ static int using_gnome = 0;
  * History item of a resize request.
  * Width and height are of gui.mainwin.
  */
-typedef struct resize_history {
-    int used;		// If true, can't match for discard. Only matches once.
-    int width;
-    int height;
-    int from_shellsize;	// TRUE if recorded by gui_mch_set_shellsize (not
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ resize_history {
+    ಪೂರ್ಣಾಂಕ ಬಳಸಿದ;		// If true, can't match for discard. Only matches once.
+    ಪೂರ್ಣಾಂಕ ಅಗಲ;
+    ಪೂರ್ಣಾಂಕ ಎತ್ತರ;
+    ಪೂರ್ಣಾಂಕ from_shellsize;	// TRUE if recorded by gui_mch_set_shellsize (not
 			// a pre-record from gui_mch_show_tabline).
 # ifdef ENABLE_RESIZE_HISTORY_LOG
-    int seq;		// for ch_log messages
+    ಪೂರ್ಣಾಂಕ seq;		// for ch_log messages
 # endif
-    struct resize_history *next;
+    ರಚನೆ resize_history *ಮುಂದಿನ;
 } resize_hist_T;
 
 // never NULL during execution
-static resize_hist_T *latest_resize_hist;
+ಸ್ಥಿರ resize_hist_T *latest_resize_hist;
 // list of stale resize requests
-static resize_hist_T *old_resize_hists;
+ಸ್ಥಿರ resize_hist_T *old_resize_hists;
 
 // On Wayland (and GTK3 with CSD), gtk_window_resize(w, h) results in
 // gtk_window_get_size() returning (w - csd_w, h - csd_h).  These offsets are
 // computed once from the first confirmed resize response and applied to all
 // subsequent gtk_window_resize() calls so the form gets the intended size.
-static int mch_csd_width = 0;
-static int mch_csd_height = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ mch_csd_ಅಗಲ = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ mch_csd_ಎತ್ತರ = 0;
 
 // Expected form widget width for the most recent gui_mch_set_shellsize()
 // call (set only after mch_csd_width is known).  Used in
 // form_configure_event() to clamp slightly-narrow configure responses that
 // result from CSD under-compensation, preventing column loss.
-static int mch_pending_form_w = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ mch_pending_form_w = 0;
 
 /*
  * Used when calling gtk_window_resize().
@@ -445,26 +445,26 @@ static int mch_pending_form_w = 0;
  * from_shellsize is TRUE when called from gui_mch_set_shellsize (vs a
  * stale pre-record from gui_mch_show_tabline).
  */
-    static void
-alloc_resize_hist(int width, int height, int from_shellsize)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+alloc_resize_hist(ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಪೂರ್ಣಾಂಕ from_shellsize)
 {
     // alloc a new resize hist, save current in list of old history
     resize_hist_T *prev_hist = latest_resize_hist;
     resize_hist_T *new_hist = ALLOC_CLEAR_ONE(resize_hist_T);
 
-    new_hist->width = width;
-    new_hist->height = height;
+    new_hist->ಅಗಲ = ಅಗಲ;
+    new_hist->ಎತ್ತರ = ಎತ್ತರ;
     new_hist->from_shellsize = from_shellsize;
     latest_resize_hist = new_hist;
 
     // previous hist item becomes head of list
-    prev_hist->next = old_resize_hists;
+    prev_hist->ಮುಂದಿನ = old_resize_hists;
     old_resize_hists = prev_hist;
 
 # ifdef ENABLE_RESIZE_HISTORY_LOG
     new_hist->seq = prev_hist->seq + 1;
-    ch_log(NULL, "gui_gtk: New resize seq %d (%d, %d) [%d, %d]",
-	   new_hist->seq, width, height, (int)Columns, (int)Rows);
+    ch_log(ಖಾಲಿ, "gui_gtk: New resize seq %d (%d, %d) [%d, %d]",
+	   new_hist->seq, ಅಗಲ, ಎತ್ತರ, (ಪೂರ್ಣಾಂಕ)Columns, (ಪೂರ್ಣಾಂಕ)ಅಡ್ಡಸಾಲುಗಳು);
 # endif
 }
 
@@ -472,33 +472,33 @@ alloc_resize_hist(int width, int height, int from_shellsize)
  * Free everything on the stale resize history list.
  * This list is empty when there are no outstanding resize requests.
  */
-    static void
-clear_resize_hists(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+clear_resize_hists(ಶೂನ್ಯ)
 {
 # ifdef ENABLE_RESIZE_HISTORY_LOG
-    int		    i = 0;
+    ಪೂರ್ಣಾಂಕ		    i = 0;
 # endif
 
-    if (latest_resize_hist)
-	latest_resize_hist->used = TRUE;
-    while (old_resize_hists != NULL)
+    ಆದರೆ (latest_resize_hist)
+	latest_resize_hist->ಬಳಸಿದ = TRUE;
+    ಆಗ (old_resize_hists != ಖಾಲಿ)
     {
-	resize_hist_T *next_hist = old_resize_hists->next;
+	resize_hist_T *ಮುಂದಿನ_hist = old_resize_hists->ಮುಂದಿನ;
 
 	vim_free(old_resize_hists);
-	old_resize_hists = next_hist;
+	old_resize_hists = ಮುಂದಿನ_hist;
 # ifdef ENABLE_RESIZE_HISTORY_LOG
 	i++;
 # endif
     }
 # ifdef ENABLE_RESIZE_HISTORY_LOG
-    ch_log(NULL, "gui_gtk: free %d hists", i);
+    ch_log(ಖಾಲಿ, "gui_gtk: free %d hists", i);
 # endif
 }
 
 // true if hist item is unused and matches w,h
-# define MATCH_WIDTH_HEIGHT(hist, w, h) \
-	  (!hist->used && hist->width == w && hist->height == h)
+# define ಹೊಂದಿಕೆ_ಅಗಲ_ಎತ್ತರ(hist, w, h) \
+	  (!hist->ಬಳಸಿದ && hist->ಅಗಲ == w && hist->ಎತ್ತರ == h)
 
 /*
  * Search the resize hist list.
@@ -506,53 +506,53 @@ clear_resize_hists(void)
  * has never matched before. Mark the matching item as used so it will
  * not match again.
  */
-    static int
-match_stale_width_height(int width, int height)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಹೊಂದಿಕೆ_stale_ಅಗಲ_ಎತ್ತರ(ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ)
 {
     resize_hist_T *hist = old_resize_hists;
 
-    for (hist = old_resize_hists; hist != NULL; hist = hist->next)
-	if (MATCH_WIDTH_HEIGHT(hist, width, height))
+    ಗಾಗಿ (hist = old_resize_hists; hist != ಖಾಲಿ; hist = hist->ಮುಂದಿನ)
+	ಆದರೆ (ಹೊಂದಿಕೆ_ಅಗಲ_ಎತ್ತರ(hist, ಅಗಲ, ಎತ್ತರ))
 	{
 # ifdef ENABLE_RESIZE_HISTORY_LOG
-	    ch_log(NULL, "gui_gtk: discard seq %d, cur seq %d",
+	    ch_log(ಖಾಲಿ, "gui_gtk: discard seq %d, cur seq %d",
 		   hist->seq, latest_resize_hist->seq);
 # endif
-	    hist->used = TRUE;
-	    return TRUE;
+	    hist->ಬಳಸಿದ = TRUE;
+	    ಹಿಂತಿರುಗಿ TRUE;
 	}
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
-# if defined(EXITFREE)
-    static void
-free_all_resize_hist(void)
+# ಆದರೆ defined(EXITFREE)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+free_all_resize_hist(ಶೂನ್ಯ)
 {
     clear_resize_hists();
     vim_free(latest_resize_hist);
 }
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * GTK doesn't set the GDK_BUTTON1_MASK state when dragging a touch. Add this
  * state when dragging.
  */
-static guint dragging_button_state = 0;
+ಸ್ಥಿರ guint dragging_button_state = 0;
 
 /*
  * Parse the GUI related command-line arguments.  Any arguments used are
  * deleted from argv, and *argc is decremented accordingly.  This is called
  * when vim is started, whether or not the GUI has been started.
  */
-    void
-gui_mch_prepare(int *argc, char **argv)
+    ಶೂನ್ಯ
+gui_mch_prepare(ಪೂರ್ಣಾಂಕ *argc, ಅಕ್ಷರ **argv)
 {
-    const cmdline_option_T  *option;
-    int			    i	= 0;
-    int			    len = 0;
+    ಸ್ಥಿರಾಂಕ cmdline_option_T  *option;
+    ಪೂರ್ಣಾಂಕ			    i	= 0;
+    ಪೂರ್ಣಾಂಕ			    len = 0;
 
-#if defined(USE_GNOME_SESSION)
+#ಆದರೆ defined(USE_GNOME_SESSION)
     /*
      * Determine the command used to invoke Vim, to be passed as restart
      * command to the session manager.	If argv[0] contains any directory
@@ -560,193 +560,193 @@ gui_mch_prepare(int *argc, char **argv)
      */
     restart_command = argv[0];
 
-    if (strchr(argv[0], G_DIR_SEPARATOR) != NULL)
+    ಆದರೆ (strchr(argv[0], G_DIR_SEPARATOR) != ಖಾಲಿ)
     {
 	char_u buf[MAXPATHL];
 
-	if (mch_FullName((char_u *)argv[0], buf, (int)sizeof(buf), TRUE) == OK)
+	ಆದರೆ (mch_ತುಂಬಿದ_Name((char_u *)argv[0], buf, (ಪೂರ್ಣಾಂಕ)ಗಾತ್ರ(buf), TRUE) == OK)
 	{
-	    abs_restart_command = (char *)vim_strsave(buf);
+	    abs_restart_command = (ಅಕ್ಷರ *)vim_strsave(buf);
 	    restart_command = abs_restart_command;
 	}
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     /*
      * Move all the entries in argv which are relevant to GTK+ and GNOME
      * into gui_argv.  Freed later in gui_mch_init().
      */
     gui_argc = 0;
-    gui_argv = ALLOC_MULT(char *, *argc + 1);
+    gui_argv = ALLOC_MULT(ಅಕ್ಷರ *, *argc + 1);
 
-    g_return_if_fail(gui_argv != NULL);
+    g_return_if_fail(gui_argv != ಖಾಲಿ);
 
     gui_argv[gui_argc++] = argv[i++];
 
-    while (i < *argc)
+    ಆಗ (i < *argc)
     {
 	// Don't waste CPU cycles on non-option arguments.
-	if (argv[i][0] != '-' && argv[i][0] != '+')
+	ಆದರೆ (argv[i][0] != '-' && argv[i][0] != '+')
 	{
 	    ++i;
-	    continue;
+	    ಮುಂದುವರಿ;
 	}
 
 	// Look for argv[i] in cmdline_options[] table.
-	for (option = &cmdline_options[0]; option->name != NULL; ++option)
+	ಗಾಗಿ (option = &cmdline_options[0]; option->name != ಖಾಲಿ; ++option)
 	{
-	    len = strlen(option->name);
+	    len = ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(option->name);
 
-	    if (strncmp(argv[i], option->name, len) == 0)
+	    ಆದರೆ (ಅಕ್ಷರಸರಣಿ_ಹೋಲಿಕೆ(argv[i], option->name, len) == 0)
 	    {
-		if (argv[i][len] == '\0')
-		    break;
+		ಆದರೆ (argv[i][len] == '\0')
+		    ನಿಲ್ಲಿಸು;
 		// allow --foo=bar style
-		if (argv[i][len] == '=' && (option->flags & ARG_HAS_VALUE))
-		    break;
-#ifdef FEAT_NETBEANS_INTG
+		ಆದರೆ (argv[i][len] == '=' && (option->flags & ARG_HAS_ಮೌಲ್ಯ))
+		    ನಿಲ್ಲಿಸು;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_NETBEANS_INTG
 		// darn, -nb has non-standard syntax
-		if (vim_strchr((char_u *)":=", argv[i][len]) != NULL
-			&& (option->flags & ARG_INDEX_MASK) == ARG_NETBEANS)
-		    break;
-#endif
+		ಆದರೆ (vim_strchr((char_u *)":=", argv[i][len]) != ಖಾಲಿ
+			&& (option->flags & ARG_ಸೂಚ್ಯಂಕ_ಮುಖವಾಡ) == ARG_NETBEANS)
+		    ನಿಲ್ಲಿಸು;
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
-	    else if ((option->flags & ARG_COMPAT_LONG)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((option->flags & ARG_COMPAT_LONG)
 			&& strcmp(argv[i], option->name + 1) == 0)
 	    {
 		// Replace the standard X arguments "-name" and "-display"
 		// with their GNU-style long option counterparts.
-		argv[i] = (char *)option->name;
-		break;
+		argv[i] = (ಅಕ್ಷರ *)option->name;
+		ನಿಲ್ಲಿಸು;
 	    }
 	}
-	if (option->name == NULL) // no match
+	ಆದರೆ (option->name == ಖಾಲಿ) // no match
 	{
 	    ++i;
-	    continue;
+	    ಮುಂದುವರಿ;
 	}
 
-	if (option->flags & ARG_FOR_GTK)
+	ಆದರೆ (option->flags & ARG_FOR_GTK)
 	{
 	    // Move the argument into gui_argv, which
 	    // will later be passed to gtk_init_check()
 	    gui_argv[gui_argc++] = argv[i];
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    char *value = NULL;
+	    ಅಕ್ಷರ *ಮೌಲ್ಯ = ಖಾಲಿ;
 
 	    // Extract the option's value if there is one.
 	    // Accept both "--foo bar" and "--foo=bar" style.
-	    if (option->flags & ARG_HAS_VALUE)
+	    ಆದರೆ (option->flags & ARG_HAS_ಮೌಲ್ಯ)
 	    {
-		if (argv[i][len] == '=')
-		    value = &argv[i][len + 1];
-		else if (i + 1 < *argc && strcmp(argv[i + 1], "--") != 0)
-		    value = argv[i + 1];
+		ಆದರೆ (argv[i][len] == '=')
+		    ಮೌಲ್ಯ = &argv[i][len + 1];
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (i + 1 < *argc && strcmp(argv[i + 1], "--") != 0)
+		    ಮೌಲ್ಯ = argv[i + 1];
 	    }
 
 	    // Check for options handled by Vim itself
-	    switch (option->flags & ARG_INDEX_MASK)
+	    ಆಯ್ಕೆ (option->flags & ARG_ಸೂಚ್ಯಂಕ_ಮುಖವಾಡ)
 	    {
-		case ARG_REVERSE:
-		    found_reverse_arg = TRUE;
-		    break;
-		case ARG_NOREVERSE:
-		    found_reverse_arg = FALSE;
-		    break;
-		case ARG_FONT:
-		    font_argument = value;
-		    break;
-		case ARG_GEOMETRY:
-		    if (value != NULL)
-			gui.geom = vim_strsave((char_u *)value);
-		    break;
-		case ARG_BACKGROUND:
-		    background_argument = value;
-		    break;
-		case ARG_FOREGROUND:
-		    foreground_argument = value;
-		    break;
-		case ARG_ICONIC:
-		    found_iconic_arg = TRUE;
-		    break;
-		case ARG_ROLE:
-		    role_argument = value; // used later in gui_mch_open()
-		    break;
-#ifdef FEAT_NETBEANS_INTG
-		case ARG_NETBEANS:
+		ಸ್ಥಿತಿ ARG_ಹಿಮ್ಮುಖ:
+		    ಸಿಕ್ಕಿತು_ಹಿಮ್ಮುಖ_arg = TRUE;
+		    ನಿಲ್ಲಿಸು;
+		ಸ್ಥಿತಿ ARG_NOREVERSE:
+		    ಸಿಕ್ಕಿತು_ಹಿಮ್ಮುಖ_arg = FALSE;
+		    ನಿಲ್ಲಿಸು;
+		ಸ್ಥಿತಿ ARG_FONT:
+		    font_ವಾದ = ಮೌಲ್ಯ;
+		    ನಿಲ್ಲಿಸು;
+		ಸ್ಥಿತಿ ARG_GEOMETRY:
+		    ಆದರೆ (ಮೌಲ್ಯ != ಖಾಲಿ)
+			gui.geom = vim_strsave((char_u *)ಮೌಲ್ಯ);
+		    ನಿಲ್ಲಿಸು;
+		ಸ್ಥಿತಿ ARG_BACKGROUND:
+		    background_ವಾದ = ಮೌಲ್ಯ;
+		    ನಿಲ್ಲಿಸು;
+		ಸ್ಥಿತಿ ARG_FOREGROUND:
+		    foreground_ವಾದ = ಮೌಲ್ಯ;
+		    ನಿಲ್ಲಿಸು;
+		ಸ್ಥಿತಿ ARG_ICONIC:
+		    ಸಿಕ್ಕಿತು_iconic_arg = TRUE;
+		    ನಿಲ್ಲಿಸು;
+		ಸ್ಥಿತಿ ARG_ROLE:
+		    role_ವಾದ = ಮೌಲ್ಯ; // used later in gui_mch_open()
+		    ನಿಲ್ಲಿಸು;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_NETBEANS_INTG
+		ಸ್ಥಿತಿ ARG_NETBEANS:
 		    gui.dofork = false; // don't fork() when starting GUI
 		    netbeansArg = argv[i];
-		    break;
-#endif
-		default:
-		    break;
+		    ನಿಲ್ಲಿಸು;
+#ಆದರೆ_ಅಂತ್ಯ
+		ಪೂರ್ವನಿಯೋಜಿತ:
+		    ನಿಲ್ಲಿಸು;
 	    }
 	}
 
 	// These arguments make gnome_program_init() print a message and exit.
 	// Must start the GUI for this, otherwise ":gui" will exit later!
 	// Only when the GUI can start.
-	if ((option->flags & ARG_NEEDS_GUI)
+	ಆದರೆ ((option->flags & ARG_NEEDS_GUI)
 				      && gui_mch_early_init_check(FALSE) == OK)
 	    gui.starting = true;
 
-	if (option->flags & ARG_KEEP)
+	ಆದರೆ (option->flags & ARG_KEEP)
 	    ++i;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // Remove the flag from the argument vector.
-	    if (--*argc > i)
+	    ಆದರೆ (--*argc > i)
 	    {
-		int n_strip = 1;
+		ಪೂರ್ಣಾಂಕ n_strip = 1;
 
 		// Move the argument's value as well, if there is one.
-		if ((option->flags & ARG_HAS_VALUE)
+		ಆದರೆ ((option->flags & ARG_HAS_ಮೌಲ್ಯ)
 			&& argv[i][len] != '='
 			&& strcmp(argv[i + 1], "--") != 0)
 		{
 		    ++n_strip;
 		    --*argc;
-		    if (option->flags & ARG_FOR_GTK)
+		    ಆದರೆ (option->flags & ARG_FOR_GTK)
 			gui_argv[gui_argc++] = argv[i + 1];
 		}
 
-		if (*argc > i)
+		ಆದರೆ (*argc > i)
 		    mch_memmove(&argv[i], &argv[i + n_strip],
-						(*argc - i) * sizeof(char *));
+						(*argc - i) * ಗಾತ್ರ(ಅಕ್ಷರ *));
 	    }
-	    argv[*argc] = NULL;
+	    argv[*argc] = ಖಾಲಿ;
 	}
     }
 
-    gui_argv[gui_argc] = NULL;
+    gui_argv[gui_argc] = ಖಾಲಿ;
 }
 
-#if defined(EXITFREE)
-    void
-gui_mch_free_all(void)
+#ಆದರೆ defined(EXITFREE)
+    ಶೂನ್ಯ
+gui_mch_free_all(ಶೂನ್ಯ)
 {
     vim_free(gui_argv);
-# if defined(USE_GNOME_SESSION)
+# ಆದರೆ defined(USE_GNOME_SESSION)
     vim_free(abs_restart_command);
 # endif
 # ifdef TRACK_RESIZE_HISTORY
     free_all_resize_hist();
 # endif
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if !GTK_CHECK_VERSION(3,0,0)
+#ಆದರೆ !GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
 /*
  * This should be maybe completely removed.
  * Doesn't seem possible, since check_copy_area() relies on
  * this information.  --danielk
  */
-    static gint
-visibility_event(GtkWidget *widget UNUSED,
+    ಸ್ಥಿರ gint
+visibility_event(GtkWidget *widget ಬಳಸದ,
 		 GdkEventVisibility *event,
-		 gpointer data UNUSED)
+		 gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
     gui.visibility = event->state;
     /*
@@ -754,33 +754,33 @@ visibility_event(GtkWidget *widget UNUSED,
      * obscured, we want to receive an event to tell us whether it worked
      * or not.
      */
-    if (gui.text_gc != NULL)
-	gdk_gc_set_exposures(gui.text_gc,
+    ಆದರೆ (gui.ಪಠ್ಯ_gc != ಖಾಲಿ)
+	gdk_gc_ಗಣ_exposures(gui.ಪಠ್ಯ_gc,
 			     gui.visibility != GDK_VISIBILITY_UNOBSCURED);
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
-#endif // !GTK_CHECK_VERSION(3,0,0)
+#ಆದರೆ_ಅಂತ್ಯ // !GTK_CHECK_VERSION(3,0,0)
 
 /*
  * Redraw the corresponding portions of the screen.
  */
-#if GTK_CHECK_VERSION(3,0,0)
-    static gboolean
-draw_event(GtkWidget *widget UNUSED,
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    ಸ್ಥಿರ gboolean
+draw_event(GtkWidget *widget ಬಳಸದ,
 	   cairo_t   *cr,
-	   gpointer   user_data UNUSED)
+	   gpointer   user_ದತ್ತಾಂಶ ಬಳಸದ)
 {
     // Skip this when the GUI isn't set up yet, will redraw later.
-    if (gui.starting)
-	return FALSE;
+    ಆದರೆ (gui.starting)
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    out_flush();		// make sure all output has been processed
+    ಹೊರಹೋಗು_flush();		// make sure all output has been processed
 				// for GTK+ 3, may induce other draw events.
 
-    cairo_set_source_surface(cr, gui.surface, 0, 0);
+    cairo_ಗಣ_ಮೂಲ_surface(cr, gui.surface, 0, 0);
     cairo_paint(cr);
 
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 /*
@@ -790,84 +790,84 @@ draw_event(GtkWidget *widget UNUSED,
 # ifdef GDK_WINDOWING_WAYLAND
 #  define GUI_GTK_SURFACE_CONTENT \
 	(gui.is_wayland ? CAIRO_CONTENT_COLOR : CAIRO_CONTENT_COLOR_ALPHA)
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  define GUI_GTK_SURFACE_CONTENT CAIRO_CONTENT_COLOR_ALPHA
 # endif
 
-# if GTK_CHECK_VERSION(3,10,0)
-    static gboolean
-scale_factor_event(GtkWidget *widget,
-		   GParamSpec* pspec UNUSED,
-		   gpointer   user_data UNUSED)
+# ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,10,0)
+    ಸ್ಥಿರ gboolean
+scale_ಗುಣಕ_event(GtkWidget *widget,
+		   GParamSpec* pspec ಬಳಸದ,
+		   gpointer   user_ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    if (gui.surface != NULL)
+    ಆದರೆ (gui.surface != ಖಾಲಿ)
 	cairo_surface_destroy(gui.surface);
 
-    int	    w, h;
-    gtk_window_get_size(GTK_WINDOW(gui.mainwin), &w, &h);
-    gui.surface = gdk_window_create_similar_surface(
-	    gtk_widget_get_window(widget),
+    ಪೂರ್ಣಾಂಕ	    w, h;
+    gtk_ಕಿಟಕಿ_get_ಗಾತ್ರ(GTK_ಕಿಟಕಿ(gui.mainwin), &w, &h);
+    gui.surface = gdk_ಕಿಟಕಿ_create_similar_surface(
+	    gtk_widget_get_ಕಿಟಕಿ(widget),
 	    GUI_GTK_SURFACE_CONTENT,
 	    w, h);
 
-    int	    usable_height = h;
-    if (gtk_socket_id != 0)
-	usable_height -= (gui.char_height - (gui.char_height/2)); // sic.
+    ಪೂರ್ಣಾಂಕ	    usable_ಎತ್ತರ = h;
+    ಆದರೆ (gtk_socket_id != 0)
+	usable_ಎತ್ತರ -= (gui.char_ಎತ್ತರ - (gui.char_ಎತ್ತರ/2)); // sic.
 
     gui_gtk_form_freeze(GTK_FORM(gui.formwin));
     gui.force_redraw = 1;
-    gui_resize_shell(w, usable_height);
+    gui_resize_shell(w, usable_ಎತ್ತರ);
     gui_gtk_form_thaw(GTK_FORM(gui.formwin));
 
-#  if defined(FEAT_IMAGE) && GTK_CHECK_VERSION(3,10,0)
-    gui.scale = gtk_widget_get_scale_factor(widget);
+#  ಆದರೆ defined(FEAT_IMAGE) && GTK_CHECK_ಆವೃತ್ತಿ(3,10,0)
+    gui.scale = gtk_widget_get_scale_ಗುಣಕ(widget);
 #  endif
 
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 # endif // GTK_CHECK_VERSION(3,10,0)
 
-#else // !GTK_CHECK_VERSION(3,0,0)
-    static gint
-expose_event(GtkWidget *widget UNUSED,
+#ಇಲ್ಲದಿದ್ದರೆ // !GTK_CHECK_VERSION(3,0,0)
+    ಸ್ಥಿರ gint
+expose_event(GtkWidget *widget ಬಳಸದ,
 	     GdkEventExpose *event,
-	     gpointer data UNUSED)
+	     gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
     // Skip this when the GUI isn't set up yet, will redraw later.
-    if (gui.starting)
-	return FALSE;
+    ಆದರೆ (gui.starting)
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    out_flush();		// make sure all output has been processed
+    ಹೊರಹೋಗು_flush();		// make sure all output has been processed
     gui_redraw(event->area.x, event->area.y,
-	       event->area.width, event->area.height);
+	       event->area.ಅಗಲ, event->area.ಎತ್ತರ);
 
     // Clear the border areas if needed
-    if (event->area.x < FILL_X(0))
-	gdk_window_clear_area(gui.drawarea->window, 0, 0, FILL_X(0), 0);
-    if (event->area.y < FILL_Y(0))
-	gdk_window_clear_area(gui.drawarea->window, 0, 0, 0, FILL_Y(0));
-    if (event->area.x > FILL_X(Columns))
-	gdk_window_clear_area(gui.drawarea->window,
-			      FILL_X((int)Columns), 0, 0, 0);
-    if (event->area.y > FILL_Y(Rows))
-	gdk_window_clear_area(gui.drawarea->window, 0, FILL_Y((int)Rows), 0, 0);
+    ಆದರೆ (event->area.x < FILL_X(0))
+	gdk_ಕಿಟಕಿ_clear_area(gui.drawarea->ಕಿಟಕಿ_2, 0, 0, FILL_X(0), 0);
+    ಆದರೆ (event->area.y < FILL_Y(0))
+	gdk_ಕಿಟಕಿ_clear_area(gui.drawarea->ಕಿಟಕಿ_2, 0, 0, 0, FILL_Y(0));
+    ಆದರೆ (event->area.x > FILL_X(Columns))
+	gdk_ಕಿಟಕಿ_clear_area(gui.drawarea->ಕಿಟಕಿ_2,
+			      FILL_X((ಪೂರ್ಣಾಂಕ)Columns), 0, 0, 0);
+    ಆದರೆ (event->area.y > FILL_Y(ಅಡ್ಡಸಾಲುಗಳು))
+	gdk_ಕಿಟಕಿ_clear_area(gui.drawarea->ಕಿಟಕಿ_2, 0, FILL_Y((ಪೂರ್ಣಾಂಕ)ಅಡ್ಡಸಾಲುಗಳು), 0, 0);
 
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
-#endif // !GTK_CHECK_VERSION(3,0,0)
+#ಆದರೆ_ಅಂತ್ಯ // !GTK_CHECK_VERSION(3,0,0)
 
-#ifdef FEAT_CLIENTSERVER
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CLIENTSERVER
 /*
  * Handle changes to the "Comm" property
  */
-    static gint
+    ಸ್ಥಿರ gint
 property_event(GtkWidget *widget,
 	       GdkEventProperty *event,
-	       gpointer data UNUSED)
+	       gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    if (event->type == GDK_PROPERTY_NOTIFY
-	    && event->state == (int)GDK_PROPERTY_NEW_VALUE
-	    && GDK_WINDOW_XID(event->window) == commWindow
+    ಆದರೆ (event->type == GDK_PROPERTY_NOTIFY
+	    && event->state == (ಪೂರ್ಣಾಂಕ)GDK_PROPERTY_NEW_ಮೌಲ್ಯ
+	    && GDK_ಕಿಟಕಿ_XID(event->ಕಿಟಕಿ_2) == comm_ಕಿಟಕಿ
 	    && GET_X_ATOM(event->atom) == commProperty)
     {
 	XEvent xev;
@@ -875,55 +875,55 @@ property_event(GtkWidget *widget,
 	// Translate to XLib
 	xev.xproperty.type = PropertyNotify;
 	xev.xproperty.atom = commProperty;
-	xev.xproperty.window = commWindow;
-	xev.xproperty.state = PropertyNewValue;
-	serverEventProc(GDK_WINDOW_XDISPLAY(gtk_widget_get_window(widget)),
+	xev.xproperty.ಕಿಟಕಿ_2 = comm_ಕಿಟಕಿ;
+	xev.xproperty.state = Property_New_ಮೌಲ್ಯ;
+	serverEventProc(GDK_ಕಿಟಕಿ_XDISPLAY(gtk_widget_get_ಕಿಟಕಿ(widget)),
 								      &xev, 0);
     }
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
-#endif // defined(FEAT_CLIENTSERVER)
+#ಆದರೆ_ಅಂತ್ಯ // defined(FEAT_CLIENTSERVER)
 
 /*
  * Handle changes to the "Xft/DPI" setting
  */
-    static void
-gtk_settings_xft_dpi_changed_cb(GtkSettings *gtk_settings UNUSED,
-				    GParamSpec *pspec UNUSED,
-				    gpointer data UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+gtk_settings_xft_dpi_ಬದಲಾಯಿತು_cb(GtkSettings *gtk_settings ಬಳಸದ,
+				    GParamSpec *pspec ಬಳಸದ,
+				    gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
     // Create a new PangoContext for this screen, and initialize it
     // with the current font if necessary.
-    if (gui.text_context != NULL)
-	g_object_unref(gui.text_context);
+    ಆದರೆ (gui.ಪಠ್ಯ_context != ಖಾಲಿ)
+	g_object_unref(gui.ಪಠ್ಯ_context);
 
-    gui.text_context = gtk_widget_create_pango_context(gui.mainwin);
-    pango_context_set_base_dir(gui.text_context, PANGO_DIRECTION_LTR);
+    gui.ಪಠ್ಯ_context = gtk_widget_create_pango_context(gui.mainwin);
+    pango_context_ಗಣ_ತಳ_dir(gui.ಪಠ್ಯ_context, PANGO_DIRECTION_LTR);
 
-    if (gui.norm_font != NULL)
+    ಆದರೆ (gui.norm_font != ಖಾಲಿ)
     {
 	// force default font
-	gui_mch_init_font(*p_guifont == NUL ? NULL : p_guifont, FALSE);
-	gui_set_shellsize(TRUE, FALSE, RESIZE_BOTH);
+	gui_mch_init_font(*p_guifont == NUL ? ಖಾಲಿ : p_guifont, FALSE);
+	gui_ಗಣ_shellsize(TRUE, FALSE, RESIZE_BOTH);
     }
 }
 
-typedef gboolean timeout_cb_type;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ gboolean timeout_cb_type;
 
 /*
  * Start a timer that will invoke the specified callback.
  * Returns the ID of the timer.
  */
-    static guint
-timeout_add(int time, timeout_cb_type (*callback)(gpointer), int *flagp)
+    ಸ್ಥಿರ guint
+timeout_ಕೂಡಿಸು(ಪೂರ್ಣಾಂಕ ಸಮಯ, timeout_cb_type (*callback)(gpointer), ಪೂರ್ಣಾಂಕ *flagp)
 {
-    return g_timeout_add((guint)time, (GSourceFunc)callback, flagp);
+    ಹಿಂತಿರುಗಿ g_timeout_ಕೂಡಿಸು((guint)ಸಮಯ, (GSourceFunc)callback, flagp);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 timeout_remove(guint timer)
 {
-    g_source_remove(timer);
+    g_ಮೂಲ_remove(timer);
 }
 
 
@@ -938,30 +938,30 @@ timeout_remove(guint timer)
  * BLINK_ON	blinking, cursor is shown
  */
 
-#define BLINK_NONE  0
-#define BLINK_OFF   1
-#define BLINK_ON    2
+#ವ್ಯಾಖ್ಯಾನಿಸು BLINK_NONE  0
+#ವ್ಯಾಖ್ಯಾನಿಸು BLINK_OFF   1
+#ವ್ಯಾಖ್ಯಾನಿಸು BLINK_ON    2
 
-static int blink_state = BLINK_NONE;
-static long_u blink_waittime = 700;
-static long_u blink_ontime = 400;
-static long_u blink_offtime = 250;
-static guint blink_timer = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ blink_state = BLINK_NONE;
+ಸ್ಥಿರ long_u blink_waittime = 700;
+ಸ್ಥಿರ long_u blink_ontime = 400;
+ಸ್ಥಿರ long_u blink_offtime = 250;
+ಸ್ಥಿರ guint blink_timer = 0;
 
-    int
-gui_mch_is_blinking(void)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_is_blinking(ಶೂನ್ಯ)
 {
-    return blink_state != BLINK_NONE;
+    ಹಿಂತಿರುಗಿ blink_state != BLINK_NONE;
 }
 
-    int
-gui_mch_is_blink_off(void)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_is_blink_off(ಶೂನ್ಯ)
 {
-    return blink_state == BLINK_OFF;
+    ಹಿಂತಿರುಗಿ blink_state == BLINK_OFF;
 }
 
-    void
-gui_mch_set_blinking(long waittime, long on, long off)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_blinking(ದೀರ್ಘ waittime, ದೀರ್ಘ on, ದೀರ್ಘ off)
 {
     blink_waittime = waittime;
     blink_ontime = on;
@@ -971,15 +971,15 @@ gui_mch_set_blinking(long waittime, long on, long off)
 /*
  * Stop the cursor blinking.  Show the cursor if it wasn't shown.
  */
-    void
-gui_mch_stop_blink(int may_call_gui_update_cursor)
+    ಶೂನ್ಯ
+gui_mch_stop_blink(ಪೂರ್ಣಾಂಕ may_call_gui_update_cursor)
 {
-    if (blink_timer)
+    ಆದರೆ (blink_timer)
     {
 	timeout_remove(blink_timer);
 	blink_timer = 0;
     }
-    if (blink_state == BLINK_OFF && may_call_gui_update_cursor)
+    ಆದರೆ (blink_state == BLINK_OFF && may_call_gui_update_cursor)
     {
 	gui_update_cursor(TRUE, FALSE);
 	gui_may_flush();
@@ -987,118 +987,118 @@ gui_mch_stop_blink(int may_call_gui_update_cursor)
     blink_state = BLINK_NONE;
 }
 
-    static timeout_cb_type
-blink_cb(gpointer data UNUSED)
+    ಸ್ಥಿರ timeout_cb_type
+blink_cb(gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    if (blink_state == BLINK_ON)
+    ಆದರೆ (blink_state == BLINK_ON)
     {
 	gui_undraw_cursor();
 	blink_state = BLINK_OFF;
-	blink_timer = timeout_add(blink_offtime, blink_cb, NULL);
+	blink_timer = timeout_ಕೂಡಿಸು(blink_offtime, blink_cb, ಖಾಲಿ);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	gui_update_cursor(TRUE, FALSE);
 	blink_state = BLINK_ON;
-	blink_timer = timeout_add(blink_ontime, blink_cb, NULL);
+	blink_timer = timeout_ಕೂಡಿಸು(blink_ontime, blink_cb, ಖಾಲಿ);
     }
     gui_may_flush();
 
-    return FALSE;		// don't happen again
+    ಹಿಂತಿರುಗಿ FALSE;		// don't happen again
 }
 
 /*
  * Start the cursor blinking.  If it was already blinking, this restarts the
  * waiting time and shows the cursor.
  */
-    void
-gui_mch_start_blink(void)
+    ಶೂನ್ಯ
+gui_mch_ಆರಂಭ_blink(ಶೂನ್ಯ)
 {
-    if (blink_timer)
+    ಆದರೆ (blink_timer)
     {
 	timeout_remove(blink_timer);
 	blink_timer = 0;
     }
     // Only switch blinking on if none of the times is zero
-    if (blink_waittime && blink_ontime && blink_offtime && gui.in_focus)
+    ಆದರೆ (blink_waittime && blink_ontime && blink_offtime && gui.ಒಳ_focus)
     {
-	blink_timer = timeout_add(blink_waittime, blink_cb, NULL);
+	blink_timer = timeout_ಕೂಡಿಸು(blink_waittime, blink_cb, ಖಾಲಿ);
 	blink_state = BLINK_ON;
 	gui_update_cursor(TRUE, FALSE);
 	gui_may_flush();
     }
 }
 
-    static gint
-enter_notify_event(GtkWidget *widget UNUSED,
-		   GdkEventCrossing *event UNUSED,
-		   gpointer data UNUSED)
+    ಸ್ಥಿರ gint
+enter_notify_event(GtkWidget *widget ಬಳಸದ,
+		   Gdk_Event_ದಾಟುವಿಕೆ *event ಬಳಸದ,
+		   gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    if (blink_state == BLINK_NONE)
-	gui_mch_start_blink();
+    ಆದರೆ (blink_state == BLINK_NONE)
+	gui_mch_ಆರಂಭ_blink();
 
     // make sure keyboard input goes there
-    if (gtk_socket_id == 0 || !gtk_widget_has_focus(gui.drawarea))
+    ಆದರೆ (gtk_socket_id == 0 || !gtk_widget_has_focus(gui.drawarea))
 	gtk_widget_grab_focus(gui.drawarea);
 
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
-    static gint
-leave_notify_event(GtkWidget *widget UNUSED,
-		   GdkEventCrossing *event UNUSED,
-		   gpointer data UNUSED)
+    ಸ್ಥಿರ gint
+leave_notify_event(GtkWidget *widget ಬಳಸದ,
+		   Gdk_Event_ದಾಟುವಿಕೆ *event ಬಳಸದ,
+		   gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    if (blink_state != BLINK_NONE)
+    ಆದರೆ (blink_state != BLINK_NONE)
 	gui_mch_stop_blink(TRUE);
 
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
-    static gint
-focus_in_event(GtkWidget *widget,
-	       GdkEventFocus *event UNUSED,
-	       gpointer data UNUSED)
+    ಸ್ಥಿರ gint
+focus_ಒಳ_event(GtkWidget *widget,
+	       GdkEventFocus *event ಬಳಸದ,
+	       gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
-#ifdef FEAT_GUI_DIALOG
-    if (gui.dialog_focus_pending > 0)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_DIALOG
+    ಆದರೆ (gui.dialog_focus_pending > 0)
     {
 	--gui.dialog_focus_pending;
 	++hold_gui_events;
 	gui_focus_change(TRUE);
 	--hold_gui_events;
     }
-    else
-#endif
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 	gui_focus_change(TRUE);
 
-    if (blink_state == BLINK_NONE)
-	gui_mch_start_blink();
+    ಆದರೆ (blink_state == BLINK_NONE)
+	gui_mch_ಆರಂಭ_blink();
 
     // make sure keyboard input goes to the draw area (if this is focus for a
     // window)
-    if (widget != gui.drawarea)
+    ಆದರೆ (widget != gui.drawarea)
 	gtk_widget_grab_focus(gui.drawarea);
 
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
-    static gint
-focus_out_event(GtkWidget *widget UNUSED,
-		GdkEventFocus *event UNUSED,
-		gpointer data UNUSED)
+    ಸ್ಥಿರ gint
+focus_ಹೊರಹೋಗು_event(GtkWidget *widget ಬಳಸದ,
+		GdkEventFocus *event ಬಳಸದ,
+		gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
-#ifdef FEAT_GUI_DIALOG
-    if (gui.dialogs_active > 0)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_DIALOG
+    ಆದರೆ (gui.dialogs_ಸಕ್ರಿಯ > 0)
 	++gui.dialog_focus_pending;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     gui_focus_change(FALSE);
 
-    if (blink_state != BLINK_NONE)
+    ಆದರೆ (blink_state != BLINK_NONE)
 	gui_mch_stop_blink(TRUE);
 
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 
@@ -1110,170 +1110,170 @@ focus_out_event(GtkWidget *widget UNUSED,
  * event->string is evil; see here why:
  * https://www.manpagez.com/html/gdk2/gdk2-2.24.24/gdk2-Event-Structures.php#GdkEventKey
  */
-    static int
-keyval_to_string(unsigned int keyval, char_u *string)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+keyval_ಗಮ್ಯ_string(ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ keyval, char_u *string)
 {
-    int	    len;
+    ಪೂರ್ಣಾಂಕ	    len;
     guint32 uc;
 
-    uc = gdk_keyval_to_unicode(keyval);
-    if (uc != 0)
+    uc = gdk_keyval_ಗಮ್ಯ_unicode(keyval);
+    ಆದರೆ (uc != 0)
     {
 	// Translate a normal key to UTF-8.  This doesn't work for dead
 	// keys of course, you _have_ to use an input method for that.
-	len = utf_char2bytes((int)uc, string);
+	len = utf_char2bytes((ಪೂರ್ಣಾಂಕ)uc, string);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Translate keys which are represented by ASCII control codes in Vim.
 	// There are only a few of those; most control keys are translated to
 	// special terminal-like control sequences.
 	len = 1;
-	switch (keyval)
+	ಆಯ್ಕೆ (keyval)
 	{
-	    case GDK_Tab: case GDK_KP_Tab: case GDK_ISO_Left_Tab:
+	    ಸ್ಥಿತಿ GDK_Tab: ಸ್ಥಿತಿ GDK_KP_Tab: ಸ್ಥಿತಿ GDK_ISO_ಎಡ_Tab:
 		string[0] = TAB;
-		break;
-	    case GDK_Linefeed:
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ GDK_Linefeed:
 		string[0] = NL;
-		break;
-	    case GDK_Return: case GDK_ISO_Enter: case GDK_3270_Enter:
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ GDK_Return: ಸ್ಥಿತಿ GDK_ISO_Enter: ಸ್ಥಿತಿ GDK_3270_Enter:
 		string[0] = CAR;
-		break;
-	    case GDK_Escape:
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ GDK_Escape:
 		string[0] = ESC;
-		break;
-	    default:
+		ನಿಲ್ಲಿಸು;
+	    ಪೂರ್ವನಿಯೋಜಿತ:
 		len = 0;
-		break;
+		ನಿಲ್ಲಿಸು;
 	}
     }
     string[len] = NUL;
 
-    return len;
+    ಹಿಂತಿರುಗಿ len;
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 modifiers_gdk2vim(guint state)
 {
-    int modifiers = 0;
+    ಪೂರ್ಣಾಂಕ modifiers = 0;
 
-    if (state & GDK_SHIFT_MASK)
-	modifiers |= MOD_MASK_SHIFT;
-    if (state & GDK_CONTROL_MASK)
-	modifiers |= MOD_MASK_CTRL;
-    if (state & GDK_MOD1_MASK)
-	modifiers |= MOD_MASK_ALT;
-#if GTK_CHECK_VERSION(2,10,0)
-    if (state & GDK_META_MASK)
-	modifiers |= MOD_MASK_META;
-    if (state & GDK_SUPER_MASK)
-	modifiers |= MOD_MASK_CMD;
-#else
-    if (state & GDK_MOD4_MASK)
-	modifiers |= MOD_MASK_CMD;
-#endif
+    ಆದರೆ (state & GDK_ಸರಿಸು_ಮುಖವಾಡ)
+	modifiers |= MOD_ಮುಖವಾಡ_ಸರಿಸು;
+    ಆದರೆ (state & GDK_CONTROL_ಮುಖವಾಡ)
+	modifiers |= MOD_ಮುಖವಾಡ_CTRL;
+    ಆದರೆ (state & GDK_MOD1_ಮುಖವಾಡ)
+	modifiers |= MOD_ಮುಖವಾಡ_ALT;
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(2,10,0)
+    ಆದರೆ (state & GDK_META_ಮುಖವಾಡ)
+	modifiers |= MOD_ಮುಖವಾಡ_META;
+    ಆದರೆ (state & GDK_SUPER_ಮುಖವಾಡ)
+	modifiers |= MOD_ಮುಖವಾಡ_CMD;
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಆದರೆ (state & GDK_MOD4_ಮುಖವಾಡ)
+	modifiers |= MOD_ಮುಖವಾಡ_CMD;
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return modifiers;
+    ಹಿಂತಿರುಗಿ modifiers;
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 modifiers_gdk2mouse(guint state)
 {
-    int modifiers = 0;
+    ಪೂರ್ಣಾಂಕ modifiers = 0;
 
-    if (state & GDK_SHIFT_MASK)
-	modifiers |= MOUSE_SHIFT;
-    if (state & GDK_CONTROL_MASK)
+    ಆದರೆ (state & GDK_ಸರಿಸು_ಮುಖವಾಡ)
+	modifiers |= MOUSE_ಸರಿಸು;
+    ಆದರೆ (state & GDK_CONTROL_ಮುಖವಾಡ)
 	modifiers |= MOUSE_CTRL;
-    if (state & GDK_MOD1_MASK)
+    ಆದರೆ (state & GDK_MOD1_ಮುಖವಾಡ)
 	modifiers |= MOUSE_ALT;
 
-    return modifiers;
+    ಹಿಂತಿರುಗಿ modifiers;
 }
 
 /*
  * Main keyboard handler:
  */
-    static gint
-key_press_event(GtkWidget *widget UNUSED,
-		GdkEventKey *event,
-		gpointer data UNUSED)
+    ಸ್ಥಿರ gint
+ಕೀಲಿ_press_event(GtkWidget *widget ಬಳಸದ,
+		Gdk_Event_ಕೀಲಿ *event,
+		gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
     // For GTK+ 2 we know for sure how large the string might get.
     // (That is, up to 6 bytes + NUL + CSI escapes + safety measure.)
     char_u	string[32], string2[32];
-    guint	key_sym;
-    int		len;
-    int		i;
-    int		modifiers;
-    int		key;
+    guint	ಕೀಲಿ_sym;
+    ಪೂರ್ಣಾಂಕ		len;
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		modifiers;
+    ಪೂರ್ಣಾಂಕ		ಕೀಲಿ;
     guint	state;
     char_u	*s, *d;
-    int		ctrl_prefix_added = 0;
+    ಪೂರ್ಣಾಂಕ		ctrl_ಪೂರ್ವಪ್ರತ್ಯಯ_added = 0;
 
-    gui.event_time = event->time;
-    key_sym = event->keyval;
+    gui.event_ಸಮಯ = event->ಸಮಯ;
+    ಕೀಲಿ_sym = event->keyval;
     state = event->state;
 
-#ifdef FEAT_XIM
-    if (xim_queue_key_press_event(event, TRUE))
-	return TRUE;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XIM
+    ಆದರೆ (xim_ಸರತಿ_ಕೀಲಿ_press_event(event, TRUE))
+	ಹಿಂತಿರುಗಿ TRUE;
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef SunXK_F36
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SunXK_F36
     /*
      * These keys have bogus lookup strings, and trapping them here is
      * easier than trying to XRebindKeysym() on them with every possible
      * combination of modifiers.
      */
-    if (key_sym == SunXK_F36 || key_sym == SunXK_F37)
+    ಆದರೆ (ಕೀಲಿ_sym == SunXK_F36 || ಕೀಲಿ_sym == SunXK_F37)
 	len = 0;
-    else
-#endif
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
     {
-	len = keyval_to_string(key_sym, string2);
+	len = keyval_ಗಮ್ಯ_string(ಕೀಲಿ_sym, string2);
 
 	// Careful: convert_input() doesn't handle the NUL character.
 	// No need to convert pure ASCII anyway, thus the len > 1 check.
-	if (len > 1 && input_conv.vc_type != CONV_NONE)
-	    len = convert_input(string2, len, sizeof(string2));
+	ಆದರೆ (len > 1 && ಒಳಹರಿವು_conv.vc_type != CONV_NONE)
+	    len = convert_ಒಳಹರಿವು(string2, len, ಗಾತ್ರ(string2));
 
 	s = string2;
 	d = string;
-	for (i = 0; i < len; ++i)
+	ಗಾಗಿ (i = 0; i < len; ++i)
 	{
 	    *d++ = s[i];
-	    if (d[-1] == CSI && d + 2 < string + sizeof(string))
+	    ಆದರೆ (d[-1] == CSI && d + 2 < string + ಗಾತ್ರ(string))
 	    {
 		// Turn CSI into K_CSI.
 		*d++ = KS_EXTRA;
-		*d++ = (int)KE_CSI;
+		*d++ = (ಪೂರ್ಣಾಂಕ)KE_CSI;
 	    }
 	}
 	len = d - string;
     }
 
     // Shift-Tab results in Left_Tab, but we want <S-Tab>
-    if (key_sym == GDK_ISO_Left_Tab)
+    ಆದರೆ (ಕೀಲಿ_sym == GDK_ISO_ಎಡ_Tab)
     {
-	key_sym = GDK_Tab;
-	state |= GDK_SHIFT_MASK;
+	ಕೀಲಿ_sym = GDK_Tab;
+	state |= GDK_ಸರಿಸು_ಮುಖವಾಡ;
     }
 
-#ifdef FEAT_MENU
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MENU
     // If there is a menu and 'wak' is "yes", or 'wak' is "menu" and the key
     // is a menu shortcut, we ignore everything with the ALT modifier.
-    if ((state & GDK_MOD1_MASK)
-	    && gui.menu_is_active
+    ಆದರೆ ((state & GDK_MOD1_ಮುಖವಾಡ)
+	    && gui.menu_is_ಸಕ್ರಿಯ
 	    && (*p_wak == 'y'
 		|| (*p_wak == 'm'
 		    && len == 1
 		    && gui_is_menu_shortcut(string[0]))))
 	// For GTK2 we return false to signify that we haven't handled the
 	// keypress, so that gtk will handle the mnemonic or accelerator.
-	return FALSE;
-#endif
+	ಹಿಂತಿರುಗಿ FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
 
     // We used to apply Alt/Meta to the key here (Mod1Mask), but that is now
     // done later, the same as it happens for the terminal.  Hopefully that
@@ -1281,91 +1281,91 @@ key_press_event(GtkWidget *widget UNUSED,
 
     // Check for special keys.	Also do this when len == 1 (key has an ASCII
     // value) to detect backspace, delete and keypad keys.
-    if (len == 0 || len == 1)
+    ಆದರೆ (len == 0 || len == 1)
     {
-	for (i = 0; special_keys[i].key_sym != 0; i++)
+	ಗಾಗಿ (i = 0; special_ಕೀಲಿಗಳು[i].ಕೀಲಿ_sym != 0; i++)
 	{
-	    if (special_keys[i].key_sym == key_sym)
+	    ಆದರೆ (special_ಕೀಲಿಗಳು[i].ಕೀಲಿ_sym == ಕೀಲಿ_sym)
 	    {
 		string[0] = CSI;
-		string[1] = special_keys[i].code0;
-		string[2] = special_keys[i].code1;
+		string[1] = special_ಕೀಲಿಗಳು[i].code0;
+		string[2] = special_ಕೀಲಿಗಳು[i].code1;
 		len = -3;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	}
     }
 
-#ifdef GDK_KEY_dead_circumflex
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ GDK_ಕೀಲಿ_dead_circumflex
     // Belgian Ctrl+[ workaround
-    if (len == 0 && key_sym == GDK_KEY_dead_circumflex)
+    ಆದರೆ (len == 0 && ಕೀಲಿ_sym == GDK_ಕೀಲಿ_dead_circumflex)
     {
 	string[0] = CSI;
 	string[1] = KS_MODIFIER;
-	string[2] = MOD_MASK_CTRL;
+	string[2] = MOD_ಮುಖವಾಡ_CTRL;
 	string[3] = '[';
 	len = 4;
-	add_to_input_buf(string, len);
+	ಕೂಡಿಸು_ಗಮ್ಯ_ಒಳಹರಿವು_buf(string, len);
 	// workaround has to return here, otherwise our fake string[] entries
 	// are confusing code downstream
-	return TRUE;
+	ಹಿಂತಿರುಗಿ TRUE;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (len == 0)   // Unrecognized key
-	return TRUE;
+    ಆದರೆ (len == 0)   // Unrecognized key
+	ಹಿಂತಿರುಗಿ TRUE;
 
     // For some keys a shift modifier is translated into another key code.
-    if (len == -3)
-	key = TO_SPECIAL(string[1], string[2]);
-    else
+    ಆದರೆ (len == -3)
+	ಕೀಲಿ = ಗಮ್ಯ_SPECIAL(string[1], string[2]);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	string[len] = NUL;
-	key = mb_ptr2char(string);
+	ಕೀಲಿ = mb_ptr2char(string);
     }
 
     // Handle modifiers.
     modifiers = modifiers_gdk2vim(state);
 
     // Recognize special keys.
-    key = simplify_key(key, &modifiers);
-    if (key == CSI)
-	key = K_CSI;
-    if (IS_SPECIAL(key))
+    ಕೀಲಿ = simplify_ಕೀಲಿ(ಕೀಲಿ, &modifiers);
+    ಆದರೆ (ಕೀಲಿ == CSI)
+	ಕೀಲಿ = K_CSI;
+    ಆದರೆ (IS_SPECIAL(ಕೀಲಿ))
     {
 	string[0] = CSI;
-	string[1] = K_SECOND(key);
-	string[2] = K_THIRD(key);
+	string[1] = K_ಎರಡನೇ(ಕೀಲಿ);
+	string[2] = K_ಮೂರನೇ(ಕೀಲಿ);
 	len = 3;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Some keys need adjustment when the Ctrl modifier is used.
-	key = may_adjust_key_for_ctrl(modifiers, key);
+	ಕೀಲಿ = may_adjust_ಕೀಲಿ_for_ctrl(modifiers, ಕೀಲಿ);
 
 	// May remove the Shift modifier if it's included in the key.
-	modifiers = may_remove_shift_modifier(modifiers, key);
+	modifiers = may_remove_ಸರಿಸು_modifier(modifiers, ಕೀಲಿ);
 
-	len = mb_char2bytes(key, string);
+	len = mb_char2bytes(ಕೀಲಿ, string);
     }
 
-    if (modifiers != 0)
+    ಆದರೆ (modifiers != 0)
     {
 	string2[0] = CSI;
 	string2[1] = KS_MODIFIER;
 	string2[2] = modifiers;
-	add_to_input_buf(string2, 3);
-	if (modifiers == 0x4)
-	    ctrl_prefix_added = 1;
+	ಕೂಡಿಸು_ಗಮ್ಯ_ಒಳಹರಿವು_buf(string2, 3);
+	ಆದರೆ (modifiers == 0x4)
+	    ctrl_ಪೂರ್ವಪ್ರತ್ಯಯ_added = 1;
     }
 
     // Check if the key interrupts.
     {
-	int int_ch = check_for_interrupt(key, modifiers);
+	ಪೂರ್ಣಾಂಕ int_ch = check_for_ಅಡಚಣೆ(ಕೀಲಿ, modifiers);
 
-	if (int_ch != NUL)
+	ಆದರೆ (int_ch != NUL)
 	{
-	    trash_input_buf();
+	    trash_ಒಳಹರಿವು_buf();
 	    string[0] = int_ch;
 	    len = 1;
 	}
@@ -1373,41 +1373,41 @@ key_press_event(GtkWidget *widget UNUSED,
 
     // workaround for German keyboard, where instead of '[' char we have code
     // sequence of bytes 195, 188 (UTF-8 for "u-umlaut")
-    if (ctrl_prefix_added && len == 2
-		    && ((int)string[0]) == 195
-		    && ((int)string[1]) == 188)
+    ಆದರೆ (ctrl_ಪೂರ್ವಪ್ರತ್ಯಯ_added && len == 2
+		    && ((ಪೂರ್ಣಾಂಕ)string[0]) == 195
+		    && ((ಪೂರ್ಣಾಂಕ)string[1]) == 188)
     {
 	string[0] = 91; // ASCII('[')
 	len = 1;
     }
-    add_to_input_buf(string, len);
+    ಕೂಡಿಸು_ಗಮ್ಯ_ಒಳಹರಿವು_buf(string, len);
 
     // blank out the pointer if necessary
-    if (p_mh)
+    ಆದರೆ (p_mh)
 	gui_mch_mousehide(TRUE);
 
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
-#if defined(FEAT_XIM) || GTK_CHECK_VERSION(3,0,0)
-    static gboolean
-key_release_event(GtkWidget *widget UNUSED,
-		  GdkEventKey *event UNUSED,
-		  gpointer data UNUSED)
+#ಆದರೆ defined(FEAT_XIM) || GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    ಸ್ಥಿರ gboolean
+ಕೀಲಿ_release_event(GtkWidget *widget ಬಳಸದ,
+		  Gdk_Event_ಕೀಲಿ *event ಬಳಸದ,
+		  gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
-# if defined(FEAT_XIM)
-    gui.event_time = event->time;
+# ಆದರೆ defined(FEAT_XIM)
+    gui.event_ಸಮಯ = event->ಸಮಯ;
     /*
      * GTK+ 2 input methods may do fancy stuff on key release events too.
      * With the default IM for instance, you can enter any UCS code point
      * by holding down CTRL-SHIFT and typing hexadecimal digits.
      */
-    return xim_queue_key_press_event(event, FALSE);
-# else
-    return TRUE;
+    ಹಿಂತಿರುಗಿ xim_ಸರತಿ_ಕೀಲಿ_press_event(event, FALSE);
+# ಇಲ್ಲದಿದ್ದರೆ
+    ಹಿಂತಿರುಗಿ TRUE;
 # endif
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1415,131 +1415,131 @@ key_release_event(GtkWidget *widget UNUSED,
 
 // Remember when clip_lose_selection was called from here, we must not call
 // gtk_selection_owner_set() then.
-static int in_selection_clear_event = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಒಳ_selection_clear_event = FALSE;
 
-    static gint
-selection_clear_event(GtkWidget		*widget UNUSED,
+    ಸ್ಥಿರ gint
+selection_clear_event(GtkWidget		*widget ಬಳಸದ,
 		      GdkEventSelection	*event,
-		      gpointer		user_data UNUSED)
+		      gpointer		user_ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    in_selection_clear_event = TRUE;
-    if (event->selection == clip_plus.gtk_sel_atom)
+    ಒಳ_selection_clear_event = TRUE;
+    ಆದರೆ (event->selection == clip_plus.gtk_sel_atom)
 	clip_lose_selection(&clip_plus);
-    else
-	clip_lose_selection(&clip_star);
-    in_selection_clear_event = FALSE;
+    ಇಲ್ಲದಿದ್ದರೆ
+	clip_lose_selection(&clip_ನಕ್ಷತ್ರ);
+    ಒಳ_selection_clear_event = FALSE;
 
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
-#define RS_NONE	0	// selection_received_cb() not called yet
-#define RS_OK	1	// selection_received_cb() called and OK
-#define RS_FAIL	2	// selection_received_cb() called and failed
-static int received_selection = RS_NONE;
+#ವ್ಯಾಖ್ಯಾನಿಸು RS_NONE	0	// selection_received_cb() not called yet
+#ವ್ಯಾಖ್ಯಾನಿಸು RS_OK	1	// selection_received_cb() called and OK
+#ವ್ಯಾಖ್ಯಾನಿಸು RS_FAIL	2	// selection_received_cb() called and failed
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ received_selection = RS_NONE;
 
-    static void
-selection_received_cb(GtkWidget		*widget UNUSED,
-		      GtkSelectionData	*data,
-		      guint		time_ UNUSED,
-		      gpointer		user_data UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+selection_received_cb(GtkWidget		*widget ಬಳಸದ,
+		      Gtk_Selection_ದತ್ತಾಂಶ	*ದತ್ತಾಂಶ,
+		      guint		ಸಮಯ_2 ಬಳಸದ,
+		      gpointer		user_ದತ್ತಾಂಶ ಬಳಸದ)
 {
     Clipboard_T	    *cbd;
-    char_u	    *text;
-    char_u	    *tmpbuf = NULL;
-    guchar	    *tmpbuf_utf8 = NULL;
-    int		    len;
-    int		    motion_type = MAUTO;
+    char_u	    *ಪಠ್ಯ;
+    char_u	    *tmpbuf = ಖಾಲಿ;
+    guchar	    *tmpbuf_utf8 = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		    len;
+    ಪೂರ್ಣಾಂಕ		    motion_type = MAUTO;
 
-    if (gtk_selection_data_get_selection(data) == clip_plus.gtk_sel_atom)
+    ಆದರೆ (gtk_selection_ದತ್ತಾಂಶ_get_selection(ದತ್ತಾಂಶ) == clip_plus.gtk_sel_atom)
 	cbd = &clip_plus;
-    else
-	cbd = &clip_star;
+    ಇಲ್ಲದಿದ್ದರೆ
+	cbd = &clip_ನಕ್ಷತ್ರ;
 
-    text = (char_u *)gtk_selection_data_get_data(data);
-    len = gtk_selection_data_get_length(data);
+    ಪಠ್ಯ = (char_u *)gtk_selection_ದತ್ತಾಂಶ_get_ದತ್ತಾಂಶ(ದತ್ತಾಂಶ);
+    len = gtk_selection_ದತ್ತಾಂಶ_get_ಉದ್ದಳತೆ(ದತ್ತಾಂಶ);
 
-    if (text == NULL || len <= 0)
+    ಆದರೆ (ಪಠ್ಯ == ಖಾಲಿ || len <= 0)
     {
 	received_selection = RS_FAIL;
 	// clip_free_selection(cbd); ???
 
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if (gtk_selection_data_get_data_type(data) == vim_atom
-	    || gtk_selection_data_get_data_type(data) == vim_mt_atom)
+    ಆದರೆ (gtk_selection_ದತ್ತಾಂಶ_get_ದತ್ತಾಂಶ_type(ದತ್ತಾಂಶ) == vim_atom
+	    || gtk_selection_ದತ್ತಾಂಶ_get_ದತ್ತಾಂಶ_type(ದತ್ತಾಂಶ) == vim_mt_atom)
     {
-	motion_type = *text++;
+	motion_type = *ಪಠ್ಯ++;
 	--len;
     }
-    else if (gtk_selection_data_get_data_type(data) == vimenc_atom
-	    || gtk_selection_data_get_data_type(data) == vimenc_mt_atom)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (gtk_selection_ದತ್ತಾಂಶ_get_ದತ್ತಾಂಶ_type(ದತ್ತಾಂಶ) == vimenc_atom
+	    || gtk_selection_ದತ್ತಾಂಶ_get_ದತ್ತಾಂಶ_type(ದತ್ತಾಂಶ) == vimenc_mt_atom)
     {
 	char_u		*enc;
 	vimconv_T	conv;
 
-	motion_type = *text++;
+	motion_type = *ಪಠ್ಯ++;
 	--len;
 
-	enc = text;
-	text += STRLEN(text) + 1;
-	len -= text - enc;
+	enc = ಪಠ್ಯ;
+	ಪಠ್ಯ += STRLEN(ಪಠ್ಯ) + 1;
+	len -= ಪಠ್ಯ - enc;
 
 	// If the encoding of the text is different from 'encoding', attempt
 	// converting it.
 	conv.vc_type = CONV_NONE;
-	convert_setup(&conv, enc, p_enc);
-	if (conv.vc_type != CONV_NONE)
+	convert_ಸಿದ್ಧತೆ(&conv, enc, p_enc);
+	ಆದರೆ (conv.vc_type != CONV_NONE)
 	{
-	    tmpbuf = string_convert(&conv, text, &len);
-	    if (tmpbuf != NULL)
-		text = tmpbuf;
-	    convert_setup(&conv, NULL, NULL);
+	    tmpbuf = string_convert(&conv, ಪಠ್ಯ, &len);
+	    ಆದರೆ (tmpbuf != ಖಾಲಿ)
+		ಪಠ್ಯ = tmpbuf;
+	    convert_ಸಿದ್ಧತೆ(&conv, ಖಾಲಿ, ಖಾಲಿ);
 	}
     }
 
     // gtk_selection_data_get_text() handles all the nasty details
     // and targets and encodings etc.  This rocks so hard.
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	tmpbuf_utf8 = gtk_selection_data_get_text(data);
-	if (tmpbuf_utf8 != NULL)
+	tmpbuf_utf8 = gtk_selection_ದತ್ತಾಂಶ_get_ಪಠ್ಯ(ದತ್ತಾಂಶ);
+	ಆದರೆ (tmpbuf_utf8 != ಖಾಲಿ)
 	{
 	    len = STRLEN(tmpbuf_utf8);
-	    if (input_conv.vc_type != CONV_NONE)
+	    ಆದರೆ (ಒಳಹರಿವು_conv.vc_type != CONV_NONE)
 	    {
-		tmpbuf = string_convert(&input_conv, tmpbuf_utf8, &len);
-		if (tmpbuf != NULL)
-		    text = tmpbuf;
+		tmpbuf = string_convert(&ಒಳಹರಿವು_conv, tmpbuf_utf8, &len);
+		ಆದರೆ (tmpbuf != ಖಾಲಿ)
+		    ಪಠ್ಯ = tmpbuf;
 	    }
-	    else
-		text = tmpbuf_utf8;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ಪಠ್ಯ = tmpbuf_utf8;
 	}
-	else if (len >= 2 && text[0] == 0xff && text[1] == 0xfe)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (len >= 2 && ಪಠ್ಯ[0] == 0xff && ಪಠ್ಯ[1] == 0xfe)
 	{
 	    vimconv_T conv;
 
 	    // UTF-16, we get this for HTML
 	    conv.vc_type = CONV_NONE;
-	    convert_setup_ext(&conv, (char_u *)"utf-16le", FALSE, p_enc, TRUE);
+	    convert_ಸಿದ್ಧತೆ_ext(&conv, (char_u *)"utf-16le", FALSE, p_enc, TRUE);
 
-	    if (conv.vc_type != CONV_NONE)
+	    ಆದರೆ (conv.vc_type != CONV_NONE)
 	    {
-		text += 2;
+		ಪಠ್ಯ += 2;
 		len -= 2;
-		tmpbuf = string_convert(&conv, text, &len);
-		convert_setup(&conv, NULL, NULL);
+		tmpbuf = string_convert(&conv, ಪಠ್ಯ, &len);
+		convert_ಸಿದ್ಧತೆ(&conv, ಖಾಲಿ, ಖಾಲಿ);
 	    }
-	    if (tmpbuf != NULL)
-		text = tmpbuf;
+	    ಆದರೆ (tmpbuf != ಖಾಲಿ)
+		ಪಠ್ಯ = tmpbuf;
 	}
     }
 
     // Chop off any trailing NUL bytes.  OpenOffice sends these.
-    while (len > 0 && text[len - 1] == NUL)
+    ಆಗ (len > 0 && ಪಠ್ಯ[len - 1] == NUL)
 	--len;
 
-    clip_yank_selection(motion_type, text, (long)len, cbd);
+    clip_yank_selection(motion_type, ಪಠ್ಯ, (ದೀರ್ಘ)len, cbd);
     received_selection = RS_OK;
     vim_free(tmpbuf);
     g_free(tmpbuf_utf8);
@@ -1549,165 +1549,165 @@ selection_received_cb(GtkWidget		*widget UNUSED,
  * Prepare our selection data for passing it to the external selection
  * client.
  */
-    static void
-selection_get_cb(GtkWidget	    *widget UNUSED,
-		 GtkSelectionData   *selection_data,
+    ಸ್ಥಿರ ಶೂನ್ಯ
+selection_get_cb(GtkWidget	    *widget ಬಳಸದ,
+		 Gtk_Selection_ದತ್ತಾಂಶ   *selection_ದತ್ತಾಂಶ,
 		 guint		    info,
-		 guint		    time_ UNUSED,
-		 gpointer	    user_data UNUSED)
+		 guint		    ಸಮಯ_2 ಬಳಸದ,
+		 gpointer	    user_ದತ್ತಾಂಶ ಬಳಸದ)
 {
     char_u	    *string;
     char_u	    *tmpbuf;
     long_u	    tmplen;
-    int		    length;
-    int		    motion_type;
+    ಪೂರ್ಣಾಂಕ		    ಉದ್ದಳತೆ;
+    ಪೂರ್ಣಾಂಕ		    motion_type;
     GdkAtom	    type;
     Clipboard_T    *cbd;
 
-    if (gtk_selection_data_get_selection(selection_data)
+    ಆದರೆ (gtk_selection_ದತ್ತಾಂಶ_get_selection(selection_ದತ್ತಾಂಶ)
 	    == clip_plus.gtk_sel_atom)
 	cbd = &clip_plus;
-    else
-	cbd = &clip_star;
+    ಇಲ್ಲದಿದ್ದರೆ
+	cbd = &clip_ನಕ್ಷತ್ರ;
 
-    if (!cbd->owned)
-	return;			// Shouldn't ever happen
+    ಆದರೆ (!cbd->owned)
+	ಹಿಂತಿರುಗಿ;			// Shouldn't ever happen
 
-    if (info != (guint)TARGET_STRING
-	    && (!clip_html || info != (guint)TARGET_HTML)
-	    && info != (guint)TARGET_UTF8_STRING
-	    && info != (guint)TARGET_VIMENC
-	    && info != (guint)TARGET_VIM
-	    && info != (guint)TARGET_VIMENC_MT
-	    && info != (guint)TARGET_VIM_MT
-	    && info != (guint)TARGET_COMPOUND_TEXT
-	    && info != (guint)TARGET_TEXT_PLAIN
-	    && info != (guint)TARGET_TEXT_PLAIN_UTF8
-	    && info != (guint)TARGET_TEXT)
-	return;
+    ಆದರೆ (info != (guint)ಗುರಿ_STRING
+	    && (!clip_html || info != (guint)ಗುರಿ_HTML)
+	    && info != (guint)ಗುರಿ_UTF8_STRING
+	    && info != (guint)ಗುರಿ_VIMENC
+	    && info != (guint)ಗುರಿ_VIM
+	    && info != (guint)ಗುರಿ_VIMENC_MT
+	    && info != (guint)ಗುರಿ_VIM_MT
+	    && info != (guint)ಗುರಿ_COMPOUND_ಪಠ್ಯ
+	    && info != (guint)ಗುರಿ_ಪಠ್ಯ_PLAIN
+	    && info != (guint)ಗುರಿ_ಪಠ್ಯ_PLAIN_UTF8
+	    && info != (guint)ಗುರಿ_ಪಠ್ಯ)
+	ಹಿಂತಿರುಗಿ;
 
     // get the selection from the '*'/'+' register
     clip_get_selection(cbd);
 
     motion_type = clip_convert_selection(&string, &tmplen, cbd);
-    if (motion_type < 0 || string == NULL)
-	return;
+    ಆದರೆ (motion_type < 0 || string == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
     // Due to int arguments we can't handle more than G_MAXINT.  Also
     // reserve one extra byte for NUL or the motion type; just in case.
     // (Not that pasting 2G of text is ever going to work, but... ;-)
-    length = MIN(tmplen, (long_u)(G_MAXINT - 1));
+    ಉದ್ದಳತೆ = MIN(tmplen, (long_u)(G_MAXINT - 1));
 
-    if (info == (guint)TARGET_VIM || info == (guint)TARGET_VIM_MT)
+    ಆದರೆ (info == (guint)ಗುರಿ_VIM || info == (guint)ಗುರಿ_VIM_MT)
     {
-	tmpbuf = alloc(length + 1);
-	if (tmpbuf != NULL)
+	tmpbuf = alloc(ಉದ್ದಳತೆ + 1);
+	ಆದರೆ (tmpbuf != ಖಾಲಿ)
 	{
 	    tmpbuf[0] = motion_type;
-	    mch_memmove(tmpbuf + 1, string, (size_t)length);
+	    mch_memmove(tmpbuf + 1, string, (size_t)ಉದ್ದಳತೆ);
 	}
 	// For our own format, the first byte contains the motion type
-	++length;
+	++ಉದ್ದಳತೆ;
 	vim_free(string);
 	string = tmpbuf;
-	if (info == (guint)TARGET_VIM)
+	ಆದರೆ (info == (guint)ಗುರಿ_VIM)
 	    type = vim_atom;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    type = vim_mt_atom;
     }
 
-    else if (info == (guint)TARGET_HTML)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (info == (guint)ಗುರಿ_HTML)
     {
 	vimconv_T conv;
 
 	// Since we get utf-16, we probably should set it as well.
 	conv.vc_type = CONV_NONE;
-	convert_setup_ext(&conv, p_enc, TRUE, (char_u *)"utf-16le", FALSE);
-	if (conv.vc_type != CONV_NONE)
+	convert_ಸಿದ್ಧತೆ_ext(&conv, p_enc, TRUE, (char_u *)"utf-16le", FALSE);
+	ಆದರೆ (conv.vc_type != CONV_NONE)
 	{
-	    tmpbuf = string_convert(&conv, string, &length);
-	    convert_setup(&conv, NULL, NULL);
+	    tmpbuf = string_convert(&conv, string, &ಉದ್ದಳತೆ);
+	    convert_ಸಿದ್ಧತೆ(&conv, ಖಾಲಿ, ಖಾಲಿ);
 	    vim_free(string);
 	    string = tmpbuf;
 	}
 
 	// Prepend the BOM: "fffe"
-	if (string != NULL)
+	ಆದರೆ (string != ಖಾಲಿ)
 	{
-	    tmpbuf = alloc(length + 2);
-	    if (tmpbuf != NULL)
+	    tmpbuf = alloc(ಉದ್ದಳತೆ + 2);
+	    ಆದರೆ (tmpbuf != ಖಾಲಿ)
 	    {
 		tmpbuf[0] = 0xff;
 		tmpbuf[1] = 0xfe;
-		mch_memmove(tmpbuf + 2, string, (size_t)length);
+		mch_memmove(tmpbuf + 2, string, (size_t)ಉದ್ದಳತೆ);
 		vim_free(string);
 		string = tmpbuf;
-		length += 2;
+		ಉದ್ದಳತೆ += 2;
 	    }
 
-#if !GTK_CHECK_VERSION(3,0,0)
+#ಆದರೆ !GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
 	    // Looks redundant even for GTK2 because these values are
 	    // overwritten by gtk_selection_data_set() that follows.
-	    selection_data->type = selection_data->target;
-	    selection_data->format = 16;	// 16 bits per char
-#endif
-	    gtk_selection_data_set(selection_data, html_atom, 16,
-							      string, length);
+	    selection_ದತ್ತಾಂಶ->type = selection_ದತ್ತಾಂಶ->ಗುರಿ;
+	    selection_ದತ್ತಾಂಶ->format = 16;	// 16 bits per char
+#ಆದರೆ_ಅಂತ್ಯ
+	    gtk_selection_ದತ್ತಾಂಶ_ಗಣ(selection_ದತ್ತಾಂಶ, html_atom, 16,
+							      string, ಉದ್ದಳತೆ);
 	    vim_free(string);
 	}
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
-    else if (info == (guint)TARGET_VIMENC || info == (guint)TARGET_VIMENC_MT)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (info == (guint)ಗುರಿ_VIMENC || info == (guint)ಗುರಿ_VIMENC_MT)
     {
-	int l = STRLEN(p_enc);
+	ಪೂರ್ಣಾಂಕ l = STRLEN(p_enc);
 
 	// contents: motion_type 'encoding' NUL text
-	tmpbuf = alloc(length + l + 2);
-	if (tmpbuf != NULL)
+	tmpbuf = alloc(ಉದ್ದಳತೆ + l + 2);
+	ಆದರೆ (tmpbuf != ಖಾಲಿ)
 	{
 	    tmpbuf[0] = motion_type;
 	    STRCPY(tmpbuf + 1, p_enc);
-	    mch_memmove(tmpbuf + l + 2, string, (size_t)length);
-	    length += l + 2;
+	    mch_memmove(tmpbuf + l + 2, string, (size_t)ಉದ್ದಳತೆ);
+	    ಉದ್ದಳತೆ += l + 2;
 	    vim_free(string);
 	    string = tmpbuf;
 	}
-	if (info == (guint)TARGET_VIMENC)
+	ಆದರೆ (info == (guint)ಗುರಿ_VIMENC)
 	    type = vimenc_atom;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    type = vimenc_mt_atom;
     }
 
     // gtk_selection_data_set_text() handles everything for us.  This is
     // so easy and simple and cool, it'd be insane not to use it.
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (output_conv.vc_type != CONV_NONE)
+	ಆದರೆ (output_conv.vc_type != CONV_NONE)
 	{
-	    tmpbuf = string_convert(&output_conv, string, &length);
+	    tmpbuf = string_convert(&output_conv, string, &ಉದ್ದಳತೆ);
 	    vim_free(string);
-	    if (tmpbuf == NULL)
-		return;
+	    ಆದರೆ (tmpbuf == ಖಾಲಿ)
+		ಹಿಂತಿರುಗಿ;
 	    string = tmpbuf;
 	}
 	// Validate the string to avoid runtime warnings
-	if (g_utf8_validate((const char *)string, (gssize)length, NULL))
+	ಆದರೆ (g_utf8_validate((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)string, (gssize)ಉದ್ದಳತೆ, ಖಾಲಿ))
 	{
-	    gtk_selection_data_set_text(selection_data,
-					(const char *)string, length);
+	    gtk_selection_ದತ್ತಾಂಶ_ಗಣ_ಪಠ್ಯ(selection_ದತ್ತಾಂಶ,
+					(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)string, ಉದ್ದಳತೆ);
 	}
 	vim_free(string);
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if (string != NULL)
+    ಆದರೆ (string != ಖಾಲಿ)
     {
-#if !GTK_CHECK_VERSION(3,0,0)
+#ಆದರೆ !GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
 	// Looks redundant even for GTK2 because these values are
 	// overwritten by gtk_selection_data_set() that follows.
-	selection_data->type = selection_data->target;
-	selection_data->format = 8;	// 8 bits per char
-#endif
-	gtk_selection_data_set(selection_data, type, 8, string, length);
+	selection_ದತ್ತಾಂಶ->type = selection_ದತ್ತಾಂಶ->ಗುರಿ;
+	selection_ದತ್ತಾಂಶ->format = 8;	// 8 bits per char
+#ಆದರೆ_ಅಂತ್ಯ
+	gtk_selection_ದತ್ತಾಂಶ_ಗಣ(selection_ದತ್ತಾಂಶ, type, 8, string, ಉದ್ದಳತೆ);
 	vim_free(string);
     }
 }
@@ -1717,22 +1717,22 @@ selection_get_cb(GtkWidget	    *widget UNUSED,
  * before fork().
  * Return OK or FAIL.
  */
-    int
-gui_mch_early_init_check(int give_message)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_early_init_check(ಪೂರ್ಣಾಂಕ give_ಸಂದೇಶ)
 {
     char_u *p, *q;
 
     // Guess that when $DISPLAY isn't set the GUI can't start.
     p = mch_getenv((char_u *)"DISPLAY");
     q = mch_getenv((char_u *)"WAYLAND_DISPLAY");
-    if ((p == NULL || *p == NUL) && (q == NULL || *q == NUL))
+    ಆದರೆ ((p == ಖಾಲಿ || *p == NUL) && (q == ಖಾಲಿ || *q == NUL))
     {
 	gui.dying = true;
-	if (give_message)
-	    emsg(_((char *)e_cannot_open_display));
-	return FAIL;
+	ಆದರೆ (give_ಸಂದೇಶ)
+	    emsg(_((ಅಕ್ಷರ *)e_cannot_open_display));
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
@@ -1740,79 +1740,79 @@ gui_mch_early_init_check(int give_message)
  * fork().
  * Return OK or FAIL.
  */
-    int
-gui_mch_init_check(void)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_init_check(ಶೂನ್ಯ)
 {
-#ifdef USE_GRESOURCE
-    static int res_registered = FALSE;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_GRESOURCE
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ res_registered = FALSE;
 
-    if (!res_registered)
+    ಆದರೆ (!res_registered)
     {
 	// Call this function in the GUI process; otherwise, the resources
 	// won't be available.  Don't call it twice.
 	res_registered = TRUE;
-	gui_gtk_register_resource();
+	gui_gtk_ರಿಜಿಸ್ಟರ್_resource();
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_GUI_GNOME
-    if (gtk_socket_id == 0)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_GNOME
+    ಆದರೆ (gtk_socket_id == 0)
 	using_gnome = 1;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // This defaults to argv[0], but we want it to match the name of the
     // shipped gvim.desktop so that Vim's windows can be associated with this
     // file.
-    g_set_prgname("gvim");
+    g_ಗಣ_prgname("gvim");
 
     // Don't use gtk_init() or gnome_init(), it exits on failure.
-    if (!gtk_init_check(&gui_argc, &gui_argv))
+    ಆದರೆ (!gtk_init_check(&gui_argc, &gui_argv))
     {
 	gui.dying = true;
-	emsg(_((char *)e_cannot_open_display));
-	return FAIL;
+	emsg(_((ಅಕ್ಷರ *)e_cannot_open_display));
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // Mouse handling callbacks
 
 
-static guint mouse_click_timer = 0;
-static int mouse_timed_out = TRUE;
+ಸ್ಥಿರ guint mouse_click_timer = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ mouse_timed_ಹೊರಹೋಗು = TRUE;
 
 /*
  * Timer used to recognize multiple clicks of the mouse button
  */
-    static timeout_cb_type
-mouse_click_timer_cb(gpointer data)
+    ಸ್ಥಿರ timeout_cb_type
+mouse_click_timer_cb(gpointer ದತ್ತಾಂಶ)
 {
     // we don't use this information currently
-    int *timed_out = (int *) data;
+    ಪೂರ್ಣಾಂಕ *timed_ಹೊರಹೋಗು = (ಪೂರ್ಣಾಂಕ *) ದತ್ತಾಂಶ;
 
-    *timed_out = TRUE;
-    return FALSE;		// don't happen again
+    *timed_ಹೊರಹೋಗು = TRUE;
+    ಹಿಂತಿರುಗಿ FALSE;		// don't happen again
 }
 
-static guint		motion_repeat_timer  = 0;
-static int		motion_repeat_offset = FALSE;
-static timeout_cb_type	motion_repeat_timer_cb(gpointer);
+ಸ್ಥಿರ guint		motion_repeat_timer  = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ		motion_repeat_ಸ್ಥಾನಾಂತರ = FALSE;
+ಸ್ಥಿರ timeout_cb_type	motion_repeat_timer_cb(gpointer);
 
-    static void
-process_motion_notify(int x, int y, GdkModifierType state)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+process_motion_notify(ಪೂರ್ಣಾಂಕ x, ಪೂರ್ಣಾಂಕ y, GdkModifierType state)
 {
-    int	    button;
+    ಪೂರ್ಣಾಂಕ	    button;
     int_u   vim_modifiers;
-    GtkAllocation allocation;
+    Gtk_ಹಂಚಿಕೆ ಹಂಚಿಕೆ;
 
     // Need to add GDK_BUTTON1_MASK state when dragging a touch.
     state |= dragging_button_state;
 
-    button = (state & (GDK_BUTTON1_MASK | GDK_BUTTON2_MASK |
-		       GDK_BUTTON3_MASK | GDK_BUTTON4_MASK |
-		       GDK_BUTTON5_MASK))
+    button = (state & (GDK_BUTTON1_ಮುಖವಾಡ | GDK_BUTTON2_ಮುಖವಾಡ |
+		       GDK_BUTTON3_ಮುಖವಾಡ | GDK_BUTTON4_ಮುಖವಾಡ |
+		       GDK_BUTTON5_ಮುಖವಾಡ))
 	      ? MOUSE_DRAG : ' ';
 
     // If our pointer is currently hidden, then we should show it.
@@ -1820,10 +1820,10 @@ process_motion_notify(int x, int y, GdkModifierType state)
 
     // Just moving the rodent above the drawing area without any button
     // being pressed.
-    if (button != MOUSE_DRAG)
+    ಆದರೆ (button != MOUSE_DRAG)
     {
 	gui_mouse_moved(x, y);
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
     // translate modifier coding between the main engine and GTK
@@ -1835,22 +1835,22 @@ process_motion_notify(int x, int y, GdkModifierType state)
     /*
      * Auto repeat timer handling.
      */
-    gtk_widget_get_allocation(gui.drawarea, &allocation);
+    gtk_widget_get_ಹಂಚಿಕೆ(gui.drawarea, &ಹಂಚಿಕೆ);
 
-    if (x < 0 || y < 0
-	    || x >= allocation.width
-	    || y >= allocation.height)
+    ಆದರೆ (x < 0 || y < 0
+	    || x >= ಹಂಚಿಕೆ.ಅಗಲ
+	    || y >= ಹಂಚಿಕೆ.ಎತ್ತರ)
     {
 
-	int dx;
-	int dy;
-	int offshoot;
-	int delay = 10;
+	ಪೂರ್ಣಾಂಕ dx;
+	ಪೂರ್ಣಾಂಕ dy;
+	ಪೂರ್ಣಾಂಕ offshoot;
+	ಪೂರ್ಣಾಂಕ delay = 10;
 
 	// Calculate the maximal distance of the cursor from the drawing area.
 	// (offshoot can't become negative here!).
-	dx = x < 0 ? -x : x - allocation.width;
-	dy = y < 0 ? -y : y - allocation.height;
+	dx = x < 0 ? -x : x - ಹಂಚಿಕೆ.ಅಗಲ;
+	dy = y < 0 ? -y : y - ಹಂಚಿಕೆ.ಎತ್ತರ;
 
 	offshoot = dx > dy ? dx : dy;
 
@@ -1862,89 +1862,89 @@ process_motion_notify(int x, int y, GdkModifierType state)
 	// drags start instead...
 	//
 	// Maybe a parabolic interpolation would suite us better here too...
-	if (offshoot > 127)
+	ಆದರೆ (offshoot > 127)
 	{
 	    // 5 appears to be somehow near to my perceptual limits :-).
 	    delay = 5;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    delay = (130 * (127 - offshoot)) / 127 + 5;
 	}
 
 	// shoot again
-	if (!motion_repeat_timer)
-	    motion_repeat_timer = timeout_add(delay, motion_repeat_timer_cb,
-									 NULL);
+	ಆದರೆ (!motion_repeat_timer)
+	    motion_repeat_timer = timeout_ಕೂಡಿಸು(delay, motion_repeat_timer_cb,
+									 ಖಾಲಿ);
     }
 }
 
-#if GTK_CHECK_VERSION(3,0,0)
-    static GdkDevice *
-gui_gtk_get_pointer_device(GtkWidget *widget)
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    ಸ್ಥಿರ GdkDevice *
+gui_gtk_get_ಸೂಚಕ_device(GtkWidget *widget)
 {
-    GdkWindow * const win = gtk_widget_get_window(widget);
-    GdkDisplay * const dpy = gdk_window_get_display(win);
-# if GTK_CHECK_VERSION(3,20,0)
-    GdkSeat * const seat = gdk_display_get_default_seat(dpy);
-    return gdk_seat_get_pointer(seat);
-# else
-    GdkDeviceManager * const mngr = gdk_display_get_device_manager(dpy);
-    return gdk_device_manager_get_client_pointer(mngr);
+    Gdk_ಕಿಟಕಿ * ಸ್ಥಿರಾಂಕ win = gtk_widget_get_ಕಿಟಕಿ(widget);
+    GdkDisplay * ಸ್ಥಿರಾಂಕ dpy = gdk_ಕಿಟಕಿ_get_display(win);
+# ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,20,0)
+    GdkSeat * ಸ್ಥಿರಾಂಕ seat = gdk_display_get_default_seat(dpy);
+    ಹಿಂತಿರುಗಿ gdk_seat_get_ಸೂಚಕ(seat);
+# ಇಲ್ಲದಿದ್ದರೆ
+    GdkDeviceManager * ಸ್ಥಿರಾಂಕ mngr = gdk_display_get_device_manager(dpy);
+    ಹಿಂತಿರುಗಿ gdk_device_manager_get_client_ಸೂಚಕ(mngr);
 # endif
 }
 
-    static GdkWindow *
-gui_gtk_get_pointer(GtkWidget       *widget,
+    ಸ್ಥಿರ Gdk_ಕಿಟಕಿ *
+gui_gtk_get_ಸೂಚಕ(GtkWidget       *widget,
 		    gint	    *x,
 		    gint	    *y,
 		    GdkModifierType *state)
 {
-    GdkWindow * const win = gtk_widget_get_window(widget);
-    GdkDevice * const dev = gui_gtk_get_pointer_device(widget);
-    return gdk_window_get_device_position(win, dev , x, y, state);
+    Gdk_ಕಿಟಕಿ * ಸ್ಥಿರಾಂಕ win = gtk_widget_get_ಕಿಟಕಿ(widget);
+    GdkDevice * ಸ್ಥಿರಾಂಕ dev = gui_gtk_get_ಸೂಚಕ_device(widget);
+    ಹಿಂತಿರುಗಿ gdk_ಕಿಟಕಿ_get_device_position(win, dev , x, y, state);
 }
 
-# if defined(FEAT_GUI_TABLINE)
-    static GdkWindow *
-gui_gtk_window_at_position(GtkWidget *widget,
+# ಆದರೆ defined(FEAT_GUI_TABLINE)
+    ಸ್ಥಿರ Gdk_ಕಿಟಕಿ *
+gui_gtk_ಕಿಟಕಿ_at_position(GtkWidget *widget,
 			   gint      *x,
 			   gint      *y)
 {
-    GdkDevice * const dev = gui_gtk_get_pointer_device(widget);
-    return gdk_device_get_window_at_position(dev, x, y);
+    GdkDevice * ಸ್ಥಿರಾಂಕ dev = gui_gtk_get_ಸೂಚಕ_device(widget);
+    ಹಿಂತಿರುಗಿ gdk_device_get_ಕಿಟಕಿ_at_position(dev, x, y);
 }
 # endif
-#else // !GTK_CHECK_VERSION(3,0,0)
-# define gui_gtk_get_pointer(wid, x, y, s) \
-    gdk_window_get_pointer((wid)->window, x, y, s)
-# define gui_gtk_window_at_position(wid, x, y)	gdk_window_at_pointer(x, y)
-#endif
+#ಇಲ್ಲದಿದ್ದರೆ // !GTK_CHECK_VERSION(3,0,0)
+# define gui_gtk_get_ಸೂಚಕ(wid, x, y, s) \
+    gdk_ಕಿಟಕಿ_get_ಸೂಚಕ((wid)->ಕಿಟಕಿ_2, x, y, s)
+# define gui_gtk_ಕಿಟಕಿ_at_position(wid, x, y)	gdk_ಕಿಟಕಿ_at_ಸೂಚಕ(x, y)
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Timer used to recognize multiple clicks of the mouse button.
  */
-    static timeout_cb_type
-motion_repeat_timer_cb(gpointer data UNUSED)
+    ಸ್ಥಿರ timeout_cb_type
+motion_repeat_timer_cb(gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    int		    x;
-    int		    y;
+    ಪೂರ್ಣಾಂಕ		    x;
+    ಪೂರ್ಣಾಂಕ		    y;
     GdkModifierType state;
 
-    gui_gtk_get_pointer(gui.drawarea, &x, &y, &state);
+    gui_gtk_get_ಸೂಚಕ(gui.drawarea, &x, &y, &state);
 
-    if (!(state & (GDK_BUTTON1_MASK | GDK_BUTTON2_MASK |
-		   GDK_BUTTON3_MASK | GDK_BUTTON4_MASK |
-		   GDK_BUTTON5_MASK)))
+    ಆದರೆ (!(state & (GDK_BUTTON1_ಮುಖವಾಡ | GDK_BUTTON2_ಮುಖವಾಡ |
+		   GDK_BUTTON3_ಮುಖವಾಡ | GDK_BUTTON4_ಮುಖವಾಡ |
+		   GDK_BUTTON5_ಮುಖವಾಡ)))
     {
 	motion_repeat_timer = 0;
-	return FALSE;
+	ಹಿಂತಿರುಗಿ FALSE;
     }
 
     // If there already is a mouse click in the input buffer, wait another
     // time (otherwise we would create a backlog of clicks)
-    if (vim_used_in_input_buf() > 10)
-	return TRUE;
+    ಆದರೆ (vim_ಬಳಸಿದ_ಒಳ_ಒಳಹರಿವು_buf() > 10)
+	ಹಿಂತಿರುಗಿ TRUE;
 
     motion_repeat_timer = 0;
 
@@ -1954,38 +1954,38 @@ motion_repeat_timer_cb(gpointer data UNUSED)
      * event, otherwise drag events will be discarded, because they are still
      * in the same character.
      */
-    if (motion_repeat_offset)
-	x += gui.char_width;
+    ಆದರೆ (motion_repeat_ಸ್ಥಾನಾಂತರ)
+	x += gui.char_ಅಗಲ;
 
-    motion_repeat_offset = !motion_repeat_offset;
+    motion_repeat_ಸ್ಥಾನಾಂತರ = !motion_repeat_ಸ್ಥಾನಾಂತರ;
     process_motion_notify(x, y, state);
 
     // Don't happen again.  We will get reinstalled in the synthetic event
     // if needed -- thus repeating should still work.
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
-    static gint
+    ಸ್ಥಿರ gint
 motion_notify_event(GtkWidget *widget,
 		    GdkEventMotion *event,
-		    gpointer data UNUSED)
+		    gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    if (event->is_hint)
+    ಆದರೆ (event->is_hint)
     {
-	int		x;
-	int		y;
+	ಪೂರ್ಣಾಂಕ		x;
+	ಪೂರ್ಣಾಂಕ		y;
 	GdkModifierType	state;
 
-	gui_gtk_get_pointer(widget, &x, &y, &state);
+	gui_gtk_get_ಸೂಚಕ(widget, &x, &y, &state);
 	process_motion_notify(x, y, state);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	process_motion_notify((int)event->x, (int)event->y,
+	process_motion_notify((ಪೂರ್ಣಾಂಕ)event->x, (ಪೂರ್ಣಾಂಕ)event->y,
 			      (GdkModifierType)event->state);
     }
 
-    return TRUE; // handled
+    ಹಿಂತಿರುಗಿ TRUE; // handled
 }
 
 
@@ -1994,202 +1994,202 @@ motion_notify_event(GtkWidget *widget,
  * by our own timeout mechanism instead of the one provided by GTK+ itself.
  * This is due to the way the generic VIM code is recognizing multiple clicks.
  */
-    static gint
+    ಸ್ಥಿರ gint
 button_press_event(GtkWidget *widget,
 		   GdkEventButton *event,
-		   gpointer data UNUSED)
+		   gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    int button;
-    int repeated_click = FALSE;
-    int x, y;
+    ಪೂರ್ಣಾಂಕ button;
+    ಪೂರ್ಣಾಂಕ repeated_click = FALSE;
+    ಪೂರ್ಣಾಂಕ x, y;
     int_u vim_modifiers;
 
-    gui.event_time = event->time;
+    gui.event_ಸಮಯ = event->ಸಮಯ;
 
     // Make sure we have focus now we've been selected
-    if (gtk_socket_id != 0 && !gtk_widget_has_focus(widget))
+    ಆದರೆ (gtk_socket_id != 0 && !gtk_widget_has_focus(widget))
 	gtk_widget_grab_focus(widget);
 
     /*
      * Don't let additional events about multiple clicks send by GTK to us
      * after the initial button press event confuse us.
      */
-    if (event->type != GDK_BUTTON_PRESS)
-	return FALSE;
+    ಆದರೆ (event->type != GDK_BUTTON_PRESS)
+	ಹಿಂತಿರುಗಿ FALSE;
 
     x = event->x;
     y = event->y;
 
     // Handle multiple clicks
-    if (!mouse_timed_out && mouse_click_timer)
+    ಆದರೆ (!mouse_timed_ಹೊರಹೋಗು && mouse_click_timer)
     {
 	timeout_remove(mouse_click_timer);
 	mouse_click_timer = 0;
 	repeated_click = TRUE;
     }
 
-    mouse_timed_out = FALSE;
-    mouse_click_timer = timeout_add(p_mouset, mouse_click_timer_cb,
-							     &mouse_timed_out);
+    mouse_timed_ಹೊರಹೋಗು = FALSE;
+    mouse_click_timer = timeout_ಕೂಡಿಸು(p_mouset, mouse_click_timer_cb,
+							     &mouse_timed_ಹೊರಹೋಗು);
 
-    switch (event->button)
+    ಆಯ್ಕೆ (event->button)
     {
 	// Keep in sync with gui_x11.c.
 	// Buttons 4-7 are handled in scroll_event()
-	case 1:
-		button = MOUSE_LEFT;
+	ಸ್ಥಿತಿ 1:
+		button = MOUSE_ಎಡ;
 		// needed for touch-drag
-		dragging_button_state |= GDK_BUTTON1_MASK;
-		break;
-	case 2: button = MOUSE_MIDDLE; break;
-	case 3: button = MOUSE_RIGHT; break;
-	case 8: button = MOUSE_X1; break;
-	case 9: button = MOUSE_X2; break;
-	default:
-	    return FALSE;		// Unknown button
+		dragging_button_state |= GDK_BUTTON1_ಮುಖವಾಡ;
+		ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ 2: button = MOUSE_ಮಧ್ಯ; ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ 3: button = MOUSE_ಬಲ; ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ 8: button = MOUSE_X1; ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ 9: button = MOUSE_X2; ನಿಲ್ಲಿಸು;
+	ಪೂರ್ವನಿಯೋಜಿತ:
+	    ಹಿಂತಿರುಗಿ FALSE;		// Unknown button
     }
 
-#ifdef FEAT_XIM
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XIM
     // cancel any preediting
-    if (im_is_preediting())
+    ಆದರೆ (im_is_preediting())
 	xim_reset();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     vim_modifiers = modifiers_gdk2mouse(event->state);
 
     gui_send_mouse_event(button, x, y, repeated_click, vim_modifiers);
 
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
  * GTK+ abstracts scrolling via the GdkEventScroll.
  */
-    static gboolean
+    ಸ್ಥಿರ gboolean
 scroll_event(GtkWidget *widget,
 	     GdkEventScroll *event,
-	     gpointer data UNUSED)
+	     gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    int	    button = 0;  // silence gcc
+    ಪೂರ್ಣಾಂಕ	    button = 0;  // silence gcc
     int_u   vim_modifiers;
-#if GTK_CHECK_VERSION(3,4,0)
-    static double  acc_x, acc_y;
-# if !GTK_CHECK_VERSION(3,22,0)
-    static guint32 last_smooth_event_time;
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,4,0)
+    ಸ್ಥಿರ ದ್ವಿಗುಣ  acc_x, acc_y;
+# ಆದರೆ !GTK_CHECK_ಆವೃತ್ತಿ(3,22,0)
+    ಸ್ಥಿರ guint32 ಕೊನೆಯ_smooth_event_ಸಮಯ;
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (gtk_socket_id != 0 && !gtk_widget_has_focus(widget))
+    ಆದರೆ (gtk_socket_id != 0 && !gtk_widget_has_focus(widget))
 	gtk_widget_grab_focus(widget);
 
-    switch (event->direction)
+    ಆಯ್ಕೆ (event->direction)
     {
-	case GDK_SCROLL_UP:
+	ಸ್ಥಿತಿ GDK_SCROLL_ಮೇಲೆ:
 	    button = MOUSE_4;
-	    break;
-	case GDK_SCROLL_DOWN:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ GDK_SCROLL_ಕೆಳಕ್ಕೆ:
 	    button = MOUSE_5;
-	    break;
-	case GDK_SCROLL_LEFT:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ GDK_SCROLL_ಎಡ:
 	    button = MOUSE_7;
-	    break;
-	case GDK_SCROLL_RIGHT:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ GDK_SCROLL_ಬಲ:
 	    button = MOUSE_6;
-	    break;
-#if GTK_CHECK_VERSION(3,4,0)
-	case GDK_SCROLL_SMOOTH:
-	    if (event->is_stop)
+	    ನಿಲ್ಲಿಸು;
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,4,0)
+	ಸ್ಥಿತಿ GDK_SCROLL_SMOOTH:
+	    ಆದರೆ (event->is_stop)
 	    {
 		acc_x = acc_y = 0;
 		// this event tells us to stop, without an actual moving
-		return FALSE;
+		ಹಿಂತಿರುಗಿ FALSE;
 	    }
-# if GTK_CHECK_VERSION(3,22,0)
-	    if (gdk_device_get_axes(event->device) & GDK_AXIS_FLAG_WHEEL)
+# ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,22,0)
+	    ಆದರೆ (gdk_device_get_axes(event->device) & GDK_AXIS_FLAG_WHEEL)
 		// this is from a wheel (as oppose to a touchpad / trackpoint)
-# else
-	    if (event->time - last_smooth_event_time > 50)
+# ಇಲ್ಲದಿದ್ದರೆ
+	    ಆದರೆ (event->ಸಮಯ - ಕೊನೆಯ_smooth_event_ಸಮಯ > 50)
 		// reset our accumulations after 50ms of silence
 # endif
 		acc_x = acc_y = 0;
 	    acc_x += event->delta_x;
 	    acc_y += event->delta_y;
-# if !GTK_CHECK_VERSION(3,22,0)
-	    last_smooth_event_time = event->time;
+# ಆದರೆ !GTK_CHECK_ಆವೃತ್ತಿ(3,22,0)
+	    ಕೊನೆಯ_smooth_event_ಸಮಯ = event->ಸಮಯ;
 # endif
-	    break;
-#endif
-	default: // This shouldn't happen
-	    return FALSE;
+	    ನಿಲ್ಲಿಸು;
+#ಆದರೆ_ಅಂತ್ಯ
+	ಪೂರ್ವನಿಯೋಜಿತ: // This shouldn't happen
+	    ಹಿಂತಿರುಗಿ FALSE;
     }
 
-#ifdef FEAT_XIM
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XIM
     // cancel any preediting
-    if (im_is_preediting())
+    ಆದರೆ (im_is_preediting())
 	xim_reset();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     vim_modifiers = modifiers_gdk2mouse(event->state);
 
-#if GTK_CHECK_VERSION(3,4,0)
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,4,0)
 # ifdef GDK_WINDOWING_WAYLAND
-    if (event->direction == GDK_SCROLL_SMOOTH && gui.is_wayland)
+    ಆದರೆ (event->direction == GDK_SCROLL_SMOOTH && gui.is_wayland)
     {
-	while (acc_x >= 1.0)
-	{ // right
+	ಆಗ (acc_x >= 1.0)
+	{ //ಬಲ
 	    acc_x = MAX(0.0, acc_x - 1.0);
-	    gui_send_mouse_event(MOUSE_6, (int)event->x, (int)event->y,
+	    gui_send_mouse_event(MOUSE_6, (ಪೂರ್ಣಾಂಕ)event->x, (ಪೂರ್ಣಾಂಕ)event->y,
 		    FALSE, vim_modifiers);
 	}
-	while (acc_x <= -1.0)
-	{ // left
+	ಆಗ (acc_x <= -1.0)
+	{ //ಎಡ
 	    acc_x = MIN(0.0, acc_x + 1.0);
-	    gui_send_mouse_event(MOUSE_7, (int)event->x, (int)event->y,
+	    gui_send_mouse_event(MOUSE_7, (ಪೂರ್ಣಾಂಕ)event->x, (ಪೂರ್ಣಾಂಕ)event->y,
 		    FALSE, vim_modifiers);
 	}
-	while (acc_y >= 1.0)
-	{ // down
+	ಆಗ (acc_y >= 1.0)
+	{ //ಕೆಳಕ್ಕೆ
 	    acc_y = MAX(0.0, acc_y - 1.0);
-	    gui_send_mouse_event(MOUSE_5, (int)event->x, (int)event->y,
+	    gui_send_mouse_event(MOUSE_5, (ಪೂರ್ಣಾಂಕ)event->x, (ಪೂರ್ಣಾಂಕ)event->y,
 		    FALSE, vim_modifiers);
 	}
-	while (acc_y <= -1.0)
-	{ // up
+	ಆಗ (acc_y <= -1.0)
+	{ //ಮೇಲೆ
 	    acc_y = MIN(0.0, acc_y + 1.0);
-	    gui_send_mouse_event(MOUSE_4, (int)event->x, (int)event->y,
+	    gui_send_mouse_event(MOUSE_4, (ಪೂರ್ಣಾಂಕ)event->x, (ಪೂರ್ಣಾಂಕ)event->y,
 		    FALSE, vim_modifiers);
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 # endif
     // on x11, despite not requested, when we copy into primary clipboard,
     // we'll get smooth events. Unsmooth ones will also come along.
-    if (event->direction == GDK_SCROLL_SMOOTH && X_DISPLAY)
+    ಆದರೆ (event->direction == GDK_SCROLL_SMOOTH && X_DISPLAY)
 	// for X11 we deal with unsmooth events, and so ignore the smooth ones
 	;
-    else
-#endif
-	gui_send_mouse_event(button, (int)event->x, (int)event->y,
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	gui_send_mouse_event(button, (ಪೂರ್ಣಾಂಕ)event->x, (ಪೂರ್ಣಾಂಕ)event->y,
 		FALSE, vim_modifiers);
 
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 
-    static gint
-button_release_event(GtkWidget *widget UNUSED,
+    ಸ್ಥಿರ gint
+button_release_event(GtkWidget *widget ಬಳಸದ,
 		     GdkEventButton *event,
-		     gpointer data UNUSED)
+		     gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    int x, y;
+    ಪೂರ್ಣಾಂಕ x, y;
     int_u vim_modifiers;
 
-    gui.event_time = event->time;
+    gui.event_ಸಮಯ = event->ಸಮಯ;
 
     // Remove any motion "machine gun" timers used for automatic further
     // extension of allocation areas if outside of the applications window
     // area .
-    if (motion_repeat_timer)
+    ಆದರೆ (motion_repeat_timer)
     {
 	timeout_remove(motion_repeat_timer);
 	motion_repeat_timer = 0;
@@ -2202,14 +2202,14 @@ button_release_event(GtkWidget *widget UNUSED,
 
     gui_send_mouse_event(MOUSE_RELEASE, x, y, FALSE, vim_modifiers);
 
-    switch (event->button)
+    ಆಯ್ಕೆ (event->button)
     {
-	case 1:  // MOUSE_LEFT
+	ಸ್ಥಿತಿ 1:  // MOUSE_LEFT
 	    dragging_button_state = 0;
-	    break;
+	    ನಿಲ್ಲಿಸು;
     }
 
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
@@ -2217,17 +2217,17 @@ button_release_event(GtkWidget *widget UNUSED,
  * button release went to that widget, thus forget about the pressed button to
  * avoid that the next mouse move is taken for a drag.
  */
-    static void
-grab_notify_event(GtkWidget *widget UNUSED,
+    ಸ್ಥಿರ ಶೂನ್ಯ
+grab_notify_event(GtkWidget *widget ಬಳಸದ,
 		  gboolean  was_grabbed,
-		  gpointer  data UNUSED)
+		  gpointer  ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    if (!was_grabbed)
+    ಆದರೆ (!was_grabbed)
 	dragging_button_state = 0;
 }
 
 
-#ifdef FEAT_DND
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DND
 /////////////////////////////////////////////////////////////////////////////
 // Drag aNd Drop support handlers.
 
@@ -2237,37 +2237,37 @@ grab_notify_event(GtkWidget *widget UNUSED,
  * thus be careful not to go past the end.	Also allow separation with
  * NUL characters.
  */
-    static int
-count_and_decode_uri_list(char_u *out, char_u *raw, int len)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಎಣಿಕೆ_and_decode_uri_list(char_u *ಹೊರಹೋಗು, char_u *raw, ಪೂರ್ಣಾಂಕ len)
 {
-    int		i;
-    char_u	*p = out;
-    int		count = 0;
+    ಪೂರ್ಣಾಂಕ		i;
+    char_u	*p = ಹೊರಹೋಗು;
+    ಪೂರ್ಣಾಂಕ		ಎಣಿಕೆ_2 = 0;
 
-    for (i = 0; i < len; ++i)
+    ಗಾಗಿ (i = 0; i < len; ++i)
     {
-	if (raw[i] == NUL || raw[i] == '\n' || raw[i] == '\r')
+	ಆದರೆ (raw[i] == NUL || raw[i] == '\n' || raw[i] == '\r')
 	{
-	    if (p > out && p[-1] != NUL)
+	    ಆದರೆ (p > ಹೊರಹೋಗು && p[-1] != NUL)
 	    {
-		++count;
+		++ಎಣಿಕೆ_2;
 		*p++ = NUL;
 	    }
 	}
-	else if (raw[i] == '%' && i + 2 < len && hexhex2nr(raw + i + 1) > 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (raw[i] == '%' && i + 2 < len && hexhex2nr(raw + i + 1) > 0)
 	{
 	    *p++ = hexhex2nr(raw + i + 1);
 	    i += 2;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    *p++ = raw[i];
     }
-    if (p > out && p[-1] != NUL)
+    ಆದರೆ (p > ಹೊರಹೋಗು && p[-1] != NUL)
     {
 	*p = NUL;	// last item didn't have \r or \n
-	++count;
+	++ಎಣಿಕೆ_2;
     }
-    return count;
+    ಹಿಂತಿರುಗಿ ಎಣಿಕೆ_2;
 }
 
 /*
@@ -2275,163 +2275,163 @@ count_and_decode_uri_list(char_u *out, char_u *raw, int len)
  * this process, URI which protocol is not "file:" are removed.  Return
  * length of array (less than "max").
  */
-    static int
-filter_uri_list(char_u **outlist, int max, char_u *src)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+filter_uri_list(char_u **outlist, ಪೂರ್ಣಾಂಕ max, char_u *src)
 {
-    int	i, j;
+    ಪೂರ್ಣಾಂಕ	i, j;
 
-    for (i = j = 0; i < max; ++i)
+    ಗಾಗಿ (i = j = 0; i < max; ++i)
     {
-	outlist[i] = NULL;
-	if (STRNCMP(src, "file:", 5) == 0)
+	outlist[i] = ಖಾಲಿ;
+	ಆದರೆ (STRNCMP(src, "file:", 5) == 0)
 	{
 	    src += 5;
-	    if (STRNCMP(src, "//localhost", 11) == 0)
+	    ಆದರೆ (STRNCMP(src, "//localhost", 11) == 0)
 		src += 11;
-	    while (src[0] == '/' && src[1] == '/')
+	    ಆಗ (src[0] == '/' && src[1] == '/')
 		++src;
 	    outlist[j++] = vim_strsave(src);
 	}
 	src += STRLEN(src) + 1;
     }
-    return j;
+    ಹಿಂತಿರುಗಿ j;
 }
 
-    static char_u **
-parse_uri_list(int *count, char_u *data, int len)
+    ಸ್ಥಿರ char_u **
+parse_uri_list(ಪೂರ್ಣಾಂಕ *ಎಣಿಕೆ_2, char_u *ದತ್ತಾಂಶ, ಪೂರ್ಣಾಂಕ len)
 {
-    int	    n	    = 0;
-    char_u  *tmp    = NULL;
-    char_u  **array = NULL;
+    ಪೂರ್ಣಾಂಕ	    n	    = 0;
+    char_u  *tmp    = ಖಾಲಿ;
+    char_u  **array = ಖಾಲಿ;
 
-    if (data != NULL && len > 0 && (tmp = alloc(len + 1)) != NULL)
+    ಆದರೆ (ದತ್ತಾಂಶ != ಖಾಲಿ && len > 0 && (tmp = alloc(len + 1)) != ಖಾಲಿ)
     {
-	n = count_and_decode_uri_list(tmp, data, len);
-	if (n > 0 && (array = ALLOC_MULT(char_u *, n)) != NULL)
+	n = ಎಣಿಕೆ_and_decode_uri_list(tmp, ದತ್ತಾಂಶ, len);
+	ಆದರೆ (n > 0 && (array = ALLOC_MULT(char_u *, n)) != ಖಾಲಿ)
 	    n = filter_uri_list(array, n, tmp);
     }
     vim_free(tmp);
-    *count = n;
-    return array;
+    *ಎಣಿಕೆ_2 = n;
+    ಹಿಂತಿರುಗಿ array;
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 drag_handle_uri_list(GdkDragContext	*context,
-		     GtkSelectionData	*data,
-		     guint		time_,
+		     Gtk_Selection_ದತ್ತಾಂಶ	*ದತ್ತಾಂಶ,
+		     guint		ಸಮಯ_2,
 		     GdkModifierType	state,
 		     gint		x,
 		     gint		y)
 {
     char_u  **fnames;
-    int	    nfiles = 0;
+    ಪೂರ್ಣಾಂಕ	    nfiles = 0;
 
     fnames = parse_uri_list(&nfiles,
-	    (char_u *)gtk_selection_data_get_data(data),
-	    gtk_selection_data_get_length(data));
+	    (char_u *)gtk_selection_ದತ್ತಾಂಶ_get_ದತ್ತಾಂಶ(ದತ್ತಾಂಶ),
+	    gtk_selection_ದತ್ತಾಂಶ_get_ಉದ್ದಳತೆ(ದತ್ತಾಂಶ));
 
-    if (fnames != NULL && nfiles > 0)
+    ಆದರೆ (fnames != ಖಾಲಿ && nfiles > 0)
     {
 	int_u   modifiers;
 
-	gtk_drag_finish(context, TRUE, FALSE, time_); // accept
+	gtk_drag_ಮುಕ್ತಾಯ(context, TRUE, FALSE, ಸಮಯ_2); // accept
 
 	modifiers = modifiers_gdk2mouse(state);
 
 	gui_handle_drop(x, y, modifiers, fnames, nfiles);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	vim_free(fnames);
 }
 
-    static void
-drag_handle_text(GdkDragContext	    *context,
-		 GtkSelectionData   *data,
-		 guint		    time_,
+    ಸ್ಥಿರ ಶೂನ್ಯ
+drag_handle_ಪಠ್ಯ(GdkDragContext	    *context,
+		 Gtk_Selection_ದತ್ತಾಂಶ   *ದತ್ತಾಂಶ,
+		 guint		    ಸಮಯ_2,
 		 GdkModifierType    state)
 {
     char_u  dropkey[6] = {CSI, KS_MODIFIER, 0, CSI, KS_EXTRA, (char_u)KE_DROP};
-    char_u  *text;
-    int	    len;
-    char_u  *tmpbuf = NULL;
+    char_u  *ಪಠ್ಯ;
+    ಪೂರ್ಣಾಂಕ	    len;
+    char_u  *tmpbuf = ಖಾಲಿ;
 
-    text = (char_u *)gtk_selection_data_get_data(data);
-    len = gtk_selection_data_get_length(data);
+    ಪಠ್ಯ = (char_u *)gtk_selection_ದತ್ತಾಂಶ_get_ದತ್ತಾಂಶ(ದತ್ತಾಂಶ);
+    len = gtk_selection_ದತ್ತಾಂಶ_get_ಉದ್ದಳತೆ(ದತ್ತಾಂಶ);
 
-    if (gtk_selection_data_get_data_type(data) == utf8_string_atom)
+    ಆದರೆ (gtk_selection_ದತ್ತಾಂಶ_get_ದತ್ತಾಂಶ_type(ದತ್ತಾಂಶ) == utf8_string_atom)
     {
-	if (input_conv.vc_type != CONV_NONE)
-	    tmpbuf = string_convert(&input_conv, text, &len);
-	if (tmpbuf != NULL)
-	    text = tmpbuf;
+	ಆದರೆ (ಒಳಹರಿವು_conv.vc_type != CONV_NONE)
+	    tmpbuf = string_convert(&ಒಳಹರಿವು_conv, ಪಠ್ಯ, &len);
+	ಆದರೆ (tmpbuf != ಖಾಲಿ)
+	    ಪಠ್ಯ = tmpbuf;
     }
 
-    dnd_yank_drag_data(text, (long)len);
-    gtk_drag_finish(context, TRUE, FALSE, time_); // accept
+    dnd_yank_drag_ದತ್ತಾಂಶ(ಪಠ್ಯ, (ದೀರ್ಘ)len);
+    gtk_drag_ಮುಕ್ತಾಯ(context, TRUE, FALSE, ಸಮಯ_2); // accept
     vim_free(tmpbuf);
 
     dropkey[2] = modifiers_gdk2vim(state);
 
-    if (dropkey[2] != 0)
-	add_to_input_buf(dropkey, (int)sizeof(dropkey));
-    else
-	add_to_input_buf(dropkey + 3, (int)(sizeof(dropkey) - 3));
+    ಆದರೆ (dropkey[2] != 0)
+	ಕೂಡಿಸು_ಗಮ್ಯ_ಒಳಹರಿವು_buf(dropkey, (ಪೂರ್ಣಾಂಕ)ಗಾತ್ರ(dropkey));
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಕೂಡಿಸು_ಗಮ್ಯ_ಒಳಹರಿವು_buf(dropkey + 3, (ಪೂರ್ಣಾಂಕ)(ಗಾತ್ರ(dropkey) - 3));
 }
 
 /*
  * DND receiver.
  */
-    static void
-drag_data_received_cb(GtkWidget		*widget,
+    ಸ್ಥಿರ ಶೂನ್ಯ
+drag_ದತ್ತಾಂಶ_received_cb(GtkWidget		*widget,
 		      GdkDragContext	*context,
 		      gint		x,
 		      gint		y,
-		      GtkSelectionData	*data,
+		      Gtk_Selection_ದತ್ತಾಂಶ	*ದತ್ತಾಂಶ,
 		      guint		info,
-		      guint		time_,
-		      gpointer		user_data UNUSED)
+		      guint		ಸಮಯ_2,
+		      gpointer		user_ದತ್ತಾಂಶ ಬಳಸದ)
 {
     GdkModifierType state;
 
     // Guard against trash
-    const guchar * const data_data = gtk_selection_data_get_data(data);
-    const gint data_length = gtk_selection_data_get_length(data);
-    const gint data_format = gtk_selection_data_get_format(data);
+    ಸ್ಥಿರಾಂಕ guchar * ಸ್ಥಿರಾಂಕ ದತ್ತಾಂಶ_ದತ್ತಾಂಶ = gtk_selection_ದತ್ತಾಂಶ_get_ದತ್ತಾಂಶ(ದತ್ತಾಂಶ);
+    ಸ್ಥಿರಾಂಕ gint ದತ್ತಾಂಶ_ಉದ್ದಳತೆ = gtk_selection_ದತ್ತಾಂಶ_get_ಉದ್ದಳತೆ(ದತ್ತಾಂಶ);
+    ಸ್ಥಿರಾಂಕ gint ದತ್ತಾಂಶ_format = gtk_selection_ದತ್ತಾಂಶ_get_format(ದತ್ತಾಂಶ);
 
-    if (data_data == NULL
-	    || data_length <= 0
-	    || data_format != 8
-	    || data_data[data_length] != '\0')
+    ಆದರೆ (ದತ್ತಾಂಶ_ದತ್ತಾಂಶ == ಖಾಲಿ
+	    || ದತ್ತಾಂಶ_ಉದ್ದಳತೆ <= 0
+	    || ದತ್ತಾಂಶ_format != 8
+	    || ದತ್ತಾಂಶ_ದತ್ತಾಂಶ[ದತ್ತಾಂಶ_ಉದ್ದಳತೆ] != '\0')
     {
-	gtk_drag_finish(context, FALSE, FALSE, time_);
-	return;
+	gtk_drag_ಮುಕ್ತಾಯ(context, FALSE, FALSE, ಸಮಯ_2);
+	ಹಿಂತಿರುಗಿ;
     }
 
     // Get the current modifier state for proper distinguishment between
     // different operations later.
-    gui_gtk_get_pointer(widget, NULL, NULL, &state);
+    gui_gtk_get_ಸೂಚಕ(widget, ಖಾಲಿ, ಖಾಲಿ, &state);
 
     // Not sure about the role of "text/plain" here...
-    if (info == (guint)TARGET_TEXT_URI_LIST)
-	drag_handle_uri_list(context, data, time_, state, x, y);
-    else
-	drag_handle_text(context, data, time_, state);
+    ಆದರೆ (info == (guint)ಗುರಿ_ಪಠ್ಯ_URI_LIST)
+	drag_handle_uri_list(context, ದತ್ತಾಂಶ, ಸಮಯ_2, state, x, y);
+    ಇಲ್ಲದಿದ್ದರೆ
+	drag_handle_ಪಠ್ಯ(context, ದತ್ತಾಂಶ, ಸಮಯ_2, state);
 
 }
-#endif // FEAT_DND
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_DND
 
 
-#if defined(USE_GNOME_SESSION)
+#ಆದರೆ defined(USE_GNOME_SESSION)
 /*
  * GnomeClient interact callback.  Check for unsaved buffers that cannot
  * be abandoned and pop up a dialog asking the user for confirmation if
  * necessary.
  */
-    static void
-sm_client_check_changed_any(GnomeClient	    *client UNUSED,
-			    gint	    key,
-			    GnomeDialogType type UNUSED,
-			    gpointer	    data UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+sm_client_check_ಬದಲಾಯಿತು_any(GnomeClient	    *client ಬಳಸದ,
+			    gint	    ಕೀಲಿ,
+			    GnomeDialogType type ಬಳಸದ,
+			    gpointer	    ದತ್ತಾಂಶ ಬಳಸದ)
 {
     cmdmod_T	save_cmdmod;
     gboolean	shutdown_cancelled;
@@ -2441,24 +2441,24 @@ sm_client_check_changed_any(GnomeClient	    *client UNUSED,
 # ifdef FEAT_BROWSE
     cmdmod.cmod_flags |= CMOD_BROWSE;
 # endif
-# if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+# ಆದರೆ defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
     cmdmod.cmod_flags |= CMOD_CONFIRM;
 # endif
     /*
      * If there are changed buffers, present the user with
      * a dialog if possible, otherwise give an error message.
      */
-    shutdown_cancelled = check_changed_any(FALSE, FALSE);
+    shutdown_cancelled = check_ಬದಲಾಯಿತು_any(FALSE, FALSE);
 
     exiting = FALSE;
     cmdmod = save_cmdmod;
     setcursor(); // position the cursor
-    out_flush();
+    ಹೊರಹೋಗು_flush();
     /*
      * If the user hit the [Cancel] button the whole shutdown
      * will be cancelled.  Wow, quite powerful feature (:
      */
-    gnome_interaction_key_return(key, shutdown_cancelled);
+    gnome_interaction_ಕೀಲಿ_return(ಕೀಲಿ, shutdown_cancelled);
 }
 
 /*
@@ -2466,50 +2466,50 @@ sm_client_check_changed_any(GnomeClient	    *client UNUSED,
  * for confirmation if necessary.  Save the current editing session and tell
  * the session manager how to restart Vim.
  */
-    static gboolean
+    ಸ್ಥಿರ gboolean
 sm_client_save_yourself(GnomeClient	    *client,
-			gint		    phase UNUSED,
-			GnomeSaveStyle	    save_style UNUSED,
-			gboolean	    shutdown UNUSED,
+			gint		    phase ಬಳಸದ,
+			GnomeSaveStyle	    save_style ಬಳಸದ,
+			gboolean	    shutdown ಬಳಸದ,
 			GnomeInteractStyle  interact_style,
-			gboolean	    fast UNUSED,
-			gpointer	    data UNUSED)
+			gboolean	    fast ಬಳಸದ,
+			gpointer	    ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    static const char	suffix[] = "-session.vim";
-    char		*session_file;
-    unsigned int	len;
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ	suffix[] = "-session.vim";
+    ಅಕ್ಷರ		*session_file;
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ	len;
     gboolean		success;
 
     // Always request an interaction if possible.  check_changed_any()
     // won't actually show a dialog unless any buffers have been modified.
     // There doesn't seem to be an obvious way to check that without
     // automatically firing the dialog.  Anyway, it works just fine.
-    if (interact_style == GNOME_INTERACT_ANY)
-	gnome_client_request_interaction(client, GNOME_DIALOG_NORMAL,
-					 &sm_client_check_changed_any,
-					 NULL);
-    out_flush();
+    ಆದರೆ (interact_style == GNOME_INTERACT_ANY)
+	gnome_client_request_interaction(client, GNOME_DIALOG_ಸಾಮಾನ್ಯ,
+					 &sm_client_check_ಬದಲಾಯಿತು_any,
+					 ಖಾಲಿ);
+    ಹೊರಹೋಗು_flush();
     ml_sync_all(FALSE, FALSE); // preserve all swap files
 
     // The path is unique for each session save.  We do neither know nor care
     // which session script will actually be used later.  This decision is in
     // the domain of the session manager.
-    session_file = gnome_config_get_real_path(
-			gnome_client_get_config_prefix(client));
-    len = strlen(session_file);
+    session_file = gnome_config_get_real_ಮಾರ್ಗ(
+			gnome_client_get_config_ಪೂರ್ವಪ್ರತ್ಯಯ(client));
+    len = ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(session_file);
 
-    if (len > 0 && session_file[len-1] == G_DIR_SEPARATOR)
+    ಆದರೆ (len > 0 && session_file[len-1] == G_DIR_SEPARATOR)
 	--len; // get rid of the superfluous trailing '/'
 
-    session_file = g_renew(char, session_file, len + sizeof(suffix));
-    memcpy(session_file + len, suffix, sizeof(suffix));
+    session_file = g_renew(ಅಕ್ಷರ, session_file, len + ಗಾತ್ರ(suffix));
+    ಸ್ಮರಣೆ_ನಕಲು(session_file + len, suffix, ಗಾತ್ರ(suffix));
 
     success = write_session_file((char_u *)session_file);
 
-    if (success)
+    ಆದರೆ (success)
     {
-	const char  *argv[8];
-	int	    i;
+	ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ  *argv[8];
+	ಪೂರ್ಣಾಂಕ	    i;
 
 	// Tell the session manager how to wipe out the stored session data.
 	// This isn't as dangerous as it looks, don't worry :)	session_file
@@ -2518,9 +2518,9 @@ sm_client_save_yourself(GnomeClient	    *client,
 	i = 0;
 	argv[i++] = "rm";
 	argv[i++] = session_file;
-	argv[i] = NULL;
+	argv[i] = ಖಾಲಿ;
 
-	gnome_client_set_discard_command(client, i, (char **)argv);
+	gnome_client_ಗಣ_discard_command(client, i, (ಅಕ್ಷರ **)argv);
 
 	// Tell the session manager how to restore the just saved session.
 	// This is easily done thanks to Vim's -S option.  Pass the -f flag
@@ -2532,18 +2532,18 @@ sm_client_save_yourself(GnomeClient	    *client,
 	argv[i++] = "-f";
 	argv[i++] = "-g";
 	argv[i++] = "--role";
-	argv[i++] = gtk_window_get_role(GTK_WINDOW(gui.mainwin));
+	argv[i++] = gtk_ಕಿಟಕಿ_get_role(GTK_ಕಿಟಕಿ(gui.mainwin));
 	argv[i++] = "-S";
 	argv[i++] = session_file;
-	argv[i] = NULL;
+	argv[i] = ಖಾಲಿ;
 
-	gnome_client_set_restart_command(client, i, (char **)argv);
-	gnome_client_set_clone_command(client, 0, NULL);
+	gnome_client_ಗಣ_restart_command(client, i, (ಅಕ್ಷರ **)argv);
+	gnome_client_ಗಣ_clone_command(client, 0, ಖಾಲಿ);
     }
 
     g_free(session_file);
 
-    return success;
+    ಹಿಂತಿರುಗಿ success;
 }
 
 /*
@@ -2551,11 +2551,11 @@ sm_client_save_yourself(GnomeClient	    *client,
  * here since "save_yourself" has been emitted before (unless serious trouble
  * is happening).
  */
-    static void
-sm_client_die(GnomeClient *client UNUSED, gpointer data UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+sm_client_die(GnomeClient *client ಬಳಸದ, gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
     // Don't write messages to the GUI anymore
-    full_screen = FALSE;
+    ತುಂಬಿದ_screen = FALSE;
 
     vim_strncpy(IObuff, (char_u *)
 		    _("Vim: Received \"die\" request from session manager\n"),
@@ -2566,46 +2566,46 @@ sm_client_die(GnomeClient *client UNUSED, gpointer data UNUSED)
 /*
  * Connect our signal handlers to be notified on session save and shutdown.
  */
-    static void
-setup_save_yourself(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಸಿದ್ಧತೆ_save_yourself(ಶೂನ್ಯ)
 {
     GnomeClient *client;
 
     client = gnome_master_client();
-    if (client == NULL)
-	return;
+    ಆದರೆ (client == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     // Must use the deprecated gtk_signal_connect() for compatibility
     // with GNOME 1.  Arrgh, zombies!
     gtk_signal_connect(GTK_OBJECT(client), "save_yourself",
-	    GTK_SIGNAL_FUNC(&sm_client_save_yourself), NULL);
+	    GTK_SIGNAL_FUNC(&sm_client_save_yourself), ಖಾಲಿ);
     gtk_signal_connect(GTK_OBJECT(client), "die",
-	    GTK_SIGNAL_FUNC(&sm_client_die), NULL);
+	    GTK_SIGNAL_FUNC(&sm_client_die), ಖಾಲಿ);
 }
 
-#else // !USE_GNOME_SESSION
+#ಇಲ್ಲದಿದ್ದರೆ // !USE_GNOME_SESSION
 
 # ifdef USE_XSMP
 /*
  * GTK tells us that XSMP needs attention
  */
-    static gboolean
-local_xsmp_handle_requests(
-    GIOChannel		*source UNUSED,
+    ಸ್ಥಿರ gboolean
+local_xsmp_handle_ವಿನಂತಿಗಳು(
+    GIOChannel		*ಮೂಲ ಬಳಸದ,
     GIOCondition	condition,
-    gpointer		data)
+    gpointer		ದತ್ತಾಂಶ)
 {
-    if (condition == G_IO_IN)
+    ಆದರೆ (condition == G_IO_ಒಳ)
     {
 	// Do stuff; maybe close connection
-	if (xsmp_handle_requests() == FAIL)
-	    g_io_channel_unref((GIOChannel *)data);
-	return TRUE;
+	ಆದರೆ (xsmp_handle_ವಿನಂತಿಗಳು() == FAIL)
+	    g_io_channel_unref((GIOChannel *)ದತ್ತಾಂಶ);
+	ಹಿಂತಿರುಗಿ TRUE;
     }
     // Error
-    g_io_channel_unref((GIOChannel *)data);
+    g_io_channel_unref((GIOChannel *)ದತ್ತಾಂಶ);
     xsmp_close();
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 # endif // USE_XSMP
 
@@ -2613,14 +2613,14 @@ local_xsmp_handle_requests(
  * Setup the WM_PROTOCOLS to indicate we want the WM_SAVE_YOURSELF event.
  * This is an ugly use of X functions.	GTK doesn't offer an alternative.
  */
-    static void
-setup_save_yourself(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಸಿದ್ಧತೆ_save_yourself(ಶೂನ್ಯ)
 {
-    Atom    *existing_atoms = NULL;
-    int	    count = 0;
+    Atom    *existing_atoms = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ	    ಎಣಿಕೆ_2 = 0;
 
 # ifdef USE_XSMP
-    if (xsmp_icefd != -1)
+    ಆದರೆ (xsmp_icefd != -1)
     {
 	/*
 	 * Use XSMP is preference to legacy WM_SAVE_YOURSELF;
@@ -2628,46 +2628,46 @@ setup_save_yourself(void)
 	 */
 	GIOChannel *g_io = g_io_channel_unix_new(xsmp_icefd);
 
-	g_io_add_watch(g_io, G_IO_IN | G_IO_ERR | G_IO_HUP,
-				  local_xsmp_handle_requests, (gpointer)g_io);
+	g_io_ಕೂಡಿಸು_watch(g_io, G_IO_ಒಳ | G_IO_ERR | G_IO_HUP,
+				  local_xsmp_handle_ವಿನಂತಿಗಳು, (gpointer)g_io);
 	g_io_channel_unref(g_io);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 # endif
     {
 	// Fall back to old method
 
 	// first get the existing value
 	Display * dpy = gui_mch_get_display();
-	if (!dpy)
-	    return;
+	ಆದರೆ (!dpy)
+	    ಹಿಂತಿರುಗಿ;
 
-	GdkWindow * const mainwin_win = gtk_widget_get_window(gui.mainwin);
-	if (XGetWMProtocols(dpy, GDK_WINDOW_XID(mainwin_win),
-		    &existing_atoms, &count))
+	Gdk_ಕಿಟಕಿ * ಸ್ಥಿರಾಂಕ mainwin_win = gtk_widget_get_ಕಿಟಕಿ(gui.mainwin);
+	ಆದರೆ (XGetWMProtocols(dpy, GDK_ಕಿಟಕಿ_XID(mainwin_win),
+		    &existing_atoms, &ಎಣಿಕೆ_2))
 	{
 	    Atom	*new_atoms;
 	    Atom	save_yourself_xatom;
-	    int	i;
+	    ಪೂರ್ಣಾಂಕ	i;
 
 	    save_yourself_xatom = GET_X_ATOM(save_yourself_atom);
 
 	    // check if WM_SAVE_YOURSELF isn't there yet
-	    for (i = 0; i < count; ++i)
-		if (existing_atoms[i] == save_yourself_xatom)
-		    break;
+	    ಗಾಗಿ (i = 0; i < ಎಣಿಕೆ_2; ++i)
+		ಆದರೆ (existing_atoms[i] == save_yourself_xatom)
+		    ನಿಲ್ಲಿಸು;
 
-	    if (i == count)
+	    ಆದರೆ (i == ಎಣಿಕೆ_2)
 	    {
 		// allocate an Atoms array which is one item longer
-		new_atoms = ALLOC_MULT(Atom, count + 1);
-		if (new_atoms != NULL)
+		new_atoms = ALLOC_MULT(Atom, ಎಣಿಕೆ_2 + 1);
+		ಆದರೆ (new_atoms != ಖಾಲಿ)
 		{
-		    memcpy(new_atoms, existing_atoms, count * sizeof(Atom));
-		    new_atoms[count] = save_yourself_xatom;
-		    XSetWMProtocols(GDK_WINDOW_XDISPLAY(mainwin_win),
-			    GDK_WINDOW_XID(mainwin_win),
-			    new_atoms, count + 1);
+		    ಸ್ಮರಣೆ_ನಕಲು(new_atoms, existing_atoms, ಎಣಿಕೆ_2 * ಗಾತ್ರ(Atom));
+		    new_atoms[ಎಣಿಕೆ_2] = save_yourself_xatom;
+		    XSetWMProtocols(GDK_ಕಿಟಕಿ_XDISPLAY(mainwin_win),
+			    GDK_ಕಿಟಕಿ_XID(mainwin_win),
+			    new_atoms, ಎಣಿಕೆ_2 + 1);
 		    vim_free(new_atoms);
 		}
 	    }
@@ -2691,213 +2691,213 @@ setup_save_yourself(void)
  * WM_SAVE_YOURSELF hack it actually stores the session...  And yes,
  * it should work with KDE as well.
  */
-    static GdkFilterReturn
+    ಸ್ಥಿರ GdkFilterReturn
 global_event_filter(GdkXEvent *xev,
-		    GdkEvent *event UNUSED,
-		    gpointer data UNUSED)
+		    GdkEvent *event ಬಳಸದ,
+		    gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
     XEvent *xevent = (XEvent *)xev;
 
-    if (xevent != NULL
-	    && xevent->type == ClientMessage
-	    && xevent->xclient.message_type == GET_X_ATOM(wm_protocols_atom)
-	    && (long_u)xevent->xclient.data.l[0]
+    ಆದರೆ (xevent != ಖಾಲಿ
+	    && xevent->type == Client_ಸಂದೇಶ
+	    && xevent->xclient.ಸಂದೇಶ_type == GET_X_ATOM(wm_protocols_atom)
+	    && (long_u)xevent->xclient.ದತ್ತಾಂಶ.l[0]
 					    == GET_X_ATOM(save_yourself_atom))
     {
-	out_flush();
+	ಹೊರಹೋಗು_flush();
 	ml_sync_all(FALSE, FALSE); // preserve all swap files
 	/*
 	 * Set the window's WM_COMMAND property, to let the window manager
 	 * know we are done saving ourselves.  We don't want to be
 	 * restarted, thus set argv to NULL.
 	 */
-	XSetCommand(GDK_WINDOW_XDISPLAY(gtk_widget_get_window(gui.mainwin)),
-		    GDK_WINDOW_XID(gtk_widget_get_window(gui.mainwin)),
-		    NULL, 0);
-	return GDK_FILTER_REMOVE;
+	XSetCommand(GDK_ಕಿಟಕಿ_XDISPLAY(gtk_widget_get_ಕಿಟಕಿ(gui.mainwin)),
+		    GDK_ಕಿಟಕಿ_XID(gtk_widget_get_ಕಿಟಕಿ(gui.mainwin)),
+		    ಖಾಲಿ, 0);
+	ಹಿಂತಿರುಗಿ GDK_FILTER_REMOVE;
     }
 
-    return GDK_FILTER_CONTINUE;
+    ಹಿಂತಿರುಗಿ GDK_FILTER_CONTINUE;
 }
-#endif // !USE_GNOME_SESSION
+#ಆದರೆ_ಅಂತ್ಯ // !USE_GNOME_SESSION
 
-    static GdkPixbuf *
-pixbuf_new_from_png_data(const unsigned char *data, unsigned int len)
+    ಸ್ಥಿರ GdkPixbuf *
+pixbuf_new_from_png_ದತ್ತಾಂಶ(ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ *ದತ್ತಾಂಶ, ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ len)
 {
-    GInputStream *stream;
+    GInput_ಹರಿವು *ಹರಿವು;
     GdkPixbuf    *pixbuf;
 
-    stream = g_memory_input_stream_new_from_data(data, len, NULL);
-    pixbuf = gdk_pixbuf_new_from_stream(stream, NULL, NULL);
-    g_object_unref(stream);
-    return pixbuf;
+    ಹರಿವು = g_ಸ್ಮರಣೆ_ಒಳಹರಿವು_ಹರಿವು_new_from_ದತ್ತಾಂಶ(ದತ್ತಾಂಶ, len, ಖಾಲಿ);
+    pixbuf = gdk_pixbuf_new_from_ಹರಿವು(ಹರಿವು, ಖಾಲಿ, ಖಾಲಿ);
+    g_object_unref(ಹರಿವು);
+    ಹಿಂತಿರುಗಿ pixbuf;
 }
 
 /*
  * Setup the window icon & xcmdsrv comm after the main window has been realized.
  */
-    static void
-mainwin_realize(GtkWidget *widget UNUSED, gpointer data UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+mainwin_realize(GtkWidget *widget ಬಳಸದ, gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
-#include "../runtime/vim16x16_png.h"
-#include "../runtime/vim32x32_png.h"
-#include "../runtime/vim48x48_png.h"
+#ಅನ್ತರ್ಭಾವ "../runtime/vim16x16_png.h"
+#ಅನ್ತರ್ಭಾವ "../runtime/vim32x32_png.h"
+#ಅನ್ತರ್ಭಾವ "../runtime/vim48x48_png.h"
 
-    GdkWindow * const mainwin_win = gtk_widget_get_window(gui.mainwin);
+    Gdk_ಕಿಟಕಿ * ಸ್ಥಿರಾಂಕ mainwin_win = gtk_widget_get_ಕಿಟಕಿ(gui.mainwin);
 
     // When started with "--echo-wid" argument, write window ID on stdout.
-    if (echo_wid_arg)
+    ಆದರೆ (echo_wid_arg)
     {
-	if (gui_mch_get_display())
-	    printf("WID: %ld\n", (long)GDK_WINDOW_XID(mainwin_win));
-	else
-	    printf("WID: 0\n");
+	ಆದರೆ (gui_mch_get_display())
+	    ಬರೆ("WID: %ld\n", (ದೀರ್ಘ)GDK_ಕಿಟಕಿ_XID(mainwin_win));
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಬರೆ("WID: 0\n");
 	fflush(stdout);
     }
 
-    if (vim_strchr(p_go, GO_ICON) != NULL)
+    ಆದರೆ (vim_strchr(p_go, GO_ICON) != ಖಾಲಿ)
     {
 	GtkIconTheme *icon_theme;
 
 	icon_theme = gtk_icon_theme_get_default();
 
-	if (icon_theme && gtk_icon_theme_has_icon(icon_theme, "gvim"))
-	    gtk_window_set_icon_name(GTK_WINDOW(gui.mainwin), "gvim");
-	else
+	ಆದರೆ (icon_theme && gtk_icon_theme_has_icon(icon_theme, "gvim"))
+	    gtk_ಕಿಟಕಿ_ಗಣ_icon_name(GTK_ಕಿಟಕಿ(gui.mainwin), "gvim");
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    /*
 	     * Add an icon to the main window. For fun and convenience of the user.
 	     */
-	    GList *icons = NULL;
+	    GList *icons = ಖಾಲಿ;
 
-	    icons = g_list_prepend(icons, pixbuf_new_from_png_data(vim16x16_png, vim16x16_png_len));
-	    icons = g_list_prepend(icons, pixbuf_new_from_png_data(vim32x32_png, vim32x32_png_len));
-	    icons = g_list_prepend(icons, pixbuf_new_from_png_data(vim48x48_png, vim48x48_png_len));
+	    icons = g_list_prepend(icons, pixbuf_new_from_png_ದತ್ತಾಂಶ(vim16x16_png, vim16x16_png_len));
+	    icons = g_list_prepend(icons, pixbuf_new_from_png_ದತ್ತಾಂಶ(vim32x32_png, vim32x32_png_len));
+	    icons = g_list_prepend(icons, pixbuf_new_from_png_ದತ್ತಾಂಶ(vim48x48_png, vim48x48_png_len));
 
-	    gtk_window_set_icon_list(GTK_WINDOW(gui.mainwin), icons);
+	    gtk_ಕಿಟಕಿ_ಗಣ_icon_list(GTK_ಕಿಟಕಿ(gui.mainwin), icons);
 
 	    // TODO: is this type cast OK?
-	    g_list_foreach(icons, (GFunc)(void *)&g_object_unref, NULL);
+	    g_list_foreach(icons, (GFunc)(ಶೂನ್ಯ *)&g_object_unref, ಖಾಲಿ);
 	    g_list_free(icons);
 	}
     }
 
-#if !defined(USE_GNOME_SESSION)
+#ಆದರೆ !defined(USE_GNOME_SESSION)
     // Register a handler for WM_SAVE_YOURSELF with GDK's low-level X I/F
-    gdk_window_add_filter(NULL, &global_event_filter, NULL);
-#endif
+    gdk_ಕಿಟಕಿ_ಕೂಡಿಸು_filter(ಖಾಲಿ, &global_event_filter, ಖಾಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ
     // Setup to indicate to the window manager that we want to catch the
     // WM_SAVE_YOURSELF event.	For GNOME, this connects to the session
     // manager instead.
-#if defined(USE_GNOME_SESSION)
-    if (using_gnome)
-#endif
-	setup_save_yourself();
+#ಆದರೆ defined(USE_GNOME_SESSION)
+    ಆದರೆ (using_gnome)
+#ಆದರೆ_ಅಂತ್ಯ
+	ಸಿದ್ಧತೆ_save_yourself();
 
-#ifdef FEAT_CLIENTSERVER
-    if (clientserver_method == CLIENTSERVER_METHOD_X11 && gui_mch_get_display())
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CLIENTSERVER
+    ಆದರೆ (clientserver_ವಿಧಾನ == CLIENTSERVER_ವಿಧಾನ_X11 && gui_mch_get_display())
     {
-	if (serverName == NULL && serverDelayedStartName != NULL)
+	ಆದರೆ (serverName == ಖಾಲಿ && server_Delayed_ಆರಂಭ_Name != ಖಾಲಿ)
 	{
 	    // This is a :gui command in a plain vim with no previous server
-	    commWindow = GDK_WINDOW_XID(mainwin_win);
+	    comm_ಕಿಟಕಿ = GDK_ಕಿಟಕಿ_XID(mainwin_win);
 
-	    (void)serverRegisterName(GDK_WINDOW_XDISPLAY(mainwin_win),
-				    serverDelayedStartName);
+	    (ಶೂನ್ಯ)server_ರಿಜಿಸ್ಟರ್_Name(GDK_ಕಿಟಕಿ_XDISPLAY(mainwin_win),
+				    server_Delayed_ಆರಂಭ_Name);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    /*
 	    * Cannot handle "XLib-only" windows with gtk event routines, we'll
 	    * have to change the "server" registration to that of the main window
 	    * If we have not registered a name yet, remember the window.
 	    */
-	    serverChangeRegisteredWindow(GDK_WINDOW_XDISPLAY(mainwin_win),
-					GDK_WINDOW_XID(mainwin_win));
+	    server_Change_Registered_ಕಿಟಕಿ(GDK_ಕಿಟಕಿ_XDISPLAY(mainwin_win),
+					GDK_ಕಿಟಕಿ_XID(mainwin_win));
 	}
-	gtk_widget_add_events(gui.mainwin, GDK_PROPERTY_CHANGE_MASK);
+	gtk_widget_ಕೂಡಿಸು_events(gui.mainwin, GDK_PROPERTY_CHANGE_ಮುಖವಾಡ);
 	g_signal_connect(G_OBJECT(gui.mainwin), "property-notify-event",
-			G_CALLBACK(property_event), NULL);
+			G_CALLBACK(property_event), ಖಾಲಿ);
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-    static GdkCursor *
-create_blank_pointer(void)
+    ಸ್ಥಿರ GdkCursor *
+create_blank_ಸೂಚಕ(ಶೂನ್ಯ)
 {
     GdkCursor	*cursor;
 
-#if GTK_CHECK_VERSION(3,0,0)
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
     GdkDisplay  *disp = gtk_widget_get_display(gui.mainwin);
     cursor = gdk_cursor_new_from_name(disp, "none");
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
     // Create a pseudo blank pointer, which is in fact one pixel by one pixel
     // in size.
-    GdkWindow	*root_window = NULL;
+    Gdk_ಕಿಟಕಿ	*ಬೇರು_ಕಿಟಕಿ = ಖಾಲಿ;
     GdkColor	color = { 0, 0, 0, 0 };
-    GdkPixmap	*blank_mask;
-    char	blank_data[] = { 0x0 };
-    root_window = gtk_widget_get_root_window(gui.mainwin);
-    blank_mask = gdk_bitmap_create_from_data(root_window, blank_data, 1, 1);
-    cursor = gdk_cursor_new_from_pixmap(blank_mask, blank_mask,
+    GdkPixmap	*blank_ಮುಖವಾಡ;
+    ಅಕ್ಷರ	blank_ದತ್ತಾಂಶ[] = { 0x0 };
+    ಬೇರು_ಕಿಟಕಿ = gtk_widget_get_ಬೇರು_ಕಿಟಕಿ(gui.mainwin);
+    blank_ಮುಖವಾಡ = gdk_bitmap_create_from_ದತ್ತಾಂಶ(ಬೇರು_ಕಿಟಕಿ, blank_ದತ್ತಾಂಶ, 1, 1);
+    cursor = gdk_cursor_new_from_pixmap(blank_ಮುಖವಾಡ, blank_ಮುಖವಾಡ,
 					&color, &color, 0, 0);
-    gdk_bitmap_unref(blank_mask);
-#endif
+    gdk_bitmap_unref(blank_ಮುಖವಾಡ);
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return cursor;
+    ಹಿಂತಿರುಗಿ cursor;
 }
 
-    static void
-mainwin_screen_changed_cb(GtkWidget  *widget,
-			  GdkScreen  *previous_screen UNUSED,
-			  gpointer   data UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+mainwin_screen_ಬದಲಾಯಿತು_cb(GtkWidget  *widget,
+			  GdkScreen  *ಹಿಂದಿನ_screen ಬಳಸದ,
+			  gpointer   ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    if (!gtk_widget_has_screen(widget))
-	return;
+    ಆದರೆ (!gtk_widget_has_screen(widget))
+	ಹಿಂತಿರುಗಿ;
 
     /*
      * Recreate the invisible mouse cursor.
      */
-    if (gui.blank_pointer != NULL)
-#if GTK_CHECK_VERSION(3,0,0)
-	g_object_unref(G_OBJECT(gui.blank_pointer));
-#else
-	gdk_cursor_unref(gui.blank_pointer);
-#endif
+    ಆದರೆ (gui.blank_ಸೂಚಕ != ಖಾಲಿ)
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+	g_object_unref(G_OBJECT(gui.blank_ಸೂಚಕ));
+#ಇಲ್ಲದಿದ್ದರೆ
+	gdk_cursor_unref(gui.blank_ಸೂಚಕ);
+#ಆದರೆ_ಅಂತ್ಯ
 
-    gui.blank_pointer = create_blank_pointer();
+    gui.blank_ಸೂಚಕ = create_blank_ಸೂಚಕ();
 
-    if (gui.pointer_hidden && gtk_widget_get_window(gui.drawarea) != NULL)
-	gdk_window_set_cursor(gtk_widget_get_window(gui.drawarea),
-		gui.blank_pointer);
+    ಆದರೆ (gui.ಸೂಚಕ_hidden && gtk_widget_get_ಕಿಟಕಿ(gui.drawarea) != ಖಾಲಿ)
+	gdk_ಕಿಟಕಿ_ಗಣ_cursor(gtk_widget_get_ಕಿಟಕಿ(gui.drawarea),
+		gui.blank_ಸೂಚಕ);
 
     /*
      * Create a new PangoContext for this screen, and initialize it
      * with the current font if necessary.
      */
-    if (gui.text_context != NULL)
-	g_object_unref(gui.text_context);
+    ಆದರೆ (gui.ಪಠ್ಯ_context != ಖಾಲಿ)
+	g_object_unref(gui.ಪಠ್ಯ_context);
 
-    gui.text_context = gtk_widget_create_pango_context(widget);
-    pango_context_set_base_dir(gui.text_context, PANGO_DIRECTION_LTR);
+    gui.ಪಠ್ಯ_context = gtk_widget_create_pango_context(widget);
+    pango_context_ಗಣ_ತಳ_dir(gui.ಪಠ್ಯ_context, PANGO_DIRECTION_LTR);
 
-    if (gui.norm_font != NULL)
+    ಆದರೆ (gui.norm_font != ಖಾಲಿ)
     {
 	gui_mch_init_font(p_guifont, FALSE);
-	gui_set_shellsize(TRUE, FALSE, RESIZE_BOTH);
+	gui_ಗಣ_shellsize(TRUE, FALSE, RESIZE_BOTH);
     }
 }
 
-    static gboolean
-mainwin_state_event_cb(GtkWidget *widget UNUSED,
-		       GdkEventWindowState *event,
-		       gpointer user_data UNUSED)
+    ಸ್ಥಿರ gboolean
+mainwin_state_event_cb(GtkWidget *widget ಬಳಸದ,
+		       Gdk_Event_ಕಿಟಕಿ_State *event,
+		       gpointer user_ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    if (event->new_window_state & GDK_WINDOW_STATE_FULLSCREEN)
+    ಆದರೆ (event->new_ಕಿಟಕಿ_state & GDK_ಕಿಟಕಿ_STATE_FULLSCREEN)
 	// To redraw the text area when switching to fullscreen mode, we will
 	// reuse the `gui_focus_change` method.
 	gui_focus_change(TRUE);
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 /*
@@ -2907,115 +2907,115 @@ mainwin_state_event_cb(GtkWidget *widget UNUSED,
  * Don't try to set any VIM scrollbar sizes anywhere here. I'm relying on the
  * fact that the main VIM engine doesn't take them into account anywhere.
  */
-    static void
-drawarea_realize_cb(GtkWidget *widget, gpointer data UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+drawarea_realize_cb(GtkWidget *widget, gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
     GtkWidget *sbar;
-    GtkAllocation allocation;
+    Gtk_ಹಂಚಿಕೆ ಹಂಚಿಕೆ;
 
-#ifdef FEAT_XIM
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XIM
     xim_init();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     gui_mch_new_colors();
-#if GTK_CHECK_VERSION(3,0,0)
-    gui.surface = gdk_window_create_similar_surface(
-	    gtk_widget_get_window(widget),
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    gui.surface = gdk_ಕಿಟಕಿ_create_similar_surface(
+	    gtk_widget_get_ಕಿಟಕಿ(widget),
 	    GUI_GTK_SURFACE_CONTENT,
-	    gtk_widget_get_allocated_width(widget),
-	    gtk_widget_get_allocated_height(widget));
-#else
-    gui.text_gc = gdk_gc_new(gui.drawarea->window);
-#endif
+	    gtk_widget_get_allocated_ಅಗಲ(widget),
+	    gtk_widget_get_allocated_ಎತ್ತರ(widget));
+#ಇಲ್ಲದಿದ್ದರೆ
+    gui.ಪಠ್ಯ_gc = gdk_gc_new(gui.drawarea->ಕಿಟಕಿ_2);
+#ಆದರೆ_ಅಂತ್ಯ
 
-    gui.blank_pointer = create_blank_pointer();
-    if (gui.pointer_hidden)
-	gdk_window_set_cursor(gtk_widget_get_window(widget), gui.blank_pointer);
+    gui.blank_ಸೂಚಕ = create_blank_ಸೂಚಕ();
+    ಆದರೆ (gui.ಸೂಚಕ_hidden)
+	gdk_ಕಿಟಕಿ_ಗಣ_cursor(gtk_widget_get_ಕಿಟಕಿ(widget), gui.blank_ಸೂಚಕ);
 
     // get the actual size of the scrollbars, if they are realized
-    sbar = firstwin->w_scrollbars[SBAR_LEFT].id;
-    if (!sbar || (!gui.which_scrollbars[SBAR_LEFT]
-				    && firstwin->w_scrollbars[SBAR_RIGHT].id))
-	sbar = firstwin->w_scrollbars[SBAR_RIGHT].id;
-    gtk_widget_get_allocation(sbar, &allocation);
-    if (sbar && gtk_widget_get_realized(sbar) && allocation.width)
-	gui.scrollbar_width = allocation.width;
+    sbar = firstwin->w_scrollbars[SBAR_ಎಡ].id;
+    ಆದರೆ (!sbar || (!gui.which_scrollbars[SBAR_ಎಡ]
+				    && firstwin->w_scrollbars[SBAR_ಬಲ].id))
+	sbar = firstwin->w_scrollbars[SBAR_ಬಲ].id;
+    gtk_widget_get_ಹಂಚಿಕೆ(sbar, &ಹಂಚಿಕೆ);
+    ಆದರೆ (sbar && gtk_widget_get_realized(sbar) && ಹಂಚಿಕೆ.ಅಗಲ)
+	gui.scrollbar_ಅಗಲ = ಹಂಚಿಕೆ.ಅಗಲ;
 
     sbar = gui.bottom_sbar.id;
-    if (sbar && gtk_widget_get_realized(sbar) && allocation.height)
-	gui.scrollbar_height = allocation.height;
+    ಆದರೆ (sbar && gtk_widget_get_realized(sbar) && ಹಂಚಿಕೆ.ಎತ್ತರ)
+	gui.scrollbar_ಎತ್ತರ = ಹಂಚಿಕೆ.ಎತ್ತರ;
 }
 
 /*
  * Properly clean up on shutdown.
  */
-    static void
-drawarea_unrealize_cb(GtkWidget *widget UNUSED, gpointer data UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+drawarea_unrealize_cb(GtkWidget *widget ಬಳಸದ, gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
     // Don't write messages to the GUI anymore
-    full_screen = FALSE;
+    ತುಂಬಿದ_screen = FALSE;
 
-#ifdef FEAT_XIM
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XIM
     im_shutdown();
-#endif
-    if (gui.ascii_glyphs != NULL)
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (gui.ascii_glyphs != ಖಾಲಿ)
     {
 	pango_glyph_string_free(gui.ascii_glyphs);
-	gui.ascii_glyphs = NULL;
+	gui.ascii_glyphs = ಖಾಲಿ;
     }
-    if (gui.ascii_font != NULL)
+    ಆದರೆ (gui.ascii_font != ಖಾಲಿ)
     {
 	g_object_unref(gui.ascii_font);
-	gui.ascii_font = NULL;
+	gui.ascii_font = ಖಾಲಿ;
     }
-    g_object_unref(gui.text_context);
-    gui.text_context = NULL;
+    g_object_unref(gui.ಪಠ್ಯ_context);
+    gui.ಪಠ್ಯ_context = ಖಾಲಿ;
 
-#if GTK_CHECK_VERSION(3,0,0)
-    if (gui.surface != NULL)
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    ಆದರೆ (gui.surface != ಖಾಲಿ)
     {
 	cairo_surface_destroy(gui.surface);
-	gui.surface = NULL;
+	gui.surface = ಖಾಲಿ;
     }
-#else
-    g_object_unref(gui.text_gc);
-    gui.text_gc = NULL;
-#endif
+#ಇಲ್ಲದಿದ್ದರೆ
+    g_object_unref(gui.ಪಠ್ಯ_gc);
+    gui.ಪಠ್ಯ_gc = ಖಾಲಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if GTK_CHECK_VERSION(3,0,0)
-    g_object_unref(G_OBJECT(gui.blank_pointer));
-#else
-    gdk_cursor_unref(gui.blank_pointer);
-#endif
-    gui.blank_pointer = NULL;
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    g_object_unref(G_OBJECT(gui.blank_ಸೂಚಕ));
+#ಇಲ್ಲದಿದ್ದರೆ
+    gdk_cursor_unref(gui.blank_ಸೂಚಕ);
+#ಆದರೆ_ಅಂತ್ಯ
+    gui.blank_ಸೂಚಕ = ಖಾಲಿ;
 }
 
-#if GTK_CHECK_VERSION(3,22,2)
-    static void
-drawarea_style_updated_cb(GtkWidget *widget UNUSED,
-			 gpointer data UNUSED)
-#else
-    static void
-drawarea_style_set_cb(GtkWidget	*widget UNUSED,
-		      GtkStyle	*previous_style UNUSED,
-		      gpointer	data UNUSED)
-#endif
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,22,2)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+drawarea_style_updated_cb(GtkWidget *widget ಬಳಸದ,
+			 gpointer ದತ್ತಾಂಶ ಬಳಸದ)
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಸ್ಥಿರ ಶೂನ್ಯ
+drawarea_style_ಗಣ_cb(GtkWidget	*widget ಬಳಸದ,
+		      GtkStyle	*ಹಿಂದಿನ_style ಬಳಸದ,
+		      gpointer	ದತ್ತಾಂಶ ಬಳಸದ)
+#ಆದರೆ_ಅಂತ್ಯ
 {
     gui_mch_new_colors();
 }
 
-#if GTK_CHECK_VERSION(3,0,0)
-    static gboolean
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    ಸ್ಥಿರ gboolean
 drawarea_configure_event_cb(GtkWidget	      *widget,
 			    GdkEventConfigure *event,
-			    gpointer	       data UNUSED)
+			    gpointer	       ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    static int cur_width = 0;
-    static int cur_height = 0;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ cur_ಅಗಲ = 0;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ cur_ಎತ್ತರ = 0;
 
     g_return_val_if_fail(event
-	    && event->width >= 1 && event->height >= 1, TRUE);
+	    && event->ಅಗಲ >= 1 && event->ಎತ್ತರ >= 1, TRUE);
 
-# if GTK_CHECK_VERSION(3,22,2) && !GTK_CHECK_VERSION(3,22,4)
+# ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,22,2) && !GTK_CHECK_ಆವೃತ್ತಿ(3,22,4)
     // As of 3.22.2, GdkWindows have started distributing configure events to
     // their "native" children (https://git.gnome.org/browse/gtk+/commit/?h=gtk-3-22&id=12579fe71b3b8f79eb9c1b80e429443bcc437dd0).
     //
@@ -3040,83 +3040,83 @@ drawarea_configure_event_cb(GtkWidget	      *widget,
     // After a few weeks later, the GdkWindow change mentioned above was
     // reverted (https://git.gnome.org/browse/gtk+/commit/?h=gtk-3-22&id=f70039cb9603a02d2369fec4038abf40a1711155).
     // The corresponding official release is 3.22.4.
-    if (event->send_event == FALSE)
-	return TRUE;
+    ಆದರೆ (event->send_event == FALSE)
+	ಹಿಂತಿರುಗಿ TRUE;
 # endif
 
-    if (event->width == cur_width && event->height == cur_height)
-	return TRUE;
+    ಆದರೆ (event->ಅಗಲ == cur_ಅಗಲ && event->ಎತ್ತರ == cur_ಎತ್ತರ)
+	ಹಿಂತಿರುಗಿ TRUE;
 
-    cur_width = event->width;
-    cur_height = event->height;
+    cur_ಅಗಲ = event->ಅಗಲ;
+    cur_ಎತ್ತರ = event->ಎತ್ತರ;
 
-    if (gui.surface != NULL)
+    ಆದರೆ (gui.surface != ಖಾಲಿ)
 	cairo_surface_destroy(gui.surface);
 
-    gui.surface = gdk_window_create_similar_surface(
-	    gtk_widget_get_window(widget),
+    gui.surface = gdk_ಕಿಟಕಿ_create_similar_surface(
+	    gtk_widget_get_ಕಿಟಕಿ(widget),
 	    GUI_GTK_SURFACE_CONTENT,
-	    event->width, event->height);
+	    event->ಅಗಲ, event->ಎತ್ತರ);
 
-    gtk_widget_queue_draw(widget);
+    gtk_widget_ಸರತಿ_draw(widget);
 
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Callback routine for the "delete_event" signal on the toplevel window.
  * Tries to vim gracefully, or refuses to exit with changed buffers.
  */
-    static gint
-delete_event_cb(GtkWidget *widget UNUSED,
-		GdkEventAny *event UNUSED,
-		gpointer data UNUSED)
+    ಸ್ಥಿರ gint
+delete_event_cb(GtkWidget *widget ಬಳಸದ,
+		GdkEventAny *event ಬಳಸದ,
+		gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
     gui_shell_closed();
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
-#if defined(FEAT_MENU) || defined(FEAT_TOOLBAR) || defined(FEAT_GUI_TABLINE)
-    static int
-get_item_dimensions(GtkWidget *widget, GtkOrientation orientation)
+#ಆದರೆ defined(FEAT_MENU) || defined(FEAT_TOOLBAR) || defined(FEAT_GUI_TABLINE)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+get_ಅಂಶ_dimensions(GtkWidget *widget, GtkOrientation orientation)
 {
 # ifdef FEAT_GUI_GNOME
-    GtkOrientation item_orientation = GTK_ORIENTATION_HORIZONTAL;
+    GtkOrientation ಅಂಶ_orientation = GTK_ORIENTATION_HORIZONTAL;
 
-    if (using_gnome && widget != NULL)
+    ಆದರೆ (using_gnome && widget != ಖಾಲಿ)
     {
-	GtkWidget *parent;
-	BonoboDockItem *dockitem;
+	GtkWidget *ಪೋಷಕ;
+	Bonobo_Dock_ಅಂಶ *dockitem;
 
-	parent	 = gtk_widget_get_parent(widget);
-	if (G_TYPE_FROM_INSTANCE(parent) == BONOBO_TYPE_DOCK_ITEM)
+	ಪೋಷಕ	 = gtk_widget_get_ಪೋಷಕ(widget);
+	ಆದರೆ (G_TYPE_FROM_INSTANCE(ಪೋಷಕ) == BONOBO_TYPE_DOCK_ಅಂಶ)
 	{
 	    // Only menu & toolbar are dock items.  Could tabline be?
 	    // Seem to be only the 2 defined in GNOME
-	    widget = parent;
-	    dockitem = BONOBO_DOCK_ITEM(widget);
+	    widget = ಪೋಷಕ;
+	    dockitem = BONOBO_DOCK_ಅಂಶ(widget);
 
-	    if (dockitem == NULL || dockitem->is_floating)
-		return 0;
-	    item_orientation = bonobo_dock_item_get_orientation(dockitem);
+	    ಆದರೆ (dockitem == ಖಾಲಿ || dockitem->is_floating)
+		ಹಿಂತಿರುಗಿ 0;
+	    ಅಂಶ_orientation = bonobo_dock_ಅಂಶ_get_orientation(dockitem);
 	}
     }
-# else
-#  define item_orientation GTK_ORIENTATION_HORIZONTAL
+# ಇಲ್ಲದಿದ್ದರೆ
+#  define ಅಂಶ_orientation GTK_ORIENTATION_HORIZONTAL
 # endif
 
-    if (widget != NULL
-	    && item_orientation == orientation
+    ಆದರೆ (widget != ಖಾಲಿ
+	    && ಅಂಶ_orientation == orientation
 	    && gtk_widget_get_realized(widget)
 	    && gtk_widget_get_visible(widget))
     {
-# if GTK_CHECK_VERSION(3,0,0) || !defined(FEAT_GUI_GNOME)
-	GtkAllocation allocation;
+# ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0) || !defined(FEAT_GUI_GNOME)
+	Gtk_ಹಂಚಿಕೆ ಹಂಚಿಕೆ;
 
-	gtk_widget_get_allocation(widget, &allocation);
-	if (allocation.height > 1)
-	    return allocation.height;
+	gtk_widget_get_ಹಂಚಿಕೆ(widget, &ಹಂಚಿಕೆ);
+	ಆದರೆ (ಹಂಚಿಕೆ.ಎತ್ತರ > 1)
+	    ಹಿಂತಿರುಗಿ ಹಂಚಿಕೆ.ಎತ್ತರ;
 
 	// Allocation hasn't been updated yet (widget just became visible,
 	// e.g. tab bar shown asynchronously on Wayland).  Query the preferred
@@ -3124,69 +3124,69 @@ get_item_dimensions(GtkWidget *widget, GtkOrientation orientation)
 	// runs.  Use the maximum of minimum and natural height: GTK may
 	// allocate min_h even when natural_h is smaller (e.g. GtkNotebook
 	// tab bar has min_h > natural_h due to CSS).
-#  if GTK_CHECK_VERSION(3,0,0)
+#  ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
 	{
 	    gint min_h = 0, natural_h = 0;
 
-	    gtk_widget_get_preferred_height(widget, &min_h, &natural_h);
-	    return MAX(min_h, natural_h);
+	    gtk_widget_get_preferred_ಎತ್ತರ(widget, &min_h, &natural_h);
+	    ಹಿಂತಿರುಗಿ MAX(min_h, natural_h);
 	}
-#  else
-	return allocation.height;
+#  ಇಲ್ಲದಿದ್ದರೆ
+	ಹಿಂತಿರುಗಿ ಹಂಚಿಕೆ.ಎತ್ತರ;
 #  endif
-# else
-	if (orientation == GTK_ORIENTATION_HORIZONTAL)
-	    return widget->allocation.height;
-	else
-	    return widget->allocation.width;
+# ಇಲ್ಲದಿದ್ದರೆ
+	ಆದರೆ (orientation == GTK_ORIENTATION_HORIZONTAL)
+	    ಹಿಂತಿರುಗಿ widget->ಹಂಚಿಕೆ.ಎತ್ತರ;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಹಿಂತಿರುಗಿ widget->ಹಂಚಿಕೆ.ಅಗಲ;
 # endif
     }
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    static int
-get_menu_tool_width(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+get_menu_tool_ಅಗಲ(ಶೂನ್ಯ)
 {
-    int width = 0;
+    ಪೂರ್ಣಾಂಕ ಅಗಲ = 0;
 
-#ifdef FEAT_GUI_GNOME // these are never vertical without GNOME
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_GNOME // these are never vertical without GNOME
 # ifdef FEAT_MENU
-    width += get_item_dimensions(gui.menubar, GTK_ORIENTATION_VERTICAL);
+    ಅಗಲ += get_ಅಂಶ_dimensions(gui.menubar, GTK_ORIENTATION_VERTICAL);
 # endif
 # ifdef FEAT_TOOLBAR
-    width += get_item_dimensions(gui.toolbar, GTK_ORIENTATION_VERTICAL);
+    ಅಗಲ += get_ಅಂಶ_dimensions(gui.toolbar, GTK_ORIENTATION_VERTICAL);
 # endif
 # ifdef FEAT_GUI_TABLINE
-    if (gui.tabline != NULL)
-	width += get_item_dimensions(gui.tabline, GTK_ORIENTATION_VERTICAL);
+    ಆದರೆ (gui.tabline != ಖಾಲಿ)
+	ಅಗಲ += get_ಅಂಶ_dimensions(gui.tabline, GTK_ORIENTATION_VERTICAL);
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return width;
+    ಹಿಂತಿರುಗಿ ಅಗಲ;
 }
 
-    static int
-get_menu_tool_height(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+get_menu_tool_ಎತ್ತರ(ಶೂನ್ಯ)
 {
-    int height = 0;
+    ಪೂರ್ಣಾಂಕ ಎತ್ತರ = 0;
 
-#ifdef FEAT_MENU
-    height += get_item_dimensions(gui.menubar, GTK_ORIENTATION_HORIZONTAL);
-#endif
-#ifdef FEAT_TOOLBAR
-    height += get_item_dimensions(gui.toolbar, GTK_ORIENTATION_HORIZONTAL);
-#endif
-#ifdef FEAT_GUI_TABLINE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MENU
+    ಎತ್ತರ += get_ಅಂಶ_dimensions(gui.menubar, GTK_ORIENTATION_HORIZONTAL);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TOOLBAR
+    ಎತ್ತರ += get_ಅಂಶ_dimensions(gui.toolbar, GTK_ORIENTATION_HORIZONTAL);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_TABLINE
     // Only include the tabline height when tabs are actually shown.  After
     // gtk_notebook_set_show_tabs(FALSE) the widget allocation is not updated
     // until the GTK main loop runs, so reading it would give a stale value.
-    if (gui.tabline != NULL
+    ಆದರೆ (gui.tabline != ಖಾಲಿ
 	    && gtk_notebook_get_show_tabs(GTK_NOTEBOOK(gui.tabline)))
-	height += get_item_dimensions(gui.tabline, GTK_ORIENTATION_HORIZONTAL);
-#endif
+	ಎತ್ತರ += get_ಅಂಶ_dimensions(gui.tabline, GTK_ORIENTATION_HORIZONTAL);
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return height;
+    ಹಿಂತಿರುಗಿ ಎತ್ತರ;
 }
 
 // This controls whether we can set the real window hints at
@@ -3194,356 +3194,356 @@ get_menu_tool_height(void)
 // 0 = normal processing (default)
 // 1 = init. hints set, no-one's tried to reset since last check
 // 2 = init. hints set, attempt made to change hints
-static int init_window_hints_state = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ init_ಕಿಟಕಿ_hints_state = 0;
 
-    static void
-update_window_manager_hints(int force_width, int force_height)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+update_ಕಿಟಕಿ_manager_hints(ಪೂರ್ಣಾಂಕ force_ಅಗಲ, ಪೂರ್ಣಾಂಕ force_ಎತ್ತರ)
 {
-    static int old_width  = 0;
-    static int old_height = 0;
-    static int old_min_width  = 0;
-    static int old_min_height = 0;
-    static int old_char_width  = 0;
-    static int old_char_height = 0;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ old_ಅಗಲ  = 0;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ old_ಎತ್ತರ = 0;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ old_min_ಅಗಲ  = 0;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ old_min_ಎತ್ತರ = 0;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ old_char_ಅಗಲ  = 0;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ old_char_ಎತ್ತರ = 0;
 
-    int width;
-    int height;
-    int min_width;
-    int min_height;
+    ಪೂರ್ಣಾಂಕ ಅಗಲ;
+    ಪೂರ್ಣಾಂಕ ಎತ್ತರ;
+    ಪೂರ್ಣಾಂಕ min_ಅಗಲ;
+    ಪೂರ್ಣಾಂಕ min_ಎತ್ತರ;
 
     // At start-up, don't try to set the hints until the initial
     // values have been used (those that dictate our initial size)
     // Let forced (i.e., correct) values through always.
-    if (!(force_width && force_height)  &&  init_window_hints_state > 0)
+    ಆದರೆ (!(force_ಅಗಲ && force_ಎತ್ತರ)  &&  init_ಕಿಟಕಿ_hints_state > 0)
     {
 	// Don't do it!
-	init_window_hints_state = 2;
-	return;
+	init_ಕಿಟಕಿ_hints_state = 2;
+	ಹಿಂತಿರುಗಿ;
     }
 
     // This also needs to be done when the main window isn't there yet,
     // otherwise the hints don't work.
-    width  = gui_get_base_width();
-    height = gui_get_base_height();
-#ifdef FEAT_MENU
-    height += tabline_height() * gui.char_height;
-#endif
-    width  += get_menu_tool_width();
-    height += get_menu_tool_height();
+    ಅಗಲ  = gui_get_ತಳ_ಅಗಲ();
+    ಎತ್ತರ = gui_get_ತಳ_ಎತ್ತರ();
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MENU
+    ಎತ್ತರ += tabline_ಎತ್ತರ() * gui.char_ಎತ್ತರ;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಅಗಲ  += get_menu_tool_ಅಗಲ();
+    ಎತ್ತರ += get_menu_tool_ಎತ್ತರ();
 
     // GtkSockets use GtkPlug's [gui,mainwin] min-size hints to determine
     // their actual widget size.  When we set our size ourselves (e.g.,
     // 'set columns=' or init. -geom) we briefly set the min. to the size
     // we wish to be instead of the legitimate minimum so that we actually
     // resize correctly.
-    if (force_width && force_height)
+    ಆದರೆ (force_ಅಗಲ && force_ಎತ್ತರ)
     {
-	min_width  = force_width;
-	min_height = force_height;
+	min_ಅಗಲ  = force_ಅಗಲ;
+	min_ಎತ್ತರ = force_ಎತ್ತರ;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	min_width  = width  + MIN_COLUMNS * gui.char_width;
-	min_height = height + MIN_LINES   * gui.char_height;
+	min_ಅಗಲ  = ಅಗಲ  + MIN_COLUMNS * gui.char_ಅಗಲ;
+	min_ಎತ್ತರ = ಎತ್ತರ + MIN_ಸಾಲುಗಳು   * gui.char_ಎತ್ತರ;
     }
 
     // Avoid an expose event when the size didn't change.
-    if (width != old_width
-	    || height != old_height
-	    || min_width != old_min_width
-	    || min_height != old_min_height
-	    || gui.char_width != old_char_width
-	    || gui.char_height != old_char_height)
+    ಆದರೆ (ಅಗಲ != old_ಅಗಲ
+	    || ಎತ್ತರ != old_ಎತ್ತರ
+	    || min_ಅಗಲ != old_min_ಅಗಲ
+	    || min_ಎತ್ತರ != old_min_ಎತ್ತರ
+	    || gui.char_ಅಗಲ != old_char_ಅಗಲ
+	    || gui.char_ಎತ್ತರ != old_char_ಎತ್ತರ)
     {
 	GdkGeometry	geometry;
-	GdkWindowHints	geometry_mask;
+	Gdk_ಕಿಟಕಿ_Hints	geometry_ಮುಖವಾಡ;
 
-	geometry.width_inc   = gui.char_width;
-	geometry.height_inc  = gui.char_height;
-	geometry.base_width  = width;
-	geometry.base_height = height;
-	geometry.min_width   = min_width;
-	geometry.min_height  = min_height;
-	geometry_mask	     = GDK_HINT_BASE_SIZE|GDK_HINT_RESIZE_INC
-			       |GDK_HINT_MIN_SIZE;
+	geometry.ಅಗಲ_inc   = gui.char_ಅಗಲ;
+	geometry.ಎತ್ತರ_inc  = gui.char_ಎತ್ತರ;
+	geometry.ತಳ_ಅಗಲ  = ಅಗಲ;
+	geometry.ತಳ_ಎತ್ತರ = ಎತ್ತರ;
+	geometry.min_ಅಗಲ   = min_ಅಗಲ;
+	geometry.min_ಎತ್ತರ  = min_ಎತ್ತರ;
+	geometry_ಮುಖವಾಡ	     = GDK_HINT_ತಳ_ಗಾತ್ರ|GDK_HINT_RESIZE_INC
+			       |GDK_HINT_MIN_ಗಾತ್ರ;
 	// Using gui.formwin as geometry widget doesn't work as expected
 	// with GTK+ 2 -- dunno why.  Presumably all the resizing hacks
 	// in Vim confuse GTK+.  For GTK 3 the second argument should be NULL
 	// to make the width/height inc works, despite the docs saying
 	// something else.
-	gtk_window_set_geometry_hints(GTK_WINDOW(gui.mainwin), NULL,
-				      &geometry, geometry_mask);
-	old_width       = width;
-	old_height      = height;
-	old_min_width   = min_width;
-	old_min_height  = min_height;
-	old_char_width  = gui.char_width;
-	old_char_height = gui.char_height;
+	gtk_ಕಿಟಕಿ_ಗಣ_geometry_hints(GTK_ಕಿಟಕಿ(gui.mainwin), ಖಾಲಿ,
+				      &geometry, geometry_ಮುಖವಾಡ);
+	old_ಅಗಲ       = ಅಗಲ;
+	old_ಎತ್ತರ      = ಎತ್ತರ;
+	old_min_ಅಗಲ   = min_ಅಗಲ;
+	old_min_ಎತ್ತರ  = min_ಎತ್ತರ;
+	old_char_ಅಗಲ  = gui.char_ಅಗಲ;
+	old_char_ಎತ್ತರ = gui.char_ಎತ್ತರ;
     }
 }
 
-#if defined(FEAT_GUI_DARKTHEME)
-    void
-gui_mch_set_dark_theme(int dark)
+#ಆದರೆ defined(FEAT_GUI_DARKTHEME)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_dark_theme(ಪೂರ್ಣಾಂಕ dark)
 {
-# if GTK_CHECK_VERSION(3,0,0)
+# ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
     GtkSettings *gtk_settings;
 
     gtk_settings = gtk_settings_get_for_screen(gdk_screen_get_default());
-    g_object_set(gtk_settings, "gtk-application-prefer-dark-theme", (gboolean)dark, NULL);
+    g_object_ಗಣ(gtk_settings, "gtk-application-prefer-dark-theme", (gboolean)dark, ಖಾಲಿ);
 # endif
 }
-#endif // FEAT_GUI_DARKTHEME
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_GUI_DARKTHEME
 
-#ifdef FEAT_TOOLBAR
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TOOLBAR
 
 /*
  * This extra effort wouldn't be necessary if we only used stock icons in the
  * toolbar, as we do for all builtin icons.  But user-defined toolbar icons
  * shouldn't be treated differently, thus we do need this.
  */
-    static void
-icon_size_changed_foreach(GtkWidget *widget, gpointer user_data)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+icon_ಗಾತ್ರ_ಬದಲಾಯಿತು_foreach(GtkWidget *widget, gpointer user_ದತ್ತಾಂಶ)
 {
-    if (GTK_IS_IMAGE(widget))
+    ಆದರೆ (GTK_IS_IMAGE(widget))
     {
 	GtkImage *image = (GtkImage *)widget;
 
-# if GTK_CHECK_VERSION(3,10,0)
-	if (gtk_image_get_storage_type(image) == GTK_IMAGE_ICON_NAME)
+# ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,10,0)
+	ಆದರೆ (gtk_image_get_storage_type(image) == GTK_IMAGE_ICON_NAME)
 	{
-	    const GtkIconSize icon_size = GPOINTER_TO_INT(user_data);
-	    const gchar *icon_name;
+	    ಸ್ಥಿರಾಂಕ Gtk_Icon_ಗಾತ್ರ icon_ಗಾತ್ರ = GPOINTER_ಗಮ್ಯ_INT(user_ದತ್ತಾಂಶ);
+	    ಸ್ಥಿರಾಂಕ gchar *icon_name;
 
-	    gtk_image_get_icon_name(image, &icon_name, NULL);
+	    gtk_image_get_icon_name(image, &icon_name, ಖಾಲಿ);
 	    image = (GtkImage *)gtk_image_new_from_icon_name(
-							 icon_name, icon_size);
+							 icon_name, icon_ಗಾತ್ರ);
 	}
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 	// User-defined icons are stored in a GtkIconSet
-	if (gtk_image_get_storage_type(image) == GTK_IMAGE_ICON_SET)
+	ಆದರೆ (gtk_image_get_storage_type(image) == GTK_IMAGE_ICON_ಗಣ)
 	{
-	    GtkIconSet	*icon_set;
-	    GtkIconSize	icon_size;
+	    Gtk_Icon_ಗಣ	*icon_ಗಣ;
+	    Gtk_Icon_ಗಾತ್ರ	icon_ಗಾತ್ರ;
 
-	    gtk_image_get_icon_set(image, &icon_set, &icon_size);
-	    icon_size = (GtkIconSize)(long)user_data;
+	    gtk_image_get_icon_ಗಣ(image, &icon_ಗಣ, &icon_ಗಾತ್ರ);
+	    icon_ಗಾತ್ರ = (Gtk_Icon_ಗಾತ್ರ)(ದೀರ್ಘ)user_ದತ್ತಾಂಶ;
 
-	    gtk_icon_set_ref(icon_set);
-	    gtk_image_set_from_icon_set(image, icon_set, icon_size);
-	    gtk_icon_set_unref(icon_set);
+	    gtk_icon_ಗಣ_ref(icon_ಗಣ);
+	    gtk_image_ಗಣ_from_icon_ಗಣ(image, icon_ಗಣ, icon_ಗಾತ್ರ);
+	    gtk_icon_ಗಣ_unref(icon_ಗಣ);
 	}
 # endif
     }
-    else if (GTK_IS_CONTAINER(widget))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (GTK_IS_CONTAINER(widget))
     {
 	gtk_container_foreach((GtkContainer *)widget,
-			      &icon_size_changed_foreach,
-			      user_data);
+			      &icon_ಗಾತ್ರ_ಬದಲಾಯಿತು_foreach,
+			      user_ದತ್ತಾಂಶ);
     }
 }
 
-    static void
-set_toolbar_style(GtkToolbar *toolbar)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_toolbar_style(GtkToolbar *toolbar)
 {
     GtkToolbarStyle style;
-    GtkIconSize	    size;
-    GtkIconSize	    oldsize;
+    Gtk_Icon_ಗಾತ್ರ	    ಗಾತ್ರ_2;
+    Gtk_Icon_ಗಾತ್ರ	    oldsize;
 
-    if ((toolbar_flags & (TOOLBAR_TEXT | TOOLBAR_ICONS | TOOLBAR_HORIZ))
-		      == (TOOLBAR_TEXT | TOOLBAR_ICONS | TOOLBAR_HORIZ))
+    ಆದರೆ ((toolbar_flags & (TOOLBAR_ಪಠ್ಯ | TOOLBAR_ICONS | TOOLBAR_HORIZ))
+		      == (TOOLBAR_ಪಠ್ಯ | TOOLBAR_ICONS | TOOLBAR_HORIZ))
 	style = GTK_TOOLBAR_BOTH_HORIZ;
-    else if ((toolbar_flags & (TOOLBAR_TEXT | TOOLBAR_ICONS))
-		      == (TOOLBAR_TEXT | TOOLBAR_ICONS))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((toolbar_flags & (TOOLBAR_ಪಠ್ಯ | TOOLBAR_ICONS))
+		      == (TOOLBAR_ಪಠ್ಯ | TOOLBAR_ICONS))
 	style = GTK_TOOLBAR_BOTH;
-    else if (toolbar_flags & TOOLBAR_TEXT)
-	style = GTK_TOOLBAR_TEXT;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (toolbar_flags & TOOLBAR_ಪಠ್ಯ)
+	style = GTK_TOOLBAR_ಪಠ್ಯ;
+    ಇಲ್ಲದಿದ್ದರೆ
 	style = GTK_TOOLBAR_ICONS;
 
-    gtk_toolbar_set_style(toolbar, style);
-# if !GTK_CHECK_VERSION(3,0,0)
-    gtk_toolbar_set_tooltips(toolbar, (toolbar_flags & TOOLBAR_TOOLTIPS) != 0);
+    gtk_toolbar_ಗಣ_style(toolbar, style);
+# ಆದರೆ !GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    gtk_toolbar_ಗಣ_tooltips(toolbar, (toolbar_flags & TOOLBAR_TOOLTIPS) != 0);
 # endif
 
-    switch (tbis_flags)
+    ಆಯ್ಕೆ (tbis_flags)
     {
-	case TBIS_TINY:	    size = GTK_ICON_SIZE_MENU;		break;
-	case TBIS_SMALL:    size = GTK_ICON_SIZE_SMALL_TOOLBAR;	break;
-	case TBIS_MEDIUM:   size = GTK_ICON_SIZE_BUTTON;	break;
-	case TBIS_LARGE:    size = GTK_ICON_SIZE_LARGE_TOOLBAR;	break;
-	case TBIS_HUGE:     size = GTK_ICON_SIZE_DND;		break;
-	case TBIS_GIANT:    size = GTK_ICON_SIZE_DIALOG;	break;
-	default:	    size = GTK_ICON_SIZE_INVALID;	break;
+	ಸ್ಥಿತಿ TBIS_TINY:	    ಗಾತ್ರ_2 = GTK_ICON_ಗಾತ್ರ_MENU;		ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ TBIS_SMALL:    ಗಾತ್ರ_2 = GTK_ICON_ಗಾತ್ರ_SMALL_TOOLBAR;	ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ TBIS_MEDIUM:   ಗಾತ್ರ_2 = GTK_ICON_ಗಾತ್ರ_BUTTON;	ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ TBIS_LARGE:    ಗಾತ್ರ_2 = GTK_ICON_ಗಾತ್ರ_LARGE_TOOLBAR;	ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ TBIS_HUGE:     ಗಾತ್ರ_2 = GTK_ICON_ಗಾತ್ರ_DND;		ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ TBIS_GIANT:    ಗಾತ್ರ_2 = GTK_ICON_ಗಾತ್ರ_DIALOG;	ನಿಲ್ಲಿಸು;
+	ಪೂರ್ವನಿಯೋಜಿತ:	    ಗಾತ್ರ_2 = GTK_ICON_ಗಾತ್ರ_INVALID;	ನಿಲ್ಲಿಸು;
     }
-    oldsize = gtk_toolbar_get_icon_size(toolbar);
+    oldsize = gtk_toolbar_get_icon_ಗಾತ್ರ(toolbar);
 
-    if (size == GTK_ICON_SIZE_INVALID)
+    ಆದರೆ (ಗಾತ್ರ_2 == GTK_ICON_ಗಾತ್ರ_INVALID)
     {
 	// Let global user preferences decide the icon size.
-	gtk_toolbar_unset_icon_size(toolbar);
-	size = gtk_toolbar_get_icon_size(toolbar);
+	gtk_toolbar_unset_icon_ಗಾತ್ರ(toolbar);
+	ಗಾತ್ರ_2 = gtk_toolbar_get_icon_ಗಾತ್ರ(toolbar);
     }
-    if (size != oldsize)
+    ಆದರೆ (ಗಾತ್ರ_2 != oldsize)
     {
 	gtk_container_foreach(GTK_CONTAINER(toolbar),
-			      &icon_size_changed_foreach,
-			      GINT_TO_POINTER((int)size));
+			      &icon_ಗಾತ್ರ_ಬದಲಾಯಿತು_foreach,
+			      GINT_ಗಮ್ಯ_ಸೂಚಕ((ಪೂರ್ಣಾಂಕ)ಗಾತ್ರ_2));
     }
-    gtk_toolbar_set_icon_size(toolbar, size);
+    gtk_toolbar_ಗಣ_icon_ಗಾತ್ರ(toolbar, ಗಾತ್ರ_2);
 }
 
-#endif // FEAT_TOOLBAR
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_TOOLBAR
 
-#if defined(FEAT_GUI_TABLINE)
-static int ignore_tabline_evt = FALSE;
-static GtkWidget *tabline_menu;
-# if !GTK_CHECK_VERSION(3,0,0)
-static GtkTooltips *tabline_tooltip;
+#ಆದರೆ defined(FEAT_GUI_TABLINE)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ignore_tabline_evt = FALSE;
+ಸ್ಥಿರ GtkWidget *tabline_menu;
+# ಆದರೆ !GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+ಸ್ಥಿರ GtkTooltips *tabline_tooltip;
 # endif
-static int clicked_page;	    // page clicked in tab line
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ clicked_ಪುಟ;	    // page clicked in tab line
 
 /*
  * Handle selecting an item in the tab line popup menu.
  */
-    static void
-tabline_menu_handler(GtkMenuItem *item UNUSED, gpointer user_data)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+tabline_menu_handler(Gtk_Menu_ಅಂಶ *ಅಂಶ ಬಳಸದ, gpointer user_ದತ್ತಾಂಶ)
 {
     // Add the string cmd into input buffer
-    send_tabline_menu_event(clicked_page, (int)(long)user_data);
+    send_tabline_menu_event(clicked_ಪುಟ, (ಪೂರ್ಣಾಂಕ)(ದೀರ್ಘ)user_ದತ್ತಾಂಶ);
 }
 
-    static void
-add_tabline_menu_item(GtkWidget *menu, char_u *text, int resp)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಕೂಡಿಸು_tabline_menu_ಅಂಶ(GtkWidget *menu, char_u *ಪಠ್ಯ, ಪೂರ್ಣಾಂಕ resp)
 {
-    GtkWidget	*item;
-    char_u	*utf_text;
+    GtkWidget	*ಅಂಶ;
+    char_u	*utf_ಪಠ್ಯ;
 
-    utf_text = CONVERT_TO_UTF8(text);
-    item = gtk_menu_item_new_with_label((const char *)utf_text);
-    gtk_widget_show(item);
-    CONVERT_TO_UTF8_FREE(utf_text);
+    utf_ಪಠ್ಯ = CONVERT_ಗಮ್ಯ_UTF8(ಪಠ್ಯ);
+    ಅಂಶ = gtk_menu_ಅಂಶ_new_with_label((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)utf_ಪಠ್ಯ);
+    gtk_widget_show(ಅಂಶ);
+    CONVERT_ಗಮ್ಯ_UTF8_FREE(utf_ಪಠ್ಯ);
 
-    gtk_container_add(GTK_CONTAINER(menu), item);
-    g_signal_connect(G_OBJECT(item), "activate",
+    gtk_container_ಕೂಡಿಸು(GTK_CONTAINER(menu), ಅಂಶ);
+    g_signal_connect(G_OBJECT(ಅಂಶ), "activate",
 	    G_CALLBACK(tabline_menu_handler),
-	    GINT_TO_POINTER(resp));
+	    GINT_ಗಮ್ಯ_ಸೂಚಕ(resp));
 }
 
 /*
  * Create a menu for the tab line.
  */
-    static GtkWidget *
-create_tabline_menu(void)
+    ಸ್ಥಿರ GtkWidget *
+create_tabline_menu(ಶೂನ್ಯ)
 {
     GtkWidget *menu;
 
     menu = gtk_menu_new();
-    add_tabline_menu_item(menu, (char_u *)_("Close tab"), TABLINE_MENU_CLOSE);
-    add_tabline_menu_item(menu, (char_u *)_("New tab"), TABLINE_MENU_NEW);
-    add_tabline_menu_item(menu, (char_u *)_("Open Tab..."), TABLINE_MENU_OPEN);
+    ಕೂಡಿಸು_tabline_menu_ಅಂಶ(menu, (char_u *)_("Close tab"), TABLINE_MENU_CLOSE);
+    ಕೂಡಿಸು_tabline_menu_ಅಂಶ(menu, (char_u *)_("New tab"), TABLINE_MENU_NEW);
+    ಕೂಡಿಸು_tabline_menu_ಅಂಶ(menu, (char_u *)_("Open Tab..."), TABLINE_MENU_OPEN);
 
-    return menu;
+    ಹಿಂತಿರುಗಿ menu;
 }
 
-    static gboolean
+    ಸ್ಥಿರ gboolean
 on_tabline_menu(GtkWidget *widget, GdkEvent *event)
 {
     // Was this button press event ?
-    if (event->type == GDK_BUTTON_PRESS)
+    ಆದರೆ (event->type == GDK_BUTTON_PRESS)
     {
 	GdkEventButton *bevent = (GdkEventButton *)event;
-	int		x = bevent->x;
-	int		y = bevent->y;
+	ಪೂರ್ಣಾಂಕ		x = bevent->x;
+	ಪೂರ್ಣಾಂಕ		y = bevent->y;
 	GtkWidget	*tabwidget;
-	GdkWindow	*tabwin;
+	Gdk_ಕಿಟಕಿ	*tabwin;
 
 	// When ignoring events return TRUE so that the selected page doesn't
 	// change.
-	if (hold_gui_events || cmdwin_type != 0)
-	    return TRUE;
+	ಆದರೆ (hold_gui_events || cmdwin_type != 0)
+	    ಹಿಂತಿರುಗಿ TRUE;
 
-	tabwin = gui_gtk_window_at_position(gui.mainwin, &x, &y);
+	tabwin = gui_gtk_ಕಿಟಕಿ_at_position(gui.mainwin, &x, &y);
 
-	gdk_window_get_user_data(tabwin, (gpointer)&tabwidget);
-	clicked_page = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(tabwidget),
+	gdk_ಕಿಟಕಿ_get_user_ದತ್ತಾಂಶ(tabwin, (gpointer)&tabwidget);
+	clicked_ಪುಟ = GPOINTER_ಗಮ್ಯ_INT(g_object_get_ದತ್ತಾಂಶ(G_OBJECT(tabwidget),
 							 "tab_num"));
 
 	// If the event was generated for 3rd button popup the menu.
-	if (bevent->button == 3)
+	ಆದರೆ (bevent->button == 3)
 	{
-# if GTK_CHECK_VERSION(3,22,2)
+# ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,22,2)
 #  ifdef GDK_WINDOWING_WAYLAND
-	    if (gui.is_wayland)
+	    ಆದರೆ (gui.is_wayland)
 	    {
-		int x2, y2;
-		gui_gtk_get_pointer(gui.mainwin, &x2, &y2, NULL);
+		ಪೂರ್ಣಾಂಕ x2, y2;
+		gui_gtk_get_ಸೂಚಕ(gui.mainwin, &x2, &y2, ಖಾಲಿ);
 		gtk_menu_popup_at_rect(GTK_MENU(widget),
-			gtk_widget_get_window(gui.mainwin), &(GdkRectangle){x2, y2, 1, 1},
-			GDK_GRAVITY_SOUTH_WEST, GDK_GRAVITY_NORTH_WEST, NULL);
+			gtk_widget_get_ಕಿಟಕಿ(gui.mainwin), &(GdkRectangle){x2, y2, 1, 1},
+			GDK_GRAVITY_SOUTH_WEST, GDK_GRAVITY_NORTH_WEST, ಖಾಲಿ);
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 #  endif
-	    gtk_menu_popup_at_pointer(GTK_MENU(widget), event);
-# else
-	    gtk_menu_popup(GTK_MENU(widget), NULL, NULL, NULL, NULL,
-						bevent->button, bevent->time);
+	    gtk_menu_popup_at_ಸೂಚಕ(GTK_MENU(widget), event);
+# ಇಲ್ಲದಿದ್ದರೆ
+	    gtk_menu_popup(GTK_MENU(widget), ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ,
+						bevent->button, bevent->ಸಮಯ);
 # endif
 	    // We handled the event.
-	    return TRUE;
+	    ಹಿಂತಿರುಗಿ TRUE;
 	}
-	else if (bevent->button == 1)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (bevent->button == 1)
 	{
-	    if (clicked_page == 0)
+	    ಆದರೆ (clicked_ಪುಟ == 0)
 	    {
 		// Click after all tabs moves to next tab page.  When "x" is
 		// small guess it's the left button.
 		send_tabline_event(x < 50 ? -1 : 0);
 	    }
 	}
-	else if (bevent->button == 2)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (bevent->button == 2)
 	{
-	    if (clicked_page != 0)
+	    ಆದರೆ (clicked_ಪುಟ != 0)
 		// Middle mouse click on tabpage label closes that tab.
-		send_tabline_menu_event(clicked_page, TABLINE_MENU_CLOSE);
+		send_tabline_menu_event(clicked_ಪುಟ, TABLINE_MENU_CLOSE);
 	}
     }
 
     // We didn't handle the event.
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 /*
  * Handle selecting one of the tabs.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 on_select_tab(
-	GtkNotebook	*notebook UNUSED,
-	gpointer	*page UNUSED,
+	GtkNotebook	*notebook ಬಳಸದ,
+	gpointer	*ಪುಟ ಬಳಸದ,
 	gint		idx,
-	gpointer	data UNUSED)
+	gpointer	ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    if (!ignore_tabline_evt)
+    ಆದರೆ (!ignore_tabline_evt)
 	send_tabline_event(idx + 1);
 }
 
-# if GTK_CHECK_VERSION(2,10,0)
+# ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(2,10,0)
 /*
  * Handle reordering the tabs (using D&D).
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 on_tab_reordered(
-	GtkNotebook	*notebook UNUSED,
-	gpointer	*page UNUSED,
+	GtkNotebook	*notebook ಬಳಸದ,
+	gpointer	*ಪುಟ ಬಳಸದ,
 	gint		idx,
-	gpointer	data UNUSED)
+	gpointer	ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    if (ignore_tabline_evt)
-	return;
+    ಆದರೆ (ignore_tabline_evt)
+	ಹಿಂತಿರುಗಿ;
 
-    if ((tabpage_index(curtab) - 1) < idx)
+    ಆದರೆ ((tabpage_ಸೂಚ್ಯಂಕ(curtab) - 1) < idx)
 	tabpage_move(idx + 1);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	tabpage_move(idx);
 }
 # endif
@@ -3551,13 +3551,13 @@ on_tab_reordered(
 /*
  * Show or hide the tabline.
  */
-    void
-gui_mch_show_tabline(int showit)
+    ಶೂನ್ಯ
+gui_mch_show_tabline(ಪೂರ್ಣಾಂಕ showit)
 {
-    if (gui.tabline == NULL)
-	return;
+    ಆದರೆ (gui.tabline == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    if (!showit != !gtk_notebook_get_show_tabs(GTK_NOTEBOOK(gui.tabline)))
+    ಆದರೆ (!showit != !gtk_notebook_get_show_tabs(GTK_NOTEBOOK(gui.tabline)))
     {
 # ifdef TRACK_RESIZE_HISTORY
 	// When the tabline visibility changes, GTK defers the formwin
@@ -3566,17 +3566,17 @@ gui_mch_show_tabline(int showit)
 	// stale (discardable) entry once gui_mch_set_shellsize() records the
 	// new target size.
 	{
-	    int w, h;
+	    ಪೂರ್ಣಾಂಕ w, h;
 
-	    gtk_window_get_size(GTK_WINDOW(gui.mainwin), &w, &h);
+	    gtk_ಕಿಟಕಿ_get_ಗಾತ್ರ(GTK_ಕಿಟಕಿ(gui.mainwin), &w, &h);
 	    alloc_resize_hist(w, h, FALSE);
 	}
 # endif
 	// Note: this may cause a resize event
-	gtk_notebook_set_show_tabs(GTK_NOTEBOOK(gui.tabline), showit);
-	update_window_manager_hints(0, 0);
-	if (showit)
-	    gtk_widget_set_can_focus(GTK_WIDGET(gui.tabline), FALSE);
+	gtk_notebook_ಗಣ_show_tabs(GTK_NOTEBOOK(gui.tabline), showit);
+	update_ಕಿಟಕಿ_manager_hints(0, 0);
+	ಆದರೆ (showit)
+	    gtk_widget_ಗಣ_can_focus(GTK_WIDGET(gui.tabline), FALSE);
     }
 
     gui_mch_update();
@@ -3585,97 +3585,97 @@ gui_mch_show_tabline(int showit)
 /*
  * Return TRUE when tabline is displayed.
  */
-    int
-gui_mch_showing_tabline(void)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_showing_tabline(ಶೂನ್ಯ)
 {
-    return gui.tabline != NULL
+    ಹಿಂತಿರುಗಿ gui.tabline != ಖಾಲಿ
 		     && gtk_notebook_get_show_tabs(GTK_NOTEBOOK(gui.tabline));
 }
 
 /*
  * Update the labels of the tabline.
  */
-    void
-gui_mch_update_tabline(void)
+    ಶೂನ್ಯ
+gui_mch_update_tabline(ಶೂನ್ಯ)
 {
-    GtkWidget	    *page;
+    GtkWidget	    *ಪುಟ;
     GtkWidget	    *event_box;
     GtkWidget	    *label;
     tabpage_T	    *tp;
-    int		    nr = 0;
-    int		    tab_num;
-    int		    curtabidx = 0;
+    ಪೂರ್ಣಾಂಕ		    nr = 0;
+    ಪೂರ್ಣಾಂಕ		    tab_ಅಂಕೆ;
+    ಪೂರ್ಣಾಂಕ		    curtabidx = 0;
     char_u	    *labeltext;
 
-    if (gui.tabline == NULL)
-	return;
+    ಆದರೆ (gui.tabline == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     ignore_tabline_evt = TRUE;
 
     // Add a label for each tab page.  They all contain the same text area.
-    for (tp = first_tabpage; tp != NULL; tp = tp->tp_next, ++nr)
+    ಗಾಗಿ (tp = ಮೊದಲ_tabpage; tp != ಖಾಲಿ; tp = tp->tp_ಮುಂದಿನ, ++nr)
     {
-	if (tp == curtab)
+	ಆದರೆ (tp == curtab)
 	    curtabidx = nr;
 
-	tab_num = nr + 1;
+	tab_ಅಂಕೆ = nr + 1;
 
-	page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(gui.tabline), nr);
-	if (page == NULL)
+	ಪುಟ = gtk_notebook_get_nth_ಪುಟ(GTK_NOTEBOOK(gui.tabline), nr);
+	ಆದರೆ (ಪುಟ == ಖಾಲಿ)
 	{
 	    // Add notebook page
-# if GTK_CHECK_VERSION(3,2,0)
-	    page = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-	    gtk_box_set_homogeneous(GTK_BOX(page), FALSE);
-# else
-	    page = gtk_vbox_new(FALSE, 0);
+# ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,2,0)
+	    ಪುಟ = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+	    gtk_box_ಗಣ_homogeneous(GTK_BOX(ಪುಟ), FALSE);
+# ಇಲ್ಲದಿದ್ದರೆ
+	    ಪುಟ = gtk_vbox_new(FALSE, 0);
 # endif
-	    gtk_widget_show(page);
+	    gtk_widget_show(ಪುಟ);
 	    event_box = gtk_event_box_new();
 	    gtk_widget_show(event_box);
 	    label = gtk_label_new("-Empty-");
-# if !GTK_CHECK_VERSION(3,14,0)
-	    gtk_misc_set_padding(GTK_MISC(label), 2, 2);
+# ಆದರೆ !GTK_CHECK_ಆವೃತ್ತಿ(3,14,0)
+	    gtk_misc_ಗಣ_padding(GTK_MISC(label), 2, 2);
 # endif
-	    gtk_container_add(GTK_CONTAINER(event_box), label);
+	    gtk_container_ಕೂಡಿಸು(GTK_CONTAINER(event_box), label);
 	    gtk_widget_show(label);
-	    gtk_notebook_insert_page(GTK_NOTEBOOK(gui.tabline),
-		    page,
+	    gtk_notebook_ಸೇರಿಸು_ಪುಟ(GTK_NOTEBOOK(gui.tabline),
+		    ಪುಟ,
 		    event_box,
 		    nr);
-# if GTK_CHECK_VERSION(2,10,0)
-	    gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(gui.tabline),
-		    page,
+# ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(2,10,0)
+	    gtk_notebook_ಗಣ_tab_reorderable(GTK_NOTEBOOK(gui.tabline),
+		    ಪುಟ,
 		    TRUE);
 # endif
 	}
 
-	event_box = gtk_notebook_get_tab_label(GTK_NOTEBOOK(gui.tabline), page);
-	g_object_set_data(G_OBJECT(event_box), "tab_num",
-						     GINT_TO_POINTER(tab_num));
-	label = gtk_bin_get_child(GTK_BIN(event_box));
+	event_box = gtk_notebook_get_tab_label(GTK_NOTEBOOK(gui.tabline), ಪುಟ);
+	g_object_ಗಣ_ದತ್ತಾಂಶ(G_OBJECT(event_box), "tab_num",
+						     GINT_ಗಮ್ಯ_ಸೂಚಕ(tab_ಅಂಕೆ));
+	label = gtk_bin_get_ಮಗು(GTK_BIN(event_box));
 	get_tabline_label(tp, FALSE);
-	labeltext = CONVERT_TO_UTF8(NameBuff);
-	gtk_label_set_text(GTK_LABEL(label), (const char *)labeltext);
-	CONVERT_TO_UTF8_FREE(labeltext);
+	labeltext = CONVERT_ಗಮ್ಯ_UTF8(NameBuff);
+	gtk_label_ಗಣ_ಪಠ್ಯ(GTK_LABEL(label), (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)labeltext);
+	CONVERT_ಗಮ್ಯ_UTF8_FREE(labeltext);
 
 	get_tabline_label(tp, TRUE);
-	labeltext = CONVERT_TO_UTF8(NameBuff);
-# if GTK_CHECK_VERSION(3,0,0)
-	gtk_widget_set_tooltip_text(event_box, (const gchar *)labeltext);
-# else
-	gtk_tooltips_set_tip(GTK_TOOLTIPS(tabline_tooltip), event_box,
-			     (const char *)labeltext, NULL);
+	labeltext = CONVERT_ಗಮ್ಯ_UTF8(NameBuff);
+# ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+	gtk_widget_ಗಣ_tooltip_ಪಠ್ಯ(event_box, (ಸ್ಥಿರಾಂಕ gchar *)labeltext);
+# ಇಲ್ಲದಿದ್ದರೆ
+	gtk_tooltips_ಗಣ_tip(GTK_TOOLTIPS(tabline_tooltip), event_box,
+			     (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)labeltext, ಖಾಲಿ);
 # endif
-	CONVERT_TO_UTF8_FREE(labeltext);
+	CONVERT_ಗಮ್ಯ_UTF8_FREE(labeltext);
     }
 
     // Remove any old labels.
-    while (gtk_notebook_get_nth_page(GTK_NOTEBOOK(gui.tabline), nr) != NULL)
-	gtk_notebook_remove_page(GTK_NOTEBOOK(gui.tabline), nr);
+    ಆಗ (gtk_notebook_get_nth_ಪುಟ(GTK_NOTEBOOK(gui.tabline), nr) != ಖಾಲಿ)
+	gtk_notebook_remove_ಪುಟ(GTK_NOTEBOOK(gui.tabline), nr);
 
-    if (gtk_notebook_get_current_page(GTK_NOTEBOOK(gui.tabline)) != curtabidx)
-	gtk_notebook_set_current_page(GTK_NOTEBOOK(gui.tabline), curtabidx);
+    ಆದರೆ (gtk_notebook_get_current_ಪುಟ(GTK_NOTEBOOK(gui.tabline)) != curtabidx)
+	gtk_notebook_ಗಣ_current_ಪುಟ(GTK_NOTEBOOK(gui.tabline), curtabidx);
 
     // Make sure everything is in place before drawing text.
     gui_mch_update();
@@ -3686,69 +3686,69 @@ gui_mch_update_tabline(void)
 /*
  * Set the current tab to "nr".  First tab is 1.
  */
-    void
-gui_mch_set_curtab(int nr)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_curtab(ಪೂರ್ಣಾಂಕ nr)
 {
-    if (gui.tabline == NULL)
-	return;
+    ಆದರೆ (gui.tabline == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     ignore_tabline_evt = TRUE;
-    if (gtk_notebook_get_current_page(GTK_NOTEBOOK(gui.tabline)) != nr - 1)
-	gtk_notebook_set_current_page(GTK_NOTEBOOK(gui.tabline), nr - 1);
+    ಆದರೆ (gtk_notebook_get_current_ಪುಟ(GTK_NOTEBOOK(gui.tabline)) != nr - 1)
+	gtk_notebook_ಗಣ_current_ಪುಟ(GTK_NOTEBOOK(gui.tabline), nr - 1);
     ignore_tabline_evt = FALSE;
 }
 
-#endif // FEAT_GUI_TABLINE
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_GUI_TABLINE
 
 /*
  * Add selection targets for PRIMARY and CLIPBOARD selections.
  */
-    void
-gui_gtk_set_selection_targets(GdkAtom selection)
+    ಶೂನ್ಯ
+gui_gtk_ಗಣ_selection_targets(GdkAtom selection)
 {
-    int		    i, j = 0;
-    static int	    n_targets = N_SELECTION_TARGETS;
-    static GtkTargetEntry  targets[N_SELECTION_TARGETS];
+    ಪೂರ್ಣಾಂಕ		    i, j = 0;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    n_targets = N_SELECTION_TARGETS;
+    ಸ್ಥಿರ Gtk_ಗುರಿ_ನಮೂದು  targets[N_SELECTION_TARGETS];
 
-    if (targets[0].target == NULL)
+    ಆದರೆ (targets[0].ಗುರಿ == ಖಾಲಿ)
     {
-	for (i = 0; i < (int)N_SELECTION_TARGETS; ++i)
+	ಗಾಗಿ (i = 0; i < (ಪೂರ್ಣಾಂಕ)N_SELECTION_TARGETS; ++i)
 	{
 	    // OpenOffice tries to use TARGET_HTML and fails when we don't
 	    // return something, instead of trying another target. Therefore only
 	    // offer TARGET_HTML when it works.
-	    if (!clip_html && selection_targets[i].info == TARGET_HTML)
+	    ಆದರೆ (!clip_html && selection_targets[i].info == ಗುರಿ_HTML)
 		n_targets--;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		targets[j++] = selection_targets[i];
 	}
     }
 
     gtk_selection_clear_targets(gui.drawarea, selection);
-    gtk_selection_add_targets(gui.drawarea, selection,
+    gtk_selection_ಕೂಡಿಸು_targets(gui.drawarea, selection,
 			      targets, n_targets);
 }
 
 /*
  * Set up for receiving DND items.
  */
-    void
-gui_gtk_set_dnd_targets(void)
+    ಶೂನ್ಯ
+gui_gtk_ಗಣ_dnd_targets(ಶೂನ್ಯ)
 {
-    int		    i, j = 0;
-    int		    n_targets = N_DND_TARGETS;
-    GtkTargetEntry  targets[N_DND_TARGETS];
+    ಪೂರ್ಣಾಂಕ		    i, j = 0;
+    ಪೂರ್ಣಾಂಕ		    n_targets = N_DND_TARGETS;
+    Gtk_ಗುರಿ_ನಮೂದು  targets[N_DND_TARGETS];
 
-    for (i = 0; i < (int)N_DND_TARGETS; ++i)
+    ಗಾಗಿ (i = 0; i < (ಪೂರ್ಣಾಂಕ)N_DND_TARGETS; ++i)
     {
-	if (!clip_html && dnd_targets[i].info == TARGET_HTML)
+	ಆದರೆ (!clip_html && dnd_targets[i].info == ಗುರಿ_HTML)
 	    n_targets--;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    targets[j++] = dnd_targets[i];
     }
 
     gtk_drag_dest_unset(gui.drawarea);
-    gtk_drag_dest_set(gui.drawarea,
+    gtk_drag_dest_ಗಣ(gui.drawarea,
 		      GTK_DEST_DEFAULT_ALL,
 		      targets, n_targets,
 		      GDK_ACTION_COPY | GDK_ACTION_MOVE);
@@ -3758,72 +3758,72 @@ gui_gtk_set_dnd_targets(void)
  * Initialize the GUI.	Create all the windows, set up all the callbacks etc.
  * Returns OK for success, FAIL when the GUI can't be started.
  */
-    int
-gui_mch_init(void)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_init(ಶೂನ್ಯ)
 {
     GtkWidget *vbox;
 
-#ifdef FEAT_GUI_GNOME
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_GNOME
     // Initialize the GNOME libraries.	gnome_program_init()/gnome_init()
     // exits on failure, but that's a non-issue because we already called
     // gtk_init_check() in gui_mch_init_check().
-    if (using_gnome)
+    ಆದರೆ (using_gnome)
     {
-	gnome_program_init(VIMPACKAGE, VIM_VERSION_SHORT,
-			   LIBGNOMEUI_MODULE, gui_argc, gui_argv, NULL);
-# if defined(LC_NUMERIC)
+	gnome_ಕಾರ್ಯಕ್ರಮ_init(VIMPACKAGE, VIM_ಆವೃತ್ತಿ_SHORT,
+			   LIBGNOMEUI_MODULE, gui_argc, gui_argv, ಖಾಲಿ);
+# ಆದರೆ defined(LC_NUMERIC)
 	{
-	    char *p = setlocale(LC_NUMERIC, NULL);
+	    ಅಕ್ಷರ *p = setlocale(LC_NUMERIC, ಖಾಲಿ);
 
 	    // Make sure strtod() uses a decimal point, not a comma. Gnome
 	    // init may change it.
-	    if (p == NULL || strcmp(p, "C") != 0)
+	    ಆದರೆ (p == ಖಾಲಿ || strcmp(p, "C") != 0)
 	       setlocale(LC_NUMERIC, "C");
 	}
 # endif
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     VIM_CLEAR(gui_argv);
 
-#if GLIB_CHECK_VERSION(2,1,3)
+#ಆದರೆ GLIB_CHECK_ಆವೃತ್ತಿ(2,1,3)
     // Set the human-readable application name
-    g_set_application_name("Vim");
-#endif
+    g_ಗಣ_application_name("Vim");
+#ಆದರೆ_ಅಂತ್ಯ
     /*
      * Force UTF-8 output no matter what the value of 'encoding' is.
      * did_set_string_option() in option.c prohibits changing 'termencoding'
      * to something else than UTF-8 if the GUI is in use.
      */
-    set_option_value_give_err((char_u *)"termencoding",
+    ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"termencoding",
 						     0L, (char_u *)"utf-8", 0);
 
-#ifdef FEAT_TOOLBAR
-    gui_gtk_register_stock_icons();
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TOOLBAR
+    gui_gtk_ರಿಜಿಸ್ಟರ್_stock_icons();
+#ಆದರೆ_ಅಂತ್ಯ
     // FIXME: Need to install the classic icons and a gtkrc.classic file.
     // The hard part is deciding install locations and the Makefile magic.
-#if !GTK_CHECK_VERSION(3,0,0)
-# if 0
+#ಆದರೆ !GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+# ಆದರೆ 0
     gtk_rc_parse("gtkrc");
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Initialize values
-    gui.border_width = 2;
-    gui.scrollbar_width = SB_DEFAULT_WIDTH;
-    gui.scrollbar_height = SB_DEFAULT_WIDTH;
-#if GTK_CHECK_VERSION(3,0,0)
+    gui.border_ಅಗಲ = 2;
+    gui.scrollbar_ಅಗಲ = SB_DEFAULT_ಅಗಲ;
+    gui.scrollbar_ಎತ್ತರ = SB_DEFAULT_ಅಗಲ;
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
     gui.fgcolor = g_new(GdkRGBA, 1);
     gui.bgcolor = g_new(GdkRGBA, 1);
     gui.spcolor = g_new(GdkRGBA, 1);
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
     // LINTED: avoid warning: conversion to 'unsigned long'
     gui.fgcolor = g_new0(GdkColor, 1);
     // LINTED: avoid warning: conversion to 'unsigned long'
     gui.bgcolor = g_new0(GdkColor, 1);
     // LINTED: avoid warning: conversion to 'unsigned long'
     gui.spcolor = g_new0(GdkColor, 1);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Initialise atoms
     html_atom = gdk_atom_intern("text/html", FALSE);
@@ -3831,133 +3831,133 @@ gui_mch_init(void)
 
     // Set default foreground and background colors.
     gui.norm_pixel = gui.def_norm_pixel;
-    gui.back_pixel = gui.def_back_pixel;
+    gui.ಹಿಂಭಾಗ_pixel = gui.def_ಹಿಂಭಾಗ_pixel;
 
-    if (gtk_socket_id != 0)
+    ಆದರೆ (gtk_socket_id != 0)
     {
 	GtkWidget *plug;
 
 	// Use GtkSocket from another app.
 	plug = gtk_plug_new_for_display(gdk_display_get_default(),
 					gtk_socket_id);
-	if (plug != NULL && gtk_plug_get_socket_window(GTK_PLUG(plug)) != NULL)
+	ಆದರೆ (plug != ಖಾಲಿ && gtk_plug_get_socket_ಕಿಟಕಿ(GTK_PLUG(plug)) != ಖಾಲಿ)
 	{
 	    gui.mainwin = plug;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    g_warning("Connection to GTK+ socket (ID %u) failed",
-		      (unsigned int)gtk_socket_id);
+		      (ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ)gtk_socket_id);
 	    // Pretend we never wanted it if it failed (get own window)
 	    gtk_socket_id = 0;
 	}
     }
 
-    if (gtk_socket_id == 0)
+    ಆದರೆ (gtk_socket_id == 0)
     {
-#ifdef FEAT_GUI_GNOME
-	if (using_gnome)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_GNOME
+	ಆದರೆ (using_gnome)
 	{
-	    gui.mainwin = gnome_app_new("Vim", NULL);
+	    gui.mainwin = gnome_app_new("Vim", ಖಾಲಿ);
 # ifdef USE_XSMP
 	    // Use the GNOME save-yourself functionality now.
 	    xsmp_close();
 # endif
 	}
-	else
-#endif
-	    gui.mainwin = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	    gui.mainwin = gtk_ಕಿಟಕಿ_new(GTK_ಕಿಟಕಿ_TOPLEVEL);
     }
 
-    gtk_widget_set_name(gui.mainwin, "vim-main-window");
+    gtk_widget_ಗಣ_name(gui.mainwin, "vim-main-window");
 
     // Create the PangoContext used for drawing all text.
-    gui.text_context = gtk_widget_create_pango_context(gui.mainwin);
-    pango_context_set_base_dir(gui.text_context, PANGO_DIRECTION_LTR);
+    gui.ಪಠ್ಯ_context = gtk_widget_create_pango_context(gui.mainwin);
+    pango_context_ಗಣ_ತಳ_dir(gui.ಪಠ್ಯ_context, PANGO_DIRECTION_LTR);
 
-    gtk_container_set_border_width(GTK_CONTAINER(gui.mainwin), 0);
-    gtk_widget_add_events(gui.mainwin, GDK_VISIBILITY_NOTIFY_MASK);
+    gtk_container_ಗಣ_border_ಅಗಲ(GTK_CONTAINER(gui.mainwin), 0);
+    gtk_widget_ಕೂಡಿಸು_events(gui.mainwin, GDK_VISIBILITY_NOTIFY_ಮುಖವಾಡ);
 
     g_signal_connect(G_OBJECT(gui.mainwin), "delete-event",
-		     G_CALLBACK(&delete_event_cb), NULL);
+		     G_CALLBACK(&delete_event_cb), ಖಾಲಿ);
 
     g_signal_connect(G_OBJECT(gui.mainwin), "realize",
-		     G_CALLBACK(&mainwin_realize), NULL);
+		     G_CALLBACK(&mainwin_realize), ಖಾಲಿ);
 
     g_signal_connect(G_OBJECT(gui.mainwin), "screen-changed",
-		     G_CALLBACK(&mainwin_screen_changed_cb), NULL);
+		     G_CALLBACK(&mainwin_screen_ಬದಲಾಯಿತು_cb), ಖಾಲಿ);
 
     g_signal_connect(G_OBJECT(gui.mainwin), "window-state-event",
-		     G_CALLBACK(&mainwin_state_event_cb), NULL);
+		     G_CALLBACK(&mainwin_state_event_cb), ಖಾಲಿ);
 
-    gui.accel_group = gtk_accel_group_new();
-    gtk_window_add_accel_group(GTK_WINDOW(gui.mainwin), gui.accel_group);
+    gui.accel_ಗುಂಪು = gtk_accel_ಗುಂಪು_new();
+    gtk_ಕಿಟಕಿ_ಕೂಡಿಸು_accel_ಗುಂಪು(GTK_ಕಿಟಕಿ(gui.mainwin), gui.accel_ಗುಂಪು);
 
     // A vertical box holds the menubar, toolbar and main text window.
-#if GTK_CHECK_VERSION(3,2,0)
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,2,0)
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_box_set_homogeneous(GTK_BOX(vbox), FALSE);
-#else
+    gtk_box_ಗಣ_homogeneous(GTK_BOX(vbox), FALSE);
+#ಇಲ್ಲದಿದ್ದರೆ
     vbox = gtk_vbox_new(FALSE, 0);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_GUI_GNOME
-    if (using_gnome)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_GNOME
+    ಆದರೆ (using_gnome)
     {
-# if defined(FEAT_MENU)
+# ಆದರೆ defined(FEAT_MENU)
 	// automagically restore menubar/toolbar placement
 	gnome_app_enable_layout_config(GNOME_APP(gui.mainwin), TRUE);
 # endif
-	gnome_app_set_contents(GNOME_APP(gui.mainwin), vbox);
+	gnome_app_ಗಣ_contents(GNOME_APP(gui.mainwin), vbox);
     }
-    else
-#endif
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
     {
-	gtk_container_add(GTK_CONTAINER(gui.mainwin), vbox);
+	gtk_container_ಕೂಡಿಸು(GTK_CONTAINER(gui.mainwin), vbox);
 	gtk_widget_show(vbox);
     }
 
-#ifdef FEAT_MENU
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MENU
     /*
      * Create the menubar and handle
      */
     gui.menubar = gtk_menu_bar_new();
-    gtk_widget_set_name(gui.menubar, "vim-menubar");
+    gtk_widget_ಗಣ_name(gui.menubar, "vim-menubar");
 
     // Avoid that GTK takes <F10> away from us.
     {
 	GtkSettings *gtk_settings;
 
 	gtk_settings = gtk_settings_get_for_screen(gdk_screen_get_default());
-	g_object_set(gtk_settings, "gtk-menu-bar-accel", NULL, NULL);
+	g_object_ಗಣ(gtk_settings, "gtk-menu-bar-accel", ಖಾಲಿ, ಖಾಲಿ);
     }
 
 
 # ifdef FEAT_GUI_GNOME
-    if (using_gnome)
+    ಆದರೆ (using_gnome)
     {
-	BonoboDockItem *dockitem;
+	Bonobo_Dock_ಅಂಶ *dockitem;
 
-	gnome_app_set_menus(GNOME_APP(gui.mainwin), GTK_MENU_BAR(gui.menubar));
-	dockitem = gnome_app_get_dock_item_by_name(GNOME_APP(gui.mainwin),
+	gnome_app_ಗಣ_menus(GNOME_APP(gui.mainwin), GTK_MENU_BAR(gui.menubar));
+	dockitem = gnome_app_get_dock_ಅಂಶ_by_name(GNOME_APP(gui.mainwin),
 						   GNOME_APP_MENUBAR_NAME);
 	// We don't want the menu to float.
-	bonobo_dock_item_set_behavior(dockitem,
-		bonobo_dock_item_get_behavior(dockitem)
-				       | BONOBO_DOCK_ITEM_BEH_NEVER_FLOATING);
+	bonobo_dock_ಅಂಶ_ಗಣ_behavior(dockitem,
+		bonobo_dock_ಅಂಶ_get_behavior(dockitem)
+				       | BONOBO_DOCK_ಅಂಶ_BEH_NEVER_FLOATING);
 	gui.menubar_h = GTK_WIDGET(dockitem);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 # endif	// FEAT_GUI_GNOME
     {
 	// Always show the menubar, otherwise <F10> doesn't work.  It may be
 	// disabled in gui_init() later.
 	gtk_widget_show(gui.menubar);
-	gtk_box_pack_start(GTK_BOX(vbox), gui.menubar, FALSE, FALSE, 0);
+	gtk_box_pack_ಆರಂಭ(GTK_BOX(vbox), gui.menubar, FALSE, FALSE, 0);
     }
-#endif	// FEAT_MENU
+#ಆದರೆ_ಅಂತ್ಯ	// FEAT_MENU
 
-#ifdef FEAT_TOOLBAR
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TOOLBAR
     /*
      * Create the toolbar and handle
      */
@@ -3966,7 +3966,7 @@ gui_mch_init(void)
     // TODO: Add GTK+ 3 code here using GtkCssProvider if necessary.
     // N.B.  Since the default value of GtkToolbar::button-relief is
     // GTK_RELIEF_NONE, there's no need to specify that, probably.
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
     gtk_rc_parse_string(
 	    "style \"vim-toolbar-style\" {\n"
 	    "  GtkToolbar::button_relief = GTK_RELIEF_NONE\n"
@@ -3974,128 +3974,128 @@ gui_mch_init(void)
 	    "widget \"*.vim-toolbar\" style \"vim-toolbar-style\"\n");
 # endif
     gui.toolbar = gtk_toolbar_new();
-    gtk_widget_set_name(gui.toolbar, "vim-toolbar");
-    set_toolbar_style(GTK_TOOLBAR(gui.toolbar));
+    gtk_widget_ಗಣ_name(gui.toolbar, "vim-toolbar");
+    ಗಣ_toolbar_style(GTK_TOOLBAR(gui.toolbar));
 
 # ifdef FEAT_GUI_GNOME
-    if (using_gnome)
+    ಆದರೆ (using_gnome)
     {
-	BonoboDockItem *dockitem;
+	Bonobo_Dock_ಅಂಶ *dockitem;
 
-	gnome_app_set_toolbar(GNOME_APP(gui.mainwin), GTK_TOOLBAR(gui.toolbar));
-	dockitem = gnome_app_get_dock_item_by_name(GNOME_APP(gui.mainwin),
+	gnome_app_ಗಣ_toolbar(GNOME_APP(gui.mainwin), GTK_TOOLBAR(gui.toolbar));
+	dockitem = gnome_app_get_dock_ಅಂಶ_by_name(GNOME_APP(gui.mainwin),
 						   GNOME_APP_TOOLBAR_NAME);
 	gui.toolbar_h = GTK_WIDGET(dockitem);
 	// When the toolbar is floating it gets stuck.  So long as that isn't
 	// fixed let's disallow floating.
-	bonobo_dock_item_set_behavior(dockitem,
-		bonobo_dock_item_get_behavior(dockitem)
-				       | BONOBO_DOCK_ITEM_BEH_NEVER_FLOATING);
-	gtk_container_set_border_width(GTK_CONTAINER(gui.toolbar), 0);
+	bonobo_dock_ಅಂಶ_ಗಣ_behavior(dockitem,
+		bonobo_dock_ಅಂಶ_get_behavior(dockitem)
+				       | BONOBO_DOCK_ಅಂಶ_BEH_NEVER_FLOATING);
+	gtk_container_ಗಣ_border_ಅಗಲ(GTK_CONTAINER(gui.toolbar), 0);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 # endif	// FEAT_GUI_GNOME
     {
-	if (vim_strchr(p_go, GO_TOOLBAR) != NULL
-		&& (toolbar_flags & (TOOLBAR_TEXT | TOOLBAR_ICONS)))
+	ಆದರೆ (vim_strchr(p_go, GO_TOOLBAR) != ಖಾಲಿ
+		&& (toolbar_flags & (TOOLBAR_ಪಠ್ಯ | TOOLBAR_ICONS)))
 	    gtk_widget_show(gui.toolbar);
-	gtk_box_pack_start(GTK_BOX(vbox), gui.toolbar, FALSE, FALSE, 0);
+	gtk_box_pack_ಆರಂಭ(GTK_BOX(vbox), gui.toolbar, FALSE, FALSE, 0);
     }
-#endif // FEAT_TOOLBAR
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_TOOLBAR
 
-#ifdef FEAT_GUI_TABLINE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_TABLINE
     /*
      * Use a Notebook for the tab pages labels.  The labels are hidden by
      * default.
      */
     gui.tabline = gtk_notebook_new();
     gtk_widget_show(gui.tabline);
-    gtk_box_pack_start(GTK_BOX(vbox), gui.tabline, FALSE, FALSE, 0);
-    gtk_notebook_set_show_border(GTK_NOTEBOOK(gui.tabline), FALSE);
-    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(gui.tabline), FALSE);
-    gtk_notebook_set_scrollable(GTK_NOTEBOOK(gui.tabline), TRUE);
-# if !GTK_CHECK_VERSION(3,0,0)
-    gtk_notebook_set_tab_border(GTK_NOTEBOOK(gui.tabline), FALSE);
+    gtk_box_pack_ಆರಂಭ(GTK_BOX(vbox), gui.tabline, FALSE, FALSE, 0);
+    gtk_notebook_ಗಣ_show_border(GTK_NOTEBOOK(gui.tabline), FALSE);
+    gtk_notebook_ಗಣ_show_tabs(GTK_NOTEBOOK(gui.tabline), FALSE);
+    gtk_notebook_ಗಣ_scrollable(GTK_NOTEBOOK(gui.tabline), TRUE);
+# ಆದರೆ !GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    gtk_notebook_ಗಣ_tab_border(GTK_NOTEBOOK(gui.tabline), FALSE);
 # endif
 
-# if !GTK_CHECK_VERSION(3,0,0)
+# ಆದರೆ !GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
     tabline_tooltip = gtk_tooltips_new();
     gtk_tooltips_enable(GTK_TOOLTIPS(tabline_tooltip));
 # endif
 
     {
-	GtkWidget *page, *label, *event_box;
+	GtkWidget *ಪುಟ, *label, *event_box;
 
 	// Add the first tab.
-# if GTK_CHECK_VERSION(3,2,0)
-	page = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-	gtk_box_set_homogeneous(GTK_BOX(page), FALSE);
-# else
-	page = gtk_vbox_new(FALSE, 0);
+# ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,2,0)
+	ಪುಟ = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+	gtk_box_ಗಣ_homogeneous(GTK_BOX(ಪುಟ), FALSE);
+# ಇಲ್ಲದಿದ್ದರೆ
+	ಪುಟ = gtk_vbox_new(FALSE, 0);
 # endif
-	gtk_widget_show(page);
-	gtk_container_add(GTK_CONTAINER(gui.tabline), page);
+	gtk_widget_show(ಪುಟ);
+	gtk_container_ಕೂಡಿಸು(GTK_CONTAINER(gui.tabline), ಪುಟ);
 	label = gtk_label_new("-Empty-");
 	gtk_widget_show(label);
 	event_box = gtk_event_box_new();
 	gtk_widget_show(event_box);
-	g_object_set_data(G_OBJECT(event_box), "tab_num", GINT_TO_POINTER(1L));
-# if !GTK_CHECK_VERSION(3,14,0)
-	gtk_misc_set_padding(GTK_MISC(label), 2, 2);
+	g_object_ಗಣ_ದತ್ತಾಂಶ(G_OBJECT(event_box), "tab_num", GINT_ಗಮ್ಯ_ಸೂಚಕ(1L));
+# ಆದರೆ !GTK_CHECK_ಆವೃತ್ತಿ(3,14,0)
+	gtk_misc_ಗಣ_padding(GTK_MISC(label), 2, 2);
 # endif
-	gtk_container_add(GTK_CONTAINER(event_box), label);
-	gtk_notebook_set_tab_label(GTK_NOTEBOOK(gui.tabline), page, event_box);
-# if GTK_CHECK_VERSION(2,10,0)
-	gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(gui.tabline), page, TRUE);
+	gtk_container_ಕೂಡಿಸು(GTK_CONTAINER(event_box), label);
+	gtk_notebook_ಗಣ_tab_label(GTK_NOTEBOOK(gui.tabline), ಪುಟ, event_box);
+# ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(2,10,0)
+	gtk_notebook_ಗಣ_tab_reorderable(GTK_NOTEBOOK(gui.tabline), ಪುಟ, TRUE);
 # endif
     }
 
     g_signal_connect(G_OBJECT(gui.tabline), "switch-page",
-		     G_CALLBACK(on_select_tab), NULL);
-# if GTK_CHECK_VERSION(2,10,0)
+		     G_CALLBACK(on_select_tab), ಖಾಲಿ);
+# ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(2,10,0)
     g_signal_connect(G_OBJECT(gui.tabline), "page-reordered",
-		     G_CALLBACK(on_tab_reordered), NULL);
+		     G_CALLBACK(on_tab_reordered), ಖಾಲಿ);
 # endif
 
     // Create a popup menu for the tab line and connect it.
     tabline_menu = create_tabline_menu();
     g_signal_connect_swapped(G_OBJECT(gui.tabline), "button-press-event",
 	    G_CALLBACK(on_tabline_menu), G_OBJECT(tabline_menu));
-#endif // FEAT_GUI_TABLINE
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_GUI_TABLINE
 
     gui.formwin = gui_gtk_form_new();
-    gtk_container_set_border_width(GTK_CONTAINER(gui.formwin), 0);
-#if !GTK_CHECK_VERSION(3,0,0)
-    gtk_widget_set_events(gui.formwin, GDK_EXPOSURE_MASK);
-#endif
-#if GTK_CHECK_VERSION(3,22,2)
-    gtk_widget_set_name(gui.formwin, "vim-gtk-form");
-#endif
+    gtk_container_ಗಣ_border_ಅಗಲ(GTK_CONTAINER(gui.formwin), 0);
+#ಆದರೆ !GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    gtk_widget_ಗಣ_events(gui.formwin, GDK_EXPOSURE_ಮುಖವಾಡ);
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,22,2)
+    gtk_widget_ಗಣ_name(gui.formwin, "vim-gtk-form");
+#ಆದರೆ_ಅಂತ್ಯ
 
     gui.drawarea = gtk_drawing_area_new();
-#if GTK_CHECK_VERSION(3,0,0)
-    gui.surface = NULL;
-#endif
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    gui.surface = ಖಾಲಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef GDK_WINDOWING_WAYLAND
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ GDK_WINDOWING_WAYLAND
     GdkDisplay *d = gdk_display_get_default();
-    if (GDK_IS_WAYLAND_DISPLAY(d))
+    ಆದರೆ (GDK_IS_WAYLAND_DISPLAY(d))
 	gui.is_wayland = true;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Determine which events we will filter.
-    gint event_mask =
-	GDK_EXPOSURE_MASK |
-	GDK_ENTER_NOTIFY_MASK |
-	GDK_LEAVE_NOTIFY_MASK |
-	GDK_BUTTON_PRESS_MASK |
-	GDK_BUTTON_RELEASE_MASK |
-	GDK_KEY_PRESS_MASK |
-	GDK_KEY_RELEASE_MASK |
-	GDK_POINTER_MOTION_MASK |
-	GDK_POINTER_MOTION_HINT_MASK;
-#if GTK_CHECK_VERSION(3,4,0)
-    if (GDK_IS_X11_DISPLAY(gdk_display_get_default()))
+    gint event_ಮುಖವಾಡ =
+	GDK_EXPOSURE_ಮುಖವಾಡ |
+	GDK_ENTER_NOTIFY_ಮುಖವಾಡ |
+	GDK_LEAVE_NOTIFY_ಮುಖವಾಡ |
+	GDK_BUTTON_PRESS_ಮುಖವಾಡ |
+	GDK_BUTTON_RELEASE_ಮುಖವಾಡ |
+	GDK_ಕೀಲಿ_PRESS_ಮುಖವಾಡ |
+	GDK_ಕೀಲಿ_RELEASE_ಮುಖವಾಡ |
+	GDK_ಸೂಚಕ_MOTION_ಮುಖವಾಡ |
+	GDK_ಸೂಚಕ_MOTION_HINT_ಮುಖವಾಡ;
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,4,0)
+    ಆದರೆ (GDK_IS_X11_DISPLAY(gdk_display_get_default()))
     {
 	gui.is_x11 = true;
 	// for X11, if we were using smooth scroll events, we
@@ -4104,66 +4104,66 @@ gui_mch_init(void)
 	// copying into the primary selection
 	//
 	// *: https://bugzilla.gnome.org/show_bug.cgi?id=675959
-	event_mask |= GDK_SCROLL_MASK;
+	event_ಮುಖವಾಡ |= GDK_SCROLL_ಮುಖವಾಡ;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// for Wayland, touchpads don't generate "unsmooth" scroll events. Both
 	// touchpads and wheels generate smooth scroll events expectedly.
-	event_mask |= GDK_SMOOTH_SCROLL_MASK;
+	event_ಮುಖವಾಡ |= GDK_SMOOTH_SCROLL_ಮುಖವಾಡ;
     }
-#else
-    event_mask |= GDK_SCROLL_MASK;
-#endif
-    gtk_widget_set_events(gui.drawarea, event_mask);
+#ಇಲ್ಲದಿದ್ದರೆ
+    event_ಮುಖವಾಡ |= GDK_SCROLL_ಮುಖವಾಡ;
+#ಆದರೆ_ಅಂತ್ಯ
+    gtk_widget_ಗಣ_events(gui.drawarea, event_ಮುಖವಾಡ);
 
     gtk_widget_show(gui.drawarea);
     gui_gtk_form_put(GTK_FORM(gui.formwin), gui.drawarea, 0, 0);
     gtk_widget_show(gui.formwin);
-    gtk_box_pack_start(GTK_BOX(vbox), gui.formwin, TRUE, TRUE, 0);
+    gtk_box_pack_ಆರಂಭ(GTK_BOX(vbox), gui.formwin, TRUE, TRUE, 0);
 
     // For GtkSockets, key-presses must go to the focus widget (drawarea)
     // and not the window.
     g_signal_connect((gtk_socket_id == 0) ? G_OBJECT(gui.mainwin)
 					  : G_OBJECT(gui.drawarea),
 		       "key-press-event",
-		       G_CALLBACK(key_press_event), NULL);
-#if defined(FEAT_XIM) || GTK_CHECK_VERSION(3,0,0)
+		       G_CALLBACK(ಕೀಲಿ_press_event), ಖಾಲಿ);
+#ಆದರೆ defined(FEAT_XIM) || GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
     // Also forward key release events for the benefit of GTK+ 2 input
     // modules.  Try CTRL-SHIFT-xdigits to enter a Unicode code point.
     g_signal_connect((gtk_socket_id == 0) ? G_OBJECT(gui.mainwin)
 					  : G_OBJECT(gui.drawarea),
 		     "key-release-event",
-		     G_CALLBACK(&key_release_event), NULL);
-#endif
+		     G_CALLBACK(&ಕೀಲಿ_release_event), ಖಾಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ
     g_signal_connect(G_OBJECT(gui.drawarea), "realize",
-		     G_CALLBACK(drawarea_realize_cb), NULL);
+		     G_CALLBACK(drawarea_realize_cb), ಖಾಲಿ);
     g_signal_connect(G_OBJECT(gui.drawarea), "unrealize",
-		     G_CALLBACK(drawarea_unrealize_cb), NULL);
-#if GTK_CHECK_VERSION(3,0,0)
+		     G_CALLBACK(drawarea_unrealize_cb), ಖಾಲಿ);
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
     g_signal_connect(G_OBJECT(gui.drawarea), "configure-event",
-	    G_CALLBACK(drawarea_configure_event_cb), NULL);
-#endif
-#if GTK_CHECK_VERSION(3,22,2)
+	    G_CALLBACK(drawarea_configure_event_cb), ಖಾಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,22,2)
     g_signal_connect_after(G_OBJECT(gui.drawarea), "style-updated",
-			   G_CALLBACK(&drawarea_style_updated_cb), NULL);
-#else
+			   G_CALLBACK(&drawarea_style_updated_cb), ಖಾಲಿ);
+#ಇಲ್ಲದಿದ್ದರೆ
     g_signal_connect_after(G_OBJECT(gui.drawarea), "style-set",
-			   G_CALLBACK(&drawarea_style_set_cb), NULL);
-#endif
+			   G_CALLBACK(&drawarea_style_ಗಣ_cb), ಖಾಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if !GTK_CHECK_VERSION(3,0,0)
+#ಆದರೆ !GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
     gui.visibility = GDK_VISIBILITY_UNOBSCURED;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if !defined(USE_GNOME_SESSION)
+#ಆದರೆ !defined(USE_GNOME_SESSION)
     wm_protocols_atom = gdk_atom_intern("WM_PROTOCOLS", FALSE);
     save_yourself_atom = gdk_atom_intern("WM_SAVE_YOURSELF", FALSE);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (gtk_socket_id != 0)
+    ಆದರೆ (gtk_socket_id != 0)
 	// make sure keyboard input can go to the drawarea
-	gtk_widget_set_can_focus(gui.drawarea, TRUE);
+	gtk_widget_ಗಣ_can_focus(gui.drawarea, TRUE);
 
     /*
      * Set clipboard specific atoms
@@ -4172,73 +4172,73 @@ gui_mch_init(void)
     vimenc_atom = gdk_atom_intern(VIMENC_ATOM_NAME, FALSE);
     vim_mt_atom = gdk_atom_intern(VIM_MIMETYPE_NAME, FALSE);
     vimenc_mt_atom = gdk_atom_intern(VIMENC_MIMETYPE_NAME, FALSE);
-    clip_star.gtk_sel_atom = GDK_SELECTION_PRIMARY;
+    clip_ನಕ್ಷತ್ರ.gtk_sel_atom = GDK_SELECTION_PRIMARY;
     clip_plus.gtk_sel_atom = gdk_atom_intern("CLIPBOARD", FALSE);
 
     /*
      * Start out by adding the configured border width into the border offset.
      */
-    gui.border_offset = gui.border_width;
+    gui.border_ಸ್ಥಾನಾಂತರ = gui.border_ಅಗಲ;
 
-#if GTK_CHECK_VERSION(3,0,0)
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
     g_signal_connect(G_OBJECT(gui.drawarea), "draw",
-		     G_CALLBACK(draw_event), NULL);
-#else
+		     G_CALLBACK(draw_event), ಖಾಲಿ);
+#ಇಲ್ಲದಿದ್ದರೆ
     gtk_signal_connect(GTK_OBJECT(gui.mainwin), "visibility_notify_event",
-		       GTK_SIGNAL_FUNC(visibility_event), NULL);
+		       GTK_SIGNAL_FUNC(visibility_event), ಖಾಲಿ);
     gtk_signal_connect(GTK_OBJECT(gui.drawarea), "expose_event",
-		       GTK_SIGNAL_FUNC(expose_event), NULL);
-#endif
+		       GTK_SIGNAL_FUNC(expose_event), ಖಾಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ
 
     /*
      * Only install these enter/leave callbacks when 'p' in 'guioptions'.
      * Only needed for some window managers.
      */
-    if (vim_strchr(p_go, GO_POINTER) != NULL)
+    ಆದರೆ (vim_strchr(p_go, GO_ಸೂಚಕ) != ಖಾಲಿ)
     {
 	g_signal_connect(G_OBJECT(gui.drawarea), "leave-notify-event",
-			 G_CALLBACK(leave_notify_event), NULL);
+			 G_CALLBACK(leave_notify_event), ಖಾಲಿ);
 	g_signal_connect(G_OBJECT(gui.drawarea), "enter-notify-event",
-			 G_CALLBACK(enter_notify_event), NULL);
+			 G_CALLBACK(enter_notify_event), ಖಾಲಿ);
     }
 
     // Real windows can get focus ... GtkPlug, being a mere container can't,
     // only its widgets.  Arguably, this could be common code and we do not
     // use the window focus at all, but let's be safe.
-    if (gtk_socket_id == 0)
+    ಆದರೆ (gtk_socket_id == 0)
     {
 	g_signal_connect(G_OBJECT(gui.mainwin), "focus-out-event",
-			 G_CALLBACK(focus_out_event), NULL);
+			 G_CALLBACK(focus_ಹೊರಹೋಗು_event), ಖಾಲಿ);
 	g_signal_connect(G_OBJECT(gui.mainwin), "focus-in-event",
-			 G_CALLBACK(focus_in_event), NULL);
+			 G_CALLBACK(focus_ಒಳ_event), ಖಾಲಿ);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	g_signal_connect(G_OBJECT(gui.drawarea), "focus-out-event",
-			 G_CALLBACK(focus_out_event), NULL);
+			 G_CALLBACK(focus_ಹೊರಹೋಗು_event), ಖಾಲಿ);
 	g_signal_connect(G_OBJECT(gui.drawarea), "focus-in-event",
-			 G_CALLBACK(focus_in_event), NULL);
-#ifdef FEAT_GUI_TABLINE
+			 G_CALLBACK(focus_ಒಳ_event), ಖಾಲಿ);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_TABLINE
 	g_signal_connect(G_OBJECT(gui.tabline), "focus-out-event",
-			 G_CALLBACK(focus_out_event), NULL);
+			 G_CALLBACK(focus_ಹೊರಹೋಗು_event), ಖಾಲಿ);
 	g_signal_connect(G_OBJECT(gui.tabline), "focus-in-event",
-			 G_CALLBACK(focus_in_event), NULL);
-#endif // FEAT_GUI_TABLINE
+			 G_CALLBACK(focus_ಒಳ_event), ಖಾಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_GUI_TABLINE
     }
 
     g_signal_connect(G_OBJECT(gui.drawarea), "motion-notify-event",
-		     G_CALLBACK(motion_notify_event), NULL);
+		     G_CALLBACK(motion_notify_event), ಖಾಲಿ);
     g_signal_connect(G_OBJECT(gui.drawarea), "button-press-event",
-		     G_CALLBACK(button_press_event), NULL);
+		     G_CALLBACK(button_press_event), ಖಾಲಿ);
     g_signal_connect(G_OBJECT(gui.drawarea), "button-release-event",
-		     G_CALLBACK(button_release_event), NULL);
+		     G_CALLBACK(button_release_event), ಖಾಲಿ);
     g_signal_connect(G_OBJECT(gui.drawarea), "grab-notify",
-		     G_CALLBACK(grab_notify_event), NULL);
+		     G_CALLBACK(grab_notify_event), ಖಾಲಿ);
     g_signal_connect(G_OBJECT(gui.drawarea), "scroll-event",
-		     G_CALLBACK(scroll_event), NULL);
+		     G_CALLBACK(scroll_event), ಖಾಲಿ);
 
     // Pretend we don't have input focus, we will get an event if we do.
-    gui.in_focus = false;
+    gui.ಒಳ_focus = false;
 
     // Handle changes to the "Xft/DPI" setting.
     {
@@ -4246,112 +4246,112 @@ gui_mch_init(void)
 			 gtk_settings_get_for_screen(gdk_screen_get_default());
 
 	g_signal_connect(gtk_settings, "notify::gtk-xft-dpi",
-			   G_CALLBACK(gtk_settings_xft_dpi_changed_cb), NULL);
+			   G_CALLBACK(gtk_settings_xft_dpi_ಬದಲಾಯಿತು_cb), ಖಾಲಿ);
     }
 
-#if defined(FEAT_IMAGE) && GTK_CHECK_VERSION(3,10,0)
-    gui.scale = gtk_widget_get_scale_factor(gui.formwin);
-#endif
+#ಆದರೆ defined(FEAT_IMAGE) && GTK_CHECK_ಆವೃತ್ತಿ(3,10,0)
+    gui.scale = gtk_widget_get_scale_ಗುಣಕ(gui.formwin);
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-#if defined(USE_GNOME_SESSION)
+#ಆದರೆ defined(USE_GNOME_SESSION)
 /*
  * This is called from gui_start() after a fork() has been done.
  * We have to tell the session manager our new PID.
  */
-    void
-gui_mch_forked(void)
+    ಶೂನ್ಯ
+gui_mch_forked(ಶೂನ್ಯ)
 {
-    if (!using_gnome)
-	return;
+    ಆದರೆ (!using_gnome)
+	ಹಿಂತಿರುಗಿ;
 
     GnomeClient *client;
 
     client = gnome_master_client();
 
-    if (client != NULL)
-	gnome_client_set_process_id(client, getpid());
+    ಆದರೆ (client != ಖಾಲಿ)
+	gnome_client_ಗಣ_process_id(client, getpid());
 }
-#endif // USE_GNOME_SESSION
+#ಆದರೆ_ಅಂತ್ಯ // USE_GNOME_SESSION
 
-#if GTK_CHECK_VERSION(3,0,0)
-    static GdkRGBA
-color_to_rgba(guicolor_T color)
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    ಸ್ಥಿರ GdkRGBA
+color_ಗಮ್ಯ_rgba(guicolor_T color)
 {
     GdkRGBA rgba;
     rgba.red   = ((color & 0xff0000) >> 16) / 255.0;
     rgba.green = ((color & 0xff00) >> 8) / 255.0;
     rgba.blue  = ((color & 0xff)) / 255.0;
     rgba.alpha = 1.0;
-    return rgba;
+    ಹಿಂತಿರುಗಿ rgba;
 }
 
-    static void
-set_cairo_source_rgba_from_color(cairo_t *cr, guicolor_T color)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_cairo_ಮೂಲ_rgba_from_color(cairo_t *cr, guicolor_T color)
 {
-    const GdkRGBA rgba = color_to_rgba(color);
-    cairo_set_source_rgba(cr, rgba.red, rgba.green, rgba.blue, rgba.alpha);
+    ಸ್ಥಿರಾಂಕ GdkRGBA rgba = color_ಗಮ್ಯ_rgba(color);
+    cairo_ಗಣ_ಮೂಲ_rgba(cr, rgba.red, rgba.green, rgba.blue, rgba.alpha);
 }
-#endif // GTK_CHECK_VERSION(3,0,0)
+#ಆದರೆ_ಅಂತ್ಯ // GTK_CHECK_VERSION(3,0,0)
 
 /*
  * Called when the foreground or background color has been changed.
  * This used to change the graphics contexts directly but we are
  * currently manipulating them where desired.
  */
-    void
-gui_mch_new_colors(void)
+    ಶೂನ್ಯ
+gui_mch_new_colors(ಶೂನ್ಯ)
 {
-    if (gui.drawarea != NULL
-#if GTK_CHECK_VERSION(3,22,2)
-	    && gui.formwin != NULL
-#endif
-	    && gtk_widget_get_window(gui.drawarea) != NULL)
+    ಆದರೆ (gui.drawarea != ಖಾಲಿ
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,22,2)
+	    && gui.formwin != ಖಾಲಿ
+#ಆದರೆ_ಅಂತ್ಯ
+	    && gtk_widget_get_ಕಿಟಕಿ(gui.drawarea) != ಖಾಲಿ)
     {
-#if !GTK_CHECK_VERSION(3,22,2)
-	GdkWindow * const da_win = gtk_widget_get_window(gui.drawarea);
-#endif
-#if GTK_CHECK_VERSION(3,22,2)
-	GtkStyleContext * const context =
+#ಆದರೆ !GTK_CHECK_ಆವೃತ್ತಿ(3,22,2)
+	Gdk_ಕಿಟಕಿ * ಸ್ಥಿರಾಂಕ da_win = gtk_widget_get_ಕಿಟಕಿ(gui.drawarea);
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,22,2)
+	GtkStyleContext * ಸ್ಥಿರಾಂಕ context =
 				     gtk_widget_get_style_context(gui.formwin);
-	GtkCssProvider * const provider = gtk_css_provider_new();
-	gchar * const css = g_strdup_printf(
+	GtkCssProvider * ಸ್ಥಿರಾಂಕ provider = gtk_css_provider_new();
+	gchar * ಸ್ಥಿರಾಂಕ css = g_strdup_printf(
 		"widget#vim-gtk-form {\n"
 		"  background-color: #%.2lx%.2lx%.2lx;\n"
 		"}\n",
-		 (gui.back_pixel >> 16) & 0xff,
-		 (gui.back_pixel >> 8) & 0xff,
-		 gui.back_pixel & 0xff);
+		 (gui.ಹಿಂಭಾಗ_pixel >> 16) & 0xff,
+		 (gui.ಹಿಂಭಾಗ_pixel >> 8) & 0xff,
+		 gui.ಹಿಂಭಾಗ_pixel & 0xff);
 
-	gtk_css_provider_load_from_data(provider, css, -1, NULL);
-	gtk_style_context_add_provider(context,
+	gtk_css_provider_ತುಂಬು_from_ದತ್ತಾಂಶ(provider, css, -1, ಖಾಲಿ);
+	gtk_style_context_ಕೂಡಿಸು_provider(context,
 		GTK_STYLE_PROVIDER(provider), G_MAXUINT);
 
 	g_free(css);
 	g_object_unref(provider);
-#elif GTK_CHECK_VERSION(3,4,0) // !GTK_CHECK_VERSION(3,22,2)
+#ಅಥವಾಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,4,0) // !GTK_CHECK_VERSION(3,22,2)
 	GdkRGBA rgba;
 
-	rgba = color_to_rgba(gui.back_pixel);
+	rgba = color_ಗಮ್ಯ_rgba(gui.ಹಿಂಭಾಗ_pixel);
 	{
-	    cairo_pattern_t * const pat = cairo_pattern_create_rgba(
+	    cairo_ನಮೂನೆ_t * ಸ್ಥಿರಾಂಕ pat = cairo_ನಮೂನೆ_create_rgba(
 		    rgba.red, rgba.green, rgba.blue, rgba.alpha);
-	    if (pat != NULL)
+	    ಆದರೆ (pat != ಖಾಲಿ)
 	    {
-		gdk_window_set_background_pattern(da_win, pat);
-		cairo_pattern_destroy(pat);
+		gdk_ಕಿಟಕಿ_ಗಣ_background_ನಮೂನೆ(da_win, pat);
+		cairo_ನಮೂನೆ_destroy(pat);
 	    }
-	    else
-		gdk_window_set_background_rgba(da_win, &rgba);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		gdk_ಕಿಟಕಿ_ಗಣ_background_rgba(da_win, &rgba);
 	}
-#else // !GTK_CHECK_VERSION(3,4,0)
+#ಇಲ್ಲದಿದ್ದರೆ // !GTK_CHECK_VERSION(3,4,0)
 	GdkColor color = { 0, 0, 0, 0 };
 
-	color.pixel = gui.back_pixel;
-	gdk_window_set_background(da_win, &color);
-#endif // !GTK_CHECK_VERSION(3,22,2)
+	color.pixel = gui.ಹಿಂಭಾಗ_pixel;
+	gdk_ಕಿಟಕಿ_ಗಣ_background(da_win, &color);
+#ಆದರೆ_ಅಂತ್ಯ // !GTK_CHECK_VERSION(3,22,2)
     }
 }
 
@@ -4364,32 +4364,32 @@ gui_mch_new_colors(void)
  * callback re-issues the shellsize with the now-known offsets so the physical
  * window matches Vim's model.
  */
-    static gboolean
-startup_resize_correction_cb(gpointer data UNUSED)
+    ಸ್ಥಿರ gboolean
+startup_resize_correction_cb(gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    gui_set_shellsize(FALSE, FALSE, RESIZE_BOTH);
-    return FALSE;  // one-shot
+    gui_ಗಣ_shellsize(FALSE, FALSE, RESIZE_BOTH);
+    ಹಿಂತಿರುಗಿ FALSE;  // one-shot
 }
 
 /*
  * This signal informs us about the need to rearrange our sub-widgets.
  */
-    static gint
-form_configure_event(GtkWidget *widget UNUSED,
+    ಸ್ಥಿರ gint
+form_configure_event(GtkWidget *widget ಬಳಸದ,
 		     GdkEventConfigure *event,
-		     gpointer data UNUSED)
+		     gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    int	    usable_height = event->height;
-#ifdef TRACK_RESIZE_HISTORY
+    ಪೂರ್ಣಾಂಕ	    usable_ಎತ್ತರ = event->ಎತ್ತರ;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TRACK_RESIZE_HISTORY
     // Resize requests are made for gui.mainwin;
     // get its dimensions for searching if this event
     // is a response to a vim request.
-    int	    w, h;
-    gtk_window_get_size(GTK_WINDOW(gui.mainwin), &w, &h);
+    ಪೂರ್ಣಾಂಕ	    w, h;
+    gtk_ಕಿಟಕಿ_get_ಗಾತ್ರ(GTK_ಕಿಟಕಿ(gui.mainwin), &w, &h);
 
 # ifdef ENABLE_RESIZE_HISTORY_LOG
-    ch_log(NULL, "gui_gtk: form_configure_event: (%d, %d) [%d, %d]",
-	   w, h, (int)Columns, (int)Rows);
+    ch_log(ಖಾಲಿ, "gui_gtk: form_configure_event: (%d, %d) [%d, %d]",
+	   w, h, (ಪೂರ್ಣಾಂಕ)Columns, (ಪೂರ್ಣಾಂಕ)ಅಡ್ಡಸಾಲುಗಳು);
 # endif
 
     // Look through history of recent vim resize requests.
@@ -4404,49 +4404,49 @@ form_configure_event(GtkWidget *widget UNUSED,
     //	    - "no match" Figure it's a user resize event, clear history.
     // NOTE: clear history is default, then all incoming events are processed
 
-    if (!MATCH_WIDTH_HEIGHT(latest_resize_hist, w, h)
-					     && match_stale_width_height(w, h))
+    ಆದರೆ (!ಹೊಂದಿಕೆ_ಅಗಲ_ಎತ್ತರ(latest_resize_hist, w, h)
+					     && ಹೊಂದಿಕೆ_stale_ಅಗಲ_ಎತ್ತರ(w, h))
 	// discard stale event
-	return TRUE;
+	ಹಿಂತಿರುಗಿ TRUE;
 
     // On Wayland (GTK3 CSD), gtk_window_resize(w, req_h) results in
     // gtk_window_get_size() returning (req_w - csd_w, req_h - csd_h).
     // Compute the offsets once from the first confirmed resize response.
-    if ((mch_csd_height == 0 || mch_csd_width == 0)
-	    && latest_resize_hist != NULL
-	    && !latest_resize_hist->used
+    ಆದರೆ ((mch_csd_ಎತ್ತರ == 0 || mch_csd_ಅಗಲ == 0)
+	    && latest_resize_hist != ಖಾಲಿ
+	    && !latest_resize_hist->ಬಳಸಿದ
 	    && latest_resize_hist->from_shellsize
-	    && gui.char_height > 0)
+	    && gui.char_ಎತ್ತರ > 0)
     {
-	int pot_csd_w = latest_resize_hist->width - w;
-	int pot_csd_h = latest_resize_hist->height - h;
+	ಪೂರ್ಣಾಂಕ pot_csd_w = latest_resize_hist->ಅಗಲ - w;
+	ಪೂರ್ಣಾಂಕ pot_csd_h = latest_resize_hist->ಎತ್ತರ - h;
 
-	if (pot_csd_w > 0 && pot_csd_w < gui.char_width)
+	ಆದರೆ (pot_csd_w > 0 && pot_csd_w < gui.char_ಅಗಲ)
 	{
-	    mch_csd_width = pot_csd_w;
+	    mch_csd_ಅಗಲ = pot_csd_w;
 	    // The resize that triggered this startup event was issued without
 	    // CSD compensation; retroactively set the expected form width so
 	    // that the clamp below corrects Columns for this same event.
-	    mch_pending_form_w = (int)Columns * gui.char_width
-						    + gui_get_base_width();
+	    mch_pending_form_w = (ಪೂರ್ಣಾಂಕ)Columns * gui.char_ಅಗಲ
+						    + gui_get_ತಳ_ಅಗಲ();
 	}
-	if (pot_csd_h > 0 && pot_csd_h < gui.char_height)
+	ಆದರೆ (pot_csd_h > 0 && pot_csd_h < gui.char_ಎತ್ತರ)
 	{
-	    mch_csd_height = pot_csd_h;
+	    mch_csd_ಎತ್ತರ = pot_csd_h;
 	    // Similarly, correct the form height for this event so that Rows
 	    // is computed correctly despite the missing CSD compensation.
-	    usable_height += mch_csd_height;
+	    usable_ಎತ್ತರ += mch_csd_ಎತ್ತರ;
 	}
 	// The window was resized without CSD compensation and is physically
 	// too small.  Schedule a corrective resize (now that offsets are
 	// known) so the window actually fits the geometry Vim has just set.
-	if ((mch_csd_height > 0 || mch_csd_width > 0) && gtk_socket_id == 0)
-	    g_idle_add_full(GTK_PRIORITY_RESIZE, startup_resize_correction_cb, NULL, NULL);
+	ಆದರೆ ((mch_csd_ಎತ್ತರ > 0 || mch_csd_ಅಗಲ > 0) && gtk_socket_id == 0)
+	    g_idle_ಕೂಡಿಸು_ತುಂಬಿದ(GTK_ಆದ್ಯತೆ_RESIZE, startup_resize_correction_cb, ಖಾಲಿ, ಖಾಲಿ);
     }
     clear_resize_hists();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if GTK_CHECK_VERSION(3,22,2) && !GTK_CHECK_VERSION(3,22,4)
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,22,2) && !GTK_CHECK_ಆವೃತ್ತಿ(3,22,4)
     // As of 3.22.2, GdkWindows have started distributing configure events to
     // their "native" children (https://git.gnome.org/browse/gtk+/commit/?h=gtk-3-22&id=12579fe71b3b8f79eb9c1b80e429443bcc437dd0).
     //
@@ -4466,34 +4466,34 @@ form_configure_event(GtkWidget *widget UNUSED,
     // After a few weeks later, the GdkWindow change mentioned above was
     // reverted (https://git.gnome.org/browse/gtk+/commit/?h=gtk-3-22&id=f70039cb9603a02d2369fec4038abf40a1711155).
     // The corresponding official release is 3.22.4.
-    if (event->window != gtk_widget_get_window(gui.formwin))
-	return TRUE;
-#endif
+    ಆದರೆ (event->ಕಿಟಕಿ_2 != gtk_widget_get_ಕಿಟಕಿ(gui.formwin))
+	ಹಿಂತಿರುಗಿ TRUE;
+#ಆದರೆ_ಅಂತ್ಯ
 
     // When in a GtkPlug, we can't guarantee valid heights (as a round
     // no. of char-heights), so we have to manually sanitise them.
     // Widths seem to sort themselves out, don't ask me why.
-    if (gtk_socket_id != 0)
-	usable_height -= (gui.char_height - (gui.char_height/2)); // sic.
+    ಆದರೆ (gtk_socket_id != 0)
+	usable_ಎತ್ತರ -= (gui.char_ಎತ್ತರ - (gui.char_ಎತ್ತರ/2)); // sic.
 
     // If the configure event delivers a form width that is slightly less than
     // the width we intended (mch_pending_form_w), the difference is within
     // one char_width and is due to CSD under-compensation.  Clamp to the
     // intended width so that column count does not drift downward.
     {
-	int use_width = event->width;
+	ಪೂರ್ಣಾಂಕ use_ಅಗಲ = event->ಅಗಲ;
 
-#ifdef TRACK_RESIZE_HISTORY
-	if (mch_pending_form_w > event->width
-		&& mch_pending_form_w - event->width < gui.char_width)
-	    use_width = mch_pending_form_w;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TRACK_RESIZE_HISTORY
+	ಆದರೆ (mch_pending_form_w > event->ಅಗಲ
+		&& mch_pending_form_w - event->ಅಗಲ < gui.char_ಅಗಲ)
+	    use_ಅಗಲ = mch_pending_form_w;
+#ಆದರೆ_ಅಂತ್ಯ
 	gui_gtk_form_freeze(GTK_FORM(gui.formwin));
-	gui_resize_shell(use_width, usable_height);
+	gui_resize_shell(use_ಅಗಲ, usable_ಎತ್ತರ);
 	gui_gtk_form_thaw(GTK_FORM(gui.formwin));
     }
 
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
@@ -4501,70 +4501,70 @@ form_configure_event(GtkWidget *widget UNUSED,
  * We can't do much more here than to trying to preserve what had been done,
  * since the window is already inevitably going away.
  */
-    static void
-mainwin_destroy_cb(GObject *object UNUSED, gpointer data UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+mainwin_destroy_cb(GObject *object ಬಳಸದ, gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
     // Don't write messages to the GUI anymore
-    full_screen = FALSE;
+    ತುಂಬಿದ_screen = FALSE;
 
-    gui.mainwin  = NULL;
-    gui.drawarea = NULL;
+    gui.mainwin  = ಖಾಲಿ;
+    gui.drawarea = ಖಾಲಿ;
 
-    if (!exiting) // only do anything if the destroy was unexpected
+    ಆದರೆ (!exiting) // only do anything if the destroy was unexpected
     {
 	vim_strncpy(IObuff,
 		(char_u *)_("Vim: Main window unexpectedly destroyed\n"),
 		IOSIZE - 1);
 	preserve_exit();
     }
-#ifdef USE_GRESOURCE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_GRESOURCE
     gui_gtk_unregister_resource();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-    void
-gui_gtk_get_screen_geom_of_win(
+    ಶೂನ್ಯ
+gui_gtk_get_screen_geom_ದ_win(
 	GtkWidget *wid,
-	int point_x,	    // x position of window if not initialized
-	int point_y,	    // y position of window if not initialized
-	int *screen_x,
-	int *screen_y,
-	int *width,
-	int *height)
+	ಪೂರ್ಣಾಂಕ ಬಿಂದು_x,	    // x position of window if not initialized
+	ಪೂರ್ಣಾಂಕ ಬಿಂದು_y,	    // y position of window if not initialized
+	ಪೂರ್ಣಾಂಕ *screen_x,
+	ಪೂರ್ಣಾಂಕ *screen_y,
+	ಪೂರ್ಣಾಂಕ *ಅಗಲ,
+	ಪೂರ್ಣಾಂಕ *ಎತ್ತರ)
 {
     GdkRectangle geometry;
-    GdkWindow *win = gtk_widget_get_window(wid);
-#if GTK_CHECK_VERSION(3,22,0)
+    Gdk_ಕಿಟಕಿ *win = gtk_widget_get_ಕಿಟಕಿ(wid);
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,22,0)
     GdkDisplay *dpy;
     GdkMonitor *monitor;
 
-    if (wid != NULL && gtk_widget_get_realized(wid))
+    ಆದರೆ (wid != ಖಾಲಿ && gtk_widget_get_realized(wid))
 	dpy = gtk_widget_get_display(wid);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	dpy = gdk_display_get_default();
-    if (win != NULL)
-	monitor = gdk_display_get_monitor_at_window(dpy, win);
-    else
-	monitor = gdk_display_get_monitor_at_point(dpy, point_x, point_y);
+    ಆದರೆ (win != ಖಾಲಿ)
+	monitor = gdk_display_get_monitor_at_ಕಿಟಕಿ(dpy, win);
+    ಇಲ್ಲದಿದ್ದರೆ
+	monitor = gdk_display_get_monitor_at_ಬಿಂದು(dpy, ಬಿಂದು_x, ಬಿಂದು_y);
     gdk_monitor_get_geometry(monitor, &geometry);
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
     GdkScreen* screen;
-    int monitor;
+    ಪೂರ್ಣಾಂಕ monitor;
 
-    if (wid != NULL && gtk_widget_has_screen(wid))
+    ಆದರೆ (wid != ಖಾಲಿ && gtk_widget_has_screen(wid))
 	screen = gtk_widget_get_screen(wid);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	screen = gdk_screen_get_default();
-    if (win != NULL)
-	monitor = gdk_screen_get_monitor_at_window(screen, win);
-    else
-	monitor = gdk_screen_get_monitor_at_point(screen, point_x, point_y);
+    ಆದರೆ (win != ಖಾಲಿ)
+	monitor = gdk_screen_get_monitor_at_ಕಿಟಕಿ(screen, win);
+    ಇಲ್ಲದಿದ್ದರೆ
+	monitor = gdk_screen_get_monitor_at_ಬಿಂದು(screen, ಬಿಂದು_x, ಬಿಂದು_y);
     gdk_screen_get_monitor_geometry(screen, monitor, &geometry);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     *screen_x = geometry.x;
     *screen_y = geometry.y;
-    *width = geometry.width;
-    *height = geometry.height;
+    *ಅಗಲ = geometry.ಅಗಲ;
+    *ಎತ್ತರ = geometry.ಎತ್ತರ;
 }
 
 /*
@@ -4572,16 +4572,16 @@ gui_gtk_get_screen_geom_of_win(
  * than the screen.  This subtracts some room for menubar, toolbar and window
  * decorations.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 gui_gtk_get_screen_dimensions(
-	int point_x,
-	int point_y,
-	int *screen_w,
-	int *screen_h)
+	ಪೂರ್ಣಾಂಕ ಬಿಂದು_x,
+	ಪೂರ್ಣಾಂಕ ಬಿಂದು_y,
+	ಪೂರ್ಣಾಂಕ *screen_w,
+	ಪೂರ್ಣಾಂಕ *screen_h)
 {
-    int	    x, y;
+    ಪೂರ್ಣಾಂಕ	    x, y;
 
-    gui_gtk_get_screen_geom_of_win(gui.mainwin, point_x, point_y,
+    gui_gtk_get_screen_geom_ದ_win(gui.mainwin, ಬಿಂದು_x, ಬಿಂದು_y,
 						   &x, &y, screen_w, screen_h);
 
     // Subtract 'guiheadroom' from the height to allow some room for the
@@ -4594,12 +4594,12 @@ gui_gtk_get_screen_dimensions(
      * height, so that the window size can be made to fit on the screen.
      * This should be completely changed later.
      */
-    *screen_w -= get_menu_tool_width();
-    *screen_h -= get_menu_tool_height();
+    *screen_w -= get_menu_tool_ಅಗಲ();
+    *screen_h -= get_menu_tool_ಎತ್ತರ();
 }
 
-    void
-gui_mch_get_screen_dimensions(int *screen_w, int *screen_h)
+    ಶೂನ್ಯ
+gui_mch_get_screen_dimensions(ಪೂರ್ಣಾಂಕ *screen_w, ಪೂರ್ಣಾಂಕ *screen_h)
 {
     gui_gtk_get_screen_dimensions(0, 0, screen_w, screen_h);
 }
@@ -4617,101 +4617,101 @@ gui_mch_get_screen_dimensions(int *screen_w, int *screen_h)
  * scrollbar init.), actually do the standard hints and stop the timer.
  * We'll not let the default hints be set while this timer's active.
  */
-    static timeout_cb_type
-check_startup_plug_hints(gpointer data UNUSED)
+    ಸ್ಥಿರ timeout_cb_type
+check_startup_plug_hints(gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    if (init_window_hints_state == 1)
+    ಆದರೆ (init_ಕಿಟಕಿ_hints_state == 1)
     {
 	// Safe to use normal hints now
-	init_window_hints_state = 0;
-	update_window_manager_hints(0, 0);
-	return FALSE;   // stop timer
+	init_ಕಿಟಕಿ_hints_state = 0;
+	update_ಕಿಟಕಿ_manager_hints(0, 0);
+	ಹಿಂತಿರುಗಿ FALSE;   // stop timer
     }
 
     // Keep on trying
-    init_window_hints_state = 1;
-    return TRUE;
+    init_ಕಿಟಕಿ_hints_state = 1;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
  * Open the GUI window which was created by a call to gui_mch_init().
  */
-    int
-gui_mch_open(void)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_open(ಶೂನ್ಯ)
 {
     guicolor_T fg_pixel = INVALCOLOR;
     guicolor_T bg_pixel = INVALCOLOR;
-    guint		pixel_width;
-    guint		pixel_height;
+    guint		pixel_ಅಗಲ;
+    guint		pixel_ಎತ್ತರ;
 
     /*
      * Allow setting a window role on the command line, or invent one
      * if none was specified.  This is mainly useful for GNOME session
      * support; allowing the WM to restore window placement.
      */
-    if (role_argument != NULL)
+    ಆದರೆ (role_ವಾದ != ಖಾಲಿ)
     {
-	gtk_window_set_role(GTK_WINDOW(gui.mainwin), role_argument);
+	gtk_ಕಿಟಕಿ_ಗಣ_role(GTK_ಕಿಟಕಿ(gui.mainwin), role_ವಾದ);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	char *role;
+	ಅಕ್ಷರ *role;
 
 	// Invent a unique-enough ID string for the role
 	role = g_strdup_printf("vim-%u-%u-%u",
-			       (unsigned)mch_get_pid(),
-			       (unsigned)g_random_int(),
-			       (unsigned)time(NULL));
+			       (ಚಿಹ್ನೆರಹಿತ)mch_get_pid(),
+			       (ಚಿಹ್ನೆರಹಿತ)g_random_int(),
+			       (ಚಿಹ್ನೆರಹಿತ)ಸಮಯ(ಖಾಲಿ));
 
-	gtk_window_set_role(GTK_WINDOW(gui.mainwin), role);
+	gtk_ಕಿಟಕಿ_ಗಣ_role(GTK_ಕಿಟಕಿ(gui.mainwin), role);
 	g_free(role);
     }
 
-    if (gui_win_x != -1 && gui_win_y != -1)
-	gtk_window_move(GTK_WINDOW(gui.mainwin), gui_win_x, gui_win_y);
+    ಆದರೆ (gui_win_x != -1 && gui_win_y != -1)
+	gtk_ಕಿಟಕಿ_move(GTK_ಕಿಟಕಿ(gui.mainwin), gui_win_x, gui_win_y);
 
     // Determine user specified geometry, if present.
-    if (gui.geom != NULL)
+    ಆದರೆ (gui.geom != ಖಾಲಿ)
     {
-	int		mask;
-	unsigned int	w, h;
-	int		x = 0;
-	int		y = 0;
+	ಪೂರ್ಣಾಂಕ		ಮುಖವಾಡ;
+	ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ	w, h;
+	ಪೂರ್ಣಾಂಕ		x = 0;
+	ಪೂರ್ಣಾಂಕ		y = 0;
 
-	mask = XParseGeometry((char *)gui.geom, &x, &y, &w, &h);
+	ಮುಖವಾಡ = XParseGeometry((ಅಕ್ಷರ *)gui.geom, &x, &y, &w, &h);
 
-	if (mask & WidthValue)
+	ಆದರೆ (ಮುಖವಾಡ & ಅಗಲ_ಮೌಲ್ಯ)
 	    Columns = w;
-	if (mask & HeightValue)
+	ಆದರೆ (ಮುಖವಾಡ & ಎತ್ತರ_ಮೌಲ್ಯ)
 	{
-	    if (p_window > (long)h - 1 || !option_was_set((char_u *)"window"))
-		p_window = h - 1;
-	    Rows = h;
+	    ಆದರೆ (p_ಕಿಟಕಿ > (ದೀರ್ಘ)h - 1 || !option_was_ಗಣ((char_u *)"window"))
+		p_ಕಿಟಕಿ = h - 1;
+	    ಅಡ್ಡಸಾಲುಗಳು = h;
 	}
-	limit_screen_size();
+	ಎಲ್ಲೆ_screen_ಗಾತ್ರ();
 
-	pixel_width = (guint)(gui_get_base_width() + Columns * gui.char_width);
-	pixel_height = (guint)(gui_get_base_height() + Rows * gui.char_height);
+	pixel_ಅಗಲ = (guint)(gui_get_ತಳ_ಅಗಲ() + Columns * gui.char_ಅಗಲ);
+	pixel_ಎತ್ತರ = (guint)(gui_get_ತಳ_ಎತ್ತರ() + ಅಡ್ಡಸಾಲುಗಳು * gui.char_ಎತ್ತರ);
 
-	pixel_width  += get_menu_tool_width();
-	pixel_height += get_menu_tool_height();
+	pixel_ಅಗಲ  += get_menu_tool_ಅಗಲ();
+	pixel_ಎತ್ತರ += get_menu_tool_ಎತ್ತರ();
 
-	if (mask & (XValue | YValue))
+	ಆದರೆ (ಮುಖವಾಡ & (XValue | YValue))
 	{
-	    int ww, hh;
+	    ಪೂರ್ಣಾಂಕ ww, hh;
 
-#ifdef FEAT_GUI_GTK
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_GTK
 	    gui_gtk_get_screen_dimensions(x, y, &ww, &hh);
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 	    gui_mch_get_screen_dimensions(&ww, &hh);
-#endif
-	    hh += p_ghr + get_menu_tool_height();
-	    ww += get_menu_tool_width();
-	    if (mask & XNegative)
-		x += ww - pixel_width;
-	    if (mask & YNegative)
-		y += hh - pixel_height;
-	    gtk_window_move(GTK_WINDOW(gui.mainwin), x, y);
+#ಆದರೆ_ಅಂತ್ಯ
+	    hh += p_ghr + get_menu_tool_ಎತ್ತರ();
+	    ww += get_menu_tool_ಅಗಲ();
+	    ಆದರೆ (ಮುಖವಾಡ & XNegative)
+		x += ww - pixel_ಅಗಲ;
+	    ಆದರೆ (ಮುಖವಾಡ & YNegative)
+		y += hh - pixel_ಎತ್ತರ;
+	    gtk_ಕಿಟಕಿ_move(GTK_ಕಿಟಕಿ(gui.mainwin), x, y);
 	}
 	VIM_CLEAR(gui.geom);
 
@@ -4719,47 +4719,47 @@ gui_mch_open(void)
 	// to their correct minimum values, stop them being set as we need
 	// them to remain at our required size for the parent GtkSocket to
 	// give us the right initial size.
-	if (gtk_socket_id != 0  &&  (mask & WidthValue || mask & HeightValue))
+	ಆದರೆ (gtk_socket_id != 0  &&  (ಮುಖವಾಡ & ಅಗಲ_ಮೌಲ್ಯ || ಮುಖವಾಡ & ಎತ್ತರ_ಮೌಲ್ಯ))
 	{
-	    update_window_manager_hints(pixel_width, pixel_height);
-	    init_window_hints_state = 1;
-	    timeout_add(1000, check_startup_plug_hints, NULL);
+	    update_ಕಿಟಕಿ_manager_hints(pixel_ಅಗಲ, pixel_ಎತ್ತರ);
+	    init_ಕಿಟಕಿ_hints_state = 1;
+	    timeout_ಕೂಡಿಸು(1000, check_startup_plug_hints, ಖಾಲಿ);
 	}
     }
 
-    pixel_width = (guint)(gui_get_base_width() + Columns * gui.char_width);
-    pixel_height = (guint)(gui_get_base_height() + Rows * gui.char_height);
+    pixel_ಅಗಲ = (guint)(gui_get_ತಳ_ಅಗಲ() + Columns * gui.char_ಅಗಲ);
+    pixel_ಎತ್ತರ = (guint)(gui_get_ತಳ_ಎತ್ತರ() + ಅಡ್ಡಸಾಲುಗಳು * gui.char_ಎತ್ತರ);
 
     // For GTK2 changing the size of the form widget doesn't cause window
     // resizing.
-    if (gtk_socket_id == 0)
-	gtk_window_resize(GTK_WINDOW(gui.mainwin), pixel_width, pixel_height);
-    update_window_manager_hints(0, 0);
+    ಆದರೆ (gtk_socket_id == 0)
+	gtk_ಕಿಟಕಿ_resize(GTK_ಕಿಟಕಿ(gui.mainwin), pixel_ಅಗಲ, pixel_ಎತ್ತರ);
+    update_ಕಿಟಕಿ_manager_hints(0, 0);
 
-    if (foreground_argument != NULL)
-	fg_pixel = gui_get_color((char_u *)foreground_argument);
-    if (fg_pixel == INVALCOLOR)
+    ಆದರೆ (foreground_ವಾದ != ಖಾಲಿ)
+	fg_pixel = gui_get_color((char_u *)foreground_ವಾದ);
+    ಆದರೆ (fg_pixel == INVALCOLOR)
 	fg_pixel = gui_get_color((char_u *)"Black");
 
-    if (background_argument != NULL)
-	bg_pixel = gui_get_color((char_u *)background_argument);
-    if (bg_pixel == INVALCOLOR)
+    ಆದರೆ (background_ವಾದ != ಖಾಲಿ)
+	bg_pixel = gui_get_color((char_u *)background_ವಾದ);
+    ಆದರೆ (bg_pixel == INVALCOLOR)
 	bg_pixel = gui_get_color((char_u *)"White");
 
-    if (found_reverse_arg)
+    ಆದರೆ (ಸಿಕ್ಕಿತು_ಹಿಮ್ಮುಖ_arg)
     {
 	gui.def_norm_pixel = bg_pixel;
-	gui.def_back_pixel = fg_pixel;
+	gui.def_ಹಿಂಭಾಗ_pixel = fg_pixel;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	gui.def_norm_pixel = fg_pixel;
-	gui.def_back_pixel = bg_pixel;
+	gui.def_ಹಿಂಭಾಗ_pixel = bg_pixel;
     }
 
     // Get the colors from the "Normal" and "Menu" group (set in syntax.c or
     // in a vimrc file)
-    set_normal_colors();
+    ಗಣ_ಸಾಮಾನ್ಯ_colors();
 
     // Check that none of the colors are the same as the background color
     gui_check_colors();
@@ -4769,7 +4769,7 @@ gui_mch_open(void)
     highlight_gui_started();	// re-init colors and fonts
 
     g_signal_connect(G_OBJECT(gui.mainwin), "destroy",
-		     G_CALLBACK(mainwin_destroy_cb), NULL);
+		     G_CALLBACK(mainwin_destroy_cb), ಖಾಲಿ);
 
     /*
      * Notify the fixed area about the need to resize the contents of the
@@ -4781,34 +4781,34 @@ gui_mch_open(void)
      * manager upon us and should not interfere with what VIM is requesting
      * upon startup.
      */
-#ifdef TRACK_RESIZE_HISTORY
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TRACK_RESIZE_HISTORY
     latest_resize_hist = ALLOC_CLEAR_ONE(resize_hist_T);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     g_signal_connect(G_OBJECT(gui.formwin), "configure-event",
-				       G_CALLBACK(form_configure_event), NULL);
-#if GTK_CHECK_VERSION(3,10,0)
+				       G_CALLBACK(form_configure_event), ಖಾಲಿ);
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,10,0)
     g_signal_connect(G_OBJECT(gui.formwin), "notify::scale-factor",
-		     G_CALLBACK(scale_factor_event), NULL);
-#endif
+		     G_CALLBACK(scale_ಗುಣಕ_event), ಖಾಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_DND
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DND
     // Set up for receiving DND items.
-    gui_gtk_set_dnd_targets();
+    gui_gtk_ಗಣ_dnd_targets();
 
     g_signal_connect(G_OBJECT(gui.drawarea), "drag-data-received",
-				      G_CALLBACK(drag_data_received_cb), NULL);
-#endif
+				      G_CALLBACK(drag_ದತ್ತಾಂಶ_received_cb), ಖಾಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ
 
 	// With GTK+ 2, we need to iconify the window before calling show()
 	// to avoid mapping the window for a short time.
-	if (found_iconic_arg && gtk_socket_id == 0)
+	ಆದರೆ (ಸಿಕ್ಕಿತು_iconic_arg && gtk_socket_id == 0)
 	    gui_mch_iconify();
 
     {
-#if defined(FEAT_GUI_GNOME) && defined(FEAT_MENU)
-	unsigned long menu_handler = 0;
+#ಆದರೆ defined(FEAT_GUI_GNOME) && defined(FEAT_MENU)
+	ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ menu_handler = 0;
 # ifdef FEAT_TOOLBAR
-	unsigned long tool_handler = 0;
+	ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ tool_handler = 0;
 # endif
 	/*
 	 * Urgh hackish :/  For some reason BonoboDockLayout always forces a
@@ -4818,82 +4818,82 @@ gui_mch_open(void)
 	 * connect signal handlers to hide the widgets just after they've been
 	 * marked visible, but before the main window is realized.
 	 */
-	if (using_gnome && vim_strchr(p_go, GO_MENUS) == NULL)
+	ಆದರೆ (using_gnome && vim_strchr(p_go, GO_MENUS) == ಖಾಲಿ)
 	    menu_handler = g_signal_connect_after(gui.menubar_h, "show",
 						  G_CALLBACK(&gtk_widget_hide),
-						  NULL);
+						  ಖಾಲಿ);
 # ifdef FEAT_TOOLBAR
-	if (using_gnome && vim_strchr(p_go, GO_TOOLBAR) == NULL
-		&& (toolbar_flags & (TOOLBAR_TEXT | TOOLBAR_ICONS)))
+	ಆದರೆ (using_gnome && vim_strchr(p_go, GO_TOOLBAR) == ಖಾಲಿ
+		&& (toolbar_flags & (TOOLBAR_ಪಠ್ಯ | TOOLBAR_ICONS)))
 	    tool_handler = g_signal_connect_after(gui.toolbar_h, "show",
 						  G_CALLBACK(&gtk_widget_hide),
-						  NULL);
+						  ಖಾಲಿ);
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	gtk_widget_show(gui.mainwin);
 
-#if defined(FEAT_GUI_GNOME) && defined(FEAT_MENU)
-	if (menu_handler != 0)
+#ಆದರೆ defined(FEAT_GUI_GNOME) && defined(FEAT_MENU)
+	ಆದರೆ (menu_handler != 0)
 	    g_signal_handler_disconnect(gui.menubar_h, menu_handler);
 # ifdef FEAT_TOOLBAR
-	if (tool_handler != 0)
+	ಆದರೆ (tool_handler != 0)
 	    g_signal_handler_disconnect(gui.toolbar_h, tool_handler);
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
     /*
      * Add selection handler functions.
      */
     g_signal_connect(G_OBJECT(gui.drawarea), "selection-clear-event",
-		     G_CALLBACK(selection_clear_event), NULL);
+		     G_CALLBACK(selection_clear_event), ಖಾಲಿ);
     g_signal_connect(G_OBJECT(gui.drawarea), "selection-received",
-		     G_CALLBACK(selection_received_cb), NULL);
+		     G_CALLBACK(selection_received_cb), ಖಾಲಿ);
 
     g_signal_connect(G_OBJECT(gui.drawarea), "selection-get",
-		     G_CALLBACK(selection_get_cb), NULL);
+		     G_CALLBACK(selection_get_cb), ಖಾಲಿ);
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Clean up for when exiting Vim.
  */
-    void
-gui_mch_exit(int rc UNUSED)
+    ಶೂನ್ಯ
+gui_mch_exit(ಪೂರ್ಣಾಂಕ rc ಬಳಸದ)
 {
     // Clean up, unless we don't want to invoke free().
-    if (gui.mainwin != NULL && !really_exiting)
+    ಆದರೆ (gui.mainwin != ಖಾಲಿ && !really_exiting)
 	gtk_widget_destroy(gui.mainwin);
 }
 
 /*
  * Get the position of the top left corner of the window.
  */
-    int
-gui_mch_get_winpos(int *x, int *y)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_get_winpos(ಪೂರ್ಣಾಂಕ *x, ಪೂರ್ಣಾಂಕ *y)
 {
-    if (gui_mch_get_display())
+    ಆದರೆ (gui_mch_get_display())
     {
-	gtk_window_get_position(GTK_WINDOW(gui.mainwin), x, y);
-	return OK;
+	gtk_ಕಿಟಕಿ_get_position(GTK_ಕಿಟಕಿ(gui.mainwin), x, y);
+	ಹಿಂತಿರುಗಿ OK;
     }
-    return FAIL;
+    ಹಿಂತಿರುಗಿ FAIL;
 }
 
 /*
  * Set the position of the top left corner of the window to the given
  * coordinates.
  */
-    void
-gui_mch_set_winpos(int x, int y)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_winpos(ಪೂರ್ಣಾಂಕ x, ಪೂರ್ಣಾಂಕ y)
 {
-    gtk_window_move(GTK_WINDOW(gui.mainwin), x, y);
+    gtk_ಕಿಟಕಿ_move(GTK_ಕಿಟಕಿ(gui.mainwin), x, y);
 }
 
-#if !GTK_CHECK_VERSION(3,0,0)
-# if 0
-static int resize_idle_installed = FALSE;
+#ಆದರೆ !GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+# ಆದರೆ 0
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ resize_idle_installed = FALSE;
 /*
  * Idle handler to force resize.  Used by gui_mch_set_shellsize() to ensure
  * the shell size doesn't exceed the window size, i.e. if the window manager
@@ -4907,49 +4907,49 @@ static int resize_idle_installed = FALSE;
  * report the new size through form_configure_event().  That caused the window
  * layout to be messed up.
  */
-    static gboolean
-force_shell_resize_idle(gpointer data)
+    ಸ್ಥಿರ gboolean
+force_shell_resize_idle(gpointer ದತ್ತಾಂಶ)
 {
-    if (gui.mainwin != NULL
+    ಆದರೆ (gui.mainwin != ಖಾಲಿ
 	    && GTK_WIDGET_REALIZED(gui.mainwin)
 	    && GTK_WIDGET_VISIBLE(gui.mainwin))
     {
-	int width;
-	int height;
+	ಪೂರ್ಣಾಂಕ ಅಗಲ;
+	ಪೂರ್ಣಾಂಕ ಎತ್ತರ;
 
-	gtk_window_get_size(GTK_WINDOW(gui.mainwin), &width, &height);
+	gtk_ಕಿಟಕಿ_get_ಗಾತ್ರ(GTK_ಕಿಟಕಿ(gui.mainwin), &ಅಗಲ, &ಎತ್ತರ);
 
-	width  -= get_menu_tool_width();
-	height -= get_menu_tool_height();
+	ಅಗಲ  -= get_menu_tool_ಅಗಲ();
+	ಎತ್ತರ -= get_menu_tool_ಎತ್ತರ();
 
-	gui_resize_shell(width, height);
+	gui_resize_shell(ಅಗಲ, ಎತ್ತರ);
     }
 
     resize_idle_installed = FALSE;
-    return FALSE; // don't call me again
+    ಹಿಂತಿರುಗಿ FALSE; // don't call me again
 }
 # endif
-#endif // !GTK_CHECK_VERSION(3,0,0)
+#ಆದರೆ_ಅಂತ್ಯ // !GTK_CHECK_VERSION(3,0,0)
 
 /*
  * Return TRUE if the main window is maximized.
  */
-    int
-gui_mch_maximized(void)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_maximized(ಶೂನ್ಯ)
 {
-    return (gui.mainwin != NULL && gtk_widget_get_window(gui.mainwin) != NULL
-	    && (gdk_window_get_state(gtk_widget_get_window(gui.mainwin))
-					       & GDK_WINDOW_STATE_MAXIMIZED));
+    ಹಿಂತಿರುಗಿ (gui.mainwin != ಖಾಲಿ && gtk_widget_get_ಕಿಟಕಿ(gui.mainwin) != ಖಾಲಿ
+	    && (gdk_ಕಿಟಕಿ_get_state(gtk_widget_get_ಕಿಟಕಿ(gui.mainwin))
+					       & GDK_ಕಿಟಕಿ_STATE_MAXIMIZED));
 }
 
 /*
  * Unmaximize the main window
  */
-    void
-gui_mch_unmaximize(void)
+    ಶೂನ್ಯ
+gui_mch_unmaximize(ಶೂನ್ಯ)
 {
-    if (gui.mainwin != NULL)
-	gtk_window_unmaximize(GTK_WINDOW(gui.mainwin));
+    ಆದರೆ (gui.mainwin != ಖಾಲಿ)
+	gtk_ಕಿಟಕಿ_unmaximize(GTK_ಕಿಟಕಿ(gui.mainwin));
 }
 
 /*
@@ -4957,71 +4957,71 @@ gui_mch_unmaximize(void)
  * is set.  Compute the new Rows and Columns.  This is like resizing the
  * window.
  */
-    void
-gui_mch_newfont(void)
+    ಶೂನ್ಯ
+gui_mch_newfont(ಶೂನ್ಯ)
 {
-    int w, h;
+    ಪೂರ್ಣಾಂಕ w, h;
 
-    gtk_window_get_size(GTK_WINDOW(gui.mainwin), &w, &h);
-    w -= get_menu_tool_width();
-    h -= get_menu_tool_height();
+    gtk_ಕಿಟಕಿ_get_ಗಾತ್ರ(GTK_ಕಿಟಕಿ(gui.mainwin), &w, &h);
+    w -= get_menu_tool_ಅಗಲ();
+    h -= get_menu_tool_ಎತ್ತರ();
     gui_resize_shell(w, h);
 }
 
 /*
  * Set the windows size.
  */
-    void
-gui_mch_set_shellsize(int width, int height,
-		      int min_width UNUSED,  int min_height UNUSED,
-		      int base_width UNUSED, int base_height UNUSED,
-		      int direction UNUSED)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_shellsize(ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ,
+		      ಪೂರ್ಣಾಂಕ min_ಅಗಲ ಬಳಸದ,  ಪೂರ್ಣಾಂಕ min_ಎತ್ತರ ಬಳಸದ,
+		      ಪೂರ್ಣಾಂಕ ತಳ_ಅಗಲ ಬಳಸದ, ಪೂರ್ಣಾಂಕ ತಳ_ಎತ್ತರ ಬಳಸದ,
+		      ಪೂರ್ಣಾಂಕ direction ಬಳಸದ)
 {
     // give GTK+ a chance to put all widget's into place
     gui_mch_update();
 
     // this will cause the proper resizement to happen too
-    if (gtk_socket_id == 0)
-	update_window_manager_hints(0, 0);
+    ಆದರೆ (gtk_socket_id == 0)
+	update_ಕಿಟಕಿ_manager_hints(0, 0);
 
     // With GTK+ 2, changing the size of the form widget doesn't resize
     // the window.  So let's do it the other way around and resize the
     // main window instead.
-    width  += get_menu_tool_width();
-    height += get_menu_tool_height();
+    ಅಗಲ  += get_menu_tool_ಅಗಲ();
+    ಎತ್ತರ += get_menu_tool_ಎತ್ತರ();
 
     // Compensate for CSD frame: on Wayland (GTK3 with CSD), the compositor
     // subtracts the decoration margin from the requested size.  mch_csd_width
     // and mch_csd_height are computed from the first startup resize response
     // and are 0 on X11.
-    width  += mch_csd_width;
-    height += mch_csd_height;
+    ಅಗಲ  += mch_csd_ಅಗಲ;
+    ಎತ್ತರ += mch_csd_ಎತ್ತರ;
 
     // Record the form width we expect the compositor to deliver.  Used in
     // form_configure_event() to clamp configure responses that are slightly
     // narrower than intended (due to CSD startup underestimate), preventing
     // column loss.  Only meaningful once mch_csd_width has been measured.
-    mch_pending_form_w = (mch_csd_width > 0)
-			    ? width - get_menu_tool_width() - mch_csd_width : 0;
+    mch_pending_form_w = (mch_csd_ಅಗಲ > 0)
+			    ? ಅಗಲ - get_menu_tool_ಅಗಲ() - mch_csd_ಅಗಲ : 0;
 
-#ifdef TRACK_RESIZE_HISTORY
-    alloc_resize_hist(width, height, TRUE);
-#endif
-    if (gtk_socket_id == 0)
-	gtk_window_resize(GTK_WINDOW(gui.mainwin), width, height);
-    else
-	update_window_manager_hints(width, height);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TRACK_RESIZE_HISTORY
+    alloc_resize_hist(ಅಗಲ, ಎತ್ತರ, TRUE);
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (gtk_socket_id == 0)
+	gtk_ಕಿಟಕಿ_resize(GTK_ಕಿಟಕಿ(gui.mainwin), ಅಗಲ, ಎತ್ತರ);
+    ಇಲ್ಲದಿದ್ದರೆ
+	update_ಕಿಟಕಿ_manager_hints(ಅಗಲ, ಎತ್ತರ);
 
-#if !GTK_CHECK_VERSION(3,0,0)
-# if 0
-    if (!resize_idle_installed)
+#ಆದರೆ !GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+# ಆದರೆ 0
+    ಆದರೆ (!resize_idle_installed)
     {
-	g_idle_add_full(GDK_PRIORITY_EVENTS + 10,
-			&force_shell_resize_idle, NULL, NULL);
+	g_idle_ಕೂಡಿಸು_ತುಂಬಿದ(GDK_ಆದ್ಯತೆ_EVENTS + 10,
+			&force_shell_resize_idle, ಖಾಲಿ, ಖಾಲಿ);
 	resize_idle_installed = TRUE;
     }
 # endif
-#endif // !GTK_CHECK_VERSION(3,0,0)
+#ಆದರೆ_ಅಂತ್ಯ // !GTK_CHECK_VERSION(3,0,0)
     /*
      * Wait until all events are processed to prevent a crash because the
      * real size of the drawing area doesn't reflect Vim's internal ideas.
@@ -5032,74 +5032,74 @@ gui_mch_set_shellsize(int width, int height,
     gui_mch_update();
 }
 
-    void
-gui_mch_settitle(char_u *title, char_u *icon UNUSED)
+    ಶೂನ್ಯ
+gui_mch_settitle(char_u *title, char_u *icon ಬಳಸದ)
 {
-    if (title != NULL && output_conv.vc_type != CONV_NONE)
-	title = string_convert(&output_conv, title, NULL);
+    ಆದರೆ (title != ಖಾಲಿ && output_conv.vc_type != CONV_NONE)
+	title = string_convert(&output_conv, title, ಖಾಲಿ);
 
-    gtk_window_set_title(GTK_WINDOW(gui.mainwin), (const char *)title);
+    gtk_ಕಿಟಕಿ_ಗಣ_title(GTK_ಕಿಟಕಿ(gui.mainwin), (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)title);
 
-    if (output_conv.vc_type != CONV_NONE)
+    ಆದರೆ (output_conv.vc_type != CONV_NONE)
 	vim_free(title);
 }
 
-#if defined(FEAT_MENU)
-    void
-gui_mch_enable_menu(int showit)
+#ಆದರೆ defined(FEAT_MENU)
+    ಶೂನ್ಯ
+gui_mch_enable_menu(ಪೂರ್ಣಾಂಕ showit)
 {
     GtkWidget *widget;
 
 # ifdef FEAT_GUI_GNOME
-    if (using_gnome)
+    ಆದರೆ (using_gnome)
 	widget = gui.menubar_h;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 # endif
 	widget = gui.menubar;
 
     // Do not disable the menu while starting up, otherwise F10 doesn't work.
-    if (!showit != !gtk_widget_get_visible(widget) && !gui.starting)
+    ಆದರೆ (!showit != !gtk_widget_get_visible(widget) && !gui.starting)
     {
-	if (showit)
+	ಆದರೆ (showit)
 	    gtk_widget_show(widget);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    gtk_widget_hide(widget);
 
-	update_window_manager_hints(0, 0);
+	update_ಕಿಟಕಿ_manager_hints(0, 0);
     }
 }
-#endif // FEAT_MENU
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_MENU
 
-#if defined(FEAT_TOOLBAR)
-    void
-gui_mch_show_toolbar(int showit)
+#ಆದರೆ defined(FEAT_TOOLBAR)
+    ಶೂನ್ಯ
+gui_mch_show_toolbar(ಪೂರ್ಣಾಂಕ showit)
 {
     GtkWidget *widget;
 
-    if (gui.toolbar == NULL)
-	return;
+    ಆದರೆ (gui.toolbar == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
 # ifdef FEAT_GUI_GNOME
-    if (using_gnome)
+    ಆದರೆ (using_gnome)
 	widget = gui.toolbar_h;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 # endif
 	widget = gui.toolbar;
 
-    if (showit)
-	set_toolbar_style(GTK_TOOLBAR(gui.toolbar));
+    ಆದರೆ (showit)
+	ಗಣ_toolbar_style(GTK_TOOLBAR(gui.toolbar));
 
-    if (!showit != !gtk_widget_get_visible(widget))
+    ಆದರೆ (!showit != !gtk_widget_get_visible(widget))
     {
-	if (showit)
+	ಆದರೆ (showit)
 	    gtk_widget_show(widget);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    gtk_widget_hide(widget);
 
-	update_window_manager_hints(0, 0);
+	update_ಕಿಟಕಿ_manager_hints(0, 0);
     }
 }
-#endif // FEAT_TOOLBAR
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_TOOLBAR
 
 /*
  * Check if a given font is a CJK font. This is done in a very crude manner. It
@@ -5108,22 +5108,22 @@ gui_mch_show_toolbar(int showit)
  * for CJK-ness for which fontconfig APIs should be used.  This is only used by
  * gui_mch_init_font() to deal with 'CJK fixed width fonts'.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 is_cjk_font(PangoFontDescription *font_desc)
 {
-    static const char * const cjk_langs[] =
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ * ಸ್ಥಿರಾಂಕ cjk_langs[] =
 	{"zh_CN", "zh_TW", "zh_HK", "ja", "ko"};
 
     PangoFont	*font;
-    unsigned	i;
-    int		is_cjk = FALSE;
+    ಚಿಹ್ನೆರಹಿತ	i;
+    ಪೂರ್ಣಾಂಕ		is_cjk = FALSE;
 
-    font = pango_context_load_font(gui.text_context, font_desc);
+    font = pango_context_ತುಂಬು_font(gui.ಪಠ್ಯ_context, font_desc);
 
-    if (font == NULL)
-	return FALSE;
+    ಆದರೆ (font == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    for (i = 0; !is_cjk && i < G_N_ELEMENTS(cjk_langs); ++i)
+    ಗಾಗಿ (i = 0; !is_cjk && i < G_N_ELEMENTS(cjk_langs); ++i)
     {
 	PangoCoverage	*coverage;
 	gunichar	uc;
@@ -5133,35 +5133,35 @@ is_cjk_font(PangoFontDescription *font_desc)
 	coverage = pango_font_get_coverage(
 		font, pango_language_from_string(cjk_langs[i]));
 
-	if (coverage != NULL)
+	ಆದರೆ (coverage != ಖಾಲಿ)
 	{
 	    uc = (cjk_langs[i][0] == 'k') ? 0xAC00 : 0x4E00;
 	    is_cjk = (pango_coverage_get(coverage, uc) == PANGO_COVERAGE_EXACT);
-#if PANGO_VERSION_CHECK(1, 52, 0)
+#ಆದರೆ PANGO_ಆವೃತ್ತಿ_CHECK(1, 52, 0)
 	    g_object_unref(coverage);
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 	    pango_coverage_unref(coverage);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	}
     }
 
     g_object_unref(font);
 
-    return is_cjk;
+    ಹಿಂತಿರುಗಿ is_cjk;
 }
 
 /*
  * Adjust gui.char_height (after 'linespace' was changed).
  */
-    int
-gui_mch_adjust_charheight(void)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_adjust_charheight(ಶೂನ್ಯ)
 {
     PangoFontMetrics	*metrics;
-    int			ascent;
-    int			descent;
+    ಪೂರ್ಣಾಂಕ			ascent;
+    ಪೂರ್ಣಾಂಕ			descent;
 
-    metrics = pango_context_get_metrics(gui.text_context, gui.norm_font,
-				pango_context_get_language(gui.text_context));
+    metrics = pango_context_get_metrics(gui.ಪಠ್ಯ_context, gui.norm_font,
+				pango_context_get_language(gui.ಪಠ್ಯ_context));
     ascent  = pango_font_metrics_get_ascent(metrics);
     descent = pango_font_metrics_get_descent(metrics);
 
@@ -5169,7 +5169,7 @@ gui_mch_adjust_charheight(void)
 
     // Round up when the value is more than about 1/16 of a pixel above a whole
     // pixel (12.0624 becomes 12, 12.07 becomes 13).  Then add 'linespace'.
-    gui.char_height = (ascent + descent + (PANGO_SCALE * 15) / 16)
+    gui.char_ಎತ್ತರ = (ascent + descent + (PANGO_SCALE * 15) / 16)
 						   / PANGO_SCALE + p_linespace;
     // LINTED: avoid warning: bitwise operation on signed value
     gui.char_ascent = PANGO_PIXELS(ascent + p_linespace * PANGO_SCALE / 2);
@@ -5177,21 +5177,21 @@ gui_mch_adjust_charheight(void)
     // A not-positive value of char_height may crash Vim.  Only happens
     // if 'linespace' is negative (which does make sense sometimes).
     gui.char_ascent = MAX(gui.char_ascent, 0);
-    gui.char_height = MAX(gui.char_height, gui.char_ascent + 1);
+    gui.char_ಎತ್ತರ = MAX(gui.char_ಎತ್ತರ, gui.char_ascent + 1);
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-#if GTK_CHECK_VERSION(3,0,0)
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
 // Callback function used in gui_mch_font_dialog()
-    static gboolean
-font_filter(const PangoFontFamily *family,
-	    const PangoFontFace   *face UNUSED,
-	    gpointer		   data UNUSED)
+    ಸ್ಥಿರ gboolean
+font_filter(ಸ್ಥಿರಾಂಕ PangoFontFamily *family,
+	    ಸ್ಥಿರಾಂಕ PangoFontFace   *face ಬಳಸದ,
+	    gpointer		   ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    return pango_font_family_is_monospace((PangoFontFamily *)family);
+    ಹಿಂತಿರುಗಿ pango_font_family_is_monospace((PangoFontFamily *)family);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Put up a font dialog and return the selected font name in allocated memory.
@@ -5206,76 +5206,76 @@ font_filter(const PangoFontFamily *family,
 gui_mch_font_dialog(char_u *oldval)
 {
     GtkWidget	*dialog;
-    int		response;
-    char_u	*fontname = NULL;
+    ಪೂರ್ಣಾಂಕ		response;
+    char_u	*fontname = ಖಾಲಿ;
     char_u	*oldname;
 
-#if GTK_CHECK_VERSION(3,2,0)
-    dialog = gtk_font_chooser_dialog_new(NULL, NULL);
-    gtk_font_chooser_set_filter_func(GTK_FONT_CHOOSER(dialog), font_filter,
-	    NULL, NULL);
-#else
-    dialog = gtk_font_selection_dialog_new(NULL);
-#endif
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,2,0)
+    dialog = gtk_font_chooser_dialog_new(ಖಾಲಿ, ಖಾಲಿ);
+    gtk_font_chooser_ಗಣ_filter_func(GTK_FONT_CHOOSER(dialog), font_filter,
+	    ಖಾಲಿ, ಖಾಲಿ);
+#ಇಲ್ಲದಿದ್ದರೆ
+    dialog = gtk_font_selection_dialog_new(ಖಾಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ
 
-    gtk_window_set_transient_for(GTK_WINDOW(dialog), GTK_WINDOW(gui.mainwin));
-    gtk_window_set_destroy_with_parent(GTK_WINDOW(dialog), TRUE);
+    gtk_ಕಿಟಕಿ_ಗಣ_transient_for(GTK_ಕಿಟಕಿ(dialog), GTK_ಕಿಟಕಿ(gui.mainwin));
+    gtk_ಕಿಟಕಿ_ಗಣ_destroy_with_ಪೋಷಕ(GTK_ಕಿಟಕಿ(dialog), TRUE);
 
-    if (oldval != NULL && oldval[0] != NUL)
+    ಆದರೆ (oldval != ಖಾಲಿ && oldval[0] != NUL)
     {
-	if (output_conv.vc_type != CONV_NONE)
-	    oldname = string_convert(&output_conv, oldval, NULL);
-	else
+	ಆದರೆ (output_conv.vc_type != CONV_NONE)
+	    oldname = string_convert(&output_conv, oldval, ಖಾಲಿ);
+	ಇಲ್ಲದಿದ್ದರೆ
 	    oldname = oldval;
 
 	// Annoying bug in GTK (or Pango): if the font name does not include a
 	// size, zero is used.  Use default point size ten.
-	if (!vim_isdigit(oldname[STRLEN(oldname) - 1]))
+	ಆದರೆ (!vim_isdigit(oldname[STRLEN(oldname) - 1]))
 	{
 	    char_u	*p = vim_strnsave(oldname, STRLEN(oldname) + 3);
 
-	    if (p != NULL)
+	    ಆದರೆ (p != ಖಾಲಿ)
 	    {
 		STRCPY(p + STRLEN(p), " 10");
-		if (oldname != oldval)
+		ಆದರೆ (oldname != oldval)
 		    vim_free(oldname);
 		oldname = p;
 	    }
 	}
 
-#if GTK_CHECK_VERSION(3,2,0)
-	gtk_font_chooser_set_font(
-		GTK_FONT_CHOOSER(dialog), (const gchar *)oldname);
-#else
-	gtk_font_selection_dialog_set_font_name(
-		GTK_FONT_SELECTION_DIALOG(dialog), (const char *)oldname);
-#endif
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,2,0)
+	gtk_font_chooser_ಗಣ_font(
+		GTK_FONT_CHOOSER(dialog), (ಸ್ಥಿರಾಂಕ gchar *)oldname);
+#ಇಲ್ಲದಿದ್ದರೆ
+	gtk_font_selection_dialog_ಗಣ_font_name(
+		GTK_FONT_SELECTION_DIALOG(dialog), (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)oldname);
+#ಆದರೆ_ಅಂತ್ಯ
 
-	if (oldname != oldval)
+	ಆದರೆ (oldname != oldval)
 	    vim_free(oldname);
     }
-    else
-#if GTK_CHECK_VERSION(3,2,0)
-	gtk_font_chooser_set_font(
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,2,0)
+	gtk_font_chooser_ಗಣ_font(
 		GTK_FONT_CHOOSER(dialog), DEFAULT_FONT);
-#else
-	gtk_font_selection_dialog_set_font_name(
+#ಇಲ್ಲದಿದ್ದರೆ
+	gtk_font_selection_dialog_ಗಣ_font_name(
 		GTK_FONT_SELECTION_DIALOG(dialog), DEFAULT_FONT);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    response = gtk_dialog_run(GTK_DIALOG(dialog));
+    response = gtk_dialog_ಸತತ(GTK_DIALOG(dialog));
 
-    if (response == GTK_RESPONSE_OK)
+    ಆದರೆ (response == GTK_RESPONSE_OK)
     {
-	char *name;
+	ಅಕ್ಷರ *name;
 
-#if GTK_CHECK_VERSION(3,2,0)
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,2,0)
 	name = gtk_font_chooser_get_font(GTK_FONT_CHOOSER(dialog));
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 	name = gtk_font_selection_dialog_get_font_name(
 			    GTK_FONT_SELECTION_DIALOG(dialog));
-#endif
-	if (name != NULL)
+#ಆದರೆ_ಅಂತ್ಯ
+	ಆದರೆ (name != ಖಾಲಿ)
 	{
 	    char_u  *p;
 
@@ -5283,20 +5283,20 @@ gui_mch_font_dialog(char_u *oldval)
 	    // that, because in 'guifont' it separates names.
 	    p = vim_strsave_escaped((char_u *)name, (char_u *)",");
 	    g_free(name);
-	    if (p != NULL && input_conv.vc_type != CONV_NONE)
+	    ಆದರೆ (p != ಖಾಲಿ && ಒಳಹರಿವು_conv.vc_type != CONV_NONE)
 	    {
-		fontname = string_convert(&input_conv, p, NULL);
+		fontname = string_convert(&ಒಳಹರಿವು_conv, p, ಖಾಲಿ);
 		vim_free(p);
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		fontname = p;
 	}
     }
 
-    if (response != GTK_RESPONSE_NONE)
+    ಆದರೆ (response != GTK_RESPONSE_NONE)
 	gtk_widget_destroy(dialog);
 
-    return fontname;
+    ಹಿಂತಿರುಗಿ fontname;
 }
 
 /*
@@ -5310,8 +5310,8 @@ gui_mch_font_dialog(char_u *oldval)
  * emulate italic on its own, provided you have a proper fontconfig
  * setup.  We wouldn't be able to emulate it in Vim anyway.
  */
-    static void
-get_styled_font_variants(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+get_styled_font_variants(ಶೂನ್ಯ)
 {
     PangoFontDescription    *bold_font_desc;
     PangoFont		    *plain_font;
@@ -5319,103 +5319,103 @@ get_styled_font_variants(void)
 
     gui.font_can_bold = false;
 
-    plain_font = pango_context_load_font(gui.text_context, gui.norm_font);
+    plain_font = pango_context_ತುಂಬು_font(gui.ಪಠ್ಯ_context, gui.norm_font);
 
-    if (plain_font == NULL)
-	return;
+    ಆದರೆ (plain_font == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     bold_font_desc = pango_font_description_copy_static(gui.norm_font);
-    pango_font_description_set_weight(bold_font_desc, PANGO_WEIGHT_BOLD);
+    pango_font_description_ಗಣ_ತೂಕ(bold_font_desc, PANGO_ತೂಕ_BOLD);
 
-    bold_font = pango_context_load_font(gui.text_context, bold_font_desc);
+    bold_font = pango_context_ತುಂಬು_font(gui.ಪಠ್ಯ_context, bold_font_desc);
     /*
      * The comparison relies on the unique handle nature of a PangoFont*,
      * i.e. it's assumed that a different PangoFont* won't refer to the
      * same font.  Seems to work, and failing here isn't critical anyway.
      */
-    if (bold_font != NULL)
+    ಆದರೆ (bold_font != ಖಾಲಿ)
     {
 	gui.font_can_bold = (bold_font != plain_font);
 	g_object_unref(bold_font);
     }
 
     pango_font_description_free(bold_font_desc);
-    if (bold_font != NULL && gui.font_can_bold)
+    ಆದರೆ (bold_font != ಖಾಲಿ && gui.font_can_bold)
 	g_object_unref(plain_font);
 }
 
-static PangoEngineShape *default_shape_engine = NULL;
+ಸ್ಥಿರ PangoEngineShape *default_shape_engine = ಖಾಲಿ;
 
 /*
  * Create a map from ASCII characters in the range [32,126] to glyphs
  * of the current font.  This is used by gui_gtk_draw_string() to skip
  * the itemize and shaping process for the most common case.
  */
-    static void
-ascii_glyph_table_init(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ascii_glyph_ಕೋಷ್ಟಕ_init(ಶೂನ್ಯ)
 {
     char_u	    ascii_chars[2 * 128];
     PangoAttrList   *attr_list;
-    GList	    *item_list;
-    int		    i;
+    GList	    *ಅಂಶ_list;
+    ಪೂರ್ಣಾಂಕ		    i;
 
-    if (gui.ascii_glyphs != NULL)
+    ಆದರೆ (gui.ascii_glyphs != ಖಾಲಿ)
 	pango_glyph_string_free(gui.ascii_glyphs);
-    if (gui.ascii_font != NULL)
+    ಆದರೆ (gui.ascii_font != ಖಾಲಿ)
 	g_object_unref(gui.ascii_font);
 
-    gui.ascii_glyphs = NULL;
-    gui.ascii_font   = NULL;
+    gui.ascii_glyphs = ಖಾಲಿ;
+    gui.ascii_font   = ಖಾಲಿ;
 
     // For safety, fill in question marks for the control characters.
     // Put a space between characters to avoid shaping.
-    for (i = 0; i < 128; ++i)
+    ಗಾಗಿ (i = 0; i < 128; ++i)
     {
-	if (i >= 32 && i < 127)
+	ಆದರೆ (i >= 32 && i < 127)
 	    ascii_chars[2 * i] = i;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    ascii_chars[2 * i] = '?';
 	ascii_chars[2 * i + 1] = ' ';
     }
 
     attr_list = pango_attr_list_new();
-    item_list = pango_itemize(gui.text_context, (const char *)ascii_chars,
-			      0, sizeof(ascii_chars), attr_list, NULL);
+    ಅಂಶ_list = pango_itemize(gui.ಪಠ್ಯ_context, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)ascii_chars,
+			      0, ಗಾತ್ರ(ascii_chars), attr_list, ಖಾಲಿ);
 
-    if (item_list != NULL && item_list->next == NULL) // play safe
+    ಆದರೆ (ಅಂಶ_list != ಖಾಲಿ && ಅಂಶ_list->ಮುಂದಿನ == ಖಾಲಿ) // play safe
     {
-	PangoItem   *item;
-	int	    width;
+	Pango_ಅಂಶ   *ಅಂಶ;
+	ಪೂರ್ಣಾಂಕ	    ಅಗಲ;
 
-	item  = (PangoItem *)item_list->data;
-	width = gui.char_width * PANGO_SCALE;
+	ಅಂಶ  = (Pango_ಅಂಶ *)ಅಂಶ_list->ದತ್ತಾಂಶ;
+	ಅಗಲ = gui.char_ಅಗಲ * PANGO_SCALE;
 
 	// Remember the shape engine used for ASCII.
-	default_shape_engine = item->analysis.shape_engine;
+	default_shape_engine = ಅಂಶ->analysis.shape_engine;
 
-	gui.ascii_font = item->analysis.font;
+	gui.ascii_font = ಅಂಶ->analysis.font;
 	g_object_ref(gui.ascii_font);
 
 	gui.ascii_glyphs = pango_glyph_string_new();
 
-	pango_shape((const char *)ascii_chars, sizeof(ascii_chars),
-		    &item->analysis, gui.ascii_glyphs);
+	pango_shape((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)ascii_chars, ಗಾತ್ರ(ascii_chars),
+		    &ಅಂಶ->analysis, gui.ascii_glyphs);
 
-	g_return_if_fail(gui.ascii_glyphs->num_glyphs == sizeof(ascii_chars));
+	g_return_if_fail(gui.ascii_glyphs->ಅಂಕೆ_glyphs == ಗಾತ್ರ(ascii_chars));
 
-	for (i = 0; i < gui.ascii_glyphs->num_glyphs; ++i)
+	ಗಾಗಿ (i = 0; i < gui.ascii_glyphs->ಅಂಕೆ_glyphs; ++i)
 	{
 	    PangoGlyphGeometry *geom;
 
 	    geom = &gui.ascii_glyphs->glyphs[i].geometry;
-	    geom->x_offset += MAX(0, width - geom->width) / 2;
-	    geom->width = width;
+	    geom->x_ಸ್ಥಾನಾಂತರ += MAX(0, ಅಗಲ - geom->ಅಗಲ) / 2;
+	    geom->ಅಗಲ = ಅಗಲ;
 	}
     }
 
     // TODO: is this type cast OK?
-    g_list_foreach(item_list, (GFunc)(void *)&pango_item_free, NULL);
-    g_list_free(item_list);
+    g_list_foreach(ಅಂಶ_list, (GFunc)(ಶೂನ್ಯ *)&pango_ಅಂಶ_free, ಖಾಲಿ);
+    g_list_free(ಅಂಶ_list);
     pango_attr_list_unref(attr_list);
 }
 
@@ -5423,31 +5423,31 @@ ascii_glyph_table_init(void)
  * Initialize Vim to use the font or fontset with the given name.
  * Return FAIL if the font could not be loaded, OK otherwise.
  */
-    int
-gui_mch_init_font(char_u *font_name, int fontset UNUSED)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_init_font(char_u *font_name, ಪೂರ್ಣಾಂಕ fontset ಬಳಸದ)
 {
     PangoFontDescription    *font_desc;
     PangoLayout		    *layout;
-    int			    width;
+    ಪೂರ್ಣಾಂಕ			    ಅಗಲ;
 
     // If font_name is NULL, this means to use the default, which should
     // be present on all proper Pango/fontconfig installations.
-    if (font_name == NULL)
+    ಆದರೆ (font_name == ಖಾಲಿ)
 	font_name = (char_u *)DEFAULT_FONT;
 
     font_desc = gui_mch_get_font(font_name, FALSE);
 
-    if (font_desc == NULL)
-	return FAIL;
+    ಆದರೆ (font_desc == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
     gui_mch_free_font(gui.norm_font);
     gui.norm_font = font_desc;
 
-    pango_context_set_font_description(gui.text_context, font_desc);
+    pango_context_ಗಣ_font_description(gui.ಪಠ್ಯ_context, font_desc);
 
-    layout = pango_layout_new(gui.text_context);
-    pango_layout_set_text(layout, "MW", 2);
-    pango_layout_get_size(layout, &width, NULL);
+    layout = pango_layout_new(gui.ಪಠ್ಯ_context);
+    pango_layout_ಗಣ_ಪಠ್ಯ(layout, "MW", 2);
+    pango_layout_get_ಗಾತ್ರ(layout, &ಅಗಲ, ಖಾಲಿ);
     /*
      * Set char_width to half the width obtained from pango_layout_get_size()
      * for CJK fixed_width/bi-width fonts.  An unpatched version of Xft leads
@@ -5467,54 +5467,54 @@ gui_mch_init_font(char_u *font_name, int fontset UNUSED)
      *	   guifont=Non_CJK_fixed_font,CJK_Fixed_font
      *	   guifont=Non_CJK_fixed_font guifontwide=CJK_fixed_font
      */
-    if (is_cjk_font(gui.norm_font))
+    ಆದರೆ (is_cjk_font(gui.norm_font))
     {
-	int cjk_width;
+	ಪೂರ್ಣಾಂಕ cjk_ಅಗಲ;
 
 	// Measure the text extent of U+4E00 and U+4E8C
-	pango_layout_set_text(layout, "\344\270\200\344\272\214", -1);
-	pango_layout_get_size(layout, &cjk_width, NULL);
+	pango_layout_ಗಣ_ಪಠ್ಯ(layout, "\344\270\200\344\272\214", -1);
+	pango_layout_get_ಗಾತ್ರ(layout, &cjk_ಅಗಲ, ಖಾಲಿ);
 
-	if (width == cjk_width)  // Xft not patched
-	    width /= 2;
+	ಆದರೆ (ಅಗಲ == cjk_ಅಗಲ)  // Xft not patched
+	    ಅಗಲ /= 2;
     }
     g_object_unref(layout);
 
-    gui.char_width = (width / 2 + PANGO_SCALE - 1) / PANGO_SCALE;
+    gui.char_ಅಗಲ = (ಅಗಲ / 2 + PANGO_SCALE - 1) / PANGO_SCALE;
 
     // A zero width may cause a crash.	Happens for semi-invalid fontsets.
-    if (gui.char_width <= 0)
-	gui.char_width = 8;
+    ಆದರೆ (gui.char_ಅಗಲ <= 0)
+	gui.char_ಅಗಲ = 8;
 
     gui_mch_adjust_charheight();
 
     // Set the fontname, which will be used for information purposes
-    hl_set_font_name(font_name);
+    hl_ಗಣ_font_name(font_name);
 
     get_styled_font_variants();
-    ascii_glyph_table_init();
+    ascii_glyph_ಕೋಷ್ಟಕ_init();
 
     // Avoid unnecessary overhead if 'guifontwide' is equal to 'guifont'.
-    if (gui.wide_font != NULL
+    ಆದರೆ (gui.wide_font != ಖಾಲಿ
 	&& pango_font_description_equal(gui.norm_font, gui.wide_font))
     {
 	pango_font_description_free(gui.wide_font);
-	gui.wide_font = NULL;
+	gui.wide_font = ಖಾಲಿ;
     }
 
-    if (gui_mch_maximized())
+    ಆದರೆ (gui_mch_maximized())
     {
 	// Update lines and columns in accordance with the new font, keep the
 	// window maximized.
 	gui_mch_newfont();
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Preserve the logical dimensions of the screen.
-	update_window_manager_hints(0, 0);
+	update_ಕಿಟಕಿ_manager_hints(0, 0);
     }
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
@@ -5522,89 +5522,89 @@ gui_mch_init_font(char_u *font_name, int fontset UNUSED)
  * Return zero for failure.
  */
     GuiFont
-gui_mch_get_font(char_u *name, int report_error)
+gui_mch_get_font(char_u *name, ಪೂರ್ಣಾಂಕ report_error)
 {
     PangoFontDescription    *font;
 
     // can't do this when GUI is not running
-    if (!gui.in_use || name == NULL)
-	return NULL;
+    ಆದರೆ (!gui.ಒಳ_use || name == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (output_conv.vc_type != CONV_NONE)
+    ಆದರೆ (output_conv.vc_type != CONV_NONE)
     {
 	char_u *buf;
 
-	buf = string_convert(&output_conv, name, NULL);
-	if (buf != NULL)
+	buf = string_convert(&output_conv, name, ಖಾಲಿ);
+	ಆದರೆ (buf != ಖಾಲಿ)
 	{
-	    font = pango_font_description_from_string((const char *)buf);
+	    font = pango_font_description_from_string((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)buf);
 	    vim_free(buf);
 	}
-	else
-	    font = NULL;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    font = ಖಾಲಿ;
     }
-    else
-	font = pango_font_description_from_string((const char *)name);
+    ಇಲ್ಲದಿದ್ದರೆ
+	font = pango_font_description_from_string((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)name);
 
-    if (font != NULL)
+    ಆದರೆ (font != ಖಾಲಿ)
     {
 	PangoFont *real_font;
 
 	// pango_context_load_font() bails out if no font size is set
-	if (pango_font_description_get_size(font) <= 0)
-	    pango_font_description_set_size(font, 10 * PANGO_SCALE);
+	ಆದರೆ (pango_font_description_get_ಗಾತ್ರ(font) <= 0)
+	    pango_font_description_ಗಣ_ಗಾತ್ರ(font, 10 * PANGO_SCALE);
 
-	real_font = pango_context_load_font(gui.text_context, font);
+	real_font = pango_context_ತುಂಬು_font(gui.ಪಠ್ಯ_context, font);
 
-	if (real_font == NULL)
+	ಆದರೆ (real_font == ಖಾಲಿ)
 	{
 	    pango_font_description_free(font);
-	    font = NULL;
+	    font = ಖಾಲಿ;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    g_object_unref(real_font);
     }
 
-    if (font == NULL)
+    ಆದರೆ (font == ಖಾಲಿ)
     {
-	if (report_error)
-	    semsg(_((char *)e_unknown_font_str), name);
-	return NULL;
+	ಆದರೆ (report_error)
+	    semsg(_((ಅಕ್ಷರ *)e_unknown_font_str), name);
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    return font;
+    ಹಿಂತಿರುಗಿ font;
 }
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * Return the name of font "font" in allocated memory.
  */
     char_u *
-gui_mch_get_fontname(GuiFont font, char_u *name UNUSED)
+gui_mch_get_fontname(GuiFont font, char_u *name ಬಳಸದ)
 {
-    if (font != NOFONT)
+    ಆದರೆ (font != NOFONT)
     {
-	char	*pangoname = pango_font_description_to_string(font);
+	ಅಕ್ಷರ	*pangoname = pango_font_description_ಗಮ್ಯ_string(font);
 
-	if (pangoname != NULL)
+	ಆದರೆ (pangoname != ಖಾಲಿ)
 	{
 	    char_u	*s = vim_strsave((char_u *)pangoname);
 
 	    g_free(pangoname);
-	    return s;
+	    ಹಿಂತಿರುಗಿ s;
 	}
     }
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * If a font is not going to be used, free its structure.
  */
-    void
+    ಶೂನ್ಯ
 gui_mch_free_font(GuiFont font)
 {
-    if (font != NOFONT)
+    ಆದರೆ (font != NOFONT)
 	pango_font_description_free(font);
 }
 
@@ -5613,54 +5613,54 @@ gui_mch_free_font(GuiFont font)
  * through all fonts for completion. When setting 'guifont' it will only show
  * monospace fonts as it's unlikely other fonts would be useful.
  */
-    void
+    ಶೂನ್ಯ
 gui_mch_expand_font(
-    optexpand_T	*args,
-    void	*param,
-    int		(*add_match)(char_u *val))
+    optexpand_T	*ವಾದಗಳು,
+    ಶೂನ್ಯ	*param,
+    ಪೂರ್ಣಾಂಕ		(*ಕೂಡಿಸು_ಹೊಂದಿಕೆ)(char_u *val))
 {
-    PangoFontFamily	**font_families = NULL;
-    int			n_families = 0;
-    int			wide = *(int *)param;
+    PangoFontFamily	**font_families = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ			n_families = 0;
+    ಪೂರ್ಣಾಂಕ			wide = *(ಪೂರ್ಣಾಂಕ *)param;
 
-    if (args->oe_include_orig_val && *args->oe_opt_value == NUL && !wide)
+    ಆದರೆ (ವಾದಗಳು->oe_include_orig_val && *ವಾದಗಳು->oe_opt_ಮೌಲ್ಯ == NUL && !wide)
     {
 	// If guifont is empty, and we want to fill in the orig value, suggest
 	// the default so the user can modify it.
-	if (add_match((char_u *)DEFAULT_FONT) != OK)
-	    return;
+	ಆದರೆ (ಕೂಡಿಸು_ಹೊಂದಿಕೆ((char_u *)DEFAULT_FONT) != OK)
+	    ಹಿಂತಿರುಗಿ;
     }
 
     pango_context_list_families(
-	    gui.text_context,
+	    gui.ಪಠ್ಯ_context,
 	    &font_families,
 	    &n_families);
 
-    for (int i = 0; i < n_families; i++)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < n_families; i++)
     {
-	if (!wide && !pango_font_family_is_monospace(font_families[i]))
-	    continue;
+	ಆದರೆ (!wide && !pango_font_family_is_monospace(font_families[i]))
+	    ಮುಂದುವರಿ;
 
-	const char* fam_name = pango_font_family_get_name(font_families[i]);
-	if (input_conv.vc_type != CONV_NONE)
+	ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* fam_name = pango_font_family_get_name(font_families[i]);
+	ಆದರೆ (ಒಳಹರಿವು_conv.vc_type != CONV_NONE)
 	{
-	    char_u *buf = string_convert(&input_conv, (char_u*)fam_name, NULL);
-	    if (buf != NULL)
+	    char_u *buf = string_convert(&ಒಳಹರಿವು_conv, (char_u*)fam_name, ಖಾಲಿ);
+	    ಆದರೆ (buf != ಖಾಲಿ)
 	    {
-		if (add_match(buf) != OK)
+		ಆದರೆ (ಕೂಡಿಸು_ಹೊಂದಿಕೆ(buf) != OK)
 		{
 		    vim_free(buf);
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 		vim_free(buf);
 	    }
-	    else
-		break;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ನಿಲ್ಲಿಸು;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (add_match((char_u *)fam_name) != OK)
-		break;
+	    ಆದರೆ (ಕೂಡಿಸು_ಹೊಂದಿಕೆ((char_u *)fam_name) != OK)
+		ನಿಲ್ಲಿಸು;
 	}
     }
 
@@ -5677,23 +5677,23 @@ gui_mch_get_color(char_u *name)
 {
     guicolor_T color = INVALCOLOR;
 
-    if (!gui.in_use)		// can't do this when GUI not running
-	return color;
+    ಆದರೆ (!gui.ಒಳ_use)		// can't do this when GUI not running
+	ಹಿಂತಿರುಗಿ color;
 
-    if (name != NULL)
+    ಆದರೆ (name != ಖಾಲಿ)
 	color = gui_get_color_cmn(name);
 
-#if GTK_CHECK_VERSION(3,0,0)
-    return color;
-#else
-    if (color == INVALCOLOR)
-	return INVALCOLOR;
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    ಹಿಂತಿರುಗಿ color;
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಆದರೆ (color == INVALCOLOR)
+	ಹಿಂತಿರುಗಿ INVALCOLOR;
 
-    return gui_mch_get_rgb_color(
+    ಹಿಂತಿರುಗಿ gui_mch_get_rgb_color(
 	    (color & 0xff0000) >> 16,
 	    (color & 0xff00) >> 8,
 	    color & 0xff);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
@@ -5701,13 +5701,13 @@ gui_mch_get_color(char_u *name)
  * Return INVALCOLOR for error.
  */
     guicolor_T
-gui_mch_get_rgb_color(int r, int g, int b)
+gui_mch_get_rgb_color(ಪೂರ್ಣಾಂಕ r, ಪೂರ್ಣಾಂಕ g, ಪೂರ್ಣಾಂಕ b)
 {
-#if GTK_CHECK_VERSION(3,0,0)
-    return gui_get_rgb_color_cmn(r, g, b);
-#else
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    ಹಿಂತಿರುಗಿ gui_get_rgb_color_cmn(r, g, b);
+#ಇಲ್ಲದಿದ್ದರೆ
     GdkColor gcolor;
-    int ret;
+    ಪೂರ್ಣಾಂಕ ret;
 
     gcolor.red = (guint16)(r / 255.0 * 65535 + 0.5);
     gcolor.green = (guint16)(g / 255.0 * 65535 + 0.5);
@@ -5716,129 +5716,129 @@ gui_mch_get_rgb_color(int r, int g, int b)
     ret = gdk_colormap_alloc_color(gtk_widget_get_colormap(gui.drawarea),
 	    &gcolor, FALSE, TRUE);
 
-    return ret != 0 ? (guicolor_T)gcolor.pixel : INVALCOLOR;
-#endif
+    ಹಿಂತಿರುಗಿ ret != 0 ? (guicolor_T)gcolor.pixel : INVALCOLOR;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Set the current text foreground color.
  */
-    void
-gui_mch_set_fg_color(guicolor_T color)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_fg_color(guicolor_T color)
 {
-#if GTK_CHECK_VERSION(3,0,0)
-    *gui.fgcolor = color_to_rgba(color);
-#else
-    gui.fgcolor->pixel = (unsigned long)color;
-#endif
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    *gui.fgcolor = color_ಗಮ್ಯ_rgba(color);
+#ಇಲ್ಲದಿದ್ದರೆ
+    gui.fgcolor->pixel = (ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ)color;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Set the current text background color.
  */
-    void
-gui_mch_set_bg_color(guicolor_T color)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_bg_color(guicolor_T color)
 {
-#if GTK_CHECK_VERSION(3,0,0)
-    *gui.bgcolor = color_to_rgba(color);
-#else
-    gui.bgcolor->pixel = (unsigned long)color;
-#endif
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    *gui.bgcolor = color_ಗಮ್ಯ_rgba(color);
+#ಇಲ್ಲದಿದ್ದರೆ
+    gui.bgcolor->pixel = (ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ)color;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Set the current text special color.
  */
-    void
-gui_mch_set_sp_color(guicolor_T color)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_sp_color(guicolor_T color)
 {
-#if GTK_CHECK_VERSION(3,0,0)
-    *gui.spcolor = color_to_rgba(color);
-#else
-    gui.spcolor->pixel = (unsigned long)color;
-#endif
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    *gui.spcolor = color_ಗಮ್ಯ_rgba(color);
+#ಇಲ್ಲದಿದ್ದರೆ
+    gui.spcolor->pixel = (ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ)color;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Function-like convenience macro for the sake of efficiency.
  */
-#define INSERT_PANGO_ATTR(Attribute, AttrList, Start, End)  \
-    G_STMT_START{					    \
+#ವ್ಯಾಖ್ಯಾನಿಸು ಸೇರಿಸು_PANGO_ATTR(Attribute, AttrList, ಆರಂಭ_2, ಕೊನೆ_2)  \
+    G_STMT_ಆರಂಭ{					    \
 	PangoAttribute *tmp_attr_;			    \
 	tmp_attr_ = (Attribute);			    \
-	tmp_attr_->start_index = (Start);		    \
-	tmp_attr_->end_index = (End);			    \
-	pango_attr_list_insert((AttrList), tmp_attr_);	    \
-    }G_STMT_END
+	tmp_attr_->ಆರಂಭ_ಸೂಚ್ಯಂಕ = (ಆರಂಭ_2);		    \
+	tmp_attr_->ಕೊನೆ_ಸೂಚ್ಯಂಕ = (ಕೊನೆ_2);			    \
+	pango_attr_list_ಸೇರಿಸು((AttrList), tmp_attr_);	    \
+    }G_STMT_ಕೊನೆ
 
-    static void
-apply_wide_font_attr(char_u *s, int len, PangoAttrList *attr_list)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+apply_wide_font_attr(char_u *s, ಪೂರ್ಣಾಂಕ len, PangoAttrList *attr_list)
 {
-    char_u  *start = NULL;
+    char_u  *ಆರಂಭ = ಖಾಲಿ;
     char_u  *p;
-    int	    uc;
+    ಪೂರ್ಣಾಂಕ	    uc;
 
-    for (p = s; p < s + len; p += utf_byte2len(*p))
+    ಗಾಗಿ (p = s; p < s + len; p += utf_byte2len(*p))
     {
 	uc = utf_ptr2char(p);
 
-	if (start == NULL)
+	ಆದರೆ (ಆರಂಭ == ಖಾಲಿ)
 	{
-	    if (uc >= 0x80 && utf_char2cells(uc) == 2)
-		start = p;
+	    ಆದರೆ (uc >= 0x80 && utf_char2cells(uc) == 2)
+		ಆರಂಭ = p;
 	}
-	else if (uc < 0x80 // optimization shortcut
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (uc < 0x80 // optimization shortcut
 		 || (utf_char2cells(uc) != 2 && !utf_iscomposing(uc)))
 	{
-	    INSERT_PANGO_ATTR(pango_attr_font_desc_new(gui.wide_font),
-			      attr_list, start - s, p - s);
-	    start = NULL;
+	    ಸೇರಿಸು_PANGO_ATTR(pango_attr_font_desc_new(gui.wide_font),
+			      attr_list, ಆರಂಭ - s, p - s);
+	    ಆರಂಭ = ಖಾಲಿ;
 	}
     }
 
-    if (start != NULL)
-	INSERT_PANGO_ATTR(pango_attr_font_desc_new(gui.wide_font),
-			  attr_list, start - s, len);
+    ಆದರೆ (ಆರಂಭ != ಖಾಲಿ)
+	ಸೇರಿಸು_PANGO_ATTR(pango_attr_font_desc_new(gui.wide_font),
+			  attr_list, ಆರಂಭ - s, len);
 }
 
-    static int
-count_cluster_cells(char_u *s, PangoItem *item,
-		    PangoGlyphString* glyphs, int i,
-		    int *cluster_width,
-		    int *last_glyph_rbearing)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಎಣಿಕೆ_cluster_cells(char_u *s, Pango_ಅಂಶ *ಅಂಶ,
+		    PangoGlyphString* glyphs, ಪೂರ್ಣಾಂಕ i,
+		    ಪೂರ್ಣಾಂಕ *cluster_ಅಗಲ,
+		    ಪೂರ್ಣಾಂಕ *ಕೊನೆಯ_glyph_rbearing)
 {
     char_u  *p;
-    int	    next;	// glyph start index of next cluster
-    int	    start, end; // string segment of current cluster
-    int	    width;	// real cluster width in Pango units
-    int	    uc;
-    int	    cellcount = 0;
+    ಪೂರ್ಣಾಂಕ	    ಮುಂದಿನ;	// glyph start index of next cluster
+    ಪೂರ್ಣಾಂಕ	    ಆರಂಭ, ಕೊನೆ; // string segment of current cluster
+    ಪೂರ್ಣಾಂಕ	    ಅಗಲ;	// real cluster width in Pango units
+    ಪೂರ್ಣಾಂಕ	    uc;
+    ಪೂರ್ಣಾಂಕ	    cellcount = 0;
 
-    width = glyphs->glyphs[i].geometry.width;
+    ಅಗಲ = glyphs->glyphs[i].geometry.ಅಗಲ;
 
-    for (next = i + 1; next < glyphs->num_glyphs; ++next)
+    ಗಾಗಿ (ಮುಂದಿನ = i + 1; ಮುಂದಿನ < glyphs->ಅಂಕೆ_glyphs; ++ಮುಂದಿನ)
     {
-	if (glyphs->glyphs[next].attr.is_cluster_start)
-	    break;
-	else if (glyphs->glyphs[next].geometry.width > width)
-	    width = glyphs->glyphs[next].geometry.width;
+	ಆದರೆ (glyphs->glyphs[ಮುಂದಿನ].attr.is_cluster_ಆರಂಭ)
+	    ನಿಲ್ಲಿಸು;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (glyphs->glyphs[ಮುಂದಿನ].geometry.ಅಗಲ > ಅಗಲ)
+	    ಅಗಲ = glyphs->glyphs[ಮುಂದಿನ].geometry.ಅಗಲ;
     }
 
-    start = item->offset + glyphs->log_clusters[i];
-    end   = item->offset + ((next < glyphs->num_glyphs) ?
-			    glyphs->log_clusters[next] : item->length);
+    ಆರಂಭ = ಅಂಶ->ಸ್ಥಾನಾಂತರ + glyphs->log_clusters[i];
+    ಕೊನೆ   = ಅಂಶ->ಸ್ಥಾನಾಂತರ + ((ಮುಂದಿನ < glyphs->ಅಂಕೆ_glyphs) ?
+			    glyphs->log_clusters[ಮುಂದಿನ] : ಅಂಶ->ಉದ್ದಳತೆ);
 
-    for (p = s + start; p < s + end; p += utf_byte2len(*p))
+    ಗಾಗಿ (p = s + ಆರಂಭ; p < s + ಕೊನೆ; p += utf_byte2len(*p))
     {
 	uc = utf_ptr2char(p);
-	if (uc < 0x80)
+	ಆದರೆ (uc < 0x80)
 	    ++cellcount;
-	else if (!utf_iscomposing(uc))
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!utf_iscomposing(uc))
 	    cellcount += utf_char2cells(uc);
     }
 
-    if (last_glyph_rbearing != NULL
-	    && cellcount > 0 && next == glyphs->num_glyphs)
+    ಆದರೆ (ಕೊನೆಯ_glyph_rbearing != ಖಾಲಿ
+	    && cellcount > 0 && ಮುಂದಿನ == glyphs->ಅಂಕೆ_glyphs)
     {
 	PangoRectangle ink_rect;
 	/*
@@ -5846,18 +5846,18 @@ count_cluster_cells(char_u *s, PangoItem *item,
 	 * font, we have to compensate manually by adapting x_offset according
 	 * to the ink extents of the previous glyph.
 	 */
-	pango_font_get_glyph_extents(item->analysis.font,
+	pango_font_get_glyph_extents(ಅಂಶ->analysis.font,
 				     glyphs->glyphs[i].glyph,
-				     &ink_rect, NULL);
+				     &ink_rect, ಖಾಲಿ);
 
-	if (PANGO_RBEARING(ink_rect) > 0)
-	    *last_glyph_rbearing = PANGO_RBEARING(ink_rect);
+	ಆದರೆ (PANGO_RBEARING(ink_rect) > 0)
+	    *ಕೊನೆಯ_glyph_rbearing = PANGO_RBEARING(ink_rect);
     }
 
-    if (cellcount > 0)
-	*cluster_width = width;
+    ಆದರೆ (cellcount > 0)
+	*cluster_ಅಗಲ = ಅಗಲ;
 
-    return cellcount;
+    ಹಿಂತಿರುಗಿ cellcount;
 }
 
 /*
@@ -5875,216 +5875,216 @@ count_cluster_cells(char_u *s, PangoItem *item,
  * X fonts which don't provide the special combining information needed by
  * Pango.
  */
-    static void
-setup_zero_width_cluster(PangoItem *item, PangoGlyphInfo *glyph,
-			 int last_cellcount, int last_cluster_width,
-			 int last_glyph_rbearing)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಸಿದ್ಧತೆ_zero_ಅಗಲ_cluster(Pango_ಅಂಶ *ಅಂಶ, PangoGlyphInfo *glyph,
+			 ಪೂರ್ಣಾಂಕ ಕೊನೆಯ_cellcount, ಪೂರ್ಣಾಂಕ ಕೊನೆಯ_cluster_ಅಗಲ,
+			 ಪೂರ್ಣಾಂಕ ಕೊನೆಯ_glyph_rbearing)
 {
     PangoRectangle  ink_rect;
     PangoRectangle  logical_rect;
-    int		    width;
+    ಪೂರ್ಣಾಂಕ		    ಅಗಲ;
 
-    width = last_cellcount * gui.char_width * PANGO_SCALE;
-    glyph->geometry.x_offset = -width + MAX(0, width - last_cluster_width) / 2;
-    glyph->geometry.width = 0;
+    ಅಗಲ = ಕೊನೆಯ_cellcount * gui.char_ಅಗಲ * PANGO_SCALE;
+    glyph->geometry.x_ಸ್ಥಾನಾಂತರ = -ಅಗಲ + MAX(0, ಅಗಲ - ಕೊನೆಯ_cluster_ಅಗಲ) / 2;
+    glyph->geometry.ಅಗಲ = 0;
 
-    pango_font_get_glyph_extents(item->analysis.font,
+    pango_font_get_glyph_extents(ಅಂಶ->analysis.font,
 				 glyph->glyph,
 				 &ink_rect, &logical_rect);
-    if (ink_rect.x < 0)
+    ಆದರೆ (ink_rect.x < 0)
     {
-	glyph->geometry.x_offset += last_glyph_rbearing;
-	glyph->geometry.y_offset  = logical_rect.height
-		- (gui.char_height - p_linespace) * PANGO_SCALE;
+	glyph->geometry.x_ಸ್ಥಾನಾಂತರ += ಕೊನೆಯ_glyph_rbearing;
+	glyph->geometry.y_ಸ್ಥಾನಾಂತರ  = logical_rect.ಎತ್ತರ
+		- (gui.char_ಎತ್ತರ - p_linespace) * PANGO_SCALE;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	// If the accent width is smaller than the cluster width, position it
 	// in the middle.
-	glyph->geometry.x_offset = -width + MAX(0, width - ink_rect.width) / 2;
+	glyph->geometry.x_ಸ್ಥಾನಾಂತರ = -ಅಗಲ + MAX(0, ಅಗಲ - ink_rect.ಅಗಲ) / 2;
 }
 
-#if GTK_CHECK_VERSION(3,0,0)
-    static void
-draw_glyph_string(int row, int col, int num_cells, int flags,
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+draw_glyph_string(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು, ಪೂರ್ಣಾಂಕ ಅಂಕೆ_cells, ಪೂರ್ಣಾಂಕ flags,
 		  PangoFont *font, PangoGlyphString *glyphs,
 		  cairo_t *cr)
-#else
-    static void
-draw_glyph_string(int row, int col, int num_cells, int flags,
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಸ್ಥಿರ ಶೂನ್ಯ
+draw_glyph_string(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು, ಪೂರ್ಣಾಂಕ ಅಂಕೆ_cells, ಪೂರ್ಣಾಂಕ flags,
 		  PangoFont *font, PangoGlyphString *glyphs)
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 {
-    if (!(flags & DRAW_TRANSP))
+    ಆದರೆ (!(flags & DRAW_TRANSP))
     {
-#if GTK_CHECK_VERSION(3,0,0)
-	cairo_set_source_rgba(cr,
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+	cairo_ಗಣ_ಮೂಲ_rgba(cr,
 		gui.bgcolor->red, gui.bgcolor->green, gui.bgcolor->blue,
 		gui.bgcolor->alpha);
 	cairo_rectangle(cr,
-			FILL_X(col), FILL_Y(row),
-			num_cells * gui.char_width, gui.char_height);
+			FILL_X(ಲಂಬಸಾಲು), FILL_Y(ಅಡ್ಡಸಾಲು),
+			ಅಂಕೆ_cells * gui.char_ಅಗಲ, gui.char_ಎತ್ತರ);
 	cairo_fill(cr);
-#else
-	gdk_gc_set_foreground(gui.text_gc, gui.bgcolor);
+#ಇಲ್ಲದಿದ್ದರೆ
+	gdk_gc_ಗಣ_foreground(gui.ಪಠ್ಯ_gc, gui.bgcolor);
 
-	gdk_draw_rectangle(gui.drawarea->window,
-			   gui.text_gc,
+	gdk_draw_rectangle(gui.drawarea->ಕಿಟಕಿ_2,
+			   gui.ಪಠ್ಯ_gc,
 			   TRUE,
-			   FILL_X(col),
-			   FILL_Y(row),
-			   num_cells * gui.char_width,
-			   gui.char_height);
-#endif
+			   FILL_X(ಲಂಬಸಾಲು),
+			   FILL_Y(ಅಡ್ಡಸಾಲು),
+			   ಅಂಕೆ_cells * gui.char_ಅಗಲ,
+			   gui.char_ಎತ್ತರ);
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
-#if GTK_CHECK_VERSION(3,0,0)
-    cairo_set_source_rgba(cr,
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    cairo_ಗಣ_ಮೂಲ_rgba(cr,
 	    gui.fgcolor->red, gui.fgcolor->green, gui.fgcolor->blue,
 	    gui.fgcolor->alpha);
-    cairo_move_to(cr, TEXT_X(col), TEXT_Y(row));
+    cairo_move_ಗಮ್ಯ(cr, ಪಠ್ಯ_X(ಲಂಬಸಾಲು), ಪಠ್ಯ_Y(ಅಡ್ಡಸಾಲು));
     pango_cairo_show_glyph_string(cr, font, glyphs);
-#else
-    gdk_gc_set_foreground(gui.text_gc, gui.fgcolor);
+#ಇಲ್ಲದಿದ್ದರೆ
+    gdk_gc_ಗಣ_foreground(gui.ಪಠ್ಯ_gc, gui.fgcolor);
 
-    gdk_draw_glyphs(gui.drawarea->window,
-		    gui.text_gc,
+    gdk_draw_glyphs(gui.drawarea->ಕಿಟಕಿ_2,
+		    gui.ಪಠ್ಯ_gc,
 		    font,
-		    TEXT_X(col),
-		    TEXT_Y(row),
+		    ಪಠ್ಯ_X(ಲಂಬಸಾಲು),
+		    ಪಠ್ಯ_Y(ಅಡ್ಡಸಾಲು),
 		    glyphs);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // redraw the contents with an offset of 1 to emulate bold
-    if ((flags & DRAW_BOLD) && !gui.font_can_bold)
-#if GTK_CHECK_VERSION(3,0,0)
+    ಆದರೆ ((flags & DRAW_BOLD) && !gui.font_can_bold)
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
     {
-	cairo_set_source_rgba(cr,
+	cairo_ಗಣ_ಮೂಲ_rgba(cr,
 		gui.fgcolor->red, gui.fgcolor->green, gui.fgcolor->blue,
 		gui.fgcolor->alpha);
-	cairo_move_to(cr, TEXT_X(col) + 1, TEXT_Y(row));
+	cairo_move_ಗಮ್ಯ(cr, ಪಠ್ಯ_X(ಲಂಬಸಾಲು) + 1, ಪಠ್ಯ_Y(ಅಡ್ಡಸಾಲು));
 	pango_cairo_show_glyph_string(cr, font, glyphs);
     }
-#else
-	gdk_draw_glyphs(gui.drawarea->window,
-			gui.text_gc,
+#ಇಲ್ಲದಿದ್ದರೆ
+	gdk_draw_glyphs(gui.drawarea->ಕಿಟಕಿ_2,
+			gui.ಪಠ್ಯ_gc,
 			font,
-			TEXT_X(col) + 1,
-			TEXT_Y(row),
+			ಪಠ್ಯ_X(ಲಂಬಸಾಲು) + 1,
+			ಪಠ್ಯ_Y(ಅಡ್ಡಸಾಲು),
 			glyphs);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Draw underline and undercurl at the bottom of the character cell.
  */
-#if GTK_CHECK_VERSION(3,0,0)
-    static void
-draw_under(int flags, int row, int col, int cells, cairo_t *cr)
-#else
-    static void
-draw_under(int flags, int row, int col, int cells)
-#endif
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+draw_under(ಪೂರ್ಣಾಂಕ flags, ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು, ಪೂರ್ಣಾಂಕ cells, cairo_t *cr)
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಸ್ಥಿರ ಶೂನ್ಯ
+draw_under(ಪೂರ್ಣಾಂಕ flags, ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು, ಪೂರ್ಣಾಂಕ cells)
+#ಆದರೆ_ಅಂತ್ಯ
 {
-    int			i;
-    int			offset;
-    static const int	val[8] = {1, 0, 0, 0, 1, 2, 2, 2 };
-    int			y = FILL_Y(row + 1) - 1;
+    ಪೂರ್ಣಾಂಕ			i;
+    ಪೂರ್ಣಾಂಕ			ಸ್ಥಾನಾಂತರ;
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ	val[8] = {1, 0, 0, 0, 1, 2, 2, 2 };
+    ಪೂರ್ಣಾಂಕ			y = FILL_Y(ಅಡ್ಡಸಾಲು + 1) - 1;
 
     // Undercurl: draw curl at the bottom of the character cell.
-    if (flags & DRAW_UNDERC)
+    ಆದರೆ (flags & DRAW_UNDERC)
     {
-#if GTK_CHECK_VERSION(3,0,0)
-	cairo_set_line_width(cr, 1.0);
-	cairo_set_line_cap(cr, CAIRO_LINE_CAP_BUTT);
-	cairo_set_source_rgba(cr,
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+	cairo_ಗಣ_ಸಾಲು_ಅಗಲ(cr, 1.0);
+	cairo_ಗಣ_ಸಾಲು_cap(cr, CAIRO_ಸಾಲು_CAP_BUTT);
+	cairo_ಗಣ_ಮೂಲ_rgba(cr,
 		gui.spcolor->red, gui.spcolor->green, gui.spcolor->blue,
 		gui.spcolor->alpha);
-	cairo_move_to(cr, FILL_X(col) + 1, y - 2 + 0.5);
-	for (i = FILL_X(col) + 1; i < FILL_X(col + cells); ++i)
+	cairo_move_ಗಮ್ಯ(cr, FILL_X(ಲಂಬಸಾಲು) + 1, y - 2 + 0.5);
+	ಗಾಗಿ (i = FILL_X(ಲಂಬಸಾಲು) + 1; i < FILL_X(ಲಂಬಸಾಲು + cells); ++i)
 	{
-	    offset = val[i % 8];
-	    cairo_line_to(cr, i, y - offset + 0.5);
+	    ಸ್ಥಾನಾಂತರ = val[i % 8];
+	    cairo_ಸಾಲು_ಗಮ್ಯ(cr, i, y - ಸ್ಥಾನಾಂತರ + 0.5);
 	}
 	cairo_stroke(cr);
-#else
-	gdk_gc_set_foreground(gui.text_gc, gui.spcolor);
-	for (i = FILL_X(col); i < FILL_X(col + cells); ++i)
+#ಇಲ್ಲದಿದ್ದರೆ
+	gdk_gc_ಗಣ_foreground(gui.ಪಠ್ಯ_gc, gui.spcolor);
+	ಗಾಗಿ (i = FILL_X(ಲಂಬಸಾಲು); i < FILL_X(ಲಂಬಸಾಲು + cells); ++i)
 	{
-	    offset = val[i % 8];
-	    gdk_draw_point(gui.drawarea->window, gui.text_gc, i, y - offset);
+	    ಸ್ಥಾನಾಂತರ = val[i % 8];
+	    gdk_draw_ಬಿಂದು(gui.drawarea->ಕಿಟಕಿ_2, gui.ಪಠ್ಯ_gc, i, y - ಸ್ಥಾನಾಂತರ);
 	}
-	gdk_gc_set_foreground(gui.text_gc, gui.fgcolor);
-#endif
+	gdk_gc_ಗಣ_foreground(gui.ಪಠ್ಯ_gc, gui.fgcolor);
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
     // Draw a strikethrough line
-    if (flags & DRAW_STRIKE)
+    ಆದರೆ (flags & DRAW_STRIKE)
     {
-#if GTK_CHECK_VERSION(3,0,0)
-	cairo_set_line_width(cr, 1.0);
-	cairo_set_line_cap(cr, CAIRO_LINE_CAP_BUTT);
-	cairo_set_source_rgba(cr,
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+	cairo_ಗಣ_ಸಾಲು_ಅಗಲ(cr, 1.0);
+	cairo_ಗಣ_ಸಾಲು_cap(cr, CAIRO_ಸಾಲು_CAP_BUTT);
+	cairo_ಗಣ_ಮೂಲ_rgba(cr,
 		gui.spcolor->red, gui.spcolor->green, gui.spcolor->blue,
 		gui.spcolor->alpha);
-	cairo_move_to(cr, FILL_X(col), y + 1 - gui.char_height/2 + 0.5);
-	cairo_line_to(cr, FILL_X(col + cells), y + 1 - gui.char_height/2 + 0.5);
+	cairo_move_ಗಮ್ಯ(cr, FILL_X(ಲಂಬಸಾಲು), y + 1 - gui.char_ಎತ್ತರ/2 + 0.5);
+	cairo_ಸಾಲು_ಗಮ್ಯ(cr, FILL_X(ಲಂಬಸಾಲು + cells), y + 1 - gui.char_ಎತ್ತರ/2 + 0.5);
 	cairo_stroke(cr);
-#else
-	gdk_gc_set_foreground(gui.text_gc, gui.spcolor);
-	gdk_draw_line(gui.drawarea->window, gui.text_gc,
-		      FILL_X(col), y + 1 - gui.char_height/2,
-		      FILL_X(col + cells), y + 1 - gui.char_height/2);
-	gdk_gc_set_foreground(gui.text_gc, gui.fgcolor);
-#endif
+#ಇಲ್ಲದಿದ್ದರೆ
+	gdk_gc_ಗಣ_foreground(gui.ಪಠ್ಯ_gc, gui.spcolor);
+	gdk_draw_ಸಾಲು(gui.drawarea->ಕಿಟಕಿ_2, gui.ಪಠ್ಯ_gc,
+		      FILL_X(ಲಂಬಸಾಲು), y + 1 - gui.char_ಎತ್ತರ/2,
+		      FILL_X(ಲಂಬಸಾಲು + cells), y + 1 - gui.char_ಎತ್ತರ/2);
+	gdk_gc_ಗಣ_foreground(gui.ಪಠ್ಯ_gc, gui.fgcolor);
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
     // Underline: draw a line at the bottom of the character cell.
-    if (flags & DRAW_UNDERL)
+    ಆದರೆ (flags & DRAW_UNDERL)
     {
 	// When p_linespace is 0, overwrite the bottom row of pixels.
 	// Otherwise put the line just below the character.
-	if (p_linespace > 1)
+	ಆದರೆ (p_linespace > 1)
 	    y -= p_linespace - 1;
-#if GTK_CHECK_VERSION(3,0,0)
-	cairo_set_line_width(cr, 1.0);
-	cairo_set_line_cap(cr, CAIRO_LINE_CAP_BUTT);
-	cairo_set_source_rgba(cr,
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+	cairo_ಗಣ_ಸಾಲು_ಅಗಲ(cr, 1.0);
+	cairo_ಗಣ_ಸಾಲು_cap(cr, CAIRO_ಸಾಲು_CAP_BUTT);
+	cairo_ಗಣ_ಮೂಲ_rgba(cr,
 		gui.fgcolor->red, gui.fgcolor->green, gui.fgcolor->blue,
 		gui.fgcolor->alpha);
-	cairo_move_to(cr, FILL_X(col), y + 0.5);
-	cairo_line_to(cr, FILL_X(col + cells), y + 0.5);
+	cairo_move_ಗಮ್ಯ(cr, FILL_X(ಲಂಬಸಾಲು), y + 0.5);
+	cairo_ಸಾಲು_ಗಮ್ಯ(cr, FILL_X(ಲಂಬಸಾಲು + cells), y + 0.5);
 	cairo_stroke(cr);
-#else
-	gdk_draw_line(gui.drawarea->window, gui.text_gc,
-		      FILL_X(col), y,
-		      FILL_X(col + cells) - 1, y);
-#endif
+#ಇಲ್ಲದಿದ್ದರೆ
+	gdk_draw_ಸಾಲು(gui.drawarea->ಕಿಟಕಿ_2, gui.ಪಠ್ಯ_gc,
+		      FILL_X(ಲಂಬಸಾಲು), y,
+		      FILL_X(ಲಂಬಸಾಲು + cells) - 1, y);
+#ಆದರೆ_ಅಂತ್ಯ
     }
 }
 
-    int
-gui_gtk_draw_string(int row, int col, char_u *s, int len, int flags)
+    ಪೂರ್ಣಾಂಕ
+gui_gtk_draw_string(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು, char_u *s, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ flags)
 {
-    char_u	*conv_buf = NULL;   // result of UTF-8 conversion
+    char_u	*conv_buf = ಖಾಲಿ;   // result of UTF-8 conversion
     char_u	*new_conv_buf;
-    int		convlen;
+    ಪೂರ್ಣಾಂಕ		convlen;
     char_u	*sp, *bp;
-    int		plen;
-    int		len_sum;	// return value needs to add up since we are
+    ಪೂರ್ಣಾಂಕ		plen;
+    ಪೂರ್ಣಾಂಕ		len_ಮೊತ್ತ;	// return value needs to add up since we are
 				// printing substrings
-    int		byte_sum;	// byte position in string
+    ಪೂರ್ಣಾಂಕ		byte_ಮೊತ್ತ;	// byte position in string
     char_u	*cs;		// current *s pointer
-    int		needs_pango;	// look ahead, 0=ascii 1=unicode/ligatures
-    int		should_need_pango = FALSE;
-    int		slen;
-    int		is_ligature;
-    int		is_utf8;
+    ಪೂರ್ಣಾಂಕ		needs_pango;	// look ahead, 0=ascii 1=unicode/ligatures
+    ಪೂರ್ಣಾಂಕ		should_need_pango = FALSE;
+    ಪೂರ್ಣಾಂಕ		slen;
+    ಪೂರ್ಣಾಂಕ		is_ligature;
+    ಪೂರ್ಣಾಂಕ		is_utf8;
     char_u	backup_ch;
 
-    if (gui.text_context == NULL || gtk_widget_get_window(gui.drawarea) == NULL)
-	return len;
+    ಆದರೆ (gui.ಪಠ್ಯ_context == ಖಾಲಿ || gtk_widget_get_ಕಿಟಕಿ(gui.drawarea) == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ len;
 
-    if (output_conv.vc_type != CONV_NONE)
+    ಆದರೆ (output_conv.vc_type != CONV_NONE)
     {
 	/*
 	 * Convert characters from 'encoding' to 'termencoding', which is set
@@ -6094,19 +6094,19 @@ gui_gtk_draw_string(int row, int col, char_u *s, int len, int flags)
 	 */
 	convlen = len;
 	conv_buf = string_convert(&output_conv, s, &convlen);
-	g_return_val_if_fail(conv_buf != NULL, len);
+	g_return_val_if_fail(conv_buf != ಖಾಲಿ, len);
 
 	// Correct for differences in char width: some chars are
 	// double-wide in 'encoding' but single-wide in utf-8.  Add a space to
 	// compensate for that.
-	for (sp = s, bp = conv_buf; sp < s + len && bp < conv_buf + convlen; )
+	ಗಾಗಿ (sp = s, bp = conv_buf; sp < s + len && bp < conv_buf + convlen; )
 	{
 	    plen = utf_ptr2len(bp);
-	    if ((*mb_ptr2cells)(sp) == 2 && utf_ptr2cells(bp) == 1)
+	    ಆದರೆ ((*mb_ptr2cells)(sp) == 2 && utf_ptr2cells(bp) == 1)
 	    {
 		new_conv_buf = alloc(convlen + 2);
-		if (new_conv_buf == NULL)
-		    return len;
+		ಆದರೆ (new_conv_buf == ಖಾಲಿ)
+		    ಹಿಂತಿರುಗಿ len;
 		plen += bp - conv_buf;
 		mch_memmove(new_conv_buf, conv_buf, plen);
 		new_conv_buf[plen] = ' ';
@@ -6133,79 +6133,79 @@ gui_gtk_draw_string(int row, int col, char_u *s, int len, int flags)
      * that are guaranteed to go through glyphs as much as possible. Since
      * single ligature char prints as ascii, print it that way.
      */
-    len_sum = 0;    // return value needs to add up since we are printing
+    len_ಮೊತ್ತ = 0;    // return value needs to add up since we are printing
 		    // substrings
-    byte_sum = 0;
+    byte_ಮೊತ್ತ = 0;
     cs = s;
     // First char decides starting needs_pango mode, 0=ascii 1=utf8/ligatures.
     // Even if it is ligature char, two chars or more make ligature.
     // Ascii followed by utf8 is also going through pango.
     is_utf8 = (*cs & 0x80);
     is_ligature = gui.ligatures_map[*cs] && (len > 1);
-    if (is_ligature)
+    ಆದರೆ (is_ligature)
 	is_ligature = gui.ligatures_map[*(cs + 1)];
-    if (!is_utf8 && len > 1)
+    ಆದರೆ (!is_utf8 && len > 1)
 	is_utf8 = (*(cs + 1) & 0x80) != 0;
     needs_pango = is_utf8 || is_ligature;
 
     // split string into ascii and non-ascii (ligatures + utf-8) substrings,
     // print glyphs or use Pango
-    while (cs < s + len)
+    ಆಗ (cs < s + len)
     {
 	slen = 0;
-	while (slen < (len - byte_sum))
+	ಆಗ (slen < (len - byte_ಮೊತ್ತ))
 	{
 	    is_ligature = gui.ligatures_map[*(cs + slen)];
 	    // look ahead, single ligature char between ascii is ascii
-	    if (is_ligature && !needs_pango)
+	    ಆದರೆ (is_ligature && !needs_pango)
 	    {
-		if ((slen + 1) < (len - byte_sum))
+		ಆದರೆ ((slen + 1) < (len - byte_ಮೊತ್ತ))
 		    is_ligature = gui.ligatures_map[*(cs + slen + 1)];
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		    is_ligature = 0;
 	    }
 	    is_utf8 = *(cs + slen) & 0x80;
 	    // ascii followed by utf8 could be combining
 	    // if so send it through pango
-	    if ((!is_utf8) && ((slen + 1) < (len - byte_sum)))
+	    ಆದರೆ ((!is_utf8) && ((slen + 1) < (len - byte_ಮೊತ್ತ)))
 		is_utf8 = (*(cs + slen + 1) & 0x80);
 	    should_need_pango = (is_ligature || is_utf8);
-	    if (needs_pango != should_need_pango) // mode switch
-		break;
-	    if (needs_pango)
+	    ಆದರೆ (needs_pango != should_need_pango) // mode switch
+		ನಿಲ್ಲಿಸು;
+	    ಆದರೆ (needs_pango)
 	    {
-		if (is_ligature)
+		ಆದರೆ (is_ligature)
 		{
 		    slen++; // ligature char by char
 		}
-		else // is_utf8
+		ಇಲ್ಲದಿದ್ದರೆ // is_utf8
 		{
-		    if ((*(cs + slen) & 0xC0) == 0x80)
+		    ಆದರೆ ((*(cs + slen) & 0xC0) == 0x80)
 		    {
 			// a continuation, find next 0xC0 != 0x80 but don't
 			// include it
-			while ((slen < (len - byte_sum))
+			ಆಗ ((slen < (len - byte_ಮೊತ್ತ))
 					    && ((*(cs + slen) & 0xC0) == 0x80))
 			{
 			    slen++;
 			}
 		    }
-		    else if ((*(cs + slen) & 0xE0) == 0xC0)
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((*(cs + slen) & 0xE0) == 0xC0)
 		    {
 			// + one byte utf8
 			slen++;
 		    }
-		    else if ((*(cs + slen) & 0xF0) == 0xE0)
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((*(cs + slen) & 0xF0) == 0xE0)
 		    {
 			// + two bytes utf8
 			slen += 2;
 		    }
-		    else if ((*(cs + slen) & 0xF8) == 0xF0)
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((*(cs + slen) & 0xF8) == 0xF0)
 		    {
 			// + three bytes utf8
 			slen += 3;
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
 			// this should not happen, try moving forward, Pango
 			// will catch it
@@ -6213,87 +6213,87 @@ gui_gtk_draw_string(int row, int col, char_u *s, int len, int flags)
 		    }
 		}
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		slen++; // ascii
 	    }
 	}
 
-	if (slen < len)
+	ಆದರೆ (slen < len)
 	{
 	    // temporarily zero terminate substring, print, restore char, wrap
 	    backup_ch = *(cs + slen);
 	    *(cs + slen) = NUL;
 	}
-	len_sum += gui_gtk_draw_string_ext(row, col + len_sum, cs, slen, flags,
+	len_ಮೊತ್ತ += gui_gtk_draw_string_ext(ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು + len_ಮೊತ್ತ, cs, slen, flags,
 					    needs_pango);
-	if (slen < len)
+	ಆದರೆ (slen < len)
 	    *(cs + slen) = backup_ch;
 	cs += slen;
-	byte_sum += slen;
+	byte_ಮೊತ್ತ += slen;
 	needs_pango = should_need_pango;
     }
     vim_free(conv_buf);
-    return len_sum;
+    ಹಿಂತಿರುಗಿ len_ಮೊತ್ತ;
 }
 
-#if GTK_CHECK_VERSION(3,0,0)
-static cairo_region_t *dirty_region = NULL;
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+ಸ್ಥಿರ cairo_region_t *dirty_region = ಖಾಲಿ;
 
-    static void
-queue_draw_area(int x, int y, int width, int height)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಸರತಿ_draw_area(ಪೂರ್ಣಾಂಕ x, ಪೂರ್ಣಾಂಕ y, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ)
 {
     cairo_rectangle_int_t rect;
 
-    if (width <= 0 || height <= 0 || gui.drawarea == NULL)
-	return;
+    ಆದರೆ (ಅಗಲ <= 0 || ಎತ್ತರ <= 0 || gui.drawarea == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     rect.x = x;
     rect.y = y;
-    rect.width = width;
-    rect.height = height;
+    rect.ಅಗಲ = ಅಗಲ;
+    rect.ಎತ್ತರ = ಎತ್ತರ;
 
-    if (dirty_region == NULL)
+    ಆದರೆ (dirty_region == ಖಾಲಿ)
 	dirty_region = cairo_region_create_rectangle(&rect);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	cairo_region_union_rectangle(dirty_region, &rect);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    int
+    ಪೂರ್ಣಾಂಕ
 gui_gtk_draw_string_ext(
-	int	row,
-	int	col,
+	ಪೂರ್ಣಾಂಕ	ಅಡ್ಡಸಾಲು,
+	ಪೂರ್ಣಾಂಕ	ಲಂಬಸಾಲು,
 	char_u	*s,
-	int	len,
-	int	flags,
-	int	force_pango)
+	ಪೂರ್ಣಾಂಕ	len,
+	ಪೂರ್ಣಾಂಕ	flags,
+	ಪೂರ್ಣಾಂಕ	force_pango)
 {
     GdkRectangle	area;		    // area for clip mask
     PangoGlyphString	*glyphs;	    // glyphs of current item
-    int			column_offset = 0;  // column offset in cells
-    int			i;
-#if GTK_CHECK_VERSION(3,0,0)
+    ಪೂರ್ಣಾಂಕ			ಸ್ತಂಭ_ಸ್ಥಾನಾಂತರ = 0;  // column offset in cells
+    ಪೂರ್ಣಾಂಕ			i;
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
     cairo_t		*cr;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     /*
      * Restrict all drawing to the current screen line in order to prevent
      * fuzzy font lookups from messing up the screen.
      */
-    area.x = gui.border_offset;
-    area.y = FILL_Y(row);
-    area.width	= gui.num_cols * gui.char_width;
-    area.height = gui.char_height;
+    area.x = gui.border_ಸ್ಥಾನಾಂತರ;
+    area.y = FILL_Y(ಅಡ್ಡಸಾಲು);
+    area.ಅಗಲ	= gui.ಅಂಕೆ_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ * gui.char_ಅಗಲ;
+    area.ಎತ್ತರ = gui.char_ಎತ್ತರ;
 
-#if GTK_CHECK_VERSION(3,0,0)
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
     cr = cairo_create(gui.surface);
-    cairo_rectangle(cr, area.x, area.y, area.width, area.height);
+    cairo_rectangle(cr, area.x, area.y, area.ಅಗಲ, area.ಎತ್ತರ);
     cairo_clip(cr);
-#else
-    gdk_gc_set_clip_origin(gui.text_gc, 0, 0);
-    gdk_gc_set_clip_rectangle(gui.text_gc, &area);
-#endif
+#ಇಲ್ಲದಿದ್ದರೆ
+    gdk_gc_ಗಣ_clip_origin(gui.ಪಠ್ಯ_gc, 0, 0);
+    gdk_gc_ಗಣ_clip_rectangle(gui.ಪಠ್ಯ_gc, &area);
+#ಆದರೆ_ಅಂತ್ಯ
 
     glyphs = pango_glyph_string_new();
 
@@ -6302,68 +6302,68 @@ gui_gtk_draw_string_ext(
      * for pure ASCII strings.	This optimization is particularly effective
      * because Vim draws space characters to clear parts of the screen.
      */
-    if (!(flags & DRAW_ITALIC)
+    ಆದರೆ (!(flags & DRAW_ITALIC)
 	    && !((flags & DRAW_BOLD) && gui.font_can_bold)
-	    && gui.ascii_glyphs != NULL
+	    && gui.ascii_glyphs != ಖಾಲಿ
 	    && !force_pango)
     {
 	char_u *p;
 
-	for (p = s; p < s + len; ++p)
-	    if (*p & 0x80)
-		goto not_ascii;
+	ಗಾಗಿ (p = s; p < s + len; ++p)
+	    ಆದರೆ (*p & 0x80)
+		ಹೋಗು not_ascii;
 
-	pango_glyph_string_set_size(glyphs, len);
+	pango_glyph_string_ಗಣ_ಗಾತ್ರ(glyphs, len);
 
-	for (i = 0; i < len; ++i)
+	ಗಾಗಿ (i = 0; i < len; ++i)
 	{
 	    glyphs->glyphs[i] = gui.ascii_glyphs->glyphs[2 * s[i]];
 	    glyphs->log_clusters[i] = i;
 	}
 
-#if GTK_CHECK_VERSION(3,0,0)
-	draw_glyph_string(row, col, len, flags, gui.ascii_font, glyphs, cr);
-#else
-	draw_glyph_string(row, col, len, flags, gui.ascii_font, glyphs);
-#endif
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+	draw_glyph_string(ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು, len, flags, gui.ascii_font, glyphs, cr);
+#ಇಲ್ಲದಿದ್ದರೆ
+	draw_glyph_string(ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು, len, flags, gui.ascii_font, glyphs);
+#ಆದರೆ_ಅಂತ್ಯ
 
-	column_offset = len;
+	ಸ್ತಂಭ_ಸ್ಥಾನಾಂತರ = len;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 not_ascii:
     {
 	PangoAttrList	*attr_list;
-	GList		*item_list;
-	int		cluster_width;
-	int		last_glyph_rbearing;
-	int		cells = 0;  // cells occupied by current cluster
+	GList		*ಅಂಶ_list;
+	ಪೂರ್ಣಾಂಕ		cluster_ಅಗಲ;
+	ಪೂರ್ಣಾಂಕ		ಕೊನೆಯ_glyph_rbearing;
+	ಪೂರ್ಣಾಂಕ		cells = 0;  // cells occupied by current cluster
 
 	// Safety check: pango crashes when invoked with invalid utf-8
 	// characters.
-	if (!utf_valid_string(s, s + len))
+	ಆದರೆ (!utf_valid_string(s, s + len))
 	{
-	    column_offset = len;
-	    goto skipitall;
+	    ಸ್ತಂಭ_ಸ್ಥಾನಾಂತರ = len;
+	    ಹೋಗು skipitall;
 	}
 
 	// original width of the current cluster
-	cluster_width = PANGO_SCALE * gui.char_width;
+	cluster_ಅಗಲ = PANGO_SCALE * gui.char_ಅಗಲ;
 
 	// right bearing of the last non-composing glyph
-	last_glyph_rbearing = PANGO_SCALE * gui.char_width;
+	ಕೊನೆಯ_glyph_rbearing = PANGO_SCALE * gui.char_ಅಗಲ;
 
 	attr_list = pango_attr_list_new();
 
 	// If 'guifontwide' is set then use that for double-width characters.
 	// Otherwise just go with 'guifont' and let Pango do its thing.
-	if (gui.wide_font != NULL)
+	ಆದರೆ (gui.wide_font != ಖಾಲಿ)
 	    apply_wide_font_attr(s, len, attr_list);
 
-	if ((flags & DRAW_BOLD) && gui.font_can_bold)
-	    INSERT_PANGO_ATTR(pango_attr_weight_new(PANGO_WEIGHT_BOLD),
+	ಆದರೆ ((flags & DRAW_BOLD) && gui.font_can_bold)
+	    ಸೇರಿಸು_PANGO_ATTR(pango_attr_ತೂಕ_new(PANGO_ತೂಕ_BOLD),
 			      attr_list, 0, len);
-	if (flags & DRAW_ITALIC)
-	    INSERT_PANGO_ATTR(pango_attr_style_new(PANGO_STYLE_ITALIC),
+	ಆದರೆ (flags & DRAW_ITALIC)
+	    ಸೇರಿಸು_PANGO_ATTR(pango_attr_style_new(PANGO_STYLE_ITALIC),
 			      attr_list, 0, len);
 	/*
 	 * Break the text into segments with consistent directional level
@@ -6371,16 +6371,16 @@ not_ascii:
 	 * so there's no need to worry about the loop's efficiency.  Better
 	 * try to optimize elsewhere, e.g. reducing exposes and stuff :)
 	 */
-	item_list = pango_itemize(gui.text_context,
-				  (const char *)s, 0, len, attr_list, NULL);
+	ಅಂಶ_list = pango_itemize(gui.ಪಠ್ಯ_context,
+				  (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)s, 0, len, attr_list, ಖಾಲಿ);
 
-	while (item_list != NULL)
+	ಆಗ (ಅಂಶ_list != ಖಾಲಿ)
 	{
-	    PangoItem	*item;
-	    int		item_cells = 0; // item length in cells
+	    Pango_ಅಂಶ	*ಅಂಶ;
+	    ಪೂರ್ಣಾಂಕ		ಅಂಶ_cells = 0; // item length in cells
 
-	    item = (PangoItem *)item_list->data;
-	    item_list = g_list_delete_link(item_list, item_list);
+	    ಅಂಶ = (Pango_ಅಂಶ *)ಅಂಶ_list->ದತ್ತಾಂಶ;
+	    ಅಂಶ_list = g_list_delete_link(ಅಂಶ_list, ಅಂಶ_list);
 	    /*
 	     * Increment the bidirectional embedding level by 1 if it is not
 	     * even.  An odd number means the output will be RTL, but we don't
@@ -6393,19 +6393,19 @@ not_ascii:
 	     * that, Vim's main screen engine would have to make use of Pango
 	     * functionality.
 	     */
-	    item->analysis.level = (item->analysis.level + 1) & (~1U);
+	    ಅಂಶ->analysis.level = (ಅಂಶ->analysis.level + 1) & (~1U);
 
 	    // HACK: Overrule the shape engine, we don't want shaping to be
 	    // done, because drawing the cursor would change the display.
-	    item->analysis.shape_engine = default_shape_engine;
+	    ಅಂಶ->analysis.shape_engine = default_shape_engine;
 
-#ifdef HAVE_PANGO_SHAPE_FULL
-	    pango_shape_full((const char *)s + item->offset, item->length,
-		    (const char *)s, len, &item->analysis, glyphs);
-#else
-	    pango_shape((const char *)s + item->offset, item->length,
-			&item->analysis, glyphs);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_PANGO_SHAPE_ತುಂಬಿದ
+	    pango_shape_ತುಂಬಿದ((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)s + ಅಂಶ->ಸ್ಥಾನಾಂತರ, ಅಂಶ->ಉದ್ದಳತೆ,
+		    (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)s, len, &ಅಂಶ->analysis, glyphs);
+#ಇಲ್ಲದಿದ್ದರೆ
+	    pango_shape((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)s + ಅಂಶ->ಸ್ಥಾನಾಂತರ, ಅಂಶ->ಉದ್ದಳತೆ,
+			&ಅಂಶ->analysis, glyphs);
+#ಆದರೆ_ಅಂತ್ಯ
 	    /*
 	     * Fixed-width hack: iterate over the array and assign a fixed
 	     * width to each glyph, thus overriding the choice made by the
@@ -6415,46 +6415,46 @@ not_ascii:
 	     * Also perform all kind of dark magic to get composing
 	     * characters right (and pretty too of course).
 	     */
-	    for (i = 0; i < glyphs->num_glyphs; ++i)
+	    ಗಾಗಿ (i = 0; i < glyphs->ಅಂಕೆ_glyphs; ++i)
 	    {
 		PangoGlyphInfo *glyph;
 
 		glyph = &glyphs->glyphs[i];
 
-		if (glyph->attr.is_cluster_start)
+		ಆದರೆ (glyph->attr.is_cluster_ಆರಂಭ)
 		{
-		    int cellcount;
+		    ಪೂರ್ಣಾಂಕ cellcount;
 
-		    cellcount = count_cluster_cells(
-			s, item, glyphs, i, &cluster_width,
-			(item_list != NULL) ? &last_glyph_rbearing : NULL);
+		    cellcount = ಎಣಿಕೆ_cluster_cells(
+			s, ಅಂಶ, glyphs, i, &cluster_ಅಗಲ,
+			(ಅಂಶ_list != ಖಾಲಿ) ? &ಕೊನೆಯ_glyph_rbearing : ಖಾಲಿ);
 
-		    if (cellcount > 0)
+		    ಆದರೆ (cellcount > 0)
 		    {
-			int width;
+			ಪೂರ್ಣಾಂಕ ಅಗಲ;
 
-			width = cellcount * gui.char_width * PANGO_SCALE;
-			glyph->geometry.x_offset +=
-					    MAX(0, width - cluster_width) / 2;
-			glyph->geometry.width = width;
+			ಅಗಲ = cellcount * gui.char_ಅಗಲ * PANGO_SCALE;
+			glyph->geometry.x_ಸ್ಥಾನಾಂತರ +=
+					    MAX(0, ಅಗಲ - cluster_ಅಗಲ) / 2;
+			glyph->geometry.ಅಗಲ = ಅಗಲ;
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
 			// If there are only combining characters in the
 			// cluster, we cannot just change the width of the
 			// previous glyph since there is none.	Therefore
 			// some guesswork is needed.
-			setup_zero_width_cluster(item, glyph, cells,
-						 cluster_width,
-						 last_glyph_rbearing);
+			ಸಿದ್ಧತೆ_zero_ಅಗಲ_cluster(ಅಂಶ, glyph, cells,
+						 cluster_ಅಗಲ,
+						 ಕೊನೆಯ_glyph_rbearing);
 		    }
 
-		    item_cells += cellcount;
+		    ಅಂಶ_cells += cellcount;
 		    cells = cellcount;
 		}
-		else if (i > 0)
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (i > 0)
 		{
-		    int width;
+		    ಪೂರ್ಣಾಂಕ ಅಗಲ;
 
 		    // There is a previous glyph, so we deal with combining
 		    // characters the canonical way.
@@ -6466,35 +6466,35 @@ not_ascii:
 		    // are.
 		    // For both adjust the x_offset to position the glyph in
 		    // the middle.
-		    if (glyph->geometry.x_offset >= 0)
+		    ಆದರೆ (glyph->geometry.x_ಸ್ಥಾನಾಂತರ >= 0)
 		    {
-			glyphs->glyphs[i].geometry.width =
-					 glyphs->glyphs[i - 1].geometry.width;
-			glyphs->glyphs[i - 1].geometry.width = 0;
+			glyphs->glyphs[i].geometry.ಅಗಲ =
+					 glyphs->glyphs[i - 1].geometry.ಅಗಲ;
+			glyphs->glyphs[i - 1].geometry.ಅಗಲ = 0;
 		    }
-		    width = cells * gui.char_width * PANGO_SCALE;
-		    glyph->geometry.x_offset +=
-					    MAX(0, width - cluster_width) / 2;
+		    ಅಗಲ = cells * gui.char_ಅಗಲ * PANGO_SCALE;
+		    glyph->geometry.x_ಸ್ಥಾನಾಂತರ +=
+					    MAX(0, ಅಗಲ - cluster_ಅಗಲ) / 2;
 		}
-		else // i == 0 "cannot happen"
+		ಇಲ್ಲದಿದ್ದರೆ // i == 0 "cannot happen"
 		{
-		    glyph->geometry.width = 0;
+		    glyph->geometry.ಅಗಲ = 0;
 		}
 	    }
 
 	    //// Aaaaand action! **
-#if GTK_CHECK_VERSION(3,0,0)
-	    draw_glyph_string(row, col + column_offset, item_cells,
-			      flags, item->analysis.font, glyphs,
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+	    draw_glyph_string(ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು + ಸ್ತಂಭ_ಸ್ಥಾನಾಂತರ, ಅಂಶ_cells,
+			      flags, ಅಂಶ->analysis.font, glyphs,
 			      cr);
-#else
-	    draw_glyph_string(row, col + column_offset, item_cells,
-			      flags, item->analysis.font, glyphs);
-#endif
+#ಇಲ್ಲದಿದ್ದರೆ
+	    draw_glyph_string(ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು + ಸ್ತಂಭ_ಸ್ಥಾನಾಂತರ, ಅಂಶ_cells,
+			      flags, ಅಂಶ->analysis.font, glyphs);
+#ಆದರೆ_ಅಂತ್ಯ
 
-	    pango_item_free(item);
+	    pango_ಅಂಶ_free(ಅಂಶ);
 
-	    column_offset += item_cells;
+	    ಸ್ತಂಭ_ಸ್ಥಾನಾಂತರ += ಅಂಶ_cells;
 	}
 
 	pango_attr_list_unref(attr_list);
@@ -6502,110 +6502,110 @@ not_ascii:
 
 skipitall:
     // Draw underline and undercurl.
-#if GTK_CHECK_VERSION(3,0,0)
-    draw_under(flags, row, col, column_offset, cr);
-#else
-    draw_under(flags, row, col, column_offset);
-#endif
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    draw_under(flags, ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು, ಸ್ತಂಭ_ಸ್ಥಾನಾಂತರ, cr);
+#ಇಲ್ಲದಿದ್ದರೆ
+    draw_under(flags, ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು, ಸ್ತಂಭ_ಸ್ಥಾನಾಂತರ);
+#ಆದರೆ_ಅಂತ್ಯ
 
     pango_glyph_string_free(glyphs);
 
-#if GTK_CHECK_VERSION(3,0,0)
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
     cairo_destroy(cr);
-    queue_draw_area(FILL_X(col), FILL_Y(row),
-	    column_offset * gui.char_width + 1, gui.char_height);
-#else
-    gdk_gc_set_clip_rectangle(gui.text_gc, NULL);
-#endif
+    ಸರತಿ_draw_area(FILL_X(ಲಂಬಸಾಲು), FILL_Y(ಅಡ್ಡಸಾಲು),
+	    ಸ್ತಂಭ_ಸ್ಥಾನಾಂತರ * gui.char_ಅಗಲ + 1, gui.char_ಎತ್ತರ);
+#ಇಲ್ಲದಿದ್ದರೆ
+    gdk_gc_ಗಣ_clip_rectangle(gui.ಪಠ್ಯ_gc, ಖಾಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return column_offset;
+    ಹಿಂತಿರುಗಿ ಸ್ತಂಭ_ಸ್ಥಾನಾಂತರ;
 }
 
 /*
  * Return OK if the key with the termcap name "name" is supported.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 gui_mch_haskey(char_u *name)
 {
-    int i;
+    ಪೂರ್ಣಾಂಕ i;
 
-    for (i = 0; special_keys[i].key_sym != 0; i++)
-	if (name[0] == special_keys[i].code0
-		&& name[1] == special_keys[i].code1)
-	    return OK;
-    return FAIL;
+    ಗಾಗಿ (i = 0; special_ಕೀಲಿಗಳು[i].ಕೀಲಿ_sym != 0; i++)
+	ಆದರೆ (name[0] == special_ಕೀಲಿಗಳು[i].code0
+		&& name[1] == special_ಕೀಲಿಗಳು[i].code1)
+	    ಹಿಂತಿರುಗಿ OK;
+    ಹಿಂತಿರುಗಿ FAIL;
 }
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * Return the text window-id and display.  Only required for X-based GUI's
  */
-    int
-gui_get_x11_windis(Window *win, Display **dis)
+    ಪೂರ್ಣಾಂಕ
+gui_get_x11_windis(ಕಿಟಕಿ *win, Display **dis)
 {
     Display * dpy = gui_mch_get_display();
-    if (dpy)
+    ಆದರೆ (dpy)
     {
 	*dis = dpy;
-	*win = GDK_WINDOW_XID(gtk_widget_get_window(gui.mainwin));
-	return OK;
+	*win = GDK_ಕಿಟಕಿ_XID(gtk_widget_get_ಕಿಟಕಿ(gui.mainwin));
+	ಹಿಂತಿರುಗಿ OK;
     }
 
-    *dis = NULL;
+    *dis = ಖಾಲಿ;
     *win = 0;
-    return FAIL;
+    ಹಿಂತಿರುಗಿ FAIL;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     Display *
-gui_mch_get_display(void)
+gui_mch_get_display(ಶೂನ್ಯ)
 {
-    if (gui.mainwin != NULL && gtk_widget_get_window(gui.mainwin) != NULL
-#if GTK_CHECK_VERSION(3,0,0)
+    ಆದರೆ (gui.mainwin != ಖಾಲಿ && gtk_widget_get_ಕಿಟಕಿ(gui.mainwin) != ಖಾಲಿ
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
 	    && GDK_IS_X11_DISPLAY(gtk_widget_get_display(gui.mainwin))
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	)
-	return GDK_WINDOW_XDISPLAY(gtk_widget_get_window(gui.mainwin));
-    else
-	return NULL;
+	ಹಿಂತಿರುಗಿ GDK_ಕಿಟಕಿ_XDISPLAY(gtk_widget_get_ಕಿಟಕಿ(gui.mainwin));
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
-    void
-gui_mch_beep(void)
+    ಶೂನ್ಯ
+gui_mch_beep(ಶೂನ್ಯ)
 {
     GdkDisplay *display;
 
-    if (gui.mainwin != NULL && gtk_widget_get_realized(gui.mainwin))
+    ಆದರೆ (gui.mainwin != ಖಾಲಿ && gtk_widget_get_realized(gui.mainwin))
 	display = gtk_widget_get_display(gui.mainwin);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	display = gdk_display_get_default();
 
-    if (display != NULL)
+    ಆದರೆ (display != ಖಾಲಿ)
 	gdk_display_beep(display);
 }
 
-    void
-gui_mch_flash(int msec)
+    ಶೂನ್ಯ
+gui_mch_flash(ಪೂರ್ಣಾಂಕ msec)
 {
-#if GTK_CHECK_VERSION(3,0,0)
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
     // TODO Replace GdkGC with Cairo
-    (void)msec;
-#else
-    GdkGCValues	values;
+    (ಶೂನ್ಯ)msec;
+#ಇಲ್ಲದಿದ್ದರೆ
+    GdkGCValues	ಮೌಲ್ಯಗಳು;
     GdkGC	*invert_gc;
 
-    if (gui.drawarea->window == NULL)
-	return;
+    ಆದರೆ (gui.drawarea->ಕಿಟಕಿ_2 == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    values.foreground.pixel = gui.norm_pixel ^ gui.back_pixel;
-    values.background.pixel = gui.norm_pixel ^ gui.back_pixel;
-    values.function = GDK_XOR;
-    invert_gc = gdk_gc_new_with_values(gui.drawarea->window,
-				       &values,
+    ಮೌಲ್ಯಗಳು.foreground.pixel = gui.norm_pixel ^ gui.ಹಿಂಭಾಗ_pixel;
+    ಮೌಲ್ಯಗಳು.background.pixel = gui.norm_pixel ^ gui.ಹಿಂಭಾಗ_pixel;
+    ಮೌಲ್ಯಗಳು.function = GDK_XOR;
+    invert_gc = gdk_gc_new_with_ಮೌಲ್ಯಗಳು(gui.drawarea->ಕಿಟಕಿ_2,
+				       &ಮೌಲ್ಯಗಳು,
 				       GDK_GC_FOREGROUND |
 				       GDK_GC_BACKGROUND |
 				       GDK_GC_FUNCTION);
-    gdk_gc_set_exposures(invert_gc,
+    gdk_gc_ಗಣ_exposures(invert_gc,
 			 gui.visibility != GDK_VISIBILITY_UNOBSCURED);
     /*
      * Do a visual beep by changing back and forth in some undetermined way,
@@ -6614,187 +6614,187 @@ gui_mch_flash(int msec)
      * arbitrary X11 servers. However this seems to be enough for what we
      * intend it to do.
      */
-    gdk_draw_rectangle(gui.drawarea->window, invert_gc,
+    gdk_draw_rectangle(gui.drawarea->ಕಿಟಕಿ_2, invert_gc,
 		       TRUE,
 		       0, 0,
-		       FILL_X((int)Columns) + gui.border_offset,
-		       FILL_Y((int)Rows) + gui.border_offset);
+		       FILL_X((ಪೂರ್ಣಾಂಕ)Columns) + gui.border_ಸ್ಥಾನಾಂತರ,
+		       FILL_Y((ಪೂರ್ಣಾಂಕ)ಅಡ್ಡಸಾಲುಗಳು) + gui.border_ಸ್ಥಾನಾಂತರ);
 
     gui_mch_flush();
-    ui_delay((long)msec, TRUE);	// wait so many msec
+    ui_delay((ದೀರ್ಘ)msec, TRUE);	// wait so many msec
 
-    gdk_draw_rectangle(gui.drawarea->window, invert_gc,
+    gdk_draw_rectangle(gui.drawarea->ಕಿಟಕಿ_2, invert_gc,
 		       TRUE,
 		       0, 0,
-		       FILL_X((int)Columns) + gui.border_offset,
-		       FILL_Y((int)Rows) + gui.border_offset);
+		       FILL_X((ಪೂರ್ಣಾಂಕ)Columns) + gui.border_ಸ್ಥಾನಾಂತರ,
+		       FILL_Y((ಪೂರ್ಣಾಂಕ)ಅಡ್ಡಸಾಲುಗಳು) + gui.border_ಸ್ಥಾನಾಂತರ);
 
     gdk_gc_destroy(invert_gc);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Invert a rectangle from row r, column c, for nr rows and nc columns.
  */
-    void
-gui_mch_invert_rectangle(int r, int c, int nr, int nc)
+    ಶೂನ್ಯ
+gui_mch_invert_rectangle(ಪೂರ್ಣಾಂಕ r, ಪೂರ್ಣಾಂಕ c, ಪೂರ್ಣಾಂಕ nr, ಪೂರ್ಣಾಂಕ nc)
 {
-#if GTK_CHECK_VERSION(3,0,0)
-    const GdkRectangle rect = {
-	FILL_X(c), FILL_Y(r), nc * gui.char_width, nr * gui.char_height
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    ಸ್ಥಿರಾಂಕ GdkRectangle rect = {
+	FILL_X(c), FILL_Y(r), nc * gui.char_ಅಗಲ, nr * gui.char_ಎತ್ತರ
     };
-    cairo_t * const cr = cairo_create(gui.surface);
+    cairo_t * ಸ್ಥಿರಾಂಕ cr = cairo_create(gui.surface);
 
-    cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 1.0);
-# if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1,9,2)
-    cairo_set_operator(cr, CAIRO_OPERATOR_DIFFERENCE);
-# else
+    cairo_ಗಣ_ಮೂಲ_rgba(cr, 1.0, 1.0, 1.0, 1.0);
+# ಆದರೆ CAIRO_ಆವೃತ್ತಿ >= CAIRO_ಆವೃತ್ತಿ_ENCODE(1,9,2)
+    cairo_ಗಣ_operator(cr, CAIRO_OPERATOR_DIFFERENCE);
+# ಇಲ್ಲದಿದ್ದರೆ
     // Give an implementation for older cairo versions if necessary.
 # endif
-    cairo_rectangle(cr, rect.x, rect.y, rect.width, rect.height);
+    cairo_rectangle(cr, rect.x, rect.y, rect.ಅಗಲ, rect.ಎತ್ತರ);
     cairo_fill(cr);
 
     cairo_destroy(cr);
 
-    queue_draw_area(rect.x, rect.y, rect.width, rect.height);
-#else
-    GdkGCValues values;
+    ಸರತಿ_draw_area(rect.x, rect.y, rect.ಅಗಲ, rect.ಎತ್ತರ);
+#ಇಲ್ಲದಿದ್ದರೆ
+    GdkGCValues ಮೌಲ್ಯಗಳು;
     GdkGC *invert_gc;
 
-    if (gui.drawarea->window == NULL)
-	return;
+    ಆದರೆ (gui.drawarea->ಕಿಟಕಿ_2 == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    values.function = GDK_INVERT;
-    invert_gc = gdk_gc_new_with_values(gui.drawarea->window,
-				       &values,
+    ಮೌಲ್ಯಗಳು.function = GDK_INVERT;
+    invert_gc = gdk_gc_new_with_ಮೌಲ್ಯಗಳು(gui.drawarea->ಕಿಟಕಿ_2,
+				       &ಮೌಲ್ಯಗಳು,
 				       GDK_GC_FUNCTION);
-    gdk_gc_set_exposures(invert_gc, gui.visibility !=
+    gdk_gc_ಗಣ_exposures(invert_gc, gui.visibility !=
 						   GDK_VISIBILITY_UNOBSCURED);
-    gdk_draw_rectangle(gui.drawarea->window, invert_gc,
+    gdk_draw_rectangle(gui.drawarea->ಕಿಟಕಿ_2, invert_gc,
 		       TRUE,
 		       FILL_X(c), FILL_Y(r),
-		       (nc) * gui.char_width, (nr) * gui.char_height);
+		       (nc) * gui.char_ಅಗಲ, (nr) * gui.char_ಎತ್ತರ);
     gdk_gc_destroy(invert_gc);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Iconify the GUI window.
  */
-    void
-gui_mch_iconify(void)
+    ಶೂನ್ಯ
+gui_mch_iconify(ಶೂನ್ಯ)
 {
-    gtk_window_iconify(GTK_WINDOW(gui.mainwin));
+    gtk_ಕಿಟಕಿ_iconify(GTK_ಕಿಟಕಿ(gui.mainwin));
 }
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * Bring the Vim window to the foreground.
  */
-    void
-gui_mch_set_foreground(void)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_foreground(ಶೂನ್ಯ)
 {
     // Just calling gtk_window_present() used to work in the past, but now this
     // sequence appears to be needed:
     // - Show the window on top of others.
     // - Present the window (also shows it above others).
     // - Do not the window on top of others (otherwise it would be stuck there).
-    gtk_window_set_keep_above(GTK_WINDOW(gui.mainwin), TRUE);
+    gtk_ಕಿಟಕಿ_ಗಣ_keep_above(GTK_ಕಿಟಕಿ(gui.mainwin), TRUE);
     gui_may_flush();
-    gtk_window_present(GTK_WINDOW(gui.mainwin));
+    gtk_ಕಿಟಕಿ_present(GTK_ಕಿಟಕಿ(gui.mainwin));
     gui_may_flush();
-    gtk_window_set_keep_above(GTK_WINDOW(gui.mainwin), FALSE);
+    gtk_ಕಿಟಕಿ_ಗಣ_keep_above(GTK_ಕಿಟಕಿ(gui.mainwin), FALSE);
     gui_may_flush();
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Draw a cursor without focus.
  */
-    void
+    ಶೂನ್ಯ
 gui_mch_draw_hollow_cursor(guicolor_T color)
 {
-    int		i = 1;
-#if GTK_CHECK_VERSION(3,0,0)
+    ಪೂರ್ಣಾಂಕ		i = 1;
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
     cairo_t    *cr;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (gtk_widget_get_window(gui.drawarea) == NULL)
-	return;
+    ಆದರೆ (gtk_widget_get_ಕಿಟಕಿ(gui.drawarea) == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-#if GTK_CHECK_VERSION(3,0,0)
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
     cr = cairo_create(gui.surface);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    gui_mch_set_fg_color(color);
+    gui_mch_ಗಣ_fg_color(color);
 
-#if GTK_CHECK_VERSION(3,0,0)
-    cairo_set_source_rgba(cr,
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    cairo_ಗಣ_ಮೂಲ_rgba(cr,
 	    gui.fgcolor->red, gui.fgcolor->green, gui.fgcolor->blue,
 	    gui.fgcolor->alpha);
-#else
-    gdk_gc_set_foreground(gui.text_gc, gui.fgcolor);
-#endif
-    if (mb_lefthalve(gui.row, gui.col))
+#ಇಲ್ಲದಿದ್ದರೆ
+    gdk_gc_ಗಣ_foreground(gui.ಪಠ್ಯ_gc, gui.fgcolor);
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (mb_lefthalve(gui.ಅಡ್ಡಸಾಲು, gui.ಲಂಬಸಾಲು))
 	i = 2;
-#if GTK_CHECK_VERSION(3,0,0)
-    cairo_set_line_width(cr, 1.0);
-    cairo_set_line_cap(cr, CAIRO_LINE_CAP_BUTT);
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    cairo_ಗಣ_ಸಾಲು_ಅಗಲ(cr, 1.0);
+    cairo_ಗಣ_ಸಾಲು_cap(cr, CAIRO_ಸಾಲು_CAP_BUTT);
     cairo_rectangle(cr,
-	    FILL_X(gui.col) + 0.5, FILL_Y(gui.row) + 0.5,
-	    i * gui.char_width - 1, gui.char_height - 1);
+	    FILL_X(gui.ಲಂಬಸಾಲು) + 0.5, FILL_Y(gui.ಅಡ್ಡಸಾಲು) + 0.5,
+	    i * gui.char_ಅಗಲ - 1, gui.char_ಎತ್ತರ - 1);
     cairo_stroke(cr);
     cairo_destroy(cr);
-#else
-    gdk_draw_rectangle(gui.drawarea->window, gui.text_gc,
+#ಇಲ್ಲದಿದ್ದರೆ
+    gdk_draw_rectangle(gui.drawarea->ಕಿಟಕಿ_2, gui.ಪಠ್ಯ_gc,
 	    FALSE,
-	    FILL_X(gui.col), FILL_Y(gui.row),
-	    i * gui.char_width - 1, gui.char_height - 1);
-#endif
+	    FILL_X(gui.ಲಂಬಸಾಲು), FILL_Y(gui.ಅಡ್ಡಸಾಲು),
+	    i * gui.char_ಅಗಲ - 1, gui.char_ಎತ್ತರ - 1);
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Draw part of a cursor, "w" pixels wide, and "h" pixels high, using
  * color "color".
  */
-    void
-gui_mch_draw_part_cursor(int w, int h, guicolor_T color)
+    ಶೂನ್ಯ
+gui_mch_draw_part_cursor(ಪೂರ್ಣಾಂಕ w, ಪೂರ್ಣಾಂಕ h, guicolor_T color)
 {
-    if (gtk_widget_get_window(gui.drawarea) == NULL)
-	return;
+    ಆದರೆ (gtk_widget_get_ಕಿಟಕಿ(gui.drawarea) == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    gui_mch_set_fg_color(color);
+    gui_mch_ಗಣ_fg_color(color);
 
-#if GTK_CHECK_VERSION(3,0,0)
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
     {
 	cairo_t *cr;
 
 	cr = cairo_create(gui.surface);
-	cairo_set_source_rgba(cr,
+	cairo_ಗಣ_ಮೂಲ_rgba(cr,
 		gui.fgcolor->red, gui.fgcolor->green, gui.fgcolor->blue,
 		gui.fgcolor->alpha);
 	cairo_rectangle(cr,
 # ifdef FEAT_RIGHTLEFT
 	    // vertical line should be on the right of current point
-	    CURSOR_BAR_RIGHT ? FILL_X(gui.col + 1) - w :
+	    CURSOR_BAR_ಬಲ ? FILL_X(gui.ಲಂಬಸಾಲು + 1) - w :
 # endif
-	    FILL_X(gui.col), FILL_Y(gui.row) + gui.char_height - h,
+	    FILL_X(gui.ಲಂಬಸಾಲು), FILL_Y(gui.ಅಡ್ಡಸಾಲು) + gui.char_ಎತ್ತರ - h,
 	    w, h);
 	cairo_fill(cr);
 	cairo_destroy(cr);
     }
-#else // !GTK_CHECK_VERSION(3,0,0)
-    gdk_gc_set_foreground(gui.text_gc, gui.fgcolor);
-    gdk_draw_rectangle(gui.drawarea->window, gui.text_gc,
+#ಇಲ್ಲದಿದ್ದರೆ // !GTK_CHECK_VERSION(3,0,0)
+    gdk_gc_ಗಣ_foreground(gui.ಪಠ್ಯ_gc, gui.fgcolor);
+    gdk_draw_rectangle(gui.drawarea->ಕಿಟಕಿ_2, gui.ಪಠ್ಯ_gc,
 	    TRUE,
 # ifdef FEAT_RIGHTLEFT
 	    // vertical line should be on the right of current point
-	    CURSOR_BAR_RIGHT ? FILL_X(gui.col + 1) - w :
+	    CURSOR_BAR_ಬಲ ? FILL_X(gui.ಲಂಬಸಾಲು + 1) - w :
 # endif
-	    FILL_X(gui.col),
-	    FILL_Y(gui.row) + gui.char_height - h,
+	    FILL_X(gui.ಲಂಬಸಾಲು),
+	    FILL_Y(gui.ಅಡ್ಡಸಾಲು) + gui.char_ಎತ್ತರ - h,
 	    w, h);
-#endif // !GTK_CHECK_VERSION(3,0,0)
+#ಆದರೆ_ಅಂತ್ಯ // !GTK_CHECK_VERSION(3,0,0)
 }
 
 
@@ -6804,47 +6804,47 @@ gui_mch_draw_part_cursor(int w, int h, guicolor_T color)
  * nothing in the X11 event queue (& no timers pending), then we return
  * immediately.
  */
-    void
-gui_mch_update(void)
+    ಶೂನ್ಯ
+gui_mch_update(ಶೂನ್ಯ)
 {
-    int cnt = 0;	// prevent endless loop
-    while (g_main_context_pending(NULL) && !vim_is_input_buf_full()
+    ಪೂರ್ಣಾಂಕ cnt = 0;	// prevent endless loop
+    ಆಗ (g_main_context_pending(ಖಾಲಿ) && !vim_is_ಒಳಹರಿವು_buf_ತುಂಬಿದ()
 	    && ++cnt < 100)
     {
-#if GTK_CHECK_VERSION(3,0,0)
-	int prio = 0;
-	g_main_context_prepare(NULL, &prio);
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+	ಪೂರ್ಣಾಂಕ prio = 0;
+	g_main_context_prepare(ಖಾಲಿ, &prio);
 	// peek internal scheduling of redraw
-	if (prio == GDK_PRIORITY_REDRAW)
+	ಆದರೆ (prio == GDK_ಆದ್ಯತೆ_REDRAW)
 	    gui_may_flush(); // prepares redraw: g_main_context_iteration
-#endif
-	g_main_context_iteration(NULL, TRUE);
+#ಆದರೆ_ಅಂತ್ಯ
+	g_main_context_iteration(ಖಾಲಿ, TRUE);
     }
 }
 
-    static timeout_cb_type
-input_timer_cb(gpointer data)
+    ಸ್ಥಿರ timeout_cb_type
+ಒಳಹರಿವು_timer_cb(gpointer ದತ್ತಾಂಶ)
 {
-    int *timed_out = (int *) data;
+    ಪೂರ್ಣಾಂಕ *timed_ಹೊರಹೋಗು = (ಪೂರ್ಣಾಂಕ *) ದತ್ತಾಂಶ;
 
     // Just inform the caller about the occurrence of it
-    *timed_out = TRUE;
+    *timed_ಹೊರಹೋಗು = TRUE;
 
-    return FALSE;		// don't happen again
+    ಹಿಂತಿರುಗಿ FALSE;		// don't happen again
 }
 
-#ifdef FEAT_JOB_CHANNEL
-    static timeout_cb_type
-channel_poll_cb(gpointer data UNUSED)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕೆಲಸ_CHANNEL
+    ಸ್ಥಿರ timeout_cb_type
+channel_poll_cb(gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
     // Using an event handler for a channel that may be disconnected does
     // not work, it hangs.  Instead poll for messages.
     channel_handle_events(TRUE);
     parse_queued_messages();
 
-    return TRUE;		// repeat
+    ಹಿಂತಿರುಗಿ TRUE;		// repeat
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * GUI input routine called by gui_wait_for_chars().  Waits for a character
@@ -6855,81 +6855,81 @@ channel_poll_cb(gpointer data UNUSED)
  * Returns OK if a character was found to be available within the given time,
  * or FAIL otherwise.
  */
-    int
-gui_mch_wait_for_chars(long wtime)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_wait_for_chars(ದೀರ್ಘ wtime)
 {
-    int		focus;
+    ಪೂರ್ಣಾಂಕ		focus;
     guint	timer;
-    static int	timed_out;
-    int		retval = FAIL;
-#ifdef FEAT_JOB_CHANNEL
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	timed_ಹೊರಹೋಗು;
+    ಪೂರ್ಣಾಂಕ		retval = FAIL;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕೆಲಸ_CHANNEL
     guint	channel_timer = 0;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    timed_out = FALSE;
+    timed_ಹೊರಹೋಗು = FALSE;
 
     // This timeout makes sure that we will return if no characters arrived in
     // time. If "wtime" is zero just use one.
-    if (wtime >= 0)
-	timer = timeout_add(wtime == 0 ? 1L : wtime,
-						   input_timer_cb, &timed_out);
-    else
+    ಆದರೆ (wtime >= 0)
+	timer = timeout_ಕೂಡಿಸು(wtime == 0 ? 1L : wtime,
+						   ಒಳಹರಿವು_timer_cb, &timed_ಹೊರಹೋಗು);
+    ಇಲ್ಲದಿದ್ದರೆ
 	timer = 0;
 
-#ifdef FEAT_JOB_CHANNEL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕೆಲಸ_CHANNEL
     // If there is a channel with the keep_open flag we need to poll for input
     // on them.
-    if (channel_any_keep_open())
-	channel_timer = timeout_add(20, channel_poll_cb, NULL);
-#endif
+    ಆದರೆ (channel_any_keep_open())
+	channel_timer = timeout_ಕೂಡಿಸು(20, channel_poll_cb, ಖಾಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ
 
-    focus = gui.in_focus;
+    focus = gui.ಒಳ_focus;
 
-    do
+    ಮಾಡು
     {
 	// Stop or start blinking when focus changes
-	if (gui.in_focus != focus)
+	ಆದರೆ (gui.ಒಳ_focus != focus)
 	{
-	    if (gui.in_focus)
-		gui_mch_start_blink();
-	    else
+	    ಆದರೆ (gui.ಒಳ_focus)
+		gui_mch_ಆರಂಭ_blink();
+	    ಇಲ್ಲದಿದ್ದರೆ
 		gui_mch_stop_blink(TRUE);
-	    focus = gui.in_focus;
+	    focus = gui.ಒಳ_focus;
 	}
 
-#ifdef MESSAGE_QUEUE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ಸಂದೇಶ_ಸರತಿ
 # ifdef FEAT_TIMERS
-	did_add_timer = FALSE;
+	did_ಕೂಡಿಸು_timer = FALSE;
 # endif
 	parse_queued_messages();
 # ifdef FEAT_TIMERS
-	if (did_add_timer)
+	ಆದರೆ (did_ಕೂಡಿಸು_timer)
 	    // Need to recompute the waiting time.
-	    goto theend;
+	    ಹೋಗು theend;
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 	/*
 	 * Loop in GTK+ processing  until a timeout or input occurs.
 	 * Skip this if input is available anyway (can happen in rare
 	 * situations, sort of race condition).
 	 */
-	if (!input_available())
+	ಆದರೆ (!ಒಳಹರಿವು_ಲಭ್ಯ())
 	{
-	    g_main_context_iteration(NULL, TRUE);
-#ifdef GDK_WINDOWING_WAYLAND
-    if (gui.is_wayland && clip_star.state == SELECT_IN_PROGRESS)
+	    g_main_context_iteration(ಖಾಲಿ, TRUE);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ GDK_WINDOWING_WAYLAND
+    ಆದರೆ (gui.is_wayland && clip_ನಕ್ಷತ್ರ.state == SELECT_ಒಳ_ಪ್ರಗತಿ)
 	gui_may_flush();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	}
 
 	// Got char, return immediately
-	if (input_available())
+	ಆದರೆ (ಒಳಹರಿವು_ಲಭ್ಯ())
 	{
 	    retval = OK;
-	    goto theend;
+	    ಹೋಗು theend;
 	}
-    } while (wtime < 0 || !timed_out);
+    } ಆಗ (wtime < 0 || !timed_ಹೊರಹೋಗು);
 
     /*
      * Flush all eventually pending (drawing) events.
@@ -6937,14 +6937,14 @@ gui_mch_wait_for_chars(long wtime)
     gui_mch_update();
 
 theend:
-    if (timer != 0 && !timed_out)
+    ಆದರೆ (timer != 0 && !timed_ಹೊರಹೋಗು)
 	timeout_remove(timer);
-#ifdef FEAT_JOB_CHANNEL
-    if (channel_timer != 0)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕೆಲಸ_CHANNEL
+    ಆದರೆ (channel_timer != 0)
 	timeout_remove(channel_timer);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
 
@@ -6954,414 +6954,414 @@ theend:
 
 
 // Flush any output to the screen
-    void
-gui_mch_flush(void)
+    ಶೂನ್ಯ
+gui_mch_flush(ಶೂನ್ಯ)
 {
-    if (gui.mainwin == NULL || !gtk_widget_get_realized(gui.mainwin))
-	return;
-#if GTK_CHECK_VERSION(3,0,0)
-    if (dirty_region != NULL && gui.drawarea != NULL)
+    ಆದರೆ (gui.mainwin == ಖಾಲಿ || !gtk_widget_get_realized(gui.mainwin))
+	ಹಿಂತಿರುಗಿ;
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    ಆದರೆ (dirty_region != ಖಾಲಿ && gui.drawarea != ಖಾಲಿ)
     {
-	gtk_widget_queue_draw_region(gui.drawarea, dirty_region);
+	gtk_widget_ಸರತಿ_draw_region(gui.drawarea, dirty_region);
 	cairo_region_destroy(dirty_region);
-	dirty_region = NULL;
+	dirty_region = ಖಾಲಿ;
     }
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
        gdk_display_flush(gtk_widget_get_display(gui.mainwin));
-       return;
-#endif
+       ಹಿಂತಿರುಗಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Clear a rectangular region of the screen from text pos (row1, col1) to
  * (row2, col2) inclusive.
  */
-    void
-gui_mch_clear_block(int row1arg, int col1arg, int row2arg, int col2arg)
+    ಶೂನ್ಯ
+gui_mch_clear_ಖಂಡ(ಪೂರ್ಣಾಂಕ row1arg, ಪೂರ್ಣಾಂಕ col1arg, ಪೂರ್ಣಾಂಕ row2arg, ಪೂರ್ಣಾಂಕ col2arg)
 {
 
-    int col1 = check_col(col1arg);
-    int col2 = check_col(col2arg);
-    int row1 = check_row(row1arg);
-    int row2 = check_row(row2arg);
+    ಪೂರ್ಣಾಂಕ col1 = check_ಲಂಬಸಾಲು(col1arg);
+    ಪೂರ್ಣಾಂಕ col2 = check_ಲಂಬಸಾಲು(col2arg);
+    ಪೂರ್ಣಾಂಕ row1 = check_ಅಡ್ಡಸಾಲು(row1arg);
+    ಪೂರ್ಣಾಂಕ row2 = check_ಅಡ್ಡಸಾಲು(row2arg);
 
-#if GTK_CHECK_VERSION(3,0,0)
-    if (gtk_widget_get_window(gui.drawarea) == NULL)
-	return;
-#else
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    ಆದರೆ (gtk_widget_get_ಕಿಟಕಿ(gui.drawarea) == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
+#ಇಲ್ಲದಿದ್ದರೆ
     GdkColor color;
 
-    if (gui.drawarea->window == NULL)
-	return;
+    ಆದರೆ (gui.drawarea->ಕಿಟಕಿ_2 == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    color.pixel = gui.back_pixel;
-#endif
+    color.pixel = gui.ಹಿಂಭಾಗ_pixel;
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if GTK_CHECK_VERSION(3,0,0)
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
     {
 	// Add one pixel to the far right column in case a double-stroked
 	// bold glyph may sit there.
-	const GdkRectangle rect = {
+	ಸ್ಥಿರಾಂಕ GdkRectangle rect = {
 	    FILL_X(col1), FILL_Y(row1),
-	    (col2 - col1 + 1) * gui.char_width + (col2 == Columns - 1),
-	    (row2 - row1 + 1) * gui.char_height
+	    (col2 - col1 + 1) * gui.char_ಅಗಲ + (col2 == Columns - 1),
+	    (row2 - row1 + 1) * gui.char_ಎತ್ತರ
 	};
-	cairo_t * const cr = cairo_create(gui.surface);
-# if GTK_CHECK_VERSION(3,22,2)
-	set_cairo_source_rgba_from_color(cr, gui.back_pixel);
-# else
-	GdkWindow * const win = gtk_widget_get_window(gui.drawarea);
-	cairo_pattern_t * const pat = gdk_window_get_background_pattern(win);
-	if (pat != NULL)
-	    cairo_set_source(cr, pat);
-	else
-	    set_cairo_source_rgba_from_color(cr, gui.back_pixel);
+	cairo_t * ಸ್ಥಿರಾಂಕ cr = cairo_create(gui.surface);
+# ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,22,2)
+	ಗಣ_cairo_ಮೂಲ_rgba_from_color(cr, gui.ಹಿಂಭಾಗ_pixel);
+# ಇಲ್ಲದಿದ್ದರೆ
+	Gdk_ಕಿಟಕಿ * ಸ್ಥಿರಾಂಕ win = gtk_widget_get_ಕಿಟಕಿ(gui.drawarea);
+	cairo_ನಮೂನೆ_t * ಸ್ಥಿರಾಂಕ pat = gdk_ಕಿಟಕಿ_get_background_ನಮೂನೆ(win);
+	ಆದರೆ (pat != ಖಾಲಿ)
+	    cairo_ಗಣ_ಮೂಲ(cr, pat);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಗಣ_cairo_ಮೂಲ_rgba_from_color(cr, gui.ಹಿಂಭಾಗ_pixel);
 # endif
-	cairo_rectangle(cr, rect.x, rect.y, rect.width, rect.height);
+	cairo_rectangle(cr, rect.x, rect.y, rect.ಅಗಲ, rect.ಎತ್ತರ);
 	cairo_fill(cr);
 	cairo_destroy(cr);
 
-	queue_draw_area(rect.x, rect.y, rect.width, rect.height);
+	ಸರತಿ_draw_area(rect.x, rect.y, rect.ಅಗಲ, rect.ಎತ್ತರ);
     }
-#else // !GTK_CHECK_VERSION(3,0,0)
-    gdk_gc_set_foreground(gui.text_gc, &color);
+#ಇಲ್ಲದಿದ್ದರೆ // !GTK_CHECK_VERSION(3,0,0)
+    gdk_gc_ಗಣ_foreground(gui.ಪಠ್ಯ_gc, &color);
 
     // Clear one extra pixel at the far right, for when bold characters have
     // spilled over to the window border.
-    gdk_draw_rectangle(gui.drawarea->window, gui.text_gc, TRUE,
+    gdk_draw_rectangle(gui.drawarea->ಕಿಟಕಿ_2, gui.ಪಠ್ಯ_gc, TRUE,
 		       FILL_X(col1), FILL_Y(row1),
-		       (col2 - col1 + 1) * gui.char_width
+		       (col2 - col1 + 1) * gui.char_ಅಗಲ
 						      + (col2 == Columns - 1),
-		       (row2 - row1 + 1) * gui.char_height);
-#endif // !GTK_CHECK_VERSION(3,0,0)
+		       (row2 - row1 + 1) * gui.char_ಎತ್ತರ);
+#ಆದರೆ_ಅಂತ್ಯ // !GTK_CHECK_VERSION(3,0,0)
 }
 
-#if GTK_CHECK_VERSION(3,0,0)
-    static void
-gui_gtk_window_clear(GdkWindow *win)
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+gui_gtk_ಕಿಟಕಿ_clear(Gdk_ಕಿಟಕಿ *win)
 {
-    const GdkRectangle rect = {
-	0, 0, gdk_window_get_width(win), gdk_window_get_height(win)
+    ಸ್ಥಿರಾಂಕ GdkRectangle rect = {
+	0, 0, gdk_ಕಿಟಕಿ_get_ಅಗಲ(win), gdk_ಕಿಟಕಿ_get_ಎತ್ತರ(win)
     };
-    cairo_t * const cr = cairo_create(gui.surface);
-# if GTK_CHECK_VERSION(3,22,2)
-    set_cairo_source_rgba_from_color(cr, gui.back_pixel);
-# else
-    cairo_pattern_t * const pat = gdk_window_get_background_pattern(win);
-    if (pat != NULL)
-	cairo_set_source(cr, pat);
-    else
-	set_cairo_source_rgba_from_color(cr, gui.back_pixel);
+    cairo_t * ಸ್ಥಿರಾಂಕ cr = cairo_create(gui.surface);
+# ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,22,2)
+    ಗಣ_cairo_ಮೂಲ_rgba_from_color(cr, gui.ಹಿಂಭಾಗ_pixel);
+# ಇಲ್ಲದಿದ್ದರೆ
+    cairo_ನಮೂನೆ_t * ಸ್ಥಿರಾಂಕ pat = gdk_ಕಿಟಕಿ_get_background_ನಮೂನೆ(win);
+    ಆದರೆ (pat != ಖಾಲಿ)
+	cairo_ಗಣ_ಮೂಲ(cr, pat);
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಗಣ_cairo_ಮೂಲ_rgba_from_color(cr, gui.ಹಿಂಭಾಗ_pixel);
 # endif
-    cairo_rectangle(cr, rect.x, rect.y, rect.width, rect.height);
+    cairo_rectangle(cr, rect.x, rect.y, rect.ಅಗಲ, rect.ಎತ್ತರ);
     cairo_fill(cr);
     cairo_destroy(cr);
 
-    queue_draw_area(rect.x, rect.y, rect.width, rect.height);
+    ಸರತಿ_draw_area(rect.x, rect.y, rect.ಅಗಲ, rect.ಎತ್ತರ);
 }
-#else
-# define gui_gtk_window_clear(win)  gdk_window_clear(win)
-#endif
+#ಇಲ್ಲದಿದ್ದರೆ
+# define gui_gtk_ಕಿಟಕಿ_clear(win)  gdk_ಕಿಟಕಿ_clear(win)
+#ಆದರೆ_ಅಂತ್ಯ
 
-    void
-gui_mch_clear_all(void)
+    ಶೂನ್ಯ
+gui_mch_clear_all(ಶೂನ್ಯ)
 {
-    if (gtk_widget_get_window(gui.drawarea) != NULL)
-	gui_gtk_window_clear(gtk_widget_get_window(gui.drawarea));
+    ಆದರೆ (gtk_widget_get_ಕಿಟಕಿ(gui.drawarea) != ಖಾಲಿ)
+	gui_gtk_ಕಿಟಕಿ_clear(gtk_widget_get_ಕಿಟಕಿ(gui.drawarea));
 }
 
-#if !GTK_CHECK_VERSION(3,0,0)
+#ಆದರೆ !GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
 /*
  * Redraw any text revealed by scrolling up/down.
  */
-    static void
-check_copy_area(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+check_copy_area(ಶೂನ್ಯ)
 {
     GdkEvent        *event;
-    int                expose_count;
-    if (gui.visibility != GDK_VISIBILITY_PARTIAL)
-	return;
+    ಪೂರ್ಣಾಂಕ                expose_ಎಣಿಕೆ;
+    ಆದರೆ (gui.visibility != GDK_VISIBILITY_PARTIAL)
+	ಹಿಂತಿರುಗಿ;
     // Avoid redrawing the cursor while scrolling or it'll end up where
     // we don't want it to be.        I'm not sure if it's correct to call
     // gui_dont_update_cursor() at this point but it works as a quick
     // fix for now.
     gui_dont_update_cursor(TRUE);
-    do
+    ಮಾಡು
     {
 	// Wait to check whether the scroll worked or not.
-	event = gdk_event_get_graphics_expose(gui.drawarea->window);
-	if (event == NULL)
-	    break; // received NoExpose event
+	event = gdk_event_get_graphics_expose(gui.drawarea->ಕಿಟಕಿ_2);
+	ಆದರೆ (event == ಖಾಲಿ)
+	    ನಿಲ್ಲಿಸು; // received NoExpose event
 	gui_redraw(event->expose.area.x, event->expose.area.y,
-		event->expose.area.width, event->expose.area.height);
-	expose_count = event->expose.count;
+		event->expose.area.ಅಗಲ, event->expose.area.ಎತ್ತರ);
+	expose_ಎಣಿಕೆ = event->expose.ಎಣಿಕೆ_2;
 	gdk_event_free(event);
     }
-    while (expose_count > 0); // more events follow
+    ಆಗ (expose_ಎಣಿಕೆ > 0); // more events follow
     gui_can_update_cursor();
 }
-#endif // !GTK_CHECK_VERSION(3,0,0)
+#ಆದರೆ_ಅಂತ್ಯ // !GTK_CHECK_VERSION(3,0,0)
 
-#if GTK_CHECK_VERSION(3,0,0)
-    static void
-gui_gtk_surface_copy_rect(int dest_x, int dest_y,
-			  int src_x,  int src_y,
-			  int width,  int height)
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+gui_gtk_surface_copy_rect(ಪೂರ್ಣಾಂಕ dest_x, ಪೂರ್ಣಾಂಕ dest_y,
+			  ಪೂರ್ಣಾಂಕ src_x,  ಪೂರ್ಣಾಂಕ src_y,
+			  ಪೂರ್ಣಾಂಕ ಅಗಲ,  ಪೂರ್ಣಾಂಕ ಎತ್ತರ)
 {
-    cairo_t * const cr = cairo_create(gui.surface);
+    cairo_t * ಸ್ಥಿರಾಂಕ cr = cairo_create(gui.surface);
 
 # ifdef GDK_WINDOWING_WAYLAND
-    static cairo_surface_t *scroll_scratch = NULL;
-    static int scratch_w = 0, scratch_h = 0;
-    int last_row = Rows - 1, last_row_y = last_row * gui.char_height;
-    bool last_row_overlap = (dest_y + height) > last_row_y;
-    if (gui.is_wayland && ( !(State & MODE_CMDLINE) || !last_row_overlap) )
+    ಸ್ಥಿರ cairo_surface_t *scroll_scratch = ಖಾಲಿ;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ scratch_w = 0, scratch_h = 0;
+    ಪೂರ್ಣಾಂಕ ಕೊನೆಯ_ಅಡ್ಡಸಾಲು = ಅಡ್ಡಸಾಲುಗಳು - 1, ಕೊನೆಯ_ಅಡ್ಡಸಾಲು_y = ಕೊನೆಯ_ಅಡ್ಡಸಾಲು * gui.char_ಎತ್ತರ;
+    bool ಕೊನೆಯ_ಅಡ್ಡಸಾಲು_overlap = (dest_y + ಎತ್ತರ) > ಕೊನೆಯ_ಅಡ್ಡಸಾಲು_y;
+    ಆದರೆ (gui.is_wayland && ( !(State & ಬಹುಲಕ_CMDLINE) || !ಕೊನೆಯ_ಅಡ್ಡಸಾಲು_overlap) )
     {
-	if (dest_y < src_y) // scroll up
+	ಆದರೆ (dest_y < src_y) // scroll up
 	{
-	    cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
-	    cairo_set_source_surface(cr, gui.surface, src_x - dest_x,
+	    cairo_ಗಣ_operator(cr, CAIRO_OPERATOR_ಮೂಲ);
+	    cairo_ಗಣ_ಮೂಲ_surface(cr, gui.surface, src_x - dest_x,
 		    dest_y - src_y);
-	    cairo_rectangle(cr, dest_x, dest_y, width, height);
+	    cairo_rectangle(cr, dest_x, dest_y, ಅಗಲ, ಎತ್ತರ);
 	    cairo_clip(cr);
 	    cairo_paint(cr);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{   //  reuse surface when scrolling, only realloc if larger
-	    if (scroll_scratch == NULL || width > scratch_w || height > scratch_h)
+	    ಆದರೆ (scroll_scratch == ಖಾಲಿ || ಅಗಲ > scratch_w || ಎತ್ತರ > scratch_h)
 	    {
 		cairo_surface_destroy(scroll_scratch); // safe even if NULL
 		scroll_scratch = cairo_surface_create_similar(gui.surface,
-			cairo_surface_get_content(gui.surface), width, height);
-		scratch_w = width, scratch_h = height;
+			cairo_surface_get_content(gui.surface), ಅಗಲ, ಎತ್ತರ);
+		scratch_w = ಅಗಲ, scratch_h = ಎತ್ತರ;
 	    }
 	    // capture scroll source region
 	    cairo_t *tcr = cairo_create(scroll_scratch);
-	    cairo_set_source_surface(tcr, gui.surface, -src_x, -src_y);
+	    cairo_ಗಣ_ಮೂಲ_surface(tcr, gui.surface, -src_x, -src_y);
 	    cairo_paint(tcr);
 	    cairo_destroy(tcr);
 	    // reuse scroll source region
-	    cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
-	    cairo_rectangle(cr, dest_x, dest_y, width, height);
+	    cairo_ಗಣ_operator(cr, CAIRO_OPERATOR_ಮೂಲ);
+	    cairo_rectangle(cr, dest_x, dest_y, ಅಗಲ, ಎತ್ತರ);
 	    cairo_clip(cr);
-	    cairo_set_source_surface(cr, scroll_scratch, dest_x, dest_y);
+	    cairo_ಗಣ_ಮೂಲ_surface(cr, scroll_scratch, dest_x, dest_y);
 	    cairo_paint(cr);
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 # endif
     {
-	cairo_rectangle(cr, dest_x, dest_y, width, height);
+	cairo_rectangle(cr, dest_x, dest_y, ಅಗಲ, ಎತ್ತರ);
 	cairo_clip(cr);
-	cairo_push_group(cr);
-	cairo_set_source_surface(cr, gui.surface, dest_x - src_x, dest_y - src_y);
+	cairo_ತಳ್ಳು_ಗುಂಪು(cr);
+	cairo_ಗಣ_ಮೂಲ_surface(cr, gui.surface, dest_x - src_x, dest_y - src_y);
 	cairo_paint(cr);
-	cairo_pop_group_to_source(cr);
+	cairo_ತೆಗೆ_ಗುಂಪು_ಗಮ್ಯ_ಮೂಲ(cr);
 	cairo_paint(cr);
     }
     cairo_destroy(cr);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Delete the given number of lines from the given row, scrolling up any
  * text further down within the scroll region.
  */
-    void
-gui_mch_delete_lines(int row, int num_lines)
+    ಶೂನ್ಯ
+gui_mch_delete_ಸಾಲುಗಳು(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು, ಪೂರ್ಣಾಂಕ ಅಂಕೆ_ಸಾಲುಗಳು)
 {
-#if GTK_CHECK_VERSION(3,0,0)
-    const int ncols = gui.scroll_region_right - gui.scroll_region_left + 1;
-    const int nrows = gui.scroll_region_bot - row + 1;
-    const int src_nrows = nrows - num_lines;
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ ncols = gui.scroll_region_ಬಲ - gui.scroll_region_ಎಡ + 1;
+    ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ nrows = gui.scroll_region_bot - ಅಡ್ಡಸಾಲು + 1;
+    ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ src_nrows = nrows - ಅಂಕೆ_ಸಾಲುಗಳು;
 
     gui_gtk_surface_copy_rect(
-	    FILL_X(gui.scroll_region_left), FILL_Y(row),
-	    FILL_X(gui.scroll_region_left), FILL_Y(row + num_lines),
-	    gui.char_width * ncols + 1,     gui.char_height * src_nrows);
-    gui_clear_block(
-	    gui.scroll_region_bot - num_lines + 1, gui.scroll_region_left,
-	    gui.scroll_region_bot,		   gui.scroll_region_right);
-    queue_draw_area(
-	    FILL_X(gui.scroll_region_left), FILL_Y(row),
-	    gui.char_width * ncols + 1,	gui.char_height * nrows);
-#else
-    if (gui.visibility == GDK_VISIBILITY_FULLY_OBSCURED)
-	return;			// Can't see the window
+	    FILL_X(gui.scroll_region_ಎಡ), FILL_Y(ಅಡ್ಡಸಾಲು),
+	    FILL_X(gui.scroll_region_ಎಡ), FILL_Y(ಅಡ್ಡಸಾಲು + ಅಂಕೆ_ಸಾಲುಗಳು),
+	    gui.char_ಅಗಲ * ncols + 1,     gui.char_ಎತ್ತರ * src_nrows);
+    gui_clear_ಖಂಡ(
+	    gui.scroll_region_bot - ಅಂಕೆ_ಸಾಲುಗಳು + 1, gui.scroll_region_ಎಡ,
+	    gui.scroll_region_bot,		   gui.scroll_region_ಬಲ);
+    ಸರತಿ_draw_area(
+	    FILL_X(gui.scroll_region_ಎಡ), FILL_Y(ಅಡ್ಡಸಾಲು),
+	    gui.char_ಅಗಲ * ncols + 1,	gui.char_ಎತ್ತರ * nrows);
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಆದರೆ (gui.visibility == GDK_VISIBILITY_FULLY_OBSCURED)
+	ಹಿಂತಿರುಗಿ;			// Can't see the window
 
-    gdk_gc_set_foreground(gui.text_gc, gui.fgcolor);
-    gdk_gc_set_background(gui.text_gc, gui.bgcolor);
+    gdk_gc_ಗಣ_foreground(gui.ಪಠ್ಯ_gc, gui.fgcolor);
+    gdk_gc_ಗಣ_background(gui.ಪಠ್ಯ_gc, gui.bgcolor);
 
     // copy one extra pixel, for when bold has spilled over
-    gdk_window_copy_area(gui.drawarea->window, gui.text_gc,
-	    FILL_X(gui.scroll_region_left), FILL_Y(row),
-	    gui.drawarea->window,
-	    FILL_X(gui.scroll_region_left),
-	    FILL_Y(row + num_lines),
-	    gui.char_width * (gui.scroll_region_right
-					    - gui.scroll_region_left + 1) + 1,
-	    gui.char_height * (gui.scroll_region_bot - row - num_lines + 1));
+    gdk_ಕಿಟಕಿ_copy_area(gui.drawarea->ಕಿಟಕಿ_2, gui.ಪಠ್ಯ_gc,
+	    FILL_X(gui.scroll_region_ಎಡ), FILL_Y(ಅಡ್ಡಸಾಲು),
+	    gui.drawarea->ಕಿಟಕಿ_2,
+	    FILL_X(gui.scroll_region_ಎಡ),
+	    FILL_Y(ಅಡ್ಡಸಾಲು + ಅಂಕೆ_ಸಾಲುಗಳು),
+	    gui.char_ಅಗಲ * (gui.scroll_region_ಬಲ
+					    - gui.scroll_region_ಎಡ + 1) + 1,
+	    gui.char_ಎತ್ತರ * (gui.scroll_region_bot - ಅಡ್ಡಸಾಲು - ಅಂಕೆ_ಸಾಲುಗಳು + 1));
 
-    gui_clear_block(gui.scroll_region_bot - num_lines + 1,
-						       gui.scroll_region_left,
-		    gui.scroll_region_bot, gui.scroll_region_right);
+    gui_clear_ಖಂಡ(gui.scroll_region_bot - ಅಂಕೆ_ಸಾಲುಗಳು + 1,
+						       gui.scroll_region_ಎಡ,
+		    gui.scroll_region_bot, gui.scroll_region_ಬಲ);
     check_copy_area();
-#endif // !GTK_CHECK_VERSION(3,0,0)
+#ಆದರೆ_ಅಂತ್ಯ // !GTK_CHECK_VERSION(3,0,0)
 }
 
 /*
  * Insert the given number of lines before the given row, scrolling down any
  * following text within the scroll region.
  */
-    void
-gui_mch_insert_lines(int row, int num_lines)
+    ಶೂನ್ಯ
+gui_mch_ಸೇರಿಸು_ಸಾಲುಗಳು(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು, ಪೂರ್ಣಾಂಕ ಅಂಕೆ_ಸಾಲುಗಳು)
 {
-#if GTK_CHECK_VERSION(3,0,0)
-    const int ncols = gui.scroll_region_right - gui.scroll_region_left + 1;
-    const int nrows = gui.scroll_region_bot - row + 1;
-    const int src_nrows = nrows - num_lines;
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ ncols = gui.scroll_region_ಬಲ - gui.scroll_region_ಎಡ + 1;
+    ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ nrows = gui.scroll_region_bot - ಅಡ್ಡಸಾಲು + 1;
+    ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ src_nrows = nrows - ಅಂಕೆ_ಸಾಲುಗಳು;
 
     gui_gtk_surface_copy_rect(
-	    FILL_X(gui.scroll_region_left), FILL_Y(row + num_lines),
-	    FILL_X(gui.scroll_region_left), FILL_Y(row),
-	    gui.char_width * ncols + 1,     gui.char_height * src_nrows);
-    gui_clear_block(
-	    row,		 gui.scroll_region_left,
-	    row + num_lines - 1, gui.scroll_region_right);
-    queue_draw_area(
-	    FILL_X(gui.scroll_region_left), FILL_Y(row),
-	    gui.char_width * ncols + 1,	gui.char_height * nrows);
-#else
-    if (gui.visibility == GDK_VISIBILITY_FULLY_OBSCURED)
-	return;			// Can't see the window
+	    FILL_X(gui.scroll_region_ಎಡ), FILL_Y(ಅಡ್ಡಸಾಲು + ಅಂಕೆ_ಸಾಲುಗಳು),
+	    FILL_X(gui.scroll_region_ಎಡ), FILL_Y(ಅಡ್ಡಸಾಲು),
+	    gui.char_ಅಗಲ * ncols + 1,     gui.char_ಎತ್ತರ * src_nrows);
+    gui_clear_ಖಂಡ(
+	    ಅಡ್ಡಸಾಲು,		 gui.scroll_region_ಎಡ,
+	    ಅಡ್ಡಸಾಲು + ಅಂಕೆ_ಸಾಲುಗಳು - 1, gui.scroll_region_ಬಲ);
+    ಸರತಿ_draw_area(
+	    FILL_X(gui.scroll_region_ಎಡ), FILL_Y(ಅಡ್ಡಸಾಲು),
+	    gui.char_ಅಗಲ * ncols + 1,	gui.char_ಎತ್ತರ * nrows);
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಆದರೆ (gui.visibility == GDK_VISIBILITY_FULLY_OBSCURED)
+	ಹಿಂತಿರುಗಿ;			// Can't see the window
 
-    gdk_gc_set_foreground(gui.text_gc, gui.fgcolor);
-    gdk_gc_set_background(gui.text_gc, gui.bgcolor);
+    gdk_gc_ಗಣ_foreground(gui.ಪಠ್ಯ_gc, gui.fgcolor);
+    gdk_gc_ಗಣ_background(gui.ಪಠ್ಯ_gc, gui.bgcolor);
 
     // copy one extra pixel, for when bold has spilled over
-    gdk_window_copy_area(gui.drawarea->window, gui.text_gc,
-	    FILL_X(gui.scroll_region_left), FILL_Y(row + num_lines),
-	    gui.drawarea->window,
-	    FILL_X(gui.scroll_region_left), FILL_Y(row),
-	    gui.char_width * (gui.scroll_region_right
-					    - gui.scroll_region_left + 1) + 1,
-	    gui.char_height * (gui.scroll_region_bot - row - num_lines + 1));
+    gdk_ಕಿಟಕಿ_copy_area(gui.drawarea->ಕಿಟಕಿ_2, gui.ಪಠ್ಯ_gc,
+	    FILL_X(gui.scroll_region_ಎಡ), FILL_Y(ಅಡ್ಡಸಾಲು + ಅಂಕೆ_ಸಾಲುಗಳು),
+	    gui.drawarea->ಕಿಟಕಿ_2,
+	    FILL_X(gui.scroll_region_ಎಡ), FILL_Y(ಅಡ್ಡಸಾಲು),
+	    gui.char_ಅಗಲ * (gui.scroll_region_ಬಲ
+					    - gui.scroll_region_ಎಡ + 1) + 1,
+	    gui.char_ಎತ್ತರ * (gui.scroll_region_bot - ಅಡ್ಡಸಾಲು - ಅಂಕೆ_ಸಾಲುಗಳು + 1));
 
-    gui_clear_block(row, gui.scroll_region_left,
-				row + num_lines - 1, gui.scroll_region_right);
+    gui_clear_ಖಂಡ(ಅಡ್ಡಸಾಲು, gui.scroll_region_ಎಡ,
+				ಅಡ್ಡಸಾಲು + ಅಂಕೆ_ಸಾಲುಗಳು - 1, gui.scroll_region_ಬಲ);
     check_copy_area();
-#endif // !GTK_CHECK_VERSION(3,0,0)
+#ಆದರೆ_ಅಂತ್ಯ // !GTK_CHECK_VERSION(3,0,0)
 }
 
 /*
  * X Selection stuff, for cutting and pasting text to other windows.
  */
-    void
+    ಶೂನ್ಯ
 clip_mch_request_selection(Clipboard_T *cbd)
 {
-    GdkAtom	target;
-    unsigned	i;
-    time_t	start;
+    GdkAtom	ಗುರಿ;
+    ಚಿಹ್ನೆರಹಿತ	i;
+    time_t	ಆರಂಭ;
 
-    for (i = 0; i < N_SELECTION_TARGETS; ++i)
+    ಗಾಗಿ (i = 0; i < N_SELECTION_TARGETS; ++i)
     {
-	if (!clip_html && selection_targets[i].info == TARGET_HTML)
-	    continue;
+	ಆದರೆ (!clip_html && selection_targets[i].info == ಗುರಿ_HTML)
+	    ಮುಂದುವರಿ;
 	received_selection = RS_NONE;
-	target = gdk_atom_intern(selection_targets[i].target, FALSE);
+	ಗುರಿ = gdk_atom_intern(selection_targets[i].ಗುರಿ, FALSE);
 
 	gtk_selection_convert(gui.drawarea,
-			      cbd->gtk_sel_atom, target,
-			      (guint32)GDK_CURRENT_TIME);
+			      cbd->gtk_sel_atom, ಗುರಿ,
+			      (guint32)GDK_CURRENT_ಸಮಯ);
 
 	// Hack: Wait up to three seconds for the selection.  A hang was
 	// noticed here when using the netrw plugin combined with ":gui"
 	// during the FocusGained event.
-	start = time(NULL);
-	while (received_selection == RS_NONE && time(NULL) < start + 3)
-	    g_main_context_iteration(NULL, TRUE);	// wait for selection_received_cb
+	ಆರಂಭ = ಸಮಯ(ಖಾಲಿ);
+	ಆಗ (received_selection == RS_NONE && ಸಮಯ(ಖಾಲಿ) < ಆರಂಭ + 3)
+	    g_main_context_iteration(ಖಾಲಿ, TRUE);	// wait for selection_received_cb
 
-	if (received_selection != RS_FAIL)
-	    return;
+	ಆದರೆ (received_selection != RS_FAIL)
+	    ಹಿಂತಿರುಗಿ;
     }
 
-    if (gui_mch_get_display())
+    ಆದರೆ (gui_mch_get_display())
 	// Final fallback position - use the X CUT_BUFFER0 store
-	yank_cut_buffer0(GDK_WINDOW_XDISPLAY(gtk_widget_get_window(gui.mainwin)),
+	yank_cut_buffer0(GDK_ಕಿಟಕಿ_XDISPLAY(gtk_widget_get_ಕಿಟಕಿ(gui.mainwin)),
 		cbd);
 }
 
 /*
  * Disown the selection.
  */
-    void
-clip_mch_lose_selection(Clipboard_T *cbd UNUSED)
+    ಶೂನ್ಯ
+clip_mch_lose_selection(Clipboard_T *cbd ಬಳಸದ)
 {
-    if (in_selection_clear_event)
-	return;
+    ಆದರೆ (ಒಳ_selection_clear_event)
+	ಹಿಂತಿರುಗಿ;
 
-    gtk_selection_owner_set(NULL, cbd->gtk_sel_atom, gui.event_time);
+    gtk_selection_owner_ಗಣ(ಖಾಲಿ, cbd->gtk_sel_atom, gui.event_ಸಮಯ);
     gui_mch_update();
 }
 
 /*
  * Own the selection and return OK if it worked.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 clip_mch_own_selection(Clipboard_T *cbd)
 {
     // If we're blocking autocmds, we are filling the register to offer the
     // selection (inside selection-get)
-    if (is_autocmd_blocked())
-	return OK;
+    ಆದರೆ (is_autocmd_blocked())
+	ಹಿಂತಿರುಗಿ OK;
 
-    int success;
+    ಪೂರ್ಣಾಂಕ success;
 
-    success = gtk_selection_owner_set(gui.drawarea, cbd->gtk_sel_atom,
-				      gui.event_time);
+    success = gtk_selection_owner_ಗಣ(gui.drawarea, cbd->gtk_sel_atom,
+				      gui.event_ಸಮಯ);
     // don't update on every visual selection change
-    if (!(cbd->owned && VIsual_active))
-	gui_gtk_set_selection_targets(cbd->gtk_sel_atom);
+    ಆದರೆ (!(cbd->owned && VIsual_ಸಕ್ರಿಯ))
+	gui_gtk_ಗಣ_selection_targets(cbd->gtk_sel_atom);
     gui_mch_update();
-    return (success) ? OK : FAIL;
+    ಹಿಂತಿರುಗಿ (success) ? OK : FAIL;
 }
 
 /*
  * Send the current selection to the clipboard.  Do nothing for X because we
  * will fill in the selection only when requested by another app.
  */
-    void
-clip_mch_set_selection(Clipboard_T *cbd UNUSED)
+    ಶೂನ್ಯ
+clip_mch_ಗಣ_selection(Clipboard_T *cbd ಬಳಸದ)
 {
 }
 
-#if defined(FEAT_XCLIPBOARD) && defined(USE_SYSTEM)
-    int
+#ಆದರೆ defined(FEAT_XCLIPBOARD) && defined(USE_SYSTEM)
+    ಪೂರ್ಣಾಂಕ
 clip_gtk_owner_exists(Clipboard_T *cbd)
 {
-    return gdk_selection_owner_get(cbd->gtk_sel_atom) != NULL;
+    ಹಿಂತಿರುಗಿ gdk_selection_owner_get(cbd->gtk_sel_atom) != ಖಾಲಿ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 
-#if defined(FEAT_MENU)
+#ಆದರೆ defined(FEAT_MENU)
 /*
  * Make a menu item appear either active or not active (grey or not grey).
  */
-    void
-gui_mch_menu_grey(vimmenu_T *menu, int grey)
+    ಶೂನ್ಯ
+gui_mch_menu_grey(vimmenu_T *menu, ಪೂರ್ಣಾಂಕ grey)
 {
-    if (menu->id == NULL)
-	return;
+    ಆದರೆ (menu->id == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    if (menu_is_separator(menu->name))
+    ಆದರೆ (menu_is_separator(menu->name))
 	grey = TRUE;
 
     gui_mch_menu_hidden(menu, FALSE);
     // Be clever about bitfields versus true booleans here!
-    if (!gtk_widget_get_sensitive(menu->id) == !grey)
+    ಆದರೆ (!gtk_widget_get_sensitive(menu->id) == !grey)
     {
-	gtk_widget_set_sensitive(menu->id, !grey);
+	gtk_widget_ಗಣ_sensitive(menu->id, !grey);
 	gui_mch_update();
     }
 }
@@ -7369,23 +7369,23 @@ gui_mch_menu_grey(vimmenu_T *menu, int grey)
 /*
  * Make menu item hidden or not hidden.
  */
-    void
-gui_mch_menu_hidden(vimmenu_T *menu, int hidden)
+    ಶೂನ್ಯ
+gui_mch_menu_hidden(vimmenu_T *menu, ಪೂರ್ಣಾಂಕ hidden)
 {
-    if (menu->id == 0)
-	return;
+    ಆದರೆ (menu->id == 0)
+	ಹಿಂತಿರುಗಿ;
 
-    if (hidden)
+    ಆದರೆ (hidden)
     {
-	if (gtk_widget_get_visible(menu->id))
+	ಆದರೆ (gtk_widget_get_visible(menu->id))
 	{
 	    gtk_widget_hide(menu->id);
 	    gui_mch_update();
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (!gtk_widget_get_visible(menu->id))
+	ಆದರೆ (!gtk_widget_get_visible(menu->id))
 	{
 	    gtk_widget_show(menu->id);
 	    gui_mch_update();
@@ -7396,25 +7396,25 @@ gui_mch_menu_hidden(vimmenu_T *menu, int hidden)
 /*
  * This is called after setting all the menus to grey/hidden or not.
  */
-    void
-gui_mch_draw_menubar(void)
+    ಶೂನ್ಯ
+gui_mch_draw_menubar(ಶೂನ್ಯ)
 {
     // just make sure that the visual changes get effect immediately
     gui_mch_update();
 }
-#endif // FEAT_MENU
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_MENU
 
 /*
  * Scrollbar stuff.
  */
-    void
-gui_mch_enable_scrollbar(scrollbar_T *sb, int flag)
+    ಶೂನ್ಯ
+gui_mch_enable_scrollbar(scrollbar_T *sb, ಪೂರ್ಣಾಂಕ flag)
 {
-    if (sb->id == NULL)
-	return;
+    ಆದರೆ (sb->id == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    gtk_widget_set_visible(sb->id, flag);
-    update_window_manager_hints(0, 0);
+    gtk_widget_ಗಣ_visible(sb->id, flag);
+    update_ಕಿಟಕಿ_manager_hints(0, 0);
 }
 
 
@@ -7424,80 +7424,80 @@ gui_mch_enable_scrollbar(scrollbar_T *sb, int flag)
     guicolor_T
 gui_mch_get_rgb(guicolor_T pixel)
 {
-#if GTK_CHECK_VERSION(3,0,0)
-    return (long_u)pixel;
-#else
+#ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    ಹಿಂತಿರುಗಿ (long_u)pixel;
+#ಇಲ್ಲದಿದ್ದರೆ
     GdkColor color;
 
     gdk_colormap_query_color(gtk_widget_get_colormap(gui.drawarea),
-			     (unsigned long)pixel, &color);
+			     (ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ)pixel, &color);
 
-    return (guicolor_T)(
-	    (((unsigned)color.red   & 0xff00) << 8)
-	 |  ((unsigned)color.green & 0xff00)
-	 | (((unsigned)color.blue  & 0xff00) >> 8));
-#endif
+    ಹಿಂತಿರುಗಿ (guicolor_T)(
+	    (((ಚಿಹ್ನೆರಹಿತ)color.red   & 0xff00) << 8)
+	 |  ((ಚಿಹ್ನೆರಹಿತ)color.green & 0xff00)
+	 | (((ಚಿಹ್ನೆರಹಿತ)color.blue  & 0xff00) >> 8));
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Get current mouse coordinates in text window.
  */
-    void
-gui_mch_getmouse(int *x, int *y)
+    ಶೂನ್ಯ
+gui_mch_getmouse(ಪೂರ್ಣಾಂಕ *x, ಪೂರ್ಣಾಂಕ *y)
 {
-    gui_gtk_get_pointer(gui.drawarea, x, y, NULL);
+    gui_gtk_get_ಸೂಚಕ(gui.drawarea, x, y, ಖಾಲಿ);
 }
 
-    void
-gui_mch_setmouse(int x, int y)
+    ಶೂನ್ಯ
+gui_mch_setmouse(ಪೂರ್ಣಾಂಕ x, ಪೂರ್ಣಾಂಕ y)
 {
     // Sorry for the Xlib call, but we can't avoid it, since there is no
     // internal GDK mechanism present to accomplish this.  (and for good
     // reason...)
     Display * dpy = gui_mch_get_display();
-    if (dpy)
-	XWarpPointer(dpy, (Window)0,
-		GDK_WINDOW_XID(gtk_widget_get_window(gui.drawarea)),
+    ಆದರೆ (dpy)
+	XWarp_ಸೂಚಕ(dpy, (ಕಿಟಕಿ)0,
+		GDK_ಕಿಟಕಿ_XID(gtk_widget_get_ಕಿಟಕಿ(gui.drawarea)),
 		0, 0, 0U, 0U, x, y);
 }
 
 
-#ifdef FEAT_MOUSESHAPE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MOUSESHAPE
 // The last set mouse pointer shape is remembered, to be used when it goes
 // from hidden to not hidden.
-static int last_shape = 0;
-#endif
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಕೊನೆಯ_shape = 0;
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Use the blank mouse pointer or not.
  *
  * hide: TRUE = use blank ptr, FALSE = use parent ptr
  */
-    void
-gui_mch_mousehide(int hide)
+    ಶೂನ್ಯ
+gui_mch_mousehide(ಪೂರ್ಣಾಂಕ hide)
 {
-    if (gui.pointer_hidden == hide)
-	return;
+    ಆದರೆ (gui.ಸೂಚಕ_hidden == hide)
+	ಹಿಂತಿರುಗಿ;
 
-    gui.pointer_hidden = hide;
-    if (gtk_widget_get_window(gui.drawarea) && gui.blank_pointer != NULL)
+    gui.ಸೂಚಕ_hidden = hide;
+    ಆದರೆ (gtk_widget_get_ಕಿಟಕಿ(gui.drawarea) && gui.blank_ಸೂಚಕ != ಖಾಲಿ)
     {
-	if (hide)
-	    gdk_window_set_cursor(gtk_widget_get_window(gui.drawarea),
-		    gui.blank_pointer);
-	else
-#ifdef FEAT_MOUSESHAPE
-	    mch_set_mouse_shape(last_shape);
-#else
-	gdk_window_set_cursor(gtk_widget_get_window(gui.drawarea), NULL);
-#endif
+	ಆದರೆ (hide)
+	    gdk_ಕಿಟಕಿ_ಗಣ_cursor(gtk_widget_get_ಕಿಟಕಿ(gui.drawarea),
+		    gui.blank_ಸೂಚಕ);
+	ಇಲ್ಲದಿದ್ದರೆ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MOUSESHAPE
+	    mch_ಗಣ_mouse_shape(ಕೊನೆಯ_shape);
+#ಇಲ್ಲದಿದ್ದರೆ
+	gdk_ಕಿಟಕಿ_ಗಣ_cursor(gtk_widget_get_ಕಿಟಕಿ(gui.drawarea), ಖಾಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ
     }
 }
 
-#if defined(FEAT_MOUSESHAPE)
+#ಆದರೆ defined(FEAT_MOUSESHAPE)
 
-# if GTK_CHECK_VERSION(3,0,0)
-static const char * mshape_css_names[] =
+# ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ * mshape_css_ಹೆಸರುಗಳು[] =
 {
     "default",                  // arrow aka GDK_LEFT_PTR
     "blank",                    // blank aka GDK_CURSOR_IS_PIXMAP
@@ -7517,12 +7517,12 @@ static const char * mshape_css_names[] =
     "default",                  // up-arrow aka GDK_CENTER_PTR (no css analogue)
     "default"                   // GDK_LEFT_PTR (no css analogue)
 };
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 // Table for shape IDs.  Keep in sync with the mshape_names[] table in
 // misc2.c!
-static const int mshape_ids[] =
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ mshape_ids[] =
 {
-    GDK_LEFT_PTR,		// arrow
+    GDK_ಎಡ_PTR,		// arrow
     GDK_CURSOR_IS_PIXMAP,	// blank
     GDK_XTERM,			// beam
     GDK_SB_V_DOUBLE_ARROW,	// updown
@@ -7536,68 +7536,68 @@ static const int mshape_ids[] =
     GDK_HAND2,			// hand2
     GDK_PENCIL,			// pencil
     GDK_QUESTION_ARROW,		// question
-    GDK_RIGHT_PTR,		// right-arrow
+    GDK_ಬಲ_PTR,		// right-arrow
     GDK_CENTER_PTR,		// up-arrow
-    GDK_LEFT_PTR		// last one
+    GDK_ಎಡ_PTR		// last one
 };
 # endif // GTK_CHECK_VERSION(3,0,0)
 
-    void
-mch_set_mouse_shape(int shape)
+    ಶೂನ್ಯ
+mch_ಗಣ_mouse_shape(ಪೂರ್ಣಾಂಕ shape)
 {
     GdkCursor	   *c;
-    int		   id;                    // Only id or css_name is used.
-# if GTK_CHECK_VERSION(3,0,0)
-    const char     *css_name = "default";
+    ಪೂರ್ಣಾಂಕ		   id;                    // Only id or css_name is used.
+# ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ     *css_name = "default";
     GdkDisplay     *disp;
 # endif
 
-    if (gtk_widget_get_window(gui.drawarea) == NULL)
-	return;
+    ಆದರೆ (gtk_widget_get_ಕಿಟಕಿ(gui.drawarea) == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    if (shape == MSHAPE_HIDE || gui.pointer_hidden)
-	gdk_window_set_cursor(gtk_widget_get_window(gui.drawarea),
-		gui.blank_pointer);
-    else
+    ಆದರೆ (shape == MSHAPE_HIDE || gui.ಸೂಚಕ_hidden)
+	gdk_ಕಿಟಕಿ_ಗಣ_cursor(gtk_widget_get_ಕಿಟಕಿ(gui.drawarea),
+		gui.blank_ಸೂಚಕ);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (shape >= MSHAPE_NUMBERED)
+	ಆದರೆ (shape >= MSHAPE_NUMBERED)
 	{
 	    id = shape - MSHAPE_NUMBERED;
-	    if (id >= GDK_LAST_CURSOR)
-		id = GDK_LEFT_PTR;
-	    else
+	    ಆದರೆ (id >= GDK_ಕೊನೆಯ_CURSOR)
+		id = GDK_ಎಡ_PTR;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		id &= ~1;	// they are always even (why?)
 	}
-# if GTK_CHECK_VERSION(3,0,0)
-	else if (shape < (int)ARRAY_LENGTH(mshape_css_names))
-	    css_name = mshape_css_names[shape];
-# else
-	else if (shape < (int)ARRAY_LENGTH(mshape_ids))
+# ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (shape < (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(mshape_css_ಹೆಸರುಗಳು))
+	    css_name = mshape_css_ಹೆಸರುಗಳು[shape];
+# ಇಲ್ಲದಿದ್ದರೆ
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (shape < (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(mshape_ids))
 	    id = mshape_ids[shape];
 # endif
-	else
-	    return;
-# if GTK_CHECK_VERSION(3,0,0)
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಹಿಂತಿರುಗಿ;
+# ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
 	disp = gtk_widget_get_display(gui.drawarea);
 	c = gdk_cursor_new_from_name(disp, css_name);
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 	c = gdk_cursor_new_for_display(
 		gtk_widget_get_display(gui.drawarea), (GdkCursorType)id);
 # endif
-	gdk_window_set_cursor(gtk_widget_get_window(gui.drawarea), c);
-# if GTK_CHECK_VERSION(3,0,0)
+	gdk_ಕಿಟಕಿ_ಗಣ_cursor(gtk_widget_get_ಕಿಟಕಿ(gui.drawarea), c);
+# ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
 	g_object_unref(G_OBJECT(c));
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 	gdk_cursor_destroy(c); // Unref, actually.  Bloody GTK+ 1.
 # endif
     }
-    if (shape != MSHAPE_HIDE)
-	last_shape = shape;
+    ಆದರೆ (shape != MSHAPE_HIDE)
+	ಕೊನೆಯ_shape = shape;
 }
-#endif // FEAT_MOUSESHAPE
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_MOUSESHAPE
 
 
-#if defined(FEAT_SIGN_ICONS)
+#ಆದರೆ defined(FEAT_SIGN_ICONS)
 /*
  * Signs are currently always 2 chars wide.  With GTK+ 2, the image will be
  * scaled down if the current font is not big enough, or scaled up if the image
@@ -7605,84 +7605,84 @@ mch_set_mouse_shape(int shape)
  * will be cut off if the current font is not big enough, or centered if it's
  * too small.
  */
-# define SIGN_WIDTH  (2 * gui.char_width)
-# define SIGN_HEIGHT (gui.char_height)
-# define SIGN_ASPECT ((double)SIGN_HEIGHT / (double)SIGN_WIDTH)
+# define SIGN_ಅಗಲ  (2 * gui.char_ಅಗಲ)
+# define SIGN_ಎತ್ತರ (gui.char_ಎತ್ತರ)
+# define SIGN_ASPECT ((ದ್ವಿಗುಣ)SIGN_ಎತ್ತರ / (ದ್ವಿಗುಣ)SIGN_ಅಗಲ)
 
-    void
-gui_mch_drawsign(int row, int col, int typenr)
+    ಶೂನ್ಯ
+gui_mch_drawsign(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು, ಪೂರ್ಣಾಂಕ typenr)
 {
     GdkPixbuf *sign;
 
     sign = (GdkPixbuf *)sign_get_image(typenr);
 
-    if (sign == NULL || gui.drawarea == NULL
-	    || gtk_widget_get_window(gui.drawarea) == NULL)
-	return;
+    ಆದರೆ (sign == ಖಾಲಿ || gui.drawarea == ಖಾಲಿ
+	    || gtk_widget_get_ಕಿಟಕಿ(gui.drawarea) == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    int width;
-    int height;
-    int xoffset;
-    int yoffset;
-    int need_scale;
+    ಪೂರ್ಣಾಂಕ ಅಗಲ;
+    ಪೂರ್ಣಾಂಕ ಎತ್ತರ;
+    ಪೂರ್ಣಾಂಕ xoffset;
+    ಪೂರ್ಣಾಂಕ yoffset;
+    ಪೂರ್ಣಾಂಕ need_scale;
 
-    width  = gdk_pixbuf_get_width(sign);
-    height = gdk_pixbuf_get_height(sign);
+    ಅಗಲ  = gdk_pixbuf_get_ಅಗಲ(sign);
+    ಎತ್ತರ = gdk_pixbuf_get_ಎತ್ತರ(sign);
     /*
      * Decide whether we need to scale.  Allow one pixel of border
      * width to be cut off, in order to avoid excessive scaling for
      * tiny differences in font size.
      * Do scale to fit the height to avoid gaps because of linespacing.
      */
-    need_scale = (width > SIGN_WIDTH + 2
-	    || height != SIGN_HEIGHT
-	    || (width < 3 * SIGN_WIDTH / 4
-		&& height < 3 * SIGN_HEIGHT / 4));
-    if (need_scale)
+    need_scale = (ಅಗಲ > SIGN_ಅಗಲ + 2
+	    || ಎತ್ತರ != SIGN_ಎತ್ತರ
+	    || (ಅಗಲ < 3 * SIGN_ಅಗಲ / 4
+		&& ಎತ್ತರ < 3 * SIGN_ಎತ್ತರ / 4));
+    ಆದರೆ (need_scale)
     {
-	double  aspect;
-	int	    w = width;
-	int	    h = height;
+	ದ್ವಿಗುಣ  aspect;
+	ಪೂರ್ಣಾಂಕ	    w = ಅಗಲ;
+	ಪೂರ್ಣಾಂಕ	    h = ಎತ್ತರ;
 
 	// Keep the original aspect ratio
-	aspect = (double)height / (double)width;
-	width  = (double)SIGN_WIDTH * SIGN_ASPECT / aspect;
-	width  = MIN(width, SIGN_WIDTH);
-	if (((double)(MAX(height, SIGN_HEIGHT)) /
-		    (double)(MIN(height, SIGN_HEIGHT))) < 1.15)
+	aspect = (ದ್ವಿಗುಣ)ಎತ್ತರ / (ದ್ವಿಗುಣ)ಅಗಲ;
+	ಅಗಲ  = (ದ್ವಿಗುಣ)SIGN_ಅಗಲ * SIGN_ASPECT / aspect;
+	ಅಗಲ  = MIN(ಅಗಲ, SIGN_ಅಗಲ);
+	ಆದರೆ (((ದ್ವಿಗುಣ)(MAX(ಎತ್ತರ, SIGN_ಎತ್ತರ)) /
+		    (ದ್ವಿಗುಣ)(MIN(ಎತ್ತರ, SIGN_ಎತ್ತರ))) < 1.15)
 	{
 	    // Change the aspect ratio by at most 15% to fill the
 	    // available space completely.
-	    height = (double)SIGN_HEIGHT * SIGN_ASPECT / aspect;
-	    height = MIN(height, SIGN_HEIGHT);
+	    ಎತ್ತರ = (ದ್ವಿಗುಣ)SIGN_ಎತ್ತರ * SIGN_ASPECT / aspect;
+	    ಎತ್ತರ = MIN(ಎತ್ತರ, SIGN_ಎತ್ತರ);
 	}
-	else
-	    height = (double)width * aspect;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಎತ್ತರ = (ದ್ವಿಗುಣ)ಅಗಲ * aspect;
 
-	if (w == width && h == height)
+	ಆದರೆ (w == ಅಗಲ && h == ಎತ್ತರ)
 	{
 	    // no change in dimensions; don't decrease reference counter
 	    // (below)
 	    need_scale = FALSE;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // This doesn't seem to be worth caching, and doing so would
 	    // complicate the code quite a bit.
-	    sign = gdk_pixbuf_scale_simple(sign, width, height,
+	    sign = gdk_pixbuf_scale_simple(sign, ಅಗಲ, ಎತ್ತರ,
 		    GDK_INTERP_BILINEAR);
-	    if (sign == NULL)
-		return; // out of memory
+	    ಆದರೆ (sign == ಖಾಲಿ)
+		ಹಿಂತಿರುಗಿ; // out of memory
 	}
     }
 
     // The origin is the upper-left corner of the pixmap.  Therefore
     // these offset may become negative if the pixmap is smaller than
     // the 2x1 cells reserved for the sign icon.
-    xoffset = (width  - SIGN_WIDTH)  / 2;
-    yoffset = (height - SIGN_HEIGHT) / 2;
+    xoffset = (ಅಗಲ  - SIGN_ಅಗಲ)  / 2;
+    yoffset = (ಎತ್ತರ - SIGN_ಎತ್ತರ) / 2;
 
-# if GTK_CHECK_VERSION(3,0,0)
+# ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
     {
 	cairo_t	    *cr;
 	cairo_surface_t *bg_surf;
@@ -7694,25 +7694,25 @@ gui_mch_drawsign(int row, int col, int typenr)
 
 	bg_surf = cairo_surface_create_similar(gui.surface,
 		cairo_surface_get_content(gui.surface),
-		SIGN_WIDTH, SIGN_HEIGHT);
+		SIGN_ಅಗಲ, SIGN_ಎತ್ತರ);
 	bg_cr = cairo_create(bg_surf);
-	cairo_set_source_rgba(bg_cr,
+	cairo_ಗಣ_ಮೂಲ_rgba(bg_cr,
 		gui.bgcolor->red, gui.bgcolor->green, gui.bgcolor->blue,
 		gui.bgcolor->alpha);
 	cairo_paint(bg_cr);
 
 	sign_surf = cairo_surface_create_similar(gui.surface,
 		cairo_surface_get_content(gui.surface),
-		SIGN_WIDTH, SIGN_HEIGHT);
+		SIGN_ಅಗಲ, SIGN_ಎತ್ತರ);
 	sign_cr = cairo_create(sign_surf);
-	gdk_cairo_set_source_pixbuf(sign_cr, sign, -xoffset, -yoffset);
+	gdk_cairo_ಗಣ_ಮೂಲ_pixbuf(sign_cr, sign, -xoffset, -yoffset);
 	cairo_paint(sign_cr);
 
-	cairo_set_operator(sign_cr, CAIRO_OPERATOR_DEST_OVER);
-	cairo_set_source_surface(sign_cr, bg_surf, 0, 0);
+	cairo_ಗಣ_operator(sign_cr, CAIRO_OPERATOR_DEST_OVER);
+	cairo_ಗಣ_ಮೂಲ_surface(sign_cr, bg_surf, 0, 0);
 	cairo_paint(sign_cr);
 
-	cairo_set_source_surface(cr, sign_surf, FILL_X(col), FILL_Y(row));
+	cairo_ಗಣ_ಮೂಲ_surface(cr, sign_surf, FILL_X(ಲಂಬಸಾಲು), FILL_Y(ಅಡ್ಡಸಾಲು));
 	cairo_paint(cr);
 
 	cairo_destroy(sign_cr);
@@ -7721,84 +7721,84 @@ gui_mch_drawsign(int row, int col, int typenr)
 	cairo_surface_destroy(bg_surf);
 	cairo_destroy(cr);
 
-	queue_draw_area(
-		FILL_X(col), FILL_Y(col), width, height);
+	ಸರತಿ_draw_area(
+		FILL_X(ಲಂಬಸಾಲು), FILL_Y(ಲಂಬಸಾಲು), ಅಗಲ, ಎತ್ತರ);
 
     }
-# else // !GTK_CHECK_VERSION(3,0,0)
-    gdk_gc_set_foreground(gui.text_gc, gui.bgcolor);
+# ಇಲ್ಲದಿದ್ದರೆ // !GTK_CHECK_VERSION(3,0,0)
+    gdk_gc_ಗಣ_foreground(gui.ಪಠ್ಯ_gc, gui.bgcolor);
 
-    gdk_draw_rectangle(gui.drawarea->window,
-	    gui.text_gc,
+    gdk_draw_rectangle(gui.drawarea->ಕಿಟಕಿ_2,
+	    gui.ಪಠ್ಯ_gc,
 	    TRUE,
-	    FILL_X(col),
-	    FILL_Y(row),
-	    SIGN_WIDTH,
-	    SIGN_HEIGHT);
+	    FILL_X(ಲಂಬಸಾಲು),
+	    FILL_Y(ಅಡ್ಡಸಾಲು),
+	    SIGN_ಅಗಲ,
+	    SIGN_ಎತ್ತರ);
 
-    gdk_pixbuf_render_to_drawable_alpha(sign,
-	    gui.drawarea->window,
+    gdk_pixbuf_render_ಗಮ್ಯ_drawable_alpha(sign,
+	    gui.drawarea->ಕಿಟಕಿ_2,
 	    MAX(0, xoffset),
 	    MAX(0, yoffset),
-	    FILL_X(col) - MIN(0, xoffset),
-	    FILL_Y(row) - MIN(0, yoffset),
-	    MIN(width,	SIGN_WIDTH),
-	    MIN(height, SIGN_HEIGHT),
+	    FILL_X(ಲಂಬಸಾಲು) - MIN(0, xoffset),
+	    FILL_Y(ಅಡ್ಡಸಾಲು) - MIN(0, yoffset),
+	    MIN(ಅಗಲ,	SIGN_ಅಗಲ),
+	    MIN(ಎತ್ತರ, SIGN_ಎತ್ತರ),
 	    GDK_PIXBUF_ALPHA_BILEVEL,
 	    127,
-	    GDK_RGB_DITHER_NORMAL,
+	    GDK_RGB_DITHER_ಸಾಮಾನ್ಯ,
 	    0, 0);
 # endif // !GTK_CHECK_VERSION(3,0,0)
-    if (need_scale)
+    ಆದರೆ (need_scale)
 	g_object_unref(sign);
 }
 
-    void *
-gui_mch_register_sign(char_u *signfile)
+    ಶೂನ್ಯ *
+gui_mch_ರಿಜಿಸ್ಟರ್_sign(char_u *signfile)
 {
-    if (signfile[0] != NUL && signfile[0] != '-' && gui.in_use)
+    ಆದರೆ (signfile[0] != NUL && signfile[0] != '-' && gui.ಒಳ_use)
     {
 	GdkPixbuf   *sign;
-	GError	    *error = NULL;
-	char_u	    *message;
+	GError	    *error = ಖಾಲಿ;
+	char_u	    *ಸಂದೇಶ_2;
 
-	sign = gdk_pixbuf_new_from_file((const char *)signfile, &error);
+	sign = gdk_pixbuf_new_from_file((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)signfile, &error);
 
-	if (error == NULL)
-	    return sign;
+	ಆದರೆ (error == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ sign;
 
-	message = (char_u *)error->message;
+	ಸಂದೇಶ_2 = (char_u *)error->ಸಂದೇಶ_2;
 
-	if (message != NULL && input_conv.vc_type != CONV_NONE)
-	    message = string_convert(&input_conv, message, NULL);
+	ಆದರೆ (ಸಂದೇಶ_2 != ಖಾಲಿ && ಒಳಹರಿವು_conv.vc_type != CONV_NONE)
+	    ಸಂದೇಶ_2 = string_convert(&ಒಳಹರಿವು_conv, ಸಂದೇಶ_2, ಖಾಲಿ);
 
-	if (message != NULL)
+	ಆದರೆ (ಸಂದೇಶ_2 != ಖಾಲಿ)
 	{
 	    // The error message is already translated and will be more
 	    // descriptive than anything we could possibly do ourselves.
-	    semsg("E255: %s", message);
+	    semsg("E255: %s", ಸಂದೇಶ_2);
 
-	    if (input_conv.vc_type != CONV_NONE)
-		vim_free(message);
+	    ಆದರೆ (ಒಳಹರಿವು_conv.vc_type != CONV_NONE)
+		vim_free(ಸಂದೇಶ_2);
 	}
 	g_error_free(error);
     }
 
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
-    void
-gui_mch_destroy_sign(void *sign)
+    ಶೂನ್ಯ
+gui_mch_destroy_sign(ಶೂನ್ಯ *sign)
 {
-    if (sign != NULL)
+    ಆದರೆ (sign != ಖಾಲಿ)
 	g_object_unref(sign);
 }
 
-#endif // FEAT_SIGN_ICONS
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_SIGN_ICONS
 
-#if defined(FEAT_IMAGE) && defined(FEAT_IMAGE_GUI)
+#ಆದರೆ defined(FEAT_IMAGE) && defined(FEAT_IMAGE_GUI)
 
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
     cairo_surface_t *surf;
 } image_cairo_T;
@@ -7810,29 +7810,29 @@ typedef struct
  * integer per pixel so the resulting bytes come out correct on either
  * endianness.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 fill_image_surface(image_T *img, cairo_surface_t *surf)
 {
-    uint8_t *src = img->data;
+    uint8_t *src = img->ದತ್ತಾಂಶ;
     uint8_t *dst;
-    int	    w = img->width;
-    int	    h = img->height;
-    int	    stride;
-    int	    x, y;
+    ಪೂರ್ಣಾಂಕ	    w = img->ಅಗಲ;
+    ಪೂರ್ಣಾಂಕ	    h = img->ಎತ್ತರ;
+    ಪೂರ್ಣಾಂಕ	    stride;
+    ಪೂರ್ಣಾಂಕ	    x, y;
 
     cairo_surface_flush(surf);
-    dst = cairo_image_surface_get_data(surf);
+    dst = cairo_image_surface_get_ದತ್ತಾಂಶ(surf);
     stride = cairo_image_surface_get_stride(surf);
 
-    if (img->fmt == IMAGE_FORMAT_RGBA)
+    ಆದರೆ (img->fmt == IMAGE_FORMAT_RGBA)
     {
-	for (y = 0; y < h; ++y)
+	ಗಾಗಿ (y = 0; y < h; ++y)
 	{
-	    unsigned int *p = (unsigned int *)(dst + y * stride);
+	    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ *p = (ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ *)(dst + y * stride);
 
-	    for (x = 0; x < w; ++x)
+	    ಗಾಗಿ (x = 0; x < w; ++x)
 	    {
-		int	idx = (y * w + x) * 4;
+		ಪೂರ್ಣಾಂಕ	idx = (y * w + x) * 4;
 		uint8_t r = src[idx + 0];
 		uint8_t g = src[idx + 1];
 		uint8_t b = src[idx + 2];
@@ -7846,15 +7846,15 @@ fill_image_surface(image_T *img, cairo_surface_t *surf)
 	    }
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	for (y = 0; y < h; ++y)
+	ಗಾಗಿ (y = 0; y < h; ++y)
 	{
-	    unsigned int *p = (unsigned int *)(dst + y * stride);
+	    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ *p = (ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ *)(dst + y * stride);
 
-	    for (x = 0; x < w; ++x)
+	    ಗಾಗಿ (x = 0; x < w; ++x)
 	    {
-		int	idx = (y * w + x) * 3;
+		ಪೂರ್ಣಾಂಕ	idx = (y * w + x) * 3;
 		uint8_t r = src[idx + 0];
 		uint8_t g = src[idx + 1];
 		uint8_t b = src[idx + 2];
@@ -7868,111 +7868,111 @@ fill_image_surface(image_T *img, cairo_surface_t *surf)
     cairo_surface_mark_dirty(surf);
 }
 
-    int
+    ಪೂರ್ಣಾಂಕ
 image_gui_init(image_T *img)
 {
     // We only support GTK3
-# if GTK_CHECK_VERSION(3,0,0)
+# ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
     image_cairo_T *ctx = ALLOC_CLEAR_ONE(image_cairo_T);
 
-    if (ctx == NULL)
-	return FAIL;
+    ಆದರೆ (ctx == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
     ctx->surf = cairo_image_surface_create(CAIRO_FORMAT_ARGB32,
-	    img->width, img->height);
+	    img->ಅಗಲ, img->ಎತ್ತರ);
 
-    if (cairo_surface_status(ctx->surf) != CAIRO_STATUS_SUCCESS)
+    ಆದರೆ (cairo_surface_ಸ್ಥಿತಿ(ctx->surf) != CAIRO_ಸ್ಥಿತಿ_SUCCESS)
     {
 	cairo_surface_destroy(ctx->surf);
-	goto fail;
+	ಹೋಗು fail;
     }
 
     fill_image_surface(img, ctx->surf);
-    img->backend_data = ctx;
+    img->backend_ದತ್ತಾಂಶ = ctx;
 
     // Set the device scale of the surface later before every redraw. This iso
     // that the GUI scale factor is used automatically.
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 fail:
     vim_free(ctx);
-    return FAIL;
-# else
-    return FAIL;
+    ಹಿಂತಿರುಗಿ FAIL;
+# ಇಲ್ಲದಿದ್ದರೆ
+    ಹಿಂತಿರುಗಿ FAIL;
 # endif
 }
 
-    void
+    ಶೂನ್ಯ
 image_gui_uninit(image_T *img)
 {
-# if GTK_CHECK_VERSION(3,0,0)
-    image_cairo_T *ctx = img->backend_data;
+# ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    image_cairo_T *ctx = img->backend_ದತ್ತಾಂಶ;
 
     cairo_surface_destroy(ctx->surf);
     vim_free(ctx);
 # endif
 }
 
-    int
-image_placement_gui_init(image_placement_T *place UNUSED)
+    ಪೂರ್ಣಾಂಕ
+image_placement_gui_init(image_placement_T *ಇರಿಸು ಬಳಸದ)
 {
-# if GTK_CHECK_VERSION(3,0,0)
-    return OK;
-# else
-    return FAIL;
+# ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    ಹಿಂತಿರುಗಿ OK;
+# ಇಲ್ಲದಿದ್ದರೆ
+    ಹಿಂತಿರುಗಿ FAIL;
 # endif
 }
 
-    void
-image_placement_gui_uninit(image_placement_T *place UNUSED)
+    ಶೂನ್ಯ
+image_placement_gui_uninit(image_placement_T *ಇರಿಸು ಬಳಸದ)
 {
 }
 
-    void
-image_placement_gui_draw(image_placement_T *place)
+    ಶೂನ್ಯ
+image_placement_gui_draw(image_placement_T *ಇರಿಸು)
 {
-# if GTK_CHECK_VERSION(3,0,0)
-    image_T		    *img = place->img;
-    image_cairo_T	    *ictx = img->backend_data;
+# ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(3,0,0)
+    image_T		    *img = ಇರಿಸು->img;
+    image_cairo_T	    *ictx = img->backend_ದತ್ತಾಂಶ;
     pixman_box32_t	    *rects;
-    int			    n_rects;
+    ಪೂರ್ಣಾಂಕ			    n_rects;
     cairo_t		    *cr;
 
-    rects = pixman_region32_rectangles(&place->visible, &n_rects);
-    if (rects == NULL || n_rects == 0)
-	return;
+    rects = pixman_region32_rectangles(&ಇರಿಸು->visible, &n_rects);
+    ಆದರೆ (rects == ಖಾಲಿ || n_rects == 0)
+	ಹಿಂತಿರುಗಿ;
 
-    cairo_surface_set_device_scale(ictx->surf, gui.scale, gui.scale);
+    cairo_surface_ಗಣ_device_scale(ictx->surf, gui.scale, gui.scale);
     cr = cairo_create(gui.surface);
 
-    for (int i = 0; i < n_rects; i++)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < n_rects; i++)
     {
 	pixman_box32_t	rect = rects[i];
-	int		row, col;
-	int		posx, posy;
-	int		x, y, w, h;
+	ಪೂರ್ಣಾಂಕ		ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು;
+	ಪೂರ್ಣಾಂಕ		posx, posy;
+	ಪೂರ್ಣಾಂಕ		x, y, w, h;
 
 	// We set the device scale for the surface, so we need logical pixel
 	// dimensions because cairo will handle the converting stuff.
-	image_placement_subrect(place, rect, &row, &col, &x, &y, &w, &h, false);
-	posx = FILL_X(col);
-	posy = FILL_Y(row);
+	image_placement_subrect(ಇರಿಸು, rect, &ಅಡ್ಡಸಾಲು, &ಲಂಬಸಾಲು, &x, &y, &w, &h, false);
+	posx = FILL_X(ಲಂಬಸಾಲು);
+	posy = FILL_Y(ಅಡ್ಡಸಾಲು);
 
 	cairo_save(cr);
-	cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
-	cairo_set_source_surface(cr, ictx->surf, posx - x, posy - y);
+	cairo_ಗಣ_operator(cr, CAIRO_OPERATOR_OVER);
+	cairo_ಗಣ_ಮೂಲ_surface(cr, ictx->surf, posx - x, posy - y);
 	cairo_rectangle(cr, posx, posy, w, h);
 	cairo_fill(cr);
 	cairo_restore(cr);
 
-	queue_draw_area(posx, posy, w, h);
+	ಸರತಿ_draw_area(posx, posy, w, h);
     }
     cairo_destroy(cr);
 # endif
 }
 
-    void
-image_placement_gui_clear(image_placement_T *place UNUSED)
+    ಶೂನ್ಯ
+image_placement_gui_clear(image_placement_T *ಇರಿಸು ಬಳಸದ)
 {
 }
 
-#endif // FEAT_IMAGE
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_IMAGE

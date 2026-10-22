@@ -11,194 +11,194 @@
  * json_test.c: Unittests for json.c
  */
 
-#undef NDEBUG
-#include <assert.h>
+#ವ್ಯಾಖ್ಯಾನ_ರದ್ದು NDEBUG
+#ಅನ್ತರ್ಭಾವ <assert.h>
 
 // Must include main.c because it contains much more than just main()
-#define NO_VIM_MAIN
-#include "main.c"
+#ವ್ಯಾಖ್ಯಾನಿಸು NO_VIM_MAIN
+#ಅನ್ತರ್ಭಾವ "main.c"
 
 // This file has to be included because the tested functions are static
-#include "json.c"
+#ಅನ್ತರ್ಭಾವ "json.c"
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * Test json_find_end() with incomplete items.
  */
-    static void
-test_decode_find_end(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+test_decode_ಕಂಡುಹಿಡಿ_ಕೊನೆ(ಶೂನ್ಯ)
 {
     js_read_T reader;
 
-    reader.js_fill = NULL;
-    reader.js_used = 0;
+    reader.js_fill = ಖಾಲಿ;
+    reader.js_ಬಳಸಿದ = 0;
 
     // string and incomplete string
     reader.js_buf = (char_u *)"\"hello\"";
-    assert(json_find_end(&reader, 0) == OK);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == OK);
     reader.js_buf = (char_u *)"  \"hello\" ";
-    assert(json_find_end(&reader, 0) == OK);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == OK);
     reader.js_buf = (char_u *)"\"hello";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
 
     // number and dash (incomplete number)
     reader.js_buf = (char_u *)"123";
-    assert(json_find_end(&reader, 0) == OK);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == OK);
     reader.js_buf = (char_u *)"-";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
 
     // false, true and null, also incomplete
     reader.js_buf = (char_u *)"false";
-    assert(json_find_end(&reader, 0) == OK);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == OK);
     reader.js_buf = (char_u *)"f";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"fa";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"fal";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"fals";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
 
     reader.js_buf = (char_u *)"true";
-    assert(json_find_end(&reader, 0) == OK);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == OK);
     reader.js_buf = (char_u *)"t";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"tr";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"tru";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
 
     reader.js_buf = (char_u *)"null";
-    assert(json_find_end(&reader, 0) == OK);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == OK);
     reader.js_buf = (char_u *)"n";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"nu";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"nul";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
 
     // object without white space
     reader.js_buf = (char_u *)"{\"a\":123}";
-    assert(json_find_end(&reader, 0) == OK);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == OK);
     reader.js_buf = (char_u *)"{\"a\":123";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"{\"a\":";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"{\"a\"";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"{\"a";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"{\"";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"{";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
 
     // object with white space
     reader.js_buf = (char_u *)"  {  \"a\"  :  123  }  ";
-    assert(json_find_end(&reader, 0) == OK);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == OK);
     reader.js_buf = (char_u *)"  {  \"a\"  :  123  ";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"  {  \"a\"  :  ";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"  {  \"a\"  ";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"  {  \"a  ";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"  {   ";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
 
     // JS object with white space
     reader.js_buf = (char_u *)"  {  a  :  123  }  ";
-    assert(json_find_end(&reader, JSON_JS) == OK);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, JSON_JS) == OK);
     reader.js_buf = (char_u *)"  {  a  :   ";
-    assert(json_find_end(&reader, JSON_JS) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, JSON_JS) == MAYBE);
 
     // array without white space
     reader.js_buf = (char_u *)"[\"a\",123]";
-    assert(json_find_end(&reader, 0) == OK);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == OK);
     reader.js_buf = (char_u *)"[\"a\",123";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"[\"a\",";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"[\"a\"";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"[\"a";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"[\"";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"[";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
 
     // array with white space
     reader.js_buf = (char_u *)"  [  \"a\"  ,  123  ]  ";
-    assert(json_find_end(&reader, 0) == OK);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == OK);
     reader.js_buf = (char_u *)"  [  \"a\"  ,  123  ";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"  [  \"a\"  ,  ";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"  [  \"a\"  ";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"  [  \"a  ";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"  [  ";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == MAYBE);
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 fill_from_cookie(js_read_T *reader)
 {
     reader->js_buf = reader->js_cookie;
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
  * Test json_find_end with an incomplete array, calling the fill function.
  */
-    static void
-test_fill_called_on_find_end(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+test_fill_called_on_ಕಂಡುಹಿಡಿ_ಕೊನೆ(ಶೂನ್ಯ)
 {
     js_read_T reader;
 
     reader.js_fill = fill_from_cookie;
-    reader.js_used = 0;
+    reader.js_ಬಳಸಿದ = 0;
     reader.js_buf = (char_u *)"  [  \"a\"  ,  123  ";
     reader.js_cookie =	      "  [  \"a\"  ,  123  ]  ";
-    assert(json_find_end(&reader, 0) == OK);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == OK);
     reader.js_buf = (char_u *)"  [  \"a\"  ,  ";
-    assert(json_find_end(&reader, 0) == OK);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == OK);
     reader.js_buf = (char_u *)"  [  \"a\"  ";
-    assert(json_find_end(&reader, 0) == OK);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == OK);
     reader.js_buf = (char_u *)"  [  \"a";
-    assert(json_find_end(&reader, 0) == OK);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == OK);
     reader.js_buf = (char_u *)"  [  ";
-    assert(json_find_end(&reader, 0) == OK);
+    ಪ್ರತಿಜ್ಞಾ(json_ಕಂಡುಹಿಡಿ_ಕೊನೆ(&reader, 0) == OK);
 }
 
 /*
  * Test json_find_end with an incomplete string, calling the fill function.
  */
-    static void
-test_fill_called_on_string(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+test_fill_called_on_string(ಶೂನ್ಯ)
 {
     js_read_T reader;
 
     reader.js_fill = fill_from_cookie;
-    reader.js_used = 0;
+    reader.js_ಬಳಸಿದ = 0;
     reader.js_buf = (char_u *)" \"foo";
-    reader.js_end = reader.js_buf + STRLEN(reader.js_buf);
+    reader.js_ಕೊನೆ = reader.js_buf + STRLEN(reader.js_buf);
     reader.js_cookie =	      " \"foobar\"  ";
-    assert(json_decode_string(&reader, NULL, '"') == OK);
+    ಪ್ರತಿಜ್ಞಾ(json_decode_string(&reader, ಖಾಲಿ, '"') == OK);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    int
-main(void)
+    ಪೂರ್ಣಾಂಕ
+ಮುಖ್ಯ(ಶೂನ್ಯ)
 {
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
     p_mfd = 100;
-    test_decode_find_end();
-    test_fill_called_on_find_end();
+    test_decode_ಕಂಡುಹಿಡಿ_ಕೊನೆ();
+    test_fill_called_on_ಕಂಡುಹಿಡಿ_ಕೊನೆ();
     test_fill_called_on_string();
-#endif
-    return 0;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ 0;
 }

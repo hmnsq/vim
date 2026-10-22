@@ -21,11 +21,11 @@
  * (char **). This define removes that prototype. We include our own prototype
  * below.
  */
-#define tgetstr tgetstr_defined_wrong
+#ವ್ಯಾಖ್ಯಾನಿಸು tgetstr tgetstr_defined_wrong
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-#ifdef HAVE_TGETENT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_TGETENT
 # ifdef HAVE_TERMIOS_H
 #  include <termios.h>	    // seems to be required for some Linux
 # endif
@@ -37,141 +37,141 @@
  * A few linux systems define outfuntype in termcap.h to be used as the third
  * argument for tputs().
  */
-# if defined(VMS) || defined(AMIGA)
-#  define TPUTSFUNCAST (void (*)(unsigned int))
-# else
+# ಆದರೆ defined(VMS) || defined(AMIGA)
+#  define TPUTSFUNCAST (ಶೂನ್ಯ (*)(ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ))
+# ಇಲ್ಲದಿದ್ದರೆ
 #  ifdef HAVE_OUTFUNTYPE
 #   define TPUTSFUNCAST (outfuntype)
-#  else
-#   define TPUTSFUNCAST (int (*)(int))
+#  ಇಲ್ಲದಿದ್ದರೆ
+#   define TPUTSFUNCAST (ಪೂರ್ಣಾಂಕ (*)(ಪೂರ್ಣಾಂಕ))
 #  endif
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#undef tgetstr
+#ವ್ಯಾಖ್ಯಾನ_ರದ್ದು tgetstr
 
 // start of keys that are not directly used by Vim but can be mapped
-#define BT_EXTRA_KEYS	0x101
+#ವ್ಯಾಖ್ಯಾನಿಸು BT_EXTRA_ಕೀಲಿಗಳು	0x101
 
-static void parse_builtin_tcap(char_u *s);
-static void gather_termleader(void);
-#ifdef FEAT_TERMRESPONSE
-static void req_codes_from_term(void);
-static void req_more_codes_from_term(void);
-static void got_code_from_term(char_u *code, int len);
-static void check_for_codes_from_term(void);
-#endif
-static void del_termcode_idx(int idx);
-static int find_term_bykeys(char_u *src, int *len);
-static int term_is_builtin(char_u *name);
-static int term_7to8bit(char_u *p);
-static void accept_modifiers_for_function_keys(void);
+ಸ್ಥಿರ ಶೂನ್ಯ parse_builtin_tcap(char_u *s);
+ಸ್ಥಿರ ಶೂನ್ಯ gather_termleader(ಶೂನ್ಯ);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMRESPONSE
+ಸ್ಥಿರ ಶೂನ್ಯ req_codes_from_ಪದ(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಶೂನ್ಯ req_ಇನ್ನಷ್ಟು_codes_from_ಪದ(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಶೂನ್ಯ got_ಸಂಕೇತ_from_ಪದ(char_u *ಸಂಕೇತ_2, ಪೂರ್ಣಾಂಕ len);
+ಸ್ಥಿರ ಶೂನ್ಯ check_for_codes_from_ಪದ(ಶೂನ್ಯ);
+#ಆದರೆ_ಅಂತ್ಯ
+ಸ್ಥಿರ ಶೂನ್ಯ del_termcode_idx(ಪೂರ್ಣಾಂಕ idx);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಕಂಡುಹಿಡಿ_ಪದ_bykeys(char_u *src, ಪೂರ್ಣಾಂಕ *len);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಪದ_is_builtin(char_u *name);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಪದ_7to8bit(char_u *p);
+ಸ್ಥಿರ ಶೂನ್ಯ accept_modifiers_for_function_ಕೀಲಿಗಳು(ಶೂನ್ಯ);
 
-#if 0  // Change to 1 to enable ch_log() calls for termresponse debugging.
+#ಆದರೆ 0  // Change to 1 to enable ch_log() calls for termresponse debugging.
 # define DEBUG_TERMRESPONSE
 # define LOG_TR1(str) \
-		ch_log(NULL, "TermResp: %s " str, \
+		ch_log(ಖಾಲಿ, "TermResp: %s " str, \
 			must_redraw == UPD_NOT_VALID ? "NV" \
 			: must_redraw == UPD_CLEAR ? "CL" : "  ")
 # define LOG_TRN(fmt,...) \
-		ch_log(NULL, "TermResp: %s " fmt, \
+		ch_log(ಖಾಲಿ, "TermResp: %s " fmt, \
 			must_redraw == UPD_NOT_VALID ? "NV" \
 			: must_redraw == UPD_CLEAR ? "CL" : "  ", __VA_ARGS__)
-#else
-# define LOG_TR1(str) do { /**/ } while (0)
-# define LOG_TRN(fmt,...) do { /**/ } while (0)
-#endif
+#ಇಲ್ಲದಿದ್ದರೆ
+# define LOG_TR1(str) ಮಾಡು { /**/ } ಆಗ (0)
+# define LOG_TRN(fmt,...) ಮಾಡು { /**/ } ಆಗ (0)
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef HAVE_TGETENT
-static char *invoke_tgetent(char_u *, char_u *);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_TGETENT
+ಸ್ಥಿರ ಅಕ್ಷರ *invoke_tgetent(char_u *, char_u *);
 
 /*
  * Here is our own prototype for tgetstr(), any prototypes from the include
  * files have been disabled by the define at the start of this file.
  */
-char		*tgetstr(char *, char **);
-#endif
+ಅಕ್ಷರ		*tgetstr(ಅಕ್ಷರ *, ಅಕ್ಷರ **);
+#ಆದರೆ_ಅಂತ್ಯ
 
-typedef enum {
-    STATUS_GET,		// send request when switching to RAW mode
-    STATUS_SENT,	// did send request, checking for response
-    STATUS_GOT,		// received response
-    STATUS_FAIL		// timed out
-} request_progress_T;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ {
+    ಸ್ಥಿತಿ_GET,		// send request when switching to RAW mode
+    ಸ್ಥಿತಿ_ಕಳುಹಿಸಿದ,	// did send request, checking for response
+    ಸ್ಥಿತಿ_GOT,		// received response
+    ಸ್ಥಿತಿ_FAIL		// timed out
+} request_ಪ್ರಗತಿ_T;
 
-typedef struct {
-    request_progress_T	    tr_progress;
-    time_t		    tr_start;	// when request was sent, -1 for never
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+    request_ಪ್ರಗತಿ_T	    tr_ಪ್ರಗತಿ;
+    time_t		    tr_ಆರಂಭ;	// when request was sent, -1 for never
 } termrequest_T;
 
 // Holds state for current OSC response.
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    int		    processing;	// If we are in the middle of an OSC response
-    char_u	    start_char;	// First char in the OSC response
+    ಪೂರ್ಣಾಂಕ		    processing;	// If we are in the middle of an OSC response
+    char_u	    ಆರಂಭ_char;	// First char in the OSC response
     garray_T	    buf;	// Buffer holding the OSC response, to be
 				// placed in the "v:termosc" vim var.
 
-#ifdef ELAPSED_FUNC
-    elapsed_T	    start_tv;	// Set at the beginning of an OSC response.
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ELAPSED_FUNC
+    elapsed_T	    ಆರಂಭ_tv;	// Set at the beginning of an OSC response.
 				// Used to timeout after a set amount of
 				// time.
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 } oscstate_T;
 
-#define TERMREQUEST_INIT {STATUS_GET, -1}
+#ವ್ಯಾಖ್ಯಾನಿಸು TERMREQUEST_INIT {ಸ್ಥಿತಿ_GET, -1}
 
 // Request Terminal Version status:
-static termrequest_T crv_status = TERMREQUEST_INIT;
+ಸ್ಥಿರ termrequest_T crv_ಸ್ಥಿತಿ = TERMREQUEST_INIT;
 
 // Request Cursor position report:
-static termrequest_T u7_status = TERMREQUEST_INIT;
+ಸ್ಥಿರ termrequest_T u7_ಸ್ಥಿತಿ = TERMREQUEST_INIT;
 
 // Request xterm compatibility check:
-static termrequest_T xcc_status = TERMREQUEST_INIT;
+ಸ್ಥಿರ termrequest_T xcc_ಸ್ಥಿತಿ = TERMREQUEST_INIT;
 
-#ifdef FEAT_TERMRESPONSE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMRESPONSE
 # ifdef FEAT_TERMINAL
 // Request foreground color report:
-static termrequest_T rfg_status = TERMREQUEST_INIT;
-static int fg_r = 0;
-static int fg_g = 0;
-static int fg_b = 0;
+ಸ್ಥಿರ termrequest_T rfg_ಸ್ಥಿತಿ = TERMREQUEST_INIT;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ fg_r = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ fg_g = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ fg_b = 0;
 # endif
 // Background color values from the OSC 11 response, also used by the
 // image backend to flatten RGBA alpha onto the actual terminal background.
-static int bg_r = 255;
-static int bg_g = 255;
-static int bg_b = 255;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ bg_r = 255;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ bg_g = 255;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ bg_b = 255;
 
 // Request background color report:
-static termrequest_T rbg_status = TERMREQUEST_INIT;
+ಸ್ಥಿರ termrequest_T rbg_ಸ್ಥಿತಿ = TERMREQUEST_INIT;
 
 // Request cursor blinking mode report:
-static termrequest_T rbm_status = TERMREQUEST_INIT;
+ಸ್ಥಿರ termrequest_T rbm_ಸ್ಥಿತಿ = TERMREQUEST_INIT;
 
 // Request cursor style report:
-static termrequest_T rcs_status = TERMREQUEST_INIT;
+ಸ್ಥಿರ termrequest_T rcs_ಸ್ಥಿತಿ = TERMREQUEST_INIT;
 
 // Request window's position report:
-static termrequest_T winpos_status = TERMREQUEST_INIT;
+ಸ್ಥಿರ termrequest_T winpos_ಸ್ಥಿತಿ = TERMREQUEST_INIT;
 
 // Request DECRQM (DEC mode) report:
-static termrequest_T decrqm_status = TERMREQUEST_INIT;
+ಸ್ಥಿರ termrequest_T decrqm_ಸ್ಥಿತಿ = TERMREQUEST_INIT;
 
-static termrequest_T *all_termrequests[] = {
-    &crv_status,
-    &u7_status,
-    &xcc_status,
+ಸ್ಥಿರ termrequest_T *all_termrequests[] = {
+    &crv_ಸ್ಥಿತಿ,
+    &u7_ಸ್ಥಿತಿ,
+    &xcc_ಸ್ಥಿತಿ,
 # ifdef FEAT_TERMINAL
-    &rfg_status,
+    &rfg_ಸ್ಥಿತಿ,
 # endif
-    &rbg_status,
-    &rbm_status,
-    &rcs_status,
-    &winpos_status,
-    &decrqm_status,
-    NULL
+    &rbg_ಸ್ಥಿತಿ,
+    &rbm_ಸ್ಥಿತಿ,
+    &rcs_ಸ್ಥಿತಿ,
+    &winpos_ಸ್ಥಿತಿ,
+    &decrqm_ಸ್ಥಿತಿ,
+    ಖಾಲಿ
 };
 
 // The t_8u code may default to a value but get reset when the term response is
@@ -180,10 +180,10 @@ static termrequest_T *all_termrequests[] = {
 // FALSE -> don't output t_8u yet
 // MAYBE -> tried outputting t_8u while FALSE
 // OK    -> can write t_8u
-int write_t_8u_state = FALSE;
-#endif
+ಪೂರ್ಣಾಂಕ write_t_8u_state = FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef HAVE_TGETENT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_TGETENT
 /*
  * Don't declare these variables if termcap.h contains them.
  * Autoconf checks if these variables should be declared extern (not all
@@ -193,42 +193,42 @@ int write_t_8u_state = FALSE;
  */
 # ifndef HAVE_OSPEED
 #  ifdef OSPEED_EXTERN
-extern short ospeed;
-#  else
-short ospeed;
+ಬಾಹ್ಯ ಗಿಡ್ಡ ospeed;
+#  ಇಲ್ಲದಿದ್ದರೆ
+ಗಿಡ್ಡ ospeed;
 #  endif
 # endif
-# ifndef HAVE_UP_BC_PC
-#  ifdef UP_BC_PC_EXTERN
-extern char *UP, *BC, PC;
-#  else
-char *UP, *BC, PC;
+# ifndef HAVE_ಮೇಲೆ_BC_PC
+#  ifdef ಮೇಲೆ_BC_PC_EXTERN
+ಬಾಹ್ಯ ಅಕ್ಷರ *ಮೇಲೆ_2, *BC, PC;
+#  ಇಲ್ಲದಿದ್ದರೆ
+ಅಕ್ಷರ *ಮೇಲೆ_2, *BC, PC;
 #  endif
 # endif
 
 # define TGETSTR(s, p)	vim_tgetstr((s), (p))
-# define TGETENT(b, t)	tgetent((char *)(b), (char *)(t))
-static char_u *vim_tgetstr(char *s, char_u **pp);
-#endif // HAVE_TGETENT
+# define TGETENT(b, t)	tgetent((ಅಕ್ಷರ *)(b), (ಅಕ್ಷರ *)(t))
+ಸ್ಥಿರ char_u *vim_tgetstr(ಅಕ್ಷರ *s, char_u **pp);
+#ಆದರೆ_ಅಂತ್ಯ // HAVE_TGETENT
 
-static int  detected_8bit = FALSE;	// detected 8-bit terminal
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ  detected_8bit = FALSE;	// detected 8-bit terminal
 
-#if (defined(UNIX) || defined(VMS))
-static int focus_state = MAYBE; // TRUE if the Vim window has focus
-#endif
+#ಆದರೆ (defined(UNIX) || defined(VMS))
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ focus_state = MAYBE; // TRUE if the Vim window has focus
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_TERMRESPONSE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMRESPONSE
 // When the cursor shape was detected these values are used:
 // 1: block, 2: underline, 3: vertical bar
-static int initial_cursor_shape = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ initial_cursor_shape = 0;
 
 // The blink flag from the style response may be inverted from the actual
 // blinking state, xterm XORs the flags.
-static int initial_cursor_shape_blink = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ initial_cursor_shape_blink = FALSE;
 
 // The blink flag from the blinking-cursor mode response
-static int initial_cursor_blink = FALSE;
-#endif
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ initial_cursor_blink = FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
 
 // 0	Mode is not recognized	not supported
 //
@@ -242,18 +242,18 @@ static int initial_cursor_blink = FALSE;
 //
 // 4	Permanently reset	not supported
 //
-static int sync_output_setting = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ sync_output_setting = 0;
 
 // > 0: Currently batching output
 // == 0: No synchronized output
-static int sync_output_state = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ sync_output_state = 0;
 
-#ifdef UNIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
 // DEC mode 2048 (in-band window resize events)
 // https://gist.github.com/rockorager/e695fb2924d36b2bcf1fff4a3704bd83
-static int win_resize_setting = 0;
-static bool win_resize_enabled = false;
-#endif
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ win_resize_setting = 0;
+ಸ್ಥಿರ bool win_resize_enabled = false;
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * The builtin termcap entries.
@@ -269,47 +269,47 @@ static bool win_resize_enabled = false;
  *
  * Entries marked with "guessed" may be wrong.
  */
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    int		bt_entry;   // either a KS_xxx code (>= 0), or a K_xxx code.
-    char	*bt_string; // value
-} tcap_entry_T;
+    ಪೂರ್ಣಾಂಕ		bt_ನಮೂದು;   // either a KS_xxx code (>= 0), or a K_xxx code.
+    ಅಕ್ಷರ	*bt_string; //ಮೌಲ್ಯ
+} tcap_ನಮೂದು_T;
 
 /*
  * Standard ANSI terminal, default for Unix.
  */
-static tcap_entry_T builtin_ansi[] = {
-    {(int)KS_CE,	"\033[K"},
-    {(int)KS_AL,	"\033[L"},
-#ifdef TERMINFO
-    {(int)KS_CAL,	"\033[%p1%dL"},
-#else
-    {(int)KS_CAL,	"\033[%dL"},
-#endif
-    {(int)KS_DL,	"\033[M"},
-#ifdef TERMINFO
-    {(int)KS_CDL,	"\033[%p1%dM"},
-#else
-    {(int)KS_CDL,	"\033[%dM"},
-#endif
-    {(int)KS_CL,	"\033[H\033[2J"},
-    {(int)KS_ME,	"\033[0m"},
-    {(int)KS_MR,	"\033[7m"},
-    {(int)KS_MS,	"y"},
-    {(int)KS_UT,	"y"},		// guessed
-    {(int)KS_LE,	"\b"},
-#ifdef TERMINFO
-    {(int)KS_CM,	"\033[%i%p1%d;%p2%dH"},
-#else
-    {(int)KS_CM,	"\033[%i%d;%dH"},
-#endif
-#ifdef TERMINFO
-    {(int)KS_CRI,	"\033[%p1%dC"},
-#else
-    {(int)KS_CRI,	"\033[%dC"},
-#endif
+ಸ್ಥಿರ tcap_ನಮೂದು_T builtin_ansi[] = {
+    {(ಪೂರ್ಣಾಂಕ)KS_CE,	"\033[K"},
+    {(ಪೂರ್ಣಾಂಕ)KS_AL,	"\033[L"},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CAL,	"\033[%p1%dL"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CAL,	"\033[%dL"},
+#ಆದರೆ_ಅಂತ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_DL,	"\033[M"},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CDL,	"\033[%p1%dM"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CDL,	"\033[%dM"},
+#ಆದರೆ_ಅಂತ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_CL,	"\033[H\033[2J"},
+    {(ಪೂರ್ಣಾಂಕ)KS_ME,	"\033[0m"},
+    {(ಪೂರ್ಣಾಂಕ)KS_MR,	"\033[7m"},
+    {(ಪೂರ್ಣಾಂಕ)KS_MS,	"y"},
+    {(ಪೂರ್ಣಾಂಕ)KS_UT,	"y"},		// guessed
+    {(ಪೂರ್ಣಾಂಕ)KS_LE,	"\b"},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CM,	"\033[%i%p1%d;%p2%dH"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CM,	"\033[%i%d;%dH"},
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CRI,	"\033[%p1%dC"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CRI,	"\033[%dC"},
+#ಆದರೆ_ಅಂತ್ಯ
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ಪೂರ್ಣಾಂಕ)KS_NAME,	ಖಾಲಿ}  // end marker
 };
 
 /*
@@ -318,53 +318,53 @@ static tcap_entry_T builtin_ansi[] = {
  * TODO:- rewrite ESC[ codes to CSI
  *      - keyboard languages (CSI ? 26 n)
  */
-static tcap_entry_T builtin_vt320[] = {
-    {(int)KS_CE,	"\033[K"},
-    {(int)KS_AL,	"\033[L"},
-#ifdef TERMINFO
-    {(int)KS_CAL,	"\033[%p1%dL"},
-#else
-    {(int)KS_CAL,	"\033[%dL"},
-#endif
-    {(int)KS_DL,	"\033[M"},
-#ifdef TERMINFO
-    {(int)KS_CDL,	"\033[%p1%dM"},
-#else
-    {(int)KS_CDL,	"\033[%dM"},
-#endif
-    {(int)KS_CL,	"\033[H\033[2J"},
-    {(int)KS_CD,	"\033[J"},
-    {(int)KS_CCO,	"8"},			// allow 8 colors
-    {(int)KS_ME,	"\033[0m"},
-    {(int)KS_MR,	"\033[7m"},
-    {(int)KS_MD,	"\033[1m"},  // bold mode
-    {(int)KS_SE,	"\033[22m"},// normal mode
-    {(int)KS_UE,	"\033[24m"},// exit underscore mode
-    {(int)KS_US,	"\033[4m"},  // underscore mode
-    {(int)KS_CZH,	"\033[34;43m"},  // italic mode: blue text on yellow
-    {(int)KS_CZR,	"\033[0m"},	    // italic mode end
-    {(int)KS_CAB,	"\033[4%dm"},	    // set background color (ANSI)
-    {(int)KS_CAF,	"\033[3%dm"},	    // set foreground color (ANSI)
-    {(int)KS_CSB,	"\033[102;%dm"},	// set screen background color
-    {(int)KS_CSF,	"\033[101;%dm"},	// set screen foreground color
-    {(int)KS_MS,	"y"},
-    {(int)KS_UT,	"y"},
-    {(int)KS_XN,	"y"},
-    {(int)KS_LE,	"\b"},
-#ifdef TERMINFO
-    {(int)KS_CM,	"\033[%i%p1%d;%p2%dH"},
-#else
-    {(int)KS_CM,	"\033[%i%d;%dH"},
-#endif
-#ifdef TERMINFO
-    {(int)KS_CRI,	"\033[%p1%dC"},
-#else
-    {(int)KS_CRI,	"\033[%dC"},
-#endif
-    {K_UP,		"\033[A"},
-    {K_DOWN,		"\033[B"},
-    {K_RIGHT,		"\033[C"},
-    {K_LEFT,		"\033[D"},
+ಸ್ಥಿರ tcap_ನಮೂದು_T builtin_vt320[] = {
+    {(ಪೂರ್ಣಾಂಕ)KS_CE,	"\033[K"},
+    {(ಪೂರ್ಣಾಂಕ)KS_AL,	"\033[L"},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CAL,	"\033[%p1%dL"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CAL,	"\033[%dL"},
+#ಆದರೆ_ಅಂತ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_DL,	"\033[M"},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CDL,	"\033[%p1%dM"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CDL,	"\033[%dM"},
+#ಆದರೆ_ಅಂತ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_CL,	"\033[H\033[2J"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CD,	"\033[J"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CCO,	"8"},			// allow 8 colors
+    {(ಪೂರ್ಣಾಂಕ)KS_ME,	"\033[0m"},
+    {(ಪೂರ್ಣಾಂಕ)KS_MR,	"\033[7m"},
+    {(ಪೂರ್ಣಾಂಕ)KS_MD,	"\033[1m"},  // bold mode
+    {(ಪೂರ್ಣಾಂಕ)KS_SE,	"\033[22m"},// normal mode
+    {(ಪೂರ್ಣಾಂಕ)KS_UE,	"\033[24m"},// exit underscore mode
+    {(ಪೂರ್ಣಾಂಕ)KS_US,	"\033[4m"},  // underscore mode
+    {(ಪೂರ್ಣಾಂಕ)KS_CZH,	"\033[34;43m"},  // italic mode: blue text on yellow
+    {(ಪೂರ್ಣಾಂಕ)KS_CZR,	"\033[0m"},	    // italic mode end
+    {(ಪೂರ್ಣಾಂಕ)KS_CAB,	"\033[4%dm"},	    // set background color (ANSI)
+    {(ಪೂರ್ಣಾಂಕ)KS_CAF,	"\033[3%dm"},	    // set foreground color (ANSI)
+    {(ಪೂರ್ಣಾಂಕ)KS_CSB,	"\033[102;%dm"},	// set screen background color
+    {(ಪೂರ್ಣಾಂಕ)KS_CSF,	"\033[101;%dm"},	// set screen foreground color
+    {(ಪೂರ್ಣಾಂಕ)KS_MS,	"y"},
+    {(ಪೂರ್ಣಾಂಕ)KS_UT,	"y"},
+    {(ಪೂರ್ಣಾಂಕ)KS_XN,	"y"},
+    {(ಪೂರ್ಣಾಂಕ)KS_LE,	"\b"},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CM,	"\033[%i%p1%d;%p2%dH"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CM,	"\033[%i%d;%dH"},
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CRI,	"\033[%p1%dC"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CRI,	"\033[%dC"},
+#ಆದರೆ_ಅಂತ್ಯ
+    {K_ಮೇಲೆ,		"\033[A"},
+    {K_ಕೆಳಕ್ಕೆ,		"\033[B"},
+    {K_ಬಲ,		"\033[C"},
+    {K_ಎಡ,		"\033[D"},
     // Note: cursor key sequences for application cursor mode are omitted,
     // because they interfere with typed commands: <Esc>OA.
     {K_F1,		"\033[11~"},
@@ -390,7 +390,7 @@ static tcap_entry_T builtin_vt320[] = {
     {K_INS,		"\033[2~"},
     {K_DEL,		"\033[3~"},
     {K_HOME,		"\033[1~"},
-    {K_END,		"\033[4~"},
+    {K_ಕೊನೆ,		"\033[4~"},
     {K_PAGEUP,		"\033[5~"},
     {K_PAGEDOWN,	"\033[6~"},
     // These sequences starting with <Esc> O may interfere with what the user
@@ -412,140 +412,140 @@ static tcap_entry_T builtin_vt320[] = {
     {K_K9,		"\033Oy"},	// keypad 9
     {K_BS,		"\x7f"},	// for some reason 0177 doesn't work
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ಪೂರ್ಣಾಂಕ)KS_NAME,	ಖಾಲಿ}  // end marker
 };
 
 /*
  * Ordinary vt52
  */
-static tcap_entry_T builtin_vt52[] = {
-    {(int)KS_CE,	"\033K"},
-    {(int)KS_CD,	"\033J"},
-#ifdef TERMINFO
-    {(int)KS_CM,	"\033Y%p1%' '%+%c%p2%' '%+%c"},
-#else
-    {(int)KS_CM,	"\033Y%+ %+ "},
-#endif
-    {(int)KS_LE,	"\b"},
-    {(int)KS_SR,	"\033I"},
-    {(int)KS_AL,	"\033L"},
-    {(int)KS_DL,	"\033M"},
-    {K_UP,		"\033A"},
-    {K_DOWN,		"\033B"},
-    {K_LEFT,		"\033D"},
-    {K_RIGHT,		"\033C"},
+ಸ್ಥಿರ tcap_ನಮೂದು_T builtin_vt52[] = {
+    {(ಪೂರ್ಣಾಂಕ)KS_CE,	"\033K"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CD,	"\033J"},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CM,	"\033Y%p1%' '%+%c%p2%' '%+%c"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CM,	"\033Y%+ %+ "},
+#ಆದರೆ_ಅಂತ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_LE,	"\b"},
+    {(ಪೂರ್ಣಾಂಕ)KS_SR,	"\033I"},
+    {(ಪೂರ್ಣಾಂಕ)KS_AL,	"\033L"},
+    {(ಪೂರ್ಣಾಂಕ)KS_DL,	"\033M"},
+    {K_ಮೇಲೆ,		"\033A"},
+    {K_ಕೆಳಕ್ಕೆ,		"\033B"},
+    {K_ಎಡ,		"\033D"},
+    {K_ಬಲ,		"\033C"},
     {K_F1,		"\033P"},
     {K_F2,		"\033Q"},
     {K_F3,		"\033R"},
-    {(int)KS_CL,	"\033H\033J"},
-    {(int)KS_MS,	"y"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CL,	"\033H\033J"},
+    {(ಪೂರ್ಣಾಂಕ)KS_MS,	"y"},
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ಪೂರ್ಣಾಂಕ)KS_NAME,	ಖಾಲಿ}  // end marker
 };
 
 /*
  * Builtin xterm with Vim-specific entries.
  */
-static tcap_entry_T builtin_xterm[] = {
-    {(int)KS_CE,	"\033[K"},
-    {(int)KS_AL,	"\033[L"},
-#ifdef TERMINFO
-    {(int)KS_CAL,	"\033[%p1%dL"},
-#else
-    {(int)KS_CAL,	"\033[%dL"},
-#endif
-    {(int)KS_DL,	"\033[M"},
-#ifdef TERMINFO
-    {(int)KS_CDL,	"\033[%p1%dM"},
-#else
-    {(int)KS_CDL,	"\033[%dM"},
-#endif
-#ifdef TERMINFO
-    {(int)KS_CS,	"\033[%i%p1%d;%p2%dr"},
-#else
-    {(int)KS_CS,	"\033[%i%d;%dr"},
-#endif
-    {(int)KS_CL,	"\033[H\033[2J"},
-    {(int)KS_CD,	"\033[J"},
-    {(int)KS_ME,	"\033[m"},
-    {(int)KS_MR,	"\033[7m"},
-    {(int)KS_MD,	"\033[1m"},
-    {(int)KS_UE,	"\033[m"},
-    {(int)KS_US,	"\033[4m"},
-    {(int)KS_STE,	"\033[29m"},
-    {(int)KS_STS,	"\033[9m"},
-    {(int)KS_MS,	"y"},
-    {(int)KS_UT,	"y"},
-    {(int)KS_LE,	"\b"},
-    {(int)KS_VI,	"\033[?25l"},
-    {(int)KS_VE,	"\033[?25h"},
-    {(int)KS_VS,	"\033[?12h"},
-    {(int)KS_CVS,	"\033[?12l"},
-#ifdef TERMINFO
-    {(int)KS_CSH,	"\033[%p1%d q"},
-#else
-    {(int)KS_CSH,	"\033[%d q"},
-#endif
-    {(int)KS_CRC,	"\033[?12$p"},
-    {(int)KS_CRS,	"\033P$q q\033\\"},
-#ifdef TERMINFO
-    {(int)KS_CM,	"\033[%i%p1%d;%p2%dH"},
-#else
-    {(int)KS_CM,	"\033[%i%d;%dH"},
-#endif
-    {(int)KS_SR,	"\033M"},
-#ifdef TERMINFO
-    {(int)KS_CRI,	"\033[%p1%dC"},
-#else
-    {(int)KS_CRI,	"\033[%dC"},
-#endif
-    {(int)KS_KS,	"\033[?1h\033="},
-    {(int)KS_KE,	"\033[?1l\033>"},
-#ifdef FEAT_XTERM_SAVE
-    {(int)KS_TI,	"\0337\033[?47h"},
-    {(int)KS_TE,	"\033[?47l\0338"},
-#endif
+ಸ್ಥಿರ tcap_ನಮೂದು_T builtin_xterm[] = {
+    {(ಪೂರ್ಣಾಂಕ)KS_CE,	"\033[K"},
+    {(ಪೂರ್ಣಾಂಕ)KS_AL,	"\033[L"},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CAL,	"\033[%p1%dL"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CAL,	"\033[%dL"},
+#ಆದರೆ_ಅಂತ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_DL,	"\033[M"},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CDL,	"\033[%p1%dM"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CDL,	"\033[%dM"},
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CS,	"\033[%i%p1%d;%p2%dr"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CS,	"\033[%i%d;%dr"},
+#ಆದರೆ_ಅಂತ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_CL,	"\033[H\033[2J"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CD,	"\033[J"},
+    {(ಪೂರ್ಣಾಂಕ)KS_ME,	"\033[m"},
+    {(ಪೂರ್ಣಾಂಕ)KS_MR,	"\033[7m"},
+    {(ಪೂರ್ಣಾಂಕ)KS_MD,	"\033[1m"},
+    {(ಪೂರ್ಣಾಂಕ)KS_UE,	"\033[m"},
+    {(ಪೂರ್ಣಾಂಕ)KS_US,	"\033[4m"},
+    {(ಪೂರ್ಣಾಂಕ)KS_STE,	"\033[29m"},
+    {(ಪೂರ್ಣಾಂಕ)KS_STS,	"\033[9m"},
+    {(ಪೂರ್ಣಾಂಕ)KS_MS,	"y"},
+    {(ಪೂರ್ಣಾಂಕ)KS_UT,	"y"},
+    {(ಪೂರ್ಣಾಂಕ)KS_LE,	"\b"},
+    {(ಪೂರ್ಣಾಂಕ)KS_VI,	"\033[?25l"},
+    {(ಪೂರ್ಣಾಂಕ)KS_VE,	"\033[?25h"},
+    {(ಪೂರ್ಣಾಂಕ)KS_VS,	"\033[?12h"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CVS,	"\033[?12l"},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CSH,	"\033[%p1%d q"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CSH,	"\033[%d q"},
+#ಆದರೆ_ಅಂತ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_ಚಕ್ರೀಯ_ಪರೀಕ್ಷೆ,	"\033[?12$p"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CRS,	"\033P$q q\033\\"},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CM,	"\033[%i%p1%d;%p2%dH"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CM,	"\033[%i%d;%dH"},
+#ಆದರೆ_ಅಂತ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_SR,	"\033M"},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CRI,	"\033[%p1%dC"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CRI,	"\033[%dC"},
+#ಆದರೆ_ಅಂತ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_KS,	"\033[?1h\033="},
+    {(ಪೂರ್ಣಾಂಕ)KS_KE,	"\033[?1l\033>"},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XTERM_SAVE
+    {(ಪೂರ್ಣಾಂಕ)KS_TI,	"\0337\033[?47h"},
+    {(ಪೂರ್ಣಾಂಕ)KS_TE,	"\033[?47l\0338"},
+#ಆದರೆ_ಅಂತ್ಯ
     // These are now under control of the 'keyprotocol' option, see
     // "builtin_mok2".
     // {(int)KS_CTI,	"\033[>4;2m"},
     // {(int)KS_CRK,	"\033[?4m"},
     // {(int)KS_CTE,	"\033[>4;m"},
-    {(int)KS_CIS,	"\033]1;"},
-    {(int)KS_CIE,	"\007"},
-    {(int)KS_TS,	"\033]2;"},
-    {(int)KS_FS,	"\007"},
-    {(int)KS_CSC,	"\033]12;"},
-    {(int)KS_CEC,	"\007"},
-#ifdef TERMINFO
-    {(int)KS_CWS,	"\033[8;%p1%d;%p2%dt"},
-    {(int)KS_CWP,	"\033[3;%p1%d;%p2%dt"},
-    {(int)KS_CGP,	"\033[13t"},
-#else
-    {(int)KS_CWS,	"\033[8;%d;%dt"},
-    {(int)KS_CWP,	"\033[3;%d;%dt"},
-    {(int)KS_CGP,	"\033[13t"},
-#endif
-    {(int)KS_CRV,	"\033[>c"},
-    {(int)KS_CXM,	"\033[?1006;1000%?%p1%{1}%=%th%el%;"},
-    {(int)KS_RFG,	"\033]10;?\007"},
-    {(int)KS_RBG,	"\033]11;?\007"},
-    {(int)KS_U7,	"\033[6n"},
-    {(int)KS_CAU,	"\033[58;5;%dm"},
-    {(int)KS_CBE,	"\033[?2004h"},
-    {(int)KS_CBD,	"\033[?2004l"},
-    {(int)KS_CST,	"\033[22;2t"},
-    {(int)KS_CRT,	"\033[23;2t"},
-    {(int)KS_SSI,	"\033[22;1t"},
-    {(int)KS_SRI,	"\033[23;1t"},
-#if (defined(UNIX) || defined(VMS))
-    {(int)KS_FD,	"\033[?1004l"},
-    {(int)KS_FE,	"\033[?1004h"},
-#endif
+    {(ಪೂರ್ಣಾಂಕ)KS_CIS,	"\033]1;"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CIE,	"\007"},
+    {(ಪೂರ್ಣಾಂಕ)KS_TS,	"\033]2;"},
+    {(ಪೂರ್ಣಾಂಕ)KS_FS,	"\007"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CSC,	"\033]12;"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CEC,	"\007"},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CWS,	"\033[8;%p1%d;%p2%dt"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CWP,	"\033[3;%p1%d;%p2%dt"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CGP,	"\033[13t"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CWS,	"\033[8;%d;%dt"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CWP,	"\033[3;%d;%dt"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CGP,	"\033[13t"},
+#ಆದರೆ_ಅಂತ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_CRV,	"\033[>c"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CXM,	"\033[?1006;1000%?%p1%{1}%=%th%el%;"},
+    {(ಪೂರ್ಣಾಂಕ)KS_RFG,	"\033]10;?\007"},
+    {(ಪೂರ್ಣಾಂಕ)KS_RBG,	"\033]11;?\007"},
+    {(ಪೂರ್ಣಾಂಕ)KS_U7,	"\033[6n"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CAU,	"\033[58;5;%dm"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CBE,	"\033[?2004h"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CBD,	"\033[?2004l"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CST,	"\033[22;2t"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CRT,	"\033[23;2t"},
+    {(ಪೂರ್ಣಾಂಕ)KS_SSI,	"\033[22;1t"},
+    {(ಪೂರ್ಣಾಂಕ)KS_SRI,	"\033[23;1t"},
+#ಆದರೆ (defined(UNIX) || defined(VMS))
+    {(ಪೂರ್ಣಾಂಕ)KS_FD,	"\033[?1004l"},
+    {(ಪೂರ್ಣಾಂಕ)KS_FE,	"\033[?1004h"},
+#ಆದರೆ_ಅಂತ್ಯ
 
-    {K_UP,		"\033O*A"},
-    {K_DOWN,		"\033O*B"},
-    {K_RIGHT,		"\033O*C"},
-    {K_LEFT,		"\033O*D"},
+    {K_ಮೇಲೆ,		"\033O*A"},
+    {K_ಕೆಳಕ್ಕೆ,		"\033O*B"},
+    {K_ಬಲ,		"\033O*C"},
+    {K_ಎಡ,		"\033O*D"},
     // An extra set of cursor keys for vt100 mode
     {K_XUP,		"\033[@;*A"},	// Esc [ A or Esc [ 1 ; A
     {K_XDOWN,		"\033[@;*B"},	// Esc [ B or Esc [ 1 ; B
@@ -578,7 +578,7 @@ static tcap_entry_T builtin_xterm[] = {
     {K_KHOME,		"\033[1;*~"},
     {K_XHOME,		"\033O*H"},	// other Home
     {K_ZHOME,		"\033[7;*~"},	// other Home
-    {K_END,		"\033[@;*F"},	// Esc [ F or Esc 1 ; F
+    {K_ಕೊನೆ,		"\033[@;*F"},	// Esc [ F or Esc 1 ; F
     // {K_S_END,		"\033O2F"},
     // {K_C_END,		"\033O5F"},
     {K_KEND,		"\033[4;*~"},
@@ -606,210 +606,210 @@ static tcap_entry_T builtin_xterm[] = {
     {K_PS,		"\033[200~"}, // paste start
     {K_PE,		"\033[201~"}, // paste end
 
-    {BT_EXTRA_KEYS,   ""},
-    {TERMCAP2KEY('k', '0'), "\033[10;*~"}, // F0
-    {TERMCAP2KEY('F', '3'), "\033[25;*~"}, // F13
+    {BT_EXTRA_ಕೀಲಿಗಳು,   ""},
+    {TERMCAP2_ಕೀಲಿ('k', '0'), "\033[10;*~"}, // F0
+    {TERMCAP2_ಕೀಲಿ('F', '3'), "\033[25;*~"}, // F13
     // F14 and F15 are missing, because they send the same codes as the undo
     // and help key, although they don't work on all keyboards.
-    {TERMCAP2KEY('F', '6'), "\033[29;*~"}, // F16
-    {TERMCAP2KEY('F', '7'), "\033[31;*~"}, // F17
-    {TERMCAP2KEY('F', '8'), "\033[32;*~"}, // F18
-    {TERMCAP2KEY('F', '9'), "\033[33;*~"}, // F19
-    {TERMCAP2KEY('F', 'A'), "\033[34;*~"}, // F20
+    {TERMCAP2_ಕೀಲಿ('F', '6'), "\033[29;*~"}, // F16
+    {TERMCAP2_ಕೀಲಿ('F', '7'), "\033[31;*~"}, // F17
+    {TERMCAP2_ಕೀಲಿ('F', '8'), "\033[32;*~"}, // F18
+    {TERMCAP2_ಕೀಲಿ('F', '9'), "\033[33;*~"}, // F19
+    {TERMCAP2_ಕೀಲಿ('F', 'A'), "\033[34;*~"}, // F20
 
-    {TERMCAP2KEY('F', 'B'), "\033[42;*~"}, // F21
-    {TERMCAP2KEY('F', 'C'), "\033[43;*~"}, // F22
-    {TERMCAP2KEY('F', 'D'), "\033[44;*~"}, // F23
-    {TERMCAP2KEY('F', 'E'), "\033[45;*~"}, // F24
-    {TERMCAP2KEY('F', 'F'), "\033[46;*~"}, // F25
-    {TERMCAP2KEY('F', 'G'), "\033[47;*~"}, // F26
-    {TERMCAP2KEY('F', 'H'), "\033[48;*~"}, // F27
-    {TERMCAP2KEY('F', 'I'), "\033[49;*~"}, // F28
-    {TERMCAP2KEY('F', 'J'), "\033[50;*~"}, // F29
-    {TERMCAP2KEY('F', 'K'), "\033[51;*~"}, // F30
+    {TERMCAP2_ಕೀಲಿ('F', 'B'), "\033[42;*~"}, // F21
+    {TERMCAP2_ಕೀಲಿ('F', 'C'), "\033[43;*~"}, // F22
+    {TERMCAP2_ಕೀಲಿ('F', 'D'), "\033[44;*~"}, // F23
+    {TERMCAP2_ಕೀಲಿ('F', 'E'), "\033[45;*~"}, // F24
+    {TERMCAP2_ಕೀಲಿ('F', 'F'), "\033[46;*~"}, // F25
+    {TERMCAP2_ಕೀಲಿ('F', 'G'), "\033[47;*~"}, // F26
+    {TERMCAP2_ಕೀಲಿ('F', 'H'), "\033[48;*~"}, // F27
+    {TERMCAP2_ಕೀಲಿ('F', 'I'), "\033[49;*~"}, // F28
+    {TERMCAP2_ಕೀಲಿ('F', 'J'), "\033[50;*~"}, // F29
+    {TERMCAP2_ಕೀಲಿ('F', 'K'), "\033[51;*~"}, // F30
 
-    {TERMCAP2KEY('F', 'L'), "\033[52;*~"}, // F31
-    {TERMCAP2KEY('F', 'M'), "\033[53;*~"}, // F32
-    {TERMCAP2KEY('F', 'N'), "\033[54;*~"}, // F33
-    {TERMCAP2KEY('F', 'O'), "\033[55;*~"}, // F34
-    {TERMCAP2KEY('F', 'P'), "\033[56;*~"}, // F35
-    {TERMCAP2KEY('F', 'Q'), "\033[57;*~"}, // F36
-    {TERMCAP2KEY('F', 'R'), "\033[58;*~"}, // F37
+    {TERMCAP2_ಕೀಲಿ('F', 'L'), "\033[52;*~"}, // F31
+    {TERMCAP2_ಕೀಲಿ('F', 'M'), "\033[53;*~"}, // F32
+    {TERMCAP2_ಕೀಲಿ('F', 'N'), "\033[54;*~"}, // F33
+    {TERMCAP2_ಕೀಲಿ('F', 'O'), "\033[55;*~"}, // F34
+    {TERMCAP2_ಕೀಲಿ('F', 'P'), "\033[56;*~"}, // F35
+    {TERMCAP2_ಕೀಲಿ('F', 'Q'), "\033[57;*~"}, // F36
+    {TERMCAP2_ಕೀಲಿ('F', 'R'), "\033[58;*~"}, // F37
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ಪೂರ್ಣಾಂಕ)KS_NAME,	ಖಾಲಿ}  // end marker
 };
 
 /*
  * Additions for using modifyOtherKeys level 2.  Same as what is used for
  * xterm.
  */
-static tcap_entry_T builtin_mok2[] = {
+ಸ್ಥಿರ tcap_ನಮೂದು_T builtin_mok2[] = {
     // t_TI enables modifyOtherKeys level 2
-    {(int)KS_CTI,	"\033[>4;2m"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CTI,	"\033[>4;2m"},
 
     // XTQMODKEYS was added in xterm version 377: "CSI ? 4 m" which should
     // return "{lead} > 4 ; Pv m".  Before version 377 we expect it to have no
     // effect.
-    {(int)KS_CRK,	"\033[?4m"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CRK,	"\033[?4m"},
 
     // t_TE disables modifyOtherKeys
-    {(int)KS_CTE,	"\033[>4;m"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CTE,	"\033[>4;m"},
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ಪೂರ್ಣಾಂಕ)KS_NAME,	ಖಾಲಿ}  // end marker
 };
 
 /*
  * Additions for using the Kitty keyboard protocol.
  */
-static tcap_entry_T builtin_kitty[] = {
+ಸ್ಥಿರ tcap_ನಮೂದು_T builtin_kitty[] = {
     // t_TI enables the kitty keyboard protocol.
-    {(int)KS_CTI,	"\033[=1;1u"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CTI,	"\033[=1;1u"},
 
     // t_RK requests the kitty keyboard protocol state
-    {(int)KS_CRK,	"\033[?u"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CRK,	"\033[?u"},
 
     // t_TE also disables modifyOtherKeys, because t_TI from xterm may already
     // have been used.
-    {(int)KS_CTE,	"\033[>4;m\033[=0;1u"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CTE,	"\033[>4;m\033[=0;1u"},
 
     // t_RF request terminal foreground color
-    {(int)KS_RFG,	"\033]10;?\033\\"},
+    {(ಪೂರ್ಣಾಂಕ)KS_RFG,	"\033]10;?\033\\"},
 
     // t_RB request terminal background color
-    {(int)KS_RBG,	"\033]11;?\033\\"},
+    {(ಪೂರ್ಣಾಂಕ)KS_RBG,	"\033]11;?\033\\"},
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ಪೂರ್ಣಾಂಕ)KS_NAME,	ಖಾಲಿ}  // end marker
 };
 
-#ifdef HAVE_TGETENT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_TGETENT
 /*
  * Additions for enabling/disabling synchronized output mode for terminal.
  */
-static tcap_entry_T builtin_sync_output[] = {
-    {(int)KS_BSU,	"\033[?2026h"},
-    {(int)KS_ESU,	"\033[?2026l"},
-    {(int)KS_NAME,	NULL}  // end marker
+ಸ್ಥಿರ tcap_ನಮೂದು_T builtin_sync_output[] = {
+    {(ಪೂರ್ಣಾಂಕ)KS_BSU,	"\033[?2026h"},
+    {(ಪೂರ್ಣಾಂಕ)KS_ESU,	"\033[?2026l"},
+    {(ಪೂರ್ಣಾಂಕ)KS_NAME,	ಖಾಲಿ}  // end marker
 };
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_TERMRESPONSE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMRESPONSE
 /*
  * List of DECRQM modes that Vim supports
  */
-static const int dec_modes[] = {
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ dec_modes[] = {
     2026,   // Synchronized output
 # ifdef UNIX
     2048    // In-band terminal resize events
 # endif
 };
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_TERMGUICOLORS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMGUICOLORS
 /*
  * Additions for using the RGB colors and terminal font
  */
-static tcap_entry_T builtin_rgb[] = {
+ಸ್ಥಿರ tcap_ನಮೂದು_T builtin_rgb[] = {
     // These are printf strings, not terminal codes.
-    {(int)KS_8F,	"\033[38;2;%lu;%lu;%lum"},
-    {(int)KS_8B,	"\033[48;2;%lu;%lu;%lum"},
-    {(int)KS_8U,	"\033[58;2;%lu;%lu;%lum"},
+    {(ಪೂರ್ಣಾಂಕ)KS_8F,	"\033[38;2;%lu;%lu;%lum"},
+    {(ಪೂರ್ಣಾಂಕ)KS_8B,	"\033[48;2;%lu;%lu;%lum"},
+    {(ಪೂರ್ಣಾಂಕ)KS_8U,	"\033[58;2;%lu;%lu;%lum"},
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ಪೂರ್ಣಾಂಕ)KS_NAME,	ಖಾಲಿ}  // end marker
 };
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef HAVE_TGETENT
-static tcap_entry_T special_term[] = {
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_TGETENT
+ಸ್ಥಿರ tcap_ನಮೂದು_T special_ಪದ[] = {
     // These are printf strings, not terminal codes.
-    {(int)KS_CF,	"\033[%dm"},
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ಪೂರ್ಣಾಂಕ)KS_CF,	"\033[%dm"},
+    {(ಪೂರ್ಣಾಂಕ)KS_NAME,	ಖಾಲಿ}  // end marker
 };
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * iris-ansi for Silicon Graphics machines.
  */
-static tcap_entry_T builtin_iris_ansi[] = {
-    {(int)KS_CE,	"\033[K"},
-    {(int)KS_CD,	"\033[J"},
-    {(int)KS_AL,	"\033[L"},
-#ifdef TERMINFO
-    {(int)KS_CAL,	"\033[%p1%dL"},
-#else
-    {(int)KS_CAL,	"\033[%dL"},
-#endif
-    {(int)KS_DL,	"\033[M"},
-#ifdef TERMINFO
-    {(int)KS_CDL,	"\033[%p1%dM"},
-#else
-    {(int)KS_CDL,	"\033[%dM"},
-#endif
-#if 0	// The scroll region is not working as Vim expects.
+ಸ್ಥಿರ tcap_ನಮೂದು_T builtin_iris_ansi[] = {
+    {(ಪೂರ್ಣಾಂಕ)KS_CE,	"\033[K"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CD,	"\033[J"},
+    {(ಪೂರ್ಣಾಂಕ)KS_AL,	"\033[L"},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CAL,	"\033[%p1%dL"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CAL,	"\033[%dL"},
+#ಆದರೆ_ಅಂತ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_DL,	"\033[M"},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CDL,	"\033[%p1%dM"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CDL,	"\033[%dM"},
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ 0	// The scroll region is not working as Vim expects.
 # ifdef TERMINFO
-    {(int)KS_CS,	"\033[%i%p1%d;%p2%dr"},
-# else
-    {(int)KS_CS,	"\033[%i%d;%dr"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CS,	"\033[%i%p1%d;%p2%dr"},
+# ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CS,	"\033[%i%d;%dr"},
 # endif
-#endif
-    {(int)KS_CL,	"\033[H\033[2J"},
-    {(int)KS_VE,	"\033[9/y\033[12/y"},	// These aren't documented
-    {(int)KS_VS,	"\033[10/y\033[=1h\033[=2l"}, // These aren't documented
-    {(int)KS_TI,	"\033[=6h"},
-    {(int)KS_TE,	"\033[=6l"},
-    {(int)KS_SE,	"\033[21;27m"},
-    {(int)KS_SO,	"\033[1;7m"},
-    {(int)KS_ME,	"\033[m"},
-    {(int)KS_MR,	"\033[7m"},
-    {(int)KS_MD,	"\033[1m"},
-    {(int)KS_CCO,	"8"},			// allow 8 colors
-    {(int)KS_CZH,	"\033[3m"},		// italic mode on
-    {(int)KS_CZR,	"\033[23m"},		// italic mode off
-    {(int)KS_US,	"\033[4m"},		// underline on
-    {(int)KS_UE,	"\033[24m"},		// underline off
-#ifdef TERMINFO
-    {(int)KS_CAB,	"\033[4%p1%dm"},    // set background color (ANSI)
-    {(int)KS_CAF,	"\033[3%p1%dm"},    // set foreground color (ANSI)
-    {(int)KS_CSB,	"\033[102;%p1%dm"}, // set screen background color
-    {(int)KS_CSF,	"\033[101;%p1%dm"}, // set screen foreground color
-#else
-    {(int)KS_CAB,	"\033[4%dm"},	    // set background color (ANSI)
-    {(int)KS_CAF,	"\033[3%dm"},	    // set foreground color (ANSI)
-    {(int)KS_CSB,	"\033[102;%dm"},    // set screen background color
-    {(int)KS_CSF,	"\033[101;%dm"},    // set screen foreground color
-#endif
-    {(int)KS_MS,	"y"},		// guessed
-    {(int)KS_UT,	"y"},		// guessed
-    {(int)KS_LE,	"\b"},
-#ifdef TERMINFO
-    {(int)KS_CM,	"\033[%i%p1%d;%p2%dH"},
-#else
-    {(int)KS_CM,	"\033[%i%d;%dH"},
-#endif
-    {(int)KS_SR,	"\033M"},
-#ifdef TERMINFO
-    {(int)KS_CRI,	"\033[%p1%dC"},
-#else
-    {(int)KS_CRI,	"\033[%dC"},
-#endif
-    {(int)KS_CIS,	"\033P3.y"},
-    {(int)KS_CIE,	"\234"},    // ST "String Terminator"
-    {(int)KS_TS,	"\033P1.y"},
-    {(int)KS_FS,	"\234"},    // ST "String Terminator"
-#ifdef TERMINFO
-    {(int)KS_CWS,	"\033[203;%p1%d;%p2%d/y"},
-    {(int)KS_CWP,	"\033[205;%p1%d;%p2%d/y"},
-#else
-    {(int)KS_CWS,	"\033[203;%d;%d/y"},
-    {(int)KS_CWP,	"\033[205;%d;%d/y"},
-#endif
-    {K_UP,		"\033[A"},
-    {K_DOWN,		"\033[B"},
-    {K_LEFT,		"\033[D"},
-    {K_RIGHT,		"\033[C"},
-    {K_S_UP,		"\033[161q"},
-    {K_S_DOWN,		"\033[164q"},
-    {K_S_LEFT,		"\033[158q"},
-    {K_S_RIGHT,		"\033[167q"},
+#ಆದರೆ_ಅಂತ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_CL,	"\033[H\033[2J"},
+    {(ಪೂರ್ಣಾಂಕ)KS_VE,	"\033[9/y\033[12/y"},	// These aren't documented
+    {(ಪೂರ್ಣಾಂಕ)KS_VS,	"\033[10/y\033[=1h\033[=2l"}, // These aren't documented
+    {(ಪೂರ್ಣಾಂಕ)KS_TI,	"\033[=6h"},
+    {(ಪೂರ್ಣಾಂಕ)KS_TE,	"\033[=6l"},
+    {(ಪೂರ್ಣಾಂಕ)KS_SE,	"\033[21;27m"},
+    {(ಪೂರ್ಣಾಂಕ)KS_SO,	"\033[1;7m"},
+    {(ಪೂರ್ಣಾಂಕ)KS_ME,	"\033[m"},
+    {(ಪೂರ್ಣಾಂಕ)KS_MR,	"\033[7m"},
+    {(ಪೂರ್ಣಾಂಕ)KS_MD,	"\033[1m"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CCO,	"8"},			// allow 8 colors
+    {(ಪೂರ್ಣಾಂಕ)KS_CZH,	"\033[3m"},		// italic mode on
+    {(ಪೂರ್ಣಾಂಕ)KS_CZR,	"\033[23m"},		// italic mode off
+    {(ಪೂರ್ಣಾಂಕ)KS_US,	"\033[4m"},		// underline on
+    {(ಪೂರ್ಣಾಂಕ)KS_UE,	"\033[24m"},		// underline off
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CAB,	"\033[4%p1%dm"},    // set background color (ANSI)
+    {(ಪೂರ್ಣಾಂಕ)KS_CAF,	"\033[3%p1%dm"},    // set foreground color (ANSI)
+    {(ಪೂರ್ಣಾಂಕ)KS_CSB,	"\033[102;%p1%dm"}, // set screen background color
+    {(ಪೂರ್ಣಾಂಕ)KS_CSF,	"\033[101;%p1%dm"}, // set screen foreground color
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CAB,	"\033[4%dm"},	    // set background color (ANSI)
+    {(ಪೂರ್ಣಾಂಕ)KS_CAF,	"\033[3%dm"},	    // set foreground color (ANSI)
+    {(ಪೂರ್ಣಾಂಕ)KS_CSB,	"\033[102;%dm"},    // set screen background color
+    {(ಪೂರ್ಣಾಂಕ)KS_CSF,	"\033[101;%dm"},    // set screen foreground color
+#ಆದರೆ_ಅಂತ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_MS,	"y"},		// guessed
+    {(ಪೂರ್ಣಾಂಕ)KS_UT,	"y"},		// guessed
+    {(ಪೂರ್ಣಾಂಕ)KS_LE,	"\b"},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CM,	"\033[%i%p1%d;%p2%dH"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CM,	"\033[%i%d;%dH"},
+#ಆದರೆ_ಅಂತ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_SR,	"\033M"},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CRI,	"\033[%p1%dC"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CRI,	"\033[%dC"},
+#ಆದರೆ_ಅಂತ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_CIS,	"\033P3.y"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CIE,	"\234"},    // ST "String Terminator"
+    {(ಪೂರ್ಣಾಂಕ)KS_TS,	"\033P1.y"},
+    {(ಪೂರ್ಣಾಂಕ)KS_FS,	"\234"},    // ST "String Terminator"
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CWS,	"\033[203;%p1%d;%p2%d/y"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CWP,	"\033[205;%p1%d;%p2%d/y"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CWS,	"\033[203;%d;%d/y"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CWP,	"\033[205;%d;%d/y"},
+#ಆದರೆ_ಅಂತ್ಯ
+    {K_ಮೇಲೆ,		"\033[A"},
+    {K_ಕೆಳಕ್ಕೆ,		"\033[B"},
+    {K_ಎಡ,		"\033[D"},
+    {K_ಬಲ,		"\033[C"},
+    {K_S_ಮೇಲೆ,		"\033[161q"},
+    {K_S_ಕೆಳಕ್ಕೆ,		"\033[164q"},
+    {K_S_ಎಡ,		"\033[158q"},
+    {K_S_ಬಲ,		"\033[167q"},
     {K_F1,		"\033[001q"},
     {K_F2,		"\033[002q"},
     {K_F3,		"\033[003q"},
@@ -836,11 +836,11 @@ static tcap_entry_T builtin_iris_ansi[] = {
     {K_S_F12,		"\033[024q"},
     {K_INS,		"\033[139q"},
     {K_HOME,		"\033[H"},
-    {K_END,		"\033[146q"},
+    {K_ಕೊನೆ,		"\033[146q"},
     {K_PAGEUP,		"\033[150q"},
     {K_PAGEDOWN,	"\033[154q"},
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ಪೂರ್ಣಾಂಕ)KS_NAME,	ಖಾಲಿ}  // end marker
 };
 
 /*
@@ -849,48 +849,48 @@ static tcap_entry_T builtin_iris_ansi[] = {
  * K_NUL '\316' in mch_inchar(), because we cannot handle NULs in key codes.
  * CTRL-arrow is used instead of SHIFT-arrow.
  */
-static tcap_entry_T builtin_pcansi[] = {
-    {(int)KS_DL,	"\033[M"},
-    {(int)KS_AL,	"\033[L"},
-    {(int)KS_CE,	"\033[K"},
-    {(int)KS_CL,	"\033[2J"},
-    {(int)KS_ME,	"\033[0m"},
-    {(int)KS_MR,	"\033[5m"},	// reverse: black on lightgrey
-    {(int)KS_MD,	"\033[1m"},	// bold: white text
-    {(int)KS_SE,	"\033[0m"},	// standout end
-    {(int)KS_SO,	"\033[31m"},	// standout: white on blue
-    {(int)KS_CZH,	"\033[34;43m"},	// italic mode: blue text on yellow
-    {(int)KS_CZR,	"\033[0m"},	// italic mode end
-    {(int)KS_US,	"\033[36;41m"},	// underscore mode: cyan text on red
-    {(int)KS_UE,	"\033[0m"},	// underscore mode end
-    {(int)KS_CCO,	"8"},		// allow 8 colors
-#ifdef TERMINFO
-    {(int)KS_CAB,	"\033[4%p1%dm"},// set background color
-    {(int)KS_CAF,	"\033[3%p1%dm"},// set foreground color
-#else
-    {(int)KS_CAB,	"\033[4%dm"},	// set background color
-    {(int)KS_CAF,	"\033[3%dm"},	// set foreground color
-#endif
-    {(int)KS_OP,	"\033[0m"},	// reset colors
-    {(int)KS_MS,	"y"},
-    {(int)KS_UT,	"y"},		// guessed
-    {(int)KS_LE,	"\b"},
-#ifdef TERMINFO
-    {(int)KS_CM,	"\033[%i%p1%d;%p2%dH"},
-#else
-    {(int)KS_CM,	"\033[%i%d;%dH"},
-#endif
-#ifdef TERMINFO
-    {(int)KS_CRI,	"\033[%p1%dC"},
-#else
-    {(int)KS_CRI,	"\033[%dC"},
-#endif
-    {K_UP,		"\316H"},
-    {K_DOWN,		"\316P"},
-    {K_LEFT,		"\316K"},
-    {K_RIGHT,		"\316M"},
-    {K_S_LEFT,		"\316s"},
-    {K_S_RIGHT,		"\316t"},
+ಸ್ಥಿರ tcap_ನಮೂದು_T builtin_pcansi[] = {
+    {(ಪೂರ್ಣಾಂಕ)KS_DL,	"\033[M"},
+    {(ಪೂರ್ಣಾಂಕ)KS_AL,	"\033[L"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CE,	"\033[K"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CL,	"\033[2J"},
+    {(ಪೂರ್ಣಾಂಕ)KS_ME,	"\033[0m"},
+    {(ಪೂರ್ಣಾಂಕ)KS_MR,	"\033[5m"},	// reverse: black on lightgrey
+    {(ಪೂರ್ಣಾಂಕ)KS_MD,	"\033[1m"},	// bold: white text
+    {(ಪೂರ್ಣಾಂಕ)KS_SE,	"\033[0m"},	// standout end
+    {(ಪೂರ್ಣಾಂಕ)KS_SO,	"\033[31m"},	// standout: white on blue
+    {(ಪೂರ್ಣಾಂಕ)KS_CZH,	"\033[34;43m"},	// italic mode: blue text on yellow
+    {(ಪೂರ್ಣಾಂಕ)KS_CZR,	"\033[0m"},	// italic mode end
+    {(ಪೂರ್ಣಾಂಕ)KS_US,	"\033[36;41m"},	// underscore mode: cyan text on red
+    {(ಪೂರ್ಣಾಂಕ)KS_UE,	"\033[0m"},	// underscore mode end
+    {(ಪೂರ್ಣಾಂಕ)KS_CCO,	"8"},		// allow 8 colors
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CAB,	"\033[4%p1%dm"},// set background color
+    {(ಪೂರ್ಣಾಂಕ)KS_CAF,	"\033[3%p1%dm"},// set foreground color
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CAB,	"\033[4%dm"},	// set background color
+    {(ಪೂರ್ಣಾಂಕ)KS_CAF,	"\033[3%dm"},	// set foreground color
+#ಆದರೆ_ಅಂತ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_OP,	"\033[0m"},	// reset colors
+    {(ಪೂರ್ಣಾಂಕ)KS_MS,	"y"},
+    {(ಪೂರ್ಣಾಂಕ)KS_UT,	"y"},		// guessed
+    {(ಪೂರ್ಣಾಂಕ)KS_LE,	"\b"},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CM,	"\033[%i%p1%d;%p2%dH"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CM,	"\033[%i%d;%dH"},
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CRI,	"\033[%p1%dC"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CRI,	"\033[%dC"},
+#ಆದರೆ_ಅಂತ್ಯ
+    {K_ಮೇಲೆ,		"\316H"},
+    {K_ಕೆಳಕ್ಕೆ,		"\316P"},
+    {K_ಎಡ,		"\316K"},
+    {K_ಬಲ,		"\316M"},
+    {K_S_ಎಡ,		"\316s"},
+    {K_S_ಬಲ,		"\316t"},
     {K_F1,		"\316;"},
     {K_F2,		"\316<"},
     {K_F3,		"\316="},
@@ -918,11 +918,11 @@ static tcap_entry_T builtin_pcansi[] = {
     {K_INS,		"\316R"},
     {K_DEL,		"\316S"},
     {K_HOME,		"\316G"},
-    {K_END,		"\316O"},
+    {K_ಕೊನೆ,		"\316O"},
     {K_PAGEDOWN,	"\316Q"},
     {K_PAGEUP,		"\316I"},
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ಪೂರ್ಣಾಂಕ)KS_NAME,	ಖಾಲಿ}  // end marker
 };
 
 /*
@@ -930,78 +930,78 @@ static tcap_entry_T builtin_pcansi[] = {
  * ESC | are translated into console calls in os_win32.c.  The function keys
  * are also translated in os_win32.c.
  */
-static tcap_entry_T builtin_win32[] = {
-    {(int)KS_CE,	"\033|K"},	// clear to end of line
-    {(int)KS_AL,	"\033|L"},	// add new blank line
-#ifdef TERMINFO
-    {(int)KS_CAL,	"\033|%p1%dL"},	// add number of new blank lines
-#else
-    {(int)KS_CAL,	"\033|%dL"},	// add number of new blank lines
-#endif
-    {(int)KS_DL,	"\033|M"},	// delete line
-#ifdef TERMINFO
-    {(int)KS_CDL,	"\033|%p1%dM"},	// delete number of lines
-    {(int)KS_CSV,	"\033|%p1%d;%p2%dV"},
-#else
-    {(int)KS_CDL,	"\033|%dM"},	// delete number of lines
-    {(int)KS_CSV,	"\033|%d;%dV"},
-#endif
-    {(int)KS_CL,	"\033|J"},	// clear screen
-    {(int)KS_CD,	"\033|j"},	// clear to end of display
-    {(int)KS_VI,	"\033|v"},	// cursor invisible
-    {(int)KS_VE,	"\033|V"},	// cursor visible
+ಸ್ಥಿರ tcap_ನಮೂದು_T builtin_win32[] = {
+    {(ಪೂರ್ಣಾಂಕ)KS_CE,	"\033|K"},	// clear to end of line
+    {(ಪೂರ್ಣಾಂಕ)KS_AL,	"\033|L"},	// add new blank line
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CAL,	"\033|%p1%dL"},	// add number of new blank lines
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CAL,	"\033|%dL"},	// add number of new blank lines
+#ಆದರೆ_ಅಂತ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_DL,	"\033|M"},	// delete line
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CDL,	"\033|%p1%dM"},	// delete number of lines
+    {(ಪೂರ್ಣಾಂಕ)KS_CSV,	"\033|%p1%d;%p2%dV"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CDL,	"\033|%dM"},	// delete number of lines
+    {(ಪೂರ್ಣಾಂಕ)KS_CSV,	"\033|%d;%dV"},
+#ಆದರೆ_ಅಂತ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_CL,	"\033|J"},	// clear screen
+    {(ಪೂರ್ಣಾಂಕ)KS_CD,	"\033|j"},	// clear to end of display
+    {(ಪೂರ್ಣಾಂಕ)KS_VI,	"\033|v"},	// cursor invisible
+    {(ಪೂರ್ಣಾಂಕ)KS_VE,	"\033|V"},	// cursor visible
 
-    {(int)KS_ME,	"\033|0m"},	// normal
-    {(int)KS_MR,	"\033|112m"},	// reverse: black on lightgray
-    {(int)KS_MD,	"\033|15m"},	// bold: white on black
-#if 1
-    {(int)KS_SO,	"\033|31m"},	// standout: white on blue
-    {(int)KS_SE,	"\033|0m"},	// standout end
-#else
-    {(int)KS_SO,	"\033|F"},	// standout: high intensity
-    {(int)KS_SE,	"\033|f"},	// standout end
-#endif
-    {(int)KS_CZH,	"\033|225m"},	// italic: blue text on yellow
-    {(int)KS_CZR,	"\033|0m"},	// italic end
-    {(int)KS_US,	"\033|67m"},	// underscore: cyan text on red
-    {(int)KS_UE,	"\033|0m"},	// underscore end
-    {(int)KS_CCO,	"16"},		// allow 16 colors
-#ifdef TERMINFO
-    {(int)KS_CAB,	"\033|%p1%db"},	// set background color
-    {(int)KS_CAF,	"\033|%p1%df"},	// set foreground color
-#else
-    {(int)KS_CAB,	"\033|%db"},	// set background color
-    {(int)KS_CAF,	"\033|%df"},	// set foreground color
-#endif
+    {(ಪೂರ್ಣಾಂಕ)KS_ME,	"\033|0m"},	//ಸಾಮಾನ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_MR,	"\033|112m"},	// reverse: black on lightgray
+    {(ಪೂರ್ಣಾಂಕ)KS_MD,	"\033|15m"},	// bold: white on black
+#ಆದರೆ 1
+    {(ಪೂರ್ಣಾಂಕ)KS_SO,	"\033|31m"},	// standout: white on blue
+    {(ಪೂರ್ಣಾಂಕ)KS_SE,	"\033|0m"},	// standout end
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_SO,	"\033|F"},	// standout: high intensity
+    {(ಪೂರ್ಣಾಂಕ)KS_SE,	"\033|f"},	// standout end
+#ಆದರೆ_ಅಂತ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_CZH,	"\033|225m"},	// italic: blue text on yellow
+    {(ಪೂರ್ಣಾಂಕ)KS_CZR,	"\033|0m"},	// italic end
+    {(ಪೂರ್ಣಾಂಕ)KS_US,	"\033|67m"},	// underscore: cyan text on red
+    {(ಪೂರ್ಣಾಂಕ)KS_UE,	"\033|0m"},	// underscore end
+    {(ಪೂರ್ಣಾಂಕ)KS_CCO,	"16"},		// allow 16 colors
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CAB,	"\033|%p1%db"},	// set background color
+    {(ಪೂರ್ಣಾಂಕ)KS_CAF,	"\033|%p1%df"},	// set foreground color
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CAB,	"\033|%db"},	// set background color
+    {(ಪೂರ್ಣಾಂಕ)KS_CAF,	"\033|%df"},	// set foreground color
+#ಆದರೆ_ಅಂತ್ಯ
 
-    {(int)KS_MS,	"y"},		// save to move cur in reverse mode
-    {(int)KS_UT,	"y"},
-    {(int)KS_XN,	"y"},
-    {(int)KS_LE,	"\b"},
-#ifdef TERMINFO
-    {(int)KS_CM,	"\033|%i%p1%d;%p2%dH"}, // cursor motion
-#else
-    {(int)KS_CM,	"\033|%i%d;%dH"}, // cursor motion
-#endif
-    {(int)KS_VB,	"\033|B"},	// visual bell
-    {(int)KS_TI,	"\033|S"},	// put terminal in termcap mode
-    {(int)KS_TE,	"\033|E"},	// out of termcap mode
-#ifdef TERMINFO
-    {(int)KS_CS,	"\033|%i%p1%d;%p2%dr"}, // scroll region
-#else
-    {(int)KS_CS,	"\033|%i%d;%dr"}, // scroll region
-#endif
+    {(ಪೂರ್ಣಾಂಕ)KS_MS,	"y"},		// save to move cur in reverse mode
+    {(ಪೂರ್ಣಾಂಕ)KS_UT,	"y"},
+    {(ಪೂರ್ಣಾಂಕ)KS_XN,	"y"},
+    {(ಪೂರ್ಣಾಂಕ)KS_LE,	"\b"},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CM,	"\033|%i%p1%d;%p2%dH"}, // cursor motion
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CM,	"\033|%i%d;%dH"}, // cursor motion
+#ಆದರೆ_ಅಂತ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_VB,	"\033|B"},	// visual bell
+    {(ಪೂರ್ಣಾಂಕ)KS_TI,	"\033|S"},	// put terminal in termcap mode
+    {(ಪೂರ್ಣಾಂಕ)KS_TE,	"\033|E"},	// out of termcap mode
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CS,	"\033|%i%p1%d;%p2%dr"}, // scroll region
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CS,	"\033|%i%d;%dr"}, // scroll region
+#ಆದರೆ_ಅಂತ್ಯ
 
-    {K_UP,		"\316H"},
-    {K_DOWN,		"\316P"},
-    {K_LEFT,		"\316K"},
-    {K_RIGHT,		"\316M"},
-    {K_S_UP,		"\316\304"},
-    {K_S_DOWN,		"\316\317"},
-    {K_S_LEFT,		"\316\311"},
-    {K_C_LEFT,		"\316s"},
-    {K_S_RIGHT,		"\316\313"},
-    {K_C_RIGHT,		"\316t"},
+    {K_ಮೇಲೆ,		"\316H"},
+    {K_ಕೆಳಕ್ಕೆ,		"\316P"},
+    {K_ಎಡ,		"\316K"},
+    {K_ಬಲ,		"\316M"},
+    {K_S_ಮೇಲೆ,		"\316\304"},
+    {K_S_ಕೆಳಕ್ಕೆ,		"\316\317"},
+    {K_S_ಎಡ,		"\316\311"},
+    {K_C_ಎಡ,		"\316s"},
+    {K_S_ಬಲ,		"\316\313"},
+    {K_C_ಬಲ,		"\316t"},
     {K_S_TAB,		"\316\017"},
     {K_F1,		"\316;"},
     {K_F2,		"\316<"},
@@ -1032,9 +1032,9 @@ static tcap_entry_T builtin_win32[] = {
     {K_HOME,		"\316G"},
     {K_S_HOME,		"\316\302"},
     {K_C_HOME,		"\316w"},
-    {K_END,		"\316O"},
-    {K_S_END,		"\316\315"},
-    {K_C_END,		"\316u"},
+    {K_ಕೊನೆ,		"\316O"},
+    {K_S_ಕೊನೆ,		"\316\315"},
+    {K_C_ಕೊನೆ,		"\316u"},
     {K_PAGEDOWN,	"\316Q"},
     {K_PAGEUP,		"\316I"},
     {K_KPLUS,		"\316N"},
@@ -1053,129 +1053,129 @@ static tcap_entry_T builtin_win32[] = {
     {K_BS,		"\316x"},
     {K_S_BS,		"\316y"},
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ಪೂರ್ಣಾಂಕ)KS_NAME,	ಖಾಲಿ}  // end marker
 };
 
-#if defined(FEAT_GUI)
+#ಆದರೆ defined(FEAT_GUI)
 /*
  * GUI uses made-up codes, only used inside Vim.
  */
-static tcap_entry_T builtin_gui[] = {
-    {(int)KS_CE,	"\033|$"},
-    {(int)KS_AL,	"\033|i"},
+ಸ್ಥಿರ tcap_ನಮೂದು_T builtin_gui[] = {
+    {(ಪೂರ್ಣಾಂಕ)KS_CE,	"\033|$"},
+    {(ಪೂರ್ಣಾಂಕ)KS_AL,	"\033|i"},
 # ifdef TERMINFO
-    {(int)KS_CAL,	"\033|%p1%dI"},
-# else
-    {(int)KS_CAL,	"\033|%dI"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CAL,	"\033|%p1%dI"},
+# ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CAL,	"\033|%dI"},
 # endif
-    {(int)KS_DL,	"\033|d"},
+    {(ಪೂರ್ಣಾಂಕ)KS_DL,	"\033|d"},
 # ifdef TERMINFO
-    {(int)KS_CDL,	"\033|%p1%dD"},
-    {(int)KS_CS,	"\033|%p1%d;%p2%dR"},
-    {(int)KS_CSV,	"\033|%p1%d;%p2%dV"},
-# else
-    {(int)KS_CDL,	"\033|%dD"},
-    {(int)KS_CS,	"\033|%d;%dR"},
-    {(int)KS_CSV,	"\033|%d;%dV"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CDL,	"\033|%p1%dD"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CS,	"\033|%p1%d;%p2%dR"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CSV,	"\033|%p1%d;%p2%dV"},
+# ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CDL,	"\033|%dD"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CS,	"\033|%d;%dR"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CSV,	"\033|%d;%dV"},
 # endif
-    {(int)KS_CL,	"\033|C"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CL,	"\033|C"},
 			// attributes switched on with 'h', off with * 'H'
-    {(int)KS_ME,	"\033|31H"}, // HL_ALL
-    {(int)KS_MR,	"\033|1h"},   // HL_INVERSE
-    {(int)KS_MD,	"\033|2h"},   // HL_BOLD
-    {(int)KS_SE,	"\033|16H"}, // HL_STANDOUT
-    {(int)KS_SO,	"\033|16h"}, // HL_STANDOUT
-    {(int)KS_UE,	"\033|8H"},   // HL_UNDERLINE
-    {(int)KS_US,	"\033|8h"},   // HL_UNDERLINE
-    {(int)KS_UCE,	"\033|8C"},   // HL_UNDERCURL
-    {(int)KS_UCS,	"\033|8c"},   // HL_UNDERCURL
-    {(int)KS_STE,	"\033|4C"},   // HL_STRIKETHROUGH
-    {(int)KS_STS,	"\033|4c"},   // HL_STRIKETHROUGH
-    {(int)KS_CZR,	"\033|4H"},   // HL_ITALIC
-    {(int)KS_CZH,	"\033|4h"},   // HL_ITALIC
-    {(int)KS_VB,	"\033|f"},
-    {(int)KS_MS,	"y"},
-    {(int)KS_UT,	"y"},
-    {(int)KS_XN,	"y"},
-    {(int)KS_LE,	"\b"},		// cursor-left = BS
-    {(int)KS_ND,	"\014"},	// cursor-right = CTRL-L
+    {(ಪೂರ್ಣಾಂಕ)KS_ME,	"\033|31H"}, // HL_ALL
+    {(ಪೂರ್ಣಾಂಕ)KS_MR,	"\033|1h"},   // HL_INVERSE
+    {(ಪೂರ್ಣಾಂಕ)KS_MD,	"\033|2h"},   // HL_BOLD
+    {(ಪೂರ್ಣಾಂಕ)KS_SE,	"\033|16H"}, // HL_STANDOUT
+    {(ಪೂರ್ಣಾಂಕ)KS_SO,	"\033|16h"}, // HL_STANDOUT
+    {(ಪೂರ್ಣಾಂಕ)KS_UE,	"\033|8H"},   // HL_UNDERLINE
+    {(ಪೂರ್ಣಾಂಕ)KS_US,	"\033|8h"},   // HL_UNDERLINE
+    {(ಪೂರ್ಣಾಂಕ)KS_UCE,	"\033|8C"},   // HL_UNDERCURL
+    {(ಪೂರ್ಣಾಂಕ)KS_UCS,	"\033|8c"},   // HL_UNDERCURL
+    {(ಪೂರ್ಣಾಂಕ)KS_STE,	"\033|4C"},   // HL_STRIKETHROUGH
+    {(ಪೂರ್ಣಾಂಕ)KS_STS,	"\033|4c"},   // HL_STRIKETHROUGH
+    {(ಪೂರ್ಣಾಂಕ)KS_CZR,	"\033|4H"},   // HL_ITALIC
+    {(ಪೂರ್ಣಾಂಕ)KS_CZH,	"\033|4h"},   // HL_ITALIC
+    {(ಪೂರ್ಣಾಂಕ)KS_VB,	"\033|f"},
+    {(ಪೂರ್ಣಾಂಕ)KS_MS,	"y"},
+    {(ಪೂರ್ಣಾಂಕ)KS_UT,	"y"},
+    {(ಪೂರ್ಣಾಂಕ)KS_XN,	"y"},
+    {(ಪೂರ್ಣಾಂಕ)KS_LE,	"\b"},		// cursor-left = BS
+    {(ಪೂರ್ಣಾಂಕ)KS_ND,	"\014"},	// cursor-right = CTRL-L
 # ifdef TERMINFO
-    {(int)KS_CM,	"\033|%p1%d;%p2%dM"},
-# else
-    {(int)KS_CM,	"\033|%d;%dM"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CM,	"\033|%p1%d;%p2%dM"},
+# ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CM,	"\033|%d;%dM"},
 # endif
 	// there are no key sequences here, the GUI sequences are recognized
 	// in check_termcode()
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ಪೂರ್ಣಾಂಕ)KS_NAME,	ಖಾಲಿ}  // end marker
 };
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Amiga console window, default for Amiga.
  */
-static tcap_entry_T builtin_amiga[] = {
-    {(int)KS_CE,	"\033[K"},
-    {(int)KS_CD,	"\033[J"},
-    {(int)KS_AL,	"\033[L"},
-#ifdef TERMINFO
-    {(int)KS_CAL,	"\033[%p1%dL"},
-#else
-    {(int)KS_CAL,	"\033[%dL"},
-#endif
-    {(int)KS_DL,	"\033[M"},
-#ifdef TERMINFO
-    {(int)KS_CDL,	"\033[%p1%dM"},
-#else
-    {(int)KS_CDL,	"\033[%dM"},
-#endif
-    {(int)KS_CL,	"\014"},
-    {(int)KS_VI,	"\033[0 p"},
-    {(int)KS_VE,	"\033[1 p"},
-    {(int)KS_ME,	"\033[0m"},
-    {(int)KS_MR,	"\033[7m"},
-    {(int)KS_MD,	"\033[1m"},
-    {(int)KS_SE,	"\033[0m"},
-    {(int)KS_SO,	"\033[33m"},
-    {(int)KS_US,	"\033[4m"},
-    {(int)KS_UE,	"\033[0m"},
-    {(int)KS_CZH,	"\033[3m"},
-    {(int)KS_CZR,	"\033[0m"},
-#if defined(__amigaos4__) || defined(__MORPHOS__) || defined(__AROS__)
-    {(int)KS_CCO,	"8"},		// allow 8 colors
+ಸ್ಥಿರ tcap_ನಮೂದು_T builtin_amiga[] = {
+    {(ಪೂರ್ಣಾಂಕ)KS_CE,	"\033[K"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CD,	"\033[J"},
+    {(ಪೂರ್ಣಾಂಕ)KS_AL,	"\033[L"},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CAL,	"\033[%p1%dL"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CAL,	"\033[%dL"},
+#ಆದರೆ_ಅಂತ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_DL,	"\033[M"},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CDL,	"\033[%p1%dM"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CDL,	"\033[%dM"},
+#ಆದರೆ_ಅಂತ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_CL,	"\014"},
+    {(ಪೂರ್ಣಾಂಕ)KS_VI,	"\033[0 p"},
+    {(ಪೂರ್ಣಾಂಕ)KS_VE,	"\033[1 p"},
+    {(ಪೂರ್ಣಾಂಕ)KS_ME,	"\033[0m"},
+    {(ಪೂರ್ಣಾಂಕ)KS_MR,	"\033[7m"},
+    {(ಪೂರ್ಣಾಂಕ)KS_MD,	"\033[1m"},
+    {(ಪೂರ್ಣಾಂಕ)KS_SE,	"\033[0m"},
+    {(ಪೂರ್ಣಾಂಕ)KS_SO,	"\033[33m"},
+    {(ಪೂರ್ಣಾಂಕ)KS_US,	"\033[4m"},
+    {(ಪೂರ್ಣಾಂಕ)KS_UE,	"\033[0m"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CZH,	"\033[3m"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CZR,	"\033[0m"},
+#ಆದರೆ defined(__amigaos4__) || defined(__MORPHOS__) || defined(__AROS__)
+    {(ಪೂರ್ಣಾಂಕ)KS_CCO,	"8"},		// allow 8 colors
 # ifdef TERMINFO
-    {(int)KS_CAB,	"\033[4%p1%dm"},// set background color
-    {(int)KS_CAF,	"\033[3%p1%dm"},// set foreground color
-# else
-    {(int)KS_CAB,	"\033[4%dm"},	// set background color
-    {(int)KS_CAF,	"\033[3%dm"},	// set foreground color
+    {(ಪೂರ್ಣಾಂಕ)KS_CAB,	"\033[4%p1%dm"},// set background color
+    {(ಪೂರ್ಣಾಂಕ)KS_CAF,	"\033[3%p1%dm"},// set foreground color
+# ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CAB,	"\033[4%dm"},	// set background color
+    {(ಪೂರ್ಣಾಂಕ)KS_CAF,	"\033[3%dm"},	// set foreground color
 # endif
-    {(int)KS_OP,	"\033[m"},	// reset colors
-#endif
-    {(int)KS_MS,	"y"},
-    {(int)KS_UT,	"y"},		// guessed
-    {(int)KS_LE,	"\b"},
-#ifdef TERMINFO
-    {(int)KS_CM,	"\033[%i%p1%d;%p2%dH"},
-#else
-    {(int)KS_CM,	"\033[%i%d;%dH"},
-#endif
-#if defined(__MORPHOS__)
-    {(int)KS_SR,	"\033M"},
-#endif
-#ifdef TERMINFO
-    {(int)KS_CRI,	"\033[%p1%dC"},
-#else
-    {(int)KS_CRI,	"\033[%dC"},
-#endif
-    {K_UP,		"\233A"},
-    {K_DOWN,		"\233B"},
-    {K_LEFT,		"\233D"},
-    {K_RIGHT,		"\233C"},
-    {K_S_UP,		"\233T"},
-    {K_S_DOWN,		"\233S"},
-    {K_S_LEFT,		"\233 A"},
-    {K_S_RIGHT,		"\233 @"},
+    {(ಪೂರ್ಣಾಂಕ)KS_OP,	"\033[m"},	// reset colors
+#ಆದರೆ_ಅಂತ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_MS,	"y"},
+    {(ಪೂರ್ಣಾಂಕ)KS_UT,	"y"},		// guessed
+    {(ಪೂರ್ಣಾಂಕ)KS_LE,	"\b"},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CM,	"\033[%i%p1%d;%p2%dH"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CM,	"\033[%i%d;%dH"},
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(__MORPHOS__)
+    {(ಪೂರ್ಣಾಂಕ)KS_SR,	"\033M"},
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CRI,	"\033[%p1%dC"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CRI,	"\033[%dC"},
+#ಆದರೆ_ಅಂತ್ಯ
+    {K_ಮೇಲೆ,		"\233A"},
+    {K_ಕೆಳಕ್ಕೆ,		"\233B"},
+    {K_ಎಡ,		"\233D"},
+    {K_ಬಲ,		"\233C"},
+    {K_S_ಮೇಲೆ,		"\233T"},
+    {K_S_ಕೆಳಕ್ಕೆ,		"\233S"},
+    {K_S_ಎಡ,		"\233 A"},
+    {K_S_ಬಲ,		"\233 @"},
     {K_S_TAB,		"\233Z"},
     {K_F1,		"\233\060~"},// some compilers don't dig "\2330"
     {K_F2,		"\233\061~"},
@@ -1202,143 +1202,143 @@ static tcap_entry_T builtin_amiga[] = {
     {K_PAGEUP,		"\233\064\061~"},	// 101 key keyboard
     {K_PAGEDOWN,	"\233\064\062~"},	// 101 key keyboard
     {K_HOME,		"\233\064\064~"},	// 101 key keyboard
-    {K_END,		"\233\064\065~"},	// 101 key keyboard
+    {K_ಕೊನೆ,		"\233\064\065~"},	// 101 key keyboard
 
-    {BT_EXTRA_KEYS,	""},
-    {TERMCAP2KEY('#', '2'), "\233\065\064~"},	// shifted home key
-    {TERMCAP2KEY('#', '3'), "\233\065\060~"},	// shifted insert key
-    {TERMCAP2KEY('*', '7'), "\233\065\065~"},	// shifted end key
+    {BT_EXTRA_ಕೀಲಿಗಳು,	""},
+    {TERMCAP2_ಕೀಲಿ('#', '2'), "\233\065\064~"},	// shifted home key
+    {TERMCAP2_ಕೀಲಿ('#', '3'), "\233\065\060~"},	// shifted insert key
+    {TERMCAP2_ಕೀಲಿ('*', '7'), "\233\065\065~"},	// shifted end key
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ಪೂರ್ಣಾಂಕ)KS_NAME,	ಖಾಲಿ}  // end marker
 };
 
 /*
  * The most minimal terminal: only clear screen and cursor positioning.
  */
-static tcap_entry_T builtin_dumb[] = {
-    {(int)KS_CL,	"\014"},
-#ifdef TERMINFO
-    {(int)KS_CM,	"\033[%i%p1%d;%p2%dH"},
-#else
-    {(int)KS_CM,	"\033[%i%d;%dH"},
-#endif
+ಸ್ಥಿರ tcap_ನಮೂದು_T builtin_dumb[] = {
+    {(ಪೂರ್ಣಾಂಕ)KS_CL,	"\014"},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CM,	"\033[%i%p1%d;%p2%dH"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CM,	"\033[%i%d;%dH"},
+#ಆದರೆ_ಅಂತ್ಯ
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ಪೂರ್ಣಾಂಕ)KS_NAME,	ಖಾಲಿ}  // end marker
 };
 
 /*
  * Terminal used for debugging.
  */
-static tcap_entry_T builtin_debug[] = {
-    {(int)KS_CE,	"[CE]"},
-    {(int)KS_CD,	"[CD]"},
-    {(int)KS_AL,	"[AL]"},
-#ifdef TERMINFO
-    {(int)KS_CAL,	"[CAL%p1%d]"},
-#else
-    {(int)KS_CAL,	"[CAL%d]"},
-#endif
-    {(int)KS_DL,	"[DL]"},
-#ifdef TERMINFO
-    {(int)KS_CDL,	"[CDL%p1%d]"},
-#else
-    {(int)KS_CDL,	"[CDL%d]"},
-#endif
-#ifdef TERMINFO
-    {(int)KS_CS,	"[%p1%dCS%p2%d]"},
-#else
-    {(int)KS_CS,	"[%dCS%d]"},
-#endif
-#ifdef TERMINFO
-    {(int)KS_CSV,	"[%p1%dCSV%p2%d]"},
-#else
-    {(int)KS_CSV,	"[%dCSV%d]"},
-#endif
-#ifdef TERMINFO
-    {(int)KS_CAB,	"[CAB%p1%d]"},
-    {(int)KS_CAF,	"[CAF%p1%d]"},
-    {(int)KS_CSB,	"[CSB%p1%d]"},
-    {(int)KS_CSF,	"[CSF%p1%d]"},
-#else
-    {(int)KS_CAB,	"[CAB%d]"},
-    {(int)KS_CAF,	"[CAF%d]"},
-    {(int)KS_CSB,	"[CSB%d]"},
-    {(int)KS_CSF,	"[CSF%d]"},
-#endif
-    {(int)KS_CAU,	"[CAU%d]"},
-    {(int)KS_OP,	"[OP]"},
-    {(int)KS_LE,	"[LE]"},
-    {(int)KS_CL,	"[CL]"},
-    {(int)KS_VI,	"[VI]"},
-    {(int)KS_VE,	"[VE]"},
-    {(int)KS_VS,	"[VS]"},
-    {(int)KS_ME,	"[ME]"},
-    {(int)KS_MR,	"[MR]"},
-    {(int)KS_MB,	"[MB]"},
-    {(int)KS_MD,	"[MD]"},
-    {(int)KS_SE,	"[SE]"},
-    {(int)KS_SO,	"[SO]"},
-    {(int)KS_UE,	"[UE]"},
-    {(int)KS_US,	"[US]"},
-    {(int)KS_UCE,	"[UCE]"},
-    {(int)KS_UCS,	"[UCS]"},
-    {(int)KS_USS,	"[USS]"},
-    {(int)KS_DS,	"[DS]"},
-    {(int)KS_CDS,	"[CDS]"},
-    {(int)KS_STE,	"[STE]"},
-    {(int)KS_STS,	"[STS]"},
-    {(int)KS_MS,	"[MS]"},
-    {(int)KS_UT,	"[UT]"},
-    {(int)KS_XN,	"[XN]"},
-#ifdef TERMINFO
-    {(int)KS_CM,	"[%p1%dCM%p2%d]"},
-#else
-    {(int)KS_CM,	"[%dCM%d]"},
-#endif
-    {(int)KS_SR,	"[SR]"},
-#ifdef TERMINFO
-    {(int)KS_CRI,	"[CRI%p1%d]"},
-#else
-    {(int)KS_CRI,	"[CRI%d]"},
-#endif
-    {(int)KS_VB,	"[VB]"},
-    {(int)KS_KS,	"[KS]"},
-    {(int)KS_KE,	"[KE]"},
-    {(int)KS_TI,	"[TI]"},
-    {(int)KS_TE,	"[TE]"},
-    {(int)KS_CIS,	"[CIS]"},
-    {(int)KS_CIE,	"[CIE]"},
-    {(int)KS_CSC,	"[CSC]"},
-    {(int)KS_CEC,	"[CEC]"},
-    {(int)KS_TS,	"[TS]"},
-    {(int)KS_FS,	"[FS]"},
-#ifdef TERMINFO
-    {(int)KS_CWS,	"[%p1%dCWS%p2%d]"},
-    {(int)KS_CWP,	"[%p1%dCWP%p2%d]"},
-#else
-    {(int)KS_CWS,	"[%dCWS%d]"},
-    {(int)KS_CWP,	"[%dCWP%d]"},
-#endif
-    {(int)KS_CRV,	"[CRV]"},
-    {(int)KS_CXM,	"[CXM]"},
-    {(int)KS_U7,	"[U7]"},
-    {(int)KS_RFG,	"[RFG]"},
-    {(int)KS_RBG,	"[RBG]"},
-    {(int)KS_CF,	"[CF%d]"},
-    {K_UP,		"[KU]"},
-    {K_DOWN,		"[KD]"},
-    {K_LEFT,		"[KL]"},
-    {K_RIGHT,		"[KR]"},
+ಸ್ಥಿರ tcap_ನಮೂದು_T builtin_debug[] = {
+    {(ಪೂರ್ಣಾಂಕ)KS_CE,	"[CE]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CD,	"[CD]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_AL,	"[AL]"},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CAL,	"[CAL%p1%d]"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CAL,	"[CAL%d]"},
+#ಆದರೆ_ಅಂತ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_DL,	"[DL]"},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CDL,	"[CDL%p1%d]"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CDL,	"[CDL%d]"},
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CS,	"[%p1%dCS%p2%d]"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CS,	"[%dCS%d]"},
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CSV,	"[%p1%dCSV%p2%d]"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CSV,	"[%dCSV%d]"},
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CAB,	"[CAB%p1%d]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CAF,	"[CAF%p1%d]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CSB,	"[CSB%p1%d]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CSF,	"[CSF%p1%d]"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CAB,	"[CAB%d]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CAF,	"[CAF%d]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CSB,	"[CSB%d]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CSF,	"[CSF%d]"},
+#ಆದರೆ_ಅಂತ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_CAU,	"[CAU%d]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_OP,	"[OP]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_LE,	"[LE]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CL,	"[CL]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_VI,	"[VI]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_VE,	"[VE]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_VS,	"[VS]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_ME,	"[ME]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_MR,	"[MR]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_MB,	"[MB]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_MD,	"[MD]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_SE,	"[SE]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_SO,	"[SO]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_UE,	"[UE]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_US,	"[US]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_UCE,	"[UCE]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_UCS,	"[UCS]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_USS,	"[USS]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_DS,	"[DS]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CDS,	"[CDS]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_STE,	"[STE]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_STS,	"[STS]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_MS,	"[MS]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_UT,	"[UT]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_XN,	"[XN]"},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CM,	"[%p1%dCM%p2%d]"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CM,	"[%dCM%d]"},
+#ಆದರೆ_ಅಂತ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_SR,	"[SR]"},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CRI,	"[CRI%p1%d]"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CRI,	"[CRI%d]"},
+#ಆದರೆ_ಅಂತ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_VB,	"[VB]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_KS,	"[KS]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_KE,	"[KE]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_TI,	"[TI]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_TE,	"[TE]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CIS,	"[CIS]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CIE,	"[CIE]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CSC,	"[CSC]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CEC,	"[CEC]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_TS,	"[TS]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_FS,	"[FS]"},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+    {(ಪೂರ್ಣಾಂಕ)KS_CWS,	"[%p1%dCWS%p2%d]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CWP,	"[%p1%dCWP%p2%d]"},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CWS,	"[%dCWS%d]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CWP,	"[%dCWP%d]"},
+#ಆದರೆ_ಅಂತ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_CRV,	"[CRV]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CXM,	"[CXM]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_U7,	"[U7]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_RFG,	"[RFG]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_RBG,	"[RBG]"},
+    {(ಪೂರ್ಣಾಂಕ)KS_CF,	"[CF%d]"},
+    {K_ಮೇಲೆ,		"[KU]"},
+    {K_ಕೆಳಕ್ಕೆ,		"[KD]"},
+    {K_ಎಡ,		"[KL]"},
+    {K_ಬಲ,		"[KR]"},
     {K_XUP,		"[xKU]"},
     {K_XDOWN,		"[xKD]"},
     {K_XLEFT,		"[xKL]"},
     {K_XRIGHT,		"[xKR]"},
-    {K_S_UP,		"[S-KU]"},
-    {K_S_DOWN,		"[S-KD]"},
-    {K_S_LEFT,		"[S-KL]"},
-    {K_C_LEFT,		"[C-KL]"},
-    {K_S_RIGHT,		"[S-KR]"},
-    {K_C_RIGHT,		"[C-KR]"},
+    {K_S_ಮೇಲೆ,		"[S-KU]"},
+    {K_S_ಕೆಳಕ್ಕೆ,		"[S-KD]"},
+    {K_S_ಎಡ,		"[S-KL]"},
+    {K_C_ಎಡ,		"[C-KL]"},
+    {K_S_ಬಲ,		"[S-KR]"},
+    {K_C_ಬಲ,		"[C-KR]"},
     {K_F1,		"[F1]"},
     {K_XF1,		"[xF1]"},
     {K_F2,		"[F2]"},
@@ -1384,9 +1384,9 @@ static tcap_entry_T builtin_debug[] = {
     {K_KHOME,		"[KHOME]"},
     {K_XHOME,		"[XHOME]"},
     {K_ZHOME,		"[ZHOME]"},
-    {K_END,		"[END]"},
-    {K_S_END,		"[C-END]"},
-    {K_C_END,		"[C-END]"},
+    {K_ಕೊನೆ,		"[END]"},
+    {K_S_ಕೊನೆ,		"[C-END]"},
+    {K_C_ಕೊನೆ,		"[C-END]"},
     {K_KEND,		"[KEND]"},
     {K_XEND,		"[XEND]"},
     {K_ZEND,		"[ZEND]"},
@@ -1414,15 +1414,15 @@ static tcap_entry_T builtin_debug[] = {
     {K_K8,		"[K8]"},
     {K_K9,		"[K9]"},
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ಪೂರ್ಣಾಂಕ)KS_NAME,	ಖಾಲಿ}  // end marker
 };
 
 /*
  * List of builtin terminals.
  */
-typedef struct {
-    char	    *bitc_name;	    // name, such as "xterm"
-    tcap_entry_T    *bitc_table;    // table with entries for bitc_name
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+    ಅಕ್ಷರ	    *bitc_name;	    // name, such as "xterm"
+    tcap_ನಮೂದು_T    *bitc_ಕೋಷ್ಟಕ;    // table with entries for bitc_name
 } builtin_tcap_T;
 
 builtin_tcap_T builtin_terminals[] = {
@@ -1438,21 +1438,21 @@ builtin_tcap_T builtin_terminals[] = {
     {"win32",	    builtin_win32},
 
     // Other systems
-#if defined(FEAT_GUI)
+#ಆದರೆ defined(FEAT_GUI)
     {"gui",	    builtin_gui},
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     {"amiga",	    builtin_amiga},
     {"dumb",	    builtin_dumb},
     {"debug",	    builtin_debug},
 
-    {NULL,	    NULL},  // end marker
+    {ಖಾಲಿ,	    ಖಾಲಿ},  // end marker
 };
 
-#if defined(FEAT_TERMGUICOLORS)
-    static guicolor_T
+#ಆದರೆ defined(FEAT_TERMGUICOLORS)
+    ಸ್ಥಿರ guicolor_T
 termgui_mch_get_color(char_u *name)
 {
-    return gui_get_color_cmn(name);
+    ಹಿಂತಿರುಗಿ gui_get_color_cmn(name);
 }
 
     guicolor_T
@@ -1460,62 +1460,62 @@ termgui_get_color(char_u *name)
 {
     guicolor_T	t;
 
-    if (*name == NUL)
-	return INVALCOLOR;
+    ಆದರೆ (*name == NUL)
+	ಹಿಂತಿರುಗಿ INVALCOLOR;
     t = termgui_mch_get_color(name);
 
-    if (t == INVALCOLOR)
+    ಆದರೆ (t == INVALCOLOR)
 	semsg(_(e_cannot_allocate_color_str), name);
-    return t;
+    ಹಿಂತಿರುಗಿ t;
 }
 
     guicolor_T
 termgui_mch_get_rgb(guicolor_T color)
 {
-    return color;
+    ಹಿಂತಿರುಗಿ color;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * DEFAULT_TERM is used, when no terminal is specified with -T option or $TERM.
  */
-#ifdef AMIGA
-# define DEFAULT_TERM	(char_u *)"amiga"
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ AMIGA
+# define DEFAULT_ಪದ	(char_u *)"amiga"
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef MSWIN
-# define DEFAULT_TERM	(char_u *)"win32"
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
+# define DEFAULT_ಪದ	(char_u *)"win32"
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(UNIX)
-# define DEFAULT_TERM	(char_u *)"ansi"
-#endif
+#ಆದರೆ defined(UNIX)
+# define DEFAULT_ಪದ	(char_u *)"ansi"
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef VMS
-# define DEFAULT_TERM	(char_u *)"vt320"
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VMS
+# define DEFAULT_ಪದ	(char_u *)"vt320"
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef __HAIKU__
-# undef DEFAULT_TERM
-# define DEFAULT_TERM	(char_u *)"xterm"
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ __HAIKU__
+# undef DEFAULT_ಪದ
+# define DEFAULT_ಪದ	(char_u *)"xterm"
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifndef DEFAULT_TERM
-# define DEFAULT_TERM	(char_u *)"dumb"
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ DEFAULT_ಪದ
+# define DEFAULT_ಪದ	(char_u *)"dumb"
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Term_strings contains currently used terminal output strings.
  * It is initialized with the default values by parse_builtin_tcap().
  * The values can be changed by setting the option with the same name.
  */
-char_u *(term_strings[(int)KS_LAST + 1]);
+char_u *(ಪದ_ಅಕ್ಷರಸರಣಿಗಳು[(ಪೂರ್ಣಾಂಕ)KS_ಕೊನೆಯ + 1]);
 
-static int	need_gather = FALSE;	    // need to fill termleader[]
-static char_u	termleader[256 + 1];	    // for check_termcode()
-#ifdef FEAT_TERMRESPONSE
-static int	check_for_codes = FALSE;    // check for key code response
-#endif
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	need_gather = FALSE;	    // need to fill termleader[]
+ಸ್ಥಿರ char_u	termleader[256 + 1];	    // for check_termcode()
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMRESPONSE
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	check_for_codes = FALSE;    // check for key code response
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Structure and table to store terminal features that can be detected by
@@ -1523,47 +1523,47 @@ static int	check_for_codes = FALSE;    // check for key code response
  * specific request.  Besides this there are:
  * t_colors - number of colors supported
  */
-typedef struct {
-    char    *tpr_name;
-    int	    tpr_set_by_termresponse;
-    int	    tpr_status;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+    ಅಕ್ಷರ    *tpr_name;
+    ಪೂರ್ಣಾಂಕ	    tpr_ಗಣ_by_termresponse;
+    ಪೂರ್ಣಾಂಕ	    tpr_ಸ್ಥಿತಿ;
 } termprop_T;
 
 // Values for tpr_status.
-#define TPR_UNKNOWN	    'u'
-#define TPR_YES		    'y'
-#define TPR_NO		    'n'
-#define TPR_MOUSE_XTERM     'x'	// use "xterm" for 'ttymouse'
-#define TPR_MOUSE_XTERM2    '2'	// use "xterm2" for 'ttymouse'
-#define TPR_MOUSE_SGR	    's'	// use "sgr" for 'ttymouse'
+#ವ್ಯಾಖ್ಯಾನಿಸು TPR_UNKNOWN	    'u'
+#ವ್ಯಾಖ್ಯಾನಿಸು TPR_YES		    'y'
+#ವ್ಯಾಖ್ಯಾನಿಸು TPR_NO		    'n'
+#ವ್ಯಾಖ್ಯಾನಿಸು TPR_MOUSE_XTERM     'x'	// use "xterm" for 'ttymouse'
+#ವ್ಯಾಖ್ಯಾನಿಸು TPR_MOUSE_XTERM2    '2'	// use "xterm2" for 'ttymouse'
+#ವ್ಯಾಖ್ಯಾನಿಸು TPR_MOUSE_SGR	    's'	// use "sgr" for 'ttymouse'
 
 // can request the cursor style without messing up the display
-#define TPR_CURSOR_STYLE	    0
+#ವ್ಯಾಖ್ಯಾನಿಸು TPR_CURSOR_STYLE	    0
 // can request the cursor blink mode without messing up the display
-#define TPR_CURSOR_BLINK	    1
+#ವ್ಯಾಖ್ಯಾನಿಸು TPR_CURSOR_BLINK	    1
 // can set the underline color with t_8u without resetting other colors
-#define TPR_UNDERLINE_RGB	    2
+#ವ್ಯಾಖ್ಯಾನಿಸು TPR_UNDERLINE_RGB	    2
 // mouse support - TPR_MOUSE_XTERM, TPR_MOUSE_XTERM2 or TPR_MOUSE_SGR
-#define TPR_MOUSE		    3
+#ವ್ಯಾಖ್ಯಾನಿಸು TPR_MOUSE		    3
 // term response indicates kitty
-#define TPR_KITTY		    4
+#ವ್ಯಾಖ್ಯಾನಿಸು TPR_KITTY		    4
 // can send DECRQM requests to terminal
-#define TPR_DECRQM		    5
+#ವ್ಯಾಖ್ಯಾನಿಸು TPR_DECRQM		    5
 // true color, from the color count of the terminal entry
-#define TPR_RGB			    6
+#ವ್ಯಾಖ್ಯಾನಿಸು TPR_RGB			    6
 // table size
-#define TPR_COUNT		    7
+#ವ್ಯಾಖ್ಯಾನಿಸು TPR_ಎಣಿಕೆ		    7
 
-static termprop_T term_props[TPR_COUNT];
+ಸ್ಥಿರ termprop_T ಪದ_props[TPR_ಎಣಿಕೆ];
 
 /*
  * Set the "rgb" terminal property from the color count.  The entry of a
  * direct color terminal, such as xterm-direct, has 16777216 colors.
  */
-    static void
-set_rgb_term_prop(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_rgb_ಪದ_prop(ಶೂನ್ಯ)
 {
-    term_props[TPR_RGB].tpr_status = t_colors == 0x1000000
+    ಪದ_props[TPR_RGB].tpr_ಸ್ಥಿತಿ = t_colors == 0x1000000
 						       ? TPR_YES : TPR_UNKNOWN;
 }
 
@@ -1572,57 +1572,57 @@ set_rgb_term_prop(void)
  * When "all" is FALSE only set those that are detected from the version
  * response.
  */
-    void
-init_term_props(int all)
+    ಶೂನ್ಯ
+init_ಪದ_props(ಪೂರ್ಣಾಂಕ all)
 {
-    int i;
+    ಪೂರ್ಣಾಂಕ i;
 
-    term_props[TPR_CURSOR_STYLE].tpr_name = "cursor_style";
-    term_props[TPR_CURSOR_STYLE].tpr_set_by_termresponse = FALSE;
-    term_props[TPR_CURSOR_BLINK].tpr_name = "cursor_blink_mode";
-    term_props[TPR_CURSOR_BLINK].tpr_set_by_termresponse = FALSE;
-    term_props[TPR_UNDERLINE_RGB].tpr_name = "underline_rgb";
-    term_props[TPR_UNDERLINE_RGB].tpr_set_by_termresponse = TRUE;
-    term_props[TPR_MOUSE].tpr_name = "mouse";
-    term_props[TPR_MOUSE].tpr_set_by_termresponse = TRUE;
-    term_props[TPR_KITTY].tpr_name = "kitty";
-    term_props[TPR_KITTY].tpr_set_by_termresponse = FALSE;
-    term_props[TPR_DECRQM].tpr_name = "decrqm";
-    term_props[TPR_DECRQM].tpr_set_by_termresponse = TRUE;
-    term_props[TPR_RGB].tpr_name = "rgb";
-    term_props[TPR_RGB].tpr_set_by_termresponse = FALSE;
+    ಪದ_props[TPR_CURSOR_STYLE].tpr_name = "cursor_style";
+    ಪದ_props[TPR_CURSOR_STYLE].tpr_ಗಣ_by_termresponse = FALSE;
+    ಪದ_props[TPR_CURSOR_BLINK].tpr_name = "cursor_blink_mode";
+    ಪದ_props[TPR_CURSOR_BLINK].tpr_ಗಣ_by_termresponse = FALSE;
+    ಪದ_props[TPR_UNDERLINE_RGB].tpr_name = "underline_rgb";
+    ಪದ_props[TPR_UNDERLINE_RGB].tpr_ಗಣ_by_termresponse = TRUE;
+    ಪದ_props[TPR_MOUSE].tpr_name = "mouse";
+    ಪದ_props[TPR_MOUSE].tpr_ಗಣ_by_termresponse = TRUE;
+    ಪದ_props[TPR_KITTY].tpr_name = "kitty";
+    ಪದ_props[TPR_KITTY].tpr_ಗಣ_by_termresponse = FALSE;
+    ಪದ_props[TPR_DECRQM].tpr_name = "decrqm";
+    ಪದ_props[TPR_DECRQM].tpr_ಗಣ_by_termresponse = TRUE;
+    ಪದ_props[TPR_RGB].tpr_name = "rgb";
+    ಪದ_props[TPR_RGB].tpr_ಗಣ_by_termresponse = FALSE;
 
-    for (i = 0; i < TPR_COUNT; ++i)
-	if (all || term_props[i].tpr_set_by_termresponse)
-	    term_props[i].tpr_status = TPR_UNKNOWN;
+    ಗಾಗಿ (i = 0; i < TPR_ಎಣಿಕೆ; ++i)
+	ಆದರೆ (all || ಪದ_props[i].tpr_ಗಣ_by_termresponse)
+	    ಪದ_props[i].tpr_ಸ್ಥಿತಿ = TPR_UNKNOWN;
 
     // Derived from the color count, not reset.
-    set_rgb_term_prop();
+    ಗಣ_rgb_ಪದ_prop();
 }
 
-#if defined(FEAT_EVAL)
-    void
-f_terminalprops(typval_T *argvars UNUSED, typval_T *rettv)
+#ಆದರೆ defined(FEAT_EVAL)
+    ಶೂನ್ಯ
+f_terminalprops(typval_T *argvars ಬಳಸದ, typval_T *rettv)
 {
 # ifdef FEAT_TERMRESPONSE
-    int i;
+    ಪೂರ್ಣಾಂಕ i;
 # endif
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    ಆದರೆ (rettv_dict_alloc(rettv) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 # ifdef FEAT_TERMRESPONSE
-    for (i = 0; i < TPR_COUNT; ++i)
+    ಗಾಗಿ (i = 0; i < TPR_ಎಣಿಕೆ; ++i)
     {
-	char_u	value[2];
+	char_u	ಮೌಲ್ಯ[2];
 
-	value[0] = term_props[i].tpr_status;
-	value[1] = NUL;
-	dict_add_string_len(rettv->vval.v_dict, term_props[i].tpr_name,
-	    value, (value[0] == NUL) ? 0 : 1);
+	ಮೌಲ್ಯ[0] = ಪದ_props[i].tpr_ಸ್ಥಿತಿ;
+	ಮೌಲ್ಯ[1] = NUL;
+	dict_ಕೂಡಿಸು_string_len(rettv->vval.v_dict, ಪದ_props[i].tpr_name,
+	    ಮೌಲ್ಯ, (ಮೌಲ್ಯ[0] == NUL) ? 0 : 1);
     }
 # endif
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Find the builtin termcap entries for "term".
@@ -1630,92 +1630,92 @@ f_terminalprops(typval_T *argvars UNUSED, typval_T *rettv)
  * entry.
  * Returns NULL when "term" is not found.
  */
-    static tcap_entry_T *
-find_builtin_term(char_u *term)
+    ಸ್ಥಿರ tcap_ನಮೂದು_T *
+ಕಂಡುಹಿಡಿ_builtin_ಪದ(char_u *ಪದ)
 {
-    for (int i = 0; ; ++i)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; ; ++i)
     {
 	char_u *name = (char_u *)builtin_terminals[i].bitc_name;
-	if (name == NULL)  // end marker
-	    break;
-#ifdef UNIX
-	if (STRCMP(name, "iris-ansi") == 0 && vim_is_iris(term))
-	    return builtin_terminals[i].bitc_table;
-	if (STRCMP(name, "xterm") == 0 && vim_is_xterm(term))
-	    return builtin_terminals[i].bitc_table;
-#endif
-#ifdef VMS
-	if (STRCMP(name, "vt320") == 0 && vim_is_vt300(term))
-	    return builtin_terminals[i].bitc_table;
-#endif
-	if (STRCMP(term, name) == 0)
-	    return builtin_terminals[i].bitc_table;
+	ಆದರೆ (name == ಖಾಲಿ)  // end marker
+	    ನಿಲ್ಲಿಸು;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
+	ಆದರೆ (STRCMP(name, "iris-ansi") == 0 && vim_is_iris(ಪದ))
+	    ಹಿಂತಿರುಗಿ builtin_terminals[i].bitc_ಕೋಷ್ಟಕ;
+	ಆದರೆ (STRCMP(name, "xterm") == 0 && vim_is_xterm(ಪದ))
+	    ಹಿಂತಿರುಗಿ builtin_terminals[i].bitc_ಕೋಷ್ಟಕ;
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VMS
+	ಆದರೆ (STRCMP(name, "vt320") == 0 && vim_is_vt300(ಪದ))
+	    ಹಿಂತಿರುಗಿ builtin_terminals[i].bitc_ಕೋಷ್ಟಕ;
+#ಆದರೆ_ಅಂತ್ಯ
+	ಆದರೆ (STRCMP(ಪದ, name) == 0)
+	    ಹಿಂತಿರುಗಿ builtin_terminals[i].bitc_ಕೋಷ್ಟಕ;
     }
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Apply entries from a builtin termcap.
  */
-    static void
-apply_builtin_tcap(char_u *term, tcap_entry_T *entries, int overwrite)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+apply_builtin_tcap(char_u *ಪದ, tcap_ನಮೂದು_T *entries, ಪೂರ್ಣಾಂಕ overwrite)
 {
-    int term_8bit = term_is_8bit(term);
+    ಪೂರ್ಣಾಂಕ ಪದ_8bit = ಪದ_is_8bit(ಪದ);
 
-    for (tcap_entry_T *p = entries;
-	      p->bt_entry != (int)KS_NAME && p->bt_entry != BT_EXTRA_KEYS; ++p)
+    ಗಾಗಿ (tcap_ನಮೂದು_T *p = entries;
+	      p->bt_ನಮೂದು != (ಪೂರ್ಣಾಂಕ)KS_NAME && p->bt_ನಮೂದು != BT_EXTRA_ಕೀಲಿಗಳು; ++p)
     {
-	if ((int)p->bt_entry >= 0)	// KS_xx entry
+	ಆದರೆ ((ಪೂರ್ಣಾಂಕ)p->bt_ನಮೂದು >= 0)	// KS_xx entry
 	{
 	    // Only set the value if it wasn't set yet or "overwrite" is TRUE.
-	    if (term_strings[p->bt_entry] == NULL
-		    || term_strings[p->bt_entry] == empty_option
+	    ಆದರೆ (ಪದ_ಅಕ್ಷರಸರಣಿಗಳು[p->bt_ನಮೂದು] == ಖಾಲಿ
+		    || ಪದ_ಅಕ್ಷರಸರಣಿಗಳು[p->bt_ನಮೂದು] == ಖಾಲಿಗಳು_option
 		    || overwrite)
 	    {
-#ifdef FEAT_EVAL
-		int opt_idx = -1;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+		ಪೂರ್ಣಾಂಕ opt_idx = -1;
+#ಆದರೆ_ಅಂತ್ಯ
 		// 8bit terminal: use CSI instead of <Esc>[
-		if (term_8bit && term_7to8bit((char_u *)p->bt_string) != 0)
+		ಆದರೆ (ಪದ_8bit && ಪದ_7to8bit((char_u *)p->bt_string) != 0)
 		{
 		    char_u  *s, *t;
 
 		    s = vim_strsave((char_u *)p->bt_string);
-		    if (s != NULL)
+		    ಆದರೆ (s != ಖಾಲಿ)
 		    {
-			for (t = s; *t; ++t)
-			    if (term_7to8bit(t))
+			ಗಾಗಿ (t = s; *t; ++t)
+			    ಆದರೆ (ಪದ_7to8bit(t))
 			    {
-				*t = term_7to8bit(t);
+				*t = ಪದ_7to8bit(t);
 				STRMOVE(t + 1, t + 2);
 			    }
-			term_strings[p->bt_entry] = s;
-#ifdef FEAT_EVAL
+			ಪದ_ಅಕ್ಷರಸರಣಿಗಳು[p->bt_ನಮೂದು] = s;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 			opt_idx =
-#endif
-				  set_term_option_alloced(
-						   &term_strings[p->bt_entry]);
+#ಆದರೆ_ಅಂತ್ಯ
+				  ಗಣ_ಪದ_option_alloced(
+						   &ಪದ_ಅಕ್ಷರಸರಣಿಗಳು[p->bt_ನಮೂದು]);
 		    }
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    term_strings[p->bt_entry] = (char_u *)p->bt_string;
-#ifdef FEAT_EVAL
-		    opt_idx = get_term_opt_idx(&term_strings[p->bt_entry]);
-#endif
+		    ಪದ_ಅಕ್ಷರಸರಣಿಗಳು[p->bt_ನಮೂದು] = (char_u *)p->bt_string;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+		    opt_idx = get_ಪದ_opt_idx(&ಪದ_ಅಕ್ಷರಸರಣಿಗಳು[p->bt_ನಮೂದು]);
+#ಆದರೆ_ಅಂತ್ಯ
 		}
-#ifdef FEAT_EVAL
-		set_term_option_sctx_idx(NULL, opt_idx);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+		ಗಣ_ಪದ_option_sctx_idx(ಖಾಲಿ, opt_idx);
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    char_u  name[2];
-	    name[0] = KEY2TERMCAP0((int)p->bt_entry);
-	    name[1] = KEY2TERMCAP1((int)p->bt_entry);
-	    if (find_termcode(name) == NULL || overwrite)
-		add_termcode(name, (char_u *)p->bt_string, term_8bit);
+	    name[0] = KEY2TERMCAP0((ಪೂರ್ಣಾಂಕ)p->bt_ನಮೂದು);
+	    name[1] = KEY2TERMCAP1((ಪೂರ್ಣಾಂಕ)p->bt_ನಮೂದು);
+	    ಆದರೆ (ಕಂಡುಹಿಡಿ_termcode(name) == ಖಾಲಿ || overwrite)
+		ಕೂಡಿಸು_termcode(name, (char_u *)p->bt_string, ಪದ_8bit);
 	}
     }
 }
@@ -1723,18 +1723,18 @@ apply_builtin_tcap(char_u *term, tcap_entry_T *entries, int overwrite)
 /*
  * Apply builtin termcap entries for a given keyprotocol.
  */
-    void
-apply_keyprotocol(char_u *term, keyprot_T prot)
+    ಶೂನ್ಯ
+apply_keyprotocol(char_u *ಪದ, keyprot_T prot)
 {
-    if (prot == KEYPROTOCOL_KITTY)
-	apply_builtin_tcap(term, builtin_kitty, TRUE);
-    if (prot == KEYPROTOCOL_MOK2)
-	apply_builtin_tcap(term, builtin_mok2, TRUE);
+    ಆದರೆ (prot == KEYPROTOCOL_KITTY)
+	apply_builtin_tcap(ಪದ, builtin_kitty, TRUE);
+    ಆದರೆ (prot == KEYPROTOCOL_MOK2)
+	apply_builtin_tcap(ಪದ, builtin_mok2, TRUE);
 
-    if (prot != KEYPROTOCOL_NONE)
+    ಆದರೆ (prot != KEYPROTOCOL_NONE)
 	// Some function keys may accept modifiers even though the
 	// terminfo/termcap entry does not indicate this.
-	accept_modifiers_for_function_keys();
+	accept_modifiers_for_function_ಕೀಲಿಗಳು();
 }
 
 /*
@@ -1742,12 +1742,12 @@ apply_keyprotocol(char_u *term, keyprot_T prot)
  * Caller should check if "term" is a valid builtin terminal name.
  * The terminal's name is not set, as this is already done in termcapinit().
  */
-    static void
-parse_builtin_tcap(char_u *term)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+parse_builtin_tcap(char_u *ಪದ)
 {
-    tcap_entry_T *entries = find_builtin_term(term);
-    if (entries != NULL)
-	apply_builtin_tcap(term, entries, FALSE);
+    tcap_ನಮೂದು_T *entries = ಕಂಡುಹಿಡಿ_builtin_ಪದ(ಪದ);
+    ಆದರೆ (entries != ಖಾಲಿ)
+	apply_builtin_tcap(ಪದ, entries, FALSE);
 }
 
 /*
@@ -1755,54 +1755,54 @@ parse_builtin_tcap(char_u *term)
  * Store it as a number in t_colors.
  * Store it as a string in T_CCO (using nr_colors[]).
  */
-    void
-set_color_count(int nr)
+    ಶೂನ್ಯ
+ಗಣ_color_ಎಣಿಕೆ(ಪೂರ್ಣಾಂಕ nr)
 {
     char_u	nr_colors[20];		// string for number of colors
 
     t_colors = nr;
-    if (t_colors > 1)
-	sprintf((char *)nr_colors, "%d", t_colors);
-    else
+    ಆದರೆ (t_colors > 1)
+	sprintf((ಅಕ್ಷರ *)nr_colors, "%d", t_colors);
+    ಇಲ್ಲದಿದ್ದರೆ
 	*nr_colors = NUL;
-#if 0
+#ಆದರೆ 0
 # ifdef FEAT_TERMGUICOLORS
     // xterm-direct, enable termguicolors, when it wasn't set yet
-    if (t_colors == 0x1000000 && !p_tgc_set)
-	set_option_value((char_u *)"termguicolors", 1L, NULL, 0);
+    ಆದರೆ (t_colors == 0x1000000 && !p_tgc_ಗಣ)
+	ಗಣ_option_ಮೌಲ್ಯ((char_u *)"termguicolors", 1L, ಖಾಲಿ, 0);
 # endif
-#endif
-    set_string_option_direct((char_u *)"t_Co", -1, nr_colors, OPT_FREE, 0);
+#ಆದರೆ_ಅಂತ್ಯ
+    ಗಣ_string_option_ನೇರ((char_u *)"t_Co", -1, nr_colors, OPT_FREE, 0);
 }
 
 /*
  * Set the color count to "val" and redraw if it changed.
  */
-    static void
-may_adjust_color_count(int val)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+may_adjust_color_ಎಣಿಕೆ(ಪೂರ್ಣಾಂಕ val)
 {
-    if (val == t_colors)
-	return;
+    ಆದರೆ (val == t_colors)
+	ಹಿಂತಿರುಗಿ;
 
     // Nr of colors changed, initialize highlighting and redraw everything.
     // This causes a redraw, which usually clears the message.  Try keeping
     // the message if it might work.
-    set_keep_msg_from_hist();
-    set_color_count(val);
+    ಗಣ_keep_ಸಂದೇಶ_from_hist();
+    ಗಣ_color_ಎಣಿಕೆ(val);
     init_highlight(TRUE, FALSE);
-#ifdef DEBUG_TERMRESPONSE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DEBUG_TERMRESPONSE
     {
-	int r = redraw_asap(UPD_CLEAR);
+	ಪೂರ್ಣಾಂಕ r = redraw_asap(UPD_CLEAR);
 
 	LOG_TRN("Received t_Co, redraw_asap(): %d", r);
     }
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
     redraw_asap(UPD_CLEAR);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#ifdef HAVE_TGETENT
-static char *(key_names[]) =
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_TGETENT
+ಸ್ಥಿರ ಅಕ್ಷರ *(ಕೀಲಿ_ಹೆಸರುಗಳು[]) =
 {
 # ifdef FEAT_TERMRESPONSE
     // Do those ones first, both may cause a screen redraw.
@@ -1818,35 +1818,35 @@ static char *(key_names[]) =
     "%1", "&8", "kb", "kI", "kD", "kh",
     "@7", "kP", "kN", "K1", "K3", "K4", "K5", "kB",
     "PS", "PE",
-    NULL
+    ಖಾಲಿ
 };
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(HAVE_TGETENT) || defined(FEAT_TERMGUICOLORS)
+#ಆದರೆ defined(HAVE_TGETENT) || defined(FEAT_TERMGUICOLORS)
 /*
  * Return TRUE if "term_strings[idx]" was not set.
  */
-    static int
-term_strings_not_set(enum SpecialKey idx)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಪದ_ಅಕ್ಷರಸರಣಿಗಳು_not_ಗಣ(ಎಣಿಕೆ Special_ಕೀಲಿ idx)
 {
-    return TERM_STR(idx) == NULL || TERM_STR(idx) == empty_option;
+    ಹಿಂತಿರುಗಿ ಪದ_STR(idx) == ಖಾಲಿ || ಪದ_STR(idx) == ಖಾಲಿಗಳು_option;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef HAVE_TGETENT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_TGETENT
 /*
  * Get the termcap entries we need with tgetstr(), tgetflag() and tgetnum().
  * "invoke_tgetent()" must have been called before.
  * If "*height" or "*width" are not zero then use the "li" and "col" entries to
  * get their value.
  */
-    static void
-get_term_entries(int *height, int *width)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+get_ಪದ_entries(ಪೂರ್ಣಾಂಕ *ಎತ್ತರ, ಪೂರ್ಣಾಂಕ *ಅಗಲ)
 {
-    static struct {
-		    enum SpecialKey dest; // index in term_strings[]
-		    char *name;		  // termcap name for string
-		  } string_names[] =
+    ಸ್ಥಿರ ರಚನೆ {
+		    ಎಣಿಕೆ Special_ಕೀಲಿ dest; // index in term_strings[]
+		    ಅಕ್ಷರ *name;		  // termcap name for string
+		  } string_ಹೆಸರುಗಳು[] =
 		    {	{KS_CE, "ce"}, {KS_AL, "al"}, {KS_CAL,"AL"},
 			{KS_DL, "dl"}, {KS_CDL,"DL"}, {KS_CS, "cs"},
 			{KS_CL, "cl"}, {KS_CD, "cd"},
@@ -1878,136 +1878,136 @@ get_term_entries(int *height, int *width)
 			{KS_CST, "ST"}, {KS_CRT, "RT"},
 			{KS_SSI, "Si"}, {KS_SRI, "Ri"},
 			{KS_CF, "CF"},
-			{(enum SpecialKey)0, NULL}
+			{(ಎಣಿಕೆ Special_ಕೀಲಿ)0, ಖಾಲಿ}
 		    };
-    int		    i;
-    static char_u   tstrbuf[TBUFSZ];
+    ಪೂರ್ಣಾಂಕ		    i;
+    ಸ್ಥಿರ char_u   tstrbuf[TBUFSZ];
     char_u	    *tp = tstrbuf;
 
     /*
      * get output strings
      */
-    for (i = 0; string_names[i].name != NULL; ++i)
+    ಗಾಗಿ (i = 0; string_ಹೆಸರುಗಳು[i].name != ಖಾಲಿ; ++i)
     {
-	if (term_strings_not_set(string_names[i].dest))
+	ಆದರೆ (ಪದ_ಅಕ್ಷರಸರಣಿಗಳು_not_ಗಣ(string_ಹೆಸರುಗಳು[i].dest))
 	{
-	    TERM_STR(string_names[i].dest) = TGETSTR(string_names[i].name, &tp);
+	    ಪದ_STR(string_ಹೆಸರುಗಳು[i].dest) = TGETSTR(string_ಹೆಸರುಗಳು[i].name, &tp);
 # ifdef FEAT_EVAL
-	    set_term_option_sctx_idx(string_names[i].name, -1);
+	    ಗಣ_ಪದ_option_sctx_idx(string_ಹೆಸರುಗಳು[i].name, -1);
 # endif
 	}
     }
 
     // tgetflag() returns 1 if the flag is present, 0 if not and
     // possibly -1 if the flag doesn't exist.
-    if ((T_MS == NULL || T_MS == empty_option) && tgetflag("ms") > 0)
+    ಆದರೆ ((T_MS == ಖಾಲಿ || T_MS == ಖಾಲಿಗಳು_option) && tgetflag("ms") > 0)
 	T_MS = (char_u *)"y";
-    if ((T_XS == NULL || T_XS == empty_option) && tgetflag("xs") > 0)
+    ಆದರೆ ((T_XS == ಖಾಲಿ || T_XS == ಖಾಲಿಗಳು_option) && tgetflag("xs") > 0)
 	T_XS = (char_u *)"y";
-    if ((T_XN == NULL || T_XN == empty_option) && tgetflag("xn") > 0)
+    ಆದರೆ ((T_XN == ಖಾಲಿ || T_XN == ಖಾಲಿಗಳು_option) && tgetflag("xn") > 0)
 	T_XN = (char_u *)"y";
-    if ((T_DB == NULL || T_DB == empty_option) && tgetflag("db") > 0)
+    ಆದರೆ ((T_DB == ಖಾಲಿ || T_DB == ಖಾಲಿಗಳು_option) && tgetflag("db") > 0)
 	T_DB = (char_u *)"y";
-    if ((T_DA == NULL || T_DA == empty_option) && tgetflag("da") > 0)
+    ಆದರೆ ((T_DA == ಖಾಲಿ || T_DA == ಖಾಲಿಗಳು_option) && tgetflag("da") > 0)
 	T_DA = (char_u *)"y";
-    if ((T_UT == NULL || T_UT == empty_option) && tgetflag("ut") > 0)
+    ಆದರೆ ((T_UT == ಖಾಲಿ || T_UT == ಖಾಲಿಗಳು_option) && tgetflag("ut") > 0)
 	T_UT = (char_u *)"y";
-    if ((T_XON == NULL || T_XON == empty_option) && tgetflag("xo") > 0)
+    ಆದರೆ ((T_XON == ಖಾಲಿ || T_XON == ಖಾಲಿಗಳು_option) && tgetflag("xo") > 0)
 	T_XON = (char_u *)"y";
 
     /*
      * get key codes
      */
-    for (i = 0; key_names[i] != NULL; ++i)
-	if (find_termcode((char_u *)key_names[i]) == NULL)
+    ಗಾಗಿ (i = 0; ಕೀಲಿ_ಹೆಸರುಗಳು[i] != ಖಾಲಿ; ++i)
+	ಆದರೆ (ಕಂಡುಹಿಡಿ_termcode((char_u *)ಕೀಲಿ_ಹೆಸರುಗಳು[i]) == ಖಾಲಿ)
 	{
-	    char_u *p = TGETSTR(key_names[i], &tp);
+	    char_u *p = TGETSTR(ಕೀಲಿ_ಹೆಸರುಗಳು[i], &tp);
 
 	    // if cursor-left == backspace, ignore it (televideo 925)
-	    if (p != NULL
+	    ಆದರೆ (p != ಖಾಲಿ
 		    && (*p != Ctrl_H
-			|| key_names[i][0] != 'k'
-			|| key_names[i][1] != 'l'))
-		add_termcode((char_u *)key_names[i], p, FALSE);
+			|| ಕೀಲಿ_ಹೆಸರುಗಳು[i][0] != 'k'
+			|| ಕೀಲಿ_ಹೆಸರುಗಳು[i][1] != 'l'))
+		ಕೂಡಿಸು_termcode((char_u *)ಕೀಲಿ_ಹೆಸರುಗಳು[i], p, FALSE);
 	}
 
-    if (*height == 0)
-	*height = tgetnum("li");
-    if (*width == 0)
-	*width = tgetnum("co");
+    ಆದರೆ (*ಎತ್ತರ == 0)
+	*ಎತ್ತರ = tgetnum("li");
+    ಆದರೆ (*ಅಗಲ == 0)
+	*ಅಗಲ = tgetnum("co");
 
     /*
      * Get number of colors (if not done already).
      */
-    if (term_strings_not_set(KS_CCO))
+    ಆದರೆ (ಪದ_ಅಕ್ಷರಸರಣಿಗಳು_not_ಗಣ(KS_CCO))
     {
-	set_color_count(tgetnum("Co"));
+	ಗಣ_color_ಎಣಿಕೆ(tgetnum("Co"));
 # ifdef FEAT_EVAL
-	set_term_option_sctx_idx("Co", -1);
+	ಗಣ_ಪದ_option_sctx_idx("Co", -1);
 # endif
     }
 
 # ifndef hpux
-    BC = (char *)TGETSTR("bc", &tp);
-    UP = (char *)TGETSTR("up", &tp);
+    BC = (ಅಕ್ಷರ *)TGETSTR("bc", &tp);
+    ಮೇಲೆ_2 = (ಅಕ್ಷರ *)TGETSTR("up", &tp);
     char_u *p = TGETSTR("pc", &tp);
-    if (p != NULL)
+    ಆದರೆ (p != ಖಾಲಿ)
 	PC = *p;
 # endif
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Report "term" is not found and list the ones we do know about.
  */
-    static void
-report_term_error(char *error_msg, char_u *term)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+report_ಪದ_error(ಅಕ್ಷರ *error_ಸಂದೇಶ, char_u *ಪದ)
 {
     mch_errmsg("\r\n");
-    if (error_msg != NULL)
+    ಆದರೆ (error_ಸಂದೇಶ != ಖಾಲಿ)
     {
-	mch_errmsg(error_msg);
+	mch_errmsg(error_ಸಂದೇಶ);
 	mch_errmsg("\r\n");
     }
     mch_errmsg("'");
-    mch_errmsg((char *)term);
+    mch_errmsg((ಅಕ್ಷರ *)ಪದ);
     mch_errmsg(_("' not known. Available builtin terminals are:"));
     mch_errmsg("\r\n");
 
-    for (int i = 0; ; ++i)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; ; ++i)
     {
-	char *name = builtin_terminals[i].bitc_name;
-	if (name == NULL)  // end marker
-	    break;
+	ಅಕ್ಷರ *name = builtin_terminals[i].bitc_name;
+	ಆದರೆ (name == ಖಾಲಿ)  // end marker
+	    ನಿಲ್ಲಿಸು;
 	// Do not mention the "gui" entry, the user won't need to type it.
-	if (STRCMP(name, "gui") != 0)
+	ಆದರೆ (STRCMP(name, "gui") != 0)
 	{
-#ifdef HAVE_TGETENT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_TGETENT
 	    mch_errmsg("    builtin_");
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 	    mch_errmsg("    ");
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    mch_errmsg(name);
 	    mch_errmsg("\r\n");
 	}
     }
     // Output extra 'cmdheight' line breaks to avoid that the following error
     // message overwrites the last terminal name.
-    for (int i = 1; i < p_ch; ++i)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 1; i < p_ch; ++i)
 	mch_errmsg("\r\n");
 }
 
-    static void
-report_default_term(char_u *term)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+report_default_ಪದ(char_u *ಪದ)
 {
     mch_errmsg(_("defaulting to '"));
-    mch_errmsg((char *)term);
+    mch_errmsg((ಅಕ್ಷರ *)ಪದ);
     mch_errmsg("'\r\n");
-    if (emsg_silent == 0 && !in_assert_fails)
+    ಆದರೆ (emsg_silent == 0 && !ಒಳ_assert_fails)
     {
-	screen_start();	// don't know where cursor is now
-	out_flush();
-	if (!is_not_a_term())
+	screen_ಆರಂಭ();	// don't know where cursor is now
+	ಹೊರಹೋಗು_flush();
+	ಆದರೆ (!is_not_a_ಪದ())
 	    ui_delay(2007L, TRUE);
     }
 }
@@ -2020,48 +2020,48 @@ report_default_term(char_u *term)
  * Returns KEYPROTOCOL_NONE if there is no match.
  */
     keyprot_T
-match_keyprotocol(char_u *term)
+ಹೊಂದಿಕೆ_keyprotocol(char_u *ಪದ)
 {
-    int		len = (int)STRLEN(p_kpc) + 1;
+    ಪೂರ್ಣಾಂಕ		len = (ಪೂರ್ಣಾಂಕ)STRLEN(p_kpc) + 1;
     char_u	*buf = alloc(len);
-    if (buf == NULL)
-	return KEYPROTOCOL_FAIL;
+    ಆದರೆ (buf == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ KEYPROTOCOL_FAIL;
 
     keyprot_T	ret = KEYPROTOCOL_FAIL;
     char_u	*p = p_kpc;
-    while (*p != NUL)
+    ಆಗ (*p != NUL)
     {
 	// Isolate one comma separated item.
-	(void)copy_option_part(&p, buf, len, ",");
+	(ಶೂನ್ಯ)copy_option_part(&p, buf, len, ",");
 	char_u *colon = vim_strchr(buf, ':');
-	if (colon == NULL || colon == buf || colon[1] == NUL)
-	    goto theend;
+	ಆದರೆ (colon == ಖಾಲಿ || colon == buf || colon[1] == NUL)
+	    ಹೋಗು theend;
 	*colon = NUL;
 
 	keyprot_T prot;
 	// Note: Keep this in sync with p_kpc_protocol_values.
-	if (STRCMP(colon + 1, "none") == 0)
+	ಆದರೆ (STRCMP(colon + 1, "none") == 0)
 	    prot = KEYPROTOCOL_NONE;
-	else if (STRCMP(colon + 1, "mok2") == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(colon + 1, "mok2") == 0)
 	    prot = KEYPROTOCOL_MOK2;
-	else if (STRCMP(colon + 1, "kitty") == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(colon + 1, "kitty") == 0)
 	    prot = KEYPROTOCOL_KITTY;
-	else
-	    goto theend;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಹೋಗು theend;
 
 	regmatch_T regmatch;
-	CLEAR_FIELD(regmatch);
+	CLEAR_ಕ್ಷೇತ್ರ(regmatch);
 	regmatch.rm_ic = TRUE;
 	regmatch.regprog = vim_regcomp(buf, RE_MAGIC);
-	if (regmatch.regprog == NULL)
-	    goto theend;
+	ಆದರೆ (regmatch.regprog == ಖಾಲಿ)
+	    ಹೋಗು theend;
 
-	int match = term != NULL && vim_regexec(&regmatch, term, (colnr_T)0);
+	ಪೂರ್ಣಾಂಕ ಹೊಂದಿಕೆ = ಪದ != ಖಾಲಿ && vim_regexec(&regmatch, ಪದ, (colnr_T)0);
 	vim_regfree(regmatch.regprog);
-	if (match)
+	ಆದರೆ (ಹೊಂದಿಕೆ)
 	{
 	    ret = prot;
-	    goto theend;
+	    ಹೋಗು theend;
 	}
 
     }
@@ -2071,7 +2071,7 @@ match_keyprotocol(char_u *term)
 
 theend:
     vim_free(buf);
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
 /*
@@ -2080,30 +2080,30 @@ theend:
  *
  * While doing this, until ttest(), some options may be NULL, be careful.
  */
-    int
-set_termname(char_u *term)
+    ಪೂರ್ಣಾಂಕ
+ಗಣ_termname(char_u *ಪದ)
 {
-#ifdef HAVE_TGETENT
-    int		builtin_first = p_tbi;
-    int		try;
-    int		termcap_cleared = FALSE;
-#endif
-    int		width = 0, height = 0;
-    char	*error_msg = NULL;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_TGETENT
+    ಪೂರ್ಣಾಂಕ		builtin_ಮೊದಲ = p_tbi;
+    ಪೂರ್ಣಾಂಕ		try;
+    ಪೂರ್ಣಾಂಕ		termcap_cleared = FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಪೂರ್ಣಾಂಕ		ಅಗಲ = 0, ಎತ್ತರ = 0;
+    ಅಕ್ಷರ	*error_ಸಂದೇಶ = ಖಾಲಿ;
     char_u	*bs_p, *del_p;
 
     // In silect mode (ex -s) we don't use the 'term' option.
-    if (silent_mode)
-	return OK;
+    ಆದರೆ (silent_ಬಹುಲಕ)
+	ಹಿಂತಿರುಗಿ OK;
 
     detected_8bit = FALSE;		// reset 8-bit detection
 
-    if (term_is_builtin(term))
+    ಆದರೆ (ಪದ_is_builtin(ಪದ))
     {
-	term += 8;
-#ifdef HAVE_TGETENT
-	builtin_first = 1;
-#endif
+	ಪದ += 8;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_TGETENT
+	builtin_ಮೊದಲ = 1;
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
 /*
@@ -2116,13 +2116,13 @@ set_termname(char_u *term)
  *     1. try external termcap
  *     2. try builtin termcap, if both fail default to a builtin terminal
  */
-#ifdef HAVE_TGETENT
-    for (try = builtin_first ? 0 : 1; try < 3; ++try)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_TGETENT
+    ಗಾಗಿ (try = builtin_ಮೊದಲ ? 0 : 1; try < 3; ++try)
     {
 	/*
 	 * Use external termcap
 	 */
-	if (try == 1)
+	ಆದರೆ (try == 1)
 	{
 	    char_u	    tbuf[TBUFSZ];
 
@@ -2130,38 +2130,38 @@ set_termname(char_u *term)
 	     * If the external termcap does not have a matching entry, try the
 	     * builtin ones.
 	     */
-	    if ((error_msg = invoke_tgetent(tbuf, term)) == NULL)
+	    ಆದರೆ ((error_ಸಂದೇಶ = invoke_tgetent(tbuf, ಪದ)) == ಖಾಲಿ)
 	    {
-		if (!termcap_cleared)
+		ಆದರೆ (!termcap_cleared)
 		{
 		    clear_termoptions();	// clear old options
 		    termcap_cleared = TRUE;
 		}
 
-		get_term_entries(&height, &width);
+		get_ಪದ_entries(&ಎತ್ತರ, &ಅಗಲ);
 	    }
 	}
-	else	    // try == 0 || try == 2
-#endif // HAVE_TGETENT
+	ಇಲ್ಲದಿದ್ದರೆ	    // try == 0 || try == 2
+#ಆದರೆ_ಅಂತ್ಯ // HAVE_TGETENT
 	/*
 	 * Use builtin termcap
 	 */
 	{
-#ifdef HAVE_TGETENT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_TGETENT
 	    /*
 	     * If builtin termcap was already used, there is no need to search
 	     * for the builtin termcap again, quit now.
 	     */
-	    if (try == 2 && builtin_first && termcap_cleared)
-		break;
-#endif
+	    ಆದರೆ (try == 2 && builtin_ಮೊದಲ && termcap_cleared)
+		ನಿಲ್ಲಿಸು;
+#ಆದರೆ_ಅಂತ್ಯ
 	    /*
 	     * Search for 'term' in builtin_terminals[].
 	     */
-	    tcap_entry_T *termp = find_builtin_term(term);
-	    if (termp == NULL)	// did not find it
+	    tcap_ನಮೂದು_T *termp = ಕಂಡುಹಿಡಿ_builtin_ಪದ(ಪದ);
+	    ಆದರೆ (termp == ಖಾಲಿ)	// did not find it
 	    {
-#ifdef HAVE_TGETENT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_TGETENT
 		/*
 		 * If try == 0, first try the external termcap. If that is not
 		 * found we'll get back here with try == 2.
@@ -2169,82 +2169,82 @@ set_termname(char_u *term)
 		 * don't complain about not finding the term in the builtin
 		 * termcap.
 		 */
-		if (try == 0)			// try external one
-		    continue;
-		if (termcap_cleared)		// found in external termcap
-		    break;
-#endif
-		report_term_error(error_msg, term);
+		ಆದರೆ (try == 0)			// try external one
+		    ಮುಂದುವರಿ;
+		ಆದರೆ (termcap_cleared)		// found in external termcap
+		    ನಿಲ್ಲಿಸು;
+#ಆದರೆ_ಅಂತ್ಯ
+		report_ಪದ_error(error_ಸಂದೇಶ, ಪದ);
 
 		// when user typed :set term=xxx, quit here
-		if (starting != NO_SCREEN)
+		ಆದರೆ (starting != NO_SCREEN)
 		{
-		    screen_start();	// don't know where cursor is now
+		    screen_ಆರಂಭ();	// don't know where cursor is now
 		    wait_return(TRUE);
-		    return FAIL;
+		    ಹಿಂತಿರುಗಿ FAIL;
 		}
-		term = DEFAULT_TERM;
-		report_default_term(term);
-		set_string_option_direct((char_u *)"term", -1, term,
+		ಪದ = DEFAULT_ಪದ;
+		report_default_ಪದ(ಪದ);
+		ಗಣ_string_option_ನೇರ((char_u *)"term", -1, ಪದ,
 								 OPT_FREE, 0);
 		display_errors();
 	    }
-	    out_flush();
-#ifdef HAVE_TGETENT
-	    if (!termcap_cleared)
+	    ಹೊರಹೋಗು_flush();
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_TGETENT
+	    ಆದರೆ (!termcap_cleared)
 	    {
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		clear_termoptions();	    // clear old options
-#ifdef HAVE_TGETENT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_TGETENT
 		termcap_cleared = TRUE;
 	    }
-#endif
-	    parse_builtin_tcap(term);
+#ಆದರೆ_ಅಂತ್ಯ
+	    parse_builtin_tcap(ಪದ);
 
-#ifdef FEAT_GUI
-	    if (term_is_gui(term))
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+	    ಆದರೆ (ಪದ_is_gui(ಪದ))
 	    {
-		out_flush();
+		ಹೊರಹೋಗು_flush();
 		gui_init();
 		// If starting the GUI failed, don't do any of the other
 		// things for this terminal
-		if (!gui.in_use)
-		    return FAIL;
+		ಆದರೆ (!gui.ಒಳ_use)
+		    ಹಿಂತಿರುಗಿ FAIL;
 # ifdef HAVE_TGETENT
-		break;		// don't try using external termcap
+		ನಿಲ್ಲಿಸು;		// don't try using external termcap
 # endif
 	    }
-#endif // FEAT_GUI
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_GUI
 	}
-#ifdef HAVE_TGETENT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_TGETENT
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_GUI
-    if (!gui.in_use)
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+    ಆದರೆ (!gui.ಒಳ_use)
+#ಆದರೆ_ಅಂತ್ಯ
     {
 	// Use the 'keyprotocol' option to adjust the t_TE and t_TI
 	// termcap entries if there is an entry matching "term".
-	keyprot_T kpc = match_keyprotocol(term);
-	apply_keyprotocol(term, kpc);
+	keyprot_T kpc = ಹೊಂದಿಕೆ_keyprotocol(ಪದ);
+	apply_keyprotocol(ಪದ, kpc);
 
-#ifdef FEAT_TERMGUICOLORS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMGUICOLORS
 	// There is no good way to detect that the terminal supports RGB
 	// colors.  Since these termcap entries are non-standard anyway and
 	// only used when the user sets 'termguicolors' we might as well add
 	// them.  But not when one of them was already set.
-	if (term_strings_not_set(KS_8F)
-		&& term_strings_not_set(KS_8B)
-		&& term_strings_not_set(KS_8U))
-	    apply_builtin_tcap(term, builtin_rgb, TRUE);
-#endif
-#ifdef HAVE_TGETENT
-	if (term_strings_not_set(KS_CF))
-	    apply_builtin_tcap(term, special_term, TRUE);
-	if (term_strings_not_set(KS_BSU) && term_strings_not_set(KS_ESU))
-	    apply_builtin_tcap(term, builtin_sync_output, TRUE);
-#endif
+	ಆದರೆ (ಪದ_ಅಕ್ಷರಸರಣಿಗಳು_not_ಗಣ(KS_8F)
+		&& ಪದ_ಅಕ್ಷರಸರಣಿಗಳು_not_ಗಣ(KS_8B)
+		&& ಪದ_ಅಕ್ಷರಸರಣಿಗಳು_not_ಗಣ(KS_8U))
+	    apply_builtin_tcap(ಪದ, builtin_rgb, TRUE);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_TGETENT
+	ಆದರೆ (ಪದ_ಅಕ್ಷರಸರಣಿಗಳು_not_ಗಣ(KS_CF))
+	    apply_builtin_tcap(ಪದ, special_ಪದ, TRUE);
+	ಆದರೆ (ಪದ_ಅಕ್ಷರಸರಣಿಗಳು_not_ಗಣ(KS_BSU) && ಪದ_ಅಕ್ಷರಸರಣಿಗಳು_not_ಗಣ(KS_ESU))
+	    apply_builtin_tcap(ಪದ, builtin_sync_output, TRUE);
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
 /*
@@ -2253,18 +2253,18 @@ set_termname(char_u *term)
  * scrolling region.  We just guess here. Only msdos pcterm is known to do it
  * relative.
  */
-    if (STRCMP(term, "pcterm") == 0)
+    ಆದರೆ (STRCMP(ಪದ, "pcterm") == 0)
 	T_CCS = (char_u *)"yes";
-    else
-	T_CCS = empty_option;
+    ಇಲ್ಲದಿದ್ದರೆ
+	T_CCS = ಖಾಲಿಗಳು_option;
 
     // Special case: "kitty" may not have a "RV" entry in terminfo, but we need
     // to request the version for several other things to work.
-    if (strstr((char *)term, "kitty") != NULL
-					   && (T_CRV == NULL || *T_CRV == NUL))
+    ಆದರೆ (ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು((ಅಕ್ಷರ *)ಪದ, "kitty") != ಖಾಲಿ
+					   && (T_CRV == ಖಾಲಿ || *T_CRV == NUL))
 	T_CRV = (char_u *)"\033[>c";
 
-#ifdef UNIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
 /*
  * Any "stty" settings override the default for t_kb from the termcap.
  * This is in os_unix.c, because it depends a lot on the version of unix that
@@ -2272,10 +2272,10 @@ set_termname(char_u *term)
  * Don't do this when the GUI is active, it uses "t_kb" and "t_kD" directly.
  */
 # ifdef FEAT_GUI
-    if (!gui.in_use)
+    ಆದರೆ (!gui.ಒಳ_use)
 # endif
 	get_stty();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * If the termcap has no entry for 'bs' and/or 'del' and the ioctl() also
@@ -2285,42 +2285,42 @@ set_termname(char_u *term)
  * bytes.  Don't do this when the GUI is active, it uses "t_kb" and "t_kD"
  * directly.
  */
-#ifdef FEAT_GUI
-    if (!gui.in_use)
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+    ಆದರೆ (!gui.ಒಳ_use)
+#ಆದರೆ_ಅಂತ್ಯ
     {
-	bs_p = find_termcode((char_u *)"kb");
-	del_p = find_termcode((char_u *)"kD");
-	if (bs_p == NULL || *bs_p == NUL)
-	    add_termcode((char_u *)"kb", (bs_p = (char_u *)CTRL_H_STR), FALSE);
-	if ((del_p == NULL || *del_p == NUL) &&
-					    (bs_p == NULL || *bs_p != DEL))
-	    add_termcode((char_u *)"kD", (char_u *)DEL_STR, FALSE);
+	bs_p = ಕಂಡುಹಿಡಿ_termcode((char_u *)"kb");
+	del_p = ಕಂಡುಹಿಡಿ_termcode((char_u *)"kD");
+	ಆದರೆ (bs_p == ಖಾಲಿ || *bs_p == NUL)
+	    ಕೂಡಿಸು_termcode((char_u *)"kb", (bs_p = (char_u *)CTRL_H_STR), FALSE);
+	ಆದರೆ ((del_p == ಖಾಲಿ || *del_p == NUL) &&
+					    (bs_p == ಖಾಲಿ || *bs_p != DEL))
+	    ಕೂಡಿಸು_termcode((char_u *)"kD", (char_u *)DEL_STR, FALSE);
     }
 
-#if defined(UNIX) || defined(VMS)
-    term_is_xterm = vim_is_xterm(term);
-#endif
-#ifdef FEAT_TERMRESPONSE
+#ಆದರೆ defined(UNIX) || defined(VMS)
+    ಪದ_is_xterm = vim_is_xterm(ಪದ);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMRESPONSE
     // Reset terminal properties that are set based on the termresponse, which
     // will be sent out soon.
-    init_term_props(FALSE);
-#endif
+    init_ಪದ_props(FALSE);
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(UNIX) || defined(VMS)
+#ಆದರೆ defined(UNIX) || defined(VMS)
     // If the first number in t_XM is 1006 then the terminal will support SGR
     // mouse reporting.
-    int did_set_ttym = FALSE;
-    if (T_CXM != NULL && *T_CXM != NUL && !option_was_set((char_u *)"ttym"))
+    ಪೂರ್ಣಾಂಕ did_ಗಣ_ttym = FALSE;
+    ಆದರೆ (T_CXM != ಖಾಲಿ && *T_CXM != NUL && !option_was_ಗಣ((char_u *)"ttym"))
     {
 	char_u *p = T_CXM;
 
-	while (*p != NUL && !VIM_ISDIGIT(*p))
+	ಆಗ (*p != NUL && !VIM_ISDIGIT(*p))
 	    ++p;
-	if (getdigits(&p) == 1006)
+	ಆದರೆ (getdigits(&p) == 1006)
 	{
-	    did_set_ttym = TRUE;
-	    set_option_value_give_err((char_u *)"ttym", 0L, (char_u *)"sgr", 0);
+	    did_ಗಣ_ttym = TRUE;
+	    ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"ttym", 0L, (char_u *)"sgr", 0);
 	}
     }
 
@@ -2332,33 +2332,33 @@ set_termname(char_u *term)
 	char_u	*p = (char_u *)"";
 
 # ifdef FEAT_MOUSE_XTERM
-	if (use_xterm_like_mouse(term))
+	ಆದರೆ (use_xterm_like_mouse(ಪದ))
 	{
-	    if (use_xterm_mouse())
-		p = NULL;	// keep existing value, might be "xterm2"
-	    else
+	    ಆದರೆ (use_xterm_mouse())
+		p = ಖಾಲಿ;	// keep existing value, might be "xterm2"
+	    ಇಲ್ಲದಿದ್ದರೆ
 		p = (char_u *)"xterm";
 	}
 # endif
-	if (p != NULL && !did_set_ttym)
+	ಆದರೆ (p != ಖಾಲಿ && !did_ಗಣ_ttym)
 	{
-	    set_option_value_give_err((char_u *)"ttym", 0L, p, 0);
+	    ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"ttym", 0L, p, 0);
 	    // Reset the WAS_SET flag, 'ttymouse' can be set to "sgr" or
 	    // "xterm2" in check_termcode().
-	    reset_option_was_set((char_u *)"ttym");
+	    reset_option_was_ಗಣ((char_u *)"ttym");
 	}
-	if (p == NULL
+	ಆದರೆ (p == ಖಾಲಿ
 # ifdef FEAT_GUI
-		|| gui.in_use
+		|| gui.ಒಳ_use
 # endif
 		)
 	    check_mouse_termcode();	// set mouse termcode anyway
     }
-#else
-    set_mouse_termcode(KS_MOUSE, (char_u *)"\233M");
-#endif
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಗಣ_mouse_termcode(KS_MOUSE, (char_u *)"\233M");
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_MOUSE_XTERM
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MOUSE_XTERM
     // Focus reporting is supported by xterm compatible terminals and tmux.
     // We hard-code the received escape sequences here.  There are the terminfo
     // entries kxIN and kxOUT, but they are rarely used and do hot have a
@@ -2373,42 +2373,42 @@ set_termname(char_u *term)
 	name[0] = KS_EXTRA;
 	name[1] = KE_FOCUSGAINED;
 	name[2] = NUL;
-	add_termcode(name, (char_u *)"\033[I", FALSE);
+	ಕೂಡಿಸು_termcode(name, (char_u *)"\033[I", FALSE);
 
 	// handle focus out event
 	name[1] = KE_FOCUSLOST;
-	add_termcode(name, (char_u *)"\033[O", FALSE);
+	ಕೂಡಿಸು_termcode(name, (char_u *)"\033[O", FALSE);
 
 	need_gather = TRUE;
     }
-#endif
-#if (defined(UNIX) || defined(VMS))
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ (defined(UNIX) || defined(VMS))
     // First time after setting 'term' a focus event is always reported.
     focus_state = MAYBE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef USE_TERM_CONSOLE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_ಪದ_CONSOLE
     // DEFAULT_TERM indicates that it is the machine console.
-    if (STRCMP(term, DEFAULT_TERM) != 0)
-	term_console = FALSE;
-    else
+    ಆದರೆ (STRCMP(ಪದ, DEFAULT_ಪದ) != 0)
+	ಪದ_console = FALSE;
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	term_console = TRUE;
+	ಪದ_console = TRUE;
 # ifdef AMIGA
 	win_resize_on();	// enable window resizing reports
 # endif
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     ttest(TRUE);	// make sure we have a valid set of terminal codes
 
-    full_screen = TRUE;		// we can use termcap codes from now on
-    set_term_defaults();	// use current values as defaults
-#ifdef FEAT_TERMRESPONSE
+    ತುಂಬಿದ_screen = TRUE;		// we can use termcap codes from now on
+    ಗಣ_ಪದ_defaults();	// use current values as defaults
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMRESPONSE
     LOG_TR1("setting crv_status to STATUS_GET");
-    crv_status.tr_progress = STATUS_GET;	// Get terminal version later
+    crv_ಸ್ಥಿತಿ.tr_ಪ್ರಗತಿ = ಸ್ಥಿತಿ_GET;	// Get terminal version later
     write_t_8u_state = FALSE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     /*
      * Initialize the terminal with the appropriate termcap codes.
@@ -2416,7 +2416,7 @@ set_termname(char_u *term)
      * Don't do this when starting, need to parse the .vimrc first, because it
      * may redefine t_TI etc.
      */
-    if (starting != NO_SCREEN)
+    ಆದರೆ (starting != NO_SCREEN)
     {
 	starttermcap();		// may change terminal mode
 	setmouse();		// may start using the mouse
@@ -2424,21 +2424,21 @@ set_termname(char_u *term)
     }
 
 	// display initial screen after ttest() checking. jw.
-    if (width <= 0 || height <= 0)
+    ಆದರೆ (ಅಗಲ <= 0 || ಎತ್ತರ <= 0)
     {
 	// termcap failed to report size
 	// set defaults, in case ui_get_shellsize() also fails
-	width = 80;
-#if defined(MSWIN)
-	height = 25;	    // console is often 25 lines
-#else
-	height = 24;	    // most terminals are 24 lines
-#endif
+	ಅಗಲ = 80;
+#ಆದರೆ defined(MSWIN)
+	ಎತ್ತರ = 25;	    // console is often 25 lines
+#ಇಲ್ಲದಿದ್ದರೆ
+	ಎತ್ತರ = 24;	    // most terminals are 24 lines
+#ಆದರೆ_ಅಂತ್ಯ
     }
-    set_shellsize(width, height, FALSE);	// may change Rows
-    if (starting != NO_SCREEN)
+    ಗಣ_shellsize(ಅಗಲ, ಎತ್ತರ, FALSE);	// may change Rows
+    ಆದರೆ (starting != NO_SCREEN)
     {
-	if (scroll_region)
+	ಆದರೆ (scroll_region)
 	    scroll_region_reset();		// In case Rows changed
 	check_map_keycodes();	// check mappings for terminal codes used
 
@@ -2452,12 +2452,12 @@ set_termname(char_u *term)
 	     */
 	    FOR_ALL_BUFFERS(buf)
 	    {
-		if (curbuf->b_ml.ml_mfp != NULL)
+		ಆದರೆ (curbuf->b_ml.ml_mfp != ಖಾಲಿ)
 		{
 		    aucmd_prepbuf(&aco, buf);
-		    if (curbuf == buf)
+		    ಆದರೆ (curbuf == buf)
 		    {
-			apply_autocmds(EVENT_TERMCHANGED, NULL, NULL, FALSE,
+			apply_autocmds(EVENT_TERMCHANGED, ಖಾಲಿ, ಖಾಲಿ, FALSE,
 								      curbuf);
 			// restore curwin/curbuf and a few other things
 			aucmd_restbuf(&aco);
@@ -2467,18 +2467,18 @@ set_termname(char_u *term)
 	}
     }
 
-#ifdef FEAT_TERMRESPONSE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMRESPONSE
     may_req_termresponse();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_IMAGE
-    (void)update_image_backend();
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_IMAGE
+    (ಶೂನ್ಯ)update_image_backend();
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-#if defined(EXITFREE)
+#ಆದರೆ defined(EXITFREE)
 
 # ifdef HAVE_DEL_CURTERM
 #  include <term.h>	    // declares cur_term
@@ -2488,31 +2488,31 @@ set_termname(char_u *term)
  * If supported, delete "cur_term", which caches terminal related entries.
  * Avoids that valgrind reports possibly lost memory.
  */
-    void
-free_cur_term(void)
+    ಶೂನ್ಯ
+free_cur_ಪದ(ಶೂನ್ಯ)
 {
 # ifdef HAVE_DEL_CURTERM
-    if (cur_term)
-	del_curterm(cur_term);
+    ಆದರೆ (cur_ಪದ)
+	del_curterm(cur_ಪದ);
 # endif
 }
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef HAVE_TGETENT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_TGETENT
 /*
  * Call tgetent()
  * Return error message if it fails, NULL if it's OK.
  */
-    static char *
-invoke_tgetent(char_u *tbuf, char_u *term)
+    ಸ್ಥಿರ ಅಕ್ಷರ *
+invoke_tgetent(char_u *tbuf, char_u *ಪದ)
 {
-    int	    i;
+    ಪೂರ್ಣಾಂಕ	    i;
 
     // Note: Valgrind may report a leak here, because the library keeps one
     // buffer around that we can't ever free.
-    i = TGETENT(tbuf, term);
-    if (i < 0		    // -1 is always an error
+    i = TGETENT(tbuf, ಪದ);
+    ಆದರೆ (i < 0		    // -1 is always an error
 # ifdef TGETENT_ZERO_ERR
 	    || i == 0	    // sometimes zero is also an error
 # endif
@@ -2521,62 +2521,62 @@ invoke_tgetent(char_u *tbuf, char_u *term)
 	// On FreeBSD tputs() gets a SEGV after a tgetent() which fails.  Call
 	// tgetent() with the always existing "dumb" entry to avoid a crash or
 	// hang.
-	(void)TGETENT(tbuf, "dumb");
+	(ಶೂನ್ಯ)TGETENT(tbuf, "dumb");
 
-	if (i < 0)
+	ಆದರೆ (i < 0)
 # ifdef TGETENT_ZERO_ERR
-	    return _(e_cannot_open_termcap_file);
-	if (i == 0)
+	    ಹಿಂತಿರುಗಿ _(e_cannot_open_termcap_file);
+	ಆದರೆ (i == 0)
 # endif
 # ifdef TERMINFO
-	    return _(e_terminal_entry_not_found_in_terminfo);
-# else
-	    return _(e_terminal_entry_not_found_in_termcap);
+	    ಹಿಂತಿರುಗಿ _(e_terminal_ನಮೂದು_not_ಸಿಕ್ಕಿತು_ಒಳ_terminfo);
+# ಇಲ್ಲದಿದ್ದರೆ
+	    ಹಿಂತಿರುಗಿ _(e_terminal_ನಮೂದು_not_ಸಿಕ್ಕಿತು_ಒಳ_termcap);
 # endif
     }
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Some versions of tgetstr() have been reported to return -1 instead of NULL.
  * Fix that here.
  */
-    static char_u *
-vim_tgetstr(char *s, char_u **pp)
+    ಸ್ಥಿರ char_u *
+vim_tgetstr(ಅಕ್ಷರ *s, char_u **pp)
 {
-    char	*p;
+    ಅಕ್ಷರ	*p;
 
-    p = tgetstr(s, (char **)pp);
-    if (p == (char *)-1)
-	p = NULL;
-    return (char_u *)p;
+    p = tgetstr(s, (ಅಕ್ಷರ **)pp);
+    ಆದರೆ (p == (ಅಕ್ಷರ *)-1)
+	p = ಖಾಲಿ;
+    ಹಿಂತಿರುಗಿ (char_u *)p;
 }
-#endif // HAVE_TGETENT
+#ಆದರೆ_ಅಂತ್ಯ // HAVE_TGETENT
 
-#if defined(HAVE_TGETENT) && (defined(UNIX) || defined(VMS) || defined(MACOS_X))
+#ಆದರೆ defined(HAVE_TGETENT) && (defined(UNIX) || defined(VMS) || defined(MACOS_X))
 /*
  * Get Columns and Rows from the termcap. Used after a window signal if the
  * ioctl() fails. It doesn't make sense to call tgetent each time if the "co"
  * and "li" entries never change. But on some systems this works.
  * Errors while getting the entries are ignored.
  */
-    void
+    ಶೂನ್ಯ
 getlinecol(
-    long	*cp,	// pointer to columns
-    long	*rp)	// pointer to rows
+    ದೀರ್ಘ	*cp,	// pointer to columns
+    ದೀರ್ಘ	*rp)	// pointer to rows
 {
     char_u	tbuf[TBUFSZ];
 
-    if (T_NAME == NULL || *T_NAME == NUL
-	    || invoke_tgetent(tbuf, T_NAME) != NULL)
-	return;
+    ಆದರೆ (T_NAME == ಖಾಲಿ || *T_NAME == NUL
+	    || invoke_tgetent(tbuf, T_NAME) != ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    if (*cp == 0)
+    ಆದರೆ (*cp == 0)
 	*cp = tgetnum("co");
-    if (*rp == 0)
+    ಆದರೆ (*rp == 0)
 	*rp = tgetnum("li");
 }
-#endif // defined(HAVE_TGETENT) && defined(UNIX)
+#ಆದರೆ_ಅಂತ್ಯ // defined(HAVE_TGETENT) && defined(UNIX)
 
 /*
  * Get a string entry from the termcap and add it to the list of termcodes.
@@ -2585,117 +2585,117 @@ getlinecol(
  * If force given, replace an existing entry.
  * Return FAIL if the entry was not found, OK if the entry was added.
  */
-    int
-add_termcap_entry(char_u *name, int force)
+    ಪೂರ್ಣಾಂಕ
+ಕೂಡಿಸು_termcap_ನಮೂದು(char_u *name, ಪೂರ್ಣಾಂಕ force)
 {
-    char_u  *term;
-    int	    key;
-#ifdef HAVE_TGETENT
+    char_u  *ಪದ;
+    ಪೂರ್ಣಾಂಕ	    ಕೀಲಿ;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_TGETENT
     char_u  *string;
-    int	    i;
-    int	    builtin_first;
+    ಪೂರ್ಣಾಂಕ	    i;
+    ಪೂರ್ಣಾಂಕ	    builtin_ಮೊದಲ;
     char_u  tbuf[TBUFSZ];
     char_u  tstrbuf[TBUFSZ];
     char_u  *tp = tstrbuf;
-    char    *error_msg = NULL;
-#endif
+    ಅಕ್ಷರ    *error_ಸಂದೇಶ = ಖಾಲಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * If the GUI is running or will start in a moment, we only support the keys
  * that the GUI can produce.
  */
-#ifdef FEAT_GUI
-    if (gui.in_use || gui.starting)
-	return gui_mch_haskey(name);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+    ಆದರೆ (gui.ಒಳ_use || gui.starting)
+	ಹಿಂತಿರುಗಿ gui_mch_haskey(name);
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (!force && find_termcode(name) != NULL)	    // it's already there
-	return OK;
+    ಆದರೆ (!force && ಕಂಡುಹಿಡಿ_termcode(name) != ಖಾಲಿ)	    // it's already there
+	ಹಿಂತಿರುಗಿ OK;
 
-    term = T_NAME;
-    if (term == NULL || *term == NUL)	    // 'term' not defined yet
-	return FAIL;
+    ಪದ = T_NAME;
+    ಆದರೆ (ಪದ == ಖಾಲಿ || *ಪದ == NUL)	    // 'term' not defined yet
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    if (term_is_builtin(term))		    // name starts with "builtin_"
+    ಆದರೆ (ಪದ_is_builtin(ಪದ))		    // name starts with "builtin_"
     {
-	term += 8;
-#ifdef HAVE_TGETENT
-	builtin_first = TRUE;
-#endif
+	ಪದ += 8;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_TGETENT
+	builtin_ಮೊದಲ = TRUE;
+#ಆದರೆ_ಅಂತ್ಯ
     }
-#ifdef HAVE_TGETENT
-    else
-	builtin_first = p_tbi;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_TGETENT
+    ಇಲ್ಲದಿದ್ದರೆ
+	builtin_ಮೊದಲ = p_tbi;
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef HAVE_TGETENT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_TGETENT
 /*
  * We can get the entry from the builtin termcap and from the external one.
  * If 'ttybuiltin' is on or the terminal name starts with "builtin_", try
  * builtin termcap first.
  * If 'ttybuiltin' is off, try external termcap first.
  */
-    for (i = 0; i < 2; ++i)
+    ಗಾಗಿ (i = 0; i < 2; ++i)
     {
-	if ((!builtin_first) == i)
-#endif
+	ಆದರೆ ((!builtin_ಮೊದಲ) == i)
+#ಆದರೆ_ಅಂತ್ಯ
 	/*
 	 * Search in builtin termcaps
 	 */
 	{
-	    tcap_entry_T *termp = find_builtin_term(term);
-	    if (termp != NULL)	// found it
+	    tcap_ನಮೂದು_T *termp = ಕಂಡುಹಿಡಿ_builtin_ಪದ(ಪದ);
+	    ಆದರೆ (termp != ಖಾಲಿ)	// found it
 	    {
-		key = TERMCAP2KEY(name[0], name[1]);
+		ಕೀಲಿ = TERMCAP2_ಕೀಲಿ(name[0], name[1]);
 		++termp;
-		while (termp->bt_entry != (int)KS_NAME)
+		ಆಗ (termp->bt_ನಮೂದು != (ಪೂರ್ಣಾಂಕ)KS_NAME)
 		{
-		    if ((int)termp->bt_entry == key)
+		    ಆದರೆ ((ಪೂರ್ಣಾಂಕ)termp->bt_ನಮೂದು == ಕೀಲಿ)
 		    {
-			add_termcode(name, (char_u *)termp->bt_string,
-							  term_is_8bit(term));
-			return OK;
+			ಕೂಡಿಸು_termcode(name, (char_u *)termp->bt_string,
+							  ಪದ_is_8bit(ಪದ));
+			ಹಿಂತಿರುಗಿ OK;
 		    }
 		    ++termp;
 		}
 	    }
 	}
-#ifdef HAVE_TGETENT
-	else
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_TGETENT
+	ಇಲ್ಲದಿದ್ದರೆ
 	/*
 	 * Search in external termcap
 	 */
 	{
-	    error_msg = invoke_tgetent(tbuf, term);
-	    if (error_msg == NULL)
+	    error_ಸಂದೇಶ = invoke_tgetent(tbuf, ಪದ);
+	    ಆದರೆ (error_ಸಂದೇಶ == ಖಾಲಿ)
 	    {
-		string = TGETSTR((char *)name, &tp);
-		if (string != NULL && *string != NUL)
+		string = TGETSTR((ಅಕ್ಷರ *)name, &tp);
+		ಆದರೆ (string != ಖಾಲಿ && *string != NUL)
 		{
-		    add_termcode(name, string, FALSE);
-		    return OK;
+		    ಕೂಡಿಸು_termcode(name, string, FALSE);
+		    ಹಿಂತಿರುಗಿ OK;
 		}
 	    }
 	}
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (SOURCING_NAME == NULL)
+    ಆದರೆ (SOURCING_NAME == ಖಾಲಿ)
     {
-#ifdef HAVE_TGETENT
-	if (error_msg != NULL)
-	    emsg(error_msg);
-	else
-#endif
-	    semsg(_(e_no_str_entry_in_termcap), name);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_TGETENT
+	ಆದರೆ (error_ಸಂದೇಶ != ಖಾಲಿ)
+	    emsg(error_ಸಂದೇಶ);
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	    semsg(_(e_no_str_ನಮೂದು_ಒಳ_termcap), name);
     }
-    return FAIL;
+    ಹಿಂತಿರುಗಿ FAIL;
 }
 
-    static int
-term_is_builtin(char_u *name)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಪದ_is_builtin(char_u *name)
 {
-    return (STRNCMP(name, "builtin_", (size_t)8) == 0);
+    ಹಿಂತಿರುಗಿ (STRNCMP(name, "builtin_", (size_t)8) == 0);
 }
 
 /*
@@ -2703,10 +2703,10 @@ term_is_builtin(char_u *name)
  * Assume that the terminal is using 8-bit controls when the name contains
  * "8bit", like in "xterm-8bit".
  */
-    int
-term_is_8bit(char_u *name)
+    ಪೂರ್ಣಾಂಕ
+ಪದ_is_8bit(char_u *name)
 {
-    return (detected_8bit || strstr((char *)name, "8bit") != NULL);
+    ಹಿಂತಿರುಗಿ (detected_8bit || ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು((ಅಕ್ಷರ *)name, "8bit") != ಖಾಲಿ);
 }
 
 /*
@@ -2715,194 +2715,194 @@ term_is_8bit(char_u *name)
  * <Esc>] -> OSC  <M-C-]>
  * <Esc>O -> <M-C-O>
  */
-    static int
-term_7to8bit(char_u *p)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಪದ_7to8bit(char_u *p)
 {
-    if (*p != ESC)
-	return 0;
+    ಆದರೆ (*p != ESC)
+	ಹಿಂತಿರುಗಿ 0;
 
-    if (p[1] == '[')
-	return CSI;
-    else if (p[1] == ']')
-	return OSC;
-    else if (p[1] == 'O')
-	return 0x8f;
-    return 0;
+    ಆದರೆ (p[1] == '[')
+	ಹಿಂತಿರುಗಿ CSI;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p[1] == ']')
+	ಹಿಂತಿರುಗಿ OSC;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p[1] == 'O')
+	ಹಿಂತಿರುಗಿ 0x8f;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-#if defined(FEAT_GUI)
-    int
-term_is_gui(char_u *name)
+#ಆದರೆ defined(FEAT_GUI)
+    ಪೂರ್ಣಾಂಕ
+ಪದ_is_gui(char_u *name)
 {
-    return (STRCMP(name, "builtin_gui") == 0 || STRCMP(name, "gui") == 0);
+    ಹಿಂತಿರುಗಿ (STRCMP(name, "builtin_gui") == 0 || STRCMP(name, "gui") == 0);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if !defined(HAVE_TGETENT) || defined(AMIGA)
+#ಆದರೆ !defined(HAVE_TGETENT) || defined(AMIGA)
 
     char_u *
-tltoa(unsigned long i)
+tltoa(ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ i)
 {
-    static char_u buf[16];
+    ಸ್ಥಿರ char_u buf[16];
     char_u	*p;
 
     p = buf + 15;
     *p = '\0';
-    do
+    ಮಾಡು
     {
 	--p;
 	*p = (char_u) (i % 10 + '0');
 	i /= 10;
     }
-    while (i > 0 && p > buf);
-    return p;
+    ಆಗ (i > 0 && p > buf);
+    ಹಿಂತಿರುಗಿ p;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifndef HAVE_TGETENT
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ HAVE_TGETENT
 
 /*
  * minimal tgoto() implementation.
  * no padding and we only parse for %i %d and %+char
  */
-    static char *
-tgoto(char *cm, int x, int y)
+    ಸ್ಥಿರ ಅಕ್ಷರ *
+tgoto(ಅಕ್ಷರ *cm, ಪೂರ್ಣಾಂಕ x, ಪೂರ್ಣಾಂಕ y)
 {
-    static char buf[30];
-    char *p, *s, *e;
+    ಸ್ಥಿರ ಅಕ್ಷರ buf[30];
+    ಅಕ್ಷರ *p, *s, *e;
 
-    if (!cm)
-	return "OOPS";
+    ಆದರೆ (!cm)
+	ಹಿಂತಿರುಗಿ "OOPS";
     e = buf + 29;
-    for (s = buf; s < e && *cm; cm++)
+    ಗಾಗಿ (s = buf; s < e && *cm; cm++)
     {
-	if (*cm != '%')
+	ಆದರೆ (*cm != '%')
 	{
 	    *s++ = *cm;
-	    continue;
+	    ಮುಂದುವರಿ;
 	}
-	switch (*++cm)
+	ಆಯ್ಕೆ (*++cm)
 	{
-	case 'd':
-	    p = (char *)tltoa((unsigned long)y);
+	ಸ್ಥಿತಿ 'd':
+	    p = (ಅಕ್ಷರ *)tltoa((ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ)y);
 	    y = x;
-	    while (*p)
+	    ಆಗ (*p)
 		*s++ = *p++;
-	    break;
-	case 'i':
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ 'i':
 	    x++;
 	    y++;
-	    break;
-	case '+':
-	    *s++ = (char)(*++cm + y);
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ '+':
+	    *s++ = (ಅಕ್ಷರ)(*++cm + y);
 	    y = x;
-	    break;
-	case '%':
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ '%':
 	    *s++ = *cm;
-	    break;
-	default:
-	    return "OOPS";
+	    ನಿಲ್ಲಿಸು;
+	ಪೂರ್ವನಿಯೋಜಿತ:
+	    ಹಿಂತಿರುಗಿ "OOPS";
 	}
     }
     *s = '\0';
-    return buf;
+    ಹಿಂತಿರುಗಿ buf;
 }
 
-#endif // HAVE_TGETENT
+#ಆದರೆ_ಅಂತ್ಯ // HAVE_TGETENT
 
 /*
  * Set the terminal name and initialize the terminal options.
  * If "name" is NULL or empty, get the terminal name from the environment.
  * If that fails, use the default terminal name.
  */
-    void
+    ಶೂನ್ಯ
 termcapinit(char_u *name)
 {
-    char_u	*term = name;
+    char_u	*ಪದ = name;
 
-    if (term != NULL && *term == NUL)
-	term = NULL;	    // empty name is equal to no name
+    ಆದರೆ (ಪದ != ಖಾಲಿ && *ಪದ == NUL)
+	ಪದ = ಖಾಲಿ;	    // empty name is equal to no name
 
-#ifndef MSWIN
-    if (term == NULL)
-	term = mch_getenv((char_u *)"TERM");
-#endif
-    if (term == NULL || *term == NUL)
-	term = DEFAULT_TERM;
-    set_string_option_direct((char_u *)"term", -1, term, OPT_FREE, 0);
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ MSWIN
+    ಆದರೆ (ಪದ == ಖಾಲಿ)
+	ಪದ = mch_getenv((char_u *)"TERM");
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (ಪದ == ಖಾಲಿ || *ಪದ == NUL)
+	ಪದ = DEFAULT_ಪದ;
+    ಗಣ_string_option_ನೇರ((char_u *)"term", -1, ಪದ, OPT_FREE, 0);
 
     // Set the default terminal name.
-    set_string_default("term", term);
-    set_string_default("ttytype", term);
+    ಗಣ_string_default("term", ಪದ);
+    ಗಣ_string_default("ttytype", ಪದ);
 
     // Avoid using "term" here, because the next mch_getenv() may overwrite it.
-    set_termname(T_NAME != NULL ? T_NAME : term);
+    ಗಣ_termname(T_NAME != ಖಾಲಿ ? T_NAME : ಪದ);
 }
 
 /*
  * The number of calls to ui_write is reduced by using "out_buf".
  */
-#define OUT_SIZE	8191
+#ವ್ಯಾಖ್ಯಾನಿಸು ಹೊರಹೋಗು_ಗಾತ್ರ	8191
 
 // add one to allow mch_write() in os_win32.c to append a NUL
-static char_u		out_buf[OUT_SIZE + 1];
+ಸ್ಥಿರ char_u		ಹೊರಹೋಗು_buf[ಹೊರಹೋಗು_ಗಾತ್ರ + 1];
 
-static int		out_pos = 0;	// number of chars in out_buf
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ		ಹೊರಹೋಗು_pos = 0;	// number of chars in out_buf
 
 // Since the maximum number of SGR parameters shown as a normal value range is
 // 16, the escape sequence length can be 4 * 16 + lead + tail.
-#define MAX_ESC_SEQ_LEN	80
+#ವ್ಯಾಖ್ಯಾನಿಸು MAX_ESC_SEQ_LEN	80
 
 /*
  * out_flush(): flush the output buffer
  */
-    void
-out_flush(void)
+    ಶೂನ್ಯ
+ಹೊರಹೋಗು_flush(ಶೂನ್ಯ)
 {
-    int	    len;
+    ಪೂರ್ಣಾಂಕ	    len;
 
-    if (out_pos == 0)
-	return;
+    ಆದರೆ (ಹೊರಹೋಗು_pos == 0)
+	ಹಿಂತಿರುಗಿ;
 
     // set out_pos to 0 before ui_write, to avoid recursiveness
-    len = out_pos;
-    out_pos = 0;
-    ui_write(out_buf, len, FALSE);
-#ifdef FEAT_EVAL
-    if (ch_log_output != FALSE)
+    len = ಹೊರಹೋಗು_pos;
+    ಹೊರಹೋಗು_pos = 0;
+    ui_write(ಹೊರಹೋಗು_buf, len, FALSE);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಆದರೆ (ch_log_output != FALSE)
     {
-	out_buf[len] = NUL;
-	ch_log(NULL, "raw %s output: \"%s\"",
+	ಹೊರಹೋಗು_buf[len] = NUL;
+	ch_log(ಖಾಲಿ, "raw %s output: \"%s\"",
 # ifdef FEAT_GUI
-		(gui.in_use && !gui.dying && !gui.starting) ? "GUI" :
+		(gui.ಒಳ_use && !gui.dying && !gui.starting) ? "GUI" :
 # endif
 		"terminal",
-		out_buf);
-	if (ch_log_output == TRUE)
+		ಹೊರಹೋಗು_buf);
+	ಆದರೆ (ch_log_output == TRUE)
 	    ch_log_output = FALSE;  // only log once
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * out_flush_cursor(): flush the output buffer and redraw the cursor.
  * Does not flush recursively in the GUI to avoid slow drawing.
  */
-    void
-out_flush_cursor(
-    int	    force UNUSED,   // when TRUE, update cursor even when not moved
-    int	    clear_selection UNUSED) // clear selection under cursor
+    ಶೂನ್ಯ
+ಹೊರಹೋಗು_flush_cursor(
+    ಪೂರ್ಣಾಂಕ	    force ಬಳಸದ,   // when TRUE, update cursor even when not moved
+    ಪೂರ್ಣಾಂಕ	    clear_selection ಬಳಸದ) // clear selection under cursor
 {
     mch_disable_flush();
-    out_flush();
+    ಹೊರಹೋಗು_flush();
     mch_enable_flush();
-#ifdef FEAT_GUI
-    if (gui.in_use)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+    ಆದರೆ (gui.ಒಳ_use)
     {
 	gui_update_cursor(force, clear_selection);
 	gui_may_flush();
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 
@@ -2910,23 +2910,23 @@ out_flush_cursor(
  * Sometimes a byte out of a multi-byte character is written with out_char().
  * To avoid flushing half of the character, call this function first.
  */
-    void
-out_flush_check(void)
+    ಶೂನ್ಯ
+ಹೊರಹೋಗು_flush_check(ಶೂನ್ಯ)
 {
-    if (enc_dbcs != 0 && out_pos >= OUT_SIZE - MB_MAXBYTES)
-	out_flush();
+    ಆದರೆ (enc_dbcs != 0 && ಹೊರಹೋಗು_pos >= ಹೊರಹೋಗು_ಗಾತ್ರ - MB_MAXBYTES)
+	ಹೊರಹೋಗು_flush();
 }
 
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 /*
  * out_trash(): Throw away the contents of the output buffer
  */
-    void
-out_trash(void)
+    ಶೂನ್ಯ
+ಹೊರಹೋಗು_trash(ಶೂನ್ಯ)
 {
-    out_pos = 0;
+    ಹೊರಹೋಗು_pos = 0;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * out_char(c): put a byte into the output buffer.
@@ -2934,32 +2934,32 @@ out_trash(void)
  * This should not be used for outputting text on the screen (use functions
  * like msg_puts() and screen_putchar() for that).
  */
-    void
-out_char(unsigned c)
+    ಶೂನ್ಯ
+ಹೊರಹೋಗು_char(ಚಿಹ್ನೆರಹಿತ c)
 {
-#if defined(UNIX) || defined(VMS) || defined(AMIGA) || defined(MACOS_X)
-    if (c == '\n')	// turn LF into CR-LF (CRMOD doesn't seem to do this)
-	out_char('\r');
-#endif
+#ಆದರೆ defined(UNIX) || defined(VMS) || defined(AMIGA) || defined(MACOS_X)
+    ಆದರೆ (c == '\n')	// turn LF into CR-LF (CRMOD doesn't seem to do this)
+	ಹೊರಹೋಗು_char('\r');
+#ಆದರೆ_ಅಂತ್ಯ
 
-    out_buf[out_pos++] = c;
+    ಹೊರಹೋಗು_buf[ಹೊರಹೋಗು_pos++] = c;
 
     // For testing we flush each time.
-    if (out_pos >= OUT_SIZE || p_wd)
-	out_flush();
+    ಆದರೆ (ಹೊರಹೋಗು_pos >= ಹೊರಹೋಗು_ಗಾತ್ರ || p_wd)
+	ಹೊರಹೋಗು_flush();
 }
 
 /*
  * Output "c" like out_char(), but don't flush when p_wd is set.
  */
-    static int
-out_char_nf(int c)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಹೊರಹೋಗು_char_nf(ಪೂರ್ಣಾಂಕ c)
 {
-    out_buf[out_pos++] = (unsigned)c;
+    ಹೊರಹೋಗು_buf[ಹೊರಹೋಗು_pos++] = (ಚಿಹ್ನೆರಹಿತ)c;
 
-    if (out_pos >= OUT_SIZE)
-	out_flush();
-    return (unsigned)c;
+    ಆದರೆ (ಹೊರಹೋಗು_pos >= ಹೊರಹೋಗು_ಗಾತ್ರ)
+	ಹೊರಹೋಗು_flush();
+    ಹಿಂತಿರುಗಿ (ಚಿಹ್ನೆರಹಿತ)c;
 }
 
 /*
@@ -2971,19 +2971,19 @@ out_char_nf(int c)
  * This should only be used for writing terminal codes, not for outputting
  * normal text (use functions like msg_puts() and screen_putchar() for that).
  */
-    void
-out_str_nf(char_u *s)
+    ಶೂನ್ಯ
+ಹೊರಹೋಗು_str_nf(char_u *s)
 {
     // avoid terminal strings being split up
-    if (out_pos > OUT_SIZE - MAX_ESC_SEQ_LEN)
-	out_flush();
+    ಆದರೆ (ಹೊರಹೋಗು_pos > ಹೊರಹೋಗು_ಗಾತ್ರ - MAX_ESC_SEQ_LEN)
+	ಹೊರಹೋಗು_flush();
 
-    for (char_u *p = s; *p != NUL; ++p)
-	out_char_nf(*p);
+    ಗಾಗಿ (char_u *p = s; *p != NUL; ++p)
+	ಹೊರಹೋಗು_char_nf(*p);
 
     // For testing we write one string at a time.
-    if (p_wd)
-	out_flush();
+    ಆದರೆ (p_wd)
+	ಹೊರಹೋಗು_flush();
 }
 
 /*
@@ -2992,69 +2992,69 @@ out_str_nf(char_u *s)
  * it at the wrong time.
  * Note: Only for terminal strings.
  */
-    void
-out_str_cf(char_u *s)
+    ಶೂನ್ಯ
+ಹೊರಹೋಗು_str_cf(char_u *s)
 {
-    if (s == NULL || *s == NUL)
-	return;
+    ಆದರೆ (s == ಖಾಲಿ || *s == NUL)
+	ಹಿಂತಿರುಗಿ;
 
-#ifdef HAVE_TGETENT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_TGETENT
     char_u *p;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
     // Don't use tputs() when GUI is used, ncurses crashes.
-    if (gui.in_use)
+    ಆದರೆ (gui.ಒಳ_use)
     {
-	out_str_nf(s);
-	return;
+	ಹೊರಹೋಗು_str_nf(s);
+	ಹಿಂತಿರುಗಿ;
     }
-#endif
-    if (out_pos > OUT_SIZE - MAX_ESC_SEQ_LEN)
-	out_flush();
-#ifdef HAVE_TGETENT
-    for (p = s; *s; ++s)
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (ಹೊರಹೋಗು_pos > ಹೊರಹೋಗು_ಗಾತ್ರ - MAX_ESC_SEQ_LEN)
+	ಹೊರಹೋಗು_flush();
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_TGETENT
+    ಗಾಗಿ (p = s; *s; ++s)
     {
 	// flush just before delay command
-	if (*s == '$' && *(s + 1) == '<')
+	ಆದರೆ (*s == '$' && *(s + 1) == '<')
 	{
 	    char_u save_c = *s;
-	    int duration = atoi((char *)s + 2);
+	    ಪೂರ್ಣಾಂಕ duration = atoi((ಅಕ್ಷರ *)s + 2);
 
 	    *s = NUL;
-	    tputs((char *)p, 1, TPUTSFUNCAST out_char_nf);
+	    tputs((ಅಕ್ಷರ *)p, 1, TPUTSFUNCAST ಹೊರಹೋಗು_char_nf);
 	    *s = save_c;
-	    out_flush();
+	    ಹೊರಹೋಗು_flush();
 # ifdef ELAPSED_FUNC
 	    // Only sleep here if we can limit this happening in
 	    // vim_beep().
 	    p = vim_strchr(s, '>');
-	    if (p == NULL || duration <= 0)
+	    ಆದರೆ (p == ಖಾಲಿ || duration <= 0)
 	    {
 		// can't parse the time, don't sleep here
 		p = s;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		++p;
 		do_sleep(duration, FALSE);
 	    }
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 	    // Rely on the terminal library to sleep.
 	    p = s;
 # endif
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
     }
-    tputs((char *)p, 1, TPUTSFUNCAST out_char_nf);
-#else
-    while (*s)
-	out_char_nf(*s++);
-#endif
+    tputs((ಅಕ್ಷರ *)p, 1, TPUTSFUNCAST ಹೊರಹೋಗು_char_nf);
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಆಗ (*s)
+	ಹೊರಹೋಗು_char_nf(*s++);
+#ಆದರೆ_ಅಂತ್ಯ
 
     // For testing we write one string at a time.
-    if (p_wd)
-	out_flush();
+    ಆದರೆ (p_wd)
+	ಹೊರಹೋಗು_flush();
 }
 
 /*
@@ -3063,94 +3063,94 @@ out_str_cf(char_u *s)
  * This should only be used for writing terminal codes, not for outputting
  * normal text (use functions like msg_puts() and screen_putchar() for that).
  */
-    void
-out_str(char_u *s)
+    ಶೂನ್ಯ
+ಹೊರಹೋಗು_str(char_u *s)
 {
-    if (s == NULL || *s == NUL)
-	return;
+    ಆದರೆ (s == ಖಾಲಿ || *s == NUL)
+	ಹಿಂತಿರುಗಿ;
 
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
     // Don't use tputs() when GUI is used, ncurses crashes.
-    if (gui.in_use)
+    ಆದರೆ (gui.ಒಳ_use)
     {
-	out_str_nf(s);
-	return;
+	ಹೊರಹೋಗು_str_nf(s);
+	ಹಿಂತಿರುಗಿ;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     // avoid terminal strings being split up
-    if (out_pos > OUT_SIZE - MAX_ESC_SEQ_LEN)
-	out_flush();
-#ifdef HAVE_TGETENT
-    tputs((char *)s, 1, TPUTSFUNCAST out_char_nf);
-#else
-    while (*s)
-	out_char_nf(*s++);
-#endif
+    ಆದರೆ (ಹೊರಹೋಗು_pos > ಹೊರಹೋಗು_ಗಾತ್ರ - MAX_ESC_SEQ_LEN)
+	ಹೊರಹೋಗು_flush();
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_TGETENT
+    tputs((ಅಕ್ಷರ *)s, 1, TPUTSFUNCAST ಹೊರಹೋಗು_char_nf);
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಆಗ (*s)
+	ಹೊರಹೋಗು_char_nf(*s++);
+#ಆದರೆ_ಅಂತ್ಯ
 
     // For testing we write one string at a time.
-    if (p_wd)
-	out_flush();
+    ಆದರೆ (p_wd)
+	ಹೊರಹೋಗು_flush();
 }
 
 /*
  * cursor positioning using termcap parser. (jw)
  */
-    void
-term_windgoto(int row, int col)
+    ಶೂನ್ಯ
+ಪದ_windgoto(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು)
 {
-    OUT_STR(tgoto((char *)T_CM, col, row));
+    ಹೊರಹೋಗು_STR(tgoto((ಅಕ್ಷರ *)T_CM, ಲಂಬಸಾಲು, ಅಡ್ಡಸಾಲು));
 }
 
-    void
-term_cursor_right(int i)
+    ಶೂನ್ಯ
+ಪದ_cursor_ಬಲ(ಪೂರ್ಣಾಂಕ i)
 {
-    OUT_STR(tgoto((char *)T_CRI, 0, i));
+    ಹೊರಹೋಗು_STR(tgoto((ಅಕ್ಷರ *)T_CRI, 0, i));
 }
 
-    void
-term_append_lines(int line_count)
+    ಶೂನ್ಯ
+ಪದ_append_ಸಾಲುಗಳು(ಪೂರ್ಣಾಂಕ ಸಾಲು_ಎಣಿಕೆ)
 {
-    OUT_STR(tgoto((char *)T_CAL, 0, line_count));
+    ಹೊರಹೋಗು_STR(tgoto((ಅಕ್ಷರ *)T_CAL, 0, ಸಾಲು_ಎಣಿಕೆ));
 }
 
-    void
-term_delete_lines(int line_count)
+    ಶೂನ್ಯ
+ಪದ_delete_ಸಾಲುಗಳು(ಪೂರ್ಣಾಂಕ ಸಾಲು_ಎಣಿಕೆ)
 {
-    OUT_STR(tgoto((char *)T_CDL, 0, line_count));
+    ಹೊರಹೋಗು_STR(tgoto((ಅಕ್ಷರ *)T_CDL, 0, ಸಾಲು_ಎಣಿಕೆ));
 }
 
-#if defined(UNIX) || defined(VMS)
-    void
-term_enable_mouse(int enable)
+#ಆದರೆ defined(UNIX) || defined(VMS)
+    ಶೂನ್ಯ
+ಪದ_enable_mouse(ಪೂರ್ಣಾಂಕ enable)
 {
-    int on = enable ? 1 : 0;
-    OUT_STR(tgoto((char *)T_CXM, 0, on));
+    ಪೂರ್ಣಾಂಕ on = enable ? 1 : 0;
+    ಹೊರಹೋಗು_STR(tgoto((ಅಕ್ಷರ *)T_CXM, 0, on));
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(HAVE_TGETENT)
-    void
-term_set_winpos(int x, int y)
+#ಆದರೆ defined(HAVE_TGETENT)
+    ಶೂನ್ಯ
+ಪದ_ಗಣ_winpos(ಪೂರ್ಣಾಂಕ x, ಪೂರ್ಣಾಂಕ y)
 {
     // Can't handle a negative value here
-    if (x < 0)
+    ಆದರೆ (x < 0)
 	x = 0;
-    if (y < 0)
+    ಆದರೆ (y < 0)
 	y = 0;
-    OUT_STR(tgoto((char *)T_CWP, y, x));
+    ಹೊರಹೋಗು_STR(tgoto((ಅಕ್ಷರ *)T_CWP, y, x));
 }
 
-# if defined(FEAT_TERMRESPONSE)
+# ಆದರೆ defined(FEAT_TERMRESPONSE)
 /*
  * Return TRUE if we can request the terminal for a response.
  */
-    static int
-can_get_termresponse(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+can_get_termresponse(ಶೂನ್ಯ)
 {
-    return cur_tmode == TMODE_RAW
-	    && termcap_active
+    ಹಿಂತಿರುಗಿ cur_tmode == TMODE_RAW
+	    && termcap_ಸಕ್ರಿಯ
 #  ifdef UNIX
-	    && (is_not_a_term() || (isatty(1) && isatty(read_cmd_fd)))
+	    && (is_not_a_ಪದ() || (isatty(1) && isatty(read_cmd_fd)))
 #  endif
 	    && p_ek;
 }
@@ -3158,72 +3158,72 @@ can_get_termresponse(void)
 /*
  * Set "status" to STATUS_SENT.
  */
-    static void
-termrequest_sent(termrequest_T *status)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+termrequest_ಕಳುಹಿಸಿದ(termrequest_T *ಸ್ಥಿತಿ_2)
 {
-    status->tr_progress = STATUS_SENT;
-    status->tr_start = time(NULL);
+    ಸ್ಥಿತಿ_2->tr_ಪ್ರಗತಿ = ಸ್ಥಿತಿ_ಕಳುಹಿಸಿದ;
+    ಸ್ಥಿತಿ_2->tr_ಆರಂಭ = ಸಮಯ(ಖಾಲಿ);
 }
 
 /*
  * Return TRUE if any of the requests are in STATUS_SENT.
  */
-    static int
-termrequest_any_pending(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+termrequest_any_pending(ಶೂನ್ಯ)
 {
-    int	    i;
-    time_t  now = time(NULL);
+    ಪೂರ್ಣಾಂಕ	    i;
+    time_t  now = ಸಮಯ(ಖಾಲಿ);
 
-    for (i = 0; all_termrequests[i] != NULL; ++i)
+    ಗಾಗಿ (i = 0; all_termrequests[i] != ಖಾಲಿ; ++i)
     {
-	if (all_termrequests[i]->tr_progress == STATUS_SENT)
+	ಆದರೆ (all_termrequests[i]->tr_ಪ್ರಗತಿ == ಸ್ಥಿತಿ_ಕಳುಹಿಸಿದ)
 	{
-	    if (all_termrequests[i]->tr_start > 0 && now > 0
-				    && all_termrequests[i]->tr_start + 2 < now)
+	    ಆದರೆ (all_termrequests[i]->tr_ಆರಂಭ > 0 && now > 0
+				    && all_termrequests[i]->tr_ಆರಂಭ + 2 < now)
 		// Sent the request more than 2 seconds ago and didn't get a
 		// response, assume it failed.
-		all_termrequests[i]->tr_progress = STATUS_FAIL;
-	    else
-		return TRUE;
+		all_termrequests[i]->tr_ಪ್ರಗತಿ = ಸ್ಥಿತಿ_FAIL;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ಹಿಂತಿರುಗಿ TRUE;
 	}
     }
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
-static int winpos_x = -1;
-static int winpos_y = -1;
-static int did_request_winpos = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ winpos_x = -1;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ winpos_y = -1;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ did_request_winpos = 0;
 
-#  if defined(FEAT_EVAL) || defined(FEAT_TERMINAL)
+#  ಆದರೆ defined(FEAT_EVAL) || defined(FEAT_TERMINAL)
 /*
  * Try getting the Vim window position from the terminal.
  * Returns OK or FAIL.
  */
-    int
-term_get_winpos(int *x, int *y, varnumber_T timeout)
+    ಪೂರ್ಣಾಂಕ
+ಪದ_get_winpos(ಪೂರ್ಣಾಂಕ *x, ಪೂರ್ಣಾಂಕ *y, varnumber_T timeout)
 {
-    int count = 0;
-    int prev_winpos_x = winpos_x;
-    int prev_winpos_y = winpos_y;
+    ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_2 = 0;
+    ಪೂರ್ಣಾಂಕ prev_winpos_x = winpos_x;
+    ಪೂರ್ಣಾಂಕ prev_winpos_y = winpos_y;
 
-    if (*T_CGP == NUL || !can_get_termresponse())
-	return FAIL;
+    ಆದರೆ (*T_CGP == NUL || !can_get_termresponse())
+	ಹಿಂತಿರುಗಿ FAIL;
     winpos_x = -1;
     winpos_y = -1;
     ++did_request_winpos;
-    termrequest_sent(&winpos_status);
-    OUT_STR(T_CGP);
-    out_flush();
+    termrequest_ಕಳುಹಿಸಿದ(&winpos_ಸ್ಥಿತಿ);
+    ಹೊರಹೋಗು_STR(T_CGP);
+    ಹೊರಹೋಗು_flush();
 
     // Try reading the result for "timeout" msec.
-    while (count++ <= timeout / 10 && !got_int)
+    ಆಗ (ಎಣಿಕೆ_2++ <= timeout / 10 && !got_int)
     {
-	(void)vpeekc_nomap();
-	if (winpos_x >= 0 && winpos_y >= 0)
+	(ಶೂನ್ಯ)vpeekc_nomap();
+	ಆದರೆ (winpos_x >= 0 && winpos_y >= 0)
 	{
 	    *x = winpos_x;
 	    *y = winpos_y;
-	    return OK;
+	    ಹಿಂತಿರುಗಿ OK;
 	}
 	ui_delay(10L, FALSE);
     }
@@ -3232,103 +3232,103 @@ term_get_winpos(int *x, int *y, varnumber_T timeout)
 
     winpos_x = prev_winpos_x;
     winpos_y = prev_winpos_y;
-    if (timeout < 10 && prev_winpos_y >= 0 && prev_winpos_x >= 0)
+    ಆದರೆ (timeout < 10 && prev_winpos_y >= 0 && prev_winpos_x >= 0)
     {
 	// Polling: return previous values if we have them.
 	*x = winpos_x;
 	*y = winpos_y;
-	return OK;
+	ಹಿಂತಿರುಗಿ OK;
     }
 
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 #  endif
 # endif
 
-    void
-term_set_winsize(int height, int width)
+    ಶೂನ್ಯ
+ಪದ_ಗಣ_winsize(ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಪೂರ್ಣಾಂಕ ಅಗಲ)
 {
-    OUT_STR(tgoto((char *)T_CWS, width, height));
+    ಹೊರಹೋಗು_STR(tgoto((ಅಕ್ಷರ *)T_CWS, ಅಗಲ, ಎತ್ತರ));
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    void
-term_font(int n)
+    ಶೂನ್ಯ
+ಪದ_font(ಪೂರ್ಣಾಂಕ n)
 {
-    if (*T_CFO)
+    ಆದರೆ (*T_CFO)
     {
-	char buf[20];
-	sprintf(buf, (char *)T_CFO, 9 + n);
-	OUT_STR(buf);
+	ಅಕ್ಷರ buf[20];
+	sprintf(buf, (ಅಕ್ಷರ *)T_CFO, 9 + n);
+	ಹೊರಹೋಗು_STR(buf);
     }
 }
 
-    static void
-term_color(char_u *s, int n)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಪದ_color(char_u *s, ಪೂರ್ಣಾಂಕ n)
 {
-    char	buf[20];
-    int		i = *s == CSI ? 1 : 2;
+    ಅಕ್ಷರ	buf[20];
+    ಪೂರ್ಣಾಂಕ		i = *s == CSI ? 1 : 2;
 		// index in s[] just after <Esc>[ or CSI
 
     // Special handling of 16 colors, because termcap can't handle it
     // Also accept "\e[3%dm" for TERMINFO, it is sometimes used
     // Also accept CSI instead of <Esc>[
-    if (n >= 8 && t_colors >= 16
+    ಆದರೆ (n >= 8 && t_colors >= 16
 	      && ((s[0] == ESC && s[1] == '[')
-#if defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
+#ಆದರೆ defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
 		  || (s[0] == ESC && s[1] == '|')
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		  || (s[0] == CSI && (i = 1) == 1))
 	      && s[i] != NUL
 	      && (STRCMP(s + i + 1, "%p1%dm") == 0
 		  || STRCMP(s + i + 1, "%dm") == 0)
 	      && (s[i] == '3' || s[i] == '4'))
     {
-#ifdef TERMINFO
-	char *format = "%s%s%%p1%%dm";
-#else
-	char *format = "%s%s%%dm";
-#endif
-	char *lead = i == 2 ? (
-#if defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TERMINFO
+	ಅಕ್ಷರ *format = "%s%s%%p1%%dm";
+#ಇಲ್ಲದಿದ್ದರೆ
+	ಅಕ್ಷರ *format = "%s%s%%dm";
+#ಆದರೆ_ಅಂತ್ಯ
+	ಅಕ್ಷರ *lead = i == 2 ? (
+#ಆದರೆ defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
 		    s[1] == '|' ? "\033|" :
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		    "\033[") : "\233";
-	char *tail = s[i] == '3' ? (n >= 16 ? "38;5;" : "9")
+	ಅಕ್ಷರ *ಬಾಲ = s[i] == '3' ? (n >= 16 ? "38;5;" : "9")
 				 : (n >= 16 ? "48;5;" : "10");
 
-	sprintf(buf, format, lead, tail);
-	OUT_STR(tgoto(buf, 0, n >= 16 ? n : n - 8));
+	sprintf(buf, format, lead, ಬಾಲ);
+	ಹೊರಹೋಗು_STR(tgoto(buf, 0, n >= 16 ? n : n - 8));
     }
-    else
-	OUT_STR(tgoto((char *)s, 0, n));
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಹೊರಹೋಗು_STR(tgoto((ಅಕ್ಷರ *)s, 0, n));
 }
 
-    void
-term_fg_color(int n)
+    ಶೂನ್ಯ
+ಪದ_fg_color(ಪೂರ್ಣಾಂಕ n)
 {
     // Use "AF" termcap entry if present, "Sf" entry otherwise
-    if (*T_CAF)
-	term_color(T_CAF, n);
-    else if (*T_CSF)
-	term_color(T_CSF, n);
+    ಆದರೆ (*T_CAF)
+	ಪದ_color(T_CAF, n);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*T_CSF)
+	ಪದ_color(T_CSF, n);
 }
 
-    void
-term_bg_color(int n)
+    ಶೂನ್ಯ
+ಪದ_bg_color(ಪೂರ್ಣಾಂಕ n)
 {
     // Use "AB" termcap entry if present, "Sb" entry otherwise
-    if (*T_CAB)
-	term_color(T_CAB, n);
-    else if (*T_CSB)
-	term_color(T_CSB, n);
+    ಆದರೆ (*T_CAB)
+	ಪದ_color(T_CAB, n);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*T_CSB)
+	ಪದ_color(T_CSB, n);
 }
 
-    void
-term_ul_color(int n)
+    ಶೂನ್ಯ
+ಪದ_ul_color(ಪೂರ್ಣಾಂಕ n)
 {
-    if (*T_CAU)
-	term_color(T_CAU, n);
+    ಆದರೆ (*T_CAU)
+	ಪದ_color(T_CAU, n);
 }
 
 /*
@@ -3344,146 +3344,146 @@ term_ul_color(int n)
  * case. If this value is 0-6 or 8, our background is dark.
  */
     char_u *
-term_bg_default(void)
+ಪದ_bg_default(ಶೂನ್ಯ)
 {
-#if defined(MSWIN)
+#ಆದರೆ defined(MSWIN)
     // DOS console is nearly always black
-    return (char_u *)"dark";
-#else
+    ಹಿಂತಿರುಗಿ (char_u *)"dark";
+#ಇಲ್ಲದಿದ್ದರೆ
     char_u	*p;
 
-    if (STRCMP(T_NAME, "linux") == 0
+    ಆದರೆ (STRCMP(T_NAME, "linux") == 0
 	    || STRCMP(T_NAME, "screen.linux") == 0
 	    || STRNCMP(T_NAME, "cygwin", 6) == 0
 	    || STRNCMP(T_NAME, "putty", 5) == 0
-	    || ((p = mch_getenv((char_u *)"COLORFGBG")) != NULL
-		&& (p = vim_strrchr(p, ';')) != NULL
+	    || ((p = mch_getenv((char_u *)"COLORFGBG")) != ಖಾಲಿ
+		&& (p = vim_strrchr(p, ';')) != ಖಾಲಿ
 		&& ((p[1] >= '0' && p[1] <= '6') || p[1] == '8')
 		&& p[2] == NUL))
-	return (char_u *)"dark";
-    return (char_u *)"light";
-#endif
+	ಹಿಂತಿರುಗಿ (char_u *)"dark";
+    ಹಿಂತಿರುಗಿ (char_u *)"light";
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#if defined(FEAT_TERMGUICOLORS)
+#ಆದರೆ defined(FEAT_TERMGUICOLORS)
 
 # define RED(rgb)   (((long_u)(rgb) >> 16) & 0xFF)
 # define GREEN(rgb) (((long_u)(rgb) >>  8) & 0xFF)
 # define BLUE(rgb)  (((long_u)(rgb)      ) & 0xFF)
 
-    static void
-term_rgb_color(char_u *s, guicolor_T rgb)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಪದ_rgb_color(char_u *s, guicolor_T rgb)
 {
 # define MAX_COLOR_STR_LEN 100
-    char	buf[MAX_COLOR_STR_LEN];
+    ಅಕ್ಷರ	buf[MAX_COLOR_STR_LEN];
 
-    if (*s == NUL)
-	return;
+    ಆದರೆ (*s == NUL)
+	ಹಿಂತಿರುಗಿ;
     vim_snprintf(buf, MAX_COLOR_STR_LEN,
-				  (char *)s, RED(rgb), GREEN(rgb), BLUE(rgb));
+				  (ಅಕ್ಷರ *)s, RED(rgb), GREEN(rgb), BLUE(rgb));
 # ifdef FEAT_VTP
-    if (use_vtp() && (p_tgc || t_colors >= 256))
+    ಆದರೆ (use_vtp() && (p_tgc || t_colors >= 256))
     {
-	out_flush();
+	ಹೊರಹೋಗು_flush();
 	buf[1] = '[';
 	vtp_printf(buf);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 # endif
-	OUT_STR(buf);
+	ಹೊರಹೋಗು_STR(buf);
 }
 
-    void
-term_fg_rgb_color(guicolor_T rgb)
+    ಶೂನ್ಯ
+ಪದ_fg_rgb_color(guicolor_T rgb)
 {
-    if (rgb != INVALCOLOR)
-	term_rgb_color(T_8F, rgb);
+    ಆದರೆ (rgb != INVALCOLOR)
+	ಪದ_rgb_color(T_8F, rgb);
 }
 
-    void
-term_bg_rgb_color(guicolor_T rgb)
+    ಶೂನ್ಯ
+ಪದ_bg_rgb_color(guicolor_T rgb)
 {
-    if (rgb != INVALCOLOR)
-	term_rgb_color(T_8B, rgb);
+    ಆದರೆ (rgb != INVALCOLOR)
+	ಪದ_rgb_color(T_8B, rgb);
 }
 
-    void
-term_ul_rgb_color(guicolor_T rgb)
+    ಶೂನ್ಯ
+ಪದ_ul_rgb_color(guicolor_T rgb)
 {
 # ifdef FEAT_TERMRESPONSE
     // If the user explicitly sets t_8u then use it.  Otherwise wait for
     // termresponse to be received, which is when t_8u would be set and a
     // redraw is needed if it was used.
-    if (!option_was_set((char_u *)"t_8u") && write_t_8u_state != OK)
+    ಆದರೆ (!option_was_ಗಣ((char_u *)"t_8u") && write_t_8u_state != OK)
 	write_t_8u_state = MAYBE;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 # endif
-	term_rgb_color(T_8U, rgb);
+	ಪದ_rgb_color(T_8U, rgb);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(UNIX) || defined(VMS) || defined(MACOS_X)
+#ಆದರೆ defined(UNIX) || defined(VMS) || defined(MACOS_X)
 /*
  * Generic function to set window title, using t_ts and t_fs.
  */
-    void
-term_settitle(char_u *title)
+    ಶೂನ್ಯ
+ಪದ_settitle(char_u *title)
 {
-    MAY_WANT_TO_LOG_THIS;
+    MAY_WANT_ಗಮ್ಯ_LOG_THIS;
 
     // t_ts takes one argument: column in status line
-    OUT_STR(tgoto((char *)T_TS, 0, 0));	// set title start
-    out_str_nf(title);
-    out_str(T_FS);			// set title end
-    out_flush();
+    ಹೊರಹೋಗು_STR(tgoto((ಅಕ್ಷರ *)T_TS, 0, 0));	// set title start
+    ಹೊರಹೋಗು_str_nf(title);
+    ಹೊರಹೋಗು_str(T_FS);			// set title end
+    ಹೊರಹೋಗು_flush();
 }
 
 /*
  * Tell the terminal to push (save) the title and/or icon, so that it can be
  * popped (restored) later.
  */
-    void
-term_push_title(int which)
+    ಶೂನ್ಯ
+ಪದ_ತಳ್ಳು_title(ಪೂರ್ಣಾಂಕ which)
 {
-    if ((which & SAVE_RESTORE_TITLE) && T_CST != NULL && *T_CST != NUL)
+    ಆದರೆ ((which & SAVE_RESTORE_TITLE) && T_CST != ಖಾಲಿ && *T_CST != NUL)
     {
-	OUT_STR(T_CST);
-	out_flush();
+	ಹೊರಹೋಗು_STR(T_CST);
+	ಹೊರಹೋಗು_flush();
     }
 
-    if ((which & SAVE_RESTORE_ICON) && T_SSI != NULL && *T_SSI != NUL)
+    ಆದರೆ ((which & SAVE_RESTORE_ICON) && T_SSI != ಖಾಲಿ && *T_SSI != NUL)
     {
-	OUT_STR(T_SSI);
-	out_flush();
+	ಹೊರಹೋಗು_STR(T_SSI);
+	ಹೊರಹೋಗು_flush();
     }
 }
 
 /*
  * Tell the terminal to pop the title and/or icon.
  */
-    void
-term_pop_title(int which)
+    ಶೂನ್ಯ
+ಪದ_ತೆಗೆ_title(ಪೂರ್ಣಾಂಕ which)
 {
-    if ((which & SAVE_RESTORE_TITLE) && T_CRT != NULL && *T_CRT != NUL)
+    ಆದರೆ ((which & SAVE_RESTORE_TITLE) && T_CRT != ಖಾಲಿ && *T_CRT != NUL)
     {
-	OUT_STR(T_CRT);
-	out_flush();
+	ಹೊರಹೋಗು_STR(T_CRT);
+	ಹೊರಹೋಗು_flush();
     }
 
-    if ((which & SAVE_RESTORE_ICON) && T_SRI != NULL && *T_SRI != NUL)
+    ಆದರೆ ((which & SAVE_RESTORE_ICON) && T_SRI != ಖಾಲಿ && *T_SRI != NUL)
     {
-	OUT_STR(T_SRI);
-	out_flush();
+	ಹೊರಹೋಗು_STR(T_SRI);
+	ಹೊರಹೋಗು_flush();
     }
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Make sure we have a valid set or terminal options.
  * Replace all entries that are NULL by empty_option
  */
-    void
-ttest(int pairs)
+    ಶೂನ್ಯ
+ttest(ಪೂರ್ಣಾಂಕ ಜೋಡಿಗಳು)
 {
     char_u *env_colors;
 
@@ -3492,38 +3492,38 @@ ttest(int pairs)
     /*
      * MUST have "cm": cursor motion.
      */
-    if (*T_CM == NUL)
+    ಆದರೆ (*T_CM == NUL)
 	emsg(_(e_terminal_capability_cm_required));
 
     /*
      * if "cs" defined, use a scroll region, it's faster.
      */
-    if (*T_CS != NUL)
+    ಆದರೆ (*T_CS != NUL)
 	scroll_region = TRUE;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	scroll_region = FALSE;
 
-    if (pairs)
+    ಆದರೆ (ಜೋಡಿಗಳು)
     {
 	/*
 	 * optional pairs
 	 */
 	// TP goes to normal mode for TI (invert) and TB (bold)
-	if (*T_ME == NUL)
-	    T_ME = T_MR = T_MD = T_MB = empty_option;
-	if (*T_SO == NUL || *T_SE == NUL)
-	    T_SO = T_SE = empty_option;
-	if (*T_US == NUL || *T_UE == NUL)
-	    T_US = T_UE = empty_option;
-	if (*T_CZH == NUL || *T_CZR == NUL)
-	    T_CZH = T_CZR = empty_option;
+	ಆದರೆ (*T_ME == NUL)
+	    T_ME = T_MR = T_MD = T_MB = ಖಾಲಿಗಳು_option;
+	ಆದರೆ (*T_SO == NUL || *T_SE == NUL)
+	    T_SO = T_SE = ಖಾಲಿಗಳು_option;
+	ಆದರೆ (*T_US == NUL || *T_UE == NUL)
+	    T_US = T_UE = ಖಾಲಿಗಳು_option;
+	ಆದರೆ (*T_CZH == NUL || *T_CZR == NUL)
+	    T_CZH = T_CZR = ಖಾಲಿಗಳು_option;
 
 	// T_VE is needed even though T_VI is not defined
-	if (*T_VE == NUL)
-	    T_VI = empty_option;
+	ಆದರೆ (*T_VE == NUL)
+	    T_VI = ಖಾಲಿಗಳು_option;
 
 	// if 'mr' or 'me' is not defined use 'so' and 'se'
-	if (*T_ME == NUL)
+	ಆದರೆ (*T_ME == NUL)
 	{
 	    T_ME = T_SE;
 	    T_MR = T_SO;
@@ -3531,41 +3531,41 @@ ttest(int pairs)
 	}
 
 	// if 'so' or 'se' is not defined use 'mr' and 'me'
-	if (*T_SO == NUL)
+	ಆದರೆ (*T_SO == NUL)
 	{
 	    T_SE = T_ME;
-	    if (*T_MR == NUL)
+	    ಆದರೆ (*T_MR == NUL)
 		T_SO = T_MD;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		T_SO = T_MR;
 	}
 
 	// if 'ZH' or 'ZR' is not defined use 'mr' and 'me'
-	if (*T_CZH == NUL)
+	ಆದರೆ (*T_CZH == NUL)
 	{
 	    T_CZR = T_ME;
-	    if (*T_MR == NUL)
+	    ಆದರೆ (*T_MR == NUL)
 		T_CZH = T_MD;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		T_CZH = T_MR;
 	}
 
 	// "Sb" and "Sf" come in pairs
-	if (*T_CSB == NUL || *T_CSF == NUL)
+	ಆದರೆ (*T_CSB == NUL || *T_CSF == NUL)
 	{
-	    T_CSB = empty_option;
-	    T_CSF = empty_option;
+	    T_CSB = ಖಾಲಿಗಳು_option;
+	    T_CSF = ಖಾಲಿಗಳು_option;
 	}
 
 	// "AB" and "AF" come in pairs
-	if (*T_CAB == NUL || *T_CAF == NUL)
+	ಆದರೆ (*T_CAB == NUL || *T_CAF == NUL)
 	{
-	    T_CAB = empty_option;
-	    T_CAF = empty_option;
+	    T_CAB = ಖಾಲಿಗಳು_option;
+	    T_CAF = ಖಾಲಿಗಳು_option;
 	}
 
 	// if 'Sb' and 'AB' are not defined, reset "Co"
-	if (*T_CSB == NUL && *T_CAB == NUL)
+	ಆದರೆ (*T_CSB == NUL && *T_CAB == NUL)
 	    free_one_termoption(T_CCO);
 
 	// Set 'weirdinvert' according to value of 't_xs'
@@ -3575,38 +3575,38 @@ ttest(int pairs)
 
     // Set t_colors to the value of $COLORS or t_Co.  Ignore $COLORS in the
     // GUI.
-    t_colors = atoi((char *)T_CCO);
-#ifdef FEAT_GUI
-    if (!gui.in_use)
-#endif
+    t_colors = atoi((ಅಕ್ಷರ *)T_CCO);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+    ಆದರೆ (!gui.ಒಳ_use)
+#ಆದರೆ_ಅಂತ್ಯ
     {
 	env_colors = mch_getenv((char_u *)"COLORS");
-	if (env_colors != NULL && SAFE_isdigit(*env_colors))
+	ಆದರೆ (env_colors != ಖಾಲಿ && ಸುರಕ್ಷಿತ_isdigit(*env_colors))
 	{
-	    int colors = atoi((char *)env_colors);
+	    ಪೂರ್ಣಾಂಕ colors = atoi((ಅಕ್ಷರ *)env_colors);
 
-	    if (colors != t_colors)
-		set_color_count(colors);
+	    ಆದರೆ (colors != t_colors)
+		ಗಣ_color_ಎಣಿಕೆ(colors);
 	}
     }
-    set_rgb_term_prop();
+    ಗಣ_rgb_ಪದ_prop();
 }
 
-#if defined(FEAT_GUI) && (defined(FEAT_MENU) || !defined(USE_ON_FLY_SCROLL))
+#ಆದರೆ defined(FEAT_GUI) && (defined(FEAT_MENU) || !defined(USE_ON_FLY_SCROLL))
 /*
  * Represent the given long_u as individual bytes, with the most significant
  * byte first, and store them in dst.
  */
-    void
-add_long_to_buf(long_u val, char_u *dst)
+    ಶೂನ್ಯ
+ಕೂಡಿಸು_long_ಗಮ್ಯ_buf(long_u val, char_u *dst)
 {
-    int	    i;
-    int	    shift;
+    ಪೂರ್ಣಾಂಕ	    i;
+    ಪೂರ್ಣಾಂಕ	    ಸರಿಸು;
 
-    for (i = 1; i <= (int)sizeof(long_u); i++)
+    ಗಾಗಿ (i = 1; i <= (ಪೂರ್ಣಾಂಕ)ಗಾತ್ರ(long_u); i++)
     {
-	shift = 8 * (sizeof(long_u) - i);
-	dst[i - 1] = (char_u) ((val >> shift) & 0xff);
+	ಸರಿಸು = 8 * (ಗಾತ್ರ(long_u) - i);
+	dst[i - 1] = (char_u) ((val >> ಸರಿಸು) & 0xff);
     }
 }
 
@@ -3618,26 +3618,26 @@ add_long_to_buf(long_u val, char_u *dst)
  * (between sizeof(long_u) and 2 * sizeof(long_u)), or -1 if not enough bytes
  * were present.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 get_long_from_buf(char_u *buf, long_u *val)
 {
-    int	    len;
-    char_u  bytes[sizeof(long_u)];
-    int	    i;
-    int	    shift;
+    ಪೂರ್ಣಾಂಕ	    len;
+    char_u  ಬೈಟುಗಳು[ಗಾತ್ರ(long_u)];
+    ಪೂರ್ಣಾಂಕ	    i;
+    ಪೂರ್ಣಾಂಕ	    ಸರಿಸು;
 
     *val = 0;
-    len = get_bytes_from_buf(buf, bytes, (int)sizeof(long_u));
-    if (len == -1)
-	return -1;
-    for (i = 0; i < (int)sizeof(long_u); i++)
+    len = get_ಬೈಟುಗಳು_from_buf(buf, ಬೈಟುಗಳು, (ಪೂರ್ಣಾಂಕ)ಗಾತ್ರ(long_u));
+    ಆದರೆ (len == -1)
+	ಹಿಂತಿರುಗಿ -1;
+    ಗಾಗಿ (i = 0; i < (ಪೂರ್ಣಾಂಕ)ಗಾತ್ರ(long_u); i++)
     {
-	shift = 8 * (sizeof(long_u) - 1 - i);
-	*val += (long_u)bytes[i] << shift;
+	ಸರಿಸು = 8 * (ಗಾತ್ರ(long_u) - 1 - i);
+	*val += (long_u)ಬೈಟುಗಳು[i] << ಸರಿಸು;
     }
-    return len;
+    ಹಿಂತಿರುಗಿ len;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Read the next num_bytes bytes from buf, and store them in bytes.  Assume
@@ -3645,168 +3645,168 @@ get_long_from_buf(char_u *buf, long_u *val)
  * from buf (between num_bytes and num_bytes*2), or -1 if not enough bytes were
  * available.
  */
-    int
-get_bytes_from_buf(char_u *buf, char_u *bytes, int num_bytes)
+    ಪೂರ್ಣಾಂಕ
+get_ಬೈಟುಗಳು_from_buf(char_u *buf, char_u *ಬೈಟುಗಳು, ಪೂರ್ಣಾಂಕ ಅಂಕೆ_ಬೈಟುಗಳು)
 {
-    int	    len = 0;
-    int	    i;
+    ಪೂರ್ಣಾಂಕ	    len = 0;
+    ಪೂರ್ಣಾಂಕ	    i;
     char_u  c;
 
-    for (i = 0; i < num_bytes; i++)
+    ಗಾಗಿ (i = 0; i < ಅಂಕೆ_ಬೈಟುಗಳು; i++)
     {
-	if ((c = buf[len++]) == NUL)
-	    return -1;
-	if (c == K_SPECIAL)
+	ಆದರೆ ((c = buf[len++]) == NUL)
+	    ಹಿಂತಿರುಗಿ -1;
+	ಆದರೆ (c == K_SPECIAL)
 	{
-	    if (buf[len] == NUL || buf[len + 1] == NUL)	    // cannot happen?
-		return -1;
-	    if (buf[len++] == (int)KS_ZERO)
+	    ಆದರೆ (buf[len] == NUL || buf[len + 1] == NUL)	    // cannot happen?
+		ಹಿಂತಿರುಗಿ -1;
+	    ಆದರೆ (buf[len++] == (ಪೂರ್ಣಾಂಕ)KS_ZERO)
 		c = NUL;
 	    // else it should be KS_SPECIAL; when followed by KE_FILLER c is
 	    // K_SPECIAL, or followed by KE_CSI and c must be CSI.
-	    if (buf[len++] == (int)KE_CSI)
+	    ಆದರೆ (buf[len++] == (ಪೂರ್ಣಾಂಕ)KE_CSI)
 		c = CSI;
 	}
-	else if (c == CSI && buf[len] == KS_EXTRA
-					       && buf[len + 1] == (int)KE_CSI)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (c == CSI && buf[len] == KS_EXTRA
+					       && buf[len + 1] == (ಪೂರ್ಣಾಂಕ)KE_CSI)
 	    // CSI is stored as CSI KS_SPECIAL KE_CSI to avoid confusion with
 	    // the start of a special key, see add_to_input_buf_csi().
 	    len += 2;
-	bytes[i] = c;
+	ಬೈಟುಗಳು[i] = c;
     }
-    return len;
+    ಹಿಂತಿರುಗಿ len;
 }
 
 /*
  * Check if the new shell size is valid, correct it if it's too small or way
  * too big.
  */
-    void
-check_shellsize(void)
+    ಶೂನ್ಯ
+check_shellsize(ಶೂನ್ಯ)
 {
     // need room for one window and command line
-    if (Rows < min_rows_for_all_tabpages())
-	Rows = min_rows_for_all_tabpages();
-    limit_screen_size();
+    ಆದರೆ (ಅಡ್ಡಸಾಲುಗಳು < min_ಅಡ್ಡಸಾಲುಗಳು_for_all_tabpages())
+	ಅಡ್ಡಸಾಲುಗಳು = min_ಅಡ್ಡಸಾಲುಗಳು_for_all_tabpages();
+    ಎಲ್ಲೆ_screen_ಗಾತ್ರ();
 
     // make sure these values are not invalid
-    if (cmdline_row >= Rows)
-	cmdline_row = Rows - 1;
-    if (msg_row >= Rows)
-	msg_row = Rows - 1;
+    ಆದರೆ (cmdline_ಅಡ್ಡಸಾಲು >= ಅಡ್ಡಸಾಲುಗಳು)
+	cmdline_ಅಡ್ಡಸಾಲು = ಅಡ್ಡಸಾಲುಗಳು - 1;
+    ಆದರೆ (ಸಂದೇಶ_ಅಡ್ಡಸಾಲು >= ಅಡ್ಡಸಾಲುಗಳು)
+	ಸಂದೇಶ_ಅಡ್ಡಸಾಲು = ಅಡ್ಡಸಾಲುಗಳು - 1;
 }
 
 /*
  * Limit Rows and Columns to avoid an overflow in Rows * Columns.
  */
-    void
-limit_screen_size(void)
+    ಶೂನ್ಯ
+ಎಲ್ಲೆ_screen_ಗಾತ್ರ(ಶೂನ್ಯ)
 {
-    if (Columns < MIN_COLUMNS)
+    ಆದರೆ (Columns < MIN_COLUMNS)
 	Columns = MIN_COLUMNS;
-    else if (Columns > 10000)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (Columns > 10000)
 	Columns = 10000;
-    if (Rows > 1000)
-	Rows = 1000;
+    ಆದರೆ (ಅಡ್ಡಸಾಲುಗಳು > 1000)
+	ಅಡ್ಡಸಾಲುಗಳು = 1000;
 }
 
 /*
  * Invoked just before the screen structures are going to be (re)allocated.
  */
-    void
-win_new_shellsize(void)
+    ಶೂನ್ಯ
+win_new_shellsize(ಶೂನ್ಯ)
 {
-    static int	old_Rows = 0;
-    static int	old_Columns = 0;
-    static int	old_coloff = 0;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	old_ಅಡ್ಡಸಾಲುಗಳು_2 = 0;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	old_Columns = 0;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	old_coloff = 0;
 
-    if (old_Rows != Rows || old_Columns != COLUMNS_WITHOUT_TPL()
+    ಆದರೆ (old_ಅಡ್ಡಸಾಲುಗಳು_2 != ಅಡ್ಡಸಾಲುಗಳು || old_Columns != COLUMNS_WITHOUT_TPL()
 	    || old_coloff != TPL_LCOL())
 	ui_new_shellsize();
-    if (old_Columns != COLUMNS_WITHOUT_TPL() || old_coloff != TPL_LCOL())
+    ಆದರೆ (old_Columns != COLUMNS_WITHOUT_TPL() || old_coloff != TPL_LCOL())
     {
 	old_Columns = COLUMNS_WITHOUT_TPL();
 	old_coloff = TPL_LCOL();
 
 	shell_new_columns();
     }
-    if (old_Rows != Rows)
+    ಆದರೆ (old_ಅಡ್ಡಸಾಲುಗಳು_2 != ಅಡ್ಡಸಾಲುಗಳು)
     {
 	// If 'window' uses the whole screen, keep it using that.
 	// Don't change it when set with "-w size" on the command line.
-	if (p_window == old_Rows - 1
-		    || (old_Rows == 0 && !option_was_set((char_u *)"window")))
-	    p_window = Rows - 1;
-	old_Rows = Rows;
-	shell_new_rows();	// update window sizes
+	ಆದರೆ (p_ಕಿಟಕಿ == old_ಅಡ್ಡಸಾಲುಗಳು_2 - 1
+		    || (old_ಅಡ್ಡಸಾಲುಗಳು_2 == 0 && !option_was_ಗಣ((char_u *)"window")))
+	    p_ಕಿಟಕಿ = ಅಡ್ಡಸಾಲುಗಳು - 1;
+	old_ಅಡ್ಡಸಾಲುಗಳು_2 = ಅಡ್ಡಸಾಲುಗಳು;
+	shell_new_ಅಡ್ಡಸಾಲುಗಳು();	// update window sizes
     }
 }
 
-#if defined(FEAT_IMAGE) || defined(FEAT_EVAL)
-    void
-update_cell_size(void)
+#ಆದರೆ defined(FEAT_IMAGE) || defined(FEAT_EVAL)
+    ಶೂನ್ಯ
+update_cell_ಗಾತ್ರ(ಶೂನ್ಯ)
 {
 # ifdef FEAT_GUI
-    if (gui.in_use)
+    ಆದರೆ (gui.ಒಳ_use)
     {
-	cell_width = gui.char_width;
-	cell_height = gui.char_height;
+	cell_ಅಗಲ = gui.char_ಅಗಲ;
+	cell_ಎತ್ತರ = gui.char_ಎತ್ತರ;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 # endif
     {
-	struct cellsize cell_sz;
+	ರಚನೆ cellsize cell_sz;
 
-	mch_calc_cell_size(&cell_sz);
-	if (cell_sz.cs_xpixel <= 0 || cell_sz.cs_ypixel <= 0)
+	mch_calc_cell_ಗಾತ್ರ(&cell_sz);
+	ಆದರೆ (cell_sz.cs_xpixel <= 0 || cell_sz.cs_ypixel <= 0)
 	{
-	    cell_width = 8;
-	    cell_height = 16;
+	    cell_ಅಗಲ = 8;
+	    cell_ಎತ್ತರ = 16;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    cell_width = cell_sz.cs_xpixel;
-	    cell_height = cell_sz.cs_ypixel;
+	    cell_ಅಗಲ = cell_sz.cs_xpixel;
+	    cell_ಎತ್ತರ = cell_sz.cs_ypixel;
 	}
     }
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Call this function when the Vim shell has been resized in any way.
  * Will obtain the current size and redraw (also when size didn't change).
  */
-    void
-shell_resized(void)
+    ಶೂನ್ಯ
+shell_resized(ಶೂನ್ಯ)
 {
-#if defined(FEAT_IMAGE) || defined(FEAT_EVAL)
-    update_cell_size();
-#endif
-    set_shellsize(0, 0, FALSE);
+#ಆದರೆ defined(FEAT_IMAGE) || defined(FEAT_EVAL)
+    update_cell_ಗಾತ್ರ();
+#ಆದರೆ_ಅಂತ್ಯ
+    ಗಣ_shellsize(0, 0, FALSE);
 }
 
 /*
  * Check if the shell size changed.  Handle a resize.
  * When the size didn't change, nothing happens.
  */
-    void
-shell_resized_check(void)
+    ಶೂನ್ಯ
+shell_resized_check(ಶೂನ್ಯ)
 {
-    int		old_Rows = Rows;
-    int		old_Columns = Columns;
+    ಪೂರ್ಣಾಂಕ		old_ಅಡ್ಡಸಾಲುಗಳು_2 = ಅಡ್ಡಸಾಲುಗಳು;
+    ಪೂರ್ಣಾಂಕ		old_Columns = Columns;
 
-    if (exiting
-#ifdef FEAT_GUI
+    ಆದರೆ (exiting
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 	    // Do not get the size when executing a shell command during
 	    // startup.
 	    || gui.starting
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    )
-	return;
+	ಹಿಂತಿರುಗಿ;
 
-    (void)ui_get_shellsize();
+    (ಶೂನ್ಯ)ui_get_shellsize();
     check_shellsize();
-    if (old_Rows != Rows || old_Columns != Columns)
+    ಆದರೆ (old_ಅಡ್ಡಸಾಲುಗಳು_2 != ಅಡ್ಡಸಾಲುಗಳು || old_Columns != Columns)
 	shell_resized();
 }
 
@@ -3817,50 +3817,50 @@ shell_resized_check(void)
  * If 'mustset' is FALSE, we may try to get the real window size and if
  * it fails use 'width' and 'height'.
  */
-    static void
-set_shellsize_inner(int width, int height, int mustset)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_shellsize_inner(ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಪೂರ್ಣಾಂಕ mustset)
 {
-    if (updating_screen)
+    ಆದರೆ (updating_screen)
 	// resizing while in update_screen() may cause a crash
-	return;
+	ಹಿಂತಿರುಗಿ;
 
     // curwin->w_buffer can be NULL when we are closing a window and the
     // buffer (or window) has already been closed and removing a scrollbar
     // causes a resize event. Don't resize then, it will happen after entering
     // another buffer.
-    if (curwin->w_buffer == NULL || curwin->w_lines == NULL)
-	return;
+    ಆದರೆ (curwin->w_ಬಫರ್ == ಖಾಲಿ || curwin->w_ಸಾಲುಗಳು == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-#ifdef AMIGA
-    out_flush();	    // must do this before mch_get_shellsize() for
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ AMIGA
+    ಹೊರಹೋಗು_flush();	    // must do this before mch_get_shellsize() for
 			    // some obscure reason
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (mustset || (ui_get_shellsize() == FAIL && height != 0))
+    ಆದರೆ (mustset || (ui_get_shellsize() == FAIL && ಎತ್ತರ != 0))
     {
-	Rows = height;
-	Columns = width;
+	ಅಡ್ಡಸಾಲುಗಳು = ಎತ್ತರ;
+	Columns = ಅಗಲ;
 	check_shellsize();
-	ui_set_shellsize(mustset);
+	ui_ಗಣ_shellsize(mustset);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	check_shellsize();
 
     // The window layout used to be adjusted here, but it now happens in
     // screenalloc() (also invoked from screenclear()).  That is because the
     // "busy" check above may skip this, but not screenalloc().
 
-    if (State != MODE_ASKMORE && State != MODE_EXTERNCMD
-						      && State != MODE_CONFIRM)
+    ಆದರೆ (State != ಬಹುಲಕ_ASKMORE && State != ಬಹುಲಕ_EXTERNCMD
+						      && State != ಬಹುಲಕ_CONFIRM)
 	screenclear();
-    else
-	screen_start();	    // don't know where cursor is now
+    ಇಲ್ಲದಿದ್ದರೆ
+	screen_ಆರಂಭ();	    // don't know where cursor is now
 
-    if (starting != NO_SCREEN)
+    ಆದರೆ (starting != NO_SCREEN)
     {
 	maketitle();
 
-	changed_line_abv_curs();
+	ಬದಲಾಯಿತು_ಸಾಲು_abv_curs();
 	invalidate_botline();
 
 	/*
@@ -3873,68 +3873,68 @@ set_shellsize_inner(int width, int height, int mustset)
 	 * Always need to call update_screen() or screenalloc(), to make
 	 * sure Rows/Columns and the size of ScreenLines[] is correct!
 	 */
-	if (State == MODE_ASKMORE || State == MODE_EXTERNCMD
-				     || State == MODE_CONFIRM || exmode_active)
+	ಆದರೆ (State == ಬಹುಲಕ_ASKMORE || State == ಬಹುಲಕ_EXTERNCMD
+				     || State == ಬಹುಲಕ_CONFIRM || exmode_ಸಕ್ರಿಯ)
 	{
 	    screenalloc(FALSE);
-	    repeat_message();
+	    repeat_ಸಂದೇಶ();
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (curwin->w_p_scb)
+	    ಆದರೆ (curwin->w_p_scb)
 		do_check_scrollbind(TRUE);
-	    if (State & MODE_CMDLINE)
+	    ಆದರೆ (State & ಬಹುಲಕ_CMDLINE)
 	    {
 		update_screen(UPD_NOT_VALID);
 		redrawcmdline();
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		update_topline();
-		if (pum_visible())
+		ಆದರೆ (pum_visible())
 		{
 		    redraw_later(UPD_NOT_VALID);
 		    ins_compl_show_pum();
 		}
 		update_screen(UPD_NOT_VALID);
-		if (redrawing())
+		ಆದರೆ (redrawing())
 		    setcursor();
 	    }
 	}
 	cursor_on();	    // redrawing may have switched it off
     }
-    out_flush();
+    ಹೊರಹೋಗು_flush();
 }
 
-    void
-set_shellsize(int width, int height, int mustset)
+    ಶೂನ್ಯ
+ಗಣ_shellsize(ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಪೂರ್ಣಾಂಕ mustset)
 {
-    static int	busy = FALSE;
-    static int	do_run = FALSE;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	busy = FALSE;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	do_ಸತತ = FALSE;
 
-    if (width < 0 || height < 0)    // just checking...
-	return;
+    ಆದರೆ (ಅಗಲ < 0 || ಎತ್ತರ < 0)    // just checking...
+	ಹಿಂತಿರುಗಿ;
 
-    if (State == MODE_HITRETURN || State == MODE_SETWSIZE)
+    ಆದರೆ (State == ಬಹುಲಕ_HITRETURN || State == ಬಹುಲಕ_SETWSIZE)
     {
 	// postpone the resizing
-	State = MODE_SETWSIZE;
-	return;
+	State = ಬಹುಲಕ_SETWSIZE;
+	ಹಿಂತಿರುಗಿ;
     }
 
     // Avoid recursiveness.  This can happen when setting the window size
     // causes another window-changed signal or when two SIGWINCH signals come
     // very close together.  There needs to be another run then after the
     // current one is done to pick up the latest size.
-    do_run = TRUE;
-    if (busy)
-	return;
+    do_ಸತತ = TRUE;
+    ಆದರೆ (busy)
+	ಹಿಂತಿರುಗಿ;
 
-    while (do_run)
+    ಆಗ (do_ಸತತ)
     {
-	do_run = FALSE;
+	do_ಸತತ = FALSE;
 	busy = TRUE;
-	set_shellsize_inner(width, height, mustset);
+	ಗಣ_shellsize_inner(ಅಗಲ, ಎತ್ತರ, mustset);
 	busy = FALSE;
     }
 }
@@ -3943,10 +3943,10 @@ set_shellsize(int width, int height, int mustset)
  * Output T_CTE, the t_TE termcap entry, and handle expected effects.
  * The code possibly disables modifyOtherKeys and the Kitty keyboard protocol.
  */
-    void
-out_str_t_TE(void)
+    ಶೂನ್ಯ
+ಹೊರಹೋಗು_str_t_TE(ಶೂನ್ಯ)
 {
-    out_str(T_CTE);
+    ಹೊರಹೋಗು_str(T_CTE);
 
     // The seenModifyOtherKeys flag is not reset here.  We do expect t_TE to
     // disable modifyOtherKeys, but until Xterm version 377 there is no way to
@@ -3958,10 +3958,10 @@ out_str_t_TE(void)
     // some situations.
     // The following t_TI is expected to request the state and then
     // modify_otherkeys_state will be set again.
-    if (modify_otherkeys_state == MOKS_ENABLED
+    ಆದರೆ (modify_otherkeys_state == MOKS_ENABLED
 	    || modify_otherkeys_state == MOKS_DISABLED)
 	modify_otherkeys_state = MOKS_DISABLED;
-    else if (modify_otherkeys_state != MOKS_INITIAL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (modify_otherkeys_state != MOKS_INITIAL)
 	modify_otherkeys_state = MOKS_AFTER_T_TE;
 
     // When the kitty keyboard protocol is enabled we expect t_TE to disable
@@ -3969,22 +3969,22 @@ out_str_t_TE(void)
     // situations.
     // The following t_TI is expected to request the state and then
     // kitty_protocol_state will be set again.
-    if (kitty_protocol_state == KKPS_ENABLED
+    ಆದರೆ (kitty_protocol_state == KKPS_ENABLED
 	    || kitty_protocol_state == KKPS_DISABLED)
 	kitty_protocol_state = KKPS_DISABLED;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	kitty_protocol_state = KKPS_AFTER_T_TE;
 }
 
-static int send_t_RK = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ send_t_RK = FALSE;
 
 /*
  * Output T_TI and setup for what follows.
  */
-    void
-out_str_t_TI(void)
+    ಶೂನ್ಯ
+ಹೊರಹೋಗು_str_t_TI(ಶೂನ್ಯ)
 {
-    out_str(T_CTI);
+    ಹೊರಹೋಗು_str(T_CTI);
 
     // Send t_RK when there is no more work to do.
     send_t_RK = TRUE;
@@ -3993,16 +3993,16 @@ out_str_t_TI(void)
 /*
  * Output T_BE, but only when t_PS and t_PE are set.
  */
-    void
-out_str_t_BE(void)
+    ಶೂನ್ಯ
+ಹೊರಹೋಗು_str_t_BE(ಶೂನ್ಯ)
 {
     char_u *p;
 
-    if (T_BE == NULL || *T_BE == NUL
-	    || (p = find_termcode((char_u *)"PS")) == NULL || *p == NUL
-	    || (p = find_termcode((char_u *)"PE")) == NULL || *p == NUL)
-	return;
-    out_str(T_BE);
+    ಆದರೆ (T_BE == ಖಾಲಿ || *T_BE == NUL
+	    || (p = ಕಂಡುಹಿಡಿ_termcode((char_u *)"PS")) == ಖಾಲಿ || *p == NUL
+	    || (p = ಕಂಡುಹಿಡಿ_termcode((char_u *)"PE")) == ಖಾಲಿ || *p == NUL)
+	ಹಿಂತಿರುಗಿ;
+    ಹೊರಹೋಗು_str(T_BE);
 }
 
 /*
@@ -4010,20 +4010,20 @@ out_str_t_BE(void)
  * t_RK.  This is postponed to avoid the response arriving in a shell command
  * or after Vim exits.
  */
-    void
-may_send_t_RK(void)
+    ಶೂನ್ಯ
+may_send_t_RK(ಶೂನ್ಯ)
 {
-    if (send_t_RK
+    ಆದರೆ (send_t_RK
 	    && !work_pending()
-	    && !ex_normal_busy
-#ifdef FEAT_EVAL
-	    && !in_feedkeys
-#endif
+	    && !ex_ಸಾಮಾನ್ಯ_busy
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	    && !ಒಳ_feedkeys
+#ಆದರೆ_ಅಂತ್ಯ
 	    && !exiting)
     {
 	send_t_RK = FALSE;
-	out_str(T_CRK);
-	out_flush();
+	ಹೊರಹೋಗು_str(T_CRK);
+	ಹೊರಹೋಗು_flush();
     }
 }
 
@@ -4031,17 +4031,17 @@ may_send_t_RK(void)
  * Set the terminal to TMODE_RAW (for Normal mode) or TMODE_COOK (for external
  * commands and Ex mode).
  */
-    void
+    ಶೂನ್ಯ
 settmode(tmode_T tmode)
 {
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
     // don't set the term where gvim was started to any mode
-    if (gui.in_use)
-	return;
-#endif
+    ಆದರೆ (gui.ಒಳ_use)
+	ಹಿಂತಿರುಗಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (!full_screen)
-	return;
+    ಆದರೆ (!ತುಂಬಿದ_screen)
+	ಹಿಂತಿರುಗಿ;
 
     /*
      * When returning after calling a shell cur_tmode is TMODE_UNKNOWN,
@@ -4051,108 +4051,108 @@ settmode(tmode_T tmode)
      * normal again, because that causes problems (logout!) on some
      * machines.
      */
-    if (tmode != cur_tmode)
+    ಆದರೆ (tmode != cur_tmode)
     {
-#ifdef FEAT_TERMRESPONSE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMRESPONSE
 # ifdef FEAT_GUI
-	if (!gui.in_use && !gui.starting)
+	ಆದರೆ (!gui.ಒಳ_use && !gui.starting)
 # endif
 	{
 	    // May need to check for T_CRV response and termcodes, it
 	    // doesn't work in Cooked mode, an external program may get
 	    // them.
-	    if (tmode != TMODE_RAW && termrequest_any_pending())
-		(void)vpeekc_nomap();
-	    check_for_codes_from_term();
+	    ಆದರೆ (tmode != TMODE_RAW && termrequest_any_pending())
+		(ಶೂನ್ಯ)vpeekc_nomap();
+	    check_for_codes_from_ಪದ();
 	}
-#endif
-	if (tmode != TMODE_RAW)
+#ಆದರೆ_ಅಂತ್ಯ
+	ಆದರೆ (tmode != TMODE_RAW)
 	    mch_setmouse(FALSE);	// switch mouse off
 
 	// Disable bracketed paste and modifyOtherKeys in cooked mode.
 	// Avoid doing this too often, on some terminals the codes are not
 	// handled properly.
-	if (termcap_active && tmode != TMODE_SLEEP
+	ಆದರೆ (termcap_ಸಕ್ರಿಯ && tmode != TMODE_SLEEP
 		&& cur_tmode != TMODE_SLEEP)
 	{
-	    MAY_WANT_TO_LOG_THIS;
+	    MAY_WANT_ಗಮ್ಯ_LOG_THIS;
 
-	    if (tmode != TMODE_RAW)
+	    ಆದರೆ (tmode != TMODE_RAW)
 	    {
-		out_str(T_BD);	// disable bracketed paste mode
-		out_str_t_TE();	// possibly disables modifyOtherKeys
+		ಹೊರಹೋಗು_str(T_BD);	// disable bracketed paste mode
+		ಹೊರಹೋಗು_str_t_TE();	// possibly disables modifyOtherKeys
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		out_str_t_BE();	// enable bracketed paste mode (should
+		ಹೊರಹೋಗು_str_t_BE();	// enable bracketed paste mode (should
 				// be before mch_settmode().
-		out_str_t_TI();	// possibly enables modifyOtherKeys
+		ಹೊರಹೋಗು_str_t_TI();	// possibly enables modifyOtherKeys
 	    }
 	}
-	out_flush();
+	ಹೊರಹೋಗು_flush();
 	mch_settmode(tmode);	// machine specific function
 	cur_tmode = tmode;
-	if (tmode == TMODE_RAW)
+	ಆದರೆ (tmode == TMODE_RAW)
 	    setmouse();		// may switch mouse on
-	out_flush();
+	ಹೊರಹೋಗು_flush();
     }
-#ifdef FEAT_TERMRESPONSE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMRESPONSE
     may_req_termresponse();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-    void
-starttermcap(void)
+    ಶೂನ್ಯ
+starttermcap(ಶೂನ್ಯ)
 {
-    if (!full_screen || termcap_active)
-	return;
+    ಆದರೆ (!ತುಂಬಿದ_screen || termcap_ಸಕ್ರಿಯ)
+	ಹಿಂತಿರುಗಿ;
 
-    MAY_WANT_TO_LOG_THIS;
+    MAY_WANT_ಗಮ್ಯ_LOG_THIS;
 
-    out_str(T_TI);			// start termcap mode
-    out_str_t_TI();			// start "raw" mode
-    out_str(T_KS);			// start "keypad transmit" mode
-    out_str_t_BE();			// enable bracketed paste mode
+    ಹೊರಹೋಗು_str(T_TI);			// start termcap mode
+    ಹೊರಹೋಗು_str_t_TI();			// start "raw" mode
+    ಹೊರಹೋಗು_str(T_KS);			// start "keypad transmit" mode
+    ಹೊರಹೋಗು_str_t_BE();			// enable bracketed paste mode
 
-#if defined(UNIX) || defined(VMS)
+#ಆದರೆ defined(UNIX) || defined(VMS)
     // Enable xterm's focus reporting mode when 'esckeys' is set.
-    if (p_ek && *T_FE != NUL)
-	out_str(T_FE);
-#endif
+    ಆದರೆ (p_ek && *T_FE != NUL)
+	ಹೊರಹೋಗು_str(T_FE);
+#ಆದರೆ_ಅಂತ್ಯ
 
-    out_flush();
-    termcap_active = TRUE;
-    screen_start();			// don't know where cursor is now
-#ifdef FEAT_TERMRESPONSE
+    ಹೊರಹೋಗು_flush();
+    termcap_ಸಕ್ರಿಯ = TRUE;
+    screen_ಆರಂಭ();			// don't know where cursor is now
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMRESPONSE
 # ifdef FEAT_GUI
-    if (!gui.in_use && !gui.starting)
+    ಆದರೆ (!gui.ಒಳ_use && !gui.starting)
 # endif
     {
 	may_req_termresponse();
 	// Immediately check for a response.  If t_Co changes, we don't
 	// want to redraw with wrong colors first.
-	if (crv_status.tr_progress == STATUS_SENT)
-	    check_for_codes_from_term();
+	ಆದರೆ (crv_ಸ್ಥಿತಿ.tr_ಪ್ರಗತಿ == ಸ್ಥಿತಿ_ಕಳುಹಿಸಿದ)
+	    check_for_codes_from_ಪದ();
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-    void
-stoptermcap(void)
+    ಶೂನ್ಯ
+stoptermcap(ಶೂನ್ಯ)
 {
     screen_stop_highlight();
     reset_cterm_colors();
 
-    if (!termcap_active)
-	return;
+    ಆದರೆ (!termcap_ಸಕ್ರಿಯ)
+	ಹಿಂತಿರುಗಿ;
 
-#ifdef FEAT_TERMRESPONSE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMRESPONSE
 # ifdef FEAT_GUI
-    if (!gui.in_use && !gui.starting)
+    ಆದರೆ (!gui.ಒಳ_use && !gui.starting)
 # endif
     {
 	// May need to discard T_CRV, T_U7 or T_RBG response.
-	if (termrequest_any_pending())
+	ಆದರೆ (termrequest_any_pending())
 	{
 # ifdef UNIX
 	    // Give the terminal a chance to respond.
@@ -4160,27 +4160,27 @@ stoptermcap(void)
 # endif
 # ifdef TCIFLUSH
 	    // Discard data received but not read.
-	    if (exiting)
+	    ಆದರೆ (exiting)
 		tcflush(fileno(stdin), TCIFLUSH);
 # endif
 	}
 	// Check for termcodes first, otherwise an external program may
 	// get them.
-	check_for_codes_from_term();
+	check_for_codes_from_ಪದ();
     }
-#endif
-    MAY_WANT_TO_LOG_THIS;
+#ಆದರೆ_ಅಂತ್ಯ
+    MAY_WANT_ಗಮ್ಯ_LOG_THIS;
 
-#if defined(UNIX) || defined(VMS)
+#ಆದರೆ defined(UNIX) || defined(VMS)
     // Disable xterm's focus reporting mode if 'esckeys' is set.
-    if (p_ek && *T_FD != NUL)
-	out_str(T_FD);
-#endif
+    ಆದರೆ (p_ek && *T_FD != NUL)
+	ಹೊರಹೋಗು_str(T_FD);
+#ಆದರೆ_ಅಂತ್ಯ
 
-    out_str(T_BD);			// disable bracketed paste mode
-    out_str(T_KE);			// stop "keypad transmit" mode
-    out_flush();
-    termcap_active = FALSE;
+    ಹೊರಹೋಗು_str(T_BD);			// disable bracketed paste mode
+    ಹೊರಹೋಗು_str(T_KE);			// stop "keypad transmit" mode
+    ಹೊರಹೋಗು_flush();
+    termcap_ಸಕ್ರಿಯ = FALSE;
 
     // Output t_te before t_TE, t_te may switch between main and alternate
     // screen and following codes may work on the active screen only.
@@ -4189,20 +4189,20 @@ stoptermcap(void)
     // use a separate state.  If we are (or were) using the Kitty keyboard
     // protocol and t_te is not empty (possibly switching screens) then
     // output t_TE both before and after outputting t_te.
-    if (*T_TE != NUL && (kitty_protocol_state == KKPS_ENABLED
+    ಆದರೆ (*T_TE != NUL && (kitty_protocol_state == KKPS_ENABLED
 		|| kitty_protocol_state == KKPS_DISABLED))
-	out_str_t_TE();		// probably disables the kitty keyboard
+	ಹೊರಹೋಗು_str_t_TE();		// probably disables the kitty keyboard
 				// protocol
 
-    out_str(T_TE);			// stop termcap mode
+    ಹೊರಹೋಗು_str(T_TE);			// stop termcap mode
     cursor_on();			// just in case it is still off
-    out_str_t_TE();			// stop "raw" mode, modifyOtherKeys and
+    ಹೊರಹೋಗು_str_t_TE();			// stop "raw" mode, modifyOtherKeys and
 					// Kitty keyboard protocol
-    screen_start();			// don't know where cursor is now
-    out_flush();
+    screen_ಆರಂಭ();			// don't know where cursor is now
+    ಹೊರಹೋಗು_flush();
 }
 
-#if defined(FEAT_TERMRESPONSE)
+#ಆದರೆ defined(FEAT_TERMRESPONSE)
 /*
  * Request version string (for xterm) when needed.
  * Only do this after switching to raw mode, otherwise the result will be
@@ -4217,22 +4217,22 @@ stoptermcap(void)
  * request to terminal while reading from a file).
  * The result is caught in check_termcode().
  */
-    void
-may_req_termresponse(void)
+    ಶೂನ್ಯ
+may_req_termresponse(ಶೂನ್ಯ)
 {
-    if (crv_status.tr_progress == STATUS_GET
+    ಆದರೆ (crv_ಸ್ಥಿತಿ.tr_ಪ್ರಗತಿ == ಸ್ಥಿತಿ_GET
 	    && can_get_termresponse()
 	    && starting == 0
 	    && *T_CRV != NUL)
     {
-	MAY_WANT_TO_LOG_THIS;
+	MAY_WANT_ಗಮ್ಯ_LOG_THIS;
 	LOG_TR1("Sending CRV request");
-	out_str(T_CRV);
-	termrequest_sent(&crv_status);
+	ಹೊರಹೋಗು_str(T_CRV);
+	termrequest_ಕಳುಹಿಸಿದ(&crv_ಸ್ಥಿತಿ);
 	// check for the characters now, otherwise they might be eaten by
 	// get_keystroke()
-	out_flush();
-	(void)vpeekc_nomap();
+	ಹೊರಹೋಗು_flush();
+	(ಶೂನ್ಯ)vpeekc_nomap();
     }
 }
 
@@ -4242,16 +4242,16 @@ may_req_termresponse(void)
  * Note that this goes out before T_CRV, so that the result can be used when
  * the termresponse arrives.
  */
-    void
-check_terminal_behavior(void)
+    ಶೂನ್ಯ
+check_terminal_behavior(ಶೂನ್ಯ)
 {
-    int	    did_send = FALSE;
+    ಪೂರ್ಣಾಂಕ	    did_send = FALSE;
 
-    if (!can_get_termresponse() || starting != 0 || *T_U7 == NUL)
-	return;
+    ಆದರೆ (!can_get_termresponse() || starting != 0 || *T_U7 == NUL)
+	ಹಿಂತಿರುಗಿ;
 
-    if (u7_status.tr_progress == STATUS_GET
-	    && !option_was_set((char_u *)"ambiwidth"))
+    ಆದರೆ (u7_ಸ್ಥಿತಿ.tr_ಪ್ರಗತಿ == ಸ್ಥಿತಿ_GET
+	    && !option_was_ಗಣ((char_u *)"ambiwidth"))
     {
 	char_u	buf[16];
 
@@ -4264,27 +4264,27 @@ check_terminal_behavior(void)
 	// width, that will be (1, 2).  This function has the side effect that
 	// changes cursor position, so it must be called immediately after
 	// entering termcap mode.
-	MAY_WANT_TO_LOG_THIS;
+	MAY_WANT_ಗಮ್ಯ_LOG_THIS;
 	LOG_TR1("Sending request for ambiwidth check");
 	// Do this in the second row.  In the first row the returned sequence
 	// may be CSI 1;2R, which is the same as <S-F3>.
-	term_windgoto(1, 0);
+	ಪದ_windgoto(1, 0);
 	buf[mb_char2bytes(0x25bd, buf)] = NUL;
-	out_str(buf);
-	out_str(T_U7);
-	termrequest_sent(&u7_status);
-	out_flush();
+	ಹೊರಹೋಗು_str(buf);
+	ಹೊರಹೋಗು_str(T_U7);
+	termrequest_ಕಳುಹಿಸಿದ(&u7_ಸ್ಥಿತಿ);
+	ಹೊರಹೋಗು_flush();
 	did_send = TRUE;
 
 	// This overwrites a few characters on the screen, a redraw is needed
 	// after this. Clear them out for now.
 	screen_stop_highlight();
-	term_windgoto(1, 0);
-	out_str((char_u *)"  ");
-	line_was_clobbered(1);
+	ಪದ_windgoto(1, 0);
+	ಹೊರಹೋಗು_str((char_u *)"  ");
+	ಸಾಲು_was_clobbered(1);
     }
 
-    if (xcc_status.tr_progress == STATUS_GET && Rows > 2)
+    ಆದರೆ (xcc_ಸ್ಥಿತಿ.tr_ಪ್ರಗತಿ == ಸ್ಥಿತಿ_GET && ಅಡ್ಡಸಾಲುಗಳು > 2)
     {
 	// 2. Check compatibility with xterm.
 	// We move the cursor to (2, 0), print a test sequence and then query
@@ -4293,39 +4293,39 @@ check_terminal_behavior(void)
 	// sequence is ignored and the cursor does not move.  If the terminal
 	// handles test sequence incorrectly, a garbage string is displayed and
 	// the cursor does move.
-	MAY_WANT_TO_LOG_THIS;
+	MAY_WANT_ಗಮ್ಯ_LOG_THIS;
 	LOG_TR1("Sending xterm compatibility test sequence.");
 	// Do this in the third row.  Second row is used by ambiguous
 	// character width check.
-	term_windgoto(2, 0);
+	ಪದ_windgoto(2, 0);
 	// send the test DCS string.
-	out_str((char_u *)"\033Pzz\033\\");
+	ಹೊರಹೋಗು_str((char_u *)"\033Pzz\033\\");
 	// send the test CSI sequence with intermediate byte.
-	out_str((char_u *)"\033[0%m");
-	out_str(T_U7);
-	termrequest_sent(&xcc_status);
-	out_flush();
+	ಹೊರಹೋಗು_str((char_u *)"\033[0%m");
+	ಹೊರಹೋಗು_str(T_U7);
+	termrequest_ಕಳುಹಿಸಿದ(&xcc_ಸ್ಥಿತಿ);
+	ಹೊರಹೋಗು_flush();
 	did_send = TRUE;
 
 	// If the terminal handles test sequence incorrectly, garbage text is
 	// displayed. Clear them out for now.
 	screen_stop_highlight();
-	term_windgoto(2, 0);
-	out_str((char_u *)"           ");
-	line_was_clobbered(2);
+	ಪದ_windgoto(2, 0);
+	ಹೊರಹೋಗು_str((char_u *)"           ");
+	ಸಾಲು_was_clobbered(2);
     }
 
-    if (did_send)
+    ಆದರೆ (did_send)
     {
-	term_windgoto(0, 0);
+	ಪದ_windgoto(0, 0);
 
 	// Need to reset the known cursor position.
-	screen_start();
+	screen_ಆರಂಭ();
 
 	// check for the characters now, otherwise they might be eaten by
 	// get_keystroke()
-	out_flush();
-	(void)vpeekc_nomap();
+	ಹೊರಹೋಗು_flush();
+	(ಶೂನ್ಯ)vpeekc_nomap();
     }
 }
 
@@ -4333,54 +4333,54 @@ check_terminal_behavior(void)
  * Similar to requesting the version string: Request the terminal background
  * color when it is the right moment.
  */
-    void
-may_req_bg_color(void)
+    ಶೂನ್ಯ
+may_req_bg_color(ಶೂನ್ಯ)
 {
-    if (can_get_termresponse() && starting == 0)
+    ಆದರೆ (can_get_termresponse() && starting == 0)
     {
-	int didit = FALSE;
+	ಪೂರ್ಣಾಂಕ didit = FALSE;
 
 # ifdef FEAT_TERMINAL
 	// Only request foreground if t_RF is set.
-	if (rfg_status.tr_progress == STATUS_GET && *T_RFG != NUL)
+	ಆದರೆ (rfg_ಸ್ಥಿತಿ.tr_ಪ್ರಗತಿ == ಸ್ಥಿತಿ_GET && *T_RFG != NUL)
 	{
-	    MAY_WANT_TO_LOG_THIS;
+	    MAY_WANT_ಗಮ್ಯ_LOG_THIS;
 	    LOG_TR1("Sending FG request");
-	    out_str(T_RFG);
-	    termrequest_sent(&rfg_status);
+	    ಹೊರಹೋಗು_str(T_RFG);
+	    termrequest_ಕಳುಹಿಸಿದ(&rfg_ಸ್ಥಿತಿ);
 	    didit = TRUE;
 	}
 # endif
 
 	// Only request background if t_RB is set.
-	if (rbg_status.tr_progress == STATUS_GET && *T_RBG != NUL)
+	ಆದರೆ (rbg_ಸ್ಥಿತಿ.tr_ಪ್ರಗತಿ == ಸ್ಥಿತಿ_GET && *T_RBG != NUL)
 	{
-	    MAY_WANT_TO_LOG_THIS;
+	    MAY_WANT_ಗಮ್ಯ_LOG_THIS;
 	    LOG_TR1("Sending BG request");
-	    out_str(T_RBG);
-	    termrequest_sent(&rbg_status);
+	    ಹೊರಹೋಗು_str(T_RBG);
+	    termrequest_ಕಳುಹಿಸಿದ(&rbg_ಸ್ಥಿತಿ);
 	    didit = TRUE;
 	}
 
-	if (didit)
+	ಆದರೆ (didit)
 	{
 	    // check for the characters now, otherwise they might be eaten by
 	    // get_keystroke()
-	    out_flush();
-	    (void)vpeekc_nomap();
+	    ಹೊರಹೋಗು_flush();
+	    (ಶೂನ್ಯ)vpeekc_nomap();
 	}
     }
 }
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Return TRUE when saving and restoring the screen.
  */
-    int
-swapping_screen(void)
+    ಪೂರ್ಣಾಂಕ
+swapping_screen(ಶೂನ್ಯ)
 {
-    return (full_screen && *T_TI != NUL);
+    ಹಿಂತಿರುಗಿ (ತುಂಬಿದ_screen && *T_TI != NUL);
 }
 
 /*
@@ -4388,31 +4388,31 @@ swapping_screen(void)
  * terminals this makes the screen scrolled to the correct position.
  * Used when starting Vim or returning from a shell.
  */
-    void
-scroll_start(void)
+    ಶೂನ್ಯ
+scroll_ಆರಂಭ(ಶೂನ್ಯ)
 {
-    if (*T_VS == NUL || *T_CVS == NUL)
-	return;
+    ಆದರೆ (*T_VS == NUL || *T_CVS == NUL)
+	ಹಿಂತಿರುಗಿ;
 
-    MAY_WANT_TO_LOG_THIS;
-    out_str(T_VS);
-    out_str(T_CVS);
-    screen_start();		// don't know where cursor is now
+    MAY_WANT_ಗಮ್ಯ_LOG_THIS;
+    ಹೊರಹೋಗು_str(T_VS);
+    ಹೊರಹೋಗು_str(T_CVS);
+    screen_ಆರಂಭ();		// don't know where cursor is now
 }
 
 // True if cursor is not visible
-static int cursor_is_off = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ cursor_is_off = FALSE;
 
 // True if cursor is not visible due to an ongoing cursor-less sleep
-static int cursor_is_asleep = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ cursor_is_asleep = FALSE;
 
 /*
  * Enable the cursor without checking if it's already enabled.
  */
-    void
-cursor_on_force(void)
+    ಶೂನ್ಯ
+cursor_on_force(ಶೂನ್ಯ)
 {
-    out_str(T_VE);
+    ಹೊರಹೋಗು_str(T_VE);
     cursor_is_off = FALSE;
     cursor_is_asleep = FALSE;
 }
@@ -4420,42 +4420,42 @@ cursor_on_force(void)
 /*
  * Enable the cursor if it's currently off.
  */
-    void
-cursor_on(void)
+    ಶೂನ್ಯ
+cursor_on(ಶೂನ್ಯ)
 {
-    if (cursor_is_off && !cursor_is_asleep)
+    ಆದರೆ (cursor_is_off && !cursor_is_asleep)
 	cursor_on_force();
 }
 
 /*
  * Disable the cursor.
  */
-    void
-cursor_off(void)
+    ಶೂನ್ಯ
+cursor_off(ಶೂನ್ಯ)
 {
-    if (full_screen && !cursor_is_off)
+    ಆದರೆ (ತುಂಬಿದ_screen && !cursor_is_off)
     {
-	out_str(T_VI);	    // disable cursor
+	ಹೊರಹೋಗು_str(T_VI);	    // disable cursor
 	cursor_is_off = TRUE;
     }
 }
 
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 /*
  * Check whether the cursor is invisible due to an ongoing cursor-less sleep
  */
-    int
-cursor_is_sleeping(void)
+    ಪೂರ್ಣಾಂಕ
+cursor_is_sleeping(ಶೂನ್ಯ)
 {
-    return cursor_is_asleep;
+    ಹಿಂತಿರುಗಿ cursor_is_asleep;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Disable the cursor and mark it disabled by cursor-less sleep
  */
-    void
-cursor_sleep(void)
+    ಶೂನ್ಯ
+cursor_sleep(ಶೂನ್ಯ)
 {
     cursor_is_asleep = TRUE;
     cursor_off();
@@ -4464,125 +4464,125 @@ cursor_sleep(void)
 /*
  * Enable the cursor and mark it not disabled by cursor-less sleep
  */
-    void
-cursor_unsleep(void)
+    ಶೂನ್ಯ
+cursor_unsleep(ಶೂನ್ಯ)
 {
     cursor_is_asleep = FALSE;
     cursor_on();
 }
 
-#if defined(CURSOR_SHAPE)
+#ಆದರೆ defined(CURSOR_SHAPE)
 /*
  * Set cursor shape to match Insert or Replace mode.
  */
-    void
-term_cursor_mode(int forced)
+    ಶೂನ್ಯ
+ಪದ_cursor_ಬಹುಲಕ(ಪೂರ್ಣಾಂಕ forced)
 {
-    static int showing_mode = -1;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ showing_ಬಹುಲಕ = -1;
     char_u *p;
 
     // Only do something when redrawing the screen and we can restore the
     // mode.
-    if (!full_screen || *T_CEI == NUL)
+    ಆದರೆ (!ತುಂಬಿದ_screen || *T_CEI == NUL)
     {
 # ifdef FEAT_TERMRESPONSE
-	if (forced && initial_cursor_shape > 0)
+	ಆದರೆ (forced && initial_cursor_shape > 0)
 	    // Restore to initial values.
-	    term_cursor_shape(initial_cursor_shape, initial_cursor_blink);
+	    ಪದ_cursor_shape(initial_cursor_shape, initial_cursor_blink);
 # endif
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if ((State & MODE_REPLACE) == MODE_REPLACE)
+    ಆದರೆ ((State & ಬಹುಲಕ_REPLACE) == ಬಹುಲಕ_REPLACE)
     {
-	if (forced || showing_mode != MODE_REPLACE)
+	ಆದರೆ (forced || showing_ಬಹುಲಕ != ಬಹುಲಕ_REPLACE)
 	{
-	    if (*T_CSR != NUL)
+	    ಆದರೆ (*T_CSR != NUL)
 		p = T_CSR;	// Replace mode cursor
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		p = T_CSI;	// fall back to Insert mode cursor
-	    if (*p != NUL)
+	    ಆದರೆ (*p != NUL)
 	    {
-		out_str(p);
-		showing_mode = MODE_REPLACE;
+		ಹೊರಹೋಗು_str(p);
+		showing_ಬಹುಲಕ = ಬಹುಲಕ_REPLACE;
 	    }
 	}
     }
-    else if (State & MODE_INSERT)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (State & ಬಹುಲಕ_ಸೇರಿಸು)
     {
-	if ((forced || showing_mode != MODE_INSERT) && *T_CSI != NUL)
+	ಆದರೆ ((forced || showing_ಬಹುಲಕ != ಬಹುಲಕ_ಸೇರಿಸು) && *T_CSI != NUL)
 	{
-	    out_str(T_CSI);	    // Insert mode cursor
-	    showing_mode = MODE_INSERT;
+	    ಹೊರಹೋಗು_str(T_CSI);	    // Insert mode cursor
+	    showing_ಬಹುಲಕ = ಬಹುಲಕ_ಸೇರಿಸು;
 	}
     }
-    else if (forced || showing_mode != MODE_NORMAL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (forced || showing_ಬಹುಲಕ != ಬಹುಲಕ_ಸಾಮಾನ್ಯ)
     {
-	out_str(T_CEI);		    // non-Insert mode cursor
-	showing_mode = MODE_NORMAL;
+	ಹೊರಹೋಗು_str(T_CEI);		    // non-Insert mode cursor
+	showing_ಬಹುಲಕ = ಬಹುಲಕ_ಸಾಮಾನ್ಯ;
     }
 }
 
-# if defined(FEAT_TERMINAL)
-    void
-term_cursor_color(char_u *color)
+# ಆದರೆ defined(FEAT_TERMINAL)
+    ಶೂನ್ಯ
+ಪದ_cursor_color(char_u *color)
 {
-    if (*T_CSC == NUL)
-	return;
+    ಆದರೆ (*T_CSC == NUL)
+	ಹಿಂತಿರುಗಿ;
 
-    out_str(T_CSC);		// set cursor color start
-    out_str_nf(color);
-    out_str(T_CEC);		// set cursor color end
-    out_flush();
+    ಹೊರಹೋಗು_str(T_CSC);		// set cursor color start
+    ಹೊರಹೋಗು_str_nf(color);
+    ಹೊರಹೋಗು_str(T_CEC);		// set cursor color end
+    ಹೊರಹೋಗು_flush();
 }
 # endif
 
-    int
-blink_state_is_inverted(void)
+    ಪೂರ್ಣಾಂಕ
+blink_state_is_inverted(ಶೂನ್ಯ)
 {
 # ifdef FEAT_TERMRESPONSE
-    return rbm_status.tr_progress == STATUS_GOT
-	&& rcs_status.tr_progress == STATUS_GOT
+    ಹಿಂತಿರುಗಿ rbm_ಸ್ಥಿತಿ.tr_ಪ್ರಗತಿ == ಸ್ಥಿತಿ_GOT
+	&& rcs_ಸ್ಥಿತಿ.tr_ಪ್ರಗತಿ == ಸ್ಥಿತಿ_GOT
 		&& initial_cursor_blink != initial_cursor_shape_blink;
-# else
-    return FALSE;
+# ಇಲ್ಲದಿದ್ದರೆ
+    ಹಿಂತಿರುಗಿ FALSE;
 # endif
 }
 
 /*
  * "shape": 1 = block, 2 = underline, 3 = vertical bar
  */
-    void
-term_cursor_shape(int shape, int blink)
+    ಶೂನ್ಯ
+ಪದ_cursor_shape(ಪೂರ್ಣಾಂಕ shape, ಪೂರ್ಣಾಂಕ blink)
 {
-    if (*T_CSH != NUL)
+    ಆದರೆ (*T_CSH != NUL)
     {
-	OUT_STR(tgoto((char *)T_CSH, 0, shape * 2 - blink));
-	out_flush();
+	ಹೊರಹೋಗು_STR(tgoto((ಅಕ್ಷರ *)T_CSH, 0, shape * 2 - blink));
+	ಹೊರಹೋಗು_flush();
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	int do_blink = blink;
+	ಪೂರ್ಣಾಂಕ do_blink = blink;
 
 	// t_SH is empty: try setting just the blink state.
 	// The blink flags are XORed together, if the initial blinking from
 	// style and shape differs, we need to invert the flag here.
-	if (blink_state_is_inverted())
+	ಆದರೆ (blink_state_is_inverted())
 	    do_blink = !blink;
 
-	if (do_blink && *T_VS != NUL)
+	ಆದರೆ (do_blink && *T_VS != NUL)
 	{
-	    out_str(T_VS);
-	    out_flush();
+	    ಹೊರಹೋಗು_str(T_VS);
+	    ಹೊರಹೋಗು_flush();
 	}
-	else if (!do_blink && *T_CVS != NUL)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!do_blink && *T_CVS != NUL)
 	{
-	    out_str(T_CVS);
-	    out_flush();
+	    ಹೊರಹೋಗು_str(T_CVS);
+	    ಹೊರಹೋಗು_flush();
 	}
     }
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Set scrolling region for window 'wp'.
@@ -4590,27 +4590,27 @@ term_cursor_shape(int shape, int blink)
  * Also set the vertical scroll region for a vertically split window.  Always
  * the full width of the window, excluding the vertical separator.
  */
-    void
-scroll_region_set(win_T *wp, int off)
+    ಶೂನ್ಯ
+scroll_region_ಗಣ(win_T *wp, ಪೂರ್ಣಾಂಕ off)
 {
-    OUT_STR(tgoto((char *)T_CS, W_WINROW(wp) + wp->w_height - 1,
+    ಹೊರಹೋಗು_STR(tgoto((ಅಕ್ಷರ *)T_CS, W_WINROW(wp) + wp->w_ಎತ್ತರ - 1,
 							 W_WINROW(wp) + off));
-    if (*T_CSV != NUL && wp->w_width != Columns)
-	OUT_STR(tgoto((char *)T_CSV, wp->w_wincol + wp->w_width - 1,
+    ಆದರೆ (*T_CSV != NUL && wp->w_ಅಗಲ != Columns)
+	ಹೊರಹೋಗು_STR(tgoto((ಅಕ್ಷರ *)T_CSV, wp->w_wincol + wp->w_ಅಗಲ - 1,
 							       wp->w_wincol));
-    screen_start();		    // don't know where cursor is now
+    screen_ಆರಂಭ();		    // don't know where cursor is now
 }
 
 /*
  * Reset scrolling region to the whole screen.
  */
-    void
-scroll_region_reset(void)
+    ಶೂನ್ಯ
+scroll_region_reset(ಶೂನ್ಯ)
 {
-    OUT_STR(tgoto((char *)T_CS, (int)Rows - 1, 0));
-    if (*T_CSV != NUL)
-	OUT_STR(tgoto((char *)T_CSV, (int)Columns - 1, 0));
-    screen_start();		    // don't know where cursor is now
+    ಹೊರಹೋಗು_STR(tgoto((ಅಕ್ಷರ *)T_CS, (ಪೂರ್ಣಾಂಕ)ಅಡ್ಡಸಾಲುಗಳು - 1, 0));
+    ಆದರೆ (*T_CSV != NUL)
+	ಹೊರಹೋಗು_STR(tgoto((ಅಕ್ಷರ *)T_CSV, (ಪೂರ್ಣಾಂಕ)Columns - 1, 0));
+    screen_ಆರಂಭ();		    // don't know where cursor is now
 }
 
 
@@ -4618,55 +4618,55 @@ scroll_region_reset(void)
  * List of terminal codes that are currently recognized.
  */
 
-static struct termcode
+ಸ್ಥಿರ ರಚನೆ termcode
 {
     char_u  name[2];	    // termcap name of entry
-    char_u  *code;	    // terminal code (in allocated memory)
-    int	    len;	    // STRLEN(code)
-    int	    modlen;	    // length of part before ";*~".
-} *termcodes = NULL;
+    char_u  *ಸಂಕೇತ_2;	    // terminal code (in allocated memory)
+    ಪೂರ್ಣಾಂಕ	    len;	    // STRLEN(code)
+    ಪೂರ್ಣಾಂಕ	    modlen;	    // length of part before ";*~".
+} *termcodes = ಖಾಲಿ;
 
-static int  tc_max_len = 0; // number of entries that termcodes[] can hold
-static int  tc_len = 0;	    // current number of entries in termcodes[]
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ  tc_max_len = 0; // number of entries that termcodes[] can hold
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ  tc_len = 0;	    // current number of entries in termcodes[]
 
-static int termcode_star(char_u *code, int len);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ termcode_ನಕ್ಷತ್ರ(char_u *ಸಂಕೇತ_2, ಪೂರ್ಣಾಂಕ len);
 
-    void
-clear_termcodes(void)
+    ಶೂನ್ಯ
+clear_termcodes(ಶೂನ್ಯ)
 {
-    while (tc_len > 0)
-	vim_free(termcodes[--tc_len].code);
+    ಆಗ (tc_len > 0)
+	vim_free(termcodes[--tc_len].ಸಂಕೇತ_2);
     VIM_CLEAR(termcodes);
     tc_max_len = 0;
 
-#ifdef HAVE_TGETENT
-    BC = (char *)empty_option;
-    UP = (char *)empty_option;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_TGETENT
+    BC = (ಅಕ್ಷರ *)ಖಾಲಿಗಳು_option;
+    ಮೇಲೆ_2 = (ಅಕ್ಷರ *)ಖಾಲಿಗಳು_option;
     PC = NUL;			// set pad character to NUL
     ospeed = 0;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     need_gather = TRUE;		// need to fill termleader[]
 }
 
-#define ATC_FROM_TERM 55
+#ವ್ಯಾಖ್ಯಾನಿಸು ATC_FROM_ಪದ 55
 
 /*
  * For xterm we recognize special codes like "ESC[42;*X" and "ESC O*X" that
  * accept modifiers.
  * Set "termcodes[idx].modlen".
  */
-    static void
-adjust_modlen(int idx)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+adjust_modlen(ಪೂರ್ಣಾಂಕ idx)
 {
     termcodes[idx].modlen = 0;
-    int j = termcode_star(termcodes[idx].code, termcodes[idx].len);
-    if (j <= 0)
-	return;
+    ಪೂರ್ಣಾಂಕ j = termcode_ನಕ್ಷತ್ರ(termcodes[idx].ಸಂಕೇತ_2, termcodes[idx].len);
+    ಆದರೆ (j <= 0)
+	ಹಿಂತಿರುಗಿ;
 
     termcodes[idx].modlen = termcodes[idx].len - 1 - j;
     // For "CSI[@;X" the "@" is not included in "modlen".
-    if (termcodes[idx].code[termcodes[idx].modlen - 1] == '@')
+    ಆದರೆ (termcodes[idx].ಸಂಕೇತ_2[termcodes[idx].modlen - 1] == '@')
 	--termcodes[idx].modlen;
 }
 
@@ -4677,74 +4677,74 @@ adjust_modlen(int idx)
  * "flags" is TRUE when replacing 7-bit by 8-bit controls is desired.
  * "flags" can also be ATC_FROM_TERM for got_code_from_term().
  */
-    void
-add_termcode(char_u *name, char_u *string, int flags)
+    ಶೂನ್ಯ
+ಕೂಡಿಸು_termcode(char_u *name, char_u *string, ಪೂರ್ಣಾಂಕ flags)
 {
-    struct termcode *new_tc;
-    int		    i, j;
+    ರಚನೆ termcode *new_tc;
+    ಪೂರ್ಣಾಂಕ		    i, j;
     char_u	    *s;
-    int		    len;
-#ifdef FEAT_EVAL
-    char	    *action = "Setting";
-#endif
+    ಪೂರ್ಣಾಂಕ		    len;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಅಕ್ಷರ	    *action = "Setting";
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (string == NULL || *string == NUL)
+    ಆದರೆ (string == ಖಾಲಿ || *string == NUL)
     {
 	del_termcode(name);
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-#if defined(MSWIN) && !defined(FEAT_GUI)
+#ಆದರೆ defined(MSWIN) && !defined(FEAT_GUI)
     s = vim_strnsave(string, STRLEN(string) + 1);
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 # ifdef VIMDLL
-    if (!gui.in_use)
+    ಆದರೆ (!gui.ಒಳ_use)
 	s = vim_strnsave(string, STRLEN(string) + 1);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 # endif
 	s = vim_strsave(string);
-#endif
-    if (s == NULL)
-	return;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (s == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     // Change leading <Esc>[ to CSI, change <Esc>O to <M-O>.
-    if (flags != 0 && flags != ATC_FROM_TERM && term_7to8bit(string) != 0)
+    ಆದರೆ (flags != 0 && flags != ATC_FROM_ಪದ && ಪದ_7to8bit(string) != 0)
     {
 	STRMOVE(s, s + 1);
-	s[0] = term_7to8bit(string);
+	s[0] = ಪದ_7to8bit(string);
     }
 
-#if defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
+#ಆದರೆ defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
 # ifdef VIMDLL
-    if (!gui.in_use)
+    ಆದರೆ (!gui.ಒಳ_use)
 # endif
     {
-	if (s[0] == K_NUL)
+	ಆದರೆ (s[0] == K_NUL)
 	{
 	    STRMOVE(s + 1, s);
 	    s[1] = 3;
 	}
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    len = (int)STRLEN(s);
+    len = (ಪೂರ್ಣಾಂಕ)STRLEN(s);
 
     need_gather = TRUE;		// need to fill termleader[]
 
     /*
      * need to make space for more entries
      */
-    if (tc_len == tc_max_len)
+    ಆದರೆ (tc_len == tc_max_len)
     {
 	tc_max_len += 20;
-	new_tc = ALLOC_MULT(struct termcode, tc_max_len);
-	if (new_tc == NULL)
+	new_tc = ALLOC_MULT(ರಚನೆ termcode, tc_max_len);
+	ಆದರೆ (new_tc == ಖಾಲಿ)
 	{
 	    tc_max_len -= 20;
 	    vim_free(s);
-	    return;
+	    ಹಿಂತಿರುಗಿ;
 	}
-	for (i = 0; i < tc_len; ++i)
+	ಗಾಗಿ (i = 0; i < tc_len; ++i)
 	    new_tc[i] = termcodes[i];
 	vim_free(termcodes);
 	termcodes = new_tc;
@@ -4755,68 +4755,68 @@ add_termcode(char_u *name, char_u *string, int flags)
      * Look for an existing entry that is alphabetical higher, the new entry
      * is inserted in front of it.
      */
-    for (i = 0; i < tc_len; ++i)
+    ಗಾಗಿ (i = 0; i < tc_len; ++i)
     {
-	if (termcodes[i].name[0] < name[0])
-	    continue;
-	if (termcodes[i].name[0] == name[0])
+	ಆದರೆ (termcodes[i].name[0] < name[0])
+	    ಮುಂದುವರಿ;
+	ಆದರೆ (termcodes[i].name[0] == name[0])
 	{
-	    if (termcodes[i].name[1] < name[1])
-		continue;
+	    ಆದರೆ (termcodes[i].name[1] < name[1])
+		ಮುಂದುವರಿ;
 	    /*
 	     * Exact match: May replace old code.
 	     */
-	    if (termcodes[i].name[1] == name[1])
+	    ಆದರೆ (termcodes[i].name[1] == name[1])
 	    {
-		if (flags == ATC_FROM_TERM && (j = termcode_star(
-				    termcodes[i].code, termcodes[i].len)) > 0)
+		ಆದರೆ (flags == ATC_FROM_ಪದ && (j = termcode_ನಕ್ಷತ್ರ(
+				    termcodes[i].ಸಂಕೇತ_2, termcodes[i].len)) > 0)
 		{
 		    // Don't replace ESC[123;*X or ESC O*X with another when
 		    // invoked from got_code_from_term().
-		    if (len == termcodes[i].len - j
-			    && STRNCMP(s, termcodes[i].code, len - 1) == 0
+		    ಆದರೆ (len == termcodes[i].len - j
+			    && STRNCMP(s, termcodes[i].ಸಂಕೇತ_2, len - 1) == 0
 			    && s[len - 1]
-				   == termcodes[i].code[termcodes[i].len - 1])
+				   == termcodes[i].ಸಂಕೇತ_2[termcodes[i].len - 1])
 		    {
 			// They are equal but for the ";*": don't add it.
-#ifdef FEAT_EVAL
-			ch_log(NULL, "Termcap entry %c%c did not change",
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+			ch_log(ಖಾಲಿ, "Termcap entry %c%c did not change",
 							     name[0], name[1]);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 			vim_free(s);
-			return;
+			ಹಿಂತಿರುಗಿ;
 		    }
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    // Replace old code.
-#ifdef FEAT_EVAL
-		    ch_log(NULL, "Termcap entry %c%c was: %s",
-					  name[0], name[1], termcodes[i].code);
-#endif
-		    vim_free(termcodes[i].code);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+		    ch_log(ಖಾಲಿ, "Termcap entry %c%c was: %s",
+					  name[0], name[1], termcodes[i].ಸಂಕೇತ_2);
+#ಆದರೆ_ಅಂತ್ಯ
+		    vim_free(termcodes[i].ಸಂಕೇತ_2);
 		    --tc_len;
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 	    }
 	}
 	/*
 	 * Found alphabetical larger entry, move rest to insert new entry
 	 */
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 	action = "Adding";
-#endif
-	for (j = tc_len; j > i; --j)
+#ಆದರೆ_ಅಂತ್ಯ
+	ಗಾಗಿ (j = tc_len; j > i; --j)
 	    termcodes[j] = termcodes[j - 1];
-	break;
+	ನಿಲ್ಲಿಸು;
     }
 
-#ifdef FEAT_EVAL
-    ch_log(NULL, "%s termcap entry %c%c to %s", action, name[0], name[1], s);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ch_log(ಖಾಲಿ, "%s termcap entry %c%c to %s", action, name[0], name[1], s);
+#ಆದರೆ_ಅಂತ್ಯ
     termcodes[i].name[0] = name[0];
     termcodes[i].name[1] = name[1];
-    termcodes[i].code = s;
+    termcodes[i].ಸಂಕೇತ_2 = s;
     termcodes[i].len = len;
     adjust_modlen(i);
 
@@ -4827,35 +4827,35 @@ add_termcode(char_u *name, char_u *string, int flags)
  * Some function keys may include modifiers, but the terminfo/termcap entries
  * do not indicate that.  Insert ";*" where we expect modifiers might appear.
  */
-    static void
-accept_modifiers_for_function_keys(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+accept_modifiers_for_function_ಕೀಲಿಗಳು(ಶೂನ್ಯ)
 {
     regmatch_T regmatch;
-    CLEAR_FIELD(regmatch);
+    CLEAR_ಕ್ಷೇತ್ರ(regmatch);
     regmatch.rm_ic = TRUE;
     regmatch.regprog = vim_regcomp((char_u *)"^\033[\\d\\+\\~$", RE_MAGIC);
 
-    for (int i = 0; i < tc_len; ++i)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < tc_len; ++i)
     {
-	if (regmatch.regprog == NULL)
-	    return;
+	ಆದರೆ (regmatch.regprog == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ;
 
 	// skip PasteStart and PasteEnd
-	if (termcodes[i].name[0] == 'P'
+	ಆದರೆ (termcodes[i].name[0] == 'P'
 		&& (termcodes[i].name[1] == 'S' || termcodes[i].name[1] == 'E'))
-	    continue;
+	    ಮುಂದುವರಿ;
 
-	char_u *s = termcodes[i].code;
-	if (s != NULL && vim_regexec(&regmatch, s, (colnr_T)0))
+	char_u *s = termcodes[i].ಸಂಕೇತ_2;
+	ಆದರೆ (s != ಖಾಲಿ && vim_regexec(&regmatch, s, (colnr_T)0))
 	{
 	    size_t len = STRLEN(s);
 	    char_u *ns = alloc(len + 3);
-	    if (ns != NULL)
+	    ಆದರೆ (ns != ಖಾಲಿ)
 	    {
 		mch_memmove(ns, s, len - 1);
 		mch_memmove(ns + len - 1, ";*~", 4);
 		vim_free(s);
-		termcodes[i].code = ns;
+		termcodes[i].ಸಂಕೇತ_2 = ns;
 		termcodes[i].len += 2;
 		adjust_modlen(i);
 	    }
@@ -4870,75 +4870,75 @@ accept_modifiers_for_function_keys(void)
  * The "X" can be any character.
  * Return 0 if not found, 2 for ;*X and 1 for *X.
  */
-    static int
-termcode_star(char_u *code, int len)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+termcode_ನಕ್ಷತ್ರ(char_u *ಸಂಕೇತ_2, ಪೂರ್ಣಾಂಕ len)
 {
     // Shortest is <M-O>*X.  With ; shortest is <CSI>@;*X
-    if (len >= 3 && code[len - 2] == '*')
+    ಆದರೆ (len >= 3 && ಸಂಕೇತ_2[len - 2] == '*')
     {
-	if (len >= 5 && code[len - 3] == ';')
-	    return 2;
-	else
-	    return 1;
+	ಆದರೆ (len >= 5 && ಸಂಕೇತ_2[len - 3] == ';')
+	    ಹಿಂತಿರುಗಿ 2;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಹಿಂತಿರುಗಿ 1;
     }
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
     char_u  *
-find_termcode(char_u *name)
+ಕಂಡುಹಿಡಿ_termcode(char_u *name)
 {
-    int	    i;
+    ಪೂರ್ಣಾಂಕ	    i;
 
-    for (i = 0; i < tc_len; ++i)
-	if (termcodes[i].name[0] == name[0] && termcodes[i].name[1] == name[1])
-	    return termcodes[i].code;
-    return NULL;
+    ಗಾಗಿ (i = 0; i < tc_len; ++i)
+	ಆದರೆ (termcodes[i].name[0] == name[0] && termcodes[i].name[1] == name[1])
+	    ಹಿಂತಿರುಗಿ termcodes[i].ಸಂಕೇತ_2;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
     char_u *
-get_termcode(int i)
+get_termcode(ಪೂರ್ಣಾಂಕ i)
 {
-    if (i >= tc_len)
-	return NULL;
-    return &termcodes[i].name[0];
+    ಆದರೆ (i >= tc_len)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    ಹಿಂತಿರುಗಿ &termcodes[i].name[0];
 }
 
 /*
  * Returns the length of the terminal code at index 'idx'.
  */
-    int
-get_termcode_len(int idx)
+    ಪೂರ್ಣಾಂಕ
+get_termcode_len(ಪೂರ್ಣಾಂಕ idx)
 {
-    return termcodes[idx].len;
+    ಹಿಂತಿರುಗಿ termcodes[idx].len;
 }
 
-    void
+    ಶೂನ್ಯ
 del_termcode(char_u *name)
 {
-    int	    i;
+    ಪೂರ್ಣಾಂಕ	    i;
 
-    if (termcodes == NULL)	// nothing there yet
-	return;
+    ಆದರೆ (termcodes == ಖಾಲಿ)	// nothing there yet
+	ಹಿಂತಿರುಗಿ;
 
     need_gather = TRUE;		// need to fill termleader[]
 
-    for (i = 0; i < tc_len; ++i)
-	if (termcodes[i].name[0] == name[0] && termcodes[i].name[1] == name[1])
+    ಗಾಗಿ (i = 0; i < tc_len; ++i)
+	ಆದರೆ (termcodes[i].name[0] == name[0] && termcodes[i].name[1] == name[1])
 	{
 	    del_termcode_idx(i);
-	    return;
+	    ಹಿಂತಿರುಗಿ;
 	}
     // not found. Give error message?
 }
 
-    static void
-del_termcode_idx(int idx)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+del_termcode_idx(ಪೂರ್ಣಾಂಕ idx)
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
 
-    vim_free(termcodes[idx].code);
+    vim_free(termcodes[idx].ಸಂಕೇತ_2);
     --tc_len;
-    for (i = idx; i < tc_len; ++i)
+    ಗಾಗಿ (i = idx; i < tc_len; ++i)
 	termcodes[i] = termcodes[i + 1];
 }
 
@@ -4946,22 +4946,22 @@ del_termcode_idx(int idx)
  * Called when detected that the terminal sends 8-bit codes.
  * Convert all 7-bit codes to their 8-bit equivalent.
  */
-    static void
-switch_to_8bit(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+switch_ಗಮ್ಯ_8bit(ಶೂನ್ಯ)
 {
-    int		i;
-    int		c;
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		c;
 
     // Only need to do something when not already using 8-bit codes.
-    if (!term_is_8bit(T_NAME))
+    ಆದರೆ (!ಪದ_is_8bit(T_NAME))
     {
-	for (i = 0; i < tc_len; ++i)
+	ಗಾಗಿ (i = 0; i < tc_len; ++i)
 	{
-	    c = term_7to8bit(termcodes[i].code);
-	    if (c != 0)
+	    c = ಪದ_7to8bit(termcodes[i].ಸಂಕೇತ_2);
+	    ಆದರೆ (c != 0)
 	    {
-		STRMOVE(termcodes[i].code + 1, termcodes[i].code + 2);
-		termcodes[i].code[0] = c;
+		STRMOVE(termcodes[i].ಸಂಕೇತ_2 + 1, termcodes[i].ಸಂಕೇತ_2 + 2);
+		termcodes[i].ಸಂಕೇತ_2[0] = c;
 	    }
 	}
 	need_gather = TRUE;		// need to fill termleader[]
@@ -4970,13 +4970,13 @@ switch_to_8bit(void)
     LOG_TR1("Switching to 8 bit");
 }
 
-#ifdef CHECK_DOUBLE_CLICK
-static linenr_T orig_topline = 0;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ CHECK_DOUBLE_CLICK
+ಸ್ಥಿರ linenr_T orig_topline = 0;
 # ifdef FEAT_DIFF
-static int orig_topfill = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ orig_topfill = 0;
 # endif
-#endif
-#if defined(CHECK_DOUBLE_CLICK)
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(CHECK_DOUBLE_CLICK)
 /*
  * Checking for double-clicks ourselves.
  * "orig_topline" is used to avoid detecting a double-click when the window
@@ -4986,8 +4986,8 @@ static int orig_topfill = 0;
  * Set orig_topline.  Used when jumping to another window, so that a double
  * click still works.
  */
-    void
-set_mouse_topline(win_T *wp)
+    ಶೂನ್ಯ
+ಗಣ_mouse_topline(win_T *wp)
 {
     orig_topline = wp->w_topline;
 # ifdef FEAT_DIFF
@@ -4999,16 +4999,16 @@ set_mouse_topline(win_T *wp)
  * Returns TRUE if the top line and top fill of window 'wp' matches the saved
  * topline and topfill.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 is_mouse_topline(win_T *wp)
 {
-    return orig_topline == wp->w_topline
+    ಹಿಂತಿರುಗಿ orig_topline == wp->w_topline
 # ifdef FEAT_DIFF
 	&& orig_topfill == wp->w_topfill
 # endif
 	;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * If "buf" is NULL put "string[new_slen]" in typebuf; "buflen" is not used.
@@ -5017,151 +5017,151 @@ is_mouse_topline(win_T *wp)
  * Remove "slen" bytes.
  * Returns FAIL for error.
  */
-    int
-put_string_in_typebuf(
-	int	offset,
-	int	slen,
+    ಪೂರ್ಣಾಂಕ
+put_string_ಒಳ_typebuf(
+	ಪೂರ್ಣಾಂಕ	ಸ್ಥಾನಾಂತರ,
+	ಪೂರ್ಣಾಂಕ	slen,
 	char_u	*string,
-	int	new_slen,
+	ಪೂರ್ಣಾಂಕ	new_slen,
 	char_u	*buf,
-	int	bufsize,
-	int	*buflen)
+	ಪೂರ್ಣಾಂಕ	bufsize,
+	ಪೂರ್ಣಾಂಕ	*buflen)
 {
-    int		extra = new_slen - slen;
+    ಪೂರ್ಣಾಂಕ		extra = new_slen - slen;
 
     string[new_slen] = NUL;
-    if (buf == NULL)
+    ಆದರೆ (buf == ಖಾಲಿ)
     {
-	if (extra < 0)
+	ಆದರೆ (extra < 0)
 	    // remove matched chars, taking care of noremap
-	    del_typebuf(-extra, offset);
-	else if (extra > 0)
+	    del_typebuf(-extra, ಸ್ಥಾನಾಂತರ);
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (extra > 0)
 	    // insert the extra space we need
-	    if (ins_typebuf(string + slen, REMAP_YES, offset, FALSE, FALSE)
+	    ಆದರೆ (ins_typebuf(string + slen, REMAP_YES, ಸ್ಥಾನಾಂತರ, FALSE, FALSE)
 								       == FAIL)
-		return FAIL;
+		ಹಿಂತಿರುಗಿ FAIL;
 
 	// Careful: del_typebuf() and ins_typebuf() may have reallocated
 	// typebuf.tb_buf[]!
-	mch_memmove(typebuf.tb_buf + typebuf.tb_off + offset, string,
+	mch_memmove(typebuf.tb_buf + typebuf.tb_off + ಸ್ಥಾನಾಂತರ, string,
 							     (size_t)new_slen);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (extra < 0)
+	ಆದರೆ (extra < 0)
 	    // remove matched characters
-	    mch_memmove(buf + offset, buf + offset - extra,
-					   (size_t)(*buflen + offset + extra));
-	else if (extra > 0)
+	    mch_memmove(buf + ಸ್ಥಾನಾಂತರ, buf + ಸ್ಥಾನಾಂತರ - extra,
+					   (size_t)(*buflen + ಸ್ಥಾನಾಂತರ + extra));
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (extra > 0)
 	{
 	    // Insert the extra space we need.  If there is insufficient
 	    // space return -1.
-	    if (*buflen + extra + new_slen >= bufsize)
-		return FAIL;
-	    mch_memmove(buf + offset + extra, buf + offset,
-						   (size_t)(*buflen - offset));
+	    ಆದರೆ (*buflen + extra + new_slen >= bufsize)
+		ಹಿಂತಿರುಗಿ FAIL;
+	    mch_memmove(buf + ಸ್ಥಾನಾಂತರ + extra, buf + ಸ್ಥಾನಾಂತರ,
+						   (size_t)(*buflen - ಸ್ಥಾನಾಂತರ));
 	}
-	mch_memmove(buf + offset, string, (size_t)new_slen);
+	mch_memmove(buf + ಸ್ಥಾನಾಂತರ, string, (size_t)new_slen);
 	*buflen = *buflen + extra + new_slen;
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Decode a modifier number as xterm provides it into MOD_MASK bits.
  */
-    int
-decode_modifiers(int n)
+    ಪೂರ್ಣಾಂಕ
+decode_modifiers(ಪೂರ್ಣಾಂಕ n)
 {
-    int	    code = n - 1;
-    int	    modifiers = 0;
+    ಪೂರ್ಣಾಂಕ	    ಸಂಕೇತ_2 = n - 1;
+    ಪೂರ್ಣಾಂಕ	    modifiers = 0;
 
-    if (code & 1)
-	modifiers |= MOD_MASK_SHIFT;
-    if (code & 2)
-	modifiers |= MOD_MASK_ALT;
-    if (code & 4)
-	modifiers |= MOD_MASK_CTRL;
-    if (code & 8)
-	modifiers |= MOD_MASK_META;
+    ಆದರೆ (ಸಂಕೇತ_2 & 1)
+	modifiers |= MOD_ಮುಖವಾಡ_ಸರಿಸು;
+    ಆದರೆ (ಸಂಕೇತ_2 & 2)
+	modifiers |= MOD_ಮುಖವಾಡ_ALT;
+    ಆದರೆ (ಸಂಕೇತ_2 & 4)
+	modifiers |= MOD_ಮುಖವಾಡ_CTRL;
+    ಆದರೆ (ಸಂಕೇತ_2 & 8)
+	modifiers |= MOD_ಮುಖವಾಡ_META;
     // Any further modifiers are silently dropped.
 
-    return modifiers;
+    ಹಿಂತಿರುಗಿ modifiers;
 }
 
-    static int
-modifiers2keycode(int modifiers, int *key, char_u *string)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+modifiers2keycode(ಪೂರ್ಣಾಂಕ modifiers, ಪೂರ್ಣಾಂಕ *ಕೀಲಿ, char_u *string)
 {
-    int new_slen = 0;
+    ಪೂರ್ಣಾಂಕ new_slen = 0;
 
-    if (modifiers == 0)
-	return 0;
+    ಆದರೆ (modifiers == 0)
+	ಹಿಂತಿರುಗಿ 0;
 
     // Some keys have the modifier included.  Need to handle that here to
     // make mappings work.  This may result in a special key, such as
     // K_S_TAB.
-    *key = simplify_key(*key, &modifiers);
-    if (modifiers != 0)
+    *ಕೀಲಿ = simplify_ಕೀಲಿ(*ಕೀಲಿ, &modifiers);
+    ಆದರೆ (modifiers != 0)
     {
 	string[new_slen++] = K_SPECIAL;
-	string[new_slen++] = (int)KS_MODIFIER;
+	string[new_slen++] = (ಪೂರ್ಣಾಂಕ)KS_MODIFIER;
 	string[new_slen++] = modifiers;
     }
-    return new_slen;
+    ಹಿಂತಿರುಗಿ new_slen;
 }
 
 /*
  * Handle a cursor position report.
  */
-    static void
-handle_u7_response(int *arg, char_u *tp UNUSED, int csi_len UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+handle_u7_response(ಪೂರ್ಣಾಂಕ *arg, char_u *tp ಬಳಸದ, ಪೂರ್ಣಾಂಕ csi_len ಬಳಸದ)
 {
-    if (arg[0] == 2 && arg[1] >= 2)
+    ಆದರೆ (arg[0] == 2 && arg[1] >= 2)
     {
-	char *aw = NULL;
+	ಅಕ್ಷರ *aw = ಖಾಲಿ;
 
 	LOG_TRN("Received U7 status: %s", tp);
-	u7_status.tr_progress = STATUS_GOT;
+	u7_ಸ್ಥಿತಿ.tr_ಪ್ರಗತಿ = ಸ್ಥಿತಿ_GOT;
 	did_cursorhold = TRUE;
-	if (arg[1] == 2)
+	ಆದರೆ (arg[1] == 2)
 	    aw = "single";
-	else if (arg[1] == 3)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (arg[1] == 3)
 	    aw = "double";
-	if (aw != NULL && STRCMP(aw, p_ambw) != 0)
+	ಆದರೆ (aw != ಖಾಲಿ && STRCMP(aw, p_ambw) != 0)
 	{
 	    // Setting the option causes a screen redraw. Do
 	    // that right away if possible, keeping any
 	    // messages.
-	    set_option_value_give_err((char_u *)"ambw", 0L, (char_u *)aw, 0);
-#ifdef DEBUG_TERMRESPONSE
+	    ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"ambw", 0L, (char_u *)aw, 0);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DEBUG_TERMRESPONSE
 	    {
-		int r = redraw_asap(UPD_CLEAR);
+		ಪೂರ್ಣಾಂಕ r = redraw_asap(UPD_CLEAR);
 
 		LOG_TRN("set 'ambiwidth', redraw_asap(): %d", r);
 	    }
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 	    redraw_asap(UPD_CLEAR);
-#endif
-#ifdef FEAT_EVAL
-	    set_vim_var_string(VV_TERMU7RESP, tp, csi_len);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	    ಗಣ_vim_var_string(VV_TERMU7RESP, tp, csi_len);
+#ಆದರೆ_ಅಂತ್ಯ
 	    apply_autocmds(EVENT_TERMRESPONSEALL,
-					(char_u *)"ambiguouswidth", NULL, FALSE, curbuf);
+					(char_u *)"ambiguouswidth", ಖಾಲಿ, FALSE, curbuf);
 	}
     }
-    else if (arg[0] == 3)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (arg[0] == 3)
     {
-	int value;
+	ಪೂರ್ಣಾಂಕ ಮೌಲ್ಯ;
 
 	LOG_TRN("Received compatibility test result: %s", tp);
-	xcc_status.tr_progress = STATUS_GOT;
+	xcc_ಸ್ಥಿತಿ.tr_ಪ್ರಗತಿ = ಸ್ಥಿತಿ_GOT;
 
 	// Third row: xterm compatibility test.
 	// If the cursor is on the first column then the terminal can handle
 	// the request for cursor style and blinking.
-	value = arg[1] == 1 ? TPR_YES : TPR_NO;
-	term_props[TPR_CURSOR_STYLE].tpr_status = value;
-	term_props[TPR_CURSOR_BLINK].tpr_status = value;
+	ಮೌಲ್ಯ = arg[1] == 1 ? TPR_YES : TPR_NO;
+	ಪದ_props[TPR_CURSOR_STYLE].tpr_ಸ್ಥಿತಿ = ಮೌಲ್ಯ;
+	ಪದ_props[TPR_CURSOR_BLINK].tpr_ಸ್ಥಿತಿ = ಮೌಲ್ಯ;
     }
 }
 
@@ -5172,119 +5172,119 @@ handle_u7_response(int *arg, char_u *tp UNUSED, int csi_len UNUSED)
  * Xterm and alike use '>' for {first}.
  * Rxvt sends "{lead}?1;2c".
  */
-    static void
-handle_version_response(int first, int *arg, int argc, char_u *tp)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+handle_ಆವೃತ್ತಿ_response(ಪೂರ್ಣಾಂಕ ಮೊದಲ, ಪೂರ್ಣಾಂಕ *arg, ಪೂರ್ಣಾಂಕ argc, char_u *tp)
 {
     // The xterm version.  It is set to zero when it can't be an actual xterm
     // version.
-    int version = arg[1];
+    ಪೂರ್ಣಾಂಕ ಆವೃತ್ತಿ_2 = arg[1];
 
     LOG_TRN("Received CRV response: %s", tp);
-    crv_status.tr_progress = STATUS_GOT;
+    crv_ಸ್ಥಿತಿ.tr_ಪ್ರಗತಿ = ಸ್ಥಿತಿ_GOT;
     did_cursorhold = TRUE;
 
     // Reset terminal properties that are set based on the termresponse.
     // Mainly useful for tests that send the termresponse multiple times.
     // For testing all props can be reset.
-    init_term_props(
-#ifdef FEAT_EVAL
-	    reset_term_props_on_termresponse
-#else
+    init_ಪದ_props(
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	    reset_ಪದ_props_on_termresponse
+#ಇಲ್ಲದಿದ್ದರೆ
 	    FALSE
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    );
 
     // If this code starts with CSI, you can bet that the
     // terminal uses 8-bit codes.
-    if (tp[0] == CSI)
-	switch_to_8bit();
+    ಆದರೆ (tp[0] == CSI)
+	switch_ಗಮ್ಯ_8bit();
 
     // Screen sends 40500.
     // rxvt sends its version number: "20703" is 2.7.3.
     // Ignore it for when the user has set 'term' to xterm,
     // even though it's an rxvt.
-    if (version > 20000)
-	version = 0;
+    ಆದರೆ (ಆವೃತ್ತಿ_2 > 20000)
+	ಆವೃತ್ತಿ_2 = 0;
 
     // Figure out more if the response is CSI > 99 ; 99 ; 99 c
-    if (first == '>' && argc == 3)
+    ಆದರೆ (ಮೊದಲ == '>' && argc == 3)
     {
 	// mintty 2.9.5 sends 77;20905;0c.
 	// (77 is ASCII 'M' for mintty.)
-	if (arg[0] == 77)
+	ಆದರೆ (arg[0] == 77)
 	{
 	    // mintty can do SGR mouse reporting
-	    term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_SGR;
+	    ಪದ_props[TPR_MOUSE].tpr_ಸ್ಥಿತಿ = TPR_MOUSE_SGR;
 	}
 
-#ifdef FEAT_TERMRESPONSE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMRESPONSE
 	// If xterm version >= 141 try to get termcap codes.  For other
 	// terminals the request should be ignored.
-	if (version >= 141 && p_xtermcodes)
+	ಆದರೆ (ಆವೃತ್ತಿ_2 >= 141 && p_xtermcodes)
 	{
 	    LOG_TR1("Enable checking for XT codes");
 	    check_for_codes = TRUE;
 	    need_gather = TRUE;
-	    req_codes_from_term();
+	    req_codes_from_ಪದ();
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 	// libvterm sends 0;100;0
 	// Konsole sends 0;115;0 and works the same way
-	if ((version == 100 || version == 115) && arg[0] == 0 && arg[2] == 0)
+	ಆದರೆ ((ಆವೃತ್ತಿ_2 == 100 || ಆವೃತ್ತಿ_2 == 115) && arg[0] == 0 && arg[2] == 0)
 	{
 	    // If run from Vim $COLORS is set to the number of
 	    // colors the terminal supports.  Otherwise assume
 	    // 256, libvterm supports even more.
-	    if (mch_getenv((char_u *)"COLORS") == NULL)
-		may_adjust_color_count(256);
+	    ಆದರೆ (mch_getenv((char_u *)"COLORS") == ಖಾಲಿ)
+		may_adjust_color_ಎಣಿಕೆ(256);
 	    // Libvterm can handle SGR mouse reporting.
-	    term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_SGR;
+	    ಪದ_props[TPR_MOUSE].tpr_ಸ್ಥಿತಿ = TPR_MOUSE_SGR;
 	}
 
-	if (version == 95)
+	ಆದರೆ (ಆವೃತ್ತಿ_2 == 95)
 	{
 	    // Mac Terminal.app sends 1;95;0
 	    //
 	    // Terminal.app doesn't seem to handle DECRQM sequences
 	    // properly, see issue #19852.
-	    if (arg[0] == 1 && arg[2] == 0)
+	    ಆದರೆ (arg[0] == 1 && arg[2] == 0)
 	    {
-		term_props[TPR_UNDERLINE_RGB].tpr_status = TPR_YES;
-		term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_SGR;
-		term_props[TPR_DECRQM].tpr_status = TPR_NO;
+		ಪದ_props[TPR_UNDERLINE_RGB].tpr_ಸ್ಥಿತಿ = TPR_YES;
+		ಪದ_props[TPR_MOUSE].tpr_ಸ್ಥಿತಿ = TPR_MOUSE_SGR;
+		ಪದ_props[TPR_DECRQM].tpr_ಸ್ಥಿತಿ = TPR_NO;
 	    }
 	    // iTerm2 sends 0;95;0
-	    else if (arg[0] == 0 && arg[2] == 0)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (arg[0] == 0 && arg[2] == 0)
 	    {
 		// iTerm2 can do SGR mouse reporting
-		term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_SGR;
-		term_props[TPR_DECRQM].tpr_status = TPR_YES;
+		ಪದ_props[TPR_MOUSE].tpr_ಸ್ಥಿತಿ = TPR_MOUSE_SGR;
+		ಪದ_props[TPR_DECRQM].tpr_ಸ್ಥಿತಿ = TPR_YES;
 	    }
 	    // old iTerm2 sends 0;95;
-	    else if (arg[0] == 0 && arg[2] == -1)
-		term_props[TPR_UNDERLINE_RGB].tpr_status = TPR_YES;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (arg[0] == 0 && arg[2] == -1)
+		ಪದ_props[TPR_UNDERLINE_RGB].tpr_ಸ್ಥಿತಿ = TPR_YES;
 	}
 
 	// screen sends 83;40500;0 83 is 'S' in ASCII.
-	if (arg[0] == 83)
+	ಆದರೆ (arg[0] == 83)
 	{
 	    // screen supports SGR mouse codes since 4.7.0
-	    if (arg[1] >= 40700)
-		term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_SGR;
-	    else
-		term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_XTERM;
+	    ಆದರೆ (arg[1] >= 40700)
+		ಪದ_props[TPR_MOUSE].tpr_ಸ್ಥಿತಿ = TPR_MOUSE_SGR;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ಪದ_props[TPR_MOUSE].tpr_ಸ್ಥಿತಿ = TPR_MOUSE_XTERM;
 	}
 
 	// If no recognized terminal has set mouse behavior, assume xterm.
-	if (term_props[TPR_MOUSE].tpr_status == TPR_UNKNOWN)
+	ಆದರೆ (ಪದ_props[TPR_MOUSE].tpr_ಸ್ಥಿತಿ == TPR_UNKNOWN)
 	{
 	    // Xterm version 277 supports SGR.
 	    // Xterm version >= 95 supports mouse dragging.
-	    if (version >= 277)
-		term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_SGR;
-	    else if (version >= 95)
-		term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_XTERM2;
+	    ಆದರೆ (ಆವೃತ್ತಿ_2 >= 277)
+		ಪದ_props[TPR_MOUSE].tpr_ಸ್ಥಿತಿ = TPR_MOUSE_SGR;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಆವೃತ್ತಿ_2 >= 95)
+		ಪದ_props[TPR_MOUSE].tpr_ಸ್ಥಿತಿ = TPR_MOUSE_XTERM2;
 	}
 
 	// Detect terminals that set $TERM to something like
@@ -5296,20 +5296,20 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 	// screen sends 83;40500;0
 	// Assuming any version number over 2500 is not an
 	// xterm (without the limit for rxvt and screen).
-	if (arg[1] >= 2500)
+	ಆದರೆ (arg[1] >= 2500)
 	{
-	    term_props[TPR_UNDERLINE_RGB].tpr_status = TPR_YES;
+	    ಪದ_props[TPR_UNDERLINE_RGB].tpr_ಸ್ಥಿತಿ = TPR_YES;
 	}
 
-	else if (version == 136 && arg[2] == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಆವೃತ್ತಿ_2 == 136 && arg[2] == 0)
 	{
-	    term_props[TPR_UNDERLINE_RGB].tpr_status = TPR_YES;
+	    ಪದ_props[TPR_UNDERLINE_RGB].tpr_ಸ್ಥಿತಿ = TPR_YES;
 
 	    // PuTTY sends 0;136;0
-	    if (arg[0] == 0)
+	    ಆದರೆ (arg[0] == 0)
 	    {
 		// supports sgr-like mouse reporting.
-		term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_SGR;
+		ಪದ_props[TPR_MOUSE].tpr_ಸ್ಥಿತಿ = TPR_MOUSE_SGR;
 	    }
 	    // vandyke SecureCRT sends 1;136;0
 	}
@@ -5320,32 +5320,32 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 	//     term_props[TPR_UNDERLINE_RGB].tpr_status = TPR_YES;
 
 	// Kitty up to 9.x sends 1;400{version};{secondary-version}
-	if (arg[0] == 1 && arg[1] >= 4000 && arg[1] <= 4009)
+	ಆದರೆ (arg[0] == 1 && arg[1] >= 4000 && arg[1] <= 4009)
 	{
-	    term_props[TPR_KITTY].tpr_status = TPR_YES;
-	    term_props[TPR_KITTY].tpr_set_by_termresponse = TRUE;
+	    ಪದ_props[TPR_KITTY].tpr_ಸ್ಥಿತಿ = TPR_YES;
+	    ಪದ_props[TPR_KITTY].tpr_ಗಣ_by_termresponse = TRUE;
 
 	    // Kitty can handle SGR mouse reporting.
-	    term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_SGR;
-	    term_props[TPR_DECRQM].tpr_status = TPR_YES;
+	    ಪದ_props[TPR_MOUSE].tpr_ಸ್ಥಿತಿ = TPR_MOUSE_SGR;
+	    ಪದ_props[TPR_DECRQM].tpr_ಸ್ಥಿತಿ = TPR_YES;
 	}
 
 	// foot terminal sends 1;12700;0
-	if (arg[0] == 1 && version == 12700 && arg[2] == 0)
+	ಆದರೆ (arg[0] == 1 && ಆವೃತ್ತಿ_2 == 12700 && arg[2] == 0)
 	{
-	    term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_SGR;
-	    term_props[TPR_DECRQM].tpr_status = TPR_YES;
+	    ಪದ_props[TPR_MOUSE].tpr_ಸ್ಥಿತಿ = TPR_MOUSE_SGR;
+	    ಪದ_props[TPR_DECRQM].tpr_ಸ್ಥಿತಿ = TPR_YES;
 	}
 
 	// GNU screen sends 83;30600;0, 83;40500;0, etc.
 	// 30600/40500 is a version number of GNU screen. DA2 support is added
 	// on 3.6.  DCS string has a special meaning to GNU screen, but xterm
 	// compatibility checking does not detect GNU screen.
-	if (arg[0] == 83 && arg[1] >= 30600)
+	ಆದರೆ (arg[0] == 83 && arg[1] >= 30600)
 	{
-	    term_props[TPR_CURSOR_STYLE].tpr_status = TPR_NO;
-	    term_props[TPR_CURSOR_BLINK].tpr_status = TPR_NO;
-	    term_props[TPR_DECRQM].tpr_status = TPR_NO; // screen doesn't seem
+	    ಪದ_props[TPR_CURSOR_STYLE].tpr_ಸ್ಥಿತಿ = TPR_NO;
+	    ಪದ_props[TPR_CURSOR_BLINK].tpr_ಸ್ಥಿತಿ = TPR_NO;
+	    ಪದ_props[TPR_DECRQM].tpr_ಸ್ಥಿತಿ = TPR_NO; // screen doesn't seem
 							// to handle DECRQM
 							// sequences
 	}
@@ -5353,13 +5353,13 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 	// Xterm first responded to this request at patch level
 	// 95, so assume anything below 95 is not xterm and hopefully supports
 	// the underline RGB color sequence.
-	if (version < 95)
-	    term_props[TPR_UNDERLINE_RGB].tpr_status = TPR_YES;
+	ಆದರೆ (ಆವೃತ್ತಿ_2 < 95)
+	    ಪದ_props[TPR_UNDERLINE_RGB].tpr_ಸ್ಥಿತಿ = TPR_YES;
 
 	// Getting the cursor style is only supported properly by xterm since
 	// version 279 (otherwise it returns 0x18).
-	if (version < 279)
-	    term_props[TPR_CURSOR_STYLE].tpr_status = TPR_NO;
+	ಆದರೆ (ಆವೃತ್ತಿ_2 < 279)
+	    ಪದ_props[TPR_CURSOR_STYLE].tpr_ಸ್ಥಿತಿ = TPR_NO;
 
 	/*
 	 * Take action on the detected properties.
@@ -5370,33 +5370,33 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 	// This may cause some flicker.  Alternative would be to set "t_8u"
 	// here if the terminal is expected to support it, but that might
 	// conflict with what was set in the .vimrc.
-	if (term_props[TPR_UNDERLINE_RGB].tpr_status != TPR_YES
+	ಆದರೆ (ಪದ_props[TPR_UNDERLINE_RGB].tpr_ಸ್ಥಿತಿ != TPR_YES
 			&& *T_8U != NUL
-			&& !option_was_set((char_u *)"t_8u"))
+			&& !option_was_ಗಣ((char_u *)"t_8u"))
 	{
-	    set_string_option_direct((char_u *)"t_8u", -1, (char_u *)"",
+	    ಗಣ_string_option_ನೇರ((char_u *)"t_8u", -1, (char_u *)"",
 								  OPT_FREE, 0);
 	}
-#ifdef FEAT_TERMRESPONSE
-	if (*T_8U != NUL && write_t_8u_state == MAYBE)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMRESPONSE
+	ಆದರೆ (*T_8U != NUL && write_t_8u_state == MAYBE)
 	    // Did skip writing t_8u, a complete redraw is needed.
 	    redraw_later_clear();
 	write_t_8u_state = OK;  // can output t_8u now
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 	// Only set 'ttymouse' automatically if it was not set
 	// by the user already.
-	if (!option_was_set((char_u *)"ttym")
-		&& (term_props[TPR_MOUSE].tpr_status == TPR_MOUSE_XTERM2
-		    || term_props[TPR_MOUSE].tpr_status == TPR_MOUSE_SGR))
+	ಆದರೆ (!option_was_ಗಣ((char_u *)"ttym")
+		&& (ಪದ_props[TPR_MOUSE].tpr_ಸ್ಥಿತಿ == TPR_MOUSE_XTERM2
+		    || ಪದ_props[TPR_MOUSE].tpr_ಸ್ಥಿತಿ == TPR_MOUSE_SGR))
 	{
-	    set_option_value_give_err((char_u *)"ttym", 0L,
-		    term_props[TPR_MOUSE].tpr_status == TPR_MOUSE_SGR
+	    ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"ttym", 0L,
+		    ಪದ_props[TPR_MOUSE].tpr_ಸ್ಥಿತಿ == TPR_MOUSE_SGR
 				    ? (char_u *)"sgr" : (char_u *)"xterm2", 0);
 	}
 
-#ifdef FEAT_TERMRESPONSE
-	int need_flush = FALSE;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMRESPONSE
+	ಪೂರ್ಣಾಂಕ need_flush = FALSE;
 
 	// Only request the cursor style if t_SH and t_RS are
 	// set. Only supported properly by xterm since version
@@ -5404,15 +5404,15 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 	// Only when getting the cursor style was detected to work.
 	// Not for Terminal.app, it can't handle t_RS, it
 	// echoes the characters to the screen.
-	if (rcs_status.tr_progress == STATUS_GET
-		&& term_props[TPR_CURSOR_STYLE].tpr_status == TPR_YES
+	ಆದರೆ (rcs_ಸ್ಥಿತಿ.tr_ಪ್ರಗತಿ == ಸ್ಥಿತಿ_GET
+		&& ಪದ_props[TPR_CURSOR_STYLE].tpr_ಸ್ಥಿತಿ == TPR_YES
 		&& *T_CSH != NUL
 		&& *T_CRS != NUL)
 	{
-	    MAY_WANT_TO_LOG_THIS;
+	    MAY_WANT_ಗಮ್ಯ_LOG_THIS;
 	    LOG_TR1("Sending cursor style request");
-	    out_str(T_CRS);
-	    termrequest_sent(&rcs_status);
+	    ಹೊರಹೋಗು_str(T_CRS);
+	    termrequest_ಕಳುಹಿಸಿದ(&rcs_ಸ್ಥಿತಿ);
 	    need_flush = TRUE;
 	}
 
@@ -5420,38 +5420,38 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 	// for Gnome terminal, it can't handle t_RC, it
 	// echoes the characters to the screen.
 	// Only when getting the cursor style was detected to work.
-	if (rbm_status.tr_progress == STATUS_GET
-		&& term_props[TPR_CURSOR_BLINK].tpr_status == TPR_YES
-		&& *T_CRC != NUL)
+	ಆದರೆ (rbm_ಸ್ಥಿತಿ.tr_ಪ್ರಗತಿ == ಸ್ಥಿತಿ_GET
+		&& ಪದ_props[TPR_CURSOR_BLINK].tpr_ಸ್ಥಿತಿ == TPR_YES
+		&& *T_ಚಕ್ರೀಯ_ಪರೀಕ್ಷೆ != NUL)
 	{
-	    MAY_WANT_TO_LOG_THIS;
+	    MAY_WANT_ಗಮ್ಯ_LOG_THIS;
 	    LOG_TR1("Sending cursor blink mode request");
-	    out_str(T_CRC);
-	    termrequest_sent(&rbm_status);
+	    ಹೊರಹೋಗು_str(T_ಚಕ್ರೀಯ_ಪರೀಕ್ಷೆ);
+	    termrequest_ಕಳುಹಿಸಿದ(&rbm_ಸ್ಥಿತಿ);
 	    need_flush = TRUE;
 	}
 
 	// Only request DEC modes via DECRQM when the terminal is known to
 	// handle it.  Not for Apple Terminal.app or GNU screen, they echo
 	// the trailing "p" to the screen.  See issue #19852.
-	if (decrqm_status.tr_progress == STATUS_GET
-		&& term_props[TPR_DECRQM].tpr_status == TPR_YES)
+	ಆದರೆ (decrqm_ಸ್ಥಿತಿ.tr_ಪ್ರಗತಿ == ಸ್ಥಿತಿ_GET
+		&& ಪದ_props[TPR_DECRQM].tpr_ಸ್ಥಿತಿ == TPR_YES)
 	{
-	    MAY_WANT_TO_LOG_THIS;
+	    MAY_WANT_ಗಮ್ಯ_LOG_THIS;
 	    LOG_TR1("Sending DECRQM requests");
-	    for (int i = 0; i < (int)ARRAY_LENGTH(dec_modes); i++)
+	    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(dec_modes); i++)
 	    {
-		vim_snprintf((char *)IObuff, IOSIZE, "\033[?%d$p", dec_modes[i]);
-		out_str(IObuff);
+		vim_snprintf((ಅಕ್ಷರ *)IObuff, IOSIZE, "\033[?%d$p", dec_modes[i]);
+		ಹೊರಹೋಗು_str(IObuff);
 	    }
-	    termrequest_sent(&decrqm_status);
+	    termrequest_ಕಳುಹಿಸಿದ(&decrqm_ಸ್ಥಿತಿ);
 	    need_flush = TRUE;
 
 	}
 
-	if (need_flush)
-	    out_flush();
-#endif
+	ಆದರೆ (need_flush)
+	    ಹೊರಹೋಗು_flush();
+#ಆದರೆ_ಅಂತ್ಯ
     }
 }
 
@@ -5459,63 +5459,63 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
  * Add "key" to "buf" and return the number of bytes used.
  * Handles special keys and multi-byte characters.
  */
-    static int
-add_key_to_buf(int key, char_u *buf)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಕೂಡಿಸು_ಕೀಲಿ_ಗಮ್ಯ_buf(ಪೂರ್ಣಾಂಕ ಕೀಲಿ, char_u *buf)
 {
-    int idx = 0;
+    ಪೂರ್ಣಾಂಕ idx = 0;
 
-    if (IS_SPECIAL(key))
+    ಆದರೆ (IS_SPECIAL(ಕೀಲಿ))
     {
 	buf[idx++] = K_SPECIAL;
-	buf[idx++] = KEY2TERMCAP0(key);
-	buf[idx++] = KEY2TERMCAP1(key);
+	buf[idx++] = KEY2TERMCAP0(ಕೀಲಿ);
+	buf[idx++] = KEY2TERMCAP1(ಕೀಲಿ);
     }
-    else if (has_mbyte)
-	idx += (*mb_char2bytes)(key, buf + idx);
-    else
-	buf[idx++] = key;
-    return idx;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (has_mbyte)
+	idx += (*mb_char2bytes)(ಕೀಲಿ, buf + idx);
+    ಇಲ್ಲದಿದ್ದರೆ
+	buf[idx++] = ಕೀಲಿ;
+    ಹಿಂತಿರುಗಿ idx;
 }
 
 /*
  * Shared between handle_key_with_modifier() and handle_csi_function_key().
  */
-    static int
-put_key_modifiers_in_typebuf(
-	int	key_arg,
-	int	modifiers_arg,
-	int	csi_len,
-	int	offset,
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+put_ಕೀಲಿ_modifiers_ಒಳ_typebuf(
+	ಪೂರ್ಣಾಂಕ	ಕೀಲಿ_arg,
+	ಪೂರ್ಣಾಂಕ	modifiers_arg,
+	ಪೂರ್ಣಾಂಕ	csi_len,
+	ಪೂರ್ಣಾಂಕ	ಸ್ಥಾನಾಂತರ,
 	char_u	*buf,
-	int	bufsize,
-	int	*buflen)
+	ಪೂರ್ಣಾಂಕ	bufsize,
+	ಪೂರ್ಣಾಂಕ	*buflen)
 {
-    int key = key_arg;
-    int modifiers = modifiers_arg;
+    ಪೂರ್ಣಾಂಕ ಕೀಲಿ = ಕೀಲಿ_arg;
+    ಪೂರ್ಣಾಂಕ modifiers = modifiers_arg;
 
     // Some keys need adjustment when the Ctrl modifier is used.
-    key = may_adjust_key_for_ctrl(modifiers, key);
+    ಕೀಲಿ = may_adjust_ಕೀಲಿ_for_ctrl(modifiers, ಕೀಲಿ);
 
     // May remove the shift modifier if it's already included in the key.
-    modifiers = may_remove_shift_modifier(modifiers, key);
+    modifiers = may_remove_ಸರಿಸು_modifier(modifiers, ಕೀಲಿ);
 
     // Produce modifiers with K_SPECIAL KS_MODIFIER {mod}
     // worst-case: 3-byte modifier + 4 byte multi-char key + NUL
-    char_u string[MAX_KEY_CODE_LEN + 2];
-    int new_slen = modifiers2keycode(modifiers, &key, string);
+    char_u string[MAX_ಕೀಲಿ_ಸಂಕೇತ_LEN + 2];
+    ಪೂರ್ಣಾಂಕ new_slen = modifiers2keycode(modifiers, &ಕೀಲಿ, string);
 
     // reject overlong key that would overflow string
-    if (key > 0x10FFFF)
-	return -1;
+    ಆದರೆ (ಕೀಲಿ > 0x10FFFF)
+	ಹಿಂತಿರುಗಿ -1;
 
     // Add the bytes for the key.
-    new_slen += add_key_to_buf(key, string + new_slen);
+    new_slen += ಕೂಡಿಸು_ಕೀಲಿ_ಗಮ್ಯ_buf(ಕೀಲಿ, string + new_slen);
 
     string[new_slen] = NUL;
-    if (put_string_in_typebuf(offset, csi_len, string, new_slen,
+    ಆದರೆ (put_string_ಒಳ_typebuf(ಸ್ಥಾನಾಂತರ, csi_len, string, new_slen,
 						 buf, bufsize, buflen) == FAIL)
-	return -1;
-    return new_slen - csi_len + offset;
+	ಹಿಂತಿರುಗಿ -1;
+    ಹಿಂತಿರುಗಿ new_slen - csi_len + ಸ್ಥಾನಾಂತರ;
 }
 
 /*
@@ -5523,30 +5523,30 @@ put_key_modifiers_in_typebuf(
  *	ESC [ {number} ~
  * Returns the key
  */
-    static int
-parse_csi_f_keys(int arg)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+parse_csi_f_ಕೀಲಿಗಳು(ಪೂರ್ಣಾಂಕ arg)
 {
-    char_u key_name[2] = { 0, 0 };
+    char_u ಕೀಲಿ_name[2] = { 0, 0 };
 
-    switch (arg)
+    ಆಯ್ಕೆ (arg)
     {
-	case 11: key_name[0] = 'k'; key_name[1] = '1'; break;  // K_F1
-	case 12: key_name[0] = 'k'; key_name[1] = '2'; break;  // K_F2
-	case 13: key_name[0] = 'k'; key_name[1] = '3'; break;  // K_F3
-	case 14: key_name[0] = 'k'; key_name[1] = '4'; break;  // K_F4
-	case 15: key_name[0] = 'k'; key_name[1] = '5'; break;  // K_F5
-	case 17: key_name[0] = 'k'; key_name[1] = '6'; break;  // K_F6
-	case 18: key_name[0] = 'k'; key_name[1] = '7'; break;  // K_F7
-	case 19: key_name[0] = 'k'; key_name[1] = '8'; break;  // K_F8
-	case 20: key_name[0] = 'k'; key_name[1] = '9'; break;  // K_F9
-	case 21: key_name[0] = 'F'; key_name[1] = ';'; break;  // K_F10
-	case 23: key_name[0] = 'F'; key_name[1] = '1'; break;  // K_F11
-	case 24: key_name[0] = 'F'; key_name[1] = '2'; break;  // K_F12
+	ಸ್ಥಿತಿ 11: ಕೀಲಿ_name[0] = 'k'; ಕೀಲಿ_name[1] = '1'; ನಿಲ್ಲಿಸು;  // K_F1
+	ಸ್ಥಿತಿ 12: ಕೀಲಿ_name[0] = 'k'; ಕೀಲಿ_name[1] = '2'; ನಿಲ್ಲಿಸು;  // K_F2
+	ಸ್ಥಿತಿ 13: ಕೀಲಿ_name[0] = 'k'; ಕೀಲಿ_name[1] = '3'; ನಿಲ್ಲಿಸು;  // K_F3
+	ಸ್ಥಿತಿ 14: ಕೀಲಿ_name[0] = 'k'; ಕೀಲಿ_name[1] = '4'; ನಿಲ್ಲಿಸು;  // K_F4
+	ಸ್ಥಿತಿ 15: ಕೀಲಿ_name[0] = 'k'; ಕೀಲಿ_name[1] = '5'; ನಿಲ್ಲಿಸು;  // K_F5
+	ಸ್ಥಿತಿ 17: ಕೀಲಿ_name[0] = 'k'; ಕೀಲಿ_name[1] = '6'; ನಿಲ್ಲಿಸು;  // K_F6
+	ಸ್ಥಿತಿ 18: ಕೀಲಿ_name[0] = 'k'; ಕೀಲಿ_name[1] = '7'; ನಿಲ್ಲಿಸು;  // K_F7
+	ಸ್ಥಿತಿ 19: ಕೀಲಿ_name[0] = 'k'; ಕೀಲಿ_name[1] = '8'; ನಿಲ್ಲಿಸು;  // K_F8
+	ಸ್ಥಿತಿ 20: ಕೀಲಿ_name[0] = 'k'; ಕೀಲಿ_name[1] = '9'; ನಿಲ್ಲಿಸು;  // K_F9
+	ಸ್ಥಿತಿ 21: ಕೀಲಿ_name[0] = 'F'; ಕೀಲಿ_name[1] = ';'; ನಿಲ್ಲಿಸು;  // K_F10
+	ಸ್ಥಿತಿ 23: ಕೀಲಿ_name[0] = 'F'; ಕೀಲಿ_name[1] = '1'; ನಿಲ್ಲಿಸು;  // K_F11
+	ಸ್ಥಿತಿ 24: ಕೀಲಿ_name[0] = 'F'; ಕೀಲಿ_name[1] = '2'; ನಿಲ್ಲಿಸು;  // K_F12
     }
-    if (key_name[0])
-	return TERMCAP2KEY(key_name[0], key_name[1]);
+    ಆದರೆ (ಕೀಲಿ_name[0])
+	ಹಿಂತಿರುಗಿ TERMCAP2_ಕೀಲಿ(ಕೀಲಿ_name[0], ಕೀಲಿ_name[1]);
     // shouldn't happen
-    return arg;
+    ಹಿಂತಿರುಗಿ arg;
 }
 
 /*
@@ -5555,16 +5555,16 @@ parse_csi_f_keys(int arg)
  *	{lead}{key};{modifier}u
  * Returns the difference in length.
  */
-    static int
-handle_key_with_modifier(
-	int	*arg,
-	int	csi_len,
-	int	offset,
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+handle_ಕೀಲಿ_with_modifier(
+	ಪೂರ್ಣಾಂಕ	*arg,
+	ಪೂರ್ಣಾಂಕ	csi_len,
+	ಪೂರ್ಣಾಂಕ	ಸ್ಥಾನಾಂತರ,
 	char_u	*buf,
-	int	bufsize,
-	int	*buflen,
-	int	iskitty,
-	int	trail)
+	ಪೂರ್ಣಾಂಕ	bufsize,
+	ಪೂರ್ಣಾಂಕ	*buflen,
+	ಪೂರ್ಣಾಂಕ	iskitty,
+	ಪೂರ್ಣಾಂಕ	trail)
 {
     // Only set seenModifyOtherKeys for the "{lead}27;" code to avoid setting
     // it for terminals using the kitty keyboard protocol.  Xterm sends
@@ -5577,35 +5577,35 @@ handle_key_with_modifier(
     //
     // Do not set seenModifyOtherKeys for kitty, it does send some sequences
     // like this but does not have the modifyOtherKeys feature.
-    if (!iskitty
+    ಆದರೆ (!iskitty
 	    && (kitty_protocol_state == KKPS_INITIAL
 		|| kitty_protocol_state == KKPS_OFF
 		|| kitty_protocol_state == KKPS_AFTER_T_TE)
-	    && term_props[TPR_KITTY].tpr_status != TPR_YES)
+	    && ಪದ_props[TPR_KITTY].tpr_ಸ್ಥಿತಿ != TPR_YES)
     {
-#ifdef FEAT_EVAL
-	ch_log(NULL, "setting seenModifyOtherKeys to TRUE");
-#endif
-	seenModifyOtherKeys = TRUE;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	ch_log(ಖಾಲಿ, "setting seenModifyOtherKeys to TRUE");
+#ಆದರೆ_ಅಂತ್ಯ
+	ನೋಡಿದ_Modify_Other_ಕೀಲಿಗಳು = TRUE;
     }
 
-    int key = iskitty ? arg[0] : arg[2];
-    int modifiers = decode_modifiers(arg[1]);
+    ಪೂರ್ಣಾಂಕ ಕೀಲಿ = iskitty ? arg[0] : arg[2];
+    ಪೂರ್ಣಾಂಕ modifiers = decode_modifiers(arg[1]);
 
     // Some terminals do not apply the Shift modifier to the key.  To make
     // mappings consistent we do it here.  TODO: support more keys.
-    if ((modifiers & MOD_MASK_SHIFT) && key >= 'a' && key <= 'z')
-	key += 'A' - 'a';
+    ಆದರೆ ((modifiers & MOD_ಮುಖವಾಡ_ಸರಿಸು) && ಕೀಲಿ >= 'a' && ಕೀಲಿ <= 'z')
+	ಕೀಲಿ += 'A' - 'a';
 
     // Putting Esc in the buffer creates ambiguity, it can be the start of an
     // escape sequence.  Use K_ESC to avoid that.
-    if (key == ESC)
-	key = K_ESC;
+    ಆದರೆ (ಕೀಲಿ == ESC)
+	ಕೀಲಿ = K_ESC;
 
-    else if (arg[0] >= 11 && arg[0] <= 24 && trail == '~')
-	key = parse_csi_f_keys(arg[0]);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (arg[0] >= 11 && arg[0] <= 24 && trail == '~')
+	ಕೀಲಿ = parse_csi_f_ಕೀಲಿಗಳು(arg[0]);
 
-    return put_key_modifiers_in_typebuf(key, modifiers, csi_len, offset, buf,
+    ಹಿಂತಿರುಗಿ put_ಕೀಲಿ_modifiers_ಒಳ_typebuf(ಕೀಲಿ, modifiers, csi_len, ಸ್ಥಾನಾಂತರ, buf,
 	    bufsize, buflen);
 }
 
@@ -5615,20 +5615,20 @@ handle_key_with_modifier(
  *	{lead}{key}~
  * Returns the difference in length.
  */
-    static int
-handle_key_without_modifier(
-	int	*arg,
-	int	csi_len,
-	int	offset,
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+handle_ಕೀಲಿ_without_modifier(
+	ಪೂರ್ಣಾಂಕ	*arg,
+	ಪೂರ್ಣಾಂಕ	csi_len,
+	ಪೂರ್ಣಾಂಕ	ಸ್ಥಾನಾಂತರ,
 	char_u	*buf,
-	int	bufsize,
-	int	*buflen,
-	int	trail)
+	ಪೂರ್ಣಾಂಕ	bufsize,
+	ಪೂರ್ಣಾಂಕ	*buflen,
+	ಪೂರ್ಣಾಂಕ	trail)
 {
-    char_u  string[MAX_KEY_CODE_LEN + 1];
-    int	    new_slen;
+    char_u  string[MAX_ಕೀಲಿ_ಸಂಕೇತ_LEN + 1];
+    ಪೂರ್ಣಾಂಕ	    new_slen;
 
-    if (arg[0] == ESC)
+    ಆದರೆ (arg[0] == ESC)
     {
 	// Putting Esc in the buffer creates ambiguity, it can be the start of
 	// an escape sequence.  Use K_ESC to avoid that.
@@ -5637,21 +5637,21 @@ handle_key_without_modifier(
 	string[2] = KE_ESC;
 	new_slen = 3;
     }
-    else if (arg[0] >= 11 && arg[0] <= 24 && trail == '~')
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (arg[0] >= 11 && arg[0] <= 24 && trail == '~')
     {
-	int key = parse_csi_f_keys(arg[0]);
+	ಪೂರ್ಣಾಂಕ ಕೀಲಿ = parse_csi_f_ಕೀಲಿಗಳು(arg[0]);
 	string[0] = K_SPECIAL;
-	string[1] = KEY2TERMCAP0(key);
-	string[2] = KEY2TERMCAP1(key);
+	string[1] = KEY2TERMCAP0(ಕೀಲಿ);
+	string[2] = KEY2TERMCAP1(ಕೀಲಿ);
 	new_slen = 3;
     }
-    else
-	new_slen = add_key_to_buf(arg[0], string);
+    ಇಲ್ಲದಿದ್ದರೆ
+	new_slen = ಕೂಡಿಸು_ಕೀಲಿ_ಗಮ್ಯ_buf(arg[0], string);
 
-    if (put_string_in_typebuf(offset, csi_len, string, new_slen,
+    ಆದರೆ (put_string_ಒಳ_typebuf(ಸ್ಥಾನಾಂತರ, csi_len, string, new_slen,
 						 buf, bufsize, buflen) == FAIL)
-	return -1;
-    return new_slen - csi_len + offset;
+	ಹಿಂತಿರುಗಿ -1;
+    ಹಿಂತಿರುಗಿ new_slen - csi_len + ಸ್ಥಾನಾಂತರ;
 }
 
 /*
@@ -5660,43 +5660,43 @@ handle_key_without_modifier(
  *	{lead}1;{modifier}[ABCDEFHPQRS]
  * Returns zero when nog recognized, a positive number when recognized.
  */
-    static int
-handle_csi_function_key(
-	int	argc,
-	int	*arg,
-	int	trail,
-	int	csi_len,
-	char_u	*key_name,
-	int	offset,
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+handle_csi_function_ಕೀಲಿ(
+	ಪೂರ್ಣಾಂಕ	argc,
+	ಪೂರ್ಣಾಂಕ	*arg,
+	ಪೂರ್ಣಾಂಕ	trail,
+	ಪೂರ್ಣಾಂಕ	csi_len,
+	char_u	*ಕೀಲಿ_name,
+	ಪೂರ್ಣಾಂಕ	ಸ್ಥಾನಾಂತರ,
 	char_u  *buf,
-	int	bufsize,
-	int	*buflen)
+	ಪೂರ್ಣಾಂಕ	bufsize,
+	ಪೂರ್ಣಾಂಕ	*buflen)
 {
-    key_name[0] = 'k';
-    switch (trail)
+    ಕೀಲಿ_name[0] = 'k';
+    ಆಯ್ಕೆ (trail)
     {
-	case 'A': key_name[1] = 'u'; break;  // K_UP
-	case 'B': key_name[1] = 'd'; break;  // K_DOWN
-	case 'C': key_name[1] = 'r'; break;  // K_RIGHT
-	case 'D': key_name[1] = 'l'; break;  // K_LEFT
+	ಸ್ಥಿತಿ 'A': ಕೀಲಿ_name[1] = 'u'; ನಿಲ್ಲಿಸು;  // K_UP
+	ಸ್ಥಿತಿ 'B': ಕೀಲಿ_name[1] = 'd'; ನಿಲ್ಲಿಸು;  // K_DOWN
+	ಸ್ಥಿತಿ 'C': ಕೀಲಿ_name[1] = 'r'; ನಿಲ್ಲಿಸು;  // K_RIGHT
+	ಸ್ಥಿತಿ 'D': ಕೀಲಿ_name[1] = 'l'; ನಿಲ್ಲಿಸು;  // K_LEFT
 
 	// case 'E': keypad BEGIN - not supported
-	case 'F': key_name[0] = '@'; key_name[1] = '7'; break;  // K_END
-	case 'H': key_name[1] = 'h'; break;  // K_HOME
+	ಸ್ಥಿತಿ 'F': ಕೀಲಿ_name[0] = '@'; ಕೀಲಿ_name[1] = '7'; ನಿಲ್ಲಿಸು;  // K_END
+	ಸ್ಥಿತಿ 'H': ಕೀಲಿ_name[1] = 'h'; ನಿಲ್ಲಿಸು;  // K_HOME
 
-	case 'P': key_name[1] = '1'; break;  // K_F1
-	case 'Q': key_name[1] = '2'; break;  // K_F2
-	case 'R': key_name[1] = '3'; break;  // K_F3
-	case 'S': key_name[1] = '4'; break;  // K_F4
+	ಸ್ಥಿತಿ 'P': ಕೀಲಿ_name[1] = '1'; ನಿಲ್ಲಿಸು;  // K_F1
+	ಸ್ಥಿತಿ 'Q': ಕೀಲಿ_name[1] = '2'; ನಿಲ್ಲಿಸು;  // K_F2
+	ಸ್ಥಿತಿ 'R': ಕೀಲಿ_name[1] = '3'; ನಿಲ್ಲಿಸು;  // K_F3
+	ಸ್ಥಿತಿ 'S': ಕೀಲಿ_name[1] = '4'; ನಿಲ್ಲಿಸು;  // K_F4
 
-	default: return 0;  // not recognized
+	ಪೂರ್ವನಿಯೋಜಿತ: ಹಿಂತಿರುಗಿ 0;  // not recognized
     }
 
-    int key = TERMCAP2KEY(key_name[0], key_name[1]);
-    int modifiers = argc == 2 ? decode_modifiers(arg[1]) : 0;
-    put_key_modifiers_in_typebuf(key, modifiers,
-					csi_len, offset, buf, bufsize, buflen);
-    return csi_len;
+    ಪೂರ್ಣಾಂಕ ಕೀಲಿ = TERMCAP2_ಕೀಲಿ(ಕೀಲಿ_name[0], ಕೀಲಿ_name[1]);
+    ಪೂರ್ಣಾಂಕ modifiers = argc == 2 ? decode_modifiers(arg[1]) : 0;
+    put_ಕೀಲಿ_modifiers_ಒಳ_typebuf(ಕೀಲಿ, modifiers,
+					csi_len, ಸ್ಥಾನಾಂತರ, buf, bufsize, buflen);
+    ಹಿಂತಿರುಗಿ csi_len;
 }
 
 /*
@@ -5726,102 +5726,102 @@ handle_csi_function_key(
  *
  * Return 0 for no match, -1 for partial match, > 0 for full match.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 handle_csi(
 	char_u	*tp,
-	int	len,
+	ಪೂರ್ಣಾಂಕ	len,
 	char_u	*argp,
-	int	offset,
+	ಪೂರ್ಣಾಂಕ	ಸ್ಥಾನಾಂತರ,
 	char_u  *buf,
-	int	bufsize,
-	int	*buflen,
-	char_u	*key_name,
-	int	*slen)
+	ಪೂರ್ಣಾಂಕ	bufsize,
+	ಪೂರ್ಣಾಂಕ	*buflen,
+	char_u	*ಕೀಲಿ_name,
+	ಪೂರ್ಣಾಂಕ	*slen)
 {
-    int		first = -1;  // optional char right after {lead}
-    int		trail;	     // char that ends CSI sequence
-    int		arg[3] = {-1, -1, -1};	// argument numbers
-    int		argc = 0;		// number of arguments
+    ಪೂರ್ಣಾಂಕ		ಮೊದಲ = -1;  // optional char right after {lead}
+    ಪೂರ್ಣಾಂಕ		trail;	     // char that ends CSI sequence
+    ಪೂರ್ಣಾಂಕ		arg[3] = {-1, -1, -1};	// argument numbers
+    ಪೂರ್ಣಾಂಕ		argc = 0;		// number of arguments
     char_u	*ap = argp;
-    int		csi_len;
+    ಪೂರ್ಣಾಂಕ		csi_len;
 
     // Check for non-digit after CSI.
-    if (!VIM_ISDIGIT(*ap))
-	first = *ap++;
+    ಆದರೆ (!VIM_ISDIGIT(*ap))
+	ಮೊದಲ = *ap++;
 
-    if (first >= 'A' && first <= 'Z')
+    ಆದರೆ (ಮೊದಲ >= 'A' && ಮೊದಲ <= 'Z')
     {
 	// If "first" is in [ABCDEFHPQRS] then it is actually the "trail" and
 	// no argument follows.
-	trail = first;
-	first = -1;
+	trail = ಮೊದಲ;
+	ಮೊದಲ = -1;
 	--ap;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Find up to three argument numbers.
-	for (argc = 0; argc < 3; )
+	ಗಾಗಿ (argc = 0; argc < 3; )
 	{
-	    if (ap >= tp + len)
-		return -1;
-	    if (*ap == ';')
+	    ಆದರೆ (ap >= tp + len)
+		ಹಿಂತಿರುಗಿ -1;
+	    ಆದರೆ (*ap == ';')
 		arg[argc++] = -1;  // omitted number
-	    else if (VIM_ISDIGIT(*ap))
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (VIM_ISDIGIT(*ap))
 	    {
 		arg[argc] = 0;
-		for (;;)
+		ಗಾಗಿ (;;)
 		{
-		    if (ap >= tp + len)
-			return -1;
-		    if (!VIM_ISDIGIT(*ap))
-			break;
+		    ಆದರೆ (ap >= tp + len)
+			ಹಿಂತಿರುಗಿ -1;
+		    ಆದರೆ (!VIM_ISDIGIT(*ap))
+			ನಿಲ್ಲಿಸು;
 		    // avoid overflow
-		    if (arg[argc] <= (INT_MAX - 9) / 10)
+		    ಆದರೆ (arg[argc] <= (ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ - 9) / 10)
 			arg[argc] = arg[argc] * 10 + (*ap - '0');
 		    ++ap;
 		}
 		++argc;
 	    }
-	    if (*ap == ';')
+	    ಆದರೆ (*ap == ';')
 		++ap;
-	    else
-		break;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ನಿಲ್ಲಿಸು;
 	}
 
 	// mrxvt has been reported to have "+" in the version. Assume
 	// the escape sequence ends with a letter or one of "{|}~".
-	while (ap < tp + len
+	ಆಗ (ap < tp + len
 		&& !(*ap >= '{' && *ap <= '~')
 		&& !ASCII_ISALPHA(*ap))
 	    ++ap;
-	if (ap >= tp + len)
-	    return -1;
+	ಆದರೆ (ap >= tp + len)
+	    ಹಿಂತಿರುಗಿ -1;
 	trail = *ap;
     }
 
-    csi_len = (int)(ap - tp) + 1;
+    csi_len = (ಪೂರ್ಣಾಂಕ)(ap - tp) + 1;
 
     // Response to XTQMODKEYS: "CSI > 4 ; Pv m" where Pv indicates the
     // modifyOtherKeys level.  Drop similar responses.
-    if (first == '>' && (argc == 1 || argc == 2) && trail == 'm')
+    ಆದರೆ (ಮೊದಲ == '>' && (argc == 1 || argc == 2) && trail == 'm')
     {
-	if (arg[0] == 4 && argc == 2)
+	ಆದರೆ (arg[0] == 4 && argc == 2)
 	    modify_otherkeys_state = arg[1] == 2 ? MOKS_ENABLED : MOKS_OFF;
 
-	key_name[0] = (int)KS_EXTRA;
-	key_name[1] = (int)KE_IGNORE;
+	ಕೀಲಿ_name[0] = (ಪೂರ್ಣಾಂಕ)KS_EXTRA;
+	ಕೀಲಿ_name[1] = (ಪೂರ್ಣಾಂಕ)KE_IGNORE;
 	*slen = csi_len;
     }
 
     // Function key starting with CSI:
     //	{lead}[ABCDEFHPQRS]
     //	{lead}1;{modifier}[ABCDEFHPQRS]
-    else if (first == -1 && ASCII_ISUPPER(trail)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಮೊದಲ == -1 && ASCII_ISUPPER(trail)
 	    && (argc == 0 || (argc == 2 && arg[0] == 1)))
     {
-	int res = handle_csi_function_key(argc, arg, trail,
-			      csi_len, key_name, offset, buf, bufsize, buflen);
-	return res <= 0 ? res : len + res;
+	ಪೂರ್ಣಾಂಕ res = handle_csi_function_ಕೀಲಿ(argc, arg, trail,
+			      csi_len, ಕೀಲಿ_name, ಸ್ಥಾನಾಂತರ, buf, bufsize, buflen);
+	ಹಿಂತಿರುಗಿ res <= 0 ? res : len + res;
     }
 
     // Cursor position report: {lead}{row};{col}R
@@ -5829,203 +5829,203 @@ handle_csi(
     // Also when u7_status is not "sent", it may be from a previous Vim that
     // just exited.  But not for <S-F3>, it sends something similar, check for
     // row and column to make sense.
-    else if (first == -1 && argc == 2 && trail == 'R')
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಮೊದಲ == -1 && argc == 2 && trail == 'R')
     {
 	handle_u7_response(arg, tp, csi_len);
 
-	key_name[0] = (int)KS_EXTRA;
-	key_name[1] = (int)KE_IGNORE;
+	ಕೀಲಿ_name[0] = (ಪೂರ್ಣಾಂಕ)KS_EXTRA;
+	ಕೀಲಿ_name[1] = (ಪೂರ್ಣಾಂಕ)KE_IGNORE;
 	*slen = csi_len;
     }
 
-#if (defined(UNIX) || defined(MSWIN)) \
+#ಆದರೆ (defined(UNIX) || defined(MSWIN)) \
     && (defined(FEAT_IMAGE) || defined(FEAT_EVAL))
     // Response to CSI 14 t or CSI 16 t
-    else if (first == -1 && argc >= 3
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಮೊದಲ == -1 && argc >= 3
 	    && (arg[0] == 4 || arg[0] == 6) && trail == 't')
     {
-	if (arg[0] == 4)
+	ಆದರೆ (arg[0] == 4)
 	{
 	    LOG_TRN("Received CSI 14 t response: %s", tp);
-	    cell_width = arg[2] / Columns;
-	    cell_height = arg[1] / Rows;
+	    cell_ಅಗಲ = arg[2] / Columns;
+	    cell_ಎತ್ತರ = arg[1] / ಅಡ್ಡಸಾಲುಗಳು;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    LOG_TRN("Received CSI 16 t response: %s", tp);
-	    cell_width = arg[2];
-	    cell_height = arg[1];
+	    cell_ಅಗಲ = arg[2];
+	    cell_ಎತ್ತರ = arg[1];
 	}
 
-	key_name[0] = (int)KS_EXTRA;
-	key_name[1] = (int)KE_IGNORE;
+	ಕೀಲಿ_name[0] = (ಪೂರ್ಣಾಂಕ)KS_EXTRA;
+	ಕೀಲಿ_name[1] = (ಪೂರ್ಣಾಂಕ)KE_IGNORE;
 	*slen = csi_len;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Primary device attributes (DA1) response
-    else if (first == '?' && trail == 'c')
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಮೊದಲ == '?' && trail == 'c')
     {
 	LOG_TRN("Received DA1 response: %s", tp);
 
 	*slen = csi_len;
-#ifdef FEAT_EVAL
-	set_vim_var_string(VV_TERMDA1, tp, *slen);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	ಗಣ_vim_var_string(VV_TERMDA1, tp, *slen);
+#ಆದರೆ_ಅಂತ್ಯ
 	apply_autocmds(EVENT_TERMRESPONSEALL,
-					(char_u *)"da1", NULL, FALSE, curbuf);
+					(char_u *)"da1", ಖಾಲಿ, FALSE, curbuf);
 
-	key_name[0] = (int)KS_EXTRA;
-	key_name[1] = (int)KE_IGNORE;
+	ಕೀಲಿ_name[0] = (ಪೂರ್ಣಾಂಕ)KS_EXTRA;
+	ಕೀಲಿ_name[1] = (ಪೂರ್ಣಾಂಕ)KE_IGNORE;
 	*slen = csi_len;
     }
 
     // DECRPM mode 2026 or 2048.
-    else if (first == '?' && trail == 'y' && argc == 2
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಮೊದಲ == '?' && trail == 'y' && argc == 2
 	    && (arg[0] == 2026 || arg[0] == 2048))
     {
-	int setting = arg[1];
+	ಪೂರ್ಣಾಂಕ setting = arg[1];
 
 	*slen = csi_len;
-	key_name[0] = (int)KS_EXTRA;
-	key_name[1] = (int)KE_IGNORE;
+	ಕೀಲಿ_name[0] = (ಪೂರ್ಣಾಂಕ)KS_EXTRA;
+	ಕೀಲಿ_name[1] = (ಪೂರ್ಣಾಂಕ)KE_IGNORE;
 
-#ifdef FEAT_TERMRESPONSE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMRESPONSE
 	// Mark the DECRQM request as answered so it is not sent again and
 	// stoptermcap() does not wait for it.
-	if (decrqm_status.tr_progress == STATUS_SENT)
-	    decrqm_status.tr_progress = STATUS_GOT;
-#endif
+	ಆದರೆ (decrqm_ಸ್ಥಿತಿ.tr_ಪ್ರಗತಿ == ಸ್ಥಿತಿ_ಕಳುಹಿಸಿದ)
+	    decrqm_ಸ್ಥಿತಿ.tr_ಪ್ರಗತಿ = ಸ್ಥಿತಿ_GOT;
+#ಆದರೆ_ಅಂತ್ಯ
 
-	if (setting >= 0 && setting <= 4)
+	ಆದರೆ (setting >= 0 && setting <= 4)
 	{
 	    LOG_TRN("Received DECRPM mode %d: %s", arg[0], tp);
 
-	    switch (arg[0])
+	    ಆಯ್ಕೆ (arg[0])
 	    {
-		case 2026:
+		ಸ್ಥಿತಿ 2026:
 		    sync_output_setting = setting;
-		    set_option_value_give_err((char_u *)"termsync",
-			    setting == 1 || setting == 2, NULL, 0);
-		    break;
-#ifdef UNIX
-		case 2048:
+		    ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"termsync",
+			    setting == 1 || setting == 2, ಖಾಲಿ, 0);
+		    ನಿಲ್ಲಿಸು;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
+		ಸ್ಥಿತಿ 2048:
 		    win_resize_setting = setting;
 
-		    term_set_win_resize(true);
-		    break;
-#endif
+		    ಪದ_ಗಣ_win_resize(true);
+		    ನಿಲ್ಲಿಸು;
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    LOG_TRN("Unknown DECRPM mode %d setting %d", arg[0], setting);
     }
 
-#ifdef UNIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
     // In-band window resize event
-    else if (win_resize_enabled && argc >= 3 && arg[0] == 48)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (win_resize_enabled && argc >= 3 && arg[0] == 48)
     {
-	int height = arg[1], width = arg[2];
+	ಪೂರ್ಣಾಂಕ ಎತ್ತರ = arg[1], ಅಗಲ = arg[2];
 
 	*slen = csi_len;
-	key_name[0] = (int)KS_EXTRA;
-	key_name[1] = (int)KE_IGNORE;
+	ಕೀಲಿ_name[0] = (ಪೂರ್ಣಾಂಕ)KS_EXTRA;
+	ಕೀಲಿ_name[1] = (ಪೂರ್ಣಾಂಕ)KE_IGNORE;
 
 	// Only update if needed. Avoids intro message from disappearing on
 	// startup (due to initial event).
-	if (height != Rows || width != Columns)
-	    set_shellsize(width, height, true);
+	ಆದರೆ (ಎತ್ತರ != ಅಡ್ಡಸಾಲುಗಳು || ಅಗಲ != Columns)
+	    ಗಣ_shellsize(ಅಗಲ, ಎತ್ತರ, true);
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Version string: Eat it when there is at least one digit and
     // it ends in 'c'
-    else if (*T_CRV != NUL && ap > argp + 1 && trail == 'c')
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*T_CRV != NUL && ap > argp + 1 && trail == 'c')
     {
-	handle_version_response(first, arg, argc, tp);
+	handle_ಆವೃತ್ತಿ_response(ಮೊದಲ, arg, argc, tp);
 
 	*slen = csi_len;
-#ifdef FEAT_EVAL
-	set_vim_var_string(VV_TERMRESPONSE, tp, *slen);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	ಗಣ_vim_var_string(VV_TERMRESPONSE, tp, *slen);
+#ಆದರೆ_ಅಂತ್ಯ
 	apply_autocmds(EVENT_TERMRESPONSE,
-					NULL, NULL, FALSE, curbuf);
+					ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
 	apply_autocmds(EVENT_TERMRESPONSEALL,
-					(char_u *)"version", NULL, FALSE, curbuf);
-	key_name[0] = (int)KS_EXTRA;
-	key_name[1] = (int)KE_IGNORE;
+					(char_u *)"version", ಖಾಲಿ, FALSE, curbuf);
+	ಕೀಲಿ_name[0] = (ಪೂರ್ಣಾಂಕ)KS_EXTRA;
+	ಕೀಲಿ_name[1] = (ಪೂರ್ಣಾಂಕ)KE_IGNORE;
     }
 
-#ifdef FEAT_TERMRESPONSE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMRESPONSE
     // Check blinking cursor from xterm:
     // {lead}?12;1$y       set
     // {lead}?12;2$y       not set
     //
     // {lead} can be <Esc>[ or CSI
-    else if (rbm_status.tr_progress == STATUS_SENT
-	    && first == '?'
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (rbm_ಸ್ಥಿತಿ.tr_ಪ್ರಗತಿ == ಸ್ಥಿತಿ_ಕಳುಹಿಸಿದ
+	    && ಮೊದಲ == '?'
 	    && ap == argp + 6
 	    && arg[0] == 12
 	    && ap[-1] == '$'
 	    && trail == 'y')
     {
 	initial_cursor_blink = (arg[1] == '1');
-	rbm_status.tr_progress = STATUS_GOT;
+	rbm_ಸ್ಥಿತಿ.tr_ಪ್ರಗತಿ = ಸ್ಥಿತಿ_GOT;
 	LOG_TRN("Received cursor blinking mode response: %s", tp);
-	key_name[0] = (int)KS_EXTRA;
-	key_name[1] = (int)KE_IGNORE;
+	ಕೀಲಿ_name[0] = (ಪೂರ್ಣಾಂಕ)KS_EXTRA;
+	ಕೀಲಿ_name[1] = (ಪೂರ್ಣಾಂಕ)KE_IGNORE;
 	*slen = csi_len;
 # ifdef FEAT_EVAL
-	set_vim_var_string(VV_TERMBLINKRESP, tp, *slen);
+	ಗಣ_vim_var_string(VV_TERMBLINKRESP, tp, *slen);
 # endif
 	apply_autocmds(EVENT_TERMRESPONSEALL,
-					(char_u *)"cursorblink", NULL, FALSE, curbuf);
+					(char_u *)"cursorblink", ಖಾಲಿ, FALSE, curbuf);
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Kitty keyboard protocol status response: CSI ? flags u
-    else if (first == '?' && argc == 1 && trail == 'u')
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಮೊದಲ == '?' && argc == 1 && trail == 'u')
     {
 	// The protocol has various "progressive enhancement flags" values, but
 	// we only check for zero and non-zero here.
-	if (arg[0] == '0')
+	ಆದರೆ (arg[0] == '0')
 	{
 	    kitty_protocol_state = KKPS_OFF;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    kitty_protocol_state = KKPS_ENABLED;
 
 	    // Reset seenModifyOtherKeys just in case some key combination has
 	    // been seen that set it before we get the status response.
-#ifdef FEAT_EVAL
-	    ch_log(NULL, "setting seenModifyOtherKeys to FALSE");
-#endif
-	    seenModifyOtherKeys = FALSE;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	    ch_log(ಖಾಲಿ, "setting seenModifyOtherKeys to FALSE");
+#ಆದರೆ_ಅಂತ್ಯ
+	    ನೋಡಿದ_Modify_Other_ಕೀಲಿಗಳು = FALSE;
 	}
 
-	key_name[0] = (int)KS_EXTRA;
-	key_name[1] = (int)KE_IGNORE;
+	ಕೀಲಿ_name[0] = (ಪೂರ್ಣಾಂಕ)KS_EXTRA;
+	ಕೀಲಿ_name[1] = (ಪೂರ್ಣಾಂಕ)KE_IGNORE;
 	*slen = csi_len;
     }
 
-#ifdef FEAT_TERMRESPONSE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMRESPONSE
     // Check for a window position response from the terminal:
     //       {lead}3;{x};{y}t
-    else if (did_request_winpos && argc == 3 && arg[0] == 3
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (did_request_winpos && argc == 3 && arg[0] == 3
 						   && trail == 't')
     {
 	winpos_x = arg[1];
 	winpos_y = arg[2];
 	// got finished code: consume it
-	key_name[0] = (int)KS_EXTRA;
-	key_name[1] = (int)KE_IGNORE;
+	ಕೀಲಿ_name[0] = (ಪೂರ್ಣಾಂಕ)KS_EXTRA;
+	ಕೀಲಿ_name[1] = (ಪೂರ್ಣಾಂಕ)KE_IGNORE;
 	*slen = csi_len;
 
-	if (--did_request_winpos <= 0)
-	    winpos_status.tr_progress = STATUS_GOT;
+	ಆದರೆ (--did_request_winpos <= 0)
+	    winpos_ಸ್ಥಿತಿ.tr_ಪ್ರಗತಿ = ಸ್ಥಿತಿ_GOT;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Key with modifier:
     //	{lead}27;{modifier};{key}~
@@ -6034,138 +6034,138 @@ handle_csi(
     // Even though we only handle four modifiers and the {modifier} value
     // should be 16 or lower, we accept all modifier values to avoid the raw
     // sequence to be passed through.
-    else if ((arg[0] == 27 && argc == 3 && trail == '~')
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((arg[0] == 27 && argc == 3 && trail == '~')
 		|| (argc == 2 && (trail == 'u' || trail == '~')))
     {
-	int iskitty = argc == 2 && (trail == 'u' || trail == '~');
-	return len + handle_key_with_modifier(arg, csi_len, offset, buf,
+	ಪೂರ್ಣಾಂಕ iskitty = argc == 2 && (trail == 'u' || trail == '~');
+	ಹಿಂತಿರುಗಿ len + handle_ಕೀಲಿ_with_modifier(arg, csi_len, ಸ್ಥಾನಾಂತರ, buf,
 		bufsize, buflen, iskitty, trail);
     }
 
     // Key without modifier (Kitty sends this for Esc or F3):
     //	{lead}{key}u
     //	{lead}{key}~
-    else if (argc == 1 && (trail == 'u' || trail == '~'))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argc == 1 && (trail == 'u' || trail == '~'))
     {
-	return len + handle_key_without_modifier(arg, csi_len, offset, buf,
+	ಹಿಂತಿರುಗಿ len + handle_ಕೀಲಿ_without_modifier(arg, csi_len, ಸ್ಥಾನಾಂತರ, buf,
 		bufsize, buflen, trail);
     }
 
     // else: Unknown CSI sequence.  We could drop it, but then the
     // user can't create a map for it.
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-static void
-check_for_color_response(char_u *resp, int len)
+ಸ್ಥಿರ ಶೂನ್ಯ
+check_for_color_response(char_u *resp, ಪೂರ್ಣಾಂಕ len)
 {
-    int		i, j;
+    ಪೂರ್ಣಾಂಕ		i, j;
     char_u	*argp;
 
     j = 1 + (resp[0] == ESC);
     argp = resp + j;
 
-    if (len >= j + 3 && (argp[0] != '1'
+    ಆದರೆ (len >= j + 3 && (argp[0] != '1'
 			     || (argp[1] != '1' && argp[1] != '0')
 			     || argp[2] != ';'))
 	i = 0; // no match
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	for (i = j; i < len; ++i)
-	    if (resp[i] == '\007' || (resp[0] == OSC ? resp[i] == STERM
+	ಗಾಗಿ (i = j; i < len; ++i)
+	    ಆದರೆ (resp[i] == '\007' || (resp[0] == OSC ? resp[i] == STERM
 			: (resp[i] == ESC && i + 1 < len && resp[i + 1] == '\\')))
 	    {
-		int is_bg = argp[1] == '1';
-		int is_4digit = i - j >= 21 && resp[j + 11] == '/'
+		ಪೂರ್ಣಾಂಕ is_bg = argp[1] == '1';
+		ಪೂರ್ಣಾಂಕ is_4digit = i - j >= 21 && resp[j + 11] == '/'
 						  && resp[j + 16] == '/';
 
-		if (i - j >= 15 && STRNCMP(resp + j + 3, "rgb:", 4) == 0
+		ಆದರೆ (i - j >= 15 && STRNCMP(resp + j + 3, "rgb:", 4) == 0
 			    && (is_4digit
 				   || (resp[j + 9] == '/' && resp[j + 12] == '/')))
 		{
 		    char_u *tp_r = resp + j + 7;
 		    char_u *tp_g = resp + j + (is_4digit ? 12 : 10);
 		    char_u *tp_b = resp + j + (is_4digit ? 17 : 13);
-#ifdef FEAT_TERMRESPONSE
-		    int rval, gval, bval;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMRESPONSE
+		    ಪೂರ್ಣಾಂಕ rval, gval, bval;
 
 		    rval = hexhex2nr(tp_r);
 		    gval = hexhex2nr(tp_g);
 		    bval = hexhex2nr(tp_b);
-#endif
-		    if (is_bg)
+#ಆದರೆ_ಅಂತ್ಯ
+		    ಆದರೆ (is_bg)
 		    {
-			char *new_bg_val = (3 * '6' < *tp_r + *tp_g +
+			ಅಕ್ಷರ *new_bg_val = (3 * '6' < *tp_r + *tp_g +
 					     *tp_b) ? "light" : "dark";
 
 			LOG_TRN("Received RBG response: r=%d g=%d b=%d", rval, gval, bval);
-#ifdef FEAT_TERMRESPONSE
-			rbg_status.tr_progress = STATUS_GOT;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMRESPONSE
+			rbg_ಸ್ಥಿತಿ.tr_ಪ್ರಗತಿ = ಸ್ಥಿತಿ_GOT;
 			bg_r = rval;
 			bg_g = gval;
 			bg_b = bval;
-#endif
-			if (!option_was_set((char_u *)"bg")
+#ಆದರೆ_ಅಂತ್ಯ
+			ಆದರೆ (!option_was_ಗಣ((char_u *)"bg")
 				      && STRCMP(p_bg, new_bg_val) != 0)
 			{
 			    // value differs, apply it
-			    set_option_value_give_err((char_u *)"bg",
+			    ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"bg",
 						  0L, (char_u *)new_bg_val, 0);
-			    reset_option_was_set((char_u *)"bg");
+			    reset_option_was_ಗಣ((char_u *)"bg");
 			    redraw_asap(UPD_CLEAR);
 			}
 		    }
-#if defined(FEAT_TERMRESPONSE) && defined(FEAT_TERMINAL)
-		    else
+#ಆದರೆ defined(FEAT_TERMRESPONSE) && defined(FEAT_TERMINAL)
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
 			LOG_TRN("Received RFG response: r=%d g=%d b=%d", rval, gval, bval);
-			rfg_status.tr_progress = STATUS_GOT;
+			rfg_ಸ್ಥಿತಿ.tr_ಪ್ರಗತಿ = ಸ್ಥಿತಿ_GOT;
 			fg_r = rval;
 			fg_g = gval;
 			fg_b = bval;
 		    }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		}
 
-#ifdef FEAT_EVAL
-		set_vim_var_string(is_bg ? VV_TERMRBGRESP
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+		ಗಣ_vim_var_string(is_bg ? VV_TERMRBGRESP
 						  : VV_TERMRFGRESP, resp, len);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		apply_autocmds(EVENT_TERMRESPONSEALL,
 			is_bg ? (char_u *)"background" : (char_u *)"foreground",
-			NULL, FALSE, curbuf);
-		break;
+			ಖಾಲಿ, FALSE, curbuf);
+		ನಿಲ್ಲಿಸು;
 	    }
     }
-    if (i == len)
+    ಆದರೆ (i == len)
 	LOG_TR1("not enough characters for RB");
 }
 
-static oscstate_T osc_state;
+ಸ್ಥಿರ oscstate_T osc_state;
 
 /*
  * Return true if currently receiving an OSC response.
  */
     bool
-in_osc_sequence(void)
+ಒಳ_osc_sequence(ಶೂನ್ಯ)
 {
-    return osc_state.processing;
+    ಹಿಂತಿರುಗಿ osc_state.processing;
 }
 
 /*
  * Handles any OSC sequence and places the result in "v:termosc". Returns OK on
  * success and FAIL on failure.
  */
-    static int
-handle_osc(char_u *tp, int len, char_u *key_name, int *slen)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+handle_osc(char_u *tp, ಪೂರ್ಣಾಂಕ len, char_u *ಕೀಲಿ_name, ಪೂರ್ಣಾಂಕ *slen)
 {
-    char_u last_char;
+    char_u ಕೊನೆಯ_char;
 
-    if (!osc_state.processing)
+    ಆದರೆ (!osc_state.processing)
     {
-	int cur;
+	ಪೂರ್ಣಾಂಕ cur;
 
-	LOG_TRN("Received OSC response: %s", (char*)tp);
+	LOG_TRN("Received OSC response: %s", (ಅಕ್ಷರ*)tp);
 	// Check if it is a valid OSC sequence, and consume it. OSC format
 	// consists of:
 	// <identifier><data><terminator>
@@ -6173,8 +6173,8 @@ handle_osc(char_u *tp, int len, char_u *key_name, int *slen)
 	// <terminator> can be '\007', <Esc>\ or STERM.
 	cur = 1 + (tp[0] == ESC);
 
-	if (len < cur + 1 + (tp[0] != OSC)) // Include terminator as well
-	    return FAIL;
+	ಆದರೆ (len < cur + 1 + (tp[0] != OSC)) // Include terminator as well
+	    ಹಿಂತಿರುಗಿ FAIL;
 
 	// The whole OSC response may be larger than the typeahead buffer.
 	// To handle this, keep reading data in and out of the typeahead
@@ -6183,65 +6183,65 @@ handle_osc(char_u *tp, int len, char_u *key_name, int *slen)
 	// We can't use the previous buffer since we transferred ownership of it
 	// to the vim var.
 	ga_init2(&osc_state.buf, 1, 1024);
-#ifdef ELAPSED_FUNC
-	ELAPSED_INIT(osc_state.start_tv);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ELAPSED_FUNC
+	ELAPSED_INIT(osc_state.ಆರಂಭ_tv);
+#ಆದರೆ_ಅಂತ್ಯ
 	osc_state.processing = TRUE;
-	osc_state.start_char = tp[0];
-	last_char = 0;
+	osc_state.ಆರಂಭ_char = tp[0];
+	ಕೊನೆಯ_char = 0;
     }
-    else
-	last_char = ((char_u *)osc_state.buf.ga_data)[osc_state.buf.ga_len - 1];
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಕೊನೆಯ_char = ((char_u *)osc_state.buf.ga_ದತ್ತಾಂಶ)[osc_state.buf.ga_len - 1];
 
-    key_name[0] = (int)KS_EXTRA;
+    ಕೀಲಿ_name[0] = (ಪೂರ್ಣಾಂಕ)KS_EXTRA;
 
     // Read data and append to buffer. If we reach a terminator, then
     // finally set the vim var.
-    for (int i = 0; i < len; i++)
-	if (tp[i] == '\007' || (osc_state.start_char == OSC ? tp[i] == STERM
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < len; i++)
+	ಆದರೆ (tp[i] == '\007' || (osc_state.ಆರಂಭ_char == OSC ? tp[i] == STERM
 		    : ((tp[i] == ESC && i + 1 < len && tp[i + 1] == '\\')
-			|| (i == 0 && tp[i] == '\\' && last_char == ESC)
+			|| (i == 0 && tp[i] == '\\' && ಕೊನೆಯ_char == ESC)
 			)))
 	{
 	    osc_state.processing = FALSE;
 
-	    key_name[1] = (int)KE_OSC;
+	    ಕೀಲಿ_name[1] = (ಪೂರ್ಣಾಂಕ)KE_OSC;
 
 	    ga_concat_len(&osc_state.buf, tp, i + 1 + (tp[i] == ESC));
 	    ga_append(&osc_state.buf, NUL);
 	    *slen = i + 1 + (tp[i] == ESC);
-#ifdef FEAT_EVAL
-	    set_vim_var_string_direct(VV_TERMOSC, osc_state.buf.ga_data);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	    ಗಣ_vim_var_string_ನೇರ(VV_TERMOSC, osc_state.buf.ga_ದತ್ತಾಂಶ);
+#ಆದರೆ_ಅಂತ್ಯ
 	    // Check for background/foreground colour response
-	    check_for_color_response(osc_state.buf.ga_data, osc_state.buf.ga_len - 1);
+	    check_for_color_response(osc_state.buf.ga_ದತ್ತಾಂಶ, osc_state.buf.ga_len - 1);
 
 	    char_u savebg = *p_bg;
 	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"osc",
-		    NULL, FALSE, curbuf);
-	    if (*p_bg != savebg)
+		    ಖಾಲಿ, FALSE, curbuf);
+	    ಆದರೆ (*p_bg != savebg)
 		redraw_asap(UPD_CLEAR);
-	    return OK;
+	    ಹಿಂತಿರುಗಿ OK;
 	}
 
-    key_name[1] = (int)KE_IGNORE;
+    ಕೀಲಿ_name[1] = (ಪೂರ್ಣಾಂಕ)KE_IGNORE;
 
-#ifdef ELAPSED_FUNC
-    if (ELAPSED_FUNC(osc_state.start_tv) >= p_ost)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ELAPSED_FUNC
+    ಆದರೆ (ELAPSED_FUNC(osc_state.ಆರಂಭ_tv) >= p_ost)
     {
-	semsg(_(e_osc_response_timed_out), osc_state.buf.ga_len,
-		osc_state.buf.ga_data);
+	semsg(_(e_osc_response_timed_ಹೊರಹೋಗು), osc_state.buf.ga_len,
+		osc_state.buf.ga_ದತ್ತಾಂಶ);
 
 	ga_clear(&osc_state.buf);
 	osc_state.processing = FALSE;
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     ga_concat(&osc_state.buf, tp);
     *slen = len; // Consume everything
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
@@ -6263,91 +6263,91 @@ handle_osc(char_u *tp, int len, char_u *key_name, int *slen)
  *
  * Consume any code that starts with "{lead}.+r" or "{lead}.$r".
  */
-    static int
-handle_dcs(char_u *tp, char_u *argp, int len, char_u *key_name, int *slen)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+handle_dcs(char_u *tp, char_u *argp, ಪೂರ್ಣಾಂಕ len, char_u *ಕೀಲಿ_name, ಪೂರ್ಣಾಂಕ *slen)
 {
-    int i, j;
+    ಪೂರ್ಣಾಂಕ i, j;
 
-    LOG_TRN("Received DCS response: %s", (char*)tp);
+    LOG_TRN("Received DCS response: %s", (ಅಕ್ಷರ*)tp);
     j = 1 + (tp[0] == ESC);
-    if (len < j + 3)
+    ಆದರೆ (len < j + 3)
 	i = len; // need more chars
-    else if ((argp[1] != '+' && argp[1] != '$')
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((argp[1] != '+' && argp[1] != '$')
 	    || (argp[2] != 'r' && argp[2] != 'R'))
 	i = 0; // no match
-    else if (argp[1] == '+')
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argp[1] == '+')
 	// key code response
-	for (i = j; i < len; ++i)
+	ಗಾಗಿ (i = j; i < len; ++i)
 	{
-	    if ((tp[i] == ESC && i + 1 < len && tp[i + 1] == '\\')
+	    ಆದರೆ ((tp[i] == ESC && i + 1 < len && tp[i + 1] == '\\')
 		    || tp[i] == STERM)
 	    {
-#ifdef FEAT_TERMRESPONSE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMRESPONSE
 		// handle a key code response, drop a resource response
-		if (i - j >= 3 && argp[2] == 'r')
-		    got_code_from_term(tp + j, i);
-#endif
-		key_name[0] = (int)KS_EXTRA;
-		key_name[1] = (int)KE_IGNORE;
+		ಆದರೆ (i - j >= 3 && argp[2] == 'r')
+		    got_ಸಂಕೇತ_from_ಪದ(tp + j, i);
+#ಆದರೆ_ಅಂತ್ಯ
+		ಕೀಲಿ_name[0] = (ಪೂರ್ಣಾಂಕ)KS_EXTRA;
+		ಕೀಲಿ_name[1] = (ಪೂರ್ಣಾಂಕ)KE_IGNORE;
 		*slen = i + 1 + (tp[i] == ESC);
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	}
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Probably the cursor shape response.  Make sure that "i"
 	// is equal to "len" when there are not sufficient
 	// characters.
-	for (i = j + 3; i < len; ++i)
+	ಗಾಗಿ (i = j + 3; i < len; ++i)
 	{
-	    if (i - j == 3 && !SAFE_isdigit(tp[i]))
-		break;
-	    if (i - j == 4 && tp[i] != ' ')
-		break;
-	    if (i - j == 5 && tp[i] != 'q')
-		break;
-	    if (i - j == 6 && tp[i] != ESC && tp[i] != STERM)
-		break;
-	    if ((i - j == 6 && tp[i] == STERM)
+	    ಆದರೆ (i - j == 3 && !ಸುರಕ್ಷಿತ_isdigit(tp[i]))
+		ನಿಲ್ಲಿಸು;
+	    ಆದರೆ (i - j == 4 && tp[i] != ' ')
+		ನಿಲ್ಲಿಸು;
+	    ಆದರೆ (i - j == 5 && tp[i] != 'q')
+		ನಿಲ್ಲಿಸು;
+	    ಆದರೆ (i - j == 6 && tp[i] != ESC && tp[i] != STERM)
+		ನಿಲ್ಲಿಸು;
+	    ಆದರೆ ((i - j == 6 && tp[i] == STERM)
 		    || (i - j == 7 && tp[i] == '\\'))
 	    {
-#ifdef FEAT_TERMRESPONSE
-		int number = argp[3] - '0';
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMRESPONSE
+		ಪೂರ್ಣಾಂಕ ಸಂಖ್ಯೆ = argp[3] - '0';
 
 		// 0, 1 = block blink, 2 = block
 		// 3 = underline blink, 4 = underline
 		// 5 = vertical bar blink, 6 = vertical bar
-		number = number == 0 ? 1 : number;
-		initial_cursor_shape = (number + 1) / 2;
+		ಸಂಖ್ಯೆ = ಸಂಖ್ಯೆ == 0 ? 1 : ಸಂಖ್ಯೆ;
+		initial_cursor_shape = (ಸಂಖ್ಯೆ + 1) / 2;
 		// The blink flag is actually inverted, compared to
 		// the value set with T_SH.
 		initial_cursor_shape_blink =
-				       (number & 1) ? FALSE : TRUE;
-		rcs_status.tr_progress = STATUS_GOT;
-#endif
+				       (ಸಂಖ್ಯೆ & 1) ? FALSE : TRUE;
+		rcs_ಸ್ಥಿತಿ.tr_ಪ್ರಗತಿ = ಸ್ಥಿತಿ_GOT;
+#ಆದರೆ_ಅಂತ್ಯ
 		LOG_TRN("Received cursor shape response: %s", tp);
 
-		key_name[0] = (int)KS_EXTRA;
-		key_name[1] = (int)KE_IGNORE;
+		ಕೀಲಿ_name[0] = (ಪೂರ್ಣಾಂಕ)KS_EXTRA;
+		ಕೀಲಿ_name[1] = (ಪೂರ್ಣಾಂಕ)KE_IGNORE;
 		*slen = i + 1;
-#ifdef FEAT_EVAL
-		set_vim_var_string(VV_TERMSTYLERESP, tp, *slen);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+		ಗಣ_vim_var_string(VV_TERMSTYLERESP, tp, *slen);
+#ಆದರೆ_ಅಂತ್ಯ
 		apply_autocmds(EVENT_TERMRESPONSEALL,
-					(char_u *)"cursorshape", NULL, FALSE, curbuf);
-		break;
+					(char_u *)"cursorshape", ಖಾಲಿ, FALSE, curbuf);
+		ನಿಲ್ಲಿಸು;
 	    }
 	}
     }
 
-    if (i == len)
+    ಆದರೆ (i == len)
     {
 	// These codes arrive many together, each code can be
 	// truncated at any point.
 	LOG_TR1("not enough characters for XT");
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
@@ -6363,37 +6363,37 @@ handle_dcs(char_u *tp, char_u *argp, int len, char_u *key_name, int *slen)
  * "buflen" is then the length of the string in buf[] and is updated for
  * inserts and deletes.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 check_termcode(
-    int		max_offset,
+    ಪೂರ್ಣಾಂಕ		max_ಸ್ಥಾನಾಂತರ,
     char_u	*buf,
-    int		bufsize,
-    int		*buflen)
+    ಪೂರ್ಣಾಂಕ		bufsize,
+    ಪೂರ್ಣಾಂಕ		*buflen)
 {
     char_u	*tp;
     char_u	*p;
-    int		slen = 0;	// init for GCC
-    int		modslen;
-    int		len;
-    int		retval = 0;
-    int		offset;
-    char_u	key_name[2];
-    int		modifiers;
-    char_u	*modifiers_start = NULL;
-    int		key;
-    int		new_slen;   // Length of what will replace the termcode
-    char_u	string[MAX_KEY_CODE_LEN + 1];
-    int		i, j;
-    int		idx = 0;
-    int		cpo_koffset;
+    ಪೂರ್ಣಾಂಕ		slen = 0;	// init for GCC
+    ಪೂರ್ಣಾಂಕ		modslen;
+    ಪೂರ್ಣಾಂಕ		len;
+    ಪೂರ್ಣಾಂಕ		retval = 0;
+    ಪೂರ್ಣಾಂಕ		ಸ್ಥಾನಾಂತರ;
+    char_u	ಕೀಲಿ_name[2];
+    ಪೂರ್ಣಾಂಕ		modifiers;
+    char_u	*modifiers_ಆರಂಭ = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		ಕೀಲಿ;
+    ಪೂರ್ಣಾಂಕ		new_slen;   // Length of what will replace the termcode
+    char_u	string[MAX_ಕೀಲಿ_ಸಂಕೇತ_LEN + 1];
+    ಪೂರ್ಣಾಂಕ		i, j;
+    ಪೂರ್ಣಾಂಕ		idx = 0;
+    ಪೂರ್ಣಾಂಕ		cpo_koffset;
 
-    cpo_koffset = (vim_strchr(p_cpo, CPO_KOFFSET) != NULL);
+    cpo_koffset = (vim_strchr(p_cpo, CPO_KOFFSET) != ಖಾಲಿ);
 
     /*
      * Speed up the checks for terminal codes by gathering all first bytes
      * used in termleader[].  Often this is just a single <Esc>.
      */
-    if (need_gather)
+    ಆದರೆ (need_gather)
 	gather_termleader();
 
     /*
@@ -6403,42 +6403,42 @@ check_termcode(
      * typebuf.tb_buf[] can become very long.
      * This is used often, KEEP IT FAST!
      */
-    for (offset = 0; offset < max_offset; ++offset)
+    ಗಾಗಿ (ಸ್ಥಾನಾಂತರ = 0; ಸ್ಥಾನಾಂತರ < max_ಸ್ಥಾನಾಂತರ; ++ಸ್ಥಾನಾಂತರ)
     {
-	if (buf == NULL)
+	ಆದರೆ (buf == ಖಾಲಿ)
 	{
-	    if (offset >= typebuf.tb_len)
-		break;
-	    tp = typebuf.tb_buf + typebuf.tb_off + offset;
-	    len = typebuf.tb_len - offset;	// length of the input
+	    ಆದರೆ (ಸ್ಥಾನಾಂತರ >= typebuf.tb_len)
+		ನಿಲ್ಲಿಸು;
+	    tp = typebuf.tb_buf + typebuf.tb_off + ಸ್ಥಾನಾಂತರ;
+	    len = typebuf.tb_len - ಸ್ಥಾನಾಂತರ;	// length of the input
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (offset >= *buflen)
-		break;
-	    tp = buf + offset;
-	    len = *buflen - offset;
+	    ಆದರೆ (ಸ್ಥಾನಾಂತರ >= *buflen)
+		ನಿಲ್ಲಿಸು;
+	    tp = buf + ಸ್ಥಾನಾಂತರ;
+	    len = *buflen - ಸ್ಥಾನಾಂತರ;
 	}
 
 	/*
 	 * Don't check characters after K_SPECIAL, those are already
 	 * translated terminal chars (avoid translating ~@^Hx).
 	 */
-	if (*tp == K_SPECIAL)
+	ಆದರೆ (*tp == K_SPECIAL)
 	{
-	    offset += 2;	// there are always 2 extra characters
-	    continue;
+	    ಸ್ಥಾನಾಂತರ += 2;	// there are always 2 extra characters
+	    ಮುಂದುವರಿ;
 	}
 
-	if (osc_state.processing)
+	ಆದರೆ (osc_state.processing)
 	{
 	    // Still processing OSC response data, go straight to handler
 	    // function.
 	    tp[len] = NUL;
-	    key_name[0] = NUL;
-	    key_name[1] = NUL;
+	    ಕೀಲಿ_name[0] = NUL;
+	    ಕೀಲಿ_name[1] = NUL;
 	    modifiers = 0;
-	    goto handle_osc;
+	    ಹೋಗು handle_osc;
 	}
 
 	/*
@@ -6447,42 +6447,42 @@ check_termcode(
 	 * termcodes start with the same character (ESC or CSI).
 	 */
 	i = *tp;
-	for (p = termleader; *p && *p != i; ++p)
+	ಗಾಗಿ (p = termleader; *p && *p != i; ++p)
 	    ;
-	if (*p == NUL)
-	    continue;
+	ಆದರೆ (*p == NUL)
+	    ಮುಂದುವರಿ;
 
 	/*
 	 * Skip this position if p_ek is not set and tp[0] is an ESC and we
 	 * are in Insert mode.
 	 */
-	if (*tp == ESC && !p_ek && (State & MODE_INSERT))
-	    continue;
+	ಆದರೆ (*tp == ESC && !p_ek && (State & ಬಹುಲಕ_ಸೇರಿಸು))
+	    ಮುಂದುವರಿ;
 
 	tp[len] = NUL;
-	key_name[0] = NUL;	// no key name found yet
-	key_name[1] = NUL;	// no key name found yet
+	ಕೀಲಿ_name[0] = NUL;	// no key name found yet
+	ಕೀಲಿ_name[1] = NUL;	// no key name found yet
 	modifiers = 0;		// no modifiers yet
 
-#ifdef FEAT_GUI
-	if (gui.in_use)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+	ಆದರೆ (gui.ಒಳ_use)
 	{
 	    /*
 	     * GUI special key codes are all of the form [CSI xx].
 	     */
-	    if (*tp == CSI)	    // Special key from GUI
+	    ಆದರೆ (*tp == CSI)	    // Special key from GUI
 	    {
-		if (len < 3)
-		    return -1;	    // Shouldn't happen
+		ಆದರೆ (len < 3)
+		    ಹಿಂತಿರುಗಿ -1;	    // Shouldn't happen
 		slen = 3;
-		key_name[0] = tp[1];
-		key_name[1] = tp[2];
+		ಕೀಲಿ_name[0] = tp[1];
+		ಕೀಲಿ_name[1] = tp[2];
 	    }
 	}
-	else
-#endif // FEAT_GUI
-#ifdef MSWIN
-	    if (len >= 3 && tp[0] == CSI && tp[1] == KS_EXTRA
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
+	    ಆದರೆ (len >= 3 && tp[0] == CSI && tp[1] == KS_EXTRA
 		    && (tp[2] == KE_MOUSEUP
 			|| tp[2] == KE_MOUSEDOWN
 			|| tp[2] == KE_MOUSELEFT
@@ -6493,19 +6493,19 @@ check_termcode(
 	    // - KS_EXTRA
 	    // - {KE_MOUSE[UP|DOWN|LEFT|RIGHT]}
 	    slen = 3;
-	    key_name[0] = tp[1];
-	    key_name[1] = tp[2];
+	    ಕೀಲಿ_name[0] = tp[1];
+	    ಕೀಲಿ_name[1] = tp[2];
 	}
-	else
-#endif
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 	{
-	    int  mouse_index_found = -1;
-	    int keypad_index_found = -1;
-	    int keypad_slen_found = 0;
+	    ಪೂರ್ಣಾಂಕ  mouse_ಸೂಚ್ಯಂಕ_ಸಿಕ್ಕಿತು = -1;
+	    ಪೂರ್ಣಾಂಕ keypad_ಸೂಚ್ಯಂಕ_ಸಿಕ್ಕಿತು = -1;
+	    ಪೂರ್ಣಾಂಕ keypad_slen_ಸಿಕ್ಕಿತು = 0;
 
-	    for (idx = 0; idx < tc_len; ++idx)
+	    ಗಾಗಿ (idx = 0; idx < tc_len; ++idx)
 	    {
-		int     is_keypad = FALSE;
+		ಪೂರ್ಣಾಂಕ     is_keypad = FALSE;
 		/*
 		 * Ignore the entry if we are not at the start of
 		 * typebuf.tb_buf[]
@@ -6513,16 +6513,16 @@ check_termcode(
 		 * But only when the 'K' flag is in 'cpoptions'.
 		 */
 		slen = termcodes[idx].len;
-		modifiers_start = NULL;
-		if (cpo_koffset && offset && len < slen)
-		    continue;
-		if (STRNCMP(termcodes[idx].code, tp,
+		modifiers_ಆರಂಭ = ಖಾಲಿ;
+		ಆದರೆ (cpo_koffset && ಸ್ಥಾನಾಂತರ && len < slen)
+		    ಮುಂದುವರಿ;
+		ಆದರೆ (STRNCMP(termcodes[idx].ಸಂಕೇತ_2, tp,
 				     (size_t)(slen > len ? len : slen)) == 0)
 		{
-		    int	    looks_like_mouse_start = FALSE;
+		    ಪೂರ್ಣಾಂಕ	    looks_like_mouse_ಆರಂಭ = FALSE;
 
-		    if (len < slen)		// got a partial sequence
-			return -1;		// need to get more chars
+		    ಆದರೆ (len < slen)		// got a partial sequence
+			ಹಿಂತಿರುಗಿ -1;		// need to get more chars
 
 		    /*
 		     * When found a keypad key, check if there is another key
@@ -6530,69 +6530,69 @@ check_termcode(
 		     * found instead of <kHome> when they produce the same
 		     * key code.
 		     */
-		    if (termcodes[idx].name[0] == 'K'
+		    ಆದರೆ (termcodes[idx].name[0] == 'K'
 				       && (VIM_ISDIGIT(termcodes[idx].name[1])
 						|| ASCII_ISUPPER(termcodes[idx].name[1])))
 		    {
 			is_keypad = TRUE;
 			// Only use it when there is no other match.
-			if (keypad_index_found < 0)
+			ಆದರೆ (keypad_ಸೂಚ್ಯಂಕ_ಸಿಕ್ಕಿತು < 0)
 			{
-			    keypad_index_found = idx;
-			    keypad_slen_found = slen;
+			    keypad_ಸೂಚ್ಯಂಕ_ಸಿಕ್ಕಿತು = idx;
+			    keypad_slen_ಸಿಕ್ಕಿತು = slen;
 			}
 		    }
 
-		    if (slen == 2 && len > 2
-			    && termcodes[idx].code[0] == ESC
-			    && termcodes[idx].code[1] == '[')
+		    ಆದರೆ (slen == 2 && len > 2
+			    && termcodes[idx].ಸಂಕೇತ_2[0] == ESC
+			    && termcodes[idx].ಸಂಕೇತ_2[1] == '[')
 		    {
 			// The mouse termcode "ESC [" is also the prefix of
 			// "ESC [ I" (focus gained) and other keys.  Check some
 			// more bytes to find out.
-			if (!SAFE_isdigit(tp[2]))
+			ಆದರೆ (!ಸುರಕ್ಷಿತ_isdigit(tp[2]))
 			{
 			    // ESC [ without number following: Only use it when
 			    // there is no other match.
-			    looks_like_mouse_start = TRUE;
+			    looks_like_mouse_ಆರಂಭ = TRUE;
 			}
-			else if (termcodes[idx].name[0] == KS_DEC_MOUSE)
+			ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (termcodes[idx].name[0] == KS_DEC_MOUSE)
 			{
 			    char_u  *nr = tp + 2;
-			    int	    count = 0;
+			    ಪೂರ್ಣಾಂಕ	    ಎಣಿಕೆ_2 = 0;
 
 			    // If a digit is following it could be a key with
 			    // modifier, e.g., ESC [ 1;2P.  Can be confused
 			    // with DEC_MOUSE, which requires four numbers
 			    // following.  If not then it can't be a DEC_MOUSE
 			    // code.
-			    for (;;)
+			    ಗಾಗಿ (;;)
 			    {
-				++count;
-				(void)getdigits(&nr);
-				if (nr >= tp + len)
-				    return -1;	// partial sequence
-				if (*nr != ';')
-				    break;
+				++ಎಣಿಕೆ_2;
+				(ಶೂನ್ಯ)getdigits(&nr);
+				ಆದರೆ (nr >= tp + len)
+				    ಹಿಂತಿರುಗಿ -1;	// partial sequence
+				ಆದರೆ (*nr != ';')
+				    ನಿಲ್ಲಿಸು;
 				++nr;
-				if (nr >= tp + len)
-				    return -1;	// partial sequence
+				ಆದರೆ (nr >= tp + len)
+				    ಹಿಂತಿರುಗಿ -1;	// partial sequence
 			    }
-			    if (count < 4)
-				continue;	// no match
+			    ಆದರೆ (ಎಣಿಕೆ_2 < 4)
+				ಮುಂದುವರಿ;	// no match
 			}
 		    }
-		    if (looks_like_mouse_start)
+		    ಆದರೆ (looks_like_mouse_ಆರಂಭ)
 		    {
 			// Only use it when there is no other match.
-			if (mouse_index_found < 0)
-			    mouse_index_found = idx;
+			ಆದರೆ (mouse_ಸೂಚ್ಯಂಕ_ಸಿಕ್ಕಿತು < 0)
+			    mouse_ಸೂಚ್ಯಂಕ_ಸಿಕ್ಕಿತು = idx;
 		    }
-		    else if (!is_keypad)
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!is_keypad)
 		    {
-			key_name[0] = termcodes[idx].name[0];
-			key_name[1] = termcodes[idx].name[1];
-			break;
+			ಕೀಲಿ_name[0] = termcodes[idx].name[0];
+			ಕೀಲಿ_name[1] = termcodes[idx].name[1];
+			ನಿಲ್ಲಿಸು;
 		    }
 		}
 
@@ -6604,95 +6604,95 @@ check_termcode(
 		 * When there is a modifier the * matches a number.
 		 * When there is no modifier the ;* or * is omitted.
 		 */
-		if (termcodes[idx].modlen > 0 && mouse_index_found < 0)
+		ಆದರೆ (termcodes[idx].modlen > 0 && mouse_ಸೂಚ್ಯಂಕ_ಸಿಕ್ಕಿತು < 0)
 		{
 		    modslen = termcodes[idx].modlen;
-		    if (cpo_koffset && offset && len < modslen)
-			continue;
-		    if (STRNCMP(termcodes[idx].code, tp,
+		    ಆದರೆ (cpo_koffset && ಸ್ಥಾನಾಂತರ && len < modslen)
+			ಮುಂದುವರಿ;
+		    ಆದರೆ (STRNCMP(termcodes[idx].ಸಂಕೇತ_2, tp,
 				(size_t)(modslen > len ? len : modslen)) == 0)
 		    {
-			int	    n;
+			ಪೂರ್ಣಾಂಕ	    n;
 
-			if (len <= modslen)	// got a partial sequence
-			    return -1;		// need to get more chars
+			ಆದರೆ (len <= modslen)	// got a partial sequence
+			    ಹಿಂತಿರುಗಿ -1;		// need to get more chars
 
-			if (tp[modslen] == termcodes[idx].code[slen - 1])
+			ಆದರೆ (tp[modslen] == termcodes[idx].ಸಂಕೇತ_2[slen - 1])
 			    // no modifiers
 			    slen = modslen + 1;
-			else if (tp[modslen] != ';' && modslen == slen - 3)
+			ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (tp[modslen] != ';' && modslen == slen - 3)
 			    // no match for "code;*X" with "code;"
-			    continue;
-			else if (termcodes[idx].code[modslen] == '@'
+			    ಮುಂದುವರಿ;
+			ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (termcodes[idx].ಸಂಕೇತ_2[modslen] == '@'
 					 && (tp[modslen] != '1'
 						    || tp[modslen + 1] != ';'))
 			    // no match for "<Esc>[@" with "<Esc>[1;"
-			    continue;
-			else
+			    ಮುಂದುವರಿ;
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
 			    // Skip over the digits, the final char must
 			    // follow. URXVT can use a negative value, thus
 			    // also accept '-'.
-			    for (j = slen - 2; j < len && (SAFE_isdigit(tp[j])
+			    ಗಾಗಿ (j = slen - 2; j < len && (ಸುರಕ್ಷಿತ_isdigit(tp[j])
 				       || tp[j] == '-' || tp[j] == ';'); ++j)
 				;
 			    ++j;
-			    if (len < j)	// got a partial sequence
-				return -1;	// need to get more chars
-			    if (tp[j - 1] != termcodes[idx].code[slen - 1])
-				continue;	// no match
+			    ಆದರೆ (len < j)	// got a partial sequence
+				ಹಿಂತಿರುಗಿ -1;	// need to get more chars
+			    ಆದರೆ (tp[j - 1] != termcodes[idx].ಸಂಕೇತ_2[slen - 1])
+				ಮುಂದುವರಿ;	// no match
 
-			    modifiers_start = tp + slen - 2;
+			    modifiers_ಆರಂಭ = tp + slen - 2;
 
 			    // Match!  Convert modifier bits.
-			    n = atoi((char *)modifiers_start);
+			    n = atoi((ಅಕ್ಷರ *)modifiers_ಆರಂಭ);
 			    modifiers |= decode_modifiers(n);
 
 			    slen = j;
 			}
-			if (termcodes[idx].name[0] == 'K'
+			ಆದರೆ (termcodes[idx].name[0] == 'K'
 					   && (VIM_ISDIGIT(termcodes[idx].name[1])
 						    || ASCII_ISUPPER(termcodes[idx].name[1])))
 			{
 			    is_keypad = TRUE;
-			    if (keypad_index_found < 0)
+			    ಆದರೆ (keypad_ಸೂಚ್ಯಂಕ_ಸಿಕ್ಕಿತು < 0)
 			    {
-				keypad_index_found = idx;
-				keypad_slen_found = slen;
+				keypad_ಸೂಚ್ಯಂಕ_ಸಿಕ್ಕಿತು = idx;
+				keypad_slen_ಸಿಕ್ಕಿತು = slen;
 			    }
 			}
-			if (!is_keypad)
+			ಆದರೆ (!is_keypad)
 			{
-			    key_name[0] = termcodes[idx].name[0];
-			    key_name[1] = termcodes[idx].name[1];
-			    break;
+			    ಕೀಲಿ_name[0] = termcodes[idx].name[0];
+			    ಕೀಲಿ_name[1] = termcodes[idx].name[1];
+			    ನಿಲ್ಲಿಸು;
 			}
 		    }
 		}
 	    }
-	    if (idx == tc_len && keypad_index_found >= 0)
+	    ಆದರೆ (idx == tc_len && keypad_ಸೂಚ್ಯಂಕ_ಸಿಕ್ಕಿತು >= 0)
 	    {
-		key_name[0] = termcodes[keypad_index_found].name[0];
-		key_name[1] = termcodes[keypad_index_found].name[1];
-		slen = keypad_slen_found;
+		ಕೀಲಿ_name[0] = termcodes[keypad_ಸೂಚ್ಯಂಕ_ಸಿಕ್ಕಿತು].name[0];
+		ಕೀಲಿ_name[1] = termcodes[keypad_ಸೂಚ್ಯಂಕ_ಸಿಕ್ಕಿತು].name[1];
+		slen = keypad_slen_ಸಿಕ್ಕಿತು;
 	    }
-	    else if (idx == tc_len && mouse_index_found >= 0)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (idx == tc_len && mouse_ಸೂಚ್ಯಂಕ_ಸಿಕ್ಕಿತು >= 0)
 	    {
-		key_name[0] = termcodes[mouse_index_found].name[0];
-		key_name[1] = termcodes[mouse_index_found].name[1];
+		ಕೀಲಿ_name[0] = termcodes[mouse_ಸೂಚ್ಯಂಕ_ಸಿಕ್ಕಿತು].name[0];
+		ಕೀಲಿ_name[1] = termcodes[mouse_ಸೂಚ್ಯಂಕ_ಸಿಕ್ಕಿತು].name[1];
 	    }
 	}
 
-	if (key_name[0] == NUL
+	ಆದರೆ (ಕೀಲಿ_name[0] == NUL
 	    // Mouse codes of DEC and pterm start with <ESC>[.  When
 	    // detecting the start of these mouse codes they might as well be
 	    // another key code or terminal response.
-#ifdef FEAT_MOUSE_DEC
-	    || key_name[0] == KS_DEC_MOUSE
-#endif
-#ifdef FEAT_MOUSE_PTERM
-	    || key_name[0] == KS_PTERM_MOUSE
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MOUSE_DEC
+	    || ಕೀಲಿ_name[0] == KS_DEC_MOUSE
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MOUSE_PTERM
+	    || ಕೀಲಿ_name[0] == KS_PTERM_MOUSE
+#ಆದರೆ_ಅಂತ್ಯ
 	   )
 	{
 	    char_u *argp = tp[0] == ESC ? tp + 2 : tp + 1;
@@ -6719,29 +6719,29 @@ check_termcode(
 	     *	    {lead}27;{modifier};{key}~
 	     *	    {lead}{key};{modifier}u
 	     */
-	    if (((tp[0] == ESC && len >= 3 && tp[1] == '[')
+	    ಆದರೆ (((tp[0] == ESC && len >= 3 && tp[1] == '[')
 			|| (tp[0] == CSI && len >= 2))
 		    && vim_strchr((char_u *)"0123456789>?ABCDEFHPQRS",
-								*argp) != NULL)
+								*argp) != ಖಾಲಿ)
 	    {
-		int resp = handle_csi(tp, len, argp, offset, buf,
-					     bufsize, buflen, key_name, &slen);
-		if (resp != 0)
+		ಪೂರ್ಣಾಂಕ resp = handle_csi(tp, len, argp, ಸ್ಥಾನಾಂತರ, buf,
+					     bufsize, buflen, ಕೀಲಿ_name, &slen);
+		ಆದರೆ (resp != 0)
 		{
-#ifdef DEBUG_TERMRESPONSE
-		    if (resp == -1)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DEBUG_TERMRESPONSE
+		    ಆದರೆ (resp == -1)
 			LOG_TR1("Not enough characters for CSI sequence");
-#endif
-		    return resp;
+#ಆದರೆ_ಅಂತ್ಯ
+		    ಹಿಂತಿರುಗಿ resp;
 		}
 	    }
 
 	    // Check for OSC responses from terminal
-	    else if ((tp[0] == ESC && len >= 2 && tp[1] == ']') || tp[0] == OSC)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((tp[0] == ESC && len >= 2 && tp[1] == ']') || tp[0] == OSC)
 	    {
 handle_osc:
-		if (handle_osc(tp, len, key_name, &slen) == FAIL)
-		    return -1;
+		ಆದರೆ (handle_osc(tp, len, ಕೀಲಿ_name, &slen) == FAIL)
+		    ಹಿಂತಿರುಗಿ -1;
 	    }
 
 	    // Check for key code response from xterm,
@@ -6749,81 +6749,81 @@ handle_osc:
 	    // It would only be needed with this condition:
 	    //	    (check_for_codes || rcs_status.tr_progress == STATUS_SENT)
 	    // Now this is always done so that DCS codes don't mess up things.
-	    else if ((tp[0] == ESC && len >= 2 && tp[1] == 'P') || tp[0] == DCS)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((tp[0] == ESC && len >= 2 && tp[1] == 'P') || tp[0] == DCS)
 	    {
-		if (handle_dcs(tp, argp, len, key_name, &slen) == FAIL)
-		    return -1;
+		ಆದರೆ (handle_dcs(tp, argp, len, ಕೀಲಿ_name, &slen) == FAIL)
+		    ಹಿಂತಿರುಗಿ -1;
 	    }
 	}
 
-	if (key_name[0] == NUL)
-	    continue;	    // No match at this position, try next one
+	ಆದರೆ (ಕೀಲಿ_name[0] == NUL)
+	    ಮುಂದುವರಿ;	    // No match at this position, try next one
 
 	// We only get here when we have a complete termcode match
 
-#if defined(FEAT_GUI) || defined(MSWIN)
+#ಆದರೆ defined(FEAT_GUI) || defined(MSWIN)
 	/*
 	 * For scroll events from the GUI or MS-Windows console, fetch the
 	 * pointer coordinates so that we know which window to scroll later.
 	 */
-	if (TRUE
-# if defined(FEAT_GUI) && !defined(MSWIN)
-		&& gui.in_use
+	ಆದರೆ (TRUE
+# ಆದರೆ defined(FEAT_GUI) && !defined(MSWIN)
+		&& gui.ಒಳ_use
 # endif
-		&& key_name[0] == (int)KS_EXTRA
-		&& (key_name[1] == (int)KE_X1MOUSE
-		    || key_name[1] == (int)KE_X2MOUSE
-		    || key_name[1] == (int)KE_MOUSEMOVE_XY
-		    || key_name[1] == (int)KE_MOUSELEFT
-		    || key_name[1] == (int)KE_MOUSERIGHT
-		    || key_name[1] == (int)KE_MOUSEDOWN
-		    || key_name[1] == (int)KE_MOUSEUP))
+		&& ಕೀಲಿ_name[0] == (ಪೂರ್ಣಾಂಕ)KS_EXTRA
+		&& (ಕೀಲಿ_name[1] == (ಪೂರ್ಣಾಂಕ)KE_X1MOUSE
+		    || ಕೀಲಿ_name[1] == (ಪೂರ್ಣಾಂಕ)KE_X2MOUSE
+		    || ಕೀಲಿ_name[1] == (ಪೂರ್ಣಾಂಕ)KE_MOUSEMOVE_XY
+		    || ಕೀಲಿ_name[1] == (ಪೂರ್ಣಾಂಕ)KE_MOUSELEFT
+		    || ಕೀಲಿ_name[1] == (ಪೂರ್ಣಾಂಕ)KE_MOUSERIGHT
+		    || ಕೀಲಿ_name[1] == (ಪೂರ್ಣಾಂಕ)KE_MOUSEDOWN
+		    || ಕೀಲಿ_name[1] == (ಪೂರ್ಣಾಂಕ)KE_MOUSEUP))
 	{
-	    char_u	bytes[6];
-	    int		num_bytes = get_bytes_from_buf(tp + slen, bytes, 4);
+	    char_u	ಬೈಟುಗಳು[6];
+	    ಪೂರ್ಣಾಂಕ		ಅಂಕೆ_ಬೈಟುಗಳು = get_ಬೈಟುಗಳು_from_buf(tp + slen, ಬೈಟುಗಳು, 4);
 
-	    if (num_bytes == -1)	// not enough coordinates
-		return -1;
-	    mouse_col = 128 * (bytes[0] - ' ' - 1) + bytes[1] - ' ' - 1;
-	    mouse_row = 128 * (bytes[2] - ' ' - 1) + bytes[3] - ' ' - 1;
-	    slen += num_bytes;
+	    ಆದರೆ (ಅಂಕೆ_ಬೈಟುಗಳು == -1)	// not enough coordinates
+		ಹಿಂತಿರುಗಿ -1;
+	    mouse_ಲಂಬಸಾಲು = 128 * (ಬೈಟುಗಳು[0] - ' ' - 1) + ಬೈಟುಗಳು[1] - ' ' - 1;
+	    mouse_ಅಡ್ಡಸಾಲು = 128 * (ಬೈಟುಗಳು[2] - ' ' - 1) + ಬೈಟುಗಳು[3] - ' ' - 1;
+	    slen += ಅಂಕೆ_ಬೈಟುಗಳು;
 	    // equal to K_MOUSEMOVE
-	    if (key_name[1] == (int)KE_MOUSEMOVE_XY)
-		key_name[1] = (int)KE_MOUSEMOVE;
+	    ಆದರೆ (ಕೀಲಿ_name[1] == (ಪೂರ್ಣಾಂಕ)KE_MOUSEMOVE_XY)
+		ಕೀಲಿ_name[1] = (ಪೂರ್ಣಾಂಕ)KE_MOUSEMOVE;
 	}
-	else
-#endif
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 	/*
 	 * If it is a mouse click, get the coordinates.
 	 */
-	if (key_name[0] == KS_MOUSE
-#ifdef FEAT_MOUSE_GPM
-		|| key_name[0] == KS_GPM_MOUSE
-#endif
-#ifdef FEAT_MOUSE_JSB
-		|| key_name[0] == KS_JSBTERM_MOUSE
-#endif
-#ifdef FEAT_MOUSE_NET
-		|| key_name[0] == KS_NETTERM_MOUSE
-#endif
-#ifdef FEAT_MOUSE_DEC
-		|| key_name[0] == KS_DEC_MOUSE
-#endif
-#ifdef FEAT_MOUSE_PTERM
-		|| key_name[0] == KS_PTERM_MOUSE
-#endif
-#ifdef FEAT_MOUSE_URXVT
-		|| key_name[0] == KS_URXVT_MOUSE
-#endif
-		|| key_name[0] == KS_SGR_MOUSE
-		|| key_name[0] == KS_SGR_MOUSE_RELEASE)
+	ಆದರೆ (ಕೀಲಿ_name[0] == KS_MOUSE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MOUSE_GPM
+		|| ಕೀಲಿ_name[0] == KS_GPM_MOUSE
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MOUSE_JSB
+		|| ಕೀಲಿ_name[0] == KS_JSBTERM_MOUSE
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MOUSE_NET
+		|| ಕೀಲಿ_name[0] == KS_NETTERM_MOUSE
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MOUSE_DEC
+		|| ಕೀಲಿ_name[0] == KS_DEC_MOUSE
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MOUSE_PTERM
+		|| ಕೀಲಿ_name[0] == KS_PTERM_MOUSE
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MOUSE_URXVT
+		|| ಕೀಲಿ_name[0] == KS_URXVT_MOUSE
+#ಆದರೆ_ಅಂತ್ಯ
+		|| ಕೀಲಿ_name[0] == KS_SGR_MOUSE
+		|| ಕೀಲಿ_name[0] == KS_SGR_MOUSE_RELEASE)
 	{
-	    if (check_termcode_mouse(tp, &slen, key_name, modifiers_start, idx,
+	    ಆದರೆ (check_termcode_mouse(tp, &slen, ಕೀಲಿ_name, modifiers_ಆರಂಭ, idx,
 							     &modifiers) == -1)
-		return -1;
+		ಹಿಂತಿರುಗಿ -1;
 	}
 
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 	/*
 	 * If using the GUI, then we get menu and scrollbar events.
 	 *
@@ -6843,221 +6843,221 @@ handle_osc:
 	 * new value of the scrollbar.
 	 */
 # ifdef FEAT_MENU
-	else if (key_name[0] == (int)KS_MENU)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಕೀಲಿ_name[0] == (ಪೂರ್ಣಾಂಕ)KS_MENU)
 	{
 	    long_u	val;
-	    int		num_bytes = get_long_from_buf(tp + slen, &val);
+	    ಪೂರ್ಣಾಂಕ		ಅಂಕೆ_ಬೈಟುಗಳು = get_long_from_buf(tp + slen, &val);
 
-	    if (num_bytes == -1)
-		return -1;
+	    ಆದರೆ (ಅಂಕೆ_ಬೈಟುಗಳು == -1)
+		ಹಿಂತಿರುಗಿ -1;
 	    current_menu = (vimmenu_T *)val;
-	    slen += num_bytes;
+	    slen += ಅಂಕೆ_ಬೈಟುಗಳು;
 
 	    // The menu may have been deleted right after it was used, check
 	    // for that.
-	    if (check_menu_pointer(root_menu, current_menu) == FAIL)
+	    ಆದರೆ (check_menu_ಸೂಚಕ(ಬೇರು_menu, current_menu) == FAIL)
 	    {
-		key_name[0] = KS_EXTRA;
-		key_name[1] = (int)KE_IGNORE;
+		ಕೀಲಿ_name[0] = KS_EXTRA;
+		ಕೀಲಿ_name[1] = (ಪೂರ್ಣಾಂಕ)KE_IGNORE;
 	    }
 	}
 # endif
 # ifdef FEAT_GUI_TABLINE
-	else if (key_name[0] == (int)KS_TABLINE)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಕೀಲಿ_name[0] == (ಪೂರ್ಣಾಂಕ)KS_TABLINE)
 	{
 	    // Selecting tabline tab or using its menu.
-	    char_u	bytes[6];
-	    int		num_bytes = get_bytes_from_buf(tp + slen, bytes, 1);
+	    char_u	ಬೈಟುಗಳು[6];
+	    ಪೂರ್ಣಾಂಕ		ಅಂಕೆ_ಬೈಟುಗಳು = get_ಬೈಟುಗಳು_from_buf(tp + slen, ಬೈಟುಗಳು, 1);
 
-	    if (num_bytes == -1)
-		return -1;
-	    current_tab = (int)bytes[0];
-	    if (current_tab == 255)	// -1 in a byte gives 255
+	    ಆದರೆ (ಅಂಕೆ_ಬೈಟುಗಳು == -1)
+		ಹಿಂತಿರುಗಿ -1;
+	    current_tab = (ಪೂರ್ಣಾಂಕ)ಬೈಟುಗಳು[0];
+	    ಆದರೆ (current_tab == 255)	// -1 in a byte gives 255
 		current_tab = -1;
-	    slen += num_bytes;
+	    slen += ಅಂಕೆ_ಬೈಟುಗಳು;
 	}
-	else if (key_name[0] == (int)KS_TABMENU)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಕೀಲಿ_name[0] == (ಪೂರ್ಣಾಂಕ)KS_TABMENU)
 	{
 	    // Selecting tabline tab or using its menu.
-	    char_u	bytes[6];
-	    int		num_bytes = get_bytes_from_buf(tp + slen, bytes, 2);
+	    char_u	ಬೈಟುಗಳು[6];
+	    ಪೂರ್ಣಾಂಕ		ಅಂಕೆ_ಬೈಟುಗಳು = get_ಬೈಟುಗಳು_from_buf(tp + slen, ಬೈಟುಗಳು, 2);
 
-	    if (num_bytes == -1)
-		return -1;
-	    current_tab = (int)bytes[0];
-	    current_tabmenu = (int)bytes[1];
-	    slen += num_bytes;
+	    ಆದರೆ (ಅಂಕೆ_ಬೈಟುಗಳು == -1)
+		ಹಿಂತಿರುಗಿ -1;
+	    current_tab = (ಪೂರ್ಣಾಂಕ)ಬೈಟುಗಳು[0];
+	    current_tabmenu = (ಪೂರ್ಣಾಂಕ)ಬೈಟುಗಳು[1];
+	    slen += ಅಂಕೆ_ಬೈಟುಗಳು;
 	}
 # endif
 # ifndef USE_ON_FLY_SCROLL
-	else if (key_name[0] == (int)KS_VER_SCROLLBAR)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಕೀಲಿ_name[0] == (ಪೂರ್ಣಾಂಕ)KS_VER_SCROLLBAR)
 	{
 	    long_u	val;
-	    char_u	bytes[6];
-	    int		num_bytes;
+	    char_u	ಬೈಟುಗಳು[6];
+	    ಪೂರ್ಣಾಂಕ		ಅಂಕೆ_ಬೈಟುಗಳು;
 
 	    // Get the last scrollbar event in the queue of the same type
 	    j = 0;
-	    for (i = 0; tp[j] == CSI && tp[j + 1] == KS_VER_SCROLLBAR
+	    ಗಾಗಿ (i = 0; tp[j] == CSI && tp[j + 1] == KS_VER_SCROLLBAR
 						     && tp[j + 2] != NUL; ++i)
 	    {
 		j += 3;
-		num_bytes = get_bytes_from_buf(tp + j, bytes, 1);
-		if (num_bytes == -1)
-		    break;
-		if (i == 0)
-		    current_scrollbar = (int)bytes[0];
-		else if (current_scrollbar != (int)bytes[0])
-		    break;
-		j += num_bytes;
-		num_bytes = get_long_from_buf(tp + j, &val);
-		if (num_bytes == -1)
-		    break;
-		scrollbar_value = val;
-		j += num_bytes;
+		ಅಂಕೆ_ಬೈಟುಗಳು = get_ಬೈಟುಗಳು_from_buf(tp + j, ಬೈಟುಗಳು, 1);
+		ಆದರೆ (ಅಂಕೆ_ಬೈಟುಗಳು == -1)
+		    ನಿಲ್ಲಿಸು;
+		ಆದರೆ (i == 0)
+		    current_scrollbar = (ಪೂರ್ಣಾಂಕ)ಬೈಟುಗಳು[0];
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (current_scrollbar != (ಪೂರ್ಣಾಂಕ)ಬೈಟುಗಳು[0])
+		    ನಿಲ್ಲಿಸು;
+		j += ಅಂಕೆ_ಬೈಟುಗಳು;
+		ಅಂಕೆ_ಬೈಟುಗಳು = get_long_from_buf(tp + j, &val);
+		ಆದರೆ (ಅಂಕೆ_ಬೈಟುಗಳು == -1)
+		    ನಿಲ್ಲಿಸು;
+		scrollbar_ಮೌಲ್ಯ = val;
+		j += ಅಂಕೆ_ಬೈಟುಗಳು;
 		slen = j;
 	    }
-	    if (i == 0)		// not enough characters to make one
-		return -1;
+	    ಆದರೆ (i == 0)		// not enough characters to make one
+		ಹಿಂತಿರುಗಿ -1;
 	}
-	else if (key_name[0] == (int)KS_HOR_SCROLLBAR)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಕೀಲಿ_name[0] == (ಪೂರ್ಣಾಂಕ)KS_HOR_SCROLLBAR)
 	{
 	    long_u	val;
-	    int		num_bytes;
+	    ಪೂರ್ಣಾಂಕ		ಅಂಕೆ_ಬೈಟುಗಳು;
 
 	    // Get the last horiz. scrollbar event in the queue
 	    j = 0;
-	    for (i = 0; tp[j] == CSI && tp[j + 1] == KS_HOR_SCROLLBAR
+	    ಗಾಗಿ (i = 0; tp[j] == CSI && tp[j + 1] == KS_HOR_SCROLLBAR
 						     && tp[j + 2] != NUL; ++i)
 	    {
 		j += 3;
-		num_bytes = get_long_from_buf(tp + j, &val);
-		if (num_bytes == -1)
-		    break;
-		scrollbar_value = val;
-		j += num_bytes;
+		ಅಂಕೆ_ಬೈಟುಗಳು = get_long_from_buf(tp + j, &val);
+		ಆದರೆ (ಅಂಕೆ_ಬೈಟುಗಳು == -1)
+		    ನಿಲ್ಲಿಸು;
+		scrollbar_ಮೌಲ್ಯ = val;
+		j += ಅಂಕೆ_ಬೈಟುಗಳು;
 		slen = j;
 	    }
-	    if (i == 0)		// not enough characters to make one
-		return -1;
+	    ಆದರೆ (i == 0)		// not enough characters to make one
+		ಹಿಂತಿರುಗಿ -1;
 	}
 # endif // !USE_ON_FLY_SCROLL
-#endif // FEAT_GUI
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_GUI
 
-#if defined(UNIX) || defined(VMS)
+#ಆದರೆ defined(UNIX) || defined(VMS)
 	/*
 	 * Handle FocusIn/FocusOut event sequences reported by XTerm.
 	 * (CSI I/CSI O)
 	 */
-	if (key_name[0] == KS_EXTRA
+	ಆದರೆ (ಕೀಲಿ_name[0] == KS_EXTRA
 # ifdef FEAT_GUI
-		&& !gui.in_use
+		&& !gui.ಒಳ_use
 # endif
 	    )
 	{
-	    if (key_name[1] == KE_FOCUSGAINED)
+	    ಆದರೆ (ಕೀಲಿ_name[1] == KE_FOCUSGAINED)
 	    {
-		if (!focus_state)
+		ಆದರೆ (!focus_state)
 		{
 		    ui_focus_change(TRUE);
 		    did_cursorhold = TRUE;
 		    focus_state = TRUE;
 		}
-		key_name[1] = (int)KE_IGNORE;
+		ಕೀಲಿ_name[1] = (ಪೂರ್ಣಾಂಕ)KE_IGNORE;
 	    }
-	    else if (key_name[1] == KE_FOCUSLOST)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಕೀಲಿ_name[1] == KE_FOCUSLOST)
 	    {
-		if (focus_state)
+		ಆದರೆ (focus_state)
 		{
 		    ui_focus_change(FALSE);
 		    did_cursorhold = TRUE;
 		    focus_state = FALSE;
 		}
-		key_name[1] = (int)KE_IGNORE;
+		ಕೀಲಿ_name[1] = (ಪೂರ್ಣಾಂಕ)KE_IGNORE;
 	    }
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 	/*
 	 * Change <xHome> to <Home>, <xUp> to <Up>, etc.
 	 */
-	key = handle_x_keys(TERMCAP2KEY(key_name[0], key_name[1]));
+	ಕೀಲಿ = handle_x_ಕೀಲಿಗಳು(TERMCAP2_ಕೀಲಿ(ಕೀಲಿ_name[0], ಕೀಲಿ_name[1]));
 
 	// Add any modifier codes to our string.
-	new_slen = modifiers2keycode(modifiers, &key, string);
+	new_slen = modifiers2keycode(modifiers, &ಕೀಲಿ, string);
 
 	// Finally, add the special key code to our string
-	key_name[0] = KEY2TERMCAP0(key);
-	key_name[1] = KEY2TERMCAP1(key);
-	if (key_name[0] == KS_KEY)
+	ಕೀಲಿ_name[0] = KEY2TERMCAP0(ಕೀಲಿ);
+	ಕೀಲಿ_name[1] = KEY2TERMCAP1(ಕೀಲಿ);
+	ಆದರೆ (ಕೀಲಿ_name[0] == KS_ಕೀಲಿ)
 	{
 	    // from ":set <M-b>=xx"
-	    if (has_mbyte)
-		new_slen += (*mb_char2bytes)(key_name[1], string + new_slen);
-	    else
-		string[new_slen++] = key_name[1];
+	    ಆದರೆ (has_mbyte)
+		new_slen += (*mb_char2bytes)(ಕೀಲಿ_name[1], string + new_slen);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		string[new_slen++] = ಕೀಲಿ_name[1];
 	}
-	else if (osc_state.processing ||
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (osc_state.processing ||
 		(new_slen == 0
-		 && key_name[0] == KS_EXTRA
-		 && key_name[1] == KE_IGNORE))
+		 && ಕೀಲಿ_name[0] == KS_EXTRA
+		 && ಕೀಲಿ_name[1] == KE_IGNORE))
 	{
 	    // Do not put K_IGNORE into the buffer, do return KEYLEN_REMOVED
 	    // to indicate what happened.
 	    retval = KEYLEN_REMOVED;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    string[new_slen++] = K_SPECIAL;
-	    string[new_slen++] = key_name[0];
-	    string[new_slen++] = key_name[1];
+	    string[new_slen++] = ಕೀಲಿ_name[0];
+	    string[new_slen++] = ಕೀಲಿ_name[1];
 	}
-	if (put_string_in_typebuf(offset, slen, string, new_slen,
+	ಆದರೆ (put_string_ಒಳ_typebuf(ಸ್ಥಾನಾಂತರ, slen, string, new_slen,
 						 buf, bufsize, buflen) == FAIL)
-	    return -1;
-	return retval == 0 ? (len + new_slen - slen + offset) : retval;
+	    ಹಿಂತಿರುಗಿ -1;
+	ಹಿಂತಿರುಗಿ retval == 0 ? (len + new_slen - slen + ಸ್ಥಾನಾಂತರ) : retval;
     }
 
-#ifdef FEAT_TERMRESPONSE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMRESPONSE
     LOG_TR1("normal character");
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return 0;			    // no match found
+    ಹಿಂತಿರುಗಿ 0;			    // no match found
 }
 
-#if defined(FEAT_TERMINAL) && defined(FEAT_TERMRESPONSE)
+#ಆದರೆ defined(FEAT_TERMINAL) && defined(FEAT_TERMRESPONSE)
 /*
  * Get the text foreground color, if known.
  */
-    void
-term_get_fg_color(char_u *r, char_u *g, char_u *b)
+    ಶೂನ್ಯ
+ಪದ_get_fg_color(char_u *r, char_u *g, char_u *b)
 {
-    if (rfg_status.tr_progress != STATUS_GOT)
-	return;
+    ಆದರೆ (rfg_ಸ್ಥಿತಿ.tr_ಪ್ರಗತಿ != ಸ್ಥಿತಿ_GOT)
+	ಹಿಂತಿರುಗಿ;
 
     *r = fg_r;
     *g = fg_g;
     *b = fg_b;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_TERMRESPONSE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMRESPONSE
 /*
  * Get the text background color, if known.  Returns OK when the OSC 11
  * response has been parsed and *r, *g, *b are populated; FAIL otherwise.
  */
-    int
-term_get_bg_color(char_u *r, char_u *g, char_u *b)
+    ಪೂರ್ಣಾಂಕ
+ಪದ_get_bg_color(char_u *r, char_u *g, char_u *b)
 {
-    if (rbg_status.tr_progress != STATUS_GOT)
-	return FAIL;
+    ಆದರೆ (rbg_ಸ್ಥಿತಿ.tr_ಪ್ರಗತಿ != ಸ್ಥಿತಿ_GOT)
+	ಹಿಂತಿರುಗಿ FAIL;
 
     *r = bg_r;
     *g = bg_g;
     *b = bg_b;
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Replace any terminal code strings in from[] with the equivalent internal
@@ -7090,26 +7090,26 @@ term_get_bg_color(char_u *r, char_u *g, char_u *b)
 replace_termcodes(
     char_u	*from,
     char_u	**bufp,
-    scid_T	sid_arg UNUSED,	// script ID to use for <SID>,
+    scid_T	sid_arg ಬಳಸದ,	// script ID to use for <SID>,
 				// or 0 to use current_sctx
-    int		flags,
-    int		*did_simplify)
+    ಪೂರ್ಣಾಂಕ		flags,
+    ಪೂರ್ಣಾಂಕ		*did_simplify)
 {
-    int		i;
-    int		slen;
-    int		key;
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		slen;
+    ಪೂರ್ಣಾಂಕ		ಕೀಲಿ;
     size_t	dlen = 0;
     char_u	*src;
-    int		do_backslash;	// backslash is a special character
-    int		do_special;	// recognize <> key codes
-    int		do_key_code;	// recognize raw key codes
-    char_u	*result;	// buffer for resulting string
+    ಪೂರ್ಣಾಂಕ		do_backslash;	// backslash is a special character
+    ಪೂರ್ಣಾಂಕ		do_special;	// recognize <> key codes
+    ಪೂರ್ಣಾಂಕ		do_ಕೀಲಿ_ಸಂಕೇತ;	// recognize raw key codes
+    char_u	*ಫಲಿತಾಂಶ;	// buffer for resulting string
     garray_T	ga;
 
-    do_backslash = (vim_strchr(p_cpo, CPO_BSLASH) == NULL);
-    do_special = (vim_strchr(p_cpo, CPO_SPECI) == NULL)
+    do_backslash = (vim_strchr(p_cpo, CPO_BSLASH) == ಖಾಲಿ);
+    do_special = (vim_strchr(p_cpo, CPO_SPECI) == ಖಾಲಿ)
 						  || (flags & REPTERM_SPECIAL);
-    do_key_code = (vim_strchr(p_cpo, CPO_KEYCODE) == NULL);
+    do_ಕೀಲಿ_ಸಂಕೇತ = (vim_strchr(p_cpo, CPO_KEYCODE) == ಖಾಲಿ);
     src = from;
 
     /*
@@ -7118,40 +7118,40 @@ replace_termcodes(
      * In the rare case more might be needed ga_grow() must be called again.
      */
     ga_init2(&ga, 1L, 100);
-    if (ga_grow(&ga, (int)(STRLEN(src) * 6 + 1)) == FAIL) // out of memory
+    ಆದರೆ (ga_grow(&ga, (ಪೂರ್ಣಾಂಕ)(STRLEN(src) * 6 + 1)) == FAIL) // out of memory
     {
-	*bufp = NULL;
-	return from;
+	*bufp = ಖಾಲಿ;
+	ಹಿಂತಿರುಗಿ from;
     }
-    result = ga.ga_data;
+    ಫಲಿತಾಂಶ = ga.ga_ದತ್ತಾಂಶ;
 
     /*
      * Check for #n at start only: function key n
      */
-    if ((flags & REPTERM_FROM_PART) && src[0] == '#' && VIM_ISDIGIT(src[1]))
+    ಆದರೆ ((flags & REPTERM_FROM_PART) && src[0] == '#' && VIM_ISDIGIT(src[1]))
     {
-	result[dlen++] = K_SPECIAL;
-	result[dlen++] = 'k';
-	if (src[1] == '0')
-	    result[dlen++] = ';';	// #0 is F10 is "k;"
-	else
-	    result[dlen++] = src[1];	// #3 is F3 is "k3"
+	ಫಲಿತಾಂಶ[dlen++] = K_SPECIAL;
+	ಫಲಿತಾಂಶ[dlen++] = 'k';
+	ಆದರೆ (src[1] == '0')
+	    ಫಲಿತಾಂಶ[dlen++] = ';';	// #0 is F10 is "k;"
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಫಲಿತಾಂಶ[dlen++] = src[1];	// #3 is F3 is "k3"
 	src += 2;
     }
 
     /*
      * Copy each byte from *from to result[dlen]
      */
-    while (*src != NUL)
+    ಆಗ (*src != NUL)
     {
 	/*
 	 * If 'cpoptions' does not contain '<', check for special key codes,
 	 * like "<C-S-LeftMouse>"
 	 */
-	if (do_special && ((flags & REPTERM_DO_LT)
+	ಆದರೆ (do_special && ((flags & REPTERM_DO_LT)
 					      || STRNCMP(src, "<lt>", 4) != 0))
 	{
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 	    /*
 	     * Change <SID>Func to K_SNR <script-nr> _Func.  This name is used
 	     * for script-local user functions.
@@ -7159,67 +7159,67 @@ replace_termcodes(
 	     * Also change <SID>name.Func to K_SNR <import-script-nr> _Func.
 	     * Only if "name" is recognized as an import.
 	     */
-	    if (STRNICMP(src, "<SID>", 5) == 0)
+	    ಆದರೆ (STRNICMP(src, "<SID>", 5) == 0)
 	    {
-		if (sid_arg < 0 || (sid_arg == 0 && current_sctx.sc_sid <= 0))
-		    emsg(_(e_using_sid_not_in_script_context));
-		else
+		ಆದರೆ (sid_arg < 0 || (sid_arg == 0 && current_sctx.sc_sid <= 0))
+		    emsg(_(e_using_sid_not_ಒಳ_script_context));
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    char_u  *dot;
-		    long    sid = sid_arg != 0 ? sid_arg : current_sctx.sc_sid;
+		    ದೀರ್ಘ    sid = sid_arg != 0 ? sid_arg : current_sctx.sc_sid;
 
 		    src += 5;
-		    if (in_vim9script()
-				       && (dot = vim_strchr(src, '.')) != NULL)
+		    ಆದರೆ (ಒಳ_vim9script()
+				       && (dot = vim_strchr(src, '.')) != ಖಾಲಿ)
 		    {
-			imported_T *imp = find_imported(src, dot - src, FALSE);
+			imported_T *imp = ಕಂಡುಹಿಡಿ_imported(src, dot - src, FALSE);
 
-			if (imp != NULL)
+			ಆದರೆ (imp != ಖಾಲಿ)
 			{
-			    scriptitem_T    *si = SCRIPT_ITEM(imp->imp_sid);
+			    scriptitem_T    *si = SCRIPT_ಅಂಶ(imp->imp_sid);
 			    size_t	    len;
 
 			    src = dot + 1;
-			    if (si->sn_autoload_prefix != NULL)
+			    ಆದರೆ (si->sn_autoload_ಪೂರ್ವಪ್ರತ್ಯಯ != ಖಾಲಿ)
 			    {
 				// Turn "<SID>name.Func"
 				// into "scriptname#Func".
-				len = STRLEN(si->sn_autoload_prefix);
-				if (ga_grow(&ga,
-				     (int)(STRLEN(src) * 6 + len + 1)) == FAIL)
+				len = STRLEN(si->sn_autoload_ಪೂರ್ವಪ್ರತ್ಯಯ);
+				ಆದರೆ (ga_grow(&ga,
+				     (ಪೂರ್ಣಾಂಕ)(STRLEN(src) * 6 + len + 1)) == FAIL)
 				{
 				    ga_clear(&ga);
-				    *bufp = NULL;
-				    return from;
+				    *bufp = ಖಾಲಿ;
+				    ಹಿಂತಿರುಗಿ from;
 				}
-				result = ga.ga_data;
-				STRCPY(result + dlen, si->sn_autoload_prefix);
+				ಫಲಿತಾಂಶ = ga.ga_ದತ್ತಾಂಶ;
+				STRCPY(ಫಲಿತಾಂಶ + dlen, si->sn_autoload_ಪೂರ್ವಪ್ರತ್ಯಯ);
 				dlen += len;
-				continue;
+				ಮುಂದುವರಿ;
 			    }
 			    sid = imp->imp_sid;
 			}
 		    }
 
-		    result[dlen++] = K_SPECIAL;
-		    result[dlen++] = (int)KS_EXTRA;
-		    result[dlen++] = (int)KE_SNR;
-		    sprintf((char *)result + dlen, "%ld", sid);
-		    dlen += STRLEN(result + dlen);
-		    result[dlen++] = '_';
-		    continue;
+		    ಫಲಿತಾಂಶ[dlen++] = K_SPECIAL;
+		    ಫಲಿತಾಂಶ[dlen++] = (ಪೂರ್ಣಾಂಕ)KS_EXTRA;
+		    ಫಲಿತಾಂಶ[dlen++] = (ಪೂರ್ಣಾಂಕ)KE_SNR;
+		    sprintf((ಅಕ್ಷರ *)ಫಲಿತಾಂಶ + dlen, "%ld", sid);
+		    dlen += STRLEN(ಫಲಿತಾಂಶ + dlen);
+		    ಫಲಿತಾಂಶ[dlen++] = '_';
+		    ಮುಂದುವರಿ;
 		}
 	    }
-#endif
-	    int fsk_flags = FSK_KEYCODE
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಪೂರ್ಣಾಂಕ fsk_flags = FSK_KEYCODE
 			| ((flags & REPTERM_NO_SIMPLIFY) ? 0 : FSK_SIMPLIFY)
 			| ((flags & REPTERM_FROM_PART) ? FSK_FROM_PART : 0);
-	    slen = trans_special(&src, result + dlen, fsk_flags,
+	    slen = trans_special(&src, ಫಲಿತಾಂಶ + dlen, fsk_flags,
 							   TRUE, did_simplify);
-	    if (slen > 0)
+	    ಆದರೆ (slen > 0)
 	    {
 		dlen += slen;
-		continue;
+		ಮುಂದುವರಿ;
 	    }
 	}
 
@@ -7229,23 +7229,23 @@ replace_termcodes(
 	 * Single character codes are NOT replaced (e.g. ^H or DEL), because
 	 * it could be a character in the file.
 	 */
-	if (do_key_code)
+	ಆದರೆ (do_ಕೀಲಿ_ಸಂಕೇತ)
 	{
-	    int len;
-	    i = find_term_bykeys(src, &len);
-	    if (i >= 0)
+	    ಪೂರ್ಣಾಂಕ len;
+	    i = ಕಂಡುಹಿಡಿ_ಪದ_bykeys(src, &len);
+	    ಆದರೆ (i >= 0)
 	    {
-		result[dlen++] = K_SPECIAL;
-		result[dlen++] = termcodes[i].name[0];
-		result[dlen++] = termcodes[i].name[1];
+		ಫಲಿತಾಂಶ[dlen++] = K_SPECIAL;
+		ಫಲಿತಾಂಶ[dlen++] = termcodes[i].name[0];
+		ಫಲಿತಾಂಶ[dlen++] = termcodes[i].name[1];
 		src += len;
 		// If terminal code matched, continue after it.
-		continue;
+		ಮುಂದುವರಿ;
 	    }
 	}
 
-#ifdef FEAT_EVAL
-	if (do_special)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	ಆದರೆ (do_special)
 	{
 	    char_u	*p, *s, len;
 
@@ -7254,35 +7254,35 @@ replace_termcodes(
 	     * Replace <LocalLeader> by the value of "maplocalleader".
 	     * If "mapleader" or "maplocalleader" isn't set use a backslash.
 	     */
-	    if (STRNICMP(src, "<Leader>", 8) == 0)
+	    ಆದರೆ (STRNICMP(src, "<Leader>", 8) == 0)
 	    {
 		len = 8;
-		p = get_var_value((char_u *)"g:mapleader");
+		p = get_var_ಮೌಲ್ಯ((char_u *)"g:mapleader");
 	    }
-	    else if (STRNICMP(src, "<LocalLeader>", 13) == 0)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRNICMP(src, "<LocalLeader>", 13) == 0)
 	    {
 		len = 13;
-		p = get_var_value((char_u *)"g:maplocalleader");
+		p = get_var_ಮೌಲ್ಯ((char_u *)"g:maplocalleader");
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		len = 0;
-		p = NULL;
+		p = ಖಾಲಿ;
 	    }
-	    if (len != 0)
+	    ಆದರೆ (len != 0)
 	    {
 		// Allow up to 8 * 6 characters for "mapleader".
-		if (p == NULL || *p == NUL || STRLEN(p) > 8 * 6)
+		ಆದರೆ (p == ಖಾಲಿ || *p == NUL || STRLEN(p) > 8 * 6)
 		    s = (char_u *)"\\";
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		    s = p;
-		while (*s != NUL)
-		    result[dlen++] = *s++;
+		ಆಗ (*s != NUL)
+		    ಫಲಿತಾಂಶ[dlen++] = *s++;
 		src += len;
-		continue;
+		ಮುಂದುವರಿ;
 	    }
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 	/*
 	 * Remove CTRL-V and ignore the next character.
@@ -7290,82 +7290,82 @@ replace_termcodes(
 	 * part it is removed.
 	 * If 'cpoptions' does not contain 'B', also accept a backslash.
 	 */
-	key = *src;
-	if (key == Ctrl_V || (do_backslash && key == '\\'))
+	ಕೀಲಿ = *src;
+	ಆದರೆ (ಕೀಲಿ == Ctrl_V || (do_backslash && ಕೀಲಿ == '\\'))
 	{
 	    ++src;				// skip CTRL-V or backslash
-	    if (*src == NUL)
+	    ಆದರೆ (*src == NUL)
 	    {
-		if (flags & REPTERM_FROM_PART)
-		    result[dlen++] = key;
-		break;
+		ಆದರೆ (flags & REPTERM_FROM_PART)
+		    ಫಲಿತಾಂಶ[dlen++] = ಕೀಲಿ;
+		ನಿಲ್ಲಿಸು;
 	    }
 	}
 
 	// skip multibyte char correctly
-	for (i = (*mb_ptr2len)(src); i > 0; --i)
+	ಗಾಗಿ (i = (*mb_ptr2len)(src); i > 0; --i)
 	{
 	    /*
 	     * If the character is K_SPECIAL, replace it with K_SPECIAL
 	     * KS_SPECIAL KE_FILLER.
 	     * If compiled with the GUI replace CSI with K_CSI.
 	     */
-	    if (*src == K_SPECIAL)
+	    ಆದರೆ (*src == K_SPECIAL)
 	    {
-		result[dlen++] = K_SPECIAL;
-		result[dlen++] = KS_SPECIAL;
-		result[dlen++] = KE_FILLER;
+		ಫಲಿತಾಂಶ[dlen++] = K_SPECIAL;
+		ಫಲಿತಾಂಶ[dlen++] = KS_SPECIAL;
+		ಫಲಿತಾಂಶ[dlen++] = KE_FILLER;
 	    }
-#ifdef FEAT_GUI
-	    else if (*src == CSI)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*src == CSI)
 	    {
-		result[dlen++] = K_SPECIAL;
-		result[dlen++] = KS_EXTRA;
-		result[dlen++] = (int)KE_CSI;
+		ಫಲಿತಾಂಶ[dlen++] = K_SPECIAL;
+		ಫಲಿತಾಂಶ[dlen++] = KS_EXTRA;
+		ಫಲಿತಾಂಶ[dlen++] = (ಪೂರ್ಣಾಂಕ)KE_CSI;
 	    }
-#endif
-	    else
-		result[dlen++] = *src;
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ಫಲಿತಾಂಶ[dlen++] = *src;
 	    ++src;
 	}
     }
-    result[dlen] = NUL;
+    ಫಲಿತಾಂಶ[dlen] = NUL;
 
     /*
      * Copy the new string to allocated memory.
      * If this fails, just return from.
      */
-    if ((*bufp = vim_strsave(result)) != NULL)
+    ಆದರೆ ((*bufp = vim_strsave(ಫಲಿತಾಂಶ)) != ಖಾಲಿ)
 	from = *bufp;
-    vim_free(result);
-    return from;
+    vim_free(ಫಲಿತಾಂಶ);
+    ಹಿಂತಿರುಗಿ from;
 }
 
 /*
  * Find a termcode with keys 'src' (must be NUL terminated).
  * Return the index in termcodes[], or -1 if not found.
  */
-    static int
-find_term_bykeys(char_u *src, int *matchlen)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಕಂಡುಹಿಡಿ_ಪದ_bykeys(char_u *src, ಪೂರ್ಣಾಂಕ *matchlen)
 {
-    int		i, j;
-    int		len = (int)STRLEN(src);
-    int         found = -1;
+    ಪೂರ್ಣಾಂಕ		i, j;
+    ಪೂರ್ಣಾಂಕ		len = (ಪೂರ್ಣಾಂಕ)STRLEN(src);
+    ಪೂರ್ಣಾಂಕ         ಸಿಕ್ಕಿತು = -1;
     // Don't return a match for a single character
-    int         foundlen = 1;
-    int         slen, modslen;
-    int         thislen;
+    ಪೂರ್ಣಾಂಕ         foundlen = 1;
+    ಪೂರ್ಣಾಂಕ         slen, modslen;
+    ಪೂರ್ಣಾಂಕ         thislen;
 
     // Most input bytes cannot start a terminal code.  Reuse the same leader
     // table as check_termcode() to avoid scanning termcodes[] unnecessarily.
-    if (need_gather)
+    ಆದರೆ (need_gather)
 	gather_termleader();
-    if (*src == NUL || vim_strchr(termleader, *src) == NULL)
-	return -1;
+    ಆದರೆ (*src == NUL || vim_strchr(termleader, *src) == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ -1;
 
     // find longest match
     // borrows part of check_termcode
-    for (i = 0; i < tc_len; ++i)
+    ಗಾಗಿ (i = 0; i < tc_len; ++i)
     {
 	slen = termcodes[i].len;
 	modslen = termcodes[i].modlen;
@@ -7378,105 +7378,105 @@ find_term_bykeys(char_u *src, int *matchlen)
 	 * When there is a modifier the * matches a number.
 	 * When there is no modifier the ;* or * is omitted.
 	 */
-	if (modslen > 0)
+	ಆದರೆ (modslen > 0)
 	{
-	    if (len > modslen
-			&& STRNCMP(termcodes[i].code, src, (size_t)modslen) == 0)
+	    ಆದರೆ (len > modslen
+			&& STRNCMP(termcodes[i].ಸಂಕೇತ_2, src, (size_t)modslen) == 0)
 	    {
 		thislen = 0;
 
-		if (src[modslen] == termcodes[i].code[slen - 1])
+		ಆದರೆ (src[modslen] == termcodes[i].ಸಂಕೇತ_2[slen - 1])
 		    // no modifiers
 		    thislen = modslen + 1;
-		else if (src[modslen] != ';' && modslen == slen - 3)
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (src[modslen] != ';' && modslen == slen - 3)
 		    // no match for "code;*X" with "code;"
-		    continue;
-		else if (termcodes[i].code[modslen] == '@'
+		    ಮುಂದುವರಿ;
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (termcodes[i].ಸಂಕೇತ_2[modslen] == '@'
 				&& (src[modslen] != '1'
 					    || src[modslen + 1] != ';'))
 		    // no match for "<Esc>[@" with "<Esc>[1;"
-		    continue;
-		else
+		    ಮುಂದುವರಿ;
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    // Skip over the digits, the final char must
 		    // follow. URXVT can use a negative value, thus
 		    // also accept '-'.
-		    for (j = slen - 2; j < len && (SAFE_isdigit(src[j])
+		    ಗಾಗಿ (j = slen - 2; j < len && (ಸುರಕ್ಷಿತ_isdigit(src[j])
 			       || src[j] == '-' || src[j] == ';'); ++j)
 			;
 		    ++j;
-		    if (len < j)	// got a partial sequence
-			continue;
-		    if (src[j - 1] != termcodes[i].code[slen - 1])
-			continue;	// no match
+		    ಆದರೆ (len < j)	// got a partial sequence
+			ಮುಂದುವರಿ;
+		    ಆದರೆ (src[j - 1] != termcodes[i].ಸಂಕೇತ_2[slen - 1])
+			ಮುಂದುವರಿ;	// no match
 
 		    thislen = j;
 		}
 
-		if (thislen > foundlen)
+		ಆದರೆ (thislen > foundlen)
 		{
-		    found = i;
+		    ಸಿಕ್ಕಿತು = i;
 		    foundlen = thislen;
 		}
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (slen > foundlen && len >= slen
-			&& STRNCMP(termcodes[i].code, src, (size_t)slen) == 0)
+	    ಆದರೆ (slen > foundlen && len >= slen
+			&& STRNCMP(termcodes[i].ಸಂಕೇತ_2, src, (size_t)slen) == 0)
 	    {
-		found = i;
+		ಸಿಕ್ಕಿತು = i;
 		foundlen = slen;
 	    }
 	}
     }
 
-    if (matchlen != NULL && found >= 0)
+    ಆದರೆ (matchlen != ಖಾಲಿ && ಸಿಕ್ಕಿತು >= 0)
 	*matchlen = foundlen;
 
-    return found;
+    ಹಿಂತಿರುಗಿ ಸಿಕ್ಕಿತು;
 }
 
 /*
  * Gather the first characters in the terminal key codes into a string.
  * Used to speed up check_termcode().
  */
-    static void
-gather_termleader(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+gather_termleader(ಶೂನ್ಯ)
 {
-    int	    i;
-    int	    len = 0;
+    ಪೂರ್ಣಾಂಕ	    i;
+    ಪೂರ್ಣಾಂಕ	    len = 0;
 
-#ifdef FEAT_GUI
-    if (gui.in_use)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+    ಆದರೆ (gui.ಒಳ_use)
 	termleader[len++] = CSI;    // the GUI codes are not in termcodes[]
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Querying cell size uses CSI 14 t
-#if defined(MSWIN) && (defined(FEAT_IMAGE) || defined(FEAT_EVAL))
+#ಆದರೆ defined(MSWIN) && (defined(FEAT_IMAGE) || defined(FEAT_EVAL))
 # ifdef FEAT_GUI
-    if (!gui.in_use)
+    ಆದರೆ (!gui.ಒಳ_use)
 # endif
     {
 	termleader[len++] = ESC;
 # ifdef FEAT_GUI
-	if (!gui.in_use)
+	ಆದರೆ (!gui.ಒಳ_use)
 # endif
 	    termleader[len++] = CSI;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_TERMRESPONSE
-    if (check_for_codes || *T_CRS != NUL)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMRESPONSE
+    ಆದರೆ (check_for_codes || *T_CRS != NUL)
 	termleader[len++] = DCS;    // the termcode response starts with DCS
 				    // in 8-bit mode
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     termleader[len] = NUL;
 
-    for (i = 0; i < tc_len; ++i)
-	if (vim_strchr(termleader, termcodes[i].code[0]) == NULL)
+    ಗಾಗಿ (i = 0; i < tc_len; ++i)
+	ಆದರೆ (vim_strchr(termleader, termcodes[i].ಸಂಕೇತ_2[0]) == ಖಾಲಿ)
 	{
-	    termleader[len++] = termcodes[i].code[0];
+	    termleader[len++] = termcodes[i].ಸಂಕೇತ_2[0];
 	    termleader[len] = NUL;
 	}
 
@@ -7488,30 +7488,30 @@ gather_termleader(void)
  * This code looks a lot like showoptions(), but is different.
  * "flags" can have OPT_ONECOLUMN.
  */
-    void
-show_termcodes(int flags)
+    ಶೂನ್ಯ
+show_termcodes(ಪೂರ್ಣಾಂಕ flags)
 {
-    int		col;
-    int		*items;
-    int		item_count;
-    int		run;
-    int		row, rows;
-    int		cols;
-    int		i;
-    int		len;
+    ಪೂರ್ಣಾಂಕ		ಲಂಬಸಾಲು;
+    ಪೂರ್ಣಾಂಕ		*ವಸ್ತುಗಳು;
+    ಪೂರ್ಣಾಂಕ		ಅಂಶ_ಎಣಿಕೆ;
+    ಪೂರ್ಣಾಂಕ		ಸತತ;
+    ಪೂರ್ಣಾಂಕ		ಅಡ್ಡಸಾಲು, ಅಡ್ಡಸಾಲುಗಳು_2;
+    ಪೂರ್ಣಾಂಕ		ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		len;
 
-#define INC3 27	    // try to make three columns
-#define INC2 40	    // try to make two columns
-#define GAP 2	    // spaces between columns
+#ವ್ಯಾಖ್ಯಾನಿಸು INC3 27	    // try to make three columns
+#ವ್ಯಾಖ್ಯಾನಿಸು INC2 40	    // try to make two columns
+#ವ್ಯಾಖ್ಯಾನಿಸು GAP 2	    // spaces between columns
 
-    if (tc_len == 0)	    // no terminal codes (must be GUI)
-	return;
-    items = ALLOC_MULT(int, tc_len);
-    if (items == NULL)
-	return;
+    ಆದರೆ (tc_len == 0)	    // no terminal codes (must be GUI)
+	ಹಿಂತಿರುಗಿ;
+    ವಸ್ತುಗಳು = ALLOC_MULT(ಪೂರ್ಣಾಂಕ, tc_len);
+    ಆದರೆ (ವಸ್ತುಗಳು == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     // Highlight title
-    msg_puts_title(_("\n--- Terminal keys ---"));
+    ಸಂದೇಶ_puts_title(_("\n--- Terminal keys ---"));
 
     /*
      * Do the loop three times:
@@ -7520,76 +7520,76 @@ show_termcodes(int flags)
      * 3. display the long items (remaining strings)
      * When "flags" has OPT_ONECOLUMN do everything in 3.
      */
-    for (run = (flags & OPT_ONECOLUMN) ? 3 : 1; run <= 3 && !got_int; ++run)
+    ಗಾಗಿ (ಸತತ = (flags & OPT_ONECOLUMN) ? 3 : 1; ಸತತ <= 3 && !got_int; ++ಸತತ)
     {
 	/*
 	 * collect the items in items[]
 	 */
-	item_count = 0;
-	for (i = 0; i < tc_len; i++)
+	ಅಂಶ_ಎಣಿಕೆ = 0;
+	ಗಾಗಿ (i = 0; i < tc_len; i++)
 	{
 	    len = show_one_termcode(termcodes[i].name,
-						    termcodes[i].code, FALSE);
-	    if ((flags & OPT_ONECOLUMN) ||
-		    (len <= INC3 - GAP ? run == 1
-			: len <= INC2 - GAP ? run == 2
-			: run == 3))
-		items[item_count++] = i;
+						    termcodes[i].ಸಂಕೇತ_2, FALSE);
+	    ಆದರೆ ((flags & OPT_ONECOLUMN) ||
+		    (len <= INC3 - GAP ? ಸತತ == 1
+			: len <= INC2 - GAP ? ಸತತ == 2
+			: ಸತತ == 3))
+		ವಸ್ತುಗಳು[ಅಂಶ_ಎಣಿಕೆ++] = i;
 	}
 
 	/*
 	 * display the items
 	 */
-	if (run <= 2)
+	ಆದರೆ (ಸತತ <= 2)
 	{
-	    cols = (Columns + GAP) / (run == 1 ? INC3 : INC2);
-	    if (cols == 0)
-		cols = 1;
-	    rows = (item_count + cols - 1) / cols;
+	    ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = (Columns + GAP) / (ಸತತ == 1 ? INC3 : INC2);
+	    ಆದರೆ (ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == 0)
+		ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = 1;
+	    ಅಡ್ಡಸಾಲುಗಳು_2 = (ಅಂಶ_ಎಣಿಕೆ + ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ - 1) / ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
 	}
-	else	// run == 3
-	    rows = item_count;
-	for (row = 0; row < rows && !got_int; ++row)
+	ಇಲ್ಲದಿದ್ದರೆ	// run == 3
+	    ಅಡ್ಡಸಾಲುಗಳು_2 = ಅಂಶ_ಎಣಿಕೆ;
+	ಗಾಗಿ (ಅಡ್ಡಸಾಲು = 0; ಅಡ್ಡಸಾಲು < ಅಡ್ಡಸಾಲುಗಳು_2 && !got_int; ++ಅಡ್ಡಸಾಲು)
 	{
-	    msg_putchar('\n');			// go to next line
-	    if (got_int)			// 'q' typed in more
-		break;
-	    col = 0;
-	    for (i = row; i < item_count; i += rows)
+	    ಸಂದೇಶ_putchar('\n');			// go to next line
+	    ಆದರೆ (got_int)			// 'q' typed in more
+		ನಿಲ್ಲಿಸು;
+	    ಲಂಬಸಾಲು = 0;
+	    ಗಾಗಿ (i = ಅಡ್ಡಸಾಲು; i < ಅಂಶ_ಎಣಿಕೆ; i += ಅಡ್ಡಸಾಲುಗಳು_2)
 	    {
-		msg_col = col;			// make columns
-		show_one_termcode(termcodes[items[i]].name,
-					      termcodes[items[i]].code, TRUE);
-		if (run == 2)
-		    col += INC2;
-		else
-		    col += INC3;
+		ಸಂದೇಶ_ಲಂಬಸಾಲು = ಲಂಬಸಾಲು;			// make columns
+		show_one_termcode(termcodes[ವಸ್ತುಗಳು[i]].name,
+					      termcodes[ವಸ್ತುಗಳು[i]].ಸಂಕೇತ_2, TRUE);
+		ಆದರೆ (ಸತತ == 2)
+		    ಲಂಬಸಾಲು += INC2;
+		ಇಲ್ಲದಿದ್ದರೆ
+		    ಲಂಬಸಾಲು += INC3;
 	    }
-	    out_flush();
+	    ಹೊರಹೋಗು_flush();
 	    ui_breakcheck();
 	}
     }
-    vim_free(items);
+    vim_free(ವಸ್ತುಗಳು);
 }
 
 /*
  * Show one termcode entry.
  * Output goes into IObuff[]
  */
-    int
-show_one_termcode(char_u *name, char_u *code, int printit)
+    ಪೂರ್ಣಾಂಕ
+show_one_termcode(char_u *name, char_u *ಸಂಕೇತ_2, ಪೂರ್ಣಾಂಕ printit)
 {
     char_u	*p;
-    int		len;
+    ಪೂರ್ಣಾಂಕ		len;
 
-    if (name[0] > '~')
+    ಆದರೆ (name[0] > '~')
     {
 	IObuff[0] = ' ';
 	IObuff[1] = ' ';
 	IObuff[2] = ' ';
 	IObuff[3] = ' ';
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	IObuff[0] = 't';
 	IObuff[1] = '_';
@@ -7598,78 +7598,78 @@ show_one_termcode(char_u *name, char_u *code, int printit)
     }
     IObuff[4] = ' ';
 
-    p = get_special_key_name(TERMCAP2KEY(name[0], name[1]), 0);
-    if (p[1] != 't')
+    p = get_special_ಕೀಲಿ_name(TERMCAP2_ಕೀಲಿ(name[0], name[1]), 0);
+    ಆದರೆ (p[1] != 't')
 	STRCPY(IObuff + 5, p);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	IObuff[5] = NUL;
-    len = (int)STRLEN(IObuff);
-    do
+    len = (ಪೂರ್ಣಾಂಕ)STRLEN(IObuff);
+    ಮಾಡು
 	IObuff[len++] = ' ';
-    while (len < 17);
+    ಆಗ (len < 17);
     IObuff[len] = NUL;
-    if (code == NULL)
+    ಆದರೆ (ಸಂಕೇತ_2 == ಖಾಲಿ)
 	len += 4;
-    else
-	len += vim_strsize(code);
+    ಇಲ್ಲದಿದ್ದರೆ
+	len += vim_strsize(ಸಂಕೇತ_2);
 
-    if (printit)
+    ಆದರೆ (printit)
     {
-	msg_puts((char *)IObuff);
-	if (code == NULL)
-	    msg_puts("NULL");
-	else
-	    msg_outtrans(code);
+	ಸಂದೇಶ_puts((ಅಕ್ಷರ *)IObuff);
+	ಆದರೆ (ಸಂಕೇತ_2 == ಖಾಲಿ)
+	    ಸಂದೇಶ_puts("NULL");
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಸಂದೇಶ_outtrans(ಸಂಕೇತ_2);
     }
-    return len;
+    ಹಿಂತಿರುಗಿ len;
 }
 
-#if defined(FEAT_TERMRESPONSE)
+#ಆದರೆ defined(FEAT_TERMRESPONSE)
 /*
  * For Xterm >= 140 compiled with OPT_TCAP_QUERY: Obtain the actually used
  * termcap codes from the terminal itself.
  * We get them one by one to avoid a very long response string.
  */
-static int xt_index_in = 0;
-static int xt_index_out = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ xt_ಸೂಚ್ಯಂಕ_ಒಳ = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ xt_ಸೂಚ್ಯಂಕ_ಹೊರಹೋಗು = 0;
 
-    static void
-req_codes_from_term(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+req_codes_from_ಪದ(ಶೂನ್ಯ)
 {
-    xt_index_out = 0;
-    xt_index_in = 0;
-    req_more_codes_from_term();
+    xt_ಸೂಚ್ಯಂಕ_ಹೊರಹೋಗು = 0;
+    xt_ಸೂಚ್ಯಂಕ_ಒಳ = 0;
+    req_ಇನ್ನಷ್ಟು_codes_from_ಪದ();
 }
 
-    static void
-req_more_codes_from_term(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+req_ಇನ್ನಷ್ಟು_codes_from_ಪದ(ಶೂನ್ಯ)
 {
-    char	buf[32];  // extra size to shut up LGTM
-    int		old_idx = xt_index_out;
+    ಅಕ್ಷರ	buf[32];  // extra size to shut up LGTM
+    ಪೂರ್ಣಾಂಕ		old_idx = xt_ಸೂಚ್ಯಂಕ_ಹೊರಹೋಗು;
 
     // Don't do anything when going to exit.
-    if (exiting)
-	return;
+    ಆದರೆ (exiting)
+	ಹಿಂತಿರುಗಿ;
 
     // Send up to 10 more requests out than we received.  Avoid sending too
     // many, there can be a buffer overflow somewhere.
-    while (xt_index_out < xt_index_in + 10 && key_names[xt_index_out] != NULL)
+    ಆಗ (xt_ಸೂಚ್ಯಂಕ_ಹೊರಹೋಗು < xt_ಸೂಚ್ಯಂಕ_ಒಳ + 10 && ಕೀಲಿ_ಹೆಸರುಗಳು[xt_ಸೂಚ್ಯಂಕ_ಹೊರಹೋಗು] != ಖಾಲಿ)
     {
-	char *key_name = key_names[xt_index_out];
+	ಅಕ್ಷರ *ಕೀಲಿ_name = ಕೀಲಿ_ಹೆಸರುಗಳು[xt_ಸೂಚ್ಯಂಕ_ಹೊರಹೋಗು];
 
-	MAY_WANT_TO_LOG_THIS;
-	LOG_TRN("Requesting XT %d: %s", xt_index_out, key_name);
-	if (key_name[2] != NUL)
-	    sprintf(buf, "\033P+q%02x%02x%02x\033\\", key_name[0], key_name[1], key_name[2]);
-	else
-	    sprintf(buf, "\033P+q%02x%02x\033\\", key_name[0], key_name[1]);
-	out_str_nf((char_u *)buf);
-	++xt_index_out;
+	MAY_WANT_ಗಮ್ಯ_LOG_THIS;
+	LOG_TRN("Requesting XT %d: %s", xt_ಸೂಚ್ಯಂಕ_ಹೊರಹೋಗು, ಕೀಲಿ_name);
+	ಆದರೆ (ಕೀಲಿ_name[2] != NUL)
+	    sprintf(buf, "\033P+q%02x%02x%02x\033\\", ಕೀಲಿ_name[0], ಕೀಲಿ_name[1], ಕೀಲಿ_name[2]);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    sprintf(buf, "\033P+q%02x%02x\033\\", ಕೀಲಿ_name[0], ಕೀಲಿ_name[1]);
+	ಹೊರಹೋಗು_str_nf((char_u *)buf);
+	++xt_ಸೂಚ್ಯಂಕ_ಹೊರಹೋಗು;
     }
 
     // Send the codes out right away.
-    if (xt_index_out != old_idx)
-	out_flush();
+    ಆದರೆ (xt_ಸೂಚ್ಯಂಕ_ಹೊರಹೋಗು != old_idx)
+	ಹೊರಹೋಗು_flush();
 }
 
 /*
@@ -7680,124 +7680,124 @@ req_more_codes_from_term(void)
  * Both <name> and <string> are encoded in hex.
  * "code" points to the "0" or "1".
  */
-    static void
-got_code_from_term(char_u *code, int len)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+got_ಸಂಕೇತ_from_ಪದ(char_u *ಸಂಕೇತ_2, ಪೂರ್ಣಾಂಕ len)
 {
 # define XT_LEN 100
     char_u	name[4];
     char_u	str[XT_LEN];
-    int		i;
-    int		j = 0;
-    int		c;
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		j = 0;
+    ಪೂರ್ಣಾಂಕ		c;
 
     // A '1' means the code is supported, a '0' means it isn't.
     // If it is supported, there must be a '=' following
     // When half the length is > XT_LEN we can't use it.
-    if (code[0] == '1' && (code[7] == '=' || code[9] == '=') && len / 2 < XT_LEN)
+    ಆದರೆ (ಸಂಕೇತ_2[0] == '1' && (ಸಂಕೇತ_2[7] == '=' || ಸಂಕೇತ_2[9] == '=') && len / 2 < XT_LEN)
     {
 	// Get the name from the response and find it in the table.
-	name[0] = hexhex2nr(code + 3);
-	name[1] = hexhex2nr(code + 5);
-	if (code[9] == '=')
-	    name[2] = hexhex2nr(code + 7);
-	else
+	name[0] = hexhex2nr(ಸಂಕೇತ_2 + 3);
+	name[1] = hexhex2nr(ಸಂಕೇತ_2 + 5);
+	ಆದರೆ (ಸಂಕೇತ_2[9] == '=')
+	    name[2] = hexhex2nr(ಸಂಕೇತ_2 + 7);
+	ಇಲ್ಲದಿದ್ದರೆ
 	    name[2] = NUL;
 	name[3] = NUL;
-	for (i = 0; key_names[i] != NULL; ++i)
+	ಗಾಗಿ (i = 0; ಕೀಲಿ_ಹೆಸರುಗಳು[i] != ಖಾಲಿ; ++i)
 	{
-	    if (STRCMP(key_names[i], name) == 0)
+	    ಆದರೆ (STRCMP(ಕೀಲಿ_ಹೆಸರುಗಳು[i], name) == 0)
 	    {
-		xt_index_in = i;
-		break;
+		xt_ಸೂಚ್ಯಂಕ_ಒಳ = i;
+		ನಿಲ್ಲಿಸು;
 	    }
 	}
 
-	LOG_TRN("Received XT %d: %s", xt_index_in, (char *)name);
+	LOG_TRN("Received XT %d: %s", xt_ಸೂಚ್ಯಂಕ_ಒಳ, (ಅಕ್ಷರ *)name);
 
-	if (key_names[i] != NULL)
+	ಆದರೆ (ಕೀಲಿ_ಹೆಸರುಗಳು[i] != ಖಾಲಿ)
 	{
-	    i = (code[7] == '=') ? 8 : 10;
-	    for (; (c = hexhex2nr(code + i)) >= 0; i += 2)
+	    i = (ಸಂಕೇತ_2[7] == '=') ? 8 : 10;
+	    ಗಾಗಿ (; (c = hexhex2nr(ಸಂಕೇತ_2 + i)) >= 0; i += 2)
 		str[j++] = c;
 	    str[j] = NUL;
-	    if (name[0] == 'C' && name[1] == 'o')
+	    ಆದರೆ (name[0] == 'C' && name[1] == 'o')
 	    {
 		// Color count is not a key code.
-		int val = atoi((char *)str);
-# if defined(FEAT_EVAL)
-		if (val == t_colors)
-		    ch_log(NULL, "got_code_from_term(Co): no change (%d)", val);
-		else
-		    ch_log(NULL,
+		ಪೂರ್ಣಾಂಕ val = atoi((ಅಕ್ಷರ *)str);
+# ಆದರೆ defined(FEAT_EVAL)
+		ಆದರೆ (val == t_colors)
+		    ch_log(ಖಾಲಿ, "got_code_from_term(Co): no change (%d)", val);
+		ಇಲ್ಲದಿದ್ದರೆ
+		    ch_log(ಖಾಲಿ,
 			       "got_code_from_term(Co): changed from %d to %d",
 								t_colors, val);
 # endif
-		may_adjust_color_count(val);
+		may_adjust_color_ಎಣಿಕೆ(val);
 	    }
-# if 0
+# ಆದರೆ 0
 #  ifdef FEAT_TERMGUICOLORS
 	    // when RGB result comes back, it is supported when the result contains an '='
-	    else if (name[0] == 'R' && name[1] == 'G' && name[2] == 'B' && code[9] == '=')
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (name[0] == 'R' && name[1] == 'G' && name[2] == 'B' && ಸಂಕೇತ_2[9] == '=')
 	    {
-		int val = atoi((char *)str);
+		ಪೂರ್ಣಾಂಕ val = atoi((ಅಕ್ಷರ *)str);
 		// only enable it, if termguicolors hasn't been set yet and
 		// there are 8 bits per color channel
-		if (val == 8 && !p_tgc_set)
+		ಆದರೆ (val == 8 && !p_tgc_ಗಣ)
 		{
 #   ifdef FEAT_EVAL
-		    ch_log(NULL, "got_code_from_term(RGB): xterm-direct colors detected");
+		    ch_log(ಖಾಲಿ, "got_code_from_term(RGB): xterm-direct colors detected");
 #   endif
 		    // RGB capability set, enable termguicolors
-		    set_option_value((char_u *)"termguicolors", 1L, NULL, 0);
+		    ಗಣ_option_ಮೌಲ್ಯ((char_u *)"termguicolors", 1L, ಖಾಲಿ, 0);
 		}
 	    }
 #  endif
 # endif
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		i = find_term_bykeys(str, NULL);
-		if (i >= 0 && name[0] == termcodes[i].name[0]
+		i = ಕಂಡುಹಿಡಿ_ಪದ_bykeys(str, ಖಾಲಿ);
+		ಆದರೆ (i >= 0 && name[0] == termcodes[i].name[0]
 					    && name[1] == termcodes[i].name[1])
 		{
 		    // Existing entry with the same name and code - skip.
 # ifdef FEAT_EVAL
-		    ch_log(NULL, "got_code_from_term(): Entry %c%c did not change",
+		    ch_log(ಖಾಲಿ, "got_code_from_term(): Entry %c%c did not change",
 							     name[0], name[1]);
 # endif
 		}
-		else if (i >= 0 && name[0] == 'K' && VIM_ISDIGIT(name[1]))
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (i >= 0 && name[0] == 'K' && VIM_ISDIGIT(name[1]))
 		{
 		    // Would replace existing entry with keypad key - skip.
 # ifdef FEAT_EVAL
-		    ch_log(NULL, "got_code_from_term(): Skipping entry %c%c in favor of %c%c with matching keys %s",
+		    ch_log(ಖಾಲಿ, "got_code_from_term(): Skipping entry %c%c in favor of %c%c with matching keys %s",
 			    name[0], name[1], termcodes[i].name[0], termcodes[i].name[1], str);
 # endif
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    if (i >= 0)
+		    ಆದರೆ (i >= 0)
 		    {
 			// Delete an existing entry using the same code.
 # ifdef FEAT_EVAL
-			ch_log(NULL, "got_code_from_term(): Deleting entry %c%c with matching keys %s",
+			ch_log(ಖಾಲಿ, "got_code_from_term(): Deleting entry %c%c with matching keys %s",
 			      termcodes[i].name[0], termcodes[i].name[1], str);
 # endif
 			del_termcode_idx(i);
 		    }
 # ifdef FEAT_EVAL
-		    else
-			ch_log(NULL, "got_code_from_term(): Adding entry %c%c with keys %s",
+		    ಇಲ್ಲದಿದ್ದರೆ
+			ch_log(ಖಾಲಿ, "got_code_from_term(): Adding entry %c%c with keys %s",
 							name[0], name[1], str);
 # endif
-		    add_termcode(name, str, ATC_FROM_TERM);
+		    ಕೂಡಿಸು_termcode(name, str, ATC_FROM_ಪದ);
 		}
 	    }
 	}
     }
 
     // May request more codes now that we received one.
-    ++xt_index_in;
-    req_more_codes_from_term();
+    ++xt_ಸೂಚ್ಯಂಕ_ಒಳ;
+    req_ಇನ್ನಷ್ಟು_codes_from_ಪದ();
 }
 
 /*
@@ -7806,68 +7806,68 @@ got_code_from_term(char_u *code, int len)
  * keyboard input.  We don't want responses to be send to that program or
  * handled as typed text.
  */
-    static void
-check_for_codes_from_term(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+check_for_codes_from_ಪದ(ಶೂನ್ಯ)
 {
-    int		c;
+    ಪೂರ್ಣಾಂಕ		c;
 
     // If no codes requested or all are answered, no need to wait.
-    if (xt_index_out == 0 || xt_index_out == xt_index_in)
-	return;
+    ಆದರೆ (xt_ಸೂಚ್ಯಂಕ_ಹೊರಹೋಗು == 0 || xt_ಸೂಚ್ಯಂಕ_ಹೊರಹೋಗು == xt_ಸೂಚ್ಯಂಕ_ಒಳ)
+	ಹಿಂತಿರುಗಿ;
 
     // Vgetc() will check for and handle any response.
     // Keep calling vpeekc() until we don't get any responses.
     ++no_mapping;
-    ++allow_keys;
-    for (;;)
+    ++allow_ಕೀಲಿಗಳು;
+    ಗಾಗಿ (;;)
     {
 	c = vpeekc();
-	if (c == NUL)	    // nothing available
-	    break;
+	ಆದರೆ (c == NUL)	    // nothing available
+	    ನಿಲ್ಲಿಸು;
 
 	// If a response is recognized it's replaced with K_IGNORE, must read
 	// it from the input stream.  If there is no K_IGNORE we can't do
 	// anything, break here (there might be some responses further on, but
 	// we don't want to throw away any typed chars).
-	if (c != K_SPECIAL && c != K_IGNORE)
-	    break;
+	ಆದರೆ (c != K_SPECIAL && c != K_IGNORE)
+	    ನಿಲ್ಲಿಸು;
 	c = vgetc();
-	if (c != K_IGNORE)
+	ಆದರೆ (c != K_IGNORE)
 	{
 	    vungetc(c);
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
     }
     --no_mapping;
-    --allow_keys;
+    --allow_ಕೀಲಿಗಳು;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
-static char ksme_str[20];
-static char ksmr_str[20];
-static char ksmd_str[20];
+#ಆದರೆ defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
+ಸ್ಥಿರ ಅಕ್ಷರ ksme_str[20];
+ಸ್ಥಿರ ಅಕ್ಷರ ksmr_str[20];
+ಸ್ಥಿರ ಅಕ್ಷರ ksmd_str[20];
 
 /*
  * For Win32 console: update termcap codes for existing console attributes.
  */
-    void
-update_tcap(int attr)
+    ಶೂನ್ಯ
+update_tcap(ಪೂರ್ಣಾಂಕ attr)
 {
     sprintf(ksme_str, "\033|%dm", attr);
     sprintf(ksmd_str, "\033|%dm", attr | 0x08);  // FOREGROUND_INTENSITY
     sprintf(ksmr_str, "\033|%dm", ((attr & 0x0F) << 4) | ((attr & 0xF0) >> 4));
 
-    tcap_entry_T *p = find_builtin_term(DEFAULT_TERM);
-    if (p == NULL)  // did not find it
-	return;
-    while (p->bt_string != NULL)
+    tcap_ನಮೂದು_T *p = ಕಂಡುಹಿಡಿ_builtin_ಪದ(DEFAULT_ಪದ);
+    ಆದರೆ (p == ಖಾಲಿ)  // did not find it
+	ಹಿಂತಿರುಗಿ;
+    ಆಗ (p->bt_string != ಖಾಲಿ)
     {
-	if (p->bt_entry == (int)KS_ME)
+	ಆದರೆ (p->bt_ನಮೂದು == (ಪೂರ್ಣಾಂಕ)KS_ME)
 	    p->bt_string = &ksme_str[0];
-	else if (p->bt_entry == (int)KS_MR)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p->bt_ನಮೂದು == (ಪೂರ್ಣಾಂಕ)KS_MR)
 	    p->bt_string = &ksmr_str[0];
-	else if (p->bt_entry == (int)KS_MD)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p->bt_ನಮೂದು == (ಪೂರ್ಣಾಂಕ)KS_MD)
 	    p->bt_string = &ksmd_str[0];
 	++p;
     }
@@ -7876,136 +7876,136 @@ update_tcap(int attr)
 # ifdef FEAT_TERMGUICOLORS
 #  define KSSIZE 20
 
-typedef enum
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ
 {
-    CMODE_INDEXED = 0,	// Use cmd.exe 4bit palette.
+    CMODE_ಸೂಚ್ಯಂಕಿತ = 0,	// Use cmd.exe 4bit palette.
     CMODE_RGB,		// Use 24bit RGB colors using VTP.
-    CMODE_256COL,	// Emulate xterm's 256-color palette using VTP.
-    CMODE_LAST,
+    CMODE_256_ಲಂಬಸಾಲು,	// Emulate xterm's 256-color palette using VTP.
+    CMODE_ಕೊನೆಯ,
 } cmode_T;
 
-struct ks_tbl_S
+ರಚನೆ ks_tbl_S
 {
-    int  code;				// value of KS_
-    char *vtp;				// code in RGB mode
-    char *vtp2;				// code in 256color mode
-    char buf[CMODE_LAST][KSSIZE];	// real buffer
+    ಪೂರ್ಣಾಂಕ  ಸಂಕೇತ_2;				// value of KS_
+    ಅಕ್ಷರ *vtp;				// code in RGB mode
+    ಅಕ್ಷರ *vtp2;				// code in 256color mode
+    ಅಕ್ಷರ buf[CMODE_ಕೊನೆಯ][KSSIZE];	// real buffer
 };
 
-static struct ks_tbl_S ks_tbl[] =
+ಸ್ಥಿರ ರಚನೆ ks_tbl_S ks_tbl[] =
 {
-    {(int)KS_ME,  "\033|0m",  "\033|0m", {""}},   // normal
-    {(int)KS_MR,  "\033|7m",  "\033|7m", {""}},   // reverse
-    {(int)KS_MD,  "\033|1m",  "\033|1m", {""}},   // bold
-    {(int)KS_SO,  "\033|91m", "\033|91m", {""}},  // standout: bright red text
-    {(int)KS_SE,  "\033|39m", "\033|39m", {""}},  // standout end: default color
-    {(int)KS_CZH, "\033|3m",  "\033|3m", {""}},   // italic
-    {(int)KS_CZR, "\033|0m",  "\033|0m", {""}},   // italic end
-    {(int)KS_US,  "\033|4m",  "\033|4m", {""}},   // underscore
-    {(int)KS_UE,  "\033|24m", "\033|24m", {""}},  // underscore end
+    {(ಪೂರ್ಣಾಂಕ)KS_ME,  "\033|0m",  "\033|0m", {""}},   //ಸಾಮಾನ್ಯ
+    {(ಪೂರ್ಣಾಂಕ)KS_MR,  "\033|7m",  "\033|7m", {""}},   //ಹಿಮ್ಮುಖ
+    {(ಪೂರ್ಣಾಂಕ)KS_MD,  "\033|1m",  "\033|1m", {""}},   // bold
+    {(ಪೂರ್ಣಾಂಕ)KS_SO,  "\033|91m", "\033|91m", {""}},  // standout: bright red text
+    {(ಪೂರ್ಣಾಂಕ)KS_SE,  "\033|39m", "\033|39m", {""}},  // standout end: default color
+    {(ಪೂರ್ಣಾಂಕ)KS_CZH, "\033|3m",  "\033|3m", {""}},   // italic
+    {(ಪೂರ್ಣಾಂಕ)KS_CZR, "\033|0m",  "\033|0m", {""}},   // italic end
+    {(ಪೂರ್ಣಾಂಕ)KS_US,  "\033|4m",  "\033|4m", {""}},   // underscore
+    {(ಪೂರ್ಣಾಂಕ)KS_UE,  "\033|24m", "\033|24m", {""}},  // underscore end
 #  ifdef TERMINFO
-    {(int)KS_CAB, "\033|%p1%db", "\033|%p14%dm", {""}}, // set background color
-    {(int)KS_CAF, "\033|%p1%df", "\033|%p13%dm", {""}}, // set foreground color
-    {(int)KS_CS,  "\033|%p1%d;%p2%dR", "\033|%p1%d;%p2%dR", {""}},
-    {(int)KS_CSV, "\033|%p1%d;%p2%dV", "\033|%p1%d;%p2%dV", {""}},
-#  else
-    {(int)KS_CAB, "\033|%db", "\033|4%dm", {""}}, // set background color
-    {(int)KS_CAF, "\033|%df", "\033|3%dm", {""}}, // set foreground color
-    {(int)KS_CS,  "\033|%d;%dR", "\033|%d;%dR", {""}},
-    {(int)KS_CSV, "\033|%d;%dV", "\033|%d;%dV", {""}},
+    {(ಪೂರ್ಣಾಂಕ)KS_CAB, "\033|%p1%db", "\033|%p14%dm", {""}}, // set background color
+    {(ಪೂರ್ಣಾಂಕ)KS_CAF, "\033|%p1%df", "\033|%p13%dm", {""}}, // set foreground color
+    {(ಪೂರ್ಣಾಂಕ)KS_CS,  "\033|%p1%d;%p2%dR", "\033|%p1%d;%p2%dR", {""}},
+    {(ಪೂರ್ಣಾಂಕ)KS_CSV, "\033|%p1%d;%p2%dV", "\033|%p1%d;%p2%dV", {""}},
+#  ಇಲ್ಲದಿದ್ದರೆ
+    {(ಪೂರ್ಣಾಂಕ)KS_CAB, "\033|%db", "\033|4%dm", {""}}, // set background color
+    {(ಪೂರ್ಣಾಂಕ)KS_CAF, "\033|%df", "\033|3%dm", {""}}, // set foreground color
+    {(ಪೂರ್ಣಾಂಕ)KS_CS,  "\033|%d;%dR", "\033|%d;%dR", {""}},
+    {(ಪೂರ್ಣಾಂಕ)KS_CSV, "\033|%d;%dV", "\033|%d;%dV", {""}},
 #  endif
-    {(int)KS_CCO, "256", "256", {""}},	    // colors
-    {(int)KS_NAME, NULL, NULL, {""}}			    // terminator
+    {(ಪೂರ್ಣಾಂಕ)KS_CCO, "256", "256", {""}},	    // colors
+    {(ಪೂರ್ಣಾಂಕ)KS_NAME, ಖಾಲಿ, ಖಾಲಿ, {""}}			    // terminator
 };
 
 /*
  * Find the first entry for "code" in the builtin termcap for "name".
  * Returns NULL when not found.
  */
-    static tcap_entry_T *
-find_first_tcap(
+    ಸ್ಥಿರ tcap_ನಮೂದು_T *
+ಕಂಡುಹಿಡಿ_ಮೊದಲ_tcap(
     char_u *name,
-    int	    code)
+    ಪೂರ್ಣಾಂಕ	    ಸಂಕೇತ_2)
 {
-    tcap_entry_T *p = find_builtin_term(name);
-    if (p == NULL)
-	return NULL;
-    while (p->bt_string != NULL)
+    tcap_ನಮೂದು_T *p = ಕಂಡುಹಿಡಿ_builtin_ಪದ(name);
+    ಆದರೆ (p == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    ಆಗ (p->bt_string != ಖಾಲಿ)
     {
-	if (p->bt_entry == code)
-	    return p;
+	ಆದರೆ (p->bt_ನಮೂದು == ಸಂಕೇತ_2)
+	    ಹಿಂತಿರುಗಿ p;
 	++p;
     }
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 # endif
 
 /*
  * For Win32 console: replace the sequence immediately after termguicolors.
  */
-    void
-swap_tcap(void)
+    ಶೂನ್ಯ
+ಅದಲುಬದಲು_tcap(ಶೂನ್ಯ)
 {
 # ifdef FEAT_TERMGUICOLORS
-    static int		init_done = FALSE;
-    static cmode_T	curr_mode;
-    struct ks_tbl_S	*ks;
-    cmode_T		mode;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ		init_ಮುಗಿದ_2 = FALSE;
+    ಸ್ಥಿರ cmode_T	curr_ಬಹುಲಕ;
+    ರಚನೆ ks_tbl_S	*ks;
+    cmode_T		ಬಹುಲಕ;
 
-    if (!init_done)
+    ಆದರೆ (!init_ಮುಗಿದ_2)
     {
-	for (ks = ks_tbl; ks->code != (int)KS_NAME; ks++)
+	ಗಾಗಿ (ks = ks_tbl; ks->ಸಂಕೇತ_2 != (ಪೂರ್ಣಾಂಕ)KS_NAME; ks++)
 	{
-	    tcap_entry_T *bt = find_first_tcap(DEFAULT_TERM, ks->code);
-	    if (bt != NULL)
+	    tcap_ನಮೂದು_T *bt = ಕಂಡುಹಿಡಿ_ಮೊದಲ_tcap(DEFAULT_ಪದ, ks->ಸಂಕೇತ_2);
+	    ಆದರೆ (bt != ಖಾಲಿ)
 	    {
 		// Preserve the original value.
-		STRNCPY(ks->buf[CMODE_INDEXED], bt->bt_string, KSSIZE);
+		STRNCPY(ks->buf[CMODE_ಸೂಚ್ಯಂಕಿತ], bt->bt_string, KSSIZE);
 		STRNCPY(ks->buf[CMODE_RGB], ks->vtp, KSSIZE);
-		STRNCPY(ks->buf[CMODE_256COL], ks->vtp2, KSSIZE);
+		STRNCPY(ks->buf[CMODE_256_ಲಂಬಸಾಲು], ks->vtp2, KSSIZE);
 
-		bt->bt_string = ks->buf[CMODE_INDEXED];
+		bt->bt_string = ks->buf[CMODE_ಸೂಚ್ಯಂಕಿತ];
 	    }
 	}
-	init_done = TRUE;
-	curr_mode = CMODE_INDEXED;
+	init_ಮುಗಿದ_2 = TRUE;
+	curr_ಬಹುಲಕ = CMODE_ಸೂಚ್ಯಂಕಿತ;
     }
 
-    if (p_tgc)
-	mode = CMODE_RGB;
-    else if (t_colors >= 256)
-	mode = CMODE_256COL;
-    else
-	mode = CMODE_INDEXED;
+    ಆದರೆ (p_tgc)
+	ಬಹುಲಕ = CMODE_RGB;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (t_colors >= 256)
+	ಬಹುಲಕ = CMODE_256_ಲಂಬಸಾಲು;
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಬಹುಲಕ = CMODE_ಸೂಚ್ಯಂಕಿತ;
 
-    if (mode == curr_mode)
-	return;
+    ಆದರೆ (ಬಹುಲಕ == curr_ಬಹುಲಕ)
+	ಹಿಂತಿರುಗಿ;
 
-    for (ks = ks_tbl; ks->code != (int)KS_NAME; ks++)
+    ಗಾಗಿ (ks = ks_tbl; ks->ಸಂಕೇತ_2 != (ಪೂರ್ಣಾಂಕ)KS_NAME; ks++)
     {
-	tcap_entry_T *bt = find_first_tcap(DEFAULT_TERM, ks->code);
-	if (bt != NULL)
-	    bt->bt_string = ks->buf[mode];
+	tcap_ನಮೂದು_T *bt = ಕಂಡುಹಿಡಿ_ಮೊದಲ_tcap(DEFAULT_ಪದ, ks->ಸಂಕೇತ_2);
+	ಆದರೆ (bt != ಖಾಲಿ)
+	    bt->bt_string = ks->buf[ಬಹುಲಕ];
     }
 
-    curr_mode = mode;
+    curr_ಬಹುಲಕ = ಬಹುಲಕ;
 # endif
 }
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 
-#if (defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))) || defined(FEAT_TERMINAL)
-static const int cube_value[] = {
+#ಆದರೆ (defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))) || defined(FEAT_TERMINAL)
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ cube_ಮೌಲ್ಯ[] = {
     0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF
 };
 
-static const int grey_ramp[] = {
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ grey_ramp[] = {
     0x08, 0x12, 0x1C, 0x26, 0x30, 0x3A, 0x44, 0x4E, 0x58, 0x62, 0x6C, 0x76,
     0x80, 0x8A, 0x94, 0x9E, 0xA8, 0xB2, 0xBC, 0xC6, 0xD0, 0xDA, 0xE4, 0xEE
 };
 
-static const char_u ansi_table[16][3] = {
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ char_u ansi_ಕೋಷ್ಟಕ[16][3] = {
 //   R    G    B
   {  0,   0,   0}, // black
   {224,   0,   0}, // dark red
@@ -8026,144 +8026,144 @@ static const char_u ansi_table[16][3] = {
   {255, 255, 255}, // white
 };
 
-# if defined(MSWIN)
+# ಆದರೆ defined(MSWIN)
 // Mapping between cterm indices < 16 and their counterpart in the ANSI palette.
-const char_u cterm_ansi_idx[] = {
+ಸ್ಥಿರಾಂಕ char_u cterm_ansi_idx[] = {
     0, 4, 2, 6, 1, 5, 3, 7, 8, 12, 10, 14, 9, 13, 11, 15
 };
 # endif
 
-# define ANSI_INDEX_NONE 0
+# define ANSI_ಸೂಚ್ಯಂಕ_NONE 0
 
-    void
-ansi_color2rgb(int nr, char_u *r, char_u *g, char_u *b, char_u *ansi_idx)
+    ಶೂನ್ಯ
+ansi_color2rgb(ಪೂರ್ಣಾಂಕ nr, char_u *r, char_u *g, char_u *b, char_u *ansi_idx)
 {
-    if (nr < 16)
+    ಆದರೆ (nr < 16)
     {
-	*r = ansi_table[nr][0];
-	*g = ansi_table[nr][1];
-	*b = ansi_table[nr][2];
+	*r = ansi_ಕೋಷ್ಟಕ[nr][0];
+	*g = ansi_ಕೋಷ್ಟಕ[nr][1];
+	*b = ansi_ಕೋಷ್ಟಕ[nr][2];
 	*ansi_idx = nr + 1;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	*r = 0;
 	*g = 0;
 	*b = 0;
-	*ansi_idx = ANSI_INDEX_NONE;
+	*ansi_idx = ANSI_ಸೂಚ್ಯಂಕ_NONE;
     }
 }
 
-    void
-cterm_color2rgb(int nr, char_u *r, char_u *g, char_u *b, char_u *ansi_idx)
+    ಶೂನ್ಯ
+cterm_color2rgb(ಪೂರ್ಣಾಂಕ nr, char_u *r, char_u *g, char_u *b, char_u *ansi_idx)
 {
-    int idx;
+    ಪೂರ್ಣಾಂಕ idx;
 
-    if (nr < 16)
+    ಆದರೆ (nr < 16)
     {
-# if defined(MSWIN)
+# ಆದರೆ defined(MSWIN)
 	idx = cterm_ansi_idx[nr];
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 	idx = nr;
 # endif
-	*r = ansi_table[idx][0];
-	*g = ansi_table[idx][1];
-	*b = ansi_table[idx][2];
+	*r = ansi_ಕೋಷ್ಟಕ[idx][0];
+	*g = ansi_ಕೋಷ್ಟಕ[idx][1];
+	*b = ansi_ಕೋಷ್ಟಕ[idx][2];
 	*ansi_idx = idx + 1;
     }
-    else if (nr < 232)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (nr < 232)
     {
 	// 216 color cube
 	idx = nr - 16;
-	*r = cube_value[idx / 36 % 6];
-	*g = cube_value[idx / 6  % 6];
-	*b = cube_value[idx      % 6];
-	*ansi_idx = ANSI_INDEX_NONE;
+	*r = cube_ಮೌಲ್ಯ[idx / 36 % 6];
+	*g = cube_ಮೌಲ್ಯ[idx / 6  % 6];
+	*b = cube_ಮೌಲ್ಯ[idx      % 6];
+	*ansi_idx = ANSI_ಸೂಚ್ಯಂಕ_NONE;
     }
-    else if (nr < 256)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (nr < 256)
     {
 	// 24 grey scale ramp
 	idx = nr - 232;
 	*r = grey_ramp[idx];
 	*g = grey_ramp[idx];
 	*b = grey_ramp[idx];
-	*ansi_idx = ANSI_INDEX_NONE;
+	*ansi_idx = ANSI_ಸೂಚ್ಯಂಕ_NONE;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	*r = 0;
 	*g = 0;
 	*b = 0;
-	*ansi_idx = ANSI_INDEX_NONE;
+	*ansi_idx = ANSI_ಸೂಚ್ಯಂಕ_NONE;
     }
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Replace K_BS by <BS> and K_DEL by <DEL>.
  * Include any modifiers into the key and drop them.
  * Returns "len" adjusted for replaced codes.
  */
-    int
-term_replace_keycodes(char_u *ta_buf, int ta_len, int len_arg)
+    ಪೂರ್ಣಾಂಕ
+ಪದ_replace_keycodes(char_u *ta_buf, ಪೂರ್ಣಾಂಕ ta_len, ಪೂರ್ಣಾಂಕ len_arg)
 {
-    int		len = len_arg;
-    int		i;
-    int		c;
+    ಪೂರ್ಣಾಂಕ		len = len_arg;
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		c;
 
-    for (i = ta_len; i < ta_len + len; ++i)
+    ಗಾಗಿ (i = ta_len; i < ta_len + len; ++i)
     {
-	if (ta_buf[i] == CSI && len - i > 3 && ta_buf[i + 1] == KS_MODIFIER)
+	ಆದರೆ (ta_buf[i] == CSI && len - i > 3 && ta_buf[i + 1] == KS_MODIFIER)
 	{
-	    int modifiers = ta_buf[i + 2];
-	    int key = ta_buf[i + 3];
+	    ಪೂರ್ಣಾಂಕ modifiers = ta_buf[i + 2];
+	    ಪೂರ್ಣಾಂಕ ಕೀಲಿ = ta_buf[i + 3];
 
 	    // Try to use the modifier to modify the key.  In any case drop the
 	    // modifier.
 	    mch_memmove(ta_buf + i + 1, ta_buf + i + 4, (size_t)(len - i - 3));
 	    len -= 3;
-	    if (key < 0x80)
-		key = merge_modifyOtherKeys(key, &modifiers);
-	    ta_buf[i] = key;
+	    ಆದರೆ (ಕೀಲಿ < 0x80)
+		ಕೀಲಿ = ವಿಲೀನ_modify_Other_ಕೀಲಿಗಳು(ಕೀಲಿ, &modifiers);
+	    ta_buf[i] = ಕೀಲಿ;
 	}
-	else if (ta_buf[i] == CSI && len - i > 2)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ta_buf[i] == CSI && len - i > 2)
 	{
-	    c = TERMCAP2KEY(ta_buf[i + 1], ta_buf[i + 2]);
-	    if (c == K_DEL || c == K_KDEL || c == K_BS)
+	    c = TERMCAP2_ಕೀಲಿ(ta_buf[i + 1], ta_buf[i + 2]);
+	    ಆದರೆ (c == K_DEL || c == K_KDEL || c == K_BS)
 	    {
 		mch_memmove(ta_buf + i + 1, ta_buf + i + 3,
 							(size_t)(len - i - 2));
-		if (c == K_DEL || c == K_KDEL)
+		ಆದರೆ (c == K_DEL || c == K_KDEL)
 		    ta_buf[i] = DEL;
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		    ta_buf[i] = Ctrl_H;
 		len -= 2;
 	    }
 	}
-	else if (ta_buf[i] == '\r')
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ta_buf[i] == '\r')
 	    ta_buf[i] = '\n';
-	if (has_mbyte)
+	ಆದರೆ (has_mbyte)
 	    i += (*mb_ptr2len_len)(ta_buf + i, ta_len + len - i) - 1;
     }
-    return len;
+    ಹಿಂತಿರುಗಿ len;
 }
 
 /*
  * Should be called when cleaning up terminal state.
  */
-    void
-term_disable_dec(void)
+    ಶೂನ್ಯ
+ಪದ_disable_dec(ಶೂನ್ಯ)
 {
-    term_set_sync_output(TERM_SYNC_OUTPUT_OFF);
-#ifdef UNIX
-    term_set_win_resize(false);
-#endif
+    ಪದ_ಗಣ_sync_output(ಪದ_SYNC_OUTPUT_OFF);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
+    ಪದ_ಗಣ_win_resize(false);
+#ಆದರೆ_ಅಂತ್ಯ
     // Make sure to always flush the output buffer, because this may be called
     // before starting the GUI
-    out_flush();
+    ಹೊರಹೋಗು_flush();
 }
 
-#ifdef UNIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
 /*
  * Enable or disable receiving in-band window resize events from the terminal.
  * If "state" is true, then if the terminal supports DEC mode 2048 and
@@ -8171,49 +8171,49 @@ term_disable_dec(void)
  * signal handling. Otherwise disable the mode if it is enabled and reinstall
  * the SIGWINCH handler.
  */
-    void
-term_set_win_resize(bool state)
+    ಶೂನ್ಯ
+ಪದ_ಗಣ_win_resize(bool state)
 {
 # ifdef FEAT_GUI
-    bool    in_gui = gui.in_use;
+    bool    ಒಳ_gui = gui.ಒಳ_use;
 
-    if (state && in_gui)
-	return;
+    ಆದರೆ (state && ಒಳ_gui)
+	ಹಿಂತಿರುಗಿ;
 # endif
 
-    if (!state || win_resize_setting == 0 || win_resize_setting == 4)
+    ಆದರೆ (!state || win_resize_setting == 0 || win_resize_setting == 4)
     {
 	// Make sure it update internal window size if DEC mode 2048 is
 	// unavailable now.
-	if (win_resize_enabled)
+	ಆದರೆ (win_resize_enabled)
 	{
-	    set_shellsize(0, 0, false);
-	    set_sigwinch_handler();
-	    out_str((char_u *)"\033[?2048l");
+	    ಗಣ_shellsize(0, 0, false);
+	    ಗಣ_sigwinch_handler();
+	    ಹೊರಹೋಗು_str((char_u *)"\033[?2048l");
 	}
 	win_resize_enabled = false;
     }
-    else if ((*p_trz == NUL || STRCMP(p_trz, "inband") == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((*p_trz == NUL || STRCMP(p_trz, "inband") == 0)
 	    && !win_resize_enabled)
     {
-	if (win_resize_setting == 2)
-	    out_str((char_u *)"\033[?2048h");
+	ಆದರೆ (win_resize_setting == 2)
+	    ಹೊರಹೋಗು_str((char_u *)"\033[?2048h");
 # ifdef SIGWINCH
 	mch_signal(SIGWINCH, SIG_DFL);
 # endif
 	win_resize_enabled = true;
     }
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    int
-sync_output_active(void)
+    ಪೂರ್ಣಾಂಕ
+sync_output_ಸಕ್ರಿಯ(ಶೂನ್ಯ)
 {
-#ifdef FEAT_GUI
-    if (gui.in_use)
-	return TRUE;
-#endif
-    return p_tsy && (sync_output_setting == 1 || sync_output_setting == 2)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+    ಆದರೆ (gui.ಒಳ_use)
+	ಹಿಂತಿರುಗಿ TRUE;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ p_tsy && (sync_output_setting == 1 || sync_output_setting == 2)
 	&& *T_BSU != NUL && *T_ESU != NUL;
 }
 
@@ -8230,68 +8230,68 @@ sync_output_active(void)
  * As long as out_flush() is done at those boundaries, putting BSU/ESU in
  * out_buf reduces small writes without changing the observable protocol.
  */
-    void
-term_set_sync_output(int flags)
+    ಶೂನ್ಯ
+ಪದ_ಗಣ_sync_output(ಪೂರ್ಣಾಂಕ flags)
 {
     bool    allowed;
-#ifdef FEAT_GUI
-    bool    in_gui = gui.in_use;
-#else
-    bool    in_gui = false;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+    bool    ಒಳ_gui = gui.ಒಳ_use;
+#ಇಲ್ಲದಿದ್ದರೆ
+    bool    ಒಳ_gui = false;
+#ಆದರೆ_ಅಂತ್ಯ
 
     allowed = p_tsy && (sync_output_setting == 1 || sync_output_setting == 2);
 
-    if (flags & TERM_SYNC_OUTPUT_FLUSH)
+    ಆದರೆ (flags & ಪದ_SYNC_OUTPUT_FLUSH)
     {
 	// Tell terminal to display screen contents, then resume batching.
-	if (allowed && !in_gui && sync_output_state > 0 && *T_ESU != NUL &&
+	ಆದರೆ (allowed && !ಒಳ_gui && sync_output_state > 0 && *T_ESU != NUL &&
 		*T_BSU != NUL)
 	{
-	    out_str_nf(T_ESU);
-	    out_str_nf(T_BSU);
-	    out_flush();
+	    ಹೊರಹೋಗು_str_nf(T_ESU);
+	    ಹೊರಹೋಗು_str_nf(T_BSU);
+	    ಹೊರಹೋಗು_flush();
 	}
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
     // Forcibly turn off synchronized output (e.g. 'notermsync')
-    if (flags & TERM_SYNC_OUTPUT_OFF)
+    ಆದರೆ (flags & ಪದ_SYNC_OUTPUT_OFF)
     {
-	if (sync_output_state > 0 && *T_ESU != NUL)
+	ಆದರೆ (sync_output_state > 0 && *T_ESU != NUL)
 	{
-	    out_str_nf(T_ESU);
-	    out_flush();
+	    ಹೊರಹೋಗು_str_nf(T_ESU);
+	    ಹೊರಹೋಗು_flush();
 	    sync_output_state = 0;
 	}
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if (!allowed || in_gui || *T_BSU == NUL || *T_ESU == NUL)
-	return;
+    ಆದರೆ (!allowed || ಒಳ_gui || *T_BSU == NUL || *T_ESU == NUL)
+	ಹಿಂತಿರುಗಿ;
 
     // Only enable if we aren't already, and only disable if we have reached
     // zero.
-    if (flags & TERM_SYNC_OUTPUT_ENABLE)
+    ಆದರೆ (flags & ಪದ_SYNC_OUTPUT_ENABLE)
     {
-	if (sync_output_state++ > 0)
-	    return;
-	out_str_nf(T_BSU);
+	ಆದರೆ (sync_output_state++ > 0)
+	    ಹಿಂತಿರುಗಿ;
+	ಹೊರಹೋಗು_str_nf(T_BSU);
     }
-    else if (flags & TERM_SYNC_OUTPUT_DISABLE)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (flags & ಪದ_SYNC_OUTPUT_DISABLE)
     {
-	if (sync_output_state == 0 || --sync_output_state > 0)
-	    return;
+	ಆದರೆ (sync_output_state == 0 || --sync_output_state > 0)
+	    ಹಿಂತಿರುಗಿ;
 	// Flush the output buffer before ending the sync batch so that
 	// all drawing output is sent to the terminal within the
 	// BSU..ESU window.  Without this, the drawing data remaining in
 	// out_buf would be sent after ESU, outside the sync batch.
-	out_str_nf(T_ESU);
-	out_flush();
+	ಹೊರಹೋಗು_str_nf(T_ESU);
+	ಹೊರಹೋಗು_flush();
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	siemsg("Unknown sync output value %d", flags);
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 }

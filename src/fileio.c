@@ -11,70 +11,70 @@
  * fileio.c: read from and write to a file
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-#if defined(__TANDEM)
+#ಆದರೆ defined(__TANDEM)
 # include <limits.h>		// for SSIZE_MAX
-#endif
-#if (defined(UNIX) || defined(VMS)) && defined(FEAT_EVAL)
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ (defined(UNIX) || defined(VMS)) && defined(FEAT_EVAL)
 # include <pwd.h>
 # include <grp.h>
-#endif
-#if defined(VMS) && defined(HAVE_XOS_R_H)
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(VMS) && defined(HAVE_XOS_R_H)
 # include <x11/xos_r.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // Is there any system that doesn't have access()?
-#define USE_MCH_ACCESS
+#ವ್ಯಾಖ್ಯಾನಿಸು USE_MCH_ACCESS
 
 // Bitmask with 0x80 set in each byte of a long_u word, used to detect
 // non-ASCII bytes (high bit set) in multiple bytes at once.
-#define NONASCII_MASK (((long_u)-1 / 0xFF) * 0x80)
+#ವ್ಯಾಖ್ಯಾನಿಸು NONASCII_ಮುಖವಾಡ (((long_u)-1 / 0xFF) * 0x80)
 
-#if defined(__hpux) && !defined(HAVE_DIRFD)
+#ಆದರೆ defined(__hpux) && !defined(HAVE_DIRFD)
 # define dirfd(x) ((x)->__dd_fd)
 # define HAVE_DIRFD
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-static char_u *next_fenc(char_u **pp, int *alloced);
-#ifdef FEAT_EVAL
-static char_u *readfile_charconvert(char_u *fname, char_u *fenc, int *fdp);
-#endif
-#ifdef FEAT_CRYPT
-static char_u *check_for_cryptkey(char_u *cryptkey, char_u *ptr, long *sizep, off_T *filesizep, int newfile, char_u *fname, int *did_ask);
-#endif
-static linenr_T readfile_linenr(linenr_T linecnt, char_u *p, char_u *endp);
-static char_u *check_for_bom(char_u *p, long size, int *lenp, int flags);
+ಸ್ಥಿರ char_u *ಮುಂದಿನ_fenc(char_u **pp, ಪೂರ್ಣಾಂಕ *alloced);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+ಸ್ಥಿರ char_u *readfile_charconvert(char_u *fname, char_u *fenc, ಪೂರ್ಣಾಂಕ *fdp);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+ಸ್ಥಿರ char_u *check_for_cryptkey(char_u *cryptkey, char_u *ptr, ದೀರ್ಘ *sizep, off_T *filesizep, ಪೂರ್ಣಾಂಕ newfile, char_u *fname, ಪೂರ್ಣಾಂಕ *did_ask);
+#ಆದರೆ_ಅಂತ್ಯ
+ಸ್ಥಿರ linenr_T readfile_linenr(linenr_T linecnt, char_u *p, char_u *endp);
+ಸ್ಥಿರ char_u *check_for_bom(char_u *p, ದೀರ್ಘ ಗಾತ್ರ_2, ಪೂರ್ಣಾಂಕ *lenp, ಪೂರ್ಣಾಂಕ flags);
 
-#ifdef FEAT_EVAL
-static int readdirex_sort;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ readdirex_ವಿಂಗಡಿಸು;
+#ಆದರೆ_ಅಂತ್ಯ
 
-    void
+    ಶೂನ್ಯ
 filemess(
     buf_T	*buf,
     char_u	*name,
     char_u	*s,
-    int		attr)
+    ಪೂರ್ಣಾಂಕ		attr)
 {
-    int		msg_scroll_save;
-    int		prev_msg_col = msg_col;
+    ಪೂರ್ಣಾಂಕ		ಸಂದೇಶ_scroll_save;
+    ಪೂರ್ಣಾಂಕ		prev_ಸಂದೇಶ_ಲಂಬಸಾಲು = ಸಂದೇಶ_ಲಂಬಸಾಲು;
     size_t	len;
 
-    if (msg_silent != 0)
-	return;
-    msg_add_fname(buf, name);	    // put file name in IObuff with quotes
+    ಆದರೆ (ಸಂದೇಶ_silent != 0)
+	ಹಿಂತಿರುಗಿ;
+    ಸಂದೇಶ_ಕೂಡಿಸು_fname(buf, name);	    // put file name in IObuff with quotes
 
     // If it's extremely long, truncate it.
     len = STRLEN(IObuff);
-    if (len > IOSIZE - 100)
+    ಆದರೆ (len > IOSIZE - 100)
     {
 	len = IOSIZE - 100;
 	IObuff[len] = NUL;
     }
 
     // Avoid an over-long translation to cause trouble.
-    if (*s != NUL)
+    ಆದರೆ (*s != NUL)
 	STRNCPY(IObuff + len, s, 99);
 
     /*
@@ -82,21 +82,21 @@ filemess(
      * For further ones overwrite the previous one, reset msg_scroll before
      * calling filemess().
      */
-    msg_scroll_save = msg_scroll;
-    if (shortmess(SHM_OVERALL) && !exiting && p_verbose == 0)
-	msg_scroll = FALSE;
-    if (!msg_scroll)	// wait a bit when overwriting an error msg
+    ಸಂದೇಶ_scroll_save = ಸಂದೇಶ_scroll;
+    ಆದರೆ (shortmess(SHM_OVERALL) && !exiting && p_verbose == 0)
+	ಸಂದೇಶ_scroll = FALSE;
+    ಆದರೆ (!ಸಂದೇಶ_scroll)	// wait a bit when overwriting an error msg
 	check_for_delay(FALSE);
-    msg_start();
-    if (prev_msg_col != 0 && msg_col == 0)
-	msg_putchar('\r');  // overwrite any previous message.
-    msg_scroll = msg_scroll_save;
-    msg_scrolled_ign = TRUE;
+    ಸಂದೇಶ_ಆರಂಭ();
+    ಆದರೆ (prev_ಸಂದೇಶ_ಲಂಬಸಾಲು != 0 && ಸಂದೇಶ_ಲಂಬಸಾಲು == 0)
+	ಸಂದೇಶ_putchar('\r');  // overwrite any previous message.
+    ಸಂದೇಶ_scroll = ಸಂದೇಶ_scroll_save;
+    ಸಂದೇಶ_scrolled_ign = TRUE;
     // may truncate the message to avoid a hit-return prompt
-    msg_outtrans_attr(msg_may_trunc(FALSE, IObuff), attr);
-    msg_clr_eos();
-    out_flush();
-    msg_scrolled_ign = FALSE;
+    ಸಂದೇಶ_outtrans_attr(ಸಂದೇಶ_may_trunc(FALSE, IObuff), attr);
+    ಸಂದೇಶ_clr_eos();
+    ಹೊರಹೋಗು_flush();
+    ಸಂದೇಶ_scrolled_ign = FALSE;
 }
 
 /*
@@ -125,115 +125,115 @@ filemess(
  *
  * return FAIL for failure, NOTDONE for directory (failure), or OK
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 readfile(
     char_u	*fname,
     char_u	*sfname,
     linenr_T	from,
-    linenr_T	lines_to_skip,
-    linenr_T	lines_to_read,
+    linenr_T	ಸಾಲುಗಳು_ಗಮ್ಯ_skip,
+    linenr_T	ಸಾಲುಗಳು_ಗಮ್ಯ_read,
     exarg_T	*eap,			// can be NULL!
-    int		flags)
+    ಪೂರ್ಣಾಂಕ		flags)
 {
-    int		retval = FAIL;	// jump to "theend" instead of returning
-    int		fd = 0;
-    int		newfile = (flags & READ_NEW);
-    int		check_readonly;
-    int		filtering = (flags & READ_FILTER);
-    int		read_stdin = (flags & READ_STDIN);
-    int		read_buffer = (flags & READ_BUFFER);
-    int		read_fifo = (flags & READ_FIFO);
-    int		set_options = newfile || read_buffer
-					   || (eap != NULL && eap->read_edit);
+    ಪೂರ್ಣಾಂಕ		retval = FAIL;	// jump to "theend" instead of returning
+    ಪೂರ್ಣಾಂಕ		fd = 0;
+    ಪೂರ್ಣಾಂಕ		newfile = (flags & READ_NEW);
+    ಪೂರ್ಣಾಂಕ		check_readonly;
+    ಪೂರ್ಣಾಂಕ		filtering = (flags & READ_FILTER);
+    ಪೂರ್ಣಾಂಕ		read_stdin = (flags & READ_STDIN);
+    ಪೂರ್ಣಾಂಕ		read_ಬಫರ್ = (flags & READ_ಬಫರ್);
+    ಪೂರ್ಣಾಂಕ		read_fifo = (flags & READ_FIFO);
+    ಪೂರ್ಣಾಂಕ		ಗಣ_options = newfile || read_ಬಫರ್
+					   || (eap != ಖಾಲಿ && eap->read_edit);
     linenr_T	read_buf_lnum = 1;	// next line to read from curbuf
-    colnr_T	read_buf_col = 0;	// next char to read from this line
+    colnr_T	read_buf_ಲಂಬಸಾಲು = 0;	// next char to read from this line
     char_u	c;
     linenr_T	lnum = from;
-    char_u	*ptr = NULL;		// pointer into read buffer
-    char_u	*buffer = NULL;		// read buffer
-    char_u	*new_buffer = NULL;	// init to shut up gcc
-    char_u	*line_start = NULL;	// init to shut up gcc
-    int		wasempty;		// buffer was empty before reading
+    char_u	*ptr = ಖಾಲಿ;		// pointer into read buffer
+    char_u	*ಬಫರ್ = ಖಾಲಿ;		// read buffer
+    char_u	*new_ಬಫರ್ = ಖಾಲಿ;	// init to shut up gcc
+    char_u	*ಸಾಲು_ಆರಂಭ = ಖಾಲಿ;	// init to shut up gcc
+    ಪೂರ್ಣಾಂಕ		wasempty;		// buffer was empty before reading
     colnr_T	len;
-    long	size = 0;
+    ದೀರ್ಘ	ಗಾತ್ರ_2 = 0;
     char_u	*p;
     off_T	filesize = 0;
-    int		skip_read = FALSE;
-#ifdef FEAT_CRYPT
+    ಪೂರ್ಣಾಂಕ		skip_read = FALSE;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
     off_T       filesize_disk = 0;      // file size read from disk
-    off_T       filesize_count = 0;     // counter
-    char_u	*cryptkey = NULL;
-    int		did_ask_for_key = FALSE;
-#endif
-#ifdef FEAT_PERSISTENT_UNDO
+    off_T       filesize_ಎಣಿಕೆ = 0;     // counter
+    char_u	*cryptkey = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		did_ask_for_ಕೀಲಿ = FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PERSISTENT_UNDO
     context_sha256_T sha_ctx;
-    int		read_undo_file = FALSE;
-#endif
-    int		split = 0;		// number of split lines
-#define UNKNOWN	 0x0fffffff		// file size is unknown
+    ಪೂರ್ಣಾಂಕ		read_undo_file = FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಪೂರ್ಣಾಂಕ		ವಿಭಜಿಸು = 0;		// number of split lines
+#ವ್ಯಾಖ್ಯಾನಿಸು UNKNOWN	 0x0fffffff		// file size is unknown
     linenr_T	linecnt;
-    int		error = FALSE;		// errors encountered
-    int		ff_error = EOL_UNKNOWN; // file format with errors
-    long	linerest = 0;		// remaining chars in line
-#ifdef UNIX
-    int		perm = 0;
-    int		swap_mode = -1;		// protection bits for swap file
-#else
-    int		perm;
-#endif
-    int		fileformat = 0;		// end-of-line format
-    int		keep_fileformat = FALSE;
+    ಪೂರ್ಣಾಂಕ		error = FALSE;		// errors encountered
+    ಪೂರ್ಣಾಂಕ		ff_error = EOL_UNKNOWN; // file format with errors
+    ದೀರ್ಘ	linerest = 0;		// remaining chars in line
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
+    ಪೂರ್ಣಾಂಕ		perm = 0;
+    ಪೂರ್ಣಾಂಕ		ಅದಲುಬದಲು_ಬಹುಲಕ = -1;		// protection bits for swap file
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಪೂರ್ಣಾಂಕ		perm;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಪೂರ್ಣಾಂಕ		fileformat = 0;		// end-of-line format
+    ಪೂರ್ಣಾಂಕ		keep_fileformat = FALSE;
     stat_T	st;
-    int		file_readonly;
-    linenr_T	skip_count = 0;
-    linenr_T	read_count = 0;
-    int		msg_save = msg_scroll;
+    ಪೂರ್ಣಾಂಕ		file_readonly;
+    linenr_T	skip_ಎಣಿಕೆ = 0;
+    linenr_T	read_ಎಣಿಕೆ = 0;
+    ಪೂರ್ಣಾಂಕ		ಸಂದೇಶ_save = ಸಂದೇಶ_scroll;
     linenr_T	read_no_eol_lnum = 0;   // non-zero lnum when last line of
 					// last read was missing the eol
-    int		try_mac;
-    int		try_dos;
-    int		try_unix;
-    int		file_rewind = FALSE;
-    int		can_retry;
+    ಪೂರ್ಣಾಂಕ		try_mac;
+    ಪೂರ್ಣಾಂಕ		try_dos;
+    ಪೂರ್ಣಾಂಕ		try_unix;
+    ಪೂರ್ಣಾಂಕ		file_rewind = FALSE;
+    ಪೂರ್ಣಾಂಕ		can_retry;
     linenr_T	conv_error = 0;		// line nr with conversion error
     linenr_T	illegal_byte = 0;	// line nr with illegal byte
-    int		keep_dest_enc = FALSE;	// don't retry when char doesn't fit
+    ಪೂರ್ಣಾಂಕ		keep_dest_enc = FALSE;	// don't retry when char doesn't fit
 					// in destination encoding
-    int		bad_char_behavior = BAD_REPLACE;
+    ಪೂರ್ಣಾಂಕ		bad_char_behavior = BAD_REPLACE;
 					// BAD_KEEP, BAD_DROP or character to
 					// replace with
-    char_u	*tmpname = NULL;	// name of 'charconvert' output file
-    int		fio_flags = 0;
+    char_u	*tmpname = ಖಾಲಿ;	// name of 'charconvert' output file
+    ಪೂರ್ಣಾಂಕ		fio_flags = 0;
     char_u	*fenc;			// fileencoding to use
-    int		fenc_alloced;		// fenc_next is in allocated memory
-    char_u	*fenc_next = NULL;	// next item in 'fencs' or NULL
-    int		advance_fenc = FALSE;
-    long	real_size = 0;
-#ifdef USE_ICONV
+    ಪೂರ್ಣಾಂಕ		fenc_alloced;		// fenc_next is in allocated memory
+    char_u	*fenc_ಮುಂದಿನ = ಖಾಲಿ;	// next item in 'fencs' or NULL
+    ಪೂರ್ಣಾಂಕ		advance_fenc = FALSE;
+    ದೀರ್ಘ	real_ಗಾತ್ರ = 0;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_ICONV
     iconv_t	iconv_fd = (iconv_t)-1;	// descriptor for iconv() or -1
 # ifdef FEAT_EVAL
-    int		did_iconv = FALSE;	// TRUE when iconv() failed and trying
+    ಪೂರ್ಣಾಂಕ		did_iconv = FALSE;	// TRUE when iconv() failed and trying
 					// 'charconvert' next
 # endif
-#endif
-    int		converted = FALSE;	// TRUE if conversion done
-    int		notconverted = FALSE;	// TRUE if conversion wanted but it
+#ಆದರೆ_ಅಂತ್ಯ
+    ಪೂರ್ಣಾಂಕ		converted = FALSE;	// TRUE if conversion done
+    ಪೂರ್ಣಾಂಕ		notconverted = FALSE;	// TRUE if conversion wanted but it
 					// wasn't possible
     char_u	conv_rest[CONV_RESTLEN];
-    int		conv_restlen = 0;	// nr of bytes in conv_rest[]
-    pos_T	orig_start;
+    ಪೂರ್ಣಾಂಕ		conv_restlen = 0;	// nr of bytes in conv_rest[]
+    pos_T	orig_ಆರಂಭ;
     buf_T	*old_curbuf;
     char_u	*old_b_ffname;
     char_u	*old_b_fname;
-    int		using_b_ffname;
-    int		using_b_fname;
-    static char *msg_is_a_directory = N_("is a directory");
-#ifdef FEAT_CRYPT
-    int		eof = FALSE;
-#endif
-#ifdef FEAT_SODIUM
-    int		may_need_lseek = FALSE;
-#endif
+    ಪೂರ್ಣಾಂಕ		using_b_ffname;
+    ಪೂರ್ಣಾಂಕ		using_b_fname;
+    ಸ್ಥಿರ ಅಕ್ಷರ *ಸಂದೇಶ_is_a_directory = N_("is a directory");
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+    ಪೂರ್ಣಾಂಕ		eof = FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SODIUM
+    ಪೂರ್ಣಾಂಕ		may_need_lseek = FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
     size_t	fnamelen = 0;
 
     curbuf->b_au_did_filetype = false; // reset before triggering any autocommands
@@ -246,14 +246,14 @@ readfile(
      * Don't do this for a read from a filter.
      * Only do this when 'cpoptions' contains the 'f' flag.
      */
-    if (curbuf->b_ffname == NULL
+    ಆದರೆ (curbuf->b_ffname == ಖಾಲಿ
 	    && !filtering
-	    && fname != NULL
-	    && vim_strchr(p_cpo, CPO_FNAMER) != NULL
+	    && fname != ಖಾಲಿ
+	    && vim_strchr(p_cpo, CPO_FNAMER) != ಖಾಲಿ
 	    && !(flags & READ_DUMMY))
     {
-	if (set_rw_fname(fname, sfname) == FAIL)
-	    goto theend;
+	ಆದರೆ (ಗಣ_rw_fname(fname, sfname) == FAIL)
+	    ಹೋಗು theend;
     }
 
     // Remember the initial values of curbuf, curbuf->b_ffname and
@@ -280,105 +280,105 @@ readfile(
      * Don't do this for MS-DOS, a "cd" in a sub-shell may have moved us to
      * another directory, which we don't detect.
      */
-    if (sfname == NULL)
+    ಆದರೆ (sfname == ಖಾಲಿ)
 	sfname = fname;
-#if defined(UNIX)
+#ಆದರೆ defined(UNIX)
     fname = sfname;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     /*
      * The BufReadCmd and FileReadCmd events intercept the reading process by
      * executing the associated commands instead.
      */
-    if (!filtering && !read_stdin && !read_buffer)
+    ಆದರೆ (!filtering && !read_stdin && !read_ಬಫರ್)
     {
-	orig_start = curbuf->b_op_start;
+	orig_ಆರಂಭ = curbuf->b_op_ಆರಂಭ;
 
 	// Set '[ mark to the line above where the lines go (line 1 if zero).
-	curbuf->b_op_start.lnum = ((from == 0) ? 1 : from);
-	curbuf->b_op_start.col = 0;
+	curbuf->b_op_ಆರಂಭ.lnum = ((from == 0) ? 1 : from);
+	curbuf->b_op_ಆರಂಭ.ಲಂಬಸಾಲು = 0;
 
-	if (newfile)
+	ಆದರೆ (newfile)
 	{
-	    if (apply_autocmds_exarg(EVENT_BUFREADCMD, NULL, sfname,
+	    ಆದರೆ (apply_autocmds_exarg(EVENT_BUFREADCMD, ಖಾಲಿ, sfname,
 							  FALSE, curbuf, eap))
 	    {
 		retval = OK;
-#ifdef FEAT_EVAL
-		if (aborting())
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+		ಆದರೆ (aborting())
 		    retval = FAIL;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		// The BufReadCmd code usually uses ":read" to get the text and
 		// perhaps ":file" to change the buffer name. But we should
 		// consider this to work like ":edit", thus reset the
 		// BF_NOTEDITED flag.  Then ":write" will work to overwrite the
 		// same file.
-		if (retval == OK)
+		ಆದರೆ (retval == OK)
 		    curbuf->b_flags &= ~BF_NOTEDITED;
-		goto theend;
+		ಹೋಗು theend;
 	    }
 	}
-	else if (apply_autocmds_exarg(EVENT_FILEREADCMD, sfname, sfname,
-							    FALSE, NULL, eap))
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (apply_autocmds_exarg(EVENT_FILEREADCMD, sfname, sfname,
+							    FALSE, ಖಾಲಿ, eap))
 	{
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 	    retval = aborting() ? FAIL : OK;
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 	    retval = OK;
-#endif
-	    goto theend;
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಹೋಗು theend;
 	}
 
-	curbuf->b_op_start = orig_start;
+	curbuf->b_op_ಆರಂಭ = orig_ಆರಂಭ;
 
-	if (flags & READ_NOFILE)
+	ಆದರೆ (flags & READ_NOFILE)
 	{
 	    // Return NOTDONE instead of FAIL so that BufEnter can be triggered
 	    // and other operations don't fail.
 	    retval = NOTDONE;
-	    goto theend;
+	    ಹೋಗು theend;
 	}
     }
 
-    if ((shortmess(SHM_OVER) || curbuf->b_help) && p_verbose == 0)
-	msg_scroll = FALSE;	// overwrite previous file message
-    else
-	msg_scroll = TRUE;	// don't overwrite previous file message
+    ಆದರೆ ((shortmess(SHM_OVER) || curbuf->b_help) && p_verbose == 0)
+	ಸಂದೇಶ_scroll = FALSE;	// overwrite previous file message
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಸಂದೇಶ_scroll = TRUE;	// don't overwrite previous file message
 
-    if (fname != NULL && *fname != NUL)
+    ಆದರೆ (fname != ಖಾಲಿ && *fname != NUL)
     {
 	fnamelen = STRLEN(fname);
 
 	// If the name is too long we might crash further on, quit here.
-	if (fnamelen >= MAXPATHL)
+	ಆದರೆ (fnamelen >= MAXPATHL)
 	{
 	    filemess(curbuf, fname, (char_u *)_("Illegal file name"), 0);
-	    msg_end();
-	    msg_scroll = msg_save;
-	    goto theend;
+	    ಸಂದೇಶ_ಕೊನೆ();
+	    ಸಂದೇಶ_scroll = ಸಂದೇಶ_save;
+	    ಹೋಗು theend;
 	}
 
 	// If the name ends in a path separator, we can't open it.  Check here,
 	// because reading the file may actually work, but then creating the
 	// swap file may destroy it!  Reported on MS-DOS and Win 95.
-	if (after_pathsep(fname, fname + fnamelen))
+	ಆದರೆ (after_pathsep(fname, fname + fnamelen))
 	{
-	    filemess(curbuf, fname, (char_u *)_(msg_is_a_directory), 0);
-	    msg_end();
-	    msg_scroll = msg_save;
+	    filemess(curbuf, fname, (char_u *)_(ಸಂದೇಶ_is_a_directory), 0);
+	    ಸಂದೇಶ_ಕೊನೆ();
+	    ಸಂದೇಶ_scroll = ಸಂದೇಶ_save;
 	    retval = NOTDONE;
-	    goto theend;
+	    ಹೋಗು theend;
 	}
     }
-#if defined(UNIX) || defined(VMS)
-    if (!read_stdin && fname != NULL)
+#ಆದರೆ defined(UNIX) || defined(VMS)
+    ಆದರೆ (!read_stdin && fname != ಖಾಲಿ)
 	perm = mch_getperm(fname);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (!read_stdin && !read_buffer && !read_fifo)
+    ಆದರೆ (!read_stdin && !read_ಬಫರ್ && !read_fifo)
     {
-#if defined(UNIX) || defined(VMS)
-	if (perm >= 0 && !S_ISREG(perm)		    // not a regular file ...
+#ಆದರೆ defined(UNIX) || defined(VMS)
+	ಆದರೆ (perm >= 0 && !S_ISREG(perm)		    // not a regular file ...
 		      && !S_ISFIFO(perm)	    // ... or fifo
 		      && !S_ISSOCK(perm)	    // ... or socket
 # ifdef OPEN_CHR_FILES
@@ -391,35 +391,35 @@ readfile(
 	     * On Unix it is possible to read a directory, so we have to
 	     * check for it before the mch_open().
 	     */
-	    if (S_ISDIR(perm))
+	    ಆದರೆ (S_ISDIR(perm))
 	    {
-		filemess(curbuf, fname, (char_u *)_(msg_is_a_directory), 0);
+		filemess(curbuf, fname, (char_u *)_(ಸಂದೇಶ_is_a_directory), 0);
 		retval = NOTDONE;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		filemess(curbuf, fname, (char_u *)_("is not a file"), 0);
-	    msg_end();
-	    msg_scroll = msg_save;
-	    goto theend;
+	    ಸಂದೇಶ_ಕೊನೆ();
+	    ಸಂದೇಶ_scroll = ಸಂದೇಶ_save;
+	    ಹೋಗು theend;
 	}
-#endif
-#if defined(MSWIN)
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(MSWIN)
 	/*
 	 * MS-Windows allows opening a device, but we will probably get stuck
 	 * trying to read it.
 	 */
-	if (!p_odev && mch_nodetype(fname) == NODE_WRITABLE)
+	ಆದರೆ (!p_odev && mch_nodetype(fname) == ಗಂಟು_WRITABLE)
 	{
 	    filemess(curbuf, fname, (char_u *)_("is a device (disabled with 'opendevice' option)"), 0);
-	    msg_end();
-	    msg_scroll = msg_save;
-	    goto theend;
+	    ಸಂದೇಶ_ಕೊನೆ();
+	    ಸಂದೇಶ_scroll = ಸಂದೇಶ_save;
+	    ಹೋಗು theend;
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
     // Set default or forced 'fileformat' and 'binary'.
-    set_file_options(set_options, eap);
+    ಗಣ_file_options(ಗಣ_options, eap);
 
     /*
      * When opening a new file we take the readonly flag from the file.
@@ -428,21 +428,21 @@ readfile(
      * Only set/reset b_p_ro when BF_CHECK_RO is set.
      */
     check_readonly = (newfile && (curbuf->b_flags & BF_CHECK_RO));
-    if (check_readonly && !readonlymode)
+    ಆದರೆ (check_readonly && !readonlymode)
 	curbuf->b_p_ro = FALSE;
 
-    if (newfile && !read_stdin && !read_buffer && !read_fifo)
+    ಆದರೆ (newfile && !read_stdin && !read_ಬಫರ್ && !read_fifo)
     {
 	// Remember time of file.
-	if (mch_stat((char *)fname, &st) >= 0)
+	ಆದರೆ (mch_stat((ಅಕ್ಷರ *)fname, &st) >= 0)
 	{
-	    buf_store_time(curbuf, &st, fname);
+	    buf_store_ಸಮಯ(curbuf, &st, fname);
 	    curbuf->b_mtime_read = curbuf->b_mtime;
 	    curbuf->b_mtime_read_ns = curbuf->b_mtime_ns;
-#ifdef FEAT_CRYPT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
 	    filesize_disk = st.st_size;
-#endif
-#ifdef UNIX
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
 	    /*
 	     * Use the protection bits of the original file for the swap file.
 	     * This makes it possible for others to read the name of the
@@ -454,22 +454,22 @@ readfile(
 	     * not be able to write to the file ourselves.
 	     * Setting the bits is done below, after creating the swap file.
 	     */
-	    swap_mode = (st.st_mode & 0644) | 0600;
-#endif
-#ifdef VMS
+	    ಅದಲುಬದಲು_ಬಹುಲಕ = (st.st_ಬಹುಲಕ & 0644) | 0600;
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VMS
 	    curbuf->b_fab_rfm = st.st_fab_rfm;
 	    curbuf->b_fab_rat = st.st_fab_rat;
 	    curbuf->b_fab_mrs = st.st_fab_mrs;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    curbuf->b_mtime = 0;
 	    curbuf->b_mtime_ns = 0;
 	    curbuf->b_mtime_read = 0;
 	    curbuf->b_mtime_read_ns = 0;
-	    curbuf->b_orig_size = 0;
-	    curbuf->b_orig_mode = 0;
+	    curbuf->b_orig_ಗಾತ್ರ = 0;
+	    curbuf->b_orig_ಬಹುಲಕ = 0;
 	}
 
 	// Reset the "new file" flag.  It will be set again below when the
@@ -482,60 +482,60 @@ readfile(
  * for Amiga: check readonly by trying to open the file for writing
  */
     file_readonly = FALSE;
-    if (read_stdin)
+    ಆದರೆ (read_stdin)
     {
-#if defined(MSWIN)
+#ಆದರೆ defined(MSWIN)
 	// Force binary I/O on stdin to avoid CR-LF -> LF conversion.
-	setmode(0, O_BINARY);
-#endif
+	setmode(0, O_ದ್ವಿಮಾನ);
+#ಆದರೆ_ಅಂತ್ಯ
     }
-    else if (!read_buffer)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!read_ಬಫರ್)
     {
-#ifdef USE_MCH_ACCESS
-	if (
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_MCH_ACCESS
+	ಆದರೆ (
 # ifdef UNIX
 	    !(perm & 0222) ||
 # endif
-				mch_access((char *)fname, W_OK))
+				mch_access((ಅಕ್ಷರ *)fname, W_OK))
 	    file_readonly = TRUE;
-	fd = mch_open((char *)fname, O_RDONLY | O_EXTRA, 0);
-#else
-	if (!newfile
+	fd = mch_open((ಅಕ್ಷರ *)fname, O_RDONLY | O_EXTRA, 0);
+#ಇಲ್ಲದಿದ್ದರೆ
+	ಆದರೆ (!newfile
 		|| readonlymode
-		|| (fd = mch_open((char *)fname, O_RDWR | O_EXTRA, 0)) < 0)
+		|| (fd = mch_open((ಅಕ್ಷರ *)fname, O_RDWR | O_EXTRA, 0)) < 0)
 	{
 	    file_readonly = TRUE;
 	    // try to open ro
-	    fd = mch_open((char *)fname, O_RDONLY | O_EXTRA, 0);
+	    fd = mch_open((ಅಕ್ಷರ *)fname, O_RDONLY | O_EXTRA, 0);
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
-    if (fd < 0)			    // cannot open at all
+    ಆದರೆ (fd < 0)			    // cannot open at all
     {
-#ifndef UNIX
-	int	isdir_f;
-#endif
-	msg_scroll = msg_save;
-#ifndef UNIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ UNIX
+	ಪೂರ್ಣಾಂಕ	isdir_f;
+#ಆದರೆ_ಅಂತ್ಯ
+	ಸಂದೇಶ_scroll = ಸಂದೇಶ_save;
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ UNIX
 	/*
 	 * On Amiga we can't open a directory, check here.
 	 */
 	isdir_f = (mch_isdir(fname));
 	perm = mch_getperm(fname);  // check if the file exists
-	if (isdir_f)
+	ಆದರೆ (isdir_f)
 	{
-	    filemess(curbuf, sfname, (char_u *)_(msg_is_a_directory), 0);
+	    filemess(curbuf, sfname, (char_u *)_(ಸಂದೇಶ_is_a_directory), 0);
 	    curbuf->b_p_ro = TRUE;	// must use "w!" now
 	}
-	else
-#endif
-	    if (newfile)
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಆದರೆ (newfile)
 	    {
-		if (perm < 0
-#ifdef ENOENT
+		ಆದರೆ (perm < 0
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ENOENT
 			&& errno == ENOENT
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		   )
 		{
 		    /*
@@ -547,105 +547,105 @@ readfile(
 		    // Create a swap file now, so that other Vims are warned
 		    // that we are editing this file.  Don't do this for a
 		    // "nofile" or "nowrite" buffer type.
-		    if (!bt_dontwrite(curbuf))
+		    ಆದರೆ (!bt_dontwrite(curbuf))
 		    {
-			check_need_swap(newfile);
+			check_need_ಅದಲುಬದಲು(newfile);
 			// SwapExists autocommand may mess things up
-			if (curbuf != old_curbuf
+			ಆದರೆ (curbuf != old_curbuf
 				|| (using_b_ffname
 					&& (old_b_ffname != curbuf->b_ffname))
 				|| (using_b_fname
 					 && (old_b_fname != curbuf->b_fname)))
 			{
-			    emsg(_(e_autocommands_changed_buffer_or_buffer_name));
-			    goto theend;
+			    emsg(_(e_autocommands_ಬದಲಾಯಿತು_ಬಫರ್_or_ಬಫರ್_name));
+			    ಹೋಗು theend;
 			}
 		    }
-		    if (dir_of_file_exists(fname))
+		    ಆದರೆ (dir_ದ_file_exists(fname))
 			filemess(curbuf, sfname,
-					      (char_u *)new_file_message(), 0);
-		    else
+					      (char_u *)new_file_ಸಂದೇಶ(), 0);
+		    ಇಲ್ಲದಿದ್ದರೆ
 			filemess(curbuf, sfname,
 					   (char_u *)_("[New DIRECTORY]"), 0);
-#ifdef FEAT_VIMINFO
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VIMINFO
 		    // Even though this is a new file, it might have been
 		    // edited before and deleted.  Get the old marks.
 		    check_marks_read();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		    // Set forced 'fileencoding'.
-		    if (eap != NULL)
-			set_forced_fenc(eap);
+		    ಆದರೆ (eap != ಖಾಲಿ)
+			ಗಣ_forced_fenc(eap);
 		    apply_autocmds_exarg(EVENT_BUFNEWFILE, sfname, sfname,
 							  FALSE, curbuf, eap);
 		    // remember the current fileformat
 		    save_file_ff(curbuf);
 
-#if defined(FEAT_EVAL)
-		    if (!aborting())   // autocmds may abort script processing
-#endif
+#ಆದರೆ defined(FEAT_EVAL)
+		    ಆದರೆ (!aborting())   // autocmds may abort script processing
+#ಆದರೆ_ಅಂತ್ಯ
 			retval = OK;	    // a new file is not an error
-		    goto theend;
+		    ಹೋಗು theend;
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    filemess(curbuf, sfname, (char_u *)(
-#ifdef EFBIG
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ EFBIG
 			    (errno == EFBIG) ? _("[File too big]") :
-#endif
-#ifdef EOVERFLOW
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ EOVERFLOW
 			    (errno == EOVERFLOW) ? _("[File too big]") :
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 						_("[Permission Denied]")), 0);
 		    curbuf->b_p_ro = TRUE;	// must use "w!" now
 		}
 	    }
 
-	goto theend;
+	ಹೋಗು theend;
     }
 
     /*
      * Only set the 'ro' flag for readonly files the first time they are
      * loaded.	Help files always get readonly mode
      */
-    if ((check_readonly && file_readonly) || curbuf->b_help)
+    ಆದರೆ ((check_readonly && file_readonly) || curbuf->b_help)
 	curbuf->b_p_ro = TRUE;
 
-    if (set_options)
+    ಆದರೆ (ಗಣ_options)
     {
 	// Don't change 'eol' if reading from buffer as it will already be
 	// correctly set when reading stdin.
-	if (!read_buffer)
+	ಆದರೆ (!read_ಬಫರ್)
 	{
 	    curbuf->b_p_eof = FALSE;
-	    curbuf->b_start_eof = FALSE;
+	    curbuf->b_ಆರಂಭ_eof = FALSE;
 	    curbuf->b_p_eol = TRUE;
-	    curbuf->b_start_eol = TRUE;
+	    curbuf->b_ಆರಂಭ_eol = TRUE;
 	}
 	curbuf->b_p_bomb = FALSE;
-	curbuf->b_start_bomb = FALSE;
+	curbuf->b_ಆರಂಭ_bomb = FALSE;
     }
 
     // Create a swap file now, so that other Vims are warned that we are
     // editing this file.
     // Don't do this for a "nofile" or "nowrite" buffer type.
-    if (!bt_dontwrite(curbuf))
+    ಆದರೆ (!bt_dontwrite(curbuf))
     {
-	check_need_swap(newfile);
-	if (!read_stdin && (curbuf != old_curbuf
+	check_need_ಅದಲುಬದಲು(newfile);
+	ಆದರೆ (!read_stdin && (curbuf != old_curbuf
 		|| (using_b_ffname && (old_b_ffname != curbuf->b_ffname))
 		|| (using_b_fname && (old_b_fname != curbuf->b_fname))))
 	{
-	    emsg(_(e_autocommands_changed_buffer_or_buffer_name));
-	    if (!read_buffer)
+	    emsg(_(e_autocommands_ಬದಲಾಯಿತು_ಬಫರ್_or_ಬಫರ್_name));
+	    ಆದರೆ (!read_ಬಫರ್)
 		close(fd);
-	    goto theend;
+	    ಹೋಗು theend;
 	}
-#ifdef UNIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
 	// Set swap file protection bits after creating it.
-	if (swap_mode > 0 && curbuf->b_ml.ml_mfp != NULL
-			  && curbuf->b_ml.ml_mfp->mf_fname != NULL)
+	ಆದರೆ (ಅದಲುಬದಲು_ಬಹುಲಕ > 0 && curbuf->b_ml.ml_mfp != ಖಾಲಿ
+			  && curbuf->b_ml.ml_mfp->mf_fname != ಖಾಲಿ)
 	{
-	    char_u *swap_fname = curbuf->b_ml.ml_mfp->mf_fname;
+	    char_u *ಅದಲುಬದಲು_fname = curbuf->b_ml.ml_mfp->mf_fname;
 
 	    /*
 	     * If the group-read bit is set but not the world-read bit, then
@@ -654,31 +654,31 @@ readfile(
 	     * avoids making the swap file readable to more users when the
 	     * primary group of the user is too permissive.
 	     */
-	    if ((swap_mode & 044) == 040)
+	    ಆದರೆ ((ಅದಲುಬದಲು_ಬಹುಲಕ & 044) == 040)
 	    {
-		stat_T	swap_st;
+		stat_T	ಅದಲುಬದಲು_st;
 
-		if (mch_stat((char *)swap_fname, &swap_st) >= 0
-			&& st.st_gid != swap_st.st_gid
+		ಆದರೆ (mch_stat((ಅಕ್ಷರ *)ಅದಲುಬದಲು_fname, &ಅದಲುಬದಲು_st) >= 0
+			&& st.st_gid != ಅದಲುಬದಲು_st.st_gid
 # ifdef HAVE_FCHOWN
 			&& fchown(curbuf->b_ml.ml_mfp->mf_fd, -1, st.st_gid)
 									  == -1
 # endif
 		   )
-		    swap_mode &= 0600;
+		    ಅದಲುಬದಲು_ಬಹುಲಕ &= 0600;
 	    }
 
-	    (void)mch_setperm(swap_fname, (long)swap_mode);
+	    (ಶೂನ್ಯ)mch_setperm(ಅದಲುಬದಲು_fname, (ದೀರ್ಘ)ಅದಲುಬದಲು_ಬಹುಲಕ);
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
     // If "Quit" selected at ATTENTION dialog, don't load the file
-    if (swap_exists_action == SEA_QUIT)
+    ಆದರೆ (ಅದಲುಬದಲು_exists_action == SEA_QUIT)
     {
-	if (!read_buffer && !read_stdin)
+	ಆದರೆ (!read_ಬಫರ್ && !read_stdin)
 	    close(fd);
-	goto theend;
+	ಹೋಗು theend;
     }
 
     ++no_wait_return;	    // don't wait for return yet
@@ -686,24 +686,24 @@ readfile(
     /*
      * Set '[ mark to the line above where the lines go (line 1 if zero).
      */
-    orig_start = curbuf->b_op_start;
-    curbuf->b_op_start.lnum = ((from == 0) ? 1 : from);
-    curbuf->b_op_start.col = 0;
+    orig_ಆರಂಭ = curbuf->b_op_ಆರಂಭ;
+    curbuf->b_op_ಆರಂಭ.lnum = ((from == 0) ? 1 : from);
+    curbuf->b_op_ಆರಂಭ.ಲಂಬಸಾಲು = 0;
 
-    try_mac = (vim_strchr(p_ffs, 'm') != NULL);
-    try_dos = (vim_strchr(p_ffs, 'd') != NULL);
-    try_unix = (vim_strchr(p_ffs, 'x') != NULL);
+    try_mac = (vim_strchr(p_ffs, 'm') != ಖಾಲಿ);
+    try_dos = (vim_strchr(p_ffs, 'd') != ಖಾಲಿ);
+    try_unix = (vim_strchr(p_ffs, 'x') != ಖಾಲಿ);
 
-    if (!read_buffer)
+    ಆದರೆ (!read_ಬಫರ್)
     {
-	int	m = msg_scroll;
-	int	n = msg_scrolled;
+	ಪೂರ್ಣಾಂಕ	m = ಸಂದೇಶ_scroll;
+	ಪೂರ್ಣಾಂಕ	n = ಸಂದೇಶ_scrolled;
 
 	/*
 	 * The file must be closed again, the autocommands may want to change
 	 * the file before reading it.
 	 */
-	if (!read_stdin)
+	ಆದರೆ (!read_stdin)
 	    close(fd);		// ignore errors
 
 	/*
@@ -711,37 +711,37 @@ readfile(
 	 * should not be overwritten: Set msg_scroll, restore its value if no
 	 * output was done.
 	 */
-	msg_scroll = TRUE;
-	if (filtering)
-	    apply_autocmds_exarg(EVENT_FILTERREADPRE, NULL, sfname,
+	ಸಂದೇಶ_scroll = TRUE;
+	ಆದರೆ (filtering)
+	    apply_autocmds_exarg(EVENT_FILTERREADPRE, ಖಾಲಿ, sfname,
 							  FALSE, curbuf, eap);
-	else if (read_stdin)
-	    apply_autocmds_exarg(EVENT_STDINREADPRE, NULL, sfname,
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (read_stdin)
+	    apply_autocmds_exarg(EVENT_STDINREADPRE, ಖಾಲಿ, sfname,
 							  FALSE, curbuf, eap);
-	else if (newfile)
-	    apply_autocmds_exarg(EVENT_BUFREADPRE, NULL, sfname,
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (newfile)
+	    apply_autocmds_exarg(EVENT_BUFREADPRE, ಖಾಲಿ, sfname,
 							  FALSE, curbuf, eap);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    apply_autocmds_exarg(EVENT_FILEREADPRE, sfname, sfname,
-							    FALSE, NULL, eap);
+							    FALSE, ಖಾಲಿ, eap);
 	// autocommands may have changed it
-	try_mac = (vim_strchr(p_ffs, 'm') != NULL);
-	try_dos = (vim_strchr(p_ffs, 'd') != NULL);
-	try_unix = (vim_strchr(p_ffs, 'x') != NULL);
-	curbuf->b_op_start = orig_start;
+	try_mac = (vim_strchr(p_ffs, 'm') != ಖಾಲಿ);
+	try_dos = (vim_strchr(p_ffs, 'd') != ಖಾಲಿ);
+	try_unix = (vim_strchr(p_ffs, 'x') != ಖಾಲಿ);
+	curbuf->b_op_ಆರಂಭ = orig_ಆರಂಭ;
 
-	if (msg_scrolled == n)
-	    msg_scroll = m;
+	ಆದರೆ (ಸಂದೇಶ_scrolled == n)
+	    ಸಂದೇಶ_scroll = m;
 
-#ifdef FEAT_EVAL
-	if (aborting())	    // autocmds may abort script processing
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	ಆದರೆ (aborting())	    // autocmds may abort script processing
 	{
 	    --no_wait_return;
-	    msg_scroll = msg_save;
+	    ಸಂದೇಶ_scroll = ಸಂದೇಶ_save;
 	    curbuf->b_p_ro = TRUE;	// must use "w!" now
-	    goto theend;
+	    ಹೋಗು theend;
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	/*
 	 * Don't allow the autocommands to change the current buffer.
 	 * Try to re-open the file.
@@ -749,26 +749,26 @@ readfile(
 	 * Don't allow the autocommands to change the buffer name either
 	 * (cd for example) if it invalidates fname or sfname.
 	 */
-	if (!read_stdin && (curbuf != old_curbuf
+	ಆದರೆ (!read_stdin && (curbuf != old_curbuf
 		|| (using_b_ffname && (old_b_ffname != curbuf->b_ffname))
 		|| (using_b_fname && (old_b_fname != curbuf->b_fname))
-		|| (fd = mch_open((char *)fname, O_RDONLY | O_EXTRA, 0)) < 0))
+		|| (fd = mch_open((ಅಕ್ಷರ *)fname, O_RDONLY | O_EXTRA, 0)) < 0))
 	{
 	    --no_wait_return;
-	    msg_scroll = msg_save;
-	    if (fd < 0)
+	    ಸಂದೇಶ_scroll = ಸಂದೇಶ_save;
+	    ಆದರೆ (fd < 0)
 		emsg(_(e_readpre_autocommands_made_file_unreadable));
-	    else
-		emsg(_(e_readpre_autocommands_must_not_change_current_buffer));
+	    ಇಲ್ಲದಿದ್ದರೆ
+		emsg(_(e_readpre_autocommands_must_not_change_current_ಬಫರ್));
 	    curbuf->b_p_ro = TRUE;	// must use "w!" now
-	    goto theend;
+	    ಹೋಗು theend;
 	}
     }
 
     // Autocommands may add lines to the file, need to check if it is empty
-    wasempty = (curbuf->b_ml.ml_flags & ML_EMPTY);
+    wasempty = (curbuf->b_ml.ml_flags & ML_ಖಾಲಿಗಳು);
 
-    if (!recoverymode && !filtering && !(flags & READ_DUMMY))
+    ಆದರೆ (!recoverymode && !filtering && !(flags & READ_DUMMY))
     {
 	/*
 	 * Show the user that we are busy reading the input.  Sometimes this
@@ -776,73 +776,73 @@ readfile(
 	 * still be running, don't move the cursor to the last line, unless
 	 * always using the GUI.
 	 */
-	if (read_stdin)
+	ಆದರೆ (read_stdin)
 	{
-	    if (!is_not_a_term())
+	    ಆದರೆ (!is_not_a_ಪದ())
 	    {
-#ifndef ALWAYS_USE_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ ALWAYS_USE_GUI
 # ifdef VIMDLL
-		if (!gui.in_use)
+		ಆದರೆ (!gui.ಒಳ_use)
 # endif
-		    mch_msg(_("Vim: Reading from stdin...\n"));
-#endif
-#ifdef FEAT_GUI
+		    mch_ಸಂದೇಶ(_("Vim: Reading from stdin...\n"));
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 		// Also write a message in the GUI window, if there is one.
-		if (gui.in_use && !gui.dying && !gui.starting)
+		ಆದರೆ (gui.ಒಳ_use && !gui.dying && !gui.starting)
 		{
 		    size_t  plen = STRLEN(_("Reading from stdin..."));
 
 		    // make a copy, gui_write() may try to change it
 		    p = vim_strnsave((char_u *)_("Reading from stdin..."), plen);
-		    if (p != NULL)
+		    ಆದರೆ (p != ಖಾಲಿ)
 		    {
-			gui_write(p, (int)plen);
+			gui_write(p, (ಪೂರ್ಣಾಂಕ)plen);
 			vim_free(p);
 		    }
 		}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
 	}
-	else if (!read_buffer)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!read_ಬಫರ್)
 	    filemess(curbuf, sfname, (char_u *)"", 0);
     }
 
-    msg_scroll = FALSE;			// overwrite the file message
+    ಸಂದೇಶ_scroll = FALSE;			// overwrite the file message
 
     /*
      * Set linecnt now, before the "retry" caused by a wrong guess for
      * fileformat, and after the autocommands, which may change them.
      */
-    linecnt = curbuf->b_ml.ml_line_count;
+    linecnt = curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
 
     // "++bad=" argument.
-    if (eap != NULL && eap->bad_char != 0)
+    ಆದರೆ (eap != ಖಾಲಿ && eap->bad_char != 0)
     {
 	bad_char_behavior = eap->bad_char;
-	if (set_options)
+	ಆದರೆ (ಗಣ_options)
 	    curbuf->b_bad_char = eap->bad_char;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	curbuf->b_bad_char = 0;
 
     /*
      * Decide which 'encoding' to use or use first.
      */
-    if (eap != NULL && eap->force_enc != 0)
+    ಆದರೆ (eap != ಖಾಲಿ && eap->force_enc != 0)
     {
 	fenc = enc_canonize(eap->cmd + eap->force_enc);
 	fenc_alloced = TRUE;
 	keep_dest_enc = TRUE;
     }
-    else if (curbuf->b_p_bin)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (curbuf->b_p_bin)
     {
 	fenc = (char_u *)"";		// binary: don't convert
 	fenc_alloced = FALSE;
     }
-    else if (curbuf->b_help)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (curbuf->b_help)
     {
 	char_u	    firstline[80];
-	int	    fc;
+	ಪೂರ್ಣಾಂಕ	    fc;
 
 	// Help files are either utf-8 or latin1.  Try utf-8 first, if this
 	// fails it must be latin1.
@@ -852,46 +852,46 @@ readfile(
 	// That is only in *.??x files.
 	fenc = (char_u *)"latin1";
 	c = enc_utf8;
-	if (!c && !read_stdin)
+	ಆದರೆ (!c && !read_stdin)
 	{
 	    fc = fname[fnamelen - 1];
-	    if (TOLOWER_ASC(fc) == 'x')
+	    ಆದರೆ (TOLOWER_ASC(fc) == 'x')
 	    {
 		// Read the first line (and a bit more).  Immediately rewind to
 		// the start of the file.  If the read() fails "len" is -1.
 		len = read_eintr(fd, firstline, 80);
 		vim_lseek(fd, (off_T)0L, SEEK_SET);
-		for (p = firstline; p < firstline + len; ++p)
-		    if (*p >= 0x80)
+		ಗಾಗಿ (p = firstline; p < firstline + len; ++p)
+		    ಆದರೆ (*p >= 0x80)
 		    {
 			c = TRUE;
-			break;
+			ನಿಲ್ಲಿಸು;
 		    }
 	    }
 	}
 
-	if (c)
+	ಆದರೆ (c)
 	{
-	    fenc_next = fenc;
+	    fenc_ಮುಂದಿನ = fenc;
 	    fenc = (char_u *)"utf-8";
 
 	    // When the file is utf-8 but a character doesn't fit in
 	    // 'encoding' don't retry.  In help text editing utf-8 bytes
 	    // doesn't make sense.
-	    if (!enc_utf8)
+	    ಆದರೆ (!enc_utf8)
 		keep_dest_enc = TRUE;
 	}
 	fenc_alloced = FALSE;
     }
-    else if (*p_fencs == NUL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*p_fencs == NUL)
     {
 	fenc = curbuf->b_p_fenc;	// use format from buffer
 	fenc_alloced = FALSE;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	fenc_next = p_fencs;		// try items in 'fileencodings'
-	fenc = next_fenc(&fenc_next, &fenc_alloced);
+	fenc_ಮುಂದಿನ = p_fencs;		// try items in 'fileencodings'
+	fenc = ಮುಂದಿನ_fenc(&fenc_ಮುಂದಿನ, &fenc_alloced);
     }
 
     /*
@@ -915,27 +915,27 @@ readfile(
      */
 retry:
 
-    if (file_rewind)
+    ಆದರೆ (file_rewind)
     {
-	if (read_buffer)
+	ಆದರೆ (read_ಬಫರ್)
 	{
 	    read_buf_lnum = 1;
-	    read_buf_col = 0;
+	    read_buf_ಲಂಬಸಾಲು = 0;
 	}
-	else if (read_stdin || vim_lseek(fd, (off_T)0L, SEEK_SET) != 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (read_stdin || vim_lseek(fd, (off_T)0L, SEEK_SET) != 0)
 	{
 	    // Can't rewind the file, give up.
 	    error = TRUE;
-	    goto failed;
+	    ಹೋಗು failed;
 	}
 	// Delete the previously read lines.
-	while (lnum > from)
+	ಆಗ (lnum > from)
 	    ml_delete(lnum--);
 	file_rewind = FALSE;
-	if (set_options)
+	ಆದರೆ (ಗಣ_options)
 	{
 	    curbuf->b_p_bomb = FALSE;
-	    curbuf->b_start_bomb = FALSE;
+	    curbuf->b_ಆರಂಭ_bomb = FALSE;
 	}
 	conv_error = 0;
     }
@@ -944,65 +944,65 @@ retry:
      * When retrying with another "fenc" and the first time "fileformat"
      * will be reset.
      */
-    if (keep_fileformat)
+    ಆದರೆ (keep_fileformat)
 	keep_fileformat = FALSE;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (eap != NULL && eap->force_ff != 0)
+	ಆದರೆ (eap != ಖಾಲಿ && eap->force_ff != 0)
 	{
 	    fileformat = get_fileformat_force(curbuf, eap);
 	    try_unix = try_dos = try_mac = FALSE;
 	}
-	else if (curbuf->b_p_bin)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (curbuf->b_p_bin)
 	    fileformat = EOL_UNIX;		// binary: use Unix format
-	else if (*p_ffs == NUL)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*p_ffs == NUL)
 	    fileformat = get_fileformat(curbuf);// use format from buffer
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    fileformat = EOL_UNKNOWN;		// detect from file
     }
 
-#ifdef USE_ICONV
-    if (iconv_fd != (iconv_t)-1)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_ICONV
+    ಆದರೆ (iconv_fd != (iconv_t)-1)
     {
 	// aborted conversion with iconv(), close the descriptor
 	iconv_close(iconv_fd);
 	iconv_fd = (iconv_t)-1;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (advance_fenc)
+    ಆದರೆ (advance_fenc)
     {
 	/*
 	 * Try the next entry in 'fileencodings'.
 	 */
 	advance_fenc = FALSE;
 
-	if (eap != NULL && eap->force_enc != 0)
+	ಆದರೆ (eap != ಖಾಲಿ && eap->force_enc != 0)
 	{
 	    // Conversion given with "++cc=" wasn't possible, read
 	    // without conversion.
 	    notconverted = TRUE;
 	    conv_error = 0;
-	    if (fenc_alloced)
+	    ಆದರೆ (fenc_alloced)
 		vim_free(fenc);
 	    fenc = (char_u *)"";
 	    fenc_alloced = FALSE;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (fenc_alloced)
+	    ಆದರೆ (fenc_alloced)
 		vim_free(fenc);
-	    if (fenc_next != NULL)
+	    ಆದರೆ (fenc_ಮುಂದಿನ != ಖಾಲಿ)
 	    {
-		fenc = next_fenc(&fenc_next, &fenc_alloced);
+		fenc = ಮುಂದಿನ_fenc(&fenc_ಮುಂದಿನ, &fenc_alloced);
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		fenc = (char_u *)"";
 		fenc_alloced = FALSE;
 	    }
 	}
-	if (tmpname != NULL)
+	ಆದರೆ (tmpname != ಖಾಲಿ)
 	{
 	    mch_remove(tmpname);		// delete converted file
 	    VIM_CLEAR(tmpname);
@@ -1015,11 +1015,11 @@ retry:
      */
     fio_flags = 0;
     converted = need_conversion(fenc);
-    if (converted)
+    ಆದರೆ (converted)
     {
 	// "ucs-bom" means we need to check the first bytes of the file
 	// for a BOM.
-	if (STRCMP(fenc, ENC_UCSBOM) == 0)
+	ಆದರೆ (STRCMP(fenc, ENC_UCSBOM) == 0)
 	    fio_flags = FIO_UCSBOM;
 
 	/*
@@ -1031,43 +1031,43 @@ retry:
 	 * conversion to UTF-8 except how the resulting character is put in
 	 * the buffer.
 	 */
-	else if (enc_utf8 || STRCMP(p_enc, "latin1") == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (enc_utf8 || STRCMP(p_enc, "latin1") == 0)
 	    fio_flags = get_fio_flags(fenc);
 
-#ifdef MSWIN
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
 	/*
 	 * Conversion from an MS-Windows codepage to UTF-8 or another codepage
 	 * is handled with MultiByteToWideChar().
 	 */
-	if (fio_flags == 0)
+	ಆದರೆ (fio_flags == 0)
 	    fio_flags = get_win_fio_flags(fenc);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef MACOS_CONVERT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MACOS_CONVERT
 	// Conversion from Apple MacRoman to latin1 or UTF-8
-	if (fio_flags == 0)
+	ಆದರೆ (fio_flags == 0)
 	    fio_flags = get_mac_fio_flags(fenc);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef USE_ICONV
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_ICONV
 	/*
 	 * Try using iconv() if we can't convert internally.
 	 */
-	if (fio_flags == 0
+	ಆದರೆ (fio_flags == 0
 # ifdef FEAT_EVAL
 		&& !did_iconv
 # endif
 		)
 	    iconv_fd = (iconv_t)my_iconv_open(
 				  enc_utf8 ? (char_u *)"utf-8" : p_enc, fenc);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 	/*
 	 * Use the 'charconvert' expression when conversion is required
 	 * and we can't do it internally or with iconv().
 	 */
-	if (fio_flags == 0 && !read_stdin && !read_buffer && *p_ccv != NUL
+	ಆದರೆ (fio_flags == 0 && !read_stdin && !read_ಬಫರ್ && *p_ccv != NUL
 						    && !read_fifo
 # ifdef USE_ICONV
 						    && iconv_fd == (iconv_t)-1
@@ -1079,37 +1079,37 @@ retry:
 # endif
 	    // Skip conversion when it's already done (retry for wrong
 	    // "fileformat").
-	    if (tmpname == NULL)
+	    ಆದರೆ (tmpname == ಖಾಲಿ)
 	    {
 		tmpname = readfile_charconvert(fname, fenc, &fd);
-		if (tmpname == NULL)
+		ಆದರೆ (tmpname == ಖಾಲಿ)
 		{
 		    // Conversion failed.  Try another one.
 		    advance_fenc = TRUE;
-		    if (fd < 0)
+		    ಆದರೆ (fd < 0)
 		    {
 			// Re-opening the original file failed!
 			emsg(_(e_conversion_mad_file_unreadable));
 			error = TRUE;
-			goto failed;
+			ಹೋಗು failed;
 		    }
-		    goto retry;
+		    ಹೋಗು retry;
 		}
 	    }
 	}
-	else
-#endif
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 	{
-	    if (fio_flags == 0
-#ifdef USE_ICONV
+	    ಆದರೆ (fio_flags == 0
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_ICONV
 		    && iconv_fd == (iconv_t)-1
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	       )
 	    {
 		// Conversion wanted but we can't.
 		// Try the next conversion in 'fileencodings'
 		advance_fenc = TRUE;
-		goto retry;
+		ಹೋಗು retry;
 	    }
 	}
     }
@@ -1119,39 +1119,39 @@ retry:
     // stdin or fixed at a specific encoding.
     can_retry = (*fenc != NUL && !read_stdin && !read_fifo && !keep_dest_enc);
 
-    if (!skip_read)
+    ಆದರೆ (!skip_read)
     {
 	linerest = 0;
 	filesize = 0;
-#ifdef FEAT_CRYPT
-	filesize_count = 0;
-#endif
-	skip_count = lines_to_skip;
-	read_count = lines_to_read;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+	filesize_ಎಣಿಕೆ = 0;
+#ಆದರೆ_ಅಂತ್ಯ
+	skip_ಎಣಿಕೆ = ಸಾಲುಗಳು_ಗಮ್ಯ_skip;
+	read_ಎಣಿಕೆ = ಸಾಲುಗಳು_ಗಮ್ಯ_read;
 	conv_restlen = 0;
-#ifdef FEAT_PERSISTENT_UNDO
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PERSISTENT_UNDO
 	read_undo_file = (newfile && (flags & READ_KEEP_UNDO) == 0
-				  && curbuf->b_ffname != NULL
+				  && curbuf->b_ffname != ಖಾಲಿ
 				  && curbuf->b_p_udf
 				  && !filtering
 				  && !read_fifo
 				  && !read_stdin
-				  && !read_buffer);
-	if (read_undo_file)
-	    sha256_start(&sha_ctx);
-#endif
-#ifdef FEAT_CRYPT
-	if (curbuf->b_cryptstate != NULL)
+				  && !read_ಬಫರ್);
+	ಆದರೆ (read_undo_file)
+	    sha256_ಆರಂಭ(&sha_ctx);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+	ಆದರೆ (curbuf->b_cryptstate != ಖಾಲಿ)
 	{
 	    // Need to free the state, but keep the key, don't want to ask for
 	    // it again.
 	    crypt_free_state(curbuf->b_cryptstate);
-	    curbuf->b_cryptstate = NULL;
+	    curbuf->b_cryptstate = ಖಾಲಿ;
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
-    while (!error && !got_int)
+    ಆಗ (!error && !got_int)
     {
 	/*
 	 * We allocate as much space for the file as we can get, plus
@@ -1159,18 +1159,18 @@ retry:
 	 * The amount is limited by the fact that read() only can read
 	 * up to max_unsigned characters (and other things).
 	 */
-	if (!skip_read)
+	ಆದರೆ (!skip_read)
 	{
-#if defined(SSIZE_MAX) && (SSIZE_MAX < 0x10000L)
-		size = SSIZE_MAX;		    // use max I/O size, 52K
-#else
+#ಆದರೆ defined(SSIZE_MAX) && (SSIZE_MAX < 0x10000L)
+		ಗಾತ್ರ_2 = SSIZE_MAX;		    // use max I/O size, 52K
+#ಇಲ್ಲದಿದ್ದರೆ
 		// Use buffer >= 64K.  Add linerest to double the size if the
 		// line gets very long, to avoid a lot of copying. But don't
 		// read more than 1 Mbyte at a time, so we can be interrupted.
-		size = 0x10000L + linerest;
-		if (size > 0x100000L)
-		    size = 0x100000L;
-#endif
+		ಗಾತ್ರ_2 = 0x10000L + linerest;
+		ಆದರೆ (ಗಾತ್ರ_2 > 0x100000L)
+		    ಗಾತ್ರ_2 = 0x100000L;
+#ಆದರೆ_ಅಂತ್ಯ
 	}
 
 	// Protect against the argument of lalloc() going negative.
@@ -1179,34 +1179,34 @@ retry:
 	// after that read, the line length won't exceed MAXCOL - 1 (because
 	// we add 1 for the NUL when casting to colnr_T).  If this check fires,
 	// we insert a synthetic newline immediately, so linerest doesn't grow.
-	if (size < 0 || size + linerest + 1 < 0 || linerest >= MAXCOL - size)
+	ಆದರೆ (ಗಾತ್ರ_2 < 0 || ಗಾತ್ರ_2 + linerest + 1 < 0 || linerest >= MAXCOL - ಗಾತ್ರ_2)
 	{
-	    ++split;
+	    ++ವಿಭಜಿಸು;
 	    *ptr = NL;		    // split line by inserting a NL
-	    size = 1;
+	    ಗಾತ್ರ_2 = 1;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (!skip_read)
+	    ಆದರೆ (!skip_read)
 	    {
-		for ( ; size >= 10; size = (long)((long_u)size >> 1))
+		ಗಾಗಿ ( ; ಗಾತ್ರ_2 >= 10; ಗಾತ್ರ_2 = (ದೀರ್ಘ)((long_u)ಗಾತ್ರ_2 >> 1))
 		{
-		    if ((new_buffer = lalloc(size + linerest + 1,
-							      FALSE)) != NULL)
-			break;
+		    ಆದರೆ ((new_ಬಫರ್ = lalloc(ಗಾತ್ರ_2 + linerest + 1,
+							      FALSE)) != ಖಾಲಿ)
+			ನಿಲ್ಲಿಸು;
 		}
-		if (new_buffer == NULL)
+		ಆದರೆ (new_ಬಫರ್ == ಖಾಲಿ)
 		{
-		    do_outofmem_msg((long_u)(size * 2 + linerest + 1));
+		    do_outofmem_ಸಂದೇಶ((long_u)(ಗಾತ್ರ_2 * 2 + linerest + 1));
 		    error = TRUE;
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
-		if (linerest)	// copy characters from the previous buffer
-		    mch_memmove(new_buffer, ptr - linerest, (size_t)linerest);
-		vim_free(buffer);
-		buffer = new_buffer;
-		ptr = buffer + linerest;
-		line_start = buffer;
+		ಆದರೆ (linerest)	// copy characters from the previous buffer
+		    mch_memmove(new_ಬಫರ್, ptr - linerest, (size_t)linerest);
+		vim_free(ಬಫರ್);
+		ಬಫರ್ = new_ಬಫರ್;
+		ptr = ಬಫರ್ + linerest;
+		ಸಾಲು_ಆರಂಭ = ಬಫರ್;
 
 		// May need room to translate into.
 		// For iconv() we don't really know the required space, use a
@@ -1218,104 +1218,104 @@ retry:
 		// multiple of 2
 		// ucs-4 to utf-8: 4 bytes become up to 6 bytes, size must be
 		// multiple of 4
-		real_size = (int)size;
-#ifdef USE_ICONV
-		if (iconv_fd != (iconv_t)-1)
-		    size = size / ICONV_MULT;
-		else
-#endif
-		    if (fio_flags & FIO_LATIN1)
-		    size = size / 2;
-		else if (fio_flags & (FIO_UCS2 | FIO_UTF16))
-		    size = (size * 2 / 3) & ~1;
-		else if (fio_flags & FIO_UCS4)
-		    size = (size * 2 / 3) & ~3;
-		else if (fio_flags == FIO_UCSBOM)
-		    size = size / ICONV_MULT;	// worst case
-#ifdef MSWIN
-		else if (fio_flags & FIO_CODEPAGE)
-		    size = size / ICONV_MULT;	// also worst case
-#endif
-#ifdef MACOS_CONVERT
-		else if (fio_flags & FIO_MACROMAN)
-		    size = size / ICONV_MULT;	// also worst case
-#endif
+		real_ಗಾತ್ರ = (ಪೂರ್ಣಾಂಕ)ಗಾತ್ರ_2;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_ICONV
+		ಆದರೆ (iconv_fd != (iconv_t)-1)
+		    ಗಾತ್ರ_2 = ಗಾತ್ರ_2 / ICONV_MULT;
+		ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+		    ಆದರೆ (fio_flags & FIO_LATIN1)
+		    ಗಾತ್ರ_2 = ಗಾತ್ರ_2 / 2;
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (fio_flags & (FIO_UCS2 | FIO_UTF16))
+		    ಗಾತ್ರ_2 = (ಗಾತ್ರ_2 * 2 / 3) & ~1;
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (fio_flags & FIO_UCS4)
+		    ಗಾತ್ರ_2 = (ಗಾತ್ರ_2 * 2 / 3) & ~3;
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (fio_flags == FIO_UCSBOM)
+		    ಗಾತ್ರ_2 = ಗಾತ್ರ_2 / ICONV_MULT;	// worst case
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (fio_flags & FIO_CODEPAGE)
+		    ಗಾತ್ರ_2 = ಗಾತ್ರ_2 / ICONV_MULT;	// also worst case
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MACOS_CONVERT
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (fio_flags & FIO_MACROMAN)
+		    ಗಾತ್ರ_2 = ಗಾತ್ರ_2 / ICONV_MULT;	// also worst case
+#ಆದರೆ_ಅಂತ್ಯ
 
-		if (conv_restlen > 0)
+		ಆದರೆ (conv_restlen > 0)
 		{
 		    // Insert unconverted bytes from previous line.
 		    mch_memmove(ptr, conv_rest, conv_restlen);
 		    ptr += conv_restlen;
-		    size -= conv_restlen;
+		    ಗಾತ್ರ_2 -= conv_restlen;
 		}
 
-		if (read_buffer)
+		ಆದರೆ (read_ಬಫರ್)
 		{
 		    /*
 		     * Read bytes from curbuf.  Used for converting text read
 		     * from stdin.
 		     */
-		    if (read_buf_lnum > from)
-			size = 0;
-		    else
+		    ಆದರೆ (read_buf_lnum > from)
+			ಗಾತ್ರ_2 = 0;
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
-			int	n, ni;
-			long	tlen;
+			ಪೂರ್ಣಾಂಕ	n, ni;
+			ದೀರ್ಘ	tlen;
 
 			tlen = 0;
-			for (;;)
+			ಗಾಗಿ (;;)
 			{
-			    p = ml_get(read_buf_lnum) + read_buf_col;
-			    n = ml_get_len(read_buf_lnum) - read_buf_col;
-			    if ((int)tlen + n + 1 > size)
+			    p = ml_get(read_buf_lnum) + read_buf_ಲಂಬಸಾಲು;
+			    n = ml_get_len(read_buf_lnum) - read_buf_ಲಂಬಸಾಲು;
+			    ಆದರೆ ((ಪೂರ್ಣಾಂಕ)tlen + n + 1 > ಗಾತ್ರ_2)
 			    {
 				// Filled up to "size", append partial line.
 				// Change NL to NUL to reverse the effect done
 				// below.
-				n = (int)(size - tlen);
-				for (ni = 0; ni < n; ++ni)
+				n = (ಪೂರ್ಣಾಂಕ)(ಗಾತ್ರ_2 - tlen);
+				ಗಾಗಿ (ni = 0; ni < n; ++ni)
 				{
-				    if (p[ni] == NL)
+				    ಆದರೆ (p[ni] == NL)
 					ptr[tlen++] = NUL;
-				    else
+				    ಇಲ್ಲದಿದ್ದರೆ
 					ptr[tlen++] = p[ni];
 				}
-				read_buf_col += n;
-				break;
+				read_buf_ಲಂಬಸಾಲು += n;
+				ನಿಲ್ಲಿಸು;
 			    }
 
 			    // Append whole line and new-line.  Change NL
 			    // to NUL to reverse the effect done below.
-			    for (ni = 0; ni < n; ++ni)
+			    ಗಾಗಿ (ni = 0; ni < n; ++ni)
 			    {
-				if (p[ni] == NL)
+				ಆದರೆ (p[ni] == NL)
 				    ptr[tlen++] = NUL;
-				else
+				ಇಲ್ಲದಿದ್ದರೆ
 				    ptr[tlen++] = p[ni];
 			    }
 			    ptr[tlen++] = NL;
-			    read_buf_col = 0;
-			    if (++read_buf_lnum > from)
+			    read_buf_ಲಂಬಸಾಲು = 0;
+			    ಆದರೆ (++read_buf_lnum > from)
 			    {
 				// When the last line didn't have an
 				// end-of-line don't add it now either.
-				if (!curbuf->b_p_eol)
+				ಆದರೆ (!curbuf->b_p_eol)
 				    --tlen;
-				size = tlen;
-#ifdef FEAT_CRYPT
+				ಗಾತ್ರ_2 = tlen;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
 				eof = TRUE;
-#endif
-				break;
+#ಆದರೆ_ಅಂತ್ಯ
+				ನಿಲ್ಲಿಸು;
 			    }
 			}
 		    }
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    /*
 		     * Read bytes from the file.
 		     */
-#ifdef FEAT_SODIUM
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SODIUM
 		    // Let the crypt layer work with a buffer size of 8192
 		    //
 		    // Sodium encryption requires a fixed block size to
@@ -1329,53 +1329,53 @@ retry:
 		    //
 		    // Be careful with changing it, it needs to stay the same
 		    // for reading back previously encrypted files!
-		    if (filesize == 0)
+		    ಆದರೆ (filesize == 0)
 		    {
 			// set size to 8K + Sodium Crypt Metadata
-			size = WRITEBUFSIZE + crypt_get_max_header_len()
+			ಗಾತ್ರ_2 = WRITEBUFSIZE + crypt_get_max_ಶೀರ್ಷಿಕೆ_len()
 			    + crypto_secretstream_xchacha20poly1305_HEADERBYTES
 				+ crypto_secretstream_xchacha20poly1305_ABYTES;
 			may_need_lseek = TRUE;
 		    }
 
-		    else if (filesize > 0 && (curbuf->b_cryptstate != NULL
-				&& crypt_method_is_sodium(
-					     curbuf->b_cryptstate->method_nr)))
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (filesize > 0 && (curbuf->b_cryptstate != ಖಾಲಿ
+				&& crypt_ವಿಧಾನ_is_sodium(
+					     curbuf->b_cryptstate->ವಿಧಾನ_nr)))
 		    {
-			size = WRITEBUFSIZE + crypto_secretstream_xchacha20poly1305_ABYTES;
+			ಗಾತ್ರ_2 = WRITEBUFSIZE + crypto_secretstream_xchacha20poly1305_ABYTES;
 			// need to rewind by - add_len from CRYPT_M_SOD2 (see
 			// description above)
-			if (curbuf->b_cryptstate->method_nr == CRYPT_M_SOD
+			ಆದರೆ (curbuf->b_cryptstate->ವಿಧಾನ_nr == CRYPT_M_SOD
 						     && !eof && may_need_lseek)
 			{
-			    lseek(fd, crypt_get_header_len(
-					       curbuf->b_cryptstate->method_nr)
-				       - crypt_get_max_header_len(), SEEK_CUR);
+			    lseek(fd, crypt_get_ಶೀರ್ಷಿಕೆ_len(
+					       curbuf->b_cryptstate->ವಿಧಾನ_nr)
+				       - crypt_get_max_ಶೀರ್ಷಿಕೆ_len(), SEEK_CUR);
 			    may_need_lseek = FALSE;
 			}
 		    }
-#endif
-		    long read_size = size;
-		    size = read_eintr(fd, ptr, read_size);
-#ifdef FEAT_CRYPT
+#ಆದರೆ_ಅಂತ್ಯ
+		    ದೀರ್ಘ read_ಗಾತ್ರ = ಗಾತ್ರ_2;
+		    ಗಾತ್ರ_2 = read_eintr(fd, ptr, read_ಗಾತ್ರ);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
 		    // Did we reach end of file?
-		    filesize_count += size;
-		    eof = (size < read_size || filesize_count == filesize_disk);
-#endif
+		    filesize_ಎಣಿಕೆ += ಗಾತ್ರ_2;
+		    eof = (ಗಾತ್ರ_2 < read_ಗಾತ್ರ || filesize_ಎಣಿಕೆ == filesize_disk);
+#ಆದರೆ_ಅಂತ್ಯ
 		}
 
-#ifdef FEAT_CRYPT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
 		/*
 		 * At start of file: Check for magic number of encryption.
 		 */
-		if (filesize == 0 && size > 0)
+		ಆದರೆ (filesize == 0 && ಗಾತ್ರ_2 > 0)
 		{
-		    cryptkey = check_for_cryptkey(cryptkey, ptr, &size,
+		    cryptkey = check_for_cryptkey(cryptkey, ptr, &ಗಾತ್ರ_2,
 						  &filesize, newfile, sfname,
-						  &did_ask_for_key);
-# if defined(CRYPT_NOT_INPLACE) && defined(FEAT_PERSISTENT_UNDO)
-		    if (curbuf->b_cryptstate != NULL
-				 && !crypt_works_inplace(curbuf->b_cryptstate))
+						  &did_ask_for_ಕೀಲಿ);
+# ಆದರೆ defined(CRYPT_NOT_INPLACE) && defined(FEAT_PERSISTENT_UNDO)
+		    ಆದರೆ (curbuf->b_cryptstate != ಖಾಲಿ
+				 && !crypt_ಕೆಲಸಮಾಡುತ್ತದೆ_inplace(curbuf->b_cryptstate))
 			// reading undo file requires crypt_decode_inplace()
 			read_undo_file = FALSE;
 # endif
@@ -1384,85 +1384,85 @@ retry:
 		 * Decrypt the read bytes.  This is done before checking for
 		 * EOF because the crypt layer may be buffering.
 		 */
-		if (cryptkey != NULL && curbuf->b_cryptstate != NULL
-								   && size > 0)
+		ಆದರೆ (cryptkey != ಖಾಲಿ && curbuf->b_cryptstate != ಖಾಲಿ
+								   && ಗಾತ್ರ_2 > 0)
 		{
 # ifdef CRYPT_NOT_INPLACE
-		    if (crypt_works_inplace(curbuf->b_cryptstate))
+		    ಆದರೆ (crypt_ಕೆಲಸಮಾಡುತ್ತದೆ_inplace(curbuf->b_cryptstate))
 		    {
 # endif
 			crypt_decode_inplace(curbuf->b_cryptstate, ptr,
-								    size, eof);
+								    ಗಾತ್ರ_2, eof);
 # ifdef CRYPT_NOT_INPLACE
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
-			char_u	*newptr = NULL;
-			int	decrypted_size;
+			char_u	*newptr = ಖಾಲಿ;
+			ಪೂರ್ಣಾಂಕ	decrypted_ಗಾತ್ರ;
 
-			decrypted_size = crypt_decode_alloc(
-				    curbuf->b_cryptstate, ptr, size,
+			decrypted_ಗಾತ್ರ = crypt_decode_alloc(
+				    curbuf->b_cryptstate, ptr, ಗಾತ್ರ_2,
 								 &newptr, eof);
 
-			if (decrypted_size < 0)
+			ಆದರೆ (decrypted_ಗಾತ್ರ < 0)
 			{
 			    // error message already given
 			    error = TRUE;
 			    vim_free(newptr);
-			    break;
+			    ನಿಲ್ಲಿಸು;
 			}
 			// If the crypt layer is buffering, not producing
 			// anything yet, need to read more.
-			if (decrypted_size == 0)
-			    continue;
+			ಆದರೆ (decrypted_ಗಾತ್ರ == 0)
+			    ಮುಂದುವರಿ;
 
-			if (linerest == 0)
+			ಆದರೆ (linerest == 0)
 			{
 			    // Simple case: reuse returned buffer (may be
 			    // NULL, checked later).
-			    new_buffer = newptr;
+			    new_ಬಫರ್ = newptr;
 			}
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
-			    long_u	new_size;
+			    long_u	new_ಗಾತ್ರ;
 
 			    // Need new buffer to add bytes carried over.
-			    new_size = (long_u)(decrypted_size + linerest + 1);
-			    new_buffer = lalloc(new_size, FALSE);
-			    if (new_buffer == NULL)
+			    new_ಗಾತ್ರ = (long_u)(decrypted_ಗಾತ್ರ + linerest + 1);
+			    new_ಬಫರ್ = lalloc(new_ಗಾತ್ರ, FALSE);
+			    ಆದರೆ (new_ಬಫರ್ == ಖಾಲಿ)
 			    {
-				do_outofmem_msg(new_size);
+				do_outofmem_ಸಂದೇಶ(new_ಗಾತ್ರ);
 				error = TRUE;
-				break;
+				ನಿಲ್ಲಿಸು;
 			    }
 
-			    mch_memmove(new_buffer, buffer, linerest + conv_restlen);
-			    if (newptr != NULL)
-				mch_memmove(new_buffer + linerest + conv_restlen,
-					newptr, decrypted_size);
+			    mch_memmove(new_ಬಫರ್, ಬಫರ್, linerest + conv_restlen);
+			    ಆದರೆ (newptr != ಖಾಲಿ)
+				mch_memmove(new_ಬಫರ್ + linerest + conv_restlen,
+					newptr, decrypted_ಗಾತ್ರ);
 			    vim_free(newptr);
 			}
 
-			if (new_buffer != NULL)
+			ಆದರೆ (new_ಬಫರ್ != ಖಾಲಿ)
 			{
-			    vim_free(buffer);
-			    buffer = new_buffer;
-			    new_buffer = NULL;
-			    line_start = buffer;
-			    ptr = buffer + linerest + conv_restlen;
-			    real_size = size;
+			    vim_free(ಬಫರ್);
+			    ಬಫರ್ = new_ಬಫರ್;
+			    new_ಬಫರ್ = ಖಾಲಿ;
+			    ಸಾಲು_ಆರಂಭ = ಬಫರ್;
+			    ptr = ಬಫರ್ + linerest + conv_restlen;
+			    real_ಗಾತ್ರ = ಗಾತ್ರ_2;
 			}
-			size = decrypted_size;
+			ಗಾತ್ರ_2 = decrypted_ಗಾತ್ರ;
 		    }
 # endif
 		}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-		if (size <= 0)
+		ಆದರೆ (ಗಾತ್ರ_2 <= 0)
 		{
-		    if (size < 0)		    // read error
+		    ಆದರೆ (ಗಾತ್ರ_2 < 0)		    // read error
 			error = TRUE;
-		    else if (conv_restlen > 0)
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (conv_restlen > 0)
 		    {
 			/*
 			 * Reached end-of-file but some trailing bytes could
@@ -1470,53 +1470,53 @@ retry:
 			 */
 
 			// When we did a conversion report an error.
-			if (fio_flags != 0
-#ifdef USE_ICONV
+			ಆದರೆ (fio_flags != 0
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_ICONV
 				|| iconv_fd != (iconv_t)-1
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 			   )
 			{
-			    if (can_retry)
-				goto rewind_retry;
-			    if (conv_error == 0)
-				conv_error = curbuf->b_ml.ml_line_count
+			    ಆದರೆ (can_retry)
+				ಹೋಗು rewind_retry;
+			    ಆದರೆ (conv_error == 0)
+				conv_error = curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ
 								- linecnt + 1;
 			}
 			// Remember the first linenr with an illegal byte
-			else if (illegal_byte == 0)
-			    illegal_byte = curbuf->b_ml.ml_line_count
+			ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (illegal_byte == 0)
+			    illegal_byte = curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ
 								- linecnt + 1;
-			if (bad_char_behavior == BAD_DROP)
+			ಆದರೆ (bad_char_behavior == BAD_DROP)
 			{
 			    *(ptr - conv_restlen) = NUL;
 			    conv_restlen = 0;
 			}
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
 			    // Replace the trailing bytes with the replacement
 			    // character if we were converting; if we weren't,
 			    // leave the UTF8 checking code to do it, as it
 			    // works slightly differently.
-			    if (bad_char_behavior != BAD_KEEP && (fio_flags != 0
-#ifdef USE_ICONV
+			    ಆದರೆ (bad_char_behavior != BAD_KEEP && (fio_flags != 0
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_ICONV
 				    || iconv_fd != (iconv_t)-1
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 			       ))
 			    {
-				while (conv_restlen > 0)
+				ಆಗ (conv_restlen > 0)
 				{
 				    *(--ptr) = bad_char_behavior;
 				    --conv_restlen;
 				}
 			    }
 			    fio_flags = 0;	// don't convert this
-#ifdef USE_ICONV
-			    if (iconv_fd != (iconv_t)-1)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_ICONV
+			    ಆದರೆ (iconv_fd != (iconv_t)-1)
 			    {
 				iconv_close(iconv_fd);
 				iconv_fd = (iconv_t)-1;
 			    }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 			}
 		    }
 		}
@@ -1529,146 +1529,146 @@ retry:
 	     * converting with 'charconvert' or when a BOM has already been
 	     * found.
 	     */
-	    if ((filesize == 0
-#ifdef FEAT_CRYPT
-		   || (cryptkey != NULL
-			&& filesize == crypt_get_header_len(
-						 crypt_get_method_nr(curbuf)))
-#endif
+	    ಆದರೆ ((filesize == 0
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+		   || (cryptkey != ಖಾಲಿ
+			&& filesize == crypt_get_ಶೀರ್ಷಿಕೆ_len(
+						 crypt_get_ವಿಧಾನ_nr(curbuf)))
+#ಆದರೆ_ಅಂತ್ಯ
 		       )
 		    && (fio_flags == FIO_UCSBOM
 			|| (!curbuf->b_p_bomb
-			    && tmpname == NULL
+			    && tmpname == ಖಾಲಿ
 			    && (*fenc == 'u' || (*fenc == NUL && enc_utf8)))))
 	    {
 		char_u	*ccname;
-		int	blen;
+		ಪೂರ್ಣಾಂಕ	blen;
 
 		// no BOM detection in a short file or in binary mode
-		if (size < 2 || curbuf->b_p_bin)
-		    ccname = NULL;
-		else
-		    ccname = check_for_bom(ptr, size, &blen,
+		ಆದರೆ (ಗಾತ್ರ_2 < 2 || curbuf->b_p_bin)
+		    ccname = ಖಾಲಿ;
+		ಇಲ್ಲದಿದ್ದರೆ
+		    ccname = check_for_bom(ptr, ಗಾತ್ರ_2, &blen,
 		      fio_flags == FIO_UCSBOM ? FIO_ALL : get_fio_flags(fenc));
-		if (ccname != NULL)
+		ಆದರೆ (ccname != ಖಾಲಿ)
 		{
 		    // Remove BOM from the text
 		    filesize += blen;
-		    size -= blen;
-		    mch_memmove(ptr, ptr + blen, (size_t)size);
-		    if (set_options)
+		    ಗಾತ್ರ_2 -= blen;
+		    mch_memmove(ptr, ptr + blen, (size_t)ಗಾತ್ರ_2);
+		    ಆದರೆ (ಗಣ_options)
 		    {
 			curbuf->b_p_bomb = TRUE;
-			curbuf->b_start_bomb = TRUE;
+			curbuf->b_ಆರಂಭ_bomb = TRUE;
 		    }
 		}
 
-		if (fio_flags == FIO_UCSBOM)
+		ಆದರೆ (fio_flags == FIO_UCSBOM)
 		{
-		    if (ccname == NULL)
+		    ಆದರೆ (ccname == ಖಾಲಿ)
 		    {
 			// No BOM detected: retry with next encoding.
 			advance_fenc = TRUE;
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
 			// BOM detected: set "fenc" and jump back
-			if (fenc_alloced)
+			ಆದರೆ (fenc_alloced)
 			    vim_free(fenc);
 			fenc = ccname;
 			fenc_alloced = FALSE;
 		    }
 		    // retry reading without getting new bytes or rewinding
 		    skip_read = TRUE;
-		    goto retry;
+		    ಹೋಗು retry;
 		}
 	    }
 
 	    // Include not converted bytes.
 	    ptr -= conv_restlen;
-	    size += conv_restlen;
+	    ಗಾತ್ರ_2 += conv_restlen;
 	    conv_restlen = 0;
 	    /*
 	     * Break here for a read error or end-of-file.
 	     */
-	    if (size <= 0)
-		break;
+	    ಆದರೆ (ಗಾತ್ರ_2 <= 0)
+		ನಿಲ್ಲಿಸು;
 
 
-#ifdef USE_ICONV
-	    if (iconv_fd != (iconv_t)-1)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_ICONV
+	    ಆದರೆ (iconv_fd != (iconv_t)-1)
 	    {
 		/*
 		 * Attempt conversion of the read bytes to 'encoding' using
 		 * iconv().
 		 */
-		const char	*fromp;
-		char		*top;
-		size_t		from_size;
-		size_t		to_size;
+		ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ	*fromp;
+		ಅಕ್ಷರ		*ತುದಿ;
+		size_t		from_ಗಾತ್ರ;
+		size_t		ಗಮ್ಯ_ಗಾತ್ರ;
 
-		fromp = (char *)ptr;
-		from_size = size;
-		ptr += size;
-		top = (char *)ptr;
-		to_size = real_size - size;
+		fromp = (ಅಕ್ಷರ *)ptr;
+		from_ಗಾತ್ರ = ಗಾತ್ರ_2;
+		ptr += ಗಾತ್ರ_2;
+		ತುದಿ = (ಅಕ್ಷರ *)ptr;
+		ಗಮ್ಯ_ಗಾತ್ರ = real_ಗಾತ್ರ - ಗಾತ್ರ_2;
 
 		/*
 		 * If there is conversion error or not enough room try using
 		 * another conversion.  Except for when there is no
 		 * alternative (help files).
 		 */
-		while ((iconv(iconv_fd, (void *)&fromp, &from_size,
-							       &top, &to_size)
+		ಆಗ ((iconv(iconv_fd, (ಶೂನ್ಯ *)&fromp, &from_ಗಾತ್ರ,
+							       &ತುದಿ, &ಗಮ್ಯ_ಗಾತ್ರ)
 			    == (size_t)-1 && ICONV_ERRNO != ICONV_EINVAL)
-						  || from_size > CONV_RESTLEN)
+						  || from_ಗಾತ್ರ > CONV_RESTLEN)
 		{
-		    if (can_retry)
-			goto rewind_retry;
-		    if (conv_error == 0)
+		    ಆದರೆ (can_retry)
+			ಹೋಗು rewind_retry;
+		    ಆದರೆ (conv_error == 0)
 			conv_error = readfile_linenr(linecnt,
-							  ptr, (char_u *)top);
+							  ptr, (char_u *)ತುದಿ);
 
 		    // Deal with a bad byte and continue with the next.
 		    ++fromp;
-		    --from_size;
-		    if (bad_char_behavior == BAD_KEEP)
+		    --from_ಗಾತ್ರ;
+		    ಆದರೆ (bad_char_behavior == BAD_KEEP)
 		    {
-			*top++ = *(fromp - 1);
-			--to_size;
+			*ತುದಿ++ = *(fromp - 1);
+			--ಗಮ್ಯ_ಗಾತ್ರ;
 		    }
-		    else if (bad_char_behavior != BAD_DROP)
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (bad_char_behavior != BAD_DROP)
 		    {
-			*top++ = bad_char_behavior;
-			--to_size;
+			*ತುದಿ++ = bad_char_behavior;
+			--ಗಮ್ಯ_ಗಾತ್ರ;
 		    }
 		}
 
-		if (from_size > 0)
+		ಆದರೆ (from_ಗಾತ್ರ > 0)
 		{
 		    // Some remaining characters, keep them for the next
 		    // round.
-		    mch_memmove(conv_rest, (char_u *)fromp, from_size);
-		    conv_restlen = (int)from_size;
+		    mch_memmove(conv_rest, (char_u *)fromp, from_ಗಾತ್ರ);
+		    conv_restlen = (ಪೂರ್ಣಾಂಕ)from_ಗಾತ್ರ;
 		}
 
 		// move the linerest to before the converted characters
-		line_start = ptr - linerest;
-		mch_memmove(line_start, buffer, (size_t)linerest);
-		size = (long)((char_u *)top - ptr);
+		ಸಾಲು_ಆರಂಭ = ptr - linerest;
+		mch_memmove(ಸಾಲು_ಆರಂಭ, ಬಫರ್, (size_t)linerest);
+		ಗಾತ್ರ_2 = (ದೀರ್ಘ)((char_u *)ತುದಿ - ptr);
 	    }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef MSWIN
-	    if (fio_flags & FIO_CODEPAGE)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
+	    ಆದರೆ (fio_flags & FIO_CODEPAGE)
 	    {
 		char_u	*src, *dst;
 		WCHAR	ucs2buf[3];
-		int	ucs2len;
-		int	codepage = FIO_GET_CP(fio_flags);
-		int	bytelen;
-		int	found_bad;
-		char	replstr[2];
+		ಪೂರ್ಣಾಂಕ	ucs2len;
+		ಪೂರ್ಣಾಂಕ	codepage = FIO_GET_CP(fio_flags);
+		ಪೂರ್ಣಾಂಕ	bytelen;
+		ಪೂರ್ಣಾಂಕ	ಸಿಕ್ಕಿತು_bad;
+		ಅಕ್ಷರ	replstr[2];
 
 		/*
 		 * Conversion from an MS-Windows codepage or UTF-8 to UTF-8 or
@@ -1683,9 +1683,9 @@ retry:
 		 */
 
 		// Replacement string for WideCharToMultiByte().
-		if (bad_char_behavior > 0)
+		ಆದರೆ (bad_char_behavior > 0)
 		    replstr[0] = bad_char_behavior;
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		    replstr[0] = '?';
 		replstr[1] = NUL;
 
@@ -1693,155 +1693,155 @@ retry:
 		 * Move the bytes to the end of the buffer, so that we have
 		 * room to put the result at the start.
 		 */
-		src = ptr + real_size - size;
-		mch_memmove(src, ptr, size);
+		src = ptr + real_ಗಾತ್ರ - ಗಾತ್ರ_2;
+		mch_memmove(src, ptr, ಗಾತ್ರ_2);
 
 		/*
 		 * Do the conversion.
 		 */
 		dst = ptr;
-		while (size > 0)
+		ಆಗ (ಗಾತ್ರ_2 > 0)
 		{
-		    found_bad = FALSE;
+		    ಸಿಕ್ಕಿತು_bad = FALSE;
 
 # ifdef CP_UTF8	// VC 4.1 doesn't define CP_UTF8
-		    if (codepage == CP_UTF8)
+		    ಆದರೆ (codepage == CP_UTF8)
 		    {
 			// Handle CP_UTF8 input ourselves to be able to handle
 			// trailing bytes properly.
 			// Get one UTF-8 character from src.
-			bytelen = (int)utf_ptr2len_len(src, size);
-			if (bytelen > size)
+			bytelen = (ಪೂರ್ಣಾಂಕ)utf_ptr2len_len(src, ಗಾತ್ರ_2);
+			ಆದರೆ (bytelen > ಗಾತ್ರ_2)
 			{
 			    // Only got some bytes of a character.  Normally
 			    // it's put in "conv_rest", but if it's too long
 			    // deal with it as if they were illegal bytes.
-			    if (bytelen <= CONV_RESTLEN)
-				break;
+			    ಆದರೆ (bytelen <= CONV_RESTLEN)
+				ನಿಲ್ಲಿಸು;
 
 			    // weird overlong byte sequence
-			    bytelen = size;
-			    found_bad = TRUE;
+			    bytelen = ಗಾತ್ರ_2;
+			    ಸಿಕ್ಕಿತು_bad = TRUE;
 			}
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
-			    int	    u8c = utf_ptr2char(src);
+			    ಪೂರ್ಣಾಂಕ	    u8c = utf_ptr2char(src);
 
-			    if (u8c > 0xffff || (*src >= 0x80 && bytelen == 1))
-				found_bad = TRUE;
+			    ಆದರೆ (u8c > 0xffff || (*src >= 0x80 && bytelen == 1))
+				ಸಿಕ್ಕಿತು_bad = TRUE;
 			    ucs2buf[0] = u8c;
 			    ucs2len = 1;
 			}
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 # endif
 		    {
 			// We don't know how long the byte sequence is, try
 			// from one to three bytes.
-			for (bytelen = 1; bytelen <= size && bytelen <= 3;
+			ಗಾಗಿ (bytelen = 1; bytelen <= ಗಾತ್ರ_2 && bytelen <= 3;
 								    ++bytelen)
 			{
-			    ucs2len = MultiByteToWideChar(codepage,
+			    ucs2len = Multi_Byte_ಗಮ್ಯ_Wide_Char(codepage,
 							 MB_ERR_INVALID_CHARS,
 							 (LPCSTR)src, bytelen,
 								   ucs2buf, 3);
-			    if (ucs2len > 0)
-				break;
+			    ಆದರೆ (ucs2len > 0)
+				ನಿಲ್ಲಿಸು;
 			}
-			if (ucs2len == 0)
+			ಆದರೆ (ucs2len == 0)
 			{
 			    // If we have only one byte then it's probably an
 			    // incomplete byte sequence.  Otherwise discard
 			    // one byte as a bad character.
-			    if (size == 1)
-				break;
-			    found_bad = TRUE;
+			    ಆದರೆ (ಗಾತ್ರ_2 == 1)
+				ನಿಲ್ಲಿಸು;
+			    ಸಿಕ್ಕಿತು_bad = TRUE;
 			    bytelen = 1;
 			}
 		    }
 
-		    if (!found_bad)
+		    ಆದರೆ (!ಸಿಕ್ಕಿತು_bad)
 		    {
-			int	i;
+			ಪೂರ್ಣಾಂಕ	i;
 
 			// Convert "ucs2buf[ucs2len]" to 'enc' in "dst".
-			if (enc_utf8)
+			ಆದರೆ (enc_utf8)
 			{
 			    // From UCS-2 to UTF-8.  Cannot fail.
-			    for (i = 0; i < ucs2len; ++i)
+			    ಗಾಗಿ (i = 0; i < ucs2len; ++i)
 				dst += utf_char2bytes(ucs2buf[i], dst);
 			}
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
 			    BOOL	bad = FALSE;
-			    int		dstlen;
+			    ಪೂರ್ಣಾಂಕ		dstlen;
 
 			    // From UCS-2 to "enc_codepage".  If the
 			    // conversion uses the default character "?",
 			    // the data doesn't fit in this encoding.
-			    dstlen = WideCharToMultiByte(enc_codepage, 0,
+			    dstlen = Wide_Char_ಗಮ್ಯ_Multi_Byte(enc_codepage, 0,
 				    (LPCWSTR)ucs2buf, ucs2len,
-				    (LPSTR)dst, (int)(src - dst),
+				    (LPSTR)dst, (ಪೂರ್ಣಾಂಕ)(src - dst),
 				    replstr, &bad);
-			    if (bad)
-				found_bad = TRUE;
-			    else
+			    ಆದರೆ (bad)
+				ಸಿಕ್ಕಿತು_bad = TRUE;
+			    ಇಲ್ಲದಿದ್ದರೆ
 				dst += dstlen;
 			}
 		    }
 
-		    if (found_bad)
+		    ಆದರೆ (ಸಿಕ್ಕಿತು_bad)
 		    {
 			// Deal with bytes we can't convert.
-			if (can_retry)
-			    goto rewind_retry;
-			if (conv_error == 0)
+			ಆದರೆ (can_retry)
+			    ಹೋಗು rewind_retry;
+			ಆದರೆ (conv_error == 0)
 			    conv_error = readfile_linenr(linecnt, ptr, dst);
-			if (bad_char_behavior != BAD_DROP)
+			ಆದರೆ (bad_char_behavior != BAD_DROP)
 			{
-			    if (bad_char_behavior == BAD_KEEP)
+			    ಆದರೆ (bad_char_behavior == BAD_KEEP)
 			    {
 				mch_memmove(dst, src, bytelen);
 				dst += bytelen;
 			    }
-			    else
+			    ಇಲ್ಲದಿದ್ದರೆ
 				*dst++ = bad_char_behavior;
 			}
 		    }
 
 		    src += bytelen;
-		    size -= bytelen;
+		    ಗಾತ್ರ_2 -= bytelen;
 		}
 
-		if (size > 0)
+		ಆದರೆ (ಗಾತ್ರ_2 > 0)
 		{
 		    // An incomplete byte sequence remaining.
-		    mch_memmove(conv_rest, src, size);
-		    conv_restlen = size;
+		    mch_memmove(conv_rest, src, ಗಾತ್ರ_2);
+		    conv_restlen = ಗಾತ್ರ_2;
 		}
 
 		// The new size is equal to how much "dst" was advanced.
-		size = (long)(dst - ptr);
+		ಗಾತ್ರ_2 = (ದೀರ್ಘ)(dst - ptr);
 	    }
-	    else
-#endif
-#ifdef MACOS_CONVERT
-	    if (fio_flags & FIO_MACROMAN)
+	    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MACOS_CONVERT
+	    ಆದರೆ (fio_flags & FIO_MACROMAN)
 	    {
 		/*
 		 * Conversion from Apple MacRoman char encoding to UTF-8 or
 		 * latin1.  This is in os_mac_conv.c.
 		 */
-		if (macroman2enc(ptr, &size, real_size) == FAIL)
-		    goto rewind_retry;
+		ಆದರೆ (macroman2enc(ptr, &ಗಾತ್ರ_2, real_ಗಾತ್ರ) == FAIL)
+		    ಹೋಗು rewind_retry;
 	    }
-	    else
-#endif
-	    if (fio_flags != 0)
+	    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಆದರೆ (fio_flags != 0)
 	    {
-		int	u8c;
+		ಪೂರ್ಣಾಂಕ	u8c;
 		char_u	*dest;
-		char_u	*tail = NULL;
+		char_u	*ಬಾಲ = ಖಾಲಿ;
 
 		/*
 		 * "enc_utf8" set: Convert Unicode or Latin1 to UTF-8.
@@ -1851,108 +1851,108 @@ retry:
 		 * "dest" points to after where the UTF-8 bytes go, "p" points
 		 * to after the next character to convert.
 		 */
-		dest = ptr + real_size;
-		if (fio_flags == FIO_LATIN1 || fio_flags == FIO_UTF8)
+		dest = ptr + real_ಗಾತ್ರ;
+		ಆದರೆ (fio_flags == FIO_LATIN1 || fio_flags == FIO_UTF8)
 		{
-		    p = ptr + size;
-		    if (fio_flags == FIO_UTF8)
+		    p = ptr + ಗಾತ್ರ_2;
+		    ಆದರೆ (fio_flags == FIO_UTF8)
 		    {
 			// Check for a trailing incomplete UTF-8 sequence
-			tail = ptr + size - 1;
-			while (tail > ptr && (*tail & 0xc0) == 0x80)
-			    --tail;
-			if (tail + utf_byte2len(*tail) <= ptr + size)
-			    tail = NULL;
-			else
-			    p = tail;
+			ಬಾಲ = ptr + ಗಾತ್ರ_2 - 1;
+			ಆಗ (ಬಾಲ > ptr && (*ಬಾಲ & 0xc0) == 0x80)
+			    --ಬಾಲ;
+			ಆದರೆ (ಬಾಲ + utf_byte2len(*ಬಾಲ) <= ptr + ಗಾತ್ರ_2)
+			    ಬಾಲ = ಖಾಲಿ;
+			ಇಲ್ಲದಿದ್ದರೆ
+			    p = ಬಾಲ;
 		    }
 		}
-		else if (fio_flags & (FIO_UCS2 | FIO_UTF16))
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (fio_flags & (FIO_UCS2 | FIO_UTF16))
 		{
 		    // Check for a trailing byte
-		    p = ptr + (size & ~1);
-		    if (size & 1)
-			tail = p;
-		    if ((fio_flags & FIO_UTF16) && p > ptr)
+		    p = ptr + (ಗಾತ್ರ_2 & ~1);
+		    ಆದರೆ (ಗಾತ್ರ_2 & 1)
+			ಬಾಲ = p;
+		    ಆದರೆ ((fio_flags & FIO_UTF16) && p > ptr)
 		    {
 			// Check for a trailing leading word
-			if (fio_flags & FIO_ENDIAN_L)
+			ಆದರೆ (fio_flags & FIO_ENDIAN_L)
 			{
 			    u8c = (*--p << 8);
 			    u8c += *--p;
 			}
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
 			    u8c = *--p;
 			    u8c += (*--p << 8);
 			}
-			if (u8c >= 0xd800 && u8c <= 0xdbff)
-			    tail = p;
-			else
+			ಆದರೆ (u8c >= 0xd800 && u8c <= 0xdbff)
+			    ಬಾಲ = p;
+			ಇಲ್ಲದಿದ್ದರೆ
 			    p += 2;
 		    }
 		}
-		else //  FIO_UCS4
+		ಇಲ್ಲದಿದ್ದರೆ //  FIO_UCS4
 		{
 		    // Check for trailing 1, 2 or 3 bytes
-		    p = ptr + (size & ~3);
-		    if (size & 3)
-			tail = p;
+		    p = ptr + (ಗಾತ್ರ_2 & ~3);
+		    ಆದರೆ (ಗಾತ್ರ_2 & 3)
+			ಬಾಲ = p;
 		}
 
 		// If there is a trailing incomplete sequence move it to
 		// conv_rest[].
-		if (tail != NULL)
+		ಆದರೆ (ಬಾಲ != ಖಾಲಿ)
 		{
-		    conv_restlen = (int)((ptr + size) - tail);
-		    mch_memmove(conv_rest, (char_u *)tail, conv_restlen);
-		    size -= conv_restlen;
+		    conv_restlen = (ಪೂರ್ಣಾಂಕ)((ptr + ಗಾತ್ರ_2) - ಬಾಲ);
+		    mch_memmove(conv_rest, (char_u *)ಬಾಲ, conv_restlen);
+		    ಗಾತ್ರ_2 -= conv_restlen;
 		}
 
 
-		while (p > ptr)
+		ಆಗ (p > ptr)
 		{
-		    if (fio_flags & FIO_LATIN1)
+		    ಆದರೆ (fio_flags & FIO_LATIN1)
 			u8c = *--p;
-		    else if (fio_flags & (FIO_UCS2 | FIO_UTF16))
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (fio_flags & (FIO_UCS2 | FIO_UTF16))
 		    {
-			if (fio_flags & FIO_ENDIAN_L)
+			ಆದರೆ (fio_flags & FIO_ENDIAN_L)
 			{
 			    u8c = (*--p << 8);
 			    u8c += *--p;
 			}
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
 			    u8c = *--p;
 			    u8c += (*--p << 8);
 			}
-			if ((fio_flags & FIO_UTF16)
+			ಆದರೆ ((fio_flags & FIO_UTF16)
 					    && u8c >= 0xdc00 && u8c <= 0xdfff)
 			{
-			    int u16c;
+			    ಪೂರ್ಣಾಂಕ u16c;
 
-			    if (p == ptr)
+			    ಆದರೆ (p == ptr)
 			    {
 				// Missing leading word.
-				if (can_retry)
-				    goto rewind_retry;
-				if (conv_error == 0)
+				ಆದರೆ (can_retry)
+				    ಹೋಗು rewind_retry;
+				ಆದರೆ (conv_error == 0)
 				    conv_error = readfile_linenr(linecnt,
 								      ptr, p);
-				if (bad_char_behavior == BAD_DROP)
-				    continue;
-				if (bad_char_behavior != BAD_KEEP)
+				ಆದರೆ (bad_char_behavior == BAD_DROP)
+				    ಮುಂದುವರಿ;
+				ಆದರೆ (bad_char_behavior != BAD_KEEP)
 				    u8c = bad_char_behavior;
 			    }
 
 			    // found second word of double-word, get the first
 			    // word and compute the resulting character
-			    if (fio_flags & FIO_ENDIAN_L)
+			    ಆದರೆ (fio_flags & FIO_ENDIAN_L)
 			    {
 				u16c = (*--p << 8);
 				u16c += *--p;
 			    }
-			    else
+			    ಇಲ್ಲದಿದ್ದರೆ
 			    {
 				u16c = *--p;
 				u16c += (*--p << 8);
@@ -1961,273 +1961,273 @@ retry:
 							      + (u8c & 0x3ff);
 
 			    // Check if the word is indeed a leading word.
-			    if (u16c < 0xd800 || u16c > 0xdbff)
+			    ಆದರೆ (u16c < 0xd800 || u16c > 0xdbff)
 			    {
-				if (can_retry)
-				    goto rewind_retry;
-				if (conv_error == 0)
+				ಆದರೆ (can_retry)
+				    ಹೋಗು rewind_retry;
+				ಆದರೆ (conv_error == 0)
 				    conv_error = readfile_linenr(linecnt,
 								      ptr, p);
-				if (bad_char_behavior == BAD_DROP)
-				    continue;
-				if (bad_char_behavior != BAD_KEEP)
+				ಆದರೆ (bad_char_behavior == BAD_DROP)
+				    ಮುಂದುವರಿ;
+				ಆದರೆ (bad_char_behavior != BAD_KEEP)
 				    u8c = bad_char_behavior;
 			    }
 			}
 		    }
-		    else if (fio_flags & FIO_UCS4)
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (fio_flags & FIO_UCS4)
 		    {
-			if (fio_flags & FIO_ENDIAN_L)
+			ಆದರೆ (fio_flags & FIO_ENDIAN_L)
 			{
-			    u8c = (unsigned)*--p << 24;
-			    u8c += (unsigned)*--p << 16;
-			    u8c += (unsigned)*--p << 8;
+			    u8c = (ಚಿಹ್ನೆರಹಿತ)*--p << 24;
+			    u8c += (ಚಿಹ್ನೆರಹಿತ)*--p << 16;
+			    u8c += (ಚಿಹ್ನೆರಹಿತ)*--p << 8;
 			    u8c += *--p;
 			}
-			else	// big endian
+			ಇಲ್ಲದಿದ್ದರೆ	// big endian
 			{
 			    u8c = *--p;
-			    u8c += (unsigned)*--p << 8;
-			    u8c += (unsigned)*--p << 16;
-			    u8c += (unsigned)*--p << 24;
+			    u8c += (ಚಿಹ್ನೆರಹಿತ)*--p << 8;
+			    u8c += (ಚಿಹ್ನೆರಹಿತ)*--p << 16;
+			    u8c += (ಚಿಹ್ನೆರಹಿತ)*--p << 24;
 			}
 		    }
-		    else    // UTF-8
+		    ಇಲ್ಲದಿದ್ದರೆ    // UTF-8
 		    {
-			if (*--p < 0x80)
+			ಆದರೆ (*--p < 0x80)
 			    u8c = *p;
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
-			    len = utf_head_off(ptr, p);
+			    len = utf_ತಲೆ_off(ptr, p);
 			    p -= len;
 			    u8c = utf_ptr2char(p);
-			    if (len == 0)
+			    ಆದರೆ (len == 0)
 			    {
 				// Not a valid UTF-8 character, retry with
 				// another fenc when possible, otherwise just
 				// report the error.
-				if (can_retry)
-				    goto rewind_retry;
-				if (conv_error == 0)
+				ಆದರೆ (can_retry)
+				    ಹೋಗು rewind_retry;
+				ಆದರೆ (conv_error == 0)
 				    conv_error = readfile_linenr(linecnt,
 								      ptr, p);
-				if (bad_char_behavior == BAD_DROP)
-				    continue;
-				if (bad_char_behavior != BAD_KEEP)
+				ಆದರೆ (bad_char_behavior == BAD_DROP)
+				    ಮುಂದುವರಿ;
+				ಆದರೆ (bad_char_behavior != BAD_KEEP)
 				    u8c = bad_char_behavior;
 			    }
 			}
 		    }
-		    if (enc_utf8)	// produce UTF-8
+		    ಆದರೆ (enc_utf8)	// produce UTF-8
 		    {
 			dest -= utf_char2len(u8c);
-			(void)utf_char2bytes(u8c, dest);
+			(ಶೂನ್ಯ)utf_char2bytes(u8c, dest);
 		    }
-		    else		// produce Latin1
+		    ಇಲ್ಲದಿದ್ದರೆ		// produce Latin1
 		    {
 			--dest;
-			if (u8c >= 0x100)
+			ಆದರೆ (u8c >= 0x100)
 			{
 			    // character doesn't fit in latin1, retry with
 			    // another fenc when possible, otherwise just
 			    // report the error.
-			    if (can_retry)
-				goto rewind_retry;
-			    if (conv_error == 0)
+			    ಆದರೆ (can_retry)
+				ಹೋಗು rewind_retry;
+			    ಆದರೆ (conv_error == 0)
 				conv_error = readfile_linenr(linecnt, ptr, p);
-			    if (bad_char_behavior == BAD_DROP)
+			    ಆದರೆ (bad_char_behavior == BAD_DROP)
 				++dest;
-			    else if (bad_char_behavior == BAD_KEEP)
+			    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (bad_char_behavior == BAD_KEEP)
 				*dest = u8c;
-			    else if (eap != NULL && eap->bad_char != 0)
+			    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (eap != ಖಾಲಿ && eap->bad_char != 0)
 				*dest = bad_char_behavior;
-			    else
+			    ಇಲ್ಲದಿದ್ದರೆ
 				*dest = 0xBF;
 			}
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			    *dest = u8c;
 		    }
 		}
 
 		// move the linerest to before the converted characters
-		line_start = dest - linerest;
-		mch_memmove(line_start, buffer, (size_t)linerest);
-		size = (long)((ptr + real_size) - dest);
+		ಸಾಲು_ಆರಂಭ = dest - linerest;
+		mch_memmove(ಸಾಲು_ಆರಂಭ, ಬಫರ್, (size_t)linerest);
+		ಗಾತ್ರ_2 = (ದೀರ್ಘ)((ptr + real_ಗಾತ್ರ) - dest);
 		ptr = dest;
 	    }
-	    else if (enc_utf8 && !curbuf->b_p_bin)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (enc_utf8 && !curbuf->b_p_bin)
 	    {
-		int  incomplete_tail = FALSE;
+		ಪೂರ್ಣಾಂಕ  incomplete_ಬಾಲ = FALSE;
 
 		// Reading UTF-8: Check if the bytes are valid UTF-8.
-		for (p = ptr; ; )
+		ಗಾಗಿ (p = ptr; ; )
 		{
-		    int	 todo;
-		    int	 l;
+		    ಪೂರ್ಣಾಂಕ	 todo;
+		    ಪೂರ್ಣಾಂಕ	 l;
 
 		    // Skip ASCII bytes quickly using word-at-a-time check.
 		    {
-			char_u *ascii_end = ptr + size;
-			while (ascii_end - p >= (long)sizeof(long_u))
+			char_u *ascii_ಕೊನೆ = ptr + ಗಾತ್ರ_2;
+			ಆಗ (ascii_ಕೊನೆ - p >= (ದೀರ್ಘ)ಗಾತ್ರ(long_u))
 			{
-			    long_u word;
-			    memcpy(&word, p, sizeof(long_u));
-			    if (word & NONASCII_MASK)
-				break;
-			    p += sizeof(long_u);
+			    long_u ಶಬ್ದ;
+			    ಸ್ಮರಣೆ_ನಕಲು(&ಶಬ್ದ, p, ಗಾತ್ರ(long_u));
+			    ಆದರೆ (ಶಬ್ದ & NONASCII_ಮುಖವಾಡ)
+				ನಿಲ್ಲಿಸು;
+			    p += ಗಾತ್ರ(long_u);
 			}
-			while (p < ascii_end && *p < 0x80)
+			ಆಗ (p < ascii_ಕೊನೆ && *p < 0x80)
 			    ++p;
 		    }
 
-		    todo = (int)((ptr + size) - p);
-		    if (todo <= 0)
-			break;
-		    if (*p >= 0x80)
+		    todo = (ಪೂರ್ಣಾಂಕ)((ptr + ಗಾತ್ರ_2) - p);
+		    ಆದರೆ (todo <= 0)
+			ನಿಲ್ಲಿಸು;
+		    ಆದರೆ (*p >= 0x80)
 		    {
 			// A length of 1 means it's an illegal byte.  Accept
 			// an incomplete character at the end though, the next
 			// read() will get the next bytes, we'll check it
 			// then.
 			l = utf_ptr2len_len(p, todo);
-			if (l > todo && !incomplete_tail)
+			ಆದರೆ (l > todo && !incomplete_ಬಾಲ)
 			{
 			    // Avoid retrying with a different encoding when
 			    // a truncated file is more likely, or attempting
 			    // to read the rest of an incomplete sequence when
 			    // we have already done so.
-			    if (p > ptr || filesize > 0)
-				incomplete_tail = TRUE;
+			    ಆದರೆ (p > ptr || filesize > 0)
+				incomplete_ಬಾಲ = TRUE;
 			    // Incomplete byte sequence, move it to conv_rest[]
 			    // and try to read the rest of it, unless we've
 			    // already done so.
-			    if (p > ptr)
+			    ಆದರೆ (p > ptr)
 			    {
 				conv_restlen = todo;
 				mch_memmove(conv_rest, p, conv_restlen);
-				size -= conv_restlen;
-				break;
+				ಗಾತ್ರ_2 -= conv_restlen;
+				ನಿಲ್ಲಿಸು;
 			    }
 			}
-			if (l == 1 || l > todo)
+			ಆದರೆ (l == 1 || l > todo)
 			{
 			    // Illegal byte.  If we can try another encoding
 			    // do that, unless at EOF where a truncated
 			    // file is more likely than a conversion error.
-			    if (can_retry && !incomplete_tail)
-				break;
-#ifdef USE_ICONV
+			    ಆದರೆ (can_retry && !incomplete_ಬಾಲ)
+				ನಿಲ್ಲಿಸು;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_ICONV
 			    // When we did a conversion report an error.
-			    if (iconv_fd != (iconv_t)-1 && conv_error == 0)
+			    ಆದರೆ (iconv_fd != (iconv_t)-1 && conv_error == 0)
 				conv_error = readfile_linenr(linecnt, ptr, p);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 			    // Remember the first linenr with an illegal byte
-			    if (conv_error == 0 && illegal_byte == 0)
+			    ಆದರೆ (conv_error == 0 && illegal_byte == 0)
 				illegal_byte = readfile_linenr(linecnt, ptr, p);
 
 			    // Drop, keep or replace the bad byte.
-			    if (bad_char_behavior == BAD_DROP)
+			    ಆದರೆ (bad_char_behavior == BAD_DROP)
 			    {
 				mch_memmove(p, p + 1, todo - 1);
-				--size;
+				--ಗಾತ್ರ_2;
 			    }
-			    else
+			    ಇಲ್ಲದಿದ್ದರೆ
 			    {
-				if (bad_char_behavior != BAD_KEEP)
+				ಆದರೆ (bad_char_behavior != BAD_KEEP)
 				    *p = bad_char_behavior;
 				++p;
 			    }
 			}
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			    p += l;
 		    }
 		}
-		if (p < ptr + size && !incomplete_tail)
+		ಆದರೆ (p < ptr + ಗಾತ್ರ_2 && !incomplete_ಬಾಲ)
 		{
 		    // Detected a UTF-8 error.
 rewind_retry:
 		    // Retry reading with another conversion.
-#if defined(FEAT_EVAL) && defined(USE_ICONV)
-		    if (*p_ccv != NUL && iconv_fd != (iconv_t)-1)
+#ಆದರೆ defined(FEAT_EVAL) && defined(USE_ICONV)
+		    ಆದರೆ (*p_ccv != NUL && iconv_fd != (iconv_t)-1)
 			// iconv() failed, try 'charconvert'
 			did_iconv = TRUE;
-		    else
-#endif
+		    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 			// use next item from 'fileencodings'
 			advance_fenc = TRUE;
 		    file_rewind = TRUE;
-		    goto retry;
+		    ಹೋಗು retry;
 		}
 	    }
 
 	    // count the number of characters (after conversion!)
-	    filesize += size;
+	    filesize += ಗಾತ್ರ_2;
 
 	    /*
 	     * when reading the first part of a file: guess EOL type
 	     */
-	    if (fileformat == EOL_UNKNOWN)
+	    ಆದರೆ (fileformat == EOL_UNKNOWN)
 	    {
 		// First try finding a NL, for Dos and Unix
-		if (try_dos || try_unix)
+		ಆದರೆ (try_dos || try_unix)
 		{
 		    // Reset the carriage return counter.
-		    if (try_mac)
+		    ಆದರೆ (try_mac)
 			try_mac = 1;
 
-		    for (p = ptr; p < ptr + size; ++p)
+		    ಗಾಗಿ (p = ptr; p < ptr + ಗಾತ್ರ_2; ++p)
 		    {
-			if (*p == NL)
+			ಆದರೆ (*p == NL)
 			{
-			    if (!try_unix
+			    ಆದರೆ (!try_unix
 				    || (try_dos && p > ptr && p[-1] == CAR))
 				fileformat = EOL_DOS;
-			    else
+			    ಇಲ್ಲದಿದ್ದರೆ
 				fileformat = EOL_UNIX;
-			    break;
+			    ನಿಲ್ಲಿಸು;
 			}
-			else if (*p == CAR && try_mac)
+			ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*p == CAR && try_mac)
 			    try_mac++;
 		    }
 
 		    // Don't give in to EOL_UNIX if EOL_MAC is more likely
-		    if (fileformat == EOL_UNIX && try_mac)
+		    ಆದರೆ (fileformat == EOL_UNIX && try_mac)
 		    {
 			// Need to reset the counters when retrying fenc.
 			try_mac = 1;
 			try_unix = 1;
-			for (; p >= ptr && *p != CAR; p--)
+			ಗಾಗಿ (; p >= ptr && *p != CAR; p--)
 			    ;
-			if (p >= ptr)
+			ಆದರೆ (p >= ptr)
 			{
-			    for (p = ptr; p < ptr + size; ++p)
+			    ಗಾಗಿ (p = ptr; p < ptr + ಗಾತ್ರ_2; ++p)
 			    {
-				if (*p == NL)
+				ಆದರೆ (*p == NL)
 				    try_unix++;
-				else if (*p == CAR)
+				ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*p == CAR)
 				    try_mac++;
 			    }
-			    if (try_mac > try_unix)
+			    ಆದರೆ (try_mac > try_unix)
 				fileformat = EOL_MAC;
 			}
 		    }
-		    else if (fileformat == EOL_UNKNOWN && try_mac == 1)
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (fileformat == EOL_UNKNOWN && try_mac == 1)
 			// Looking for CR but found no end-of-line markers at
 			// all: use the default format.
 			fileformat = default_fileformat();
 		}
 
 		// No NL found: may use Mac format
-		if (fileformat == EOL_UNKNOWN && try_mac)
+		ಆದರೆ (fileformat == EOL_UNKNOWN && try_mac)
 		    fileformat = EOL_MAC;
 
 		// Still nothing found?  Use first format in 'ffs'
-		if (fileformat == EOL_UNKNOWN)
+		ಆದರೆ (fileformat == EOL_UNKNOWN)
 		    fileformat = default_fileformat();
 
 		// if editing a new file: may set p_tx and p_ff
-		if (set_options)
-		    set_fileformat(fileformat, OPT_LOCAL);
+		ಆದರೆ (ಗಣ_options)
+		    ಗಣ_fileformat(fileformat, OPT_LOCAL);
 	    }
 	}
 
@@ -2235,92 +2235,92 @@ rewind_retry:
 	 * This loop is executed once for every character read.
 	 * Keep it fast!
 	 */
-	if (fileformat == EOL_MAC)
+	ಆದರೆ (fileformat == EOL_MAC)
 	{
 	    --ptr;
-	    while (++ptr, --size >= 0)
+	    ಆಗ (++ptr, --ಗಾತ್ರ_2 >= 0)
 	    {
 		// catch most common case first
-		if ((c = *ptr) != NUL && c != CAR && c != NL)
-		    continue;
-		if (c == NUL)
+		ಆದರೆ ((c = *ptr) != NUL && c != CAR && c != NL)
+		    ಮುಂದುವರಿ;
+		ಆದರೆ (c == NUL)
 		    *ptr = NL;	// NULs are replaced by newlines!
-		else if (c == NL)
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (c == NL)
 		    *ptr = CAR;	// NLs are replaced by CRs!
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    if (skip_count == 0)
+		    ಆದರೆ (skip_ಎಣಿಕೆ == 0)
 		    {
 			*ptr = NUL;	    // end of line
-			len = (colnr_T) (ptr - line_start + 1);
-			if (ml_append(lnum, line_start, len, newfile) == FAIL)
+			len = (colnr_T) (ptr - ಸಾಲು_ಆರಂಭ + 1);
+			ಆದರೆ (ml_append(lnum, ಸಾಲು_ಆರಂಭ, len, newfile) == FAIL)
 			{
 			    error = TRUE;
-			    break;
+			    ನಿಲ್ಲಿಸು;
 			}
-#ifdef FEAT_PERSISTENT_UNDO
-			if (read_undo_file)
-			    sha256_update(&sha_ctx, line_start, len);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PERSISTENT_UNDO
+			ಆದರೆ (read_undo_file)
+			    sha256_update(&sha_ctx, ಸಾಲು_ಆರಂಭ, len);
+#ಆದರೆ_ಅಂತ್ಯ
 			++lnum;
-			if (--read_count == 0)
+			ಆದರೆ (--read_ಎಣಿಕೆ == 0)
 			{
 			    error = TRUE;	// break loop
-			    line_start = ptr;	// nothing left to write
-			    break;
+			    ಸಾಲು_ಆರಂಭ = ptr;	// nothing left to write
+			    ನಿಲ್ಲಿಸು;
 			}
 		    }
-		    else
-			--skip_count;
-		    line_start = ptr + 1;
+		    ಇಲ್ಲದಿದ್ದರೆ
+			--skip_ಎಣಿಕೆ;
+		    ಸಾಲು_ಆರಂಭ = ptr + 1;
 		}
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // Use memchr() for SIMD-optimized newline scanning instead
 	    // of scanning each byte individually.
-	    char_u *end = ptr + size;
+	    char_u *ಕೊನೆ = ptr + ಗಾತ್ರ_2;
 
-	    while (ptr < end)
+	    ಆಗ (ptr < ಕೊನೆ)
 	    {
-		char_u *nl = (char_u *)memchr(ptr, NL, end - ptr);
-		char_u *nul_scan;
+		char_u *nl = (char_u *)memchr(ptr, NL, ಕೊನೆ - ptr);
+		char_u *nul_ಪರಿಶೀಲನೆ;
 
-		if (nl == NULL)
+		ಆದರೆ (nl == ಖಾಲಿ)
 		{
 		    // No more newlines in buffer.
 		    // Replace any NUL bytes with NL in remaining data.
-		    while ((nul_scan = (char_u *)memchr(ptr, NUL,
-						      end - ptr)) != NULL)
+		    ಆಗ ((nul_ಪರಿಶೀಲನೆ = (char_u *)memchr(ptr, NUL,
+						      ಕೊನೆ - ptr)) != ಖಾಲಿ)
 		    {
-			*nul_scan = NL;
-			ptr = nul_scan + 1;
+			*nul_ಪರಿಶೀಲನೆ = NL;
+			ptr = nul_ಪರಿಶೀಲನೆ + 1;
 		    }
-		    ptr = end;
-		    break;
+		    ptr = ಕೊನೆ;
+		    ನಿಲ್ಲಿಸು;
 		}
 
 		// Replace NUL bytes with NL before the newline.
 		{
-		    char_u *scan = ptr;
-		    while ((nul_scan = (char_u *)memchr(scan, NUL,
-						       nl - scan)) != NULL)
+		    char_u *ಪರಿಶೀಲನೆ = ptr;
+		    ಆಗ ((nul_ಪರಿಶೀಲನೆ = (char_u *)memchr(ಪರಿಶೀಲನೆ, NUL,
+						       nl - ಪರಿಶೀಲನೆ)) != ಖಾಲಿ)
 		    {
-			*nul_scan = NL;
-			scan = nul_scan + 1;
+			*nul_ಪರಿಶೀಲನೆ = NL;
+			ಪರಿಶೀಲನೆ = nul_ಪರಿಶೀಲನೆ + 1;
 		    }
 		}
 
 		// Process the newline.
 		ptr = nl;
-		if (skip_count == 0)
+		ಆದರೆ (skip_ಎಣಿಕೆ == 0)
 		{
 		    *ptr = NUL;		// end of line
-		    len = (colnr_T)(ptr - line_start + 1);
-		    if (fileformat == EOL_DOS)
+		    len = (colnr_T)(ptr - ಸಾಲು_ಆರಂಭ + 1);
+		    ಆದರೆ (fileformat == EOL_DOS)
 		    {
-			if (ptr > line_start && ptr[-1] == CAR)
+			ಆದರೆ (ptr > ಸಾಲು_ಆರಂಭ && ptr[-1] == CAR)
 			{
 			    // remove CR before NL
 			    ptr[-1] = NUL;
@@ -2332,55 +2332,55 @@ rewind_retry:
 			 * the lines read so far and start all over again.
 			 * Otherwise give an error message later.
 			 */
-			else if (ff_error != EOL_DOS)
+			ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ff_error != EOL_DOS)
 			{
-			    if (   try_unix
+			    ಆದರೆ (   try_unix
 				&& !read_stdin
-				&& (read_buffer
+				&& (read_ಬಫರ್
 				    || vim_lseek(fd, (off_T)0L, SEEK_SET)
 								      == 0))
 			    {
 				fileformat = EOL_UNIX;
-				if (set_options)
-				    set_fileformat(EOL_UNIX, OPT_LOCAL);
+				ಆದರೆ (ಗಣ_options)
+				    ಗಣ_fileformat(EOL_UNIX, OPT_LOCAL);
 				file_rewind = TRUE;
 				keep_fileformat = TRUE;
-				goto retry;
+				ಹೋಗು retry;
 			    }
 			    ff_error = EOL_DOS;
 			}
 		    }
-		    if (ml_append(lnum, line_start, len, newfile) == FAIL)
+		    ಆದರೆ (ml_append(lnum, ಸಾಲು_ಆರಂಭ, len, newfile) == FAIL)
 		    {
 			error = TRUE;
-			break;
+			ನಿಲ್ಲಿಸು;
 		    }
-#ifdef FEAT_PERSISTENT_UNDO
-		    if (read_undo_file)
-			sha256_update(&sha_ctx, line_start, len);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PERSISTENT_UNDO
+		    ಆದರೆ (read_undo_file)
+			sha256_update(&sha_ctx, ಸಾಲು_ಆರಂಭ, len);
+#ಆದರೆ_ಅಂತ್ಯ
 		    ++lnum;
-		    if (--read_count == 0)
+		    ಆದರೆ (--read_ಎಣಿಕೆ == 0)
 		    {
 			error = TRUE;	    // break loop
-			line_start = ptr;   // nothing left to write
-			break;
+			ಸಾಲು_ಆರಂಭ = ptr;   // nothing left to write
+			ನಿಲ್ಲಿಸು;
 		    }
 		}
-		else
-		    --skip_count;
-		line_start = ptr + 1;
+		ಇಲ್ಲದಿದ್ದರೆ
+		    --skip_ಎಣಿಕೆ;
+		ಸಾಲು_ಆರಂಭ = ptr + 1;
 		++ptr;
 	    }
-	    size = -1;
+	    ಗಾತ್ರ_2 = -1;
 	}
-	linerest = (long)(ptr - line_start);
+	linerest = (ದೀರ್ಘ)(ptr - ಸಾಲು_ಆರಂಭ);
 	ui_breakcheck();
     }
 
 failed:
     // not an error, max. number of lines reached
-    if (error && read_count == 0)
+    ಆದರೆ (error && read_ಎಣಿಕೆ == 0)
 	error = FALSE;
 
     // In Dos format ignore a trailing CTRL-Z, unless 'binary' is set.
@@ -2389,90 +2389,90 @@ failed:
     // system that keeps file length properly the CTRL-Z should be dropped.
     // Set the 'endoffile' option so the user can decide what to write later.
     // In Unix format the CTRL-Z is just another character.
-    if (linerest != 0
+    ಆದರೆ (linerest != 0
 	    && !curbuf->b_p_bin
 	    && fileformat == EOL_DOS
 	    && ptr[-1] == Ctrl_Z)
     {
 	ptr--;
 	linerest--;
-	if (set_options)
+	ಆದರೆ (ಗಣ_options)
 	    curbuf->b_p_eof = TRUE;
     }
 
     // If we get EOF in the middle of a line, note the fact by resetting
     // 'endofline' and add the line normally.
-    if (!error
+    ಆದರೆ (!error
 	    && !got_int
 	    && linerest != 0)
     {
 	// remember for when writing
-	if (set_options)
+	ಆದರೆ (ಗಣ_options)
 	    curbuf->b_p_eol = FALSE;
 	*ptr = NUL;
-	len = (colnr_T)(ptr - line_start + 1);
-	if (ml_append(lnum, line_start, len, newfile) == FAIL)
+	len = (colnr_T)(ptr - ಸಾಲು_ಆರಂಭ + 1);
+	ಆದರೆ (ml_append(lnum, ಸಾಲು_ಆರಂಭ, len, newfile) == FAIL)
 	    error = TRUE;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-#ifdef FEAT_PERSISTENT_UNDO
-	    if (read_undo_file)
-		sha256_update(&sha_ctx, line_start, len);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PERSISTENT_UNDO
+	    ಆದರೆ (read_undo_file)
+		sha256_update(&sha_ctx, ಸಾಲು_ಆರಂಭ, len);
+#ಆದರೆ_ಅಂತ್ಯ
 	    read_no_eol_lnum = ++lnum;
 	}
     }
 
-    if (set_options)
+    ಆದರೆ (ಗಣ_options)
 	save_file_ff(curbuf);		// remember the current file format
 
-#ifdef FEAT_CRYPT
-    if (curbuf->b_cryptstate != NULL)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+    ಆದರೆ (curbuf->b_cryptstate != ಖಾಲಿ)
     {
 	crypt_free_state(curbuf->b_cryptstate);
-	curbuf->b_cryptstate = NULL;
+	curbuf->b_cryptstate = ಖಾಲಿ;
     }
-    if (cryptkey != NULL && cryptkey != curbuf->b_p_key)
-	crypt_free_key(cryptkey);
+    ಆದರೆ (cryptkey != ಖಾಲಿ && cryptkey != curbuf->b_p_ಕೀಲಿ)
+	crypt_free_ಕೀಲಿ(cryptkey);
     // Don't set cryptkey to NULL, it's used below as a flag that
     // encryption was used.
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // If editing a new file: set 'fenc' for the current buffer.
     // Also for ":read ++edit file".
-    if (set_options)
-	set_string_option_direct((char_u *)"fenc", -1, fenc,
+    ಆದರೆ (ಗಣ_options)
+	ಗಣ_string_option_ನೇರ((char_u *)"fenc", -1, fenc,
 						       OPT_FREE|OPT_LOCAL, 0);
-    if (fenc_alloced)
+    ಆದರೆ (fenc_alloced)
 	vim_free(fenc);
-#ifdef USE_ICONV
-    if (iconv_fd != (iconv_t)-1)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_ICONV
+    ಆದರೆ (iconv_fd != (iconv_t)-1)
 	iconv_close(iconv_fd);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (!read_buffer && !read_stdin)
+    ಆದರೆ (!read_ಬಫರ್ && !read_stdin)
 	close(fd);				// errors are ignored
-#ifdef HAVE_FD_CLOEXEC
-    else
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_FD_CLOEXEC
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	int fdflags = fcntl(fd, F_GETFD);
+	ಪೂರ್ಣಾಂಕ fdflags = fcntl(fd, F_GETFD);
 
-	if (fdflags >= 0 && (fdflags & FD_CLOEXEC) == 0)
-	    (void)fcntl(fd, F_SETFD, fdflags | FD_CLOEXEC);
+	ಆದರೆ (fdflags >= 0 && (fdflags & FD_CLOEXEC) == 0)
+	    (ಶೂನ್ಯ)fcntl(fd, F_SETFD, fdflags | FD_CLOEXEC);
     }
-#endif
-    vim_free(buffer);
+#ಆದರೆ_ಅಂತ್ಯ
+    vim_free(ಬಫರ್);
 
-#ifdef HAVE_DUP
-    if (read_stdin)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_DUP
+    ಆದರೆ (read_stdin)
     {
 	// Use stderr for stdin, makes shell commands work.
 	close(0);
 	vim_ignored = dup(2);
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (tmpname != NULL)
+    ಆದರೆ (tmpname != ಖಾಲಿ)
     {
 	mch_remove(tmpname);		// delete converted file
 	vim_free(tmpname);
@@ -2482,198 +2482,198 @@ failed:
     /*
      * In recovery mode everything but autocommands is skipped.
      */
-    if (!recoverymode)
+    ಆದರೆ (!recoverymode)
     {
 	// need to delete the last line, which comes from the empty buffer
-	if (newfile && wasempty && !(curbuf->b_ml.ml_flags & ML_EMPTY))
+	ಆದರೆ (newfile && wasempty && !(curbuf->b_ml.ml_flags & ML_ಖಾಲಿಗಳು))
 	{
-#ifdef FEAT_NETBEANS_INTG
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_NETBEANS_INTG
 	    netbeansFireChanges = 0;
-#endif
-	    ml_delete(curbuf->b_ml.ml_line_count);
-#ifdef FEAT_NETBEANS_INTG
+#ಆದರೆ_ಅಂತ್ಯ
+	    ml_delete(curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_NETBEANS_INTG
 	    netbeansFireChanges = 1;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    --linecnt;
 	}
-	linecnt = curbuf->b_ml.ml_line_count - linecnt;
-	if (filesize == 0)
+	linecnt = curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ - linecnt;
+	ಆದರೆ (filesize == 0)
 	    linecnt = 0;
-	if (newfile || read_buffer)
+	ಆದರೆ (newfile || read_ಬಫರ್)
 	{
 	    redraw_curbuf_later(UPD_NOT_VALID);
-#ifdef FEAT_DIFF
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
 	    // After reading the text into the buffer the diff info needs to
 	    // be updated.
 	    diff_invalidate(curbuf);
-#endif
-#ifdef FEAT_FOLDING
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_FOLDING
 	    // All folds in the window are invalid now.  Mark them for update
 	    // before triggering autocommands.
 	    foldUpdateAll(curwin);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	}
-	else if (linecnt)		// appended at least one line
-	    appended_lines_mark(from, linecnt);
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (linecnt)		// appended at least one line
+	    appended_ಸಾಲುಗಳು_mark(from, linecnt);
 
-#ifndef ALWAYS_USE_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ ALWAYS_USE_GUI
 	/*
 	 * If we were reading from the same terminal as where messages go,
 	 * the screen will have been messed up.
 	 * Switch on raw mode now and clear the screen.
 	 */
-	if (read_stdin)
+	ಆದರೆ (read_stdin)
 	{
 	    settmode(TMODE_RAW);	// set to raw mode
 	    starttermcap();
 	    screenclear();
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-	if (got_int)
+	ಆದರೆ (got_int)
 	{
-	    if (!(flags & READ_DUMMY))
+	    ಆದರೆ (!(flags & READ_DUMMY))
 	    {
 		filemess(curbuf, sfname, (char_u *)_(e_interrupted), 0);
-		if (newfile)
+		ಆದರೆ (newfile)
 		    curbuf->b_p_ro = TRUE;	// must use "w!" now
 	    }
-	    msg_scroll = msg_save;
-#ifdef FEAT_VIMINFO
+	    ಸಂದೇಶ_scroll = ಸಂದೇಶ_save;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VIMINFO
 	    check_marks_read();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    retval = OK;	// an interrupt isn't really an error
-	    goto theend;
+	    ಹೋಗು theend;
 	}
 
-	if (!filtering && !(flags & READ_DUMMY))
+	ಆದರೆ (!filtering && !(flags & READ_DUMMY))
 	{
-	    int	buflen;
+	    ಪೂರ್ಣಾಂಕ	buflen;
 
-	    msg_add_fname(curbuf, sfname);   // fname in IObuff with quotes
+	    ಸಂದೇಶ_ಕೂಡಿಸು_fname(curbuf, sfname);   // fname in IObuff with quotes
 	    c = FALSE;
 
-	    buflen = (int)STRLEN(IObuff);
-#ifdef UNIX
-	    if (S_ISFIFO(perm))			    // fifo
+	    buflen = (ಪೂರ್ಣಾಂಕ)STRLEN(IObuff);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
+	    ಆದರೆ (S_ISFIFO(perm))			    // fifo
 	    {
-		buflen += vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
+		buflen += vim_snprintf((ಅಕ್ಷರ *)IObuff + buflen, IOSIZE - buflen,
 			_("[fifo]"));
 		c = TRUE;
 	    }
-	    if (S_ISSOCK(perm))			    // or socket
+	    ಆದರೆ (S_ISSOCK(perm))			    // or socket
 	    {
-		buflen += vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
+		buflen += vim_snprintf((ಅಕ್ಷರ *)IObuff + buflen, IOSIZE - buflen,
 			_("[socket]"));
 		c = TRUE;
 	    }
 # ifdef OPEN_CHR_FILES
-	    if (S_ISCHR(perm))			    // or character special
+	    ಆದರೆ (S_ISCHR(perm))			    // or character special
 	    {
-		buflen += vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
+		buflen += vim_snprintf((ಅಕ್ಷರ *)IObuff + buflen, IOSIZE - buflen,
 			_("[character special]"));
 		c = TRUE;
 	    }
 # endif
-#endif
-	    if (curbuf->b_p_ro)
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಆದರೆ (curbuf->b_p_ro)
 	    {
-		buflen += vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
+		buflen += vim_snprintf((ಅಕ್ಷರ *)IObuff + buflen, IOSIZE - buflen,
 			"%s", shortmess(SHM_RO) ? _("[RO]") : _("[readonly]"));
 		c = TRUE;
 	    }
-	    if (read_no_eol_lnum)
+	    ಆದರೆ (read_no_eol_lnum)
 	    {
-		msg_add_eol();
+		ಸಂದೇಶ_ಕೂಡಿಸು_eol();
 		c = TRUE;
 	    }
-	    if (ff_error == EOL_DOS)
+	    ಆದರೆ (ff_error == EOL_DOS)
 	    {
-		buflen += vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
+		buflen += vim_snprintf((ಅಕ್ಷರ *)IObuff + buflen, IOSIZE - buflen,
 			_("[CR missing]"));
 		c = TRUE;
 	    }
-	    if (split)
+	    ಆದರೆ (ವಿಭಜಿಸು)
 	    {
-		buflen += vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
+		buflen += vim_snprintf((ಅಕ್ಷರ *)IObuff + buflen, IOSIZE - buflen,
 			_("[long lines split]"));
 		c = TRUE;
 	    }
-	    if (notconverted)
+	    ಆದರೆ (notconverted)
 	    {
-		buflen += vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
+		buflen += vim_snprintf((ಅಕ್ಷರ *)IObuff + buflen, IOSIZE - buflen,
 			_("[NOT converted]"));
 		c = TRUE;
 	    }
-	    else if (converted)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (converted)
 	    {
-		buflen += vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
+		buflen += vim_snprintf((ಅಕ್ಷರ *)IObuff + buflen, IOSIZE - buflen,
 			_("[converted]"));
 		c = TRUE;
 	    }
-#ifdef FEAT_CRYPT
-	    if (cryptkey != NULL)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+	    ಆದರೆ (cryptkey != ಖಾಲಿ)
 	    {
-		crypt_append_msg(curbuf);
+		crypt_append_ಸಂದೇಶ(curbuf);
 		c = TRUE;
 	    }
-#endif
-	    if (conv_error != 0)
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಆದರೆ (conv_error != 0)
 	    {
-		vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
-			_("[CONVERSION ERROR in line %ld]"), (long)conv_error);
+		vim_snprintf((ಅಕ್ಷರ *)IObuff + buflen, IOSIZE - buflen,
+			_("[CONVERSION ERROR in line %ld]"), (ದೀರ್ಘ)conv_error);
 		c = TRUE;
 	    }
-	    else if (illegal_byte > 0)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (illegal_byte > 0)
 	    {
-		vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
-			_("[ILLEGAL BYTE in line %ld]"), (long)illegal_byte);
+		vim_snprintf((ಅಕ್ಷರ *)IObuff + buflen, IOSIZE - buflen,
+			_("[ILLEGAL BYTE in line %ld]"), (ದೀರ್ಘ)illegal_byte);
 		c = TRUE;
 	    }
-	    else if (error)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (error)
 	    {
-		vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
+		vim_snprintf((ಅಕ್ಷರ *)IObuff + buflen, IOSIZE - buflen,
 			_("[READ ERRORS]"));
 		c = TRUE;
 	    }
-	    if (msg_add_fileformat(fileformat))
+	    ಆದರೆ (ಸಂದೇಶ_ಕೂಡಿಸು_fileformat(fileformat))
 		c = TRUE;
-#ifdef FEAT_CRYPT
-	    if (cryptkey != NULL)
-		msg_add_lines(c, (long)linecnt, filesize
-			 - crypt_get_header_len(crypt_get_method_nr(curbuf)));
-	    else
-#endif
-		msg_add_lines(c, (long)linecnt, filesize);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+	    ಆದರೆ (cryptkey != ಖಾಲಿ)
+		ಸಂದೇಶ_ಕೂಡಿಸು_ಸಾಲುಗಳು(c, (ದೀರ್ಘ)linecnt, filesize
+			 - crypt_get_ಶೀರ್ಷಿಕೆ_len(crypt_get_ವಿಧಾನ_nr(curbuf)));
+	    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+		ಸಂದೇಶ_ಕೂಡಿಸು_ಸಾಲುಗಳು(c, (ದೀರ್ಘ)linecnt, filesize);
 
-	    VIM_CLEAR(keep_msg);
-	    msg_scrolled_ign = TRUE;
-#ifdef ALWAYS_USE_GUI
+	    VIM_CLEAR(keep_ಸಂದೇಶ);
+	    ಸಂದೇಶ_scrolled_ign = TRUE;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ALWAYS_USE_GUI
 	    // Don't show the message when reading stdin, it would end up in a
 	    // message box (which might be shown when exiting!)
-	    if (read_stdin || read_buffer)
-		p = msg_may_trunc(FALSE, IObuff);
-	    else
-#endif
+	    ಆದರೆ (read_stdin || read_ಬಫರ್)
+		p = ಸಂದೇಶ_may_trunc(FALSE, IObuff);
+	    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 	    {
-		if (msg_col > 0)
-		    msg_putchar('\r');  // overwrite previous message
-		p = (char_u *)msg_trunc_attr((char *)IObuff, FALSE, 0);
+		ಆದರೆ (ಸಂದೇಶ_ಲಂಬಸಾಲು > 0)
+		    ಸಂದೇಶ_putchar('\r');  // overwrite previous message
+		p = (char_u *)ಸಂದೇಶ_trunc_attr((ಅಕ್ಷರ *)IObuff, FALSE, 0);
 	    }
-	    if (read_stdin || read_buffer || restart_edit != 0
-		    || (msg_scrolled != 0 && !need_wait_return))
+	    ಆದರೆ (read_stdin || read_ಬಫರ್ || restart_edit != 0
+		    || (ಸಂದೇಶ_scrolled != 0 && !need_wait_return))
 		// Need to repeat the message after redrawing when:
 		// - When reading from stdin (the screen will be cleared next).
 		// - When restart_edit is set (otherwise there will be a delay
 		//   before redrawing).
 		// - When the screen was scrolled but there is no wait-return
 		//   prompt.
-		set_keep_msg(p, 0);
-	    msg_scrolled_ign = FALSE;
+		ಗಣ_keep_ಸಂದೇಶ(p, 0);
+	    ಸಂದೇಶ_scrolled_ign = FALSE;
 	}
 
 	// with errors writing the file requires ":w!"
-	if (newfile && (error
+	ಆದರೆ (newfile && (error
 		    || conv_error != 0
 		    || (illegal_byte > 0 && bad_char_behavior != BAD_KEEP)))
 	    curbuf->b_p_ro = TRUE;
@@ -2684,23 +2684,23 @@ failed:
 	 * In Ex mode: cursor at last new line.
 	 * Otherwise: cursor at first new line.
 	 */
-	if (exmode_active)
+	ಆದರೆ (exmode_ಸಕ್ರಿಯ)
 	    curwin->w_cursor.lnum = from + linecnt;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    curwin->w_cursor.lnum = from + 1;
 	check_cursor_lnum();
 	beginline(BL_WHITE | BL_FIX);	    // on first non-blank
 
-	if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+	ಆದರೆ ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
 	{
 	    // Set '[ and '] marks to the newly read lines.
-	    curbuf->b_op_start.lnum = from + 1;
-	    curbuf->b_op_start.col = 0;
-	    curbuf->b_op_end.lnum = from + linecnt;
-	    curbuf->b_op_end.col = 0;
+	    curbuf->b_op_ಆರಂಭ.lnum = from + 1;
+	    curbuf->b_op_ಆರಂಭ.ಲಂಬಸಾಲು = 0;
+	    curbuf->b_op_ಕೊನೆ.lnum = from + linecnt;
+	    curbuf->b_op_ಕೊನೆ.ಲಂಬಸಾಲು = 0;
 	}
 
-#ifdef MSWIN
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
 	/*
 	 * Work around a weird problem: When a file has two links (only
 	 * possible on NTFS) and we write through one link, then stat() it
@@ -2708,23 +2708,23 @@ failed:
 	 * It's correct again after reading the file, thus reset the timestamp
 	 * here.
 	 */
-	if (newfile && !read_stdin && !read_buffer
-					 && mch_stat((char *)fname, &st) >= 0)
+	ಆದರೆ (newfile && !read_stdin && !read_ಬಫರ್
+					 && mch_stat((ಅಕ್ಷರ *)fname, &st) >= 0)
 	{
-	    buf_store_time(curbuf, &st, fname);
+	    buf_store_ಸಮಯ(curbuf, &st, fname);
 	    curbuf->b_mtime_read = curbuf->b_mtime;
 	    curbuf->b_mtime_read_ns = curbuf->b_mtime_ns;
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
-    msg_scroll = msg_save;
+    ಸಂದೇಶ_scroll = ಸಂದೇಶ_save;
 
-#ifdef FEAT_VIMINFO
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VIMINFO
     /*
      * Get the marks before executing autocommands, so they can be used there.
      */
     check_marks_read();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     /*
      * We remember if the last line of the read didn't have
@@ -2736,30 +2736,30 @@ failed:
 
     // When reloading a buffer put the cursor at the first line that is
     // different.
-    if (flags & READ_KEEP_UNDO)
-	u_find_first_changed();
+    ಆದರೆ (flags & READ_KEEP_UNDO)
+	u_ಕಂಡುಹಿಡಿ_ಮೊದಲ_ಬದಲಾಯಿತು();
 
-#ifdef FEAT_PERSISTENT_UNDO
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PERSISTENT_UNDO
     /*
      * When opening a new file locate undo info and read it.
      */
-    if (read_undo_file)
+    ಆದರೆ (read_undo_file)
     {
-	char_u	hash[UNDO_HASH_SIZE];
+	char_u	hash[UNDO_HASH_ಗಾತ್ರ];
 
-	sha256_finish(&sha_ctx, hash);
-	u_read_undo(NULL, hash, fname);
+	sha256_ಮುಕ್ತಾಯ(&sha_ctx, hash);
+	u_read_undo(ಖಾಲಿ, hash, fname);
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (!read_stdin && !read_fifo && (!read_buffer || sfname != NULL))
+    ಆದರೆ (!read_stdin && !read_fifo && (!read_ಬಫರ್ || sfname != ಖಾಲಿ))
     {
-	int m = msg_scroll;
-	int n = msg_scrolled;
+	ಪೂರ್ಣಾಂಕ m = ಸಂದೇಶ_scroll;
+	ಪೂರ್ಣಾಂಕ n = ಸಂದೇಶ_scrolled;
 
 	// Save the fileformat now, otherwise the buffer will be considered
 	// modified if the format/encoding was automatically detected.
-	if (set_options)
+	ಆದರೆ (ಗಣ_options)
 	    save_file_ff(curbuf);
 
 	/*
@@ -2767,15 +2767,15 @@ failed:
 	 * should not be overwritten: Set msg_scroll, restore its value if no
 	 * output was done.
 	 */
-	msg_scroll = TRUE;
-	if (filtering)
-	    apply_autocmds_exarg(EVENT_FILTERREADPOST, NULL, sfname,
+	ಸಂದೇಶ_scroll = TRUE;
+	ಆದರೆ (filtering)
+	    apply_autocmds_exarg(EVENT_FILTERREADPOST, ಖಾಲಿ, sfname,
 							  FALSE, curbuf, eap);
-	else if (newfile || (read_buffer && sfname != NULL))
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (newfile || (read_ಬಫರ್ && sfname != ಖಾಲಿ))
 	{
-	    apply_autocmds_exarg(EVENT_BUFREADPOST, NULL, sfname,
+	    apply_autocmds_exarg(EVENT_BUFREADPOST, ಖಾಲಿ, sfname,
 							  FALSE, curbuf, eap);
-	    if (!curbuf->b_au_did_filetype && *curbuf->b_p_ft != NUL)
+	    ಆದರೆ (!curbuf->b_au_did_filetype && *curbuf->b_p_ft != NUL)
 		/*
 		 * EVENT_FILETYPE was not triggered but the buffer already has a
 		 * filetype. Trigger EVENT_FILETYPE using the existing filetype.
@@ -2783,53 +2783,53 @@ failed:
 		apply_autocmds(EVENT_FILETYPE, curbuf->b_p_ft, curbuf->b_fname,
 			TRUE, curbuf);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    apply_autocmds_exarg(EVENT_FILEREADPOST, sfname, sfname,
-							    FALSE, NULL, eap);
-	if (msg_scrolled == n)
-	    msg_scroll = m;
-#ifdef FEAT_EVAL
-	if (aborting())	    // autocmds may abort script processing
-	    goto theend;
-#endif
+							    FALSE, ಖಾಲಿ, eap);
+	ಆದರೆ (ಸಂದೇಶ_scrolled == n)
+	    ಸಂದೇಶ_scroll = m;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	ಆದರೆ (aborting())	    // autocmds may abort script processing
+	    ಹೋಗು theend;
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
-    if (!(recoverymode && error))
+    ಆದರೆ (!(recoverymode && error))
 	retval = OK;
 
 theend:
-    if (curbuf->b_ml.ml_mfp != NULL
+    ಆದರೆ (curbuf->b_ml.ml_mfp != ಖಾಲಿ
 		       && curbuf->b_ml.ml_mfp->mf_dirty == MF_DIRTY_YES_NOSYNC)
 	// OK to sync the swap file now
 	curbuf->b_ml.ml_mfp->mf_dirty = MF_DIRTY_YES;
 
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
-#if defined(OPEN_CHR_FILES)
+#ಆದರೆ defined(OPEN_CHR_FILES)
 /*
  * Returns TRUE if the file name argument is of the form "/dev/fd/\d\+",
  * which is the name of files used for process substitution output by
  * some shells on some operating systems, e.g., bash on SunOS.
  * Do not accept "/dev/fd/[012]", opening these may hang Vim.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 is_dev_fd_file(char_u *fname)
 {
-    return (STRNCMP(fname, "/dev/fd/", 8) == 0
+    ಹಿಂತಿರುಗಿ (STRNCMP(fname, "/dev/fd/", 8) == 0
 	    && VIM_ISDIGIT(fname[8])
 	    && *skipdigits(fname + 9) == NUL
 	    && (fname[9] != NUL
 		|| (fname[8] != '0' && fname[8] != '1' && fname[8] != '2')));
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * From the current line count and characters read after that, estimate the
  * line number where we are now.
  * Used for error messages that include a line number.
  */
-    static linenr_T
+    ಸ್ಥಿರ linenr_T
 readfile_linenr(
     linenr_T	linecnt,	// line count before reading more bytes
     char_u	*p,		// start of more bytes read
@@ -2838,11 +2838,11 @@ readfile_linenr(
     char_u	*s;
     linenr_T	lnum;
 
-    lnum = curbuf->b_ml.ml_line_count - linecnt + 1;
-    for (s = p; s < endp; ++s)
-	if (*s == '\n')
+    lnum = curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ - linecnt + 1;
+    ಗಾಗಿ (s = p; s < endp; ++s)
+	ಆದರೆ (*s == '\n')
 	    ++lnum;
-    return lnum;
+    ಹಿಂತಿರುಗಿ lnum;
 }
 
 /*
@@ -2850,14 +2850,14 @@ readfile_linenr(
  * equal to the buffer "buf".  Used for calling readfile().
  * Returns OK or FAIL.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 prep_exarg(exarg_T *eap, buf_T *buf)
 {
-    eap->cmd = alloc(15 + (unsigned)STRLEN(buf->b_p_fenc));
-    if (eap->cmd == NULL)
-	return FAIL;
+    eap->cmd = alloc(15 + (ಚಿಹ್ನೆರಹಿತ)STRLEN(buf->b_p_fenc));
+    ಆದರೆ (eap->cmd == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    sprintf((char *)eap->cmd, "e ++enc=%s", buf->b_p_fenc);
+    sprintf((ಅಕ್ಷರ *)eap->cmd, "e ++enc=%s", buf->b_p_fenc);
     eap->force_enc = 8;
     eap->bad_char = buf->b_bad_char;
     eap->force_ff = *buf->b_p_ff;
@@ -2865,47 +2865,47 @@ prep_exarg(exarg_T *eap, buf_T *buf)
     eap->force_bin = buf->b_p_bin ? FORCE_BIN : FORCE_NOBIN;
     eap->read_edit = FALSE;
     eap->forceit = FALSE;
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Set default or forced 'fileformat' and 'binary'.
  */
-    void
-set_file_options(int set_options, exarg_T *eap)
+    ಶೂನ್ಯ
+ಗಣ_file_options(ಪೂರ್ಣಾಂಕ ಗಣ_options, exarg_T *eap)
 {
     // set default 'fileformat'
-    if (set_options)
+    ಆದರೆ (ಗಣ_options)
     {
-	if (eap != NULL && eap->force_ff != 0)
-	    set_fileformat(get_fileformat_force(curbuf, eap), OPT_LOCAL);
-	else if (*p_ffs != NUL)
-	    set_fileformat(default_fileformat(), OPT_LOCAL);
+	ಆದರೆ (eap != ಖಾಲಿ && eap->force_ff != 0)
+	    ಗಣ_fileformat(get_fileformat_force(curbuf, eap), OPT_LOCAL);
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*p_ffs != NUL)
+	    ಗಣ_fileformat(default_fileformat(), OPT_LOCAL);
     }
 
     // set or reset 'binary'
-    if (eap != NULL && eap->force_bin != 0)
+    ಆದರೆ (eap != ಖಾಲಿ && eap->force_bin != 0)
     {
-	int	oldval = curbuf->b_p_bin;
+	ಪೂರ್ಣಾಂಕ	oldval = curbuf->b_p_bin;
 
 	curbuf->b_p_bin = (eap->force_bin == FORCE_BIN);
-	set_options_bin(oldval, curbuf->b_p_bin, OPT_LOCAL);
+	ಗಣ_options_bin(oldval, curbuf->b_p_bin, OPT_LOCAL);
     }
 }
 
 /*
  * Set forced 'fileencoding'.
  */
-    void
-set_forced_fenc(exarg_T *eap)
+    ಶೂನ್ಯ
+ಗಣ_forced_fenc(exarg_T *eap)
 {
-    if (eap->force_enc == 0)
-	return;
+    ಆದರೆ (eap->force_enc == 0)
+	ಹಿಂತಿರುಗಿ;
 
     char_u *fenc = enc_canonize(eap->cmd + eap->force_enc);
 
-    if (fenc != NULL)
-	set_string_option_direct((char_u *)"fenc", -1,
+    ಆದರೆ (fenc != ಖಾಲಿ)
+	ಗಣ_string_option_ನೇರ((char_u *)"fenc", -1,
 		fenc, OPT_FREE|OPT_LOCAL, 0);
     vim_free(fenc);
 }
@@ -2918,47 +2918,47 @@ set_forced_fenc(exarg_T *eap)
  * When *pp is not set to NULL, the result is in allocated memory and "alloced"
  * is set to TRUE.
  */
-    static char_u *
-next_fenc(char_u **pp, int *alloced)
+    ಸ್ಥಿರ char_u *
+ಮುಂದಿನ_fenc(char_u **pp, ಪೂರ್ಣಾಂಕ *alloced)
 {
     char_u	*p;
     char_u	*r;
 
     *alloced = FALSE;
-    if (**pp == NUL)
+    ಆದರೆ (**pp == NUL)
     {
-	*pp = NULL;
-	return (char_u *)"";
+	*pp = ಖಾಲಿ;
+	ಹಿಂತಿರುಗಿ (char_u *)"";
     }
     p = vim_strchr(*pp, ',');
-    if (p == NULL)
+    ಆದರೆ (p == ಖಾಲಿ)
     {
 	r = enc_canonize(*pp);
 	*pp += STRLEN(*pp);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	r = vim_strnsave(*pp, p - *pp);
 	*pp = p + 1;
-	if (r != NULL)
+	ಆದರೆ (r != ಖಾಲಿ)
 	{
 	    p = enc_canonize(r);
 	    vim_free(r);
 	    r = p;
 	}
     }
-    if (r != NULL)
+    ಆದರೆ (r != ಖಾಲಿ)
 	*alloced = TRUE;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// out of memory
 	r = (char_u *)"";
-	*pp = NULL;
+	*pp = ಖಾಲಿ;
     }
-    return r;
+    ಹಿಂತಿರುಗಿ r;
 }
 
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 /*
  * Convert a file with the 'charconvert' expression.
  * This closes the file which is to be read, converts it and opens the
@@ -2967,36 +2967,36 @@ next_fenc(char_u **pp, int *alloced)
  * after reading it).
  * Returns NULL if the conversion failed ("*fdp" is not set) .
  */
-    static char_u *
+    ಸ್ಥಿರ char_u *
 readfile_charconvert(
     char_u	*fname,		// name of input file
     char_u	*fenc,		// converted from
-    int		*fdp)		// in/out: file descriptor of file
+    ಪೂರ್ಣಾಂಕ		*fdp)		// in/out: file descriptor of file
 {
     char_u	*tmpname;
-    char	*errmsg = NULL;
+    ಅಕ್ಷರ	*errmsg = ಖಾಲಿ;
 
     tmpname = vim_tempname('r', FALSE);
-    if (tmpname == NULL)
+    ಆದರೆ (tmpname == ಖಾಲಿ)
 	errmsg = _("Can't find temp file for conversion");
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	close(*fdp);		// close the input file, ignore errors
 	*fdp = -1;
-	if (eval_charconvert(fenc, enc_utf8 ? (char_u *)"utf-8" : p_enc,
+	ಆದರೆ (eval_charconvert(fenc, enc_utf8 ? (char_u *)"utf-8" : p_enc,
 						      fname, tmpname) == FAIL)
 	    errmsg = _("Conversion with 'charconvert' failed");
-	if (errmsg == NULL && (*fdp = mch_open((char *)tmpname,
+	ಆದರೆ (errmsg == ಖಾಲಿ && (*fdp = mch_open((ಅಕ್ಷರ *)tmpname,
 						  O_RDONLY | O_EXTRA, 0)) < 0)
 	    errmsg = _("can't read output of 'charconvert'");
     }
 
-    if (errmsg != NULL)
+    ಆದರೆ (errmsg != ಖಾಲಿ)
     {
 	// Don't use emsg(), it breaks mappings, the retry with
 	// another type of conversion might still work.
-	msg(errmsg);
-	if (tmpname != NULL)
+	ಸಂದೇಶ(errmsg);
+	ಆದರೆ (tmpname != ಖಾಲಿ)
 	{
 	    mch_remove(tmpname);	// delete converted file
 	    VIM_CLEAR(tmpname);
@@ -3004,91 +3004,91 @@ readfile_charconvert(
     }
 
     // If the input file is closed, open it (caller should check for error).
-    if (*fdp < 0)
-	*fdp = mch_open((char *)fname, O_RDONLY | O_EXTRA, 0);
+    ಆದರೆ (*fdp < 0)
+	*fdp = mch_open((ಅಕ್ಷರ *)fname, O_RDONLY | O_EXTRA, 0);
 
-    return tmpname;
+    ಹಿಂತಿರುಗಿ tmpname;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_CRYPT)
+#ಆದರೆ defined(FEAT_CRYPT)
 /*
  * Check for magic number used for encryption.  Applies to the current buffer.
  * If found, the magic number is removed from ptr[*sizep] and *sizep and
  * *filesizep are updated.
  * Return the (new) encryption key, NULL for no encryption.
  */
-    static char_u *
+    ಸ್ಥಿರ char_u *
 check_for_cryptkey(
     char_u	*cryptkey,	// previous encryption key or NULL
     char_u	*ptr,		// pointer to read bytes
-    long	*sizep,		// length of read bytes
+    ದೀರ್ಘ	*sizep,		// length of read bytes
     off_T	*filesizep,	// nr of bytes used from file
-    int		newfile,	// editing a new buffer
+    ಪೂರ್ಣಾಂಕ		newfile,	// editing a new buffer
     char_u	*fname,		// file name to display
-    int		*did_ask)	// flag: whether already asked for key
+    ಪೂರ್ಣಾಂಕ		*did_ask)	// flag: whether already asked for key
 {
-    int method = crypt_method_nr_from_magic((char *)ptr, *sizep);
-    int b_p_ro = curbuf->b_p_ro;
+    ಪೂರ್ಣಾಂಕ ವಿಧಾನ = crypt_ವಿಧಾನ_nr_from_magic((ಅಕ್ಷರ *)ptr, *sizep);
+    ಪೂರ್ಣಾಂಕ b_p_ro = curbuf->b_p_ro;
 
-    if (method >= 0)
+    ಆದರೆ (ವಿಧಾನ >= 0)
     {
 	// Mark the buffer as read-only until the decryption has taken place.
 	// Avoids accidentally overwriting the file with garbage.
 	curbuf->b_p_ro = TRUE;
 
 	// Set the cryptmethod local to the buffer.
-	crypt_set_cm_option(curbuf, method);
-	if (cryptkey == NULL && !*did_ask)
+	crypt_ಗಣ_cm_option(curbuf, ವಿಧಾನ);
+	ಆದರೆ (cryptkey == ಖಾಲಿ && !*did_ask)
 	{
-	    if (*curbuf->b_p_key)
+	    ಆದರೆ (*curbuf->b_p_ಕೀಲಿ)
 	    {
-		cryptkey = curbuf->b_p_key;
+		cryptkey = curbuf->b_p_ಕೀಲಿ;
 		crypt_check_swapfile_curbuf();
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		// When newfile is TRUE, store the typed key in the 'key'
 		// option and don't free it.  bf needs hash of the key saved.
 		// Don't ask for the key again when first time Enter was hit.
 		// Happens when retrying to detect encoding.
-		smsg(_(need_key_msg), fname);
-		msg_scroll = TRUE;
-		crypt_check_method(method);
-		cryptkey = crypt_get_key(newfile, FALSE);
+		smsg(_(need_ಕೀಲಿ_ಸಂದೇಶ), fname);
+		ಸಂದೇಶ_scroll = TRUE;
+		crypt_check_ವಿಧಾನ(ವಿಧಾನ);
+		cryptkey = crypt_get_ಕೀಲಿ(newfile, FALSE);
 		*did_ask = TRUE;
 
 		// check if empty key entered
-		if (cryptkey != NULL && *cryptkey == NUL)
+		ಆದರೆ (cryptkey != ಖಾಲಿ && *cryptkey == NUL)
 		{
-		    if (cryptkey != curbuf->b_p_key)
+		    ಆದರೆ (cryptkey != curbuf->b_p_ಕೀಲಿ)
 			vim_free(cryptkey);
-		    cryptkey = NULL;
+		    cryptkey = ಖಾಲಿ;
 		}
 	    }
 	}
 
-	if (cryptkey != NULL)
+	ಆದರೆ (cryptkey != ಖಾಲಿ)
 	{
-	    int header_len;
+	    ಪೂರ್ಣಾಂಕ ಶೀರ್ಷಿಕೆ_len;
 
-	    header_len = crypt_get_header_len(method);
-	    if (*sizep < header_len)
+	    ಶೀರ್ಷಿಕೆ_len = crypt_get_ಶೀರ್ಷಿಕೆ_len(ವಿಧಾನ);
+	    ಆದರೆ (*sizep < ಶೀರ್ಷಿಕೆ_len)
 	    {
 		// invalid header, buffer can't be encrypted
-		if (cryptkey != curbuf->b_p_key)
+		ಆದರೆ (cryptkey != curbuf->b_p_ಕೀಲಿ)
 		    vim_free(cryptkey);
-		return NULL;
+		ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	    }
 
-	    curbuf->b_cryptstate = crypt_create_from_header(
-							method, cryptkey, ptr);
-	    crypt_set_cm_option(curbuf, method);
+	    curbuf->b_cryptstate = crypt_create_from_ಶೀರ್ಷಿಕೆ(
+							ವಿಧಾನ, cryptkey, ptr);
+	    crypt_ಗಣ_cm_option(curbuf, ವಿಧಾನ);
 
 	    // Remove cryptmethod specific header from the text.
-	    *filesizep += header_len;
-	    *sizep -= header_len;
-	    mch_memmove(ptr, ptr + header_len, (size_t)*sizep);
+	    *filesizep += ಶೀರ್ಷಿಕೆ_len;
+	    *sizep -= ಶೀರ್ಷಿಕೆ_len;
+	    mch_memmove(ptr, ptr + ಶೀರ್ಷಿಕೆ_len, (size_t)*sizep);
 
 	    // Restore the read-only flag.
 	    curbuf->b_p_ro = b_p_ro;
@@ -3096,113 +3096,113 @@ check_for_cryptkey(
     }
     // When starting to edit a new file which does not have encryption, clear
     // the 'key' option, except when starting up (called with -x argument)
-    else if (newfile && *curbuf->b_p_key != NUL && !starting)
-	set_option_value_give_err((char_u *)"key", 0L, (char_u *)"", OPT_LOCAL);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (newfile && *curbuf->b_p_ಕೀಲಿ != NUL && !starting)
+	ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"key", 0L, (char_u *)"", OPT_LOCAL);
 
-    return cryptkey;
+    ಹಿಂತಿರುಗಿ cryptkey;
 }
-#endif  // FEAT_CRYPT
+#ಆದರೆ_ಅಂತ್ಯ  // FEAT_CRYPT
 
 /*
  * Return TRUE if a file appears to be read-only from the file permissions.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 check_file_readonly(
     char_u	*fname,		// full path to file
-    int		perm UNUSED)	// known permissions on file
+    ಪೂರ್ಣಾಂಕ		perm ಬಳಸದ)	// known permissions on file
 {
-#ifndef USE_MCH_ACCESS
-    int	    fd = 0;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ USE_MCH_ACCESS
+    ಪೂರ್ಣಾಂಕ	    fd = 0;
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return (
-#ifdef USE_MCH_ACCESS
+    ಹಿಂತಿರುಗಿ (
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_MCH_ACCESS
 # ifdef UNIX
 	(perm & 0222) == 0 ||
 # endif
-	mch_access((char *)fname, W_OK)
-#else
-	(fd = mch_open((char *)fname, O_RDWR | O_EXTRA, 0)) < 0
+	mch_access((ಅಕ್ಷರ *)fname, W_OK)
+#ಇಲ್ಲದಿದ್ದರೆ
+	(fd = mch_open((ಅಕ್ಷರ *)fname, O_RDWR | O_EXTRA, 0)) < 0
 					? TRUE : (close(fd), FALSE)
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	);
 }
 
-#if defined(HAVE_FSYNC)
+#ಆದರೆ defined(HAVE_FSYNC)
 /*
  * Call fsync() with Mac-specific exception.
  * Return fsync() result: zero for success.
  */
-    int
-vim_fsync(int fd)
+    ಪೂರ್ಣಾಂಕ
+vim_fsync(ಪೂರ್ಣಾಂಕ fd)
 {
-    int r;
+    ಪೂರ್ಣಾಂಕ r;
 
 # ifdef MACOS_X
     r = fcntl(fd, F_FULLFSYNC);
-    if (r != 0)  // F_FULLFSYNC not working or not supported
+    ಆದರೆ (r != 0)  // F_FULLFSYNC not working or not supported
 # endif
 	r = fsync(fd);
-    return r;
+    ಹಿಂತಿರುಗಿ r;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Set the name of the current buffer.  Use when the buffer doesn't have a
  * name and a ":r" or ":w" command with a file name is used.
  */
-    int
-set_rw_fname(char_u *fname, char_u *sfname)
+    ಪೂರ್ಣಾಂಕ
+ಗಣ_rw_fname(char_u *fname, char_u *sfname)
 {
     buf_T	*buf = curbuf;
 
     // It's like the unnamed buffer is deleted....
-    if (curbuf->b_p_bl)
-	apply_autocmds(EVENT_BUFDELETE, NULL, NULL, FALSE, curbuf);
-    apply_autocmds(EVENT_BUFWIPEOUT, NULL, NULL, FALSE, curbuf);
-#ifdef FEAT_EVAL
-    if (aborting())	    // autocmds may abort script processing
-	return FAIL;
-#endif
-    if (curbuf != buf)
+    ಆದರೆ (curbuf->b_p_bl)
+	apply_autocmds(EVENT_BUFDELETE, ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
+    apply_autocmds(EVENT_BUFWIPEOUT, ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಆದರೆ (aborting())	    // autocmds may abort script processing
+	ಹಿಂತಿರುಗಿ FAIL;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (curbuf != buf)
     {
 	// We are in another buffer now, don't do the renaming.
-	emsg(_(e_autocommands_changed_buffer_or_buffer_name));
-	return FAIL;
+	emsg(_(e_autocommands_ಬದಲಾಯಿತು_ಬಫರ್_or_ಬಫರ್_name));
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
-    if (setfname(curbuf, fname, sfname, FALSE) == OK)
+    ಆದರೆ (setfname(curbuf, fname, sfname, FALSE) == OK)
 	curbuf->b_flags |= BF_NOTEDITED;
 
     // ....and a new named one is created
-    apply_autocmds(EVENT_BUFNEW, NULL, NULL, FALSE, curbuf);
-    if (curbuf->b_p_bl)
-	apply_autocmds(EVENT_BUFADD, NULL, NULL, FALSE, curbuf);
-#ifdef FEAT_EVAL
-    if (aborting())	    // autocmds may abort script processing
-	return FAIL;
-#endif
+    apply_autocmds(EVENT_BUFNEW, ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
+    ಆದರೆ (curbuf->b_p_bl)
+	apply_autocmds(EVENT_BUFADD, ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಆದರೆ (aborting())	    // autocmds may abort script processing
+	ಹಿಂತಿರುಗಿ FAIL;
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Do filetype detection now if 'filetype' is empty.
-    if (*curbuf->b_p_ft == NUL)
+    ಆದರೆ (*curbuf->b_p_ft == NUL)
     {
-	if (au_has_group((char_u *)"filetypedetect"))
-	    (void)do_doautocmd((char_u *)"filetypedetect BufRead", FALSE, NULL);
+	ಆದರೆ (au_has_ಗುಂಪು((char_u *)"filetypedetect"))
+	    (ಶೂನ್ಯ)do_doautocmd((char_u *)"filetypedetect BufRead", FALSE, ಖಾಲಿ);
 	do_modelines(0);
     }
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Put file name into IObuff with quotes.
  */
-    void
-msg_add_fname(buf_T *buf, char_u *fname)
+    ಶೂನ್ಯ
+ಸಂದೇಶ_ಕೂಡಿಸು_fname(buf_T *buf, char_u *fname)
 {
     size_t  IObufflen = 0;
 
-    if (fname == NULL)
+    ಆದರೆ (fname == ಖಾಲಿ)
 	fname = (char_u *)"-stdin-";
     IObuff[IObufflen++] = '"';
     IObufflen += home_replace(buf, fname, IObuff + IObufflen, IOSIZE - 4, TRUE);
@@ -3213,51 +3213,51 @@ msg_add_fname(buf_T *buf, char_u *fname)
  * Append message for text mode to IObuff.
  * Return TRUE if something appended.
  */
-    int
-msg_add_fileformat(int eol_type)
+    ಪೂರ್ಣಾಂಕ
+ಸಂದೇಶ_ಕೂಡಿಸು_fileformat(ಪೂರ್ಣಾಂಕ eol_type)
 {
-#ifndef USE_CRNL
-    if (eol_type == EOL_DOS)
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ USE_CRNL
+    ಆದರೆ (eol_type == EOL_DOS)
     {
-	STRCAT(IObuff, shortmess(SHM_TEXT) ? _("[dos]") : _("[dos format]"));
-	return TRUE;
+	STRCAT(IObuff, shortmess(SHM_ಪಠ್ಯ) ? _("[dos]") : _("[dos format]"));
+	ಹಿಂತಿರುಗಿ TRUE;
     }
-#endif
-    if (eol_type == EOL_MAC)
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (eol_type == EOL_MAC)
     {
-	STRCAT(IObuff, shortmess(SHM_TEXT) ? _("[mac]") : _("[mac format]"));
-	return TRUE;
+	STRCAT(IObuff, shortmess(SHM_ಪಠ್ಯ) ? _("[mac]") : _("[mac format]"));
+	ಹಿಂತಿರುಗಿ TRUE;
     }
-#ifdef USE_CRNL
-    if (eol_type == EOL_UNIX)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_CRNL
+    ಆದರೆ (eol_type == EOL_UNIX)
     {
-	STRCAT(IObuff, shortmess(SHM_TEXT) ? _("[unix]") : _("[unix format]"));
-	return TRUE;
+	STRCAT(IObuff, shortmess(SHM_ಪಠ್ಯ) ? _("[unix]") : _("[unix format]"));
+	ಹಿಂತಿರುಗಿ TRUE;
     }
-#endif
-    return FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 /*
  * Append line and character count to IObuff.
  */
-    void
-msg_add_lines(
-    int	    insert_space,
-    long    lnum,
+    ಶೂನ್ಯ
+ಸಂದೇಶ_ಕೂಡಿಸು_ಸಾಲುಗಳು(
+    ಪೂರ್ಣಾಂಕ	    ಸೇರಿಸು_space,
+    ದೀರ್ಘ    lnum,
     off_T   nchars)
 {
-    int  len = (int)STRLEN(IObuff);
+    ಪೂರ್ಣಾಂಕ  len = (ಪೂರ್ಣಾಂಕ)STRLEN(IObuff);
 
-    if (shortmess(SHM_LINES))
-	vim_snprintf((char *)IObuff + len, IOSIZE - (size_t)len,
+    ಆದರೆ (shortmess(SHM_ಸಾಲುಗಳು))
+	vim_snprintf((ಅಕ್ಷರ *)IObuff + len, IOSIZE - (size_t)len,
 		// l10n: L as in line, B as in byte
-		_("%s%ldL, %lldB"), insert_space ? " " : "", lnum, (varnumber_T)nchars);
-    else
+		_("%s%ldL, %lldB"), ಸೇರಿಸು_space ? " " : "", lnum, (varnumber_T)nchars);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	len += vim_snprintf((char *)IObuff + len, IOSIZE - (size_t)len,
-		NGETTEXT("%s%ld line, ", "%s%ld lines, ", lnum), insert_space ? " " : "", lnum);
-	vim_snprintf((char *)IObuff + len, IOSIZE - (size_t)len,
+	len += vim_snprintf((ಅಕ್ಷರ *)IObuff + len, IOSIZE - (size_t)len,
+		NGETTEXT("%s%ld line, ", "%s%ld lines, ", lnum), ಸೇರಿಸು_space ? " " : "", lnum);
+	vim_snprintf((ಅಕ್ಷರ *)IObuff + len, IOSIZE - (size_t)len,
 		NGETTEXT("%lld byte", "%lld bytes", nchars), (varnumber_T)nchars);
     }
 }
@@ -3265,27 +3265,27 @@ msg_add_lines(
 /*
  * Append message for missing line separator to IObuff.
  */
-    void
-msg_add_eol(void)
+    ಶೂನ್ಯ
+ಸಂದೇಶ_ಕೂಡಿಸು_eol(ಶೂನ್ಯ)
 {
-    STRCAT(IObuff, shortmess(SHM_LAST) ? _("[noeol]") : _("[Incomplete last line]"));
+    STRCAT(IObuff, shortmess(SHM_ಕೊನೆಯ) ? _("[noeol]") : _("[Incomplete last line]"));
 }
 
-    int
-time_differs(stat_T *st, long mtime, long mtime_ns UNUSED)
+    ಪೂರ್ಣಾಂಕ
+ಸಮಯ_differs(stat_T *st, ದೀರ್ಘ mtime, ದೀರ್ಘ mtime_ns ಬಳಸದ)
 {
-    return
-#ifdef ST_MTIM_NSEC
-	(long)st->ST_MTIM_NSEC != mtime_ns ||
-#endif
-#if defined(__linux__) || defined(MSWIN)
+    ಹಿಂತಿರುಗಿ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ST_MTIM_NSEC
+	(ದೀರ್ಘ)st->ST_MTIM_NSEC != mtime_ns ||
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(__linux__) || defined(MSWIN)
 	// On a FAT filesystem, esp. under Linux, there are only 5 bits to store
 	// the seconds.  Since the roundoff is done when flushing the inode, the
 	// time may change unexpectedly by one second!!!
-	(long)st->st_mtime - mtime > 1 || mtime - (long)st->st_mtime > 1
-#else
-	(long)st->st_mtime != mtime
-#endif
+	(ದೀರ್ಘ)st->st_mtime - mtime > 1 || mtime - (ದೀರ್ಘ)st->st_mtime > 1
+#ಇಲ್ಲದಿದ್ದರೆ
+	(ದೀರ್ಘ)st->st_mtime != mtime
+#ಆದರೆ_ಅಂತ್ಯ
 	;
 }
 
@@ -3293,19 +3293,19 @@ time_differs(stat_T *st, long mtime, long mtime_ns UNUSED)
  * Return TRUE if file encoding "fenc" requires conversion from or to
  * 'encoding'.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 need_conversion(char_u *fenc)
 {
-    int		same_encoding;
-    int		enc_flags;
-    int		fenc_flags;
+    ಪೂರ್ಣಾಂಕ		same_encoding;
+    ಪೂರ್ಣಾಂಕ		enc_flags;
+    ಪೂರ್ಣಾಂಕ		fenc_flags;
 
-    if (*fenc == NUL || STRCMP(p_enc, fenc) == 0)
+    ಆದರೆ (*fenc == NUL || STRCMP(p_enc, fenc) == 0)
     {
 	same_encoding = TRUE;
 	fenc_flags = 0;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Ignore difference between "ansi" and "latin1", "ucs-4" and
 	// "ucs-4be", etc.
@@ -3313,16 +3313,16 @@ need_conversion(char_u *fenc)
 	fenc_flags = get_fio_flags(fenc);
 	same_encoding = (enc_flags != 0 && fenc_flags == enc_flags);
     }
-    if (same_encoding)
+    ಆದರೆ (same_encoding)
     {
 	// Specified encoding matches with 'encoding'.  This requires
 	// conversion when 'encoding' is Unicode but not UTF-8.
-	return enc_unicode != 0;
+	ಹಿಂತಿರುಗಿ enc_unicode != 0;
     }
 
     // Encodings differ.  However, conversion is not needed when 'enc' is any
     // Unicode encoding and the file is UTF-8.
-    return !(enc_utf8 && fenc_flags == FIO_UTF8);
+    ಹಿಂತಿರುಗಿ !(enc_utf8 && fenc_flags == FIO_UTF8);
 }
 
 /*
@@ -3330,86 +3330,86 @@ need_conversion(char_u *fenc)
  * internal conversion.
  * if "ptr" is an empty string, use 'encoding'.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 get_fio_flags(char_u *ptr)
 {
-    int		prop;
+    ಪೂರ್ಣಾಂಕ		prop;
 
-    if (*ptr == NUL)
+    ಆದರೆ (*ptr == NUL)
 	ptr = p_enc;
 
     prop = enc_canon_props(ptr);
-    if (prop & ENC_UNICODE)
+    ಆದರೆ (prop & ENC_UNICODE)
     {
-	if (prop & ENC_2BYTE)
+	ಆದರೆ (prop & ENC_2BYTE)
 	{
-	    if (prop & ENC_ENDIAN_L)
-		return FIO_UCS2 | FIO_ENDIAN_L;
-	    return FIO_UCS2;
+	    ಆದರೆ (prop & ENC_ENDIAN_L)
+		ಹಿಂತಿರುಗಿ FIO_UCS2 | FIO_ENDIAN_L;
+	    ಹಿಂತಿರುಗಿ FIO_UCS2;
 	}
-	if (prop & ENC_4BYTE)
+	ಆದರೆ (prop & ENC_4BYTE)
 	{
-	    if (prop & ENC_ENDIAN_L)
-		return FIO_UCS4 | FIO_ENDIAN_L;
-	    return FIO_UCS4;
+	    ಆದರೆ (prop & ENC_ENDIAN_L)
+		ಹಿಂತಿರುಗಿ FIO_UCS4 | FIO_ENDIAN_L;
+	    ಹಿಂತಿರುಗಿ FIO_UCS4;
 	}
-	if (prop & ENC_2WORD)
+	ಆದರೆ (prop & ENC_2_ಶಬ್ದ)
 	{
-	    if (prop & ENC_ENDIAN_L)
-		return FIO_UTF16 | FIO_ENDIAN_L;
-	    return FIO_UTF16;
+	    ಆದರೆ (prop & ENC_ENDIAN_L)
+		ಹಿಂತಿರುಗಿ FIO_UTF16 | FIO_ENDIAN_L;
+	    ಹಿಂತಿರುಗಿ FIO_UTF16;
 	}
-	return FIO_UTF8;
+	ಹಿಂತಿರುಗಿ FIO_UTF8;
     }
-    if (prop & ENC_LATIN1)
-	return FIO_LATIN1;
+    ಆದರೆ (prop & ENC_LATIN1)
+	ಹಿಂತಿರುಗಿ FIO_LATIN1;
     // must be ENC_DBCS, requires iconv()
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-#if defined(MSWIN)
+#ಆದರೆ defined(MSWIN)
 /*
  * Check "ptr" for a MS-Windows codepage name and return the FIO_ flags needed
  * for the conversion MS-Windows can do for us.  Also accept "utf-8".
  * Used for conversion between 'encoding' and 'fileencoding'.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 get_win_fio_flags(char_u *ptr)
 {
-    int		cp;
+    ಪೂರ್ಣಾಂಕ		cp;
 
     // Cannot do this when 'encoding' is not utf-8 and not a codepage.
-    if (!enc_utf8 && enc_codepage <= 0)
-	return 0;
+    ಆದರೆ (!enc_utf8 && enc_codepage <= 0)
+	ಹಿಂತಿರುಗಿ 0;
 
     cp = encname2codepage(ptr);
-    if (cp == 0)
+    ಆದರೆ (cp == 0)
     {
 # ifdef CP_UTF8	// VC 4.1 doesn't define CP_UTF8
-	if (STRCMP(ptr, "utf-8") == 0)
+	ಆದರೆ (STRCMP(ptr, "utf-8") == 0)
 	    cp = CP_UTF8;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 # endif
-	    return 0;
+	    ಹಿಂತಿರುಗಿ 0;
     }
-    return FIO_PUT_CP(cp) | FIO_CODEPAGE;
+    ಹಿಂತಿರುಗಿ FIO_PUT_CP(cp) | FIO_CODEPAGE;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(MACOS_CONVERT)
+#ಆದರೆ defined(MACOS_CONVERT)
 /*
  * Check "ptr" for a Carbon supported encoding and return the FIO_ flags
  * needed for the internal conversion to/from utf-8 or latin1.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 get_mac_fio_flags(char_u *ptr)
 {
-    if ((enc_utf8 || STRCMP(p_enc, "latin1") == 0)
+    ಆದರೆ ((enc_utf8 || STRCMP(p_enc, "latin1") == 0)
 				     && (enc_canon_props(ptr) & ENC_MACROMAN))
-	return FIO_MACROMAN;
-    return 0;
+	ಹಿಂತಿರುಗಿ FIO_MACROMAN;
+    ಹಿಂತಿರುಗಿ 0;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Check for a Unicode BOM (Byte Order Mark) at the start of p[size].
@@ -3417,46 +3417,46 @@ get_mac_fio_flags(char_u *ptr)
  * Return the name of the encoding and set "*lenp" to the length.
  * Returns NULL when no BOM found.
  */
-    static char_u *
+    ಸ್ಥಿರ char_u *
 check_for_bom(
     char_u	*p,
-    long	size,
-    int		*lenp,
-    int		flags)
+    ದೀರ್ಘ	ಗಾತ್ರ_2,
+    ಪೂರ್ಣಾಂಕ		*lenp,
+    ಪೂರ್ಣಾಂಕ		flags)
 {
-    char	*name = NULL;
-    int		len = 2;
+    ಅಕ್ಷರ	*name = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		len = 2;
 
-    if (p[0] == 0xef && p[1] == 0xbb && size >= 3 && p[2] == 0xbf
+    ಆದರೆ (p[0] == 0xef && p[1] == 0xbb && ಗಾತ್ರ_2 >= 3 && p[2] == 0xbf
 	    && (flags == FIO_ALL || flags == FIO_UTF8 || flags == 0))
     {
 	name = "utf-8";		// EF BB BF
 	len = 3;
     }
-    else if (p[0] == 0xff && p[1] == 0xfe)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p[0] == 0xff && p[1] == 0xfe)
     {
-	if (size >= 4 && p[2] == 0 && p[3] == 0
+	ಆದರೆ (ಗಾತ್ರ_2 >= 4 && p[2] == 0 && p[3] == 0
 	    && (flags == FIO_ALL || flags == (FIO_UCS4 | FIO_ENDIAN_L)))
 	{
 	    name = "ucs-4le";	// FF FE 00 00
 	    len = 4;
 	}
-	else if (flags == (FIO_UCS2 | FIO_ENDIAN_L))
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (flags == (FIO_UCS2 | FIO_ENDIAN_L))
 	    name = "ucs-2le";	// FF FE
-	else if (flags == FIO_ALL || flags == (FIO_UTF16 | FIO_ENDIAN_L))
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (flags == FIO_ALL || flags == (FIO_UTF16 | FIO_ENDIAN_L))
 	    // utf-16le is preferred, it also works for ucs-2le text
 	    name = "utf-16le";	// FF FE
     }
-    else if (p[0] == 0xfe && p[1] == 0xff
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p[0] == 0xfe && p[1] == 0xff
 	    && (flags == FIO_ALL || flags == FIO_UCS2 || flags == FIO_UTF16))
     {
 	// Default to utf-16, it works also for ucs-2 text.
-	if (flags == FIO_UCS2)
+	ಆದರೆ (flags == FIO_UCS2)
 	    name = "ucs-2";	// FE FF
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    name = "utf-16";	// FE FF
     }
-    else if (size >= 4 && p[0] == 0 && p[1] == 0 && p[2] == 0xfe
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಗಾತ್ರ_2 >= 4 && p[0] == 0 && p[1] == 0 && p[2] == 0xfe
 	    && p[3] == 0xff && (flags == FIO_ALL || flags == FIO_UCS4))
     {
 	name = "ucs-4";		// 00 00 FE FF
@@ -3464,7 +3464,7 @@ check_for_bom(
     }
 
     *lenp = len;
-    return (char_u *)name;
+    ಹಿಂತಿರುಗಿ (char_u *)name;
 }
 
 /*
@@ -3473,22 +3473,22 @@ check_for_bom(
  * Returns "full_path" or pointer into "full_path" if shortened.
  */
     char_u *
-shorten_fname1(char_u *full_path)
+shorten_fname1(char_u *ತುಂಬಿದ_ಮಾರ್ಗ)
 {
     char_u	*dirname;
-    char_u	*p = full_path;
+    char_u	*p = ತುಂಬಿದ_ಮಾರ್ಗ;
 
     dirname = alloc(MAXPATHL);
-    if (dirname == NULL)
-	return full_path;
-    if (mch_dirname(dirname, MAXPATHL) == OK)
+    ಆದರೆ (dirname == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ತುಂಬಿದ_ಮಾರ್ಗ;
+    ಆದರೆ (mch_dirname(dirname, MAXPATHL) == OK)
     {
-	p = shorten_fname(full_path, dirname);
-	if (p == NULL || *p == NUL)
-	    p = full_path;
+	p = shorten_fname(ತುಂಬಿದ_ಮಾರ್ಗ, dirname);
+	ಆದರೆ (p == ಖಾಲಿ || *p == NUL)
+	    p = ತುಂಬಿದ_ಮಾರ್ಗ;
     }
     vim_free(dirname);
-    return p;
+    ಹಿಂತಿರುಗಿ p;
 }
 
 /*
@@ -3498,51 +3498,51 @@ shorten_fname1(char_u *full_path)
  * otherwise.
  */
     char_u *
-shorten_fname(char_u *full_path, char_u *dir_name)
+shorten_fname(char_u *ತುಂಬಿದ_ಮಾರ್ಗ, char_u *dir_name)
 {
-    int		len;
+    ಪೂರ್ಣಾಂಕ		len;
     char_u	*p;
 
-    if (full_path == NULL)
-	return NULL;
-    len = (int)STRLEN(dir_name);
-    if (fnamencmp(dir_name, full_path, len) == 0)
+    ಆದರೆ (ತುಂಬಿದ_ಮಾರ್ಗ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    len = (ಪೂರ್ಣಾಂಕ)STRLEN(dir_name);
+    ಆದರೆ (fnamencmp(dir_name, ತುಂಬಿದ_ಮಾರ್ಗ, len) == 0)
     {
-	p = full_path + len;
-#if defined(MSWIN)
+	p = ತುಂಬಿದ_ಮಾರ್ಗ + len;
+#ಆದರೆ defined(MSWIN)
 	/*
 	 * MS-Windows: when a file is in the root directory, dir_name will end
 	 * in a slash, since C: by itself does not define a specific dir. In
 	 * this case p may already be correct. <negri>
 	 */
-	if (!((len > 2) && (*(p - 2) == ':')))
-#endif
+	ಆದರೆ (!((len > 2) && (*(p - 2) == ':')))
+#ಆದರೆ_ಅಂತ್ಯ
 	{
-	    if (vim_ispathsep(*p))
-		do
+	    ಆದರೆ (vim_ispathsep(*p))
+		ಮಾಡು
 		    ++p;
-		while (vim_ispathsep_nocolon(*p));
-#ifndef VMS   // the path separator is always part of the path
-	    else
-		p = NULL;
-#endif
+		ಆಗ (vim_ispathsep_nocolon(*p));
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ VMS   // the path separator is always part of the path
+	    ಇಲ್ಲದಿದ್ದರೆ
+		p = ಖಾಲಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 	}
     }
-#if defined(MSWIN)
+#ಆದರೆ defined(MSWIN)
     /*
      * When using a file in the current drive, remove the drive name:
      * "A:\dir\file" -> "\dir\file".  This helps when moving a session file on
      * a floppy from "A:\dir" to "B:\dir".
      */
-    else if (len > 3
-	    && TOUPPER_LOC(full_path[0]) == TOUPPER_LOC(dir_name[0])
-	    && full_path[1] == ':'
-	    && vim_ispathsep(full_path[2]))
-	p = full_path + 2;
-#endif
-    else
-	p = NULL;
-    return p;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (len > 3
+	    && TOUPPER_LOC(ತುಂಬಿದ_ಮಾರ್ಗ[0]) == TOUPPER_LOC(dir_name[0])
+	    && ತುಂಬಿದ_ಮಾರ್ಗ[1] == ':'
+	    && vim_ispathsep(ತುಂಬಿದ_ಮಾರ್ಗ[2]))
+	p = ತುಂಬಿದ_ಮಾರ್ಗ + 2;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಇಲ್ಲದಿದ್ದರೆ
+	p = ಖಾಲಿ;
+    ಹಿಂತಿರುಗಿ p;
 }
 
 /*
@@ -3554,27 +3554,27 @@ shorten_fname(char_u *full_path, char_u *dir_name)
  * For buffers that have buftype "nofile" or "scratch": never change the file
  * name.
  */
-    void
-shorten_buf_fname(buf_T *buf, char_u *dirname, int force)
+    ಶೂನ್ಯ
+shorten_buf_fname(buf_T *buf, char_u *dirname, ಪೂರ್ಣಾಂಕ force)
 {
     char_u	*p;
 
-    if (buf->b_fname != NULL
+    ಆದರೆ (buf->b_fname != ಖಾಲಿ
 	    && !bt_nofilename(buf)
-	    && !path_with_url(buf->b_fname)
+	    && !ಮಾರ್ಗ_with_url(buf->b_fname)
 	    && (force
-		|| buf->b_sfname == NULL
-		|| mch_isFullName(buf->b_sfname)))
+		|| buf->b_sfname == ಖಾಲಿ
+		|| mch_is_ತುಂಬಿದ_Name(buf->b_sfname)))
     {
-	if (buf->b_sfname != buf->b_ffname)
+	ಆದರೆ (buf->b_sfname != buf->b_ffname)
 	    VIM_CLEAR(buf->b_sfname);
 	p = shorten_fname(buf->b_ffname, dirname);
-	if (p != NULL)
+	ಆದರೆ (p != ಖಾಲಿ)
 	{
 	    buf->b_sfname = vim_strsave(p);
 	    buf->b_fname = buf->b_sfname;
 	}
-	if (p == NULL || buf->b_fname == NULL)
+	ಆದರೆ (p == ಖಾಲಿ || buf->b_fname == ಖಾಲಿ)
 	    buf->b_fname = buf->b_ffname;
     }
 }
@@ -3582,8 +3582,8 @@ shorten_buf_fname(buf_T *buf, char_u *dirname, int force)
 /*
  * Shorten filenames for all buffers.
  */
-    void
-shorten_fnames(int force)
+    ಶೂನ್ಯ
+shorten_fnames(ಪೂರ್ಣಾಂಕ force)
 {
     char_u	dirname[MAXPATHL];
     buf_T	*buf;
@@ -3597,35 +3597,35 @@ shorten_fnames(int force)
 	// also have a swap file.
 	mf_fullname(buf->b_ml.ml_mfp);
     }
-    status_redraw_all();
+    ಸ್ಥಿತಿ_redraw_all();
     redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#ಆದರೆ defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
-#endif
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
     popup_update_preview_title();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#if (defined(FEAT_DND) && defined(FEAT_GUI_GTK)) \
+#ಆದರೆ (defined(FEAT_DND) && defined(FEAT_GUI_GTK)) \
 	|| defined(FEAT_GUI_MSWIN) \
 	|| defined(FEAT_GUI_HAIKU)
 /*
  * Shorten all filenames in "fnames[count]" by current directory.
  */
-    void
-shorten_filenames(char_u **fnames, int count)
+    ಶೂನ್ಯ
+shorten_filenames(char_u **fnames, ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_2)
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
     char_u	dirname[MAXPATHL];
     char_u	*p;
 
-    if (fnames == NULL || count < 1)
-	return;
-    mch_dirname(dirname, sizeof(dirname));
-    for (i = 0; i < count; ++i)
+    ಆದರೆ (fnames == ಖಾಲಿ || ಎಣಿಕೆ_2 < 1)
+	ಹಿಂತಿರುಗಿ;
+    mch_dirname(dirname, ಗಾತ್ರ(dirname));
+    ಗಾಗಿ (i = 0; i < ಎಣಿಕೆ_2; ++i)
     {
-	if ((p = shorten_fname(fnames[i], dirname)) != NULL)
+	ಆದರೆ ((p = shorten_fname(fnames[i], dirname)) != ಖಾಲಿ)
 	{
 	    // shorten_fname() returns pointer in given "fnames[i]".  If free
 	    // "fnames[i]" first, "p" becomes invalid.  So we need to copy
@@ -3636,7 +3636,7 @@ shorten_filenames(char_u **fnames, int count)
 	}
     }
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Add extension to file name - change path/fo.o.h to path/fo.o.h.ext or
@@ -3653,60 +3653,60 @@ shorten_filenames(char_u **fnames, int count)
 modname(
     char_u *fname,
     char_u *ext,
-    int	    prepend_dot)	// may prepend a '.' to file name
+    ಪೂರ್ಣಾಂಕ	    prepend_dot)	// may prepend a '.' to file name
 {
-    return buf_modname((curbuf->b_p_sn || curbuf->b_shortname),
+    ಹಿಂತಿರುಗಿ buf_modname((curbuf->b_p_sn || curbuf->b_shortname),
 						     fname, ext, prepend_dot);
 }
 
     char_u *
 buf_modname(
-    int	    shortname,		// use 8.3 file name
+    ಪೂರ್ಣಾಂಕ	    shortname,		// use 8.3 file name
     char_u  *fname,
     char_u  *ext,
-    int	    prepend_dot)	// may prepend a '.' to file name
+    ಪೂರ್ಣಾಂಕ	    prepend_dot)	// may prepend a '.' to file name
 {
     char_u	*retval;
     char_u	*s;
     char_u	*e;
     char_u	*ptr;
     size_t	ptrlen;
-    int		fnamelen, extlen;
+    ಪೂರ್ಣಾಂಕ		fnamelen, extlen;
 
-    extlen = (int)STRLEN(ext);
+    extlen = (ಪೂರ್ಣಾಂಕ)STRLEN(ext);
 
     /*
      * If there is no file name we must get the name of the current directory
      * (we need the full path in case :cd is used).
      */
-    if (fname == NULL || *fname == NUL)
+    ಆದರೆ (fname == ಖಾಲಿ || *fname == NUL)
     {
 	retval = alloc(MAXPATHL + extlen + 3);
-	if (retval == NULL)
-	    return NULL;
-	if (mch_dirname(retval, MAXPATHL) == FAIL ||
-				     (fnamelen = (int)STRLEN(retval)) == 0)
+	ಆದರೆ (retval == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+	ಆದರೆ (mch_dirname(retval, MAXPATHL) == FAIL ||
+				     (fnamelen = (ಪೂರ್ಣಾಂಕ)STRLEN(retval)) == 0)
 	{
 	    vim_free(retval);
-	    return NULL;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
-	if (!after_pathsep(retval, retval + fnamelen))
+	ಆದರೆ (!after_pathsep(retval, retval + fnamelen))
 	{
 	    retval[fnamelen++] = PATHSEP;
 	    retval[fnamelen] = NUL;
 	}
 	prepend_dot = FALSE;	    // nothing to prepend a dot to
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	fnamelen = (int)STRLEN(fname);
+	fnamelen = (ಪೂರ್ಣಾಂಕ)STRLEN(fname);
 	retval = alloc(fnamelen + extlen + 3);
-	if (retval == NULL)
-	    return NULL;
+	ಆದರೆ (retval == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	STRCPY(retval, fname);
-#ifdef VMS
-	vms_remove_version(retval); // we do not need versions here
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VMS
+	vms_remove_ಆವೃತ್ತಿ(retval); // we do not need versions here
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
     /*
@@ -3715,21 +3715,21 @@ buf_modname(
      * Then truncate what is after the '/', '\' or ':' to 8 characters for
      * MSDOS and 26 characters for AMIGA, a lot more for UNIX.
      */
-    for (ptr = retval + fnamelen; ptr > retval; MB_PTR_BACK(retval, ptr))
+    ಗಾಗಿ (ptr = retval + fnamelen; ptr > retval; MB_PTR_ಹಿಂಭಾಗ(retval, ptr))
     {
-	if (*ext == '.' && shortname)
-	    if (*ptr == '.')	// replace '.' by '_'
+	ಆದರೆ (*ext == '.' && shortname)
+	    ಆದರೆ (*ptr == '.')	// replace '.' by '_'
 		*ptr = '_';
-	if (vim_ispathsep(*ptr))
+	ಆದರೆ (vim_ispathsep(*ptr))
 	{
 	    ++ptr;
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
     }
 
     // the file name has at most BASENAMELEN characters.
     ptrlen = (size_t)(fnamelen - (ptr - retval));
-    if (ptrlen > (unsigned)BASENAMELEN)
+    ಆದರೆ (ptrlen > (ಚಿಹ್ನೆರಹಿತ)BASENAMELEN)
     {
 	ptrlen = BASENAMELEN;
 	ptr[ptrlen] = NUL;
@@ -3740,26 +3740,26 @@ buf_modname(
     /*
      * For 8.3 file names we may have to reduce the length.
      */
-    if (shortname)
+    ಆದರೆ (shortname)
     {
 	/*
 	 * If there is no file name, or the file name ends in '/', and the
 	 * extension starts with '.', put a '_' before the dot, because just
 	 * ".ext" is invalid.
 	 */
-	if (fname == NULL || *fname == NUL
+	ಆದರೆ (fname == ಖಾಲಿ || *fname == NUL
 				   || vim_ispathsep(fname[STRLEN(fname) - 1]))
 	{
-	    if (*ext == '.')
+	    ಆದರೆ (*ext == '.')
 		*s++ = '_';
 	}
 	/*
 	 * If the extension starts with '.', truncate the base name at 8
 	 * characters
 	 */
-	else if (*ext == '.')
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*ext == '.')
 	{
-	    if ((size_t)(s - ptr) > (size_t)8)
+	    ಆದರೆ ((size_t)(s - ptr) > (size_t)8)
 	    {
 		s = ptr + 8;
 		*s = '\0';
@@ -3769,24 +3769,24 @@ buf_modname(
 	 * If the extension doesn't start with '.', and the file name
 	 * doesn't have an extension yet, append a '.'
 	 */
-	else if ((e = vim_strchr(ptr, '.')) == NULL)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((e = vim_strchr(ptr, '.')) == ಖಾಲಿ)
 	    *s++ = '.';
 	/*
 	 * If the extension doesn't start with '.', and there already is an
 	 * extension, it may need to be truncated
 	 */
-	else if ((int)(ptrlen - (e - retval)) + extlen > 4)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((ಪೂರ್ಣಾಂಕ)(ptrlen - (e - retval)) + extlen > 4)
 	    s = e + 4 - extlen;
     }
-#ifdef MSWIN
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
     /*
      * If there is no file name, and the extension starts with '.', put a
      * '_' before the dot, because just ".ext" may be invalid if it's on a
      * FAT partition, and on HPFS it doesn't matter.
      */
-    else if ((fname == NULL || *fname == NUL) && *ext == '.')
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((fname == ಖಾಲಿ || *fname == NUL) && *ext == '.')
 	*s++ = '_';
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     /*
      * Append the extension.
@@ -3796,7 +3796,7 @@ buf_modname(
     /*
      * Prepend the dot.
      */
-    if (prepend_dot && !shortname && *(e = gettail(retval)) != '.')
+    ಆದರೆ (prepend_dot && !shortname && *(e = gettail(retval)) != '.')
     {
 	mch_memmove(e + 1, e, (size_t)(((fnamelen + extlen) - (e - retval)) + 1));	// +1 for NUL
 	*e = '.';
@@ -3806,21 +3806,21 @@ buf_modname(
      * Check that, after appending the extension, the file name is really
      * different.
      */
-    if (fname != NULL && STRCMP(fname, retval) == 0)
+    ಆದರೆ (fname != ಖಾಲಿ && STRCMP(fname, retval) == 0)
     {
 	// we search for a character that can be replaced by '_'
-	while (--s >= ptr)
+	ಆಗ (--s >= ptr)
 	{
-	    if (*s != '_')
+	    ಆದರೆ (*s != '_')
 	    {
 		*s = '_';
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	}
-	if (s < ptr)	// fname was "________.<ext>", how tricky!
+	ಆದರೆ (s < ptr)	// fname was "________.<ext>", how tricky!
 	    *ptr = 'v';
     }
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
 /*
@@ -3828,35 +3828,35 @@ buf_modname(
  * rest of the line is thrown away.  Returns TRUE for end-of-file.
  * If the line is truncated then buf[size - 2] will not be NUL.
  */
-    int
-vim_fgets(char_u *buf, int size, FILE *fp)
+    ಪೂರ್ಣಾಂಕ
+vim_fgets(char_u *buf, ಪೂರ್ಣಾಂಕ ಗಾತ್ರ_2, FILE *fp)
 {
-    char	*eof;
-#define FGETS_SIZE 200
-    char	tbuf[FGETS_SIZE];
+    ಅಕ್ಷರ	*eof;
+#ವ್ಯಾಖ್ಯಾನಿಸು FGETS_ಗಾತ್ರ 200
+    ಅಕ್ಷರ	tbuf[FGETS_ಗಾತ್ರ];
 
     // safety check
-    if (size < 2)
+    ಆದರೆ (ಗಾತ್ರ_2 < 2)
     {
-	if (size == 1)
+	ಆದರೆ (ಗಾತ್ರ_2 == 1)
 	    buf[0] = NUL;
-	return TRUE;
+	ಹಿಂತಿರುಗಿ TRUE;
     }
 
-    buf[size - 2] = NUL;
-    eof = fgets((char *)buf, size, fp);
-    if (buf[size - 2] != NUL && buf[size - 2] != '\n')
+    buf[ಗಾತ್ರ_2 - 2] = NUL;
+    eof = fgets((ಅಕ್ಷರ *)buf, ಗಾತ್ರ_2, fp);
+    ಆದರೆ (buf[ಗಾತ್ರ_2 - 2] != NUL && buf[ಗಾತ್ರ_2 - 2] != '\n')
     {
-	buf[size - 1] = NUL;	    // Truncate the line
+	buf[ಗಾತ್ರ_2 - 1] = NUL;	    // Truncate the line
 
 	// Now throw away the rest of the line:
-	do
+	ಮಾಡು
 	{
-	    tbuf[FGETS_SIZE - 2] = NUL;
-	    vim_ignoredp = fgets((char *)tbuf, FGETS_SIZE, fp);
-	} while (tbuf[FGETS_SIZE - 2] != NUL && tbuf[FGETS_SIZE - 2] != '\n');
+	    tbuf[FGETS_ಗಾತ್ರ - 2] = NUL;
+	    vim_ignoredp = fgets((ಅಕ್ಷರ *)tbuf, FGETS_ಗಾತ್ರ, fp);
+	} ಆಗ (tbuf[FGETS_ಗಾತ್ರ - 2] != NUL && tbuf[FGETS_ಗಾತ್ರ - 2] != '\n');
     }
-    return (eof == NULL);
+    ಹಿಂತಿರುಗಿ (eof == ಖಾಲಿ);
 }
 
 /*
@@ -3864,96 +3864,96 @@ vim_fgets(char_u *buf, int size, FILE *fp)
  * function will (attempts to?) copy the file across if rename fails -- webb
  * Return -1 for failure, 0 for success.
  */
-    int
-vim_rename(char_u *from, char_u *to)
+    ಪೂರ್ಣಾಂಕ
+vim_rename(char_u *from, char_u *ಗಮ್ಯ)
 {
-    int		n;
-    int		ret;
-#ifdef AMIGA
+    ಪೂರ್ಣಾಂಕ		n;
+    ಪೂರ್ಣಾಂಕ		ret;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ AMIGA
     BPTR	flock;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     stat_T	st;
-    int		use_tmp_file = FALSE;
+    ಪೂರ್ಣಾಂಕ		use_tmp_file = FALSE;
 
     /*
      * When the names are identical, there is nothing to do.  When they refer
      * to the same file (ignoring case and slash/backslash differences) but
      * the file name differs we need to go through a temp file.
      */
-    if (fnamecmp(from, to) == 0)
+    ಆದರೆ (fnamecmp(from, ಗಮ್ಯ) == 0)
     {
-	if (p_fic && STRCMP(gettail(from), gettail(to)) != 0)
+	ಆದರೆ (p_fic && STRCMP(gettail(from), gettail(ಗಮ್ಯ)) != 0)
 	    use_tmp_file = TRUE;
-	else
-	    return 0;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಹಿಂತಿರುಗಿ 0;
     }
 
     /*
      * Fail if the "from" file doesn't exist.  Avoids that "to" is deleted.
      */
-    if (mch_stat((char *)from, &st) < 0)
-	return -1;
+    ಆದರೆ (mch_stat((ಅಕ್ಷರ *)from, &st) < 0)
+	ಹಿಂತಿರುಗಿ -1;
 
-#ifdef UNIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
     {
-	stat_T	st_to;
+	stat_T	st_ಗಮ್ಯ;
 
 	// It's possible for the source and destination to be the same file.
 	// This happens when "from" and "to" differ in case and are on a FAT32
 	// filesystem.  In that case go through a temp file name.
-	if (mch_stat((char *)to, &st_to) >= 0
-		&& st.st_dev == st_to.st_dev
-		&& st.st_ino == st_to.st_ino)
+	ಆದರೆ (mch_stat((ಅಕ್ಷರ *)ಗಮ್ಯ, &st_ಗಮ್ಯ) >= 0
+		&& st.st_dev == st_ಗಮ್ಯ.st_dev
+		&& st.st_ino == st_ಗಮ್ಯ.st_ino)
 	    use_tmp_file = TRUE;
     }
-#endif
-#ifdef MSWIN
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
     {
 	BY_HANDLE_FILE_INFORMATION info1, info2;
 
 	// It's possible for the source and destination to be the same file.
 	// In that case go through a temp file name.  This makes rename("foo",
 	// "./foo") a no-op (in a complicated way).
-	if (win32_fileinfo(from, &info1) == FILEINFO_OK
-		&& win32_fileinfo(to, &info2) == FILEINFO_OK
-		&& info1.dwVolumeSerialNumber == info2.dwVolumeSerialNumber
-		&& info1.nFileIndexHigh == info2.nFileIndexHigh
-		&& info1.nFileIndexLow == info2.nFileIndexLow)
+	ಆದರೆ (win32_fileinfo(from, &info1) == FILEINFO_OK
+		&& win32_fileinfo(ಗಮ್ಯ, &info2) == FILEINFO_OK
+		&& info1.dw_Volume_Serial_ಸಂಖ್ಯೆ == info2.dw_Volume_Serial_ಸಂಖ್ಯೆ
+		&& info1.n_File_ಸೂಚ್ಯಂಕ_ಮೇಲಿನ == info2.n_File_ಸೂಚ್ಯಂಕ_ಮೇಲಿನ
+		&& info1.n_File_ಸೂಚ್ಯಂಕ_ಕೆಳಗಿನ == info2.n_File_ಸೂಚ್ಯಂಕ_ಕೆಳಗಿನ)
 	    use_tmp_file = TRUE;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (use_tmp_file)
+    ಆದರೆ (use_tmp_file)
     {
-	char	tempname[MAXPATHL + 1];
+	ಅಕ್ಷರ	tempname[MAXPATHL + 1];
 
 	/*
 	 * Find a name that doesn't exist and is in the same directory.
 	 * Rename "from" to "tempname" and then rename "tempname" to "to".
 	 */
-	if (STRLEN(from) >= MAXPATHL - 5)
-	    return -1;
+	ಆದರೆ (STRLEN(from) >= MAXPATHL - 5)
+	    ಹಿಂತಿರುಗಿ -1;
 	STRCPY(tempname, from);
-	for (n = 123; n < 99999; ++n)
+	ಗಾಗಿ (n = 123; n < 99999; ++n)
 	{
-	    sprintf((char *)gettail((char_u *)tempname), "%d", n);
-	    if (mch_stat(tempname, &st) < 0)
+	    sprintf((ಅಕ್ಷರ *)gettail((char_u *)tempname), "%d", n);
+	    ಆದರೆ (mch_stat(tempname, &st) < 0)
 	    {
-		if (mch_rename((char *)from, tempname) == 0)
+		ಆದರೆ (mch_rename((ಅಕ್ಷರ *)from, tempname) == 0)
 		{
-		    if (mch_rename(tempname, (char *)to) == 0)
-			return 0;
+		    ಆದರೆ (mch_rename(tempname, (ಅಕ್ಷರ *)ಗಮ್ಯ) == 0)
+			ಹಿಂತಿರುಗಿ 0;
 		    // Strange, the second step failed.  Try moving the
 		    // file back and return failure.
-		    (void)mch_rename(tempname, (char *)from);
-		    return -1;
+		    (ಶೂನ್ಯ)mch_rename(tempname, (ಅಕ್ಷರ *)from);
+		    ಹಿಂತಿರುಗಿ -1;
 		}
 		// If it fails for one temp name it will most likely fail
 		// for any temp name, give up.
-		return -1;
+		ಹಿಂತಿರುಗಿ -1;
 	    }
 	}
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 
     /*
@@ -3962,7 +3962,7 @@ vim_rename(char_u *from, char_u *to)
      * two files when the mch_rename() fails.
      */
 
-#ifdef AMIGA
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ AMIGA
     /*
      * With MSDOS-compatible filesystems (crossdos, messydos) it is possible
      * that the name of the "to" file is the same as the "from" file, even
@@ -3976,34 +3976,34 @@ vim_rename(char_u *from, char_u *to)
      * original file will be somewhere else so the backup isn't really
      * important. If autoscripting is off the rename may fail.
      */
-    flock = Lock((UBYTE *)from, (long)VIM_ACCESS_READ);
-#endif
-    mch_remove(to);
-#ifdef AMIGA
-    if (flock)
-	UnLock(flock);
-#endif
+    flock = ಬೀಗ_2((UBYTE *)from, (ದೀರ್ಘ)VIM_ACCESS_READ);
+#ಆದರೆ_ಅಂತ್ಯ
+    mch_remove(ಗಮ್ಯ);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ AMIGA
+    ಆದರೆ (flock)
+	Un_ಬೀಗ(flock);
+#ಆದರೆ_ಅಂತ್ಯ
 
     /*
      * First try a normal rename, return if it works.
      */
-    if (mch_rename((char *)from, (char *)to) == 0)
-	return 0;
+    ಆದರೆ (mch_rename((ಅಕ್ಷರ *)from, (ಅಕ್ಷರ *)ಗಮ್ಯ) == 0)
+	ಹಿಂತಿರುಗಿ 0;
 
     /*
      * Rename() failed, try copying the file.
      */
-    ret = vim_copyfile(from, to);
-    if (ret != OK)
-	return -1;
+    ret = vim_copyfile(from, ಗಮ್ಯ);
+    ಆದರೆ (ret != OK)
+	ಹಿಂತಿರುಗಿ -1;
 
     /*
      * Remove copied original file
      */
-    if (mch_stat((char *)from, &st) >= 0)
+    ಆದರೆ (mch_stat((ಅಕ್ಷರ *)from, &st) >= 0)
 	mch_remove(from);
 
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
 
@@ -4011,115 +4011,115 @@ vim_rename(char_u *from, char_u *to)
  * Create the new file with same permissions as the original.
  * Return FAIL for failure, OK for success.
  */
-    int
-vim_copyfile(char_u *from, char_u *to)
+    ಪೂರ್ಣಾಂಕ
+vim_copyfile(char_u *from, char_u *ಗಮ್ಯ)
 {
-    int		fd_in;
-    int		fd_out;
-    int		n;
-    char	*errmsg = NULL;
-    char	*buffer;
-    long	perm;
-#ifdef HAVE_ACL
+    ಪೂರ್ಣಾಂಕ		fd_ಒಳ;
+    ಪೂರ್ಣಾಂಕ		fd_ಹೊರಹೋಗು;
+    ಪೂರ್ಣಾಂಕ		n;
+    ಅಕ್ಷರ	*errmsg = ಖಾಲಿ;
+    ಅಕ್ಷರ	*ಬಫರ್;
+    ದೀರ್ಘ	perm;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_ACL
     vim_acl_T	acl;		// ACL from original file
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef HAVE_READLINK
-    int		ret;
-    int		len;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_READLINK
+    ಪೂರ್ಣಾಂಕ		ret;
+    ಪೂರ್ಣಾಂಕ		len;
     stat_T	st;
-    char	linkbuf[MAXPATHL + 1];
+    ಅಕ್ಷರ	linkbuf[MAXPATHL + 1];
 
-    ret = mch_lstat((char *)from, &st);
-    if (ret >= 0 && S_ISLNK(st.st_mode))
+    ret = mch_lstat((ಅಕ್ಷರ *)from, &st);
+    ಆದರೆ (ret >= 0 && S_ISLNK(st.st_ಬಹುಲಕ))
     {
 	ret = -1;
 
-	len = readlink((char *)from, linkbuf, MAXPATHL);
-	if (len > 0)
+	len = readlink((ಅಕ್ಷರ *)from, linkbuf, MAXPATHL);
+	ಆದರೆ (len > 0)
 	{
 	    linkbuf[len] = NUL;
 
 	    // Create link
-	    ret = symlink(linkbuf, (char *)to);
+	    ret = symlink(linkbuf, (ಅಕ್ಷರ *)ಗಮ್ಯ);
 	}
 
-	return ret == 0 ? OK : FAIL;
+	ಹಿಂತಿರುಗಿ ret == 0 ? OK : FAIL;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     perm = mch_getperm(from);
-#ifdef HAVE_ACL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_ACL
     // For systems that support ACL: get the ACL from the original file.
     acl = mch_get_acl(from);
-#endif
-    fd_in = mch_open((char *)from, O_RDONLY|O_EXTRA, 0);
-    if (fd_in == -1)
+#ಆದರೆ_ಅಂತ್ಯ
+    fd_ಒಳ = mch_open((ಅಕ್ಷರ *)from, O_RDONLY|O_EXTRA, 0);
+    ಆದರೆ (fd_ಒಳ == -1)
     {
-#ifdef HAVE_ACL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_ACL
 	mch_free_acl(acl);
-#endif
-	return FAIL;
+#ಆದರೆ_ಅಂತ್ಯ
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
     // Create the new file with same permissions as the original.
-    fd_out = mch_open((char *)to,
-		       O_CREAT|O_EXCL|O_WRONLY|O_EXTRA|O_NOFOLLOW, (int)perm);
-    if (fd_out == -1)
+    fd_ಹೊರಹೋಗು = mch_open((ಅಕ್ಷರ *)ಗಮ್ಯ,
+		       O_CREAT|O_EXCL|O_WRONLY|O_EXTRA|O_NOFOLLOW, (ಪೂರ್ಣಾಂಕ)perm);
+    ಆದರೆ (fd_ಹೊರಹೋಗು == -1)
     {
-	close(fd_in);
-#ifdef HAVE_ACL
+	close(fd_ಒಳ);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_ACL
 	mch_free_acl(acl);
-#endif
-	return FAIL;
+#ಆದರೆ_ಅಂತ್ಯ
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
-    buffer = alloc(WRITEBUFSIZE);
-    if (buffer == NULL)
+    ಬಫರ್ = alloc(WRITEBUFSIZE);
+    ಆದರೆ (ಬಫರ್ == ಖಾಲಿ)
     {
-	close(fd_out);
-	close(fd_in);
-#ifdef HAVE_ACL
+	close(fd_ಹೊರಹೋಗು);
+	close(fd_ಒಳ);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_ACL
 	mch_free_acl(acl);
-#endif
-	return FAIL;
+#ಆದರೆ_ಅಂತ್ಯ
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
-    while ((n = read_eintr(fd_in, buffer, WRITEBUFSIZE)) > 0)
-	if (write_eintr(fd_out, buffer, n) != n)
+    ಆಗ ((n = read_eintr(fd_ಒಳ, ಬಫರ್, WRITEBUFSIZE)) > 0)
+	ಆದರೆ (write_eintr(fd_ಹೊರಹೋಗು, ಬಫರ್, n) != n)
 	{
-	    errmsg = _(e_error_writing_to_str);
-	    break;
+	    errmsg = _(e_error_writing_ಗಮ್ಯ_str);
+	    ನಿಲ್ಲಿಸು;
 	}
 
-    vim_free(buffer);
-    close(fd_in);
-    if (close(fd_out) < 0)
+    vim_free(ಬಫರ್);
+    close(fd_ಒಳ);
+    ಆದರೆ (close(fd_ಹೊರಹೋಗು) < 0)
 	errmsg = _(e_error_closing_str);
-    if (n < 0)
+    ಆದರೆ (n < 0)
     {
 	errmsg = _(e_error_reading_str);
-	to = from;
+	ಗಮ್ಯ = from;
     }
-#ifndef UNIX	    // for Unix mch_open() already set the permission
-    mch_setperm(to, perm);
-#endif
-#ifdef HAVE_ACL
-    mch_set_acl(to, acl);
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ UNIX	    // for Unix mch_open() already set the permission
+    mch_setperm(ಗಮ್ಯ, perm);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_ACL
+    mch_ಗಣ_acl(ಗಮ್ಯ, acl);
     mch_free_acl(acl);
-#endif
-#if defined(HAVE_SELINUX) || defined(HAVE_SMACK)
-    mch_copy_sec(from, to);
-#endif
-    if (errmsg != NULL)
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(HAVE_SELINUX) || defined(HAVE_SMACK)
+    mch_copy_sec(from, ಗಮ್ಯ);
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (errmsg != ಖಾಲಿ)
     {
-	semsg(errmsg, to);
-	return FAIL;
+	semsg(errmsg, ಗಮ್ಯ);
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-static int already_warned = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ already_warned = FALSE;
 
 /*
  * Check if any not hidden buffer has been changed.
@@ -4129,32 +4129,32 @@ static int already_warned = FALSE;
  * Returns TRUE if some message was written (screen should be redrawn and
  * cursor positioned).
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 check_timestamps(
-    int		focus)		// called for GUI focus event
+    ಪೂರ್ಣಾಂಕ		focus)		// called for GUI focus event
 {
     buf_T	*buf;
-    int		didit = 0;
-    int		n;
+    ಪೂರ್ಣಾಂಕ		didit = 0;
+    ಪೂರ್ಣಾಂಕ		n;
 
     // Don't check timestamps while system() or another low-level function may
     // cause us to lose and gain focus.
-    if (no_check_timestamps > 0)
-	return FALSE;
+    ಆದರೆ (no_check_timestamps > 0)
+	ಹಿಂತಿರುಗಿ FALSE;
 
     // Avoid doing a check twice.  The OK/Reload dialog can cause a focus
     // event and we would keep on checking if the file is steadily growing.
     // Do check again after typing something.
-    if (focus && did_check_timestamps)
+    ಆದರೆ (focus && did_check_timestamps)
     {
 	need_check_timestamps = TRUE;
-	return FALSE;
+	ಹಿಂತಿರುಗಿ FALSE;
     }
 
-    if (!stuff_empty() || global_busy || !typebuf_typed()
-			|| autocmd_busy || curbuf_lock > 0 || allbuf_lock > 0)
+    ಆದರೆ (!stuff_ಖಾಲಿಗಳು() || global_busy || !typebuf_typed()
+			|| autocmd_busy || curbuf_ಬೀಗ > 0 || allbuf_ಬೀಗ > 0)
 	need_check_timestamps = TRUE;		// check later
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	++no_wait_return;
 	did_check_timestamps = TRUE;
@@ -4162,33 +4162,33 @@ check_timestamps(
 	FOR_ALL_BUFFERS(buf)
 	{
 	    // Only check buffers in a window.
-	    if (buf->b_nwindows > 0)
+	    ಆದರೆ (buf->b_nwindows > 0)
 	    {
 		bufref_T bufref;
 
-		set_bufref(&bufref, buf);
+		ಗಣ_bufref(&bufref, buf);
 		n = buf_check_timestamp(buf, focus);
-		if (didit < n)
+		ಆದರೆ (didit < n)
 		    didit = n;
-		if (n > 0 && !bufref_valid(&bufref))
+		ಆದರೆ (n > 0 && !bufref_valid(&bufref))
 		{
 		    // Autocommands have removed the buffer, start at the
 		    // first one again.
 		    buf = firstbuf;
-		    continue;
+		    ಮುಂದುವರಿ;
 		}
 	    }
 	}
 	--no_wait_return;
 	need_check_timestamps = FALSE;
-	if (need_wait_return && didit == 2)
+	ಆದರೆ (need_wait_return && didit == 2)
 	{
 	    // make sure msg isn't overwritten
-	    msg_puts("\n");
-	    out_flush();
+	    ಸಂದೇಶ_puts("\n");
+	    ಹೊರಹೋಗು_flush();
 	}
     }
-    return didit;
+    ಹಿಂತಿರುಗಿ didit;
 }
 
 /*
@@ -4196,44 +4196,44 @@ check_timestamps(
  * Return OK or FAIL.  When FAIL "tobuf" is incomplete and/or "frombuf" is not
  * empty.
  */
-    static int
-move_lines(buf_T *frombuf, buf_T *tobuf)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+move_ಸಾಲುಗಳು(buf_T *frombuf, buf_T *tobuf)
 {
     buf_T	*tbuf = curbuf;
-    int		retval = OK;
+    ಪೂರ್ಣಾಂಕ		retval = OK;
     linenr_T	lnum;
     char_u	*p;
 
     // Copy the lines in "frombuf" to "tobuf".
     curbuf = tobuf;
-    for (lnum = 1; lnum <= frombuf->b_ml.ml_line_count; ++lnum)
+    ಗಾಗಿ (lnum = 1; lnum <= frombuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ; ++lnum)
     {
 	p = vim_strnsave(ml_get_buf(frombuf, lnum, FALSE), ml_get_buf_len(frombuf, lnum));
-	if (p == NULL || ml_append(lnum - 1, p, 0, FALSE) == FAIL)
+	ಆದರೆ (p == ಖಾಲಿ || ml_append(lnum - 1, p, 0, FALSE) == FAIL)
 	{
 	    vim_free(p);
 	    retval = FAIL;
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
 	vim_free(p);
     }
 
     // Delete all the lines in "frombuf".
-    if (retval != FAIL)
+    ಆದರೆ (retval != FAIL)
     {
 	curbuf = frombuf;
-	for (lnum = curbuf->b_ml.ml_line_count; lnum > 0; --lnum)
-	    if (ml_delete(lnum) == FAIL)
+	ಗಾಗಿ (lnum = curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ; lnum > 0; --lnum)
+	    ಆದರೆ (ml_delete(lnum) == FAIL)
 	    {
 		// Oops!  We could try putting back the saved lines, but that
 		// might fail again...
 		retval = FAIL;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
     }
 
     curbuf = tbuf;
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
 /*
@@ -4243,84 +4243,84 @@ move_lines(buf_T *frombuf, buf_T *tobuf)
  * return 2 if a message has been displayed.
  * return 0 otherwise.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 buf_check_timestamp(
     buf_T	*buf,
-    int		focus UNUSED)	// called for GUI focus event
+    ಪೂರ್ಣಾಂಕ		focus ಬಳಸದ)	// called for GUI focus event
 {
     stat_T	st;
-    int		stat_res;
-    int		retval = 0;
-    char	*mesg = NULL;
-    char	*mesg2 = "";
-    int		helpmesg = FALSE;
-    enum {
+    ಪೂರ್ಣಾಂಕ		stat_res;
+    ಪೂರ್ಣಾಂಕ		retval = 0;
+    ಅಕ್ಷರ	*mesg = ಖಾಲಿ;
+    ಅಕ್ಷರ	*mesg2 = "";
+    ಪೂರ್ಣಾಂಕ		helpmesg = FALSE;
+    ಎಣಿಕೆ {
 	RELOAD_NONE,
-	RELOAD_NORMAL,
+	RELOAD_ಸಾಮಾನ್ಯ,
 	RELOAD_DETECT
     }		reload = RELOAD_NONE;
-#if defined(FEAT_CON_DIALOG) || defined(FEAT_GUI_DIALOG)
-    int		can_reload = FALSE;
-#endif
-    off_T	orig_size = buf->b_orig_size;
-    int		orig_mode = buf->b_orig_mode;
-#ifdef FEAT_GUI
-    int		save_mouse_correct = need_mouse_correct;
-#endif
-    static int	busy = FALSE;
-    int		n;
+#ಆದರೆ defined(FEAT_CON_DIALOG) || defined(FEAT_GUI_DIALOG)
+    ಪೂರ್ಣಾಂಕ		can_reload = FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
+    off_T	orig_ಗಾತ್ರ = buf->b_orig_ಗಾತ್ರ;
+    ಪೂರ್ಣಾಂಕ		orig_ಬಹುಲಕ = buf->b_orig_ಬಹುಲಕ;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+    ಪೂರ್ಣಾಂಕ		save_mouse_correct = need_mouse_correct;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	busy = FALSE;
+    ಪೂರ್ಣಾಂಕ		n;
     bufref_T	bufref;
 
-    set_bufref(&bufref, buf);
+    ಗಣ_bufref(&bufref, buf);
 
     // If there is no file name, the buffer is not loaded, 'buftype' is
     // set, we are in the middle of a save or being called recursively: ignore
     // this buffer.
-    if (buf->b_ffname == NULL
-	    || buf->b_ml.ml_mfp == NULL
-	    || !bt_normal(buf)
+    ಆದರೆ (buf->b_ffname == ಖಾಲಿ
+	    || buf->b_ml.ml_mfp == ಖಾಲಿ
+	    || !bt_ಸಾಮಾನ್ಯ(buf)
 	    || buf->b_saving
 	    || busy
-#ifdef FEAT_NETBEANS_INTG
-	    || isNetbeansBuffer(buf)
-#endif
-#ifdef FEAT_TERMINAL
-	    || buf->b_term != NULL
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_NETBEANS_INTG
+	    || is_Netbeans_ಬಫರ್(buf)
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMINAL
+	    || buf->b_ಪದ != ಖಾಲಿ
+#ಆದರೆ_ಅಂತ್ಯ
 	    )
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
 
-    if (       !(buf->b_flags & BF_NOTEDITED)
+    ಆದರೆ (       !(buf->b_flags & BF_NOTEDITED)
 	    && buf->b_mtime != 0
-	    && ((stat_res = mch_stat((char *)buf->b_ffname, &st)) < 0
-		|| time_differs(&st, buf->b_mtime, buf->b_mtime_ns)
-		|| st.st_size != buf->b_orig_size
-#ifdef HAVE_ST_MODE
-		|| (int)st.st_mode != buf->b_orig_mode
-#else
-		|| mch_getperm(buf->b_ffname) != buf->b_orig_mode
-#endif
+	    && ((stat_res = mch_stat((ಅಕ್ಷರ *)buf->b_ffname, &st)) < 0
+		|| ಸಮಯ_differs(&st, buf->b_mtime, buf->b_mtime_ns)
+		|| st.st_size != buf->b_orig_ಗಾತ್ರ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_ST_ಬಹುಲಕ
+		|| (ಪೂರ್ಣಾಂಕ)st.st_ಬಹುಲಕ != buf->b_orig_ಬಹುಲಕ
+#ಇಲ್ಲದಿದ್ದರೆ
+		|| mch_getperm(buf->b_ffname) != buf->b_orig_ಬಹುಲಕ
+#ಆದರೆ_ಅಂತ್ಯ
 		))
     {
-	long prev_b_mtime = buf->b_mtime;
+	ದೀರ್ಘ prev_b_mtime = buf->b_mtime;
 
 	retval = 1;
 
 	// set b_mtime to stop further warnings (e.g., when executing
 	// FileChangedShell autocmd)
-	if (stat_res < 0)
+	ಆದರೆ (stat_res < 0)
 	{
 	    // Check the file again later to see if it re-appears.
 	    buf->b_mtime = -1;
-	    buf->b_orig_size = 0;
-	    buf->b_orig_mode = 0;
+	    buf->b_orig_ಗಾತ್ರ = 0;
+	    buf->b_orig_ಬಹುಲಕ = 0;
 	}
-	else
-	    buf_store_time(buf, &st, buf->b_ffname);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    buf_store_ಸಮಯ(buf, &st, buf->b_ffname);
 
 	// Don't do anything for a directory.  Might contain the file
 	// explorer.
-	if (mch_isdir(buf->b_fname))
+	ಆದರೆ (mch_isdir(buf->b_fname))
 	    ;
 
 	/*
@@ -4328,55 +4328,55 @@ buf_check_timestamp(
 	 * exists, reload the buffer.  Use the buffer-local option value if it
 	 * was set, the global option value otherwise.
 	 */
-	else if ((buf->b_p_ar >= 0 ? buf->b_p_ar : p_ar)
-				       && !bufIsChanged(buf) && stat_res >= 0)
-	    reload = RELOAD_NORMAL;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((buf->b_p_ar >= 0 ? buf->b_p_ar : p_ar)
+				       && !buf_Is_ಬದಲಾಯಿತು(buf) && stat_res >= 0)
+	    reload = RELOAD_ಸಾಮಾನ್ಯ;
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    char    *reason;
-#ifdef FEAT_EVAL
+	    ಅಕ್ಷರ    *reason;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 	    size_t  reasonlen;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-	    if (stat_res < 0)
+	    ಆದರೆ (stat_res < 0)
 	    {
 		reason = "deleted";
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 		reasonlen = STRLEN_LITERAL("deleted");
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
-	    else if (bufIsChanged(buf))
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (buf_Is_ಬದಲಾಯಿತು(buf))
 	    {
 		reason = "conflict";
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 		reasonlen = STRLEN_LITERAL("conflict");
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
 	    /*
 	     * Check if the file contents really changed to avoid giving a
 	     * warning when only the timestamp was set (e.g., checked out of
 	     * CVS).  Always warn when the buffer was changed.
 	     */
-	    else if (orig_size != buf->b_orig_size || buf_contents_changed(buf))
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (orig_ಗಾತ್ರ != buf->b_orig_ಗಾತ್ರ || buf_contents_ಬದಲಾಯಿತು(buf))
 	    {
 		reason = "changed";
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 		reasonlen = STRLEN_LITERAL("changed");
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
-	    else if (orig_mode != buf->b_orig_mode)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (orig_ಬಹುಲಕ != buf->b_orig_ಬಹುಲಕ)
 	    {
 		reason = "mode";
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 		reasonlen = STRLEN_LITERAL("mode");
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		reason = "time";
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 		reasonlen = STRLEN_LITERAL("time");
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
 
 	    /*
@@ -4385,61 +4385,61 @@ buf_check_timestamp(
 	     * Avoid being called recursively by setting "busy".
 	     */
 	    busy = TRUE;
-#ifdef FEAT_EVAL
-	    set_vim_var_string(VV_FCS_REASON, (char_u *)reason, (int)reasonlen);
-	    set_vim_var_string(VV_FCS_CHOICE, (char_u *)"", 0);
-#endif
-	    ++allbuf_lock;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	    ಗಣ_vim_var_string(VV_FCS_REASON, (char_u *)reason, (ಪೂರ್ಣಾಂಕ)reasonlen);
+	    ಗಣ_vim_var_string(VV_FCS_CHOICE, (char_u *)"", 0);
+#ಆದರೆ_ಅಂತ್ಯ
+	    ++allbuf_ಬೀಗ;
 	    n = apply_autocmds(EVENT_FILECHANGEDSHELL,
 				      buf->b_fname, buf->b_fname, FALSE, buf);
-	    --allbuf_lock;
+	    --allbuf_ಬೀಗ;
 	    busy = FALSE;
-	    if (n)
+	    ಆದರೆ (n)
 	    {
-		if (!bufref_valid(&bufref))
-		    emsg(_(e_filechangedshell_autocommand_deleted_buffer));
-#ifdef FEAT_EVAL
+		ಆದರೆ (!bufref_valid(&bufref))
+		    emsg(_(e_filechangedshell_autocommand_deleted_ಬಫರ್));
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 		char_u	*s = get_vim_var_str(VV_FCS_CHOICE);
-		if (STRCMP(s, "reload") == 0 && *reason != 'd')
-		    reload = RELOAD_NORMAL;
-		else if (STRCMP(s, "edit") == 0)
+		ಆದರೆ (STRCMP(s, "reload") == 0 && *reason != 'd')
+		    reload = RELOAD_ಸಾಮಾನ್ಯ;
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(s, "edit") == 0)
 		    reload = RELOAD_DETECT;
-		else if (STRCMP(s, "ask") == 0)
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(s, "ask") == 0)
 		    n = FALSE;
-		else
-#endif
-		    return 2;
+		ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+		    ಹಿಂತಿರುಗಿ 2;
 	    }
-	    if (!n)
+	    ಆದರೆ (!n)
 	    {
-		if (*reason == 'd')
+		ಆದರೆ (*reason == 'd')
 		{
 		    // Only give the message once.
-		    if (prev_b_mtime != -1)
-			mesg = _(e_file_str_no_longer_available);
+		    ಆದರೆ (prev_b_mtime != -1)
+			mesg = _(e_file_str_no_longer_ಲಭ್ಯ);
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    helpmesg = TRUE;
-#if defined(FEAT_CON_DIALOG) || defined(FEAT_GUI_DIALOG)
+#ಆದರೆ defined(FEAT_CON_DIALOG) || defined(FEAT_GUI_DIALOG)
 		    can_reload = TRUE;
-#endif
-		    if (reason[2] == 'n')
+#ಆದರೆ_ಅಂತ್ಯ
+		    ಆದರೆ (reason[2] == 'n')
 		    {
 			mesg = _("W12: Warning: File \"%s\" has changed and the buffer was changed in Vim as well");
 			mesg2 = _("See \":help W12\" for more info.");
 		    }
-		    else if (reason[1] == 'h')
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (reason[1] == 'h')
 		    {
 			mesg = _("W11: Warning: File \"%s\" has changed since editing started");
 			mesg2 = _("See \":help W11\" for more info.");
 		    }
-		    else if (*reason == 'm')
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*reason == 'm')
 		    {
 			mesg = _("W16: Warning: Mode of file \"%s\" has changed since editing started");
 			mesg2 = _("See \":help W16\" for more info.");
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
 			// Only timestamp changed, store it to avoid a warning
 			// in check_mtime() later.
@@ -4451,86 +4451,86 @@ buf_check_timestamp(
 	}
 
     }
-    else if ((buf->b_flags & BF_NEW) && !(buf->b_flags & BF_NEW_W)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((buf->b_flags & BF_NEW) && !(buf->b_flags & BF_NEW_W)
 						&& vim_fexists(buf->b_ffname))
     {
 	retval = 1;
 	mesg = _("W13: Warning: File \"%s\" has been created after editing started");
 	buf->b_flags |= BF_NEW_W;
-#if defined(FEAT_CON_DIALOG) || defined(FEAT_GUI_DIALOG)
+#ಆದರೆ defined(FEAT_CON_DIALOG) || defined(FEAT_GUI_DIALOG)
 	can_reload = TRUE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
-    if (mesg != NULL)
+    ಆದರೆ (mesg != ಖಾಲಿ)
     {
-	char_u *path;
+	char_u *ಮಾರ್ಗ;
 
-	path = home_replace_save(buf, buf->b_fname);
-	if (path != NULL)
+	ಮಾರ್ಗ = home_replace_save(buf, buf->b_fname);
+	ಆದರೆ (ಮಾರ್ಗ != ಖಾಲಿ)
 	{
 	    size_t  tbufsize;
-	    char    *tbuf;
+	    ಅಕ್ಷರ    *tbuf;
 
-	    if (!helpmesg)
+	    ಆದರೆ (!helpmesg)
 		mesg2 = "";
-	    tbufsize = STRLEN(mesg) + STRLEN(path) + 2 + STRLEN(mesg2) + 1; // +2 for either '\n' or "; "
+	    tbufsize = STRLEN(mesg) + STRLEN(ಮಾರ್ಗ) + 2 + STRLEN(mesg2) + 1; // +2 for either '\n' or "; "
 									    // and +1 for NUL
 	    tbuf = alloc(tbufsize);
-	    if (tbuf != NULL)
+	    ಆದರೆ (tbuf != ಖಾಲಿ)
 	    {
-		int tbuflen;
+		ಪೂರ್ಣಾಂಕ tbuflen;
 
-		tbuflen = vim_snprintf(tbuf, tbufsize, mesg, path);
-#ifdef FEAT_EVAL
+		tbuflen = vim_snprintf(tbuf, tbufsize, mesg, ಮಾರ್ಗ);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 		// Set warningmsg here, before the unimportant and output-specific
 		// mesg2 has been appended.
-		set_vim_var_string(VV_WARNINGMSG, (char_u *)tbuf, tbuflen);
-#endif
-#if defined(FEAT_CON_DIALOG) || defined(FEAT_GUI_DIALOG)
-		if (can_reload)
+		ಗಣ_vim_var_string(VV_WARNINGMSG, (char_u *)tbuf, tbuflen);
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(FEAT_CON_DIALOG) || defined(FEAT_GUI_DIALOG)
+		ಆದರೆ (can_reload)
 		{
-		    if (*mesg2 != NUL)
+		    ಆದರೆ (*mesg2 != NUL)
 			vim_snprintf(tbuf + tbuflen, tbufsize - tbuflen, "\n%s", mesg2);
-		    switch (do_dialog(VIM_WARNING, (char_u *)_("Warning"),
+		    ಆಯ್ಕೆ (do_dialog(VIM_WARNING, (char_u *)_("Warning"),
 			    (char_u *)tbuf,
 			    (char_u *)_("&OK\n&Load File\nLoad File &and Options"),
-			    1, NULL, TRUE))
+			    1, ಖಾಲಿ, TRUE))
 		    {
-			case 2:
-			    reload = RELOAD_NORMAL;
-			    break;
-			case 3:
+			ಸ್ಥಿತಿ 2:
+			    reload = RELOAD_ಸಾಮಾನ್ಯ;
+			    ನಿಲ್ಲಿಸು;
+			ಸ್ಥಿತಿ 3:
 			    reload = RELOAD_DETECT;
-			    break;
+			    ನಿಲ್ಲಿಸು;
 		    }
 		}
-		else
-#endif
-		if (State > MODE_NORMAL_BUSY || (State & MODE_CMDLINE)
+		ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+		ಆದರೆ (State > ಬಹುಲಕ_ಸಾಮಾನ್ಯ_BUSY || (State & ಬಹುಲಕ_CMDLINE)
 								 || already_warned)
 		{
-		    if (*mesg2 != NUL)
+		    ಆದರೆ (*mesg2 != NUL)
 			vim_snprintf(tbuf + tbuflen, tbufsize - tbuflen, "; %s", mesg2);
 		    emsg(tbuf);
 		    retval = 2;
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    if (!autocmd_busy)
+		    ಆದರೆ (!autocmd_busy)
 		    {
-			msg_start();
-			msg_puts_attr(tbuf, HL_ATTR(HLF_E) + MSG_HIST);
-			if (*mesg2 != NUL)
-			    msg_puts_attr(mesg2, HL_ATTR(HLF_W) + MSG_HIST);
-			msg_clr_eos();
-			(void)msg_end();
-			if (emsg_silent == 0 && !in_assert_fails)
+			ಸಂದೇಶ_ಆರಂಭ();
+			ಸಂದೇಶ_puts_attr(tbuf, HL_ATTR(HLF_E) + ಸಂದೇಶ_HIST);
+			ಆದರೆ (*mesg2 != NUL)
+			    ಸಂದೇಶ_puts_attr(mesg2, HL_ATTR(HLF_W) + ಸಂದೇಶ_HIST);
+			ಸಂದೇಶ_clr_eos();
+			(ಶೂನ್ಯ)ಸಂದೇಶ_ಕೊನೆ();
+			ಆದರೆ (emsg_silent == 0 && !ಒಳ_assert_fails)
 			{
-			    out_flush();
-#ifdef FEAT_GUI
-			    if (!focus)
-#endif
+			    ಹೊರಹೋಗು_flush();
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+			    ಆದರೆ (!focus)
+#ಆದರೆ_ಅಂತ್ಯ
 				// give the user some time to think about it
 				ui_delay(1004L, TRUE);
 
@@ -4543,40 +4543,40 @@ buf_check_timestamp(
 	    }
 
 	    vim_free(tbuf);
-	    vim_free(path);
+	    vim_free(ಮಾರ್ಗ);
 	}
     }
 
-    if (reload != RELOAD_NONE)
+    ಆದರೆ (reload != RELOAD_NONE)
     {
 	// Reload the buffer.
-	buf_reload(buf, orig_mode, reload == RELOAD_DETECT);
-#ifdef FEAT_PERSISTENT_UNDO
-	if (bufref_valid(&bufref) && buf->b_p_udf && buf->b_ffname != NULL)
+	buf_reload(buf, orig_ಬಹುಲಕ, reload == RELOAD_DETECT);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PERSISTENT_UNDO
+	ಆದರೆ (bufref_valid(&bufref) && buf->b_p_udf && buf->b_ffname != ಖಾಲಿ)
 	{
-	    char_u	    hash[UNDO_HASH_SIZE];
+	    char_u	    hash[UNDO_HASH_ಗಾತ್ರ];
 	    buf_T	    *save_curbuf = curbuf;
 
 	    // Any existing undo file is unusable, write it now.
 	    curbuf = buf;
 	    u_compute_hash(hash);
-	    u_write_undo(NULL, FALSE, buf, hash);
+	    u_write_undo(ಖಾಲಿ, FALSE, buf, hash);
 	    curbuf = save_curbuf;
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
     // Trigger FileChangedShell when the file was changed in any way.
-    if (bufref_valid(&bufref) && retval != 0)
-	(void)apply_autocmds(EVENT_FILECHANGEDSHELLPOST,
+    ಆದರೆ (bufref_valid(&bufref) && retval != 0)
+	(ಶೂನ್ಯ)apply_autocmds(EVENT_FILECHANGEDSHELLPOST,
 				      buf->b_fname, buf->b_fname, FALSE, buf);
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
     // restore this in case an autocommand has set it; it would break
     // 'mousefocus'
     need_mouse_correct = save_mouse_correct;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
 /*
@@ -4585,48 +4585,48 @@ buf_check_timestamp(
  * "orig_mode" is buf->b_orig_mode before the need for reloading was detected.
  * buf->b_orig_mode may have been reset already.
  */
-    void
-buf_reload(buf_T *buf, int orig_mode, int reload_options)
+    ಶೂನ್ಯ
+buf_reload(buf_T *buf, ಪೂರ್ಣಾಂಕ orig_ಬಹುಲಕ, ಪೂರ್ಣಾಂಕ reload_options)
 {
     exarg_T	ea;
     pos_T	old_cursor;
     linenr_T	old_topline;
-    int		old_ro = buf->b_p_ro;
+    ಪೂರ್ಣಾಂಕ		old_ro = buf->b_p_ro;
     buf_T	*savebuf;
     bufref_T	bufref;
-    int		saved = OK;
+    ಪೂರ್ಣಾಂಕ		saved = OK;
     aco_save_T	aco;
-    int		flags = READ_NEW;
-    int		prepped = OK;
+    ಪೂರ್ಣಾಂಕ		flags = READ_NEW;
+    ಪೂರ್ಣಾಂಕ		prepped = OK;
 
     // Set curwin/curbuf for "buf" and save some things.
     aucmd_prepbuf(&aco, buf);
-    if (curbuf != buf)
+    ಆದರೆ (curbuf != buf)
     {
 	// Failed to find a window for "buf", it is dangerous to continue,
 	// better bail out.
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
     // Unless reload_options is set, we only want to read the text from the
     // file, not reset the syntax highlighting, clear marks, diff status, etc.
     // Force the fileformat and encoding to be the same.
-    if (reload_options)
-	CLEAR_FIELD(ea);
-    else
+    ಆದರೆ (reload_options)
+	CLEAR_ಕ್ಷೇತ್ರ(ea);
+    ಇಲ್ಲದಿದ್ದರೆ
 	prepped = prep_exarg(&ea, buf);
 
-    if (prepped == OK)
+    ಆದರೆ (prepped == OK)
     {
 	old_cursor = curwin->w_cursor;
 	old_topline = curwin->w_topline;
 
-	if (p_ur < 0 || curbuf->b_ml.ml_line_count <= p_ur)
+	ಆದರೆ (p_ur < 0 || curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ <= p_ur)
 	{
 	    // Save all the text, so that the reload can be undone.
 	    // Sync first so that this is a separate undo-able action.
 	    u_sync(FALSE);
-	    saved = u_savecommon(0, curbuf->b_ml.ml_line_count + 1, 0, TRUE);
+	    saved = u_savecommon(0, curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ + 1, 0, TRUE);
 	    flags |= READ_KEEP_UNDO;
 	}
 
@@ -4637,109 +4637,109 @@ buf_reload(buf_T *buf, int orig_mode, int reload_options)
 	 * the old contents.  Can't use memory only, the file might be
 	 * too big.  Use a hidden buffer to move the buffer contents to.
 	 */
-	if (BUFEMPTY() || saved == FAIL)
-	    savebuf = NULL;
-	else
+	ಆದರೆ (BUFEMPTY() || saved == FAIL)
+	    savebuf = ಖಾಲಿ;
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // Allocate a buffer without putting it in the buffer list.
-	    savebuf = buflist_new(NULL, NULL, (linenr_T)1, BLN_DUMMY);
-	    set_bufref(&bufref, savebuf);
-	    if (savebuf != NULL && buf == curbuf)
+	    savebuf = buflist_new(ಖಾಲಿ, ಖಾಲಿ, (linenr_T)1, BLN_DUMMY);
+	    ಗಣ_bufref(&bufref, savebuf);
+	    ಆದರೆ (savebuf != ಖಾಲಿ && buf == curbuf)
 	    {
 		// Open the memline.
 		curbuf = savebuf;
-		curwin->w_buffer = savebuf;
+		curwin->w_ಬಫರ್ = savebuf;
 		saved = ml_open(curbuf);
 		curbuf = buf;
-		curwin->w_buffer = buf;
+		curwin->w_ಬಫರ್ = buf;
 	    }
-	    if (savebuf == NULL || saved == FAIL || buf != curbuf
-				      || move_lines(buf, savebuf) == FAIL)
+	    ಆದರೆ (savebuf == ಖಾಲಿ || saved == FAIL || buf != curbuf
+				      || move_ಸಾಲುಗಳು(buf, savebuf) == FAIL)
 	    {
 		semsg(_(e_could_not_prepare_for_reloading_str), buf->b_fname);
 		saved = FAIL;
 	    }
 	}
 
-	if (saved == OK)
+	ಆದರೆ (saved == OK)
 	{
-	    int old_msg_silent = msg_silent;
+	    ಪೂರ್ಣಾಂಕ old_ಸಂದೇಶ_silent = ಸಂದೇಶ_silent;
 
 	    curbuf->b_flags |= BF_CHECK_RO;	// check for RO again
 	    curbuf->b_keep_filetype = true;	// don't detect 'filetype'
 
-	    if (shortmess(SHM_FILEINFO))
-		msg_silent = 1;
+	    ಆದರೆ (shortmess(SHM_FILEINFO))
+		ಸಂದೇಶ_silent = 1;
 
-	    if (readfile(buf->b_ffname, buf->b_fname, (linenr_T)0,
+	    ಆದರೆ (readfile(buf->b_ffname, buf->b_fname, (linenr_T)0,
 			(linenr_T)0,
 			(linenr_T)MAXLNUM, &ea, flags) != OK)
 	    {
-#if defined(FEAT_EVAL)
-		if (!aborting())
-#endif
+#ಆದರೆ defined(FEAT_EVAL)
+		ಆದರೆ (!aborting())
+#ಆದರೆ_ಅಂತ್ಯ
 		    semsg(_(e_could_not_reload_str), buf->b_fname);
-		if (savebuf != NULL && bufref_valid(&bufref) && buf == curbuf)
+		ಆದರೆ (savebuf != ಖಾಲಿ && bufref_valid(&bufref) && buf == curbuf)
 		{
 		    // Put the text back from the save buffer.  First
 		    // delete any lines that readfile() added.
-		    while (!BUFEMPTY())
-			if (ml_delete(buf->b_ml.ml_line_count) == FAIL)
-			    break;
-		    (void)move_lines(savebuf, buf);
+		    ಆಗ (!BUFEMPTY())
+			ಆದರೆ (ml_delete(buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ) == FAIL)
+			    ನಿಲ್ಲಿಸು;
+		    (ಶೂನ್ಯ)move_ಸಾಲುಗಳು(savebuf, buf);
 		}
 	    }
-	    else if (buf == curbuf)  // "buf" still valid
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (buf == curbuf)  // "buf" still valid
 	    {
 		// Mark the buffer as unmodified and free undo info.
 		unchanged(buf, TRUE, TRUE);
-		if ((flags & READ_KEEP_UNDO) == 0)
+		ಆದರೆ ((flags & READ_KEEP_UNDO) == 0)
 		    u_clearallandblockfree(buf);
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    // Mark all undo states as changed.
 		    u_unchanged(curbuf);
 		}
 	    }
 
-	    msg_silent = old_msg_silent;
+	    ಸಂದೇಶ_silent = old_ಸಂದೇಶ_silent;
 	}
 	vim_free(ea.cmd);
 
-	if (savebuf != NULL && bufref_valid(&bufref))
-	    wipe_buffer(savebuf, FALSE);
+	ಆದರೆ (savebuf != ಖಾಲಿ && bufref_valid(&bufref))
+	    wipe_ಬಫರ್(savebuf, FALSE);
 
-#ifdef FEAT_DIFF
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
 	// Invalidate diff info if necessary.
 	diff_invalidate(curbuf);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 	// Restore the topline and cursor position and check it (lines may
 	// have been removed).
-	if (old_topline > curbuf->b_ml.ml_line_count)
-	    curwin->w_topline = curbuf->b_ml.ml_line_count;
-	else
+	ಆದರೆ (old_topline > curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
+	    curwin->w_topline = curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
+	ಇಲ್ಲದಿದ್ದರೆ
 	    curwin->w_topline = old_topline;
 	curwin->w_cursor = old_cursor;
 	check_cursor();
 	update_topline();
 	curbuf->b_keep_filetype = false;
-#ifdef FEAT_FOLDING
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_FOLDING
 	{
 	    win_T	*wp;
 	    tabpage_T	*tp;
 
 	    // Update folds unless they are defined manually.
 	    FOR_ALL_TAB_WINDOWS(tp, wp)
-		if (wp->w_buffer == curwin->w_buffer
+		ಆದರೆ (wp->w_ಬಫರ್ == curwin->w_ಬಫರ್
 			&& !foldmethodIsManual(wp))
 		    foldUpdateAll(wp);
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	// If the mode didn't change and 'readonly' was set, keep the old
 	// value; the user probably used the ":view" command.  But don't
 	// reset it, might have had a read error.
-	if (orig_mode == curbuf->b_orig_mode)
+	ಆದರೆ (orig_ಬಹುಲಕ == curbuf->b_orig_ಬಹುಲಕ)
 	    curbuf->b_p_ro |= old_ro;
 
 	// Modelines must override settings done by autocommands.
@@ -4751,321 +4751,321 @@ buf_reload(buf_T *buf, int orig_mode, int reload_options)
     // Careful: autocommands may have made "buf" invalid!
 }
 
-    void
-buf_store_time(buf_T *buf, stat_T *st, char_u *fname UNUSED)
+    ಶೂನ್ಯ
+buf_store_ಸಮಯ(buf_T *buf, stat_T *st, char_u *fname ಬಳಸದ)
 {
-    buf->b_mtime = (long)st->st_mtime;
-#ifdef ST_MTIM_NSEC
-    buf->b_mtime_ns = (long)st->ST_MTIM_NSEC;
-#else
+    buf->b_mtime = (ದೀರ್ಘ)st->st_mtime;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ST_MTIM_NSEC
+    buf->b_mtime_ns = (ದೀರ್ಘ)st->ST_MTIM_NSEC;
+#ಇಲ್ಲದಿದ್ದರೆ
     buf->b_mtime_ns = 0;
-#endif
-    buf->b_orig_size = st->st_size;
-#ifdef HAVE_ST_MODE
-    buf->b_orig_mode = (int)st->st_mode;
-#else
-    buf->b_orig_mode = mch_getperm(fname);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
+    buf->b_orig_ಗಾತ್ರ = st->st_size;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_ST_ಬಹುಲಕ
+    buf->b_orig_ಬಹುಲಕ = (ಪೂರ್ಣಾಂಕ)st->st_ಬಹುಲಕ;
+#ಇಲ್ಲದಿದ್ದರೆ
+    buf->b_orig_ಬಹುಲಕ = mch_getperm(fname);
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Adjust the line with missing eol, used for the next write.
  * Used for do_filter(), when the input lines for the filter are deleted.
  */
-    void
-write_lnum_adjust(linenr_T offset)
+    ಶೂನ್ಯ
+write_lnum_adjust(linenr_T ಸ್ಥಾನಾಂತರ)
 {
-    if (curbuf->b_no_eol_lnum != 0)	// only if there is a missing eol
-	curbuf->b_no_eol_lnum += offset;
+    ಆದರೆ (curbuf->b_no_eol_lnum != 0)	// only if there is a missing eol
+	curbuf->b_no_eol_lnum += ಸ್ಥಾನಾಂತರ;
 }
 
 // Subfuncions for readdirex()
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 # ifdef MSWIN
-    static char_u *
-getfpermwfd(WIN32_FIND_DATAW *wfd, char_u *perm)
+    ಸ್ಥಿರ char_u *
+getfpermwfd(WIN32_ಕಂಡುಹಿಡಿ_DATAW *wfd, char_u *perm)
 {
     stat_T	    st;
-    unsigned short  st_mode;
-    DWORD	    flag = wfd->dwFileAttributes;
+    ಚಿಹ್ನೆರಹಿತ ಗಿಡ್ಡ  st_ಬಹುಲಕ;
+    DWORD	    flag = wfd->dw_File_ಗುಣಲಕ್ಷಣಗಳು;
     WCHAR	    *wp;
 
-    st_mode = (flag & FILE_ATTRIBUTE_DIRECTORY)
+    st_ಬಹುಲಕ = (flag & FILE_ATTRIBUTE_DIRECTORY)
 					? (_S_IFDIR | _S_IEXEC) : _S_IFREG;
-    st_mode |= (flag & FILE_ATTRIBUTE_READONLY)
+    st_ಬಹುಲಕ |= (flag & FILE_ATTRIBUTE_READONLY)
 					? _S_IREAD : (_S_IREAD | _S_IWRITE);
 
     wp = wcsrchr(wfd->cFileName, L'.');
-    if (wp != NULL)
+    ಆದರೆ (wp != ಖಾಲಿ)
     {
-	if (_wcsicmp(wp, L".exe") == 0 ||
+	ಆದರೆ (_wcsicmp(wp, L".exe") == 0 ||
 		_wcsicmp(wp, L".com") == 0 ||
 		_wcsicmp(wp, L".cmd") == 0 ||
 		_wcsicmp(wp, L".bat") == 0)
-	    st_mode |= _S_IEXEC;
+	    st_ಬಹುಲಕ |= _S_IEXEC;
     }
 
     // Copy user bits to group/other.
-    st_mode |= (st_mode & 0700) >> 3;
-    st_mode |= (st_mode & 0700) >> 6;
+    st_ಬಹುಲಕ |= (st_ಬಹುಲಕ & 0700) >> 3;
+    st_ಬಹುಲಕ |= (st_ಬಹುಲಕ & 0700) >> 6;
 
-    st.st_mode = st_mode;
-    return getfpermst(&st, perm);
+    st.st_ಬಹುಲಕ = st_ಬಹುಲಕ;
+    ಹಿಂತಿರುಗಿ getfpermst(&st, perm);
 }
 
-    static void
-getftypewfd(WIN32_FIND_DATAW *wfd, string_T *ret)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+getftypewfd(WIN32_ಕಂಡುಹಿಡಿ_DATAW *wfd, string_T *ret)
 {
-    DWORD flag = wfd->dwFileAttributes;
-    DWORD tag = wfd->dwReserved0;
+    DWORD flag = wfd->dw_File_ಗುಣಲಕ್ಷಣಗಳು;
+    DWORD ಟ್ಯಾಗ್ = wfd->dwReserved0;
 
-    if (flag & FILE_ATTRIBUTE_REPARSE_POINT)
+    ಆದರೆ (flag & FILE_ATTRIBUTE_REPARSE_ಬಿಂದು)
     {
-	if (tag == IO_REPARSE_TAG_MOUNT_POINT)
+	ಆದರೆ (ಟ್ಯಾಗ್ == IO_REPARSE_ಟ್ಯಾಗ್_MOUNT_ಬಿಂದು)
 	{
 	    ret->string = (char_u *)"junction";
-	    ret->length = STRLEN_LITERAL("junction");
-	    return;
+	    ret->ಉದ್ದಳತೆ = STRLEN_LITERAL("junction");
+	    ಹಿಂತಿರುಗಿ;
 	}
-	if (tag == IO_REPARSE_TAG_SYMLINK)
+	ಆದರೆ (ಟ್ಯಾಗ್ == IO_REPARSE_ಟ್ಯಾಗ್_SYMLINK)
 	{
-	    if (flag & FILE_ATTRIBUTE_DIRECTORY)
+	    ಆದರೆ (flag & FILE_ATTRIBUTE_DIRECTORY)
 	    {
 		ret->string = (char_u *)"linkd";
-		ret->length = STRLEN_LITERAL("linkd");
-		return;
+		ret->ಉದ್ದಳತೆ = STRLEN_LITERAL("linkd");
+		ಹಿಂತಿರುಗಿ;
 	    }
 
 	    ret->string = (char_u *)"link";
-	    ret->length = STRLEN_LITERAL("link");
-	    return;
+	    ret->ಉದ್ದಳತೆ = STRLEN_LITERAL("link");
+	    ಹಿಂತಿರುಗಿ;
 	}
 
 	// unknown reparse point type
 	ret->string = (char_u *)"reparse";
-	ret->length = STRLEN_LITERAL("reparse");
-	return;
+	ret->ಉದ್ದಳತೆ = STRLEN_LITERAL("reparse");
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if (flag & FILE_ATTRIBUTE_DIRECTORY)
+    ಆದರೆ (flag & FILE_ATTRIBUTE_DIRECTORY)
     {
 	ret->string = (char_u *)"dir";
-	ret->length = STRLEN_LITERAL("dir");
-	return;
+	ret->ಉದ್ದಳತೆ = STRLEN_LITERAL("dir");
+	ಹಿಂತಿರುಗಿ;
     }
 
     ret->string = (char_u *)"file";
-    ret->length = STRLEN_LITERAL("file");
+    ret->ಉದ್ದಳತೆ = STRLEN_LITERAL("file");
 }
 
-    static dict_T *
-create_readdirex_item(WIN32_FIND_DATAW *wfd)
+    ಸ್ಥಿರ dict_T *
+create_readdirex_ಅಂಶ(WIN32_ಕಂಡುಹಿಡಿ_DATAW *wfd)
 {
-    dict_T	*item;
+    dict_T	*ಅಂಶ;
     char_u	*p;
-    varnumber_T	size, time;
+    varnumber_T	ಗಾತ್ರ_2, ಸಮಯ;
     char_u	permbuf[] = "---------";
     string_T	s;
 
-    item = dict_alloc();
-    if (item == NULL)
-	return NULL;
-    item->dv_refcount++;
+    ಅಂಶ = dict_alloc();
+    ಆದರೆ (ಅಂಶ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    ಅಂಶ->dv_refcount++;
 
-    p = utf16_to_enc(wfd->cFileName, NULL);
-    if (p == NULL)
-	goto theend;
-    if (dict_add_string(item, "name", p) == FAIL)
+    p = utf16_ಗಮ್ಯ_enc(wfd->cFileName, ಖಾಲಿ);
+    ಆದರೆ (p == ಖಾಲಿ)
+	ಹೋಗು theend;
+    ಆದರೆ (dict_ಕೂಡಿಸು_string(ಅಂಶ, "name", p) == FAIL)
     {
 	vim_free(p);
-	goto theend;
+	ಹೋಗು theend;
     }
     vim_free(p);
 
-    size = (((varnumber_T)wfd->nFileSizeHigh) << 32) | wfd->nFileSizeLow;
-    if (dict_add_number(item, "size", size) == FAIL)
-	goto theend;
+    ಗಾತ್ರ_2 = (((varnumber_T)wfd->n_File_ಗಾತ್ರ_ಮೇಲಿನ) << 32) | wfd->n_File_ಗಾತ್ರ_ಕೆಳಗಿನ;
+    ಆದರೆ (dict_ಕೂಡಿಸು_ಸಂಖ್ಯೆ(ಅಂಶ, "size", ಗಾತ್ರ_2) == FAIL)
+	ಹೋಗು theend;
 
     // Convert FILETIME to unix time.
-    time = (((((varnumber_T)wfd->ftLastWriteTime.dwHighDateTime) << 32) |
-		wfd->ftLastWriteTime.dwLowDateTime)
+    ಸಮಯ = (((((varnumber_T)wfd->ft_ಕೊನೆಯ_Write_ಸಮಯ.dw_ಮೇಲಿನ_Date_ಸಮಯ) << 32) |
+		wfd->ft_ಕೊನೆಯ_Write_ಸಮಯ.dw_ಕೆಳಗಿನ_Date_ಸಮಯ)
 	    - 116444736000000000) / 10000000;
-    if (dict_add_number(item, "time", time) == FAIL)
-	goto theend;
+    ಆದರೆ (dict_ಕೂಡಿಸು_ಸಂಖ್ಯೆ(ಅಂಶ, "time", ಸಮಯ) == FAIL)
+	ಹೋಗು theend;
 
     getftypewfd(wfd, &s);
-    if (dict_add_string_len(item, "type", s.string, (int)s.length) == FAIL)
-	goto theend;
-    if (dict_add_string(item, "perm", getfpermwfd(wfd, permbuf)) == FAIL)
-	goto theend;
+    ಆದರೆ (dict_ಕೂಡಿಸು_string_len(ಅಂಶ, "type", s.string, (ಪೂರ್ಣಾಂಕ)s.ಉದ್ದಳತೆ) == FAIL)
+	ಹೋಗು theend;
+    ಆದರೆ (dict_ಕೂಡಿಸು_string(ಅಂಶ, "perm", getfpermwfd(wfd, permbuf)) == FAIL)
+	ಹೋಗು theend;
 
-    if (dict_add_string_len(item, "user", (char_u *)"", 0) == FAIL)
-	goto theend;
-    if (dict_add_string_len(item, "group", (char_u *)"", 0) == FAIL)
-	goto theend;
+    ಆದರೆ (dict_ಕೂಡಿಸು_string_len(ಅಂಶ, "user", (char_u *)"", 0) == FAIL)
+	ಹೋಗು theend;
+    ಆದರೆ (dict_ಕೂಡಿಸು_string_len(ಅಂಶ, "group", (char_u *)"", 0) == FAIL)
+	ಹೋಗು theend;
 
-    return item;
+    ಹಿಂತಿರುಗಿ ಅಂಶ;
 
 theend:
-    dict_unref(item);
-    return NULL;
+    dict_unref(ಅಂಶ);
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
-# else
-    static dict_T *
-create_readdirex_item(char_u *path, char_u *name)
+# ಇಲ್ಲದಿದ್ದರೆ
+    ಸ್ಥಿರ dict_T *
+create_readdirex_ಅಂಶ(char_u *ಮಾರ್ಗ, char_u *name)
 {
-    dict_T	*item;
-    char	*p;
+    dict_T	*ಅಂಶ;
+    ಅಕ್ಷರ	*p;
     size_t	pathlen, len;
     size_t	namelen;
     stat_T	st;
-    int		ret, link = FALSE;
-    varnumber_T	size;
+    ಪೂರ್ಣಾಂಕ		ret, link = FALSE;
+    varnumber_T	ಗಾತ್ರ_2;
     char_u	permbuf[] = "---------";
-    string_T	q = {NULL, 0};
-    struct passwd *pw;
-    struct group  *gr;
+    string_T	q = {ಖಾಲಿ, 0};
+    ರಚನೆ passwd *pw;
+    ರಚನೆ ಗುಂಪು  *gr;
 
-    item = dict_alloc();
-    if (item == NULL)
-	return NULL;
-    item->dv_refcount++;
+    ಅಂಶ = dict_alloc();
+    ಆದರೆ (ಅಂಶ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    ಅಂಶ->dv_refcount++;
 
-    pathlen = STRLEN(path);
+    pathlen = STRLEN(ಮಾರ್ಗ);
     namelen = STRLEN(name);
     len = pathlen + 1 + namelen + 1;
     p = alloc(len);
-    if (p == NULL)
-	goto theend;
-    if (pathlen > 0 && path[pathlen - 1] == '/')
-	vim_snprintf(p, len, "%s%s", path, name);
-    else
-	vim_snprintf(p, len, "%s/%s", path, name);
+    ಆದರೆ (p == ಖಾಲಿ)
+	ಹೋಗು theend;
+    ಆದರೆ (pathlen > 0 && ಮಾರ್ಗ[pathlen - 1] == '/')
+	vim_snprintf(p, len, "%s%s", ಮಾರ್ಗ, name);
+    ಇಲ್ಲದಿದ್ದರೆ
+	vim_snprintf(p, len, "%s/%s", ಮಾರ್ಗ, name);
     ret = mch_lstat(p, &st);
-    if (ret >= 0 && S_ISLNK(st.st_mode))
+    ಆದರೆ (ret >= 0 && S_ISLNK(st.st_ಬಹುಲಕ))
     {
 	link = TRUE;
 	ret = mch_stat(p, &st);
-	if (ret < 0)
-	    STR_LITERAL_SET(q, "link");
+	ಆದರೆ (ret < 0)
+	    STR_LITERAL_ಗಣ(q, "link");
     }
     vim_free(p);
 
-    if (dict_add_string_len(item, "name", name, (int)namelen) == FAIL)
-	goto theend;
+    ಆದರೆ (dict_ಕೂಡಿಸು_string_len(ಅಂಶ, "name", name, (ಪೂರ್ಣಾಂಕ)namelen) == FAIL)
+	ಹೋಗು theend;
 
-    if (ret >= 0)
+    ಆದರೆ (ret >= 0)
     {
-	size = (varnumber_T)st.st_size;
-	if (S_ISDIR(st.st_mode))
-	    size = 0;
+	ಗಾತ್ರ_2 = (varnumber_T)st.st_size;
+	ಆದರೆ (S_ISDIR(st.st_ಬಹುಲಕ))
+	    ಗಾತ್ರ_2 = 0;
 	// non-perfect check for overflow
-	else if ((off_T)size != (off_T)st.st_size)
-	    size = -2;
-	if (dict_add_number(item, "size", size) == FAIL)
-	    goto theend;
-	if (dict_add_number(item, "time", (varnumber_T)st.st_mtime) == FAIL)
-	    goto theend;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((off_T)ಗಾತ್ರ_2 != (off_T)st.st_size)
+	    ಗಾತ್ರ_2 = -2;
+	ಆದರೆ (dict_ಕೂಡಿಸು_ಸಂಖ್ಯೆ(ಅಂಶ, "size", ಗಾತ್ರ_2) == FAIL)
+	    ಹೋಗು theend;
+	ಆದರೆ (dict_ಕೂಡಿಸು_ಸಂಖ್ಯೆ(ಅಂಶ, "time", (varnumber_T)st.st_mtime) == FAIL)
+	    ಹೋಗು theend;
 
-	if (link)
+	ಆದರೆ (link)
 	{
-	    if (S_ISDIR(st.st_mode))
-		STR_LITERAL_SET(q, "linkd");
-	    else
-		STR_LITERAL_SET(q, "link");
+	    ಆದರೆ (S_ISDIR(st.st_ಬಹುಲಕ))
+		STR_LITERAL_ಗಣ(q, "linkd");
+	    ಇಲ್ಲದಿದ್ದರೆ
+		STR_LITERAL_ಗಣ(q, "link");
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    q.string = getftypest(&st);
-	    q.length = STRLEN(q.string);
+	    q.ಉದ್ದಳತೆ = STRLEN(q.string);
 	}
-	if (dict_add_string_len(item, "type", q.string, (int)q.length) == FAIL)
-	    goto theend;
-	if (dict_add_string(item, "perm", getfpermst(&st, permbuf)) == FAIL)
-	    goto theend;
+	ಆದರೆ (dict_ಕೂಡಿಸು_string_len(ಅಂಶ, "type", q.string, (ಪೂರ್ಣಾಂಕ)q.ಉದ್ದಳತೆ) == FAIL)
+	    ಹೋಗು theend;
+	ಆದರೆ (dict_ಕೂಡಿಸು_string(ಅಂಶ, "perm", getfpermst(&st, permbuf)) == FAIL)
+	    ಹೋಗು theend;
 
 	pw = getpwuid(st.st_uid);
-	if (pw == NULL)
-	    STR_LITERAL_SET(q, "");
-	else
+	ಆದರೆ (pw == ಖಾಲಿ)
+	    STR_LITERAL_ಗಣ(q, "");
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    q.string = (char_u *)pw->pw_name;
-	    q.length = STRLEN(q.string);
+	    q.ಉದ್ದಳತೆ = STRLEN(q.string);
 	}
-	if (dict_add_string_len(item, "user", q.string, (int)q.length) == FAIL)
-	    goto theend;
-#  if !defined(VMS) || (defined(VMS) && defined(HAVE_XOS_R_H))
+	ಆದರೆ (dict_ಕೂಡಿಸು_string_len(ಅಂಶ, "user", q.string, (ಪೂರ್ಣಾಂಕ)q.ಉದ್ದಳತೆ) == FAIL)
+	    ಹೋಗು theend;
+#  ಆದರೆ !defined(VMS) || (defined(VMS) && defined(HAVE_XOS_R_H))
 	gr = getgrgid(st.st_gid);
-	if (gr == NULL)
-	    STR_LITERAL_SET(q, "");
-	else
+	ಆದರೆ (gr == ಖಾಲಿ)
+	    STR_LITERAL_ಗಣ(q, "");
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    q.string = (char_u *)gr->gr_name;
-	    q.length = STRLEN(q.string);
+	    q.ಉದ್ದಳತೆ = STRLEN(q.string);
 	}
 #  endif
-	if (dict_add_string_len(item, "group", q.string, (int)q.length) == FAIL)
-	    goto theend;
+	ಆದರೆ (dict_ಕೂಡಿಸು_string_len(ಅಂಶ, "group", q.string, (ಪೂರ್ಣಾಂಕ)q.ಉದ್ದಳತೆ) == FAIL)
+	    ಹೋಗು theend;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (dict_add_number(item, "size", -1) == FAIL)
-	    goto theend;
-	if (dict_add_number(item, "time", -1) == FAIL)
-	    goto theend;
-	if (q.string == NULL)
+	ಆದರೆ (dict_ಕೂಡಿಸು_ಸಂಖ್ಯೆ(ಅಂಶ, "size", -1) == FAIL)
+	    ಹೋಗು theend;
+	ಆದರೆ (dict_ಕೂಡಿಸು_ಸಂಖ್ಯೆ(ಅಂಶ, "time", -1) == FAIL)
+	    ಹೋಗು theend;
+	ಆದರೆ (q.string == ಖಾಲಿ)
 	{
-	    if (dict_add_string_len(item, "type", (char_u *)"", 0) == FAIL)
-		goto theend;
+	    ಆದರೆ (dict_ಕೂಡಿಸು_string_len(ಅಂಶ, "type", (char_u *)"", 0) == FAIL)
+		ಹೋಗು theend;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (dict_add_string_len(item, "type", q.string, (int)q.length) == FAIL)
-		goto theend;
+	    ಆದರೆ (dict_ಕೂಡಿಸು_string_len(ಅಂಶ, "type", q.string, (ಪೂರ್ಣಾಂಕ)q.ಉದ್ದಳತೆ) == FAIL)
+		ಹೋಗು theend;
 	}
-	if (dict_add_string_len(item, "perm", (char_u *)"", 0) == FAIL)
-	    goto theend;
-	if (dict_add_string_len(item, "user", (char_u *)"", 0) == FAIL)
-	    goto theend;
-	if (dict_add_string_len(item, "group", (char_u *)"", 0) == FAIL)
-	    goto theend;
+	ಆದರೆ (dict_ಕೂಡಿಸು_string_len(ಅಂಶ, "perm", (char_u *)"", 0) == FAIL)
+	    ಹೋಗು theend;
+	ಆದರೆ (dict_ಕೂಡಿಸು_string_len(ಅಂಶ, "user", (char_u *)"", 0) == FAIL)
+	    ಹೋಗು theend;
+	ಆದರೆ (dict_ಕೂಡಿಸು_string_len(ಅಂಶ, "group", (char_u *)"", 0) == FAIL)
+	    ಹೋಗು theend;
     }
-    return item;
+    ಹಿಂತಿರುಗಿ ಅಂಶ;
 
 theend:
-    dict_unref(item);
-    return NULL;
+    dict_unref(ಅಂಶ);
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 # endif
 
-    static int
-compare_readdirex_item(const void *p1, const void *p2)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+compare_readdirex_ಅಂಶ(ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *p1, ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *p2)
 {
     char_u  *name1, *name2;
 
     name1 = dict_get_string(*(dict_T**)p1, "name", FALSE);
     name2 = dict_get_string(*(dict_T**)p2, "name", FALSE);
-    if (readdirex_sort == READDIR_SORT_BYTE)
-	return STRCMP(name1, name2);
-    if (readdirex_sort == READDIR_SORT_IC)
-	return STRICMP(name1, name2);
+    ಆದರೆ (readdirex_ವಿಂಗಡಿಸು == READDIR_ವಿಂಗಡಿಸು_BYTE)
+	ಹಿಂತಿರುಗಿ STRCMP(name1, name2);
+    ಆದರೆ (readdirex_ವಿಂಗಡಿಸು == READDIR_ವಿಂಗಡಿಸು_IC)
+	ಹಿಂತಿರುಗಿ STRICMP(name1, name2);
 
-    return STRCOLL(name1, name2);
+    ಹಿಂತಿರುಗಿ STRCOLL(name1, name2);
 }
 
-    static int
-compare_readdir_item(const void *s1, const void *s2)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+compare_readdir_ಅಂಶ(ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *s1, ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *s2)
 {
-    if (readdirex_sort == READDIR_SORT_BYTE)
-	return STRCMP(*(char **)s1, *(char **)s2);
-    if (readdirex_sort == READDIR_SORT_IC)
-	return STRICMP(*(char **)s1, *(char **)s2);
+    ಆದರೆ (readdirex_ವಿಂಗಡಿಸು == READDIR_ವಿಂಗಡಿಸು_BYTE)
+	ಹಿಂತಿರುಗಿ STRCMP(*(ಅಕ್ಷರ **)s1, *(ಅಕ್ಷರ **)s2);
+    ಆದರೆ (readdirex_ವಿಂಗಡಿಸು == READDIR_ವಿಂಗಡಿಸು_IC)
+	ಹಿಂತಿರುಗಿ STRICMP(*(ಅಕ್ಷರ **)s1, *(ಅಕ್ಷರ **)s2);
 
-    return STRCOLL(*(char **)s1, *(char **)s2);
+    ಹಿಂತಿರುಗಿ STRCOLL(*(ಅಕ್ಷರ **)s1, *(ಅಕ್ಷರ **)s2);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(TEMPDIRNAMES) || defined(FEAT_EVAL)
+#ಆದರೆ defined(TEMPDIRNAMES) || defined(FEAT_EVAL)
 /*
  * Core part of "readdir()" and "readdirex()" function.
  * Retrieve the list of files/directories of "path" into "gap".
@@ -5073,286 +5073,286 @@ compare_readdir_item(const void *s1, const void *s2)
  * If "withattr" is FALSE, retrieve the names only.
  * Return OK for success, FAIL for failure.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 readdir_core(
     garray_T	*gap,
-    char_u	*path,
-    int		withattr UNUSED,
-    void	*context,
-    int		(*checkitem)(void *context, void *item),
-    int		sort)
+    char_u	*ಮಾರ್ಗ,
+    ಪೂರ್ಣಾಂಕ		withattr ಬಳಸದ,
+    ಶೂನ್ಯ	*context,
+    ಪೂರ್ಣಾಂಕ		(*checkitem)(ಶೂನ್ಯ *context, ಶೂನ್ಯ *ಅಂಶ),
+    ಪೂರ್ಣಾಂಕ		ವಿಂಗಡಿಸು)
 {
-    int			failed = FALSE;
+    ಪೂರ್ಣಾಂಕ			failed = FALSE;
     char_u		*p;
 # ifdef MSWIN
     char_u		*buf;
-    int			ok;
-    HANDLE		hFind = INVALID_HANDLE_VALUE;
-    WIN32_FIND_DATAW    wfd;
-    WCHAR		*wn = NULL;	// UTF-16 name, NULL when not used.
-    char_u		*p_end;
-# else
+    ಪೂರ್ಣಾಂಕ			ok;
+    HANDLE		h_ಕಂಡುಹಿಡಿ = INVALID_HANDLE_ಮೌಲ್ಯ;
+    WIN32_ಕಂಡುಹಿಡಿ_DATAW    wfd;
+    WCHAR		*wn = ಖಾಲಿ;	// UTF-16 name, NULL when not used.
+    char_u		*p_ಕೊನೆ;
+# ಇಲ್ಲದಿದ್ದರೆ
     DIR			*dirp;
-    struct dirent	*dp;
+    ರಚನೆ dirent	*dp;
 # endif
 
-    ga_init2(gap, sizeof(void *), 20);
+    ga_init2(gap, ಗಾತ್ರ(ಶೂನ್ಯ *), 20);
 
 # ifdef FEAT_EVAL
-#  define FREE_ITEM(item)   do { \
-	if (withattr) \
-	    dict_unref((dict_T*)(item)); \
-	else \
-	    vim_free(item); \
-    } while (0)
+#  define FREE_ಅಂಶ(ಅಂಶ)   ಮಾಡು { \
+	ಆದರೆ (withattr) \
+	    dict_unref((dict_T*)(ಅಂಶ)); \
+	ಇಲ್ಲದಿದ್ದರೆ \
+	    vim_free(ಅಂಶ); \
+    } ಆಗ (0)
 
-    readdirex_sort = READDIR_SORT_BYTE;
-# else
-#  define FREE_ITEM(item)   vim_free(item)
+    readdirex_ವಿಂಗಡಿಸು = READDIR_ವಿಂಗಡಿಸು_BYTE;
+# ಇಲ್ಲದಿದ್ದರೆ
+#  define FREE_ಅಂಶ(ಅಂಶ)   vim_free(ಅಂಶ)
 # endif
 
 # ifdef MSWIN
     buf = alloc(MAXPATHL);
-    if (buf == NULL)
-	return FAIL;
-    STRNCPY(buf, path, MAXPATHL-5);
-    p = p_end = buf + STRLEN(buf);
-    MB_PTR_BACK(buf, p);
-    if (*p == '\\' || *p == '/')
-	p_end = p;
-    STRCPY(p_end, "\\*");
+    ಆದರೆ (buf == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
+    STRNCPY(buf, ಮಾರ್ಗ, MAXPATHL-5);
+    p = p_ಕೊನೆ = buf + STRLEN(buf);
+    MB_PTR_ಹಿಂಭಾಗ(buf, p);
+    ಆದರೆ (*p == '\\' || *p == '/')
+	p_ಕೊನೆ = p;
+    STRCPY(p_ಕೊನೆ, "\\*");
 
-    wn = enc_to_utf16(buf, NULL);
-    if (wn != NULL)
-	hFind = FindFirstFileW(wn, &wfd);
-    ok = (hFind != INVALID_HANDLE_VALUE);
-    if (!ok)
+    wn = enc_ಗಮ್ಯ_utf16(buf, ಖಾಲಿ);
+    ಆದರೆ (wn != ಖಾಲಿ)
+	h_ಕಂಡುಹಿಡಿ = ಕಂಡುಹಿಡಿ_ಮೊದಲ_File_W(wn, &wfd);
+    ok = (h_ಕಂಡುಹಿಡಿ != INVALID_HANDLE_ಮೌಲ್ಯ);
+    ಆದರೆ (!ok)
     {
 	failed = TRUE;
-	semsg(_(e_cant_open_file_str), path);
+	semsg(_(e_cant_open_file_str), ಮಾರ್ಗ);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	while (ok)
+	ಆಗ (ok)
 	{
-	    int	    ignore;
-	    void    *item;
+	    ಪೂರ್ಣಾಂಕ	    ignore;
+	    ಶೂನ್ಯ    *ಅಂಶ;
 	    WCHAR   *wp;
 
 	    wp = wfd.cFileName;
 	    ignore = wp[0] == L'.' &&
 		    (wp[1] == NUL ||
 		     (wp[1] == L'.' && wp[2] == NUL));
-	    if (ignore)
+	    ಆದರೆ (ignore)
 	    {
-		ok = FindNextFileW(hFind, &wfd);
-		continue;
+		ok = ಕಂಡುಹಿಡಿ_ಮುಂದಿನ_File_W(h_ಕಂಡುಹಿಡಿ, &wfd);
+		ಮುಂದುವರಿ;
 	    }
 #  ifdef FEAT_EVAL
-	    if (withattr)
-		item = (void*)create_readdirex_item(&wfd);
-	    else
+	    ಆದರೆ (withattr)
+		ಅಂಶ = (ಶೂನ್ಯ*)create_readdirex_ಅಂಶ(&wfd);
+	    ಇಲ್ಲದಿದ್ದರೆ
 #  endif
-		item = (void*)utf16_to_enc(wfd.cFileName, NULL);
-	    if (item == NULL)
+		ಅಂಶ = (ಶೂನ್ಯ*)utf16_ಗಮ್ಯ_enc(wfd.cFileName, ಖಾಲಿ);
+	    ಆದರೆ (ಅಂಶ == ಖಾಲಿ)
 	    {
 		failed = TRUE;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 
-	    if (!ignore && checkitem != NULL)
+	    ಆದರೆ (!ignore && checkitem != ಖಾಲಿ)
 	    {
-		int r = checkitem(context, item);
+		ಪೂರ್ಣಾಂಕ r = checkitem(context, ಅಂಶ);
 
-		if (r < 0)
+		ಆದರೆ (r < 0)
 		{
-		    FREE_ITEM(item);
-		    break;
+		    FREE_ಅಂಶ(ಅಂಶ);
+		    ನಿಲ್ಲಿಸು;
 		}
-		if (r == 0)
+		ಆದರೆ (r == 0)
 		    ignore = TRUE;
 	    }
 
-	    if (!ignore)
+	    ಆದರೆ (!ignore)
 	    {
-		if (ga_grow(gap, 1) == OK)
-		    ((void**)gap->ga_data)[gap->ga_len++] = item;
-		else
+		ಆದರೆ (ga_grow(gap, 1) == OK)
+		    ((ಶೂನ್ಯ**)gap->ga_ದತ್ತಾಂಶ)[gap->ga_len++] = ಅಂಶ;
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    failed = TRUE;
-		    FREE_ITEM(item);
-		    break;
+		    FREE_ಅಂಶ(ಅಂಶ);
+		    ನಿಲ್ಲಿಸು;
 		}
 	    }
-	    else
-		FREE_ITEM(item);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		FREE_ಅಂಶ(ಅಂಶ);
 
-	    ok = FindNextFileW(hFind, &wfd);
+	    ok = ಕಂಡುಹಿಡಿ_ಮುಂದಿನ_File_W(h_ಕಂಡುಹಿಡಿ, &wfd);
 	}
-	FindClose(hFind);
+	ಕಂಡುಹಿಡಿ_Close(h_ಕಂಡುಹಿಡಿ);
     }
 
     vim_free(buf);
     vim_free(wn);
-# else	// MSWIN
-    dirp = opendir((char *)path);
-    if (dirp == NULL)
+# ಇಲ್ಲದಿದ್ದರೆ	// MSWIN
+    dirp = opendir((ಅಕ್ಷರ *)ಮಾರ್ಗ);
+    ಆದರೆ (dirp == ಖಾಲಿ)
     {
 	failed = TRUE;
-	semsg(_(e_cant_open_file_str), path);
+	semsg(_(e_cant_open_file_str), ಮಾರ್ಗ);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	for (;;)
+	ಗಾಗಿ (;;)
 	{
-	    int	    ignore;
-	    void    *item;
+	    ಪೂರ್ಣಾಂಕ	    ignore;
+	    ಶೂನ್ಯ    *ಅಂಶ;
 
 	    dp = readdir(dirp);
-	    if (dp == NULL)
-		break;
+	    ಆದರೆ (dp == ಖಾಲಿ)
+		ನಿಲ್ಲಿಸು;
 	    p = (char_u *)dp->d_name;
 
 	    ignore = p[0] == '.' &&
 		    (p[1] == NUL ||
 		     (p[1] == '.' && p[2] == NUL));
-	    if (ignore)
-		continue;
+	    ಆದರೆ (ignore)
+		ಮುಂದುವರಿ;
 #  ifdef FEAT_EVAL
-	    if (withattr)
-		item = (void*)create_readdirex_item(path, p);
-	    else
+	    ಆದರೆ (withattr)
+		ಅಂಶ = (ಶೂನ್ಯ*)create_readdirex_ಅಂಶ(ಮಾರ್ಗ, p);
+	    ಇಲ್ಲದಿದ್ದರೆ
 #  endif
-		item = (void*)vim_strsave(p);
-	    if (item == NULL)
+		ಅಂಶ = (ಶೂನ್ಯ*)vim_strsave(p);
+	    ಆದರೆ (ಅಂಶ == ಖಾಲಿ)
 	    {
 		failed = TRUE;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 
-	    if (checkitem != NULL)
+	    ಆದರೆ (checkitem != ಖಾಲಿ)
 	    {
-		int r = checkitem(context, item);
+		ಪೂರ್ಣಾಂಕ r = checkitem(context, ಅಂಶ);
 
-		if (r < 0)
+		ಆದರೆ (r < 0)
 		{
-		    FREE_ITEM(item);
-		    break;
+		    FREE_ಅಂಶ(ಅಂಶ);
+		    ನಿಲ್ಲಿಸು;
 		}
-		if (r == 0)
+		ಆದರೆ (r == 0)
 		    ignore = TRUE;
 	    }
 
-	    if (!ignore)
+	    ಆದರೆ (!ignore)
 	    {
-		if (ga_grow(gap, 1) == OK)
-		    ((void**)gap->ga_data)[gap->ga_len++] = item;
-		else
+		ಆದರೆ (ga_grow(gap, 1) == OK)
+		    ((ಶೂನ್ಯ**)gap->ga_ದತ್ತಾಂಶ)[gap->ga_len++] = ಅಂಶ;
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    failed = TRUE;
-		    FREE_ITEM(item);
-		    break;
+		    FREE_ಅಂಶ(ಅಂಶ);
+		    ನಿಲ್ಲಿಸು;
 		}
 	    }
-	    else
-		FREE_ITEM(item);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		FREE_ಅಂಶ(ಅಂಶ);
 	}
 
 	closedir(dirp);
     }
 # endif	// MSWIN
 
-# undef FREE_ITEM
+# undef FREE_ಅಂಶ
 
-    if (!failed && gap->ga_len > 0 && sort > READDIR_SORT_NONE)
+    ಆದರೆ (!failed && gap->ga_len > 0 && ವಿಂಗಡಿಸು > READDIR_ವಿಂಗಡಿಸು_NONE)
     {
 # ifdef FEAT_EVAL
-	readdirex_sort = sort;
-	if (withattr)
-	    qsort((void*)gap->ga_data, (size_t)gap->ga_len, sizeof(dict_T*),
-		    compare_readdirex_item);
-	else
-	    qsort((void*)gap->ga_data, (size_t)gap->ga_len, sizeof(char_u *),
-		    compare_readdir_item);
-# else
-	    sort_strings((char_u **)gap->ga_data, gap->ga_len);
+	readdirex_ವಿಂಗಡಿಸು = ವಿಂಗಡಿಸು;
+	ಆದರೆ (withattr)
+	    qsort((ಶೂನ್ಯ*)gap->ga_ದತ್ತಾಂಶ, (size_t)gap->ga_len, ಗಾತ್ರ(dict_T*),
+		    compare_readdirex_ಅಂಶ);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    qsort((ಶೂನ್ಯ*)gap->ga_ದತ್ತಾಂಶ, (size_t)gap->ga_len, ಗಾತ್ರ(char_u *),
+		    compare_readdir_ಅಂಶ);
+# ಇಲ್ಲದಿದ್ದರೆ
+	    ವಿಂಗಡಿಸು_ಅಕ್ಷರಸರಣಿಗಳು((char_u **)gap->ga_ದತ್ತಾಂಶ, gap->ga_len);
 # endif
     }
 
-    return failed ? FAIL : OK;
+    ಹಿಂತಿರುಗಿ failed ? FAIL : OK;
 }
 
 /*
  * Delete "name" and everything in it, recursively.
  * return 0 for success, -1 if some file was not deleted.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 delete_recursive(char_u *name)
 {
-    int result = 0;
+    ಪೂರ್ಣಾಂಕ ಫಲಿತಾಂಶ = 0;
 
     // A symbolic link to a directory itself is deleted, not the directory it
     // points to.
-    if (
-# if defined(UNIX) || defined(MSWIN)
+    ಆದರೆ (
+# ಆದರೆ defined(UNIX) || defined(MSWIN)
 	 mch_isrealdir(name)
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 	 mch_isdir(name)
 # endif
 	    )
     {
-	char_u	    *exp = vim_strsave(name);
+	char_u	    *ಘಾತಾಂಕ = vim_strsave(name);
 	garray_T    ga;
 
-	if (exp == NULL)
-	    return -1;
-	if (readdir_core(&ga, exp, FALSE, NULL, NULL, READDIR_SORT_NONE) == OK)
+	ಆದರೆ (ಘಾತಾಂಕ == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ -1;
+	ಆದರೆ (readdir_core(&ga, ಘಾತಾಂಕ, FALSE, ಖಾಲಿ, ಖಾಲಿ, READDIR_ವಿಂಗಡಿಸು_NONE) == OK)
 	{
-	    int	len = vim_snprintf((char *)NameBuff, MAXPATHL, "%s/", exp);
-	    int	i;
+	    ಪೂರ್ಣಾಂಕ	len = vim_snprintf((ಅಕ್ಷರ *)NameBuff, MAXPATHL, "%s/", ಘಾತಾಂಕ);
+	    ಪೂರ್ಣಾಂಕ	i;
 
-	    for (i = 0; i < ga.ga_len; ++i)
+	    ಗಾಗಿ (i = 0; i < ga.ga_len; ++i)
 	    {
-		vim_snprintf((char *)NameBuff + len, MAXPATHL - len, "%s", ((char_u **)ga.ga_data)[i]);
-		if (delete_recursive(NameBuff) != 0)
+		vim_snprintf((ಅಕ್ಷರ *)NameBuff + len, MAXPATHL - len, "%s", ((char_u **)ga.ga_ದತ್ತಾಂಶ)[i]);
+		ಆದರೆ (delete_recursive(NameBuff) != 0)
 		    // Remember the failure but continue deleting any further
 		    // entries.
-		    result = -1;
+		    ಫಲಿತಾಂಶ = -1;
 	    }
-	    ga_clear_strings(&ga);
-	    if (mch_rmdir(exp) != 0)
-		result = -1;
+	    ga_clear_ಅಕ್ಷರಸರಣಿಗಳು(&ga);
+	    ಆದರೆ (mch_rmdir(ಘಾತಾಂಕ) != 0)
+		ಫಲಿತಾಂಶ = -1;
 	}
-	else
-	    result = -1;
-	vim_free(exp);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಫಲಿತಾಂಶ = -1;
+	vim_free(ಘಾತಾಂಕ);
     }
-    else
-	result = mch_remove(name) == 0 ? 0 : -1;
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಫಲಿತಾಂಶ = mch_remove(name) == 0 ? 0 : -1;
 
-    return result;
+    ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(TEMPDIRNAMES)
-static long	temp_count = 0;		// Temp filename counter.
+#ಆದರೆ defined(TEMPDIRNAMES)
+ಸ್ಥಿರ ದೀರ್ಘ	ತಾತ್ಕಾಲಿಕ_ಎಣಿಕೆ = 0;		// Temp filename counter.
 
-# if defined(UNIX) && defined(HAVE_FLOCK) && defined(HAVE_DIRFD)
+# ಆದರೆ defined(UNIX) && defined(HAVE_FLOCK) && defined(HAVE_DIRFD)
 /*
  * Open temporary directory and take file lock to prevent
  * to be auto-cleaned.
  */
-   static void
-vim_opentempdir(void)
+   ಸ್ಥಿರ ಶೂನ್ಯ
+vim_opentempdir(ಶೂನ್ಯ)
 {
-    DIR *dp = NULL;
+    DIR *dp = ಖಾಲಿ;
 
-    if (vim_tempdir_dp != NULL)
-	return;
+    ಆದರೆ (vim_tempdir_dp != ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    dp = opendir((const char*)vim_tempdir);
-    if (dp == NULL)
-	return;
+    dp = opendir((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ*)vim_tempdir);
+    ಆದರೆ (dp == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     vim_tempdir_dp = dp;
     flock(dirfd(vim_tempdir_dp), LOCK_SH);
@@ -5361,40 +5361,40 @@ vim_opentempdir(void)
 /*
  * Close temporary directory - it automatically release file lock.
  */
-   static void
-vim_closetempdir(void)
+   ಸ್ಥಿರ ಶೂನ್ಯ
+vim_closetempdir(ಶೂನ್ಯ)
 {
-    if (vim_tempdir_dp == NULL)
-	return;
+    ಆದರೆ (vim_tempdir_dp == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     closedir(vim_tempdir_dp);
-    vim_tempdir_dp = NULL;
+    vim_tempdir_dp = ಖಾಲಿ;
 }
 
 /*
  * Return true if the temp directory we created is gone.
  */
-    static bool
-vim_tempdir_gone(void)
+    ಸ್ಥಿರ bool
+vim_tempdir_gone(ಶೂನ್ಯ)
 {
     stat_T	st;
 
-    if (vim_tempdir_dp == NULL)
-	return false;
-    return fstat(dirfd(vim_tempdir_dp), &st) < 0 || st.st_nlink == 0;
+    ಆದರೆ (vim_tempdir_dp == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ false;
+    ಹಿಂತಿರುಗಿ fstat(dirfd(vim_tempdir_dp), &st) < 0 || st.st_nlink == 0;
 }
 # endif
 
 /*
  * Delete the temp directory and all files it contains.
  */
-    void
-vim_deltempdir(void)
+    ಶೂನ್ಯ
+vim_deltempdir(ಶೂನ್ಯ)
 {
-    if (vim_tempdir == NULL)
-	return;
+    ಆದರೆ (vim_tempdir == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-# if defined(UNIX) && defined(HAVE_FLOCK) && defined(HAVE_DIRFD)
+# ಆದರೆ defined(UNIX) && defined(HAVE_FLOCK) && defined(HAVE_DIRFD)
     vim_closetempdir();
 # endif
     // remove the trailing path separator
@@ -5408,31 +5408,31 @@ vim_deltempdir(void)
  * it in "vim_tempdir".  This avoids that using ":cd" would confuse us.
  * "tempdir" must be no longer than MAXPATHL.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 vim_settempdir(char_u *tempdir)
 {
     char_u	*buf;
     size_t	buflen;
 
     buf = alloc(MAXPATHL + 2);
-    if (buf == NULL)
-	return;
+    ಆದರೆ (buf == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    if (vim_FullName(tempdir, buf, MAXPATHL, FALSE) == FAIL)
+    ಆದರೆ (vim_ತುಂಬಿದ_Name(tempdir, buf, MAXPATHL, FALSE) == FAIL)
 	STRCPY(buf, tempdir);
     buflen = STRLEN(buf);
-    if (!after_pathsep(buf, buf + buflen))
+    ಆದರೆ (!after_pathsep(buf, buf + buflen))
     {
 	STRCPY(buf + buflen, PATHSEPSTR);
-	buflen += sizeof(PATHSEP);
+	buflen += ಗಾತ್ರ(PATHSEP);
     }
     vim_tempdir = vim_strnsave(buf, buflen);
-# if defined(UNIX) && defined(HAVE_FLOCK) && defined(HAVE_DIRFD)
+# ಆದರೆ defined(UNIX) && defined(HAVE_FLOCK) && defined(HAVE_DIRFD)
     vim_opentempdir();
 # endif
     vim_free(buf);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * vim_tempname(): Return a unique name that can be used for a temp file.
@@ -5445,27 +5445,27 @@ vim_settempdir(char_u *tempdir)
  */
     char_u  *
 vim_tempname(
-    int	    extra_char UNUSED,  // char to use in the name instead of '?'
-    int	    keep UNUSED)
+    ಪೂರ್ಣಾಂಕ	    extra_char ಬಳಸದ,  // char to use in the name instead of '?'
+    ಪೂರ್ಣಾಂಕ	    keep ಬಳಸದ)
 {
-#ifdef USE_TMPNAM
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_TMPNAM
     char_u	itmp[L_tmpnam];	// use tmpnam()
-#elif defined(MSWIN)
+#ಅಥವಾಆದರೆ defined(MSWIN)
     WCHAR	itmp[TEMPNAMELEN];
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
     char_u	itmp[TEMPNAMELEN];
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef TEMPDIRNAMES
-    static char	*(tempdirs[]) = {TEMPDIRNAMES};
-    int		i;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TEMPDIRNAMES
+    ಸ್ಥಿರ ಅಕ್ಷರ	*(tempdirs[]) = {TEMPDIRNAMES};
+    ಪೂರ್ಣಾಂಕ		i;
 # ifndef EEXIST
     stat_T	st;
 # endif
 
-# if defined(UNIX) && defined(HAVE_FLOCK) && defined(HAVE_DIRFD)
+# ಆದರೆ defined(UNIX) && defined(HAVE_FLOCK) && defined(HAVE_DIRFD)
     // if the temp directory is gone, force re-creation of it
-    if (vim_tempdir != NULL && vim_tempdir_gone())
+    ಆದರೆ (vim_tempdir != ಖಾಲಿ && vim_tempdir_gone())
     {
 	vim_closetempdir();
 	VIM_CLEAR(vim_tempdir);
@@ -5479,34 +5479,34 @@ vim_tempname(
      * It's also a bit faster, because we only need to check for an existing
      * file when creating the directory and not for each temp file.
      */
-    if (vim_tempdir == NULL)
+    ಆದರೆ (vim_tempdir == ಖಾಲಿ)
     {
 	/*
 	 * Try the entries in TEMPDIRNAMES to create the temp directory.
 	 */
-	for (i = 0; i < (int)ARRAY_LENGTH(tempdirs); ++i)
+	ಗಾಗಿ (i = 0; i < (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(tempdirs); ++i)
 	{
 # ifndef HAVE_MKDTEMP
-	    long	nr;
-	    long	off;
+	    ದೀರ್ಘ	nr;
+	    ದೀರ್ಘ	off;
 # endif
 	    size_t	itmplen;
 
 	    // Expand $TMP, leave room for "/v1100000/999999999".
 	    // Skip the directory check if the expansion fails.
 	    itmplen = expand_env((char_u *)tempdirs[i], itmp, TEMPNAMELEN - 20);
-	    if (itmp[0] != '$' && mch_isdir(itmp))
+	    ಆದರೆ (itmp[0] != '$' && mch_isdir(itmp))
 	    {
 		// directory exists
-		if (!after_pathsep(itmp, itmp + itmplen))
+		ಆದರೆ (!after_pathsep(itmp, itmp + itmplen))
 		{
 		    STRCPY(itmp + itmplen, PATHSEPSTR);
-		    itmplen += sizeof(PATHSEP);
+		    itmplen += ಗಾತ್ರ(PATHSEP);
 		}
 
 # ifdef HAVE_MKDTEMP
 		{
-#  if defined(UNIX) || defined(VMS)
+#  ಆದರೆ defined(UNIX) || defined(VMS)
 		    // Make sure the umask doesn't remove the executable bit.
 		    // "repl" has been reported to use "177".
 		    mode_t	umask_save = umask(077);
@@ -5514,92 +5514,92 @@ vim_tempname(
 		    // Leave room for filename
 		    STRCPY(itmp + itmplen, "vXXXXXX");
 		    itmplen += STRLEN_LITERAL("vXXXXXX");
-		    if (mkdtemp((char *)itmp) != NULL)
+		    ಆದರೆ (mkdtemp((ಅಕ್ಷರ *)itmp) != ಖಾಲಿ)
 			vim_settempdir(itmp);
-#  if defined(UNIX) || defined(VMS)
-		    (void)umask(umask_save);
+#  ಆದರೆ defined(UNIX) || defined(VMS)
+		    (ಶೂನ್ಯ)umask(umask_save);
 #  endif
 		}
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 		// Get an arbitrary number of up to 6 digits.  When it's
 		// unlikely that it already exists it will be faster,
 		// otherwise it doesn't matter.  The use of mkdir() avoids any
 		// security problems because of the predictable number.
-		nr = (mch_get_pid() + (long)time(NULL)) % 1000000L;
+		nr = (mch_get_pid() + (ದೀರ್ಘ)ಸಮಯ(ಖಾಲಿ)) % 1000000L;
 
 		// Try up to 10000 different values until we find a name that
 		// doesn't exist.
-		for (off = 0; off < 10000L; ++off)
+		ಗಾಗಿ (off = 0; off < 10000L; ++off)
 		{
-		    int		r;
-#  if defined(UNIX) || defined(VMS)
+		    ಪೂರ್ಣಾಂಕ		r;
+#  ಆದರೆ defined(UNIX) || defined(VMS)
 		    mode_t	umask_save;
 #  endif
 
-		    vim_snprintf((char *)itmp + itmplen, sizeof(itmp) - itmplen, "v%ld", nr + off);
+		    vim_snprintf((ಅಕ್ಷರ *)itmp + itmplen, ಗಾತ್ರ(itmp) - itmplen, "v%ld", nr + off);
 #  ifndef EEXIST
 		    // If mkdir() does not set errno to EEXIST, check for
 		    // existing file here.  There is a race condition then,
 		    // although it's fail-safe.
-		    if (mch_stat((char *)itmp, &st) >= 0)
-			continue;
+		    ಆದರೆ (mch_stat((ಅಕ್ಷರ *)itmp, &st) >= 0)
+			ಮುಂದುವರಿ;
 #  endif
-#  if defined(UNIX) || defined(VMS)
+#  ಆದರೆ defined(UNIX) || defined(VMS)
 		    // Make sure the umask doesn't remove the executable bit.
 		    // "repl" has been reported to use "177".
 		    umask_save = umask(077);
 #  endif
 		    r = vim_mkdir(itmp, 0700);
-#  if defined(UNIX) || defined(VMS)
-		    (void)umask(umask_save);
+#  ಆದರೆ defined(UNIX) || defined(VMS)
+		    (ಶೂನ್ಯ)umask(umask_save);
 #  endif
-		    if (r == 0)
+		    ಆದರೆ (r == 0)
 		    {
 			vim_settempdir(itmp);
-			break;
+			ನಿಲ್ಲಿಸು;
 		    }
 #  ifdef EEXIST
 		    // If the mkdir() didn't fail because the file/dir exists,
 		    // we probably can't create any dir here, try another
 		    // place.
-		    if (errno != EEXIST)
+		    ಆದರೆ (errno != EEXIST)
 #  endif
-			break;
+			ನಿಲ್ಲಿಸು;
 		}
 # endif // HAVE_MKDTEMP
-		if (vim_tempdir != NULL)
-		    break;
+		ಆದರೆ (vim_tempdir != ಖಾಲಿ)
+		    ನಿಲ್ಲಿಸು;
 	    }
 	}
     }
 
-    if (vim_tempdir != NULL)
+    ಆದರೆ (vim_tempdir != ಖಾಲಿ)
     {
 	// There is no need to check if the file exists, because we own the
 	// directory and nobody else creates a file in it.
-	int itmplen = vim_snprintf((char *)itmp, sizeof(itmp), "%s%ld", vim_tempdir, temp_count++);
-	return vim_strnsave(itmp, (size_t)itmplen);
+	ಪೂರ್ಣಾಂಕ itmplen = vim_snprintf((ಅಕ್ಷರ *)itmp, ಗಾತ್ರ(itmp), "%s%ld", vim_tempdir, ತಾತ್ಕಾಲಿಕ_ಎಣಿಕೆ++);
+	ಹಿಂತಿರುಗಿ vim_strnsave(itmp, (size_t)itmplen);
     }
 
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-#else // TEMPDIRNAMES
+#ಇಲ್ಲದಿದ್ದರೆ // TEMPDIRNAMES
     char_u	*p;
 
 # ifdef MSWIN
-    WCHAR	wszTempFile[_MAX_PATH + 1];
+    WCHAR	wsz_ತಾತ್ಕಾಲಿಕ_File[MAX_ಮಾರ್ಗ_2 + 1];
     WCHAR	buf4[4];
     WCHAR	*chartab = L"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     char_u	*retval;
     char_u	*shname;
-    long	i;
+    ದೀರ್ಘ	i;
 
     wcscpy(itmp, L"");
-    if (GetTempPathW(_MAX_PATH, wszTempFile) == 0)
+    ಆದರೆ (Get_ತಾತ್ಕಾಲಿಕ_ಮಾರ್ಗ_W(MAX_ಮಾರ್ಗ_2, wsz_ತಾತ್ಕಾಲಿಕ_File) == 0)
     {
-	wszTempFile[0] = L'.';	// GetTempPathW() failed, use current dir
-	wszTempFile[1] = L'\\';
-	wszTempFile[2] = NUL;
+	wsz_ತಾತ್ಕಾಲಿಕ_File[0] = L'.';	// GetTempPathW() failed, use current dir
+	wsz_ತಾತ್ಕಾಲಿಕ_File[1] = L'\\';
+	wsz_ತಾತ್ಕಾಲಿಕ_File[2] = NUL;
     }
     wcscpy(buf4, L"VIM");
 
@@ -5607,86 +5607,86 @@ vim_tempname(
     i = mch_get_pid() + extra_char;
     buf4[1] = chartab[i % 36];
     buf4[2] = chartab[(i / 36) % 36];
-    if (GetTempFileNameW(wszTempFile, buf4, 0, itmp) == 0)
-	return NULL;
-    if (!keep)
+    ಆದರೆ (Get_ತಾತ್ಕಾಲಿಕ_File_Name_W(wsz_ತಾತ್ಕಾಲಿಕ_File, buf4, 0, itmp) == 0)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    ಆದರೆ (!keep)
 	// GetTempFileNameW() will create the file, we don't want that
-	(void)DeleteFileW(itmp);
+	(ಶೂನ್ಯ)DeleteFileW(itmp);
 
     // Backslashes in a temp file name cause problems when filtering with
     // "sh".  NOTE: This also checks 'shellcmdflag' to help those people who
     // didn't set 'shellslash' but only if not using PowerShell.
-    retval = utf16_to_enc(itmp, NULL);
-    if (retval == NULL)
-	return NULL;
+    retval = utf16_ಗಮ್ಯ_enc(itmp, ಖಾಲಿ);
+    ಆದರೆ (retval == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     shname = gettail(p_sh);
-    if ((*p_shcf == '-' && !(strstr((char *)shname, "powershell") != NULL
-			     || strstr((char *)shname, "pwsh") != NULL ))
+    ಆದರೆ ((*p_shcf == '-' && !(ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು((ಅಕ್ಷರ *)shname, "powershell") != ಖಾಲಿ
+			     || ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು((ಅಕ್ಷರ *)shname, "pwsh") != ಖಾಲಿ ))
 								    || p_ssl)
-	for (p = retval; *p; ++p)
-	    if (*p == '\\')
+	ಗಾಗಿ (p = retval; *p; ++p)
+	    ಆದರೆ (*p == '\\')
 		*p = '/';
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 
-# else // MSWIN
-    int		itmplen;
+# ಇಲ್ಲದಿದ್ದರೆ // MSWIN
+    ಪೂರ್ಣಾಂಕ		itmplen;
 
 #  ifdef USE_TMPNAM
     // tmpnam() will make its own name
-    p = tmpnam((char *)itmp);
-    if (p == NULL || *p == NUL)
-	return NULL;
-#  else
+    p = tmpnam((ಅಕ್ಷರ *)itmp);
+    ಆದರೆ (p == ಖಾಲಿ || *p == NUL)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+#  ಇಲ್ಲದಿದ್ದರೆ
 
 #   ifdef VMS_TEMPNAM
     // mktemp() is not working on VMS.  It seems to be
     // a do-nothing function. Therefore we use tempnam().
-    vim_snprintf((char *)itmp, sizeof(itmp), "VIM%c", extra_char);
-    p = (char_u *)tempnam("tmp:", (char *)itmp);
-    if (p != NULL)
+    vim_snprintf((ಅಕ್ಷರ *)itmp, ಗಾತ್ರ(itmp), "VIM%c", extra_char);
+    p = (char_u *)tempnam("tmp:", (ಅಕ್ಷರ *)itmp);
+    ಆದರೆ (p != ಖಾಲಿ)
     {
 	// VMS will use '.LIS' if we don't explicitly specify an extension,
 	// and VIM will then be unable to find the file later
-	itmplen = vim_snprintf((char *)itmp, sizeof(itmp), "%s.txt", p);
-	free(p);
+	itmplen = vim_snprintf((ಅಕ್ಷರ *)itmp, ಗಾತ್ರ(itmp), "%s.txt", p);
+	ಬಿಡುಗಡೆ(p);
     }
-    else
-	return NULL;
-#   else
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+#   ಇಲ್ಲದಿದ್ದರೆ
     STRCPY(itmp, TEMPNAME);
     itmplen = STRLEN_LITERAL(TEMPNAME);
-    if ((p = vim_strchr(itmp, '?')) != NULL)
+    ಆದರೆ ((p = vim_strchr(itmp, '?')) != ಖಾಲಿ)
 	*p = extra_char;
-    if (mktemp((char *)itmp) == NULL)
-	return NULL;
+    ಆದರೆ (mktemp((ಅಕ್ಷರ *)itmp) == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 #   endif
 #  endif
 
-    return vim_strnsave(itmp, (size_t)itmplen);
+    ಹಿಂತಿರುಗಿ vim_strnsave(itmp, (size_t)itmplen);
 # endif // MSWIN
-#endif // TEMPDIRNAMES
+#ಆದರೆ_ಅಂತ್ಯ // TEMPDIRNAMES
 }
 
-#if defined(BACKSLASH_IN_FILENAME)
+#ಆದರೆ defined(BACKSLASH_ಒಳ_FILENAME)
 /*
  * Convert all backslashes in fname to forward slashes in-place, unless when
  * it looks like a URL.
  */
-    void
+    ಶೂನ್ಯ
 forward_slash(char_u *fname)
 {
     char_u	*p;
 
-    if (path_with_url(fname))
-	return;
-    for (p = fname; *p != NUL; ++p)
+    ಆದರೆ (ಮಾರ್ಗ_with_url(fname))
+	ಹಿಂತಿರುಗಿ;
+    ಗಾಗಿ (p = fname; *p != NUL; ++p)
 	// The Big5 encoding can have '\' in the trail byte.
-	if (enc_dbcs != 0 && (*mb_ptr2len)(p) > 1)
+	ಆದರೆ (enc_dbcs != 0 && (*mb_ptr2len)(p) > 1)
 	    ++p;
-	else if (*p == '\\')
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*p == '\\')
 	    *p = '/';
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Try matching a filename with a "pattern" ("prog" is NULL), or use the
@@ -5695,23 +5695,23 @@ forward_slash(char_u *fname)
  * Used for autocommands and 'wildignore'.
  * Returns TRUE if there is a match, FALSE otherwise.
  */
-    int
-match_file_pat(
-    char_u	*pattern,		// pattern to match with
+    ಪೂರ್ಣಾಂಕ
+ಹೊಂದಿಕೆ_file_pat(
+    char_u	*ನಮೂನೆ,		// pattern to match with
     regprog_T	**prog,			// pre-compiled regprog or NULL
     char_u	*fname,			// full path of file name
     char_u	*sfname,		// short file name or NULL
-    char_u	*tail,			// tail of path
-    int		allow_dirs)		// allow matching with dir
+    char_u	*ಬಾಲ,			// tail of path
+    ಪೂರ್ಣಾಂಕ		allow_dirs)		// allow matching with dir
 {
     regmatch_T	regmatch;
-    int		result = FALSE;
+    ಪೂರ್ಣಾಂಕ		ಫಲಿತಾಂಶ = FALSE;
 
     regmatch.rm_ic = p_fic; // ignore case if 'fileignorecase' is set
-    if (prog != NULL)
+    ಆದರೆ (prog != ಖಾಲಿ)
 	regmatch.regprog = *prog;
-    else
-	regmatch.regprog = vim_regcomp(pattern, RE_MAGIC);
+    ಇಲ್ಲದಿದ್ದರೆ
+	regmatch.regprog = vim_regcomp(ನಮೂನೆ, RE_MAGIC);
 
     /*
      * Try for a match with the pattern with:
@@ -5719,19 +5719,19 @@ match_file_pat(
      * 2. the short file name, when the pattern has a '/'.
      * 3. the tail of the file name, when the pattern has no '/'.
      */
-    if (regmatch.regprog != NULL
+    ಆದರೆ (regmatch.regprog != ಖಾಲಿ
 	     && ((allow_dirs
 		     && (vim_regexec(&regmatch, fname, (colnr_T)0)
-			 || (sfname != NULL
+			 || (sfname != ಖಾಲಿ
 			     && vim_regexec(&regmatch, sfname, (colnr_T)0))))
-		 || (!allow_dirs && vim_regexec(&regmatch, tail, (colnr_T)0))))
-	result = TRUE;
+		 || (!allow_dirs && vim_regexec(&regmatch, ಬಾಲ, (colnr_T)0))))
+	ಫಲಿತಾಂಶ = TRUE;
 
-    if (prog != NULL)
+    ಆದರೆ (prog != ಖಾಲಿ)
 	*prog = regmatch.regprog;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	vim_regfree(regmatch.regprog);
-    return result;
+    ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
 }
 
 /*
@@ -5739,33 +5739,33 @@ match_file_pat(
  * "list" is a comma-separated list of patterns, like 'wildignore'.
  * "sfname" is the short file name or NULL, "ffname" the long file name.
  */
-    int
-match_file_list(char_u *list, char_u *sfname, char_u *ffname)
+    ಪೂರ್ಣಾಂಕ
+ಹೊಂದಿಕೆ_file_list(char_u *list, char_u *sfname, char_u *ffname)
 {
     char_u	buf[MAXPATHL];
-    char_u	*tail;
+    char_u	*ಬಾಲ;
     char_u	*regpat;
-    char	allow_dirs;
-    int		match;
+    ಅಕ್ಷರ	allow_dirs;
+    ಪೂರ್ಣಾಂಕ		ಹೊಂದಿಕೆ;
     char_u	*p;
 
-    tail = gettail(sfname);
+    ಬಾಲ = gettail(sfname);
 
     // try all patterns in 'wildignore'
     p = list;
-    while (*p)
+    ಆಗ (*p)
     {
 	copy_option_part(&p, buf, MAXPATHL, ",");
-	regpat = file_pat_to_reg_pat(buf, NULL, &allow_dirs, FALSE);
-	if (regpat == NULL)
-	    break;
-	match = match_file_pat(regpat, NULL, ffname, sfname,
-						       tail, (int)allow_dirs);
+	regpat = file_pat_ಗಮ್ಯ_reg_pat(buf, ಖಾಲಿ, &allow_dirs, FALSE);
+	ಆದರೆ (regpat == ಖಾಲಿ)
+	    ನಿಲ್ಲಿಸು;
+	ಹೊಂದಿಕೆ = ಹೊಂದಿಕೆ_file_pat(regpat, ಖಾಲಿ, ffname, sfname,
+						       ಬಾಲ, (ಪೂರ್ಣಾಂಕ)allow_dirs);
 	vim_free(regpat);
-	if (match)
-	    return TRUE;
+	ಆದರೆ (ಹೊಂದಿಕೆ)
+	    ಹಿಂತಿರುಗಿ TRUE;
     }
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 /*
@@ -5780,113 +5780,113 @@ match_file_list(char_u *list, char_u *sfname, char_u *ffname)
  * Returns NULL when out of memory.
  */
     char_u *
-file_pat_to_reg_pat(
+file_pat_ಗಮ್ಯ_reg_pat(
     char_u	*pat,
-    char_u	*pat_end,	// first char after pattern or NULL
-    char	*allow_dirs,	// Result passed back out in here
-    int		no_bslash UNUSED) // Don't use a backward slash as pathsep
+    char_u	*pat_ಕೊನೆ,	// first char after pattern or NULL
+    ಅಕ್ಷರ	*allow_dirs,	// Result passed back out in here
+    ಪೂರ್ಣಾಂಕ		no_bslash ಬಳಸದ) // Don't use a backward slash as pathsep
 {
-    int		size = 2; // '^' at start, '$' at end
+    ಪೂರ್ಣಾಂಕ		ಗಾತ್ರ_2 = 2; // '^' at start, '$' at end
     char_u	*endp;
     char_u	*reg_pat;
     char_u	*p;
-    int		i;
-    int		nested = 0;
-    int		add_dollar = TRUE;
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		nested = 0;
+    ಪೂರ್ಣಾಂಕ		ಕೂಡಿಸು_dollar = TRUE;
 
-    if (allow_dirs != NULL)
+    ಆದರೆ (allow_dirs != ಖಾಲಿ)
 	*allow_dirs = FALSE;
-    if (pat_end == NULL)
-	pat_end = pat + STRLEN(pat);
+    ಆದರೆ (pat_ಕೊನೆ == ಖಾಲಿ)
+	pat_ಕೊನೆ = pat + STRLEN(pat);
 
-    for (p = pat; p < pat_end; p++)
+    ಗಾಗಿ (p = pat; p < pat_ಕೊನೆ; p++)
     {
-	switch (*p)
+	ಆಯ್ಕೆ (*p)
 	{
-	    case '*':
-	    case '.':
-	    case ',':
-	    case '{':
-	    case '}':
-	    case '~':
-		size += 2;	// extra backslash
-		break;
-#ifdef BACKSLASH_IN_FILENAME
-	    case '\\':
-	    case '/':
-		size += 4;	// could become "[\/]"
-		break;
-#endif
-	    default:
-		size++;
-		if (enc_dbcs != 0 && (*mb_ptr2len)(p) > 1)
+	    ಸ್ಥಿತಿ '*':
+	    ಸ್ಥಿತಿ '.':
+	    ಸ್ಥಿತಿ ',':
+	    ಸ್ಥಿತಿ '{':
+	    ಸ್ಥಿತಿ '}':
+	    ಸ್ಥಿತಿ '~':
+		ಗಾತ್ರ_2 += 2;	// extra backslash
+		ನಿಲ್ಲಿಸು;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ BACKSLASH_ಒಳ_FILENAME
+	    ಸ್ಥಿತಿ '\\':
+	    ಸ್ಥಿತಿ '/':
+		ಗಾತ್ರ_2 += 4;	// could become "[\/]"
+		ನಿಲ್ಲಿಸು;
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಪೂರ್ವನಿಯೋಜಿತ:
+		ಗಾತ್ರ_2++;
+		ಆದರೆ (enc_dbcs != 0 && (*mb_ptr2len)(p) > 1)
 		{
 		    ++p;
-		    ++size;
+		    ++ಗಾತ್ರ_2;
 		}
-		break;
+		ನಿಲ್ಲಿಸು;
 	}
     }
-    reg_pat = alloc(size + 1);
-    if (reg_pat == NULL)
-	return NULL;
+    reg_pat = alloc(ಗಾತ್ರ_2 + 1);
+    ಆದರೆ (reg_pat == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     i = 0;
 
-    if (pat[0] == '*')
-	while (pat[0] == '*' && pat < pat_end - 1)
+    ಆದರೆ (pat[0] == '*')
+	ಆಗ (pat[0] == '*' && pat < pat_ಕೊನೆ - 1)
 	    pat++;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	reg_pat[i++] = '^';
-    endp = pat_end - 1;
-    if (endp >= pat && *endp == '*')
+    endp = pat_ಕೊನೆ - 1;
+    ಆದರೆ (endp >= pat && *endp == '*')
     {
-	while (endp - pat > 0 && *endp == '*')
+	ಆಗ (endp - pat > 0 && *endp == '*')
 	    endp--;
-	add_dollar = FALSE;
+	ಕೂಡಿಸು_dollar = FALSE;
     }
-    for (p = pat; *p && nested >= 0 && p <= endp; p++)
+    ಗಾಗಿ (p = pat; *p && nested >= 0 && p <= endp; p++)
     {
-	switch (*p)
+	ಆಯ್ಕೆ (*p)
 	{
-	    case '*':
+	    ಸ್ಥಿತಿ '*':
 		reg_pat[i++] = '.';
 		reg_pat[i++] = '*';
-		while (p[1] == '*')	// "**" matches like "*"
+		ಆಗ (p[1] == '*')	// "**" matches like "*"
 		    ++p;
-		break;
-	    case '.':
-	    case '~':
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ '.':
+	    ಸ್ಥಿತಿ '~':
 		reg_pat[i++] = '\\';
 		reg_pat[i++] = *p;
-		break;
-	    case '?':
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ '?':
 		reg_pat[i++] = '.';
-		break;
-	    case '\\':
-		if (p[1] == NUL)
-		    break;
-#ifdef BACKSLASH_IN_FILENAME
-		if (!no_bslash)
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ '\\':
+		ಆದರೆ (p[1] == NUL)
+		    ನಿಲ್ಲಿಸು;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ BACKSLASH_ಒಳ_FILENAME
+		ಆದರೆ (!no_bslash)
 		{
 		    // translate:
 		    // "\x" to "\\x"  e.g., "dir\file"
 		    // "\*" to "\\.*" e.g., "dir\*.c"
 		    // "\?" to "\\."  e.g., "dir\??.c"
 		    // "\+" to "\+"   e.g., "fileX\+.c"
-		    if ((vim_isfilec(p[1]) || p[1] == '*' || p[1] == '?')
+		    ಆದರೆ ((vim_isfilec(p[1]) || p[1] == '*' || p[1] == '?')
 			    && p[1] != '+')
 		    {
 			reg_pat[i++] = '[';
 			reg_pat[i++] = '\\';
 			reg_pat[i++] = '/';
 			reg_pat[i++] = ']';
-			if (allow_dirs != NULL)
+			ಆದರೆ (allow_dirs != ಖಾಲಿ)
 			    *allow_dirs = TRUE;
-			break;
+			ನಿಲ್ಲಿಸು;
 		    }
 		}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		// Undo escaping from ExpandEscape():
 		// foo\?bar -> foo?bar
 		// foo\%bar -> foo%bar
@@ -5896,130 +5896,130 @@ file_pat_to_reg_pat(
 		// regexp.
 		// An escaped { must be unescaped since we use magic not
 		// verymagic.  Use "\\\{n,m\}"" to get "\{n,m}".
-		if (*++p == '?'
-#ifdef BACKSLASH_IN_FILENAME
+		ಆದರೆ (*++p == '?'
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ BACKSLASH_ಒಳ_FILENAME
 			&& no_bslash
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 			)
 		    reg_pat[i++] = '?';
-		else
-		    if (*p == ',' || *p == '%' || *p == '#'
+		ಇಲ್ಲದಿದ್ದರೆ
+		    ಆದರೆ (*p == ',' || *p == '%' || *p == '#'
 			       || vim_isspace(*p) || *p == '{' || *p == '}')
 			reg_pat[i++] = *p;
-		    else if (*p == '\\' && p[1] == '\\' && p[2] == '{')
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*p == '\\' && p[1] == '\\' && p[2] == '{')
 		    {
 			reg_pat[i++] = '\\';
 			reg_pat[i++] = '{';
 			p += 2;
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
-			if (allow_dirs != NULL && vim_ispathsep(*p)
-#ifdef BACKSLASH_IN_FILENAME
+			ಆದರೆ (allow_dirs != ಖಾಲಿ && vim_ispathsep(*p)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ BACKSLASH_ಒಳ_FILENAME
 				&& (!no_bslash || *p != '\\')
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 				)
 			    *allow_dirs = TRUE;
 			reg_pat[i++] = '\\';
-			if (enc_dbcs != 0 && (*mb_ptr2len)(p) > 1)
+			ಆದರೆ (enc_dbcs != 0 && (*mb_ptr2len)(p) > 1)
 			    reg_pat[i++] = *p++;
 			reg_pat[i++] = *p;
 		    }
-		break;
-#ifdef BACKSLASH_IN_FILENAME
-	    case '/':
+		ನಿಲ್ಲಿಸು;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ BACKSLASH_ಒಳ_FILENAME
+	    ಸ್ಥಿತಿ '/':
 		reg_pat[i++] = '[';
 		reg_pat[i++] = '\\';
 		reg_pat[i++] = '/';
 		reg_pat[i++] = ']';
-		if (allow_dirs != NULL)
+		ಆದರೆ (allow_dirs != ಖಾಲಿ)
 		    *allow_dirs = TRUE;
-		break;
-#endif
-	    case '{':
+		ನಿಲ್ಲಿಸು;
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಸ್ಥಿತಿ '{':
 		reg_pat[i++] = '\\';
 		reg_pat[i++] = '(';
 		nested++;
-		break;
-	    case '}':
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ '}':
 		reg_pat[i++] = '\\';
 		reg_pat[i++] = ')';
 		--nested;
-		break;
-	    case ',':
-		if (nested)
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ ',':
+		ಆದರೆ (nested)
 		{
 		    reg_pat[i++] = '\\';
 		    reg_pat[i++] = '|';
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		    reg_pat[i++] = ',';
-		break;
-	    default:
-		if (enc_dbcs != 0 && (*mb_ptr2len)(p) > 1)
+		ನಿಲ್ಲಿಸು;
+	    ಪೂರ್ವನಿಯೋಜಿತ:
+		ಆದರೆ (enc_dbcs != 0 && (*mb_ptr2len)(p) > 1)
 		    reg_pat[i++] = *p++;
-		else if (allow_dirs != NULL && vim_ispathsep(*p))
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (allow_dirs != ಖಾಲಿ && vim_ispathsep(*p))
 		    *allow_dirs = TRUE;
 		reg_pat[i++] = *p;
-		break;
+		ನಿಲ್ಲಿಸು;
 	}
     }
-    if (add_dollar)
+    ಆದರೆ (ಕೂಡಿಸು_dollar)
 	reg_pat[i++] = '$';
     reg_pat[i] = NUL;
-    if (nested != 0)
+    ಆದರೆ (nested != 0)
     {
-	if (nested < 0)
+	ಆದರೆ (nested < 0)
 	    emsg(_(e_missing_open_curly));
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    emsg(_(e_missing_close_curly));
 	VIM_CLEAR(reg_pat);
     }
-    return reg_pat;
+    ಹಿಂತಿರುಗಿ reg_pat;
 }
 
-#if defined(EINTR)
+#ಆದರೆ defined(EINTR)
 /*
  * Version of read() that retries when interrupted by EINTR (possibly
  * by a SIGWINCH).
  */
-    long
-read_eintr(int fd, void *buf, size_t bufsize)
+    ದೀರ್ಘ
+read_eintr(ಪೂರ್ಣಾಂಕ fd, ಶೂನ್ಯ *buf, size_t bufsize)
 {
-    long ret;
+    ದೀರ್ಘ ret;
 
-    for (;;)
+    ಗಾಗಿ (;;)
     {
 	ret = vim_read(fd, buf, bufsize);
-	if (ret >= 0 || errno != EINTR)
-	    break;
+	ಆದರೆ (ret >= 0 || errno != EINTR)
+	    ನಿಲ್ಲಿಸು;
     }
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
 /*
  * Version of write() that retries when interrupted by EINTR (possibly
  * by a SIGWINCH).
  */
-    long
-write_eintr(int fd, void *buf, size_t bufsize)
+    ದೀರ್ಘ
+write_eintr(ಪೂರ್ಣಾಂಕ fd, ಶೂನ್ಯ *buf, size_t bufsize)
 {
-    long    ret = 0;
-    long    wlen;
+    ದೀರ್ಘ    ret = 0;
+    ದೀರ್ಘ    wlen;
 
     // Repeat the write() so long it didn't fail, other than being interrupted
     // by a signal.
-    while (ret < (long)bufsize)
+    ಆಗ (ret < (ದೀರ್ಘ)bufsize)
     {
-	wlen = vim_write(fd, (char *)buf + ret, bufsize - ret);
-	if (wlen < 0)
+	wlen = vim_write(fd, (ಅಕ್ಷರ *)buf + ret, bufsize - ret);
+	ಆದರೆ (wlen < 0)
 	{
-	    if (errno != EINTR)
-		break;
+	    ಆದರೆ (errno != EINTR)
+		ನಿಲ್ಲಿಸು;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    ret += wlen;
     }
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ

@@ -66,50 +66,50 @@ TODO:
  *  ::vim::buffer new		#   create new buffer + Tcl command
  */
 
-#include "vim.h"
-#undef EXTERN			// tcl.h defines it too
+#ಅನ್ತರ್ಭಾವ "vim.h"
+#ವ್ಯಾಖ್ಯಾನ_ರದ್ದು EXTERN			// tcl.h defines it too
 
-#ifdef DYNAMIC_TCL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DYNAMIC_TCL
 # define USE_TCL_STUBS // use tcl's stubs mechanism
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#include <tcl.h>
-#include <string.h>
+#ಅನ್ತರ್ಭಾವ <tcl.h>
+#ಅನ್ತರ್ಭಾವ <string.h>
 
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
     Tcl_Interp *interp;
-    int exitvalue;
-    int range_start, range_end;
-    int lbase;
-    char *curbuf, *curwin;
+    ಪೂರ್ಣಾಂಕ exitvalue;
+    ಪೂರ್ಣಾಂಕ range_ಆರಂಭ, range_ಕೊನೆ;
+    ಪೂರ್ಣಾಂಕ lbase;
+    ಅಕ್ಷರ *curbuf, *curwin;
 } tcl_info;
 
-static tcl_info tclinfo = { NULL, 0, 0, 0, 0, NULL, NULL };
+ಸ್ಥಿರ tcl_info tclinfo = { ಖಾಲಿ, 0, 0, 0, 0, ಖಾಲಿ, ಖಾಲಿ };
 
-#define VAR_RANGE1	"::vim::range(start)"
-#define VAR_RANGE2	"::vim::range(begin)"
-#define VAR_RANGE3	"::vim::range(end)"
-#define VAR_CURBUF	"::vim::current(buffer)"
-#define VAR_CURWIN	"::vim::current(window)"
-#define VAR_LBASE	"::vim::lbase"
-#define VAR_CURLINE	"line"
-#define VAR_CURLNUM	"lnum"
-#define VARNAME_SIZE	64
+#ವ್ಯಾಖ್ಯಾನಿಸು VAR_RANGE1	"::vim::range(start)"
+#ವ್ಯಾಖ್ಯಾನಿಸು VAR_RANGE2	"::vim::range(begin)"
+#ವ್ಯಾಖ್ಯಾನಿಸು VAR_RANGE3	"::vim::range(end)"
+#ವ್ಯಾಖ್ಯಾನಿಸು VAR_CURBUF	"::vim::current(buffer)"
+#ವ್ಯಾಖ್ಯಾನಿಸು VAR_CURWIN	"::vim::current(window)"
+#ವ್ಯಾಖ್ಯಾನಿಸು VAR_LBASE	"::vim::lbase"
+#ವ್ಯಾಖ್ಯಾನಿಸು VAR_CURLINE	"line"
+#ವ್ಯಾಖ್ಯಾನಿಸು VAR_CURLNUM	"lnum"
+#ವ್ಯಾಖ್ಯಾನಿಸು VARNAME_ಗಾತ್ರ	64
 
-#define row2tcl(x)  ((x) - (tclinfo.lbase==0))
-#define row2vim(x)  ((x) + (tclinfo.lbase==0))
-#define col2tcl(x)  ((x) + (tclinfo.lbase!=0))
-#define col2vim(x)  ((x) - (tclinfo.lbase!=0))
+#ವ್ಯಾಖ್ಯಾನಿಸು row2tcl(x)  ((x) - (tclinfo.lbase==0))
+#ವ್ಯಾಖ್ಯಾನಿಸು row2vim(x)  ((x) + (tclinfo.lbase==0))
+#ವ್ಯಾಖ್ಯಾನಿಸು col2tcl(x)  ((x) + (tclinfo.lbase!=0))
+#ವ್ಯಾಖ್ಯಾನಿಸು col2vim(x)  ((x) - (tclinfo.lbase!=0))
 
 
-#define VIMOUT	((ClientData)1)
-#define VIMERR	((ClientData)2)
+#ವ್ಯಾಖ್ಯಾನಿಸು VIMOUT	((Client_ದತ್ತಾಂಶ)1)
+#ವ್ಯಾಖ್ಯಾನಿಸು VIMERR	((Client_ದತ್ತಾಂಶ)2)
 
 // This appears to be new in Tcl 8.4.
-#ifndef CONST84
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ CONST84
 # define CONST84
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  *  List of Tcl interpreters who reference a vim window or buffer.
@@ -118,37 +118,37 @@ static tcl_info tclinfo = { NULL, 0, 0, 0, 0, NULL, NULL };
  *  the "interp" command, and each interpreter can reference all windows and
  *  buffers.
  */
-struct ref
+ರಚನೆ ref
 {
-    struct ref	*next;
+    ರಚನೆ ref	*ಮುಂದಿನ;
 
     Tcl_Interp	*interp;
     Tcl_Command cmd;	    // Tcl command that represents this object
     Tcl_Obj	*delcmd;    // Tcl command to call when object is being del.
-    void	*vimobj;    // Vim window or buffer (win_T* or buf_T*)
+    ಶೂನ್ಯ	*vimobj;    // Vim window or buffer (win_T* or buf_T*)
 };
-static char * tclgetbuffer _ANSI_ARGS_((Tcl_Interp *interp, buf_T *buf));
-static char * tclgetwindow _ANSI_ARGS_((Tcl_Interp *interp, win_T *win));
-static int tclsetdelcmd _ANSI_ARGS_((Tcl_Interp *interp, struct ref *reflist, void *vimobj, Tcl_Obj *delcmd));
-static int tclgetlinenum _ANSI_ARGS_ ((Tcl_Interp *interp, Tcl_Obj *obj, int *valueP, buf_T *buf));
-static win_T *tclfindwin _ANSI_ARGS_ ((buf_T *buf));
-static int tcldoexcommand _ANSI_ARGS_ ((Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[], int objn));
-static int tclsetoption _ANSI_ARGS_ ((Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[], int objn));
-static int tclvimexpr _ANSI_ARGS_ ((Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[], int objn));
-static void tcldelthisinterp _ANSI_ARGS_ ((void));
+ಸ್ಥಿರ ಅಕ್ಷರ * tclgetbuffer ANSI_ವಾದಗಳು((Tcl_Interp *interp, buf_T *buf));
+ಸ್ಥಿರ ಅಕ್ಷರ * tclgetwindow ANSI_ವಾದಗಳು((Tcl_Interp *interp, win_T *win));
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ tclsetdelcmd ANSI_ವಾದಗಳು((Tcl_Interp *interp, ರಚನೆ ref *reflist, ಶೂನ್ಯ *vimobj, Tcl_Obj *delcmd));
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ tclgetlinenum ANSI_ವಾದಗಳು ((Tcl_Interp *interp, Tcl_Obj *obj, ಪೂರ್ಣಾಂಕ *ಮೌಲ್ಯ_P, buf_T *buf));
+ಸ್ಥಿರ win_T *tclfindwin ANSI_ವಾದಗಳು ((buf_T *buf));
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ tcldoexcommand ANSI_ವಾದಗಳು ((Tcl_Interp *interp, ಪೂರ್ಣಾಂಕ objc, Tcl_Obj *CONST objv[], ಪೂರ್ಣಾಂಕ objn));
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ tclsetoption ANSI_ವಾದಗಳು ((Tcl_Interp *interp, ಪೂರ್ಣಾಂಕ objc, Tcl_Obj *CONST objv[], ಪೂರ್ಣಾಂಕ objn));
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ tclvimexpr ANSI_ವಾದಗಳು ((Tcl_Interp *interp, ಪೂರ್ಣಾಂಕ objc, Tcl_Obj *CONST objv[], ಪೂರ್ಣಾಂಕ objn));
+ಸ್ಥಿರ ಶೂನ್ಯ tcldelthisinterp ANSI_ವಾದಗಳು ((ಶೂನ್ಯ));
 
-static int vimerror _ANSI_ARGS_((Tcl_Interp *interp));
-static void tclmsg _ANSI_ARGS_((char *text));
-static void tclerrmsg _ANSI_ARGS_((char *text));
-static void tclupdatevars _ANSI_ARGS_((void));
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ vimerror ANSI_ವಾದಗಳು((Tcl_Interp *interp));
+ಸ್ಥಿರ ಶೂನ್ಯ tclmsg ANSI_ವಾದಗಳು((ಅಕ್ಷರ *ಪಠ್ಯ));
+ಸ್ಥಿರ ಶೂನ್ಯ tclerrmsg ANSI_ವಾದಗಳು((ಅಕ್ಷರ *ಪಠ್ಯ));
+ಸ್ಥಿರ ಶೂನ್ಯ tclupdatevars ANSI_ವಾದಗಳು((ಶೂನ್ಯ));
 
-static struct ref refsdeleted;	// dummy object for deleted ref list
+ಸ್ಥಿರ ರಚನೆ ref refsdeleted;	// dummy object for deleted ref list
 
 //////////////////////////////////////////////////////////////////////////////
 // TCL interface manager
 ////////////////////////////////////////////////////////////////////////////
 
-#if defined(DYNAMIC_TCL)
+#ಆದರೆ defined(DYNAMIC_TCL)
 # ifndef DYNAMIC_TCL_DLL
 #  define DYNAMIC_TCL_DLL "tcl83.dll"
 # endif
@@ -157,42 +157,42 @@ static struct ref refsdeleted;	// dummy object for deleted ref list
 # endif
 
 # ifndef  DYNAMIC_TCL // Just generating prototypes
-typedef int HANDLE;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಪೂರ್ಣಾಂಕ HANDLE;
 # endif
 
 # ifdef MSWIN
 #  define TCL_PROC FARPROC
-#  define load_dll vimLoadLib
-#  define symbol_from_dll GetProcAddress
+#  define ತುಂಬು_dll vim_ತುಂಬು_Lib
+#  define ಚಿಹ್ನೆ_from_dll Get_Proc_ವಿಳಾಸ
 #  define close_dll FreeLibrary
-#  define load_dll_error GetWin32Error
-# else
+#  define ತುಂಬು_dll_error GetWin32Error
+# ಇಲ್ಲದಿದ್ದರೆ
 #  include <dlfcn.h>
-#  define HANDLE void*
-#  define TCL_PROC void*
-#  define load_dll(n) dlopen((n), RTLD_LAZY|RTLD_GLOBAL)
-#  define symbol_from_dll dlsym
+#  define HANDLE ಶೂನ್ಯ*
+#  define TCL_PROC ಶೂನ್ಯ*
+#  define ತುಂಬು_dll(n) dlopen((n), RTLD_LAZY|RTLD_GLOBAL)
+#  define ಚಿಹ್ನೆ_from_dll dlsym
 #  define close_dll dlclose
-#  define load_dll_error dlerror
+#  define ತುಂಬು_dll_error dlerror
 # endif
 
 /*
  * Declare HANDLE for tcl.dll and function pointers.
  */
-static HANDLE hTclLib = NULL;
-Tcl_Interp* (*dll_Tcl_CreateInterp)(void);
-void (*dll_Tcl_FindExecutable)(const void *);
+ಸ್ಥಿರ HANDLE hTclLib = ಖಾಲಿ;
+Tcl_Interp* (*dll_Tcl_CreateInterp)(ಶೂನ್ಯ);
+ಶೂನ್ಯ (*dll_Tcl_ಕಂಡುಹಿಡಿ_Executable)(ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *);
 
 /*
  * Table of name to function pointer of tcl.
  */
-static struct {
-    char* name;
+ಸ್ಥಿರ ರಚನೆ {
+    ಅಕ್ಷರ* name;
     TCL_PROC* ptr;
-} tcl_funcname_table[] = {
+} tcl_funcname_ಕೋಷ್ಟಕ[] = {
     {"Tcl_CreateInterp", (TCL_PROC*)&dll_Tcl_CreateInterp},
-    {"Tcl_FindExecutable", (TCL_PROC*)&dll_Tcl_FindExecutable},
-    {NULL, NULL},
+    {"Tcl_FindExecutable", (TCL_PROC*)&dll_Tcl_ಕಂಡುಹಿಡಿ_Executable},
+    {ಖಾಲಿ, ಖಾಲಿ},
 };
 
 /*
@@ -205,72 +205,72 @@ static struct {
  * Parameter 'libname' provides name of DLL.
  * Return OK or FAIL.
  */
-    static int
-tcl_runtime_link_init(char *libname, int verbose)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+tcl_runtime_link_init(ಅಕ್ಷರ *libname, ಪೂರ್ಣಾಂಕ verbose)
 {
-    int i;
+    ಪೂರ್ಣಾಂಕ i;
 
-    if (hTclLib)
-	return OK;
-    if (!(hTclLib = load_dll(libname)))
+    ಆದರೆ (hTclLib)
+	ಹಿಂತಿರುಗಿ OK;
+    ಆದರೆ (!(hTclLib = ತುಂಬು_dll(libname)))
     {
-	if (verbose)
-	    semsg(_(e_could_not_load_library_str_str), libname, load_dll_error());
-	return FAIL;
+	ಆದರೆ (verbose)
+	    semsg(_(e_could_not_ತುಂಬು_library_str_str), libname, ತುಂಬು_dll_error());
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-    for (i = 0; tcl_funcname_table[i].ptr; ++i)
+    ಗಾಗಿ (i = 0; tcl_funcname_ಕೋಷ್ಟಕ[i].ptr; ++i)
     {
-	if (!(*tcl_funcname_table[i].ptr = symbol_from_dll(hTclLib,
-						  tcl_funcname_table[i].name)))
+	ಆದರೆ (!(*tcl_funcname_ಕೋಷ್ಟಕ[i].ptr = ಚಿಹ್ನೆ_from_dll(hTclLib,
+						  tcl_funcname_ಕೋಷ್ಟಕ[i].name)))
 	{
 	    close_dll(hTclLib);
-	    hTclLib = NULL;
-	    if (verbose)
-		semsg(_(e_could_not_load_library_function_str),
-						   tcl_funcname_table[i].name);
-	    return FAIL;
+	    hTclLib = ಖಾಲಿ;
+	    ಆದರೆ (verbose)
+		semsg(_(e_could_not_ತುಂಬು_library_function_str),
+						   tcl_funcname_ಕೋಷ್ಟಕ[i].name);
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
-#endif // defined(DYNAMIC_TCL)
+#ಆದರೆ_ಅಂತ್ಯ // defined(DYNAMIC_TCL)
 
-#ifdef DYNAMIC_TCL
-static char *find_executable_arg = NULL;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DYNAMIC_TCL
+ಸ್ಥಿರ ಅಕ್ಷರ *ಕಂಡುಹಿಡಿ_executable_arg = ಖಾಲಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 
-    void
-vim_tcl_init(char *arg)
+    ಶೂನ್ಯ
+vim_tcl_init(ಅಕ್ಷರ *arg)
 {
-#ifdef DYNAMIC_TCL
-    find_executable_arg = arg;
-#else
-    Tcl_FindExecutable(arg);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DYNAMIC_TCL
+    ಕಂಡುಹಿಡಿ_executable_arg = arg;
+#ಇಲ್ಲದಿದ್ದರೆ
+    Tcl_ಕಂಡುಹಿಡಿ_Executable(arg);
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#if defined(DYNAMIC_TCL)
+#ಆದರೆ defined(DYNAMIC_TCL)
 
-static int stubs_initialized = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ stubs_initialized = FALSE;
 
 /*
  * Return TRUE if the TCL interface can be used.
  */
-    int
-tcl_enabled(int verbose)
+    ಪೂರ್ಣಾಂಕ
+tcl_enabled(ಪೂರ್ಣಾಂಕ verbose)
 {
-    if (!stubs_initialized && find_executable_arg != NULL
-	    && tcl_runtime_link_init((char *)p_tcldll, verbose) == OK)
+    ಆದರೆ (!stubs_initialized && ಕಂಡುಹಿಡಿ_executable_arg != ಖಾಲಿ
+	    && tcl_runtime_link_init((ಅಕ್ಷರ *)p_tcldll, verbose) == OK)
     {
 	Tcl_Interp *interp;
 
 	// Note: the library will allocate memory to store the executable name,
 	// which will be reported as possibly leaked by valgrind.
-	dll_Tcl_FindExecutable(find_executable_arg);
+	dll_Tcl_ಕಂಡುಹಿಡಿ_Executable(ಕಂಡುಹಿಡಿ_executable_arg);
 
-	if ((interp = dll_Tcl_CreateInterp()) != NULL)
+	ಆದರೆ ((interp = dll_Tcl_CreateInterp()) != ಖಾಲಿ)
 	{
-	    if (Tcl_InitStubs(interp, DYNAMIC_TCL_VER, 0) != NULL)
+	    ಆದರೆ (Tcl_InitStubs(interp, DYNAMIC_TCL_VER, 0) != ಖಾಲಿ)
 	    {
 		Tcl_DeleteInterp(interp);
 		stubs_initialized = TRUE;
@@ -278,26 +278,26 @@ tcl_enabled(int verbose)
 	    // FIXME: When Tcl_InitStubs() was failed, how delete interp?
 	}
     }
-    return stubs_initialized;
+    ಹಿಂತಿರುಗಿ stubs_initialized;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(EXITFREE)
+#ಆದರೆ defined(EXITFREE)
 /*
  * Called once when exiting.
  */
-    void
-vim_tcl_finalize(void)
+    ಶೂನ್ಯ
+vim_tcl_finalize(ಶೂನ್ಯ)
 {
 # ifdef DYNAMIC_TCL
-    if (stubs_initialized)
+    ಆದರೆ (stubs_initialized)
 # endif
 	Tcl_Finalize();
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    void
-tcl_end(void)
+    ಶೂನ್ಯ
+tcl_ಕೊನೆ(ಶೂನ್ಯ)
 {
 }
 
@@ -319,49 +319,49 @@ tcl_end(void)
  * string in the interpreter's result value. Therefore it would be
  * useless for this routine to return the exit code via Tcl_SetResult().
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 exitcmd(
-    ClientData dummy UNUSED,
+    Client_ದತ್ತಾಂಶ dummy ಬಳಸದ,
     Tcl_Interp *interp,
-    int objc,
+    ಪೂರ್ಣಾಂಕ objc,
     Tcl_Obj *CONST objv[])
 {
-    int value = 0;
+    ಪೂರ್ಣಾಂಕ ಮೌಲ್ಯ = 0;
 
-    switch (objc)
+    ಆಯ್ಕೆ (objc)
     {
-	case 2:
-	    if (Tcl_GetIntFromObj(interp, objv[1], &value) != TCL_OK)
-		break;
+	ಸ್ಥಿತಿ 2:
+	    ಆದರೆ (Tcl_GetIntFromObj(interp, objv[1], &ಮೌಲ್ಯ) != TCL_OK)
+		ನಿಲ್ಲಿಸು;
 	    // FALLTHROUGH
-	case 1:
-	    tclinfo.exitvalue = value;
+	ಸ್ಥಿತಿ 1:
+	    tclinfo.exitvalue = ಮೌಲ್ಯ;
 
 	    Tcl_DeleteInterp(interp);
-	    break;
-	default:
-	    Tcl_WrongNumArgs(interp, 1, objv, "?returnCode?");
+	    ನಿಲ್ಲಿಸು;
+	ಪೂರ್ವನಿಯೋಜಿತ:
+	    Tcl_Wrong_ಅಂಕೆ_ವಾದಗಳು(interp, 1, objv, "?returnCode?");
     }
-    return TCL_ERROR;
+    ಹಿಂತಿರುಗಿ TCL_ERROR;
 }
 
 /*
  *  "::vim::beep" - what Vi[m] does best :-)
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 beepcmd(
-    ClientData dummy UNUSED,
+    Client_ದತ್ತಾಂಶ dummy ಬಳಸದ,
     Tcl_Interp *interp,
-    int objc,
+    ಪೂರ್ಣಾಂಕ objc,
     Tcl_Obj *CONST objv[])
 {
-    if (objc != 1)
+    ಆದರೆ (objc != 1)
     {
-	Tcl_WrongNumArgs(interp, 1, objv, NULL);
-	return TCL_ERROR;
+	Tcl_Wrong_ಅಂಕೆ_ವಾದಗಳು(interp, 1, objv, ಖಾಲಿ);
+	ಹಿಂತಿರುಗಿ TCL_ERROR;
     }
     vim_beep(BO_LANG);
-    return TCL_OK;
+    ಹಿಂತಿರುಗಿ TCL_OK;
 }
 
 /*
@@ -370,330 +370,330 @@ beepcmd(
  *  "::vim::buffer exists {N}" - test if buffer N exists.
  *  "::vim::buffer new" - create a new buffer (not implemented)
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 buffercmd(
-    ClientData dummy UNUSED,
+    Client_ದತ್ತಾಂಶ dummy ಬಳಸದ,
     Tcl_Interp *interp,
-    int objc,
+    ಪೂರ್ಣಾಂಕ objc,
     Tcl_Obj *CONST objv[])
 {
-    char	*name;
+    ಅಕ್ಷರ	*name;
     buf_T	*buf;
     Tcl_Obj	*resobj;
-    int		err, n, idx;
-    enum {BCMD_EXISTS, BCMD_LIST};
-    static CONST84 char *bcmdoptions[] =
+    ಪೂರ್ಣಾಂಕ		err, n, idx;
+    ಎಣಿಕೆ {BCMD_EXISTS, BCMD_LIST};
+    ಸ್ಥಿರ CONST84 ಅಕ್ಷರ *bcmdoptions[] =
     {
-	"exists", "list", (char *)0
+	"exists", "list", (ಅಕ್ಷರ *)0
     };
 
-    if (objc < 2)
+    ಆದರೆ (objc < 2)
     {
-	Tcl_WrongNumArgs(interp, 1, objv, "option");
-	return TCL_ERROR;
+	Tcl_Wrong_ಅಂಕೆ_ವಾದಗಳು(interp, 1, objv, "option");
+	ಹಿಂತಿರುಗಿ TCL_ERROR;
     }
     err = Tcl_GetIntFromObj(interp, objv[1], &n);
-    if (err == TCL_OK)
+    ಆದರೆ (err == TCL_OK)
     {
-	if (objc != 2)
+	ಆದರೆ (objc != 2)
 	{
-	    Tcl_WrongNumArgs(interp, 1, objv, "bufNumber");
-	    return TCL_ERROR;
+	    Tcl_Wrong_ಅಂಕೆ_ವಾದಗಳು(interp, 1, objv, "bufNumber");
+	    ಹಿಂತಿರುಗಿ TCL_ERROR;
 	}
 	FOR_ALL_BUFFERS(buf)
 	{
-	    if (buf->b_fnum == n)
+	    ಆದರೆ (buf->b_fnum == n)
 	    {
 		name = tclgetbuffer(interp, buf);
-		if (name == NULL)
-		    return TCL_ERROR;
-		Tcl_SetResult(interp, name, TCL_VOLATILE);
-		return TCL_OK;
+		ಆದರೆ (name == ಖಾಲಿ)
+		    ಹಿಂತಿರುಗಿ TCL_ERROR;
+		Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, name, TCL_VOLATILE);
+		ಹಿಂತಿರುಗಿ TCL_OK;
 	    }
 	}
-	Tcl_SetResult(interp, _("invalid buffer number"), TCL_STATIC);
-	return TCL_ERROR;
+	Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, _("invalid buffer number"), TCL_STATIC);
+	ಹಿಂತಿರುಗಿ TCL_ERROR;
     }
-    Tcl_ResetResult(interp); // clear error from Tcl_GetIntFromObj
+    Tcl_Reset_ಫಲಿತಾಂಶ(interp); // clear error from Tcl_GetIntFromObj
 
-    err = Tcl_GetIndexFromObj(interp, objv[1], bcmdoptions, "option", 0, &idx);
-    if (err != TCL_OK)
-	return err;
-    switch (idx)
+    err = Tcl_Get_ಸೂಚ್ಯಂಕ_From_Obj(interp, objv[1], bcmdoptions, "option", 0, &idx);
+    ಆದರೆ (err != TCL_OK)
+	ಹಿಂತಿರುಗಿ err;
+    ಆಯ್ಕೆ (idx)
     {
-	case BCMD_LIST:
-	    if (objc != 2)
+	ಸ್ಥಿತಿ BCMD_LIST:
+	    ಆದರೆ (objc != 2)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "");
+		Tcl_Wrong_ಅಂಕೆ_ವಾದಗಳು(interp, 2, objv, "");
 		err = TCL_ERROR;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	    FOR_ALL_BUFFERS(buf)
 	    {
 		name = tclgetbuffer(interp, buf);
-		if (name == NULL)
+		ಆದರೆ (name == ಖಾಲಿ)
 		{
 		    err = TCL_ERROR;
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 		Tcl_AppendElement(interp, name);
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	case BCMD_EXISTS:
-	    if (objc != 3)
+	ಸ್ಥಿತಿ BCMD_EXISTS:
+	    ಆದರೆ (objc != 3)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "bufNumber");
+		Tcl_Wrong_ಅಂಕೆ_ವಾದಗಳು(interp, 2, objv, "bufNumber");
 		err = TCL_ERROR;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	    err = Tcl_GetIntFromObj(interp, objv[2], &n);
-	    if (err == TCL_OK)
+	    ಆದರೆ (err == TCL_OK)
 	    {
 		buf = buflist_findnr(n);
-		resobj = Tcl_NewIntObj(buf != NULL);
-		Tcl_SetObjResult(interp, resobj);
+		resobj = Tcl_NewIntObj(buf != ಖಾಲಿ);
+		Tcl_ಗಣ_Obj_ಫಲಿತಾಂಶ(interp, resobj);
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	default:
-	    Tcl_SetResult(interp, _("not implemented yet"), TCL_STATIC);
+	ಪೂರ್ವನಿಯೋಜಿತ:
+	    Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, _("not implemented yet"), TCL_STATIC);
 	    err = TCL_ERROR;
     }
-    return err;
+    ಹಿಂತಿರುಗಿ err;
 }
 
 /*
  * "::vim::window list" - create list of window commands.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 windowcmd(
-    ClientData	dummy UNUSED,
+    Client_ದತ್ತಾಂಶ	dummy ಬಳಸದ,
     Tcl_Interp	*interp,
-    int		objc,
+    ಪೂರ್ಣಾಂಕ		objc,
     Tcl_Obj	*CONST objv[])
 {
-    char	*what, *string;
+    ಅಕ್ಷರ	*what, *string;
     win_T	*win;
 
-    if (objc != 2)
+    ಆದರೆ (objc != 2)
     {
-	Tcl_WrongNumArgs(interp, 1, objv, "option");
-	return TCL_ERROR;
+	Tcl_Wrong_ಅಂಕೆ_ವಾದಗಳು(interp, 1, objv, "option");
+	ಹಿಂತಿರುಗಿ TCL_ERROR;
     }
-    what = Tcl_GetStringFromObj(objv[1], NULL);
-    if (strcmp(what, "list") == 0)
+    what = Tcl_GetStringFromObj(objv[1], ಖಾಲಿ);
+    ಆದರೆ (strcmp(what, "list") == 0)
     {
 	FOR_ALL_WINDOWS(win)
 	{
 	    string = tclgetwindow(interp, win);
-	    if (string == NULL)
-		return TCL_ERROR;
+	    ಆದರೆ (string == ಖಾಲಿ)
+		ಹಿಂತಿರುಗಿ TCL_ERROR;
 	    Tcl_AppendElement(interp, string);
 	}
-	return TCL_OK;
+	ಹಿಂತಿರುಗಿ TCL_OK;
     }
-    Tcl_SetResult(interp, _("unknown option"), TCL_STATIC);
-    return TCL_ERROR;
+    Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, _("unknown option"), TCL_STATIC);
+    ಹಿಂತಿರುಗಿ TCL_ERROR;
 }
 
 /*
  * flags for bufselfcmd and winselfcmd to indicate outstanding actions.
  */
-#define FL_UPDATE_SCREEN	(1<<0)
-#define FL_UPDATE_CURBUF	(1<<1)
-#define FL_ADJUST_CURSOR	(1<<2)
+#ವ್ಯಾಖ್ಯಾನಿಸು FL_UPDATE_SCREEN	(1<<0)
+#ವ್ಯಾಖ್ಯಾನಿಸು FL_UPDATE_CURBUF	(1<<1)
+#ವ್ಯಾಖ್ಯಾನಿಸು FL_ADJUST_CURSOR	(1<<2)
 
 /*
  * This function implements the buffer commands.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 bufselfcmd(
-    ClientData	ref,
+    Client_ದತ್ತಾಂಶ	ref,
     Tcl_Interp	*interp,
-    int		objc,
+    ಪೂರ್ಣಾಂಕ		objc,
     Tcl_Obj	*CONST objv[])
 {
-    int		opt, err, idx, flags;
-    int		val1, val2, n, i;
+    ಪೂರ್ಣಾಂಕ		opt, err, idx, flags;
+    ಪೂರ್ಣಾಂಕ		val1, val2, n, i;
     buf_T	*buf, *savebuf;
     win_T	*win, *savewin;
     Tcl_Obj	*resobj;
     pos_T	*pos;
-    char	*line;
+    ಅಕ್ಷರ	*ಸಾಲು;
 
-    enum
+    ಎಣಿಕೆ
     {
-	BUF_APPEND, BUF_COMMAND, BUF_COUNT, BUF_DELCMD, BUF_DELETE, BUF_EXPR,
-	BUF_GET, BUF_INSERT, BUF_LAST, BUF_MARK, BUF_NAME, BUF_NUMBER,
-	BUF_OPTION, BUF_SET, BUF_WINDOWS
+	BUF_APPEND, BUF_COMMAND, BUF_ಎಣಿಕೆ, BUF_DELCMD, BUF_DELETE, BUF_ಅಭಿವ್ಯಕ್ತಿ,
+	BUF_GET, BUF_ಸೇರಿಸು, BUF_ಕೊನೆಯ, BUF_MARK, BUF_NAME, BUF_ಸಂಖ್ಯೆ,
+	BUF_OPTION, BUF_ಗಣ, BUF_WINDOWS
     };
-    static CONST84 char *bufoptions[] =
+    ಸ್ಥಿರ CONST84 ಅಕ್ಷರ *bufoptions[] =
     {
 	"append", "command", "count", "delcmd", "delete", "expr",
 	"get", "insert", "last", "mark", "name", "number",
-	"option", "set", "windows", (char *)0
+	"option", "set", "windows", (ಅಕ್ಷರ *)0
     };
 
-    if (objc < 2)
+    ಆದರೆ (objc < 2)
     {
-	Tcl_WrongNumArgs(interp, 1, objv, "option ?arg ...?");
-	return TCL_ERROR;
+	Tcl_Wrong_ಅಂಕೆ_ವಾದಗಳು(interp, 1, objv, "option ?arg ...?");
+	ಹಿಂತಿರುಗಿ TCL_ERROR;
     }
 
-    err = Tcl_GetIndexFromObj(interp, objv[1], bufoptions, "option", 0, &idx);
-    if (err != TCL_OK)
-	return err;
+    err = Tcl_Get_ಸೂಚ್ಯಂಕ_From_Obj(interp, objv[1], bufoptions, "option", 0, &idx);
+    ಆದರೆ (err != TCL_OK)
+	ಹಿಂತಿರುಗಿ err;
 
-    buf = (buf_T *)((struct ref *)ref)->vimobj;
+    buf = (buf_T *)((ರಚನೆ ref *)ref)->vimobj;
     savebuf = curbuf;  curbuf = buf;
     savewin = curwin;  curwin = tclfindwin(buf);
     flags = 0;
     opt = 0;
 
-    switch (idx)
+    ಆಯ್ಕೆ (idx)
     {
-	case BUF_COMMAND:
+	ಸ್ಥಿತಿ BUF_COMMAND:
 	    err = tcldoexcommand(interp, objc, objv, 2);
 	    flags |= FL_UPDATE_SCREEN;
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	case BUF_OPTION:
+	ಸ್ಥಿತಿ BUF_OPTION:
 	    err = tclsetoption(interp, objc, objv, 2);
 	    flags |= FL_UPDATE_SCREEN;
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	case BUF_EXPR:
+	ಸ್ಥಿತಿ BUF_ಅಭಿವ್ಯಕ್ತಿ:
 	    err = tclvimexpr(interp, objc, objv, 2);
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	case BUF_NAME:
+	ಸ್ಥಿತಿ BUF_NAME:
 	    /*
 	     *	Get filename of buffer.
 	     */
-	    if (objc != 2)
+	    ಆದರೆ (objc != 2)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, NULL);
+		Tcl_Wrong_ಅಂಕೆ_ವಾದಗಳು(interp, 2, objv, ಖಾಲಿ);
 		err = TCL_ERROR;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	    if (buf->b_ffname)
-		Tcl_SetResult(interp, (char *)buf->b_ffname, TCL_VOLATILE);
-	    else
-		Tcl_SetResult(interp, "", TCL_STATIC);
-	    break;
+	    ಆದರೆ (buf->b_ffname)
+		Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, (ಅಕ್ಷರ *)buf->b_ffname, TCL_VOLATILE);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, "", TCL_STATIC);
+	    ನಿಲ್ಲಿಸು;
 
-	case BUF_LAST:
+	ಸ್ಥಿತಿ BUF_ಕೊನೆಯ:
 	    /*
 	     * Get line number of last line.
 	     */
 	    opt = 1;
 	    // fallthrough
-	case BUF_COUNT:
+	ಸ್ಥಿತಿ BUF_ಎಣಿಕೆ:
 	    /*
 	     * Get number of lines in buffer.
 	     */
-	    if (objc != 2)
+	    ಆದರೆ (objc != 2)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, NULL);
+		Tcl_Wrong_ಅಂಕೆ_ವಾದಗಳು(interp, 2, objv, ಖಾಲಿ);
 		err = TCL_ERROR;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	    val1 = (int)buf->b_ml.ml_line_count;
-	    if (opt)
+	    val1 = (ಪೂರ್ಣಾಂಕ)buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
+	    ಆದರೆ (opt)
 		val1 = row2tcl(val1);
 
 	    resobj = Tcl_NewIntObj(val1);
-	    Tcl_SetObjResult(interp, resobj);
-	    break;
+	    Tcl_ಗಣ_Obj_ಫಲಿತಾಂಶ(interp, resobj);
+	    ನಿಲ್ಲಿಸು;
 
-	case BUF_NUMBER:
+	ಸ್ಥಿತಿ BUF_ಸಂಖ್ಯೆ:
 	    /*
 	     * Get buffer's number.
 	     */
-	    if (objc != 2)
+	    ಆದರೆ (objc != 2)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, NULL);
+		Tcl_Wrong_ಅಂಕೆ_ವಾದಗಳು(interp, 2, objv, ಖಾಲಿ);
 		err = TCL_ERROR;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	    resobj = Tcl_NewIntObj((int)buf->b_fnum);
-	    Tcl_SetObjResult(interp, resobj);
-	    break;
+	    resobj = Tcl_NewIntObj((ಪೂರ್ಣಾಂಕ)buf->b_fnum);
+	    Tcl_ಗಣ_Obj_ಫಲಿತಾಂಶ(interp, resobj);
+	    ನಿಲ್ಲಿಸು;
 
-	case BUF_GET:
-	    if (objc != 3 && objc != 4)
+	ಸ್ಥಿತಿ BUF_GET:
+	    ಆದರೆ (objc != 3 && objc != 4)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "lineNumber ?lineNumber?");
+		Tcl_Wrong_ಅಂಕೆ_ವಾದಗಳು(interp, 2, objv, "lineNumber ?lineNumber?");
 		err = TCL_ERROR;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	    err = tclgetlinenum(interp, objv[2], &val1, buf);
-	    if (err != TCL_OK)
-		break;
-	    if (objc == 4)
+	    ಆದರೆ (err != TCL_OK)
+		ನಿಲ್ಲಿಸು;
+	    ಆದರೆ (objc == 4)
 	    {
 		err = tclgetlinenum(interp, objv[3], &val2, buf);
-		if (err != TCL_OK)
-		    break;
-		if (val1 > val2)
+		ಆದರೆ (err != TCL_OK)
+		    ನಿಲ್ಲಿಸು;
+		ಆದರೆ (val1 > val2)
 		{
 		    n = val1; val1 = val2; val2 = n;
 		}
-		Tcl_ResetResult(interp);
+		Tcl_Reset_ಫಲಿತಾಂಶ(interp);
 
-		for (n = val1; n <= val2 && err == TCL_OK; n++)
+		ಗಾಗಿ (n = val1; n <= val2 && err == TCL_OK; n++)
 		{
-		    line = (char *)ml_get_buf(buf, (linenr_T)n, FALSE);
-		    if (line)
-			Tcl_AppendElement(interp, line);
-		    else
+		    ಸಾಲು = (ಅಕ್ಷರ *)ml_get_buf(buf, (linenr_T)n, FALSE);
+		    ಆದರೆ (ಸಾಲು)
+			Tcl_AppendElement(interp, ಸಾಲು);
+		    ಇಲ್ಲದಿದ್ದರೆ
 			err = TCL_ERROR;
 		}
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {  // objc == 3
-		line = (char *)ml_get_buf(buf, (linenr_T)val1, FALSE);
-		Tcl_SetResult(interp, line, TCL_VOLATILE);
+		ಸಾಲು = (ಅಕ್ಷರ *)ml_get_buf(buf, (linenr_T)val1, FALSE);
+		Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, ಸಾಲು, TCL_VOLATILE);
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	case BUF_SET:
-	    if (objc != 4 && objc != 5)
+	ಸ್ಥಿತಿ BUF_ಗಣ:
+	    ಆದರೆ (objc != 4 && objc != 5)
 	    {
-		Tcl_WrongNumArgs(interp, 3, objv, "lineNumber ?lineNumber? stringOrList");
+		Tcl_Wrong_ಅಂಕೆ_ವಾದಗಳು(interp, 3, objv, "lineNumber ?lineNumber? stringOrList");
 		err = TCL_ERROR;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	    err = tclgetlinenum(interp, objv[2], &val1, buf);
-	    if (err != TCL_OK)
-		return TCL_ERROR;
-	    if (objc == 4)
+	    ಆದರೆ (err != TCL_OK)
+		ಹಿಂತಿರುಗಿ TCL_ERROR;
+	    ಆದರೆ (objc == 4)
 	    {
 		/*
 		 *  Replace one line with a string.
 		 *	$buf set {n} {string}
 		 */
-		line = Tcl_GetStringFromObj(objv[3], NULL);
-		if (u_savesub((linenr_T)val1) != OK)
+		ಸಾಲು = Tcl_GetStringFromObj(objv[3], ಖಾಲಿ);
+		ಆದರೆ (u_savesub((linenr_T)val1) != OK)
 		{
-		    Tcl_SetResult(interp, _("cannot save undo information"), TCL_STATIC);
+		    Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, _("cannot save undo information"), TCL_STATIC);
 		    err = TCL_ERROR;
 		}
-		else
-		if (ml_replace((linenr_T)val1, (char_u *)line, TRUE) != OK)
+		ಇಲ್ಲದಿದ್ದರೆ
+		ಆದರೆ (ml_replace((linenr_T)val1, (char_u *)ಸಾಲು, TRUE) != OK)
 		{
-		    Tcl_SetResult(interp, _("cannot replace line"), TCL_STATIC);
+		    Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, _("cannot replace line"), TCL_STATIC);
 		    err = TCL_ERROR;
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    changed_bytes((linenr_T)val1, 0);
+		    ಬದಲಾಯಿತು_ಬೈಟುಗಳು((linenr_T)val1, 0);
 		    flags |= FL_UPDATE_CURBUF;
 		}
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		/*
 		 * Replace several lines with the elements of a Tcl list.
@@ -703,16 +703,16 @@ bufselfcmd(
 		 * elements, * the lines from {n}+length({list}) through {m}
 		 * are deleted.
 		 */
-		int	    lc;
+		ಪೂರ್ಣಾಂಕ	    lc;
 		Tcl_Obj	    **lv;
 
 		err = tclgetlinenum(interp, objv[3], &val2, buf);
-		if (err != TCL_OK)
-		    break;
+		ಆದರೆ (err != TCL_OK)
+		    ನಿಲ್ಲಿಸು;
 		err = Tcl_ListObjGetElements(interp, objv[4], &lc, &lv);
-		if (err != TCL_OK)
-		    break;
-		if (val1 > val2)
+		ಆದರೆ (err != TCL_OK)
+		    ನಿಲ್ಲಿಸು;
+		ಆದರೆ (val1 > val2)
 		{
 		    n = val1;
 		    val1 = val2;
@@ -720,443 +720,443 @@ bufselfcmd(
 		}
 
 		n = val1;
-		if (u_save((linenr_T)(val1 - 1), (linenr_T)(val2 + 1)) != OK)
+		ಆದರೆ (u_save((linenr_T)(val1 - 1), (linenr_T)(val2 + 1)) != OK)
 		{
-		    Tcl_SetResult(interp, _("cannot save undo information"),
+		    Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, _("cannot save undo information"),
 								  TCL_STATIC);
 		    err = TCL_ERROR;
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 		flags |= FL_UPDATE_CURBUF;
 
-		for (i = 0; i < lc && n <= val2; i++)
+		ಗಾಗಿ (i = 0; i < lc && n <= val2; i++)
 		{
-		    line = Tcl_GetStringFromObj(lv[i], NULL);
-		    if (ml_replace((linenr_T)n, (char_u *)line, TRUE) != OK)
-			goto setListError;
+		    ಸಾಲು = Tcl_GetStringFromObj(lv[i], ಖಾಲಿ);
+		    ಆದರೆ (ml_replace((linenr_T)n, (char_u *)ಸಾಲು, TRUE) != OK)
+			ಹೋಗು ಗಣ_List_Error;
 		    ++n;
 		}
-		if (i < lc)
+		ಆದರೆ (i < lc)
 		{
 		    // append lines
-		    do
+		    ಮಾಡು
 		    {
-			line = Tcl_GetStringFromObj(lv[i], NULL);
-			if (ml_append((linenr_T)(n - 1),
-					      (char_u *)line, 0, FALSE) != OK)
-			    goto setListError;
+			ಸಾಲು = Tcl_GetStringFromObj(lv[i], ಖಾಲಿ);
+			ಆದರೆ (ml_append((linenr_T)(n - 1),
+					      (char_u *)ಸಾಲು, 0, FALSE) != OK)
+			    ಹೋಗು ಗಣ_List_Error;
 			++n;
 			++i;
-		    } while (i < lc);
+		    } ಆಗ (i < lc);
 		}
-		else if (n <= val2)
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (n <= val2)
 		{
 		    // did not replace all lines, delete
 		    i = n;
-		    do
+		    ಮಾಡು
 		    {
-			if (ml_delete((linenr_T)i) != OK)
-			    goto setListError;
+			ಆದರೆ (ml_delete((linenr_T)i) != OK)
+			    ಹೋಗು ಗಣ_List_Error;
 			++n;
-		    } while (n <= val2);
+		    } ಆಗ (n <= val2);
 		}
 		lc -= val2 - val1 + 1;	// number of lines to be replaced
-		mark_adjust((linenr_T)val1, (linenr_T)val2, (long)MAXLNUM,
-								    (long)lc);
-		changed_lines((linenr_T)val1, 0, (linenr_T)val2 + 1, (long)lc);
-		break;
-    setListError:
+		mark_adjust((linenr_T)val1, (linenr_T)val2, (ದೀರ್ಘ)MAXLNUM,
+								    (ದೀರ್ಘ)lc);
+		ಬದಲಾಯಿತು_ಸಾಲುಗಳು((linenr_T)val1, 0, (linenr_T)val2 + 1, (ದೀರ್ಘ)lc);
+		ನಿಲ್ಲಿಸು;
+    ಗಣ_List_Error:
 		u_undo(1);  // ???
-		Tcl_SetResult(interp, _("cannot set line(s)"), TCL_STATIC);
+		Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, _("cannot set line(s)"), TCL_STATIC);
 		err = TCL_ERROR;
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	case BUF_DELETE:
-	    if (objc != 3  &&  objc != 4)
+	ಸ್ಥಿತಿ BUF_DELETE:
+	    ಆದರೆ (objc != 3  &&  objc != 4)
 	    {
-		Tcl_WrongNumArgs(interp, 3, objv, "lineNumber ?lineNumber?");
+		Tcl_Wrong_ಅಂಕೆ_ವಾದಗಳು(interp, 3, objv, "lineNumber ?lineNumber?");
 		err = TCL_ERROR;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	    err = tclgetlinenum(interp, objv[2], &val1, buf);
-	    if (err != TCL_OK)
-		break;
+	    ಆದರೆ (err != TCL_OK)
+		ನಿಲ್ಲಿಸು;
 	    val2 = val1;
-	    if (objc == 4)
+	    ಆದರೆ (objc == 4)
 	    {
 		err = tclgetlinenum(interp, objv[3], &val2, buf);
-		if (err != TCL_OK)
-		    return err;
-		if (val1 > val2)
+		ಆದರೆ (err != TCL_OK)
+		    ಹಿಂತಿರುಗಿ err;
+		ಆದರೆ (val1 > val2)
 		{
 		    i = val1; val1 = val2; val2 = i;
 		}
 	    }
 	    n = val2 - val1 + 1;
-	    if (u_savedel((linenr_T)val1, (long)n) != OK)
+	    ಆದರೆ (u_savedel((linenr_T)val1, (ದೀರ್ಘ)n) != OK)
 	    {
-		Tcl_SetResult(interp, _("cannot save undo information"),
+		Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, _("cannot save undo information"),
 								  TCL_STATIC);
 		err = TCL_ERROR;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	    for (i = 0; i < n; i++)
+	    ಗಾಗಿ (i = 0; i < n; i++)
 	    {
 		ml_delete((linenr_T)val1);
 		err = vimerror(interp);
-		if (err != TCL_OK)
-		    break;
+		ಆದರೆ (err != TCL_OK)
+		    ನಿಲ್ಲಿಸು;
 	    }
-	    if (i > 0)
-		deleted_lines_mark((linenr_T)val1, (long)i);
+	    ಆದರೆ (i > 0)
+		deleted_ಸಾಲುಗಳು_mark((linenr_T)val1, (ದೀರ್ಘ)i);
 	    flags |= FL_ADJUST_CURSOR|FL_UPDATE_SCREEN;
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	case BUF_MARK:
-	    if (objc != 3)
+	ಸ್ಥಿತಿ BUF_MARK:
+	    ಆದರೆ (objc != 3)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "markName");
+		Tcl_Wrong_ಅಂಕೆ_ವಾದಗಳು(interp, 2, objv, "markName");
 		err = TCL_ERROR;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	    line = Tcl_GetStringFromObj(objv[2], NULL);
+	    ಸಾಲು = Tcl_GetStringFromObj(objv[2], ಖಾಲಿ);
 
-	    pos = NULL;
-	    if (line[0] != '\0'  &&  line[1] == '\0')
-		pos = getmark(line[0], FALSE);
-	    if (pos == NULL)
+	    pos = ಖಾಲಿ;
+	    ಆದರೆ (ಸಾಲು[0] != '\0'  &&  ಸಾಲು[1] == '\0')
+		pos = getmark(ಸಾಲು[0], FALSE);
+	    ಆದರೆ (pos == ಖಾಲಿ)
 	    {
-		Tcl_SetResult(interp, _("invalid mark name"), TCL_STATIC);
+		Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, _("invalid mark name"), TCL_STATIC);
 		err = TCL_ERROR;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	    err = vimerror(interp);
-	    if (err != TCL_OK)
-		break;
-	    if (pos->lnum <= 0)
+	    ಆದರೆ (err != TCL_OK)
+		ನಿಲ್ಲಿಸು;
+	    ಆದರೆ (pos->lnum <= 0)
 	    {
-		Tcl_SetResult(interp, _("mark not set"), TCL_STATIC);
+		Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, _("mark not set"), TCL_STATIC);
 		err = TCL_ERROR;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		char rbuf[64];
+		ಅಕ್ಷರ rbuf[64];
 
 		sprintf(rbuf, _("row %d column %d"),
-			     (int)row2tcl(pos->lnum), (int)col2tcl(pos->col));
-		Tcl_SetResult(interp, rbuf, TCL_VOLATILE);
+			     (ಪೂರ್ಣಾಂಕ)row2tcl(pos->lnum), (ಪೂರ್ಣಾಂಕ)col2tcl(pos->ಲಂಬಸಾಲು));
+		Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, rbuf, TCL_VOLATILE);
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	case BUF_INSERT:
+	ಸ್ಥಿತಿ BUF_ಸೇರಿಸು:
 	    opt = 1;
 	    // fallthrough
-	case BUF_APPEND:
-	    if (objc != 4)
+	ಸ್ಥಿತಿ BUF_APPEND:
+	    ಆದರೆ (objc != 4)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "lineNum text");
+		Tcl_Wrong_ಅಂಕೆ_ವಾದಗಳು(interp, 2, objv, "lineNum text");
 		err = TCL_ERROR;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	    err = tclgetlinenum(interp, objv[2], &val1, buf);
-	    if (err != TCL_OK)
-		break;
-	    if (opt)
+	    ಆದರೆ (err != TCL_OK)
+		ನಿಲ್ಲಿಸು;
+	    ಆದರೆ (opt)
 		--val1;
-	    if (u_save((linenr_T)val1, (linenr_T)(val1+1)) != OK)
+	    ಆದರೆ (u_save((linenr_T)val1, (linenr_T)(val1+1)) != OK)
 	    {
-		Tcl_SetResult(interp, _("cannot save undo information"),
+		Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, _("cannot save undo information"),
 								  TCL_STATIC);
 		err = TCL_ERROR;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 
-	    line = Tcl_GetStringFromObj(objv[3], NULL);
-	    if (ml_append((linenr_T)val1, (char_u *)line, 0, FALSE) != OK)
+	    ಸಾಲು = Tcl_GetStringFromObj(objv[3], ಖಾಲಿ);
+	    ಆದರೆ (ml_append((linenr_T)val1, (char_u *)ಸಾಲು, 0, FALSE) != OK)
 	    {
-		Tcl_SetResult(interp, _("cannot insert/append line"),
+		Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, _("cannot insert/append line"),
 								  TCL_STATIC);
 		err = TCL_ERROR;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	    appended_lines_mark((linenr_T)val1, 1L);
+	    appended_ಸಾಲುಗಳು_mark((linenr_T)val1, 1L);
 	    flags |= FL_UPDATE_SCREEN;
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	case BUF_WINDOWS:
+	ಸ್ಥಿತಿ BUF_WINDOWS:
 	    /*
 	     * Return list of window commands.
 	     */
-	    if (objc != 2)
+	    ಆದರೆ (objc != 2)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, NULL);
+		Tcl_Wrong_ಅಂಕೆ_ವಾದಗಳು(interp, 2, objv, ಖಾಲಿ);
 		err = TCL_ERROR;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	    Tcl_ResetResult(interp);
+	    Tcl_Reset_ಫಲಿತಾಂಶ(interp);
 	    FOR_ALL_WINDOWS(win)
 	    {
-		if (win->w_buffer == buf)
+		ಆದರೆ (win->w_ಬಫರ್ == buf)
 		{
-		    line = tclgetwindow(interp, win);
-		    if (line != NULL)
-			Tcl_AppendElement(interp, line);
-		    else
+		    ಸಾಲು = tclgetwindow(interp, win);
+		    ಆದರೆ (ಸಾಲು != ಖಾಲಿ)
+			Tcl_AppendElement(interp, ಸಾಲು);
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
 			err = TCL_ERROR;
-			break;
+			ನಿಲ್ಲಿಸು;
 		    }
 		}
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	case BUF_DELCMD:
+	ಸ್ಥಿತಿ BUF_DELCMD:
 	    /*
 	     * Register deletion callback.
 	     * TODO: Should be able to register multiple callbacks
 	     */
-	    if (objc != 3)
+	    ಆದರೆ (objc != 3)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "command");
+		Tcl_Wrong_ಅಂಕೆ_ವಾದಗಳು(interp, 2, objv, "command");
 		err = TCL_ERROR;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	    err = tclsetdelcmd(interp, buf->b_tcl_ref, (void *)buf, objv[2]);
-	    break;
+	    err = tclsetdelcmd(interp, buf->b_tcl_ref, (ಶೂನ್ಯ *)buf, objv[2]);
+	    ನಿಲ್ಲಿಸು;
 
-	default:
-	    Tcl_SetResult(interp, _("not implemented yet"), TCL_STATIC);
+	ಪೂರ್ವನಿಯೋಜಿತ:
+	    Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, _("not implemented yet"), TCL_STATIC);
 	    err = TCL_ERROR;
     }
 
-    if (flags & FL_UPDATE_CURBUF)
+    ಆದರೆ (flags & FL_UPDATE_CURBUF)
 	redraw_curbuf_later(UPD_NOT_VALID);
     curbuf = savebuf;
     curwin = savewin;
-    if (flags & FL_ADJUST_CURSOR)
+    ಆದರೆ (flags & FL_ADJUST_CURSOR)
 	check_cursor();
-    if (flags & (FL_UPDATE_SCREEN | FL_UPDATE_CURBUF))
+    ಆದರೆ (flags & (FL_UPDATE_SCREEN | FL_UPDATE_CURBUF))
 	update_screen(UPD_NOT_VALID);
 
-    return err;
+    ಹಿಂತಿರುಗಿ err;
 }
 
 /*
  * This function implements the window commands.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 winselfcmd(
-    ClientData	ref,
+    Client_ದತ್ತಾಂಶ	ref,
     Tcl_Interp	*interp,
-    int		objc,
+    ಪೂರ್ಣಾಂಕ		objc,
     Tcl_Obj	*CONST objv[])
 {
-    int		err, idx, flags;
-    int		val1, val2;
+    ಪೂರ್ಣಾಂಕ		err, idx, flags;
+    ಪೂರ್ಣಾಂಕ		val1, val2;
     Tcl_Obj	*resobj;
     win_T	*savewin, *win;
     buf_T	*savebuf;
-    char	*str;
+    ಅಕ್ಷರ	*str;
 
-    enum
+    ಎಣಿಕೆ
     {
-	WIN_BUFFER, WIN_COMMAND, WIN_CURSOR, WIN_DELCMD, WIN_EXPR,
-	WIN_HEIGHT, WIN_OPTION
+	WIN_ಬಫರ್, WIN_COMMAND, WIN_CURSOR, WIN_DELCMD, WIN_ಅಭಿವ್ಯಕ್ತಿ,
+	WIN_ಎತ್ತರ, WIN_OPTION
     };
-    static CONST84 char *winoptions[] =
+    ಸ್ಥಿರ CONST84 ಅಕ್ಷರ *winoptions[] =
     {
 	"buffer", "command", "cursor", "delcmd", "expr",
-	"height", "option", (char *)0
+	"height", "option", (ಅಕ್ಷರ *)0
     };
 
-    if (objc < 2)
+    ಆದರೆ (objc < 2)
     {
-	Tcl_WrongNumArgs(interp, 1, objv, "option ?arg ...?");
-	return TCL_ERROR;
+	Tcl_Wrong_ಅಂಕೆ_ವಾದಗಳು(interp, 1, objv, "option ?arg ...?");
+	ಹಿಂತಿರುಗಿ TCL_ERROR;
     }
 
-    err = Tcl_GetIndexFromObj(interp, objv[1], winoptions, "option", 0,  &idx);
-    if (err != TCL_OK)
-	return TCL_ERROR;
+    err = Tcl_Get_ಸೂಚ್ಯಂಕ_From_Obj(interp, objv[1], winoptions, "option", 0,  &idx);
+    ಆದರೆ (err != TCL_OK)
+	ಹಿಂತಿರುಗಿ TCL_ERROR;
 
-    win = (win_T *)((struct ref *)ref)->vimobj;
+    win = (win_T *)((ರಚನೆ ref *)ref)->vimobj;
     savewin = curwin;  curwin = win;
-    savebuf = curbuf;  curbuf = win->w_buffer;
+    savebuf = curbuf;  curbuf = win->w_ಬಫರ್;
     flags = 0;
 
-    switch (idx)
+    ಆಯ್ಕೆ (idx)
     {
-	case WIN_OPTION:
+	ಸ್ಥಿತಿ WIN_OPTION:
 	    err = tclsetoption(interp, objc, objv, 2);
 	    flags |= FL_UPDATE_SCREEN;
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	case WIN_COMMAND:
+	ಸ್ಥಿತಿ WIN_COMMAND:
 	    err = tcldoexcommand(interp, objc, objv, 2);
 	    flags |= FL_UPDATE_SCREEN;
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	case WIN_EXPR:
+	ಸ್ಥಿತಿ WIN_ಅಭಿವ್ಯಕ್ತಿ:
 	    err = tclvimexpr(interp, objc, objv, 2);
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	case WIN_HEIGHT:
-	    if (objc == 3)
+	ಸ್ಥಿತಿ WIN_ಎತ್ತರ:
+	    ಆದರೆ (objc == 3)
 	    {
 		err = Tcl_GetIntFromObj(interp, objv[2], &val1);
-		if (err != TCL_OK)
-		    break;
-#ifdef FEAT_GUI
+		ಆದರೆ (err != TCL_OK)
+		    ನಿಲ್ಲಿಸು;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 		need_mouse_correct = TRUE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		win_setheight(val1);
 		err = vimerror(interp);
-		if (err != TCL_OK)
-		    break;
+		ಆದರೆ (err != TCL_OK)
+		    ನಿಲ್ಲಿಸು;
 	    }
-	    else
-	    if (objc != 2)
+	    ಇಲ್ಲದಿದ್ದರೆ
+	    ಆದರೆ (objc != 2)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "?value?");
+		Tcl_Wrong_ಅಂಕೆ_ವಾದಗಳು(interp, 2, objv, "?value?");
 		err = TCL_ERROR;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 
-	    resobj = Tcl_NewIntObj((int)(win->w_height));
-	    Tcl_SetObjResult(interp, resobj);
-	    break;
+	    resobj = Tcl_NewIntObj((ಪೂರ್ಣಾಂಕ)(win->w_ಎತ್ತರ));
+	    Tcl_ಗಣ_Obj_ಫಲಿತಾಂಶ(interp, resobj);
+	    ನಿಲ್ಲಿಸು;
 
-	case WIN_BUFFER:
-	    if (objc != 2)
+	ಸ್ಥಿತಿ WIN_ಬಫರ್:
+	    ಆದರೆ (objc != 2)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, NULL);
+		Tcl_Wrong_ಅಂಕೆ_ವಾದಗಳು(interp, 2, objv, ಖಾಲಿ);
 		err = TCL_ERROR;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	    str = tclgetbuffer(interp, win->w_buffer);
-	    if (str)
-		Tcl_SetResult(interp, str, TCL_VOLATILE);
-	    else
+	    str = tclgetbuffer(interp, win->w_ಬಫರ್);
+	    ಆದರೆ (str)
+		Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, str, TCL_VOLATILE);
+	    ಇಲ್ಲದಿದ್ದರೆ
 		err = TCL_ERROR;
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	case WIN_DELCMD:
-	    if (objc != 3)
+	ಸ್ಥಿತಿ WIN_DELCMD:
+	    ಆದರೆ (objc != 3)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "command");
+		Tcl_Wrong_ಅಂಕೆ_ವಾದಗಳು(interp, 2, objv, "command");
 		err = TCL_ERROR;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	    err = tclsetdelcmd(interp, win->w_tcl_ref, (void *)win, objv[2]);
-	    break;
+	    err = tclsetdelcmd(interp, win->w_tcl_ref, (ಶೂನ್ಯ *)win, objv[2]);
+	    ನಿಲ್ಲಿಸು;
 
-	case WIN_CURSOR:
-	    if (objc > 4)
+	ಸ್ಥಿತಿ WIN_CURSOR:
+	    ಆದರೆ (objc > 4)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "?arg1 ?arg2??");
+		Tcl_Wrong_ಅಂಕೆ_ವಾದಗಳು(interp, 2, objv, "?arg1 ?arg2??");
 		err = TCL_ERROR;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	    if (objc == 2)
+	    ಆದರೆ (objc == 2)
 	    {
-		char buf[64];
+		ಅಕ್ಷರ buf[64];
 
-		sprintf(buf, _("row %d column %d"), (int)row2tcl(win->w_cursor.lnum), (int)col2tcl(win->w_cursor.col));
-		Tcl_SetResult(interp, buf, TCL_VOLATILE);
-		break;
+		sprintf(buf, _("row %d column %d"), (ಪೂರ್ಣಾಂಕ)row2tcl(win->w_cursor.lnum), (ಪೂರ್ಣಾಂಕ)col2tcl(win->w_cursor.ಲಂಬಸಾಲು));
+		Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, buf, TCL_VOLATILE);
+		ನಿಲ್ಲಿಸು;
 	    }
-	    else if (objc == 3)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (objc == 3)
 	    {
 		Tcl_Obj *part, *var;
 
 		part = Tcl_NewStringObj("row", -1);
-		var = Tcl_ObjGetVar2(interp, objv[2], part, TCL_LEAVE_ERR_MSG);
-		if (var == NULL)
+		var = Tcl_ObjGetVar2(interp, objv[2], part, TCL_LEAVE_ERR_ಸಂದೇಶ);
+		ಆದರೆ (var == ಖಾಲಿ)
 		{
 		    err = TCL_ERROR;
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
-		err = tclgetlinenum(interp, var, &val1, win->w_buffer);
-		if (err != TCL_OK)
-		    break;
+		err = tclgetlinenum(interp, var, &val1, win->w_ಬಫರ್);
+		ಆದರೆ (err != TCL_OK)
+		    ನಿಲ್ಲಿಸು;
 		part = Tcl_NewStringObj("column", -1);
-		var = Tcl_ObjGetVar2(interp, objv[2], part, TCL_LEAVE_ERR_MSG);
-		if (var == NULL)
+		var = Tcl_ObjGetVar2(interp, objv[2], part, TCL_LEAVE_ERR_ಸಂದೇಶ);
+		ಆದರೆ (var == ಖಾಲಿ)
 		{
 		    err = TCL_ERROR;
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 		err = Tcl_GetIntFromObj(interp, var, &val2);
-		if (err != TCL_OK)
-		    break;
+		ಆದರೆ (err != TCL_OK)
+		    ನಿಲ್ಲಿಸು;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {  // objc == 4
-		err = tclgetlinenum(interp, objv[2], &val1, win->w_buffer);
-		if (err != TCL_OK)
-		    break;
+		err = tclgetlinenum(interp, objv[2], &val1, win->w_ಬಫರ್);
+		ಆದರೆ (err != TCL_OK)
+		    ನಿಲ್ಲಿಸು;
 		err = Tcl_GetIntFromObj(interp, objv[3], &val2);
-		if (err != TCL_OK)
-		    break;
+		ಆದರೆ (err != TCL_OK)
+		    ನಿಲ್ಲಿಸು;
 	    }
 	    // TODO: should check column
 	    win->w_cursor.lnum = val1;
-	    win->w_cursor.col = col2vim(val2);
-	    win->w_set_curswant = true;
+	    win->w_cursor.ಲಂಬಸಾಲು = col2vim(val2);
+	    win->w_ಗಣ_curswant = true;
 	    flags |= FL_UPDATE_SCREEN;
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	default:
-	    Tcl_SetResult(interp, _("not implemented yet"), TCL_STATIC);
-	    break;
+	ಪೂರ್ವನಿಯೋಜಿತ:
+	    Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, _("not implemented yet"), TCL_STATIC);
+	    ನಿಲ್ಲಿಸು;
     }
 
     curwin = savewin;
     curbuf = savebuf;
-    if (flags & FL_UPDATE_SCREEN)
+    ಆದರೆ (flags & FL_UPDATE_SCREEN)
 	update_screen(UPD_NOT_VALID);
 
-    return err;
+    ಹಿಂತಿರುಗಿ err;
 }
 
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 commandcmd(
-    ClientData	dummy UNUSED,
+    Client_ದತ್ತಾಂಶ	dummy ಬಳಸದ,
     Tcl_Interp	*interp,
-    int		objc,
+    ಪೂರ್ಣಾಂಕ		objc,
     Tcl_Obj	*CONST objv[])
 {
-    int		err;
+    ಪೂರ್ಣಾಂಕ		err;
 
     err = tcldoexcommand(interp, objc, objv, 1);
     update_screen(UPD_VALID);
-    return err;
+    ಹಿಂತಿರುಗಿ err;
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 optioncmd(
-    ClientData	dummy UNUSED,
+    Client_ದತ್ತಾಂಶ	dummy ಬಳಸದ,
     Tcl_Interp	*interp,
-    int		objc,
+    ಪೂರ್ಣಾಂಕ		objc,
     Tcl_Obj	*CONST objv[])
 {
-    int		err;
+    ಪೂರ್ಣಾಂಕ		err;
 
     err = tclsetoption(interp, objc, objv, 1);
     update_screen(UPD_VALID);
-    return err;
+    ಹಿಂತಿರುಗಿ err;
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 exprcmd(
-    ClientData	dummy UNUSED,
+    Client_ದತ್ತಾಂಶ	dummy ಬಳಸದ,
     Tcl_Interp	*interp,
-    int		objc,
+    ಪೂರ್ಣಾಂಕ		objc,
     Tcl_Obj	*CONST objv[])
 {
-    return tclvimexpr(interp, objc, objv, 1);
+    ಹಿಂತಿರುಗಿ tclvimexpr(interp, objc, objv, 1);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1166,271 +1166,271 @@ exprcmd(
 /*
  * Get a line number from 'obj' and convert it to vim's range.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 tclgetlinenum(
     Tcl_Interp	*interp,
     Tcl_Obj	*obj,
-    int		*valueP,
+    ಪೂರ್ಣಾಂಕ		*ಮೌಲ್ಯ_P,
     buf_T	*buf)
 {
-    int err, i;
+    ಪೂರ್ಣಾಂಕ err, i;
 
-    enum { LN_BEGIN, LN_BOTTOM, LN_END, LN_FIRST, LN_LAST, LN_START, LN_TOP };
+    ಎಣಿಕೆ { LN_BEGIN, LN_BOTTOM, LN_ಕೊನೆ, LN_ಮೊದಲ, LN_ಕೊನೆಯ, LN_ಆರಂಭ, LN_ತುದಿ };
 
-    static CONST84 char *keyw[] =
+    ಸ್ಥಿರ CONST84 ಅಕ್ಷರ *keyw[] =
     {
-	"begin", "bottom", "end", "first", "last", "start", "top", (char *)0
+	"begin", "bottom", "end", "first", "last", "start", "top", (ಅಕ್ಷರ *)0
     };
 
-    err = Tcl_GetIndexFromObj(interp, obj, keyw, "", 0, &i);
-    if (err == TCL_OK)
+    err = Tcl_Get_ಸೂಚ್ಯಂಕ_From_Obj(interp, obj, keyw, "", 0, &i);
+    ಆದರೆ (err == TCL_OK)
     {
-	switch (i)
+	ಆಯ್ಕೆ (i)
 	{
-	    case LN_BEGIN:
-	    case LN_FIRST:
-	    case LN_START:
-	    case LN_TOP:
-		*valueP = 1;
-		break;
-	    case LN_BOTTOM:
-	    case LN_END:
-	    case LN_LAST:
-		*valueP = buf->b_ml.ml_line_count;
-		break;
+	    ಸ್ಥಿತಿ LN_BEGIN:
+	    ಸ್ಥಿತಿ LN_ಮೊದಲ:
+	    ಸ್ಥಿತಿ LN_ಆರಂಭ:
+	    ಸ್ಥಿತಿ LN_ತುದಿ:
+		*ಮೌಲ್ಯ_P = 1;
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ LN_BOTTOM:
+	    ಸ್ಥಿತಿ LN_ಕೊನೆ:
+	    ಸ್ಥಿತಿ LN_ಕೊನೆಯ:
+		*ಮೌಲ್ಯ_P = buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
+		ನಿಲ್ಲಿಸು;
 	}
-	return TCL_OK;
+	ಹಿಂತಿರುಗಿ TCL_OK;
     }
-    Tcl_ResetResult(interp);
+    Tcl_Reset_ಫಲಿತಾಂಶ(interp);
 
     err = Tcl_GetIntFromObj(interp, obj, &i);
-    if (err != TCL_OK)
-	return err;
+    ಆದರೆ (err != TCL_OK)
+	ಹಿಂತಿರುಗಿ err;
     i = row2vim(i);
-    if (i < 1  ||  i > buf->b_ml.ml_line_count)
+    ಆದರೆ (i < 1  ||  i > buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
     {
-	Tcl_SetResult(interp, _("line number out of range"), TCL_STATIC);
-	return TCL_ERROR;
+	Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, _("line number out of range"), TCL_STATIC);
+	ಹಿಂತಿರುಗಿ TCL_ERROR;
     }
-    *valueP = i;
-    return TCL_OK;
+    *ಮೌಲ್ಯ_P = i;
+    ಹಿಂತಿರುಗಿ TCL_OK;
 }
 
 /*
  * Find the first window in the window list that displays the buffer.
  */
-    static win_T *
+    ಸ್ಥಿರ win_T *
 tclfindwin(buf_T *buf)
 {
     win_T *win;
 
     FOR_ALL_WINDOWS(win)
     {
-	if (win->w_buffer == buf)
-	    return win;
+	ಆದರೆ (win->w_ಬಫರ್ == buf)
+	    ಹಿಂತಿರುಗಿ win;
     }
-    return curwin;  // keep current window context
+    ಹಿಂತಿರುಗಿ curwin;  // keep current window context
 }
 
 /*
  * Do-it-all function for "::vim::command", "$buf command" and "$win command".
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 tcldoexcommand(
     Tcl_Interp	*interp,
-    int		objc,
+    ಪೂರ್ಣಾಂಕ		objc,
     Tcl_Obj	*CONST objv[],
-    int		objn)
+    ಪೂರ್ಣಾಂಕ		objn)
 {
     tcl_info	saveinfo;
-    int		err, flag, nobjs;
-    char	*arg;
+    ಪೂರ್ಣಾಂಕ		err, flag, nobjs;
+    ಅಕ್ಷರ	*arg;
 
     nobjs = objc - objn;
-    if (nobjs < 1 || nobjs > 2)
+    ಆದರೆ (nobjs < 1 || nobjs > 2)
     {
-	Tcl_WrongNumArgs(interp, objn, objv, "?-quiet? exCommand");
-	return TCL_ERROR;
+	Tcl_Wrong_ಅಂಕೆ_ವಾದಗಳು(interp, objn, objv, "?-quiet? exCommand");
+	ಹಿಂತಿರುಗಿ TCL_ERROR;
     }
 
     flag = 0;
-    if (nobjs == 2)
+    ಆದರೆ (nobjs == 2)
     {
-	arg = Tcl_GetStringFromObj(objv[objn], NULL);
-	if (strcmp(arg, "-quiet") == 0)
+	arg = Tcl_GetStringFromObj(objv[objn], ಖಾಲಿ);
+	ಆದರೆ (strcmp(arg, "-quiet") == 0)
 	    flag = 1;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    Tcl_ResetResult(interp);
-	    Tcl_AppendResult(interp, _("unknown flag: "), arg, (char *)0);
-	    return TCL_ERROR;
+	    Tcl_Reset_ಫಲಿತಾಂಶ(interp);
+	    Tcl_Append_ಫಲಿತಾಂಶ(interp, _("unknown flag: "), arg, (ಅಕ್ಷರ *)0);
+	    ಹಿಂತಿರುಗಿ TCL_ERROR;
 	}
 	++objn;
     }
 
-    memcpy(&saveinfo, &tclinfo, sizeof(tcl_info));
-    tclinfo.interp = NULL;
-    tclinfo.curwin = NULL;
-    tclinfo.curbuf = NULL;
+    ಸ್ಮರಣೆ_ನಕಲು(&saveinfo, &tclinfo, ಗಾತ್ರ(tcl_info));
+    tclinfo.interp = ಖಾಲಿ;
+    tclinfo.curwin = ಖಾಲಿ;
+    tclinfo.curbuf = ಖಾಲಿ;
 
-    arg = Tcl_GetStringFromObj(objv[objn], NULL);
-    if (flag)
+    arg = Tcl_GetStringFromObj(objv[objn], ಖಾಲಿ);
+    ಆದರೆ (flag)
 	++emsg_off;
     do_cmdline_cmd((char_u *)arg);
-    if (flag)
+    ಆದರೆ (flag)
 	--emsg_off;
     err = vimerror(interp);
 
     // If the ex command created a new Tcl interpreter, remove it
-    if (tclinfo.interp)
+    ಆದರೆ (tclinfo.interp)
 	tcldelthisinterp();
-    memcpy(&tclinfo, &saveinfo, sizeof(tcl_info));
+    ಸ್ಮರಣೆ_ನಕಲು(&tclinfo, &saveinfo, ಗಾತ್ರ(tcl_info));
     tclupdatevars();
 
-    return err;
+    ಹಿಂತಿರುಗಿ err;
 }
 
 /*
  * Do-it-all function for "::vim::option", "$buf option" and "$win option".
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 tclsetoption(
     Tcl_Interp	*interp,
-    int		objc,
+    ಪೂರ್ಣಾಂಕ		objc,
     Tcl_Obj	*CONST objv[],
-    int		objn)
+    ಪೂರ್ಣಾಂಕ		objn)
 {
-    int		err, nobjs, idx;
+    ಪೂರ್ಣಾಂಕ		err, nobjs, idx;
     char_u	*option;
     getoption_T	gov;
-    long	lval;
+    ದೀರ್ಘ	lval;
     char_u	*sval;
     Tcl_Obj	*resobj;
 
-    enum { OPT_OFF, OPT_ON, OPT_TOGGLE };
-    static CONST84 char *optkw[] = { "off", "on", "toggle", (char *)0 };
+    ಎಣಿಕೆ { OPT_OFF, OPT_ON, OPT_TOGGLE };
+    ಸ್ಥಿರ CONST84 ಅಕ್ಷರ *optkw[] = { "off", "on", "toggle", (ಅಕ್ಷರ *)0 };
 
     nobjs = objc - objn;
-    if (nobjs != 1 && nobjs != 2)
+    ಆದರೆ (nobjs != 1 && nobjs != 2)
     {
-	Tcl_WrongNumArgs(interp, objn, objv, "vimOption ?value?");
-	return TCL_ERROR;
+	Tcl_Wrong_ಅಂಕೆ_ವಾದಗಳು(interp, objn, objv, "vimOption ?value?");
+	ಹಿಂತಿರುಗಿ TCL_ERROR;
     }
 
-    option = (char_u *)Tcl_GetStringFromObj(objv[objn], NULL);
+    option = (char_u *)Tcl_GetStringFromObj(objv[objn], ಖಾಲಿ);
     ++objn;
-    gov = get_option_value(option, &lval, &sval, NULL, 0);
+    gov = get_option_ಮೌಲ್ಯ(option, &lval, &sval, ಖಾಲಿ, 0);
     err = TCL_OK;
-    switch (gov)
+    ಆಯ್ಕೆ (gov)
     {
-	case gov_string:
-	    Tcl_SetResult(interp, (char *)sval, TCL_VOLATILE);
+	ಸ್ಥಿತಿ gov_string:
+	    Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, (ಅಕ್ಷರ *)sval, TCL_VOLATILE);
 	    vim_free(sval);
-	    break;
-	case gov_bool:
-	case gov_number:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ gov_bool:
+	ಸ್ಥಿತಿ gov_ಸಂಖ್ಯೆ:
 	    resobj = Tcl_NewLongObj(lval);
-	    Tcl_SetObjResult(interp, resobj);
-	    break;
-	default:
-	    Tcl_SetResult(interp, _("unknown vimOption"), TCL_STATIC);
-	    return TCL_ERROR;
+	    Tcl_ಗಣ_Obj_ಫಲಿತಾಂಶ(interp, resobj);
+	    ನಿಲ್ಲಿಸು;
+	ಪೂರ್ವನಿಯೋಜಿತ:
+	    Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, _("unknown vimOption"), TCL_STATIC);
+	    ಹಿಂತಿರುಗಿ TCL_ERROR;
     }
-    if (nobjs == 2)
+    ಆದರೆ (nobjs == 2)
     {
-	if (gov != gov_string)
+	ಆದರೆ (gov != gov_string)
 	{
-	    sval = NULL;    // avoid compiler warning
-	    err = Tcl_GetIndexFromObj(interp, objv[objn], optkw, "", 0, &idx);
-	    if (err != TCL_OK)
+	    sval = ಖಾಲಿ;    // avoid compiler warning
+	    err = Tcl_Get_ಸೂಚ್ಯಂಕ_From_Obj(interp, objv[objn], optkw, "", 0, &idx);
+	    ಆದರೆ (err != TCL_OK)
 	    {
-		Tcl_ResetResult(interp);
+		Tcl_Reset_ಫಲಿತಾಂಶ(interp);
 		err = Tcl_GetLongFromObj(interp, objv[objn], &lval);
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		switch (idx)
+		ಆಯ್ಕೆ (idx)
 		{
-		    case OPT_ON:
+		    ಸ್ಥಿತಿ OPT_ON:
 			lval = 1;
-			break;
-		    case OPT_OFF:
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ OPT_OFF:
 			lval = 0;
-			break;
-		    case OPT_TOGGLE:
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ OPT_TOGGLE:
 			lval = !lval;
-			break;
+			ನಿಲ್ಲಿಸು;
 		}
 	    }
 	}
-	else
-	    sval = (char_u *)Tcl_GetStringFromObj(objv[objn], NULL);
-	if (err == TCL_OK)
+	ಇಲ್ಲದಿದ್ದರೆ
+	    sval = (char_u *)Tcl_GetStringFromObj(objv[objn], ಖಾಲಿ);
+	ಆದರೆ (err == TCL_OK)
 	{
-	    set_option_value_give_err(option, lval, sval, OPT_LOCAL);
+	    ಗಣ_option_ಮೌಲ್ಯ_give_err(option, lval, sval, OPT_LOCAL);
 	    err = vimerror(interp);
 	}
     }
-    return err;
+    ಹಿಂತಿರುಗಿ err;
 }
 
 /*
  * Do-it-all function for "::vim::expr", "$buf expr" and "$win expr".
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 tclvimexpr(
     Tcl_Interp	*interp,
-    int		objc,
+    ಪೂರ್ಣಾಂಕ		objc,
     Tcl_Obj	*CONST objv[],
-    int		objn)
+    ಪೂರ್ಣಾಂಕ		objn)
 {
-#ifdef FEAT_EVAL
-    char	*expr, *str;
-#endif
-    int		err;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಅಕ್ಷರ	*ಅಭಿವ್ಯಕ್ತಿ, *str;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಪೂರ್ಣಾಂಕ		err;
 
-    if (objc - objn != 1)
+    ಆದರೆ (objc - objn != 1)
     {
-	Tcl_WrongNumArgs(interp, objn, objv, "vimExpr");
-	return TCL_ERROR;
+	Tcl_Wrong_ಅಂಕೆ_ವಾದಗಳು(interp, objn, objv, "vimExpr");
+	ಹಿಂತಿರುಗಿ TCL_ERROR;
     }
 
-#ifdef FEAT_EVAL
-    expr = Tcl_GetStringFromObj(objv[objn], NULL);
-    str = (char *)eval_to_string((char_u *)expr, TRUE, FALSE);
-    if (str == NULL)
-	Tcl_SetResult(interp, _("invalid expression"), TCL_STATIC);
-    else
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಅಭಿವ್ಯಕ್ತಿ = Tcl_GetStringFromObj(objv[objn], ಖಾಲಿ);
+    str = (ಅಕ್ಷರ *)eval_ಗಮ್ಯ_string((char_u *)ಅಭಿವ್ಯಕ್ತಿ, TRUE, FALSE);
+    ಆದರೆ (str == ಖಾಲಿ)
+	Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, _("invalid expression"), TCL_STATIC);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	Tcl_SetResult(interp, str, TCL_VOLATILE);
+	Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, str, TCL_VOLATILE);
 	vim_free(str);
     }
     err = vimerror(interp);
-#else
-    Tcl_SetResult(interp, _("expressions disabled at compile time"), TCL_STATIC);
+#ಇಲ್ಲದಿದ್ದರೆ
+    Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, _("expressions disabled at compile time"), TCL_STATIC);
     err = TCL_ERROR;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return err;
+    ಹಿಂತಿರುಗಿ err;
 }
 
 /*
  * Check for internal vim errors.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 vimerror(Tcl_Interp *interp)
 {
-    if (got_int)
+    ಆದರೆ (got_int)
     {
-	Tcl_SetResult(interp, _("keyboard interrupt"), TCL_STATIC);
-	return TCL_ERROR;
+	Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, _("keyboard interrupt"), TCL_STATIC);
+	ಹಿಂತಿರುಗಿ TCL_ERROR;
     }
-    else if (did_emsg)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (did_emsg)
     {
-	Tcl_SetResult(interp, _("Vim error"), TCL_STATIC);
-	return TCL_ERROR;
+	Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, _("Vim error"), TCL_STATIC);
+	ಹಿಂತಿರುಗಿ TCL_ERROR;
     }
-    return TCL_OK;
+    ಹಿಂತಿರುಗಿ TCL_OK;
 }
 
 /*
@@ -1441,120 +1441,120 @@ vimerror(Tcl_Interp *interp)
  *   tclgetbuffer() - buffer frontend for tclgetref()
  *   tclsetdelcmd() - add Tcl callback command to a vim object
  */
-    static void
-delref(ClientData cref)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+delref(Client_ದತ್ತಾಂಶ cref)
 {
-    struct ref *ref = (struct ref *)cref;
+    ರಚನೆ ref *ref = (ರಚನೆ ref *)cref;
 
-    if (ref->delcmd)
+    ಆದರೆ (ref->delcmd)
     {
-	Tcl_DecrRefCount(ref->delcmd);
-	ref->delcmd = NULL;
+	Tcl_Decr_Ref_ಎಣಿಕೆ(ref->delcmd);
+	ref->delcmd = ಖಾಲಿ;
     }
-    ref->interp = NULL;
+    ref->interp = ಖಾಲಿ;
 }
 
-    static char *
+    ಸ್ಥಿರ ಅಕ್ಷರ *
 tclgetref(
     Tcl_Interp	*interp,
-    void	**refstartP,	// ptr to w_tcl_ref/b_tcl-ref member of
+    ಶೂನ್ಯ	**refstartP,	// ptr to w_tcl_ref/b_tcl-ref member of
 				// win_T/buf_T struct
-    char	*prefix,	// "win" or "buf"
-    void	*vimobj,	// win_T* or buf_T*
+    ಅಕ್ಷರ	*ಪೂರ್ವಪ್ರತ್ಯಯ,	// "win" or "buf"
+    ಶೂನ್ಯ	*vimobj,	// win_T* or buf_T*
     Tcl_ObjCmdProc *proc)	// winselfcmd or bufselfcmd
 {
-    struct ref *ref, *unused = NULL;
-    static char name[VARNAME_SIZE];
+    ರಚನೆ ref *ref, *ಬಳಸದ_2 = ಖಾಲಿ;
+    ಸ್ಥಿರ ಅಕ್ಷರ name[VARNAME_ಗಾತ್ರ];
     Tcl_Command cmd;
 
-    ref = (struct ref *)(*refstartP);
-    if (ref == &refsdeleted)
+    ref = (ರಚನೆ ref *)(*refstartP);
+    ಆದರೆ (ref == &refsdeleted)
     {
-	Tcl_SetResult(interp, _("cannot create buffer/window command: object is being deleted"), TCL_STATIC);
-	return NULL;
+	Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, _("cannot create buffer/window command: object is being deleted"), TCL_STATIC);
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    while (ref != NULL)
+    ಆಗ (ref != ಖಾಲಿ)
     {
-	if (ref->interp == interp)
-	    break;
-	if (ref->interp == NULL)
-	    unused = ref;
-	ref = ref->next;
+	ಆದರೆ (ref->interp == interp)
+	    ನಿಲ್ಲಿಸು;
+	ಆದರೆ (ref->interp == ಖಾಲಿ)
+	    ಬಳಸದ_2 = ref;
+	ref = ref->ಮುಂದಿನ;
     }
 
-    if (ref)
-	vim_snprintf(name, sizeof(name), "::vim::%s",
+    ಆದರೆ (ref)
+	vim_snprintf(name, ಗಾತ್ರ(name), "::vim::%s",
 					Tcl_GetCommandName(interp, ref->cmd));
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (unused)
-	    ref = unused;
-	else
+	ಆದರೆ (ಬಳಸದ_2)
+	    ref = ಬಳಸದ_2;
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    ref = (struct ref *)Tcl_Alloc(sizeof(struct ref));
-	    ref->interp = NULL;
-	    ref->next = (struct ref *)(*refstartP);
-	    (*refstartP) = (void *)ref;
+	    ref = (ರಚನೆ ref *)Tcl_Alloc(ಗಾತ್ರ(ರಚನೆ ref));
+	    ref->interp = ಖಾಲಿ;
+	    ref->ಮುಂದಿನ = (ರಚನೆ ref *)(*refstartP);
+	    (*refstartP) = (ಶೂನ್ಯ *)ref;
 	}
 
 	// This might break on some exotic systems...
-	vim_snprintf(name, sizeof(name), "::vim::%s_%lx",
-					       prefix, (unsigned long)vimobj);
+	vim_snprintf(name, ಗಾತ್ರ(name), "::vim::%s_%lx",
+					       ಪೂರ್ವಪ್ರತ್ಯಯ, (ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ)vimobj);
 	cmd = Tcl_CreateObjCommand(interp, name, proc,
-	    (ClientData)ref, (Tcl_CmdDeleteProc *)delref);
-	if (!cmd)
-	    return NULL;
+	    (Client_ದತ್ತಾಂಶ)ref, (Tcl_CmdDeleteProc *)delref);
+	ಆದರೆ (!cmd)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
 	ref->interp = interp;
 	ref->cmd = cmd;
-	ref->delcmd = NULL;
+	ref->delcmd = ಖಾಲಿ;
 	ref->vimobj = vimobj;
     }
-    return name;
+    ಹಿಂತಿರುಗಿ name;
 }
 
-    static char *
+    ಸ್ಥಿರ ಅಕ್ಷರ *
 tclgetwindow(Tcl_Interp *interp, win_T *win)
 {
-    return tclgetref(interp, &(win->w_tcl_ref), "win", (void *)win, winselfcmd);
+    ಹಿಂತಿರುಗಿ tclgetref(interp, &(win->w_tcl_ref), "win", (ಶೂನ್ಯ *)win, winselfcmd);
 }
 
-    static char *
+    ಸ್ಥಿರ ಅಕ್ಷರ *
 tclgetbuffer(Tcl_Interp *interp, buf_T *buf)
 {
-    return tclgetref(interp, &(buf->b_tcl_ref), "buf", (void *)buf, bufselfcmd);
+    ಹಿಂತಿರುಗಿ tclgetref(interp, &(buf->b_tcl_ref), "buf", (ಶೂನ್ಯ *)buf, bufselfcmd);
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 tclsetdelcmd(
     Tcl_Interp	*interp,
-    struct ref	*reflist,
-    void	*vimobj,
+    ರಚನೆ ref	*reflist,
+    ಶೂನ್ಯ	*vimobj,
     Tcl_Obj	*delcmd)
 {
-    if (reflist == &refsdeleted)
+    ಆದರೆ (reflist == &refsdeleted)
     {
-	Tcl_SetResult(interp, _("cannot register callback command: buffer/window is already being deleted"), TCL_STATIC);
-	return TCL_ERROR;
+	Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, _("cannot register callback command: buffer/window is already being deleted"), TCL_STATIC);
+	ಹಿಂತಿರುಗಿ TCL_ERROR;
     }
 
-    while (reflist != NULL)
+    ಆಗ (reflist != ಖಾಲಿ)
     {
-	if (reflist->interp == interp && reflist->vimobj == vimobj)
+	ಆದರೆ (reflist->interp == interp && reflist->vimobj == vimobj)
 	{
-	    if (reflist->delcmd)
-		Tcl_DecrRefCount(reflist->delcmd);
-	    Tcl_IncrRefCount(delcmd);
+	    ಆದರೆ (reflist->delcmd)
+		Tcl_Decr_Ref_ಎಣಿಕೆ(reflist->delcmd);
+	    Tcl_Incr_Ref_ಎಣಿಕೆ(delcmd);
 	    reflist->delcmd = delcmd;
-	    return TCL_OK;
+	    ಹಿಂತಿರುಗಿ TCL_OK;
 	}
-	reflist = reflist->next;
+	reflist = reflist->ಮುಂದಿನ;
     }
     // This should never happen.  Famous last word?
     iemsg(e_tcl_fatal_error_reflist_corrupt_please_report_this);
-    Tcl_SetResult(interp, _("cannot register callback command: buffer/window reference not found"), TCL_STATIC);
-    return TCL_ERROR;
+    Tcl_ಗಣ_ಫಲಿತಾಂಶ(interp, _("cannot register callback command: buffer/window reference not found"), TCL_STATIC);
+    ಹಿಂತಿರುಗಿ TCL_ERROR;
 }
 
 
@@ -1562,133 +1562,133 @@ tclsetdelcmd(
 //    I/O Channel
 ////////////////////////////////////////////
 
-    static int
-tcl_channel_close(ClientData instance, Tcl_Interp *interp UNUSED)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+tcl_channel_close(Client_ದತ್ತಾಂಶ instance, Tcl_Interp *interp ಬಳಸದ)
 {
-    int		err = 0;
+    ಪೂರ್ಣಾಂಕ		err = 0;
 
     // currently does nothing
 
-    if (instance != VIMOUT && instance != VIMERR)
+    ಆದರೆ (instance != VIMOUT && instance != VIMERR)
     {
-	Tcl_SetErrno(EBADF);
+	Tcl_ಗಣ_Errno(EBADF);
 	err = EBADF;
     }
-    return err;
+    ಹಿಂತಿರುಗಿ err;
 }
 
-    static int
-tcl_channel_input(
-    ClientData	instance UNUSED,
-    char	*buf UNUSED,
-    int		bufsiz UNUSED,
-    int		*errptr)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+tcl_channel_ಒಳಹರಿವು(
+    Client_ದತ್ತಾಂಶ	instance ಬಳಸದ,
+    ಅಕ್ಷರ	*buf ಬಳಸದ,
+    ಪೂರ್ಣಾಂಕ		bufsiz ಬಳಸದ,
+    ಪೂರ್ಣಾಂಕ		*errptr)
 {
 
     // input is currently not supported
 
-    Tcl_SetErrno(EINVAL);
-    if (errptr)
+    Tcl_ಗಣ_Errno(EINVAL);
+    ಆದರೆ (errptr)
 	*errptr = EINVAL;
-    return -1;
+    ಹಿಂತಿರುಗಿ -1;
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 tcl_channel_output(
-    ClientData	instance,
-    const char	*buf,
-    int		bufsiz,
-    int		*errptr)
+    Client_ದತ್ತಾಂಶ	instance,
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ	*buf,
+    ಪೂರ್ಣಾಂಕ		bufsiz,
+    ಪೂರ್ಣಾಂಕ		*errptr)
 {
     char_u	*str;
-    int		result;
+    ಪೂರ್ಣಾಂಕ		ಫಲಿತಾಂಶ;
 
     // The buffer is not guaranteed to be 0-terminated, and we don't if
     // there is enough room to add a '\0'.  So we have to create a copy
     // of the buffer...
     str = vim_strnsave((char_u *)buf, bufsiz);
-    if (!str)
+    ಆದರೆ (!str)
     {
-	Tcl_SetErrno(ENOMEM);
-	if (errptr)
+	Tcl_ಗಣ_Errno(ENOMEM);
+	ಆದರೆ (errptr)
 	    *errptr = ENOMEM;
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 
-    result = bufsiz;
-    if (instance == VIMOUT)
-	tclmsg((char *)str);
-    else
-    if (instance == VIMERR)
-	tclerrmsg((char *)str);
-    else
+    ಫಲಿತಾಂಶ = bufsiz;
+    ಆದರೆ (instance == VIMOUT)
+	tclmsg((ಅಕ್ಷರ *)str);
+    ಇಲ್ಲದಿದ್ದರೆ
+    ಆದರೆ (instance == VIMERR)
+	tclerrmsg((ಅಕ್ಷರ *)str);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	Tcl_SetErrno(EBADF);
-	if (errptr)
+	Tcl_ಗಣ_Errno(EBADF);
+	ಆದರೆ (errptr)
 	    *errptr = EBADF;
-	result = -1;
+	ಫಲಿತಾಂಶ = -1;
     }
     vim_free(str);
-    return result;
+    ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
 }
 
-    static void
-tcl_channel_watch(ClientData instance UNUSED, int mask UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+tcl_channel_watch(Client_ದತ್ತಾಂಶ instance ಬಳಸದ, ಪೂರ್ಣಾಂಕ ಮುಖವಾಡ ಬಳಸದ)
 {
-    Tcl_SetErrno(EINVAL);
+    Tcl_ಗಣ_Errno(EINVAL);
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 tcl_channel_gethandle(
-    ClientData	instance UNUSED,
-    int		direction UNUSED,
-    ClientData	*handleptr UNUSED)
+    Client_ದತ್ತಾಂಶ	instance ಬಳಸದ,
+    ಪೂರ್ಣಾಂಕ		direction ಬಳಸದ,
+    Client_ದತ್ತಾಂಶ	*handleptr ಬಳಸದ)
 {
-    Tcl_SetErrno(EINVAL);
-    return EINVAL;
+    Tcl_ಗಣ_Errno(EINVAL);
+    ಹಿಂತಿರುಗಿ EINVAL;
 }
 
 
-static Tcl_ChannelType tcl_channel_type =
+ಸ್ಥಿರ Tcl_ChannelType tcl_channel_type =
 {
     "vimmessage",	// typeName
-    TCL_CHANNEL_VERSION_2, // version
+    TCL_CHANNEL_ಆವೃತ್ತಿ_2, //ಆವೃತ್ತಿ
     tcl_channel_close,	// closeProc
-    tcl_channel_input,	// inputProc
+    tcl_channel_ಒಳಹರಿವು,	// inputProc
     tcl_channel_output,	// outputProc
-    NULL,		// seekProc
-    NULL,		// setOptionProc
-    NULL,		// getOptionProc
+    ಖಾಲಿ,		// seekProc
+    ಖಾಲಿ,		// setOptionProc
+    ಖಾಲಿ,		// getOptionProc
     tcl_channel_watch,	// watchProc
     tcl_channel_gethandle, // getHandleProc
-    NULL,		// close2Proc
-    NULL,		// blockModeProc
-#ifdef TCL_CHANNEL_VERSION_2
-    NULL,		// flushProc
-    NULL,		// handlerProc
-#endif
+    ಖಾಲಿ,		// close2Proc
+    ಖಾಲಿ,		// blockModeProc
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TCL_CHANNEL_ಆವೃತ್ತಿ_2
+    ಖಾಲಿ,		// flushProc
+    ಖಾಲಿ,		// handlerProc
+#ಆದರೆ_ಅಂತ್ಯ
 // The following should not be necessary since TCL_CHANNEL_VERSION_2 was
 // set above
-#ifdef TCL_CHANNEL_VERSION_3
-    NULL,		// wideSeekProc
-#endif
-#ifdef TCL_CHANNEL_VERSION_4
-    NULL,		// threadActionProc
-#endif
-#ifdef TCL_CHANNEL_VERSION_5
-    NULL		// truncateProc
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TCL_CHANNEL_ಆವೃತ್ತಿ_3
+    ಖಾಲಿ,		// wideSeekProc
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TCL_CHANNEL_ಆವೃತ್ತಿ_4
+    ಖಾಲಿ,		// threadActionProc
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TCL_CHANNEL_ಆವೃತ್ತಿ_5
+    ಖಾಲಿ		// truncateProc
+#ಆದರೆ_ಅಂತ್ಯ
 };
 
 ///////////////////////////////////
 // Interface to vim
 //////////////////////////////////
 
-    static void
-tclupdatevars(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+tclupdatevars(ಶೂನ್ಯ)
 {
-    char varname[VARNAME_SIZE];	// must be writeable
-    char *name;
+    ಅಕ್ಷರ varname[VARNAME_ಗಾತ್ರ];	// must be writeable
+    ಅಕ್ಷರ *name;
 
     strcpy(varname, VAR_RANGE1);
     Tcl_UpdateLinkedVar(tclinfo.interp, varname);
@@ -1712,149 +1712,149 @@ tclupdatevars(void)
 }
 
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 tclinit(exarg_T *eap)
 {
-    char varname[VARNAME_SIZE];	// Tcl_LinkVar requires writeable varname
-    char *name;
+    ಅಕ್ಷರ varname[VARNAME_ಗಾತ್ರ];	// Tcl_LinkVar requires writeable varname
+    ಅಕ್ಷರ *name;
 
-#ifdef DYNAMIC_TCL
-    if (!tcl_enabled(TRUE))
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DYNAMIC_TCL
+    ಆದರೆ (!tcl_enabled(TRUE))
     {
 	emsg(_(e_sorry_this_command_is_disabled_tcl_library_could_not_be_loaded));
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (!tclinfo.interp)
+    ಆದರೆ (!tclinfo.interp)
     {
 	Tcl_Interp *interp;
-	static Tcl_Channel ch1, ch2;
+	ಸ್ಥಿರ Tcl_Channel ch1, ch2;
 
 	// Create replacement channels for stdout and stderr; this has to be
 	// done each time an interpreter is created since the channels are closed
 	// when the interpreter is deleted
 	ch1 = Tcl_CreateChannel(&tcl_channel_type, "vimout", VIMOUT, TCL_WRITABLE);
 	ch2 = Tcl_CreateChannel(&tcl_channel_type, "vimerr", VIMERR, TCL_WRITABLE);
-	Tcl_SetStdChannel(ch1, TCL_STDOUT);
-	Tcl_SetStdChannel(ch2, TCL_STDERR);
+	Tcl_ಗಣ_Std_Channel(ch1, TCL_STDOUT);
+	Tcl_ಗಣ_Std_Channel(ch2, TCL_STDERR);
 
 	interp = Tcl_CreateInterp();
 	Tcl_Preserve(interp);
-	if (Tcl_Init(interp) == TCL_ERROR)
+	ಆದರೆ (Tcl_Init(interp) == TCL_ERROR)
 	{
 	    Tcl_Release(interp);
 	    Tcl_DeleteInterp(interp);
-	    return FAIL;
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
-#if 0
+#ಆದರೆ 0
 	// VIM sure is interactive
-	Tcl_SetVar(interp, "tcl_interactive", "1", TCL_GLOBAL_ONLY);
-#endif
+	Tcl_ಗಣ_Var(interp, "tcl_interactive", "1", TCL_GLOBAL_ONLY);
+#ಆದರೆ_ಅಂತ್ಯ
 
-	Tcl_SetChannelOption(interp, ch1, "-buffering", "line");
-#ifdef MSWIN
-	Tcl_SetChannelOption(interp, ch1, "-translation", "lf");
-#endif
-	Tcl_SetChannelOption(interp, ch2, "-buffering", "line");
-#ifdef MSWIN
-	Tcl_SetChannelOption(interp, ch2, "-translation", "lf");
-#endif
+	Tcl_ಗಣ_Channel_Option(interp, ch1, "-buffering", "line");
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
+	Tcl_ಗಣ_Channel_Option(interp, ch1, "-translation", "lf");
+#ಆದರೆ_ಅಂತ್ಯ
+	Tcl_ಗಣ_Channel_Option(interp, ch2, "-buffering", "line");
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
+	Tcl_ಗಣ_Channel_Option(interp, ch2, "-translation", "lf");
+#ಆದರೆ_ಅಂತ್ಯ
 
 	// replace standard Tcl exit command
 	Tcl_DeleteCommand(interp, "exit");
 	Tcl_CreateObjCommand(interp, "exit", exitcmd,
-	    (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
+	    (Client_ದತ್ತಾಂಶ)ಖಾಲಿ, (Tcl_CmdDeleteProc *)ಖಾಲಿ);
 
 	// new commands, in ::vim namespace
 	Tcl_CreateObjCommand(interp, "::vim::buffer", buffercmd,
-	    (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
+	    (Client_ದತ್ತಾಂಶ)ಖಾಲಿ, (Tcl_CmdDeleteProc *)ಖಾಲಿ);
 	Tcl_CreateObjCommand(interp, "::vim::window", windowcmd,
-	   (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
+	   (Client_ದತ್ತಾಂಶ)ಖಾಲಿ, (Tcl_CmdDeleteProc *)ಖಾಲಿ);
 	Tcl_CreateObjCommand(interp, "::vim::command", commandcmd,
-	   (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
+	   (Client_ದತ್ತಾಂಶ)ಖಾಲಿ, (Tcl_CmdDeleteProc *)ಖಾಲಿ);
 	Tcl_CreateObjCommand(interp, "::vim::beep", beepcmd,
-	   (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
+	   (Client_ದತ್ತಾಂಶ)ಖಾಲಿ, (Tcl_CmdDeleteProc *)ಖಾಲಿ);
 	Tcl_CreateObjCommand(interp, "::vim::option", optioncmd,
-	   (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
+	   (Client_ದತ್ತಾಂಶ)ಖಾಲಿ, (Tcl_CmdDeleteProc *)ಖಾಲಿ);
 	Tcl_CreateObjCommand(interp, "::vim::expr", exprcmd,
-	   (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
+	   (Client_ದತ್ತಾಂಶ)ಖಾಲಿ, (Tcl_CmdDeleteProc *)ಖಾಲಿ);
 
 	// "lbase" variable
 	tclinfo.lbase = 1;
 	strcpy(varname, VAR_LBASE);
-	Tcl_LinkVar(interp, varname, (char *)&tclinfo.lbase, TCL_LINK_INT);
+	Tcl_LinkVar(interp, varname, (ಅಕ್ಷರ *)&tclinfo.lbase, TCL_LINK_INT);
 
 	// "range" variable
-	tclinfo.range_start = eap->line1;
+	tclinfo.range_ಆರಂಭ = eap->line1;
 	strcpy(varname, VAR_RANGE1);
-	Tcl_LinkVar(interp, varname, (char *)&tclinfo.range_start, TCL_LINK_INT|TCL_LINK_READ_ONLY);
+	Tcl_LinkVar(interp, varname, (ಅಕ್ಷರ *)&tclinfo.range_ಆರಂಭ, TCL_LINK_INT|TCL_LINK_READ_ONLY);
 	strcpy(varname, VAR_RANGE2);
-	Tcl_LinkVar(interp, varname, (char *)&tclinfo.range_start, TCL_LINK_INT|TCL_LINK_READ_ONLY);
-	tclinfo.range_end   = eap->line2;
+	Tcl_LinkVar(interp, varname, (ಅಕ್ಷರ *)&tclinfo.range_ಆರಂಭ, TCL_LINK_INT|TCL_LINK_READ_ONLY);
+	tclinfo.range_ಕೊನೆ   = eap->line2;
 	strcpy(varname, VAR_RANGE3);
-	Tcl_LinkVar(interp, varname, (char *)&tclinfo.range_end, TCL_LINK_INT|TCL_LINK_READ_ONLY);
+	Tcl_LinkVar(interp, varname, (ಅಕ್ಷರ *)&tclinfo.range_ಕೊನೆ, TCL_LINK_INT|TCL_LINK_READ_ONLY);
 
 	// "current" variable
-	tclinfo.curbuf = Tcl_Alloc(VARNAME_SIZE);
-	tclinfo.curwin = Tcl_Alloc(VARNAME_SIZE);
+	tclinfo.curbuf = Tcl_Alloc(VARNAME_ಗಾತ್ರ);
+	tclinfo.curwin = Tcl_Alloc(VARNAME_ಗಾತ್ರ);
 	name = tclgetbuffer(interp, curbuf);
 	strcpy(tclinfo.curbuf, name);
 	strcpy(varname, VAR_CURBUF);
-	Tcl_LinkVar(interp, varname, (char *)&tclinfo.curbuf, TCL_LINK_STRING|TCL_LINK_READ_ONLY);
+	Tcl_LinkVar(interp, varname, (ಅಕ್ಷರ *)&tclinfo.curbuf, TCL_LINK_STRING|TCL_LINK_READ_ONLY);
 	name = tclgetwindow(interp, curwin);
 	strcpy(tclinfo.curwin, name);
 	strcpy(varname, VAR_CURWIN);
-	Tcl_LinkVar(interp, varname, (char *)&tclinfo.curwin, TCL_LINK_STRING|TCL_LINK_READ_ONLY);
+	Tcl_LinkVar(interp, varname, (ಅಕ್ಷರ *)&tclinfo.curwin, TCL_LINK_STRING|TCL_LINK_READ_ONLY);
 
 	tclinfo.interp = interp;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Interpreter already exists, just update variables
-	tclinfo.range_start = row2tcl(eap->line1);
-	tclinfo.range_end = row2tcl(eap->line2);
+	tclinfo.range_ಆರಂಭ = row2tcl(eap->line1);
+	tclinfo.range_ಕೊನೆ = row2tcl(eap->line2);
 	tclupdatevars();
     }
 
     tclinfo.exitvalue = 0;
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-    static void
-tclerrmsg(char *text)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+tclerrmsg(ಅಕ್ಷರ *ಪಠ್ಯ)
 {
-    char *next;
+    ಅಕ್ಷರ *ಮುಂದಿನ;
 
-    while ((next=strchr(text, '\n')))
+    ಆಗ ((ಮುಂದಿನ=strchr(ಪಠ್ಯ, '\n')))
     {
-	*next++ = '\0';
-	emsg(text);
-	text = next;
+	*ಮುಂದಿನ++ = '\0';
+	emsg(ಪಠ್ಯ);
+	ಪಠ್ಯ = ಮುಂದಿನ;
     }
-    if (*text)
-	emsg(text);
+    ಆದರೆ (*ಪಠ್ಯ)
+	emsg(ಪಠ್ಯ);
 }
 
-    static void
-tclmsg(char *text)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+tclmsg(ಅಕ್ಷರ *ಪಠ್ಯ)
 {
-    char *next;
+    ಅಕ್ಷರ *ಮುಂದಿನ;
 
-    while ((next=strchr(text, '\n')))
+    ಆಗ ((ಮುಂದಿನ=strchr(ಪಠ್ಯ, '\n')))
     {
-	*next++ = '\0';
-	msg(text);
-	text = next;
+	*ಮುಂದಿನ++ = '\0';
+	ಸಂದೇಶ(ಪಠ್ಯ);
+	ಪಠ್ಯ = ಮುಂದಿನ;
     }
-    if (*text)
-	msg(text);
+    ಆದರೆ (*ಪಠ್ಯ)
+	ಸಂದೇಶ(ಪಠ್ಯ);
 }
 
-    static void
-tcldelthisinterp(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+tcldelthisinterp(ಶೂನ್ಯ)
 {
-    if (!Tcl_InterpDeleted(tclinfo.interp))
+    ಆದರೆ (!Tcl_InterpDeleted(tclinfo.interp))
 	Tcl_DeleteInterp(tclinfo.interp);
     Tcl_Release(tclinfo.interp);
     // The interpreter is now gets deleted.  All registered commands (esp.
@@ -1866,77 +1866,77 @@ tcldelthisinterp(void)
     // the effort.  Unused refs are recycled by other interpreters, and
     // all refs are free'd when the window/buffer gets closed by vim.
 
-    tclinfo.interp = NULL;
+    tclinfo.interp = ಖಾಲಿ;
     Tcl_Free(tclinfo.curbuf);
     Tcl_Free(tclinfo.curwin);
-    tclinfo.curbuf = tclinfo.curwin = NULL;
+    tclinfo.curbuf = tclinfo.curwin = ಖಾಲಿ;
 }
 
-    static int
-tclexit(int error)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+tclexit(ಪೂರ್ಣಾಂಕ error)
 {
-    int newerr = OK;
+    ಪೂರ್ಣಾಂಕ newerr = OK;
 
-    if (Tcl_InterpDeleted(tclinfo.interp)     // True if we intercepted Tcl's exit command
-#if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION >= 5) || TCL_MAJOR_VERSION > 8
-	|| Tcl_LimitExceeded(tclinfo.interp)  // True if the interpreter cannot continue
-#endif
+    ಆದರೆ (Tcl_InterpDeleted(tclinfo.interp)     // True if we intercepted Tcl's exit command
+#ಆದರೆ (TCL_MAJOR_ಆವೃತ್ತಿ == 8 && TCL_MINOR_ಆವೃತ್ತಿ >= 5) || TCL_MAJOR_ಆವೃತ್ತಿ > 8
+	|| Tcl_ಎಲ್ಲೆ_Exceeded(tclinfo.interp)  // True if the interpreter cannot continue
+#ಆದರೆ_ಅಂತ್ಯ
 	)
     {
-	char buf[50];
+	ಅಕ್ಷರ buf[50];
 
-	sprintf(buf, _(e_exit_code_nr), tclinfo.exitvalue);
+	sprintf(buf, _(e_exit_ಸಂಕೇತ_nr), tclinfo.exitvalue);
 	tclerrmsg(buf);
-	if (tclinfo.exitvalue == 0)
+	ಆದರೆ (tclinfo.exitvalue == 0)
 	{
 	    did_emsg = 0;
 	    newerr = OK;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    newerr = FAIL;
 
 	tcldelthisinterp();
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	char *result;
+	ಅಕ್ಷರ *ಫಲಿತಾಂಶ;
 
-	result = (char *)Tcl_GetStringResult(tclinfo.interp);
-	if (error == TCL_OK)
+	ಫಲಿತಾಂಶ = (ಅಕ್ಷರ *)Tcl_Get_String_ಫಲಿತಾಂಶ(tclinfo.interp);
+	ಆದರೆ (error == TCL_OK)
 	{
-	    tclmsg(result);
+	    tclmsg(ಫಲಿತಾಂಶ);
 	    newerr = OK;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    tclerrmsg(result);
+	    tclerrmsg(ಫಲಿತಾಂಶ);
 	    newerr = FAIL;
 	}
     }
 
-    return newerr;
+    ಹಿಂತಿರುಗಿ newerr;
 }
 
 /*
  * ":tcl"
  */
-    void
+    ಶೂನ್ಯ
 ex_tcl(exarg_T *eap)
 {
     char_u	*script;
-    int		err;
+    ಪೂರ್ಣಾಂಕ		err;
 
     script = script_get(eap, eap->arg);
-    if (!eap->skip)
+    ಆದರೆ (!eap->skip)
     {
 	err = tclinit(eap);
-	if (err == OK)
+	ಆದರೆ (err == OK)
 	{
 	    Tcl_AllowExceptions(tclinfo.interp);
-	    if (script == NULL)
-		err = Tcl_Eval(tclinfo.interp, (char *)eap->arg);
-	    else
-		err = Tcl_Eval(tclinfo.interp, (char *)script);
+	    ಆದರೆ (script == ಖಾಲಿ)
+		err = Tcl_Eval(tclinfo.interp, (ಅಕ್ಷರ *)eap->arg);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		err = Tcl_Eval(tclinfo.interp, (ಅಕ್ಷರ *)script);
 	    err = tclexit(err);
 	}
     }
@@ -1946,14 +1946,14 @@ ex_tcl(exarg_T *eap)
 /*
  * ":tclfile"
  */
-    void
+    ಶೂನ್ಯ
 ex_tclfile(exarg_T *eap)
 {
-    char *file = (char *)eap->arg;
-    int err;
+    ಅಕ್ಷರ *file = (ಅಕ್ಷರ *)eap->arg;
+    ಪೂರ್ಣಾಂಕ err;
 
     err = tclinit(eap);
-    if (err == OK)
+    ಆದರೆ (err == OK)
     {
 	Tcl_AllowExceptions(tclinfo.interp);
 	err = Tcl_EvalFile(tclinfo.interp, file);
@@ -1964,157 +1964,157 @@ ex_tclfile(exarg_T *eap)
 /*
  * ":tcldo"
  */
-    void
+    ಶೂನ್ಯ
 ex_tcldo(exarg_T *eap)
 {
-    char	*script, *line;
-    int		err, rs, re, lnum;
-    char	var_lnum[VARNAME_SIZE]; // must be writeable memory
-    char	var_line[VARNAME_SIZE];
-    linenr_T	first_line = 0;
-    linenr_T	last_line = 0;
+    ಅಕ್ಷರ	*script, *ಸಾಲು;
+    ಪೂರ್ಣಾಂಕ		err, rs, re, lnum;
+    ಅಕ್ಷರ	var_lnum[VARNAME_ಗಾತ್ರ]; // must be writeable memory
+    ಅಕ್ಷರ	var_ಸಾಲು[VARNAME_ಗಾತ್ರ];
+    linenr_T	ಮೊದಲ_ಸಾಲು = 0;
+    linenr_T	ಕೊನೆಯ_ಸಾಲು = 0;
     buf_T	*was_curbuf = curbuf;
 
     rs = eap->line1;
     re = eap->line2;
-    script = (char *)eap->arg;
+    script = (ಅಕ್ಷರ *)eap->arg;
     strcpy(var_lnum, VAR_CURLNUM);
-    strcpy(var_line, VAR_CURLINE);
+    strcpy(var_ಸಾಲು, VAR_CURLINE);
 
     err = tclinit(eap);
-    if (err != OK)
-	return;
+    ಆದರೆ (err != OK)
+	ಹಿಂತಿರುಗಿ;
 
     lnum = row2tcl(rs);
-    Tcl_LinkVar(tclinfo.interp, var_lnum, (char *)&lnum, TCL_LINK_INT|TCL_LINK_READ_ONLY);
+    Tcl_LinkVar(tclinfo.interp, var_lnum, (ಅಕ್ಷರ *)&lnum, TCL_LINK_INT|TCL_LINK_READ_ONLY);
     err = TCL_OK;
-    if (u_save((linenr_T)(rs-1), (linenr_T)(re+1)) != OK)
+    ಆದರೆ (u_save((linenr_T)(rs-1), (linenr_T)(re+1)) != OK)
     {
-	Tcl_SetResult(tclinfo.interp, _("cannot save undo information"), TCL_STATIC);
+	Tcl_ಗಣ_ಫಲಿತಾಂಶ(tclinfo.interp, _("cannot save undo information"), TCL_STATIC);
 	err = TCL_ERROR;
     }
-    while (err == TCL_OK  &&  rs <= re)
+    ಆಗ (err == TCL_OK  &&  rs <= re)
     {
-	if ((linenr_T)rs > curbuf->b_ml.ml_line_count)
-	    break;
-	line = (char *)ml_get_buf(curbuf, (linenr_T)rs, FALSE);
-	if (!line)
+	ಆದರೆ ((linenr_T)rs > curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
+	    ನಿಲ್ಲಿಸು;
+	ಸಾಲು = (ಅಕ್ಷರ *)ml_get_buf(curbuf, (linenr_T)rs, FALSE);
+	ಆದರೆ (!ಸಾಲು)
 	{
-	    Tcl_SetResult(tclinfo.interp, _("cannot get line"), TCL_STATIC);
+	    Tcl_ಗಣ_ಫಲಿತಾಂಶ(tclinfo.interp, _("cannot get line"), TCL_STATIC);
 	    err = TCL_ERROR;
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
-	Tcl_SetVar(tclinfo.interp, var_line, line, 0);
+	Tcl_ಗಣ_Var(tclinfo.interp, var_ಸಾಲು, ಸಾಲು, 0);
 	Tcl_AllowExceptions(tclinfo.interp);
 	err = Tcl_Eval(tclinfo.interp, script);
-	if (err != TCL_OK
+	ಆದರೆ (err != TCL_OK
 	    || Tcl_InterpDeleted(tclinfo.interp)
-#if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION >= 5) || TCL_MAJOR_VERSION > 8
-	    || Tcl_LimitExceeded(tclinfo.interp)
-#endif
+#ಆದರೆ (TCL_MAJOR_ಆವೃತ್ತಿ == 8 && TCL_MINOR_ಆವೃತ್ತಿ >= 5) || TCL_MAJOR_ಆವೃತ್ತಿ > 8
+	    || Tcl_ಎಲ್ಲೆ_Exceeded(tclinfo.interp)
+#ಆದರೆ_ಅಂತ್ಯ
 	    || curbuf != was_curbuf
-	    || (linenr_T)rs > curbuf->b_ml.ml_line_count)
-	    break;
-	line = (char *)Tcl_GetVar(tclinfo.interp, var_line, 0);
-	if (line)
+	    || (linenr_T)rs > curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
+	    ನಿಲ್ಲಿಸು;
+	ಸಾಲು = (ಅಕ್ಷರ *)Tcl_GetVar(tclinfo.interp, var_ಸಾಲು, 0);
+	ಆದರೆ (ಸಾಲು)
 	{
-	    if (ml_replace((linenr_T)rs, (char_u *)line, TRUE) != OK)
+	    ಆದರೆ (ml_replace((linenr_T)rs, (char_u *)ಸಾಲು, TRUE) != OK)
 	    {
-		Tcl_SetResult(tclinfo.interp, _("cannot replace line"), TCL_STATIC);
+		Tcl_ಗಣ_ಫಲಿತಾಂಶ(tclinfo.interp, _("cannot replace line"), TCL_STATIC);
 		err = TCL_ERROR;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	    if (first_line == 0)
-		first_line = rs;
-	    last_line = rs;
+	    ಆದರೆ (ಮೊದಲ_ಸಾಲು == 0)
+		ಮೊದಲ_ಸಾಲು = rs;
+	    ಕೊನೆಯ_ಸಾಲು = rs;
 	}
 	++rs;
 	++lnum;
 	Tcl_UpdateLinkedVar(tclinfo.interp, var_lnum);
     }
-    if (first_line)
-	changed_lines(first_line, 0, last_line + 1, (long)0);
+    ಆದರೆ (ಮೊದಲ_ಸಾಲು)
+	ಬದಲಾಯಿತು_ಸಾಲುಗಳು(ಮೊದಲ_ಸಾಲು, 0, ಕೊನೆಯ_ಸಾಲು + 1, (ದೀರ್ಘ)0);
 
-    Tcl_UnsetVar(tclinfo.interp, var_line, 0);
+    Tcl_UnsetVar(tclinfo.interp, var_ಸಾಲು, 0);
     Tcl_UnlinkVar(tclinfo.interp, var_lnum);
-    if (err == TCL_OK)
-	Tcl_ResetResult(tclinfo.interp);
+    ಆದರೆ (err == TCL_OK)
+	Tcl_Reset_ಫಲಿತಾಂಶ(tclinfo.interp);
 
-    (void)tclexit(err);
+    (ಶೂನ್ಯ)tclexit(err);
 }
 
-    static void
-tcldelallrefs(struct ref *ref)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+tcldelallrefs(ರಚನೆ ref *ref)
 {
-    struct ref	*next;
-    int		err;
-    char	*result;
+    ರಚನೆ ref	*ಮುಂದಿನ;
+    ಪೂರ್ಣಾಂಕ		err;
+    ಅಕ್ಷರ	*ಫಲಿತಾಂಶ;
 
-#ifdef DYNAMIC_TCL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DYNAMIC_TCL
     // TODO: this code currently crashes Vim on exit
-    if (exiting)
-	return;
-#endif
+    ಆದರೆ (exiting)
+	ಹಿಂತಿರುಗಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 
-    while (ref != NULL)
+    ಆಗ (ref != ಖಾಲಿ)
     {
-	next = ref->next;
-	if (ref->interp)
+	ಮುಂದಿನ = ref->ಮುಂದಿನ;
+	ಆದರೆ (ref->interp)
 	{
-	    if (ref->delcmd)
+	    ಆದರೆ (ref->delcmd)
 	    {
 		err = Tcl_GlobalEvalObj(ref->interp, ref->delcmd);
-		if (err != TCL_OK)
+		ಆದರೆ (err != TCL_OK)
 		{
-		    result = (char *)Tcl_GetStringResult(ref->interp);
-		    if (result)
-			tclerrmsg(result);
+		    ಫಲಿತಾಂಶ = (ಅಕ್ಷರ *)Tcl_Get_String_ಫಲಿತಾಂಶ(ref->interp);
+		    ಆದರೆ (ಫಲಿತಾಂಶ)
+			tclerrmsg(ಫಲಿತಾಂಶ);
 		}
-		Tcl_DecrRefCount(ref->delcmd);
-		ref->delcmd = NULL;
+		Tcl_Decr_Ref_ಎಣಿಕೆ(ref->delcmd);
+		ref->delcmd = ಖಾಲಿ;
 	    }
 	    Tcl_DeleteCommandFromToken(ref->interp, ref->cmd);
 	}
-	Tcl_Free((char *)ref);
-	ref = next;
+	Tcl_Free((ಅಕ್ಷರ *)ref);
+	ref = ಮುಂದಿನ;
     }
 }
 
-    void
-tcl_buffer_free(buf_T *buf)
+    ಶೂನ್ಯ
+tcl_ಬಫರ್_free(buf_T *buf)
 {
-    struct ref *reflist;
+    ರಚನೆ ref *reflist;
 
-#ifdef DYNAMIC_TCL
-    if (!stubs_initialized)	// Not using Tcl, nothing to do.
-	return;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DYNAMIC_TCL
+    ಆದರೆ (!stubs_initialized)	// Not using Tcl, nothing to do.
+	ಹಿಂತಿರುಗಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 
-    reflist = (struct ref *)(buf->b_tcl_ref);
-    if (reflist != &refsdeleted)
+    reflist = (ರಚನೆ ref *)(buf->b_tcl_ref);
+    ಆದರೆ (reflist != &refsdeleted)
     {
-	buf->b_tcl_ref = (void *)&refsdeleted;
+	buf->b_tcl_ref = (ಶೂನ್ಯ *)&refsdeleted;
 	tcldelallrefs(reflist);
-	buf->b_tcl_ref = NULL;
+	buf->b_tcl_ref = ಖಾಲಿ;
     }
 }
 
-    void
-tcl_window_free(win_T *win)
+    ಶೂನ್ಯ
+tcl_ಕಿಟಕಿ_free(win_T *win)
 {
-    struct ref *reflist;
+    ರಚನೆ ref *reflist;
 
-#ifdef DYNAMIC_TCL
-    if (!stubs_initialized)	// Not using Tcl, nothing to do.
-	return;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DYNAMIC_TCL
+    ಆದರೆ (!stubs_initialized)	// Not using Tcl, nothing to do.
+	ಹಿಂತಿರುಗಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 
-    reflist = (struct ref*)(win->w_tcl_ref);
-    if (reflist != &refsdeleted)
+    reflist = (ರಚನೆ ref*)(win->w_tcl_ref);
+    ಆದರೆ (reflist != &refsdeleted)
     {
-	win->w_tcl_ref = (void *)&refsdeleted;
+	win->w_tcl_ref = (ಶೂನ್ಯ *)&refsdeleted;
 	tcldelallrefs(reflist);
-	win->w_tcl_ref = NULL;
+	win->w_tcl_ref = ಖಾಲಿ;
     }
 }
 

@@ -9,17 +9,17 @@
  * (original link, now dead: iamphet.nm.ru/vim/index.html)
  */
 
-#ifndef WIN32_LEAN_AND_MEAN
-# define WIN32_LEAN_AND_MEAN
-#endif
-#include <windows.h>
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ WIN32_LEAN_AND_ಸರಾಸರಿ
+# define WIN32_LEAN_AND_ಸರಾಸರಿ
+#ಆದರೆ_ಅಂತ್ಯ
+#ಅನ್ತರ್ಭಾವ <windows.h>
 
-#include "xpm_w32.h"
+#ಅನ್ತರ್ಭಾವ "xpm_w32.h"
 
 // Engage Windows support in libXpm
-#define FOR_MSW
+#ವ್ಯಾಖ್ಯಾನಿಸು FOR_MSW
 
-#include "xpm.h"
+#ಅನ್ತರ್ಭಾವ "xpm.h"
 
 /*
  * Tries to load an Xpm image from the file "filename".
@@ -27,30 +27,30 @@
  * Returns 0 on success and stores image and mask BITMAPS in "hImage" and
  * "hShape".
  */
-    int
-LoadXpmImage(
-    char    *filename,
+    ಪೂರ್ಣಾಂಕ
+ತುಂಬು_Xpm_Image(
+    ಅಕ್ಷರ    *filename,
     HBITMAP *hImage,
     HBITMAP *hShape)
 {
     XImage	    *img;  // loaded image
     XImage	    *shp;  // shapeimage
-    XpmAttributes   attr;
-    int		    res;
-    HDC		    hdc = CreateCompatibleDC(NULL);
+    Xpm_ಗುಣಲಕ್ಷಣಗಳು   attr;
+    ಪೂರ್ಣಾಂಕ		    res;
+    HDC		    hdc = CreateCompatibleDC(ಖಾಲಿ);
 
     attr.valuemask = 0;
-    res = XpmReadFileToImage(&hdc, filename, &img, &shp, &attr);
+    res = Xpm_Read_File_ಗಮ್ಯ_Image(&hdc, filename, &img, &shp, &attr);
     DeleteDC(hdc);
-    if (res < 0)
-	return -1;
-    if (shp == NULL)
+    ಆದರೆ (res < 0)
+	ಹಿಂತಿರುಗಿ -1;
+    ಆದರೆ (shp == ಖಾಲಿ)
     {
-	if (img)
+	ಆದರೆ (img)
 	    XDestroyImage(img);
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
     *hImage = img->bitmap;
     *hShape = shp->bitmap;
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }

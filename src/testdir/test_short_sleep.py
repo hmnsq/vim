@@ -4,8 +4,8 @@
 #
 # This requires Python 2.6 or later.
 
-import time
+ಆಮದು ಸಮಯ
 
-if __name__ == "__main__":
+ಆದರೆ __name__ == "__main__":
 
-    time.sleep(0.1)  # sleep 100 msec
+    ಸಮಯ.ಸುಷುಪ್ತಿ(0.1)  # sleep 100 msec

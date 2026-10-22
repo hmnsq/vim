@@ -27,16 +27,16 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifdef _WIN32
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ _WIN32
 
-#include <ctype.h>
-#include <io.h>
-#include <wchar.h>
-#include <windows.h>
+#ಅನ್ತರ್ಭಾವ <ctype.h>
+#ಅನ್ತರ್ಭಾವ <io.h>
+#ಅನ್ತರ್ಭಾವ <wchar.h>
+#ಅನ್ತರ್ಭಾವ <windows.h>
 
-#ifdef USE_FILEEXTD
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_FILEEXTD
 // VC 7.1 or earlier doesn't support SAL.
-# if !defined(_MSC_VER) || (_MSC_VER < 1400)
+# ಆದರೆ !defined(_MSC_VER) || (_MSC_VER < 1400)
 #  define __out
 #  define __in
 #  define __in_opt
@@ -45,146 +45,146 @@
 // defunct link: microsoft.com/en-us/download/details.aspx?id=22599
 // Needed for WinXP.
 # include <fileextd.h>
-#else // USE_FILEEXTD
+#ಇಲ್ಲದಿದ್ದರೆ // USE_FILEEXTD
 // VC 8 or earlier.
-# if defined(_MSC_VER) && (_MSC_VER < 1500)
+# ಆದರೆ defined(_MSC_VER) && (_MSC_VER < 1500)
 #  ifdef ENABLE_STUB_IMPL
 #   define STUB_IMPL
-#  else
+#  ಇಲ್ಲದಿದ್ದರೆ
 #   error "Win32 FileID API Library is required for VC2005 or earlier."
 #  endif
 # endif
-#endif // USE_FILEEXTD
+#ಆದರೆ_ಅಂತ್ಯ // USE_FILEEXTD
 
-#ifdef __MINGW32__
-# define UNUSED __attribute__((unused))
-#else
-# define UNUSED
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ __MINGW32__
+# define ಬಳಸದ __attribute__((ಬಳಸದ_2))
+#ಇಲ್ಲದಿದ್ದರೆ
+# define ಬಳಸದ
+#ಆದರೆ_ಅಂತ್ಯ
 
-#include "iscygpty.h"
+#ಅನ್ತರ್ಭಾವ "iscygpty.h"
 
 //#define USE_DYNFILEID
-#ifdef USE_DYNFILEID
-typedef BOOL (WINAPI *pfnGetFileInformationByHandleEx)(
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_DYNFILEID
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ BOOL (WINAPI *pfnGetFileInformationByHandleEx)(
 		HANDLE						hFile,
 		FILE_INFO_BY_HANDLE_CLASS	FileInformationClass,
 		LPVOID						lpFileInformation,
-		DWORD						dwBufferSize);
-static pfnGetFileInformationByHandleEx pGetFileInformationByHandleEx = NULL;
+		DWORD						dw_ಬಫರ್_ಗಾತ್ರ);
+ಸ್ಥಿರ pfnGetFileInformationByHandleEx pGetFileInformationByHandleEx = ಖಾಲಿ;
 
 # ifndef USE_FILEEXTD
-static BOOL WINAPI stub_GetFileInformationByHandleEx(
-		HANDLE						hFile UNUSED,
-		FILE_INFO_BY_HANDLE_CLASS	FileInformationClass UNUSED,
-		LPVOID						lpFileInformation UNUSED,
-		DWORD						dwBufferSize UNUSED)
+ಸ್ಥಿರ BOOL WINAPI stub_GetFileInformationByHandleEx(
+		HANDLE						hFile ಬಳಸದ,
+		FILE_INFO_BY_HANDLE_CLASS	FileInformationClass ಬಳಸದ,
+		LPVOID						lpFileInformation ಬಳಸದ,
+		DWORD						dw_ಬಫರ್_ಗಾತ್ರ ಬಳಸದ)
 {
-	return FALSE;
+	ಹಿಂತಿರುಗಿ FALSE;
 }
 # endif
 
-static void setup_fileid_api(void)
+ಸ್ಥಿರ ಶೂನ್ಯ ಸಿದ್ಧತೆ_fileid_api(ಶೂನ್ಯ)
 {
-	if (pGetFileInformationByHandleEx != NULL) {
-		return;
+	ಆದರೆ (pGetFileInformationByHandleEx != ಖಾಲಿ) {
+		ಹಿಂತಿರುಗಿ;
 	}
 	pGetFileInformationByHandleEx = (pfnGetFileInformationByHandleEx)
-		GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")),
+		Get_Proc_ವಿಳಾಸ(GetModuleHandle(ಪಠ್ಯ_3("kernel32.dll")),
 				"GetFileInformationByHandleEx");
-	if (pGetFileInformationByHandleEx == NULL) {
+	ಆದರೆ (pGetFileInformationByHandleEx == ಖಾಲಿ) {
 # ifdef USE_FILEEXTD
 		pGetFileInformationByHandleEx = GetFileInformationByHandleEx;
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 		pGetFileInformationByHandleEx = stub_GetFileInformationByHandleEx;
 # endif
 	}
 }
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 # define pGetFileInformationByHandleEx	GetFileInformationByHandleEx
-# define setup_fileid_api()
-#endif
+# define ಸಿದ್ಧತೆ_fileid_api()
+#ಆದರೆ_ಅಂತ್ಯ
 
 
-#define is_wprefix(s, prefix) \
-	(wcsncmp((s), (prefix), sizeof(prefix) / sizeof(WCHAR) - 1) == 0)
+#ವ್ಯಾಖ್ಯಾನಿಸು is_wprefix(s, ಪೂರ್ವಪ್ರತ್ಯಯ) \
+	(wcsncmp((s), (ಪೂರ್ವಪ್ರತ್ಯಯ), ಗಾತ್ರ(ಪೂರ್ವಪ್ರತ್ಯಯ) / ಗಾತ್ರ(WCHAR) - 1) == 0)
 
 // Check if the fd is a cygwin/msys's pty.
-int is_cygpty(int fd)
+ಪೂರ್ಣಾಂಕ is_cygpty(ಪೂರ್ಣಾಂಕ fd)
 {
-#ifdef STUB_IMPL
-	return 0;
-#else
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ STUB_IMPL
+	ಹಿಂತಿರುಗಿ 0;
+#ಇಲ್ಲದಿದ್ದರೆ
 	HANDLE h;
-	const int size = sizeof(FILE_NAME_INFO) + sizeof(WCHAR) * (MAX_PATH - 1);
+	ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ ಗಾತ್ರ_2 = ಗಾತ್ರ(FILE_NAME_INFO) + ಗಾತ್ರ(WCHAR) * (MAX_ಮಾರ್ಗ - 1);
 	FILE_NAME_INFO *nameinfo;
-	WCHAR *p = NULL;
+	WCHAR *p = ಖಾಲಿ;
 
-	setup_fileid_api();
+	ಸಿದ್ಧತೆ_fileid_api();
 
 	h = (HANDLE) _get_osfhandle(fd);
-	if (h == INVALID_HANDLE_VALUE) {
-		return 0;
+	ಆದರೆ (h == INVALID_HANDLE_ಮೌಲ್ಯ) {
+		ಹಿಂತಿರುಗಿ 0;
 	}
 	// Cygwin/msys's pty is a pipe.
-	if (GetFileType(h) != FILE_TYPE_PIPE) {
-		return 0;
+	ಆದರೆ (GetFileType(h) != FILE_TYPE_PIPE) {
+		ಹಿಂತಿರುಗಿ 0;
 	}
-	nameinfo = malloc(size + sizeof(WCHAR));
-	if (nameinfo == NULL) {
-		return 0;
+	nameinfo = ಸ್ಮರಣೆ_ಕೊಡು(ಗಾತ್ರ_2 + ಗಾತ್ರ(WCHAR));
+	ಆದರೆ (nameinfo == ಖಾಲಿ) {
+		ಹಿಂತಿರುಗಿ 0;
 	}
 	// Check the name of the pipe:
 	// "\\{cygwin,msys}-XXXXXXXXXXXXXXXX-ptyN-{from,to}-master"
-	if (pGetFileInformationByHandleEx(h, FileNameInfo, nameinfo, size)) {
-		nameinfo->FileName[nameinfo->FileNameLength / sizeof(WCHAR)] = L'\0';
+	ಆದರೆ (pGetFileInformationByHandleEx(h, FileNameInfo, nameinfo, ಗಾತ್ರ_2)) {
+		nameinfo->FileName[nameinfo->File_Name_ಉದ್ದಳತೆ / ಗಾತ್ರ(WCHAR)] = L'\0';
 		p = nameinfo->FileName;
-		if (is_wprefix(p, L"\\cygwin-")) {		// Cygwin
+		ಆದರೆ (is_wprefix(p, L"\\cygwin-")) {		// Cygwin
 			p += 8;
-		} else if (is_wprefix(p, L"\\msys-")) {	// MSYS and MSYS2
+		} ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (is_wprefix(p, L"\\msys-")) {	// MSYS and MSYS2
 			p += 6;
-		} else {
-			p = NULL;
+		} ಇಲ್ಲದಿದ್ದರೆ {
+			p = ಖಾಲಿ;
 		}
-		if (p != NULL) {
+		ಆದರೆ (p != ಖಾಲಿ) {
 			// Skip 16-digit hexadecimal.
-			while (*p && iswascii(*p) && isxdigit(*p))
+			ಆಗ (*p && iswascii(*p) && isxdigit(*p))
 				++p;
-			if (is_wprefix(p, L"-pty")) {
+			ಆದರೆ (is_wprefix(p, L"-pty")) {
 				p += 4;
-			} else {
-				p = NULL;
+			} ಇಲ್ಲದಿದ್ದರೆ {
+				p = ಖಾಲಿ;
 			}
 		}
-		if (p != NULL) {
+		ಆದರೆ (p != ಖಾಲಿ) {
 			// Skip pty number.
-			while (*p && iswascii(*p) && isdigit(*p))
+			ಆಗ (*p && iswascii(*p) && ಅಂಕಿಯೇ(*p))
 				++p;
-			if (is_wprefix(p, L"-from-master")) {
+			ಆದರೆ (is_wprefix(p, L"-from-master")) {
 				//p += 12;
-			} else if (is_wprefix(p, L"-to-master")) {
+			} ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (is_wprefix(p, L"-to-master")) {
 				//p += 10;
-			} else {
-				p = NULL;
+			} ಇಲ್ಲದಿದ್ದರೆ {
+				p = ಖಾಲಿ;
 			}
 		}
 	}
-	free(nameinfo);
-	return (p != NULL);
-#endif // STUB_IMPL
+	ಬಿಡುಗಡೆ(nameinfo);
+	ಹಿಂತಿರುಗಿ (p != ಖಾಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ // STUB_IMPL
 }
 
 // Check if at least one cygwin/msys pty is used.
-int is_cygpty_used(void)
+ಪೂರ್ಣಾಂಕ is_cygpty_ಬಳಸಿದ(ಶೂನ್ಯ)
 {
-	int fd, ret = 0;
+	ಪೂರ್ಣಾಂಕ fd, ret = 0;
 
-	for (fd = 0; fd < 3; fd++) {
+	ಗಾಗಿ (fd = 0; fd < 3; fd++) {
 		ret |= is_cygpty(fd);
 	}
-	return ret;
+	ಹಿಂತಿರುಗಿ ret;
 }
 
-#endif // _WIN32
+#ಆದರೆ_ಅಂತ್ಯ // _WIN32
 
 // vim: set ts=4 sw=4:

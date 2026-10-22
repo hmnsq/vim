@@ -12,18 +12,18 @@
  * here are optional, except "cm" (cursor motion).
  */
 
-#if defined(SASC) && SASC < 658
+#ಆದರೆ defined(SASC) && SASC < 658
 /*
  * The SAS C compiler has a bug that makes typedefs being forgotten
  * in include files.  Has been fixed in version 6.58.
  */
-typedef unsigned char char_u;
-#endif
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ char_u;
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Index of the termcap codes in the term_strings array.
  */
-enum SpecialKey
+ಎಣಿಕೆ Special_ಕೀಲಿ
 {
     KS_NAME = 0,// name of this terminal entry
     KS_CE,	// clear to end of line
@@ -42,7 +42,7 @@ enum SpecialKey
     KS_VS,	// cursor very visible (blink)
     KS_CVS,	// cursor normally visible (no blink)
     KS_CSH,	// cursor shape
-    KS_CRC,	// request cursor blinking
+    KS_ಚಕ್ರೀಯ_ಪರೀಕ್ಷೆ,	// request cursor blinking
     KS_CRS,	// request cursor style
     KS_ME,	// normal mode
     KS_MR,	// reverse mode
@@ -121,7 +121,7 @@ enum SpecialKey
     KS_ESU	// end synchronized update
 };
 
-#define KS_LAST	    KS_ESU
+#ವ್ಯಾಖ್ಯಾನಿಸು KS_ಕೊನೆಯ	    KS_ESU
 
 /*
  * the terminal capabilities are stored in this array
@@ -131,114 +131,114 @@ enum SpecialKey
  * - there should be code in term.c to obtain the value from the termcap
  */
 
-extern char_u *(term_strings[]);    // current terminal strings
+ಬಾಹ್ಯ char_u *(ಪದ_ಅಕ್ಷರಸರಣಿಗಳು[]);    // current terminal strings
 
 /*
  * strings used for terminal
  */
-#define T_NAME	(TERM_STR(KS_NAME))	// terminal name
-#define T_CE	(TERM_STR(KS_CE))	// clear to end of line
-#define T_AL	(TERM_STR(KS_AL))	// add new blank line
-#define T_CAL	(TERM_STR(KS_CAL))	// add number of blank lines
-#define T_DL	(TERM_STR(KS_DL))	// delete line
-#define T_CDL	(TERM_STR(KS_CDL))	// delete number of lines
-#define T_CS	(TERM_STR(KS_CS))	// scroll region
-#define T_CSV	(TERM_STR(KS_CSV))	// scroll region vertical
-#define T_CL	(TERM_STR(KS_CL))	// clear screen
-#define T_CD	(TERM_STR(KS_CD))	// clear to end of display
-#define T_UT	(TERM_STR(KS_UT))	// clearing uses background color
-#define T_DA	(TERM_STR(KS_DA))	// text may be scrolled down from up
-#define T_DB	(TERM_STR(KS_DB))	// text may be scrolled up from down
-#define T_VI	(TERM_STR(KS_VI))	// cursor invisible
-#define T_VE	(TERM_STR(KS_VE))	// cursor visible
-#define T_VS	(TERM_STR(KS_VS))	// cursor very visible (blink)
-#define T_CVS	(TERM_STR(KS_CVS))	// cursor normally visible (no blink)
-#define T_CSH	(TERM_STR(KS_CSH))	// cursor shape
-#define T_CRC	(TERM_STR(KS_CRC))	// request cursor blinking
-#define T_CRS	(TERM_STR(KS_CRS))	// request cursor style
-#define T_ME	(TERM_STR(KS_ME))	// normal mode
-#define T_MR	(TERM_STR(KS_MR))	// reverse mode
-#define T_MD	(TERM_STR(KS_MD))	// bold mode
-#define T_SE	(TERM_STR(KS_SE))	// normal mode
-#define T_SO	(TERM_STR(KS_SO))	// standout mode
-#define T_CZH	(TERM_STR(KS_CZH))	// italic mode start
-#define T_CZR	(TERM_STR(KS_CZR))	// italic mode end
-#define T_UE	(TERM_STR(KS_UE))	// exit underscore (underline) mode
-#define T_US	(TERM_STR(KS_US))	// underscore (underline) mode
-#define T_UCE	(TERM_STR(KS_UCE))	// exit undercurl mode
-#define T_UCS	(TERM_STR(KS_UCS))	// undercurl mode
-#define T_USS	(TERM_STR(KS_USS))	// double underline mode
-#define T_DS	(TERM_STR(KS_DS))	// dotted underline mode
-#define T_CDS	(TERM_STR(KS_CDS))	// dashed underline mode
-#define T_STE	(TERM_STR(KS_STE))	// exit strikethrough mode
-#define T_STS	(TERM_STR(KS_STS))	// strikethrough mode
-#define T_MS	(TERM_STR(KS_MS))	// save to move cur in reverse mode
-#define T_CM	(TERM_STR(KS_CM))	// cursor motion
-#define T_SR	(TERM_STR(KS_SR))	// scroll reverse (backward)
-#define T_CRI	(TERM_STR(KS_CRI))	// cursor number of chars right
-#define T_VB	(TERM_STR(KS_VB))	// visual bell
-#define T_KS	(TERM_STR(KS_KS))	// put term in "keypad transmit" mode
-#define T_KE	(TERM_STR(KS_KE))	// out of "keypad transmit" mode
-#define T_TI	(TERM_STR(KS_TI))	// put terminal in termcap mode
-#define T_CTI	(TERM_STR(KS_CTI))	// put terminal in "raw" mode
-#define T_CRK	(TERM_STR(KS_CRK))	// request keyboard protocol status
-#define T_TE	(TERM_STR(KS_TE))	// end of termcap mode
-#define T_CTE	(TERM_STR(KS_CTE))	// end of "raw" mode
-#define T_BC	(TERM_STR(KS_BC))	// backspace character
-#define T_CCS	(TERM_STR(KS_CCS))	// cur is relative to scroll region
-#define T_CCO	(TERM_STR(KS_CCO))	// number of colors
-#define T_CSF	(TERM_STR(KS_CSF))	// set foreground color
-#define T_CSB	(TERM_STR(KS_CSB))	// set background color
-#define T_XS	(TERM_STR(KS_XS))	// standout not erased by overwriting
-#define T_XN	(TERM_STR(KS_XN))	// newline glitch
-#define T_MB	(TERM_STR(KS_MB))	// blink mode
-#define T_CAF	(TERM_STR(KS_CAF))	// set foreground color (ANSI)
-#define T_CAB	(TERM_STR(KS_CAB))	// set background color (ANSI)
-#define T_CAU	(TERM_STR(KS_CAU))	// set underline color (ANSI)
-#define T_CFO	(TERM_STR(KS_CF))	// set alternate font
-#define T_LE	(TERM_STR(KS_LE))	// cursor left
-#define T_ND	(TERM_STR(KS_ND))	// cursor right
-#define T_CIS	(TERM_STR(KS_CIS))	// set icon text start
-#define T_CIE	(TERM_STR(KS_CIE))	// set icon text end
-#define T_TS	(TERM_STR(KS_TS))	// set window title start
-#define T_FS	(TERM_STR(KS_FS))	// set window title end
-#define T_CSC	(TERM_STR(KS_CSC))	// set cursor color start
-#define T_CEC	(TERM_STR(KS_CEC))	// set cursor color end
-#define T_CWP	(TERM_STR(KS_CWP))	// set window position
-#define T_CGP	(TERM_STR(KS_CGP))	// get window position
-#define T_CWS	(TERM_STR(KS_CWS))	// window size
-#define T_CSI	(TERM_STR(KS_CSI))	// start insert mode
-#define T_CEI	(TERM_STR(KS_CEI))	// end insert mode
-#define T_CSR	(TERM_STR(KS_CSR))	// start replace mode
-#define T_CRV	(TERM_STR(KS_CRV))	// request version string
-#define T_CXM	(TERM_STR(KS_CXM))	// enable/disable mouse reporting
-#define T_RFG	(TERM_STR(KS_RFG))	// request foreground RGB
-#define T_RBG	(TERM_STR(KS_RBG))	// request background RGB
-#define T_OP	(TERM_STR(KS_OP))	// original color pair
-#define T_U7	(TERM_STR(KS_U7))	// request cursor position
-#define T_8F	(TERM_STR(KS_8F))	// set foreground color (RGB)
-#define T_8B	(TERM_STR(KS_8B))	// set background color (RGB)
-#define T_8U	(TERM_STR(KS_8U))	// set underline color (RGB)
-#define T_BE	(TERM_STR(KS_CBE))	// enable bracketed paste mode
-#define T_BD	(TERM_STR(KS_CBD))	// disable bracketed paste mode
-#define T_CST	(TERM_STR(KS_CST))	// save window title
-#define T_CRT	(TERM_STR(KS_CRT))	// restore window title
-#define T_SSI	(TERM_STR(KS_SSI))	// save icon text
-#define T_SRI	(TERM_STR(KS_SRI))	// restore icon text
-#define T_FD	(TERM_STR(KS_FD))	// disable focus event tracking
-#define T_FE	(TERM_STR(KS_FE))	// enable focus event tracking
-#define T_XON	(TERM_STR(KS_XON))	// terminal uses xon/xoff handshaking
-#define T_BSU	(TERM_STR(KS_BSU))	// begin synchronized update
-#define T_ESU	(TERM_STR(KS_ESU))	// end synchronized update
+#ವ್ಯಾಖ್ಯಾನಿಸು T_NAME	(ಪದ_STR(KS_NAME))	// terminal name
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CE	(ಪದ_STR(KS_CE))	// clear to end of line
+#ವ್ಯಾಖ್ಯಾನಿಸು T_AL	(ಪದ_STR(KS_AL))	// add new blank line
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CAL	(ಪದ_STR(KS_CAL))	// add number of blank lines
+#ವ್ಯಾಖ್ಯಾನಿಸು T_DL	(ಪದ_STR(KS_DL))	// delete line
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CDL	(ಪದ_STR(KS_CDL))	// delete number of lines
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CS	(ಪದ_STR(KS_CS))	// scroll region
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CSV	(ಪದ_STR(KS_CSV))	// scroll region vertical
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CL	(ಪದ_STR(KS_CL))	// clear screen
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CD	(ಪದ_STR(KS_CD))	// clear to end of display
+#ವ್ಯಾಖ್ಯಾನಿಸು T_UT	(ಪದ_STR(KS_UT))	// clearing uses background color
+#ವ್ಯಾಖ್ಯಾನಿಸು T_DA	(ಪದ_STR(KS_DA))	// text may be scrolled down from up
+#ವ್ಯಾಖ್ಯಾನಿಸು T_DB	(ಪದ_STR(KS_DB))	// text may be scrolled up from down
+#ವ್ಯಾಖ್ಯಾನಿಸು T_VI	(ಪದ_STR(KS_VI))	// cursor invisible
+#ವ್ಯಾಖ್ಯಾನಿಸು T_VE	(ಪದ_STR(KS_VE))	// cursor visible
+#ವ್ಯಾಖ್ಯಾನಿಸು T_VS	(ಪದ_STR(KS_VS))	// cursor very visible (blink)
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CVS	(ಪದ_STR(KS_CVS))	// cursor normally visible (no blink)
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CSH	(ಪದ_STR(KS_CSH))	// cursor shape
+#ವ್ಯಾಖ್ಯಾನಿಸು T_ಚಕ್ರೀಯ_ಪರೀಕ್ಷೆ	(ಪದ_STR(KS_ಚಕ್ರೀಯ_ಪರೀಕ್ಷೆ))	// request cursor blinking
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CRS	(ಪದ_STR(KS_CRS))	// request cursor style
+#ವ್ಯಾಖ್ಯಾನಿಸು T_ME	(ಪದ_STR(KS_ME))	// normal mode
+#ವ್ಯಾಖ್ಯಾನಿಸು T_MR	(ಪದ_STR(KS_MR))	// reverse mode
+#ವ್ಯಾಖ್ಯಾನಿಸು T_MD	(ಪದ_STR(KS_MD))	// bold mode
+#ವ್ಯಾಖ್ಯಾನಿಸು T_SE	(ಪದ_STR(KS_SE))	// normal mode
+#ವ್ಯಾಖ್ಯಾನಿಸು T_SO	(ಪದ_STR(KS_SO))	// standout mode
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CZH	(ಪದ_STR(KS_CZH))	// italic mode start
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CZR	(ಪದ_STR(KS_CZR))	// italic mode end
+#ವ್ಯಾಖ್ಯಾನಿಸು T_UE	(ಪದ_STR(KS_UE))	// exit underscore (underline) mode
+#ವ್ಯಾಖ್ಯಾನಿಸು T_US	(ಪದ_STR(KS_US))	// underscore (underline) mode
+#ವ್ಯಾಖ್ಯಾನಿಸು T_UCE	(ಪದ_STR(KS_UCE))	// exit undercurl mode
+#ವ್ಯಾಖ್ಯಾನಿಸು T_UCS	(ಪದ_STR(KS_UCS))	// undercurl mode
+#ವ್ಯಾಖ್ಯಾನಿಸು T_USS	(ಪದ_STR(KS_USS))	// double underline mode
+#ವ್ಯಾಖ್ಯಾನಿಸು T_DS	(ಪದ_STR(KS_DS))	// dotted underline mode
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CDS	(ಪದ_STR(KS_CDS))	// dashed underline mode
+#ವ್ಯಾಖ್ಯಾನಿಸು T_STE	(ಪದ_STR(KS_STE))	// exit strikethrough mode
+#ವ್ಯಾಖ್ಯಾನಿಸು T_STS	(ಪದ_STR(KS_STS))	// strikethrough mode
+#ವ್ಯಾಖ್ಯಾನಿಸು T_MS	(ಪದ_STR(KS_MS))	// save to move cur in reverse mode
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CM	(ಪದ_STR(KS_CM))	// cursor motion
+#ವ್ಯಾಖ್ಯಾನಿಸು T_SR	(ಪದ_STR(KS_SR))	// scroll reverse (backward)
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CRI	(ಪದ_STR(KS_CRI))	// cursor number of chars right
+#ವ್ಯಾಖ್ಯಾನಿಸು T_VB	(ಪದ_STR(KS_VB))	// visual bell
+#ವ್ಯಾಖ್ಯಾನಿಸು T_KS	(ಪದ_STR(KS_KS))	// put term in "keypad transmit" mode
+#ವ್ಯಾಖ್ಯಾನಿಸು T_KE	(ಪದ_STR(KS_KE))	// out of "keypad transmit" mode
+#ವ್ಯಾಖ್ಯಾನಿಸು T_TI	(ಪದ_STR(KS_TI))	// put terminal in termcap mode
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CTI	(ಪದ_STR(KS_CTI))	// put terminal in "raw" mode
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CRK	(ಪದ_STR(KS_CRK))	// request keyboard protocol status
+#ವ್ಯಾಖ್ಯಾನಿಸು T_TE	(ಪದ_STR(KS_TE))	// end of termcap mode
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CTE	(ಪದ_STR(KS_CTE))	// end of "raw" mode
+#ವ್ಯಾಖ್ಯಾನಿಸು T_BC	(ಪದ_STR(KS_BC))	// backspace character
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CCS	(ಪದ_STR(KS_CCS))	// cur is relative to scroll region
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CCO	(ಪದ_STR(KS_CCO))	// number of colors
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CSF	(ಪದ_STR(KS_CSF))	// set foreground color
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CSB	(ಪದ_STR(KS_CSB))	// set background color
+#ವ್ಯಾಖ್ಯಾನಿಸು T_XS	(ಪದ_STR(KS_XS))	// standout not erased by overwriting
+#ವ್ಯಾಖ್ಯಾನಿಸು T_XN	(ಪದ_STR(KS_XN))	// newline glitch
+#ವ್ಯಾಖ್ಯಾನಿಸು T_MB	(ಪದ_STR(KS_MB))	// blink mode
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CAF	(ಪದ_STR(KS_CAF))	// set foreground color (ANSI)
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CAB	(ಪದ_STR(KS_CAB))	// set background color (ANSI)
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CAU	(ಪದ_STR(KS_CAU))	// set underline color (ANSI)
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CFO	(ಪದ_STR(KS_CF))	// set alternate font
+#ವ್ಯಾಖ್ಯಾನಿಸು T_LE	(ಪದ_STR(KS_LE))	// cursor left
+#ವ್ಯಾಖ್ಯಾನಿಸು T_ND	(ಪದ_STR(KS_ND))	// cursor right
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CIS	(ಪದ_STR(KS_CIS))	// set icon text start
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CIE	(ಪದ_STR(KS_CIE))	// set icon text end
+#ವ್ಯಾಖ್ಯಾನಿಸು T_TS	(ಪದ_STR(KS_TS))	// set window title start
+#ವ್ಯಾಖ್ಯಾನಿಸು T_FS	(ಪದ_STR(KS_FS))	// set window title end
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CSC	(ಪದ_STR(KS_CSC))	// set cursor color start
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CEC	(ಪದ_STR(KS_CEC))	// set cursor color end
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CWP	(ಪದ_STR(KS_CWP))	// set window position
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CGP	(ಪದ_STR(KS_CGP))	// get window position
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CWS	(ಪದ_STR(KS_CWS))	// window size
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CSI	(ಪದ_STR(KS_CSI))	// start insert mode
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CEI	(ಪದ_STR(KS_CEI))	// end insert mode
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CSR	(ಪದ_STR(KS_CSR))	// start replace mode
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CRV	(ಪದ_STR(KS_CRV))	// request version string
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CXM	(ಪದ_STR(KS_CXM))	// enable/disable mouse reporting
+#ವ್ಯಾಖ್ಯಾನಿಸು T_RFG	(ಪದ_STR(KS_RFG))	// request foreground RGB
+#ವ್ಯಾಖ್ಯಾನಿಸು T_RBG	(ಪದ_STR(KS_RBG))	// request background RGB
+#ವ್ಯಾಖ್ಯಾನಿಸು T_OP	(ಪದ_STR(KS_OP))	// original color pair
+#ವ್ಯಾಖ್ಯಾನಿಸು T_U7	(ಪದ_STR(KS_U7))	// request cursor position
+#ವ್ಯಾಖ್ಯಾನಿಸು T_8F	(ಪದ_STR(KS_8F))	// set foreground color (RGB)
+#ವ್ಯಾಖ್ಯಾನಿಸು T_8B	(ಪದ_STR(KS_8B))	// set background color (RGB)
+#ವ್ಯಾಖ್ಯಾನಿಸು T_8U	(ಪದ_STR(KS_8U))	// set underline color (RGB)
+#ವ್ಯಾಖ್ಯಾನಿಸು T_BE	(ಪದ_STR(KS_CBE))	// enable bracketed paste mode
+#ವ್ಯಾಖ್ಯಾನಿಸು T_BD	(ಪದ_STR(KS_CBD))	// disable bracketed paste mode
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CST	(ಪದ_STR(KS_CST))	// save window title
+#ವ್ಯಾಖ್ಯಾನಿಸು T_CRT	(ಪದ_STR(KS_CRT))	// restore window title
+#ವ್ಯಾಖ್ಯಾನಿಸು T_SSI	(ಪದ_STR(KS_SSI))	// save icon text
+#ವ್ಯಾಖ್ಯಾನಿಸು T_SRI	(ಪದ_STR(KS_SRI))	// restore icon text
+#ವ್ಯಾಖ್ಯಾನಿಸು T_FD	(ಪದ_STR(KS_FD))	// disable focus event tracking
+#ವ್ಯಾಖ್ಯಾನಿಸು T_FE	(ಪದ_STR(KS_FE))	// enable focus event tracking
+#ವ್ಯಾಖ್ಯಾನಿಸು T_XON	(ಪದ_STR(KS_XON))	// terminal uses xon/xoff handshaking
+#ವ್ಯಾಖ್ಯಾನಿಸು T_BSU	(ಪದ_STR(KS_BSU))	// begin synchronized update
+#ವ್ಯಾಖ್ಯಾನಿಸು T_ESU	(ಪದ_STR(KS_ESU))	// end synchronized update
 
-typedef enum {
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ {
     TMODE_COOK,	    // terminal mode for external cmds and Ex mode
     TMODE_SLEEP,    // terminal mode for sleeping (cooked but no echo)
     TMODE_RAW,	    // terminal mode for Normal and Insert mode
     TMODE_UNKNOWN   // after executing a shell
 } tmode_T;
 
-#if defined(MSWIN)
+#ಆದರೆ defined(MSWIN)
 // Mapping between cterm indices < 16 and their counterpart in the ANSI palette.
-extern const char_u cterm_ansi_idx[];
-#endif
+ಬಾಹ್ಯ ಸ್ಥಿರಾಂಕ char_u cterm_ansi_idx[];
+#ಆದರೆ_ಅಂತ್ಯ

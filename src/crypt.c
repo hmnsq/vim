@@ -10,9 +10,9 @@
 /*
  * crypt.c: Generic encryption support.
  */
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-#if defined(FEAT_CRYPT)
+#ಆದರೆ defined(FEAT_CRYPT)
 /*
  * Optional encryption support.
  * Mohsin Ahmed, mosh@sasi.com, 1998-09-24
@@ -29,37 +29,37 @@
  * and sha256 by Christophe Devine.
  */
 
-typedef struct {
-    char	*name;		// encryption name as used in 'cryptmethod'
-    char	*magic;		// magic bytes stored in file header
-    int		salt_len;	// length of salt, or 0 when not using salt
-    int		seed_len;	// length of seed, or 0 when not using seed
-    int		add_len;	// additional length in the header needed for storing
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+    ಅಕ್ಷರ	*name;		// encryption name as used in 'cryptmethod'
+    ಅಕ್ಷರ	*magic;		// magic bytes stored in file header
+    ಪೂರ್ಣಾಂಕ		salt_len;	// length of salt, or 0 when not using salt
+    ಪೂರ್ಣಾಂಕ		ಬೀಜ_len;	// length of seed, or 0 when not using seed
+    ಪೂರ್ಣಾಂಕ		ಕೂಡಿಸು_len;	// additional length in the header needed for storing
 				// custom data
-#ifdef CRYPT_NOT_INPLACE
-    int		works_inplace;	// encryption/decryption can be done in-place
-#endif
-    int		whole_undofile;	// whole undo file is encrypted
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ CRYPT_NOT_INPLACE
+    ಪೂರ್ಣಾಂಕ		ಕೆಲಸಮಾಡುತ್ತದೆ_inplace;	// encryption/decryption can be done in-place
+#ಆದರೆ_ಅಂತ್ಯ
+    ಪೂರ್ಣಾಂಕ		ಸಂಪೂರ್ಣ_undofile;	// whole undo file is encrypted
 
     // Optional function pointer for a self-test.
-    int (*self_test_fn)(void);
+    ಪೂರ್ಣಾಂಕ (*self_test_fn)(ಶೂನ್ಯ);
 
     // Function pointer for initializing encryption/decryption.
-    int (* init_fn)(cryptstate_T *state, char_u *key, crypt_arg_T *arg);
+    ಪೂರ್ಣಾಂಕ (* init_fn)(cryptstate_T *state, char_u *ಕೀಲಿ, crypt_arg_T *arg);
 
     // Function pointers for encoding/decoding from one buffer into another.
     // Optional, however, these or the _buffer ones should be configured.
-    void (*encode_fn)(cryptstate_T *state, char_u *from, size_t len,
-							char_u *to, int last);
-    void (*decode_fn)(cryptstate_T *state, char_u *from, size_t len,
-							char_u *to, int last);
+    ಶೂನ್ಯ (*encode_fn)(cryptstate_T *state, char_u *from, size_t len,
+							char_u *ಗಮ್ಯ, ಪೂರ್ಣಾಂಕ ಕೊನೆಯ);
+    ಶೂನ್ಯ (*decode_fn)(cryptstate_T *state, char_u *from, size_t len,
+							char_u *ಗಮ್ಯ, ಪೂರ್ಣಾಂಕ ಕೊನೆಯ);
 
     // Function pointers for encoding and decoding, can buffer data if needed.
     // Optional (however, these or the above should be configured).
-    long (*encode_buffer_fn)(cryptstate_T *state, char_u *from, size_t len,
-						    char_u **newptr, int last);
-    long (*decode_buffer_fn)(cryptstate_T *state, char_u *from, size_t len,
-						    char_u **newptr, int last);
+    ದೀರ್ಘ (*encode_ಬಫರ್_fn)(cryptstate_T *state, char_u *from, size_t len,
+						    char_u **newptr, ಪೂರ್ಣಾಂಕ ಕೊನೆಯ);
+    ದೀರ್ಘ (*decode_ಬಫರ್_fn)(cryptstate_T *state, char_u *from, size_t len,
+						    char_u **newptr, ಪೂರ್ಣಾಂಕ ಕೊನೆಯ);
 
     // Function pointers for in-place encoding and decoding, used for
     // crypt_*_inplace(). "from" and "to" arguments will be equal.
@@ -68,27 +68,27 @@ typedef struct {
     // the crypt_(en|de)code() interface (for example because it wishes to add
     // padding to files).
     // This method is used for swap and undo files which have a rigid format.
-    void (*encode_inplace_fn)(cryptstate_T *state, char_u *p1, size_t len,
-							char_u *p2, int last);
-    void (*decode_inplace_fn)(cryptstate_T *state, char_u *p1, size_t len,
-							char_u *p2, int last);
+    ಶೂನ್ಯ (*encode_inplace_fn)(cryptstate_T *state, char_u *p1, size_t len,
+							char_u *p2, ಪೂರ್ಣಾಂಕ ಕೊನೆಯ);
+    ಶೂನ್ಯ (*decode_inplace_fn)(cryptstate_T *state, char_u *p1, size_t len,
+							char_u *p2, ಪೂರ್ಣಾಂಕ ಕೊನೆಯ);
 } cryptmethod_T;
 
-static int crypt_sodium_init_(cryptstate_T *state, char_u *key, crypt_arg_T *arg);
-static long crypt_sodium_buffer_decode(cryptstate_T *state, char_u *from, size_t len, char_u **buf_out, int last);
-static long crypt_sodium_buffer_encode(cryptstate_T *state, char_u *from, size_t len, char_u **buf_out, int last);
-#if defined(FEAT_SODIUM)
-static void crypt_long_long_to_char(long long n, char_u *s);
-static void crypt_int_to_char(int n, char_u *s);
-static long long crypt_char_to_long_long(char_u *s);
-static int crypt_char_to_int(char_u *s);
-#endif
-#if defined(FEAT_EVAL) && defined(FEAT_SODIUM)
-static void crypt_sodium_report_hash_params(unsigned long long opslimit, unsigned long long ops_def, size_t memlimit, size_t mem_def, int alg, int alg_def);
-#endif
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ crypt_sodium_init_(cryptstate_T *state, char_u *ಕೀಲಿ, crypt_arg_T *arg);
+ಸ್ಥಿರ ದೀರ್ಘ crypt_sodium_ಬಫರ್_decode(cryptstate_T *state, char_u *from, size_t len, char_u **buf_ಹೊರಹೋಗು, ಪೂರ್ಣಾಂಕ ಕೊನೆಯ);
+ಸ್ಥಿರ ದೀರ್ಘ crypt_sodium_ಬಫರ್_encode(cryptstate_T *state, char_u *from, size_t len, char_u **buf_ಹೊರಹೋಗು, ಪೂರ್ಣಾಂಕ ಕೊನೆಯ);
+#ಆದರೆ defined(FEAT_SODIUM)
+ಸ್ಥಿರ ಶೂನ್ಯ crypt_long_long_ಗಮ್ಯ_char(ದೀರ್ಘ ದೀರ್ಘ n, char_u *s);
+ಸ್ಥಿರ ಶೂನ್ಯ crypt_int_ಗಮ್ಯ_char(ಪೂರ್ಣಾಂಕ n, char_u *s);
+ಸ್ಥಿರ ದೀರ್ಘ ದೀರ್ಘ crypt_char_ಗಮ್ಯ_long_long(char_u *s);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ crypt_char_ಗಮ್ಯ_int(char_u *s);
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(FEAT_EVAL) && defined(FEAT_SODIUM)
+ಸ್ಥಿರ ಶೂನ್ಯ crypt_sodium_report_hash_params(ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ ದೀರ್ಘ opslimit, ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ ದೀರ್ಘ ops_def, size_t memlimit, size_t mem_def, ಪೂರ್ಣಾಂಕ alg, ಪೂರ್ಣಾಂಕ alg_def);
+#ಆದರೆ_ಅಂತ್ಯ
 
 // index is method_nr of cryptstate_T, CRYPT_M_*
-static cryptmethod_T cryptmethods[CRYPT_M_COUNT] = {
+ಸ್ಥಿರ cryptmethod_T cryptmethods[CRYPT_M_ಎಣಿಕೆ] = {
     // PK_Zip; very weak
     {
 	"zip",
@@ -96,14 +96,14 @@ static cryptmethod_T cryptmethods[CRYPT_M_COUNT] = {
 	0,
 	0,
 	0,
-#ifdef CRYPT_NOT_INPLACE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ CRYPT_NOT_INPLACE
 	TRUE,
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	FALSE,
-	NULL,
+	ಖಾಲಿ,
 	crypt_zip_init,
 	crypt_zip_encode, crypt_zip_decode,
-	NULL, NULL,
+	ಖಾಲಿ, ಖಾಲಿ,
 	crypt_zip_encode, crypt_zip_decode,
     },
 
@@ -114,14 +114,14 @@ static cryptmethod_T cryptmethods[CRYPT_M_COUNT] = {
 	8,
 	8,
 	0,
-#ifdef CRYPT_NOT_INPLACE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ CRYPT_NOT_INPLACE
 	TRUE,
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	FALSE,
 	blowfish_self_test,
 	crypt_blowfish_init,
 	crypt_blowfish_encode, crypt_blowfish_decode,
-	NULL, NULL,
+	ಖಾಲಿ, ಖಾಲಿ,
 	crypt_blowfish_encode, crypt_blowfish_decode,
     },
 
@@ -132,14 +132,14 @@ static cryptmethod_T cryptmethods[CRYPT_M_COUNT] = {
 	8,
 	8,
 	0,
-#ifdef CRYPT_NOT_INPLACE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ CRYPT_NOT_INPLACE
 	TRUE,
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	TRUE,
 	blowfish_self_test,
 	crypt_blowfish_init,
 	crypt_blowfish_encode, crypt_blowfish_decode,
-	NULL, NULL,
+	ಖಾಲಿ, ಖಾಲಿ,
 	crypt_blowfish_encode, crypt_blowfish_decode,
     },
 
@@ -147,54 +147,54 @@ static cryptmethod_T cryptmethods[CRYPT_M_COUNT] = {
     {
 	"xchacha20",
 	"VimCrypt~04!",
-#ifdef FEAT_SODIUM
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SODIUM
 	crypto_pwhash_argon2id_SALTBYTES, // 16
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 	16,
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	8,
 	0,
-#ifdef CRYPT_NOT_INPLACE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ CRYPT_NOT_INPLACE
 	FALSE,
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	FALSE,
-	NULL,
+	ಖಾಲಿ,
 	crypt_sodium_init_,
-	NULL, NULL,
-	crypt_sodium_buffer_encode, crypt_sodium_buffer_decode,
-	NULL, NULL,
+	ಖಾಲಿ, ಖಾಲಿ,
+	crypt_sodium_ಬಫರ್_encode, crypt_sodium_ಬಫರ್_decode,
+	ಖಾಲಿ, ಖಾಲಿ,
     },
     // XChaCha20 using libsodium; stores parameters in header
     {
 	"xchacha20v2",
 	"VimCrypt~05!",
-#ifdef FEAT_SODIUM
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SODIUM
 	crypto_pwhash_argon2id_SALTBYTES, // 16
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 	16,
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	8,
 	// sizeof(crypto_pwhash_OPSLIMIT_INTERACTIVE + crypto_pwhash_MEMLIMIT_INTERACTIVE + crypto_pwhash_ALG_DEFAULT)
 	20,
-#ifdef CRYPT_NOT_INPLACE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ CRYPT_NOT_INPLACE
 	FALSE,
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	FALSE,
-	NULL,
+	ಖಾಲಿ,
 	crypt_sodium_init_,
-	NULL, NULL,
-	crypt_sodium_buffer_encode, crypt_sodium_buffer_decode,
-	NULL, NULL,
+	ಖಾಲಿ, ಖಾಲಿ,
+	crypt_sodium_ಬಫರ್_encode, crypt_sodium_ಬಫರ್_decode,
+	ಖಾಲಿ, ಖಾಲಿ,
     },
 
     // NOTE: when adding a new method, use some random bytes for the magic key,
     // to avoid that a text file is recognized as encrypted.
 };
 
-#if defined(FEAT_SODIUM)
-typedef struct {
-    size_t	    count;
-    unsigned char   key[crypto_box_SEEDBYTES];
+#ಆದರೆ defined(FEAT_SODIUM)
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+    size_t	    ಎಣಿಕೆ_2;
+    ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ   ಕೀಲಿ[crypto_box_SEEDBYTES];
 		  // 32, same as crypto_secretstream_xchacha20poly1305_KEYBYTES
     crypto_secretstream_xchacha20poly1305_state
 		    state;
@@ -204,12 +204,12 @@ typedef struct {
 # ifdef DYNAMIC_SODIUM
 #  ifdef MSWIN
 #   define SODIUM_PROC FARPROC
-#   define load_dll vimLoadLib
-#   define symbol_from_dll GetProcAddress
+#   define ತುಂಬು_dll vim_ತುಂಬು_Lib
+#   define ಚಿಹ್ನೆ_from_dll Get_Proc_ವಿಳಾಸ
 #   define close_dll FreeLibrary
-#   define load_dll_error GetWin32Error
-#  else
-#   error Dynamic loading of libsodium is not supported for now.
+#   define ತುಂಬು_dll_error GetWin32Error
+#  ಇಲ್ಲದಿದ್ದರೆ
+#   error Dynamic loading ದ libsodium is not supported ಗಾಗಿ now.
 //#   define HINSTANCE void*
 //#   define SODIUM_PROC void*
 //#   define load_dll(n) dlopen((n), RTLD_LAZY|RTLD_GLOBAL)
@@ -218,16 +218,16 @@ typedef struct {
 //#   define load_dll_error dlerror
 #  endif
 
-#  define sodium_init	    load_sodium
+#  define sodium_init	    ತುಂಬು_sodium
 #  define sodium_free	    dll_sodium_free
 #  define sodium_malloc	    dll_sodium_malloc
 #  define sodium_memzero    dll_sodium_memzero
 #  define sodium_mlock	    dll_sodium_mlock
 #  define sodium_munlock    dll_sodium_munlock
-#  define crypto_secretstream_xchacha20poly1305_init_push \
-    dll_crypto_secretstream_xchacha20poly1305_init_push
-#  define crypto_secretstream_xchacha20poly1305_push \
-    dll_crypto_secretstream_xchacha20poly1305_push
+#  define crypto_secretstream_xchacha20poly1305_init_ತಳ್ಳು \
+    dll_crypto_secretstream_xchacha20poly1305_init_ತಳ್ಳು
+#  define crypto_secretstream_xchacha20poly1305_ತಳ್ಳು \
+    dll_crypto_secretstream_xchacha20poly1305_ತಳ್ಳು
 #  define crypto_secretstream_xchacha20poly1305_init_pull \
     dll_crypto_secretstream_xchacha20poly1305_init_pull
 #  define crypto_secretstream_xchacha20poly1305_pull \
@@ -236,113 +236,113 @@ typedef struct {
 #  define randombytes_buf   dll_randombytes_buf
 #  define randombytes_random dll_randombytes_random
 
-static int (*dll_sodium_init)(void) = NULL;
-static void (*dll_sodium_free)(void *) = NULL;
-static void *(*dll_sodium_malloc)(const size_t) = NULL;
-static void (*dll_sodium_memzero)(void * const, const size_t) = NULL;
-static int (*dll_sodium_mlock)(void * const, const size_t) = NULL;
-static int (*dll_sodium_munlock)(void * const, const size_t) = NULL;
-static int (*dll_crypto_secretstream_xchacha20poly1305_init_push)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ (*dll_sodium_init)(ಶೂನ್ಯ) = ಖಾಲಿ;
+ಸ್ಥಿರ ಶೂನ್ಯ (*dll_sodium_free)(ಶೂನ್ಯ *) = ಖಾಲಿ;
+ಸ್ಥಿರ ಶೂನ್ಯ *(*dll_sodium_malloc)(ಸ್ಥಿರಾಂಕ size_t) = ಖಾಲಿ;
+ಸ್ಥಿರ ಶೂನ್ಯ (*dll_sodium_memzero)(ಶೂನ್ಯ * ಸ್ಥಿರಾಂಕ, ಸ್ಥಿರಾಂಕ size_t) = ಖಾಲಿ;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ (*dll_sodium_mlock)(ಶೂನ್ಯ * ಸ್ಥಿರಾಂಕ, ಸ್ಥಿರಾಂಕ size_t) = ಖಾಲಿ;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ (*dll_sodium_munlock)(ಶೂನ್ಯ * ಸ್ಥಿರಾಂಕ, ಸ್ಥಿರಾಂಕ size_t) = ಖಾಲಿ;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ (*dll_crypto_secretstream_xchacha20poly1305_init_ತಳ್ಳು)
    (crypto_secretstream_xchacha20poly1305_state *state,
-    unsigned char [],
-    const unsigned char []) = NULL;
-static int (*dll_crypto_secretstream_xchacha20poly1305_push)
+    ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ [],
+    ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ []) = ಖಾಲಿ;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ (*dll_crypto_secretstream_xchacha20poly1305_ತಳ್ಳು)
    (crypto_secretstream_xchacha20poly1305_state *state,
-    unsigned char *c, unsigned long long *clen_p,
-    const unsigned char *m, unsigned long long mlen,
-    const unsigned char *ad, unsigned long long adlen, unsigned char tag)
-    = NULL;
-static int (*dll_crypto_secretstream_xchacha20poly1305_init_pull)
+    ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ *c, ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ ದೀರ್ಘ *clen_p,
+    ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ *m, ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ ದೀರ್ಘ mlen,
+    ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ *ad, ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ ದೀರ್ಘ adlen, ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ ಟ್ಯಾಗ್)
+    = ಖಾಲಿ;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ (*dll_crypto_secretstream_xchacha20poly1305_init_pull)
    (crypto_secretstream_xchacha20poly1305_state *state,
-    const unsigned char [],
-    const unsigned char []) = NULL;
-static int (*dll_crypto_secretstream_xchacha20poly1305_pull)
+    ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ [],
+    ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ []) = ಖಾಲಿ;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ (*dll_crypto_secretstream_xchacha20poly1305_pull)
    (crypto_secretstream_xchacha20poly1305_state *state,
-    unsigned char *m, unsigned long long *mlen_p, unsigned char *tag_p,
-    const unsigned char *c, unsigned long long clen,
-    const unsigned char *ad, unsigned long long adlen) = NULL;
-static int (*dll_crypto_pwhash)(unsigned char * const out,
-    unsigned long long outlen,
-    const char * const passwd, unsigned long long passwdlen,
-    const unsigned char * const salt,
-    unsigned long long opslimit, size_t memlimit, int alg)
-    = NULL;
-static void (*dll_randombytes_buf)(void * const buf, const size_t size);
-static uint32_t (*dll_randombytes_random)(void);
+    ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ *m, ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ ದೀರ್ಘ *mlen_p, ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ *ಟ್ಯಾಗ್_p,
+    ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ *c, ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ ದೀರ್ಘ clen,
+    ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ *ad, ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ ದೀರ್ಘ adlen) = ಖಾಲಿ;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ (*dll_crypto_pwhash)(ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ * ಸ್ಥಿರಾಂಕ ಹೊರಹೋಗು,
+    ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ ದೀರ್ಘ outlen,
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ * ಸ್ಥಿರಾಂಕ passwd, ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ ದೀರ್ಘ passwdlen,
+    ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ * ಸ್ಥಿರಾಂಕ salt,
+    ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ ದೀರ್ಘ opslimit, size_t memlimit, ಪೂರ್ಣಾಂಕ alg)
+    = ಖಾಲಿ;
+ಸ್ಥಿರ ಶೂನ್ಯ (*dll_randombytes_buf)(ಶೂನ್ಯ * ಸ್ಥಿರಾಂಕ buf, ಸ್ಥಿರಾಂಕ size_t ಗಾತ್ರ_2);
+ಸ್ಥಿರ uint32_t (*dll_randombytes_random)(ಶೂನ್ಯ);
 
-static struct {
-    const char *name;
+ಸ್ಥಿರ ರಚನೆ {
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *name;
     SODIUM_PROC *ptr;
-} sodium_funcname_table[] = {
+} sodium_funcname_ಕೋಷ್ಟಕ[] = {
     {"sodium_init", (SODIUM_PROC*)&dll_sodium_init},
     {"sodium_free", (SODIUM_PROC*)&dll_sodium_free},
     {"sodium_malloc", (SODIUM_PROC*)&dll_sodium_malloc},
     {"sodium_memzero", (SODIUM_PROC*)&dll_sodium_memzero},
     {"sodium_mlock", (SODIUM_PROC*)&dll_sodium_mlock},
     {"sodium_munlock", (SODIUM_PROC*)&dll_sodium_munlock},
-    {"crypto_secretstream_xchacha20poly1305_init_push", (SODIUM_PROC*)&dll_crypto_secretstream_xchacha20poly1305_init_push},
-    {"crypto_secretstream_xchacha20poly1305_push", (SODIUM_PROC*)&dll_crypto_secretstream_xchacha20poly1305_push},
+    {"crypto_secretstream_xchacha20poly1305_init_push", (SODIUM_PROC*)&dll_crypto_secretstream_xchacha20poly1305_init_ತಳ್ಳು},
+    {"crypto_secretstream_xchacha20poly1305_push", (SODIUM_PROC*)&dll_crypto_secretstream_xchacha20poly1305_ತಳ್ಳು},
     {"crypto_secretstream_xchacha20poly1305_init_pull", (SODIUM_PROC*)&dll_crypto_secretstream_xchacha20poly1305_init_pull},
     {"crypto_secretstream_xchacha20poly1305_pull", (SODIUM_PROC*)&dll_crypto_secretstream_xchacha20poly1305_pull},
     {"crypto_pwhash", (SODIUM_PROC*)&dll_crypto_pwhash},
     {"randombytes_buf", (SODIUM_PROC*)&dll_randombytes_buf},
     {"randombytes_random", (SODIUM_PROC*)&dll_randombytes_random},
-    {NULL, NULL}
+    {ಖಾಲಿ, ಖಾಲಿ}
 };
 
-    static int
-sodium_runtime_link_init(int verbose)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+sodium_runtime_link_init(ಪೂರ್ಣಾಂಕ verbose)
 {
-    static HINSTANCE hsodium = NULL;
-    const char *libname = DYNAMIC_SODIUM_DLL;
-    int i;
+    ಸ್ಥಿರ HINSTANCE hsodium = ಖಾಲಿ;
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *libname = DYNAMIC_SODIUM_DLL;
+    ಪೂರ್ಣಾಂಕ i;
 
-    if (hsodium != NULL)
-	return OK;
+    ಆದರೆ (hsodium != ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ OK;
 
-    hsodium = load_dll(libname);
-    if (hsodium == NULL)
+    hsodium = ತುಂಬು_dll(libname);
+    ಆದರೆ (hsodium == ಖಾಲಿ)
     {
-	if (verbose)
-	    semsg(_(e_could_not_load_library_str_str), libname, load_dll_error());
-	return FAIL;
+	ಆದರೆ (verbose)
+	    semsg(_(e_could_not_ತುಂಬು_library_str_str), libname, ತುಂಬು_dll_error());
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
-    for (i = 0; sodium_funcname_table[i].ptr; ++i)
+    ಗಾಗಿ (i = 0; sodium_funcname_ಕೋಷ್ಟಕ[i].ptr; ++i)
     {
-	if ((*sodium_funcname_table[i].ptr = symbol_from_dll(hsodium,
-			sodium_funcname_table[i].name)) == NULL)
+	ಆದರೆ ((*sodium_funcname_ಕೋಷ್ಟಕ[i].ptr = ಚಿಹ್ನೆ_from_dll(hsodium,
+			sodium_funcname_ಕೋಷ್ಟಕ[i].name)) == ಖಾಲಿ)
 	{
 	    close_dll(hsodium);
-	    hsodium = NULL;
-	    if (verbose)
-		semsg(_(e_could_not_load_library_function_str), sodium_funcname_table[i].name);
-	    return FAIL;
+	    hsodium = ಖಾಲಿ;
+	    ಆದರೆ (verbose)
+		semsg(_(e_could_not_ತುಂಬು_library_function_str), sodium_funcname_ಕೋಷ್ಟಕ[i].name);
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-    static int
-load_sodium(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ತುಂಬು_sodium(ಶೂನ್ಯ)
 {
-    if (sodium_runtime_link_init(TRUE) == FAIL)
-	return -1;
-    return dll_sodium_init();
+    ಆದರೆ (sodium_runtime_link_init(TRUE) == FAIL)
+	ಹಿಂತಿರುಗಿ -1;
+    ಹಿಂತಿರುಗಿ dll_sodium_init();
 }
 # endif
 
-# if defined(DYNAMIC_SODIUM)
-    int
-sodium_enabled(int verbose)
+# ಆದರೆ defined(DYNAMIC_SODIUM)
+    ಪೂರ್ಣಾಂಕ
+sodium_enabled(ಪೂರ್ಣಾಂಕ verbose)
 {
-    return sodium_runtime_link_init(verbose) == OK;
+    ಹಿಂತಿರುಗಿ sodium_runtime_link_init(verbose) == OK;
 }
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#define CRYPT_MAGIC_LEN	12	// cannot change
-static const char crypt_magic_head[] = "VimCrypt~";
+#ವ್ಯಾಖ್ಯಾನಿಸು CRYPT_MAGIC_LEN	12	// cannot change
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ crypt_magic_ತಲೆ[] = "VimCrypt~";
 
 /*
  * Return int value for crypt method name.
@@ -350,15 +350,15 @@ static const char crypt_magic_head[] = "VimCrypt~";
  * 1 for "blowfish".
  * 2 for "blowfish2".
  */
-    int
-crypt_method_nr_from_name(char_u *name)
+    ಪೂರ್ಣಾಂಕ
+crypt_ವಿಧಾನ_nr_from_name(char_u *name)
 {
-    int i;
+    ಪೂರ್ಣಾಂಕ i;
 
-    for (i = 0; i < CRYPT_M_COUNT; ++i)
-	if (STRCMP(name, cryptmethods[i].name) == 0)
-	    return i;
-    return 0;
+    ಗಾಗಿ (i = 0; i < CRYPT_M_ಎಣಿಕೆ; ++i)
+	ಆದರೆ (STRCMP(name, cryptmethods[i].name) == 0)
+	    ಹಿಂತಿರುಗಿ i;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
 /*
@@ -366,121 +366,121 @@ crypt_method_nr_from_name(char_u *name)
  * start of the file.
  * Returns -1 when no encryption used.
  */
-    int
-crypt_method_nr_from_magic(char *ptr, int len)
+    ಪೂರ್ಣಾಂಕ
+crypt_ವಿಧಾನ_nr_from_magic(ಅಕ್ಷರ *ptr, ಪೂರ್ಣಾಂಕ len)
 {
-    int i;
+    ಪೂರ್ಣಾಂಕ i;
 
-    if (len < CRYPT_MAGIC_LEN)
-	return -1;
+    ಆದರೆ (len < CRYPT_MAGIC_LEN)
+	ಹಿಂತಿರುಗಿ -1;
 
-    for (i = 0; i < CRYPT_M_COUNT; i++)
-	if (memcmp(ptr, cryptmethods[i].magic, CRYPT_MAGIC_LEN) == 0)
-	    return i;
+    ಗಾಗಿ (i = 0; i < CRYPT_M_ಎಣಿಕೆ; i++)
+	ಆದರೆ (memcmp(ptr, cryptmethods[i].magic, CRYPT_MAGIC_LEN) == 0)
+	    ಹಿಂತಿರುಗಿ i;
 
-    i = (int)STRLEN(crypt_magic_head);
-    if (len >= i && memcmp(ptr, crypt_magic_head, i) == 0)
-	emsg(_(e_file_is_encrypted_with_unknown_method));
+    i = (ಪೂರ್ಣಾಂಕ)STRLEN(crypt_magic_ತಲೆ);
+    ಆದರೆ (len >= i && memcmp(ptr, crypt_magic_ತಲೆ, i) == 0)
+	emsg(_(e_file_is_encrypted_with_unknown_ವಿಧಾನ));
 
-    return -1;
+    ಹಿಂತಿರುಗಿ -1;
 }
 
-#ifdef CRYPT_NOT_INPLACE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ CRYPT_NOT_INPLACE
 /*
  * Return TRUE if the crypt method for "method_nr" can be done in-place.
  */
-    int
-crypt_works_inplace(cryptstate_T *state)
+    ಪೂರ್ಣಾಂಕ
+crypt_ಕೆಲಸಮಾಡುತ್ತದೆ_inplace(cryptstate_T *state)
 {
-    return cryptmethods[state->method_nr].works_inplace;
+    ಹಿಂತಿರುಗಿ cryptmethods[state->ವಿಧಾನ_nr].ಕೆಲಸಮಾಡುತ್ತದೆ_inplace;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Get the crypt method for buffer "buf" as a number.
  */
-    int
-crypt_get_method_nr(buf_T *buf)
+    ಪೂರ್ಣಾಂಕ
+crypt_get_ವಿಧಾನ_nr(buf_T *buf)
 {
-    return crypt_method_nr_from_name(*buf->b_p_cm == NUL ? p_cm : buf->b_p_cm);
+    ಹಿಂತಿರುಗಿ crypt_ವಿಧಾನ_nr_from_name(*buf->b_p_cm == NUL ? p_cm : buf->b_p_cm);
 }
 
 /*
  * Returns True for Sodium Encryption.
  */
-    int
-crypt_method_is_sodium(int method)
+    ಪೂರ್ಣಾಂಕ
+crypt_ವಿಧಾನ_is_sodium(ಪೂರ್ಣಾಂಕ ವಿಧಾನ)
 {
-    return method == CRYPT_M_SOD || method == CRYPT_M_SOD2;
+    ಹಿಂತಿರುಗಿ ವಿಧಾನ == CRYPT_M_SOD || ವಿಧಾನ == CRYPT_M_SOD2;
 }
 
 /*
  * Return TRUE when the buffer uses an encryption method that encrypts the
  * whole undo file, not only the text.
  */
-    int
-crypt_whole_undofile(int method_nr)
+    ಪೂರ್ಣಾಂಕ
+crypt_ಸಂಪೂರ್ಣ_undofile(ಪೂರ್ಣಾಂಕ ವಿಧಾನ_nr)
 {
-    return cryptmethods[method_nr].whole_undofile;
+    ಹಿಂತಿರುಗಿ cryptmethods[ವಿಧಾನ_nr].ಸಂಪೂರ್ಣ_undofile;
 }
 
 /*
  * Get crypt method specific length of the file header in bytes.
  */
-    int
-crypt_get_header_len(int method_nr)
+    ಪೂರ್ಣಾಂಕ
+crypt_get_ಶೀರ್ಷಿಕೆ_len(ಪೂರ್ಣಾಂಕ ವಿಧಾನ_nr)
 {
-    return CRYPT_MAGIC_LEN
-	+ cryptmethods[method_nr].salt_len
-	+ cryptmethods[method_nr].seed_len
-	+ cryptmethods[method_nr].add_len;
+    ಹಿಂತಿರುಗಿ CRYPT_MAGIC_LEN
+	+ cryptmethods[ವಿಧಾನ_nr].salt_len
+	+ cryptmethods[ವಿಧಾನ_nr].ಬೀಜ_len
+	+ cryptmethods[ವಿಧಾನ_nr].ಕೂಡಿಸು_len;
 }
 
 
-#if defined(FEAT_SODIUM)
+#ಆದರೆ defined(FEAT_SODIUM)
 /*
  * Get maximum crypt method specific length of the file header in bytes.
  */
-    int
-crypt_get_max_header_len(void)
+    ಪೂರ್ಣಾಂಕ
+crypt_get_max_ಶೀರ್ಷಿಕೆ_len(ಶೂನ್ಯ)
 {
-    int i;
-    int max = 0;
-    int temp = 0;
+    ಪೂರ್ಣಾಂಕ i;
+    ಪೂರ್ಣಾಂಕ max = 0;
+    ಪೂರ್ಣಾಂಕ ತಾತ್ಕಾಲಿಕ = 0;
 
-    for (i = 0; i < CRYPT_M_COUNT; ++i)
+    ಗಾಗಿ (i = 0; i < CRYPT_M_ಎಣಿಕೆ; ++i)
     {
-	temp = crypt_get_header_len(i);
-	if (temp > max)
-	    max = temp;
+	ತಾತ್ಕಾಲಿಕ = crypt_get_ಶೀರ್ಷಿಕೆ_len(i);
+	ಆದರೆ (ತಾತ್ಕಾಲಿಕ > max)
+	    max = ತಾತ್ಕಾಲಿಕ;
     }
-    return max;
+    ಹಿಂತಿರುಗಿ max;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Set the crypt method for buffer "buf" to "method_nr" using the int value as
  * returned by crypt_method_nr_from_name().
  */
-    void
-crypt_set_cm_option(buf_T *buf, int method_nr)
+    ಶೂನ್ಯ
+crypt_ಗಣ_cm_option(buf_T *buf, ಪೂರ್ಣಾಂಕ ವಿಧಾನ_nr)
 {
     free_string_option(buf->b_p_cm);
-    buf->b_p_cm = vim_strsave((char_u *)cryptmethods[method_nr].name);
+    buf->b_p_cm = vim_strsave((char_u *)cryptmethods[ವಿಧಾನ_nr].name);
 }
 
 /*
  * If the crypt method for the current buffer has a self-test, run it and
  * return OK/FAIL.
  */
-    int
-crypt_self_test(void)
+    ಪೂರ್ಣಾಂಕ
+crypt_self_test(ಶೂನ್ಯ)
 {
-    int method_nr = crypt_get_method_nr(curbuf);
+    ಪೂರ್ಣಾಂಕ ವಿಧಾನ_nr = crypt_get_ವಿಧಾನ_nr(curbuf);
 
-    if (cryptmethods[method_nr].self_test_fn == NULL)
-	return OK;
-    return cryptmethods[method_nr].self_test_fn();
+    ಆದರೆ (cryptmethods[ವಿಧಾನ_nr].self_test_fn == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ OK;
+    ಹಿಂತಿರುಗಿ cryptmethods[ವಿಧಾನ_nr].self_test_fn();
 }
 
 /*
@@ -489,22 +489,22 @@ crypt_self_test(void)
  */
     cryptstate_T *
 crypt_create(
-    int		method_nr,
-    char_u	*key,
+    ಪೂರ್ಣಾಂಕ		ವಿಧಾನ_nr,
+    char_u	*ಕೀಲಿ,
     crypt_arg_T *crypt_arg)
 {
     cryptstate_T *state = ALLOC_ONE(cryptstate_T);
 
-    if (state == NULL)
-	return state;
+    ಆದರೆ (state == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ state;
 
-    state->method_nr = method_nr;
-    if (cryptmethods[method_nr].init_fn(state, key, crypt_arg) == FAIL)
+    state->ವಿಧಾನ_nr = ವಿಧಾನ_nr;
+    ಆದರೆ (cryptmethods[ವಿಧಾನ_nr].init_fn(state, ಕೀಲಿ, crypt_arg) == FAIL)
     {
 	vim_free(state);
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
-    return state;
+    ಹಿಂತಿರುಗಿ state;
 }
 
 /*
@@ -513,28 +513,28 @@ crypt_create(
  * crypt_get_header_len() returns for "method_nr".
  */
     cryptstate_T *
-crypt_create_from_header(
-    int		method_nr,
-    char_u	*key,
-    char_u	*header)
+crypt_create_from_ಶೀರ್ಷಿಕೆ(
+    ಪೂರ್ಣಾಂಕ		ವಿಧಾನ_nr,
+    char_u	*ಕೀಲಿ,
+    char_u	*ಶೀರ್ಷಿಕೆ)
 {
     crypt_arg_T arg;
 
-    CLEAR_FIELD(arg);
+    CLEAR_ಕ್ಷೇತ್ರ(arg);
     arg.cat_init_from_file = TRUE;
 
-    arg.cat_salt_len = cryptmethods[method_nr].salt_len;
-    arg.cat_seed_len = cryptmethods[method_nr].seed_len;
-    arg.cat_add_len = cryptmethods[method_nr].add_len;
-    if (arg.cat_salt_len > 0)
-	arg.cat_salt = header + CRYPT_MAGIC_LEN;
-    if (arg.cat_seed_len > 0)
-	arg.cat_seed = header + CRYPT_MAGIC_LEN + arg.cat_salt_len;
-    if (arg.cat_add_len > 0)
-	arg.cat_add = header + CRYPT_MAGIC_LEN
-					 + arg.cat_salt_len + arg.cat_seed_len;
+    arg.cat_salt_len = cryptmethods[ವಿಧಾನ_nr].salt_len;
+    arg.cat_ಬೀಜ_len = cryptmethods[ವಿಧಾನ_nr].ಬೀಜ_len;
+    arg.cat_ಕೂಡಿಸು_len = cryptmethods[ವಿಧಾನ_nr].ಕೂಡಿಸು_len;
+    ಆದರೆ (arg.cat_salt_len > 0)
+	arg.cat_salt = ಶೀರ್ಷಿಕೆ + CRYPT_MAGIC_LEN;
+    ಆದರೆ (arg.cat_ಬೀಜ_len > 0)
+	arg.cat_ಬೀಜ = ಶೀರ್ಷಿಕೆ + CRYPT_MAGIC_LEN + arg.cat_salt_len;
+    ಆದರೆ (arg.cat_ಕೂಡಿಸು_len > 0)
+	arg.cat_ಕೂಡಿಸು = ಶೀರ್ಷಿಕೆ + CRYPT_MAGIC_LEN
+					 + arg.cat_salt_len + arg.cat_ಬೀಜ_len;
 
-    return crypt_create(method_nr, key, &arg);
+    ಹಿಂತಿರುಗಿ crypt_create(ವಿಧಾನ_nr, ಕೀಲಿ, &arg);
 }
 
 /*
@@ -542,35 +542,35 @@ crypt_create_from_header(
  * Return an allocated cryptstate_T or NULL on error.
  */
     cryptstate_T *
-crypt_create_from_file(FILE *fp, char_u *key)
+crypt_create_from_file(FILE *fp, char_u *ಕೀಲಿ)
 {
-    int		method_nr;
-    int		header_len;
-    char	magic_buffer[CRYPT_MAGIC_LEN];
-    char_u	*buffer;
+    ಪೂರ್ಣಾಂಕ		ವಿಧಾನ_nr;
+    ಪೂರ್ಣಾಂಕ		ಶೀರ್ಷಿಕೆ_len;
+    ಅಕ್ಷರ	magic_ಬಫರ್[CRYPT_MAGIC_LEN];
+    char_u	*ಬಫರ್;
     cryptstate_T *state;
 
-    if (fread(magic_buffer, CRYPT_MAGIC_LEN, 1, fp) != 1)
-	return NULL;
-    method_nr = crypt_method_nr_from_magic(magic_buffer, CRYPT_MAGIC_LEN);
-    if (method_nr < 0)
-	return NULL;
+    ಆದರೆ (fread(magic_ಬಫರ್, CRYPT_MAGIC_LEN, 1, fp) != 1)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    ವಿಧಾನ_nr = crypt_ವಿಧಾನ_nr_from_magic(magic_ಬಫರ್, CRYPT_MAGIC_LEN);
+    ಆದರೆ (ವಿಧಾನ_nr < 0)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    header_len = crypt_get_header_len(method_nr);
-    if ((buffer = alloc(header_len)) == NULL)
-	return NULL;
-    mch_memmove(buffer, magic_buffer, CRYPT_MAGIC_LEN);
-    if (header_len > CRYPT_MAGIC_LEN
-	    && fread(buffer + CRYPT_MAGIC_LEN,
-				    header_len - CRYPT_MAGIC_LEN, 1, fp) != 1)
+    ಶೀರ್ಷಿಕೆ_len = crypt_get_ಶೀರ್ಷಿಕೆ_len(ವಿಧಾನ_nr);
+    ಆದರೆ ((ಬಫರ್ = alloc(ಶೀರ್ಷಿಕೆ_len)) == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    mch_memmove(ಬಫರ್, magic_ಬಫರ್, CRYPT_MAGIC_LEN);
+    ಆದರೆ (ಶೀರ್ಷಿಕೆ_len > CRYPT_MAGIC_LEN
+	    && fread(ಬಫರ್ + CRYPT_MAGIC_LEN,
+				    ಶೀರ್ಷಿಕೆ_len - CRYPT_MAGIC_LEN, 1, fp) != 1)
     {
-	vim_free(buffer);
-	return NULL;
+	vim_free(ಬಫರ್);
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    state = crypt_create_from_header(method_nr, key, buffer);
-    vim_free(buffer);
-    return state;
+    state = crypt_create_from_ಶೀರ್ಷಿಕೆ(ವಿಧಾನ_nr, ಕೀಲಿ, ಬಫರ್);
+    vim_free(ಬಫರ್);
+    ಹಿಂತಿರುಗಿ state;
 }
 
 /*
@@ -582,106 +582,106 @@ crypt_create_from_file(FILE *fp, char_u *key)
  */
     cryptstate_T *
 crypt_create_for_writing(
-    int	    method_nr,
-    char_u  *key,
-    char_u  **header,
-    int	    *header_len)
+    ಪೂರ್ಣಾಂಕ	    ವಿಧಾನ_nr,
+    char_u  *ಕೀಲಿ,
+    char_u  **ಶೀರ್ಷಿಕೆ,
+    ಪೂರ್ಣಾಂಕ	    *ಶೀರ್ಷಿಕೆ_len)
 {
-    int	    len = crypt_get_header_len(method_nr);
+    ಪೂರ್ಣಾಂಕ	    len = crypt_get_ಶೀರ್ಷಿಕೆ_len(ವಿಧಾನ_nr);
     crypt_arg_T arg;
     cryptstate_T *state;
 
-    CLEAR_FIELD(arg);
-    arg.cat_salt_len = cryptmethods[method_nr].salt_len;
-    arg.cat_seed_len = cryptmethods[method_nr].seed_len;
-    arg.cat_add_len  = cryptmethods[method_nr].add_len;
+    CLEAR_ಕ್ಷೇತ್ರ(arg);
+    arg.cat_salt_len = cryptmethods[ವಿಧಾನ_nr].salt_len;
+    arg.cat_ಬೀಜ_len = cryptmethods[ವಿಧಾನ_nr].ಬೀಜ_len;
+    arg.cat_ಕೂಡಿಸು_len  = cryptmethods[ವಿಧಾನ_nr].ಕೂಡಿಸು_len;
     arg.cat_init_from_file = FALSE;
 
-    *header_len = len;
-    *header = alloc(len);
-    if (*header == NULL)
-	return NULL;
+    *ಶೀರ್ಷಿಕೆ_len = len;
+    *ಶೀರ್ಷಿಕೆ = alloc(len);
+    ಆದರೆ (*ಶೀರ್ಷಿಕೆ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    mch_memmove(*header, cryptmethods[method_nr].magic, CRYPT_MAGIC_LEN);
-    if (arg.cat_salt_len > 0 || arg.cat_seed_len > 0 || arg.cat_add_len > 0)
+    mch_memmove(*ಶೀರ್ಷಿಕೆ, cryptmethods[ವಿಧಾನ_nr].magic, CRYPT_MAGIC_LEN);
+    ಆದರೆ (arg.cat_salt_len > 0 || arg.cat_ಬೀಜ_len > 0 || arg.cat_ಕೂಡಿಸು_len > 0)
     {
-	if (arg.cat_salt_len > 0)
-	    arg.cat_salt = *header + CRYPT_MAGIC_LEN;
-	if (arg.cat_seed_len > 0)
-	    arg.cat_seed = *header + CRYPT_MAGIC_LEN + arg.cat_salt_len;
-	if (arg.cat_add_len > 0)
-	    arg.cat_add = *header + CRYPT_MAGIC_LEN
-					 + arg.cat_salt_len + arg.cat_seed_len;
+	ಆದರೆ (arg.cat_salt_len > 0)
+	    arg.cat_salt = *ಶೀರ್ಷಿಕೆ + CRYPT_MAGIC_LEN;
+	ಆದರೆ (arg.cat_ಬೀಜ_len > 0)
+	    arg.cat_ಬೀಜ = *ಶೀರ್ಷಿಕೆ + CRYPT_MAGIC_LEN + arg.cat_salt_len;
+	ಆದರೆ (arg.cat_ಕೂಡಿಸು_len > 0)
+	    arg.cat_ಕೂಡಿಸು = *ಶೀರ್ಷಿಕೆ + CRYPT_MAGIC_LEN
+					 + arg.cat_salt_len + arg.cat_ಬೀಜ_len;
 
 	// TODO: Should this be crypt method specific? (Probably not worth
 	// it).  sha2_seed is pretty bad for large amounts of entropy, so make
 	// that into something which is suitable for anything.
-#ifdef FEAT_SODIUM
-	if (sodium_init() >= 0)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SODIUM
+	ಆದರೆ (sodium_init() >= 0)
 	{
-	    if (arg.cat_salt_len > 0)
+	    ಆದರೆ (arg.cat_salt_len > 0)
 		randombytes_buf(arg.cat_salt, arg.cat_salt_len);
-	    if (arg.cat_seed_len > 0)
-		randombytes_buf(arg.cat_seed, arg.cat_seed_len);
+	    ಆದರೆ (arg.cat_ಬೀಜ_len > 0)
+		randombytes_buf(arg.cat_ಬೀಜ, arg.cat_ಬೀಜ_len);
 	}
-	else
-#endif
-	    sha2_seed(arg.cat_salt, arg.cat_salt_len, arg.cat_seed, arg.cat_seed_len);
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	    sha2_ಬೀಜ(arg.cat_salt, arg.cat_salt_len, arg.cat_ಬೀಜ, arg.cat_ಬೀಜ_len);
     }
-    state = crypt_create(method_nr, key, &arg);
-    if (state == NULL)
-	VIM_CLEAR(*header);
-    return state;
+    state = crypt_create(ವಿಧಾನ_nr, ಕೀಲಿ, &arg);
+    ಆದರೆ (state == ಖಾಲಿ)
+	VIM_CLEAR(*ಶೀರ್ಷಿಕೆ);
+    ಹಿಂತಿರುಗಿ state;
 }
 
 /*
  * Free the crypt state.
  */
-    void
+    ಶೂನ್ಯ
 crypt_free_state(cryptstate_T *state)
 {
-#ifdef FEAT_SODIUM
-    if (crypt_method_is_sodium(state->method_nr))
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SODIUM
+    ಆದರೆ (crypt_ವಿಧಾನ_is_sodium(state->ವಿಧಾನ_nr))
     {
-	sodium_munlock(((sodium_state_T *)state->method_state)->key,
+	sodium_munlock(((sodium_state_T *)state->ವಿಧಾನ_state)->ಕೀಲಿ,
 							 crypto_box_SEEDBYTES);
-	sodium_memzero(state->method_state, sizeof(sodium_state_T));
-	sodium_free(state->method_state);
+	sodium_memzero(state->ವಿಧಾನ_state, ಗಾತ್ರ(sodium_state_T));
+	sodium_free(state->ವಿಧಾನ_state);
     }
-    else
-#endif
-	vim_free(state->method_state);
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	vim_free(state->ವಿಧಾನ_state);
     vim_free(state);
 }
 
-#ifdef CRYPT_NOT_INPLACE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ CRYPT_NOT_INPLACE
 /*
  * Encode "from[len]" and store the result in a newly allocated buffer, which
  * is stored in "newptr".
  * Return number of bytes in "newptr", 0 for need more or -1 on error.
  */
-    long
+    ದೀರ್ಘ
 crypt_encode_alloc(
     cryptstate_T *state,
     char_u	*from,
     size_t	len,
     char_u	**newptr,
-    int		last)
+    ಪೂರ್ಣಾಂಕ		ಕೊನೆಯ)
 {
-    cryptmethod_T *method = &cryptmethods[state->method_nr];
+    cryptmethod_T *ವಿಧಾನ = &cryptmethods[state->ವಿಧಾನ_nr];
 
-    if (method->encode_buffer_fn != NULL)
+    ಆದರೆ (ವಿಧಾನ->encode_ಬಫರ್_fn != ಖಾಲಿ)
 	// Has buffer function, pass through.
-	return method->encode_buffer_fn(state, from, len, newptr, last);
-    if (len == 0)
+	ಹಿಂತಿರುಗಿ ವಿಧಾನ->encode_ಬಫರ್_fn(state, from, len, newptr, ಕೊನೆಯ);
+    ಆದರೆ (len == 0)
 	// Not buffering, just return EOF.
-	return (long)len;
+	ಹಿಂತಿರುಗಿ (ದೀರ್ಘ)len;
 
     *newptr = alloc(len + 50);
-    if (*newptr == NULL)
-	return -1;
-    method->encode_fn(state, from, len, *newptr, last);
-    return (long)len;
+    ಆದರೆ (*newptr == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ -1;
+    ವಿಧಾನ->encode_fn(state, from, len, *newptr, ಕೊನೆಯ);
+    ಹಿಂತಿರುಗಿ (ದೀರ್ಘ)len;
 }
 
 /*
@@ -689,122 +689,122 @@ crypt_encode_alloc(
  * is stored in "newptr".
  * Return number of bytes in "newptr", 0 for need more or -1 on error.
  */
-    long
+    ದೀರ್ಘ
 crypt_decode_alloc(
     cryptstate_T *state,
     char_u	*ptr,
-    long	len,
+    ದೀರ್ಘ	len,
     char_u      **newptr,
-    int		last)
+    ಪೂರ್ಣಾಂಕ		ಕೊನೆಯ)
 {
-    cryptmethod_T *method = &cryptmethods[state->method_nr];
+    cryptmethod_T *ವಿಧಾನ = &cryptmethods[state->ವಿಧಾನ_nr];
 
-    if (method->decode_buffer_fn != NULL)
+    ಆದರೆ (ವಿಧಾನ->decode_ಬಫರ್_fn != ಖಾಲಿ)
 	// Has buffer function, pass through.
-	return method->decode_buffer_fn(state, ptr, len, newptr, last);
+	ಹಿಂತಿರುಗಿ ವಿಧಾನ->decode_ಬಫರ್_fn(state, ptr, len, newptr, ಕೊನೆಯ);
 
-    if (len == 0)
+    ಆದರೆ (len == 0)
 	// Not buffering, just return EOF.
-	return len;
+	ಹಿಂತಿರುಗಿ len;
 
     *newptr = alloc(len);
-    if (*newptr == NULL)
-	return -1;
-    method->decode_fn(state, ptr, len, *newptr, last);
-    return len;
+    ಆದರೆ (*newptr == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ -1;
+    ವಿಧಾನ->decode_fn(state, ptr, len, *newptr, ಕೊನೆಯ);
+    ಹಿಂತಿರುಗಿ len;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Encrypting "from[len]" into "to[len]".
  */
-    void
+    ಶೂನ್ಯ
 crypt_encode(
     cryptstate_T *state,
     char_u	*from,
     size_t	len,
-    char_u	*to,
-    int		last)
+    char_u	*ಗಮ್ಯ,
+    ಪೂರ್ಣಾಂಕ		ಕೊನೆಯ)
 {
-    cryptmethods[state->method_nr].encode_fn(state, from, len, to, last);
+    cryptmethods[state->ವಿಧಾನ_nr].encode_fn(state, from, len, ಗಮ್ಯ, ಕೊನೆಯ);
 }
 
-#if 0  // unused
+#ಆದರೆ 0  //ಬಳಸದ
 /*
  * decrypting "from[len]" into "to[len]".
  */
-    void
+    ಶೂನ್ಯ
 crypt_decode(
     cryptstate_T *state,
     char_u	*from,
     size_t	len,
-    char_u	*to,
-    int		last)
+    char_u	*ಗಮ್ಯ,
+    ಪೂರ್ಣಾಂಕ		ಕೊನೆಯ)
 {
-    cryptmethods[state->method_nr].decode_fn(state, from, len, to, last);
+    cryptmethods[state->ವಿಧಾನ_nr].decode_fn(state, from, len, ಗಮ್ಯ, ಕೊನೆಯ);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Simple inplace encryption, modifies "buf[len]" in place.
  */
-    void
+    ಶೂನ್ಯ
 crypt_encode_inplace(
     cryptstate_T *state,
     char_u	*buf,
     size_t	len,
-    int		last)
+    ಪೂರ್ಣಾಂಕ		ಕೊನೆಯ)
 {
-    cryptmethods[state->method_nr].encode_inplace_fn(state, buf, len,
-								    buf, last);
+    cryptmethods[state->ವಿಧಾನ_nr].encode_inplace_fn(state, buf, len,
+								    buf, ಕೊನೆಯ);
 }
 
 /*
  * Simple inplace decryption, modifies "buf[len]" in place.
  */
-    void
+    ಶೂನ್ಯ
 crypt_decode_inplace(
     cryptstate_T *state,
     char_u	*buf,
     size_t	len,
-    int		last)
+    ಪೂರ್ಣಾಂಕ		ಕೊನೆಯ)
 {
-    cryptmethods[state->method_nr].decode_inplace_fn(state, buf, len,
-								    buf, last);
+    cryptmethods[state->ವಿಧಾನ_nr].decode_inplace_fn(state, buf, len,
+								    buf, ಕೊನೆಯ);
 }
 
 /*
  * Free an allocated crypt key.  Clear the text to make sure it doesn't stay
  * in memory anywhere.
  */
-    void
-crypt_free_key(char_u *key)
+    ಶೂನ್ಯ
+crypt_free_ಕೀಲಿ(char_u *ಕೀಲಿ)
 {
     // Create a safe memset which cannot be optimized away by compiler
-    static void *(* volatile vim_memset_safe)(void *s, int c, size_t n) =
+    ಸ್ಥಿರ ಶೂನ್ಯ *(* ಅಸ್ಥಿರ vim_memset_ಸುರಕ್ಷಿತ)(ಶೂನ್ಯ *s, ಪೂರ್ಣಾಂಕ c, size_t n) =
 	memset;
-    if (key != NULL)
+    ಆದರೆ (ಕೀಲಿ != ಖಾಲಿ)
     {
-#ifdef FEAT_SODIUM
-	if (sodium_init() >= 0)
-	    sodium_memzero(key, STRLEN(key));
-	else
-#endif
-	    vim_memset_safe(key, 0, STRLEN(key));
-	vim_free(key);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SODIUM
+	ಆದರೆ (sodium_init() >= 0)
+	    sodium_memzero(ಕೀಲಿ, STRLEN(ಕೀಲಿ));
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	    vim_memset_ಸುರಕ್ಷಿತ(ಕೀಲಿ, 0, STRLEN(ಕೀಲಿ));
+	vim_free(ಕೀಲಿ);
     }
 }
 
 /*
  * Check the crypt method and give a warning if it's outdated.
  */
-    void
-crypt_check_method(int method)
+    ಶೂನ್ಯ
+crypt_check_ವಿಧಾನ(ಪೂರ್ಣಾಂಕ ವಿಧಾನ)
 {
-    if (method < CRYPT_M_BF2 || method == CRYPT_M_SOD)
+    ಆದರೆ (ವಿಧಾನ < CRYPT_M_BF2 || ವಿಧಾನ == CRYPT_M_SOD)
     {
-	msg_scroll = TRUE;
-	msg(_("Warning: Using a weak encryption method; see :help 'cm'"));
+	ಸಂದೇಶ_scroll = TRUE;
+	ಸಂದೇಶ(_("Warning: Using a weak encryption method; see :help 'cm'"));
     }
 }
 
@@ -812,27 +812,27 @@ crypt_check_method(int method)
  * If the crypt method for "curbuf" does not support encrypting the swap file
  * then disable the swap file.
  */
-    void
-crypt_check_swapfile_curbuf(void)
+    ಶೂನ್ಯ
+crypt_check_swapfile_curbuf(ಶೂನ್ಯ)
 {
-#ifdef FEAT_SODIUM
-    int method = crypt_get_method_nr(curbuf);
-    if (crypt_method_is_sodium(method))
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SODIUM
+    ಪೂರ್ಣಾಂಕ ವಿಧಾನ = crypt_get_ವಿಧಾನ_nr(curbuf);
+    ಆದರೆ (crypt_ವಿಧಾನ_is_sodium(ವಿಧಾನ))
     {
 	// encryption uses padding and MAC, that does not work very well with
 	// swap and undo files, so disable them
 	mf_close_file(curbuf, TRUE);	// remove the swap file
-	set_option_value_give_err((char_u *)"swf", 0, NULL, OPT_LOCAL);
-	msg_scroll = TRUE;
-	msg(_("Note: Encryption of swapfile not supported, disabling swap file"));
+	ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"swf", 0, ಖಾಲಿ, OPT_LOCAL);
+	ಸಂದೇಶ_scroll = TRUE;
+	ಸಂದೇಶ(_("Note: Encryption of swapfile not supported, disabling swap file"));
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-    void
-crypt_check_current_method(void)
+    ಶೂನ್ಯ
+crypt_check_current_ವಿಧಾನ(ಶೂನ್ಯ)
 {
-    crypt_check_method(crypt_get_method_nr(curbuf));
+    crypt_check_ವಿಧಾನ(crypt_get_ವಿಧಾನ_nr(curbuf));
 }
 
 /*
@@ -843,74 +843,74 @@ crypt_check_current_method(void)
  * Returns NULL on failure.
  */
     char_u *
-crypt_get_key(
-    int		store,
-    int		twice)	    // Ask for the key twice.
+crypt_get_ಕೀಲಿ(
+    ಪೂರ್ಣಾಂಕ		store,
+    ಪೂರ್ಣಾಂಕ		twice)	    // Ask for the key twice.
 {
-    char_u	*p1, *p2 = NULL;
-    int		round;
+    char_u	*p1, *p2 = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		ಸುತ್ತು;
 
-    for (round = 0; ; ++round)
+    ಗಾಗಿ (ಸುತ್ತು = 0; ; ++ಸುತ್ತು)
     {
-	cmdline_star = TRUE;
-	cmdline_row = msg_row;
-	p1 = getcmdline_prompt(NUL, round == 0
+	cmdline_ನಕ್ಷತ್ರ = TRUE;
+	cmdline_ಅಡ್ಡಸಾಲು = ಸಂದೇಶ_ಅಡ್ಡಸಾಲು;
+	p1 = getcmdline_prompt(NUL, ಸುತ್ತು == 0
 		? (char_u *)_("Enter encryption key: ")
 		: (char_u *)_("Enter same key again: "), 0, EXPAND_NOTHING,
-		NULL);
-	cmdline_star = FALSE;
+		ಖಾಲಿ);
+	cmdline_ನಕ್ಷತ್ರ = FALSE;
 
-	if (p1 == NULL)
-	    break;
+	ಆದರೆ (p1 == ಖಾಲಿ)
+	    ನಿಲ್ಲಿಸು;
 
-	if (round == twice)
+	ಆದರೆ (ಸುತ್ತು == twice)
 	{
-	    if (p2 != NULL && STRCMP(p1, p2) != 0)
+	    ಆದರೆ (p2 != ಖಾಲಿ && STRCMP(p1, p2) != 0)
 	    {
-		msg(_("Keys don't match!"));
-		crypt_free_key(p1);
-		crypt_free_key(p2);
-		p2 = NULL;
-		round = -1;		// do it again
-		continue;
+		ಸಂದೇಶ(_("Keys don't match!"));
+		crypt_free_ಕೀಲಿ(p1);
+		crypt_free_ಕೀಲಿ(p2);
+		p2 = ಖಾಲಿ;
+		ಸುತ್ತು = -1;		// do it again
+		ಮುಂದುವರಿ;
 	    }
 
-	    if (store)
+	    ಆದರೆ (store)
 	    {
-		set_option_value_give_err((char_u *)"key", 0L, p1, OPT_LOCAL);
-		crypt_free_key(p1);
-		p1 = curbuf->b_p_key;
+		ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"key", 0L, p1, OPT_LOCAL);
+		crypt_free_ಕೀಲಿ(p1);
+		p1 = curbuf->b_p_ಕೀಲಿ;
 		crypt_check_swapfile_curbuf();
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
 	p2 = p1;
     }
 
     // since the user typed this, no need to wait for return
-    if (!crypt_method_is_sodium(crypt_get_method_nr(curbuf)))
+    ಆದರೆ (!crypt_ವಿಧಾನ_is_sodium(crypt_get_ವಿಧಾನ_nr(curbuf)))
     {
-	if (msg_didout)
-	    msg_putchar('\n');
+	ಆದರೆ (ಸಂದೇಶ_didout)
+	    ಸಂದೇಶ_putchar('\n');
 	need_wait_return = FALSE;
-	msg_didout = FALSE;
+	ಸಂದೇಶ_didout = FALSE;
     }
 
-    crypt_free_key(p2);
-    return p1;
+    crypt_free_ಕೀಲಿ(p2);
+    ಹಿಂತಿರುಗಿ p1;
 }
 
 
 /*
  * Append a message to IObuff for the encryption/decryption method being used.
  */
-    void
-crypt_append_msg(
+    ಶೂನ್ಯ
+crypt_append_ಸಂದೇಶ(
     buf_T *buf)
 {
-    if (crypt_get_method_nr(buf) == 0)
+    ಆದರೆ (crypt_get_ವಿಧಾನ_nr(buf) == 0)
 	STRCAT(IObuff, _("[crypted]"));
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	STRCAT(IObuff, "[");
 	STRCAT(IObuff, *buf->b_p_cm == NUL ? p_cm : buf->b_p_cm);
@@ -918,37 +918,37 @@ crypt_append_msg(
     }
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 crypt_sodium_init_(
-    cryptstate_T	*state UNUSED,
-    char_u		*key UNUSED,
-    crypt_arg_T		*arg UNUSED)
+    cryptstate_T	*state ಬಳಸದ,
+    char_u		*ಕೀಲಿ ಬಳಸದ,
+    crypt_arg_T		*arg ಬಳಸದ)
 {
-#ifdef FEAT_SODIUM
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SODIUM
     // crypto_box_SEEDBYTES ==  crypto_secretstream_xchacha20poly1305_KEYBYTES
-    unsigned char	dkey[crypto_box_SEEDBYTES]; // 32
+    ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ	dkey[crypto_box_SEEDBYTES]; // 32
     sodium_state_T	*sd_state;
-    int			retval = 0;
-    unsigned long long	opslimit;
-    unsigned long long	memlimit;
-    int			alg;
+    ಪೂರ್ಣಾಂಕ			retval = 0;
+    ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ ದೀರ್ಘ	opslimit;
+    ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ ದೀರ್ಘ	memlimit;
+    ಪೂರ್ಣಾಂಕ			alg;
 
-    if (sodium_init() < 0)
-	return FAIL;
+    ಆದರೆ (sodium_init() < 0)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    sd_state = (sodium_state_T *)sodium_malloc(sizeof(sodium_state_T));
-    sodium_memzero(sd_state, sizeof(sodium_state_T));
+    sd_state = (sodium_state_T *)sodium_malloc(ಗಾತ್ರ(sodium_state_T));
+    sodium_memzero(sd_state, ಗಾತ್ರ(sodium_state_T));
 
-    if ((state->method_nr == CRYPT_M_SOD2 && !arg->cat_init_from_file)
-	    || state->method_nr == CRYPT_M_SOD)
+    ಆದರೆ ((state->ವಿಧಾನ_nr == CRYPT_M_SOD2 && !arg->cat_init_from_file)
+	    || state->ವಿಧಾನ_nr == CRYPT_M_SOD)
     {
 	opslimit = crypto_pwhash_OPSLIMIT_INTERACTIVE;
 	memlimit = crypto_pwhash_MEMLIMIT_INTERACTIVE;
 	alg = crypto_pwhash_ALG_DEFAULT;
 
-# if 0
+# ಆದರೆ 0
 	// For testing
-	if (state->method_nr == CRYPT_M_SOD2)
+	ಆದರೆ (state->ವಿಧಾನ_nr == CRYPT_M_SOD2)
 	{
 	    opslimit = crypto_pwhash_OPSLIMIT_MODERATE;
 	    memlimit = crypto_pwhash_MEMLIMIT_MODERATE;
@@ -956,66 +956,66 @@ crypt_sodium_init_(
 # endif
 
 	// derive a key from the password
-	if (crypto_pwhash(dkey, sizeof(dkey), (const char *)key, STRLEN(key),
+	ಆದರೆ (crypto_pwhash(dkey, ಗಾತ್ರ(dkey), (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)ಕೀಲಿ, STRLEN(ಕೀಲಿ),
 			  arg->cat_salt, opslimit, (size_t)memlimit, alg) != 0)
 	{
 	    // out of memory
 	    sodium_free(sd_state);
-	    return FAIL;
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
-	memcpy(sd_state->key, dkey, crypto_box_SEEDBYTES);
+	ಸ್ಮರಣೆ_ನಕಲು(sd_state->ಕೀಲಿ, dkey, crypto_box_SEEDBYTES);
 
-	retval += sodium_mlock(sd_state->key, crypto_box_SEEDBYTES);
-	retval += sodium_mlock(key, STRLEN(key));
+	retval += sodium_mlock(sd_state->ಕೀಲಿ, crypto_box_SEEDBYTES);
+	retval += sodium_mlock(ಕೀಲಿ, STRLEN(ಕೀಲಿ));
 
-	if (retval < 0)
+	ಆದರೆ (retval < 0)
 	{
 	    emsg(_(e_encryption_sodium_mlock_failed));
 	    sodium_free(sd_state);
-	    return FAIL;
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
 	// "cat_add" should not be NULL, check anyway for safety
-	if (state->method_nr == CRYPT_M_SOD2 && arg->cat_add != NULL)
+	ಆದರೆ (state->ವಿಧಾನ_nr == CRYPT_M_SOD2 && arg->cat_ಕೂಡಿಸು != ಖಾಲಿ)
 	{
-	    char_u	buffer[20];
-	    char_u	*p = buffer;
-	    vim_memset(buffer, 0, 20);
+	    char_u	ಬಫರ್[20];
+	    char_u	*p = ಬಫರ್;
+	    vim_memset(ಬಫರ್, 0, 20);
 
-	    crypt_long_long_to_char(opslimit, p);
-	    p += sizeof(opslimit);
+	    crypt_long_long_ಗಮ್ಯ_char(opslimit, p);
+	    p += ಗಾತ್ರ(opslimit);
 
-	    crypt_long_long_to_char(memlimit, p);
-	    p += sizeof(memlimit);
+	    crypt_long_long_ಗಮ್ಯ_char(memlimit, p);
+	    p += ಗಾತ್ರ(memlimit);
 
-	    crypt_int_to_char(alg, p);
-	    memcpy(arg->cat_add, buffer, sizeof(opslimit) + sizeof(memlimit) + sizeof(alg));
+	    crypt_int_ಗಮ್ಯ_char(alg, p);
+	    ಸ್ಮರಣೆ_ನಕಲು(arg->cat_ಕೂಡಿಸು, ಬಫರ್, ಗಾತ್ರ(opslimit) + ಗಾತ್ರ(memlimit) + ಗಾತ್ರ(alg));
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	char_u	buffer[20];
-	char_u	*p = buffer;
-	vim_memset(buffer, 0, 20);
-	int	size = sizeof(opslimit) +
-	    sizeof(memlimit) + sizeof(alg);
+	char_u	ಬಫರ್[20];
+	char_u	*p = ಬಫರ್;
+	vim_memset(ಬಫರ್, 0, 20);
+	ಪೂರ್ಣಾಂಕ	ಗಾತ್ರ_2 = ಗಾತ್ರ(opslimit) +
+	    ಗಾತ್ರ(memlimit) + ಗಾತ್ರ(alg);
 
 	// Reading parameters from file
-	if (arg->cat_add_len < size)
+	ಆದರೆ (arg->cat_ಕೂಡಿಸು_len < ಗಾತ್ರ_2)
 	{
 	    sodium_free(sd_state);
-	    return FAIL;
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
 
 	// derive the key from the file header
-	memcpy(p, arg->cat_add, size);
-	arg->cat_add += size;
+	ಸ್ಮರಣೆ_ನಕಲು(p, arg->cat_ಕೂಡಿಸು, ಗಾತ್ರ_2);
+	arg->cat_ಕೂಡಿಸು += ಗಾತ್ರ_2;
 
-	opslimit = crypt_char_to_long_long(p);
-	p += sizeof(opslimit);
-	memlimit = crypt_char_to_long_long(p);
-	p += sizeof(memlimit);
-	alg = crypt_char_to_int(p);
-	p += sizeof(alg);
+	opslimit = crypt_char_ಗಮ್ಯ_long_long(p);
+	p += ಗಾತ್ರ(opslimit);
+	memlimit = crypt_char_ಗಮ್ಯ_long_long(p);
+	p += ಗಾತ್ರ(memlimit);
+	alg = crypt_char_ಗಮ್ಯ_int(p);
+	p += ಗಾತ್ರ(alg);
 
 # ifdef FEAT_EVAL
 	crypt_sodium_report_hash_params(opslimit,
@@ -1024,33 +1024,33 @@ crypt_sodium_init_(
 		alg, crypto_pwhash_ALG_DEFAULT);
 # endif
 
-	if (crypto_pwhash(dkey, sizeof(dkey), (const char *)key, STRLEN(key),
+	ಆದರೆ (crypto_pwhash(dkey, ಗಾತ್ರ(dkey), (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)ಕೀಲಿ, STRLEN(ಕೀಲಿ),
 			  arg->cat_salt, opslimit, (size_t)memlimit, alg) != 0)
 	{
 	    // out of memory
 	    sodium_free(sd_state);
-	    return FAIL;
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
-	memcpy(sd_state->key, dkey, crypto_box_SEEDBYTES);
+	ಸ್ಮರಣೆ_ನಕಲು(sd_state->ಕೀಲಿ, dkey, crypto_box_SEEDBYTES);
 
-	retval += sodium_mlock(sd_state->key, crypto_box_SEEDBYTES);
-	retval += sodium_mlock(key, STRLEN(key));
+	retval += sodium_mlock(sd_state->ಕೀಲಿ, crypto_box_SEEDBYTES);
+	retval += sodium_mlock(ಕೀಲಿ, STRLEN(ಕೀಲಿ));
 
-	if (retval < 0)
+	ಆದರೆ (retval < 0)
 	{
 	    emsg(_(e_encryption_sodium_mlock_failed));
 	    sodium_free(sd_state);
-	    return FAIL;
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
     }
-    sd_state->count = 0;
-    state->method_state = sd_state;
+    sd_state->ಎಣಿಕೆ_2 = 0;
+    state->ವಿಧಾನ_state = sd_state;
 
-    return OK;
-#else
-    emsg(_(e_libsodium_not_built_in));
-    return FAIL;
-#endif
+    ಹಿಂತಿರುಗಿ OK;
+#ಇಲ್ಲದಿದ್ದರೆ
+    emsg(_(e_libsodium_not_built_ಒಳ));
+    ಹಿಂತಿರುಗಿ FAIL;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
@@ -1058,354 +1058,354 @@ crypt_sodium_init_(
  * "from" and "to" can be equal to encrypt in place.
  * Call needs to ensure that there is enough space in to (for the header)
  */
-#if 0  // Currently unused
-    void
+#ಆದರೆ 0  // Currently unused
+    ಶೂನ್ಯ
 crypt_sodium_encode(
-    cryptstate_T *state UNUSED,
-    char_u	*from UNUSED,
-    size_t	len UNUSED,
-    char_u	*to UNUSED,
-    int		last UNUSED)
+    cryptstate_T *state ಬಳಸದ,
+    char_u	*from ಬಳಸದ,
+    size_t	len ಬಳಸದ,
+    char_u	*ಗಮ್ಯ ಬಳಸದ,
+    ಪೂರ್ಣಾಂಕ		ಕೊನೆಯ ಬಳಸದ)
 {
 # ifdef FEAT_SODIUM
     // crypto_box_SEEDBYTES == crypto_secretstream_xchacha20poly1305_KEYBYTES
-    sodium_state_T *sod_st = state->method_state;
-    unsigned char  tag = last
-			? crypto_secretstream_xchacha20poly1305_TAG_FINAL  : 0;
+    sodium_state_T *sod_st = state->ವಿಧಾನ_state;
+    ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ  ಟ್ಯಾಗ್ = ಕೊನೆಯ
+			? crypto_secretstream_xchacha20poly1305_ಟ್ಯಾಗ್_FINAL  : 0;
 
-    if (sod_st->count == 0)
+    ಆದರೆ (sod_st->ಎಣಿಕೆ_2 == 0)
     {
-	if (len <= crypto_secretstream_xchacha20poly1305_HEADERBYTES)
+	ಆದರೆ (len <= crypto_secretstream_xchacha20poly1305_HEADERBYTES)
 	{
-	    emsg(_(e_libsodium_cannot_encrypt_header));
-	    return;
+	    emsg(_(e_libsodium_cannot_encrypt_ಶೀರ್ಷಿಕೆ));
+	    ಹಿಂತಿರುಗಿ;
 	}
-	crypto_secretstream_xchacha20poly1305_init_push(&sod_st->state,
-							      to, sod_st->key);
-	to += crypto_secretstream_xchacha20poly1305_HEADERBYTES;
+	crypto_secretstream_xchacha20poly1305_init_ತಳ್ಳು(&sod_st->state,
+							      ಗಮ್ಯ, sod_st->ಕೀಲಿ);
+	ಗಮ್ಯ += crypto_secretstream_xchacha20poly1305_HEADERBYTES;
     }
 
-    if (sod_st->count && len <= crypto_secretstream_xchacha20poly1305_ABYTES)
+    ಆದರೆ (sod_st->ಎಣಿಕೆ_2 && len <= crypto_secretstream_xchacha20poly1305_ABYTES)
     {
-	emsg(_(e_libsodium_cannot_encrypt_buffer));
-	return;
+	emsg(_(e_libsodium_cannot_encrypt_ಬಫರ್));
+	ಹಿಂತಿರುಗಿ;
     }
 
-    crypto_secretstream_xchacha20poly1305_push(&sod_st->state, to, NULL,
-						      from, len, NULL, 0, tag);
+    crypto_secretstream_xchacha20poly1305_ತಳ್ಳು(&sod_st->state, ಗಮ್ಯ, ಖಾಲಿ,
+						      from, len, ಖಾಲಿ, 0, ಟ್ಯಾಗ್);
 
-    sod_st->count++;
+    sod_st->ಎಣಿಕೆ_2++;
 # endif
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Decrypt "from[len]" into "to[len]".
  * "from" and "to" can be equal to encrypt in place.
  */
-#if 0  // Currently unused
-    void
+#ಆದರೆ 0  // Currently unused
+    ಶೂನ್ಯ
 crypt_sodium_decode(
-    cryptstate_T *state UNUSED,
-    char_u	*from UNUSED,
-    size_t	len UNUSED,
-    char_u	*to UNUSED,
-    int		last UNUSED)
+    cryptstate_T *state ಬಳಸದ,
+    char_u	*from ಬಳಸದ,
+    size_t	len ಬಳಸದ,
+    char_u	*ಗಮ್ಯ ಬಳಸದ,
+    ಪೂರ್ಣಾಂಕ		ಕೊನೆಯ ಬಳಸದ)
 {
 # ifdef FEAT_SODIUM
     // crypto_box_SEEDBYTES ==  crypto_secretstream_xchacha20poly1305_KEYBYTES
-    sodium_state_T *sod_st = state->method_state;
-    unsigned char  tag;
-    unsigned long long buf_len;
+    sodium_state_T *sod_st = state->ವಿಧಾನ_state;
+    ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ  ಟ್ಯಾಗ್;
+    ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ ದೀರ್ಘ buf_len;
     char_u *p1 = from;
-    char_u *p2 = to;
-    char_u *buf_out;
+    char_u *p2 = ಗಮ್ಯ;
+    char_u *buf_ಹೊರಹೋಗು;
 
-    if (sod_st->count == 0
+    ಆದರೆ (sod_st->ಎಣಿಕೆ_2 == 0
 		   && len <= crypto_secretstream_xchacha20poly1305_HEADERBYTES)
     {
-	emsg(_(e_libsodium_cannot_decrypt_header));
-	return;
+	emsg(_(e_libsodium_cannot_decrypt_ಶೀರ್ಷಿಕೆ));
+	ಹಿಂತಿರುಗಿ;
     }
 
-    buf_out = (char_u *)alloc(len);
+    buf_ಹೊರಹೋಗು = (char_u *)alloc(len);
 
-    if (buf_out == NULL)
+    ಆದರೆ (buf_ಹೊರಹೋಗು == ಖಾಲಿ)
     {
-	emsg(_(e_libsodium_cannot_allocate_buffer));
-	return;
+	emsg(_(e_libsodium_cannot_allocate_ಬಫರ್));
+	ಹಿಂತಿರುಗಿ;
     }
-    if (sod_st->count == 0)
+    ಆದರೆ (sod_st->ಎಣಿಕೆ_2 == 0)
     {
-	if (crypto_secretstream_xchacha20poly1305_init_pull(
-				       &sod_st->state, from, sod_st->key) != 0)
+	ಆದರೆ (crypto_secretstream_xchacha20poly1305_init_pull(
+				       &sod_st->state, from, sod_st->ಕೀಲಿ) != 0)
 	{
-	    emsg(_(e_libsodium_decryption_failed_header_incomplete));
-	    goto fail;
+	    emsg(_(e_libsodium_decryption_failed_ಶೀರ್ಷಿಕೆ_incomplete));
+	    ಹೋಗು fail;
 	}
 
 	from += crypto_secretstream_xchacha20poly1305_HEADERBYTES;
 	len -= crypto_secretstream_xchacha20poly1305_HEADERBYTES;
 
-	if (p1 == p2)
-	    to += crypto_secretstream_xchacha20poly1305_HEADERBYTES;
+	ಆದರೆ (p1 == p2)
+	    ಗಮ್ಯ += crypto_secretstream_xchacha20poly1305_HEADERBYTES;
     }
 
-    if (sod_st->count && len <= crypto_secretstream_xchacha20poly1305_ABYTES)
+    ಆದರೆ (sod_st->ಎಣಿಕೆ_2 && len <= crypto_secretstream_xchacha20poly1305_ABYTES)
     {
-	emsg(_(e_libsodium_cannot_decrypt_buffer));
-	goto fail;
+	emsg(_(e_libsodium_cannot_decrypt_ಬಫರ್));
+	ಹೋಗು fail;
     }
-    if (crypto_secretstream_xchacha20poly1305_pull(&sod_st->state,
-			     buf_out, &buf_len, &tag, from, len, NULL, 0) != 0)
+    ಆದರೆ (crypto_secretstream_xchacha20poly1305_pull(&sod_st->state,
+			     buf_ಹೊರಹೋಗು, &buf_len, &ಟ್ಯಾಗ್, from, len, ಖಾಲಿ, 0) != 0)
     {
 	emsg(_(e_libsodium_decryption_failed));
-	goto fail;
+	ಹೋಗು fail;
     }
-    sod_st->count++;
+    sod_st->ಎಣಿಕೆ_2++;
 
-    if (tag == crypto_secretstream_xchacha20poly1305_TAG_FINAL && !last)
+    ಆದರೆ (ಟ್ಯಾಗ್ == crypto_secretstream_xchacha20poly1305_ಟ್ಯಾಗ್_FINAL && !ಕೊನೆಯ)
     {
 	emsg(_(e_libsodium_decryption_failed_premature));
-	goto fail;
+	ಹೋಗು fail;
     }
-    if (p1 == p2)
-	mch_memmove(p2, buf_out, buf_len);
+    ಆದರೆ (p1 == p2)
+	mch_memmove(p2, buf_ಹೊರಹೋಗು, buf_len);
 
 fail:
-    vim_free(buf_out);
+    vim_free(buf_ಹೊರಹೋಗು);
 # endif
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Encrypt "from[len]" into "to[len]".
  * "from" and "to" can be equal to encrypt in place.
  */
-    static long
-crypt_sodium_buffer_encode(
-    cryptstate_T *state UNUSED,
-    char_u	*from UNUSED,
-    size_t	len UNUSED,
-    char_u	**buf_out UNUSED,
-    int		last UNUSED)
+    ಸ್ಥಿರ ದೀರ್ಘ
+crypt_sodium_ಬಫರ್_encode(
+    cryptstate_T *state ಬಳಸದ,
+    char_u	*from ಬಳಸದ,
+    size_t	len ಬಳಸದ,
+    char_u	**buf_ಹೊರಹೋಗು ಬಳಸದ,
+    ಪೂರ್ಣಾಂಕ		ಕೊನೆಯ ಬಳಸದ)
 {
-#ifdef FEAT_SODIUM
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SODIUM
     // crypto_box_SEEDBYTES ==  crypto_secretstream_xchacha20poly1305_KEYBYTES
-    unsigned long long	out_len;
+    ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ ದೀರ್ಘ	ಹೊರಹೋಗು_len;
     char_u		*ptr;
-    unsigned char	tag = last
-			? crypto_secretstream_xchacha20poly1305_TAG_FINAL  : 0;
-    int			length;
-    sodium_state_T	*sod_st = state->method_state;
-    int			first = (sod_st->count == 0);
+    ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ	ಟ್ಯಾಗ್ = ಕೊನೆಯ
+			? crypto_secretstream_xchacha20poly1305_ಟ್ಯಾಗ್_FINAL  : 0;
+    ಪೂರ್ಣಾಂಕ			ಉದ್ದಳತೆ;
+    sodium_state_T	*sod_st = state->ವಿಧಾನ_state;
+    ಪೂರ್ಣಾಂಕ			ಮೊದಲ = (sod_st->ಎಣಿಕೆ_2 == 0);
 
-    length = (int)len + crypto_secretstream_xchacha20poly1305_ABYTES
-	     + (first ? crypto_secretstream_xchacha20poly1305_HEADERBYTES : 0);
-    *buf_out = alloc_clear(length);
-    if (*buf_out == NULL)
+    ಉದ್ದಳತೆ = (ಪೂರ್ಣಾಂಕ)len + crypto_secretstream_xchacha20poly1305_ABYTES
+	     + (ಮೊದಲ ? crypto_secretstream_xchacha20poly1305_HEADERBYTES : 0);
+    *buf_ಹೊರಹೋಗು = alloc_clear(ಉದ್ದಳತೆ);
+    ಆದರೆ (*buf_ಹೊರಹೋಗು == ಖಾಲಿ)
     {
-	emsg(_(e_libsodium_cannot_allocate_buffer));
-	return -1;
+	emsg(_(e_libsodium_cannot_allocate_ಬಫರ್));
+	ಹಿಂತಿರುಗಿ -1;
     }
-    ptr = *buf_out;
+    ptr = *buf_ಹೊರಹೋಗು;
 
-    if (first)
+    ಆದರೆ (ಮೊದಲ)
     {
-	crypto_secretstream_xchacha20poly1305_init_push(&sod_st->state,
-		ptr, sod_st->key);
+	crypto_secretstream_xchacha20poly1305_init_ತಳ್ಳು(&sod_st->state,
+		ptr, sod_st->ಕೀಲಿ);
 	ptr += crypto_secretstream_xchacha20poly1305_HEADERBYTES;
     }
 
-    crypto_secretstream_xchacha20poly1305_push(&sod_st->state, ptr,
-	    &out_len, from, len, NULL, 0, tag);
+    crypto_secretstream_xchacha20poly1305_ತಳ್ಳು(&sod_st->state, ptr,
+	    &ಹೊರಹೋಗು_len, from, len, ಖಾಲಿ, 0, ಟ್ಯಾಗ್);
 
-    sod_st->count++;
-    return out_len + (first
+    sod_st->ಎಣಿಕೆ_2++;
+    ಹಿಂತಿರುಗಿ ಹೊರಹೋಗು_len + (ಮೊದಲ
 		      ? crypto_secretstream_xchacha20poly1305_HEADERBYTES : 0);
-#else
-    return -1;
-#endif
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಹಿಂತಿರುಗಿ -1;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Decrypt "from[len]" into "to[len]".
  * "from" and "to" can be equal to encrypt in place.
  */
-    static long
-crypt_sodium_buffer_decode(
-    cryptstate_T *state UNUSED,
-    char_u	*from UNUSED,
-    size_t	len UNUSED,
-    char_u	**buf_out UNUSED,
-    int		last UNUSED)
+    ಸ್ಥಿರ ದೀರ್ಘ
+crypt_sodium_ಬಫರ್_decode(
+    cryptstate_T *state ಬಳಸದ,
+    char_u	*from ಬಳಸದ,
+    size_t	len ಬಳಸದ,
+    char_u	**buf_ಹೊರಹೋಗು ಬಳಸದ,
+    ಪೂರ್ಣಾಂಕ		ಕೊನೆಯ ಬಳಸದ)
 {
-#ifdef FEAT_SODIUM
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SODIUM
     // crypto_box_SEEDBYTES ==  crypto_secretstream_xchacha20poly1305_KEYBYTES
-    sodium_state_T *sod_st = state->method_state;
-    unsigned char  tag;
-    unsigned long long out_len;
+    sodium_state_T *sod_st = state->ವಿಧಾನ_state;
+    ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ  ಟ್ಯಾಗ್;
+    ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ ದೀರ್ಘ ಹೊರಹೋಗು_len;
 
-    if (sod_st->count == 0
-	    && state->method_nr == CRYPT_M_SOD
+    ಆದರೆ (sod_st->ಎಣಿಕೆ_2 == 0
+	    && state->ವಿಧಾನ_nr == CRYPT_M_SOD
 	    && len > WRITEBUFSIZE
 		+ crypto_secretstream_xchacha20poly1305_HEADERBYTES
 		+ crypto_secretstream_xchacha20poly1305_ABYTES)
-	len -= cryptmethods[CRYPT_M_SOD2].add_len;
+	len -= cryptmethods[CRYPT_M_SOD2].ಕೂಡಿಸು_len;
 
-    *buf_out = alloc_clear(len);
-    if (*buf_out == NULL)
+    *buf_ಹೊರಹೋಗು = alloc_clear(len);
+    ಆದರೆ (*buf_ಹೊರಹೋಗು == ಖಾಲಿ)
     {
-	emsg(_(e_libsodium_cannot_allocate_buffer));
-	return -1;
+	emsg(_(e_libsodium_cannot_allocate_ಬಫರ್));
+	ಹಿಂತಿರುಗಿ -1;
     }
 
-    if (sod_st->count == 0)
+    ಆದರೆ (sod_st->ಎಣಿಕೆ_2 == 0)
     {
-	if (len < crypto_secretstream_xchacha20poly1305_HEADERBYTES ||
+	ಆದರೆ (len < crypto_secretstream_xchacha20poly1305_HEADERBYTES ||
 		crypto_secretstream_xchacha20poly1305_init_pull(&sod_st->state,
-						       from, sod_st->key) != 0)
+						       from, sod_st->ಕೀಲಿ) != 0)
 	{
-	    emsg(_(e_libsodium_decryption_failed_header_incomplete));
-	    return -1;
+	    emsg(_(e_libsodium_decryption_failed_ಶೀರ್ಷಿಕೆ_incomplete));
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 	from += crypto_secretstream_xchacha20poly1305_HEADERBYTES;
 	len -= crypto_secretstream_xchacha20poly1305_HEADERBYTES;
-	sod_st->count++;
+	sod_st->ಎಣಿಕೆ_2++;
     }
-    if (crypto_secretstream_xchacha20poly1305_pull(&sod_st->state,
-			    *buf_out, &out_len, &tag, from, len, NULL, 0) != 0)
+    ಆದರೆ (crypto_secretstream_xchacha20poly1305_pull(&sod_st->state,
+			    *buf_ಹೊರಹೋಗು, &ಹೊರಹೋಗು_len, &ಟ್ಯಾಗ್, from, len, ಖಾಲಿ, 0) != 0)
     {
 	emsg(_(e_libsodium_decryption_failed));
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 
-    if (tag == crypto_secretstream_xchacha20poly1305_TAG_FINAL && !last)
+    ಆದರೆ (ಟ್ಯಾಗ್ == crypto_secretstream_xchacha20poly1305_ಟ್ಯಾಗ್_FINAL && !ಕೊನೆಯ)
 	emsg(_(e_libsodium_decryption_failed_premature));
-    return (long) out_len;
-#else
-    return -1;
-#endif
+    ಹಿಂತಿರುಗಿ (ದೀರ್ಘ) ಹೊರಹೋಗು_len;
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಹಿಂತಿರುಗಿ -1;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#if defined(FEAT_SODIUM)
-    void
-crypt_sodium_lock_key(char_u *key)
+#ಆದರೆ defined(FEAT_SODIUM)
+    ಶೂನ್ಯ
+crypt_sodium_ಬೀಗ_ಕೀಲಿ(char_u *ಕೀಲಿ)
 {
-    if (sodium_init() >= 0)
-	sodium_mlock(key, STRLEN(key));
+    ಆದರೆ (sodium_init() >= 0)
+	sodium_mlock(ಕೀಲಿ, STRLEN(ಕೀಲಿ));
 }
 
-    int
-crypt_sodium_munlock(void *const addr, const size_t len)
+    ಪೂರ್ಣಾಂಕ
+crypt_sodium_munlock(ಶೂನ್ಯ *ಸ್ಥಿರಾಂಕ addr, ಸ್ಥಿರಾಂಕ size_t len)
 {
-    return sodium_munlock(addr, len);
+    ಹಿಂತಿರುಗಿ sodium_munlock(addr, len);
 }
 
-    void
-crypt_sodium_randombytes_buf(void *const buf, const size_t size)
+    ಶೂನ್ಯ
+crypt_sodium_randombytes_buf(ಶೂನ್ಯ *ಸ್ಥಿರಾಂಕ buf, ಸ್ಥಿರಾಂಕ size_t ಗಾತ್ರ_2)
 {
-    randombytes_buf(buf, size);
+    randombytes_buf(buf, ಗಾತ್ರ_2);
 }
 
-    int
-crypt_sodium_init(void)
+    ಪೂರ್ಣಾಂಕ
+crypt_sodium_init(ಶೂನ್ಯ)
 {
-    return sodium_init();
+    ಹಿಂತಿರುಗಿ sodium_init();
 }
 
     UINT32_T
-crypt_sodium_randombytes_random(void)
+crypt_sodium_randombytes_random(ಶೂನ್ಯ)
 {
-    return randombytes_random();
+    ಹಿಂತಿರುಗಿ randombytes_random();
 }
 
-# if defined(FEAT_EVAL)
-    static void
+# ಆದರೆ defined(FEAT_EVAL)
+    ಸ್ಥಿರ ಶೂನ್ಯ
 crypt_sodium_report_hash_params(
-	unsigned long long opslimit,
-	unsigned long long ops_def,
+	ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ ದೀರ್ಘ opslimit,
+	ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ ದೀರ್ಘ ops_def,
 	size_t memlimit,
 	size_t mem_def,
-	int alg,
-	int alg_def)
+	ಪೂರ್ಣಾಂಕ alg,
+	ಪೂರ್ಣಾಂಕ alg_def)
 {
-    if (p_verbose > 0)
+    ಆದರೆ (p_verbose > 0)
     {
 	verbose_enter();
-	if (opslimit != ops_def)
+	ಆದರೆ (opslimit != ops_def)
 	    smsg(_("xchacha20v2: using custom opslimit \"%llu\" for Key derivation."), opslimit);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    smsg(_("xchacha20v2: using default opslimit \"%llu\" for Key derivation."), opslimit);
-	if (memlimit != mem_def)
-	    smsg(_("xchacha20v2: using custom memlimit \"%lu\" for Key derivation."), (unsigned long)memlimit);
-	else
-	    smsg(_("xchacha20v2: using default memlimit \"%lu\" for Key derivation."), (unsigned long)memlimit);
-	if (alg != alg_def)
+	ಆದರೆ (memlimit != mem_def)
+	    smsg(_("xchacha20v2: using custom memlimit \"%lu\" for Key derivation."), (ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ)memlimit);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    smsg(_("xchacha20v2: using default memlimit \"%lu\" for Key derivation."), (ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ)memlimit);
+	ಆದರೆ (alg != alg_def)
 	    smsg(_("xchacha20v2: using custom algorithm \"%d\" for Key derivation."), alg);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    smsg(_("xchacha20v2: using default algorithm \"%d\" for Key derivation."), alg);
 	verbose_leave();
     }
 }
 # endif
 
-    static void
-crypt_long_long_to_char(long long n, char_u *s)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+crypt_long_long_ಗಮ್ಯ_char(ದೀರ್ಘ ದೀರ್ಘ n, char_u *s)
 {
-    int i;
-    for (i = 0; i < 8; i++)
+    ಪೂರ್ಣಾಂಕ i;
+    ಗಾಗಿ (i = 0; i < 8; i++)
     {
 	s[i] = (char_u)(n & 0xff);
-	n = (unsigned long long)n >> 8;
+	n = (ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ ದೀರ್ಘ)n >> 8;
     }
 }
 
-    static void
-crypt_int_to_char(int n, char_u *s)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+crypt_int_ಗಮ್ಯ_char(ಪೂರ್ಣಾಂಕ n, char_u *s)
 {
-    int i;
-    for (i = 0; i < 4; i++)
+    ಪೂರ್ಣಾಂಕ i;
+    ಗಾಗಿ (i = 0; i < 4; i++)
     {
 	s[i] = (char_u)(n & 0xff);
-	n = (unsigned long long)n >> 8;
+	n = (ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ ದೀರ್ಘ)n >> 8;
     }
 }
 
-    static long long
-crypt_char_to_long_long(char_u *s)
+    ಸ್ಥಿರ ದೀರ್ಘ ದೀರ್ಘ
+crypt_char_ಗಮ್ಯ_long_long(char_u *s)
 {
-    unsigned long long    retval = 0;
-    int i;
-    for (i = 7; i >= 0; i--)
+    ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ ದೀರ್ಘ    retval = 0;
+    ಪೂರ್ಣಾಂಕ i;
+    ಗಾಗಿ (i = 7; i >= 0; i--)
     {
-	if (i == 7)
+	ಆದರೆ (i == 7)
 	    retval = s[i];
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    retval |= s[i];
-	if (i > 0)
+	ಆದರೆ (i > 0)
 	    retval <<= 8;
     }
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
-    static int
-crypt_char_to_int(char_u *s)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+crypt_char_ಗಮ್ಯ_int(char_u *s)
 {
-    int retval = 0;
-    int i;
+    ಪೂರ್ಣಾಂಕ retval = 0;
+    ಪೂರ್ಣಾಂಕ i;
 
-    for (i = 3; i >= 0; i--)
+    ಗಾಗಿ (i = 3; i >= 0; i--)
     {
-	if (i == 3)
+	ಆದರೆ (i == 3)
 	    retval = s[i];
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    retval |= s[i];
-	if (i > 0)
+	ಆದರೆ (i > 0)
 	    retval <<= 8;
     }
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#endif // FEAT_CRYPT
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_CRYPT

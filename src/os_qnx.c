@@ -12,34 +12,34 @@
  * os_qnx.c
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
 
-#if defined(FEAT_GUI_PHOTON)
-int is_photon_available;
-#endif
+#ಆದರೆ defined(FEAT_GUI_PHOTON)
+ಪೂರ್ಣಾಂಕ is_photon_ಲಭ್ಯ;
+#ಆದರೆ_ಅಂತ್ಯ
 
-void qnx_init(void)
+ಶೂನ್ಯ qnx_init(ಶೂನ್ಯ)
 {
-#if defined(FEAT_GUI_PHOTON)
+#ಆದರೆ defined(FEAT_GUI_PHOTON)
     PhChannelParms_t parms;
 
-    CLEAR_FIELD(parms);
-    parms.flags = Ph_DYNAMIC_BUFFER;
+    CLEAR_ಕ್ಷೇತ್ರ(parms);
+    parms.flags = Ph_DYNAMIC_ಬಫರ್;
 
-    is_photon_available = (PhAttach(NULL, &parms) != NULL) ? TRUE : FALSE;
-#endif
+    is_photon_ಲಭ್ಯ = (PhAttach(ಖಾಲಿ, &parms) != ಖಾಲಿ) ? TRUE : FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#if defined(FEAT_GUI_PHOTON) && defined(FEAT_CLIPBOARD)
+#ಆದರೆ defined(FEAT_GUI_PHOTON) && defined(FEAT_CLIPBOARD)
 
 # define CLIP_TYPE_VIM "VIMTYPE"
-# define CLIP_TYPE_TEXT "TEXT"
+# define CLIP_TYPE_ಪಠ್ಯ "TEXT"
 
 // Turn on the clipboard for a console vim when photon is running
-void qnx_clip_init(void)
+ಶೂನ್ಯ qnx_clip_init(ಶೂನ್ಯ)
 {
-    if (is_photon_available == TRUE && !gui.in_use)
+    ಆದರೆ (is_photon_ಲಭ್ಯ == TRUE && !gui.ಒಳ_use)
 	clip_init(TRUE);
 }
 
@@ -47,109 +47,109 @@ void qnx_clip_init(void)
 // Clipboard
 
 // No support for owning the clipboard
-int
+ಪೂರ್ಣಾಂಕ
 clip_mch_own_selection(Clipboard_T *cbd)
 {
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
-void
+ಶೂನ್ಯ
 clip_mch_lose_selection(Clipboard_T *cbd)
 {
 }
 
-void
+ಶೂನ್ಯ
 clip_mch_request_selection(Clipboard_T *cbd)
 {
-    int		    type = MLINE, clip_length = 0, is_type_set = FALSE;
-    void	    *cbdata;
-    PhClipHeader    *clip_header;
-    char_u	    *clip_text = NULL;
+    ಪೂರ್ಣಾಂಕ		    type = MLINE, clip_ಉದ್ದಳತೆ = 0, is_type_ಗಣ = FALSE;
+    ಶೂನ್ಯ	    *cbdata;
+    Ph_Clip_ಶೀರ್ಷಿಕೆ    *clip_ಶೀರ್ಷಿಕೆ;
+    char_u	    *clip_ಪಠ್ಯ = ಖಾಲಿ;
 
-    cbdata = PhClipboardPasteStart(PhInputGroup(NULL));
-    if (cbdata == NULL)
-	return;
+    cbdata = Ph_Clipboard_Paste_ಆರಂಭ(Ph_ಒಳಹರಿವು_ಗುಂಪು(ಖಾಲಿ));
+    ಆದರೆ (cbdata == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     // Look for the vim specific clip first
-    clip_header = PhClipboardPasteType(cbdata, CLIP_TYPE_VIM);
-    if (clip_header != NULL && clip_header->data != NULL)
+    clip_ಶೀರ್ಷಿಕೆ = PhClipboardPasteType(cbdata, CLIP_TYPE_VIM);
+    ಆದರೆ (clip_ಶೀರ್ಷಿಕೆ != ಖಾಲಿ && clip_ಶೀರ್ಷಿಕೆ->ದತ್ತಾಂಶ != ಖಾಲಿ)
     {
-	switch(*(char *) clip_header->data)
+	ಆಯ್ಕೆ(*(ಅಕ್ಷರ *) clip_ಶೀರ್ಷಿಕೆ->ದತ್ತಾಂಶ)
 	{
-	    default: // fallthrough to line type
-	    case 'L': type = MLINE; break;
-	    case 'C': type = MCHAR; break;
-	    case 'B': type = MBLOCK; break;
+	    ಪೂರ್ವನಿಯೋಜಿತ: // fallthrough to line type
+	    ಸ್ಥಿತಿ 'L': type = MLINE; ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ 'C': type = MCHAR; ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ 'B': type = MBLOCK; ನಿಲ್ಲಿಸು;
 	}
-	is_type_set = TRUE;
+	is_type_ಗಣ = TRUE;
     }
 
     // Try for just normal text
-    clip_header = PhClipboardPasteType(cbdata, CLIP_TYPE_TEXT);
-    if (clip_header != NULL)
+    clip_ಶೀರ್ಷಿಕೆ = PhClipboardPasteType(cbdata, CLIP_TYPE_ಪಠ್ಯ);
+    ಆದರೆ (clip_ಶೀರ್ಷಿಕೆ != ಖಾಲಿ)
     {
-	clip_text = clip_header->data;
-	clip_length  = clip_header->length - 1;
+	clip_ಪಠ್ಯ = clip_ಶೀರ್ಷಿಕೆ->ದತ್ತಾಂಶ;
+	clip_ಉದ್ದಳತೆ  = clip_ಶೀರ್ಷಿಕೆ->ಉದ್ದಳತೆ - 1;
 
-	if (clip_text != NULL && is_type_set == FALSE)
+	ಆದರೆ (clip_ಪಠ್ಯ != ಖಾಲಿ && is_type_ಗಣ == FALSE)
 	    type = MAUTO;
     }
 
-    if ((clip_text != NULL) && (clip_length > 0))
-	clip_yank_selection(type, clip_text, clip_length, cbd);
+    ಆದರೆ ((clip_ಪಠ್ಯ != ಖಾಲಿ) && (clip_ಉದ್ದಳತೆ > 0))
+	clip_yank_selection(type, clip_ಪಠ್ಯ, clip_ಉದ್ದಳತೆ, cbd);
 
-    PhClipboardPasteFinish(cbdata);
+    Ph_Clipboard_Paste_ಮುಕ್ತಾಯ(cbdata);
 }
 
-void
-clip_mch_set_selection(Clipboard_T *cbd)
+ಶೂನ್ಯ
+clip_mch_ಗಣ_selection(Clipboard_T *cbd)
 {
-    int type;
+    ಪೂರ್ಣಾಂಕ type;
     long_u  len;
-    char_u *text_clip, vim_clip[2], *str = NULL;
-    PhClipHeader clip_header[2];
+    char_u *ಪಠ್ಯ_clip, vim_clip[2], *str = ಖಾಲಿ;
+    Ph_Clip_ಶೀರ್ಷಿಕೆ clip_ಶೀರ್ಷಿಕೆ[2];
 
     // Prevent recursion from clip_get_selection()
-    if (cbd->owned == TRUE)
-	return;
+    ಆದರೆ (cbd->owned == TRUE)
+	ಹಿಂತಿರುಗಿ;
 
     cbd->owned = TRUE;
     clip_get_selection(cbd);
     cbd->owned = FALSE;
 
     type = clip_convert_selection(&str, &len, cbd);
-    if (type >= 0)
+    ಆದರೆ (type >= 0)
     {
-	text_clip = alloc(len + 1); // Normal text
+	ಪಠ್ಯ_clip = alloc(len + 1); // Normal text
 
-	if (text_clip && vim_clip)
+	ಆದರೆ (ಪಠ್ಯ_clip && vim_clip)
 	{
-	    CLEAR_FIELD(clip_header);
+	    CLEAR_ಕ್ಷೇತ್ರ(clip_ಶೀರ್ಷಿಕೆ);
 
-	    STRNCPY(clip_header[0].type, CLIP_TYPE_VIM, 8);
-	    clip_header[0].length = sizeof(vim_clip);
-	    clip_header[0].data   = vim_clip;
+	    STRNCPY(clip_ಶೀರ್ಷಿಕೆ[0].type, CLIP_TYPE_VIM, 8);
+	    clip_ಶೀರ್ಷಿಕೆ[0].ಉದ್ದಳತೆ = ಗಾತ್ರ(vim_clip);
+	    clip_ಶೀರ್ಷಿಕೆ[0].ದತ್ತಾಂಶ   = vim_clip;
 
-	    STRNCPY(clip_header[1].type, CLIP_TYPE_TEXT, 8);
-	    clip_header[1].length = len + 1;
-	    clip_header[1].data   = text_clip;
+	    STRNCPY(clip_ಶೀರ್ಷಿಕೆ[1].type, CLIP_TYPE_ಪಠ್ಯ, 8);
+	    clip_ಶೀರ್ಷಿಕೆ[1].ಉದ್ದಳತೆ = len + 1;
+	    clip_ಶೀರ್ಷಿಕೆ[1].ದತ್ತಾಂಶ   = ಪಠ್ಯ_clip;
 
-	    switch(type)
+	    ಆಯ್ಕೆ(type)
 	    {
-		default: // fallthrough to MLINE
-		case MLINE:	*vim_clip = 'L'; break;
-		case MCHAR:	*vim_clip = 'C'; break;
-		case MBLOCK:	*vim_clip = 'B'; break;
+		ಪೂರ್ವನಿಯೋಜಿತ: // fallthrough to MLINE
+		ಸ್ಥಿತಿ MLINE:	*vim_clip = 'L'; ನಿಲ್ಲಿಸು;
+		ಸ್ಥಿತಿ MCHAR:	*vim_clip = 'C'; ನಿಲ್ಲಿಸು;
+		ಸ್ಥಿತಿ MBLOCK:	*vim_clip = 'B'; ನಿಲ್ಲಿಸು;
 	    }
 
-	    vim_strncpy(text_clip, str, len);
+	    vim_strncpy(ಪಠ್ಯ_clip, str, len);
 
 	    vim_clip[ 1 ] = NUL;
 
-	    PhClipboardCopy(PhInputGroup(NULL), 2, clip_header);
+	    PhClipboardCopy(Ph_ಒಳಹರಿವು_ಗುಂಪು(ಖಾಲಿ), 2, clip_ಶೀರ್ಷಿಕೆ);
 	}
-	vim_free(text_clip);
+	vim_free(ಪಠ್ಯ_clip);
     }
     vim_free(str);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ

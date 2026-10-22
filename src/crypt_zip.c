@@ -10,9 +10,9 @@
 /*
  * crypt_zip.c: Zip encryption support.
  */
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-#if defined(FEAT_CRYPT)
+#ಆದರೆ defined(FEAT_CRYPT)
 /*
  * Optional encryption support.
  * Mohsin Ahmed, mosh@sasi.com, 98-09-24
@@ -24,131 +24,131 @@
  */
 
 // Need a type that should be 32 bits. 64 also works but wastes space.
-typedef unsigned int u32_T;	// int is at least 32 bits
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ u32_T;	// int is at least 32 bits
 
 // The state of encryption, referenced by cryptstate_T.
-typedef struct {
-    u32_T keys[3];
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+    u32_T ಕೀಲಿಗಳು[3];
 } zip_state_T;
 
 
-static u32_T crc_32_table[256];
+ಸ್ಥಿರ u32_T ಚಕ್ರೀಯ_ಪರೀಕ್ಷೆ_32_ಕೋಷ್ಟಕ[256];
 
 /*
  * Fill the CRC table, if not done already.
  */
-    static void
-make_crc_tab(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+make_ಚಕ್ರೀಯ_ಪರೀಕ್ಷೆ_tab(ಶೂನ್ಯ)
 {
     u32_T	s, t, v;
-    static int	done = FALSE;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	ಮುಗಿದ = FALSE;
 
-    if (done)
-	return;
-    for (t = 0; t < 256; t++)
+    ಆದರೆ (ಮುಗಿದ)
+	ಹಿಂತಿರುಗಿ;
+    ಗಾಗಿ (t = 0; t < 256; t++)
     {
 	v = t;
-	for (s = 0; s < 8; s++)
+	ಗಾಗಿ (s = 0; s < 8; s++)
 	    v = (v >> 1) ^ ((v & 1) * (u32_T)0xedb88320L);
-	crc_32_table[t] = v;
+	ಚಕ್ರೀಯ_ಪರೀಕ್ಷೆ_32_ಕೋಷ್ಟಕ[t] = v;
     }
-    done = TRUE;
+    ಮುಗಿದ = TRUE;
 }
 
-#define CRC32(c, b) (crc_32_table[((int)(c) ^ (b)) & 0xff] ^ ((c) >> 8))
+#ವ್ಯಾಖ್ಯಾನಿಸು ಚಕ್ರೀಯ_ಪರೀಕ್ಷೆ_32(c, b) (ಚಕ್ರೀಯ_ಪರೀಕ್ಷೆ_32_ಕೋಷ್ಟಕ[((ಪೂರ್ಣಾಂಕ)(c) ^ (b)) & 0xff] ^ ((c) >> 8))
 
 /*
  * Return the next byte in the pseudo-random sequence.
  */
-#define DECRYPT_BYTE_ZIP(keys, t) \
+#ವ್ಯಾಖ್ಯಾನಿಸು DECRYPT_BYTE_ZIP(ಕೀಲಿಗಳು, t) \
 { \
-    short_u temp = (short_u)keys[2] | 2; \
-    t = (int)(((unsigned)(temp * (temp ^ 1U)) >> 8) & 0xff); \
+    short_u ತಾತ್ಕಾಲಿಕ = (short_u)ಕೀಲಿಗಳು[2] | 2; \
+    t = (ಪೂರ್ಣಾಂಕ)(((ಚಿಹ್ನೆರಹಿತ)(ತಾತ್ಕಾಲಿಕ * (ತಾತ್ಕಾಲಿಕ ^ 1U)) >> 8) & 0xff); \
 }
 
 /*
  * Update the encryption keys with the next byte of plain text.
  */
-#define UPDATE_KEYS_ZIP(keys, c) do { \
-    keys[0] = CRC32(keys[0], (c)); \
-    keys[1] += keys[0] & 0xff; \
-    keys[1] = keys[1] * 134775813L + 1; \
-    keys[2] = CRC32(keys[2], (int)(keys[1] >> 24)); \
-} while (0)
+#ವ್ಯಾಖ್ಯಾನಿಸು UPDATE_ಕೀಲಿಗಳು_ZIP(ಕೀಲಿಗಳು, c) ಮಾಡು { \
+    ಕೀಲಿಗಳು[0] = ಚಕ್ರೀಯ_ಪರೀಕ್ಷೆ_32(ಕೀಲಿಗಳು[0], (c)); \
+    ಕೀಲಿಗಳು[1] += ಕೀಲಿಗಳು[0] & 0xff; \
+    ಕೀಲಿಗಳು[1] = ಕೀಲಿಗಳು[1] * 134775813L + 1; \
+    ಕೀಲಿಗಳು[2] = ಚಕ್ರೀಯ_ಪರೀಕ್ಷೆ_32(ಕೀಲಿಗಳು[2], (ಪೂರ್ಣಾಂಕ)(ಕೀಲಿಗಳು[1] >> 24)); \
+} ಆಗ (0)
 
 /*
  * Initialize for encryption/decryption.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 crypt_zip_init(
     cryptstate_T    *state,
-    char_u	    *key,
-    crypt_arg_T     *arg UNUSED)
+    char_u	    *ಕೀಲಿ,
+    crypt_arg_T     *arg ಬಳಸದ)
 {
     char_u	*p;
     zip_state_T	*zs;
 
     zs = ALLOC_ONE(zip_state_T);
-    if (zs == NULL)
-	return FAIL;
-    state->method_state = zs;
+    ಆದರೆ (zs == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
+    state->ವಿಧಾನ_state = zs;
 
-    make_crc_tab();
-    zs->keys[0] = 305419896L;
-    zs->keys[1] = 591751049L;
-    zs->keys[2] = 878082192L;
-    for (p = key; *p != NUL; ++p)
-	UPDATE_KEYS_ZIP(zs->keys, (int)*p);
+    make_ಚಕ್ರೀಯ_ಪರೀಕ್ಷೆ_tab();
+    zs->ಕೀಲಿಗಳು[0] = 305419896L;
+    zs->ಕೀಲಿಗಳು[1] = 591751049L;
+    zs->ಕೀಲಿಗಳು[2] = 878082192L;
+    ಗಾಗಿ (p = ಕೀಲಿ; *p != NUL; ++p)
+	UPDATE_ಕೀಲಿಗಳು_ZIP(zs->ಕೀಲಿಗಳು, (ಪೂರ್ಣಾಂಕ)*p);
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Encrypt "from[len]" into "to[len]".
  * "from" and "to" can be equal to encrypt in place.
  */
-    void
+    ಶೂನ್ಯ
 crypt_zip_encode(
     cryptstate_T *state,
     char_u	*from,
     size_t	len,
-    char_u	*to,
-    int		last UNUSED)
+    char_u	*ಗಮ್ಯ,
+    ಪೂರ್ಣಾಂಕ		ಕೊನೆಯ ಬಳಸದ)
 {
-    zip_state_T *zs = state->method_state;
+    zip_state_T *zs = state->ವಿಧಾನ_state;
     size_t	i;
-    int		ztemp, t;
+    ಪೂರ್ಣಾಂಕ		ztemp, t;
 
-    for (i = 0; i < len; ++i)
+    ಗಾಗಿ (i = 0; i < len; ++i)
     {
 	ztemp = from[i];
-	DECRYPT_BYTE_ZIP(zs->keys, t);
-	UPDATE_KEYS_ZIP(zs->keys, ztemp);
-	to[i] = t ^ ztemp;
+	DECRYPT_BYTE_ZIP(zs->ಕೀಲಿಗಳು, t);
+	UPDATE_ಕೀಲಿಗಳು_ZIP(zs->ಕೀಲಿಗಳು, ztemp);
+	ಗಮ್ಯ[i] = t ^ ztemp;
     }
 }
 
 /*
  * Decrypt "from[len]" into "to[len]".
  */
-    void
+    ಶೂನ್ಯ
 crypt_zip_decode(
     cryptstate_T *state,
     char_u	*from,
     size_t	len,
-    char_u	*to,
-    int		last UNUSED)
+    char_u	*ಗಮ್ಯ,
+    ಪೂರ್ಣಾಂಕ		ಕೊನೆಯ ಬಳಸದ)
 {
-    zip_state_T *zs = state->method_state;
+    zip_state_T *zs = state->ವಿಧಾನ_state;
     size_t	i;
-    short_u	temp;
+    short_u	ತಾತ್ಕಾಲಿಕ;
 
-    for (i = 0; i < len; ++i)
+    ಗಾಗಿ (i = 0; i < len; ++i)
     {
-	temp = (short_u)zs->keys[2] | 2;
-	temp = (int)(((unsigned)(temp * (temp ^ 1U)) >> 8) & 0xff);
-	UPDATE_KEYS_ZIP(zs->keys, to[i] = from[i] ^ temp);
+	ತಾತ್ಕಾಲಿಕ = (short_u)zs->ಕೀಲಿಗಳು[2] | 2;
+	ತಾತ್ಕಾಲಿಕ = (ಪೂರ್ಣಾಂಕ)(((ಚಿಹ್ನೆರಹಿತ)(ತಾತ್ಕಾಲಿಕ * (ತಾತ್ಕಾಲಿಕ ^ 1U)) >> 8) & 0xff);
+	UPDATE_ಕೀಲಿಗಳು_ZIP(zs->ಕೀಲಿಗಳು, ಗಮ್ಯ[i] = from[i] ^ ತಾತ್ಕಾಲಿಕ);
     }
 }
 
-#endif // FEAT_CRYPT
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_CRYPT

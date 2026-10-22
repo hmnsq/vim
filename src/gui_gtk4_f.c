@@ -7,19 +7,19 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
-#include <gtk/gtk.h>
-#include "gui_gtk4_f.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
+#ಅನ್ತರ್ಭಾವ <gtk/gtk.h>
+#ಅನ್ತರ್ಭಾವ "gui_gtk4_f.h"
 
 /*
  * Child widget at position (x, y).
  */
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
     GtkWidget	*widget;
-    int		x;
-    int		y;
-} VimFormChild;
+    ಪೂರ್ಣಾಂಕ		x;
+    ಪೂರ್ಣಾಂಕ		y;
+} Vim_Form_ಮಗು;
 
 /*
  * Similar to the GtkFixed widget, allows absolute position and sizing of child
@@ -27,135 +27,135 @@ typedef struct
  * so this is needed to take advantage of that. We don't use GtkFixed directly
  * since we need to override some vfuncs.
  */
-struct _VimForm
+ರಚನೆ _VimForm
 {
-    GtkWidget parent;
+    GtkWidget ಪೋಷಕ;
 
     GList *children;
 
     // See vim_form_size_allocate()
     guint resize_idle_id;
-    int last_width;
-    int last_height;
+    ಪೂರ್ಣಾಂಕ ಕೊನೆಯ_ಅಗಲ;
+    ಪೂರ್ಣಾಂಕ ಕೊನೆಯ_ಎತ್ತರ;
 };
 
 G_DEFINE_TYPE(VimForm, vim_form, GTK_TYPE_WIDGET)
 
-static void vim_form_snapshot(GtkWidget *widget, GtkSnapshot *snapshot);
-static void vim_form_size_allocate(GtkWidget *widget, int width, int height, int baseline);
-static void vim_form_measure(GtkWidget *widget, GtkOrientation orientation, int for_size, int *minimum, int *natural, int *minimum_baseline, int *natural_baseline);
-static gboolean vim_form_contains(GtkWidget *widget, double x, double y);
+ಸ್ಥಿರ ಶೂನ್ಯ vim_form_snapshot(GtkWidget *widget, GtkSnapshot *snapshot);
+ಸ್ಥಿರ ಶೂನ್ಯ vim_form_ಗಾತ್ರ_allocate(GtkWidget *widget, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಪೂರ್ಣಾಂಕ baseline);
+ಸ್ಥಿರ ಶೂನ್ಯ vim_form_measure(GtkWidget *widget, GtkOrientation orientation, ಪೂರ್ಣಾಂಕ for_ಗಾತ್ರ, ಪೂರ್ಣಾಂಕ *minimum, ಪೂರ್ಣಾಂಕ *natural, ಪೂರ್ಣಾಂಕ *minimum_baseline, ಪೂರ್ಣಾಂಕ *natural_baseline);
+ಸ್ಥಿರ gboolean vim_form_ಒಳಗೊಂಡಿದೆ(GtkWidget *widget, ದ್ವಿಗುಣ x, ದ್ವಿಗುಣ y);
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 vim_form_dispose(GObject *obj)
 {
     VimForm *self = VIM_FORM(obj);
     GList   *ele = self->children;
 
-    while (ele != NULL)
+    ಆಗ (ele != ಖಾಲಿ)
     {
-	VimFormChild *child = ele->data;
+	Vim_Form_ಮಗು *ಮಗು = ele->ದತ್ತಾಂಶ;
 
-	ele = ele->next;
-	gtk_widget_unparent(child->widget);
-	g_free(child);
+	ele = ele->ಮುಂದಿನ;
+	gtk_widget_unparent(ಮಗು->widget);
+	g_free(ಮಗು);
     }
     g_list_free(self->children);
-    self->children = NULL;
+    self->children = ಖಾಲಿ;
 
-    G_OBJECT_CLASS(vim_form_parent_class)->dispose(obj);
+    G_OBJECT_CLASS(vim_form_ಪೋಷಕ_class)->dispose(obj);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 vim_form_class_init(VimFormClass *class)
 {
     GtkWidgetClass  *widget_class = GTK_WIDGET_CLASS(class);
     GObjectClass    *obj_class = G_OBJECT_CLASS(class);
 
     widget_class->snapshot = vim_form_snapshot;
-    widget_class->size_allocate = vim_form_size_allocate;
+    widget_class->ಗಾತ್ರ_allocate = vim_form_ಗಾತ್ರ_allocate;
     widget_class->measure = vim_form_measure;
-    widget_class->contains = vim_form_contains;
+    widget_class->ಒಳಗೊಂಡಿದೆ = vim_form_ಒಳಗೊಂಡಿದೆ;
 
     obj_class->dispose = vim_form_dispose;
 }
 
-    static void
-vim_form_init(VimForm *self UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+vim_form_init(VimForm *self ಬಳಸದ)
 {
 }
 
     GtkWidget *
-vim_form_new(void)
+vim_form_new(ಶೂನ್ಯ)
 {
-    return g_object_new(VIM_TYPE_FORM, NULL);
+    ಹಿಂತಿರುಗಿ g_object_new(VIM_TYPE_FORM, ಖಾಲಿ);
 }
 
 /*
  * Transform the child
  */
-    static void
-vim_form_position_child(VimForm	*self, VimFormChild *child)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+vim_form_position_ಮಗು(VimForm	*self, Vim_Form_ಮಗು *ಮಗು)
 {
     GtkRequisition  requisition;
     GskTransform    *transform;
-    int		    w, h;
+    ಪೂರ್ಣಾಂಕ		    w, h;
 
-    gtk_widget_get_preferred_size(child->widget, &requisition, NULL);
-    w = requisition.width;
-    h = requisition.height;
+    gtk_widget_get_preferred_ಗಾತ್ರ(ಮಗು->widget, &requisition, ಖಾಲಿ);
+    w = requisition.ಅಗಲ;
+    h = requisition.ಎತ್ತರ;
 
     // If widget has no size request, use parent size
-    if (w <= 0)
-	w = gtk_widget_get_width(GTK_WIDGET(self));
-    if (h <= 0)
-	h = gtk_widget_get_height(GTK_WIDGET(self));
-    if (w <= 0) w = 1;
-    if (h <= 0) h = 1;
+    ಆದರೆ (w <= 0)
+	w = gtk_widget_get_ಅಗಲ(GTK_WIDGET(self));
+    ಆದರೆ (h <= 0)
+	h = gtk_widget_get_ಎತ್ತರ(GTK_WIDGET(self));
+    ಆದರೆ (w <= 0) w = 1;
+    ಆದರೆ (h <= 0) h = 1;
 
-    transform = gsk_transform_translate(NULL,
-	    &GRAPHENE_POINT_INIT((float)child->x, (float)child->y));
-    gtk_widget_allocate(child->widget, w, h, -1, transform);
+    transform = gsk_transform_translate(ಖಾಲಿ,
+	    &GRAPHENE_ಬಿಂದು_INIT((ದಶಮಾಂಶ)ಮಗು->x, (ದಶಮಾಂಶ)ಮಗು->y));
+    gtk_widget_allocate(ಮಗು->widget, w, h, -1, transform);
 }
 
 /*
  * Place the given widget at the point (x, y).
  */
-    void
-vim_form_put(VimForm *self, GtkWidget *widget, int x, int y)
+    ಶೂನ್ಯ
+vim_form_put(VimForm *self, GtkWidget *widget, ಪೂರ್ಣಾಂಕ x, ಪೂರ್ಣಾಂಕ y)
 {
-    VimFormChild *child;
+    Vim_Form_ಮಗು *ಮಗು;
 
-    child = g_new(VimFormChild, 1);
+    ಮಗು = g_new(Vim_Form_ಮಗು, 1);
 
-    child->widget = widget;
-    child->x = x;
-    child->y = y;
+    ಮಗು->widget = widget;
+    ಮಗು->x = x;
+    ಮಗು->y = y;
 
-    gtk_widget_set_size_request(child->widget, -1, -1);
+    gtk_widget_ಗಣ_ಗಾತ್ರ_request(ಮಗು->widget, -1, -1);
 
-    self->children = g_list_append(self->children, child);
+    self->children = g_list_append(self->children, ಮಗು);
 
-    gtk_widget_set_parent(widget, GTK_WIDGET(self));
-    vim_form_position_child(self, child);
+    gtk_widget_ಗಣ_ಪೋಷಕ(widget, GTK_WIDGET(self));
+    vim_form_position_ಮಗು(self, ಮಗು);
 }
 
 /*
  * Move the widget (which should have already been added using vim_form_put())
  * to the given point (x, y).
  */
-    void
-vim_form_move(VimForm *self, GtkWidget *widget, int x, int y)
+    ಶೂನ್ಯ
+vim_form_move(VimForm *self, GtkWidget *widget, ಪೂರ್ಣಾಂಕ x, ಪೂರ್ಣಾಂಕ y)
 {
-    for (GList *ele = self->children; ele != NULL; ele = ele->next)
+    ಗಾಗಿ (GList *ele = self->children; ele != ಖಾಲಿ; ele = ele->ಮುಂದಿನ)
     {
-	VimFormChild *child = ele->data;
-	if (child->widget == widget)
+	Vim_Form_ಮಗು *ಮಗು = ele->ದತ್ತಾಂಶ;
+	ಆದರೆ (ಮಗು->widget == widget)
 	{
-	    child->x = x;
-	    child->y = y;
-	    vim_form_position_child(self, child);
-	    return;
+	    ಮಗು->x = x;
+	    ಮಗು->y = y;
+	    vim_form_position_ಮಗು(self, ಮಗು);
+	    ಹಿಂತಿರುಗಿ;
 	}
     }
 }
@@ -163,7 +163,7 @@ vim_form_move(VimForm *self, GtkWidget *widget, int x, int y)
 /*
  * Move and resize the child.
  */
-    void
+    ಶೂನ್ಯ
 vim_form_move_resize(
 	VimForm	    *self,
 	GtkWidget   *widget,
@@ -172,140 +172,140 @@ vim_form_move_resize(
 	gint	    w,
 	gint	    h)
 {
-    gtk_widget_set_size_request(widget, w, h);
-    if (!gtk_widget_get_visible(widget))
-	gtk_widget_queue_resize(widget);
+    gtk_widget_ಗಣ_ಗಾತ್ರ_request(widget, w, h);
+    ಆದರೆ (!gtk_widget_get_visible(widget))
+	gtk_widget_ಸರತಿ_resize(widget);
     vim_form_move(self, widget, x, y);
 }
 
-    void
+    ಶೂನ್ಯ
 vim_form_remove(VimForm *self, GtkWidget *widget)
 {
-    for (GList *ele = self->children; ele != NULL; ele = ele->next)
+    ಗಾಗಿ (GList *ele = self->children; ele != ಖಾಲಿ; ele = ele->ಮುಂದಿನ)
     {
-	VimFormChild *child = ele->data;
-	if (child->widget == widget)
+	Vim_Form_ಮಗು *ಮಗು = ele->ದತ್ತಾಂಶ;
+	ಆದರೆ (ಮಗು->widget == widget)
 	{
 	    self->children = g_list_remove_link(self->children, ele);
 	    g_list_free_1(ele);
 	    gtk_widget_unparent(widget);
-	    g_free(child);
-	    return;
+	    g_free(ಮಗು);
+	    ಹಿಂತಿರುಗಿ;
 	}
     }
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 vim_form_snapshot(GtkWidget *widget, GtkSnapshot *snapshot)
 {
     VimForm *self = VIM_FORM(widget);
 
-    for (GList *ele = self->children; ele != NULL; ele = ele->next)
+    ಗಾಗಿ (GList *ele = self->children; ele != ಖಾಲಿ; ele = ele->ಮುಂದಿನ)
     {
-	VimFormChild *child = ele->data;
-	gtk_widget_snapshot_child(widget, child->widget, snapshot);
+	Vim_Form_ಮಗು *ಮಗು = ele->ದತ್ತಾಂಶ;
+	gtk_widget_snapshot_ಮಗು(widget, ಮಗು->widget, snapshot);
     }
 }
 
-    static gboolean
+    ಸ್ಥಿರ gboolean
 vim_form_resize_idle_cb(VimForm *self)
 {
     self->resize_idle_id = 0;
 
-    if (gui.drawarea == NULL)
-	goto exit;
+    ಆದರೆ (gui.drawarea == ಖಾಲಿ)
+	ಹೋಗು ನಿರ್ಗಮಿಸು;
 
-    if (self->last_width > 1 && self->last_height > 1)
+    ಆದರೆ (self->ಕೊನೆಯ_ಅಗಲ > 1 && self->ಕೊನೆಯ_ಎತ್ತರ > 1)
     {
 	// Ignore an allocation that does not answer the size that was last
 	// asked for: it was computed before the request and using it would
 	// compute Rows and Columns from the old size together with the new
 	// base size, losing columns. Give up after one allocation in case
 	// the request is never answered exactly.
-	if (gui.pending_form_w > 0
-		&& (self->last_width != gui.pending_form_w
-		    || self->last_height != gui.pending_form_h)
+	ಆದರೆ (gui.pending_form_w > 0
+		&& (self->ಕೊನೆಯ_ಅಗಲ != gui.pending_form_w
+		    || self->ಕೊನೆಯ_ಎತ್ತರ != gui.pending_form_h)
 		&& --gui.pending_form_skip >= 0)
-	    goto exit;
+	    ಹೋಗು ನಿರ್ಗಮಿಸು;
 
-	int	req_w, req_h;
+	ಪೂರ್ಣಾಂಕ	req_w, req_h;
 
 	gui.pending_form_w = 0;
 
 	// The size request that Vim made has been answered.  Keep the size and
 	// drop the request, otherwise the window could not be made smaller.
-	gtk_widget_get_size_request(GTK_WIDGET(self), &req_w, &req_h);
-	if (req_w != -1 || req_h != -1)
+	gtk_widget_get_ಗಾತ್ರ_request(GTK_WIDGET(self), &req_w, &req_h);
+	ಆದರೆ (req_w != -1 || req_h != -1)
 	{
-	    gtk_window_set_default_size(GTK_WINDOW(gui.mainwin),
-		    gtk_widget_get_width(gui.mainwin),
-		    gtk_widget_get_height(gui.mainwin));
-	    gtk_widget_set_size_request(GTK_WIDGET(self), -1, -1);
+	    gtk_ಕಿಟಕಿ_ಗಣ_default_ಗಾತ್ರ(GTK_ಕಿಟಕಿ(gui.mainwin),
+		    gtk_widget_get_ಅಗಲ(gui.mainwin),
+		    gtk_widget_get_ಎತ್ತರ(gui.mainwin));
+	    gtk_widget_ಗಣ_ಗಾತ್ರ_request(GTK_WIDGET(self), -1, -1);
 	}
 
-	gui_resize_shell(self->last_width, self->last_height);
+	gui_resize_shell(self->ಕೊನೆಯ_ಅಗಲ, self->ಕೊನೆಯ_ಎತ್ತರ);
     }
 
-exit:
+ನಿರ್ಗಮಿಸು:
     g_object_unref(self);
-    return G_SOURCE_REMOVE;
+    ಹಿಂತಿರುಗಿ G_ಮೂಲ_REMOVE;
 }
 
-    static void
-vim_form_size_allocate(
+    ಸ್ಥಿರ ಶೂನ್ಯ
+vim_form_ಗಾತ್ರ_allocate(
 	GtkWidget *widget,
-	int width,
-	int height,
-	int baseline UNUSED)
+	ಪೂರ್ಣಾಂಕ ಅಗಲ,
+	ಪೂರ್ಣಾಂಕ ಎತ್ತರ,
+	ಪೂರ್ಣಾಂಕ baseline ಬಳಸದ)
 {
     VimForm *self = VIM_FORM(widget);
 
-    for (GList *ele = self->children; ele != NULL; ele = ele->next)
-	vim_form_position_child(self, ele->data);
+    ಗಾಗಿ (GList *ele = self->children; ele != ಖಾಲಿ; ele = ele->ಮುಂದಿನ)
+	vim_form_position_ಮಗು(self, ele->ದತ್ತಾಂಶ);
 
     // Notify Vim about size change via idle callback
-    if (width != self->last_width || height != self->last_height)
+    ಆದರೆ (ಅಗಲ != self->ಕೊನೆಯ_ಅಗಲ || ಎತ್ತರ != self->ಕೊನೆಯ_ಎತ್ತರ)
     {
-	self->last_width = width;
-	self->last_height = height;
+	self->ಕೊನೆಯ_ಅಗಲ = ಅಗಲ;
+	self->ಕೊನೆಯ_ಎತ್ತರ = ಎತ್ತರ;
 
-	if (self->resize_idle_id == 0)
-	    self->resize_idle_id = g_idle_add(
+	ಆದರೆ (self->resize_idle_id == 0)
+	    self->resize_idle_id = g_idle_ಕೂಡಿಸು(
 		    (GSourceFunc)vim_form_resize_idle_cb, g_object_ref(self));
     }
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 vim_form_measure(
-	GtkWidget	*widget UNUSED,
+	GtkWidget	*widget ಬಳಸದ,
 	GtkOrientation	orientation,
-	int		for_size UNUSED,
-	int		*minimum,
-	int		*natural,
-	int		*minimum_baseline,
-	int		*natural_baseline)
+	ಪೂರ್ಣಾಂಕ		for_ಗಾತ್ರ ಬಳಸದ,
+	ಪೂರ್ಣಾಂಕ		*minimum,
+	ಪೂರ್ಣಾಂಕ		*natural,
+	ಪೂರ್ಣಾಂಕ		*minimum_baseline,
+	ಪೂರ್ಣಾಂಕ		*natural_baseline)
 {
-    if (orientation == GTK_ORIENTATION_VERTICAL)
+    ಆದರೆ (orientation == GTK_ORIENTATION_VERTICAL)
     {
 	// Set minimum height of form widget to 4 rows.
-	if (minimum != NULL)
-	    *minimum  = gui.char_height * 4;
-	if (natural != NULL)
-	    *natural = gui.char_height * 4;
+	ಆದರೆ (minimum != ಖಾಲಿ)
+	    *minimum  = gui.char_ಎತ್ತರ * 4;
+	ಆದರೆ (natural != ಖಾಲಿ)
+	    *natural = gui.char_ಎತ್ತರ * 4;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Set minimum width of form widget to 20 columns. Any less and the draw
 	// area seems to glitch out...
-	if (minimum != NULL)
-	    *minimum  = gui.char_width * 20;
-	if (natural != NULL)
-	    *natural = gui.char_width * 20;
+	ಆದರೆ (minimum != ಖಾಲಿ)
+	    *minimum  = gui.char_ಅಗಲ * 20;
+	ಆದರೆ (natural != ಖಾಲಿ)
+	    *natural = gui.char_ಅಗಲ * 20;
     }
 
-    if (minimum_baseline != NULL)
+    ಆದರೆ (minimum_baseline != ಖಾಲಿ)
 	*minimum_baseline = -1;
-    if (natural_baseline != NULL)
+    ಆದರೆ (natural_baseline != ಖಾಲಿ)
 	*natural_baseline = -1;
 }
 
@@ -314,8 +314,8 @@ vim_form_measure(
  * Make the form itself input-transparent so clicks on its empty area fall
  * through to the drawarea below, while the scrollbar children stay pickable.
  */
-    static gboolean
-vim_form_contains(GtkWidget *widget UNUSED, double x UNUSED, double y UNUSED)
+    ಸ್ಥಿರ gboolean
+vim_form_ಒಳಗೊಂಡಿದೆ(GtkWidget *widget ಬಳಸದ, ದ್ವಿಗುಣ x ಬಳಸದ, ದ್ವಿಗುಣ y ಬಳಸದ)
 {
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }

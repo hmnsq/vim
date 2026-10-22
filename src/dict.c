@@ -11,91 +11,91 @@
  * dict.c: Dictionary support
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 
 // List head for garbage collection. Although there can be a reference loop
 // from partial to dict to partial, we don't need to keep track of the partial,
 // since it will get freed when the dict is unused and gets freed.
-static dict_T		*first_dict = NULL;
+ಸ್ಥಿರ dict_T		*ಮೊದಲ_dict = ಖಾಲಿ;
 
 /*
  * Allocate an empty header for a dictionary.
  * Caller should take care of the reference count.
  */
     dict_T *
-dict_alloc(void)
+dict_alloc(ಶೂನ್ಯ)
 {
     dict_T *d;
 
     d = ALLOC_CLEAR_ONE(dict_T);
-    if (d == NULL)
-	return NULL;
+    ಆದರೆ (d == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     // Add the dict to the list of dicts for garbage collection.
-    if (first_dict != NULL)
-	first_dict->dv_used_prev = d;
-    d->dv_used_next = first_dict;
-    d->dv_used_prev = NULL;
-    first_dict = d;
+    ಆದರೆ (ಮೊದಲ_dict != ಖಾಲಿ)
+	ಮೊದಲ_dict->dv_ಬಳಸಿದ_prev = d;
+    d->dv_ಬಳಸಿದ_ಮುಂದಿನ = ಮೊದಲ_dict;
+    d->dv_ಬಳಸಿದ_prev = ಖಾಲಿ;
+    ಮೊದಲ_dict = d;
 
     hash_init(&d->dv_hashtab);
-    d->dv_lock = 0;
+    d->dv_ಬೀಗ = 0;
     d->dv_scope = 0;
     d->dv_refcount = 0;
     d->dv_copyID = 0;
-    return d;
+    ಹಿಂತಿರುಗಿ d;
 }
 
 /*
  * dict_alloc() with an ID for alloc_fail().
  */
     dict_T *
-dict_alloc_id(alloc_id_T id UNUSED)
+dict_alloc_id(alloc_id_T id ಬಳಸದ)
 {
-#ifdef FEAT_EVAL
-    if (alloc_fail_id == id && alloc_does_fail(sizeof(list_T)))
-	return NULL;
-#endif
-    return (dict_alloc());
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಆದರೆ (alloc_fail_id == id && alloc_does_fail(ಗಾತ್ರ(list_T)))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ (dict_alloc());
 }
 
     dict_T *
-dict_alloc_lock(int lock)
+dict_alloc_ಬೀಗ(ಪೂರ್ಣಾಂಕ ಬೀಗ)
 {
     dict_T *d = dict_alloc();
 
-    if (d != NULL)
-	d->dv_lock = lock;
-    return d;
+    ಆದರೆ (d != ಖಾಲಿ)
+	d->dv_ಬೀಗ = ಬೀಗ;
+    ಹಿಂತಿರುಗಿ d;
 }
 
 /*
  * Allocate an empty dict for a return value.
  * Returns OK or FAIL.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 rettv_dict_alloc(typval_T *rettv)
 {
-    dict_T	*d = dict_alloc_lock(0);
+    dict_T	*d = dict_alloc_ಬೀಗ(0);
 
-    if (d == NULL)
-	return FAIL;
+    ಆದರೆ (d == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    rettv_dict_set(rettv, d);
-    return OK;
+    rettv_dict_ಗಣ(rettv, d);
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Set a dictionary as the return value
  */
-    void
-rettv_dict_set(typval_T *rettv, dict_T *d)
+    ಶೂನ್ಯ
+rettv_dict_ಗಣ(typval_T *rettv, dict_T *d)
 {
     rettv->v_type = VAR_DICT;
     rettv->vval.v_dict = d;
-    if (d != NULL)
+    ಆದರೆ (d != ಖಾಲಿ)
 	++d->dv_refcount;
 }
 
@@ -103,34 +103,34 @@ rettv_dict_set(typval_T *rettv, dict_T *d)
  * Free a Dictionary, including all non-container items it contains.
  * Ignores the reference count.
  */
-    void
+    ಶೂನ್ಯ
 dict_free_contents(dict_T *d)
 {
     hashtab_free_contents(&d->dv_hashtab);
     free_type(d->dv_type);
-    d->dv_type = NULL;
+    d->dv_type = ಖಾಲಿ;
 }
 
 /*
  * Clear hashtab "ht" and dict items it contains.
  * If "ht" is not freed then you should call hash_init() next!
  */
-    void
+    ಶೂನ್ಯ
 hashtab_free_contents(hashtab_T *ht)
 {
-    int		todo;
+    ಪೂರ್ಣಾಂಕ		todo;
     hashitem_T	*hi;
     dictitem_T	*di;
 
-    if (check_hashtab_frozen(ht, "clear dict"))
-	return;
+    ಆದರೆ (check_hashtab_frozen(ht, "clear dict"))
+	ಹಿಂತಿರುಗಿ;
 
     // Lock the hashtab, we don't want it to resize while freeing items.
-    hash_lock(ht);
-    todo = (int)ht->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+    hash_ಬೀಗ(ht);
+    todo = (ಪೂರ್ಣಾಂಕ)ht->ht_ಬಳಸಿದ;
+    FOR_ALL_HASHTAB_ವಸ್ತುಗಳು(ht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	ಆದರೆ (!HASHITEM_ಖಾಲಿಗಳು(hi))
 	{
 	    // Remove the item before deleting it, just in case there is
 	    // something recursive causing trouble.
@@ -145,23 +145,23 @@ hashtab_free_contents(hashtab_T *ht)
     hash_clear(ht);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 dict_free_dict(dict_T *d)
 {
     // Remove the dict from the list of dicts for garbage collection.
-    if (d->dv_used_prev == NULL)
-	first_dict = d->dv_used_next;
-    else
-	d->dv_used_prev->dv_used_next = d->dv_used_next;
-    if (d->dv_used_next != NULL)
-	d->dv_used_next->dv_used_prev = d->dv_used_prev;
+    ಆದರೆ (d->dv_ಬಳಸಿದ_prev == ಖಾಲಿ)
+	ಮೊದಲ_dict = d->dv_ಬಳಸಿದ_ಮುಂದಿನ;
+    ಇಲ್ಲದಿದ್ದರೆ
+	d->dv_ಬಳಸಿದ_prev->dv_ಬಳಸಿದ_ಮುಂದಿನ = d->dv_ಬಳಸಿದ_ಮುಂದಿನ;
+    ಆದರೆ (d->dv_ಬಳಸಿದ_ಮುಂದಿನ != ಖಾಲಿ)
+	d->dv_ಬಳಸಿದ_ಮುಂದಿನ->dv_ಬಳಸಿದ_prev = d->dv_ಬಳಸಿದ_prev;
     vim_free(d);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 dict_free(dict_T *d)
 {
-    if (!in_free_unref_items)
+    ಆದರೆ (!ಒಳ_free_unref_ವಸ್ತುಗಳು)
     {
 	dict_free_contents(d);
 	dict_free_dict(d);
@@ -172,10 +172,10 @@ dict_free(dict_T *d)
  * Unreference a Dictionary: decrement the reference count and free it when it
  * becomes zero.
  */
-    void
+    ಶೂನ್ಯ
 dict_unref(dict_T *d)
 {
-    if (d != NULL && --d->dv_refcount <= 0)
+    ಆದರೆ (d != ಖಾಲಿ && --d->dv_refcount <= 0)
 	dict_free(d);
 }
 
@@ -183,14 +183,14 @@ dict_unref(dict_T *d)
  * Go through the list of dicts and free items without the copyID.
  * Returns TRUE if something was freed.
  */
-    int
-dict_free_nonref(int copyID)
+    ಪೂರ್ಣಾಂಕ
+dict_free_nonref(ಪೂರ್ಣಾಂಕ copyID)
 {
     dict_T	*dd;
-    int		did_free = FALSE;
+    ಪೂರ್ಣಾಂಕ		did_free = FALSE;
 
-    for (dd = first_dict; dd != NULL; dd = dd->dv_used_next)
-	if ((dd->dv_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
+    ಗಾಗಿ (dd = ಮೊದಲ_dict; dd != ಖಾಲಿ; dd = dd->dv_ಬಳಸಿದ_ಮುಂದಿನ)
+	ಆದರೆ ((dd->dv_copyID & COPYID_ಮುಖವಾಡ) != (copyID & COPYID_ಮುಖವಾಡ))
 	{
 	    // Free the Dictionary and ordinary items it contains, but don't
 	    // recurse into Lists and Dictionaries, they will be in the list
@@ -198,18 +198,18 @@ dict_free_nonref(int copyID)
 	    dict_free_contents(dd);
 	    did_free = TRUE;
 	}
-    return did_free;
+    ಹಿಂತಿರುಗಿ did_free;
 }
 
-    void
-dict_free_items(int copyID)
+    ಶೂನ್ಯ
+dict_free_ವಸ್ತುಗಳು(ಪೂರ್ಣಾಂಕ copyID)
 {
-    dict_T	*dd, *dd_next;
+    dict_T	*dd, *dd_ಮುಂದಿನ;
 
-    for (dd = first_dict; dd != NULL; dd = dd_next)
+    ಗಾಗಿ (dd = ಮೊದಲ_dict; dd != ಖಾಲಿ; dd = dd_ಮುಂದಿನ)
     {
-	dd_next = dd->dv_used_next;
-	if ((dd->dv_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
+	dd_ಮುಂದಿನ = dd->dv_ಬಳಸಿದ_ಮುಂದಿನ;
+	ಆದರೆ ((dd->dv_copyID & COPYID_ಮುಖವಾಡ) != (copyID & COPYID_ಮುಖವಾಡ))
 	    dict_free_dict(dd);
     }
 }
@@ -222,67 +222,67 @@ dict_free_items(int copyID)
  * Returns NULL when out of memory.
  */
     dictitem_T *
-dictitem_alloc(char_u *key)
+dictitem_alloc(char_u *ಕೀಲಿ)
 {
     dictitem_T *di;
-    size_t len = STRLEN(key);
+    size_t len = STRLEN(ಕೀಲಿ);
 
-    di = alloc(offsetof(dictitem_T, di_key) + len + 1);
-    if (di == NULL)
-	return NULL;
+    di = alloc(offsetof(dictitem_T, di_ಕೀಲಿ) + len + 1);
+    ಆದರೆ (di == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    mch_memmove(di->di_key, key, len + 1);
+    mch_memmove(di->di_ಕೀಲಿ, ಕೀಲಿ, len + 1);
     di->di_flags = DI_FLAGS_ALLOC;
-    di->di_tv.v_lock = 0;
+    di->di_tv.v_ಬೀಗ = 0;
     di->di_tv.v_type = VAR_UNKNOWN;
-    return di;
+    ಹಿಂತಿರುಗಿ di;
 }
 
 /*
  * Make a copy of a Dictionary item.
  */
-    static dictitem_T *
+    ಸ್ಥಿರ dictitem_T *
 dictitem_copy(dictitem_T *org)
 {
     dictitem_T *di;
-    size_t	len = STRLEN(org->di_key);
+    size_t	len = STRLEN(org->di_ಕೀಲಿ);
 
-    di = alloc(offsetof(dictitem_T, di_key) + len + 1);
-    if (di == NULL)
-	return NULL;
+    di = alloc(offsetof(dictitem_T, di_ಕೀಲಿ) + len + 1);
+    ಆದರೆ (di == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    mch_memmove(di->di_key, org->di_key, len + 1);
+    mch_memmove(di->di_ಕೀಲಿ, org->di_ಕೀಲಿ, len + 1);
     di->di_flags = DI_FLAGS_ALLOC;
     copy_tv(&org->di_tv, &di->di_tv);
-    return di;
+    ಹಿಂತಿರುಗಿ di;
 }
 
 /*
  * Remove item "item" from Dictionary "dict" and free it.
  * "command" is used for the error message when the hashtab if frozen.
  */
-    void
-dictitem_remove(dict_T *dict, dictitem_T *item, char *command)
+    ಶೂನ್ಯ
+dictitem_remove(dict_T *dict, dictitem_T *ಅಂಶ, ಅಕ್ಷರ *command)
 {
     hashitem_T	*hi;
 
-    hi = hash_find(&dict->dv_hashtab, item->di_key);
-    if (HASHITEM_EMPTY(hi))
-	internal_error("dictitem_remove()");
-    else
+    hi = hash_ಕಂಡುಹಿಡಿ(&dict->dv_hashtab, ಅಂಶ->di_ಕೀಲಿ);
+    ಆದರೆ (HASHITEM_ಖಾಲಿಗಳು(hi))
+	ಆಂತರಿಕ_error("dictitem_remove()");
+    ಇಲ್ಲದಿದ್ದರೆ
 	hash_remove(&dict->dv_hashtab, hi, command);
-    dictitem_free(item);
+    dictitem_free(ಅಂಶ);
 }
 
 /*
  * Free a dict item.  Also clears the value.
  */
-    void
-dictitem_free(dictitem_T *item)
+    ಶೂನ್ಯ
+dictitem_free(dictitem_T *ಅಂಶ)
 {
-    clear_tv(&item->di_tv);
-    if (item->di_flags & DI_FLAGS_ALLOC)
-	vim_free(item);
+    clear_tv(&ಅಂಶ->di_tv);
+    ಆದರೆ (ಅಂಶ->di_flags & DI_FLAGS_ALLOC)
+	vim_free(ಅಂಶ);
 }
 
 /*
@@ -292,79 +292,79 @@ dictitem_free(dictitem_T *item)
  * Returns NULL when out of memory.
  */
     dict_T *
-dict_copy(dict_T *orig, int deep, int top, int copyID)
+dict_copy(dict_T *orig, ಪೂರ್ಣಾಂಕ deep, ಪೂರ್ಣಾಂಕ ತುದಿ, ಪೂರ್ಣಾಂಕ copyID)
 {
     dict_T	*copy;
     dictitem_T	*di;
-    int		todo;
+    ಪೂರ್ಣಾಂಕ		todo;
     hashitem_T	*hi;
 
-    if (orig == NULL)
-	return NULL;
+    ಆದರೆ (orig == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     copy = dict_alloc();
-    if (copy == NULL)
-	return NULL;
+    ಆದರೆ (copy == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (copyID != 0)
+    ಆದರೆ (copyID != 0)
     {
 	orig->dv_copyID = copyID;
 	orig->dv_copydict = copy;
     }
-    if (orig->dv_type == NULL || top || deep)
-	copy->dv_type = NULL;
-    else
+    ಆದರೆ (orig->dv_type == ಖಾಲಿ || ತುದಿ || deep)
+	copy->dv_type = ಖಾಲಿ;
+    ಇಲ್ಲದಿದ್ದರೆ
 	copy->dv_type = alloc_type(orig->dv_type);
 
-    todo = (int)orig->dv_hashtab.ht_used;
-    for (hi = orig->dv_hashtab.ht_array; todo > 0 && !got_int; ++hi)
+    todo = (ಪೂರ್ಣಾಂಕ)orig->dv_hashtab.ht_ಬಳಸಿದ;
+    ಗಾಗಿ (hi = orig->dv_hashtab.ht_array; todo > 0 && !got_int; ++hi)
     {
-	if (!HASHITEM_EMPTY(hi))
+	ಆದರೆ (!HASHITEM_ಖಾಲಿಗಳು(hi))
 	{
 	    --todo;
 
-	    di = dictitem_alloc(hi->hi_key);
-	    if (di == NULL)
-		break;
-	    if (deep)
+	    di = dictitem_alloc(hi->hi_ಕೀಲಿ);
+	    ಆದರೆ (di == ಖಾಲಿ)
+		ನಿಲ್ಲಿಸು;
+	    ಆದರೆ (deep)
 	    {
-		if (item_copy(&HI2DI(hi)->di_tv, &di->di_tv,
+		ಆದರೆ (ಅಂಶ_copy(&HI2DI(hi)->di_tv, &di->di_tv,
 			    deep, FALSE, copyID) == FAIL)
 		{
 		    vim_free(di);
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		copy_tv(&HI2DI(hi)->di_tv, &di->di_tv);
-	    if (dict_add(copy, di) == FAIL)
+	    ಆದರೆ (dict_ಕೂಡಿಸು(copy, di) == FAIL)
 	    {
 		dictitem_free(di);
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	}
     }
 
     ++copy->dv_refcount;
-    if (todo > 0)
+    ಆದರೆ (todo > 0)
     {
 	dict_unref(copy);
-	copy = NULL;
+	copy = ಖಾಲಿ;
     }
 
-    return copy;
+    ಹಿಂತಿರುಗಿ copy;
 }
 
 /*
  * Check for adding a function to g: or s: (in Vim9 script) or l:.
  * If the name is wrong give an error message and return TRUE.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 dict_wrong_func_name(dict_T *d, typval_T *tv, char_u *name)
 {
-    return (d == get_globvar_dict()
-		|| (in_vim9script() && SCRIPT_ID_VALID(current_sctx.sc_sid)
-		   && d == &SCRIPT_ITEM(current_sctx.sc_sid)->sn_vars->sv_dict)
+    ಹಿಂತಿರುಗಿ (d == get_globvar_dict()
+		|| (ಒಳ_vim9script() && SCRIPT_ID_VALID(current_sctx.sc_sid)
+		   && d == &SCRIPT_ಅಂಶ(current_sctx.sc_sid)->sn_vars->sv_dict)
 		|| &d->dv_hashtab == get_funccal_local_ht())
 	    && (tv->v_type == VAR_FUNC || tv->v_type == VAR_PARTIAL)
 	    && var_wrong_func_name(name, TRUE);
@@ -374,68 +374,68 @@ dict_wrong_func_name(dict_T *d, typval_T *tv, char_u *name)
  * Add item "item" to Dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add(dict_T *d, dictitem_T *item)
+    ಪೂರ್ಣಾಂಕ
+dict_ಕೂಡಿಸು(dict_T *d, dictitem_T *ಅಂಶ)
 {
-    if (dict_wrong_func_name(d, &item->di_tv, item->di_key))
-	return FAIL;
-    return hash_add(&d->dv_hashtab, item->di_key, "add to dictionary");
+    ಆದರೆ (dict_wrong_func_name(d, &ಅಂಶ->di_tv, ಅಂಶ->di_ಕೀಲಿ))
+	ಹಿಂತಿರುಗಿ FAIL;
+    ಹಿಂತಿರುಗಿ hash_ಕೂಡಿಸು(&d->dv_hashtab, ಅಂಶ->di_ಕೀಲಿ, "add to dictionary");
 }
 
 /*
  * Add a number or special entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    static int
-dict_add_number_special(
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+dict_ಕೂಡಿಸು_ಸಂಖ್ಯೆ_special(
     dict_T	*d,
-    char	*key,
+    ಅಕ್ಷರ	*ಕೀಲಿ,
     varnumber_T	nr,
     vartype_T	vartype)
 {
-    dictitem_T	*item;
+    dictitem_T	*ಅಂಶ;
 
-    item = dictitem_alloc((char_u *)key);
-    if (item == NULL)
-	return FAIL;
-    item->di_tv.v_type = vartype;
-    item->di_tv.vval.v_number = nr;
-    if (dict_add(d, item) == FAIL)
+    ಅಂಶ = dictitem_alloc((char_u *)ಕೀಲಿ);
+    ಆದರೆ (ಅಂಶ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
+    ಅಂಶ->di_tv.v_type = vartype;
+    ಅಂಶ->di_tv.vval.v_ಸಂಖ್ಯೆ = nr;
+    ಆದರೆ (dict_ಕೂಡಿಸು(d, ಅಂಶ) == FAIL)
     {
-	dictitem_free(item);
-	return FAIL;
+	dictitem_free(ಅಂಶ);
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Add a number entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_number(dict_T *d, char *key, varnumber_T nr)
+    ಪೂರ್ಣಾಂಕ
+dict_ಕೂಡಿಸು_ಸಂಖ್ಯೆ(dict_T *d, ಅಕ್ಷರ *ಕೀಲಿ, varnumber_T nr)
 {
-    return dict_add_number_special(d, key, nr, VAR_NUMBER);
+    ಹಿಂತಿರುಗಿ dict_ಕೂಡಿಸು_ಸಂಖ್ಯೆ_special(d, ಕೀಲಿ, nr, VAR_ಸಂಖ್ಯೆ);
 }
 
 /*
  * Add a special entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_bool(dict_T *d, char *key, varnumber_T nr)
+    ಪೂರ್ಣಾಂಕ
+dict_ಕೂಡಿಸು_bool(dict_T *d, ಅಕ್ಷರ *ಕೀಲಿ, varnumber_T nr)
 {
-    return dict_add_number_special(d, key, nr, VAR_BOOL);
+    ಹಿಂತಿರುಗಿ dict_ಕೂಡಿಸು_ಸಂಖ್ಯೆ_special(d, ಕೀಲಿ, nr, VAR_BOOL);
 }
 
 /*
  * Add a string entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_string(dict_T *d, char *key, char_u *str)
+    ಪೂರ್ಣಾಂಕ
+dict_ಕೂಡಿಸು_string(dict_T *d, ಅಕ್ಷರ *ಕೀಲಿ, char_u *str)
 {
-    return dict_add_string_len(d, key, str, -1);
+    ಹಿಂತಿರುಗಿ dict_ಕೂಡಿಸು_string_len(d, ಕೀಲಿ, str, -1);
 }
 
 /*
@@ -444,122 +444,122 @@ dict_add_string(dict_T *d, char *key, char_u *str)
  * When "len" is -1 use the whole string, otherwise only this many bytes.
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_string_len(dict_T *d, char *key, char_u *str, int len)
+    ಪೂರ್ಣಾಂಕ
+dict_ಕೂಡಿಸು_string_len(dict_T *d, ಅಕ್ಷರ *ಕೀಲಿ, char_u *str, ಪೂರ್ಣಾಂಕ len)
 {
-    dictitem_T	*item;
-    char_u	*val = NULL;
+    dictitem_T	*ಅಂಶ;
+    char_u	*val = ಖಾಲಿ;
 
-    item = dictitem_alloc((char_u *)key);
-    if (item == NULL)
-	return FAIL;
-    item->di_tv.v_type = VAR_STRING;
-    if (str != NULL)
+    ಅಂಶ = dictitem_alloc((char_u *)ಕೀಲಿ);
+    ಆದರೆ (ಅಂಶ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
+    ಅಂಶ->di_tv.v_type = VAR_STRING;
+    ಆದರೆ (str != ಖಾಲಿ)
     {
-	if (len == -1)
+	ಆದರೆ (len == -1)
 	    val = vim_strsave(str);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    val = vim_strnsave(str, len);
     }
-    item->di_tv.vval.v_string = val;
-    if (dict_add(d, item) == FAIL)
+    ಅಂಶ->di_tv.vval.v_string = val;
+    ಆದರೆ (dict_ಕೂಡಿಸು(d, ಅಂಶ) == FAIL)
     {
-	dictitem_free(item);
-	return FAIL;
+	dictitem_free(ಅಂಶ);
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Add a list entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_list(dict_T *d, char *key, list_T *list)
+    ಪೂರ್ಣಾಂಕ
+dict_ಕೂಡಿಸು_list(dict_T *d, ಅಕ್ಷರ *ಕೀಲಿ, list_T *list)
 {
-    dictitem_T	*item;
+    dictitem_T	*ಅಂಶ;
 
-    item = dictitem_alloc((char_u *)key);
-    if (item == NULL)
-	return FAIL;
-    item->di_tv.v_type = VAR_LIST;
-    item->di_tv.vval.v_list = list;
-    if (dict_add(d, item) == FAIL)
+    ಅಂಶ = dictitem_alloc((char_u *)ಕೀಲಿ);
+    ಆದರೆ (ಅಂಶ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
+    ಅಂಶ->di_tv.v_type = VAR_LIST;
+    ಅಂಶ->di_tv.vval.v_list = list;
+    ಆದರೆ (dict_ಕೂಡಿಸು(d, ಅಂಶ) == FAIL)
     {
 	// Detach "list" so dictitem_free() does not unref it: on failure
 	// ownership stays with the caller.
-	item->di_tv.vval.v_list = NULL;
-	dictitem_free(item);
-	return FAIL;
+	ಅಂಶ->di_tv.vval.v_list = ಖಾಲಿ;
+	dictitem_free(ಅಂಶ);
+	ಹಿಂತಿರುಗಿ FAIL;
     }
     ++list->lv_refcount;
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Add a typval_T entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_tv(dict_T *d, char *key, typval_T *tv)
+    ಪೂರ್ಣಾಂಕ
+dict_ಕೂಡಿಸು_tv(dict_T *d, ಅಕ್ಷರ *ಕೀಲಿ, typval_T *tv)
 {
-    dictitem_T	*item;
+    dictitem_T	*ಅಂಶ;
 
-    item = dictitem_alloc((char_u *)key);
-    if (item == NULL)
-	return FAIL;
-    copy_tv(tv, &item->di_tv);
-    if (dict_add(d, item) == FAIL)
+    ಅಂಶ = dictitem_alloc((char_u *)ಕೀಲಿ);
+    ಆದರೆ (ಅಂಶ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
+    copy_tv(tv, &ಅಂಶ->di_tv);
+    ಆದರೆ (dict_ಕೂಡಿಸು(d, ಅಂಶ) == FAIL)
     {
-	dictitem_free(item);
-	return FAIL;
+	dictitem_free(ಅಂಶ);
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Add a callback to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_callback(dict_T *d, char *key, callback_T *cb)
+    ಪೂರ್ಣಾಂಕ
+dict_ಕೂಡಿಸು_callback(dict_T *d, ಅಕ್ಷರ *ಕೀಲಿ, callback_T *cb)
 {
-    dictitem_T	*item;
+    dictitem_T	*ಅಂಶ;
 
-    item = dictitem_alloc((char_u *)key);
-    if (item == NULL)
-	return FAIL;
-    put_callback(cb, &item->di_tv);
-    if (dict_add(d, item) == FAIL)
+    ಅಂಶ = dictitem_alloc((char_u *)ಕೀಲಿ);
+    ಆದರೆ (ಅಂಶ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
+    put_callback(cb, &ಅಂಶ->di_tv);
+    ಆದರೆ (dict_ಕೂಡಿಸು(d, ಅಂಶ) == FAIL)
     {
-	dictitem_free(item);
-	return FAIL;
+	dictitem_free(ಅಂಶ);
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Add a function entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_func(dict_T *d, char *key, ufunc_T *fp)
+    ಪೂರ್ಣಾಂಕ
+dict_ಕೂಡಿಸು_func(dict_T *d, ಅಕ್ಷರ *ಕೀಲಿ, ufunc_T *fp)
 {
-    dictitem_T	*item;
+    dictitem_T	*ಅಂಶ;
 
-    item = dictitem_alloc((char_u *)key);
-    if (item == NULL)
-	return FAIL;
-    item->di_tv.v_type = VAR_FUNC;
-    item->di_tv.vval.v_string = vim_strnsave(fp->uf_name, fp->uf_namelen);
+    ಅಂಶ = dictitem_alloc((char_u *)ಕೀಲಿ);
+    ಆದರೆ (ಅಂಶ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
+    ಅಂಶ->di_tv.v_type = VAR_FUNC;
+    ಅಂಶ->di_tv.vval.v_string = vim_strnsave(fp->uf_name, fp->uf_namelen);
     // Reference before dict_add() so dictitem_free()'s unref stays balanced on failure.
-    func_ref(item->di_tv.vval.v_string);
-    if (dict_add(d, item) == FAIL)
+    func_ref(ಅಂಶ->di_tv.vval.v_string);
+    ಆದರೆ (dict_ಕೂಡಿಸು(d, ಅಂಶ) == FAIL)
     {
-	dictitem_free(item);
-	return FAIL;
+	dictitem_free(ಅಂಶ);
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
@@ -569,16 +569,16 @@ dict_add_func(dict_T *d, char *key, ufunc_T *fp)
  * iterate over, no error is given.
  * NOTE: The dictionary must not change until iterating is finished!
  */
-    void
-dict_iterate_start(typval_T *var, dict_iterator_T *iter)
+    ಶೂನ್ಯ
+dict_iterate_ಆರಂಭ(typval_T *var, dict_iterator_T *iter)
 {
-    if (var->v_type != VAR_DICT || var->vval.v_dict == NULL)
+    ಆದರೆ (var->v_type != VAR_DICT || var->vval.v_dict == ಖಾಲಿ)
 	iter->dit_todo = 0;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	dict_T	*d = var->vval.v_dict;
 
-	iter->dit_todo = d->dv_hashtab.ht_used;
+	iter->dit_todo = d->dv_hashtab.ht_ಬಳಸಿದ;
 	iter->dit_hi = d->dv_hashtab.ht_array;
     }
 }
@@ -591,61 +591,61 @@ dict_iterate_start(typval_T *var, dict_iterator_T *iter)
  * If there are no more items, NULL is returned.
  */
     char_u *
-dict_iterate_next(dict_iterator_T *iter, typval_T **tv_result)
+dict_iterate_ಮುಂದಿನ(dict_iterator_T *iter, typval_T **tv_ಫಲಿತಾಂಶ)
 {
     dictitem_T	*di;
-    char_u      *result;
+    char_u      *ಫಲಿತಾಂಶ;
 
-    if (iter->dit_todo == 0)
-	return NULL;
+    ಆದರೆ (iter->dit_todo == 0)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    while (HASHITEM_EMPTY(iter->dit_hi))
+    ಆಗ (HASHITEM_ಖಾಲಿಗಳು(iter->dit_hi))
 	++iter->dit_hi;
 
     di = HI2DI(iter->dit_hi);
-    result = di->di_key;
-    *tv_result = &di->di_tv;
+    ಫಲಿತಾಂಶ = di->di_ಕೀಲಿ;
+    *tv_ಫಲಿತಾಂಶ = &di->di_tv;
 
     --iter->dit_todo;
     ++iter->dit_hi;
-    return result;
+    ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
 }
 
 /*
  * Add a dict entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_dict(dict_T *d, char *key, dict_T *dict)
+    ಪೂರ್ಣಾಂಕ
+dict_ಕೂಡಿಸು_dict(dict_T *d, ಅಕ್ಷರ *ಕೀಲಿ, dict_T *dict)
 {
-    dictitem_T	*item;
+    dictitem_T	*ಅಂಶ;
 
-    item = dictitem_alloc((char_u *)key);
-    if (item == NULL)
-	return FAIL;
-    item->di_tv.v_type = VAR_DICT;
-    item->di_tv.vval.v_dict = dict;
-    if (dict_add(d, item) == FAIL)
+    ಅಂಶ = dictitem_alloc((char_u *)ಕೀಲಿ);
+    ಆದರೆ (ಅಂಶ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
+    ಅಂಶ->di_tv.v_type = VAR_DICT;
+    ಅಂಶ->di_tv.vval.v_dict = dict;
+    ಆದರೆ (dict_ಕೂಡಿಸು(d, ಅಂಶ) == FAIL)
     {
 	// Detach "dict" so dictitem_free() does not unref it: on failure
 	// ownership stays with the caller.
-	item->di_tv.vval.v_dict = NULL;
-	dictitem_free(item);
-	return FAIL;
+	ಅಂಶ->di_tv.vval.v_dict = ಖಾಲಿ;
+	dictitem_free(ಅಂಶ);
+	ಹಿಂತಿರುಗಿ FAIL;
     }
     ++dict->dv_refcount;
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Get the number of items in a Dictionary.
  */
-    long
+    ದೀರ್ಘ
 dict_len(dict_T *d)
 {
-    if (d == NULL)
-	return 0L;
-    return (long)d->dv_hashtab.ht_used;
+    ಆದರೆ (d == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ 0L;
+    ಹಿಂತಿರುಗಿ (ದೀರ್ಘ)d->dv_hashtab.ht_ಬಳಸಿದ;
 }
 
 /*
@@ -654,62 +654,62 @@ dict_len(dict_T *d)
  * Returns NULL when not found.
  */
     dictitem_T *
-dict_find(dict_T *d, char_u *key, int len)
+dict_ಕಂಡುಹಿಡಿ(dict_T *d, char_u *ಕೀಲಿ, ಪೂರ್ಣಾಂಕ len)
 {
-#define AKEYLEN 200
+#ವ್ಯಾಖ್ಯಾನಿಸು AKEYLEN 200
     char_u	buf[AKEYLEN];
     char_u	*akey;
-    char_u	*tofree = NULL;
+    char_u	*tofree = ಖಾಲಿ;
     hashitem_T	*hi;
 
-    if (d == NULL)
-	return NULL;
-    if (len < 0)
-	akey = key;
-    else if (len >= AKEYLEN)
+    ಆದರೆ (d == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    ಆದರೆ (len < 0)
+	akey = ಕೀಲಿ;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (len >= AKEYLEN)
     {
-	tofree = akey = vim_strnsave(key, len);
-	if (akey == NULL)
-	    return NULL;
+	tofree = akey = vim_strnsave(ಕೀಲಿ, len);
+	ಆದರೆ (akey == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Avoid a malloc/free by using buf[].
-	mch_memmove(buf, key, (size_t)len);
+	mch_memmove(buf, ಕೀಲಿ, (size_t)len);
 	buf[len] = NUL;
 	akey = buf;
     }
 
-    hi = hash_find(&d->dv_hashtab, akey);
+    hi = hash_ಕಂಡುಹಿಡಿ(&d->dv_hashtab, akey);
     vim_free(tofree);
-    if (HASHITEM_EMPTY(hi))
-	return NULL;
-    return HI2DI(hi);
+    ಆದರೆ (HASHITEM_ಖಾಲಿಗಳು(hi))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    ಹಿಂತಿರುಗಿ HI2DI(hi);
 }
 
 /*
  * Returns TRUE if "key" is present in Dictionary "d".
  */
-    int
-dict_has_key(dict_T *d, char *key)
+    ಪೂರ್ಣಾಂಕ
+dict_has_ಕೀಲಿ(dict_T *d, ಅಕ್ಷರ *ಕೀಲಿ)
 {
-    return dict_find(d, (char_u *)key, -1) != NULL;
+    ಹಿಂತಿರುಗಿ dict_ಕಂಡುಹಿಡಿ(d, (char_u *)ಕೀಲಿ, -1) != ಖಾಲಿ;
 }
 
 /*
  * Get a typval_T item from a dictionary and copy it into "rettv".
  * Returns FAIL if the entry doesn't exist or out of memory.
  */
-    int
-dict_get_tv(dict_T *d, char *key, typval_T *rettv)
+    ಪೂರ್ಣಾಂಕ
+dict_get_tv(dict_T *d, ಅಕ್ಷರ *ಕೀಲಿ, typval_T *rettv)
 {
     dictitem_T	*di;
 
-    di = dict_find(d, (char_u *)key, -1);
-    if (di == NULL)
-	return FAIL;
+    di = dict_ಕಂಡುಹಿಡಿ(d, (char_u *)ಕೀಲಿ, -1);
+    ಆದರೆ (di == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
     copy_tv(&di->di_tv, rettv);
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
@@ -719,18 +719,18 @@ dict_get_tv(dict_T *d, char *key, typval_T *rettv)
  * Returns NULL if the entry doesn't exist or out of memory.
  */
     char_u *
-dict_get_string(dict_T *d, char *key, int save)
+dict_get_string(dict_T *d, ಅಕ್ಷರ *ಕೀಲಿ, ಪೂರ್ಣಾಂಕ save)
 {
     dictitem_T	*di;
     char_u	*s;
 
-    di = dict_find(d, (char_u *)key, -1);
-    if (di == NULL)
-	return NULL;
+    di = dict_ಕಂಡುಹಿಡಿ(d, (char_u *)ಕೀಲಿ, -1);
+    ಆದರೆ (di == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     s = tv_get_string(&di->di_tv);
-    if (save && s != NULL)
+    ಆದರೆ (save && s != ಖಾಲಿ)
 	s = vim_strsave(s);
-    return s;
+    ಹಿಂತಿರುಗಿ s;
 }
 
 /*
@@ -738,9 +738,9 @@ dict_get_string(dict_T *d, char *key, int save)
  * Returns 0 if the entry doesn't exist.
  */
     varnumber_T
-dict_get_number(dict_T *d, char *key)
+dict_get_ಸಂಖ್ಯೆ(dict_T *d, ಅಕ್ಷರ *ಕೀಲಿ)
 {
-    return dict_get_number_def(d, key, 0);
+    ಹಿಂತಿರುಗಿ dict_get_ಸಂಖ್ಯೆ_def(d, ಕೀಲಿ, 0);
 }
 
 /*
@@ -748,14 +748,14 @@ dict_get_number(dict_T *d, char *key)
  * Returns "def" if the entry doesn't exist.
  */
     varnumber_T
-dict_get_number_def(dict_T *d, char *key, int def)
+dict_get_ಸಂಖ್ಯೆ_def(dict_T *d, ಅಕ್ಷರ *ಕೀಲಿ, ಪೂರ್ಣಾಂಕ def)
 {
     dictitem_T	*di;
 
-    di = dict_find(d, (char_u *)key, -1);
-    if (di == NULL)
-	return def;
-    return tv_get_number(&di->di_tv);
+    di = dict_ಕಂಡುಹಿಡಿ(d, (char_u *)ಕೀಲಿ, -1);
+    ಆದರೆ (di == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ def;
+    ಹಿಂತಿರುಗಿ tv_get_ಸಂಖ್ಯೆ(&di->di_tv);
 }
 
 /*
@@ -764,19 +764,19 @@ dict_get_number_def(dict_T *d, char *key, int def)
  * Give an error if the entry is not a number.
  */
     varnumber_T
-dict_get_number_check(dict_T *d, char_u *key)
+dict_get_ಸಂಖ್ಯೆ_check(dict_T *d, char_u *ಕೀಲಿ)
 {
     dictitem_T	*di;
 
-    di = dict_find(d, key, -1);
-    if (di == NULL)
-	return 0;
-    if (di->di_tv.v_type != VAR_NUMBER)
+    di = dict_ಕಂಡುಹಿಡಿ(d, ಕೀಲಿ, -1);
+    ಆದರೆ (di == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ 0;
+    ಆದರೆ (di->di_tv.v_type != VAR_ಸಂಖ್ಯೆ)
     {
-	semsg(_(e_invalid_argument_str), tv_get_string(&di->di_tv));
-	return 0;
+	semsg(_(e_invalid_ವಾದ_str), tv_get_string(&di->di_tv));
+	ಹಿಂತಿರುಗಿ 0;
     }
-    return tv_get_number(&di->di_tv);
+    ಹಿಂತಿರುಗಿ tv_get_ಸಂಖ್ಯೆ(&di->di_tv);
 }
 
 /*
@@ -784,14 +784,14 @@ dict_get_number_check(dict_T *d, char_u *key)
  * Returns "def" if the entry doesn't exist.
  */
     varnumber_T
-dict_get_bool(dict_T *d, char *key, int def)
+dict_get_bool(dict_T *d, ಅಕ್ಷರ *ಕೀಲಿ, ಪೂರ್ಣಾಂಕ def)
 {
     dictitem_T	*di;
 
-    di = dict_find(d, (char_u *)key, -1);
-    if (di == NULL)
-	return def;
-    return tv_get_bool(&di->di_tv);
+    di = dict_ಕಂಡುಹಿಡಿ(d, (char_u *)ಕೀಲಿ, -1);
+    ಆದರೆ (di == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ def;
+    ಹಿಂತಿರುಗಿ tv_get_bool(&di->di_tv);
 }
 
 /*
@@ -799,44 +799,44 @@ dict_get_bool(dict_T *d, char *key, int def)
  * May return NULL.
  */
     char_u *
-dict2string(typval_T *tv, int copyID, int restore_copyID)
+dict2string(typval_T *tv, ಪೂರ್ಣಾಂಕ copyID, ಪೂರ್ಣಾಂಕ restore_copyID)
 {
     garray_T	ga;
-    int		first = TRUE;
+    ಪೂರ್ಣಾಂಕ		ಮೊದಲ = TRUE;
     char_u	*tofree;
     char_u	numbuf[NUMBUFLEN];
     hashitem_T	*hi;
     char_u	*s;
     dict_T	*d;
-    int		todo;
-    int		prev_lock;
+    ಪೂರ್ಣಾಂಕ		todo;
+    ಪೂರ್ಣಾಂಕ		prev_ಬೀಗ;
 
-    if ((d = tv->vval.v_dict) == NULL)
-	return NULL;
-    ga_init2(&ga, sizeof(char), 80);
+    ಆದರೆ ((d = tv->vval.v_dict) == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    ga_init2(&ga, ಗಾತ್ರ(ಅಕ್ಷರ), 80);
     ga_append(&ga, '{');
 
     // Lock the dict, the string() method of an object item could remove an
     // item or make the hashtab resize while we iterate over it.
-    prev_lock = d->dv_lock;
-    if (d->dv_lock == 0)
-	d->dv_lock = VAR_LOCKED;
-    hash_lock(&d->dv_hashtab);
+    prev_ಬೀಗ = d->dv_ಬೀಗ;
+    ಆದರೆ (d->dv_ಬೀಗ == 0)
+	d->dv_ಬೀಗ = VAR_LOCKED;
+    hash_ಬೀಗ(&d->dv_hashtab);
 
-    todo = (int)d->dv_hashtab.ht_used;
-    FOR_ALL_HASHTAB_ITEMS(&d->dv_hashtab, hi, todo)
+    todo = (ಪೂರ್ಣಾಂಕ)d->dv_hashtab.ht_ಬಳಸಿದ;
+    FOR_ALL_HASHTAB_ವಸ್ತುಗಳು(&d->dv_hashtab, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	ಆದರೆ (!HASHITEM_ಖಾಲಿಗಳು(hi))
 	{
 	    --todo;
 
-	    if (first)
-		first = FALSE;
-	    else
+	    ಆದರೆ (ಮೊದಲ)
+		ಮೊದಲ = FALSE;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		GA_CONCAT_LITERAL(&ga, ", ");
 
-	    tofree = string_quote(hi->hi_key, FALSE);
-	    if (tofree != NULL)
+	    tofree = string_quote(hi->hi_ಕೀಲಿ, FALSE);
+	    ಆದರೆ (tofree != ಖಾಲಿ)
 	    {
 		ga_concat(&ga, tofree);
 		vim_free(tofree);
@@ -844,58 +844,58 @@ dict2string(typval_T *tv, int copyID, int restore_copyID)
 	    GA_CONCAT_LITERAL(&ga, ": ");
 	    s = echo_string_core(&HI2DI(hi)->di_tv, &tofree, numbuf, copyID,
 						 FALSE, restore_copyID, TRUE);
-	    if (s != NULL)
+	    ಆದರೆ (s != ಖಾಲಿ)
 		ga_concat(&ga, s);
 	    vim_free(tofree);
-	    if (s == NULL || did_echo_string_emsg)
-		break;
-	    line_breakcheck();
+	    ಆದರೆ (s == ಖಾಲಿ || did_echo_string_emsg)
+		ನಿಲ್ಲಿಸು;
+	    ಸಾಲು_breakcheck();
 
 	}
     }
     hash_unlock(&d->dv_hashtab);
-    d->dv_lock = prev_lock;
-    if (todo > 0)
+    d->dv_ಬೀಗ = prev_ಬೀಗ;
+    ಆದರೆ (todo > 0)
     {
-	vim_free(ga.ga_data);
-	return NULL;
+	vim_free(ga.ga_ದತ್ತಾಂಶ);
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
     ga_append(&ga, '}');
     ga_append(&ga, NUL);
-    return (char_u *)ga.ga_data;
+    ಹಿಂತಿರುಗಿ (char_u *)ga.ga_ದತ್ತಾಂಶ;
 }
 
 /*
  * Advance over a literal key, including "-".  If the first character is not a
  * literal key character then "key" is returned.
  */
-    static char_u *
-skip_literal_key(char_u *key)
+    ಸ್ಥಿರ char_u *
+skip_literal_ಕೀಲಿ(char_u *ಕೀಲಿ)
 {
     char_u *p;
 
-    for (p = key; ASCII_ISALNUM(*p) || *p == '_' || *p == '-'; ++p)
+    ಗಾಗಿ (p = ಕೀಲಿ; ASCII_ISALNUM(*p) || *p == '_' || *p == '-'; ++p)
 	;
-    return p;
+    ಹಿಂತಿರುಗಿ p;
 }
 
 /*
  * Get the key for #{key: val} into "tv" and advance "arg".
  * Return FAIL when there is no valid key.
  */
-    static int
-get_literal_key_tv(char_u **arg, typval_T *tv)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+get_literal_ಕೀಲಿ_tv(char_u **arg, typval_T *tv)
 {
-    char_u *p = skip_literal_key(*arg);
+    char_u *p = skip_literal_ಕೀಲಿ(*arg);
 
-    if (p == *arg)
-	return FAIL;
+    ಆದರೆ (p == *arg)
+	ಹಿಂತಿರುಗಿ FAIL;
     tv->v_type = VAR_STRING;
     tv->vval.v_string = vim_strnsave(*arg, p - *arg);
 
     *arg = p;
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
@@ -907,36 +907,36 @@ get_literal_key_tv(char_u **arg, typval_T *tv)
  * "arg" is advanced to just after the key.
  */
     char_u *
-get_literal_key(char_u **arg)
+get_literal_ಕೀಲಿ(char_u **arg)
 {
-    char_u	*key;
-    char_u	*end;
+    char_u	*ಕೀಲಿ;
+    char_u	*ಕೊನೆ;
     typval_T	rettv;
 
-    if (**arg == '\'')
+    ಆದರೆ (**arg == '\'')
     {
-	if (eval_lit_string(arg, &rettv, TRUE, FALSE) == FAIL)
-	    return NULL;
-	key = rettv.vval.v_string;
+	ಆದರೆ (eval_lit_string(arg, &rettv, TRUE, FALSE) == FAIL)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+	ಕೀಲಿ = rettv.vval.v_string;
     }
-    else if (**arg == '"')
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (**arg == '"')
     {
-	if (eval_string(arg, &rettv, TRUE, FALSE) == FAIL)
-	    return NULL;
-	key = rettv.vval.v_string;
+	ಆದರೆ (eval_string(arg, &rettv, TRUE, FALSE) == FAIL)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+	ಕೀಲಿ = rettv.vval.v_string;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	end = skip_literal_key(*arg);
-	if (end == *arg)
+	ಕೊನೆ = skip_literal_ಕೀಲಿ(*arg);
+	ಆದರೆ (ಕೊನೆ == *arg)
 	{
-	    semsg(_(e_invalid_key_str), *arg);
-	    return NULL;
+	    semsg(_(e_invalid_ಕೀಲಿ_str), *arg);
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
-	key = vim_strnsave(*arg, end - *arg);
-	*arg = end;
+	ಕೀಲಿ = vim_strnsave(*arg, ಕೊನೆ - *arg);
+	*arg = ಕೊನೆ;
     }
-    return key;
+    ಹಿಂತಿರುಗಿ ಕೀಲಿ;
 }
 
 /*
@@ -945,20 +945,20 @@ get_literal_key(char_u **arg)
  * "literal" is TRUE for #{key: val}
  * Return OK or FAIL.  Returns NOTDONE for {expr}.
  */
-    int
-eval_dict(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int literal)
+    ಪೂರ್ಣಾಂಕ
+eval_dict(char_u **arg, typval_T *rettv, evalarg_T *evalarg, ಪೂರ್ಣಾಂಕ literal)
 {
-    int		evaluate = evalarg == NULL ? FALSE
+    ಪೂರ್ಣಾಂಕ		evaluate = evalarg == ಖಾಲಿ ? FALSE
 				       : (evalarg->eval_flags & EVAL_EVALUATE);
-    dict_T	*d = NULL;
+    dict_T	*d = ಖಾಲಿ;
     typval_T	tvkey;
     typval_T	tv;
-    char_u	*key = NULL;
-    dictitem_T	*item;
-    char_u	*curly_expr = skipwhite(*arg + 1);
+    char_u	*ಕೀಲಿ = ಖಾಲಿ;
+    dictitem_T	*ಅಂಶ;
+    char_u	*curly_ಅಭಿವ್ಯಕ್ತಿ = skipwhite(*arg + 1);
     char_u	buf[NUMBUFLEN];
-    int		vim9script = in_vim9script();
-    int		had_comma;
+    ಪೂರ್ಣಾಂಕ		vim9script = ಒಳ_vim9script();
+    ಪೂರ್ಣಾಂಕ		had_comma;
 
     // First check if it's not a curly-braces expression: {expr}.
     // Must do this without evaluating, otherwise a function may be called
@@ -966,53 +966,53 @@ eval_dict(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int literal)
     // first item.
     // "{}" is an empty Dictionary.
     // "#{abc}" is never a curly-braces expression.
-    if (!vim9script
-	    && *curly_expr != '}'
+    ಆದರೆ (!vim9script
+	    && *curly_ಅಭಿವ್ಯಕ್ತಿ != '}'
 	    && !literal
-	    && eval1(&curly_expr, &tv, NULL) == OK
-	    && *skipwhite(curly_expr) == '}')
-	return NOTDONE;
+	    && eval1(&curly_ಅಭಿವ್ಯಕ್ತಿ, &tv, ಖಾಲಿ) == OK
+	    && *skipwhite(curly_ಅಭಿವ್ಯಕ್ತಿ) == '}')
+	ಹಿಂತಿರುಗಿ NOTDONE;
 
-    if (evaluate)
+    ಆದರೆ (evaluate)
     {
 	d = dict_alloc();
-	if (d == NULL)
-	    return FAIL;
+	ಆದರೆ (d == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ FAIL;
     }
     tvkey.v_type = VAR_UNKNOWN;
     tv.v_type = VAR_UNKNOWN;
 
     *arg = skipwhite_and_linebreak(*arg + 1, evalarg);
-    while (**arg != '}' && **arg != NUL)
+    ಆಗ (**arg != '}' && **arg != NUL)
     {
-	int	has_bracket = vim9script && **arg == '[';
+	ಪೂರ್ಣಾಂಕ	has_bracket = vim9script && **arg == '[';
 
-	if (literal)
+	ಆದರೆ (literal)
 	{
-	    if (get_literal_key_tv(arg, &tvkey) == FAIL)
-		goto failret;
+	    ಆದರೆ (get_literal_ಕೀಲಿ_tv(arg, &tvkey) == FAIL)
+		ಹೋಗು failret;
 	}
-	else if (vim9script && !has_bracket)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (vim9script && !has_bracket)
 	{
-	    tvkey.vval.v_string = get_literal_key(arg);
-	    if (tvkey.vval.v_string == NULL)
-		goto failret;
+	    tvkey.vval.v_string = get_literal_ಕೀಲಿ(arg);
+	    ಆದರೆ (tvkey.vval.v_string == ಖಾಲಿ)
+		ಹೋಗು failret;
 	    tvkey.v_type = VAR_STRING;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (has_bracket)
+	    ಆದರೆ (has_bracket)
 		*arg = skipwhite(*arg + 1);
-	    if (eval1(arg, &tvkey, evalarg) == FAIL)	// recursive!
-		goto failret;
-	    if (has_bracket)
+	    ಆದರೆ (eval1(arg, &tvkey, evalarg) == FAIL)	// recursive!
+		ಹೋಗು failret;
+	    ಆದರೆ (has_bracket)
 	    {
 		*arg = skipwhite(*arg);
-		if (**arg != ']')
+		ಆದರೆ (**arg != ']')
 		{
-		    emsg(_(e_missing_matching_bracket_after_dict_key));
+		    emsg(_(e_missing_matching_bracket_after_dict_ಕೀಲಿ));
 		    clear_tv(&tvkey);
-		    goto failret;
+		    ಹೋಗು failret;
 		}
 		++*arg;
 	    }
@@ -1020,116 +1020,116 @@ eval_dict(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int literal)
 
 	// the colon should come right after the key, but this wasn't checked
 	// previously, so only require it in Vim9 script.
-	if (!vim9script)
+	ಆದರೆ (!vim9script)
 	    *arg = skipwhite(*arg);
-	if (**arg != ':')
+	ಆದರೆ (**arg != ':')
 	{
-	    if (*skipwhite(*arg) == ':')
+	    ಆದರೆ (*skipwhite(*arg) == ':')
 		semsg(_(e_no_white_space_allowed_before_str_str), ":", *arg);
-	    else
-		semsg(_(e_missing_colon_in_dictionary_str), *arg);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		semsg(_(e_missing_colon_ಒಳ_dictionary_str), *arg);
 	    clear_tv(&tvkey);
-	    goto failret;
+	    ಹೋಗು failret;
 	}
-	if (evaluate)
+	ಆದರೆ (evaluate)
 	{
-	    if (tvkey.v_type == VAR_FLOAT)
+	    ಆದರೆ (tvkey.v_type == VAR_FLOAT)
 	    {
 		tvkey.vval.v_string = typval_tostring(&tvkey, TRUE);
 		tvkey.v_type = VAR_STRING;
 	    }
-	    key = tv_get_string_buf_chk(&tvkey, buf);
-	    if (key == NULL)
+	    ಕೀಲಿ = tv_get_string_buf_chk(&tvkey, buf);
+	    ಆದರೆ (ಕೀಲಿ == ಖಾಲಿ)
 	    {
 		// "key" is NULL when tv_get_string_buf_chk() gave an errmsg
 		clear_tv(&tvkey);
-		goto failret;
+		ಹೋಗು failret;
 	    }
 	}
-	if (vim9script && (*arg)[1] != NUL && !VIM_ISWHITE((*arg)[1]))
+	ಆದರೆ (vim9script && (*arg)[1] != NUL && !VIM_ISWHITE((*arg)[1]))
 	{
 	    semsg(_(e_white_space_required_after_str_str), ":", *arg);
 	    clear_tv(&tvkey);
-	    goto failret;
+	    ಹೋಗು failret;
 	}
 
 	*arg = skipwhite_and_linebreak(*arg + 1, evalarg);
-	if (eval1(arg, &tv, evalarg) == FAIL)	// recursive!
+	ಆದರೆ (eval1(arg, &tv, evalarg) == FAIL)	// recursive!
 	{
 	    clear_tv(&tvkey);
-	    goto failret;
+	    ಹೋಗು failret;
 	}
-	if (check_typval_is_value(&tv) == FAIL)
+	ಆದರೆ (check_typval_is_ಮೌಲ್ಯ(&tv) == FAIL)
 	{
 	    clear_tv(&tvkey);
 	    clear_tv(&tv);
-	    goto failret;
+	    ಹೋಗು failret;
 	}
-	if (evaluate)
+	ಆದರೆ (evaluate)
 	{
-	    item = dict_find(d, key, -1);
-	    if (item != NULL)
+	    ಅಂಶ = dict_ಕಂಡುಹಿಡಿ(d, ಕೀಲಿ, -1);
+	    ಆದರೆ (ಅಂಶ != ಖಾಲಿ)
 	    {
-		semsg(_(e_duplicate_key_in_dictionary_str), key);
+		semsg(_(e_duplicate_ಕೀಲಿ_ಒಳ_dictionary_str), ಕೀಲಿ);
 		clear_tv(&tvkey);
 		clear_tv(&tv);
-		goto failret;
+		ಹೋಗು failret;
 	    }
-	    item = dictitem_alloc(key);
-	    if (item != NULL)
+	    ಅಂಶ = dictitem_alloc(ಕೀಲಿ);
+	    ಆದರೆ (ಅಂಶ != ಖಾಲಿ)
 	    {
-		item->di_tv = tv;
-		item->di_tv.v_lock = 0;
-		if (dict_add(d, item) == FAIL)
-		    dictitem_free(item);
+		ಅಂಶ->di_tv = tv;
+		ಅಂಶ->di_tv.v_ಬೀಗ = 0;
+		ಆದರೆ (dict_ಕೂಡಿಸು(d, ಅಂಶ) == FAIL)
+		    dictitem_free(ಅಂಶ);
 	    }
 	}
 	clear_tv(&tvkey);
 
 	// the comma should come right after the value, but this wasn't checked
 	// previously, so only require it in Vim9 script.
-	if (!vim9script)
+	ಆದರೆ (!vim9script)
 	    *arg = skipwhite(*arg);
 	had_comma = **arg == ',';
-	if (had_comma)
+	ಆದರೆ (had_comma)
 	{
-	    if (vim9script && !IS_WHITE_NL_OR_NUL((*arg)[1]))
+	    ಆದರೆ (vim9script && !IS_WHITE_NL_OR_NUL((*arg)[1]))
 	    {
 		semsg(_(e_white_space_required_after_str_str), ",", *arg);
-		goto failret;
+		ಹೋಗು failret;
 	    }
 	    *arg = skipwhite_and_nl(*arg + 1);
 	}
 
 	// the "}" can be on the next line
 	*arg = skipwhite_and_linebreak(*arg, evalarg);
-	if (**arg == '}')
-	    break;
-	if (!had_comma)
+	ಆದರೆ (**arg == '}')
+	    ನಿಲ್ಲಿಸು;
+	ಆದರೆ (!had_comma)
 	{
-	    if (**arg == ',')
+	    ಆದರೆ (**arg == ',')
 		semsg(_(e_no_white_space_allowed_before_str_str), ",", *arg);
-	    else
-		semsg(_(e_missing_comma_in_dictionary_str), *arg);
-	    goto failret;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		semsg(_(e_missing_comma_ಒಳ_dictionary_str), *arg);
+	    ಹೋಗು failret;
 	}
     }
 
-    if (**arg != '}')
+    ಆದರೆ (**arg != '}')
     {
-	if (evalarg != NULL)
-	    semsg(_(e_missing_dict_end_str), *arg);
+	ಆದರೆ (evalarg != ಖಾಲಿ)
+	    semsg(_(e_missing_dict_ಕೊನೆ_str), *arg);
 failret:
-	if (d != NULL)
+	ಆದರೆ (d != ಖಾಲಿ)
 	    dict_free(d);
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
     *arg = *arg + 1;
-    if (evaluate)
-	rettv_dict_set(rettv, d);
+    ಆದರೆ (evaluate)
+	rettv_dict_ಗಣ(rettv, d);
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
@@ -1138,25 +1138,25 @@ failret:
  * On return, "*arg" points to the character after the Dict.
  * Return OK or FAIL.  Returns NOTDONE for {expr}.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 eval_lit_dict(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 {
-    int		vim9script = in_vim9script();
-    int		ret = OK;
+    ಪೂರ್ಣಾಂಕ		vim9script = ಒಳ_vim9script();
+    ಪೂರ್ಣಾಂಕ		ret = OK;
 
-    if (vim9script)
+    ಆದರೆ (vim9script)
     {
 	ret = vim9_bad_comment(*arg) ? FAIL : NOTDONE;
     }
-    else if ((*arg)[1] == '{')
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((*arg)[1] == '{')
     {
 	++*arg;
 	ret = eval_dict(arg, rettv, evalarg, TRUE);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	ret = NOTDONE;
 
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
 /*
@@ -1167,83 +1167,83 @@ eval_lit_dict(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
  * Otherwise duplicate keys are ignored ("action" is "keep").
  * "func_name" is used for reporting where an error occurred.
  */
-    void
-dict_extend(dict_T *d1, dict_T *d2, char_u *action, char *func_name)
+    ಶೂನ್ಯ
+dict_extend(dict_T *d1, dict_T *d2, char_u *action, ಅಕ್ಷರ *func_name)
 {
     dictitem_T	*di1;
-    int		todo;
+    ಪೂರ್ಣಾಂಕ		todo;
     char_u	*arg_errmsg = (char_u *)N_("extend() argument");
     type_T	*type;
 
-    if (check_hashtab_frozen(&d1->dv_hashtab, "extend"))
-	return;
+    ಆದರೆ (check_hashtab_frozen(&d1->dv_hashtab, "extend"))
+	ಹಿಂತಿರುಗಿ;
 
-    if (*action == 'm')
+    ಆದರೆ (*action == 'm')
     {
-	if (check_hashtab_frozen(&d2->dv_hashtab, "extend"))
-	    return;
-	hash_lock(&d2->dv_hashtab);  // don't rehash on hash_remove()
+	ಆದರೆ (check_hashtab_frozen(&d2->dv_hashtab, "extend"))
+	    ಹಿಂತಿರುಗಿ;
+	hash_ಬೀಗ(&d2->dv_hashtab);  // don't rehash on hash_remove()
     }
 
-    if (d1->dv_type != NULL && d1->dv_type->tt_member != NULL)
+    ಆದರೆ (d1->dv_type != ಖಾಲಿ && d1->dv_type->tt_member != ಖಾಲಿ)
 	type = d1->dv_type->tt_member;
-    else
-	type = NULL;
+    ಇಲ್ಲದಿದ್ದರೆ
+	type = ಖಾಲಿ;
 
-    todo = (int)d2->dv_hashtab.ht_used;
+    todo = (ಪೂರ್ಣಾಂಕ)d2->dv_hashtab.ht_ಬಳಸಿದ;
     hashitem_T *hi2;
-    FOR_ALL_HASHTAB_ITEMS(&d2->dv_hashtab, hi2, todo)
+    FOR_ALL_HASHTAB_ವಸ್ತುಗಳು(&d2->dv_hashtab, hi2, todo)
     {
-	if (!HASHITEM_EMPTY(hi2))
+	ಆದರೆ (!HASHITEM_ಖಾಲಿಗಳು(hi2))
 	{
 	    --todo;
-	    di1 = dict_find(d1, hi2->hi_key, -1);
+	    di1 = dict_ಕಂಡುಹಿಡಿ(d1, hi2->hi_ಕೀಲಿ, -1);
 	    // Check the key to be valid when adding to any scope.
-	    if (d1->dv_scope != 0 && !valid_varname(hi2->hi_key, -1, TRUE))
-		break;
+	    ಆದರೆ (d1->dv_scope != 0 && !valid_varname(hi2->hi_ಕೀಲಿ, -1, TRUE))
+		ನಿಲ್ಲಿಸು;
 
-	    if (type != NULL
+	    ಆದರೆ (type != ಖಾಲಿ
 		     && check_typval_arg_type(type, &HI2DI(hi2)->di_tv,
 							 func_name, 0) == FAIL)
-		break;
+		ನಿಲ್ಲಿಸು;
 
-	    if (di1 == NULL)
+	    ಆದರೆ (di1 == ಖಾಲಿ)
 	    {
-		if (*action == 'm')
+		ಆದರೆ (*action == 'm')
 		{
 		    // Cheap way to move a dict item from "d2" to "d1".
 		    // If dict_add() fails then "d2" won't be empty.
 		    di1 = HI2DI(hi2);
-		    if (dict_add(d1, di1) == OK)
+		    ಆದರೆ (dict_ಕೂಡಿಸು(d1, di1) == OK)
 			hash_remove(&d2->dv_hashtab, hi2, "extend");
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    di1 = dictitem_copy(HI2DI(hi2));
-		    if (di1 != NULL && dict_add(d1, di1) == FAIL)
+		    ಆದರೆ (di1 != ಖಾಲಿ && dict_ಕೂಡಿಸು(d1, di1) == FAIL)
 			dictitem_free(di1);
 		}
 	    }
-	    else if (*action == 'e')
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*action == 'e')
 	    {
-		semsg(_(e_key_already_exists_str), hi2->hi_key);
-		break;
+		semsg(_(e_ಕೀಲಿ_already_exists_str), hi2->hi_ಕೀಲಿ);
+		ನಿಲ್ಲಿಸು;
 	    }
-	    else if (*action == 'f' && HI2DI(hi2) != di1)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*action == 'f' && HI2DI(hi2) != di1)
 	    {
-		if (value_check_lock(di1->di_tv.v_lock, arg_errmsg, TRUE)
+		ಆದರೆ (ಮೌಲ್ಯ_check_ಬೀಗ(di1->di_tv.v_ಬೀಗ, arg_errmsg, TRUE)
 			|| var_check_ro(di1->di_flags, arg_errmsg, TRUE))
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		// Disallow replacing a builtin function.
-		if (dict_wrong_func_name(d1, &HI2DI(hi2)->di_tv, hi2->hi_key))
-		    break;
+		ಆದರೆ (dict_wrong_func_name(d1, &HI2DI(hi2)->di_tv, hi2->hi_ಕೀಲಿ))
+		    ನಿಲ್ಲಿಸು;
 		clear_tv(&di1->di_tv);
 		copy_tv(&HI2DI(hi2)->di_tv, &di1->di_tv);
 	    }
 	}
     }
 
-    if (*action == 'm')
+    ಆದರೆ (*action == 'm')
 	hash_unlock(&d2->dv_hashtab);
 }
 
@@ -1253,157 +1253,157 @@ dict_extend(dict_T *d1, dict_T *d2, char_u *action, char *func_name)
     dictitem_T *
 dict_lookup(hashitem_T *hi)
 {
-    return HI2DI(hi);
+    ಹಿಂತಿರುಗಿ HI2DI(hi);
 }
 
 /*
  * Return TRUE when two dictionaries have exactly the same key/values.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 dict_equal(
     dict_T	*d1,
     dict_T	*d2,
-    int		ic)	    // ignore case for strings
+    ಪೂರ್ಣಾಂಕ		ic)	    // ignore case for strings
 {
     hashitem_T	*hi;
     dictitem_T	*item2;
-    int		todo;
+    ಪೂರ್ಣಾಂಕ		todo;
 
-    if (d1 == d2)
-	return TRUE;
-    if (dict_len(d1) != dict_len(d2))
-	return FALSE;
-    if (dict_len(d1) == 0)
+    ಆದರೆ (d1 == d2)
+	ಹಿಂತಿರುಗಿ TRUE;
+    ಆದರೆ (dict_len(d1) != dict_len(d2))
+	ಹಿಂತಿರುಗಿ FALSE;
+    ಆದರೆ (dict_len(d1) == 0)
 	// empty and NULL dicts are considered equal
-	return TRUE;
-    if (d1 == NULL || d2 == NULL)
-	return FALSE;
+	ಹಿಂತಿರುಗಿ TRUE;
+    ಆದರೆ (d1 == ಖಾಲಿ || d2 == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    todo = (int)d1->dv_hashtab.ht_used;
-    FOR_ALL_HASHTAB_ITEMS(&d1->dv_hashtab, hi, todo)
+    todo = (ಪೂರ್ಣಾಂಕ)d1->dv_hashtab.ht_ಬಳಸಿದ;
+    FOR_ALL_HASHTAB_ವಸ್ತುಗಳು(&d1->dv_hashtab, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	ಆದರೆ (!HASHITEM_ಖಾಲಿಗಳು(hi))
 	{
-	    item2 = dict_find(d2, hi->hi_key, -1);
-	    if (item2 == NULL)
-		return FALSE;
-	    if (!tv_equal(&HI2DI(hi)->di_tv, &item2->di_tv, ic))
-		return FALSE;
+	    item2 = dict_ಕಂಡುಹಿಡಿ(d2, hi->hi_ಕೀಲಿ, -1);
+	    ಆದರೆ (item2 == ಖಾಲಿ)
+		ಹಿಂತಿರುಗಿ FALSE;
+	    ಆದರೆ (!tv_equal(&HI2DI(hi)->di_tv, &item2->di_tv, ic))
+		ಹಿಂತಿರುಗಿ FALSE;
 	    --todo;
 	}
     }
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
  * Count the number of times item "needle" occurs in Dict "d". Case is ignored
  * if "ic" is TRUE.
  */
-    long
-dict_count(dict_T *d, typval_T *needle, int ic)
+    ದೀರ್ಘ
+dict_ಎಣಿಕೆ(dict_T *d, typval_T *needle, ಪೂರ್ಣಾಂಕ ic)
 {
-    int		todo;
+    ಪೂರ್ಣಾಂಕ		todo;
     hashitem_T	*hi;
-    long	n = 0;
+    ದೀರ್ಘ	n = 0;
 
-    if (d == NULL)
-	return 0;
+    ಆದರೆ (d == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ 0;
 
-    todo = (int)d->dv_hashtab.ht_used;
-    FOR_ALL_HASHTAB_ITEMS(&d->dv_hashtab, hi, todo)
+    todo = (ಪೂರ್ಣಾಂಕ)d->dv_hashtab.ht_ಬಳಸಿದ;
+    FOR_ALL_HASHTAB_ವಸ್ತುಗಳು(&d->dv_hashtab, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	ಆದರೆ (!HASHITEM_ಖಾಲಿಗಳು(hi))
 	{
 	    --todo;
-	    if (tv_equal(&HI2DI(hi)->di_tv, needle, ic))
+	    ಆದರೆ (tv_equal(&HI2DI(hi)->di_tv, needle, ic))
 		++n;
 	}
     }
 
-    return n;
+    ಹಿಂತಿರುಗಿ n;
 }
 
 /*
  * extend() a Dict. Append Dict argvars[1] to Dict argvars[0] and return the
  * resulting Dict in "rettv".  "is_new" is TRUE for extendnew().
  */
-    void
+    ಶೂನ್ಯ
 dict_extend_func(
 	typval_T	*argvars,
 	type_T		*type,
-	char		*func_name,
+	ಅಕ್ಷರ		*func_name,
 	char_u		*arg_errmsg,
-	int		is_new,
+	ಪೂರ್ಣಾಂಕ		is_new,
 	typval_T	*rettv)
 {
     dict_T	*d1, *d2;
     char_u	*action;
-    int	i;
+    ಪೂರ್ಣಾಂಕ	i;
 
     d1 = argvars[0].vval.v_dict;
-    if (d1 == NULL)
+    ಆದರೆ (d1 == ಖಾಲಿ)
     {
 	emsg(_(e_cannot_extend_null_dict));
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if (!is_new && value_check_lock(d1->dv_lock, arg_errmsg, TRUE))
-	return;
+    ಆದರೆ (!is_new && ಮೌಲ್ಯ_check_ಬೀಗ(d1->dv_ಬೀಗ, arg_errmsg, TRUE))
+	ಹಿಂತಿರುಗಿ;
 
-    if (is_new)
+    ಆದರೆ (is_new)
     {
 	d1 = dict_copy(d1, FALSE, TRUE, get_copyID());
-	if (d1 == NULL)
-	    return;
+	ಆದರೆ (d1 == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ;
     }
 
     d2 = argvars[1].vval.v_dict;
-    if (d2 == NULL)
-	goto theend;
+    ಆದರೆ (d2 == ಖಾಲಿ)
+	ಹೋಗು theend;
 
     // Check the third argument.
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ಆದರೆ (argvars[2].v_type != VAR_UNKNOWN)
     {
-	static char *(av[]) = {"keep", "force", "error"};
+	ಸ್ಥಿರ ಅಕ್ಷರ *(av[]) = {"keep", "force", "error"};
 
 	action = tv_get_string_chk(&argvars[2]);
-	if (action == NULL)
+	ಆದರೆ (action == ಖಾಲಿ)
 	{
-	    if (is_new)
+	    ಆದರೆ (is_new)
 		dict_unref(d1);
-	    return;
+	    ಹಿಂತಿರುಗಿ;
 	}
-	for (i = 0; i < 3; ++i)
-	    if (STRCMP(action, av[i]) == 0)
-		break;
-	if (i == 3)
+	ಗಾಗಿ (i = 0; i < 3; ++i)
+	    ಆದರೆ (STRCMP(action, av[i]) == 0)
+		ನಿಲ್ಲಿಸು;
+	ಆದರೆ (i == 3)
 	{
-	    if (is_new)
+	    ಆದರೆ (is_new)
 		dict_unref(d1);
-	    semsg(_(e_invalid_argument_str), action);
-	    return;
+	    semsg(_(e_invalid_ವಾದ_str), action);
+	    ಹಿಂತಿರುಗಿ;
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	action = (char_u *)"force";
 
-    if (type != NULL && check_typval_arg_type(type, &argvars[1],
+    ಆದರೆ (type != ಖಾಲಿ && check_typval_arg_type(type, &argvars[1],
 							 func_name, 2) == FAIL)
     {
-	if (is_new)
+	ಆದರೆ (is_new)
 	    dict_unref(d1);
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
     dict_extend(d1, d2, action, func_name);
 
 theend:
-    if (is_new)
+    ಆದರೆ (is_new)
     {
 	rettv->v_type = VAR_DICT;
 	rettv->vval.v_dict = d1;
-	rettv->v_lock = FALSE;
+	rettv->v_ಬೀಗ = FALSE;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	copy_tv(&argvars[0], rettv);
 }
 
@@ -1411,160 +1411,160 @@ theend:
  * Implementation of map(), filter(), foreach() for a Dict.  Apply "expr" to
  * every item in Dict "d" and return the result in "rettv".
  */
-    void
+    ಶೂನ್ಯ
 dict_filter_map(
 	dict_T		*d,
 	filtermap_T	filtermap,
 	type_T		*argtype,
-	char		*func_name,
+	ಅಕ್ಷರ		*func_name,
 	char_u		*arg_errmsg,
-	typval_T	*expr,
+	typval_T	*ಅಭಿವ್ಯಕ್ತಿ,
 	typval_T	*rettv)
 {
-    dict_T	*d_ret = NULL;
+    dict_T	*d_ret = ಖಾಲಿ;
     hashtab_T	*ht;
     hashitem_T	*hi;
     dictitem_T	*di;
-    int		todo;
-    int		rem;
+    ಪೂರ್ಣಾಂಕ		todo;
+    ಪೂರ್ಣಾಂಕ		rem;
     typval_T	newtv;
     funccall_T	*fc;
 
-    if (filtermap == FILTERMAP_MAPNEW)
+    ಆದರೆ (filtermap == FILTERMAP_MAPNEW)
     {
 	rettv->v_type = VAR_DICT;
-	rettv->vval.v_dict = NULL;
+	rettv->vval.v_dict = ಖಾಲಿ;
     }
-    if (d == NULL
+    ಆದರೆ (d == ಖಾಲಿ
 	  || (filtermap == FILTERMAP_FILTER
-			&& value_check_lock(d->dv_lock, arg_errmsg, TRUE)))
-	return;
+			&& ಮೌಲ್ಯ_check_ಬೀಗ(d->dv_ಬೀಗ, arg_errmsg, TRUE)))
+	ಹಿಂತಿರುಗಿ;
 
-    if (filtermap == FILTERMAP_MAPNEW)
+    ಆದರೆ (filtermap == FILTERMAP_MAPNEW)
     {
-	if (rettv_dict_alloc(rettv) == FAIL)
-	    return;
+	ಆದರೆ (rettv_dict_alloc(rettv) == FAIL)
+	    ಹಿಂತಿರುಗಿ;
 	d_ret = rettv->vval.v_dict;
     }
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, &newtv);
+    fc = eval_ಅಭಿವ್ಯಕ್ತಿ_get_funccal(ಅಭಿವ್ಯಕ್ತಿ, &newtv);
 
-    int prev_lock = d->dv_lock;
-    if (d->dv_lock == 0)
-	d->dv_lock = VAR_LOCKED;
+    ಪೂರ್ಣಾಂಕ prev_ಬೀಗ = d->dv_ಬೀಗ;
+    ಆದರೆ (d->dv_ಬೀಗ == 0)
+	d->dv_ಬೀಗ = VAR_LOCKED;
     ht = &d->dv_hashtab;
-    hash_lock(ht);
-    todo = (int)ht->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+    hash_ಬೀಗ(ht);
+    todo = (ಪೂರ್ಣಾಂಕ)ht->ht_ಬಳಸಿದ;
+    FOR_ALL_HASHTAB_ವಸ್ತುಗಳು(ht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	ಆದರೆ (!HASHITEM_ಖಾಲಿಗಳು(hi))
 	{
-	    int		r;
+	    ಪೂರ್ಣಾಂಕ		r;
 
 	    --todo;
 	    di = HI2DI(hi);
-	    if (filtermap == FILTERMAP_MAP
-		    && (value_check_lock(di->di_tv.v_lock,
+	    ಆದರೆ (filtermap == FILTERMAP_MAP
+		    && (ಮೌಲ್ಯ_check_ಬೀಗ(di->di_tv.v_ಬೀಗ,
 			    arg_errmsg, TRUE)
 			|| var_check_ro(di->di_flags,
 			    arg_errmsg, TRUE)))
-		break;
-	    set_vim_var_string(VV_KEY, di->di_key, -1);
-	    r = filter_map_one(&di->di_tv, expr, filtermap, fc, &newtv, &rem);
-	    clear_tv(get_vim_var_tv(VV_KEY));
-	    if (r == FAIL || did_emsg)
+		ನಿಲ್ಲಿಸು;
+	    ಗಣ_vim_var_string(VV_ಕೀಲಿ, di->di_ಕೀಲಿ, -1);
+	    r = filter_map_one(&di->di_tv, ಅಭಿವ್ಯಕ್ತಿ, filtermap, fc, &newtv, &rem);
+	    clear_tv(get_vim_var_tv(VV_ಕೀಲಿ));
+	    ಆದರೆ (r == FAIL || did_emsg)
 	    {
 		clear_tv(&newtv);
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	    if (filtermap == FILTERMAP_MAP)
+	    ಆದರೆ (filtermap == FILTERMAP_MAP)
 	    {
-		if (argtype != NULL && check_typval_arg_type(
+		ಆದರೆ (argtype != ಖಾಲಿ && check_typval_arg_type(
 			     argtype->tt_member, &newtv, func_name, 0) == FAIL)
 		{
 		    clear_tv(&newtv);
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 		// map(): replace the dict item value
 		clear_tv(&di->di_tv);
-		newtv.v_lock = 0;
+		newtv.v_ಬೀಗ = 0;
 		di->di_tv = newtv;
 	    }
-	    else if (filtermap == FILTERMAP_MAPNEW)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (filtermap == FILTERMAP_MAPNEW)
 	    {
 		// mapnew(): add the item value to the new dict
-		r = dict_add_tv(d_ret, (char *)di->di_key, &newtv);
+		r = dict_ಕೂಡಿಸು_tv(d_ret, (ಅಕ್ಷರ *)di->di_ಕೀಲಿ, &newtv);
 		clear_tv(&newtv);
-		if (r == FAIL)
-		    break;
+		ಆದರೆ (r == FAIL)
+		    ನಿಲ್ಲಿಸು;
 	    }
-	    else if (filtermap == FILTERMAP_FILTER && rem)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (filtermap == FILTERMAP_FILTER && rem)
 	    {
 		// filter(false): remove the item from the dict
-		if (var_check_fixed(di->di_flags, arg_errmsg, TRUE)
+		ಆದರೆ (var_check_fixed(di->di_flags, arg_errmsg, TRUE)
 			|| var_check_ro(di->di_flags, arg_errmsg, TRUE))
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		dictitem_remove(d, di, "filter");
 	    }
 	}
     }
     hash_unlock(ht);
-    d->dv_lock = prev_lock;
-    if (fc != NULL)
+    d->dv_ಬೀಗ = prev_ಬೀಗ;
+    ಆದರೆ (fc != ಖಾಲಿ)
 	remove_funccal();
 }
 
 /*
  * "remove({dict})" function
  */
-    void
+    ಶೂನ್ಯ
 dict_remove(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg)
 {
     dict_T	*d;
-    char_u	*key;
+    char_u	*ಕೀಲಿ;
     dictitem_T	*di;
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ಆದರೆ (argvars[2].v_type != VAR_UNKNOWN)
     {
 	semsg(_(e_too_many_arguments_for_function_str), "remove()");
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
     d = argvars[0].vval.v_dict;
-    if (d == NULL || value_check_lock(d->dv_lock, arg_errmsg, TRUE))
-	return;
+    ಆದರೆ (d == ಖಾಲಿ || ಮೌಲ್ಯ_check_ಬೀಗ(d->dv_ಬೀಗ, arg_errmsg, TRUE))
+	ಹಿಂತಿರುಗಿ;
 
-    key = tv_get_string_chk(&argvars[1]);
-    if (key == NULL)
-	return;
+    ಕೀಲಿ = tv_get_string_chk(&argvars[1]);
+    ಆದರೆ (ಕೀಲಿ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    di = dict_find(d, key, -1);
-    if (di == NULL)
+    di = dict_ಕಂಡುಹಿಡಿ(d, ಕೀಲಿ, -1);
+    ಆದರೆ (di == ಖಾಲಿ)
     {
-	semsg(_(e_key_not_present_in_dictionary_str), key);
-	return;
+	semsg(_(e_ಕೀಲಿ_not_present_ಒಳ_dictionary_str), ಕೀಲಿ);
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if (var_check_fixed(di->di_flags, arg_errmsg, TRUE)
+    ಆದರೆ (var_check_fixed(di->di_flags, arg_errmsg, TRUE)
 	    || var_check_ro(di->di_flags, arg_errmsg, TRUE))
-	return;
+	ಹಿಂತಿರುಗಿ;
 
     *rettv = di->di_tv;
     init_tv(&di->di_tv);
     dictitem_remove(d, di, "remove()");
 }
 
-typedef enum {
-    DICT2LIST_KEYS,
-    DICT2LIST_VALUES,
-    DICT2LIST_ITEMS,
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ {
+    DICT2_LIST_ಕೀಲಿಗಳು,
+    DICT2_LIST_ಮೌಲ್ಯಗಳು,
+    DICT2_LIST_ವಸ್ತುಗಳು,
 } dict2list_T;
 
 /*
  * Turn a dict into a list.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 dict2list(typval_T *argvars, typval_T *rettv, dict2list_T what)
 {
     list_T	*l;
@@ -1573,122 +1573,122 @@ dict2list(typval_T *argvars, typval_T *rettv, dict2list_T what)
     hashitem_T	*hi;
     listitem_T	*li;
     dict_T	*d;
-    int		todo;
+    ಪೂರ್ಣಾಂಕ		todo;
 
-    if (check_for_dict_arg(argvars, 0) == FAIL)
+    ಆದರೆ (check_for_dict_arg(argvars, 0) == FAIL)
     {
 	// invalid argument, return an empty list
-	(void)rettv_list_alloc(rettv);
-	return;
+	(ಶೂನ್ಯ)rettv_list_alloc(rettv);
+	ಹಿಂತಿರುಗಿ;
     }
 
     // NULL dict behaves like an empty dict
     d = argvars[0].vval.v_dict;
-    todo = d == NULL ? 0 : (int)d->dv_hashtab.ht_used;
+    todo = d == ಖಾಲಿ ? 0 : (ಪೂರ್ಣಾಂಕ)d->dv_hashtab.ht_ಬಳಸಿದ;
 
     // The number of items is known, allocate the list and all its items in
     // one go for efficiency.
-    l = list_alloc_with_items(todo);
-    if (l == NULL)
+    l = list_alloc_with_ವಸ್ತುಗಳು(todo);
+    ಆದರೆ (l == ಖಾಲಿ)
     {
-	(void)rettv_list_alloc(rettv);
-	return;
+	(ಶೂನ್ಯ)rettv_list_alloc(rettv);
+	ಹಿಂತಿರುಗಿ;
     }
-    rettv_list_set(rettv, l);
-    if (todo == 0)
+    rettv_list_ಗಣ(rettv, l);
+    ಆದರೆ (todo == 0)
 	// NULL or empty dict, return the empty list
-	return;
+	ಹಿಂತಿರುಗಿ;
 
-    li = l->lv_first;
-    FOR_ALL_HASHTAB_ITEMS(&d->dv_hashtab, hi, todo)
+    li = l->lv_ಮೊದಲ;
+    FOR_ALL_HASHTAB_ವಸ್ತುಗಳು(&d->dv_hashtab, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	ಆದರೆ (!HASHITEM_ಖಾಲಿಗಳು(hi))
 	{
 	    --todo;
 	    di = HI2DI(hi);
 
-	    if (what == DICT2LIST_KEYS)
+	    ಆದರೆ (what == DICT2_LIST_ಕೀಲಿಗಳು)
 	    {
 		// keys()
 		li->li_tv.v_type = VAR_STRING;
-		li->li_tv.v_lock = 0;
-		li->li_tv.vval.v_string = vim_strsave(di->di_key);
+		li->li_tv.v_ಬೀಗ = 0;
+		li->li_tv.vval.v_string = vim_strsave(di->di_ಕೀಲಿ);
 	    }
-	    else if (what == DICT2LIST_VALUES)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (what == DICT2_LIST_ಮೌಲ್ಯಗಳು)
 	    {
 		// values()
 		copy_tv(&di->di_tv, &li->li_tv);
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		// items()
-		l2 = list_alloc_with_items(2);
+		l2 = list_alloc_with_ವಸ್ತುಗಳು(2);
 		li->li_tv.v_type = VAR_LIST;
-		li->li_tv.v_lock = 0;
+		li->li_tv.v_ಬೀಗ = 0;
 		li->li_tv.vval.v_list = l2;
-		if (l2 == NULL)
-		    goto alloc_failed;
+		ಆದರೆ (l2 == ಖಾಲಿ)
+		    ಹೋಗು alloc_failed;
 		++l2->lv_refcount;
 
-		l2->lv_first->li_tv.v_type = VAR_STRING;
-		l2->lv_first->li_tv.vval.v_string = vim_strsave(di->di_key);
-		if (l2->lv_first->li_tv.vval.v_string == NULL)
-		    goto alloc_failed;
-		copy_tv(&di->di_tv, &l2->lv_u.mat.lv_last->li_tv);
+		l2->lv_ಮೊದಲ->li_tv.v_type = VAR_STRING;
+		l2->lv_ಮೊದಲ->li_tv.vval.v_string = vim_strsave(di->di_ಕೀಲಿ);
+		ಆದರೆ (l2->lv_ಮೊದಲ->li_tv.vval.v_string == ಖಾಲಿ)
+		    ಹೋಗು alloc_failed;
+		copy_tv(&di->di_tv, &l2->lv_u.mat.lv_ಕೊನೆಯ->li_tv);
 	    }
-	    li = li->li_next;
+	    li = li->li_ಮುಂದಿನ;
 	}
     }
-    return;
+    ಹಿಂತಿರುಗಿ;
 
 alloc_failed:
     // On a memory allocation failure some of the pre-allocated items may be
     // left unset; free the whole list and return an empty one instead.
     list_unref(l);
-    (void)rettv_list_alloc(rettv);
+    (ಶೂನ್ಯ)rettv_list_alloc(rettv);
 }
 
 /*
  * "items(dict)" function
  */
-    void
+    ಶೂನ್ಯ
 dict2items(typval_T *argvars, typval_T *rettv)
 {
-    dict2list(argvars, rettv, DICT2LIST_ITEMS);
+    dict2list(argvars, rettv, DICT2_LIST_ವಸ್ತುಗಳು);
 }
 
 /*
  * "keys()" function
  */
-    void
-f_keys(typval_T *argvars, typval_T *rettv)
+    ಶೂನ್ಯ
+f_ಕೀಲಿಗಳು(typval_T *argvars, typval_T *rettv)
 {
-    dict2list(argvars, rettv, DICT2LIST_KEYS);
+    dict2list(argvars, rettv, DICT2_LIST_ಕೀಲಿಗಳು);
 }
 
 /*
  * "values(dict)" function
  */
-    void
-f_values(typval_T *argvars, typval_T *rettv)
+    ಶೂನ್ಯ
+f_ಮೌಲ್ಯಗಳು(typval_T *argvars, typval_T *rettv)
 {
-    dict2list(argvars, rettv, DICT2LIST_VALUES);
+    dict2list(argvars, rettv, DICT2_LIST_ಮೌಲ್ಯಗಳು);
 }
 
 /*
  * Make each item in the dict readonly (not the value of the item).
  */
-    void
-dict_set_items_ro(dict_T *di)
+    ಶೂನ್ಯ
+dict_ಗಣ_ವಸ್ತುಗಳು_ro(dict_T *di)
 {
-    int		todo = (int)di->dv_hashtab.ht_used;
+    ಪೂರ್ಣಾಂಕ		todo = (ಪೂರ್ಣಾಂಕ)di->dv_hashtab.ht_ಬಳಸಿದ;
     hashitem_T	*hi;
 
     // Set readonly
-    FOR_ALL_HASHTAB_ITEMS(&di->dv_hashtab, hi, todo)
+    FOR_ALL_HASHTAB_ವಸ್ತುಗಳು(&di->dv_hashtab, hi, todo)
     {
-	if (HASHITEM_EMPTY(hi))
-	    continue;
+	ಆದರೆ (HASHITEM_ಖಾಲಿಗಳು(hi))
+	    ಮುಂದುವರಿ;
 	--todo;
 	HI2DI(hi)->di_flags |= DI_FLAGS_RO | DI_FLAGS_FIX;
     }
@@ -1697,22 +1697,22 @@ dict_set_items_ro(dict_T *di)
 /*
  * "has_key()" function
  */
-    void
-f_has_key(typval_T *argvars, typval_T *rettv)
+    ಶೂನ್ಯ
+f_has_ಕೀಲಿ(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    ಆದರೆ (ಒಳ_vim9script()
 	    && (check_for_dict_arg(argvars, 0) == FAIL
-		|| check_for_string_or_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_string_or_ಸಂಖ್ಯೆ_arg(argvars, 1) == FAIL))
+	ಹಿಂತಿರುಗಿ;
 
-    if (check_for_dict_arg(argvars, 0) == FAIL)
-	return;
+    ಆದರೆ (check_for_dict_arg(argvars, 0) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
-    if (argvars[0].vval.v_dict == NULL)
-	return;
+    ಆದರೆ (argvars[0].vval.v_dict == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    rettv->vval.v_number = dict_has_key(argvars[0].vval.v_dict,
-				(char *)tv_get_string(&argvars[1]));
+    rettv->vval.v_ಸಂಖ್ಯೆ = dict_has_ಕೀಲಿ(argvars[0].vval.v_dict,
+				(ಅಕ್ಷರ *)tv_get_string(&argvars[1]));
 }
 
-#endif // defined(FEAT_EVAL)
+#ಆದರೆ_ಅಂತ್ಯ // defined(FEAT_EVAL)

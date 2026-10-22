@@ -27,32 +27,32 @@
  * precompiled for OS/2. That one probably works better.
  */
 
-#ifndef _MSC_VER
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ _MSC_VER
 # include <unistd.h>
-#endif
-#include <malloc.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <fcntl.h>
+#ಆದರೆ_ಅಂತ್ಯ
+#ಅನ್ತರ್ಭಾವ <malloc.h>
+#ಅನ್ತರ್ಭಾವ <stdio.h>
+#ಅನ್ತರ್ಭಾವ <stdlib.h>
+#ಅನ್ತರ್ಭಾವ <string.h>
+#ಅನ್ತರ್ಭಾವ <fcntl.h>
 
-#ifdef _WIN32
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ _WIN32
 # define sysconf(x) -1
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-void usage(void)
+ಶೂನ್ಯ usage(ಶೂನ್ಯ)
 {
 	fprintf(stderr,
 "tee usage:\n\
 \ttee [-a] file ... file_n\n\
 \n\
-\t-a\tappend to files instead of truncating\n\
-\nTee reads its input, and writes to each of the specified files,\n\
-as well as to the standard output.\n\
+\t-a\tappend ಗಮ್ಯ files instead ದ truncating\n\
+\nTee reads its ಒಳಹರಿವು, and writes ಗಮ್ಯ each ದ the specified files,\n\
+as well as ಗಮ್ಯ the standard output.\n\
 \n\
-This version supplied with Vim 4.2 to make ':make' possible.\n\
-For a more complete and stable version, consider getting\n\
-[a port of] the GNU shellutils package.\n\
+This ಆವೃತ್ತಿ_2 supplied with Vim 4.2 ಗಮ್ಯ make ':make' possible.\n\
+For a ಇನ್ನಷ್ಟು complete and stable ಆವೃತ್ತಿ_2, consider getting\n\
+[a ಪೋರ್ಟ್ ದ] the GNU shellutils package.\n\
 ");
 }
 
@@ -61,105 +61,105 @@ For a more complete and stable version, consider getting\n\
  * We could use fgets, but I want to be able to handle binary blubber.
  */
 
-int
-myfread(char *buf, int elsize /*ignored*/, int max, FILE *fp)
+ಪೂರ್ಣಾಂಕ
+myfread(ಅಕ್ಷರ *buf, ಪೂರ್ಣಾಂಕ elsize /*ignored*/, ಪೂರ್ಣಾಂಕ max, FILE *fp)
 {
-	int	c;
-	int	n = 0;
+	ಪೂರ್ಣಾಂಕ	c;
+	ಪೂರ್ಣಾಂಕ	n = 0;
 
-	while ((n < max) && ((c = getchar()) != EOF))
+	ಆಗ ((n < max) && ((c = getchar()) != EOF))
 	{
 		*(buf++) = c;
 		n++;
-		if (c == '\n' || c == '\r')
-			break;
+		ಆದರೆ (c == '\n' || c == '\r')
+			ನಿಲ್ಲಿಸು;
 	}
-	return n;
+	ಹಿಂತಿರುಗಿ n;
 }
 
 
-int
-main(int argc, char *argv[])
+ಪೂರ್ಣಾಂಕ
+ಮುಖ್ಯ(ಪೂರ್ಣಾಂಕ argc, ಅಕ್ಷರ *argv[])
 {
-	int	append = 0;
+	ಪೂರ್ಣಾಂಕ	append = 0;
 	size_t	numfiles;
-	int	maxfiles;
+	ಪೂರ್ಣಾಂಕ	maxfiles;
 	FILE	**filepointers;
-	int	i;
-	char	buf[BUFSIZ];
-	int	n;
-	int	optind = 1;
+	ಪೂರ್ಣಾಂಕ	i;
+	ಅಕ್ಷರ	buf[BUFSIZ];
+	ಪೂರ್ಣಾಂಕ	n;
+	ಪೂರ್ಣಾಂಕ	optind = 1;
 
-	for (i = 1; i < argc; i++)
+	ಗಾಗಿ (i = 1; i < argc; i++)
 	{
-		if (argv[i][0] != '-')
-			break;
-		if (!strcmp(argv[i], "-a"))
+		ಆದರೆ (argv[i][0] != '-')
+			ನಿಲ್ಲಿಸು;
+		ಆದರೆ (!strcmp(argv[i], "-a"))
 			append++;
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 			usage();
 		optind++;
 	}
 
 	numfiles = argc - optind;
 
-	if (numfiles == 0)
+	ಆದರೆ (numfiles == 0)
 	{
 		fprintf(stderr, "doesn't make much sense using tee without any file name arguments...\n");
 		usage();
-		exit(2);
+		ನಿರ್ಗಮಿಸು(2);
 	}
 
 	maxfiles = sysconf(_SC_OPEN_MAX);	/* or fill in 10 or so */
-	if (maxfiles < 0)
+	ಆದರೆ (maxfiles < 0)
 		maxfiles = 10;
-	if (numfiles + 3 > maxfiles)	/* +3 accounts for stdin, out, err */
+	ಆದರೆ (numfiles + 3 > maxfiles)	/* +3 accounts for stdin, out, err */
 	{
 		fprintf(stderr, "Sorry, there is a limit of max %d files.\n", maxfiles - 3);
-		exit(1);
+		ನಿರ್ಗಮಿಸು(1);
 	}
-	filepointers = calloc(numfiles, sizeof(FILE *));
-	if (filepointers == NULL)
+	filepointers = ಸೊನ್ನೆ_ಸ್ಮರಣೆ_ಕೊಡು(numfiles, ಗಾತ್ರ(FILE *));
+	ಆದರೆ (filepointers == ಖಾಲಿ)
 	{
 		fprintf(stderr, "Error allocating memory for %ld files\n",
-															   (long)numfiles);
-		exit(1);
+															   (ದೀರ್ಘ)numfiles);
+		ನಿರ್ಗಮಿಸು(1);
 	}
-	for (i = 0; i < numfiles; i++)
+	ಗಾಗಿ (i = 0; i < numfiles; i++)
 	{
 		filepointers[i] = fopen(argv[i+optind], append ? "ab" : "wb");
-		if (filepointers[i] == NULL)
+		ಆದರೆ (filepointers[i] == ಖಾಲಿ)
 		{
 			fprintf(stderr, "Can't open \"%s\"\n", argv[i+optind]);
-			exit(1);
+			ನಿರ್ಗಮಿಸು(1);
 		}
 	}
-#ifdef _WIN32
-	setmode(fileno(stdin),  O_BINARY);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ _WIN32
+	setmode(fileno(stdin),  O_ದ್ವಿಮಾನ);
 	fflush(stdout);	/* needed for _fsetmode(stdout) */
-	setmode(fileno(stdout),  O_BINARY);
-#endif
+	setmode(fileno(stdout),  O_ದ್ವಿಮಾನ);
+#ಆದರೆ_ಅಂತ್ಯ
 
-	while ((n = myfread(buf, sizeof(char), sizeof(buf), stdin)) > 0)
+	ಆಗ ((n = myfread(buf, ಗಾತ್ರ(ಅಕ್ಷರ), ಗಾತ್ರ(buf), stdin)) > 0)
 	{
-		fwrite(buf, sizeof(char), n, stdout);
+		fwrite(buf, ಗಾತ್ರ(ಅಕ್ಷರ), n, stdout);
 		fflush(stdout);
-		for (i = 0; i < numfiles; i++)
+		ಗಾಗಿ (i = 0; i < numfiles; i++)
 		{
-			if (filepointers[i] &&
-			     fwrite(buf, sizeof(char), n, filepointers[i]) != n)
+			ಆದರೆ (filepointers[i] &&
+			     fwrite(buf, ಗಾತ್ರ(ಅಕ್ಷರ), n, filepointers[i]) != n)
 			{
 				fprintf(stderr, "Error writing to file \"%s\"\n", argv[i+optind]);
 				fclose(filepointers[i]);
-				filepointers[i] = NULL;
+				filepointers[i] = ಖಾಲಿ;
 			}
 		}
 	}
-	for (i = 0; i < numfiles; i++)
+	ಗಾಗಿ (i = 0; i < numfiles; i++)
 	{
-		if (filepointers[i])
+		ಆದರೆ (filepointers[i])
 			fclose(filepointers[i]);
 	}
 
-	exit(0);
+	ನಿರ್ಗಮಿಸು(0);
 }

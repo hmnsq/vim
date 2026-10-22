@@ -2,6 +2,6 @@
  * Header file for xpm_w32.c
  */
 
-#ifndef XPM_W32__H
-int LoadXpmImage(char *filename, HBITMAP *hImage, HBITMAP *hShape);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ XPM_W32__H
+ಪೂರ್ಣಾಂಕ ತುಂಬು_Xpm_Image(ಅಕ್ಷರ *filename, HBITMAP *hImage, HBITMAP *hShape);
+#ಆದರೆ_ಅಂತ್ಯ

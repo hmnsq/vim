@@ -12,122 +12,122 @@
  * Mostly by Ivan Krasilnikov.
  */
 
-#undef NDEBUG
-#include <assert.h>
+#ವ್ಯಾಖ್ಯಾನ_ರದ್ದು NDEBUG
+#ಅನ್ತರ್ಭಾವ <assert.h>
 
 // Must include main.c because it contains much more than just main()
-#define NO_VIM_MAIN
-#include "main.c"
+#ವ್ಯಾಖ್ಯಾನಿಸು NO_VIM_MAIN
+#ಅನ್ತರ್ಭಾವ "main.c"
 
 // This file has to be included because the tested functions are static
-#include "memfile.c"
+#ಅನ್ತರ್ಭಾವ "memfile.c"
 
-#define index_to_key(i) ((i) ^ 15167)
-#define TEST_COUNT 50000
+#ವ್ಯಾಖ್ಯಾನಿಸು ಸೂಚ್ಯಂಕ_ಗಮ್ಯ_ಕೀಲಿ(i) ((i) ^ 15167)
+#ವ್ಯಾಖ್ಯಾನಿಸು TEST_ಎಣಿಕೆ 50000
 
 /*
  * Test mf_hash_*() functions.
  */
-    static void
-test_mf_hash(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+test_mf_hash(ಶೂನ್ಯ)
 {
     mf_hashtab_T   ht;
-    mf_hashitem_T  *item;
-    blocknr_T      key;
+    mf_hashitem_T  *ಅಂಶ;
+    blocknr_T      ಕೀಲಿ;
     long_u	   i;
-    long_u	   num_buckets;
+    long_u	   ಅಂಕೆ_buckets;
 
     mf_hash_init(&ht);
 
     // insert some items and check invariants
-    for (i = 0; i < TEST_COUNT; i++)
+    ಗಾಗಿ (i = 0; i < TEST_ಎಣಿಕೆ; i++)
     {
-	assert(ht.mht_count == i);
+	ಪ್ರತಿಜ್ಞಾ(ht.mht_ಎಣಿಕೆ == i);
 
 	// check that number of buckets is a power of 2
-	num_buckets = ht.mht_mask + 1;
-	assert(num_buckets > 0 && (num_buckets & (num_buckets - 1)) == 0);
+	ಅಂಕೆ_buckets = ht.mht_ಮುಖವಾಡ + 1;
+	ಪ್ರತಿಜ್ಞಾ(ಅಂಕೆ_buckets > 0 && (ಅಂಕೆ_buckets & (ಅಂಕೆ_buckets - 1)) == 0);
 
 	// check load factor
-	assert(ht.mht_count <= (num_buckets << MHT_LOG_LOAD_FACTOR));
+	ಪ್ರತಿಜ್ಞಾ(ht.mht_ಎಣಿಕೆ <= (ಅಂಕೆ_buckets << MHT_LOG_ತುಂಬು_ಗುಣಕ));
 
-	if (i < (MHT_INIT_SIZE << MHT_LOG_LOAD_FACTOR))
+	ಆದರೆ (i < (MHT_INIT_ಗಾತ್ರ << MHT_LOG_ತುಂಬು_ಗುಣಕ))
 	{
 	    // first expansion shouldn't have occurred yet
-	    assert(num_buckets == MHT_INIT_SIZE);
-	    assert(ht.mht_buckets == ht.mht_small_buckets);
+	    ಪ್ರತಿಜ್ಞಾ(ಅಂಕೆ_buckets == MHT_INIT_ಗಾತ್ರ);
+	    ಪ್ರತಿಜ್ಞಾ(ht.mht_buckets == ht.mht_small_buckets);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    assert(num_buckets > MHT_INIT_SIZE);
-	    assert(ht.mht_buckets != ht.mht_small_buckets);
+	    ಪ್ರತಿಜ್ಞಾ(ಅಂಕೆ_buckets > MHT_INIT_ಗಾತ್ರ);
+	    ಪ್ರತಿಜ್ಞಾ(ht.mht_buckets != ht.mht_small_buckets);
 	}
 
-	key = index_to_key(i);
-	assert(mf_hash_find(&ht, key) == NULL);
+	ಕೀಲಿ = ಸೂಚ್ಯಂಕ_ಗಮ್ಯ_ಕೀಲಿ(i);
+	ಪ್ರತಿಜ್ಞಾ(mf_hash_ಕಂಡುಹಿಡಿ(&ht, ಕೀಲಿ) == ಖಾಲಿ);
 
 	// allocate and add new item
-	item = LALLOC_CLEAR_ONE(mf_hashitem_T);
-	assert(item != NULL);
-	item->mhi_key = key;
-	mf_hash_add_item(&ht, item);
+	ಅಂಶ = LALLOC_CLEAR_ONE(mf_hashitem_T);
+	ಪ್ರತಿಜ್ಞಾ(ಅಂಶ != ಖಾಲಿ);
+	ಅಂಶ->mhi_ಕೀಲಿ = ಕೀಲಿ;
+	mf_hash_ಕೂಡಿಸು_ಅಂಶ(&ht, ಅಂಶ);
 
-	assert(mf_hash_find(&ht, key) == item);
+	ಪ್ರತಿಜ್ಞಾ(mf_hash_ಕಂಡುಹಿಡಿ(&ht, ಕೀಲಿ) == ಅಂಶ);
 
-	if (ht.mht_mask + 1 != num_buckets)
+	ಆದರೆ (ht.mht_ಮುಖವಾಡ + 1 != ಅಂಕೆ_buckets)
 	{
 	    // hash table was expanded
-	    assert(ht.mht_mask + 1 == num_buckets * MHT_GROWTH_FACTOR);
-	    assert(i + 1 == (num_buckets << MHT_LOG_LOAD_FACTOR));
+	    ಪ್ರತಿಜ್ಞಾ(ht.mht_ಮುಖವಾಡ + 1 == ಅಂಕೆ_buckets * MHT_GROWTH_ಗುಣಕ);
+	    ಪ್ರತಿಜ್ಞಾ(i + 1 == (ಅಂಕೆ_buckets << MHT_LOG_ತುಂಬು_ಗುಣಕ));
 	}
     }
 
     // check presence of inserted items
-    for (i = 0; i < TEST_COUNT; i++)
+    ಗಾಗಿ (i = 0; i < TEST_ಎಣಿಕೆ; i++)
     {
-	key = index_to_key(i);
-	item = mf_hash_find(&ht, key);
-	assert(item != NULL);
-	assert(item->mhi_key == key);
+	ಕೀಲಿ = ಸೂಚ್ಯಂಕ_ಗಮ್ಯ_ಕೀಲಿ(i);
+	ಅಂಶ = mf_hash_ಕಂಡುಹಿಡಿ(&ht, ಕೀಲಿ);
+	ಪ್ರತಿಜ್ಞಾ(ಅಂಶ != ಖಾಲಿ);
+	ಪ್ರತಿಜ್ಞಾ(ಅಂಶ->mhi_ಕೀಲಿ == ಕೀಲಿ);
     }
 
     // delete some items
-    for (i = 0; i < TEST_COUNT; i++)
+    ಗಾಗಿ (i = 0; i < TEST_ಎಣಿಕೆ; i++)
     {
-	if (i % 100 < 70)
+	ಆದರೆ (i % 100 < 70)
 	{
-	    key = index_to_key(i);
-	    item = mf_hash_find(&ht, key);
-	    assert(item != NULL);
-	    assert(item->mhi_key == key);
+	    ಕೀಲಿ = ಸೂಚ್ಯಂಕ_ಗಮ್ಯ_ಕೀಲಿ(i);
+	    ಅಂಶ = mf_hash_ಕಂಡುಹಿಡಿ(&ht, ಕೀಲಿ);
+	    ಪ್ರತಿಜ್ಞಾ(ಅಂಶ != ಖಾಲಿ);
+	    ಪ್ರತಿಜ್ಞಾ(ಅಂಶ->mhi_ಕೀಲಿ == ಕೀಲಿ);
 
-	    mf_hash_rem_item(&ht, item);
-	    assert(mf_hash_find(&ht, key) == NULL);
+	    mf_hash_rem_ಅಂಶ(&ht, ಅಂಶ);
+	    ಪ್ರತಿಜ್ಞಾ(mf_hash_ಕಂಡುಹಿಡಿ(&ht, ಕೀಲಿ) == ಖಾಲಿ);
 
-	    mf_hash_add_item(&ht, item);
-	    assert(mf_hash_find(&ht, key) == item);
+	    mf_hash_ಕೂಡಿಸು_ಅಂಶ(&ht, ಅಂಶ);
+	    ಪ್ರತಿಜ್ಞಾ(mf_hash_ಕಂಡುಹಿಡಿ(&ht, ಕೀಲಿ) == ಅಂಶ);
 
-	    mf_hash_rem_item(&ht, item);
-	    assert(mf_hash_find(&ht, key) == NULL);
+	    mf_hash_rem_ಅಂಶ(&ht, ಅಂಶ);
+	    ಪ್ರತಿಜ್ಞಾ(mf_hash_ಕಂಡುಹಿಡಿ(&ht, ಕೀಲಿ) == ಖಾಲಿ);
 
-	    vim_free(item);
+	    vim_free(ಅಂಶ);
 	}
     }
 
     // check again
-    for (i = 0; i < TEST_COUNT; i++)
+    ಗಾಗಿ (i = 0; i < TEST_ಎಣಿಕೆ; i++)
     {
-	key = index_to_key(i);
-	item = mf_hash_find(&ht, key);
+	ಕೀಲಿ = ಸೂಚ್ಯಂಕ_ಗಮ್ಯ_ಕೀಲಿ(i);
+	ಅಂಶ = mf_hash_ಕಂಡುಹಿಡಿ(&ht, ಕೀಲಿ);
 
-	if (i % 100 < 70)
+	ಆದರೆ (i % 100 < 70)
 	{
-	    assert(item == NULL);
+	    ಪ್ರತಿಜ್ಞಾ(ಅಂಶ == ಖಾಲಿ);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    assert(item != NULL);
-	    assert(item->mhi_key == key);
+	    ಪ್ರತಿಜ್ಞಾ(ಅಂಶ != ಖಾಲಿ);
+	    ಪ್ರತಿಜ್ಞಾ(ಅಂಶ->mhi_ಕೀಲಿ == ಕೀಲಿ);
 	}
     }
 
@@ -135,9 +135,9 @@ test_mf_hash(void)
     mf_hash_free_all(&ht);
 }
 
-    int
-main(void)
+    ಪೂರ್ಣಾಂಕ
+ಮುಖ್ಯ(ಶೂನ್ಯ)
 {
     test_mf_hash();
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }

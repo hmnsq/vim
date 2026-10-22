@@ -10,9 +10,9 @@
  * socketserver.c: Socketserver clientserver functionality
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-#ifdef FEAT_SOCKETSERVER
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SOCKETSERVER
 
 // Always greater than one.
 # define PROTOCOL_VER 1
@@ -43,74 +43,74 @@
  * used to find the specific ss_reply_T, and a single string is popped from the
  * array.
  */
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
     char_u *sender; // Includes "type:" prefix if any
-    garray_T strings;
-} ss_reply_T;
+    garray_T ಅಕ್ಷರಸರಣಿಗಳು;
+} ss_ಉತ್ತರ_T;
 
-static channel_T    *server_channel = NULL;
-static char_u	    *server_address = NULL; // Includes "type:" prefix if any
-static bool	    server_is_unix = false;
-static char_u	    *server_addr_cwd = NULL; // CWD when server was started, used
+ಸ್ಥಿರ channel_T    *server_channel = ಖಾಲಿ;
+ಸ್ಥಿರ char_u	    *server_ವಿಳಾಸ = ಖಾಲಿ; // Includes "type:" prefix if any
+ಸ್ಥಿರ bool	    server_is_unix = false;
+ಸ್ಥಿರ char_u	    *server_addr_cwd = ಖಾಲಿ; // CWD when server was started, used
 					  // to handle relative file paths.
-static garray_T	    server_replies;
+ಸ್ಥಿರ garray_T	    server_replies;
 
-static channel_T    *client_channels = NULL;
-static int	    client_channel_count = 0;
+ಸ್ಥಿರ channel_T    *client_channels = ಖಾಲಿ;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    client_channel_ಎಣಿಕೆ = 0;
 
 # define FOR_ALL_CLIENTS(ch) \
-    for (ch = client_channels; ch != NULL; ch = ch->ch_ss_next)
+    ಗಾಗಿ (ch = client_channels; ch != ಖಾಲಿ; ch = ch->ch_ss_ಮುಂದಿನ)
 
-static void socketserver_cleanup(void);
-static char_u *socketserver_create_path(char_u *name, bool quiet);
-static char_u *socketserver_get_path(char_u *name, bool new, bool quiet, bool ignore, bool *fatal);
-static void socketserver_accept(channel_T *channel);
-static void socketserver_close(channel_T *channel);
-static ss_reply_T *socketserver_add_reply(char_u *sender);
+ಸ್ಥಿರ ಶೂನ್ಯ socketserver_cleanup(ಶೂನ್ಯ);
+ಸ್ಥಿರ char_u *socketserver_create_ಮಾರ್ಗ(char_u *name, bool quiet);
+ಸ್ಥಿರ char_u *socketserver_get_ಮಾರ್ಗ(char_u *name, bool new, bool quiet, bool ignore, bool *fatal);
+ಸ್ಥಿರ ಶೂನ್ಯ socketserver_accept(channel_T *channel);
+ಸ್ಥಿರ ಶೂನ್ಯ socketserver_close(channel_T *channel);
+ಸ್ಥಿರ ss_ಉತ್ತರ_T *socketserver_ಕೂಡಿಸು_ಉತ್ತರ(char_u *sender);
 
 /*
  * Start the socketserver using the given name. Returns OK on success and FAIL
  * on failure.
  */
-    int
-socketserver_start(char_u *name, bool quiet)
+    ಪೂರ್ಣಾಂಕ
+socketserver_ಆರಂಭ(char_u *name, bool quiet)
 {
-    char_u	*address = NULL;
-    int		port;
+    char_u	*ವಿಳಾಸ = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		ಪೋರ್ಟ್;
     bool	is_unix = false;
     channel_T	*channel;
     char_u	*buf;
     char_u	dirbuf[MAXPATHL];
 
-    if (server_channel != NULL)
-	return OK;
+    ಆದರೆ (server_channel != ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ OK;
 
-    if (STRNICMP(name, "channel:", 8) == 0)
+    ಆದರೆ (STRNICMP(name, "channel:", 8) == 0)
     {
-	if (channel_parse_socketserver_address(name + 8, &port, &address, quiet)
+	ಆದರೆ (channel_parse_socketserver_ವಿಳಾಸ(name + 8, &ಪೋರ್ಟ್, &ವಿಳಾಸ, quiet)
 		== FAIL)
-	    return FAIL;
-	if (address != NULL)
+	    ಹಿಂತಿರುಗಿ FAIL;
+	ಆದರೆ (ವಿಳಾಸ != ಖಾಲಿ)
 	    is_unix = true;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	address = socketserver_create_path(name, quiet);
-	if (address == NULL)
-	    return FAIL;
+	ವಿಳಾಸ = socketserver_create_ಮಾರ್ಗ(name, quiet);
+	ಆದರೆ (ವಿಳಾಸ == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ FAIL;
 	is_unix = true;
     }
 
-    if (is_unix)
-	channel = channel_listen_unix((char *)address, NULL, false);
-    else
-	channel = channel_listen(port, NULL);
+    ಆದರೆ (is_unix)
+	channel = channel_listen_unix((ಅಕ್ಷರ *)ವಿಳಾಸ, ಖಾಲಿ, false);
+    ಇಲ್ಲದಿದ್ದರೆ
+	channel = channel_listen(ಪೋರ್ಟ್, ಖಾಲಿ);
 
-    if (channel == NULL)
+    ಆದರೆ (channel == ಖಾಲಿ)
     {
-	vim_free(address);
-	return FAIL;
+	vim_free(ವಿಳಾಸ);
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
     channel->ch_socketserver = true;
@@ -122,103 +122,103 @@ socketserver_start(char_u *name, bool quiet)
 
     VIM_CLEAR(serverName);
 
-    if (STRNICMP(name, "channel:", 8) == 0)
+    ಆದರೆ (STRNICMP(name, "channel:", 8) == 0)
 	buf = vim_strsave(name);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	buf = alloc(MAXPATHL + 1);
-	if (buf != NULL)
+	ಆದರೆ (buf != ಖಾಲಿ)
 	{
 	    buf[0] = NUL;
-	    mch_FullName(address, buf, MAXPATHL, false);
+	    mch_ತುಂಬಿದ_Name(ವಿಳಾಸ, buf, MAXPATHL, false);
 	}
     }
-    vim_free(address);
+    vim_free(ವಿಳಾಸ);
 
-    if (buf != NULL)
+    ಆದರೆ (buf != ಖಾಲಿ)
     {
-	server_address = vim_strsave(buf);
+	server_ವಿಳಾಸ = vim_strsave(buf);
 	serverName = buf;
-	set_vim_var_string(VV_SEND_SERVER, serverName, -1);
+	ಗಣ_vim_var_string(VV_SEND_SERVER, serverName, -1);
     }
 
     vim_free(server_addr_cwd);
-    if (mch_dirname(dirbuf, sizeof(dirbuf)) == OK)
+    ಆದರೆ (mch_dirname(dirbuf, ಗಾತ್ರ(dirbuf)) == OK)
 	server_addr_cwd = vim_strsave(dirbuf);
-    else
-	server_addr_cwd = NULL;
+    ಇಲ್ಲದಿದ್ದರೆ
+	server_addr_cwd = ಖಾಲಿ;
 
-    ga_init2(&server_replies, sizeof(ss_reply_T), 2);
+    ga_init2(&server_replies, ಗಾತ್ರ(ss_ಉತ್ತರ_T), 2);
 
-    ch_log(NULL, "socketserver: started server at %s", name);
+    ch_log(ಖಾಲಿ, "socketserver: started server at %s", name);
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Stop running the socketserver if it is. Note that this does not stop Vim from
  * becoming a client.
  */
-    void
-socketserver_stop(void)
+    ಶೂನ್ಯ
+socketserver_stop(ಶೂನ್ಯ)
 {
-    if (server_channel == NULL)
-	return;
+    ಆದರೆ (server_channel == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     channel_close(server_channel, false);
     channel_clear(server_channel);
 
     socketserver_cleanup();
 
-    ch_log(NULL, "socketserver: shutting down server");
+    ch_log(ಖಾಲಿ, "socketserver: shutting down server");
 }
 
 /*
  * Cleanup server stuff. Do not close client channels, as those are not part of
  * the actual server.
  */
-    static void
-socketserver_cleanup(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+socketserver_cleanup(ಶೂನ್ಯ)
 {
 # ifdef UNIX
-    if (server_is_unix && server_address != NULL)
+    ಆದರೆ (server_is_unix && server_ವಿಳಾಸ != ಖಾಲಿ)
     {
-	char_u *path = server_address;
+	char_u *ಮಾರ್ಗ = server_ವಿಳಾಸ;
 	char_u dirbuf[MAXPATHL];
 
-	if (STRNICMP(path, "channel:unix:", 13) == 0)
-	    path += 13;
-	else if (STRNICMP(path, "name:", 5) == 0)
-	    path += 5;
+	ಆದರೆ (STRNICMP(ಮಾರ್ಗ, "channel:unix:", 13) == 0)
+	    ಮಾರ್ಗ += 13;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRNICMP(ಮಾರ್ಗ, "name:", 5) == 0)
+	    ಮಾರ್ಗ += 5;
 
-	if (*path == '/')
-	    mch_remove(path);
+	ಆದರೆ (*ಮಾರ್ಗ == '/')
+	    mch_remove(ಮಾರ್ಗ);
 	// Go to the directory where the server was started. This is to handle
 	// when Vim changes directories and the servername is a relative path.
-	else if (server_addr_cwd != NULL
-		&& mch_dirname(dirbuf, sizeof(dirbuf)) == OK)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (server_addr_cwd != ಖಾಲಿ
+		&& mch_dirname(dirbuf, ಗಾತ್ರ(dirbuf)) == OK)
 	{
-	    if (mch_chdir((char *)server_addr_cwd) == 0)
+	    ಆದರೆ (mch_chdir((ಅಕ್ಷರ *)server_addr_cwd) == 0)
 	    {
-		mch_remove(path);
-		if (mch_chdir((char *)dirbuf) < 0)
-		    emsg(_(e_cannot_go_back_to_previous_directory));
+		mch_remove(ಮಾರ್ಗ);
+		ಆದರೆ (mch_chdir((ಅಕ್ಷರ *)dirbuf) < 0)
+		    emsg(_(e_cannot_go_ಹಿಂಭಾಗ_ಗಮ್ಯ_ಹಿಂದಿನ_directory));
 	    }
 	}
     }
 # endif
 
-    server_channel = NULL;
-    VIM_CLEAR(server_address);
+    server_channel = ಖಾಲಿ;
+    VIM_CLEAR(server_ವಿಳಾಸ);
     VIM_CLEAR(server_addr_cwd);
 
     // Free all replies
-    for (int i = 0; i < server_replies.ga_len; i++)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < server_replies.ga_len; i++)
     {
-	ss_reply_T *reply = (ss_reply_T *)server_replies.ga_data + i;
+	ss_ಉತ್ತರ_T *ಉತ್ತರ = (ss_ಉತ್ತರ_T *)server_replies.ga_ದತ್ತಾಂಶ + i;
 
-	vim_free(reply->sender);
-	ga_clear_strings(&reply->strings);
+	vim_free(ಉತ್ತರ->sender);
+	ga_clear_ಅಕ್ಷರಸರಣಿಗಳು(&ಉತ್ತರ->ಅಕ್ಷರಸರಣಿಗಳು);
     }
     ga_clear(&server_replies);
 }
@@ -230,78 +230,78 @@ socketserver_cleanup(void)
  * and NULL on failure.
  */
     list_T *
-socketserver_list(void)
+socketserver_list(ಶೂನ್ಯ)
 {
     list_T *list = list_alloc();
 
-    if (list == NULL)
-	return NULL;
+    ಆದರೆ (list == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
 # ifdef MSWIN
     // Only support addresses on Windows
-    return list;
-# else
+    ಹಿಂತಿರುಗಿ list;
+# ಇಲ್ಲದಿದ್ದರೆ
     string_T	    buf;
-    string_T	    path;
+    string_T	    ಮಾರ್ಗ;
     DIR		    *dirp;
-    struct dirent   *dp;
-    const char_u    *known_dirs[] = {
+    ರಚನೆ dirent   *dp;
+    ಸ್ಥಿರಾಂಕ char_u    *ತಿಳಿದ_dirs[] = {
 	mch_getenv("XDG_RUNTIME_DIR"),
 	mch_getenv("TMPDIR"),
 	(char_u *)"/tmp"
     };
 
-    if ((buf.string = alloc(MAXPATHL)) == NULL)
-	return NULL;
-    if ((path.string = alloc(MAXPATHL)) == NULL)
+    ಆದರೆ ((buf.string = alloc(MAXPATHL)) == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    ಆದರೆ ((ಮಾರ್ಗ.string = alloc(MAXPATHL)) == ಖಾಲಿ)
     {
 	vim_free(buf.string);
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
-    buf.length = 0;
-    path.length = 0;
+    buf.ಉದ್ದಳತೆ = 0;
+    ಮಾರ್ಗ.ಉದ್ದಳತೆ = 0;
 
-    for (size_t i = 0 ; i < ARRAY_LENGTH(known_dirs); i++)
+    ಗಾಗಿ (size_t i = 0 ; i < ARRAY_ಉದ್ದಳತೆ(ತಿಳಿದ_dirs); i++)
     {
-	const char_u *dir = known_dirs[i];
+	ಸ್ಥಿರಾಂಕ char_u *dir = ತಿಳಿದ_dirs[i];
 
-	if (dir == NULL)
-	    continue;
+	ಆದರೆ (dir == ಖಾಲಿ)
+	    ಮುಂದುವರಿ;
 
-	if (STRCMP(dir, "/tmp") == 0 ||
-		(known_dirs[1] != NULL && STRCMP(dir, known_dirs[1]) == 0))
-	    path.length = vim_snprintf_safelen((char *)path.string, MAXPATHL,
-		    "%s/vim-%lu", dir, (unsigned long int)getuid());
-	else
-	    path.length = vim_snprintf_safelen((char *)path.string, MAXPATHL,
+	ಆದರೆ (STRCMP(dir, "/tmp") == 0 ||
+		(ತಿಳಿದ_dirs[1] != ಖಾಲಿ && STRCMP(dir, ತಿಳಿದ_dirs[1]) == 0))
+	    ಮಾರ್ಗ.ಉದ್ದಳತೆ = vim_snprintf_safelen((ಅಕ್ಷರ *)ಮಾರ್ಗ.string, MAXPATHL,
+		    "%s/vim-%lu", dir, (ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ ಪೂರ್ಣಾಂಕ)getuid());
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಮಾರ್ಗ.ಉದ್ದಳತೆ = vim_snprintf_safelen((ಅಕ್ಷರ *)ಮಾರ್ಗ.string, MAXPATHL,
 		    "%s/vim", dir);
 
-	dirp = opendir((char *)path.string);
-	if (dirp == NULL)
-	    continue;
+	dirp = opendir((ಅಕ್ಷರ *)ಮಾರ್ಗ.string);
+	ಆದರೆ (dirp == ಖಾಲಿ)
+	    ಮುಂದುವರಿ;
 
 	// Loop through directory
-	while ((dp = readdir(dirp)) != NULL)
+	ಆಗ ((dp = readdir(dirp)) != ಖಾಲಿ)
 	{
-	    if (STRCMP(dp->d_name, ".") == 0 || STRCMP(dp->d_name, "..") == 0)
-		continue;
+	    ಆದರೆ (STRCMP(dp->d_name, ".") == 0 || STRCMP(dp->d_name, "..") == 0)
+		ಮುಂದುವರಿ;
 
-	    buf.length = vim_snprintf_safelen((char *)buf.string, MAXPATHL,
-		    "%s/%s", path.string, dp->d_name);
+	    buf.ಉದ್ದಳತೆ = vim_snprintf_safelen((ಅಕ್ಷರ *)buf.string, MAXPATHL,
+		    "%s/%s", ಮಾರ್ಗ.string, dp->d_name);
 
 	    list_append_string(list, (char_u *)dp->d_name,
-		    buf.length - (path.length + 1));
+		    buf.ಉದ್ದಳತೆ - (ಮಾರ್ಗ.ಉದ್ದಳತೆ + 1));
 	}
 
 	closedir(dirp);
 
-	break;
+	ನಿಲ್ಲಿಸು;
     }
 
-    vim_free(path.string);
+    vim_free(ಮಾರ್ಗ.string);
     vim_free(buf.string);
 
-    return list;
+    ಹಿಂತಿರುಗಿ list;
 # endif
 }
 
@@ -311,61 +311,61 @@ socketserver_list(void)
  * an incrementing number to the path until we find a socket filename that can
  * be used. Returns alloced string or NULL on failure.
  */
-    static char_u *
-socketserver_create_path(char_u *name, bool quiet)
+    ಸ್ಥಿರ char_u *
+socketserver_create_ಮಾರ್ಗ(char_u *name, bool quiet)
 {
 # ifdef MSWIN
     // Only support channel addresses on Windows
-    if (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
-	return vim_strsave(name + 8);
-    else
+    ಆದರೆ (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
+	ಹಿಂತಿರುಗಿ vim_strsave(name + 8);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (!quiet)
-	    semsg(_(e_invalid_argument_str), name);
-	return NULL;
+	ಆದರೆ (!quiet)
+	    semsg(_(e_invalid_ವಾದ_str), name);
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
-# else
-    char_u  *buf = NULL;
-    int	    buflen = STRLEN(name) + NUMBUFLEN;
-    char_u  *path = NULL;
+# ಇಲ್ಲದಿದ್ದರೆ
+    char_u  *buf = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ	    buflen = STRLEN(name) + NUMBUFLEN;
+    char_u  *ಮಾರ್ಗ = ಖಾಲಿ;
     bool    fatal = false;
 
-    if (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
-	return vim_strsave(name + 8);
-    if (STRNICMP(name, "name:", 5) == 0)
+    ಆದರೆ (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
+	ಹಿಂತಿರುಗಿ vim_strsave(name + 8);
+    ಆದರೆ (STRNICMP(name, "name:", 5) == 0)
 	name += 5;
 
-    for (int i = 0; i < 1000; i++)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < 1000; i++)
     {
-	if (buf != NULL)
+	ಆದರೆ (buf != ಖಾಲಿ)
 	{
-	    vim_snprintf((char *)buf, buflen, "%s%d", name, i);
-	    path = socketserver_get_path(buf, true, quiet, true, &fatal);
+	    vim_snprintf((ಅಕ್ಷರ *)buf, buflen, "%s%d", name, i);
+	    ಮಾರ್ಗ = socketserver_get_ಮಾರ್ಗ(buf, true, quiet, true, &fatal);
 	}
-	else
-	    path = socketserver_get_path(name, true, quiet, true, &fatal);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಮಾರ್ಗ = socketserver_get_ಮಾರ್ಗ(name, true, quiet, true, &fatal);
 
-	if (fatal)
-	    break;
+	ಆದರೆ (fatal)
+	    ನಿಲ್ಲಿಸು;
 
-	if (path == NULL)
+	ಆದರೆ (ಮಾರ್ಗ == ಖಾಲಿ)
 	{
-	    if (buf == NULL)
+	    ಆದರೆ (buf == ಖಾಲಿ)
 	    {
 		buf = alloc(buflen);
-		if (buf == NULL)
+		ಆದರೆ (buf == ಖಾಲಿ)
 		{
-		    semsg(_(e_out_of_memory_allocating_nr_bytes), buflen);
-		    return NULL;
+		    semsg(_(e_ಹೊರಹೋಗು_ದ_ಸ್ಮರಣೆ_allocating_nr_ಬೈಟುಗಳು), buflen);
+		    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 		}
 	    }
-	    continue;
+	    ಮುಂದುವರಿ;
 	}
-	break;
+	ನಿಲ್ಲಿಸು;
     }
     vim_free(buf);
 
-    return path;
+    ಹಿಂತಿರುಗಿ ಮಾರ್ಗ;
 # endif
 }
 
@@ -386,117 +386,117 @@ socketserver_create_path(char_u *name, bool quiet)
  *
  * Returns path on success and NULL on failure.
  */
-    static char_u *
-socketserver_get_path(
+    ಸ್ಥಿರ char_u *
+socketserver_get_ಮಾರ್ಗ(
 	char_u *name,
-	bool new UNUSED,
+	bool new ಬಳಸದ,
 	bool quiet,
-	bool ignore UNUSED,
+	bool ignore ಬಳಸದ,
 	bool *fatal)
 {
 # ifdef MSWIN
     // Only support channel addresses on Windows
-    if (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
-	return vim_strsave(name + 8);
-    else
+    ಆದರೆ (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
+	ಹಿಂತಿರುಗಿ vim_strsave(name + 8);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (!quiet)
-	    semsg(_(e_invalid_argument_str), name);
-	if (fatal != NULL)
+	ಆದರೆ (!quiet)
+	    semsg(_(e_invalid_ವಾದ_str), name);
+	ಆದರೆ (fatal != ಖಾಲಿ)
 	    *fatal = true;
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
     char_u	    *buf;
     bool	    res = false;
     channel_T	    *channel;
-    const char_u    *known_dirs[] = {
+    ಸ್ಥಿರಾಂಕ char_u    *ತಿಳಿದ_dirs[] = {
 	mch_getenv("XDG_RUNTIME_DIR"),
 	mch_getenv("TMPDIR"),
 	(char_u *)"/tmp"
     };
 
-    if (name == NULL)
+    ಆದರೆ (name == ಖಾಲಿ)
     {
-	if (fatal != NULL)
+	ಆದರೆ (fatal != ಖಾಲಿ)
 	    *fatal = true;
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
     // Ignore if name is a path
-    if (name[0] == '/' || STRNCMP(name, "./", 2) == 0 ||
+    ಆದರೆ (name[0] == '/' || STRNCMP(name, "./", 2) == 0 ||
 	    STRNCMP(name, "../", 3) == 0)
-	return vim_strsave(name);
+	ಹಿಂತಿರುಗಿ vim_strsave(name);
 
-    if (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
-	return vim_strsave(name + 8);
+    ಆದರೆ (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
+	ಹಿಂತಿರುಗಿ vim_strsave(name + 8);
 
-    if (STRNICMP(name, "name:", 5) == 0)
+    ಆದರೆ (STRNICMP(name, "name:", 5) == 0)
 	name += 5;
 
-    if (vim_strchr(name, '/') != NULL)
+    ಆದರೆ (vim_strchr(name, '/') != ಖಾಲಿ)
     {
-	if (!quiet)
+	ಆದರೆ (!quiet)
 	    semsg(_(e_socket_name_no_slashes), name);
-	if (fatal != NULL)
+	ಆದರೆ (fatal != ಖಾಲಿ)
 	    *fatal = true;
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
     buf = alloc(MAXPATHL);
 
-    if (buf == NULL)
+    ಆದರೆ (buf == ಖಾಲಿ)
     {
-	if (fatal != NULL)
+	ಆದರೆ (fatal != ಖಾಲಿ)
 	    *fatal = true;
-	semsg(_(e_out_of_memory_allocating_nr_bytes), MAXPATHL);
-	return NULL;
+	semsg(_(e_ಹೊರಹೋಗು_ದ_ಸ್ಮರಣೆ_allocating_nr_ಬೈಟುಗಳು), MAXPATHL);
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    for (size_t i = 0; i < ARRAY_LENGTH(known_dirs); i++)
+    ಗಾಗಿ (size_t i = 0; i < ARRAY_ಉದ್ದಳತೆ(ತಿಳಿದ_dirs); i++)
     {
-	const char_u	*dir = known_dirs[i];
+	ಸ್ಥಿರಾಂಕ char_u	*dir = ತಿಳಿದ_dirs[i];
 	bool		got = false;
 
-	if (dir == NULL)
-	    continue;
-	else if (STRCMP(dir, "/tmp") == 0 ||
-		(known_dirs[1] != NULL && STRCMP(dir, known_dirs[1]) == 0))
+	ಆದರೆ (dir == ಖಾಲಿ)
+	    ಮುಂದುವರಿ;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(dir, "/tmp") == 0 ||
+		(ತಿಳಿದ_dirs[1] != ಖಾಲಿ && STRCMP(dir, ತಿಳಿದ_dirs[1]) == 0))
 	{
 	    // "/tmp" or $TMPDIR, must suffix dir with uid
-	    vim_snprintf((char *)buf, MAXPATHL, "%s/vim-%lu", dir,
-		    (unsigned long int)getuid());
-	    if (vim_mkdir(buf, 0700) == -1 && errno != EEXIST)
-		continue;
+	    vim_snprintf((ಅಕ್ಷರ *)buf, MAXPATHL, "%s/vim-%lu", dir,
+		    (ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ ಪೂರ್ಣಾಂಕ)getuid());
+	    ಆದರೆ (vim_mkdir(buf, 0700) == -1 && errno != EEXIST)
+		ಮುಂದುವರಿ;
 
-	    vim_snprintf((char *)buf, MAXPATHL, "%s/vim-%lu/%s", dir,
-		    (unsigned long int)getuid(), name);
+	    vim_snprintf((ಅಕ್ಷರ *)buf, MAXPATHL, "%s/vim-%lu/%s", dir,
+		    (ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ ಪೂರ್ಣಾಂಕ)getuid(), name);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    vim_snprintf((char *)buf, MAXPATHL, "%s/vim", dir);
-	    if (vim_mkdir(buf, 0700) == -1 && errno != EEXIST)
-		continue;
+	    vim_snprintf((ಅಕ್ಷರ *)buf, MAXPATHL, "%s/vim", dir);
+	    ಆದರೆ (vim_mkdir(buf, 0700) == -1 && errno != EEXIST)
+		ಮುಂದುವರಿ;
 
-	    vim_snprintf((char *)buf, MAXPATHL, "%s/vim/%s", dir, name);
+	    vim_snprintf((ಅಕ್ಷರ *)buf, MAXPATHL, "%s/vim/%s", dir, name);
 	}
 
 	// If looking for a new socket path, and "buf" currently exists, check
 	// if it is a dead socket, if it is then remove it.
-	if (new)
+	ಆದರೆ (new)
 	{
 	    emsg_silent++;
 	    emsg_off++;
-	    channel = channel_open_unix((char *)buf, NULL);
+	    channel = channel_open_unix((ಅಕ್ಷರ *)buf, ಖಾಲಿ);
 	    emsg_off--;
 	    emsg_silent--;
 
-	    if (channel != NULL)
+	    ಆದರೆ (channel != ಖಾಲಿ)
 	    {
 		channel_close(channel, false);
 		channel_clear(channel);
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		mch_remove(buf);
 		got = true;
@@ -504,63 +504,63 @@ socketserver_get_path(
 	}
 
 	res = true;
-	if (got || (!new && mch_access((char *)buf, F_OK) == 0))
+	ಆದರೆ (got || (!new && mch_access((ಅಕ್ಷರ *)buf, F_OK) == 0))
 	{
-	    if (server_address != NULL && STRCMP(buf, server_address) == 0)
+	    ಆದರೆ (server_ವಿಳಾಸ != ಖಾಲಿ && STRCMP(buf, server_ವಿಳಾಸ) == 0)
 		// Can't connect to itself
-		break;
-	    return buf;
+		ನಿಲ್ಲಿಸು;
+	    ಹಿಂತಿರುಗಿ buf;
 	}
-	break;
+	ನಿಲ್ಲಿಸು;
     }
 
-    if (!quiet)
+    ಆದರೆ (!quiet)
     {
-	if (!res)
+	ಆದರೆ (!res)
 	    semsg(_("Failed creating socket directory: %s"), strerror(errno));
-	else if (!ignore)
-	    semsg(_(e_invalid_server_id_used_str), name);
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!ignore)
+	    semsg(_(e_invalid_server_id_ಬಳಸಿದ_str), name);
     }
-    if (!res && fatal != NULL)
+    ಆದರೆ (!res && fatal != ಖಾಲಿ)
 	*fatal = true;
 
     vim_free(buf);
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 # endif
 }
 
 /*
  * Callback for when client channel is closed
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 socketserver_client_close(channel_T *channel)
 {
-    if (channel == client_channels)
-	client_channels = channel->ch_ss_next;
-    if (channel->ch_ss_prev != NULL)
-	channel->ch_ss_prev->ch_ss_next = channel->ch_ss_next;
-    if (channel->ch_ss_next != NULL)
-	channel->ch_ss_next->ch_ss_prev = channel->ch_ss_prev;
-    if (client_channel_count > 0)
-	--client_channel_count;
+    ಆದರೆ (channel == client_channels)
+	client_channels = channel->ch_ss_ಮುಂದಿನ;
+    ಆದರೆ (channel->ch_ss_prev != ಖಾಲಿ)
+	channel->ch_ss_prev->ch_ss_ಮುಂದಿನ = channel->ch_ss_ಮುಂದಿನ;
+    ಆದರೆ (channel->ch_ss_ಮುಂದಿನ != ಖಾಲಿ)
+	channel->ch_ss_ಮುಂದಿನ->ch_ss_prev = channel->ch_ss_prev;
+    ಆದರೆ (client_channel_ಎಣಿಕೆ > 0)
+	--client_channel_ಎಣಿಕೆ;
 
-    ch_log(NULL, "socketserver: client channel closed");
+    ch_log(ಖಾಲಿ, "socketserver: client channel closed");
 }
 
 /*
  * Callback for when server channel accepted new client.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 socketserver_accept(channel_T *channel)
 {
-    if (client_channel_count >= MAX_CLIENT_CHANNELS)
+    ಆದರೆ (client_channel_ಎಣಿಕೆ >= MAX_CLIENT_CHANNELS)
     {
 	// Too many client connections: refuse this one instead of letting the
 	// channel's file descriptor overflow the select()/poll() sets.
-	ch_log(NULL, "socketserver: too many clients, refusing connection");
+	ch_log(ಖಾಲಿ, "socketserver: too many clients, refusing connection");
 	channel_close(channel, FALSE);
 	channel_unref(channel);
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
     channel->ch_socketserver = true;
@@ -568,43 +568,43 @@ socketserver_accept(channel_T *channel)
 
     // Append the client, so that commands are processed in the order the
     // clients were accepted, not reversed.
-    channel->ch_ss_next = NULL;
-    if (client_channels == NULL)
+    channel->ch_ss_ಮುಂದಿನ = ಖಾಲಿ;
+    ಆದರೆ (client_channels == ಖಾಲಿ)
     {
-	channel->ch_ss_prev = NULL;
+	channel->ch_ss_prev = ಖಾಲಿ;
 	client_channels = channel;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	channel_T *last = client_channels;
+	channel_T *ಕೊನೆಯ = client_channels;
 
-	while (last->ch_ss_next != NULL)
-	    last = last->ch_ss_next;
-	last->ch_ss_next = channel;
-	channel->ch_ss_prev = last;
+	ಆಗ (ಕೊನೆಯ->ch_ss_ಮುಂದಿನ != ಖಾಲಿ)
+	    ಕೊನೆಯ = ಕೊನೆಯ->ch_ss_ಮುಂದಿನ;
+	ಕೊನೆಯ->ch_ss_ಮುಂದಿನ = channel;
+	channel->ch_ss_prev = ಕೊನೆಯ;
     }
-    ++client_channel_count;
+    ++client_channel_ಎಣಿಕೆ;
 
     // We will read the command from the client later in the input loop.
-    ch_log(NULL, "socketserver: accepted new client");
+    ch_log(ಖಾಲಿ, "socketserver: accepted new client");
 }
 
 /*
  * Callback for when server channel is closed
  */
-    static void
-socketserver_close(channel_T *channel UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+socketserver_close(channel_T *channel ಬಳಸದ)
 {
     socketserver_cleanup();
 
-    ch_log(NULL, "socketserver: server channel closed");
+    ch_log(ಖಾಲಿ, "socketserver: server channel closed");
 }
 
 /*
  * Mark references to socketserver channels
  */
-    int
-set_ref_in_socketserver_channel(int copyID)
+    ಪೂರ್ಣಾಂಕ
+ಗಣ_ref_ಒಳ_socketserver_channel(ಪೂರ್ಣಾಂಕ copyID)
 {
     bool	abort = false;
     channel_T	*channel;
@@ -612,18 +612,18 @@ set_ref_in_socketserver_channel(int copyID)
 
     tv.v_type = VAR_CHANNEL;
     tv.vval.v_channel = server_channel;
-    abort = abort || set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
+    abort = abort || ಗಣ_ref_ಒಳ_ಅಂಶ(&tv, copyID, ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ);
 
     FOR_ALL_CLIENTS(channel)
     {
-	if (abort)
-	    break;
+	ಆದರೆ (abort)
+	    ನಿಲ್ಲಿಸು;
 
 	tv.v_type = VAR_CHANNEL;
 	tv.vval.v_channel = channel;
-	abort = abort || set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
+	abort = abort || ಗಣ_ref_ಒಳ_ಅಂಶ(&tv, copyID, ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ);
     }
-    return abort;
+    ಹಿಂತಿರುಗಿ abort;
 }
 
 /*
@@ -631,56 +631,56 @@ set_ref_in_socketserver_channel(int copyID)
  * adds version header to "msg", if "ver" is true. Returns OK on success and
  * FAIL on failure.
  */
-    static int
-socketserver_send_message(channel_T *ch, dict_T *msg, char *func, bool ver)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+socketserver_send_ಸಂದೇಶ(channel_T *ch, dict_T *ಸಂದೇಶ, ಅಕ್ಷರ *func, bool ver)
 {
     typval_T	tv;
     char_u	*buf;
-    int		ret;
+    ಪೂರ್ಣಾಂಕ		ret;
 
-    if (ver)
-	dict_add_number(msg, "version", PROTOCOL_VER);
+    ಆದರೆ (ver)
+	dict_ಕೂಡಿಸು_ಸಂಖ್ಯೆ(ಸಂದೇಶ, "version", PROTOCOL_VER);
 
     tv.v_type = VAR_DICT;
-    tv.vval.v_dict = msg;
+    tv.vval.v_dict = ಸಂದೇಶ;
     buf = json_encode(&tv, JSON_NL);
 
-    if (buf != NULL)
+    ಆದರೆ (buf != ಖಾಲಿ)
     {
 	emsg_silent++;
-	ret = channel_send(ch, PART_SOCK, buf, (int)STRLEN(buf), func);
+	ret = channel_send(ch, PART_SOCK, buf, (ಪೂರ್ಣಾಂಕ)STRLEN(buf), func);
 	emsg_silent--;
     }
-    else
-	return FAIL;
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಹಿಂತಿರುಗಿ FAIL;
     vim_free(buf);
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
 /*
  * Execute the JSON message represented by "dict".
  */
-    static void
-socketserver_exec(channel_T *channel, dict_T *message)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+socketserver_exec(channel_T *channel, dict_T *ಸಂದೇಶ_2)
 {
     dictitem_T	*di;
     char_u	*type;
-    char_u	*str = NULL;
-    char_u	*sender = NULL;
+    char_u	*str = ಖಾಲಿ;
+    char_u	*sender = ಖಾಲಿ;
     char_u	idbuf[11 + NUMBUFLEN];
 
-    di = dict_find(message, (char_u *)"type", -1);
-    if (di == NULL || di->di_tv.v_type != VAR_STRING)
-	return;
-    else
+    di = dict_ಕಂಡುಹಿಡಿ(ಸಂದೇಶ_2, (char_u *)"type", -1);
+    ಆದರೆ (di == ಖಾಲಿ || di->di_tv.v_type != VAR_STRING)
+	ಹಿಂತಿರುಗಿ;
+    ಇಲ್ಲದಿದ್ದರೆ
 	type = di->di_tv.vval.v_string;
 
-    di = dict_find(message, (char_u *)"str", -1);
-    if (di != NULL && di->di_tv.v_type == VAR_STRING)
+    di = dict_ಕಂಡುಹಿಡಿ(ಸಂದೇಶ_2, (char_u *)"str", -1);
+    ಆದರೆ (di != ಖಾಲಿ && di->di_tv.v_type == VAR_STRING)
 	str = di->di_tv.vval.v_string;
 
-    di = dict_find(message, (char_u *)"sender", -1);
-    if (di != NULL && di->di_tv.v_type == VAR_STRING)
+    di = dict_ಕಂಡುಹಿಡಿ(ಸಂದೇಶ_2, (char_u *)"sender", -1);
+    ಆದರೆ (di != ಖಾಲಿ && di->di_tv.v_type == VAR_STRING)
     {
 	sender = di->di_tv.vval.v_string;
 
@@ -689,12 +689,12 @@ socketserver_exec(channel_T *channel, dict_T *message)
 	client_socket = vim_strsave(sender);
     }
 
-    di = dict_find(message, (char_u *)"wait", -1);
-    if (di != NULL && di->di_tv.v_type == VAR_BOOL && di->di_tv.vval.v_number)
+    di = dict_ಕಂಡುಹಿಡಿ(ಸಂದೇಶ_2, (char_u *)"wait", -1);
+    ಆದರೆ (di != ಖಾಲಿ && di->di_tv.v_type == VAR_BOOL && di->di_tv.vval.v_ಸಂಖ್ಯೆ)
     {
 	// Client is not a server, but still wants a response later. Save the
 	// ID of the channel connection that we will use to send back a response,
-	vim_snprintf((char *)idbuf, sizeof(idbuf), "remotewait:%d",
+	vim_snprintf((ಅಕ್ಷರ *)idbuf, ಗಾತ್ರ(idbuf), "remotewait:%d",
 		channel->ch_id);
 
 	sender = idbuf;
@@ -702,142 +702,142 @@ socketserver_exec(channel_T *channel, dict_T *message)
 	client_socket = vim_strsave(sender);
     }
 
-    ch_log(NULL, "socketserver_exec(): result: %s",
-	    str == NULL ? (char_u *)"(null)" : str);
+    ch_log(ಖಾಲಿ, "socketserver_exec(): result: %s",
+	    str == ಖಾಲಿ ? (char_u *)"(null)" : str);
 
-    if (STRCMP(type, "expr") == 0 && str != NULL)
+    ಆದರೆ (STRCMP(type, "expr") == 0 && str != ಖಾಲಿ)
     {
 	// Evaluate expression and send back reply
 	dict_T	    *dict;
-	char_u	    *result;
-	int	    code;
+	char_u	    *ಫಲಿತಾಂಶ;
+	ಪೂರ್ಣಾಂಕ	    ಸಂಕೇತ_2;
 
 	dict = dict_alloc();
-	if (dict == NULL)
-	    return;
+	ಆದರೆ (dict == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ;
 
-	result = eval_client_expr_to_string(str);
-	code = result == NULL ? -1 : 0;
+	ಫಲಿತಾಂಶ = eval_client_ಅಭಿವ್ಯಕ್ತಿ_ಗಮ್ಯ_string(str);
+	ಸಂಕೇತ_2 = ಫಲಿತಾಂಶ == ಖಾಲಿ ? -1 : 0;
 
-	dict_add_string(dict, "type", (char_u *)"reply");
-	if (result != NULL)
+	dict_ಕೂಡಿಸು_string(dict, "type", (char_u *)"reply");
+	ಆದರೆ (ಫಲಿತಾಂಶ != ಖಾಲಿ)
 	{
-	    dict_add_string(dict, "str", result);
-	    vim_free(result);
+	    dict_ಕೂಡಿಸು_string(dict, "str", ಫಲಿತಾಂಶ);
+	    vim_free(ಫಲಿತಾಂಶ);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    // Error occurred, return error message
-	    dict_add_string(dict, "str",
-		    (char_u *)_(e_invalid_expression_received));
+	    dict_ಕೂಡಿಸು_string(dict, "str",
+		    (char_u *)_(e_invalid_ಅಭಿವ್ಯಕ್ತಿ_received));
 
-	dict_add_number(dict, "code", code);
+	dict_ಕೂಡಿಸು_ಸಂಖ್ಯೆ(dict, "code", ಸಂಕೇತ_2);
 
-	socketserver_send_message(channel, dict, "socketserver_exec", true);
+	socketserver_send_ಸಂದೇಶ(channel, dict, "socketserver_exec", true);
 	dict_unref(dict);
     }
-    else if (STRCMP(type, "keystrokes") == 0 && str != NULL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(type, "keystrokes") == 0 && str != ಖಾಲಿ)
     {
 	// Execute keystrokes
-	server_to_input_buf(str);
+	server_ಗಮ್ಯ_ಒಳಹರಿವು_buf(str);
     }
-    else if (STRCMP(type, "notify") == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(type, "notify") == 0)
     {
 	// Notification, execute autocommands and save the reply for later use
-	if (sender != NULL && str != NULL)
+	ಆದರೆ (sender != ಖಾಲಿ && str != ಖಾಲಿ)
 	{
-	    ss_reply_T *reply;
+	    ss_ಉತ್ತರ_T *ಉತ್ತರ;
 
-	    reply = socketserver_add_reply(sender);
+	    ಉತ್ತರ = socketserver_ಕೂಡಿಸು_ಉತ್ತರ(sender);
 
-	    if (reply != NULL)
-		ga_copy_string(&reply->strings, str);
+	    ಆದರೆ (ಉತ್ತರ != ಖಾಲಿ)
+		ga_copy_string(&ಉತ್ತರ->ಅಕ್ಷರಸರಣಿಗಳು, str);
 
 	    apply_autocmds(EVENT_REMOTEREPLY, sender, str, TRUE, curbuf);
 	}
     }
-    else if (STRCMP(type, "ver") == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(type, "ver") == 0)
     {
 	// A message we sent previously had the wrong version. Emit an error
 	// message to alert the user.
-	emsg(_(e_socket_server_version_mismatch));
+	emsg(_(e_socket_server_ಆವೃತ್ತಿ_mismatch));
     }
-    else
-	ch_error(NULL, "socketserver: unknown command type '%s'", type);
+    ಇಲ್ಲದಿದ್ದರೆ
+	ch_error(ಖಾಲಿ, "socketserver: unknown command type '%s'", type);
 }
 
-    static int
-socketserver_get_message(channel_T *channel, typval_T **tv)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+socketserver_get_ಸಂದೇಶ(channel_T *channel, typval_T **tv)
 {
-    jsonq_T *head = &channel->ch_part[PART_SOCK].ch_json_head;
-    jsonq_T *json_msg = head->jq_next;
-    int	    ver;
+    jsonq_T *ತಲೆ = &channel->ch_part[PART_SOCK].ch_json_ತಲೆ;
+    jsonq_T *json_ಸಂದೇಶ = ತಲೆ->jq_ಮುಂದಿನ;
+    ಪೂರ್ಣಾಂಕ	    ver;
 
-    if (json_msg == NULL)
+    ಆದರೆ (json_ಸಂದೇಶ == ಖಾಲಿ)
     {
 	// Check the readahead buffer
 	channel_parse_json(channel, PART_SOCK, true);
-	json_msg = head->jq_next;
+	json_ಸಂದೇಶ = ತಲೆ->jq_ಮುಂದಿನ;
     }
-    if (json_msg == NULL)
-	return FAIL;
-    *tv = json_msg->jq_value;
-    remove_json_node(head, json_msg);
+    ಆದರೆ (json_ಸಂದೇಶ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
+    *tv = json_ಸಂದೇಶ->jq_ಮೌಲ್ಯ;
+    remove_json_ಗಂಟು(ತಲೆ, json_ಸಂದೇಶ);
 
-    if ((*tv)->v_type != VAR_DICT)
+    ಆದರೆ ((*tv)->v_type != VAR_DICT)
     {
-	ch_error(NULL, "socketserver: message is not a JSON object");
+	ch_error(ಖಾಲಿ, "socketserver: message is not a JSON object");
 	free_tv(*tv);
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
-    ver = dict_get_number((*tv)->vval.v_dict, "version");
+    ver = dict_get_ಸಂಖ್ಯೆ((*tv)->vval.v_dict, "version");
 
-    if (ver != 0 && ver != PROTOCOL_VER)
+    ಆದರೆ (ver != 0 && ver != PROTOCOL_VER)
     {
 	dict_T *dict;
 
-	ch_error(NULL, "socketserver: message has different version %d", ver);
+	ch_error(ಖಾಲಿ, "socketserver: message has different version %d", ver);
 	free_tv(*tv);
 
 	// Send back a special error
 	dict = dict_alloc();
-	if (dict != NULL)
+	ಆದರೆ (dict != ಖಾಲಿ)
 	{
-	    dict_add_string(dict, "type", (char_u *)"ver");
-	    socketserver_send_message(channel, dict,
+	    dict_ಕೂಡಿಸು_string(dict, "type", (char_u *)"ver");
+	    socketserver_send_ಸಂದೇಶ(channel, dict,
 		    "socketserver_get_message", false);
 	    dict_unref(dict);
 	}
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Parse any commands in the queue and execute them.
  */
-    void
-socketserver_parse_messages(void)
+    ಶೂನ್ಯ
+socketserver_parse_messages(ಶೂನ್ಯ)
 {
     typval_T	*tv;
 
-    for (channel_T *ch = client_channels; ch != NULL;)
+    ಗಾಗಿ (channel_T *ch = client_channels; ch != ಖಾಲಿ;)
     {
 	// Make sure to save next channel in case "ch" is freed. Not sure if
 	// this can actually happen but be safe.
-	channel_T *next = ch->ch_ss_next;
+	channel_T *ಮುಂದಿನ = ch->ch_ss_ಮುಂದಿನ;
 
 	// Get the JSON message if there is any from the queue for this channel.
-	if (socketserver_get_message(ch, &tv) == FAIL)
+	ಆದರೆ (socketserver_get_ಸಂದೇಶ(ch, &tv) == FAIL)
 	{
-	    ch = next;
-	    continue;
+	    ch = ಮುಂದಿನ;
+	    ಮುಂದುವರಿ;
 	}
 
 	socketserver_exec(ch, tv->vval.v_dict);
 	free_tv(tv);
-	ch = next;
+	ch = ಮುಂದಿನ;
     }
 }
 
@@ -850,19 +850,19 @@ socketserver_parse_messages(void)
  *
  * Return OK on success and FAIL on failure or timeout.
  */
-    static int
-socketserver_wait(channel_T *channel, int timeout)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+socketserver_wait(channel_T *channel, ಪೂರ್ಣಾಂಕ timeout)
 {
-    while (true)
+    ಆಗ (true)
     {
-	int		ret;
+	ಪೂರ್ಣಾಂಕ		ret;
 	channel_T	*ch;
 # ifdef HAVE_SELECT
 	fd_set		rfds;
-	struct timeval  tv;
-	int		maxfd = -1;
+	ರಚನೆ timeval  tv;
+	ಪೂರ್ಣಾಂಕ		maxfd = -1;
 
-	if (timeout != -1)
+	ಆದರೆ (timeout != -1)
 	{
 	    tv.tv_sec = timeout / 1000;
 	    tv.tv_usec = (timeout % 1000) * 1000;
@@ -870,95 +870,95 @@ socketserver_wait(channel_T *channel, int timeout)
 
 	FD_ZERO(&rfds);
 
-	if (channel != NULL)
+	ಆದರೆ (channel != ಖಾಲಿ)
 	{
-	    if (channel->CH_SOCK_FD == INVALID_FD)
+	    ಆದರೆ (channel->CH_SOCK_FD == INVALID_FD)
 		// Shouldn't happen
-		return FAIL;
+		ಹಿಂತಿರುಗಿ FAIL;
 
 	    maxfd = channel->CH_SOCK_FD;
 	    FD_SET(channel->CH_SOCK_FD, &rfds);
 	}
-	if (server_channel != NULL && server_channel->CH_SOCK_FD != INVALID_FD)
+	ಆದರೆ (server_channel != ಖಾಲಿ && server_channel->CH_SOCK_FD != INVALID_FD)
 	{
 	    FD_SET(server_channel->CH_SOCK_FD, &rfds);
-	    if (server_channel->CH_SOCK_FD > maxfd)
+	    ಆದರೆ (server_channel->CH_SOCK_FD > maxfd)
 		maxfd = server_channel->CH_SOCK_FD;
 	}
 
 	FOR_ALL_CLIENTS(ch)
 	{
-	    if (ch->CH_SOCK_FD != INVALID_FD
+	    ಆದರೆ (ch->CH_SOCK_FD != INVALID_FD
 #  ifdef FD_SETSIZE
-		    && (int)ch->CH_SOCK_FD < FD_SETSIZE
+		    && (ಪೂರ್ಣಾಂಕ)ch->CH_SOCK_FD < FD_SETSIZE
 #  endif
 		    )
 	    {
 		FD_SET(ch->CH_SOCK_FD, &rfds);
-		if (maxfd < (int)ch->CH_SOCK_FD)
-		    maxfd = (int)ch->CH_SOCK_FD;
+		ಆದರೆ (maxfd < (ಪೂರ್ಣಾಂಕ)ch->CH_SOCK_FD)
+		    maxfd = (ಪೂರ್ಣಾಂಕ)ch->CH_SOCK_FD;
 	    }
 	}
 
-	if (maxfd == -1)
-	    return FAIL;
+	ಆದರೆ (maxfd == -1)
+	    ಹಿಂತಿರುಗಿ FAIL;
 
-	ret = select(maxfd + 1, &rfds, NULL, NULL, timeout == -1 ? NULL : &tv);
+	ret = select(maxfd + 1, &rfds, ಖಾಲಿ, ಖಾಲಿ, timeout == -1 ? ಖಾಲಿ : &tv);
 
 #  ifdef EINTR
-	if (ret == -1 && errno == EINTR)
+	ಆದರೆ (ret == -1 && errno == EINTR)
 	{
-	    if (got_int)
-		break;
-	    continue;
+	    ಆದರೆ (got_int)
+		ನಿಲ್ಲಿಸು;
+	    ಮುಂದುವರಿ;
 	}
 #  endif
 
-	if (ret > 0)
+	ಆದರೆ (ret > 0)
 	{
-	    if (server_channel != NULL
+	    ಆದರೆ (server_channel != ಖಾಲಿ
 		    && server_channel->CH_SOCK_FD != INVALID_FD
 		    && FD_ISSET(server_channel->CH_SOCK_FD, &rfds))
 		channel_check(server_channel, PART_SOCK);
 
 	    FOR_ALL_CLIENTS(ch)
-		if (ch->CH_SOCK_FD != INVALID_FD
+		ಆದರೆ (ch->CH_SOCK_FD != INVALID_FD
 #  ifdef FD_SETSIZE
-			&& (int)ch->CH_SOCK_FD < FD_SETSIZE
+			&& (ಪೂರ್ಣಾಂಕ)ch->CH_SOCK_FD < FD_SETSIZE
 #  endif
 			&& FD_ISSET(ch->CH_SOCK_FD, &rfds))
 		    channel_check(ch, PART_SOCK);
 
 	    socketserver_parse_messages();
 
-	    if (channel == NULL)
-		return OK;
+	    ಆದರೆ (channel == ಖಾಲಿ)
+		ಹಿಂತಿರುಗಿ OK;
 
-	    if (channel->CH_SOCK_FD != INVALID_FD
+	    ಆದರೆ (channel->CH_SOCK_FD != INVALID_FD
 		    && FD_ISSET(channel->CH_SOCK_FD, &rfds))
 	    {
 		channel_check(channel, PART_SOCK);
-		return OK;
+		ಹಿಂತಿರುಗಿ OK;
 	    }
-	    continue;
+	    ಮುಂದುವರಿ;
 	}
-# else
-	struct pollfd   fds[MAX_OPEN_CHANNELS + 1 + MAX_CLIENT_CHANNELS];
-	int		nfd = 0;
-	int		channel_idx = -1;
-	int		server_idx = -1;
+# ಇಲ್ಲದಿದ್ದರೆ
+	ರಚನೆ pollfd   fds[MAX_OPEN_CHANNELS + 1 + MAX_CLIENT_CHANNELS];
+	ಪೂರ್ಣಾಂಕ		nfd = 0;
+	ಪೂರ್ಣಾಂಕ		channel_idx = -1;
+	ಪೂರ್ಣಾಂಕ		server_idx = -1;
 
-	if (channel != NULL)
+	ಆದರೆ (channel != ಖಾಲಿ)
 	{
-	    if (channel->CH_SOCK_FD == INVALID_FD)
+	    ಆದರೆ (channel->CH_SOCK_FD == INVALID_FD)
 		// Shouldn't happen
-		return FAIL;
+		ಹಿಂತಿರುಗಿ FAIL;
 
 	    channel_idx = nfd;
 	    fds[nfd].fd = channel->CH_SOCK_FD;
 	    fds[nfd++].events = POLLIN;
 	}
-	if (server_channel != NULL && server_channel->CH_SOCK_FD != INVALID_FD)
+	ಆದರೆ (server_channel != ಖಾಲಿ && server_channel->CH_SOCK_FD != INVALID_FD)
 	{
 	    server_idx = nfd;
 	    fds[nfd].fd = server_channel->CH_SOCK_FD;
@@ -966,7 +966,7 @@ socketserver_wait(channel_T *channel, int timeout)
 	}
 
 	FOR_ALL_CLIENTS(ch)
-	    if (ch->CH_SOCK_FD != INVALID_FD)
+	    ಆದರೆ (ch->CH_SOCK_FD != INVALID_FD)
 	    {
 		fds[nfd].fd = ch->CH_SOCK_FD;
 		fds[nfd].events = POLLIN;
@@ -977,44 +977,44 @@ socketserver_wait(channel_T *channel, int timeout)
 	ret = poll(fds, nfd, timeout);
 
 #  ifdef EINTR
-	if (ret == -1 && errno == EINTR)
+	ಆದರೆ (ret == -1 && errno == EINTR)
 	{
-	    if (got_int)
-		break;
-	    continue;
+	    ಆದರೆ (got_int)
+		ನಿಲ್ಲಿಸು;
+	    ಮುಂದುವರಿ;
 	}
 #  endif
 
-	if (ret > 0)
+	ಆದರೆ (ret > 0)
 	{
-	    if (server_channel != NULL
+	    ಆದರೆ (server_channel != ಖಾಲಿ
 		    && server_channel->CH_SOCK_FD != INVALID_FD
 		    && fds[server_idx].revents & POLLIN)
 		channel_check(server_channel, PART_SOCK);
 
 	    FOR_ALL_CLIENTS(ch)
-		if (ch->CH_SOCK_FD != INVALID_FD
+		ಆದರೆ (ch->CH_SOCK_FD != INVALID_FD
 			&& fds[ch->ch_part[PART_SOCK].ch_poll_idx]
 			.revents & POLLIN)
 		    channel_check(ch, PART_SOCK);
 
 	    socketserver_parse_messages();
 
-	    if (channel == NULL)
-		return OK;
+	    ಆದರೆ (channel == ಖಾಲಿ)
+		ಹಿಂತಿರುಗಿ OK;
 
-	    if (channel->CH_SOCK_FD != INVALID_FD
+	    ಆದರೆ (channel->CH_SOCK_FD != INVALID_FD
 		    && fds[channel_idx].revents & POLLIN)
 	    {
 		channel_check(channel, PART_SOCK);
-		return OK;
+		ಹಿಂತಿರುಗಿ OK;
 	    }
-	    continue;
+	    ಮುಂದುವರಿ;
 	}
 # endif
-	break;
+	ನಿಲ್ಲಿಸು;
     }
-    return FAIL;
+    ಹಿಂತಿರುಗಿ FAIL;
 }
 
 /*
@@ -1023,54 +1023,54 @@ socketserver_wait(channel_T *channel, int timeout)
  * true. Returns NULL on
  * failure.
  */
-    static channel_T *
+    ಸ್ಥಿರ channel_T *
 socketserver_get_channel(char_u *name, bool quiet, bool *wait)
 {
-    char_u	*address = NULL;
-    int		port;
+    char_u	*ವಿಳಾಸ = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		ಪೋರ್ಟ್;
     bool	is_unix = false;
     channel_T	*channel;
 
-    if (STRNICMP(name, "channel:", 8) == 0)
+    ಆದರೆ (STRNICMP(name, "channel:", 8) == 0)
     {
-	if (channel_parse_socketserver_address(name + 8, &port, &address, true)
+	ಆದರೆ (channel_parse_socketserver_ವಿಳಾಸ(name + 8, &ಪೋರ್ಟ್, &ವಿಳಾಸ, true)
 		== FAIL)
-	    return NULL;
-	if (address != NULL)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+	ಆದರೆ (ವಿಳಾಸ != ಖಾಲಿ)
 	    is_unix = true;
     }
-    else if (STRNICMP(name, "remotewait:", 11) == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRNICMP(name, "remotewait:", 11) == 0)
     {
 	// Channel ID name, find channel with that ID.
-	int id;
+	ಪೂರ್ಣಾಂಕ id;
 
-	if (name[11] == NUL)
-	    return NULL;
-	id = strtol((char *)name + 11, NULL, 10);
-	if (wait != NULL)
+	ಆದರೆ (name[11] == NUL)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+	id = strtol((ಅಕ್ಷರ *)name + 11, ಖಾಲಿ, 10);
+	ಆದರೆ (wait != ಖಾಲಿ)
 	    *wait = true;
 
-	return channel_find(id);
+	ಹಿಂತಿರುಗಿ channel_ಕಂಡುಹಿಡಿ(id);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	address = socketserver_get_path(name, false, quiet, false, NULL);
-	if (address == NULL)
-	    return NULL;
+	ವಿಳಾಸ = socketserver_get_ಮಾರ್ಗ(name, false, quiet, false, ಖಾಲಿ);
+	ಆದರೆ (ವಿಳಾಸ == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	is_unix = true;
     }
 
-    if (is_unix)
-	channel = channel_open_unix((char *)address, NULL);
-    else
-	channel =  channel_open("localhost", port, 1000, NULL);
+    ಆದರೆ (is_unix)
+	channel = channel_open_unix((ಅಕ್ಷರ *)ವಿಳಾಸ, ಖಾಲಿ);
+    ಇಲ್ಲದಿದ್ದರೆ
+	channel =  channel_open("localhost", ಪೋರ್ಟ್, 1000, ಖಾಲಿ);
 
-    if (channel == NULL && !quiet)
+    ಆದರೆ (channel == ಖಾಲಿ && !quiet)
 	semsg(_(e_socket_server_failed_connecting), name);
 
-    vim_free(address);
+    vim_free(ವಿಳಾಸ);
 
-    return channel;
+    ಹಿಂತಿರುಗಿ channel;
 }
 
 /*
@@ -1079,42 +1079,42 @@ socketserver_get_channel(char_u *name, bool quiet, bool *wait)
  * be closed immediately, this is used for --remote-wait. Returns 0 for OK, -1
  * on error.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 socketserver_send(
 	char_u *name,
 	char_u *str,
-	char_u **result,
-	bool is_expr,
-	int timeout,
+	char_u **ಫಲಿತಾಂಶ,
+	bool is_ಅಭಿವ್ಯಕ್ತಿ,
+	ಪೂರ್ಣಾಂಕ timeout,
 	bool silent,
 	channel_T **ch)
 {
-    int		rcode = -1;
+    ಪೂರ್ಣಾಂಕ		rcode = -1;
     channel_T	*channel;
     dict_T	*dict;
     dictitem_T	*di;
-    typval_T	*resp_tv = NULL;
+    typval_T	*resp_tv = ಖಾಲಿ;
 
-    if (*name == NUL)
+    ಆದರೆ (*name == NUL)
     {
-	semsg(_(e_unable_to_send_to_str), name);
-	return -1;
+	semsg(_(e_unable_ಗಮ್ಯ_send_ಗಮ್ಯ_str), name);
+	ಹಿಂತಿರುಗಿ -1;
     }
 
     // Execute locally if target is ourselves
-    if (serverName != NULL && STRICMP(name, serverName) == 0)
-	return sendToLocalVim(str, is_expr, result);
+    ಆದರೆ (serverName != ಖಾಲಿ && STRICMP(name, serverName) == 0)
+	ಹಿಂತಿರುಗಿ send_ಗಮ್ಯ_Local_Vim(str, is_ಅಭಿವ್ಯಕ್ತಿ, ಫಲಿತಾಂಶ);
 
-    channel = socketserver_get_channel(name, silent, NULL);
-    if (channel == NULL)
-	return -1;
+    channel = socketserver_get_channel(name, silent, ಖಾಲಿ);
+    ಆದರೆ (channel == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ -1;
 
     dict = dict_alloc();
-    if (dict == NULL)
-	goto exit;
+    ಆದರೆ (dict == ಖಾಲಿ)
+	ಹೋಗು ನಿರ್ಗಮಿಸು;
 
-    dict_add_string(dict, "type", (char_u *)(is_expr ? "expr" : "keystrokes"));
-    dict_add_string(dict, "str", str);
+    dict_ಕೂಡಿಸು_string(dict, "type", (char_u *)(is_ಅಭಿವ್ಯಕ್ತಿ ? "expr" : "keystrokes"));
+    dict_ಕೂಡಿಸು_string(dict, "str", str);
 
     // Tell server who we are so it can save our socket path internally for
     // later use with server2client. Only do this if we are actually a server.
@@ -1123,164 +1123,164 @@ socketserver_send(
     // case, we add "wait" to the JSON message set to true, so that the server
     // will create an internal address for our connection to it.  This is
     // only used for --remote-wait, not exposed to user.
-    if (server_address != NULL)
-	dict_add_string(dict, "sender", server_address);
-    else if (ch != NULL)
-	dict_add_bool(dict, "wait", true);
+    ಆದರೆ (server_ವಿಳಾಸ != ಖಾಲಿ)
+	dict_ಕೂಡಿಸು_string(dict, "sender", server_ವಿಳಾಸ);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ch != ಖಾಲಿ)
+	dict_ಕೂಡಿಸು_bool(dict, "wait", true);
 
-    if (socketserver_send_message(channel, dict, "socketserver_send", true)
+    ಆದರೆ (socketserver_send_ಸಂದೇಶ(channel, dict, "socketserver_send", true)
 	    == FAIL)
     {
-	semsg(_(e_unable_to_send_to_str), name);
+	semsg(_(e_unable_ಗಮ್ಯ_send_ಗಮ್ಯ_str), name);
 	dict_unref(dict);
-	goto exit;
+	ಹೋಗು ನಿರ್ಗಮಿಸು;
     }
     dict_unref(dict);
 
-    if (!is_expr)
+    ಆದರೆ (!is_ಅಭಿವ್ಯಕ್ತಿ)
     {
 	// Exit, we aren't waiting for a response
 	rcode = 0;
 
-	if (ch != NULL)
+	ಆದರೆ (ch != ಖಾಲಿ)
 	{
 	    *ch = channel;
 
-	    channel->ch_ss_next = client_channels;
-	    channel->ch_ss_prev = NULL;
+	    channel->ch_ss_ಮುಂದಿನ = client_channels;
+	    channel->ch_ss_prev = ಖಾಲಿ;
 	    channel->ch_ss_close_cb = socketserver_client_close;
 	    client_channels = channel;
 
-	    return rcode;
+	    ಹಿಂತಿರುಗಿ rcode;
 	}
-	goto exit;
+	ಹೋಗು ನಿರ್ಗಮಿಸು;
     }
 
-    if (timeout == 0)
+    ಆದರೆ (timeout == 0)
 	timeout = 1000;
 
     // To handle recursive calls, we must handle any socketserver channels as
     // well.
-    while (socketserver_wait(channel, timeout) == OK)
-	if (socketserver_get_message(channel, &resp_tv) == OK)
-	    break;
+    ಆಗ (socketserver_wait(channel, timeout) == OK)
+	ಆದರೆ (socketserver_get_ಸಂದೇಶ(channel, &resp_tv) == OK)
+	    ನಿಲ್ಲಿಸು;
 
-    if (resp_tv == NULL)
+    ಆದರೆ (resp_tv == ಖಾಲಿ)
     {
 	// Channel closed, don't make this an error, because this may be the
 	// result of the expression (e.g. --remote-expr 'execute("qa!")')
 	rcode = 0;
-	goto exit;
+	ಹೋಗು ನಿರ್ಗಮಿಸು;
     }
 
     dict = resp_tv->vval.v_dict;
 
-    di = dict_find(dict, (char_u *)"type", -1);
-    if (di == NULL || di->di_tv.v_type != VAR_STRING ||
+    di = dict_ಕಂಡುಹಿಡಿ(dict, (char_u *)"type", -1);
+    ಆದರೆ (di == ಖಾಲಿ || di->di_tv.v_type != VAR_STRING ||
 	    (STRCMP(di->di_tv.vval.v_string, "reply") != 0
 	     && STRCMP(di->di_tv.vval.v_string, "ver") != 0))
     {
-	ch_error(NULL, "socketserver: unknown reply type");
+	ch_error(ಖಾಲಿ, "socketserver: unknown reply type");
 	free_tv(resp_tv);
-	goto exit;
+	ಹೋಗು ನಿರ್ಗಮಿಸು;
     }
 
-    if (STRCMP(di->di_tv.vval.v_string, "ver") == 0)
+    ಆದರೆ (STRCMP(di->di_tv.vval.v_string, "ver") == 0)
     {
-	emsg(_(e_socket_server_version_mismatch));
+	emsg(_(e_socket_server_ಆವೃತ್ತಿ_mismatch));
 	free_tv(resp_tv);
-	goto exit;
+	ಹೋಗು ನಿರ್ಗಮಿಸು;
     }
 
-    if (result != NULL)
+    ಆದರೆ (ಫಲಿತಾಂಶ != ಖಾಲಿ)
     {
-	di = dict_find(dict, (char_u *)"str", -1);
-	if (di != NULL && di->di_tv.v_type == VAR_STRING)
-	    *result = vim_strsave(di->di_tv.vval.v_string);
-	else
+	di = dict_ಕಂಡುಹಿಡಿ(dict, (char_u *)"str", -1);
+	ಆದರೆ (di != ಖಾಲಿ && di->di_tv.v_type == VAR_STRING)
+	    *ಫಲಿತಾಂಶ = vim_strsave(di->di_tv.vval.v_string);
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    free_tv(resp_tv);
-	    goto exit;
+	    ಹೋಗು ನಿರ್ಗಮಿಸು;
 	}
     }
 
-    di = dict_find(dict, (char_u *)"code", -1);
-    if (di != NULL && di->di_tv.v_type == VAR_NUMBER)
-	rcode = di->di_tv.vval.v_number;
+    di = dict_ಕಂಡುಹಿಡಿ(dict, (char_u *)"code", -1);
+    ಆದರೆ (di != ಖಾಲಿ && di->di_tv.v_type == VAR_ಸಂಖ್ಯೆ)
+	rcode = di->di_tv.vval.v_ಸಂಖ್ಯೆ;
 
     free_tv(resp_tv);
 
-exit:
+ನಿರ್ಗಮಿಸು:
     channel_close(channel, false);
     channel_clear(channel);
-    return rcode;
+    ಹಿಂತಿರುಗಿ rcode;
 }
 
-   static ss_reply_T *
-socketserver_get_reply(char_u *sender, int *index)
+   ಸ್ಥಿರ ss_ಉತ್ತರ_T *
+socketserver_get_ಉತ್ತರ(char_u *sender, ಪೂರ್ಣಾಂಕ *ಸೂಚ್ಯಂಕ)
 {
-    for (int i = 0; i < server_replies.ga_len; i++)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < server_replies.ga_len; i++)
     {
-	ss_reply_T *reply = ((ss_reply_T *)server_replies.ga_data) + i;
+	ss_ಉತ್ತರ_T *ಉತ್ತರ = ((ss_ಉತ್ತರ_T *)server_replies.ga_ದತ್ತಾಂಶ) + i;
 
-	if (STRCMP(reply->sender, sender) == 0)
+	ಆದರೆ (STRCMP(ಉತ್ತರ->sender, sender) == 0)
 	{
-	    if (index != NULL)
-		*index = i;
-	    return reply;
+	    ಆದರೆ (ಸೂಚ್ಯಂಕ != ಖಾಲಿ)
+		*ಸೂಚ್ಯಂಕ = i;
+	    ಹಿಂತಿರುಗಿ ಉತ್ತರ;
 	}
     }
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Add reply to list of replies. Returns a pointer to the ss_reply_T that was
  * initialized or was found.
  */
-    static ss_reply_T *
-socketserver_add_reply(char_u *sender)
+    ಸ್ಥಿರ ss_ಉತ್ತರ_T *
+socketserver_ಕೂಡಿಸು_ಉತ್ತರ(char_u *sender)
 {
-    ss_reply_T *reply;
+    ss_ಉತ್ತರ_T *ಉತ್ತರ;
 
-    if (server_replies.ga_growsize == 0)
-	ga_init2(&server_replies, sizeof(ss_reply_T), 1);
+    ಆದರೆ (server_replies.ga_growsize == 0)
+	ga_init2(&server_replies, ಗಾತ್ರ(ss_ಉತ್ತರ_T), 1);
 
-    reply = socketserver_get_reply(sender, NULL);
+    ಉತ್ತರ = socketserver_get_ಉತ್ತರ(sender, ಖಾಲಿ);
 
-    if (reply == NULL && ga_grow(&server_replies, 1) == OK)
+    ಆದರೆ (ಉತ್ತರ == ಖಾಲಿ && ga_grow(&server_replies, 1) == OK)
     {
-	reply = ((ss_reply_T *)server_replies.ga_data) + server_replies.ga_len++;
+	ಉತ್ತರ = ((ss_ಉತ್ತರ_T *)server_replies.ga_ದತ್ತಾಂಶ) + server_replies.ga_len++;
 
-	reply->sender = vim_strsave(sender);
+	ಉತ್ತರ->sender = vim_strsave(sender);
 
-	if (reply->sender == NULL)
-	    return NULL;
+	ಆದರೆ (ಉತ್ತರ->sender == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-	ga_init2(&reply->strings, sizeof(char_u *), 5);
+	ga_init2(&ಉತ್ತರ->ಅಕ್ಷರಸರಣಿಗಳು, ಗಾತ್ರ(char_u *), 5);
     }
 
-    return reply;
+    ಹಿಂತಿರುಗಿ ಉತ್ತರ;
 }
 
-    static void
-socketserver_remove_reply(char_u *sender)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+socketserver_remove_ಉತ್ತರ(char_u *sender)
 {
-    int index;
-    ss_reply_T *reply = socketserver_get_reply(sender, &index);
+    ಪೂರ್ಣಾಂಕ ಸೂಚ್ಯಂಕ;
+    ss_ಉತ್ತರ_T *ಉತ್ತರ = socketserver_get_ಉತ್ತರ(sender, &ಸೂಚ್ಯಂಕ);
 
-    if (reply != NULL)
+    ಆದರೆ (ಉತ್ತರ != ಖಾಲಿ)
     {
-	ss_reply_T  *arr = server_replies.ga_data;
-	int	    len	 = server_replies.ga_len;
+	ss_ಉತ್ತರ_T  *arr = server_replies.ga_ದತ್ತಾಂಶ;
+	ಪೂರ್ಣಾಂಕ	    len	 = server_replies.ga_len;
 
 	// Free strings
-	vim_free(reply->sender);
-	ga_clear_strings(&reply->strings);
+	vim_free(ಉತ್ತರ->sender);
+	ga_clear_ಅಕ್ಷರಸರಣಿಗಳು(&ಉತ್ತರ->ಅಕ್ಷರಸರಣಿಗಳು);
 
 	// Move all elements after the removed reply forward by one
-	if (len > 1)
-	    mch_memmove(arr + index, arr + index + 1,
-		    sizeof(ss_reply_T) * (len - index - 1));
+	ಆದರೆ (len > 1)
+	    mch_memmove(arr + ಸೂಚ್ಯಂಕ, arr + ಸೂಚ್ಯಂಕ + 1,
+		    ಗಾತ್ರ(ss_ಉತ್ತರ_T) * (len - ಸೂಚ್ಯಂಕ - 1));
 	server_replies.ga_len--;
     }
 }
@@ -1289,119 +1289,119 @@ socketserver_remove_reply(char_u *sender)
  * Send a string to "client" as a reply (notification). Returns OK on success
  * and FAIL on failure.
  */
-    int
-socketserver_send_reply(char_u *client, char_u *str)
+    ಪೂರ್ಣಾಂಕ
+socketserver_send_ಉತ್ತರ(char_u *client, char_u *str)
 {
     dict_T	*dict;
     channel_T	*channel;
-    int		ret = OK;
+    ಪೂರ್ಣಾಂಕ		ret = OK;
     bool	wait = false;
 
-    if (*client == NUL)
+    ಆದರೆ (*client == NUL)
     {
-	semsg(_(e_invalid_server_id_used_str), client);
-	return FAIL;
+	semsg(_(e_invalid_server_id_ಬಳಸಿದ_str), client);
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
-    if (server_channel == NULL || server_address == NULL)
+    ಆದರೆ (server_channel == ಖಾಲಿ || server_ವಿಳಾಸ == ಖಾಲಿ)
     {
 	emsg(_(e_socket_server_not_online));
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
     channel = socketserver_get_channel(client, false, &wait);
-    if (channel == NULL)
-	return FAIL;
+    ಆದರೆ (channel == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
     dict = dict_alloc();
-    if (dict == NULL)
+    ಆದರೆ (dict == ಖಾಲಿ)
     {
 	ret = FAIL;
-	goto exit;
+	ಹೋಗು ನಿರ್ಗಮಿಸು;
     }
 
-    dict_add_string(dict, "type", (char_u *)"notify");
-    dict_add_string(dict, "str", str);
-    if (server_address != NULL)
-	dict_add_string(dict, "sender", server_address);
+    dict_ಕೂಡಿಸು_string(dict, "type", (char_u *)"notify");
+    dict_ಕೂಡಿಸು_string(dict, "str", str);
+    ಆದರೆ (server_ವಿಳಾಸ != ಖಾಲಿ)
+	dict_ಕೂಡಿಸು_string(dict, "sender", server_ವಿಳಾಸ);
 
-    ret = socketserver_send_message(channel, dict,
+    ret = socketserver_send_ಸಂದೇಶ(channel, dict,
 	    "socketserver_send_reply", true);
     dict_unref(dict);
 
-exit:
+ನಿರ್ಗಮಿಸು:
     // Don't want to close the channel if client is referenced by channel ID.
     // This allows --remote-wait to work with multiple files.
-    if (!wait)
+    ಆದರೆ (!wait)
     {
 	channel_close(channel, false);
 	channel_clear(channel);
     }
 
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
 /*
  * Wait for reply from "client" and place result in "str". Returns OK on success
  * and FAIL on failure. Timeout is in milliseconds
  */
-    int
-socketserver_read_reply(
+    ಪೂರ್ಣಾಂಕ
+socketserver_read_ಉತ್ತರ(
 	char_u *client,
 	char_u **str,
-	int timeout,
+	ಪೂರ್ಣಾಂಕ timeout,
 	bool remotewait)
 {
-    ss_reply_T	*reply = NULL;
+    ss_ಉತ್ತರ_T	*ಉತ್ತರ = ಖಾಲಿ;
     char_u	*actual;
 
-    if (*client == NUL)
+    ಆದರೆ (*client == NUL)
     {
-	semsg(_(e_invalid_server_id_used_str), client);
-	return FAIL;
+	semsg(_(e_invalid_server_id_ಬಳಸಿದ_str), client);
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
-    if (!remotewait && (server_channel == NULL || server_address == NULL))
+    ಆದರೆ (!remotewait && (server_channel == ಖಾಲಿ || server_ವಿಳಾಸ == ಖಾಲಿ))
     {
 	emsg(_(e_socket_server_not_online));
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
-    actual = socketserver_get_path(client, false, false, false, NULL);
-    if (actual == NULL)
-	return FAIL;
+    actual = socketserver_get_ಮಾರ್ಗ(client, false, false, false, ಖಾಲಿ);
+    ಆದರೆ (actual == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    while (true)
+    ಆಗ (true)
     {
-	reply = socketserver_get_reply(actual, NULL);
-	if (reply != NULL)
-	    break;
-	if (socketserver_wait(NULL, timeout) == FAIL)
-	    break;
+	ಉತ್ತರ = socketserver_get_ಉತ್ತರ(actual, ಖಾಲಿ);
+	ಆದರೆ (ಉತ್ತರ != ಖಾಲಿ)
+	    ನಿಲ್ಲಿಸು;
+	ಆದರೆ (socketserver_wait(ಖಾಲಿ, timeout) == FAIL)
+	    ನಿಲ್ಲಿಸು;
     }
 
-    if (reply == NULL || reply->strings.ga_len == 0)
+    ಆದರೆ (ಉತ್ತರ == ಖಾಲಿ || ಉತ್ತರ->ಅಕ್ಷರಸರಣಿಗಳು.ga_len == 0)
     {
 	vim_free(actual);
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
     // Consume the string
-    *str = ((char_u **)reply->strings.ga_data)[0];
+    *str = ((char_u **)ಉತ್ತರ->ಅಕ್ಷರಸರಣಿಗಳು.ga_ದತ್ತಾಂಶ)[0];
 
-    if (reply->strings.ga_len > 1)
-	mch_memmove((char_u **)reply->strings.ga_data,
-		((char_u **)reply->strings.ga_data) + 1,
-		sizeof(char_u *) * (reply->strings.ga_len - 1));
-    reply->strings.ga_len--;
+    ಆದರೆ (ಉತ್ತರ->ಅಕ್ಷರಸರಣಿಗಳು.ga_len > 1)
+	mch_memmove((char_u **)ಉತ್ತರ->ಅಕ್ಷರಸರಣಿಗಳು.ga_ದತ್ತಾಂಶ,
+		((char_u **)ಉತ್ತರ->ಅಕ್ಷರಸರಣಿಗಳು.ga_ದತ್ತಾಂಶ) + 1,
+		ಗಾತ್ರ(char_u *) * (ಉತ್ತರ->ಅಕ್ಷರಸರಣಿಗಳು.ga_len - 1));
+    ಉತ್ತರ->ಅಕ್ಷರಸರಣಿಗಳು.ga_len--;
 
-    if (reply->strings.ga_len < 1)
+    ಆದರೆ (ಉತ್ತರ->ಅಕ್ಷರಸರಣಿಗಳು.ga_len < 1)
 	// Last string removed, remove the reply
-	socketserver_remove_reply(actual);
+	socketserver_remove_ಉತ್ತರ(actual);
 
     vim_free(actual);
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
@@ -1410,38 +1410,38 @@ socketserver_read_reply(
  * Returns 0 if otherwise and -1 on
  * error.
  */
-    int
-socketserver_peek_reply(char_u *sender, char_u **str)
+    ಪೂರ್ಣಾಂಕ
+socketserver_peek_ಉತ್ತರ(char_u *sender, char_u **str)
 {
-    ss_reply_T	*reply;
+    ss_ಉತ್ತರ_T	*ಉತ್ತರ;
     char_u	*actual;
 
-    if (*sender == NUL)
+    ಆದರೆ (*sender == NUL)
     {
-	semsg(_(e_invalid_server_id_used_str), sender);
-	return FAIL;
+	semsg(_(e_invalid_server_id_ಬಳಸಿದ_str), sender);
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
-    if (server_channel == NULL || server_address == NULL)
+    ಆದರೆ (server_channel == ಖಾಲಿ || server_ವಿಳಾಸ == ಖಾಲಿ)
     {
 	emsg(_(e_socket_server_not_online));
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
-    actual = socketserver_get_path(sender, false, false, false, NULL);
-    if (actual == NULL)
-	return FAIL;
+    actual = socketserver_get_ಮಾರ್ಗ(sender, false, false, false, ಖಾಲಿ);
+    ಆದರೆ (actual == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    reply = socketserver_get_reply(actual, NULL);
+    ಉತ್ತರ = socketserver_get_ಉತ್ತರ(actual, ಖಾಲಿ);
     vim_free(actual);
 
-    if (reply != NULL && reply->strings.ga_len > 0)
+    ಆದರೆ (ಉತ್ತರ != ಖಾಲಿ && ಉತ್ತರ->ಅಕ್ಷರಸರಣಿಗಳು.ga_len > 0)
     {
-	if (str != NULL)
-	    *str = ((char_u **)reply->strings.ga_data)[0];
-	return 1;
+	ಆದರೆ (str != ಖಾಲಿ)
+	    *str = ((char_u **)ಉತ್ತರ->ಅಕ್ಷರಸರಣಿಗಳು.ga_ದತ್ತಾಂಶ)[0];
+	ಹಿಂತಿರುಗಿ 1;
     }
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-#endif // FEAT_SOCKETSERVER
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_SOCKETSERVER

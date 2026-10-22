@@ -42,8 +42,8 @@
  * Lorens Younes (d93-hyo@nada.kth.se) 4/96
  */
 
-#ifndef XPM_h
-#define XPM_h
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ XPM_h
+#ವ್ಯಾಖ್ಯಾನಿಸು XPM_h
 
 /*
  * first some identification numbers:
@@ -57,41 +57,41 @@
  *
  * Then the XpmIncludeVersion number is built from these numbers.
  */
-#define XpmFormat 3
-#define XpmVersion 4
-#define XpmRevision 11
-#define XpmIncludeVersion ((XpmFormat * 100 + XpmVersion) * 100 + XpmRevision)
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmFormat 3
+#ವ್ಯಾಖ್ಯಾನಿಸು Xpm_ಆವೃತ್ತಿ 4
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmRevision 11
+#ವ್ಯಾಖ್ಯಾನಿಸು Xpm_Include_ಆವೃತ್ತಿ ((XpmFormat * 100 + Xpm_ಆವೃತ್ತಿ) * 100 + XpmRevision)
 
-#ifndef XPM_NUMBERS
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ XPM_NUMBERS
 
-#ifdef FOR_MSW
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FOR_MSW
 # define SYSV			/* uses memcpy string.h etc. */
 # include <malloc.h>
 # include "simx.h"		/* defines some X stuff using MSW types */
-#define NEED_STRCASECMP		/* at least for MSVC++ */
-#else /* FOR_MSW */
+#ವ್ಯಾಖ್ಯಾನಿಸು NEED_STRCASECMP		/* at least for MSVC++ */
+#ಇಲ್ಲದಿದ್ದರೆ /* FOR_MSW */
 # ifdef AMIGA
 #  include "amigax.h"
-# else /* not AMIGA */
+# ಇಲ್ಲದಿದ್ದರೆ /* not AMIGA */
 #  include <X11/Xlib.h>
 #  include <X11/Xutil.h>
 # endif /* not AMIGA */
-#endif /* FOR_MSW */
+#ಆದರೆ_ಅಂತ್ಯ /* FOR_MSW */
 
 /* let's define Pixel if it is not done yet */
-#if ! defined(_XtIntrinsic_h) && ! defined(PIXEL_ALREADY_TYPEDEFED)
-typedef unsigned long Pixel;	/* Index into colormap */
+#ಆದರೆ ! defined(_XtIntrinsic_h) && ! defined(PIXEL_ALREADY_TYPEDEFED)
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ Pixel;	/* Index into colormap */
 # define PIXEL_ALREADY_TYPEDEFED
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /* make sure we know whether function prototypes are needed or not */
-#ifndef NeedFunctionPrototypes
-# if defined(__STDC__) || defined(__cplusplus) || defined(c_plusplus)
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ NeedFunctionPrototypes
+# ಆದರೆ defined(__STDC__) || defined(__cplusplus) || defined(c_plusplus)
 #  define NeedFunctionPrototypes 1
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  define NeedFunctionPrototypes 0
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 
 /* Return ErrorStatus codes:
@@ -100,402 +100,402 @@ typedef unsigned long Pixel;	/* Index into colormap */
  * negative if failure
  */
 
-#define XpmColorError    1
-#define XpmSuccess       0
-#define XpmOpenFailed   -1
-#define XpmFileInvalid  -2
-#define XpmNoMemory     -3
-#define XpmColorFailed  -4
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmColorError    1
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmSuccess       0
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmOpenFailed   -1
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmFileInvalid  -2
+#ವ್ಯಾಖ್ಯಾನಿಸು Xpm_No_ಸ್ಮರಣೆ     -3
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmColorFailed  -4
 
-typedef struct {
-    char *name;			/* Symbolic color name */
-    char *value;		/* Color value */
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+    ಅಕ್ಷರ *name;			/* Symbolic color name */
+    ಅಕ್ಷರ *ಮೌಲ್ಯ;		/* Color value */
     Pixel pixel;		/* Color pixel */
-}      XpmColorSymbol;
+}      Xpm_Color_ಚಿಹ್ನೆ;
 
-typedef struct {
-    char *name;			/* name of the extension */
-    unsigned int nlines;	/* number of lines in this extension */
-    char **lines;		/* pointer to the extension array of strings */
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+    ಅಕ್ಷರ *name;			/* name of the extension */
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ nlines;	/* number of lines in this extension */
+    ಅಕ್ಷರ **ಸಾಲುಗಳು;		/* pointer to the extension array of strings */
 }      XpmExtension;
 
-typedef struct {
-    char *string;		/* characters string */
-    char *symbolic;		/* symbolic name */
-    char *m_color;		/* monochrom default */
-    char *g4_color;		/* 4 level grayscale default */
-    char *g_color;		/* other level grayscale default */
-    char *c_color;		/* color default */
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+    ಅಕ್ಷರ *string;		/* characters string */
+    ಅಕ್ಷರ *symbolic;		/* symbolic name */
+    ಅಕ್ಷರ *m_color;		/* monochrom default */
+    ಅಕ್ಷರ *g4_color;		/* 4 level grayscale default */
+    ಅಕ್ಷರ *g_color;		/* other level grayscale default */
+    ಅಕ್ಷರ *c_color;		/* color default */
 }      XpmColor;
 
-typedef struct {
-    unsigned int width;		/* image width */
-    unsigned int height;	/* image height */
-    unsigned int cpp;		/* number of characters per pixel */
-    unsigned int ncolors;	/* number of colors */
-    XpmColor *colorTable;	/* list of related colors */
-    unsigned int *data;		/* image data */
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ ಅಗಲ;		/* image width */
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ ಎತ್ತರ;	/* image height */
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ cpp;		/* number of characters per pixel */
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ ncolors;	/* number of colors */
+    XpmColor *color_ಕೋಷ್ಟಕ;	/* list of related colors */
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ *ದತ್ತಾಂಶ;		/* image data */
 }      XpmImage;
 
-typedef struct {
-    unsigned long valuemask;	/* Specifies which attributes are defined */
-    char *hints_cmt;		/* Comment of the hints section */
-    char *colors_cmt;		/* Comment of the colors section */
-    char *pixels_cmt;		/* Comment of the pixels section */
-    unsigned int x_hotspot;	/* Returns the x hotspot's coordinate */
-    unsigned int y_hotspot;	/* Returns the y hotspot's coordinate */
-    unsigned int nextensions;	/* number of extensions */
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+    ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ valuemask;	/* Specifies which attributes are defined */
+    ಅಕ್ಷರ *hints_cmt;		/* Comment of the hints section */
+    ಅಕ್ಷರ *colors_cmt;		/* Comment of the colors section */
+    ಅಕ್ಷರ *pixels_cmt;		/* Comment of the pixels section */
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ x_hotspot;	/* Returns the x hotspot's coordinate */
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ y_hotspot;	/* Returns the y hotspot's coordinate */
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ nextensions;	/* number of extensions */
     XpmExtension *extensions;	/* pointer to array of extensions */
 }      XpmInfo;
 
-typedef int (*XpmAllocColorFunc)(
-#if NeedFunctionPrototypes
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಪೂರ್ಣಾಂಕ (*XpmAllocColorFunc)(
+#ಆದರೆ NeedFunctionPrototypes
     Display*			/* display */,
     Colormap			/* colormap */,
-    char*			/* colorname */,
+    ಅಕ್ಷರ*			/* colorname */,
     XColor*			/* xcolor */,
-    void*			/* closure */
-#endif
+    ಶೂನ್ಯ*			/*ಆವರಣ*/
+#ಆದರೆ_ಅಂತ್ಯ
 );
 
-typedef int (*XpmFreeColorsFunc)(
-#if NeedFunctionPrototypes
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಪೂರ್ಣಾಂಕ (*XpmFreeColorsFunc)(
+#ಆದರೆ NeedFunctionPrototypes
     Display*			/* display */,
     Colormap			/* colormap */,
     Pixel*			/* pixels */,
-    int				/* npixels */,
-    void*			/* closure */
-#endif
+    ಪೂರ್ಣಾಂಕ				/* npixels */,
+    ಶೂನ್ಯ*			/*ಆವರಣ*/
+#ಆದರೆ_ಅಂತ್ಯ
 );
 
-typedef struct {
-    unsigned long valuemask;		/* Specifies which attributes are
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+    ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ valuemask;		/* Specifies which attributes are
 					   defined */
 
     Visual *visual;			/* Specifies the visual to use */
     Colormap colormap;			/* Specifies the colormap to use */
-    unsigned int depth;			/* Specifies the depth */
-    unsigned int width;			/* Returns the width of the created
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ ಆಳ;			/* Specifies the depth */
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ ಅಗಲ;			/* Returns the width of the created
 					   pixmap */
-    unsigned int height;		/* Returns the height of the created
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ ಎತ್ತರ;		/* Returns the height of the created
 					   pixmap */
-    unsigned int x_hotspot;		/* Returns the x hotspot's
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ x_hotspot;		/* Returns the x hotspot's
 					   coordinate */
-    unsigned int y_hotspot;		/* Returns the y hotspot's
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ y_hotspot;		/* Returns the y hotspot's
 					   coordinate */
-    unsigned int cpp;			/* Specifies the number of char per
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ cpp;			/* Specifies the number of char per
 					   pixel */
     Pixel *pixels;			/* List of used color pixels */
-    unsigned int npixels;		/* Number of used pixels */
-    XpmColorSymbol *colorsymbols;	/* List of color symbols to override */
-    unsigned int numsymbols;		/* Number of symbols */
-    char *rgb_fname;			/* RGB text file name */
-    unsigned int nextensions;		/* Number of extensions */
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ npixels;		/* Number of used pixels */
+    Xpm_Color_ಚಿಹ್ನೆ *colorsymbols;	/* List of color symbols to override */
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ numsymbols;		/* Number of symbols */
+    ಅಕ್ಷರ *rgb_fname;			/* RGB text file name */
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ nextensions;		/* Number of extensions */
     XpmExtension *extensions;		/* List of extensions */
 
-    unsigned int ncolors;               /* Number of colors */
-    XpmColor *colorTable;               /* List of colors */
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ ncolors;               /* Number of colors */
+    XpmColor *color_ಕೋಷ್ಟಕ;               /* List of colors */
 /* 3.2 backward compatibility code */
-    char *hints_cmt;                    /* Comment of the hints section */
-    char *colors_cmt;                   /* Comment of the colors section */
-    char *pixels_cmt;                   /* Comment of the pixels section */
+    ಅಕ್ಷರ *hints_cmt;                    /* Comment of the hints section */
+    ಅಕ್ಷರ *colors_cmt;                   /* Comment of the colors section */
+    ಅಕ್ಷರ *pixels_cmt;                   /* Comment of the pixels section */
 /* end 3.2 bc */
-    unsigned int mask_pixel;            /* Color table index of transparent
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ ಮುಖವಾಡ_pixel;            /* Color table index of transparent
                                            color */
 
     /* Color Allocation Directives */
     Bool exactColors;			/* Only use exact colors for visual */
-    unsigned int closeness;		/* Allowable RGB deviation */
-    unsigned int red_closeness;		/* Allowable red deviation */
-    unsigned int green_closeness;	/* Allowable green deviation */
-    unsigned int blue_closeness;	/* Allowable blue deviation */
-    int color_key;			/* Use colors from this color set */
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ closeness;		/* Allowable RGB deviation */
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ red_closeness;		/* Allowable red deviation */
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ green_closeness;	/* Allowable green deviation */
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ blue_closeness;	/* Allowable blue deviation */
+    ಪೂರ್ಣಾಂಕ color_ಕೀಲಿ;			/* Use colors from this color set */
 
     Pixel *alloc_pixels;		/* Returns the list of alloc'ed color
 					   pixels */
-    int nalloc_pixels;			/* Returns the number of alloc'ed
+    ಪೂರ್ಣಾಂಕ nalloc_pixels;			/* Returns the number of alloc'ed
 					   color pixels */
 
     Bool alloc_close_colors;    	/* Specify whether close colors should
 					   be allocated using XAllocColor
 					   or not */
-    int bitmap_format;			/* Specify the format of 1bit depth
+    ಪೂರ್ಣಾಂಕ bitmap_format;			/* Specify the format of 1bit depth
 					   images: ZPixmap or XYBitmap */
 
     /* Color functions */
     XpmAllocColorFunc alloc_color;	/* Application color allocator */
     XpmFreeColorsFunc free_colors;	/* Application color de-allocator */
-    void *color_closure;		/* Application private data to pass to
+    ಶೂನ್ಯ *color_ಆವರಣ;		/* Application private data to pass to
 					   alloc_color and free_colors */
 
-}      XpmAttributes;
+}      Xpm_ಗುಣಲಕ್ಷಣಗಳು;
 
 /* XpmAttributes value masks bits */
-#define XpmVisual	   (1L<<0)
-#define XpmColormap	   (1L<<1)
-#define XpmDepth	   (1L<<2)
-#define XpmSize		   (1L<<3)	/* width & height */
-#define XpmHotspot	   (1L<<4)	/* x_hotspot & y_hotspot */
-#define XpmCharsPerPixel   (1L<<5)
-#define XpmColorSymbols	   (1L<<6)
-#define XpmRgbFilename	   (1L<<7)
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmVisual	   (1L<<0)
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmColormap	   (1L<<1)
+#ವ್ಯಾಖ್ಯಾನಿಸು Xpm_ಆಳ	   (1L<<2)
+#ವ್ಯಾಖ್ಯಾನಿಸು Xpm_ಗಾತ್ರ		   (1L<<3)	/* width & height */
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmHotspot	   (1L<<4)	/* x_hotspot & y_hotspot */
+#ವ್ಯಾಖ್ಯಾನಿಸು Xpm_Chars_ಪ್ರತಿ_Pixel   (1L<<5)
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmColorSymbols	   (1L<<6)
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmRgbFilename	   (1L<<7)
 /* 3.2 backward compatibility code */
-#define XpmInfos	   (1L<<8)
-#define XpmReturnInfos	   XpmInfos
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmInfos	   (1L<<8)
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmReturnInfos	   XpmInfos
 /* end 3.2 bc */
-#define XpmReturnPixels	   (1L<<9)
-#define XpmExtensions      (1L<<10)
-#define XpmReturnExtensions XpmExtensions
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmReturnPixels	   (1L<<9)
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmExtensions      (1L<<10)
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmReturnExtensions XpmExtensions
 
-#define XpmExactColors     (1L<<11)
-#define XpmCloseness	   (1L<<12)
-#define XpmRGBCloseness	   (1L<<13)
-#define XpmColorKey	   (1L<<14)
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmExactColors     (1L<<11)
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmCloseness	   (1L<<12)
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmRGBCloseness	   (1L<<13)
+#ವ್ಯಾಖ್ಯಾನಿಸು Xpm_Color_ಕೀಲಿ	   (1L<<14)
 
-#define XpmColorTable      (1L<<15)
-#define XpmReturnColorTable XpmColorTable
+#ವ್ಯಾಖ್ಯಾನಿಸು Xpm_Color_ಕೋಷ್ಟಕ      (1L<<15)
+#ವ್ಯಾಖ್ಯಾನಿಸು Xpm_Return_Color_ಕೋಷ್ಟಕ Xpm_Color_ಕೋಷ್ಟಕ
 
-#define XpmReturnAllocPixels (1L<<16)
-#define XpmAllocCloseColors (1L<<17)
-#define XpmBitmapFormat    (1L<<18)
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmReturnAllocPixels (1L<<16)
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmAllocCloseColors (1L<<17)
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmBitmapFormat    (1L<<18)
 
-#define XpmAllocColor      (1L<<19)
-#define XpmFreeColors      (1L<<20)
-#define XpmColorClosure    (1L<<21)
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmAllocColor      (1L<<19)
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmFreeColors      (1L<<20)
+#ವ್ಯಾಖ್ಯಾನಿಸು Xpm_Color_ಆವರಣ    (1L<<21)
 
 
 /* XpmInfo value masks bits */
-#define XpmComments        XpmInfos
-#define XpmReturnComments  XpmComments
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmComments        XpmInfos
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmReturnComments  XpmComments
 
 /* XpmAttributes mask_pixel value when there is no mask */
-#ifndef FOR_MSW
-#define XpmUndefPixel 0x80000000
-#else
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FOR_MSW
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmUndefPixel 0x80000000
+#ಇಲ್ಲದಿದ್ದರೆ
 /* int is only 16 bit for MSW */
-#define XpmUndefPixel 0x8000
-#endif
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmUndefPixel 0x8000
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * color keys for visual type, they must fit along with the number key of
  * each related element in xpmColorKeys[] defined in XpmI.h
  */
-#define XPM_MONO	2
-#define XPM_GREY4	3
-#define XPM_GRAY4	3
-#define XPM_GREY 	4
-#define XPM_GRAY 	4
-#define XPM_COLOR	5
+#ವ್ಯಾಖ್ಯಾನಿಸು XPM_MONO	2
+#ವ್ಯಾಖ್ಯಾನಿಸು XPM_GREY4	3
+#ವ್ಯಾಖ್ಯಾನಿಸು XPM_GRAY4	3
+#ವ್ಯಾಖ್ಯಾನಿಸು XPM_GREY 	4
+#ವ್ಯಾಖ್ಯಾನಿಸು XPM_ಬೂದು 	4
+#ವ್ಯಾಖ್ಯಾನಿಸು XPM_COLOR	5
 
 
 /* macros for forward declarations of functions with prototypes */
-#if NeedFunctionPrototypes
-#define FUNC(f, t, p) extern t f p
-#define LFUNC(f, t, p) static t f p
-#else
-#define FUNC(f, t, p) extern t f()
-#define LFUNC(f, t, p) static t f()
-#endif
+#ಆದರೆ NeedFunctionPrototypes
+#ವ್ಯಾಖ್ಯಾನಿಸು FUNC(f, t, p) ಬಾಹ್ಯ t f p
+#ವ್ಯಾಖ್ಯಾನಿಸು LFUNC(f, t, p) ಸ್ಥಿರ t f p
+#ಇಲ್ಲದಿದ್ದರೆ
+#ವ್ಯಾಖ್ಯಾನಿಸು FUNC(f, t, p) ಬಾಹ್ಯ t f()
+#ವ್ಯಾಖ್ಯಾನಿಸು LFUNC(f, t, p) ಸ್ಥಿರ t f()
+#ಆದರೆ_ಅಂತ್ಯ
 
 
 /*
  * functions declarations
  */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ __cplusplus
+ಬಾಹ್ಯ "C" {
+#ಆದರೆ_ಅಂತ್ಯ
 
 /* FOR_MSW, all ..Pixmap.. are excluded, only the ..XImage.. are used */
 /* Same for Amiga! */
 
-#if !defined(FOR_MSW) && !defined(AMIGA)
-    FUNC(XpmCreatePixmapFromData, int, (Display *display,
+#ಆದರೆ !defined(FOR_MSW) && !defined(AMIGA)
+    FUNC(Xpm_Create_Pixmap_From_ದತ್ತಾಂಶ, ಪೂರ್ಣಾಂಕ, (Display *display,
 					Drawable d,
-					char **data,
+					ಅಕ್ಷರ **ದತ್ತಾಂಶ,
 					Pixmap *pixmap_return,
 					Pixmap *shapemask_return,
-					XpmAttributes *attributes));
+					Xpm_ಗುಣಲಕ್ಷಣಗಳು *ಗುಣಲಕ್ಷಣಗಳು));
 
-    FUNC(XpmCreateDataFromPixmap, int, (Display *display,
-					char ***data_return,
+    FUNC(Xpm_Create_ದತ್ತಾಂಶ_From_Pixmap, ಪೂರ್ಣಾಂಕ, (Display *display,
+					ಅಕ್ಷರ ***ದತ್ತಾಂಶ_return,
 					Pixmap pixmap,
 					Pixmap shapemask,
-					XpmAttributes *attributes));
+					Xpm_ಗುಣಲಕ್ಷಣಗಳು *ಗುಣಲಕ್ಷಣಗಳು));
 
-    FUNC(XpmReadFileToPixmap, int, (Display *display,
+    FUNC(Xpm_Read_File_ಗಮ್ಯ_Pixmap, ಪೂರ್ಣಾಂಕ, (Display *display,
 				    Drawable d,
-				    char *filename,
+				    ಅಕ್ಷರ *filename,
 				    Pixmap *pixmap_return,
 				    Pixmap *shapemask_return,
-				    XpmAttributes *attributes));
+				    Xpm_ಗುಣಲಕ್ಷಣಗಳು *ಗುಣಲಕ್ಷಣಗಳು));
 
-    FUNC(XpmWriteFileFromPixmap, int, (Display *display,
-				       char *filename,
+    FUNC(XpmWriteFileFromPixmap, ಪೂರ್ಣಾಂಕ, (Display *display,
+				       ಅಕ್ಷರ *filename,
 				       Pixmap pixmap,
 				       Pixmap shapemask,
-				       XpmAttributes *attributes));
-#endif
+				       Xpm_ಗುಣಲಕ್ಷಣಗಳು *ಗುಣಲಕ್ಷಣಗಳು));
+#ಆದರೆ_ಅಂತ್ಯ
 
-    FUNC(XpmCreateImageFromData, int, (Display *display,
-				       char **data,
+    FUNC(Xpm_Create_Image_From_ದತ್ತಾಂಶ, ಪೂರ್ಣಾಂಕ, (Display *display,
+				       ಅಕ್ಷರ **ದತ್ತಾಂಶ,
 				       XImage **image_return,
 				       XImage **shapemask_return,
-				       XpmAttributes *attributes));
+				       Xpm_ಗುಣಲಕ್ಷಣಗಳು *ಗುಣಲಕ್ಷಣಗಳು));
 
-    FUNC(XpmCreateDataFromImage, int, (Display *display,
-				       char ***data_return,
+    FUNC(Xpm_Create_ದತ್ತಾಂಶ_From_Image, ಪೂರ್ಣಾಂಕ, (Display *display,
+				       ಅಕ್ಷರ ***ದತ್ತಾಂಶ_return,
 				       XImage *image,
 				       XImage *shapeimage,
-				       XpmAttributes *attributes));
+				       Xpm_ಗುಣಲಕ್ಷಣಗಳು *ಗುಣಲಕ್ಷಣಗಳು));
 
-    FUNC(XpmReadFileToImage, int, (Display *display,
-				   char *filename,
+    FUNC(Xpm_Read_File_ಗಮ್ಯ_Image, ಪೂರ್ಣಾಂಕ, (Display *display,
+				   ಅಕ್ಷರ *filename,
 				   XImage **image_return,
 				   XImage **shapeimage_return,
-				   XpmAttributes *attributes));
+				   Xpm_ಗುಣಲಕ್ಷಣಗಳು *ಗುಣಲಕ್ಷಣಗಳು));
 
-    FUNC(XpmWriteFileFromImage, int, (Display *display,
-				      char *filename,
+    FUNC(XpmWriteFileFromImage, ಪೂರ್ಣಾಂಕ, (Display *display,
+				      ಅಕ್ಷರ *filename,
 				      XImage *image,
 				      XImage *shapeimage,
-				      XpmAttributes *attributes));
+				      Xpm_ಗುಣಲಕ್ಷಣಗಳು *ಗುಣಲಕ್ಷಣಗಳು));
 
-    FUNC(XpmCreateImageFromBuffer, int, (Display *display,
-					 char *buffer,
+    FUNC(Xpm_Create_Image_From_ಬಫರ್, ಪೂರ್ಣಾಂಕ, (Display *display,
+					 ಅಕ್ಷರ *ಬಫರ್,
 					 XImage **image_return,
 					 XImage **shapemask_return,
-					 XpmAttributes *attributes));
-#if !defined(FOR_MSW) && !defined(AMIGA)
-    FUNC(XpmCreatePixmapFromBuffer, int, (Display *display,
+					 Xpm_ಗುಣಲಕ್ಷಣಗಳು *ಗುಣಲಕ್ಷಣಗಳು));
+#ಆದರೆ !defined(FOR_MSW) && !defined(AMIGA)
+    FUNC(Xpm_Create_Pixmap_From_ಬಫರ್, ಪೂರ್ಣಾಂಕ, (Display *display,
 					  Drawable d,
-					  char *buffer,
+					  ಅಕ್ಷರ *ಬಫರ್,
 					  Pixmap *pixmap_return,
 					  Pixmap *shapemask_return,
-					  XpmAttributes *attributes));
+					  Xpm_ಗುಣಲಕ್ಷಣಗಳು *ಗುಣಲಕ್ಷಣಗಳು));
 
-    FUNC(XpmCreateBufferFromImage, int, (Display *display,
-					 char **buffer_return,
+    FUNC(Xpm_Create_ಬಫರ್_From_Image, ಪೂರ್ಣಾಂಕ, (Display *display,
+					 ಅಕ್ಷರ **ಬಫರ್_return,
 					 XImage *image,
 					 XImage *shapeimage,
-					 XpmAttributes *attributes));
+					 Xpm_ಗುಣಲಕ್ಷಣಗಳು *ಗುಣಲಕ್ಷಣಗಳು));
 
-    FUNC(XpmCreateBufferFromPixmap, int, (Display *display,
-					  char **buffer_return,
+    FUNC(Xpm_Create_ಬಫರ್_From_Pixmap, ಪೂರ್ಣಾಂಕ, (Display *display,
+					  ಅಕ್ಷರ **ಬಫರ್_return,
 					  Pixmap pixmap,
 					  Pixmap shapemask,
-					  XpmAttributes *attributes));
-#endif
-    FUNC(XpmReadFileToBuffer, int, (char *filename, char **buffer_return));
-    FUNC(XpmWriteFileFromBuffer, int, (char *filename, char *buffer));
+					  Xpm_ಗುಣಲಕ್ಷಣಗಳು *ಗುಣಲಕ್ಷಣಗಳು));
+#ಆದರೆ_ಅಂತ್ಯ
+    FUNC(Xpm_Read_File_ಗಮ್ಯ_ಬಫರ್, ಪೂರ್ಣಾಂಕ, (ಅಕ್ಷರ *filename, ಅಕ್ಷರ **ಬಫರ್_return));
+    FUNC(Xpm_Write_File_From_ಬಫರ್, ಪೂರ್ಣಾಂಕ, (ಅಕ್ಷರ *filename, ಅಕ್ಷರ *ಬಫರ್));
 
-    FUNC(XpmReadFileToData, int, (char *filename, char ***data_return));
-    FUNC(XpmWriteFileFromData, int, (char *filename, char **data));
+    FUNC(Xpm_Read_File_ಗಮ್ಯ_ದತ್ತಾಂಶ, ಪೂರ್ಣಾಂಕ, (ಅಕ್ಷರ *filename, ಅಕ್ಷರ ***ದತ್ತಾಂಶ_return));
+    FUNC(Xpm_Write_File_From_ದತ್ತಾಂಶ, ಪೂರ್ಣಾಂಕ, (ಅಕ್ಷರ *filename, ಅಕ್ಷರ **ದತ್ತಾಂಶ));
 
-    FUNC(XpmAttributesSize, int, ());
-    FUNC(XpmFreeAttributes, void, (XpmAttributes *attributes));
-    FUNC(XpmFreeExtensions, void, (XpmExtension *extensions,
-				   int nextensions));
+    FUNC(Xpm_ಗುಣಲಕ್ಷಣಗಳು_ಗಾತ್ರ, ಪೂರ್ಣಾಂಕ, ());
+    FUNC(Xpm_Free_ಗುಣಲಕ್ಷಣಗಳು, ಶೂನ್ಯ, (Xpm_ಗುಣಲಕ್ಷಣಗಳು *ಗುಣಲಕ್ಷಣಗಳು));
+    FUNC(XpmFreeExtensions, ಶೂನ್ಯ, (XpmExtension *extensions,
+				   ಪೂರ್ಣಾಂಕ nextensions));
 
-    FUNC(XpmFreeXpmImage, void, (XpmImage *image));
-    FUNC(XpmFreeXpmInfo, void, (XpmInfo *info));
-    FUNC(XpmGetErrorString, char *, (int errcode));
-    FUNC(XpmLibraryVersion, int, ());
+    FUNC(XpmFreeXpmImage, ಶೂನ್ಯ, (XpmImage *image));
+    FUNC(XpmFreeXpmInfo, ಶೂನ್ಯ, (XpmInfo *info));
+    FUNC(XpmGetErrorString, ಅಕ್ಷರ *, (ಪೂರ್ಣಾಂಕ errcode));
+    FUNC(Xpm_Library_ಆವೃತ್ತಿ, ಪೂರ್ಣಾಂಕ, ());
 
     /* XpmImage functions */
-    FUNC(XpmReadFileToXpmImage, int, (char *filename,
+    FUNC(Xpm_Read_File_ಗಮ್ಯ_Xpm_Image, ಪೂರ್ಣಾಂಕ, (ಅಕ್ಷರ *filename,
 				      XpmImage *image,
 				      XpmInfo *info));
 
-    FUNC(XpmWriteFileFromXpmImage, int, (char *filename,
+    FUNC(XpmWriteFileFromXpmImage, ಪೂರ್ಣಾಂಕ, (ಅಕ್ಷರ *filename,
 					 XpmImage *image,
 					 XpmInfo *info));
-#if !defined(FOR_MSW) && !defined(AMIGA)
-    FUNC(XpmCreatePixmapFromXpmImage, int, (Display *display,
+#ಆದರೆ !defined(FOR_MSW) && !defined(AMIGA)
+    FUNC(XpmCreatePixmapFromXpmImage, ಪೂರ್ಣಾಂಕ, (Display *display,
 					    Drawable d,
 					    XpmImage *image,
 					    Pixmap *pixmap_return,
 					    Pixmap *shapemask_return,
-					    XpmAttributes *attributes));
-#endif
-    FUNC(XpmCreateImageFromXpmImage, int, (Display *display,
+					    Xpm_ಗುಣಲಕ್ಷಣಗಳು *ಗುಣಲಕ್ಷಣಗಳು));
+#ಆದರೆ_ಅಂತ್ಯ
+    FUNC(XpmCreateImageFromXpmImage, ಪೂರ್ಣಾಂಕ, (Display *display,
 					   XpmImage *image,
 					   XImage **image_return,
 					   XImage **shapeimage_return,
-					   XpmAttributes *attributes));
+					   Xpm_ಗುಣಲಕ್ಷಣಗಳು *ಗುಣಲಕ್ಷಣಗಳು));
 
-    FUNC(XpmCreateXpmImageFromImage, int, (Display *display,
+    FUNC(XpmCreateXpmImageFromImage, ಪೂರ್ಣಾಂಕ, (Display *display,
 					   XImage *image,
 					   XImage *shapeimage,
 					   XpmImage *xpmimage,
-					   XpmAttributes *attributes));
-#if !defined(FOR_MSW) && !defined(AMIGA)
-    FUNC(XpmCreateXpmImageFromPixmap, int, (Display *display,
+					   Xpm_ಗುಣಲಕ್ಷಣಗಳು *ಗುಣಲಕ್ಷಣಗಳು));
+#ಆದರೆ !defined(FOR_MSW) && !defined(AMIGA)
+    FUNC(XpmCreateXpmImageFromPixmap, ಪೂರ್ಣಾಂಕ, (Display *display,
 					    Pixmap pixmap,
 					    Pixmap shapemask,
 					    XpmImage *xpmimage,
-					    XpmAttributes *attributes));
-#endif
-    FUNC(XpmCreateDataFromXpmImage, int, (char ***data_return,
+					    Xpm_ಗುಣಲಕ್ಷಣಗಳು *ಗುಣಲಕ್ಷಣಗಳು));
+#ಆದರೆ_ಅಂತ್ಯ
+    FUNC(Xpm_Create_ದತ್ತಾಂಶ_From_Xpm_Image, ಪೂರ್ಣಾಂಕ, (ಅಕ್ಷರ ***ದತ್ತಾಂಶ_return,
 					  XpmImage *image,
 					  XpmInfo *info));
 
-    FUNC(XpmCreateXpmImageFromData, int, (char **data,
+    FUNC(Xpm_Create_Xpm_Image_From_ದತ್ತಾಂಶ, ಪೂರ್ಣಾಂಕ, (ಅಕ್ಷರ **ದತ್ತಾಂಶ,
 					  XpmImage *image,
 					  XpmInfo *info));
 
-    FUNC(XpmCreateXpmImageFromBuffer, int, (char *buffer,
+    FUNC(Xpm_Create_Xpm_Image_From_ಬಫರ್, ಪೂರ್ಣಾಂಕ, (ಅಕ್ಷರ *ಬಫರ್,
 					    XpmImage *image,
 					    XpmInfo *info));
 
-    FUNC(XpmCreateBufferFromXpmImage, int, (char **buffer_return,
+    FUNC(Xpm_Create_ಬಫರ್_From_Xpm_Image, ಪೂರ್ಣಾಂಕ, (ಅಕ್ಷರ **ಬಫರ್_return,
 					    XpmImage *image,
 					    XpmInfo *info));
 
-    FUNC(XpmGetParseError, int, (char *filename,
-				 int *linenum_return,
-				 int *charnum_return));
+    FUNC(XpmGetParseError, ಪೂರ್ಣಾಂಕ, (ಅಕ್ಷರ *filename,
+				 ಪೂರ್ಣಾಂಕ *linenum_return,
+				 ಪೂರ್ಣಾಂಕ *charnum_return));
 
-    FUNC(XpmFree, void, (void *ptr));
+    FUNC(XpmFree, ಶೂನ್ಯ, (ಶೂನ್ಯ *ptr));
 
-#ifdef __cplusplus
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ __cplusplus
 } /* for C++ V2.0 */
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 
 /* backward compatibility */
 
 /* for version 3.0c */
-#define XpmPixmapColorError  XpmColorError
-#define XpmPixmapSuccess     XpmSuccess
-#define XpmPixmapOpenFailed  XpmOpenFailed
-#define XpmPixmapFileInvalid XpmFileInvalid
-#define XpmPixmapNoMemory    XpmNoMemory
-#define XpmPixmapColorFailed XpmColorFailed
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmPixmapColorError  XpmColorError
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmPixmapSuccess     XpmSuccess
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmPixmapOpenFailed  XpmOpenFailed
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmPixmapFileInvalid XpmFileInvalid
+#ವ್ಯಾಖ್ಯಾನಿಸು Xpm_Pixmap_No_ಸ್ಮರಣೆ    Xpm_No_ಸ್ಮರಣೆ
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmPixmapColorFailed XpmColorFailed
 
-#define XpmReadPixmapFile(dpy, d, file, pix, mask, att) \
-    XpmReadFileToPixmap(dpy, d, file, pix, mask, att)
-#define XpmWritePixmapFile(dpy, file, pix, mask, att) \
-    XpmWriteFileFromPixmap(dpy, file, pix, mask, att)
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmReadPixmapFile(dpy, d, file, pix, ಮುಖವಾಡ, att) \
+    Xpm_Read_File_ಗಮ್ಯ_Pixmap(dpy, d, file, pix, ಮುಖವಾಡ, att)
+#ವ್ಯಾಖ್ಯಾನಿಸು XpmWritePixmapFile(dpy, file, pix, ಮುಖವಾಡ, att) \
+    XpmWriteFileFromPixmap(dpy, file, pix, ಮುಖವಾಡ, att)
 
 /* for version 3.0b */
-#define PixmapColorError  XpmColorError
-#define PixmapSuccess     XpmSuccess
-#define PixmapOpenFailed  XpmOpenFailed
-#define PixmapFileInvalid XpmFileInvalid
-#define PixmapNoMemory    XpmNoMemory
-#define PixmapColorFailed XpmColorFailed
+#ವ್ಯಾಖ್ಯಾನಿಸು PixmapColorError  XpmColorError
+#ವ್ಯಾಖ್ಯಾನಿಸು PixmapSuccess     XpmSuccess
+#ವ್ಯಾಖ್ಯಾನಿಸು PixmapOpenFailed  XpmOpenFailed
+#ವ್ಯಾಖ್ಯಾನಿಸು PixmapFileInvalid XpmFileInvalid
+#ವ್ಯಾಖ್ಯಾನಿಸು Pixmap_No_ಸ್ಮರಣೆ    Xpm_No_ಸ್ಮರಣೆ
+#ವ್ಯಾಖ್ಯಾನಿಸು PixmapColorFailed XpmColorFailed
 
-#define ColorSymbol XpmColorSymbol
+#ವ್ಯಾಖ್ಯಾನಿಸು Color_ಚಿಹ್ನೆ Xpm_Color_ಚಿಹ್ನೆ
 
-#define XReadPixmapFile(dpy, d, file, pix, mask, att) \
-    XpmReadFileToPixmap(dpy, d, file, pix, mask, att)
-#define XWritePixmapFile(dpy, file, pix, mask, att) \
-    XpmWriteFileFromPixmap(dpy, file, pix, mask, att)
-#define XCreatePixmapFromData(dpy, d, data, pix, mask, att) \
-    XpmCreatePixmapFromData(dpy, d, data, pix, mask, att)
-#define XCreateDataFromPixmap(dpy, data, pix, mask, att) \
-    XpmCreateDataFromPixmap(dpy, data, pix, mask, att)
+#ವ್ಯಾಖ್ಯಾನಿಸು XReadPixmapFile(dpy, d, file, pix, ಮುಖವಾಡ, att) \
+    Xpm_Read_File_ಗಮ್ಯ_Pixmap(dpy, d, file, pix, ಮುಖವಾಡ, att)
+#ವ್ಯಾಖ್ಯಾನಿಸು XWritePixmapFile(dpy, file, pix, ಮುಖವಾಡ, att) \
+    XpmWriteFileFromPixmap(dpy, file, pix, ಮುಖವಾಡ, att)
+#ವ್ಯಾಖ್ಯಾನಿಸು XCreate_Pixmap_From_ದತ್ತಾಂಶ(dpy, d, ದತ್ತಾಂಶ, pix, ಮುಖವಾಡ, att) \
+    Xpm_Create_Pixmap_From_ದತ್ತಾಂಶ(dpy, d, ದತ್ತಾಂಶ, pix, ಮುಖವಾಡ, att)
+#ವ್ಯಾಖ್ಯಾನಿಸು XCreate_ದತ್ತಾಂಶ_From_Pixmap(dpy, ದತ್ತಾಂಶ, pix, ಮುಖವಾಡ, att) \
+    Xpm_Create_ದತ್ತಾಂಶ_From_Pixmap(dpy, ದತ್ತಾಂಶ, pix, ಮುಖವಾಡ, att)
 
-#endif /* XPM_NUMBERS */
-#endif
+#ಆದರೆ_ಅಂತ್ಯ /* XPM_NUMBERS */
+#ಆದರೆ_ಅಂತ್ಯ

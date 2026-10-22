@@ -2,134 +2,134 @@
 
 # Used by Test_channel_dap_mode in test_channel.vim to test DAP functionality.
 
-import json
-import socket
-import threading
-import time
+ಆಮದು json
+ಆಮದು socket
+ಆಮದು threading
+ಆಮದು ಸಮಯ
 
-try:
-    import socketserver
-except ImportError:
-    import SocketServer as socketserver
+ಪ್ರಯತ್ನಿಸು:
+    ಆಮದು socketserver
+ಅಪವಾದ ImportError:
+    ಆಮದು SocketServer ಇವ socketserver
 
-def make_dap_message(obj):
+ವ್ಯಾಖ್ಯಾನ make_dap_ಸಂದೇಶ(obj):
     payload = json.dumps(obj).encode("utf-8")
-    header = f"Content-Length: {len(payload)}\r\n\r\n".encode("ascii")
-    return header + payload
+    ಶೀರ್ಷಿಕೆ = f"Content-Length: {len(payload)}\r\n\r\n".encode("ascii")
+    ಹಿಂತಿರುಗಿ ಶೀರ್ಷಿಕೆ + payload
 
 
-def parse_messages(buffer):
+ವ್ಯಾಖ್ಯಾನ parse_messages(ಬಫರ್):
     messages = []
 
-    while True:
-        hdr_end = buffer.find(b"\r\n\r\n")
-        if hdr_end == -1:
-            break
+    ಆಗ ನಿಜ:
+        hdr_ಕೊನೆ = ಬಫರ್.ಕಂಡುಹಿಡಿ(b"\r\n\r\n")
+        ಆದರೆ hdr_ಕೊನೆ == -1:
+            ನಿಲ್ಲಿಸು
 
-        header = buffer[:hdr_end].decode("ascii", errors="ignore")
-        content_length = None
+        ಶೀರ್ಷಿಕೆ = ಬಫರ್[:hdr_ಕೊನೆ].decode("ascii", errors="ignore")
+        content_ಉದ್ದಳತೆ = ಏನೂಇಲ್ಲ
 
-        for line in header.split("\r\n"):
-            if line.lower().startswith("content-length:"):
-                content_length = int(line.split(":")[1].strip())
+        ಗಾಗಿ ಸಾಲು ಒಳಗೆ ಶೀರ್ಷಿಕೆ.ವಿಭಜಿಸು("\r\n"):
+            ಆದರೆ ಸಾಲು.ಅಧೋ().startswith("content-length:"):
+                content_ಉದ್ದಳತೆ = ಪೂರ್ಣಾಂಕ(ಸಾಲು.ವಿಭಜಿಸು(":")[1].strip())
 
-        if content_length is None:
-            break
+        ಆದರೆ content_ಉದ್ದಳತೆ ಆಗಿರುವ ಏನೂಇಲ್ಲ:
+            ನಿಲ್ಲಿಸು
 
-        total_len = hdr_end + 4 + content_length
-        if len(buffer) < total_len:
-            break  # partial
+        ಒಟ್ಟು_len = hdr_ಕೊನೆ + 4 + content_ಉದ್ದಳತೆ
+        ಆದರೆ ಉದ್ದ(ಬಫರ್) < ಒಟ್ಟು_len:
+            ನಿಲ್ಲಿಸು  # partial
 
-        body = buffer[hdr_end + 4:total_len]
+        body = ಬಫರ್[hdr_ಕೊನೆ + 4:ಒಟ್ಟು_len]
         messages.append(json.loads(body.decode("utf-8")))
-        buffer = buffer[total_len:]
+        ಬಫರ್ = ಬಫರ್[ಒಟ್ಟು_len:]
 
-    return messages, buffer
+    ಹಿಂತಿರುಗಿ messages, ಬಫರ್
 
 
-class DAPHandler(socketserver.BaseRequestHandler):
+ವರ್ಗ DAPHandler(socketserver.ತಳ_Request_Handler):
 
-    def setup(self):
+    ವ್ಯಾಖ್ಯಾನ ಸಿದ್ಧತೆ(self):
         self.request.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         self.seq = 1  # server sequence counter
 
-    def send(self, obj):
+    ವ್ಯಾಖ್ಯಾನ send(self, obj):
         obj["seq"] = self.seq
         self.seq += 1
-        self.request.sendall(make_dap_message(obj))
+        self.request.sendall(make_dap_ಸಂದೇಶ(obj))
 
-    def send_response(self, request, body=None, success=True):
+    ವ್ಯಾಖ್ಯಾನ send_response(self, request, body=ಏನೂಇಲ್ಲ, success=ನಿಜ):
         self.send({
             "type": "response",
             "request_seq": request["seq"],
             "success": success,
             "command": request["command"],
-            "body": body or {}
+            "body": body ಅಥವಾ {}
         })
 
-    def send_event(self, event, body=None):
+    ವ್ಯಾಖ್ಯಾನ send_event(self, event, body=ಏನೂಇಲ್ಲ):
         self.send({
             "type": "event",
             "event": event,
-            "body": body or {}
+            "body": body ಅಥವಾ {}
         })
 
-    def handle_request(self, msg):
-        cmd = msg.get("command")
+    ವ್ಯಾಖ್ಯಾನ handle_request(self, ಸಂದೇಶ):
+        cmd = ಸಂದೇಶ.get("command")
 
-        if cmd == "initialize":
-            self.send_response(msg, {
-                "supportsConfigurationDoneRequest": True
+        ಆದರೆ cmd == "initialize":
+            self.send_response(ಸಂದೇಶ, {
+                "supportsConfigurationDoneRequest": ನಿಜ
             })
             self.send_event("initialized")
-        else:
-            self.send_response(msg)
+        ಇಲ್ಲದಿದ್ದರೆ:
+            self.send_response(ಸಂದೇಶ)
 
-        return True
+        ಹಿಂತಿರುಗಿ ನಿಜ
 
-    def handle(self):
-        buffer = b""
+    ವ್ಯಾಖ್ಯಾನ handle(self):
+        ಬಫರ್ = b""
 
-        while True:
-            data = self.request.recv(4096)
-            if not data:
-                break
+        ಆಗ ನಿಜ:
+            ದತ್ತಾಂಶ = self.request.recv(4096)
+            ಆದರೆ ಅಲ್ಲ ದತ್ತಾಂಶ:
+                ನಿಲ್ಲಿಸು
 
-            buffer += data
-            messages, buffer = parse_messages(buffer)
+            ಬಫರ್ += ದತ್ತಾಂಶ
+            messages, ಬಫರ್ = parse_messages(ಬಫರ್)
 
-            for msg in messages:
-                if msg.get("type") == "request":
-                    if not self.handle_request(msg):
-                        return
+            ಗಾಗಿ ಸಂದೇಶ ಒಳಗೆ messages:
+                ಆದರೆ ಸಂದೇಶ.get("type") == "request":
+                    ಆದರೆ ಅಲ್ಲ self.handle_request(ಸಂದೇಶ):
+                        ಹಿಂತಿರುಗಿ
 
 
-class ThreadedDAPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
-    allow_reuse_address = True
+ವರ್ಗ ThreadedDAPServer(socketserver.Threading_Mix_ಒಳ, socketserver.TCPServer):
+    allow_reuse_ವಿಳಾಸ = ನಿಜ
 
-def write_port_to_file(port, filename="Xportnr"):
-    with open(filename, "w") as f:
-        f.write(str(port))
+ವ್ಯಾಖ್ಯಾನ write_ಪೋರ್ಟ್_ಗಮ್ಯ_file(ಪೋರ್ಟ್, filename="Xportnr"):
+    ಜೊತೆ open(filename, "w") ಇವ f:
+        f.ಲಿಖ(str(ಪೋರ್ಟ್))
 
-def main():
+ವ್ಯಾಖ್ಯಾನ ಮುಖ್ಯ():
     server = ThreadedDAPServer(("localhost", 0), DAPHandler)
 
     # Get the actual assigned port
-    ip, assigned_port = server.server_address
+    ip, assigned_ಪೋರ್ಟ್ = server.server_ವಿಳಾಸ
 
     # Write port so client/test can read it
-    write_port_to_file(assigned_port)
+    write_ಪೋರ್ಟ್_ಗಮ್ಯ_file(assigned_ಪೋರ್ಟ್)
 
-    thread = threading.Thread(target=server.serve_forever)
-    thread.daemon = True
-    thread.start()
+    thread = threading.ಎಳೆ(ಗುರಿ=server.serve_forever)
+    thread.daemon = ನಿಜ
+    thread.ಆರಂಭ()
 
-    try:
-        while thread.is_alive():
+    ಪ್ರಯತ್ನಿಸು:
+        ಆಗ thread.is_alive():
             thread.join(1)
-    except KeyboardInterrupt:
+    ಅಪವಾದ Keyboard_ಅಡಚಣೆ:
         server.shutdown()
 
-if __name__ == "__main__":
-    main()
+ಆದರೆ __name__ == "__main__":
+    ಮುಖ್ಯ()
 

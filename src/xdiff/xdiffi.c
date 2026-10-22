@@ -20,22 +20,22 @@
  *
  */
 
-#include "xinclude.h"
+#ಅನ್ತರ್ಭಾವ "xinclude.h"
 
-static unsigned long get_hash(xdfile_t *xdf, long index)
+ಸ್ಥಿರ ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ get_hash(xdfile_t *xdf, ದೀರ್ಘ ಸೂಚ್ಯಂಕ)
 {
-	return xdf->recs[xdf->rindex[index]].ha;
+	ಹಿಂತಿರುಗಿ xdf->recs[xdf->rindex[ಸೂಚ್ಯಂಕ]].ha;
 }
 
-#define XDL_MAX_COST_MIN 256
-#define XDL_HEUR_MIN_COST 256
-#define XDL_LINE_MAX (long)((1UL << (CHAR_BIT * sizeof(long) - 1)) - 1)
-#define XDL_SNAKE_CNT 20
-#define XDL_K_HEUR 4
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_MAX_ವೆಚ್ಚ_MIN 256
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_HEUR_MIN_ವೆಚ್ಚ 256
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_ಸಾಲು_MAX (ದೀರ್ಘ)((1UL << (CHAR_BIT * ಗಾತ್ರ(ದೀರ್ಘ) - 1)) - 1)
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_SNAKE_CNT 20
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_K_HEUR 4
 
-typedef struct s_xdpsplit {
-	long i1, i2;
-	int min_lo, min_hi;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ s_xdpsplit {
+	ದೀರ್ಘ i1, i2;
+	ಪೂರ್ಣಾಂಕ min_lo, min_hi;
 } xdpsplit_t;
 
 /*
@@ -47,16 +47,16 @@ typedef struct s_xdpsplit {
  * using this algorithm, so a little bit of heuristic is needed to cut the
  * search and to return a suboptimal point.
  */
-static long xdl_split(xdfile_t *xdf1, long off1, long lim1,
-		      xdfile_t *xdf2, long off2, long lim2,
-		      long *kvdf, long *kvdb, int need_min, xdpsplit_t *spl,
+ಸ್ಥಿರ ದೀರ್ಘ xdl_ವಿಭಜಿಸು(xdfile_t *xdf1, ದೀರ್ಘ off1, ದೀರ್ಘ lim1,
+		      xdfile_t *xdf2, ದೀರ್ಘ off2, ದೀರ್ಘ lim2,
+		      ದೀರ್ಘ *kvdf, ದೀರ್ಘ *kvdb, ಪೂರ್ಣಾಂಕ need_min, xdpsplit_t *spl,
 		      xdalgoenv_t *xenv) {
-	long dmin = off1 - lim2, dmax = lim1 - off2;
-	long fmid = off1 - off2, bmid = lim1 - lim2;
-	long odd = (fmid - bmid) & 1;
-	long fmin = fmid, fmax = fmid;
-	long bmin = bmid, bmax = bmid;
-	long ec, d, i1, i2, prev1, best, dd, v, k;
+	ದೀರ್ಘ dmin = off1 - lim2, dmax = lim1 - off2;
+	ದೀರ್ಘ fmid = off1 - off2, bmid = lim1 - lim2;
+	ದೀರ್ಘ odd = (fmid - bmid) & 1;
+	ದೀರ್ಘ fmin = fmid, fmax = fmid;
+	ದೀರ್ಘ bmin = bmid, bmax = bmid;
+	ದೀರ್ಘ ec, d, i1, i2, prev1, ಉತ್ತಮ, dd, v, k;
 
 	/*
 	 * Set initial diagonal values for both forward and backward path.
@@ -64,8 +64,8 @@ static long xdl_split(xdfile_t *xdf1, long off1, long lim1,
 	kvdf[fmid] = off1;
 	kvdb[bmid] = lim1;
 
-	for (ec = 1;; ec++) {
-		int got_snake = 0;
+	ಗಾಗಿ (ec = 1;; ec++) {
+		ಪೂರ್ಣಾಂಕ got_snake = 0;
 
 		/*
 		 * We need to extend the diagonal "domain" by one. If the next
@@ -76,31 +76,31 @@ static long xdl_split(xdfile_t *xdf1, long off1, long lim1,
 		 * Also we initialize the external K value to -1 so that we can
 		 * avoid extra conditions in the check inside the core loop.
 		 */
-		if (fmin > dmin)
+		ಆದರೆ (fmin > dmin)
 			kvdf[--fmin - 1] = -1;
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 			++fmin;
-		if (fmax < dmax)
+		ಆದರೆ (fmax < dmax)
 			kvdf[++fmax + 1] = -1;
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 			--fmax;
 
-		for (d = fmax; d >= fmin; d -= 2) {
-			if (kvdf[d - 1] >= kvdf[d + 1])
+		ಗಾಗಿ (d = fmax; d >= fmin; d -= 2) {
+			ಆದರೆ (kvdf[d - 1] >= kvdf[d + 1])
 				i1 = kvdf[d - 1] + 1;
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 				i1 = kvdf[d + 1];
 			prev1 = i1;
 			i2 = i1 - d;
-			for (; i1 < lim1 && i2 < lim2 && get_hash(xdf1, i1) == get_hash(xdf2, i2); i1++, i2++);
-			if (i1 - prev1 > xenv->snake_cnt)
+			ಗಾಗಿ (; i1 < lim1 && i2 < lim2 && get_hash(xdf1, i1) == get_hash(xdf2, i2); i1++, i2++);
+			ಆದರೆ (i1 - prev1 > xenv->snake_cnt)
 				got_snake = 1;
 			kvdf[d] = i1;
-			if (odd && bmin <= d && d <= bmax && kvdb[d] <= i1) {
+			ಆದರೆ (odd && bmin <= d && d <= bmax && kvdb[d] <= i1) {
 				spl->i1 = i1;
 				spl->i2 = i2;
 				spl->min_lo = spl->min_hi = 1;
-				return ec;
+				ಹಿಂತಿರುಗಿ ec;
 			}
 		}
 
@@ -113,36 +113,36 @@ static long xdl_split(xdfile_t *xdf1, long off1, long lim1,
 		 * Also we initialize the external K value to -1 so that we can
 		 * avoid extra conditions in the check inside the core loop.
 		 */
-		if (bmin > dmin)
-			kvdb[--bmin - 1] = XDL_LINE_MAX;
-		else
+		ಆದರೆ (bmin > dmin)
+			kvdb[--bmin - 1] = XDL_ಸಾಲು_MAX;
+		ಇಲ್ಲದಿದ್ದರೆ
 			++bmin;
-		if (bmax < dmax)
-			kvdb[++bmax + 1] = XDL_LINE_MAX;
-		else
+		ಆದರೆ (bmax < dmax)
+			kvdb[++bmax + 1] = XDL_ಸಾಲು_MAX;
+		ಇಲ್ಲದಿದ್ದರೆ
 			--bmax;
 
-		for (d = bmax; d >= bmin; d -= 2) {
-			if (kvdb[d - 1] < kvdb[d + 1])
+		ಗಾಗಿ (d = bmax; d >= bmin; d -= 2) {
+			ಆದರೆ (kvdb[d - 1] < kvdb[d + 1])
 				i1 = kvdb[d - 1];
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 				i1 = kvdb[d + 1] - 1;
 			prev1 = i1;
 			i2 = i1 - d;
-			for (; i1 > off1 && i2 > off2 && get_hash(xdf1, i1 - 1) == get_hash(xdf2, i2 - 1); i1--, i2--);
-			if (prev1 - i1 > xenv->snake_cnt)
+			ಗಾಗಿ (; i1 > off1 && i2 > off2 && get_hash(xdf1, i1 - 1) == get_hash(xdf2, i2 - 1); i1--, i2--);
+			ಆದರೆ (prev1 - i1 > xenv->snake_cnt)
 				got_snake = 1;
 			kvdb[d] = i1;
-			if (!odd && fmin <= d && d <= fmax && i1 <= kvdf[d]) {
+			ಆದರೆ (!odd && fmin <= d && d <= fmax && i1 <= kvdf[d]) {
 				spl->i1 = i1;
 				spl->i2 = i2;
 				spl->min_lo = spl->min_hi = 1;
-				return ec;
+				ಹಿಂತಿರುಗಿ ec;
 			}
 		}
 
-		if (need_min)
-			continue;
+		ಆದರೆ (need_min)
+			ಮುಂದುವರಿ;
 
 		/*
 		 * If the edit cost is above the heuristic trigger and if
@@ -154,53 +154,53 @@ static long xdl_split(xdfile_t *xdf1, long off1, long lim1,
 		 * edit cost times a magic factor (XDL_K_HEUR) we consider
 		 * it interesting.
 		 */
-		if (got_snake && ec > xenv->heur_min) {
-			for (best = 0, d = fmax; d >= fmin; d -= 2) {
+		ಆದರೆ (got_snake && ec > xenv->heur_min) {
+			ಗಾಗಿ (ಉತ್ತಮ = 0, d = fmax; d >= fmin; d -= 2) {
 				dd = d > fmid ? d - fmid: fmid - d;
 				i1 = kvdf[d];
 				i2 = i1 - d;
 				v = (i1 - off1) + (i2 - off2) - dd;
 
-				if (v > XDL_K_HEUR * ec && v > best &&
+				ಆದರೆ (v > XDL_K_HEUR * ec && v > ಉತ್ತಮ &&
 				    off1 + xenv->snake_cnt <= i1 && i1 < lim1 &&
 				    off2 + xenv->snake_cnt <= i2 && i2 < lim2) {
-					for (k = 1; get_hash(xdf1, i1 - k) == get_hash(xdf2, i2 - k); k++)
-						if (k == xenv->snake_cnt) {
-							best = v;
+					ಗಾಗಿ (k = 1; get_hash(xdf1, i1 - k) == get_hash(xdf2, i2 - k); k++)
+						ಆದರೆ (k == xenv->snake_cnt) {
+							ಉತ್ತಮ = v;
 							spl->i1 = i1;
 							spl->i2 = i2;
-							break;
+							ನಿಲ್ಲಿಸು;
 						}
 				}
 			}
-			if (best > 0) {
+			ಆದರೆ (ಉತ್ತಮ > 0) {
 				spl->min_lo = 1;
 				spl->min_hi = 0;
-				return ec;
+				ಹಿಂತಿರುಗಿ ec;
 			}
 
-			for (best = 0, d = bmax; d >= bmin; d -= 2) {
+			ಗಾಗಿ (ಉತ್ತಮ = 0, d = bmax; d >= bmin; d -= 2) {
 				dd = d > bmid ? d - bmid: bmid - d;
 				i1 = kvdb[d];
 				i2 = i1 - d;
 				v = (lim1 - i1) + (lim2 - i2) - dd;
 
-				if (v > XDL_K_HEUR * ec && v > best &&
+				ಆದರೆ (v > XDL_K_HEUR * ec && v > ಉತ್ತಮ &&
 				    off1 < i1 && i1 <= lim1 - xenv->snake_cnt &&
 				    off2 < i2 && i2 <= lim2 - xenv->snake_cnt) {
-					for (k = 0; get_hash(xdf1, i1 + k) == get_hash(xdf2, i2 + k); k++)
-						if (k == xenv->snake_cnt - 1) {
-							best = v;
+					ಗಾಗಿ (k = 0; get_hash(xdf1, i1 + k) == get_hash(xdf2, i2 + k); k++)
+						ಆದರೆ (k == xenv->snake_cnt - 1) {
+							ಉತ್ತಮ = v;
 							spl->i1 = i1;
 							spl->i2 = i2;
-							break;
+							ನಿಲ್ಲಿಸು;
 						}
 				}
 			}
-			if (best > 0) {
+			ಆದರೆ (ಉತ್ತಮ > 0) {
 				spl->min_lo = 0;
 				spl->min_hi = 1;
-				return ec;
+				ಹಿಂತಿರುಗಿ ec;
 			}
 		}
 
@@ -209,49 +209,49 @@ static long xdl_split(xdfile_t *xdf1, long off1, long lim1,
 		 * collect the furthest reaching path using the (i1 + i2)
 		 * measure.
 		 */
-		if (ec >= xenv->mxcost) {
-			long fbest, fbest1, bbest, bbest1;
+		ಆದರೆ (ec >= xenv->mxcost) {
+			ದೀರ್ಘ fbest, fbest1, bbest, bbest1;
 
 			fbest = fbest1 = -1;
-			for (d = fmax; d >= fmin; d -= 2) {
+			ಗಾಗಿ (d = fmax; d >= fmin; d -= 2) {
 				i1 = XDL_MIN(kvdf[d], lim1);
 				i2 = i1 - d;
-				if (lim2 < i2) {
+				ಆದರೆ (lim2 < i2) {
 					i1 = lim2 + d;
 					i2 = lim2;
 				}
-				if (fbest < i1 + i2) {
+				ಆದರೆ (fbest < i1 + i2) {
 					fbest = i1 + i2;
 					fbest1 = i1;
 				}
 			}
 
-			bbest = bbest1 = XDL_LINE_MAX;
-			for (d = bmax; d >= bmin; d -= 2) {
+			bbest = bbest1 = XDL_ಸಾಲು_MAX;
+			ಗಾಗಿ (d = bmax; d >= bmin; d -= 2) {
 				i1 = XDL_MAX(off1, kvdb[d]);
 				i2 = i1 - d;
-				if (i2 < off2) {
+				ಆದರೆ (i2 < off2) {
 					i1 = off2 + d;
 					i2 = off2;
 				}
-				if (i1 + i2 < bbest) {
+				ಆದರೆ (i1 + i2 < bbest) {
 					bbest = i1 + i2;
 					bbest1 = i1;
 				}
 			}
 
-			if ((lim1 + lim2) - bbest < fbest - (off1 + off2)) {
+			ಆದರೆ ((lim1 + lim2) - bbest < fbest - (off1 + off2)) {
 				spl->i1 = fbest1;
 				spl->i2 = fbest - fbest1;
 				spl->min_lo = 1;
 				spl->min_hi = 0;
-			} else {
+			} ಇಲ್ಲದಿದ್ದರೆ {
 				spl->i1 = bbest1;
 				spl->i2 = bbest - bbest1;
 				spl->min_lo = 0;
 				spl->min_hi = 1;
 			}
-			return ec;
+			ಹಿಂತಿರುಗಿ ec;
 		}
 	}
 }
@@ -262,73 +262,73 @@ static long xdl_split(xdfile_t *xdf1, long off1, long lim1,
  * sub-boxes by calling the box splitting function. Note that the real job
  * (marking changed lines) is done in the two boundary reaching checks.
  */
-int xdl_recs_cmp(xdfile_t *xdf1, long off1, long lim1,
-		 xdfile_t *xdf2, long off2, long lim2,
-		 long *kvdf, long *kvdb, int need_min, xdalgoenv_t *xenv) {
+ಪೂರ್ಣಾಂಕ xdl_recs_cmp(xdfile_t *xdf1, ದೀರ್ಘ off1, ದೀರ್ಘ lim1,
+		 xdfile_t *xdf2, ದೀರ್ಘ off2, ದೀರ್ಘ lim2,
+		 ದೀರ್ಘ *kvdf, ದೀರ್ಘ *kvdb, ಪೂರ್ಣಾಂಕ need_min, xdalgoenv_t *xenv) {
 
 	/*
 	 * Shrink the box by walking through each diagonal snake (SW and NE).
 	 */
-	for (; off1 < lim1 && off2 < lim2 && get_hash(xdf1, off1) == get_hash(xdf2, off2); off1++, off2++);
-	for (; off1 < lim1 && off2 < lim2 && get_hash(xdf1, lim1 - 1) == get_hash(xdf2, lim2 - 1); lim1--, lim2--);
+	ಗಾಗಿ (; off1 < lim1 && off2 < lim2 && get_hash(xdf1, off1) == get_hash(xdf2, off2); off1++, off2++);
+	ಗಾಗಿ (; off1 < lim1 && off2 < lim2 && get_hash(xdf1, lim1 - 1) == get_hash(xdf2, lim2 - 1); lim1--, lim2--);
 
 	/*
 	 * If one dimension is empty, then all records on the other one must
 	 * be obviously changed.
 	 */
-	if (off1 == lim1) {
-		for (; off2 < lim2; off2++)
-			xdf2->changed[xdf2->rindex[off2]] = true;
-	} else if (off2 == lim2) {
-		for (; off1 < lim1; off1++)
-			xdf1->changed[xdf1->rindex[off1]] = true;
-	} else {
+	ಆದರೆ (off1 == lim1) {
+		ಗಾಗಿ (; off2 < lim2; off2++)
+			xdf2->ಬದಲಾಯಿತು[xdf2->rindex[off2]] = true;
+	} ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (off2 == lim2) {
+		ಗಾಗಿ (; off1 < lim1; off1++)
+			xdf1->ಬದಲಾಯಿತು[xdf1->rindex[off1]] = true;
+	} ಇಲ್ಲದಿದ್ದರೆ {
 		xdpsplit_t spl;
 		spl.i1 = spl.i2 = 0;
 
 		/*
 		 * Divide ...
 		 */
-		if (xdl_split(xdf1, off1, lim1, xdf2, off2, lim2, kvdf, kvdb,
+		ಆದರೆ (xdl_ವಿಭಜಿಸು(xdf1, off1, lim1, xdf2, off2, lim2, kvdf, kvdb,
 			      need_min, &spl, xenv) < 0) {
 
-			return -1;
+			ಹಿಂತಿರುಗಿ -1;
 		}
 
 		/*
 		 * ... et Impera.
 		 */
-		if (xdl_recs_cmp(xdf1, off1, spl.i1, xdf2, off2, spl.i2,
+		ಆದರೆ (xdl_recs_cmp(xdf1, off1, spl.i1, xdf2, off2, spl.i2,
 				 kvdf, kvdb, spl.min_lo, xenv) < 0 ||
 		    xdl_recs_cmp(xdf1, spl.i1, lim1, xdf2, spl.i2, lim2,
 				 kvdf, kvdb, spl.min_hi, xenv) < 0) {
 
-			return -1;
+			ಹಿಂತಿರುಗಿ -1;
 		}
 	}
 
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
 }
 
 
-int xdl_do_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
+ಪೂರ್ಣಾಂಕ xdl_do_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t ಸ್ಥಿರಾಂಕ *xpp,
 		xdfenv_t *xe) {
-	long ndiags;
-	long *kvd, *kvdf, *kvdb;
+	ದೀರ್ಘ ndiags;
+	ದೀರ್ಘ *kvd, *kvdf, *kvdb;
 	xdalgoenv_t xenv;
-	int res;
+	ಪೂರ್ಣಾಂಕ res;
 
-	if (xdl_prepare_env(mf1, mf2, xpp, xe) < 0)
-		return -1;
+	ಆದರೆ (xdl_prepare_env(mf1, mf2, xpp, xe) < 0)
+		ಹಿಂತಿರುಗಿ -1;
 
-	if (XDF_DIFF_ALG(xpp->flags) == XDF_PATIENCE_DIFF) {
+	ಆದರೆ (XDF_DIFF_ALG(xpp->flags) == XDF_PATIENCE_DIFF) {
 		res = xdl_do_patience_diff(xpp, xe);
-		goto out;
+		ಹೋಗು ಹೊರಹೋಗು;
 	}
 
-	if (XDF_DIFF_ALG(xpp->flags) == XDF_HISTOGRAM_DIFF) {
+	ಆದರೆ (XDF_DIFF_ALG(xpp->flags) == XDF_HISTOGRAM_DIFF) {
 		res = xdl_do_histogram_diff(xpp, xe);
-		goto out;
+		ಹೋಗು ಹೊರಹೋಗು;
 	}
 
 	/*
@@ -338,10 +338,10 @@ int xdl_do_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
 	 * One is to store the forward path and one to store the backward path.
 	 */
 	ndiags = xe->xdf1.nreff + xe->xdf2.nreff + 3;
-	if (!XDL_ALLOC_ARRAY(kvd, 2 * ndiags + 2)) {
+	ಆದರೆ (!XDL_ALLOC_ARRAY(kvd, 2 * ndiags + 2)) {
 
 		xdl_free_env(xe);
-		return -1;
+		ಹಿಂತಿರುಗಿ -1;
 	}
 	kvdf = kvd;
 	kvdb = kvdf + ndiags;
@@ -349,43 +349,43 @@ int xdl_do_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
 	kvdb += xe->xdf2.nreff + 1;
 
 	xenv.mxcost = xdl_bogosqrt(ndiags);
-	if (xenv.mxcost < XDL_MAX_COST_MIN)
-		xenv.mxcost = XDL_MAX_COST_MIN;
+	ಆದರೆ (xenv.mxcost < XDL_MAX_ವೆಚ್ಚ_MIN)
+		xenv.mxcost = XDL_MAX_ವೆಚ್ಚ_MIN;
 	xenv.snake_cnt = XDL_SNAKE_CNT;
-	xenv.heur_min = XDL_HEUR_MIN_COST;
+	xenv.heur_min = XDL_HEUR_MIN_ವೆಚ್ಚ;
 
 	res = xdl_recs_cmp(&xe->xdf1, 0, xe->xdf1.nreff, &xe->xdf2, 0, xe->xdf2.nreff,
-			   kvdf, kvdb, (xpp->flags & XDF_NEED_MINIMAL) != 0,
+			   kvdf, kvdb, (xpp->flags & XDF_NEED_ಕನಿಷ್ಠತಮ) != 0,
 			   &xenv);
 	xdl_free(kvd);
- out:
-	if (res < 0)
+ ಹೊರಹೋಗು:
+	ಆದರೆ (res < 0)
 		xdl_free_env(xe);
 
-	return res;
+	ಹಿಂತಿರುಗಿ res;
 }
 
 
-static xdchange_t *xdl_add_change(xdchange_t *xscr, long i1, long i2, long chg1, long chg2) {
+ಸ್ಥಿರ xdchange_t *xdl_ಕೂಡಿಸು_change(xdchange_t *xscr, ದೀರ್ಘ i1, ದೀರ್ಘ i2, ದೀರ್ಘ chg1, ದೀರ್ಘ chg2) {
 	xdchange_t *xch;
 
-	if (!(xch = (xdchange_t *) xdl_malloc(sizeof(xdchange_t))))
-		return NULL;
+	ಆದರೆ (!(xch = (xdchange_t *) xdl_malloc(ಗಾತ್ರ(xdchange_t))))
+		ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-	xch->next = xscr;
+	xch->ಮುಂದಿನ = xscr;
 	xch->i1 = i1;
 	xch->i2 = i2;
 	xch->chg1 = chg1;
 	xch->chg2 = chg2;
 	xch->ignore = 0;
 
-	return xch;
+	ಹಿಂತಿರುಗಿ xch;
 }
 
 
-static int recs_match(xrecord_t *rec1, xrecord_t *rec2)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ recs_ಹೊಂದಿಕೆ(xrecord_t *rec1, xrecord_t *rec2)
 {
-	return (rec1->ha == rec2->ha);
+	ಹಿಂತಿರುಗಿ (rec1->ha == rec2->ha);
 }
 
 /*
@@ -394,35 +394,35 @@ static int recs_match(xrecord_t *rec1, xrecord_t *rec2)
  * human-readable text, and also ensures that the output of xget_indent fits within
  * an int.
  */
-#define MAX_INDENT 200
+#ವ್ಯಾಖ್ಯಾನಿಸು MAX_INDENT 200
 
 /*
  * Return the amount of indentation of the specified line, treating TAB as 8
  * columns. Return -1 if line is empty or contains only whitespace. Clamp the
  * output value at MAX_INDENT.
  */
-static int xget_indent(xrecord_t *rec)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ xget_indent(xrecord_t *rec)
 {
-	long i;
-	int ret = 0;
+	ದೀರ್ಘ i;
+	ಪೂರ್ಣಾಂಕ ret = 0;
 
-	for (i = 0; i < rec->size; i++) {
-		char c = rec->ptr[i];
+	ಗಾಗಿ (i = 0; i < rec->ಗಾತ್ರ_2; i++) {
+		ಅಕ್ಷರ c = rec->ptr[i];
 
-		if (!XDL_ISSPACE(c))
-			return ret;
-		else if (c == ' ')
+		ಆದರೆ (!XDL_ISSPACE(c))
+			ಹಿಂತಿರುಗಿ ret;
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (c == ' ')
 			ret += 1;
-		else if (c == '\t')
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (c == '\t')
 			ret += 8 - ret % 8;
 		/* ignore other whitespace characters */
 
-		if (ret >= MAX_INDENT)
-			return MAX_INDENT;
+		ಆದರೆ (ret >= MAX_INDENT)
+			ಹಿಂತಿರುಗಿ MAX_INDENT;
 	}
 
 	/* The line contains only whitespace. */
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
 }
 
 /*
@@ -430,91 +430,91 @@ static int xget_indent(xrecord_t *rec)
  * this value. This avoids requiring O(N^2) work for pathological cases, and
  * also ensures that the output of score_split fits in an int.
  */
-#define MAX_BLANKS 20
+#ವ್ಯಾಖ್ಯಾನಿಸು MAX_BLANKS 20
 
 /* Characteristics measured about a hypothetical split position. */
-struct split_measurement {
+ರಚನೆ ವಿಭಜಿಸು_measurement {
 	/*
 	 * Is the split at the end of the file (aside from any blank lines)?
 	 */
-	int end_of_file;
+	ಪೂರ್ಣಾಂಕ ಕೊನೆ_ದ_file;
 
 	/*
 	 * How much is the line immediately following the split indented (or -1
 	 * if the line is blank):
 	 */
-	int indent;
+	ಪೂರ್ಣಾಂಕ indent;
 
 	/*
 	 * How many consecutive lines above the split are blank?
 	 */
-	int pre_blank;
+	ಪೂರ್ಣಾಂಕ pre_blank;
 
 	/*
 	 * How much is the nearest non-blank line above the split indented (or
 	 * -1 if there is no such line)?
 	 */
-	int pre_indent;
+	ಪೂರ್ಣಾಂಕ pre_indent;
 
 	/*
 	 * How many lines after the line following the split are blank?
 	 */
-	int post_blank;
+	ಪೂರ್ಣಾಂಕ post_blank;
 
 	/*
 	 * How much is the nearest non-blank line after the line following the
 	 * split indented (or -1 if there is no such line)?
 	 */
-	int post_indent;
+	ಪೂರ್ಣಾಂಕ post_indent;
 };
 
-struct split_score {
+ರಚನೆ ವಿಭಜಿಸು_score {
 	/* The effective indent of this split (smaller is preferred). */
-	int effective_indent;
+	ಪೂರ್ಣಾಂಕ effective_indent;
 
 	/* Penalty for this split (smaller is preferred). */
-	int penalty;
+	ಪೂರ್ಣಾಂಕ penalty;
 };
 
 /*
  * Fill m with information about a hypothetical split of xdf above line split.
  */
-static void measure_split(const xdfile_t *xdf, long split,
-			  struct split_measurement *m)
+ಸ್ಥಿರ ಶೂನ್ಯ measure_ವಿಭಜಿಸು(ಸ್ಥಿರಾಂಕ xdfile_t *xdf, ದೀರ್ಘ ವಿಭಜಿಸು,
+			  ರಚನೆ ವಿಭಜಿಸು_measurement *m)
 {
-	long i;
+	ದೀರ್ಘ i;
 
-	if (split >= xdf->nrec) {
-		m->end_of_file = 1;
+	ಆದರೆ (ವಿಭಜಿಸು >= xdf->nrec) {
+		m->ಕೊನೆ_ದ_file = 1;
 		m->indent = -1;
-	} else {
-		m->end_of_file = 0;
-		m->indent = xget_indent(&xdf->recs[split]);
+	} ಇಲ್ಲದಿದ್ದರೆ {
+		m->ಕೊನೆ_ದ_file = 0;
+		m->indent = xget_indent(&xdf->recs[ವಿಭಜಿಸು]);
 	}
 
 	m->pre_blank = 0;
 	m->pre_indent = -1;
-	for (i = split - 1; i >= 0; i--) {
+	ಗಾಗಿ (i = ವಿಭಜಿಸು - 1; i >= 0; i--) {
 		m->pre_indent = xget_indent(&xdf->recs[i]);
-		if (m->pre_indent != -1)
-			break;
+		ಆದರೆ (m->pre_indent != -1)
+			ನಿಲ್ಲಿಸು;
 		m->pre_blank += 1;
-		if (m->pre_blank == MAX_BLANKS) {
+		ಆದರೆ (m->pre_blank == MAX_BLANKS) {
 			m->pre_indent = 0;
-			break;
+			ನಿಲ್ಲಿಸು;
 		}
 	}
 
 	m->post_blank = 0;
 	m->post_indent = -1;
-	for (i = split + 1; i < xdf->nrec; i++) {
+	ಗಾಗಿ (i = ವಿಭಜಿಸು + 1; i < xdf->nrec; i++) {
 		m->post_indent = xget_indent(&xdf->recs[i]);
-		if (m->post_indent != -1)
-			break;
+		ಆದರೆ (m->post_indent != -1)
+			ನಿಲ್ಲಿಸು;
 		m->post_blank += 1;
-		if (m->post_blank == MAX_BLANKS) {
+		ಆದರೆ (m->post_blank == MAX_BLANKS) {
 			m->post_indent = 0;
-			break;
+			ನಿಲ್ಲಿಸು;
 		}
 	}
 }
@@ -532,36 +532,36 @@ static void measure_split(const xdfile_t *xdf, long split,
  */
 
 /* Penalty if there are no non-blank lines before the split */
-#define START_OF_FILE_PENALTY 1
+#ವ್ಯಾಖ್ಯಾನಿಸು ಆರಂಭ_ದ_FILE_PENALTY 1
 
 /* Penalty if there are no non-blank lines after the split */
-#define END_OF_FILE_PENALTY 21
+#ವ್ಯಾಖ್ಯಾನಿಸು ಕೊನೆ_ದ_FILE_PENALTY 21
 
 /* Multiplier for the number of blank lines around the split */
-#define TOTAL_BLANK_WEIGHT (-30)
+#ವ್ಯಾಖ್ಯಾನಿಸು ಒಟ್ಟು_BLANK_ತೂಕ (-30)
 
 /* Multiplier for the number of blank lines after the split */
-#define POST_BLANK_WEIGHT 6
+#ವ್ಯಾಖ್ಯಾನಿಸು POST_BLANK_ತೂಕ 6
 
 /*
  * Penalties applied if the line is indented more than its predecessor
  */
-#define RELATIVE_INDENT_PENALTY (-4)
-#define RELATIVE_INDENT_WITH_BLANK_PENALTY 10
+#ವ್ಯಾಖ್ಯಾನಿಸು RELATIVE_INDENT_PENALTY (-4)
+#ವ್ಯಾಖ್ಯಾನಿಸು RELATIVE_INDENT_WITH_BLANK_PENALTY 10
 
 /*
  * Penalties applied if the line is indented less than both its predecessor and
  * its successor
  */
-#define RELATIVE_OUTDENT_PENALTY 24
-#define RELATIVE_OUTDENT_WITH_BLANK_PENALTY 17
+#ವ್ಯಾಖ್ಯಾನಿಸು RELATIVE_OUTDENT_PENALTY 24
+#ವ್ಯಾಖ್ಯಾನಿಸು RELATIVE_OUTDENT_WITH_BLANK_PENALTY 17
 
 /*
  * Penalties applied if the line is indented less than its predecessor but not
  * less than its successor
  */
-#define RELATIVE_DEDENT_PENALTY 23
-#define RELATIVE_DEDENT_WITH_BLANK_PENALTY 17
+#ವ್ಯಾಖ್ಯಾನಿಸು RELATIVE_DEDENT_PENALTY 23
+#ವ್ಯಾಖ್ಯಾನಿಸು RELATIVE_DEDENT_WITH_BLANK_PENALTY 17
 
 /*
  * We only consider whether the sum of the effective indents for splits are
@@ -569,12 +569,12 @@ static void measure_split(const xdfile_t *xdf, long split,
  * value is multiplied by the following weight and combined with the penalty to
  * determine the better of two scores.
  */
-#define INDENT_WEIGHT 60
+#ವ್ಯಾಖ್ಯಾನಿಸು INDENT_ತೂಕ 60
 
 /*
  * How far do we slide a hunk at most?
  */
-#define INDENT_HEURISTIC_MAX_SLIDING 100
+#ವ್ಯಾಖ್ಯಾನಿಸು INDENT_HEURISTIC_MAX_SLIDING 100
 
 /*
  * Compute a badness score for the hypothetical split whose measurements are
@@ -586,58 +586,58 @@ static void measure_split(const xdfile_t *xdf, long split,
  * Also see that project if you want to improve the weights based on, for
  * example, a larger or more diverse corpus.
  */
-static void score_add_split(const struct split_measurement *m, struct split_score *s)
+ಸ್ಥಿರ ಶೂನ್ಯ score_ಕೂಡಿಸು_ವಿಭಜಿಸು(ಸ್ಥಿರಾಂಕ ರಚನೆ ವಿಭಜಿಸು_measurement *m, ರಚನೆ ವಿಭಜಿಸು_score *s)
 {
 	/*
 	 * A place to accumulate penalty factors (positive makes this index more
 	 * favored):
 	 */
-	int post_blank, total_blank, indent, any_blanks;
+	ಪೂರ್ಣಾಂಕ post_blank, ಒಟ್ಟು_blank, indent, any_blanks;
 
-	if (m->pre_indent == -1 && m->pre_blank == 0)
-		s->penalty += START_OF_FILE_PENALTY;
+	ಆದರೆ (m->pre_indent == -1 && m->pre_blank == 0)
+		s->penalty += ಆರಂಭ_ದ_FILE_PENALTY;
 
-	if (m->end_of_file)
-		s->penalty += END_OF_FILE_PENALTY;
+	ಆದರೆ (m->ಕೊನೆ_ದ_file)
+		s->penalty += ಕೊನೆ_ದ_FILE_PENALTY;
 
 	/*
 	 * Set post_blank to the number of blank lines following the split,
 	 * including the line immediately after the split:
 	 */
 	post_blank = (m->indent == -1) ? 1 + m->post_blank : 0;
-	total_blank = m->pre_blank + post_blank;
+	ಒಟ್ಟು_blank = m->pre_blank + post_blank;
 
 	/* Penalties based on nearby blank lines: */
-	s->penalty += TOTAL_BLANK_WEIGHT * total_blank;
-	s->penalty += POST_BLANK_WEIGHT * post_blank;
+	s->penalty += ಒಟ್ಟು_BLANK_ತೂಕ * ಒಟ್ಟು_blank;
+	s->penalty += POST_BLANK_ತೂಕ * post_blank;
 
-	if (m->indent != -1)
+	ಆದರೆ (m->indent != -1)
 		indent = m->indent;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 		indent = m->post_indent;
 
-	any_blanks = (total_blank != 0);
+	any_blanks = (ಒಟ್ಟು_blank != 0);
 
 	/* Note that the effective indent is -1 at the end of the file: */
 	s->effective_indent += indent;
 
-	if (indent == -1) {
+	ಆದರೆ (indent == -1) {
 		/* No additional adjustments needed. */
-	} else if (m->pre_indent == -1) {
+	} ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (m->pre_indent == -1) {
 		/* No additional adjustments needed. */
-	} else if (indent > m->pre_indent) {
+	} ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (indent > m->pre_indent) {
 		/*
 		 * The line is indented more than its predecessor.
 		 */
 		s->penalty += any_blanks ?
 			RELATIVE_INDENT_WITH_BLANK_PENALTY :
 			RELATIVE_INDENT_PENALTY;
-	} else if (indent == m->pre_indent) {
+	} ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (indent == m->pre_indent) {
 		/*
 		 * The line has the same indentation level as its predecessor.
 		 * No additional adjustments needed.
 		 */
-	} else {
+	} ಇಲ್ಲದಿದ್ದರೆ {
 		/*
 		 * The line is indented less than its predecessor. It could be
 		 * the block terminator of the previous block, but it could
@@ -645,7 +645,7 @@ static void score_add_split(const struct split_measurement *m, struct split_scor
 		 * maybe the previous block didn't have a block terminator).
 		 * Try to distinguish those cases based on what comes next:
 		 */
-		if (m->post_indent != -1 && m->post_indent > indent) {
+		ಆದರೆ (m->post_indent != -1 && m->post_indent > indent) {
 			/*
 			 * The following line is indented more. So it is likely
 			 * that this line is the start of a block.
@@ -653,7 +653,7 @@ static void score_add_split(const struct split_measurement *m, struct split_scor
 			s->penalty += any_blanks ?
 				RELATIVE_OUTDENT_WITH_BLANK_PENALTY :
 				RELATIVE_OUTDENT_PENALTY;
-		} else {
+		} ಇಲ್ಲದಿದ್ದರೆ {
 			/*
 			 * That was probably the end of a block.
 			 */
@@ -664,13 +664,13 @@ static void score_add_split(const struct split_measurement *m, struct split_scor
 	}
 }
 
-static int score_cmp(struct split_score *s1, struct split_score *s2)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ score_cmp(ರಚನೆ ವಿಭಜಿಸು_score *s1, ರಚನೆ ವಿಭಜಿಸು_score *s2)
 {
 	/* -1 if s1.effective_indent < s2->effective_indent, etc. */
-	int cmp_indents = ((s1->effective_indent > s2->effective_indent) -
+	ಪೂರ್ಣಾಂಕ cmp_indents = ((s1->effective_indent > s2->effective_indent) -
 			   (s1->effective_indent < s2->effective_indent));
 
-	return INDENT_WEIGHT * cmp_indents + (s1->penalty - s2->penalty);
+	ಹಿಂತಿರುಗಿ INDENT_ತೂಕ * cmp_indents + (s1->penalty - s2->penalty);
 }
 
 /*
@@ -688,60 +688,60 @@ static int score_cmp(struct split_score *s1, struct split_score *s2)
  * Note that loops that are testing for changed lines in xdf->rchg do not need
  * index bounding since the array is prepared with a zero at position -1 and N.
  */
-struct xdlgroup {
+ರಚನೆ xdlgroup {
 	/*
 	 * The index of the first changed line in the group, or the index of
 	 * the unchanged line above which the (empty) group is located.
 	 */
-	long start;
+	ದೀರ್ಘ ಆರಂಭ;
 
 	/*
 	 * The index of the first unchanged line after the group. For an empty
 	 * group, end is equal to start.
 	 */
-	long end;
+	ದೀರ್ಘ ಕೊನೆ;
 };
 
 /*
  * Initialize g to point at the first group in xdf.
  */
-static void group_init(xdfile_t *xdf, struct xdlgroup *g)
+ಸ್ಥಿರ ಶೂನ್ಯ ಗುಂಪು_init(xdfile_t *xdf, ರಚನೆ xdlgroup *g)
 {
-	g->start = g->end = 0;
-	while (xdf->changed[g->end])
-		g->end++;
+	g->ಆರಂಭ = g->ಕೊನೆ = 0;
+	ಆಗ (xdf->ಬದಲಾಯಿತು[g->ಕೊನೆ])
+		g->ಕೊನೆ++;
 }
 
 /*
  * Move g to describe the next (possibly empty) group in xdf and return 0. If g
  * is already at the end of the file, do nothing and return -1.
  */
-static inline int group_next(xdfile_t *xdf, struct xdlgroup *g)
+ಸ್ಥಿರ ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ ಗುಂಪು_ಮುಂದಿನ(xdfile_t *xdf, ರಚನೆ xdlgroup *g)
 {
-	if (g->end == xdf->nrec)
-		return -1;
+	ಆದರೆ (g->ಕೊನೆ == xdf->nrec)
+		ಹಿಂತಿರುಗಿ -1;
 
-	g->start = g->end + 1;
-	for (g->end = g->start; xdf->changed[g->end]; g->end++)
+	g->ಆರಂಭ = g->ಕೊನೆ + 1;
+	ಗಾಗಿ (g->ಕೊನೆ = g->ಆರಂಭ; xdf->ಬದಲಾಯಿತು[g->ಕೊನೆ]; g->ಕೊನೆ++)
 		;
 
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
 }
 
 /*
  * Move g to describe the previous (possibly empty) group in xdf and return 0.
  * If g is already at the beginning of the file, do nothing and return -1.
  */
-static inline int group_previous(xdfile_t *xdf, struct xdlgroup *g)
+ಸ್ಥಿರ ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ ಗುಂಪು_ಹಿಂದಿನ(xdfile_t *xdf, ರಚನೆ xdlgroup *g)
 {
-	if (g->start == 0)
-		return -1;
+	ಆದರೆ (g->ಆರಂಭ == 0)
+		ಹಿಂತಿರುಗಿ -1;
 
-	g->end = g->start - 1;
-	for (g->start = g->end; xdf->changed[g->start - 1]; g->start--)
+	g->ಕೊನೆ = g->ಆರಂಭ - 1;
+	ಗಾಗಿ (g->ಆರಂಭ = g->ಕೊನೆ; xdf->ಬದಲಾಯಿತು[g->ಆರಂಭ - 1]; g->ಆರಂಭ--)
 		;
 
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
 }
 
 /*
@@ -749,19 +749,19 @@ static inline int group_previous(xdfile_t *xdf, struct xdlgroup *g)
  * following group, expand this group to include it. Return 0 on success or -1
  * if g cannot be slid down.
  */
-static int group_slide_down(xdfile_t *xdf, struct xdlgroup *g)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಗುಂಪು_slide_ಕೆಳಕ್ಕೆ(xdfile_t *xdf, ರಚನೆ xdlgroup *g)
 {
-	if (g->end < xdf->nrec &&
-	    recs_match(&xdf->recs[g->start], &xdf->recs[g->end])) {
-		xdf->changed[g->start++] = false;
-		xdf->changed[g->end++] = true;
+	ಆದರೆ (g->ಕೊನೆ < xdf->nrec &&
+	    recs_ಹೊಂದಿಕೆ(&xdf->recs[g->ಆರಂಭ], &xdf->recs[g->ಕೊನೆ])) {
+		xdf->ಬದಲಾಯಿತು[g->ಆರಂಭ++] = false;
+		xdf->ಬದಲಾಯಿತು[g->ಕೊನೆ++] = true;
 
-		while (xdf->changed[g->end])
-			g->end++;
+		ಆಗ (xdf->ಬದಲಾಯಿತು[g->ಕೊನೆ])
+			g->ಕೊನೆ++;
 
-		return 0;
-	} else {
-		return -1;
+		ಹಿಂತಿರುಗಿ 0;
+	} ಇಲ್ಲದಿದ್ದರೆ {
+		ಹಿಂತಿರುಗಿ -1;
 	}
 }
 
@@ -770,26 +770,26 @@ static int group_slide_down(xdfile_t *xdf, struct xdlgroup *g)
  * into a previous group, expand this group to include it. Return 0 on success
  * or -1 if g cannot be slid up.
  */
-static int group_slide_up(xdfile_t *xdf, struct xdlgroup *g)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಗುಂಪು_slide_ಮೇಲೆ(xdfile_t *xdf, ರಚನೆ xdlgroup *g)
 {
-	if (g->start > 0 &&
-	    recs_match(&xdf->recs[g->start - 1], &xdf->recs[g->end - 1])) {
-		xdf->changed[--g->start] = true;
-		xdf->changed[--g->end] = false;
+	ಆದರೆ (g->ಆರಂಭ > 0 &&
+	    recs_ಹೊಂದಿಕೆ(&xdf->recs[g->ಆರಂಭ - 1], &xdf->recs[g->ಕೊನೆ - 1])) {
+		xdf->ಬದಲಾಯಿತು[--g->ಆರಂಭ] = true;
+		xdf->ಬದಲಾಯಿತು[--g->ಕೊನೆ] = false;
 
-		while (xdf->changed[g->start - 1])
-			g->start--;
+		ಆಗ (xdf->ಬದಲಾಯಿತು[g->ಆರಂಭ - 1])
+			g->ಆರಂಭ--;
 
-		return 0;
-	} else {
-		return -1;
+		ಹಿಂತಿರುಗಿ 0;
+	} ಇಲ್ಲದಿದ್ದರೆ {
+		ಹಿಂತಿರುಗಿ -1;
 	}
 }
 
-void xdl_bug(const char *msg)
+ಶೂನ್ಯ xdl_bug(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಸಂದೇಶ)
 {
-	fprintf(stderr, "BUG: %s\n", msg);
-	exit(1);
+	fprintf(stderr, "BUG: %s\n", ಸಂದೇಶ);
+	ನಿರ್ಗಮಿಸು(1);
 }
 
 /*
@@ -797,28 +797,28 @@ void xdl_bug(const char *msg)
  * This also helps in finding joinable change groups and reducing the diff
  * size.
  */
-int xdl_change_compact(xdfile_t *xdf, xdfile_t *xdfo, long flags) {
-	struct xdlgroup g, go;
-	long earliest_end, end_matching_other;
-	long groupsize;
+ಪೂರ್ಣಾಂಕ xdl_change_compact(xdfile_t *xdf, xdfile_t *xdfo, ದೀರ್ಘ flags) {
+	ರಚನೆ xdlgroup g, go;
+	ದೀರ್ಘ earliest_ಕೊನೆ, ಕೊನೆ_matching_other;
+	ದೀರ್ಘ groupsize;
 
-	group_init(xdf, &g);
-	group_init(xdfo, &go);
+	ಗುಂಪು_init(xdf, &g);
+	ಗುಂಪು_init(xdfo, &go);
 
-	while (1) {
+	ಆಗ (1) {
 		/*
 		 * If the group is empty in the to-be-compacted file, skip it:
 		 */
-		if (g.end == g.start)
-			goto next;
+		ಆದರೆ (g.ಕೊನೆ == g.ಆರಂಭ)
+			ಹೋಗು ಮುಂದಿನ;
 
 		/*
 		 * Now shift the change up and then down as far as possible in
 		 * each direction. If it bumps into any other changes, merge
 		 * them.
 		 */
-		do {
-			groupsize = g.end - g.start;
+		ಮಾಡು {
+			groupsize = g.ಕೊನೆ - g.ಆರಂಭ;
 
 			/*
 			 * Keep track of the last "end" index that causes this
@@ -826,33 +826,33 @@ int xdl_change_compact(xdfile_t *xdf, xdfile_t *xdfo, long flags) {
 			 * other file. -1 indicates that we haven't found such
 			 * a match yet:
 			 */
-			end_matching_other = -1;
+			ಕೊನೆ_matching_other = -1;
 
 			/* Shift the group backward as much as possible: */
-			while (!group_slide_up(xdf, &g))
-				if (group_previous(xdfo, &go))
+			ಆಗ (!ಗುಂಪು_slide_ಮೇಲೆ(xdf, &g))
+				ಆದರೆ (ಗುಂಪು_ಹಿಂದಿನ(xdfo, &go))
 					xdl_bug("group sync broken sliding up");
 
 			/*
 			 * This is this highest that this group can be shifted.
 			 * Record its end index:
 			 */
-			earliest_end = g.end;
+			earliest_ಕೊನೆ = g.ಕೊನೆ;
 
-			if (go.end > go.start)
-				end_matching_other = g.end;
+			ಆದರೆ (go.ಕೊನೆ > go.ಆರಂಭ)
+				ಕೊನೆ_matching_other = g.ಕೊನೆ;
 
 			/* Now shift the group forward as far as possible: */
-			while (1) {
-				if (group_slide_down(xdf, &g))
-					break;
-				if (group_next(xdfo, &go))
+			ಆಗ (1) {
+				ಆದರೆ (ಗುಂಪು_slide_ಕೆಳಕ್ಕೆ(xdf, &g))
+					ನಿಲ್ಲಿಸು;
+				ಆದರೆ (ಗುಂಪು_ಮುಂದಿನ(xdfo, &go))
 					xdl_bug("group sync broken sliding down");
 
-				if (go.end > go.start)
-					end_matching_other = g.end;
+				ಆದರೆ (go.ಕೊನೆ > go.ಆರಂಭ)
+					ಕೊನೆ_matching_other = g.ಕೊನೆ;
 			}
-		} while (groupsize != g.end - g.start);
+		} ಆಗ (groupsize != g.ಕೊನೆ - g.ಆರಂಭ);
 
 		/*
 		 * If the group can be shifted, then we can possibly use this
@@ -862,21 +862,21 @@ int xdl_change_compact(xdfile_t *xdf, xdfile_t *xdfo, long flags) {
 		 * the heuristics below only have to handle upwards shifts.
 		 */
 
-		if (g.end == earliest_end) {
+		ಆದರೆ (g.ಕೊನೆ == earliest_ಕೊನೆ) {
 			/* no shifting was possible */
-		} else if (end_matching_other != -1) {
+		} ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಕೊನೆ_matching_other != -1) {
 			/*
 			 * Move the possibly merged group of changes back to
 			 * line up with the last group of changes from the
 			 * other file that it can align with.
 			 */
-			while (go.end == go.start) {
-				if (group_slide_up(xdf, &g))
+			ಆಗ (go.ಕೊನೆ == go.ಆರಂಭ) {
+				ಆದರೆ (ಗುಂಪು_slide_ಮೇಲೆ(xdf, &g))
 					xdl_bug("match disappeared");
-				if (group_previous(xdfo, &go))
+				ಆದರೆ (ಗುಂಪು_ಹಿಂದಿನ(xdfo, &go))
 					xdl_bug("group sync broken sliding to match");
 			}
-		} else if (flags & XDF_INDENT_HEURISTIC) {
+		} ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (flags & XDF_INDENT_HEURISTIC) {
 			/*
 			 * Indent heuristic: a group of pure add/delete lines
 			 * implies two splits, one between the end of the
@@ -889,203 +889,203 @@ int xdl_change_compact(xdfile_t *xdf, xdfile_t *xdfo, long flags) {
 			 * position that the group can be shifted to. Then we
 			 * pick the shift with the lowest score.
 			 */
-			long shift, best_shift = -1;
-			struct split_score best_score;
+			ದೀರ್ಘ ಸರಿಸು, ಉತ್ತಮ_ಸರಿಸು = -1;
+			ರಚನೆ ವಿಭಜಿಸು_score ಉತ್ತಮ_score;
 
-			shift = earliest_end;
-			if (g.end - groupsize - 1 > shift)
-				shift = g.end - groupsize - 1;
-			if (g.end - INDENT_HEURISTIC_MAX_SLIDING > shift)
-				shift = g.end - INDENT_HEURISTIC_MAX_SLIDING;
-			for (; shift <= g.end; shift++) {
-				struct split_measurement m;
-				struct split_score score = {0, 0};
+			ಸರಿಸು = earliest_ಕೊನೆ;
+			ಆದರೆ (g.ಕೊನೆ - groupsize - 1 > ಸರಿಸು)
+				ಸರಿಸು = g.ಕೊನೆ - groupsize - 1;
+			ಆದರೆ (g.ಕೊನೆ - INDENT_HEURISTIC_MAX_SLIDING > ಸರಿಸು)
+				ಸರಿಸು = g.ಕೊನೆ - INDENT_HEURISTIC_MAX_SLIDING;
+			ಗಾಗಿ (; ಸರಿಸು <= g.ಕೊನೆ; ಸರಿಸು++) {
+				ರಚನೆ ವಿಭಜಿಸು_measurement m;
+				ರಚನೆ ವಿಭಜಿಸು_score score = {0, 0};
 
-				measure_split(xdf, shift, &m);
-				score_add_split(&m, &score);
-				measure_split(xdf, shift - groupsize, &m);
-				score_add_split(&m, &score);
-				if (best_shift == -1 ||
-				    score_cmp(&score, &best_score) <= 0) {
-					best_score.effective_indent = score.effective_indent;
-					best_score.penalty = score.penalty;
-					best_shift = shift;
+				measure_ವಿಭಜಿಸು(xdf, ಸರಿಸು, &m);
+				score_ಕೂಡಿಸು_ವಿಭಜಿಸು(&m, &score);
+				measure_ವಿಭಜಿಸು(xdf, ಸರಿಸು - groupsize, &m);
+				score_ಕೂಡಿಸು_ವಿಭಜಿಸು(&m, &score);
+				ಆದರೆ (ಉತ್ತಮ_ಸರಿಸು == -1 ||
+				    score_cmp(&score, &ಉತ್ತಮ_score) <= 0) {
+					ಉತ್ತಮ_score.effective_indent = score.effective_indent;
+					ಉತ್ತಮ_score.penalty = score.penalty;
+					ಉತ್ತಮ_ಸರಿಸು = ಸರಿಸು;
 				}
 			}
 
-			while (g.end > best_shift) {
-				if (group_slide_up(xdf, &g))
+			ಆಗ (g.ಕೊನೆ > ಉತ್ತಮ_ಸರಿಸು) {
+				ಆದರೆ (ಗುಂಪು_slide_ಮೇಲೆ(xdf, &g))
 					xdl_bug("best shift unreached");
-				if (group_previous(xdfo, &go))
+				ಆದರೆ (ಗುಂಪು_ಹಿಂದಿನ(xdfo, &go))
 					xdl_bug("group sync broken sliding to blank line");
 			}
 		}
 
-	next:
+	ಮುಂದಿನ:
 		/* Move past the just-processed group: */
-		if (group_next(xdf, &g))
-			break;
-		if (group_next(xdfo, &go))
+		ಆದರೆ (ಗುಂಪು_ಮುಂದಿನ(xdf, &g))
+			ನಿಲ್ಲಿಸು;
+		ಆದರೆ (ಗುಂಪು_ಮುಂದಿನ(xdfo, &go))
 			xdl_bug("group sync broken moving to next group");
 	}
 
-	if (!group_next(xdfo, &go))
+	ಆದರೆ (!ಗುಂಪು_ಮುಂದಿನ(xdfo, &go))
 		xdl_bug("group sync broken at end of file");
 
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
 }
 
 
-int xdl_build_script(xdfenv_t *xe, xdchange_t **xscr) {
-	xdchange_t *cscr = NULL, *xch;
-	bool *changed1 = xe->xdf1.changed, *changed2 = xe->xdf2.changed;
-	long i1, i2, l1, l2;
+ಪೂರ್ಣಾಂಕ xdl_build_script(xdfenv_t *xe, xdchange_t **xscr) {
+	xdchange_t *cscr = ಖಾಲಿ, *xch;
+	bool *changed1 = xe->xdf1.ಬದಲಾಯಿತು, *changed2 = xe->xdf2.ಬದಲಾಯಿತು;
+	ದೀರ್ಘ i1, i2, l1, l2;
 
 	/*
 	 * Trivial. Collects "groups" of changes and creates an edit script.
 	 */
-	for (i1 = xe->xdf1.nrec, i2 = xe->xdf2.nrec; i1 >= 0 || i2 >= 0; i1--, i2--)
-		if (changed1[i1 - 1] || changed2[i2 - 1]) {
-			for (l1 = i1; changed1[i1 - 1]; i1--);
-			for (l2 = i2; changed2[i2 - 1]; i2--);
+	ಗಾಗಿ (i1 = xe->xdf1.nrec, i2 = xe->xdf2.nrec; i1 >= 0 || i2 >= 0; i1--, i2--)
+		ಆದರೆ (changed1[i1 - 1] || changed2[i2 - 1]) {
+			ಗಾಗಿ (l1 = i1; changed1[i1 - 1]; i1--);
+			ಗಾಗಿ (l2 = i2; changed2[i2 - 1]; i2--);
 
-			if (!(xch = xdl_add_change(cscr, i1, i2, l1 - i1, l2 - i2))) {
+			ಆದರೆ (!(xch = xdl_ಕೂಡಿಸು_change(cscr, i1, i2, l1 - i1, l2 - i2))) {
 				xdl_free_script(cscr);
-				return -1;
+				ಹಿಂತಿರುಗಿ -1;
 			}
 			cscr = xch;
 		}
 
 	*xscr = cscr;
 
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
 }
 
 
-void xdl_free_script(xdchange_t *xscr) {
+ಶೂನ್ಯ xdl_free_script(xdchange_t *xscr) {
 	xdchange_t *xch;
 
-	while ((xch = xscr) != NULL) {
-		xscr = xscr->next;
+	ಆಗ ((xch = xscr) != ಖಾಲಿ) {
+		xscr = xscr->ಮುಂದಿನ;
 		xdl_free(xch);
 	}
 }
 
-static int xdl_call_hunk_func(xdfenv_t *xe UNUSED, xdchange_t *xscr, xdemitcb_t *ecb,
-			      xdemitconf_t const *xecfg)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ xdl_call_hunk_func(xdfenv_t *xe ಬಳಸದ, xdchange_t *xscr, xdemitcb_t *ecb,
+			      xdemitconf_t ಸ್ಥಿರಾಂಕ *xecfg)
 {
 	xdchange_t *xch, *xche;
 
-	for (xch = xscr; xch; xch = xche->next) {
+	ಗಾಗಿ (xch = xscr; xch; xch = xche->ಮುಂದಿನ) {
 		xche = xdl_get_hunk(&xch, xecfg);
-		if (!xch)
-			break;
-		if (xecfg->hunk_func(xch->i1, xche->i1 + xche->chg1 - xch->i1,
+		ಆದರೆ (!xch)
+			ನಿಲ್ಲಿಸು;
+		ಆದರೆ (xecfg->hunk_func(xch->i1, xche->i1 + xche->chg1 - xch->i1,
 				     xch->i2, xche->i2 + xche->chg2 - xch->i2,
 				     ecb->priv) < 0)
-			return -1;
+			ಹಿಂತಿರುಗಿ -1;
 	}
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
 }
 
-static void xdl_mark_ignorable_lines(xdchange_t *xscr, xdfenv_t *xe, long flags)
+ಸ್ಥಿರ ಶೂನ್ಯ xdl_mark_ignorable_ಸಾಲುಗಳು(xdchange_t *xscr, xdfenv_t *xe, ದೀರ್ಘ flags)
 {
 	xdchange_t *xch;
 
-	for (xch = xscr; xch; xch = xch->next) {
-		int ignore = 1;
+	ಗಾಗಿ (xch = xscr; xch; xch = xch->ಮುಂದಿನ) {
+		ಪೂರ್ಣಾಂಕ ignore = 1;
 		xrecord_t *rec;
-		long i;
+		ದೀರ್ಘ i;
 
 		rec = &xe->xdf1.recs[xch->i1];
-		for (i = 0; i < xch->chg1 && ignore; i++)
-			ignore = xdl_blankline(rec[i].ptr, rec[i].size, flags);
+		ಗಾಗಿ (i = 0; i < xch->chg1 && ignore; i++)
+			ignore = xdl_blankline(rec[i].ptr, rec[i].ಗಾತ್ರ_2, flags);
 
 		rec = &xe->xdf2.recs[xch->i2];
-		for (i = 0; i < xch->chg2 && ignore; i++)
-			ignore = xdl_blankline(rec[i].ptr, rec[i].size, flags);
+		ಗಾಗಿ (i = 0; i < xch->chg2 && ignore; i++)
+			ignore = xdl_blankline(rec[i].ptr, rec[i].ಗಾತ್ರ_2, flags);
 
 		xch->ignore = ignore;
 	}
 }
 
-#if 0 // unused by Vim
-static int record_matches_regex(xrecord_t *rec, xpparam_t const *xpp) {
+#ಆದರೆ 0 // unused by Vim
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ದಾಖಲೆ_matches_regex(xrecord_t *rec, xpparam_t ಸ್ಥಿರಾಂಕ *xpp) {
 	regmatch_t regmatch;
 	size_t i;
 
-	for (i = 0; i < xpp->ignore_regex_nr; i++)
-		if (!regexec_buf(xpp->ignore_regex[i], rec->ptr, rec->size, 1,
+	ಗಾಗಿ (i = 0; i < xpp->ignore_regex_nr; i++)
+		ಆದರೆ (!regexec_buf(xpp->ignore_regex[i], rec->ptr, rec->ಗಾತ್ರ_2, 1,
 				 &regmatch, 0))
-			return 1;
+			ಹಿಂತಿರುಗಿ 1;
 
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
 }
 
-static void xdl_mark_ignorable_regex(xdchange_t *xscr, const xdfenv_t *xe,
-				     xpparam_t const *xpp)
+ಸ್ಥಿರ ಶೂನ್ಯ xdl_mark_ignorable_regex(xdchange_t *xscr, ಸ್ಥಿರಾಂಕ xdfenv_t *xe,
+				     xpparam_t ಸ್ಥಿರಾಂಕ *xpp)
 {
 	xdchange_t *xch;
 
-	for (xch = xscr; xch; xch = xch->next) {
+	ಗಾಗಿ (xch = xscr; xch; xch = xch->ಮುಂದಿನ) {
 		xrecord_t *rec;
-		int ignore = 1;
-		long i;
+		ಪೂರ್ಣಾಂಕ ignore = 1;
+		ದೀರ್ಘ i;
 
 		/*
 		 * Do not override --ignore-blank-lines.
 		 */
-		if (xch->ignore)
-			continue;
+		ಆದರೆ (xch->ignore)
+			ಮುಂದುವರಿ;
 
 		rec = &xe->xdf1.recs[xch->i1];
-		for (i = 0; i < xch->chg1 && ignore; i++)
-			ignore = record_matches_regex(&rec[i], xpp);
+		ಗಾಗಿ (i = 0; i < xch->chg1 && ignore; i++)
+			ignore = ದಾಖಲೆ_matches_regex(&rec[i], xpp);
 
 		rec = &xe->xdf2.recs[xch->i2];
-		for (i = 0; i < xch->chg2 && ignore; i++)
-			ignore = record_matches_regex(&rec[i], xpp);
+		ಗಾಗಿ (i = 0; i < xch->chg2 && ignore; i++)
+			ignore = ದಾಖಲೆ_matches_regex(&rec[i], xpp);
 
 		xch->ignore = ignore;
 	}
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-int xdl_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
-	     xdemitconf_t const *xecfg, xdemitcb_t *ecb) {
+ಪೂರ್ಣಾಂಕ xdl_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t ಸ್ಥಿರಾಂಕ *xpp,
+	     xdemitconf_t ಸ್ಥಿರಾಂಕ *xecfg, xdemitcb_t *ecb) {
 	xdchange_t *xscr;
 	xdfenv_t xe;
 	emit_func_t ef = xecfg->hunk_func ? xdl_call_hunk_func : xdl_emit_diff;
 
-	if (xdl_do_diff(mf1, mf2, xpp, &xe) < 0) {
+	ಆದರೆ (xdl_do_diff(mf1, mf2, xpp, &xe) < 0) {
 
-		return -1;
+		ಹಿಂತಿರುಗಿ -1;
 	}
-	if (xdl_change_compact(&xe.xdf1, &xe.xdf2, xpp->flags) < 0 ||
+	ಆದರೆ (xdl_change_compact(&xe.xdf1, &xe.xdf2, xpp->flags) < 0 ||
 	    xdl_change_compact(&xe.xdf2, &xe.xdf1, xpp->flags) < 0 ||
 	    xdl_build_script(&xe, &xscr) < 0) {
 
 		xdl_free_env(&xe);
-		return -1;
+		ಹಿಂತಿರುಗಿ -1;
 	}
-	if (xscr) {
-		if (xpp->flags & XDF_IGNORE_BLANK_LINES)
-			xdl_mark_ignorable_lines(xscr, &xe, xpp->flags);
+	ಆದರೆ (xscr) {
+		ಆದರೆ (xpp->flags & XDF_IGNORE_BLANK_ಸಾಲುಗಳು)
+			xdl_mark_ignorable_ಸಾಲುಗಳು(xscr, &xe, xpp->flags);
 
-#if 0
-		if (xpp->ignore_regex)
+#ಆದರೆ 0
+		ಆದರೆ (xpp->ignore_regex)
 			xdl_mark_ignorable_regex(xscr, &xe, xpp);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-		if (ef(&xe, xscr, ecb, xecfg) < 0) {
+		ಆದರೆ (ef(&xe, xscr, ecb, xecfg) < 0) {
 
 			xdl_free_script(xscr);
 			xdl_free_env(&xe);
-			return -1;
+			ಹಿಂತಿರುಗಿ -1;
 		}
 		xdl_free_script(xscr);
 	}
 	xdl_free_env(&xe);
 
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
 }

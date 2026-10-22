@@ -11,346 +11,346 @@
  * alloc.c: functions for memory management
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
 /**********************************************************************
  * Various routines dealing with allocation and deallocation of memory.
  */
 
-#if defined(MEM_PROFILE)
+#ಆದರೆ defined(MEM_PROFILE)
 
 # define MEM_SIZES  8200
-static long_u mem_allocs[MEM_SIZES];
-static long_u mem_frees[MEM_SIZES];
-static long_u mem_allocated;
-static long_u mem_freed;
-static long_u mem_peak;
-static long_u num_alloc;
-static long_u num_freed;
+ಸ್ಥಿರ long_u mem_allocs[MEM_SIZES];
+ಸ್ಥಿರ long_u mem_frees[MEM_SIZES];
+ಸ್ಥಿರ long_u mem_allocated;
+ಸ್ಥಿರ long_u mem_freed;
+ಸ್ಥಿರ long_u mem_peak;
+ಸ್ಥಿರ long_u ಅಂಕೆ_alloc;
+ಸ್ಥಿರ long_u ಅಂಕೆ_freed;
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 mem_pre_alloc_s(size_t *sizep)
 {
-    *sizep += sizeof(size_t);
+    *sizep += ಗಾತ್ರ(size_t);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 mem_pre_alloc_l(size_t *sizep)
 {
-    *sizep += sizeof(size_t);
+    *sizep += ಗಾತ್ರ(size_t);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 mem_post_alloc(
-    void **pp,
-    size_t size)
+    ಶೂನ್ಯ **pp,
+    size_t ಗಾತ್ರ_2)
 {
-    if (*pp == NULL)
-	return;
-    size -= sizeof(size_t);
-    *(long_u *)*pp = size;
-    if (size <= MEM_SIZES-1)
-	mem_allocs[size-1]++;
-    else
+    ಆದರೆ (*pp == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
+    ಗಾತ್ರ_2 -= ಗಾತ್ರ(size_t);
+    *(long_u *)*pp = ಗಾತ್ರ_2;
+    ಆದರೆ (ಗಾತ್ರ_2 <= MEM_SIZES-1)
+	mem_allocs[ಗಾತ್ರ_2-1]++;
+    ಇಲ್ಲದಿದ್ದರೆ
 	mem_allocs[MEM_SIZES-1]++;
-    mem_allocated += size;
-    if (mem_allocated - mem_freed > mem_peak)
+    mem_allocated += ಗಾತ್ರ_2;
+    ಆದರೆ (mem_allocated - mem_freed > mem_peak)
 	mem_peak = mem_allocated - mem_freed;
-    num_alloc++;
-    *pp = (void *)((char *)*pp + sizeof(size_t));
+    ಅಂಕೆ_alloc++;
+    *pp = (ಶೂನ್ಯ *)((ಅಕ್ಷರ *)*pp + ಗಾತ್ರ(size_t));
 }
 
-    static void
-mem_pre_free(void **pp)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+mem_pre_free(ಶೂನ್ಯ **pp)
 {
-    long_u size;
+    long_u ಗಾತ್ರ_2;
 
-    *pp = (void *)((char *)*pp - sizeof(size_t));
-    size = *(size_t *)*pp;
-    if (size <= MEM_SIZES-1)
-	mem_frees[size-1]++;
-    else
+    *pp = (ಶೂನ್ಯ *)((ಅಕ್ಷರ *)*pp - ಗಾತ್ರ(size_t));
+    ಗಾತ್ರ_2 = *(size_t *)*pp;
+    ಆದರೆ (ಗಾತ್ರ_2 <= MEM_SIZES-1)
+	mem_frees[ಗಾತ್ರ_2-1]++;
+    ಇಲ್ಲದಿದ್ದರೆ
 	mem_frees[MEM_SIZES-1]++;
-    mem_freed += size;
-    num_freed++;
+    mem_freed += ಗಾತ್ರ_2;
+    ಅಂಕೆ_freed++;
 }
 
 /*
  * called on exit via atexit()
  */
-    void
-vim_mem_profile_dump(void)
+    ಶೂನ್ಯ
+vim_mem_profile_dump(ಶೂನ್ಯ)
 {
-    int i, j;
+    ಪೂರ್ಣಾಂಕ i, j;
 
-    printf("\r\n");
+    ಬರೆ("\r\n");
     j = 0;
-    for (i = 0; i < MEM_SIZES - 1; i++)
+    ಗಾಗಿ (i = 0; i < MEM_SIZES - 1; i++)
     {
-	if (mem_allocs[i] == 0 && mem_frees[i] == 0)
-	    continue;
+	ಆದರೆ (mem_allocs[i] == 0 && mem_frees[i] == 0)
+	    ಮುಂದುವರಿ;
 
-	if (mem_frees[i] > mem_allocs[i])
-	    printf("\r\n%s", _("ERROR: "));
-	printf("[%4d / %4lu-%-4lu] ", i + 1, mem_allocs[i], mem_frees[i]);
+	ಆದರೆ (mem_frees[i] > mem_allocs[i])
+	    ಬರೆ("\r\n%s", _("ERROR: "));
+	ಬರೆ("[%4d / %4lu-%-4lu] ", i + 1, mem_allocs[i], mem_frees[i]);
 	j++;
-	if (j > 3)
+	ಆದರೆ (j > 3)
 	{
 	    j = 0;
-	    printf("\r\n");
+	    ಬರೆ("\r\n");
 	}
     }
 
     i = MEM_SIZES - 1;
-    if (mem_allocs[i])
+    ಆದರೆ (mem_allocs[i])
     {
-	printf("\r\n");
-	if (mem_frees[i] > mem_allocs[i])
+	ಬರೆ("\r\n");
+	ಆದರೆ (mem_frees[i] > mem_allocs[i])
 	    puts(_("ERROR: "));
-	printf("[>%d / %4lu-%-4lu]", i, mem_allocs[i], mem_frees[i]);
+	ಬರೆ("[>%d / %4lu-%-4lu]", i, mem_allocs[i], mem_frees[i]);
     }
 
-    printf(_("\n[bytes] total alloc-freed %lu-%lu, in use %lu, peak use %lu\n"),
+    ಬರೆ(_("\n[bytes] total alloc-freed %lu-%lu, in use %lu, peak use %lu\n"),
 	    mem_allocated, mem_freed, mem_allocated - mem_freed, mem_peak);
-    printf(_("[calls] total re/malloc()'s %lu, total free()'s %lu\n\n"),
-	    num_alloc, num_freed);
+    ಬರೆ(_("[calls] total re/malloc()'s %lu, total free()'s %lu\n\n"),
+	    ಅಂಕೆ_alloc, ಅಂಕೆ_freed);
 }
 
-#endif // MEM_PROFILE
+#ಆದರೆ_ಅಂತ್ಯ // MEM_PROFILE
 
-#ifdef FEAT_EVAL
-    int
-alloc_does_fail(size_t size)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಪೂರ್ಣಾಂಕ
+alloc_does_fail(size_t ಗಾತ್ರ_2)
 {
-    if (alloc_fail_countdown == 0)
+    ಆದರೆ (alloc_fail_countdown == 0)
     {
-	if (--alloc_fail_repeat <= 0)
+	ಆದರೆ (--alloc_fail_repeat <= 0)
 	    alloc_fail_id = 0;
-	do_outofmem_msg(size);
-	return TRUE;
+	do_outofmem_ಸಂದೇಶ(ಗಾತ್ರ_2);
+	ಹಿಂತಿರುಗಿ TRUE;
     }
     --alloc_fail_countdown;
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Some memory is reserved for error messages and for being able to
  * call mf_release_all(), which needs some memory for mf_trans_add().
  */
-#define KEEP_ROOM (2 * 8192L)
-#define KEEP_ROOM_KB (KEEP_ROOM / 1024L)
+#ವ್ಯಾಖ್ಯಾನಿಸು KEEP_ಸ್ಥಳ (2 * 8192L)
+#ವ್ಯಾಖ್ಯಾನಿಸು KEEP_ಸ್ಥಳ_KB (KEEP_ಸ್ಥಳ / 1024L)
 
 /*
  * The normal way to allocate memory.  This handles an out-of-memory situation
  * as well as possible, still returns NULL when we're completely out.
  */
-    void *
-alloc(size_t size)
+    ಶೂನ್ಯ *
+alloc(size_t ಗಾತ್ರ_2)
 {
-    return lalloc(size, TRUE);
+    ಹಿಂತಿರುಗಿ lalloc(ಗಾತ್ರ_2, TRUE);
 }
 
-#if defined(FEAT_QUICKFIX)
+#ಆದರೆ defined(FEAT_QUICKFIX)
 /*
  * alloc() with an ID for alloc_fail().
  */
-    void *
-alloc_id(size_t size, alloc_id_T id UNUSED)
+    ಶೂನ್ಯ *
+alloc_id(size_t ಗಾತ್ರ_2, alloc_id_T id ಬಳಸದ)
 {
 # ifdef FEAT_EVAL
-    if (alloc_fail_id == id && alloc_does_fail(size))
-	return NULL;
+    ಆದರೆ (alloc_fail_id == id && alloc_does_fail(ಗಾತ್ರ_2))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 # endif
-    return lalloc(size, TRUE);
+    ಹಿಂತಿರುಗಿ lalloc(ಗಾತ್ರ_2, TRUE);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Allocate memory and set all bytes to zero.
  */
-    void *
-alloc_clear(size_t size)
+    ಶೂನ್ಯ *
+alloc_clear(size_t ಗಾತ್ರ_2)
 {
-    void *p;
+    ಶೂನ್ಯ *p;
 
-    p = lalloc(size, TRUE);
-    if (p != NULL)
-	(void)vim_memset(p, 0, size);
-    return p;
+    p = lalloc(ಗಾತ್ರ_2, TRUE);
+    ಆದರೆ (p != ಖಾಲಿ)
+	(ಶೂನ್ಯ)vim_memset(p, 0, ಗಾತ್ರ_2);
+    ಹಿಂತಿರುಗಿ p;
 }
 
 /*
  * Same as alloc_clear() but with allocation id for testing
  */
-    void *
-alloc_clear_id(size_t size, alloc_id_T id UNUSED)
+    ಶೂನ್ಯ *
+alloc_clear_id(size_t ಗಾತ್ರ_2, alloc_id_T id ಬಳಸದ)
 {
-#ifdef FEAT_EVAL
-    if (alloc_fail_id == id && alloc_does_fail(size))
-	return NULL;
-#endif
-    return alloc_clear(size);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಆದರೆ (alloc_fail_id == id && alloc_does_fail(ಗಾತ್ರ_2))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ alloc_clear(ಗಾತ್ರ_2);
 }
 
 /*
  * Allocate memory like lalloc() and set all bytes to zero.
  */
-    void *
-lalloc_clear(size_t size, int message)
+    ಶೂನ್ಯ *
+lalloc_clear(size_t ಗಾತ್ರ_2, ಪೂರ್ಣಾಂಕ ಸಂದೇಶ_2)
 {
-    void *p;
+    ಶೂನ್ಯ *p;
 
-    p = lalloc(size, message);
-    if (p != NULL)
-	(void)vim_memset(p, 0, size);
-    return p;
+    p = lalloc(ಗಾತ್ರ_2, ಸಂದೇಶ_2);
+    ಆದರೆ (p != ಖಾಲಿ)
+	(ಶೂನ್ಯ)vim_memset(p, 0, ಗಾತ್ರ_2);
+    ಹಿಂತಿರುಗಿ p;
 }
 
 /*
  * Low level memory allocation function.
  * This is used often, KEEP IT FAST!
  */
-    void *
-lalloc(size_t size, int message)
+    ಶೂನ್ಯ *
+lalloc(size_t ಗಾತ್ರ_2, ಪೂರ್ಣಾಂಕ ಸಂದೇಶ_2)
 {
-    void	*p;		    // pointer to new storage space
-    static int	releasing = FALSE;  // don't do mf_release_all() recursive
-    int		try_again;
-#if defined(HAVE_AVAIL_MEM)
-    static size_t allocated = 0;    // allocated since last avail check
-#endif
+    ಶೂನ್ಯ	*p;		    // pointer to new storage space
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	releasing = FALSE;  // don't do mf_release_all() recursive
+    ಪೂರ್ಣಾಂಕ		try_again;
+#ಆದರೆ defined(HAVE_AVAIL_MEM)
+    ಸ್ಥಿರ size_t allocated = 0;    // allocated since last avail check
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Safety check for allocating zero bytes
-    if (size == 0)
+    ಆದರೆ (ಗಾತ್ರ_2 == 0)
     {
 	// Don't hide this message
 	emsg_silent = 0;
-	iemsg(e_internal_error_lalloc_zero);
-	return NULL;
+	iemsg(e_ಆಂತರಿಕ_error_lalloc_zero);
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-#ifdef MEM_PROFILE
-    mem_pre_alloc_l(&size);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MEM_PROFILE
+    mem_pre_alloc_l(&ಗಾತ್ರ_2);
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Loop when out of memory: Try to release some memfile blocks and
     // if some blocks are released call malloc again.
-    for (;;)
+    ಗಾಗಿ (;;)
     {
 	// Handle three kinds of systems:
 	// 1. No check for available memory: Just return.
 	// 2. Slow check for available memory: call mch_avail_mem() after
 	//    allocating KEEP_ROOM amount of memory.
 	// 3. Strict check for available memory: call mch_avail_mem()
-	if ((p = malloc(size)) != NULL)
+	ಆದರೆ ((p = ಸ್ಮರಣೆ_ಕೊಡು(ಗಾತ್ರ_2)) != ಖಾಲಿ)
 	{
-#ifndef HAVE_AVAIL_MEM
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ HAVE_AVAIL_MEM
 	    // 1. No check for available memory: Just return.
-	    goto theend;
-#else
+	    ಹೋಗು theend;
+#ಇಲ್ಲದಿದ್ದರೆ
 	    // 2. Slow check for available memory: call mch_avail_mem() after
 	    //    allocating (KEEP_ROOM / 2) amount of memory.
-	    allocated += size;
-	    if (allocated < KEEP_ROOM / 2)
-		goto theend;
+	    allocated += ಗಾತ್ರ_2;
+	    ಆದರೆ (allocated < KEEP_ಸ್ಥಳ / 2)
+		ಹೋಗು theend;
 	    allocated = 0;
 
 	    // 3. check for available memory: call mch_avail_mem()
-	    if (mch_avail_mem(TRUE) < KEEP_ROOM_KB && !releasing)
+	    ಆದರೆ (mch_avail_mem(TRUE) < KEEP_ಸ್ಥಳ_KB && !releasing)
 	    {
-		free(p);	// System is low... no go!
-		p = NULL;
+		ಬಿಡುಗಡೆ(p);	// System is low... no go!
+		p = ಖಾಲಿ;
 	    }
-	    else
-		goto theend;
-#endif
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ಹೋಗು theend;
+#ಆದರೆ_ಅಂತ್ಯ
 	}
 	// Remember that mf_release_all() is being called to avoid an endless
 	// loop, because mf_release_all() may call alloc() recursively.
-	if (releasing)
-	    break;
+	ಆದರೆ (releasing)
+	    ನಿಲ್ಲಿಸು;
 	releasing = TRUE;
 
-	clear_sb_text(TRUE);	      // free any scrollback text
+	clear_sb_ಪಠ್ಯ(TRUE);	      // free any scrollback text
 	try_again = mf_release_all(); // release as many blocks as possible
 
 	releasing = FALSE;
-	if (!try_again)
-	    break;
+	ಆದರೆ (!try_again)
+	    ನಿಲ್ಲಿಸು;
     }
 
-    if (message && p == NULL)
-	do_outofmem_msg(size);
+    ಆದರೆ (ಸಂದೇಶ_2 && p == ಖಾಲಿ)
+	do_outofmem_ಸಂದೇಶ(ಗಾತ್ರ_2);
 
 theend:
-#ifdef MEM_PROFILE
-    mem_post_alloc(&p, size);
-#endif
-    return p;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MEM_PROFILE
+    mem_post_alloc(&p, ಗಾತ್ರ_2);
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ p;
 }
 
 /*
  * lalloc() with an ID for alloc_fail().
  */
-#if defined(FEAT_SIGNS)
-    void *
-lalloc_id(size_t size, int message, alloc_id_T id UNUSED)
+#ಆದರೆ defined(FEAT_SIGNS)
+    ಶೂನ್ಯ *
+lalloc_id(size_t ಗಾತ್ರ_2, ಪೂರ್ಣಾಂಕ ಸಂದೇಶ_2, alloc_id_T id ಬಳಸದ)
 {
 # ifdef FEAT_EVAL
-    if (alloc_fail_id == id && alloc_does_fail(size))
-	return NULL;
+    ಆದರೆ (alloc_fail_id == id && alloc_does_fail(ಗಾತ್ರ_2))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 # endif
-    return (lalloc(size, message));
+    ಹಿಂತಿರುಗಿ (lalloc(ಗಾತ್ರ_2, ಸಂದೇಶ_2));
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(MEM_PROFILE)
+#ಆದರೆ defined(MEM_PROFILE)
 /*
  * realloc() with memory profiling.
  */
-    void *
-mem_realloc(void *ptr, size_t size)
+    ಶೂನ್ಯ *
+mem_realloc(ಶೂನ್ಯ *ptr, size_t ಗಾತ್ರ_2)
 {
-    void *p;
+    ಶೂನ್ಯ *p;
 
     mem_pre_free(&ptr);
-    mem_pre_alloc_s(&size);
+    mem_pre_alloc_s(&ಗಾತ್ರ_2);
 
-    p = realloc(ptr, size);
+    p = realloc(ptr, ಗಾತ್ರ_2);
 
-    mem_post_alloc(&p, size);
+    mem_post_alloc(&p, ಗಾತ್ರ_2);
 
-    return p;
+    ಹಿಂತಿರುಗಿ p;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
 * Avoid repeating the error message many times (they take 1 second each).
 * Did_outofmem_msg is reset when a character is read.
 */
-    void
-do_outofmem_msg(size_t size)
+    ಶೂನ್ಯ
+do_outofmem_ಸಂದೇಶ(size_t ಗಾತ್ರ_2)
 {
-    if (did_outofmem_msg)
-	return;
+    ಆದರೆ (did_outofmem_ಸಂದೇಶ)
+	ಹಿಂತಿರುಗಿ;
 
     // Don't hide this message
     emsg_silent = 0;
 
     // Must come first to avoid coming back here when printing the error
     // message fails, e.g. when setting v:errmsg.
-    did_outofmem_msg = TRUE;
+    did_outofmem_ಸಂದೇಶ = TRUE;
 
-    semsg(_(e_out_of_memory_allocating_nr_bytes), (long_u)size);
+    semsg(_(e_ಹೊರಹೋಗು_ದ_ಸ್ಮರಣೆ_allocating_nr_ಬೈಟುಗಳು), (long_u)ಗಾತ್ರ_2);
 
-    if (starting == NO_SCREEN)
+    ಆದರೆ (starting == NO_SCREEN)
 	// Not even finished with initializations and already out of
 	// memory?  Then nothing is going to work, exit.
 	mch_exit(123);
 }
 
-#if defined(EXITFREE)
+#ಆದರೆ defined(EXITFREE)
 
 /*
  * Free everything that we allocated.
@@ -359,45 +359,45 @@ do_outofmem_msg(size_t size)
  * surprised if Vim crashes...
  * Some things can't be freed, esp. things local to a library function.
  */
-    void
-free_all_mem(void)
+    ಶೂನ್ಯ
+free_all_mem(ಶೂನ್ಯ)
 {
     buf_T	*buf, *nextbuf;
 
     // When we cause a crash here it is caught and Vim tries to exit cleanly.
     // Don't try freeing everything again.
-    if (entered_free_all_mem)
-	return;
+    ಆದರೆ (entered_free_all_mem)
+	ಹಿಂತಿರುಗಿ;
     entered_free_all_mem = TRUE;
     // Don't want to trigger autocommands from here on.
-    block_autocmds();
+    ಖಂಡ_autocmds();
 
     // Close all tabs and windows.  Reset 'equalalways' to avoid redraws.
     p_ea = FALSE;
-    if (first_tabpage != NULL && first_tabpage->tp_next != NULL)
+    ಆದರೆ (ಮೊದಲ_tabpage != ಖಾಲಿ && ಮೊದಲ_tabpage->tp_ಮುಂದಿನ != ಖಾಲಿ)
 	do_cmdline_cmd((char_u *)"tabonly!");
-    if (!ONE_WINDOW)
+    ಆದರೆ (!ONE_ಕಿಟಕಿ)
 	do_cmdline_cmd((char_u *)"only!");
 
-# if defined(FEAT_SPELL)
+# ಆದರೆ defined(FEAT_SPELL)
     // Free all spell info.
     spell_free_all();
 # endif
 
-# if defined(FEAT_BEVAL_TERM)
+# ಆದರೆ defined(FEAT_BEVAL_ಪದ)
     ui_remove_balloon();
 # endif
 # ifdef FEAT_PROP_POPUP
-    if (curwin != NULL)
+    ಆದರೆ (curwin != ಖಾಲಿ)
 	close_all_popups(TRUE);
 # endif
 
     // Clear user commands (before deleting buffers).
-    ex_comclear(NULL);
+    ex_comclear(ಖಾಲಿ);
 
     // When exiting from mainerr_arg_missing curbuf has not been initialized,
     // and not much else.
-    if (curbuf != NULL)
+    ಆದರೆ (curbuf != ಖಾಲಿ)
     {
 # ifdef FEAT_MENU
 	// Clear menus.
@@ -413,13 +413,13 @@ free_all_mem(void)
 	do_cmdline_cmd((char_u *)"mapclear");
 	do_cmdline_cmd((char_u *)"mapclear!");
 	do_cmdline_cmd((char_u *)"abclear");
-# if defined(FEAT_EVAL)
+# ಆದರೆ defined(FEAT_EVAL)
 	do_cmdline_cmd((char_u *)"breakdel *");
 # endif
-# if defined(FEAT_PROFILE)
+# ಆದರೆ defined(FEAT_PROFILE)
 	do_cmdline_cmd((char_u *)"profdel *");
 # endif
-# if defined(FEAT_KEYMAP)
+# ಆದರೆ defined(FEAT_KEYMAP)
 	do_cmdline_cmd((char_u *)"set keymap=");
 # endif
     }
@@ -434,13 +434,13 @@ free_all_mem(void)
     alist_clear(&global_alist);
     free_homedir();
     free_users();
-    free_search_patterns();
+    free_ಹುಡುಕು_patterns();
     free_old_sub();
-    free_last_insert();
+    free_ಕೊನೆಯ_ಸೇರಿಸು();
     free_insexpand_stuff();
     free_prev_shellcmd();
     free_regexp_stuff();
-    free_tag_stuff();
+    free_ಟ್ಯಾಗ್_stuff();
     free_xim_stuff();
     free_cd_dir();
 # ifdef FEAT_SIGNS
@@ -448,22 +448,22 @@ free_all_mem(void)
 # endif
 # ifdef FEAT_EVAL
     free_eval_regcomp_cache();
-    set_expr_line(NULL, NULL);
+    ಗಣ_ಅಭಿವ್ಯಕ್ತಿ_ಸಾಲು(ಖಾಲಿ, ಖಾಲಿ);
 # endif
 # ifdef FEAT_DIFF
-    if (curtab != NULL)
+    ಆದರೆ (curtab != ಖಾಲಿ)
 	diff_clear(curtab);
 # endif
-    clear_sb_text(TRUE);	      // free any scrollback text
+    clear_sb_ಪಠ್ಯ(TRUE);	      // free any scrollback text
 
     // Free some global vars.
     free_username();
 # ifdef FEAT_CLIPBOARD
     vim_regfree(clip_exclude_prog);
 # endif
-    vim_free(last_cmdline);
-    vim_free(new_last_cmdline);
-    set_keep_msg(NULL, 0);
+    vim_free(ಕೊನೆಯ_cmdline);
+    vim_free(new_ಕೊನೆಯ_cmdline);
+    ಗಣ_keep_ಸಂದೇಶ(ಖಾಲಿ, 0);
 
     // Clear cmdline history.
     p_hi = 0;
@@ -479,7 +479,7 @@ free_all_mem(void)
     // Close all script inputs.
     close_all_scripts();
 
-    if (curwin != NULL)
+    ಆದರೆ (curwin != ಖಾಲಿ)
 	// Destroy all windows.  Must come before freeing buffers.
 	win_free_all();
 
@@ -491,18 +491,18 @@ free_all_mem(void)
 # ifdef FEAT_AUTOCHDIR
     p_acd = FALSE;
 # endif
-    for (buf = firstbuf; buf != NULL; )
+    ಗಾಗಿ (buf = firstbuf; buf != ಖಾಲಿ; )
     {
 	bufref_T    bufref;
 
-	set_bufref(&bufref, buf);
-	nextbuf = buf->b_next;
+	ಗಣ_bufref(&bufref, buf);
+	nextbuf = buf->b_ಮುಂದಿನ;
 	// All windows were freed.  Reset b_nwindows so buffers can be wiped.
 	buf->b_nwindows = 0;
-	close_buffer(NULL, buf, DOBUF_WIPE, FALSE, FALSE, FALSE);
-	if (bufref_valid(&bufref))
+	close_ಬಫರ್(ಖಾಲಿ, buf, DOBUF_WIPE, FALSE, FALSE, FALSE);
+	ಆದರೆ (bufref_valid(&bufref))
 	    buf = nextbuf;	// didn't work, try next one
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    buf = firstbuf;
     }
 
@@ -515,19 +515,19 @@ free_all_mem(void)
     ResetRedobuff();
     ResetRedobuff();
 
-# if defined(FEAT_CLIENTSERVER) && defined(FEAT_X11)
-    vim_free(serverDelayedStartName);
+# ಆದರೆ defined(FEAT_CLIENTSERVER) && defined(FEAT_X11)
+    vim_free(server_Delayed_ಆರಂಭ_Name);
 # endif
 
     // highlight info
     free_highlight();
 
-    reset_last_sourcing();
+    reset_ಕೊನೆಯ_sourcing();
 
-    if (first_tabpage != NULL)
+    ಆದರೆ (ಮೊದಲ_tabpage != ಖಾಲಿ)
     {
-	free_tabpage(first_tabpage);
-	first_tabpage = NULL;
+	free_tabpage(ಮೊದಲ_tabpage);
+	ಮೊದಲ_tabpage = ಖಾಲಿ;
     }
 
 # ifdef UNIX
@@ -536,11 +536,11 @@ free_all_mem(void)
 # endif
 
     // message history
-    for (;;)
-	if (delete_first_msg() == FAIL)
-	    break;
+    ಗಾಗಿ (;;)
+	ಆದರೆ (delete_ಮೊದಲ_ಸಂದೇಶ() == FAIL)
+	    ನಿಲ್ಲಿಸು;
 
-# ifdef FEAT_JOB_CHANNEL
+# ifdef FEAT_ಕೆಲಸ_CHANNEL
     channel_free_all();
 # endif
 # ifdef FEAT_TIMERS
@@ -550,21 +550,21 @@ free_all_mem(void)
     // must be after channel_free_all() with unrefs partials
     eval_clear();
 # endif
-# ifdef FEAT_JOB_CHANNEL
+# ifdef FEAT_ಕೆಲಸ_CHANNEL
     // must be after eval_clear() with unrefs jobs
-    job_free_all();
+    ಕೆಲಸ_free_all();
 # endif
 
     free_termoptions();
-    free_cur_term();
+    free_cur_ಪದ();
 
     // screenlines (can't display anything now!)
     free_screenlines();
 
-# if defined(FEAT_SOUND)
+# ಆದರೆ defined(FEAT_SOUND)
     sound_free();
 # endif
-# if defined(USE_XSMP)
+# ಆದರೆ defined(USE_XSMP)
     xsmp_close();
 # endif
 # ifdef FEAT_GUI_GTK
@@ -581,11 +581,11 @@ free_all_mem(void)
     check_quickfix_busy();
 # endif
 # ifdef FEAT_EVAL
-    free_resub_eval_result();
+    free_resub_eval_ಫಲಿತಾಂಶ();
 # endif
     free_vbuf();
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Copy "p[len]" into allocated memory, ignoring NUL characters.
@@ -596,9 +596,9 @@ vim_memsave(char_u *p, size_t len)
 {
     char_u *ret = alloc(len);
 
-    if (ret != NULL)
+    ಆದರೆ (ret != ಖಾಲಿ)
 	mch_memmove(ret, p, len);
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
 /*
@@ -608,15 +608,15 @@ vim_memsave(char_u *p, size_t len)
  * If you want to set NULL after calling this function, you should use
  * VIM_CLEAR() instead.
  */
-    void
-vim_free(void *x)
+    ಶೂನ್ಯ
+vim_free(ಶೂನ್ಯ *x)
 {
-    if (x != NULL && !really_exiting)
+    ಆದರೆ (x != ಖಾಲಿ && !really_exiting)
     {
-#ifdef MEM_PROFILE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MEM_PROFILE
 	mem_pre_free(&x);
-#endif
-	free(x);
+#ಆದರೆ_ಅಂತ್ಯ
+	ಬಿಡುಗಡೆ(x);
     }
 }
 
@@ -627,81 +627,81 @@ vim_free(void *x)
 /*
  * Clear an allocated growing array.
  */
-    void
+    ಶೂನ್ಯ
 ga_clear(garray_T *gap)
 {
-    vim_free(gap->ga_data);
+    vim_free(gap->ga_ದತ್ತಾಂಶ);
     ga_init(gap);
 }
 
 /*
  * Clear a growing array that contains a list of strings.
  */
-    void
-ga_clear_strings(garray_T *gap)
+    ಶೂನ್ಯ
+ga_clear_ಅಕ್ಷರಸರಣಿಗಳು(garray_T *gap)
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
 
-    if (gap->ga_data != NULL)
-	for (i = 0; i < gap->ga_len; ++i)
-	    vim_free(((char_u **)(gap->ga_data))[i]);
+    ಆದರೆ (gap->ga_ದತ್ತಾಂಶ != ಖಾಲಿ)
+	ಗಾಗಿ (i = 0; i < gap->ga_len; ++i)
+	    vim_free(((char_u **)(gap->ga_ದತ್ತಾಂಶ))[i]);
     ga_clear(gap);
 }
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * Copy a growing array that contains a list of strings.
  */
-    int
-ga_copy_strings(garray_T *from, garray_T *to)
+    ಪೂರ್ಣಾಂಕ
+ga_copy_ಅಕ್ಷರಸರಣಿಗಳು(garray_T *from, garray_T *ಗಮ್ಯ)
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
 
-    ga_init2(to, sizeof(char_u *), 1);
-    if (ga_grow(to, from->ga_len) == FAIL)
-	return FAIL;
+    ga_init2(ಗಮ್ಯ, ಗಾತ್ರ(char_u *), 1);
+    ಆದರೆ (ga_grow(ಗಮ್ಯ, from->ga_len) == FAIL)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    for (i = 0; i < from->ga_len; ++i)
+    ಗಾಗಿ (i = 0; i < from->ga_len; ++i)
     {
-	char_u *orig = ((char_u **)from->ga_data)[i];
+	char_u *orig = ((char_u **)from->ga_ದತ್ತಾಂಶ)[i];
 	char_u *copy;
 
-	if (orig == NULL)
-	    copy = NULL;
-	else
+	ಆದರೆ (orig == ಖಾಲಿ)
+	    copy = ಖಾಲಿ;
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    copy = vim_strsave(orig);
-	    if (copy == NULL)
+	    ಆದರೆ (copy == ಖಾಲಿ)
 	    {
-		to->ga_len = i;
-		ga_clear_strings(to);
-		return FAIL;
+		ಗಮ್ಯ->ga_len = i;
+		ga_clear_ಅಕ್ಷರಸರಣಿಗಳು(ಗಮ್ಯ);
+		ಹಿಂತಿರುಗಿ FAIL;
 	    }
 	}
-	((char_u **)to->ga_data)[i] = copy;
+	((char_u **)ಗಮ್ಯ->ga_ದತ್ತಾಂಶ)[i] = copy;
     }
-    to->ga_len = from->ga_len;
-    return OK;
+    ಗಮ್ಯ->ga_len = from->ga_len;
+    ಹಿಂತಿರುಗಿ OK;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Initialize a growing array.	Don't forget to set ga_itemsize and
  * ga_growsize!  Or use ga_init2().
  */
-    void
+    ಶೂನ್ಯ
 ga_init(garray_T *gap)
 {
-    gap->ga_data = NULL;
+    gap->ga_ದತ್ತಾಂಶ = ಖಾಲಿ;
     gap->ga_maxlen = 0;
     gap->ga_len = 0;
 }
 
-    void
-ga_init2(garray_T *gap, size_t itemsize, int growsize)
+    ಶೂನ್ಯ
+ga_init2(garray_T *gap, size_t itemsize, ಪೂರ್ಣಾಂಕ growsize)
 {
     ga_init(gap);
-    gap->ga_itemsize = (int)itemsize;
+    gap->ga_itemsize = (ಪೂರ್ಣಾಂಕ)itemsize;
     gap->ga_growsize = growsize;
 }
 
@@ -709,55 +709,55 @@ ga_init2(garray_T *gap, size_t itemsize, int growsize)
  * Make room in growing array "gap" for at least "n" items.
  * Return FAIL for failure, OK otherwise.
  */
-    int
-ga_grow(garray_T *gap, int n)
+    ಪೂರ್ಣಾಂಕ
+ga_grow(garray_T *gap, ಪೂರ್ಣಾಂಕ n)
 {
-    if (gap->ga_maxlen - gap->ga_len < n)
-	return ga_grow_inner(gap, n);
-    return OK;
+    ಆದರೆ (gap->ga_maxlen - gap->ga_len < n)
+	ಹಿಂತಿರುಗಿ ga_grow_inner(gap, n);
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Same as ga_grow() but uses an allocation id for testing.
  */
-    int
-ga_grow_id(garray_T *gap, int n, alloc_id_T id UNUSED)
+    ಪೂರ್ಣಾಂಕ
+ga_grow_id(garray_T *gap, ಪೂರ್ಣಾಂಕ n, alloc_id_T id ಬಳಸದ)
 {
-#ifdef FEAT_EVAL
-    if (alloc_fail_id == id && alloc_does_fail(sizeof(list_T)))
-	return FAIL;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಆದರೆ (alloc_fail_id == id && alloc_does_fail(ಗಾತ್ರ(list_T)))
+	ಹಿಂತಿರುಗಿ FAIL;
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return ga_grow(gap, n);
+    ಹಿಂತಿರುಗಿ ga_grow(gap, n);
 }
 
-    int
-ga_grow_inner(garray_T *gap, int n)
+    ಪೂರ್ಣಾಂಕ
+ga_grow_inner(garray_T *gap, ಪೂರ್ಣಾಂಕ n)
 {
     size_t	old_len;
     size_t	new_len;
     char_u	*pp;
 
-    if (n < gap->ga_growsize)
+    ಆದರೆ (n < gap->ga_growsize)
 	n = gap->ga_growsize;
 
     // A linear growth is very inefficient when the array grows big.  This
     // is a compromise between allocating memory that won't be used and too
     // many copy operations. A factor of 1.5 seems reasonable.
-    if (n < gap->ga_len / 2)
+    ಆದರೆ (n < gap->ga_len / 2)
 	n = gap->ga_len / 2;
 
-    if (n > 0 && (size_t)(gap->ga_len + n) > SIZE_MAX / gap->ga_itemsize)
-	return FAIL;
+    ಆದರೆ (n > 0 && (size_t)(gap->ga_len + n) > ಗಾತ್ರ_MAX / gap->ga_itemsize)
+	ಹಿಂತಿರುಗಿ FAIL;
     new_len = (size_t)gap->ga_itemsize * (gap->ga_len + n);
-    pp = vim_realloc(gap->ga_data, new_len);
-    if (pp == NULL)
-	return FAIL;
+    pp = vim_realloc(gap->ga_ದತ್ತಾಂಶ, new_len);
+    ಆದರೆ (pp == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
     old_len = (size_t)gap->ga_itemsize * gap->ga_maxlen;
     vim_memset(pp + old_len, 0, new_len - old_len);
     gap->ga_maxlen = gap->ga_len + n;
-    gap->ga_data = pp;
-    return OK;
+    gap->ga_ದತ್ತಾಂಶ = pp;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
@@ -766,71 +766,71 @@ ga_grow_inner(garray_T *gap, int n)
  * Returns NULL when out of memory.
  */
     char_u *
-ga_concat_strings(garray_T *gap, char *sep)
+ga_concat_ಅಕ್ಷರಸರಣಿಗಳು(garray_T *gap, ಅಕ್ಷರ *sep)
 {
-    int		i;
-    int		len = 0;
-    int		sep_len = (int)STRLEN(sep);
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		len = 0;
+    ಪೂರ್ಣಾಂಕ		sep_len = (ಪೂರ್ಣಾಂಕ)STRLEN(sep);
     char_u	*s;
     char_u	*p;
 
-    for (i = 0; i < gap->ga_len; ++i)
-	len += (int)STRLEN(((char_u **)(gap->ga_data))[i]);
+    ಗಾಗಿ (i = 0; i < gap->ga_len; ++i)
+	len += (ಪೂರ್ಣಾಂಕ)STRLEN(((char_u **)(gap->ga_ದತ್ತಾಂಶ))[i]);
 
-    if (gap->ga_len > 1)
+    ಆದರೆ (gap->ga_len > 1)
 	len += (gap->ga_len - 1) * sep_len;
 
     s = alloc(len + 1);
-    if (s == NULL)
-	return NULL;
+    ಆದರೆ (s == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     *s = NUL;
     p = s;
-    for (i = 0; i < gap->ga_len; ++i)
+    ಗಾಗಿ (i = 0; i < gap->ga_len; ++i)
     {
-	if (p != s)
+	ಆದರೆ (p != s)
 	{
 	    STRCPY(p, sep);
 	    p += sep_len;
 	}
-	STRCPY(p, ((char_u **)(gap->ga_data))[i]);
+	STRCPY(p, ((char_u **)(gap->ga_ದತ್ತಾಂಶ))[i]);
 	p += STRLEN(p);
     }
-    return s;
+    ಹಿಂತಿರುಗಿ s;
 }
 
 /*
  * Make a copy of string "p" and add it to "gap".
  * When out of memory nothing changes and FAIL is returned.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 ga_copy_string(garray_T *gap, char_u *p)
 {
     char_u *cp = vim_strsave(p);
 
-    if (cp == NULL)
-	return FAIL;
+    ಆದರೆ (cp == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    if (ga_grow(gap, 1) == FAIL)
+    ಆದರೆ (ga_grow(gap, 1) == FAIL)
     {
 	vim_free(cp);
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-    ((char_u **)(gap->ga_data))[gap->ga_len++] = cp;
-    return OK;
+    ((char_u **)(gap->ga_ದತ್ತಾಂಶ))[gap->ga_len++] = cp;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Add string "p" to "gap".
  * When out of memory FAIL is returned (caller may want to free "p").
  */
-    int
-ga_add_string(garray_T *gap, char_u *p)
+    ಪೂರ್ಣಾಂಕ
+ga_ಕೂಡಿಸು_string(garray_T *gap, char_u *p)
 {
-    if (ga_grow(gap, 1) == FAIL)
-	return FAIL;
-    ((char_u **)(gap->ga_data))[gap->ga_len++] = p;
-    return OK;
+    ಆದರೆ (ga_grow(gap, 1) == FAIL)
+	ಹಿಂತಿರುಗಿ FAIL;
+    ((char_u **)(gap->ga_ದತ್ತಾಂಶ))[gap->ga_len++] = p;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
@@ -838,17 +838,17 @@ ga_add_string(garray_T *gap, char_u *p)
  * When "s" is NULL memory allocation fails does not do anything.
  * Note: Does NOT copy the NUL at the end!
  */
-    void
+    ಶೂನ್ಯ
 ga_concat(garray_T *gap, char_u *s)
 {
-    int    len;
+    ಪೂರ್ಣಾಂಕ    len;
 
-    if (s == NULL || *s == NUL)
-	return;
-    len = (int)STRLEN(s);
-    if (ga_grow(gap, len) == OK)
+    ಆದರೆ (s == ಖಾಲಿ || *s == NUL)
+	ಹಿಂತಿರುಗಿ;
+    len = (ಪೂರ್ಣಾಂಕ)STRLEN(s);
+    ಆದರೆ (ga_grow(gap, len) == OK)
     {
-	mch_memmove((char *)gap->ga_data + gap->ga_len, s, (size_t)len);
+	mch_memmove((ಅಕ್ಷರ *)gap->ga_ದತ್ತಾಂಶ + gap->ga_len, s, (size_t)len);
 	gap->ga_len += len;
     }
 }
@@ -857,77 +857,77 @@ ga_concat(garray_T *gap, char_u *s)
  * Concatenate 'len' bytes from string 's' to a growarray.
  * When "s" is NULL does not do anything.
  */
-    void
+    ಶೂನ್ಯ
 ga_concat_len(garray_T *gap, char_u *s, size_t len)
 {
-    if (s == NULL || *s == NUL || len == 0)
-	return;
-    if (len > (size_t)(INT_MAX - gap->ga_len))
+    ಆದರೆ (s == ಖಾಲಿ || *s == NUL || len == 0)
+	ಹಿಂತಿರುಗಿ;
+    ಆದರೆ (len > (size_t)(ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ - gap->ga_len))
     {
-	emsg(_(e_resulting_text_too_long));
-	return;
+	emsg(_(e_resulting_ಪಠ್ಯ_too_long));
+	ಹಿಂತಿರುಗಿ;
     }
-    if (ga_grow(gap, (int)len) == OK)
+    ಆದರೆ (ga_grow(gap, (ಪೂರ್ಣಾಂಕ)len) == OK)
     {
-	mch_memmove((char *)gap->ga_data + gap->ga_len, s, len);
-	gap->ga_len += (int)len;
+	mch_memmove((ಅಕ್ಷರ *)gap->ga_ದತ್ತಾಂಶ + gap->ga_len, s, len);
+	gap->ga_len += (ಪೂರ್ಣಾಂಕ)len;
     }
 }
 
 /*
  * Append one byte to a growarray which contains bytes.
  */
-    int
-ga_append(garray_T *gap, int c)
+    ಪೂರ್ಣಾಂಕ
+ga_append(garray_T *gap, ಪೂರ್ಣಾಂಕ c)
 {
-    if (ga_grow(gap, 1) == FAIL)
-	return FAIL;
-    *((char *)gap->ga_data + gap->ga_len) = c;
+    ಆದರೆ (ga_grow(gap, 1) == FAIL)
+	ಹಿಂತಿರುಗಿ FAIL;
+    *((ಅಕ್ಷರ *)gap->ga_ದತ್ತಾಂಶ + gap->ga_len) = c;
     ++gap->ga_len;
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-#if (defined(UNIX) && !defined(USE_SYSTEM)) || defined(MSWIN)
+#ಆದರೆ (defined(UNIX) && !defined(USE_SYSTEM)) || defined(MSWIN)
 /*
  * Append the text in "gap" below the cursor line and clear "gap".
  */
-    void
-append_ga_line(garray_T *gap)
+    ಶೂನ್ಯ
+append_ga_ಸಾಲು(garray_T *gap)
 {
     // Remove trailing CR.
-    if (gap->ga_len > 0
+    ಆದರೆ (gap->ga_len > 0
 	    && !curbuf->b_p_bin
-	    && ((char_u *)gap->ga_data)[gap->ga_len - 1] == CAR)
+	    && ((char_u *)gap->ga_ದತ್ತಾಂಶ)[gap->ga_len - 1] == CAR)
 	--gap->ga_len;
     ga_append(gap, NUL);
-    ml_append(curwin->w_cursor.lnum++, gap->ga_data, 0, FALSE);
+    ml_append(curwin->w_cursor.lnum++, gap->ga_ದತ್ತಾಂಶ, 0, FALSE);
     gap->ga_len = 0;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_IMAGE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_IMAGE
 /*
  * Append a string to a growarray of bytes.  Returns FAIL on OOM.
  */
-    int
-ga_concat_bytes(garray_T *gap, const char *s, int len)
+    ಪೂರ್ಣಾಂಕ
+ga_concat_ಬೈಟುಗಳು(garray_T *gap, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *s, ಪೂರ್ಣಾಂಕ len)
 {
-    if (ga_grow(gap, len) == FAIL)
-	return FAIL;
-    mch_memmove((char_u *)gap->ga_data + gap->ga_len, s, len);
+    ಆದರೆ (ga_grow(gap, len) == FAIL)
+	ಹಿಂತಿರುಗಿ FAIL;
+    mch_memmove((char_u *)gap->ga_ದತ್ತಾಂಶ + gap->ga_len, s, len);
     gap->ga_len += len;
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Append the string form of an integer to "gap". Returns FAIL on OOM.
  */
-    int
-ga_concat_int(garray_T *gap, int n)
+    ಪೂರ್ಣಾಂಕ
+ga_concat_int(garray_T *gap, ಪೂರ್ಣಾಂಕ n)
 {
-    char    buf[16];
-    int	    len = vim_snprintf(buf, sizeof(buf), "%d", n);
+    ಅಕ್ಷರ    buf[16];
+    ಪೂರ್ಣಾಂಕ	    len = vim_snprintf(buf, ಗಾತ್ರ(buf), "%d", n);
 
-    return ga_concat_bytes(gap, buf, len);
+    ಹಿಂತಿರುಗಿ ga_concat_ಬೈಟುಗಳು(gap, buf, len);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ

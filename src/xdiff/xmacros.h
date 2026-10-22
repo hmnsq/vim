@@ -20,46 +20,46 @@
  *
  */
 
-#if !defined(XMACROS_H)
-#define XMACROS_H
+#ಆದರೆ !defined(XMACROS_H)
+#ವ್ಯಾಖ್ಯಾನಿಸು XMACROS_H
 
 
 // SIZE_MAX may not be defined on older platforms without <stdint.h>.
-#ifndef SIZE_MAX
-# define SIZE_MAX ((size_t)(-1))
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ ಗಾತ್ರ_MAX
+# define ಗಾತ್ರ_MAX ((size_t)(-1))
+#ಆದರೆ_ಅಂತ್ಯ
 
-#define XDL_MIN(a, b) ((a) < (b) ? (a): (b))
-#define XDL_MAX(a, b) ((a) > (b) ? (a): (b))
-#define XDL_ABS(v) ((v) >= 0 ? (v): -(v))
-#define XDL_ISDIGIT(c) ((c) >= '0' && (c) <= '9')
-#define XDL_ISSPACE(c) (isspace((unsigned char)(c)))
-#define XDL_ADDBITS(v,b)	((v) + ((v) >> (b)))
-#define XDL_MASKBITS(b)		((1UL << (b)) - 1)
-#define XDL_HASHLONG(v,b)	(XDL_ADDBITS((unsigned long)(v), b) & XDL_MASKBITS(b))
-#define XDL_LE32_PUT(p, v) \
-do { \
-	unsigned char *__p = (unsigned char *) (p); \
-	*__p++ = (unsigned char) (v); \
-	*__p++ = (unsigned char) ((v) >> 8); \
-	*__p++ = (unsigned char) ((v) >> 16); \
-	*__p = (unsigned char) ((v) >> 24); \
-} while (0)
-#define XDL_LE32_GET(p, v) \
-do { \
-	unsigned char const *__p = (unsigned char const *) (p); \
-	(v) = (unsigned long) __p[0] | ((unsigned long) __p[1]) << 8 | \
-		((unsigned long) __p[2]) << 16 | ((unsigned long) __p[3]) << 24; \
-} while (0)
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_MIN(a, b) ((a) < (b) ? (a): (b))
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_MAX(a, b) ((a) > (b) ? (a): (b))
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_ABS(v) ((v) >= 0 ? (v): -(v))
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_ISDIGIT(c) ((c) >= '0' && (c) <= '9')
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_ISSPACE(c) (ಖಾಲಿಯೇ((ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ)(c)))
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_ADDBITS(v,b)	((v) + ((v) >> (b)))
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_MASKBITS(b)		((1UL << (b)) - 1)
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_HASHLONG(v,b)	(XDL_ADDBITS((ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ)(v), b) & XDL_MASKBITS(b))
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_LE32_PUT(p, v) \
+ಮಾಡು { \
+	ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ *__p = (ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ *) (p); \
+	*__p++ = (ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ) (v); \
+	*__p++ = (ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ) ((v) >> 8); \
+	*__p++ = (ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ) ((v) >> 16); \
+	*__p = (ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ) ((v) >> 24); \
+} ಆಗ (0)
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_LE32_GET(p, v) \
+ಮಾಡು { \
+	ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ ಸ್ಥಿರಾಂಕ *__p = (ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ ಸ್ಥಿರಾಂಕ *) (p); \
+	(v) = (ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ) __p[0] | ((ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ) __p[1]) << 8 | \
+		((ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ) __p[2]) << 16 | ((ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ) __p[3]) << 24; \
+} ಆಗ (0)
 
 /* Allocate an array of nr elements, returns NULL on failure */
-#define XDL_ALLOC_ARRAY(p, nr)				\
-	((p) = SIZE_MAX / sizeof(*(p)) >= (size_t)(nr)	\
-		? xdl_malloc((nr) * sizeof(*(p)))	\
-		: NULL)
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_ALLOC_ARRAY(p, nr)				\
+	((p) = ಗಾತ್ರ_MAX / ಗಾತ್ರ(*(p)) >= (size_t)(nr)	\
+		? xdl_malloc((nr) * ಗಾತ್ರ(*(p)))	\
+		: ಖಾಲಿ)
 
 /* Allocate an array of nr zeroed out elements, returns NULL on failure */
-#define XDL_CALLOC_ARRAY(p, nr)	((p) = xdl_calloc(nr, sizeof(*(p))))
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_CALLOC_ARRAY(p, nr)	((p) = xdl_calloc(nr, ಗಾತ್ರ(*(p))))
 
 /*
  * Ensure array p can accommodate at least nr elements, growing the
@@ -67,8 +67,8 @@ do { \
  * elements) as necessary. Frees p and returns -1 on failure, returns
  * 0 on success
  */
-#define XDL_ALLOC_GROW(p, nr, alloc)	\
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_ALLOC_GROW(p, nr, alloc)	\
 	(-!((nr) <= (alloc) ||		\
-	    ((p) = xdl_alloc_grow_helper((p), (nr), &(alloc), sizeof(*(p))))))
+	    ((p) = xdl_alloc_grow_helper((p), (nr), &(alloc), ಗಾತ್ರ(*(p))))))
 
-#endif /* #if !defined(XMACROS_H) */
+#ಆದರೆ_ಅಂತ್ಯ /* #if !defined(XMACROS_H) */

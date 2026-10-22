@@ -11,9 +11,9 @@
  * filepath.c: dealing with file names and paths.
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-#ifdef MSWIN
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
 /*
  * Functions for ":8" filename modifier: get 8.3 version of a filename.
  */
@@ -26,62 +26,62 @@
  * *fnamelen is the length of "fnamep" and set to 0 for a nonexistent path.
  * Returns OK on success, FAIL on failure.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 get_short_pathname(char_u **fnamep, char_u **bufp, size_t *fnamelen)
 {
-    int		l, len;
+    ಪೂರ್ಣಾಂಕ		l, len;
     WCHAR	*newbuf;
     WCHAR	*wfname;
 
     len = MAXPATHL;
-    newbuf = malloc(len * sizeof(*newbuf));
-    if (newbuf == NULL)
-	return FAIL;
+    newbuf = ಸ್ಮರಣೆ_ಕೊಡು(len * ಗಾತ್ರ(*newbuf));
+    ಆದರೆ (newbuf == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    wfname = enc_to_utf16(*fnamep, NULL);
-    if (wfname == NULL)
+    wfname = enc_ಗಮ್ಯ_utf16(*fnamep, ಖಾಲಿ);
+    ಆದರೆ (wfname == ಖಾಲಿ)
     {
 	vim_free(newbuf);
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
-    l = GetShortPathNameW(wfname, newbuf, len);
-    if (l > len - 1)
+    l = Get_Short_ಮಾರ್ಗ_Name_W(wfname, newbuf, len);
+    ಆದರೆ (l > len - 1)
     {
 	// If that doesn't work (not enough space), then save the string
 	// and try again with a new buffer big enough.
 	WCHAR *newbuf_t = newbuf;
-	newbuf = vim_realloc(newbuf, (l + 1) * sizeof(*newbuf));
-	if (newbuf == NULL)
+	newbuf = vim_realloc(newbuf, (l + 1) * ಗಾತ್ರ(*newbuf));
+	ಆದರೆ (newbuf == ಖಾಲಿ)
 	{
 	    vim_free(wfname);
 	    vim_free(newbuf_t);
-	    return FAIL;
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
 	// Really should always succeed, as the buffer is big enough.
-	l = GetShortPathNameW(wfname, newbuf, l+1);
+	l = Get_Short_ಮಾರ್ಗ_Name_W(wfname, newbuf, l+1);
     }
-    if (l != 0)
+    ಆದರೆ (l != 0)
     {
-	char_u *p = utf16_to_enc(newbuf, NULL);
+	char_u *p = utf16_ಗಮ್ಯ_enc(newbuf, ಖಾಲಿ);
 
-	if (p != NULL)
+	ಆದರೆ (p != ಖಾಲಿ)
 	{
 	    vim_free(*bufp);
 	    *fnamep = *bufp = p;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    vim_free(wfname);
 	    vim_free(newbuf);
-	    return FAIL;
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
     }
     vim_free(wfname);
     vim_free(newbuf);
 
     *fnamelen = l == 0 ? l : STRLEN(*bufp);
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
@@ -99,29 +99,29 @@ get_short_pathname(char_u **fnamep, char_u **bufp, size_t *fnamelen)
  *
  * Returns OK on success (or nothing done) and FAIL on failure (out of memory).
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 shortpath_for_invalid_fname(
     char_u	**fname,
     char_u	**bufp,
     size_t	*fnamelen)
 {
     char_u	*save_fname;
-    char_u	*pbuf_unused = NULL;
-    char_u	*short_fname = NULL;
+    char_u	*pbuf_ಬಳಸದ = ಖಾಲಿ;
+    char_u	*short_fname = ಖಾಲಿ;
     char_u	*endp, *save_endp;
     char_u	ch;
     size_t	old_len;
     size_t	len;
     size_t	new_len, sfx_len;
-    int		retval = OK;
+    ಪೂರ್ಣಾಂಕ		retval = OK;
 
     // Make a copy
     old_len = *fnamelen;
     save_fname = vim_strnsave(*fname, old_len);
-    if (save_fname == NULL)
+    ಆದರೆ (save_fname == ಖಾಲಿ)
     {
 	retval = FAIL;
-	goto theend;
+	ಹೋಗು theend;
     }
 
     endp = save_fname + old_len - 1; // Find the end of the copy
@@ -132,13 +132,13 @@ shortpath_for_invalid_fname(
      * directory at a time from the tail of the path.
      */
     len = 0;
-    for (;;)
+    ಗಾಗಿ (;;)
     {
 	// go back one path-separator
-	while (endp > save_fname && !after_pathsep(save_fname, endp + 1))
+	ಆಗ (endp > save_fname && !after_pathsep(save_fname, endp + 1))
 	    --endp;
-	if (endp <= save_fname)
-	    break;		// processed the complete path
+	ಆದರೆ (endp <= save_fname)
+	    ನಿಲ್ಲಿಸು;		// processed the complete path
 
 	/*
 	 * Replace the path separator with a NUL and try to shorten the
@@ -148,21 +148,21 @@ shortpath_for_invalid_fname(
 	*endp = 0;
 	short_fname = save_fname;
 	len = STRLEN(short_fname) + 1;
-	if (get_short_pathname(&short_fname, &pbuf_unused, &len) == FAIL)
+	ಆದರೆ (get_short_pathname(&short_fname, &pbuf_ಬಳಸದ, &len) == FAIL)
 	{
 	    retval = FAIL;
-	    goto theend;
+	    ಹೋಗು theend;
 	}
 	*endp = ch;	// preserve the string
 
-	if (len > 0)
-	    break;	// successfully shortened the path
+	ಆದರೆ (len > 0)
+	    ನಿಲ್ಲಿಸು;	// successfully shortened the path
 
 	// failed to shorten the path. Skip the path separator
 	--endp;
     }
 
-    if (len > 0)
+    ಆದರೆ (len > 0)
     {
 	/*
 	 * Succeeded in shortening the path. Now concatenate the shortened
@@ -175,109 +175,109 @@ shortpath_for_invalid_fname(
 
 	*fnamelen = new_len;
 	vim_free(*bufp);
-	if (new_len > old_len)
+	ಆದರೆ (new_len > old_len)
 	{
 	    // There is not enough space in the currently allocated string,
 	    // copy it to a buffer big enough.
 	    *fname = *bufp = vim_strnsave(short_fname, new_len);
-	    if (*fname == NULL)
+	    ಆದರೆ (*fname == ಖಾಲಿ)
 	    {
 		retval = FAIL;
-		goto theend;
+		ಹೋಗು theend;
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // Transfer short_fname to the main buffer (it's big enough),
 	    // unless get_short_pathname() did its work in-place.
 	    *fname = *bufp = save_fname;
-	    if (short_fname != save_fname)
+	    ಆದರೆ (short_fname != save_fname)
 		STRNCPY(save_fname, short_fname, len);
-	    save_fname = NULL;
+	    save_fname = ಖಾಲಿ;
 	}
 
 	// concat the not-shortened part of the path
-	if ((*fname + len) != endp)
+	ಆದರೆ ((*fname + len) != endp)
 	    vim_strncpy(*fname + len, endp, sfx_len);
 	(*fname)[new_len] = NUL;
     }
 
 theend:
-    vim_free(pbuf_unused);
+    vim_free(pbuf_ಬಳಸದ);
     vim_free(save_fname);
 
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
 /*
  * Get a pathname for a partial path.
  * Returns OK for success, FAIL for failure.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 shortpath_for_partial(
     char_u	**fnamep,
     char_u	**bufp,
     size_t	*fnamelen)
 {
-    int		sepcount;
+    ಪೂರ್ಣಾಂಕ		sepcount;
     size_t	len, tflen;
     char_u	*p;
     char_u	*pbuf, *tfname;
-    int		hasTilde;
+    ಪೂರ್ಣಾಂಕ		hasTilde;
 
     // Count up the path separators from the RHS.. so we know which part
     // of the path to return.
     sepcount = 0;
-    for (p = *fnamep; p < *fnamep + *fnamelen; MB_PTR_ADV(p))
-	if (vim_ispathsep(*p))
+    ಗಾಗಿ (p = *fnamep; p < *fnamep + *fnamelen; MB_PTR_ADV(p))
+	ಆದರೆ (vim_ispathsep(*p))
 	    ++sepcount;
 
     // Need full path first (use expand_env() to remove a "~/")
     hasTilde = (**fnamep == '~');
-    if (hasTilde)
+    ಆದರೆ (hasTilde)
 	pbuf = tfname = expand_env_save(*fnamep);
-    else
-	pbuf = tfname = FullName_save(*fnamep, FALSE);
-    if (tfname == NULL)
-	return FAIL;
+    ಇಲ್ಲದಿದ್ದರೆ
+	pbuf = tfname = ತುಂಬಿದ_Name_save(*fnamep, FALSE);
+    ಆದರೆ (tfname == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
     len = tflen = STRLEN(tfname);
 
-    if (get_short_pathname(&tfname, &pbuf, &len) == FAIL)
-	return FAIL;
+    ಆದರೆ (get_short_pathname(&tfname, &pbuf, &len) == FAIL)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    if (len == 0)
+    ಆದರೆ (len == 0)
     {
 	// Don't have a valid filename, so shorten the rest of the
 	// path if we can. This CAN give us invalid 8.3 filenames, but
 	// there's not a lot of point in guessing what it might be.
 	len = tflen;
-	if (shortpath_for_invalid_fname(&tfname, &pbuf, &len) == FAIL)
-	    return FAIL;
+	ಆದರೆ (shortpath_for_invalid_fname(&tfname, &pbuf, &len) == FAIL)
+	    ಹಿಂತಿರುಗಿ FAIL;
     }
 
     // Count the paths backward to find the beginning of the desired string.
-    for (p = tfname + len - 1; p >= tfname; --p)
+    ಗಾಗಿ (p = tfname + len - 1; p >= tfname; --p)
     {
-	if (has_mbyte)
-	    p -= mb_head_off(tfname, p);
-	if (vim_ispathsep(*p))
+	ಆದರೆ (has_mbyte)
+	    p -= mb_ತಲೆ_off(tfname, p);
+	ಆದರೆ (vim_ispathsep(*p))
 	{
-	    if (sepcount == 0 || (hasTilde && sepcount == 1))
-		break;
-	    else
+	    ಆದರೆ (sepcount == 0 || (hasTilde && sepcount == 1))
+		ನಿಲ್ಲಿಸು;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		sepcount --;
 	}
     }
-    if (hasTilde)
+    ಆದರೆ (hasTilde)
     {
 	--p;
-	if (p >= tfname)
+	ಆದರೆ (p >= tfname)
 	    *p = '~';
-	else
-	    return FAIL;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಹಿಂತಿರುಗಿ FAIL;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	++p;
 
     // Copy in the string - p indexes into tfname - allocated at pbuf
@@ -286,9 +286,9 @@ shortpath_for_partial(
     *bufp = pbuf;
     *fnamep = p;
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
-#endif // MSWIN
+#ಆದರೆ_ಅಂತ್ಯ // MSWIN
 
 /*
  * Adjust a filename, according to a string of modifiers.
@@ -297,98 +297,98 @@ shortpath_for_partial(
  * Returns VALID_ flags or -1 for failure.
  * When there is an error, *fnamep is set to NULL.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 modify_fname(
     char_u	*src,		// string with modifiers
-    int		tilde_file,	// "~" is a file name, not $HOME
+    ಪೂರ್ಣಾಂಕ		tilde_file,	// "~" is a file name, not $HOME
     size_t	*usedlen,	// characters after src that are used
     char_u	**fnamep,	// file name so far
     char_u	**bufp,		// buffer for allocated file name or NULL
     size_t	*fnamelen)	// length of fnamep
 {
-    int		valid = 0;
-    char_u	*tail;
+    ಪೂರ್ಣಾಂಕ		valid = 0;
+    char_u	*ಬಾಲ;
     char_u	*s, *p, *pbuf;
     char_u	dirname[MAXPATHL];
-    int		c;
-    int		has_fullname = 0;
-    int		has_homerelative = 0;
-#ifdef MSWIN
-    char_u	*fname_start = *fnamep;
-    int		has_shortname = 0;
-#endif
+    ಪೂರ್ಣಾಂಕ		c;
+    ಪೂರ್ಣಾಂಕ		has_fullname = 0;
+    ಪೂರ್ಣಾಂಕ		has_homerelative = 0;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
+    char_u	*fname_ಆರಂಭ = *fnamep;
+    ಪೂರ್ಣಾಂಕ		has_shortname = 0;
+#ಆದರೆ_ಅಂತ್ಯ
 
 repeat:
     // ":p" - full path/file_name
-    if (src[*usedlen] == ':' && src[*usedlen + 1] == 'p')
+    ಆದರೆ (src[*usedlen] == ':' && src[*usedlen + 1] == 'p')
     {
 	has_fullname = 1;
 
-	valid |= VALID_PATH;
+	valid |= VALID_ಮಾರ್ಗ;
 	*usedlen += 2;
 
 	// Expand "~/path" for all systems and "~user/path" for Unix and VMS
-	if ((*fnamep)[0] == '~'
-#if !defined(UNIX) && !(defined(VMS) && defined(USER_HOME))
+	ಆದರೆ ((*fnamep)[0] == '~'
+#ಆದರೆ !defined(UNIX) && !(defined(VMS) && defined(USER_HOME))
 		&& ((*fnamep)[1] == '/'
-# ifdef BACKSLASH_IN_FILENAME
+# ifdef BACKSLASH_ಒಳ_FILENAME
 		    || (*fnamep)[1] == '\\'
 # endif
 		    || (*fnamep)[1] == NUL)
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		&& !(tilde_file && (*fnamep)[1] == NUL)
 	   )
 	{
 	    *fnamep = expand_env_save(*fnamep);
 	    vim_free(*bufp);	// free any allocated file name
 	    *bufp = *fnamep;
-	    if (*fnamep == NULL)
-		return -1;
+	    ಆದರೆ (*fnamep == ಖಾಲಿ)
+		ಹಿಂತಿರುಗಿ -1;
 	}
 
 	// When "/." or "/.." is used: force expansion to get rid of it.
-	for (p = *fnamep; *p != NUL; MB_PTR_ADV(p))
+	ಗಾಗಿ (p = *fnamep; *p != NUL; MB_PTR_ADV(p))
 	{
-	    if (vim_ispathsep(*p)
+	    ಆದರೆ (vim_ispathsep(*p)
 		    && p[1] == '.'
 		    && (p[2] == NUL
 			|| vim_ispathsep(p[2])
 			|| (p[2] == '.'
 			    && (p[3] == NUL || vim_ispathsep(p[3])))))
-		break;
+		ನಿಲ್ಲಿಸು;
 	}
 
 	// FullName_save() is slow, don't use it when not needed.
-	if (*p != NUL || !vim_isAbsName(*fnamep)
-#ifdef MSWIN	// enforce drive letter on Windows paths
+	ಆದರೆ (*p != NUL || !vim_isAbsName(*fnamep)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN	// enforce drive letter on Windows paths
 		|| **fnamep == '/' || **fnamep == '\\'
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	)
 	{
-	    *fnamep = FullName_save(*fnamep, *p != NUL);
+	    *fnamep = ತುಂಬಿದ_Name_save(*fnamep, *p != NUL);
 	    vim_free(*bufp);	// free any allocated file name
 	    *bufp = *fnamep;
-	    if (*fnamep == NULL)
-		return -1;
+	    ಆದರೆ (*fnamep == ಖಾಲಿ)
+		ಹಿಂತಿರುಗಿ -1;
 	}
 
-#ifdef MSWIN
-# if _WIN32_WINNT >= 0x0500
-	if (vim_strchr(*fnamep, '~') != NULL)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
+# ಆದರೆ _WIN32_WINNT >= 0x0500
+	ಆದರೆ (vim_strchr(*fnamep, '~') != ಖಾಲಿ)
 	{
 	    // Expand 8.3 filename to full path.  Needed to make sure the same
 	    // file does not have two different names.
 	    // Note: problem does not occur if _WIN32_WINNT < 0x0500.
-	    WCHAR *wfname = enc_to_utf16(*fnamep, NULL);
-	    WCHAR buf[_MAX_PATH];
+	    WCHAR *wfname = enc_ಗಮ್ಯ_utf16(*fnamep, ಖಾಲಿ);
+	    WCHAR buf[MAX_ಮಾರ್ಗ_2];
 
-	    if (wfname != NULL)
+	    ಆದರೆ (wfname != ಖಾಲಿ)
 	    {
-		if (GetLongPathNameW(wfname, buf, _MAX_PATH))
+		ಆದರೆ (Get_Long_ಮಾರ್ಗ_Name_W(wfname, buf, MAX_ಮಾರ್ಗ_2))
 		{
-		    char_u *q = utf16_to_enc(buf, NULL);
+		    char_u *q = utf16_ಗಮ್ಯ_enc(buf, ಖಾಲಿ);
 
-		    if (q != NULL)
+		    ಆದರೆ (q != ಖಾಲಿ)
 		    {
 			vim_free(*bufp);    // free any allocated file name
 			*bufp = *fnamep = q;
@@ -398,96 +398,96 @@ repeat:
 	    }
 	}
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	// Append a path separator to a directory.
-	if (mch_isdir(*fnamep))
+	ಆದರೆ (mch_isdir(*fnamep))
 	{
 	    // Make room for one or two extra characters.
 	    *fnamep = vim_strnsave(*fnamep, STRLEN(*fnamep) + 2);
 	    vim_free(*bufp);	// free any allocated file name
 	    *bufp = *fnamep;
-	    if (*fnamep == NULL)
-		return -1;
-	    add_pathsep(*fnamep);
+	    ಆದರೆ (*fnamep == ಖಾಲಿ)
+		ಹಿಂತಿರುಗಿ -1;
+	    ಕೂಡಿಸು_pathsep(*fnamep);
 	}
     }
 
     // ":." - path relative to the current directory
     // ":~" - path relative to the home directory
     // ":8" - shortname path - postponed till after
-    while (src[*usedlen] == ':'
+    ಆಗ (src[*usedlen] == ':'
 		  && ((c = src[*usedlen + 1]) == '.' || c == '~' || c == '8'))
     {
 	*usedlen += 2;
-	if (c == '8')
+	ಆದರೆ (c == '8')
 	{
-#ifdef MSWIN
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
 	    has_shortname = 1; // Postpone this.
-#endif
-	    continue;
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಮುಂದುವರಿ;
 	}
-	pbuf = NULL;
+	pbuf = ಖಾಲಿ;
 	// Need full path first (use expand_env() to remove a "~/")
-	if (!has_fullname && !has_homerelative)
+	ಆದರೆ (!has_fullname && !has_homerelative)
 	{
-	    if (**fnamep == '~')
+	    ಆದರೆ (**fnamep == '~')
 		p = pbuf = expand_env_save(*fnamep);
-	    else
-		p = pbuf = FullName_save(*fnamep, FALSE);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		p = pbuf = ತುಂಬಿದ_Name_save(*fnamep, FALSE);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    p = *fnamep;
 
 	has_fullname = 0;
 
-	if (p != NULL)
+	ಆದರೆ (p != ಖಾಲಿ)
 	{
 	    size_t  dirnamelen = 0;
 
-	    if (c == '.')
+	    ಆದರೆ (c == '.')
 	    {
 		mch_dirname(dirname, MAXPATHL);
-		if (has_homerelative)
+		ಆದರೆ (has_homerelative)
 		{
 		    s = vim_strsave(dirname);
-		    if (s != NULL)
+		    ಆದರೆ (s != ಖಾಲಿ)
 		    {
-			dirnamelen = home_replace(NULL, s, dirname, MAXPATHL, TRUE);
+			dirnamelen = home_replace(ಖಾಲಿ, s, dirname, MAXPATHL, TRUE);
 			vim_free(s);
 		    }
 		}
 
-		if (dirnamelen == 0)
+		ಆದರೆ (dirnamelen == 0)
 		    dirnamelen = STRLEN(dirname);
 
 		// Do not call shorten_fname() here since it removes the prefix
 		// even though the path does not have a prefix.
-		if (fnamencmp(p, dirname, dirnamelen) == 0)
+		ಆದರೆ (fnamencmp(p, dirname, dirnamelen) == 0)
 		{
 		    p += dirnamelen;
-		    if (vim_ispathsep(*p))
+		    ಆದರೆ (vim_ispathsep(*p))
 		    {
-			while (*p && vim_ispathsep(*p))
+			ಆಗ (*p && vim_ispathsep(*p))
 			    ++p;
 			*fnamep = p;
-			if (pbuf != NULL)
+			ಆದರೆ (pbuf != ಖಾಲಿ)
 			{
 			    // free any allocated file name
 			    vim_free(*bufp);
 			    *bufp = pbuf;
-			    pbuf = NULL;
+			    pbuf = ಖಾಲಿ;
 			}
 		    }
 		}
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		dirnamelen = home_replace(NULL, p, dirname, MAXPATHL, TRUE);
+		dirnamelen = home_replace(ಖಾಲಿ, p, dirname, MAXPATHL, TRUE);
 		// Only replace it when it starts with '~'
-		if (*dirname == '~')
+		ಆದರೆ (*dirname == '~')
 		{
 		    s = vim_strnsave(dirname, dirnamelen);
-		    if (s != NULL)
+		    ಆದರೆ (s != ಖಾಲಿ)
 		    {
 			*fnamep = s;
 			vim_free(*bufp);
@@ -500,148 +500,148 @@ repeat:
 	}
     }
 
-    tail = gettail(*fnamep);
+    ಬಾಲ = gettail(*fnamep);
     *fnamelen = STRLEN(*fnamep);
 
     // ":h" - head, remove "/file_name", can be repeated
     // Don't remove the first "/" or "c:\"
-    while (src[*usedlen] == ':' && src[*usedlen + 1] == 'h')
+    ಆಗ (src[*usedlen] == ':' && src[*usedlen + 1] == 'h')
     {
-	valid |= VALID_HEAD;
+	valid |= VALID_ತಲೆ;
 	*usedlen += 2;
-	s = get_past_head(*fnamep);
-	while (tail > s && after_pathsep(s, tail))
-	    MB_PTR_BACK(*fnamep, tail);
-	*fnamelen = tail - *fnamep;
-#ifdef VMS
-	if (*fnamelen > 0)
+	s = get_past_ತಲೆ(*fnamep);
+	ಆಗ (ಬಾಲ > s && after_pathsep(s, ಬಾಲ))
+	    MB_PTR_ಹಿಂಭಾಗ(*fnamep, ಬಾಲ);
+	*fnamelen = ಬಾಲ - *fnamep;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VMS
+	ಆದರೆ (*fnamelen > 0)
 	    *fnamelen += 1; // the path separator is part of the path
-#endif
-	if (*fnamelen == 0)
+#ಆದರೆ_ಅಂತ್ಯ
+	ಆದರೆ (*fnamelen == 0)
 	{
 	    // Result is empty.  Turn it into "." to make ":cd %:h" work.
 	    p = vim_strsave((char_u *)".");
-	    if (p == NULL)
-		return -1;
+	    ಆದರೆ (p == ಖಾಲಿ)
+		ಹಿಂತಿರುಗಿ -1;
 	    vim_free(*bufp);
-	    *bufp = *fnamep = tail = p;
+	    *bufp = *fnamep = ಬಾಲ = p;
 	    *fnamelen = 1;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    while (tail > s && !after_pathsep(s, tail))
-		MB_PTR_BACK(*fnamep, tail);
+	    ಆಗ (ಬಾಲ > s && !after_pathsep(s, ಬಾಲ))
+		MB_PTR_ಹಿಂಭಾಗ(*fnamep, ಬಾಲ);
 	}
     }
 
     // ":8" - shortname
-    if (src[*usedlen] == ':' && src[*usedlen + 1] == '8')
+    ಆದರೆ (src[*usedlen] == ':' && src[*usedlen + 1] == '8')
     {
 	*usedlen += 2;
-#ifdef MSWIN
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
 	has_shortname = 1;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
-#ifdef MSWIN
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
     /*
      * Handle ":8" after we have done 'heads' and before we do 'tails'.
      */
-    if (has_shortname)
+    ಆದರೆ (has_shortname)
     {
 	// Copy the string if it is shortened by :h and when it wasn't copied
 	// yet, because we are going to change it in place.  Avoids changing
 	// the buffer name for "%:8".
-	if (*fnamelen < STRLEN(*fnamep) || *fnamep == fname_start)
+	ಆದರೆ (*fnamelen < STRLEN(*fnamep) || *fnamep == fname_ಆರಂಭ)
 	{
 	    p = vim_strnsave(*fnamep, *fnamelen);
-	    if (p == NULL)
-		return -1;
+	    ಆದರೆ (p == ಖಾಲಿ)
+		ಹಿಂತಿರುಗಿ -1;
 	    vim_free(*bufp);
 	    *bufp = *fnamep = p;
 	}
 
 	// Split into two implementations - makes it easier.  First is where
 	// there isn't a full name already, second is where there is.
-	if (!has_fullname && !vim_isAbsName(*fnamep))
+	ಆದರೆ (!has_fullname && !vim_isAbsName(*fnamep))
 	{
-	    if (shortpath_for_partial(fnamep, bufp, fnamelen) == FAIL)
-		return -1;
+	    ಆದರೆ (shortpath_for_partial(fnamep, bufp, fnamelen) == FAIL)
+		ಹಿಂತಿರುಗಿ -1;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    size_t	l = *fnamelen;
 
 	    // Simple case, already have the full-name.
 	    // Nearly always shorter, so try first time.
-	    if (get_short_pathname(fnamep, bufp, &l) == FAIL)
-		return -1;
+	    ಆದರೆ (get_short_pathname(fnamep, bufp, &l) == FAIL)
+		ಹಿಂತಿರುಗಿ -1;
 
-	    if (l == 0)
+	    ಆದರೆ (l == 0)
 	    {
 		// Couldn't find the filename, search the paths.
 		l = *fnamelen;
-		if (shortpath_for_invalid_fname(fnamep, bufp, &l) == FAIL)
-		    return -1;
+		ಆದರೆ (shortpath_for_invalid_fname(fnamep, bufp, &l) == FAIL)
+		    ಹಿಂತಿರುಗಿ -1;
 	    }
 	    *fnamelen = l;
 	}
 
 	// The name was replaced by the short name, "tail" points into the
 	// previous name.
-	tail = gettail(*fnamep);
+	ಬಾಲ = gettail(*fnamep);
     }
-#endif // MSWIN
+#ಆದರೆ_ಅಂತ್ಯ // MSWIN
 
     // ":t" - tail, just the basename
-    if (src[*usedlen] == ':' && src[*usedlen + 1] == 't')
+    ಆದರೆ (src[*usedlen] == ':' && src[*usedlen + 1] == 't')
     {
 	*usedlen += 2;
-	*fnamelen -= tail - *fnamep;
-	*fnamep = tail;
+	*fnamelen -= ಬಾಲ - *fnamep;
+	*fnamep = ಬಾಲ;
     }
 
     // ":e" - extension, can be repeated
     // ":r" - root, without extension, can be repeated
-    while (src[*usedlen] == ':'
+    ಆಗ (src[*usedlen] == ':'
 	    && (src[*usedlen + 1] == 'e' || src[*usedlen + 1] == 'r'))
     {
 	// find a '.' in the tail:
 	// - for second :e: before the current fname
 	// - otherwise: The last '.'
-	if (src[*usedlen + 1] == 'e' && *fnamep > tail)
+	ಆದರೆ (src[*usedlen + 1] == 'e' && *fnamep > ಬಾಲ)
 	    s = *fnamep - 2;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    s = *fnamep + *fnamelen - 1;
-	for ( ; s > tail; --s)
-	    if (s[0] == '.')
-		break;
-	if (src[*usedlen + 1] == 'e')		// :e
+	ಗಾಗಿ ( ; s > ಬಾಲ; --s)
+	    ಆದರೆ (s[0] == '.')
+		ನಿಲ್ಲಿಸು;
+	ಆದರೆ (src[*usedlen + 1] == 'e')		// :e
 	{
-	    if (s > tail)
+	    ಆದರೆ (s > ಬಾಲ)
 	    {
 		*fnamelen += (*fnamep - (s + 1));
 		*fnamep = s + 1;
-#ifdef VMS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VMS
 		// cut version from the extension
 		s = *fnamep + *fnamelen - 1;
-		for ( ; s > *fnamep; --s)
-		    if (s[0] == ';')
-			break;
-		if (s > *fnamep)
+		ಗಾಗಿ ( ; s > *fnamep; --s)
+		    ಆದರೆ (s[0] == ';')
+			ನಿಲ್ಲಿಸು;
+		ಆದರೆ (s > *fnamep)
 		    *fnamelen = s - *fnamep;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
-	    else if (*fnamep <= tail)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*fnamep <= ಬಾಲ)
 		*fnamelen = 0;
 	}
-	else				// :r
+	ಇಲ್ಲದಿದ್ದರೆ				// :r
 	{
-	    char_u *limit = *fnamep;
+	    char_u *ಎಲ್ಲೆ = *fnamep;
 
-	    if (limit < tail)
-		limit = tail;
-	    if (s > limit)	// remove one extension
+	    ಆದರೆ (ಎಲ್ಲೆ < ಬಾಲ)
+		ಎಲ್ಲೆ = ಬಾಲ;
+	    ಆದರೆ (s > ಎಲ್ಲೆ)	// remove one extension
 		*fnamelen = s - *fnamep;
 	}
 	*usedlen += 2;
@@ -649,49 +649,49 @@ repeat:
 
     // ":s?pat?foo?" - substitute
     // ":gs?pat?foo?" - global substitute
-    if (src[*usedlen] == ':'
+    ಆದರೆ (src[*usedlen] == ':'
 	    && (src[*usedlen + 1] == 's'
 		|| (src[*usedlen + 1] == 'g' && src[*usedlen + 2] == 's')))
     {
 	char_u	    *str;
 	char_u	    *pat;
 	char_u	    *sub;
-	int	    sep;
+	ಪೂರ್ಣಾಂಕ	    sep;
 	char_u	    *flags;
-	int	    didit = FALSE;
+	ಪೂರ್ಣಾಂಕ	    didit = FALSE;
 
 	flags = (char_u *)"";
 	s = src + *usedlen + 2;
-	if (src[*usedlen + 1] == 'g')
+	ಆದರೆ (src[*usedlen + 1] == 'g')
 	{
 	    flags = (char_u *)"g";
 	    ++s;
 	}
 
 	sep = *s++;
-	if (sep)
+	ಆದರೆ (sep)
 	{
 	    // find end of pattern
 	    p = vim_strchr(s, sep);
-	    if (p != NULL)
+	    ಆದರೆ (p != ಖಾಲಿ)
 	    {
 		pat = vim_strnsave(s, p - s);
-		if (pat != NULL)
+		ಆದರೆ (pat != ಖಾಲಿ)
 		{
 		    s = p + 1;
 		    // find end of substitution
 		    p = vim_strchr(s, sep);
-		    if (p != NULL)
+		    ಆದರೆ (p != ಖಾಲಿ)
 		    {
 			sub = vim_strnsave(s, p - s);
 			str = vim_strnsave(*fnamep, *fnamelen);
-			if (sub != NULL && str != NULL)
+			ಆದರೆ (sub != ಖಾಲಿ && str != ಖಾಲಿ)
 			{
 			    size_t slen;
 
 			    *usedlen = p + 1 - src;
-			    s = do_string_sub(str, *fnamelen, pat, sub, NULL, flags, &slen);
-			    if (s != NULL)
+			    s = do_string_sub(str, *fnamelen, pat, sub, ಖಾಲಿ, flags, &slen);
+			    ಆದರೆ (s != ಖಾಲಿ)
 			    {
 				*fnamep = s;
 				*fnamelen = slen;
@@ -707,29 +707,29 @@ repeat:
 		}
 	    }
 	    // after using ":s", repeat all the modifiers
-	    if (didit)
-		goto repeat;
+	    ಆದರೆ (didit)
+		ಹೋಗು repeat;
 	}
     }
 
-    if (src[*usedlen] == ':' && src[*usedlen + 1] == 'S')
+    ಆದರೆ (src[*usedlen] == ':' && src[*usedlen + 1] == 'S')
     {
 	// vim_strsave_shellescape() needs a NUL terminated string.
 	c = (*fnamep)[*fnamelen];
-	if (c != NUL)
+	ಆದರೆ (c != NUL)
 	    (*fnamep)[*fnamelen] = NUL;
 	p = vim_strsave_shellescape(*fnamep, FALSE, FALSE);
-	if (c != NUL)
+	ಆದರೆ (c != NUL)
 	    (*fnamep)[*fnamelen] = c;
-	if (p == NULL)
-	    return -1;
+	ಆದರೆ (p == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ -1;
 	vim_free(*bufp);
 	*bufp = *fnamep = p;
 	*fnamelen = STRLEN(p);
 	*usedlen += 2;
     }
 
-    return valid;
+    ಹಿಂತಿರುಗಿ valid;
 }
 
 /*
@@ -738,47 +738,47 @@ repeat:
  * Must be 1 or more.
  * It's done in-place.
  */
-    static void
-shorten_dir_len(char_u *str, int trim_len)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+shorten_dir_len(char_u *str, ಪೂರ್ಣಾಂಕ trim_len)
 {
-    char_u	*tail, *s, *d;
-    int		skip = FALSE;
-    int		dirchunk_len = 0;
+    char_u	*ಬಾಲ, *s, *d;
+    ಪೂರ್ಣಾಂಕ		skip = FALSE;
+    ಪೂರ್ಣಾಂಕ		dirchunk_len = 0;
 
-    tail = gettail(str);
+    ಬಾಲ = gettail(str);
     d = str;
-    for (s = str; ; ++s)
+    ಗಾಗಿ (s = str; ; ++s)
     {
-	if (s >= tail)		    // copy the whole tail
+	ಆದರೆ (s >= ಬಾಲ)		    // copy the whole tail
 	{
 	    *d++ = *s;
-	    if (*s == NUL)
-		break;
+	    ಆದರೆ (*s == NUL)
+		ನಿಲ್ಲಿಸು;
 	}
-	else if (vim_ispathsep(*s))	    // copy '/' and next char
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (vim_ispathsep(*s))	    // copy '/' and next char
 	{
 	    *d++ = *s;
 	    skip = FALSE;
 	    dirchunk_len = 0;
 	}
-	else if (!skip)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!skip)
 	{
 	    *d++ = *s;			// copy next char
-	    if (*s != '~' && *s != '.') // and leading "~" and "."
+	    ಆದರೆ (*s != '~' && *s != '.') // and leading "~" and "."
 	    {
 		++dirchunk_len; // only count word chars for the size
 
 		// keep copying chars until we have our preferred length (or
 		// until the above if/else branches move us along)
-		if (dirchunk_len >= trim_len)
+		ಆದರೆ (dirchunk_len >= trim_len)
 		    skip = TRUE;
 	    }
 
-	    if (has_mbyte)
+	    ಆದರೆ (has_mbyte)
 	    {
-		int l = mb_ptr2len(s);
+		ಪೂರ್ಣಾಂಕ l = mb_ptr2len(s);
 
-		while (--l > 0)
+		ಆಗ (--l > 0)
 		    *d++ = *++s;
 	    }
 	}
@@ -789,7 +789,7 @@ shorten_dir_len(char_u *str, int trim_len)
  * Shorten the path of a file from "~/foo/../.bar/fname" to "~/f/../.b/fname"
  * It's done in-place.
  */
-    void
+    ಶೂನ್ಯ
 shorten_dir(char_u *str)
 {
     shorten_dir_len(str, 1);
@@ -798,58 +798,58 @@ shorten_dir(char_u *str)
 /*
  * Return TRUE if "fname" is a readable file.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 file_is_readable(char_u *fname)
 {
-    int		fd;
+    ಪೂರ್ಣಾಂಕ		fd;
 
-#ifndef O_NONBLOCK
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ O_NONBLOCK
 # define O_NONBLOCK 0
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     // Opening a file that does not exist is slow.
-    if (*fname == NUL || mch_isdir_or_missing(fname))
-	return FALSE;
-    if ((fd = mch_open((char *)fname, O_RDONLY | O_NONBLOCK, 0)) >= 0)
+    ಆದರೆ (*fname == NUL || mch_isdir_or_missing(fname))
+	ಹಿಂತಿರುಗಿ FALSE;
+    ಆದರೆ ((fd = mch_open((ಅಕ್ಷರ *)fname, O_RDONLY | O_NONBLOCK, 0)) >= 0)
     {
 	close(fd);
-	return TRUE;
+	ಹಿಂತಿರುಗಿ TRUE;
     }
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 
 /*
  * "chdir(dir)" function
  */
-    void
+    ಶೂನ್ಯ
 f_chdir(typval_T *argvars, typval_T *rettv)
 {
     char_u	*cwd;
     cdscope_T	scope = CDSCOPE_GLOBAL;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ಖಾಲಿ;
 
-    if (check_secure())
-	return;
+    ಆದರೆ (check_secure())
+	ಹಿಂತಿರುಗಿ;
 
-    if (argvars[0].v_type != VAR_STRING)
+    ಆದರೆ (argvars[0].v_type != VAR_STRING)
     {
 	// Returning an empty string means it failed.
 	// No error message, for historic reasons.
-	if (in_vim9script())
-	    (void) check_for_string_arg(argvars, 0);
-	return;
+	ಆದರೆ (ಒಳ_vim9script())
+	    (ಶೂನ್ಯ) check_for_string_arg(argvars, 0);
+	ಹಿಂತಿರುಗಿ;
     }
 
     // Return the current directory
     cwd = alloc(MAXPATHL);
-    if (cwd != NULL)
+    ಆದರೆ (cwd != ಖಾಲಿ)
     {
-	if (mch_dirname(cwd, MAXPATHL) != FAIL)
+	ಆದರೆ (mch_dirname(cwd, MAXPATHL) != FAIL)
 	{
-# ifdef BACKSLASH_IN_FILENAME
+# ifdef BACKSLASH_ಒಳ_FILENAME
 	    slash_adjust(cwd);
 # endif
 	    rettv->vval.v_string = vim_strsave(cwd);
@@ -857,27 +857,27 @@ f_chdir(typval_T *argvars, typval_T *rettv)
 	vim_free(cwd);
     }
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ಆದರೆ (argvars[1].v_type != VAR_UNKNOWN)
     {
 	char_u *s = tv_get_string(&argvars[1]);
-	if (STRCMP(s, "global") == 0)
+	ಆದರೆ (STRCMP(s, "global") == 0)
 	    scope = CDSCOPE_GLOBAL;
-	else if (STRCMP(s, "tabpage") == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(s, "tabpage") == 0)
 	    scope = CDSCOPE_TABPAGE;
-	else if (STRCMP(s, "window") == 0)
-	    scope = CDSCOPE_WINDOW;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(s, "window") == 0)
+	    scope = CDSCOPE_ಕಿಟಕಿ;
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    semsg(_(e_invalid_value_for_argument_str_str), "scope", s);
-	    return;
+	    semsg(_(e_invalid_ಮೌಲ್ಯ_for_ವಾದ_str_str), "scope", s);
+	    ಹಿಂತಿರುಗಿ;
 	}
     }
-    else if (curwin->w_localdir != NULL)
-	scope = CDSCOPE_WINDOW;
-    else if (curtab->tp_localdir != NULL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (curwin->w_localdir != ಖಾಲಿ)
+	scope = CDSCOPE_ಕಿಟಕಿ;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (curtab->tp_localdir != ಖಾಲಿ)
 	scope = CDSCOPE_TABPAGE;
 
-    if (!changedir_func(argvars[0].vval.v_string, TRUE, scope))
+    ಆದರೆ (!changedir_func(argvars[0].vval.v_string, TRUE, scope))
 	// Directory change failed
 	VIM_CLEAR(rettv->vval.v_string);
 }
@@ -885,71 +885,71 @@ f_chdir(typval_T *argvars, typval_T *rettv)
 /*
  * "delete()" function
  */
-    void
+    ಶೂನ್ಯ
 f_delete(typval_T *argvars, typval_T *rettv)
 {
     char_u	nbuf[NUMBUFLEN];
     char_u	*name;
     char_u	*flags;
 
-    rettv->vval.v_number = -1;
-    if (check_restricted() || check_secure())
-	return;
+    rettv->vval.v_ಸಂಖ್ಯೆ = -1;
+    ಆದರೆ (check_restricted() || check_secure())
+	ಹಿಂತಿರುಗಿ;
 
-    if (in_vim9script()
+    ಆದರೆ (ಒಳ_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	ಹಿಂತಿರುಗಿ;
 
     name = tv_get_string(&argvars[0]);
-    if (name == NULL || *name == NUL)
+    ಆದರೆ (name == ಖಾಲಿ || *name == NUL)
     {
-	emsg(_(e_invalid_argument));
-	return;
+	emsg(_(e_invalid_ವಾದ));
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ಆದರೆ (argvars[1].v_type != VAR_UNKNOWN)
 	flags = tv_get_string_buf(&argvars[1], nbuf);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	flags = (char_u *)"";
 
-    if (*flags == NUL)
+    ಆದರೆ (*flags == NUL)
 	// delete a file
-	rettv->vval.v_number = mch_remove(name) == 0 ? 0 : -1;
-    else if (STRCMP(flags, "d") == 0)
+	rettv->vval.v_ಸಂಖ್ಯೆ = mch_remove(name) == 0 ? 0 : -1;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(flags, "d") == 0)
 	// delete an empty directory
-	rettv->vval.v_number = mch_rmdir(name) == 0 ? 0 : -1;
-    else if (STRCMP(flags, "rf") == 0)
+	rettv->vval.v_ಸಂಖ್ಯೆ = mch_rmdir(name) == 0 ? 0 : -1;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(flags, "rf") == 0)
 	// delete a directory recursively
-	rettv->vval.v_number = delete_recursive(name);
-    else
-	semsg(_(e_invalid_expression_str), flags);
+	rettv->vval.v_ಸಂಖ್ಯೆ = delete_recursive(name);
+    ಇಲ್ಲದಿದ್ದರೆ
+	semsg(_(e_invalid_ಅಭಿವ್ಯಕ್ತಿ_str), flags);
 }
 
 /*
  * "executable()" function
  */
-    void
+    ಶೂನ್ಯ
 f_executable(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ಆದರೆ (ಒಳ_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
     // Check in $PATH and also check directly if there is a directory name.
-    rettv->vval.v_number = mch_can_exe(tv_get_string(&argvars[0]), NULL, TRUE);
+    rettv->vval.v_ಸಂಖ್ಯೆ = mch_can_exe(tv_get_string(&argvars[0]), ಖಾಲಿ, TRUE);
 }
 
 /*
  * "exepath()" function
  */
-    void
+    ಶೂನ್ಯ
 f_exepath(typval_T *argvars, typval_T *rettv)
 {
-    char_u *p = NULL;
+    char_u *p = ಖಾಲಿ;
 
-    if (in_vim9script() && check_for_nonempty_string_arg(argvars, 0) == FAIL)
-	return;
-    (void)mch_can_exe(tv_get_string(&argvars[0]), &p, TRUE);
+    ಆದರೆ (ಒಳ_vim9script() && check_for_nonempty_string_arg(argvars, 0) == FAIL)
+	ಹಿಂತಿರುಗಿ;
+    (ಶೂನ್ಯ)mch_can_exe(tv_get_string(&argvars[0]), &p, TRUE);
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = p;
 }
@@ -957,106 +957,106 @@ f_exepath(typval_T *argvars, typval_T *rettv)
 /*
  * "filereadable()" function
  */
-    void
+    ಶೂನ್ಯ
 f_filereadable(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
-    rettv->vval.v_number = file_is_readable(tv_get_string(&argvars[0]));
+    ಆದರೆ (ಒಳ_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ಹಿಂತಿರುಗಿ;
+    rettv->vval.v_ಸಂಖ್ಯೆ = file_is_readable(tv_get_string(&argvars[0]));
 }
 
 /*
  * Return 0 for not writable, 1 for writable file, 2 for a dir which we have
  * rights to write into.
  */
-    void
+    ಶೂನ್ಯ
 f_filewritable(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
-    rettv->vval.v_number = filewritable(tv_get_string(&argvars[0]));
+    ಆದರೆ (ಒಳ_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ಹಿಂತಿರುಗಿ;
+    rettv->vval.v_ಸಂಖ್ಯೆ = filewritable(tv_get_string(&argvars[0]));
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 findfilendir(
     typval_T	*argvars,
     typval_T	*rettv,
-    int		find_what)
+    ಪೂರ್ಣಾಂಕ		ಕಂಡುಹಿಡಿ_what)
 {
     char_u	*fname;
-    char_u	*fresult = NULL;
-    char_u	*path = *curbuf->b_p_path == NUL ? p_path : curbuf->b_p_path;
+    char_u	*fresult = ಖಾಲಿ;
+    char_u	*ಮಾರ್ಗ = *curbuf->b_p_ಮಾರ್ಗ == NUL ? p_ಮಾರ್ಗ : curbuf->b_p_ಮಾರ್ಗ;
     char_u	*p;
     char_u	pathbuf[NUMBUFLEN];
-    int		count = 1;
-    int		first = TRUE;
-    int		error = FALSE;
+    ಪೂರ್ಣಾಂಕ		ಎಣಿಕೆ_2 = 1;
+    ಪೂರ್ಣಾಂಕ		ಮೊದಲ = TRUE;
+    ಪೂರ್ಣಾಂಕ		error = FALSE;
 
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ಖಾಲಿ;
     rettv->v_type = VAR_STRING;
-    if (in_vim9script()
+    ಆದರೆ (ಒಳ_vim9script()
 	    && (check_for_nonempty_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
-	return;
+		    && check_for_opt_ಸಂಖ್ಯೆ_arg(argvars, 2) == FAIL)))
+	ಹಿಂತಿರುಗಿ;
 
     fname = tv_get_string(&argvars[0]);
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ಆದರೆ (argvars[1].v_type != VAR_UNKNOWN)
     {
 	p = tv_get_string_buf_chk(&argvars[1], pathbuf);
-	if (p == NULL)
+	ಆದರೆ (p == ಖಾಲಿ)
 	    error = TRUE;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (*p != NUL)
-		path = p;
+	    ಆದರೆ (*p != NUL)
+		ಮಾರ್ಗ = p;
 
-	    if (argvars[2].v_type != VAR_UNKNOWN)
-		count = (int)tv_get_number_chk(&argvars[2], &error);
+	    ಆದರೆ (argvars[2].v_type != VAR_UNKNOWN)
+		ಎಣಿಕೆ_2 = (ಪೂರ್ಣಾಂಕ)tv_get_ಸಂಖ್ಯೆ_chk(&argvars[2], &error);
 	}
     }
 
-    if (count < 0 && rettv_list_alloc(rettv) == FAIL)
+    ಆದರೆ (ಎಣಿಕೆ_2 < 0 && rettv_list_alloc(rettv) == FAIL)
 	error = TRUE;
 
-    if (*fname != NUL && !error)
+    ಆದರೆ (*fname != NUL && !error)
     {
-	char_u	*file_to_find = NULL;
-	char	*search_ctx = NULL;
+	char_u	*file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ = ಖಾಲಿ;
+	ಅಕ್ಷರ	*ಹುಡುಕು_ctx = ಖಾಲಿ;
 
-	do
+	ಮಾಡು
 	{
-	    if (rettv->v_type == VAR_STRING || rettv->v_type == VAR_LIST)
+	    ಆದರೆ (rettv->v_type == VAR_STRING || rettv->v_type == VAR_LIST)
 		vim_free(fresult);
-	    fresult = find_file_in_path_option(first ? fname : NULL,
-					       first ? (int)STRLEN(fname) : 0,
-					0, first, path,
-					find_what,
+	    fresult = ಕಂಡುಹಿಡಿ_file_ಒಳ_ಮಾರ್ಗ_option(ಮೊದಲ ? fname : ಖಾಲಿ,
+					       ಮೊದಲ ? (ಪೂರ್ಣಾಂಕ)STRLEN(fname) : 0,
+					0, ಮೊದಲ, ಮಾರ್ಗ,
+					ಕಂಡುಹಿಡಿ_what,
 					curbuf->b_ffname,
-					find_what == FINDFILE_DIR
+					ಕಂಡುಹಿಡಿ_what == FINDFILE_DIR
 					    ? (char_u *)"" : curbuf->b_p_sua,
-					    &file_to_find, &search_ctx);
-	    first = FALSE;
+					    &file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ, &ಹುಡುಕು_ctx);
+	    ಮೊದಲ = FALSE;
 
-	    if (fresult != NULL && rettv->v_type == VAR_LIST)
+	    ಆದರೆ (fresult != ಖಾಲಿ && rettv->v_type == VAR_LIST)
 		list_append_string(rettv->vval.v_list, fresult, -1);
 
-	} while ((rettv->v_type == VAR_LIST || --count > 0) && fresult != NULL);
+	} ಆಗ ((rettv->v_type == VAR_LIST || --ಎಣಿಕೆ_2 > 0) && fresult != ಖಾಲಿ);
 
-	vim_free(file_to_find);
-	vim_findfile_cleanup(search_ctx);
+	vim_free(file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ);
+	vim_findfile_cleanup(ಹುಡುಕು_ctx);
     }
 
-    if (rettv->v_type == VAR_STRING)
+    ಆದರೆ (rettv->v_type == VAR_STRING)
 	rettv->vval.v_string = fresult;
 }
 
 /*
  * "finddir({fname}[, {path}[, {count}]])" function
  */
-    void
+    ಶೂನ್ಯ
 f_finddir(typval_T *argvars, typval_T *rettv)
 {
     findfilendir(argvars, rettv, FINDFILE_DIR);
@@ -1065,7 +1065,7 @@ f_finddir(typval_T *argvars, typval_T *rettv)
 /*
  * "findfile({fname}[, {path}[, {count}]])" function
  */
-    void
+    ಶೂನ್ಯ
 f_findfile(typval_T *argvars, typval_T *rettv)
 {
     findfilendir(argvars, rettv, FINDFILE_FILE);
@@ -1074,36 +1074,36 @@ f_findfile(typval_T *argvars, typval_T *rettv)
 /*
  * "fnamemodify({fname}, {mods})" function
  */
-    void
+    ಶೂನ್ಯ
 f_fnamemodify(typval_T *argvars, typval_T *rettv)
 {
     char_u	*fname;
     char_u	*mods;
     size_t	usedlen = 0;
     size_t	len = 0;
-    char_u	*fbuf = NULL;
+    char_u	*fbuf = ಖಾಲಿ;
     char_u	buf[NUMBUFLEN];
 
-    if (in_vim9script()
+    ಆದರೆ (ಒಳ_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	ಹಿಂತಿರುಗಿ;
 
     fname = tv_get_string_chk(&argvars[0]);
     mods = tv_get_string_buf_chk(&argvars[1], buf);
-    if (mods == NULL || fname == NULL)
-	fname = NULL;
-    else
+    ಆದರೆ (mods == ಖಾಲಿ || fname == ಖಾಲಿ)
+	fname = ಖಾಲಿ;
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	len = STRLEN(fname);
-	if (mods != NULL && *mods != NUL)
-	    (void)modify_fname(mods, FALSE, &usedlen, &fname, &fbuf, &len);
+	ಆದರೆ (mods != ಖಾಲಿ && *mods != NUL)
+	    (ಶೂನ್ಯ)modify_fname(mods, FALSE, &usedlen, &fname, &fbuf, &len);
     }
 
     rettv->v_type = VAR_STRING;
-    if (fname == NULL)
-	rettv->vval.v_string = NULL;
-    else
+    ಆದರೆ (fname == ಖಾಲಿ)
+	rettv->vval.v_string = ಖಾಲಿ;
+    ಇಲ್ಲದಿದ್ದರೆ
 	rettv->vval.v_string = vim_strnsave(fname, len);
     vim_free(fbuf);
 }
@@ -1125,53 +1125,53 @@ f_fnamemodify(typval_T *argvars, typval_T *rettv)
  * specified window in the specified tab page.
  * If the window or the tab page doesn't exist then return NULL.
  */
-    void
+    ಶೂನ್ಯ
 f_getcwd(typval_T *argvars, typval_T *rettv)
 {
-    win_T	*wp = NULL;
-    tabpage_T	*tp = NULL;
+    win_T	*wp = ಖಾಲಿ;
+    tabpage_T	*tp = ಖಾಲಿ;
     char_u	*cwd;
-    int		global = FALSE;
+    ಪೂರ್ಣಾಂಕ		global = FALSE;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ಖಾಲಿ;
 
-    if (in_vim9script()
-	    && (check_for_opt_number_arg(argvars, 0) == FAIL
+    ಆದರೆ (ಒಳ_vim9script()
+	    && (check_for_opt_ಸಂಖ್ಯೆ_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 1) == FAIL)))
-	return;
+		    && check_for_opt_ಸಂಖ್ಯೆ_arg(argvars, 1) == FAIL)))
+	ಹಿಂತಿರುಗಿ;
 
-    if (argvars[0].v_type == VAR_NUMBER
-	    && argvars[0].vval.v_number == -1
+    ಆದರೆ (argvars[0].v_type == VAR_ಸಂಖ್ಯೆ
+	    && argvars[0].vval.v_ಸಂಖ್ಯೆ == -1
 	    && argvars[1].v_type == VAR_UNKNOWN)
 	global = TRUE;
-    else
-	wp = find_tabwin(&argvars[0], &argvars[1], &tp);
+    ಇಲ್ಲದಿದ್ದರೆ
+	wp = ಕಂಡುಹಿಡಿ_tabwin(&argvars[0], &argvars[1], &tp);
 
-    if (wp != NULL && wp->w_localdir != NULL
+    ಆದರೆ (wp != ಖಾಲಿ && wp->w_localdir != ಖಾಲಿ
 					   && argvars[0].v_type != VAR_UNKNOWN)
 	rettv->vval.v_string = vim_strsave(wp->w_localdir);
-    else if (tp != NULL && tp->tp_localdir != NULL
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (tp != ಖಾಲಿ && tp->tp_localdir != ಖಾಲಿ
 					   && argvars[0].v_type != VAR_UNKNOWN)
 	rettv->vval.v_string = vim_strsave(tp->tp_localdir);
-    else if (wp != NULL || tp != NULL || global)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (wp != ಖಾಲಿ || tp != ಖಾಲಿ || global)
     {
-	if (globaldir != NULL && argvars[0].v_type != VAR_UNKNOWN)
+	ಆದರೆ (globaldir != ಖಾಲಿ && argvars[0].v_type != VAR_UNKNOWN)
 	    rettv->vval.v_string = vim_strsave(globaldir);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    cwd = alloc(MAXPATHL);
-	    if (cwd != NULL)
+	    ಆದರೆ (cwd != ಖಾಲಿ)
 	    {
-		if (mch_dirname(cwd, MAXPATHL) != FAIL)
+		ಆದರೆ (mch_dirname(cwd, MAXPATHL) != FAIL)
 		    rettv->vval.v_string = vim_strsave(cwd);
 		vim_free(cwd);
 	    }
 	}
     }
-# ifdef BACKSLASH_IN_FILENAME
-    if (rettv->vval.v_string != NULL)
+# ifdef BACKSLASH_ಒಳ_FILENAME
+    ಆದರೆ (rettv->vval.v_string != ಖಾಲಿ)
 	slash_adjust(rettv->vval.v_string);
 # endif
 }
@@ -1183,36 +1183,36 @@ f_getcwd(typval_T *argvars, typval_T *rettv)
 getfpermst(stat_T *st, char_u *perm)
 {
     char_u	    flags[] = "rwx";
-    int		    i;
+    ಪೂರ್ಣಾಂಕ		    i;
 
-    for (i = 0; i < 9; i++)
+    ಗಾಗಿ (i = 0; i < 9; i++)
     {
-	if (st->st_mode & (1 << (8 - i)))
+	ಆದರೆ (st->st_ಬಹುಲಕ & (1 << (8 - i)))
 	    perm[i] = flags[i % 3];
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    perm[i] = '-';
     }
-    return perm;
+    ಹಿಂತಿರುಗಿ perm;
 }
 
 /*
  * "getfperm({fname})" function
  */
-    void
+    ಶೂನ್ಯ
 f_getfperm(typval_T *argvars, typval_T *rettv)
 {
     char_u	*fname;
     stat_T	st;
-    char_u	*perm = NULL;
+    char_u	*perm = ಖಾಲಿ;
     char_u	permbuf[] = "---------";
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ಆದರೆ (ಒಳ_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
     fname = tv_get_string(&argvars[0]);
 
     rettv->v_type = VAR_STRING;
-    if (mch_stat((char *)fname, &st) >= 0)
+    ಆದರೆ (mch_stat((ಅಕ್ಷರ *)fname, &st) >= 0)
 	perm = vim_strsave(getfpermst(&st, permbuf));
     rettv->vval.v_string = perm;
 }
@@ -1220,50 +1220,50 @@ f_getfperm(typval_T *argvars, typval_T *rettv)
 /*
  * "getfsize({fname})" function
  */
-    void
+    ಶೂನ್ಯ
 f_getfsize(typval_T *argvars, typval_T *rettv)
 {
     char_u	*fname;
     stat_T	st;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ಆದರೆ (ಒಳ_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
     fname = tv_get_string(&argvars[0]);
-    if (mch_stat((char *)fname, &st) >= 0)
+    ಆದರೆ (mch_stat((ಅಕ್ಷರ *)fname, &st) >= 0)
     {
-	if (S_ISDIR(st.st_mode))
-	    rettv->vval.v_number = 0;
-	else
+	ಆದರೆ (S_ISDIR(st.st_ಬಹುಲಕ))
+	    rettv->vval.v_ಸಂಖ್ಯೆ = 0;
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    rettv->vval.v_number = (varnumber_T)st.st_size;
+	    rettv->vval.v_ಸಂಖ್ಯೆ = (varnumber_T)st.st_size;
 
 	    // non-perfect check for overflow
-	    if ((off_T)rettv->vval.v_number != (off_T)st.st_size)
-		rettv->vval.v_number = -2;
+	    ಆದರೆ ((off_T)rettv->vval.v_ಸಂಖ್ಯೆ != (off_T)st.st_size)
+		rettv->vval.v_ಸಂಖ್ಯೆ = -2;
 	}
     }
-    else
-	  rettv->vval.v_number = -1;
+    ಇಲ್ಲದಿದ್ದರೆ
+	  rettv->vval.v_ಸಂಖ್ಯೆ = -1;
 }
 
 /*
  * "getftime({fname})" function
  */
-    void
+    ಶೂನ್ಯ
 f_getftime(typval_T *argvars, typval_T *rettv)
 {
     char_u	*fname;
     stat_T	st;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ಆದರೆ (ಒಳ_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
     fname = tv_get_string(&argvars[0]);
-    if (mch_stat((char *)fname, &st) >= 0)
-	rettv->vval.v_number = (varnumber_T)st.st_mtime;
-    else
-	rettv->vval.v_number = -1;
+    ಆದರೆ (mch_stat((ಅಕ್ಷರ *)fname, &st) >= 0)
+	rettv->vval.v_ಸಂಖ್ಯೆ = (varnumber_T)st.st_mtime;
+    ಇಲ್ಲದಿದ್ದರೆ
+	rettv->vval.v_ಸಂಖ್ಯೆ = -1;
 }
 
 /*
@@ -1272,44 +1272,44 @@ f_getftime(typval_T *argvars, typval_T *rettv)
     char_u *
 getftypest(stat_T *st)
 {
-    char    *t;
+    ಅಕ್ಷರ    *t;
 
-    if (S_ISREG(st->st_mode))
+    ಆದರೆ (S_ISREG(st->st_ಬಹುಲಕ))
 	t = "file";
-    else if (S_ISDIR(st->st_mode))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (S_ISDIR(st->st_ಬಹುಲಕ))
 	t = "dir";
-    else if (S_ISLNK(st->st_mode))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (S_ISLNK(st->st_ಬಹುಲಕ))
 	t = "link";
-    else if (S_ISBLK(st->st_mode))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (S_ISBLK(st->st_ಬಹುಲಕ))
 	t = "bdev";
-    else if (S_ISCHR(st->st_mode))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (S_ISCHR(st->st_ಬಹುಲಕ))
 	t = "cdev";
-    else if (S_ISFIFO(st->st_mode))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (S_ISFIFO(st->st_ಬಹುಲಕ))
 	t = "fifo";
-    else if (S_ISSOCK(st->st_mode))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (S_ISSOCK(st->st_ಬಹುಲಕ))
 	t = "socket";
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	t = "other";
-    return (char_u*)t;
+    ಹಿಂತಿರುಗಿ (char_u*)t;
 }
 
 /*
  * "getftype({fname})" function
  */
-    void
+    ಶೂನ್ಯ
 f_getftype(typval_T *argvars, typval_T *rettv)
 {
     char_u	*fname;
     stat_T	st;
-    char_u	*type = NULL;
+    char_u	*type = ಖಾಲಿ;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ಆದರೆ (ಒಳ_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
     fname = tv_get_string(&argvars[0]);
 
     rettv->v_type = VAR_STRING;
-    if (mch_lstat((char *)fname, &st) >= 0)
+    ಆದರೆ (mch_lstat((ಅಕ್ಷರ *)fname, &st) >= 0)
 	type = vim_strsave(getftypest(&st));
     rettv->vval.v_string = type;
 }
@@ -1317,95 +1317,95 @@ f_getftype(typval_T *argvars, typval_T *rettv)
 /*
  * "glob()" function
  */
-    void
+    ಶೂನ್ಯ
 f_glob(typval_T *argvars, typval_T *rettv)
 {
-    int		options = WILD_SILENT|WILD_USE_NL;
+    ಪೂರ್ಣಾಂಕ		options = WILD_SILENT|WILD_USE_NL;
     expand_T	xpc;
-    int		error = FALSE;
+    ಪೂರ್ಣಾಂಕ		error = FALSE;
 
-    if (in_vim9script()
+    ಆದರೆ (ಒಳ_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && (check_for_opt_bool_arg(argvars, 2) == FAIL
 			|| (argvars[2].v_type != VAR_UNKNOWN
 			    && check_for_opt_bool_arg(argvars, 3) == FAIL)))))
-	return;
+	ಹಿಂತಿರುಗಿ;
 
     // When the optional second argument is non-zero, don't remove matches
     // for 'wildignore' and don't put matches for 'suffixes' at the end.
     rettv->v_type = VAR_STRING;
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ಆದರೆ (argvars[1].v_type != VAR_UNKNOWN)
     {
-	if (tv_get_bool_chk(&argvars[1], &error))
+	ಆದರೆ (tv_get_bool_chk(&argvars[1], &error))
 	    options |= WILD_KEEP_ALL;
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	ಆದರೆ (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    if (tv_get_bool_chk(&argvars[2], &error))
-		rettv_list_set(rettv, NULL);
-	    if (argvars[3].v_type != VAR_UNKNOWN
+	    ಆದರೆ (tv_get_bool_chk(&argvars[2], &error))
+		rettv_list_ಗಣ(rettv, ಖಾಲಿ);
+	    ಆದರೆ (argvars[3].v_type != VAR_UNKNOWN
 				    && tv_get_bool_chk(&argvars[3], &error))
 		options |= WILD_ALLLINKS;
 	}
     }
-    if (!error)
+    ಆದರೆ (!error)
     {
 	ExpandInit(&xpc);
 	xpc.xp_context = EXPAND_FILES;
-	if (p_wic)
+	ಆದರೆ (p_wic)
 	    options += WILD_ICASE;
-	if (rettv->v_type == VAR_STRING)
+	ಆದರೆ (rettv->v_type == VAR_STRING)
 	    rettv->vval.v_string = ExpandOne(&xpc, tv_get_string(&argvars[0]),
-						     NULL, options, WILD_ALL);
-	else if (rettv_list_alloc(rettv) == OK)
+						     ಖಾಲಿ, options, WILD_ALL);
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (rettv_list_alloc(rettv) == OK)
 	{
-	  int i;
+	  ಪೂರ್ಣಾಂಕ i;
 
 	  ExpandOne(&xpc, tv_get_string(&argvars[0]),
-						NULL, options, WILD_ALL_KEEP);
-	  for (i = 0; i < xpc.xp_numfiles; i++)
+						ಖಾಲಿ, options, WILD_ALL_KEEP);
+	  ಗಾಗಿ (i = 0; i < xpc.xp_numfiles; i++)
 	      list_append_string(rettv->vval.v_list, xpc.xp_files[i], -1);
 
 	  ExpandCleanup(&xpc);
 	}
     }
-    else
-	rettv->vval.v_string = NULL;
+    ಇಲ್ಲದಿದ್ದರೆ
+	rettv->vval.v_string = ಖಾಲಿ;
 }
 
 /*
  * "glob2regpat()" function
  */
-    void
+    ಶೂನ್ಯ
 f_glob2regpat(typval_T *argvars, typval_T *rettv)
 {
     char_u	buf[NUMBUFLEN];
     char_u	*pat;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ಆದರೆ (ಒಳ_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
-    pat = tv_get_string_buf_chk_strict(&argvars[0], buf, in_vim9script());
+    pat = tv_get_string_buf_chk_strict(&argvars[0], buf, ಒಳ_vim9script());
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = (pat == NULL)
-			 ? NULL : file_pat_to_reg_pat(pat, NULL, NULL, FALSE);
+    rettv->vval.v_string = (pat == ಖಾಲಿ)
+			 ? ಖಾಲಿ : file_pat_ಗಮ್ಯ_reg_pat(pat, ಖಾಲಿ, ಖಾಲಿ, FALSE);
 }
 
 /*
  * "globpath()" function
  */
-    void
+    ಶೂನ್ಯ
 f_globpath(typval_T *argvars, typval_T *rettv)
 {
-    int		flags = WILD_IGNORE_COMPLETESLASH;
+    ಪೂರ್ಣಾಂಕ		flags = WILD_IGNORE_COMPLETESLASH;
     char_u	buf1[NUMBUFLEN];
     char_u	*file;
-    int		error = FALSE;
+    ಪೂರ್ಣಾಂಕ		error = FALSE;
     garray_T	ga;
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
 
-    if (in_vim9script()
+    ಆದರೆ (ಒಳ_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_bool_arg(argvars, 2) == FAIL
@@ -1413,64 +1413,64 @@ f_globpath(typval_T *argvars, typval_T *rettv)
 		    && (check_for_opt_bool_arg(argvars, 3) == FAIL
 			|| (argvars[3].v_type != VAR_UNKNOWN
 			    && check_for_opt_bool_arg(argvars, 4) == FAIL)))))
-	return;
+	ಹಿಂತಿರುಗಿ;
 
     file = tv_get_string_buf_chk(&argvars[1], buf1);
 
     // When the optional second argument is non-zero, don't remove matches
     // for 'wildignore' and don't put matches for 'suffixes' at the end.
     rettv->v_type = VAR_STRING;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ಆದರೆ (argvars[2].v_type != VAR_UNKNOWN)
     {
-	if (tv_get_bool_chk(&argvars[2], &error))
+	ಆದರೆ (tv_get_bool_chk(&argvars[2], &error))
 	    flags |= WILD_KEEP_ALL;
-	if (argvars[3].v_type != VAR_UNKNOWN)
+	ಆದರೆ (argvars[3].v_type != VAR_UNKNOWN)
 	{
-	    if (tv_get_bool_chk(&argvars[3], &error))
-		rettv_list_set(rettv, NULL);
-	    if (argvars[4].v_type != VAR_UNKNOWN
+	    ಆದರೆ (tv_get_bool_chk(&argvars[3], &error))
+		rettv_list_ಗಣ(rettv, ಖಾಲಿ);
+	    ಆದರೆ (argvars[4].v_type != VAR_UNKNOWN
 				    && tv_get_bool_chk(&argvars[4], &error))
 		flags |= WILD_ALLLINKS;
 	}
     }
-    if (file != NULL && !error)
+    ಆದರೆ (file != ಖಾಲಿ && !error)
     {
-	ga_init2(&ga, sizeof(char_u *), 10);
+	ga_init2(&ga, ಗಾತ್ರ(char_u *), 10);
 	globpath(tv_get_string(&argvars[0]), file, &ga, flags, FALSE);
-	if (rettv->v_type == VAR_STRING)
-	    rettv->vval.v_string = ga_concat_strings(&ga, "\n");
-	else if (rettv_list_alloc(rettv) == OK)
-	    for (i = 0; i < ga.ga_len; ++i)
+	ಆದರೆ (rettv->v_type == VAR_STRING)
+	    rettv->vval.v_string = ga_concat_ಅಕ್ಷರಸರಣಿಗಳು(&ga, "\n");
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (rettv_list_alloc(rettv) == OK)
+	    ಗಾಗಿ (i = 0; i < ga.ga_len; ++i)
 		list_append_string(rettv->vval.v_list,
-					    ((char_u **)(ga.ga_data))[i], -1);
-	ga_clear_strings(&ga);
+					    ((char_u **)(ga.ga_ದತ್ತಾಂಶ))[i], -1);
+	ga_clear_ಅಕ್ಷರಸರಣಿಗಳು(&ga);
     }
-    else
-	rettv->vval.v_string = NULL;
+    ಇಲ್ಲದಿದ್ದರೆ
+	rettv->vval.v_string = ಖಾಲಿ;
 }
 
 /*
  * "isdirectory()" function
  */
-    void
+    ಶೂನ್ಯ
 f_isdirectory(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ಆದರೆ (ಒಳ_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
-    rettv->vval.v_number = mch_isdir(tv_get_string(&argvars[0]));
+    rettv->vval.v_ಸಂಖ್ಯೆ = mch_isdir(tv_get_string(&argvars[0]));
 }
 
 /*
  * "isabsolutepath()" function
  */
-    void
+    ಶೂನ್ಯ
 f_isabsolutepath(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ಆದರೆ (ಒಳ_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
-    rettv->vval.v_number = mch_isFullName(tv_get_string_strict(&argvars[0]));
+    rettv->vval.v_ಸಂಖ್ಯೆ = mch_is_ತುಂಬಿದ_Name(tv_get_string_strict(&argvars[0]));
 }
 
 /*
@@ -1480,113 +1480,113 @@ f_isabsolutepath(typval_T *argvars, typval_T *rettv)
  * NULL until that happens.
  * Return OK or FAIL.
  */
-    static int
-mkdir_recurse(char_u *dir, int prot, char_u **created)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+mkdir_recurse(char_u *dir, ಪೂರ್ಣಾಂಕ prot, char_u **created)
 {
     char_u	*p;
     char_u	*updir;
-    int		r = FAIL;
+    ಪೂರ್ಣಾಂಕ		r = FAIL;
 
     // Get end of directory name in "dir".
     // We're done when it's "/" or "c:/".
     p = gettail_sep(dir);
-    if (p <= get_past_head(dir))
-	return OK;
+    ಆದರೆ (p <= get_past_ತಲೆ(dir))
+	ಹಿಂತಿರುಗಿ OK;
 
     // If the directory exists we're done.  Otherwise: create it.
     updir = vim_strnsave(dir, p - dir);
-    if (updir == NULL)
-	return FAIL;
-    if (mch_isdir(updir))
+    ಆದರೆ (updir == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
+    ಆದರೆ (mch_isdir(updir))
 	r = OK;
-    else if (mkdir_recurse(updir, prot, created) == OK)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (mkdir_recurse(updir, prot, created) == OK)
     {
 	r = vim_mkdir_emsg(updir, prot);
-	if (r == OK && created != NULL && *created == NULL)
-	    *created = FullName_save(updir, FALSE);
+	ಆದರೆ (r == OK && created != ಖಾಲಿ && *created == ಖಾಲಿ)
+	    *created = ತುಂಬಿದ_Name_save(updir, FALSE);
     }
     vim_free(updir);
-    return r;
+    ಹಿಂತಿರುಗಿ r;
 }
 
 /*
  * "mkdir()" function
  */
-    void
+    ಶೂನ್ಯ
 f_mkdir(typval_T *argvars, typval_T *rettv)
 {
     char_u	*dir;
     char_u	buf[NUMBUFLEN];
-    int		prot = 0755;
-    int		defer = FALSE;
-    int		defer_recurse = FALSE;
-    char_u	*created = NULL;
+    ಪೂರ್ಣಾಂಕ		prot = 0755;
+    ಪೂರ್ಣಾಂಕ		defer = FALSE;
+    ಪೂರ್ಣಾಂಕ		defer_recurse = FALSE;
+    char_u	*created = ಖಾಲಿ;
 
-    rettv->vval.v_number = FAIL;
-    if (check_restricted() || check_secure())
-	return;
+    rettv->vval.v_ಸಂಖ್ಯೆ = FAIL;
+    ಆದರೆ (check_restricted() || check_secure())
+	ಹಿಂತಿರುಗಿ;
 
-    if (in_vim9script()
+    ಆದರೆ (ಒಳ_vim9script()
 	    && (check_for_nonempty_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
-	return;
+		    && check_for_opt_ಸಂಖ್ಯೆ_arg(argvars, 2) == FAIL)))
+	ಹಿಂತಿರುಗಿ;
 
     dir = tv_get_string_buf(&argvars[0], buf);
-    if (*dir == NUL)
-	return;
+    ಆದರೆ (*dir == NUL)
+	ಹಿಂತಿರುಗಿ;
 
-    if (*gettail(dir) == NUL)
+    ಆದರೆ (*gettail(dir) == NUL)
 	// remove trailing slashes
 	*gettail_sep(dir) = NUL;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ಆದರೆ (argvars[1].v_type != VAR_UNKNOWN)
     {
 	char_u *arg2;
 
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	ಆದರೆ (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    prot = (int)tv_get_number_chk(&argvars[2], NULL);
-	    if (prot == -1)
-		return;
+	    prot = (ಪೂರ್ಣಾಂಕ)tv_get_ಸಂಖ್ಯೆ_chk(&argvars[2], ಖಾಲಿ);
+	    ಆದರೆ (prot == -1)
+		ಹಿಂತಿರುಗಿ;
 	}
 	arg2 = tv_get_string(&argvars[1]);
-	defer = vim_strchr(arg2, 'D') != NULL;
-	defer_recurse = vim_strchr(arg2, 'R') != NULL;
-	if ((defer || defer_recurse) && !can_add_defer())
-	    return;
+	defer = vim_strchr(arg2, 'D') != ಖಾಲಿ;
+	defer_recurse = vim_strchr(arg2, 'R') != ಖಾಲಿ;
+	ಆದರೆ ((defer || defer_recurse) && !can_ಕೂಡಿಸು_defer())
+	    ಹಿಂತಿರುಗಿ;
 
-	if (vim_strchr(arg2, 'p') != NULL)
+	ಆದರೆ (vim_strchr(arg2, 'p') != ಖಾಲಿ)
 	{
-	    if (mch_isdir(dir))
+	    ಆದರೆ (mch_isdir(dir))
 	    {
 		// With the "p" flag it's OK if the dir already exists.
-		rettv->vval.v_number = OK;
-		return;
+		rettv->vval.v_ಸಂಖ್ಯೆ = OK;
+		ಹಿಂತಿರುಗಿ;
 	    }
-	    mkdir_recurse(dir, prot, defer || defer_recurse ? &created : NULL);
+	    mkdir_recurse(dir, prot, defer || defer_recurse ? &created : ಖಾಲಿ);
 	}
     }
-    rettv->vval.v_number = vim_mkdir_emsg(dir, prot);
+    rettv->vval.v_ಸಂಖ್ಯೆ = vim_mkdir_emsg(dir, prot);
 
     // Handle "D" and "R": deferred deletion of the created directory.
-    if (rettv->vval.v_number == OK
-				&& created == NULL && (defer || defer_recurse))
-	created = FullName_save(dir, FALSE);
-    if (created != NULL)
+    ಆದರೆ (rettv->vval.v_ಸಂಖ್ಯೆ == OK
+				&& created == ಖಾಲಿ && (defer || defer_recurse))
+	created = ತುಂಬಿದ_Name_save(dir, FALSE);
+    ಆದರೆ (created != ಖಾಲಿ)
     {
 	typval_T tv[2];
 
 	tv[0].v_type = VAR_STRING;
-	tv[0].v_lock = 0;
+	tv[0].v_ಬೀಗ = 0;
 	tv[0].vval.v_string = created;
 	tv[1].v_type = VAR_STRING;
-	tv[1].v_lock = 0;
+	tv[1].v_ಬೀಗ = 0;
 	tv[1].vval.v_string = vim_strsave(
 				       (char_u *)(defer_recurse ? "rf" : "d"));
-	if (tv[0].vval.v_string == NULL || tv[1].vval.v_string == NULL
-		|| add_defer((char_u *)"delete", 2, tv) == FAIL)
+	ಆದರೆ (tv[0].vval.v_string == ಖಾಲಿ || tv[1].vval.v_string == ಖಾಲಿ
+		|| ಕೂಡಿಸು_defer((char_u *)"delete", 2, tv) == FAIL)
 	{
 	    vim_free(tv[0].vval.v_string);
 	    vim_free(tv[1].vval.v_string);
@@ -1597,34 +1597,34 @@ f_mkdir(typval_T *argvars, typval_T *rettv)
 /*
  * "pathshorten()" function
  */
-    void
+    ಶೂನ್ಯ
 f_pathshorten(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
-    int		trim_len = 1;
+    ಪೂರ್ಣಾಂಕ		trim_len = 1;
 
-    if (in_vim9script()
+    ಆದರೆ (ಒಳ_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_ಸಂಖ್ಯೆ_arg(argvars, 1) == FAIL))
+	ಹಿಂತಿರುಗಿ;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ಆದರೆ (argvars[1].v_type != VAR_UNKNOWN)
     {
-	trim_len = (int)tv_get_number(&argvars[1]);
-	if (trim_len < 1)
+	trim_len = (ಪೂರ್ಣಾಂಕ)tv_get_ಸಂಖ್ಯೆ(&argvars[1]);
+	ಆದರೆ (trim_len < 1)
 	    trim_len = 1;
     }
 
     rettv->v_type = VAR_STRING;
     p = tv_get_string_chk(&argvars[0]);
 
-    if (p == NULL)
-	rettv->vval.v_string = NULL;
-    else
+    ಆದರೆ (p == ಖಾಲಿ)
+	rettv->vval.v_string = ಖಾಲಿ;
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	p = vim_strsave(p);
 	rettv->vval.v_string = p;
-	if (p != NULL)
+	ಆದರೆ (p != ಖಾಲಿ)
 	    shorten_dir_len(p, trim_len);
     }
 }
@@ -1633,189 +1633,189 @@ f_pathshorten(typval_T *argvars, typval_T *rettv)
  * Common code for readdir_checkitem() and readdirex_checkitem().
  * Either "name" or "dict" is NULL.
  */
-    static int
-checkitem_common(void *context, char_u *name, dict_T *dict)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+checkitem_common(ಶೂನ್ಯ *context, char_u *name, dict_T *dict)
 {
-    typval_T	*expr = (typval_T *)context;
+    typval_T	*ಅಭಿವ್ಯಕ್ತಿ = (typval_T *)context;
     typval_T	save_val;
     typval_T	rettv;
     typval_T	argv[2];
-    int		retval = 0;
-    int		error = FALSE;
+    ಪೂರ್ಣಾಂಕ		retval = 0;
+    ಪೂರ್ಣಾಂಕ		error = FALSE;
 
     prepare_vimvar(VV_VAL, &save_val);
-    if (name != NULL)
+    ಆದರೆ (name != ಖಾಲಿ)
     {
-	set_vim_var_string(VV_VAL, name, -1);
+	ಗಣ_vim_var_string(VV_VAL, name, -1);
 	argv[0].v_type = VAR_STRING;
 	argv[0].vval.v_string = name;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	set_vim_var_dict(VV_VAL, dict);
+	ಗಣ_vim_var_dict(VV_VAL, dict);
 	argv[0].v_type = VAR_DICT;
 	argv[0].vval.v_dict = dict;
     }
 
-    if (eval_expr_typval(expr, FALSE, argv, 1, NULL, &rettv) == FAIL)
-	goto theend;
+    ಆದರೆ (eval_ಅಭಿವ್ಯಕ್ತಿ_typval(ಅಭಿವ್ಯಕ್ತಿ, FALSE, argv, 1, ಖಾಲಿ, &rettv) == FAIL)
+	ಹೋಗು theend;
 
     // We want to use -1, but also true/false should be allowed.
-    if (rettv.v_type == VAR_SPECIAL || rettv.v_type == VAR_BOOL)
+    ಆದರೆ (rettv.v_type == VAR_SPECIAL || rettv.v_type == VAR_BOOL)
     {
-	rettv.v_type = VAR_NUMBER;
-	rettv.vval.v_number = rettv.vval.v_number == VVAL_TRUE;
+	rettv.v_type = VAR_ಸಂಖ್ಯೆ;
+	rettv.vval.v_ಸಂಖ್ಯೆ = rettv.vval.v_ಸಂಖ್ಯೆ == VVAL_TRUE;
     }
-    retval = tv_get_number_chk(&rettv, &error);
-    if (error)
+    retval = tv_get_ಸಂಖ್ಯೆ_chk(&rettv, &error);
+    ಆದರೆ (error)
 	retval = -1;
     clear_tv(&rettv);
 
 theend:
-    if (name != NULL)
-	set_vim_var_string(VV_VAL, NULL, 0);
-    else
-	set_vim_var_dict(VV_VAL, NULL);
+    ಆದರೆ (name != ಖಾಲಿ)
+	ಗಣ_vim_var_string(VV_VAL, ಖಾಲಿ, 0);
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಗಣ_vim_var_dict(VV_VAL, ಖಾಲಿ);
     restore_vimvar(VV_VAL, &save_val);
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
 /*
  * Evaluate "expr" (= "context") for readdir().
  */
-    static int
-readdir_checkitem(void *context, void *item)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+readdir_checkitem(ಶೂನ್ಯ *context, ಶೂನ್ಯ *ಅಂಶ)
 {
-    char_u	*name = (char_u *)item;
+    char_u	*name = (char_u *)ಅಂಶ;
 
-    return checkitem_common(context, name, NULL);
+    ಹಿಂತಿರುಗಿ checkitem_common(context, name, ಖಾಲಿ);
 }
 
 /*
  * Process the keys in the Dict argument to the readdir() and readdirex()
  * functions.  Assumes the Dict argument is the 3rd argument.
  */
-    static int
-readdirex_dict_arg(typval_T *argvars, int *cmp)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+readdirex_dict_arg(typval_T *argvars, ಪೂರ್ಣಾಂಕ *cmp)
 {
     char_u     *compare;
 
-    if (check_for_nonnull_dict_arg(argvars, 2) == FAIL)
-	return FAIL;
+    ಆದರೆ (check_for_nonnull_dict_arg(argvars, 2) == FAIL)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    if (dict_has_key(argvars[2].vval.v_dict, "sort"))
+    ಆದರೆ (dict_has_ಕೀಲಿ(argvars[2].vval.v_dict, "sort"))
 	compare = dict_get_string(argvars[2].vval.v_dict, "sort", FALSE);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	semsg(_(e_dictionary_key_str_required), "sort");
-	return FAIL;
+	semsg(_(e_dictionary_ಕೀಲಿ_str_required), "sort");
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
-    if (STRCMP(compare, (char_u *) "none") == 0)
-	*cmp = READDIR_SORT_NONE;
-    else if (STRCMP(compare, (char_u *) "case") == 0)
-	*cmp = READDIR_SORT_BYTE;
-    else if (STRCMP(compare, (char_u *) "icase") == 0)
-	*cmp = READDIR_SORT_IC;
-    else if (STRCMP(compare, (char_u *) "collate") == 0)
-	*cmp = READDIR_SORT_COLLATE;
-    return OK;
+    ಆದರೆ (STRCMP(compare, (char_u *) "none") == 0)
+	*cmp = READDIR_ವಿಂಗಡಿಸು_NONE;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(compare, (char_u *) "case") == 0)
+	*cmp = READDIR_ವಿಂಗಡಿಸು_BYTE;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(compare, (char_u *) "icase") == 0)
+	*cmp = READDIR_ವಿಂಗಡಿಸು_IC;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(compare, (char_u *) "collate") == 0)
+	*cmp = READDIR_ವಿಂಗಡಿಸು_COLLATE;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * "readdir()" function
  */
-    void
+    ಶೂನ್ಯ
 f_readdir(typval_T *argvars, typval_T *rettv)
 {
-    typval_T	*expr;
-    int		ret;
-    char_u	*path;
+    typval_T	*ಅಭಿವ್ಯಕ್ತಿ;
+    ಪೂರ್ಣಾಂಕ		ret;
+    char_u	*ಮಾರ್ಗ;
     char_u	*p;
     garray_T	ga;
-    int		i;
-    int		sort = READDIR_SORT_BYTE;
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		ವಿಂಗಡಿಸು = READDIR_ವಿಂಗಡಿಸು_BYTE;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
-    if (check_secure())
-	return;
+    ಆದರೆ (rettv_list_alloc(rettv) == FAIL)
+	ಹಿಂತಿರುಗಿ;
+    ಆದರೆ (check_secure())
+	ಹಿಂತಿರುಗಿ;
 
-    if (in_vim9script()
+    ಆದರೆ (ಒಳ_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_dict_arg(argvars, 2) == FAIL)))
-	return;
+	ಹಿಂತಿರುಗಿ;
 
-    path = tv_get_string(&argvars[0]);
-    expr = &argvars[1];
+    ಮಾರ್ಗ = tv_get_string(&argvars[0]);
+    ಅಭಿವ್ಯಕ್ತಿ = &argvars[1];
 
-    if (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN &&
-	    readdirex_dict_arg(argvars, &sort) == FAIL)
-	return;
+    ಆದರೆ (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN &&
+	    readdirex_dict_arg(argvars, &ವಿಂಗಡಿಸು) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
-    ret = readdir_core(&ga, path, FALSE, (void *)expr,
-	    (expr->v_type == VAR_UNKNOWN) ? NULL : readdir_checkitem, sort);
-    if (ret == OK)
+    ret = readdir_core(&ga, ಮಾರ್ಗ, FALSE, (ಶೂನ್ಯ *)ಅಭಿವ್ಯಕ್ತಿ,
+	    (ಅಭಿವ್ಯಕ್ತಿ->v_type == VAR_UNKNOWN) ? ಖಾಲಿ : readdir_checkitem, ವಿಂಗಡಿಸು);
+    ಆದರೆ (ret == OK)
     {
-	for (i = 0; i < ga.ga_len; i++)
+	ಗಾಗಿ (i = 0; i < ga.ga_len; i++)
 	{
-	    p = ((char_u **)ga.ga_data)[i];
+	    p = ((char_u **)ga.ga_ದತ್ತಾಂಶ)[i];
 	    list_append_string(rettv->vval.v_list, p, -1);
 	}
     }
-    ga_clear_strings(&ga);
+    ga_clear_ಅಕ್ಷರಸರಣಿಗಳು(&ga);
 }
 
 /*
  * Evaluate "expr" (= "context") for readdirex().
  */
-    static int
-readdirex_checkitem(void *context, void *item)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+readdirex_checkitem(ಶೂನ್ಯ *context, ಶೂನ್ಯ *ಅಂಶ)
 {
-    dict_T	*dict = (dict_T*)item;
+    dict_T	*dict = (dict_T*)ಅಂಶ;
 
-    return checkitem_common(context, NULL, dict);
+    ಹಿಂತಿರುಗಿ checkitem_common(context, ಖಾಲಿ, dict);
 }
 
 /*
  * "readdirex()" function
  */
-    void
+    ಶೂನ್ಯ
 f_readdirex(typval_T *argvars, typval_T *rettv)
 {
-    typval_T	*expr;
-    int		ret;
-    char_u	*path;
+    typval_T	*ಅಭಿವ್ಯಕ್ತಿ;
+    ಪೂರ್ಣಾಂಕ		ret;
+    char_u	*ಮಾರ್ಗ;
     garray_T	ga;
-    int		i;
-    int		sort = READDIR_SORT_BYTE;
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		ವಿಂಗಡಿಸು = READDIR_ವಿಂಗಡಿಸು_BYTE;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
-    if (check_secure())
-	return;
+    ಆದರೆ (rettv_list_alloc(rettv) == FAIL)
+	ಹಿಂತಿರುಗಿ;
+    ಆದರೆ (check_secure())
+	ಹಿಂತಿರುಗಿ;
 
-    if (in_vim9script()
+    ಆದರೆ (ಒಳ_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_dict_arg(argvars, 2) == FAIL)))
-	return;
+	ಹಿಂತಿರುಗಿ;
 
-    path = tv_get_string(&argvars[0]);
-    expr = &argvars[1];
+    ಮಾರ್ಗ = tv_get_string(&argvars[0]);
+    ಅಭಿವ್ಯಕ್ತಿ = &argvars[1];
 
-    if (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN &&
-	    readdirex_dict_arg(argvars, &sort) == FAIL)
-	return;
+    ಆದರೆ (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN &&
+	    readdirex_dict_arg(argvars, &ವಿಂಗಡಿಸು) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
-    ret = readdir_core(&ga, path, TRUE, (void *)expr,
-	    (expr->v_type == VAR_UNKNOWN) ? NULL : readdirex_checkitem, sort);
-    if (ret == OK)
+    ret = readdir_core(&ga, ಮಾರ್ಗ, TRUE, (ಶೂನ್ಯ *)ಅಭಿವ್ಯಕ್ತಿ,
+	    (ಅಭಿವ್ಯಕ್ತಿ->v_type == VAR_UNKNOWN) ? ಖಾಲಿ : readdirex_checkitem, ವಿಂಗಡಿಸು);
+    ಆದರೆ (ret == OK)
     {
-	for (i = 0; i < ga.ga_len; i++)
+	ಗಾಗಿ (i = 0; i < ga.ga_len; i++)
 	{
-	    dict_T  *dict = ((dict_T**)ga.ga_data)[i];
+	    dict_T  *dict = ((dict_T**)ga.ga_ದತ್ತಾಂಶ)[i];
 	    list_append_dict(rettv->vval.v_list, dict);
 	    dict_unref(dict);
 	}
@@ -1826,145 +1826,145 @@ f_readdirex(typval_T *argvars, typval_T *rettv)
 /*
  * "readfile()" function
  */
-    static void
-read_file_or_blob(typval_T *argvars, typval_T *rettv, int always_blob)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+read_file_or_blob(typval_T *argvars, typval_T *rettv, ಪೂರ್ಣಾಂಕ always_blob)
 {
-    int		binary = FALSE;
-    int		blob = always_blob;
-    int		failed = FALSE;
+    ಪೂರ್ಣಾಂಕ		ದ್ವಿಮಾನ = FALSE;
+    ಪೂರ್ಣಾಂಕ		blob = always_blob;
+    ಪೂರ್ಣಾಂಕ		failed = FALSE;
     char_u	*fname;
     FILE	*fd;
     char_u	buf[(IOSIZE/256)*256];	// rounded to avoid odd + 1
-    int		io_size = sizeof(buf);
-    int		readlen;		// size of last fread()
-    char_u	*prev	 = NULL;	// previously read bytes, if any
-    long	prevlen  = 0;		// length of data in prev
-    long	prevsize = 0;		// size of prev buffer
-    long	maxline  = MAXLNUM;
-    long	cnt	 = 0;
+    ಪೂರ್ಣಾಂಕ		io_ಗಾತ್ರ = ಗಾತ್ರ(buf);
+    ಪೂರ್ಣಾಂಕ		readlen;		// size of last fread()
+    char_u	*prev	 = ಖಾಲಿ;	// previously read bytes, if any
+    ದೀರ್ಘ	prevlen  = 0;		// length of data in prev
+    ದೀರ್ಘ	prevsize = 0;		// size of prev buffer
+    ದೀರ್ಘ	maxline  = MAXLNUM;
+    ದೀರ್ಘ	cnt	 = 0;
     char_u	*p;			// position in buf
-    char_u	*start;			// start of current line
-    off_T	offset = 0;
-    off_T	size = -1;
+    char_u	*ಆರಂಭ;			// start of current line
+    off_T	ಸ್ಥಾನಾಂತರ = 0;
+    off_T	ಗಾತ್ರ_2 = -1;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ಆದರೆ (argvars[1].v_type != VAR_UNKNOWN)
     {
-	if (always_blob)
+	ಆದರೆ (always_blob)
 	{
-	    offset = (off_T)tv_get_number(&argvars[1]);
-	    if (argvars[2].v_type != VAR_UNKNOWN)
-		size = (off_T)tv_get_number(&argvars[2]);
+	    ಸ್ಥಾನಾಂತರ = (off_T)tv_get_ಸಂಖ್ಯೆ(&argvars[1]);
+	    ಆದರೆ (argvars[2].v_type != VAR_UNKNOWN)
+		ಗಾತ್ರ_2 = (off_T)tv_get_ಸಂಖ್ಯೆ(&argvars[2]);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (STRCMP(tv_get_string(&argvars[1]), "b") == 0)
-		binary = TRUE;
-	    if (STRCMP(tv_get_string(&argvars[1]), "B") == 0)
+	    ಆದರೆ (STRCMP(tv_get_string(&argvars[1]), "b") == 0)
+		ದ್ವಿಮಾನ = TRUE;
+	    ಆದರೆ (STRCMP(tv_get_string(&argvars[1]), "B") == 0)
 		blob = TRUE;
 
-	    if (argvars[2].v_type != VAR_UNKNOWN)
-		maxline = (long)tv_get_number(&argvars[2]);
+	    ಆದರೆ (argvars[2].v_type != VAR_UNKNOWN)
+		maxline = (ದೀರ್ಘ)tv_get_ಸಂಖ್ಯೆ(&argvars[2]);
 	}
     }
 
-    if ((blob ? rettv_blob_alloc(rettv) : rettv_list_alloc(rettv)) == FAIL)
-	return;
+    ಆದರೆ ((blob ? rettv_blob_alloc(rettv) : rettv_list_alloc(rettv)) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
     // Always open the file in binary mode, library functions have a mind of
     // their own about CR-LF conversion.
     fname = tv_get_string(&argvars[0]);
 
-    if (mch_isdir(fname))
+    ಆದರೆ (mch_isdir(fname))
     {
 	semsg(_(e_str_is_directory), fname);
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
-    if (*fname == NUL || (fd = mch_fopen((char *)fname, READBIN)) == NULL)
+    ಆದರೆ (*fname == NUL || (fd = mch_fopen((ಅಕ್ಷರ *)fname, READBIN)) == ಖಾಲಿ)
     {
 	semsg(_(e_cant_open_file_str),
 			       *fname == NUL ? (char_u *)_("<empty>") : fname);
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if (blob)
+    ಆದರೆ (blob)
     {
-	if (read_blob(fd, rettv, offset, size) == FAIL)
+	ಆದರೆ (read_blob(fd, rettv, ಸ್ಥಾನಾಂತರ, ಗಾತ್ರ_2) == FAIL)
 	    semsg(_(e_cant_read_file_str), fname);
 	fclose(fd);
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    while (cnt < maxline || maxline < 0)
+    ಆಗ (cnt < maxline || maxline < 0)
     {
-	readlen = (int)fread(buf, 1, io_size, fd);
+	readlen = (ಪೂರ್ಣಾಂಕ)fread(buf, 1, io_ಗಾತ್ರ, fd);
 
 	// This for loop processes what was read, but is also entered at end
 	// of file so that either:
 	// - an incomplete line gets written
 	// - a "binary" file gets an empty line at the end if it ends in a
 	//   newline.
-	for (p = buf, start = buf;
-		p < buf + readlen || (readlen <= 0 && (prevlen > 0 || binary));
+	ಗಾಗಿ (p = buf, ಆರಂಭ = buf;
+		p < buf + readlen || (readlen <= 0 && (prevlen > 0 || ದ್ವಿಮಾನ));
 		++p)
 	{
-	    if (readlen <= 0 || *p == '\n')
+	    ಆದರೆ (readlen <= 0 || *p == '\n')
 	    {
 		listitem_T  *li;
-		char_u	    *s	= NULL;
-		long_u	    len = p - start;
+		char_u	    *s	= ಖಾಲಿ;
+		long_u	    len = p - ಆರಂಭ;
 
 		// Finished a line.  Remove CRs before NL.
-		if (readlen > 0 && !binary)
+		ಆದರೆ (readlen > 0 && !ದ್ವಿಮಾನ)
 		{
-		    while (len > 0 && start[len - 1] == '\r')
+		    ಆಗ (len > 0 && ಆರಂಭ[len - 1] == '\r')
 			--len;
 		    // removal may cross back to the "prev" string
-		    if (len == 0)
-			while (prevlen > 0 && prev[prevlen - 1] == '\r')
+		    ಆದರೆ (len == 0)
+			ಆಗ (prevlen > 0 && prev[prevlen - 1] == '\r')
 			    --prevlen;
 		}
-		if (prevlen == 0)
-		    s = vim_strnsave(start, len);
-		else
+		ಆದರೆ (prevlen == 0)
+		    s = vim_strnsave(ಆರಂಭ, len);
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    // Change "prev" buffer to be the right size.  This way
 		    // the bytes are only copied once, and very long lines are
 		    // allocated only once.
-		    if ((s = vim_realloc(prev, prevlen + len + 1)) != NULL)
+		    ಆದರೆ ((s = vim_realloc(prev, prevlen + len + 1)) != ಖಾಲಿ)
 		    {
-			mch_memmove(s + prevlen, start, len);
+			mch_memmove(s + prevlen, ಆರಂಭ, len);
 			s[prevlen + len] = NUL;
-			prev = NULL; // the list will own the string
+			prev = ಖಾಲಿ; // the list will own the string
 			prevlen = prevsize = 0;
 		    }
 		}
-		if (s == NULL)
+		ಆದರೆ (s == ಖಾಲಿ)
 		{
-		    do_outofmem_msg((long_u) prevlen + len + 1);
+		    do_outofmem_ಸಂದೇಶ((long_u) prevlen + len + 1);
 		    failed = TRUE;
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 
-		if ((li = listitem_alloc()) == NULL)
+		ಆದರೆ ((li = listitem_alloc()) == ಖಾಲಿ)
 		{
 		    vim_free(s);
 		    failed = TRUE;
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 		li->li_tv.v_type = VAR_STRING;
-		li->li_tv.v_lock = 0;
+		li->li_tv.v_ಬೀಗ = 0;
 		li->li_tv.vval.v_string = s;
 		list_append(rettv->vval.v_list, li);
 
-		start = p + 1; // step over newline
-		if ((++cnt >= maxline && maxline >= 0) || readlen <= 0)
-		    break;
+		ಆರಂಭ = p + 1; // step over newline
+		ಆದರೆ ((++cnt >= maxline && maxline >= 0) || readlen <= 0)
+		    ನಿಲ್ಲಿಸು;
 	    }
-	    else if (*p == NUL)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*p == NUL)
 		*p = '\n';
 	    // Check for utf8 "bom"; U+FEFF is encoded as EF BB BF.  Do this
 	    // when finding the BF and check the previous two bytes.
-	    else if (*p == 0xbf && enc_utf8 && !binary)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*p == 0xbf && enc_utf8 && !ದ್ವಿಮಾನ)
 	    {
 		// Find the two bytes before the 0xbf.	If p is at buf, or buf
 		// + 1, these may be in the "prev" string.
@@ -1974,26 +1974,26 @@ read_file_or_blob(typval_T *argvars, typval_T *rettv, int always_blob)
 			  : p == buf + 1 && prevlen >= 1 ? prev[prevlen - 1]
 			  : prevlen >= 2 ? prev[prevlen - 2] : NUL;
 
-		if (back2 == 0xef && back1 == 0xbb)
+		ಆದರೆ (back2 == 0xef && back1 == 0xbb)
 		{
 		    char_u *dest = p - 2;
 
 		    // Usually a BOM is at the beginning of a file, and so at
 		    // the beginning of a line; then we can just step over it.
-		    if (start == dest)
-			start = p + 1;
-		    else
+		    ಆದರೆ (ಆರಂಭ == dest)
+			ಆರಂಭ = p + 1;
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
 			// have to shuffle buf to close gap
-			int adjust_prevlen = 0;
+			ಪೂರ್ಣಾಂಕ adjust_prevlen = 0;
 
-			if (dest < buf)
+			ಆದರೆ (dest < buf)
 			{
 			    // must be 1 or 2
-			    adjust_prevlen = (int)(buf - dest);
+			    adjust_prevlen = (ಪೂರ್ಣಾಂಕ)(buf - dest);
 			    dest = buf;
 			}
-			if (readlen > p - buf + 1)
+			ಆದರೆ (readlen > p - buf + 1)
 			    mch_memmove(dest, p + 1, readlen - (p - buf) - 1);
 			readlen -= 3 - adjust_prevlen;
 			prevlen -= adjust_prevlen;
@@ -2003,12 +2003,12 @@ read_file_or_blob(typval_T *argvars, typval_T *rettv, int always_blob)
 	    }
 	} // for
 
-	if (failed || (cnt >= maxline && maxline >= 0) || readlen <= 0)
-	    break;
-	if (start < p)
+	ಆದರೆ (failed || (cnt >= maxline && maxline >= 0) || readlen <= 0)
+	    ನಿಲ್ಲಿಸು;
+	ಆದರೆ (ಆರಂಭ < p)
 	{
 	    // There's part of a line in buf, store it in "prev".
-	    if (p - start + prevlen >= prevsize)
+	    ಆದರೆ (p - ಆರಂಭ + prevlen >= prevsize)
 	    {
 		// need bigger "prev" buffer
 		char_u *newprev;
@@ -2017,39 +2017,39 @@ read_file_or_blob(typval_T *argvars, typval_T *rettv, int always_blob)
 		// fragment of a line, so the first allocation is made
 		// small, to avoid repeatedly 'allocing' large and
 		// 'reallocing' small.
-		if (prevsize == 0)
-		    prevsize = (long)(p - start);
-		else
+		ಆದರೆ (prevsize == 0)
+		    prevsize = (ದೀರ್ಘ)(p - ಆರಂಭ);
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    long grow50pc = (prevsize * 3) / 2;
-		    long growmin  = (long)((p - start) * 2 + prevlen);
+		    ದೀರ್ಘ grow50pc = (prevsize * 3) / 2;
+		    ದೀರ್ಘ growmin  = (ದೀರ್ಘ)((p - ಆರಂಭ) * 2 + prevlen);
 		    prevsize = grow50pc > growmin ? grow50pc : growmin;
 		}
 		newprev = vim_realloc(prev, prevsize);
-		if (newprev == NULL)
+		ಆದರೆ (newprev == ಖಾಲಿ)
 		{
-		    do_outofmem_msg((long_u)prevsize);
+		    do_outofmem_ಸಂದೇಶ((long_u)prevsize);
 		    failed = TRUE;
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 		prev = newprev;
 	    }
 	    // Add the line part to end of "prev".
-	    mch_memmove(prev + prevlen, start, p - start);
-	    prevlen += (long)(p - start);
+	    mch_memmove(prev + prevlen, ಆರಂಭ, p - ಆರಂಭ);
+	    prevlen += (ದೀರ್ಘ)(p - ಆರಂಭ);
 	}
     } // while
 
     // For a negative line count use only the lines at the end of the file,
     // free the rest.
-    if (!failed && maxline < 0)
-	while (cnt > -maxline)
+    ಆದರೆ (!failed && maxline < 0)
+	ಆಗ (cnt > -maxline)
 	{
-	    listitem_remove(rettv->vval.v_list, rettv->vval.v_list->lv_first);
+	    listitem_remove(rettv->vval.v_list, rettv->vval.v_list->lv_ಮೊದಲ);
 	    --cnt;
 	}
 
-    if (failed)
+    ಆದರೆ (failed)
     {
 	// an empty list is returned on error
 	list_free(rettv->vval.v_list);
@@ -2063,18 +2063,18 @@ read_file_or_blob(typval_T *argvars, typval_T *rettv, int always_blob)
 /*
  * "readblob()" function
  */
-    void
+    ಶೂನ್ಯ
 f_readblob(typval_T *argvars, typval_T *rettv)
 {
-    if (check_secure())
-	return;
+    ಆದರೆ (check_secure())
+	ಹಿಂತಿರುಗಿ;
 
-    if (in_vim9script()
+    ಆದರೆ (ಒಳ_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL
+		|| check_for_opt_ಸಂಖ್ಯೆ_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
-	return;
+		    && check_for_opt_ಸಂಖ್ಯೆ_arg(argvars, 2) == FAIL)))
+	ಹಿಂತಿರುಗಿ;
 
     read_file_or_blob(argvars, rettv, TRUE);
 }
@@ -2082,18 +2082,18 @@ f_readblob(typval_T *argvars, typval_T *rettv)
 /*
  * "readfile()" function
  */
-    void
+    ಶೂನ್ಯ
 f_readfile(typval_T *argvars, typval_T *rettv)
 {
-    if (check_secure())
-	return;
+    ಆದರೆ (check_secure())
+	ಹಿಂತಿರುಗಿ;
 
-    if (in_vim9script()
+    ಆದರೆ (ಒಳ_vim9script()
 	    && (check_for_nonempty_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
-	return;
+		    && check_for_opt_ಸಂಖ್ಯೆ_arg(argvars, 2) == FAIL)))
+	ಹಿಂತಿರುಗಿ;
 
     read_file_or_blob(argvars, rettv, FALSE);
 }
@@ -2101,55 +2101,55 @@ f_readfile(typval_T *argvars, typval_T *rettv)
 /*
  * "resolve()" function
  */
-    void
+    ಶೂನ್ಯ
 f_resolve(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
 # ifdef HAVE_READLINK
-    char_u	*buf = NULL;
+    char_u	*buf = ಖಾಲಿ;
 # endif
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ಆದರೆ (ಒಳ_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
     p = tv_get_string(&argvars[0]);
 # ifdef FEAT_SHORTCUT
     {
-	char_u	*v = NULL;
+	char_u	*v = ಖಾಲಿ;
 
-	v = mch_resolve_path(p, TRUE);
-	if (v != NULL)
+	v = mch_resolve_ಮಾರ್ಗ(p, TRUE);
+	ಆದರೆ (v != ಖಾಲಿ)
 	    rettv->vval.v_string = v;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    rettv->vval.v_string = vim_strsave(p);
     }
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  ifdef HAVE_READLINK
     {
 	char_u	*cpy;
-	int	len;
-	char_u	*remain = NULL;
+	ಪೂರ್ಣಾಂಕ	len;
+	char_u	*remain = ಖಾಲಿ;
 	char_u	*q;
-	int	is_relative_to_current = FALSE;
-	int	has_trailing_pathsep = FALSE;
-	int	limit = 100;
+	ಪೂರ್ಣಾಂಕ	is_relative_ಗಮ್ಯ_current = FALSE;
+	ಪೂರ್ಣಾಂಕ	has_trailing_pathsep = FALSE;
+	ಪೂರ್ಣಾಂಕ	ಎಲ್ಲೆ = 100;
 
 	p = vim_strsave(p);
-	if (p == NULL)
-	    goto fail;
-	if (p[0] == '.' && (vim_ispathsep(p[1])
+	ಆದರೆ (p == ಖಾಲಿ)
+	    ಹೋಗು fail;
+	ಆದರೆ (p[0] == '.' && (vim_ispathsep(p[1])
 				   || (p[1] == '.' && (vim_ispathsep(p[2])))))
-	    is_relative_to_current = TRUE;
+	    is_relative_ಗಮ್ಯ_current = TRUE;
 
 	len = STRLEN(p);
-	if (len > 1 && after_pathsep(p, p + len))
+	ಆದರೆ (len > 1 && after_pathsep(p, p + len))
 	{
 	    has_trailing_pathsep = TRUE;
 	    p[len - 1] = NUL; // the trailing slash breaks readlink()
 	}
 
 	q = getnextcomp(p);
-	if (*q != NUL)
+	ಆದರೆ (*q != NUL)
 	{
 	    // Separate the first path component in "p", and keep the
 	    // remainder (beginning with the path separator).
@@ -2158,47 +2158,47 @@ f_resolve(typval_T *argvars, typval_T *rettv)
 	}
 
 	buf = alloc(MAXPATHL + 1);
-	if (buf == NULL)
+	ಆದರೆ (buf == ಖಾಲಿ)
 	{
 	    vim_free(p);
 	    vim_free(remain);
-	    goto fail;
+	    ಹೋಗು fail;
 	}
 
-	for (;;)
+	ಗಾಗಿ (;;)
 	{
-	    for (;;)
+	    ಗಾಗಿ (;;)
 	    {
-		len = readlink((char *)p, (char *)buf, MAXPATHL);
-		if (len <= 0)
-		    break;
+		len = readlink((ಅಕ್ಷರ *)p, (ಅಕ್ಷರ *)buf, MAXPATHL);
+		ಆದರೆ (len <= 0)
+		    ನಿಲ್ಲಿಸು;
 		buf[len] = NUL;
 
-		if (limit-- == 0)
+		ಆದರೆ (ಎಲ್ಲೆ-- == 0)
 		{
 		    vim_free(p);
 		    vim_free(remain);
-		    emsg(_(e_too_many_symbolic_links_cycle));
-		    rettv->vval.v_string = NULL;
-		    goto fail;
+		    emsg(_(e_too_many_symbolic_links_ಚಕ್ರ));
+		    rettv->vval.v_string = ಖಾಲಿ;
+		    ಹೋಗು fail;
 		}
 
 		// Ensure that the result will have a trailing path separator
 		// if the argument has one.
-		if (remain == NULL && has_trailing_pathsep)
-		    add_pathsep(buf);
+		ಆದರೆ (remain == ಖಾಲಿ && has_trailing_pathsep)
+		    ಕೂಡಿಸು_pathsep(buf);
 
 		// Separate the first path component in the link value and
 		// concatenate the remainders.
 		q = getnextcomp(vim_ispathsep(*buf) ? buf + 1 : buf);
-		if (*q != NUL)
+		ಆದರೆ (*q != NUL)
 		{
-		    if (remain == NULL)
+		    ಆದರೆ (remain == ಖಾಲಿ)
 			remain = vim_strsave(q - 1);
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
 			cpy = concat_str(q - 1, remain);
-			if (cpy != NULL)
+			ಆದರೆ (cpy != ಖಾಲಿ)
 			{
 			    vim_free(remain);
 			    remain = cpy;
@@ -2208,17 +2208,17 @@ f_resolve(typval_T *argvars, typval_T *rettv)
 		}
 
 		q = gettail(p);
-		if (q > p && *q == NUL)
+		ಆದರೆ (q > p && *q == NUL)
 		{
 		    // Ignore trailing path separator.
 		    p[q - p - 1] = NUL;
 		    q = gettail(p);
 		}
-		if (q > p && !mch_isFullName(buf))
+		ಆದರೆ (q > p && !mch_is_ತುಂಬಿದ_Name(buf))
 		{
 		    // symlink is relative to directory of argument
 		    cpy = alloc(STRLEN(p) + STRLEN(buf) + 1);
-		    if (cpy != NULL)
+		    ಆದರೆ (cpy != ಖಾಲಿ)
 		    {
 			STRCPY(cpy, p);
 			STRCPY(gettail(cpy), buf);
@@ -2226,38 +2226,38 @@ f_resolve(typval_T *argvars, typval_T *rettv)
 			p = cpy;
 		    }
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    vim_free(p);
 		    p = vim_strsave(buf);
 		}
 	    }
 
-	    if (remain == NULL)
-		break;
+	    ಆದರೆ (remain == ಖಾಲಿ)
+		ನಿಲ್ಲಿಸು;
 
 	    // Append the first path component of "remain" to "p".
 	    q = getnextcomp(remain + 1);
 	    len = q - remain - (*q != NUL);
 	    cpy = vim_strnsave(p, STRLEN(p) + len);
-	    if (cpy != NULL)
+	    ಆದರೆ (cpy != ಖಾಲಿ)
 	    {
 		STRNCAT(cpy, remain, len);
 		vim_free(p);
 		p = cpy;
 	    }
 	    // Shorten "remain".
-	    if (*q != NUL)
+	    ಆದರೆ (*q != NUL)
 		STRMOVE(remain, q - 1);
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		VIM_CLEAR(remain);
 	}
 
 	// If the result is a relative path name, make it explicitly relative to
 	// the current directory if and only if the argument had this form.
-	if (!vim_ispathsep(*p))
+	ಆದರೆ (!vim_ispathsep(*p))
 	{
-	    if (is_relative_to_current
+	    ಆದರೆ (is_relative_ಗಮ್ಯ_current
 		    && *p != NUL
 		    && !(p[0] == '.'
 			&& (p[1] == NUL
@@ -2268,35 +2268,35 @@ f_resolve(typval_T *argvars, typval_T *rettv)
 	    {
 		// Prepend "./".
 		cpy = concat_str((char_u *)"./", p);
-		if (cpy != NULL)
+		ಆದರೆ (cpy != ಖಾಲಿ)
 		{
 		    vim_free(p);
 		    p = cpy;
 		}
 	    }
-	    else if (!is_relative_to_current)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!is_relative_ಗಮ್ಯ_current)
 	    {
 		// Strip leading "./".
 		q = p;
-		while (q[0] == '.' && vim_ispathsep(q[1]))
+		ಆಗ (q[0] == '.' && vim_ispathsep(q[1]))
 		    q += 2;
-		if (q > p)
+		ಆದರೆ (q > p)
 		    STRMOVE(p, p + 2);
 	    }
 	}
 
 	// Ensure that the result will have no trailing path separator
 	// if the argument had none.  But keep "/" or "//".
-	if (!has_trailing_pathsep)
+	ಆದರೆ (!has_trailing_pathsep)
 	{
 	    q = p + STRLEN(p);
-	    if (after_pathsep(p, q))
+	    ಆದರೆ (after_pathsep(p, q))
 		*gettail_sep(p) = NUL;
 	}
 
 	rettv->vval.v_string = p;
     }
-#  else
+#  ಇಲ್ಲದಿದ್ದರೆ
     rettv->vval.v_string = vim_strsave(p);
 #  endif
 # endif
@@ -2313,147 +2313,147 @@ fail:
 /*
  * "tempname()" function
  */
-    void
-f_tempname(typval_T *argvars UNUSED, typval_T *rettv)
+    ಶೂನ್ಯ
+f_tempname(typval_T *argvars ಬಳಸದ, typval_T *rettv)
 {
-    static int	x = 'A';
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	x = 'A';
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = vim_tempname(x, FALSE);
 
     // Advance 'x' to use A-Z and 0-9, so that there are at least 34 different
     // names.  Skip 'I' and 'O', they are used for shell redirection.
-    do
+    ಮಾಡು
     {
-	if (x == 'Z')
+	ಆದರೆ (x == 'Z')
 	    x = '0';
-	else if (x == '9')
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (x == '9')
 	    x = 'A';
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    ++x;
-    } while (x == 'I' || x == 'O');
+    } ಆಗ (x == 'I' || x == 'O');
 }
 
 /*
  * "writefile()" function
  */
-    void
+    ಶೂನ್ಯ
 f_writefile(typval_T *argvars, typval_T *rettv)
 {
-    int		binary = FALSE;
-    int		append = FALSE;
-    int		defer = FALSE;
+    ಪೂರ್ಣಾಂಕ		ದ್ವಿಮಾನ = FALSE;
+    ಪೂರ್ಣಾಂಕ		append = FALSE;
+    ಪೂರ್ಣಾಂಕ		defer = FALSE;
 # ifdef HAVE_FSYNC
-    int		do_fsync = p_fs;
+    ಪೂರ್ಣಾಂಕ		do_fsync = p_fs;
 # endif
     char_u	*fname;
     FILE	*fd;
-    int		ret = 0;
+    ಪೂರ್ಣಾಂಕ		ret = 0;
     listitem_T	*li;
-    list_T	*list = NULL;
-    blob_T	*blob = NULL;
+    list_T	*list = ಖಾಲಿ;
+    blob_T	*blob = ಖಾಲಿ;
 
-    rettv->vval.v_number = -1;
-    if (check_secure())
-	return;
+    rettv->vval.v_ಸಂಖ್ಯೆ = -1;
+    ಆದರೆ (check_secure())
+	ಹಿಂತಿರುಗಿ;
 
-    if (in_vim9script()
+    ಆದರೆ (ಒಳ_vim9script()
 	    && (check_for_list_or_blob_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_string_arg(argvars, 2) == FAIL))
-	return;
+	ಹಿಂತಿರುಗಿ;
 
-    if (argvars[0].v_type == VAR_LIST)
+    ಆದರೆ (argvars[0].v_type == VAR_LIST)
     {
 	list = argvars[0].vval.v_list;
-	if (list == NULL)
-	    return;
+	ಆದರೆ (list == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ;
 	CHECK_LIST_MATERIALIZE(list);
-	FOR_ALL_LIST_ITEMS(list, li)
-	    if (tv_get_string_chk(&li->li_tv) == NULL)
-		return;
+	FOR_ALL_LIST_ವಸ್ತುಗಳು(list, li)
+	    ಆದರೆ (tv_get_string_chk(&li->li_tv) == ಖಾಲಿ)
+		ಹಿಂತಿರುಗಿ;
     }
-    else if (argvars[0].v_type == VAR_BLOB)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argvars[0].v_type == VAR_BLOB)
     {
 	blob = argvars[0].vval.v_blob;
-	if (blob == NULL)
-	    return;
+	ಆದರೆ (blob == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	semsg(_(e_invalid_argument_str),
+	semsg(_(e_invalid_ವಾದ_str),
 		_("writefile() first argument must be a List or a Blob"));
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ಆದರೆ (argvars[2].v_type != VAR_UNKNOWN)
     {
 	char_u *arg2 = tv_get_string_chk(&argvars[2]);
 
-	if (arg2 == NULL)
-	    return;
-	if (vim_strchr(arg2, 'b') != NULL)
-	    binary = TRUE;
-	if (vim_strchr(arg2, 'a') != NULL)
+	ಆದರೆ (arg2 == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ;
+	ಆದರೆ (vim_strchr(arg2, 'b') != ಖಾಲಿ)
+	    ದ್ವಿಮಾನ = TRUE;
+	ಆದರೆ (vim_strchr(arg2, 'a') != ಖಾಲಿ)
 	    append = TRUE;
-	if (vim_strchr(arg2, 'D') != NULL)
+	ಆದರೆ (vim_strchr(arg2, 'D') != ಖಾಲಿ)
 	    defer = TRUE;
 # ifdef HAVE_FSYNC
-	if (vim_strchr(arg2, 's') != NULL)
+	ಆದರೆ (vim_strchr(arg2, 's') != ಖಾಲಿ)
 	    do_fsync = TRUE;
-	else if (vim_strchr(arg2, 'S') != NULL)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (vim_strchr(arg2, 'S') != ಖಾಲಿ)
 	    do_fsync = FALSE;
 # endif
     }
 
     fname = tv_get_string_chk(&argvars[1]);
-    if (fname == NULL)
-	return;
+    ಆದರೆ (fname == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    if (defer && !can_add_defer())
-	return;
+    ಆದರೆ (defer && !can_ಕೂಡಿಸು_defer())
+	ಹಿಂತಿರುಗಿ;
 
     // Always open the file in binary mode, library functions have a mind of
     // their own about CR-LF conversion.
-    if (*fname == NUL || (fd = mch_fopen((char *)fname,
-				      append ? APPENDBIN : WRITEBIN)) == NULL)
+    ಆದರೆ (*fname == NUL || (fd = mch_fopen((ಅಕ್ಷರ *)fname,
+				      append ? APPENDBIN : WRITEBIN)) == ಖಾಲಿ)
     {
 	semsg(_(e_cant_create_file_str),
 			       *fname == NUL ? (char_u *)_("<empty>") : fname);
 	ret = -1;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (defer)
+	ಆದರೆ (defer)
 	{
 	    typval_T tv;
 
 	    tv.v_type = VAR_STRING;
-	    tv.v_lock = 0;
-	    tv.vval.v_string = FullName_save(fname, FALSE);
-	    if (tv.vval.v_string == NULL
-		    || add_defer((char_u *)"delete", 1, &tv) == FAIL)
+	    tv.v_ಬೀಗ = 0;
+	    tv.vval.v_string = ತುಂಬಿದ_Name_save(fname, FALSE);
+	    ಆದರೆ (tv.vval.v_string == ಖಾಲಿ
+		    || ಕೂಡಿಸು_defer((char_u *)"delete", 1, &tv) == FAIL)
 	    {
 		ret = -1;
 		fclose(fd);
-		(void)mch_remove(fname);
+		(ಶೂನ್ಯ)mch_remove(fname);
 	    }
 	}
 
-	if (ret == 0)
+	ಆದರೆ (ret == 0)
 	{
-	    if (blob)
+	    ಆದರೆ (blob)
 	    {
-		if (write_blob(fd, blob) == FAIL)
+		ಆದರೆ (write_blob(fd, blob) == FAIL)
 		    ret = -1;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		if (write_list(fd, list, binary) == FAIL)
+		ಆದರೆ (write_list(fd, list, ದ್ವಿಮಾನ) == FAIL)
 		    ret = -1;
 	    }
 # ifdef HAVE_FSYNC
-	    if (ret == 0 && do_fsync)
+	    ಆದರೆ (ret == 0 && do_fsync)
 		// Ignore the error, the user wouldn't know what to do about
 		// it.  May happen for a device.
 		vim_ignored = vim_fsync(fileno(fd));
@@ -2462,19 +2462,19 @@ f_writefile(typval_T *argvars, typval_T *rettv)
 	}
     }
 
-    rettv->vval.v_number = ret;
+    rettv->vval.v_ಸಂಖ್ಯೆ = ret;
 }
 
-#endif // FEAT_EVAL
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_EVAL
 
-#if defined(FEAT_BROWSE)
+#ಆದರೆ defined(FEAT_BROWSE)
 /*
  * Generic browse function.  Calls gui_mch_browse() when possible.
  * Later this may pop-up a non-GUI file selector (external command?).
  */
     char_u *
 do_browse(
-    int		flags,		// BROWSE_SAVE and BROWSE_DIR
+    ಪೂರ್ಣಾಂಕ		flags,		// BROWSE_SAVE and BROWSE_DIR
     char_u	*title,		// title for the window
     char_u	*dflt,		// default file name (may include directory)
     char_u	*ext,		// extension added
@@ -2484,37 +2484,37 @@ do_browse(
     buf_T	*buf)		// buffer to read/write for
 {
     char_u		*fname;
-    static char_u	*last_dir = NULL;    // last used directory
-    char_u		*tofree = NULL;
-    int			save_cmod_flags = cmdmod.cmod_flags;
+    ಸ್ಥಿರ char_u	*ಕೊನೆಯ_dir = ಖಾಲಿ;    // last used directory
+    char_u		*tofree = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ			save_cmod_flags = cmdmod.cmod_flags;
 
     // Must turn off browse to avoid that autocommands will get the
     // flag too!
     cmdmod.cmod_flags &= ~CMOD_BROWSE;
 
-    if (title == NULL || *title == NUL)
+    ಆದರೆ (title == ಖಾಲಿ || *title == NUL)
     {
-	if (flags & BROWSE_DIR)
+	ಆದರೆ (flags & BROWSE_DIR)
 	    title = (char_u *)_("Select Directory dialog");
-	else if (flags & BROWSE_SAVE)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (flags & BROWSE_SAVE)
 	    title = (char_u *)_("Save File dialog");
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    title = (char_u *)_("Open File dialog");
     }
 
     // When no directory specified, use default file name, default dir, buffer
     // dir, last dir or current dir
-    if ((initdir == NULL || *initdir == NUL) && dflt != NULL && *dflt != NUL)
+    ಆದರೆ ((initdir == ಖಾಲಿ || *initdir == NUL) && dflt != ಖಾಲಿ && *dflt != NUL)
     {
-	if (mch_isdir(dflt))		// default file name is a directory
+	ಆದರೆ (mch_isdir(dflt))		// default file name is a directory
 	{
 	    initdir = dflt;
-	    dflt = NULL;
+	    dflt = ಖಾಲಿ;
 	}
-	else if (gettail(dflt) != dflt)	// default file name includes a path
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (gettail(dflt) != dflt)	// default file name includes a path
 	{
 	    tofree = vim_strsave(dflt);
-	    if (tofree != NULL)
+	    ಆದರೆ (tofree != ಖಾಲಿ)
 	    {
 		initdir = tofree;
 		*gettail(initdir) = NUL;
@@ -2523,69 +2523,69 @@ do_browse(
 	}
     }
 
-    if (initdir == NULL || *initdir == NUL)
+    ಆದರೆ (initdir == ಖಾಲಿ || *initdir == NUL)
     {
 	// When 'browsedir' is a directory, use it
-	if (STRCMP(p_bsdir, "last") != 0
+	ಆದರೆ (STRCMP(p_bsdir, "last") != 0
 		&& STRCMP(p_bsdir, "buffer") != 0
 		&& STRCMP(p_bsdir, "current") != 0
 		&& mch_isdir(p_bsdir))
 	    initdir = p_bsdir;
 	// When saving or 'browsedir' is "buffer", use buffer fname
-	else if (((flags & BROWSE_SAVE) || *p_bsdir == 'b')
-		&& buf != NULL && buf->b_ffname != NULL)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (((flags & BROWSE_SAVE) || *p_bsdir == 'b')
+		&& buf != ಖಾಲಿ && buf->b_ffname != ಖಾಲಿ)
 	{
-	    if (dflt == NULL || *dflt == NUL)
+	    ಆದರೆ (dflt == ಖಾಲಿ || *dflt == NUL)
 		dflt = gettail(curbuf->b_ffname);
 	    tofree = vim_strsave(curbuf->b_ffname);
-	    if (tofree != NULL)
+	    ಆದರೆ (tofree != ಖಾಲಿ)
 	    {
 		initdir = tofree;
 		*gettail(initdir) = NUL;
 	    }
 	}
 	// When 'browsedir' is "last", use dir from last browse
-	else if (*p_bsdir == 'l')
-	    initdir = last_dir;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*p_bsdir == 'l')
+	    initdir = ಕೊನೆಯ_dir;
 	// When 'browsedir is "current", use current directory.  This is the
 	// default already, leave initdir empty.
     }
 
 # ifdef FEAT_GUI
-    if (gui.in_use)		// when this changes, also adjust f_has()!
+    ಆದರೆ (gui.ಒಳ_use)		// when this changes, also adjust f_has()!
     {
-	if (filter == NULL
+	ಆದರೆ (filter == ಖಾಲಿ
 #  ifdef FEAT_EVAL
-		&& (filter = get_var_value((char_u *)"b:browsefilter")) == NULL
-		&& (filter = get_var_value((char_u *)"g:browsefilter")) == NULL
+		&& (filter = get_var_ಮೌಲ್ಯ((char_u *)"b:browsefilter")) == ಖಾಲಿ
+		&& (filter = get_var_ಮೌಲ್ಯ((char_u *)"g:browsefilter")) == ಖಾಲಿ
 #  endif
 	)
 	    filter = BROWSE_FILTER_DEFAULT;
-	if (flags & BROWSE_DIR)
+	ಆದರೆ (flags & BROWSE_DIR)
 	{
-#  if defined(FEAT_GUI_GTK) || defined(MSWIN)
+#  ಆದರೆ defined(FEAT_GUI_GTK) || defined(MSWIN)
 	    // For systems that have a directory dialog.
 	    fname = gui_mch_browsedir(title, initdir);
-#  else
+#  ಇಲ್ಲದಿದ್ದರೆ
 	    // Generic solution for selecting a directory: select a file and
 	    // remove the file name.
 	    fname = gui_mch_browse(0, title, dflt, ext, initdir, (char_u *)"");
 #  endif
-#  if !defined(FEAT_GUI_GTK)
+#  ಆದರೆ !defined(FEAT_GUI_GTK)
 	    // Win32 adds a dummy file name, others return an arbitrary file
 	    // name.  GTK+ 2 returns only the directory,
-	    if (fname != NULL && *fname != NUL && !mch_isdir(fname))
+	    ಆದರೆ (fname != ಖಾಲಿ && *fname != NUL && !mch_isdir(fname))
 	    {
 		// Remove the file name.
-		char_u	    *tail = gettail_sep(fname);
+		char_u	    *ಬಾಲ = gettail_sep(fname);
 
-		if (tail == fname)
-		    *tail++ = '.';	// use current dir
-		*tail = NUL;
+		ಆದರೆ (ಬಾಲ == fname)
+		    *ಬಾಲ++ = '.';	// use current dir
+		*ಬಾಲ = NUL;
 	    }
 #  endif
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    fname = gui_mch_browse(flags & BROWSE_SAVE,
 			       title, dflt, ext, initdir, (char_u *)_(filter));
 
@@ -2595,29 +2595,29 @@ do_browse(
 	need_check_timestamps = TRUE;
 	did_check_timestamps = FALSE;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 # endif
     {
 	// TODO: non-GUI file selector here
-	emsg(_(e_sorry_no_file_browser_in_console_mode));
-	fname = NULL;
+	emsg(_(e_sorry_no_file_browser_ಒಳ_console_ಬಹುಲಕ));
+	fname = ಖಾಲಿ;
     }
 
     // keep the directory for next time
-    if (fname != NULL)
+    ಆದರೆ (fname != ಖಾಲಿ)
     {
-	vim_free(last_dir);
-	last_dir = vim_strsave(fname);
-	if (last_dir != NULL && !(flags & BROWSE_DIR))
+	vim_free(ಕೊನೆಯ_dir);
+	ಕೊನೆಯ_dir = vim_strsave(fname);
+	ಆದರೆ (ಕೊನೆಯ_dir != ಖಾಲಿ && !(flags & BROWSE_DIR))
 	{
-	    *gettail(last_dir) = NUL;
-	    if (*last_dir == NUL)
+	    *gettail(ಕೊನೆಯ_dir) = NUL;
+	    ಆದರೆ (*ಕೊನೆಯ_dir == NUL)
 	    {
 		// filename only returned, must be in current dir
-		vim_free(last_dir);
-		last_dir = alloc(MAXPATHL);
-		if (last_dir != NULL)
-		    mch_dirname(last_dir, MAXPATHL);
+		vim_free(ಕೊನೆಯ_dir);
+		ಕೊನೆಯ_dir = alloc(MAXPATHL);
+		ಆದರೆ (ಕೊನೆಯ_dir != ಖಾಲಿ)
+		    mch_dirname(ಕೊನೆಯ_dir, MAXPATHL);
 	    }
 	}
     }
@@ -2625,47 +2625,47 @@ do_browse(
     vim_free(tofree);
     cmdmod.cmod_flags = save_cmod_flags;
 
-    return fname;
+    ಹಿಂತಿರುಗಿ fname;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 
 /*
  * "browse(save, title, initdir, default)" function
  */
-    void
-f_browse(typval_T *argvars UNUSED, typval_T *rettv)
+    ಶೂನ್ಯ
+f_browse(typval_T *argvars ಬಳಸದ, typval_T *rettv)
 {
 # ifdef FEAT_BROWSE
-    int		save;
+    ಪೂರ್ಣಾಂಕ		save;
     char_u	*title;
     char_u	*initdir;
     char_u	*defname;
     char_u	buf[NUMBUFLEN];
     char_u	buf2[NUMBUFLEN];
-    int		error = FALSE;
+    ಪೂರ್ಣಾಂಕ		error = FALSE;
 
-    if (in_vim9script()
+    ಆದರೆ (ಒಳ_vim9script()
 	    && (check_for_bool_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_string_arg(argvars, 2) == FAIL
 		|| check_for_string_arg(argvars, 3) == FAIL))
-	return;
+	ಹಿಂತಿರುಗಿ;
 
-    save = (int)tv_get_bool_chk(&argvars[0], &error);
+    save = (ಪೂರ್ಣಾಂಕ)tv_get_bool_chk(&argvars[0], &error);
     title = tv_get_string_chk(&argvars[1]);
     initdir = tv_get_string_buf_chk(&argvars[2], buf);
     defname = tv_get_string_buf_chk(&argvars[3], buf2);
 
-    if (error || title == NULL || initdir == NULL || defname == NULL)
-	rettv->vval.v_string = NULL;
-    else
+    ಆದರೆ (error || title == ಖಾಲಿ || initdir == ಖಾಲಿ || defname == ಖಾಲಿ)
+	rettv->vval.v_string = ಖಾಲಿ;
+    ಇಲ್ಲದಿದ್ದರೆ
 	rettv->vval.v_string =
 		 do_browse(save ? BROWSE_SAVE : 0,
-				 title, defname, NULL, initdir, NULL, curbuf);
-# else
-    rettv->vval.v_string = NULL;
+				 title, defname, ಖಾಲಿ, initdir, ಖಾಲಿ, curbuf);
+# ಇಲ್ಲದಿದ್ದರೆ
+    rettv->vval.v_string = ಖಾಲಿ;
 # endif
     rettv->v_type = VAR_STRING;
 }
@@ -2673,29 +2673,29 @@ f_browse(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "browsedir(title, initdir)" function
  */
-    void
-f_browsedir(typval_T *argvars UNUSED, typval_T *rettv)
+    ಶೂನ್ಯ
+f_browsedir(typval_T *argvars ಬಳಸದ, typval_T *rettv)
 {
 # ifdef FEAT_BROWSE
     char_u	*title;
     char_u	*initdir;
     char_u	buf[NUMBUFLEN];
 
-    if (in_vim9script()
+    ಆದರೆ (ಒಳ_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	ಹಿಂತಿರುಗಿ;
 
     title = tv_get_string_chk(&argvars[0]);
     initdir = tv_get_string_buf_chk(&argvars[1], buf);
 
-    if (title == NULL || initdir == NULL)
-	rettv->vval.v_string = NULL;
-    else
+    ಆದರೆ (title == ಖಾಲಿ || initdir == ಖಾಲಿ)
+	rettv->vval.v_string = ಖಾಲಿ;
+    ಇಲ್ಲದಿದ್ದರೆ
 	rettv->vval.v_string = do_browse(BROWSE_DIR,
-				    title, NULL, NULL, initdir, NULL, curbuf);
-# else
-    rettv->vval.v_string = NULL;
+				    title, ಖಾಲಿ, ಖಾಲಿ, initdir, ಖಾಲಿ, curbuf);
+# ಇಲ್ಲದಿದ್ದರೆ
+    rettv->vval.v_string = ಖಾಲಿ;
 # endif
     rettv->v_type = VAR_STRING;
 }
@@ -2703,29 +2703,29 @@ f_browsedir(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "filecopy()" function
  */
-    void
+    ಶೂನ್ಯ
 f_filecopy(typval_T *argvars, typval_T *rettv)
 {
     char_u	*from;
     stat_T	st;
 
-    rettv->vval.v_number = FALSE;
+    rettv->vval.v_ಸಂಖ್ಯೆ = FALSE;
 
-    if (check_restricted() || check_secure()
+    ಆದರೆ (check_restricted() || check_secure()
 	|| check_for_string_arg(argvars, 0) == FAIL
 	|| check_for_string_arg(argvars, 1) == FAIL)
-	return;
+	ಹಿಂತಿರುಗಿ;
 
     from = tv_get_string(&argvars[0]);
 
-    if (mch_lstat((char *)from, &st) >= 0
-	&& (S_ISREG(st.st_mode) || S_ISLNK(st.st_mode)))
-	rettv->vval.v_number = vim_copyfile(
+    ಆದರೆ (mch_lstat((ಅಕ್ಷರ *)from, &st) >= 0
+	&& (S_ISREG(st.st_ಬಹುಲಕ) || S_ISLNK(st.st_ಬಹುಲಕ)))
+	rettv->vval.v_ಸಂಖ್ಯೆ = vim_copyfile(
 	    tv_get_string(&argvars[0]),
 	    tv_get_string(&argvars[1])) == OK ? TRUE : FALSE;
 }
 
-#endif // FEAT_EVAL
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_EVAL
 
 /*
  * Replace home directory by "~" in each space or comma separated file name in
@@ -2737,70 +2737,70 @@ home_replace(
     buf_T	*buf,	// when not NULL, check for help files
     char_u	*src,	// input file name
     char_u	*dst,	// where to put the result
-    int		dstlen,	// maximum length of the result
-    int		one)	// if TRUE, only replace one file name, include
+    ಪೂರ್ಣಾಂಕ		dstlen,	// maximum length of the result
+    ಪೂರ್ಣಾಂಕ		one)	// if TRUE, only replace one file name, include
 			// spaces and commas in the file name.
 {
     size_t	dirlen = 0, envlen = 0;
     size_t	len;
     char_u	*homedir_env, *homedir_env_orig;
     char_u	*p;
-    char_u	*dst_start;
+    char_u	*dst_ಆರಂಭ;
 
-    if (src == NULL)
+    ಆದರೆ (src == ಖಾಲಿ)
     {
 	*dst = NUL;
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
     }
 
     /*
      * If the file is a help file, remove the path completely.
      */
-    if (buf != NULL && buf->b_help)
-	return vim_snprintf_safelen((char *)dst, dstlen, "%s", gettail(src));
+    ಆದರೆ (buf != ಖಾಲಿ && buf->b_help)
+	ಹಿಂತಿರುಗಿ vim_snprintf_safelen((ಅಕ್ಷರ *)dst, dstlen, "%s", gettail(src));
 
     /*
      * We check both the value of the $HOME environment variable and the
      * "real" home directory.
      */
-    if (homedir != NULL)
+    ಆದರೆ (homedir != ಖಾಲಿ)
 	dirlen = STRLEN(homedir);
 
-#ifdef VMS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VMS
     homedir_env_orig = homedir_env = mch_getenv((char_u *)"SYS$LOGIN");
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
     homedir_env_orig = homedir_env = mch_getenv((char_u *)"HOME");
-#endif
-#ifdef MSWIN
-    if (homedir_env == NULL)
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
+    ಆದರೆ (homedir_env == ಖಾಲಿ)
 	homedir_env_orig = homedir_env = mch_getenv((char_u *)"USERPROFILE");
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     // Empty is the same as not set.
-    if (homedir_env != NULL && *homedir_env == NUL)
-	homedir_env = NULL;
+    ಆದರೆ (homedir_env != ಖಾಲಿ && *homedir_env == NUL)
+	homedir_env = ಖಾಲಿ;
 
-    if (homedir_env != NULL && *homedir_env == '~')
+    ಆದರೆ (homedir_env != ಖಾಲಿ && *homedir_env == '~')
     {
 	size_t	usedlen = 0;
 	size_t	flen;
-	char_u	*fbuf = NULL;
+	char_u	*fbuf = ಖಾಲಿ;
 
 	flen = STRLEN(homedir_env);
-	(void)modify_fname((char_u *)":p", FALSE, &usedlen,
+	(ಶೂನ್ಯ)modify_fname((char_u *)":p", FALSE, &usedlen,
 						  &homedir_env, &fbuf, &flen);
 	flen = STRLEN(homedir_env);
-	if (flen > 0 && vim_ispathsep(homedir_env[flen - 1]))
+	ಆದರೆ (flen > 0 && vim_ispathsep(homedir_env[flen - 1]))
 	    // Remove the trailing / that is added to a directory.
 	    homedir_env[flen - 1] = NUL;
     }
 
-    if (homedir_env != NULL)
+    ಆದರೆ (homedir_env != ಖಾಲಿ)
 	envlen = STRLEN(homedir_env);
 
-    if (!one)
+    ಆದರೆ (!one)
 	src = skipwhite(src);
-    dst_start = dst;		// remember the start
-    while (*src && dstlen > 0)
+    dst_ಆರಂಭ = dst;		// remember the start
+    ಆಗ (*src && dstlen > 0)
     {
 	/*
 	 * Here we are at the beginning of a file name.
@@ -2813,44 +2813,44 @@ home_replace(
 	 */
 	p = homedir;
 	len = dirlen;
-	for (;;)
+	ಗಾಗಿ (;;)
 	{
-	    if (   len
+	    ಆದರೆ (   len
 		&& fnamencmp(src, p, len) == 0
 		&& (vim_ispathsep(src[len])
 		    || (!one && (src[len] == ',' || src[len] == ' '))
 		    || src[len] == NUL))
 	    {
 		src += len;
-		if (--dstlen > 0)
+		ಆದರೆ (--dstlen > 0)
 		    *dst++ = '~';
 
 		// Do not add directory separator into dst, because dst is
 		// expected to just return the directory name without the
 		// directory separator '/'.
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	    if (p == homedir_env)
-		break;
+	    ಆದರೆ (p == homedir_env)
+		ನಿಲ್ಲಿಸು;
 	    p = homedir_env;
 	    len = envlen;
 	}
 
 	// if (!one) skip to separator: space or comma
-	while (*src && (one || (*src != ',' && *src != ' ')) && --dstlen > 0)
+	ಆಗ (*src && (one || (*src != ',' && *src != ' ')) && --dstlen > 0)
 	    *dst++ = *src++;
 	// skip separator
-	while ((*src == ' ' || *src == ',') && --dstlen > 0)
+	ಆಗ ((*src == ' ' || *src == ',') && --dstlen > 0)
 	    *dst++ = *src++;
     }
     // if (dstlen == 0) out of space, what to do???
 
     *dst = NUL;
 
-    if (homedir_env != homedir_env_orig)
+    ಆದರೆ (homedir_env != homedir_env_orig)
 	vim_free(homedir_env);
 
-    return (size_t)(dst - dst_start);
+    ಹಿಂತಿರುಗಿ (size_t)(dst - dst_ಆರಂಭ);
 }
 
 /*
@@ -2863,15 +2863,15 @@ home_replace_save(
     char_u	*src)	// input file name
 {
     char_u	*dst;
-    unsigned	len;
+    ಚಿಹ್ನೆರಹಿತ	len;
 
     len = 3;			// space for "~/" and trailing NUL
-    if (src != NULL)		// just in case
-	len += (unsigned)STRLEN(src);
+    ಆದರೆ (src != ಖಾಲಿ)		// just in case
+	len += (ಚಿಹ್ನೆರಹಿತ)STRLEN(src);
     dst = alloc(len);
-    if (dst != NULL)
+    ಆದರೆ (dst != ಖಾಲಿ)
 	home_replace(buf, src, dst, len, TRUE);
-    return dst;
+    ಹಿಂತಿರುಗಿ dst;
 }
 
 /*
@@ -2884,83 +2884,83 @@ home_replace_save(
  * For the first name environment variables are expanded if "expandenv" is
  * TRUE.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 fullpathcmp(
     char_u *s1,
     char_u *s2,
-    int	    checkname,		// when both don't exist, check file names
-    int	    expandenv)
+    ಪೂರ್ಣಾಂಕ	    checkname,		// when both don't exist, check file names
+    ಪೂರ್ಣಾಂಕ	    expandenv)
 {
-#ifdef UNIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
     char_u	    exp1[MAXPATHL];
     char_u	    full1[MAXPATHL];
     char_u	    full2[MAXPATHL];
     stat_T	    st1, st2;
-    int		    r1, r2;
+    ಪೂರ್ಣಾಂಕ		    r1, r2;
 
-    if (expandenv)
+    ಆದರೆ (expandenv)
 	expand_env(s1, exp1, MAXPATHL);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	vim_strncpy(exp1, s1, MAXPATHL - 1);
-    r1 = mch_stat((char *)exp1, &st1);
-    r2 = mch_stat((char *)s2, &st2);
-    if (r1 != 0 && r2 != 0)
+    r1 = mch_stat((ಅಕ್ಷರ *)exp1, &st1);
+    r2 = mch_stat((ಅಕ್ಷರ *)s2, &st2);
+    ಆದರೆ (r1 != 0 && r2 != 0)
     {
 	// if mch_stat() doesn't work, may compare the names
-	if (checkname)
+	ಆದರೆ (checkname)
 	{
-	    if (fnamecmp(exp1, s2) == 0)
-		return FPC_SAMEX;
-	    r1 = vim_FullName(exp1, full1, MAXPATHL, FALSE);
-	    r2 = vim_FullName(s2, full2, MAXPATHL, FALSE);
-	    if (r1 == OK && r2 == OK && fnamecmp(full1, full2) == 0)
-		return FPC_SAMEX;
+	    ಆದರೆ (fnamecmp(exp1, s2) == 0)
+		ಹಿಂತಿರುಗಿ FPC_SAMEX;
+	    r1 = vim_ತುಂಬಿದ_Name(exp1, full1, MAXPATHL, FALSE);
+	    r2 = vim_ತುಂಬಿದ_Name(s2, full2, MAXPATHL, FALSE);
+	    ಆದರೆ (r1 == OK && r2 == OK && fnamecmp(full1, full2) == 0)
+		ಹಿಂತಿರುಗಿ FPC_SAMEX;
 	}
-	return FPC_NOTX;
+	ಹಿಂತಿರುಗಿ FPC_NOTX;
     }
-    if (r1 != 0 || r2 != 0)
-	return FPC_DIFFX;
-    if (st1.st_dev == st2.st_dev && st1.st_ino == st2.st_ino)
-	return FPC_SAME;
-    return FPC_DIFF;
-#else
+    ಆದರೆ (r1 != 0 || r2 != 0)
+	ಹಿಂತಿರುಗಿ FPC_DIFFX;
+    ಆದರೆ (st1.st_dev == st2.st_dev && st1.st_ino == st2.st_ino)
+	ಹಿಂತಿರುಗಿ FPC_SAME;
+    ಹಿಂತಿರುಗಿ FPC_DIFF;
+#ಇಲ್ಲದಿದ್ದರೆ
     char_u  *exp1;		// expanded s1
     char_u  *full1;		// full path of s1
     char_u  *full2;		// full path of s2
-    int	    retval = FPC_DIFF;
-    int	    r1, r2;
+    ಪೂರ್ಣಾಂಕ	    retval = FPC_DIFF;
+    ಪೂರ್ಣಾಂಕ	    r1, r2;
 
     // allocate one buffer to store three paths (alloc()/free() is slow!)
-    if ((exp1 = alloc(MAXPATHL * 3)) != NULL)
+    ಆದರೆ ((exp1 = alloc(MAXPATHL * 3)) != ಖಾಲಿ)
     {
 	full1 = exp1 + MAXPATHL;
 	full2 = full1 + MAXPATHL;
 
-	if (expandenv)
+	ಆದರೆ (expandenv)
 	    expand_env(s1, exp1, MAXPATHL);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    vim_strncpy(exp1, s1, MAXPATHL - 1);
-	r1 = vim_FullName(exp1, full1, MAXPATHL, FALSE);
-	r2 = vim_FullName(s2, full2, MAXPATHL, FALSE);
+	r1 = vim_ತುಂಬಿದ_Name(exp1, full1, MAXPATHL, FALSE);
+	r2 = vim_ತುಂಬಿದ_Name(s2, full2, MAXPATHL, FALSE);
 
 	// If vim_FullName() fails, the file probably doesn't exist.
-	if (r1 != OK && r2 != OK)
+	ಆದರೆ (r1 != OK && r2 != OK)
 	{
-	    if (checkname && fnamecmp(exp1, s2) == 0)
+	    ಆದರೆ (checkname && fnamecmp(exp1, s2) == 0)
 		retval = FPC_SAMEX;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		retval = FPC_NOTX;
 	}
-	else if (r1 != OK || r2 != OK)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (r1 != OK || r2 != OK)
 	    retval = FPC_DIFFX;
-	else if (fnamecmp(full1, full2))
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (fnamecmp(full1, full2))
 	    retval = FPC_DIFF;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    retval = FPC_SAME;
 	vim_free(exp1);
     }
-    return retval;
-#endif
+    ಹಿಂತಿರುಗಿ retval;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
@@ -2973,15 +2973,15 @@ gettail(char_u *fname)
 {
     char_u  *p1, *p2;
 
-    if (fname == NULL)
-	return (char_u *)"";
-    for (p1 = p2 = get_past_head(fname); *p2; )	// find last part of path
+    ಆದರೆ (fname == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ (char_u *)"";
+    ಗಾಗಿ (p1 = p2 = get_past_ತಲೆ(fname); *p2; )	// find last part of path
     {
-	if (vim_ispathsep_nocolon(*p2))
+	ಆದರೆ (vim_ispathsep_nocolon(*p2))
 	    p1 = p2 + 1;
 	MB_PTR_ADV(p2);
     }
-    return p1;
+    ಹಿಂತಿರುಗಿ p1;
 }
 
 /*
@@ -2995,15 +2995,15 @@ gettail_sep(char_u *fname)
     char_u	*p;
     char_u	*t;
 
-    p = get_past_head(fname);	// don't remove the '/' from "c:/file"
+    p = get_past_ತಲೆ(fname);	// don't remove the '/' from "c:/file"
     t = gettail(fname);
-    while (t > p && after_pathsep(fname, t))
+    ಆಗ (t > p && after_pathsep(fname, t))
 	--t;
-#ifdef VMS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VMS
     // path separator is part of the path
     ++t;
-#endif
-    return t;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ t;
 }
 
 /*
@@ -3012,11 +3012,11 @@ gettail_sep(char_u *fname)
     char_u *
 getnextcomp(char_u *fname)
 {
-    while (*fname && !vim_ispathsep(*fname))
+    ಆಗ (*fname && !vim_ispathsep(*fname))
 	MB_PTR_ADV(fname);
-    if (*fname)
+    ಆದರೆ (*fname)
 	++fname;
-    return fname;
+    ಹಿಂತಿರುಗಿ fname;
 }
 
 /*
@@ -3025,67 +3025,67 @@ getnextcomp(char_u *fname)
  * If there is no head, path is returned.
  */
     char_u *
-get_past_head(char_u *path)
+get_past_ತಲೆ(char_u *ಮಾರ್ಗ)
 {
     char_u  *retval;
 
-#if defined(MSWIN)
+#ಆದರೆ defined(MSWIN)
     // may skip "c:"
-    if (SAFE_isalpha(path[0]) && path[1] == ':')
-	retval = path + 2;
-    else
-	retval = path;
-#else
-# if defined(AMIGA)
+    ಆದರೆ (ಸುರಕ್ಷಿತ_isalpha(ಮಾರ್ಗ[0]) && ಮಾರ್ಗ[1] == ':')
+	retval = ಮಾರ್ಗ + 2;
+    ಇಲ್ಲದಿದ್ದರೆ
+	retval = ಮಾರ್ಗ;
+#ಇಲ್ಲದಿದ್ದರೆ
+# ಆದರೆ defined(AMIGA)
     // may skip "label:"
-    retval = vim_strchr(path, ':');
-    if (retval == NULL)
-	retval = path;
-# else	// Unix
-    retval = path;
+    retval = vim_strchr(ಮಾರ್ಗ, ':');
+    ಆದರೆ (retval == ಖಾಲಿ)
+	retval = ಮಾರ್ಗ;
+# ಇಲ್ಲದಿದ್ದರೆ	// Unix
+    retval = ಮಾರ್ಗ;
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    while (vim_ispathsep(*retval))
+    ಆಗ (vim_ispathsep(*retval))
 	++retval;
 
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
 /*
  * Return TRUE if 'c' is a path separator.
  * Note that for MS-Windows this includes the colon.
  */
-    int
-vim_ispathsep(int c)
+    ಪೂರ್ಣಾಂಕ
+vim_ispathsep(ಪೂರ್ಣಾಂಕ c)
 {
-#ifdef UNIX
-    return (c == '/');	    // UNIX has ':' inside file names
-#else
-# ifdef BACKSLASH_IN_FILENAME
-    return (c == ':' || c == '/' || c == '\\');
-# else
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
+    ಹಿಂತಿರುಗಿ (c == '/');	    // UNIX has ':' inside file names
+#ಇಲ್ಲದಿದ್ದರೆ
+# ifdef BACKSLASH_ಒಳ_FILENAME
+    ಹಿಂತಿರುಗಿ (c == ':' || c == '/' || c == '\\');
+# ಇಲ್ಲದಿದ್ದರೆ
 #  ifdef VMS
     // server"user passwd"::device:[full.path.name]fname.extension;version"
-    return (c == ':' || c == '[' || c == ']' || c == '/'
+    ಹಿಂತಿರುಗಿ (c == ':' || c == '[' || c == ']' || c == '/'
 	    || c == '<' || c == '>' || c == '"' );
-#  else
-    return (c == ':' || c == '/');
+#  ಇಲ್ಲದಿದ್ದರೆ
+    ಹಿಂತಿರುಗಿ (c == ':' || c == '/');
 #  endif // VMS
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Like vim_ispathsep(c), but exclude the colon for MS-Windows.
  */
-    int
-vim_ispathsep_nocolon(int c)
+    ಪೂರ್ಣಾಂಕ
+vim_ispathsep_nocolon(ಪೂರ್ಣಾಂಕ c)
 {
-    return vim_ispathsep(c)
-#ifdef BACKSLASH_IN_FILENAME
+    ಹಿಂತಿರುಗಿ vim_ispathsep(c)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ BACKSLASH_ಒಳ_FILENAME
 	&& c != ':'
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	;
 }
 
@@ -3094,47 +3094,47 @@ vim_ispathsep_nocolon(int c)
  * Also returns TRUE if there is no directory name.
  * "fname" must be writable!.
  */
-    int
-dir_of_file_exists(char_u *fname)
+    ಪೂರ್ಣಾಂಕ
+dir_ದ_file_exists(char_u *fname)
 {
     char_u	*p;
-    int		c;
-    int		retval;
+    ಪೂರ್ಣಾಂಕ		c;
+    ಪೂರ್ಣಾಂಕ		retval;
 
     p = gettail_sep(fname);
-    if (p == fname)
-	return TRUE;
+    ಆದರೆ (p == fname)
+	ಹಿಂತಿರುಗಿ TRUE;
     c = *p;
     *p = NUL;
     retval = mch_isdir(fname);
     *p = c;
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
 /*
  * Versions of fnamecmp() and fnamencmp() that handle '/' and '\' equally
  * and deal with 'fileignorecase'.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 vim_fnamecmp(char_u *x, char_u *y)
 {
-#ifdef BACKSLASH_IN_FILENAME
-    return vim_fnamencmp(x, y, MAXPATHL);
-#else
-    if (p_fic)
-	return MB_STRICMP(x, y);
-    return STRCMP(x, y);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ BACKSLASH_ಒಳ_FILENAME
+    ಹಿಂತಿರುಗಿ vim_fnamencmp(x, y, MAXPATHL);
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಆದರೆ (p_fic)
+	ಹಿಂತಿರುಗಿ MB_STRICMP(x, y);
+    ಹಿಂತಿರುಗಿ STRCMP(x, y);
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-    int
+    ಪೂರ್ಣಾಂಕ
 vim_fnamencmp(char_u *x, char_u *y, size_t len)
 {
-#ifdef BACKSLASH_IN_FILENAME
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ BACKSLASH_ಒಳ_FILENAME
     char_u	*px = x;
     char_u	*py = y;
-    int		cx = NUL;
-    int		cy = NUL;
+    ಪೂರ್ಣಾಂಕ		cx = NUL;
+    ಪೂರ್ಣಾಂಕ		cy = NUL;
 
 # ifdef MSWIN
     /*
@@ -3143,25 +3143,25 @@ vim_fnamencmp(char_u *x, char_u *y, size_t len)
      *	 - another with implicit drive letter \xxx
      * advance the pointer, of the explicit one, to skip the drive
      */
-    for (int swap = 0, drive = NUL; swap < 2; ++swap)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ ಅದಲುಬದಲು = 0, drive = NUL; ಅದಲುಬದಲು < 2; ++ಅದಲುಬದಲು)
     {
 	// Handle absolute paths with implicit drive letter
 	cx = PTR2CHAR(px);
 	cy = PTR2CHAR(py);
 
-	if ((cx == '/' || cx == '\\') && ASCII_ISALPHA(cy))
+	ಆದರೆ ((cx == '/' || cx == '\\') && ASCII_ISALPHA(cy))
 	{
 	    drive = MB_TOUPPER(cy) - 'A' + 1;
 
 	    // Check for the colon
 	    py += mb_ptr2len(py);
 	    cy = PTR2CHAR(py);
-	    if (cy == ':' && drive == _getdrive())
+	    ಆದರೆ (cy == ':' && drive == _getdrive())
 	    { // skip the drive for comparison
 		py += mb_ptr2len(py);
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	    else // ignore
+	    ಇಲ್ಲದಿದ್ದರೆ // ignore
 		py -= mb_ptr2len(py);
 	}
 
@@ -3172,27 +3172,27 @@ vim_fnamencmp(char_u *x, char_u *y, size_t len)
     }
 # endif
 
-    while (len > 0)
+    ಆಗ (len > 0)
     {
 	cx = PTR2CHAR(px);
 	cy = PTR2CHAR(py);
-	if (cx == NUL || cy == NUL
+	ಆದರೆ (cx == NUL || cy == NUL
 	    || ((p_fic ? MB_TOLOWER(cx) != MB_TOLOWER(cy) : cx != cy)
 		&& !(cx == '/' && cy == '\\')
 		&& !(cx == '\\' && cy == '/')))
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	len -= mb_ptr2len(px);
 	px += mb_ptr2len(px);
 	py += mb_ptr2len(py);
     }
-    if (len == 0)
-	return 0;
-    return (cx - cy);
-#else
-    if (p_fic)
-	return MB_STRNICMP(x, y, len);
-    return STRNCMP(x, y, len);
-#endif
+    ಆದರೆ (len == 0)
+	ಹಿಂತಿರುಗಿ 0;
+    ಹಿಂತಿರುಗಿ (cx - cy);
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಆದರೆ (p_fic)
+	ಹಿಂತಿರುಗಿ MB_STRNICMP(x, y, len);
+    ಹಿಂತಿರುಗಿ STRNCMP(x, y, len);
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
@@ -3200,41 +3200,41 @@ vim_fnamencmp(char_u *x, char_u *y, size_t len)
  * Only add a '/' or '\\' when 'sep' is TRUE and it is necessary.
  */
     char_u  *
-concat_fnames(char_u *fname1, size_t fname1len, char_u *fname2, size_t fname2len, int sep, string_T *ret)
+concat_fnames(char_u *fname1, size_t fname1len, char_u *fname2, size_t fname2len, ಪೂರ್ಣಾಂಕ sep, string_T *ret)
 {
-    ret->string = alloc(fname1len + (sep ? sizeof(PATHSEP) : 0) + fname2len + 1);
-    if (ret->string == NULL)
-	ret->length = 0;
-    else
+    ret->string = alloc(fname1len + (sep ? ಗಾತ್ರ(PATHSEP) : 0) + fname2len + 1);
+    ಆದರೆ (ret->string == ಖಾಲಿ)
+	ret->ಉದ್ದಳತೆ = 0;
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	STRCPY(ret->string, fname1);
-	ret->length = fname1len;
-	if (sep && *ret->string != NUL && !after_pathsep(ret->string, ret->string + ret->length))
+	ret->ಉದ್ದಳತೆ = fname1len;
+	ಆದರೆ (sep && *ret->string != NUL && !after_pathsep(ret->string, ret->string + ret->ಉದ್ದಳತೆ))
 	{
-	    STRCPY(ret->string + ret->length, PATHSEPSTR);
-	    ret->length += sizeof(PATHSEP);
+	    STRCPY(ret->string + ret->ಉದ್ದಳತೆ, PATHSEPSTR);
+	    ret->ಉದ್ದಳತೆ += ಗಾತ್ರ(PATHSEP);
 	}
-	STRCPY(ret->string + ret->length, fname2);
-	ret->length += fname2len;
+	STRCPY(ret->string + ret->ಉದ್ದಳತೆ, fname2);
+	ret->ಉದ್ದಳತೆ += fname2len;
     }
 
-    return ret->string;
+    ಹಿಂತಿರುಗಿ ret->string;
 }
 
 /*
  * Add a path separator to a file name, unless it already ends in a path
  * separator.
  */
-    void
-add_pathsep(char_u *p)
+    ಶೂನ್ಯ
+ಕೂಡಿಸು_pathsep(char_u *p)
 {
     size_t  plen;
 
-    if (*p == NUL)
-	return;
+    ಆದರೆ (*p == NUL)
+	ಹಿಂತಿರುಗಿ;
 
     plen = STRLEN(p);
-    if (!after_pathsep(p, p + plen))
+    ಆದರೆ (!after_pathsep(p, p + plen))
 	STRCPY(p + plen, PATHSEPSTR);
 }
 
@@ -3243,40 +3243,40 @@ add_pathsep(char_u *p)
  * Returns NULL when out of memory.
  */
     char_u  *
-FullName_save(
+ತುಂಬಿದ_Name_save(
     char_u	*fname,
-    int		force)		// force expansion, even when it already looks
+    ಪೂರ್ಣಾಂಕ		force)		// force expansion, even when it already looks
 				// like a full path name
 {
     char_u	*buf;
-    char_u	*new_fname = NULL;
+    char_u	*new_fname = ಖಾಲಿ;
 
-    if (fname == NULL)
-	return NULL;
+    ಆದರೆ (fname == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     buf = alloc(MAXPATHL);
-    if (buf == NULL)
-	return NULL;
+    ಆದರೆ (buf == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (vim_FullName(fname, buf, MAXPATHL, force) != FAIL)
+    ಆದರೆ (vim_ತುಂಬಿದ_Name(fname, buf, MAXPATHL, force) != FAIL)
 	new_fname = vim_strsave(buf);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	new_fname = vim_strsave(fname);
     vim_free(buf);
-    return new_fname;
+    ಹಿಂತಿರುಗಿ new_fname;
 }
 
 /*
  * return TRUE if "fname" exists.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 vim_fexists(char_u *fname)
 {
     stat_T st;
 
-    if (mch_stat((char *)fname, &st))
-	return FALSE;
-    return TRUE;
+    ಆದರೆ (mch_stat((ಅಕ್ಷರ *)fname, &st))
+	ಹಿಂತಿರುಗಿ FALSE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
@@ -3284,50 +3284,50 @@ vim_fexists(char_u *fname)
  * Expand items like "%:h" before the expansion.
  * Returns OK or FAIL.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 expand_wildcards_eval(
     char_u	 **pat,		// pointer to input pattern
-    int		  *num_file,	// resulting number of files
+    ಪೂರ್ಣಾಂಕ		  *ಅಂಕೆ_file,	// resulting number of files
     char_u	***file,	// array of resulting files
-    int		   flags)	// EW_DIR, etc.
+    ಪೂರ್ಣಾಂಕ		   flags)	// EW_DIR, etc.
 {
-    int		ret = FAIL;
-    char_u	*eval_pat = NULL;
+    ಪೂರ್ಣಾಂಕ		ret = FAIL;
+    char_u	*eval_pat = ಖಾಲಿ;
     char_u	*exp_pat = *pat;
-    char	*ignored_msg;
+    ಅಕ್ಷರ	*ignored_ಸಂದೇಶ;
     size_t	usedlen;
-    int		is_cur_alt_file = *exp_pat == '%' || *exp_pat == '#';
-    int		star_follows = FALSE;
+    ಪೂರ್ಣಾಂಕ		is_cur_alt_file = *exp_pat == '%' || *exp_pat == '#';
+    ಪೂರ್ಣಾಂಕ		ನಕ್ಷತ್ರ_follows = FALSE;
 
-    if (is_cur_alt_file || *exp_pat == '<')
+    ಆದರೆ (is_cur_alt_file || *exp_pat == '<')
     {
 	++emsg_off;
 	eval_pat = eval_vars(exp_pat, exp_pat, &usedlen,
-					       NULL, &ignored_msg, NULL, TRUE);
+					       ಖಾಲಿ, &ignored_ಸಂದೇಶ, ಖಾಲಿ, TRUE);
 	--emsg_off;
-	if (eval_pat != NULL)
+	ಆದರೆ (eval_pat != ಖಾಲಿ)
 	{
-	    star_follows = STRCMP(exp_pat + usedlen, "*") == 0;
+	    ನಕ್ಷತ್ರ_follows = STRCMP(exp_pat + usedlen, "*") == 0;
 	    exp_pat = concat_str(eval_pat, exp_pat + usedlen);
 	}
     }
 
-    if (exp_pat != NULL)
-	ret = expand_wildcards(1, &exp_pat, num_file, file, flags);
+    ಆದರೆ (exp_pat != ಖಾಲಿ)
+	ret = expand_wildcards(1, &exp_pat, ಅಂಕೆ_file, file, flags);
 
-    if (eval_pat != NULL)
+    ಆದರೆ (eval_pat != ಖಾಲಿ)
     {
-	if (*num_file == 0 && is_cur_alt_file && star_follows)
+	ಆದರೆ (*ಅಂಕೆ_file == 0 && is_cur_alt_file && ನಕ್ಷತ್ರ_follows)
 	{
 	    // Expanding "%" or "#" and the file does not exist: Add the
 	    // pattern anyway (without the star) so that this works for remote
 	    // files and non-file buffer names.
 	    *file = ALLOC_ONE(char_u *);
-	    if (*file != NULL)
+	    ಆದರೆ (*file != ಖಾಲಿ)
 	    {
 		**file = eval_pat;
-		eval_pat = NULL;
-		*num_file = 1;
+		eval_pat = ಖಾಲಿ;
+		*ಅಂಕೆ_file = 1;
 		ret = OK;
 	    }
 	}
@@ -3335,7 +3335,7 @@ expand_wildcards_eval(
 	vim_free(eval_pat);
     }
 
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
 /*
@@ -3343,58 +3343,58 @@ expand_wildcards_eval(
  * 'wildignore'.
  * Returns OK or FAIL.  When FAIL then "num_files" won't be set.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 expand_wildcards(
-    int		   num_pat,	// number of input patterns
+    ಪೂರ್ಣಾಂಕ		   ಅಂಕೆ_pat,	// number of input patterns
     char_u	 **pat,		// array of input patterns
-    int		  *num_files,	// resulting number of files
+    ಪೂರ್ಣಾಂಕ		  *ಅಂಕೆ_files,	// resulting number of files
     char_u	***files,	// array of resulting files
-    int		   flags)	// EW_DIR, etc.
+    ಪೂರ್ಣಾಂಕ		   flags)	// EW_DIR, etc.
 {
-    int		retval;
-    int		i, j;
+    ಪೂರ್ಣಾಂಕ		retval;
+    ಪೂರ್ಣಾಂಕ		i, j;
     char_u	*p;
-    int		non_suf_match;	// number without matching suffix
+    ಪೂರ್ಣಾಂಕ		non_suf_ಹೊಂದಿಕೆ;	// number without matching suffix
 
-    retval = gen_expand_wildcards(num_pat, pat, num_files, files, flags);
+    retval = gen_expand_wildcards(ಅಂಕೆ_pat, pat, ಅಂಕೆ_files, files, flags);
 
     // When keeping all matches, return here
-    if ((flags & EW_KEEPALL) || retval == FAIL)
-	return retval;
+    ಆದರೆ ((flags & EW_KEEPALL) || retval == FAIL)
+	ಹಿಂತಿರುಗಿ retval;
 
     /*
      * Remove names that match 'wildignore'.
      */
-    if (*p_wig)
+    ಆದರೆ (*p_wig)
     {
 	char_u	*ffname;
 
 	// check all files in (*files)[]
-	for (i = 0; i < *num_files; ++i)
+	ಗಾಗಿ (i = 0; i < *ಅಂಕೆ_files; ++i)
 	{
-	    ffname = FullName_save((*files)[i], FALSE);
-	    if (ffname == NULL)		// out of memory
-		break;
-#ifdef VMS
-	    vms_remove_version(ffname);
-#endif
-	    if (match_file_list(p_wig, (*files)[i], ffname))
+	    ffname = ತುಂಬಿದ_Name_save((*files)[i], FALSE);
+	    ಆದರೆ (ffname == ಖಾಲಿ)		// out of memory
+		ನಿಲ್ಲಿಸು;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VMS
+	    vms_remove_ಆವೃತ್ತಿ(ffname);
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಆದರೆ (ಹೊಂದಿಕೆ_file_list(p_wig, (*files)[i], ffname))
 	    {
 		// remove this matching file from the list
 		vim_free((*files)[i]);
-		for (j = i; j + 1 < *num_files; ++j)
+		ಗಾಗಿ (j = i; j + 1 < *ಅಂಕೆ_files; ++j)
 		    (*files)[j] = (*files)[j + 1];
-		--*num_files;
+		--*ಅಂಕೆ_files;
 		--i;
 	    }
 	    vim_free(ffname);
 	}
 
 	// If the number of matches is now zero, we fail.
-	if (*num_files == 0)
+	ಆದರೆ (*ಅಂಕೆ_files == 0)
 	{
 	    VIM_CLEAR(*files);
-	    return FAIL;
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
     }
 
@@ -3402,74 +3402,74 @@ expand_wildcards(
      * Move the names where 'suffixes' match to the end.
      * Skip when interrupted, the result probably won't be used.
      */
-    if (*num_files > 1 && !got_int)
+    ಆದರೆ (*ಅಂಕೆ_files > 1 && !got_int)
     {
-	non_suf_match = 0;
-	for (i = 0; i < *num_files; ++i)
+	non_suf_ಹೊಂದಿಕೆ = 0;
+	ಗಾಗಿ (i = 0; i < *ಅಂಕೆ_files; ++i)
 	{
-	    if (!match_suffix((*files)[i]))
+	    ಆದರೆ (!ಹೊಂದಿಕೆ_suffix((*files)[i]))
 	    {
 		/*
 		 * Move the name without matching suffix to the front
 		 * of the list.
 		 */
 		p = (*files)[i];
-		for (j = i; j > non_suf_match; --j)
+		ಗಾಗಿ (j = i; j > non_suf_ಹೊಂದಿಕೆ; --j)
 		    (*files)[j] = (*files)[j - 1];
-		(*files)[non_suf_match++] = p;
+		(*files)[non_suf_ಹೊಂದಿಕೆ++] = p;
 	    }
 	}
     }
 
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
 /*
  * Return TRUE if "fname" matches with an entry in 'suffixes'.
  */
-    int
-match_suffix(char_u *fname)
+    ಪೂರ್ಣಾಂಕ
+ಹೊಂದಿಕೆ_suffix(char_u *fname)
 {
-    int		fnamelen, setsuflen;
+    ಪೂರ್ಣಾಂಕ		fnamelen, setsuflen;
     char_u	*setsuf;
-#define MAXSUFLEN 30	    // maximum length of a file suffix
+#ವ್ಯಾಖ್ಯಾನಿಸು MAXSUFLEN 30	    // maximum length of a file suffix
     char_u	suf_buf[MAXSUFLEN];
 
-    fnamelen = (int)STRLEN(fname);
+    fnamelen = (ಪೂರ್ಣಾಂಕ)STRLEN(fname);
     setsuflen = 0;
-    for (setsuf = p_su; *setsuf; )
+    ಗಾಗಿ (setsuf = p_su; *setsuf; )
     {
 	setsuflen = copy_option_part(&setsuf, suf_buf, MAXSUFLEN, ".,");
-	if (setsuflen == 0)
+	ಆದರೆ (setsuflen == 0)
 	{
-	    char_u *tail = gettail(fname);
+	    char_u *ಬಾಲ = gettail(fname);
 
 	    // empty entry: match name without a '.'
-	    if (vim_strchr(tail, '.') == NULL)
+	    ಆದರೆ (vim_strchr(ಬಾಲ, '.') == ಖಾಲಿ)
 	    {
 		setsuflen = 1;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (fnamelen >= setsuflen
+	    ಆದರೆ (fnamelen >= setsuflen
 		    && fnamencmp(suf_buf, fname + fnamelen - setsuflen,
 						  (size_t)setsuflen) == 0)
-		break;
+		ನಿಲ್ಲಿಸು;
 	    setsuflen = 0;
 	}
     }
-    return (setsuflen != 0);
+    ಹಿಂತಿರುಗಿ (setsuflen != 0);
 }
 
 /*
  * Return TRUE if we can expand this backtick thing here.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 vim_backtick(char_u *p)
 {
-    return (*p == '`' && *(p + 1) != NUL && *(p + STRLEN(p) - 1) == '`');
+    ಹಿಂತಿರುಗಿ (*p == '`' && *(p + 1) != NUL && *(p + STRLEN(p) - 1) == '`');
 }
 
 /*
@@ -3477,43 +3477,43 @@ vim_backtick(char_u *p)
  * Currently only works when pat[] starts and ends with a `.
  * Returns number of file names found, -1 if an error is encountered.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 expand_backtick(
     garray_T	*gap,
     char_u	*pat,
-    int		flags)	// EW_* flags
+    ಪೂರ್ಣಾಂಕ		flags)	// EW_* flags
 {
     char_u	*p;
     char_u	*cmd;
-    char_u	*buffer;
-    int		cnt = 0;
-    int		i;
+    char_u	*ಬಫರ್;
+    ಪೂರ್ಣಾಂಕ		cnt = 0;
+    ಪೂರ್ಣಾಂಕ		i;
 
     // Create the command: lop off the backticks.
     cmd = vim_strnsave(pat + 1, STRLEN(pat) - 2);
-    if (cmd == NULL)
-	return -1;
+    ಆದರೆ (cmd == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ -1;
 
-#ifdef FEAT_EVAL
-    if (*cmd == '=')	    // `={expr}`: Expand expression
-	buffer = eval_to_string(cmd + 1, TRUE, FALSE);
-    else
-#endif
-	buffer = get_cmd_output(cmd, NULL,
-				(flags & EW_SILENT) ? SHELL_SILENT : 0, NULL);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಆದರೆ (*cmd == '=')	    // `={expr}`: Expand expression
+	ಬಫರ್ = eval_ಗಮ್ಯ_string(cmd + 1, TRUE, FALSE);
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	ಬಫರ್ = get_cmd_output(cmd, ಖಾಲಿ,
+				(flags & EW_SILENT) ? SHELL_SILENT : 0, ಖಾಲಿ);
     vim_free(cmd);
-    if (buffer == NULL)
-	return -1;
+    ಆದರೆ (ಬಫರ್ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ -1;
 
-    cmd = buffer;
-    while (*cmd != NUL)
+    cmd = ಬಫರ್;
+    ಆಗ (*cmd != NUL)
     {
 	cmd = skipwhite(cmd);		// skip over white space
 	p = cmd;
-	while (*p != NUL && *p != '\r' && *p != '\n') // skip over entry
+	ಆಗ (*p != NUL && *p != '\r' && *p != '\n') // skip over entry
 	    ++p;
 	// add an entry if it is not empty
-	if (p > cmd)
+	ಆದರೆ (p > cmd)
 	{
 	    i = *p;
 	    *p = NUL;
@@ -3522,15 +3522,15 @@ expand_backtick(
 	    ++cnt;
 	}
 	cmd = p;
-	while (*cmd != NUL && (*cmd == '\r' || *cmd == '\n'))
+	ಆಗ (*cmd != NUL && (*cmd == '\r' || *cmd == '\n'))
 	    ++cmd;
     }
 
-    vim_free(buffer);
-    return cnt;
+    vim_free(ಬಫರ್);
+    ಹಿಂತಿರುಗಿ cnt;
 }
 
-#if defined(MSWIN)
+#ಆದರೆ defined(MSWIN)
 /*
  * File name expansion code for MS-DOS, Win16 and Win32.  It's here because
  * it's shared between these systems.
@@ -3539,10 +3539,10 @@ expand_backtick(
 /*
  * comparison function for qsort in dos_expandpath()
  */
-    static int
-pstrcmp(const void *a, const void *b)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+pstrcmp(ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *a, ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *b)
 {
-    return (pathcmp(*(char **)a, *(char **)b, -1));
+    ಹಿಂತಿರುಗಿ (pathcmp(*(ಅಕ್ಷರ **)a, *(ಅಕ್ಷರ **)b, -1));
 }
 
 /*
@@ -3554,47 +3554,47 @@ pstrcmp(const void *a, const void *b)
  * Return the number of matches found.
  * NOTE: much of this is identical to unix_expandpath(), keep in sync!
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 dos_expandpath(
     garray_T	*gap,
-    char_u	*path,
+    char_u	*ಮಾರ್ಗ,
     size_t	wildoff,
-    int		flags,		// EW_* flags
-    int		didstar)	// expanded "**" once already
+    ಪೂರ್ಣಾಂಕ		flags,		// EW_* flags
+    ಪೂರ್ಣಾಂಕ		didstar)	// expanded "**" once already
 {
     char_u	*buf;
-    char_u	*path_end;
+    char_u	*ಮಾರ್ಗ_ಕೊನೆ;
     char_u	*p, *s, *e;
-    int		start_len = gap->ga_len;
+    ಪೂರ್ಣಾಂಕ		ಆರಂಭ_len = gap->ga_len;
     char_u	*pat;
     regmatch_T	regmatch;
-    int		starts_with_dot;
-    int		matches;
+    ಪೂರ್ಣಾಂಕ		starts_with_dot;
+    ಪೂರ್ಣಾಂಕ		matches;
     size_t	buflen;
     size_t	len;
-    int		starstar = FALSE;
-    static int	stardepth = 0;	    // depth for "**" expansion
-    HANDLE		hFind = INVALID_HANDLE_VALUE;
-    WIN32_FIND_DATAW    wfb;
-    WCHAR		*wn = NULL;	// UCS-2 name, NULL when not used.
+    ಪೂರ್ಣಾಂಕ		starstar = FALSE;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	stardepth = 0;	    // depth for "**" expansion
+    HANDLE		h_ಕಂಡುಹಿಡಿ = INVALID_HANDLE_ಮೌಲ್ಯ;
+    WIN32_ಕಂಡುಹಿಡಿ_DATAW    wfb;
+    WCHAR		*wn = ಖಾಲಿ;	// UCS-2 name, NULL when not used.
     char_u		*matchname;
-    int			ok;
+    ಪೂರ್ಣಾಂಕ			ok;
     char_u		*p_alt;
-    int			use_short_name;
+    ಪೂರ್ಣಾಂಕ			use_short_name;
 
     // Expanding "**" may take a long time, check for CTRL-C.
-    if (stardepth > 0)
+    ಆದರೆ (stardepth > 0)
     {
 	ui_breakcheck();
-	if (got_int)
-	    return 0;
+	ಆದರೆ (got_int)
+	    ಹಿಂತಿರುಗಿ 0;
     }
 
     // Make room for file name (a bit too much to stay on the safe side).
-    buflen = STRLEN(path) + MAXPATHL;
+    buflen = STRLEN(ಮಾರ್ಗ) + MAXPATHL;
     buf = alloc(buflen);
-    if (buf == NULL)
-	return 0;
+    ಆದರೆ (buf == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ 0;
 
     /*
      * Find the first part in the path name that contains a wildcard or a ~1.
@@ -3602,33 +3602,33 @@ dos_expandpath(
      */
     p = buf;
     s = buf;
-    e = NULL;
-    path_end = path;
-    while (*path_end != NUL)
+    e = ಖಾಲಿ;
+    ಮಾರ್ಗ_ಕೊನೆ = ಮಾರ್ಗ;
+    ಆಗ (*ಮಾರ್ಗ_ಕೊನೆ != NUL)
     {
 	// May ignore a wildcard that has a backslash before it; it will
 	// be removed by rem_backslash() or file_pat_to_reg_pat() below.
-	if (path_end >= path + wildoff && rem_backslash(path_end))
-	    *p++ = *path_end++;
-	else if (*path_end == '\\' || *path_end == ':' || *path_end == '/')
+	ಆದರೆ (ಮಾರ್ಗ_ಕೊನೆ >= ಮಾರ್ಗ + wildoff && rem_backslash(ಮಾರ್ಗ_ಕೊನೆ))
+	    *p++ = *ಮಾರ್ಗ_ಕೊನೆ++;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*ಮಾರ್ಗ_ಕೊನೆ == '\\' || *ಮಾರ್ಗ_ಕೊನೆ == ':' || *ಮಾರ್ಗ_ಕೊನೆ == '/')
 	{
-	    if (e != NULL)
-		break;
+	    ಆದರೆ (e != ಖಾಲಿ)
+		ನಿಲ್ಲಿಸು;
 	    s = p + 1;
 	}
-	else if (path_end >= path + wildoff
-			 && vim_strchr((char_u *)"*?[~", *path_end) != NULL)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಮಾರ್ಗ_ಕೊನೆ >= ಮಾರ್ಗ + wildoff
+			 && vim_strchr((char_u *)"*?[~", *ಮಾರ್ಗ_ಕೊನೆ) != ಖಾಲಿ)
 	    e = p;
-	if (has_mbyte)
+	ಆದರೆ (has_mbyte)
 	{
-	    int charlen = (*mb_ptr2len)(path_end);
+	    ಪೂರ್ಣಾಂಕ charlen = (*mb_ptr2len)(ಮಾರ್ಗ_ಕೊನೆ);
 
-	    STRNCPY(p, path_end, (size_t)charlen);
+	    STRNCPY(p, ಮಾರ್ಗ_ಕೊನೆ, (size_t)charlen);
 	    p += charlen;
-	    path_end += charlen;
+	    ಮಾರ್ಗ_ಕೊನೆ += charlen;
 	}
-	else
-	    *p++ = *path_end++;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    *p++ = *ಮಾರ್ಗ_ಕೊನೆ++;
     }
     e = p;
     *e = NUL;
@@ -3636,8 +3636,8 @@ dos_expandpath(
     // now we have one wildcard component between s and e
     // Remove backslashes between "wildoff" and the start of the wildcard
     // component.
-    for (p = buf + wildoff; p < s; ++p)
-	if (rem_backslash(p))
+    ಗಾಗಿ (p = buf + wildoff; p < s; ++p)
+	ಆದರೆ (rem_backslash(p))
 	{
 	    STRMOVE(p, p + 1);
 	    --e;
@@ -3645,31 +3645,31 @@ dos_expandpath(
 	}
 
     // Check for "**" between "s" and "e".
-    for (p = s; p < e; ++p)
-	if (p[0] == '*' && p[1] == '*')
+    ಗಾಗಿ (p = s; p < e; ++p)
+	ಆದರೆ (p[0] == '*' && p[1] == '*')
 	    starstar = TRUE;
 
     starts_with_dot = *s == '.';
-    pat = file_pat_to_reg_pat(s, e, NULL, FALSE);
-    if (pat == NULL)
+    pat = file_pat_ಗಮ್ಯ_reg_pat(s, e, ಖಾಲಿ, FALSE);
+    ಆದರೆ (pat == ಖಾಲಿ)
     {
 	vim_free(buf);
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
     }
 
     // compile the regexp into a program
-    if (flags & (EW_NOERROR | EW_NOTWILD))
+    ಆದರೆ (flags & (EW_NOERROR | EW_NOTWILD))
 	++emsg_silent;
     regmatch.rm_ic = TRUE;		// Always ignore case
     regmatch.regprog = vim_regcomp(pat, RE_MAGIC);
-    if (flags & (EW_NOERROR | EW_NOTWILD))
+    ಆದರೆ (flags & (EW_NOERROR | EW_NOTWILD))
 	--emsg_silent;
     vim_free(pat);
 
-    if (regmatch.regprog == NULL && (flags & EW_NOTWILD) == 0)
+    ಆದರೆ (regmatch.regprog == ಖಾಲಿ && (flags & EW_NOTWILD) == 0)
     {
 	vim_free(buf);
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
     }
 
     // remember the pattern or file name being looked for
@@ -3677,89 +3677,89 @@ dos_expandpath(
 
     // Only match against the alternate (8.3) file name when the pattern looks
     // like a short name, it contains a '~'.
-    use_short_name = vim_strchr(s, '~') != NULL;
+    use_short_name = vim_strchr(s, '~') != ಖಾಲಿ;
 
     len = (size_t)(s - buf);
     // If "**" is by itself, this is the first time we encounter it and more
     // is following then find matches without any directory.
-    if (!didstar && stardepth < 100 && starstar && e - s == 2
-							  && *path_end == '/')
+    ಆದರೆ (!didstar && stardepth < 100 && starstar && e - s == 2
+							  && *ಮಾರ್ಗ_ಕೊನೆ == '/')
     {
-	vim_snprintf((char *)s, buflen - len, "%s", path_end + 1);
+	vim_snprintf((ಅಕ್ಷರ *)s, buflen - len, "%s", ಮಾರ್ಗ_ಕೊನೆ + 1);
 	++stardepth;
-	(void)dos_expandpath(gap, buf, len, flags, TRUE);
+	(ಶೂನ್ಯ)dos_expandpath(gap, buf, len, flags, TRUE);
 	--stardepth;
     }
 
     // Scan all files in the directory with "dir/ *.*"
-    vim_snprintf((char *)s, buflen - len, "*.*");
-    wn = enc_to_utf16(buf, NULL);
-    if (wn != NULL)
-	hFind = FindFirstFileW(wn, &wfb);
-    ok = (hFind != INVALID_HANDLE_VALUE);
+    vim_snprintf((ಅಕ್ಷರ *)s, buflen - len, "*.*");
+    wn = enc_ಗಮ್ಯ_utf16(buf, ಖಾಲಿ);
+    ಆದರೆ (wn != ಖಾಲಿ)
+	h_ಕಂಡುಹಿಡಿ = ಕಂಡುಹಿಡಿ_ಮೊದಲ_File_W(wn, &wfb);
+    ok = (h_ಕಂಡುಹಿಡಿ != INVALID_HANDLE_ಮೌಲ್ಯ);
 
-    while (ok)
+    ಆಗ (ok)
     {
-	p = utf16_to_enc(wfb.cFileName, NULL);   // p is allocated here
+	p = utf16_ಗಮ್ಯ_enc(wfb.cFileName, ಖಾಲಿ);   // p is allocated here
 
-	if (p == NULL)
-	    break;  // out of memory
+	ಆದರೆ (p == ಖಾಲಿ)
+	    ನಿಲ್ಲಿಸು;  // out of memory
 
 	// Do not use the alternate filename when the file name ends in '~',
 	// because it picks up backup files: short name for "foo.vim~" is
 	// "foo~1.vim", which matches "*.vim".
-	if (!use_short_name || *wfb.cAlternateFileName == NUL
+	ಆದರೆ (!use_short_name || *wfb.cAlternateFileName == NUL
 						  || p[STRLEN(p) - 1] == '~')
-	    p_alt = NULL;
-	else
-	    p_alt = utf16_to_enc(wfb.cAlternateFileName, NULL);
+	    p_alt = ಖಾಲಿ;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    p_alt = utf16_ಗಮ್ಯ_enc(wfb.cAlternateFileName, ಖಾಲಿ);
 
 	len = (size_t)(s - buf);
 	// Ignore entries starting with a dot, unless when asked for.  Accept
 	// all entries found with "matchname".
-	if ((p[0] != '.' || starts_with_dot
+	ಆದರೆ ((p[0] != '.' || starts_with_dot
 			 || ((flags & EW_DODOT)
 			     && p[1] != NUL && (p[1] != '.' || p[2] != NUL)))
-		&& (matchname == NULL
-		  || (regmatch.regprog != NULL
+		&& (matchname == ಖಾಲಿ
+		  || (regmatch.regprog != ಖಾಲಿ
 		      && (vim_regexec(&regmatch, p, (colnr_T)0)
-			 || (p_alt != NULL
+			 || (p_alt != ಖಾಲಿ
 				&& vim_regexec(&regmatch, p_alt, (colnr_T)0))))
 		  || ((flags & EW_NOTWILD)
-		     && fnamencmp(path + len, p, e - s) == 0)))
+		     && fnamencmp(ಮಾರ್ಗ + len, p, e - s) == 0)))
 	{
-	    len += vim_snprintf((char *)s, buflen - len, "%s", p);
-	    if (len + 1 < buflen)
+	    len += vim_snprintf((ಅಕ್ಷರ *)s, buflen - len, "%s", p);
+	    ಆದರೆ (len + 1 < buflen)
 	    {
-		if (starstar && stardepth < 100
-			  && (wfb.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+		ಆದರೆ (starstar && stardepth < 100
+			  && (wfb.dw_File_ಗುಣಲಕ್ಷಣಗಳು & FILE_ATTRIBUTE_DIRECTORY))
 		{
 		    // For "**" in the pattern first go deeper in the tree to
 		    // find matches.
-		    vim_snprintf((char *)buf + len, buflen - len,
-							    "/**%s", path_end);
+		    vim_snprintf((ಅಕ್ಷರ *)buf + len, buflen - len,
+							    "/**%s", ಮಾರ್ಗ_ಕೊನೆ);
 		    ++stardepth;
-		    (void)dos_expandpath(gap, buf, len + 1, flags, TRUE);
+		    (ಶೂನ್ಯ)dos_expandpath(gap, buf, len + 1, flags, TRUE);
 		    --stardepth;
 		}
 
-		vim_snprintf((char *)buf + len, buflen - len, "%s", path_end);
-		if (mch_has_exp_wildcard(path_end))
+		vim_snprintf((ಅಕ್ಷರ *)buf + len, buflen - len, "%s", ಮಾರ್ಗ_ಕೊನೆ);
+		ಆದರೆ (mch_has_exp_wildcard(ಮಾರ್ಗ_ಕೊನೆ))
 		{
-		    if (stardepth < 100)
+		    ಆದರೆ (stardepth < 100)
 		    {
 			// need to expand another component of the path
 			// remove backslashes for the remaining components only
 			++stardepth;
-			(void)dos_expandpath(gap, buf, len + 1, flags, FALSE);
+			(ಶೂನ್ಯ)dos_expandpath(gap, buf, len + 1, flags, FALSE);
 			--stardepth;
 		    }
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    // no more wildcards, check if there is a match
 		    // remove backslashes for the remaining components only
-		    if (*path_end != 0)
+		    ಆದರೆ (*ಮಾರ್ಗ_ಕೊನೆ != 0)
 			backslash_halve(buf + len + 1);
 		    // addfile() checks existence; do not stat the same path twice.
 		    // Even with EW_NOTFOUND, a literal suffix must exist.
@@ -3770,32 +3770,32 @@ dos_expandpath(
 
 	vim_free(p_alt);
 	vim_free(p);
-	ok = FindNextFileW(hFind, &wfb);
+	ok = ಕಂಡುಹಿಡಿ_ಮುಂದಿನ_File_W(h_ಕಂಡುಹಿಡಿ, &wfb);
     }
 
-    FindClose(hFind);
+    ಕಂಡುಹಿಡಿ_Close(h_ಕಂಡುಹಿಡಿ);
     vim_free(wn);
     vim_free(buf);
     vim_regfree(regmatch.regprog);
     vim_free(matchname);
 
-    matches = gap->ga_len - start_len;
-    if (matches > 0)
-	qsort(((char_u **)gap->ga_data) + start_len, (size_t)matches,
-						   sizeof(char_u *), pstrcmp);
-    return matches;
+    matches = gap->ga_len - ಆರಂಭ_len;
+    ಆದರೆ (matches > 0)
+	qsort(((char_u **)gap->ga_ದತ್ತಾಂಶ) + ಆರಂಭ_len, (size_t)matches,
+						   ಗಾತ್ರ(char_u *), pstrcmp);
+    ಹಿಂತಿರುಗಿ matches;
 }
-#endif // MSWIN
+#ಆದರೆ_ಅಂತ್ಯ // MSWIN
 
-#if (defined(UNIX) && !defined(VMS)) || defined(USE_UNIXFILENAME)
+#ಆದರೆ (defined(UNIX) && !defined(VMS)) || defined(USE_UNIXFILENAME)
 /*
  * Unix style wildcard expansion code.
  * It's here because it's used both for Unix and Mac.
  */
-    static int
-pstrcmp(const void *a, const void *b)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+pstrcmp(ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *a, ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *b)
 {
-    return (pathcmp(*(char **)a, *(char **)b, -1));
+    ಹಿಂತಿರುಗಿ (pathcmp(*(ಅಕ್ಷರ **)a, *(ಅಕ್ಷರ **)b, -1));
 }
 
 /*
@@ -3806,43 +3806,43 @@ pstrcmp(const void *a, const void *b)
  * Return the number of matches found.
  * NOTE: much of this is identical to dos_expandpath(), keep in sync!
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 unix_expandpath(
     garray_T	*gap,
-    char_u	*path,
+    char_u	*ಮಾರ್ಗ,
     size_t	wildoff,
-    int		flags,		// EW_* flags
-    int		didstar)	// expanded "**" once already
+    ಪೂರ್ಣಾಂಕ		flags,		// EW_* flags
+    ಪೂರ್ಣಾಂಕ		didstar)	// expanded "**" once already
 {
     char_u	*buf;
-    char_u	*path_end;
+    char_u	*ಮಾರ್ಗ_ಕೊನೆ;
     char_u	*p, *s, *e;
-    int		start_len = gap->ga_len;
+    ಪೂರ್ಣಾಂಕ		ಆರಂಭ_len = gap->ga_len;
     char_u	*pat;
     regmatch_T	regmatch;
-    int		starts_with_dot;
-    int		matches;
+    ಪೂರ್ಣಾಂಕ		starts_with_dot;
+    ಪೂರ್ಣಾಂಕ		matches;
     size_t	buflen;
     size_t	len;
-    int		starstar = FALSE;
-    static int	stardepth = 0;	    // depth for "**" expansion
+    ಪೂರ್ಣಾಂಕ		starstar = FALSE;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	stardepth = 0;	    // depth for "**" expansion
 
     DIR		*dirp;
-    struct dirent *dp;
+    ರಚನೆ dirent *dp;
 
     // Expanding "**" may take a long time, check for CTRL-C.
-    if (stardepth > 0)
+    ಆದರೆ (stardepth > 0)
     {
 	ui_breakcheck();
-	if (got_int)
-	    return 0;
+	ಆದರೆ (got_int)
+	    ಹಿಂತಿರುಗಿ 0;
     }
 
     // Make room for file name (a bit too much to stay on the safe side).
-    buflen = STRLEN(path) + MAXPATHL;
+    buflen = STRLEN(ಮಾರ್ಗ) + MAXPATHL;
     buf = alloc(buflen);
-    if (buf == NULL)
-	return 0;
+    ಆದರೆ (buf == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ 0;
 
     /*
      * Find the first part in the path name that contains a wildcard.
@@ -3851,35 +3851,35 @@ unix_expandpath(
      */
     p = buf;
     s = buf;
-    e = NULL;
-    path_end = path;
-    while (*path_end != NUL)
+    e = ಖಾಲಿ;
+    ಮಾರ್ಗ_ಕೊನೆ = ಮಾರ್ಗ;
+    ಆಗ (*ಮಾರ್ಗ_ಕೊನೆ != NUL)
     {
 	// May ignore a wildcard that has a backslash before it; it will
 	// be removed by rem_backslash() or file_pat_to_reg_pat() below.
-	if (path_end >= path + wildoff && rem_backslash(path_end))
-	    *p++ = *path_end++;
-	else if (*path_end == '/')
+	ಆದರೆ (ಮಾರ್ಗ_ಕೊನೆ >= ಮಾರ್ಗ + wildoff && rem_backslash(ಮಾರ್ಗ_ಕೊನೆ))
+	    *p++ = *ಮಾರ್ಗ_ಕೊನೆ++;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*ಮಾರ್ಗ_ಕೊನೆ == '/')
 	{
-	    if (e != NULL)
-		break;
+	    ಆದರೆ (e != ಖಾಲಿ)
+		ನಿಲ್ಲಿಸು;
 	    s = p + 1;
 	}
-	else if (path_end >= path + wildoff
-			 && (vim_strchr((char_u *)"*?[{~$", *path_end) != NULL
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಮಾರ್ಗ_ಕೊನೆ >= ಮಾರ್ಗ + wildoff
+			 && (vim_strchr((char_u *)"*?[{~$", *ಮಾರ್ಗ_ಕೊನೆ) != ಖಾಲಿ
 			     || (!p_fic && (flags & EW_ICASE)
-					  && vim_isalpha(PTR2CHAR(path_end)))))
+					  && vim_isalpha(PTR2CHAR(ಮಾರ್ಗ_ಕೊನೆ)))))
 	    e = p;
-	if (has_mbyte)
+	ಆದರೆ (has_mbyte)
 	{
-	    int charlen = (*mb_ptr2len)(path_end);
+	    ಪೂರ್ಣಾಂಕ charlen = (*mb_ptr2len)(ಮಾರ್ಗ_ಕೊನೆ);
 
-	    STRNCPY(p, path_end, (size_t)charlen);
+	    STRNCPY(p, ಮಾರ್ಗ_ಕೊನೆ, (size_t)charlen);
 	    p += charlen;
-	    path_end += charlen;
+	    ಮಾರ್ಗ_ಕೊನೆ += charlen;
 	}
-	else
-	    *p++ = *path_end++;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    *p++ = *ಮಾರ್ಗ_ಕೊನೆ++;
     }
     e = p;
     *e = NUL;
@@ -3887,8 +3887,8 @@ unix_expandpath(
     // Now we have one wildcard component between "s" and "e".
     // Remove backslashes between "wildoff" and the start of the wildcard
     // component.
-    for (p = buf + wildoff; p < s; ++p)
-	if (rem_backslash(p))
+    ಗಾಗಿ (p = buf + wildoff; p < s; ++p)
+	ಆದರೆ (rem_backslash(p))
 	{
 	    STRMOVE(p, p + 1);
 	    --e;
@@ -3896,116 +3896,116 @@ unix_expandpath(
 	}
 
     // Check for "**" between "s" and "e".
-    for (p = s; p < e; ++p)
-	if (p[0] == '*' && p[1] == '*')
+    ಗಾಗಿ (p = s; p < e; ++p)
+	ಆದರೆ (p[0] == '*' && p[1] == '*')
 	    starstar = TRUE;
 
     // convert the file pattern to a regexp pattern
     starts_with_dot = *s == '.';
-    pat = file_pat_to_reg_pat(s, e, NULL, FALSE);
-    if (pat == NULL)
+    pat = file_pat_ಗಮ್ಯ_reg_pat(s, e, ಖಾಲಿ, FALSE);
+    ಆದರೆ (pat == ಖಾಲಿ)
     {
 	vim_free(buf);
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
     }
 
     // compile the regexp into a program
-    if (flags & EW_ICASE)
+    ಆದರೆ (flags & EW_ICASE)
 	regmatch.rm_ic = TRUE;		// 'wildignorecase' set
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	regmatch.rm_ic = p_fic;	// ignore case when 'fileignorecase' is set
-    if (flags & (EW_NOERROR | EW_NOTWILD))
+    ಆದರೆ (flags & (EW_NOERROR | EW_NOTWILD))
 	++emsg_silent;
     regmatch.regprog = vim_regcomp(pat, RE_MAGIC);
-    if (flags & (EW_NOERROR | EW_NOTWILD))
+    ಆದರೆ (flags & (EW_NOERROR | EW_NOTWILD))
 	--emsg_silent;
     vim_free(pat);
 
-    if (regmatch.regprog == NULL && (flags & EW_NOTWILD) == 0)
+    ಆದರೆ (regmatch.regprog == ಖಾಲಿ && (flags & EW_NOTWILD) == 0)
     {
 	vim_free(buf);
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
     }
 
     len = (size_t)(s - buf);
     // If "**" is by itself, this is the first time we encounter it and more
     // is following then find matches without any directory.
-    if (!didstar && stardepth < 100 && starstar && e - s == 2
-							  && *path_end == '/')
+    ಆದರೆ (!didstar && stardepth < 100 && starstar && e - s == 2
+							  && *ಮಾರ್ಗ_ಕೊನೆ == '/')
     {
-	vim_snprintf((char *)s, buflen - len, "%s", path_end + 1);
+	vim_snprintf((ಅಕ್ಷರ *)s, buflen - len, "%s", ಮಾರ್ಗ_ಕೊನೆ + 1);
 	++stardepth;
-	(void)unix_expandpath(gap, buf, len, flags, TRUE);
+	(ಶೂನ್ಯ)unix_expandpath(gap, buf, len, flags, TRUE);
 	--stardepth;
     }
 
     // open the directory for scanning
     *s = NUL;
-    dirp = opendir(*buf == NUL ? "." : (char *)buf);
+    dirp = opendir(*buf == NUL ? "." : (ಅಕ್ಷರ *)buf);
 
     // Find all matching entries
-    if (dirp != NULL)
+    ಆದರೆ (dirp != ಖಾಲಿ)
     {
-	while (!got_int)
+	ಆಗ (!got_int)
 	{
 	    dp = readdir(dirp);
-	    if (dp == NULL)
-		break;
+	    ಆದರೆ (dp == ಖಾಲಿ)
+		ನಿಲ್ಲಿಸು;
 	    len = (size_t)(s - buf);
-	    if ((dp->d_name[0] != '.' || starts_with_dot
+	    ಆದರೆ ((dp->d_name[0] != '.' || starts_with_dot
 			|| ((flags & EW_DODOT)
 			    && dp->d_name[1] != NUL
 			    && (dp->d_name[1] != '.' || dp->d_name[2] != NUL)))
-		 && ((regmatch.regprog != NULL && vim_regexec(&regmatch,
+		 && ((regmatch.regprog != ಖಾಲಿ && vim_regexec(&regmatch,
 					     (char_u *)dp->d_name, (colnr_T)0))
 		   || ((flags & EW_NOTWILD)
-		     && fnamencmp(path + len, dp->d_name, e - s) == 0)))
+		     && fnamencmp(ಮಾರ್ಗ + len, dp->d_name, e - s) == 0)))
 	    {
-		len += vim_snprintf((char *)s, buflen - len, "%s", dp->d_name);
-		if (len + 1 >= buflen)
-		    continue;
+		len += vim_snprintf((ಅಕ್ಷರ *)s, buflen - len, "%s", dp->d_name);
+		ಆದರೆ (len + 1 >= buflen)
+		    ಮುಂದುವರಿ;
 
-		if (starstar && stardepth < 100)
+		ಆದರೆ (starstar && stardepth < 100)
 		{
 		    // For "**" in the pattern first go deeper in the tree to
 		    // find matches.
-		    vim_snprintf((char *)buf + len, buflen - len,
-							    "/**%s", path_end);
+		    vim_snprintf((ಅಕ್ಷರ *)buf + len, buflen - len,
+							    "/**%s", ಮಾರ್ಗ_ಕೊನೆ);
 		    ++stardepth;
-		    (void)unix_expandpath(gap, buf, len + 1, flags, TRUE);
+		    (ಶೂನ್ಯ)unix_expandpath(gap, buf, len + 1, flags, TRUE);
 		    --stardepth;
 		}
 
-		vim_snprintf((char *)buf + len, buflen - len, "%s", path_end);
-		if (mch_has_exp_wildcard(path_end)) // handle more wildcards
+		vim_snprintf((ಅಕ್ಷರ *)buf + len, buflen - len, "%s", ಮಾರ್ಗ_ಕೊನೆ);
+		ಆದರೆ (mch_has_exp_wildcard(ಮಾರ್ಗ_ಕೊನೆ)) // handle more wildcards
 		{
-		    if (stardepth < 100)
+		    ಆದರೆ (stardepth < 100)
 		    {
 			// need to expand another component of the path
 			// remove backslashes for the remaining components only
 			++stardepth;
-			(void)unix_expandpath(gap, buf, len + 1, flags, FALSE);
+			(ಶೂನ್ಯ)unix_expandpath(gap, buf, len + 1, flags, FALSE);
 			--stardepth;
 		    }
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    stat_T  sb;
 
 		    // no more wildcards, check if there is a match
 		    // remove backslashes for the remaining components only
-		    if (*path_end != NUL)
+		    ಆದರೆ (*ಮಾರ್ಗ_ಕೊನೆ != NUL)
 			backslash_halve(buf + len + 1);
 		    // add existing file or symbolic link
-		    if ((flags & EW_ALLLINKS) ? mch_lstat((char *)buf, &sb) >= 0
+		    ಆದರೆ ((flags & EW_ALLLINKS) ? mch_lstat((ಅಕ್ಷರ *)buf, &sb) >= 0
 						      : mch_getperm(buf) >= 0)
 		    {
 # ifdef MACOS_CONVERT
 			size_t precomp_len = STRLEN(buf)+1;
 			char_u *precomp_buf =
-			    mac_precompose_path(buf, precomp_len, &precomp_len);
+			    mac_precompose_ಮಾರ್ಗ(buf, precomp_len, &precomp_len);
 
-			if (precomp_buf)
+			ಆದರೆ (precomp_buf)
 			{
 			    mch_memmove(buf, precomp_buf, precomp_len);
 			    vim_free(precomp_buf);
@@ -4025,67 +4025,67 @@ unix_expandpath(
 
     // When interrupted the matches probably won't be used and sorting can be
     // slow, thus skip it.
-    matches = gap->ga_len - start_len;
-    if (matches > 0 && !got_int)
-	qsort(((char_u **)gap->ga_data) + start_len, matches,
-						   sizeof(char_u *), pstrcmp);
-    return matches;
+    matches = gap->ga_len - ಆರಂಭ_len;
+    ಆದರೆ (matches > 0 && !got_int)
+	qsort(((char_u **)gap->ga_ದತ್ತಾಂಶ) + ಆರಂಭ_len, matches,
+						   ಗಾತ್ರ(char_u *), pstrcmp);
+    ಹಿಂತಿರುಗಿ matches;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Return TRUE if "p" contains what looks like an environment variable.
  * Allowing for escaping.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 has_env_var(char_u *p)
 {
-    for ( ; *p; MB_PTR_ADV(p))
+    ಗಾಗಿ ( ; *p; MB_PTR_ADV(p))
     {
-	if (*p == '\\' && p[1] != NUL)
+	ಆದರೆ (*p == '\\' && p[1] != NUL)
 	    ++p;
-	else if (vim_strchr((char_u *)
-#if defined(MSWIN)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (vim_strchr((char_u *)
+#ಆದರೆ defined(MSWIN)
 				    "$%"
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 				    "$"
-#endif
-					, *p) != NULL)
-	    return TRUE;
+#ಆದರೆ_ಅಂತ್ಯ
+					, *p) != ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ TRUE;
     }
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
-#ifdef SPECIAL_WILDCHAR
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SPECIAL_WILDCHAR
 /*
  * Return TRUE if "p" contains a special wildcard character, one that Vim
  * cannot expand, requires using a shell.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 has_special_wildchar(char_u *p)
 {
-    for ( ; *p; MB_PTR_ADV(p))
+    ಗಾಗಿ ( ; *p; MB_PTR_ADV(p))
     {
 	// Disallow line break characters.
-	if (*p == '\r' || *p == '\n')
-	    break;
+	ಆದರೆ (*p == '\r' || *p == '\n')
+	    ನಿಲ್ಲಿಸು;
 	// Allow for escaping.
-	if (*p == '\\' && p[1] != NUL && p[1] != '\r' && p[1] != '\n')
+	ಆದರೆ (*p == '\\' && p[1] != NUL && p[1] != '\r' && p[1] != '\n')
 	    ++p;
-	else if (vim_strchr((char_u *)SPECIAL_WILDCHAR, *p) != NULL)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (vim_strchr((char_u *)SPECIAL_WILDCHAR, *p) != ಖಾಲಿ)
 	{
 	    // A { must be followed by a matching }.
-	    if (*p == '{' && vim_strchr(p, '}') == NULL)
-		continue;
+	    ಆದರೆ (*p == '{' && vim_strchr(p, '}') == ಖಾಲಿ)
+		ಮುಂದುವರಿ;
 	    // A quote and backtick must be followed by another one.
-	    if ((*p == '`' || *p == '\'') && vim_strchr(p, *p) == NULL)
-		continue;
-	    return TRUE;
+	    ಆದರೆ ((*p == '`' || *p == '\'') && vim_strchr(p, *p) == ಖಾಲಿ)
+		ಮುಂದುವರಿ;
+	    ಹಿಂತಿರುಗಿ TRUE;
 	}
     }
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Generic wildcard expansion code.
@@ -4098,23 +4098,23 @@ has_special_wildchar(char_u *p)
  * Return OK when some files found.  "num_file" is set to the number of
  * matches, "file" to the array of matches.  Call FreeWild() later.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 gen_expand_wildcards(
-    int		num_pat,	// number of input patterns
+    ಪೂರ್ಣಾಂಕ		ಅಂಕೆ_pat,	// number of input patterns
     char_u	**pat,		// array of input patterns
-    int		*num_file,	// resulting number of files
+    ಪೂರ್ಣಾಂಕ		*ಅಂಕೆ_file,	// resulting number of files
     char_u	***file,	// array of resulting files
-    int		flags)		// EW_* flags
+    ಪೂರ್ಣಾಂಕ		flags)		// EW_* flags
 {
-    int			i;
+    ಪೂರ್ಣಾಂಕ			i;
     garray_T		ga;
     char_u		*p;
-    static int		recursive = FALSE;
-    int			add_pat;
-    int			retval = OK;
-    int			did_expand_in_path = FALSE;
-    char_u		*path_option = *curbuf->b_p_path == NUL ?
-					p_path : curbuf->b_p_path;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ		recursive = FALSE;
+    ಪೂರ್ಣಾಂಕ			ಕೂಡಿಸು_pat;
+    ಪೂರ್ಣಾಂಕ			retval = OK;
+    ಪೂರ್ಣಾಂಕ			did_expand_ಒಳ_ಮಾರ್ಗ = FALSE;
+    char_u		*ಮಾರ್ಗ_option = *curbuf->b_p_ಮಾರ್ಗ == NUL ?
+					p_ಮಾರ್ಗ : curbuf->b_p_ಮಾರ್ಗ;
 
     /*
      * expand_env() is called to expand things like "~user".  If this fails,
@@ -4122,73 +4122,73 @@ gen_expand_wildcards(
      * call the machine specific expansion function, if possible.  Otherwise,
      * return FAIL.
      */
-    if (recursive)
-#ifdef SPECIAL_WILDCHAR
-	return mch_expand_wildcards(num_pat, pat, num_file, file, flags);
-#else
-	return FAIL;
-#endif
+    ಆದರೆ (recursive)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SPECIAL_WILDCHAR
+	ಹಿಂತಿರುಗಿ mch_expand_wildcards(ಅಂಕೆ_pat, pat, ಅಂಕೆ_file, file, flags);
+#ಇಲ್ಲದಿದ್ದರೆ
+	ಹಿಂತಿರುಗಿ FAIL;
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef SPECIAL_WILDCHAR
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SPECIAL_WILDCHAR
     /*
      * If there are any special wildcard characters which we cannot handle
      * here, call machine specific function for all the expansion.  This
      * avoids starting the shell for each argument separately.
      * For `=expr` do use the internal function.
      */
-    for (i = 0; i < num_pat; i++)
+    ಗಾಗಿ (i = 0; i < ಅಂಕೆ_pat; i++)
     {
-	if (has_special_wildchar(pat[i])
+	ಆದರೆ (has_special_wildchar(pat[i])
 		&& !(vim_backtick(pat[i]) && pat[i][1] == '=')
 	   )
-	    return mch_expand_wildcards(num_pat, pat, num_file, file, flags);
+	    ಹಿಂತಿರುಗಿ mch_expand_wildcards(ಅಂಕೆ_pat, pat, ಅಂಕೆ_file, file, flags);
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     recursive = TRUE;
 
     /*
      * The matching file names are stored in a growarray.  Init it empty.
      */
-    ga_init2(&ga, sizeof(char_u *), 30);
+    ga_init2(&ga, ಗಾತ್ರ(char_u *), 30);
 
-    for (i = 0; i < num_pat && !got_int; ++i)
+    ಗಾಗಿ (i = 0; i < ಅಂಕೆ_pat && !got_int; ++i)
     {
-	add_pat = -1;
+	ಕೂಡಿಸು_pat = -1;
 	p = pat[i];
 
-	if (vim_backtick(p))
+	ಆದರೆ (vim_backtick(p))
 	{
-	    add_pat = expand_backtick(&ga, p, flags);
-	    if (add_pat == -1)
+	    ಕೂಡಿಸು_pat = expand_backtick(&ga, p, flags);
+	    ಆದರೆ (ಕೂಡಿಸು_pat == -1)
 		retval = FAIL;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    /*
 	     * First expand environment variables, "~/" and "~user/".
 	     */
-	    if ((has_env_var(p) && !(flags & EW_NOTENV)) || *p == '~')
+	    ಆದರೆ ((has_env_var(p) && !(flags & EW_NOTENV)) || *p == '~')
 	    {
-		p = expand_env_save_opt(p, TRUE, (char_u *)PATH_ESC_WILDCARDS);
-		if (p == NULL)
+		p = expand_env_save_opt(p, TRUE, (char_u *)ಮಾರ್ಗ_ESC_WILDCARDS);
+		ಆದರೆ (p == ಖಾಲಿ)
 		    p = pat[i];
-#ifdef UNIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
 		/*
 		 * On Unix, if expand_env() can't expand an environment
 		 * variable, use the shell to do that.  Discard previously
 		 * found file names and start all over again.
 		 */
-		else if (has_env_var(p) || *p == '~')
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (has_env_var(p) || *p == '~')
 		{
 		    vim_free(p);
-		    ga_clear_strings(&ga);
-		    i = mch_expand_wildcards(num_pat, pat, num_file, file,
+		    ga_clear_ಅಕ್ಷರಸರಣಿಗಳು(&ga);
+		    i = mch_expand_wildcards(ಅಂಕೆ_pat, pat, ಅಂಕೆ_file, file,
 							 flags|EW_KEEPDOLLAR);
 		    recursive = FALSE;
-		    return i;
+		    ಹಿಂತಿರುಗಿ i;
 		}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
 
 	    /*
@@ -4198,10 +4198,10 @@ gen_expand_wildcards(
 	     * Otherwise: Add the file name if it exists or when EW_NOTFOUND is
 	     * given.
 	     */
-	    if (mch_has_exp_wildcard(p) || (flags & EW_ICASE))
+	    ಆದರೆ (mch_has_exp_wildcard(p) || (flags & EW_ICASE))
 	    {
-		if ((flags & (EW_PATH | EW_CDPATH))
-			&& !mch_isFullName(p)
+		ಆದರೆ ((flags & (EW_ಮಾರ್ಗ | EW_CDPATH))
+			&& !mch_is_ತುಂಬಿದ_Name(p)
 			&& !(p[0] == '.'
 			    && (vim_ispathsep(p[1])
 				|| (p[1] == '.' && vim_ispathsep(p[2]))))
@@ -4210,47 +4210,47 @@ gen_expand_wildcards(
 		    // :find completion where 'path' is used.
 		    // Recursiveness is OK here.
 		    recursive = FALSE;
-		    add_pat = expand_in_path(&ga, p, flags);
+		    ಕೂಡಿಸು_pat = expand_ಒಳ_ಮಾರ್ಗ(&ga, p, flags);
 		    recursive = TRUE;
-		    did_expand_in_path = TRUE;
+		    did_expand_ಒಳ_ಮಾರ್ಗ = TRUE;
 		}
-		else
-		    add_pat = mch_expandpath(&ga, p, flags);
+		ಇಲ್ಲದಿದ್ದರೆ
+		    ಕೂಡಿಸು_pat = mch_expandpath(&ga, p, flags);
 	    }
 	}
 
-	if (add_pat == -1 || (add_pat == 0 && (flags & EW_NOTFOUND)))
+	ಆದರೆ (ಕೂಡಿಸು_pat == -1 || (ಕೂಡಿಸು_pat == 0 && (flags & EW_NOTFOUND)))
 	{
 	    char_u	*t = backslash_halve_save(p);
 
 	    // When EW_NOTFOUND is used, always add files and dirs.  Makes
 	    // "vim c:/" work.
-	    if (flags & EW_NOTFOUND)
+	    ಆದರೆ (flags & EW_NOTFOUND)
 		addfile(&ga, t, flags | EW_DIR | EW_FILE);
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		addfile(&ga, t, flags);
 
-	    if (t != p)
+	    ಆದರೆ (t != p)
 		vim_free(t);
 	}
 
-	if (did_expand_in_path && ga.ga_len > 0 && (flags & (EW_PATH | EW_CDPATH)))
-	    uniquefy_paths(&ga, p, path_option);
-	if (p != pat[i])
+	ಆದರೆ (did_expand_ಒಳ_ಮಾರ್ಗ && ga.ga_len > 0 && (flags & (EW_ಮಾರ್ಗ | EW_CDPATH)))
+	    uniquefy_paths(&ga, p, ಮಾರ್ಗ_option);
+	ಆದರೆ (p != pat[i])
 	    vim_free(p);
     }
 
     // When returning FAIL the array must be freed here.
-    if (retval == FAIL)
-	ga_clear_strings(&ga);
+    ಆದರೆ (retval == FAIL)
+	ga_clear_ಅಕ್ಷರಸರಣಿಗಳು(&ga);
 
-    *num_file = ga.ga_len;
-    *file = (ga.ga_data != NULL) ? (char_u **)ga.ga_data
+    *ಅಂಕೆ_file = ga.ga_len;
+    *file = (ga.ga_ದತ್ತಾಂಶ != ಖಾಲಿ) ? (char_u **)ga.ga_ದತ್ತಾಂಶ
 						  : (char_u **)_("no matches");
 
     recursive = FALSE;
 
-    return ((flags & EW_EMPTYOK) || ga.ga_data != NULL) ? retval : FAIL;
+    ಹಿಂತಿರುಗಿ ((flags & EW_EMPTYOK) || ga.ga_ದತ್ತಾಂಶ != ಖಾಲಿ) ? retval : FAIL;
 }
 
 /*
@@ -4262,82 +4262,82 @@ gen_expand_wildcards(
  * EW_ADDSLASH	add slash after directory name
  * EW_ALLLINKS	add symlink also when the referred file does not exist
  */
-    void
+    ಶೂನ್ಯ
 addfile(
     garray_T	*gap,
     char_u	*f,	// filename
-    int		flags)
+    ಪೂರ್ಣಾಂಕ		flags)
 {
     char_u	*p;
-    int		isdir;
+    ಪೂರ್ಣಾಂಕ		isdir;
     stat_T	sb;
 
-#ifdef MSWIN
-    if (!(flags & (EW_NOTFOUND | EW_ALLLINKS)))
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
+    ಆದರೆ (!(flags & (EW_NOTFOUND | EW_ALLLINKS)))
     {
-	long perm = mch_getperm(f);
+	ದೀರ್ಘ perm = mch_getperm(f);
 
-	if (perm < 0)
-	    return;
+	ಆದರೆ (perm < 0)
+	    ಹಿಂತಿರುಗಿ;
 	// The stat result already tells us whether this is a directory.
 	isdir = (perm & S_IFMT) == S_IFDIR;
     }
-    else
-#endif
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
     {
 	// if the file/dir/link doesn't exist, may not add it
-	if (!(flags & EW_NOTFOUND) && ((flags & EW_ALLLINKS)
-		    ? mch_lstat((char *)f, &sb) < 0 : mch_getperm(f) < 0))
-	    return;
+	ಆದರೆ (!(flags & EW_NOTFOUND) && ((flags & EW_ALLLINKS)
+		    ? mch_lstat((ಅಕ್ಷರ *)f, &sb) < 0 : mch_getperm(f) < 0))
+	    ಹಿಂತಿರುಗಿ;
 	isdir = mch_isdir(f);
     }
 
-#ifdef FNAME_ILLEGAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FNAME_ILLEGAL
     // if the file/dir contains illegal characters, don't add it
-    if (vim_strpbrk(f, (char_u *)FNAME_ILLEGAL) != NULL)
-	return;
-#endif
+    ಆದರೆ (vim_strpbrk(f, (char_u *)FNAME_ILLEGAL) != ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if ((isdir && !(flags & EW_DIR)) || (!isdir && !(flags & EW_FILE)))
-	return;
+    ಆದರೆ ((isdir && !(flags & EW_DIR)) || (!isdir && !(flags & EW_FILE)))
+	ಹಿಂತಿರುಗಿ;
 
     // If the file isn't executable, may not add it.  Do accept directories.
     // When invoked from expand_shellcmd() do not use $PATH.
-    if (!isdir && (flags & EW_EXEC)
-			     && !mch_can_exe(f, NULL, !(flags & EW_SHELLCMD)))
-	return;
+    ಆದರೆ (!isdir && (flags & EW_EXEC)
+			     && !mch_can_exe(f, ಖಾಲಿ, !(flags & EW_SHELLCMD)))
+	ಹಿಂತಿರುಗಿ;
 
     // Make room for another item in the file list.
-    if (ga_grow(gap, 1) == FAIL)
-	return;
+    ಆದರೆ (ga_grow(gap, 1) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
     p = alloc(STRLEN(f) + 1 + isdir);
-    if (p == NULL)
-	return;
+    ಆದರೆ (p == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     STRCPY(p, f);
-#ifdef BACKSLASH_IN_FILENAME
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ BACKSLASH_ಒಳ_FILENAME
     slash_adjust(p);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     /*
      * Append a slash or backslash after directory names if none is present.
      */
-    if (isdir && (flags & EW_ADDSLASH))
-	add_pathsep(p);
-    ((char_u **)gap->ga_data)[gap->ga_len++] = p;
+    ಆದರೆ (isdir && (flags & EW_ADDSLASH))
+	ಕೂಡಿಸು_pathsep(p);
+    ((char_u **)gap->ga_ದತ್ತಾಂಶ)[gap->ga_len++] = p;
 }
 
 /*
  * Free the list of files returned by expand_wildcards() or other expansion
  * functions.
  */
-    void
-FreeWild(int count, char_u **files)
+    ಶೂನ್ಯ
+FreeWild(ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_2, char_u **files)
 {
-    if (count <= 0 || files == NULL)
-	return;
-    while (count--)
-	vim_free(files[count]);
+    ಆದರೆ (ಎಣಿಕೆ_2 <= 0 || files == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
+    ಆಗ (ಎಣಿಕೆ_2--)
+	vim_free(files[ಎಣಿಕೆ_2]);
     vim_free(files);
 }
 
@@ -4346,82 +4346,82 @@ FreeWild(int count, char_u **files)
  * If "maxlen" >= 0 compare "p[maxlen]" to "q[maxlen]"
  * Return value like strcmp(p, q), but consider path separators.
  */
-    int
-pathcmp(const char *p, const char *q, int maxlen)
+    ಪೂರ್ಣಾಂಕ
+pathcmp(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *p, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *q, ಪೂರ್ಣಾಂಕ maxlen)
 {
-    int		i, j;
-    int		c1, c2;
-    const char	*s = NULL;
+    ಪೂರ್ಣಾಂಕ		i, j;
+    ಪೂರ್ಣಾಂಕ		c1, c2;
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ	*s = ಖಾಲಿ;
 
-    for (i = 0, j = 0; maxlen < 0 || (i < maxlen && j < maxlen);)
+    ಗಾಗಿ (i = 0, j = 0; maxlen < 0 || (i < maxlen && j < maxlen);)
     {
 	c1 = PTR2CHAR((char_u *)p + i);
 	c2 = PTR2CHAR((char_u *)q + j);
 
 	// End of "p": check if "q" also ends or just has a slash.
-	if (c1 == NUL)
+	ಆದರೆ (c1 == NUL)
 	{
-	    if (c2 == NUL)  // full match
-		return 0;
+	    ಆದರೆ (c2 == NUL)  // full match
+		ಹಿಂತಿರುಗಿ 0;
 	    s = q;
 	    i = j;
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
 
 	// End of "q": check if "p" just has a slash.
-	if (c2 == NUL)
+	ಆದರೆ (c2 == NUL)
 	{
 	    s = p;
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
 
-	if ((p_fic ? MB_TOUPPER(c1) != MB_TOUPPER(c2) : c1 != c2)
-#ifdef BACKSLASH_IN_FILENAME
+	ಆದರೆ ((p_fic ? MB_TOUPPER(c1) != MB_TOUPPER(c2) : c1 != c2)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ BACKSLASH_ಒಳ_FILENAME
 		// consider '/' and '\\' to be equal
 		&& !((c1 == '/' && c2 == '\\')
 		    || (c1 == '\\' && c2 == '/'))
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		)
 	{
-	    if (vim_ispathsep(c1))
-		return -1;
-	    if (vim_ispathsep(c2))
-		return 1;
-	    return p_fic ? MB_TOUPPER(c1) - MB_TOUPPER(c2)
+	    ಆದರೆ (vim_ispathsep(c1))
+		ಹಿಂತಿರುಗಿ -1;
+	    ಆದರೆ (vim_ispathsep(c2))
+		ಹಿಂತಿರುಗಿ 1;
+	    ಹಿಂತಿರುಗಿ p_fic ? MB_TOUPPER(c1) - MB_TOUPPER(c2)
 		    : c1 - c2;  // no match
 	}
 
 	i += mb_ptr2len((char_u *)p + i);
 	j += mb_ptr2len((char_u *)q + j);
     }
-    if (s == NULL)	// "i" or "j" ran into "maxlen"
-	return 0;
+    ಆದರೆ (s == ಖಾಲಿ)	// "i" or "j" ran into "maxlen"
+	ಹಿಂತಿರುಗಿ 0;
 
     c1 = PTR2CHAR((char_u *)s + i);
     c2 = PTR2CHAR((char_u *)s + i + mb_ptr2len((char_u *)s + i));
     // ignore a trailing slash, but not "//" or ":/"
-    if (c2 == NUL
+    ಆದರೆ (c2 == NUL
 	    && i > 0
 	    && !after_pathsep((char_u *)s, (char_u *)s + i)
-#ifdef BACKSLASH_IN_FILENAME
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ BACKSLASH_ಒಳ_FILENAME
 	    && (c1 == '/' || c1 == '\\')
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 	    && c1 == '/'
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
        )
-	return 0;   // match with trailing slash
-    if (s == q)
-	return -1;	    // no match
-    return 1;
+	ಹಿಂತಿರುಗಿ 0;   // match with trailing slash
+    ಆದರೆ (s == q)
+	ಹಿಂತಿರುಗಿ -1;	    // no match
+    ಹಿಂತಿರುಗಿ 1;
 }
 
 /*
  * Return TRUE if "name" is a full (absolute) path name or URL.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 vim_isAbsName(char_u *name)
 {
-    return (path_with_url(name) != 0 || mch_isFullName(name));
+    ಹಿಂತಿರುಗಿ (ಮಾರ್ಗ_with_url(name) != 0 || mch_is_ತುಂಬಿದ_Name(name));
 }
 
 /*
@@ -4429,30 +4429,30 @@ vim_isAbsName(char_u *name)
  *
  * return FAIL for failure, OK otherwise
  */
-    int
-vim_FullName(
+    ಪೂರ್ಣಾಂಕ
+vim_ತುಂಬಿದ_Name(
     char_u	*fname,
     char_u	*buf,
-    int		len,
-    int		force)	    // force expansion even when already absolute
+    ಪೂರ್ಣಾಂಕ		len,
+    ಪೂರ್ಣಾಂಕ		force)	    // force expansion even when already absolute
 {
-    int		retval = OK;
-    int		url;
+    ಪೂರ್ಣಾಂಕ		retval = OK;
+    ಪೂರ್ಣಾಂಕ		url;
 
     *buf = NUL;
-    if (fname == NULL)
-	return FAIL;
+    ಆದರೆ (fname == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    url = path_with_url(fname);
-    if (!url)
-	retval = mch_FullName(fname, buf, len, force);
-    if (url || retval == FAIL)
+    url = ಮಾರ್ಗ_with_url(fname);
+    ಆದರೆ (!url)
+	retval = mch_ತುಂಬಿದ_Name(fname, buf, len, force);
+    ಆದರೆ (url || retval == FAIL)
     {
 	// something failed; use the file name (truncate when too long)
 	vim_strncpy(buf, fname, len - 1);
     }
-#if defined(MSWIN)
+#ಆದರೆ defined(MSWIN)
     slash_adjust(buf);
-#endif
-    return retval;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ retval;
 }

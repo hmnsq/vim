@@ -14,17 +14,17 @@
  * Also used by Cygwin, using os_unix.c.
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
 /*
  * Compile only the clipboard handling features when compiling for cygwin
  * posix environment.
  */
-#ifdef FEAT_CYGWIN_WIN32_CLIPBOARD
-# define WIN32_LEAN_AND_MEAN
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CYGWIN_WIN32_CLIPBOARD
+# define WIN32_LEAN_AND_ಸರಾಸರಿ
 # include <windows.h>
 # include "winclip.pro"
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Convert an UTF-8 string to UTF-16.
@@ -33,46 +33,46 @@
  * Otherwise "outstr" must be a buffer of sufficient size.
  * Returns the number of UTF-16 words produced.
  */
-    int
-utf8_to_utf16(char_u *instr, int inlen, short_u *outstr, int *unconvlenp)
+    ಪೂರ್ಣಾಂಕ
+utf8_ಗಮ್ಯ_utf16(char_u *instr, ಪೂರ್ಣಾಂಕ inlen, short_u *outstr, ಪೂರ್ಣಾಂಕ *unconvlenp)
 {
-    int		outlen = 0;
+    ಪೂರ್ಣಾಂಕ		outlen = 0;
     char_u	*p = instr;
-    int		todo = inlen;
-    int		l;
-    int		ch;
+    ಪೂರ್ಣಾಂಕ		todo = inlen;
+    ಪೂರ್ಣಾಂಕ		l;
+    ಪೂರ್ಣಾಂಕ		ch;
 
-    while (todo > 0)
+    ಆಗ (todo > 0)
     {
 	// Only convert if we have a complete sequence.
 	l = utf_ptr2len_len(p, todo);
-	if (l > todo)
+	ಆದರೆ (l > todo)
 	{
 	    // Return length of incomplete sequence.
-	    if (unconvlenp != NULL)
+	    ಆದರೆ (unconvlenp != ಖಾಲಿ)
 		*unconvlenp = todo;
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
 
 	ch = utf_ptr2char(p);
-	if (ch >= 0x10000)
+	ಆದರೆ (ch >= 0x10000)
 	{
 	    // non-BMP character, encoding with surrogate pairs
 	    ++outlen;
-	    if (outstr != NULL)
+	    ಆದರೆ (outstr != ಖಾಲಿ)
 	    {
 		*outstr++ = (0xD800 - (0x10000 >> 10)) + (ch >> 10);
 		*outstr++ = 0xDC00 | (ch & 0x3FF);
 	    }
 	}
-	else if (outstr != NULL)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (outstr != ಖಾಲಿ)
 	    *outstr++ = ch;
 	++outlen;
 	p += l;
 	todo -= l;
     }
 
-    return outlen;
+    ಹಿಂತಿರುಗಿ outlen;
 }
 
 /*
@@ -82,42 +82,42 @@ utf8_to_utf16(char_u *instr, int inlen, short_u *outstr, int *unconvlenp)
  * Otherwise "outstr" must be a buffer of sufficient size.
  * Return the number of bytes produced.
  */
-    int
-utf16_to_utf8(short_u *instr, int inlen, char_u *outstr)
+    ಪೂರ್ಣಾಂಕ
+utf16_ಗಮ್ಯ_utf8(short_u *instr, ಪೂರ್ಣಾಂಕ inlen, char_u *outstr)
 {
-    int		outlen = 0;
-    int		todo = inlen;
+    ಪೂರ್ಣಾಂಕ		outlen = 0;
+    ಪೂರ್ಣಾಂಕ		todo = inlen;
     short_u	*p = instr;
-    int		l;
-    int		ch, ch2;
+    ಪೂರ್ಣಾಂಕ		l;
+    ಪೂರ್ಣಾಂಕ		ch, ch2;
 
-    while (todo > 0)
+    ಆಗ (todo > 0)
     {
 	ch = *p;
-	if (ch >= 0xD800 && ch <= 0xDBFF && todo > 1)
+	ಆದರೆ (ch >= 0xD800 && ch <= 0xDBFF && todo > 1)
 	{
 	    // surrogate pairs handling
 	    ch2 = p[1];
-	    if (ch2 >= 0xDC00 && ch2 <= 0xDFFF)
+	    ಆದರೆ (ch2 >= 0xDC00 && ch2 <= 0xDFFF)
 	    {
 		ch = ((ch - 0xD800) << 10) + (ch2 & 0x3FF) + 0x10000;
 		++p;
 		--todo;
 	    }
 	}
-	if (outstr != NULL)
+	ಆದರೆ (outstr != ಖಾಲಿ)
 	{
 	    l = utf_char2bytes(ch, outstr);
 	    outstr += l;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    l = utf_char2len(ch);
 	++p;
 	outlen += l;
 	--todo;
     }
 
-    return outlen;
+    ಹಿಂತಿರುಗಿ outlen;
 }
 
 /*
@@ -125,48 +125,48 @@ utf16_to_utf8(short_u *instr, int inlen, char_u *outstr)
  * Returns the result in "*out[*outlen]" with an extra zero appended.
  * "outlen" is in words.
  */
-    void
-MultiByteToWideChar_alloc(UINT cp, DWORD flags,
-	LPCSTR in, int inlen,
-	LPWSTR *out, int *outlen)
+    ಶೂನ್ಯ
+Multi_Byte_ಗಮ್ಯ_Wide_Char_alloc(UINT cp, DWORD flags,
+	LPCSTR ಒಳ, ಪೂರ್ಣಾಂಕ inlen,
+	LPWSTR *ಹೊರಹೋಗು, ಪೂರ್ಣಾಂಕ *outlen)
 {
-    *outlen = MultiByteToWideChar(cp, flags, in, inlen, 0, 0);
+    *outlen = Multi_Byte_ಗಮ್ಯ_Wide_Char(cp, flags, ಒಳ, inlen, 0, 0);
     // Add one word to avoid a zero-length alloc().
-    *out = ALLOC_MULT(WCHAR, *outlen + 1);
-    if (*out == NULL)
-	return;
+    *ಹೊರಹೋಗು = ALLOC_MULT(WCHAR, *outlen + 1);
+    ಆದರೆ (*ಹೊರಹೋಗು == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    MultiByteToWideChar(cp, flags, in, inlen, *out, *outlen);
-    (*out)[*outlen] = 0;
+    Multi_Byte_ಗಮ್ಯ_Wide_Char(cp, flags, ಒಳ, inlen, *ಹೊರಹೋಗು, *outlen);
+    (*ಹೊರಹೋಗು)[*outlen] = 0;
 }
 
 /*
  * Call WideCharToMultiByte() and allocate memory for the result.
  * Returns the result in "*out[*outlen]" with an extra NUL appended.
  */
-    void
-WideCharToMultiByte_alloc(UINT cp, DWORD flags,
-	LPCWSTR in, int inlen,
-	LPSTR *out, int *outlen,
+    ಶೂನ್ಯ
+Wide_Char_ಗಮ್ಯ_Multi_Byte_alloc(UINT cp, DWORD flags,
+	LPCWSTR ಒಳ, ಪೂರ್ಣಾಂಕ inlen,
+	LPSTR *ಹೊರಹೋಗು, ಪೂರ್ಣಾಂಕ *outlen,
 	LPCSTR def, LPBOOL useddef)
 {
-    *outlen = WideCharToMultiByte(cp, flags, in, inlen, NULL, 0, def, useddef);
+    *outlen = Wide_Char_ಗಮ್ಯ_Multi_Byte(cp, flags, ಒಳ, inlen, ಖಾಲಿ, 0, def, useddef);
     // Add one byte to avoid a zero-length alloc().
-    *out = alloc(*outlen + 1);
-    if (*out == NULL)
-	return;
-    WideCharToMultiByte(cp, flags, in, inlen, *out, *outlen, def, useddef);
-    (*out)[*outlen] = 0;
+    *ಹೊರಹೋಗು = alloc(*outlen + 1);
+    ಆದರೆ (*ಹೊರಹೋಗು == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
+    Wide_Char_ಗಮ್ಯ_Multi_Byte(cp, flags, ಒಳ, inlen, *ಹೊರಹೋಗು, *outlen, def, useddef);
+    (*ಹೊರಹೋಗು)[*outlen] = 0;
 }
 
 
-#ifdef FEAT_CLIPBOARD
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CLIPBOARD
 /*
  * Clipboard stuff, for cutting and pasting text to other windows.
  */
 
-    void
-win_clip_init(void)
+    ಶೂನ್ಯ
+win_clip_init(ಶೂನ್ಯ)
 {
     clip_init(TRUE);
 
@@ -176,38 +176,38 @@ win_clip_init(void)
      * "Clipboard_T" was used for previous versions, using the first
      * character to specify MCHAR, MLINE or MBLOCK.
      */
-    clip_star.format = RegisterClipboardFormat("VimClipboard2");
-    clip_star.format_raw = RegisterClipboardFormat("VimRawBytes");
+    clip_ನಕ್ಷತ್ರ.format = ರಿಜಿಸ್ಟರ್_Clipboard_Format("VimClipboard2");
+    clip_ನಕ್ಷತ್ರ.format_raw = ರಿಜಿಸ್ಟರ್_Clipboard_Format("VimRawBytes");
 }
 
 // Type used for the clipboard type of Vim's data.
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    int type;		// MCHAR, MBLOCK or MLINE
-    int txtlen;		// length of CF_TEXT in bytes
-    int ucslen;		// length of CF_UNICODETEXT in words
-    int rawlen;		// length of clip_star.format_raw, including encoding,
+    ಪೂರ್ಣಾಂಕ type;		// MCHAR, MBLOCK or MLINE
+    ಪೂರ್ಣಾಂಕ txtlen;		// length of CF_TEXT in bytes
+    ಪೂರ್ಣಾಂಕ ucslen;		// length of CF_UNICODETEXT in words
+    ಪೂರ್ಣಾಂಕ rawlen;		// length of clip_star.format_raw, including encoding,
 			// excluding terminating NUL
 } VimClipType_t;
 
 /*
  * Make vim the owner of the current selection.  Return OK upon success.
  */
-    int
-clip_mch_own_selection(Clipboard_T *cbd UNUSED)
+    ಪೂರ್ಣಾಂಕ
+clip_mch_own_selection(Clipboard_T *cbd ಬಳಸದ)
 {
     /*
      * Never actually own the clipboard.  If another application sets the
      * clipboard, we don't want to think that we still own it.
      */
-    return FAIL;
+    ಹಿಂತಿರುಗಿ FAIL;
 }
 
 /*
  * Make vim NOT the owner of the current selection.
  */
-    void
-clip_mch_lose_selection(Clipboard_T *cbd UNUSED)
+    ಶೂನ್ಯ
+clip_mch_lose_selection(Clipboard_T *cbd ಬಳಸದ)
 {
     // Nothing needs to be done here
 }
@@ -217,50 +217,50 @@ clip_mch_lose_selection(Clipboard_T *cbd UNUSED)
  * Return the allocated result and the size in "*size".
  * Returns NULL when out of memory.
  */
-    static char_u *
-crnl_to_nl(const char_u *str, int *size)
+    ಸ್ಥಿರ char_u *
+crnl_ಗಮ್ಯ_nl(ಸ್ಥಿರಾಂಕ char_u *str, ಪೂರ್ಣಾಂಕ *ಗಾತ್ರ_2)
 {
-    int		pos = 0;
-    int		str_len = *size;
+    ಪೂರ್ಣಾಂಕ		pos = 0;
+    ಪೂರ್ಣಾಂಕ		str_len = *ಗಾತ್ರ_2;
     char_u	*ret;
     char_u	*retp;
 
     // Avoid allocating zero bytes, it generates an error message.
     ret = alloc(str_len == 0 ? 1 : str_len);
-    if (ret != NULL)
+    ಆದರೆ (ret != ಖಾಲಿ)
     {
 	retp = ret;
-	for (pos = 0; pos < str_len; ++pos)
+	ಗಾಗಿ (pos = 0; pos < str_len; ++pos)
 	{
-	    if (str[pos] == '\r' && str[pos + 1] == '\n')
+	    ಆದರೆ (str[pos] == '\r' && str[pos + 1] == '\n')
 	    {
 		++pos;
-		--(*size);
+		--(*ಗಾತ್ರ_2);
 	    }
 	    *retp++ = str[pos];
 	}
     }
 
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
 /*
  * Wait for another process to Close the Clipboard.
  * Returns TRUE for success.
  */
-    static int
-vim_open_clipboard(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+vim_open_clipboard(ಶೂನ್ಯ)
 {
-    int delay = 10;
+    ಪೂರ್ಣಾಂಕ delay = 10;
 
-    while (!OpenClipboard(NULL))
+    ಆಗ (!OpenClipboard(ಖಾಲಿ))
     {
-	if (delay > 500)
-	    return FALSE;  // waited too long, give up
+	ಆದರೆ (delay > 500)
+	    ಹಿಂತಿರುಗಿ FALSE;  // waited too long, give up
 	Sleep(delay);
 	delay *= 2;	// wait for 10, 20, 40, 80, etc. msec
     }
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
@@ -274,176 +274,176 @@ vim_open_clipboard(void)
  * so we can't just cast the return value of GetClipboardData to (char_u*).
  * <VN>
  */
-    void
+    ಶೂನ್ಯ
 clip_mch_request_selection(Clipboard_T *cbd)
 {
     VimClipType_t	metadata = { -1, -1, -1, -1 };
-    HGLOBAL		hMem = NULL;
-    char_u		*str = NULL;
-    char_u		*to_free = NULL;
-    HGLOBAL		rawh = NULL;
-    int			str_size = 0;
-    int			maxlen;
+    HGLOBAL		hMem = ಖಾಲಿ;
+    char_u		*str = ಖಾಲಿ;
+    char_u		*ಗಮ್ಯ_free = ಖಾಲಿ;
+    HGLOBAL		rawh = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ			str_ಗಾತ್ರ = 0;
+    ಪೂರ್ಣಾಂಕ			maxlen;
     size_t		n;
 
     /*
      * Don't pass GetActiveWindow() as an argument to OpenClipboard() because
      * then we can't paste back into the same window for some reason - webb.
      */
-    if (!vim_open_clipboard())
-	return;
+    ಆದರೆ (!vim_open_clipboard())
+	ಹಿಂತಿರುಗಿ;
 
     // Check for vim's own clipboard format first.  This only gets the type of
     // the data, still need to use CF_UNICODETEXT or CF_TEXT for the text.
-    if (IsClipboardFormatAvailable(cbd->format))
+    ಆದರೆ (Is_Clipboard_Format_ಲಭ್ಯ(cbd->format))
     {
 	VimClipType_t	*meta_p;
 	HGLOBAL		meta_h;
 
 	// We have metadata on the clipboard; try to get it.
-	if ((meta_h = GetClipboardData(cbd->format)) != NULL
-		&& (meta_p = (VimClipType_t *)GlobalLock(meta_h)) != NULL)
+	ಆದರೆ ((meta_h = Get_Clipboard_ದತ್ತಾಂಶ(cbd->format)) != ಖಾಲಿ
+		&& (meta_p = (VimClipType_t *)Global_ಬೀಗ(meta_h)) != ಖಾಲಿ)
 	{
 	    // The size of "VimClipType_t" changed, "rawlen" was added later.
 	    // Only copy what is available for backwards compatibility.
-	    n = sizeof(VimClipType_t);
-	    if (GlobalSize(meta_h) < n)
-		n = GlobalSize(meta_h);
-	    memcpy(&metadata, meta_p, n);
+	    n = ಗಾತ್ರ(VimClipType_t);
+	    ಆದರೆ (Global_ಗಾತ್ರ(meta_h) < n)
+		n = Global_ಗಾತ್ರ(meta_h);
+	    ಸ್ಮರಣೆ_ನಕಲು(&metadata, meta_p, n);
 	    GlobalUnlock(meta_h);
 	}
     }
 
     // Check for Vim's raw clipboard format first.  This is used without
     // conversion, but only if 'encoding' matches.
-    if (IsClipboardFormatAvailable(cbd->format_raw)
-				      && metadata.rawlen > (int)STRLEN(p_enc))
+    ಆದರೆ (Is_Clipboard_Format_ಲಭ್ಯ(cbd->format_raw)
+				      && metadata.rawlen > (ಪೂರ್ಣಾಂಕ)STRLEN(p_enc))
     {
 	// We have raw data on the clipboard; try to get it.
-	if ((rawh = GetClipboardData(cbd->format_raw)) != NULL)
+	ಆದರೆ ((rawh = Get_Clipboard_ದತ್ತಾಂಶ(cbd->format_raw)) != ಖಾಲಿ)
 	{
 	    char_u	*rawp;
 
-	    rawp = (char_u *)GlobalLock(rawh);
-	    if (rawp != NULL && STRCMP(p_enc, rawp) == 0)
+	    rawp = (char_u *)Global_ಬೀಗ(rawh);
+	    ಆದರೆ (rawp != ಖಾಲಿ && STRCMP(p_enc, rawp) == 0)
 	    {
 		n = STRLEN(p_enc) + 1;
 		str = rawp + n;
-		str_size = (int)(metadata.rawlen - n);
+		str_ಗಾತ್ರ = (ಪೂರ್ಣಾಂಕ)(metadata.rawlen - n);
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		GlobalUnlock(rawh);
-		rawh = NULL;
+		rawh = ಖಾಲಿ;
 	    }
 	}
     }
-    if (str == NULL)
+    ಆದರೆ (str == ಖಾಲಿ)
     {
 	// Try to get the clipboard in Unicode if it's not an empty string.
-	if (IsClipboardFormatAvailable(CF_UNICODETEXT) && metadata.ucslen != 0)
+	ಆದರೆ (Is_Clipboard_Format_ಲಭ್ಯ(CF_UNICODETEXT) && metadata.ucslen != 0)
 	{
 	    HGLOBAL hMemW;
 
-	    if ((hMemW = GetClipboardData(CF_UNICODETEXT)) != NULL)
+	    ಆದರೆ ((hMemW = Get_Clipboard_ದತ್ತಾಂಶ(CF_UNICODETEXT)) != ಖಾಲಿ)
 	    {
-		WCHAR *hMemWstr = (WCHAR *)GlobalLock(hMemW);
+		WCHAR *hMemWstr = (WCHAR *)Global_ಬೀಗ(hMemW);
 
 		// Use the length of our metadata if possible, but limit it to
 		// the GlobalSize() for safety.
-		maxlen = (int)(GlobalSize(hMemW) / sizeof(WCHAR));
-		if (metadata.ucslen >= 0)
+		maxlen = (ಪೂರ್ಣಾಂಕ)(Global_ಗಾತ್ರ(hMemW) / ಗಾತ್ರ(WCHAR));
+		ಆದರೆ (metadata.ucslen >= 0)
 		{
-		    if (metadata.ucslen > maxlen)
-			str_size = maxlen;
-		    else
-			str_size = metadata.ucslen;
+		    ಆದರೆ (metadata.ucslen > maxlen)
+			str_ಗಾತ್ರ = maxlen;
+		    ಇಲ್ಲದಿದ್ದರೆ
+			str_ಗಾತ್ರ = metadata.ucslen;
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    for (str_size = 0; str_size < maxlen; ++str_size)
-			if (hMemWstr[str_size] == NUL)
-			    break;
+		    ಗಾಗಿ (str_ಗಾತ್ರ = 0; str_ಗಾತ್ರ < maxlen; ++str_ಗಾತ್ರ)
+			ಆದರೆ (hMemWstr[str_ಗಾತ್ರ] == NUL)
+			    ನಿಲ್ಲಿಸು;
 		}
-		to_free = str = utf16_to_enc((short_u *)hMemWstr, &str_size);
+		ಗಮ್ಯ_free = str = utf16_ಗಮ್ಯ_enc((short_u *)hMemWstr, &str_ಗಾತ್ರ);
 		GlobalUnlock(hMemW);
 	    }
 	}
 	// Get the clipboard in the Active codepage.
-	else if (IsClipboardFormatAvailable(CF_TEXT))
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (Is_Clipboard_Format_ಲಭ್ಯ(CF_ಪಠ್ಯ))
 	{
-	    if ((hMem = GetClipboardData(CF_TEXT)) != NULL)
+	    ಆದರೆ ((hMem = Get_Clipboard_ದತ್ತಾಂಶ(CF_ಪಠ್ಯ)) != ಖಾಲಿ)
 	    {
-		str = (char_u *)GlobalLock(hMem);
+		str = (char_u *)Global_ಬೀಗ(hMem);
 
 		// The length is either what our metadata says or the strlen().
 		// But limit it to the GlobalSize() for safety.
-		maxlen = (int)GlobalSize(hMem);
-		if (metadata.txtlen >= 0)
+		maxlen = (ಪೂರ್ಣಾಂಕ)Global_ಗಾತ್ರ(hMem);
+		ಆದರೆ (metadata.txtlen >= 0)
 		{
-		    if (metadata.txtlen > maxlen)
-			str_size = maxlen;
-		    else
-			str_size = metadata.txtlen;
+		    ಆದರೆ (metadata.txtlen > maxlen)
+			str_ಗಾತ್ರ = maxlen;
+		    ಇಲ್ಲದಿದ್ದರೆ
+			str_ಗಾತ್ರ = metadata.txtlen;
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    for (str_size = 0; str_size < maxlen; ++str_size)
-			if (str[str_size] == NUL)
-			    break;
+		    ಗಾಗಿ (str_ಗಾತ್ರ = 0; str_ಗಾತ್ರ < maxlen; ++str_ಗಾತ್ರ)
+			ಆದರೆ (str[str_ಗಾತ್ರ] == NUL)
+			    ನಿಲ್ಲಿಸು;
 		}
 
 		// The text is in the active codepage.  Convert to
 		// 'encoding', going through UTF-16.
-		acp_to_enc(str, str_size, &to_free, &maxlen);
-		if (to_free != NULL)
+		acp_ಗಮ್ಯ_enc(str, str_ಗಾತ್ರ, &ಗಮ್ಯ_free, &maxlen);
+		ಆದರೆ (ಗಮ್ಯ_free != ಖಾಲಿ)
 		{
-		    str_size = maxlen;
-		    str = to_free;
+		    str_ಗಾತ್ರ = maxlen;
+		    str = ಗಮ್ಯ_free;
 		}
 	    }
 	}
     }
 
-    if (str != NULL && metadata.txtlen != 0)
+    ಆದರೆ (str != ಖಾಲಿ && metadata.txtlen != 0)
     {
-	char_u *temp_clipboard;
+	char_u *ತಾತ್ಕಾಲಿಕ_clipboard;
 
 	// If the type is not known detect it.
-	if (metadata.type == -1)
+	ಆದರೆ (metadata.type == -1)
 	    metadata.type = MAUTO;
 
 	// Translate <CR><NL> into <NL>.
-	temp_clipboard = crnl_to_nl(str, &str_size);
-	if (temp_clipboard != NULL)
+	ತಾತ್ಕಾಲಿಕ_clipboard = crnl_ಗಮ್ಯ_nl(str, &str_ಗಾತ್ರ);
+	ಆದರೆ (ತಾತ್ಕಾಲಿಕ_clipboard != ಖಾಲಿ)
 	{
-	    clip_yank_selection(metadata.type, temp_clipboard, str_size, cbd);
-	    vim_free(temp_clipboard);
+	    clip_yank_selection(metadata.type, ತಾತ್ಕಾಲಿಕ_clipboard, str_ಗಾತ್ರ, cbd);
+	    vim_free(ತಾತ್ಕಾಲಿಕ_clipboard);
 	}
     }
 
     // unlock the global object
-    if (hMem != NULL)
+    ಆದರೆ (hMem != ಖಾಲಿ)
 	GlobalUnlock(hMem);
-    if (rawh != NULL)
+    ಆದರೆ (rawh != ಖಾಲಿ)
 	GlobalUnlock(rawh);
     CloseClipboard();
-    vim_free(to_free);
+    vim_free(ಗಮ್ಯ_free);
 }
 
 /*
  * Send the current selection to the clipboard.
  */
-    void
-clip_mch_set_selection(Clipboard_T *cbd)
+    ಶೂನ್ಯ
+clip_mch_ಗಣ_selection(Clipboard_T *cbd)
 {
-    char_u		*str = NULL;
+    char_u		*str = ಖಾಲಿ;
     VimClipType_t	metadata;
     long_u		txtlen;
-    HGLOBAL		hMemRaw = NULL;
-    HGLOBAL		hMem = NULL;
-    HGLOBAL		hMemVim = NULL;
-    HGLOBAL		hMemW = NULL;
+    HGLOBAL		hMemRaw = ಖಾಲಿ;
+    HGLOBAL		hMem = ಖಾಲಿ;
+    HGLOBAL		hMemVim = ಖಾಲಿ;
+    HGLOBAL		hMemW = ಖಾಲಿ;
 
     // If the '*' register isn't already filled in, fill it in now
     cbd->owned = TRUE;
@@ -452,9 +452,9 @@ clip_mch_set_selection(Clipboard_T *cbd)
 
     // Get the text to be put on the clipboard, with CR-LF.
     metadata.type = clip_convert_selection(&str, &txtlen, cbd);
-    if (metadata.type < 0)
-	return;
-    metadata.txtlen = (int)txtlen;
+    ಆದರೆ (metadata.type < 0)
+	ಹಿಂತಿರುಗಿ;
+    metadata.txtlen = (ಪೂರ್ಣಾಂಕ)txtlen;
     metadata.ucslen = 0;
     metadata.rawlen = 0;
 
@@ -464,57 +464,57 @@ clip_mch_set_selection(Clipboard_T *cbd)
     {
 	LPSTR lpszMemRaw;
 
-	metadata.rawlen = (int)(txtlen + STRLEN(p_enc) + 1);
+	metadata.rawlen = (ಪೂರ್ಣಾಂಕ)(txtlen + STRLEN(p_enc) + 1);
 	hMemRaw = (LPSTR)GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE,
 							 metadata.rawlen + 1);
-	lpszMemRaw = (LPSTR)GlobalLock(hMemRaw);
-	if (lpszMemRaw != NULL)
+	lpszMemRaw = (LPSTR)Global_ಬೀಗ(hMemRaw);
+	ಆದರೆ (lpszMemRaw != ಖಾಲಿ)
 	{
 	    STRCPY(lpszMemRaw, p_enc);
-	    memcpy(lpszMemRaw + STRLEN(p_enc) + 1, str, txtlen + 1);
+	    ಸ್ಮರಣೆ_ನಕಲು(lpszMemRaw + STRLEN(p_enc) + 1, str, txtlen + 1);
 	    GlobalUnlock(hMemRaw);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    metadata.rawlen = 0;
     }
 
     {
-	WCHAR		*out;
-	int		len = metadata.txtlen;
+	WCHAR		*ಹೊರಹೋಗು;
+	ಪೂರ್ಣಾಂಕ		len = metadata.txtlen;
 
 	// Convert the text to UTF-16. This is put on the clipboard as
 	// CF_UNICODETEXT.
-	out = (WCHAR *)enc_to_utf16(str, &len);
-	if (out != NULL)
+	ಹೊರಹೋಗು = (WCHAR *)enc_ಗಮ್ಯ_utf16(str, &len);
+	ಆದರೆ (ಹೊರಹೋಗು != ಖಾಲಿ)
 	{
 	    WCHAR *lpszMemW;
 
 	    // Convert the text for CF_TEXT to Active codepage. Otherwise it's
 	    // p_enc, which has no relation to the Active codepage.
-	    metadata.txtlen = WideCharToMultiByte(GetACP(), 0, out, len,
-							       NULL, 0, 0, 0);
+	    metadata.txtlen = Wide_Char_ಗಮ್ಯ_Multi_Byte(GetACP(), 0, ಹೊರಹೋಗು, len,
+							       ಖಾಲಿ, 0, 0, 0);
 	    vim_free(str);
 	    str = alloc(metadata.txtlen == 0 ? 1 : metadata.txtlen);
-	    if (str == NULL)
+	    ಆದರೆ (str == ಖಾಲಿ)
 	    {
-		vim_free(out);
-		return;		// out of memory
+		vim_free(ಹೊರಹೋಗು);
+		ಹಿಂತಿರುಗಿ;		// out of memory
 	    }
-	    WideCharToMultiByte(GetACP(), 0, out, len,
+	    Wide_Char_ಗಮ್ಯ_Multi_Byte(GetACP(), 0, ಹೊರಹೋಗು, len,
 					   (LPSTR)str, metadata.txtlen, 0, 0);
 
 	    // Allocate memory for the UTF-16 text, add one NUL word to
 	    // terminate the string.
 	    hMemW = (LPSTR)GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE,
-						   (len + 1) * sizeof(WCHAR));
-	    lpszMemW = (WCHAR *)GlobalLock(hMemW);
-	    if (lpszMemW != NULL)
+						   (len + 1) * ಗಾತ್ರ(WCHAR));
+	    lpszMemW = (WCHAR *)Global_ಬೀಗ(hMemW);
+	    ಆದರೆ (lpszMemW != ಖಾಲಿ)
 	    {
-		memcpy(lpszMemW, out, len * sizeof(WCHAR));
+		ಸ್ಮರಣೆ_ನಕಲು(lpszMemW, ಹೊರಹೋಗು, len * ಗಾತ್ರ(WCHAR));
 		lpszMemW[len] = NUL;
 		GlobalUnlock(hMemW);
 	    }
-	    vim_free(out);
+	    vim_free(ಹೊರಹೋಗು);
 	    metadata.ucslen = len;
 	}
     }
@@ -522,9 +522,9 @@ clip_mch_set_selection(Clipboard_T *cbd)
     // Allocate memory for the text, add one NUL byte to terminate the string.
     hMem = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, metadata.txtlen + 1);
     {
-	LPSTR lpszMem = (LPSTR)GlobalLock(hMem);
+	LPSTR lpszMem = (LPSTR)Global_ಬೀಗ(hMem);
 
-	if (lpszMem)
+	ಆದರೆ (lpszMem)
 	{
 	    mch_memmove((char_u *)lpszMem, str, metadata.txtlen);
 	    GlobalUnlock(hMem);
@@ -533,12 +533,12 @@ clip_mch_set_selection(Clipboard_T *cbd)
 
     // Set up metadata:
     {
-	VimClipType_t *lpszMemVim = NULL;
+	VimClipType_t *lpszMemVim = ಖಾಲಿ;
 
 	hMemVim = GlobalAlloc(GMEM_MOVEABLE|GMEM_DDESHARE,
-						       sizeof(VimClipType_t));
-	lpszMemVim = (VimClipType_t *)GlobalLock(hMemVim);
-	memcpy(lpszMemVim, &metadata, sizeof(metadata));
+						       ಗಾತ್ರ(VimClipType_t));
+	lpszMemVim = (VimClipType_t *)Global_ಬೀಗ(hMemVim);
+	ಸ್ಮರಣೆ_ನಕಲು(lpszMemVim, &metadata, ಗಾತ್ರ(metadata));
 	GlobalUnlock(hMemVim);
     }
 
@@ -550,20 +550,20 @@ clip_mch_set_selection(Clipboard_T *cbd)
      * because then we can't paste back into the same window for some
      * reason - webb.
      */
-    if (vim_open_clipboard())
+    ಆದರೆ (vim_open_clipboard())
     {
-	if (EmptyClipboard())
+	ಆದರೆ (ಖಾಲಿಗಳು_Clipboard())
 	{
-	    SetClipboardData(cbd->format, hMemVim);
+	    ಗಣ_Clipboard_ದತ್ತಾಂಶ(cbd->format, hMemVim);
 	    hMemVim = 0;
-	    if (hMemW != NULL)
+	    ಆದರೆ (hMemW != ಖಾಲಿ)
 	    {
-		if (SetClipboardData(CF_UNICODETEXT, hMemW) != NULL)
-		    hMemW = NULL;
+		ಆದರೆ (ಗಣ_Clipboard_ದತ್ತಾಂಶ(CF_UNICODETEXT, hMemW) != ಖಾಲಿ)
+		    hMemW = ಖಾಲಿ;
 	    }
 	    // Always use CF_TEXT.  On Win98 Notepad won't obtain the
 	    // CF_UNICODETEXT text, only CF_TEXT.
-	    SetClipboardData(CF_TEXT, hMem);
+	    ಗಣ_Clipboard_ದತ್ತಾಂಶ(CF_ಪಠ್ಯ, hMem);
 	    hMem = 0;
 	}
 	CloseClipboard();
@@ -571,17 +571,17 @@ clip_mch_set_selection(Clipboard_T *cbd)
 
     vim_free(str);
     // Free any allocations we didn't give to the clipboard:
-    if (hMemRaw)
+    ಆದರೆ (hMemRaw)
 	GlobalFree(hMemRaw);
-    if (hMem)
+    ಆದರೆ (hMem)
 	GlobalFree(hMem);
-    if (hMemW)
+    ಆದರೆ (hMemW)
 	GlobalFree(hMemW);
-    if (hMemVim)
+    ಆದರೆ (hMemVim)
 	GlobalFree(hMemVim);
 }
 
-#endif // FEAT_CLIPBOARD
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_CLIPBOARD
 
 /*
  * Note: the following two functions are only guaranteed to work when using
@@ -596,57 +596,57 @@ clip_mch_set_selection(Clipboard_T *cbd)
  * Returns NULL when out of memory.
  */
     short_u *
-enc_to_utf16(char_u *str, int *lenp)
+enc_ಗಮ್ಯ_utf16(char_u *str, ಪೂರ್ಣಾಂಕ *lenp)
 {
     vimconv_T	conv;
     WCHAR	*ret;
-    char_u	*allocbuf = NULL;
-    int		len_loc;
-    int		length;
+    char_u	*allocbuf = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		len_loc;
+    ಪೂರ್ಣಾಂಕ		ಉದ್ದಳತೆ;
 
-    if (lenp == NULL)
+    ಆದರೆ (lenp == ಖಾಲಿ)
     {
-	len_loc = (int)STRLEN(str) + 1;
+	len_loc = (ಪೂರ್ಣಾಂಕ)STRLEN(str) + 1;
 	lenp = &len_loc;
     }
 
-    if (enc_codepage > 0)
+    ಆದರೆ (enc_codepage > 0)
     {
 	// We can do any CP### -> UTF-16 in one pass, and we can do it
 	// without iconv() (convert_* may need iconv).
-	MultiByteToWideChar_alloc(enc_codepage, 0, (LPCSTR)str, *lenp,
-							       &ret, &length);
+	Multi_Byte_ಗಮ್ಯ_Wide_Char_alloc(enc_codepage, 0, (LPCSTR)str, *lenp,
+							       &ret, &ಉದ್ದಳತೆ);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Use "latin1" by default, we might be called before we have p_enc
 	// set up.  Convert to utf-8 first, works better with iconv().  Does
 	// nothing if 'encoding' is "utf-8".
 	conv.vc_type = CONV_NONE;
-	if (convert_setup(&conv, p_enc ? p_enc : (char_u *)"latin1",
+	ಆದರೆ (convert_ಸಿದ್ಧತೆ(&conv, p_enc ? p_enc : (char_u *)"latin1",
 						   (char_u *)"utf-8") == FAIL)
-	    return NULL;
-	if (conv.vc_type != CONV_NONE)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+	ಆದರೆ (conv.vc_type != CONV_NONE)
 	{
 	    str = allocbuf = string_convert(&conv, str, lenp);
-	    if (str == NULL)
-		return NULL;
+	    ಆದರೆ (str == ಖಾಲಿ)
+		ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
-	convert_setup(&conv, NULL, NULL);
+	convert_ಸಿದ್ಧತೆ(&conv, ಖಾಲಿ, ಖಾಲಿ);
 
-	length = utf8_to_utf16(str, *lenp, NULL, NULL);
-	ret = ALLOC_MULT(WCHAR, length + 1);
-	if (ret != NULL)
+	ಉದ್ದಳತೆ = utf8_ಗಮ್ಯ_utf16(str, *lenp, ಖಾಲಿ, ಖಾಲಿ);
+	ret = ALLOC_MULT(WCHAR, ಉದ್ದಳತೆ + 1);
+	ಆದರೆ (ret != ಖಾಲಿ)
 	{
-	    utf8_to_utf16(str, *lenp, (short_u *)ret, NULL);
-	    ret[length] = 0;
+	    utf8_ಗಮ್ಯ_utf16(str, *lenp, (short_u *)ret, ಖಾಲಿ);
+	    ret[ಉದ್ದಳತೆ] = 0;
 	}
 
 	vim_free(allocbuf);
     }
 
-    *lenp = length;
-    return (short_u *)ret;
+    *lenp = ಉದ್ದಳತೆ;
+    ಹಿಂತಿರುಗಿ (short_u *)ret;
 }
 
 /*
@@ -658,54 +658,54 @@ enc_to_utf16(char_u *str, int *lenp)
  * Returns NULL when out of memory.
  */
     char_u *
-utf16_to_enc(short_u *str, int *lenp)
+utf16_ಗಮ್ಯ_enc(short_u *str, ಪೂರ್ಣಾಂಕ *lenp)
 {
     vimconv_T	conv;
-    char_u	*utf8_str = NULL, *enc_str = NULL;
-    int		len_loc;
+    char_u	*utf8_str = ಖಾಲಿ, *enc_str = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		len_loc;
 
-    if (lenp == NULL)
+    ಆದರೆ (lenp == ಖಾಲಿ)
     {
-	len_loc = (int)wcslen(str) + 1;
+	len_loc = (ಪೂರ್ಣಾಂಕ)wcslen(str) + 1;
 	lenp = &len_loc;
     }
 
-    if (enc_codepage > 0)
+    ಆದರೆ (enc_codepage > 0)
     {
 	// We can do any UTF-16 -> CP### in one pass.
-	int length;
+	ಪೂರ್ಣಾಂಕ ಉದ್ದಳತೆ;
 
-	WideCharToMultiByte_alloc(enc_codepage, 0, str, *lenp,
-					    (LPSTR *)&enc_str, &length, 0, 0);
-	*lenp = length;
-	return enc_str;
+	Wide_Char_ಗಮ್ಯ_Multi_Byte_alloc(enc_codepage, 0, str, *lenp,
+					    (LPSTR *)&enc_str, &ಉದ್ದಳತೆ, 0, 0);
+	*lenp = ಉದ್ದಳತೆ;
+	ಹಿಂತಿರುಗಿ enc_str;
     }
 
     // Avoid allocating zero bytes, it generates an error message.
-    utf8_str = alloc(utf16_to_utf8(str, *lenp == 0 ? 1 : *lenp, NULL));
-    if (utf8_str != NULL)
+    utf8_str = alloc(utf16_ಗಮ್ಯ_utf8(str, *lenp == 0 ? 1 : *lenp, ಖಾಲಿ));
+    ಆದರೆ (utf8_str != ಖಾಲಿ)
     {
-	*lenp = utf16_to_utf8(str, *lenp, utf8_str);
+	*lenp = utf16_ಗಮ್ಯ_utf8(str, *lenp, utf8_str);
 
 	// We might be called before we have p_enc set up.
 	conv.vc_type = CONV_NONE;
-	convert_setup(&conv, (char_u *)"utf-8",
+	convert_ಸಿದ್ಧತೆ(&conv, (char_u *)"utf-8",
 					    p_enc? p_enc: (char_u *)"latin1");
-	if (conv.vc_type == CONV_NONE)
+	ಆದರೆ (conv.vc_type == CONV_NONE)
 	{
 	    // p_enc is utf-8, so we're done.
 	    enc_str = utf8_str;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    enc_str = string_convert(&conv, utf8_str, lenp);
 	    vim_free(utf8_str);
 	}
 
-	convert_setup(&conv, NULL, NULL);
+	convert_ಸಿದ್ಧತೆ(&conv, ಖಾಲಿ, ಖಾಲಿ);
     }
 
-    return enc_str;
+    ಹಿಂತಿರುಗಿ enc_str;
 }
 
 /*
@@ -714,22 +714,22 @@ utf16_to_enc(short_u *str, int *lenp)
  * The result is in allocated memory: "out[outlen]".  "outlen" includes the
  * terminating NUL.
  */
-    void
-acp_to_enc(
+    ಶೂನ್ಯ
+acp_ಗಮ್ಯ_enc(
     char_u	*str,
-    int		str_size,
-    char_u	**out,
-    int		*outlen)
+    ಪೂರ್ಣಾಂಕ		str_ಗಾತ್ರ,
+    char_u	**ಹೊರಹೋಗು,
+    ಪೂರ್ಣಾಂಕ		*outlen)
 
 {
     LPWSTR	widestr;
 
-    MultiByteToWideChar_alloc(GetACP(), 0, (LPCSTR)str, str_size,
+    Multi_Byte_ಗಮ್ಯ_Wide_Char_alloc(GetACP(), 0, (LPCSTR)str, str_ಗಾತ್ರ,
 							    &widestr, outlen);
-    if (widestr == NULL)
-	return;
+    ಆದರೆ (widestr == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
     ++*outlen;	// Include the 0 after the string
-    *out = utf16_to_enc((short_u *)widestr, outlen);
+    *ಹೊರಹೋಗು = utf16_ಗಮ್ಯ_enc((short_u *)widestr, outlen);
     vim_free(widestr);
 }
 
@@ -738,21 +738,21 @@ acp_to_enc(
  * Input is "str[str_size]".
  * The result is in allocated memory: "out[outlen]".  With terminating NUL.
  */
-    void
-enc_to_acp(
+    ಶೂನ್ಯ
+enc_ಗಮ್ಯ_acp(
     char_u	*str,
-    int		str_size,
-    char_u	**out,
-    int		*outlen)
+    ಪೂರ್ಣಾಂಕ		str_ಗಾತ್ರ,
+    char_u	**ಹೊರಹೋಗು,
+    ಪೂರ್ಣಾಂಕ		*outlen)
 
 {
     LPWSTR	widestr;
-    int		len = str_size;
+    ಪೂರ್ಣಾಂಕ		len = str_ಗಾತ್ರ;
 
-    widestr = (WCHAR *)enc_to_utf16(str, &len);
-    if (widestr == NULL)
-	return;
-    WideCharToMultiByte_alloc(GetACP(), 0, widestr, len,
-	    (LPSTR *)out, outlen, 0, 0);
+    widestr = (WCHAR *)enc_ಗಮ್ಯ_utf16(str, &len);
+    ಆದರೆ (widestr == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
+    Wide_Char_ಗಮ್ಯ_Multi_Byte_alloc(GetACP(), 0, widestr, len,
+	    (LPSTR *)ಹೊರಹೋಗು, outlen, 0, 0);
     vim_free(widestr);
 }

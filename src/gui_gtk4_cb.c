@@ -7,13 +7,13 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
-#include <gtk/gtk.h>
-#include "gui_gtk4_cb.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
+#ಅನ್ತರ್ಭಾವ <gtk/gtk.h>
+#ಅನ್ತರ್ಭಾವ "gui_gtk4_cb.h"
 
-struct _VimContentProvider
+ರಚನೆ _VimContentProvider
 {
-    GdkContentProvider parent;
+    GdkContentProvider ಪೋಷಕ;
 
     // Clipboard this content provider is associated with.
     Clipboard_T *cbd;
@@ -28,171 +28,171 @@ struct _VimContentProvider
 // and
 // https://discourse.gnome.org/t/gtk4-clipboard-does-not-provide-contents-using-custom-mime-type-without-character/6858
 // To get around this, add a new VIM*_MIMETYPE_NAME conforming mime type.
-const char *supported_mimes[] = {
+ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *supported_mimes[] = {
     VIMENC_MIMETYPE_NAME,
     VIM_MIMETYPE_NAME,
     "text/html",
     "text/plain;charset=utf-8",
     "text/plain",
-    NULL // gdk_clipboard_read_async expects array to be NULL terminated.
+    ಖಾಲಿ // gdk_clipboard_read_async expects array to be NULL terminated.
 };
-#define SUPPORTED_MIMES_LEN (ARRAY_LENGTH(supported_mimes) - 1)
+#ವ್ಯಾಖ್ಯಾನಿಸು SUPPORTED_MIMES_LEN (ARRAY_ಉದ್ದಳತೆ(supported_mimes) - 1)
 
 G_DEFINE_TYPE(VimContentProvider, vim_content_provider, GDK_TYPE_CONTENT_PROVIDER)
 
-static GdkContentFormats *vim_content_provider_ref_formats(GdkContentProvider *cp);
-static void vim_content_provider_write_mime_type_async(GdkContentProvider *cp, const char *mime_type, GOutputStream *stream, int io_priority, GCancellable *cancellable, GAsyncReadyCallback callback, gpointer user_data);
-static gboolean vim_content_provider_write_mime_type_finish(GdkContentProvider *cp, GAsyncResult *result, GError **error);
+ಸ್ಥಿರ GdkContentFormats *vim_content_provider_ref_formats(GdkContentProvider *cp);
+ಸ್ಥಿರ ಶೂನ್ಯ vim_content_provider_write_mime_type_async(GdkContentProvider *cp, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *mime_type, GOutput_ಹರಿವು *ಹರಿವು, ಪೂರ್ಣಾಂಕ io_ಆದ್ಯತೆ, GCancellable *cancellable, GAsyncReadyCallback callback, gpointer user_ದತ್ತಾಂಶ);
+ಸ್ಥಿರ gboolean vim_content_provider_write_mime_type_ಮುಕ್ತಾಯ(GdkContentProvider *cp, GAsync_ಫಲಿತಾಂಶ *ಫಲಿತಾಂಶ, GError **error);
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 vim_content_provider_class_init(VimContentProviderClass *class)
 {
     GdkContentProviderClass *cp_class = GDK_CONTENT_PROVIDER_CLASS(class);
 
     cp_class->ref_formats = vim_content_provider_ref_formats;
     cp_class->write_mime_type_async = vim_content_provider_write_mime_type_async;
-    cp_class->write_mime_type_finish = vim_content_provider_write_mime_type_finish;
+    cp_class->write_mime_type_ಮುಕ್ತಾಯ = vim_content_provider_write_mime_type_ಮುಕ್ತಾಯ;
 }
 
-    static void
-vim_content_provider_init(VimContentProvider *self UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+vim_content_provider_init(VimContentProvider *self ಬಳಸದ)
 {
 }
 
     GdkContentProvider *
 vim_content_provider_new(Clipboard_T *cbd)
 {
-    VimContentProvider *vcp = g_object_new(VIM_TYPE_CONTENT_PROVIDER, NULL);
+    VimContentProvider *vcp = g_object_new(VIM_TYPE_CONTENT_PROVIDER, ಖಾಲಿ);
 
     vcp->cbd = cbd;
 
-    return GDK_CONTENT_PROVIDER(vcp);
+    ಹಿಂತಿರುಗಿ GDK_CONTENT_PROVIDER(vcp);
 }
 
-    static GdkContentFormats *
-vim_content_provider_ref_formats(GdkContentProvider *cp UNUSED)
+    ಸ್ಥಿರ GdkContentFormats *
+vim_content_provider_ref_formats(GdkContentProvider *cp ಬಳಸದ)
 {
     // We support text formats + our own Vim specific mime types. Also expose
     // html if user specified 'html' in 'clipboard' option.
     GdkContentFormatsBuilder *builder = gdk_content_formats_builder_new();
 
-    for (size_t i = 0; i < SUPPORTED_MIMES_LEN; i++)
+    ಗಾಗಿ (size_t i = 0; i < SUPPORTED_MIMES_LEN; i++)
     {
-	if (STRCMP(supported_mimes[i], "text/html") == 0 && !clip_html)
-	    continue;
-	gdk_content_formats_builder_add_mime_type(builder, supported_mimes[i]);
+	ಆದರೆ (STRCMP(supported_mimes[i], "text/html") == 0 && !clip_html)
+	    ಮುಂದುವರಿ;
+	gdk_content_formats_builder_ಕೂಡಿಸು_mime_type(builder, supported_mimes[i]);
     }
-    return gdk_content_formats_builder_free_to_formats(builder);
+    ಹಿಂತಿರುಗಿ gdk_content_formats_builder_free_ಗಮ್ಯ_formats(builder);
 }
 
-static void
-vim_content_provider_write_mime_type_done (
-	GObject		*stream,
-	GAsyncResult	*result,
+ಸ್ಥಿರ ಶೂನ್ಯ
+vim_content_provider_write_mime_type_ಮುಗಿದ (
+	GObject		*ಹರಿವು,
+	GAsync_ಫಲಿತಾಂಶ	*ಫಲಿತಾಂಶ,
 	GTask		*task)
 {
-    GError *error = NULL;
+    GError *error = ಖಾಲಿ;
 
-    if (!g_output_stream_write_all_finish (G_OUTPUT_STREAM (stream),
-		result, NULL, &error))
+    ಆದರೆ (!g_output_ಹರಿವು_write_all_ಮುಕ್ತಾಯ (G_OUTPUT_ಹರಿವು (ಹರಿವು),
+		ಫಲಿತಾಂಶ, ಖಾಲಿ, &error))
 	g_task_return_error (task, error);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	g_task_return_boolean (task, TRUE);
     g_object_unref (task);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 vim_content_provider_write_mime_type_async(
 	GdkContentProvider  *cp,
-	const char	    *mime_type,
-	GOutputStream	    *stream,
-	int		    io_priority,
+	ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ	    *mime_type,
+	GOutput_ಹರಿವು	    *ಹರಿವು,
+	ಪೂರ್ಣಾಂಕ		    io_ಆದ್ಯತೆ,
 	GCancellable	    *cancellable,
 	GAsyncReadyCallback callback,
-	void		    *udata)
+	ಶೂನ್ಯ		    *udata)
 {
     VimContentProvider	*self = VIM_CONTENT_PROVIDER(cp);
     Clipboard_T		*cbd = self->cbd;
-    int			motion_type;
-    long_u		length;
+    ಪೂರ್ಣಾಂಕ			motion_type;
+    long_u		ಉದ್ದಳತೆ;
     char_u		*string;
-    int			offset = 0;
+    ಪೂರ್ಣಾಂಕ			ಸ್ಥಾನಾಂತರ = 0;
     bool		is_vim, is_vimenc;
     GTask		*task;
     gboolean		have_mime = FALSE;
 
     task = g_task_new (self, cancellable, callback, udata);
-    g_task_set_priority (task, io_priority);
-    g_task_set_source_tag (task, vim_content_provider_write_mime_type_async);
+    g_task_ಗಣ_ಆದ್ಯತೆ (task, io_ಆದ್ಯತೆ);
+    g_task_ಗಣ_ಮೂಲ_ಟ್ಯಾಗ್ (task, vim_content_provider_write_mime_type_async);
 
-    if (STRCMP(mime_type, "text/html") == 0 && !clip_html)
+    ಆದರೆ (STRCMP(mime_type, "text/html") == 0 && !clip_html)
     {
 	g_task_return_new_error(
 		task, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
 		"HTML not supported");
 	g_object_unref(task);
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
     // Check if we actually support the mime type
-    for (int i = 0; i < (int)SUPPORTED_MIMES_LEN; i++)
-	if (STRCMP(supported_mimes[i], mime_type) == 0)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < (ಪೂರ್ಣಾಂಕ)SUPPORTED_MIMES_LEN; i++)
+	ಆದರೆ (STRCMP(supported_mimes[i], mime_type) == 0)
 	{
 	    have_mime = TRUE;
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
 
-    if (!have_mime)
+    ಆದರೆ (!have_mime)
     {
 	g_task_return_new_error(
 		task, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
 		"Cannot provide contents as '%s'", mime_type);
 	g_object_unref(task);
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
     // Add the required stuff for our own specific formats.
     is_vimenc = STRCMP(mime_type, VIMENC_MIMETYPE_NAME) == 0;
     is_vim = STRCMP(mime_type, VIM_MIMETYPE_NAME) == 0;
 
-    if (is_vimenc)
-	offset += 2 + STRLEN(p_enc);
-    else if (is_vim)
-	offset += 1;
+    ಆದರೆ (is_vimenc)
+	ಸ್ಥಾನಾಂತರ += 2 + STRLEN(p_enc);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (is_vim)
+	ಸ್ಥಾನಾಂತರ += 1;
 
     clip_get_selection(cbd);
-    motion_type = clip_convert_selection_offset(&string, &length, offset, cbd);
+    motion_type = clip_convert_selection_ಸ್ಥಾನಾಂತರ(&string, &ಉದ್ದಳತೆ, ಸ್ಥಾನಾಂತರ, cbd);
 
-    if (motion_type < 0)
+    ಆದರೆ (motion_type < 0)
     {
 	g_task_return_new_error(
 		task, G_IO_ERROR, G_IO_ERROR_FAILED, "Error converting data");
 	g_object_unref(task);
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if (is_vimenc)
+    ಆದರೆ (is_vimenc)
     {
 	string[0] = (char_u)motion_type;
 	// Use vim_strncpy for safer copying
 	vim_strncpy(string + 1, p_enc, STRLEN(p_enc));
     }
-    else if (is_vim)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (is_vim)
 	string[0] = (char_u)motion_type;
 
     // "string" is allocated using vim's allocation functions
-    g_task_set_task_data(task, string, vim_free);
+    g_task_ಗಣ_task_ದತ್ತಾಂಶ(task, string, vim_free);
 
-    g_output_stream_write_all_async(
-	    stream, string, length, io_priority, cancellable,
-	    (GAsyncReadyCallback)vim_content_provider_write_mime_type_done, task);
+    g_output_ಹರಿವು_write_all_async(
+	    ಹರಿವು, string, ಉದ್ದಳತೆ, io_ಆದ್ಯತೆ, cancellable,
+	    (GAsyncReadyCallback)vim_content_provider_write_mime_type_ಮುಗಿದ, task);
 }
 
-    static gboolean
-vim_content_provider_write_mime_type_finish(
-	GdkContentProvider  *cp UNUSED,
-	GAsyncResult	    *result,
+    ಸ್ಥಿರ gboolean
+vim_content_provider_write_mime_type_ಮುಕ್ತಾಯ(
+	GdkContentProvider  *cp ಬಳಸದ,
+	GAsync_ಫಲಿತಾಂಶ	    *ಫಲಿತಾಂಶ,
 	GError		    **error)
 {
-  return g_task_propagate_boolean (G_TASK (result), error);
+  ಹಿಂತಿರುಗಿ g_task_propagate_boolean (G_TASK (ಫಲಿತಾಂಶ), error);
 }

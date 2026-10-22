@@ -11,11 +11,11 @@
  * session.c: session related functions
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-#if defined(FEAT_SESSION)
+#ಆದರೆ defined(FEAT_SESSION)
 
-static int did_lcd;	// whether ":lcd" was produced for a session
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ did_lcd;	// whether ":lcd" was produced for a session
 
 /*
  * Write a file name to the session file.
@@ -23,37 +23,37 @@ static int did_lcd;	// whether ":lcd" was produced for a session
  * characters.
  * Returns FAIL if writing fails or out of memory.
  */
-    static int
-ses_put_fname(FILE *fd, char_u *name, unsigned *flagp)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ses_put_fname(FILE *fd, char_u *name, ಚಿಹ್ನೆರಹಿತ *flagp)
 {
     char_u	*sname;
     char_u	*p;
-    int		retval = OK;
+    ಪೂರ್ಣಾಂಕ		retval = OK;
 
-    sname = home_replace_save(NULL, name);
-    if (sname == NULL)
-	return FAIL;
+    sname = home_replace_save(ಖಾಲಿ, name);
+    ಆದರೆ (sname == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    if (*flagp & SSOP_SLASH)
+    ಆದರೆ (*flagp & SSOP_SLASH)
     {
 	// change all backslashes to forward slashes
-	for (p = sname; *p != NUL; MB_PTR_ADV(p))
-	    if (*p == '\\')
+	ಗಾಗಿ (p = sname; *p != NUL; MB_PTR_ADV(p))
+	    ಆದರೆ (*p == '\\')
 		*p = '/';
     }
 
     // escape special characters
     p = vim_strsave_fnameescape(sname, VSE_NONE);
     vim_free(sname);
-    if (p == NULL)
-	return FAIL;
+    ಆದರೆ (p == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
     // write the result
-    if (fputs((char *)p, fd) < 0)
+    ಆದರೆ (fputs((ಅಕ್ಷರ *)p, fd) < 0)
 	retval = FAIL;
 
     vim_free(p);
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
 /*
@@ -61,8 +61,8 @@ ses_put_fname(FILE *fd, char_u *name, unsigned *flagp)
  * Also ends the line, if "add_eol" is TRUE.
  * Returns FAIL if writing fails.
  */
-    static int
-ses_fname(FILE *fd, buf_T *buf, unsigned *flagp, int add_eol)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ses_fname(FILE *fd, buf_T *buf, ಚಿಹ್ನೆರಹಿತ *flagp, ಪೂರ್ಣಾಂಕ ಕೂಡಿಸು_eol)
 {
     char_u	*name;
 
@@ -71,7 +71,7 @@ ses_fname(FILE *fd, buf_T *buf, unsigned *flagp, int add_eol)
     // Don't do this for ":mkview", we don't know the current directory.
     // Don't do this after ":lcd", we don't keep track of what the current
     // directory is.
-    if (buf->b_sfname != NULL
+    ಆದರೆ (buf->b_sfname != ಖಾಲಿ
 	    && flagp == &ssop_flags
 	    && (ssop_flags & (SSOP_CURDIR | SSOP_SESDIR))
 # ifdef FEAT_AUTOCHDIR
@@ -79,113 +79,113 @@ ses_fname(FILE *fd, buf_T *buf, unsigned *flagp, int add_eol)
 # endif
 	    && !did_lcd)
 	name = buf->b_sfname;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	name = buf->b_ffname;
-    if (ses_put_fname(fd, name, flagp) == FAIL
-	    || (add_eol && put_eol(fd) == FAIL))
-	return FAIL;
-    return OK;
+    ಆದರೆ (ses_put_fname(fd, name, flagp) == FAIL
+	    || (ಕೂಡಿಸು_eol && put_eol(fd) == FAIL))
+	ಹಿಂತಿರುಗಿ FAIL;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Write an argument list to the session file.
  * Returns FAIL if writing fails.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 ses_arglist(
     FILE	*fd,
-    char	*cmd,
+    ಅಕ್ಷರ	*cmd,
     garray_T	*gap,
-    int		fullname,	// TRUE: use full path name
-    unsigned	*flagp)
+    ಪೂರ್ಣಾಂಕ		fullname,	// TRUE: use full path name
+    ಚಿಹ್ನೆರಹಿತ	*flagp)
 {
-    int		i;
-    char_u	*buf = NULL;
+    ಪೂರ್ಣಾಂಕ		i;
+    char_u	*buf = ಖಾಲಿ;
     char_u	*s;
 
-    if (fputs(cmd, fd) < 0 || put_eol(fd) == FAIL)
-	return FAIL;
-    if (put_line(fd, ":%argdel") == FAIL)
-	return FAIL;
-    for (i = 0; i < gap->ga_len; ++i)
+    ಆದರೆ (fputs(cmd, fd) < 0 || put_eol(fd) == FAIL)
+	ಹಿಂತಿರುಗಿ FAIL;
+    ಆದರೆ (put_ಸಾಲು(fd, ":%argdel") == FAIL)
+	ಹಿಂತಿರುಗಿ FAIL;
+    ಗಾಗಿ (i = 0; i < gap->ga_len; ++i)
     {
 	// NULL file names are skipped (only happens when out of memory).
-	s = alist_name(&((aentry_T *)gap->ga_data)[i]);
-	if (s != NULL)
+	s = alist_name(&((aentry_T *)gap->ga_ದತ್ತಾಂಶ)[i]);
+	ಆದರೆ (s != ಖಾಲಿ)
 	{
-	    if (fullname)
+	    ಆದರೆ (fullname)
 	    {
 		buf = alloc(MAXPATHL);
-		if (buf != NULL)
+		ಆದರೆ (buf != ಖಾಲಿ)
 		{
-		    (void)vim_FullName(s, buf, MAXPATHL, FALSE);
+		    (ಶೂನ್ಯ)vim_ತುಂಬಿದ_Name(s, buf, MAXPATHL, FALSE);
 		    s = buf;
 		}
 	    }
-	    if (fputs(":$argadd ", fd) < 0
+	    ಆದರೆ (fputs(":$argadd ", fd) < 0
 		    || ses_put_fname(fd, s, flagp) == FAIL
 		    || put_eol(fd) == FAIL)
 	    {
 		vim_free(buf);
-		return FAIL;
+		ಹಿಂತಿರುಗಿ FAIL;
 	    }
 	    vim_free(buf);
 	}
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Return non-zero if window "wp" is to be stored in the Session.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 ses_do_win(win_T *wp)
 {
 # ifdef FEAT_TERMINAL
-    if (bt_terminal(wp->w_buffer))
-	return !term_is_finished(wp->w_buffer)
+    ಆದರೆ (bt_terminal(wp->w_ಬಫರ್))
+	ಹಿಂತಿರುಗಿ !ಪದ_is_ಪೂರ್ಣಗೊಂಡ(wp->w_ಬಫರ್)
 	    && (ssop_flags & SSOP_TERMINAL)
-	    && term_should_restore(wp->w_buffer);
+	    && ಪದ_should_restore(wp->w_ಬಫರ್);
 # endif
-    if (wp->w_buffer->b_fname == NULL
+    ಆದರೆ (wp->w_ಬಫರ್->b_fname == ಖಾಲಿ
 	    // When 'buftype' is "nofile" can't restore the window contents.
-	    || bt_nofilename(wp->w_buffer))
-	return (ssop_flags & SSOP_BLANK);
-    if (bt_help(wp->w_buffer))
-	return (ssop_flags & SSOP_HELP);
-    return TRUE;
+	    || bt_nofilename(wp->w_ಬಫರ್))
+	ಹಿಂತಿರುಗಿ (ssop_flags & SSOP_BLANK);
+    ಆದರೆ (bt_help(wp->w_ಬಫರ್))
+	ಹಿಂತಿರುಗಿ (ssop_flags & SSOP_HELP);
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
  * Return TRUE if frame "fr" has a window somewhere that we want to save in
  * the Session.
  */
-    static int
-ses_do_frame(frame_T *fr)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ses_do_ಚೌಕಟ್ಟು(ಚೌಕಟ್ಟು_T *fr)
 {
-    frame_T	*frc;
+    ಚೌಕಟ್ಟು_T	*frc;
 
-    if (fr->fr_layout == FR_LEAF)
-	return ses_do_win(fr->fr_win);
-    FOR_ALL_FRAMES(frc, fr->fr_child)
-	if (ses_do_frame(frc))
-	    return TRUE;
-    return FALSE;
+    ಆದರೆ (fr->fr_layout == FR_ಎಲೆ)
+	ಹಿಂತಿರುಗಿ ses_do_win(fr->fr_win);
+    FOR_ALL_ಚೌಕಟ್ಟುಗಳು(frc, fr->fr_ಮಗು)
+	ಆದರೆ (ses_do_ಚೌಕಟ್ಟು(frc))
+	    ಹಿಂತಿರುಗಿ TRUE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 /*
  * Skip frames that don't contain windows we want to save in the Session.
  * Returns NULL when there none.
  */
-    static frame_T *
-ses_skipframe(frame_T *fr)
+    ಸ್ಥಿರ ಚೌಕಟ್ಟು_T *
+ses_skipframe(ಚೌಕಟ್ಟು_T *fr)
 {
-    frame_T	*frc;
+    ಚೌಕಟ್ಟು_T	*frc;
 
-    FOR_ALL_FRAMES(frc, fr)
-	if (ses_do_frame(frc))
-	    break;
-    return frc;
+    FOR_ALL_ಚೌಕಟ್ಟುಗಳು(frc, fr)
+	ಆದರೆ (ses_do_ಚೌಕಟ್ಟು(frc))
+	    ನಿಲ್ಲಿಸು;
+    ಹಿಂತಿರುಗಿ frc;
 }
 
 /*
@@ -194,187 +194,187 @@ ses_skipframe(frame_T *fr)
  * After the commands the last window in the frame is the current window.
  * Returns FAIL when writing the commands to "fd" fails.
  */
-    static int
-ses_win_rec(FILE *fd, frame_T *fr)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ses_win_rec(FILE *fd, ಚೌಕಟ್ಟು_T *fr)
 {
-    frame_T	*frc;
-    int		count = 0;
+    ಚೌಕಟ್ಟು_T	*frc;
+    ಪೂರ್ಣಾಂಕ		ಎಣಿಕೆ_2 = 0;
 
-    if (fr->fr_layout == FR_LEAF)
-	return OK;
+    ಆದರೆ (fr->fr_layout == FR_ಎಲೆ)
+	ಹಿಂತಿರುಗಿ OK;
 
     // Find first frame that's not skipped and then create a window for
     // each following one (first frame is already there).
-    frc = ses_skipframe(fr->fr_child);
-    if (frc != NULL)
-	while ((frc = ses_skipframe(frc->fr_next)) != NULL)
+    frc = ses_skipframe(fr->fr_ಮಗು);
+    ಆದರೆ (frc != ಖಾಲಿ)
+	ಆಗ ((frc = ses_skipframe(frc->fr_ಮುಂದಿನ)) != ಖಾಲಿ)
 	{
 	    // Make window as big as possible so that we have lots of room
 	    // to split.
-	    if (put_line(fd, "wincmd _ | wincmd |") == FAIL
-		    || put_line(fd, fr->fr_layout == FR_COL
+	    ಆದರೆ (put_ಸಾಲು(fd, "wincmd _ | wincmd |") == FAIL
+		    || put_ಸಾಲು(fd, fr->fr_layout == FR_ಲಂಬಸಾಲು
 			? "split" : "vsplit") == FAIL)
-		return FAIL;
-	    ++count;
+		ಹಿಂತಿರುಗಿ FAIL;
+	    ++ಎಣಿಕೆ_2;
 	}
 
     // Go back to the first window.
-    if (count > 0 && (fprintf(fd, fr->fr_layout == FR_COL
-		    ? ":%dwincmd k" : ":%dwincmd h", count) < 0
+    ಆದರೆ (ಎಣಿಕೆ_2 > 0 && (fprintf(fd, fr->fr_layout == FR_ಲಂಬಸಾಲು
+		    ? ":%dwincmd k" : ":%dwincmd h", ಎಣಿಕೆ_2) < 0
 		|| put_eol(fd) == FAIL))
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
 
     // Recursively create frames/windows in each window of this column or
     // row.
-    frc = ses_skipframe(fr->fr_child);
-    while (frc != NULL)
+    frc = ses_skipframe(fr->fr_ಮಗು);
+    ಆಗ (frc != ಖಾಲಿ)
     {
 	ses_win_rec(fd, frc);
-	frc = ses_skipframe(frc->fr_next);
+	frc = ses_skipframe(frc->fr_ಮುಂದಿನ);
 	// Go to next window.
-	if (frc != NULL && put_line(fd, "wincmd w") == FAIL)
-	    return FAIL;
+	ಆದರೆ (frc != ಖಾಲಿ && put_ಸಾಲು(fd, "wincmd w") == FAIL)
+	    ಹಿಂತಿರುಗಿ FAIL;
     }
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 ses_winsizes(
     FILE	*fd,
-    int		restore_size,
+    ಪೂರ್ಣಾಂಕ		restore_ಗಾತ್ರ,
     win_T	*tab_firstwin)
 {
-    int		n = 0;
+    ಪೂರ್ಣಾಂಕ		n = 0;
     win_T	*wp;
 
-    if (restore_size && (ssop_flags & SSOP_WINSIZE))
+    ಆದರೆ (restore_ಗಾತ್ರ && (ssop_flags & SSOP_WINSIZE))
     {
-	for (wp = tab_firstwin; wp != NULL; wp = wp->w_next)
+	ಗಾಗಿ (wp = tab_firstwin; wp != ಖಾಲಿ; wp = wp->w_ಮುಂದಿನ)
 	{
-	    if (!ses_do_win(wp))
-		continue;
+	    ಆದರೆ (!ses_do_win(wp))
+		ಮುಂದುವರಿ;
 	    ++n;
 
 	    // restore height when not full height
-	    if (wp->w_height + wp->w_status_height < topframe->fr_height
+	    ಆದರೆ (wp->w_ಎತ್ತರ + wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ < topframe->fr_ಎತ್ತರ
 		    && (fprintf(fd,
 			  "exe ':%dresize ' .. ((&lines * %ld + %ld) / %ld)",
-			    n, (long)wp->w_height, Rows / 2, Rows) < 0
+			    n, (ದೀರ್ಘ)wp->w_ಎತ್ತರ, ಅಡ್ಡಸಾಲುಗಳು / 2, ಅಡ್ಡಸಾಲುಗಳು) < 0
 						  || put_eol(fd) == FAIL))
-		return FAIL;
+		ಹಿಂತಿರುಗಿ FAIL;
 
 	    // restore width when not full width
-	    if (wp->w_width < Columns && (fprintf(fd,
+	    ಆದರೆ (wp->w_ಅಗಲ < Columns && (fprintf(fd,
 		   "exe 'vert :%dresize ' .. ((&columns * %ld + %ld) / %ld)",
-			    n, (long)wp->w_width, Columns / 2, Columns) < 0
+			    n, (ದೀರ್ಘ)wp->w_ಅಗಲ, Columns / 2, Columns) < 0
 						  || put_eol(fd) == FAIL))
-		return FAIL;
+		ಹಿಂತಿರುಗಿ FAIL;
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Just equalise window sizes
-	if (put_line(fd, "wincmd =") == FAIL)
-	    return FAIL;
+	ಆದರೆ (put_ಸಾಲು(fd, "wincmd =") == FAIL)
+	    ಹಿಂತಿರುಗಿ FAIL;
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-    static int
-put_view_curpos(FILE *fd, win_T *wp, char *spaces)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+put_view_curpos(FILE *fd, win_T *wp, ಅಕ್ಷರ *spaces)
 {
-    int r;
+    ಪೂರ್ಣಾಂಕ r;
 
-    if (wp->w_curswant == MAXCOL)
+    ಆದರೆ (wp->w_curswant == MAXCOL)
 	r = fprintf(fd, "%snormal! $", spaces);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	r = fprintf(fd, "%snormal! 0%d|", spaces, wp->w_virtcol + 1);
-    return r < 0 || put_eol(fd) == FAIL ? FALSE : OK;
+    ಹಿಂತಿರುಗಿ r < 0 || put_eol(fd) == FAIL ? FALSE : OK;
 }
 
 /*
  * Write commands to "fd" to restore the view of a window.
  * Caller must make sure 'scrolloff' is zero.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 put_view(
     FILE	*fd,
     win_T	*wp,
     tabpage_T	*tp,
-    int		add_edit,	     // add ":edit" command to view
-    unsigned	*flagp,		     // vop_flags or ssop_flags
-    int		current_arg_idx,     // current argument index of the window,
+    ಪೂರ್ಣಾಂಕ		ಕೂಡಿಸು_edit,	     // add ":edit" command to view
+    ಚಿಹ್ನೆರಹಿತ	*flagp,		     // vop_flags or ssop_flags
+    ಪೂರ್ಣಾಂಕ		current_arg_idx,     // current argument index of the window,
 				     // use -1 if unknown
-    hashtab_T *terminal_bufs UNUSED) // already encountered terminal buffers,
+    hashtab_T *terminal_bufs ಬಳಸದ) // already encountered terminal buffers,
 				     // can be NULL
 {
     win_T	*save_curwin;
-    int		f;
-    int		do_cursor;
-    int		did_next = FALSE;
+    ಪೂರ್ಣಾಂಕ		f;
+    ಪೂರ್ಣಾಂಕ		do_cursor;
+    ಪೂರ್ಣಾಂಕ		did_ಮುಂದಿನ = FALSE;
 
     // Always restore cursor position for ":mksession".  For ":mkview" only
     // when 'viewoptions' contains "cursor".
     do_cursor = (flagp == &ssop_flags || *flagp & SSOP_CURSOR);
 
     // Local argument list.
-    if (wp->w_alist == &global_alist)
+    ಆದರೆ (wp->w_alist == &global_alist)
     {
-	if (put_line(fd, "argglobal") == FAIL)
-	    return FAIL;
+	ಆದರೆ (put_ಸಾಲು(fd, "argglobal") == FAIL)
+	    ಹಿಂತಿರುಗಿ FAIL;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (ses_arglist(fd, "arglocal", &wp->w_alist->al_ga,
+	ಆದರೆ (ses_arglist(fd, "arglocal", &wp->w_alist->al_ga,
 			flagp == &vop_flags
 			|| !(*flagp & SSOP_CURDIR)
-			|| tp->tp_localdir != NULL
-			|| wp->w_localdir != NULL, flagp) == FAIL)
-	    return FAIL;
+			|| tp->tp_localdir != ಖಾಲಿ
+			|| wp->w_localdir != ಖಾಲಿ, flagp) == FAIL)
+	    ಹಿಂತಿರುಗಿ FAIL;
     }
 
     // Only when part of a session: restore the argument index.  Some
     // arguments may have been deleted, check if the index is valid.
-    if (wp->w_arg_idx != current_arg_idx && wp->w_arg_idx < WARGCOUNT(wp)
+    ಆದರೆ (wp->w_arg_idx != current_arg_idx && wp->w_arg_idx < WARGCOUNT(wp)
 						      && flagp == &ssop_flags)
     {
-	if (fprintf(fd, ":%ldargu", (long)wp->w_arg_idx + 1) < 0
+	ಆದರೆ (fprintf(fd, ":%ldargu", (ದೀರ್ಘ)wp->w_arg_idx + 1) < 0
 		|| put_eol(fd) == FAIL)
-	    return FAIL;
-	did_next = TRUE;
+	    ಹಿಂತಿರುಗಿ FAIL;
+	did_ಮುಂದಿನ = TRUE;
     }
 
     // Edit the file.  Skip this when ":next" already did it.
-    if (add_edit && (!did_next || wp->w_arg_idx_invalid))
+    ಆದರೆ (ಕೂಡಿಸು_edit && (!did_ಮುಂದಿನ || wp->w_arg_idx_invalid))
     {
-	if (bt_help(wp->w_buffer))
+	ಆದರೆ (bt_help(wp->w_ಬಫರ್))
 	{
-	    char *curtag = "";
+	    ಅಕ್ಷರ *curtag = "";
 
 	    // A help buffer needs some options to be set.
 	    // First, create a new empty buffer with "buftype=help".
 	    // Then ":help" will re-use both the buffer and the window and set
 	    // the options, even when "options" is not in 'sessionoptions'.
-	    if (0 < wp->w_tagstackidx
+	    ಆದರೆ (0 < wp->w_tagstackidx
 		    && wp->w_tagstackidx <= wp->w_tagstacklen)
-		curtag = (char *)wp->w_tagstack[wp->w_tagstackidx - 1].tagname;
+		curtag = (ಅಕ್ಷರ *)wp->w_tagstack[wp->w_tagstackidx - 1].tagname;
 
-	    if (put_line(fd, "enew | setl bt=help") == FAIL
+	    ಆದರೆ (put_ಸಾಲು(fd, "enew | setl bt=help") == FAIL
 		    || fprintf(fd, "help %s", curtag) < 0
 		    || put_eol(fd) == FAIL)
-		return FAIL;
+		ಹಿಂತಿರುಗಿ FAIL;
 	}
 # ifdef FEAT_TERMINAL
-	else if (bt_terminal(wp->w_buffer))
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (bt_terminal(wp->w_ಬಫರ್))
 	{
-	    if (term_write_session(fd, wp, terminal_bufs) == FAIL)
-		return FAIL;
+	    ಆದರೆ (ಪದ_write_session(fd, wp, terminal_bufs) == FAIL)
+		ಹಿಂತಿರುಗಿ FAIL;
 	}
 # endif
 	// Load the file.
-	else if (wp->w_buffer->b_ffname != NULL
-		&& !bt_nofilename(wp->w_buffer))
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (wp->w_ಬಫರ್->b_ffname != ಖಾಲಿ
+		&& !bt_nofilename(wp->w_ಬಫರ್))
 	{
 	    // Editing a file in this buffer: use ":edit file".
 	    // This may have side effects! (e.g., compressed or network file).
@@ -382,53 +382,53 @@ put_view(
 	    // Note, if a buffer for that file already exists, use :badd to
 	    // edit that buffer, to not lose folding information (:edit resets
 	    // folds in other buffers)
-	    if (fputs("if bufexists(fnamemodify(\"", fd) < 0
-		    || ses_fname(fd, wp->w_buffer, flagp, FALSE) == FAIL
+	    ಆದರೆ (fputs("if bufexists(fnamemodify(\"", fd) < 0
+		    || ses_fname(fd, wp->w_ಬಫರ್, flagp, FALSE) == FAIL
 		    || fputs("\", \":p\")) | buffer ", fd) < 0
-		    || ses_fname(fd, wp->w_buffer, flagp, FALSE) == FAIL
+		    || ses_fname(fd, wp->w_ಬಫರ್, flagp, FALSE) == FAIL
 		    || fputs(" | else | edit ", fd) < 0
-		    || ses_fname(fd, wp->w_buffer, flagp, FALSE) == FAIL
+		    || ses_fname(fd, wp->w_ಬಫರ್, flagp, FALSE) == FAIL
 		    || fputs(" | endif", fd) < 0
 		    || put_eol(fd) == FAIL)
-		return FAIL;
+		ಹಿಂತಿರುಗಿ FAIL;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // No file in this buffer, just make it empty.
-	    if (put_line(fd, "enew") == FAIL)
-		return FAIL;
+	    ಆದರೆ (put_ಸಾಲು(fd, "enew") == FAIL)
+		ಹಿಂತಿರುಗಿ FAIL;
 # ifdef FEAT_QUICKFIX
-	    if (wp->w_buffer->b_ffname != NULL)
+	    ಆದರೆ (wp->w_ಬಫರ್->b_ffname != ಖಾಲಿ)
 	    {
 		// The buffer does have a name, but it's not a file name.
-		if (fputs("file ", fd) < 0
-			|| ses_fname(fd, wp->w_buffer, flagp, TRUE) == FAIL)
-		    return FAIL;
+		ಆದರೆ (fputs("file ", fd) < 0
+			|| ses_fname(fd, wp->w_ಬಫರ್, flagp, TRUE) == FAIL)
+		    ಹಿಂತಿರುಗಿ FAIL;
 	    }
 # endif
 	    do_cursor = FALSE;
 	}
     }
 
-    if (wp->w_alt_fnum)
+    ಆದರೆ (wp->w_alt_fnum)
     {
 	buf_T *alt = buflist_findnr(wp->w_alt_fnum);
 
 	// Set the alternate file if the buffer is listed.
-	if ((flagp == &ssop_flags)
-		&& alt != NULL
-		&& alt->b_fname != NULL
+	ಆದರೆ ((flagp == &ssop_flags)
+		&& alt != ಖಾಲಿ
+		&& alt->b_fname != ಖಾಲಿ
 		&& *alt->b_fname != NUL
 		&& alt->b_p_bl
 		&& (fputs("balt ", fd) < 0
 		|| ses_fname(fd, alt, flagp, TRUE) == FAIL))
-	    return FAIL;
+	    ಹಿಂತಿರುಗಿ FAIL;
     }
 
     // Local mappings and abbreviations.
-    if ((*flagp & (SSOP_OPTIONS | SSOP_LOCALOPTIONS))
-					 && makemap(fd, wp->w_buffer) == FAIL)
-	return FAIL;
+    ಆದರೆ ((*flagp & (SSOP_OPTIONS | SSOP_LOCALOPTIONS))
+					 && makemap(fd, wp->w_ಬಫರ್) == FAIL)
+	ಹಿಂತಿರುಗಿ FAIL;
 
     // Local options.  Need to go to the window temporarily.
     // Store only local values when using ":mkview" and when ":mksession" is
@@ -437,143 +437,143 @@ put_view(
     // otherwise the folds would not be restored correctly.
     save_curwin = curwin;
     curwin = wp;
-    curbuf = curwin->w_buffer;
-    if (*flagp & (SSOP_OPTIONS | SSOP_LOCALOPTIONS))
+    curbuf = curwin->w_ಬಫರ್;
+    ಆದರೆ (*flagp & (SSOP_OPTIONS | SSOP_LOCALOPTIONS))
 	f = makeset(fd, OPT_LOCAL,
 			     flagp == &vop_flags || !(*flagp & SSOP_OPTIONS));
 # ifdef FEAT_FOLDING
-    else if (*flagp & SSOP_FOLDS)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*flagp & SSOP_FOLDS)
 	f = makefoldset(fd);
 # endif
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	f = OK;
     curwin = save_curwin;
-    curbuf = curwin->w_buffer;
-    if (f == FAIL)
-	return FAIL;
+    curbuf = curwin->w_ಬಫರ್;
+    ಆದರೆ (f == FAIL)
+	ಹಿಂತಿರುಗಿ FAIL;
 
 # ifdef FEAT_FOLDING
     // Save Folds when 'buftype' is empty and for help files.
-    if ((*flagp & SSOP_FOLDS)
-	    && wp->w_buffer->b_ffname != NULL
-	    && (bt_normal(wp->w_buffer) || bt_help(wp->w_buffer)))
+    ಆದರೆ ((*flagp & SSOP_FOLDS)
+	    && wp->w_ಬಫರ್->b_ffname != ಖಾಲಿ
+	    && (bt_ಸಾಮಾನ್ಯ(wp->w_ಬಫರ್) || bt_help(wp->w_ಬಫರ್)))
     {
-	if (put_folds(fd, wp) == FAIL)
-	    return FAIL;
+	ಆದರೆ (put_folds(fd, wp) == FAIL)
+	    ಹಿಂತಿರುಗಿ FAIL;
     }
 # endif
 
     // Set the cursor after creating folds, since that moves the cursor.
-    if (do_cursor)
+    ಆದರೆ (do_cursor)
     {
 
 	// Restore the cursor line in the file and relatively in the
 	// window.  Don't use "G", it changes the jumplist.
-	if (put_line(fd, "{") == FAIL)
-	    return FAIL;
+	ಆದರೆ (put_ಸಾಲು(fd, "{") == FAIL)
+	    ಹಿಂತಿರುಗಿ FAIL;
 
-	if (wp->w_height <= 0)
+	ಆದರೆ (wp->w_ಎತ್ತರ <= 0)
 	{
-	    if (fprintf(fd, "  var l: number = %ld", (long)wp->w_cursor.lnum) < 0)
-		return FAIL;
+	    ಆದರೆ (fprintf(fd, "  var l: number = %ld", (ದೀರ್ಘ)wp->w_cursor.lnum) < 0)
+		ಹಿಂತಿರುಗಿ FAIL;
 	}
-	else if (fprintf(fd,
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (fprintf(fd,
 		    "  var l: number = %ld - ((%ld * winheight(0) + %ld) / %ld)",
-		    (long)wp->w_cursor.lnum,
-		    (long)(wp->w_cursor.lnum - wp->w_topline),
-		    (long)wp->w_height / 2, (long)wp->w_height) < 0)
-	    return FAIL;
+		    (ದೀರ್ಘ)wp->w_cursor.lnum,
+		    (ದೀರ್ಘ)(wp->w_cursor.lnum - wp->w_topline),
+		    (ದೀರ್ಘ)wp->w_ಎತ್ತರ / 2, (ದೀರ್ಘ)wp->w_ಎತ್ತರ) < 0)
+	    ಹಿಂತಿರುಗಿ FAIL;
 
-	if (put_eol(fd) == FAIL
-		|| put_line(fd, "  if l < 1 | l = 1 | endif") == FAIL
-		|| put_line(fd, "  keepjumps exe \":\" .. l") == FAIL
-		|| put_line(fd, "  normal! zt") == FAIL
-		|| fprintf(fd, "  keepjumps :%ld", (long)wp->w_cursor.lnum) < 0
+	ಆದರೆ (put_eol(fd) == FAIL
+		|| put_ಸಾಲು(fd, "  if l < 1 | l = 1 | endif") == FAIL
+		|| put_ಸಾಲು(fd, "  keepjumps exe \":\" .. l") == FAIL
+		|| put_ಸಾಲು(fd, "  normal! zt") == FAIL
+		|| fprintf(fd, "  keepjumps :%ld", (ದೀರ್ಘ)wp->w_cursor.lnum) < 0
 		|| put_eol(fd) == FAIL)
-	    return FAIL;
+	    ಹಿಂತಿರುಗಿ FAIL;
 	// Restore the cursor column and left offset when not wrapping.
-	if (wp->w_cursor.col == 0)
+	ಆದರೆ (wp->w_cursor.ಲಂಬಸಾಲು == 0)
 	{
-	    if (put_line(fd, "  normal! 0") == FAIL)
-		return FAIL;
+	    ಆದರೆ (put_ಸಾಲು(fd, "  normal! 0") == FAIL)
+		ಹಿಂತಿರುಗಿ FAIL;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (!wp->w_p_wrap && wp->w_leftcol > 0 && wp->w_width > 0)
+	    ಆದರೆ (!wp->w_p_wrap && wp->w_leftcol > 0 && wp->w_ಅಗಲ > 0)
 	    {
-		if (fprintf(fd,
+		ಆದರೆ (fprintf(fd,
 			  "  var c: number = %ld - ((%ld * winwidth(0) + %ld) / %ld)",
-			    (long)wp->w_virtcol + 1,
-			    (long)(wp->w_virtcol - wp->w_leftcol),
-			    (long)wp->w_width / 2, (long)wp->w_width) < 0
+			    (ದೀರ್ಘ)wp->w_virtcol + 1,
+			    (ದೀರ್ಘ)(wp->w_virtcol - wp->w_leftcol),
+			    (ದೀರ್ಘ)wp->w_ಅಗಲ / 2, (ದೀರ್ಘ)wp->w_ಅಗಲ) < 0
 			|| put_eol(fd) == FAIL
-			|| put_line(fd, "  if c > 0") == FAIL
+			|| put_ಸಾಲು(fd, "  if c > 0") == FAIL
 			|| fprintf(fd,
 			    "    exe 'normal! ' .. c .. '|zs' .. %ld .. '|'",
-			    (long)wp->w_virtcol + 1) < 0
+			    (ದೀರ್ಘ)wp->w_virtcol + 1) < 0
 			|| put_eol(fd) == FAIL
-			|| put_line(fd, "  else") == FAIL
+			|| put_ಸಾಲು(fd, "  else") == FAIL
 			|| put_view_curpos(fd, wp, "    ") == FAIL
-			|| put_line(fd, "  endif") == FAIL)
-		    return FAIL;
+			|| put_ಸಾಲು(fd, "  endif") == FAIL)
+		    ಹಿಂತಿರುಗಿ FAIL;
 	    }
-	    else if (put_view_curpos(fd, wp, "  ") == FAIL)
-		return FAIL;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (put_view_curpos(fd, wp, "  ") == FAIL)
+		ಹಿಂತಿರುಗಿ FAIL;
 	}
 
-	if (put_line(fd, "}") == FAIL)
-	    return FAIL;
+	ಆದರೆ (put_ಸಾಲು(fd, "}") == FAIL)
+	    ಹಿಂತಿರುಗಿ FAIL;
     }
 
     // Local directory, if the current flag is not view options or the "curdir"
     // option is included.
-    if (wp->w_localdir != NULL
+    ಆದರೆ (wp->w_localdir != ಖಾಲಿ
 			    && (flagp != &vop_flags || (*flagp & SSOP_CURDIR)))
     {
-	if (fputs("lcd ", fd) < 0
+	ಆದರೆ (fputs("lcd ", fd) < 0
 		|| ses_put_fname(fd, wp->w_localdir, flagp) == FAIL
 		|| put_eol(fd) == FAIL)
-	    return FAIL;
+	    ಹಿಂತಿರುಗಿ FAIL;
 	did_lcd = TRUE;
     }
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 # ifdef FEAT_EVAL
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 store_session_globals(FILE *fd)
 {
     hashtab_T	*gvht = get_globvar_ht();
     hashitem_T	*hi;
     dictitem_T	*this_var;
-    int		todo;
+    ಪೂರ್ಣಾಂಕ		todo;
     char_u	*p, *t;
 
-    todo = (int)gvht->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(gvht, hi, todo)
+    todo = (ಪೂರ್ಣಾಂಕ)gvht->ht_ಬಳಸಿದ;
+    FOR_ALL_HASHTAB_ವಸ್ತುಗಳು(gvht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	ಆದರೆ (!HASHITEM_ಖಾಲಿಗಳು(hi))
 	{
 	    --todo;
 	    this_var = HI2DI(hi);
-	    if ((this_var->di_tv.v_type == VAR_NUMBER
+	    ಆದರೆ ((this_var->di_tv.v_type == VAR_ಸಂಖ್ಯೆ
 			|| this_var->di_tv.v_type == VAR_STRING)
-		    && var_flavour(this_var->di_key) == VAR_FLAVOUR_SESSION)
+		    && var_flavour(this_var->di_ಕೀಲಿ) == VAR_FLAVOUR_SESSION)
 	    {
 		// Escape special characters with a backslash.  Turn a LF and
 		// CR into \n and \r.
 		p = vim_strsave_escaped(tv_get_string(&this_var->di_tv),
 							(char_u *)"\\\"\n\r");
-		if (p == NULL)	    // out of memory
-		    break;
-		for (t = p; *t != NUL; ++t)
-		    if (*t == '\n')
+		ಆದರೆ (p == ಖಾಲಿ)	    // out of memory
+		    ನಿಲ್ಲಿಸು;
+		ಗಾಗಿ (t = p; *t != NUL; ++t)
+		    ಆದರೆ (*t == '\n')
 			*t = 'n';
-		    else if (*t == '\r')
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*t == '\r')
 			*t = 'r';
-		if ((fprintf(fd, "g:%s = %c%s%c",
-				this_var->di_key,
+		ಆದರೆ ((fprintf(fd, "g:%s = %c%s%c",
+				this_var->di_ಕೀಲಿ,
 				(this_var->di_tv.v_type == VAR_STRING) ? '"'
 									: ' ',
 				p,
@@ -582,29 +582,29 @@ store_session_globals(FILE *fd)
 			|| put_eol(fd) == FAIL)
 		{
 		    vim_free(p);
-		    return FAIL;
+		    ಹಿಂತಿರುಗಿ FAIL;
 		}
 		vim_free(p);
 	    }
-	    else if (this_var->di_tv.v_type == VAR_FLOAT
-		    && var_flavour(this_var->di_key) == VAR_FLAVOUR_SESSION)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (this_var->di_tv.v_type == VAR_FLOAT
+		    && var_flavour(this_var->di_ಕೀಲಿ) == VAR_FLAVOUR_SESSION)
 	    {
 		float_T f = this_var->di_tv.vval.v_float;
-		int sign = ' ';
+		ಪೂರ್ಣಾಂಕ sign = ' ';
 
-		if (f < 0)
+		ಆದರೆ (f < 0)
 		{
 		    f = -f;
 		    sign = '-';
 		}
-		if ((fprintf(fd, "g:%s = %c%f",
-					       this_var->di_key, sign, f) < 0)
+		ಆದರೆ ((fprintf(fd, "g:%s = %c%f",
+					       this_var->di_ಕೀಲಿ, sign, f) < 0)
 			|| put_eol(fd) == FAIL)
-		    return FAIL;
+		    ಹಿಂತಿರುಗಿ FAIL;
 	    }
 	}
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 # endif
 
@@ -612,25 +612,25 @@ store_session_globals(FILE *fd)
  * Write openfile commands for the current buffers to an .exrc file.
  * Return FAIL on error, OK otherwise.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 makeopens(
     FILE	*fd,
     char_u	*dirnow)	// Current directory name
 {
     buf_T	*buf;
-    int		only_save_windows = TRUE;
-    int		nr;
-    int		restore_size = TRUE;
-    int		restore_height_width = FALSE;
+    ಪೂರ್ಣಾಂಕ		only_save_windows = TRUE;
+    ಪೂರ್ಣಾಂಕ		nr;
+    ಪೂರ್ಣಾಂಕ		restore_ಗಾತ್ರ = TRUE;
+    ಪೂರ್ಣಾಂಕ		restore_ಎತ್ತರ_ಅಗಲ = FALSE;
     win_T	*wp;
     char_u	*sname;
-    win_T	*edited_win = NULL;
-    int		restore_stal = FALSE;
+    win_T	*edited_win = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		restore_stal = FALSE;
     win_T	*tab_firstwin;
-    frame_T	*tab_topframe;
-    int		cur_arg_idx = 0;
-    int		next_arg_idx = 0;
-    int		ret = FAIL;
+    ಚೌಕಟ್ಟು_T	*tab_topframe;
+    ಪೂರ್ಣಾಂಕ		cur_arg_idx = 0;
+    ಪೂರ್ಣಾಂಕ		ಮುಂದಿನ_arg_idx = 0;
+    ಪೂರ್ಣಾಂಕ		ret = FAIL;
     tabpage_T	*tp;
 # ifdef FEAT_TERMINAL
     hashtab_T	terminal_bufs;
@@ -638,77 +638,77 @@ makeopens(
     hash_init(&terminal_bufs);
 # endif
 
-    if (ssop_flags & SSOP_BUFFERS)
+    ಆದರೆ (ssop_flags & SSOP_BUFFERS)
 	only_save_windows = FALSE;		// Save ALL buffers
 
     // Begin by setting the this_session variable, and then other
     // sessionable variables.
 # ifdef FEAT_EVAL
 
-    if (put_line(fd, "v:this_session = expand(\"<sfile>:p\")") == FAIL)
-	goto fail;
+    ಆದರೆ (put_ಸಾಲು(fd, "v:this_session = expand(\"<sfile>:p\")") == FAIL)
+	ಹೋಗು fail;
 
-    if (put_line(fd, "doautoall SessionLoadPre") == FAIL)
-	goto fail;
+    ಆದರೆ (put_ಸಾಲು(fd, "doautoall SessionLoadPre") == FAIL)
+	ಹೋಗು fail;
 
-    if (put_line(fd, "var save_splitbelow: bool") == FAIL
-	    || put_line(fd, "var save_splitright: bool") == FAIL
-	    || put_line(fd, "var save_winminheight: number") == FAIL
-	    || put_line(fd, "var save_winminwidth: number") == FAIL
-	    || put_line(fd, "var wipebuf: number = -1") == FAIL
-	    || put_line(fd, "var shortmess_save: string") == FAIL)
-	goto fail;
+    ಆದರೆ (put_ಸಾಲು(fd, "var save_splitbelow: bool") == FAIL
+	    || put_ಸಾಲು(fd, "var save_splitright: bool") == FAIL
+	    || put_ಸಾಲು(fd, "var save_winminheight: number") == FAIL
+	    || put_ಸಾಲು(fd, "var save_winminwidth: number") == FAIL
+	    || put_ಸಾಲು(fd, "var wipebuf: number = -1") == FAIL
+	    || put_ಸಾಲು(fd, "var shortmess_save: string") == FAIL)
+	ಹೋಗು fail;
 
-    if (ssop_flags & SSOP_GLOBALS)
-	if (store_session_globals(fd) == FAIL)
-	    goto fail;
+    ಆದರೆ (ssop_flags & SSOP_GLOBALS)
+	ಆದರೆ (store_session_globals(fd) == FAIL)
+	    ಹೋಗು fail;
 # endif
 
     // Close all windows and tabs but one.
-    if (put_line(fd, "silent only") == FAIL)
-	goto fail;
-    if ((ssop_flags & SSOP_TABPAGES)
-	    && put_line(fd, "silent tabonly") == FAIL)
-	goto fail;
+    ಆದರೆ (put_ಸಾಲು(fd, "silent only") == FAIL)
+	ಹೋಗು fail;
+    ಆದರೆ ((ssop_flags & SSOP_TABPAGES)
+	    && put_ಸಾಲು(fd, "silent tabonly") == FAIL)
+	ಹೋಗು fail;
 
     // Now a :cd command to the session directory or the current directory
-    if (ssop_flags & SSOP_SESDIR)
+    ಆದರೆ (ssop_flags & SSOP_SESDIR)
     {
-	if (put_line(fd, "exe \"cd \" .. escape(expand(\"<sfile>:p:h\"), ' ')")
+	ಆದರೆ (put_ಸಾಲು(fd, "exe \"cd \" .. escape(expand(\"<sfile>:p:h\"), ' ')")
 								      == FAIL)
-	    goto fail;
+	    ಹೋಗು fail;
     }
-    else if (ssop_flags & SSOP_CURDIR)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ssop_flags & SSOP_CURDIR)
     {
-	sname = home_replace_save(NULL, globaldir != NULL ? globaldir : dirnow);
-	if (sname == NULL
+	sname = home_replace_save(ಖಾಲಿ, globaldir != ಖಾಲಿ ? globaldir : dirnow);
+	ಆದರೆ (sname == ಖಾಲಿ
 		|| fputs("cd ", fd) < 0
 		|| ses_put_fname(fd, sname, &ssop_flags) == FAIL
 		|| put_eol(fd) == FAIL)
 	{
 	    vim_free(sname);
-	    goto fail;
+	    ಹೋಗು fail;
 	}
 	vim_free(sname);
     }
 
     // If there is an empty, unnamed buffer we will wipe it out later.
     // Remember the buffer number.
-    if (put_line(fd, "if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''") == FAIL)
-	goto fail;
-    if (put_line(fd, "  wipebuf = bufnr('%')") == FAIL)
-	goto fail;
-    if (put_line(fd, "endif") == FAIL)
-	goto fail;
+    ಆದರೆ (put_ಸಾಲು(fd, "if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''") == FAIL)
+	ಹೋಗು fail;
+    ಆದರೆ (put_ಸಾಲು(fd, "  wipebuf = bufnr('%')") == FAIL)
+	ಹೋಗು fail;
+    ಆದರೆ (put_ಸಾಲು(fd, "endif") == FAIL)
+	ಹೋಗು fail;
 
     // Save 'shortmess' if not storing options.
-    if ((ssop_flags & SSOP_OPTIONS) == 0
-	    && put_line(fd, "shortmess_save = &shortmess") == FAIL)
-	goto fail;
+    ಆದರೆ ((ssop_flags & SSOP_OPTIONS) == 0
+	    && put_ಸಾಲು(fd, "shortmess_save = &shortmess") == FAIL)
+	ಹೋಗು fail;
 
     // Set 'shortmess' for the following.
-    if (put_line(fd, "set shortmess+=aoO") == FAIL)
-	goto fail;
+    ಆದರೆ (put_ಸಾಲು(fd, "set shortmess+=aoO") == FAIL)
+	ಹೋಗು fail;
 
     // Now save the current files, current buffer first.
     // Put all buffers into the buffer list.
@@ -716,44 +716,44 @@ makeopens(
     // can be disrupted by prior `edit` or `tabedit` calls).
     FOR_ALL_BUFFERS(buf)
     {
-	if (!(only_save_windows && buf->b_nwindows == 0)
+	ಆದರೆ (!(only_save_windows && buf->b_nwindows == 0)
 		&& !(buf->b_help && !(ssop_flags & SSOP_HELP))
 		// Skip terminal buffers: finished ones are not useful, others
 		// will be resurrected and result in a new buffer.
 		&& !bt_terminal(buf)
-		&& buf->b_fname != NULL
+		&& buf->b_fname != ಖಾಲಿ
 		&& buf->b_p_bl)
 	{
-	    if (fprintf(fd, "badd +%ld ", buf->b_wininfo == NULL ? 1L
+	    ಆದರೆ (fprintf(fd, "badd +%ld ", buf->b_wininfo == ಖಾಲಿ ? 1L
 					   : buf->b_wininfo->wi_fpos.lnum) < 0
 		    || ses_fname(fd, buf, &ssop_flags, TRUE) == FAIL)
-		goto fail;
+		ಹೋಗು fail;
 	}
     }
 
     // the global argument list
-    if (ses_arglist(fd, "argglobal", &global_alist.al_ga,
+    ಆದರೆ (ses_arglist(fd, "argglobal", &global_alist.al_ga,
 			    !(ssop_flags & SSOP_CURDIR), &ssop_flags) == FAIL)
-	goto fail;
+	ಹೋಗು fail;
 
-    if (ssop_flags & SSOP_RESIZE)
+    ಆದರೆ (ssop_flags & SSOP_RESIZE)
     {
 	// Note: after the restore we still check it worked!
-	if (fprintf(fd, "set lines=%ld columns=%ld" , Rows, Columns) < 0
+	ಆದರೆ (fprintf(fd, "set lines=%ld columns=%ld" , ಅಡ್ಡಸಾಲುಗಳು, Columns) < 0
 		|| put_eol(fd) == FAIL)
-	    goto fail;
+	    ಹೋಗು fail;
     }
 
 # ifdef FEAT_GUI
-    if (gui.in_use && (ssop_flags & SSOP_WINPOS))
+    ಆದರೆ (gui.ಒಳ_use && (ssop_flags & SSOP_WINPOS))
     {
-	int	x, y;
+	ಪೂರ್ಣಾಂಕ	x, y;
 
-	if (gui_mch_get_winpos(&x, &y) == OK)
+	ಆದರೆ (gui_mch_get_winpos(&x, &y) == OK)
 	{
 	    // Note: after the restore we still check it worked!
-	    if (fprintf(fd, "winpos %d %d", x, y) < 0 || put_eol(fd) == FAIL)
-		goto fail;
+	    ಆದರೆ (fprintf(fd, "winpos %d %d", x, y) < 0 || put_eol(fd) == FAIL)
+		ಹೋಗು fail;
 	}
     }
 # endif
@@ -762,14 +762,14 @@ makeopens(
     // will be displayed when creating the next tab.  That resizes the windows
     // in the first tab, which may cause problems.  Set 'showtabline' to 2
     // temporarily to avoid that.
-    if (p_stal == 1 && first_tabpage->tp_next != NULL)
+    ಆದರೆ (p_stal == 1 && ಮೊದಲ_tabpage->tp_ಮುಂದಿನ != ಖಾಲಿ)
     {
-	if (put_line(fd, "set stal=2") == FAIL)
-	    goto fail;
+	ಆದರೆ (put_ಸಾಲು(fd, "set stal=2") == FAIL)
+	    ಹೋಗು fail;
 	restore_stal = TRUE;
     }
 
-    if ((ssop_flags & SSOP_TABPAGES))
+    ಆದರೆ ((ssop_flags & SSOP_TABPAGES))
     {
 	// "tabpages" is in 'sessionoptions': Similar to ses_win_rec() below,
 	// populate the tab pages first so later local options won't be copied
@@ -778,40 +778,40 @@ makeopens(
 	    // Use `bufhidden=wipe` to remove empty "placeholder" buffers once
 	    // they are not needed. This prevents creating extra buffers (see
 	    // cause of patch 8.1.0829)
-	    if (tp->tp_next != NULL
-		  && put_line(fd, "tabnew +setlocal\\ bufhidden=wipe") == FAIL)
-		goto fail;
-	if (first_tabpage->tp_next != NULL && put_line(fd, "tabrewind") == FAIL)
-	    goto fail;
+	    ಆದರೆ (tp->tp_ಮುಂದಿನ != ಖಾಲಿ
+		  && put_ಸಾಲು(fd, "tabnew +setlocal\\ bufhidden=wipe") == FAIL)
+		ಹೋಗು fail;
+	ಆದರೆ (ಮೊದಲ_tabpage->tp_ಮುಂದಿನ != ಖಾಲಿ && put_ಸಾಲು(fd, "tabrewind") == FAIL)
+	    ಹೋಗು fail;
     }
 
     // Assume "tabpages" is in 'sessionoptions'.  If not then we only do
     // "curtab" and bail out of the loop.
     FOR_ALL_TABPAGES(tp)
     {
-	int	need_tabnext = FALSE;
-	int	cnr = 1;
+	ಪೂರ್ಣಾಂಕ	need_tabnext = FALSE;
+	ಪೂರ್ಣಾಂಕ	cnr = 1;
 
 	// May repeat putting Windows for each tab, when "tabpages" is in
 	// 'sessionoptions'.
 	// Don't use goto_tabpage(), it may change directory and trigger
 	// autocommands.
-	if ((ssop_flags & SSOP_TABPAGES))
+	ಆದರೆ ((ssop_flags & SSOP_TABPAGES))
 	{
-	    if (tp == curtab)
+	    ಆದರೆ (tp == curtab)
 	    {
 		tab_firstwin = firstwin;
 		tab_topframe = topframe;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		tab_firstwin = tp->tp_firstwin;
 		tab_topframe = tp->tp_topframe;
 	    }
-	    if (tp != first_tabpage)
+	    ಆದರೆ (tp != ಮೊದಲ_tabpage)
 		need_tabnext = TRUE;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    tp = curtab;
 	    tab_firstwin = firstwin;
@@ -821,66 +821,66 @@ makeopens(
 	// Before creating the window layout, try loading one file.  If this
 	// is aborted we don't end up with a number of useless windows.
 	// This may have side effects! (e.g., compressed or network file).
-	for (wp = tab_firstwin; wp != NULL; wp = wp->w_next)
+	ಗಾಗಿ (wp = tab_firstwin; wp != ಖಾಲಿ; wp = wp->w_ಮುಂದಿನ)
 	{
-	    if (ses_do_win(wp)
-		    && wp->w_buffer->b_ffname != NULL
-		    && !bt_help(wp->w_buffer)
-		    && !bt_nofilename(wp->w_buffer))
+	    ಆದರೆ (ses_do_win(wp)
+		    && wp->w_ಬಫರ್->b_ffname != ಖಾಲಿ
+		    && !bt_help(wp->w_ಬಫರ್)
+		    && !bt_nofilename(wp->w_ಬಫರ್))
 	    {
-		if (need_tabnext && put_line(fd, "tabnext") == FAIL)
-		    goto fail;
+		ಆದರೆ (need_tabnext && put_ಸಾಲು(fd, "tabnext") == FAIL)
+		    ಹೋಗು fail;
 		need_tabnext = FALSE;
 
-		if (fputs("edit ", fd) < 0
-			      || ses_fname(fd, wp->w_buffer, &ssop_flags, TRUE)
+		ಆದರೆ (fputs("edit ", fd) < 0
+			      || ses_fname(fd, wp->w_ಬಫರ್, &ssop_flags, TRUE)
 								       == FAIL)
-		    goto fail;
-		if (!wp->w_arg_idx_invalid)
+		    ಹೋಗು fail;
+		ಆದರೆ (!wp->w_arg_idx_invalid)
 		    edited_win = wp;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	}
 
 	// If no file got edited create an empty tab page.
-	if (need_tabnext && put_line(fd, "tabnext") == FAIL)
-	    goto fail;
+	ಆದರೆ (need_tabnext && put_ಸಾಲು(fd, "tabnext") == FAIL)
+	    ಹೋಗು fail;
 
-	if (tab_topframe->fr_layout != FR_LEAF)
+	ಆದರೆ (tab_topframe->fr_layout != FR_ಎಲೆ)
 	{
 	    // Save current window layout.
-	    if (put_line(fd, "save_splitbelow = &splitbelow") == FAIL
-		    || put_line(fd, "save_splitright = &splitright")
+	    ಆದರೆ (put_ಸಾಲು(fd, "save_splitbelow = &splitbelow") == FAIL
+		    || put_ಸಾಲು(fd, "save_splitright = &splitright")
 								       == FAIL)
-		goto fail;
-	    if (put_line(fd, "set splitbelow splitright") == FAIL)
-		goto fail;
-	    if (ses_win_rec(fd, tab_topframe) == FAIL)
-		goto fail;
-	    if (put_line(fd, "&splitbelow = save_splitbelow") == FAIL
-		    || put_line(fd, "&splitright = save_splitright")
+		ಹೋಗು fail;
+	    ಆದರೆ (put_ಸಾಲು(fd, "set splitbelow splitright") == FAIL)
+		ಹೋಗು fail;
+	    ಆದರೆ (ses_win_rec(fd, tab_topframe) == FAIL)
+		ಹೋಗು fail;
+	    ಆದರೆ (put_ಸಾಲು(fd, "&splitbelow = save_splitbelow") == FAIL
+		    || put_ಸಾಲು(fd, "&splitright = save_splitright")
 								       == FAIL)
-		goto fail;
+		ಹೋಗು fail;
 	}
 
 	// Check if window sizes can be restored (no windows omitted).
 	// Remember the window number of the current window after restoring.
 	nr = 0;
-	for (wp = tab_firstwin; wp != NULL; wp = W_NEXT(wp))
+	ಗಾಗಿ (wp = tab_firstwin; wp != ಖಾಲಿ; wp = W_ಮುಂದಿನ(wp))
 	{
-	    if (ses_do_win(wp))
+	    ಆದರೆ (ses_do_win(wp))
 		++nr;
-	    else
-		restore_size = FALSE;
-	    if (curwin == wp)
+	    ಇಲ್ಲದಿದ್ದರೆ
+		restore_ಗಾತ್ರ = FALSE;
+	    ಆದರೆ (curwin == wp)
 		cnr = nr;
 	}
 
-	if (tab_firstwin->w_next != NULL)
+	ಆದರೆ (tab_firstwin->w_ಮುಂದಿನ != ಖಾಲಿ)
 	{
 	    // Go to the first window.
-	    if (put_line(fd, "wincmd t") == FAIL)
-		goto fail;
+	    ಆದರೆ (put_ಸಾಲು(fd, "wincmd t") == FAIL)
+		ಹೋಗು fail;
 
 	    // If more than one window, see if sizes can be restored.
 	    // First set 'winheight' and 'winwidth' to 1 to avoid the windows
@@ -889,187 +889,187 @@ makeopens(
 	    // cursor can be set.  This is done again below.
 	    // winminheight and winminwidth need to be set to avoid an error if
 	    // the user has set winheight or winwidth.
-	    if (!restore_height_width
-		    && (put_line(fd, "save_winminheight = &winminheight")
+	    ಆದರೆ (!restore_ಎತ್ತರ_ಅಗಲ
+		    && (put_ಸಾಲು(fd, "save_winminheight = &winminheight")
 									== FAIL
-			|| put_line(fd, "save_winminwidth = &winminwidth")
+			|| put_ಸಾಲು(fd, "save_winminwidth = &winminwidth")
 								       == FAIL))
-		goto fail;
-	    if (put_line(fd, "set winminheight=0") == FAIL
-		    || put_line(fd, "set winheight=1") == FAIL
-		    || put_line(fd, "set winminwidth=0") == FAIL
-		    || put_line(fd, "set winwidth=1") == FAIL)
-		goto fail;
-	    restore_height_width = TRUE;
+		ಹೋಗು fail;
+	    ಆದರೆ (put_ಸಾಲು(fd, "set winminheight=0") == FAIL
+		    || put_ಸಾಲು(fd, "set winheight=1") == FAIL
+		    || put_ಸಾಲು(fd, "set winminwidth=0") == FAIL
+		    || put_ಸಾಲು(fd, "set winwidth=1") == FAIL)
+		ಹೋಗು fail;
+	    restore_ಎತ್ತರ_ಅಗಲ = TRUE;
 	}
-	if (nr > 1 && ses_winsizes(fd, restore_size, tab_firstwin) == FAIL)
-	    goto fail;
+	ಆದರೆ (nr > 1 && ses_winsizes(fd, restore_ಗಾತ್ರ, tab_firstwin) == FAIL)
+	    ಹೋಗು fail;
 
 	// Restore the tab-local working directory if specified
 	// Do this before the windows, so that the window-local directory can
 	// override the tab-local directory.
-	if ((ssop_flags & SSOP_CURDIR) && tp->tp_localdir != NULL)
+	ಆದರೆ ((ssop_flags & SSOP_CURDIR) && tp->tp_localdir != ಖಾಲಿ)
 	{
-	    if (fputs("tcd ", fd) < 0
+	    ಆದರೆ (fputs("tcd ", fd) < 0
 		     || ses_put_fname(fd, tp->tp_localdir, &ssop_flags) == FAIL
 		     || put_eol(fd) == FAIL)
-		goto fail;
+		ಹೋಗು fail;
 	    did_lcd = TRUE;
 	}
 
 	// Restore the view of the window (options, file, cursor, etc.).
-	for (wp = tab_firstwin; wp != NULL; wp = wp->w_next)
+	ಗಾಗಿ (wp = tab_firstwin; wp != ಖಾಲಿ; wp = wp->w_ಮುಂದಿನ)
 	{
-	    if (!ses_do_win(wp))
-		continue;
-	    if (put_view(fd, wp, tp, wp != edited_win, &ssop_flags,
+	    ಆದರೆ (!ses_do_win(wp))
+		ಮುಂದುವರಿ;
+	    ಆದರೆ (put_view(fd, wp, tp, wp != edited_win, &ssop_flags,
 							 cur_arg_idx,
 # ifdef FEAT_TERMINAL
 							 &terminal_bufs
-# else
-							 NULL
+# ಇಲ್ಲದಿದ್ದರೆ
+							 ಖಾಲಿ
 # endif
 		 ) == FAIL)
-		goto fail;
-	    if (nr > 1 && put_line(fd, "wincmd w") == FAIL)
-		goto fail;
-	    next_arg_idx = wp->w_arg_idx;
+		ಹೋಗು fail;
+	    ಆದರೆ (nr > 1 && put_ಸಾಲು(fd, "wincmd w") == FAIL)
+		ಹೋಗು fail;
+	    ಮುಂದಿನ_arg_idx = wp->w_arg_idx;
 	}
 
 	// The argument index in the first tab page is zero, need to set it in
 	// each window.  For further tab pages it's the window where we do
 	// "tabedit".
-	cur_arg_idx = next_arg_idx;
+	cur_arg_idx = ಮುಂದಿನ_arg_idx;
 
 	// Restore cursor to the current window if it's not the first one.
-	if (cnr > 1 && (fprintf(fd, ":%dwincmd w", cnr) < 0
+	ಆದರೆ (cnr > 1 && (fprintf(fd, ":%dwincmd w", cnr) < 0
 						      || put_eol(fd) == FAIL))
-	    goto fail;
+	    ಹೋಗು fail;
 
 	// Restore window sizes again after jumping around in windows, because
 	// the current window has a minimum size while others may not.
-	if (nr > 1 && ses_winsizes(fd, restore_size, tab_firstwin) == FAIL)
-	    goto fail;
+	ಆದರೆ (nr > 1 && ses_winsizes(fd, restore_ಗಾತ್ರ, tab_firstwin) == FAIL)
+	    ಹೋಗು fail;
 
 	// Don't continue in another tab page when doing only the current one
 	// or when at the last tab page.
-	if (!(ssop_flags & SSOP_TABPAGES))
-	    break;
+	ಆದರೆ (!(ssop_flags & SSOP_TABPAGES))
+	    ನಿಲ್ಲಿಸು;
     }
 
-    if (ssop_flags & SSOP_TABPAGES)
+    ಆದರೆ (ssop_flags & SSOP_TABPAGES)
     {
-	if (fprintf(fd, "tabnext %d", tabpage_index(curtab)) < 0
+	ಆದರೆ (fprintf(fd, "tabnext %d", tabpage_ಸೂಚ್ಯಂಕ(curtab)) < 0
 		|| put_eol(fd) == FAIL)
-	    goto fail;
+	    ಹೋಗು fail;
     }
-    if (restore_stal && put_line(fd, "set stal=1") == FAIL)
-	goto fail;
+    ಆದರೆ (restore_stal && put_ಸಾಲು(fd, "set stal=1") == FAIL)
+	ಹೋಗು fail;
 
     // Wipe out an empty unnamed buffer we started in.
-    if (put_line(fd, "if wipebuf != -1 && len(win_findbuf(wipebuf)) == 0")
+    ಆದರೆ (put_ಸಾಲು(fd, "if wipebuf != -1 && len(win_findbuf(wipebuf)) == 0")
 								       == FAIL)
-	goto fail;
-    if (put_line(fd, "  silent exe 'bwipe ' .. wipebuf") == FAIL)
-	goto fail;
-    if (put_line(fd, "endif") == FAIL)
-	goto fail;
+	ಹೋಗು fail;
+    ಆದರೆ (put_ಸಾಲು(fd, "  silent exe 'bwipe ' .. wipebuf") == FAIL)
+	ಹೋಗು fail;
+    ಆದರೆ (put_ಸಾಲು(fd, "endif") == FAIL)
+	ಹೋಗು fail;
 
     // Re-apply 'winheight' and 'winwidth', but honor 'winminheight' and
     // 'winminwidth' settings we saved from the original user context.
-    if (fprintf(fd, "&winheight = max([%ld, save_winminheight])", p_wh) < 0
+    ಆದರೆ (fprintf(fd, "&winheight = max([%ld, save_winminheight])", p_wh) < 0
 	    || put_eol(fd) == FAIL
 	    || fprintf(fd, "&winwidth = max([%ld, save_winminwidth])", p_wiw) < 0
 	    || put_eol(fd) == FAIL)
-	goto fail;
+	ಹೋಗು fail;
 
     // Restore 'shortmess'.
-    if (ssop_flags & SSOP_OPTIONS)
+    ಆದರೆ (ssop_flags & SSOP_OPTIONS)
     {
-	if (fprintf(fd, "set shortmess=%s", p_shm) < 0 || put_eol(fd) == FAIL)
-	    goto fail;
+	ಆದರೆ (fprintf(fd, "set shortmess=%s", p_shm) < 0 || put_eol(fd) == FAIL)
+	    ಹೋಗು fail;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (put_line(fd, "&shortmess = shortmess_save") == FAIL)
-	    goto fail;
+	ಆದರೆ (put_ಸಾಲು(fd, "&shortmess = shortmess_save") == FAIL)
+	    ಹೋಗು fail;
     }
 
-    if (restore_height_width)
+    ಆದರೆ (restore_ಎತ್ತರ_ಅಗಲ)
     {
 	// Restore 'winminheight' and 'winminwidth'.
-	if (put_line(fd, "&winminheight = save_winminheight") == FAIL
-	      || put_line(fd, "&winminwidth = save_winminwidth") == FAIL)
-	    goto fail;
+	ಆದರೆ (put_ಸಾಲು(fd, "&winminheight = save_winminheight") == FAIL
+	      || put_ಸಾಲು(fd, "&winminwidth = save_winminwidth") == FAIL)
+	    ಹೋಗು fail;
     }
 
     // Lastly, execute the x.vim file if it exists.
-    if (put_line(fd, "var sx: string = expand(\"<sfile>:p:r\") .. \"x.vim\"") == FAIL
-	    || put_line(fd, "if filereadable(sx)") == FAIL
-	    || put_line(fd, "  exe \"source \" .. fnameescape(sx)") == FAIL
-	    || put_line(fd, "endif") == FAIL)
-	goto fail;
+    ಆದರೆ (put_ಸಾಲು(fd, "var sx: string = expand(\"<sfile>:p:r\") .. \"x.vim\"") == FAIL
+	    || put_ಸಾಲು(fd, "if filereadable(sx)") == FAIL
+	    || put_ಸಾಲು(fd, "  exe \"source \" .. fnameescape(sx)") == FAIL
+	    || put_ಸಾಲು(fd, "endif") == FAIL)
+	ಹೋಗು fail;
 
     ret = OK;
 fail:
 # ifdef FEAT_TERMINAL
     hash_clear_all(&terminal_bufs, 0);
 # endif
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
 /*
  * Get the name of the view file for the current buffer.
  */
-    static char_u *
-get_view_file(int c)
+    ಸ್ಥಿರ char_u *
+get_view_file(ಪೂರ್ಣಾಂಕ c)
 {
-    int		len = 0;
+    ಪೂರ್ಣಾಂಕ		len = 0;
     char_u	*p, *s;
     char_u	*retval;
     char_u	*sname;
 
-    if (curbuf->b_ffname == NULL)
+    ಆದರೆ (curbuf->b_ffname == ಖಾಲಿ)
     {
 	emsg(_(e_no_file_name));
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
-    sname = home_replace_save(NULL, curbuf->b_ffname);
-    if (sname == NULL)
-	return NULL;
+    sname = home_replace_save(ಖಾಲಿ, curbuf->b_ffname);
+    ಆದರೆ (sname == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     // We want a file name without separators, because we're not going to make
     // a directory.
     // "normal" path separator	-> "=+"
     // "="			-> "=="
     // ":" path separator	-> "=-"
-    for (p = sname; *p; ++p)
-	if (*p == '=' || vim_ispathsep(*p))
+    ಗಾಗಿ (p = sname; *p; ++p)
+	ಆದರೆ (*p == '=' || vim_ispathsep(*p))
 	    ++len;
     retval = alloc(STRLEN(sname) + len + STRLEN(p_vdir) + 9);
-    if (retval != NULL)
+    ಆದರೆ (retval != ಖಾಲಿ)
     {
 	STRCPY(retval, p_vdir);
-	add_pathsep(retval);
+	ಕೂಡಿಸು_pathsep(retval);
 	s = retval + STRLEN(retval);
-	for (p = sname; *p; ++p)
+	ಗಾಗಿ (p = sname; *p; ++p)
 	{
-	    if (*p == '=')
+	    ಆದರೆ (*p == '=')
 	    {
 		*s++ = '=';
 		*s++ = '=';
 	    }
-	    else if (vim_ispathsep(*p))
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (vim_ispathsep(*p))
 	    {
 		*s++ = '=';
-# if defined(BACKSLASH_IN_FILENAME) || defined(AMIGA) || defined(VMS)
-		if (*p == ':')
+# ಆದರೆ defined(BACKSLASH_ಒಳ_FILENAME) || defined(AMIGA) || defined(VMS)
+		ಆದರೆ (*p == ':')
 		    *s++ = '-';
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 # endif
 		    *s++ = '+';
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		*s++ = *p;
 	}
 	*s++ = '=';
@@ -1078,50 +1078,50 @@ get_view_file(int c)
     }
 
     vim_free(sname);
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
 /*
  * ":loadview [nr]"
  */
-    void
+    ಶೂನ್ಯ
 ex_loadview(exarg_T *eap)
 {
     char_u	*fname;
 
     fname = get_view_file(*eap->arg);
-    if (fname == NULL)
-	return;
+    ಆದರೆ (fname == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    (void)do_source(fname, FALSE, DOSO_NONE, NULL);
+    (ಶೂನ್ಯ)do_ಮೂಲ(fname, FALSE, DOSO_NONE, ಖಾಲಿ);
     vim_free(fname);
 }
 
-# if defined(FEAT_GUI_GNOME) \
+# ಆದರೆ defined(FEAT_GUI_GNOME) \
 	|| (defined(GUI_MAY_SPAWN) && defined(EXPERIMENTAL_GUI_CMD))
 /*
  * Generate a script that can be used to restore the current editing session.
  * Save the value of v:this_session before running :mksession in order to make
  * automagic session save fully transparent.  Return TRUE on success.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 write_session_file(char_u *filename)
 {
     char_u	    *escaped_filename;
-    char	    *mksession_cmdline;
-    unsigned int    save_ssop_flags;
-    int		    failed;
+    ಅಕ್ಷರ	    *mksession_cmdline;
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ    save_ssop_flags;
+    ಪೂರ್ಣಾಂಕ		    failed;
 
     // Build an ex command line to create a script that restores the current
     // session if executed.  Escape the filename to avoid nasty surprises.
     escaped_filename = vim_strsave_escaped(filename, escape_chars);
-    if (escaped_filename == NULL)
-	return FALSE;
+    ಆದರೆ (escaped_filename == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FALSE;
     mksession_cmdline = alloc(10 + STRLEN(escaped_filename) + 1);
-    if (mksession_cmdline == NULL)
+    ಆದರೆ (mksession_cmdline == ಖಾಲಿ)
     {
 	vim_free(escaped_filename);
-	return FALSE;
+	ಹಿಂತಿರುಗಿ FALSE;
     }
     strcpy(mksession_cmdline, "mksession ");
     STRCAT(mksession_cmdline, escaped_filename);
@@ -1148,100 +1148,100 @@ write_session_file(char_u *filename)
     // as if this save never happened.	This is to avoid conflicts with
     // the user's own sessions.  FIXME: It's probably less hackish to add
     // a "stealth" flag to 'sessionoptions' -- gotta ask Bram.
-    if (!failed)
+    ಆದರೆ (!failed)
     {
 	FILE *fd;
 
 	fd = open_exfile(filename, TRUE, APPENDBIN);
 
-	failed = (fd == NULL
-	       || put_line(fd, "v:this_session = g:Save_VV_this_session")
+	failed = (fd == ಖಾಲಿ
+	       || put_ಸಾಲು(fd, "v:this_session = g:Save_VV_this_session")
 									== FAIL
-	       || put_line(fd, "unlet g:Save_VV_this_session") == FAIL);
+	       || put_ಸಾಲು(fd, "unlet g:Save_VV_this_session") == FAIL);
 
-	if (fd != NULL && fclose(fd) != 0)
+	ಆದರೆ (fd != ಖಾಲಿ && fclose(fd) != 0)
 	    failed = TRUE;
 
-	if (failed)
+	ಆದರೆ (failed)
 	    mch_remove(filename);
     }
 
-    return !failed;
+    ಹಿಂತಿರುಗಿ !failed;
 }
 # endif
 
-#endif // FEAT_SESSION
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_SESSION
 
-#if defined(FEAT_SESSION) && defined(USE_CRNL)
+#ಆದರೆ defined(FEAT_SESSION) && defined(USE_CRNL)
 # define MKSESSION_NL
-static int mksession_nl = FALSE;    // use NL only in put_eol()
-#endif
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ mksession_nl = FALSE;    // use NL only in put_eol()
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * ":mkexrc", ":mkvimrc", ":mkview" and ":mksession".
  */
-    void
+    ಶೂನ್ಯ
 ex_mkrc(exarg_T	*eap)
 {
     FILE	*fd;
-    int		failed = FALSE;
+    ಪೂರ್ಣಾಂಕ		failed = FALSE;
     char_u	*fname;
-#ifdef FEAT_BROWSE
-    char_u	*browseFile = NULL;
-#endif
-#ifdef FEAT_SESSION
-    int		view_session = FALSE;
-    int		using_vdir = FALSE;	// using 'viewdir'?
-    char_u	*viewFile = NULL;
-    unsigned	*flagp;
-#endif
-#if defined(FEAT_EVAL)
-    int		sid;
-    scriptitem_T *si = NULL;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_BROWSE
+    char_u	*browseFile = ಖಾಲಿ;
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SESSION
+    ಪೂರ್ಣಾಂಕ		view_session = FALSE;
+    ಪೂರ್ಣಾಂಕ		using_vdir = FALSE;	// using 'viewdir'?
+    char_u	*viewFile = ಖಾಲಿ;
+    ಚಿಹ್ನೆರಹಿತ	*flagp;
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(FEAT_EVAL)
+    ಪೂರ್ಣಾಂಕ		sid;
+    scriptitem_T *si = ಖಾಲಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (eap->cmdidx == CMD_mksession || eap->cmdidx == CMD_mkview)
+    ಆದರೆ (eap->cmdidx == CMD_mksession || eap->cmdidx == CMD_mkview)
     {
-#ifdef FEAT_SESSION
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SESSION
 	view_session = TRUE;
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 	ex_ni(eap);
-	return;
-#endif
+	ಹಿಂತಿರುಗಿ;
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
-#ifdef FEAT_SESSION
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SESSION
     // Use the short file name until ":lcd" is used.  We also don't use the
     // short file name when 'acd' is set, that is checked later.
     did_lcd = FALSE;
 
     // ":mkview" or ":mkview 9": generate file name with 'viewdir'
-    if (eap->cmdidx == CMD_mkview
+    ಆದರೆ (eap->cmdidx == CMD_mkview
 	    && (*eap->arg == NUL
 		|| (vim_isdigit(*eap->arg) && eap->arg[1] == NUL)))
     {
 	eap->forceit = TRUE;
 	fname = get_view_file(*eap->arg);
-	if (fname == NULL)
-	    return;
+	ಆದರೆ (fname == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ;
 	viewFile = fname;
 	using_vdir = TRUE;
     }
-    else
-#endif
-	if (*eap->arg != NUL)
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	ಆದರೆ (*eap->arg != NUL)
 	fname = eap->arg;
-    else if (eap->cmdidx == CMD_mkvimrc)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (eap->cmdidx == CMD_mkvimrc)
 	fname = (char_u *)VIMRC_FILE;
-#ifdef FEAT_SESSION
-    else if (eap->cmdidx == CMD_mksession)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SESSION
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (eap->cmdidx == CMD_mksession)
 	fname = (char_u *)SESSION_FILE;
-#endif
-    else
+#ಆದರೆ_ಅಂತ್ಯ
+    ಇಲ್ಲದಿದ್ದರೆ
 	fname = (char_u *)EXRC_FILE;
 
-#ifdef FEAT_BROWSE
-    if (cmdmod.cmod_flags & CMOD_BROWSE)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_BROWSE
+    ಆದರೆ (cmdmod.cmod_flags & CMOD_BROWSE)
     {
 	browseFile = do_browse(BROWSE_SAVE,
 # ifdef FEAT_SESSION
@@ -1249,284 +1249,284 @@ ex_mkrc(exarg_T	*eap)
 		eap->cmdidx == CMD_mksession ? (char_u *)_("Save Session") :
 # endif
 		(char_u *)_("Save Setup"),
-		fname, (char_u *)"vim", NULL,
-		(char_u *)_(BROWSE_FILTER_MACROS), NULL);
-	if (browseFile == NULL)
-	    goto theend;
+		fname, (char_u *)"vim", ಖಾಲಿ,
+		(char_u *)_(BROWSE_FILTER_MACROS), ಖಾಲಿ);
+	ಆದರೆ (browseFile == ಖಾಲಿ)
+	    ಹೋಗು theend;
 	fname = browseFile;
 	eap->forceit = TRUE;	// since dialog already asked
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_SESSION) && defined(vim_mkdir)
+#ಆದರೆ defined(FEAT_SESSION) && defined(vim_mkdir)
     // When using 'viewdir' may have to create the directory.
-    if (using_vdir && !mch_isdir(p_vdir))
+    ಆದರೆ (using_vdir && !mch_isdir(p_vdir))
 	vim_mkdir_emsg(p_vdir, 0755);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     fd = open_exfile(fname, eap->forceit, WRITEBIN);
-    if (fd != NULL)
+    ಆದರೆ (fd != ಖಾಲಿ)
     {
-#ifdef FEAT_SESSION
-	if (eap->cmdidx == CMD_mkview)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SESSION
+	ಆದರೆ (eap->cmdidx == CMD_mkview)
 	    flagp = &vop_flags;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    flagp = &ssop_flags;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef MKSESSION_NL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MKSESSION_NL
 	// "unix" in 'sessionoptions': use NL line separator
-	if (view_session && (*flagp & SSOP_UNIX))
+	ಆದರೆ (view_session && (*flagp & SSOP_UNIX))
 	    mksession_nl = TRUE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 	// Enforce vim9script
-	if (put_line(fd, "vim9script") == FAIL)
+	ಆದರೆ (put_ಸಾಲು(fd, "vim9script") == FAIL)
 	    failed = TRUE;
 
 	// Write the version command for :mkvimrc
-	if (eap->cmdidx == CMD_mkvimrc)
-	    (void)put_line(fd, "version 6.0");
+	ಆದರೆ (eap->cmdidx == CMD_mkvimrc)
+	    (ಶೂನ್ಯ)put_ಸಾಲು(fd, "version 6.0");
 
-#ifdef FEAT_SESSION
-	if (eap->cmdidx == CMD_mksession)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SESSION
+	ಆದರೆ (eap->cmdidx == CMD_mksession)
 	{
-	    if (put_line(fd, "g:SessionLoad = 1") == FAIL)
+	    ಆದರೆ (put_ಸಾಲು(fd, "g:SessionLoad = 1") == FAIL)
 		failed = TRUE;
 	}
 
-	if (eap->cmdidx != CMD_mkview)
-#endif
+	ಆದರೆ (eap->cmdidx != CMD_mkview)
+#ಆದರೆ_ಅಂತ್ಯ
 	{
 	    // Write setting 'compatible' first, because it has side effects.
 	    // For that same reason only do it when needed.
-	    if (p_cp)
-		(void)put_line(fd, "if !&cp | set cp | endif");
-	    else
-		(void)put_line(fd, "if &cp | set nocp | endif");
+	    ಆದರೆ (p_cp)
+		(ಶೂನ್ಯ)put_ಸಾಲು(fd, "if !&cp | set cp | endif");
+	    ಇಲ್ಲದಿದ್ದರೆ
+		(ಶೂನ್ಯ)put_ಸಾಲು(fd, "if &cp | set nocp | endif");
 	}
 
-#ifdef FEAT_SESSION
-	if (!view_session
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SESSION
+	ಆದರೆ (!view_session
 		|| (eap->cmdidx == CMD_mksession
 		    && (*flagp & (SSOP_OPTIONS | SSOP_LOCALOPTIONS))))
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	{
 	    bool do_mappings = true;
-	    int flags = OPT_GLOBAL;
+	    ಪೂರ್ಣಾಂಕ flags = OPT_GLOBAL;
 
-#ifdef FEAT_SESSION
-	    failed |= put_line(fd, "var cpo_save: string") == FAIL;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SESSION
+	    failed |= put_ಸಾಲು(fd, "var cpo_save: string") == FAIL;
 
-	    if (eap->cmdidx == CMD_mksession)
+	    ಆದರೆ (eap->cmdidx == CMD_mksession)
 	    {
-		if (*flagp & SSOP_SKIP_RTP)
+		ಆದರೆ (*flagp & SSOP_SKIP_RTP)
 		    flags |= OPT_SKIPRTP;
 
 		// SSOP_LOCALOPTIONS requires only local mappings
 		do_mappings = *flagp & SSOP_OPTIONS;
 	    }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-	    if (do_mappings)
-		failed |= (makemap(fd, NULL) == FAIL
+	    ಆದರೆ (do_mappings)
+		failed |= (makemap(fd, ಖಾಲಿ) == FAIL
 					 || makeset(fd, flags, FALSE) == FAIL);
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 	    // Save delay load import modules.
 	    // Either SSOP_LOCALOPTIONS or SSOP_OPTIONS require them
-	    for (sid = 1; sid <= script_items.ga_len; ++sid)
+	    ಗಾಗಿ (sid = 1; sid <= script_ವಸ್ತುಗಳು.ga_len; ++sid)
 	    {
-		si = SCRIPT_ITEM(sid);
+		si = SCRIPT_ಅಂಶ(sid);
 
 		// Autoload script paths may be absolute, relative to the
 		// current script or relative to a 'runtimepath' directory
 		// Ignore if missing
-		if ((si->sn_autoload_prefix || si->sn_import_autoload)
+		ಆದರೆ ((si->sn_autoload_ಪೂರ್ವಪ್ರತ್ಯಯ || si->sn_import_autoload)
 			&& file_is_readable(si->sn_name))
 		{
 		    // Check if conflicts with a previous import
-		    int b_sid = sid - 1;
+		    ಪೂರ್ಣಾಂಕ b_sid = sid - 1;
 		    char_u *name = gettail(si->sn_name);
 
-		    for (; b_sid; --b_sid)
+		    ಗಾಗಿ (; b_sid; --b_sid)
 		    {
-			scriptitem_T *b_si = SCRIPT_ITEM(b_sid);
+			scriptitem_T *b_si = SCRIPT_ಅಂಶ(b_sid);
 
 			// Only autoload may conflict. Ignore if missing
-			if ((!b_si->sn_autoload_prefix && !b_si->sn_import_autoload)
+			ಆದರೆ ((!b_si->sn_autoload_ಪೂರ್ವಪ್ರತ್ಯಯ && !b_si->sn_import_autoload)
 				|| !file_is_readable(b_si->sn_name))
-			    continue;
+			    ಮುಂದುವರಿ;
 
 			// compare prefixes if available
-			if (si->sn_autoload_prefix != NULL && b_si->sn_autoload_prefix != NULL
-				&& (STRCMP(si->sn_autoload_prefix, b_si->sn_autoload_prefix) == 0))
-			    break;
+			ಆದರೆ (si->sn_autoload_ಪೂರ್ವಪ್ರತ್ಯಯ != ಖಾಲಿ && b_si->sn_autoload_ಪೂರ್ವಪ್ರತ್ಯಯ != ಖಾಲಿ
+				&& (STRCMP(si->sn_autoload_ಪೂರ್ವಪ್ರತ್ಯಯ, b_si->sn_autoload_ಪೂರ್ವಪ್ರತ್ಯಯ) == 0))
+			    ನಿಲ್ಲಿಸು;
 
 			// otherwise compare tails
 			char_u *b_name = gettail(b_si->sn_name);
-			if (STRCMP(name, b_name) == 0)
-			    break;
+			ಆದರೆ (STRCMP(name, b_name) == 0)
+			    ನಿಲ್ಲಿಸು;
 		    }
 
 		    // import the auto script if there are no conflicts
-		    if (fprintf(fd, "%simport autoload '%s'", b_sid ? "# " : "", si->sn_name) < 0 ||
+		    ಆದರೆ (fprintf(fd, "%simport autoload '%s'", b_sid ? "# " : "", si->sn_name) < 0 ||
 			put_eol(fd) == FAIL)
 		    failed = TRUE;
 		}
 	    }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	}
 
-#ifdef FEAT_SESSION
-	if (!failed && view_session)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SESSION
+	ಆದರೆ (!failed && view_session)
 	{
-	    if (put_line(fd, "const so_save: number = &g:so | const siso_save: number = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1") == FAIL)
+	    ಆದರೆ (put_ಸಾಲು(fd, "const so_save: number = &g:so | const siso_save: number = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1") == FAIL)
 		failed = TRUE;
-	    if (eap->cmdidx == CMD_mksession)
+	    ಆದರೆ (eap->cmdidx == CMD_mksession)
 	    {
 		char_u *dirnow;	 // current directory
 
 		dirnow = alloc(MAXPATHL);
-		if (dirnow == NULL)
+		ಆದರೆ (dirnow == ಖಾಲಿ)
 		    failed = TRUE;
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    // Change to session file's dir.
-		    if (mch_dirname(dirnow, MAXPATHL) == FAIL
-					    || mch_chdir((char *)dirnow) != 0)
+		    ಆದರೆ (mch_dirname(dirnow, MAXPATHL) == FAIL
+					    || mch_chdir((ಅಕ್ಷರ *)dirnow) != 0)
 			*dirnow = NUL;
-		    if (*dirnow != NUL && (ssop_flags & SSOP_SESDIR))
+		    ಆದರೆ (*dirnow != NUL && (ssop_flags & SSOP_SESDIR))
 		    {
-			if (vim_chdirfile(fname, NULL) == OK)
+			ಆದರೆ (vim_chdirfile(fname, ಖಾಲಿ) == OK)
 			    shorten_fnames(TRUE);
 		    }
-		    else if (*dirnow != NUL
-			   && (ssop_flags & SSOP_CURDIR) && globaldir != NULL)
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*dirnow != NUL
+			   && (ssop_flags & SSOP_CURDIR) && globaldir != ಖಾಲಿ)
 		    {
-			if (mch_chdir((char *)globaldir) == 0)
+			ಆದರೆ (mch_chdir((ಅಕ್ಷರ *)globaldir) == 0)
 			    shorten_fnames(TRUE);
 		    }
 
 		    failed |= (makeopens(fd, dirnow) == FAIL);
 
 		    // restore original dir
-		    if (*dirnow != NUL && ((ssop_flags & SSOP_SESDIR)
-			|| ((ssop_flags & SSOP_CURDIR) && globaldir != NULL)))
+		    ಆದರೆ (*dirnow != NUL && ((ssop_flags & SSOP_SESDIR)
+			|| ((ssop_flags & SSOP_CURDIR) && globaldir != ಖಾಲಿ)))
 		    {
-			if (mch_chdir((char *)dirnow) != 0)
-			    emsg(_(e_cannot_go_back_to_previous_directory));
+			ಆದರೆ (mch_chdir((ಅಕ್ಷರ *)dirnow) != 0)
+			    emsg(_(e_cannot_go_ಹಿಂಭಾಗ_ಗಮ್ಯ_ಹಿಂದಿನ_directory));
 			shorten_fnames(TRUE);
 		    }
 		    vim_free(dirnow);
 		}
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		failed |= put_line(fd, "var cpo_save: string") == FAIL;
+		failed |= put_ಸಾಲು(fd, "var cpo_save: string") == FAIL;
 		failed |= (put_view(fd, curwin, curtab, !using_vdir, flagp, -1,
-								NULL) == FAIL);
+								ಖಾಲಿ) == FAIL);
 	    }
-	    if (put_line(fd, "&g:so = so_save | &g:siso = siso_save") == FAIL)
+	    ಆದರೆ (put_ಸಾಲು(fd, "&g:so = so_save | &g:siso = siso_save") == FAIL)
 		failed = TRUE;
-# ifdef FEAT_SEARCH_EXTRA
-	    if (no_hlsearch && put_line(fd, "nohlsearch") == FAIL)
+# ifdef FEAT_ಹುಡುಕು_EXTRA
+	    ಆದರೆ (no_hlsearch && put_ಸಾಲು(fd, "nohlsearch") == FAIL)
 		failed = TRUE;
 # endif
-	    if (put_line(fd, "doautoall SessionLoadPost") == FAIL)
+	    ಆದರೆ (put_ಸಾಲು(fd, "doautoall SessionLoadPost") == FAIL)
 		failed = TRUE;
-	    if (eap->cmdidx == CMD_mksession)
+	    ಆದರೆ (eap->cmdidx == CMD_mksession)
 	    {
-		if (put_line(fd, "unlet g:SessionLoad") == FAIL)
+		ಆದರೆ (put_ಸಾಲು(fd, "unlet g:SessionLoad") == FAIL)
 		    failed = TRUE;
 	    }
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-	if (put_line(fd, "# vim: set ft=vim :") == FAIL)
+	ಆದರೆ (put_ಸಾಲು(fd, "# vim: set ft=vim :") == FAIL)
 	    failed = TRUE;
 
 	failed |= fclose(fd);
 
-	if (failed)
+	ಆದರೆ (failed)
 	    emsg(_(e_error_while_writing));
-#if defined(FEAT_SESSION)
-	else if (eap->cmdidx == CMD_mksession)
+#ಆದರೆ defined(FEAT_SESSION)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (eap->cmdidx == CMD_mksession)
 	{
 	    // successful session write - set this_session var
 	    char_u	*tbuf;
 
 	    tbuf = alloc(MAXPATHL);
-	    if (tbuf != NULL)
+	    ಆದರೆ (tbuf != ಖಾಲಿ)
 	    {
-		if (vim_FullName(fname, tbuf, MAXPATHL, FALSE) == OK)
-		    set_vim_var_string(VV_THIS_SESSION, tbuf, -1);
+		ಆದರೆ (vim_ತುಂಬಿದ_Name(fname, tbuf, MAXPATHL, FALSE) == OK)
+		    ಗಣ_vim_var_string(VV_THIS_SESSION, tbuf, -1);
 		vim_free(tbuf);
 	    }
 	}
-#endif
-#ifdef MKSESSION_NL
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MKSESSION_NL
 	mksession_nl = FALSE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
-#ifdef FEAT_BROWSE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_BROWSE
 theend:
     vim_free(browseFile);
-#endif
-#ifdef FEAT_SESSION
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SESSION
     vim_free(viewFile);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    apply_autocmds(EVENT_SESSIONWRITEPOST, NULL, NULL, FALSE, curbuf);
+    apply_autocmds(EVENT_SESSIONWRITEPOST, ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
 }
 
-#if defined(FEAT_VIMINFO) || defined(FEAT_SESSION)
+#ಆದರೆ defined(FEAT_VIMINFO) || defined(FEAT_SESSION)
     var_flavour_T
 var_flavour(char_u *varname)
 {
     char_u *p = varname;
 
-    if (ASCII_ISUPPER(*p))
+    ಆದರೆ (ASCII_ISUPPER(*p))
     {
-	while (*(++p))
-	    if (ASCII_ISLOWER(*p))
-		return VAR_FLAVOUR_SESSION;
-	return VAR_FLAVOUR_VIMINFO;
+	ಆಗ (*(++p))
+	    ಆದರೆ (ASCII_ISLOWER(*p))
+		ಹಿಂತಿರುಗಿ VAR_FLAVOUR_SESSION;
+	ಹಿಂತಿರುಗಿ VAR_FLAVOUR_VIMINFO;
     }
-    else
-	return VAR_FLAVOUR_DEFAULT;
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಹಿಂತಿರುಗಿ VAR_FLAVOUR_DEFAULT;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Write end-of-line character(s) for ":mkexrc", ":mkvimrc" and ":mksession".
  * Return FAIL for a write error.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 put_eol(FILE *fd)
 {
-    if (
-#ifdef USE_CRNL
+    ಆದರೆ (
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_CRNL
 	    (
 # ifdef MKSESSION_NL
 	     !mksession_nl &&
 # endif
 	     (putc('\r', fd) < 0)) ||
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    (putc('\n', fd) < 0))
-	return FAIL;
-    return OK;
+	ಹಿಂತಿರುಗಿ FAIL;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Write a line to "fd".
  * Return FAIL for a write error.
  */
-    int
-put_line(FILE *fd, char *s)
+    ಪೂರ್ಣಾಂಕ
+put_ಸಾಲು(FILE *fd, ಅಕ್ಷರ *s)
 {
-    if (fputs(s, fd) < 0 || put_eol(fd) == FAIL)
-	return FAIL;
-    return OK;
+    ಆದರೆ (fputs(s, fd) < 0 || put_eol(fd) == FAIL)
+	ಹಿಂತಿರುಗಿ FAIL;
+    ಹಿಂತಿರುಗಿ OK;
 }

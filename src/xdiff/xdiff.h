@@ -20,141 +20,141 @@
  *
  */
 
-#if !defined(XDIFF_H)
-#define XDIFF_H
+#ಆದರೆ !defined(XDIFF_H)
+#ವ್ಯಾಖ್ಯಾನಿಸು XDIFF_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* #ifdef __cplusplus */
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ __cplusplus
+ಬಾಹ್ಯ "C" {
+#ಆದರೆ_ಅಂತ್ಯ /* #ifdef __cplusplus */
 
 /* xpparm_t.flags */
-#define XDF_NEED_MINIMAL (1 << 0)
+#ವ್ಯಾಖ್ಯಾನಿಸು XDF_NEED_ಕನಿಷ್ಠತಮ (1 << 0)
 
-#define XDF_IGNORE_WHITESPACE (1 << 1)
-#define XDF_IGNORE_WHITESPACE_CHANGE (1 << 2)
-#define XDF_IGNORE_WHITESPACE_AT_EOL (1 << 3)
-#define XDF_IGNORE_CR_AT_EOL (1 << 4)
-#define XDF_WHITESPACE_FLAGS (XDF_IGNORE_WHITESPACE | \
+#ವ್ಯಾಖ್ಯಾನಿಸು XDF_IGNORE_WHITESPACE (1 << 1)
+#ವ್ಯಾಖ್ಯಾನಿಸು XDF_IGNORE_WHITESPACE_CHANGE (1 << 2)
+#ವ್ಯಾಖ್ಯಾನಿಸು XDF_IGNORE_WHITESPACE_AT_EOL (1 << 3)
+#ವ್ಯಾಖ್ಯಾನಿಸು XDF_IGNORE_CR_AT_EOL (1 << 4)
+#ವ್ಯಾಖ್ಯಾನಿಸು XDF_WHITESPACE_FLAGS (XDF_IGNORE_WHITESPACE | \
 			      XDF_IGNORE_WHITESPACE_CHANGE | \
 			      XDF_IGNORE_WHITESPACE_AT_EOL | \
 			      XDF_IGNORE_CR_AT_EOL)
 
-#define XDF_IGNORE_BLANK_LINES (1 << 7)
+#ವ್ಯಾಖ್ಯಾನಿಸು XDF_IGNORE_BLANK_ಸಾಲುಗಳು (1 << 7)
 
-#define XDF_PATIENCE_DIFF (1 << 14)
-#define XDF_HISTOGRAM_DIFF (1 << 15)
-#define XDF_DIFF_ALGORITHM_MASK (XDF_PATIENCE_DIFF | XDF_HISTOGRAM_DIFF)
-#define XDF_DIFF_ALG(x) ((x) & XDF_DIFF_ALGORITHM_MASK)
+#ವ್ಯಾಖ್ಯಾನಿಸು XDF_PATIENCE_DIFF (1 << 14)
+#ವ್ಯಾಖ್ಯಾನಿಸು XDF_HISTOGRAM_DIFF (1 << 15)
+#ವ್ಯಾಖ್ಯಾನಿಸು XDF_DIFF_ALGORITHM_ಮುಖವಾಡ (XDF_PATIENCE_DIFF | XDF_HISTOGRAM_DIFF)
+#ವ್ಯಾಖ್ಯಾನಿಸು XDF_DIFF_ALG(x) ((x) & XDF_DIFF_ALGORITHM_ಮುಖವಾಡ)
 
-#define XDF_INDENT_HEURISTIC (1 << 23)
+#ವ್ಯಾಖ್ಯಾನಿಸು XDF_INDENT_HEURISTIC (1 << 23)
 
 /* xdemitconf_t.flags */
-#define XDL_EMIT_FUNCNAMES (1 << 0)
-#define XDL_EMIT_NO_HUNK_HDR (1 << 1)
-#define XDL_EMIT_FUNCCONTEXT (1 << 2)
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_EMIT_FUNCNAMES (1 << 0)
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_EMIT_NO_HUNK_HDR (1 << 1)
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_EMIT_FUNCCONTEXT (1 << 2)
 
 /* merge simplification levels */
-#define XDL_MERGE_MINIMAL 0
-#define XDL_MERGE_EAGER 1
-#define XDL_MERGE_ZEALOUS 2
-#define XDL_MERGE_ZEALOUS_ALNUM 3
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_ವಿಲೀನ_ಕನಿಷ್ಠತಮ 0
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_ವಿಲೀನ_EAGER 1
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_ವಿಲೀನ_ZEALOUS 2
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_ವಿಲೀನ_ZEALOUS_ALNUM 3
 
 /* merge favor modes */
-#define XDL_MERGE_FAVOR_OURS 1
-#define XDL_MERGE_FAVOR_THEIRS 2
-#define XDL_MERGE_FAVOR_UNION 3
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_ವಿಲೀನ_FAVOR_OURS 1
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_ವಿಲೀನ_FAVOR_THEIRS 2
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_ವಿಲೀನ_FAVOR_UNION 3
 
 /* merge output styles */
-#define XDL_MERGE_DIFF3 1
-#define XDL_MERGE_ZEALOUS_DIFF3 2
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_ವಿಲೀನ_DIFF3 1
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_ವಿಲೀನ_ZEALOUS_DIFF3 2
 
-typedef struct s_mmfile {
-	char *ptr;
-	long size;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ s_mmfile {
+	ಅಕ್ಷರ *ptr;
+	ದೀರ್ಘ ಗಾತ್ರ_2;
 } mmfile_t;
 
-typedef struct s_mmbuffer {
-	char *ptr;
-	long size;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ s_mmbuffer {
+	ಅಕ್ಷರ *ptr;
+	ದೀರ್ಘ ಗಾತ್ರ_2;
 } mmbuffer_t;
 
-typedef struct s_xpparam {
-	unsigned long flags;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ s_xpparam {
+	ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ flags;
 
 	/* -I<regex> */
- #if 0  // unused by Vim
+ #ಆದರೆ 0  // unused by Vim
 	regex_t **ignore_regex;
 	size_t ignore_regex_nr;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 	/* See Documentation/diff-options.adoc. */
-	char **anchors;
+	ಅಕ್ಷರ **anchors;
 	size_t anchors_nr;
 } xpparam_t;
 
-typedef struct s_xdemitcb {
-	void *priv;
-	int (*out_hunk)(void *,
-			long old_begin, long old_nr,
-			long new_begin, long new_nr,
-			const char *func, long funclen);
-	int (*out_line)(void *, mmbuffer_t *, int);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ s_xdemitcb {
+	ಶೂನ್ಯ *priv;
+	ಪೂರ್ಣಾಂಕ (*ಹೊರಹೋಗು_hunk)(ಶೂನ್ಯ *,
+			ದೀರ್ಘ old_begin, ದೀರ್ಘ old_nr,
+			ದೀರ್ಘ new_begin, ದೀರ್ಘ new_nr,
+			ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *func, ದೀರ್ಘ funclen);
+	ಪೂರ್ಣಾಂಕ (*ಹೊರಹೋಗು_ಸಾಲು)(ಶೂನ್ಯ *, mmbuffer_t *, ಪೂರ್ಣಾಂಕ);
 } xdemitcb_t;
 
-typedef long (*find_func_t)(const char *line, long line_len, char *buffer, long buffer_size, void *priv);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ದೀರ್ಘ (*ಕಂಡುಹಿಡಿ_func_t)(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಸಾಲು, ದೀರ್ಘ ಸಾಲು_len, ಅಕ್ಷರ *ಬಫರ್, ದೀರ್ಘ ಬಫರ್_ಗಾತ್ರ_3, ಶೂನ್ಯ *priv);
 
-typedef int (*xdl_emit_hunk_consume_func_t)(long start_a, long count_a,
-					    long start_b, long count_b,
-					    void *cb_data);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಪೂರ್ಣಾಂಕ (*xdl_emit_hunk_consume_func_t)(ದೀರ್ಘ ಆರಂಭ_a, ದೀರ್ಘ ಎಣಿಕೆ_a,
+					    ದೀರ್ಘ ಆರಂಭ_b, ದೀರ್ಘ ಎಣಿಕೆ_b,
+					    ಶೂನ್ಯ *cb_ದತ್ತಾಂಶ_2);
 
-typedef struct s_xdemitconf {
-	long ctxlen;
-	long interhunkctxlen;
-	unsigned long flags;
-	find_func_t find_func;
-	void *find_func_priv;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ s_xdemitconf {
+	ದೀರ್ಘ ctxlen;
+	ದೀರ್ಘ interhunkctxlen;
+	ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ flags;
+	ಕಂಡುಹಿಡಿ_func_t ಕಂಡುಹಿಡಿ_func;
+	ಶೂನ್ಯ *ಕಂಡುಹಿಡಿ_func_priv;
 	xdl_emit_hunk_consume_func_t hunk_func;
 } xdemitconf_t;
 
-typedef struct s_bdiffparam {
-	long bsize;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ s_bdiffparam {
+	ದೀರ್ಘ bsize;
 } bdiffparam_t;
 
-#ifdef VMS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VMS
 # include "[]vim.h"
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 # include "../vim.h"
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#define xdl_malloc(x) lalloc((x), TRUE)
-#define xdl_calloc(n, sz) lalloc_clear(n*sz, TRUE)
-#define xdl_free(ptr) vim_free(ptr)
-#define xdl_realloc(ptr,x) vim_realloc((ptr),(x))
+#ವ್ಯಾಖ್ಯಾನಿಸು xdl_malloc(x) lalloc((x), TRUE)
+#ವ್ಯಾಖ್ಯಾನಿಸು xdl_calloc(n, sz) lalloc_clear(n*sz, TRUE)
+#ವ್ಯಾಖ್ಯಾನಿಸು xdl_free(ptr) vim_free(ptr)
+#ವ್ಯಾಖ್ಯಾನಿಸು xdl_realloc(ptr,x) vim_realloc((ptr),(x))
 
-void *xdl_mmfile_first(mmfile_t *mmf, long *size);
-long xdl_mmfile_size(mmfile_t *mmf);
+ಶೂನ್ಯ *xdl_mmfile_ಮೊದಲ(mmfile_t *mmf, ದೀರ್ಘ *ಗಾತ್ರ_2);
+ದೀರ್ಘ xdl_mmfile_ಗಾತ್ರ(mmfile_t *mmf);
 
-int xdl_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
-	     xdemitconf_t const *xecfg, xdemitcb_t *ecb);
+ಪೂರ್ಣಾಂಕ xdl_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t ಸ್ಥಿರಾಂಕ *xpp,
+	     xdemitconf_t ಸ್ಥಿರಾಂಕ *xecfg, xdemitcb_t *ecb);
 
-typedef struct s_xmparam {
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ s_xmparam {
 	xpparam_t xpp;
-	int marker_size;
-	int level;
-	int favor;
-	int style;
-	const char *ancestor;	/* label for orig */
-	const char *file1;	/* label for mf1 */
-	const char *file2;	/* label for mf2 */
+	ಪೂರ್ಣಾಂಕ marker_ಗಾತ್ರ;
+	ಪೂರ್ಣಾಂಕ level;
+	ಪೂರ್ಣಾಂಕ favor;
+	ಪೂರ್ಣಾಂಕ style;
+	ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ancestor;	/* label for orig */
+	ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *file1;	/* label for mf1 */
+	ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *file2;	/* label for mf2 */
 } xmparam_t;
 
-#define DEFAULT_CONFLICT_MARKER_SIZE 7
+#ವ್ಯಾಖ್ಯಾನಿಸು DEFAULT_CONFLICT_MARKER_ಗಾತ್ರ 7
 
-int xdl_merge(mmfile_t *orig, mmfile_t *mf1, mmfile_t *mf2,
-		xmparam_t const *xmp, mmbuffer_t *result);
+ಪೂರ್ಣಾಂಕ xdl_ವಿಲೀನ(mmfile_t *orig, mmfile_t *mf1, mmfile_t *mf2,
+		xmparam_t ಸ್ಥಿರಾಂಕ *xmp, mmbuffer_t *ಫಲಿತಾಂಶ);
 
-#ifdef __cplusplus
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ __cplusplus
 }
-#endif /* #ifdef __cplusplus */
+#ಆದರೆ_ಅಂತ್ಯ /* #ifdef __cplusplus */
 
-#endif /* #if !defined(XDIFF_H) */
+#ಆದರೆ_ಅಂತ್ಯ /* #if !defined(XDIFF_H) */

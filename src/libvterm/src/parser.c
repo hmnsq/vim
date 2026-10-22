@@ -1,67 +1,67 @@
-#include "vterm_internal.h"
+#ಅನ್ತರ್ಭಾವ "vterm_internal.h"
 
-#include <stdio.h>
-#include <string.h>
+#ಅನ್ತರ್ಭಾವ <stdio.h>
+#ಅನ್ತರ್ಭಾವ <string.h>
 
-#undef DEBUG_PARSER
+#ವ್ಯಾಖ್ಯಾನ_ರದ್ದು DEBUG_PARSER
 
-static int is_intermed(unsigned char c)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ is_intermed(ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ c)
 {
-  return c >= 0x20 && c <= 0x2f;
+  ಹಿಂತಿರುಗಿ c >= 0x20 && c <= 0x2f;
 }
 
-static void do_control(VTerm *vt, unsigned char control)
+ಸ್ಥಿರ ಶೂನ್ಯ do_control(VTerm *vt, ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ control)
 {
-  if(vt->parser.callbacks && vt->parser.callbacks->control)
-    if((*vt->parser.callbacks->control)(control, vt->parser.cbdata))
-      return;
+  ಆದರೆ(vt->parser.callbacks && vt->parser.callbacks->control)
+    ಆದರೆ((*vt->parser.callbacks->control)(control, vt->parser.cbdata))
+      ಹಿಂತಿರುಗಿ;
 
   DEBUG_LOG1("libvterm: Unhandled control 0x%02x\n", control);
 }
 
-static void do_csi(VTerm *vt, char command)
+ಸ್ಥಿರ ಶೂನ್ಯ do_csi(VTerm *vt, ಅಕ್ಷರ command)
 {
-#ifdef DEBUG_PARSER
-  printf("Parsed CSI args as:\n", arglen, args);
-  printf(" leader: %s\n", vt->parser.v.csi.leader);
-  for(int argi = 0; argi < vt->parser.v.csi.argi; argi++) {
-    printf(" %lu", CSI_ARG(vt->parser.v.csi.args[argi]));
-    if(!CSI_ARG_HAS_MORE(vt->parser.v.csi.args[argi]))
-      printf("\n");
-  printf(" intermed: %s\n", vt->parser.intermed);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DEBUG_PARSER
+  ಬರೆ("Parsed CSI args as:\n", arglen, ವಾದಗಳು);
+  ಬರೆ(" leader: %s\n", vt->parser.v.csi.leader);
+  ಗಾಗಿ(ಪೂರ್ಣಾಂಕ argi = 0; argi < vt->parser.v.csi.argi; argi++) {
+    ಬರೆ(" %lu", CSI_ARG(vt->parser.v.csi.ವಾದಗಳು[argi]));
+    ಆದರೆ(!CSI_ARG_HAS_ಇನ್ನಷ್ಟು(vt->parser.v.csi.ವಾದಗಳು[argi]))
+      ಬರೆ("\n");
+  ಬರೆ(" intermed: %s\n", vt->parser.intermed);
   }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-  if(vt->parser.callbacks && vt->parser.callbacks->csi)
-    if((*vt->parser.callbacks->csi)(
-          vt->parser.v.csi.leaderlen ? vt->parser.v.csi.leader : NULL,
-          vt->parser.v.csi.args,
+  ಆದರೆ(vt->parser.callbacks && vt->parser.callbacks->csi)
+    ಆದರೆ((*vt->parser.callbacks->csi)(
+          vt->parser.v.csi.leaderlen ? vt->parser.v.csi.leader : ಖಾಲಿ,
+          vt->parser.v.csi.ವಾದಗಳು,
           vt->parser.v.csi.argi,
-          vt->parser.intermedlen ? vt->parser.intermed : NULL,
+          vt->parser.intermedlen ? vt->parser.intermed : ಖಾಲಿ,
           command,
           vt->parser.cbdata))
-      return;
+      ಹಿಂತಿರುಗಿ;
 
   DEBUG_LOG1("libvterm: Unhandled CSI %c\n", command);
 }
 
-static void do_escape(VTerm *vt, char command)
+ಸ್ಥಿರ ಶೂನ್ಯ do_escape(VTerm *vt, ಅಕ್ಷರ command)
 {
-  char seq[INTERMED_MAX+1];
+  ಅಕ್ಷರ seq[INTERMED_MAX+1];
 
   size_t len = vt->parser.intermedlen;
   strncpy(seq, vt->parser.intermed, len);
   seq[len++] = command;
   seq[len]   = 0;
 
-  if(vt->parser.callbacks && vt->parser.callbacks->escape)
-    if((*vt->parser.callbacks->escape)(seq, len, vt->parser.cbdata))
-      return;
+  ಆದರೆ(vt->parser.callbacks && vt->parser.callbacks->escape)
+    ಆದರೆ((*vt->parser.callbacks->escape)(seq, len, vt->parser.cbdata))
+      ಹಿಂತಿರುಗಿ;
 
   DEBUG_LOG1("libvterm: Unhandled escape ESC 0x%02x\n", command);
 }
 
-static void string_fragment(VTerm *vt, const char *str, size_t len, int final)
+ಸ್ಥಿರ ಶೂನ್ಯ string_fragment(VTerm *vt, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *str, size_t len, ಪೂರ್ಣಾಂಕ final)
 {
   VTermStringFragment frag;
 
@@ -70,188 +70,188 @@ static void string_fragment(VTerm *vt, const char *str, size_t len, int final)
   frag.initial = vt->parser.string_initial;
   frag.final = final;
 
-  switch(vt->parser.state) {
-    case OSC:
-      if(vt->parser.callbacks && vt->parser.callbacks->osc)
+  ಆಯ್ಕೆ(vt->parser.state) {
+    ಸ್ಥಿತಿ OSC:
+      ಆದರೆ(vt->parser.callbacks && vt->parser.callbacks->osc)
         (*vt->parser.callbacks->osc)(vt->parser.v.osc.command, frag, vt->parser.cbdata);
-      break;
+      ನಿಲ್ಲಿಸು;
 
-    case DCS:
-      if(vt->parser.callbacks && vt->parser.callbacks->dcs)
+    ಸ್ಥಿತಿ DCS:
+      ಆದರೆ(vt->parser.callbacks && vt->parser.callbacks->dcs)
         (*vt->parser.callbacks->dcs)(vt->parser.v.dcs.command, vt->parser.v.dcs.commandlen, frag, vt->parser.cbdata);
-      break;
+      ನಿಲ್ಲಿಸು;
 
-    case APC:
-      if(vt->parser.callbacks && vt->parser.callbacks->apc)
+    ಸ್ಥಿತಿ APC:
+      ಆದರೆ(vt->parser.callbacks && vt->parser.callbacks->apc)
         (*vt->parser.callbacks->apc)(frag, vt->parser.cbdata);
-      break;
+      ನಿಲ್ಲಿಸು;
 
-    case PM:
-      if(vt->parser.callbacks && vt->parser.callbacks->pm)
+    ಸ್ಥಿತಿ PM:
+      ಆದರೆ(vt->parser.callbacks && vt->parser.callbacks->pm)
         (*vt->parser.callbacks->pm)(frag, vt->parser.cbdata);
-      break;
+      ನಿಲ್ಲಿಸು;
 
-    case SOS:
-      if(vt->parser.callbacks && vt->parser.callbacks->sos)
+    ಸ್ಥಿತಿ SOS:
+      ಆದರೆ(vt->parser.callbacks && vt->parser.callbacks->sos)
         (*vt->parser.callbacks->sos)(frag, vt->parser.cbdata);
-      break;
+      ನಿಲ್ಲಿಸು;
 
-    case NORMAL:
-    case CSI_LEADER:
-    case CSI_ARGS:
-    case CSI_INTERMED:
-    case OSC_COMMAND:
-    case DCS_COMMAND:
-      break;
+    ಸ್ಥಿತಿ ಸಾಮಾನ್ಯ_2:
+    ಸ್ಥಿತಿ CSI_LEADER:
+    ಸ್ಥಿತಿ CSI_ವಾದಗಳು:
+    ಸ್ಥಿತಿ CSI_INTERMED:
+    ಸ್ಥಿತಿ OSC_COMMAND:
+    ಸ್ಥಿತಿ DCS_COMMAND:
+      ನಿಲ್ಲಿಸು;
   }
 
   vt->parser.string_initial = FALSE;
 }
 
-size_t vterm_input_write(VTerm *vt, const char *bytes, size_t len)
+size_t vterm_ಒಳಹರಿವು_write(VTerm *vt, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಬೈಟುಗಳು, size_t len)
 {
   size_t pos = 0;
-  const char *string_start = NULL;  // init to avoid gcc warning
+  ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *string_ಆರಂಭ = ಖಾಲಿ;  // init to avoid gcc warning
 
-  vt->in_backspace = 0;		    // Count down with BS key and activate when
+  vt->ಒಳ_backspace = 0;		    // Count down with BS key and activate when
 				    // it reaches 1
 
-  switch(vt->parser.state) {
-  case NORMAL:
-  case CSI_LEADER:
-  case CSI_ARGS:
-  case CSI_INTERMED:
-  case OSC_COMMAND:
-  case DCS_COMMAND:
-    string_start = NULL;
-    break;
-  case OSC:
-  case DCS:
-  case APC:
-  case PM:
-  case SOS:
-    string_start = bytes;
-    break;
+  ಆಯ್ಕೆ(vt->parser.state) {
+  ಸ್ಥಿತಿ ಸಾಮಾನ್ಯ_2:
+  ಸ್ಥಿತಿ CSI_LEADER:
+  ಸ್ಥಿತಿ CSI_ವಾದಗಳು:
+  ಸ್ಥಿತಿ CSI_INTERMED:
+  ಸ್ಥಿತಿ OSC_COMMAND:
+  ಸ್ಥಿತಿ DCS_COMMAND:
+    string_ಆರಂಭ = ಖಾಲಿ;
+    ನಿಲ್ಲಿಸು;
+  ಸ್ಥಿತಿ OSC:
+  ಸ್ಥಿತಿ DCS:
+  ಸ್ಥಿತಿ APC:
+  ಸ್ಥಿತಿ PM:
+  ಸ್ಥಿತಿ SOS:
+    string_ಆರಂಭ = ಬೈಟುಗಳು;
+    ನಿಲ್ಲಿಸು;
   }
 
-#define ENTER_STATE(st)        do { vt->parser.state = st; string_start = NULL; } while(0)
-#define ENTER_NORMAL_STATE()   ENTER_STATE(NORMAL)
+#ವ್ಯಾಖ್ಯಾನಿಸು ENTER_STATE(st)        ಮಾಡು { vt->parser.state = st; string_ಆರಂಭ = ಖಾಲಿ; } ಆಗ(0)
+#ವ್ಯಾಖ್ಯಾನಿಸು ENTER_ಸಾಮಾನ್ಯ_STATE()   ENTER_STATE(ಸಾಮಾನ್ಯ_2)
 
-#define IS_STRING_STATE()      (vt->parser.state >= OSC_COMMAND)
+#ವ್ಯಾಖ್ಯಾನಿಸು IS_STRING_STATE()      (vt->parser.state >= OSC_COMMAND)
 
-  for( ; pos < len; pos++) {
-    unsigned char c = bytes[pos];
-    int c1_allowed = !vt->mode.utf8;
+  ಗಾಗಿ( ; pos < len; pos++) {
+    ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ c = ಬೈಟುಗಳು[pos];
+    ಪೂರ್ಣಾಂಕ c1_allowed = !vt->ಬಹುಲಕ.utf8;
 
-    if(c == 0x00 || c == 0x7f) { // NUL, DEL
-      if(IS_STRING_STATE()) {
-        string_fragment(vt, string_start, bytes + pos - string_start, FALSE);
-        string_start = bytes + pos + 1;
+    ಆದರೆ(c == 0x00 || c == 0x7f) { // NUL, DEL
+      ಆದರೆ(IS_STRING_STATE()) {
+        string_fragment(vt, string_ಆರಂಭ, ಬೈಟುಗಳು + pos - string_ಆರಂಭ, FALSE);
+        string_ಆರಂಭ = ಬೈಟುಗಳು + pos + 1;
       }
-      if(vt->parser.emit_nul)
+      ಆದರೆ(vt->parser.emit_nul)
         do_control(vt, c);
-      continue;
+      ಮುಂದುವರಿ;
     }
-    if(c == 0x18 || c == 0x1a) { // CAN, SUB
-      vt->parser.in_esc = FALSE;
-      ENTER_NORMAL_STATE();
-      if(vt->parser.emit_nul)
+    ಆದರೆ(c == 0x18 || c == 0x1a) { // CAN, SUB
+      vt->parser.ಒಳ_esc = FALSE;
+      ENTER_ಸಾಮಾನ್ಯ_STATE();
+      ಆದರೆ(vt->parser.emit_nul)
         do_control(vt, c);
-      continue;
+      ಮುಂದುವರಿ;
     }
-    else if(c == 0x1b) { // ESC
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(c == 0x1b) { // ESC
       vt->parser.intermedlen = 0;
-      if(!IS_STRING_STATE())
-        vt->parser.state = NORMAL;
-      vt->parser.in_esc = TRUE;
-      continue;
+      ಆದರೆ(!IS_STRING_STATE())
+        vt->parser.state = ಸಾಮಾನ್ಯ_2;
+      vt->parser.ಒಳ_esc = TRUE;
+      ಮುಂದುವರಿ;
     }
-    else if(c == 0x07 &&  // BEL, can stand for ST in OSC or DCS state
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(c == 0x07 &&  // BEL, can stand for ST in OSC or DCS state
             IS_STRING_STATE()) {
       // fallthrough
     }
-    else if(c < 0x20) { // other C0
-      if(vt->parser.state == SOS)
-        continue; // All other C0s permitted in SOS
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(c < 0x20) { // other C0
+      ಆದರೆ(vt->parser.state == SOS)
+        ಮುಂದುವರಿ; // All other C0s permitted in SOS
 
-      if(vterm_get_special_pty_type() == 2) {
-        if(c == 0x08) // BS
+      ಆದರೆ(vterm_get_special_pty_type() == 2) {
+        ಆದರೆ(c == 0x08) // BS
           // Set the trick for BS output after a sequence, to delay backspace
           // activation
-          if(pos + 2 < len && bytes[pos + 1] == 0x20 && bytes[pos + 2] == 0x08)
-            vt->in_backspace = 2; // Trigger when count down to 1
+          ಆದರೆ(pos + 2 < len && ಬೈಟುಗಳು[pos + 1] == 0x20 && ಬೈಟುಗಳು[pos + 2] == 0x08)
+            vt->ಒಳ_backspace = 2; // Trigger when count down to 1
       }
-      if(IS_STRING_STATE())
-        string_fragment(vt, string_start, bytes + pos - string_start, FALSE);
+      ಆದರೆ(IS_STRING_STATE())
+        string_fragment(vt, string_ಆರಂಭ, ಬೈಟುಗಳು + pos - string_ಆರಂಭ, FALSE);
       do_control(vt, c);
-      if(IS_STRING_STATE())
-        string_start = bytes + pos + 1;
-      continue;
+      ಆದರೆ(IS_STRING_STATE())
+        string_ಆರಂಭ = ಬೈಟುಗಳು + pos + 1;
+      ಮುಂದುವರಿ;
     }
     // else fallthrough
 
-    size_t string_len = bytes + pos - string_start;
+    size_t string_len = ಬೈಟುಗಳು + pos - string_ಆರಂಭ;
 
-    if(vt->parser.in_esc) {
+    ಆದರೆ(vt->parser.ಒಳ_esc) {
       // Hoist an ESC letter into a C1 if we're not in a string mode
       // Always accept ESC \ == ST even in string mode
-      if(!vt->parser.intermedlen &&
+      ಆದರೆ(!vt->parser.intermedlen &&
           c >= 0x40 && c < 0x60 &&
           ((!IS_STRING_STATE() || c == 0x5c))) {
         c += 0x40;
         c1_allowed = TRUE;
-        if(string_len)
+        ಆದರೆ(string_len)
           string_len -= 1;
-        vt->parser.in_esc = FALSE;
+        vt->parser.ಒಳ_esc = FALSE;
       }
-      else {
-        string_start = NULL;
-        vt->parser.state = NORMAL;
+      ಇಲ್ಲದಿದ್ದರೆ {
+        string_ಆರಂಭ = ಖಾಲಿ;
+        vt->parser.state = ಸಾಮಾನ್ಯ_2;
       }
     }
 
-    switch(vt->parser.state) {
-    case CSI_LEADER:
+    ಆಯ್ಕೆ(vt->parser.state) {
+    ಸ್ಥಿತಿ CSI_LEADER:
       /* Extract leader bytes 0x3c to 0x3f */
-      if(c >= 0x3c && c <= 0x3f) {
-        if(vt->parser.v.csi.leaderlen < CSI_LEADER_MAX-1)
+      ಆದರೆ(c >= 0x3c && c <= 0x3f) {
+        ಆದರೆ(vt->parser.v.csi.leaderlen < CSI_LEADER_MAX-1)
           vt->parser.v.csi.leader[vt->parser.v.csi.leaderlen++] = c;
-        break;
+        ನಿಲ್ಲಿಸು;
       }
 
       /* else fallthrough */
       vt->parser.v.csi.leader[vt->parser.v.csi.leaderlen] = 0;
 
       vt->parser.v.csi.argi = 0;
-      vt->parser.v.csi.args[0] = CSI_ARG_MISSING;
-      vt->parser.state = CSI_ARGS;
+      vt->parser.v.csi.ವಾದಗಳು[0] = CSI_ARG_MISSING;
+      vt->parser.state = CSI_ವಾದಗಳು;
 
       /* fallthrough */
-    case CSI_ARGS:
+    ಸ್ಥಿತಿ CSI_ವಾದಗಳು:
       /* Numerical value of argument */
-      if(c >= '0' && c <= '9') {
-        long arg_max = CSI_ARG_MISSING - 1;
-        long *arg = &vt->parser.v.csi.args[vt->parser.v.csi.argi];
-        int digit = c - '0';
+      ಆದರೆ(c >= '0' && c <= '9') {
+        ದೀರ್ಘ arg_max = CSI_ARG_MISSING - 1;
+        ದೀರ್ಘ *arg = &vt->parser.v.csi.ವಾದಗಳು[vt->parser.v.csi.argi];
+        ಪೂರ್ಣಾಂಕ digit = c - '0';
 
-        if(*arg == CSI_ARG_MISSING)
+        ಆದರೆ(*arg == CSI_ARG_MISSING)
           *arg = 0;
-        if(*arg > (arg_max - digit) / 10)
+        ಆದರೆ(*arg > (arg_max - digit) / 10)
           *arg = arg_max;
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
           *arg = *arg * 10 + digit;
-        break;
+        ನಿಲ್ಲಿಸು;
       }
-      if(c == ':') {
-        vt->parser.v.csi.args[vt->parser.v.csi.argi] |= CSI_ARG_FLAG_MORE;
+      ಆದರೆ(c == ':') {
+        vt->parser.v.csi.ವಾದಗಳು[vt->parser.v.csi.argi] |= CSI_ARG_FLAG_ಇನ್ನಷ್ಟು;
         c = ';';
       }
-      if(c == ';') {
-        if(vt->parser.v.csi.argi >= CSI_ARGS_MAX - 1)
-          break; /* drop excess args */
+      ಆದರೆ(c == ';') {
+        ಆದರೆ(vt->parser.v.csi.argi >= CSI_ವಾದಗಳು_MAX - 1)
+          ನಿಲ್ಲಿಸು; /* drop excess args */
         vt->parser.v.csi.argi++;
-        vt->parser.v.csi.args[vt->parser.v.csi.argi] = CSI_ARG_MISSING;
-        break;
+        vt->parser.v.csi.ವಾದಗಳು[vt->parser.v.csi.argi] = CSI_ARG_MISSING;
+        ನಿಲ್ಲಿಸು;
       }
 
       /* else fallthrough */
@@ -259,130 +259,130 @@ size_t vterm_input_write(VTerm *vt, const char *bytes, size_t len)
       vt->parser.intermedlen = 0;
       vt->parser.state = CSI_INTERMED;
       // FALLTHROUGH
-    case CSI_INTERMED:
-      if(is_intermed(c)) {
-        if(vt->parser.intermedlen < INTERMED_MAX-1)
+    ಸ್ಥಿತಿ CSI_INTERMED:
+      ಆದರೆ(is_intermed(c)) {
+        ಆದರೆ(vt->parser.intermedlen < INTERMED_MAX-1)
           vt->parser.intermed[vt->parser.intermedlen++] = c;
-        break;
+        ನಿಲ್ಲಿಸು;
       }
-      else if(c == 0x1b) {
+      ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(c == 0x1b) {
         /* ESC in CSI cancels */
       }
-      else if(c >= 0x40 && c <= 0x7e) {
+      ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(c >= 0x40 && c <= 0x7e) {
         vt->parser.intermed[vt->parser.intermedlen] = 0;
         do_csi(vt, c);
       }
       /* else was invalid CSI */
 
-      ENTER_NORMAL_STATE();
-      break;
+      ENTER_ಸಾಮಾನ್ಯ_STATE();
+      ನಿಲ್ಲಿಸು;
 
-    case OSC_COMMAND:
+    ಸ್ಥಿತಿ OSC_COMMAND:
       /* Numerical value of command */
-      if(c >= '0' && c <= '9') {
-        if(vt->parser.v.osc.command == -1)
+      ಆದರೆ(c >= '0' && c <= '9') {
+        ಆದರೆ(vt->parser.v.osc.command == -1)
           vt->parser.v.osc.command = 0;
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
           vt->parser.v.osc.command *= 10;
         vt->parser.v.osc.command += c - '0';
-        break;
+        ನಿಲ್ಲಿಸು;
       }
-      if(c == ';') {
+      ಆದರೆ(c == ';') {
         vt->parser.state = OSC;
-        string_start = bytes + pos + 1;
-        break;
+        string_ಆರಂಭ = ಬೈಟುಗಳು + pos + 1;
+        ನಿಲ್ಲಿಸು;
       }
 
       /* else fallthrough */
-      string_start = bytes + pos;
+      string_ಆರಂಭ = ಬೈಟುಗಳು + pos;
       string_len   = 0;
       vt->parser.state = OSC;
-      goto string_state;
+      ಹೋಗು string_state;
 
-    case DCS_COMMAND:
-      if(vt->parser.v.dcs.commandlen < CSI_LEADER_MAX)
+    ಸ್ಥಿತಿ DCS_COMMAND:
+      ಆದರೆ(vt->parser.v.dcs.commandlen < CSI_LEADER_MAX)
         vt->parser.v.dcs.command[vt->parser.v.dcs.commandlen++] = c;
 
-      if(c >= 0x40 && c<= 0x7e) {
-        string_start = bytes + pos + 1;
+      ಆದರೆ(c >= 0x40 && c<= 0x7e) {
+        string_ಆರಂಭ = ಬೈಟುಗಳು + pos + 1;
         vt->parser.state = DCS;
       }
-      break;
+      ನಿಲ್ಲಿಸು;
 
 string_state:
-    case OSC:
-    case DCS:
-    case APC:
-    case PM:
-    case SOS:
-      if(c == 0x07 || (c1_allowed && c == 0x9c)) {
-        string_fragment(vt, string_start, string_len, TRUE);
-        ENTER_NORMAL_STATE();
+    ಸ್ಥಿತಿ OSC:
+    ಸ್ಥಿತಿ DCS:
+    ಸ್ಥಿತಿ APC:
+    ಸ್ಥಿತಿ PM:
+    ಸ್ಥಿತಿ SOS:
+      ಆದರೆ(c == 0x07 || (c1_allowed && c == 0x9c)) {
+        string_fragment(vt, string_ಆರಂಭ, string_len, TRUE);
+        ENTER_ಸಾಮಾನ್ಯ_STATE();
       }
-      break;
+      ನಿಲ್ಲಿಸು;
 
-    case NORMAL:
-      if(vt->parser.in_esc) {
-        if(is_intermed(c)) {
-          if(vt->parser.intermedlen < INTERMED_MAX-1)
+    ಸ್ಥಿತಿ ಸಾಮಾನ್ಯ_2:
+      ಆದರೆ(vt->parser.ಒಳ_esc) {
+        ಆದರೆ(is_intermed(c)) {
+          ಆದರೆ(vt->parser.intermedlen < INTERMED_MAX-1)
             vt->parser.intermed[vt->parser.intermedlen++] = c;
         }
-        else if(c >= 0x30 && c < 0x7f) {
+        ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(c >= 0x30 && c < 0x7f) {
           do_escape(vt, c);
-          vt->parser.in_esc = 0;
-          ENTER_NORMAL_STATE();
+          vt->parser.ಒಳ_esc = 0;
+          ENTER_ಸಾಮಾನ್ಯ_STATE();
         }
-        else {
+        ಇಲ್ಲದಿದ್ದರೆ {
           DEBUG_LOG1("TODO: Unhandled byte %02x in Escape\n", c);
         }
-        break;
+        ನಿಲ್ಲಿಸು;
       }
-      if(c1_allowed && c >= 0x80 && c < 0xa0) {
-        switch(c) {
-        case 0x90: // DCS
+      ಆದರೆ(c1_allowed && c >= 0x80 && c < 0xa0) {
+        ಆಯ್ಕೆ(c) {
+        ಸ್ಥಿತಿ 0x90: // DCS
           vt->parser.string_initial = TRUE;
           vt->parser.v.dcs.commandlen = 0;
           ENTER_STATE(DCS_COMMAND);
-          break;
-        case 0x98: // SOS
+          ನಿಲ್ಲಿಸು;
+        ಸ್ಥಿತಿ 0x98: // SOS
           vt->parser.string_initial = TRUE;
           ENTER_STATE(SOS);
-          string_start = bytes + pos + 1;
+          string_ಆರಂಭ = ಬೈಟುಗಳು + pos + 1;
           string_len = 0;
-          break;
-        case 0x9b: // CSI
+          ನಿಲ್ಲಿಸು;
+        ಸ್ಥಿತಿ 0x9b: // CSI
           vt->parser.v.csi.leaderlen = 0;
           ENTER_STATE(CSI_LEADER);
-          break;
-        case 0x9d: // OSC
+          ನಿಲ್ಲಿಸು;
+        ಸ್ಥಿತಿ 0x9d: // OSC
           vt->parser.v.osc.command = -1;
           vt->parser.string_initial = TRUE;
-          string_start = bytes + pos + 1;
+          string_ಆರಂಭ = ಬೈಟುಗಳು + pos + 1;
           ENTER_STATE(OSC_COMMAND);
-          break;
-        case 0x9e: // PM
+          ನಿಲ್ಲಿಸು;
+        ಸ್ಥಿತಿ 0x9e: // PM
           vt->parser.string_initial = TRUE;
           ENTER_STATE(PM);
-          string_start = bytes + pos + 1;
+          string_ಆರಂಭ = ಬೈಟುಗಳು + pos + 1;
           string_len = 0;
-          break;
-        case 0x9f: // APC
+          ನಿಲ್ಲಿಸು;
+        ಸ್ಥಿತಿ 0x9f: // APC
           vt->parser.string_initial = TRUE;
           ENTER_STATE(APC);
-          string_start = bytes + pos + 1;
+          string_ಆರಂಭ = ಬೈಟುಗಳು + pos + 1;
           string_len = 0;
-          break;
-        default:
+          ನಿಲ್ಲಿಸು;
+        ಪೂರ್ವನಿಯೋಜಿತ:
           do_control(vt, c);
-          break;
+          ನಿಲ್ಲಿಸು;
         }
       }
-      else {
+      ಇಲ್ಲದಿದ್ದರೆ {
         size_t eaten = 0;
-        if(vt->parser.callbacks && vt->parser.callbacks->text)
-          eaten = (*vt->parser.callbacks->text)(bytes + pos, len - pos, vt->parser.cbdata);
+        ಆದರೆ(vt->parser.callbacks && vt->parser.callbacks->ಪಠ್ಯ)
+          eaten = (*vt->parser.callbacks->ಪಠ್ಯ)(ಬೈಟುಗಳು + pos, len - pos, vt->parser.cbdata);
 
-        if(!eaten) {
+        ಆದರೆ(!eaten) {
           DEBUG_LOG("libvterm: Text callback did not consume any input\n");
           /* force it to make progress */
           eaten = 1;
@@ -390,32 +390,32 @@ string_state:
 
         pos += (eaten - 1); // we'll ++ it again in a moment
       }
-      break;
+      ನಿಲ್ಲಿಸು;
     }
   }
 
-  if(string_start) {
-    size_t string_len = bytes + pos - string_start;
-    if(vt->parser.in_esc)
+  ಆದರೆ(string_ಆರಂಭ) {
+    size_t string_len = ಬೈಟುಗಳು + pos - string_ಆರಂಭ;
+    ಆದರೆ(vt->parser.ಒಳ_esc)
       string_len -= 1;
-    string_fragment(vt, string_start, string_len, FALSE);
+    string_fragment(vt, string_ಆರಂಭ, string_len, FALSE);
   }
 
-  return len;
+  ಹಿಂತಿರುಗಿ len;
 }
 
-void vterm_parser_set_callbacks(VTerm *vt, const VTermParserCallbacks *callbacks, void *user)
+ಶೂನ್ಯ vterm_parser_ಗಣ_callbacks(VTerm *vt, ಸ್ಥಿರಾಂಕ VTermParserCallbacks *callbacks, ಶೂನ್ಯ *user)
 {
   vt->parser.callbacks = callbacks;
   vt->parser.cbdata = user;
 }
 
-void *vterm_parser_get_cbdata(VTerm *vt)
+ಶೂನ್ಯ *vterm_parser_get_cbdata(VTerm *vt)
 {
-  return vt->parser.cbdata;
+  ಹಿಂತಿರುಗಿ vt->parser.cbdata;
 }
 
-void vterm_parser_set_emit_nul(VTerm *vt, int emit)
+ಶೂನ್ಯ vterm_parser_ಗಣ_emit_nul(VTerm *vt, ಪೂರ್ಣಾಂಕ emit)
 {
   vt->parser.emit_nul = emit;
 }

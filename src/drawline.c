@@ -13,511 +13,511 @@
  * lower level.
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
 /*
  * Get the 'listchars' "extends" characters to use for "wp", or NUL if it
  * shouldn't be used.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 get_lcs_ext(win_T *wp)
 {
-    if (wp->w_p_wrap)
+    ಆದರೆ (wp->w_p_wrap)
 	// Line never continues beyond the right of the screen with 'wrap'.
-	return NUL;
-    if (wp->w_p_wrap_flags & P_INSECURE)
+	ಹಿಂತಿರುಗಿ NUL;
+    ಆದರೆ (wp->w_p_wrap_flags & P_INSECURE)
 	// If 'nowrap' was set from a modeline, forcibly use '>'.
-	return '>';
-    return wp->w_p_list ? wp->w_lcs_chars.ext : NUL;
+	ಹಿಂತಿರುಗಿ '>';
+    ಹಿಂತಿರುಗಿ wp->w_p_list ? wp->w_lcs_chars.ext : NUL;
 }
 
-#ifdef FEAT_SYN_HL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
 /*
  * Advance **color_cols and return TRUE when there are columns to draw.
  */
-    static int
-advance_color_col(int vcol, int **color_cols)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+advance_color_ಲಂಬಸಾಲು(ಪೂರ್ಣಾಂಕ vcol, ಪೂರ್ಣಾಂಕ **color_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ)
 {
-    while (**color_cols >= 0 && vcol > **color_cols)
-	++*color_cols;
-    return (**color_cols >= 0);
+    ಆಗ (**color_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ >= 0 && vcol > **color_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ)
+	++*color_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+    ಹಿಂತಿರುಗಿ (**color_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ >= 0);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_SYN_HL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
 /*
  * Used when 'cursorlineopt' contains "screenline": compute the margins between
  * which the highlighting is used.
  */
-    static void
-margin_columns_win(win_T *wp, int *left_col, int *right_col)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+margin_columns_win(win_T *wp, ಪೂರ್ಣಾಂಕ *ಎಡ_ಲಂಬಸಾಲು, ಪೂರ್ಣಾಂಕ *ಬಲ_ಲಂಬಸಾಲು)
 {
     // cache previous calculations depending on w_virtcol
-    static int saved_w_virtcol;
-    static win_T *prev_wp;
-    static int prev_width1;
-    static int prev_width2;
-    static int prev_left_col;
-    static int prev_right_col;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ saved_w_virtcol;
+    ಸ್ಥಿರ win_T *prev_wp;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ prev_width1;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ prev_width2;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ prev_ಎಡ_ಲಂಬಸಾಲು;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ prev_ಬಲ_ಲಂಬಸಾಲು;
 
-    int cur_col_off = win_col_off(wp);
-    int	width1;
-    int	width2;
+    ಪೂರ್ಣಾಂಕ cur_ಲಂಬಸಾಲು_off = win_ಲಂಬಸಾಲು_off(wp);
+    ಪೂರ್ಣಾಂಕ	width1;
+    ಪೂರ್ಣಾಂಕ	width2;
 
-    width1 = wp->w_width - cur_col_off;
-    width2 = width1 + win_col_off2(wp);
+    width1 = wp->w_ಅಗಲ - cur_ಲಂಬಸಾಲು_off;
+    width2 = width1 + win_ಲಂಬಸಾಲು_off2(wp);
 
-    if (saved_w_virtcol == wp->w_virtcol && prev_wp == wp
+    ಆದರೆ (saved_w_virtcol == wp->w_virtcol && prev_wp == wp
 	    && prev_width1 == width1 && prev_width2 == width2)
     {
-	*right_col = prev_right_col;
-	*left_col = prev_left_col;
-	return;
+	*ಬಲ_ಲಂಬಸಾಲು = prev_ಬಲ_ಲಂಬಸಾಲು;
+	*ಎಡ_ಲಂಬಸಾಲು = prev_ಎಡ_ಲಂಬಸಾಲು;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    *left_col = 0;
-    *right_col = width1;
+    *ಎಡ_ಲಂಬಸಾಲು = 0;
+    *ಬಲ_ಲಂಬಸಾಲು = width1;
 
-    if (wp->w_virtcol >= (colnr_T)width1 && width2 > 0)
-	*right_col = width1 + ((wp->w_virtcol - width1) / width2 + 1) * width2;
-    if (wp->w_virtcol >= (colnr_T)width1 && width2 > 0)
-	*left_col = (wp->w_virtcol - width1) / width2 * width2 + width1;
+    ಆದರೆ (wp->w_virtcol >= (colnr_T)width1 && width2 > 0)
+	*ಬಲ_ಲಂಬಸಾಲು = width1 + ((wp->w_virtcol - width1) / width2 + 1) * width2;
+    ಆದರೆ (wp->w_virtcol >= (colnr_T)width1 && width2 > 0)
+	*ಎಡ_ಲಂಬಸಾಲು = (wp->w_virtcol - width1) / width2 * width2 + width1;
 
     // cache values
-    prev_left_col = *left_col;
-    prev_right_col = *right_col;
+    prev_ಎಡ_ಲಂಬಸಾಲು = *ಎಡ_ಲಂಬಸಾಲು;
+    prev_ಬಲ_ಲಂಬಸಾಲು = *ಬಲ_ಲಂಬಸಾಲು;
     prev_wp = wp;
     prev_width1 = width1;
     prev_width2 = width2;
     saved_w_virtcol = wp->w_virtcol;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_SIGNS) || defined(FEAT_QUICKFIX) \
+#ಆದರೆ defined(FEAT_SIGNS) || defined(FEAT_QUICKFIX) \
 	|| defined(FEAT_SYN_HL) || defined(FEAT_DIFF)
 // using an attribute for the whole line
-# define LINE_ATTR
-#endif
+# define ಸಾಲು_ATTR
+#ಆದರೆ_ಅಂತ್ಯ
 
 // structure with variables passed between win_line() and other functions
-typedef struct {
-    int		draw_state;	// what to draw next
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+    ಪೂರ್ಣಾಂಕ		draw_state;	// what to draw next
 
     linenr_T	lnum;		// line number to be drawn
 
-    int		startrow;	// first row in the window to be drawn
-    int		row;		// row in the window, excl w_winrow
-    int		screen_row;	// row on the screen, incl w_winrow
+    ಪೂರ್ಣಾಂಕ		startrow;	// first row in the window to be drawn
+    ಪೂರ್ಣಾಂಕ		ಅಡ್ಡಸಾಲು;		// row in the window, excl w_winrow
+    ಪೂರ್ಣಾಂಕ		screen_ಅಡ್ಡಸಾಲು;	// row on the screen, incl w_winrow
 
-    long	vcol;		// virtual column, before wrapping
-    int		col;		// visual column on screen, after wrapping
-#ifdef FEAT_CONCEAL
-    int		boguscols;	// nonexistent columns added to "col" to force
+    ದೀರ್ಘ	vcol;		// virtual column, before wrapping
+    ಪೂರ್ಣಾಂಕ		ಲಂಬಸಾಲು;		// visual column on screen, after wrapping
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CONCEAL
+    ಪೂರ್ಣಾಂಕ		boguscols;	// nonexistent columns added to "col" to force
 				// wrapping
-    int		vcol_off_co;	// offset for concealed characters
-#endif
-    int		vcol_off_tp;	// offset for virtual text
-#ifdef FEAT_SYN_HL
-    int		draw_color_col;	// highlight colorcolumn
-    int		*color_cols;	// pointer to according columns array
-#endif
-    int		eol_hl_off;	// 1 if highlighted char after EOL
+    ಪೂರ್ಣಾಂಕ		vcol_off_co;	// offset for concealed characters
+#ಆದರೆ_ಅಂತ್ಯ
+    ಪೂರ್ಣಾಂಕ		vcol_off_tp;	// offset for virtual text
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
+    ಪೂರ್ಣಾಂಕ		draw_color_ಲಂಬಸಾಲು;	// highlight colorcolumn
+    ಪೂರ್ಣಾಂಕ		*color_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;	// pointer to according columns array
+#ಆದರೆ_ಅಂತ್ಯ
+    ಪೂರ್ಣಾಂಕ		eol_hl_off;	// 1 if highlighted char after EOL
 
-    unsigned	off;		// offset in ScreenLines/ScreenAttrs
+    ಚಿಹ್ನೆರಹಿತ	off;		// offset in ScreenLines/ScreenAttrs
 
-    int		win_attr;	// background for the whole window, except
+    ಪೂರ್ಣಾಂಕ		win_attr;	// background for the whole window, except
 				// margins and "~" lines.
-#ifdef FEAT_SYN_HL
-    int		cul_attr;	// set when 'cursorline' active
-#endif
-#ifdef LINE_ATTR
-    int		line_attr;	// for the whole line, includes 'cursorline'
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
+    ಪೂರ್ಣಾಂಕ		cul_attr;	// set when 'cursorline' active
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ಸಾಲು_ATTR
+    ಪೂರ್ಣಾಂಕ		ಸಾಲು_attr;	// for the whole line, includes 'cursorline'
+#ಆದರೆ_ಅಂತ್ಯ
 
-    int		screen_line_flags;  // flags for screen_line()
+    ಪೂರ್ಣಾಂಕ		screen_ಸಾಲು_flags;  // flags for screen_line()
 
-    int		fromcol;	// start of inverting
-    int		tocol;		// end of inverting
+    ಪೂರ್ಣಾಂಕ		fromcol;	// start of inverting
+    ಪೂರ್ಣಾಂಕ		tocol;		// end of inverting
 
-#ifdef FEAT_LINEBREAK
-    long	vcol_sbr;	    // virtual column after showbreak
-    int		need_showbreak;	    // overlong line, skipping first x chars
-    int		dont_use_showbreak; // do not use 'showbreak'
-#endif
-#ifdef FEAT_PROP_POPUP
-    int		text_prop_above_count;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
+    ದೀರ್ಘ	vcol_sbr;	    // virtual column after showbreak
+    ಪೂರ್ಣಾಂಕ		need_showbreak;	    // overlong line, skipping first x chars
+    ಪೂರ್ಣಾಂಕ		dont_use_showbreak; // do not use 'showbreak'
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+    ಪೂರ್ಣಾಂಕ		ಪಠ್ಯ_prop_above_ಎಣಿಕೆ;
+#ಆದರೆ_ಅಂತ್ಯ
 
     // TRUE when 'cursorlineopt' has "screenline" and cursor is in this line
-    int		cul_screenline;
+    ಪೂರ್ಣಾಂಕ		cul_screenline;
 
-    int		char_attr;	// attributes for the next character
+    ಪೂರ್ಣಾಂಕ		char_attr;	// attributes for the next character
 
-    int		n_extra;	// number of extra bytes
+    ಪೂರ್ಣಾಂಕ		n_extra;	// number of extra bytes
     char_u	*p_extra;	// string of extra chars, plus NUL, only used
 				// when c_extra and c_final are NUL
     char_u	*p_extra_free;  // p_extra buffer that needs to be freed
-    int		extra_attr;	// attributes for p_extra, should be combined
+    ಪೂರ್ಣಾಂಕ		extra_attr;	// attributes for p_extra, should be combined
 				// with win_attr if needed
-    int		n_attr_skip;    // chars to skip before using extra_attr
-    int		c_extra;	// extra chars, all the same
-    int		c_final;	// final char, mandatory if set
-    int		extra_for_textprop; // n_extra set for textprop
-    int		start_extra_for_textprop; // extra_for_textprop was just set
+    ಪೂರ್ಣಾಂಕ		n_attr_skip;    // chars to skip before using extra_attr
+    ಪೂರ್ಣಾಂಕ		c_extra;	// extra chars, all the same
+    ಪೂರ್ಣಾಂಕ		c_final;	// final char, mandatory if set
+    ಪೂರ್ಣಾಂಕ		extra_for_textprop; // n_extra set for textprop
+    ಪೂರ್ಣಾಂಕ		ಆರಂಭ_extra_for_textprop; // extra_for_textprop was just set
 
     // saved "extra" items for when draw_state becomes WL_LINE (again)
-    int		saved_n_extra;
+    ಪೂರ್ಣಾಂಕ		saved_n_extra;
     char_u	*saved_p_extra;
     char_u	*saved_p_extra_free;
-    int		saved_extra_attr;
-    int		saved_n_attr_skip;
-    int		saved_extra_for_textprop;
-    int		saved_c_extra;
-    int		saved_c_final;
-    int		saved_char_attr;
+    ಪೂರ್ಣಾಂಕ		saved_extra_attr;
+    ಪೂರ್ಣಾಂಕ		saved_n_attr_skip;
+    ಪೂರ್ಣಾಂಕ		saved_extra_for_textprop;
+    ಪೂರ್ಣಾಂಕ		saved_c_extra;
+    ಪೂರ್ಣಾಂಕ		saved_c_final;
+    ಪೂರ್ಣಾಂಕ		saved_char_attr;
 
     char_u	extra[NUMBUFLEN + MB_MAXBYTES];
 				// "%ld " and 'fdc' must fit in here, as well
 				// any text sign
 
-#ifdef FEAT_DIFF
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
     hlf_T	diff_hlf;	// type of diff highlighting
-#endif
-    int		filler_lines;	// nr of filler lines to be drawn
-    int		filler_todo;	// nr of filler lines still to do + 1
-#ifdef FEAT_SIGNS
+#ಆದರೆ_ಅಂತ್ಯ
+    ಪೂರ್ಣಾಂಕ		filler_ಸಾಲುಗಳು;	// nr of filler lines to be drawn
+    ಪೂರ್ಣಾಂಕ		filler_todo;	// nr of filler lines still to do + 1
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SIGNS
     sign_attrs_T sattr;
-#endif
-#ifdef FEAT_LINEBREAK
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
      // do consider wrapping in linebreak mode only after encountering
      // a non whitespace char
-    int		need_lbr;
-#endif
+    ಪೂರ್ಣಾಂಕ		need_lbr;
+#ಆದರೆ_ಅಂತ್ಯ
 } winlinevars_T;
 
 // draw_state values for items that are drawn in sequence:
-#define WL_START	0		// nothing done yet, must be zero
-#define WL_CMDLINE	(WL_START + 1)	// cmdline window column
-#ifdef FEAT_FOLDING
+#ವ್ಯಾಖ್ಯಾನಿಸು WL_ಆರಂಭ	0		// nothing done yet, must be zero
+#ವ್ಯಾಖ್ಯಾನಿಸು WL_CMDLINE	(WL_ಆರಂಭ + 1)	// cmdline window column
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_FOLDING
 # define WL_FOLD	(WL_CMDLINE + 1)	// 'foldcolumn'
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 # define WL_FOLD	WL_CMDLINE
-#endif
-#ifdef FEAT_SIGNS
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SIGNS
 # define WL_SIGN	(WL_FOLD + 1)	// column for signs
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 # define WL_SIGN	WL_FOLD		// column for signs
-#endif
-#define WL_NR		(WL_SIGN + 1)	// line number
-#ifdef FEAT_LINEBREAK
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿಸು WL_NR		(WL_SIGN + 1)	// line number
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
 # define WL_BRI		(WL_NR + 1)	// 'breakindent'
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 # define WL_BRI		WL_NR
-#endif
-#if defined(FEAT_LINEBREAK) || defined(FEAT_DIFF)
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(FEAT_LINEBREAK) || defined(FEAT_DIFF)
 # define WL_SBR		(WL_BRI + 1)	// 'showbreak' or 'diff'
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 # define WL_SBR		WL_BRI
-#endif
-#define WL_LINE		(WL_SBR + 1)	// text in the line
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿಸು WL_ಸಾಲು		(WL_SBR + 1)	// text in the line
 
-#if defined(FEAT_SIGNS) || defined(FEAT_FOLDING)
+#ಆದರೆ defined(FEAT_SIGNS) || defined(FEAT_FOLDING)
 /*
  * Return TRUE if CursorLineSign / CursorLineFold highlight is to be used.
  * This depends only on 'cursorline', not on 'cursorlineopt'.
  */
-    static int
-use_cursor_line_highlight(win_T *wp, linenr_T lnum)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+use_cursor_ಸಾಲು_highlight(win_T *wp, linenr_T lnum)
 {
-    return wp->w_p_cul
+    ಹಿಂತಿರುಗಿ wp->w_p_cul
 	    && lnum == wp->w_cursor.lnum;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 
-#ifdef FEAT_FOLDING
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_FOLDING
 /*
  * Setup for drawing the 'foldcolumn', if there is one.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 handle_foldcolumn(win_T *wp, winlinevars_T *wlv)
 {
-    int fdc = compute_foldcolumn(wp, 0);
+    ಪೂರ್ಣಾಂಕ fdc = compute_foldcolumn(wp, 0);
 
-    if (fdc <= 0)
-	return;
+    ಆದರೆ (fdc <= 0)
+	ಹಿಂತಿರುಗಿ;
 
     // Allocate a buffer, "wlv->extra[]" may already be in use.
     vim_free(wlv->p_extra_free);
     wlv->p_extra_free = alloc(MAX_MCO * fdc + 1);
-    if (wlv->p_extra_free == NULL)
-	return;
+    ಆದರೆ (wlv->p_extra_free == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    wlv->n_extra = (int)fill_foldcolumn(wlv->p_extra_free,
+    wlv->n_extra = (ಪೂರ್ಣಾಂಕ)fill_foldcolumn(wlv->p_extra_free,
 							 wp, FALSE, wlv->lnum);
     wlv->p_extra_free[wlv->n_extra] = NUL;
     wlv->p_extra = wlv->p_extra_free;
     wlv->c_extra = NUL;
     wlv->c_final = NUL;
-    if (use_cursor_line_highlight(wp, wlv->lnum))
+    ಆದರೆ (use_cursor_ಸಾಲು_highlight(wp, wlv->lnum))
 	wlv->char_attr = hl_combine_attr(get_win_attr(wp), HL_ATTR(HLF_CLF));
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	wlv->char_attr = hl_combine_attr(get_win_attr(wp), HL_ATTR(HLF_FC));
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_SIGNS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SIGNS
 /*
  * Get information needed to display the sign in line "wlv->lnum" in window
  * "wp".
  * If "nrcol" is TRUE, the sign is going to be displayed in the number column.
  * Otherwise the sign is going to be displayed in the sign column.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 get_sign_display_info(
-	int		nrcol,
+	ಪೂರ್ಣಾಂಕ		nrcol,
 	win_T		*wp,
 	winlinevars_T	*wlv)
 {
-    int	text_sign;
+    ಪೂರ್ಣಾಂಕ	ಪಠ್ಯ_sign;
 # ifdef FEAT_SIGN_ICONS
-    int	icon_sign;
+    ಪೂರ್ಣಾಂಕ	icon_sign;
 # endif
 
     // Draw two cells with the sign value or blank.
     wlv->c_extra = ' ';
     wlv->c_final = NUL;
-    if (nrcol)
-	wlv->n_extra = number_width(wp) + 1;
-    else
+    ಆದರೆ (nrcol)
+	wlv->n_extra = ಸಂಖ್ಯೆ_ಅಗಲ(wp) + 1;
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (use_cursor_line_highlight(wp, wlv->lnum))
+	ಆದರೆ (use_cursor_ಸಾಲು_highlight(wp, wlv->lnum))
 	    wlv->char_attr = hl_combine_attr(get_win_attr(wp), HL_ATTR(HLF_CLS));
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    wlv->char_attr = hl_combine_attr(get_win_attr(wp), HL_ATTR(HLF_SC));
 	wlv->n_extra = 2;
     }
 
-    if (wlv->row == wlv->startrow
+    ಆದರೆ (wlv->ಅಡ್ಡಸಾಲು == wlv->startrow
 # ifdef FEAT_DIFF
-	    + wlv->filler_lines && wlv->filler_todo <= 0
+	    + wlv->filler_ಸಾಲುಗಳು && wlv->filler_todo <= 0
 # endif
        )
     {
-	text_sign = (wlv->sattr.sat_text != NULL) ? wlv->sattr.sat_typenr : 0;
+	ಪಠ್ಯ_sign = (wlv->sattr.sat_ಪಠ್ಯ != ಖಾಲಿ) ? wlv->sattr.sat_typenr : 0;
 # ifdef FEAT_SIGN_ICONS
-	icon_sign = (wlv->sattr.sat_icon != NULL) ? wlv->sattr.sat_typenr : 0;
-	if (gui.in_use && icon_sign != 0)
+	icon_sign = (wlv->sattr.sat_icon != ಖಾಲಿ) ? wlv->sattr.sat_typenr : 0;
+	ಆದರೆ (gui.ಒಳ_use && icon_sign != 0)
 	{
 	    // Use the image in this position.
-	    if (nrcol)
+	    ಆದರೆ (nrcol)
 	    {
 		wlv->c_extra = NUL;
-		wlv->n_extra = vim_snprintf((char *)wlv->extra, sizeof(wlv->extra),
-						"%-*c ", number_width(wp), SIGN_BYTE);
+		wlv->n_extra = vim_snprintf((ಅಕ್ಷರ *)wlv->extra, ಗಾತ್ರ(wlv->extra),
+						"%-*c ", ಸಂಖ್ಯೆ_ಅಗಲ(wp), SIGN_BYTE);
 		wlv->p_extra = wlv->extra;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		wlv->c_extra = SIGN_BYTE;
 #  ifdef FEAT_NETBEANS_INTG
-	    if (netbeans_active() && (buf_signcount(wp->w_buffer, wlv->lnum)
+	    ಆದರೆ (netbeans_ಸಕ್ರಿಯ() && (buf_signcount(wp->w_ಬಫರ್, wlv->lnum)
 									  > 1))
 	    {
-		if (nrcol)
+		ಆದರೆ (nrcol)
 		{
 		    wlv->c_extra = NUL;
-		    wlv->n_extra = vim_snprintf((char *)wlv->extra, sizeof(wlv->extra),
-						"%-*c ", number_width(wp), MULTISIGN_BYTE);
+		    wlv->n_extra = vim_snprintf((ಅಕ್ಷರ *)wlv->extra, ಗಾತ್ರ(wlv->extra),
+						"%-*c ", ಸಂಖ್ಯೆ_ಅಗಲ(wp), MULTISIGN_BYTE);
 		    wlv->p_extra = wlv->extra;
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		    wlv->c_extra = MULTISIGN_BYTE;
 	    }
 #  endif
 	    wlv->c_final = NUL;
 	    wlv->char_attr = icon_sign;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 # endif
-	    if (text_sign != 0)
+	    ಆದರೆ (ಪಠ್ಯ_sign != 0)
 	    {
-		wlv->p_extra = wlv->sattr.sat_text;
-		if (wlv->p_extra != NULL)
+		wlv->p_extra = wlv->sattr.sat_ಪಠ್ಯ;
+		ಆದರೆ (wlv->p_extra != ಖಾಲಿ)
 		{
-		    if (nrcol)
+		    ಆದರೆ (nrcol)
 		    {
-			int width = number_width(wp) - 2;
+			ಪೂರ್ಣಾಂಕ ಅಗಲ = ಸಂಖ್ಯೆ_ಅಗಲ(wp) - 2;
 
-			vim_memset(wlv->extra, ' ', width);
-			wlv->n_extra = width;
-			wlv->n_extra += vim_snprintf((char *)wlv->extra + width,
-				  sizeof(wlv->extra) - width, "%s ", wlv->p_extra);
+			vim_memset(wlv->extra, ' ', ಅಗಲ);
+			wlv->n_extra = ಅಗಲ;
+			wlv->n_extra += vim_snprintf((ಅಕ್ಷರ *)wlv->extra + ಅಗಲ,
+				  ಗಾತ್ರ(wlv->extra) - ಅಗಲ, "%s ", wlv->p_extra);
 			wlv->p_extra = wlv->extra;
 		    }
-		    else
-			wlv->n_extra = (int)STRLEN(wlv->p_extra);
+		    ಇಲ್ಲದಿದ್ದರೆ
+			wlv->n_extra = (ಪೂರ್ಣಾಂಕ)STRLEN(wlv->p_extra);
 
 		    wlv->c_extra = NUL;
 		    wlv->c_final = NUL;
 		}
 
-		if (use_cursor_line_highlight(wp, wlv->lnum)
+		ಆದರೆ (use_cursor_ಸಾಲು_highlight(wp, wlv->lnum)
 						  && wlv->sattr.sat_culhl > 0)
 		    wlv->char_attr = wlv->sattr.sat_culhl;
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		    wlv->char_attr = wlv->sattr.sat_texthl;
 	    }
     }
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Display the absolute or relative line number.  After the first row fill with
  * blanks when the 'n' flag isn't in 'cpo'.
  */
-    static void
-handle_lnum_col(
+    ಸ್ಥಿರ ಶೂನ್ಯ
+handle_lnum_ಲಂಬಸಾಲು(
 	win_T		*wp,
 	winlinevars_T	*wlv,
-	int		sign_present UNUSED,
-	int		num_attr UNUSED)
+	ಪೂರ್ಣಾಂಕ		sign_present ಬಳಸದ,
+	ಪೂರ್ಣಾಂಕ		ಅಂಕೆ_attr ಬಳಸದ)
 {
-    int has_cpo_n = vim_strchr(p_cpo, CPO_NUMCOL) != NULL;
-    int lnum_row = wlv->startrow + wlv->filler_lines
-#ifdef FEAT_PROP_POPUP
-		      + wlv->text_prop_above_count
-#endif
+    ಪೂರ್ಣಾಂಕ has_cpo_n = vim_strchr(p_cpo, CPO_NUMCOL) != ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ lnum_ಅಡ್ಡಸಾಲು = wlv->startrow + wlv->filler_ಸಾಲುಗಳು
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+		      + wlv->ಪಠ್ಯ_prop_above_ಎಣಿಕೆ
+#ಆದರೆ_ಅಂತ್ಯ
 		      ;
 
-    if ((wp->w_p_nu || wp->w_p_rnu)
-	     && (wlv->row <= lnum_row || !has_cpo_n)
+    ಆದರೆ ((wp->w_p_nu || wp->w_p_rnu)
+	     && (wlv->ಅಡ್ಡಸಾಲು <= lnum_ಅಡ್ಡಸಾಲು || !has_cpo_n)
 	     // there is no line number in a wrapped line when "n" is in
 	     // 'cpoptions', but 'breakindent' assumes it anyway.
 	     && !((has_cpo_n
-#ifdef FEAT_LINEBREAK
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
 		     && !wp->w_p_bri
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		  ) && wp->w_skipcol > 0 && wlv->lnum == wp->w_topline))
     {
-#ifdef FEAT_SIGNS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SIGNS
 	// If 'signcolumn' is set to 'number' and a sign is present
 	// in 'lnum', then display the sign instead of the line
 	// number.
-	if ((*wp->w_p_scl == 'n' && *(wp->w_p_scl + 1) == 'u') && sign_present
-		&& wlv->sattr.sat_text != NULL)
+	ಆದರೆ ((*wp->w_p_scl == 'n' && *(wp->w_p_scl + 1) == 'u') && sign_present
+		&& wlv->sattr.sat_ಪಠ್ಯ != ಖಾಲಿ)
 	    get_sign_display_info(TRUE, wp, wlv);
-	else
-#endif
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 	{
 	  // Draw the line number (empty space after wrapping).
 	  // When there are text properties above the line put the line number
 	  // below them.
-	  if (wlv->row == lnum_row
-		    && (wp->w_skipcol == 0 || wlv->row > 0
+	  ಆದರೆ (wlv->ಅಡ್ಡಸಾಲು == lnum_ಅಡ್ಡಸಾಲು
+		    && (wp->w_skipcol == 0 || wlv->ಅಡ್ಡಸಾಲು > 0
 					       || (wp->w_p_nu && wp->w_p_rnu)))
 	  {
-	      long num;
-	      char *fmt = "%*ld ";
+	      ದೀರ್ಘ ಅಂಕೆ;
+	      ಅಕ್ಷರ *fmt = "%*ld ";
 
-	      if (wp->w_p_nu && !wp->w_p_rnu)
+	      ಆದರೆ (wp->w_p_nu && !wp->w_p_rnu)
 		  // 'number' + 'norelativenumber'
-		  num = (long)wlv->lnum;
-	      else
+		  ಅಂಕೆ = (ದೀರ್ಘ)wlv->lnum;
+	      ಇಲ್ಲದಿದ್ದರೆ
 	      {
 		  // 'relativenumber', don't use negative numbers
-		  num = labs((long)get_cursor_rel_lnum(wp, wlv->lnum));
-		  if (num == 0 && wp->w_p_nu && wp->w_p_rnu)
+		  ಅಂಕೆ = labs((ದೀರ್ಘ)get_cursor_rel_lnum(wp, wlv->lnum));
+		  ಆದರೆ (ಅಂಕೆ == 0 && wp->w_p_nu && wp->w_p_rnu)
 		  {
 		      // 'number' + 'relativenumber'
-		      num = wlv->lnum;
+		      ಅಂಕೆ = wlv->lnum;
 		      fmt = "%-*ld ";
 		  }
 	      }
 
-	      vim_snprintf((char *)wlv->extra, sizeof(wlv->extra), fmt, number_width(wp), num);
-	      if (wp->w_skipcol > 0 && wlv->startrow == 0)
-		  for (wlv->p_extra = wlv->extra; *wlv->p_extra == ' ';
+	      vim_snprintf((ಅಕ್ಷರ *)wlv->extra, ಗಾತ್ರ(wlv->extra), fmt, ಸಂಖ್ಯೆ_ಅಗಲ(wp), ಅಂಕೆ);
+	      ಆದರೆ (wp->w_skipcol > 0 && wlv->startrow == 0)
+		  ಗಾಗಿ (wlv->p_extra = wlv->extra; *wlv->p_extra == ' ';
 			  ++wlv->p_extra)
 		      *wlv->p_extra = '-';
-#ifdef FEAT_RIGHTLEFT
-	      if (wp->w_p_rl)		    // reverse line numbers
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+	      ಆದರೆ (wp->w_p_rl)		    // reverse line numbers
 	      {
 		  char_u    *p1, *p2;
-		  int	    t;
+		  ಪೂರ್ಣಾಂಕ	    t;
 
 		  // like rl_mirror(), but keep the space at the end
 		  p2 = skipwhite(wlv->extra);
 		  p2 = skiptowhite(p2) - 1;
-		  for (p1 = skipwhite(wlv->extra); p1 < p2; ++p1, --p2)
+		  ಗಾಗಿ (p1 = skipwhite(wlv->extra); p1 < p2; ++p1, --p2)
 		  {
 		      t = *p1;
 		      *p1 = *p2;
 		      *p2 = t;
 		  }
 	      }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	      wlv->p_extra = wlv->extra;
 	      wlv->c_extra = NUL;
 	      wlv->c_final = NUL;
 	  }
-	  else
+	  ಇಲ್ಲದಿದ್ದರೆ
 	  {
 	      wlv->c_extra = ' ';
 	      wlv->c_final = NUL;
 	  }
-	  wlv->n_extra = number_width(wp) + 1;
+	  wlv->n_extra = ಸಂಖ್ಯೆ_ಅಗಲ(wp) + 1;
 	  wlv->char_attr = hl_combine_attr(get_win_attr(wp), HL_ATTR(HLF_N));
-#ifdef FEAT_SYN_HL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
 	  // When 'cursorline' is set highlight the line number of
 	  // the current line differently.
 	  // When 'cursorlineopt' does not have "line" only
 	  // highlight the line number itself.
 	  // TODO: Can we use CursorLine instead of CursorLineNr
 	  // when CursorLineNr isn't set?
-	  if (wp->w_p_cul
+	  ಆದರೆ (wp->w_p_cul
 		  && wlv->lnum == wp->w_cursor.lnum
 		  && (wp->w_p_culopt_flags & CULOPT_NBR)
-		  && (wlv->row == lnum_row
-		      || (wlv->row > lnum_row
-			 && (wp->w_p_culopt_flags & CULOPT_LINE))))
+		  && (wlv->ಅಡ್ಡಸಾಲು == lnum_ಅಡ್ಡಸಾಲು
+		      || (wlv->ಅಡ್ಡಸಾಲು > lnum_ಅಡ್ಡಸಾಲು
+			 && (wp->w_p_culopt_flags & CULOPT_ಸಾಲು))))
 	    wlv->char_attr = hl_combine_attr(get_win_attr(wp), HL_ATTR(HLF_CLN));
-#endif
-	  if (wp->w_p_rnu && wlv->lnum < wp->w_cursor.lnum
+#ಆದರೆ_ಅಂತ್ಯ
+	  ಆದರೆ (wp->w_p_rnu && wlv->lnum < wp->w_cursor.lnum
 						      && HL_ATTR(HLF_LNA) != 0)
 	      // Use LineNrAbove
 	      wlv->char_attr = hl_combine_attr(get_win_attr(wp), HL_ATTR(HLF_LNA));
-	  if (wp->w_p_rnu && wlv->lnum > wp->w_cursor.lnum
+	  ಆದರೆ (wp->w_p_rnu && wlv->lnum > wp->w_cursor.lnum
 						      && HL_ATTR(HLF_LNB) != 0)
 	      // Use LineNrBelow
 	      wlv->char_attr = hl_combine_attr(get_win_attr(wp), HL_ATTR(HLF_LNB));
 	}
-#ifdef FEAT_SIGNS
-	if (num_attr)
-	    wlv->char_attr = num_attr;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SIGNS
+	ಆದರೆ (ಅಂಕೆ_attr)
+	    wlv->char_attr = ಅಂಕೆ_attr;
+#ಆದರೆ_ಅಂತ್ಯ
     }
 }
 
-#ifdef FEAT_LINEBREAK
-    static void
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
+    ಸ್ಥಿರ ಶೂನ್ಯ
 handle_breakindent(win_T *wp, winlinevars_T *wlv)
 {
-    if (wp->w_briopt_sbr && wlv->draw_state == WL_BRI - 1
-					    && *get_showbreak_value(wp) != NUL)
+    ಆದರೆ (wp->w_briopt_sbr && wlv->draw_state == WL_BRI - 1
+					    && *get_showbreak_ಮೌಲ್ಯ(wp) != NUL)
 	// draw indent after showbreak value
 	wlv->draw_state = WL_BRI;
-    else if (wp->w_briopt_sbr && wlv->draw_state == WL_SBR)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (wp->w_briopt_sbr && wlv->draw_state == WL_SBR)
 	// After the showbreak, draw the breakindent
 	wlv->draw_state = WL_BRI - 1;
 
     // draw 'breakindent': indent wrapped text accordingly
-    if (wlv->draw_state == WL_BRI - 1)
+    ಆದರೆ (wlv->draw_state == WL_BRI - 1)
     {
 	wlv->draw_state = WL_BRI;
 	// if wlv->need_showbreak is set, breakindent also applies
-	if (wp->w_p_bri && (wlv->row > wlv->startrow
+	ಆದರೆ (wp->w_p_bri && (wlv->ಅಡ್ಡಸಾಲು > wlv->startrow
 # ifdef FEAT_DIFF
-		    + wlv->filler_lines
+		    + wlv->filler_ಸಾಲುಗಳು
 # endif
 		    || wlv->need_showbreak)
 # ifdef FEAT_PROP_POPUP
@@ -527,138 +527,138 @@ handle_breakindent(win_T *wp, winlinevars_T *wlv)
 	{
 	    wlv->char_attr = 0;
 # ifdef FEAT_DIFF
-	    if (wlv->diff_hlf != (hlf_T)0)
+	    ಆದರೆ (wlv->diff_hlf != (hlf_T)0)
 		wlv->char_attr = HL_ATTR(wlv->diff_hlf);
 # endif
-	    wlv->p_extra = NULL;
+	    wlv->p_extra = ಖಾಲಿ;
 	    wlv->c_extra = ' ';
 	    wlv->c_final = NUL;
 	    wlv->n_extra = get_breakindent_win(wp,
-				   ml_get_buf(wp->w_buffer, wlv->lnum, FALSE));
-	    if (wlv->row == wlv->startrow)
+				   ml_get_buf(wp->w_ಬಫರ್, wlv->lnum, FALSE));
+	    ಆದರೆ (wlv->ಅಡ್ಡಸಾಲು == wlv->startrow)
 	    {
-		wlv->n_extra -= win_col_off2(wp);
-		if (wlv->n_extra < 0)
+		wlv->n_extra -= win_ಲಂಬಸಾಲು_off2(wp);
+		ಆದರೆ (wlv->n_extra < 0)
 		    wlv->n_extra = 0;
 	    }
 
 	    // Correct start of highlighted area for 'breakindent',
-	    if (wlv->fromcol >= wlv->vcol
+	    ಆದರೆ (wlv->fromcol >= wlv->vcol
 				    && wlv->fromcol < wlv->vcol + wlv->n_extra)
 		wlv->fromcol = wlv->vcol + wlv->n_extra;
 
 	    // Correct end of highlighted area for 'breakindent',
 	    // required when 'linebreak' is also set.
-	    if (wlv->tocol == wlv->vcol)
+	    ಆದರೆ (wlv->tocol == wlv->vcol)
 		wlv->tocol += wlv->n_extra;
 	}
 
-	if (wp->w_skipcol > 0 && wlv->startrow == 0 && wp->w_p_wrap
+	ಆದರೆ (wp->w_skipcol > 0 && wlv->startrow == 0 && wp->w_p_wrap
 							   && wp->w_briopt_sbr)
 	    wlv->need_showbreak = FALSE;
     }
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_LINEBREAK) || defined(FEAT_DIFF)
-    static void
+#ಆದರೆ defined(FEAT_LINEBREAK) || defined(FEAT_DIFF)
+    ಸ್ಥಿರ ಶೂನ್ಯ
 handle_showbreak_and_filler(win_T *wp, winlinevars_T *wlv)
 {
 # ifdef FEAT_DIFF
-    if (wlv->filler_todo > 0)
+    ಆದರೆ (wlv->filler_todo > 0)
     {
 	// Draw "deleted" diff line(s).
-	if (char2cells(wp->w_fill_chars.diff) > 1)
+	ಆದರೆ (char2cells(wp->w_fill_chars.diff) > 1)
 	{
 	    wlv->c_extra = '-';
 	    wlv->c_final = NUL;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    wlv->c_extra = wp->w_fill_chars.diff;
 	    wlv->c_final = NUL;
 	}
 #  ifdef FEAT_RIGHTLEFT
-	if (wp->w_p_rl)
-	    wlv->n_extra = wlv->col + 1;
-	else
+	ಆದರೆ (wp->w_p_rl)
+	    wlv->n_extra = wlv->ಲಂಬಸಾಲು + 1;
+	ಇಲ್ಲದಿದ್ದರೆ
 #  endif
-	    wlv->n_extra = wp->w_width - wlv->col;
+	    wlv->n_extra = wp->w_ಅಗಲ - wlv->ಲಂಬಸಾಲು;
 	wlv->char_attr = HL_ATTR(HLF_DED);
     }
 # endif
 
 # ifdef FEAT_LINEBREAK
-    char_u *sbr = get_showbreak_value(wp);
-    if (*sbr != NUL && wlv->need_showbreak)
+    char_u *sbr = get_showbreak_ಮೌಲ್ಯ(wp);
+    ಆದರೆ (*sbr != NUL && wlv->need_showbreak)
     {
 	// Draw 'showbreak' at the start of each broken line.
 	wlv->p_extra = sbr;
 	wlv->c_extra = NUL;
 	wlv->c_final = NUL;
-	wlv->n_extra = (int)STRLEN(sbr);
+	wlv->n_extra = (ಪೂರ್ಣಾಂಕ)STRLEN(sbr);
 	wlv->vcol_sbr = wlv->vcol + MB_CHARLEN(sbr);
 
 	// Correct start of highlighted area for 'showbreak'.
-	if (wlv->fromcol >= wlv->vcol && wlv->fromcol < wlv->vcol_sbr)
+	ಆದರೆ (wlv->fromcol >= wlv->vcol && wlv->fromcol < wlv->vcol_sbr)
 	    wlv->fromcol = wlv->vcol_sbr;
 
 	// Correct end of highlighted area for 'showbreak',
 	// required when 'linebreak' is also set.
-	if (wlv->tocol == wlv->vcol)
+	ಆದರೆ (wlv->tocol == wlv->vcol)
 	    wlv->tocol = wlv->vcol_sbr;
 	// combine 'showbreak' with HLF_WIN
 	wlv->char_attr = hl_combine_attr(wlv->win_attr, HL_ATTR(HLF_AT));
 #  ifdef FEAT_SYN_HL
 	// combine 'showbreak' with 'cursorline'
-	if (wlv->cul_attr != 0)
+	ಆದರೆ (wlv->cul_attr != 0)
 	    wlv->char_attr = hl_combine_attr(wlv->char_attr, wlv->cul_attr);
 #  endif
     }
 
-    if (wp->w_skipcol == 0 || wlv->startrow > 0 || !wp->w_p_wrap
+    ಆದರೆ (wp->w_skipcol == 0 || wlv->startrow > 0 || !wp->w_p_wrap
 							  || !wp->w_briopt_sbr)
 	wlv->need_showbreak = FALSE;
 # endif
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_PROP_POPUP)
+#ಆದರೆ defined(FEAT_PROP_POPUP)
 /*
  * Return the cell size of virtual text after truncation.
  */
-    static int
-textprop_size_after_trunc(
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+textprop_ಗಾತ್ರ_after_trunc(
 	win_T	*wp,
-	int	flags,	    // TP_FLAG_ALIGN_*
-	int	added,
-	int	padding,
-	char_u	*text,
-	int	*n_used_ptr)
+	ಪೂರ್ಣಾಂಕ	flags,	    // TP_FLAG_ALIGN_*
+	ಪೂರ್ಣಾಂಕ	added,
+	ಪೂರ್ಣಾಂಕ	padding,
+	char_u	*ಪಠ್ಯ,
+	ಪೂರ್ಣಾಂಕ	*n_ಬಳಸಿದ_ptr)
 {
-    int	space = (flags & (TP_FLAG_ALIGN_BELOW | TP_FLAG_ALIGN_ABOVE))
-				       ? wp->w_width - win_col_off(wp) : added;
-    int strsize = 0;
+    ಪೂರ್ಣಾಂಕ	space = (flags & (TP_FLAG_ALIGN_ಕೆಳಗೆ | TP_FLAG_ALIGN_ABOVE))
+				       ? wp->w_ಅಗಲ - win_ಲಂಬಸಾಲು_off(wp) : added;
+    ಪೂರ್ಣಾಂಕ strsize = 0;
     char_u *p;
 
     // if the remaining size is too small and 'wrap' is set we wrap anyway and
     // use the next line
-    if (space < PROP_TEXT_MIN_CELLS && wp->w_p_wrap)
-	space += wp->w_width;
-    if (flags & (TP_FLAG_ALIGN_BELOW | TP_FLAG_ALIGN_ABOVE))
+    ಆದರೆ (space < PROP_ಪಠ್ಯ_MIN_CELLS && wp->w_p_wrap)
+	space += wp->w_ಅಗಲ;
+    ಆದರೆ (flags & (TP_FLAG_ALIGN_ಕೆಳಗೆ | TP_FLAG_ALIGN_ABOVE))
 	space -= padding;
 
-    for (p = text; *p != NUL; p += (*mb_ptr2len)(p))
+    ಗಾಗಿ (p = ಪಠ್ಯ; *p != NUL; p += (*mb_ptr2len)(p))
     {
-	int clen = ptr2cells(p);
+	ಪೂರ್ಣಾಂಕ clen = ptr2cells(p);
 
-	if (strsize + clen > space)
-	    break;
+	ಆದರೆ (strsize + clen > space)
+	    ನಿಲ್ಲಿಸು;
 	strsize += clen;
     }
-    *n_used_ptr = (int)(p - text);
+    *n_ಬಳಸಿದ_ptr = (ಪೂರ್ಣಾಂಕ)(p - ಪಠ್ಯ);
 
-    return strsize;
+    ಹಿಂತಿರುಗಿ strsize;
 }
 
 /*
@@ -669,117 +669,117 @@ textprop_size_after_trunc(
  * When "n_attr" is NULL returns the number of screen cells used.
  * Otherwise returns TRUE when drawing continues on the next line.
  */
-    int
-text_prop_position(
+    ಪೂರ್ಣಾಂಕ
+ಪಠ್ಯ_prop_position(
 	win_T	    *wp,
 	textprop_T  *tp,
-	int	    vcol,	    // current text column
-	int	    scr_col,	    // current screen column
-	int	    *n_extra,	    // nr of bytes for virtual text
+	ಪೂರ್ಣಾಂಕ	    vcol,	    // current text column
+	ಪೂರ್ಣಾಂಕ	    scr_ಲಂಬಸಾಲು,	    // current screen column
+	ಪೂರ್ಣಾಂಕ	    *n_extra,	    // nr of bytes for virtual text
 	char_u	    **p_extra,	    // virtual text
-	int	    *n_attr,	    // attribute cells, NULL if not used
-	int	    *n_attr_skip,   // cells to skip attr, NULL if not used
-	int	    do_skip)	    // skip_cells is not zero
+	ಪೂರ್ಣಾಂಕ	    *n_attr,	    // attribute cells, NULL if not used
+	ಪೂರ್ಣಾಂಕ	    *n_attr_skip,   // cells to skip attr, NULL if not used
+	ಪೂರ್ಣಾಂಕ	    do_skip)	    // skip_cells is not zero
 {
-    int	    right = (tp->tp_flags & TP_FLAG_ALIGN_RIGHT);
-    int	    above = (tp->tp_flags & TP_FLAG_ALIGN_ABOVE);
-    int	    below = (tp->tp_flags & TP_FLAG_ALIGN_BELOW);
-    int	    wrap = tp->tp_col < MAXCOL || (tp->tp_flags & TP_FLAG_WRAP);
-    int	    padding = tp->tp_col == MAXCOL ? tp->tp_padleft : 0;
-    int	    col_with_padding = scr_col + (below ? 0 : padding);
-    int	    room = wp->w_width - col_with_padding;
-    int	    before = room;	// spaces before the text
-    int	    after = 0;		// spaces after the text
-    int	    n_used = *n_extra;
-    char_u  *l = NULL;
-    int	    strsize = vim_strsize(*p_extra);
-    int	    cells = wrap ? strsize : textprop_size_after_trunc(wp,
-			     tp->tp_flags, before, padding, *p_extra, &n_used);
+    ಪೂರ್ಣಾಂಕ	    ಬಲ_2 = (tp->tp_flags & TP_FLAG_ALIGN_ಬಲ);
+    ಪೂರ್ಣಾಂಕ	    above = (tp->tp_flags & TP_FLAG_ALIGN_ABOVE);
+    ಪೂರ್ಣಾಂಕ	    ಕೆಳಗೆ = (tp->tp_flags & TP_FLAG_ALIGN_ಕೆಳಗೆ);
+    ಪೂರ್ಣಾಂಕ	    wrap = tp->tp_ಲಂಬಸಾಲು < MAXCOL || (tp->tp_flags & TP_FLAG_WRAP);
+    ಪೂರ್ಣಾಂಕ	    padding = tp->tp_ಲಂಬಸಾಲು == MAXCOL ? tp->tp_padleft : 0;
+    ಪೂರ್ಣಾಂಕ	    ಲಂಬಸಾಲು_with_padding = scr_ಲಂಬಸಾಲು + (ಕೆಳಗೆ ? 0 : padding);
+    ಪೂರ್ಣಾಂಕ	    ಸ್ಥಳ = wp->w_ಅಗಲ - ಲಂಬಸಾಲು_with_padding;
+    ಪೂರ್ಣಾಂಕ	    before = ಸ್ಥಳ;	// spaces before the text
+    ಪೂರ್ಣಾಂಕ	    after = 0;		// spaces after the text
+    ಪೂರ್ಣಾಂಕ	    n_ಬಳಸಿದ = *n_extra;
+    char_u  *l = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ	    strsize = vim_strsize(*p_extra);
+    ಪೂರ್ಣಾಂಕ	    cells = wrap ? strsize : textprop_ಗಾತ್ರ_after_trunc(wp,
+			     tp->tp_flags, before, padding, *p_extra, &n_ಬಳಸಿದ);
 
-    if (wrap || right || above || below || padding > 0 || n_used < *n_extra)
+    ಆದರೆ (wrap || ಬಲ_2 || above || ಕೆಳಗೆ || padding > 0 || n_ಬಳಸಿದ < *n_extra)
     {
-	int	    col_off = win_col_off(wp) - win_col_off2(wp);
+	ಪೂರ್ಣಾಂಕ	    ಲಂಬಸಾಲು_off = win_ಲಂಬಸಾಲು_off(wp) - win_ಲಂಬಸಾಲು_off2(wp);
 
-	if (above)
+	ಆದರೆ (above)
 	{
 	    before = 0;
-	    after = wp->w_width - cells - win_col_off(wp) - padding;
-	    if (after < 0)
+	    after = wp->w_ಅಗಲ - cells - win_ಲಂಬಸಾಲು_off(wp) - padding;
+	    ಆದರೆ (after < 0)
 	    {
 		// text "above" has too much padding to fit
 		padding += after;
 		after = 0;
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // Right-align: fill with before
-	    if (right)
+	    ಆದರೆ (ಬಲ_2)
 		before -= cells;
 
 	    // Below-align: empty line add one character
-	    if (below && vcol == 0 && col_with_padding == col_off
-					    && wp->w_width - col_off == before)
-		col_with_padding += 1;
+	    ಆದರೆ (ಕೆಳಗೆ && vcol == 0 && ಲಂಬಸಾಲು_with_padding == ಲಂಬಸಾಲು_off
+					    && wp->w_ಅಗಲ - ಲಂಬಸಾಲು_off == before)
+		ಲಂಬಸಾಲು_with_padding += 1;
 
-	    if (before < 0
-		    || !(right || below)
-		    || (below ? (col_with_padding <= col_off || !wp->w_p_wrap)
-			      : (n_used < *n_extra)))
+	    ಆದರೆ (before < 0
+		    || !(ಬಲ_2 || ಕೆಳಗೆ)
+		    || (ಕೆಳಗೆ ? (ಲಂಬಸಾಲು_with_padding <= ಲಂಬಸಾಲು_off || !wp->w_p_wrap)
+			      : (n_ಬಳಸಿದ < *n_extra)))
 	    {
-		if (right && (wrap
-			      || (room < PROP_TEXT_MIN_CELLS && wp->w_p_wrap)))
+		ಆದರೆ (ಬಲ_2 && (wrap
+			      || (ಸ್ಥಳ < PROP_ಪಠ್ಯ_MIN_CELLS && wp->w_p_wrap)))
 		{
 		    // right-align on next line instead of wrapping if possible
-		    before = wp->w_width - col_off - strsize + room;
-		    if (before < 0)
+		    before = wp->w_ಅಗಲ - ಲಂಬಸಾಲು_off - strsize + ಸ್ಥಳ;
+		    ಆದರೆ (before < 0)
 			before = 0;
-		    else
-			n_used = *n_extra;
+		    ಇಲ್ಲದಿದ್ದರೆ
+			n_ಬಳಸಿದ = *n_extra;
 		}
-		else if (below && before > vcol && do_skip)
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಕೆಳಗೆ && before > vcol && do_skip)
 		    before -= vcol;
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		    before = 0;
 	    }
 	}
 
 	// With 'nowrap' add one to show the "extends" character if needed (it
 	// doesn't show if the text just fits).
-	if (n_used < *n_extra && get_lcs_ext(wp) != NUL)
-	    ++n_used;
+	ಆದರೆ (n_ಬಳಸಿದ < *n_extra && get_lcs_ext(wp) != NUL)
+	    ++n_ಬಳಸಿದ;
 
 	// add 1 for NUL, 2 for when '…' is used
-	if (n_attr != NULL)
-	    l = alloc(n_used + before + after + (padding > 0 ? padding : 0) + 3);
-	if (n_attr == NULL || l != NULL)
+	ಆದರೆ (n_attr != ಖಾಲಿ)
+	    l = alloc(n_ಬಳಸಿದ + before + after + (padding > 0 ? padding : 0) + 3);
+	ಆದರೆ (n_attr == ಖಾಲಿ || l != ಖಾಲಿ)
 	{
-	    int off = 0;
+	    ಪೂರ್ಣಾಂಕ off = 0;
 
-	    if (n_attr != NULL)
+	    ಆದರೆ (n_attr != ಖಾಲಿ)
 	    {
 		vim_memset(l, ' ', before);
 		off += before;
-		if (padding > 0)
+		ಆದರೆ (padding > 0)
 		{
 		    vim_memset(l + off, ' ', padding);
 		    off += padding;
 		}
-		vim_strncpy(l + off, *p_extra, n_used);
-		off += n_used;
+		vim_strncpy(l + off, *p_extra, n_ಬಳಸಿದ);
+		off += n_ಬಳಸಿದ;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		off = before + after + padding + n_used;
+		off = before + after + padding + n_ಬಳಸಿದ;
 		cells += before + after + padding;
 	    }
-	    if (n_attr != NULL)
+	    ಆದರೆ (n_attr != ಖಾಲಿ)
 	    {
-		if (n_used < *n_extra && wp->w_p_wrap)
+		ಆದರೆ (n_ಬಳಸಿದ < *n_extra && wp->w_p_wrap)
 		{
 		    char_u *lp = l + off - 1;
 
-		    if (has_mbyte)
+		    ಆದರೆ (has_mbyte)
 		    {
 			char_u	buf[MB_MAXBYTES + 1];
 			char_u	*cp = buf;
@@ -787,77 +787,77 @@ text_prop_position(
 			// change the last character to '…', converted to the
 			// current 'encoding'
 			STRCPY(buf, "…");
-			if (!enc_utf8)
+			ಆದರೆ (!enc_utf8)
 			{
 			    vimconv_T	vc;
 
 			    vc.vc_type = CONV_NONE;
-			    convert_setup(&vc, (char_u *)"utf-8", p_enc);
-			    if (vc.vc_type != CONV_NONE)
+			    convert_ಸಿದ್ಧತೆ(&vc, (char_u *)"utf-8", p_enc);
+			    ಆದರೆ (vc.vc_type != CONV_NONE)
 			    {
-				cp = string_convert(&vc, buf, NULL);
-				if (cp == NULL)
+				cp = string_convert(&vc, buf, ಖಾಲಿ);
+				ಆದರೆ (cp == ಖಾಲಿ)
 				{
 				    // when conversion fails use '>'
 				    cp = buf;
 				    STRCPY(buf, ">");
 				}
-				convert_setup(&vc, NULL, NULL);
+				convert_ಸಿದ್ಧತೆ(&vc, ಖಾಲಿ, ಖಾಲಿ);
 			    }
 			}
 
 			lp -= (*mb_ptr2cells)(cp) - 1;
-			lp -= (*mb_head_off)(l, lp);
+			lp -= (*mb_ತಲೆ_off)(l, lp);
 			STRCPY(lp, cp);
-			n_used = lp - l + 3 - before - padding;
-			if (cp != buf)
+			n_ಬಳಸಿದ = lp - l + 3 - before - padding;
+			ಆದರೆ (cp != buf)
 			    vim_free(cp);
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 			// change last character to '>'
 			*lp = '>';
 		}
-		else if (after > 0)
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (after > 0)
 		{
 		    vim_memset(l + off, ' ', after);
 		    l[off + after] = NUL;
 		}
 
 		*p_extra = l;
-		*n_extra = n_used + before + after + padding;
+		*n_extra = n_ಬಳಸಿದ + before + after + padding;
 		*n_attr = mb_charlen(*p_extra);
 		// n_attr_skip will not be decremented before draw_state is
 		// WL_LINE
 		*n_attr_skip = before + (padding > 0 ? padding : 0);
 		*n_attr -= *n_attr_skip;
-		if (above)
+		ಆದರೆ (above)
 		    *n_attr -= after;
 	    }
 	}
     }
 
-    if (n_attr == NULL)
-	return cells;
-    return (below && col_with_padding > win_col_off(wp) && !wp->w_p_wrap);
+    ಆದರೆ (n_attr == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ cells;
+    ಹಿಂತಿರುಗಿ (ಕೆಳಗೆ && ಲಂಬಸಾಲು_with_padding > win_ಲಂಬಸಾಲು_off(wp) && !wp->w_p_wrap);
 }
 
-# if defined(FEAT_LINEBREAK)
+# ಆದರೆ defined(FEAT_LINEBREAK)
 /*
  * no 'showbreak' before "below" text property
  * or after "above" or "right" text property
  */
-    int
-text_prop_no_showbreak(textprop_T *tp)
+    ಪೂರ್ಣಾಂಕ
+ಪಠ್ಯ_prop_no_showbreak(textprop_T *tp)
 {
-    int	    right = (tp->tp_flags & TP_FLAG_ALIGN_RIGHT);
-    int	    above = (tp->tp_flags & TP_FLAG_ALIGN_ABOVE);
-    int	    below = (tp->tp_flags & TP_FLAG_ALIGN_BELOW);
-    int	    wrap = tp->tp_col < MAXCOL || (tp->tp_flags & TP_FLAG_WRAP);
+    ಪೂರ್ಣಾಂಕ	    ಬಲ_2 = (tp->tp_flags & TP_FLAG_ALIGN_ಬಲ);
+    ಪೂರ್ಣಾಂಕ	    above = (tp->tp_flags & TP_FLAG_ALIGN_ABOVE);
+    ಪೂರ್ಣಾಂಕ	    ಕೆಳಗೆ = (tp->tp_flags & TP_FLAG_ALIGN_ಕೆಳಗೆ);
+    ಪೂರ್ಣಾಂಕ	    wrap = tp->tp_ಲಂಬಸಾಲು < MAXCOL || (tp->tp_flags & TP_FLAG_WRAP);
 
-    return (right || above || below || !wrap);
+    ಹಿಂತಿರುಗಿ (ಬಲ_2 || above || ಕೆಳಗೆ || !wrap);
 }
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Call screen_line() using values from "wlv".
@@ -865,219 +865,219 @@ text_prop_no_showbreak(textprop_T *tp)
  * when 'showbreak' is not set.
  * When "clear_end" is TRUE clear until the end of the screen line.
  */
-    static void
-wlv_screen_line(win_T *wp, winlinevars_T *wlv, int clear_end)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+wlv_screen_ಸಾಲು(win_T *wp, winlinevars_T *wlv, ಪೂರ್ಣಾಂಕ clear_ಕೊನೆ)
 {
-    if (wlv->row == 0 && wp->w_skipcol > 0
-#if defined(FEAT_LINEBREAK)
+    ಆದರೆ (wlv->ಅಡ್ಡಸಾಲು == 0 && wp->w_skipcol > 0
+#ಆದರೆ defined(FEAT_LINEBREAK)
 	    // do not overwrite the 'showbreak' text with "<<<"
-	    && *get_showbreak_value(wp) == NUL
-#endif
+	    && *get_showbreak_ಮೌಲ್ಯ(wp) == NUL
+#ಆದರೆ_ಅಂತ್ಯ
 	    // do not overwrite the 'listchars' "precedes" text with "<<<"
 	    && !(wp->w_p_list && wp->w_lcs_chars.prec != 0))
     {
-	int off = (int)(current_ScreenLine - ScreenLines);
-	int max_off = off + screen_Columns;
-	int skip = 0;
+	ಪೂರ್ಣಾಂಕ off = (ಪೂರ್ಣಾಂಕ)(current_Screen_ಸಾಲು - Screen_ಸಾಲುಗಳು);
+	ಪೂರ್ಣಾಂಕ max_off = off + screen_Columns;
+	ಪೂರ್ಣಾಂಕ skip = 0;
 
-	if (wp->w_p_nu && wp->w_p_rnu)
+	ಆದರೆ (wp->w_p_nu && wp->w_p_rnu)
 	    // Do not overwrite the line number, change "123 text" to
 	    // "123<<<xt".
-	    while (skip < wp->w_width && VIM_ISDIGIT(ScreenLines[off]))
+	    ಆಗ (skip < wp->w_ಅಗಲ && VIM_ISDIGIT(Screen_ಸಾಲುಗಳು[off]))
 	    {
 		++off;
 		++skip;
 	    }
 
-	for (int i = 0; i < 3 && i + skip < wp->w_width; ++i)
+	ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < 3 && i + skip < wp->w_ಅಗಲ; ++i)
 	{
-	    if ((*mb_off2cells)(off, max_off) > 1)
+	    ಆದರೆ ((*mb_off2cells)(off, max_off) > 1)
 		// When the first half of a double-width character is
 		// overwritten, change the second half to a space.
-		ScreenLines[off + 1] = ' ';
-	    ScreenLines[off] = '<';
-	    if (enc_utf8)
-		ScreenLinesUC[off] = 0;
+		Screen_ಸಾಲುಗಳು[off + 1] = ' ';
+	    Screen_ಸಾಲುಗಳು[off] = '<';
+	    ಆದರೆ (enc_utf8)
+		Screen_ಸಾಲುಗಳು_UC[off] = 0;
 	    ScreenAttrs[off] = HL_ATTR(HLF_AT);
 	    ++off;
 	}
     }
 
-    screen_line(wp, wlv->screen_row, wp->w_wincol, wlv->col,
-		    clear_end ? wp->w_width : -wp->w_width,
-		    wlv->vcol - 1, wlv->screen_line_flags);
+    screen_ಸಾಲು(wp, wlv->screen_ಅಡ್ಡಸಾಲು, wp->w_wincol, wlv->ಲಂಬಸಾಲು,
+		    clear_ಕೊನೆ ? wp->w_ಅಗಲ : -wp->w_ಅಗಲ,
+		    wlv->vcol - 1, wlv->screen_ಸಾಲು_flags);
 }
 
 /*
  * Called when finished with the line: draw the screen line and handle any
  * highlighting until the right of the window.
  */
-    static void
-draw_screen_line(win_T *wp, winlinevars_T *wlv)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+draw_screen_ಸಾಲು(win_T *wp, winlinevars_T *wlv)
 {
-#ifdef FEAT_SYN_HL
-    long	v;
-    int		wcol;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
+    ದೀರ್ಘ	v;
+    ಪೂರ್ಣಾಂಕ		wcol;
 
     // Highlight 'cursorcolumn' & 'colorcolumn' past end of the line.
-    if (wp->w_p_wrap)
+    ಆದರೆ (wp->w_p_wrap)
 	v = wlv->startrow == 0 ? wp->w_skipcol : 0;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	v = wp->w_leftcol;
 
     wcol =
 # ifdef FEAT_RIGHTLEFT
-	wp->w_p_rl ? wp->w_width - wlv->col - 1 :
+	wp->w_p_rl ? wp->w_ಅಗಲ - wlv->ಲಂಬಸಾಲು - 1 :
 # endif
-	wlv->col;
+	wlv->ಲಂಬಸಾಲು;
     // check if line ends before left margin
-    if (wlv->vcol < v + wcol - win_col_off(wp))
-	wlv->vcol = v + wcol - win_col_off(wp);
+    ಆದರೆ (wlv->vcol < v + wcol - win_ಲಂಬಸಾಲು_off(wp))
+	wlv->vcol = v + wcol - win_ಲಂಬಸಾಲು_off(wp);
 # ifdef FEAT_CONCEAL
     // Get rid of the boguscols now, we want to draw until the right
     // edge for 'cursorcolumn'.
-    wlv->col -= wlv->boguscols;
+    wlv->ಲಂಬಸಾಲು -= wlv->boguscols;
     wlv->boguscols = 0;
 #  define VCOL_HLC (wlv->vcol - wlv->vcol_off_co - wlv->vcol_off_tp)
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  define VCOL_HLC (wlv->vcol - wlv->vcol_off_tp)
 # endif
 
-    if (wlv->draw_color_col)
-	wlv->draw_color_col = advance_color_col(VCOL_HLC, &wlv->color_cols);
+    ಆದರೆ (wlv->draw_color_ಲಂಬಸಾಲು)
+	wlv->draw_color_ಲಂಬಸಾಲು = advance_color_ಲಂಬಸಾಲು(VCOL_HLC, &wlv->color_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ);
 
-    if (((wp->w_p_cuc
-		    && (int)wp->w_virtcol >= VCOL_HLC - wlv->eol_hl_off
-		    && (int)wp->w_virtcol <
-			 (long)wp->w_width * (wlv->row - wlv->startrow + 1) + v
+    ಆದರೆ (((wp->w_p_cuc
+		    && (ಪೂರ್ಣಾಂಕ)wp->w_virtcol >= VCOL_HLC - wlv->eol_hl_off
+		    && (ಪೂರ್ಣಾಂಕ)wp->w_virtcol <
+			 (ದೀರ್ಘ)wp->w_ಅಗಲ * (wlv->ಅಡ್ಡಸಾಲು - wlv->startrow + 1) + v
 			 && wlv->lnum != wp->w_cursor.lnum)
-		|| wlv->draw_color_col
-# ifdef LINE_ATTR
-		|| wlv->line_attr != 0
+		|| wlv->draw_color_ಲಂಬಸಾಲು
+# ifdef ಸಾಲು_ATTR
+		|| wlv->ಸಾಲು_attr != 0
 # endif
 		|| wlv->win_attr != 0))
     {
-	int	rightmost_vcol = 0;
-	int	i;
+	ಪೂರ್ಣಾಂಕ	rightmost_vcol = 0;
+	ಪೂರ್ಣಾಂಕ	i;
 
-	if (wp->w_p_cuc)
+	ಆದರೆ (wp->w_p_cuc)
 	    rightmost_vcol = wp->w_virtcol;
-	if (wlv->draw_color_col)
+	ಆದರೆ (wlv->draw_color_ಲಂಬಸಾಲು)
 	    // determine rightmost colorcolumn to possibly draw
-	    for (i = 0; wlv->color_cols[i] >= 0; ++i)
-		if (rightmost_vcol < wlv->color_cols[i])
-		    rightmost_vcol = wlv->color_cols[i];
+	    ಗಾಗಿ (i = 0; wlv->color_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ[i] >= 0; ++i)
+		ಆದರೆ (rightmost_vcol < wlv->color_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ[i])
+		    rightmost_vcol = wlv->color_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ[i];
 
-	while (
+	ಆಗ (
 # ifdef FEAT_RIGHTLEFT
-		wp->w_p_rl ? (wlv->col >= 0) :
+		wp->w_p_rl ? (wlv->ಲಂಬಸಾಲು >= 0) :
 # endif
-		(wlv->col < wp->w_width))
+		(wlv->ಲಂಬಸಾಲು < wp->w_ಅಗಲ))
 	{
-	    ScreenLines[wlv->off] = ' ';
-	    if (enc_utf8)
-		ScreenLinesUC[wlv->off] = 0;
+	    Screen_ಸಾಲುಗಳು[wlv->off] = ' ';
+	    ಆದರೆ (enc_utf8)
+		Screen_ಸಾಲುಗಳು_UC[wlv->off] = 0;
 
-	    if (wlv->draw_color_col)
-		wlv->draw_color_col = advance_color_col(
-						   VCOL_HLC, &wlv->color_cols);
+	    ಆದರೆ (wlv->draw_color_ಲಂಬಸಾಲು)
+		wlv->draw_color_ಲಂಬಸಾಲು = advance_color_ಲಂಬಸಾಲು(
+						   VCOL_HLC, &wlv->color_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ);
 
-	    int attr = wlv->win_attr;
-# ifdef LINE_ATTR
-	    if (wlv->line_attr != 0)
-		attr = hl_combine_attr(attr, wlv->line_attr);
+	    ಪೂರ್ಣಾಂಕ attr = wlv->win_attr;
+# ifdef ಸಾಲು_ATTR
+	    ಆದರೆ (wlv->ಸಾಲು_attr != 0)
+		attr = hl_combine_attr(attr, wlv->ಸಾಲು_attr);
 # endif
-	    if (wp->w_p_cuc && VCOL_HLC == (long)wp->w_virtcol
+	    ಆದರೆ (wp->w_p_cuc && VCOL_HLC == (ದೀರ್ಘ)wp->w_virtcol
 		    && wlv->lnum != wp->w_cursor.lnum)
 		attr = hl_combine_attr(attr, HL_ATTR(HLF_CUC));
-	    else if (wlv->draw_color_col && VCOL_HLC == *wlv->color_cols)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (wlv->draw_color_ಲಂಬಸಾಲು && VCOL_HLC == *wlv->color_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ)
 		attr = hl_combine_attr(attr, HL_ATTR(HLF_MC));
 	    ScreenAttrs[wlv->off] = attr;
-	    ScreenCols[wlv->off] = wlv->vcol;
+	    Screen_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ[wlv->off] = wlv->vcol;
 # ifdef FEAT_RIGHTLEFT
-	    if (wp->w_p_rl)
+	    ಆದರೆ (wp->w_p_rl)
 	    {
 		--wlv->off;
-		--wlv->col;
+		--wlv->ಲಂಬಸಾಲು;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 # endif
 	    {
 		++wlv->off;
-		++wlv->col;
+		++wlv->ಲಂಬಸಾಲು;
 	    }
 	    ++wlv->vcol;
 
-	    if (VCOL_HLC > rightmost_vcol
-# ifdef LINE_ATTR
-		    && wlv->line_attr == 0
+	    ಆದರೆ (VCOL_HLC > rightmost_vcol
+# ifdef ಸಾಲು_ATTR
+		    && wlv->ಸಾಲು_attr == 0
 # endif
 		    && wlv->win_attr == 0)
-		break;
+		ನಿಲ್ಲಿಸು;
 	}
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Set increasing virtual columns in ScreenCols[] to set correct curswant
     // (or "coladd" for 'virtualedit') when clicking after end of line.
-    wlv->screen_line_flags |= SLF_INC_VCOL;
-    wlv_screen_line(wp, wlv, TRUE);
-    wlv->screen_line_flags &= ~SLF_INC_VCOL;
-    ++wlv->row;
-    ++wlv->screen_row;
+    wlv->screen_ಸಾಲು_flags |= SLF_INC_VCOL;
+    wlv_screen_ಸಾಲು(wp, wlv, TRUE);
+    wlv->screen_ಸಾಲು_flags &= ~SLF_INC_VCOL;
+    ++wlv->ಅಡ್ಡಸಾಲು;
+    ++wlv->screen_ಅಡ್ಡಸಾಲು;
 }
-#undef VCOL_HLC
+#ವ್ಯಾಖ್ಯಾನ_ರದ್ದು VCOL_HLC
 
 /*
  * Start a screen line at column zero.
  * When "save_extra" is TRUE save and reset n_extra, p_extra, etc.
  */
-    static void
-win_line_start(win_T *wp UNUSED, winlinevars_T *wlv, int save_extra)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+win_ಸಾಲು_ಆರಂಭ(win_T *wp ಬಳಸದ, winlinevars_T *wlv, ಪೂರ್ಣಾಂಕ save_extra)
 {
-    wlv->col = 0;
-    wlv->off = (unsigned)(current_ScreenLine - ScreenLines);
-#ifdef FEAT_LINEBREAK
+    wlv->ಲಂಬಸಾಲು = 0;
+    wlv->off = (ಚಿಹ್ನೆರಹಿತ)(current_Screen_ಸಾಲು - Screen_ಸಾಲುಗಳು);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
     wlv->need_lbr = FALSE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_RIGHTLEFT
-    if (wp->w_p_rl)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+    ಆದರೆ (wp->w_p_rl)
     {
 	// Rightleft window: process the text in the normal direction, but put
 	// it in current_ScreenLine[] from right to left.  Start at the
 	// rightmost column of the window.
-	wlv->col = wp->w_width - 1;
-	wlv->off += wlv->col;
-	wlv->screen_line_flags |= SLF_RIGHTLEFT;
+	wlv->ಲಂಬಸಾಲು = wp->w_ಅಗಲ - 1;
+	wlv->off += wlv->ಲಂಬಸಾಲು;
+	wlv->screen_ಸಾಲು_flags |= SLF_RIGHTLEFT;
     }
-#endif
-    if (save_extra)
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (save_extra)
     {
 	// reset the drawing state for the start of a wrapped line
-	wlv->draw_state = WL_START;
+	wlv->draw_state = WL_ಆರಂಭ;
 	wlv->saved_n_extra = wlv->n_extra;
 	wlv->saved_p_extra = wlv->p_extra;
 	vim_free(wlv->saved_p_extra_free);
 	wlv->saved_p_extra_free = wlv->p_extra_free;
-	wlv->p_extra_free = NULL;
+	wlv->p_extra_free = ಖಾಲಿ;
 	wlv->saved_extra_attr = wlv->extra_attr;
 	wlv->saved_n_attr_skip = wlv->n_attr_skip;
 	wlv->saved_extra_for_textprop = wlv->extra_for_textprop;
 	wlv->saved_c_extra = wlv->c_extra;
 	wlv->saved_c_final = wlv->c_final;
-#ifdef FEAT_LINEBREAK
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
 	wlv->need_lbr = TRUE;
-#endif
-#ifdef FEAT_SYN_HL
-	if (!(wlv->cul_screenline
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
+	ಆದರೆ (!(wlv->cul_screenline
 # ifdef FEAT_DIFF
 		    && wlv->diff_hlf == (hlf_T)0
 # endif
 	     ))
 	    wlv->saved_char_attr = wlv->char_attr;
-	else
-#endif
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 	    wlv->saved_char_attr = 0;
 
 	// these are not used until restored in win_line_continue()
@@ -1089,10 +1089,10 @@ win_line_start(win_T *wp UNUSED, winlinevars_T *wlv, int save_extra)
 /*
  * Called when wlv->draw_state is set to WL_LINE.
  */
-    static void
-win_line_continue(winlinevars_T *wlv)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+win_ಸಾಲು_continue(winlinevars_T *wlv)
 {
-    if (wlv->saved_n_extra > 0)
+    ಆದರೆ (wlv->saved_n_extra > 0)
     {
 	// Continue item from end of wrapped line.
 	wlv->n_extra = wlv->saved_n_extra;
@@ -1102,45 +1102,45 @@ win_line_continue(winlinevars_T *wlv)
 	wlv->p_extra = wlv->saved_p_extra;
 	vim_free(wlv->p_extra_free);
 	wlv->p_extra_free = wlv->saved_p_extra_free;
-	wlv->saved_p_extra_free = NULL;
+	wlv->saved_p_extra_free = ಖಾಲಿ;
 	wlv->extra_attr = wlv->saved_extra_attr;
 	wlv->n_attr_skip = wlv->saved_n_attr_skip;
 	wlv->extra_for_textprop = wlv->saved_extra_for_textprop;
 	wlv->char_attr = wlv->saved_char_attr;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	wlv->char_attr = wlv->win_attr;
 }
 
-#ifdef FEAT_SYN_HL
-    static void
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
+    ಸ್ಥಿರ ಶೂನ್ಯ
 apply_cursorline_highlight(
 	winlinevars_T *wlv,
-	int sign_present UNUSED)
+	ಪೂರ್ಣಾಂಕ sign_present ಬಳಸದ)
 {
     wlv->cul_attr = HL_ATTR(HLF_CUL);
 # ifdef FEAT_SIGNS
     // Combine the 'cursorline' and sign highlighting, depending on
     // the sign priority.
-    if (sign_present && wlv->sattr.sat_linehl > 0)
+    ಆದರೆ (sign_present && wlv->sattr.sat_linehl > 0)
     {
-	if (wlv->sattr.sat_priority >= 100)
-	    wlv->line_attr = hl_combine_attr(wlv->cul_attr, wlv->line_attr);
-	else
-	    wlv->line_attr = hl_combine_attr(wlv->line_attr, wlv->cul_attr);
+	ಆದರೆ (wlv->sattr.sat_ಆದ್ಯತೆ >= 100)
+	    wlv->ಸಾಲು_attr = hl_combine_attr(wlv->cul_attr, wlv->ಸಾಲು_attr);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    wlv->ಸಾಲು_attr = hl_combine_attr(wlv->ಸಾಲು_attr, wlv->cul_attr);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 # endif
-# if defined(FEAT_QUICKFIX)
+# ಆದರೆ defined(FEAT_QUICKFIX)
 	// let the line attribute overrule 'cursorline', otherwise
 	// it disappears when both have background set;
 	// 'cursorline' can use underline or bold to make it show
-	wlv->line_attr = hl_combine_attr(wlv->cul_attr, wlv->line_attr);
-# else
-	wlv->line_attr = wlv->cul_attr;
+	wlv->ಸಾಲು_attr = hl_combine_attr(wlv->cul_attr, wlv->ಸಾಲು_attr);
+# ಇಲ್ಲದಿದ್ದರೆ
+	wlv->ಸಾಲು_attr = wlv->cul_attr;
 # endif
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Display line "lnum" of window "wp" on the screen.
@@ -1153,196 +1153,196 @@ apply_cursorline_highlight(
  *
  * Return the number of last row the line occupies.
  */
-    int
-win_line(
+    ಪೂರ್ಣಾಂಕ
+win_ಸಾಲು(
     win_T	*wp,
     linenr_T	lnum,
-    int		startrow,
-    int		endrow,
-    int		number_only,
-    spellvars_T	*spv UNUSED)
+    ಪೂರ್ಣಾಂಕ		startrow,
+    ಪೂರ್ಣಾಂಕ		endrow,
+    ಪೂರ್ಣಾಂಕ		ಸಂಖ್ಯೆ_only,
+    spellvars_T	*spv ಬಳಸದ)
 {
     winlinevars_T	wlv;		// variables passed between functions
 
-    int		c = 0;			// init for GCC
-    char_u	*line;			// current line
+    ಪೂರ್ಣಾಂಕ		c = 0;			// init for GCC
+    char_u	*ಸಾಲು;			// current line
     char_u	*ptr;			// current position in "line"
-    int		in_curline = wp == curwin && lnum == curwin->w_cursor.lnum;
+    ಪೂರ್ಣಾಂಕ		ಒಳ_curline = wp == curwin && lnum == curwin->w_cursor.lnum;
 
-#ifdef FEAT_PROP_POPUP
-    char_u	*p_extra_free2 = NULL;   // another p_extra to be freed
-#endif
-#if defined(FEAT_LINEBREAK) && defined(FEAT_PROP_POPUP)
-    int		in_linebreak = FALSE;	// n_extra set for showing linebreak
-#endif
-    int		lcs_eol_one = wp->w_lcs_chars.eol; // eol until it's been used
-    int		lcs_prec_todo = wp->w_lcs_chars.prec;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+    char_u	*p_extra_free2 = ಖಾಲಿ;   // another p_extra to be freed
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(FEAT_LINEBREAK) && defined(FEAT_PROP_POPUP)
+    ಪೂರ್ಣಾಂಕ		ಒಳ_linebreak = FALSE;	// n_extra set for showing linebreak
+#ಆದರೆ_ಅಂತ್ಯ
+    ಪೂರ್ಣಾಂಕ		lcs_eol_one = wp->w_lcs_chars.eol; // eol until it's been used
+    ಪೂರ್ಣಾಂಕ		lcs_prec_todo = wp->w_lcs_chars.prec;
 					// prec until it's been used
 
-    int		n_attr = 0;	    // chars with special attr
-    int		saved_attr2 = 0;    // char_attr saved for n_attr
-    int		n_attr3 = 0;	    // chars with overruling special attr
-    int		saved_attr3 = 0;    // char_attr saved for n_attr3
+    ಪೂರ್ಣಾಂಕ		n_attr = 0;	    // chars with special attr
+    ಪೂರ್ಣಾಂಕ		saved_attr2 = 0;    // char_attr saved for n_attr
+    ಪೂರ್ಣಾಂಕ		n_attr3 = 0;	    // chars with overruling special attr
+    ಪೂರ್ಣಾಂಕ		saved_attr3 = 0;    // char_attr saved for n_attr3
 
-    int		skip_cells = 0;		// nr of cells to skip for w_leftcol or
+    ಪೂರ್ಣಾಂಕ		skip_cells = 0;		// nr of cells to skip for w_leftcol or
 					// w_skipcol or concealing
-    int		skipped_cells = 0;	// nr of skipped cells for virtual text
+    ಪೂರ್ಣಾಂಕ		skipped_cells = 0;	// nr of skipped cells for virtual text
 					// to be added to wlv.vcol later
-    int		lnum_in_visual_area = FALSE;
+    ಪೂರ್ಣಾಂಕ		lnum_ಒಳ_visual_area = FALSE;
     pos_T	pos;
-    long	v;
+    ದೀರ್ಘ	v;
 
-    int		attr_pri = FALSE;	// char_attr has priority
-    int		area_highlighting = FALSE; // Visual or incsearch highlighting
+    ಪೂರ್ಣಾಂಕ		attr_pri = FALSE;	// char_attr has priority
+    ಪೂರ್ಣಾಂಕ		area_highlighting = FALSE; // Visual or incsearch highlighting
 					   // in this line
-    int		vi_attr = 0;		// attributes for Visual and incsearch
+    ಪೂರ್ಣಾಂಕ		vi_attr = 0;		// attributes for Visual and incsearch
 					// highlighting
-    int		area_attr = 0;		// attributes desired by highlighting
-    int		search_attr = 0;	// attributes desired by 'hlsearch' or
+    ಪೂರ್ಣಾಂಕ		area_attr = 0;		// attributes desired by highlighting
+    ಪೂರ್ಣಾಂಕ		ಹುಡುಕು_attr = 0;	// attributes desired by 'hlsearch' or
 					// ComplMatchIns
-#ifdef FEAT_SYN_HL
-    int		vcol_save_attr = 0;	// saved attr for 'cursorcolumn'
-    int		syntax_attr = 0;	// attributes desired by syntax
-    int		prev_syntax_col = -1;	// column of prev_syntax_attr
-    int		prev_syntax_attr = 0;	// syntax_attr at prev_syntax_col
-    int		has_syntax = FALSE;	// this buffer has syntax highl.
-    int		save_did_emsg;
-#endif
-#ifdef FEAT_PROP_POPUP
-# define WIN_LINE_TEXT_PROP_STACK_LEN 32
-    int		did_line = FALSE;	// set to TRUE when line text done
-    int		text_prop_count;
-    int		last_textprop_text_idx = -1;
-    int		text_prop_next = 0;	// next text property to use
-    textprop_T	text_props_buf[WIN_LINE_TEXT_PROP_STACK_LEN];
-    int		text_prop_idxs_buf[WIN_LINE_TEXT_PROP_STACK_LEN];
-    char_u	text_prop_suffix_flags_buf[WIN_LINE_TEXT_PROP_STACK_LEN + 1];
-    textprop_T	*text_props = NULL;
-    int		*text_prop_idxs = NULL;
-    char_u	*text_prop_suffix_flags = NULL;
-    int		text_props_active = 0;
-    int		text_props_need_sort = FALSE;
-    proptype_T  *text_prop_type = NULL;
-    int		text_prop_attr = 0;
-    int		text_prop_attr_comb = 0;  // text_prop_attr combined with
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
+    ಪೂರ್ಣಾಂಕ		vcol_save_attr = 0;	// saved attr for 'cursorcolumn'
+    ಪೂರ್ಣಾಂಕ		syntax_attr = 0;	// attributes desired by syntax
+    ಪೂರ್ಣಾಂಕ		prev_syntax_ಲಂಬಸಾಲು = -1;	// column of prev_syntax_attr
+    ಪೂರ್ಣಾಂಕ		prev_syntax_attr = 0;	// syntax_attr at prev_syntax_col
+    ಪೂರ್ಣಾಂಕ		has_syntax = FALSE;	// this buffer has syntax highl.
+    ಪೂರ್ಣಾಂಕ		save_did_emsg;
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+# define WIN_ಸಾಲು_ಪಠ್ಯ_PROP_ರಾಶಿ_LEN 32
+    ಪೂರ್ಣಾಂಕ		did_ಸಾಲು = FALSE;	// set to TRUE when line text done
+    ಪೂರ್ಣಾಂಕ		ಪಠ್ಯ_prop_ಎಣಿಕೆ;
+    ಪೂರ್ಣಾಂಕ		ಕೊನೆಯ_textprop_ಪಠ್ಯ_idx = -1;
+    ಪೂರ್ಣಾಂಕ		ಪಠ್ಯ_prop_ಮುಂದಿನ = 0;	// next text property to use
+    textprop_T	ಪಠ್ಯ_props_buf[WIN_ಸಾಲು_ಪಠ್ಯ_PROP_ರಾಶಿ_LEN];
+    ಪೂರ್ಣಾಂಕ		ಪಠ್ಯ_prop_idxs_buf[WIN_ಸಾಲು_ಪಠ್ಯ_PROP_ರಾಶಿ_LEN];
+    char_u	ಪಠ್ಯ_prop_suffix_flags_buf[WIN_ಸಾಲು_ಪಠ್ಯ_PROP_ರಾಶಿ_LEN + 1];
+    textprop_T	*ಪಠ್ಯ_props = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		*ಪಠ್ಯ_prop_idxs = ಖಾಲಿ;
+    char_u	*ಪಠ್ಯ_prop_suffix_flags = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		ಪಠ್ಯ_props_ಸಕ್ರಿಯ = 0;
+    ಪೂರ್ಣಾಂಕ		ಪಠ್ಯ_props_need_ವಿಂಗಡಿಸು = FALSE;
+    proptype_T  *ಪಠ್ಯ_prop_type = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		ಪಠ್ಯ_prop_attr = 0;
+    ಪೂರ್ಣಾಂಕ		ಪಠ್ಯ_prop_attr_comb = 0;  // text_prop_attr combined with
 					  // syntax_attr
-    int		text_prop_id = 0;	// active property ID
-    int		text_prop_flags = 0;
-    int		text_prop_above = FALSE;  // first doing virtual text above
-    int		text_prop_follows = FALSE;  // another text prop to display
-    int		saved_search_attr = 0;	// search_attr to be used when n_extra
+    ಪೂರ್ಣಾಂಕ		ಪಠ್ಯ_prop_id = 0;	// active property ID
+    ಪೂರ್ಣಾಂಕ		ಪಠ್ಯ_prop_flags = 0;
+    ಪೂರ್ಣಾಂಕ		ಪಠ್ಯ_prop_above = FALSE;  // first doing virtual text above
+    ಪೂರ್ಣಾಂಕ		ಪಠ್ಯ_prop_follows = FALSE;  // another text prop to display
+    ಪೂರ್ಣಾಂಕ		saved_ಹುಡುಕು_attr = 0;	// search_attr to be used when n_extra
 					// goes to zero
-    int		saved_area_attr = 0;	// idem for area_attr
-    int		reset_extra_attr = FALSE;
-#endif
-#ifdef FEAT_SPELL
-    int		can_spell = FALSE;
+    ಪೂರ್ಣಾಂಕ		saved_area_attr = 0;	// idem for area_attr
+    ಪೂರ್ಣಾಂಕ		reset_extra_attr = FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SPELL
+    ಪೂರ್ಣಾಂಕ		can_spell = FALSE;
 # define SPWORDLEN 150
     char_u	nextline[SPWORDLEN * 2];// text with start of the next line
-    int		nextlinecol = 0;	// column where nextline[] starts
-    int		nextline_idx = 0;	// index in nextline[] where next line
+    ಪೂರ್ಣಾಂಕ		nextlinecol = 0;	// column where nextline[] starts
+    ಪೂರ್ಣಾಂಕ		nextline_idx = 0;	// index in nextline[] where next line
 					// starts
-    int		spell_attr = 0;		// attributes desired by spelling
-    int		word_end = 0;		// last byte with same spell_attr
-    int		cur_checked_col = 0;	// checked column for current line
-#endif
-    int		extra_check = FALSE;	// has extra highlighting
-    int		multi_attr = 0;		// attributes desired by multibyte
-    int		mb_l = 1;		// multi-byte byte length
-    int		mb_c = 0;		// decoded multi-byte character
-    int		mb_utf8 = FALSE;	// screen char is UTF-8 char
-    int		u8cc[MAX_MCO];		// composing UTF-8 chars
-#ifdef FEAT_DIFF
-    int		change_start = MAXCOL;	// first col of changed area
-    int		change_end = -1;	// last col of changed area
-    diffline_T	line_changes;
-    int		change_index = -1;
-#endif
+    ಪೂರ್ಣಾಂಕ		spell_attr = 0;		// attributes desired by spelling
+    ಪೂರ್ಣಾಂಕ		ಶಬ್ದ_ಕೊನೆ = 0;		// last byte with same spell_attr
+    ಪೂರ್ಣಾಂಕ		cur_checked_ಲಂಬಸಾಲು = 0;	// checked column for current line
+#ಆದರೆ_ಅಂತ್ಯ
+    ಪೂರ್ಣಾಂಕ		extra_check = FALSE;	// has extra highlighting
+    ಪೂರ್ಣಾಂಕ		multi_attr = 0;		// attributes desired by multibyte
+    ಪೂರ್ಣಾಂಕ		mb_l = 1;		// multi-byte byte length
+    ಪೂರ್ಣಾಂಕ		mb_c = 0;		// decoded multi-byte character
+    ಪೂರ್ಣಾಂಕ		mb_utf8 = FALSE;	// screen char is UTF-8 char
+    ಪೂರ್ಣಾಂಕ		u8cc[MAX_MCO];		// composing UTF-8 chars
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
+    ಪೂರ್ಣಾಂಕ		change_ಆರಂಭ = MAXCOL;	// first col of changed area
+    ಪೂರ್ಣಾಂಕ		change_ಕೊನೆ = -1;	// last col of changed area
+    diffline_T	ಸಾಲು_changes;
+    ಪೂರ್ಣಾಂಕ		change_ಸೂಚ್ಯಂಕ = -1;
+#ಆದರೆ_ಅಂತ್ಯ
     colnr_T	trailcol = MAXCOL;	// start of trailing spaces
     colnr_T	leadcol = 0;		// start of leading spaces
-    int		in_multispace = FALSE;	// in multiple consecutive spaces
-    int		multispace_pos = 0;	// position in lcs-multispace string
-#ifdef LINE_ATTR
-    int		line_attr_save = 0;
-#endif
-    int		sign_present = FALSE;
-    int		num_attr = 0;		// attribute for the number column
-#ifdef FEAT_ARABIC
-    int		prev_c = 0;		// previous Arabic character
-    int		prev_c1 = 0;		// first composing char for prev_c
-#endif
-#if defined(LINE_ATTR)
-    int		did_line_attr = 0;
-#endif
-#ifdef FEAT_TERMINAL
-    int		get_term_attr = FALSE;
-#endif
+    ಪೂರ್ಣಾಂಕ		ಒಳ_multispace = FALSE;	// in multiple consecutive spaces
+    ಪೂರ್ಣಾಂಕ		multispace_pos = 0;	// position in lcs-multispace string
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ಸಾಲು_ATTR
+    ಪೂರ್ಣಾಂಕ		ಸಾಲು_attr_save = 0;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಪೂರ್ಣಾಂಕ		sign_present = FALSE;
+    ಪೂರ್ಣಾಂಕ		ಅಂಕೆ_attr = 0;		// attribute for the number column
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ARABIC
+    ಪೂರ್ಣಾಂಕ		prev_c = 0;		// previous Arabic character
+    ಪೂರ್ಣಾಂಕ		prev_c1 = 0;		// first composing char for prev_c
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(ಸಾಲು_ATTR)
+    ಪೂರ್ಣಾಂಕ		did_ಸಾಲು_attr = 0;
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMINAL
+    ಪೂರ್ಣಾಂಕ		get_ಪದ_attr = FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_SYN_HL) || defined(FEAT_DIFF)
+#ಆದರೆ defined(FEAT_SYN_HL) || defined(FEAT_DIFF)
     // margin columns for the screen line, needed for when 'cursorlineopt'
     // contains "screenline"
-    int		left_curline_col = 0;
-    int		right_curline_col = 0;
-#endif
+    ಪೂರ್ಣಾಂಕ		ಎಡ_curline_ಲಂಬಸಾಲು = 0;
+    ಪೂರ್ಣಾಂಕ		ಬಲ_curline_ಲಂಬಸಾಲು = 0;
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
-    int		feedback_col = 0;
-    int		feedback_old_attr = -1;
-#endif
+#ಆದರೆ defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
+    ಪೂರ್ಣಾಂಕ		feedback_ಲಂಬಸಾಲು = 0;
+    ಪೂರ್ಣಾಂಕ		feedback_old_attr = -1;
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_CONCEAL) || defined(FEAT_SEARCH_EXTRA)
-    int		match_conc	= 0;	// cchar for match functions
-#endif
-#if defined(FEAT_CONCEAL) || defined(FEAT_SEARCH_EXTRA) || defined(FEAT_LINEBREAK)
-    int		on_last_col     = FALSE;
-#endif
-#ifdef FEAT_CONCEAL
-    int		syntax_flags	= 0;
-    int		syntax_seqnr	= 0;
-    int		prev_syntax_id	= 0;
-    int		conceal_attr	= HL_ATTR(HLF_CONCEAL);
-    int		is_concealing	= FALSE;
-    int		did_wcol	= FALSE;
-    int		old_boguscols   = 0;
+#ಆದರೆ defined(FEAT_CONCEAL) || defined(FEAT_ಹುಡುಕು_EXTRA)
+    ಪೂರ್ಣಾಂಕ		ಹೊಂದಿಕೆ_conc	= 0;	// cchar for match functions
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(FEAT_CONCEAL) || defined(FEAT_ಹುಡುಕು_EXTRA) || defined(FEAT_LINEBREAK)
+    ಪೂರ್ಣಾಂಕ		on_ಕೊನೆಯ_ಲಂಬಸಾಲು     = FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CONCEAL
+    ಪೂರ್ಣಾಂಕ		syntax_flags	= 0;
+    ಪೂರ್ಣಾಂಕ		syntax_seqnr	= 0;
+    ಪೂರ್ಣಾಂಕ		prev_syntax_id	= 0;
+    ಪೂರ್ಣಾಂಕ		conceal_attr	= HL_ATTR(HLF_CONCEAL);
+    ಪೂರ್ಣಾಂಕ		is_concealing	= FALSE;
+    ಪೂರ್ಣಾಂಕ		did_wcol	= FALSE;
+    ಪೂರ್ಣಾಂಕ		old_boguscols   = 0;
 # define VCOL_HLC (wlv.vcol - wlv.vcol_off_co - wlv.vcol_off_tp)
 # define FIX_FOR_BOGUSCOLS \
     { \
 	wlv.n_extra += wlv.vcol_off_co; \
 	wlv.vcol -= wlv.vcol_off_co; \
 	wlv.vcol_off_co = 0; \
-	wlv.col -= wlv.boguscols; \
+	wlv.ಲಂಬಸಾಲು -= wlv.boguscols; \
 	old_boguscols = wlv.boguscols; \
 	wlv.boguscols = 0; \
     }
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 # define VCOL_HLC (wlv.vcol - wlv.vcol_off_tp)
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (startrow > endrow)		// past the end already!
-	return startrow;
+    ಆದರೆ (startrow > endrow)		// past the end already!
+	ಹಿಂತಿರುಗಿ startrow;
 
-    CLEAR_FIELD(wlv);
+    CLEAR_ಕ್ಷೇತ್ರ(wlv);
 
     wlv.lnum = lnum;
     wlv.startrow = startrow;
-    wlv.row = startrow;
-    wlv.screen_row = wlv.row + W_WINROW(wp);
+    wlv.ಅಡ್ಡಸಾಲು = startrow;
+    wlv.screen_ಅಡ್ಡಸಾಲು = wlv.ಅಡ್ಡಸಾಲು + W_WINROW(wp);
     wlv.fromcol = -10;
     wlv.tocol = MAXCOL;
-#ifdef FEAT_LINEBREAK
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
     wlv.vcol_sbr = -1;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (number_only == 0)
+    ಆದರೆ (ಸಂಖ್ಯೆ_only == 0)
     {
 	// To speed up the loop below, set extra_check when there is linebreak,
 	// trailing white space and/or syntax processing to be done.
-#ifdef FEAT_LINEBREAK
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
 	extra_check = wp->w_p_lbr;
-#endif
-#ifdef FEAT_SYN_HL
-	if (syntax_present(wp) && !wp->w_s->b_syn_error
-# ifdef SYN_TIME_LIMIT
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
+	ಆದರೆ (syntax_present(wp) && !wp->w_s->b_syn_error
+# ifdef SYN_ಸಮಯ_ಎಲ್ಲೆ
 		&& !wp->w_s->b_syn_slow
 # endif
 	   )
@@ -1351,14 +1351,14 @@ win_line(
 	    // error, stop syntax highlighting.
 	    save_did_emsg = did_emsg;
 	    did_emsg = FALSE;
-	    syntax_start(wp, lnum);
-	    if (did_emsg)
+	    syntax_ಆರಂಭ(wp, lnum);
+	    ಆದರೆ (did_emsg)
 		wp->w_s->b_syn_error = TRUE;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		did_emsg = save_did_emsg;
-# ifdef SYN_TIME_LIMIT
-		if (!wp->w_s->b_syn_slow)
+# ifdef SYN_ಸಮಯ_ಎಲ್ಲೆ
+		ಆದರೆ (!wp->w_s->b_syn_slow)
 # endif
 		{
 		    has_syntax = TRUE;
@@ -1368,80 +1368,80 @@ win_line(
 	}
 
 	// Check for columns to display for 'colorcolumn'.
-	wlv.color_cols = wp->w_p_cc_cols;
-	if (wlv.color_cols != NULL)
-	    wlv.draw_color_col = advance_color_col(VCOL_HLC, &wlv.color_cols);
-#endif
+	wlv.color_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = wp->w_p_cc_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+	ಆದರೆ (wlv.color_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ != ಖಾಲಿ)
+	    wlv.draw_color_ಲಂಬಸಾಲು = advance_color_ಲಂಬಸಾಲು(VCOL_HLC, &wlv.color_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ);
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_TERMINAL
-	if (term_show_buffer(wp->w_buffer))
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMINAL
+	ಆದರೆ (ಪದ_show_ಬಫರ್(wp->w_ಬಫರ್))
 	{
 	    extra_check = TRUE;
-	    get_term_attr = TRUE;
-	    wlv.win_attr = term_get_attr(wp, lnum, -1);
+	    get_ಪದ_attr = TRUE;
+	    wlv.win_attr = ಪದ_get_attr(wp, lnum, -1);
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 	// handle Visual active in this window
-	if (VIsual_active && wp->w_buffer == curwin->w_buffer)
+	ಆದರೆ (VIsual_ಸಕ್ರಿಯ && wp->w_ಬಫರ್ == curwin->w_ಬಫರ್)
 	{
-	    pos_T	*top, *bot;
+	    pos_T	*ತುದಿ, *bot;
 
-	    if (LTOREQ_POS(curwin->w_cursor, VIsual))
+	    ಆದರೆ (LTOREQ_POS(curwin->w_cursor, VIsual))
 	    {
 		// Visual is after curwin->w_cursor
-		top = &curwin->w_cursor;
+		ತುದಿ = &curwin->w_cursor;
 		bot = &VIsual;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		// Visual is before curwin->w_cursor
-		top = &VIsual;
+		ತುದಿ = &VIsual;
 		bot = &curwin->w_cursor;
 	    }
-	    lnum_in_visual_area = (lnum >= top->lnum && lnum <= bot->lnum);
-	    if (VIsual_mode == Ctrl_V)
+	    lnum_ಒಳ_visual_area = (lnum >= ತುದಿ->lnum && lnum <= bot->lnum);
+	    ಆದರೆ (VIsual_ಬಹುಲಕ == Ctrl_V)
 	    {
 		// block mode
-		if (lnum_in_visual_area)
+		ಆದರೆ (lnum_ಒಳ_visual_area)
 		{
 		    wlv.fromcol = wp->w_old_cursor_fcol;
 		    wlv.tocol = wp->w_old_cursor_lcol;
 		}
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		// non-block mode
-		if (lnum > top->lnum && lnum <= bot->lnum)
+		ಆದರೆ (lnum > ತುದಿ->lnum && lnum <= bot->lnum)
 		    wlv.fromcol = 0;
-		else if (lnum == top->lnum)
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (lnum == ತುದಿ->lnum)
 		{
-		    if (VIsual_mode == 'V')	// linewise
+		    ಆದರೆ (VIsual_ಬಹುಲಕ == 'V')	// linewise
 			wlv.fromcol = 0;
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
-			getvvcol(wp, top, &wlv.fromcol, NULL, NULL, 0);
-			if (gchar_pos(top) == NUL)
+			getvvcol(wp, ತುದಿ, &wlv.fromcol, ಖಾಲಿ, ಖಾಲಿ, 0);
+			ಆದರೆ (gchar_pos(ತುದಿ) == NUL)
 			    wlv.tocol = wlv.fromcol + 1;
 		    }
 		}
-		if (VIsual_mode != 'V' && lnum == bot->lnum)
+		ಆದರೆ (VIsual_ಬಹುಲಕ != 'V' && lnum == bot->lnum)
 		{
-		    if (*p_sel == 'e' && bot->col == 0 && bot->coladd == 0)
+		    ಆದರೆ (*p_sel == 'e' && bot->ಲಂಬಸಾಲು == 0 && bot->coladd == 0)
 		    {
 			wlv.fromcol = -10;
 			wlv.tocol = MAXCOL;
 		    }
-		    else if (bot->col == MAXCOL)
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (bot->ಲಂಬಸಾಲು == MAXCOL)
 			wlv.tocol = MAXCOL;
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
 			pos = *bot;
-			if (*p_sel == 'e')
-			    getvvcol(wp, &pos, &wlv.tocol, NULL, NULL, 0);
-			else
+			ಆದರೆ (*p_sel == 'e')
+			    getvvcol(wp, &pos, &wlv.tocol, ಖಾಲಿ, ಖಾಲಿ, 0);
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
-			    getvvcol(wp, &pos, NULL, NULL, &wlv.tocol, 0);
+			    getvvcol(wp, &pos, ಖಾಲಿ, ಖಾಲಿ, &wlv.tocol, 0);
 			    ++wlv.tocol;
 			}
 		    }
@@ -1449,225 +1449,225 @@ win_line(
 	    }
 
 	    // if inverting in this line set area_highlighting
-	    if (wlv.fromcol >= 0)
+	    ಆದರೆ (wlv.fromcol >= 0)
 	    {
 		area_highlighting = TRUE;
 		vi_attr = HL_ATTR(HLF_V);
-#if defined(FEAT_CLIPBOARD) && (defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD))
-		if ((clip_star.available && !clip_star.owned
-						    && clip_isautosel_star())
-			|| (clip_plus.available && !clip_plus.owned
+#ಆದರೆ defined(FEAT_CLIPBOARD) && (defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD))
+		ಆದರೆ ((clip_ನಕ್ಷತ್ರ.ಲಭ್ಯ && !clip_ನಕ್ಷತ್ರ.owned
+						    && clip_isautosel_ನಕ್ಷತ್ರ())
+			|| (clip_plus.ಲಭ್ಯ && !clip_plus.owned
 						    && clip_isautosel_plus()))
 		    vi_attr = HL_ATTR(HLF_VNC);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
 	}
 
 	// handle 'incsearch' and ":s///c" highlighting
-	else if (highlight_match
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (highlight_ಹೊಂದಿಕೆ
 		&& wp == curwin
 		&& lnum >= curwin->w_cursor.lnum
-		&& lnum <= curwin->w_cursor.lnum + search_match_lines)
+		&& lnum <= curwin->w_cursor.lnum + ಹುಡುಕು_ಹೊಂದಿಕೆ_ಸಾಲುಗಳು)
 	{
-	    if (lnum == curwin->w_cursor.lnum)
+	    ಆದರೆ (lnum == curwin->w_cursor.lnum)
 		getvcol(curwin, &(curwin->w_cursor),
-						&wlv.fromcol, NULL, NULL, 0);
-	    else
+						&wlv.fromcol, ಖಾಲಿ, ಖಾಲಿ, 0);
+	    ಇಲ್ಲದಿದ್ದರೆ
 		wlv.fromcol = 0;
-	    if (lnum == curwin->w_cursor.lnum + search_match_lines)
+	    ಆದರೆ (lnum == curwin->w_cursor.lnum + ಹುಡುಕು_ಹೊಂದಿಕೆ_ಸಾಲುಗಳು)
 	    {
 		pos.lnum = lnum;
-		pos.col = search_match_endcol;
-		getvcol(curwin, &pos, &wlv.tocol, NULL, NULL, 0);
+		pos.ಲಂಬಸಾಲು = ಹುಡುಕು_ಹೊಂದಿಕೆ_endcol;
+		getvcol(curwin, &pos, &wlv.tocol, ಖಾಲಿ, ಖಾಲಿ, 0);
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		wlv.tocol = MAXCOL;
 	    // do at least one character; happens when past end of line
-	    if (wlv.fromcol == wlv.tocol && search_match_endcol)
+	    ಆದರೆ (wlv.fromcol == wlv.tocol && ಹುಡುಕು_ಹೊಂದಿಕೆ_endcol)
 		wlv.tocol = wlv.fromcol + 1;
 	    area_highlighting = TRUE;
 	    vi_attr = HL_ATTR(HLF_I);
 	}
     }
 
-#ifdef FEAT_DIFF
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
 
-    int linestatus = 0;
-    wlv.filler_lines = diff_check_with_linestatus(wp, lnum, &linestatus);
+    ಪೂರ್ಣಾಂಕ linestatus = 0;
+    wlv.filler_ಸಾಲುಗಳು = diff_check_with_linestatus(wp, lnum, &linestatus);
 
-    CLEAR_FIELD(line_changes);
+    CLEAR_ಕ್ಷೇತ್ರ(ಸಾಲು_changes);
 
-    if (linestatus < 0)
+    ಆದರೆ (linestatus < 0)
     {
-	if (linestatus == -1)
+	ಆದರೆ (linestatus == -1)
 	{
-	    if (diff_find_change(wp, lnum, &line_changes))
+	    ಆದರೆ (diff_ಕಂಡುಹಿಡಿ_change(wp, lnum, &ಸಾಲು_changes))
 	    {
-		wlv.diff_hlf = HLF_ADD;	// added line
+		wlv.diff_hlf = HLF_ಕೂಡಿಸು;	// added line
 	    }
-	    else if (line_changes.num_changes > 0)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಸಾಲು_changes.ಅಂಕೆ_changes > 0)
 	    {
-		int added = diff_change_parse(
-			&line_changes, &line_changes.changes[0],
-			&change_start, &change_end);
-		if (change_start == 0)
+		ಪೂರ್ಣಾಂಕ added = diff_change_parse(
+			&ಸಾಲು_changes, &ಸಾಲು_changes.changes[0],
+			&change_ಆರಂಭ, &change_ಕೊನೆ);
+		ಆದರೆ (change_ಆರಂಭ == 0)
 		{
-		    if (added)
+		    ಆದರೆ (added)
 			wlv.diff_hlf = HLF_TXA;	// added text on changed line
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 			wlv.diff_hlf = HLF_TXD;	// changed text on changed line
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		    wlv.diff_hlf = HLF_CHD;	// unchanged text on changed line
-		change_index = 0;
+		change_ಸೂಚ್ಯಂಕ = 0;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		wlv.diff_hlf = HLF_CHD;	// changed line
-		change_index = 0;
+		change_ಸೂಚ್ಯಂಕ = 0;
 	    }
 	}
-	else
-	    wlv.diff_hlf = HLF_ADD;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    wlv.diff_hlf = HLF_ಕೂಡಿಸು;
 
 	area_highlighting = TRUE;
     }
 
-    if (lnum == wp->w_topline)
-	wlv.filler_lines = wp->w_topfill;
+    ಆದರೆ (lnum == wp->w_topline)
+	wlv.filler_ಸಾಲುಗಳು = wp->w_topfill;
 
-    wlv.filler_todo = wlv.filler_lines;
-#endif
+    wlv.filler_todo = wlv.filler_ಸಾಲುಗಳು;
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_SIGNS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SIGNS
     sign_present = buf_get_signattrs(wp, lnum, &wlv.sattr);
-    if (sign_present)
-	num_attr = wlv.sattr.sat_numhl;
-#endif
+    ಆದರೆ (sign_present)
+	ಅಂಕೆ_attr = wlv.sattr.sat_numhl;
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef LINE_ATTR
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ಸಾಲು_ATTR
 # ifdef FEAT_SIGNS
     // If this line has a sign with line highlighting set wlv.line_attr.
-    if (sign_present)
-	wlv.line_attr = wlv.sattr.sat_linehl;
+    ಆದರೆ (sign_present)
+	wlv.ಸಾಲು_attr = wlv.sattr.sat_linehl;
 # endif
-# if defined(FEAT_QUICKFIX)
+# ಆದರೆ defined(FEAT_QUICKFIX)
     // Highlight the current line in the quickfix window.
-    if (bt_quickfix(wp->w_buffer) && qf_current_entry(wp) == lnum)
-	wlv.line_attr = HL_ATTR(HLF_QFL);
+    ಆದರೆ (bt_quickfix(wp->w_ಬಫರ್) && qf_current_ನಮೂದು(wp) == lnum)
+	wlv.ಸಾಲು_attr = HL_ATTR(HLF_QFL);
 # endif
-    if (wlv.line_attr != 0)
+    ಆದರೆ (wlv.ಸಾಲು_attr != 0)
 	area_highlighting = TRUE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_SPELL
-    if (spv->spv_has_spell && number_only == 0)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SPELL
+    ಆದರೆ (spv->spv_has_spell && ಸಂಖ್ಯೆ_only == 0)
     {
 	// Prepare for spell checking.
 	extra_check = TRUE;
 
 	// When a word wrapped from the previous line the start of the
 	// current line is valid.
-	if (lnum == spv->spv_checked_lnum)
-	    cur_checked_col = spv->spv_checked_col;
+	ಆದರೆ (lnum == spv->spv_checked_lnum)
+	    cur_checked_ಲಂಬಸಾಲು = spv->spv_checked_ಲಂಬಸಾಲು;
 	// Previous line was not spell checked, check for capital. This happens
 	// for the first line in an updated region or after a closed fold.
-	if (spv->spv_capcol_lnum == 0 && check_need_cap(wp, lnum, 0))
-	    spv->spv_cap_col = 0;
-	else if (lnum != spv->spv_capcol_lnum)
-	    spv->spv_cap_col = -1;
+	ಆದರೆ (spv->spv_capcol_lnum == 0 && check_need_cap(wp, lnum, 0))
+	    spv->spv_cap_ಲಂಬಸಾಲು = 0;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (lnum != spv->spv_capcol_lnum)
+	    spv->spv_cap_ಲಂಬಸಾಲು = -1;
 	spv->spv_checked_lnum = 0;
 
 	// Get the start of the next line, so that words that wrap to the
 	// next line are found too: "et<line-break>al.".
 	// Trick: skip a few chars for C/shell/Vim comments
 	nextline[SPWORDLEN] = NUL;
-	if (lnum < wp->w_buffer->b_ml.ml_line_count)
+	ಆದರೆ (lnum < wp->w_ಬಫರ್->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
 	{
-	    line = ml_get_buf(wp->w_buffer, lnum + 1, FALSE);
-	    spell_cat_line(nextline + SPWORDLEN, line, SPWORDLEN);
+	    ಸಾಲು = ml_get_buf(wp->w_ಬಫರ್, lnum + 1, FALSE);
+	    spell_cat_ಸಾಲು(nextline + SPWORDLEN, ಸಾಲು, SPWORDLEN);
 	}
-	line = ml_get_buf(wp->w_buffer, lnum, FALSE);
+	ಸಾಲು = ml_get_buf(wp->w_ಬಫರ್, lnum, FALSE);
 
 	// If current line is empty, check first word in next line for capital.
-	ptr = skipwhite(line);
-	if (*ptr == NUL)
+	ptr = skipwhite(ಸಾಲು);
+	ಆದರೆ (*ptr == NUL)
 	{
-	    spv->spv_cap_col = 0;
+	    spv->spv_cap_ಲಂಬಸಾಲು = 0;
 	    spv->spv_capcol_lnum = lnum + 1;
 	}
 	// For checking first word with a capital skip white space.
-	else if (spv->spv_cap_col == 0)
-	    spv->spv_cap_col = ptr - line;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (spv->spv_cap_ಲಂಬಸಾಲು == 0)
+	    spv->spv_cap_ಲಂಬಸಾಲು = ptr - ಸಾಲು;
 
 	// Copy the end of the current line into nextline[].
-	if (nextline[SPWORDLEN] == NUL)
+	ಆದರೆ (nextline[SPWORDLEN] == NUL)
 	{
 	    // No next line or it is empty.
 	    nextlinecol = MAXCOL;
 	    nextline_idx = 0;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    v = ml_get_buf_len(wp->w_buffer, lnum);
-	    if (v < SPWORDLEN)
+	    v = ml_get_buf_len(wp->w_ಬಫರ್, lnum);
+	    ಆದರೆ (v < SPWORDLEN)
 	    {
 		// Short line, use it completely and append the start of the
 		// next line.
 		nextlinecol = 0;
-		mch_memmove(nextline, line, (size_t)v);
+		mch_memmove(nextline, ಸಾಲು, (size_t)v);
 		STRMOVE(nextline + v, nextline + SPWORDLEN);
 		nextline_idx = v + 1;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		// Long line, use only the last SPWORDLEN bytes.
 		nextlinecol = v - SPWORDLEN;
-		mch_memmove(nextline, line + nextlinecol, SPWORDLEN);
+		mch_memmove(nextline, ಸಾಲು + nextlinecol, SPWORDLEN);
 		nextline_idx = SPWORDLEN + 1;
 	    }
 	}
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    line = ml_get_buf(wp->w_buffer, lnum, FALSE);
-    ptr = line;
+    ಸಾಲು = ml_get_buf(wp->w_ಬಫರ್, lnum, FALSE);
+    ptr = ಸಾಲು;
 
-    if (wp->w_p_list)
+    ಆದರೆ (wp->w_p_list)
     {
-	if (wp->w_lcs_chars.space
-		|| wp->w_lcs_chars.multispace != NULL
-		|| wp->w_lcs_chars.leadmultispace != NULL
+	ಆದರೆ (wp->w_lcs_chars.space
+		|| wp->w_lcs_chars.multispace != ಖಾಲಿ
+		|| wp->w_lcs_chars.leadmultispace != ಖಾಲಿ
 		|| wp->w_lcs_chars.trail
 		|| wp->w_lcs_chars.lead
 		|| wp->w_lcs_chars.nbsp)
 	    extra_check = TRUE;
 
 	// find start of trailing whitespace
-	if (wp->w_lcs_chars.trail)
+	ಆದರೆ (wp->w_lcs_chars.trail)
 	{
-	    trailcol = ml_get_buf_len(wp->w_buffer, lnum);
-	    while (trailcol > (colnr_T)0 && VIM_ISWHITE(ptr[trailcol - 1]))
+	    trailcol = ml_get_buf_len(wp->w_ಬಫರ್, lnum);
+	    ಆಗ (trailcol > (colnr_T)0 && VIM_ISWHITE(ptr[trailcol - 1]))
 		--trailcol;
-	    trailcol += (colnr_T)(ptr - line);
+	    trailcol += (colnr_T)(ptr - ಸಾಲು);
 	}
 	// find end of leading whitespace
-	if (wp->w_lcs_chars.lead || wp->w_lcs_chars.leadmultispace != NULL ||
+	ಆದರೆ (wp->w_lcs_chars.lead || wp->w_lcs_chars.leadmultispace != ಖಾಲಿ ||
 	    wp->w_lcs_chars.leadtab1 != NUL)
 	{
 	    leadcol = 0;
-	    while (VIM_ISWHITE(ptr[leadcol]))
+	    ಆಗ (VIM_ISWHITE(ptr[leadcol]))
 		++leadcol;
-	    if (ptr[leadcol] == NUL)
+	    ಆದರೆ (ptr[leadcol] == NUL)
 		// in a line full of spaces all of them are treated as trailing
 		leadcol = (colnr_T)0;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		// keep track of the first column not filled with spaces
-		leadcol += (colnr_T)(ptr - line) + 1;
+		leadcol += (colnr_T)(ptr - ಸಾಲು) + 1;
 	}
     }
 
-    if (get_win_attr(wp) != 0)
+    ಆದರೆ (get_win_attr(wp) != 0)
     {
 	wlv.win_attr = get_win_attr(wp);
 	area_highlighting = TRUE;
@@ -1675,194 +1675,194 @@ win_line(
 
     // When w_skipcol is non-zero and there is virtual text above the actual
     // text, then this much of the virtual text is skipped.
-    int skipcol_in_text_prop_above = 0;
+    ಪೂರ್ಣಾಂಕ skipcol_ಒಳ_ಪಠ್ಯ_prop_above = 0;
 
-#ifdef FEAT_PROP_POPUP
-    if (WIN_IS_POPUP(wp))
-	wlv.screen_line_flags |= SLF_POPUP;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+    ಆದರೆ (WIN_IS_POPUP(wp))
+	wlv.screen_ಸಾಲು_flags |= SLF_POPUP;
 
-    char_u *prop_start;
-    text_prop_count = get_text_props(wp->w_buffer, lnum, &prop_start, FALSE);
-    if (text_prop_count > 0)
+    char_u *prop_ಆರಂಭ;
+    ಪಠ್ಯ_prop_ಎಣಿಕೆ = get_ಪಠ್ಯ_props(wp->w_ಬಫರ್, lnum, &prop_ಆರಂಭ, FALSE);
+    ಆದರೆ (ಪಠ್ಯ_prop_ಎಣಿಕೆ > 0)
     {
 	// Make a copy of the properties, so that they are properly
 	// aligned.
-	if (text_prop_count <= WIN_LINE_TEXT_PROP_STACK_LEN)
-	    text_props = text_props_buf;
-	else
-	    text_props = ALLOC_MULT(textprop_T, text_prop_count);
-	if (text_props != NULL)
+	ಆದರೆ (ಪಠ್ಯ_prop_ಎಣಿಕೆ <= WIN_ಸಾಲು_ಪಠ್ಯ_PROP_ರಾಶಿ_LEN)
+	    ಪಠ್ಯ_props = ಪಠ್ಯ_props_buf;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಪಠ್ಯ_props = ALLOC_MULT(textprop_T, ಪಠ್ಯ_prop_ಎಣಿಕೆ);
+	ಆದರೆ (ಪಠ್ಯ_props != ಖಾಲಿ)
 	{
-	    mch_memmove(text_props, prop_start,
-				     text_prop_count * sizeof(textprop_T));
+	    mch_memmove(ಪಠ್ಯ_props, prop_ಆರಂಭ,
+				     ಪಠ್ಯ_prop_ಎಣಿಕೆ * ಗಾತ್ರ(textprop_T));
 
 	    // Convert tp_text_offset to tp_text pointer for virtual
 	    // text properties.  prop_start points into the memline
 	    // after the prop_count field.
-	    char_u *count_ptr = prop_start - PROP_COUNT_SIZE;
+	    char_u *ಎಣಿಕೆ_ptr = prop_ಆರಂಭ - PROP_ಎಣಿಕೆ_ಗಾತ್ರ;
 
-	    for (int i = 0; i < text_prop_count; ++i)
+	    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < ಪಠ್ಯ_prop_ಎಣಿಕೆ; ++i)
 	    {
-		if (text_props[i].tp_id < 0
-				&& text_props[i].u.tp_text_offset > 0)
+		ಆದರೆ (ಪಠ್ಯ_props[i].tp_id < 0
+				&& ಪಠ್ಯ_props[i].u.tp_ಪಠ್ಯ_ಸ್ಥಾನಾಂತರ > 0)
 		{
-		    text_props[i].u.tp_text =
-			    count_ptr + text_props[i].u.tp_text_offset;
-		    text_props[i].tp_flags |= TP_FLAG_VTEXT_PTR;
+		    ಪಠ್ಯ_props[i].u.tp_ಪಠ್ಯ =
+			    ಎಣಿಕೆ_ptr + ಪಠ್ಯ_props[i].u.tp_ಪಠ್ಯ_ಸ್ಥಾನಾಂತರ;
+		    ಪಠ್ಯ_props[i].tp_flags |= TP_FLAG_VTEXT_PTR;
 		}
-		else
-		    text_props[i].u.tp_text = NULL;
+		ಇಲ್ಲದಿದ್ದರೆ
+		    ಪಠ್ಯ_props[i].u.tp_ಪಠ್ಯ = ಖಾಲಿ;
 	    }
 	}
 
 	// Allocate an array for the indexes.
-	if (text_prop_count <= WIN_LINE_TEXT_PROP_STACK_LEN)
-	    text_prop_idxs = text_prop_idxs_buf;
-	else
-	    text_prop_idxs = ALLOC_MULT(int, text_prop_count);
-	if (text_prop_idxs == NULL)
+	ಆದರೆ (ಪಠ್ಯ_prop_ಎಣಿಕೆ <= WIN_ಸಾಲು_ಪಠ್ಯ_PROP_ರಾಶಿ_LEN)
+	    ಪಠ್ಯ_prop_idxs = ಪಠ್ಯ_prop_idxs_buf;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಪಠ್ಯ_prop_idxs = ALLOC_MULT(ಪೂರ್ಣಾಂಕ, ಪಠ್ಯ_prop_ಎಣಿಕೆ);
+	ಆದರೆ (ಪಠ್ಯ_prop_idxs == ಖಾಲಿ)
 	{
-	    if (text_props != text_props_buf)
-		VIM_CLEAR(text_props);
-	    else
-		text_props = NULL;
+	    ಆದರೆ (ಪಠ್ಯ_props != ಪಠ್ಯ_props_buf)
+		VIM_CLEAR(ಪಠ್ಯ_props);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ಪಠ್ಯ_props = ಖಾಲಿ;
 	}
-	if (text_prop_count <= WIN_LINE_TEXT_PROP_STACK_LEN)
-	    text_prop_suffix_flags = text_prop_suffix_flags_buf;
-	else
-	    text_prop_suffix_flags = ALLOC_MULT(char_u, text_prop_count + 1);
-	if (text_prop_suffix_flags == NULL)
+	ಆದರೆ (ಪಠ್ಯ_prop_ಎಣಿಕೆ <= WIN_ಸಾಲು_ಪಠ್ಯ_PROP_ರಾಶಿ_LEN)
+	    ಪಠ್ಯ_prop_suffix_flags = ಪಠ್ಯ_prop_suffix_flags_buf;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಪಠ್ಯ_prop_suffix_flags = ALLOC_MULT(char_u, ಪಠ್ಯ_prop_ಎಣಿಕೆ + 1);
+	ಆದರೆ (ಪಠ್ಯ_prop_suffix_flags == ಖಾಲಿ)
 	{
-	    if (text_prop_idxs != text_prop_idxs_buf)
-		vim_free(text_prop_idxs);
-	    text_prop_idxs = NULL;
-	    if (text_props != text_props_buf)
-		VIM_CLEAR(text_props);
-	    else
-		text_props = NULL;
+	    ಆದರೆ (ಪಠ್ಯ_prop_idxs != ಪಠ್ಯ_prop_idxs_buf)
+		vim_free(ಪಠ್ಯ_prop_idxs);
+	    ಪಠ್ಯ_prop_idxs = ಖಾಲಿ;
+	    ಆದರೆ (ಪಠ್ಯ_props != ಪಠ್ಯ_props_buf)
+		VIM_CLEAR(ಪಠ್ಯ_props);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ಪಠ್ಯ_props = ಖಾಲಿ;
 	}
 
-	if (text_props != NULL)
+	ಆದರೆ (ಪಠ್ಯ_props != ಖಾಲಿ)
 	{
 	    area_highlighting = TRUE;
 	    extra_check = TRUE;
 
 	    /* Find the last text property that inserts text. */
-	    for (int i = 0; i < text_prop_count; ++i)
-		if (text_props[i].tp_id < 0)
-		    last_textprop_text_idx = i;
+	    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < ಪಠ್ಯ_prop_ಎಣಿಕೆ; ++i)
+		ಆದರೆ (ಪಠ್ಯ_props[i].tp_id < 0)
+		    ಕೊನೆಯ_textprop_ಪಠ್ಯ_idx = i;
 
 	    // Text props "above" move the line number down to where the text
 	    // is.  Only count the ones that are visible, not those that are
 	    // skipped because of w_skipcol.
-	    int text_width = wp->w_width - win_col_off(wp);
-	    for (int i = text_prop_count - 1; i >= 0; --i)
-		if (text_props[i].tp_flags & TP_FLAG_ALIGN_ABOVE)
+	    ಪೂರ್ಣಾಂಕ ಪಠ್ಯ_ಅಗಲ = wp->w_ಅಗಲ - win_ಲಂಬಸಾಲು_off(wp);
+	    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = ಪಠ್ಯ_prop_ಎಣಿಕೆ - 1; i >= 0; --i)
+		ಆದರೆ (ಪಠ್ಯ_props[i].tp_flags & TP_FLAG_ALIGN_ABOVE)
 		{
-		    if (lnum == wp->w_topline
-			    && wp->w_skipcol - skipcol_in_text_prop_above
-								 >= text_width)
+		    ಆದರೆ (lnum == wp->w_topline
+			    && wp->w_skipcol - skipcol_ಒಳ_ಪಠ್ಯ_prop_above
+								 >= ಪಠ್ಯ_ಅಗಲ)
 		    {
 			// This virtual text above is skipped, remove it from
 			// the array.
-			skipcol_in_text_prop_above += text_width;
-			for (int j = i + 1; j < text_prop_count; ++j)
-			    text_props[j - 1] = text_props[j];
+			skipcol_ಒಳ_ಪಠ್ಯ_prop_above += ಪಠ್ಯ_ಅಗಲ;
+			ಗಾಗಿ (ಪೂರ್ಣಾಂಕ j = i + 1; j < ಪಠ್ಯ_prop_ಎಣಿಕೆ; ++j)
+			    ಪಠ್ಯ_props[j - 1] = ಪಠ್ಯ_props[j];
 			++i;
-			--text_prop_count;
+			--ಪಠ್ಯ_prop_ಎಣಿಕೆ;
 		    }
-		    else
-			++wlv.text_prop_above_count;
+		    ಇಲ್ಲದಿದ್ದರೆ
+			++wlv.ಪಠ್ಯ_prop_above_ಎಣಿಕೆ;
 		}
 
-	    text_prop_suffix_flags[text_prop_count] = 0;
-	    for (int i = text_prop_count - 1; i >= 0; --i)
+	    ಪಠ್ಯ_prop_suffix_flags[ಪಠ್ಯ_prop_ಎಣಿಕೆ] = 0;
+	    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = ಪಠ್ಯ_prop_ಎಣಿಕೆ - 1; i >= 0; --i)
 	    {
-		int flags = text_prop_suffix_flags[i + 1];
+		ಪೂರ್ಣಾಂಕ flags = ಪಠ್ಯ_prop_suffix_flags[i + 1];
 
-		if (text_props[i].tp_col == MAXCOL)
+		ಆದರೆ (ಪಠ್ಯ_props[i].tp_ಲಂಬಸಾಲು == MAXCOL)
 		{
 		    flags |= 1;
-		    if (text_props[i].tp_flags & TP_FLAG_ALIGN_BELOW)
+		    ಆದರೆ (ಪಠ್ಯ_props[i].tp_flags & TP_FLAG_ALIGN_ಕೆಳಗೆ)
 			flags |= 2;
 		}
-		text_prop_suffix_flags[i] = flags;
+		ಪಠ್ಯ_prop_suffix_flags[i] = flags;
 	    }
 	}
     }
 
-    if (number_only > 0)
+    ಆದರೆ (ಸಂಖ್ಯೆ_only > 0)
     {
 	// skip over rows only used for virtual text above
-	wlv.row += wlv.text_prop_above_count;
-	if (wlv.row >= endrow)
+	wlv.ಅಡ್ಡಸಾಲು += wlv.ಪಠ್ಯ_prop_above_ಎಣಿಕೆ;
+	ಆದರೆ (wlv.ಅಡ್ಡಸಾಲು >= endrow)
 	{
-	    if (text_props != text_props_buf)
-		vim_free(text_props);
-	    if (text_prop_idxs != text_prop_idxs_buf)
-		vim_free(text_prop_idxs);
-	    if (text_prop_suffix_flags != text_prop_suffix_flags_buf)
-		vim_free(text_prop_suffix_flags);
-	    return wlv.row;
+	    ಆದರೆ (ಪಠ್ಯ_props != ಪಠ್ಯ_props_buf)
+		vim_free(ಪಠ್ಯ_props);
+	    ಆದರೆ (ಪಠ್ಯ_prop_idxs != ಪಠ್ಯ_prop_idxs_buf)
+		vim_free(ಪಠ್ಯ_prop_idxs);
+	    ಆದರೆ (ಪಠ್ಯ_prop_suffix_flags != ಪಠ್ಯ_prop_suffix_flags_buf)
+		vim_free(ಪಠ್ಯ_prop_suffix_flags);
+	    ಹಿಂತಿರುಗಿ wlv.ಅಡ್ಡಸಾಲು;
 	}
-	wlv.screen_row += wlv.text_prop_above_count;
+	wlv.screen_ಅಡ್ಡಸಾಲು += wlv.ಪಠ್ಯ_prop_above_ಎಣಿಕೆ;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_LINEBREAK) && defined(FEAT_PROP_POPUP)
-    colnr_T vcol_first_char = 0;
-    if (wp->w_p_lbr && number_only == 0)
+#ಆದರೆ defined(FEAT_LINEBREAK) && defined(FEAT_PROP_POPUP)
+    colnr_T vcol_ಮೊದಲ_char = 0;
+    ಆದರೆ (wp->w_p_lbr && ಸಂಖ್ಯೆ_only == 0)
     {
 	chartabsize_T cts;
-	init_chartabsize_arg(&cts, wp, lnum, 0, line, line);
-	(void)win_lbr_chartabsize(&cts, NULL, NULL);
-	vcol_first_char = cts.cts_first_char;
+	init_chartabsize_arg(&cts, wp, lnum, 0, ಸಾಲು, ಸಾಲು);
+	(ಶೂನ್ಯ)win_lbr_chartabsize(&cts, ಖಾಲಿ, ಖಾಲಿ);
+	vcol_ಮೊದಲ_char = cts.cts_ಮೊದಲ_char;
 	clear_chartabsize_arg(&cts);
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // 'nowrap' or 'wrap' and a single line that doesn't fit: Advance to the
     // first character to be displayed.
-    if (wp->w_p_wrap)
-	v = startrow == 0 ? wp->w_skipcol - skipcol_in_text_prop_above : 0;
-    else
+    ಆದರೆ (wp->w_p_wrap)
+	v = startrow == 0 ? wp->w_skipcol - skipcol_ಒಳ_ಪಠ್ಯ_prop_above : 0;
+    ಇಲ್ಲದಿದ್ದರೆ
 	v = wp->w_leftcol;
-    if (v > 0 && number_only == 0)
+    ಆದರೆ (v > 0 && ಸಂಖ್ಯೆ_only == 0)
     {
 	char_u		*prev_ptr = ptr;
 	chartabsize_T	cts;
-	int		charsize = 0;
-	int		head = 0;
+	ಪೂರ್ಣಾಂಕ		charsize = 0;
+	ಪೂರ್ಣಾಂಕ		ತಲೆ = 0;
 
-	init_chartabsize_arg(&cts, wp, lnum, wlv.vcol, line, ptr);
-	cts.cts_max_head_vcol = v;
-	while (cts.cts_vcol < v)
+	init_chartabsize_arg(&cts, wp, lnum, wlv.vcol, ಸಾಲು, ptr);
+	cts.cts_max_ತಲೆ_vcol = v;
+	ಆಗ (cts.cts_vcol < v)
 	{
-	    head = 0;
-	    charsize = win_lbr_chartabsize(&cts, &head, NULL);
+	    ತಲೆ = 0;
+	    charsize = win_lbr_chartabsize(&cts, &ತಲೆ, ಖಾಲಿ);
 	    cts.cts_vcol += charsize;
 	    prev_ptr = cts.cts_ptr;
-	    if (*prev_ptr == NUL)
-		break;
+	    ಆದರೆ (*prev_ptr == NUL)
+		ನಿಲ್ಲಿಸು;
 	    MB_PTR_ADV(cts.cts_ptr);
-	    if (wp->w_p_list)
+	    ಆದರೆ (wp->w_p_list)
 	    {
-		in_multispace = *prev_ptr == ' ' && (*cts.cts_ptr == ' '
-				  || (prev_ptr > line && prev_ptr[-1] == ' '));
-		if (!in_multispace)
+		ಒಳ_multispace = *prev_ptr == ' ' && (*cts.cts_ptr == ' '
+				  || (prev_ptr > ಸಾಲು && prev_ptr[-1] == ' '));
+		ಆದರೆ (!ಒಳ_multispace)
 		    multispace_pos = 0;
-		else if (cts.cts_ptr >= line + leadcol
-					 && wp->w_lcs_chars.multispace != NULL)
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (cts.cts_ptr >= ಸಾಲು + leadcol
+					 && wp->w_lcs_chars.multispace != ಖಾಲಿ)
 		{
 		    ++multispace_pos;
-		    if (wp->w_lcs_chars.multispace[multispace_pos] == NUL)
+		    ಆದರೆ (wp->w_lcs_chars.multispace[multispace_pos] == NUL)
 			multispace_pos = 0;
 		}
-		else if (cts.cts_ptr < line + leadcol
-				     && wp->w_lcs_chars.leadmultispace != NULL)
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (cts.cts_ptr < ಸಾಲು + leadcol
+				     && wp->w_lcs_chars.leadmultispace != ಖಾಲಿ)
 		{
 		    ++multispace_pos;
-		    if (wp->w_lcs_chars.leadmultispace[multispace_pos] == NUL)
+		    ಆದರೆ (wp->w_lcs_chars.leadmultispace[multispace_pos] == NUL)
 			multispace_pos = 0;
 		}
 	    }
@@ -1877,106 +1877,106 @@ win_line(
 	// - 'virtualedit' is set, or
 	// - the visual mode is active,
 	// the end of the line may be before the start of the displayed part.
-	if (wlv.vcol < v && (
-#ifdef FEAT_SYN_HL
-	     wp->w_p_cuc || wlv.draw_color_col ||
-#endif
-	     virtual_active() ||
-	     (VIsual_active && wp->w_buffer == curwin->w_buffer)))
+	ಆದರೆ (wlv.vcol < v && (
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
+	     wp->w_p_cuc || wlv.draw_color_ಲಂಬಸಾಲು ||
+#ಆದರೆ_ಅಂತ್ಯ
+	     virtual_ಸಕ್ರಿಯ() ||
+	     (VIsual_ಸಕ್ರಿಯ && wp->w_ಬಫರ್ == curwin->w_ಬಫರ್)))
 	    wlv.vcol = v;
 
 	// Handle a character that's not completely on the screen: Put ptr at
 	// that character but skip the first few screen characters.
-	if (wlv.vcol > v)
+	ಆದರೆ (wlv.vcol > v)
 	{
 	    wlv.vcol -= charsize;
 	    ptr = prev_ptr;
 	}
-	if (v > wlv.vcol)
-	    skip_cells = v - wlv.vcol - head;
+	ಆದರೆ (v > wlv.vcol)
+	    skip_cells = v - wlv.vcol - ತಲೆ;
 
 	// Adjust for when the inverted text is before the screen,
 	// and when the start of the inverted text is before the screen.
-	if (wlv.tocol <= wlv.vcol)
+	ಆದರೆ (wlv.tocol <= wlv.vcol)
 	    wlv.fromcol = 0;
-	else if (wlv.fromcol >= 0 && wlv.fromcol < wlv.vcol)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (wlv.fromcol >= 0 && wlv.fromcol < wlv.vcol)
 	    wlv.fromcol = wlv.vcol;
 
-#ifdef FEAT_LINEBREAK
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
 	// When w_skipcol is non-zero, first line needs 'showbreak'
-	if (wp->w_p_wrap)
+	ಆದರೆ (wp->w_p_wrap)
 	    wlv.need_showbreak = TRUE;
-#endif
-#ifdef FEAT_SPELL
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SPELL
 	// When spell checking a word we need to figure out the start of the
 	// word and if it's badly spelled or not.
-	if (spv->spv_has_spell)
+	ಆದರೆ (spv->spv_has_spell)
 	{
-	    int		len;
-	    colnr_T	linecol = (colnr_T)(ptr - line);
-	    hlf_T	spell_hlf = HLF_COUNT;
+	    ಪೂರ್ಣಾಂಕ		len;
+	    colnr_T	linecol = (colnr_T)(ptr - ಸಾಲು);
+	    hlf_T	spell_hlf = HLF_ಎಣಿಕೆ;
 
 	    pos = wp->w_cursor;
 	    wp->w_cursor.lnum = lnum;
-	    wp->w_cursor.col = linecol;
-	    len = spell_move_to(wp, FORWARD, SMT_ALL, TRUE, &spell_hlf);
+	    wp->w_cursor.ಲಂಬಸಾಲು = linecol;
+	    len = spell_move_ಗಮ್ಯ(wp, FORWARD, SMT_ALL, TRUE, &spell_hlf);
 
 	    // spell_move_to() may call ml_get() and make "line" invalid
-	    line = ml_get_buf(wp->w_buffer, lnum, FALSE);
-	    ptr = line + linecol;
+	    ಸಾಲು = ml_get_buf(wp->w_ಬಫರ್, lnum, FALSE);
+	    ptr = ಸಾಲು + linecol;
 
-	    if (len == 0 || (int)wp->w_cursor.col > linecol)
+	    ಆದರೆ (len == 0 || (ಪೂರ್ಣಾಂಕ)wp->w_cursor.ಲಂಬಸಾಲು > linecol)
 	    {
 		// no bad word found at line start, don't check until end of a
-		// word
-		spell_hlf = HLF_COUNT;
-		word_end = (int)(spell_to_word_end(ptr, wp) - line + 1);
+		//ಶಬ್ದ
+		spell_hlf = HLF_ಎಣಿಕೆ;
+		ಶಬ್ದ_ಕೊನೆ = (ಪೂರ್ಣಾಂಕ)(spell_ಗಮ್ಯ_ಶಬ್ದ_ಕೊನೆ(ptr, wp) - ಸಾಲು + 1);
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		// bad word found, use attributes until end of word
-		word_end = wp->w_cursor.col + len + 1;
+		ಶಬ್ದ_ಕೊನೆ = wp->w_cursor.ಲಂಬಸಾಲು + len + 1;
 
 		// Turn index into actual attributes.
-		if (spell_hlf != HLF_COUNT)
+		ಆದರೆ (spell_hlf != HLF_ಎಣಿಕೆ)
 		    spell_attr = highlight_attr[spell_hlf];
 	    }
 	    wp->w_cursor = pos;
 
 # ifdef FEAT_SYN_HL
 	    // Need to restart syntax highlighting for this line.
-	    if (has_syntax)
-		syntax_start(wp, lnum);
+	    ಆದರೆ (has_syntax)
+		syntax_ಆರಂಭ(wp, lnum);
 # endif
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
-    if (wlv.fromcol >= wlv.tocol)
+    ಆದರೆ (wlv.fromcol >= wlv.tocol)
 	wlv.fromcol = -1;
 
-#ifdef FEAT_SEARCH_EXTRA
-    if (number_only == 0)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಹುಡುಕು_EXTRA
+    ಆದರೆ (ಸಂಖ್ಯೆ_only == 0)
     {
-	v = (long)(ptr - line);
-	area_highlighting |= prepare_search_hl_line(wp, lnum, (colnr_T)v,
-					      &line, &screen_search_hl,
-					      &search_attr);
-	ptr = line + v; // "line" may have been updated
+	v = (ದೀರ್ಘ)(ptr - ಸಾಲು);
+	area_highlighting |= prepare_ಹುಡುಕು_hl_ಸಾಲು(wp, lnum, (colnr_T)v,
+					      &ಸಾಲು, &screen_ಹುಡುಕು_hl,
+					      &ಹುಡುಕು_attr);
+	ptr = ಸಾಲು + v; // "line" may have been updated
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if ((State & MODE_INSERT) && ins_compl_win_active(wp)
-			    && (in_curline || ins_compl_lnum_in_range(lnum)))
+    ಆದರೆ ((State & ಬಹುಲಕ_ಸೇರಿಸು) && ins_compl_win_ಸಕ್ರಿಯ(wp)
+			    && (ಒಳ_curline || ins_compl_lnum_ಒಳ_range(lnum)))
 	area_highlighting = TRUE;
 
-#ifdef FEAT_SYN_HL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
     // Cursor line highlighting for 'cursorline' in the current window.
-    if (wp->w_p_cul && lnum == wp->w_cursor.lnum)
+    ಆದರೆ (wp->w_p_cul && lnum == wp->w_cursor.lnum)
     {
 	// Do not show the cursor line in the text when Visual mode is active,
 	// because it's not clear what is selected then.
-	if (!(wp == curwin && VIsual_active)
+	ಆದರೆ (!(wp == curwin && VIsual_ಸಕ್ರಿಯ)
 					 && wp->w_p_culopt_flags != CULOPT_NBR)
 	{
 	    wlv.cul_screenline = (wp->w_p_wrap
@@ -1984,340 +1984,340 @@ win_line(
 
 	    // Only apply CursorLine highlight here when "screenline" is not
 	    // present in 'cursorlineopt'.  Otherwise it's done later.
-	    if (!wlv.cul_screenline)
+	    ಆದರೆ (!wlv.cul_screenline)
 		apply_cursorline_highlight(&wlv, sign_present);
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		line_attr_save = wlv.line_attr;
-		margin_columns_win(wp, &left_curline_col, &right_curline_col);
+		ಸಾಲು_attr_save = wlv.ಸಾಲು_attr;
+		margin_columns_win(wp, &ಎಡ_curline_ಲಂಬಸಾಲು, &ಬಲ_curline_ಲಂಬಸಾಲು);
 	    }
 	    area_highlighting = TRUE;
 	}
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    win_line_start(wp, &wlv, FALSE);
+    win_ಸಾಲು_ಆರಂಭ(wp, &wlv, FALSE);
 
     // Repeat for the whole displayed line.
-    for (;;)
+    ಗಾಗಿ (;;)
     {
-#if defined(FEAT_CONCEAL) || defined(FEAT_SEARCH_EXTRA)
-	int	has_match_conc = 0;	// match wants to conceal
-#endif
-#ifdef FEAT_CONCEAL
-	int	did_decrement_ptr = FALSE;
-#endif
+#ಆದರೆ defined(FEAT_CONCEAL) || defined(FEAT_ಹುಡುಕು_EXTRA)
+	ಪೂರ್ಣಾಂಕ	has_ಹೊಂದಿಕೆ_conc = 0;	// match wants to conceal
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CONCEAL
+	ಪೂರ್ಣಾಂಕ	did_decrement_ptr = FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
 
 	// Skip this quickly when working on the text.
-	if (wlv.draw_state != WL_LINE)
+	ಆದರೆ (wlv.draw_state != WL_ಸಾಲು)
 	{
-#ifdef FEAT_SYN_HL
-	    if (wlv.cul_screenline)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
+	    ಆದರೆ (wlv.cul_screenline)
 	    {
 		wlv.cul_attr = 0;
-		wlv.line_attr = line_attr_save;
+		wlv.ಸಾಲು_attr = ಸಾಲು_attr_save;
 	    }
-#endif
-	    if (wlv.draw_state == WL_CMDLINE - 1 && wlv.n_extra == 0)
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಆದರೆ (wlv.draw_state == WL_CMDLINE - 1 && wlv.n_extra == 0)
 	    {
 		wlv.draw_state = WL_CMDLINE;
-		if (wp == cmdwin_win)
+		ಆದರೆ (wp == cmdwin_win)
 		{
 		    wlv.n_extra = 1;
 		    wlv.c_final = NUL;
-		    if (wlv.row == wlv.startrow)
+		    ಆದರೆ (wlv.ಅಡ್ಡಸಾಲು == wlv.startrow)
 		    {
 			wlv.c_extra = cmdwin_type;
 			wlv.char_attr = hl_combine_attr(
 				    get_win_attr(wp), HL_ATTR(HLF_AT));
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
 			wlv.c_extra = ' ';
 			wlv.char_attr = get_win_attr(wp);
 		    }
 		}
 	    }
-#ifdef FEAT_FOLDING
-	    if (wlv.draw_state == WL_FOLD - 1 && wlv.n_extra == 0)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_FOLDING
+	    ಆದರೆ (wlv.draw_state == WL_FOLD - 1 && wlv.n_extra == 0)
 	    {
 		wlv.draw_state = WL_FOLD;
 		handle_foldcolumn(wp, &wlv);
 	    }
-#endif
-#ifdef FEAT_SIGNS
-	    if (wlv.draw_state == WL_SIGN - 1 && wlv.n_extra == 0)
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SIGNS
+	    ಆದರೆ (wlv.draw_state == WL_SIGN - 1 && wlv.n_extra == 0)
 	    {
 		// Show the sign column when desired or when using Netbeans.
 		wlv.draw_state = WL_SIGN;
-		if (signcolumn_on(wp))
+		ಆದರೆ (signcolumn_on(wp))
 		    get_sign_display_info(FALSE, wp, &wlv);
 	    }
-#endif
-	    if (wlv.draw_state == WL_NR - 1 && wlv.n_extra == 0)
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಆದರೆ (wlv.draw_state == WL_NR - 1 && wlv.n_extra == 0)
 	    {
 		// Show the line number, if desired.
 		wlv.draw_state = WL_NR;
-		handle_lnum_col(wp, &wlv, sign_present, num_attr);
+		handle_lnum_ಲಂಬಸಾಲು(wp, &wlv, sign_present, ಅಂಕೆ_attr);
 	    }
 
 	    // When only displaying the (relative) line number and that's done,
 	    // stop here.
-	    if (number_only > 0 && wlv.draw_state == WL_NR && wlv.n_extra == 0)
+	    ಆದರೆ (ಸಂಖ್ಯೆ_only > 0 && wlv.draw_state == WL_NR && wlv.n_extra == 0)
 	    {
-		wlv_screen_line(wp, &wlv, FALSE);
+		wlv_screen_ಸಾಲು(wp, &wlv, FALSE);
 		// Need to update more screen lines if:
 		// - LineNrAbove or LineNrBelow is used, or
 		// - still drawing filler lines.
-		if ((wlv.row + 1 - wlv.startrow < number_only
+		ಆದರೆ ((wlv.ಅಡ್ಡಸಾಲು + 1 - wlv.startrow < ಸಂಖ್ಯೆ_only
 			&& (HL_ATTR(HLF_LNA) != 0 || HL_ATTR(HLF_LNB) != 0))
-#ifdef FEAT_DIFF
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
 			|| wlv.filler_todo > 0
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 			)
 		{
-		    ++wlv.row;
-		    ++wlv.screen_row;
-		    if (wlv.row == endrow)
-			break;
-#ifdef FEAT_DIFF
+		    ++wlv.ಅಡ್ಡಸಾಲು;
+		    ++wlv.screen_ಅಡ್ಡಸಾಲು;
+		    ಆದರೆ (wlv.ಅಡ್ಡಸಾಲು == endrow)
+			ನಿಲ್ಲಿಸು;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
 		    --wlv.filler_todo;
-		    if (wlv.filler_todo == 0 && wp->w_botfill)
-			break;
-#endif
-		    win_line_start(wp, &wlv, TRUE);
-		    continue;
+		    ಆದರೆ (wlv.filler_todo == 0 && wp->w_botfill)
+			ನಿಲ್ಲಿಸು;
+#ಆದರೆ_ಅಂತ್ಯ
+		    win_ಸಾಲು_ಆರಂಭ(wp, &wlv, TRUE);
+		    ಮುಂದುವರಿ;
 		}
-		else
-		    break;
+		ಇಲ್ಲದಿದ್ದರೆ
+		    ನಿಲ್ಲಿಸು;
 	    }
 
-#ifdef FEAT_LINEBREAK
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
 	    // Check if 'breakindent' applies and show it.
 	    // May change wlv.draw_state to WL_BRI or WL_BRI - 1.
-	    if (wlv.n_extra == 0)
+	    ಆದರೆ (wlv.n_extra == 0)
 		handle_breakindent(wp, &wlv);
-#endif
-#if defined(FEAT_LINEBREAK) || defined(FEAT_DIFF)
-	    if (wlv.draw_state == WL_SBR - 1 && wlv.n_extra == 0)
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(FEAT_LINEBREAK) || defined(FEAT_DIFF)
+	    ಆದರೆ (wlv.draw_state == WL_SBR - 1 && wlv.n_extra == 0)
 	    {
 		wlv.draw_state = WL_SBR;
 		handle_showbreak_and_filler(wp, &wlv);
 	    }
-#endif
-	    if (wlv.draw_state == WL_LINE - 1 && wlv.n_extra == 0)
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಆದರೆ (wlv.draw_state == WL_ಸಾಲು - 1 && wlv.n_extra == 0)
 	    {
-		wlv.draw_state = WL_LINE;
-		win_line_continue(&wlv);  // use wlv.saved_ values
+		wlv.draw_state = WL_ಸಾಲು;
+		win_ಸಾಲು_continue(&wlv);  // use wlv.saved_ values
 	    }
 	}
 
-#ifdef FEAT_SYN_HL
-	if (wlv.cul_screenline && wlv.draw_state == WL_LINE
-		&& wlv.vcol >= left_curline_col
-		&& wlv.vcol < right_curline_col)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
+	ಆದರೆ (wlv.cul_screenline && wlv.draw_state == WL_ಸಾಲು
+		&& wlv.vcol >= ಎಡ_curline_ಲಂಬಸಾಲು
+		&& wlv.vcol < ಬಲ_curline_ಲಂಬಸಾಲು)
 	    apply_cursorline_highlight(&wlv, sign_present);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 	// When still displaying '$' of change command, stop at cursor.
-	if (dollar_vcol >= 0 && in_curline && wlv.vcol >= (long)wp->w_virtcol)
+	ಆದರೆ (dollar_vcol >= 0 && ಒಳ_curline && wlv.vcol >= (ದೀರ್ಘ)wp->w_virtcol)
 	{
-	    wlv_screen_line(wp, &wlv, FALSE);
+	    wlv_screen_ಸಾಲು(wp, &wlv, FALSE);
 	    // Pretend we have finished updating the window.  Except when
 	    // 'cursorcolumn' is set.
-#ifdef FEAT_SYN_HL
-	    if (wp->w_p_cuc)
-		wlv.row = wp->w_cline_row + wp->w_cline_height;
-	    else
-#endif
-		wlv.row = wp->w_height;
-	    break;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
+	    ಆದರೆ (wp->w_p_cuc)
+		wlv.ಅಡ್ಡಸಾಲು = wp->w_cline_ಅಡ್ಡಸಾಲು + wp->w_cline_ಎತ್ತರ;
+	    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+		wlv.ಅಡ್ಡಸಾಲು = wp->w_ಎತ್ತರ;
+	    ನಿಲ್ಲಿಸು;
 	}
 
-	if (wlv.draw_state == WL_LINE && (area_highlighting || extra_check))
+	ಆದರೆ (wlv.draw_state == WL_ಸಾಲು && (area_highlighting || extra_check))
 	{
-#ifdef FEAT_PROP_POPUP
-	    if (text_props != NULL)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+	    ಆದರೆ (ಪಠ್ಯ_props != ಖಾಲಿ)
 	    {
-		int pi;
-		int bcol = (int)(ptr - line);
+		ಪೂರ್ಣಾಂಕ pi;
+		ಪೂರ್ಣಾಂಕ bcol = (ಪೂರ್ಣಾಂಕ)(ptr - ಸಾಲು);
 
-		if (wlv.n_extra > 0
+		ಆದರೆ (wlv.n_extra > 0
 # ifdef FEAT_LINEBREAK
-			&& !in_linebreak
+			&& !ಒಳ_linebreak
 # endif
 			)
 		    --bcol;  // still working on the previous char, e.g. Tab
 
 		// Check if any active property ends.
-		for (pi = 0; pi < text_props_active; ++pi)
+		ಗಾಗಿ (pi = 0; pi < ಪಠ್ಯ_props_ಸಕ್ರಿಯ; ++pi)
 		{
-		    int		tpi = text_prop_idxs[pi];
-		    textprop_T  *tp = &text_props[tpi];
+		    ಪೂರ್ಣಾಂಕ		tpi = ಪಠ್ಯ_prop_idxs[pi];
+		    textprop_T  *tp = &ಪಠ್ಯ_props[tpi];
 
 		    // An inline property ends when after the start column plus
 		    // length. An "above" property ends when used and n_extra
 		    // is zero.
-		    if ((tp->tp_col != MAXCOL
-				       && bcol >= tp->tp_col - 1 + tp->tp_len))
+		    ಆದರೆ ((tp->tp_ಲಂಬಸಾಲು != MAXCOL
+				       && bcol >= tp->tp_ಲಂಬಸಾಲು - 1 + tp->tp_len))
 		    {
-			if (pi + 1 < text_props_active)
-			    mch_memmove(text_prop_idxs + pi,
-					text_prop_idxs + pi + 1,
-					sizeof(int)
-					     * (text_props_active - (pi + 1)));
-			--text_props_active;
-			text_props_need_sort = TRUE;
+			ಆದರೆ (pi + 1 < ಪಠ್ಯ_props_ಸಕ್ರಿಯ)
+			    mch_memmove(ಪಠ್ಯ_prop_idxs + pi,
+					ಪಠ್ಯ_prop_idxs + pi + 1,
+					ಗಾತ್ರ(ಪೂರ್ಣಾಂಕ)
+					     * (ಪಠ್ಯ_props_ಸಕ್ರಿಯ - (pi + 1)));
+			--ಪಠ್ಯ_props_ಸಕ್ರಿಯ;
+			ಪಠ್ಯ_props_need_ವಿಂಗಡಿಸು = TRUE;
 			--pi;
 # ifdef FEAT_LINEBREAK
 			// not exactly right but should work in most cases
-			if (in_linebreak && syntax_attr == text_prop_attr_comb)
+			ಆದರೆ (ಒಳ_linebreak && syntax_attr == ಪಠ್ಯ_prop_attr_comb)
 			    syntax_attr = 0;
 # endif
 		    }
 		}
 
 # ifdef FEAT_LINEBREAK
-		if (wlv.n_extra > 0 && in_linebreak)
+		ಆದರೆ (wlv.n_extra > 0 && ಒಳ_linebreak)
 		    // not on the next char yet, don't start another prop
 		    --bcol;
 # endif
 		// Add any text property that starts in this column.
-		while (text_prop_next < text_prop_count)
+		ಆಗ (ಪಠ್ಯ_prop_ಮುಂದಿನ < ಪಠ್ಯ_prop_ಎಣಿಕೆ)
 		{
-		    int active;
-		    textprop_T *tp = &text_props[text_prop_next];
-		    if (tp->tp_col == MAXCOL)
+		    ಪೂರ್ಣಾಂಕ ಸಕ್ರಿಯ;
+		    textprop_T *tp = &ಪಠ್ಯ_props[ಪಠ್ಯ_prop_ಮುಂದಿನ];
+		    ಆದರೆ (tp->tp_ಲಂಬಸಾಲು == MAXCOL)
 		    {
-			if (bcol == 0 && (tp->tp_flags & TP_FLAG_ALIGN_ABOVE))
-			    active = TRUE;
-			else if (*ptr != NUL)
-			    break;
-			else
+			ಆದರೆ (bcol == 0 && (tp->tp_flags & TP_FLAG_ALIGN_ABOVE))
+			    ಸಕ್ರಿಯ = TRUE;
+			ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*ptr != NUL)
+			    ನಿಲ್ಲಿಸು;
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
 			    // With 'nowrap' and not in the first screen line only "below"
 			    // text prop can show.
-			    active = wp->w_p_wrap
-				  || wlv.row == startrow
-				  || (tp->tp_flags & TP_FLAG_ALIGN_BELOW);
+			    ಸಕ್ರಿಯ = wp->w_p_wrap
+				  || wlv.ಅಡ್ಡಸಾಲು == startrow
+				  || (tp->tp_flags & TP_FLAG_ALIGN_ಕೆಳಗೆ);
 			}
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
-			if (bcol < tp->tp_col - 1)
-			    break;
-			active = bcol <= tp->tp_col - 1 + tp->tp_len;
+			ಆದರೆ (bcol < tp->tp_ಲಂಬಸಾಲು - 1)
+			    ನಿಲ್ಲಿಸು;
+			ಸಕ್ರಿಯ = bcol <= tp->tp_ಲಂಬಸಾಲು - 1 + tp->tp_len;
 		    }
 
-		    if (active)
+		    ಆದರೆ (ಸಕ್ರಿಯ)
 		    {
-			text_prop_idxs[text_props_active++] = text_prop_next;
-			text_props_need_sort = TRUE;
+			ಪಠ್ಯ_prop_idxs[ಪಠ್ಯ_props_ಸಕ್ರಿಯ++] = ಪಠ್ಯ_prop_ಮುಂದಿನ;
+			ಪಠ್ಯ_props_need_ವಿಂಗಡಿಸು = TRUE;
 		    }
-		    ++text_prop_next;
+		    ++ಪಠ್ಯ_prop_ಮುಂದಿನ;
 		}
 
-		if (wlv.n_extra == 0 ||
+		ಆದರೆ (wlv.n_extra == 0 ||
 			(!wlv.extra_for_textprop
-			 && !(text_prop_type != NULL &&
-			     text_prop_flags & PT_FLAG_OVERRIDE)
+			 && !(ಪಠ್ಯ_prop_type != ಖಾಲಿ &&
+			     ಪಠ್ಯ_prop_flags & PT_FLAG_OVERRIDE)
 		    ))
 		{
-		    text_prop_attr = 0;
-		    text_prop_attr_comb = 0;
-		    text_prop_flags = 0;
-		    text_prop_type = NULL;
-		    text_prop_id = 0;
+		    ಪಠ್ಯ_prop_attr = 0;
+		    ಪಠ್ಯ_prop_attr_comb = 0;
+		    ಪಠ್ಯ_prop_flags = 0;
+		    ಪಠ್ಯ_prop_type = ಖಾಲಿ;
+		    ಪಠ್ಯ_prop_id = 0;
 		    reset_extra_attr = FALSE;
 		}
-		if (text_props_active > 0 && wlv.n_extra == 0)
+		ಆದರೆ (ಪಠ್ಯ_props_ಸಕ್ರಿಯ > 0 && wlv.n_extra == 0)
 		{
-		    int used_tpi = -1;
-		    int used_attr = 0;
-		    int other_tpi = -1;
+		    ಪೂರ್ಣಾಂಕ ಬಳಸಿದ_tpi = -1;
+		    ಪೂರ್ಣಾಂಕ ಬಳಸಿದ_attr = 0;
+		    ಪೂರ್ಣಾಂಕ other_tpi = -1;
 
-		    text_prop_above = FALSE;
-		    text_prop_follows = FALSE;
+		    ಪಠ್ಯ_prop_above = FALSE;
+		    ಪಠ್ಯ_prop_follows = FALSE;
 
-		    if (text_props_need_sort)
+		    ಆದರೆ (ಪಠ್ಯ_props_need_ವಿಂಗಡಿಸು)
 		    {
 			// The active set only changes when a property starts
 			// or ends, so avoid sorting again for every column.
-			sort_text_props(wp->w_buffer, text_props,
-					text_prop_idxs, text_props_active);
-			text_props_need_sort = FALSE;
+			ವಿಂಗಡಿಸು_ಪಠ್ಯ_props(wp->w_ಬಫರ್, ಪಠ್ಯ_props,
+					ಪಠ್ಯ_prop_idxs, ಪಠ್ಯ_props_ಸಕ್ರಿಯ);
+			ಪಠ್ಯ_props_need_ವಿಂಗಡಿಸು = FALSE;
 		    }
 
-		    for (pi = 0; pi < text_props_active; ++pi)
+		    ಗಾಗಿ (pi = 0; pi < ಪಠ್ಯ_props_ಸಕ್ರಿಯ; ++pi)
 		    {
-			int	    tpi = text_prop_idxs[pi];
-			textprop_T  *tp = &text_props[tpi];
-			proptype_T  *pt = text_prop_type_by_id(
-						    wp->w_buffer, tp->tp_type);
+			ಪೂರ್ಣಾಂಕ	    tpi = ಪಠ್ಯ_prop_idxs[pi];
+			textprop_T  *tp = &ಪಠ್ಯ_props[tpi];
+			proptype_T  *pt = ಪಠ್ಯ_prop_type_by_id(
+						    wp->w_ಬಫರ್, tp->tp_type);
 
 			// Only use a text property that can be displayed.
 			// Skip "after" properties when wrap is off and at the
 			// end of the window.
-			if (pt != NULL
+			ಆದರೆ (pt != ಖಾಲಿ
 				&& (pt->pt_hl_id > 0 || tp->tp_id < 0)
 				&& tp->tp_id != -MAXCOL
 				&& !(tp->tp_id < 0
 				    && !wp->w_p_wrap
-				    && (tp->tp_flags & (TP_FLAG_ALIGN_RIGHT
+				    && (tp->tp_flags & (TP_FLAG_ALIGN_ಬಲ
 						| TP_FLAG_ALIGN_ABOVE
-						| TP_FLAG_ALIGN_BELOW)) == 0
-				    && wlv.col >= wp->w_width))
+						| TP_FLAG_ALIGN_ಕೆಳಗೆ)) == 0
+				    && wlv.ಲಂಬಸಾಲು >= wp->w_ಅಗಲ))
 			{
-			    if (tp->tp_col == MAXCOL
+			    ಆದರೆ (tp->tp_ಲಂಬಸಾಲು == MAXCOL
 				     && *ptr == NUL
 				     && ((wp->w_p_list && lcs_eol_one > 0
 					     && (tp->tp_flags
 						   & TP_FLAG_ALIGN_ABOVE) == 0)
-					 || (ptr == line
-						&& !did_line
+					 || (ptr == ಸಾಲು
+						&& !did_ಸಾಲು
 						&& (tp->tp_flags
-						      & TP_FLAG_ALIGN_BELOW))))
+						      & TP_FLAG_ALIGN_ಕೆಳಗೆ))))
 			    {
 				// skip this prop, first display the '$' after
 				// the line or display an empty line
-				text_prop_follows = TRUE;
-				continue;
+				ಪಠ್ಯ_prop_follows = TRUE;
+				ಮುಂದುವರಿ;
 			    }
 
-			    if (pt->pt_hl_id > 0)
-				used_attr = syn_id2attr(pt->pt_hl_id);
-			    text_prop_type = pt;
-			    text_prop_attr =
-				   hl_combine_attr(text_prop_attr, used_attr);
-			    if (used_tpi >= 0 && text_props[used_tpi].tp_id < 0)
-				other_tpi = used_tpi;
-			    text_prop_flags = pt->pt_flags;
-			    text_prop_id = tp->tp_id;
-			    used_tpi = tpi;
+			    ಆದರೆ (pt->pt_hl_id > 0)
+				ಬಳಸಿದ_attr = syn_id2attr(pt->pt_hl_id);
+			    ಪಠ್ಯ_prop_type = pt;
+			    ಪಠ್ಯ_prop_attr =
+				   hl_combine_attr(ಪಠ್ಯ_prop_attr, ಬಳಸಿದ_attr);
+			    ಆದರೆ (ಬಳಸಿದ_tpi >= 0 && ಪಠ್ಯ_props[ಬಳಸಿದ_tpi].tp_id < 0)
+				other_tpi = ಬಳಸಿದ_tpi;
+			    ಪಠ್ಯ_prop_flags = pt->pt_flags;
+			    ಪಠ್ಯ_prop_id = tp->tp_id;
+			    ಬಳಸಿದ_tpi = tpi;
 			}
 		    }
-		    if (text_prop_id < 0 && used_tpi >= 0
-				 && text_props[used_tpi].u.tp_text != NULL)
+		    ಆದರೆ (ಪಠ್ಯ_prop_id < 0 && ಬಳಸಿದ_tpi >= 0
+				 && ಪಠ್ಯ_props[ಬಳಸಿದ_tpi].u.tp_ಪಠ್ಯ != ಖಾಲಿ)
 		    {
-			textprop_T  *tp = &text_props[used_tpi];
-			char_u	    *p = tp->u.tp_text;
-			int	    above = (tp->tp_flags
+			textprop_T  *tp = &ಪಠ್ಯ_props[ಬಳಸಿದ_tpi];
+			char_u	    *p = tp->u.tp_ಪಠ್ಯ;
+			ಪೂರ್ಣಾಂಕ	    above = (tp->tp_flags
 							& TP_FLAG_ALIGN_ABOVE);
-			int	    bail_out = FALSE;
+			ಪೂರ್ಣಾಂಕ	    bail_ಹೊರಹೋಗು = FALSE;
 
 			// reset the ID in the copy to avoid it being used
 			// again
 			tp->tp_id = -MAXCOL;
 
-			if (p != NULL)
+			ಆದರೆ (p != ಖಾಲಿ)
 			{
-			    int	    right = (tp->tp_flags
-							& TP_FLAG_ALIGN_RIGHT);
-			    int	    below = (tp->tp_flags
-							& TP_FLAG_ALIGN_BELOW);
-			    int	    wrap = tp->tp_col < MAXCOL
+			    ಪೂರ್ಣಾಂಕ	    ಬಲ_2 = (tp->tp_flags
+							& TP_FLAG_ALIGN_ಬಲ);
+			    ಪೂರ್ಣಾಂಕ	    ಕೆಳಗೆ = (tp->tp_flags
+							& TP_FLAG_ALIGN_ಕೆಳಗೆ);
+			    ಪೂರ್ಣಾಂಕ	    wrap = tp->tp_ಲಂಬಸಾಲು < MAXCOL
 					      || (tp->tp_flags & TP_FLAG_WRAP);
-			    int	    padding = tp->tp_col == MAXCOL
+			    ಪೂರ್ಣಾಂಕ	    padding = tp->tp_ಲಂಬಸಾಲು == MAXCOL
 							  ? tp->tp_padleft : 0;
 
 			    // Insert virtual text before the current
@@ -2325,96 +2325,96 @@ win_line(
 			    wlv.p_extra = p;
 			    wlv.c_extra = NUL;
 			    wlv.c_final = NUL;
-			    wlv.n_extra = (int)STRLEN(p);
+			    wlv.n_extra = (ಪೂರ್ಣಾಂಕ)STRLEN(p);
 			    wlv.extra_for_textprop = TRUE;
-			    wlv.start_extra_for_textprop = TRUE;
+			    wlv.ಆರಂಭ_extra_for_textprop = TRUE;
 			    wlv.extra_attr = hl_combine_attr(wlv.win_attr,
-								    used_attr);
+								    ಬಳಸಿದ_attr);
 			    n_attr = mb_charlen(p);
-			    text_prop_attr = 0;
-			    text_prop_attr_comb = 0;
-			    if (*ptr == NUL)
+			    ಪಠ್ಯ_prop_attr = 0;
+			    ಪಠ್ಯ_prop_attr_comb = 0;
+			    ಆದರೆ (*ptr == NUL)
 				// don't combine char attr after EOL
-				text_prop_flags &= ~PT_FLAG_COMBINE;
+				ಪಠ್ಯ_prop_flags &= ~PT_FLAG_COMBINE;
 # ifdef FEAT_LINEBREAK
-			    if (text_prop_no_showbreak(tp))
+			    ಆದರೆ (ಪಠ್ಯ_prop_no_showbreak(tp))
 			    {
 				wlv.need_showbreak = FALSE;
 				wlv.dont_use_showbreak = TRUE;
 			    }
 # endif
-			    if ((right || above || below || !wrap
-					    || padding > 0) && wp->w_width > 2)
+			    ಆದರೆ ((ಬಲ_2 || above || ಕೆಳಗೆ || !wrap
+					    || padding > 0) && wp->w_ಅಗಲ > 2)
 			    {
 				char_u	*prev_p_extra = wlv.p_extra;
-				int	start_line;
+				ಪೂರ್ಣಾಂಕ	ಆರಂಭ_ಸಾಲು;
 
 				// Take care of padding, right-align and
 				// truncation.
 				// Shared with win_lbr_chartabsize(), must do
 				// exactly the same.
-				start_line = text_prop_position(wp, tp,
+				ಆರಂಭ_ಸಾಲು = ಪಠ್ಯ_prop_position(wp, tp,
 						    wlv.vcol,
 # ifdef FEAT_RIGHTLEFT
 						    wp->w_p_rl
-						    ? wp->w_width - wlv.col - 1
+						    ? wp->w_ಅಗಲ - wlv.ಲಂಬಸಾಲು - 1
 						    :
 # endif
-						    wlv.col,
+						    wlv.ಲಂಬಸಾಲು,
 						    &wlv.n_extra, &wlv.p_extra,
 						    &n_attr, &wlv.n_attr_skip,
 						    skip_cells > 0);
-				if (wlv.p_extra != prev_p_extra)
+				ಆದರೆ (wlv.p_extra != prev_p_extra)
 				{
 				    // wlv.p_extra was allocated
 				    vim_free(p_extra_free2);
 				    p_extra_free2 = wlv.p_extra;
 				}
 
-				if (above)
+				ಆದರೆ (above)
 				    wlv.vcol_off_tp += vim_strsize(wlv.p_extra);
 
-				if (lcs_eol_one < 0
+				ಆದರೆ (lcs_eol_one < 0
 					&& wp->w_p_wrap
-					&& wlv.col
-					       + wlv.n_extra - 2 > wp->w_width)
+					&& wlv.ಲಂಬಸಾಲು
+					       + wlv.n_extra - 2 > wp->w_ಅಗಲ)
 				    // don't bail out at end of line
-				    text_prop_follows = TRUE;
+				    ಪಠ್ಯ_prop_follows = TRUE;
 
 				// When 'wrap' is off then for "below" we need
 				// to start a new line explicitly.
-				if (start_line)
+				ಆದರೆ (ಆರಂಭ_ಸಾಲು)
 				{
-				    draw_screen_line(wp, &wlv);
+				    draw_screen_ಸಾಲು(wp, &wlv);
 
 				    // When line got too long for screen break
 				    // here.
-				    if (wlv.row == endrow)
+				    ಆದರೆ (wlv.ಅಡ್ಡಸಾಲು == endrow)
 				    {
-					++wlv.row;
-					break;
+					++wlv.ಅಡ್ಡಸಾಲು;
+					ನಿಲ್ಲಿಸು;
 				    }
-				    win_line_start(wp, &wlv, TRUE);
-				    bail_out = TRUE;
+				    win_ಸಾಲು_ಆರಂಭ(wp, &wlv, TRUE);
+				    bail_ಹೊರಹೋಗು = TRUE;
 				}
 			    }
 			}
 
 			// If the text didn't reach until the first window
 			// column we need to skip cells.
-			if (skip_cells > 0)
+			ಆದರೆ (skip_cells > 0)
 			{
-			    if (wlv.n_extra > skip_cells)
+			    ಆದರೆ (wlv.n_extra > skip_cells)
 			    {
 				wlv.n_extra -= skip_cells;
 				wlv.p_extra += skip_cells;
 				wlv.n_attr_skip -= skip_cells;
-				if (wlv.n_attr_skip < 0)
+				ಆದರೆ (wlv.n_attr_skip < 0)
 				    wlv.n_attr_skip = 0;
 				skipped_cells += skip_cells;
 				skip_cells = 0;
 			    }
-			    else
+			    ಇಲ್ಲದಿದ್ದರೆ
 			    {
 				// the whole text is left of the window, drop
 				// it and advance to the next one
@@ -2422,7 +2422,7 @@ win_line(
 				skipped_cells += wlv.n_extra;
 				wlv.n_extra = 0;
 				wlv.n_attr_skip = 0;
-				bail_out = TRUE;
+				bail_ಹೊರಹೋಗು = TRUE;
 			    }
 			}
 
@@ -2430,20 +2430,20 @@ win_line(
 			// the last window column must know.
 			// If this is an "above" text prop and 'nowrap' then we
 			// must wrap anyway.
-			text_prop_above = above;
-			text_prop_follows |= other_tpi != -1
+			ಪಠ್ಯ_prop_above = above;
+			ಪಠ್ಯ_prop_follows |= other_tpi != -1
 					&& (wp->w_p_wrap
-					     || (text_props[other_tpi].tp_flags
-			       & (TP_FLAG_ALIGN_BELOW | TP_FLAG_ALIGN_RIGHT)));
+					     || (ಪಠ್ಯ_props[other_tpi].tp_flags
+			       & (TP_FLAG_ALIGN_ಕೆಳಗೆ | TP_FLAG_ALIGN_ಬಲ)));
 
-			if (bail_out)
+			ಆದರೆ (bail_ಹೊರಹೋಗು)
 			    // starting a new line for "below"
-			    continue;
+			    ಮುಂದುವರಿ;
 		    }
 		}
-		else if (text_prop_next < text_prop_count
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಪಠ್ಯ_prop_ಮುಂದಿನ < ಪಠ್ಯ_prop_ಎಣಿಕೆ
 			   && ((*ptr != NUL && ptr[mb_ptr2len(ptr)] == NUL)
-			       || (!wp->w_p_wrap && wlv.col == wp->w_width - 1)))
+			       || (!wp->w_p_wrap && wlv.ಲಂಬಸಾಲು == wp->w_ಅಗಲ - 1)))
 		{
 		    // When at last-but-one character and a text property
 		    // follows after it, we may need to flush the line after
@@ -2452,135 +2452,135 @@ win_line(
 
 		    // Use the displayed width so a double-width or <Tab> last
 		    // character filling the rightmost column is detected too.
-		    int only_below_follows = !wp->w_p_wrap
-				 && wlv.col + win_chartabsize(wp, ptr, wlv.vcol)
-								>= wp->w_width;
-		    int suffix_flags = text_prop_suffix_flags[text_prop_next];
+		    ಪೂರ್ಣಾಂಕ only_ಕೆಳಗೆ_follows = !wp->w_p_wrap
+				 && wlv.ಲಂಬಸಾಲು + win_chartabsize(wp, ptr, wlv.vcol)
+								>= wp->w_ಅಗಲ;
+		    ಪೂರ್ಣಾಂಕ suffix_flags = ಪಠ್ಯ_prop_suffix_flags[ಪಠ್ಯ_prop_ಮುಂದಿನ];
 
-		    text_prop_follows = (suffix_flags
-					& (only_below_follows ? 2 : 1)) != 0;
+		    ಪಠ್ಯ_prop_follows = (suffix_flags
+					& (only_ಕೆಳಗೆ_follows ? 2 : 1)) != 0;
 		}
 	    }
 
-	    if (wlv.start_extra_for_textprop)
+	    ಆದರೆ (wlv.ಆರಂಭ_extra_for_textprop)
 	    {
-		wlv.start_extra_for_textprop = FALSE;
+		wlv.ಆರಂಭ_extra_for_textprop = FALSE;
 		// restore search_attr and area_attr when n_extra
 		// is down to zero
-		saved_search_attr = search_attr;
+		saved_ಹುಡುಕು_attr = ಹುಡುಕು_attr;
 		saved_area_attr = area_attr;
-		search_attr = 0;
+		ಹುಡುಕು_attr = 0;
 		area_attr = 0;
 	    }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-	    int *area_attr_p =
-#ifdef FEAT_PROP_POPUP
+	    ಪೂರ್ಣಾಂಕ *area_attr_p =
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
 		wlv.extra_for_textprop ? &saved_area_attr :
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 							    &area_attr;
 
 	    // handle Visual or match highlighting in this line
-	    if (wlv.vcol == wlv.fromcol
+	    ಆದರೆ (wlv.vcol == wlv.fromcol
 		    || (has_mbyte && wlv.vcol + 1 == wlv.fromcol
 			&& ((wlv.n_extra == 0 && (*mb_ptr2cells)(ptr) > 1)
-			    || (wlv.n_extra > 0 && wlv.p_extra != NULL
+			    || (wlv.n_extra > 0 && wlv.p_extra != ಖಾಲಿ
 				&& (*mb_ptr2cells)(wlv.p_extra) > 1))))
 		*area_attr_p = vi_attr;		// start highlighting
-	    else if (*area_attr_p != 0 && wlv.vcol == wlv.tocol)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*area_attr_p != 0 && wlv.vcol == wlv.tocol)
 		*area_attr_p = 0;		// stop highlighting
 
-	    if (wlv.n_extra == 0)
+	    ಆದರೆ (wlv.n_extra == 0)
 	    {
-#ifdef FEAT_SEARCH_EXTRA
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಹುಡುಕು_EXTRA
 		// Check for start/end of 'hlsearch' and other matches.
 		// After end, check for start/end of next match.
 		// When another match, have to check for start again.
-		v = (long)(ptr - line);
-		search_attr = update_search_hl(wp, lnum, (colnr_T)v, &line,
-				      &screen_search_hl, &has_match_conc,
-				      &match_conc, did_line_attr, lcs_eol_one,
-				      &on_last_col);
-		ptr = line + v;  // "line" may have been changed
+		v = (ದೀರ್ಘ)(ptr - ಸಾಲು);
+		ಹುಡುಕು_attr = update_ಹುಡುಕು_hl(wp, lnum, (colnr_T)v, &ಸಾಲು,
+				      &screen_ಹುಡುಕು_hl, &has_ಹೊಂದಿಕೆ_conc,
+				      &ಹೊಂದಿಕೆ_conc, did_ಸಾಲು_attr, lcs_eol_one,
+				      &on_ಕೊನೆಯ_ಲಂಬಸಾಲು);
+		ptr = ಸಾಲು + v;  // "line" may have been changed
 
 		// Do not allow a conceal over EOL otherwise EOL will be missed
 		// and bad things happen.
-		if (*ptr == NUL)
-		    has_match_conc = 0;
-#else
-		search_attr = 0;
-#endif
+		ಆದರೆ (*ptr == NUL)
+		    has_ಹೊಂದಿಕೆ_conc = 0;
+#ಇಲ್ಲದಿದ್ದರೆ
+		ಹುಡುಕು_attr = 0;
+#ಆದರೆ_ಅಂತ್ಯ
 
 		// Check if ComplMatchIns highlight is needed.
-		if ((State & MODE_INSERT) && ins_compl_win_active(wp)
-			    && (in_curline || ins_compl_lnum_in_range(lnum)))
+		ಆದರೆ ((State & ಬಹುಲಕ_ಸೇರಿಸು) && ins_compl_win_ಸಕ್ರಿಯ(wp)
+			    && (ಒಳ_curline || ins_compl_lnum_ಒಳ_range(lnum)))
 		{
-		    int ins_match_attr =
-			ins_compl_col_range_attr(lnum, (int)(ptr - line));
-		    if (ins_match_attr > 0)
-			search_attr =
-			    hl_combine_attr(search_attr, ins_match_attr);
+		    ಪೂರ್ಣಾಂಕ ins_ಹೊಂದಿಕೆ_attr =
+			ins_compl_ಲಂಬಸಾಲು_range_attr(lnum, (ಪೂರ್ಣಾಂಕ)(ptr - ಸಾಲು));
+		    ಆದರೆ (ins_ಹೊಂದಿಕೆ_attr > 0)
+			ಹುಡುಕು_attr =
+			    hl_combine_attr(ಹುಡುಕು_attr, ins_ಹೊಂದಿಕೆ_attr);
 		}
 	    }
 
-#ifdef FEAT_DIFF
-	    if (wlv.diff_hlf != (hlf_T)0)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
+	    ಆದರೆ (wlv.diff_hlf != (hlf_T)0)
 	    {
-		if (line_changes.num_changes > 0
-			&& change_index >= 0
-			&& change_index < line_changes.num_changes - 1)
+		ಆದರೆ (ಸಾಲು_changes.ಅಂಕೆ_changes > 0
+			&& change_ಸೂಚ್ಯಂಕ >= 0
+			&& change_ಸೂಚ್ಯಂಕ < ಸಾಲು_changes.ಅಂಕೆ_changes - 1)
 		{
-		    if (ptr - line >= line_changes.changes[change_index+1].dc_start[line_changes.bufidx])
-			change_index += 1;
+		    ಆದರೆ (ptr - ಸಾಲು >= ಸಾಲು_changes.changes[change_ಸೂಚ್ಯಂಕ+1].dc_ಆರಂಭ[ಸಾಲು_changes.bufidx])
+			change_ಸೂಚ್ಯಂಕ += 1;
 		}
-		int added = FALSE;
-		if (line_changes.num_changes > 0 && change_index >= 0 && change_index < line_changes.num_changes)
+		ಪೂರ್ಣಾಂಕ added = FALSE;
+		ಆದರೆ (ಸಾಲು_changes.ಅಂಕೆ_changes > 0 && change_ಸೂಚ್ಯಂಕ >= 0 && change_ಸೂಚ್ಯಂಕ < ಸಾಲು_changes.ಅಂಕೆ_changes)
 		{
-		    added = diff_change_parse(&line_changes,
-			    &line_changes.changes[change_index],
-			    &change_start,
-			    &change_end);
+		    added = diff_change_parse(&ಸಾಲು_changes,
+			    &ಸಾಲು_changes.changes[change_ಸೂಚ್ಯಂಕ],
+			    &change_ಆರಂಭ,
+			    &change_ಕೊನೆ);
 		}
 		// When there is extra text (e.g. virtual text) it gets the
 		// diff highlighting for the line, but not for changed text.
-		if (wlv.diff_hlf == HLF_CHD && ptr - line >= change_start
+		ಆದರೆ (wlv.diff_hlf == HLF_CHD && ptr - ಸಾಲು >= change_ಆರಂಭ
 							   && wlv.n_extra == 0)
 		    wlv.diff_hlf = added ? HLF_TXA : HLF_TXD;	// added/changed text
-		if ((wlv.diff_hlf == HLF_TXD || wlv.diff_hlf == HLF_TXA)
-			&& ((ptr - line >= change_end && wlv.n_extra == 0)
+		ಆದರೆ ((wlv.diff_hlf == HLF_TXD || wlv.diff_hlf == HLF_TXA)
+			&& ((ptr - ಸಾಲು >= change_ಕೊನೆ && wlv.n_extra == 0)
 			       || (wlv.n_extra > 0 && wlv.extra_for_textprop)))
 		    wlv.diff_hlf = HLF_CHD;		// changed line
-		wlv.line_attr = HL_ATTR(wlv.diff_hlf);
-		if (wp->w_p_cul && lnum == wp->w_cursor.lnum
+		wlv.ಸಾಲು_attr = HL_ATTR(wlv.diff_hlf);
+		ಆದರೆ (wp->w_p_cul && lnum == wp->w_cursor.lnum
 			&& wp->w_p_culopt_flags != CULOPT_NBR
-			&& (!wlv.cul_screenline || (wlv.vcol >= left_curline_col
-					    && wlv.vcol <= right_curline_col)))
-		    wlv.line_attr = hl_combine_attr(
-					  wlv.line_attr, HL_ATTR(HLF_CUL));
+			&& (!wlv.cul_screenline || (wlv.vcol >= ಎಡ_curline_ಲಂಬಸಾಲು
+					    && wlv.vcol <= ಬಲ_curline_ಲಂಬಸಾಲು)))
+		    wlv.ಸಾಲು_attr = hl_combine_attr(
+					  wlv.ಸಾಲು_attr, HL_ATTR(HLF_CUL));
 	    }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_SYN_HL
-	    if (extra_check && wlv.n_extra == 0)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
+	    ಆದರೆ (extra_check && wlv.n_extra == 0)
 	    {
 		syntax_attr = 0;
 # ifdef FEAT_TERMINAL
-		if (get_term_attr)
-		    syntax_attr = term_get_attr(wp, lnum, wlv.vcol);
+		ಆದರೆ (get_ಪದ_attr)
+		    syntax_attr = ಪದ_get_attr(wp, lnum, wlv.vcol);
 # endif
 		// Get syntax attribute.
-		if (has_syntax)
+		ಆದರೆ (has_syntax)
 		{
 		    // Get the syntax attribute for the character.  If there
 		    // is an error, disable syntax highlighting.
 		    save_did_emsg = did_emsg;
 		    did_emsg = FALSE;
 
-		    v = (long)(ptr - line);
-		    if (v == prev_syntax_col)
+		    v = (ದೀರ್ಘ)(ptr - ಸಾಲು);
+		    ಆದರೆ (v == prev_syntax_ಲಂಬಸಾಲು)
 			// at same column again
 			syntax_attr = prev_syntax_attr;
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
 # ifdef FEAT_SPELL
 			can_spell = TRUE;
@@ -2589,112 +2589,112 @@ win_line(
 # ifdef FEAT_SPELL
 					    spv->spv_has_spell ? &can_spell :
 # endif
-					    NULL, FALSE);
-			prev_syntax_col = v;
+					    ಖಾಲಿ, FALSE);
+			prev_syntax_ಲಂಬಸಾಲು = v;
 			prev_syntax_attr = syntax_attr;
 		    }
 
-		    if (did_emsg)
+		    ಆದರೆ (did_emsg)
 		    {
 			wp->w_s->b_syn_error = TRUE;
 			has_syntax = FALSE;
 			syntax_attr = 0;
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 			did_emsg = save_did_emsg;
-# ifdef SYN_TIME_LIMIT
-		    if (wp->w_s->b_syn_slow)
+# ifdef SYN_ಸಮಯ_ಎಲ್ಲೆ
+		    ಆದರೆ (wp->w_s->b_syn_slow)
 			has_syntax = FALSE;
 # endif
 
 		    // Need to get the line again, a multi-line regexp may
 		    // have made it invalid.
-		    line = ml_get_buf(wp->w_buffer, lnum, FALSE);
-		    ptr = line + v;
+		    ಸಾಲು = ml_get_buf(wp->w_ಬಫರ್, lnum, FALSE);
+		    ptr = ಸಾಲು + v;
 # ifdef FEAT_CONCEAL
 		    // no concealing past the end of the line, it interferes
 		    // with line highlighting
-		    if (*ptr == NUL)
+		    ಆದರೆ (*ptr == NUL)
 			syntax_flags = 0;
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 			syntax_flags = get_syntax_info(&syntax_seqnr);
 # endif
 		}
 	    }
 # ifdef FEAT_PROP_POPUP
 	    // Combine text property highlight into syntax highlight.
-	    if (text_prop_type != NULL)
+	    ಆದರೆ (ಪಠ್ಯ_prop_type != ಖಾಲಿ)
 	    {
-		if (text_prop_flags & PT_FLAG_COMBINE)
-		    syntax_attr = hl_combine_attr(syntax_attr, text_prop_attr);
-		else
-		    syntax_attr = text_prop_attr;
-		text_prop_attr_comb = syntax_attr;
+		ಆದರೆ (ಪಠ್ಯ_prop_flags & PT_FLAG_COMBINE)
+		    syntax_attr = hl_combine_attr(syntax_attr, ಪಠ್ಯ_prop_attr);
+		ಇಲ್ಲದಿದ್ದರೆ
+		    syntax_attr = ಪಠ್ಯ_prop_attr;
+		ಪಠ್ಯ_prop_attr_comb = syntax_attr;
 	    }
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 	    // Decide which of the highlight attributes to use.
 	    attr_pri = TRUE;
-#ifdef LINE_ATTR
-	    if (area_attr != 0)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ಸಾಲು_ATTR
+	    ಆದರೆ (area_attr != 0)
 	    {
-		wlv.char_attr = hl_combine_attr(wlv.line_attr, area_attr);
-		if (!highlight_match)
+		wlv.char_attr = hl_combine_attr(wlv.ಸಾಲು_attr, area_attr);
+		ಆದರೆ (!highlight_ಹೊಂದಿಕೆ)
 		    // let search highlight show in Visual area if possible
-		    wlv.char_attr = hl_combine_attr(search_attr, wlv.char_attr);
+		    wlv.char_attr = hl_combine_attr(ಹುಡುಕು_attr, wlv.char_attr);
 # ifdef FEAT_SYN_HL
 		wlv.char_attr = hl_combine_attr(syntax_attr, wlv.char_attr);
 # endif
 	    }
-	    else if (search_attr != 0)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಹುಡುಕು_attr != 0)
 	    {
-		wlv.char_attr = hl_combine_attr(wlv.line_attr, search_attr);
+		wlv.char_attr = hl_combine_attr(wlv.ಸಾಲು_attr, ಹುಡುಕು_attr);
 # ifdef FEAT_SYN_HL
 		wlv.char_attr = hl_combine_attr(syntax_attr, wlv.char_attr);
 # endif
 	    }
-	    else if (wlv.line_attr != 0
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (wlv.ಸಾಲು_attr != 0
 		    && ((wlv.fromcol == -10 && wlv.tocol == MAXCOL)
 			      || wlv.vcol < wlv.fromcol
 			      || wlv.vcol >= wlv.tocol))
 	    {
 		// Use wlv.line_attr when not in the Visual or 'incsearch' area
 # ifdef FEAT_SYN_HL
-		wlv.char_attr = hl_combine_attr(syntax_attr, wlv.line_attr);
-# else
-		wlv.char_attr = wlv.line_attr;
+		wlv.char_attr = hl_combine_attr(syntax_attr, wlv.ಸಾಲು_attr);
+# ಇಲ್ಲದಿದ್ದರೆ
+		wlv.char_attr = wlv.ಸಾಲು_attr;
 # endif
 		attr_pri = FALSE;
 	    }
-#else
-	    if (area_attr != 0)
+#ಇಲ್ಲದಿದ್ದರೆ
+	    ಆದರೆ (area_attr != 0)
 		wlv.char_attr = area_attr;
-	    else if (search_attr != 0)
-		wlv.char_attr = search_attr;
-#endif
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಹುಡುಕು_attr != 0)
+		wlv.char_attr = ಹುಡುಕು_attr;
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		attr_pri = FALSE;
-#ifdef FEAT_SYN_HL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
 		wlv.char_attr = syntax_attr;
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 		wlv.char_attr = 0;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
-#ifdef FEAT_PROP_POPUP
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
 	    // override with text property highlight when "override" is TRUE
-	    if (text_prop_type != NULL && (text_prop_flags & PT_FLAG_OVERRIDE))
-		wlv.char_attr = hl_combine_attr(wlv.char_attr, text_prop_attr);
-#endif
+	    ಆದರೆ (ಪಠ್ಯ_prop_type != ಖಾಲಿ && (ಪಠ್ಯ_prop_flags & PT_FLAG_OVERRIDE))
+		wlv.char_attr = hl_combine_attr(wlv.char_attr, ಪಠ್ಯ_prop_attr);
+#ಆದರೆ_ಅಂತ್ಯ
 	}
 
 	// combine attribute with HLF_WIN
-	if (wlv.win_attr != 0)
+	ಆದರೆ (wlv.win_attr != 0)
 	{
-	    if (wlv.char_attr == 0)
+	    ಆದರೆ (wlv.char_attr == 0)
 		wlv.char_attr = wlv.win_attr;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		wlv.char_attr = hl_combine_attr(wlv.win_attr, wlv.char_attr);
 	}
 
@@ -2707,62 +2707,62 @@ win_line(
 	// "p_extra" must end in a NUL to avoid mb_ptr2len() reads past
 	// "p_extra[n_extra]".
 	// For the '$' of the 'list' option, n_extra == 1, p_extra == "".
-	if (wlv.n_extra > 0)
+	ಆದರೆ (wlv.n_extra > 0)
 	{
-	    if (wlv.c_extra != NUL || (wlv.n_extra == 1 && wlv.c_final != NUL))
+	    ಆದರೆ (wlv.c_extra != NUL || (wlv.n_extra == 1 && wlv.c_final != NUL))
 	    {
 		c = (wlv.n_extra == 1 && wlv.c_final != NUL)
 						   ? wlv.c_final : wlv.c_extra;
 		mb_c = c;	// doesn't handle non-utf-8 multi-byte!
-		if (enc_utf8 && utf_char2len(c) > 1)
+		ಆದರೆ (enc_utf8 && utf_char2len(c) > 1)
 		{
 		    mb_utf8 = TRUE;
 		    u8cc[0] = 0;
 		    c = 0xc0;
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		    mb_utf8 = FALSE;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		c = *wlv.p_extra;
-		if (has_mbyte)
+		ಆದರೆ (has_mbyte)
 		{
 		    mb_c = c;
-		    if (enc_utf8)
+		    ಆದರೆ (enc_utf8)
 		    {
 			// If the UTF-8 character is more than one byte:
 			// Decode it into "mb_c".
 			mb_l = utfc_ptr2len(wlv.p_extra);
 			mb_utf8 = FALSE;
-			if (mb_l > wlv.n_extra)
+			ಆದರೆ (mb_l > wlv.n_extra)
 			    mb_l = 1;
-			else if (mb_l > 1)
+			ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (mb_l > 1)
 			{
 			    mb_c = utfc_ptr2char(wlv.p_extra, u8cc);
 			    mb_utf8 = TRUE;
 			    c = 0xc0;
 			}
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
 			// if this is a DBCS character, put it in "mb_c"
 			mb_l = MB_BYTE2LEN(c);
-			if (mb_l >= wlv.n_extra)
+			ಆದರೆ (mb_l >= wlv.n_extra)
 			    mb_l = 1;
-			else if (mb_l > 1)
+			ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (mb_l > 1)
 			    mb_c = (c << 8) + wlv.p_extra[1];
 		    }
-		    if (mb_l == 0)  // at the NUL at end-of-line
+		    ಆದರೆ (mb_l == 0)  // at the NUL at end-of-line
 			mb_l = 1;
 
 		    // If a double-width char doesn't fit display a '>' in the
 		    // last column.
-		    if ((
-#ifdef FEAT_RIGHTLEFT
-			    wp->w_p_rl ? (wlv.col <= 0) :
-#endif
-				    (wlv.col >= wp->w_width - 1))
+		    ಆದರೆ ((
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+			    wp->w_p_rl ? (wlv.ಲಂಬಸಾಲು <= 0) :
+#ಆದರೆ_ಅಂತ್ಯ
+				    (wlv.ಲಂಬಸಾಲು >= wp->w_ಅಗಲ - 1))
 			    && (*mb_char2cells)(mb_c) == 2)
 		    {
 			c = '>';
@@ -2770,11 +2770,11 @@ win_line(
 			mb_l = 1;
 			mb_utf8 = FALSE;
 			multi_attr = HL_ATTR(HLF_AT);
-#ifdef FEAT_SYN_HL
-			if (wlv.cul_attr)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
+			ಆದರೆ (wlv.cul_attr)
 			    multi_attr = hl_combine_attr(
 						     multi_attr, wlv.cul_attr);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 			multi_attr = hl_combine_attr(wlv.win_attr, multi_attr);
 
 			// put the pointer back to output the double-width
@@ -2782,7 +2782,7 @@ win_line(
 			++wlv.n_extra;
 			--wlv.p_extra;
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
 			wlv.n_extra -= mb_l - 1;
 			wlv.p_extra += mb_l - 1;
@@ -2791,19 +2791,19 @@ win_line(
 		++wlv.p_extra;
 	    }
 	    --wlv.n_extra;
-#if defined(FEAT_PROP_POPUP)
-	    if (wlv.n_extra <= 0)
+#ಆದರೆ defined(FEAT_PROP_POPUP)
+	    ಆದರೆ (wlv.n_extra <= 0)
 	    {
 		// Only restore search_attr and area_attr after "n_extra" in
 		// the next screen line is also done.
-		if (wlv.saved_n_extra <= 0)
+		ಆದರೆ (wlv.saved_n_extra <= 0)
 		{
-		    if (search_attr == 0)
-			search_attr = saved_search_attr;
-		    if (area_attr == 0 && *ptr != NUL)
+		    ಆದರೆ (ಹುಡುಕು_attr == 0)
+			ಹುಡುಕು_attr = saved_ಹುಡುಕು_attr;
+		    ಆದರೆ (area_attr == 0 && *ptr != NUL)
 			area_attr = saved_area_attr;
 
-		    if (wlv.extra_for_textprop)
+		    ಆದರೆ (wlv.extra_for_textprop)
 			// wlv.extra_attr should be used at this position but
 			// not any further.
 			reset_extra_attr = TRUE;
@@ -2811,88 +2811,88 @@ win_line(
 
 		wlv.extra_for_textprop = FALSE;
 # ifdef FEAT_LINEBREAK
-		in_linebreak = FALSE;
+		ಒಳ_linebreak = FALSE;
 # endif
 	    }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-#ifdef FEAT_LINEBREAK
-	    int		c0;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
+	    ಪೂರ್ಣಾಂಕ		c0;
+#ಆದರೆ_ಅಂತ್ಯ
 	    char_u	*prev_ptr = ptr;
 
 	    // Get a character from the line itself.
 	    c = *ptr;
-#ifdef FEAT_LINEBREAK
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
 	    c0 = *ptr;
-#endif
-	    if (c == NUL)
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಆದರೆ (c == NUL)
 	    {
-#ifdef FEAT_PROP_POPUP
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
 		// text is finished, may display a "below" virtual text
-		did_line = TRUE;
-#endif
+		did_ಸಾಲು = TRUE;
+#ಆದರೆ_ಅಂತ್ಯ
 		// no more cells to skip
 		skip_cells = 0;
 	    }
 
-	    if (has_mbyte)
+	    ಆದರೆ (has_mbyte)
 	    {
 		mb_c = c;
-		if (enc_utf8)
+		ಆದರೆ (enc_utf8)
 		{
 		    // If the UTF-8 character is more than one byte: Decode it
 		    // into "mb_c".
 		    mb_l = utfc_ptr2len(ptr);
 		    mb_utf8 = FALSE;
-		    if (mb_l > 1)
+		    ಆದರೆ (mb_l > 1)
 		    {
 			mb_c = utfc_ptr2char(ptr, u8cc);
 			// Overlong encoded ASCII or ASCII with composing char
 			// is displayed normally, except a NUL.
-			if (mb_c < 0x80)
+			ಆದರೆ (mb_c < 0x80)
 			{
 			    c = mb_c;
-#ifdef FEAT_LINEBREAK
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
 			    c0 = mb_c;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 			}
 			mb_utf8 = TRUE;
 
 			// At start of the line we can have a composing char.
 			// Draw it as a space with a composing char.
-			if (utf_iscomposing(mb_c))
+			ಆದರೆ (utf_iscomposing(mb_c))
 			{
-			    int i;
+			    ಪೂರ್ಣಾಂಕ i;
 
-			    for (i = Screen_mco - 1; i > 0; --i)
+			    ಗಾಗಿ (i = Screen_mco - 1; i > 0; --i)
 				u8cc[i] = u8cc[i - 1];
 			    u8cc[0] = mb_c;
 			    mb_c = ' ';
 			}
 		    }
 
-		    if ((mb_l == 1 && c >= 0x80)
+		    ಆದರೆ ((mb_l == 1 && c >= 0x80)
 			    || (mb_l >= 1 && mb_c == 0)
 			    || (mb_l > 1 && (!vim_isprintc(mb_c))))
 		    {
 			// Illegal UTF-8 byte: display as <xx>.
 			// Non-BMP character : display as ? or fullwidth ?.
 			transchar_hex(wlv.extra, mb_c);
-#ifdef FEAT_RIGHTLEFT
-			if (wp->w_p_rl)		// reverse
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+			ಆದರೆ (wp->w_p_rl)		//ಹಿಮ್ಮುಖ
 			    rl_mirror(wlv.extra);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 			wlv.p_extra = wlv.extra;
 			c = *wlv.p_extra;
 			mb_c = mb_ptr2char_adv(&wlv.p_extra);
 			mb_utf8 = (c >= 0x80);
-			wlv.n_extra = (int)STRLEN(wlv.p_extra);
+			wlv.n_extra = (ಪೂರ್ಣಾಂಕ)STRLEN(wlv.p_extra);
 			wlv.c_extra = NUL;
 			wlv.c_final = NUL;
-			if (area_attr == 0 && search_attr == 0)
+			ಆದರೆ (area_attr == 0 && ಹುಡುಕು_attr == 0)
 			{
 			    n_attr = wlv.n_extra + 1;
 			    wlv.extra_attr = hl_combine_attr(
@@ -2900,25 +2900,25 @@ win_line(
 			    saved_attr2 = wlv.char_attr; // save current attr
 			}
 		    }
-		    else if (mb_l == 0)  // at the NUL at end-of-line
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (mb_l == 0)  // at the NUL at end-of-line
 			mb_l = 1;
-#ifdef FEAT_ARABIC
-		    else if (p_arshape && !p_tbidi && ARABIC_CHAR(mb_c))
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ARABIC
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p_arshape && !p_tbidi && ARABIC_CHAR(mb_c))
 		    {
 			// Do Arabic shaping.
-			int	pc, pc1, nc;
-			int	pcc[MAX_MCO];
+			ಪೂರ್ಣಾಂಕ	pc, pc1, nc;
+			ಪೂರ್ಣಾಂಕ	pcc[MAX_MCO];
 
 			// The idea of what is the previous and next
 			// character depends on 'rightleft'.
-			if (wp->w_p_rl)
+			ಆದರೆ (wp->w_p_rl)
 			{
 			    pc = prev_c;
 			    pc1 = prev_c1;
 			    nc = utf_ptr2char(ptr + mb_l);
 			    prev_c1 = u8cc[0];
 			}
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
 			    pc = utfc_ptr2char(ptr + mb_l, pcc);
 			    nc = prev_c;
@@ -2928,31 +2928,31 @@ win_line(
 
 			mb_c = arabic_shape(mb_c, &c, &u8cc[0], pc, pc1, nc);
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 			prev_c = mb_c;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		}
-		else	// enc_dbcs
+		ಇಲ್ಲದಿದ್ದರೆ	// enc_dbcs
 		{
 		    mb_l = MB_BYTE2LEN(c);
-		    if (mb_l == 0)  // at the NUL at end-of-line
+		    ಆದರೆ (mb_l == 0)  // at the NUL at end-of-line
 			mb_l = 1;
-		    else if (mb_l > 1)
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (mb_l > 1)
 		    {
 			// We assume a second byte below 32 is illegal.
 			// Hopefully this is OK for all double-byte encodings!
-			if (ptr[1] >= 32)
+			ಆದರೆ (ptr[1] >= 32)
 			    mb_c = (c << 8) + ptr[1];
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
-			    if (ptr[1] == NUL)
+			    ಆದರೆ (ptr[1] == NUL)
 			    {
 				// head byte at end of line
 				mb_l = 1;
-				transchar_nonprint(wp->w_buffer, wlv.extra, c);
-				wlv.n_extra = (int)STRLEN(wlv.extra) - 1;
+				transchar_nonprint(wp->w_ಬಫರ್, wlv.extra, c);
+				wlv.n_extra = (ಪೂರ್ಣಾಂಕ)STRLEN(wlv.extra) - 1;
 			    }
-			    else
+			    ಇಲ್ಲದಿದ್ದರೆ
 			    {
 				// illegal tail byte
 				mb_l = 2;
@@ -2963,7 +2963,7 @@ win_line(
 			    wlv.c_extra = NUL;
 			    wlv.c_final = NUL;
 			    c = *wlv.p_extra++;
-			    if (area_attr == 0 && search_attr == 0)
+			    ಆದರೆ (area_attr == 0 && ಹುಡುಕು_attr == 0)
 			    {
 				n_attr = wlv.n_extra + 1;
 				wlv.extra_attr = hl_combine_attr(
@@ -2978,11 +2978,11 @@ win_line(
 		// If a double-width char doesn't fit display a '>' in the
 		// last column; the character is displayed at the start of the
 		// next line.
-		if ((
-#ifdef FEAT_RIGHTLEFT
-			    wp->w_p_rl ? (wlv.col <= 0) :
-#endif
-				(wlv.col >= wp->w_width - 1))
+		ಆದರೆ ((
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+			    wp->w_p_rl ? (wlv.ಲಂಬಸಾಲು <= 0) :
+#ಆದರೆ_ಅಂತ್ಯ
+				(wlv.ಲಂಬಸಾಲು >= wp->w_ಅಗಲ - 1))
 			&& (*mb_char2cells)(mb_c) == 2)
 		{
 		    c = '>';
@@ -2993,23 +2993,23 @@ win_line(
 		    // Put pointer back so that the character will be
 		    // displayed at the start of the next line.
 		    --ptr;
-#ifdef FEAT_CONCEAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CONCEAL
 		    did_decrement_ptr = TRUE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		}
-		else if (*ptr != NUL)
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*ptr != NUL)
 		    ptr += mb_l - 1;
 
 		// If a double-width char doesn't fit at the left side display
 		// a '<' in the first column.  Don't do this for unprintable
 		// characters.
-		if (skip_cells > 0 && mb_l > 1 && wlv.n_extra == 0)
+		ಆದರೆ (skip_cells > 0 && mb_l > 1 && wlv.n_extra == 0)
 		{
 		    wlv.n_extra = 1;
 		    wlv.c_extra = MB_FILLER_CHAR;
 		    wlv.c_final = NUL;
 		    c = ' ';
-		    if (area_attr == 0 && search_attr == 0)
+		    ಆದರೆ (area_attr == 0 && ಹುಡುಕು_attr == 0)
 		    {
 			n_attr = wlv.n_extra + 1;
 			wlv.extra_attr = hl_combine_attr(
@@ -3024,115 +3024,115 @@ win_line(
 	    }
 	    ++ptr;
 
-	    if (extra_check)
+	    ಆದರೆ (extra_check)
 	    {
-#ifdef FEAT_SPELL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SPELL
 		// Check spelling (unless at the end of the line).
 		// Only do this when there is no syntax highlighting, the
 		// @Spell cluster is not used or the current syntax item
 		// contains the @Spell cluster.
-		v = (long)(ptr - line);
-		if (spv->spv_has_spell && v >= word_end && v > cur_checked_col)
+		v = (ದೀರ್ಘ)(ptr - ಸಾಲು);
+		ಆದರೆ (spv->spv_has_spell && v >= ಶಬ್ದ_ಕೊನೆ && v > cur_checked_ಲಂಬಸಾಲು)
 		{
 		    spell_attr = 0;
 		    // do not calculate cap_col at the end of the line or when
 		    // only white space is following
-		    if (c != 0 && (*skipwhite(prev_ptr) != NUL) && (
+		    ಆದರೆ (c != 0 && (*skipwhite(prev_ptr) != NUL) && (
 # ifdef FEAT_SYN_HL
 				!has_syntax ||
 # endif
 				can_spell))
 		    {
 			char_u	*p;
-			int	len;
-			hlf_T	spell_hlf = HLF_COUNT;
+			ಪೂರ್ಣಾಂಕ	len;
+			hlf_T	spell_hlf = HLF_ಎಣಿಕೆ;
 
-			if (has_mbyte)
+			ಆದರೆ (has_mbyte)
 			    v -= mb_l - 1;
 
 			// Use nextline[] if possible, it has the start of the
 			// next line concatenated.
-			if ((prev_ptr - line) - nextlinecol >= 0)
-			    p = nextline + (prev_ptr - line) - nextlinecol;
-			else
+			ಆದರೆ ((prev_ptr - ಸಾಲು) - nextlinecol >= 0)
+			    p = nextline + (prev_ptr - ಸಾಲು) - nextlinecol;
+			ಇಲ್ಲದಿದ್ದರೆ
 			    p = prev_ptr;
-			spv->spv_cap_col -= (int)(prev_ptr - line);
-			len = spell_check(wp, p, &spell_hlf, &spv->spv_cap_col,
+			spv->spv_cap_ಲಂಬಸಾಲು -= (ಪೂರ್ಣಾಂಕ)(prev_ptr - ಸಾಲು);
+			len = spell_check(wp, p, &spell_hlf, &spv->spv_cap_ಲಂಬಸಾಲು,
 							    spv->spv_unchanged);
-			word_end = v + len;
+			ಶಬ್ದ_ಕೊನೆ = v + len;
 
 			// In Insert mode only highlight a word that
 			// doesn't touch the cursor.
-			if (spell_hlf != HLF_COUNT
-				&& (State & MODE_INSERT)
+			ಆದರೆ (spell_hlf != HLF_ಎಣಿಕೆ
+				&& (State & ಬಹುಲಕ_ಸೇರಿಸು)
 				&& wp->w_cursor.lnum == lnum
-				&& wp->w_cursor.col >=
-						    (colnr_T)(prev_ptr - line)
-				&& wp->w_cursor.col < (colnr_T)word_end)
+				&& wp->w_cursor.ಲಂಬಸಾಲು >=
+						    (colnr_T)(prev_ptr - ಸಾಲು)
+				&& wp->w_cursor.ಲಂಬಸಾಲು < (colnr_T)ಶಬ್ದ_ಕೊನೆ)
 			{
-			    spell_hlf = HLF_COUNT;
+			    spell_hlf = HLF_ಎಣಿಕೆ;
 			    spell_redraw_lnum = lnum;
 			}
 
-			if (spell_hlf == HLF_COUNT && p != prev_ptr
+			ಆದರೆ (spell_hlf == HLF_ಎಣಿಕೆ && p != prev_ptr
 				       && (p - nextline) + len > nextline_idx)
 			{
 			    // Remember that the good word continues at the
 			    // start of the next line.
 			    spv->spv_checked_lnum = lnum + 1;
-			    spv->spv_checked_col = (p - nextline) + len
+			    spv->spv_checked_ಲಂಬಸಾಲು = (p - nextline) + len
 								- nextline_idx;
 			}
 
 			// Turn index into actual attributes.
-			if (spell_hlf != HLF_COUNT)
+			ಆದರೆ (spell_hlf != HLF_ಎಣಿಕೆ)
 			    spell_attr = highlight_attr[spell_hlf];
 
-			if (spv->spv_cap_col > 0)
+			ಆದರೆ (spv->spv_cap_ಲಂಬಸಾಲು > 0)
 			{
-			    if (p != prev_ptr
-				    && (p - nextline) + spv->spv_cap_col
+			    ಆದರೆ (p != prev_ptr
+				    && (p - nextline) + spv->spv_cap_ಲಂಬಸಾಲು
 								>= nextline_idx)
 			    {
 				// Remember that the word in the next line
 				// must start with a capital.
 				spv->spv_capcol_lnum = lnum + 1;
-				spv->spv_cap_col = ((p - nextline)
-					    + spv->spv_cap_col - nextline_idx);
+				spv->spv_cap_ಲಂಬಸಾಲು = ((p - nextline)
+					    + spv->spv_cap_ಲಂಬಸಾಲು - nextline_idx);
 			    }
-			    else
+			    ಇಲ್ಲದಿದ್ದರೆ
 				// Compute the actual column.
-				spv->spv_cap_col += (prev_ptr - line);
+				spv->spv_cap_ಲಂಬಸಾಲು += (prev_ptr - ಸಾಲು);
 			}
 		    }
 		}
-		if (spell_attr != 0)
+		ಆದರೆ (spell_attr != 0)
 		{
-		    if (!attr_pri)
+		    ಆದರೆ (!attr_pri)
 			wlv.char_attr = hl_combine_attr(wlv.char_attr,
 								   spell_attr);
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 			wlv.char_attr = hl_combine_attr(spell_attr,
 								wlv.char_attr);
 		}
-#endif
-#ifdef FEAT_LINEBREAK
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
 		// we don't want linebreak to apply for lines that start with
 		// leading spaces, followed by long letters (since it would add
 		// a break at the beginning of a line and this might be unexpected)
 		//
 		// So only allow to linebreak, once we have found chars not in
 		// 'breakat' in the line.
-		if ( wp->w_p_lbr && !wlv.need_lbr && c != NUL &&
-			!VIM_ISBREAK((int)*ptr))
+		ಆದರೆ ( wp->w_p_lbr && !wlv.need_lbr && c != NUL &&
+			!VIM_ISBREAK((ಪೂರ್ಣಾಂಕ)*ptr))
 		    wlv.need_lbr = TRUE;
-#endif
-#ifdef FEAT_LINEBREAK
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
 		// Found last space before word: check for line break.
-		if (wp->w_p_lbr && c0 == c && wlv.need_lbr
-				  && VIM_ISBREAK(c) && !VIM_ISBREAK((int)*ptr))
+		ಆದರೆ (wp->w_p_lbr && c0 == c && wlv.need_lbr
+				  && VIM_ISBREAK(c) && !VIM_ISBREAK((ಪೂರ್ಣಾಂಕ)*ptr))
 		{
-		    int	    mb_off = has_mbyte ? (*mb_head_off)(line, ptr - 1)
+		    ಪೂರ್ಣಾಂಕ	    mb_off = has_mbyte ? (*mb_ತಲೆ_off)(ಸಾಲು, ptr - 1)
 									   : 0;
 		    char_u  *p = ptr - (mb_off + 1);
 		    chartabsize_T cts;
@@ -3140,64 +3140,64 @@ win_line(
 
 		    colnr_T init_colnr = wlv.vcol;
 # ifdef FEAT_PROP_POPUP
-		    init_colnr -= vcol_first_char;
+		    init_colnr -= vcol_ಮೊದಲ_char;
 # endif
-		    init_chartabsize_arg(&cts, wp, lnum, init_colnr, line, p);
+		    init_chartabsize_arg(&cts, wp, lnum, init_colnr, ಸಾಲು, p);
 
 # ifdef FEAT_PROP_POPUP
 		    // do not want virtual text counted here
-		    cts.cts_has_prop_with_text = FALSE;
+		    cts.cts_has_prop_with_ಪಠ್ಯ = FALSE;
 # endif
 		    // TODO: consider using "tailp" here
-		    wlv.n_extra = win_lbr_chartabsize(&cts, NULL, NULL) - 1;
+		    wlv.n_extra = win_lbr_chartabsize(&cts, ಖಾಲಿ, ಖಾಲಿ) - 1;
 		    clear_chartabsize_arg(&cts);
 
-		    if (on_last_col && c != TAB)
+		    ಆದರೆ (on_ಕೊನೆಯ_ಲಂಬಸಾಲು && c != TAB)
 			// Do not continue search/match highlighting over the
 			// line break, but for TABs the highlighting should
 			// include the complete width of the character
-			search_attr = 0;
+			ಹುಡುಕು_attr = 0;
 
-		    if (c == TAB && wlv.n_extra + wlv.col > wp->w_width)
+		    ಆದರೆ (c == TAB && wlv.n_extra + wlv.ಲಂಬಸಾಲು > wp->w_ಅಗಲ)
 # ifdef FEAT_VARTABS
 			wlv.n_extra = tabstop_padding(wlv.vcol,
-					      wp->w_buffer->b_p_ts,
-					      wp->w_buffer->b_p_vts_array) - 1;
-# else
-			wlv.n_extra = (int)wp->w_buffer->b_p_ts
-				    - wlv.vcol % (int)wp->w_buffer->b_p_ts - 1;
+					      wp->w_ಬಫರ್->b_p_ts,
+					      wp->w_ಬಫರ್->b_p_vts_array) - 1;
+# ಇಲ್ಲದಿದ್ದರೆ
+			wlv.n_extra = (ಪೂರ್ಣಾಂಕ)wp->w_ಬಫರ್->b_p_ts
+				    - wlv.vcol % (ಪೂರ್ಣಾಂಕ)wp->w_ಬಫರ್->b_p_ts - 1;
 # endif
 
 		    wlv.c_extra = mb_off > 0 ? MB_FILLER_CHAR : ' ';
 		    wlv.c_final = NUL;
 # ifdef FEAT_PROP_POPUP
-		    if (wlv.n_extra > 0 && c != TAB)
-			in_linebreak = TRUE;
+		    ಆದರೆ (wlv.n_extra > 0 && c != TAB)
+			ಒಳ_linebreak = TRUE;
 # endif
-		    if (VIM_ISWHITE(c))
+		    ಆದರೆ (VIM_ISWHITE(c))
 		    {
 # ifdef FEAT_CONCEAL
-			if (c == TAB)
+			ಆದರೆ (c == TAB)
 			    // See "Tab alignment" below.
 			    FIX_FOR_BOGUSCOLS;
 # endif
-			if (!wp->w_p_list)
+			ಆದರೆ (!wp->w_p_list)
 			    c = ' ';
 		    }
 		}
-#endif
-		if (wp->w_p_list)
+#ಆದರೆ_ಅಂತ್ಯ
+		ಆದರೆ (wp->w_p_list)
 		{
-		    in_multispace = c == ' ' && (*ptr == ' '
-				  || (prev_ptr > line && prev_ptr[-1] == ' '));
-		    if (!in_multispace)
+		    ಒಳ_multispace = c == ' ' && (*ptr == ' '
+				  || (prev_ptr > ಸಾಲು && prev_ptr[-1] == ' '));
+		    ಆದರೆ (!ಒಳ_multispace)
 			multispace_pos = 0;
 		}
 
 		// 'list': Change char 160 to 'nbsp' and space to 'space'
 		// setting in 'listchars'.  But not when the character is
 		// followed by a composing character (use mb_l to check that).
-		if (wp->w_p_list
+		ಆದರೆ (wp->w_p_list
 			&& ((((c == 160 && mb_l == 1)
 			      || (mb_utf8
 				  && ((mb_c == 160 && mb_l == 2)
@@ -3206,21 +3206,21 @@ win_line(
 			    || (c == ' '
 				&& mb_l == 1
 				&& (wp->w_lcs_chars.space
-				    || (in_multispace
-					&& wp->w_lcs_chars.multispace != NULL))
-				&& ptr - line >= leadcol
-				&& ptr - line <= trailcol)))
+				    || (ಒಳ_multispace
+					&& wp->w_lcs_chars.multispace != ಖಾಲಿ))
+				&& ptr - ಸಾಲು >= leadcol
+				&& ptr - ಸಾಲು <= trailcol)))
 		{
-		    if (in_multispace && wp->w_lcs_chars.multispace != NULL)
+		    ಆದರೆ (ಒಳ_multispace && wp->w_lcs_chars.multispace != ಖಾಲಿ)
 		    {
 			c = wp->w_lcs_chars.multispace[multispace_pos++];
-			if (wp->w_lcs_chars.multispace[multispace_pos] == NUL)
+			ಆದರೆ (wp->w_lcs_chars.multispace[multispace_pos] == NUL)
 			    multispace_pos = 0;
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 			c = (c == ' ') ? wp->w_lcs_chars.space
 					: wp->w_lcs_chars.nbsp;
-		    if (area_attr == 0 && search_attr == 0)
+		    ಆದರೆ (area_attr == 0 && ಹುಡುಕು_attr == 0)
 		    {
 			n_attr = 1;
 			wlv.extra_attr = hl_combine_attr(wlv.win_attr,
@@ -3228,39 +3228,39 @@ win_line(
 			saved_attr2 = wlv.char_attr; // save current attr
 		    }
 		    mb_c = c;
-		    if (enc_utf8 && utf_char2len(c) > 1)
+		    ಆದರೆ (enc_utf8 && utf_char2len(c) > 1)
 		    {
 			mb_utf8 = TRUE;
 			u8cc[0] = 0;
 			c = 0xc0;
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 			mb_utf8 = FALSE;
 		}
 
-		if (c == ' ' && ((trailcol != MAXCOL && ptr > line + trailcol)
-				    || (leadcol != 0 && ptr < line + leadcol)))
+		ಆದರೆ (c == ' ' && ((trailcol != MAXCOL && ptr > ಸಾಲು + trailcol)
+				    || (leadcol != 0 && ptr < ಸಾಲು + leadcol)))
 		{
-		    if (leadcol != 0 && in_multispace && ptr < line + leadcol
-			    && wp->w_lcs_chars.leadmultispace != NULL)
+		    ಆದರೆ (leadcol != 0 && ಒಳ_multispace && ptr < ಸಾಲು + leadcol
+			    && wp->w_lcs_chars.leadmultispace != ಖಾಲಿ)
 		    {
 			c = wp->w_lcs_chars.leadmultispace[multispace_pos++];
-			if (wp->w_lcs_chars.leadmultispace[multispace_pos]
+			ಆದರೆ (wp->w_lcs_chars.leadmultispace[multispace_pos]
 									== NUL)
 			    multispace_pos = 0;
 		    }
 
-		    else if (ptr > line + trailcol && wp->w_lcs_chars.trail)
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ptr > ಸಾಲು + trailcol && wp->w_lcs_chars.trail)
 			c = wp->w_lcs_chars.trail;
 
-		    else if (ptr < line + leadcol && wp->w_lcs_chars.lead)
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ptr < ಸಾಲು + leadcol && wp->w_lcs_chars.lead)
 			c = wp->w_lcs_chars.lead;
 
-		    else if (leadcol != 0 && wp->w_lcs_chars.space)
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (leadcol != 0 && wp->w_lcs_chars.space)
 			c = wp->w_lcs_chars.space;
 
 
-		    if (!attr_pri)
+		    ಆದರೆ (!attr_pri)
 		    {
 			n_attr = 1;
 			wlv.extra_attr = hl_combine_attr(wlv.win_attr,
@@ -3268,120 +3268,120 @@ win_line(
 			saved_attr2 = wlv.char_attr; // save current attr
 		    }
 		    mb_c = c;
-		    if (enc_utf8 && utf_char2len(c) > 1)
+		    ಆದರೆ (enc_utf8 && utf_char2len(c) > 1)
 		    {
 			mb_utf8 = TRUE;
 			u8cc[0] = 0;
 			c = 0xc0;
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 			mb_utf8 = FALSE;
 		}
 	    }
 
 	    // Handling of non-printable characters. 'isprint' does not apply
 	    // to a UTF-8 leading byte, the character was checked above.
-	    if (!vim_isprintc(c) && !(enc_utf8 && c >= 0x80))
+	    ಆದರೆ (!vim_isprintc(c) && !(enc_utf8 && c >= 0x80))
 	    {
 		// when getting a character from the file, we may have to
 		// turn it into something else on the way to putting it
 		// into "ScreenLines".
-		if (c == TAB && (!wp->w_p_list || wp->w_lcs_chars.tab1))
+		ಆದರೆ (c == TAB && (!wp->w_p_list || wp->w_lcs_chars.tab1))
 		{
-		    int	    tab_len = 0;
+		    ಪೂರ್ಣಾಂಕ	    tab_len = 0;
 		    // Virtual text and 'showbreak' do not count for the size
 		    // of a Tab.
-		    long    vcol_adjusted = wlv.vcol - wlv.vcol_off_tp;
-		    int	    lcs_tab1 = wp->w_lcs_chars.tab1;
-		    int	    lcs_tab2 = wp->w_lcs_chars.tab2;
-		    int	    lcs_tab3 = wp->w_lcs_chars.tab3;
+		    ದೀರ್ಘ    vcol_adjusted = wlv.vcol - wlv.vcol_off_tp;
+		    ಪೂರ್ಣಾಂಕ	    lcs_tab1 = wp->w_lcs_chars.tab1;
+		    ಪೂರ್ಣಾಂಕ	    lcs_tab2 = wp->w_lcs_chars.tab2;
+		    ಪೂರ್ಣಾಂಕ	    lcs_tab3 = wp->w_lcs_chars.tab3;
 
 		    // check if leadtab is set in 'listchars'
-		    if (wp->w_p_list && wp->w_lcs_chars.leadtab1 != NUL &&
-							  ptr < line + leadcol)
+		    ಆದರೆ (wp->w_p_list && wp->w_lcs_chars.leadtab1 != NUL &&
+							  ptr < ಸಾಲು + leadcol)
 		    {
 			lcs_tab1 = wp->w_lcs_chars.leadtab1;
 			lcs_tab2 = wp->w_lcs_chars.leadtab2;
 			lcs_tab3 = wp->w_lcs_chars.leadtab3;
 		    }
-#ifdef FEAT_LINEBREAK
-		    char_u  *sbr = get_showbreak_value(wp);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
+		    char_u  *sbr = get_showbreak_ಮೌಲ್ಯ(wp);
 
 		    // only adjust the tab_len, when at the first column
 		    // after the showbreak value was drawn
-		    if (*sbr != NUL && wlv.vcol == wlv.vcol_sbr && wp->w_p_wrap)
+		    ಆದರೆ (*sbr != NUL && wlv.vcol == wlv.vcol_sbr && wp->w_p_wrap)
 			vcol_adjusted -= MB_CHARLEN(sbr);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		    // tab amount depends on current column
-#ifdef FEAT_VARTABS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
 		    tab_len = tabstop_padding(vcol_adjusted,
-					      wp->w_buffer->b_p_ts,
-					      wp->w_buffer->b_p_vts_array) - 1;
-#else
-		    tab_len = (int)wp->w_buffer->b_p_ts
-			       - vcol_adjusted % (int)wp->w_buffer->b_p_ts - 1;
-#endif
+					      wp->w_ಬಫರ್->b_p_ts,
+					      wp->w_ಬಫರ್->b_p_vts_array) - 1;
+#ಇಲ್ಲದಿದ್ದರೆ
+		    tab_len = (ಪೂರ್ಣಾಂಕ)wp->w_ಬಫರ್->b_p_ts
+			       - vcol_adjusted % (ಪೂರ್ಣಾಂಕ)wp->w_ಬಫರ್->b_p_ts - 1;
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_LINEBREAK
-		    if (!wp->w_p_lbr || !wp->w_p_list)
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
+		    ಆದರೆ (!wp->w_p_lbr || !wp->w_p_list)
+#ಆದರೆ_ಅಂತ್ಯ
 		    {
 			// tab amount depends on current column
 			wlv.n_extra = tab_len;
 		    }
-#ifdef FEAT_LINEBREAK
-		    else
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
 			char_u	*p;
-			int	len;
-			int	i;
-			int	saved_nextra = wlv.n_extra;
+			ಪೂರ್ಣಾಂಕ	len;
+			ಪೂರ್ಣಾಂಕ	i;
+			ಪೂರ್ಣಾಂಕ	saved_nextra = wlv.n_extra;
 
 # ifdef FEAT_CONCEAL
-			if (wlv.vcol_off_co > 0)
+			ಆದರೆ (wlv.vcol_off_co > 0)
 			    // there are characters to conceal
 			    tab_len += wlv.vcol_off_co;
 
 			// boguscols before FIX_FOR_BOGUSCOLS macro from above
-			if (wp->w_p_list && lcs_tab1 &&
+			ಆದರೆ (wp->w_p_list && lcs_tab1 &&
 			    old_boguscols > 0 &&
 			    wlv.n_extra > tab_len)
 			    tab_len += wlv.n_extra - tab_len;
 # endif
-			if (tab_len > 0)
+			ಆದರೆ (tab_len > 0)
 			{
 			    // If wlv.n_extra > 0, it gives the number of chars
 			    // to use for a tab, else we need to calculate the
 			    // width for a tab.
-			    int tab2_len = mb_char2len(lcs_tab2);
+			    ಪೂರ್ಣಾಂಕ tab2_len = mb_char2len(lcs_tab2);
 			    len = tab_len * tab2_len;
-			    if (lcs_tab3)
+			    ಆದರೆ (lcs_tab3)
 				len += mb_char2len(lcs_tab3) - tab2_len;
-			    if (wlv.n_extra > 0)
+			    ಆದರೆ (wlv.n_extra > 0)
 				len += wlv.n_extra - tab_len;
 			    c = lcs_tab1;
 			    p = alloc(len + 1);
-			    if (p == NULL)
+			    ಆದರೆ (p == ಖಾಲಿ)
 				wlv.n_extra = 0;
-			    else
+			    ಇಲ್ಲದಿದ್ದರೆ
 			    {
 				vim_memset(p, ' ', len);
 				p[len] = NUL;
 				vim_free(wlv.p_extra_free);
 				wlv.p_extra_free = p;
-				for (i = 0; i < tab_len; i++)
+				ಗಾಗಿ (i = 0; i < tab_len; i++)
 				{
-				    int lcs = lcs_tab2;
+				    ಪೂರ್ಣಾಂಕ lcs = lcs_tab2;
 
-				    if (*p == NUL)
+				    ಆದರೆ (*p == NUL)
 				    {
 					tab_len = i;
-					break;
+					ನಿಲ್ಲಿಸು;
 				    }
 
 				    // if tab3 is given, use it for the last
 				    // char
-				    if (lcs_tab3 && i == tab_len - 1)
+				    ಆದರೆ (lcs_tab3 && i == tab_len - 1)
 					lcs = lcs_tab3;
 				    p += mb_char2bytes(lcs, p);
 				    wlv.n_extra += mb_char2len(lcs)
@@ -3392,16 +3392,16 @@ win_line(
 				// n_extra will be increased by
 				// FIX_FOX_BOGUSCOLS macro below, so need to
 				// adjust for that here
-				if (wlv.vcol_off_co > 0)
+				ಆದರೆ (wlv.vcol_off_co > 0)
 				    wlv.n_extra -= wlv.vcol_off_co;
 # endif
 			    }
 			}
 		    }
-#endif
-#ifdef FEAT_CONCEAL
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CONCEAL
 		    {
-			int vc_saved = wlv.vcol_off_co;
+			ಪೂರ್ಣಾಂಕ vc_saved = wlv.vcol_off_co;
 
 			// Tab alignment should be identical regardless of
 			// 'conceallevel' value. So tab compensates of all
@@ -3414,22 +3414,22 @@ win_line(
 			// Make sure, the highlighting for the tab char will be
 			// correctly set further below (effectively reverts the
 			// FIX_FOR_BOGUSCOLS macro).
-			if (wlv.n_extra == tab_len + vc_saved && wp->w_p_list
+			ಆದರೆ (wlv.n_extra == tab_len + vc_saved && wp->w_p_list
 						&& wp->w_lcs_chars.tab1)
 			    tab_len += vc_saved;
 		    }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		    mb_utf8 = FALSE;	// don't draw as UTF-8
-		    if (wp->w_p_list)
+		    ಆದರೆ (wp->w_p_list)
 		    {
 			c = (wlv.n_extra == 0 && lcs_tab3)  ? lcs_tab3
 							    : lcs_tab1;
-#ifdef FEAT_LINEBREAK
-			if (wp->w_p_lbr && wlv.p_extra != NULL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
+			ಆದರೆ (wp->w_p_lbr && wlv.p_extra != ಖಾಲಿ
 							&& *wlv.p_extra != NUL)
 			    wlv.c_extra = NUL; // using p_extra from above
-			else
-#endif
+			ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 			    wlv.c_extra = lcs_tab2;
 			wlv.c_final = lcs_tab3;
 			n_attr = tab_len + 1;
@@ -3437,102 +3437,102 @@ win_line(
 							       HL_ATTR(HLF_8));
 			saved_attr2 = wlv.char_attr; // save current attr
 			mb_c = c;
-			if (enc_utf8 && utf_char2len(c) > 1)
+			ಆದರೆ (enc_utf8 && utf_char2len(c) > 1)
 			{
 			    mb_utf8 = TRUE;
 			    u8cc[0] = 0;
 			    c = 0xc0;
 			}
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
 			wlv.c_final = NUL;
 			wlv.c_extra = ' ';
 			c = ' ';
 		    }
 		}
-		else if (c == NUL
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (c == NUL
 			&& wlv.n_extra == 0
 			&& (wp->w_p_list
 			    || (wlv.fromcol >= 0
 				&& wlv.tocol > wlv.vcol
-				&& VIsual_mode != Ctrl_V
+				&& VIsual_ಬಹುಲಕ != Ctrl_V
 				&& (
-#ifdef FEAT_RIGHTLEFT
-				    wp->w_p_rl ? (wlv.col >= 0) :
-#endif
-				    (wlv.col < wp->w_width))))
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+				    wp->w_p_rl ? (wlv.ಲಂಬಸಾಲು >= 0) :
+#ಆದರೆ_ಅಂತ್ಯ
+				    (wlv.ಲಂಬಸಾಲು < wp->w_ಅಗಲ))))
 			&& lcs_eol_one > 0)
 		{
 		    // Display a '$' after the line or highlight an extra
 		    // character if the line break is included.
-#if defined(FEAT_DIFF) || defined(LINE_ATTR)
+#ಆದರೆ defined(FEAT_DIFF) || defined(ಸಾಲು_ATTR)
 		    // For a diff line the highlighting continues after the
 		    // "$".
-		    if (
+		    ಆದರೆ (
 # ifdef FEAT_DIFF
 			    wlv.diff_hlf == (hlf_T)0
-#  ifdef LINE_ATTR
+#  ifdef ಸಾಲು_ATTR
 			    &&
 #  endif
 # endif
-# ifdef LINE_ATTR
-			    wlv.line_attr == 0
+# ifdef ಸಾಲು_ATTR
+			    wlv.ಸಾಲು_attr == 0
 # endif
 		       )
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		    {
 			// In virtualedit, visual selections may extend
 			// beyond end of line.
-			if (!(area_highlighting && virtual_active()
+			ಆದರೆ (!(area_highlighting && virtual_ಸಕ್ರಿಯ()
 				       && wlv.tocol != MAXCOL
 				       && wlv.vcol < wlv.tocol))
 			    wlv.p_extra = (char_u *)"";
 			wlv.n_extra = 0;
 		    }
-		    if (wp->w_p_list && wp->w_lcs_chars.eol > 0)
+		    ಆದರೆ (wp->w_p_list && wp->w_lcs_chars.eol > 0)
 			c = wp->w_lcs_chars.eol;
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 			c = ' ';
 		    lcs_eol_one = -1;
 		    --ptr;	    // put it back at the NUL
-		    if (!attr_pri)
+		    ಆದರೆ (!attr_pri)
 		    {
 			wlv.extra_attr = hl_combine_attr(wlv.win_attr,
 							      HL_ATTR(HLF_AT));
 			n_attr = 1;
 		    }
 		    mb_c = c;
-		    if (enc_utf8 && utf_char2len(c) > 1)
+		    ಆದರೆ (enc_utf8 && utf_char2len(c) > 1)
 		    {
 			mb_utf8 = TRUE;
 			u8cc[0] = 0;
 			c = 0xc0;
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 			mb_utf8 = FALSE;	// don't draw as UTF-8
 		}
-		else if (c != NUL)
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (c != NUL)
 		{
-		    wlv.p_extra = transchar_buf(wp->w_buffer, c);
-		    if (wlv.n_extra == 0)
+		    wlv.p_extra = transchar_buf(wp->w_ಬಫರ್, c);
+		    ಆದರೆ (wlv.n_extra == 0)
 			wlv.n_extra = byte2cells(c) - 1;
-#ifdef FEAT_RIGHTLEFT
-		    if ((dy_flags & DY_UHEX) && wp->w_p_rl)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+		    ಆದರೆ ((dy_flags & DY_UHEX) && wp->w_p_rl)
 			rl_mirror(wlv.p_extra);	// reverse "<12>"
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		    wlv.c_extra = NUL;
 		    wlv.c_final = NUL;
-#ifdef FEAT_LINEBREAK
-		    if (wp->w_p_lbr)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
+		    ಆದರೆ (wp->w_p_lbr)
 		    {
 			char_u *p;
 
 			c = *wlv.p_extra;
 			p = alloc(wlv.n_extra + 1);
-			if (p == NULL)
+			ಆದರೆ (p == ಖಾಲಿ)
 			    wlv.n_extra = 0;
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
 			    vim_memset(p, ' ', wlv.n_extra);
 			    STRNCPY(p, wlv.p_extra + 1, STRLEN(wlv.p_extra) - 1);
@@ -3541,329 +3541,329 @@ win_line(
 			    wlv.p_extra_free = wlv.p_extra = p;
 			}
 		    }
-		    else
-#endif
+		    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 		    {
 			wlv.n_extra = byte2cells(c) - 1;
 			c = *wlv.p_extra++;
 		    }
-		    if (!attr_pri)
+		    ಆದರೆ (!attr_pri)
 		    {
 			n_attr = wlv.n_extra + 1;
 			wlv.extra_attr = hl_combine_attr(wlv.win_attr,
 							       HL_ATTR(HLF_8));
-#ifdef FEAT_PROP_POPUP
-			if (text_prop_type != NULL &&
-				 text_prop_flags & PT_FLAG_OVERRIDE)
-			    wlv.extra_attr = hl_combine_attr(text_prop_attr,
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+			ಆದರೆ (ಪಠ್ಯ_prop_type != ಖಾಲಿ &&
+				 ಪಠ್ಯ_prop_flags & PT_FLAG_OVERRIDE)
+			    wlv.extra_attr = hl_combine_attr(ಪಠ್ಯ_prop_attr,
 							       wlv.extra_attr);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 			saved_attr2 = wlv.char_attr; // save current attr
 		    }
 		    mb_utf8 = FALSE;	// don't draw as UTF-8
 		}
-		else if (VIsual_active
-			 && (VIsual_mode == Ctrl_V
-			     || VIsual_mode == 'v')
-			 && virtual_active()
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (VIsual_ಸಕ್ರಿಯ
+			 && (VIsual_ಬಹುಲಕ == Ctrl_V
+			     || VIsual_ಬಹುಲಕ == 'v')
+			 && virtual_ಸಕ್ರಿಯ()
 			 && wlv.tocol != MAXCOL
 			 && wlv.vcol < wlv.tocol
 			 && (
-#ifdef FEAT_RIGHTLEFT
-			    wp->w_p_rl ? (wlv.col >= 0) :
-#endif
-			    (wlv.col < wp->w_width)))
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+			    wp->w_p_rl ? (wlv.ಲಂಬಸಾಲು >= 0) :
+#ಆದರೆ_ಅಂತ್ಯ
+			    (wlv.ಲಂಬಸಾಲು < wp->w_ಅಗಲ)))
 		{
 		    c = ' ';
 		    --ptr;	    // put it back at the NUL
 		}
-#if defined(LINE_ATTR)
-		else if ((
+#ಆದರೆ defined(ಸಾಲು_ATTR)
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((
 # ifdef FEAT_DIFF
 			    wlv.diff_hlf != (hlf_T)0 ||
 # endif
 # ifdef FEAT_TERMINAL
 			    wlv.win_attr != 0 ||
 # endif
-			    wlv.line_attr != 0
+			    wlv.ಸಾಲು_attr != 0
 			) && (
 # ifdef FEAT_RIGHTLEFT
-			    wp->w_p_rl ? (wlv.col >= 0) :
+			    wp->w_p_rl ? (wlv.ಲಂಬಸಾಲು >= 0) :
 # endif
-			    (wlv.col
+			    (wlv.ಲಂಬಸಾಲು
 # ifdef FEAT_CONCEAL
 				- wlv.boguscols
 # endif
-					    < wp->w_width)))
+					    < wp->w_ಅಗಲ)))
 		{
 		    // Highlight until the right side of the window
 		    c = ' ';
 		    --ptr;	    // put it back at the NUL
 
 		    // Remember we do the char for line highlighting.
-		    ++did_line_attr;
+		    ++did_ಸಾಲು_attr;
 
 		    // don't do search HL for the rest of the line
-		    if (wlv.line_attr != 0 && wlv.char_attr == search_attr
-					&& (did_line_attr > 1
+		    ಆದರೆ (wlv.ಸಾಲು_attr != 0 && wlv.char_attr == ಹುಡುಕು_attr
+					&& (did_ಸಾಲು_attr > 1
 					    || (wp->w_p_list &&
 						wp->w_lcs_chars.eol > 0)))
-			wlv.char_attr = wlv.line_attr;
+			wlv.char_attr = wlv.ಸಾಲು_attr;
 # ifdef FEAT_SIGNS
 		    // At end of line: if Sign is present with line highlight, reset char_attr
 		    // but not when cursorline is active
-		    if (sign_present && wlv.sattr.sat_linehl > 0 && wlv.draw_state == WL_LINE
+		    ಆದರೆ (sign_present && wlv.sattr.sat_linehl > 0 && wlv.draw_state == WL_ಸಾಲು
 			 && !(wp->w_p_cul && lnum == wp->w_cursor.lnum))
 			wlv.char_attr = wlv.sattr.sat_linehl;
 # endif
 # ifdef FEAT_DIFF
-		    if (wlv.diff_hlf == HLF_TXD || wlv.diff_hlf == HLF_TXA)
+		    ಆದರೆ (wlv.diff_hlf == HLF_TXD || wlv.diff_hlf == HLF_TXA)
 		    {
 			wlv.diff_hlf = HLF_CHD;
-			if (vi_attr == 0 || wlv.char_attr != vi_attr)
+			ಆದರೆ (vi_attr == 0 || wlv.char_attr != vi_attr)
 			{
 			    wlv.char_attr = HL_ATTR(wlv.diff_hlf);
-			    if (wp->w_p_cul && lnum == wp->w_cursor.lnum
+			    ಆದರೆ (wp->w_p_cul && lnum == wp->w_cursor.lnum
 				    && wp->w_p_culopt_flags != CULOPT_NBR
 				    && (!wlv.cul_screenline
-					|| (wlv.vcol >= left_curline_col
-					    && wlv.vcol <= right_curline_col)))
+					|| (wlv.vcol >= ಎಡ_curline_ಲಂಬಸಾಲು
+					    && wlv.vcol <= ಬಲ_curline_ಲಂಬಸಾಲು)))
 				wlv.char_attr = hl_combine_attr(
 					  wlv.char_attr, HL_ATTR(HLF_CUL));
 			}
 		    }
 # endif
 # ifdef FEAT_TERMINAL
-		    if (wlv.win_attr != 0)
+		    ಆದರೆ (wlv.win_attr != 0)
 		    {
 			wlv.char_attr = wlv.win_attr;
-			if (wp->w_p_cul && lnum == wp->w_cursor.lnum
+			ಆದರೆ (wp->w_p_cul && lnum == wp->w_cursor.lnum
 				    && wp->w_p_culopt_flags != CULOPT_NBR)
 			{
-			    if (!wlv.cul_screenline
-				    || (wlv.vcol >= left_curline_col
-					     && wlv.vcol <= right_curline_col))
+			    ಆದರೆ (!wlv.cul_screenline
+				    || (wlv.vcol >= ಎಡ_curline_ಲಂಬಸಾಲು
+					     && wlv.vcol <= ಬಲ_curline_ಲಂಬಸಾಲು))
 				wlv.char_attr = hl_combine_attr(
 					      wlv.char_attr, HL_ATTR(HLF_CUL));
 			}
-			else if (wlv.line_attr)
+			ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (wlv.ಸಾಲು_attr)
 			    wlv.char_attr = hl_combine_attr(
-						 wlv.char_attr, wlv.line_attr);
+						 wlv.char_attr, wlv.ಸಾಲು_attr);
 			// Show a Visual or search highlight on the first cell
 			// of an empty line, on top of the background color.
-			if (wlv.vcol == 0)
+			ಆದರೆ (wlv.vcol == 0)
 			{
-			    if (area_attr != 0)
+			    ಆದರೆ (area_attr != 0)
 				wlv.char_attr = hl_combine_attr(
 						     wlv.char_attr, area_attr);
-			    else if (search_attr != 0)
+			    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಹುಡುಕು_attr != 0)
 				wlv.char_attr = hl_combine_attr(
-						   wlv.char_attr, search_attr);
+						   wlv.char_attr, ಹುಡುಕು_attr);
 			}
 		    }
 # endif
 		}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
 
-#ifdef FEAT_CONCEAL
-	    if (   wp->w_p_cole > 0
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CONCEAL
+	    ಆದರೆ (   wp->w_p_cole > 0
 		&& (wp != curwin || lnum != wp->w_cursor.lnum
-						    || conceal_cursor_line(wp))
-		&& ((syntax_flags & HL_CONCEAL) != 0 || has_match_conc > 0)
-		&& !(lnum_in_visual_area
-				    && vim_strchr(wp->w_p_cocu, 'v') == NULL))
+						    || conceal_cursor_ಸಾಲು(wp))
+		&& ((syntax_flags & HL_CONCEAL) != 0 || has_ಹೊಂದಿಕೆ_conc > 0)
+		&& !(lnum_ಒಳ_visual_area
+				    && vim_strchr(wp->w_p_cocu, 'v') == ಖಾಲಿ))
 	    {
-		int syntax_conceal = (syntax_flags & HL_CONCEAL) != 0;
+		ಪೂರ್ಣಾಂಕ syntax_conceal = (syntax_flags & HL_CONCEAL) != 0;
 		wlv.char_attr = conceal_attr;
-		if (((prev_syntax_id != syntax_seqnr && syntax_conceal)
-			    || has_match_conc > 1)
+		ಆದರೆ (((prev_syntax_id != syntax_seqnr && syntax_conceal)
+			    || has_ಹೊಂದಿಕೆ_conc > 1)
 			&& ((syntax_conceal && syn_get_sub_char() != NUL)
-				|| (has_match_conc && match_conc)
+				|| (has_ಹೊಂದಿಕೆ_conc && ಹೊಂದಿಕೆ_conc)
 				|| wp->w_p_cole == 1)
 			&& wp->w_p_cole != 3)
 		{
 		    // First time at this concealed item: display one
 		    // character.
-		    if (has_match_conc && match_conc)
-			c = match_conc;
-		    else if (syntax_conceal && syn_get_sub_char() != NUL)
+		    ಆದರೆ (has_ಹೊಂದಿಕೆ_conc && ಹೊಂದಿಕೆ_conc)
+			c = ಹೊಂದಿಕೆ_conc;
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (syntax_conceal && syn_get_sub_char() != NUL)
 			c = syn_get_sub_char();
-		    else if (wp->w_lcs_chars.conceal != NUL)
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (wp->w_lcs_chars.conceal != NUL)
 			c = wp->w_lcs_chars.conceal;
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 			c = ' ';
 
-		    if (has_mbyte && (*mb_char2cells)(mb_c) > 1)
+		    ಆದರೆ (has_mbyte && (*mb_char2cells)(mb_c) > 1)
 			// When the first char to be concealed is double-width,
 			// need to advance one more virtual column.
 			wlv.n_extra++;
 
 		    mb_c = c;
-		    if (enc_utf8 && utf_char2len(c) > 1)
+		    ಆದರೆ (enc_utf8 && utf_char2len(c) > 1)
 		    {
 			mb_utf8 = TRUE;
 			u8cc[0] = 0;
 			c = 0xc0;
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 			mb_utf8 = FALSE;	// don't draw as UTF-8
 
 		    prev_syntax_id = syntax_seqnr;
 
-		    if (wlv.n_extra > 0)
+		    ಆದರೆ (wlv.n_extra > 0)
 			wlv.vcol_off_co += wlv.n_extra;
 		    wlv.vcol += wlv.n_extra;
-		    if (wp->w_p_wrap && wlv.n_extra > 0)
+		    ಆದರೆ (wp->w_p_wrap && wlv.n_extra > 0)
 		    {
 # ifdef FEAT_RIGHTLEFT
-			if (wp->w_p_rl)
+			ಆದರೆ (wp->w_p_rl)
 			{
-			    wlv.col -= wlv.n_extra;
+			    wlv.ಲಂಬಸಾಲು -= wlv.n_extra;
 			    wlv.boguscols -= wlv.n_extra;
 			}
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 # endif
 			{
 			    wlv.boguscols += wlv.n_extra;
-			    wlv.col += wlv.n_extra;
+			    wlv.ಲಂಬಸಾಲು += wlv.n_extra;
 			}
 		    }
 		    wlv.n_extra = 0;
 		    n_attr = 0;
 		}
-		else if (skip_cells == 0)
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (skip_cells == 0)
 		{
 		    is_concealing = TRUE;
 		    skip_cells = 1;
 		}
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		prev_syntax_id = 0;
 		is_concealing = FALSE;
 	    }
 
-	    if (skip_cells > 0 && did_decrement_ptr)
+	    ಆದರೆ (skip_cells > 0 && did_decrement_ptr)
 		// not showing the '>', put pointer back to avoid getting stuck
 		++ptr;
 
-#endif // FEAT_CONCEAL
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_CONCEAL
 	}
 
-#ifdef FEAT_CONCEAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CONCEAL
 	// In the cursor line and we may be concealing characters: correct
 	// the cursor column when we reach its position.
 	// With 'virtualedit' we may never reach cursor position, but we still
 	// need to correct the cursor column, so do that at end of line.
-	if (!did_wcol && wlv.draw_state == WL_LINE
-		&& in_curline && conceal_cursor_line(wp)
+	ಆದರೆ (!did_wcol && wlv.draw_state == WL_ಸಾಲು
+		&& ಒಳ_curline && conceal_cursor_ಸಾಲು(wp)
 		&& (wlv.vcol + skip_cells >= wp->w_virtcol || c == NUL))
 	{
 # ifdef FEAT_RIGHTLEFT
-	    if (wp->w_p_rl)
-		wp->w_wcol = wp->w_width - wlv.col + wlv.boguscols - 1;
-	    else
+	    ಆದರೆ (wp->w_p_rl)
+		wp->w_wcol = wp->w_ಅಗಲ - wlv.ಲಂಬಸಾಲು + wlv.boguscols - 1;
+	    ಇಲ್ಲದಿದ್ದರೆ
 # endif
-		wp->w_wcol = wlv.col - wlv.boguscols;
+		wp->w_wcol = wlv.ಲಂಬಸಾಲು - wlv.boguscols;
 	    // Screen cells concealed before the cursor on this screen line, so
 	    // pum_display() can line the menu up with the visible text;
 	    // "skip_cells" is the concealed cell at the cursor not yet counted.
 	    wp->w_wcol_conceal_off = wlv.vcol_off_co + skip_cells;
-	    if (wlv.vcol + skip_cells < wp->w_virtcol)
+	    ಆದರೆ (wlv.vcol + skip_cells < wp->w_virtcol)
 		// Cursor beyond end of the line with 'virtualedit'.
 		wp->w_wcol += wp->w_virtcol - wlv.vcol - skip_cells;
-	    wp->w_wrow = wlv.row;
+	    wp->w_wrow = wlv.ಅಡ್ಡಸಾಲು;
 	    did_wcol = TRUE;
 	    curwin->w_valid |= VALID_WCOL|VALID_WROW|VALID_VIRTCOL;
 # ifdef FEAT_PROP_POPUP
 	    curwin->w_flags &= ~(WFLAG_WCOL_OFF_ADDED | WFLAG_WROW_OFF_ADDED);
 # endif
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 	// Use "wlv.extra_attr", but don't override visual selection
 	// highlighting, unless text property overrides.
 	// Don't use "wlv.extra_attr" until wlv.n_attr_skip is zero.
-	if (wlv.n_attr_skip == 0 && n_attr > 0
-		&& wlv.draw_state == WL_LINE
+	ಆದರೆ (wlv.n_attr_skip == 0 && n_attr > 0
+		&& wlv.draw_state == WL_ಸಾಲು
 		&& (!attr_pri
-#ifdef FEAT_PROP_POPUP
-		    || (text_prop_flags & PT_FLAG_OVERRIDE)
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+		    || (ಪಠ್ಯ_prop_flags & PT_FLAG_OVERRIDE)
+#ಆದರೆ_ಅಂತ್ಯ
 		   ))
 	{
-#ifdef LINE_ATTR
-	    if (wlv.line_attr)
-		wlv.char_attr = hl_combine_attr(wlv.line_attr, wlv.extra_attr);
-	    else
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ಸಾಲು_ATTR
+	    ಆದರೆ (wlv.ಸಾಲು_attr)
+		wlv.char_attr = hl_combine_attr(wlv.ಸಾಲು_attr, wlv.extra_attr);
+	    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 		wlv.char_attr = wlv.extra_attr;
-#ifdef FEAT_PROP_POPUP
-	    if (reset_extra_attr)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+	    ಆದರೆ (reset_extra_attr)
 	    {
 		reset_extra_attr = FALSE;
 		wlv.extra_attr = 0;
 	    }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	}
 
-#if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
+#ಆದರೆ defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
 	// XIM don't send preedit_start and preedit_end, but they send
 	// preedit_changed and commit.  Thus Vim can't set "im_is_active", use
 	// im_is_preediting() here.
-	if (p_imst == IM_ON_THE_SPOT
-		&& xic != NULL
+	ಆದರೆ (p_imst == IM_ON_THE_SPOT
+		&& xic != ಖಾಲಿ
 		&& lnum == wp->w_cursor.lnum
-		&& (State & MODE_INSERT)
+		&& (State & ಬಹುಲಕ_ಸೇರಿಸು)
 		&& !p_imdisable
 		&& im_is_preediting()
-		&& wlv.draw_state == WL_LINE)
+		&& wlv.draw_state == WL_ಸಾಲು)
 	{
 	    colnr_T tcol;
 
-	    if (preedit_end_col == MAXCOL)
-		getvcol(curwin, &(wp->w_cursor), &tcol, NULL, NULL, 0);
-	    else
-		tcol = preedit_end_col;
-	    if ((long)preedit_start_col <= wlv.vcol && wlv.vcol < (long)tcol)
+	    ಆದರೆ (preedit_ಕೊನೆ_ಲಂಬಸಾಲು == MAXCOL)
+		getvcol(curwin, &(wp->w_cursor), &tcol, ಖಾಲಿ, ಖಾಲಿ, 0);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		tcol = preedit_ಕೊನೆ_ಲಂಬಸಾಲು;
+	    ಆದರೆ ((ದೀರ್ಘ)preedit_ಆರಂಭ_ಲಂಬಸಾಲು <= wlv.vcol && wlv.vcol < (ದೀರ್ಘ)tcol)
 	    {
-		if (feedback_old_attr < 0)
+		ಆದರೆ (feedback_old_attr < 0)
 		{
-		    feedback_col = 0;
+		    feedback_ಲಂಬಸಾಲು = 0;
 		    feedback_old_attr = wlv.char_attr;
 		}
-		wlv.char_attr = im_get_feedback_attr(feedback_col);
-		if (wlv.char_attr < 0)
+		wlv.char_attr = im_get_feedback_attr(feedback_ಲಂಬಸಾಲು);
+		ಆದರೆ (wlv.char_attr < 0)
 		    wlv.char_attr = feedback_old_attr;
-		feedback_col++;
+		feedback_ಲಂಬಸಾಲು++;
 	    }
-	    else if (feedback_old_attr >= 0)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (feedback_old_attr >= 0)
 	    {
 		wlv.char_attr = feedback_old_attr;
 		feedback_old_attr = -1;
-		feedback_col = 0;
+		feedback_ಲಂಬಸಾಲು = 0;
 	    }
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	// Handle the case where we are in column 0 but not on the first
 	// character of the line and the user wants us to show us a
 	// special character (via 'listchars' option "precedes:<char>").
-	if (lcs_prec_todo != NUL
+	ಆದರೆ (lcs_prec_todo != NUL
 		&& wp->w_p_list
-		&& (wp->w_p_wrap ? (wp->w_skipcol > 0 && wlv.row == 0)
+		&& (wp->w_p_wrap ? (wp->w_skipcol > 0 && wlv.ಅಡ್ಡಸಾಲು == 0)
 				 : wp->w_leftcol > 0)
-#ifdef FEAT_DIFF
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
 		&& wlv.filler_todo <= 0
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		&& wlv.draw_state > WL_NR
 		&& skip_cells <= 0
 		&& c != NUL)
 	{
 	    c = wp->w_lcs_chars.prec;
 	    lcs_prec_todo = NUL;
-	    if (has_mbyte && (*mb_char2cells)(mb_c) > 1)
+	    ಆದರೆ (has_mbyte && (*mb_char2cells)(mb_c) > 1)
 	    {
 		// Double-width character being overwritten by the "precedes"
 		// character, need to fill up half the character.
@@ -3875,15 +3875,15 @@ win_line(
 				hl_combine_attr(wlv.win_attr, HL_ATTR(HLF_AT));
 	    }
 	    mb_c = c;
-	    if (enc_utf8 && utf_char2len(c) > 1)
+	    ಆದರೆ (enc_utf8 && utf_char2len(c) > 1)
 	    {
 		mb_utf8 = TRUE;
 		u8cc[0] = 0;
 		c = 0xc0;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		mb_utf8 = FALSE;	// don't draw as UTF-8
-	    if (!attr_pri)
+	    ಆದರೆ (!attr_pri)
 	    {
 		saved_attr3 = wlv.char_attr; // save current attr
 		wlv.char_attr = hl_combine_attr(wlv.win_attr, HL_ATTR(HLF_AT));
@@ -3892,94 +3892,94 @@ win_line(
 	}
 
 	// At end of the text line or just after the last character.
-	if ((c == NUL
-#if defined(LINE_ATTR)
-		|| did_line_attr == 1
-#endif
+	ಆದರೆ ((c == NUL
+#ಆದರೆ defined(ಸಾಲು_ATTR)
+		|| did_ಸಾಲು_attr == 1
+#ಆದರೆ_ಅಂತ್ಯ
 		) && wlv.eol_hl_off == 0)
 	{
-#ifdef FEAT_SEARCH_EXTRA
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಹುಡುಕು_EXTRA
 	    // flag to indicate whether prevcol equals startcol of search_hl or
 	    // one of the matches
-	    int prevcol_hl_flag = get_prevcol_hl_flag(wp, &screen_search_hl,
-					      (long)(ptr - line) - (c == NUL));
-#endif
+	    ಪೂರ್ಣಾಂಕ prevcol_hl_flag = get_prevcol_hl_flag(wp, &screen_ಹುಡುಕು_hl,
+					      (ದೀರ್ಘ)(ptr - ಸಾಲು) - (c == NUL));
+#ಆದರೆ_ಅಂತ್ಯ
 	    // Invert at least one char, used for Visual and empty line or
 	    // highlight match at end of line. If it's beyond the last
 	    // char on the screen, just overwrite that one (tricky!)  Not
 	    // needed when a '$' was displayed for 'list'.
-	    if (wp->w_lcs_chars.eol == lcs_eol_one
+	    ಆದರೆ (wp->w_lcs_chars.eol == lcs_eol_one
 		    && ((area_attr != 0 && wlv.vcol == wlv.fromcol
-			    && (VIsual_mode != Ctrl_V
+			    && (VIsual_ಬಹುಲಕ != Ctrl_V
 				|| lnum == VIsual.lnum
 				|| lnum == curwin->w_cursor.lnum)
 			    && c == NUL)
-#ifdef FEAT_SEARCH_EXTRA
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಹುಡುಕು_EXTRA
 			// highlight 'hlsearch' match at end of line
 			|| (prevcol_hl_flag
 # ifdef FEAT_SYN_HL
 			    && !(wp->w_p_cul && lnum == wp->w_cursor.lnum
-				    && !(wp == curwin && VIsual_active))
+				    && !(wp == curwin && VIsual_ಸಕ್ರಿಯ))
 # endif
 # ifdef FEAT_DIFF
 			    && wlv.diff_hlf == (hlf_T)0
 # endif
-# if defined(LINE_ATTR)
-			    && did_line_attr <= 1
+# ಆದರೆ defined(ಸಾಲು_ATTR)
+			    && did_ಸಾಲು_attr <= 1
 # endif
 			   )
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		       ))
 	    {
-		int n = 0;
+		ಪೂರ್ಣಾಂಕ n = 0;
 
-#ifdef FEAT_RIGHTLEFT
-		if (wp->w_p_rl)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+		ಆದರೆ (wp->w_p_rl)
 		{
-		    if (wlv.col < 0)
+		    ಆದರೆ (wlv.ಲಂಬಸಾಲು < 0)
 			n = 1;
 		}
-		else
-#endif
+		ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 		{
-		    if (wlv.col >= wp->w_width)
+		    ಆದರೆ (wlv.ಲಂಬಸಾಲು >= wp->w_ಅಗಲ)
 			n = -1;
 		}
-		if (n != 0)
+		ಆದರೆ (n != 0)
 		{
 		    // At the window boundary, highlight the last character
 		    // instead (better than nothing).
 		    wlv.off += n;
-		    wlv.col += n;
+		    wlv.ಲಂಬಸಾಲು += n;
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    // Add a blank character to highlight.
-		    ScreenLines[wlv.off] = ' ';
-		    if (enc_utf8)
-			ScreenLinesUC[wlv.off] = 0;
+		    Screen_ಸಾಲುಗಳು[wlv.off] = ' ';
+		    ಆದರೆ (enc_utf8)
+			Screen_ಸಾಲುಗಳು_UC[wlv.off] = 0;
 		}
-#ifdef FEAT_SEARCH_EXTRA
-		if (area_attr == 0)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಹುಡುಕು_EXTRA
+		ಆದರೆ (area_attr == 0)
 		{
 		    // Use attributes from match with highest priority among
 		    // 'search_hl' and the match list.
-		    get_search_match_hl(wp, &screen_search_hl,
-					   (long)(ptr - line), &wlv.char_attr);
+		    get_ಹುಡುಕು_ಹೊಂದಿಕೆ_hl(wp, &screen_ಹುಡುಕು_hl,
+					   (ದೀರ್ಘ)(ptr - ಸಾಲು), &wlv.char_attr);
 		}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		ScreenAttrs[wlv.off] = wlv.char_attr;
-		ScreenCols[wlv.off] = wlv.vcol;
-#ifdef FEAT_RIGHTLEFT
-		if (wp->w_p_rl)
+		Screen_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ[wlv.off] = wlv.vcol;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+		ಆದರೆ (wp->w_p_rl)
 		{
-		    --wlv.col;
+		    --wlv.ಲಂಬಸಾಲು;
 		    --wlv.off;
 		}
-		else
-#endif
+		ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 		{
-		    ++wlv.col;
+		    ++wlv.ಲಂಬಸಾಲು;
 		    ++wlv.off;
 		}
 		++wlv.vcol;
@@ -3988,73 +3988,73 @@ win_line(
 	}
 
 	// At end of the text line.
-	if (c == NUL)
+	ಆದರೆ (c == NUL)
 	{
-#ifdef FEAT_PROP_POPUP
-	    if (text_prop_follows)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+	    ಆದರೆ (ಪಠ್ಯ_prop_follows)
 	    {
 		// Put the pointer back to the NUL.
 		--ptr;
 		c = ' ';
 	    }
-	    else
-#endif
+	    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 	    {
-		draw_screen_line(wp, &wlv);
+		draw_screen_ಸಾಲು(wp, &wlv);
 
 		// Update w_cline_height and w_cline_folded if the cursor line
 		// was updated (saves a call to plines() later).
-		if (in_curline)
+		ಆದರೆ (ಒಳ_curline)
 		{
-		    curwin->w_cline_row = startrow;
-		    curwin->w_cline_height = wlv.row - startrow;
-#ifdef FEAT_FOLDING
+		    curwin->w_cline_ಅಡ್ಡಸಾಲು = startrow;
+		    curwin->w_cline_ಎತ್ತರ = wlv.ಅಡ್ಡಸಾಲು - startrow;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_FOLDING
 		    curwin->w_cline_folded = false;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		    curwin->w_valid |= (VALID_CHEIGHT|VALID_CROW);
 		}
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	}
 
 	// Show "extends" character from 'listchars' if beyond the line end.
-	int lcs_ext = get_lcs_ext(wp);
-	if (lcs_ext != NUL
-		&& wlv.draw_state == WL_LINE
-#ifdef FEAT_DIFF
+	ಪೂರ್ಣಾಂಕ lcs_ext = get_lcs_ext(wp);
+	ಆದರೆ (lcs_ext != NUL
+		&& wlv.draw_state == WL_ಸಾಲು
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
 		&& wlv.filler_todo <= 0
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		&& (
-#ifdef FEAT_RIGHTLEFT
-		    wp->w_p_rl ? wlv.col == 0 :
-#endif
-		    wlv.col == wp->w_width - 1)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+		    wp->w_p_rl ? wlv.ಲಂಬಸಾಲು == 0 :
+#ಆದರೆ_ಅಂತ್ಯ
+		    wlv.ಲಂಬಸಾಲು == wp->w_ಅಗಲ - 1)
 		&& (*ptr != NUL
 		    || lcs_eol_one > 0
 		    || (wlv.n_extra > 0 && (wlv.c_extra != NUL
 						     || *wlv.p_extra != NUL))
-#ifdef FEAT_PROP_POPUP
-		    || text_prop_next <= last_textprop_text_idx
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+		    || ಪಠ್ಯ_prop_ಮುಂದಿನ <= ಕೊನೆಯ_textprop_ಪಠ್ಯ_idx
+#ಆದರೆ_ಅಂತ್ಯ
 		   ))
 	{
 	    c = lcs_ext;
 	    wlv.char_attr = hl_combine_attr(wlv.win_attr, HL_ATTR(HLF_AT));
 	    mb_c = c;
-	    if (enc_utf8 && utf_char2len(c) > 1)
+	    ಆದರೆ (enc_utf8 && utf_char2len(c) > 1)
 	    {
 		mb_utf8 = TRUE;
 		u8cc[0] = 0;
 		c = 0xc0;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		mb_utf8 = FALSE;
 	}
 
-#ifdef FEAT_SYN_HL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
 	// advance to the next 'colorcolumn'
-	if (wlv.draw_color_col)
-	    wlv.draw_color_col = advance_color_col(VCOL_HLC, &wlv.color_cols);
+	ಆದರೆ (wlv.draw_color_ಲಂಬಸಾಲು)
+	    wlv.draw_color_ಲಂಬಸಾಲು = advance_color_ಲಂಬಸಾಲು(VCOL_HLC, &wlv.color_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ);
 
 	// Highlight the cursor column if 'cursorcolumn' is set.  But don't
 	// highlight the cursor position itself.
@@ -4063,144 +4063,144 @@ win_line(
 	// Also highlight the 'colorcolumn' if 'breakindent' and/or 'showbreak'
 	// options are set
 	vcol_save_attr = -1;
-	if (((wlv.draw_state == WL_LINE
+	ಆದರೆ (((wlv.draw_state == WL_ಸಾಲು
 		    || wlv.draw_state == WL_BRI
 		    || wlv.draw_state == WL_SBR)
-		&& !lnum_in_visual_area
-		&& search_attr == 0
+		&& !lnum_ಒಳ_visual_area
+		&& ಹುಡುಕು_attr == 0
 		&& area_attr == 0)
 # ifdef FEAT_DIFF
 			&& wlv.filler_todo <= 0
 # endif
 		)
 	{
-	    if (wp->w_p_cuc && VCOL_HLC == (long)wp->w_virtcol
+	    ಆದರೆ (wp->w_p_cuc && VCOL_HLC == (ದೀರ್ಘ)wp->w_virtcol
 						 && lnum != wp->w_cursor.lnum)
 	    {
 		vcol_save_attr = wlv.char_attr;
 		wlv.char_attr = hl_combine_attr(wlv.char_attr,
 							     HL_ATTR(HLF_CUC));
 	    }
-	    else if (wlv.draw_color_col && VCOL_HLC == *wlv.color_cols)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (wlv.draw_color_ಲಂಬಸಾಲು && VCOL_HLC == *wlv.color_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ)
 	    {
 		vcol_save_attr = wlv.char_attr;
 		wlv.char_attr = hl_combine_attr(wlv.char_attr, HL_ATTR(HLF_MC));
 	    }
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 	// Store character to be displayed.
 	// Skip characters that are left of the screen for 'nowrap'.
-	if (wlv.draw_state < WL_LINE || skip_cells <= 0)
+	ಆದರೆ (wlv.draw_state < WL_ಸಾಲು || skip_cells <= 0)
 	{
 	    // Store the character.
-#if defined(FEAT_RIGHTLEFT)
-	    if (has_mbyte && wp->w_p_rl && (*mb_char2cells)(mb_c) > 1)
+#ಆದರೆ defined(FEAT_RIGHTLEFT)
+	    ಆದರೆ (has_mbyte && wp->w_p_rl && (*mb_char2cells)(mb_c) > 1)
 	    {
 		// A double-wide character is: put first half in left cell.
 		--wlv.off;
-		--wlv.col;
+		--wlv.ಲಂಬಸಾಲು;
 	    }
-#endif
-	    ScreenLines[wlv.off] = c;
-	    if (enc_dbcs == DBCS_JPNU)
+#ಆದರೆ_ಅಂತ್ಯ
+	    Screen_ಸಾಲುಗಳು[wlv.off] = c;
+	    ಆದರೆ (enc_dbcs == DBCS_JPNU)
 	    {
-		if ((mb_c & 0xff00) == 0x8e00)
-		    ScreenLines[wlv.off] = 0x8e;
+		ಆದರೆ ((mb_c & 0xff00) == 0x8e00)
+		    Screen_ಸಾಲುಗಳು[wlv.off] = 0x8e;
 		ScreenLines2[wlv.off] = mb_c & 0xff;
 	    }
-	    else if (enc_utf8)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (enc_utf8)
 	    {
-		if (mb_utf8)
+		ಆದರೆ (mb_utf8)
 		{
-		    int i;
+		    ಪೂರ್ಣಾಂಕ i;
 
-		    ScreenLinesUC[wlv.off] = mb_c;
-		    if ((c & 0xff) == 0)
-			ScreenLines[wlv.off] = 0x80;   // avoid storing zero
-		    for (i = 0; i < Screen_mco; ++i)
+		    Screen_ಸಾಲುಗಳು_UC[wlv.off] = mb_c;
+		    ಆದರೆ ((c & 0xff) == 0)
+			Screen_ಸಾಲುಗಳು[wlv.off] = 0x80;   // avoid storing zero
+		    ಗಾಗಿ (i = 0; i < Screen_mco; ++i)
 		    {
-			ScreenLinesC[i][wlv.off] = u8cc[i];
-			if (u8cc[i] == 0)
-			    break;
+			Screen_ಸಾಲುಗಳು_C[i][wlv.off] = u8cc[i];
+			ಆದರೆ (u8cc[i] == 0)
+			    ನಿಲ್ಲಿಸು;
 		    }
 		}
-		else
-		    ScreenLinesUC[wlv.off] = 0;
+		ಇಲ್ಲದಿದ್ದರೆ
+		    Screen_ಸಾಲುಗಳು_UC[wlv.off] = 0;
 	    }
-	    if (multi_attr)
+	    ಆದರೆ (multi_attr)
 	    {
 		ScreenAttrs[wlv.off] = multi_attr;
 		multi_attr = 0;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		ScreenAttrs[wlv.off] = wlv.char_attr;
 
-	    if (wlv.draw_state > WL_NR
-#ifdef FEAT_DIFF
+	    ಆದರೆ (wlv.draw_state > WL_NR
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
 		    && wlv.filler_todo <= 0
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		    )
-		ScreenCols[wlv.off] = wlv.vcol;
-	    else
-		ScreenCols[wlv.off] = -1;
+		Screen_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ[wlv.off] = wlv.vcol;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		Screen_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ[wlv.off] = -1;
 
-	    if (has_mbyte && (*mb_char2cells)(mb_c) > 1)
+	    ಆದರೆ (has_mbyte && (*mb_char2cells)(mb_c) > 1)
 	    {
 		// Need to fill two screen columns.
 		++wlv.off;
-		++wlv.col;
-		if (enc_utf8)
+		++wlv.ಲಂಬಸಾಲು;
+		ಆದರೆ (enc_utf8)
 		    // UTF-8: Put a 0 in the second screen char.
-		    ScreenLines[wlv.off] = 0;
-		else
+		    Screen_ಸಾಲುಗಳು[wlv.off] = 0;
+		ಇಲ್ಲದಿದ್ದರೆ
 		    // DBCS: Put second byte in the second screen char.
-		    ScreenLines[wlv.off] = mb_c & 0xff;
+		    Screen_ಸಾಲುಗಳು[wlv.off] = mb_c & 0xff;
 
-		if (wlv.draw_state > WL_NR
-#ifdef FEAT_DIFF
+		ಆದರೆ (wlv.draw_state > WL_NR
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
 			&& wlv.filler_todo <= 0
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 			)
-		    ScreenCols[wlv.off] = ++wlv.vcol;
-		else
-		    ScreenCols[wlv.off] = -1;
+		    Screen_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ[wlv.off] = ++wlv.vcol;
+		ಇಲ್ಲದಿದ್ದರೆ
+		    Screen_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ[wlv.off] = -1;
 
 		// When "wlv.tocol" is halfway a character, set it to the end
 		// of the character, otherwise highlighting won't stop.
-		if (wlv.tocol == wlv.vcol)
+		ಆದರೆ (wlv.tocol == wlv.vcol)
 		    ++wlv.tocol;
 
-#ifdef FEAT_RIGHTLEFT
-		if (wp->w_p_rl)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+		ಆದರೆ (wp->w_p_rl)
 		{
 		    // now it's time to backup one cell
 		    --wlv.off;
-		    --wlv.col;
+		    --wlv.ಲಂಬಸಾಲು;
 		}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
-#ifdef FEAT_RIGHTLEFT
-	    if (wp->w_p_rl)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+	    ಆದರೆ (wp->w_p_rl)
 	    {
 		--wlv.off;
-		--wlv.col;
+		--wlv.ಲಂಬಸಾಲು;
 	    }
-	    else
-#endif
+	    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 	    {
 		++wlv.off;
-		++wlv.col;
+		++wlv.ಲಂಬಸಾಲು;
 	    }
 	}
-#ifdef FEAT_CONCEAL
-	else if (wp->w_p_cole > 0 && is_concealing)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CONCEAL
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (wp->w_p_cole > 0 && is_concealing)
 	{
-	    int concealed_wide = has_mbyte && (*mb_char2cells)(mb_c) > 1;
+	    ಪೂರ್ಣಾಂಕ concealed_wide = has_mbyte && (*mb_char2cells)(mb_c) > 1;
 
 	    --skip_cells;
 	    ++wlv.vcol_off_co;
-	    if (concealed_wide)
+	    ಆದರೆ (concealed_wide)
 	    {
 		// When a double-width char is concealed,
 		// need to advance one more virtual column.
@@ -4208,10 +4208,10 @@ win_line(
 		++wlv.vcol_off_co;
 	    }
 
-	    if (wlv.n_extra > 0)
+	    ಆದರೆ (wlv.n_extra > 0)
 		wlv.vcol_off_co += wlv.n_extra;
 
-	    if (wp->w_p_wrap)
+	    ಆದರೆ (wp->w_p_wrap)
 	    {
 		// Special voodoo required if 'wrap' is on.
 		//
@@ -4228,28 +4228,28 @@ win_line(
 		// For popup windows with fixed width, don't advance col
 		// to allow full text to be displayed.
 # ifdef FEAT_PROP_POPUP
-		int adjust_col = !WIN_IS_POPUP(wp);
-# else
-		int adjust_col = TRUE;
+		ಪೂರ್ಣಾಂಕ adjust_ಲಂಬಸಾಲು = !WIN_IS_POPUP(wp);
+# ಇಲ್ಲದಿದ್ದರೆ
+		ಪೂರ್ಣಾಂಕ adjust_ಲಂಬಸಾಲು = TRUE;
 # endif
-		if (wlv.n_extra > 0)
+		ಆದರೆ (wlv.n_extra > 0)
 		{
 		    wlv.vcol += wlv.n_extra;
 # ifdef FEAT_RIGHTLEFT
-		    if (wp->w_p_rl)
+		    ಆದರೆ (wp->w_p_rl)
 		    {
-			if (adjust_col)
+			ಆದರೆ (adjust_ಲಂಬಸಾಲು)
 			{
-			    wlv.col -= wlv.n_extra;
+			    wlv.ಲಂಬಸಾಲು -= wlv.n_extra;
 			    wlv.boguscols -= wlv.n_extra;
 			}
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 # endif
 		    {
-			if (adjust_col)
+			ಆದರೆ (adjust_ಲಂಬಸಾಲು)
 			{
-			    wlv.col += wlv.n_extra;
+			    wlv.ಲಂಬಸಾಲು += wlv.n_extra;
 			    wlv.boguscols += wlv.n_extra;
 			}
 		    }
@@ -4257,51 +4257,51 @@ win_line(
 		    n_attr = 0;
 		}
 
-		if (concealed_wide)
+		ಆದರೆ (concealed_wide)
 		{
 		    // Need to fill two screen columns.
 # ifdef FEAT_RIGHTLEFT
-		    if (wp->w_p_rl)
+		    ಆದರೆ (wp->w_p_rl)
 		    {
-			if (adjust_col)
+			ಆದರೆ (adjust_ಲಂಬಸಾಲು)
 			{
 			    --wlv.boguscols;
-			    --wlv.col;
+			    --wlv.ಲಂಬಸಾಲು;
 			}
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 # endif
 		    {
-			if (adjust_col)
+			ಆದರೆ (adjust_ಲಂಬಸಾಲು)
 			{
 			    ++wlv.boguscols;
-			    ++wlv.col;
+			    ++wlv.ಲಂಬಸಾಲು;
 			}
 		    }
 		}
 
 # ifdef FEAT_RIGHTLEFT
-		if (wp->w_p_rl)
+		ಆದರೆ (wp->w_p_rl)
 		{
-		    if (adjust_col)
+		    ಆದರೆ (adjust_ಲಂಬಸಾಲು)
 		    {
 			--wlv.boguscols;
-			--wlv.col;
+			--wlv.ಲಂಬಸಾಲು;
 		    }
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 # endif
 		{
-		    if (adjust_col)
+		    ಆದರೆ (adjust_ಲಂಬಸಾಲು)
 		    {
 			++wlv.boguscols;
-			++wlv.col;
+			++wlv.ಲಂಬಸಾಲು;
 		    }
 		}
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		if (wlv.n_extra > 0)
+		ಆದರೆ (wlv.n_extra > 0)
 		{
 		    wlv.vcol += wlv.n_extra;
 		    wlv.n_extra = 0;
@@ -4310,11 +4310,11 @@ win_line(
 	    }
 
 	}
-#endif // FEAT_CONCEAL
-	else
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_CONCEAL
+	ಇಲ್ಲದಿದ್ದರೆ
 	    --skip_cells;
 
-	if (wlv.draw_state > WL_NR && skipped_cells > 0)
+	ಆದರೆ (wlv.draw_state > WL_NR && skipped_cells > 0)
 	{
 	    wlv.vcol += skipped_cells;
 	    skipped_cells = 0;
@@ -4322,156 +4322,156 @@ win_line(
 
 	// Only advance the "wlv.vcol" when after the 'number' or
 	// 'relativenumber' column.
-	if (wlv.draw_state > WL_NR
-#ifdef FEAT_DIFF
+	ಆದರೆ (wlv.draw_state > WL_NR
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
 		&& wlv.filler_todo <= 0
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		)
 	    ++wlv.vcol;
 
-#ifdef FEAT_SYN_HL
-	if (vcol_save_attr >= 0)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
+	ಆದರೆ (vcol_save_attr >= 0)
 	    wlv.char_attr = vcol_save_attr;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 	// restore attributes after "precedes" in 'listchars'
-	if (wlv.draw_state > WL_NR && n_attr3 > 0 && --n_attr3 == 0)
+	ಆದರೆ (wlv.draw_state > WL_NR && n_attr3 > 0 && --n_attr3 == 0)
 	    wlv.char_attr = saved_attr3;
 
 	// restore attributes after last 'listchars' or 'number' char
-	if (n_attr > 0 && wlv.draw_state == WL_LINE
+	ಆದರೆ (n_attr > 0 && wlv.draw_state == WL_ಸಾಲು
 				      && wlv.n_attr_skip == 0 && --n_attr == 0)
 	    wlv.char_attr = saved_attr2;
-	if (wlv.n_attr_skip > 0)
+	ಆದರೆ (wlv.n_attr_skip > 0)
 	    --wlv.n_attr_skip;
 
 	// At end of screen line and there is more to come: Display the line
 	// so far.  If there is no more to display it is caught above.
-	if ((
-#ifdef FEAT_RIGHTLEFT
-	    wp->w_p_rl ? (wlv.col < 0) :
-#endif
-				    (wlv.col >= wp->w_width))
-		&& (wlv.draw_state != WL_LINE
+	ಆದರೆ ((
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+	    wp->w_p_rl ? (wlv.ಲಂಬಸಾಲು < 0) :
+#ಆದರೆ_ಅಂತ್ಯ
+				    (wlv.ಲಂಬಸಾಲು >= wp->w_ಅಗಲ))
+		&& (wlv.draw_state != WL_ಸಾಲು
 		    || *ptr != NUL
-#ifdef FEAT_DIFF
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
 		    || wlv.filler_todo > 0
-#endif
-#ifdef FEAT_PROP_POPUP
-		    || text_prop_above || text_prop_follows
-		    || text_prop_next <= last_textprop_text_idx
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+		    || ಪಠ್ಯ_prop_above || ಪಠ್ಯ_prop_follows
+		    || ಪಠ್ಯ_prop_ಮುಂದಿನ <= ಕೊನೆಯ_textprop_ಪಠ್ಯ_idx
+#ಆದರೆ_ಅಂತ್ಯ
 		    || (wp->w_p_list && wp->w_lcs_chars.eol != NUL
 						&& lcs_eol_one != -1)
 		    || (wlv.n_extra != 0 && (wlv.c_extra != NUL
 						      || *wlv.p_extra != NUL)))
 		)
 	{
-#ifdef FEAT_CONCEAL
-	    wlv.col -= wlv.boguscols;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CONCEAL
+	    wlv.ಲಂಬಸಾಲು -= wlv.boguscols;
 	    // Apply 'cursorline' and HLF_WIN highlight.
-	    if (wlv.boguscols != 0 && (
-# ifdef LINE_ATTR
-			wlv.line_attr != 0 ||
+	    ಆದರೆ (wlv.boguscols != 0 && (
+# ifdef ಸಾಲು_ATTR
+			wlv.ಸಾಲು_attr != 0 ||
 # endif
 			wlv.win_attr != 0
 			)
 	       )
 	    {
-		int attr = wlv.win_attr;
-# ifdef LINE_ATTR
-		if (wlv.line_attr != 0)
-		    attr = hl_combine_attr(attr, wlv.line_attr);
+		ಪೂರ್ಣಾಂಕ attr = wlv.win_attr;
+# ifdef ಸಾಲು_ATTR
+		ಆದರೆ (wlv.ಸಾಲು_attr != 0)
+		    attr = hl_combine_attr(attr, wlv.ಸಾಲು_attr);
 # endif
-		while ((
+		ಆಗ ((
 # ifdef FEAT_RIGHTLEFT
-			    wp->w_p_rl ? wlv.col >= 0 :
+			    wp->w_p_rl ? wlv.ಲಂಬಸಾಲು >= 0 :
 # endif
-			    wlv.col < wp->w_width))
+			    wlv.ಲಂಬಸಾಲು < wp->w_ಅಗಲ))
 		{
-		    ScreenLines[wlv.off] = ' ';
-		    if (enc_utf8)
-			ScreenLinesUC[wlv.off] = 0;
+		    Screen_ಸಾಲುಗಳು[wlv.off] = ' ';
+		    ಆದರೆ (enc_utf8)
+			Screen_ಸಾಲುಗಳು_UC[wlv.off] = 0;
 		    ScreenAttrs[wlv.off] = attr;
-		    ScreenCols[wlv.off] = wlv.vcol - 1;
+		    Screen_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ[wlv.off] = wlv.vcol - 1;
 # ifdef FEAT_RIGHTLEFT
-		    if (wp->w_p_rl)
+		    ಆದರೆ (wp->w_p_rl)
 		    {
 			wlv.off--;
-			wlv.col--;
+			wlv.ಲಂಬಸಾಲು--;
 			wlv.boguscols++;
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 # endif
 		    {
 			wlv.off++;
-			wlv.col++;
+			wlv.ಲಂಬಸಾಲು++;
 			wlv.boguscols--;
 		    }
 		}
 	    }
-	    wlv_screen_line(wp, &wlv, TRUE);
-	    wlv.col += wlv.boguscols;
+	    wlv_screen_ಸಾಲು(wp, &wlv, TRUE);
+	    wlv.ಲಂಬಸಾಲು += wlv.boguscols;
 	    wlv.boguscols = 0;
 	    wlv.vcol_off_co = 0;
-#else
-	    wlv_screen_line(wp, &wlv, TRUE);
-#endif
-	    ++wlv.row;
-	    ++wlv.screen_row;
+#ಇಲ್ಲದಿದ್ದರೆ
+	    wlv_screen_ಸಾಲು(wp, &wlv, TRUE);
+#ಆದರೆ_ಅಂತ್ಯ
+	    ++wlv.ಅಡ್ಡಸಾಲು;
+	    ++wlv.screen_ಅಡ್ಡಸಾಲು;
 
 	    // When not wrapping and finished diff lines, break here.
-	    if (!wp->w_p_wrap
-#ifdef FEAT_DIFF
+	    ಆದರೆ (!wp->w_p_wrap
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
 			&& wlv.filler_todo <= 0
-#endif
-#ifdef FEAT_PROP_POPUP
-			&& !text_prop_above
-			&& !text_prop_follows
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+			&& !ಪಠ್ಯ_prop_above
+			&& !ಪಠ್ಯ_prop_follows
+#ಆದರೆ_ಅಂತ್ಯ
 		       )
-		break;
-#ifdef FEAT_PROP_POPUP
-	    if (!wp->w_p_wrap && text_prop_follows && !text_prop_above)
+		ನಿಲ್ಲಿಸು;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+	    ಆದರೆ (!wp->w_p_wrap && ಪಠ್ಯ_prop_follows && !ಪಠ್ಯ_prop_above)
 	    {
 		// do not output more of the line, only the "below" prop
-		ptr = line + (size_t)ml_get_buf_len(wp->w_buffer, lnum);
+		ptr = ಸಾಲು + (size_t)ml_get_buf_len(wp->w_ಬಫರ್, lnum);
 # ifdef FEAT_LINEBREAK
 		wlv.dont_use_showbreak = TRUE;
 # endif
 	    }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 	    // When the window is too narrow draw all "@" lines.
-	    if (wlv.draw_state != WL_LINE
-#ifdef FEAT_DIFF
+	    ಆದರೆ (wlv.draw_state != WL_ಸಾಲು
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
 		    && wlv.filler_todo <= 0
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		    )
 	    {
-		win_draw_end(wp, '@', ' ', TRUE, wlv.row, wp->w_height, HLF_AT);
-		draw_vsep_win(wp, wlv.row);
-		wlv.row = endrow;
+		win_draw_ಕೊನೆ(wp, '@', ' ', TRUE, wlv.ಅಡ್ಡಸಾಲು, wp->w_ಎತ್ತರ, HLF_AT);
+		draw_vsep_win(wp, wlv.ಅಡ್ಡಸಾಲು);
+		wlv.ಅಡ್ಡಸಾಲು = endrow;
 	    }
 
 	    // When line got too long for screen break here.
-	    if (wlv.row == endrow)
+	    ಆದರೆ (wlv.ಅಡ್ಡಸಾಲು == endrow)
 	    {
-		++wlv.row;
-		break;
+		++wlv.ಅಡ್ಡಸಾಲು;
+		ನಿಲ್ಲಿಸು;
 	    }
 
-	    if (screen_cur_row == wlv.screen_row - 1
-#ifdef FEAT_DIFF
+	    ಆದರೆ (screen_cur_ಅಡ್ಡಸಾಲು == wlv.screen_ಅಡ್ಡಸಾಲು - 1
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
 		     && wlv.filler_todo <= 0
-#endif
-#ifdef FEAT_PROP_POPUP
-		     && !text_prop_above && !text_prop_follows
-#endif
-		     && wp->w_width == Columns)
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+		     && !ಪಠ್ಯ_prop_above && !ಪಠ್ಯ_prop_follows
+#ಆದರೆ_ಅಂತ್ಯ
+		     && wp->w_ಅಗಲ == Columns)
 	    {
 		// Remember that the line wraps, used for modeless copy.
-		LineWraps[wlv.screen_row - 1] = TRUE;
+		ಸಾಲು_Wraps[wlv.screen_ಅಡ್ಡಸಾಲು - 1] = TRUE;
 
 		// Special trick to make copy/paste of wrapped lines work with
 		// xterm/screen: write an extra character beyond the end of
@@ -4483,75 +4483,75 @@ win_line(
 		// Don't do this for the GUI.
 		// Don't do this for double-width characters.
 		// Don't do this for a window not at the right screen border.
-		if (p_tf
-#ifdef FEAT_GUI
-			 && !gui.in_use
-#endif
+		ಆದರೆ (p_tf
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+			 && !gui.ಒಳ_use
+#ಆದರೆ_ಅಂತ್ಯ
 			 && !(has_mbyte
-			     && ((*mb_off2cells)(LineOffset[wlv.screen_row],
-				   LineOffset[wlv.screen_row] + screen_Columns)
+			     && ((*mb_off2cells)(ಸಾಲು_ಸ್ಥಾನಾಂತರ[wlv.screen_ಅಡ್ಡಸಾಲು],
+				   ಸಾಲು_ಸ್ಥಾನಾಂತರ[wlv.screen_ಅಡ್ಡಸಾಲು] + screen_Columns)
 									  == 2
 				 || (*mb_off2cells)(
-				     LineOffset[wlv.screen_row - 1]
-							    + (int)topframe->fr_width - 2,
-				     LineOffset[wlv.screen_row]
+				     ಸಾಲು_ಸ್ಥಾನಾಂತರ[wlv.screen_ಅಡ್ಡಸಾಲು - 1]
+							    + (ಪೂರ್ಣಾಂಕ)topframe->fr_ಅಗಲ - 2,
+				     ಸಾಲು_ಸ್ಥಾನಾಂತರ[wlv.screen_ಅಡ್ಡಸಾಲು]
 						      + screen_Columns) == 2)))
 		{
 		    // First make sure we are at the end of the screen line,
 		    // then output the same character again to let the
 		    // terminal know about the wrap.  If the terminal doesn't
 		    // auto-wrap, we overwrite the character.
-		    if (screen_cur_col != wp->w_width)
-			screen_char(LineOffset[wlv.screen_row - 1]
-						       + (unsigned)topframe->fr_width - 1,
-				       wlv.screen_row - 1, (int)(topframe->fr_width - 1));
+		    ಆದರೆ (screen_cur_ಲಂಬಸಾಲು != wp->w_ಅಗಲ)
+			screen_char(ಸಾಲು_ಸ್ಥಾನಾಂತರ[wlv.screen_ಅಡ್ಡಸಾಲು - 1]
+						       + (ಚಿಹ್ನೆರಹಿತ)topframe->fr_ಅಗಲ - 1,
+				       wlv.screen_ಅಡ್ಡಸಾಲು - 1, (ಪೂರ್ಣಾಂಕ)(topframe->fr_ಅಗಲ - 1));
 
 		    // When there is a multi-byte character, just output a
 		    // space to keep it simple.
-		    if (has_mbyte && MB_BYTE2LEN(ScreenLines[LineOffset[
-				     wlv.screen_row - 1] + (topframe->fr_width - 1)]) > 1)
-			out_char(' ');
-		    else
-			out_char(ScreenLines[LineOffset[wlv.screen_row - 1]
-							    + (topframe->fr_width - 1)]);
+		    ಆದರೆ (has_mbyte && MB_BYTE2LEN(Screen_ಸಾಲುಗಳು[ಸಾಲು_ಸ್ಥಾನಾಂತರ[
+				     wlv.screen_ಅಡ್ಡಸಾಲು - 1] + (topframe->fr_ಅಗಲ - 1)]) > 1)
+			ಹೊರಹೋಗು_char(' ');
+		    ಇಲ್ಲದಿದ್ದರೆ
+			ಹೊರಹೋಗು_char(Screen_ಸಾಲುಗಳು[ಸಾಲು_ಸ್ಥಾನಾಂತರ[wlv.screen_ಅಡ್ಡಸಾಲು - 1]
+							    + (topframe->fr_ಅಗಲ - 1)]);
 		    // force a redraw of the first char on the next line
-		    ScreenAttrs[LineOffset[wlv.screen_row]] = (sattr_T)-1;
-		    screen_start();	// don't know where cursor is now
+		    ScreenAttrs[ಸಾಲು_ಸ್ಥಾನಾಂತರ[wlv.screen_ಅಡ್ಡಸಾಲು]] = (sattr_T)-1;
+		    screen_ಆರಂಭ();	// don't know where cursor is now
 		}
 	    }
 
-	    win_line_start(wp, &wlv, TRUE);
+	    win_ಸಾಲು_ಆರಂಭ(wp, &wlv, TRUE);
 
 	    lcs_prec_todo = wp->w_lcs_chars.prec;
-#ifdef FEAT_LINEBREAK
-	    if (!wlv.dont_use_showbreak
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
+	    ಆದರೆ (!wlv.dont_use_showbreak
 # ifdef FEAT_DIFF
 		    && wlv.filler_todo <= 0
 # endif
 	       )
 		wlv.need_showbreak = TRUE;
-#endif
-#ifdef FEAT_DIFF
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
 	    --wlv.filler_todo;
 	    // When the filler lines are actually below the last line of the
 	    // file, don't draw the line itself, break here.
-	    if (wlv.filler_todo == 0 && wp->w_botfill)
-		break;
-#endif
+	    ಆದರೆ (wlv.filler_todo == 0 && wp->w_botfill)
+		ನಿಲ್ಲಿಸು;
+#ಆದರೆ_ಅಂತ್ಯ
 	}
 
     }	// for every character in the line
-#ifdef FEAT_PROP_POPUP
-    if (text_props != text_props_buf)
-	vim_free(text_props);
-    if (text_prop_idxs != text_prop_idxs_buf)
-	vim_free(text_prop_idxs);
-    if (text_prop_suffix_flags != text_prop_suffix_flags_buf)
-	vim_free(text_prop_suffix_flags);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+    ಆದರೆ (ಪಠ್ಯ_props != ಪಠ್ಯ_props_buf)
+	vim_free(ಪಠ್ಯ_props);
+    ಆದರೆ (ಪಠ್ಯ_prop_idxs != ಪಠ್ಯ_prop_idxs_buf)
+	vim_free(ಪಠ್ಯ_prop_idxs);
+    ಆದರೆ (ಪಠ್ಯ_prop_suffix_flags != ಪಠ್ಯ_prop_suffix_flags_buf)
+	vim_free(ಪಠ್ಯ_prop_suffix_flags);
     vim_free(p_extra_free2);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     vim_free(wlv.p_extra_free);
     vim_free(wlv.saved_p_extra_free);
-    return wlv.row;
+    ಹಿಂತಿರುಗಿ wlv.ಅಡ್ಡಸಾಲು;
 }

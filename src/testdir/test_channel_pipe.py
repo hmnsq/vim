@@ -4,73 +4,73 @@
 #
 # This requires Python 2.6 or later.
 
-from __future__ import print_function
-import os
-import sys
-import time
+ತಃ __future__ ಆಮದು print_function
+ಆಮದು os
+ಆಮದು sys
+ಆಮದು ಸಮಯ
 
-if __name__ == "__main__":
+ಆದರೆ __name__ == "__main__":
 
-    if len(sys.argv) > 1:
-        if sys.argv[1].startswith("err"):
-            print(sys.argv[1], file=sys.stderr)
+    ಆದರೆ ಉದ್ದ(sys.argv) > 1:
+        ಆದರೆ sys.argv[1].startswith("err"):
+            ಮುದ್ರಿಸು(sys.argv[1], file=sys.stderr)
             sys.stderr.flush()
-        elif sys.argv[1].startswith("incomplete"):
-            print(sys.argv[1], end='')
+        ಅಥವಾಆದರೆ sys.argv[1].startswith("incomplete"):
+            ಮುದ್ರಿಸು(sys.argv[1], ಕೊನೆ='')
             sys.stdout.flush()
             sys.exit(0)
-        elif sys.argv[1].startswith("busy"):
-            time.sleep(100)
+        ಅಥವಾಆದರೆ sys.argv[1].startswith("busy"):
+            ಸಮಯ.ಸುಷುಪ್ತಿ(100)
             sys.exit(0)
-        else:
-            print(sys.argv[1])
+        ಇಲ್ಲದಿದ್ದರೆ:
+            ಮುದ್ರಿಸು(sys.argv[1])
             sys.stdout.flush()
-            if sys.argv[1].startswith("quit"):
+            ಆದರೆ sys.argv[1].startswith("quit"):
                 sys.exit(0)
 
-    if os.getenv('CI'):
-        try:
-            import thread_util
-            thread_util.set_high_priority()
-        except Exception:
-            pass
+    ಆದರೆ os.getenv('CI'):
+        ಪ್ರಯತ್ನಿಸು:
+            ಆಮದು thread_util
+            thread_util.ಗಣ_ಮೇಲಿನ_ಆದ್ಯತೆ()
+        ಅಪವಾದ Exception:
+            ದಾಟು
 
-    while True:
+    ಆಗ ನಿಜ:
         typed = sys.stdin.readline()
-        if typed == "":  # EOF -- stop
-            break
-        if typed.startswith("quit"):
-            print("Goodbye!")
+        ಆದರೆ typed == "":  # EOF -- stop
+            ನಿಲ್ಲಿಸು
+        ಆದರೆ typed.startswith("quit"):
+            ಮುದ್ರಿಸು("Goodbye!")
             sys.stdout.flush()
-            break
-        if typed.startswith("echo "):
-            print(typed[5:-1])
+            ನಿಲ್ಲಿಸು
+        ಆದರೆ typed.startswith("echo "):
+            ಮುದ್ರಿಸು(typed[5:-1])
             sys.stdout.flush()
-        if typed.startswith("echosplit "):
-            for part in typed[10:-1].split('|'):
-                sys.stdout.write(part)
+        ಆದರೆ typed.startswith("echosplit "):
+            ಗಾಗಿ part ಒಳಗೆ typed[10:-1].ವಿಭಜಿಸು('|'):
+                sys.stdout.ಲಿಖ(part)
                 sys.stdout.flush()
-                time.sleep(0.05)
-        if typed.startswith("double "):
-            print(typed[7:-1] + "\nAND " + typed[7:-1])
+                ಸಮಯ.ಸುಷುಪ್ತಿ(0.05)
+        ಆದರೆ typed.startswith("double "):
+            ಮುದ್ರಿಸು(typed[7:-1] + "\nAND " + typed[7:-1])
             sys.stdout.flush()
-        if typed.startswith("split "):
-            print(typed[6:-1], end='')
+        ಆದರೆ typed.startswith("split "):
+            ಮುದ್ರಿಸು(typed[6:-1], ಕೊನೆ='')
             sys.stdout.flush()
-            time.sleep(0.05)
-            print(typed[6:-1], end='')
+            ಸಮಯ.ಸುಷುಪ್ತಿ(0.05)
+            ಮುದ್ರಿಸು(typed[6:-1], ಕೊನೆ='')
             sys.stdout.flush()
-            time.sleep(0.05)
-            print(typed[6:-1])
+            ಸಮಯ.ಸುಷುಪ್ತಿ(0.05)
+            ಮುದ್ರಿಸು(typed[6:-1])
             sys.stdout.flush()
-        if typed.startswith("echoerr "):
-            print(typed[8:-1], file=sys.stderr)
+        ಆದರೆ typed.startswith("echoerr "):
+            ಮುದ್ರಿಸು(typed[8:-1], file=sys.stderr)
             sys.stderr.flush()
-        if typed.startswith("doubleerr "):
-            print(typed[10:-1] + "\nAND " + typed[10:-1], file=sys.stderr)
+        ಆದರೆ typed.startswith("doubleerr "):
+            ಮುದ್ರಿಸು(typed[10:-1] + "\nAND " + typed[10:-1], file=sys.stderr)
             sys.stderr.flush()
-        if typed.startswith("XXX"):
-            print(typed, end='')
+        ಆದರೆ typed.startswith("XXX"):
+            ಮುದ್ರಿಸು(typed, ಕೊನೆ='')
             sys.stderr.flush()
-            break
+            ನಿಲ್ಲಿಸು
 

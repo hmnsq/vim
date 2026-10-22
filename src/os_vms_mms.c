@@ -1,77 +1,77 @@
-#include	<stdio.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<unixio.h>
-#include	"vim.h"
-int main(int argc, char *argv[])
+#ಅನ್ತರ್ಭಾವ	<stdio.h>
+#ಅನ್ತರ್ಭಾವ	<stdlib.h>
+#ಅನ್ತರ್ಭಾವ	<string.h>
+#ಅನ್ತರ್ಭಾವ	<unixio.h>
+#ಅನ್ತರ್ಭಾವ	"vim.h"
+ಪೂರ್ಣಾಂಕ ಮುಖ್ಯ(ಪೂರ್ಣಾಂಕ argc, ಅಕ್ಷರ *argv[])
 {
     FILE	*fpi, *fpo;
-    char	cmd[132], buf[BUFSIZ], *argp, *error_file, target[132], *mms;
-    int		err = 0, err_line = 0;
+    ಅಕ್ಷರ	cmd[132], buf[BUFSIZ], *argp, *error_file, ಗುರಿ[132], *mms;
+    ಪೂರ್ಣಾಂಕ		err = 0, err_ಸಾಲು = 0;
 
     mms = "mms";
     argc--;
     argv++;
-    while (argc-- > 0)
+    ಆಗ (argc-- > 0)
     {
 	argp = *argv++;
-	if (*argp == '-')
+	ಆದರೆ (*argp == '-')
 	{
-	    switch (*++argp)
+	    ಆಯ್ಕೆ (*++argp)
 	    {
-		case 'm':
+		ಸ್ಥಿತಿ 'm':
 		    mms = ++argp;
-		    break;
-		case 'e':
-		    if (!*(error_file = ++argp))
+		    ನಿಲ್ಲಿಸು;
+		ಸ್ಥಿತಿ 'e':
+		    ಆದರೆ (!*(error_file = ++argp))
 		    {
 			error_file = *argv++;
 			argc--;
 		    }
-		    break;
-		default:
-		    break;
+		    ನಿಲ್ಲಿಸು;
+		ಪೂರ್ವನಿಯೋಜಿತ:
+		    ನಿಲ್ಲಿಸು;
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (*target)
-		strcat(target, " ");
-	    strcat(target, argp);
+	    ಆದರೆ (*ಗುರಿ)
+		strcat(ಗುರಿ, " ");
+	    strcat(ಗುರಿ, argp);
 	}
     }
-    vim_snprintf(cmd, sizeof(cmd), "%s/output=tmp:errors.vim_tmp %s",
-								 mms, target);
+    vim_snprintf(cmd, ಗಾತ್ರ(cmd), "%s/output=tmp:errors.vim_tmp %s",
+								 mms, ಗುರಿ);
     system(cmd);
     fpi = fopen("tmp:errors.vim_tmp", "r");
     fpo = fopen(error_file, "w");
-    while (fgets(buf, BUFSIZ, fpi))
+    ಆಗ (fgets(buf, BUFSIZ, fpi))
     {
-	if (!memcmp(buf, "%CC-", 4))
+	ಆದರೆ (!memcmp(buf, "%CC-", 4))
 	{
-	    err_line++;
-	    buf[strlen(buf)-1] = '\0';
+	    err_ಸಾಲು++;
+	    buf[ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(buf)-1] = '\0';
 	    err++;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (err_line)
+	    ಆದರೆ (err_ಸಾಲು)
 	    {
-		if (strstr(buf, _("At line")))
+		ಆದರೆ (ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು(buf, _("At line")))
 		{
-		    err_line = 0;
+		    err_ಸಾಲು = 0;
 		    fprintf(fpo, "@");
 		}
-		else
-		    buf[strlen(buf)-1] = '\0';
+		ಇಲ್ಲದಿದ್ದರೆ
+		    buf[ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(buf)-1] = '\0';
 	    }
 	}
 	fprintf(fpo, "%s", buf);
     }
     fclose(fpi);
     fclose(fpo);
-    while (!delete("tmp:errors.vim_tmp"))
+    ಆಗ (!delete("tmp:errors.vim_tmp"))
 	/*nop*/;
-    exit(err ? 44 : 1);
-    return(0);
+    ನಿರ್ಗಮಿಸು(err ? 44 : 1);
+    ಹಿಂತಿರುಗಿ(0);
 }

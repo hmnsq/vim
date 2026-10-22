@@ -9,7 +9,7 @@
 
 // for debugging
 // #define CHECK(c, s)	do { if (c) emsg((s)); } while (0)
-#define CHECK(c, s)	do { /**/ } while (0)
+#ವ್ಯಾಖ್ಯಾನಿಸು CHECK(c, s)	ಮಾಡು { /**/ } ಆಗ (0)
 
 /*
  * memline.c: Contains the functions for appending, deleting and changing the
@@ -42,67 +42,67 @@
  *  mf_get().
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-#include <time.h>
+#ಅನ್ತರ್ಭಾವ <time.h>
 
-#if defined(SASC) || defined(__amigaos4__)
+#ಆದರೆ defined(SASC) || defined(__amigaos4__)
 # include <proto/dos.h>	    // for Open() and Close()
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-typedef struct block0		ZERO_BL;    // contents of the first block
-typedef struct pointer_block	PTR_BL;	    // contents of a pointer block
-typedef struct data_block	DATA_BL;    // contents of a data block
-typedef struct pointer_entry	PTR_EN;	    // block/line-count pair
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ block0		ZERO_BL;    // contents of the first block
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ ಸೂಚಕ_ಖಂಡ	PTR_BL;	    // contents of a pointer block
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ ದತ್ತಾಂಶ_ಖಂಡ	ದತ್ತಾಂಶ_BL;    // contents of a data block
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ ಸೂಚಕ_ನಮೂದು	PTR_EN;	    // block/line-count pair
 
-#define DATA_ID	       (('d' << 8) + 'a')   // data block id
-#define PTR_ID	       (('p' << 8) + 't')   // pointer block id
-#define BLOCK0_ID0     'b'		    // block 0 id 0
-#define BLOCK0_ID1     '0'		    // block 0 id 1
-#define BLOCK0_ID1_C0  'c'		    // block 0 id 1 'cm' 0
-#define BLOCK0_ID1_C1  'C'		    // block 0 id 1 'cm' 1
-#define BLOCK0_ID1_C2  'd'		    // block 0 id 1 'cm' 2
+#ವ್ಯಾಖ್ಯಾನಿಸು ದತ್ತಾಂಶ_ID	       (('d' << 8) + 'a')   // data block id
+#ವ್ಯಾಖ್ಯಾನಿಸು PTR_ID	       (('p' << 8) + 't')   // pointer block id
+#ವ್ಯಾಖ್ಯಾನಿಸು BLOCK0_ID0     'b'		    // block 0 id 0
+#ವ್ಯಾಖ್ಯಾನಿಸು BLOCK0_ID1     '0'		    // block 0 id 1
+#ವ್ಯಾಖ್ಯಾನಿಸು BLOCK0_ID1_C0  'c'		    // block 0 id 1 'cm' 0
+#ವ್ಯಾಖ್ಯಾನಿಸು BLOCK0_ID1_C1  'C'		    // block 0 id 1 'cm' 1
+#ವ್ಯಾಖ್ಯಾನಿಸು BLOCK0_ID1_C2  'd'		    // block 0 id 1 'cm' 2
 // BLOCK0_ID1_C3 and BLOCK0_ID1_C4 are for libsodium encryption.  However, for
 // these the swapfile is disabled, thus they will not be used.  Added for
 // consistency anyway.
-#define BLOCK0_ID1_C3  'S'		    // block 0 id 1 'cm' 3
-#define BLOCK0_ID1_C4  's'		    // block 0 id 1 'cm' 4
+#ವ್ಯಾಖ್ಯಾನಿಸು BLOCK0_ID1_C3  'S'		    // block 0 id 1 'cm' 3
+#ವ್ಯಾಖ್ಯಾನಿಸು BLOCK0_ID1_C4  's'		    // block 0 id 1 'cm' 4
 
-#if defined(FEAT_CRYPT)
-static const int id1_codes[] = {
+#ಆದರೆ defined(FEAT_CRYPT)
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ id1_codes[] = {
     BLOCK0_ID1_C0,  // CRYPT_M_ZIP
     BLOCK0_ID1_C1,  // CRYPT_M_BF
     BLOCK0_ID1_C2,  // CRYPT_M_BF2
     BLOCK0_ID1_C3,  // CRYPT_M_SOD  - Unused!
     BLOCK0_ID1_C4,  // CRYPT_M_SOD2  - Unused!
 };
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * pointer to a block, used in a pointer block
  */
-struct pointer_entry
+ರಚನೆ ಸೂಚಕ_ನಮೂದು
 {
     blocknr_T	pe_bnum;	// block number
-    linenr_T	pe_line_count;	// number of lines in this branch
+    linenr_T	pe_ಸಾಲು_ಎಣಿಕೆ;	// number of lines in this branch
     linenr_T	pe_old_lnum;	// lnum for this block (for recovery)
-    int		pe_page_count;	// number of pages in block pe_bnum
+    ಪೂರ್ಣಾಂಕ		pe_ಪುಟ_ಎಣಿಕೆ;	// number of pages in block pe_bnum
 };
 
 /*
  * A pointer block contains a list of branches in the tree.
  */
-struct pointer_block
+ರಚನೆ ಸೂಚಕ_ಖಂಡ
 {
     short_u	pb_id;		// ID for pointer block: PTR_ID
-    short_u	pb_count;	// number of pointers in this block
-    short_u	pb_count_max;	// maximum value for pb_count
-    PTR_EN	pb_pointer[1];	// list of pointers to blocks (actually longer)
+    short_u	pb_ಎಣಿಕೆ;	// number of pointers in this block
+    short_u	pb_ಎಣಿಕೆ_max;	// maximum value for pb_count
+    PTR_EN	pb_ಸೂಚಕ[1];	// list of pointers to blocks (actually longer)
 				// followed by empty space until end of page
 };
 
 // Value for pb_count_max.
-#define PB_COUNT_MAX(mfp) (short_u)(((mfp)->mf_page_size - offsetof(PTR_BL, pb_pointer)) / sizeof(PTR_EN))
+#ವ್ಯಾಖ್ಯಾನಿಸು PB_ಎಣಿಕೆ_MAX(mfp) (short_u)(((mfp)->mf_ಪುಟ_ಗಾತ್ರ - offsetof(PTR_BL, pb_ಸೂಚಕ)) / ಗಾತ್ರ(PTR_EN))
 
 /*
  * A data block is a leaf in the tree.
@@ -111,14 +111,14 @@ struct pointer_block
  * in the block is put at the end, the text of the second line in front of it,
  * etc. Thus the order of the lines is the opposite of the line number.
  */
-struct data_block
+ರಚನೆ ದತ್ತಾಂಶ_ಖಂಡ
 {
     short_u	db_id;		// ID for data block: DATA_ID
-    unsigned	db_free;	// free space available
-    unsigned	db_txt_start;	// byte where text starts
-    unsigned	db_txt_end;	// byte just after data block
-    linenr_T	db_line_count;	// number of lines in this block
-    unsigned	db_index[1];	// index for start of line (actually bigger)
+    ಚಿಹ್ನೆರಹಿತ	db_free;	// free space available
+    ಚಿಹ್ನೆರಹಿತ	db_txt_ಆರಂಭ;	// byte where text starts
+    ಚಿಹ್ನೆರಹಿತ	db_txt_ಕೊನೆ;	// byte just after data block
+    linenr_T	db_ಸಾಲು_ಎಣಿಕೆ;	// number of lines in this block
+    ಚಿಹ್ನೆರಹಿತ	db_ಸೂಚ್ಯಂಕ[1];	// index for start of line (actually bigger)
 				// followed by empty space up to db_txt_start
 				// followed by the text in the lines until
 				// end of page
@@ -132,26 +132,26 @@ struct data_block
  * The mark has to be in this place to keep it with the correct line when other
  * lines are inserted or deleted.
  */
-#define DB_MARKED	((unsigned)1 << ((sizeof(unsigned) * 8) - 1))
-#define DB_INDEX_MASK	(~DB_MARKED)
+#ವ್ಯಾಖ್ಯಾನಿಸು DB_MARKED	((ಚಿಹ್ನೆರಹಿತ)1 << ((ಗಾತ್ರ(ಚಿಹ್ನೆರಹಿತ) * 8) - 1))
+#ವ್ಯಾಖ್ಯಾನಿಸು DB_ಸೂಚ್ಯಂಕ_ಮುಖವಾಡ	(~DB_MARKED)
 
-#define INDEX_SIZE  (sizeof(unsigned))	    // size of one db_index entry
-#define HEADER_SIZE (offsetof(DATA_BL, db_index))  // size of data block header
+#ವ್ಯಾಖ್ಯಾನಿಸು ಸೂಚ್ಯಂಕ_ಗಾತ್ರ  (ಗಾತ್ರ(ಚಿಹ್ನೆರಹಿತ))	    // size of one db_index entry
+#ವ್ಯಾಖ್ಯಾನಿಸು ಶೀರ್ಷಿಕೆ_ಗಾತ್ರ (offsetof(ದತ್ತಾಂಶ_BL, db_ಸೂಚ್ಯಂಕ))  // size of data block header
 
-#define B0_FNAME_SIZE_ORG	900	// what it was in older versions
-#define B0_FNAME_SIZE_NOCRYPT	898	// 2 bytes used for other things
-#define B0_FNAME_SIZE_CRYPT	890	// 10 bytes used for other things
-#define B0_UNAME_SIZE		40
-#define B0_HNAME_SIZE		40
+#ವ್ಯಾಖ್ಯಾನಿಸು B0_FNAME_ಗಾತ್ರ_ORG	900	// what it was in older versions
+#ವ್ಯಾಖ್ಯಾನಿಸು B0_FNAME_ಗಾತ್ರ_NOCRYPT	898	// 2 bytes used for other things
+#ವ್ಯಾಖ್ಯಾನಿಸು B0_FNAME_ಗಾತ್ರ_CRYPT	890	// 10 bytes used for other things
+#ವ್ಯಾಖ್ಯಾನಿಸು B0_UNAME_ಗಾತ್ರ		40
+#ವ್ಯಾಖ್ಯಾನಿಸು B0_HNAME_ಗಾತ್ರ		40
 /*
  * Restrict the numbers to 32 bits, otherwise most compilers will complain.
  * This won't detect a 64 bit machine that only swaps a byte in the top 32
  * bits, but that is crazy anyway.
  */
-#define B0_MAGIC_LONG	0x30313233L
-#define B0_MAGIC_INT	0x20212223L
-#define B0_MAGIC_SHORT	0x10111213L
-#define B0_MAGIC_CHAR	0x55
+#ವ್ಯಾಖ್ಯಾನಿಸು B0_MAGIC_LONG	0x30313233L
+#ವ್ಯಾಖ್ಯಾನಿಸು B0_MAGIC_INT	0x20212223L
+#ವ್ಯಾಖ್ಯಾನಿಸು B0_MAGIC_SHORT	0x10111213L
+#ವ್ಯಾಖ್ಯಾನಿಸು B0_MAGIC_CHAR	0x55
 
 /*
  * Block zero holds all info about the swap file.
@@ -165,21 +165,21 @@ struct data_block
  * different machines. b0_magic_* is used to check the byte order and size of
  * variables, because the rest of the swap file is not portable.
  */
-struct block0
+ರಚನೆ block0
 {
     char_u	b0_id[2];	// id for block 0: BLOCK0_ID0 and BLOCK0_ID1,
 				// BLOCK0_ID1_C0, BLOCK0_ID1_C1, etc.
-    char_u	b0_version[10];	// Vim version string
-    char_u	b0_page_size[4];// number of bytes per page
+    char_u	b0_ಆವೃತ್ತಿ[10];	// Vim version string
+    char_u	b0_ಪುಟ_ಗಾತ್ರ[4];// number of bytes per page
     char_u	b0_mtime[4];	// last modification time of file
     char_u	b0_ino[4];	// inode of b0_fname
     char_u	b0_pid[4];	// process id of creator (or 0)
-    char_u	b0_uname[B0_UNAME_SIZE]; // name of user (uid if no name)
-    char_u	b0_hname[B0_HNAME_SIZE]; // host name (if it has a name)
-    char_u	b0_fname[B0_FNAME_SIZE_ORG]; // name of file being edited
-    long	b0_magic_long;	// check for byte order of long
-    int		b0_magic_int;	// check for byte order of int
-    short	b0_magic_short;	// check for byte order of short
+    char_u	b0_uname[B0_UNAME_ಗಾತ್ರ]; // name of user (uid if no name)
+    char_u	b0_hname[B0_HNAME_ಗಾತ್ರ]; // host name (if it has a name)
+    char_u	b0_fname[B0_FNAME_ಗಾತ್ರ_ORG]; // name of file being edited
+    ದೀರ್ಘ	b0_magic_long;	// check for byte order of long
+    ಪೂರ್ಣಾಂಕ		b0_magic_int;	// check for byte order of int
+    ಗಿಡ್ಡ	b0_magic_short;	// check for byte order of short
     char_u	b0_magic_char;	// check for last char
 };
 
@@ -189,34 +189,34 @@ struct block0
  * The 'fileencoding' comes before b0_flags, with a NUL in front.  But only
  * when there is room, for very long file names it's omitted.
  */
-#define B0_DIRTY	0x55
-#define b0_dirty	b0_fname[B0_FNAME_SIZE_ORG - 1]
+#ವ್ಯಾಖ್ಯಾನಿಸು B0_DIRTY	0x55
+#ವ್ಯಾಖ್ಯಾನಿಸು b0_dirty	b0_fname[B0_FNAME_ಗಾತ್ರ_ORG - 1]
 
 /*
  * The b0_flags field is new in Vim 7.0.
  */
-#define b0_flags	b0_fname[B0_FNAME_SIZE_ORG - 2]
+#ವ್ಯಾಖ್ಯಾನಿಸು b0_flags	b0_fname[B0_FNAME_ಗಾತ್ರ_ORG - 2]
 
 /*
  * Crypt seed goes here, 8 bytes.  New in Vim 7.3.
  * Without encryption these bytes may be used for 'fenc'.
  */
-#define b0_seed		b0_fname[B0_FNAME_SIZE_ORG - 2 - MF_SEED_LEN]
+#ವ್ಯಾಖ್ಯಾನಿಸು b0_ಬೀಜ		b0_fname[B0_FNAME_ಗಾತ್ರ_ORG - 2 - MF_ಬೀಜ_LEN]
 
 // The lowest two bits contain the fileformat.  Zero means it's not set
 // (compatible with Vim 6.x), otherwise it's EOL_UNIX + 1, EOL_DOS + 1 or
 // EOL_MAC + 1.
-#define B0_FF_MASK	3
+#ವ್ಯಾಖ್ಯಾನಿಸು B0_FF_ಮುಖವಾಡ	3
 
 // Swap file is in directory of edited file.  Used to find the file from
 // different mount points.
-#define B0_SAME_DIR	4
+#ವ್ಯಾಖ್ಯಾನಿಸು B0_SAME_DIR	4
 
 // The 'fileencoding' is at the end of b0_fname[], with a NUL in front of it.
 // When empty there is only the NUL.
-#define B0_HAS_FENC	8
+#ವ್ಯಾಖ್ಯಾನಿಸು B0_HAS_FENC	8
 
-#define STACK_INCR	5	// nr of entries added to ml_stack at a time
+#ವ್ಯಾಖ್ಯಾನಿಸು ರಾಶಿ_INCR	5	// nr of entries added to ml_stack at a time
 
 /*
  * The line number where the first mark may be is remembered.
@@ -224,142 +224,142 @@ struct block0
  * (always used for the current buffer only, no buffer change possible while
  * executing a global command).
  */
-static linenr_T	lowest_marked = 0;
+ಸ್ಥಿರ linenr_T	ಅತಿಕಡಿಮೆ_marked = 0;
 
 /*
  * arguments for ml_find_line()
  */
-#define ML_DELETE	0x11	    // delete line
-#define ML_INSERT	0x12	    // insert line
-#define ML_FIND		0x13	    // just find the line
-#define ML_FLUSH	0x02	    // flush locked block
-#define ML_SIMPLE(x)	((x) & 0x10)  // DEL, INS or FIND
+#ವ್ಯಾಖ್ಯಾನಿಸು ML_DELETE	0x11	    // delete line
+#ವ್ಯಾಖ್ಯಾನಿಸು ML_ಸೇರಿಸು	0x12	    // insert line
+#ವ್ಯಾಖ್ಯಾನಿಸು ML_ಕಂಡುಹಿಡಿ		0x13	    // just find the line
+#ವ್ಯಾಖ್ಯಾನಿಸು ML_FLUSH	0x02	    // flush locked block
+#ವ್ಯಾಖ್ಯಾನಿಸು ML_SIMPLE(x)	((x) & 0x10)  // DEL, INS or FIND
 
 // argument for ml_upd_block0()
-typedef enum {
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ {
       UB_FNAME = 0	// update timestamp and filename
     , UB_SAME_DIR       // update the B0_SAME_DIR flag
     , UB_CRYPT		// update crypt key
 } upd_block0_T;
 
-#ifdef FEAT_CRYPT
-static void ml_set_b0_crypt(buf_T *buf, ZERO_BL *b0p);
-#endif
-static void ml_upd_block0(buf_T *buf, upd_block0_T what);
-static void set_b0_fname(ZERO_BL *, buf_T *buf);
-static void set_b0_dir_flag(ZERO_BL *b0p, buf_T *buf);
-static void add_b0_fenc(ZERO_BL *b0p, buf_T *buf);
-static time_t swapfile_info(char_u *);
-static int recov_file_names(char_u **, char_u *, int prepend_dot);
-static char_u *findswapname(buf_T *, char_u **, char_u *);
-static void ml_flush_line(buf_T *);
-static bhdr_T *ml_new_data(memfile_T *, int, int);
-static bhdr_T *ml_new_ptr(memfile_T *);
-static bhdr_T *ml_find_line(buf_T *, linenr_T, int);
-static int ml_add_stack(buf_T *);
-static void ml_lineadd(buf_T *, int);
-static int b0_magic_wrong(ZERO_BL *);
-#ifdef CHECK_INODE
-static int fnamecmp_ino(char_u *, char_u *, long);
-#endif
-static void long_to_char(long, char_u *);
-static long char_to_long(char_u *);
-#ifdef FEAT_CRYPT
-static cryptstate_T *ml_crypt_prepare(memfile_T *mfp, off_T offset, int reading);
-#endif
-#ifdef FEAT_BYTEOFF
-static void ml_updatechunk(buf_T *buf, long line, long len, int updtype);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+ಸ್ಥಿರ ಶೂನ್ಯ ml_ಗಣ_b0_crypt(buf_T *buf, ZERO_BL *b0p);
+#ಆದರೆ_ಅಂತ್ಯ
+ಸ್ಥಿರ ಶೂನ್ಯ ml_upd_block0(buf_T *buf, upd_block0_T what);
+ಸ್ಥಿರ ಶೂನ್ಯ ಗಣ_b0_fname(ZERO_BL *, buf_T *buf);
+ಸ್ಥಿರ ಶೂನ್ಯ ಗಣ_b0_dir_flag(ZERO_BL *b0p, buf_T *buf);
+ಸ್ಥಿರ ಶೂನ್ಯ ಕೂಡಿಸು_b0_fenc(ZERO_BL *b0p, buf_T *buf);
+ಸ್ಥಿರ time_t swapfile_info(char_u *);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ recov_file_ಹೆಸರುಗಳು(char_u **, char_u *, ಪೂರ್ಣಾಂಕ prepend_dot);
+ಸ್ಥಿರ char_u *findswapname(buf_T *, char_u **, char_u *);
+ಸ್ಥಿರ ಶೂನ್ಯ ml_flush_ಸಾಲು(buf_T *);
+ಸ್ಥಿರ bhdr_T *ml_new_ದತ್ತಾಂಶ(memfile_T *, ಪೂರ್ಣಾಂಕ, ಪೂರ್ಣಾಂಕ);
+ಸ್ಥಿರ bhdr_T *ml_new_ptr(memfile_T *);
+ಸ್ಥಿರ bhdr_T *ml_ಕಂಡುಹಿಡಿ_ಸಾಲು(buf_T *, linenr_T, ಪೂರ್ಣಾಂಕ);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ml_ಕೂಡಿಸು_ರಾಶಿ(buf_T *);
+ಸ್ಥಿರ ಶೂನ್ಯ ml_lineadd(buf_T *, ಪೂರ್ಣಾಂಕ);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ b0_magic_wrong(ZERO_BL *);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ CHECK_INODE
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ fnamecmp_ino(char_u *, char_u *, ದೀರ್ಘ);
+#ಆದರೆ_ಅಂತ್ಯ
+ಸ್ಥಿರ ಶೂನ್ಯ long_ಗಮ್ಯ_char(ದೀರ್ಘ, char_u *);
+ಸ್ಥಿರ ದೀರ್ಘ char_ಗಮ್ಯ_long(char_u *);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+ಸ್ಥಿರ cryptstate_T *ml_crypt_prepare(memfile_T *mfp, off_T ಸ್ಥಾನಾಂತರ, ಪೂರ್ಣಾಂಕ reading);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_BYTEOFF
+ಸ್ಥಿರ ಶೂನ್ಯ ml_updatechunk(buf_T *buf, ದೀರ್ಘ ಸಾಲು, ದೀರ್ಘ len, ಪೂರ್ಣಾಂಕ updtype);
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Open a new memline for "buf".
  *
  * Return FAIL for failure, OK otherwise.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 ml_open(buf_T *buf)
 {
     memfile_T	*mfp;
-    bhdr_T	*hp = NULL;
+    bhdr_T	*hp = ಖಾಲಿ;
     ZERO_BL	*b0p;
     PTR_BL	*pp;
-    DATA_BL	*dp;
+    ದತ್ತಾಂಶ_BL	*dp;
 
     /*
      * init fields in memline struct
      */
-    buf->b_ml.ml_stack_size = 0; // no stack yet
-    buf->b_ml.ml_stack = NULL;	// no stack yet
-    buf->b_ml.ml_stack_top = 0;	// nothing in the stack
-    buf->b_ml.ml_locked = NULL;	// no cached block
-    buf->b_ml.ml_line_lnum = 0;	// no cached line
-#ifdef FEAT_BYTEOFF
-    buf->b_ml.ml_chunksize = NULL;
+    buf->b_ml.ml_ರಾಶಿ_ಗಾತ್ರ = 0; // no stack yet
+    buf->b_ml.ml_ರಾಶಿ = ಖಾಲಿ;	// no stack yet
+    buf->b_ml.ml_ರಾಶಿ_ತುದಿ = 0;	// nothing in the stack
+    buf->b_ml.ml_locked = ಖಾಲಿ;	// no cached block
+    buf->b_ml.ml_ಸಾಲು_lnum = 0;	// no cached line
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_BYTEOFF
+    buf->b_ml.ml_chunksize = ಖಾಲಿ;
     buf->b_ml.ml_usedchunks = 0;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (cmdmod.cmod_flags & CMOD_NOSWAPFILE)
+    ಆದರೆ (cmdmod.cmod_flags & CMOD_NOSWAPFILE)
 	buf->b_p_swf = FALSE;
 
     /*
      * When 'updatecount' is non-zero swap file may be opened later.
      */
-    if (p_uc && buf->b_p_swf)
-	buf->b_may_swap = true;
-    else
-	buf->b_may_swap = false;
+    ಆದರೆ (p_uc && buf->b_p_swf)
+	buf->b_may_ಅದಲುಬದಲು = true;
+    ಇಲ್ಲದಿದ್ದರೆ
+	buf->b_may_ಅದಲುಬದಲು = false;
 
     /*
      * Open the memfile.  No swap file is created yet.
      */
-    mfp = mf_open(NULL, 0);
-    if (mfp == NULL)
-	goto error;
+    mfp = mf_open(ಖಾಲಿ, 0);
+    ಆದರೆ (mfp == ಖಾಲಿ)
+	ಹೋಗು error;
 
     buf->b_ml.ml_mfp = mfp;
-#ifdef FEAT_CRYPT
-    mfp->mf_buffer = buf;
-#endif
-    buf->b_ml.ml_flags = ML_EMPTY;
-    buf->b_ml.ml_line_count = 1;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+    mfp->mf_ಬಫರ್ = buf;
+#ಆದರೆ_ಅಂತ್ಯ
+    buf->b_ml.ml_flags = ML_ಖಾಲಿಗಳು;
+    buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ = 1;
 
 /*
  * fill block0 struct and write page 0
  */
-    if ((hp = mf_new(mfp, FALSE, 1)) == NULL)
-	goto error;
-    if (hp->bh_bnum != 0)
+    ಆದರೆ ((hp = mf_new(mfp, FALSE, 1)) == ಖಾಲಿ)
+	ಹೋಗು error;
+    ಆದರೆ (hp->bh_bnum != 0)
     {
-	iemsg(e_didnt_get_block_nr_zero);
-	goto error;
+	iemsg(e_didnt_get_ಖಂಡ_nr_zero);
+	ಹೋಗು error;
     }
-    b0p = (ZERO_BL *)(hp->bh_data);
+    b0p = (ZERO_BL *)(hp->bh_ದತ್ತಾಂಶ);
 
     b0p->b0_id[0] = BLOCK0_ID0;
     b0p->b0_id[1] = BLOCK0_ID1;
-    b0p->b0_magic_long = (long)B0_MAGIC_LONG;
-    b0p->b0_magic_int = (int)B0_MAGIC_INT;
-    b0p->b0_magic_short = (short)B0_MAGIC_SHORT;
+    b0p->b0_magic_long = (ದೀರ್ಘ)B0_MAGIC_LONG;
+    b0p->b0_magic_int = (ಪೂರ್ಣಾಂಕ)B0_MAGIC_INT;
+    b0p->b0_magic_short = (ಗಿಡ್ಡ)B0_MAGIC_SHORT;
     b0p->b0_magic_char = B0_MAGIC_CHAR;
-    mch_memmove(b0p->b0_version, "VIM ", 4);
-    STRNCPY(b0p->b0_version + 4, Version, 6);
-    long_to_char((long)mfp->mf_page_size, b0p->b0_page_size);
+    mch_memmove(b0p->b0_ಆವೃತ್ತಿ, "VIM ", 4);
+    STRNCPY(b0p->b0_ಆವೃತ್ತಿ + 4, ಆವೃತ್ತಿ, 6);
+    long_ಗಮ್ಯ_char((ದೀರ್ಘ)mfp->mf_ಪುಟ_ಗಾತ್ರ, b0p->b0_ಪುಟ_ಗಾತ್ರ);
 
-#ifdef FEAT_SPELL
-    if (!buf->b_spell)
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SPELL
+    ಆದರೆ (!buf->b_spell)
+#ಆದರೆ_ಅಂತ್ಯ
     {
-	b0p->b0_dirty = buf->b_changed ? B0_DIRTY : 0;
+	b0p->b0_dirty = buf->b_ಬದಲಾಯಿತು ? B0_DIRTY : 0;
 	b0p->b0_flags = get_fileformat(buf) + 1;
-	set_b0_fname(b0p, buf);
-	(void)get_user_name(b0p->b0_uname, B0_UNAME_SIZE);
-	b0p->b0_uname[B0_UNAME_SIZE - 1] = NUL;
-	mch_get_host_name(b0p->b0_hname, B0_HNAME_SIZE);
-	b0p->b0_hname[B0_HNAME_SIZE - 1] = NUL;
-	long_to_char(mch_get_pid(), b0p->b0_pid);
-#ifdef FEAT_CRYPT
-	ml_set_b0_crypt(buf, b0p);
-#endif
+	ಗಣ_b0_fname(b0p, buf);
+	(ಶೂನ್ಯ)get_user_name(b0p->b0_uname, B0_UNAME_ಗಾತ್ರ);
+	b0p->b0_uname[B0_UNAME_ಗಾತ್ರ - 1] = NUL;
+	mch_get_host_name(b0p->b0_hname, B0_HNAME_ಗಾತ್ರ);
+	b0p->b0_hname[B0_HNAME_ಗಾತ್ರ - 1] = NUL;
+	long_ಗಮ್ಯ_char(mch_get_pid(), b0p->b0_pid);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+	ml_ಗಣ_b0_crypt(buf, b0p);
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
     /*
@@ -370,95 +370,95 @@ ml_open(buf_T *buf)
      * is created.
      */
     mf_put(mfp, hp, TRUE, FALSE);
-    if (!buf->b_help && !B_SPELL(buf))
-	(void)mf_sync(mfp, 0);
+    ಆದರೆ (!buf->b_help && !B_SPELL(buf))
+	(ಶೂನ್ಯ)mf_sync(mfp, 0);
 
     /*
      * Fill in root pointer block and write page 1.
      */
-    if ((hp = ml_new_ptr(mfp)) == NULL)
-	goto error;
-    if (hp->bh_bnum != 1)
+    ಆದರೆ ((hp = ml_new_ptr(mfp)) == ಖಾಲಿ)
+	ಹೋಗು error;
+    ಆದರೆ (hp->bh_bnum != 1)
     {
-	iemsg(e_didnt_get_block_nr_one);
-	goto error;
+	iemsg(e_didnt_get_ಖಂಡ_nr_one);
+	ಹೋಗು error;
     }
-    pp = (PTR_BL *)(hp->bh_data);
-    pp->pb_count = 1;
-    pp->pb_pointer[0].pe_bnum = 2;
-    pp->pb_pointer[0].pe_page_count = 1;
-    pp->pb_pointer[0].pe_old_lnum = 1;
-    pp->pb_pointer[0].pe_line_count = 1;    // line count after insertion
+    pp = (PTR_BL *)(hp->bh_ದತ್ತಾಂಶ);
+    pp->pb_ಎಣಿಕೆ = 1;
+    pp->pb_ಸೂಚಕ[0].pe_bnum = 2;
+    pp->pb_ಸೂಚಕ[0].pe_ಪುಟ_ಎಣಿಕೆ = 1;
+    pp->pb_ಸೂಚಕ[0].pe_old_lnum = 1;
+    pp->pb_ಸೂಚಕ[0].pe_ಸಾಲು_ಎಣಿಕೆ = 1;    // line count after insertion
     mf_put(mfp, hp, TRUE, FALSE);
 
     /*
      * Allocate first data block and create an empty line 1.
      */
-    if ((hp = ml_new_data(mfp, FALSE, 1)) == NULL)
-	goto error;
-    if (hp->bh_bnum != 2)
+    ಆದರೆ ((hp = ml_new_ದತ್ತಾಂಶ(mfp, FALSE, 1)) == ಖಾಲಿ)
+	ಹೋಗು error;
+    ಆದರೆ (hp->bh_bnum != 2)
     {
-	iemsg(e_didnt_get_block_nr_two);
-	goto error;
+	iemsg(e_didnt_get_ಖಂಡ_nr_two);
+	ಹೋಗು error;
     }
 
-    dp = (DATA_BL *)(hp->bh_data);
-    dp->db_index[0] = --dp->db_txt_start;	// at end of block
-    dp->db_free -= 1 + INDEX_SIZE;
-    dp->db_line_count = 1;
-    *((char_u *)dp + dp->db_txt_start) = NUL;	// empty line
+    dp = (ದತ್ತಾಂಶ_BL *)(hp->bh_ದತ್ತಾಂಶ);
+    dp->db_ಸೂಚ್ಯಂಕ[0] = --dp->db_txt_ಆರಂಭ;	// at end of block
+    dp->db_free -= 1 + ಸೂಚ್ಯಂಕ_ಗಾತ್ರ;
+    dp->db_ಸಾಲು_ಎಣಿಕೆ = 1;
+    *((char_u *)dp + dp->db_txt_ಆರಂಭ) = NUL;	// empty line
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 
 error:
-    if (mfp != NULL)
+    ಆದರೆ (mfp != ಖಾಲಿ)
     {
-	if (hp)
+	ಆದರೆ (hp)
 	    mf_put(mfp, hp, FALSE, FALSE);
 	mf_close(mfp, TRUE);	    // will also free(mfp->mf_fname)
     }
-    buf->b_ml.ml_mfp = NULL;
-    return FAIL;
+    buf->b_ml.ml_mfp = ಖಾಲಿ;
+    ಹಿಂತಿರುಗಿ FAIL;
 }
 
-#if defined(FEAT_CRYPT)
+#ಆದರೆ defined(FEAT_CRYPT)
 /*
  * Swapfile encryption is not supported by XChaCha20.  If this crypt method is
  * used then disable the swapfile, to avoid plain text being written to disk,
  * and return TRUE.
  * Otherwise return FALSE.
  */
-    static int
-crypt_may_close_swapfile(buf_T *buf, char_u *key, int method)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+crypt_may_close_swapfile(buf_T *buf, char_u *ಕೀಲಿ, ಪೂರ್ಣಾಂಕ ವಿಧಾನ)
 {
-    if (crypt_method_is_sodium(method) && *key != NUL)
+    ಆದರೆ (crypt_ವಿಧಾನ_is_sodium(ವಿಧಾನ) && *ಕೀಲಿ != NUL)
     {
 	mf_close_file(buf, TRUE);
 	buf->b_p_swf = FALSE;
-	return TRUE;
+	ಹಿಂತಿರುಗಿ TRUE;
     }
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 /*
  * Prepare encryption for "buf" for the current key and method.
  */
-    static void
-ml_set_mfp_crypt(buf_T *buf)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ml_ಗಣ_mfp_crypt(buf_T *buf)
 {
-    if (*buf->b_p_key == NUL)
-	return;
+    ಆದರೆ (*buf->b_p_ಕೀಲಿ == NUL)
+	ಹಿಂತಿರುಗಿ;
 
-    int method_nr = crypt_get_method_nr(buf);
+    ಪೂರ್ಣಾಂಕ ವಿಧಾನ_nr = crypt_get_ವಿಧಾನ_nr(buf);
 
-    if (method_nr > CRYPT_M_ZIP && method_nr < CRYPT_M_SOD)
+    ಆದರೆ (ವಿಧಾನ_nr > CRYPT_M_ZIP && ವಿಧಾನ_nr < CRYPT_M_SOD)
     {
 	// Generate a seed and store it in the memfile.
-	sha2_seed(buf->b_ml.ml_mfp->mf_seed, MF_SEED_LEN, NULL, 0);
+	sha2_ಬೀಜ(buf->b_ml.ml_mfp->mf_ಬೀಜ, MF_ಬೀಜ_LEN, ಖಾಲಿ, 0);
     }
 # ifdef FEAT_SODIUM
-    else if (crypt_method_is_sodium(method_nr))
-	crypt_sodium_randombytes_buf(buf->b_ml.ml_mfp->mf_seed, MF_SEED_LEN);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (crypt_ವಿಧಾನ_is_sodium(ವಿಧಾನ_nr))
+	crypt_sodium_randombytes_buf(buf->b_ml.ml_mfp->mf_ಬೀಜ, MF_ಬೀಜ_LEN);
 # endif
 }
 
@@ -467,21 +467,21 @@ ml_set_mfp_crypt(buf_T *buf)
  * Note: should not be called with libsodium encryption, since xchacha20 does
  * not support swapfile encryption.
  */
-    static void
-ml_set_b0_crypt(buf_T *buf, ZERO_BL *b0p)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ml_ಗಣ_b0_crypt(buf_T *buf, ZERO_BL *b0p)
 {
-    if (*buf->b_p_key == NUL)
+    ಆದರೆ (*buf->b_p_ಕೀಲಿ == NUL)
 	b0p->b0_id[1] = BLOCK0_ID1;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	int method_nr = crypt_get_method_nr(buf);
+	ಪೂರ್ಣಾಂಕ ವಿಧಾನ_nr = crypt_get_ವಿಧಾನ_nr(buf);
 
-	b0p->b0_id[1] = id1_codes[method_nr];
-	if (method_nr > CRYPT_M_ZIP && method_nr < CRYPT_M_SOD)
+	b0p->b0_id[1] = id1_codes[ವಿಧಾನ_nr];
+	ಆದರೆ (ವಿಧಾನ_nr > CRYPT_M_ZIP && ವಿಧಾನ_nr < CRYPT_M_SOD)
 	{
 	    // Generate a seed and store it in block 0 and in the memfile.
-	    sha2_seed(&b0p->b0_seed, MF_SEED_LEN, NULL, 0);
-	    mch_memmove(buf->b_ml.ml_mfp->mf_seed, &b0p->b0_seed, MF_SEED_LEN);
+	    sha2_ಬೀಜ(&b0p->b0_ಬೀಜ, MF_ಬೀಜ_LEN, ಖಾಲಿ, 0);
+	    mch_memmove(buf->b_ml.ml_mfp->mf_ಬೀಜ, &b0p->b0_ಬೀಜ, MF_ಬೀಜ_LEN);
 	}
     }
 }
@@ -494,57 +494,57 @@ ml_set_b0_crypt(buf_T *buf, ZERO_BL *b0p)
  * "old_cm" is the previous 'cryptmethod'.  It is equal to the current
  * 'cryptmethod' when 'key' is changed.
  */
-    void
-ml_set_crypt_key(
+    ಶೂನ್ಯ
+ml_ಗಣ_crypt_ಕೀಲಿ(
     buf_T	*buf,
-    char_u	*old_key,
+    char_u	*old_ಕೀಲಿ,
     char_u	*old_cm)
 {
     memfile_T	*mfp = buf->b_ml.ml_mfp;
     bhdr_T	*hp;
-    int		page_count;
-    int		idx;
-    long	error;
+    ಪೂರ್ಣಾಂಕ		ಪುಟ_ಎಣಿಕೆ;
+    ಪೂರ್ಣಾಂಕ		idx;
+    ದೀರ್ಘ	error;
     infoptr_T	*ip;
     PTR_BL	*pp;
-    DATA_BL	*dp;
+    ದತ್ತಾಂಶ_BL	*dp;
     blocknr_T	bnum;
-    int		top;
-    int		old_method;
+    ಪೂರ್ಣಾಂಕ		ತುದಿ;
+    ಪೂರ್ಣಾಂಕ		old_ವಿಧಾನ;
 
-    if (mfp == NULL || mfp->mf_fd < 0)
-	return;  // no memfile yet, nothing to do
-    old_method = crypt_method_nr_from_name(old_cm);
+    ಆದರೆ (mfp == ಖಾಲಿ || mfp->mf_fd < 0)
+	ಹಿಂತಿರುಗಿ;  // no memfile yet, nothing to do
+    old_ವಿಧಾನ = crypt_ವಿಧಾನ_nr_from_name(old_cm);
 
 # ifdef FEAT_CRYPT
-    if (crypt_may_close_swapfile(buf, buf->b_p_key, crypt_get_method_nr(buf)))
-	return;
+    ಆದರೆ (crypt_may_close_swapfile(buf, buf->b_p_ಕೀಲಿ, crypt_get_ವಿಧಾನ_nr(buf)))
+	ಹಿಂತಿರುಗಿ;
 # endif
 
     // First make sure the swapfile is in a consistent state, using the old
     // key and method.
     {
-	char_u *new_key = buf->b_p_key;
+	char_u *new_ಕೀಲಿ = buf->b_p_ಕೀಲಿ;
 	char_u *new_buf_cm = buf->b_p_cm;
 
-	buf->b_p_key = old_key;
+	buf->b_p_ಕೀಲಿ = old_ಕೀಲಿ;
 	buf->b_p_cm = old_cm;
 	ml_preserve(buf, FALSE);
-	buf->b_p_key = new_key;
+	buf->b_p_ಕೀಲಿ = new_ಕೀಲಿ;
 	buf->b_p_cm = new_buf_cm;
     }
 
     // Set the key, method and seed to be used for reading, these must be the
     // old values.
-    mfp->mf_old_key = old_key;
-    mfp->mf_old_cm = old_method;
-    if (old_method > 0 && *old_key != NUL)
-	mch_memmove(mfp->mf_old_seed, mfp->mf_seed, MF_SEED_LEN);
+    mfp->mf_old_ಕೀಲಿ = old_ಕೀಲಿ;
+    mfp->mf_old_cm = old_ವಿಧಾನ;
+    ಆದರೆ (old_ವಿಧಾನ > 0 && *old_ಕೀಲಿ != NUL)
+	mch_memmove(mfp->mf_old_ಬೀಜ, mfp->mf_ಬೀಜ, MF_ಬೀಜ_LEN);
 
     // Update block 0 with the crypt flag and may set a new seed.
     ml_upd_block0(buf, UB_CRYPT);
 
-    if (mfp->mf_infile_count > 2)
+    ಆದರೆ (mfp->mf_infile_ಎಣಿಕೆ > 2)
     {
 	/*
 	 * Need to read back all data blocks from disk, decrypt them with the
@@ -552,213 +552,213 @@ ml_set_crypt_key(
 	 * similar to what happens in ml_recover(), but we skip negative block
 	 * numbers.
 	 */
-	ml_flush_line(buf);		    // flush buffered line
-	(void)ml_find_line(buf, (linenr_T)0, ML_FLUSH); // flush locked block
+	ml_flush_ಸಾಲು(buf);		    // flush buffered line
+	(ಶೂನ್ಯ)ml_ಕಂಡುಹಿಡಿ_ಸಾಲು(buf, (linenr_T)0, ML_FLUSH); // flush locked block
 
-	hp = NULL;
+	hp = ಖಾಲಿ;
 	bnum = 1;		// start with block 1
-	page_count = 1;		// which is 1 page
+	ಪುಟ_ಎಣಿಕೆ = 1;		// which is 1 page
 	idx = 0;		// start with first index in block 1
 	error = 0;
-	buf->b_ml.ml_stack_top = 0;
-	VIM_CLEAR(buf->b_ml.ml_stack);
-	buf->b_ml.ml_stack_size = 0;	// no stack yet
+	buf->b_ml.ml_ರಾಶಿ_ತುದಿ = 0;
+	VIM_CLEAR(buf->b_ml.ml_ರಾಶಿ);
+	buf->b_ml.ml_ರಾಶಿ_ಗಾತ್ರ = 0;	// no stack yet
 
-	for ( ; !got_int; line_breakcheck())
+	ಗಾಗಿ ( ; !got_int; ಸಾಲು_breakcheck())
 	{
-	    if (hp != NULL)
+	    ಆದರೆ (hp != ಖಾಲಿ)
 		mf_put(mfp, hp, FALSE, FALSE);	// release previous block
 
 	    // get the block (pointer or data)
-	    if ((hp = mf_get(mfp, bnum, page_count)) == NULL)
+	    ಆದರೆ ((hp = mf_get(mfp, bnum, ಪುಟ_ಎಣಿಕೆ)) == ಖಾಲಿ)
 	    {
-		if (bnum == 1)
-		    break;
+		ಆದರೆ (bnum == 1)
+		    ನಿಲ್ಲಿಸು;
 		++error;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		pp = (PTR_BL *)(hp->bh_data);
-		if (pp->pb_id == PTR_ID)	// it is a pointer block
+		pp = (PTR_BL *)(hp->bh_ದತ್ತಾಂಶ);
+		ಆದರೆ (pp->pb_id == PTR_ID)	// it is a pointer block
 		{
-		    if (pp->pb_count == 0)
+		    ಆದರೆ (pp->pb_ಎಣಿಕೆ == 0)
 		    {
 			// empty block?
 			++error;
 		    }
-		    else if (idx < (int)pp->pb_count)	// go a block deeper
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (idx < (ಪೂರ್ಣಾಂಕ)pp->pb_ಎಣಿಕೆ)	// go a block deeper
 		    {
-			if (pp->pb_pointer[idx].pe_bnum < 0)
+			ಆದರೆ (pp->pb_ಸೂಚಕ[idx].pe_bnum < 0)
 			{
 			    // Skip data block with negative block number.
 			    // Should not happen, because of the ml_preserve()
 			    // above. Get same block again for next index.
 			    ++idx;
-			    continue;
+			    ಮುಂದುವರಿ;
 			}
 
 			// going one block deeper in the tree, new entry in
-			// stack
-			if ((top = ml_add_stack(buf)) < 0)
+			//ರಾಶಿ
+			ಆದರೆ ((ತುದಿ = ml_ಕೂಡಿಸು_ರಾಶಿ(buf)) < 0)
 			{
 			    ++error;
-			    break;		    // out of memory
+			    ನಿಲ್ಲಿಸು;		    // out of memory
 			}
-			ip = &(buf->b_ml.ml_stack[top]);
+			ip = &(buf->b_ml.ml_ರಾಶಿ[ತುದಿ]);
 			ip->ip_bnum = bnum;
-			ip->ip_index = idx;
+			ip->ip_ಸೂಚ್ಯಂಕ = idx;
 
-			bnum = pp->pb_pointer[idx].pe_bnum;
-			page_count = pp->pb_pointer[idx].pe_page_count;
+			bnum = pp->pb_ಸೂಚಕ[idx].pe_bnum;
+			ಪುಟ_ಎಣಿಕೆ = pp->pb_ಸೂಚಕ[idx].pe_ಪುಟ_ಎಣಿಕೆ;
 			idx = 0;
-			continue;
+			ಮುಂದುವರಿ;
 		    }
 		}
-		else	    // not a pointer block
+		ಇಲ್ಲದಿದ್ದರೆ	    // not a pointer block
 		{
-		    dp = (DATA_BL *)(hp->bh_data);
-		    if (dp->db_id != DATA_ID)	// block id wrong
+		    dp = (ದತ್ತಾಂಶ_BL *)(hp->bh_ದತ್ತಾಂಶ);
+		    ಆದರೆ (dp->db_id != ದತ್ತಾಂಶ_ID)	// block id wrong
 			++error;
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
 			// It is a data block, need to write it back to disk.
 			mf_put(mfp, hp, TRUE, FALSE);
-			hp = NULL;
+			hp = ಖಾಲಿ;
 		    }
 		}
 	    }
 
-	    if (buf->b_ml.ml_stack_top == 0)	// finished
-		break;
+	    ಆದರೆ (buf->b_ml.ml_ರಾಶಿ_ತುದಿ == 0)	//ಪೂರ್ಣಗೊಂಡ
+		ನಿಲ್ಲಿಸು;
 
 	    // go one block up in the tree
-	    ip = &(buf->b_ml.ml_stack[--(buf->b_ml.ml_stack_top)]);
+	    ip = &(buf->b_ml.ml_ರಾಶಿ[--(buf->b_ml.ml_ರಾಶಿ_ತುದಿ)]);
 	    bnum = ip->ip_bnum;
-	    idx = ip->ip_index + 1;	    // go to next index
-	    page_count = 1;
+	    idx = ip->ip_ಸೂಚ್ಯಂಕ + 1;	    // go to next index
+	    ಪುಟ_ಎಣಿಕೆ = 1;
 	}
-	if (hp != NULL)
+	ಆದರೆ (hp != ಖಾಲಿ)
 	    mf_put(mfp, hp, FALSE, FALSE);  // release previous block
 
-	if (error > 0)
-	    emsg(_(e_error_while_updating_swap_file_crypt));
+	ಆದರೆ (error > 0)
+	    emsg(_(e_error_while_updating_ಅದಲುಬದಲು_file_crypt));
     }
 
-    mfp->mf_old_key = NULL;
+    mfp->mf_old_ಕೀಲಿ = ಖಾಲಿ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * ml_setname() is called when the file name of "buf" has been changed.
  * It may rename the swap file.
  */
-    void
+    ಶೂನ್ಯ
 ml_setname(buf_T *buf)
 {
-    int		success = FALSE;
+    ಪೂರ್ಣಾಂಕ		success = FALSE;
     memfile_T	*mfp;
     char_u	*fname;
     char_u	*dirp;
-#if defined(MSWIN)
+#ಆದರೆ defined(MSWIN)
     char_u	*p;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     mfp = buf->b_ml.ml_mfp;
-    if (mfp->mf_fd < 0)		    // there is no swap file yet
+    ಆದರೆ (mfp->mf_fd < 0)		    // there is no swap file yet
     {
 	/*
 	 * When 'updatecount' is 0 and 'noswapfile' there is no swap file.
 	 * For help files we will make a swap file now.
 	 */
-	if (p_uc != 0 && (cmdmod.cmod_flags & CMOD_NOSWAPFILE) == 0)
+	ಆದರೆ (p_uc != 0 && (cmdmod.cmod_flags & CMOD_NOSWAPFILE) == 0)
 	    ml_open_file(buf);	    // create a swap file
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
     /*
      * Try all directories in the 'directory' option.
      */
     dirp = p_dir;
-    for (;;)
+    ಗಾಗಿ (;;)
     {
-	if (*dirp == NUL)	    // tried all directories, fail
-	    break;
+	ಆದರೆ (*dirp == NUL)	    // tried all directories, fail
+	    ನಿಲ್ಲಿಸು;
 	fname = findswapname(buf, &dirp, mfp->mf_fname);
 	// autocmd may have freed mfp if findswapname creates
 	// different swapfile name
-	if (buf->b_ml.ml_mfp != mfp)
+	ಆದರೆ (buf->b_ml.ml_mfp != mfp)
 	{
 	    vim_free(fname);
-	    return;
+	    ಹಿಂತಿರುಗಿ;
 	}
 						    // alloc's fname
-	if (dirp == NULL)	    // out of memory
-	    break;
-	if (fname == NULL)	    // no file name found for this dir
-	    continue;
+	ಆದರೆ (dirp == ಖಾಲಿ)	    // out of memory
+	    ನಿಲ್ಲಿಸು;
+	ಆದರೆ (fname == ಖಾಲಿ)	    // no file name found for this dir
+	    ಮುಂದುವರಿ;
 
-#if defined(MSWIN)
+#ಆದರೆ defined(MSWIN)
 	/*
 	 * Set full pathname for swap file now, because a ":!cd dir" may
 	 * change directory without us knowing it.
 	 */
-	p = FullName_save(fname, FALSE);
+	p = ತುಂಬಿದ_Name_save(fname, FALSE);
 	vim_free(fname);
 	fname = p;
-	if (fname == NULL)
-	    continue;
-#endif
+	ಆದರೆ (fname == ಖಾಲಿ)
+	    ಮುಂದುವರಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 	// if the file name is the same we don't have to do anything
-	if (fnamecmp(fname, mfp->mf_fname) == 0)
+	ಆದರೆ (fnamecmp(fname, mfp->mf_fname) == 0)
 	{
 	    vim_free(fname);
 	    success = TRUE;
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
 	// need to close the swap file before renaming
-	if (mfp->mf_fd >= 0)
+	ಆದರೆ (mfp->mf_fd >= 0)
 	{
 	    close(mfp->mf_fd);
 	    mfp->mf_fd = -1;
 	}
 
 	// try to rename the swap file
-	if (vim_rename(mfp->mf_fname, fname) == 0)
+	ಆದರೆ (vim_rename(mfp->mf_fname, fname) == 0)
 	{
 	    success = TRUE;
 	    vim_free(mfp->mf_fname);
 	    mfp->mf_fname = fname;
 	    vim_free(mfp->mf_ffname);
-#if defined(MSWIN)
-	    mfp->mf_ffname = NULL;  // mf_fname is full pathname already
-#else
-	    mf_set_ffname(mfp);
-#endif
+#ಆದರೆ defined(MSWIN)
+	    mfp->mf_ffname = ಖಾಲಿ;  // mf_fname is full pathname already
+#ಇಲ್ಲದಿದ್ದರೆ
+	    mf_ಗಣ_ffname(mfp);
+#ಆದರೆ_ಅಂತ್ಯ
 	    ml_upd_block0(buf, UB_SAME_DIR);
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
 	vim_free(fname);	    // this fname didn't work, try another
     }
 
-    if (mfp->mf_fd == -1)	    // need to (re)open the swap file
+    ಆದರೆ (mfp->mf_fd == -1)	    // need to (re)open the swap file
     {
-	mfp->mf_fd = mch_open((char *)mfp->mf_fname, O_RDWR | O_EXTRA, 0);
-	if (mfp->mf_fd < 0)
+	mfp->mf_fd = mch_open((ಅಕ್ಷರ *)mfp->mf_fname, O_RDWR | O_EXTRA, 0);
+	ಆದರೆ (mfp->mf_fd < 0)
 	{
 	    // could not (re)open the swap file, what can we do????
-	    emsg(_(e_oops_lost_the_swap_file));
-	    return;
+	    emsg(_(e_oops_ಕಳೆದುಹೋದ_the_ಅದಲುಬದಲು_file));
+	    ಹಿಂತಿರುಗಿ;
 	}
-#ifdef HAVE_FD_CLOEXEC
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_FD_CLOEXEC
 	{
-	    int fdflags = fcntl(mfp->mf_fd, F_GETFD);
-	    if (fdflags >= 0 && (fdflags & FD_CLOEXEC) == 0)
-		(void)fcntl(mfp->mf_fd, F_SETFD, fdflags | FD_CLOEXEC);
+	    ಪೂರ್ಣಾಂಕ fdflags = fcntl(mfp->mf_fd, F_GETFD);
+	    ಆದರೆ (fdflags >= 0 && (fdflags & FD_CLOEXEC) == 0)
+		(ಶೂನ್ಯ)fcntl(mfp->mf_fd, F_SETFD, fdflags | FD_CLOEXEC);
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
-    if (!success)
-	emsg(_(e_could_not_rename_swap_file));
+    ಆದರೆ (!success)
+	emsg(_(e_could_not_rename_ಅದಲುಬದಲು_file));
 }
 
 /*
@@ -766,13 +766,13 @@ ml_setname(buf_T *buf)
  * been modified.
  * Used when 'updatecount' changes from zero to non-zero.
  */
-    void
-ml_open_files(void)
+    ಶೂನ್ಯ
+ml_open_files(ಶೂನ್ಯ)
 {
     buf_T	*buf;
 
     FOR_ALL_BUFFERS(buf)
-	if (!buf->b_p_ro || buf->b_changed)
+	ಆದರೆ (!buf->b_p_ro || buf->b_ಬದಲಾಯಿತು)
 	    ml_open_file(buf);
 }
 
@@ -781,7 +781,7 @@ ml_open_files(void)
  * If we are unable to find a file name, mf_fname will be NULL
  * and the memfile will be in memory only (no recovery possible).
  */
-    void
+    ಶೂನ್ಯ
 ml_open_file(buf_T *buf)
 {
     memfile_T	*mfp;
@@ -789,117 +789,117 @@ ml_open_file(buf_T *buf)
     char_u	*dirp;
 
     mfp = buf->b_ml.ml_mfp;
-    if (mfp == NULL || mfp->mf_fd >= 0 || !buf->b_p_swf
+    ಆದರೆ (mfp == ಖಾಲಿ || mfp->mf_fd >= 0 || !buf->b_p_swf
 				      || (cmdmod.cmod_flags & CMOD_NOSWAPFILE))
-	return;		// nothing to do
+	ಹಿಂತಿರುಗಿ;		// nothing to do
 
-#ifdef FEAT_SPELL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SPELL
     // For a spell buffer use a temp file name.
-    if (buf->b_spell)
+    ಆದರೆ (buf->b_spell)
     {
 	fname = vim_tempname('s', FALSE);
-	if (fname != NULL)
-	    (void)mf_open_file(mfp, fname);	// consumes fname!
-	buf->b_may_swap = false;
-	return;
+	ಆದರೆ (fname != ಖಾಲಿ)
+	    (ಶೂನ್ಯ)mf_open_file(mfp, fname);	// consumes fname!
+	buf->b_may_ಅದಲುಬದಲು = false;
+	ಹಿಂತಿರುಗಿ;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     /*
      * Try all directories in 'directory' option.
      */
     dirp = p_dir;
-    for (;;)
+    ಗಾಗಿ (;;)
     {
-	if (*dirp == NUL)
-	    break;
+	ಆದರೆ (*dirp == NUL)
+	    ನಿಲ್ಲಿಸು;
 	// There is a small chance that between choosing the swap file name
 	// and creating it, another Vim creates the file.  In that case the
 	// creation will fail and we will use another directory.
-	fname = findswapname(buf, &dirp, NULL); // allocates fname
+	fname = findswapname(buf, &dirp, ಖಾಲಿ); // allocates fname
 	// autocmd may have freed mfp, grr!
-	if (buf->b_ml.ml_mfp != mfp)
+	ಆದರೆ (buf->b_ml.ml_mfp != mfp)
 	{
 	    vim_free(fname);
-	    return;
+	    ಹಿಂತಿರುಗಿ;
 	}
-	if (dirp == NULL)
-	    break;  // out of memory
-	if (fname == NULL)
-	    continue;
-	if (mf_open_file(mfp, fname) == OK)	// consumes fname!
+	ಆದರೆ (dirp == ಖಾಲಿ)
+	    ನಿಲ್ಲಿಸು;  // out of memory
+	ಆದರೆ (fname == ಖಾಲಿ)
+	    ಮುಂದುವರಿ;
+	ಆದರೆ (mf_open_file(mfp, fname) == OK)	// consumes fname!
 	{
 	    // don't sync yet in ml_sync_all()
 	    mfp->mf_dirty = MF_DIRTY_YES_NOSYNC;
-#if defined(MSWIN)
+#ಆದರೆ defined(MSWIN)
 	    /*
 	     * set full pathname for swap file now, because a ":!cd dir" may
 	     * change directory without us knowing it.
 	     */
 	    mf_fullname(mfp);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    ml_upd_block0(buf, UB_SAME_DIR);
 
 	    // Flush block zero, so others can read it
-	    if (mf_sync(mfp, MFS_ZERO) == OK)
+	    ಆದರೆ (mf_sync(mfp, MFS_ZERO) == OK)
 	    {
 		// Mark all blocks that should be in the swapfile as dirty.
 		// Needed for when the 'swapfile' option was reset, so that
 		// the swap file was deleted, and then on again.
-		mf_set_dirty(mfp);
-		break;
+		mf_ಗಣ_dirty(mfp);
+		ನಿಲ್ಲಿಸು;
 	    }
 	    // Writing block 0 failed: close the file and try another dir
 	    mf_close_file(buf, FALSE);
 	}
     }
 
-    if (*p_dir != NUL && mfp->mf_fname == NULL)
+    ಆದರೆ (*p_dir != NUL && mfp->mf_fname == ಖಾಲಿ)
     {
 	need_wait_return = TRUE;	// call wait_return() later
 	++no_wait_return;
-	(void)semsg(_(e_unable_to_open_swap_file_for_str_recovery_impossible),
-		    buf_spname(buf) != NULL ? buf_spname(buf) : buf->b_fname);
+	(ಶೂನ್ಯ)semsg(_(e_unable_ಗಮ್ಯ_open_ಅದಲುಬದಲು_file_for_str_recovery_impossible),
+		    buf_spname(buf) != ಖಾಲಿ ? buf_spname(buf) : buf->b_fname);
 	--no_wait_return;
     }
 
     // don't try to open a swap file again
-    buf->b_may_swap = false;
+    buf->b_may_ಅದಲುಬದಲು = false;
 }
 
 /*
  * If still need to create a swap file, and starting to edit a not-readonly
  * file, or reading into an existing buffer, create a swap file now.
  */
-    void
-check_need_swap(
-    int	    newfile)		// reading file into new buffer
+    ಶೂನ್ಯ
+check_need_ಅದಲುಬದಲು(
+    ಪೂರ್ಣಾಂಕ	    newfile)		// reading file into new buffer
 {
-    int old_msg_silent = msg_silent; // might be reset by an E325 message
+    ಪೂರ್ಣಾಂಕ old_ಸಂದೇಶ_silent = ಸಂದೇಶ_silent; // might be reset by an E325 message
 
-    if (curbuf->b_may_swap && (!curbuf->b_p_ro || !newfile))
+    ಆದರೆ (curbuf->b_may_ಅದಲುಬದಲು && (!curbuf->b_p_ro || !newfile))
 	ml_open_file(curbuf);
-    msg_silent = old_msg_silent;
+    ಸಂದೇಶ_silent = old_ಸಂದೇಶ_silent;
 }
 
 /*
  * Close memline for buffer 'buf'.
  * If 'del_file' is TRUE, delete the swap file
  */
-    void
-ml_close(buf_T *buf, int del_file)
+    ಶೂನ್ಯ
+ml_close(buf_T *buf, ಪೂರ್ಣಾಂಕ del_file)
 {
-    if (buf->b_ml.ml_mfp == NULL)		// not open
-	return;
+    ಆದರೆ (buf->b_ml.ml_mfp == ಖಾಲಿ)		// not open
+	ಹಿಂತಿರುಗಿ;
     mf_close(buf->b_ml.ml_mfp, del_file);	// close the .swp file
-    if (buf->b_ml.ml_line_lnum != 0
-		      && (buf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED)))
-	vim_free(buf->b_ml.ml_line_ptr);
-    vim_free(buf->b_ml.ml_stack);
-#ifdef FEAT_BYTEOFF
+    ಆದರೆ (buf->b_ml.ml_ಸಾಲು_lnum != 0
+		      && (buf->b_ml.ml_flags & (ML_ಸಾಲು_DIRTY | ML_ALLOCATED)))
+	vim_free(buf->b_ml.ml_ಸಾಲು_ptr);
+    vim_free(buf->b_ml.ml_ರಾಶಿ);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_BYTEOFF
     VIM_CLEAR(buf->b_ml.ml_chunksize);
-#endif
-    buf->b_ml.ml_mfp = NULL;
+#ಆದರೆ_ಅಂತ್ಯ
+    buf->b_ml.ml_mfp = ಖಾಲಿ;
 
     // Reset the "recovered" flag, give the ATTENTION prompt the next time
     // this buffer is loaded.
@@ -912,33 +912,33 @@ ml_close(buf_T *buf, int del_file)
  * When 'del_file' is TRUE, delete the memfiles.
  * But don't delete files that were ":preserve"d when we are POSIX compatible.
  */
-    void
-ml_close_all(int del_file)
+    ಶೂನ್ಯ
+ml_close_all(ಪೂರ್ಣಾಂಕ del_file)
 {
     buf_T	*buf;
 
     FOR_ALL_BUFFERS(buf)
 	ml_close(buf, del_file && ((buf->b_flags & BF_PRESERVED) == 0
-				 || vim_strchr(p_cpo, CPO_PRESERVE) == NULL));
-#ifdef FEAT_SPELL
+				 || vim_strchr(p_cpo, CPO_PRESERVE) == ಖಾಲಿ));
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SPELL
     spell_delete_wordlist();	// delete the internal wordlist
-#endif
-#ifdef TEMPDIRNAMES
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TEMPDIRNAMES
     vim_deltempdir();		// delete created temp directory
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Close all memfiles for not modified buffers.
  * Only use just before exiting!
  */
-    void
-ml_close_notmod(void)
+    ಶೂನ್ಯ
+ml_close_notmod(ಶೂನ್ಯ)
 {
     buf_T	*buf;
 
     FOR_ALL_BUFFERS(buf)
-	if (!bufIsChanged(buf))
+	ಆದರೆ (!buf_Is_ಬದಲಾಯಿತು(buf))
 	    ml_close(buf, TRUE);    // close all not-modified buffers
 }
 
@@ -946,7 +946,7 @@ ml_close_notmod(void)
  * Update the timestamp in the .swp file.
  * Used when the file has been written.
  */
-    void
+    ಶೂನ್ಯ
 ml_timestamp(buf_T *buf)
 {
     ml_upd_block0(buf, UB_FNAME);
@@ -955,10 +955,10 @@ ml_timestamp(buf_T *buf)
 /*
  * Return FAIL when the ID of "b0p" is wrong.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 ml_check_b0_id(ZERO_BL *b0p)
 {
-    if (b0p->b0_id[0] != BLOCK0_ID0
+    ಆದರೆ (b0p->b0_id[0] != BLOCK0_ID0
 	    || (b0p->b0_id[1] != BLOCK0_ID1
 		&& b0p->b0_id[1] != BLOCK0_ID1_C0
 		&& b0p->b0_id[1] != BLOCK0_ID1_C1
@@ -966,14 +966,14 @@ ml_check_b0_id(ZERO_BL *b0p)
 		&& b0p->b0_id[1] != BLOCK0_ID1_C3
 		&& b0p->b0_id[1] != BLOCK0_ID1_C4)
 	    )
-	return FAIL;
-    return OK;
+	ಹಿಂತಿರುಗಿ FAIL;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Update the timestamp or the B0_SAME_DIR flag of the .swp file.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ml_upd_block0(buf_T *buf, upd_block0_T what)
 {
     memfile_T	*mfp;
@@ -981,32 +981,32 @@ ml_upd_block0(buf_T *buf, upd_block0_T what)
     ZERO_BL	*b0p;
 
     mfp = buf->b_ml.ml_mfp;
-    if (mfp == NULL)
-	return;
+    ಆದರೆ (mfp == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
     hp = mf_get(mfp, (blocknr_T)0, 1);
-    if (hp == NULL)
+    ಆದರೆ (hp == ಖಾಲಿ)
     {
-#ifdef FEAT_CRYPT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
 	// Possibly update the seed in the memfile before there is a block0.
-	if (what == UB_CRYPT)
-	    ml_set_mfp_crypt(buf);
-#endif
-	return;
+	ಆದರೆ (what == UB_CRYPT)
+	    ml_ಗಣ_mfp_crypt(buf);
+#ಆದರೆ_ಅಂತ್ಯ
+	ಹಿಂತಿರುಗಿ;
     }
 
-    b0p = (ZERO_BL *)(hp->bh_data);
-    if (ml_check_b0_id(b0p) == FAIL)
-	iemsg(e_ml_upd_block0_didnt_get_block_zero);
-    else
+    b0p = (ZERO_BL *)(hp->bh_ದತ್ತಾಂಶ);
+    ಆದರೆ (ml_check_b0_id(b0p) == FAIL)
+	iemsg(e_ml_upd_block0_didnt_get_ಖಂಡ_zero);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (what == UB_FNAME)
-	    set_b0_fname(b0p, buf);
-#ifdef FEAT_CRYPT
-	else if (what == UB_CRYPT)
-	    ml_set_b0_crypt(buf, b0p);
-#endif
-	else // what == UB_SAME_DIR
-	    set_b0_dir_flag(b0p, buf);
+	ಆದರೆ (what == UB_FNAME)
+	    ಗಣ_b0_fname(b0p, buf);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (what == UB_CRYPT)
+	    ml_ಗಣ_b0_crypt(buf, b0p);
+#ಆದರೆ_ಅಂತ್ಯ
+	ಇಲ್ಲದಿದ್ದರೆ // what == UB_SAME_DIR
+	    ಗಣ_b0_dir_flag(b0p, buf);
     }
     mf_put(mfp, hp, TRUE, FALSE);
 }
@@ -1016,26 +1016,26 @@ ml_upd_block0(buf_T *buf, upd_block0_T what)
  * Also set buf->b_mtime.
  * Don't use NameBuff[]!!!
  */
-    static void
-set_b0_fname(ZERO_BL *b0p, buf_T *buf)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_b0_fname(ZERO_BL *b0p, buf_T *buf)
 {
     stat_T	st;
 
-    if (buf->b_ffname == NULL)
+    ಆದರೆ (buf->b_ffname == ಖಾಲಿ)
 	b0p->b0_fname[0] = NUL;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-#if defined(MSWIN) || defined(AMIGA)
+#ಆದರೆ defined(MSWIN) || defined(AMIGA)
 	// Systems that cannot translate "~user" back into a path: copy the
 	// file name unmodified.  Do use slashes instead of backslashes for
 	// portability.
-	vim_strncpy(b0p->b0_fname, buf->b_ffname, B0_FNAME_SIZE_CRYPT - 1);
-# ifdef BACKSLASH_IN_FILENAME
+	vim_strncpy(b0p->b0_fname, buf->b_ffname, B0_FNAME_ಗಾತ್ರ_CRYPT - 1);
+# ifdef BACKSLASH_ಒಳ_FILENAME
 	forward_slash(b0p->b0_fname);
 # endif
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 	size_t	flen;
-	char_u	uname[B0_UNAME_SIZE];
+	char_u	uname[B0_UNAME_ಗಾತ್ರ];
 
 	/*
 	 * For a file under the home directory of the current user, we try to
@@ -1044,51 +1044,51 @@ set_b0_fname(ZERO_BL *b0p, buf_T *buf)
 	 * First replace home dir path with "~/" with home_replace().
 	 * Then insert the user name to get "~user/".
 	 */
-	flen = home_replace(NULL, buf->b_ffname, b0p->b0_fname,
-						   B0_FNAME_SIZE_CRYPT, TRUE);
-	if (b0p->b0_fname[0] == '~')
+	flen = home_replace(ಖಾಲಿ, buf->b_ffname, b0p->b0_fname,
+						   B0_FNAME_ಗಾತ್ರ_CRYPT, TRUE);
+	ಆದರೆ (b0p->b0_fname[0] == '~')
 	{
 	    size_t  ulen;
 
 	    // If there is no user name or it is too long, don't use "~/"
-	    if (get_user_name(uname, B0_UNAME_SIZE) == FAIL
-		   || (ulen = STRLEN(uname)) + flen > B0_FNAME_SIZE_CRYPT - 1)
+	    ಆದರೆ (get_user_name(uname, B0_UNAME_ಗಾತ್ರ) == FAIL
+		   || (ulen = STRLEN(uname)) + flen > B0_FNAME_ಗಾತ್ರ_CRYPT - 1)
 		vim_strncpy(b0p->b0_fname, buf->b_ffname,
-						     B0_FNAME_SIZE_CRYPT - 1);
-	    else
+						     B0_FNAME_ಗಾತ್ರ_CRYPT - 1);
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		mch_memmove(b0p->b0_fname + ulen + 1, b0p->b0_fname + 1, flen);
 		mch_memmove(b0p->b0_fname + 1, uname, ulen);
 	    }
 	}
-#endif
-	if (mch_stat((char *)buf->b_ffname, &st) >= 0)
+#ಆದರೆ_ಅಂತ್ಯ
+	ಆದರೆ (mch_stat((ಅಕ್ಷರ *)buf->b_ffname, &st) >= 0)
 	{
-	    long_to_char((long)st.st_mtime, b0p->b0_mtime);
-#ifdef CHECK_INODE
-	    long_to_char((long)st.st_ino, b0p->b0_ino);
-#endif
-	    buf_store_time(buf, &st, buf->b_ffname);
+	    long_ಗಮ್ಯ_char((ದೀರ್ಘ)st.st_mtime, b0p->b0_mtime);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ CHECK_INODE
+	    long_ಗಮ್ಯ_char((ದೀರ್ಘ)st.st_ino, b0p->b0_ino);
+#ಆದರೆ_ಅಂತ್ಯ
+	    buf_store_ಸಮಯ(buf, &st, buf->b_ffname);
 	    buf->b_mtime_read = buf->b_mtime;
 	    buf->b_mtime_read_ns = buf->b_mtime_ns;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    long_to_char(0L, b0p->b0_mtime);
-#ifdef CHECK_INODE
-	    long_to_char(0L, b0p->b0_ino);
-#endif
+	    long_ಗಮ್ಯ_char(0L, b0p->b0_mtime);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ CHECK_INODE
+	    long_ಗಮ್ಯ_char(0L, b0p->b0_ino);
+#ಆದರೆ_ಅಂತ್ಯ
 	    buf->b_mtime = 0;
 	    buf->b_mtime_ns = 0;
 	    buf->b_mtime_read = 0;
 	    buf->b_mtime_read_ns = 0;
-	    buf->b_orig_size = 0;
-	    buf->b_orig_mode = 0;
+	    buf->b_orig_ಗಾತ್ರ = 0;
+	    buf->b_orig_ಬಹುಲಕ = 0;
 	}
     }
 
     // Also add the 'fileencoding' if there is room.
-    add_b0_fenc(b0p, curbuf);
+    ಕೂಡಿಸು_b0_fenc(b0p, curbuf);
 }
 
 /*
@@ -1097,124 +1097,124 @@ set_b0_fname(ZERO_BL *b0p, buf_T *buf)
  * This is fail safe: if we are not sure the directories are equal the flag is
  * not set.
  */
-    static void
-set_b0_dir_flag(ZERO_BL *b0p, buf_T *buf)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_b0_dir_flag(ZERO_BL *b0p, buf_T *buf)
 {
-    if (same_directory(buf->b_ml.ml_mfp->mf_fname, buf->b_ffname))
+    ಆದರೆ (same_directory(buf->b_ml.ml_mfp->mf_fname, buf->b_ffname))
 	b0p->b0_flags |= B0_SAME_DIR;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	b0p->b0_flags &= ~B0_SAME_DIR;
 }
 
 /*
  * When there is room, add the 'fileencoding' to block zero.
  */
-    static void
-add_b0_fenc(
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಕೂಡಿಸು_b0_fenc(
     ZERO_BL	*b0p,
     buf_T	*buf)
 {
-    int		n;
-    int		size = B0_FNAME_SIZE_NOCRYPT;
+    ಪೂರ್ಣಾಂಕ		n;
+    ಪೂರ್ಣಾಂಕ		ಗಾತ್ರ_2 = B0_FNAME_ಗಾತ್ರ_NOCRYPT;
 
-#ifdef FEAT_CRYPT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
     // Without encryption use the same offset as in Vim 7.2 to be compatible.
     // With encryption it's OK to move elsewhere, the swap file is not
     // compatible anyway.
-    if (*buf->b_p_key != NUL)
-	size = B0_FNAME_SIZE_CRYPT;
-#endif
+    ಆದರೆ (*buf->b_p_ಕೀಲಿ != NUL)
+	ಗಾತ್ರ_2 = B0_FNAME_ಗಾತ್ರ_CRYPT;
+#ಆದರೆ_ಅಂತ್ಯ
 
-    n = (int)STRLEN(buf->b_p_fenc);
-    if ((int)STRLEN(b0p->b0_fname) + n + 1 > size)
+    n = (ಪೂರ್ಣಾಂಕ)STRLEN(buf->b_p_fenc);
+    ಆದರೆ ((ಪೂರ್ಣಾಂಕ)STRLEN(b0p->b0_fname) + n + 1 > ಗಾತ್ರ_2)
 	b0p->b0_flags &= ~B0_HAS_FENC;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	mch_memmove((char *)b0p->b0_fname + size - n,
-					    (char *)buf->b_p_fenc, (size_t)n);
-	*(b0p->b0_fname + size - n - 1) = NUL;
+	mch_memmove((ಅಕ್ಷರ *)b0p->b0_fname + ಗಾತ್ರ_2 - n,
+					    (ಅಕ್ಷರ *)buf->b_p_fenc, (size_t)n);
+	*(b0p->b0_fname + ಗಾತ್ರ_2 - n - 1) = NUL;
 	b0p->b0_flags |= B0_HAS_FENC;
     }
 }
 
-#if defined(HAVE_SYS_SYSINFO_H) && defined(HAVE_SYSINFO_UPTIME)
+#ಆದರೆ defined(HAVE_SYS_SYSINFO_H) && defined(HAVE_SYSINFO_UPTIME)
 # include <sys/sysinfo.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(UNIX) || defined(MSWIN)
+#ಆದರೆ defined(UNIX) || defined(MSWIN)
 /*
  * Return TRUE if the process with number "b0p->b0_pid" is still running.
  * "swap_fname" is the name of the swap file, if it's from before a reboot then
  * the result is FALSE;
  */
-    static int
-swapfile_process_running(ZERO_BL *b0p, char_u *swap_fname UNUSED)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+swapfile_process_running(ZERO_BL *b0p, char_u *ಅದಲುಬದಲು_fname ಬಳಸದ)
 {
-# if defined(HAVE_SYSINFO) && defined(HAVE_SYSINFO_UPTIME)
+# ಆದರೆ defined(HAVE_SYSINFO) && defined(HAVE_SYSINFO_UPTIME)
     stat_T	    st;
-    struct sysinfo  sinfo;
+    ರಚನೆ sysinfo  sinfo;
 
     // If the system rebooted after when the swap file was written then the
     // process can't be running now.
-    if (mch_stat((char *)swap_fname, &st) != -1
+    ಆದರೆ (mch_stat((ಅಕ್ಷರ *)ಅದಲುಬದಲು_fname, &st) != -1
 	    && sysinfo(&sinfo) == 0
-	    && st.st_mtime < time(NULL) - (
+	    && st.st_mtime < ಸಮಯ(ಖಾಲಿ) - (
 #  ifdef FEAT_EVAL
 		override_sysinfo_uptime >= 0 ? override_sysinfo_uptime :
 #  endif
 		sinfo.uptime))
-	return FALSE;
+	ಹಿಂತಿರುಗಿ FALSE;
 # endif
-    return mch_process_running(char_to_long(b0p->b0_pid));
+    ಹಿಂತಿರುಗಿ mch_process_running(char_ಗಮ್ಯ_long(b0p->b0_pid));
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Try to recover curbuf from the .swp file.
  * If "checkext" is TRUE, check the extension and detect whether it is
  * a swap file.
  */
-    void
-ml_recover(int checkext)
+    ಶೂನ್ಯ
+ml_recover(ಪೂರ್ಣಾಂಕ checkext)
 {
-    buf_T	*buf = NULL;
-    memfile_T	*mfp = NULL;
+    buf_T	*buf = ಖಾಲಿ;
+    memfile_T	*mfp = ಖಾಲಿ;
     char_u	*fname;
-    char_u	*fname_used = NULL;
-    bhdr_T	*hp = NULL;
+    char_u	*fname_ಬಳಸಿದ = ಖಾಲಿ;
+    bhdr_T	*hp = ಖಾಲಿ;
     ZERO_BL	*b0p;
-    int		b0_ff;
-    char_u	*b0_fenc = NULL;
-#ifdef FEAT_CRYPT
-    int		b0_cm = -1;
-#endif
+    ಪೂರ್ಣಾಂಕ		b0_ff;
+    char_u	*b0_fenc = ಖಾಲಿ;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+    ಪೂರ್ಣಾಂಕ		b0_cm = -1;
+#ಆದರೆ_ಅಂತ್ಯ
     PTR_BL	*pp;
-    DATA_BL	*dp;
+    ದತ್ತಾಂಶ_BL	*dp;
     infoptr_T	*ip;
     blocknr_T	bnum;
-    int		page_count;
+    ಪೂರ್ಣಾಂಕ		ಪುಟ_ಎಣಿಕೆ;
     stat_T	org_stat, swp_stat;
-    int		len;
-    int		directly;
+    ಪೂರ್ಣಾಂಕ		len;
+    ಪೂರ್ಣಾಂಕ		directly;
     linenr_T	lnum;
     char_u	*p;
-    int		i;
-    long	error;
-    int		cannot_open;
-    linenr_T	line_count;
-    int		has_error;
-    int		idx;
-    int		top;
-    int		txt_start;
-    off_T	size;
-    int		called_from_main;
-    int		serious_error = TRUE;
-    long	mtime;
-    int		attr;
-    int		orig_file_status = NOTDONE;
+    ಪೂರ್ಣಾಂಕ		i;
+    ದೀರ್ಘ	error;
+    ಪೂರ್ಣಾಂಕ		cannot_open;
+    linenr_T	ಸಾಲು_ಎಣಿಕೆ;
+    ಪೂರ್ಣಾಂಕ		has_error;
+    ಪೂರ್ಣಾಂಕ		idx;
+    ಪೂರ್ಣಾಂಕ		ತುದಿ;
+    ಪೂರ್ಣಾಂಕ		txt_ಆರಂಭ;
+    off_T	ಗಾತ್ರ_2;
+    ಪೂರ್ಣಾಂಕ		called_from_main;
+    ಪೂರ್ಣಾಂಕ		serious_error = TRUE;
+    ದೀರ್ಘ	mtime;
+    ಪೂರ್ಣಾಂಕ		attr;
+    ಪೂರ್ಣಾಂಕ		orig_file_ಸ್ಥಿತಿ = NOTDONE;
 
     recoverymode = TRUE;
-    called_from_main = (curbuf->b_ml.ml_mfp == NULL);
+    called_from_main = (curbuf->b_ml.ml_mfp == ಖಾಲಿ);
     attr = HL_ATTR(HLF_E);
 
     /*
@@ -1222,54 +1222,54 @@ ml_recover(int checkext)
      * Otherwise a search is done to find the swap file(s).
      */
     fname = curbuf->b_fname;
-    if (fname == NULL)		    // When there is no file name
+    ಆದರೆ (fname == ಖಾಲಿ)		    // When there is no file name
 	fname = (char_u *)"";
-    len = (int)STRLEN(fname);
-    if (checkext && len >= 4 &&
-#if defined(VMS)
+    len = (ಪೂರ್ಣಾಂಕ)STRLEN(fname);
+    ಆದರೆ (checkext && len >= 4 &&
+#ಆದರೆ defined(VMS)
 	    STRNICMP(fname + len - 4, "_s", 2)
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 	    STRNICMP(fname + len - 4, ".s", 2)
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 						== 0
 		&& vim_strchr((char_u *)"abcdefghijklmnopqrstuvw",
-					   TOLOWER_ASC(fname[len - 2])) != NULL
+					   TOLOWER_ASC(fname[len - 2])) != ಖಾಲಿ
 		&& ASCII_ISALPHA(fname[len - 1]))
     {
 	directly = TRUE;
-	fname_used = vim_strsave(fname); // make a copy for mf_open()
+	fname_ಬಳಸಿದ = vim_strsave(fname); // make a copy for mf_open()
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	directly = FALSE;
 
 	// count the number of matching swap files
-	len = recover_names(fname, FALSE, NULL, 0, NULL);
-	if (len == 0)		    // no swap files found
+	len = recover_ಹೆಸರುಗಳು(fname, FALSE, ಖಾಲಿ, 0, ಖಾಲಿ);
+	ಆದರೆ (len == 0)		    // no swap files found
 	{
-	    semsg(_(e_no_swap_file_found_for_str), fname);
-	    goto theend;
+	    semsg(_(e_no_ಅದಲುಬದಲು_file_ಸಿಕ್ಕಿತು_for_str), fname);
+	    ಹೋಗು theend;
 	}
-	if (len == 1)		    // one swap file found, use it
+	ಆದರೆ (len == 1)		    // one swap file found, use it
 	    i = 1;
-	else			    // several swap files found, choose
+	ಇಲ್ಲದಿದ್ದರೆ			    // several swap files found, choose
 	{
 	    // list the names of the swap files
-	    (void)recover_names(fname, TRUE, NULL, 0, NULL);
-	    msg_putchar('\n');
-	    msg_puts(_("Enter number of swap file to use (0 to quit): "));
-	    i = get_number(FALSE, NULL);
-	    if (i < 1 || i > len)
-		goto theend;
+	    (ಶೂನ್ಯ)recover_ಹೆಸರುಗಳು(fname, TRUE, ಖಾಲಿ, 0, ಖಾಲಿ);
+	    ಸಂದೇಶ_putchar('\n');
+	    ಸಂದೇಶ_puts(_("Enter number of swap file to use (0 to quit): "));
+	    i = get_ಸಂಖ್ಯೆ(FALSE, ಖಾಲಿ);
+	    ಆದರೆ (i < 1 || i > len)
+		ಹೋಗು theend;
 	}
 	// get the swap file name that will be used
-	(void)recover_names(fname, FALSE, NULL, i, &fname_used);
+	(ಶೂನ್ಯ)recover_ಹೆಸರುಗಳು(fname, FALSE, ಖಾಲಿ, i, &fname_ಬಳಸಿದ);
     }
-    if (fname_used == NULL)
-	goto theend;			// out of memory
+    ಆದರೆ (fname_ಬಳಸಿದ == ಖಾಲಿ)
+	ಹೋಗು theend;			// out of memory
 
     // When called from main() still need to initialize storage structure
-    if (called_from_main && ml_open(curbuf) == FAIL)
+    ಆದರೆ (called_from_main && ml_open(curbuf) == FAIL)
 	getout(1);
 
     /*
@@ -1277,40 +1277,40 @@ ml_recover(int checkext)
      * Only the memline and crypt information in it are really used.
      */
     buf = ALLOC_ONE(buf_T);
-    if (buf == NULL)
-	goto theend;
+    ಆದರೆ (buf == ಖಾಲಿ)
+	ಹೋಗು theend;
 
     /*
      * init fields in memline struct
      */
-    buf->b_ml.ml_stack_size = 0;	// no stack yet
-    buf->b_ml.ml_stack = NULL;		// no stack yet
-    buf->b_ml.ml_stack_top = 0;		// nothing in the stack
-    buf->b_ml.ml_line_lnum = 0;		// no cached line
-    buf->b_ml.ml_locked = NULL;		// no locked block
+    buf->b_ml.ml_ರಾಶಿ_ಗಾತ್ರ = 0;	// no stack yet
+    buf->b_ml.ml_ರಾಶಿ = ಖಾಲಿ;		// no stack yet
+    buf->b_ml.ml_ರಾಶಿ_ತುದಿ = 0;		// nothing in the stack
+    buf->b_ml.ml_ಸಾಲು_lnum = 0;		// no cached line
+    buf->b_ml.ml_locked = ಖಾಲಿ;		// no locked block
     buf->b_ml.ml_flags = 0;
-#ifdef FEAT_CRYPT
-    buf->b_p_key = empty_option;
-    buf->b_p_cm = empty_option;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+    buf->b_p_ಕೀಲಿ = ಖಾಲಿಗಳು_option;
+    buf->b_p_cm = ಖಾಲಿಗಳು_option;
+#ಆದರೆ_ಅಂತ್ಯ
 
     /*
      * open the memfile from the old swap file
      */
-    p = vim_strsave(fname_used); // save "fname_used" for the message:
+    p = vim_strsave(fname_ಬಳಸಿದ); // save "fname_used" for the message:
 				 // mf_open() will consume "fname_used"!
-    mfp = mf_open(fname_used, O_RDONLY);
-    fname_used = p;
-    if (mfp == NULL || mfp->mf_fd < 0)
+    mfp = mf_open(fname_ಬಳಸಿದ, O_RDONLY);
+    fname_ಬಳಸಿದ = p;
+    ಆದರೆ (mfp == ಖಾಲಿ || mfp->mf_fd < 0)
     {
-	if (fname_used != NULL)
-	    semsg(_(e_cannot_open_str), fname_used);
-	goto theend;
+	ಆದರೆ (fname_ಬಳಸಿದ != ಖಾಲಿ)
+	    semsg(_(e_cannot_open_str), fname_ಬಳಸಿದ);
+	ಹೋಗು theend;
     }
     buf->b_ml.ml_mfp = mfp;
-#ifdef FEAT_CRYPT
-    mfp->mf_buffer = buf;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+    mfp->mf_ಬಫರ್ = buf;
+#ಆದರೆ_ಅಂತ್ಯ
 
     /*
      * The page size set in mf_open() might be different from the page size
@@ -1318,163 +1318,163 @@ ml_recover(int checkext)
      * 0 we need a page size.  Use the minimal size for block 0 here, it will
      * be set to the real value below.
      */
-    mfp->mf_page_size = MIN_SWAP_PAGE_SIZE;
+    mfp->mf_ಪುಟ_ಗಾತ್ರ = MIN_ಅದಲುಬದಲು_ಪುಟ_ಗಾತ್ರ;
 
     /*
      * try to read block 0
      */
-    if ((hp = mf_get(mfp, (blocknr_T)0, 1)) == NULL)
+    ಆದರೆ ((hp = mf_get(mfp, (blocknr_T)0, 1)) == ಖಾಲಿ)
     {
-	msg_start();
-	msg_puts_attr(_("Unable to read block 0 from "), attr | MSG_HIST);
-	msg_outtrans_attr(mfp->mf_fname, attr | MSG_HIST);
-	msg_puts_attr(_("\nMaybe no changes were made or Vim did not update the swap file."),
-		attr | MSG_HIST);
-	msg_end();
-	goto theend;
+	ಸಂದೇಶ_ಆರಂಭ();
+	ಸಂದೇಶ_puts_attr(_("Unable to read block 0 from "), attr | ಸಂದೇಶ_HIST);
+	ಸಂದೇಶ_outtrans_attr(mfp->mf_fname, attr | ಸಂದೇಶ_HIST);
+	ಸಂದೇಶ_puts_attr(_("\nMaybe no changes were made or Vim did not update the swap file."),
+		attr | ಸಂದೇಶ_HIST);
+	ಸಂದೇಶ_ಕೊನೆ();
+	ಹೋಗು theend;
     }
-    b0p = (ZERO_BL *)(hp->bh_data);
-    if (STRNCMP(b0p->b0_version, "VIM 3.0", 7) == 0)
+    b0p = (ZERO_BL *)(hp->bh_ದತ್ತಾಂಶ);
+    ಆದರೆ (STRNCMP(b0p->b0_ಆವೃತ್ತಿ, "VIM 3.0", 7) == 0)
     {
-	msg_start();
-	msg_outtrans_attr(mfp->mf_fname, MSG_HIST);
-	msg_puts_attr(_(" cannot be used with this version of Vim.\n"),
-								    MSG_HIST);
-	msg_puts_attr(_("Use Vim version 3.0.\n"), MSG_HIST);
-	msg_end();
-	goto theend;
+	ಸಂದೇಶ_ಆರಂಭ();
+	ಸಂದೇಶ_outtrans_attr(mfp->mf_fname, ಸಂದೇಶ_HIST);
+	ಸಂದೇಶ_puts_attr(_(" cannot be used with this version of Vim.\n"),
+								    ಸಂದೇಶ_HIST);
+	ಸಂದೇಶ_puts_attr(_("Use Vim version 3.0.\n"), ಸಂದೇಶ_HIST);
+	ಸಂದೇಶ_ಕೊನೆ();
+	ಹೋಗು theend;
     }
-    if (ml_check_b0_id(b0p) == FAIL)
+    ಆದರೆ (ml_check_b0_id(b0p) == FAIL)
     {
-	semsg(_(e_str_does_not_look_like_vim_swap_file), mfp->mf_fname);
-	goto theend;
+	semsg(_(e_str_does_not_look_like_vim_ಅದಲುಬದಲು_file), mfp->mf_fname);
+	ಹೋಗು theend;
     }
-    if (b0_magic_wrong(b0p))
+    ಆದರೆ (b0_magic_wrong(b0p))
     {
-	msg_start();
-	msg_outtrans_attr(mfp->mf_fname, attr | MSG_HIST);
-#if defined(MSWIN)
-	if (STRNCMP(b0p->b0_hname, "PC ", 3) == 0)
-	    msg_puts_attr(_(" cannot be used with this version of Vim.\n"),
-							     attr | MSG_HIST);
-	else
-#endif
-	    msg_puts_attr(_(" cannot be used on this computer.\n"),
-							     attr | MSG_HIST);
-	msg_puts_attr(_("The file was created on "), attr | MSG_HIST);
+	ಸಂದೇಶ_ಆರಂಭ();
+	ಸಂದೇಶ_outtrans_attr(mfp->mf_fname, attr | ಸಂದೇಶ_HIST);
+#ಆದರೆ defined(MSWIN)
+	ಆದರೆ (STRNCMP(b0p->b0_hname, "PC ", 3) == 0)
+	    ಸಂದೇಶ_puts_attr(_(" cannot be used with this version of Vim.\n"),
+							     attr | ಸಂದೇಶ_HIST);
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಸಂದೇಶ_puts_attr(_(" cannot be used on this computer.\n"),
+							     attr | ಸಂದೇಶ_HIST);
+	ಸಂದೇಶ_puts_attr(_("The file was created on "), attr | ಸಂದೇಶ_HIST);
 	// avoid going past the end of a corrupted hostname
 	b0p->b0_fname[0] = NUL;
-	msg_puts_attr((char *)b0p->b0_hname, attr | MSG_HIST);
-	msg_puts_attr(_(",\nor the file has been damaged."), attr | MSG_HIST);
-	msg_end();
-	goto theend;
+	ಸಂದೇಶ_puts_attr((ಅಕ್ಷರ *)b0p->b0_hname, attr | ಸಂದೇಶ_HIST);
+	ಸಂದೇಶ_puts_attr(_(",\nor the file has been damaged."), attr | ಸಂದೇಶ_HIST);
+	ಸಂದೇಶ_ಕೊನೆ();
+	ಹೋಗು theend;
     }
 
-#ifdef FEAT_CRYPT
-    for (i = 0; i < (int)ARRAY_LENGTH(id1_codes); ++i)
-	if (id1_codes[i] == b0p->b0_id[1])
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+    ಗಾಗಿ (i = 0; i < (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(id1_codes); ++i)
+	ಆದರೆ (id1_codes[i] == b0p->b0_id[1])
 	    b0_cm = i;
-    if (b0_cm > 0)
-	mch_memmove(mfp->mf_seed, &b0p->b0_seed, MF_SEED_LEN);
-    crypt_set_cm_option(buf, b0_cm < 0 ? 0 : b0_cm);
-#else
-    if (b0p->b0_id[1] != BLOCK0_ID1)
+    ಆದರೆ (b0_cm > 0)
+	mch_memmove(mfp->mf_ಬೀಜ, &b0p->b0_ಬೀಜ, MF_ಬೀಜ_LEN);
+    crypt_ಗಣ_cm_option(buf, b0_cm < 0 ? 0 : b0_cm);
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಆದರೆ (b0p->b0_id[1] != BLOCK0_ID1)
     {
-	semsg(_(e_str_is_encrypted_and_this_version_of_vim_does_not_support_encryption), mfp->mf_fname);
-	goto theend;
+	semsg(_(e_str_is_encrypted_and_this_ಆವೃತ್ತಿ_ದ_vim_does_not_support_encryption), mfp->mf_fname);
+	ಹೋಗು theend;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     /*
      * If we guessed the wrong page size, we have to recalculate the
      * highest block number in the file.
      */
-    if (mfp->mf_page_size != (unsigned)char_to_long(b0p->b0_page_size))
+    ಆದರೆ (mfp->mf_ಪುಟ_ಗಾತ್ರ != (ಚಿಹ್ನೆರಹಿತ)char_ಗಮ್ಯ_long(b0p->b0_ಪುಟ_ಗಾತ್ರ))
     {
-	unsigned previous_page_size = mfp->mf_page_size;
+	ಚಿಹ್ನೆರಹಿತ ಹಿಂದಿನ_ಪುಟ_ಗಾತ್ರ = mfp->mf_ಪುಟ_ಗಾತ್ರ;
 
-	mf_new_page_size(mfp, (unsigned)char_to_long(b0p->b0_page_size));
-	if (mfp->mf_page_size < previous_page_size)
+	mf_new_ಪುಟ_ಗಾತ್ರ(mfp, (ಚಿಹ್ನೆರಹಿತ)char_ಗಮ್ಯ_long(b0p->b0_ಪುಟ_ಗಾತ್ರ));
+	ಆದರೆ (mfp->mf_ಪುಟ_ಗಾತ್ರ < ಹಿಂದಿನ_ಪುಟ_ಗಾತ್ರ)
 	{
-	    msg_start();
-	    msg_outtrans_attr(mfp->mf_fname, attr | MSG_HIST);
-	    msg_puts_attr(_(" has been damaged (page size is smaller than minimum value).\n"),
-			attr | MSG_HIST);
-	    msg_end();
-	    goto theend;
+	    ಸಂದೇಶ_ಆರಂಭ();
+	    ಸಂದೇಶ_outtrans_attr(mfp->mf_fname, attr | ಸಂದೇಶ_HIST);
+	    ಸಂದೇಶ_puts_attr(_(" has been damaged (page size is smaller than minimum value).\n"),
+			attr | ಸಂದೇಶ_HIST);
+	    ಸಂದೇಶ_ಕೊನೆ();
+	    ಹೋಗು theend;
 	}
-	if ((size = vim_lseek(mfp->mf_fd, (off_T)0L, SEEK_END)) <= 0)
+	ಆದರೆ ((ಗಾತ್ರ_2 = vim_lseek(mfp->mf_fd, (off_T)0L, SEEK_END)) <= 0)
 	    mfp->mf_blocknr_max = 0;	    // no file or empty file
-	else
-	    mfp->mf_blocknr_max = (blocknr_T)(size / mfp->mf_page_size);
-	mfp->mf_infile_count = mfp->mf_blocknr_max;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    mfp->mf_blocknr_max = (blocknr_T)(ಗಾತ್ರ_2 / mfp->mf_ಪುಟ_ಗಾತ್ರ);
+	mfp->mf_infile_ಎಣಿಕೆ = mfp->mf_blocknr_max;
 
 	// need to reallocate the memory used to store the data
-	p = alloc(mfp->mf_page_size);
-	if (p == NULL)
-	    goto theend;
-	mch_memmove(p, hp->bh_data, previous_page_size);
-	vim_free(hp->bh_data);
-	hp->bh_data = p;
-	b0p = (ZERO_BL *)(hp->bh_data);
+	p = alloc(mfp->mf_ಪುಟ_ಗಾತ್ರ);
+	ಆದರೆ (p == ಖಾಲಿ)
+	    ಹೋಗು theend;
+	mch_memmove(p, hp->bh_ದತ್ತಾಂಶ, ಹಿಂದಿನ_ಪುಟ_ಗಾತ್ರ);
+	vim_free(hp->bh_ದತ್ತಾಂಶ);
+	hp->bh_ದತ್ತಾಂಶ = p;
+	b0p = (ZERO_BL *)(hp->bh_ದತ್ತಾಂಶ);
     }
 
     /*
      * If .swp file name given directly, use name from swap file for buffer.
      */
-    if (directly)
+    ಆದರೆ (directly)
     {
 	expand_env(b0p->b0_fname, NameBuff, MAXPATHL);
-	if (setfname(curbuf, NameBuff, NULL, TRUE) == FAIL)
-	    goto theend;
+	ಆದರೆ (setfname(curbuf, NameBuff, ಖಾಲಿ, TRUE) == FAIL)
+	    ಹೋಗು theend;
     }
 
-    home_replace(NULL, mfp->mf_fname, NameBuff, MAXPATHL, TRUE);
+    home_replace(ಖಾಲಿ, mfp->mf_fname, NameBuff, MAXPATHL, TRUE);
     smsg(_("Using swap file \"%s\""), NameBuff);
 
-    if (buf_spname(curbuf) != NULL)
+    ಆದರೆ (buf_spname(curbuf) != ಖಾಲಿ)
 	vim_strncpy(NameBuff, buf_spname(curbuf), MAXPATHL - 1);
-    else
-	home_replace(NULL, curbuf->b_ffname, NameBuff, MAXPATHL, TRUE);
+    ಇಲ್ಲದಿದ್ದರೆ
+	home_replace(ಖಾಲಿ, curbuf->b_ffname, NameBuff, MAXPATHL, TRUE);
     smsg(_("Original file \"%s\""), NameBuff);
-    msg_putchar('\n');
+    ಸಂದೇಶ_putchar('\n');
 
     /*
      * check date of swap file and original file
      */
-    mtime = char_to_long(b0p->b0_mtime);
-    if (curbuf->b_ffname != NULL
-	    && mch_stat((char *)curbuf->b_ffname, &org_stat) != -1
-	    && ((mch_stat((char *)mfp->mf_fname, &swp_stat) != -1
+    mtime = char_ಗಮ್ಯ_long(b0p->b0_mtime);
+    ಆದರೆ (curbuf->b_ffname != ಖಾಲಿ
+	    && mch_stat((ಅಕ್ಷರ *)curbuf->b_ffname, &org_stat) != -1
+	    && ((mch_stat((ಅಕ್ಷರ *)mfp->mf_fname, &swp_stat) != -1
 		    && org_stat.st_mtime > swp_stat.st_mtime)
 		|| org_stat.st_mtime != mtime))
-	emsg(_(e_warning_original_file_may_have_been_changed));
-    out_flush();
+	emsg(_(e_warning_original_file_may_have_been_ಬದಲಾಯಿತು));
+    ಹೊರಹೋಗು_flush();
 
     // Get the 'fileformat' and 'fileencoding' from block zero.
-    b0_ff = (b0p->b0_flags & B0_FF_MASK);
-    if (b0p->b0_flags & B0_HAS_FENC)
+    b0_ff = (b0p->b0_flags & B0_FF_ಮುಖವಾಡ);
+    ಆದರೆ (b0p->b0_flags & B0_HAS_FENC)
     {
-	int fnsize = B0_FNAME_SIZE_NOCRYPT;
+	ಪೂರ್ಣಾಂಕ fnsize = B0_FNAME_ಗಾತ್ರ_NOCRYPT;
 
-#ifdef FEAT_CRYPT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
 	// Use the same size as in add_b0_fenc().
-	if (b0p->b0_id[1] != BLOCK0_ID1)
-	    fnsize = B0_FNAME_SIZE_CRYPT;
-#endif
-	for (p = b0p->b0_fname + fnsize; p > b0p->b0_fname && p[-1] != NUL; --p)
+	ಆದರೆ (b0p->b0_id[1] != BLOCK0_ID1)
+	    fnsize = B0_FNAME_ಗಾತ್ರ_CRYPT;
+#ಆದರೆ_ಅಂತ್ಯ
+	ಗಾಗಿ (p = b0p->b0_fname + fnsize; p > b0p->b0_fname && p[-1] != NUL; --p)
 	    ;
 	b0_fenc = vim_strnsave(p, b0p->b0_fname + fnsize - p);
     }
 
     mf_put(mfp, hp, FALSE, FALSE);	// release block 0
-    hp = NULL;
+    hp = ಖಾಲಿ;
 
     /*
      * Now that we are sure that the file is going to be recovered, clear the
      * contents of the current buffer.
      */
-    while (!(curbuf->b_ml.ml_flags & ML_EMPTY))
+    ಆಗ (!(curbuf->b_ml.ml_flags & ML_ಖಾಲಿಗಳು))
 	ml_delete((linenr_T)1);
 
     /*
@@ -1482,108 +1482,108 @@ ml_recover(int checkext)
      * 'fileencoding', etc.  Ignore errors.  The text itself is not used.
      * When the file is encrypted the user is asked to enter the key.
      */
-    if (curbuf->b_ffname != NULL)
-	orig_file_status = readfile(curbuf->b_ffname, NULL, (linenr_T)0,
-			      (linenr_T)0, (linenr_T)MAXLNUM, NULL, READ_NEW);
+    ಆದರೆ (curbuf->b_ffname != ಖಾಲಿ)
+	orig_file_ಸ್ಥಿತಿ = readfile(curbuf->b_ffname, ಖಾಲಿ, (linenr_T)0,
+			      (linenr_T)0, (linenr_T)MAXLNUM, ಖಾಲಿ, READ_NEW);
 
-#ifdef FEAT_CRYPT
-    if (b0_cm >= 0)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+    ಆದರೆ (b0_cm >= 0)
     {
 	// Need to ask the user for the crypt key.  If this fails we continue
 	// without a key, will probably get garbage text.
-	if (*curbuf->b_p_key != NUL)
+	ಆದರೆ (*curbuf->b_p_ಕೀಲಿ != NUL)
 	{
-	    smsg(_("Swap file is encrypted: \"%s\""), fname_used);
-	    msg_puts(_("\nIf you entered a new crypt key but did not write the text file,"));
-	    msg_puts(_("\nenter the new crypt key."));
-	    msg_puts(_("\nIf you wrote the text file after changing the crypt key press enter"));
-	    msg_puts(_("\nto use the same key for text file and swap file"));
+	    smsg(_("Swap file is encrypted: \"%s\""), fname_ಬಳಸಿದ);
+	    ಸಂದೇಶ_puts(_("\nIf you entered a new crypt key but did not write the text file,"));
+	    ಸಂದೇಶ_puts(_("\nenter the new crypt key."));
+	    ಸಂದೇಶ_puts(_("\nIf you wrote the text file after changing the crypt key press enter"));
+	    ಸಂದೇಶ_puts(_("\nto use the same key for text file and swap file"));
 	}
-	else
-	    smsg(_(need_key_msg), fname_used);
-	buf->b_p_key = crypt_get_key(FALSE, FALSE);
-	if (buf->b_p_key == NULL)
-	    buf->b_p_key = curbuf->b_p_key;
-	else if (*buf->b_p_key == NUL)
+	ಇಲ್ಲದಿದ್ದರೆ
+	    smsg(_(need_ಕೀಲಿ_ಸಂದೇಶ), fname_ಬಳಸಿದ);
+	buf->b_p_ಕೀಲಿ = crypt_get_ಕೀಲಿ(FALSE, FALSE);
+	ಆದರೆ (buf->b_p_ಕೀಲಿ == ಖಾಲಿ)
+	    buf->b_p_ಕೀಲಿ = curbuf->b_p_ಕೀಲಿ;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*buf->b_p_ಕೀಲಿ == NUL)
 	{
-	    vim_free(buf->b_p_key);
-	    buf->b_p_key = curbuf->b_p_key;
+	    vim_free(buf->b_p_ಕೀಲಿ);
+	    buf->b_p_ಕೀಲಿ = curbuf->b_p_ಕೀಲಿ;
 	}
-	if (buf->b_p_key == NULL)
-	    buf->b_p_key = empty_option;
+	ಆದರೆ (buf->b_p_ಕೀಲಿ == ಖಾಲಿ)
+	    buf->b_p_ಕೀಲಿ = ಖಾಲಿಗಳು_option;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Use the 'fileformat' and 'fileencoding' as stored in the swap file.
-    if (b0_ff != 0)
-	set_fileformat(b0_ff - 1, OPT_LOCAL);
-    if (b0_fenc != NULL)
+    ಆದರೆ (b0_ff != 0)
+	ಗಣ_fileformat(b0_ff - 1, OPT_LOCAL);
+    ಆದರೆ (b0_fenc != ಖಾಲಿ)
     {
-	set_option_value_give_err((char_u *)"fenc", 0L, b0_fenc, OPT_LOCAL);
+	ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"fenc", 0L, b0_fenc, OPT_LOCAL);
 	vim_free(b0_fenc);
     }
     unchanged(curbuf, TRUE, TRUE);
 
     bnum = 1;		// start with block 1
-    page_count = 1;	// which is 1 page
+    ಪುಟ_ಎಣಿಕೆ = 1;	// which is 1 page
     lnum = 0;		// append after line 0 in curbuf
-    line_count = 0;
+    ಸಾಲು_ಎಣಿಕೆ = 0;
     idx = 0;		// start with first index in block 1
     error = 0;
-    buf->b_ml.ml_stack_top = 0;
-    buf->b_ml.ml_stack = NULL;
-    buf->b_ml.ml_stack_size = 0;	// no stack yet
+    buf->b_ml.ml_ರಾಶಿ_ತುದಿ = 0;
+    buf->b_ml.ml_ರಾಶಿ = ಖಾಲಿ;
+    buf->b_ml.ml_ರಾಶಿ_ಗಾತ್ರ = 0;	// no stack yet
 
-    if (curbuf->b_ffname == NULL)
+    ಆದರೆ (curbuf->b_ffname == ಖಾಲಿ)
 	cannot_open = TRUE;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	cannot_open = FALSE;
 
     serious_error = FALSE;
-    for ( ; !got_int; line_breakcheck())
+    ಗಾಗಿ ( ; !got_int; ಸಾಲು_breakcheck())
     {
-	if (hp != NULL)
+	ಆದರೆ (hp != ಖಾಲಿ)
 	    mf_put(mfp, hp, FALSE, FALSE);	// release previous block
 
 	/*
 	 * get block
 	 */
-	if ((hp = mf_get(mfp, bnum, page_count)) == NULL)
+	ಆದರೆ ((hp = mf_get(mfp, bnum, ಪುಟ_ಎಣಿಕೆ)) == ಖಾಲಿ)
 	{
-	    if (bnum == 1)
+	    ಆದರೆ (bnum == 1)
 	    {
-		semsg(_(e_unable_to_read_block_one_from_str), mfp->mf_fname);
-		goto theend;
+		semsg(_(e_unable_ಗಮ್ಯ_read_ಖಂಡ_one_from_str), mfp->mf_fname);
+		ಹೋಗು theend;
 	    }
 	    ++error;
 	    ml_append(lnum++, (char_u *)_("???MANY LINES MISSING"),
 							    (colnr_T)0, TRUE);
 	}
-	else		// there is a block
+	ಇಲ್ಲದಿದ್ದರೆ		// there is a block
 	{
-	    pp = (PTR_BL *)(hp->bh_data);
-	    if (pp->pb_id == PTR_ID)		// it is a pointer block
+	    pp = (PTR_BL *)(hp->bh_ದತ್ತಾಂಶ);
+	    ಆದರೆ (pp->pb_id == PTR_ID)		// it is a pointer block
 	    {
-		int ptr_block_error = FALSE;
-		if (pp->pb_count_max != PB_COUNT_MAX(mfp))
+		ಪೂರ್ಣಾಂಕ ptr_ಖಂಡ_error = FALSE;
+		ಆದರೆ (pp->pb_ಎಣಿಕೆ_max != PB_ಎಣಿಕೆ_MAX(mfp))
 		{
-		    ptr_block_error = TRUE;
-		    pp->pb_count_max = PB_COUNT_MAX(mfp);
+		    ptr_ಖಂಡ_error = TRUE;
+		    pp->pb_ಎಣಿಕೆ_max = PB_ಎಣಿಕೆ_MAX(mfp);
 		}
-		if (pp->pb_count > pp->pb_count_max)
+		ಆದರೆ (pp->pb_ಎಣಿಕೆ > pp->pb_ಎಣಿಕೆ_max)
 		{
-		    ptr_block_error = TRUE;
-		    pp->pb_count = pp->pb_count_max;
+		    ptr_ಖಂಡ_error = TRUE;
+		    pp->pb_ಎಣಿಕೆ = pp->pb_ಎಣಿಕೆ_max;
 		}
-		if (ptr_block_error)
-		    emsg(_(e_warning_pointer_block_corrupted));
+		ಆದರೆ (ptr_ಖಂಡ_error)
+		    emsg(_(e_warning_ಸೂಚಕ_ಖಂಡ_corrupted));
 
 		// check line count when using pointer block first time
-		if (idx == 0 && line_count != 0)
+		ಆದರೆ (idx == 0 && ಸಾಲು_ಎಣಿಕೆ != 0)
 		{
-		    for (i = 0; i < (int)pp->pb_count; ++i)
-			line_count -= pp->pb_pointer[i].pe_line_count;
-		    if (line_count != 0)
+		    ಗಾಗಿ (i = 0; i < (ಪೂರ್ಣಾಂಕ)pp->pb_ಎಣಿಕೆ; ++i)
+			ಸಾಲು_ಎಣಿಕೆ -= pp->pb_ಸೂಚಕ[i].pe_ಸಾಲು_ಎಣಿಕೆ;
+		    ಆದರೆ (ಸಾಲು_ಎಣಿಕೆ != 0)
 		    {
 			++error;
 			ml_append(lnum++, (char_u *)_("???LINE COUNT WRONG"),
@@ -1591,68 +1591,68 @@ ml_recover(int checkext)
 		    }
 		}
 
-		if (pp->pb_count == 0)
+		ಆದರೆ (pp->pb_ಎಣಿಕೆ == 0)
 		{
 		    ml_append(lnum++, (char_u *)_("???EMPTY BLOCK"),
 							    (colnr_T)0, TRUE);
 		    ++error;
 		}
-		else if (idx < (int)pp->pb_count)	// go a block deeper
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (idx < (ಪೂರ್ಣಾಂಕ)pp->pb_ಎಣಿಕೆ)	// go a block deeper
 		{
-		    if (pp->pb_pointer[idx].pe_bnum < 0)
+		    ಆದರೆ (pp->pb_ಸೂಚಕ[idx].pe_bnum < 0)
 		    {
 			/*
 			 * Data block with negative block number.
 			 * Try to read lines from the original file.
 			 * This is slow, but it works.
 			 */
-			if (!cannot_open)
+			ಆದರೆ (!cannot_open)
 			{
-			    line_count = pp->pb_pointer[idx].pe_line_count;
-			    linenr_T pe_old_lnum = pp->pb_pointer[idx].pe_old_lnum;
+			    ಸಾಲು_ಎಣಿಕೆ = pp->pb_ಸೂಚಕ[idx].pe_ಸಾಲು_ಎಣಿಕೆ;
+			    linenr_T pe_old_lnum = pp->pb_ಸೂಚಕ[idx].pe_old_lnum;
 			    // Validate pe_line_count and pe_old_lnum from the
 			    // untrusted swap file before passing to readfile().
-			    if (line_count <= 0 || pe_old_lnum < 1 ||
-				    readfile(curbuf->b_ffname, NULL, lnum,
+			    ಆದರೆ (ಸಾಲು_ಎಣಿಕೆ <= 0 || pe_old_lnum < 1 ||
+				    readfile(curbuf->b_ffname, ಖಾಲಿ, lnum,
 					pe_old_lnum - 1,
-					line_count, NULL, 0) != OK)
+					ಸಾಲು_ಎಣಿಕೆ, ಖಾಲಿ, 0) != OK)
 				cannot_open = TRUE;
-			    else
-				lnum += line_count;
+			    ಇಲ್ಲದಿದ್ದರೆ
+				lnum += ಸಾಲು_ಎಣಿಕೆ;
 			}
-			if (cannot_open)
+			ಆದರೆ (cannot_open)
 			{
 			    ++error;
 			    ml_append(lnum++, (char_u *)_("???LINES MISSING"),
 							    (colnr_T)0, TRUE);
 			}
 			++idx;	    // get same block again for next index
-			continue;
+			ಮುಂದುವರಿ;
 		    }
 
 		    /*
 		     * going one block deeper in the tree
 		     */
-		    if ((top = ml_add_stack(buf)) < 0)	// new entry in stack
+		    ಆದರೆ ((ತುದಿ = ml_ಕೂಡಿಸು_ರಾಶಿ(buf)) < 0)	// new entry in stack
 		    {
 			++error;
-			break;		    // out of memory
+			ನಿಲ್ಲಿಸು;		    // out of memory
 		    }
-		    ip = &(buf->b_ml.ml_stack[top]);
+		    ip = &(buf->b_ml.ml_ರಾಶಿ[ತುದಿ]);
 		    ip->ip_bnum = bnum;
-		    ip->ip_index = idx;
+		    ip->ip_ಸೂಚ್ಯಂಕ = idx;
 
-		    bnum = pp->pb_pointer[idx].pe_bnum;
-		    line_count = pp->pb_pointer[idx].pe_line_count;
-		    page_count = pp->pb_pointer[idx].pe_page_count;
+		    bnum = pp->pb_ಸೂಚಕ[idx].pe_bnum;
+		    ಸಾಲು_ಎಣಿಕೆ = pp->pb_ಸೂಚಕ[idx].pe_ಸಾಲು_ಎಣಿಕೆ;
+		    ಪುಟ_ಎಣಿಕೆ = pp->pb_ಸೂಚಕ[idx].pe_ಪುಟ_ಎಣಿಕೆ;
 		    // Validate pe_bnum and pe_page_count from the untrusted
 		    // swap file before passing to mf_get(), which uses
 		    // page_count to calculate allocation size.  A bogus value
 		    // (e.g. 0x40000000) would cause a multi-GB allocation.
 		    // pe_page_count must be >= 1 and bnum + page_count must
 		    // not exceed the number of pages in the swap file.
-		    if (page_count < 1
-			    || bnum + page_count > mfp->mf_blocknr_max + 1)
+		    ಆದರೆ (ಪುಟ_ಎಣಿಕೆ < 1
+			    || bnum + ಪುಟ_ಎಣಿಕೆ > mfp->mf_blocknr_max + 1)
 		    {
 			++error;
 			ml_append(lnum++,
@@ -1660,32 +1660,32 @@ ml_recover(int checkext)
 				(colnr_T)0, TRUE);
 			// Skip this entry and pop back up the stack to keep
 			// recovering whatever else we can.
-			idx = ip->ip_index + 1;
+			idx = ip->ip_ಸೂಚ್ಯಂಕ + 1;
 			bnum = ip->ip_bnum;
-			page_count = 1;
-			--buf->b_ml.ml_stack_top;
-			continue;
+			ಪುಟ_ಎಣಿಕೆ = 1;
+			--buf->b_ml.ml_ರಾಶಿ_ತುದಿ;
+			ಮುಂದುವರಿ;
 		    }
 		    idx = 0;
-		    continue;
+		    ಮುಂದುವರಿ;
 		}
 	    }
-	    else	    // not a pointer block
+	    ಇಲ್ಲದಿದ್ದರೆ	    // not a pointer block
 	    {
-		dp = (DATA_BL *)(hp->bh_data);
-		if (dp->db_id != DATA_ID)	// block id wrong
+		dp = (ದತ್ತಾಂಶ_BL *)(hp->bh_ದತ್ತಾಂಶ);
+		ಆದರೆ (dp->db_id != ದತ್ತಾಂಶ_ID)	// block id wrong
 		{
-		    if (bnum == 1)
+		    ಆದರೆ (bnum == 1)
 		    {
-			semsg(_(e_block_one_id_wrong_str_not_swp_file),
+			semsg(_(e_ಖಂಡ_one_id_wrong_str_not_swp_file),
 							       mfp->mf_fname);
-			goto theend;
+			ಹೋಗು theend;
 		    }
 		    ++error;
 		    ml_append(lnum++, (char_u *)_("???BLOCK MISSING"),
 							    (colnr_T)0, TRUE);
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    /*
 		     * It is a data block.
@@ -1699,41 +1699,41 @@ ml_recover(int checkext)
 		    // crafted swap file referencing the same block twice
 		    // with different pe_page_count values would cause an
 		    // OOB write below.
-		    if (hp->bh_page_count != page_count)
+		    ಆದರೆ (hp->bh_ಪುಟ_ಎಣಿಕೆ != ಪುಟ_ಎಣಿಕೆ)
 		    {
 			++error;
 			ml_append(lnum++, (char_u *)_("??? BLOCK PAGE COUNT MISMATCH"),
 							    (colnr_T)0, TRUE);
-			page_count = hp->bh_page_count;
+			ಪುಟ_ಎಣಿಕೆ = hp->bh_ಪುಟ_ಎಣಿಕೆ;
 		    }
 
 		    // Check the length of the block.
 		    // If wrong, use the length given in the pointer block.
-		    if (page_count * mfp->mf_page_size != dp->db_txt_end)
+		    ಆದರೆ (ಪುಟ_ಎಣಿಕೆ * mfp->mf_ಪುಟ_ಗಾತ್ರ != dp->db_txt_ಕೊನೆ)
 		    {
 			ml_append(lnum++, (char_u *)_("??? from here until ???END lines may be messed up"),
 							    (colnr_T)0, TRUE);
 			++error;
 			has_error = TRUE;
-			dp->db_txt_end = page_count * mfp->mf_page_size;
+			dp->db_txt_ಕೊನೆ = ಪುಟ_ಎಣಿಕೆ * mfp->mf_ಪುಟ_ಗಾತ್ರ;
 		    }
 
-		    if (dp->db_txt_start < HEADER_SIZE
-			    || dp->db_txt_start > dp->db_txt_end)
+		    ಆದರೆ (dp->db_txt_ಆರಂಭ < ಶೀರ್ಷಿಕೆ_ಗಾತ್ರ
+			    || dp->db_txt_ಆರಂಭ > dp->db_txt_ಕೊನೆ)
 		    {
 			ml_append(lnum++, (char_u *)_("??? block header corrupted"),
 								    (colnr_T)0, TRUE);
 			++error;
 			has_error = TRUE;
-			dp->db_txt_start = dp->db_txt_end;
+			dp->db_txt_ಆರಂಭ = dp->db_txt_ಕೊನೆ;
 		    }
 		    // Make sure there is a NUL at the end of the block so we
 		    // don't go over the end when copying text.
-		    *((char_u *)dp + dp->db_txt_end - 1) = NUL;
+		    *((char_u *)dp + dp->db_txt_ಕೊನೆ - 1) = NUL;
 
 		    // Check the number of lines in the block.
 		    // If wrong, use the count in the data block.
-		    if (line_count != dp->db_line_count)
+		    ಆದರೆ (ಸಾಲು_ಎಣಿಕೆ != dp->db_ಸಾಲು_ಎಣಿಕೆ)
 		    {
 			ml_append(lnum++, (char_u *)_("??? from here until ???END lines may have been inserted/deleted"),
 							    (colnr_T)0, TRUE);
@@ -1741,55 +1741,55 @@ ml_recover(int checkext)
 			has_error = TRUE;
 		    }
 
-		    int did_questions = FALSE;
-		    for (i = 0; i < dp->db_line_count; ++i)
+		    ಪೂರ್ಣಾಂಕ did_questions = FALSE;
+		    ಗಾಗಿ (i = 0; i < dp->db_ಸಾಲು_ಎಣಿಕೆ; ++i)
 		    {
-			if ((char_u *)&(dp->db_index[i])
-					    >= (char_u *)dp + dp->db_txt_start)
+			ಆದರೆ ((char_u *)&(dp->db_ಸೂಚ್ಯಂಕ[i])
+					    >= (char_u *)dp + dp->db_txt_ಆರಂಭ)
 			{
 			    // line count must be wrong
 			    ++error;
 			    ml_append(lnum++,
 				    (char_u *)_("??? lines may be missing"),
 							     (colnr_T)0, TRUE);
-			    break;
+			    ನಿಲ್ಲಿಸು;
 			}
 
-			txt_start = (dp->db_index[i] & DB_INDEX_MASK);
-			if (txt_start <= (int)HEADER_SIZE
-					  || txt_start >= (int)dp->db_txt_end)
+			txt_ಆರಂಭ = (dp->db_ಸೂಚ್ಯಂಕ[i] & DB_ಸೂಚ್ಯಂಕ_ಮುಖವಾಡ);
+			ಆದರೆ (txt_ಆರಂಭ <= (ಪೂರ್ಣಾಂಕ)ಶೀರ್ಷಿಕೆ_ಗಾತ್ರ
+					  || txt_ಆರಂಭ >= (ಪೂರ್ಣಾಂಕ)dp->db_txt_ಕೊನೆ)
 			{
 			    ++error;
 			    // avoid lots of lines with "???"
-			    if (did_questions)
-				continue;
+			    ಆದರೆ (did_questions)
+				ಮುಂದುವರಿ;
 			    did_questions = TRUE;
 			    p = (char_u *)"???";
 			}
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
 			    did_questions = FALSE;
-			    p = (char_u *)dp + txt_start;
+			    p = (char_u *)dp + txt_ಆರಂಭ;
 			}
 			ml_append(lnum++, p, (colnr_T)0, TRUE);
 		    }
-		    if (has_error)
+		    ಆದರೆ (has_error)
 			ml_append(lnum++, (char_u *)_("???END"),
 							    (colnr_T)0, TRUE);
 		}
 	    }
 	}
 
-	if (buf->b_ml.ml_stack_top == 0)	// finished
-	    break;
+	ಆದರೆ (buf->b_ml.ml_ರಾಶಿ_ತುದಿ == 0)	//ಪೂರ್ಣಗೊಂಡ
+	    ನಿಲ್ಲಿಸು;
 
 	/*
 	 * go one block up in the tree
 	 */
-	ip = &(buf->b_ml.ml_stack[--(buf->b_ml.ml_stack_top)]);
+	ip = &(buf->b_ml.ml_ರಾಶಿ[--(buf->b_ml.ml_ರಾಶಿ_ತುದಿ)]);
 	bnum = ip->ip_bnum;
-	idx = ip->ip_index + 1;	    // go to next index
-	page_count = 1;
+	idx = ip->ip_ಸೂಚ್ಯಂಕ + 1;	    // go to next index
+	ಪುಟ_ಎಣಿಕೆ = 1;
     }
 
     /*
@@ -1799,29 +1799,29 @@ ml_recover(int checkext)
      * Lines lnum + 1 to ml_line_count are the original contents.
      * Line ml_line_count + 1 in the dummy empty line.
      */
-    if (orig_file_status != OK || curbuf->b_ml.ml_line_count != lnum * 2 + 1)
+    ಆದರೆ (orig_file_ಸ್ಥಿತಿ != OK || curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ != lnum * 2 + 1)
     {
 	// Recovering an empty file results in two lines and the first line is
 	// empty.  Don't set the modified flag then.
-	if (!(curbuf->b_ml.ml_line_count == 2 && *ml_get(1) == NUL))
+	ಆದರೆ (!(curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ == 2 && *ml_get(1) == NUL))
 	{
-	    changed_internal();
+	    ಬದಲಾಯಿತು_ಆಂತರಿಕ();
 	    ++CHANGEDTICK(curbuf);
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	for (idx = 1; idx <= lnum; ++idx)
+	ಗಾಗಿ (idx = 1; idx <= lnum; ++idx)
 	{
 	    // Need to copy one line, fetching the other one may flush it.
 	    p = vim_strnsave(ml_get(idx), ml_get_len(idx));
 	    i = STRCMP(p, ml_get(idx + lnum));
 	    vim_free(p);
-	    if (i != 0)
+	    ಆದರೆ (i != 0)
 	    {
-		changed_internal();
+		ಬದಲಾಯಿತು_ಆಂತರಿಕ();
 		++CHANGEDTICK(curbuf);
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	}
     }
@@ -1830,81 +1830,81 @@ ml_recover(int checkext)
      * Delete the lines from the original file and the dummy line from the
      * empty buffer.  These will now be after the last line in the buffer.
      */
-    while (curbuf->b_ml.ml_line_count > lnum
-				       && !(curbuf->b_ml.ml_flags & ML_EMPTY))
-	ml_delete(curbuf->b_ml.ml_line_count);
+    ಆಗ (curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ > lnum
+				       && !(curbuf->b_ml.ml_flags & ML_ಖಾಲಿಗಳು))
+	ml_delete(curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ);
     curbuf->b_flags |= BF_RECOVERED;
     check_cursor();
 
     recoverymode = FALSE;
-    if (got_int)
+    ಆದರೆ (got_int)
 	emsg(_(e_recovery_interrupted));
-    else if (error)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (error)
     {
 	++no_wait_return;
-	msg(">>>>>>>>>>>>>");
-	emsg(_(e_errors_detected_while_recovering_look_for_lines_starting_with_questions));
+	ಸಂದೇಶ(">>>>>>>>>>>>>");
+	emsg(_(e_errors_detected_while_recovering_look_for_ಸಾಲುಗಳು_starting_with_questions));
 	--no_wait_return;
-	msg(_("See \":help E312\" for more information."));
-	msg(">>>>>>>>>>>>>");
+	ಸಂದೇಶ(_("See \":help E312\" for more information."));
+	ಸಂದೇಶ(">>>>>>>>>>>>>");
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (curbuf->b_changed)
+	ಆದರೆ (curbuf->b_ಬದಲಾಯಿತು)
 	{
-	    msg(_("Recovery completed. You should check if everything is OK."));
-	    msg_puts(_("\n(You might want to write out this file under another name\n"));
-	    msg_puts(_("and run diff with the original file to check for changes)"));
+	    ಸಂದೇಶ(_("Recovery completed. You should check if everything is OK."));
+	    ಸಂದೇಶ_puts(_("\n(You might want to write out this file under another name\n"));
+	    ಸಂದೇಶ_puts(_("and run diff with the original file to check for changes)"));
 	}
-	else
-	    msg(_("Recovery completed. Buffer contents equals file contents."));
-	msg_puts(_("\nYou may want to delete the .swp file now."));
-#if defined(UNIX) || defined(MSWIN)
-	if (swapfile_process_running(b0p, fname_used))
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಸಂದೇಶ(_("Recovery completed. Buffer contents equals file contents."));
+	ಸಂದೇಶ_puts(_("\nYou may want to delete the .swp file now."));
+#ಆದರೆ defined(UNIX) || defined(MSWIN)
+	ಆದರೆ (swapfile_process_running(b0p, fname_ಬಳಸಿದ))
 	{
 	    // Warn there could be an active Vim on the same file, the user may
 	    // want to kill it.
-	    msg_puts(_("\nNote: process STILL RUNNING: "));
-	    msg_outnum(char_to_long(b0p->b0_pid));
+	    ಸಂದೇಶ_puts(_("\nNote: process STILL RUNNING: "));
+	    ಸಂದೇಶ_outnum(char_ಗಮ್ಯ_long(b0p->b0_pid));
 	}
-#endif
-	msg_puts("\n\n");
-	cmdline_row = msg_row;
+#ಆದರೆ_ಅಂತ್ಯ
+	ಸಂದೇಶ_puts("\n\n");
+	cmdline_ಅಡ್ಡಸಾಲು = ಸಂದೇಶ_ಅಡ್ಡಸಾಲು;
     }
-#ifdef FEAT_CRYPT
-    if (*buf->b_p_key != NUL && STRCMP(curbuf->b_p_key, buf->b_p_key) != 0)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+    ಆದರೆ (*buf->b_p_ಕೀಲಿ != NUL && STRCMP(curbuf->b_p_ಕೀಲಿ, buf->b_p_ಕೀಲಿ) != 0)
     {
-	msg_puts(_("Using crypt key from swap file for the text file.\n"));
-	set_option_value_give_err((char_u *)"key", 0L, buf->b_p_key, OPT_LOCAL);
+	ಸಂದೇಶ_puts(_("Using crypt key from swap file for the text file.\n"));
+	ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"key", 0L, buf->b_p_ಕೀಲಿ, OPT_LOCAL);
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     redraw_curbuf_later(UPD_NOT_VALID);
 
 theend:
-    vim_free(fname_used);
+    vim_free(fname_ಬಳಸಿದ);
     recoverymode = FALSE;
-    if (mfp != NULL)
+    ಆದರೆ (mfp != ಖಾಲಿ)
     {
-	if (hp != NULL)
+	ಆದರೆ (hp != ಖಾಲಿ)
 	    mf_put(mfp, hp, FALSE, FALSE);
 	mf_close(mfp, FALSE);	    // will also vim_free(mfp->mf_fname)
     }
-    if (buf != NULL)
+    ಆದರೆ (buf != ಖಾಲಿ)
     {
-#ifdef FEAT_CRYPT
-	if (buf->b_p_key != curbuf->b_p_key)
-	    free_string_option(buf->b_p_key);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+	ಆದರೆ (buf->b_p_ಕೀಲಿ != curbuf->b_p_ಕೀಲಿ)
+	    free_string_option(buf->b_p_ಕೀಲಿ);
 	free_string_option(buf->b_p_cm);
-#endif
-	vim_free(buf->b_ml.ml_stack);
+#ಆದರೆ_ಅಂತ್ಯ
+	vim_free(buf->b_ml.ml_ರಾಶಿ);
 	vim_free(buf);
     }
-    if (serious_error && called_from_main)
+    ಆದರೆ (serious_error && called_from_main)
 	ml_close(curbuf, TRUE);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	apply_autocmds(EVENT_BUFREADPOST, NULL, curbuf->b_fname, FALSE, curbuf);
-	apply_autocmds(EVENT_BUFWINENTER, NULL, curbuf->b_fname, FALSE, curbuf);
+	apply_autocmds(EVENT_BUFREADPOST, ಖಾಲಿ, curbuf->b_fname, FALSE, curbuf);
+	apply_autocmds(EVENT_BUFWINENTER, ಖಾಲಿ, curbuf->b_fname, FALSE, curbuf);
     }
 }
 
@@ -1919,44 +1919,44 @@ theend:
  * - list the swap files for swapfilelist()
  * - find the name of the n'th swap file when recovering
  */
-    int
-recover_names(
+    ಪೂರ್ಣಾಂಕ
+recover_ಹೆಸರುಗಳು(
     char_u	*fname,		// base for swap file name
-    int		do_list,	// when TRUE, list the swap file names
-    list_T	*ret_list UNUSED, // when not NULL add file names to it
-    int		nr,		// when non-zero, return nr'th swap file name
-    char_u	**fname_out)	// result when "nr" > 0
+    ಪೂರ್ಣಾಂಕ		do_list,	// when TRUE, list the swap file names
+    list_T	*ret_list ಬಳಸದ, // when not NULL add file names to it
+    ಪೂರ್ಣಾಂಕ		nr,		// when non-zero, return nr'th swap file name
+    char_u	**fname_ಹೊರಹೋಗು)	// result when "nr" > 0
 {
-    int		num_names;
-    char_u	*(names[6]);
+    ಪೂರ್ಣಾಂಕ		ಅಂಕೆ_ಹೆಸರುಗಳು;
+    char_u	*(ಹೆಸರುಗಳು[6]);
     char_u	*p;
-    int		num_files;
-    int		file_count = 0;
+    ಪೂರ್ಣಾಂಕ		ಅಂಕೆ_files;
+    ಪೂರ್ಣಾಂಕ		file_ಎಣಿಕೆ = 0;
     char_u	**files;
     char_u	*dirp;
     string_T	dir_name;
-    char_u	*fname_res = NULL;
-#ifdef HAVE_READLINK
+    char_u	*fname_res = ಖಾಲಿ;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_READLINK
     char_u	fname_buf[MAXPATHL];
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (fname != NULL)
+    ಆದರೆ (fname != ಖಾಲಿ)
     {
-#ifdef HAVE_READLINK
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_READLINK
 	// Expand symlink in the file name, because the swap file is created
 	// with the actual file instead of with the symlink.
-	if (resolve_symlink(fname, fname_buf) == OK)
+	ಆದರೆ (resolve_symlink(fname, fname_buf) == OK)
 	    fname_res = fname_buf;
-	else
-#endif
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 	    fname_res = fname;
     }
 
-    if (do_list)
+    ಆದರೆ (do_list)
     {
 	// use msg() to start the scrolling properly
-	msg(_("Swap files found:"));
-	msg_putchar('\n');
+	ಸಂದೇಶ(_("Swap files found:"));
+	ಸಂದೇಶ_putchar('\n');
     }
 
     /*
@@ -1965,146 +1965,146 @@ recover_names(
      */
     dir_name.string = alloc(STRLEN(p_dir) + 1);
     dirp = p_dir;
-    while (dir_name.string != NULL && *dirp)
+    ಆಗ (dir_name.string != ಖಾಲಿ && *dirp)
     {
 	/*
 	 * Isolate a directory name from *dirp and put it in dir_name (we know
 	 * it is large enough, so use 31000 for length).
 	 * Advance dirp to next directory name.
 	 */
-	dir_name.length = (size_t)copy_option_part(&dirp, dir_name.string, 31000, ",");
+	dir_name.ಉದ್ದಳತೆ = (size_t)copy_option_part(&dirp, dir_name.string, 31000, ",");
 
-	if (dir_name.string[0] == '.' && dir_name.string[1] == NUL)	// check current dir
+	ಆದರೆ (dir_name.string[0] == '.' && dir_name.string[1] == NUL)	// check current dir
 	{
-	    if (fname == NULL)
+	    ಆದರೆ (fname == ಖಾಲಿ)
 	    {
-#ifdef VMS
-		names[0] = vim_strnsave((char_u *)"*_sw%", STRLEN_LITERAL("*_sw%"));
-#else
-		names[0] = vim_strnsave((char_u *)"*.sw?", STRLEN_LITERAL("*.sw?"));
-#endif
-#if defined(UNIX) || defined(MSWIN)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VMS
+		ಹೆಸರುಗಳು[0] = vim_strnsave((char_u *)"*_sw%", STRLEN_LITERAL("*_sw%"));
+#ಇಲ್ಲದಿದ್ದರೆ
+		ಹೆಸರುಗಳು[0] = vim_strnsave((char_u *)"*.sw?", STRLEN_LITERAL("*.sw?"));
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(UNIX) || defined(MSWIN)
 		// For Unix names starting with a dot are special.  MS-Windows
 		// supports this too, on some file systems.
-		names[1] = vim_strnsave((char_u *)".*.sw?", STRLEN_LITERAL(".*.sw?"));
-		names[2] = vim_strnsave((char_u *)".sw?", STRLEN_LITERAL(".sw?"));
-		num_names = 3;
-#else
+		ಹೆಸರುಗಳು[1] = vim_strnsave((char_u *)".*.sw?", STRLEN_LITERAL(".*.sw?"));
+		ಹೆಸರುಗಳು[2] = vim_strnsave((char_u *)".sw?", STRLEN_LITERAL(".sw?"));
+		ಅಂಕೆ_ಹೆಸರುಗಳು = 3;
+#ಇಲ್ಲದಿದ್ದರೆ
 # ifdef VMS
-		names[1] = vim_strnsave((char_u *)".*_sw%", STRLEN_LITERAL(".*_sw%"));
-		num_names = 2;
-# else
-		num_names = 1;
+		ಹೆಸರುಗಳು[1] = vim_strnsave((char_u *)".*_sw%", STRLEN_LITERAL(".*_sw%"));
+		ಅಂಕೆ_ಹೆಸರುಗಳು = 2;
+# ಇಲ್ಲದಿದ್ದರೆ
+		ಅಂಕೆ_ಹೆಸರುಗಳು = 1;
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
-	    else
-		num_names = recov_file_names(names, fname_res, TRUE);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ಅಂಕೆ_ಹೆಸರುಗಳು = recov_file_ಹೆಸರುಗಳು(ಹೆಸರುಗಳು, fname_res, TRUE);
 	}
-	else			    // check directory dir_name
+	ಇಲ್ಲದಿದ್ದರೆ			    // check directory dir_name
 	{
-	    if (fname == NULL)
+	    ಆದರೆ (fname == ಖಾಲಿ)
 	    {
 		string_T    ret;
 
-#ifdef VMS
-		names[0] = concat_fnames(dir_name.string, dir_name.length,
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VMS
+		ಹೆಸರುಗಳು[0] = concat_fnames(dir_name.string, dir_name.ಉದ್ದಳತೆ,
 		    (char_u *)"*_sw%", STRLEN_LITERAL("*_sw%"), TRUE, &ret);
-#else
-		names[0] = concat_fnames(dir_name.string, dir_name.length,
+#ಇಲ್ಲದಿದ್ದರೆ
+		ಹೆಸರುಗಳು[0] = concat_fnames(dir_name.string, dir_name.ಉದ್ದಳತೆ,
 		    (char_u *)"*.sw?", STRLEN_LITERAL("*.sw?"), TRUE, &ret);
-#endif
-#if defined(UNIX) || defined(MSWIN)
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(UNIX) || defined(MSWIN)
 		// For Unix names starting with a dot are special.  MS-Windows
 		// supports this too, on some file systems.
-		names[1] = concat_fnames(dir_name.string, dir_name.length,
+		ಹೆಸರುಗಳು[1] = concat_fnames(dir_name.string, dir_name.ಉದ್ದಳತೆ,
 		    (char_u *)".*.sw?", STRLEN_LITERAL(".*.sw?"), TRUE, &ret);
-		names[2] = concat_fnames(dir_name.string, dir_name.length,
+		ಹೆಸರುಗಳು[2] = concat_fnames(dir_name.string, dir_name.ಉದ್ದಳತೆ,
 		    (char_u *)".sw?", STRLEN_LITERAL(".sw?"), TRUE, &ret);
-		num_names = 3;
-#else
+		ಅಂಕೆ_ಹೆಸರುಗಳು = 3;
+#ಇಲ್ಲದಿದ್ದರೆ
 # ifdef VMS
-		names[1] = concat_fnames(dir_name.string, dir_name.length,
+		ಹೆಸರುಗಳು[1] = concat_fnames(dir_name.string, dir_name.ಉದ್ದಳತೆ,
 		    (char_u *)".*_sw%", STRLEN_LITERAL(".*_sw%"), TRUE, &ret);
-		num_names = 2;
-# else
-		num_names = 1;
+		ಅಂಕೆ_ಹೆಸರುಗಳು = 2;
+# ಇಲ್ಲದಿದ್ದರೆ
+		ಅಂಕೆ_ಹೆಸರುಗಳು = 1;
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		char_u	*tail;
+		char_u	*ಬಾಲ;
 
-#if defined(UNIX) || defined(MSWIN)
-		p = dir_name.string + dir_name.length;
-		if (after_pathsep(dir_name.string, p) && dir_name.length > 1 && p[-1] == p[-2])
+#ಆದರೆ defined(UNIX) || defined(MSWIN)
+		p = dir_name.string + dir_name.ಉದ್ದಳತೆ;
+		ಆದರೆ (after_pathsep(dir_name.string, p) && dir_name.ಉದ್ದಳತೆ > 1 && p[-1] == p[-2])
 		{
 		    // Ends with '//', Use Full path for swap name
-		    tail = make_percent_swname(dir_name.string, p, fname_res);
+		    ಬಾಲ = make_percent_swname(dir_name.string, p, fname_res);
 		}
-		else
-#endif
+		ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 		{
 		    string_T	ret;
 
-		    tail = gettail(fname_res);
-		    tail = concat_fnames(dir_name.string, dir_name.length,
-			tail, STRLEN(tail), TRUE, &ret);
+		    ಬಾಲ = gettail(fname_res);
+		    ಬಾಲ = concat_fnames(dir_name.string, dir_name.ಉದ್ದಳತೆ,
+			ಬಾಲ, STRLEN(ಬಾಲ), TRUE, &ret);
 		}
-		if (tail == NULL)
-		    num_names = 0;
-		else
+		ಆದರೆ (ಬಾಲ == ಖಾಲಿ)
+		    ಅಂಕೆ_ಹೆಸರುಗಳು = 0;
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    num_names = recov_file_names(names, tail, FALSE);
-		    vim_free(tail);
+		    ಅಂಕೆ_ಹೆಸರುಗಳು = recov_file_ಹೆಸರುಗಳು(ಹೆಸರುಗಳು, ಬಾಲ, FALSE);
+		    vim_free(ಬಾಲ);
 		}
 	    }
 	}
 
 	// check for out-of-memory
-	for (int i = 0; i < num_names; ++i)
+	ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < ಅಂಕೆ_ಹೆಸರುಗಳು; ++i)
 	{
-	    if (names[i] == NULL)
+	    ಆದರೆ (ಹೆಸರುಗಳು[i] == ಖಾಲಿ)
 	    {
-		for (i = 0; i < num_names; ++i)
-		    vim_free(names[i]);
-		num_names = 0;
+		ಗಾಗಿ (i = 0; i < ಅಂಕೆ_ಹೆಸರುಗಳು; ++i)
+		    vim_free(ಹೆಸರುಗಳು[i]);
+		ಅಂಕೆ_ಹೆಸರುಗಳು = 0;
 	    }
 	}
-	if (num_names == 0)
-	    num_files = 0;
-	else if (expand_wildcards(num_names, names, &num_files, &files,
+	ಆದರೆ (ಅಂಕೆ_ಹೆಸರುಗಳು == 0)
+	    ಅಂಕೆ_files = 0;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (expand_wildcards(ಅಂಕೆ_ಹೆಸರುಗಳು, ಹೆಸರುಗಳು, &ಅಂಕೆ_files, &files,
 			    EW_NOTENV|EW_KEEPALL|EW_FILE|EW_SILENT) == FAIL)
-	    num_files = 0;
+	    ಅಂಕೆ_files = 0;
 
 	/*
 	 * When no swap file found, wildcard expansion might have failed (e.g.
 	 * not able to execute the shell).
 	 * Try finding a swap file by simply adding ".swp" to the file name.
 	 */
-	if (*dirp == NUL && file_count + num_files == 0 && fname != NULL)
+	ಆದರೆ (*dirp == NUL && file_ಎಣಿಕೆ + ಅಂಕೆ_files == 0 && fname != ಖಾಲಿ)
 	{
 	    stat_T	    st;
 	    char_u	    *swapname;
 
 	    swapname = modname(fname_res,
-#if defined(VMS)
+#ಆದರೆ defined(VMS)
 			       (char_u *)"_swp", FALSE
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 			       (char_u *)".swp", TRUE
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 			      );
-	    if (swapname != NULL)
+	    ಆದರೆ (swapname != ಖಾಲಿ)
 	    {
-		if (mch_stat((char *)swapname, &st) != -1)    // It exists!
+		ಆದರೆ (mch_stat((ಅಕ್ಷರ *)swapname, &st) != -1)    // It exists!
 		{
 		    files = ALLOC_ONE(char_u *);
-		    if (files != NULL)
+		    ಆದರೆ (files != ಖಾಲಿ)
 		    {
 			files[0] = swapname;
-			swapname = NULL;
-			num_files = 1;
+			swapname = ಖಾಲಿ;
+			ಅಂಕೆ_files = 1;
 		    }
 		}
 		vim_free(swapname);
@@ -2115,98 +2115,98 @@ recover_names(
 	 * Remove swapfile name of the current buffer, it must be ignored.
 	 * But keep it for swapfilelist().
 	 */
-	if (curbuf->b_ml.ml_mfp != NULL
-			       && (p = curbuf->b_ml.ml_mfp->mf_fname) != NULL
-			       && ret_list == NULL)
+	ಆದರೆ (curbuf->b_ml.ml_mfp != ಖಾಲಿ
+			       && (p = curbuf->b_ml.ml_mfp->mf_fname) != ಖಾಲಿ
+			       && ret_list == ಖಾಲಿ)
 	{
-	    for (int i = 0; i < num_files; ++i)
+	    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < ಅಂಕೆ_files; ++i)
 		// Do not expand wildcards, on windows would try to expand
 		// "%tmp%" in "%tmp%file".
-		if (fullpathcmp(p, files[i], TRUE, FALSE) & FPC_SAME)
+		ಆದರೆ (fullpathcmp(p, files[i], TRUE, FALSE) & FPC_SAME)
 		{
 		    // Remove the name from files[i].  Move further entries
 		    // down.  When the array becomes empty free it here, since
 		    // FreeWild() won't be called below.
 		    vim_free(files[i]);
-		    if (--num_files == 0)
+		    ಆದರೆ (--ಅಂಕೆ_files == 0)
 			vim_free(files);
-		    else
-			for ( ; i < num_files; ++i)
+		    ಇಲ್ಲದಿದ್ದರೆ
+			ಗಾಗಿ ( ; i < ಅಂಕೆ_files; ++i)
 			    files[i] = files[i + 1];
 		}
 	}
-	if (nr > 0)
+	ಆದರೆ (nr > 0)
 	{
-	    file_count += num_files;
-	    if (nr <= file_count)
+	    file_ಎಣಿಕೆ += ಅಂಕೆ_files;
+	    ಆದರೆ (nr <= file_ಎಣಿಕೆ)
 	    {
-		*fname_out = vim_strsave(
-				      files[nr - 1 + num_files - file_count]);
+		*fname_ಹೊರಹೋಗು = vim_strsave(
+				      files[nr - 1 + ಅಂಕೆ_files - file_ಎಣಿಕೆ]);
 		dirp = (char_u *)"";		    // stop searching
 	    }
 	}
-	else if (do_list)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (do_list)
 	{
-	    if (dir_name.string[0] == '.' && dir_name.string[1] == NUL)
+	    ಆದರೆ (dir_name.string[0] == '.' && dir_name.string[1] == NUL)
 	    {
-		if (fname == NULL)
-		    msg_puts(_("   In current directory:\n"));
-		else
-		    msg_puts(_("   Using specified name:\n"));
+		ಆದರೆ (fname == ಖಾಲಿ)
+		    ಸಂದೇಶ_puts(_("   In current directory:\n"));
+		ಇಲ್ಲದಿದ್ದರೆ
+		    ಸಂದೇಶ_puts(_("   Using specified name:\n"));
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		msg_puts(_("   In directory "));
-		msg_home_replace(dir_name.string);
-		msg_puts(":\n");
+		ಸಂದೇಶ_puts(_("   In directory "));
+		ಸಂದೇಶ_home_replace(dir_name.string);
+		ಸಂದೇಶ_puts(":\n");
 	    }
 
-	    if (num_files)
+	    ಆದರೆ (ಅಂಕೆ_files)
 	    {
-		for (int i = 0; i < num_files; ++i)
+		ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < ಅಂಕೆ_files; ++i)
 		{
 		    // print the swap file name
-		    msg_outnum((long)++file_count);
-		    msg_puts(".    ");
-		    msg_puts((char *)gettail(files[i]));
-		    msg_putchar('\n');
-		    (void)swapfile_info(files[i]);
+		    ಸಂದೇಶ_outnum((ದೀರ್ಘ)++file_ಎಣಿಕೆ);
+		    ಸಂದೇಶ_puts(".    ");
+		    ಸಂದೇಶ_puts((ಅಕ್ಷರ *)gettail(files[i]));
+		    ಸಂದೇಶ_putchar('\n');
+		    (ಶೂನ್ಯ)swapfile_info(files[i]);
 		}
 	    }
-	    else
-		msg_puts(_("      -- none --\n"));
-	    out_flush();
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ಸಂದೇಶ_puts(_("      -- none --\n"));
+	    ಹೊರಹೋಗು_flush();
 	}
-#ifdef FEAT_EVAL
-	else if (ret_list != NULL)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ret_list != ಖಾಲಿ)
 	{
 	    string_T	name;
 
-	    for (int i = 0; i < num_files; ++i)
+	    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < ಅಂಕೆ_files; ++i)
 	    {
-		concat_fnames(dir_name.string, dir_name.length,
+		concat_fnames(dir_name.string, dir_name.ಉದ್ದಳತೆ,
 		    files[i], STRLEN(files[i]), TRUE, &name);
-		if (name.string != NULL)
+		ಆದರೆ (name.string != ಖಾಲಿ)
 		{
-		    list_append_string(ret_list, name.string, (int)name.length);
+		    list_append_string(ret_list, name.string, (ಪೂರ್ಣಾಂಕ)name.ಉದ್ದಳತೆ);
 		    vim_free(name.string);
 		}
 	    }
 	}
-#endif
-	else
-	    file_count += num_files;
+#ಆದರೆ_ಅಂತ್ಯ
+	ಇಲ್ಲದಿದ್ದರೆ
+	    file_ಎಣಿಕೆ += ಅಂಕೆ_files;
 
-	for (int i = 0; i < num_names; ++i)
-	    vim_free(names[i]);
-	if (num_files > 0)
-	    FreeWild(num_files, files);
+	ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < ಅಂಕೆ_ಹೆಸರುಗಳು; ++i)
+	    vim_free(ಹೆಸರುಗಳು[i]);
+	ಆದರೆ (ಅಂಕೆ_files > 0)
+	    FreeWild(ಅಂಕೆ_files, files);
     }
     vim_free(dir_name.string);
-    return file_count;
+    ಹಿಂತಿರುಗಿ file_ಎಣಿಕೆ;
 }
 
-#if defined(UNIX) || defined(MSWIN)
+#ಆದರೆ defined(UNIX) || defined(MSWIN)
 /*
  * Need _very_ long file names.
  * Append the full path to name with path separators made into percent
@@ -2215,263 +2215,263 @@ recover_names(
  * removed.
  */
     char_u *
-make_percent_swname(char_u *dir, char_u *dir_end, char_u *name)
+make_percent_swname(char_u *dir, char_u *dir_ಕೊನೆ, char_u *name)
 {
-    string_T	d = {NULL, 0};
+    string_T	d = {ಖಾಲಿ, 0};
     string_T	fixed_fname;
     char_u	*p;
 
-    fixed_fname.string = fix_fname(name != NULL ? name : (char_u *)"");
-    if (fixed_fname.string == NULL)
-	return NULL;
+    fixed_fname.string = fix_fname(name != ಖಾಲಿ ? name : (char_u *)"");
+    ಆದರೆ (fixed_fname.string == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    for (p = fixed_fname.string; *p != NUL; MB_PTR_ADV(p))
-	if (vim_ispathsep(*p))
+    ಗಾಗಿ (p = fixed_fname.string; *p != NUL; MB_PTR_ADV(p))
+	ಆದರೆ (vim_ispathsep(*p))
 	    *p = '%';
-    fixed_fname.length = (size_t)(p - fixed_fname.string);
+    fixed_fname.ಉದ್ದಳತೆ = (size_t)(p - fixed_fname.string);
 
     // remove one trailing slash
-    p = &dir_end[-1];
+    p = &dir_ಕೊನೆ[-1];
     *p = NUL;
-    concat_fnames(dir, (size_t)(p - dir), fixed_fname.string, fixed_fname.length, TRUE, &d);
+    concat_fnames(dir, (size_t)(p - dir), fixed_fname.string, fixed_fname.ಉದ್ದಳತೆ, TRUE, &d);
     vim_free(fixed_fname.string);
 
-    return d.string;
+    ಹಿಂತಿರುಗಿ d.string;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if (defined(UNIX) || defined(VMS) || defined(MSWIN)) \
+#ಆದರೆ (defined(UNIX) || defined(VMS) || defined(MSWIN)) \
 	&& (defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG))
 # define HAVE_PROCESS_STILL_RUNNING
-static int process_still_running;
-#endif
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ process_still_running;
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * Return information found in swapfile "fname" in dictionary "d".
  * This is used by the swapinfo() function.
  */
-    void
+    ಶೂನ್ಯ
 get_b0_dict(char_u *fname, dict_T *d)
 {
-    int fd;
-    struct block0 b0;
+    ಪೂರ್ಣಾಂಕ fd;
+    ರಚನೆ block0 b0;
 
-    if ((fd = mch_open((char *)fname, O_RDONLY | O_EXTRA, 0)) >= 0)
+    ಆದರೆ ((fd = mch_open((ಅಕ್ಷರ *)fname, O_RDONLY | O_EXTRA, 0)) >= 0)
     {
-	if (read_eintr(fd, &b0, sizeof(b0)) == sizeof(b0))
+	ಆದರೆ (read_eintr(fd, &b0, ಗಾತ್ರ(b0)) == ಗಾತ್ರ(b0))
 	{
-	    if (ml_check_b0_id(&b0) == FAIL)
-		dict_add_string_len(d, "error",
+	    ಆದರೆ (ml_check_b0_id(&b0) == FAIL)
+		dict_ಕೂಡಿಸು_string_len(d, "error",
 		    (char_u *)"Not a swap file", STRLEN_LITERAL("Not a swap file"));
-	    else if (b0_magic_wrong(&b0))
-		dict_add_string_len(d, "error",
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (b0_magic_wrong(&b0))
+		dict_ಕೂಡಿಸು_string_len(d, "error",
 		    (char_u *)"Magic number mismatch", STRLEN_LITERAL("Magic number mismatch"));
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		// we have swap information
-		dict_add_string_len(d, "version", b0.b0_version, 10);
-		dict_add_string_len(d, "user", b0.b0_uname, B0_UNAME_SIZE);
-		dict_add_string_len(d, "host", b0.b0_hname, B0_HNAME_SIZE);
-		dict_add_string_len(d, "fname", b0.b0_fname, B0_FNAME_SIZE_ORG);
+		dict_ಕೂಡಿಸು_string_len(d, "version", b0.b0_ಆವೃತ್ತಿ, 10);
+		dict_ಕೂಡಿಸು_string_len(d, "user", b0.b0_uname, B0_UNAME_ಗಾತ್ರ);
+		dict_ಕೂಡಿಸು_string_len(d, "host", b0.b0_hname, B0_HNAME_ಗಾತ್ರ);
+		dict_ಕೂಡಿಸು_string_len(d, "fname", b0.b0_fname, B0_FNAME_ಗಾತ್ರ_ORG);
 
-		dict_add_number(d, "pid", char_to_long(b0.b0_pid));
-		dict_add_number(d, "mtime", char_to_long(b0.b0_mtime));
-		dict_add_number(d, "dirty", b0.b0_dirty ? 1 : 0);
+		dict_ಕೂಡಿಸು_ಸಂಖ್ಯೆ(d, "pid", char_ಗಮ್ಯ_long(b0.b0_pid));
+		dict_ಕೂಡಿಸು_ಸಂಖ್ಯೆ(d, "mtime", char_ಗಮ್ಯ_long(b0.b0_mtime));
+		dict_ಕೂಡಿಸು_ಸಂಖ್ಯೆ(d, "dirty", b0.b0_dirty ? 1 : 0);
 # ifdef CHECK_INODE
-		dict_add_number(d, "inode", char_to_long(b0.b0_ino));
+		dict_ಕೂಡಿಸು_ಸಂಖ್ಯೆ(d, "inode", char_ಗಮ್ಯ_long(b0.b0_ino));
 # endif
 	    }
 	}
-	else
-	    dict_add_string_len(d, "error", (char_u *)"Cannot read file", STRLEN_LITERAL("Cannot read file"));
+	ಇಲ್ಲದಿದ್ದರೆ
+	    dict_ಕೂಡಿಸು_string_len(d, "error", (char_u *)"Cannot read file", STRLEN_LITERAL("Cannot read file"));
 	close(fd);
     }
-    else
-	dict_add_string_len(d, "error", (char_u *)"Cannot open file", STRLEN_LITERAL("Cannot open file"));
+    ಇಲ್ಲದಿದ್ದರೆ
+	dict_ಕೂಡಿಸು_string_len(d, "error", (char_u *)"Cannot open file", STRLEN_LITERAL("Cannot open file"));
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Give information about an existing swap file.
  * Returns timestamp (0 when unknown).
  */
-    static time_t
+    ಸ್ಥಿರ time_t
 swapfile_info(char_u *fname)
 {
     stat_T	    st;
-    int		    fd;
-    struct block0   b0;
-#ifdef UNIX
-    char_u	    uname[B0_UNAME_SIZE];
-#endif
+    ಪೂರ್ಣಾಂಕ		    fd;
+    ರಚನೆ block0   b0;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
+    char_u	    uname[B0_UNAME_ಗಾತ್ರ];
+#ಆದರೆ_ಅಂತ್ಯ
 
     // print the swap file date
-    if (mch_stat((char *)fname, &st) != -1)
+    ಆದರೆ (mch_stat((ಅಕ್ಷರ *)fname, &st) != -1)
     {
-#ifdef UNIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
 	// print name of owner of the file
-	if (mch_get_uname(st.st_uid, uname, B0_UNAME_SIZE) == OK)
+	ಆದರೆ (mch_get_uname(st.st_uid, uname, B0_UNAME_ಗಾತ್ರ) == OK)
 	{
-	    msg_puts(_("          owned by: "));
-	    msg_outtrans(uname);
-	    msg_puts(_("   dated: "));
+	    ಸಂದೇಶ_puts(_("          owned by: "));
+	    ಸಂದೇಶ_outtrans(uname);
+	    ಸಂದೇಶ_puts(_("   dated: "));
 	}
-	else
-#endif
-	    msg_puts(_("             dated: "));
-	msg_puts(get_ctime(st.st_mtime, TRUE));
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಸಂದೇಶ_puts(_("             dated: "));
+	ಸಂದೇಶ_puts(get_ctime(st.st_mtime, TRUE));
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	st.st_mtime = 0;
 
     /*
      * print the original file name
      */
-    fd = mch_open((char *)fname, O_RDONLY | O_EXTRA, 0);
-    if (fd >= 0)
+    fd = mch_open((ಅಕ್ಷರ *)fname, O_RDONLY | O_EXTRA, 0);
+    ಆದರೆ (fd >= 0)
     {
-	if (read_eintr(fd, &b0, sizeof(b0)) == sizeof(b0))
+	ಆದರೆ (read_eintr(fd, &b0, ಗಾತ್ರ(b0)) == ಗಾತ್ರ(b0))
 	{
-	    if (STRNCMP(b0.b0_version, "VIM 3.0", 7) == 0)
+	    ಆದರೆ (STRNCMP(b0.b0_ಆವೃತ್ತಿ, "VIM 3.0", 7) == 0)
 	    {
-		msg_puts(_("         [from Vim version 3.0]"));
+		ಸಂದೇಶ_puts(_("         [from Vim version 3.0]"));
 	    }
-	    else if (ml_check_b0_id(&b0) == FAIL)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ml_check_b0_id(&b0) == FAIL)
 	    {
-		msg_puts(_("         [does not look like a Vim swap file]"));
+		ಸಂದೇಶ_puts(_("         [does not look like a Vim swap file]"));
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		msg_puts(_("         file name: "));
-		if (b0.b0_fname[0] == NUL)
-		    msg_puts(_("[No Name]"));
-		else
-		    msg_outtrans(b0.b0_fname);
+		ಸಂದೇಶ_puts(_("         file name: "));
+		ಆದರೆ (b0.b0_fname[0] == NUL)
+		    ಸಂದೇಶ_puts(_("[No Name]"));
+		ಇಲ್ಲದಿದ್ದರೆ
+		    ಸಂದೇಶ_outtrans(b0.b0_fname);
 
-		msg_puts(_("\n          modified: "));
-		msg_puts(b0.b0_dirty ? _("YES") : _("no"));
+		ಸಂದೇಶ_puts(_("\n          modified: "));
+		ಸಂದೇಶ_puts(b0.b0_dirty ? _("YES") : _("no"));
 
-		if (*(b0.b0_uname) != NUL)
+		ಆದರೆ (*(b0.b0_uname) != NUL)
 		{
-		    msg_puts(_("\n         user name: "));
-		    msg_outtrans(b0.b0_uname);
+		    ಸಂದೇಶ_puts(_("\n         user name: "));
+		    ಸಂದೇಶ_outtrans(b0.b0_uname);
 		}
 
-		if (*(b0.b0_hname) != NUL)
+		ಆದರೆ (*(b0.b0_hname) != NUL)
 		{
-		    if (*(b0.b0_uname) != NUL)
-			msg_puts(_("   host name: "));
-		    else
-			msg_puts(_("\n         host name: "));
-		    msg_outtrans(b0.b0_hname);
+		    ಆದರೆ (*(b0.b0_uname) != NUL)
+			ಸಂದೇಶ_puts(_("   host name: "));
+		    ಇಲ್ಲದಿದ್ದರೆ
+			ಸಂದೇಶ_puts(_("\n         host name: "));
+		    ಸಂದೇಶ_outtrans(b0.b0_hname);
 		}
 
-		if (char_to_long(b0.b0_pid) != 0L)
+		ಆದರೆ (char_ಗಮ್ಯ_long(b0.b0_pid) != 0L)
 		{
-		    msg_puts(_("\n        process ID: "));
-		    msg_outnum(char_to_long(b0.b0_pid));
-#if defined(UNIX) || defined(MSWIN)
-		    if (swapfile_process_running(&b0, fname))
+		    ಸಂದೇಶ_puts(_("\n        process ID: "));
+		    ಸಂದೇಶ_outnum(char_ಗಮ್ಯ_long(b0.b0_pid));
+#ಆದರೆ defined(UNIX) || defined(MSWIN)
+		    ಆದರೆ (swapfile_process_running(&b0, fname))
 		    {
-			msg_puts(_(" (STILL RUNNING)"));
+			ಸಂದೇಶ_puts(_(" (STILL RUNNING)"));
 # ifdef HAVE_PROCESS_STILL_RUNNING
 			process_still_running = TRUE;
 # endif
 		    }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		}
 
-		if (b0_magic_wrong(&b0))
+		ಆದರೆ (b0_magic_wrong(&b0))
 		{
-#if defined(MSWIN)
-		    if (STRNCMP(b0.b0_hname, "PC ", 3) == 0)
-			msg_puts(_("\n         [not usable with this version of Vim]"));
-		    else
-#endif
-			msg_puts(_("\n         [not usable on this computer]"));
+#ಆದರೆ defined(MSWIN)
+		    ಆದರೆ (STRNCMP(b0.b0_hname, "PC ", 3) == 0)
+			ಸಂದೇಶ_puts(_("\n         [not usable with this version of Vim]"));
+		    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+			ಸಂದೇಶ_puts(_("\n         [not usable on this computer]"));
 		}
 	    }
 	}
-	else
-	    msg_puts(_("         [cannot be read]"));
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಸಂದೇಶ_puts(_("         [cannot be read]"));
 	close(fd);
     }
-    else
-	msg_puts(_("         [cannot be opened]"));
-    msg_putchar('\n');
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಸಂದೇಶ_puts(_("         [cannot be opened]"));
+    ಸಂದೇಶ_putchar('\n');
 
-    return st.st_mtime;
+    ಹಿಂತಿರುಗಿ st.st_mtime;
 }
 
 /*
  * Return TRUE if the swap file looks OK and there are no changes, thus it can
  * be safely deleted.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 swapfile_unchanged(char_u *fname)
 {
     stat_T	    st;
-    int		    fd;
-    struct block0   b0;
-    int		    ret = TRUE;
+    ಪೂರ್ಣಾಂಕ		    fd;
+    ರಚನೆ block0   b0;
+    ಪೂರ್ಣಾಂಕ		    ret = TRUE;
 
     // must be able to stat the swap file
-    if (mch_stat((char *)fname, &st) == -1)
-	return FALSE;
+    ಆದರೆ (mch_stat((ಅಕ್ಷರ *)fname, &st) == -1)
+	ಹಿಂತಿರುಗಿ FALSE;
 
     // must be able to read the first block
-    fd = mch_open((char *)fname, O_RDONLY | O_EXTRA, 0);
-    if (fd < 0)
-	return FALSE;
-    if (read_eintr(fd, &b0, sizeof(b0)) != sizeof(b0))
+    fd = mch_open((ಅಕ್ಷರ *)fname, O_RDONLY | O_EXTRA, 0);
+    ಆದರೆ (fd < 0)
+	ಹಿಂತಿರುಗಿ FALSE;
+    ಆದರೆ (read_eintr(fd, &b0, ಗಾತ್ರ(b0)) != ಗಾತ್ರ(b0))
     {
 	close(fd);
-	return FALSE;
+	ಹಿಂತಿರುಗಿ FALSE;
     }
 
     // the ID and magic number must be correct
-    if (ml_check_b0_id(&b0) == FAIL|| b0_magic_wrong(&b0))
+    ಆದರೆ (ml_check_b0_id(&b0) == FAIL|| b0_magic_wrong(&b0))
 	ret = FALSE;
 
     // must be unchanged
-    if (b0.b0_dirty)
+    ಆದರೆ (b0.b0_dirty)
 	ret = FALSE;
 
-#if defined(UNIX) || defined(MSWIN)
+#ಆದರೆ defined(UNIX) || defined(MSWIN)
     // Host name must be known and must equal the current host name, otherwise
     // comparing pid is meaningless.
-    if (*(b0.b0_hname) == NUL)
+    ಆದರೆ (*(b0.b0_hname) == NUL)
     {
 	ret = FALSE;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	char_u	    hostname[B0_HNAME_SIZE];
+	char_u	    hostname[B0_HNAME_ಗಾತ್ರ];
 
-	mch_get_host_name(hostname, B0_HNAME_SIZE);
-	hostname[B0_HNAME_SIZE - 1] = NUL;
-	b0.b0_hname[B0_HNAME_SIZE - 1] = NUL; // in case of corruption
-	if (STRICMP(b0.b0_hname, hostname) != 0)
+	mch_get_host_name(hostname, B0_HNAME_ಗಾತ್ರ);
+	hostname[B0_HNAME_ಗಾತ್ರ - 1] = NUL;
+	b0.b0_hname[B0_HNAME_ಗಾತ್ರ - 1] = NUL; // in case of corruption
+	ಆದರೆ (STRICMP(b0.b0_hname, hostname) != 0)
 	    ret = FALSE;
     }
 
     // process must be known and not be running
-    if (char_to_long(b0.b0_pid) == 0L || swapfile_process_running(&b0, fname))
+    ಆದರೆ (char_ಗಮ್ಯ_long(b0.b0_pid) == 0L || swapfile_process_running(&b0, fname))
 	ret = FALSE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // We do not check the user, it should be irrelevant for whether the swap
     // file is still useful.
 
     close(fd);
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-    static int
-recov_file_names(char_u **names, char_u *path, int prepend_dot)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+recov_file_ಹೆಸರುಗಳು(char_u **ಹೆಸರುಗಳು, char_u *ಮಾರ್ಗ, ಪೂರ್ಣಾಂಕ prepend_dot)
 {
-    int		num_names;
+    ಪೂರ್ಣಾಂಕ		ಅಂಕೆ_ಹೆಸರುಗಳು;
 
     /*
      * (Win32 and Win64) never short names, but do prepend a dot.
@@ -2479,87 +2479,87 @@ recov_file_names(char_u **names, char_u *path, int prepend_dot)
      * Only use the short name if it is different.
      */
     char_u	*p;
-    int		i;
-#ifndef MSWIN
+    ಪೂರ್ಣಾಂಕ		i;
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ MSWIN
     bool    shortname = curbuf->b_shortname;
 
     curbuf->b_shortname = false;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     string_T	ret;
 
-    num_names = 0;
+    ಅಂಕೆ_ಹೆಸರುಗಳು = 0;
 
     /*
      * May also add the file name with a dot prepended, for swap file in same
      * dir as original file.
      */
-    if (prepend_dot)
+    ಆದರೆ (prepend_dot)
     {
-	names[num_names] = modname(path, (char_u *)".sw?", TRUE);
-	if (names[num_names] == NULL)
-	    goto end;
-	++num_names;
+	ಹೆಸರುಗಳು[ಅಂಕೆ_ಹೆಸರುಗಳು] = modname(ಮಾರ್ಗ, (char_u *)".sw?", TRUE);
+	ಆದರೆ (ಹೆಸರುಗಳು[ಅಂಕೆ_ಹೆಸರುಗಳು] == ಖಾಲಿ)
+	    ಹೋಗು ಕೊನೆ;
+	++ಅಂಕೆ_ಹೆಸರುಗಳು;
     }
 
     /*
      * Form the normal swap file name pattern by appending ".sw?".
      */
-#ifdef VMS
-    names[num_names] = concat_fnames(path, STRLEN(path),
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VMS
+    ಹೆಸರುಗಳು[ಅಂಕೆ_ಹೆಸರುಗಳು] = concat_fnames(ಮಾರ್ಗ, STRLEN(ಮಾರ್ಗ),
 	(char_u *)"_sw%", STRLEN_LITERAL("_sw%"), FALSE, &ret);
-#else
-    names[num_names] = concat_fnames(path, STRLEN(path),
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಹೆಸರುಗಳು[ಅಂಕೆ_ಹೆಸರುಗಳು] = concat_fnames(ಮಾರ್ಗ, STRLEN(ಮಾರ್ಗ),
 	(char_u *)".sw?", STRLEN_LITERAL(".sw?"), FALSE, &ret);
-#endif
-    if (names[num_names] == NULL)
-	goto end;
-    if (num_names >= 1)	    // check if we have the same name twice
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (ಹೆಸರುಗಳು[ಅಂಕೆ_ಹೆಸರುಗಳು] == ಖಾಲಿ)
+	ಹೋಗು ಕೊನೆ;
+    ಆದರೆ (ಅಂಕೆ_ಹೆಸರುಗಳು >= 1)	    // check if we have the same name twice
     {
-	p = names[num_names - 1];
-	i = (int)STRLEN(names[num_names - 1]) - (int)STRLEN(names[num_names]);
-	if (i > 0)
+	p = ಹೆಸರುಗಳು[ಅಂಕೆ_ಹೆಸರುಗಳು - 1];
+	i = (ಪೂರ್ಣಾಂಕ)STRLEN(ಹೆಸರುಗಳು[ಅಂಕೆ_ಹೆಸರುಗಳು - 1]) - (ಪೂರ್ಣಾಂಕ)STRLEN(ಹೆಸರುಗಳು[ಅಂಕೆ_ಹೆಸರುಗಳು]);
+	ಆದರೆ (i > 0)
 	    p += i;	    // file name has been expanded to full path
 
-	if (STRCMP(p, names[num_names]) != 0)
-	    ++num_names;
-	else
-	    vim_free(names[num_names]);
+	ಆದರೆ (STRCMP(p, ಹೆಸರುಗಳು[ಅಂಕೆ_ಹೆಸರುಗಳು]) != 0)
+	    ++ಅಂಕೆ_ಹೆಸರುಗಳು;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    vim_free(ಹೆಸರುಗಳು[ಅಂಕೆ_ಹೆಸರುಗಳು]);
     }
-    else
-	++num_names;
+    ಇಲ್ಲದಿದ್ದರೆ
+	++ಅಂಕೆ_ಹೆಸರುಗಳು;
 
-#ifndef MSWIN
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ MSWIN
     /*
      * Also try with 'shortname' set, in case the file is on a DOS filesystem.
      */
     curbuf->b_shortname = true;
 # ifdef VMS
-    names[num_names] = modname(path, (char_u *)"_sw%", FALSE);
-# else
-    names[num_names] = modname(path, (char_u *)".sw?", FALSE);
+    ಹೆಸರುಗಳು[ಅಂಕೆ_ಹೆಸರುಗಳು] = modname(ಮಾರ್ಗ, (char_u *)"_sw%", FALSE);
+# ಇಲ್ಲದಿದ್ದರೆ
+    ಹೆಸರುಗಳು[ಅಂಕೆ_ಹೆಸರುಗಳು] = modname(ಮಾರ್ಗ, (char_u *)".sw?", FALSE);
 # endif
-    if (names[num_names] == NULL)
-	goto end;
+    ಆದರೆ (ಹೆಸರುಗಳು[ಅಂಕೆ_ಹೆಸರುಗಳು] == ಖಾಲಿ)
+	ಹೋಗು ಕೊನೆ;
 
     /*
      * Remove the one from 'shortname', if it's the same as with 'noshortname'.
      */
-    p = names[num_names];
-    i = STRLEN(names[num_names]) - STRLEN(names[num_names - 1]);
-    if (i > 0)
+    p = ಹೆಸರುಗಳು[ಅಂಕೆ_ಹೆಸರುಗಳು];
+    i = STRLEN(ಹೆಸರುಗಳು[ಅಂಕೆ_ಹೆಸರುಗಳು]) - STRLEN(ಹೆಸರುಗಳು[ಅಂಕೆ_ಹೆಸರುಗಳು - 1]);
+    ಆದರೆ (i > 0)
 	p += i;		// file name has been expanded to full path
-    if (STRCMP(names[num_names - 1], p) == 0)
-	vim_free(names[num_names]);
-    else
-	++num_names;
-#endif
+    ಆದರೆ (STRCMP(ಹೆಸರುಗಳು[ಅಂಕೆ_ಹೆಸರುಗಳು - 1], p) == 0)
+	vim_free(ಹೆಸರುಗಳು[ಅಂಕೆ_ಹೆಸರುಗಳು]);
+    ಇಲ್ಲದಿದ್ದರೆ
+	++ಅಂಕೆ_ಹೆಸರುಗಳು;
+#ಆದರೆ_ಅಂತ್ಯ
 
-end:
-#ifndef MSWIN
+ಕೊನೆ:
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ MSWIN
     curbuf->b_shortname = shortname;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return num_names;
+    ಹಿಂತಿರುಗಿ ಅಂಕೆ_ಹೆಸರುಗಳು;
 }
 
 /*
@@ -2569,53 +2569,53 @@ end:
  * If 'check_char' is TRUE, stop syncing when character becomes available, but
  * always sync at least one block.
  */
-    void
-ml_sync_all(int check_file, int check_char)
+    ಶೂನ್ಯ
+ml_sync_all(ಪೂರ್ಣಾಂಕ check_file, ಪೂರ್ಣಾಂಕ check_char)
 {
     buf_T		*buf;
     stat_T		st;
 
     FOR_ALL_BUFFERS(buf)
     {
-	if (buf->b_ml.ml_mfp == NULL
-		|| buf->b_ml.ml_mfp->mf_fname == NULL
+	ಆದರೆ (buf->b_ml.ml_mfp == ಖಾಲಿ
+		|| buf->b_ml.ml_mfp->mf_fname == ಖಾಲಿ
 		|| buf->b_ml.ml_mfp->mf_fd < 0)
-	    continue;			    // no file
+	    ಮುಂದುವರಿ;			    // no file
 
-#ifdef FEAT_CRYPT
-	if (crypt_may_close_swapfile(buf, buf->b_p_key,
-						     crypt_get_method_nr(buf)))
-	    continue;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+	ಆದರೆ (crypt_may_close_swapfile(buf, buf->b_p_ಕೀಲಿ,
+						     crypt_get_ವಿಧಾನ_nr(buf)))
+	    ಮುಂದುವರಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 
-	ml_flush_line(buf);		    // flush buffered line
+	ml_flush_ಸಾಲು(buf);		    // flush buffered line
 					    // flush locked block
-	(void)ml_find_line(buf, (linenr_T)0, ML_FLUSH);
-	if (bufIsChanged(buf) && check_file && mf_need_trans(buf->b_ml.ml_mfp)
-						     && buf->b_ffname != NULL)
+	(ಶೂನ್ಯ)ml_ಕಂಡುಹಿಡಿ_ಸಾಲು(buf, (linenr_T)0, ML_FLUSH);
+	ಆದರೆ (buf_Is_ಬದಲಾಯಿತು(buf) && check_file && mf_need_trans(buf->b_ml.ml_mfp)
+						     && buf->b_ffname != ಖಾಲಿ)
 	{
 	    /*
 	     * If the original file does not exist anymore or has been changed
 	     * call ml_preserve() to get rid of all negative numbered blocks.
 	     */
-	    if (mch_stat((char *)buf->b_ffname, &st) == -1
+	    ಆದರೆ (mch_stat((ಅಕ್ಷರ *)buf->b_ffname, &st) == -1
 		    || st.st_mtime != buf->b_mtime_read
-#ifdef ST_MTIM_NSEC
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ST_MTIM_NSEC
 		    || st.ST_MTIM_NSEC != buf->b_mtime_read_ns
-#endif
-		    || st.st_size != buf->b_orig_size)
+#ಆದರೆ_ಅಂತ್ಯ
+		    || st.st_size != buf->b_orig_ಗಾತ್ರ)
 	    {
 		ml_preserve(buf, FALSE);
 		did_check_timestamps = FALSE;
 		need_check_timestamps = TRUE;	// give message later
 	    }
 	}
-	if (buf->b_ml.ml_mfp->mf_dirty == MF_DIRTY_YES)
+	ಆದರೆ (buf->b_ml.ml_mfp->mf_dirty == MF_DIRTY_YES)
 	{
-	    (void)mf_sync(buf->b_ml.ml_mfp, (check_char ? MFS_STOP : 0)
-					| (bufIsChanged(buf) ? MFS_FLUSH : 0));
-	    if (check_char && ui_char_avail())	// character available now
-		break;
+	    (ಶೂನ್ಯ)mf_sync(buf->b_ml.ml_mfp, (check_char ? MFS_STOP : 0)
+					| (buf_Is_ಬದಲಾಯಿತು(buf) ? MFS_FLUSH : 0));
+	    ಆದರೆ (check_char && ui_char_avail())	// character available now
+		ನಿಲ್ಲಿಸು;
 	}
     }
 }
@@ -2630,36 +2630,36 @@ ml_sync_all(int check_file, int check_char)
  *
  * when message is TRUE the success of preserving is reported
  */
-    void
-ml_preserve(buf_T *buf, int message)
+    ಶೂನ್ಯ
+ml_preserve(buf_T *buf, ಪೂರ್ಣಾಂಕ ಸಂದೇಶ_2)
 {
     bhdr_T	*hp;
     linenr_T	lnum;
     memfile_T	*mfp = buf->b_ml.ml_mfp;
-    int		status;
-    int		got_int_save = got_int;
+    ಪೂರ್ಣಾಂಕ		ಸ್ಥಿತಿ_2;
+    ಪೂರ್ಣಾಂಕ		got_int_save = got_int;
 
-    if (mfp == NULL || mfp->mf_fname == NULL)
+    ಆದರೆ (mfp == ಖಾಲಿ || mfp->mf_fname == ಖಾಲಿ)
     {
-	if (message)
-	    emsg(_(e_cannot_preserve_there_is_no_swap_file));
-	return;
+	ಆದರೆ (ಸಂದೇಶ_2)
+	    emsg(_(e_cannot_preserve_there_is_no_ಅದಲುಬದಲು_file));
+	ಹಿಂತಿರುಗಿ;
     }
-#ifdef FEAT_CRYPT
-    if (crypt_may_close_swapfile(buf, buf->b_p_key, crypt_get_method_nr(buf)))
-	return;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+    ಆದರೆ (crypt_may_close_swapfile(buf, buf->b_p_ಕೀಲಿ, crypt_get_ವಿಧಾನ_nr(buf)))
+	ಹಿಂತಿರುಗಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 
     // We only want to stop when interrupted here, not when interrupted
     // before.
     got_int = FALSE;
 
-    ml_flush_line(buf);				    // flush buffered line
-    (void)ml_find_line(buf, (linenr_T)0, ML_FLUSH); // flush locked block
-    status = mf_sync(mfp, MFS_ALL | MFS_FLUSH);
+    ml_flush_ಸಾಲು(buf);				    // flush buffered line
+    (ಶೂನ್ಯ)ml_ಕಂಡುಹಿಡಿ_ಸಾಲು(buf, (linenr_T)0, ML_FLUSH); // flush locked block
+    ಸ್ಥಿತಿ_2 = mf_sync(mfp, MFS_ALL | MFS_FLUSH);
 
     // stack is invalid after mf_sync(.., MFS_ALL)
-    buf->b_ml.ml_stack_top = 0;
+    buf->b_ml.ml_ರಾಶಿ_ತುದಿ = 0;
 
     /*
      * Some of the data blocks may have been changed from negative to
@@ -2673,34 +2673,34 @@ ml_preserve(buf_T *buf, int message)
      * ml_find_line() does the work by translating the negative block numbers
      * when getting the first line of each data block.
      */
-    if (mf_need_trans(mfp) && !got_int)
+    ಆದರೆ (mf_need_trans(mfp) && !got_int)
     {
 	lnum = 1;
-	while (mf_need_trans(mfp) && lnum <= buf->b_ml.ml_line_count)
+	ಆಗ (mf_need_trans(mfp) && lnum <= buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
 	{
-	    hp = ml_find_line(buf, lnum, ML_FIND);
-	    if (hp == NULL)
+	    hp = ml_ಕಂಡುಹಿಡಿ_ಸಾಲು(buf, lnum, ML_ಕಂಡುಹಿಡಿ);
+	    ಆದರೆ (hp == ಖಾಲಿ)
 	    {
-		status = FAIL;
-		goto theend;
+		ಸ್ಥಿತಿ_2 = FAIL;
+		ಹೋಗು theend;
 	    }
-	    CHECK(buf->b_ml.ml_locked_low != lnum, "low != lnum");
-	    lnum = buf->b_ml.ml_locked_high + 1;
+	    CHECK(buf->b_ml.ml_locked_ಕೆಳಗಿನ != lnum, "low != lnum");
+	    lnum = buf->b_ml.ml_locked_ಮೇಲಿನ + 1;
 	}
-	(void)ml_find_line(buf, (linenr_T)0, ML_FLUSH);	// flush locked block
+	(ಶೂನ್ಯ)ml_ಕಂಡುಹಿಡಿ_ಸಾಲು(buf, (linenr_T)0, ML_FLUSH);	// flush locked block
 	// sync the updated pointer blocks
-	if (mf_sync(mfp, MFS_ALL | MFS_FLUSH) == FAIL)
-	    status = FAIL;
-	buf->b_ml.ml_stack_top = 0;	    // stack is invalid now
+	ಆದರೆ (mf_sync(mfp, MFS_ALL | MFS_FLUSH) == FAIL)
+	    ಸ್ಥಿತಿ_2 = FAIL;
+	buf->b_ml.ml_ರಾಶಿ_ತುದಿ = 0;	    // stack is invalid now
     }
 theend:
     got_int |= got_int_save;
 
-    if (message)
+    ಆದರೆ (ಸಂದೇಶ_2)
     {
-	if (status == OK)
-	    msg(_("File preserved"));
-	else
+	ಆದರೆ (ಸ್ಥಿತಿ_2 == OK)
+	    ಸಂದೇಶ(_("File preserved"));
+	ಇಲ್ಲದಿದ್ದರೆ
 	    emsg(_(e_preserve_failed));
     }
 }
@@ -2721,7 +2721,7 @@ theend:
     char_u  *
 ml_get(linenr_T lnum)
 {
-    return ml_get_buf(curbuf, lnum, FALSE);
+    ಹಿಂತಿರುಗಿ ml_get_buf(curbuf, lnum, FALSE);
 }
 
 /*
@@ -2730,68 +2730,68 @@ ml_get(linenr_T lnum)
     char_u *
 ml_get_pos(pos_T *pos)
 {
-    return (ml_get_buf(curbuf, pos->lnum, FALSE) + pos->col);
+    ಹಿಂತಿರುಗಿ (ml_get_buf(curbuf, pos->lnum, FALSE) + pos->ಲಂಬಸಾಲು);
 }
 
 /*
  * Return pointer to cursor line.
  */
     char_u *
-ml_get_curline(void)
+ml_get_curline(ಶೂನ್ಯ)
 {
-    return ml_get_buf(curbuf, curwin->w_cursor.lnum, FALSE);
+    ಹಿಂತಿರುಗಿ ml_get_buf(curbuf, curwin->w_cursor.lnum, FALSE);
 }
 
 /*
  * Return pointer to cursor position.
  */
     char_u *
-ml_get_cursor(void)
+ml_get_cursor(ಶೂನ್ಯ)
 {
-    return (ml_get_buf(curbuf, curwin->w_cursor.lnum, FALSE) +
-							curwin->w_cursor.col);
+    ಹಿಂತಿರುಗಿ (ml_get_buf(curbuf, curwin->w_cursor.lnum, FALSE) +
+							curwin->w_cursor.ಲಂಬಸಾಲು);
 }
 
 // return length (excluding the NUL) of the given line
     colnr_T
 ml_get_len(linenr_T lnum)
 {
-    return ml_get_buf_len(curbuf, lnum);
+    ಹಿಂತಿರುಗಿ ml_get_buf_len(curbuf, lnum);
 }
 
 // return length (excluding the NUL) of the text after position "pos"
     colnr_T
 ml_get_pos_len(pos_T *pos)
 {
-    return ml_get_buf_len(curbuf, pos->lnum) - pos->col;
+    ಹಿಂತಿರುಗಿ ml_get_buf_len(curbuf, pos->lnum) - pos->ಲಂಬಸಾಲು;
 }
 
 // return length (excluding the NUL) of the cursor line
     colnr_T
-ml_get_curline_len(void)
+ml_get_curline_len(ಶೂನ್ಯ)
 {
-    return ml_get_buf_len(curbuf, curwin->w_cursor.lnum);
+    ಹಿಂತಿರುಗಿ ml_get_buf_len(curbuf, curwin->w_cursor.lnum);
 }
 
 // return length (excluding the NUL) of the cursor position
     colnr_T
-ml_get_cursor_len(void)
+ml_get_cursor_len(ಶೂನ್ಯ)
 {
-    return ml_get_buf_len(curbuf, curwin->w_cursor.lnum) - curwin->w_cursor.col;
+    ಹಿಂತಿರುಗಿ ml_get_buf_len(curbuf, curwin->w_cursor.lnum) - curwin->w_cursor.ಲಂಬಸಾಲು;
 }
 
 // return length (excluding the NUL) of the given line in the given buffer
     colnr_T
 ml_get_buf_len(buf_T *buf, linenr_T lnum)
 {
-    char_u	*line;
+    char_u	*ಸಾಲು;
 
-    if (*(line = ml_get_buf(buf, lnum, FALSE)) == NUL)
-	return 0;
+    ಆದರೆ (*(ಸಾಲು = ml_get_buf(buf, lnum, FALSE)) == NUL)
+	ಹಿಂತಿರುಗಿ 0;
 
-    if (buf->b_ml.ml_line_textlen <= 0)
-	buf->b_ml.ml_line_textlen = (int)STRLEN(line) + 1;
-    return buf->b_ml.ml_line_textlen - 1;
+    ಆದರೆ (buf->b_ml.ml_ಸಾಲು_textlen <= 0)
+	buf->b_ml.ml_ಸಾಲು_textlen = (ಪೂರ್ಣಾಂಕ)STRLEN(ಸಾಲು) + 1;
+    ಹಿಂತಿರುಗಿ buf->b_ml.ml_ಸಾಲು_textlen - 1;
 }
 
 /*
@@ -2804,16 +2804,16 @@ ml_get_buf_len(buf_T *buf, linenr_T lnum)
 ml_get_buf(
     buf_T	*buf,
     linenr_T	lnum,
-    int		will_change)		// line will be changed
+    ಪೂರ್ಣಾಂಕ		will_change)		// line will be changed
 {
     bhdr_T	*hp;
-    DATA_BL	*dp;
-    static int	recursive = 0;
-    static char_u questions[4];
+    ದತ್ತಾಂಶ_BL	*dp;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	recursive = 0;
+    ಸ್ಥಿರ char_u questions[4];
 
-    if (lnum > buf->b_ml.ml_line_count)	// invalid line number
+    ಆದರೆ (lnum > buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)	// invalid line number
     {
-	if (recursive == 0)
+	ಆದರೆ (recursive == 0)
 	{
 	    // Avoid giving this message for a recursive call, may happen when
 	    // the GUI redraws part of the text.
@@ -2821,22 +2821,22 @@ ml_get_buf(
 	    siemsg(e_ml_get_invalid_lnum_nr, lnum);
 	    --recursive;
 	}
-	ml_flush_line(buf);
+	ml_flush_ಸಾಲು(buf);
 errorret:
 	STRCPY(questions, "???");
-	buf->b_ml.ml_line_len = 4;
-	buf->b_ml.ml_line_textlen = buf->b_ml.ml_line_len;
-	buf->b_ml.ml_line_lnum = lnum;
-	return questions;
+	buf->b_ml.ml_ಸಾಲು_len = 4;
+	buf->b_ml.ml_ಸಾಲು_textlen = buf->b_ml.ml_ಸಾಲು_len;
+	buf->b_ml.ml_ಸಾಲು_lnum = lnum;
+	ಹಿಂತಿರುಗಿ questions;
     }
-    if (lnum <= 0)			// pretend line 0 is line 1
+    ಆದರೆ (lnum <= 0)			// pretend line 0 is line 1
 	lnum = 1;
 
-    if (buf->b_ml.ml_mfp == NULL)	// there are no lines
+    ಆದರೆ (buf->b_ml.ml_mfp == ಖಾಲಿ)	// there are no lines
     {
-	buf->b_ml.ml_line_len = 1;
-	buf->b_ml.ml_line_textlen = buf->b_ml.ml_line_len;
-	return (char_u *)"";
+	buf->b_ml.ml_ಸಾಲು_len = 1;
+	buf->b_ml.ml_ಸಾಲು_textlen = buf->b_ml.ml_ಸಾಲು_len;
+	ಹಿಂತಿರುಗಿ (char_u *)"";
     }
 
     /*
@@ -2845,88 +2845,88 @@ errorret:
      * Don't use the last used line when 'swapfile' is reset, need to load all
      * blocks.
      */
-    if (buf->b_ml.ml_line_lnum != lnum || mf_dont_release)
+    ಆದರೆ (buf->b_ml.ml_ಸಾಲು_lnum != lnum || mf_dont_release)
     {
-	unsigned    start, end;
-	int	    idx;
+	ಚಿಹ್ನೆರಹಿತ    ಆರಂಭ, ಕೊನೆ;
+	ಪೂರ್ಣಾಂಕ	    idx;
 
-	ml_flush_line(buf);
+	ml_flush_ಸಾಲು(buf);
 
 	/*
 	 * Find the data block containing the line.
 	 * This also fills the stack with the blocks from the root to the data
 	 * block and releases any locked block.
 	 */
-	if ((hp = ml_find_line(buf, lnum, ML_FIND)) == NULL)
+	ಆದರೆ ((hp = ml_ಕಂಡುಹಿಡಿ_ಸಾಲು(buf, lnum, ML_ಕಂಡುಹಿಡಿ)) == ಖಾಲಿ)
 	{
-	    if (recursive == 0)
+	    ಆದರೆ (recursive == 0)
 	    {
 		// Avoid giving this message for a recursive call, may happen
 		// when the GUI redraws part of the text.
 		++recursive;
 		get_trans_bufname(buf);
 		shorten_dir(NameBuff);
-		siemsg(e_ml_get_cannot_find_line_nr_in_buffer_nr_str,
+		siemsg(e_ml_get_cannot_ಕಂಡುಹಿಡಿ_ಸಾಲು_nr_ಒಳ_ಬಫರ್_nr_str,
 						  lnum, buf->b_fnum, NameBuff);
 		--recursive;
 	    }
-	    goto errorret;
+	    ಹೋಗು errorret;
 	}
 
-	dp = (DATA_BL *)(hp->bh_data);
+	dp = (ದತ್ತಾಂಶ_BL *)(hp->bh_ದತ್ತಾಂಶ);
 
-	idx = lnum - buf->b_ml.ml_locked_low;
-	start = ((dp->db_index[idx]) & DB_INDEX_MASK);
+	idx = lnum - buf->b_ml.ml_locked_ಕೆಳಗಿನ;
+	ಆರಂಭ = ((dp->db_ಸೂಚ್ಯಂಕ[idx]) & DB_ಸೂಚ್ಯಂಕ_ಮುಖವಾಡ);
 	// The text ends where the previous line starts.  The first line ends
 	// at the end of the block.
-	if (idx == 0)
-	    end = dp->db_txt_end;
-	else
-	    end = ((dp->db_index[idx - 1]) & DB_INDEX_MASK);
+	ಆದರೆ (idx == 0)
+	    ಕೊನೆ = dp->db_txt_ಕೊನೆ;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಕೊನೆ = ((dp->db_ಸೂಚ್ಯಂಕ[idx - 1]) & DB_ಸೂಚ್ಯಂಕ_ಮುಖವಾಡ);
 
-	buf->b_ml.ml_line_ptr = (char_u *)dp + start;
-	buf->b_ml.ml_line_len = end - start;
-#if defined(FEAT_BYTEOFF) && defined(FEAT_PROP_POPUP)
+	buf->b_ml.ml_ಸಾಲು_ptr = (char_u *)dp + ಆರಂಭ;
+	buf->b_ml.ml_ಸಾಲು_len = ಕೊನೆ - ಆರಂಭ;
+#ಆದರೆ defined(FEAT_BYTEOFF) && defined(FEAT_PROP_POPUP)
 	// Text properties come after a NUL byte, so ml_line_len should be
 	// larger than the size of textprop_T if there is any.
-	if (buf->b_has_textprop
-			 && (size_t)buf->b_ml.ml_line_len > sizeof(textprop_T))
-	    buf->b_ml.ml_line_textlen = 0;  // call STRLEN() later when needed
-	else
-#endif
-	    buf->b_ml.ml_line_textlen = buf->b_ml.ml_line_len;
-	buf->b_ml.ml_line_lnum = lnum;
-	buf->b_ml.ml_flags &= ~(ML_LINE_DIRTY | ML_ALLOCATED);
+	ಆದರೆ (buf->b_has_textprop
+			 && (size_t)buf->b_ml.ml_ಸಾಲು_len > ಗಾತ್ರ(textprop_T))
+	    buf->b_ml.ml_ಸಾಲು_textlen = 0;  // call STRLEN() later when needed
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	    buf->b_ml.ml_ಸಾಲು_textlen = buf->b_ml.ml_ಸಾಲು_len;
+	buf->b_ml.ml_ಸಾಲು_lnum = lnum;
+	buf->b_ml.ml_flags &= ~(ML_ಸಾಲು_DIRTY | ML_ALLOCATED);
     }
-    if (will_change)
+    ಆದರೆ (will_change)
     {
 	buf->b_ml.ml_flags |= (ML_LOCKED_DIRTY | ML_LOCKED_POS);
-#ifdef FEAT_EVAL
-	if (ml_get_alloc_lines && (buf->b_ml.ml_flags & ML_ALLOCATED))
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	ಆದರೆ (ml_get_alloc_ಸಾಲುಗಳು && (buf->b_ml.ml_flags & ML_ALLOCATED))
 	    // can't make the change in the data block
-	    buf->b_ml.ml_flags |= ML_LINE_DIRTY;
-#endif
+	    buf->b_ml.ml_flags |= ML_ಸಾಲು_DIRTY;
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
-#ifdef FEAT_EVAL
-    if (ml_get_alloc_lines
-		 && (buf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED)) == 0)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಆದರೆ (ml_get_alloc_ಸಾಲುಗಳು
+		 && (buf->b_ml.ml_flags & (ML_ಸಾಲು_DIRTY | ML_ALLOCATED)) == 0)
     {
-	char_u *p = alloc(buf->b_ml.ml_line_len);
+	char_u *p = alloc(buf->b_ml.ml_ಸಾಲು_len);
 
 	// make sure the text is in allocated memory
-	if (p != NULL)
+	ಆದರೆ (p != ಖಾಲಿ)
 	{
-	    memmove(p, buf->b_ml.ml_line_ptr, buf->b_ml.ml_line_len);
-	    buf->b_ml.ml_line_ptr = p;
+	    memmove(p, buf->b_ml.ml_ಸಾಲು_ptr, buf->b_ml.ml_ಸಾಲು_len);
+	    buf->b_ml.ml_ಸಾಲು_ptr = p;
 	    buf->b_ml.ml_flags |= ML_ALLOCATED;
-	    if (will_change)
+	    ಆದರೆ (will_change)
 		// can't make the change in the data block
-		buf->b_ml.ml_flags |= ML_LINE_DIRTY;
+		buf->b_ml.ml_flags |= ML_ಸಾಲು_DIRTY;
 	}
     }
-#endif
-    return buf->b_ml.ml_line_ptr;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ buf->b_ml.ml_ಸಾಲು_ptr;
 }
 
 /*
@@ -2935,168 +2935,168 @@ errorret:
  * This ignores ML_ALLOCATED to get the same behavior as without the test
  * override.
  */
-    int
-ml_line_alloced(void)
+    ಪೂರ್ಣಾಂಕ
+ml_ಸಾಲು_alloced(ಶೂನ್ಯ)
 {
-    return (curbuf->b_ml.ml_flags & ML_LINE_DIRTY);
+    ಹಿಂತಿರುಗಿ (curbuf->b_ml.ml_flags & ML_ಸಾಲು_DIRTY);
 }
 
-#ifdef FEAT_PROP_POPUP
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
 /*
  * Add text properties that continue from the previous line.
  */
-    static void
-add_text_props_for_append(
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಕೂಡಿಸು_ಪಠ್ಯ_props_for_append(
 	    buf_T	*buf,
 	    linenr_T	lnum,
-	    char_u	**line,
-	    int		*len,
+	    char_u	**ಸಾಲು,
+	    ಪೂರ್ಣಾಂಕ		*len,
 	    char_u	**tofree)
 {
-    int		round;
-    int		new_prop_count = 0;
-    int		count;
-    int		n;
+    ಪೂರ್ಣಾಂಕ		ಸುತ್ತು;
+    ಪೂರ್ಣಾಂಕ		new_prop_ಎಣಿಕೆ = 0;
+    ಪೂರ್ಣಾಂಕ		ಎಣಿಕೆ_2;
+    ಪೂರ್ಣಾಂಕ		n;
     char_u	*props;
-    int		new_len = 0;  // init for gcc
-    char_u	*new_line = NULL;
+    ಪೂರ್ಣಾಂಕ		new_len = 0;  // init for gcc
+    char_u	*new_ಸಾಲು = ಖಾಲಿ;
     textprop_T	prop;
 
     // Make two rounds:
     // 1. calculate the extra space needed
     // 2. allocate the space and fill it
-    for (round = 1; round <= 2; ++round)
+    ಗಾಗಿ (ಸುತ್ತು = 1; ಸುತ್ತು <= 2; ++ಸುತ್ತು)
     {
-	if (round == 2)
+	ಆದರೆ (ಸುತ್ತು == 2)
 	{
 	    uint16_t pc;
 
-	    if (new_prop_count == 0)
-		return;  // nothing to do
-	    new_len = *len + (int)PROP_COUNT_SIZE
-			     + new_prop_count * (int)sizeof(textprop_T);
-	    new_line = alloc(new_len);
-	    if (new_line == NULL)
-		return;
-	    mch_memmove(new_line, *line, *len);
+	    ಆದರೆ (new_prop_ಎಣಿಕೆ == 0)
+		ಹಿಂತಿರುಗಿ;  // nothing to do
+	    new_len = *len + (ಪೂರ್ಣಾಂಕ)PROP_ಎಣಿಕೆ_ಗಾತ್ರ
+			     + new_prop_ಎಣಿಕೆ * (ಪೂರ್ಣಾಂಕ)ಗಾತ್ರ(textprop_T);
+	    new_ಸಾಲು = alloc(new_len);
+	    ಆದರೆ (new_ಸಾಲು == ಖಾಲಿ)
+		ಹಿಂತಿರುಗಿ;
+	    mch_memmove(new_ಸಾಲು, *ಸಾಲು, *len);
 	    // Write prop_count header.
-	    pc = (uint16_t)new_prop_count;
-	    mch_memmove(new_line + *len, &pc, PROP_COUNT_SIZE);
-	    new_prop_count = 0;
+	    pc = (uint16_t)new_prop_ಎಣಿಕೆ;
+	    mch_memmove(new_ಸಾಲು + *len, &pc, PROP_ಎಣಿಕೆ_ಗಾತ್ರ);
+	    new_prop_ಎಣಿಕೆ = 0;
 	}
 
 	// Get the line above to find any props that continue in the next
 	// line.
-	count = get_text_props(buf, lnum, &props, FALSE);
-	for (n = 0; n < count; ++n)
+	ಎಣಿಕೆ_2 = get_ಪಠ್ಯ_props(buf, lnum, &props, FALSE);
+	ಗಾಗಿ (n = 0; n < ಎಣಿಕೆ_2; ++n)
 	{
-	    mch_memmove(&prop, props + n * sizeof(textprop_T),
-							   sizeof(textprop_T));
-	    if (prop.tp_flags & TP_FLAG_CONT_NEXT)
+	    mch_memmove(&prop, props + n * ಗಾತ್ರ(textprop_T),
+							   ಗಾತ್ರ(textprop_T));
+	    ಆದರೆ (prop.tp_flags & TP_FLAG_CONT_ಮುಂದಿನ)
 	    {
-		if (round == 2)
+		ಆದರೆ (ಸುತ್ತು == 2)
 		{
 		    prop.tp_flags |= TP_FLAG_CONT_PREV;
-		    prop.tp_col = 1;
+		    prop.tp_ಲಂಬಸಾಲು = 1;
 		    prop.tp_len = *len;  // not exactly the right length
-		    prop.u.tp_text_offset = 0;
-		    mch_memmove(new_line + *len + (int)PROP_COUNT_SIZE
-			    + new_prop_count * sizeof(textprop_T),
-			    &prop, sizeof(textprop_T));
+		    prop.u.tp_ಪಠ್ಯ_ಸ್ಥಾನಾಂತರ = 0;
+		    mch_memmove(new_ಸಾಲು + *len + (ಪೂರ್ಣಾಂಕ)PROP_ಎಣಿಕೆ_ಗಾತ್ರ
+			    + new_prop_ಎಣಿಕೆ * ಗಾತ್ರ(textprop_T),
+			    &prop, ಗಾತ್ರ(textprop_T));
 		}
-		++new_prop_count;
+		++new_prop_ಎಣಿಕೆ;
 	    }
 	}
     }
-    *line = new_line;
-    *tofree = new_line;
+    *ಸಾಲು = new_ಸಾಲು;
+    *tofree = new_ಸಾಲು;
     *len = new_len;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 ml_append_int(
     buf_T	*buf,
     linenr_T	lnum,		// append after this line (can be 0)
-    char_u	*line_arg,	// text of the new line
+    char_u	*ಸಾಲು_arg,	// text of the new line
     colnr_T	len_arg,	// length of line, including NUL, or 0
-    int		flags)		// ML_APPEND_ flags
+    ಪೂರ್ಣಾಂಕ		flags)		// ML_APPEND_ flags
 {
-    char_u	*line = line_arg;
+    char_u	*ಸಾಲು = ಸಾಲು_arg;
     colnr_T	len = len_arg;
-    int		i;
-    int		line_count;	// number of indexes in current block
-    int		offset;
-    int		from, to;
-    long	space_needed;	// space needed for new line
-    int		page_size;
-    int		page_count;
-    int		db_idx;		// index for lnum in data block
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		ಸಾಲು_ಎಣಿಕೆ;	// number of indexes in current block
+    ಪೂರ್ಣಾಂಕ		ಸ್ಥಾನಾಂತರ;
+    ಪೂರ್ಣಾಂಕ		from, ಗಮ್ಯ;
+    ದೀರ್ಘ	space_needed;	// space needed for new line
+    ಪೂರ್ಣಾಂಕ		ಪುಟ_ಗಾತ್ರ;
+    ಪೂರ್ಣಾಂಕ		ಪುಟ_ಎಣಿಕೆ;
+    ಪೂರ್ಣಾಂಕ		db_idx;		// index for lnum in data block
     bhdr_T	*hp;
     memfile_T	*mfp;
-    DATA_BL	*dp;
+    ದತ್ತಾಂಶ_BL	*dp;
     PTR_BL	*pp;
     infoptr_T	*ip;
-#ifdef FEAT_PROP_POPUP
-    char_u	*tofree = NULL;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+    char_u	*tofree = ಖಾಲಿ;
 # ifdef FEAT_BYTEOFF
-    colnr_T	text_len = 0;	// text len with NUL without text properties
+    colnr_T	ಪಠ್ಯ_len = 0;	// text len with NUL without text properties
 # endif
-#endif
-    int		ret = FAIL;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಪೂರ್ಣಾಂಕ		ret = FAIL;
 
-    if (lnum > buf->b_ml.ml_line_count || buf->b_ml.ml_mfp == NULL)
-	return FAIL;  // lnum out of range
+    ಆದರೆ (lnum > buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ || buf->b_ml.ml_mfp == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;  // lnum out of range
 
-    if (lowest_marked && lowest_marked > lnum)
-	lowest_marked = lnum + 1;
+    ಆದರೆ (ಅತಿಕಡಿಮೆ_marked && ಅತಿಕಡಿಮೆ_marked > lnum)
+	ಅತಿಕಡಿಮೆ_marked = lnum + 1;
 
-    if (len == 0)
+    ಆದರೆ (len == 0)
     {
-	len = (colnr_T)STRLEN(line) + 1;	// space needed for the text
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_BYTEOFF)
-	text_len = len;
-#endif
+	len = (colnr_T)STRLEN(ಸಾಲು) + 1;	// space needed for the text
+#ಆದರೆ defined(FEAT_PROP_POPUP) && defined(FEAT_BYTEOFF)
+	ಪಠ್ಯ_len = len;
+#ಆದರೆ_ಅಂತ್ಯ
     }
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_BYTEOFF)
-    else if (curbuf->b_has_textprop)
+#ಆದರೆ defined(FEAT_PROP_POPUP) && defined(FEAT_BYTEOFF)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (curbuf->b_has_textprop)
 	// "len" may include text properties, get the length of the text.
-	text_len = (colnr_T)STRLEN(line) + 1;
-    else
-	text_len = len;
-#endif
+	ಪಠ್ಯ_len = (colnr_T)STRLEN(ಸಾಲು) + 1;
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಪಠ್ಯ_len = len;
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_PROP_POPUP
-    if (curbuf->b_has_textprop && lnum > 0
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+    ಆದರೆ (curbuf->b_has_textprop && lnum > 0
 			     && !(flags & (ML_APPEND_UNDO | ML_APPEND_NOPROP)))
 	// Add text properties that continue from the previous line.
-	add_text_props_for_append(buf, lnum, &line, &len, &tofree);
-#endif
+	ಕೂಡಿಸು_ಪಠ್ಯ_props_for_append(buf, lnum, &ಸಾಲು, &len, &tofree);
+#ಆದರೆ_ಅಂತ್ಯ
 
-    space_needed = len + INDEX_SIZE;	// space needed for text + index
+    space_needed = len + ಸೂಚ್ಯಂಕ_ಗಾತ್ರ;	// space needed for text + index
 
     mfp = buf->b_ml.ml_mfp;
-    page_size = mfp->mf_page_size;
+    ಪುಟ_ಗಾತ್ರ = mfp->mf_ಪುಟ_ಗಾತ್ರ;
 
 /*
  * find the data block containing the previous line
  * This also fills the stack with the blocks from the root to the data block
  * This also releases any locked block.
  */
-    if ((hp = ml_find_line(buf, lnum == 0 ? (linenr_T)1 : lnum,
-							  ML_INSERT)) == NULL)
-	goto theend;
+    ಆದರೆ ((hp = ml_ಕಂಡುಹಿಡಿ_ಸಾಲು(buf, lnum == 0 ? (linenr_T)1 : lnum,
+							  ML_ಸೇರಿಸು)) == ಖಾಲಿ)
+	ಹೋಗು theend;
 
-    buf->b_ml.ml_flags &= ~ML_EMPTY;
+    buf->b_ml.ml_flags &= ~ML_ಖಾಲಿಗಳು;
 
-    if (lnum == 0)		// got line one instead, correct db_idx
+    ಆದರೆ (lnum == 0)		// got line one instead, correct db_idx
 	db_idx = -1;		// careful, it is negative!
-    else
-	db_idx = lnum - buf->b_ml.ml_locked_low;
+    ಇಲ್ಲದಿದ್ದರೆ
+	db_idx = lnum - buf->b_ml.ml_locked_ಕೆಳಗಿನ;
 		// get line count before the insertion
-    line_count = buf->b_ml.ml_locked_high - buf->b_ml.ml_locked_low;
+    ಸಾಲು_ಎಣಿಕೆ = buf->b_ml.ml_locked_ಮೇಲಿನ - buf->b_ml.ml_locked_ಕೆಳಗಿನ;
 
-    dp = (DATA_BL *)(hp->bh_data);
+    dp = (ದತ್ತಾಂಶ_BL *)(hp->bh_ದತ್ತಾಂಶ);
 
 /*
  * If
@@ -3105,8 +3105,8 @@ ml_append_int(
  * - not appending to the last line in the file
  * insert in front of the next block.
  */
-    if ((long)dp->db_free < space_needed && db_idx == line_count - 1
-					    && lnum < buf->b_ml.ml_line_count)
+    ಆದರೆ ((ದೀರ್ಘ)dp->db_free < space_needed && db_idx == ಸಾಲು_ಎಣಿಕೆ - 1
+					    && lnum < buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
     {
 	/*
 	 * Now that the line is not going to be inserted in the block that we
@@ -3114,86 +3114,86 @@ ml_append_int(
 	 * by using ml_locked_lineadd.
 	 */
 	--(buf->b_ml.ml_locked_lineadd);
-	--(buf->b_ml.ml_locked_high);
-	if ((hp = ml_find_line(buf, lnum + 1, ML_INSERT)) == NULL)
-	    goto theend;
+	--(buf->b_ml.ml_locked_ಮೇಲಿನ);
+	ಆದರೆ ((hp = ml_ಕಂಡುಹಿಡಿ_ಸಾಲು(buf, lnum + 1, ML_ಸೇರಿಸು)) == ಖಾಲಿ)
+	    ಹೋಗು theend;
 
 	db_idx = -1;		    // careful, it is negative!
 		    // get line count before the insertion
-	line_count = buf->b_ml.ml_locked_high - buf->b_ml.ml_locked_low;
-	CHECK(buf->b_ml.ml_locked_low != lnum + 1, "locked_low != lnum + 1");
+	ಸಾಲು_ಎಣಿಕೆ = buf->b_ml.ml_locked_ಮೇಲಿನ - buf->b_ml.ml_locked_ಕೆಳಗಿನ;
+	CHECK(buf->b_ml.ml_locked_ಕೆಳಗಿನ != lnum + 1, "locked_low != lnum + 1");
 
-	dp = (DATA_BL *)(hp->bh_data);
+	dp = (ದತ್ತಾಂಶ_BL *)(hp->bh_ದತ್ತಾಂಶ);
     }
 
-    ++buf->b_ml.ml_line_count;
+    ++buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
 
-    if ((long)dp->db_free >= space_needed)	// enough room in data block
+    ಆದರೆ ((ದೀರ್ಘ)dp->db_free >= space_needed)	// enough room in data block
     {
 	/*
 	 * Insert the new line in an existing data block, or in the data block
 	 * allocated above.
 	 */
-	dp->db_txt_start -= len;
+	dp->db_txt_ಆರಂಭ -= len;
 	dp->db_free -= space_needed;
-	++(dp->db_line_count);
+	++(dp->db_ಸಾಲು_ಎಣಿಕೆ);
 
 	/*
 	 * move the text of the lines that follow to the front
 	 * adjust the indexes of the lines that follow
 	 */
-	if (line_count > db_idx + 1)	    // if there are following lines
+	ಆದರೆ (ಸಾಲು_ಎಣಿಕೆ > db_idx + 1)	    // if there are following lines
 	{
 	    /*
 	     * Offset is the start of the previous line.
 	     * This will become the character just after the new line.
 	     */
-	    if (db_idx < 0)
-		offset = dp->db_txt_end;
-	    else
-		offset = ((dp->db_index[db_idx]) & DB_INDEX_MASK);
-	    mch_memmove((char *)dp + dp->db_txt_start,
-					  (char *)dp + dp->db_txt_start + len,
-				 (size_t)(offset - (dp->db_txt_start + len)));
-	    for (i = line_count - 1; i > db_idx; --i)
-		dp->db_index[i + 1] = dp->db_index[i] - len;
-	    dp->db_index[db_idx + 1] = offset - len;
+	    ಆದರೆ (db_idx < 0)
+		ಸ್ಥಾನಾಂತರ = dp->db_txt_ಕೊನೆ;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ಸ್ಥಾನಾಂತರ = ((dp->db_ಸೂಚ್ಯಂಕ[db_idx]) & DB_ಸೂಚ್ಯಂಕ_ಮುಖವಾಡ);
+	    mch_memmove((ಅಕ್ಷರ *)dp + dp->db_txt_ಆರಂಭ,
+					  (ಅಕ್ಷರ *)dp + dp->db_txt_ಆರಂಭ + len,
+				 (size_t)(ಸ್ಥಾನಾಂತರ - (dp->db_txt_ಆರಂಭ + len)));
+	    ಗಾಗಿ (i = ಸಾಲು_ಎಣಿಕೆ - 1; i > db_idx; --i)
+		dp->db_ಸೂಚ್ಯಂಕ[i + 1] = dp->db_ಸೂಚ್ಯಂಕ[i] - len;
+	    dp->db_ಸೂಚ್ಯಂಕ[db_idx + 1] = ಸ್ಥಾನಾಂತರ - len;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    // add line at the end (which is the start of the text)
-	    dp->db_index[db_idx + 1] = dp->db_txt_start;
+	    dp->db_ಸೂಚ್ಯಂಕ[db_idx + 1] = dp->db_txt_ಆರಂಭ;
 
 	/*
 	 * copy the text into the block
 	 */
-	mch_memmove((char *)dp + dp->db_index[db_idx + 1], line, (size_t)len);
-	if (flags & ML_APPEND_MARK)
-	    dp->db_index[db_idx + 1] |= DB_MARKED;
+	mch_memmove((ಅಕ್ಷರ *)dp + dp->db_ಸೂಚ್ಯಂಕ[db_idx + 1], ಸಾಲು, (size_t)len);
+	ಆದರೆ (flags & ML_APPEND_MARK)
+	    dp->db_ಸೂಚ್ಯಂಕ[db_idx + 1] |= DB_MARKED;
 
 	/*
 	 * Mark the block dirty.
 	 */
 	buf->b_ml.ml_flags |= ML_LOCKED_DIRTY;
-	if (!(flags & ML_APPEND_NEW))
+	ಆದರೆ (!(flags & ML_APPEND_NEW))
 	    buf->b_ml.ml_flags |= ML_LOCKED_POS;
     }
-    else	    // not enough space in data block
+    ಇಲ್ಲದಿದ್ದರೆ	    // not enough space in data block
     {
-	long	    line_count_left, line_count_right;
-	int	    page_count_left, page_count_right;
-	bhdr_T	    *hp_left;
-	bhdr_T	    *hp_right;
+	ದೀರ್ಘ	    ಸಾಲು_ಎಣಿಕೆ_ಎಡ, ಸಾಲು_ಎಣಿಕೆ_ಬಲ;
+	ಪೂರ್ಣಾಂಕ	    ಪುಟ_ಎಣಿಕೆ_ಎಡ, ಪುಟ_ಎಣಿಕೆ_ಬಲ;
+	bhdr_T	    *hp_ಎಡ;
+	bhdr_T	    *hp_ಬಲ;
 	bhdr_T	    *hp_new;
-	int	    lines_moved;
-	int	    data_moved = 0;	    // init to shut up gcc
-	int	    total_moved = 0;	    // init to shut up gcc
-	DATA_BL	    *dp_right, *dp_left;
-	int	    stack_idx;
-	int	    in_left;
-	int	    lineadd;
-	blocknr_T   bnum_left, bnum_right;
-	linenr_T    lnum_left, lnum_right;
-	int	    pb_idx;
+	ಪೂರ್ಣಾಂಕ	    ಸಾಲುಗಳು_moved;
+	ಪೂರ್ಣಾಂಕ	    ದತ್ತಾಂಶ_moved = 0;	    // init to shut up gcc
+	ಪೂರ್ಣಾಂಕ	    ಒಟ್ಟು_moved = 0;	    // init to shut up gcc
+	ದತ್ತಾಂಶ_BL	    *dp_ಬಲ, *dp_ಎಡ;
+	ಪೂರ್ಣಾಂಕ	    ರಾಶಿ_idx;
+	ಪೂರ್ಣಾಂಕ	    ಒಳ_ಎಡ;
+	ಪೂರ್ಣಾಂಕ	    lineadd;
+	blocknr_T   bnum_ಎಡ, bnum_ಬಲ;
+	linenr_T    lnum_ಎಡ, lnum_ಬಲ;
+	ಪೂರ್ಣಾಂಕ	    pb_idx;
 	PTR_BL	    *pp_new;
 
 	/*
@@ -3212,135 +3212,135 @@ ml_append_int(
 	 * also put in the right block. This method is more efficient when
 	 * inserting a lot of lines at one place.
 	 */
-	if (db_idx < 0)		// left block is new, right block is existing
+	ಆದರೆ (db_idx < 0)		// left block is new, right block is existing
 	{
-	    lines_moved = 0;
-	    in_left = TRUE;
+	    ಸಾಲುಗಳು_moved = 0;
+	    ಒಳ_ಎಡ = TRUE;
 	    // space_needed does not change
 	}
-	else			// left block is existing, right block is new
+	ಇಲ್ಲದಿದ್ದರೆ			// left block is existing, right block is new
 	{
-	    lines_moved = line_count - db_idx - 1;
-	    if (lines_moved == 0)
-		in_left = FALSE;	// put new line in right block
+	    ಸಾಲುಗಳು_moved = ಸಾಲು_ಎಣಿಕೆ - db_idx - 1;
+	    ಆದರೆ (ಸಾಲುಗಳು_moved == 0)
+		ಒಳ_ಎಡ = FALSE;	// put new line in right block
 					// space_needed does not change
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		data_moved = ((dp->db_index[db_idx]) & DB_INDEX_MASK) -
-							    dp->db_txt_start;
-		total_moved = data_moved + lines_moved * INDEX_SIZE;
-		if ((long)dp->db_free + total_moved >= space_needed)
+		ದತ್ತಾಂಶ_moved = ((dp->db_ಸೂಚ್ಯಂಕ[db_idx]) & DB_ಸೂಚ್ಯಂಕ_ಮುಖವಾಡ) -
+							    dp->db_txt_ಆರಂಭ;
+		ಒಟ್ಟು_moved = ದತ್ತಾಂಶ_moved + ಸಾಲುಗಳು_moved * ಸೂಚ್ಯಂಕ_ಗಾತ್ರ;
+		ಆದರೆ ((ದೀರ್ಘ)dp->db_free + ಒಟ್ಟು_moved >= space_needed)
 		{
-		    in_left = TRUE;	// put new line in left block
-		    space_needed = total_moved;
+		    ಒಳ_ಎಡ = TRUE;	// put new line in left block
+		    space_needed = ಒಟ್ಟು_moved;
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    in_left = FALSE;	    // put new line in right block
-		    space_needed += total_moved;
+		    ಒಳ_ಎಡ = FALSE;	    // put new line in right block
+		    space_needed += ಒಟ್ಟು_moved;
 		}
 	    }
 	}
 
-	page_count = ((space_needed + HEADER_SIZE) + page_size - 1) / page_size;
-	if ((hp_new = ml_new_data(mfp, flags & ML_APPEND_NEW, page_count))
-								       == NULL)
+	ಪುಟ_ಎಣಿಕೆ = ((space_needed + ಶೀರ್ಷಿಕೆ_ಗಾತ್ರ) + ಪುಟ_ಗಾತ್ರ - 1) / ಪುಟ_ಗಾತ್ರ;
+	ಆದರೆ ((hp_new = ml_new_ದತ್ತಾಂಶ(mfp, flags & ML_APPEND_NEW, ಪುಟ_ಎಣಿಕೆ))
+								       == ಖಾಲಿ)
 	{
 			// correct line counts in pointer blocks
 	    --(buf->b_ml.ml_locked_lineadd);
-	    --(buf->b_ml.ml_locked_high);
-	    goto theend;
+	    --(buf->b_ml.ml_locked_ಮೇಲಿನ);
+	    ಹೋಗು theend;
 	}
-	if (db_idx < 0)		// left block is new
+	ಆದರೆ (db_idx < 0)		// left block is new
 	{
-	    hp_left = hp_new;
-	    hp_right = hp;
-	    line_count_left = 0;
-	    line_count_right = line_count;
+	    hp_ಎಡ = hp_new;
+	    hp_ಬಲ = hp;
+	    ಸಾಲು_ಎಣಿಕೆ_ಎಡ = 0;
+	    ಸಾಲು_ಎಣಿಕೆ_ಬಲ = ಸಾಲು_ಎಣಿಕೆ;
 	}
-	else			// right block is new
+	ಇಲ್ಲದಿದ್ದರೆ			// right block is new
 	{
-	    hp_left = hp;
-	    hp_right = hp_new;
-	    line_count_left = line_count;
-	    line_count_right = 0;
+	    hp_ಎಡ = hp;
+	    hp_ಬಲ = hp_new;
+	    ಸಾಲು_ಎಣಿಕೆ_ಎಡ = ಸಾಲು_ಎಣಿಕೆ;
+	    ಸಾಲು_ಎಣಿಕೆ_ಬಲ = 0;
 	}
-	dp_right = (DATA_BL *)(hp_right->bh_data);
-	dp_left = (DATA_BL *)(hp_left->bh_data);
-	bnum_left = hp_left->bh_bnum;
-	bnum_right = hp_right->bh_bnum;
-	page_count_left = hp_left->bh_page_count;
-	page_count_right = hp_right->bh_page_count;
+	dp_ಬಲ = (ದತ್ತಾಂಶ_BL *)(hp_ಬಲ->bh_ದತ್ತಾಂಶ);
+	dp_ಎಡ = (ದತ್ತಾಂಶ_BL *)(hp_ಎಡ->bh_ದತ್ತಾಂಶ);
+	bnum_ಎಡ = hp_ಎಡ->bh_bnum;
+	bnum_ಬಲ = hp_ಬಲ->bh_bnum;
+	ಪುಟ_ಎಣಿಕೆ_ಎಡ = hp_ಎಡ->bh_ಪುಟ_ಎಣಿಕೆ;
+	ಪುಟ_ಎಣಿಕೆ_ಬಲ = hp_ಬಲ->bh_ಪುಟ_ಎಣಿಕೆ;
 
 	/*
 	 * May move the new line into the right/new block.
 	 */
-	if (!in_left)
+	ಆದರೆ (!ಒಳ_ಎಡ)
 	{
-	    dp_right->db_txt_start -= len;
-	    dp_right->db_free -= len + INDEX_SIZE;
-	    dp_right->db_index[0] = dp_right->db_txt_start;
-	    if (flags & ML_APPEND_MARK)
-		dp_right->db_index[0] |= DB_MARKED;
+	    dp_ಬಲ->db_txt_ಆರಂಭ -= len;
+	    dp_ಬಲ->db_free -= len + ಸೂಚ್ಯಂಕ_ಗಾತ್ರ;
+	    dp_ಬಲ->db_ಸೂಚ್ಯಂಕ[0] = dp_ಬಲ->db_txt_ಆರಂಭ;
+	    ಆದರೆ (flags & ML_APPEND_MARK)
+		dp_ಬಲ->db_ಸೂಚ್ಯಂಕ[0] |= DB_MARKED;
 
-	    mch_memmove((char *)dp_right + dp_right->db_txt_start,
-							   line, (size_t)len);
-	    ++line_count_right;
+	    mch_memmove((ಅಕ್ಷರ *)dp_ಬಲ + dp_ಬಲ->db_txt_ಆರಂಭ,
+							   ಸಾಲು, (size_t)len);
+	    ++ಸಾಲು_ಎಣಿಕೆ_ಬಲ;
 	}
 	/*
 	 * may move lines from the left/old block to the right/new one.
 	 */
-	if (lines_moved)
+	ಆದರೆ (ಸಾಲುಗಳು_moved)
 	{
-	    dp_right->db_txt_start -= data_moved;
-	    dp_right->db_free -= total_moved;
-	    mch_memmove((char *)dp_right + dp_right->db_txt_start,
-			(char *)dp_left + dp_left->db_txt_start,
-			(size_t)data_moved);
-	    offset = dp_right->db_txt_start - dp_left->db_txt_start;
-	    dp_left->db_txt_start += data_moved;
-	    dp_left->db_free += total_moved;
+	    dp_ಬಲ->db_txt_ಆರಂಭ -= ದತ್ತಾಂಶ_moved;
+	    dp_ಬಲ->db_free -= ಒಟ್ಟು_moved;
+	    mch_memmove((ಅಕ್ಷರ *)dp_ಬಲ + dp_ಬಲ->db_txt_ಆರಂಭ,
+			(ಅಕ್ಷರ *)dp_ಎಡ + dp_ಎಡ->db_txt_ಆರಂಭ,
+			(size_t)ದತ್ತಾಂಶ_moved);
+	    ಸ್ಥಾನಾಂತರ = dp_ಬಲ->db_txt_ಆರಂಭ - dp_ಎಡ->db_txt_ಆರಂಭ;
+	    dp_ಎಡ->db_txt_ಆರಂಭ += ದತ್ತಾಂಶ_moved;
+	    dp_ಎಡ->db_free += ಒಟ್ಟು_moved;
 
 	    /*
 	     * update indexes in the new block
 	     */
-	    for (to = line_count_right, from = db_idx + 1;
-					 from < line_count_left; ++from, ++to)
-		dp_right->db_index[to] = dp->db_index[from] + offset;
-	    line_count_right += lines_moved;
-	    line_count_left -= lines_moved;
+	    ಗಾಗಿ (ಗಮ್ಯ = ಸಾಲು_ಎಣಿಕೆ_ಬಲ, from = db_idx + 1;
+					 from < ಸಾಲು_ಎಣಿಕೆ_ಎಡ; ++from, ++ಗಮ್ಯ)
+		dp_ಬಲ->db_ಸೂಚ್ಯಂಕ[ಗಮ್ಯ] = dp->db_ಸೂಚ್ಯಂಕ[from] + ಸ್ಥಾನಾಂತರ;
+	    ಸಾಲು_ಎಣಿಕೆ_ಬಲ += ಸಾಲುಗಳು_moved;
+	    ಸಾಲು_ಎಣಿಕೆ_ಎಡ -= ಸಾಲುಗಳು_moved;
 	}
 
 	/*
 	 * May move the new line into the left (old or new) block.
 	 */
-	if (in_left)
+	ಆದರೆ (ಒಳ_ಎಡ)
 	{
-	    dp_left->db_txt_start -= len;
-	    dp_left->db_free -= len + INDEX_SIZE;
-	    dp_left->db_index[line_count_left] = dp_left->db_txt_start;
-	    if (flags & ML_APPEND_MARK)
-		dp_left->db_index[line_count_left] |= DB_MARKED;
-	    mch_memmove((char *)dp_left + dp_left->db_txt_start,
-							   line, (size_t)len);
-	    ++line_count_left;
+	    dp_ಎಡ->db_txt_ಆರಂಭ -= len;
+	    dp_ಎಡ->db_free -= len + ಸೂಚ್ಯಂಕ_ಗಾತ್ರ;
+	    dp_ಎಡ->db_ಸೂಚ್ಯಂಕ[ಸಾಲು_ಎಣಿಕೆ_ಎಡ] = dp_ಎಡ->db_txt_ಆರಂಭ;
+	    ಆದರೆ (flags & ML_APPEND_MARK)
+		dp_ಎಡ->db_ಸೂಚ್ಯಂಕ[ಸಾಲು_ಎಣಿಕೆ_ಎಡ] |= DB_MARKED;
+	    mch_memmove((ಅಕ್ಷರ *)dp_ಎಡ + dp_ಎಡ->db_txt_ಆರಂಭ,
+							   ಸಾಲು, (size_t)len);
+	    ++ಸಾಲು_ಎಣಿಕೆ_ಎಡ;
 	}
 
-	if (db_idx < 0)		// left block is new
+	ಆದರೆ (db_idx < 0)		// left block is new
 	{
-	    lnum_left = lnum + 1;
-	    lnum_right = 0;
+	    lnum_ಎಡ = lnum + 1;
+	    lnum_ಬಲ = 0;
 	}
-	else			// right block is new
+	ಇಲ್ಲದಿದ್ದರೆ			// right block is new
 	{
-	    lnum_left = 0;
-	    if (in_left)
-		lnum_right = lnum + 2;
-	    else
-		lnum_right = lnum + 1;
+	    lnum_ಎಡ = 0;
+	    ಆದರೆ (ಒಳ_ಎಡ)
+		lnum_ಬಲ = lnum + 2;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		lnum_ಬಲ = lnum + 1;
 	}
-	dp_left->db_line_count = line_count_left;
-	dp_right->db_line_count = line_count_right;
+	dp_ಎಡ->db_ಸಾಲು_ಎಣಿಕೆ = ಸಾಲು_ಎಣಿಕೆ_ಎಡ;
+	dp_ಬಲ->db_ಸಾಲು_ಎಣಿಕೆ = ಸಾಲು_ಎಣಿಕೆ_ಬಲ;
 
 	/*
 	 * release the two data blocks
@@ -3348,9 +3348,9 @@ ml_append_int(
 	 * The old one (hp, in ml_locked) gets a positive blocknumber if
 	 * we changed it and we are not editing a new file.
 	 */
-	if (lines_moved || in_left)
+	ಆದರೆ (ಸಾಲುಗಳು_moved || ಒಳ_ಎಡ)
 	    buf->b_ml.ml_flags |= ML_LOCKED_DIRTY;
-	if (!(flags & ML_APPEND_NEW) && db_idx >= 0 && in_left)
+	ಆದರೆ (!(flags & ML_APPEND_NEW) && db_idx >= 0 && ಒಳ_ಎಡ)
 	    buf->b_ml.ml_flags |= ML_LOCKED_POS;
 	mf_put(mfp, hp_new, TRUE, FALSE);
 
@@ -3361,67 +3361,67 @@ ml_append_int(
 	 */
 	lineadd = buf->b_ml.ml_locked_lineadd;
 	buf->b_ml.ml_locked_lineadd = 0;
-	ml_find_line(buf, (linenr_T)0, ML_FLUSH);   // flush data block
+	ml_ಕಂಡುಹಿಡಿ_ಸಾಲು(buf, (linenr_T)0, ML_FLUSH);   // flush data block
 
 	/*
 	 * update pointer blocks for the new data block
 	 */
-	for (stack_idx = buf->b_ml.ml_stack_top - 1; stack_idx >= 0;
-								  --stack_idx)
+	ಗಾಗಿ (ರಾಶಿ_idx = buf->b_ml.ml_ರಾಶಿ_ತುದಿ - 1; ರಾಶಿ_idx >= 0;
+								  --ರಾಶಿ_idx)
 	{
-	    ip = &(buf->b_ml.ml_stack[stack_idx]);
-	    pb_idx = ip->ip_index;
-	    if ((hp = mf_get(mfp, ip->ip_bnum, 1)) == NULL)
-		goto theend;
-	    pp = (PTR_BL *)(hp->bh_data);   // must be pointer block
-	    if (pp->pb_id != PTR_ID)
+	    ip = &(buf->b_ml.ml_ರಾಶಿ[ರಾಶಿ_idx]);
+	    pb_idx = ip->ip_ಸೂಚ್ಯಂಕ;
+	    ಆದರೆ ((hp = mf_get(mfp, ip->ip_bnum, 1)) == ಖಾಲಿ)
+		ಹೋಗು theend;
+	    pp = (PTR_BL *)(hp->bh_ದತ್ತಾಂಶ);   // must be pointer block
+	    ಆದರೆ (pp->pb_id != PTR_ID)
 	    {
-		iemsg(e_pointer_block_id_wrong_three);
+		iemsg(e_ಸೂಚಕ_ಖಂಡ_id_wrong_three);
 		mf_put(mfp, hp, FALSE, FALSE);
-		goto theend;
+		ಹೋಗು theend;
 	    }
 	    /*
 	     * TODO: If the pointer block is full and we are adding at the end
 	     * try to insert in front of the next block
 	     */
 	    // block not full, add one entry
-	    if (pp->pb_count < pp->pb_count_max)
+	    ಆದರೆ (pp->pb_ಎಣಿಕೆ < pp->pb_ಎಣಿಕೆ_max)
 	    {
-		if (pb_idx + 1 < (int)pp->pb_count)
-		    mch_memmove(&pp->pb_pointer[pb_idx + 2],
-				&pp->pb_pointer[pb_idx + 1],
-			(size_t)(pp->pb_count - pb_idx - 1) * sizeof(PTR_EN));
-		++pp->pb_count;
-		pp->pb_pointer[pb_idx].pe_line_count = line_count_left;
-		pp->pb_pointer[pb_idx].pe_bnum = bnum_left;
-		pp->pb_pointer[pb_idx].pe_page_count = page_count_left;
-		pp->pb_pointer[pb_idx + 1].pe_line_count = line_count_right;
-		pp->pb_pointer[pb_idx + 1].pe_bnum = bnum_right;
-		pp->pb_pointer[pb_idx + 1].pe_page_count = page_count_right;
+		ಆದರೆ (pb_idx + 1 < (ಪೂರ್ಣಾಂಕ)pp->pb_ಎಣಿಕೆ)
+		    mch_memmove(&pp->pb_ಸೂಚಕ[pb_idx + 2],
+				&pp->pb_ಸೂಚಕ[pb_idx + 1],
+			(size_t)(pp->pb_ಎಣಿಕೆ - pb_idx - 1) * ಗಾತ್ರ(PTR_EN));
+		++pp->pb_ಎಣಿಕೆ;
+		pp->pb_ಸೂಚಕ[pb_idx].pe_ಸಾಲು_ಎಣಿಕೆ = ಸಾಲು_ಎಣಿಕೆ_ಎಡ;
+		pp->pb_ಸೂಚಕ[pb_idx].pe_bnum = bnum_ಎಡ;
+		pp->pb_ಸೂಚಕ[pb_idx].pe_ಪುಟ_ಎಣಿಕೆ = ಪುಟ_ಎಣಿಕೆ_ಎಡ;
+		pp->pb_ಸೂಚಕ[pb_idx + 1].pe_ಸಾಲು_ಎಣಿಕೆ = ಸಾಲು_ಎಣಿಕೆ_ಬಲ;
+		pp->pb_ಸೂಚಕ[pb_idx + 1].pe_bnum = bnum_ಬಲ;
+		pp->pb_ಸೂಚಕ[pb_idx + 1].pe_ಪುಟ_ಎಣಿಕೆ = ಪುಟ_ಎಣಿಕೆ_ಬಲ;
 
-		if (lnum_left != 0)
-		    pp->pb_pointer[pb_idx].pe_old_lnum = lnum_left;
-		if (lnum_right != 0)
-		    pp->pb_pointer[pb_idx + 1].pe_old_lnum = lnum_right;
+		ಆದರೆ (lnum_ಎಡ != 0)
+		    pp->pb_ಸೂಚಕ[pb_idx].pe_old_lnum = lnum_ಎಡ;
+		ಆದರೆ (lnum_ಬಲ != 0)
+		    pp->pb_ಸೂಚಕ[pb_idx + 1].pe_old_lnum = lnum_ಬಲ;
 
 		mf_put(mfp, hp, TRUE, FALSE);
-		buf->b_ml.ml_stack_top = stack_idx + 1;	    // truncate stack
+		buf->b_ml.ml_ರಾಶಿ_ತುದಿ = ರಾಶಿ_idx + 1;	    // truncate stack
 
-		if (lineadd)
+		ಆದರೆ (lineadd)
 		{
-		    --(buf->b_ml.ml_stack_top);
+		    --(buf->b_ml.ml_ರಾಶಿ_ತುದಿ);
 		    // fix line count for rest of blocks in the stack
 		    ml_lineadd(buf, lineadd);
 							// fix stack itself
-		    buf->b_ml.ml_stack[buf->b_ml.ml_stack_top].ip_high +=
+		    buf->b_ml.ml_ರಾಶಿ[buf->b_ml.ml_ರಾಶಿ_ತುದಿ].ip_ಮೇಲಿನ +=
 								      lineadd;
-		    ++(buf->b_ml.ml_stack_top);
+		    ++(buf->b_ml.ml_ರಾಶಿ_ತುದಿ);
 		}
 
 		/*
 		 * We are finished, break the loop here.
 		 */
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	    // pointer block full
 	    /*
@@ -3430,15 +3430,15 @@ ml_append_int(
 	     * move some of the pointer into the new block
 	     * prepare for updating the parent block
 	     */
-	    for (;;)	// do this twice when splitting block 1
+	    ಗಾಗಿ (;;)	// do this twice when splitting block 1
 	    {
 		hp_new = ml_new_ptr(mfp);
-		if (hp_new == NULL)	    // TODO: try to fix tree
-		    goto theend;
-		pp_new = (PTR_BL *)(hp_new->bh_data);
+		ಆದರೆ (hp_new == ಖಾಲಿ)	    // TODO: try to fix tree
+		    ಹೋಗು theend;
+		pp_new = (PTR_BL *)(hp_new->bh_ದತ್ತಾಂಶ);
 
-		if (hp->bh_bnum != 1)
-		    break;
+		ಆದರೆ (hp->bh_bnum != 1)
+		    ನಿಲ್ಲಿಸು;
 
 		/*
 		 * if block 1 becomes full the tree is given an extra level
@@ -3446,67 +3446,67 @@ ml_append_int(
 		 * block 1 is updated to point to the new block
 		 * then continue to split the new block
 		 */
-		mch_memmove(pp_new, pp, (size_t)page_size);
-		pp->pb_count = 1;
-		pp->pb_pointer[0].pe_bnum = hp_new->bh_bnum;
-		pp->pb_pointer[0].pe_line_count = buf->b_ml.ml_line_count;
-		pp->pb_pointer[0].pe_old_lnum = 1;
-		pp->pb_pointer[0].pe_page_count = 1;
+		mch_memmove(pp_new, pp, (size_t)ಪುಟ_ಗಾತ್ರ);
+		pp->pb_ಎಣಿಕೆ = 1;
+		pp->pb_ಸೂಚಕ[0].pe_bnum = hp_new->bh_bnum;
+		pp->pb_ಸೂಚಕ[0].pe_ಸಾಲು_ಎಣಿಕೆ = buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
+		pp->pb_ಸೂಚಕ[0].pe_old_lnum = 1;
+		pp->pb_ಸೂಚಕ[0].pe_ಪುಟ_ಎಣಿಕೆ = 1;
 		mf_put(mfp, hp, TRUE, FALSE);   // release block 1
 		hp = hp_new;		// new block is to be split
 		pp = pp_new;
-		CHECK(stack_idx != 0, _("stack_idx should be 0"));
-		ip->ip_index = 0;
-		++stack_idx;	// do block 1 again later
+		CHECK(ರಾಶಿ_idx != 0, _("stack_idx should be 0"));
+		ip->ip_ಸೂಚ್ಯಂಕ = 0;
+		++ರಾಶಿ_idx;	// do block 1 again later
 	    }
 	    /*
 	     * move the pointers after the current one to the new block
 	     * If there are none, the new entry will be in the new block.
 	     */
-	    total_moved = pp->pb_count - pb_idx - 1;
-	    if (total_moved)
+	    ಒಟ್ಟು_moved = pp->pb_ಎಣಿಕೆ - pb_idx - 1;
+	    ಆದರೆ (ಒಟ್ಟು_moved)
 	    {
-		mch_memmove(&pp_new->pb_pointer[0],
-				&pp->pb_pointer[pb_idx + 1],
-				(size_t)(total_moved) * sizeof(PTR_EN));
-		pp_new->pb_count = total_moved;
-		pp->pb_count -= total_moved - 1;
-		pp->pb_pointer[pb_idx + 1].pe_bnum = bnum_right;
-		pp->pb_pointer[pb_idx + 1].pe_line_count = line_count_right;
-		pp->pb_pointer[pb_idx + 1].pe_page_count = page_count_right;
-		if (lnum_right)
-		    pp->pb_pointer[pb_idx + 1].pe_old_lnum = lnum_right;
+		mch_memmove(&pp_new->pb_ಸೂಚಕ[0],
+				&pp->pb_ಸೂಚಕ[pb_idx + 1],
+				(size_t)(ಒಟ್ಟು_moved) * ಗಾತ್ರ(PTR_EN));
+		pp_new->pb_ಎಣಿಕೆ = ಒಟ್ಟು_moved;
+		pp->pb_ಎಣಿಕೆ -= ಒಟ್ಟು_moved - 1;
+		pp->pb_ಸೂಚಕ[pb_idx + 1].pe_bnum = bnum_ಬಲ;
+		pp->pb_ಸೂಚಕ[pb_idx + 1].pe_ಸಾಲು_ಎಣಿಕೆ = ಸಾಲು_ಎಣಿಕೆ_ಬಲ;
+		pp->pb_ಸೂಚಕ[pb_idx + 1].pe_ಪುಟ_ಎಣಿಕೆ = ಪುಟ_ಎಣಿಕೆ_ಬಲ;
+		ಆದರೆ (lnum_ಬಲ)
+		    pp->pb_ಸೂಚಕ[pb_idx + 1].pe_old_lnum = lnum_ಬಲ;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		pp_new->pb_count = 1;
-		pp_new->pb_pointer[0].pe_bnum = bnum_right;
-		pp_new->pb_pointer[0].pe_line_count = line_count_right;
-		pp_new->pb_pointer[0].pe_page_count = page_count_right;
-		pp_new->pb_pointer[0].pe_old_lnum = lnum_right;
+		pp_new->pb_ಎಣಿಕೆ = 1;
+		pp_new->pb_ಸೂಚಕ[0].pe_bnum = bnum_ಬಲ;
+		pp_new->pb_ಸೂಚಕ[0].pe_ಸಾಲು_ಎಣಿಕೆ = ಸಾಲು_ಎಣಿಕೆ_ಬಲ;
+		pp_new->pb_ಸೂಚಕ[0].pe_ಪುಟ_ಎಣಿಕೆ = ಪುಟ_ಎಣಿಕೆ_ಬಲ;
+		pp_new->pb_ಸೂಚಕ[0].pe_old_lnum = lnum_ಬಲ;
 	    }
-	    pp->pb_pointer[pb_idx].pe_bnum = bnum_left;
-	    pp->pb_pointer[pb_idx].pe_line_count = line_count_left;
-	    pp->pb_pointer[pb_idx].pe_page_count = page_count_left;
-	    if (lnum_left)
-		pp->pb_pointer[pb_idx].pe_old_lnum = lnum_left;
-	    lnum_left = 0;
-	    lnum_right = 0;
+	    pp->pb_ಸೂಚಕ[pb_idx].pe_bnum = bnum_ಎಡ;
+	    pp->pb_ಸೂಚಕ[pb_idx].pe_ಸಾಲು_ಎಣಿಕೆ = ಸಾಲು_ಎಣಿಕೆ_ಎಡ;
+	    pp->pb_ಸೂಚಕ[pb_idx].pe_ಪುಟ_ಎಣಿಕೆ = ಪುಟ_ಎಣಿಕೆ_ಎಡ;
+	    ಆದರೆ (lnum_ಎಡ)
+		pp->pb_ಸೂಚಕ[pb_idx].pe_old_lnum = lnum_ಎಡ;
+	    lnum_ಎಡ = 0;
+	    lnum_ಬಲ = 0;
 
 	    /*
 	     * recompute line counts
 	     */
-	    line_count_right = 0;
-	    for (i = 0; i < (int)pp_new->pb_count; ++i)
-		line_count_right += pp_new->pb_pointer[i].pe_line_count;
-	    line_count_left = 0;
-	    for (i = 0; i < (int)pp->pb_count; ++i)
-		line_count_left += pp->pb_pointer[i].pe_line_count;
+	    ಸಾಲು_ಎಣಿಕೆ_ಬಲ = 0;
+	    ಗಾಗಿ (i = 0; i < (ಪೂರ್ಣಾಂಕ)pp_new->pb_ಎಣಿಕೆ; ++i)
+		ಸಾಲು_ಎಣಿಕೆ_ಬಲ += pp_new->pb_ಸೂಚಕ[i].pe_ಸಾಲು_ಎಣಿಕೆ;
+	    ಸಾಲು_ಎಣಿಕೆ_ಎಡ = 0;
+	    ಗಾಗಿ (i = 0; i < (ಪೂರ್ಣಾಂಕ)pp->pb_ಎಣಿಕೆ; ++i)
+		ಸಾಲು_ಎಣಿಕೆ_ಎಡ += pp->pb_ಸೂಚಕ[i].pe_ಸಾಲು_ಎಣಿಕೆ;
 
-	    bnum_left = hp->bh_bnum;
-	    bnum_right = hp_new->bh_bnum;
-	    page_count_left = 1;
-	    page_count_right = 1;
+	    bnum_ಎಡ = hp->bh_bnum;
+	    bnum_ಬಲ = hp_new->bh_bnum;
+	    ಪುಟ_ಎಣಿಕೆ_ಎಡ = 1;
+	    ಪುಟ_ಎಣಿಕೆ_ಬಲ = 1;
 	    mf_put(mfp, hp, TRUE, FALSE);
 	    mf_put(mfp, hp_new, TRUE, FALSE);
 
@@ -3515,77 +3515,77 @@ ml_append_int(
 	/*
 	 * Safety check: fallen out of for loop?
 	 */
-	if (stack_idx < 0)
+	ಆದರೆ (ರಾಶಿ_idx < 0)
 	{
-	    iemsg(e_updated_too_many_blocks);
-	    buf->b_ml.ml_stack_top = 0;	// invalidate stack
+	    iemsg(e_updated_too_many_ಖಂಡಗಳು);
+	    buf->b_ml.ml_ರಾಶಿ_ತುದಿ = 0;	// invalidate stack
 	}
     }
 
-#ifdef FEAT_BYTEOFF
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_BYTEOFF
     // The line was inserted below 'lnum'
     ml_updatechunk(buf, lnum + 1,
 # ifdef FEAT_PROP_POPUP
-	    (long)text_len
-# else
-	    (long)len
+	    (ದೀರ್ಘ)ಪಠ್ಯ_len
+# ಇಲ್ಲದಿದ್ದರೆ
+	    (ದೀರ್ಘ)len
 # endif
 	    , ML_CHNK_ADDLINE);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_NETBEANS_INTG
-    if (!(flags & ML_APPEND_NEW) && netbeans_active())
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_NETBEANS_INTG
+    ಆದರೆ (!(flags & ML_APPEND_NEW) && netbeans_ಸಕ್ರಿಯ())
     {
-	int line_len = (int)STRLEN(line);
-	if (line_len > 0)
-	    netbeans_inserted(buf, lnum+1, (colnr_T)0, line, line_len);
-	netbeans_inserted(buf, lnum+1, (colnr_T)line_len, (char_u *)"\n", 1);
+	ಪೂರ್ಣಾಂಕ ಸಾಲು_len = (ಪೂರ್ಣಾಂಕ)STRLEN(ಸಾಲು);
+	ಆದರೆ (ಸಾಲು_len > 0)
+	    netbeans_inserted(buf, lnum+1, (colnr_T)0, ಸಾಲು, ಸಾಲು_len);
+	netbeans_inserted(buf, lnum+1, (colnr_T)ಸಾಲು_len, (char_u *)"\n", 1);
     }
-#endif
-#ifdef FEAT_JOB_CHANNEL
-    if (!(flags & ML_APPEND_NEW) && buf->b_write_to_channel)
-	channel_write_new_lines(buf);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕೆಲಸ_CHANNEL
+    ಆದರೆ (!(flags & ML_APPEND_NEW) && buf->b_write_ಗಮ್ಯ_channel)
+	channel_write_new_ಸಾಲುಗಳು(buf);
+#ಆದರೆ_ಅಂತ್ಯ
     ret = OK;
 
 theend:
-#ifdef FEAT_PROP_POPUP
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
     vim_free(tofree);
-#endif
-    return ret;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ ret;
 }
 
 /*
  * Flush any pending change and call ml_append_int()
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 ml_append_flush(
     buf_T	*buf,
     linenr_T	lnum,		// append after this line (can be 0)
-    char_u	*line,		// text of the new line
+    char_u	*ಸಾಲು,		// text of the new line
     colnr_T	len,		// length of line, including NUL, or 0
-    int		flags)		// ML_APPEND_ flags
+    ಪೂರ್ಣಾಂಕ		flags)		// ML_APPEND_ flags
 {
-    if (lnum > buf->b_ml.ml_line_count)
-	return FAIL;  // lnum out of range
+    ಆದರೆ (lnum > buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
+	ಹಿಂತಿರುಗಿ FAIL;  // lnum out of range
 
-    if (buf->b_ml.ml_line_lnum != 0)
+    ಆದರೆ (buf->b_ml.ml_ಸಾಲು_lnum != 0)
 	// This may also invoke ml_append_int().
-	ml_flush_line(buf);
+	ml_flush_ಸಾಲು(buf);
 
-#ifdef FEAT_EVAL
-    if (!(flags & ML_APPEND_NEW))
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಆದರೆ (!(flags & ML_APPEND_NEW))
     {
 	// When inserting above recorded changes: flush the changes before
 	// changing the text.  Then flush the cached line, it may become
 	// invalid.  Skip during initial file read for performance.
 	may_invoke_listeners(buf, lnum + 1, lnum + 1, 1);
-	if (buf->b_ml.ml_line_lnum != 0)
-	    ml_flush_line(buf);
+	ಆದರೆ (buf->b_ml.ml_ಸಾಲು_lnum != 0)
+	    ml_flush_ಸಾಲು(buf);
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return ml_append_int(buf, lnum, line, len, flags);
+    ಹಿಂತಿರುಗಿ ml_append_int(buf, lnum, ಸಾಲು, len, flags);
 }
 
 /*
@@ -3600,49 +3600,49 @@ ml_append_flush(
  *
  * return FAIL for failure, OK otherwise
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 ml_append(
     linenr_T	lnum,		// append after this line (can be 0)
-    char_u	*line,		// text of the new line
+    char_u	*ಸಾಲು,		// text of the new line
     colnr_T	len,		// length of new line, including NUL, or 0
-    int		newfile)	// flag, see above
+    ಪೂರ್ಣಾಂಕ		newfile)	// flag, see above
 {
-    return ml_append_flags(lnum, line, len, newfile ? ML_APPEND_NEW : 0);
+    ಹಿಂತಿರುಗಿ ml_append_flags(lnum, ಸಾಲು, len, newfile ? ML_APPEND_NEW : 0);
 }
 
-    int
+    ಪೂರ್ಣಾಂಕ
 ml_append_flags(
     linenr_T	lnum,		// append after this line (can be 0)
-    char_u	*line,		// text of the new line
+    char_u	*ಸಾಲು,		// text of the new line
     colnr_T	len,		// length of new line, including NUL, or 0
-    int		flags)		// ML_APPEND_ values
+    ಪೂರ್ಣಾಂಕ		flags)		// ML_APPEND_ values
 {
     // When starting up, we might still need to create the memfile
-    if (curbuf->b_ml.ml_mfp == NULL && open_buffer(FALSE, NULL, 0) == FAIL)
-	return FAIL;
-    return ml_append_flush(curbuf, lnum, line, len, flags);
+    ಆದರೆ (curbuf->b_ml.ml_mfp == ಖಾಲಿ && open_ಬಫರ್(FALSE, ಖಾಲಿ, 0) == FAIL)
+	ಹಿಂತಿರುಗಿ FAIL;
+    ಹಿಂತಿರುಗಿ ml_append_flush(curbuf, lnum, ಸಾಲು, len, flags);
 }
 
 
-#if defined(FEAT_SPELL) || defined(FEAT_QUICKFIX) || defined(FEAT_PROP_POPUP)
+#ಆದರೆ defined(FEAT_SPELL) || defined(FEAT_QUICKFIX) || defined(FEAT_PROP_POPUP)
 
 /*
  * Like ml_append() but for an arbitrary buffer.  The buffer must already have
  * a memline.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 ml_append_buf(
     buf_T	*buf,
     linenr_T	lnum,		// append after this line (can be 0)
-    char_u	*line,		// text of the new line
+    char_u	*ಸಾಲು,		// text of the new line
     colnr_T	len,		// length of new line, including NUL, or 0
-    int		newfile)	// flag, see above
+    ಪೂರ್ಣಾಂಕ		newfile)	// flag, see above
 {
-    if (buf->b_ml.ml_mfp == NULL)
-	return FAIL;
-    return ml_append_flush(buf, lnum, line, len, newfile ? ML_APPEND_NEW : 0);
+    ಆದರೆ (buf->b_ml.ml_mfp == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
+    ಹಿಂತಿರುಗಿ ml_append_flush(buf, lnum, ಸಾಲು, len, newfile ? ML_APPEND_NEW : 0);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Replace line "lnum", with buffering, in current buffer.
@@ -3657,14 +3657,14 @@ ml_append_buf(
  *
  * return FAIL for failure, OK otherwise
  */
-    int
-ml_replace(linenr_T lnum, char_u *line, int copy)
+    ಪೂರ್ಣಾಂಕ
+ml_replace(linenr_T lnum, char_u *ಸಾಲು, ಪೂರ್ಣಾಂಕ copy)
 {
     colnr_T len = -1;
 
-    if (line != NULL)
-	len = (colnr_T)STRLEN(line);
-    return ml_replace_len(lnum, line, len, FALSE, copy);
+    ಆದರೆ (ಸಾಲು != ಖಾಲಿ)
+	len = (colnr_T)STRLEN(ಸಾಲು);
+    ಹಿಂತಿರುಗಿ ml_replace_len(lnum, ಸಾಲು, len, FALSE, copy);
 }
 
 /*
@@ -3675,212 +3675,212 @@ ml_replace(linenr_T lnum, char_u *line, int copy)
  * When "copy" is TRUE copy the text into allocated memory, otherwise
  * "line_arg" must be allocated and will be consumed here.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 ml_replace_len(
 	linenr_T    lnum,
-	char_u	    *line_arg,
+	char_u	    *ಸಾಲು_arg,
 	colnr_T	    len_arg,
-	int	    has_props,
-	int	    copy)
+	ಪೂರ್ಣಾಂಕ	    has_props,
+	ಪೂರ್ಣಾಂಕ	    copy)
 {
-    char_u *line = line_arg;
+    char_u *ಸಾಲು = ಸಾಲು_arg;
     colnr_T len = len_arg;
 
-    if (line == NULL)		// just checking...
-	return FAIL;
+    ಆದರೆ (ಸಾಲು == ಖಾಲಿ)		// just checking...
+	ಹಿಂತಿರುಗಿ FAIL;
 
     // When starting up, we might still need to create the memfile
-    if (curbuf->b_ml.ml_mfp == NULL && open_buffer(FALSE, NULL, 0) == FAIL)
-	return FAIL;
+    ಆದರೆ (curbuf->b_ml.ml_mfp == ಖಾಲಿ && open_ಬಫರ್(FALSE, ಖಾಲಿ, 0) == FAIL)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    if (!has_props)
+    ಆದರೆ (!has_props)
 	++len;  // include the NUL after the text
-    if (copy)
+    ಆದರೆ (copy)
     {
 	// copy the line to allocated memory
-#ifdef FEAT_PROP_POPUP
-	if (has_props)
-	    line = vim_memsave(line, len);
-	else
-#endif
-	    line = vim_strnsave(line, len - 1);
-	if (line == NULL)
-	    return FAIL;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+	ಆದರೆ (has_props)
+	    ಸಾಲು = vim_memsave(ಸಾಲು, len);
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಸಾಲು = vim_strnsave(ಸಾಲು, len - 1);
+	ಆದರೆ (ಸಾಲು == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ FAIL;
     }
 
-#ifdef FEAT_NETBEANS_INTG
-    if (netbeans_active())
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_NETBEANS_INTG
+    ಆದರೆ (netbeans_ಸಕ್ರಿಯ())
     {
-	netbeans_removed(curbuf, lnum, 0, (long)ml_get_len(lnum));
-	netbeans_inserted(curbuf, lnum, 0, line, (int)STRLEN(line));
+	netbeans_removed(curbuf, lnum, 0, (ದೀರ್ಘ)ml_get_len(lnum));
+	netbeans_inserted(curbuf, lnum, 0, ಸಾಲು, (ಪೂರ್ಣಾಂಕ)STRLEN(ಸಾಲು));
     }
-#endif
-    if (curbuf->b_ml.ml_line_lnum != lnum)
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (curbuf->b_ml.ml_ಸಾಲು_lnum != lnum)
     {
 	// another line is buffered, flush it
-	ml_flush_line(curbuf);
+	ml_flush_ಸಾಲು(curbuf);
 
-#ifdef FEAT_PROP_POPUP
-	if (curbuf->b_has_textprop && !has_props)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+	ಆದರೆ (curbuf->b_has_textprop && !has_props)
 	    // Need to fetch the old line to copy over any text properties.
 	    ml_get_buf(curbuf, lnum, TRUE);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
-#ifdef FEAT_PROP_POPUP
-    if (curbuf->b_has_textprop && !has_props)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+    ಆದರೆ (curbuf->b_has_textprop && !has_props)
     {
-	size_t	oldtextlen = STRLEN(curbuf->b_ml.ml_line_ptr) + 1;
+	size_t	oldtextlen = STRLEN(curbuf->b_ml.ml_ಸಾಲು_ptr) + 1;
 
-	if (oldtextlen < (size_t)curbuf->b_ml.ml_line_len)
+	ಆದರೆ (oldtextlen < (size_t)curbuf->b_ml.ml_ಸಾಲು_len)
 	{
 	    char_u *newline;
-	    size_t textproplen = curbuf->b_ml.ml_line_len - oldtextlen;
+	    size_t textproplen = curbuf->b_ml.ml_ಸಾಲು_len - oldtextlen;
 
 	    // Need to copy over text properties, stored after the text.
 	    newline = alloc(len + textproplen);
-	    if (newline != NULL)
+	    ಆದರೆ (newline != ಖಾಲಿ)
 	    {
-		mch_memmove(newline, line, len);
-		mch_memmove(newline + len, curbuf->b_ml.ml_line_ptr
+		mch_memmove(newline, ಸಾಲು, len);
+		mch_memmove(newline + len, curbuf->b_ml.ml_ಸಾಲು_ptr
 						    + oldtextlen, textproplen);
-		vim_free(line);
-		line = newline;
+		vim_free(ಸಾಲು);
+		ಸಾಲು = newline;
 		len += (colnr_T)textproplen;
 	    }
 	}
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (curbuf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
-	vim_free(curbuf->b_ml.ml_line_ptr);	// free allocated line
+    ಆದರೆ (curbuf->b_ml.ml_flags & (ML_ಸಾಲು_DIRTY | ML_ALLOCATED))
+	vim_free(curbuf->b_ml.ml_ಸಾಲು_ptr);	// free allocated line
 
-    curbuf->b_ml.ml_line_ptr = line;
-    curbuf->b_ml.ml_line_len = len;
-    curbuf->b_ml.ml_line_textlen = !has_props ? len_arg + 1 : 0;
-    curbuf->b_ml.ml_line_lnum = lnum;
-    curbuf->b_ml.ml_flags = (curbuf->b_ml.ml_flags | ML_LINE_DIRTY) & ~ML_EMPTY;
+    curbuf->b_ml.ml_ಸಾಲು_ptr = ಸಾಲು;
+    curbuf->b_ml.ml_ಸಾಲು_len = len;
+    curbuf->b_ml.ml_ಸಾಲು_textlen = !has_props ? len_arg + 1 : 0;
+    curbuf->b_ml.ml_ಸಾಲು_lnum = lnum;
+    curbuf->b_ml.ml_flags = (curbuf->b_ml.ml_flags | ML_ಸಾಲು_DIRTY) & ~ML_ಖಾಲಿಗಳು;
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-#ifdef FEAT_PROP_POPUP
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
 /*
  * Adjust text properties in line "lnum" for a deleted line.
  * When "above" is true this is the line above the deleted line, otherwise this
  * is the line below the deleted line.
  * "del_props[del_props_len]" are the properties of the deleted line.
  */
-    static void
-adjust_text_props_for_delete(
+    ಸ್ಥಿರ ಶೂನ್ಯ
+adjust_ಪಠ್ಯ_props_for_delete(
 	buf_T	    *buf,
 	linenr_T    lnum,
 	char_u	    *del_props,
-	int	    del_props_len,
-	int	    above)
+	ಪೂರ್ಣಾಂಕ	    del_props_len,
+	ಪೂರ್ಣಾಂಕ	    above)
 {
-    int		did_get_line = FALSE;
-    int		done_del;
-    int		done_this;
+    ಪೂರ್ಣಾಂಕ		did_get_ಸಾಲು = FALSE;
+    ಪೂರ್ಣಾಂಕ		ಮುಗಿದ_del;
+    ಪೂರ್ಣಾಂಕ		ಮುಗಿದ_this;
     textprop_T	prop_del;
     bhdr_T	*hp;
-    DATA_BL	*dp;
-    int		idx;
-    int		line_start;
-    long	line_size;
-    int		this_props_len = 0;
-    char_u	*text;
+    ದತ್ತಾಂಶ_BL	*dp;
+    ಪೂರ್ಣಾಂಕ		idx;
+    ಪೂರ್ಣಾಂಕ		ಸಾಲು_ಆರಂಭ;
+    ದೀರ್ಘ	ಸಾಲು_ಗಾತ್ರ;
+    ಪೂರ್ಣಾಂಕ		this_props_len = 0;
+    char_u	*ಪಠ್ಯ;
     size_t	textlen;
-    int		found;
+    ಪೂರ್ಣಾಂಕ		ಸಿಕ್ಕಿತು;
 
-    for (done_del = 0; done_del < del_props_len; done_del += sizeof(textprop_T))
+    ಗಾಗಿ (ಮುಗಿದ_del = 0; ಮುಗಿದ_del < del_props_len; ಮುಗಿದ_del += ಗಾತ್ರ(textprop_T))
     {
-	mch_memmove(&prop_del, del_props + done_del, sizeof(textprop_T));
-	if ((above && (prop_del.tp_flags & TP_FLAG_CONT_PREV)
-		    && !(prop_del.tp_flags & TP_FLAG_CONT_NEXT))
-		|| (!above && (prop_del.tp_flags & TP_FLAG_CONT_NEXT)
+	mch_memmove(&prop_del, del_props + ಮುಗಿದ_del, ಗಾತ್ರ(textprop_T));
+	ಆದರೆ ((above && (prop_del.tp_flags & TP_FLAG_CONT_PREV)
+		    && !(prop_del.tp_flags & TP_FLAG_CONT_ಮುಂದಿನ))
+		|| (!above && (prop_del.tp_flags & TP_FLAG_CONT_ಮುಂದಿನ)
 		    && !(prop_del.tp_flags & TP_FLAG_CONT_PREV)))
 	{
-	    if (!did_get_line)
+	    ಆದರೆ (!did_get_ಸಾಲು)
 	    {
-		did_get_line = TRUE;
-		if ((hp = ml_find_line(buf, lnum, ML_FIND)) == NULL)
-		    return;
+		did_get_ಸಾಲು = TRUE;
+		ಆದರೆ ((hp = ml_ಕಂಡುಹಿಡಿ_ಸಾಲು(buf, lnum, ML_ಕಂಡುಹಿಡಿ)) == ಖಾಲಿ)
+		    ಹಿಂತಿರುಗಿ;
 
-		dp = (DATA_BL *)(hp->bh_data);
-		idx = lnum - buf->b_ml.ml_locked_low;
-		line_start = ((dp->db_index[idx]) & DB_INDEX_MASK);
-		if (idx == 0)		// first line in block, text at the end
-		    line_size = dp->db_txt_end - line_start;
-		else
-		    line_size = ((dp->db_index[idx - 1]) & DB_INDEX_MASK)
-								  - line_start;
-		text = (char_u *)dp + line_start;
-		textlen = STRLEN(text) + 1;
-		if ((long)textlen >= line_size)
+		dp = (ದತ್ತಾಂಶ_BL *)(hp->bh_ದತ್ತಾಂಶ);
+		idx = lnum - buf->b_ml.ml_locked_ಕೆಳಗಿನ;
+		ಸಾಲು_ಆರಂಭ = ((dp->db_ಸೂಚ್ಯಂಕ[idx]) & DB_ಸೂಚ್ಯಂಕ_ಮುಖವಾಡ);
+		ಆದರೆ (idx == 0)		// first line in block, text at the end
+		    ಸಾಲು_ಗಾತ್ರ = dp->db_txt_ಕೊನೆ - ಸಾಲು_ಆರಂಭ;
+		ಇಲ್ಲದಿದ್ದರೆ
+		    ಸಾಲು_ಗಾತ್ರ = ((dp->db_ಸೂಚ್ಯಂಕ[idx - 1]) & DB_ಸೂಚ್ಯಂಕ_ಮುಖವಾಡ)
+								  - ಸಾಲು_ಆರಂಭ;
+		ಪಠ್ಯ = (char_u *)dp + ಸಾಲು_ಆರಂಭ;
+		textlen = STRLEN(ಪಠ್ಯ) + 1;
+		ಆದರೆ ((ದೀರ್ಘ)textlen >= ಸಾಲು_ಗಾತ್ರ)
 		{
 		    // No properties on this line.
-		    if (above)
-			internal_error("no text property above deleted line");
-		    else
-			internal_error("no text property below deleted line");
-		    return;
+		    ಆದರೆ (above)
+			ಆಂತರಿಕ_error("no text property above deleted line");
+		    ಇಲ್ಲದಿದ್ದರೆ
+			ಆಂತರಿಕ_error("no text property below deleted line");
+		    ಹಿಂತಿರುಗಿ;
 		}
-		if ((long)textlen + (long)PROP_COUNT_SIZE > line_size)
+		ಆದರೆ ((ದೀರ್ಘ)textlen + (ದೀರ್ಘ)PROP_ಎಣಿಕೆ_ಗಾತ್ರ > ಸಾಲು_ಗಾತ್ರ)
 		{
-		    internal_error("text property data too short");
-		    return;
+		    ಆಂತರಿಕ_error("text property data too short");
+		    ಹಿಂತಿರುಗಿ;
 		}
 
 		uint16_t pc;
 
-		mch_memmove(&pc, text + textlen, PROP_COUNT_SIZE);
-		if (!text_prop_count_valid(pc, (size_t)(line_size - (long)textlen)))
+		mch_memmove(&pc, ಪಠ್ಯ + textlen, PROP_ಎಣಿಕೆ_ಗಾತ್ರ);
+		ಆದರೆ (!ಪಠ್ಯ_prop_ಎಣಿಕೆ_valid(pc, (size_t)(ಸಾಲು_ಗಾತ್ರ - (ದೀರ್ಘ)textlen)))
 		{
-		    internal_error("text property count too large");
-		    return;
+		    ಆಂತರಿಕ_error("text property count too large");
+		    ಹಿಂತಿರುಗಿ;
 		}
-		this_props_len = pc * (int)sizeof(textprop_T);
+		this_props_len = pc * (ಪೂರ್ಣಾಂಕ)ಗಾತ್ರ(textprop_T);
 	    }
 
-	    found = FALSE;
+	    ಸಿಕ್ಕಿತು = FALSE;
 	    {
-		char_u *props_start = text + textlen + PROP_COUNT_SIZE;
+		char_u *props_ಆರಂಭ = ಪಠ್ಯ + textlen + PROP_ಎಣಿಕೆ_ಗಾತ್ರ;
 
-		for (done_this = 0; done_this < this_props_len;
-					       done_this += sizeof(textprop_T))
+		ಗಾಗಿ (ಮುಗಿದ_this = 0; ಮುಗಿದ_this < this_props_len;
+					       ಮುಗಿದ_this += ಗಾತ್ರ(textprop_T))
 		{
-		    int		flag = above ? TP_FLAG_CONT_NEXT
+		    ಪೂರ್ಣಾಂಕ		flag = above ? TP_FLAG_CONT_ಮುಂದಿನ
 							   : TP_FLAG_CONT_PREV;
 		    textprop_T	prop_this;
 
-		    mch_memmove(&prop_this, props_start + done_this,
-							   sizeof(textprop_T));
-		    if ((prop_this.tp_flags & flag)
+		    mch_memmove(&prop_this, props_ಆರಂಭ + ಮುಗಿದ_this,
+							   ಗಾತ್ರ(textprop_T));
+		    ಆದರೆ ((prop_this.tp_flags & flag)
 			    && prop_del.tp_id == prop_this.tp_id
 			    && prop_del.tp_type == prop_this.tp_type)
 		    {
-			found = TRUE;
+			ಸಿಕ್ಕಿತು = TRUE;
 			prop_this.tp_flags &= ~flag;
-			mch_memmove(props_start + done_this, &prop_this,
-							   sizeof(textprop_T));
-			break;
+			mch_memmove(props_ಆರಂಭ + ಮುಗಿದ_this, &prop_this,
+							   ಗಾತ್ರ(textprop_T));
+			ನಿಲ್ಲಿಸು;
 		    }
 		}
 	    }
-	    if (!found)
+	    ಆದರೆ (!ಸಿಕ್ಕಿತು)
 	    {
-		if (above)
-		    internal_error("text property above deleted line not found");
-		else
-		    internal_error("text property below deleted line not found");
+		ಆದರೆ (above)
+		    ಆಂತರಿಕ_error("text property above deleted line not found");
+		ಇಲ್ಲದಿದ್ದರೆ
+		    ಆಂತರಿಕ_error("text property below deleted line not found");
 	    }
 
 	    buf->b_ml.ml_flags |= (ML_LOCKED_DIRTY | ML_LOCKED_POS);
 	}
     }
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Delete line "lnum" in the current buffer.
@@ -3889,47 +3889,47 @@ adjust_text_props_for_delete(
  *
  * return FAIL for failure, OK otherwise
  */
-    static int
-ml_delete_int(buf_T *buf, linenr_T lnum, int flags)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ml_delete_int(buf_T *buf, linenr_T lnum, ಪೂರ್ಣಾಂಕ flags)
 {
     bhdr_T	*hp;
     memfile_T	*mfp;
-    DATA_BL	*dp;
+    ದತ್ತಾಂಶ_BL	*dp;
     PTR_BL	*pp;
     infoptr_T	*ip;
-    int		count;	    // number of entries in block
-    int		idx;
-    int		stack_idx;
-    int		text_start;
-    int		line_start;
-    long	line_size;
-    int		i;
-    int		ret = FAIL;
-#ifdef FEAT_PROP_POPUP
-    char_u	*textprop_save = NULL;
-    long	textprop_len = 0;
-#endif
+    ಪೂರ್ಣಾಂಕ		ಎಣಿಕೆ_2;	    // number of entries in block
+    ಪೂರ್ಣಾಂಕ		idx;
+    ಪೂರ್ಣಾಂಕ		ರಾಶಿ_idx;
+    ಪೂರ್ಣಾಂಕ		ಪಠ್ಯ_ಆರಂಭ;
+    ಪೂರ್ಣಾಂಕ		ಸಾಲು_ಆರಂಭ;
+    ದೀರ್ಘ	ಸಾಲು_ಗಾತ್ರ;
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		ret = FAIL;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+    char_u	*textprop_save = ಖಾಲಿ;
+    ದೀರ್ಘ	textprop_len = 0;
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (lowest_marked && lowest_marked > lnum)
-	lowest_marked--;
+    ಆದರೆ (ಅತಿಕಡಿಮೆ_marked && ಅತಿಕಡಿಮೆ_marked > lnum)
+	ಅತಿಕಡಿಮೆ_marked--;
 
 /*
  * If the file becomes empty the last line is replaced by an empty line.
  */
-    if (buf->b_ml.ml_line_count == 1)	    // file becomes empty
+    ಆದರೆ (buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ == 1)	    // file becomes empty
     {
-	if ((flags & ML_DEL_MESSAGE)
-#ifdef FEAT_NETBEANS_INTG
-		&& !netbeansSuppressNoLines
-#endif
+	ಆದರೆ ((flags & ML_DEL_ಸಂದೇಶ)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_NETBEANS_INTG
+		&& !netbeans_Suppress_No_ಸಾಲುಗಳು
+#ಆದರೆ_ಅಂತ್ಯ
 	   )
-	    set_keep_msg((char_u *)_(no_lines_msg), 0);
+	    ಗಣ_keep_ಸಂದೇಶ((char_u *)_(no_ಸಾಲುಗಳು_ಸಂದೇಶ), 0);
 
 	// FEAT_BYTEOFF already handled in there, don't worry 'bout it below
 	i = ml_replace((linenr_T)1, (char_u *)"", TRUE);
-	buf->b_ml.ml_flags |= ML_EMPTY;
+	buf->b_ml.ml_flags |= ML_ಖಾಲಿಗಳು;
 
-	return i;
+	ಹಿಂತಿರುಗಿ i;
     }
 
 /*
@@ -3938,44 +3938,44 @@ ml_delete_int(buf_T *buf, linenr_T lnum, int flags)
  * This also releases any locked block..
  */
     mfp = buf->b_ml.ml_mfp;
-    if (mfp == NULL)
-	return FAIL;
+    ಆದರೆ (mfp == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    if ((hp = ml_find_line(buf, lnum, ML_DELETE)) == NULL)
-	return FAIL;
+    ಆದರೆ ((hp = ml_ಕಂಡುಹಿಡಿ_ಸಾಲು(buf, lnum, ML_DELETE)) == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    dp = (DATA_BL *)(hp->bh_data);
+    dp = (ದತ್ತಾಂಶ_BL *)(hp->bh_ದತ್ತಾಂಶ);
     // compute line count before the delete
-    count = (long)(buf->b_ml.ml_locked_high)
-					- (long)(buf->b_ml.ml_locked_low) + 2;
-    idx = lnum - buf->b_ml.ml_locked_low;
+    ಎಣಿಕೆ_2 = (ದೀರ್ಘ)(buf->b_ml.ml_locked_ಮೇಲಿನ)
+					- (ದೀರ್ಘ)(buf->b_ml.ml_locked_ಕೆಳಗಿನ) + 2;
+    idx = lnum - buf->b_ml.ml_locked_ಕೆಳಗಿನ;
 
-    --buf->b_ml.ml_line_count;
+    --buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
 
-    line_start = ((dp->db_index[idx]) & DB_INDEX_MASK);
-    if (idx == 0)		// first line in block, text at the end
-	line_size = dp->db_txt_end - line_start;
-    else
-	line_size = ((dp->db_index[idx - 1]) & DB_INDEX_MASK) - line_start;
+    ಸಾಲು_ಆರಂಭ = ((dp->db_ಸೂಚ್ಯಂಕ[idx]) & DB_ಸೂಚ್ಯಂಕ_ಮುಖವಾಡ);
+    ಆದರೆ (idx == 0)		// first line in block, text at the end
+	ಸಾಲು_ಗಾತ್ರ = dp->db_txt_ಕೊನೆ - ಸಾಲು_ಆರಂಭ;
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಸಾಲು_ಗಾತ್ರ = ((dp->db_ಸೂಚ್ಯಂಕ[idx - 1]) & DB_ಸೂಚ್ಯಂಕ_ಮುಖವಾಡ) - ಸಾಲು_ಆರಂಭ;
 
-#ifdef FEAT_NETBEANS_INTG
-    if (netbeans_active())
-	netbeans_removed(buf, lnum, 0, line_size);
-#endif
-#ifdef FEAT_PROP_POPUP
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_NETBEANS_INTG
+    ಆದರೆ (netbeans_ಸಕ್ರಿಯ())
+	netbeans_removed(buf, lnum, 0, ಸಾಲು_ಗಾತ್ರ);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
     // If there are text properties compute their byte length.
     // if needed make a copy, so that we can update properties in preceding and
     // following lines.
-    if (buf->b_has_textprop)
+    ಆದರೆ (buf->b_has_textprop)
     {
-	size_t	textlen = STRLEN((char_u *)dp + line_start) + 1;
+	size_t	textlen = STRLEN((char_u *)dp + ಸಾಲು_ಆರಂಭ) + 1;
 
-	textprop_len = line_size - (long)textlen;
-	if (!(flags & (ML_DEL_UNDO | ML_DEL_NOPROP)) && textprop_len > 0)
-	    textprop_save = vim_memsave((char_u *)dp + line_start + textlen,
+	textprop_len = ಸಾಲು_ಗಾತ್ರ - (ದೀರ್ಘ)textlen;
+	ಆದರೆ (!(flags & (ML_DEL_UNDO | ML_DEL_NOPROP)) && textprop_len > 0)
+	    textprop_save = vim_memsave((char_u *)dp + ಸಾಲು_ಆರಂಭ + textlen,
 								 textprop_len);
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * special case: If there is only one line in the data block it becomes empty.
@@ -3985,70 +3985,70 @@ ml_delete_int(buf_T *buf, linenr_T lnum, int flags)
  * The line counts in the pointer blocks have already been adjusted by
  * ml_find_line().
  */
-    if (count == 1)
+    ಆದರೆ (ಎಣಿಕೆ_2 == 1)
     {
 	mf_free(mfp, hp);	// free the data block
-	buf->b_ml.ml_locked = NULL;
+	buf->b_ml.ml_locked = ಖಾಲಿ;
 
-	for (stack_idx = buf->b_ml.ml_stack_top - 1; stack_idx >= 0;
-								  --stack_idx)
+	ಗಾಗಿ (ರಾಶಿ_idx = buf->b_ml.ml_ರಾಶಿ_ತುದಿ - 1; ರಾಶಿ_idx >= 0;
+								  --ರಾಶಿ_idx)
 	{
-	    buf->b_ml.ml_stack_top = 0;	    // stack is invalid when failing
-	    ip = &(buf->b_ml.ml_stack[stack_idx]);
-	    idx = ip->ip_index;
-	    if ((hp = mf_get(mfp, ip->ip_bnum, 1)) == NULL)
-		goto theend;
-	    pp = (PTR_BL *)(hp->bh_data);   // must be pointer block
-	    if (pp->pb_id != PTR_ID)
+	    buf->b_ml.ml_ರಾಶಿ_ತುದಿ = 0;	    // stack is invalid when failing
+	    ip = &(buf->b_ml.ml_ರಾಶಿ[ರಾಶಿ_idx]);
+	    idx = ip->ip_ಸೂಚ್ಯಂಕ;
+	    ಆದರೆ ((hp = mf_get(mfp, ip->ip_bnum, 1)) == ಖಾಲಿ)
+		ಹೋಗು theend;
+	    pp = (PTR_BL *)(hp->bh_ದತ್ತಾಂಶ);   // must be pointer block
+	    ಆದರೆ (pp->pb_id != PTR_ID)
 	    {
-		iemsg(e_pointer_block_id_wrong_four);
+		iemsg(e_ಸೂಚಕ_ಖಂಡ_id_wrong_four);
 		mf_put(mfp, hp, FALSE, FALSE);
-		goto theend;
+		ಹೋಗು theend;
 	    }
-	    count = --(pp->pb_count);
-	    if (count == 0)	    // the pointer block becomes empty!
+	    ಎಣಿಕೆ_2 = --(pp->pb_ಎಣಿಕೆ);
+	    ಆದರೆ (ಎಣಿಕೆ_2 == 0)	    // the pointer block becomes empty!
 		mf_free(mfp, hp);
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		if (count != idx)	// move entries after the deleted one
-		    mch_memmove(&pp->pb_pointer[idx], &pp->pb_pointer[idx + 1],
-				      (size_t)(count - idx) * sizeof(PTR_EN));
+		ಆದರೆ (ಎಣಿಕೆ_2 != idx)	// move entries after the deleted one
+		    mch_memmove(&pp->pb_ಸೂಚಕ[idx], &pp->pb_ಸೂಚಕ[idx + 1],
+				      (size_t)(ಎಣಿಕೆ_2 - idx) * ಗಾತ್ರ(PTR_EN));
 		mf_put(mfp, hp, TRUE, FALSE);
 
-		buf->b_ml.ml_stack_top = stack_idx;	// truncate stack
+		buf->b_ml.ml_ರಾಶಿ_ತುದಿ = ರಾಶಿ_idx;	// truncate stack
 		// fix line count for rest of blocks in the stack
-		if (buf->b_ml.ml_locked_lineadd != 0)
+		ಆದರೆ (buf->b_ml.ml_locked_lineadd != 0)
 		{
 		    ml_lineadd(buf, buf->b_ml.ml_locked_lineadd);
-		    buf->b_ml.ml_stack[buf->b_ml.ml_stack_top].ip_high +=
+		    buf->b_ml.ml_ರಾಶಿ[buf->b_ml.ml_ರಾಶಿ_ತುದಿ].ip_ಮೇಲಿನ +=
 						  buf->b_ml.ml_locked_lineadd;
 		}
-		++(buf->b_ml.ml_stack_top);
+		++(buf->b_ml.ml_ರಾಶಿ_ತುದಿ);
 
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	}
-	CHECK(stack_idx < 0, _("deleted block 1?"));
+	CHECK(ರಾಶಿ_idx < 0, _("deleted block 1?"));
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	/*
 	 * delete the text by moving the next lines forwards
 	 */
-	text_start = dp->db_txt_start;
-	mch_memmove((char *)dp + text_start + line_size,
-		  (char *)dp + text_start, (size_t)(line_start - text_start));
+	ಪಠ್ಯ_ಆರಂಭ = dp->db_txt_ಆರಂಭ;
+	mch_memmove((ಅಕ್ಷರ *)dp + ಪಠ್ಯ_ಆರಂಭ + ಸಾಲು_ಗಾತ್ರ,
+		  (ಅಕ್ಷರ *)dp + ಪಠ್ಯ_ಆರಂಭ, (size_t)(ಸಾಲು_ಆರಂಭ - ಪಠ್ಯ_ಆರಂಭ));
 
 	/*
 	 * delete the index by moving the next indexes backwards
 	 * Adjust the indexes for the text movement.
 	 */
-	for (i = idx; i < count - 1; ++i)
-	    dp->db_index[i] = dp->db_index[i + 1] + line_size;
+	ಗಾಗಿ (i = idx; i < ಎಣಿಕೆ_2 - 1; ++i)
+	    dp->db_ಸೂಚ್ಯಂಕ[i] = dp->db_ಸೂಚ್ಯಂಕ[i + 1] + ಸಾಲು_ಗಾತ್ರ;
 
-	dp->db_free += line_size + INDEX_SIZE;
-	dp->db_txt_start += line_size;
-	--(dp->db_line_count);
+	dp->db_free += ಸಾಲು_ಗಾತ್ರ + ಸೂಚ್ಯಂಕ_ಗಾತ್ರ;
+	dp->db_txt_ಆರಂಭ += ಸಾಲು_ಗಾತ್ರ;
+	--(dp->db_ಸಾಲು_ಎಣಿಕೆ);
 
 	/*
 	 * mark the block dirty and make sure it is in the file (for recovery)
@@ -4056,42 +4056,42 @@ ml_delete_int(buf_T *buf, linenr_T lnum, int flags)
 	buf->b_ml.ml_flags |= (ML_LOCKED_DIRTY | ML_LOCKED_POS);
     }
 
-#ifdef FEAT_BYTEOFF
-    ml_updatechunk(buf, lnum, line_size
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_BYTEOFF
+    ml_updatechunk(buf, lnum, ಸಾಲು_ಗಾತ್ರ
 # ifdef FEAT_PROP_POPUP
 					- textprop_len
 # endif
 						    , ML_CHNK_DELLINE);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     ret = OK;
 
 theend:
-#ifdef FEAT_PROP_POPUP
-    if (textprop_save != NULL)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+    ಆದರೆ (textprop_save != ಖಾಲಿ)
     {
 	// textprop_save is [prop_count][textprop_T...][vtext...].
 	// Skip prop_count header and pass only the textprop_T part.
 	uint16_t    pc;
-	char_u	    *props_data;
-	int	    props_bytes;
+	char_u	    *props_ದತ್ತಾಂಶ;
+	ಪೂರ್ಣಾಂಕ	    props_ಬೈಟುಗಳು;
 
-	mch_memmove(&pc, textprop_save, PROP_COUNT_SIZE);
-	props_data = textprop_save + PROP_COUNT_SIZE;
-	props_bytes = pc * (int)sizeof(textprop_T);
-	if (!text_prop_count_valid(pc, (size_t)textprop_len))
-	    props_bytes = 0;
+	mch_memmove(&pc, textprop_save, PROP_ಎಣಿಕೆ_ಗಾತ್ರ);
+	props_ದತ್ತಾಂಶ = textprop_save + PROP_ಎಣಿಕೆ_ಗಾತ್ರ;
+	props_ಬೈಟುಗಳು = pc * (ಪೂರ್ಣಾಂಕ)ಗಾತ್ರ(textprop_T);
+	ಆದರೆ (!ಪಠ್ಯ_prop_ಎಣಿಕೆ_valid(pc, (size_t)textprop_len))
+	    props_ಬೈಟುಗಳು = 0;
 
 	// Adjust text properties in the line above and below.
-	if (lnum > 1)
-	    adjust_text_props_for_delete(buf, lnum - 1,
-					     props_data, props_bytes, TRUE);
-	if (lnum <= buf->b_ml.ml_line_count)
-	    adjust_text_props_for_delete(buf, lnum,
-					    props_data, props_bytes, FALSE);
+	ಆದರೆ (lnum > 1)
+	    adjust_ಪಠ್ಯ_props_for_delete(buf, lnum - 1,
+					     props_ದತ್ತಾಂಶ, props_ಬೈಟುಗಳು, TRUE);
+	ಆದರೆ (lnum <= buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
+	    adjust_ಪಠ್ಯ_props_for_delete(buf, lnum,
+					    props_ದತ್ತಾಂಶ, props_ಬೈಟುಗಳು, FALSE);
     }
     vim_free(textprop_save);
-#endif
-    return ret;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ ret;
 }
 
 /*
@@ -4103,57 +4103,57 @@ theend:
  *
  * return FAIL for failure, OK otherwise
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 ml_delete(linenr_T lnum)
 {
-    return ml_delete_flags(lnum, 0);
+    ಹಿಂತಿರುಗಿ ml_delete_flags(lnum, 0);
 }
 
 /*
  * Like ml_delete() but using flags (see ml_delete_int()).
  */
-    int
-ml_delete_flags(linenr_T lnum, int flags)
+    ಪೂರ್ಣಾಂಕ
+ml_delete_flags(linenr_T lnum, ಪೂರ್ಣಾಂಕ flags)
 {
-    ml_flush_line(curbuf);
-    if (lnum < 1 || lnum > curbuf->b_ml.ml_line_count)
-	return FAIL;
+    ml_flush_ಸಾಲು(curbuf);
+    ಆದರೆ (lnum < 1 || lnum > curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     // When inserting above recorded changes: flush the changes before changing
     // the text.
     may_invoke_listeners(curbuf, lnum, lnum + 1, -1);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return ml_delete_int(curbuf, lnum, flags);
+    ಹಿಂತಿರುಗಿ ml_delete_int(curbuf, lnum, flags);
 }
 
 /*
  * set the DB_MARKED flag for line 'lnum'
  */
-    void
+    ಶೂನ್ಯ
 ml_setmarked(linenr_T lnum)
 {
     bhdr_T    *hp;
-    DATA_BL *dp;
+    ದತ್ತಾಂಶ_BL *dp;
 				    // invalid line number
-    if (lnum < 1 || lnum > curbuf->b_ml.ml_line_count
-					       || curbuf->b_ml.ml_mfp == NULL)
-	return;			    // give error message?
+    ಆದರೆ (lnum < 1 || lnum > curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ
+					       || curbuf->b_ml.ml_mfp == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;			    // give error message?
 
-    if (lowest_marked == 0 || lowest_marked > lnum)
-	lowest_marked = lnum;
+    ಆದರೆ (ಅತಿಕಡಿಮೆ_marked == 0 || ಅತಿಕಡಿಮೆ_marked > lnum)
+	ಅತಿಕಡಿಮೆ_marked = lnum;
 
     /*
      * find the data block containing the line
      * This also fills the stack with the blocks from the root to the data block
      * This also releases any locked block.
      */
-    if ((hp = ml_find_line(curbuf, lnum, ML_FIND)) == NULL)
-	return;		    // give error message?
+    ಆದರೆ ((hp = ml_ಕಂಡುಹಿಡಿ_ಸಾಲು(curbuf, lnum, ML_ಕಂಡುಹಿಡಿ)) == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;		    // give error message?
 
-    dp = (DATA_BL *)(hp->bh_data);
-    dp->db_index[lnum - curbuf->b_ml.ml_locked_low] |= DB_MARKED;
+    dp = (ದತ್ತಾಂಶ_BL *)(hp->bh_ದತ್ತಾಂಶ);
+    dp->db_ಸೂಚ್ಯಂಕ[lnum - curbuf->b_ml.ml_locked_ಕೆಳಗಿನ] |= DB_MARKED;
     curbuf->b_ml.ml_flags |= ML_LOCKED_DIRTY;
 }
 
@@ -4161,182 +4161,182 @@ ml_setmarked(linenr_T lnum)
  * find the first line with its DB_MARKED flag set
  */
     linenr_T
-ml_firstmarked(void)
+ml_firstmarked(ಶೂನ್ಯ)
 {
     bhdr_T	*hp;
-    DATA_BL	*dp;
+    ದತ್ತಾಂಶ_BL	*dp;
     linenr_T	lnum;
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
 
-    if (curbuf->b_ml.ml_mfp == NULL)
-	return (linenr_T) 0;
+    ಆದರೆ (curbuf->b_ml.ml_mfp == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ (linenr_T) 0;
 
     /*
      * The search starts with lowest_marked line. This is the last line where
      * a mark was found, adjusted by inserting/deleting lines.
      */
-    for (lnum = lowest_marked; lnum <= curbuf->b_ml.ml_line_count; )
+    ಗಾಗಿ (lnum = ಅತಿಕಡಿಮೆ_marked; lnum <= curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ; )
     {
 	/*
 	 * Find the data block containing the line.
 	 * This also fills the stack with the blocks from the root to the data
 	 * block This also releases any locked block.
 	 */
-	if ((hp = ml_find_line(curbuf, lnum, ML_FIND)) == NULL)
-	    return (linenr_T)0;		    // give error message?
+	ಆದರೆ ((hp = ml_ಕಂಡುಹಿಡಿ_ಸಾಲು(curbuf, lnum, ML_ಕಂಡುಹಿಡಿ)) == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ (linenr_T)0;		    // give error message?
 
-	dp = (DATA_BL *)(hp->bh_data);
+	dp = (ದತ್ತಾಂಶ_BL *)(hp->bh_ದತ್ತಾಂಶ);
 
-	for (i = lnum - curbuf->b_ml.ml_locked_low;
-			    lnum <= curbuf->b_ml.ml_locked_high; ++i, ++lnum)
-	    if ((dp->db_index[i]) & DB_MARKED)
+	ಗಾಗಿ (i = lnum - curbuf->b_ml.ml_locked_ಕೆಳಗಿನ;
+			    lnum <= curbuf->b_ml.ml_locked_ಮೇಲಿನ; ++i, ++lnum)
+	    ಆದರೆ ((dp->db_ಸೂಚ್ಯಂಕ[i]) & DB_MARKED)
 	    {
-		(dp->db_index[i]) &= DB_INDEX_MASK;
+		(dp->db_ಸೂಚ್ಯಂಕ[i]) &= DB_ಸೂಚ್ಯಂಕ_ಮುಖವಾಡ;
 		curbuf->b_ml.ml_flags |= ML_LOCKED_DIRTY;
-		lowest_marked = lnum + 1;
-		return lnum;
+		ಅತಿಕಡಿಮೆ_marked = lnum + 1;
+		ಹಿಂತಿರುಗಿ lnum;
 	    }
     }
 
-    return (linenr_T) 0;
+    ಹಿಂತಿರುಗಿ (linenr_T) 0;
 }
 
 /*
  * clear all DB_MARKED flags
  */
-    void
-ml_clearmarked(void)
+    ಶೂನ್ಯ
+ml_clearmarked(ಶೂನ್ಯ)
 {
     bhdr_T	*hp;
-    DATA_BL	*dp;
+    ದತ್ತಾಂಶ_BL	*dp;
     linenr_T	lnum;
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
 
-    if (curbuf->b_ml.ml_mfp == NULL)	    // nothing to do
-	return;
+    ಆದರೆ (curbuf->b_ml.ml_mfp == ಖಾಲಿ)	    // nothing to do
+	ಹಿಂತಿರುಗಿ;
 
     /*
      * The search starts with line lowest_marked.
      */
-    for (lnum = lowest_marked; lnum <= curbuf->b_ml.ml_line_count; )
+    ಗಾಗಿ (lnum = ಅತಿಕಡಿಮೆ_marked; lnum <= curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ; )
     {
 	/*
 	 * Find the data block containing the line.
 	 * This also fills the stack with the blocks from the root to the data
 	 * block and releases any locked block.
 	 */
-	if ((hp = ml_find_line(curbuf, lnum, ML_FIND)) == NULL)
-	    return;		// give error message?
+	ಆದರೆ ((hp = ml_ಕಂಡುಹಿಡಿ_ಸಾಲು(curbuf, lnum, ML_ಕಂಡುಹಿಡಿ)) == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ;		// give error message?
 
-	dp = (DATA_BL *)(hp->bh_data);
+	dp = (ದತ್ತಾಂಶ_BL *)(hp->bh_ದತ್ತಾಂಶ);
 
-	for (i = lnum - curbuf->b_ml.ml_locked_low;
-			    lnum <= curbuf->b_ml.ml_locked_high; ++i, ++lnum)
-	    if ((dp->db_index[i]) & DB_MARKED)
+	ಗಾಗಿ (i = lnum - curbuf->b_ml.ml_locked_ಕೆಳಗಿನ;
+			    lnum <= curbuf->b_ml.ml_locked_ಮೇಲಿನ; ++i, ++lnum)
+	    ಆದರೆ ((dp->db_ಸೂಚ್ಯಂಕ[i]) & DB_MARKED)
 	    {
-		(dp->db_index[i]) &= DB_INDEX_MASK;
+		(dp->db_ಸೂಚ್ಯಂಕ[i]) &= DB_ಸೂಚ್ಯಂಕ_ಮುಖವಾಡ;
 		curbuf->b_ml.ml_flags |= ML_LOCKED_DIRTY;
 	    }
     }
 
-    lowest_marked = 0;
+    ಅತಿಕಡಿಮೆ_marked = 0;
 }
 
 /*
  * flush ml_line if necessary
  */
-    static void
-ml_flush_line(buf_T *buf)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ml_flush_ಸಾಲು(buf_T *buf)
 {
     bhdr_T	*hp;
-    DATA_BL	*dp;
+    ದತ್ತಾಂಶ_BL	*dp;
     linenr_T	lnum;
-    char_u	*new_line;
-    char_u	*old_line;
+    char_u	*new_ಸಾಲು;
+    char_u	*old_ಸಾಲು;
     colnr_T	new_len;
-    int		old_len;
-    int		extra;
-    int		idx;
-    int		start;
-    int		count;
-    int		i;
-    static int  entered = FALSE;
+    ಪೂರ್ಣಾಂಕ		old_len;
+    ಪೂರ್ಣಾಂಕ		extra;
+    ಪೂರ್ಣಾಂಕ		idx;
+    ಪೂರ್ಣಾಂಕ		ಆರಂಭ;
+    ಪೂರ್ಣಾಂಕ		ಎಣಿಕೆ_2;
+    ಪೂರ್ಣಾಂಕ		i;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ  entered = FALSE;
 
-    if (buf->b_ml.ml_line_lnum == 0 || buf->b_ml.ml_mfp == NULL)
-	return;		// nothing to do
+    ಆದರೆ (buf->b_ml.ml_ಸಾಲು_lnum == 0 || buf->b_ml.ml_mfp == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;		// nothing to do
 
-    if (buf->b_ml.ml_flags & ML_LINE_DIRTY)
+    ಆದರೆ (buf->b_ml.ml_flags & ML_ಸಾಲು_DIRTY)
     {
 	// This code doesn't work recursively, but Netbeans may call back here
 	// when obtaining the cursor position.
-	if (entered)
-	    return;
+	ಆದರೆ (entered)
+	    ಹಿಂತಿರುಗಿ;
 	entered = TRUE;
 
-	lnum = buf->b_ml.ml_line_lnum;
-	new_line = buf->b_ml.ml_line_ptr;
+	lnum = buf->b_ml.ml_ಸಾಲು_lnum;
+	new_ಸಾಲು = buf->b_ml.ml_ಸಾಲು_ptr;
 
-	hp = ml_find_line(buf, lnum, ML_FIND);
-	if (hp == NULL)
-	    siemsg(e_cannot_find_line_nr, lnum);
-	else
+	hp = ml_ಕಂಡುಹಿಡಿ_ಸಾಲು(buf, lnum, ML_ಕಂಡುಹಿಡಿ);
+	ಆದರೆ (hp == ಖಾಲಿ)
+	    siemsg(e_cannot_ಕಂಡುಹಿಡಿ_ಸಾಲು_nr, lnum);
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    dp = (DATA_BL *)(hp->bh_data);
-	    idx = lnum - buf->b_ml.ml_locked_low;
-	    start = ((dp->db_index[idx]) & DB_INDEX_MASK);
-	    old_line = (char_u *)dp + start;
-	    if (idx == 0)	// line is last in block
-		old_len = dp->db_txt_end - start;
-	    else		// text of previous line follows
-		old_len = (dp->db_index[idx - 1] & DB_INDEX_MASK) - start;
-	    new_len = buf->b_ml.ml_line_len;
+	    dp = (ದತ್ತಾಂಶ_BL *)(hp->bh_ದತ್ತಾಂಶ);
+	    idx = lnum - buf->b_ml.ml_locked_ಕೆಳಗಿನ;
+	    ಆರಂಭ = ((dp->db_ಸೂಚ್ಯಂಕ[idx]) & DB_ಸೂಚ್ಯಂಕ_ಮುಖವಾಡ);
+	    old_ಸಾಲು = (char_u *)dp + ಆರಂಭ;
+	    ಆದರೆ (idx == 0)	// line is last in block
+		old_len = dp->db_txt_ಕೊನೆ - ಆರಂಭ;
+	    ಇಲ್ಲದಿದ್ದರೆ		// text of previous line follows
+		old_len = (dp->db_ಸೂಚ್ಯಂಕ[idx - 1] & DB_ಸೂಚ್ಯಂಕ_ಮುಖವಾಡ) - ಆರಂಭ;
+	    new_len = buf->b_ml.ml_ಸಾಲು_len;
 	    extra = new_len - old_len;	    // negative if lines gets smaller
 
 	    /*
 	     * if new line fits in data block, replace directly
 	     */
-	    if ((int)dp->db_free >= extra)
+	    ಆದರೆ ((ಪೂರ್ಣಾಂಕ)dp->db_free >= extra)
 	    {
-#if defined(FEAT_BYTEOFF) && defined(FEAT_PROP_POPUP)
-		int old_prop_len = 0;
-		if (buf->b_has_textprop)
-		    old_prop_len = old_len - (int)STRLEN(old_line) - 1;
-#endif
+#ಆದರೆ defined(FEAT_BYTEOFF) && defined(FEAT_PROP_POPUP)
+		ಪೂರ್ಣಾಂಕ old_prop_len = 0;
+		ಆದರೆ (buf->b_has_textprop)
+		    old_prop_len = old_len - (ಪೂರ್ಣಾಂಕ)STRLEN(old_ಸಾಲು) - 1;
+#ಆದರೆ_ಅಂತ್ಯ
 		// if the length changes and there are following lines
-		count = buf->b_ml.ml_locked_high - buf->b_ml.ml_locked_low + 1;
-		if (extra != 0 && idx < count - 1)
+		ಎಣಿಕೆ_2 = buf->b_ml.ml_locked_ಮೇಲಿನ - buf->b_ml.ml_locked_ಕೆಳಗಿನ + 1;
+		ಆದರೆ (extra != 0 && idx < ಎಣಿಕೆ_2 - 1)
 		{
 		    // move text of following lines
-		    mch_memmove((char *)dp + dp->db_txt_start - extra,
-				(char *)dp + dp->db_txt_start,
-				(size_t)(start - dp->db_txt_start));
+		    mch_memmove((ಅಕ್ಷರ *)dp + dp->db_txt_ಆರಂಭ - extra,
+				(ಅಕ್ಷರ *)dp + dp->db_txt_ಆರಂಭ,
+				(size_t)(ಆರಂಭ - dp->db_txt_ಆರಂಭ));
 
 		    // adjust pointers of this and following lines
-		    for (i = idx + 1; i < count; ++i)
-			dp->db_index[i] -= extra;
+		    ಗಾಗಿ (i = idx + 1; i < ಎಣಿಕೆ_2; ++i)
+			dp->db_ಸೂಚ್ಯಂಕ[i] -= extra;
 		}
-		dp->db_index[idx] -= extra;
+		dp->db_ಸೂಚ್ಯಂಕ[idx] -= extra;
 
 		// adjust free space
 		dp->db_free -= extra;
-		dp->db_txt_start -= extra;
+		dp->db_txt_ಆರಂಭ -= extra;
 
 		// copy new line into the data block
-		mch_memmove(old_line - extra, new_line, (size_t)new_len);
+		mch_memmove(old_ಸಾಲು - extra, new_ಸಾಲು, (size_t)new_len);
 		buf->b_ml.ml_flags |= (ML_LOCKED_DIRTY | ML_LOCKED_POS);
-#if defined(FEAT_BYTEOFF) && defined(FEAT_PROP_POPUP)
+#ಆದರೆ defined(FEAT_BYTEOFF) && defined(FEAT_PROP_POPUP)
 		// The else case is already covered by the insert and delete
-		if (buf->b_has_textprop)
+		ಆದರೆ (buf->b_has_textprop)
 		{
 		    // Do not count the size of any text properties.
 		    extra += old_prop_len;
-		    extra -= new_len - (int)STRLEN(new_line) - 1;
+		    extra -= new_len - (ಪೂರ್ಣಾಂಕ)STRLEN(new_ಸಾಲು) - 1;
 		}
-		if (extra != 0)
-		    ml_updatechunk(buf, lnum, (long)extra, ML_CHNK_UPDLINE);
-#endif
+		ಆದರೆ (extra != 0)
+		    ml_updatechunk(buf, lnum, (ದೀರ್ಘ)extra, ML_CHNK_UPDLINE);
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		/*
 		 * Cannot do it in one data block: Delete and append.
@@ -4346,65 +4346,65 @@ ml_flush_line(buf_T *buf)
 		 * Don't forget to copy the mark!
 		 */
 		// How about handling errors???
-		(void)ml_append_int(buf, lnum, new_line, new_len,
-			 ((dp->db_index[idx] & DB_MARKED) ? ML_APPEND_MARK : 0)
-#ifdef FEAT_PROP_POPUP
+		(ಶೂನ್ಯ)ml_append_int(buf, lnum, new_ಸಾಲು, new_len,
+			 ((dp->db_ಸೂಚ್ಯಂಕ[idx] & DB_MARKED) ? ML_APPEND_MARK : 0)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
 			     | ML_APPEND_NOPROP
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 			 );
-		(void)ml_delete_int(buf, lnum, ML_DEL_NOPROP);
+		(ಶೂನ್ಯ)ml_delete_int(buf, lnum, ML_DEL_NOPROP);
 	    }
 	}
-	vim_free(new_line);
+	vim_free(new_ಸಾಲು);
 
 	entered = FALSE;
     }
-    else if (buf->b_ml.ml_flags & ML_ALLOCATED)
-	vim_free(buf->b_ml.ml_line_ptr);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (buf->b_ml.ml_flags & ML_ALLOCATED)
+	vim_free(buf->b_ml.ml_ಸಾಲು_ptr);
 
-    buf->b_ml.ml_flags &= ~(ML_LINE_DIRTY | ML_ALLOCATED);
-    buf->b_ml.ml_line_lnum = 0;
+    buf->b_ml.ml_flags &= ~(ML_ಸಾಲು_DIRTY | ML_ALLOCATED);
+    buf->b_ml.ml_ಸಾಲು_lnum = 0;
 }
 
 /*
  * create a new, empty, data block
  */
-    static bhdr_T *
-ml_new_data(memfile_T *mfp, int negative, int page_count)
+    ಸ್ಥಿರ bhdr_T *
+ml_new_ದತ್ತಾಂಶ(memfile_T *mfp, ಪೂರ್ಣಾಂಕ negative, ಪೂರ್ಣಾಂಕ ಪುಟ_ಎಣಿಕೆ)
 {
     bhdr_T	*hp;
-    DATA_BL	*dp;
+    ದತ್ತಾಂಶ_BL	*dp;
 
-    if ((hp = mf_new(mfp, negative, page_count)) == NULL)
-	return NULL;
+    ಆದರೆ ((hp = mf_new(mfp, negative, ಪುಟ_ಎಣಿಕೆ)) == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    dp = (DATA_BL *)(hp->bh_data);
-    dp->db_id = DATA_ID;
-    dp->db_txt_start = dp->db_txt_end = page_count * mfp->mf_page_size;
-    dp->db_free = dp->db_txt_start - HEADER_SIZE;
-    dp->db_line_count = 0;
+    dp = (ದತ್ತಾಂಶ_BL *)(hp->bh_ದತ್ತಾಂಶ);
+    dp->db_id = ದತ್ತಾಂಶ_ID;
+    dp->db_txt_ಆರಂಭ = dp->db_txt_ಕೊನೆ = ಪುಟ_ಎಣಿಕೆ * mfp->mf_ಪುಟ_ಗಾತ್ರ;
+    dp->db_free = dp->db_txt_ಆರಂಭ - ಶೀರ್ಷಿಕೆ_ಗಾತ್ರ;
+    dp->db_ಸಾಲು_ಎಣಿಕೆ = 0;
 
-    return hp;
+    ಹಿಂತಿರುಗಿ hp;
 }
 
 /*
  * create a new, empty, pointer block
  */
-    static bhdr_T *
+    ಸ್ಥಿರ bhdr_T *
 ml_new_ptr(memfile_T *mfp)
 {
     bhdr_T	*hp;
     PTR_BL	*pp;
 
-    if ((hp = mf_new(mfp, FALSE, 1)) == NULL)
-	return NULL;
+    ಆದರೆ ((hp = mf_new(mfp, FALSE, 1)) == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    pp = (PTR_BL *)(hp->bh_data);
+    pp = (PTR_BL *)(hp->bh_ದತ್ತಾಂಶ);
     pp->pb_id = PTR_ID;
-    pp->pb_count = 0;
-    pp->pb_count_max = PB_COUNT_MAX(mfp);
+    pp->pb_ಎಣಿಕೆ = 0;
+    pp->pb_ಎಣಿಕೆ_max = PB_ಎಣಿಕೆ_MAX(mfp);
 
-    return hp;
+    ಹಿಂತಿರುಗಿ hp;
 }
 
 /*
@@ -4422,21 +4422,21 @@ ml_new_ptr(memfile_T *mfp)
  *
  * return: NULL for failure, pointer to block header otherwise
  */
-    static bhdr_T *
-ml_find_line(buf_T *buf, linenr_T lnum, int action)
+    ಸ್ಥಿರ bhdr_T *
+ml_ಕಂಡುಹಿಡಿ_ಸಾಲು(buf_T *buf, linenr_T lnum, ಪೂರ್ಣಾಂಕ action)
 {
-    DATA_BL	*dp;
+    ದತ್ತಾಂಶ_BL	*dp;
     PTR_BL	*pp;
     infoptr_T	*ip;
     bhdr_T	*hp;
     memfile_T	*mfp;
     linenr_T	t;
     blocknr_T	bnum, bnum2;
-    int		dirty;
-    linenr_T	low, high;
-    int		top;
-    int		page_count;
-    int		idx;
+    ಪೂರ್ಣಾಂಕ		dirty;
+    linenr_T	ಕೆಳಗಿನ, ಮೇಲಿನ;
+    ಪೂರ್ಣಾಂಕ		ತುದಿ;
+    ಪೂರ್ಣಾಂಕ		ಪುಟ_ಎಣಿಕೆ;
+    ಪೂರ್ಣಾಂಕ		idx;
 
     mfp = buf->b_ml.ml_mfp;
 
@@ -4447,163 +4447,163 @@ ml_find_line(buf_T *buf, linenr_T lnum, int action)
      * Don't do this for ML_FLUSH, because we want to flush the locked block.
      * Don't do this when 'swapfile' is reset, we want to load all the blocks.
      */
-    if (buf->b_ml.ml_locked)
+    ಆದರೆ (buf->b_ml.ml_locked)
     {
-	if (ML_SIMPLE(action)
-		&& buf->b_ml.ml_locked_low <= lnum
-		&& buf->b_ml.ml_locked_high >= lnum
+	ಆದರೆ (ML_SIMPLE(action)
+		&& buf->b_ml.ml_locked_ಕೆಳಗಿನ <= lnum
+		&& buf->b_ml.ml_locked_ಮೇಲಿನ >= lnum
 		&& !mf_dont_release)
 	{
 	    // remember to update pointer blocks and stack later
-	    if (action == ML_INSERT)
+	    ಆದರೆ (action == ML_ಸೇರಿಸು)
 	    {
 		++(buf->b_ml.ml_locked_lineadd);
-		++(buf->b_ml.ml_locked_high);
+		++(buf->b_ml.ml_locked_ಮೇಲಿನ);
 	    }
-	    else if (action == ML_DELETE)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (action == ML_DELETE)
 	    {
 		--(buf->b_ml.ml_locked_lineadd);
-		--(buf->b_ml.ml_locked_high);
+		--(buf->b_ml.ml_locked_ಮೇಲಿನ);
 	    }
-	    return (buf->b_ml.ml_locked);
+	    ಹಿಂತಿರುಗಿ (buf->b_ml.ml_locked);
 	}
 
 	mf_put(mfp, buf->b_ml.ml_locked, buf->b_ml.ml_flags & ML_LOCKED_DIRTY,
 					    buf->b_ml.ml_flags & ML_LOCKED_POS);
-	buf->b_ml.ml_locked = NULL;
+	buf->b_ml.ml_locked = ಖಾಲಿ;
 
 	/*
 	 * If lines have been added or deleted in the locked block, need to
 	 * update the line count in pointer blocks.
 	 */
-	if (buf->b_ml.ml_locked_lineadd != 0)
+	ಆದರೆ (buf->b_ml.ml_locked_lineadd != 0)
 	    ml_lineadd(buf, buf->b_ml.ml_locked_lineadd);
     }
 
-    if (action == ML_FLUSH)	    // nothing else to do
-	return NULL;
+    ಆದರೆ (action == ML_FLUSH)	    // nothing else to do
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     bnum = 1;			    // start at the root of the tree
-    page_count = 1;
-    low = 1;
-    high = buf->b_ml.ml_line_count;
+    ಪುಟ_ಎಣಿಕೆ = 1;
+    ಕೆಳಗಿನ = 1;
+    ಮೇಲಿನ = buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
 
-    if (action == ML_FIND)	// first try stack entries
+    ಆದರೆ (action == ML_ಕಂಡುಹಿಡಿ)	// first try stack entries
     {
-	for (top = buf->b_ml.ml_stack_top - 1; top >= 0; --top)
+	ಗಾಗಿ (ತುದಿ = buf->b_ml.ml_ರಾಶಿ_ತುದಿ - 1; ತುದಿ >= 0; --ತುದಿ)
 	{
-	    ip = &(buf->b_ml.ml_stack[top]);
-	    if (ip->ip_low <= lnum && ip->ip_high >= lnum)
+	    ip = &(buf->b_ml.ml_ರಾಶಿ[ತುದಿ]);
+	    ಆದರೆ (ip->ip_ಕೆಳಗಿನ <= lnum && ip->ip_ಮೇಲಿನ >= lnum)
 	    {
 		bnum = ip->ip_bnum;
-		low = ip->ip_low;
-		high = ip->ip_high;
-		buf->b_ml.ml_stack_top = top;	// truncate stack at prev entry
-		break;
+		ಕೆಳಗಿನ = ip->ip_ಕೆಳಗಿನ;
+		ಮೇಲಿನ = ip->ip_ಮೇಲಿನ;
+		buf->b_ml.ml_ರಾಶಿ_ತುದಿ = ತುದಿ;	// truncate stack at prev entry
+		ನಿಲ್ಲಿಸು;
 	    }
 	}
-	if (top < 0)
-	    buf->b_ml.ml_stack_top = 0;		// not found, start at the root
+	ಆದರೆ (ತುದಿ < 0)
+	    buf->b_ml.ml_ರಾಶಿ_ತುದಿ = 0;		// not found, start at the root
     }
-    else	// ML_DELETE or ML_INSERT
-	buf->b_ml.ml_stack_top = 0;	// start at the root
+    ಇಲ್ಲದಿದ್ದರೆ	// ML_DELETE or ML_INSERT
+	buf->b_ml.ml_ರಾಶಿ_ತುದಿ = 0;	// start at the root
 
 /*
  * search downwards in the tree until a data block is found
  */
-    for (;;)
+    ಗಾಗಿ (;;)
     {
-	if ((hp = mf_get(mfp, bnum, page_count)) == NULL)
-	    goto error_noblock;
+	ಆದರೆ ((hp = mf_get(mfp, bnum, ಪುಟ_ಎಣಿಕೆ)) == ಖಾಲಿ)
+	    ಹೋಗು error_noblock;
 
 	/*
 	 * update high for insert/delete
 	 */
-	if (action == ML_INSERT)
-	    ++high;
-	else if (action == ML_DELETE)
-	    --high;
+	ಆದರೆ (action == ML_ಸೇರಿಸು)
+	    ++ಮೇಲಿನ;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (action == ML_DELETE)
+	    --ಮೇಲಿನ;
 
-	dp = (DATA_BL *)(hp->bh_data);
-	if (dp->db_id == DATA_ID)	// data block
+	dp = (ದತ್ತಾಂಶ_BL *)(hp->bh_ದತ್ತಾಂಶ);
+	ಆದರೆ (dp->db_id == ದತ್ತಾಂಶ_ID)	// data block
 	{
 	    buf->b_ml.ml_locked = hp;
-	    buf->b_ml.ml_locked_low = low;
-	    buf->b_ml.ml_locked_high = high;
+	    buf->b_ml.ml_locked_ಕೆಳಗಿನ = ಕೆಳಗಿನ;
+	    buf->b_ml.ml_locked_ಮೇಲಿನ = ಮೇಲಿನ;
 	    buf->b_ml.ml_locked_lineadd = 0;
 	    buf->b_ml.ml_flags &= ~(ML_LOCKED_DIRTY | ML_LOCKED_POS);
-	    return hp;
+	    ಹಿಂತಿರುಗಿ hp;
 	}
 
 	pp = (PTR_BL *)(dp);		// must be pointer block
-	if (pp->pb_id != PTR_ID)
+	ಆದರೆ (pp->pb_id != PTR_ID)
 	{
-	    iemsg(e_pointer_block_id_wrong);
-	    goto error_block;
+	    iemsg(e_ಸೂಚಕ_ಖಂಡ_id_wrong);
+	    ಹೋಗು error_ಖಂಡ;
 	}
 
-	if ((top = ml_add_stack(buf)) < 0)	// add new entry to stack
-	    goto error_block;
-	ip = &(buf->b_ml.ml_stack[top]);
+	ಆದರೆ ((ತುದಿ = ml_ಕೂಡಿಸು_ರಾಶಿ(buf)) < 0)	// add new entry to stack
+	    ಹೋಗು error_ಖಂಡ;
+	ip = &(buf->b_ml.ml_ರಾಶಿ[ತುದಿ]);
 	ip->ip_bnum = bnum;
-	ip->ip_low = low;
-	ip->ip_high = high;
-	ip->ip_index = -1;		// index not known yet
+	ip->ip_ಕೆಳಗಿನ = ಕೆಳಗಿನ;
+	ip->ip_ಮೇಲಿನ = ಮೇಲಿನ;
+	ip->ip_ಸೂಚ್ಯಂಕ = -1;		// index not known yet
 
 	dirty = FALSE;
-	for (idx = 0; idx < (int)pp->pb_count; ++idx)
+	ಗಾಗಿ (idx = 0; idx < (ಪೂರ್ಣಾಂಕ)pp->pb_ಎಣಿಕೆ; ++idx)
 	{
-	    t = pp->pb_pointer[idx].pe_line_count;
+	    t = pp->pb_ಸೂಚಕ[idx].pe_ಸಾಲು_ಎಣಿಕೆ;
 	    CHECK(t == 0, _("pe_line_count is zero"));
-	    if ((low += t) > lnum)
+	    ಆದರೆ ((ಕೆಳಗಿನ += t) > lnum)
 	    {
-		ip->ip_index = idx;
-		bnum = pp->pb_pointer[idx].pe_bnum;
-		page_count = pp->pb_pointer[idx].pe_page_count;
-		high = low - 1;
-		low -= t;
+		ip->ip_ಸೂಚ್ಯಂಕ = idx;
+		bnum = pp->pb_ಸೂಚಕ[idx].pe_bnum;
+		ಪುಟ_ಎಣಿಕೆ = pp->pb_ಸೂಚಕ[idx].pe_ಪುಟ_ಎಣಿಕೆ;
+		ಮೇಲಿನ = ಕೆಳಗಿನ - 1;
+		ಕೆಳಗಿನ -= t;
 
 		/*
 		 * a negative block number may have been changed
 		 */
-		if (bnum < 0)
+		ಆದರೆ (bnum < 0)
 		{
 		    bnum2 = mf_trans_del(mfp, bnum);
-		    if (bnum != bnum2)
+		    ಆದರೆ (bnum != bnum2)
 		    {
 			bnum = bnum2;
-			pp->pb_pointer[idx].pe_bnum = bnum;
+			pp->pb_ಸೂಚಕ[idx].pe_bnum = bnum;
 			dirty = TRUE;
 		    }
 		}
 
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	}
-	if (idx >= (int)pp->pb_count)	    // past the end: something wrong!
+	ಆದರೆ (idx >= (ಪೂರ್ಣಾಂಕ)pp->pb_ಎಣಿಕೆ)	    // past the end: something wrong!
 	{
-	    if (lnum > buf->b_ml.ml_line_count)
-		siemsg(e_line_number_out_of_range_nr_past_the_end,
-					      lnum - buf->b_ml.ml_line_count);
+	    ಆದರೆ (lnum > buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
+		siemsg(e_ಸಾಲು_ಸಂಖ್ಯೆ_ಹೊರಹೋಗು_ದ_range_nr_past_the_ಕೊನೆ,
+					      lnum - buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ);
 
-	    else
-		siemsg(e_line_count_wrong_in_block_nr, bnum);
-	    goto error_block;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		siemsg(e_ಸಾಲು_ಎಣಿಕೆ_wrong_ಒಳ_ಖಂಡ_nr, bnum);
+	    ಹೋಗು error_ಖಂಡ;
 	}
-	if (action == ML_DELETE)
+	ಆದರೆ (action == ML_DELETE)
 	{
-	    pp->pb_pointer[idx].pe_line_count--;
+	    pp->pb_ಸೂಚಕ[idx].pe_ಸಾಲು_ಎಣಿಕೆ--;
 	    dirty = TRUE;
 	}
-	else if (action == ML_INSERT)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (action == ML_ಸೇರಿಸು)
 	{
-	    pp->pb_pointer[idx].pe_line_count++;
+	    pp->pb_ಸೂಚಕ[idx].pe_ಸಾಲು_ಎಣಿಕೆ++;
 	    dirty = TRUE;
 	}
 	mf_put(mfp, hp, dirty, FALSE);
     }
 
-error_block:
+error_ಖಂಡ:
     mf_put(mfp, hp, FALSE, FALSE);
 error_noblock:
     /*
@@ -4611,12 +4611,12 @@ error_noblock:
      * the incremented/decremented line counts, because there won't be a line
      * inserted/deleted after all.
      */
-    if (action == ML_DELETE)
+    ಆದರೆ (action == ML_DELETE)
 	ml_lineadd(buf, 1);
-    else if (action == ML_INSERT)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (action == ML_ಸೇರಿಸು)
 	ml_lineadd(buf, -1);
-    buf->b_ml.ml_stack_top = 0;
-    return NULL;
+    buf->b_ml.ml_ರಾಶಿ_ತುದಿ = 0;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
@@ -4624,32 +4624,32 @@ error_noblock:
  *
  * return -1 for failure, number of the new entry otherwise
  */
-    static int
-ml_add_stack(buf_T *buf)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ml_ಕೂಡಿಸು_ರಾಶಿ(buf_T *buf)
 {
-    int		top;
+    ಪೂರ್ಣಾಂಕ		ತುದಿ;
     infoptr_T	*newstack;
 
-    top = buf->b_ml.ml_stack_top;
+    ತುದಿ = buf->b_ml.ml_ರಾಶಿ_ತುದಿ;
 
     // may have to increase the stack size
-    if (top == buf->b_ml.ml_stack_size)
+    ಆದರೆ (ತುದಿ == buf->b_ml.ml_ರಾಶಿ_ಗಾತ್ರ)
     {
-	CHECK(top > 0, _("Stack size increases")); // more than 5 levels???
+	CHECK(ತುದಿ > 0, _("Stack size increases")); // more than 5 levels???
 
-	newstack = ALLOC_MULT(infoptr_T, buf->b_ml.ml_stack_size + STACK_INCR);
-	if (newstack == NULL)
-	    return -1;
-	if (top > 0)
-	    mch_memmove(newstack, buf->b_ml.ml_stack,
-					     (size_t)top * sizeof(infoptr_T));
-	vim_free(buf->b_ml.ml_stack);
-	buf->b_ml.ml_stack = newstack;
-	buf->b_ml.ml_stack_size += STACK_INCR;
+	newstack = ALLOC_MULT(infoptr_T, buf->b_ml.ml_ರಾಶಿ_ಗಾತ್ರ + ರಾಶಿ_INCR);
+	ಆದರೆ (newstack == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ -1;
+	ಆದರೆ (ತುದಿ > 0)
+	    mch_memmove(newstack, buf->b_ml.ml_ರಾಶಿ,
+					     (size_t)ತುದಿ * ಗಾತ್ರ(infoptr_T));
+	vim_free(buf->b_ml.ml_ರಾಶಿ);
+	buf->b_ml.ml_ರಾಶಿ = newstack;
+	buf->b_ml.ml_ರಾಶಿ_ಗಾತ್ರ += ರಾಶಿ_INCR;
     }
 
-    buf->b_ml.ml_stack_top++;
-    return top;
+    buf->b_ml.ml_ರಾಶಿ_ತುದಿ++;
+    ಹಿಂತಿರುಗಿ ತುದಿ;
 }
 
 /*
@@ -4662,34 +4662,34 @@ ml_add_stack(buf_T *buf)
  *
  * Count is the number of lines added, negative if lines have been deleted.
  */
-    static void
-ml_lineadd(buf_T *buf, int count)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ml_lineadd(buf_T *buf, ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_2)
 {
-    int		idx;
+    ಪೂರ್ಣಾಂಕ		idx;
     infoptr_T	*ip;
     PTR_BL	*pp;
     memfile_T	*mfp = buf->b_ml.ml_mfp;
     bhdr_T	*hp;
 
-    for (idx = buf->b_ml.ml_stack_top - 1; idx >= 0; --idx)
+    ಗಾಗಿ (idx = buf->b_ml.ml_ರಾಶಿ_ತುದಿ - 1; idx >= 0; --idx)
     {
-	ip = &(buf->b_ml.ml_stack[idx]);
-	if ((hp = mf_get(mfp, ip->ip_bnum, 1)) == NULL)
-	    break;
-	pp = (PTR_BL *)(hp->bh_data);	// must be pointer block
-	if (pp->pb_id != PTR_ID)
+	ip = &(buf->b_ml.ml_ರಾಶಿ[idx]);
+	ಆದರೆ ((hp = mf_get(mfp, ip->ip_bnum, 1)) == ಖಾಲಿ)
+	    ನಿಲ್ಲಿಸು;
+	pp = (PTR_BL *)(hp->bh_ದತ್ತಾಂಶ);	// must be pointer block
+	ಆದರೆ (pp->pb_id != PTR_ID)
 	{
 	    mf_put(mfp, hp, FALSE, FALSE);
-	    iemsg(e_pointer_block_id_wrong_two);
-	    break;
+	    iemsg(e_ಸೂಚಕ_ಖಂಡ_id_wrong_two);
+	    ನಿಲ್ಲಿಸು;
 	}
-	pp->pb_pointer[ip->ip_index].pe_line_count += count;
-	ip->ip_high += count;
+	pp->pb_ಸೂಚಕ[ip->ip_ಸೂಚ್ಯಂಕ].pe_ಸಾಲು_ಎಣಿಕೆ += ಎಣಿಕೆ_2;
+	ip->ip_ಮೇಲಿನ += ಎಣಿಕೆ_2;
 	mf_put(mfp, hp, TRUE, FALSE);
     }
 }
 
-#if defined(HAVE_READLINK)
+#ಆದರೆ defined(HAVE_READLINK)
 /*
  * Resolve a symlink in the last component of a file name.
  * Note that f_resolve() does it for every part of the path, we don't do that
@@ -4697,45 +4697,45 @@ ml_lineadd(buf_T *buf, int count)
  * If it worked returns OK and the resolved link in "buf[MAXPATHL]".
  * Otherwise returns FAIL.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 resolve_symlink(char_u *fname, char_u *buf)
 {
     char_u	tmp[MAXPATHL];
-    int		ret;
-    int		depth = 0;
+    ಪೂರ್ಣಾಂಕ		ret;
+    ಪೂರ್ಣಾಂಕ		ಆಳ = 0;
 
-    if (fname == NULL)
-	return FAIL;
+    ಆದರೆ (fname == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
     // Put the result so far in tmp[], starting with the original name.
     vim_strncpy(tmp, fname, MAXPATHL - 1);
 
-    for (;;)
+    ಗಾಗಿ (;;)
     {
 	// Limit symlink depth to 100, catch recursive loops.
-	if (++depth == 100)
+	ಆದರೆ (++ಆಳ == 100)
 	{
 	    semsg(_(e_symlink_loop_for_str), fname);
-	    return FAIL;
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
 
-	ret = readlink((char *)tmp, (char *)buf, MAXPATHL - 1);
-	if (ret <= 0)
+	ret = readlink((ಅಕ್ಷರ *)tmp, (ಅಕ್ಷರ *)buf, MAXPATHL - 1);
+	ಆದರೆ (ret <= 0)
 	{
-	    if (errno == EINVAL || errno == ENOENT)
+	    ಆದರೆ (errno == EINVAL || errno == ENOENT)
 	    {
 		// Found non-symlink or not existing file, stop here.
 		// When at the first level use the unmodified name, skip the
 		// call to vim_FullName().
-		if (depth == 1)
-		    return FAIL;
+		ಆದರೆ (ಆಳ == 1)
+		    ಹಿಂತಿರುಗಿ FAIL;
 
 		// Use the resolved name in tmp[].
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 
 	    // There must be some error reading links, use original name.
-	    return FAIL;
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
 	buf[ret] = NUL;
 
@@ -4745,16 +4745,16 @@ resolve_symlink(char_u *fname, char_u *buf)
 	 * portion of the filename (if any) and the path the symlink
 	 * points to.
 	 */
-	if (mch_isFullName(buf))
+	ಆದರೆ (mch_is_ತುಂಬಿದ_Name(buf))
 	    STRCPY(tmp, buf);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    char_u *tail;
+	    char_u *ಬಾಲ;
 
-	    tail = gettail(tmp);
-	    if (STRLEN(tail) + STRLEN(buf) >= MAXPATHL)
-		return FAIL;
-	    STRCPY(tail, buf);
+	    ಬಾಲ = gettail(tmp);
+	    ಆದರೆ (STRLEN(ಬಾಲ) + STRLEN(buf) >= MAXPATHL)
+		ಹಿಂತಿರುಗಿ FAIL;
+	    STRCPY(ಬಾಲ, buf);
 	}
     }
 
@@ -4763,9 +4763,9 @@ resolve_symlink(char_u *fname, char_u *buf)
      * be consistent even when opening a relative symlink from different
      * working directories.
      */
-    return vim_FullName(tmp, buf, MAXPATHL, TRUE);
+    ಹಿಂತಿರುಗಿ vim_ತುಂಬಿದ_Name(tmp, buf, MAXPATHL, TRUE);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Make swap file name out of the file name and a directory name.
@@ -4774,54 +4774,54 @@ resolve_symlink(char_u *fname, char_u *buf)
     char_u *
 makeswapname(
     char_u	*fname,
-    char_u	*ffname UNUSED,
+    char_u	*ffname ಬಳಸದ,
     buf_T	*buf,
     char_u	*dir_name)
 {
     char_u	*r, *s;
     char_u	*fname_res = fname;
-#ifdef HAVE_READLINK
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_READLINK
     char_u	fname_buf[MAXPATHL];
 
     // Expand symlink in the file name, so that we put the swap file with the
     // actual file instead of with the symlink.
-    if (resolve_symlink(fname, fname_buf) == OK)
+    ಆದರೆ (resolve_symlink(fname, fname_buf) == OK)
 	fname_res = fname_buf;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(UNIX) || defined(MSWIN)  // Need _very_ long file names
-    int		len = (int)STRLEN(dir_name);
+#ಆದರೆ defined(UNIX) || defined(MSWIN)  // Need _very_ long file names
+    ಪೂರ್ಣಾಂಕ		len = (ಪೂರ್ಣಾಂಕ)STRLEN(dir_name);
 
     s = dir_name + len;
-    if (after_pathsep(dir_name, s) && len > 1 && s[-1] == s[-2])
+    ಆದರೆ (after_pathsep(dir_name, s) && len > 1 && s[-1] == s[-2])
     {			       // Ends with '//', Use Full path
-	r = NULL;
-	if ((s = make_percent_swname(dir_name, s, fname_res)) != NULL)
+	r = ಖಾಲಿ;
+	ಆದರೆ ((s = make_percent_swname(dir_name, s, fname_res)) != ಖಾಲಿ)
 	{
 	    r = modname(s, (char_u *)".swp", FALSE);
 	    vim_free(s);
 	}
-	return r;
+	ಹಿಂತಿರುಗಿ r;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     r = buf_modname(
 	    (buf->b_p_sn || buf->b_shortname),
 	    fname_res,
 	    (char_u *)
-#if defined(VMS)
+#ಆದರೆ defined(VMS)
 	    "_swp",
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 	    ".swp",
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    // Prepend a '.' to the swap file name for the current directory.
 	    dir_name[0] == '.' && dir_name[1] == NUL);
-    if (r == NULL)	    // out of memory
-	return NULL;
+    ಆದರೆ (r == ಖಾಲಿ)	    // out of memory
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    s = get_file_in_dir(r, dir_name);
+    s = get_file_ಒಳ_dir(r, dir_name);
     vim_free(r);
-    return s;
+    ಹಿಂತಿರುಗಿ s;
 }
 
 /*
@@ -4837,113 +4837,113 @@ makeswapname(
  * The return value is an allocated string and can be NULL.
  */
     char_u *
-get_file_in_dir(
+get_file_ಒಳ_dir(
     char_u  *fname,
     char_u  *dname)	// don't use "dirname", it is a global for Alpha
 {
-    string_T	tail;
+    string_T	ಬಾಲ;
     string_T	retval;
 
-    tail.string = gettail(fname);
-    tail.length = STRLEN(tail.string);
+    ಬಾಲ.string = gettail(fname);
+    ಬಾಲ.ಉದ್ದಳತೆ = STRLEN(ಬಾಲ.string);
 
-    if (dname[0] == '.' && dname[1] == NUL)
+    ಆದರೆ (dname[0] == '.' && dname[1] == NUL)
 	retval.string =
-	    vim_strnsave(fname, (size_t)(tail.string - fname) + tail.length);
-    else
+	    vim_strnsave(fname, (size_t)(ಬಾಲ.string - fname) + ಬಾಲ.ಉದ್ದಳತೆ);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	size_t	dname_len = STRLEN(dname);
 
-	if (dname[0] == '.' && vim_ispathsep(dname[1]))
+	ಆದರೆ (dname[0] == '.' && vim_ispathsep(dname[1]))
 	{
-	    if (tail.string == fname)	    // no path before file name
+	    ಆದರೆ (ಬಾಲ.string == fname)	    // no path before file name
 		concat_fnames(dname + 2, dname_len - 2,
-		    tail.string, tail.length, TRUE, &retval);
-	    else
+		    ಬಾಲ.string, ಬಾಲ.ಉದ್ದಳತೆ, TRUE, &retval);
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		int	    save_char;
+		ಪೂರ್ಣಾಂಕ	    save_char;
 		string_T    tmp;
 
-		save_char = *tail.string;
-		*tail.string = NUL;
-		concat_fnames(fname, (size_t)(tail.string - fname),
+		save_char = *ಬಾಲ.string;
+		*ಬಾಲ.string = NUL;
+		concat_fnames(fname, (size_t)(ಬಾಲ.string - fname),
 		    dname + 2, dname_len - 2, TRUE, &tmp);
-		*tail.string = save_char;
-		if (tmp.string == NULL)	    // out of memory
-		    retval.string = NULL;
-		else
+		*ಬಾಲ.string = save_char;
+		ಆದರೆ (tmp.string == ಖಾಲಿ)	    // out of memory
+		    retval.string = ಖಾಲಿ;
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    concat_fnames(tmp.string, tmp.length,
-			tail.string, tail.length, TRUE, &retval);
+		    concat_fnames(tmp.string, tmp.ಉದ್ದಳತೆ,
+			ಬಾಲ.string, ಬಾಲ.ಉದ್ದಳತೆ, TRUE, &retval);
 		    vim_free(tmp.string);
 		}
 	    }
 	}
-	else
-	    concat_fnames(dname, dname_len, tail.string, tail.length,
+	ಇಲ್ಲದಿದ್ದರೆ
+	    concat_fnames(dname, dname_len, ಬಾಲ.string, ಬಾಲ.ಉದ್ದಳತೆ,
 		TRUE, &retval);
     }
 
-#ifdef MSWIN
-    if (retval.string != NULL)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
+    ಆದರೆ (retval.string != ಖಾಲಿ)
     {
 	char_u	*t;
 
-	for (t = gettail(retval.string); *t != NUL; MB_PTR_ADV(t))
-	    if (*t == ':')
+	ಗಾಗಿ (t = gettail(retval.string); *t != NUL; MB_PTR_ADV(t))
+	    ಆದರೆ (*t == ':')
 		*t = '%';
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return retval.string;
+    ಹಿಂತಿರುಗಿ retval.string;
 }
 
 /*
  * Print the ATTENTION message: info about an existing swap file.
  */
-    static void
-attention_message(
+    ಸ್ಥಿರ ಶೂನ್ಯ
+attention_ಸಂದೇಶ(
     buf_T   *buf,	// buffer being edited
     char_u  *fname)	// swap file name
 {
     stat_T	st;
-    time_t	swap_mtime;
+    time_t	ಅದಲುಬದಲು_mtime;
 
     ++no_wait_return;
-    (void)emsg(_(e_attention));
-    msg_puts(_("\nFound a swap file by the name \""));
-    msg_home_replace(fname);
-    msg_puts("\"\n");
-    swap_mtime = swapfile_info(fname);
-    msg_puts(_("While opening file \""));
-    msg_outtrans(buf->b_fname);
-    msg_puts("\"\n");
-    if (mch_stat((char *)buf->b_fname, &st) == -1)
+    (ಶೂನ್ಯ)emsg(_(e_attention));
+    ಸಂದೇಶ_puts(_("\nFound a swap file by the name \""));
+    ಸಂದೇಶ_home_replace(fname);
+    ಸಂದೇಶ_puts("\"\n");
+    ಅದಲುಬದಲು_mtime = swapfile_info(fname);
+    ಸಂದೇಶ_puts(_("While opening file \""));
+    ಸಂದೇಶ_outtrans(buf->b_fname);
+    ಸಂದೇಶ_puts("\"\n");
+    ಆದರೆ (mch_stat((ಅಕ್ಷರ *)buf->b_fname, &st) == -1)
     {
-	msg_puts(_("      CANNOT BE FOUND"));
+	ಸಂದೇಶ_puts(_("      CANNOT BE FOUND"));
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	msg_puts(_("             dated: "));
-	msg_puts(get_ctime(st.st_mtime, TRUE));
-	if (swap_mtime != 0 && st.st_mtime > swap_mtime)
-	    msg_puts(_("      NEWER than swap file!\n"));
+	ಸಂದೇಶ_puts(_("             dated: "));
+	ಸಂದೇಶ_puts(get_ctime(st.st_mtime, TRUE));
+	ಆದರೆ (ಅದಲುಬದಲು_mtime != 0 && st.st_mtime > ಅದಲುಬದಲು_mtime)
+	    ಸಂದೇಶ_puts(_("      NEWER than swap file!\n"));
     }
     // Some of these messages are long to allow translation to
     // other languages.
-    msg_puts(_("\n(1) Another program may be editing the same file.  If this is the case,\n    be careful not to end up with two different instances of the same\n    file when making changes.  Quit, or continue with caution.\n"));
-    msg_puts(_("(2) An edit session for this file crashed.\n"));
-    msg_puts(_("    If this is the case, use \":recover\" or \"vim -r "));
-    msg_outtrans(buf->b_fname);
-    msg_puts(_("\"\n    to recover the changes (see \":help recovery\").\n"));
-    msg_puts(_("    If you did this already, delete the swap file \""));
-    msg_outtrans(fname);
-    msg_puts(_("\"\n    to avoid this message.\n"));
-    cmdline_row = msg_row;
+    ಸಂದೇಶ_puts(_("\n(1) Another program may be editing the same file.  If this is the case,\n    be careful not to end up with two different instances of the same\n    file when making changes.  Quit, or continue with caution.\n"));
+    ಸಂದೇಶ_puts(_("(2) An edit session for this file crashed.\n"));
+    ಸಂದೇಶ_puts(_("    If this is the case, use \":recover\" or \"vim -r "));
+    ಸಂದೇಶ_outtrans(buf->b_fname);
+    ಸಂದೇಶ_puts(_("\"\n    to recover the changes (see \":help recovery\").\n"));
+    ಸಂದೇಶ_puts(_("    If you did this already, delete the swap file \""));
+    ಸಂದೇಶ_outtrans(fname);
+    ಸಂದೇಶ_puts(_("\"\n    to avoid this message.\n"));
+    cmdline_ಅಡ್ಡಸಾಲು = ಸಂದೇಶ_ಅಡ್ಡಸಾಲು;
     --no_wait_return;
 }
 
-typedef enum {
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ {
     SEA_CHOICE_NONE = 0,
     SEA_CHOICE_READONLY = 1,
     SEA_CHOICE_EDIT = 2,
@@ -4953,38 +4953,38 @@ typedef enum {
     SEA_CHOICE_ABORT = 6
 } sea_choice_T;
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * Trigger the SwapExists autocommands.
  * Returns a value for equivalent to do_dialog().
  */
-    static sea_choice_T
+    ಸ್ಥಿರ sea_choice_T
 do_swapexists(buf_T *buf, char_u *fname)
 {
-    set_vim_var_string(VV_SWAPNAME, fname, -1);
-    set_vim_var_string(VV_SWAPCHOICE, NULL, -1);
+    ಗಣ_vim_var_string(VV_SWAPNAME, fname, -1);
+    ಗಣ_vim_var_string(VV_SWAPCHOICE, ಖಾಲಿ, -1);
 
     // Trigger SwapExists autocommands with <afile> set to the file being
     // edited.  Disallow changing directory here.
-    ++allbuf_lock;
-    apply_autocmds(EVENT_SWAPEXISTS, buf->b_fname, NULL, FALSE, NULL);
-    --allbuf_lock;
+    ++allbuf_ಬೀಗ;
+    apply_autocmds(EVENT_SWAPEXISTS, buf->b_fname, ಖಾಲಿ, FALSE, ಖಾಲಿ);
+    --allbuf_ಬೀಗ;
 
-    set_vim_var_string(VV_SWAPNAME, NULL, -1);
+    ಗಣ_vim_var_string(VV_SWAPNAME, ಖಾಲಿ, -1);
 
-    switch (*get_vim_var_str(VV_SWAPCHOICE))
+    ಆಯ್ಕೆ (*get_vim_var_str(VV_SWAPCHOICE))
     {
-	case 'o': return SEA_CHOICE_READONLY;
-	case 'e': return SEA_CHOICE_EDIT;
-	case 'r': return SEA_CHOICE_RECOVER;
-	case 'd': return SEA_CHOICE_DELETE;
-	case 'q': return SEA_CHOICE_QUIT;
-	case 'a': return SEA_CHOICE_ABORT;
+	ಸ್ಥಿತಿ 'o': ಹಿಂತಿರುಗಿ SEA_CHOICE_READONLY;
+	ಸ್ಥಿತಿ 'e': ಹಿಂತಿರುಗಿ SEA_CHOICE_EDIT;
+	ಸ್ಥಿತಿ 'r': ಹಿಂತಿರುಗಿ SEA_CHOICE_RECOVER;
+	ಸ್ಥಿತಿ 'd': ಹಿಂತಿರುಗಿ SEA_CHOICE_DELETE;
+	ಸ್ಥಿತಿ 'q': ಹಿಂತಿರುಗಿ SEA_CHOICE_QUIT;
+	ಸ್ಥಿತಿ 'a': ಹಿಂತಿರುಗಿ SEA_CHOICE_ABORT;
     }
 
-    return SEA_CHOICE_NONE;
+    ಹಿಂತಿರುಗಿ SEA_CHOICE_NONE;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Find out what name to use for the swap file for buffer 'buf'.
@@ -4997,37 +4997,37 @@ do_swapexists(buf_T *buf, char_u *fname)
  *	 not being able to open the swap or undo file
  * Note: May trigger SwapExists autocmd, pointers may change!
  */
-    static char_u *
+    ಸ್ಥಿರ char_u *
 findswapname(
     buf_T	*buf,
     char_u	**dirp,		// pointer to list of directories
     char_u	*old_fname)	// don't give warning for this file name
 {
     char_u	*fname;
-    int		n;
+    ಪೂರ್ಣಾಂಕ		n;
     char_u	*dir_name;
-#ifdef AMIGA
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ AMIGA
     BPTR	fh;
-#endif
-    int		r;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಪೂರ್ಣಾಂಕ		r;
     char_u	*buf_fname = buf->b_fname;
 
-#if !defined(UNIX)
+#ಆದರೆ !defined(UNIX)
 # define CREATE_DUMMY_FILE
-    FILE	*dummyfd = NULL;
+    FILE	*dummyfd = ಖಾಲಿ;
 
 # ifdef MSWIN
-    if (buf_fname != NULL && !mch_isFullName(buf_fname)
+    ಆದರೆ (buf_fname != ಖಾಲಿ && !mch_is_ತುಂಬಿದ_Name(buf_fname)
 				       && vim_strchr(gettail(buf_fname), ':'))
     {
 	char_u *t;
 
 	buf_fname = vim_strsave(buf_fname);
-	if (buf_fname == NULL)
+	ಆದರೆ (buf_fname == ಖಾಲಿ)
 	    buf_fname = buf->b_fname;
-	else
-	    for (t = gettail(buf_fname); *t != NUL; MB_PTR_ADV(t))
-		if (*t == ':')
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಗಾಗಿ (t = gettail(buf_fname); *t != NUL; MB_PTR_ADV(t))
+		ಆದರೆ (*t == ':')
 		    *t = '%';
     }
 # endif
@@ -5039,175 +5039,175 @@ findswapname(
      * this problem we temporarily create "test.doc".  Don't do this when the
      * check below for an 8.3 file name is used.
      */
-    if (!(buf->b_p_sn || buf->b_shortname) && buf_fname != NULL
+    ಆದರೆ (!(buf->b_p_sn || buf->b_shortname) && buf_fname != ಖಾಲಿ
 					     && mch_getperm(buf_fname) < 0)
-	dummyfd = mch_fopen((char *)buf_fname, "w");
-#endif
+	dummyfd = mch_fopen((ಅಕ್ಷರ *)buf_fname, "w");
+#ಆದರೆ_ಅಂತ್ಯ
 
     /*
      * Isolate a directory name from *dirp and put it in dir_name.
      * First allocate some memory to put the directory name in.
      */
     dir_name = alloc(STRLEN(*dirp) + 1);
-    if (dir_name == NULL)
-	*dirp = NULL;
-    else
-	(void)copy_option_part(dirp, dir_name, 31000, ",");
+    ಆದರೆ (dir_name == ಖಾಲಿ)
+	*dirp = ಖಾಲಿ;
+    ಇಲ್ಲದಿದ್ದರೆ
+	(ಶೂನ್ಯ)copy_option_part(dirp, dir_name, 31000, ",");
 
     /*
      * we try different names until we find one that does not exist yet
      */
-    if (dir_name == NULL)	    // out of memory
-	fname = NULL;
-    else
+    ಆದರೆ (dir_name == ಖಾಲಿ)	    // out of memory
+	fname = ಖಾಲಿ;
+    ಇಲ್ಲದಿದ್ದರೆ
 	fname = makeswapname(buf_fname, buf->b_ffname, buf, dir_name);
 
-    for (;;)
+    ಗಾಗಿ (;;)
     {
-	if (fname == NULL)	// must be out of memory
-	    break;
-	if ((n = (int)STRLEN(fname)) == 0)	// safety check
+	ಆದರೆ (fname == ಖಾಲಿ)	// must be out of memory
+	    ನಿಲ್ಲಿಸು;
+	ಆದರೆ ((n = (ಪೂರ್ಣಾಂಕ)STRLEN(fname)) == 0)	// safety check
 	{
 	    VIM_CLEAR(fname);
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
-#if defined(UNIX)
+#ಆದರೆ defined(UNIX)
 /*
  * Some systems have a MS-DOS compatible filesystem that use 8.3 character
  * file names. If this is the first try and the swap file name does not fit in
  * 8.3, detect if this is the case, set shortname and try again.
  */
-	if (fname[n - 2] == 'w' && fname[n - 1] == 'p'
+	ಆದರೆ (fname[n - 2] == 'w' && fname[n - 1] == 'p'
 					&& !(buf->b_p_sn || buf->b_shortname))
 	{
-	    char_u	    *tail;
+	    char_u	    *ಬಾಲ;
 	    char_u	    *fname2;
 	    stat_T	    s1, s2;
-	    int		    f1, f2;
-	    int		    created1 = FALSE, created2 = FALSE;
-	    int		    same = FALSE;
+	    ಪೂರ್ಣಾಂಕ		    f1, f2;
+	    ಪೂರ್ಣಾಂಕ		    created1 = FALSE, created2 = FALSE;
+	    ಪೂರ್ಣಾಂಕ		    same = FALSE;
 
 	    /*
 	     * Check if swapfile name does not fit in 8.3:
 	     * It either contains two dots, is longer than 8 chars, or starts
 	     * with a dot.
 	     */
-	    tail = gettail(buf_fname);
-	    if (       vim_strchr(tail, '.') != NULL
-		    || STRLEN(tail) > (size_t)8
+	    ಬಾಲ = gettail(buf_fname);
+	    ಆದರೆ (       vim_strchr(ಬಾಲ, '.') != ಖಾಲಿ
+		    || STRLEN(ಬಾಲ) > (size_t)8
 		    || *gettail(fname) == '.')
 	    {
 		fname2 = alloc(n + 2);
-		if (fname2 != NULL)
+		ಆದರೆ (fname2 != ಖಾಲಿ)
 		{
 		    STRCPY(fname2, fname);
 		    // if fname == "xx.xx.swp",	    fname2 = "xx.xx.swx"
 		    // if fname == ".xx.swp",	    fname2 = ".xx.swpx"
 		    // if fname == "123456789.swp", fname2 = "12345678x.swp"
-		    if (vim_strchr(tail, '.') != NULL)
+		    ಆದರೆ (vim_strchr(ಬಾಲ, '.') != ಖಾಲಿ)
 			fname2[n - 1] = 'x';
-		    else if (*gettail(fname) == '.')
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*gettail(fname) == '.')
 		    {
 			fname2[n] = 'x';
 			fname2[n + 1] = NUL;
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 			fname2[n - 5] += 1;
 		    /*
 		     * may need to create the files to be able to use mch_stat()
 		     */
-		    f1 = mch_open((char *)fname, O_RDONLY | O_EXTRA, 0);
-		    if (f1 < 0)
+		    f1 = mch_open((ಅಕ್ಷರ *)fname, O_RDONLY | O_EXTRA, 0);
+		    ಆದರೆ (f1 < 0)
 		    {
-			f1 = mch_open_rw((char *)fname,
+			f1 = mch_open_rw((ಅಕ್ಷರ *)fname,
 					       O_RDWR|O_CREAT|O_EXCL|O_EXTRA);
 			created1 = TRUE;
 		    }
-		    if (f1 >= 0)
+		    ಆದರೆ (f1 >= 0)
 		    {
-			f2 = mch_open((char *)fname2, O_RDONLY | O_EXTRA, 0);
-			if (f2 < 0)
+			f2 = mch_open((ಅಕ್ಷರ *)fname2, O_RDONLY | O_EXTRA, 0);
+			ಆದರೆ (f2 < 0)
 			{
-			    f2 = mch_open_rw((char *)fname2,
+			    f2 = mch_open_rw((ಅಕ್ಷರ *)fname2,
 					       O_RDWR|O_CREAT|O_EXCL|O_EXTRA);
 			    created2 = TRUE;
 			}
-			if (f2 >= 0)
+			ಆದರೆ (f2 >= 0)
 			{
 			    /*
 			     * Both files exist now. If mch_stat() returns the
 			     * same device and inode they are the same file.
 			     */
-			    if (mch_fstat(f1, &s1) != -1
+			    ಆದರೆ (mch_fstat(f1, &s1) != -1
 				    && mch_fstat(f2, &s2) != -1
 				    && s1.st_dev == s2.st_dev
 				    && s1.st_ino == s2.st_ino)
 				same = TRUE;
 			    close(f2);
-			    if (created2)
+			    ಆದರೆ (created2)
 				mch_remove(fname2);
 			}
 			close(f1);
-			if (created1)
+			ಆದರೆ (created1)
 			    mch_remove(fname);
 		    }
 		    vim_free(fname2);
-		    if (same)
+		    ಆದರೆ (same)
 		    {
 			buf->b_shortname = true;
 			vim_free(fname);
 			fname = makeswapname(buf_fname, buf->b_ffname,
 							       buf, dir_name);
-			continue;	// try again with b_shortname set
+			ಮುಂದುವರಿ;	// try again with b_shortname set
 		    }
 		}
 	    }
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	/*
 	 * check if the swapfile already exists
 	 */
-	if (mch_getperm(fname) < 0)	// it does not exist
+	ಆದರೆ (mch_getperm(fname) < 0)	// it does not exist
 	{
-#ifdef HAVE_LSTAT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_LSTAT
 	    stat_T	sb;
 
 	    /*
 	     * Extra security check: When a swap file is a symbolic link, this
 	     * is most likely a symlink attack.
 	     */
-	    if (mch_lstat((char *)fname, &sb) < 0)
-#else
+	    ಆದರೆ (mch_lstat((ಅಕ್ಷರ *)fname, &sb) < 0)
+#ಇಲ್ಲದಿದ್ದರೆ
 # ifdef AMIGA
-	    fh = Open((UBYTE *)fname, (long)MODE_NEWFILE);
+	    fh = Open((UBYTE *)fname, (ದೀರ್ಘ)ಬಹುಲಕ_NEWFILE);
 	    /*
 	     * on the Amiga mch_getperm() will return -1 when the file exists
 	     * but is being used by another program. This happens if you edit
 	     * a file twice.
 	     */
-	    if (fh != (BPTR)NULL)	// can open file, OK
+	    ಆದರೆ (fh != (BPTR)ಖಾಲಿ)	// can open file, OK
 	    {
 		Close(fh);
 		mch_remove(fname);
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	    if (IoErr() != ERROR_OBJECT_IN_USE
+	    ಆದರೆ (IoErr() != ERROR_OBJECT_ಒಳ_USE
 					    && IoErr() != ERROR_OBJECT_EXISTS)
 # endif
-#endif
-		break;
+#ಆದರೆ_ಅಂತ್ಯ
+		ನಿಲ್ಲಿಸು;
 	}
 
 	/*
 	 * A file name equal to old_fname is OK to use.
 	 */
-	if (old_fname != NULL && fnamecmp(fname, old_fname) == 0)
-	    break;
+	ಆದರೆ (old_fname != ಖಾಲಿ && fnamecmp(fname, old_fname) == 0)
+	    ನಿಲ್ಲಿಸು;
 
 	/*
 	 * get here when file already exists
 	 */
-	if (fname[n - 2] == 'w' && fname[n - 1] == 'p')	// first try
+	ಆದರೆ (fname[n - 2] == 'w' && fname[n - 1] == 'p')	// first try
 	{
 	    /*
 	     * on MS-DOS compatible filesystems (e.g. messydos) file.doc.swp
@@ -5217,18 +5217,18 @@ findswapname(
 	     * underscores for this file), and try again. If it doesn't we
 	     * assume that "file.doc.swp" already exists.
 	     */
-	    if (!(buf->b_p_sn || buf->b_shortname))	// not tried yet
+	    ಆದರೆ (!(buf->b_p_sn || buf->b_shortname))	// not tried yet
 	    {
 		fname[n - 1] = 'x';
 		r = mch_getperm(fname);		// try "file.swx"
 		fname[n - 1] = 'p';
-		if (r >= 0)		    // "file.swx" seems to exist
+		ಆದರೆ (r >= 0)		    // "file.swx" seems to exist
 		{
 		    buf->b_shortname = true;
 		    vim_free(fname);
 		    fname = makeswapname(buf_fname, buf->b_ffname,
 							       buf, dir_name);
-		    continue;	    // try again with '.' replaced with '_'
+		    ಮುಂದುವರಿ;	    // try again with '.' replaced with '_'
 		}
 	    }
 	    /*
@@ -5237,60 +5237,60 @@ findswapname(
 	     * viewing a help file or when the path of the file is different
 	     * (happens when all .swp files are in one directory).
 	     */
-	    if (!recoverymode && buf_fname != NULL
+	    ಆದರೆ (!recoverymode && buf_fname != ಖಾಲಿ
 				&& !buf->b_help
 				&& !(buf->b_flags & (BF_DUMMY | BF_NO_SEA)))
 	    {
-		int		fd;
-		struct block0	b0;
-		int		differ = FALSE;
+		ಪೂರ್ಣಾಂಕ		fd;
+		ರಚನೆ block0	b0;
+		ಪೂರ್ಣಾಂಕ		ವ್ಯತ್ಯಾಸ = FALSE;
 
 		/*
 		 * Try to read block 0 from the swap file to get the original
 		 * file name (and inode number).
 		 */
-		fd = mch_open((char *)fname, O_RDONLY | O_EXTRA, 0);
-		if (fd >= 0)
+		fd = mch_open((ಅಕ್ಷರ *)fname, O_RDONLY | O_EXTRA, 0);
+		ಆದರೆ (fd >= 0)
 		{
-		    if (read_eintr(fd, &b0, sizeof(b0)) == sizeof(b0))
+		    ಆದರೆ (read_eintr(fd, &b0, ಗಾತ್ರ(b0)) == ಗಾತ್ರ(b0))
 		    {
 			/*
 			 * If the swapfile has the same directory as the
 			 * buffer don't compare the directory names, they can
 			 * have a different mountpoint.
 			 */
-			if (b0.b0_flags & B0_SAME_DIR)
+			ಆದರೆ (b0.b0_flags & B0_SAME_DIR)
 			{
-			    if (fnamecmp(gettail(buf->b_ffname),
+			    ಆದರೆ (fnamecmp(gettail(buf->b_ffname),
 						   gettail(b0.b0_fname)) != 0
 				    || !same_directory(fname, buf->b_ffname))
 			    {
-#ifdef CHECK_INODE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ CHECK_INODE
 				// Symlinks may point to the same file even
 				// when the name differs, need to check the
 				// inode too.
 				expand_env(b0.b0_fname, NameBuff, MAXPATHL);
-				if (fnamecmp_ino(buf->b_ffname, NameBuff,
-						     char_to_long(b0.b0_ino)))
-#endif
-				    differ = TRUE;
+				ಆದರೆ (fnamecmp_ino(buf->b_ffname, NameBuff,
+						     char_ಗಮ್ಯ_long(b0.b0_ino)))
+#ಆದರೆ_ಅಂತ್ಯ
+				    ವ್ಯತ್ಯಾಸ = TRUE;
 			    }
 			}
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
 			    /*
 			     * The name in the swap file may be
 			     * "~user/path/file".  Expand it first.
 			     */
 			    expand_env(b0.b0_fname, NameBuff, MAXPATHL);
-#ifdef CHECK_INODE
-			    if (fnamecmp_ino(buf->b_ffname, NameBuff,
-						     char_to_long(b0.b0_ino)))
-				differ = TRUE;
-#else
-			    if (fnamecmp(NameBuff, buf->b_ffname) != 0)
-				differ = TRUE;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ CHECK_INODE
+			    ಆದರೆ (fnamecmp_ino(buf->b_ffname, NameBuff,
+						     char_ಗಮ್ಯ_long(b0.b0_ino)))
+				ವ್ಯತ್ಯಾಸ = TRUE;
+#ಇಲ್ಲದಿದ್ದರೆ
+			    ಆದರೆ (fnamecmp(NameBuff, buf->b_ffname) != 0)
+				ವ್ಯತ್ಯಾಸ = TRUE;
+#ಆದರೆ_ಅಂತ್ಯ
 			}
 		    }
 		    close(fd);
@@ -5298,72 +5298,72 @@ findswapname(
 
 		// give the ATTENTION message when there is an old swap file
 		// for the current file, and the buffer was not recovered.
-		if (differ == FALSE && !(curbuf->b_flags & BF_RECOVERED)
-			&& vim_strchr(p_shm, SHM_ATTENTION) == NULL)
+		ಆದರೆ (ವ್ಯತ್ಯಾಸ == FALSE && !(curbuf->b_flags & BF_RECOVERED)
+			&& vim_strchr(p_shm, SHM_ATTENTION) == ಖಾಲಿ)
 		{
 		    sea_choice_T choice = SEA_CHOICE_NONE;
 		    stat_T	 st;
-#ifdef CREATE_DUMMY_FILE
-		    int		 did_use_dummy = FALSE;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ CREATE_DUMMY_FILE
+		    ಪೂರ್ಣಾಂಕ		 did_use_dummy = FALSE;
 
 		    // Avoid getting a warning for the file being created
 		    // outside of Vim, it was created at the start of this
 		    // function.  Delete the file now, because Vim might exit
 		    // here if the window is closed.
-		    if (dummyfd != NULL)
+		    ಆದರೆ (dummyfd != ಖಾಲಿ)
 		    {
 			fclose(dummyfd);
-			dummyfd = NULL;
+			dummyfd = ಖಾಲಿ;
 			mch_remove(buf_fname);
 			did_use_dummy = TRUE;
 		    }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef HAVE_PROCESS_STILL_RUNNING
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_PROCESS_STILL_RUNNING
 		    process_still_running = FALSE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		    // It's safe to delete the swap file if all these are true:
 		    // - the edited file exists
 		    // - the swap file has no changes and looks OK
-		    if (mch_stat((char *)buf->b_fname, &st) == 0
+		    ಆದರೆ (mch_stat((ಅಕ್ಷರ *)buf->b_fname, &st) == 0
 						  && swapfile_unchanged(fname))
 		    {
 			choice = SEA_CHOICE_DELETE;
-			if (p_verbose > 0)
-			    verb_msg(_("Found a swap file that is not useful, deleting it"));
+			ಆದರೆ (p_verbose > 0)
+			    verb_ಸಂದೇಶ(_("Found a swap file that is not useful, deleting it"));
 		    }
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 		    /*
 		     * If there is an SwapExists autocommand and we can handle
 		     * the response, trigger it.  It may return 0 to ask the
 		     * user anyway.
 		     */
-		    if (choice == SEA_CHOICE_NONE
-			    && swap_exists_action != SEA_NONE
+		    ಆದರೆ (choice == SEA_CHOICE_NONE
+			    && ಅದಲುಬದಲು_exists_action != SEA_NONE
 			    && has_autocmd(EVENT_SWAPEXISTS, buf_fname, buf))
 			choice = do_swapexists(buf, fname);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-		    if (choice == SEA_CHOICE_NONE
-					 && swap_exists_action == SEA_READONLY)
+		    ಆದರೆ (choice == SEA_CHOICE_NONE
+					 && ಅದಲುಬದಲು_exists_action == SEA_READONLY)
 		    {
 			// always open readonly.
 			choice = SEA_CHOICE_READONLY;
 		    }
 
-		    if (choice == SEA_CHOICE_NONE)
+		    ಆದರೆ (choice == SEA_CHOICE_NONE)
 		    {
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 			// If we are supposed to start the GUI but it wasn't
 			// completely started yet, start it now.  This makes
 			// the messages displayed in the Vim window when
 			// loading a session from the .gvimrc file.
-			if (gui.starting && !gui.in_use)
-			    gui_start(NULL);
-#endif
+			ಆದರೆ (gui.starting && !gui.ಒಳ_use)
+			    gui_ಆರಂಭ(ಖಾಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ
 			// Show info about the existing swap file.
-			attention_message(buf, fname);
+			attention_ಸಂದೇಶ(buf, fname);
 
 			// We don't want a 'q' typed at the more-prompt
 			// interrupt loading a file.
@@ -5374,93 +5374,93 @@ findswapname(
 			flush_buffers(FLUSH_TYPEAHEAD);
 		    }
 
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-		    if (swap_exists_action != SEA_NONE
+#ಆದರೆ defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+		    ಆದರೆ (ಅದಲುಬದಲು_exists_action != SEA_NONE
 						  && choice == SEA_CHOICE_NONE)
 		    {
-			string_T    prefix = {(char_u *)_("Swap file \""), 0};
+			string_T    ಪೂರ್ವಪ್ರತ್ಯಯ = {(char_u *)_("Swap file \""), 0};
 			string_T    suffix = {(char_u *)_("\" already exists!"), 0};
-			size_t	    message_size;
-			string_T    message;
+			size_t	    ಸಂದೇಶ_ಗಾತ್ರ;
+			string_T    ಸಂದೇಶ_2;
 			char_u	    *tofree;
-			int	    dialog_result;
+			ಪೂರ್ಣಾಂಕ	    dialog_ಫಲಿತಾಂಶ;
 
-			prefix.length = STRLEN(prefix.string);
-			suffix.length = STRLEN(suffix.string);
-			message_size = prefix.length
+			ಪೂರ್ವಪ್ರತ್ಯಯ.ಉದ್ದಳತೆ = STRLEN(ಪೂರ್ವಪ್ರತ್ಯಯ.string);
+			suffix.ಉದ್ದಳತೆ = STRLEN(suffix.string);
+			ಸಂದೇಶ_ಗಾತ್ರ = ಪೂರ್ವಪ್ರತ್ಯಯ.ಉದ್ದಳತೆ
 				+ STRLEN(fname)
-				+ suffix.length + 5;
-			message.string = tofree = alloc(message_size);
-			if (message.string != NULL)
+				+ suffix.ಉದ್ದಳತೆ + 5;
+			ಸಂದೇಶ_2.string = tofree = alloc(ಸಂದೇಶ_ಗಾತ್ರ);
+			ಆದರೆ (ಸಂದೇಶ_2.string != ಖಾಲಿ)
 			{
-			    STRCPY(message.string, prefix.string);
-			    message.length = prefix.length;
-			    message.length += home_replace(NULL, fname,
-				message.string + message.length, (int)(message_size - message.length), TRUE);
-			    STRCPY(message.string + message.length, suffix.string);
+			    STRCPY(ಸಂದೇಶ_2.string, ಪೂರ್ವಪ್ರತ್ಯಯ.string);
+			    ಸಂದೇಶ_2.ಉದ್ದಳತೆ = ಪೂರ್ವಪ್ರತ್ಯಯ.ಉದ್ದಳತೆ;
+			    ಸಂದೇಶ_2.ಉದ್ದಳತೆ += home_replace(ಖಾಲಿ, fname,
+				ಸಂದೇಶ_2.string + ಸಂದೇಶ_2.ಉದ್ದಳತೆ, (ಪೂರ್ಣಾಂಕ)(ಸಂದೇಶ_ಗಾತ್ರ - ಸಂದೇಶ_2.ಉದ್ದಳತೆ), TRUE);
+			    STRCPY(ಸಂದೇಶ_2.string + ಸಂದೇಶ_2.ಉದ್ದಳತೆ, suffix.string);
 			}
-			else
-			    message.string = (char_u *)_("Swap file already exists!");
-			dialog_result = do_dialog(VIM_WARNING,
+			ಇಲ್ಲದಿದ್ದರೆ
+			    ಸಂದೇಶ_2.string = (char_u *)_("Swap file already exists!");
+			dialog_ಫಲಿತಾಂಶ = do_dialog(VIM_WARNING,
 				    (char_u *)_("VIM - ATTENTION"),
-				    message.string,
+				    ಸಂದೇಶ_2.string,
 # ifdef HAVE_PROCESS_STILL_RUNNING
 				    process_still_running
 					? (char_u *)_("&Open Read-Only\n&Edit anyway\n&Recover\n&Quit\n&Abort") :
 # endif
-					(char_u *)_("&Open Read-Only\n&Edit anyway\n&Recover\n&Delete it\n&Quit\n&Abort"), 1, NULL, FALSE);
+					(char_u *)_("&Open Read-Only\n&Edit anyway\n&Recover\n&Delete it\n&Quit\n&Abort"), 1, ಖಾಲಿ, FALSE);
 
 # ifdef HAVE_PROCESS_STILL_RUNNING
-			if (process_still_running && dialog_result >= 4)
+			ಆದರೆ (process_still_running && dialog_ಫಲಿತಾಂಶ >= 4)
 			    // compensate for missing "Delete it" button
-			    dialog_result++;
+			    dialog_ಫಲಿತಾಂಶ++;
 # endif
-			choice = dialog_result;
+			choice = dialog_ಫಲಿತಾಂಶ;
 			vim_free(tofree);
 
 			// pretend screen didn't scroll, need redraw anyway
-			msg_scrolled = 0;
+			ಸಂದೇಶ_scrolled = 0;
 			redraw_all_later(UPD_NOT_VALID);
 		    }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-		    switch (choice)
+		    ಆಯ್ಕೆ (choice)
 		    {
-			case SEA_CHOICE_READONLY:
+			ಸ್ಥಿತಿ SEA_CHOICE_READONLY:
 			    buf->b_p_ro = TRUE;
-			    break;
-			case SEA_CHOICE_EDIT:
-			    break;
-			case SEA_CHOICE_RECOVER:
-			    swap_exists_action = SEA_RECOVER;
-			    break;
-			case SEA_CHOICE_DELETE:
+			    ನಿಲ್ಲಿಸು;
+			ಸ್ಥಿತಿ SEA_CHOICE_EDIT:
+			    ನಿಲ್ಲಿಸು;
+			ಸ್ಥಿತಿ SEA_CHOICE_RECOVER:
+			    ಅದಲುಬದಲು_exists_action = SEA_RECOVER;
+			    ನಿಲ್ಲಿಸು;
+			ಸ್ಥಿತಿ SEA_CHOICE_DELETE:
 			    mch_remove(fname);
-			    break;
-			case SEA_CHOICE_QUIT:
-			    swap_exists_action = SEA_QUIT;
-			    break;
-			case SEA_CHOICE_ABORT:
-			    swap_exists_action = SEA_QUIT;
+			    ನಿಲ್ಲಿಸು;
+			ಸ್ಥಿತಿ SEA_CHOICE_QUIT:
+			    ಅದಲುಬದಲು_exists_action = SEA_QUIT;
+			    ನಿಲ್ಲಿಸು;
+			ಸ್ಥಿತಿ SEA_CHOICE_ABORT:
+			    ಅದಲುಬದಲು_exists_action = SEA_QUIT;
 			    got_int = TRUE;
-			    break;
-			case SEA_CHOICE_NONE:
-			    msg_puts("\n");
-			    if (msg_silent == 0)
+			    ನಿಲ್ಲಿಸು;
+			ಸ್ಥಿತಿ SEA_CHOICE_NONE:
+			    ಸಂದೇಶ_puts("\n");
+			    ಆದರೆ (ಸಂದೇಶ_silent == 0)
 				// call wait_return() later
 				need_wait_return = TRUE;
-			    break;
+			    ನಿಲ್ಲಿಸು;
 		    }
 
 		    // If the file was deleted this fname can be used.
-		    if (choice != SEA_CHOICE_NONE && mch_getperm(fname) < 0)
-			break;
+		    ಆದರೆ (choice != SEA_CHOICE_NONE && mch_getperm(fname) < 0)
+			ನಿಲ್ಲಿಸು;
 
-#ifdef CREATE_DUMMY_FILE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ CREATE_DUMMY_FILE
 		    // Going to try another name, need the dummy file again.
-		    if (did_use_dummy)
-			dummyfd = mch_fopen((char *)buf_fname, "w");
-#endif
+		    ಆದರೆ (did_use_dummy)
+			dummyfd = mch_fopen((ಅಕ್ಷರ *)buf_fname, "w");
+#ಆದರೆ_ಅಂತ್ಯ
 		}
 	    }
 	}
@@ -5471,13 +5471,13 @@ findswapname(
 	 * If that still isn't enough decrement the last but one char: ".svz"
 	 * Can happen when editing many "No Name" buffers.
 	 */
-	if (fname[n - 1] == 'a')	// ".s?a"
+	ಆದರೆ (fname[n - 1] == 'a')	// ".s?a"
 	{
-	    if (fname[n - 2] == 'a')    // ".saa": tried enough, give up
+	    ಆದರೆ (fname[n - 2] == 'a')    // ".saa": tried enough, give up
 	    {
-		emsg(_(e_too_many_swap_files_found));
+		emsg(_(e_too_many_ಅದಲುಬದಲು_files_ಸಿಕ್ಕಿತು));
 		VIM_CLEAR(fname);
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	    --fname[n - 2];		// ".svz", ".suz", etc.
 	    fname[n - 1] = 'z' + 1;
@@ -5486,30 +5486,30 @@ findswapname(
     }
 
     vim_free(dir_name);
-#ifdef CREATE_DUMMY_FILE
-    if (dummyfd != NULL)	// file has been created temporarily
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ CREATE_DUMMY_FILE
+    ಆದರೆ (dummyfd != ಖಾಲಿ)	// file has been created temporarily
     {
 	fclose(dummyfd);
 	mch_remove(buf_fname);
     }
-#endif
-#ifdef MSWIN
-    if (buf_fname != buf->b_fname)
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
+    ಆದರೆ (buf_fname != buf->b_fname)
 	vim_free(buf_fname);
-#endif
-    return fname;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ fname;
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 b0_magic_wrong(ZERO_BL *b0p)
 {
-    return (b0p->b0_magic_long != (long)B0_MAGIC_LONG
-	    || b0p->b0_magic_int != (int)B0_MAGIC_INT
-	    || b0p->b0_magic_short != (short)B0_MAGIC_SHORT
+    ಹಿಂತಿರುಗಿ (b0p->b0_magic_long != (ದೀರ್ಘ)B0_MAGIC_LONG
+	    || b0p->b0_magic_int != (ಪೂರ್ಣಾಂಕ)B0_MAGIC_INT
+	    || b0p->b0_magic_short != (ಗಿಡ್ಡ)B0_MAGIC_SHORT
 	    || b0p->b0_magic_char != B0_MAGIC_CHAR);
 }
 
-#ifdef CHECK_INODE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ CHECK_INODE
 /*
  * Compare current file name with file name from swap file.
  * Try to use inode numbers when possible.
@@ -5559,21 +5559,21 @@ b0_magic_wrong(ZERO_BL *b0p)
  * versions.
  */
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 fnamecmp_ino(
     char_u	*fname_c,	    // current file name
     char_u	*fname_s,	    // file name from swap file
-    long	ino_block0)
+    ದೀರ್ಘ	ino_block0)
 {
     stat_T	st;
     ino_t	ino_c = 0;	    // ino of current file
     ino_t	ino_s;		    // ino of file from swap file
     char_u	buf_c[MAXPATHL];    // full path of fname_c
     char_u	buf_s[MAXPATHL];    // full path of fname_s
-    int		retval_c;	    // flag: buf_c valid
-    int		retval_s;	    // flag: buf_s valid
+    ಪೂರ್ಣಾಂಕ		retval_c;	    // flag: buf_c valid
+    ಪೂರ್ಣಾಂಕ		retval_s;	    // flag: buf_s valid
 
-    if (mch_stat((char *)fname_c, &st) == 0)
+    ಆದರೆ (mch_stat((ಅಕ್ಷರ *)fname_c, &st) == 0)
 	ino_c = (ino_t)st.st_ino;
 
     /*
@@ -5581,54 +5581,54 @@ fnamecmp_ino(
      * the swap file may be outdated.  If that fails (e.g. this path is not
      * valid on this machine), use the inode from block 0.
      */
-    if (mch_stat((char *)fname_s, &st) == 0)
+    ಆದರೆ (mch_stat((ಅಕ್ಷರ *)fname_s, &st) == 0)
 	ino_s = (ino_t)st.st_ino;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	ino_s = (ino_t)ino_block0;
 
-    if (ino_c && ino_s)
-	return (ino_c != ino_s);
+    ಆದರೆ (ino_c && ino_s)
+	ಹಿಂತಿರುಗಿ (ino_c != ino_s);
 
     /*
      * One of the inode numbers is unknown, try a forced vim_FullName() and
      * compare the file names.
      */
-    retval_c = vim_FullName(fname_c, buf_c, MAXPATHL, TRUE);
-    retval_s = vim_FullName(fname_s, buf_s, MAXPATHL, TRUE);
-    if (retval_c == OK && retval_s == OK)
-	return STRCMP(buf_c, buf_s) != 0;
+    retval_c = vim_ತುಂಬಿದ_Name(fname_c, buf_c, MAXPATHL, TRUE);
+    retval_s = vim_ತುಂಬಿದ_Name(fname_s, buf_s, MAXPATHL, TRUE);
+    ಆದರೆ (retval_c == OK && retval_s == OK)
+	ಹಿಂತಿರುಗಿ STRCMP(buf_c, buf_s) != 0;
 
     /*
      * Can't compare inodes or file names, guess that the files are different,
      * unless both appear not to exist at all, then compare with the file name
      * in the swap file.
      */
-    if (ino_s == 0 && ino_c == 0 && retval_c == FAIL && retval_s == FAIL)
-	return STRCMP(fname_c, fname_s) != 0;
-    return TRUE;
+    ಆದರೆ (ino_s == 0 && ino_c == 0 && retval_c == FAIL && retval_s == FAIL)
+	ಹಿಂತಿರುಗಿ STRCMP(fname_c, fname_s) != 0;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
-#endif // CHECK_INODE
+#ಆದರೆ_ಅಂತ್ಯ // CHECK_INODE
 
 /*
  * Move a long integer into a four byte character array.
  * Used for machine independency in block zero.
  */
-    static void
-long_to_char(long n, char_u *s)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+long_ಗಮ್ಯ_char(ದೀರ್ಘ n, char_u *s)
 {
     s[0] = (char_u)(n & 0xff);
-    n = (unsigned)n >> 8;
+    n = (ಚಿಹ್ನೆರಹಿತ)n >> 8;
     s[1] = (char_u)(n & 0xff);
-    n = (unsigned)n >> 8;
+    n = (ಚಿಹ್ನೆರಹಿತ)n >> 8;
     s[2] = (char_u)(n & 0xff);
-    n = (unsigned)n >> 8;
+    n = (ಚಿಹ್ನೆರಹಿತ)n >> 8;
     s[3] = (char_u)(n & 0xff);
 }
 
-    static long
-char_to_long(char_u *s)
+    ಸ್ಥಿರ ದೀರ್ಘ
+char_ಗಮ್ಯ_long(char_u *s)
 {
-    long    retval;
+    ದೀರ್ಘ    retval;
 
     retval = s[3];
     retval <<= 8;
@@ -5638,7 +5638,7 @@ char_to_long(char_u *s)
     retval <<= 8;
     retval |= s[0];
 
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
 /*
@@ -5647,115 +5647,115 @@ char_to_long(char_u *s)
  * - 'fileformat'
  * - 'fileencoding'
  */
-    void
+    ಶೂನ್ಯ
 ml_setflags(buf_T *buf)
 {
     bhdr_T	*hp;
     ZERO_BL	*b0p;
 
-    if (!buf->b_ml.ml_mfp)
-	return;
-    for (hp = buf->b_ml.ml_mfp->mf_used_last; hp != NULL; hp = hp->bh_prev)
+    ಆದರೆ (!buf->b_ml.ml_mfp)
+	ಹಿಂತಿರುಗಿ;
+    ಗಾಗಿ (hp = buf->b_ml.ml_mfp->mf_ಬಳಸಿದ_ಕೊನೆಯ; hp != ಖಾಲಿ; hp = hp->bh_prev)
     {
-	if (hp->bh_bnum == 0)
+	ಆದರೆ (hp->bh_bnum == 0)
 	{
-	    b0p = (ZERO_BL *)(hp->bh_data);
-	    b0p->b0_dirty = buf->b_changed ? B0_DIRTY : 0;
-	    b0p->b0_flags = (b0p->b0_flags & ~B0_FF_MASK)
+	    b0p = (ZERO_BL *)(hp->bh_ದತ್ತಾಂಶ);
+	    b0p->b0_dirty = buf->b_ಬದಲಾಯಿತು ? B0_DIRTY : 0;
+	    b0p->b0_flags = (b0p->b0_flags & ~B0_FF_ಮುಖವಾಡ)
 						  | (get_fileformat(buf) + 1);
-	    add_b0_fenc(b0p, buf);
+	    ಕೂಡಿಸು_b0_fenc(b0p, buf);
 	    hp->bh_flags |= BH_DIRTY;
 	    mf_sync(buf->b_ml.ml_mfp, MFS_ZERO);
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
     }
 }
 
-#if defined(FEAT_CRYPT)
+#ಆದರೆ defined(FEAT_CRYPT)
 /*
  * If "data" points to a data block encrypt the text in it and return a copy
  * in allocated memory.  Return NULL when out of memory.
  * Otherwise return "data".
  */
     char_u *
-ml_encrypt_data(
+ml_encrypt_ದತ್ತಾಂಶ(
     memfile_T	*mfp,
-    char_u	*data,
-    off_T	offset,
-    unsigned	size)
+    char_u	*ದತ್ತಾಂಶ,
+    off_T	ಸ್ಥಾನಾಂತರ,
+    ಚಿಹ್ನೆರಹಿತ	ಗಾತ್ರ_2)
 {
-    DATA_BL	*dp = (DATA_BL *)data;
-    char_u	*head_end;
-    char_u	*text_start;
-    char_u	*new_data;
-    int		text_len;
+    ದತ್ತಾಂಶ_BL	*dp = (ದತ್ತಾಂಶ_BL *)ದತ್ತಾಂಶ;
+    char_u	*ತಲೆ_ಕೊನೆ;
+    char_u	*ಪಠ್ಯ_ಆರಂಭ;
+    char_u	*new_ದತ್ತಾಂಶ;
+    ಪೂರ್ಣಾಂಕ		ಪಠ್ಯ_len;
     cryptstate_T *state;
 
-    if (dp->db_id != DATA_ID)
-	return data;
+    ಆದರೆ (dp->db_id != ದತ್ತಾಂಶ_ID)
+	ಹಿಂತಿರುಗಿ ದತ್ತಾಂಶ;
 
-    state = ml_crypt_prepare(mfp, offset, FALSE);
-    if (state == NULL)
-	return data;
+    state = ml_crypt_prepare(mfp, ಸ್ಥಾನಾಂತರ, FALSE);
+    ಆದರೆ (state == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ದತ್ತಾಂಶ;
 
-    new_data = alloc(size);
-    if (new_data == NULL)
+    new_ದತ್ತಾಂಶ = alloc(ಗಾತ್ರ_2);
+    ಆದರೆ (new_ದತ್ತಾಂಶ == ಖಾಲಿ)
     {
 	crypt_free_state(state);
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
-    head_end = (char_u *)(&dp->db_index[dp->db_line_count]);
-    text_start = (char_u *)dp + dp->db_txt_start;
-    text_len = size - dp->db_txt_start;
+    ತಲೆ_ಕೊನೆ = (char_u *)(&dp->db_ಸೂಚ್ಯಂಕ[dp->db_ಸಾಲು_ಎಣಿಕೆ]);
+    ಪಠ್ಯ_ಆರಂಭ = (char_u *)dp + dp->db_txt_ಆರಂಭ;
+    ಪಠ್ಯ_len = ಗಾತ್ರ_2 - dp->db_txt_ಆರಂಭ;
 
     // Copy the header and the text.
-    mch_memmove(new_data, dp, head_end - (char_u *)dp);
+    mch_memmove(new_ದತ್ತಾಂಶ, dp, ತಲೆ_ಕೊನೆ - (char_u *)dp);
 
     // Encrypt the text.
-    crypt_encode(state, text_start, text_len, new_data + dp->db_txt_start,
+    crypt_encode(state, ಪಠ್ಯ_ಆರಂಭ, ಪಠ್ಯ_len, new_ದತ್ತಾಂಶ + dp->db_txt_ಆರಂಭ,
 									FALSE);
     crypt_free_state(state);
 
     // Clear the gap.
-    if (head_end < text_start)
-	vim_memset(new_data + (head_end - data), 0, text_start - head_end);
+    ಆದರೆ (ತಲೆ_ಕೊನೆ < ಪಠ್ಯ_ಆರಂಭ)
+	vim_memset(new_ದತ್ತಾಂಶ + (ತಲೆ_ಕೊನೆ - ದತ್ತಾಂಶ), 0, ಪಠ್ಯ_ಆರಂಭ - ತಲೆ_ಕೊನೆ);
 
-    return new_data;
+    ಹಿಂತಿರುಗಿ new_ದತ್ತಾಂಶ;
 }
 
 /*
  * Decrypt the text in "data" if it points to an encrypted data block.
  */
-    void
-ml_decrypt_data(
+    ಶೂನ್ಯ
+ml_decrypt_ದತ್ತಾಂಶ(
     memfile_T	*mfp,
-    char_u	*data,
-    off_T	offset,
-    unsigned	size)
+    char_u	*ದತ್ತಾಂಶ,
+    off_T	ಸ್ಥಾನಾಂತರ,
+    ಚಿಹ್ನೆರಹಿತ	ಗಾತ್ರ_2)
 {
-    DATA_BL	*dp = (DATA_BL *)data;
-    char_u	*head_end;
-    char_u	*text_start;
-    int		text_len;
+    ದತ್ತಾಂಶ_BL	*dp = (ದತ್ತಾಂಶ_BL *)ದತ್ತಾಂಶ;
+    char_u	*ತಲೆ_ಕೊನೆ;
+    char_u	*ಪಠ್ಯ_ಆರಂಭ;
+    ಪೂರ್ಣಾಂಕ		ಪಠ್ಯ_len;
     cryptstate_T *state;
 
-    if (dp->db_id != DATA_ID)
-	return;
+    ಆದರೆ (dp->db_id != ದತ್ತಾಂಶ_ID)
+	ಹಿಂತಿರುಗಿ;
 
-    head_end = (char_u *)(&dp->db_index[dp->db_line_count]);
-    text_start = (char_u *)dp + dp->db_txt_start;
-    text_len = dp->db_txt_end - dp->db_txt_start;
+    ತಲೆ_ಕೊನೆ = (char_u *)(&dp->db_ಸೂಚ್ಯಂಕ[dp->db_ಸಾಲು_ಎಣಿಕೆ]);
+    ಪಠ್ಯ_ಆರಂಭ = (char_u *)dp + dp->db_txt_ಆರಂಭ;
+    ಪಠ್ಯ_len = dp->db_txt_ಕೊನೆ - dp->db_txt_ಆರಂಭ;
 
-    if (head_end > text_start || dp->db_txt_start > size
-	    || dp->db_txt_end > size)
-	return;  // data was messed up
+    ಆದರೆ (ತಲೆ_ಕೊನೆ > ಪಠ್ಯ_ಆರಂಭ || dp->db_txt_ಆರಂಭ > ಗಾತ್ರ_2
+	    || dp->db_txt_ಕೊನೆ > ಗಾತ್ರ_2)
+	ಹಿಂತಿರುಗಿ;  // data was messed up
 
-    state = ml_crypt_prepare(mfp, offset, TRUE);
-    if (state == NULL)
-	return;
+    state = ml_crypt_prepare(mfp, ಸ್ಥಾನಾಂತರ, TRUE);
+    ಆದರೆ (state == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     // Decrypt the text in place.
-    crypt_decode_inplace(state, text_start, text_len, FALSE);
+    crypt_decode_inplace(state, ಪಠ್ಯ_ಆರಂಭ, ಪಠ್ಯ_len, FALSE);
     crypt_free_state(state);
 }
 
@@ -5764,65 +5764,65 @@ ml_decrypt_data(
  * Return an allocated cryptstate_T *.
  * Note: Encryption not supported for SODIUM
  */
-    static cryptstate_T *
-ml_crypt_prepare(memfile_T *mfp, off_T offset, int reading)
+    ಸ್ಥಿರ cryptstate_T *
+ml_crypt_prepare(memfile_T *mfp, off_T ಸ್ಥಾನಾಂತರ, ಪೂರ್ಣಾಂಕ reading)
 {
-    buf_T	*buf = mfp->mf_buffer;
+    buf_T	*buf = mfp->mf_ಬಫರ್;
     char_u	salt[50];
-    int		method_nr;
-    char_u	*key;
+    ಪೂರ್ಣಾಂಕ		ವಿಧಾನ_nr;
+    char_u	*ಕೀಲಿ;
     crypt_arg_T arg;
 
-    CLEAR_FIELD(arg);
-    if (reading && mfp->mf_old_key != NULL)
+    CLEAR_ಕ್ಷೇತ್ರ(arg);
+    ಆದರೆ (reading && mfp->mf_old_ಕೀಲಿ != ಖಾಲಿ)
     {
 	// Reading back blocks with the previous key/method/seed.
-	method_nr = mfp->mf_old_cm;
-	key = mfp->mf_old_key;
-	arg.cat_seed = mfp->mf_old_seed;
+	ವಿಧಾನ_nr = mfp->mf_old_cm;
+	ಕೀಲಿ = mfp->mf_old_ಕೀಲಿ;
+	arg.cat_ಬೀಜ = mfp->mf_old_ಬೀಜ;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	method_nr = crypt_get_method_nr(buf);
-	key = buf->b_p_key;
-	arg.cat_seed = mfp->mf_seed;
+	ವಿಧಾನ_nr = crypt_get_ವಿಧಾನ_nr(buf);
+	ಕೀಲಿ = buf->b_p_ಕೀಲಿ;
+	arg.cat_ಬೀಜ = mfp->mf_ಬೀಜ;
     }
 
-    if (*key == NUL)
-	return NULL;
+    ಆದರೆ (*ಕೀಲಿ == NUL)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (crypt_may_close_swapfile(buf, key, method_nr))
-	return NULL;
+    ಆದರೆ (crypt_may_close_swapfile(buf, ಕೀಲಿ, ವಿಧಾನ_nr))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (method_nr == CRYPT_M_ZIP)
+    ಆದರೆ (ವಿಧಾನ_nr == CRYPT_M_ZIP)
     {
 	// For PKzip: Append the offset to the key, so that we use a different
 	// key for every block.
-	vim_snprintf((char *)salt, sizeof(salt), "%s%ld", key, (long)offset);
-	arg.cat_seed = NULL;
+	vim_snprintf((ಅಕ್ಷರ *)salt, ಗಾತ್ರ(salt), "%s%ld", ಕೀಲಿ, (ದೀರ್ಘ)ಸ್ಥಾನಾಂತರ);
+	arg.cat_ಬೀಜ = ಖಾಲಿ;
 	arg.cat_init_from_file = FALSE;
 
-	return crypt_create(method_nr, salt, &arg);
+	ಹಿಂತಿರುಗಿ crypt_create(ವಿಧಾನ_nr, salt, &arg);
     }
 
     // Using blowfish or better: add salt and seed. We use the byte offset
     // of the block for the salt.
-    vim_snprintf((char *)salt, sizeof(salt), "%ld", (long)offset);
+    vim_snprintf((ಅಕ್ಷರ *)salt, ಗಾತ್ರ(salt), "%ld", (ದೀರ್ಘ)ಸ್ಥಾನಾಂತರ);
 
     arg.cat_salt = salt;
-    arg.cat_salt_len = (int)STRLEN(salt);
-    arg.cat_seed_len = MF_SEED_LEN;
-    arg.cat_add_len = 0;
-    arg.cat_add = NULL;
+    arg.cat_salt_len = (ಪೂರ್ಣಾಂಕ)STRLEN(salt);
+    arg.cat_ಬೀಜ_len = MF_ಬೀಜ_LEN;
+    arg.cat_ಕೂಡಿಸು_len = 0;
+    arg.cat_ಕೂಡಿಸು = ಖಾಲಿ;
     arg.cat_init_from_file = FALSE;
 
-    return crypt_create(method_nr, key, &arg);
+    ಹಿಂತಿರುಗಿ crypt_create(ವಿಧಾನ_nr, ಕೀಲಿ, &arg);
 }
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 
-#if defined(FEAT_BYTEOFF)
+#ಆದರೆ defined(FEAT_BYTEOFF)
 
 # define MLCS_MAXL 800	// max no of lines in chunk
 # define MLCS_MINL 400   // should be half of MLCS_MAXL
@@ -5834,52 +5834,52 @@ ml_crypt_prepare(memfile_T *mfp, off_T offset, int reading)
  * ML_CHNK_DELLINE: Subtract len from parent chunk, possibly deleting it
  * ML_CHNK_UPDLINE: Add len to parent chunk, as a signed entity.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ml_updatechunk(
     buf_T	*buf,
-    linenr_T	line,
-    long	len,
-    int		updtype)
+    linenr_T	ಸಾಲು,
+    ದೀರ್ಘ	len,
+    ಪೂರ್ಣಾಂಕ		updtype)
 {
-    static buf_T	*ml_upd_lastbuf = NULL;
-    static linenr_T	ml_upd_lastcurline;
-    static int		ml_upd_lastcurix;
+    ಸ್ಥಿರ buf_T	*ml_upd_lastbuf = ಖಾಲಿ;
+    ಸ್ಥಿರ linenr_T	ml_upd_lastcurline;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ		ml_upd_lastcurix;
 
     linenr_T		curline = ml_upd_lastcurline;
-    int			curix = ml_upd_lastcurix;
-    long		size;
+    ಪೂರ್ಣಾಂಕ			curix = ml_upd_lastcurix;
+    ದೀರ್ಘ		ಗಾತ್ರ_2;
     chunksize_T		*curchnk;
-    int			rest;
+    ಪೂರ್ಣಾಂಕ			rest;
     bhdr_T		*hp;
-    DATA_BL		*dp;
+    ದತ್ತಾಂಶ_BL		*dp;
 
-    if (buf->b_ml.ml_usedchunks == -1 || len == 0)
-	return;
-    if (buf->b_ml.ml_chunksize == NULL)
+    ಆದರೆ (buf->b_ml.ml_usedchunks == -1 || len == 0)
+	ಹಿಂತಿರುಗಿ;
+    ಆದರೆ (buf->b_ml.ml_chunksize == ಖಾಲಿ)
     {
 	buf->b_ml.ml_chunksize = ALLOC_MULT(chunksize_T, 100);
-	if (buf->b_ml.ml_chunksize == NULL)
+	ಆದರೆ (buf->b_ml.ml_chunksize == ಖಾಲಿ)
 	{
 	    buf->b_ml.ml_usedchunks = -1;
-	    return;
+	    ಹಿಂತಿರುಗಿ;
 	}
 	buf->b_ml.ml_numchunks = 100;
 	buf->b_ml.ml_usedchunks = 1;
 	buf->b_ml.ml_chunksize[0].mlcs_numlines = 1;
 	buf->b_ml.ml_chunksize[0].mlcs_totalsize = 1;
-	ml_upd_lastbuf = NULL;		// invalidate resume cache
+	ml_upd_lastbuf = ಖಾಲಿ;		// invalidate resume cache
     }
 
-    if (updtype == ML_CHNK_UPDLINE && buf->b_ml.ml_line_count == 1)
+    ಆದರೆ (updtype == ML_CHNK_UPDLINE && buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ == 1)
     {
 	/*
 	 * First line in empty buffer from ml_flush_line() -- reset
 	 */
 	buf->b_ml.ml_usedchunks = 1;
 	buf->b_ml.ml_chunksize[0].mlcs_numlines = 1;
-	buf->b_ml.ml_chunksize[0].mlcs_totalsize = (long)buf->b_ml.ml_line_len;
-	ml_upd_lastbuf = NULL;		// invalidate resume cache
-	return;
+	buf->b_ml.ml_chunksize[0].mlcs_totalsize = (ದೀರ್ಘ)buf->b_ml.ml_ಸಾಲು_len;
+	ml_upd_lastbuf = ಖಾಲಿ;		// invalidate resume cache
+	ಹಿಂತಿರುಗಿ;
     }
 
     /*
@@ -5888,116 +5888,116 @@ ml_updatechunk(
      * The scan resumes at the cached chunk while ml_upd_lastbuf is set: the
      * chunks have not moved since the last call.
      */
-    if (buf != ml_upd_lastbuf || line < curline)
+    ಆದರೆ (buf != ml_upd_lastbuf || ಸಾಲು < curline)
     {
 	curline = 1;
 	curix = 0;
     }
-    for (; curix < buf->b_ml.ml_usedchunks - 1
-	     && line >= curline + buf->b_ml.ml_chunksize[curix].mlcs_numlines;
+    ಗಾಗಿ (; curix < buf->b_ml.ml_usedchunks - 1
+	     && ಸಾಲು >= curline + buf->b_ml.ml_chunksize[curix].mlcs_numlines;
 	     curix++)
 	curline += buf->b_ml.ml_chunksize[curix].mlcs_numlines;
     curchnk = buf->b_ml.ml_chunksize + curix;
 
-    if (updtype == ML_CHNK_DELLINE)
+    ಆದರೆ (updtype == ML_CHNK_DELLINE)
 	len = -len;
     curchnk->mlcs_totalsize += len;
-    if (updtype == ML_CHNK_ADDLINE)
+    ಆದರೆ (updtype == ML_CHNK_ADDLINE)
     {
 	curchnk->mlcs_numlines++;
 
 	// May resize here so we don't have to do it in both cases below
-	if (buf->b_ml.ml_usedchunks + 1 >= buf->b_ml.ml_numchunks)
+	ಆದರೆ (buf->b_ml.ml_usedchunks + 1 >= buf->b_ml.ml_numchunks)
 	{
 	    chunksize_T *t_chunksize = buf->b_ml.ml_chunksize;
 
 	    buf->b_ml.ml_numchunks = buf->b_ml.ml_numchunks * 3 / 2;
 	    buf->b_ml.ml_chunksize = vim_realloc(buf->b_ml.ml_chunksize,
-			    sizeof(chunksize_T) * buf->b_ml.ml_numchunks);
-	    if (buf->b_ml.ml_chunksize == NULL)
+			    ಗಾತ್ರ(chunksize_T) * buf->b_ml.ml_numchunks);
+	    ಆದರೆ (buf->b_ml.ml_chunksize == ಖಾಲಿ)
 	    {
 		// Hmmmm, Give up on offset for this buffer
 		vim_free(t_chunksize);
 		buf->b_ml.ml_usedchunks = -1;
-		return;
+		ಹಿಂತಿರುಗಿ;
 	    }
 	}
 
-	if (buf->b_ml.ml_chunksize[curix].mlcs_numlines >= MLCS_MAXL)
+	ಆದರೆ (buf->b_ml.ml_chunksize[curix].mlcs_numlines >= MLCS_MAXL)
 	{
-	    int	    count;	    // number of entries in block
-	    int	    idx;
-	    int	    end_idx;
-	    int	    text_end;
-	    int	    linecnt;
+	    ಪೂರ್ಣಾಂಕ	    ಎಣಿಕೆ_2;	    // number of entries in block
+	    ಪೂರ್ಣಾಂಕ	    idx;
+	    ಪೂರ್ಣಾಂಕ	    ಕೊನೆ_idx;
+	    ಪೂರ್ಣಾಂಕ	    ಪಠ್ಯ_ಕೊನೆ;
+	    ಪೂರ್ಣಾಂಕ	    linecnt;
 
 	    mch_memmove(buf->b_ml.ml_chunksize + curix + 1,
 			buf->b_ml.ml_chunksize + curix,
 			(buf->b_ml.ml_usedchunks - curix) *
-			sizeof(chunksize_T));
+			ಗಾತ್ರ(chunksize_T));
 	    // Compute length of first half of lines in the split chunk
-	    size = 0;
+	    ಗಾತ್ರ_2 = 0;
 	    linecnt = 0;
-	    while (curline < buf->b_ml.ml_line_count
+	    ಆಗ (curline < buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ
 			&& linecnt < MLCS_MINL)
 	    {
-		if ((hp = ml_find_line(buf, curline, ML_FIND)) == NULL)
+		ಆದರೆ ((hp = ml_ಕಂಡುಹಿಡಿ_ಸಾಲು(buf, curline, ML_ಕಂಡುಹಿಡಿ)) == ಖಾಲಿ)
 		{
 		    buf->b_ml.ml_usedchunks = -1;
-		    return;
+		    ಹಿಂತಿರುಗಿ;
 		}
-		dp = (DATA_BL *)(hp->bh_data);
-		count = (long)(buf->b_ml.ml_locked_high) -
-			(long)(buf->b_ml.ml_locked_low) + 1;
-		idx = curline - buf->b_ml.ml_locked_low;
-		curline = buf->b_ml.ml_locked_high + 1;
+		dp = (ದತ್ತಾಂಶ_BL *)(hp->bh_ದತ್ತಾಂಶ);
+		ಎಣಿಕೆ_2 = (ದೀರ್ಘ)(buf->b_ml.ml_locked_ಮೇಲಿನ) -
+			(ದೀರ್ಘ)(buf->b_ml.ml_locked_ಕೆಳಗಿನ) + 1;
+		idx = curline - buf->b_ml.ml_locked_ಕೆಳಗಿನ;
+		curline = buf->b_ml.ml_locked_ಮೇಲಿನ + 1;
 
 		// compute index of last line to use in this MEMLINE
-		rest = count - idx;
-		if (linecnt + rest > MLCS_MINL)
+		rest = ಎಣಿಕೆ_2 - idx;
+		ಆದರೆ (linecnt + rest > MLCS_MINL)
 		{
-		    end_idx = idx + MLCS_MINL - linecnt - 1;
+		    ಕೊನೆ_idx = idx + MLCS_MINL - linecnt - 1;
 		    linecnt = MLCS_MINL;
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    end_idx = count - 1;
+		    ಕೊನೆ_idx = ಎಣಿಕೆ_2 - 1;
 		    linecnt += rest;
 		}
 # ifdef FEAT_PROP_POPUP
-		if (buf->b_has_textprop)
+		ಆದರೆ (buf->b_has_textprop)
 		{
-		    int i;
+		    ಪೂರ್ಣಾಂಕ i;
 
 		    // We cannot use the text pointers to get the text length,
 		    // the text prop info would also be counted.  Go over the
 		    // lines.
-		    for (i = end_idx; i < idx; ++i)
-			size += (int)STRLEN((char_u *)dp
-				      + (dp->db_index[i] & DB_INDEX_MASK)) + 1;
+		    ಗಾಗಿ (i = ಕೊನೆ_idx; i < idx; ++i)
+			ಗಾತ್ರ_2 += (ಪೂರ್ಣಾಂಕ)STRLEN((char_u *)dp
+				      + (dp->db_ಸೂಚ್ಯಂಕ[i] & DB_ಸೂಚ್ಯಂಕ_ಮುಖವಾಡ)) + 1;
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 # endif
 		{
-		    if (idx == 0) // first line in block, text at the end
-			text_end = dp->db_txt_end;
-		    else
-			text_end = ((dp->db_index[idx - 1]) & DB_INDEX_MASK);
-		    size += text_end
-				   - ((dp->db_index[end_idx]) & DB_INDEX_MASK);
+		    ಆದರೆ (idx == 0) // first line in block, text at the end
+			ಪಠ್ಯ_ಕೊನೆ = dp->db_txt_ಕೊನೆ;
+		    ಇಲ್ಲದಿದ್ದರೆ
+			ಪಠ್ಯ_ಕೊನೆ = ((dp->db_ಸೂಚ್ಯಂಕ[idx - 1]) & DB_ಸೂಚ್ಯಂಕ_ಮುಖವಾಡ);
+		    ಗಾತ್ರ_2 += ಪಠ್ಯ_ಕೊನೆ
+				   - ((dp->db_ಸೂಚ್ಯಂಕ[ಕೊನೆ_idx]) & DB_ಸೂಚ್ಯಂಕ_ಮುಖವಾಡ);
 		}
 	    }
 	    buf->b_ml.ml_chunksize[curix].mlcs_numlines = linecnt;
 	    buf->b_ml.ml_chunksize[curix + 1].mlcs_numlines -= linecnt;
-	    buf->b_ml.ml_chunksize[curix].mlcs_totalsize = size;
-	    buf->b_ml.ml_chunksize[curix + 1].mlcs_totalsize -= size;
+	    buf->b_ml.ml_chunksize[curix].mlcs_totalsize = ಗಾತ್ರ_2;
+	    buf->b_ml.ml_chunksize[curix + 1].mlcs_totalsize -= ಗಾತ್ರ_2;
 	    buf->b_ml.ml_usedchunks++;
-	    ml_upd_lastbuf = NULL;   // Force recalc of curix & curline
-	    return;
+	    ml_upd_lastbuf = ಖಾಲಿ;   // Force recalc of curix & curline
+	    ಹಿಂತಿರುಗಿ;
 	}
-	else if (buf->b_ml.ml_chunksize[curix].mlcs_numlines >= MLCS_MINL
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (buf->b_ml.ml_chunksize[curix].mlcs_numlines >= MLCS_MINL
 		     && curix == buf->b_ml.ml_usedchunks - 1
-		     && buf->b_ml.ml_line_count - line <= 1)
+		     && buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ - ಸಾಲು <= 1)
 	{
 	    /*
 	     * We are in the last chunk and it is cheap to create a new one
@@ -6005,30 +6005,30 @@ ml_updatechunk(
 	     */
 	    curchnk = buf->b_ml.ml_chunksize + curix + 1;
 	    buf->b_ml.ml_usedchunks++;
-	    if (line == buf->b_ml.ml_line_count)
+	    ಆದರೆ (ಸಾಲು == buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
 	    {
 		curchnk->mlcs_numlines = 0;
 		curchnk->mlcs_totalsize = 0;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		/*
 		 * Line is just prior to last, move count for last
 		 * This is the common case  when loading a new file
 		 */
-		hp = ml_find_line(buf, buf->b_ml.ml_line_count, ML_FIND);
-		if (hp == NULL)
+		hp = ml_ಕಂಡುಹಿಡಿ_ಸಾಲು(buf, buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ, ML_ಕಂಡುಹಿಡಿ);
+		ಆದರೆ (hp == ಖಾಲಿ)
 		{
 		    buf->b_ml.ml_usedchunks = -1;
-		    return;
+		    ಹಿಂತಿರುಗಿ;
 		}
-		dp = (DATA_BL *)(hp->bh_data);
-		if (dp->db_line_count == 1)
-		    rest = dp->db_txt_end - dp->db_txt_start;
-		else
+		dp = (ದತ್ತಾಂಶ_BL *)(hp->bh_ದತ್ತಾಂಶ);
+		ಆದರೆ (dp->db_ಸಾಲು_ಎಣಿಕೆ == 1)
+		    rest = dp->db_txt_ಕೊನೆ - dp->db_txt_ಆರಂಭ;
+		ಇಲ್ಲದಿದ್ದರೆ
 		    rest =
-			((dp->db_index[dp->db_line_count - 2]) & DB_INDEX_MASK)
-			- dp->db_txt_start;
+			((dp->db_ಸೂಚ್ಯಂಕ[dp->db_ಸಾಲು_ಎಣಿಕೆ - 2]) & DB_ಸೂಚ್ಯಂಕ_ಮುಖವಾಡ)
+			- dp->db_txt_ಆರಂಭ;
 		curchnk->mlcs_totalsize = rest;
 		curchnk->mlcs_numlines = 1;
 		curchnk[-1].mlcs_totalsize -= rest;
@@ -6036,25 +6036,25 @@ ml_updatechunk(
 	    }
 	}
     }
-    else if (updtype == ML_CHNK_DELLINE)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (updtype == ML_CHNK_DELLINE)
     {
 	curchnk->mlcs_numlines--;
-	if (curix < buf->b_ml.ml_usedchunks - 1
+	ಆದರೆ (curix < buf->b_ml.ml_usedchunks - 1
 		&& curchnk->mlcs_numlines + curchnk[1].mlcs_numlines
 								  <= MLCS_MINL)
 	{
 	    curix++;
 	    curchnk = buf->b_ml.ml_chunksize + curix;
 	}
-	else if (curix == 0 && curchnk->mlcs_numlines <= 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (curix == 0 && curchnk->mlcs_numlines <= 0)
 	{
-	    ml_upd_lastbuf = NULL;   // Force recalc of curix & curline
+	    ml_upd_lastbuf = ಖಾಲಿ;   // Force recalc of curix & curline
 	    buf->b_ml.ml_usedchunks--;
 	    mch_memmove(buf->b_ml.ml_chunksize, buf->b_ml.ml_chunksize + 1,
-			buf->b_ml.ml_usedchunks * sizeof(chunksize_T));
-	    return;
+			buf->b_ml.ml_usedchunks * ಗಾತ್ರ(chunksize_T));
+	    ಹಿಂತಿರುಗಿ;
 	}
-	else if (curix == 0 || (curchnk->mlcs_numlines > 10
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (curix == 0 || (curchnk->mlcs_numlines > 10
 		    && curchnk->mlcs_numlines + curchnk[-1].mlcs_numlines
 								  > MLCS_MINL))
 	{
@@ -6063,20 +6063,20 @@ ml_updatechunk(
 	    ml_upd_lastbuf = buf;
 	    ml_upd_lastcurline = curline;
 	    ml_upd_lastcurix = curix;
-	    return;
+	    ಹಿಂತಿರುಗಿ;
 	}
 
 	// Collapse chunks
-	ml_upd_lastbuf = NULL;   // Force recalc of curix & curline
+	ml_upd_lastbuf = ಖಾಲಿ;   // Force recalc of curix & curline
 	curchnk[-1].mlcs_numlines += curchnk->mlcs_numlines;
 	curchnk[-1].mlcs_totalsize += curchnk->mlcs_totalsize;
 	buf->b_ml.ml_usedchunks--;
-	if (curix < buf->b_ml.ml_usedchunks)
+	ಆದರೆ (curix < buf->b_ml.ml_usedchunks)
 	    mch_memmove(buf->b_ml.ml_chunksize + curix,
 			buf->b_ml.ml_chunksize + curix + 1,
 			(buf->b_ml.ml_usedchunks - curix) *
-			sizeof(chunksize_T));
-	return;
+			ಗಾತ್ರ(chunksize_T));
+	ಹಿಂತಿರುಗಿ;
     }
     ml_upd_lastbuf = buf;
     ml_upd_lastcurline = curline;
@@ -6089,212 +6089,212 @@ ml_updatechunk(
  * Find offset of line if "lnum" > 0
  * return -1 if information is not available
  */
-    long
-ml_find_line_or_offset(buf_T *buf, linenr_T lnum, long *offp)
+    ದೀರ್ಘ
+ml_ಕಂಡುಹಿಡಿ_ಸಾಲು_or_ಸ್ಥಾನಾಂತರ(buf_T *buf, linenr_T lnum, ದೀರ್ಘ *offp)
 {
     linenr_T	curline;
-    int		curix;
-    long	size;
+    ಪೂರ್ಣಾಂಕ		curix;
+    ದೀರ್ಘ	ಗಾತ್ರ_2;
     bhdr_T	*hp;
-    DATA_BL	*dp;
-    int		count;		// number of entries in block
-    int		idx;
-    int		start_idx;
-    int		text_end;
-    long	offset;
-    int		len;
-    int		ffdos = (get_fileformat(buf) == EOL_DOS);
-    int		extra = 0;
+    ದತ್ತಾಂಶ_BL	*dp;
+    ಪೂರ್ಣಾಂಕ		ಎಣಿಕೆ_2;		// number of entries in block
+    ಪೂರ್ಣಾಂಕ		idx;
+    ಪೂರ್ಣಾಂಕ		ಆರಂಭ_idx;
+    ಪೂರ್ಣಾಂಕ		ಪಠ್ಯ_ಕೊನೆ;
+    ದೀರ್ಘ	ಸ್ಥಾನಾಂತರ;
+    ಪೂರ್ಣಾಂಕ		len;
+    ಪೂರ್ಣಾಂಕ		ffdos = (get_fileformat(buf) == EOL_DOS);
+    ಪೂರ್ಣಾಂಕ		extra = 0;
 
     // take care of cached line first
-    ml_flush_line(curbuf);
+    ml_flush_ಸಾಲು(curbuf);
 
-    if (buf->b_ml.ml_usedchunks == -1
-	    || buf->b_ml.ml_chunksize == NULL
+    ಆದರೆ (buf->b_ml.ml_usedchunks == -1
+	    || buf->b_ml.ml_chunksize == ಖಾಲಿ
 	    || lnum < 0)
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
 
-    if (offp == NULL)
-	offset = 0;
-    else
-	offset = *offp;
-    if (lnum == 0 && offset <= 0)
-	return 1;   // Not a "find offset" and offset 0 _must_ be in line 1
+    ಆದರೆ (offp == ಖಾಲಿ)
+	ಸ್ಥಾನಾಂತರ = 0;
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಸ್ಥಾನಾಂತರ = *offp;
+    ಆದರೆ (lnum == 0 && ಸ್ಥಾನಾಂತರ <= 0)
+	ಹಿಂತಿರುಗಿ 1;   // Not a "find offset" and offset 0 _must_ be in line 1
     /*
      * Find the last chunk before the one containing our line. Last chunk is
      * special because it will never qualify.
      */
     curline = 1;
-    curix = size = 0;
-    while (curix < buf->b_ml.ml_usedchunks - 1
+    curix = ಗಾತ್ರ_2 = 0;
+    ಆಗ (curix < buf->b_ml.ml_usedchunks - 1
 	    && ((lnum != 0
 	     && lnum >= curline + buf->b_ml.ml_chunksize[curix].mlcs_numlines)
-		|| (offset != 0
-	       && offset > size + buf->b_ml.ml_chunksize[curix].mlcs_totalsize
-		 + (long)ffdos * buf->b_ml.ml_chunksize[curix].mlcs_numlines)))
+		|| (ಸ್ಥಾನಾಂತರ != 0
+	       && ಸ್ಥಾನಾಂತರ > ಗಾತ್ರ_2 + buf->b_ml.ml_chunksize[curix].mlcs_totalsize
+		 + (ದೀರ್ಘ)ffdos * buf->b_ml.ml_chunksize[curix].mlcs_numlines)))
     {
 	curline += buf->b_ml.ml_chunksize[curix].mlcs_numlines;
-	size += buf->b_ml.ml_chunksize[curix].mlcs_totalsize;
-	if (offset && ffdos)
-	    size += buf->b_ml.ml_chunksize[curix].mlcs_numlines;
+	ಗಾತ್ರ_2 += buf->b_ml.ml_chunksize[curix].mlcs_totalsize;
+	ಆದರೆ (ಸ್ಥಾನಾಂತರ && ffdos)
+	    ಗಾತ್ರ_2 += buf->b_ml.ml_chunksize[curix].mlcs_numlines;
 	curix++;
     }
 
-    while ((lnum != 0 && curline < lnum) || (offset != 0 && size < offset))
+    ಆಗ ((lnum != 0 && curline < lnum) || (ಸ್ಥಾನಾಂತರ != 0 && ಗಾತ್ರ_2 < ಸ್ಥಾನಾಂತರ))
     {
 # ifdef FEAT_PROP_POPUP
-	size_t textprop_total = 0;
+	size_t textprop_ಒಟ್ಟು = 0;
 # endif
 
-	if (curline > buf->b_ml.ml_line_count
-		|| (hp = ml_find_line(buf, curline, ML_FIND)) == NULL)
-	    return -1;
-	dp = (DATA_BL *)(hp->bh_data);
-	count = (long)(buf->b_ml.ml_locked_high) -
-		(long)(buf->b_ml.ml_locked_low) + 1;
-	start_idx = idx = curline - buf->b_ml.ml_locked_low;
-	if (idx == 0)  // first line in block, text at the end
-	    text_end = dp->db_txt_end;
-	else
-	    text_end = ((dp->db_index[idx - 1]) & DB_INDEX_MASK);
+	ಆದರೆ (curline > buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ
+		|| (hp = ml_ಕಂಡುಹಿಡಿ_ಸಾಲು(buf, curline, ML_ಕಂಡುಹಿಡಿ)) == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ -1;
+	dp = (ದತ್ತಾಂಶ_BL *)(hp->bh_ದತ್ತಾಂಶ);
+	ಎಣಿಕೆ_2 = (ದೀರ್ಘ)(buf->b_ml.ml_locked_ಮೇಲಿನ) -
+		(ದೀರ್ಘ)(buf->b_ml.ml_locked_ಕೆಳಗಿನ) + 1;
+	ಆರಂಭ_idx = idx = curline - buf->b_ml.ml_locked_ಕೆಳಗಿನ;
+	ಆದರೆ (idx == 0)  // first line in block, text at the end
+	    ಪಠ್ಯ_ಕೊನೆ = dp->db_txt_ಕೊನೆ;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಪಠ್ಯ_ಕೊನೆ = ((dp->db_ಸೂಚ್ಯಂಕ[idx - 1]) & DB_ಸೂಚ್ಯಂಕ_ಮುಖವಾಡ);
 	// Compute index of last line to use in this MEMLINE
-	if (lnum != 0)
+	ಆದರೆ (lnum != 0)
 	{
-	    if (curline + (count - idx) >= lnum)
+	    ಆದರೆ (curline + (ಎಣಿಕೆ_2 - idx) >= lnum)
 		idx += lnum - curline - 1;
-	    else
-		idx = count - 1;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		idx = ಎಣಿಕೆ_2 - 1;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    extra = 0;
-	    for (;;)
+	    ಗಾಗಿ (;;)
 	    {
 # ifdef FEAT_PROP_POPUP
-		size_t textprop_size = 0;
+		size_t textprop_ಗಾತ್ರ = 0;
 
-		if (buf->b_has_textprop)
+		ಆದರೆ (buf->b_has_textprop)
 		{
 		    char_u *l1, *l2;
 
 		    // compensate for the extra bytes taken by textprops
-		    l1 = (char_u *)dp + ((dp->db_index[idx]) & DB_INDEX_MASK);
-		    l2 = (char_u *)dp + (idx == 0 ? dp->db_txt_end
-				  : ((dp->db_index[idx - 1]) & DB_INDEX_MASK));
-		    textprop_size = (l2 - l1) - (STRLEN(l1) + 1);
+		    l1 = (char_u *)dp + ((dp->db_ಸೂಚ್ಯಂಕ[idx]) & DB_ಸೂಚ್ಯಂಕ_ಮುಖವಾಡ);
+		    l2 = (char_u *)dp + (idx == 0 ? dp->db_txt_ಕೊನೆ
+				  : ((dp->db_ಸೂಚ್ಯಂಕ[idx - 1]) & DB_ಸೂಚ್ಯಂಕ_ಮುಖವಾಡ));
+		    textprop_ಗಾತ್ರ = (l2 - l1) - (STRLEN(l1) + 1);
 		}
 # endif
-		if (!(offset >= size
-			+ text_end - (int)((dp->db_index[idx]) & DB_INDEX_MASK)
+		ಆದರೆ (!(ಸ್ಥಾನಾಂತರ >= ಗಾತ್ರ_2
+			+ ಪಠ್ಯ_ಕೊನೆ - (ಪೂರ್ಣಾಂಕ)((dp->db_ಸೂಚ್ಯಂಕ[idx]) & DB_ಸೂಚ್ಯಂಕ_ಮುಖವಾಡ)
 # ifdef FEAT_PROP_POPUP
-			- (long)(textprop_total + textprop_size)
+			- (ದೀರ್ಘ)(textprop_ಒಟ್ಟು + textprop_ಗಾತ್ರ)
 # endif
 			+ ffdos))
-		    break;
+		    ನಿಲ್ಲಿಸು;
 
-		if (ffdos)
-		    size++;
+		ಆದರೆ (ffdos)
+		    ಗಾತ್ರ_2++;
 # ifdef FEAT_PROP_POPUP
-		textprop_total += textprop_size;
+		textprop_ಒಟ್ಟು += textprop_ಗಾತ್ರ;
 # endif
-		if (idx == count - 1)
+		ಆದರೆ (idx == ಎಣಿಕೆ_2 - 1)
 		{
 		    extra = 1;
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 		idx++;
 	    }
 	}
 # ifdef FEAT_PROP_POPUP
-	if (buf->b_has_textprop && lnum != 0)
+	ಆದರೆ (buf->b_has_textprop && lnum != 0)
 	{
-	    int i;
+	    ಪೂರ್ಣಾಂಕ i;
 
 	    // cannot use the db_index pointer, need to get the actual text
 	    // lengths.
 	    len = 0;
-	    for (i = start_idx; i <= idx; ++i)
+	    ಗಾಗಿ (i = ಆರಂಭ_idx; i <= idx; ++i)
 	    {
-		char_u *p = (char_u *)dp + ((dp->db_index[i]) & DB_INDEX_MASK);
-		len += (int)STRLEN(p) + 1;
+		char_u *p = (char_u *)dp + ((dp->db_ಸೂಚ್ಯಂಕ[i]) & DB_ಸೂಚ್ಯಂಕ_ಮುಖವಾಡ);
+		len += (ಪೂರ್ಣಾಂಕ)STRLEN(p) + 1;
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 # endif
-	    len = text_end - ((dp->db_index[idx]) & DB_INDEX_MASK)
+	    len = ಪಠ್ಯ_ಕೊನೆ - ((dp->db_ಸೂಚ್ಯಂಕ[idx]) & DB_ಸೂಚ್ಯಂಕ_ಮುಖವಾಡ)
 # ifdef FEAT_PROP_POPUP
-				- (long)textprop_total
+				- (ದೀರ್ಘ)textprop_ಒಟ್ಟು
 # endif
 				;
-	size += len;
-	if (offset != 0 && size >= offset)
+	ಗಾತ್ರ_2 += len;
+	ಆದರೆ (ಸ್ಥಾನಾಂತರ != 0 && ಗಾತ್ರ_2 >= ಸ್ಥಾನಾಂತರ)
 	{
-	    if (size + ffdos == offset)
+	    ಆದರೆ (ಗಾತ್ರ_2 + ffdos == ಸ್ಥಾನಾಂತರ)
 		*offp = 0;
-	    else if (idx == start_idx)
-		*offp = offset - size + len;
-	    else
-		*offp = offset - size + len
-		     - (text_end - ((dp->db_index[idx - 1]) & DB_INDEX_MASK))
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (idx == ಆರಂಭ_idx)
+		*offp = ಸ್ಥಾನಾಂತರ - ಗಾತ್ರ_2 + len;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		*offp = ಸ್ಥಾನಾಂತರ - ಗಾತ್ರ_2 + len
+		     - (ಪಠ್ಯ_ಕೊನೆ - ((dp->db_ಸೂಚ್ಯಂಕ[idx - 1]) & DB_ಸೂಚ್ಯಂಕ_ಮುಖವಾಡ))
 # ifdef FEAT_PROP_POPUP
-		     + (long)textprop_total
+		     + (ದೀರ್ಘ)textprop_ಒಟ್ಟು
 # endif
 		     ;
-	    curline += idx - start_idx + extra;
-	    if (curline > buf->b_ml.ml_line_count)
-		return -1;	// exactly one byte beyond the end
-	    return curline;
+	    curline += idx - ಆರಂಭ_idx + extra;
+	    ಆದರೆ (curline > buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
+		ಹಿಂತಿರುಗಿ -1;	// exactly one byte beyond the end
+	    ಹಿಂತಿರುಗಿ curline;
 	}
-	curline = buf->b_ml.ml_locked_high + 1;
+	curline = buf->b_ml.ml_locked_ಮೇಲಿನ + 1;
     }
 
-    if (lnum != 0)
+    ಆದರೆ (lnum != 0)
     {
 	// Count extra CR characters.
-	if (ffdos)
-	    size += lnum - 1;
+	ಆದರೆ (ffdos)
+	    ಗಾತ್ರ_2 += lnum - 1;
 
 	// Don't count the last line break if 'noeol' and ('bin' or
 	// 'nofixeol').
-	if ((!buf->b_p_fixeol || buf->b_p_bin) && !buf->b_p_eol
-					   && lnum > buf->b_ml.ml_line_count)
-	    size -= ffdos + 1;
+	ಆದರೆ ((!buf->b_p_fixeol || buf->b_p_bin) && !buf->b_p_eol
+					   && lnum > buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
+	    ಗಾತ್ರ_2 -= ffdos + 1;
     }
 
-    return size;
+    ಹಿಂತಿರುಗಿ ಗಾತ್ರ_2;
 }
 
 /*
  * Goto byte in buffer with offset 'cnt'.
  */
-    void
-goto_byte(long cnt)
+    ಶೂನ್ಯ
+goto_byte(ದೀರ್ಘ cnt)
 {
-    long	boff = cnt;
+    ದೀರ್ಘ	boff = cnt;
     linenr_T	lnum;
 
-    ml_flush_line(curbuf);	// cached line may be dirty
+    ml_flush_ಸಾಲು(curbuf);	// cached line may be dirty
     setpcmark();
-    if (boff)
+    ಆದರೆ (boff)
 	--boff;
-    lnum = ml_find_line_or_offset(curbuf, (linenr_T)0, &boff);
-    if (lnum < 1)	// past the end
+    lnum = ml_ಕಂಡುಹಿಡಿ_ಸಾಲು_or_ಸ್ಥಾನಾಂತರ(curbuf, (linenr_T)0, &boff);
+    ಆದರೆ (lnum < 1)	// past the end
     {
-	curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
+	curwin->w_cursor.lnum = curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
 	curwin->w_curswant = MAXCOL;
 	coladvance((colnr_T)MAXCOL);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	curwin->w_cursor.lnum = lnum;
-	curwin->w_cursor.col = (colnr_T)boff;
+	curwin->w_cursor.ಲಂಬಸಾಲು = (colnr_T)boff;
 	curwin->w_cursor.coladd = 0;
-	curwin->w_set_curswant = true;
+	curwin->w_ಗಣ_curswant = true;
     }
     check_cursor();
 
     // Make sure the cursor is on the first byte of a multi-byte char.
-    if (has_mbyte)
+    ಆದರೆ (has_mbyte)
 	mb_adjust_cursor();
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ

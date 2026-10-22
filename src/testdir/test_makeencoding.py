@@ -3,65 +3,65 @@
 
 # Test program for :make, :grep and :cgetfile.
 
-from __future__ import print_function, unicode_literals
-import locale
-import io
-import sys
+ತಃ __future__ ಆಮದು print_function, unicode_literals
+ಆಮದು locale
+ಆಮದು io
+ಆಮದು sys
 
-def set_output_encoding(enc=None):
+ವ್ಯಾಖ್ಯಾನ ಗಣ_output_encoding(enc=ಏನೂಇಲ್ಲ):
     """Set the encoding of stdout and stderr
 
     arguments:
       enc -- Encoding name.
              If omitted, locale.getpreferredencoding() is used.
     """
-    if enc is None:
+    ಆದರೆ enc ಆಗಿರುವ ಏನೂಇಲ್ಲ:
         enc = locale.getpreferredencoding()
 
-    def get_text_writer(fo, **kwargs):
+    ವ್ಯಾಖ್ಯಾನ get_ಪಠ್ಯ_writer(fo, **kwargs):
         kw = dict(kwargs)
         kw.setdefault('errors', 'backslashreplace') # use \uXXXX style
-        kw.setdefault('closefd', False)
+        kw.setdefault('closefd', ಸುಳ್ಳು)
 
-        if sys.version_info[0] < 3:
+        ಆದರೆ sys.ಆವೃತ್ತಿ_info[0] < 3:
             # Work around for Python 2.x
             # New line conversion isn't needed here. Done in somewhere else.
-            writer = io.open(fo.fileno(), mode='w', newline='', **kw)
-            write = writer.write    # save the original write() function
+            writer = io.open(fo.fileno(), ಬಹುಲಕ='w', newline='', **kw)
+            ಲಿಖ = writer.ಲಿಖ    # save the original write() function
             enc = locale.getpreferredencoding()
-            def convwrite(s):
-                if isinstance(s, bytes):
-                    write(s.decode(enc))    # convert to unistr
-                else:
-                    write(s)
-                try:
+            ವ್ಯಾಖ್ಯಾನ convwrite(s):
+                ಆದರೆ isinstance(s, ಬೈಟುಗಳು):
+                    ಲಿಖ(s.decode(enc))    # convert to unistr
+                ಇಲ್ಲದಿದ್ದರೆ:
+                    ಲಿಖ(s)
+                ಪ್ರಯತ್ನಿಸು:
                     writer.flush()  # needed on Windows
-                except IOError:
-                    pass
-            writer.write = convwrite
-        else:
-            writer = io.open(fo.fileno(), mode='w', **kw)
-        return writer
+                ಅಪವಾದ IOError:
+                    ದಾಟು
+            writer.ಲಿಖ = convwrite
+        ಇಲ್ಲದಿದ್ದರೆ:
+            writer = io.open(fo.fileno(), ಬಹುಲಕ='w', **kw)
+        ಹಿಂತಿರುಗಿ writer
 
-    sys.stdout = get_text_writer(sys.stdout, encoding=enc)
-    sys.stderr = get_text_writer(sys.stderr, encoding=enc)
+    sys.stdout = get_ಪಠ್ಯ_writer(sys.stdout, encoding=enc)
+    sys.stderr = get_ಪಠ್ಯ_writer(sys.stderr, encoding=enc)
 
 
-def main():
+ವ್ಯಾಖ್ಯಾನ ಮುಖ್ಯ():
     enc = 'utf-8'
-    if len(sys.argv) > 1:
+    ಆದರೆ ಉದ್ದ(sys.argv) > 1:
         enc = sys.argv[1]
-    set_output_encoding(enc)
+    ಗಣ_output_encoding(enc)
 
-    message_tbl = {
+    ಸಂದೇಶ_tbl = {
             'utf-8': 'ÀÈÌÒÙ こんにちは 你好',
             'latin1': 'ÀÈÌÒÙ',
             'cp932': 'こんにちは',
             'cp936': '你好',
             }
 
-    print('Xfoobar.c(10) : %s (%s)' % (message_tbl[enc], enc))
+    ಮುದ್ರಿಸು('Xfoobar.c(10) : %s (%s)' % (ಸಂದೇಶ_tbl[enc], enc))
 
 
-if __name__ == "__main__":
-    main()
+ಆದರೆ __name__ == "__main__":
+    ಮುಖ್ಯ()

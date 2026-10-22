@@ -11,25 +11,25 @@
  * list.c: List support and container (List, Dict, Blob) functions.
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 
 // List heads for garbage collection.
-static list_T		*first_list = NULL;	// list of all lists
+ಸ್ಥಿರ list_T		*ಮೊದಲ_list = ಖಾಲಿ;	// list of all lists
 
-#define FOR_ALL_WATCHERS(l, lw) \
-    for ((lw) = (l)->lv_watch; (lw) != NULL; (lw) = (lw)->lw_next)
+#ವ್ಯಾಖ್ಯಾನಿಸು FOR_ALL_WATCHERS(l, lw) \
+    ಗಾಗಿ ((lw) = (l)->lv_watch; (lw) != ಖಾಲಿ; (lw) = (lw)->lw_ಮುಂದಿನ)
 
-static void list_free_item(list_T *l, listitem_T *item);
+ಸ್ಥಿರ ಶೂನ್ಯ list_free_ಅಂಶ(list_T *l, listitem_T *ಅಂಶ);
 
 /*
  * Add a watcher to a list.
  */
-    void
-list_add_watch(list_T *l, listwatch_T *lw)
+    ಶೂನ್ಯ
+list_ಕೂಡಿಸು_watch(list_T *l, listwatch_T *lw)
 {
-    lw->lw_next = l->lv_watch;
+    lw->lw_ಮುಂದಿನ = l->lv_watch;
     l->lv_watch = lw;
 }
 
@@ -37,7 +37,7 @@ list_add_watch(list_T *l, listwatch_T *lw)
  * Remove a watcher from a list.
  * No warning when it isn't found...
  */
-    void
+    ಶೂನ್ಯ
 list_rem_watch(list_T *l, listwatch_T *lwrem)
 {
     listwatch_T	*lw, **lwp;
@@ -45,12 +45,12 @@ list_rem_watch(list_T *l, listwatch_T *lwrem)
     lwp = &l->lv_watch;
     FOR_ALL_WATCHERS(l, lw)
     {
-	if (lw == lwrem)
+	ಆದರೆ (lw == lwrem)
 	{
-	    *lwp = lw->lw_next;
-	    break;
+	    *lwp = lw->lw_ಮುಂದಿನ;
+	    ನಿಲ್ಲಿಸು;
 	}
-	lwp = &lw->lw_next;
+	lwp = &lw->lw_ಮುಂದಿನ;
     }
 }
 
@@ -58,25 +58,25 @@ list_rem_watch(list_T *l, listwatch_T *lwrem)
  * Just before removing an item from a list: advance watchers to the next
  * item.
  */
-    static void
-list_fix_watch(list_T *l, listitem_T *item)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+list_fix_watch(list_T *l, listitem_T *ಅಂಶ)
 {
     listwatch_T	*lw;
 
     FOR_ALL_WATCHERS(l, lw)
-	if (lw->lw_item == item)
-	    lw->lw_item = item->li_next;
+	ಆದರೆ (lw->lw_ಅಂಶ == ಅಂಶ)
+	    lw->lw_ಅಂಶ = ಅಂಶ->li_ಮುಂದಿನ;
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 list_init(list_T *l)
 {
     // Prepend the list to the list of lists for garbage collection.
-    if (first_list != NULL)
-	first_list->lv_used_prev = l;
-    l->lv_used_prev = NULL;
-    l->lv_used_next = first_list;
-    first_list = l;
+    ಆದರೆ (ಮೊದಲ_list != ಖಾಲಿ)
+	ಮೊದಲ_list->lv_ಬಳಸಿದ_prev = l;
+    l->lv_ಬಳಸಿದ_prev = ಖಾಲಿ;
+    l->lv_ಬಳಸಿದ_ಮುಂದಿನ = ಮೊದಲ_list;
+    ಮೊದಲ_list = l;
 }
 
 /*
@@ -84,27 +84,27 @@ list_init(list_T *l)
  * Caller should take care of the reference count.
  */
     list_T *
-list_alloc(void)
+list_alloc(ಶೂನ್ಯ)
 {
     list_T  *l;
 
     l = ALLOC_CLEAR_ONE(list_T);
-    if (l != NULL)
+    ಆದರೆ (l != ಖಾಲಿ)
 	list_init(l);
-    return l;
+    ಹಿಂತಿರುಗಿ l;
 }
 
 /*
  * list_alloc() with an ID for alloc_fail().
  */
     list_T *
-list_alloc_id(alloc_id_T id UNUSED)
+list_alloc_id(alloc_id_T id ಬಳಸದ)
 {
-#ifdef FEAT_EVAL
-    if (alloc_fail_id == id && alloc_does_fail(sizeof(list_T)))
-	return NULL;
-#endif
-    return (list_alloc());
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಆದರೆ (alloc_fail_id == id && alloc_does_fail(ಗಾತ್ರ(list_T)))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ (list_alloc());
 }
 
 /*
@@ -114,43 +114,43 @@ list_alloc_id(alloc_id_T id UNUSED)
  * Next list_set_item() must be called for each item.
  */
     list_T *
-list_alloc_with_items(int count)
+list_alloc_with_ವಸ್ತುಗಳು(ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_2)
 {
     list_T	*l;
 
-    if (count > 0
-	    && (size_t)count > (SIZE_MAX - sizeof(list_T)) / sizeof(listitem_T))
-	return NULL;
-    l = (list_T *)alloc_clear(sizeof(list_T) + count * sizeof(listitem_T));
-    if (l == NULL)
-	return NULL;
+    ಆದರೆ (ಎಣಿಕೆ_2 > 0
+	    && (size_t)ಎಣಿಕೆ_2 > (ಗಾತ್ರ_MAX - ಗಾತ್ರ(list_T)) / ಗಾತ್ರ(listitem_T))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    l = (list_T *)alloc_clear(ಗಾತ್ರ(list_T) + ಎಣಿಕೆ_2 * ಗಾತ್ರ(listitem_T));
+    ಆದರೆ (l == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     list_init(l);
 
-    if (count <= 0)
-	return l;
+    ಆದರೆ (ಎಣಿಕೆ_2 <= 0)
+	ಹಿಂತಿರುಗಿ l;
 
     listitem_T	*li = (listitem_T *)(l + 1);
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
 
-    l->lv_len = count;
-    l->lv_with_items = count;
-    l->lv_first = li;
-    l->lv_u.mat.lv_last = li + count - 1;
-    for (i = 0; i < count; ++i)
+    l->lv_len = ಎಣಿಕೆ_2;
+    l->lv_with_ವಸ್ತುಗಳು = ಎಣಿಕೆ_2;
+    l->lv_ಮೊದಲ = li;
+    l->lv_u.mat.lv_ಕೊನೆಯ = li + ಎಣಿಕೆ_2 - 1;
+    ಗಾಗಿ (i = 0; i < ಎಣಿಕೆ_2; ++i)
     {
-	if (i == 0)
-	    li->li_prev = NULL;
-	else
+	ಆದರೆ (i == 0)
+	    li->li_prev = ಖಾಲಿ;
+	ಇಲ್ಲದಿದ್ದರೆ
 	    li->li_prev = li - 1;
-	if (i == count - 1)
-	    li->li_next = NULL;
-	else
-	    li->li_next = li + 1;
+	ಆದರೆ (i == ಎಣಿಕೆ_2 - 1)
+	    li->li_ಮುಂದಿನ = ಖಾಲಿ;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    li->li_ಮುಂದಿನ = li + 1;
 	++li;
     }
 
-    return l;
+    ಹಿಂತಿರುಗಿ l;
 }
 
 /*
@@ -158,8 +158,8 @@ list_alloc_with_items(int count)
  * The contents of "tv" is moved into the list item.
  * Each item must be set exactly once.
  */
-    void
-list_set_item(list_T *l, int idx, typval_T *tv)
+    ಶೂನ್ಯ
+list_ಗಣ_ಅಂಶ(list_T *l, ಪೂರ್ಣಾಂಕ idx, typval_T *tv)
 {
     listitem_T	*li = (listitem_T *)(l + 1) + idx;
 
@@ -170,42 +170,42 @@ list_set_item(list_T *l, int idx, typval_T *tv)
  * Allocate an empty list for a return value, with reference count set.
  * Returns OK or FAIL.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 rettv_list_alloc(typval_T *rettv)
 {
     list_T	*l = list_alloc();
 
-    if (l == NULL)
-	return FAIL;
+    ಆದರೆ (l == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    rettv->v_lock = 0;
-    rettv_list_set(rettv, l);
-    return OK;
+    rettv->v_ಬೀಗ = 0;
+    rettv_list_ಗಣ(rettv, l);
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Same as rettv_list_alloc() but uses an allocation id for testing.
  */
-    int
-rettv_list_alloc_id(typval_T *rettv, alloc_id_T id UNUSED)
+    ಪೂರ್ಣಾಂಕ
+rettv_list_alloc_id(typval_T *rettv, alloc_id_T id ಬಳಸದ)
 {
-#ifdef FEAT_EVAL
-    if (alloc_fail_id == id && alloc_does_fail(sizeof(list_T)))
-	return FAIL;
-#endif
-    return rettv_list_alloc(rettv);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಆದರೆ (alloc_fail_id == id && alloc_does_fail(ಗಾತ್ರ(list_T)))
+	ಹಿಂತಿರುಗಿ FAIL;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ rettv_list_alloc(rettv);
 }
 
 
 /*
  * Set a list as the return value.  Increments the reference count.
  */
-    void
-rettv_list_set(typval_T *rettv, list_T *l)
+    ಶೂನ್ಯ
+rettv_list_ಗಣ(typval_T *rettv, list_T *l)
 {
     rettv->v_type = VAR_LIST;
     rettv->vval.v_list = l;
-    if (l != NULL)
+    ಆದರೆ (l != ಖಾಲಿ)
 	++l->lv_refcount;
 }
 
@@ -213,10 +213,10 @@ rettv_list_set(typval_T *rettv, list_T *l)
  * Unreference a list: decrement the reference count and free it when it
  * becomes zero.
  */
-    void
+    ಶೂನ್ಯ
 list_unref(list_T *l)
 {
-    if (l != NULL && --l->lv_refcount <= 0)
+    ಆದರೆ (l != ಖಾಲಿ && --l->lv_refcount <= 0)
 	list_free(l);
 }
 
@@ -224,18 +224,18 @@ list_unref(list_T *l)
  * Free a list, including all non-container items it points to.
  * Ignores the reference count.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 list_free_contents(list_T *l)
 {
-    listitem_T *item;
+    listitem_T *ಅಂಶ;
 
-    if (l->lv_first != &range_list_item)
-	for (item = l->lv_first; item != NULL; item = l->lv_first)
+    ಆದರೆ (l->lv_ಮೊದಲ != &range_list_ಅಂಶ)
+	ಗಾಗಿ (ಅಂಶ = l->lv_ಮೊದಲ; ಅಂಶ != ಖಾಲಿ; ಅಂಶ = l->lv_ಮೊದಲ)
 	{
 	    // Remove the item before deleting it.
-	    l->lv_first = item->li_next;
-	    clear_tv(&item->li_tv);
-	    list_free_item(l, item);
+	    l->lv_ಮೊದಲ = ಅಂಶ->li_ಮುಂದಿನ;
+	    clear_tv(&ಅಂಶ->li_tv);
+	    list_free_ಅಂಶ(l, ಅಂಶ);
 	}
 }
 
@@ -244,15 +244,15 @@ list_free_contents(list_T *l)
  * But don't free a list that has a watcher (used in a for loop), these
  * are not referenced anywhere.
  */
-    int
-list_free_nonref(int copyID)
+    ಪೂರ್ಣಾಂಕ
+list_free_nonref(ಪೂರ್ಣಾಂಕ copyID)
 {
     list_T	*ll;
-    int		did_free = FALSE;
+    ಪೂರ್ಣಾಂಕ		did_free = FALSE;
 
-    for (ll = first_list; ll != NULL; ll = ll->lv_used_next)
-	if ((ll->lv_copyID & COPYID_MASK) != (copyID & COPYID_MASK)
-						      && ll->lv_watch == NULL)
+    ಗಾಗಿ (ll = ಮೊದಲ_list; ll != ಖಾಲಿ; ll = ll->lv_ಬಳಸಿದ_ಮುಂದಿನ)
+	ಆದರೆ ((ll->lv_copyID & COPYID_ಮುಖವಾಡ) != (copyID & COPYID_ಮುಖವಾಡ)
+						      && ll->lv_watch == ಖಾಲಿ)
 	{
 	    // Free the List and ordinary items it contains, but don't recurse
 	    // into Lists and Dictionaries, they will be in the list of dicts
@@ -260,34 +260,34 @@ list_free_nonref(int copyID)
 	    list_free_contents(ll);
 	    did_free = TRUE;
 	}
-    return did_free;
+    ಹಿಂತಿರುಗಿ did_free;
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 list_free_list(list_T  *l)
 {
     // Remove the list from the list of lists for garbage collection.
-    if (l->lv_used_prev == NULL)
-	first_list = l->lv_used_next;
-    else
-	l->lv_used_prev->lv_used_next = l->lv_used_next;
-    if (l->lv_used_next != NULL)
-	l->lv_used_next->lv_used_prev = l->lv_used_prev;
+    ಆದರೆ (l->lv_ಬಳಸಿದ_prev == ಖಾಲಿ)
+	ಮೊದಲ_list = l->lv_ಬಳಸಿದ_ಮುಂದಿನ;
+    ಇಲ್ಲದಿದ್ದರೆ
+	l->lv_ಬಳಸಿದ_prev->lv_ಬಳಸಿದ_ಮುಂದಿನ = l->lv_ಬಳಸಿದ_ಮುಂದಿನ;
+    ಆದರೆ (l->lv_ಬಳಸಿದ_ಮುಂದಿನ != ಖಾಲಿ)
+	l->lv_ಬಳಸಿದ_ಮುಂದಿನ->lv_ಬಳಸಿದ_prev = l->lv_ಬಳಸಿದ_prev;
 
     free_type(l->lv_type);
     vim_free(l);
 }
 
-    void
-list_free_items(int copyID)
+    ಶೂನ್ಯ
+list_free_ವಸ್ತುಗಳು(ಪೂರ್ಣಾಂಕ copyID)
 {
-    list_T	*ll, *ll_next;
+    list_T	*ll, *ll_ಮುಂದಿನ;
 
-    for (ll = first_list; ll != NULL; ll = ll_next)
+    ಗಾಗಿ (ll = ಮೊದಲ_list; ll != ಖಾಲಿ; ll = ll_ಮುಂದಿನ)
     {
-	ll_next = ll->lv_used_next;
-	if ((ll->lv_copyID & COPYID_MASK) != (copyID & COPYID_MASK)
-						      && ll->lv_watch == NULL)
+	ll_ಮುಂದಿನ = ll->lv_ಬಳಸಿದ_ಮುಂದಿನ;
+	ಆದರೆ ((ll->lv_copyID & COPYID_ಮುಖವಾಡ) != (copyID & COPYID_ಮುಖವಾಡ)
+						      && ll->lv_watch == ಖಾಲಿ)
 	{
 	    // Free the List and ordinary items it contains, but don't recurse
 	    // into Lists and Dictionaries, they will be in the list of dicts
@@ -297,11 +297,11 @@ list_free_items(int copyID)
     }
 }
 
-    void
+    ಶೂನ್ಯ
 list_free(list_T *l)
 {
-    if (in_free_unref_items)
-	return;
+    ಆದರೆ (ಒಳ_free_unref_ವಸ್ತುಗಳು)
+	ಹಿಂತಿರುಗಿ;
 
     list_free_contents(l);
     list_free_list(l);
@@ -312,85 +312,85 @@ list_free(list_T *l)
  * It is not initialized, don't forget to set v_lock.
  */
     listitem_T *
-listitem_alloc(void)
+listitem_alloc(ಶೂನ್ಯ)
 {
-    return ALLOC_ONE(listitem_T);
+    ಹಿಂತಿರುಗಿ ALLOC_ONE(listitem_T);
 }
 
 /*
  * Free a list item, unless it was allocated together with the list itself.
  * Does not clear the value.  Does not notify watchers.
  */
-    static void
-list_free_item(list_T *l, listitem_T *item)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+list_free_ಅಂಶ(list_T *l, listitem_T *ಅಂಶ)
 {
-    if (l->lv_with_items == 0 || item < (listitem_T *)l
-			   || item >= (listitem_T *)(l + 1) + l->lv_with_items)
-	vim_free(item);
+    ಆದರೆ (l->lv_with_ವಸ್ತುಗಳು == 0 || ಅಂಶ < (listitem_T *)l
+			   || ಅಂಶ >= (listitem_T *)(l + 1) + l->lv_with_ವಸ್ತುಗಳು)
+	vim_free(ಅಂಶ);
 }
 
 /*
  * Free a list item, unless it was allocated together with the list itself.
  * Also clears the value.  Does not notify watchers.
  */
-    void
-listitem_free(list_T *l, listitem_T *item)
+    ಶೂನ್ಯ
+listitem_free(list_T *l, listitem_T *ಅಂಶ)
 {
-    clear_tv(&item->li_tv);
-    list_free_item(l, item);
+    clear_tv(&ಅಂಶ->li_tv);
+    list_free_ಅಂಶ(l, ಅಂಶ);
 }
 
 /*
  * Remove a list item from a List and free it.  Also clears the value.
  */
-    void
-listitem_remove(list_T *l, listitem_T *item)
+    ಶೂನ್ಯ
+listitem_remove(list_T *l, listitem_T *ಅಂಶ)
 {
-    vimlist_remove(l, item, item);
-    listitem_free(l, item);
+    vimlist_remove(l, ಅಂಶ, ಅಂಶ);
+    listitem_free(l, ಅಂಶ);
 }
 
 /*
  * Get the number of items in a list.
  */
-    long
+    ದೀರ್ಘ
 list_len(list_T *l)
 {
-    if (l == NULL)
-	return 0L;
-    return l->lv_len;
+    ಆದರೆ (l == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ 0L;
+    ಹಿಂತಿರುಗಿ l->lv_len;
 }
 
 /*
  * Return TRUE when two lists have exactly the same values.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 list_equal(
     list_T	*l1,
     list_T	*l2,
-    int		ic)	// ignore case for strings
+    ಪೂರ್ಣಾಂಕ		ic)	// ignore case for strings
 {
     listitem_T	*item1, *item2;
 
-    if (l1 == l2)
-	return TRUE;
-    if (list_len(l1) != list_len(l2))
-	return FALSE;
-    if (list_len(l1) == 0)
+    ಆದರೆ (l1 == l2)
+	ಹಿಂತಿರುಗಿ TRUE;
+    ಆದರೆ (list_len(l1) != list_len(l2))
+	ಹಿಂತಿರುಗಿ FALSE;
+    ಆದರೆ (list_len(l1) == 0)
 	// empty and NULL list are considered equal
-	return TRUE;
-    if (l1 == NULL || l2 == NULL)
-	return FALSE;
+	ಹಿಂತಿರುಗಿ TRUE;
+    ಆದರೆ (l1 == ಖಾಲಿ || l2 == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FALSE;
 
     CHECK_LIST_MATERIALIZE(l1);
     CHECK_LIST_MATERIALIZE(l2);
 
-    for (item1 = l1->lv_first, item2 = l2->lv_first;
-	    item1 != NULL && item2 != NULL;
-			       item1 = item1->li_next, item2 = item2->li_next)
-	if (!tv_equal(&item1->li_tv, &item2->li_tv, ic))
-	    return FALSE;
-    return item1 == NULL && item2 == NULL;
+    ಗಾಗಿ (item1 = l1->lv_ಮೊದಲ, item2 = l2->lv_ಮೊದಲ;
+	    item1 != ಖಾಲಿ && item2 != ಖಾಲಿ;
+			       item1 = item1->li_ಮುಂದಿನ, item2 = item2->li_ಮುಂದಿನ)
+	ಆದರೆ (!tv_equal(&item1->li_tv, &item2->li_tv, ic))
+	    ಹಿಂತಿರುಗಿ FALSE;
+    ಹಿಂತಿರುಗಿ item1 == ಖಾಲಿ && item2 == ಖಾಲಿ;
 }
 
 /*
@@ -399,142 +399,142 @@ list_equal(
  * Returns NULL when "n" is out of range.
  */
     listitem_T *
-list_find(list_T *l, long n)
+list_ಕಂಡುಹಿಡಿ(list_T *l, ದೀರ್ಘ n)
 {
-    listitem_T	*item;
-    long	idx;
+    listitem_T	*ಅಂಶ;
+    ದೀರ್ಘ	idx;
 
-    if (l == NULL)
-	return NULL;
+    ಆದರೆ (l == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     // Negative index is relative to the end.
-    if (n < 0)
+    ಆದರೆ (n < 0)
 	n = l->lv_len + n;
 
     // Check for index out of range.
-    if (n < 0 || n >= l->lv_len)
-	return NULL;
+    ಆದರೆ (n < 0 || n >= l->lv_len)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     CHECK_LIST_MATERIALIZE(l);
 
     // range_list_materialize may reset l->lv_len
-    if (n >= l->lv_len)
-	return NULL;
+    ಆದರೆ (n >= l->lv_len)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     // When there is a cached index may start search from there.
-    if (l->lv_u.mat.lv_idx_item != NULL)
+    ಆದರೆ (l->lv_u.mat.lv_idx_ಅಂಶ != ಖಾಲಿ)
     {
-	if (n < l->lv_u.mat.lv_idx / 2)
+	ಆದರೆ (n < l->lv_u.mat.lv_idx / 2)
 	{
 	    // closest to the start of the list
-	    item = l->lv_first;
+	    ಅಂಶ = l->lv_ಮೊದಲ;
 	    idx = 0;
 	}
-	else if (n > (l->lv_u.mat.lv_idx + l->lv_len) / 2)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (n > (l->lv_u.mat.lv_idx + l->lv_len) / 2)
 	{
 	    // closest to the end of the list
-	    item = l->lv_u.mat.lv_last;
+	    ಅಂಶ = l->lv_u.mat.lv_ಕೊನೆಯ;
 	    idx = l->lv_len - 1;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // closest to the cached index
-	    item = l->lv_u.mat.lv_idx_item;
+	    ಅಂಶ = l->lv_u.mat.lv_idx_ಅಂಶ;
 	    idx = l->lv_u.mat.lv_idx;
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (n < l->lv_len / 2)
+	ಆದರೆ (n < l->lv_len / 2)
 	{
 	    // closest to the start of the list
-	    item = l->lv_first;
+	    ಅಂಶ = l->lv_ಮೊದಲ;
 	    idx = 0;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // closest to the end of the list
-	    item = l->lv_u.mat.lv_last;
+	    ಅಂಶ = l->lv_u.mat.lv_ಕೊನೆಯ;
 	    idx = l->lv_len - 1;
 	}
     }
 
-    while (n > idx)
+    ಆಗ (n > idx)
     {
 	// search forward
-	item = item->li_next;
+	ಅಂಶ = ಅಂಶ->li_ಮುಂದಿನ;
 	++idx;
     }
-    while (n < idx)
+    ಆಗ (n < idx)
     {
 	// search backward
-	item = item->li_prev;
+	ಅಂಶ = ಅಂಶ->li_prev;
 	--idx;
     }
 
     // cache the used index
     l->lv_u.mat.lv_idx = idx;
-    l->lv_u.mat.lv_idx_item = item;
+    l->lv_u.mat.lv_idx_ಅಂಶ = ಅಂಶ;
 
-    return item;
+    ಹಿಂತಿರುಗಿ ಅಂಶ;
 }
 
 /*
  * Get list item "l[idx]" as a number.
  */
-    long
-list_find_nr(
+    ದೀರ್ಘ
+list_ಕಂಡುಹಿಡಿ_nr(
     list_T	*l,
-    long	idx,
-    int		*errorp)	// set to TRUE when something wrong
+    ದೀರ್ಘ	idx,
+    ಪೂರ್ಣಾಂಕ		*errorp)	// set to TRUE when something wrong
 {
     listitem_T	*li;
 
-    if (l != NULL && l->lv_first == &range_list_item)
+    ಆದರೆ (l != ಖಾಲಿ && l->lv_ಮೊದಲ == &range_list_ಅಂಶ)
     {
-	long	    n = idx;
+	ದೀರ್ಘ	    n = idx;
 
 	// not materialized range() list: compute the value.
 	// Negative index is relative to the end.
-	if (n < 0)
+	ಆದರೆ (n < 0)
 	    n = l->lv_len + n;
 
 	// Check for index out of range.
-	if (n < 0 || n >= l->lv_len)
+	ಆದರೆ (n < 0 || n >= l->lv_len)
 	{
-	    if (errorp != NULL)
+	    ಆದರೆ (errorp != ಖಾಲಿ)
 		*errorp = TRUE;
-	    return -1L;
+	    ಹಿಂತಿರುಗಿ -1L;
 	}
 
-	return l->lv_u.nonmat.lv_start + n * l->lv_u.nonmat.lv_stride;
+	ಹಿಂತಿರುಗಿ l->lv_u.nonmat.lv_ಆರಂಭ + n * l->lv_u.nonmat.lv_stride;
     }
 
-    li = list_find(l, idx);
-    if (li == NULL)
+    li = list_ಕಂಡುಹಿಡಿ(l, idx);
+    ಆದರೆ (li == ಖಾಲಿ)
     {
-	if (errorp != NULL)
+	ಆದರೆ (errorp != ಖಾಲಿ)
 	    *errorp = TRUE;
-	return -1L;
+	ಹಿಂತಿರುಗಿ -1L;
     }
-    return (long)tv_get_number_chk(&li->li_tv, errorp);
+    ಹಿಂತಿರುಗಿ (ದೀರ್ಘ)tv_get_ಸಂಖ್ಯೆ_chk(&li->li_tv, errorp);
 }
 
 /*
  * Get list item "l[idx - 1]" as a string.  Returns NULL for failure.
  */
     char_u *
-list_find_str(list_T *l, long idx)
+list_ಕಂಡುಹಿಡಿ_str(list_T *l, ದೀರ್ಘ idx)
 {
     listitem_T	*li;
 
-    li = list_find(l, idx - 1);
-    if (li == NULL)
+    li = list_ಕಂಡುಹಿಡಿ(l, idx - 1);
+    ಆದರೆ (li == ಖಾಲಿ)
     {
-	semsg(_(e_list_index_out_of_range_nr), idx);
-	return NULL;
+	semsg(_(e_list_ಸೂಚ್ಯಂಕ_ಹೊರಹೋಗು_ದ_range_nr), idx);
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
-    return tv_get_string(&li->li_tv);
+    ಹಿಂತಿರುಗಿ tv_get_string(&li->li_tv);
 }
 
 /*
@@ -542,138 +542,138 @@ list_find_str(list_T *l, long idx)
  * zero and set "idx" to zero.  Used for first index of a range.
  */
     listitem_T *
-list_find_index(list_T *l, long *idx)
+list_ಕಂಡುಹಿಡಿ_ಸೂಚ್ಯಂಕ(list_T *l, ದೀರ್ಘ *idx)
 {
-    listitem_T *li = list_find(l, *idx);
+    listitem_T *li = list_ಕಂಡುಹಿಡಿ(l, *idx);
 
-    if (li != NULL)
-	return li;
+    ಆದರೆ (li != ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ li;
 
-    if (*idx < 0)
+    ಆದರೆ (*idx < 0)
     {
 	*idx = 0;
-	li = list_find(l, *idx);
+	li = list_ಕಂಡುಹಿಡಿ(l, *idx);
     }
-    return li;
+    ಹಿಂತಿರುಗಿ li;
 }
 
 /*
  * Locate "item" list "l" and return its index.
  * Returns -1 when "item" is not in the list.
  */
-    long
-list_idx_of_item(list_T *l, listitem_T *item)
+    ದೀರ್ಘ
+list_idx_ದ_ಅಂಶ(list_T *l, listitem_T *ಅಂಶ)
 {
-    long	idx = 0;
+    ದೀರ್ಘ	idx = 0;
     listitem_T	*li;
 
-    if (l == NULL)
-	return -1;
+    ಆದರೆ (l == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ -1;
     CHECK_LIST_MATERIALIZE(l);
     idx = 0;
-    for (li = l->lv_first; li != NULL && li != item; li = li->li_next)
+    ಗಾಗಿ (li = l->lv_ಮೊದಲ; li != ಖಾಲಿ && li != ಅಂಶ; li = li->li_ಮುಂದಿನ)
 	++idx;
-    if (li == NULL)
-	return -1;
-    return idx;
+    ಆದರೆ (li == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ -1;
+    ಹಿಂತಿರುಗಿ idx;
 }
 
 /*
  * Append item "item" to the end of list "l".
  */
-    void
-list_append(list_T *l, listitem_T *item)
+    ಶೂನ್ಯ
+list_append(list_T *l, listitem_T *ಅಂಶ)
 {
     CHECK_LIST_MATERIALIZE(l);
-    if (l->lv_u.mat.lv_last == NULL)
+    ಆದರೆ (l->lv_u.mat.lv_ಕೊನೆಯ == ಖಾಲಿ)
     {
 	// empty list
-	l->lv_first = item;
-	item->li_prev = NULL;
+	l->lv_ಮೊದಲ = ಅಂಶ;
+	ಅಂಶ->li_prev = ಖಾಲಿ;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	l->lv_u.mat.lv_last->li_next = item;
-	item->li_prev = l->lv_u.mat.lv_last;
+	l->lv_u.mat.lv_ಕೊನೆಯ->li_ಮುಂದಿನ = ಅಂಶ;
+	ಅಂಶ->li_prev = l->lv_u.mat.lv_ಕೊನೆಯ;
     }
-    l->lv_u.mat.lv_last = item;
+    l->lv_u.mat.lv_ಕೊನೆಯ = ಅಂಶ;
     ++l->lv_len;
-    item->li_next = NULL;
+    ಅಂಶ->li_ಮುಂದಿನ = ಖಾಲಿ;
 }
 
 /*
  * Append typval_T "tv" to the end of list "l".  "tv" is copied.
  * Return FAIL when out of memory or the type is wrong.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 list_append_tv(list_T *l, typval_T *tv)
 {
     listitem_T	*li;
 
-    if (l->lv_type != NULL && l->lv_type->tt_member != NULL
+    ಆದರೆ (l->lv_type != ಖಾಲಿ && l->lv_type->tt_member != ಖಾಲಿ
 		&& check_typval_arg_type(l->lv_type->tt_member, tv,
-							      NULL, 0) == FAIL)
-	return FAIL;
+							      ಖಾಲಿ, 0) == FAIL)
+	ಹಿಂತಿರುಗಿ FAIL;
     li = listitem_alloc();
-    if (li == NULL)
-	return FAIL;
+    ಆದರೆ (li == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
     copy_tv(tv, &li->li_tv);
     list_append(l, li);
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * As list_append_tv() but move the value instead of copying it.
  * Return FAIL when out of memory.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 list_append_tv_move(list_T *l, typval_T *tv)
 {
     listitem_T	*li = listitem_alloc();
 
-    if (li == NULL)
-	return FAIL;
+    ಆದರೆ (li == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
     li->li_tv = *tv;
     list_append(l, li);
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Add a dictionary to a list.  Used by getqflist().
  * Return FAIL when out of memory.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 list_append_dict(list_T *list, dict_T *dict)
 {
     listitem_T	*li = listitem_alloc();
 
-    if (li == NULL)
-	return FAIL;
+    ಆದರೆ (li == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
     li->li_tv.v_type = VAR_DICT;
-    li->li_tv.v_lock = 0;
+    li->li_tv.v_ಬೀಗ = 0;
     li->li_tv.vval.v_dict = dict;
     list_append(list, li);
     ++dict->dv_refcount;
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Append list2 to list1.
  * Return FAIL when out of memory.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 list_append_list(list_T *list1, list_T *list2)
 {
     listitem_T	*li = listitem_alloc();
 
-    if (li == NULL)
-	return FAIL;
+    ಆದರೆ (li == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
     li->li_tv.v_type = VAR_LIST;
-    li->li_tv.v_lock = 0;
+    li->li_tv.v_ಬೀಗ = 0;
     li->li_tv.vval.v_list = list2;
     list_append(list1, li);
     ++list2->lv_refcount;
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
@@ -681,41 +681,41 @@ list_append_list(list_T *list1, list_T *list2)
  * When "len" >= 0 use "str[len]".
  * Returns FAIL when out of memory.
  */
-    int
-list_append_string(list_T *l, char_u *str, int len)
+    ಪೂರ್ಣಾಂಕ
+list_append_string(list_T *l, char_u *str, ಪೂರ್ಣಾಂಕ len)
 {
     listitem_T *li = listitem_alloc();
 
-    if (li == NULL)
-	return FAIL;
+    ಆದರೆ (li == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
     list_append(l, li);
     li->li_tv.v_type = VAR_STRING;
-    li->li_tv.v_lock = 0;
-    if (str == NULL)
-	li->li_tv.vval.v_string = NULL;
-    else if ((li->li_tv.vval.v_string = (len >= 0 ? vim_strnsave(str, len)
-						 : vim_strsave(str))) == NULL)
-	return FAIL;
-    return OK;
+    li->li_tv.v_ಬೀಗ = 0;
+    ಆದರೆ (str == ಖಾಲಿ)
+	li->li_tv.vval.v_string = ಖಾಲಿ;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((li->li_tv.vval.v_string = (len >= 0 ? vim_strnsave(str, len)
+						 : vim_strsave(str))) == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Append "n" to list "l".
  * Returns FAIL when out of memory.
  */
-    int
-list_append_number(list_T *l, varnumber_T n)
+    ಪೂರ್ಣಾಂಕ
+list_append_ಸಂಖ್ಯೆ(list_T *l, varnumber_T n)
 {
     listitem_T	*li;
 
     li = listitem_alloc();
-    if (li == NULL)
-	return FAIL;
-    li->li_tv.v_type = VAR_NUMBER;
-    li->li_tv.v_lock = 0;
-    li->li_tv.vval.v_number = n;
+    ಆದರೆ (li == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
+    li->li_tv.v_type = VAR_ಸಂಖ್ಯೆ;
+    li->li_tv.v_ಬೀಗ = 0;
+    li->li_tv.vval.v_ಸಂಖ್ಯೆ = n;
     list_append(l, li);
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
@@ -723,46 +723,46 @@ list_append_number(list_T *l, varnumber_T n)
  * If "item" is NULL append at the end.
  * Return FAIL when out of memory or the type is wrong.
  */
-    int
-list_insert_tv(list_T *l, typval_T *tv, listitem_T *item)
+    ಪೂರ್ಣಾಂಕ
+list_ಸೇರಿಸು_tv(list_T *l, typval_T *tv, listitem_T *ಅಂಶ)
 {
     listitem_T	*ni;
 
-    if (l->lv_type != NULL && l->lv_type->tt_member != NULL
+    ಆದರೆ (l->lv_type != ಖಾಲಿ && l->lv_type->tt_member != ಖಾಲಿ
 		&& check_typval_arg_type(l->lv_type->tt_member, tv,
-							      NULL, 0) == FAIL)
-	return FAIL;
+							      ಖಾಲಿ, 0) == FAIL)
+	ಹಿಂತಿರುಗಿ FAIL;
     ni = listitem_alloc();
-    if (ni == NULL)
-	return FAIL;
+    ಆದರೆ (ni == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
     copy_tv(tv, &ni->li_tv);
-    list_insert(l, ni, item);
-    return OK;
+    list_ಸೇರಿಸು(l, ni, ಅಂಶ);
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-    void
-list_insert(list_T *l, listitem_T *ni, listitem_T *item)
+    ಶೂನ್ಯ
+list_ಸೇರಿಸು(list_T *l, listitem_T *ni, listitem_T *ಅಂಶ)
 {
     CHECK_LIST_MATERIALIZE(l);
-    if (item == NULL)
+    ಆದರೆ (ಅಂಶ == ಖಾಲಿ)
 	// Append new item at end of list.
 	list_append(l, ni);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Insert new item before existing item.
-	ni->li_prev = item->li_prev;
-	ni->li_next = item;
-	if (item->li_prev == NULL)
+	ni->li_prev = ಅಂಶ->li_prev;
+	ni->li_ಮುಂದಿನ = ಅಂಶ;
+	ಆದರೆ (ಅಂಶ->li_prev == ಖಾಲಿ)
 	{
-	    l->lv_first = ni;
+	    l->lv_ಮೊದಲ = ni;
 	    ++l->lv_u.mat.lv_idx;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    item->li_prev->li_next = ni;
-	    l->lv_u.mat.lv_idx_item = NULL;
+	    ಅಂಶ->li_prev->li_ಮುಂದಿನ = ni;
+	    l->lv_u.mat.lv_idx_ಅಂಶ = ಖಾಲಿ;
 	}
-	item->li_prev = ni;
+	ಅಂಶ->li_prev = ni;
 	++l->lv_len;
     }
 }
@@ -772,58 +772,58 @@ list_insert(list_T *l, listitem_T *ni, listitem_T *item)
  * adding a new element to a List in Vim9script by using the current list
  * length as the index.
  */
-    static int
-list_append_new_item(list_T *l)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+list_append_new_ಅಂಶ(list_T *l)
 {
     typval_T	tv;
 
-    if (l->lv_type != NULL && l->lv_type->tt_member != NULL)
+    ಆದರೆ (l->lv_type != ಖಾಲಿ && l->lv_type->tt_member != ಖಾಲಿ)
 	tv.v_type = l->lv_type->tt_member->tt_type;
-    else
-	tv.v_type = VAR_NUMBER;
-    tv.v_lock = 0;
+    ಇಲ್ಲದಿದ್ದರೆ
+	tv.v_type = VAR_ಸಂಖ್ಯೆ;
+    tv.v_ಬೀಗ = 0;
 
-    switch (tv.v_type)
+    ಆಯ್ಕೆ (tv.v_type)
     {
-	case VAR_BOOL: tv.vval.v_number = VVAL_FALSE; break;
-	case VAR_SPECIAL: tv.vval.v_number = 0; break;
-	case VAR_NUMBER: tv.vval.v_number = 0; break;
-	case VAR_FLOAT: tv.vval.v_float = 0; break;
-	case VAR_STRING: tv.vval.v_string = NULL; break;
-	case VAR_BLOB: tv.vval.v_blob = blob_alloc(); break;
-	case VAR_FUNC: tv.vval.v_string = NULL; break;
-	case VAR_PARTIAL: tv.vval.v_partial = NULL; break;
-	case VAR_LIST: tv.vval.v_list = list_alloc(); break;
-	case VAR_DICT: tv.vval.v_dict = dict_alloc(); break;
-#ifdef FEAT_JOB_CHANNEL
-	case VAR_JOB: tv.vval.v_job = NULL; break;
-	case VAR_CHANNEL: tv.vval.v_channel = NULL; break;
-#endif
-	case VAR_CLASS:
-	    if (l->lv_type != NULL && l->lv_type->tt_member != NULL)
+	ಸ್ಥಿತಿ VAR_BOOL: tv.vval.v_ಸಂಖ್ಯೆ = VVAL_FALSE; ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ VAR_SPECIAL: tv.vval.v_ಸಂಖ್ಯೆ = 0; ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ VAR_ಸಂಖ್ಯೆ: tv.vval.v_ಸಂಖ್ಯೆ = 0; ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ VAR_FLOAT: tv.vval.v_float = 0; ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ VAR_STRING: tv.vval.v_string = ಖಾಲಿ; ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ VAR_BLOB: tv.vval.v_blob = blob_alloc(); ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ VAR_FUNC: tv.vval.v_string = ಖಾಲಿ; ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ VAR_PARTIAL: tv.vval.v_partial = ಖಾಲಿ; ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ VAR_LIST: tv.vval.v_list = list_alloc(); ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ VAR_DICT: tv.vval.v_dict = dict_alloc(); ನಿಲ್ಲಿಸು;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕೆಲಸ_CHANNEL
+	ಸ್ಥಿತಿ VAR_ಕೆಲಸ: tv.vval.v_ಕೆಲಸ = ಖಾಲಿ; ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ VAR_CHANNEL: tv.vval.v_channel = ಖಾಲಿ; ನಿಲ್ಲಿಸು;
+#ಆದರೆ_ಅಂತ್ಯ
+	ಸ್ಥಿತಿ VAR_CLASS:
+	    ಆದರೆ (l->lv_type != ಖಾಲಿ && l->lv_type->tt_member != ಖಾಲಿ)
 		tv.vval.v_class = l->lv_type->tt_member->tt_class;
-	    else
-		tv.vval.v_class = NULL;
-	    break;
-	case VAR_OBJECT:
-	    if (l->lv_type != NULL && l->lv_type->tt_member != NULL)
+	    ಇಲ್ಲದಿದ್ದರೆ
+		tv.vval.v_class = ಖಾಲಿ;
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ VAR_OBJECT:
+	    ಆದರೆ (l->lv_type != ಖಾಲಿ && l->lv_type->tt_member != ಖಾಲಿ)
 		tv.vval.v_object =
 		    alloc_object(l->lv_type->tt_member->tt_class);
-	    else
-		tv.vval.v_object = NULL;
-	    break;
-	case VAR_TYPEALIAS: tv.vval.v_typealias = NULL; break;
-	case VAR_TUPLE: tv.vval.v_tuple = tuple_alloc(); break;
-	default:
-	    tv.v_type = VAR_NUMBER;
-	    tv.vval.v_number = 0;
-	    break;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		tv.vval.v_object = ಖಾಲಿ;
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ VAR_TYPEALIAS: tv.vval.v_typealias = ಖಾಲಿ; ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ VAR_TUPLE: tv.vval.v_tuple = tuple_alloc(); ನಿಲ್ಲಿಸು;
+	ಪೂರ್ವನಿಯೋಜಿತ:
+	    tv.v_type = VAR_ಸಂಖ್ಯೆ;
+	    tv.vval.v_ಸಂಖ್ಯೆ = 0;
+	    ನಿಲ್ಲಿಸು;
     }
 
-    if (l->lv_type != NULL && l->lv_type->tt_member != NULL)
-	set_tv_type(&tv, l->lv_type->tt_member);
+    ಆದರೆ (l->lv_type != ಖಾಲಿ && l->lv_type->tt_member != ಖಾಲಿ)
+	ಗಣ_tv_type(&tv, l->lv_type->tt_member);
 
-    return list_append_tv(l, &tv);
+    ಹಿಂತಿರುಗಿ list_append_tv(l, &tv);
 }
 
 /*
@@ -832,29 +832,29 @@ list_append_new_item(list_T *l)
  * Return NULL if there is no such item.
  */
     listitem_T *
-check_range_index_one(list_T *l, long *n1, int can_append, int quiet)
+check_range_ಸೂಚ್ಯಂಕ_one(list_T *l, ದೀರ್ಘ *n1, ಪೂರ್ಣಾಂಕ can_append, ಪೂರ್ಣಾಂಕ quiet)
 {
-    long	orig_n1 = *n1;
-    listitem_T	*li = list_find_index(l, n1);
+    ದೀರ್ಘ	orig_n1 = *n1;
+    listitem_T	*li = list_ಕಂಡುಹಿಡಿ_ಸೂಚ್ಯಂಕ(l, n1);
 
-    if (li != NULL)
-	return li;
+    ಆದರೆ (li != ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ li;
 
     // Vim9: Allow for adding an item at the end.
-    if (can_append && in_vim9script()
-	    && *n1 == l->lv_len && l->lv_lock == 0)
+    ಆದರೆ (can_append && ಒಳ_vim9script()
+	    && *n1 == l->lv_len && l->lv_ಬೀಗ == 0)
     {
-	if (list_append_new_item(l) == FAIL)
-	    return NULL;
-	li = list_find_index(l, n1);
+	ಆದರೆ (list_append_new_ಅಂಶ(l) == FAIL)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+	li = list_ಕಂಡುಹಿಡಿ_ಸೂಚ್ಯಂಕ(l, n1);
     }
-    if (li == NULL)
+    ಆದರೆ (li == ಖಾಲಿ)
     {
-	if (!quiet)
-	    semsg(_(e_list_index_out_of_range_nr), orig_n1);
-	return NULL;
+	ಆದರೆ (!quiet)
+	    semsg(_(e_list_ಸೂಚ್ಯಂಕ_ಹೊರಹೋಗು_ದ_range_nr), orig_n1);
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
-    return li;
+    ಹಿಂತಿರುಗಿ li;
 }
 
 /*
@@ -863,37 +863,37 @@ check_range_index_one(list_T *l, long *n1, int can_append, int quiet)
  * "li1" is the item for item "n1".
  * Return OK or FAIL.
  */
-    int
-check_range_index_two(
+    ಪೂರ್ಣಾಂಕ
+check_range_ಸೂಚ್ಯಂಕ_two(
 	list_T	    *l,
-	long	    *n1,
+	ದೀರ್ಘ	    *n1,
 	listitem_T  *li1,
-	long	    *n2,
-	int	    quiet)
+	ದೀರ್ಘ	    *n2,
+	ಪೂರ್ಣಾಂಕ	    quiet)
 {
-    if (*n2 < 0)
+    ಆದರೆ (*n2 < 0)
     {
-	listitem_T	*ni = list_find(l, *n2);
+	listitem_T	*ni = list_ಕಂಡುಹಿಡಿ(l, *n2);
 
-	if (ni == NULL)
+	ಆದರೆ (ni == ಖಾಲಿ)
 	{
-	    if (!quiet)
-		semsg(_(e_list_index_out_of_range_nr), *n2);
-	    return FAIL;
+	    ಆದರೆ (!quiet)
+		semsg(_(e_list_ಸೂಚ್ಯಂಕ_ಹೊರಹೋಗು_ದ_range_nr), *n2);
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
-	*n2 = list_idx_of_item(l, ni);
+	*n2 = list_idx_ದ_ಅಂಶ(l, ni);
     }
 
     // Check that n2 isn't before n1.
-    if (*n1 < 0)
-	*n1 = list_idx_of_item(l, li1);
-    if (*n2 < *n1)
+    ಆದರೆ (*n1 < 0)
+	*n1 = list_idx_ದ_ಅಂಶ(l, li1);
+    ಆದರೆ (*n2 < *n1)
     {
-	if (!quiet)
-	    semsg(_(e_list_index_out_of_range_nr), *n2);
-	return FAIL;
+	ಆದರೆ (!quiet)
+	    semsg(_(e_list_ಸೂಚ್ಯಂಕ_ಹೊರಹೋಗು_ದ_range_nr), *n2);
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
@@ -905,85 +905,85 @@ check_range_index_two(
  * "varname" is used for error messages.
  * Returns OK or FAIL.
  */
-    int
-list_assign_range(
+    ಪೂರ್ಣಾಂಕ
+list_ನಿಯೋಜಿಸು_range(
 	list_T	    *dest,
 	list_T	    *src,
-	long	    idx1_arg,
-	long	    idx2,
-	int	    empty_idx2,
+	ದೀರ್ಘ	    idx1_arg,
+	ದೀರ್ಘ	    idx2,
+	ಪೂರ್ಣಾಂಕ	    ಖಾಲಿಗಳು_idx2,
 	char_u	    *op,
 	char_u	    *varname)
 {
     listitem_T	*src_li;
     listitem_T	*dest_li;
-    long	idx1 = idx1_arg;
-    listitem_T	*first_li = list_find_index(dest, &idx1);
-    long	idx;
-    type_T	*member_type = NULL;
+    ದೀರ್ಘ	idx1 = idx1_arg;
+    listitem_T	*ಮೊದಲ_li = list_ಕಂಡುಹಿಡಿ_ಸೂಚ್ಯಂಕ(dest, &idx1);
+    ದೀರ್ಘ	idx;
+    type_T	*member_type = ಖಾಲಿ;
 
     // Check whether any of the list items is locked before making any changes.
     idx = idx1;
-    dest_li = first_li;
-    for (src_li = src->lv_first; src_li != NULL && dest_li != NULL; )
+    dest_li = ಮೊದಲ_li;
+    ಗಾಗಿ (src_li = src->lv_ಮೊದಲ; src_li != ಖಾಲಿ && dest_li != ಖಾಲಿ; )
     {
-	if (value_check_lock(dest_li->li_tv.v_lock, varname, FALSE))
-	    return FAIL;
-	src_li = src_li->li_next;
-	if (src_li == NULL || (!empty_idx2 && idx2 == idx))
-	    break;
-	dest_li = dest_li->li_next;
+	ಆದರೆ (ಮೌಲ್ಯ_check_ಬೀಗ(dest_li->li_tv.v_ಬೀಗ, varname, FALSE))
+	    ಹಿಂತಿರುಗಿ FAIL;
+	src_li = src_li->li_ಮುಂದಿನ;
+	ಆದರೆ (src_li == ಖಾಲಿ || (!ಖಾಲಿಗಳು_idx2 && idx2 == idx))
+	    ನಿಲ್ಲಿಸು;
+	dest_li = dest_li->li_ಮುಂದಿನ;
 	++idx;
     }
 
-    if (in_vim9script() && dest->lv_type != NULL
-					   && dest->lv_type->tt_member != NULL)
+    ಆದರೆ (ಒಳ_vim9script() && dest->lv_type != ಖಾಲಿ
+					   && dest->lv_type->tt_member != ಖಾಲಿ)
 	member_type = dest->lv_type->tt_member;
 
     // Assign the List values to the list items.
     idx = idx1;
-    dest_li = first_li;
-    for (src_li = src->lv_first; src_li != NULL; )
+    dest_li = ಮೊದಲ_li;
+    ಗಾಗಿ (src_li = src->lv_ಮೊದಲ; src_li != ಖಾಲಿ; )
     {
-	if (op != NULL && *op != '=')
+	ಆದರೆ (op != ಖಾಲಿ && *op != '=')
 	    tv_op(&dest_li->li_tv, &src_li->li_tv, op);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (member_type != NULL
+	    ಆದರೆ (member_type != ಖಾಲಿ
 		    && check_typval_arg_type(member_type, &src_li->li_tv,
-							      NULL, 0) == FAIL)
-		return FAIL;
+							      ಖಾಲಿ, 0) == FAIL)
+		ಹಿಂತಿರುಗಿ FAIL;
 	    clear_tv(&dest_li->li_tv);
 	    copy_tv(&src_li->li_tv, &dest_li->li_tv);
 	}
-	src_li = src_li->li_next;
-	if (src_li == NULL || (!empty_idx2 && idx2 == idx))
-	    break;
-	if (dest_li->li_next == NULL)
+	src_li = src_li->li_ಮುಂದಿನ;
+	ಆದರೆ (src_li == ಖಾಲಿ || (!ಖಾಲಿಗಳು_idx2 && idx2 == idx))
+	    ನಿಲ್ಲಿಸು;
+	ಆದರೆ (dest_li->li_ಮುಂದಿನ == ಖಾಲಿ)
 	{
 	    // Need to add an empty item.
-	    if (list_append_number(dest, 0) == FAIL)
+	    ಆದರೆ (list_append_ಸಂಖ್ಯೆ(dest, 0) == FAIL)
 	    {
-		src_li = NULL;
-		break;
+		src_li = ಖಾಲಿ;
+		ನಿಲ್ಲಿಸು;
 	    }
 	}
-	dest_li = dest_li->li_next;
+	dest_li = dest_li->li_ಮುಂದಿನ;
 	++idx;
     }
-    if (src_li != NULL)
+    ಆದರೆ (src_li != ಖಾಲಿ)
     {
-	emsg(_(e_list_value_has_more_items_than_targets));
-	return FAIL;
+	emsg(_(e_list_ಮೌಲ್ಯ_has_ಇನ್ನಷ್ಟು_ವಸ್ತುಗಳು_than_targets));
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-    if (empty_idx2
-	    ? (dest_li != NULL && dest_li->li_next != NULL)
+    ಆದರೆ (ಖಾಲಿಗಳು_idx2
+	    ? (dest_li != ಖಾಲಿ && dest_li->li_ಮುಂದಿನ != ಖಾಲಿ)
 	    : idx != idx2)
     {
-	emsg(_(e_list_value_does_not_have_enough_items));
-	return FAIL;
+	emsg(_(e_list_ಮೌಲ್ಯ_does_not_have_enough_ವಸ್ತುಗಳು));
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
@@ -992,130 +992,130 @@ list_assign_range(
  * It does nothing if "maxdepth" is 0.
  * Returns FAIL when out of memory.
  */
-    static void
-list_flatten(list_T *list, listitem_T *first, long maxitems, long maxdepth)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+list_flatten(list_T *list, listitem_T *ಮೊದಲ, ದೀರ್ಘ maxitems, ದೀರ್ಘ maxdepth)
 {
-    listitem_T	*item;
-    int		done = 0;
+    listitem_T	*ಅಂಶ;
+    ಪೂರ್ಣಾಂಕ		ಮುಗಿದ = 0;
 
-    if (maxdepth == 0)
-	return;
+    ಆದರೆ (maxdepth == 0)
+	ಹಿಂತಿರುಗಿ;
     CHECK_LIST_MATERIALIZE(list);
-    if (first == NULL)
-	item = list->lv_first;
-    else
-	item = first;
+    ಆದರೆ (ಮೊದಲ == ಖಾಲಿ)
+	ಅಂಶ = list->lv_ಮೊದಲ;
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಅಂಶ = ಮೊದಲ;
 
-    while (item != NULL && done < maxitems)
+    ಆಗ (ಅಂಶ != ಖಾಲಿ && ಮುಗಿದ < maxitems)
     {
-	listitem_T	*next = item->li_next;
+	listitem_T	*ಮುಂದಿನ = ಅಂಶ->li_ಮುಂದಿನ;
 
 	fast_breakcheck();
-	if (got_int)
-	    return;
+	ಆದರೆ (got_int)
+	    ಹಿಂತಿರುಗಿ;
 
-	if (item->li_tv.v_type == VAR_LIST)
+	ಆದರೆ (ಅಂಶ->li_tv.v_type == VAR_LIST)
 	{
-	    list_T	*itemlist = item->li_tv.vval.v_list;
+	    list_T	*itemlist = ಅಂಶ->li_tv.vval.v_list;
 
-	    vimlist_remove(list, item, item);
-	    if (list_extend(list, itemlist, next) == FAIL)
+	    vimlist_remove(list, ಅಂಶ, ಅಂಶ);
+	    ಆದರೆ (list_extend(list, itemlist, ಮುಂದಿನ) == FAIL)
 	    {
-		list_free_item(list, item);
-		return;
+		list_free_ಅಂಶ(list, ಅಂಶ);
+		ಹಿಂತಿರುಗಿ;
 	    }
 
-	    if (maxdepth > 0)
-		list_flatten(list, item->li_prev == NULL
-				     ? list->lv_first : item->li_prev->li_next,
+	    ಆದರೆ (maxdepth > 0)
+		list_flatten(list, ಅಂಶ->li_prev == ಖಾಲಿ
+				     ? list->lv_ಮೊದಲ : ಅಂಶ->li_prev->li_ಮುಂದಿನ,
 				itemlist->lv_len, maxdepth - 1);
-	    clear_tv(&item->li_tv);
-	    list_free_item(list, item);
+	    clear_tv(&ಅಂಶ->li_tv);
+	    list_free_ಅಂಶ(list, ಅಂಶ);
 	}
 
-	++done;
-	item = next;
+	++ಮುಗಿದ;
+	ಅಂಶ = ಮುಂದಿನ;
     }
 }
 
 /*
  * "flatten()" and "flattennew()" functions
  */
-    static void
-flatten_common(typval_T *argvars, typval_T *rettv, int make_copy)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+flatten_common(typval_T *argvars, typval_T *rettv, ಪೂರ್ಣಾಂಕ make_copy)
 {
     list_T  *l;
-    long    maxdepth;
-    int	    error = FALSE;
+    ದೀರ್ಘ    maxdepth;
+    ಪೂರ್ಣಾಂಕ	    error = FALSE;
 
-    if (in_vim9script()
+    ಆದರೆ (ಒಳ_vim9script()
 	    && (check_for_list_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_ಸಂಖ್ಯೆ_arg(argvars, 1) == FAIL))
+	ಹಿಂತಿರುಗಿ;
 
-    if (argvars[0].v_type != VAR_LIST)
+    ಆದರೆ (argvars[0].v_type != VAR_LIST)
     {
-	semsg(_(e_argument_of_str_must_be_list), "flatten()");
-	return;
+	semsg(_(e_ವಾದ_ದ_str_must_be_list), "flatten()");
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if (argvars[1].v_type == VAR_UNKNOWN)
+    ಆದರೆ (argvars[1].v_type == VAR_UNKNOWN)
 	maxdepth = 999999;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	maxdepth = (long)tv_get_number_chk(&argvars[1], &error);
-	if (error)
-	    return;
-	if (maxdepth < 0)
+	maxdepth = (ದೀರ್ಘ)tv_get_ಸಂಖ್ಯೆ_chk(&argvars[1], &error);
+	ಆದರೆ (error)
+	    ಹಿಂತಿರುಗಿ;
+	ಆದರೆ (maxdepth < 0)
 	{
-	    emsg(_(e_maxdepth_must_be_non_negative_number));
-	    return;
+	    emsg(_(e_maxdepth_must_be_non_negative_ಸಂಖ್ಯೆ));
+	    ಹಿಂತಿರುಗಿ;
 	}
     }
 
     l = argvars[0].vval.v_list;
     rettv->v_type = VAR_LIST;
     rettv->vval.v_list = l;
-    if (l == NULL)
-	return;
+    ಆದರೆ (l == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    if (make_copy)
+    ಆದರೆ (make_copy)
     {
 	l = list_copy(l, FALSE, TRUE, get_copyID());
 	rettv->vval.v_list = l;
-	if (l == NULL)
-	    return;
+	ಆದರೆ (l == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ;
 	// The type will change.
 	free_type(l->lv_type);
-	l->lv_type = NULL;
+	l->lv_type = ಖಾಲಿ;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (value_check_lock(l->lv_lock,
+	ಆದರೆ (ಮೌಲ್ಯ_check_ಬೀಗ(l->lv_ಬೀಗ,
 				     (char_u *)N_("flatten() argument"), TRUE))
-	    return;
+	    ಹಿಂತಿರುಗಿ;
 	++l->lv_refcount;
     }
 
-    list_flatten(l, NULL, l->lv_len, maxdepth);
+    list_flatten(l, ಖಾಲಿ, l->lv_len, maxdepth);
 }
 
 /*
  * "flatten(list[, {maxdepth}])" function
  */
-    void
+    ಶೂನ್ಯ
 f_flatten(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script())
-	emsg(_(e_cannot_use_flatten_in_vim9_script));
-    else
+    ಆದರೆ (ಒಳ_vim9script())
+	emsg(_(e_cannot_use_flatten_ಒಳ_vim9_script));
+    ಇಲ್ಲದಿದ್ದರೆ
 	flatten_common(argvars, rettv, FALSE);
 }
 
 /*
  * "flattennew(list[, {maxdepth}])" function
  */
-    void
+    ಶೂನ್ಯ
 f_flattennew(typval_T *argvars, typval_T *rettv)
 {
     flatten_common(argvars, rettv, TRUE);
@@ -1125,34 +1125,34 @@ f_flattennew(typval_T *argvars, typval_T *rettv)
  * "items(list)" function
  * Caller must have already checked that argvars[0] is a List.
  */
-    void
+    ಶೂನ್ಯ
 list2items(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l = argvars[0].vval.v_list;
     listitem_T	*li;
     varnumber_T	idx;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
-    if (l == NULL)
-	return;  // null list behaves like an empty list
+    ಆದರೆ (rettv_list_alloc(rettv) == FAIL)
+	ಹಿಂತಿರುಗಿ;
+    ಆದರೆ (l == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;  // null list behaves like an empty list
 
     // TODO: would be more efficient to not materialize the argument
     CHECK_LIST_MATERIALIZE(l);
-    for (idx = 0, li = l->lv_first; li != NULL; li = li->li_next, ++idx)
+    ಗಾಗಿ (idx = 0, li = l->lv_ಮೊದಲ; li != ಖಾಲಿ; li = li->li_ಮುಂದಿನ, ++idx)
     {
 	list_T	    *l2 = list_alloc();
 
-	if (l2 == NULL)
-	    break;
-	if (list_append_list(rettv->vval.v_list, l2) == FAIL)
+	ಆದರೆ (l2 == ಖಾಲಿ)
+	    ನಿಲ್ಲಿಸು;
+	ಆದರೆ (list_append_list(rettv->vval.v_list, l2) == FAIL)
 	{
 	    list_free(l2);
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
-	if (list_append_number(l2, idx) == FAIL
+	ಆದರೆ (list_append_ಸಂಖ್ಯೆ(l2, idx) == FAIL
 		|| list_append_tv(l2, &li->li_tv) == FAIL)
-	    break;
+	    ನಿಲ್ಲಿಸು;
     }
 }
 
@@ -1160,35 +1160,35 @@ list2items(typval_T *argvars, typval_T *rettv)
  * "items(string)" function
  * Caller must have already checked that argvars[0] is a String.
  */
-    void
+    ಶೂನ್ಯ
 string2items(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p = argvars[0].vval.v_string;
     varnumber_T idx;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
-    if (p == NULL)
-	return;  // null string behaves like an empty string
+    ಆದರೆ (rettv_list_alloc(rettv) == FAIL)
+	ಹಿಂತಿರುಗಿ;
+    ಆದರೆ (p == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;  // null string behaves like an empty string
 
-    for (idx = 0; *p != NUL; ++idx)
+    ಗಾಗಿ (idx = 0; *p != NUL; ++idx)
     {
-	int	    len = mb_ptr2len(p);
+	ಪೂರ್ಣಾಂಕ	    len = mb_ptr2len(p);
 	list_T	    *l2;
 
-	if (len == 0)
-	    break;
+	ಆದರೆ (len == 0)
+	    ನಿಲ್ಲಿಸು;
 	l2 = list_alloc();
-	if (l2 == NULL)
-	    break;
-	if (list_append_list(rettv->vval.v_list, l2) == FAIL)
+	ಆದರೆ (l2 == ಖಾಲಿ)
+	    ನಿಲ್ಲಿಸು;
+	ಆದರೆ (list_append_list(rettv->vval.v_list, l2) == FAIL)
 	{
 	    list_free(l2);
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
-	if (list_append_number(l2, idx) == FAIL
+	ಆದರೆ (list_append_ಸಂಖ್ಯೆ(l2, idx) == FAIL
 		|| list_append_string(l2, p, len) == FAIL)
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	p += len;
     }
 }
@@ -1198,16 +1198,16 @@ string2items(typval_T *argvars, typval_T *rettv)
  * If "bef" is NULL append at the end, otherwise insert before this item.
  * Returns FAIL when out of memory.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 list_extend(list_T *l1, list_T *l2, listitem_T *bef)
 {
-    listitem_T	*item;
-    int		todo;
+    listitem_T	*ಅಂಶ;
+    ಪೂರ್ಣಾಂಕ		todo;
     listitem_T	*bef_prev;
 
     // NULL list is equivalent to an empty list: nothing to do.
-    if (l2 == NULL || l2->lv_len == 0)
-	return OK;
+    ಆದರೆ (l2 == ಖಾಲಿ || l2->lv_len == 0)
+	ಹಿಂತಿರುಗಿ OK;
 
     todo = l2->lv_len;
     CHECK_LIST_MATERIALIZE(l1);
@@ -1216,196 +1216,196 @@ list_extend(list_T *l1, list_T *l2, listitem_T *bef)
     // When exending a list with itself, at some point we run into the item
     // that was before "bef" and need to skip over the already inserted items
     // to "bef".
-    bef_prev = bef == NULL ? NULL : bef->li_prev;
+    bef_prev = bef == ಖಾಲಿ ? ಖಾಲಿ : bef->li_prev;
 
     // We also quit the loop when we have inserted the original item count of
     // the list, avoid a hang when we extend a list with itself.
-    for (item = l2->lv_first; item != NULL && --todo >= 0;
-				 item = item == bef_prev ? bef : item->li_next)
-	if (list_insert_tv(l1, &item->li_tv, bef) == FAIL)
-	    return FAIL;
-    return OK;
+    ಗಾಗಿ (ಅಂಶ = l2->lv_ಮೊದಲ; ಅಂಶ != ಖಾಲಿ && --todo >= 0;
+				 ಅಂಶ = ಅಂಶ == bef_prev ? bef : ಅಂಶ->li_ಮುಂದಿನ)
+	ಆದರೆ (list_ಸೇರಿಸು_tv(l1, &ಅಂಶ->li_tv, bef) == FAIL)
+	    ಹಿಂತಿರುಗಿ FAIL;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Concatenate lists "l1" and "l2" into a new list, stored in "tv".
  * Return FAIL when out of memory.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 list_concat(list_T *l1, list_T *l2, typval_T *tv)
 {
     list_T	*l;
-    int		len1 = l1 == NULL ? 0 : l1->lv_len;
-    int		len2 = l2 == NULL ? 0 : l2->lv_len;
-    long	totallen = (long)len1 + (long)len2;
-    int		i;
-    listitem_T	*item;
+    ಪೂರ್ಣಾಂಕ		len1 = l1 == ಖಾಲಿ ? 0 : l1->lv_len;
+    ಪೂರ್ಣಾಂಕ		len2 = l2 == ಖಾಲಿ ? 0 : l2->lv_len;
+    ದೀರ್ಘ	totallen = (ದೀರ್ಘ)len1 + (ದೀರ್ಘ)len2;
+    ಪೂರ್ಣಾಂಕ		i;
+    listitem_T	*ಅಂಶ;
 
-    if (totallen == 0)
+    ಆದರೆ (totallen == 0)
     {
 	l = list_alloc();
-	if (l == NULL)
-	    return FAIL;
+	ಆದರೆ (l == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ FAIL;
 	++l->lv_refcount;
 	tv->v_type = VAR_LIST;
-	tv->v_lock = 0;
+	tv->v_ಬೀಗ = 0;
 	tv->vval.v_list = l;
-	return OK;
+	ಹಿಂತಿರುಗಿ OK;
     }
-    if (totallen > INT_MAX)
-	return FAIL;
+    ಆದರೆ (totallen > ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
     // allocate all items at once for efficiency
-    l = list_alloc_with_items((int)totallen);
-    if (l == NULL)
-	return FAIL;
+    l = list_alloc_with_ವಸ್ತುಗಳು((ಪೂರ್ಣಾಂಕ)totallen);
+    ಆದರೆ (l == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
     i = 0;
-    if (len1 > 0)
+    ಆದರೆ (len1 > 0)
     {
 	CHECK_LIST_MATERIALIZE(l1);
-	for (item = l1->lv_first; item != NULL && !got_int;
-		item = item->li_next)
+	ಗಾಗಿ (ಅಂಶ = l1->lv_ಮೊದಲ; ಅಂಶ != ಖಾಲಿ && !got_int;
+		ಅಂಶ = ಅಂಶ->li_ಮುಂದಿನ)
 	{
 	    typval_T new_tv;
 
-	    copy_tv(&item->li_tv, &new_tv);
-	    list_set_item(l, i++, &new_tv);
+	    copy_tv(&ಅಂಶ->li_tv, &new_tv);
+	    list_ಗಣ_ಅಂಶ(l, i++, &new_tv);
 	}
     }
-    if (len2 > 0)
+    ಆದರೆ (len2 > 0)
     {
 	CHECK_LIST_MATERIALIZE(l2);
-	for (item = l2->lv_first; item != NULL && !got_int;
-		item = item->li_next)
+	ಗಾಗಿ (ಅಂಶ = l2->lv_ಮೊದಲ; ಅಂಶ != ಖಾಲಿ && !got_int;
+		ಅಂಶ = ಅಂಶ->li_ಮುಂದಿನ)
 	{
 	    typval_T new_tv;
 
-	    copy_tv(&item->li_tv, &new_tv);
-	    list_set_item(l, i++, &new_tv);
+	    copy_tv(&ಅಂಶ->li_tv, &new_tv);
+	    list_ಗಣ_ಅಂಶ(l, i++, &new_tv);
 	}
     }
 
     ++l->lv_refcount;
     tv->v_type = VAR_LIST;
-    tv->v_lock = 0;
+    tv->v_ಬೀಗ = 0;
     tv->vval.v_list = l;
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
     list_T *
-list_slice(list_T *ol, long n1, long n2)
+list_ತುಂಡು(list_T *ol, ದೀರ್ಘ n1, ದೀರ್ಘ n2)
 {
-    listitem_T	*item;
+    listitem_T	*ಅಂಶ;
     list_T	*l;
-    long	count;
-    long	idx;
+    ದೀರ್ಘ	ಎಣಿಕೆ_2;
+    ದೀರ್ಘ	idx;
 
-    if (n2 < n1)
-	return list_alloc();
-    if (n1 > INT_MAX - (n2 - n1) - 1)
-	return NULL;
-    count = n2 - n1 + 1;
+    ಆದರೆ (n2 < n1)
+	ಹಿಂತಿರುಗಿ list_alloc();
+    ಆದರೆ (n1 > ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ - (n2 - n1) - 1)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    ಎಣಿಕೆ_2 = n2 - n1 + 1;
 
     // The length is known, so allocate the list and all items at once.
-    l = list_alloc_with_items((int)count);
-    if (l == NULL)
-	return NULL;
+    l = list_alloc_with_ವಸ್ತುಗಳು((ಪೂರ್ಣಾಂಕ)ಎಣಿಕೆ_2);
+    ಆದರೆ (l == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    item = list_find(ol, n1);
-    for (idx = 0; idx < count; ++idx)
+    ಅಂಶ = list_ಕಂಡುಹಿಡಿ(ol, n1);
+    ಗಾಗಿ (idx = 0; idx < ಎಣಿಕೆ_2; ++idx)
     {
 	typval_T	new_tv;
 
 	// "item" is NULL when materializing "ol" stopped early.
-	if (item == NULL)
+	ಆದರೆ (ಅಂಶ == ಖಾಲಿ)
 	{
 	    list_free(l);
-	    return NULL;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
 
-	copy_tv(&item->li_tv, &new_tv);
-	list_set_item(l, (int)idx, &new_tv);
-	item = item->li_next;
+	copy_tv(&ಅಂಶ->li_tv, &new_tv);
+	list_ಗಣ_ಅಂಶ(l, (ಪೂರ್ಣಾಂಕ)idx, &new_tv);
+	ಅಂಶ = ಅಂಶ->li_ಮುಂದಿನ;
     }
-    return l;
+    ಹಿಂತಿರುಗಿ l;
 }
 
-    int
-list_slice_or_index(
+    ಪೂರ್ಣಾಂಕ
+list_ತುಂಡು_or_ಸೂಚ್ಯಂಕ(
 	    list_T	*list,
-	    int		range,
+	    ಪೂರ್ಣಾಂಕ		range,
 	    varnumber_T	n1_arg,
 	    varnumber_T	n2_arg,
-	    int		exclusive,
+	    ಪೂರ್ಣಾಂಕ		exclusive,
 	    typval_T	*rettv,
-	    int		verbose)
+	    ಪೂರ್ಣಾಂಕ		verbose)
 {
-    long	len = list_len(list);
+    ದೀರ್ಘ	len = list_len(list);
     varnumber_T	n1 = n1_arg;
     varnumber_T	n2 = n2_arg;
     typval_T	var1;
 
-    if (n1 < 0)
+    ಆದರೆ (n1 < 0)
 	n1 = len + n1;
-    if (n1 < 0 || n1 >= len)
+    ಆದರೆ (n1 < 0 || n1 >= len)
     {
 	// For a range we allow invalid values and for legacy script return an
 	// empty list, for Vim9 script start at the first item.
 	// A list index out of range is an error.
-	if (!range)
+	ಆದರೆ (!range)
 	{
-	    if (verbose)
-		semsg(_(e_list_index_out_of_range_nr), (long)n1_arg);
-	    return FAIL;
+	    ಆದರೆ (verbose)
+		semsg(_(e_list_ಸೂಚ್ಯಂಕ_ಹೊರಹೋಗು_ದ_range_nr), (ದೀರ್ಘ)n1_arg);
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
-	if (in_vim9script())
+	ಆದರೆ (ಒಳ_vim9script())
 	    n1 = n1 < 0 ? 0 : len;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    n1 = len;
     }
-    if (range)
+    ಆದರೆ (range)
     {
 	list_T	*l;
 
-	if (n2 < 0)
+	ಆದರೆ (n2 < 0)
 	    n2 = len + n2;
-	else if (n2 >= len)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (n2 >= len)
 	    n2 = len - (exclusive ? 0 : 1);
-	if (exclusive)
+	ಆದರೆ (exclusive)
 	    --n2;
-	if (n2 < 0 || n2 + 1 < n1)
+	ಆದರೆ (n2 < 0 || n2 + 1 < n1)
 	    n2 = -1;
-	l = list_slice(list, n1, n2);
-	if (l == NULL)
-	    return FAIL;
+	l = list_ತುಂಡು(list, n1, n2);
+	ಆದರೆ (l == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ FAIL;
 	clear_tv(rettv);
-	rettv_list_set(rettv, l);
+	rettv_list_ಗಣ(rettv, l);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// copy the item to "var1" to avoid that freeing the list makes it
 	// invalid.
-	long index = n1;
-	listitem_T *li = check_range_index_one(list, &index, TRUE, TRUE);
-	if (li == NULL)
-	    return FAIL;
+	ದೀರ್ಘ ಸೂಚ್ಯಂಕ = n1;
+	listitem_T *li = check_range_ಸೂಚ್ಯಂಕ_one(list, &ಸೂಚ್ಯಂಕ, TRUE, TRUE);
+	ಆದರೆ (li == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ FAIL;
 	copy_tv(&li->li_tv, &var1);
 
 	// If "var1" is a List and the List item type is not set, then set it
 	// from the declared list item type.
-	if (in_vim9script() && var1.v_type == VAR_LIST
-					&& var1.vval.v_list != NULL
-					&& var1.vval.v_list->lv_type == NULL)
+	ಆದರೆ (ಒಳ_vim9script() && var1.v_type == VAR_LIST
+					&& var1.vval.v_list != ಖಾಲಿ
+					&& var1.vval.v_list->lv_type == ಖಾಲಿ)
 	{
-	    if (list->lv_type != NULL && list->lv_type->tt_member != NULL)
-		set_tv_type(&var1, list->lv_type->tt_member);
+	    ಆದರೆ (list->lv_type != ಖಾಲಿ && list->lv_type->tt_member != ಖಾಲಿ)
+		ಗಣ_tv_type(&var1, list->lv_type->tt_member);
 	}
 
 	clear_tv(rettv);
 	*rettv = var1;
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
@@ -1415,54 +1415,54 @@ list_slice_or_index(
  * Returns NULL when out of memory.
  */
     list_T *
-list_copy(list_T *orig, int deep, int top, int copyID)
+list_copy(list_T *orig, ಪೂರ್ಣಾಂಕ deep, ಪೂರ್ಣಾಂಕ ತುದಿ, ಪೂರ್ಣಾಂಕ copyID)
 {
     list_T	*copy;
-    listitem_T	*item;
-    int		idx = 0;
+    listitem_T	*ಅಂಶ;
+    ಪೂರ್ಣಾಂಕ		idx = 0;
 
-    if (orig == NULL)
-	return NULL;
+    ಆದರೆ (orig == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     // The length is known, so allocate the list and all items at once.
     CHECK_LIST_MATERIALIZE(orig);
-    copy = list_alloc_with_items(orig->lv_len);
-    if (copy == NULL)
-	return NULL;
+    copy = list_alloc_with_ವಸ್ತುಗಳು(orig->lv_len);
+    ಆದರೆ (copy == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (orig->lv_type == NULL || top || deep)
-	copy->lv_type = NULL;
-    else
+    ಆದರೆ (orig->lv_type == ಖಾಲಿ || ತುದಿ || deep)
+	copy->lv_type = ಖಾಲಿ;
+    ಇಲ್ಲದಿದ್ದರೆ
 	copy->lv_type = alloc_type(orig->lv_type);
-    if (copyID != 0)
+    ಆದರೆ (copyID != 0)
     {
 	// Do this before adding the items, because one of the items may
 	// refer back to this list.
 	orig->lv_copyID = copyID;
 	orig->lv_copylist = copy;
     }
-    for (item = orig->lv_first; item != NULL && !got_int;
-	    item = item->li_next)
+    ಗಾಗಿ (ಅಂಶ = orig->lv_ಮೊದಲ; ಅಂಶ != ಖಾಲಿ && !got_int;
+	    ಅಂಶ = ಅಂಶ->li_ಮುಂದಿನ)
     {
 	typval_T	new_tv;
 
-	if (deep)
+	ಆದರೆ (deep)
 	{
-	    if (item_copy(&item->li_tv, &new_tv, deep, FALSE, copyID) == FAIL)
-		break;
+	    ಆದರೆ (ಅಂಶ_copy(&ಅಂಶ->li_tv, &new_tv, deep, FALSE, copyID) == FAIL)
+		ನಿಲ್ಲಿಸು;
 	}
-	else
-	    copy_tv(&item->li_tv, &new_tv);
-	list_set_item(copy, idx++, &new_tv);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    copy_tv(&ಅಂಶ->li_tv, &new_tv);
+	list_ಗಣ_ಅಂಶ(copy, idx++, &new_tv);
     }
     ++copy->lv_refcount;
-    if (item != NULL)
+    ಆದರೆ (ಅಂಶ != ಖಾಲಿ)
     {
 	list_unref(copy);
-	copy = NULL;
+	copy = ಖಾಲಿ;
     }
 
-    return copy;
+    ಹಿಂತಿರುಗಿ copy;
 }
 
 /*
@@ -1471,31 +1471,31 @@ list_copy(list_T *orig, int deep, int top, int copyID)
  * This used to be called list_remove, but that conflicts with a Sun header
  * file.
  */
-    void
-vimlist_remove(list_T *l, listitem_T *item, listitem_T *item2)
+    ಶೂನ್ಯ
+vimlist_remove(list_T *l, listitem_T *ಅಂಶ, listitem_T *item2)
 {
     listitem_T	*ip;
 
     CHECK_LIST_MATERIALIZE(l);
 
     // notify watchers
-    for (ip = item; ip != NULL; ip = ip->li_next)
+    ಗಾಗಿ (ip = ಅಂಶ; ip != ಖಾಲಿ; ip = ip->li_ಮುಂದಿನ)
     {
 	--l->lv_len;
 	list_fix_watch(l, ip);
-	if (ip == item2)
-	    break;
+	ಆದರೆ (ip == item2)
+	    ನಿಲ್ಲಿಸು;
     }
 
-    if (item2->li_next == NULL)
-	l->lv_u.mat.lv_last = item->li_prev;
-    else
-	item2->li_next->li_prev = item->li_prev;
-    if (item->li_prev == NULL)
-	l->lv_first = item2->li_next;
-    else
-	item->li_prev->li_next = item2->li_next;
-    l->lv_u.mat.lv_idx_item = NULL;
+    ಆದರೆ (item2->li_ಮುಂದಿನ == ಖಾಲಿ)
+	l->lv_u.mat.lv_ಕೊನೆಯ = ಅಂಶ->li_prev;
+    ಇಲ್ಲದಿದ್ದರೆ
+	item2->li_ಮುಂದಿನ->li_prev = ಅಂಶ->li_prev;
+    ಆದರೆ (ಅಂಶ->li_prev == ಖಾಲಿ)
+	l->lv_ಮೊದಲ = item2->li_ಮುಂದಿನ;
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಅಂಶ->li_prev->li_ಮುಂದಿನ = item2->li_ಮುಂದಿನ;
+    l->lv_u.mat.lv_idx_ಅಂಶ = ಖಾಲಿ;
 }
 
 /*
@@ -1503,49 +1503,49 @@ vimlist_remove(list_T *l, listitem_T *item, listitem_T *item2)
  * May return NULL.
  */
     char_u *
-list2string(typval_T *tv, int copyID, int restore_copyID)
+list2string(typval_T *tv, ಪೂರ್ಣಾಂಕ copyID, ಪೂರ್ಣಾಂಕ restore_copyID)
 {
     garray_T	ga;
 
-    if (tv->vval.v_list == NULL)
-	return NULL;
-    ga_init2(&ga, sizeof(char), 80);
+    ಆದರೆ (tv->vval.v_list == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    ga_init2(&ga, ಗಾತ್ರ(ಅಕ್ಷರ), 80);
     ga_append(&ga, '[');
     CHECK_LIST_MATERIALIZE(tv->vval.v_list);
-    if (list_join(&ga, tv->vval.v_list, (char_u *)", ",
+    ಆದರೆ (list_join(&ga, tv->vval.v_list, (char_u *)", ",
 				       FALSE, restore_copyID, copyID) == FAIL)
     {
-	vim_free(ga.ga_data);
-	return NULL;
+	vim_free(ga.ga_ದತ್ತಾಂಶ);
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
     ga_append(&ga, ']');
     ga_append(&ga, NUL);
-    return (char_u *)ga.ga_data;
+    ಹಿಂತಿರುಗಿ (char_u *)ga.ga_ದತ್ತಾಂಶ;
 }
 
-typedef struct join_S {
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ join_S {
     string_T	s;
     char_u	*tofree;
 } join_T;
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 list_join_inner(
     garray_T	*gap,		// to store the result in
     list_T	*l,
     char_u	*sep,
-    int		echo_style,
-    int		restore_copyID,
-    int		copyID,
+    ಪೂರ್ಣಾಂಕ		echo_style,
+    ಪೂರ್ಣಾಂಕ		restore_copyID,
+    ಪೂರ್ಣಾಂಕ		copyID,
     garray_T	*join_gap)	// to keep each list item string
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
     join_T	*p;
-    long	sumlen = 0;
-    int		first = TRUE;
-    int		prev_lock;
+    ದೀರ್ಘ	sumlen = 0;
+    ಪೂರ್ಣಾಂಕ		ಮೊದಲ = TRUE;
+    ಪೂರ್ಣಾಂಕ		prev_ಬೀಗ;
     char_u	*tofree;
     char_u	numbuf[NUMBUFLEN];
-    listitem_T	*item;
+    listitem_T	*ಅಂಶ;
     string_T	s;
     size_t	seplen;
 
@@ -1553,65 +1553,65 @@ list_join_inner(
     CHECK_LIST_MATERIALIZE(l);
     // Lock the list, the string() method of an object item could remove the
     // item the loop is standing on.
-    prev_lock = l->lv_lock;
-    if (l->lv_lock == 0)
-	l->lv_lock = VAR_LOCKED;
-    for (item = l->lv_first; item != NULL && !got_int; item = item->li_next)
+    prev_ಬೀಗ = l->lv_ಬೀಗ;
+    ಆದರೆ (l->lv_ಬೀಗ == 0)
+	l->lv_ಬೀಗ = VAR_LOCKED;
+    ಗಾಗಿ (ಅಂಶ = l->lv_ಮೊದಲ; ಅಂಶ != ಖಾಲಿ && !got_int; ಅಂಶ = ಅಂಶ->li_ಮುಂದಿನ)
     {
-	s.string = echo_string_core(&item->li_tv, &tofree, numbuf, copyID,
+	s.string = echo_string_core(&ಅಂಶ->li_tv, &tofree, numbuf, copyID,
 				      echo_style, restore_copyID, !echo_style);
-	if (s.string == NULL)
+	ಆದರೆ (s.string == ಖಾಲಿ)
 	{
-	    l->lv_lock = prev_lock;
-	    return FAIL;
+	    l->lv_ಬೀಗ = prev_ಬೀಗ;
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
 
-	s.length = STRLEN(s.string);
-	sumlen += (long)s.length;
+	s.ಉದ್ದಳತೆ = STRLEN(s.string);
+	sumlen += (ದೀರ್ಘ)s.ಉದ್ದಳತೆ;
 
-	(void)ga_grow(join_gap, 1);
-	p = ((join_T *)join_gap->ga_data) + (join_gap->ga_len++);
-	if (tofree != NULL || s.string != numbuf)
+	(ಶೂನ್ಯ)ga_grow(join_gap, 1);
+	p = ((join_T *)join_gap->ga_ದತ್ತಾಂಶ) + (join_gap->ga_len++);
+	ಆದರೆ (tofree != ಖಾಲಿ || s.string != numbuf)
 	{
 	    p->s.string = s.string;
-	    p->s.length = s.length;
+	    p->s.ಉದ್ದಳತೆ = s.ಉದ್ದಳತೆ;
 	    p->tofree = tofree;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    p->s.string = vim_strnsave(s.string, s.length);
-	    p->s.length = s.length;
+	    p->s.string = vim_strnsave(s.string, s.ಉದ್ದಳತೆ);
+	    p->s.ಉದ್ದಳತೆ = s.ಉದ್ದಳತೆ;
 	    p->tofree = p->s.string;
 	}
 
-	line_breakcheck();
-	if (did_echo_string_emsg)  // recursion error, bail out
-	    break;
+	ಸಾಲು_breakcheck();
+	ಆದರೆ (did_echo_string_emsg)  // recursion error, bail out
+	    ನಿಲ್ಲಿಸು;
     }
-    l->lv_lock = prev_lock;
+    l->lv_ಬೀಗ = prev_ಬೀಗ;
 
     // Allocate result buffer with its total size, avoid re-allocation and
     // multiple copy operations.  Add 2 for a tailing ']' and NUL.
     seplen = STRLEN(sep);
-    if (join_gap->ga_len >= 2)
-	sumlen += (long)seplen * (join_gap->ga_len - 1);
-    if (sumlen > INT_MAX - 2 || ga_grow(gap, (int)sumlen + 2) == FAIL)
-	return FAIL;
+    ಆದರೆ (join_gap->ga_len >= 2)
+	sumlen += (ದೀರ್ಘ)seplen * (join_gap->ga_len - 1);
+    ಆದರೆ (sumlen > ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ - 2 || ga_grow(gap, (ಪೂರ್ಣಾಂಕ)sumlen + 2) == FAIL)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    for (i = 0; i < join_gap->ga_len && !got_int; ++i)
+    ಗಾಗಿ (i = 0; i < join_gap->ga_len && !got_int; ++i)
     {
-	if (first)
-	    first = FALSE;
-	else
+	ಆದರೆ (ಮೊದಲ)
+	    ಮೊದಲ = FALSE;
+	ಇಲ್ಲದಿದ್ದರೆ
 	    ga_concat_len(gap, sep, seplen);
-	p = ((join_T *)join_gap->ga_data) + i;
+	p = ((join_T *)join_gap->ga_ದತ್ತಾಂಶ) + i;
 
-	if (p->s.string != NULL)
-	    ga_concat_len(gap, p->s.string, p->s.length);
-	line_breakcheck();
+	ಆದರೆ (p->s.string != ಖಾಲಿ)
+	    ga_concat_len(gap, p->s.string, p->s.ಉದ್ದಳತೆ);
+	ಸಾಲು_breakcheck();
     }
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
@@ -1619,45 +1619,45 @@ list_join_inner(
  * When "echo_style" is TRUE use String as echoed, otherwise as inside a List.
  * Return FAIL or OK.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 list_join(
     garray_T	*gap,
     list_T	*l,
     char_u	*sep,
-    int		echo_style,
-    int		restore_copyID,
-    int		copyID)
+    ಪೂರ್ಣಾಂಕ		echo_style,
+    ಪೂರ್ಣಾಂಕ		restore_copyID,
+    ಪೂರ್ಣಾಂಕ		copyID)
 {
     garray_T	join_ga;
-    int		retval;
+    ಪೂರ್ಣಾಂಕ		retval;
     join_T	*p;
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
 
-    if (l->lv_len < 1)
-	return OK; // nothing to do
-    ga_init2(&join_ga, sizeof(join_T), l->lv_len);
+    ಆದರೆ (l->lv_len < 1)
+	ಹಿಂತಿರುಗಿ OK; // nothing to do
+    ga_init2(&join_ga, ಗಾತ್ರ(join_T), l->lv_len);
     retval = list_join_inner(gap, l, sep, echo_style, restore_copyID,
 							    copyID, &join_ga);
 
-    if (join_ga.ga_data == NULL)
-	return retval;
+    ಆದರೆ (join_ga.ga_ದತ್ತಾಂಶ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ retval;
 
     // Dispose each item in join_ga.
-    p = (join_T *)join_ga.ga_data;
-    for (i = 0; i < join_ga.ga_len; ++i)
+    p = (join_T *)join_ga.ga_ದತ್ತಾಂಶ;
+    ಗಾಗಿ (i = 0; i < join_ga.ga_len; ++i)
     {
 	vim_free(p->tofree);
 	++p;
     }
     ga_clear(&join_ga);
 
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
 /*
  * "join()" function
  */
-    void
+    ಶೂನ್ಯ
 f_join(typval_T *argvars, typval_T *rettv)
 {
     garray_T	ga;
@@ -1665,32 +1665,32 @@ f_join(typval_T *argvars, typval_T *rettv)
 
     rettv->v_type = VAR_STRING;
 
-    if (check_for_list_or_tuple_arg(argvars, 0) == FAIL
+    ಆದರೆ (check_for_list_or_tuple_arg(argvars, 0) == FAIL
 	    || check_for_opt_string_arg(argvars, 1) == FAIL)
-	return;
+	ಹಿಂತಿರುಗಿ;
 
-    if ((argvars[0].v_type == VAR_LIST && argvars[0].vval.v_list == NULL)
+    ಆದರೆ ((argvars[0].v_type == VAR_LIST && argvars[0].vval.v_list == ಖಾಲಿ)
 	    || (argvars[0].v_type == VAR_TUPLE
-		&& argvars[0].vval.v_tuple == NULL))
-	return;
+		&& argvars[0].vval.v_tuple == ಖಾಲಿ))
+	ಹಿಂತಿರುಗಿ;
 
-    if (argvars[1].v_type == VAR_UNKNOWN)
+    ಆದರೆ (argvars[1].v_type == VAR_UNKNOWN)
 	sep = (char_u *)" ";
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	sep = tv_get_string_chk(&argvars[1]);
 
-    if (sep != NULL)
+    ಆದರೆ (sep != ಖಾಲಿ)
     {
-	ga_init2(&ga, sizeof(char), 80);
-	if (argvars[0].v_type == VAR_LIST)
+	ga_init2(&ga, ಗಾತ್ರ(ಅಕ್ಷರ), 80);
+	ಆದರೆ (argvars[0].v_type == VAR_LIST)
 	    list_join(&ga, argvars[0].vval.v_list, sep, TRUE, FALSE, 0);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    tuple_join(&ga, argvars[0].vval.v_tuple, sep, TRUE, FALSE, 0);
 	ga_append(&ga, NUL);
-	rettv->vval.v_string = (char_u *)ga.ga_data;
+	rettv->vval.v_string = (char_u *)ga.ga_ದತ್ತಾಂಶ;
     }
-    else
-	rettv->vval.v_string = NULL;
+    ಇಲ್ಲದಿದ್ದರೆ
+	rettv->vval.v_string = ಖಾಲಿ;
 }
 
 /*
@@ -1698,59 +1698,59 @@ f_join(typval_T *argvars, typval_T *rettv)
  * "*arg" points to the "[".
  * Return OK or FAIL.
  */
-    int
-eval_list(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int do_error)
+    ಪೂರ್ಣಾಂಕ
+eval_list(char_u **arg, typval_T *rettv, evalarg_T *evalarg, ಪೂರ್ಣಾಂಕ do_error)
 {
-    int		evaluate = evalarg == NULL ? FALSE
+    ಪೂರ್ಣಾಂಕ		evaluate = evalarg == ಖಾಲಿ ? FALSE
 					 : evalarg->eval_flags & EVAL_EVALUATE;
-    list_T	*l = NULL;
+    list_T	*l = ಖಾಲಿ;
     typval_T	tv;
-    listitem_T	*item;
-    int		vim9script = in_vim9script();
-    int		had_comma;
+    listitem_T	*ಅಂಶ;
+    ಪೂರ್ಣಾಂಕ		vim9script = ಒಳ_vim9script();
+    ಪೂರ್ಣಾಂಕ		had_comma;
 
-    if (evaluate)
+    ಆದರೆ (evaluate)
     {
 	l = list_alloc();
-	if (l == NULL)
-	    return FAIL;
+	ಆದರೆ (l == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ FAIL;
     }
 
     *arg = skipwhite_and_linebreak(*arg + 1, evalarg);
-    while (**arg != ']' && **arg != NUL)
+    ಆಗ (**arg != ']' && **arg != NUL)
     {
-	if (eval1(arg, &tv, evalarg) == FAIL)	// recursive!
-	    goto failret;
-	if (check_typval_is_value(&tv) == FAIL)
+	ಆದರೆ (eval1(arg, &tv, evalarg) == FAIL)	// recursive!
+	    ಹೋಗು failret;
+	ಆದರೆ (check_typval_is_ಮೌಲ್ಯ(&tv) == FAIL)
 	{
-	    if (evaluate)
+	    ಆದರೆ (evaluate)
 		clear_tv(&tv);
-	    goto failret;
+	    ಹೋಗು failret;
 	}
-	if (evaluate)
+	ಆದರೆ (evaluate)
 	{
-	    item = listitem_alloc();
-	    if (item != NULL)
+	    ಅಂಶ = listitem_alloc();
+	    ಆದರೆ (ಅಂಶ != ಖಾಲಿ)
 	    {
-		item->li_tv = tv;
-		item->li_tv.v_lock = 0;
-		list_append(l, item);
+		ಅಂಶ->li_tv = tv;
+		ಅಂಶ->li_tv.v_ಬೀಗ = 0;
+		list_append(l, ಅಂಶ);
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		clear_tv(&tv);
 	}
 	// Legacy Vim script allowed a space before the comma.
-	if (!vim9script)
+	ಆದರೆ (!vim9script)
 	    *arg = skipwhite(*arg);
 
 	// the comma must come after the value
 	had_comma = **arg == ',';
-	if (had_comma)
+	ಆದರೆ (had_comma)
 	{
-	    if (vim9script && !IS_WHITE_NL_OR_NUL((*arg)[1]) && (*arg)[1] != ']')
+	    ಆದರೆ (vim9script && !IS_WHITE_NL_OR_NUL((*arg)[1]) && (*arg)[1] != ']')
 	    {
 		semsg(_(e_white_space_required_after_str_str), ",", *arg);
-		goto failret;
+		ಹೋಗು failret;
 	    }
 	    *arg = skipwhite(*arg + 1);
 	}
@@ -1758,183 +1758,183 @@ eval_list(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int do_error)
 	// The "]" can be on the next line.  But a double quoted string may
 	// follow, not a comment.
 	*arg = skipwhite_and_linebreak(*arg, evalarg);
-	if (**arg == ']')
-	    break;
+	ಆದರೆ (**arg == ']')
+	    ನಿಲ್ಲಿಸು;
 
-	if (!had_comma)
+	ಆದರೆ (!had_comma)
 	{
-	    if (do_error)
+	    ಆದರೆ (do_error)
 	    {
-		if (**arg == ',')
+		ಆದರೆ (**arg == ',')
 		    semsg(_(e_no_white_space_allowed_before_str_str),
 								    ",", *arg);
-		else
-		    semsg(_(e_missing_comma_in_list_str), *arg);
+		ಇಲ್ಲದಿದ್ದರೆ
+		    semsg(_(e_missing_comma_ಒಳ_list_str), *arg);
 	    }
-	    goto failret;
+	    ಹೋಗು failret;
 	}
     }
 
-    if (**arg != ']')
+    ಆದರೆ (**arg != ']')
     {
-	if (do_error)
-	    semsg(_(e_missing_end_of_list_rsb_str), *arg);
+	ಆದರೆ (do_error)
+	    semsg(_(e_missing_ಕೊನೆ_ದ_list_rsb_str), *arg);
 failret:
-	if (evaluate)
+	ಆದರೆ (evaluate)
 	    list_free(l);
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
     *arg += 1;
-    if (evaluate)
-	rettv_list_set(rettv, l);
+    ಆದರೆ (evaluate)
+	rettv_list_ಗಣ(rettv, l);
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Write "list" of strings to file "fd".
  */
-    int
-write_list(FILE *fd, list_T *list, int binary)
+    ಪೂರ್ಣಾಂಕ
+write_list(FILE *fd, list_T *list, ಪೂರ್ಣಾಂಕ ದ್ವಿಮಾನ)
 {
     listitem_T	*li;
-    int		c;
-    int		ret = OK;
+    ಪೂರ್ಣಾಂಕ		c;
+    ಪೂರ್ಣಾಂಕ		ret = OK;
     char_u	*s;
 
     CHECK_LIST_MATERIALIZE(list);
-    FOR_ALL_LIST_ITEMS(list, li)
+    FOR_ALL_LIST_ವಸ್ತುಗಳು(list, li)
     {
-	for (s = tv_get_string(&li->li_tv); *s != NUL; ++s)
+	ಗಾಗಿ (s = tv_get_string(&li->li_tv); *s != NUL; ++s)
 	{
-	    if (*s == '\n')
+	    ಆದರೆ (*s == '\n')
 		c = putc(NUL, fd);
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		c = putc(*s, fd);
-	    if (c == EOF)
+	    ಆದರೆ (c == EOF)
 	    {
 		ret = FAIL;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	}
-	if (!binary || li->li_next != NULL)
-	    if (putc('\n', fd) == EOF)
+	ಆದರೆ (!ದ್ವಿಮಾನ || li->li_ಮುಂದಿನ != ಖಾಲಿ)
+	    ಆದರೆ (putc('\n', fd) == EOF)
 	    {
 		ret = FAIL;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	if (ret == FAIL)
+	ಆದರೆ (ret == FAIL)
 	{
 	    emsg(_(e_error_while_writing));
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
     }
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
 /*
  * Initialize a static list with 10 items.
  */
-    void
+    ಶೂನ್ಯ
 init_static_list(staticList10_T *sl)
 {
     list_T  *l = &sl->sl_list;
-    int	    i;
+    ಪೂರ್ಣಾಂಕ	    i;
 
-    CLEAR_POINTER(sl);
-    l->lv_first = &sl->sl_items[0];
-    l->lv_u.mat.lv_last = &sl->sl_items[9];
+    CLEAR_ಸೂಚಕ(sl);
+    l->lv_ಮೊದಲ = &sl->sl_ವಸ್ತುಗಳು[0];
+    l->lv_u.mat.lv_ಕೊನೆಯ = &sl->sl_ವಸ್ತುಗಳು[9];
     l->lv_refcount = DO_NOT_FREE_CNT;
-    l->lv_lock = VAR_FIXED;
+    l->lv_ಬೀಗ = VAR_FIXED;
     sl->sl_list.lv_len = 10;
 
-    for (i = 0; i < 10; ++i)
+    ಗಾಗಿ (i = 0; i < 10; ++i)
     {
-	listitem_T *li = &sl->sl_items[i];
+	listitem_T *li = &sl->sl_ವಸ್ತುಗಳು[i];
 
-	if (i == 0)
-	    li->li_prev = NULL;
-	else
+	ಆದರೆ (i == 0)
+	    li->li_prev = ಖಾಲಿ;
+	ಇಲ್ಲದಿದ್ದರೆ
 	    li->li_prev = li - 1;
-	if (i == 9)
-	    li->li_next = NULL;
-	else
-	    li->li_next = li + 1;
+	ಆದರೆ (i == 9)
+	    li->li_ಮುಂದಿನ = ಖಾಲಿ;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    li->li_ಮುಂದಿನ = li + 1;
     }
 }
 
 /*
  * "list2str()" function
  */
-    void
+    ಶೂನ್ಯ
 f_list2str(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l;
     listitem_T	*li;
     garray_T	ga;
-    int		utf8 = FALSE;
+    ಪೂರ್ಣಾಂಕ		utf8 = FALSE;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ಖಾಲಿ;
 
-    if (in_vim9script()
+    ಆದರೆ (ಒಳ_vim9script()
 	    && (check_for_list_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	ಹಿಂತಿರುಗಿ;
 
-    if (check_for_list_arg(argvars, 0) == FAIL)
-	return;
+    ಆದರೆ (check_for_list_arg(argvars, 0) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
     l = argvars[0].vval.v_list;
-    if (l == NULL)
-	return;  // empty list results in empty string
+    ಆದರೆ (l == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;  // empty list results in empty string
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
-	utf8 = (int)tv_get_bool_chk(&argvars[1], NULL);
+    ಆದರೆ (argvars[1].v_type != VAR_UNKNOWN)
+	utf8 = (ಪೂರ್ಣಾಂಕ)tv_get_bool_chk(&argvars[1], ಖಾಲಿ);
 
     CHECK_LIST_MATERIALIZE(l);
     ga_init2(&ga, 1, 80);
-    if (has_mbyte || utf8)
+    ಆದರೆ (has_mbyte || utf8)
     {
 	char_u	buf[MB_MAXBYTES + 1];
-	int	(*char2bytes)(int, char_u *);
+	ಪೂರ್ಣಾಂಕ	(*char2bytes)(ಪೂರ್ಣಾಂಕ, char_u *);
 
-	if (utf8 || enc_utf8)
+	ಆದರೆ (utf8 || enc_utf8)
 	    char2bytes = utf_char2bytes;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    char2bytes = mb_char2bytes;
 
-	FOR_ALL_LIST_ITEMS(l, li)
+	FOR_ALL_LIST_ವಸ್ತುಗಳು(l, li)
 	{
 	    size_t  buflen;
 
-	    buflen = (size_t)(*char2bytes)(tv_get_number(&li->li_tv), buf);
+	    buflen = (size_t)(*char2bytes)(tv_get_ಸಂಖ್ಯೆ(&li->li_tv), buf);
 	    buf[buflen] = NUL;
 	    ga_concat_len(&ga, buf, buflen);
 	}
 	ga_append(&ga, NUL);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	long len = (long)list_len(l) + 1;
+	ದೀರ್ಘ len = (ದೀರ್ಘ)list_len(l) + 1;
 
-	if (len <= INT_MAX && ga_grow(&ga, (int)len) == OK)
+	ಆದರೆ (len <= ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ && ga_grow(&ga, (ಪೂರ್ಣಾಂಕ)len) == OK)
 	{
-	    FOR_ALL_LIST_ITEMS(l, li)
-		ga_append(&ga, tv_get_number(&li->li_tv));
+	    FOR_ALL_LIST_ವಸ್ತುಗಳು(l, li)
+		ga_append(&ga, tv_get_ಸಂಖ್ಯೆ(&li->li_tv));
 	    ga_append(&ga, NUL);
 	}
     }
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = ga.ga_data;
+    rettv->vval.v_string = ga.ga_ದತ್ತಾಂಶ;
 }
 
 /*
  * "list2tuple()" function
  */
-    void
+    ಶೂನ್ಯ
 f_list2tuple(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l;
@@ -1942,439 +1942,439 @@ f_list2tuple(typval_T *argvars, typval_T *rettv)
     tuple_T	*tuple;
 
     rettv->v_type = VAR_TUPLE;
-    rettv->vval.v_tuple = NULL;
+    rettv->vval.v_tuple = ಖಾಲಿ;
 
-    if (check_for_list_arg(argvars, 0) == FAIL)
-	return;
+    ಆದರೆ (check_for_list_arg(argvars, 0) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
     l = argvars[0].vval.v_list;
-    if (l == NULL)
-	return;  // empty list results in empty tuple
+    ಆದರೆ (l == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;  // empty list results in empty tuple
 
     CHECK_LIST_MATERIALIZE(l);
 
-    if (rettv_tuple_set_with_items(rettv, list_len(l)) == FAIL)
-	return;
+    ಆದರೆ (rettv_tuple_ಗಣ_with_ವಸ್ತುಗಳು(rettv, list_len(l)) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
     tuple = rettv->vval.v_tuple;
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_ವಸ್ತುಗಳು(l, li)
     {
-	copy_tv(&li->li_tv, TUPLE_ITEM(tuple, TUPLE_LEN(tuple)));
-	tuple->tv_items.ga_len++;
+	copy_tv(&li->li_tv, TUPLE_ಅಂಶ(tuple, TUPLE_LEN(tuple)));
+	tuple->tv_ವಸ್ತುಗಳು.ga_len++;
     }
 }
 
 /*
  * "tuple2list()" function
  */
-    void
+    ಶೂನ್ಯ
 f_tuple2list(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l;
     tuple_T	*tuple;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ಆದರೆ (rettv_list_alloc(rettv) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
-    if (check_for_tuple_arg(argvars, 0) == FAIL)
-	return;
+    ಆದರೆ (check_for_tuple_arg(argvars, 0) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
     tuple = argvars[0].vval.v_tuple;
-    if (tuple == NULL)
-	return;  // empty tuple results in empty list
+    ಆದರೆ (tuple == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;  // empty tuple results in empty list
 
     l = rettv->vval.v_list;
-    for (int i = 0; i < tuple_len(tuple); i++)
-	list_append_tv(l, TUPLE_ITEM(tuple, i));
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < tuple_len(tuple); i++)
+	list_append_tv(l, TUPLE_ಅಂಶ(tuple, i));
 }
 
 /*
  * Remove item argvars[1] from List argvars[0]. If argvars[2] is supplied, then
  * remove the range of items from argvars[1] to argvars[2] (inclusive).
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 list_remove(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg)
 {
     list_T	*l;
-    listitem_T	*item, *item2;
+    listitem_T	*ಅಂಶ, *item2;
     listitem_T	*li;
-    int		error = FALSE;
-    long	idx;
-    long	end;
-    int		cnt = 0;
+    ಪೂರ್ಣಾಂಕ		error = FALSE;
+    ದೀರ್ಘ	idx;
+    ದೀರ್ಘ	ಕೊನೆ;
+    ಪೂರ್ಣಾಂಕ		cnt = 0;
     list_T	*rl;
 
-    if ((l = argvars[0].vval.v_list) == NULL
-			     || value_check_lock(l->lv_lock, arg_errmsg, TRUE))
-	return;
+    ಆದರೆ ((l = argvars[0].vval.v_list) == ಖಾಲಿ
+			     || ಮೌಲ್ಯ_check_ಬೀಗ(l->lv_ಬೀಗ, arg_errmsg, TRUE))
+	ಹಿಂತಿರುಗಿ;
 
-    idx = (long)tv_get_number_chk(&argvars[1], &error);
-    if (error)
-	return;		// type error: do nothing, errmsg already given
+    idx = (ದೀರ್ಘ)tv_get_ಸಂಖ್ಯೆ_chk(&argvars[1], &error);
+    ಆದರೆ (error)
+	ಹಿಂತಿರುಗಿ;		// type error: do nothing, errmsg already given
 
-    if ((item = list_find(l, idx)) == NULL)
+    ಆದರೆ ((ಅಂಶ = list_ಕಂಡುಹಿಡಿ(l, idx)) == ಖಾಲಿ)
     {
-	semsg(_(e_list_index_out_of_range_nr), idx);
-	return;
+	semsg(_(e_list_ಸೂಚ್ಯಂಕ_ಹೊರಹೋಗು_ದ_range_nr), idx);
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if (argvars[2].v_type == VAR_UNKNOWN)
+    ಆದರೆ (argvars[2].v_type == VAR_UNKNOWN)
     {
 	// Remove one item, return its value.
-	vimlist_remove(l, item, item);
-	*rettv = item->li_tv;
-	list_free_item(l, item);
-	return;
+	vimlist_remove(l, ಅಂಶ, ಅಂಶ);
+	*rettv = ಅಂಶ->li_tv;
+	list_free_ಅಂಶ(l, ಅಂಶ);
+	ಹಿಂತಿರುಗಿ;
     }
 
     // Remove range of items, return list with values.
-    end = (long)tv_get_number_chk(&argvars[2], &error);
-    if (error)
-	return;		// type error: do nothing
+    ಕೊನೆ = (ದೀರ್ಘ)tv_get_ಸಂಖ್ಯೆ_chk(&argvars[2], &error);
+    ಆದರೆ (error)
+	ಹಿಂತಿರುಗಿ;		// type error: do nothing
 
-    if ((item2 = list_find(l, end)) == NULL)
+    ಆದರೆ ((item2 = list_ಕಂಡುಹಿಡಿ(l, ಕೊನೆ)) == ಖಾಲಿ)
     {
-	semsg(_(e_list_index_out_of_range_nr), end);
-	return;
+	semsg(_(e_list_ಸೂಚ್ಯಂಕ_ಹೊರಹೋಗು_ದ_range_nr), ಕೊನೆ);
+	ಹಿಂತಿರುಗಿ;
     }
 
-    for (li = item; li != NULL; li = li->li_next)
+    ಗಾಗಿ (li = ಅಂಶ; li != ಖಾಲಿ; li = li->li_ಮುಂದಿನ)
     {
 	++cnt;
-	if (li == item2)
-	    break;
+	ಆದರೆ (li == item2)
+	    ನಿಲ್ಲಿಸು;
     }
-    if (li == NULL)  // didn't find "item2" after "item"
+    ಆದರೆ (li == ಖಾಲಿ)  // didn't find "item2" after "item"
     {
 	emsg(_(e_invalid_range));
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    vimlist_remove(l, item, item2);
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    vimlist_remove(l, ಅಂಶ, item2);
+    ಆದರೆ (rettv_list_alloc(rettv) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
     rl = rettv->vval.v_list;
 
-    if (l->lv_with_items > 0)
+    ಆದರೆ (l->lv_with_ವಸ್ತುಗಳು > 0)
     {
 	// need to copy the list items and move the value
-	while (item != NULL)
+	ಆಗ (ಅಂಶ != ಖಾಲಿ)
 	{
 	    li = listitem_alloc();
-	    if (li == NULL)
-		return;
-	    li->li_tv = item->li_tv;
-	    init_tv(&item->li_tv);
+	    ಆದರೆ (li == ಖಾಲಿ)
+		ಹಿಂತಿರುಗಿ;
+	    li->li_tv = ಅಂಶ->li_tv;
+	    init_tv(&ಅಂಶ->li_tv);
 	    list_append(rl, li);
-	    if (item == item2)
-		break;
-	    item = item->li_next;
+	    ಆದರೆ (ಅಂಶ == item2)
+		ನಿಲ್ಲಿಸು;
+	    ಅಂಶ = ಅಂಶ->li_ಮುಂದಿನ;
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	rl->lv_first = item;
-	rl->lv_u.mat.lv_last = item2;
-	item->li_prev = NULL;
-	item2->li_next = NULL;
+	rl->lv_ಮೊದಲ = ಅಂಶ;
+	rl->lv_u.mat.lv_ಕೊನೆಯ = item2;
+	ಅಂಶ->li_prev = ಖಾಲಿ;
+	item2->li_ಮುಂದಿನ = ಖಾಲಿ;
 	rl->lv_len = cnt;
     }
 }
 
-static int item_compare(const void *s1, const void *s2);
-static int item_compare2(const void *s1, const void *s2);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಅಂಶ_compare(ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *s1, ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *s2);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಅಂಶ_compare2(ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *s1, ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *s2);
 
 // struct used in the array that's given to qsort()
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    listitem_T	*item;
-    int		idx;
+    listitem_T	*ಅಂಶ;
+    ಪೂರ್ಣಾಂಕ		idx;
     // Sort key precomputed once per item for the numeric compare modes.
     // Only valid when sortinfo->item_compare_keys_ready is set (the sort()
     // path); uniq() passes a bare listitem_T pointer and must not read this.
-    union {
+    ಒಕ್ಕೂಟ {
 	varnumber_T	inum;	// for "N"
-	double		fnum;	// for "n" and "f"
-    } key;
-} sortItem_T;
+	ದ್ವಿಗುಣ		fnum;	// for "n" and "f"
+    } ಕೀಲಿ;
+} ವಿಂಗಡಿಸು_ಅಂಶ_T;
 
 // struct storing information about current sort
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    int		item_compare_ic;
-    int		item_compare_lc;
-    int		item_compare_numeric;
-    int		item_compare_numbers;
-    int		item_compare_float;
-    char_u	*item_compare_func;
-    partial_T	*item_compare_partial;
-    dict_T	*item_compare_selfdict;
-    int		item_compare_func_err;
-    int		item_compare_keep_zero;
-    int		item_compare_keys_ready;  // ptrs[].key is precomputed
+    ಪೂರ್ಣಾಂಕ		ಅಂಶ_compare_ic;
+    ಪೂರ್ಣಾಂಕ		ಅಂಶ_compare_lc;
+    ಪೂರ್ಣಾಂಕ		ಅಂಶ_compare_numeric;
+    ಪೂರ್ಣಾಂಕ		ಅಂಶ_compare_numbers;
+    ಪೂರ್ಣಾಂಕ		ಅಂಶ_compare_float;
+    char_u	*ಅಂಶ_compare_func;
+    partial_T	*ಅಂಶ_compare_partial;
+    dict_T	*ಅಂಶ_compare_selfdict;
+    ಪೂರ್ಣಾಂಕ		ಅಂಶ_compare_func_err;
+    ಪೂರ್ಣಾಂಕ		ಅಂಶ_compare_keep_zero;
+    ಪೂರ್ಣಾಂಕ		ಅಂಶ_compare_ಕೀಲಿಗಳು_ready;  // ptrs[].key is precomputed
 } sortinfo_T;
-static sortinfo_T	*sortinfo = NULL;
-#define ITEM_COMPARE_FAIL 999
+ಸ್ಥಿರ sortinfo_T	*sortinfo = ಖಾಲಿ;
+#ವ್ಯಾಖ್ಯಾನಿಸು ಅಂಶ_COMPARE_FAIL 999
 
 /*
  * Compare functions for f_sort() and f_uniq() below.
  */
-    static int
-item_compare(const void *s1, const void *s2)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಅಂಶ_compare(ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *s1, ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *s2)
 {
-    sortItem_T  *si1, *si2;
+    ವಿಂಗಡಿಸು_ಅಂಶ_T  *si1, *si2;
     typval_T	*tv1, *tv2;
     char_u	*p1, *p2;
-    char_u	*tofree1 = NULL, *tofree2 = NULL;
-    int		res;
+    char_u	*tofree1 = ಖಾಲಿ, *tofree2 = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		res;
     char_u	numbuf1[NUMBUFLEN];
     char_u	numbuf2[NUMBUFLEN];
 
-    si1 = (sortItem_T *)s1;
-    si2 = (sortItem_T *)s2;
-    tv1 = &si1->item->li_tv;
-    tv2 = &si2->item->li_tv;
+    si1 = (ವಿಂಗಡಿಸು_ಅಂಶ_T *)s1;
+    si2 = (ವಿಂಗಡಿಸು_ಅಂಶ_T *)s2;
+    tv1 = &si1->ಅಂಶ->li_tv;
+    tv2 = &si2->ಅಂಶ->li_tv;
 
-    if (sortinfo->item_compare_numbers)
+    ಆದರೆ (sortinfo->ಅಂಶ_compare_numbers)
     {
-	varnumber_T	v1 = sortinfo->item_compare_keys_ready
-					? si1->key.inum : tv_to_number(tv1);
-	varnumber_T	v2 = sortinfo->item_compare_keys_ready
-					? si2->key.inum : tv_to_number(tv2);
+	varnumber_T	v1 = sortinfo->ಅಂಶ_compare_ಕೀಲಿಗಳು_ready
+					? si1->ಕೀಲಿ.inum : tv_ಗಮ್ಯ_ಸಂಖ್ಯೆ(tv1);
+	varnumber_T	v2 = sortinfo->ಅಂಶ_compare_ಕೀಲಿಗಳು_ready
+					? si2->ಕೀಲಿ.inum : tv_ಗಮ್ಯ_ಸಂಖ್ಯೆ(tv2);
 
-	return v1 == v2 ? 0 : v1 > v2 ? 1 : -1;
+	ಹಿಂತಿರುಗಿ v1 == v2 ? 0 : v1 > v2 ? 1 : -1;
     }
 
-    if (sortinfo->item_compare_float)
+    ಆದರೆ (sortinfo->ಅಂಶ_compare_float)
     {
-	float_T	v1 = sortinfo->item_compare_keys_ready
-					? si1->key.fnum : tv_get_float(tv1);
-	float_T	v2 = sortinfo->item_compare_keys_ready
-					? si2->key.fnum : tv_get_float(tv2);
+	float_T	v1 = sortinfo->ಅಂಶ_compare_ಕೀಲಿಗಳು_ready
+					? si1->ಕೀಲಿ.fnum : tv_get_float(tv1);
+	float_T	v2 = sortinfo->ಅಂಶ_compare_ಕೀಲಿಗಳು_ready
+					? si2->ಕೀಲಿ.fnum : tv_get_float(tv2);
 
-	return v1 == v2 ? 0 : v1 > v2 ? 1 : -1;
+	ಹಿಂತಿರುಗಿ v1 == v2 ? 0 : v1 > v2 ? 1 : -1;
     }
 
-    if (sortinfo->item_compare_numeric && sortinfo->item_compare_keys_ready)
+    ಆದರೆ (sortinfo->ಅಂಶ_compare_numeric && sortinfo->ಅಂಶ_compare_ಕೀಲಿಗಳು_ready)
     {
-	double	n1 = si1->key.fnum;
-	double	n2 = si2->key.fnum;
+	ದ್ವಿಗುಣ	n1 = si1->ಕೀಲಿ.fnum;
+	ದ್ವಿಗುಣ	n2 = si2->ಕೀಲಿ.fnum;
 
 	res = n1 == n2 ? 0 : n1 > n2 ? 1 : -1;
-	if (res == 0 && !sortinfo->item_compare_keep_zero)
+	ಆದರೆ (res == 0 && !sortinfo->ಅಂಶ_compare_keep_zero)
 	    res = si1->idx > si2->idx ? 1 : -1;
-	return res;
+	ಹಿಂತಿರುಗಿ res;
     }
 
     // tv2string() puts quotes around a string and allocates memory.  Don't do
     // that for string variables. Use a single quote when comparing with a
     // non-string to do what the docs promise.
-    if (tv1->v_type == VAR_STRING)
+    ಆದರೆ (tv1->v_type == VAR_STRING)
     {
-	if (tv2->v_type != VAR_STRING || sortinfo->item_compare_numeric)
+	ಆದರೆ (tv2->v_type != VAR_STRING || sortinfo->ಅಂಶ_compare_numeric)
 	    p1 = (char_u *)"'";
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    p1 = tv1->vval.v_string;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	p1 = tv2string(tv1, &tofree1, numbuf1, 0);
-    if (tv2->v_type == VAR_STRING)
+    ಆದರೆ (tv2->v_type == VAR_STRING)
     {
-	if (tv1->v_type != VAR_STRING || sortinfo->item_compare_numeric)
+	ಆದರೆ (tv1->v_type != VAR_STRING || sortinfo->ಅಂಶ_compare_numeric)
 	    p2 = (char_u *)"'";
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    p2 = tv2->vval.v_string;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	p2 = tv2string(tv2, &tofree2, numbuf2, 0);
-    if (p1 == NULL)
+    ಆದರೆ (p1 == ಖಾಲಿ)
 	p1 = (char_u *)"";
-    if (p2 == NULL)
+    ಆದರೆ (p2 == ಖಾಲಿ)
 	p2 = (char_u *)"";
-    if (!sortinfo->item_compare_numeric)
+    ಆದರೆ (!sortinfo->ಅಂಶ_compare_numeric)
     {
-	if (sortinfo->item_compare_lc)
-	    res = strcoll((char *)p1, (char *)p2);
-	else
-	    res = sortinfo->item_compare_ic ? STRICMP(p1, p2): STRCMP(p1, p2);
+	ಆದರೆ (sortinfo->ಅಂಶ_compare_lc)
+	    res = strcoll((ಅಕ್ಷರ *)p1, (ಅಕ್ಷರ *)p2);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    res = sortinfo->ಅಂಶ_compare_ic ? STRICMP(p1, p2): STRCMP(p1, p2);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	double n1, n2;
-	n1 = strtod((char *)p1, (char **)&p1);
-	n2 = strtod((char *)p2, (char **)&p2);
+	ದ್ವಿಗುಣ n1, n2;
+	n1 = strtod((ಅಕ್ಷರ *)p1, (ಅಕ್ಷರ **)&p1);
+	n2 = strtod((ಅಕ್ಷರ *)p2, (ಅಕ್ಷರ **)&p2);
 	res = n1 == n2 ? 0 : n1 > n2 ? 1 : -1;
     }
 
     // When the result would be zero, compare the item indexes.  Makes the
     // sort stable.
-    if (res == 0 && !sortinfo->item_compare_keep_zero)
+    ಆದರೆ (res == 0 && !sortinfo->ಅಂಶ_compare_keep_zero)
 	res = si1->idx > si2->idx ? 1 : -1;
 
     vim_free(tofree1);
     vim_free(tofree2);
-    return res;
+    ಹಿಂತಿರುಗಿ res;
 }
 
-    static int
-item_compare2(const void *s1, const void *s2)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಅಂಶ_compare2(ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *s1, ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *s2)
 {
-    sortItem_T  *si1, *si2;
-    int		res;
+    ವಿಂಗಡಿಸು_ಅಂಶ_T  *si1, *si2;
+    ಪೂರ್ಣಾಂಕ		res;
     typval_T	rettv;
     typval_T	argv[3];
     char_u	*func_name;
-    partial_T	*partial = sortinfo->item_compare_partial;
+    partial_T	*partial = sortinfo->ಅಂಶ_compare_partial;
     funcexe_T	funcexe;
-    int		did_emsg_before = did_emsg;
+    ಪೂರ್ಣಾಂಕ		did_emsg_before = did_emsg;
 
     // shortcut after failure in previous call; compare all items equal
-    if (sortinfo->item_compare_func_err)
-	return 0;
+    ಆದರೆ (sortinfo->ಅಂಶ_compare_func_err)
+	ಹಿಂತಿರುಗಿ 0;
 
-    si1 = (sortItem_T *)s1;
-    si2 = (sortItem_T *)s2;
+    si1 = (ವಿಂಗಡಿಸು_ಅಂಶ_T *)s1;
+    si2 = (ವಿಂಗಡಿಸು_ಅಂಶ_T *)s2;
 
-    if (partial == NULL)
-	func_name = sortinfo->item_compare_func;
-    else
+    ಆದರೆ (partial == ಖಾಲಿ)
+	func_name = sortinfo->ಅಂಶ_compare_func;
+    ಇಲ್ಲದಿದ್ದರೆ
 	func_name = partial_name(partial);
 
     // Copy the values.  This is needed to be able to set v_lock to VAR_FIXED
     // in the copy without changing the original list items.
-    copy_tv(&si1->item->li_tv, &argv[0]);
-    copy_tv(&si2->item->li_tv, &argv[1]);
+    copy_tv(&si1->ಅಂಶ->li_tv, &argv[0]);
+    copy_tv(&si2->ಅಂಶ->li_tv, &argv[1]);
 
     rettv.v_type = VAR_UNKNOWN;		// clear_tv() uses this
-    CLEAR_FIELD(funcexe);
+    CLEAR_ಕ್ಷೇತ್ರ(funcexe);
     funcexe.fe_evaluate = TRUE;
     funcexe.fe_partial = partial;
-    funcexe.fe_selfdict = sortinfo->item_compare_selfdict;
+    funcexe.fe_selfdict = sortinfo->ಅಂಶ_compare_selfdict;
     res = call_func(func_name, -1, &rettv, 2, argv, &funcexe);
     clear_tv(&argv[0]);
     clear_tv(&argv[1]);
 
-    if (res == FAIL || did_emsg > did_emsg_before)
-	res = ITEM_COMPARE_FAIL;
-    else
+    ಆದರೆ (res == FAIL || did_emsg > did_emsg_before)
+	res = ಅಂಶ_COMPARE_FAIL;
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	varnumber_T	n;
 
-	n = tv_get_number_chk(&rettv, &sortinfo->item_compare_func_err);
+	n = tv_get_ಸಂಖ್ಯೆ_chk(&rettv, &sortinfo->ಅಂಶ_compare_func_err);
 	res = (n > 0) ? 1 : (n < 0) ? -1 : 0;
     }
-    if (sortinfo->item_compare_func_err)
-	res = ITEM_COMPARE_FAIL;  // return value has wrong type
+    ಆದರೆ (sortinfo->ಅಂಶ_compare_func_err)
+	res = ಅಂಶ_COMPARE_FAIL;  // return value has wrong type
     clear_tv(&rettv);
 
     // When the result would be zero, compare the pointers themselves.  Makes
     // the sort stable.
-    if (res == 0 && !sortinfo->item_compare_keep_zero)
+    ಆದರೆ (res == 0 && !sortinfo->ಅಂಶ_compare_keep_zero)
 	res = si1->idx > si2->idx ? 1 : -1;
 
-    return res;
+    ಹಿಂತಿರುಗಿ res;
 }
 
 /*
  * Precompute the numeric sort key of each item.  Only for the builtin numeric
  * compare modes; each key is computed exactly as item_compare() would have.
  */
-    static void
-sort_compute_keys(sortItem_T *ptrs, long len, sortinfo_T *info)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ವಿಂಗಡಿಸು_compute_ಕೀಲಿಗಳು(ವಿಂಗಡಿಸು_ಅಂಶ_T *ptrs, ದೀರ್ಘ len, sortinfo_T *info)
 {
-    long	i;
+    ದೀರ್ಘ	i;
 
-    if (info->item_compare_numbers)
+    ಆದರೆ (info->ಅಂಶ_compare_numbers)
     {
-	for (i = 0; i < len; ++i)
-	    ptrs[i].key.inum = tv_to_number(&ptrs[i].item->li_tv);
+	ಗಾಗಿ (i = 0; i < len; ++i)
+	    ptrs[i].ಕೀಲಿ.inum = tv_ಗಮ್ಯ_ಸಂಖ್ಯೆ(&ptrs[i].ಅಂಶ->li_tv);
     }
-    else if (info->item_compare_float)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (info->ಅಂಶ_compare_float)
     {
-	for (i = 0; i < len; ++i)
-	    ptrs[i].key.fnum = tv_get_float(&ptrs[i].item->li_tv);
+	ಗಾಗಿ (i = 0; i < len; ++i)
+	    ptrs[i].ಕೀಲಿ.fnum = tv_get_float(&ptrs[i].ಅಂಶ->li_tv);
     }
-    else // info->item_compare_numeric
+    ಇಲ್ಲದಿದ್ದರೆ // info->item_compare_numeric
     {
-	for (i = 0; i < len; ++i)
+	ಗಾಗಿ (i = 0; i < len; ++i)
 	{
-	    typval_T	*tv = &ptrs[i].item->li_tv;
+	    typval_T	*tv = &ptrs[i].ಅಂಶ->li_tv;
 
 	    // A string is compared as a single quote in numeric mode, which
 	    // strtod() reads as 0.
-	    if (tv->v_type == VAR_STRING)
-		ptrs[i].key.fnum = 0.0;
-	    else
+	    ಆದರೆ (tv->v_type == VAR_STRING)
+		ptrs[i].ಕೀಲಿ.fnum = 0.0;
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		char_u	numbuf[NUMBUFLEN];
-		char_u	*tofree = NULL;
+		char_u	*tofree = ಖಾಲಿ;
 		char_u	*p = tv2string(tv, &tofree, numbuf, 0);
 
-		ptrs[i].key.fnum = p == NULL ? 0.0 : strtod((char *)p, NULL);
+		ptrs[i].ಕೀಲಿ.fnum = p == ಖಾಲಿ ? 0.0 : strtod((ಅಕ್ಷರ *)p, ಖಾಲಿ);
 		vim_free(tofree);
 	    }
 	}
     }
-    info->item_compare_keys_ready = TRUE;
+    info->ಅಂಶ_compare_ಕೀಲಿಗಳು_ready = TRUE;
 }
 
 /*
  * sort() List "l"
  */
-    static void
-do_sort(list_T *l, sortinfo_T *info)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+do_ವಿಂಗಡಿಸು(list_T *l, sortinfo_T *info)
 {
-    long	len;
-    sortItem_T	*ptrs;
-    long	i = 0;
+    ದೀರ್ಘ	len;
+    ವಿಂಗಡಿಸು_ಅಂಶ_T	*ptrs;
+    ದೀರ್ಘ	i = 0;
     listitem_T	*li;
 
     len = list_len(l);
 
     // Make an array with each entry pointing to an item in the List.
-    ptrs = ALLOC_MULT(sortItem_T, len);
-    if (ptrs == NULL)
-	return;
+    ptrs = ALLOC_MULT(ವಿಂಗಡಿಸು_ಅಂಶ_T, len);
+    ಆದರೆ (ptrs == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     // sort(): ptrs will be the list to sort
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_ವಸ್ತುಗಳು(l, li)
     {
-	ptrs[i].item = li;
+	ptrs[i].ಅಂಶ = li;
 	ptrs[i].idx = i;
 	++i;
     }
 
-    info->item_compare_func_err = FALSE;
-    info->item_compare_keep_zero = FALSE;
-    info->item_compare_keys_ready = FALSE;
+    info->ಅಂಶ_compare_func_err = FALSE;
+    info->ಅಂಶ_compare_keep_zero = FALSE;
+    info->ಅಂಶ_compare_ಕೀಲಿಗಳು_ready = FALSE;
 
-    if (info->item_compare_func == NULL && info->item_compare_partial == NULL
-	    && (info->item_compare_numbers || info->item_compare_float
-						|| info->item_compare_numeric))
-	sort_compute_keys(ptrs, len, info);
+    ಆದರೆ (info->ಅಂಶ_compare_func == ಖಾಲಿ && info->ಅಂಶ_compare_partial == ಖಾಲಿ
+	    && (info->ಅಂಶ_compare_numbers || info->ಅಂಶ_compare_float
+						|| info->ಅಂಶ_compare_numeric))
+	ವಿಂಗಡಿಸು_compute_ಕೀಲಿಗಳು(ptrs, len, info);
     // test the compare function
-    if ((info->item_compare_func != NULL
-		|| info->item_compare_partial != NULL)
-	    && item_compare2((void *)&ptrs[0], (void *)&ptrs[1])
-	    == ITEM_COMPARE_FAIL)
-	emsg(_(e_sort_compare_function_failed));
-    else
+    ಆದರೆ ((info->ಅಂಶ_compare_func != ಖಾಲಿ
+		|| info->ಅಂಶ_compare_partial != ಖಾಲಿ)
+	    && ಅಂಶ_compare2((ಶೂನ್ಯ *)&ptrs[0], (ಶೂನ್ಯ *)&ptrs[1])
+	    == ಅಂಶ_COMPARE_FAIL)
+	emsg(_(e_ವಿಂಗಡಿಸು_compare_function_failed));
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Sort the array with item pointers.
-	qsort((void *)ptrs, (size_t)len, sizeof(sortItem_T),
-		info->item_compare_func == NULL
-		&& info->item_compare_partial == NULL
-		? item_compare : item_compare2);
+	qsort((ಶೂನ್ಯ *)ptrs, (size_t)len, ಗಾತ್ರ(ವಿಂಗಡಿಸು_ಅಂಶ_T),
+		info->ಅಂಶ_compare_func == ಖಾಲಿ
+		&& info->ಅಂಶ_compare_partial == ಖಾಲಿ
+		? ಅಂಶ_compare : ಅಂಶ_compare2);
 
-	if (!info->item_compare_func_err)
+	ಆದರೆ (!info->ಅಂಶ_compare_func_err)
 	{
 	    // Clear the List and append the items in sorted order.
-	    l->lv_first = l->lv_u.mat.lv_last
-		= l->lv_u.mat.lv_idx_item = NULL;
+	    l->lv_ಮೊದಲ = l->lv_u.mat.lv_ಕೊನೆಯ
+		= l->lv_u.mat.lv_idx_ಅಂಶ = ಖಾಲಿ;
 	    l->lv_len = 0;
-	    for (i = 0; i < len; ++i)
-		list_append(l, ptrs[i].item);
+	    ಗಾಗಿ (i = 0; i < len; ++i)
+		list_append(l, ptrs[i].ಅಂಶ);
 	}
     }
 
@@ -2384,52 +2384,52 @@ do_sort(list_T *l, sortinfo_T *info)
 /*
  * uniq() List "l"
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 do_uniq(list_T *l, sortinfo_T *info)
 {
-    long	len;
-    sortItem_T	*ptrs;
-    long	i = 0;
+    ದೀರ್ಘ	len;
+    ವಿಂಗಡಿಸು_ಅಂಶ_T	*ptrs;
+    ದೀರ್ಘ	i = 0;
     listitem_T	*li;
-    int	(*item_compare_func_ptr)(const void *, const void *);
+    ಪೂರ್ಣಾಂಕ	(*ಅಂಶ_compare_func_ptr)(ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *, ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *);
 
     len = list_len(l);
 
     // Make an array with each entry pointing to an item in the List.
-    ptrs = ALLOC_MULT(sortItem_T, len);
-    if (ptrs == NULL)
-	return;
+    ptrs = ALLOC_MULT(ವಿಂಗಡಿಸು_ಅಂಶ_T, len);
+    ಆದರೆ (ptrs == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     // f_uniq(): ptrs will be a stack of items to remove
-    info->item_compare_func_err = FALSE;
-    info->item_compare_keep_zero = TRUE;
-    item_compare_func_ptr = info->item_compare_func != NULL
-	|| info->item_compare_partial != NULL
-	? item_compare2 : item_compare;
+    info->ಅಂಶ_compare_func_err = FALSE;
+    info->ಅಂಶ_compare_keep_zero = TRUE;
+    ಅಂಶ_compare_func_ptr = info->ಅಂಶ_compare_func != ಖಾಲಿ
+	|| info->ಅಂಶ_compare_partial != ಖಾಲಿ
+	? ಅಂಶ_compare2 : ಅಂಶ_compare;
 
-    for (li = l->lv_first; li != NULL && li->li_next != NULL;
-	    li = li->li_next)
+    ಗಾಗಿ (li = l->lv_ಮೊದಲ; li != ಖಾಲಿ && li->li_ಮುಂದಿನ != ಖಾಲಿ;
+	    li = li->li_ಮುಂದಿನ)
     {
-	if (item_compare_func_ptr((void *)&li, (void *)&li->li_next)
+	ಆದರೆ (ಅಂಶ_compare_func_ptr((ಶೂನ್ಯ *)&li, (ಶೂನ್ಯ *)&li->li_ಮುಂದಿನ)
 		== 0)
-	    ptrs[i++].item = li;
-	if (info->item_compare_func_err)
+	    ptrs[i++].ಅಂಶ = li;
+	ಆದರೆ (info->ಅಂಶ_compare_func_err)
 	{
 	    emsg(_(e_uniq_compare_function_failed));
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
     }
 
-    if (!info->item_compare_func_err)
+    ಆದರೆ (!info->ಅಂಶ_compare_func_err)
     {
-	while (--i >= 0)
+	ಆಗ (--i >= 0)
 	{
-	    li = ptrs[i].item->li_next;
-	    ptrs[i].item->li_next = li->li_next;
-	    if (li->li_next != NULL)
-		li->li_next->li_prev = ptrs[i].item;
-	    else
-		l->lv_u.mat.lv_last = ptrs[i].item;
+	    li = ptrs[i].ಅಂಶ->li_ಮುಂದಿನ;
+	    ptrs[i].ಅಂಶ->li_ಮುಂದಿನ = li->li_ಮುಂದಿನ;
+	    ಆದರೆ (li->li_ಮುಂದಿನ != ಖಾಲಿ)
+		li->li_ಮುಂದಿನ->li_prev = ptrs[i].ಅಂಶ;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		l->lv_u.mat.lv_ಕೊನೆಯ = ptrs[i].ಅಂಶ;
 	    list_fix_watch(l, li);
 	    listitem_free(l, li);
 	    l->lv_len--;
@@ -2443,118 +2443,118 @@ do_uniq(list_T *l, sortinfo_T *info)
  * Parse the optional arguments supplied to the sort() or uniq() function and
  * return the values in "info".
  */
-    static int
-parse_sort_uniq_args(typval_T *argvars, sortinfo_T *info)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+parse_ವಿಂಗಡಿಸು_uniq_ವಾದಗಳು(typval_T *argvars, sortinfo_T *info)
 {
-    info->item_compare_ic = FALSE;
-    info->item_compare_lc = FALSE;
-    info->item_compare_numeric = FALSE;
-    info->item_compare_numbers = FALSE;
-    info->item_compare_float = FALSE;
-    info->item_compare_func = NULL;
-    info->item_compare_partial = NULL;
-    info->item_compare_selfdict = NULL;
-    info->item_compare_keys_ready = FALSE;
+    info->ಅಂಶ_compare_ic = FALSE;
+    info->ಅಂಶ_compare_lc = FALSE;
+    info->ಅಂಶ_compare_numeric = FALSE;
+    info->ಅಂಶ_compare_numbers = FALSE;
+    info->ಅಂಶ_compare_float = FALSE;
+    info->ಅಂಶ_compare_func = ಖಾಲಿ;
+    info->ಅಂಶ_compare_partial = ಖಾಲಿ;
+    info->ಅಂಶ_compare_selfdict = ಖಾಲಿ;
+    info->ಅಂಶ_compare_ಕೀಲಿಗಳು_ready = FALSE;
 
-    if (argvars[1].v_type == VAR_UNKNOWN)
-	return OK;
+    ಆದರೆ (argvars[1].v_type == VAR_UNKNOWN)
+	ಹಿಂತಿರುಗಿ OK;
 
     // optional second argument: {func}
-    if (argvars[1].v_type == VAR_FUNC)
-	info->item_compare_func = argvars[1].vval.v_string;
-    else if (argvars[1].v_type == VAR_PARTIAL)
-	info->item_compare_partial = argvars[1].vval.v_partial;
-    else
+    ಆದರೆ (argvars[1].v_type == VAR_FUNC)
+	info->ಅಂಶ_compare_func = argvars[1].vval.v_string;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argvars[1].v_type == VAR_PARTIAL)
+	info->ಅಂಶ_compare_partial = argvars[1].vval.v_partial;
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	int	    error = FALSE;
-	int	    nr = 0;
+	ಪೂರ್ಣಾಂಕ	    error = FALSE;
+	ಪೂರ್ಣಾಂಕ	    nr = 0;
 
-	if (argvars[1].v_type == VAR_NUMBER)
+	ಆದರೆ (argvars[1].v_type == VAR_ಸಂಖ್ಯೆ)
 	{
-	    nr = tv_get_number_chk(&argvars[1], &error);
-	    if (error)
-		return FAIL;
-	    if (nr == 1)
-		info->item_compare_ic = TRUE;
+	    nr = tv_get_ಸಂಖ್ಯೆ_chk(&argvars[1], &error);
+	    ಆದರೆ (error)
+		ಹಿಂತಿರುಗಿ FAIL;
+	    ಆದರೆ (nr == 1)
+		info->ಅಂಶ_compare_ic = TRUE;
 	}
-	if (nr != 1)
+	ಆದರೆ (nr != 1)
 	{
-	    if (argvars[1].v_type != VAR_NUMBER)
-		info->item_compare_func = tv_get_string(&argvars[1]);
-	    else if (nr != 0)
+	    ಆದರೆ (argvars[1].v_type != VAR_ಸಂಖ್ಯೆ)
+		info->ಅಂಶ_compare_func = tv_get_string(&argvars[1]);
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (nr != 0)
 	    {
-		emsg(_(e_invalid_argument));
-		return FAIL;
+		emsg(_(e_invalid_ವಾದ));
+		ಹಿಂತಿರುಗಿ FAIL;
 	    }
 	}
-	if (info->item_compare_func != NULL)
+	ಆದರೆ (info->ಅಂಶ_compare_func != ಖಾಲಿ)
 	{
-	    if (*info->item_compare_func == NUL)
+	    ಆದರೆ (*info->ಅಂಶ_compare_func == NUL)
 	    {
 		// empty string means default sort
-		info->item_compare_func = NULL;
+		info->ಅಂಶ_compare_func = ಖಾಲಿ;
 	    }
-	    else if (STRCMP(info->item_compare_func, "n") == 0)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(info->ಅಂಶ_compare_func, "n") == 0)
 	    {
-		info->item_compare_func = NULL;
-		info->item_compare_numeric = TRUE;
+		info->ಅಂಶ_compare_func = ಖಾಲಿ;
+		info->ಅಂಶ_compare_numeric = TRUE;
 	    }
-	    else if (STRCMP(info->item_compare_func, "N") == 0)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(info->ಅಂಶ_compare_func, "N") == 0)
 	    {
-		info->item_compare_func = NULL;
-		info->item_compare_numbers = TRUE;
+		info->ಅಂಶ_compare_func = ಖಾಲಿ;
+		info->ಅಂಶ_compare_numbers = TRUE;
 	    }
-	    else if (STRCMP(info->item_compare_func, "f") == 0)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(info->ಅಂಶ_compare_func, "f") == 0)
 	    {
-		info->item_compare_func = NULL;
-		info->item_compare_float = TRUE;
+		info->ಅಂಶ_compare_func = ಖಾಲಿ;
+		info->ಅಂಶ_compare_float = TRUE;
 	    }
-	    else if (STRCMP(info->item_compare_func, "i") == 0)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(info->ಅಂಶ_compare_func, "i") == 0)
 	    {
-		info->item_compare_func = NULL;
-		info->item_compare_ic = TRUE;
+		info->ಅಂಶ_compare_func = ಖಾಲಿ;
+		info->ಅಂಶ_compare_ic = TRUE;
 	    }
-	    else if (STRCMP(info->item_compare_func, "l") == 0)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(info->ಅಂಶ_compare_func, "l") == 0)
 	    {
-		info->item_compare_func = NULL;
-		info->item_compare_lc = TRUE;
+		info->ಅಂಶ_compare_func = ಖಾಲಿ;
+		info->ಅಂಶ_compare_lc = TRUE;
 	    }
 	}
     }
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ಆದರೆ (argvars[2].v_type != VAR_UNKNOWN)
     {
 	// optional third argument: {dict}
-	if (check_for_dict_arg(argvars, 2) == FAIL)
-	    return FAIL;
-	info->item_compare_selfdict = argvars[2].vval.v_dict;
+	ಆದರೆ (check_for_dict_arg(argvars, 2) == FAIL)
+	    ಹಿಂತಿರುಗಿ FAIL;
+	info->ಅಂಶ_compare_selfdict = argvars[2].vval.v_dict;
     }
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * "sort()" or "uniq()" function
  */
-    static void
-do_sort_uniq(typval_T *argvars, typval_T *rettv, int sort)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+do_ವಿಂಗಡಿಸು_uniq(typval_T *argvars, typval_T *rettv, ಪೂರ್ಣಾಂಕ ವಿಂಗಡಿಸು)
 {
     list_T	*l;
     sortinfo_T	*old_sortinfo;
     sortinfo_T	info;
-    long	len;
+    ದೀರ್ಘ	len;
 
-    if (in_vim9script()
+    ಆದರೆ (ಒಳ_vim9script()
 	    && (check_for_list_arg(argvars, 0) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && (check_for_string_or_func_arg(argvars, 1) == FAIL
 			      || check_for_opt_dict_arg(argvars, 2) == FAIL))))
-	return;
+	ಹಿಂತಿರುಗಿ;
 
-    if (argvars[0].v_type != VAR_LIST)
+    ಆದರೆ (argvars[0].v_type != VAR_LIST)
     {
-	semsg(_(e_argument_of_str_must_be_list), sort ? "sort()" : "uniq()");
-	return;
+	semsg(_(e_ವಾದ_ದ_str_must_be_list), ವಿಂಗಡಿಸು ? "sort()" : "uniq()");
+	ಹಿಂತಿರುಗಿ;
     }
 
     // Pointer to current info struct used in compare function. Save and
@@ -2563,25 +2563,25 @@ do_sort_uniq(typval_T *argvars, typval_T *rettv, int sort)
     sortinfo = &info;
 
     l = argvars[0].vval.v_list;
-    if (l != NULL && value_check_lock(l->lv_lock,
-		(char_u *)(sort ? N_("sort() argument") : N_("uniq() argument")),
+    ಆದರೆ (l != ಖಾಲಿ && ಮೌಲ್ಯ_check_ಬೀಗ(l->lv_ಬೀಗ,
+		(char_u *)(ವಿಂಗಡಿಸು ? N_("sort() argument") : N_("uniq() argument")),
 		TRUE))
-	goto theend;
-    rettv_list_set(rettv, l);
-    if (l == NULL)
-	goto theend;
+	ಹೋಗು theend;
+    rettv_list_ಗಣ(rettv, l);
+    ಆದರೆ (l == ಖಾಲಿ)
+	ಹೋಗು theend;
     CHECK_LIST_MATERIALIZE(l);
 
     len = list_len(l);
-    if (len <= 1)
-	goto theend;	// short list sorts pretty quickly
+    ಆದರೆ (len <= 1)
+	ಹೋಗು theend;	// short list sorts pretty quickly
 
-    if (parse_sort_uniq_args(argvars, &info) == FAIL)
-	goto theend;
+    ಆದರೆ (parse_ವಿಂಗಡಿಸು_uniq_ವಾದಗಳು(argvars, &info) == FAIL)
+	ಹೋಗು theend;
 
-    if (sort)
-	do_sort(l, &info);
-    else
+    ಆದರೆ (ವಿಂಗಡಿಸು)
+	do_ವಿಂಗಡಿಸು(l, &info);
+    ಇಲ್ಲದಿದ್ದರೆ
 	do_uniq(l, &info);
 
 theend:
@@ -2591,240 +2591,240 @@ theend:
 /*
  * "sort({list})" function
  */
-    void
-f_sort(typval_T *argvars, typval_T *rettv)
+    ಶೂನ್ಯ
+f_ವಿಂಗಡಿಸು(typval_T *argvars, typval_T *rettv)
 {
-    do_sort_uniq(argvars, rettv, TRUE);
+    do_ವಿಂಗಡಿಸು_uniq(argvars, rettv, TRUE);
 }
 
 /*
  * "uniq({list})" function
  */
-    void
+    ಶೂನ್ಯ
 f_uniq(typval_T *argvars, typval_T *rettv)
 {
-    do_sort_uniq(argvars, rettv, FALSE);
+    do_ವಿಂಗಡಿಸು_uniq(argvars, rettv, FALSE);
 }
 
 /*
  * Handle one item for map(), filter(), foreach().
  * Sets v:val to "tv".  Caller must set v:key.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 filter_map_one(
 	typval_T	*tv,	    // original value
-	typval_T	*expr,	    // callback
+	typval_T	*ಅಭಿವ್ಯಕ್ತಿ,	    // callback
 	filtermap_T	filtermap,
 	funccall_T	*fc,	    // from eval_expr_get_funccal()
 	typval_T	*newtv,	    // for map() and mapnew(): new value
-	int		*remp)	    // for filter(): remove flag
+	ಪೂರ್ಣಾಂಕ		*remp)	    // for filter(): remove flag
 {
     typval_T	argv[3];
-    int		retval = FAIL;
+    ಪೂರ್ಣಾಂಕ		retval = FAIL;
 
     copy_tv(tv, get_vim_var_tv(VV_VAL));
 
     newtv->v_type = VAR_UNKNOWN;
-    if (filtermap == FILTERMAP_FOREACH && expr->v_type == VAR_STRING)
+    ಆದರೆ (filtermap == FILTERMAP_FOREACH && ಅಭಿವ್ಯಕ್ತಿ->v_type == VAR_STRING)
     {
 	// foreach() is not limited to an expression
-	do_cmdline_cmd(expr->vval.v_string);
-	if (!did_emsg)
+	do_cmdline_cmd(ಅಭಿವ್ಯಕ್ತಿ->vval.v_string);
+	ಆದರೆ (!did_emsg)
 	    retval = OK;
-	goto theend;
+	ಹೋಗು theend;
     }
 
-    argv[0] = *get_vim_var_tv(VV_KEY);
+    argv[0] = *get_vim_var_tv(VV_ಕೀಲಿ);
     argv[1] = *get_vim_var_tv(VV_VAL);
-    if (eval_expr_typval(expr, FALSE, argv, 2, fc, newtv) == FAIL)
-	goto theend;
-    if (filtermap == FILTERMAP_FILTER)
+    ಆದರೆ (eval_ಅಭಿವ್ಯಕ್ತಿ_typval(ಅಭಿವ್ಯಕ್ತಿ, FALSE, argv, 2, fc, newtv) == FAIL)
+	ಹೋಗು theend;
+    ಆದರೆ (filtermap == FILTERMAP_FILTER)
     {
-	int	    error = FALSE;
+	ಪೂರ್ಣಾಂಕ	    error = FALSE;
 
 	// filter(): when expr is zero remove the item
-	if (in_vim9script())
+	ಆದರೆ (ಒಳ_vim9script())
 	    *remp = !tv_get_bool_chk(newtv, &error);
-	else
-	    *remp = (tv_get_number_chk(newtv, &error) == 0);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    *remp = (tv_get_ಸಂಖ್ಯೆ_chk(newtv, &error) == 0);
 	clear_tv(newtv);
 	// On type error, nothing has been removed; return FAIL to stop the
 	// loop.  The error message was given by tv_get_number_chk().
-	if (error)
-	    goto theend;
+	ಆದರೆ (error)
+	    ಹೋಗು theend;
     }
-    else if (filtermap == FILTERMAP_FOREACH)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (filtermap == FILTERMAP_FOREACH)
 	clear_tv(newtv);
     retval = OK;
 theend:
     clear_tv(get_vim_var_tv(VV_VAL));
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
 /*
  * Implementation of map(), filter(), foreach() for a List.  Apply "expr" to
  * every item in List "l" and return the result in "rettv".
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 list_filter_map(
 	list_T		*l,
 	filtermap_T	filtermap,
 	type_T		*argtype,
-	char		*func_name,
+	ಅಕ್ಷರ		*func_name,
 	char_u		*arg_errmsg,
-	typval_T	*expr,
+	typval_T	*ಅಭಿವ್ಯಕ್ತಿ,
 	typval_T	*rettv)
 {
-    int		prev_lock;
-    list_T	*l_ret = NULL;
-    int		idx = 0;
-    int		rem;
+    ಪೂರ್ಣಾಂಕ		prev_ಬೀಗ;
+    list_T	*l_ret = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		idx = 0;
+    ಪೂರ್ಣಾಂಕ		rem;
     listitem_T	*li, *nli;
     typval_T	newtv;
     funccall_T	*fc;
 
-    if (filtermap == FILTERMAP_MAPNEW)
+    ಆದರೆ (filtermap == FILTERMAP_MAPNEW)
     {
 	rettv->v_type = VAR_LIST;
-	rettv->vval.v_list = NULL;
+	rettv->vval.v_list = ಖಾಲಿ;
     }
-    if (l == NULL || (filtermap == FILTERMAP_FILTER
-			    && value_check_lock(l->lv_lock, arg_errmsg, TRUE)))
-	return;
+    ಆದರೆ (l == ಖಾಲಿ || (filtermap == FILTERMAP_FILTER
+			    && ಮೌಲ್ಯ_check_ಬೀಗ(l->lv_ಬೀಗ, arg_errmsg, TRUE)))
+	ಹಿಂತಿರುಗಿ;
 
-    prev_lock = l->lv_lock;
+    prev_ಬೀಗ = l->lv_ಬೀಗ;
 
-    if (filtermap == FILTERMAP_MAPNEW)
+    ಆದರೆ (filtermap == FILTERMAP_MAPNEW)
     {
-	if (rettv_list_alloc(rettv) == FAIL)
-	    return;
+	ಆದರೆ (rettv_list_alloc(rettv) == FAIL)
+	    ಹಿಂತಿರುಗಿ;
 	l_ret = rettv->vval.v_list;
     }
     // set_vim_var_nr() doesn't set the type
-    set_vim_var_type(VV_KEY, VAR_NUMBER);
+    ಗಣ_vim_var_type(VV_ಕೀಲಿ, VAR_ಸಂಖ್ಯೆ);
 
-    if (l->lv_lock == 0)
-	l->lv_lock = VAR_LOCKED;
+    ಆದರೆ (l->lv_ಬೀಗ == 0)
+	l->lv_ಬೀಗ = VAR_LOCKED;
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, &newtv);
+    fc = eval_ಅಭಿವ್ಯಕ್ತಿ_get_funccal(ಅಭಿವ್ಯಕ್ತಿ, &newtv);
 
-    if (l->lv_first == &range_list_item)
+    ಆದರೆ (l->lv_ಮೊದಲ == &range_list_ಅಂಶ)
     {
-	varnumber_T	val = l->lv_u.nonmat.lv_start;
-	int		len = l->lv_len;
-	int		stride = l->lv_u.nonmat.lv_stride;
+	varnumber_T	val = l->lv_u.nonmat.lv_ಆರಂಭ;
+	ಪೂರ್ಣಾಂಕ		len = l->lv_len;
+	ಪೂರ್ಣಾಂಕ		stride = l->lv_u.nonmat.lv_stride;
 
 	// List from range(): loop over the numbers
 	// NOTE: foreach() returns the range_list_item
-	if (filtermap != FILTERMAP_MAPNEW && filtermap != FILTERMAP_FOREACH)
+	ಆದರೆ (filtermap != FILTERMAP_MAPNEW && filtermap != FILTERMAP_FOREACH)
 	{
-	    l->lv_first = NULL;
-	    l->lv_u.mat.lv_last = NULL;
+	    l->lv_ಮೊದಲ = ಖಾಲಿ;
+	    l->lv_u.mat.lv_ಕೊನೆಯ = ಖಾಲಿ;
 	    l->lv_len = 0;
-	    l->lv_u.mat.lv_idx_item = NULL;
+	    l->lv_u.mat.lv_idx_ಅಂಶ = ಖಾಲಿ;
 	}
 
-	for (idx = 0; idx < len; ++idx)
+	ಗಾಗಿ (idx = 0; idx < len; ++idx)
 	{
 	    typval_T tv;
 
-	    tv.v_type = VAR_NUMBER;
-	    tv.v_lock = 0;
-	    tv.vval.v_number = val;
-	    set_vim_var_nr(VV_KEY, idx);
-	    if (filter_map_one(&tv, expr, filtermap, fc, &newtv, &rem) == FAIL)
-		break;
-	    if (did_emsg)
+	    tv.v_type = VAR_ಸಂಖ್ಯೆ;
+	    tv.v_ಬೀಗ = 0;
+	    tv.vval.v_ಸಂಖ್ಯೆ = val;
+	    ಗಣ_vim_var_nr(VV_ಕೀಲಿ, idx);
+	    ಆದರೆ (filter_map_one(&tv, ಅಭಿವ್ಯಕ್ತಿ, filtermap, fc, &newtv, &rem) == FAIL)
+		ನಿಲ್ಲಿಸು;
+	    ಆದರೆ (did_emsg)
 	    {
 		clear_tv(&newtv);
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	    if (filtermap != FILTERMAP_FOREACH)
+	    ಆದರೆ (filtermap != FILTERMAP_FOREACH)
 	    {
-		if (filtermap != FILTERMAP_FILTER)
+		ಆದರೆ (filtermap != FILTERMAP_FILTER)
 		{
-		    if (filtermap == FILTERMAP_MAP && argtype != NULL
+		    ಆದರೆ (filtermap == FILTERMAP_MAP && argtype != ಖಾಲಿ
 			&& check_typval_arg_type(
 						 argtype->tt_member, &newtv,
 						 func_name, 0) == FAIL)
 		    {
 			clear_tv(&newtv);
-			break;
+			ನಿಲ್ಲಿಸು;
 		    }
 		    // map(), mapnew(): always append the new value to the
 		    // list
-		    if (list_append_tv_move(filtermap == FILTERMAP_MAP
+		    ಆದರೆ (list_append_tv_move(filtermap == FILTERMAP_MAP
 					    ? l : l_ret, &newtv) == FAIL)
-			break;
+			ನಿಲ್ಲಿಸು;
 		}
-		else if (!rem)
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!rem)
 		{
 		    // filter(): append the list item value when not rem
-		    if (list_append_tv_move(l, &tv) == FAIL)
-			break;
+		    ಆದರೆ (list_append_tv_move(l, &tv) == FAIL)
+			ನಿಲ್ಲಿಸು;
 		}
 	    }
 
 	    val += stride;
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Materialized list: loop over the items
-	for (li = l->lv_first; li != NULL; li = nli)
+	ಗಾಗಿ (li = l->lv_ಮೊದಲ; li != ಖಾಲಿ; li = nli)
 	{
-	    if (filtermap == FILTERMAP_MAP && value_check_lock(
-			li->li_tv.v_lock, arg_errmsg, TRUE))
-		break;
-	    nli = li->li_next;
-	    set_vim_var_nr(VV_KEY, idx);
-	    if (filter_map_one(&li->li_tv, expr, filtermap, fc,
+	    ಆದರೆ (filtermap == FILTERMAP_MAP && ಮೌಲ್ಯ_check_ಬೀಗ(
+			li->li_tv.v_ಬೀಗ, arg_errmsg, TRUE))
+		ನಿಲ್ಲಿಸು;
+	    nli = li->li_ಮುಂದಿನ;
+	    ಗಣ_vim_var_nr(VV_ಕೀಲಿ, idx);
+	    ಆದರೆ (filter_map_one(&li->li_tv, ಅಭಿವ್ಯಕ್ತಿ, filtermap, fc,
 							 &newtv, &rem) == FAIL)
-		break;
-	    if (did_emsg)
+		ನಿಲ್ಲಿಸು;
+	    ಆದರೆ (did_emsg)
 	    {
 		clear_tv(&newtv);
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	    if (filtermap == FILTERMAP_MAP)
+	    ಆದರೆ (filtermap == FILTERMAP_MAP)
 	    {
-		if (argtype != NULL && check_typval_arg_type(
+		ಆದರೆ (argtype != ಖಾಲಿ && check_typval_arg_type(
 			    argtype->tt_member, &newtv, func_name, 0) == FAIL)
 		{
 		    clear_tv(&newtv);
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 		// map(): replace the list item value
 		clear_tv(&li->li_tv);
-		newtv.v_lock = 0;
+		newtv.v_ಬೀಗ = 0;
 		li->li_tv = newtv;
 	    }
-	    else if (filtermap == FILTERMAP_MAPNEW)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (filtermap == FILTERMAP_MAPNEW)
 	    {
 		// mapnew(): append the list item value
-		if (list_append_tv_move(l_ret, &newtv) == FAIL)
-		    break;
+		ಆದರೆ (list_append_tv_move(l_ret, &newtv) == FAIL)
+		    ನಿಲ್ಲಿಸು;
 	    }
-	    else if (filtermap == FILTERMAP_FILTER && rem)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (filtermap == FILTERMAP_FILTER && rem)
 		    listitem_remove(l, li);
 	    ++idx;
 	}
     }
 
-    l->lv_lock = prev_lock;
-    if (fc != NULL)
+    l->lv_ಬೀಗ = prev_ಬೀಗ;
+    ಆದರೆ (fc != ಖಾಲಿ)
 	remove_funccal();
 }
 
 /*
  * Implementation of map(), filter() and foreach().
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 filter_map(typval_T *argvars, typval_T *rettv, filtermap_T filtermap)
 {
-    typval_T	*expr;
-    char	*func_name = filtermap == FILTERMAP_MAP ? "map()"
+    typval_T	*ಅಭಿವ್ಯಕ್ತಿ;
+    ಅಕ್ಷರ	*func_name = filtermap == FILTERMAP_MAP ? "map()"
 				  : filtermap == FILTERMAP_MAPNEW ? "mapnew()"
 				  : filtermap == FILTERMAP_FILTER ? "filter()"
 				  : "foreach()";
@@ -2835,84 +2835,84 @@ filter_map(typval_T *argvars, typval_T *rettv, filtermap_T filtermap)
 				       : filtermap == FILTERMAP_FILTER
 						      ? N_("filter() argument")
 						   : N_("foreach() argument"));
-    int		save_did_emsg;
-    type_T	*type = NULL;
+    ಪೂರ್ಣಾಂಕ		save_did_emsg;
+    type_T	*type = ಖಾಲಿ;
 
     // map(), filter(), foreach() return the first argument, also on failure.
-    if (filtermap != FILTERMAP_MAPNEW && argvars[0].v_type != VAR_STRING)
+    ಆದರೆ (filtermap != FILTERMAP_MAPNEW && argvars[0].v_type != VAR_STRING)
 	copy_tv(&argvars[0], rettv);
 
-    if (in_vim9script()
+    ಆದರೆ (ಒಳ_vim9script()
 	    && (check_for_list_tuple_dict_blob_or_string_arg(argvars, 0)
 								== FAIL))
-	return;
+	ಹಿಂತಿರುಗಿ;
 
-    if (argvars[0].v_type == VAR_TUPLE && filtermap != FILTERMAP_FOREACH)
+    ಆದರೆ (argvars[0].v_type == VAR_TUPLE && filtermap != FILTERMAP_FOREACH)
     {
 	semsg(_(e_cannot_use_tuple_with_function_str), func_name);
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if (filtermap == FILTERMAP_MAP && in_vim9script())
+    ಆದರೆ (filtermap == FILTERMAP_MAP && ಒಳ_vim9script())
     {
 	// Check that map() does not change the declared type of the list or
 	// dict.
-	if (argvars[0].v_type == VAR_DICT && argvars[0].vval.v_dict != NULL)
+	ಆದರೆ (argvars[0].v_type == VAR_DICT && argvars[0].vval.v_dict != ಖಾಲಿ)
 	    type = argvars[0].vval.v_dict->dv_type;
-	else if (argvars[0].v_type == VAR_LIST
-					     && argvars[0].vval.v_list != NULL)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argvars[0].v_type == VAR_LIST
+					     && argvars[0].vval.v_list != ಖಾಲಿ)
 	    type = argvars[0].vval.v_list->lv_type;
     }
 
-    if (argvars[0].v_type != VAR_BLOB
+    ಆದರೆ (argvars[0].v_type != VAR_BLOB
 	    && argvars[0].v_type != VAR_LIST
 	    && argvars[0].v_type != VAR_TUPLE
 	    && argvars[0].v_type != VAR_DICT
 	    && argvars[0].v_type != VAR_STRING)
     {
-	char *msg;
+	ಅಕ್ಷರ *ಸಂದೇಶ;
 
-	if (filtermap == FILTERMAP_FOREACH)
-	    msg = e_argument_of_str_must_be_list_tuple_string_dictionary_or_blob;
-	else
-	    msg = e_argument_of_str_must_be_list_string_dictionary_or_blob;
-	semsg(_(msg), func_name);
-	return;
+	ಆದರೆ (filtermap == FILTERMAP_FOREACH)
+	    ಸಂದೇಶ = e_ವಾದ_ದ_str_must_be_list_tuple_string_dictionary_or_blob;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಸಂದೇಶ = e_ವಾದ_ದ_str_must_be_list_string_dictionary_or_blob;
+	semsg(_(ಸಂದೇಶ), func_name);
+	ಹಿಂತಿರುಗಿ;
     }
 
     // On type errors, the preceding call has already displayed an error
     // message.  Avoid a misleading error message for an empty string that
     // was not passed as argument.
-    expr = &argvars[1];
-    if (expr->v_type == VAR_UNKNOWN)
-	return;
+    ಅಭಿವ್ಯಕ್ತಿ = &argvars[1];
+    ಆದರೆ (ಅಭಿವ್ಯಕ್ತಿ->v_type == VAR_UNKNOWN)
+	ಹಿಂತಿರುಗಿ;
 
     typval_T	save_val;
-    typval_T	save_key;
+    typval_T	save_ಕೀಲಿ;
 
     prepare_vimvar(VV_VAL, &save_val);
-    prepare_vimvar(VV_KEY, &save_key);
+    prepare_vimvar(VV_ಕೀಲಿ, &save_ಕೀಲಿ);
 
     // We reset "did_emsg" to be able to detect whether an error
     // occurred during evaluation of the expression.
     save_did_emsg = did_emsg;
     did_emsg = FALSE;
 
-    if (argvars[0].v_type == VAR_DICT)
+    ಆದರೆ (argvars[0].v_type == VAR_DICT)
 	dict_filter_map(argvars[0].vval.v_dict, filtermap, type, func_name,
-						      arg_errmsg, expr, rettv);
-    else if (argvars[0].v_type == VAR_BLOB)
-	blob_filter_map(argvars[0].vval.v_blob, filtermap, expr,
+						      arg_errmsg, ಅಭಿವ್ಯಕ್ತಿ, rettv);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argvars[0].v_type == VAR_BLOB)
+	blob_filter_map(argvars[0].vval.v_blob, filtermap, ಅಭಿವ್ಯಕ್ತಿ,
 							    arg_errmsg, rettv);
-    else if (argvars[0].v_type == VAR_STRING)
-	string_filter_map(tv_get_string(&argvars[0]), filtermap, expr, rettv);
-    else if (argvars[0].v_type == VAR_TUPLE)
-	tuple_foreach(argvars[0].vval.v_tuple, filtermap, expr);
-    else // argvars[0].v_type == VAR_LIST
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argvars[0].v_type == VAR_STRING)
+	string_filter_map(tv_get_string(&argvars[0]), filtermap, ಅಭಿವ್ಯಕ್ತಿ, rettv);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argvars[0].v_type == VAR_TUPLE)
+	tuple_foreach(argvars[0].vval.v_tuple, filtermap, ಅಭಿವ್ಯಕ್ತಿ);
+    ಇಲ್ಲದಿದ್ದರೆ // argvars[0].v_type == VAR_LIST
 	list_filter_map(argvars[0].vval.v_list, filtermap, type, func_name,
-						      arg_errmsg, expr, rettv);
+						      arg_errmsg, ಅಭಿವ್ಯಕ್ತಿ, rettv);
 
-    restore_vimvar(VV_KEY, &save_key);
+    restore_vimvar(VV_ಕೀಲಿ, &save_ಕೀಲಿ);
     restore_vimvar(VV_VAL, &save_val);
 
     did_emsg |= save_did_emsg;
@@ -2921,7 +2921,7 @@ filter_map(typval_T *argvars, typval_T *rettv, filtermap_T filtermap)
 /*
  * "filter()" function
  */
-    void
+    ಶೂನ್ಯ
 f_filter(typval_T *argvars, typval_T *rettv)
 {
     filter_map(argvars, rettv, FILTERMAP_FILTER);
@@ -2930,7 +2930,7 @@ f_filter(typval_T *argvars, typval_T *rettv)
 /*
  * "map()" function
  */
-    void
+    ಶೂನ್ಯ
 f_map(typval_T *argvars, typval_T *rettv)
 {
     filter_map(argvars, rettv, FILTERMAP_MAP);
@@ -2939,7 +2939,7 @@ f_map(typval_T *argvars, typval_T *rettv)
 /*
  * "mapnew()" function
  */
-    void
+    ಶೂನ್ಯ
 f_mapnew(typval_T *argvars, typval_T *rettv)
 {
     filter_map(argvars, rettv, FILTERMAP_MAPNEW);
@@ -2948,7 +2948,7 @@ f_mapnew(typval_T *argvars, typval_T *rettv)
 /*
  * "foreach()" function
  */
-    void
+    ಶೂನ್ಯ
 f_foreach(typval_T *argvars, typval_T *rettv)
 {
     filter_map(argvars, rettv, FILTERMAP_FOREACH);
@@ -2957,17 +2957,17 @@ f_foreach(typval_T *argvars, typval_T *rettv)
 /*
  * "add(list, item)" function
  */
-    static void
-list_add(typval_T *argvars, typval_T *rettv)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+list_ಕೂಡಿಸು(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l = argvars[0].vval.v_list;
 
-    if (l == NULL)
+    ಆದರೆ (l == ಖಾಲಿ)
     {
-	if (in_vim9script())
-	    emsg(_(e_cannot_add_to_null_list));
+	ಆದರೆ (ಒಳ_vim9script())
+	    emsg(_(e_cannot_ಕೂಡಿಸು_ಗಮ್ಯ_null_list));
     }
-    else if (!value_check_lock(l->lv_lock,
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!ಮೌಲ್ಯ_check_ಬೀಗ(l->lv_ಬೀಗ,
 		(char_u *)N_("add() argument"), TRUE)
 	    && list_append_tv(l, &argvars[1]) == OK)
     {
@@ -2978,22 +2978,22 @@ list_add(typval_T *argvars, typval_T *rettv)
 /*
  * "add(object, item)" function
  */
-    void
-f_add(typval_T *argvars, typval_T *rettv)
+    ಶೂನ್ಯ
+f_ಕೂಡಿಸು(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = 1; // Default: Failed
+    rettv->vval.v_ಸಂಖ್ಯೆ = 1; // Default: Failed
 
-    if (in_vim9script()
+    ಆದರೆ (ಒಳ_vim9script()
 	    && (check_for_list_or_blob_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type == VAR_BLOB
-		    && check_for_number_arg(argvars, 1) == FAIL)))
-	return;
+		    && check_for_ಸಂಖ್ಯೆ_arg(argvars, 1) == FAIL)))
+	ಹಿಂತಿರುಗಿ;
 
-    if (argvars[0].v_type == VAR_LIST)
-	list_add(argvars, rettv);
-    else if (argvars[0].v_type == VAR_BLOB)
-	blob_add(argvars, rettv);
-    else
+    ಆದರೆ (argvars[0].v_type == VAR_LIST)
+	list_ಕೂಡಿಸು(argvars, rettv);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argvars[0].v_type == VAR_BLOB)
+	blob_ಕೂಡಿಸು(argvars, rettv);
+    ಇಲ್ಲದಿದ್ದರೆ
 	emsg(_(e_list_or_blob_required));
 }
 
@@ -3001,89 +3001,89 @@ f_add(typval_T *argvars, typval_T *rettv)
  * Count the number of times item "needle" occurs in List "l" starting at index
  * "idx". Case is ignored if "ic" is TRUE.
  */
-    static long
-list_count(list_T *l, typval_T *needle, long idx, int ic)
+    ಸ್ಥಿರ ದೀರ್ಘ
+list_ಎಣಿಕೆ(list_T *l, typval_T *needle, ದೀರ್ಘ idx, ಪೂರ್ಣಾಂಕ ic)
 {
-    long	n = 0;
+    ದೀರ್ಘ	n = 0;
     listitem_T	*li;
 
-    if (l == NULL)
-	return 0;
+    ಆದರೆ (l == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ 0;
 
     CHECK_LIST_MATERIALIZE(l);
 
-    if (list_len(l) == 0)
-	return 0;
+    ಆದರೆ (list_len(l) == 0)
+	ಹಿಂತಿರುಗಿ 0;
 
-    li = list_find(l, idx);
-    if (li == NULL)
+    li = list_ಕಂಡುಹಿಡಿ(l, idx);
+    ಆದರೆ (li == ಖಾಲಿ)
     {
-	semsg(_(e_list_index_out_of_range_nr), idx);
-	return 0;
+	semsg(_(e_list_ಸೂಚ್ಯಂಕ_ಹೊರಹೋಗು_ದ_range_nr), idx);
+	ಹಿಂತಿರುಗಿ 0;
     }
 
-    for ( ; li != NULL; li = li->li_next)
-	if (tv_equal(&li->li_tv, needle, ic))
+    ಗಾಗಿ ( ; li != ಖಾಲಿ; li = li->li_ಮುಂದಿನ)
+	ಆದರೆ (tv_equal(&li->li_tv, needle, ic))
 	    ++n;
 
-    return n;
+    ಹಿಂತಿರುಗಿ n;
 }
 
 /*
  * "count()" function
  */
-    void
-f_count(typval_T *argvars, typval_T *rettv)
+    ಶೂನ್ಯ
+f_ಎಣಿಕೆ(typval_T *argvars, typval_T *rettv)
 {
-    long	n = 0;
-    int		ic = FALSE;
-    int		error = FALSE;
+    ದೀರ್ಘ	n = 0;
+    ಪೂರ್ಣಾಂಕ		ic = FALSE;
+    ಪೂರ್ಣಾಂಕ		error = FALSE;
 
-    if (in_vim9script()
+    ಆದರೆ (ಒಳ_vim9script()
 	    && (check_for_string_list_tuple_or_dict_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 3) == FAIL)))
-	return;
+		    && check_for_opt_ಸಂಖ್ಯೆ_arg(argvars, 3) == FAIL)))
+	ಹಿಂತಿರುಗಿ;
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
-	ic = (int)tv_get_bool_chk(&argvars[2], &error);
+    ಆದರೆ (argvars[2].v_type != VAR_UNKNOWN)
+	ic = (ಪೂರ್ಣಾಂಕ)tv_get_bool_chk(&argvars[2], &error);
 
-    if (!error && argvars[0].v_type == VAR_STRING)
-	n = string_count(argvars[0].vval.v_string,
+    ಆದರೆ (!error && argvars[0].v_type == VAR_STRING)
+	n = string_ಎಣಿಕೆ(argvars[0].vval.v_string,
 					tv_get_string_chk(&argvars[1]), ic);
-    else if (!error && argvars[0].v_type == VAR_LIST)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!error && argvars[0].v_type == VAR_LIST)
     {
-	long idx = 0;
+	ದೀರ್ಘ idx = 0;
 
-	if (argvars[2].v_type != VAR_UNKNOWN
+	ಆದರೆ (argvars[2].v_type != VAR_UNKNOWN
 		&& argvars[3].v_type != VAR_UNKNOWN)
-	    idx = (long)tv_get_number_chk(&argvars[3], &error);
-	if (!error)
-	    n = list_count(argvars[0].vval.v_list, &argvars[1], idx, ic);
+	    idx = (ದೀರ್ಘ)tv_get_ಸಂಖ್ಯೆ_chk(&argvars[3], &error);
+	ಆದರೆ (!error)
+	    n = list_ಎಣಿಕೆ(argvars[0].vval.v_list, &argvars[1], idx, ic);
     }
-    else if (!error && argvars[0].v_type == VAR_TUPLE)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!error && argvars[0].v_type == VAR_TUPLE)
     {
-	long idx = 0;
+	ದೀರ್ಘ idx = 0;
 
-	if (argvars[2].v_type != VAR_UNKNOWN
+	ಆದರೆ (argvars[2].v_type != VAR_UNKNOWN
 		&& argvars[3].v_type != VAR_UNKNOWN)
-	    idx = (long)tv_get_number_chk(&argvars[3], &error);
-	if (!error)
-	    n = tuple_count(argvars[0].vval.v_tuple, &argvars[1], idx, ic);
+	    idx = (ದೀರ್ಘ)tv_get_ಸಂಖ್ಯೆ_chk(&argvars[3], &error);
+	ಆದರೆ (!error)
+	    n = tuple_ಎಣಿಕೆ(argvars[0].vval.v_tuple, &argvars[1], idx, ic);
     }
-    else if (!error && argvars[0].v_type == VAR_DICT)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!error && argvars[0].v_type == VAR_DICT)
     {
-	if (argvars[2].v_type != VAR_UNKNOWN
+	ಆದರೆ (argvars[2].v_type != VAR_UNKNOWN
 		&& argvars[3].v_type != VAR_UNKNOWN)
-	    emsg(_(e_invalid_argument));
-	else
-	    n = dict_count(argvars[0].vval.v_dict, &argvars[1], ic);
+	    emsg(_(e_invalid_ವಾದ));
+	ಇಲ್ಲದಿದ್ದರೆ
+	    n = dict_ಎಣಿಕೆ(argvars[0].vval.v_dict, &argvars[1], ic);
     }
-    else if (!error)
-	semsg(_(e_argument_of_str_must_be_list_string_or_dictionary),
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!error)
+	semsg(_(e_ವಾದ_ದ_str_must_be_list_string_or_dictionary),
 								    "count()");
-    rettv->vval.v_number = n;
+    rettv->vval.v_ಸಂಖ್ಯೆ = n;
 }
 
 /*
@@ -3091,76 +3091,76 @@ f_count(typval_T *argvars, typval_T *rettv)
  * argvars[3] and return the resulting list in "rettv".  "is_new" is TRUE for
  * extendnew().
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 list_extend_func(
 	typval_T	*argvars,
 	type_T		*type,
-	char		*func_name,
+	ಅಕ್ಷರ		*func_name,
 	char_u		*arg_errmsg,
-	int		is_new,
+	ಪೂರ್ಣಾಂಕ		is_new,
 	typval_T	*rettv)
 {
     list_T	*l1, *l2;
-    listitem_T	*item;
-    long	before;
-    int		error = FALSE;
+    listitem_T	*ಅಂಶ;
+    ದೀರ್ಘ	before;
+    ಪೂರ್ಣಾಂಕ		error = FALSE;
 
     l1 = argvars[0].vval.v_list;
-    if (l1 == NULL)
+    ಆದರೆ (l1 == ಖಾಲಿ)
     {
 	emsg(_(e_cannot_extend_null_list));
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
-    if (is_new || !value_check_lock(l1->lv_lock, arg_errmsg, TRUE))
+    ಆದರೆ (is_new || !ಮೌಲ್ಯ_check_ಬೀಗ(l1->lv_ಬೀಗ, arg_errmsg, TRUE))
     {
-	if (is_new)
+	ಆದರೆ (is_new)
 	{
 	    l1 = list_copy(l1, FALSE, TRUE, get_copyID());
-	    if (l1 == NULL)
-		return;
+	    ಆದರೆ (l1 == ಖಾಲಿ)
+		ಹಿಂತಿರುಗಿ;
 	}
 
 	l2 = argvars[1].vval.v_list;
-	if (l2 == NULL)
-	    goto theend;
+	ಆದರೆ (l2 == ಖಾಲಿ)
+	    ಹೋಗು theend;
 
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	ಆದರೆ (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    before = (long)tv_get_number_chk(&argvars[2], &error);
-	    if (error)
-		goto cleanup;		// type error; errmsg already given
-	    if (before == l1->lv_len)
-		item = NULL;
-	    else
+	    before = (ದೀರ್ಘ)tv_get_ಸಂಖ್ಯೆ_chk(&argvars[2], &error);
+	    ಆದರೆ (error)
+		ಹೋಗು cleanup;		// type error; errmsg already given
+	    ಆದರೆ (before == l1->lv_len)
+		ಅಂಶ = ಖಾಲಿ;
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		item = list_find(l1, before);
-		if (item == NULL)
+		ಅಂಶ = list_ಕಂಡುಹಿಡಿ(l1, before);
+		ಆದರೆ (ಅಂಶ == ಖಾಲಿ)
 		{
-		    semsg(_(e_list_index_out_of_range_nr), before);
-		    goto cleanup;
+		    semsg(_(e_list_ಸೂಚ್ಯಂಕ_ಹೊರಹೋಗು_ದ_range_nr), before);
+		    ಹೋಗು cleanup;
 		}
 	    }
 	}
-	else
-	    item = NULL;
-	if (type != NULL && check_typval_arg_type(
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಅಂಶ = ಖಾಲಿ;
+	ಆದರೆ (type != ಖಾಲಿ && check_typval_arg_type(
 		    type, &argvars[1], func_name, 2) == FAIL)
-	    goto cleanup;
-	list_extend(l1, l2, item);
+	    ಹೋಗು cleanup;
+	list_extend(l1, l2, ಅಂಶ);
 
 theend:
-	if (is_new)
+	ಆದರೆ (is_new)
 	{
 	    rettv->v_type = VAR_LIST;
 	    rettv->vval.v_list = l1;
-	    rettv->v_lock = FALSE;
+	    rettv->v_ಬೀಗ = FALSE;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    copy_tv(&argvars[0], rettv);
-	return;
+	ಹಿಂತಿರುಗಿ;
 
 cleanup:
-	if (is_new)
+	ಆದರೆ (is_new)
 	    list_unref(l1);
     }
 }
@@ -3168,32 +3168,32 @@ cleanup:
 /*
  * "extend()" or "extendnew()" function.  "is_new" is TRUE for extendnew().
  */
-    static void
-extend(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg, int is_new)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+extend(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg, ಪೂರ್ಣಾಂಕ is_new)
 {
-    type_T	*type = NULL;
-    char	*func_name = is_new ? "extendnew()" : "extend()";
+    type_T	*type = ಖಾಲಿ;
+    ಅಕ್ಷರ	*func_name = is_new ? "extendnew()" : "extend()";
 
-    if (argvars[0].v_type == VAR_LIST && argvars[1].v_type == VAR_LIST)
+    ಆದರೆ (argvars[0].v_type == VAR_LIST && argvars[1].v_type == VAR_LIST)
     {
 	// Check that extend() does not change the type of the list if it was
 	// declared.
-	if (!is_new && in_vim9script() && argvars[0].vval.v_list != NULL)
+	ಆದರೆ (!is_new && ಒಳ_vim9script() && argvars[0].vval.v_list != ಖಾಲಿ)
 	    type = argvars[0].vval.v_list->lv_type;
 	list_extend_func(argvars, type, func_name, arg_errmsg, is_new, rettv);
     }
-    else if (argvars[0].v_type == VAR_DICT && argvars[1].v_type == VAR_DICT)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argvars[0].v_type == VAR_DICT && argvars[1].v_type == VAR_DICT)
     {
 	// Check that extend() does not change the type of the dict if it was
 	// declared.
-	if (!is_new && in_vim9script() && argvars[0].vval.v_dict != NULL)
+	ಆದರೆ (!is_new && ಒಳ_vim9script() && argvars[0].vval.v_dict != ಖಾಲಿ)
 	    type = argvars[0].vval.v_dict->dv_type;
 	dict_extend_func(argvars, type, func_name, arg_errmsg, is_new, rettv);
     }
-    else if (argvars[0].v_type == VAR_BLOB && argvars[1].v_type == VAR_BLOB)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argvars[0].v_type == VAR_BLOB && argvars[1].v_type == VAR_BLOB)
 	blob_extend_func(argvars, arg_errmsg, is_new, rettv);
-    else
-	semsg(_(e_argument_of_str_must_be_list_dictionary_or_blob), func_name);
+    ಇಲ್ಲದಿದ್ದರೆ
+	semsg(_(e_ವಾದ_ದ_str_must_be_list_dictionary_or_blob), func_name);
 }
 
 /*
@@ -3201,7 +3201,7 @@ extend(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg, int is_new)
  * "extend(dict, dict [, action])" function
  * "extend(blob, blob [, idx])" function
  */
-    void
+    ಶೂನ್ಯ
 f_extend(typval_T *argvars, typval_T *rettv)
 {
     char_u      *errmsg = (char_u *)N_("extend() argument");
@@ -3214,7 +3214,7 @@ f_extend(typval_T *argvars, typval_T *rettv)
  * "extendnew(dict, dict [, action])" function
  * "extendnew(blob, blob [, idx])" function
  */
-    void
+    ಶೂನ್ಯ
 f_extendnew(typval_T *argvars, typval_T *rettv)
 {
     char_u      *errmsg = (char_u *)N_("extendnew() argument");
@@ -3222,43 +3222,43 @@ f_extendnew(typval_T *argvars, typval_T *rettv)
     extend(argvars, rettv, errmsg, TRUE);
 }
 
-    static void
-list_insert_func(typval_T *argvars, typval_T *rettv)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+list_ಸೇರಿಸು_func(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l = argvars[0].vval.v_list;
-    long	before = 0;
-    listitem_T	*item;
-    int		error = FALSE;
+    ದೀರ್ಘ	before = 0;
+    listitem_T	*ಅಂಶ;
+    ಪೂರ್ಣಾಂಕ		error = FALSE;
 
-    if (l == NULL)
+    ಆದರೆ (l == ಖಾಲಿ)
     {
-	if (in_vim9script())
-	    emsg(_(e_cannot_add_to_null_list));
-	return;
+	ಆದರೆ (ಒಳ_vim9script())
+	    emsg(_(e_cannot_ಕೂಡಿಸು_ಗಮ್ಯ_null_list));
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if (value_check_lock(l->lv_lock, (char_u *)N_("insert() argument"), TRUE))
-	return;
+    ಆದರೆ (ಮೌಲ್ಯ_check_ಬೀಗ(l->lv_ಬೀಗ, (char_u *)N_("insert() argument"), TRUE))
+	ಹಿಂತಿರುಗಿ;
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
-	before = (long)tv_get_number_chk(&argvars[2], &error);
-    if (error)
-	return;		// type error; errmsg already given
+    ಆದರೆ (argvars[2].v_type != VAR_UNKNOWN)
+	before = (ದೀರ್ಘ)tv_get_ಸಂಖ್ಯೆ_chk(&argvars[2], &error);
+    ಆದರೆ (error)
+	ಹಿಂತಿರುಗಿ;		// type error; errmsg already given
 
-    if (before == l->lv_len)
-	item = NULL;
-    else
+    ಆದರೆ (before == l->lv_len)
+	ಅಂಶ = ಖಾಲಿ;
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	item = list_find(l, before);
-	if (item == NULL)
+	ಅಂಶ = list_ಕಂಡುಹಿಡಿ(l, before);
+	ಆದರೆ (ಅಂಶ == ಖಾಲಿ)
 	{
-	    semsg(_(e_list_index_out_of_range_nr), before);
-	    l = NULL;
+	    semsg(_(e_list_ಸೂಚ್ಯಂಕ_ಹೊರಹೋಗು_ದ_range_nr), before);
+	    l = ಖಾಲಿ;
 	}
     }
-    if (l != NULL)
+    ಆದರೆ (l != ಖಾಲಿ)
     {
-	(void)list_insert_tv(l, &argvars[1], item);
+	(ಶೂನ್ಯ)list_ಸೇರಿಸು_tv(l, &argvars[1], ಅಂಶ);
 	copy_tv(&argvars[0], rettv);
     }
 }
@@ -3266,76 +3266,76 @@ list_insert_func(typval_T *argvars, typval_T *rettv)
 /*
  * "insert()" function
  */
-    void
-f_insert(typval_T *argvars, typval_T *rettv)
+    ಶೂನ್ಯ
+f_ಸೇರಿಸು(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    ಆದರೆ (ಒಳ_vim9script()
 	    && (check_for_list_or_blob_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type == VAR_BLOB
-		    && check_for_number_arg(argvars, 1) == FAIL)
-		|| check_for_opt_number_arg(argvars, 2) == FAIL))
-	return;
+		    && check_for_ಸಂಖ್ಯೆ_arg(argvars, 1) == FAIL)
+		|| check_for_opt_ಸಂಖ್ಯೆ_arg(argvars, 2) == FAIL))
+	ಹಿಂತಿರುಗಿ;
 
-    if (argvars[0].v_type == VAR_BLOB)
-	blob_insert_func(argvars, rettv);
-    else if (argvars[0].v_type != VAR_LIST)
-	semsg(_(e_argument_of_str_must_be_list_or_blob), "insert()");
-    else
-	list_insert_func(argvars, rettv);
+    ಆದರೆ (argvars[0].v_type == VAR_BLOB)
+	blob_ಸೇರಿಸು_func(argvars, rettv);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argvars[0].v_type != VAR_LIST)
+	semsg(_(e_ವಾದ_ದ_str_must_be_list_or_blob), "insert()");
+    ಇಲ್ಲದಿದ್ದರೆ
+	list_ಸೇರಿಸು_func(argvars, rettv);
 }
 
 /*
  * "remove()" function
  */
-    void
+    ಶೂನ್ಯ
 f_remove(typval_T *argvars, typval_T *rettv)
 {
     char_u	*arg_errmsg = (char_u *)N_("remove() argument");
 
-    if (in_vim9script()
+    ಆದರೆ (ಒಳ_vim9script()
 	    && (check_for_list_or_dict_or_blob_arg(argvars, 0) == FAIL
 		|| ((argvars[0].v_type == VAR_LIST
 			|| argvars[0].v_type == VAR_BLOB)
-		    && (check_for_number_arg(argvars, 1) == FAIL
-			|| check_for_opt_number_arg(argvars, 2) == FAIL))
+		    && (check_for_ಸಂಖ್ಯೆ_arg(argvars, 1) == FAIL
+			|| check_for_opt_ಸಂಖ್ಯೆ_arg(argvars, 2) == FAIL))
 		|| (argvars[0].v_type == VAR_DICT
-		    && check_for_string_or_number_arg(argvars, 1) == FAIL)))
-	return;
+		    && check_for_string_or_ಸಂಖ್ಯೆ_arg(argvars, 1) == FAIL)))
+	ಹಿಂತಿರುಗಿ;
 
-    if (argvars[0].v_type == VAR_DICT)
+    ಆದರೆ (argvars[0].v_type == VAR_DICT)
 	dict_remove(argvars, rettv, arg_errmsg);
-    else if (argvars[0].v_type == VAR_BLOB)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argvars[0].v_type == VAR_BLOB)
 	blob_remove(argvars, rettv, arg_errmsg);
-    else if (argvars[0].v_type == VAR_LIST)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argvars[0].v_type == VAR_LIST)
 	list_remove(argvars, rettv, arg_errmsg);
-    else
-	semsg(_(e_argument_of_str_must_be_list_dictionary_or_blob), "remove()");
+    ಇಲ್ಲದಿದ್ದರೆ
+	semsg(_(e_ವಾದ_ದ_str_must_be_list_dictionary_or_blob), "remove()");
 }
 
-    static void
-list_reverse(list_T *l, typval_T *rettv)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+list_ಹಿಮ್ಮುಖ(list_T *l, typval_T *rettv)
 {
     listitem_T	*li, *ni;
 
-    rettv_list_set(rettv, l);
-    if (l != NULL
-	    && !value_check_lock(l->lv_lock,
+    rettv_list_ಗಣ(rettv, l);
+    ಆದರೆ (l != ಖಾಲಿ
+	    && !ಮೌಲ್ಯ_check_ಬೀಗ(l->lv_ಬೀಗ,
 		(char_u *)N_("reverse() argument"), TRUE))
     {
-	if (l->lv_first == &range_list_item)
+	ಆದರೆ (l->lv_ಮೊದಲ == &range_list_ಅಂಶ)
 	{
-	    varnumber_T new_start = l->lv_u.nonmat.lv_start
+	    varnumber_T new_ಆರಂಭ = l->lv_u.nonmat.lv_ಆರಂಭ
 		+ ((varnumber_T)l->lv_len - 1) * l->lv_u.nonmat.lv_stride;
-	    l->lv_u.nonmat.lv_end = new_start
-		- (l->lv_u.nonmat.lv_end - l->lv_u.nonmat.lv_start);
-	    l->lv_u.nonmat.lv_start = new_start;
+	    l->lv_u.nonmat.lv_ಕೊನೆ = new_ಆರಂಭ
+		- (l->lv_u.nonmat.lv_ಕೊನೆ - l->lv_u.nonmat.lv_ಆರಂಭ);
+	    l->lv_u.nonmat.lv_ಆರಂಭ = new_ಆರಂಭ;
 	    l->lv_u.nonmat.lv_stride = -l->lv_u.nonmat.lv_stride;
-	    return;
+	    ಹಿಂತಿರುಗಿ;
 	}
-	li = l->lv_u.mat.lv_last;
-	l->lv_first = l->lv_u.mat.lv_last = NULL;
+	li = l->lv_u.mat.lv_ಕೊನೆಯ;
+	l->lv_ಮೊದಲ = l->lv_u.mat.lv_ಕೊನೆಯ = ಖಾಲಿ;
 	l->lv_len = 0;
-	while (li != NULL)
+	ಆಗ (li != ಖಾಲಿ)
 	{
 	    ni = li->li_prev;
 	    list_append(l, li);
@@ -3348,26 +3348,26 @@ list_reverse(list_T *l, typval_T *rettv)
 /*
  * "reverse({list})" function
  */
-    void
-f_reverse(typval_T *argvars, typval_T *rettv)
+    ಶೂನ್ಯ
+f_ಹಿಮ್ಮುಖ(typval_T *argvars, typval_T *rettv)
 {
-    if (check_for_string_or_list_or_tuple_or_blob_arg(argvars, 0) == FAIL)
-	return;
+    ಆದರೆ (check_for_string_or_list_or_tuple_or_blob_arg(argvars, 0) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
-    if (argvars[0].v_type == VAR_BLOB)
-	blob_reverse(argvars[0].vval.v_blob, rettv);
-    else if (argvars[0].v_type == VAR_STRING)
+    ಆದರೆ (argvars[0].v_type == VAR_BLOB)
+	blob_ಹಿಮ್ಮುಖ(argvars[0].vval.v_blob, rettv);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argvars[0].v_type == VAR_STRING)
     {
 	rettv->v_type = VAR_STRING;
-	if (argvars[0].vval.v_string != NULL)
-	    rettv->vval.v_string = reverse_text(argvars[0].vval.v_string);
-	else
-	    rettv->vval.v_string = NULL;
+	ಆದರೆ (argvars[0].vval.v_string != ಖಾಲಿ)
+	    rettv->vval.v_string = ಹಿಮ್ಮುಖ_ಪಠ್ಯ(argvars[0].vval.v_string);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    rettv->vval.v_string = ಖಾಲಿ;
     }
-    else if (argvars[0].v_type == VAR_LIST)
-	list_reverse(argvars[0].vval.v_list, rettv);
-    else if (argvars[0].v_type == VAR_TUPLE)
-	tuple_reverse(argvars[0].vval.v_tuple, rettv);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argvars[0].v_type == VAR_LIST)
+	list_ಹಿಮ್ಮುಖ(argvars[0].vval.v_list, rettv);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argvars[0].v_type == VAR_TUPLE)
+	tuple_ಹಿಮ್ಮುಖ(argvars[0].vval.v_tuple, rettv);
 }
 
 /*
@@ -3375,100 +3375,100 @@ f_reverse(typval_T *argvars, typval_T *rettv)
  * starting with the optional initial value argvars[2] and return the result in
  * "rettv".
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 list_reduce(
 	typval_T	*argvars,
-	typval_T	*expr,
+	typval_T	*ಅಭಿವ್ಯಕ್ತಿ,
 	typval_T	*rettv)
 {
     list_T	*l = argvars[0].vval.v_list;
-    listitem_T  *li = NULL;
-    int		range_list;
-    int		range_idx = 0;
+    listitem_T  *li = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		range_list;
+    ಪೂರ್ಣಾಂಕ		range_idx = 0;
     varnumber_T	range_val = 0;
     typval_T	initial;
     typval_T	argv[3];
-    int		r;
-    int		called_emsg_start = called_emsg;
-    int		prev_locked;
+    ಪೂರ್ಣಾಂಕ		r;
+    ಪೂರ್ಣಾಂಕ		called_emsg_ಆರಂಭ = called_emsg;
+    ಪೂರ್ಣಾಂಕ		prev_locked;
     funccall_T	*fc;
 
     // Using reduce on a range() uses "range_idx" and "range_val".
-    range_list = l != NULL && l->lv_first == &range_list_item;
-    if (range_list)
-	range_val = l->lv_u.nonmat.lv_start;
+    range_list = l != ಖಾಲಿ && l->lv_ಮೊದಲ == &range_list_ಅಂಶ;
+    ಆದರೆ (range_list)
+	range_val = l->lv_u.nonmat.lv_ಆರಂಭ;
 
-    if (argvars[2].v_type == VAR_UNKNOWN)
+    ಆದರೆ (argvars[2].v_type == VAR_UNKNOWN)
     {
-	if (l == NULL || l->lv_len == 0)
+	ಆದರೆ (l == ಖಾಲಿ || l->lv_len == 0)
 	{
-	    semsg(_(e_reduce_of_an_empty_str_with_no_initial_value), "List");
-	    return;
+	    semsg(_(e_reduce_ದ_an_ಖಾಲಿಗಳು_str_with_no_initial_ಮೌಲ್ಯ), "List");
+	    ಹಿಂತಿರುಗಿ;
 	}
-	if (range_list)
+	ಆದರೆ (range_list)
 	{
-	    initial.v_type = VAR_NUMBER;
-	    initial.vval.v_number = range_val;
+	    initial.v_type = VAR_ಸಂಖ್ಯೆ;
+	    initial.vval.v_ಸಂಖ್ಯೆ = range_val;
 	    range_val += l->lv_u.nonmat.lv_stride;
 	    range_idx = 1;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    initial = l->lv_first->li_tv;
-	    li = l->lv_first->li_next;
+	    initial = l->lv_ಮೊದಲ->li_tv;
+	    li = l->lv_ಮೊದಲ->li_ಮುಂದಿನ;
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	initial = argvars[2];
-	if (l != NULL && !range_list)
-	    li = l->lv_first;
+	ಆದರೆ (l != ಖಾಲಿ && !range_list)
+	    li = l->lv_ಮೊದಲ;
     }
     copy_tv(&initial, rettv);
 
-    if (l == NULL)
-	return;
+    ಆದರೆ (l == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, rettv);
+    fc = eval_ಅಭಿವ್ಯಕ್ತಿ_get_funccal(ಅಭಿವ್ಯಕ್ತಿ, rettv);
 
-    prev_locked = l->lv_lock;
-    l->lv_lock = VAR_FIXED;  // disallow the list changing here
+    prev_locked = l->lv_ಬೀಗ;
+    l->lv_ಬೀಗ = VAR_FIXED;  // disallow the list changing here
 
-    while (range_list ? range_idx < l->lv_len : li != NULL)
+    ಆಗ (range_list ? range_idx < l->lv_len : li != ಖಾಲಿ)
     {
 	argv[0] = *rettv;
 	rettv->v_type = VAR_UNKNOWN;
 
-	if (range_list)
+	ಆದರೆ (range_list)
 	{
-	    argv[1].v_type = VAR_NUMBER;
-	    argv[1].vval.v_number = range_val;
+	    argv[1].v_type = VAR_ಸಂಖ್ಯೆ;
+	    argv[1].vval.v_ಸಂಖ್ಯೆ = range_val;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    argv[1] = li->li_tv;
 
-	r = eval_expr_typval(expr, TRUE, argv, 2, fc, rettv);
+	r = eval_ಅಭಿವ್ಯಕ್ತಿ_typval(ಅಭಿವ್ಯಕ್ತಿ, TRUE, argv, 2, fc, rettv);
 
-	if (argv[0].v_type != VAR_NUMBER && argv[0].v_type != VAR_UNKNOWN)
+	ಆದರೆ (argv[0].v_type != VAR_ಸಂಖ್ಯೆ && argv[0].v_type != VAR_UNKNOWN)
 	    clear_tv(&argv[0]);
-	if (r == FAIL || called_emsg != called_emsg_start)
-	    break;
+	ಆದರೆ (r == FAIL || called_emsg != called_emsg_ಆರಂಭ)
+	    ನಿಲ್ಲಿಸು;
 
 	// advance to the next item
-	if (range_list)
+	ಆದರೆ (range_list)
 	{
 	    range_val += l->lv_u.nonmat.lv_stride;
 	    ++range_idx;
 	}
-	else
-	    li = li->li_next;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    li = li->li_ಮುಂದಿನ;
     }
 
-    if (fc != NULL)
+    ಆದರೆ (fc != ಖಾಲಿ)
 	remove_funccal();
 
-    l->lv_lock = prev_locked;
+    l->lv_ಬೀಗ = prev_locked;
 }
 
 /*
@@ -3477,59 +3477,59 @@ list_reduce(
  * "reduce(blob, { accumulator, element -> value } [, initial])"
  * "reduce(string, { accumulator, element -> value } [, initial])"
  */
-    void
+    ಶೂನ್ಯ
 f_reduce(typval_T *argvars, typval_T *rettv)
 {
     char_u	*func_name;
 
-    if (check_for_string_or_list_or_tuple_or_blob_arg(argvars, 0) == FAIL)
-	return;
+    ಆದರೆ (check_for_string_or_list_or_tuple_or_blob_arg(argvars, 0) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
-    if (argvars[1].v_type == VAR_FUNC)
+    ಆದರೆ (argvars[1].v_type == VAR_FUNC)
 	func_name = argvars[1].vval.v_string;
-    else if (argvars[1].v_type == VAR_PARTIAL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argvars[1].v_type == VAR_PARTIAL)
 	func_name = partial_name(argvars[1].vval.v_partial);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	func_name = tv_get_string_strict(&argvars[1]);
-    if (func_name == NULL || *func_name == NUL)
+    ಆದರೆ (func_name == ಖಾಲಿ || *func_name == NUL)
     {
-	emsg(_(e_missing_function_argument));
-	return;
+	emsg(_(e_missing_function_ವಾದ));
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if (argvars[0].v_type == VAR_LIST)
+    ಆದರೆ (argvars[0].v_type == VAR_LIST)
 	list_reduce(argvars, &argvars[1], rettv);
-    else if (argvars[0].v_type == VAR_TUPLE)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argvars[0].v_type == VAR_TUPLE)
 	tuple_reduce(argvars, &argvars[1], rettv);
-    else if (argvars[0].v_type == VAR_STRING)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argvars[0].v_type == VAR_STRING)
 	string_reduce(argvars, &argvars[1], rettv);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	blob_reduce(argvars, &argvars[1], rettv);
 }
 
 /*
  * slice() function
  */
-    void
-f_slice(typval_T *argvars, typval_T *rettv)
+    ಶೂನ್ಯ
+f_ತುಂಡು(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    ಆದರೆ (ಒಳ_vim9script()
 	    && ((argvars[0].v_type != VAR_STRING
 		    && argvars[0].v_type != VAR_LIST
 		    && argvars[0].v_type != VAR_TUPLE
 		    && argvars[0].v_type != VAR_BLOB
 		    && check_for_list_arg(argvars, 0) == FAIL)
-		|| check_for_number_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL))
-	return;
+		|| check_for_ಸಂಖ್ಯೆ_arg(argvars, 1) == FAIL
+		|| check_for_opt_ಸಂಖ್ಯೆ_arg(argvars, 2) == FAIL))
+	ಹಿಂತಿರುಗಿ;
 
-    if (check_can_index(&argvars[0], TRUE, FALSE) != OK)
-	return;
+    ಆದರೆ (check_can_ಸೂಚ್ಯಂಕ(&argvars[0], TRUE, FALSE) != OK)
+	ಹಿಂತಿರುಗಿ;
 
     copy_tv(argvars, rettv);
-    eval_index_inner(rettv, TRUE, argvars + 1,
-	    argvars[2].v_type == VAR_UNKNOWN ? NULL : argvars + 2,
-	    TRUE, NULL, 0, FALSE);
+    eval_ಸೂಚ್ಯಂಕ_inner(rettv, TRUE, argvars + 1,
+	    argvars[2].v_type == VAR_UNKNOWN ? ಖಾಲಿ : argvars + 2,
+	    TRUE, ಖಾಲಿ, 0, FALSE);
 }
 
-#endif // defined(FEAT_EVAL)
+#ಆದರೆ_ಅಂತ್ಯ // defined(FEAT_EVAL)

@@ -11,69 +11,69 @@
  * cmdhist.c: Functions for the history of the command-line.
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-static histentry_T *(history[HIST_COUNT]) = {NULL, NULL, NULL, NULL, NULL};
-static int	hisidx[HIST_COUNT] = {-1, -1, -1, -1, -1};  // lastused entry
-static int	hisnum[HIST_COUNT] = {0, 0, 0, 0, 0};
+ಸ್ಥಿರ histentry_T *(history[HIST_ಎಣಿಕೆ]) = {ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ};
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	hisidx[HIST_ಎಣಿಕೆ] = {-1, -1, -1, -1, -1};  // lastused entry
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	hisnum[HIST_ಎಣಿಕೆ] = {0, 0, 0, 0, 0};
 		    // identifying (unique) number of newest history entry
-static int	hislen = 0;		// actual length of history tables
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	hislen = 0;		// actual length of history tables
 
 /*
  * Return the length of the history tables
  */
-    int
-get_hislen(void)
+    ಪೂರ್ಣಾಂಕ
+get_hislen(ಶೂನ್ಯ)
 {
-    return hislen;
+    ಹಿಂತಿರುಗಿ hislen;
 }
 
 /*
  * Return a pointer to a specified history table
  */
     histentry_T *
-get_histentry(int hist_type)
+get_histentry(ಪೂರ್ಣಾಂಕ hist_type)
 {
-    return history[hist_type];
+    ಹಿಂತಿರುಗಿ history[hist_type];
 }
 
-#if defined(FEAT_VIMINFO)
-    void
-set_histentry(int hist_type, histentry_T *entry)
+#ಆದರೆ defined(FEAT_VIMINFO)
+    ಶೂನ್ಯ
+ಗಣ_histentry(ಪೂರ್ಣಾಂಕ hist_type, histentry_T *ನಮೂದು)
 {
-    history[hist_type] = entry;
+    history[hist_type] = ನಮೂದು;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    int *
-get_hisidx(int hist_type)
+    ಪೂರ್ಣಾಂಕ *
+get_hisidx(ಪೂರ್ಣಾಂಕ hist_type)
 {
-    return &hisidx[hist_type];
+    ಹಿಂತಿರುಗಿ &hisidx[hist_type];
 }
 
-#if defined(FEAT_VIMINFO)
-    int *
-get_hisnum(int hist_type)
+#ಆದರೆ defined(FEAT_VIMINFO)
+    ಪೂರ್ಣಾಂಕ *
+get_hisnum(ಪೂರ್ಣಾಂಕ hist_type)
 {
-    return &hisnum[hist_type];
+    ಹಿಂತಿರುಗಿ &hisnum[hist_type];
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Translate a history character to the associated type number.
  */
-    int
-hist_char2type(int c)
+    ಪೂರ್ಣಾಂಕ
+hist_char2type(ಪೂರ್ಣಾಂಕ c)
 {
-    if (c == ':')
-	return HIST_CMD;
-    if (c == '=')
-	return HIST_EXPR;
-    if (c == '@')
-	return HIST_INPUT;
-    if (c == '>')
-	return HIST_DEBUG;
-    return HIST_SEARCH;	    // must be '?' or '/'
+    ಆದರೆ (c == ':')
+	ಹಿಂತಿರುಗಿ HIST_CMD;
+    ಆದರೆ (c == '=')
+	ಹಿಂತಿರುಗಿ HIST_ಅಭಿವ್ಯಕ್ತಿ;
+    ಆದರೆ (c == '@')
+	ಹಿಂತಿರುಗಿ HIST_ಒಳಹರಿವು;
+    ಆದರೆ (c == '>')
+	ಹಿಂತಿರುಗಿ HIST_DEBUG;
+    ಹಿಂತಿರುಗಿ HIST_ಹುಡುಕು;	    // must be '?' or '/'
 }
 
 /*
@@ -82,14 +82,14 @@ hist_char2type(int c)
  * It is sufficient to give the significant prefix of a history name.
  */
 
-static char *(history_names[]) =
+ಸ್ಥಿರ ಅಕ್ಷರ *(history_ಹೆಸರುಗಳು[]) =
 {
     "cmd",
     "search",
     "expr",
     "input",
     "debug",
-    NULL
+    ಖಾಲಿ
 };
 
 /*
@@ -97,181 +97,181 @@ static char *(history_names[]) =
  * arguments of the ":history command.
  */
     char_u *
-get_history_arg(expand_T *xp UNUSED, int idx)
+get_history_arg(expand_T *xp ಬಳಸದ, ಪೂರ್ಣಾಂಕ idx)
 {
-    char    *short_names = ":=@>?/";
-    int	    short_names_count = (int)STRLEN(short_names);
-    int	    history_name_count = ARRAY_LENGTH(history_names) - 1;
+    ಅಕ್ಷರ    *short_ಹೆಸರುಗಳು = ":=@>?/";
+    ಪೂರ್ಣಾಂಕ	    short_ಹೆಸರುಗಳು_ಎಣಿಕೆ = (ಪೂರ್ಣಾಂಕ)STRLEN(short_ಹೆಸರುಗಳು);
+    ಪೂರ್ಣಾಂಕ	    history_name_ಎಣಿಕೆ = ARRAY_ಉದ್ದಳತೆ(history_ಹೆಸರುಗಳು) - 1;
 
-    if (idx < short_names_count)
+    ಆದರೆ (idx < short_ಹೆಸರುಗಳು_ಎಣಿಕೆ)
     {
-	xp->xp_buf[0] = (char_u)short_names[idx];
+	xp->xp_buf[0] = (char_u)short_ಹೆಸರುಗಳು[idx];
 	xp->xp_buf[1] = NUL;
-	return xp->xp_buf;
+	ಹಿಂತಿರುಗಿ xp->xp_buf;
     }
-    if (idx < short_names_count + history_name_count)
-	return (char_u *)history_names[idx - short_names_count];
-    if (idx == short_names_count + history_name_count)
-	return (char_u *)"all";
-    return NULL;
+    ಆದರೆ (idx < short_ಹೆಸರುಗಳು_ಎಣಿಕೆ + history_name_ಎಣಿಕೆ)
+	ಹಿಂತಿರುಗಿ (char_u *)history_ಹೆಸರುಗಳು[idx - short_ಹೆಸರುಗಳು_ಎಣಿಕೆ];
+    ಆದರೆ (idx == short_ಹೆಸರುಗಳು_ಎಣಿಕೆ + history_name_ಎಣಿಕೆ)
+	ಹಿಂತಿರುಗಿ (char_u *)"all";
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * init_history() - Initialize the command line history.
  * Also used to re-allocate the history when the size changes.
  */
-    void
-init_history(void)
+    ಶೂನ್ಯ
+init_history(ಶೂನ್ಯ)
 {
-    int		newlen;	    // new length of history table
-    histentry_T	*temp;
-    int		type;
+    ಪೂರ್ಣಾಂಕ		newlen;	    // new length of history table
+    histentry_T	*ತಾತ್ಕಾಲಿಕ;
+    ಪೂರ್ಣಾಂಕ		type;
 
     // If size of history table changed, reallocate it
-    newlen = (int)p_hi;
-    if (newlen == hislen)		// history length didn't change
-	return;
+    newlen = (ಪೂರ್ಣಾಂಕ)p_hi;
+    ಆದರೆ (newlen == hislen)		// history length didn't change
+	ಹಿಂತಿರುಗಿ;
 
     // history length changed
-    for (type = 0; type < HIST_COUNT; ++type)   // adjust the tables
+    ಗಾಗಿ (type = 0; type < HIST_ಎಣಿಕೆ; ++type)   // adjust the tables
     {
-	if (newlen > 0)
+	ಆದರೆ (newlen > 0)
 	{
-	    temp = ALLOC_MULT(histentry_T, newlen);
-	    if (temp == NULL)   // out of memory!
+	    ತಾತ್ಕಾಲಿಕ = ALLOC_MULT(histentry_T, newlen);
+	    ಆದರೆ (ತಾತ್ಕಾಲಿಕ == ಖಾಲಿ)   // out of memory!
 	    {
-		if (type == 0)  // first one: just keep the old length
+		ಆದರೆ (type == 0)  // first one: just keep the old length
 		{
 		    newlen = hislen;
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 		// Already changed one table, now we can only have zero
 		// length for all tables.
 		newlen = 0;
 		type = -1;
-		continue;
+		ಮುಂದುವರಿ;
 	    }
 	}
-	else
-	    temp = NULL;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ತಾತ್ಕಾಲಿಕ = ಖಾಲಿ;
 
-	if (hisidx[type] < 0)		// there are no entries yet
+	ಆದರೆ (hisidx[type] < 0)		// there are no entries yet
 	{
-	    int	i;
+	    ಪೂರ್ಣಾಂಕ	i;
 
-	    for (i = 0; i < newlen; ++i)
-		clear_hist_entry(&temp[i]);
+	    ಗಾಗಿ (i = 0; i < newlen; ++i)
+		clear_hist_ನಮೂದು(&ತಾತ್ಕಾಲಿಕ[i]);
 	}
-	else if (newlen > hislen)	// array becomes bigger
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (newlen > hislen)	// array becomes bigger
 	{
-	    int	i;
-	    int	j;
+	    ಪೂರ್ಣಾಂಕ	i;
+	    ಪೂರ್ಣಾಂಕ	j;
 
-	    for (i = 0; i <= hisidx[type]; ++i)
-		temp[i] = history[type][i];
+	    ಗಾಗಿ (i = 0; i <= hisidx[type]; ++i)
+		ತಾತ್ಕಾಲಿಕ[i] = history[type][i];
 	    j = i;
-	    for ( ; i <= newlen - (hislen - hisidx[type]); ++i)
-		clear_hist_entry(&temp[i]);
-	    for ( ; j < hislen; ++i, ++j)
-		temp[i] = history[type][j];
+	    ಗಾಗಿ ( ; i <= newlen - (hislen - hisidx[type]); ++i)
+		clear_hist_ನಮೂದು(&ತಾತ್ಕಾಲಿಕ[i]);
+	    ಗಾಗಿ ( ; j < hislen; ++i, ++j)
+		ತಾತ್ಕಾಲಿಕ[i] = history[type][j];
 	}
-	else				// array becomes smaller or 0
+	ಇಲ್ಲದಿದ್ದರೆ				// array becomes smaller or 0
 	{
-	    int	i;
-	    int	j;
+	    ಪೂರ್ಣಾಂಕ	i;
+	    ಪೂರ್ಣಾಂಕ	j;
 
 	    j = hisidx[type];
-	    for (i = newlen - 1; ; --i)
+	    ಗಾಗಿ (i = newlen - 1; ; --i)
 	    {
-		if (i >= 0)		// copy newest entries
-		    temp[i] = history[type][j];
-		else			// remove older entries
+		ಆದರೆ (i >= 0)		// copy newest entries
+		    ತಾತ್ಕಾಲಿಕ[i] = history[type][j];
+		ಇಲ್ಲದಿದ್ದರೆ			// remove older entries
 		{
 		    vim_free(history[type][j].hisstr);
 		    history[type][j].hisstrlen = 0;
 		}
-		if (--j < 0)
+		ಆದರೆ (--j < 0)
 		    j = hislen - 1;
-		if (j == hisidx[type])
-		    break;
+		ಆದರೆ (j == hisidx[type])
+		    ನಿಲ್ಲಿಸು;
 	    }
 	    hisidx[type] = newlen - 1;
 	}
 	vim_free(history[type]);
-	history[type] = temp;
+	history[type] = ತಾತ್ಕಾಲಿಕ;
     }
     hislen = newlen;
 }
 
-    void
-clear_hist_entry(histentry_T *hisptr)
+    ಶೂನ್ಯ
+clear_hist_ನಮೂದು(histentry_T *hisptr)
 {
     hisptr->hisnum = 0;
     hisptr->viminfo = FALSE;
-    hisptr->hisstr = NULL;
+    hisptr->hisstr = ಖಾಲಿ;
     hisptr->hisstrlen = 0;
-    hisptr->time_set = 0;
+    hisptr->ಸಮಯ_ಗಣ = 0;
 }
 
 /*
  * Check if command line 'str' is already in history.
  * If 'move_to_front' is TRUE, matching entry is moved to end of history.
  */
-    int
-in_history(
-    int	    type,
+    ಪೂರ್ಣಾಂಕ
+ಒಳ_history(
+    ಪೂರ್ಣಾಂಕ	    type,
     char_u  *str,
-    int	    move_to_front,	// Move the entry to the front if it exists
-    int	    sep,
-    int	    writing)		// ignore entries read from viminfo
+    ಪೂರ್ಣಾಂಕ	    move_ಗಮ್ಯ_front,	// Move the entry to the front if it exists
+    ಪೂರ್ಣಾಂಕ	    sep,
+    ಪೂರ್ಣಾಂಕ	    writing)		// ignore entries read from viminfo
 {
-    int	    i;
-    int	    last_i = -1;
+    ಪೂರ್ಣಾಂಕ	    i;
+    ಪೂರ್ಣಾಂಕ	    ಕೊನೆಯ_i = -1;
     char_u  *p;
     size_t  len;
 
-    if (hisidx[type] < 0)
-	return FALSE;
+    ಆದರೆ (hisidx[type] < 0)
+	ಹಿಂತಿರುಗಿ FALSE;
     i = hisidx[type];
-    do
+    ಮಾಡು
     {
-	if (history[type][i].hisstr == NULL)
-	    return FALSE;
+	ಆದರೆ (history[type][i].hisstr == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ FALSE;
 
 	// For search history, check that the separator character matches as
 	// well.
 	p = history[type][i].hisstr;
-	if (STRCMP(str, p) == 0
+	ಆದರೆ (STRCMP(str, p) == 0
 		&& !(writing && history[type][i].viminfo)
-		&& (type != HIST_SEARCH || sep == p[history[type][i].hisstrlen + 1]))
+		&& (type != HIST_ಹುಡುಕು || sep == p[history[type][i].hisstrlen + 1]))
 	{
-	    if (!move_to_front)
-		return TRUE;
-	    last_i = i;
-	    break;
+	    ಆದರೆ (!move_ಗಮ್ಯ_front)
+		ಹಿಂತಿರುಗಿ TRUE;
+	    ಕೊನೆಯ_i = i;
+	    ನಿಲ್ಲಿಸು;
 	}
-	if (--i < 0)
+	ಆದರೆ (--i < 0)
 	    i = hislen - 1;
-    } while (i != hisidx[type]);
+    } ಆಗ (i != hisidx[type]);
 
-    if (last_i < 0)
-	return FALSE;
+    ಆದರೆ (ಕೊನೆಯ_i < 0)
+	ಹಿಂತಿರುಗಿ FALSE;
 
     str = history[type][i].hisstr;
     len = history[type][i].hisstrlen;
-    while (i != hisidx[type])
+    ಆಗ (i != hisidx[type])
     {
-	if (++i >= hislen)
+	ಆದರೆ (++i >= hislen)
 	    i = 0;
-	history[type][last_i] = history[type][i];
-	last_i = i;
+	history[type][ಕೊನೆಯ_i] = history[type][i];
+	ಕೊನೆಯ_i = i;
     }
     history[type][i].hisnum = ++hisnum[type];
     history[type][i].viminfo = FALSE;
     history[type][i].hisstr = str;
     history[type][i].hisstrlen = len;
-    history[type][i].time_set = vim_time();
-    return TRUE;
+    history[type][i].ಸಮಯ_ಗಣ = vim_ಸಮಯ();
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
@@ -279,80 +279,80 @@ in_history(
  * When "name" is empty, return "cmd" history.
  * Returns -1 for unknown history name.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 get_histtype(char_u *name)
 {
-    int		i;
-    int		len = (int)STRLEN(name);
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		len = (ಪೂರ್ಣಾಂಕ)STRLEN(name);
 
     // No argument: use current history.
-    if (len == 0)
-	return hist_char2type(get_cmdline_firstc());
+    ಆದರೆ (len == 0)
+	ಹಿಂತಿರುಗಿ hist_char2type(get_cmdline_firstc());
 
-    for (i = 0; history_names[i] != NULL; ++i)
-	if (STRNICMP(name, history_names[i], len) == 0)
-	    return i;
+    ಗಾಗಿ (i = 0; history_ಹೆಸರುಗಳು[i] != ಖಾಲಿ; ++i)
+	ಆದರೆ (STRNICMP(name, history_ಹೆಸರುಗಳು[i], len) == 0)
+	    ಹಿಂತಿರುಗಿ i;
 
-    if (vim_strchr((char_u *)":=@>?/", name[0]) != NULL && name[1] == NUL)
-	return hist_char2type(name[0]);
+    ಆದರೆ (vim_strchr((char_u *)":=@>?/", name[0]) != ಖಾಲಿ && name[1] == NUL)
+	ಹಿಂತಿರುಗಿ hist_char2type(name[0]);
 
-    return -1;
+    ಹಿಂತಿರುಗಿ -1;
 }
 
-static int	last_maptick = -1;	// last seen maptick
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	ಕೊನೆಯ_maptick = -1;	// last seen maptick
 
 /*
  * Add the given string to the given history.  If the string is already in the
  * history then it is moved to the front.  "histype" may be one of he HIST_
  * values.
  */
-    void
-add_to_history(
-    int		histype,
-    char_u	*new_entry,
+    ಶೂನ್ಯ
+ಕೂಡಿಸು_ಗಮ್ಯ_history(
+    ಪೂರ್ಣಾಂಕ		histype,
+    char_u	*new_ನಮೂದು,
     size_t	new_entrylen,
-    int		in_map,		// consider maptick when inside a mapping
-    int		sep)		// separator character used (search hist)
+    ಪೂರ್ಣಾಂಕ		ಒಳ_map,		// consider maptick when inside a mapping
+    ಪೂರ್ಣಾಂಕ		sep)		// separator character used (search hist)
 {
     histentry_T	*hisptr;
 
-    if (hislen == 0)		// no history
-	return;
+    ಆದರೆ (hislen == 0)		// no history
+	ಹಿಂತಿರುಗಿ;
 
-    if ((cmdmod.cmod_flags & CMOD_KEEPPATTERNS) && histype == HIST_SEARCH)
-	return;
+    ಆದರೆ ((cmdmod.cmod_flags & CMOD_KEEPPATTERNS) && histype == HIST_ಹುಡುಕು)
+	ಹಿಂತಿರುಗಿ;
 
     // Searches inside the same mapping overwrite each other, so that only
     // the last line is kept.  Be careful not to remove a line that was moved
     // down, only lines that were added.
-    if (histype == HIST_SEARCH && in_map)
+    ಆದರೆ (histype == HIST_ಹುಡುಕು && ಒಳ_map)
     {
-	if (maptick == last_maptick && hisidx[HIST_SEARCH] >= 0)
+	ಆದರೆ (maptick == ಕೊನೆಯ_maptick && hisidx[HIST_ಹುಡುಕು] >= 0)
 	{
 	    // Current line is from the same mapping, remove it
-	    hisptr = &history[HIST_SEARCH][hisidx[HIST_SEARCH]];
+	    hisptr = &history[HIST_ಹುಡುಕು][hisidx[HIST_ಹುಡುಕು]];
 	    vim_free(hisptr->hisstr);
-	    clear_hist_entry(hisptr);
+	    clear_hist_ನಮೂದು(hisptr);
 	    --hisnum[histype];
-	    if (--hisidx[HIST_SEARCH] < 0)
-		hisidx[HIST_SEARCH] = hislen - 1;
+	    ಆದರೆ (--hisidx[HIST_ಹುಡುಕು] < 0)
+		hisidx[HIST_ಹುಡುಕು] = hislen - 1;
 	}
-	last_maptick = -1;
+	ಕೊನೆಯ_maptick = -1;
     }
 
-    if (in_history(histype, new_entry, TRUE, sep, FALSE))
-	return;
+    ಆದರೆ (ಒಳ_history(histype, new_ನಮೂದು, TRUE, sep, FALSE))
+	ಹಿಂತಿರುಗಿ;
 
-    if (++hisidx[histype] == hislen)
+    ಆದರೆ (++hisidx[histype] == hislen)
 	hisidx[histype] = 0;
     hisptr = &history[histype][hisidx[histype]];
     vim_free(hisptr->hisstr);
 
     // Store the separator after the NUL of the string.
-    hisptr->hisstr = vim_strnsave(new_entry, new_entrylen + 2);
-    if (hisptr->hisstr == NULL)
+    hisptr->hisstr = vim_strnsave(new_ನಮೂದು, new_entrylen + 2);
+    ಆದರೆ (hisptr->hisstr == ಖಾಲಿ)
 	hisptr->hisstrlen = 0;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	hisptr->hisstr[new_entrylen + 1] = sep;
 	hisptr->hisstrlen = new_entrylen;
@@ -360,25 +360,25 @@ add_to_history(
 
     hisptr->hisnum = ++hisnum[histype];
     hisptr->viminfo = FALSE;
-    hisptr->time_set = vim_time();
-    if (histype == HIST_SEARCH && in_map)
-	last_maptick = maptick;
+    hisptr->ಸಮಯ_ಗಣ = vim_ಸಮಯ();
+    ಆದರೆ (histype == HIST_ಹುಡುಕು && ಒಳ_map)
+	ಕೊನೆಯ_maptick = maptick;
 }
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 
 /*
  * Get identifier of newest history entry.
  * "histype" may be one of the HIST_ values.
  */
-    static int
-get_history_idx(int histype)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+get_history_idx(ಪೂರ್ಣಾಂಕ histype)
 {
-    if (hislen == 0 || histype < 0 || histype >= HIST_COUNT
+    ಆದರೆ (hislen == 0 || histype < 0 || histype >= HIST_ಎಣಿಕೆ
 		    || hisidx[histype] < 0)
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
 
-    return history[histype][hisidx[histype]].hisnum;
+    ಹಿಂತಿರುಗಿ history[histype][hisidx[histype]].hisnum;
 }
 
 /*
@@ -387,261 +387,261 @@ get_history_idx(int histype)
  *   num < 0: relative position in history wrt newest entry
  * "histype" may be one of the HIST_ values.
  */
-    static int
-calc_hist_idx(int histype, int num)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+calc_hist_idx(ಪೂರ್ಣಾಂಕ histype, ಪೂರ್ಣಾಂಕ ಅಂಕೆ)
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
     histentry_T	*hist;
-    int		wrapped = FALSE;
+    ಪೂರ್ಣಾಂಕ		wrapped = FALSE;
 
-    if (hislen == 0 || histype < 0 || histype >= HIST_COUNT
-		    || (i = hisidx[histype]) < 0 || num == 0)
-	return -1;
+    ಆದರೆ (hislen == 0 || histype < 0 || histype >= HIST_ಎಣಿಕೆ
+		    || (i = hisidx[histype]) < 0 || ಅಂಕೆ == 0)
+	ಹಿಂತಿರುಗಿ -1;
 
     hist = history[histype];
-    if (num > 0)
+    ಆದರೆ (ಅಂಕೆ > 0)
     {
-	while (hist[i].hisnum > num)
-	    if (--i < 0)
+	ಆಗ (hist[i].hisnum > ಅಂಕೆ)
+	    ಆದರೆ (--i < 0)
 	    {
-		if (wrapped)
-		    break;
+		ಆದರೆ (wrapped)
+		    ನಿಲ್ಲಿಸು;
 		i += hislen;
 		wrapped = TRUE;
 	    }
-	if (i >= 0 && hist[i].hisnum == num && hist[i].hisstr != NULL)
-	    return i;
+	ಆದರೆ (i >= 0 && hist[i].hisnum == ಅಂಕೆ && hist[i].hisstr != ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ i;
     }
-    else if (-num <= hislen)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (-ಅಂಕೆ <= hislen)
     {
-	i += num + 1;
-	if (i < 0)
+	i += ಅಂಕೆ + 1;
+	ಆದರೆ (i < 0)
 	    i += hislen;
-	if (hist[i].hisstr != NULL)
-	    return i;
+	ಆದರೆ (hist[i].hisstr != ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ i;
     }
-    return -1;
+    ಹಿಂತಿರುಗಿ -1;
 }
 
 /*
  * Clear all entries of a history.
  * "histype" may be one of the HIST_ values.
  */
-    static int
-clr_history(int histype)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+clr_history(ಪೂರ್ಣಾಂಕ histype)
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
     histentry_T	*hisptr;
 
-    if (hislen != 0 && histype >= 0 && histype < HIST_COUNT)
+    ಆದರೆ (hislen != 0 && histype >= 0 && histype < HIST_ಎಣಿಕೆ)
     {
 	hisptr = history[histype];
-	for (i = hislen; i--;)
+	ಗಾಗಿ (i = hislen; i--;)
 	{
 	    vim_free(hisptr->hisstr);
-	    clear_hist_entry(hisptr);
+	    clear_hist_ನಮೂದು(hisptr);
 	    hisptr++;
 	}
 	hisidx[histype] = -1;	// mark history as cleared
 	hisnum[histype] = 0;	// reset identifier counter
-	return OK;
+	ಹಿಂತಿರುಗಿ OK;
     }
-    return FAIL;
+    ಹಿಂತಿರುಗಿ FAIL;
 }
 
 /*
  * Remove all entries matching {str} from a history.
  * "histype" may be one of the HIST_ values.
  */
-    static int
-del_history_entry(int histype, char_u *str)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+del_history_ನಮೂದು(ಪೂರ್ಣಾಂಕ histype, char_u *str)
 {
     regmatch_T	regmatch;
     histentry_T	*hisptr;
-    int		idx;
-    int		i;
-    int		last;
-    int		found = FALSE;
+    ಪೂರ್ಣಾಂಕ		idx;
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		ಕೊನೆಯ;
+    ಪೂರ್ಣಾಂಕ		ಸಿಕ್ಕಿತು = FALSE;
 
-    if (hislen == 0 || histype < 0 || histype >= HIST_COUNT || *str == NUL
+    ಆದರೆ (hislen == 0 || histype < 0 || histype >= HIST_ಎಣಿಕೆ || *str == NUL
 		|| hisidx[histype] < 0)
-	return FALSE;
+	ಹಿಂತಿರುಗಿ FALSE;
 
     idx = hisidx[histype];
     regmatch.regprog = vim_regcomp(str, RE_MAGIC + RE_STRING);
-    if (regmatch.regprog == NULL)
-	return FALSE;
+    ಆದರೆ (regmatch.regprog == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FALSE;
 
     regmatch.rm_ic = FALSE;	// always match case
 
-    i = last = idx;
-    do
+    i = ಕೊನೆಯ = idx;
+    ಮಾಡು
     {
 	hisptr = &history[histype][i];
-	if (hisptr->hisstr == NULL)
-	    break;
-	if (vim_regexec(&regmatch, hisptr->hisstr, (colnr_T)0))
+	ಆದರೆ (hisptr->hisstr == ಖಾಲಿ)
+	    ನಿಲ್ಲಿಸು;
+	ಆದರೆ (vim_regexec(&regmatch, hisptr->hisstr, (colnr_T)0))
 	{
-	    found = TRUE;
+	    ಸಿಕ್ಕಿತು = TRUE;
 	    vim_free(hisptr->hisstr);
-	    clear_hist_entry(hisptr);
+	    clear_hist_ನಮೂದು(hisptr);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (i != last)
+	    ಆದರೆ (i != ಕೊನೆಯ)
 	    {
-		history[histype][last] = *hisptr;
-		clear_hist_entry(hisptr);
+		history[histype][ಕೊನೆಯ] = *hisptr;
+		clear_hist_ನಮೂದು(hisptr);
 	    }
-	    if (--last < 0)
-		last += hislen;
+	    ಆದರೆ (--ಕೊನೆಯ < 0)
+		ಕೊನೆಯ += hislen;
 	}
-	if (--i < 0)
+	ಆದರೆ (--i < 0)
 	    i += hislen;
-    } while (i != idx);
+    } ಆಗ (i != idx);
 
-    if (history[histype][idx].hisstr == NULL)
+    ಆದರೆ (history[histype][idx].hisstr == ಖಾಲಿ)
 	hisidx[histype] = -1;
 
     vim_regfree(regmatch.regprog);
-    return found;
+    ಹಿಂತಿರುಗಿ ಸಿಕ್ಕಿತು;
 }
 
 /*
  * Remove an indexed entry from a history.
  * "histype" may be one of the HIST_ values.
  */
-    static int
-del_history_idx(int histype, int idx)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+del_history_idx(ಪೂರ್ಣಾಂಕ histype, ಪೂರ್ಣಾಂಕ idx)
 {
-    int	    i, j;
+    ಪೂರ್ಣಾಂಕ	    i, j;
 
     i = calc_hist_idx(histype, idx);
-    if (i < 0)
-	return FALSE;
+    ಆದರೆ (i < 0)
+	ಹಿಂತಿರುಗಿ FALSE;
     idx = hisidx[histype];
     vim_free(history[histype][i].hisstr);
     history[histype][i].hisstrlen = 0;
 
     // When deleting the last added search string in a mapping, reset
     // last_maptick, so that the last added search string isn't deleted again.
-    if (histype == HIST_SEARCH && maptick == last_maptick && i == idx)
-	last_maptick = -1;
+    ಆದರೆ (histype == HIST_ಹುಡುಕು && maptick == ಕೊನೆಯ_maptick && i == idx)
+	ಕೊನೆಯ_maptick = -1;
 
-    while (i != idx)
+    ಆಗ (i != idx)
     {
 	j = (i + 1) % hislen;
 	history[histype][i] = history[histype][j];
 	i = j;
     }
-    clear_hist_entry(&history[histype][i]);
-    if (--i < 0)
+    clear_hist_ನಮೂದು(&history[histype][i]);
+    ಆದರೆ (--i < 0)
 	i += hislen;
     hisidx[histype] = i;
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
  * "histadd()" function
  */
-    void
-f_histadd(typval_T *argvars UNUSED, typval_T *rettv)
+    ಶೂನ್ಯ
+f_histadd(typval_T *argvars ಬಳಸದ, typval_T *rettv)
 {
-    int		histype;
+    ಪೂರ್ಣಾಂಕ		histype;
     char_u	*str;
     char_u	buf[NUMBUFLEN];
 
-    rettv->vval.v_number = FALSE;
-    if (check_secure())
-	return;
+    rettv->vval.v_ಸಂಖ್ಯೆ = FALSE;
+    ಆದರೆ (check_secure())
+	ಹಿಂತಿರುಗಿ;
 
-    if (in_vim9script()
+    ಆದರೆ (ಒಳ_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	ಹಿಂತಿರುಗಿ;
 
     str = tv_get_string_chk(&argvars[0]);	// NULL on type error
-    histype = str != NULL ? get_histtype(str) : -1;
-    if (histype < 0)
-	return;
+    histype = str != ಖಾಲಿ ? get_histtype(str) : -1;
+    ಆದರೆ (histype < 0)
+	ಹಿಂತಿರುಗಿ;
 
     str = tv_get_string_buf(&argvars[1], buf);
-    if (*str == NUL)
-	return;
+    ಆದರೆ (*str == NUL)
+	ಹಿಂತಿರುಗಿ;
 
     init_history();
-    add_to_history(histype, str, STRLEN(str), FALSE, NUL);
-    rettv->vval.v_number = TRUE;
+    ಕೂಡಿಸು_ಗಮ್ಯ_history(histype, str, STRLEN(str), FALSE, NUL);
+    rettv->vval.v_ಸಂಖ್ಯೆ = TRUE;
 }
 
 /*
  * "histdel()" function
  */
-    void
-f_histdel(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
+    ಶೂನ್ಯ
+f_histdel(typval_T *argvars ಬಳಸದ, typval_T *rettv ಬಳಸದ)
 {
-    int		n;
+    ಪೂರ್ಣಾಂಕ		n;
     char_u	*str;
 
-    if (in_vim9script()
+    ಆದರೆ (ಒಳ_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_string_or_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_string_or_ಸಂಖ್ಯೆ_arg(argvars, 1) == FAIL))
+	ಹಿಂತಿರುಗಿ;
 
     str = tv_get_string_chk(&argvars[0]);	// NULL on type error
-    if (str == NULL)
+    ಆದರೆ (str == ಖಾಲಿ)
 	n = 0;
-    else if (argvars[1].v_type == VAR_UNKNOWN)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argvars[1].v_type == VAR_UNKNOWN)
 	// only one argument: clear entire history
 	n = clr_history(get_histtype(str));
-    else if (argvars[1].v_type == VAR_NUMBER)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argvars[1].v_type == VAR_ಸಂಖ್ಯೆ)
 	// index given: remove that entry
 	n = del_history_idx(get_histtype(str),
-					  (int)tv_get_number(&argvars[1]));
-    else
+					  (ಪೂರ್ಣಾಂಕ)tv_get_ಸಂಖ್ಯೆ(&argvars[1]));
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	char_u	buf[NUMBUFLEN];
 
 	// string given: remove all matching entries
-	n = del_history_entry(get_histtype(str),
+	n = del_history_ನಮೂದು(get_histtype(str),
 				      tv_get_string_buf(&argvars[1], buf));
     }
 
-    rettv->vval.v_number = n;
+    rettv->vval.v_ಸಂಖ್ಯೆ = n;
 }
 
 /*
  * "histget()" function
  */
-    void
-f_histget(typval_T *argvars UNUSED, typval_T *rettv)
+    ಶೂನ್ಯ
+f_histget(typval_T *argvars ಬಳಸದ, typval_T *rettv)
 {
     char_u  *str;
 
-    if (in_vim9script()
+    ಆದರೆ (ಒಳ_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_ಸಂಖ್ಯೆ_arg(argvars, 1) == FAIL))
+	ಹಿಂತಿರುಗಿ;
 
     str = tv_get_string_chk(&argvars[0]);	// NULL on type error
-    if (str == NULL)
-	rettv->vval.v_string = NULL;
-    else
+    ಆದರೆ (str == ಖಾಲಿ)
+	rettv->vval.v_string = ಖಾಲಿ;
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	int type;
-	int idx;
+	ಪೂರ್ಣಾಂಕ type;
+	ಪೂರ್ಣಾಂಕ idx;
 
 	type = get_histtype(str);
-	if (argvars[1].v_type == VAR_UNKNOWN)
+	ಆದರೆ (argvars[1].v_type == VAR_UNKNOWN)
 	    idx = get_history_idx(type);
-	else
-	    idx = (int)tv_get_number_chk(&argvars[1], NULL);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    idx = (ಪೂರ್ಣಾಂಕ)tv_get_ಸಂಖ್ಯೆ_chk(&argvars[1], ಖಾಲಿ);
 						    // -1 on type error
 
 	idx = calc_hist_idx(type, idx);
-	if (idx < 0)
+	ಆದರೆ (idx < 0)
 	    rettv->vval.v_string = vim_strnsave((char_u *)"", 0);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    rettv->vval.v_string = vim_strnsave(history[type][idx].hisstr, history[type][idx].hisstrlen);
     }
     rettv->v_type = VAR_STRING;
@@ -650,163 +650,163 @@ f_histget(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "histnr()" function
  */
-    void
-f_histnr(typval_T *argvars UNUSED, typval_T *rettv)
+    ಶೂನ್ಯ
+f_histnr(typval_T *argvars ಬಳಸದ, typval_T *rettv)
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
     char_u	*histname;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ಆದರೆ (ಒಳ_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
     histname = tv_get_string_chk(&argvars[0]);
-    i = histname == NULL ? HIST_CMD - 1 : get_histtype(histname);
-    if (i >= HIST_CMD && i < HIST_COUNT)
-	rettv->vval.v_number = get_history_idx(i);
-    else
-	rettv->vval.v_number = -1;
+    i = histname == ಖಾಲಿ ? HIST_CMD - 1 : get_histtype(histname);
+    ಆದರೆ (i >= HIST_CMD && i < HIST_ಎಣಿಕೆ)
+	rettv->vval.v_ಸಂಖ್ಯೆ = get_history_idx(i);
+    ಇಲ್ಲದಿದ್ದರೆ
+	rettv->vval.v_ಸಂಖ್ಯೆ = -1;
 }
-#endif // FEAT_EVAL
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_EVAL
 
-#if defined(FEAT_CRYPT)
+#ಆದರೆ defined(FEAT_CRYPT)
 /*
  * Very specific function to remove the value in ":set key=val" from the
  * history.
  */
-    void
-remove_key_from_history(void)
+    ಶೂನ್ಯ
+remove_ಕೀಲಿ_from_history(ಶೂನ್ಯ)
 {
-    char_u	*p_start;
-    char_u	*p_end;
+    char_u	*p_ಆರಂಭ;
+    char_u	*p_ಕೊನೆ;
     char_u	*p;
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
 
     i = hisidx[HIST_CMD];
-    if (i < 0)
-	return;
-    p_start = history[HIST_CMD][i].hisstr;
-    if (p_start == NULL)
-	return;
+    ಆದರೆ (i < 0)
+	ಹಿಂತಿರುಗಿ;
+    p_ಆರಂಭ = history[HIST_CMD][i].hisstr;
+    ಆದರೆ (p_ಆರಂಭ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    p_end = p_start + history[HIST_CMD][i].hisstrlen;
-    for (p = p_start; *p; ++p)
+    p_ಕೊನೆ = p_ಆರಂಭ + history[HIST_CMD][i].hisstrlen;
+    ಗಾಗಿ (p = p_ಆರಂಭ; *p; ++p)
     {
-	if (STRNCMP(p, "key", 3) == 0 && !SAFE_isalpha(p[3]))
+	ಆದರೆ (STRNCMP(p, "key", 3) == 0 && !ಸುರಕ್ಷಿತ_isalpha(p[3]))
 	{
 	    p = vim_strchr(p + 3, '=');
-	    if (p == NULL)
-		break;
+	    ಆದರೆ (p == ಖಾಲಿ)
+		ನಿಲ್ಲಿಸು;
 	    ++p;
-	    for (i = 0; p[i] && !VIM_ISWHITE(p[i]); ++i)
-		if (p[i] == '\\' && p[i + 1])
+	    ಗಾಗಿ (i = 0; p[i] && !VIM_ISWHITE(p[i]); ++i)
+		ಆದರೆ (p[i] == '\\' && p[i + 1])
 		    ++i;
 
-	    mch_memmove(p, p + i, (p_end - (p + i)) + 1);	    // +1 for the NUL
-	    p_end -= i;						    // adjust p_end for shortened string
+	    mch_memmove(p, p + i, (p_ಕೊನೆ - (p + i)) + 1);	    // +1 for the NUL
+	    p_ಕೊನೆ -= i;						    // adjust p_end for shortened string
 	    --p;
 	}
     }
 
-    history[HIST_CMD][i].hisstrlen = (size_t)(p_end - p_start);
+    history[HIST_CMD][i].hisstrlen = (size_t)(p_ಕೊನೆ - p_ಆರಂಭ);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * :history command - print a history
  */
-    void
+    ಶೂನ್ಯ
 ex_history(exarg_T *eap)
 {
     histentry_T	*hist;
-    int		histype1 = HIST_CMD;
-    int		histype2 = HIST_CMD;
-    int		hisidx1 = 1;
-    int		hisidx2 = -1;
-    int		idx;
-    int		i, j, k;
-    char_u	*end;
+    ಪೂರ್ಣಾಂಕ		histype1 = HIST_CMD;
+    ಪೂರ್ಣಾಂಕ		histype2 = HIST_CMD;
+    ಪೂರ್ಣಾಂಕ		hisidx1 = 1;
+    ಪೂರ್ಣಾಂಕ		hisidx2 = -1;
+    ಪೂರ್ಣಾಂಕ		idx;
+    ಪೂರ್ಣಾಂಕ		i, j, k;
+    char_u	*ಕೊನೆ;
     char_u	*arg = eap->arg;
 
-    if (hislen == 0)
+    ಆದರೆ (hislen == 0)
     {
-	msg(_("'history' option is zero"));
-	return;
+	ಸಂದೇಶ(_("'history' option is zero"));
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if (!(VIM_ISDIGIT(*arg) || *arg == '-' || *arg == ','))
+    ಆದರೆ (!(VIM_ISDIGIT(*arg) || *arg == '-' || *arg == ','))
     {
-	end = arg;
-	while (ASCII_ISALPHA(*end)
-		|| vim_strchr((char_u *)":=@>/?", *end) != NULL)
-	    end++;
-	i = *end;
-	*end = NUL;
+	ಕೊನೆ = arg;
+	ಆಗ (ASCII_ISALPHA(*ಕೊನೆ)
+		|| vim_strchr((char_u *)":=@>/?", *ಕೊನೆ) != ಖಾಲಿ)
+	    ಕೊನೆ++;
+	i = *ಕೊನೆ;
+	*ಕೊನೆ = NUL;
 	histype1 = get_histtype(arg);
-	if (histype1 == -1)
+	ಆದರೆ (histype1 == -1)
 	{
-	    if (STRNICMP(arg, "all", STRLEN(arg)) == 0)
+	    ಆದರೆ (STRNICMP(arg, "all", STRLEN(arg)) == 0)
 	    {
 		histype1 = 0;
-		histype2 = HIST_COUNT-1;
+		histype2 = HIST_ಎಣಿಕೆ-1;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		*end = i;
+		*ಕೊನೆ = i;
 		semsg(_(e_trailing_characters_str), arg);
-		return;
+		ಹಿಂತಿರುಗಿ;
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    histype2 = histype1;
-	*end = i;
+	*ಕೊನೆ = i;
     }
-    else
-	end = arg;
-    if (!get_list_range(&end, &hisidx1, &hisidx2) || *end != NUL)
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಕೊನೆ = arg;
+    ಆದರೆ (!get_list_range(&ಕೊನೆ, &hisidx1, &hisidx2) || *ಕೊನೆ != NUL)
     {
-	if (*end != NUL)
-	    semsg(_(e_trailing_characters_str), end);
-	else
+	ಆದರೆ (*ಕೊನೆ != NUL)
+	    semsg(_(e_trailing_characters_str), ಕೊನೆ);
+	ಇಲ್ಲದಿದ್ದರೆ
 	    semsg(_(e_val_too_large), arg);
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    for (; !got_int && histype1 <= histype2; ++histype1)
+    ಗಾಗಿ (; !got_int && histype1 <= histype2; ++histype1)
     {
-	vim_snprintf((char *)IObuff, IOSIZE, "\n      #  %s history", history_names[histype1]);
-	msg_puts_title((char *)IObuff);
+	vim_snprintf((ಅಕ್ಷರ *)IObuff, IOSIZE, "\n      #  %s history", history_ಹೆಸರುಗಳು[histype1]);
+	ಸಂದೇಶ_puts_title((ಅಕ್ಷರ *)IObuff);
 	idx = hisidx[histype1];
 	hist = history[histype1];
 	j = hisidx1;
 	k = hisidx2;
-	if (j < 0)
+	ಆದರೆ (j < 0)
 	    j = (-j > hislen) ? 0 : hist[(hislen + j + idx + 1) % hislen].hisnum;
-	if (k < 0)
+	ಆದರೆ (k < 0)
 	    k = (-k > hislen) ? 0 : hist[(hislen + k + idx + 1) % hislen].hisnum;
-	if (idx >= 0 && j <= k)
-	    for (i = idx + 1; !got_int; ++i)
+	ಆದರೆ (idx >= 0 && j <= k)
+	    ಗಾಗಿ (i = idx + 1; !got_int; ++i)
 	    {
-		if (i == hislen)
+		ಆದರೆ (i == hislen)
 		    i = 0;
-		if (hist[i].hisstr != NULL
+		ಆದರೆ (hist[i].hisstr != ಖಾಲಿ
 			&& hist[i].hisnum >= j && hist[i].hisnum <= k
-			&& !message_filtered(hist[i].hisstr))
+			&& !ಸಂದೇಶ_filtered(hist[i].hisstr))
 		{
-		    int  len;
+		    ಪೂರ್ಣಾಂಕ  len;
 
-		    msg_putchar('\n');
-		    len = vim_snprintf((char *)IObuff, IOSIZE,
+		    ಸಂದೇಶ_putchar('\n');
+		    len = vim_snprintf((ಅಕ್ಷರ *)IObuff, IOSIZE,
 				"%c%6d  ", i == idx ? '>' : ' ', hist[i].hisnum);
-		    if (vim_strsize(hist[i].hisstr) > (int)Columns - 10)
+		    ಆದರೆ (vim_strsize(hist[i].hisstr) > (ಪೂರ್ಣಾಂಕ)Columns - 10)
 			trunc_string(hist[i].hisstr, IObuff + len,
-			     (int)Columns - 10, IOSIZE - (int)len);
-		    else
+			     (ಪೂರ್ಣಾಂಕ)Columns - 10, IOSIZE - (ಪೂರ್ಣಾಂಕ)len);
+		    ಇಲ್ಲದಿದ್ದರೆ
 			STRCPY(IObuff + len, hist[i].hisstr);
-		    msg_outtrans(IObuff);
-		    out_flush();
+		    ಸಂದೇಶ_outtrans(IObuff);
+		    ಹೊರಹೋಗು_flush();
 		}
-		if (i == idx)
-		    break;
+		ಆದರೆ (i == idx)
+		    ನಿಲ್ಲಿಸು;
 	    }
     }
 }

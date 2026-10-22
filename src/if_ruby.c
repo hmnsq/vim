@@ -11,46 +11,46 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "protodef.h"
-#ifdef HAVE_CONFIG_H
+#ಅನ್ತರ್ಭಾವ "protodef.h"
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_CONFIG_H
 # include "auto/config.h"
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#include <stdio.h>
-#include <string.h>
+#ಅನ್ತರ್ಭಾವ <stdio.h>
+#ಅನ್ತರ್ಭಾವ <string.h>
 
-#ifdef _WIN32
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ _WIN32
 # ifndef DYNAMIC_RUBY
 #  define NT
 #  define IMPORT // For static dll usage __declspec(dllimport)
 #  define RUBYEXTERN __declspec(dllimport)
 # endif
-#endif
-#ifndef RUBYEXTERN
-# define RUBYEXTERN extern
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ RUBYEXTERN
+# define RUBYEXTERN ಬಾಹ್ಯ
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef DYNAMIC_RUBY
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DYNAMIC_RUBY
 /*
  * This is tricky.  In ruby.h there is (inline) function rb_class_of()
  * definition.  This function use these variables.  But we want function to
  * use dll_* variables.
  */
-# if RUBY_VERSION >= 24
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 24
 #  define USE_RUBY_INTEGER
 # endif
 
 # define rb_cFalseClass		(*dll_rb_cFalseClass)
 # define rb_cFixnum		(*dll_rb_cFixnum)
-# if defined(USE_RUBY_INTEGER)
+# ಆದರೆ defined(USE_RUBY_INTEGER)
 #  define rb_cInteger		(*dll_rb_cInteger)
 # endif
-# if RUBY_VERSION >= 20
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 20
 #  define rb_cFloat		(*dll_rb_cFloat)
 # endif
 # define rb_cNilClass		(*dll_rb_cNilClass)
 # define rb_cString		(*dll_rb_cString)
-# define rb_cSymbol		(*dll_rb_cSymbol)
+# define rb_c_ಚಿಹ್ನೆ		(*dll_rb_c_ಚಿಹ್ನೆ)
 # define rb_cTrueClass		(*dll_rb_cTrueClass)
 
 /*
@@ -66,83 +66,83 @@
 # define rb_num2long	rb_num2long_stub
 # define rb_int2big	rb_int2big_stub
 
-# if RUBY_VERSION >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
 // Ruby 1.9 defines a number of static functions which use rb_fix2int and
 // rb_num2int if VIM_SIZEOF_INT < VIM_SIZEOF_LONG (64bit)
 #  define rb_fix2int	rb_fix2int_stub
 #  define rb_num2int	rb_num2int_stub
 # endif
 
-# if RUBY_VERSION >= 20
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 20
 // USE_TYPEDDATA is not defined yet. We just check for 2.0.
 #  define rb_check_typeddata		rb_check_typeddata_stub
 # endif
 
-# if RUBY_VERSION == 21
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ == 21
 // Ruby 2.1 adds new GC called RGenGC and RARRAY_PTR uses
 // rb_gc_writebarrier_unprotect_promoted if USE_RGENGC
 #  define rb_gc_writebarrier_unprotect_promoted	rb_gc_writebarrier_unprotect_promoted_stub
 # endif
 
-# if RUBY_VERSION >= 22
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 22
 #  define rb_gc_writebarrier_unprotect	rb_gc_writebarrier_unprotect_stub
 # endif
 
-# if RUBY_VERSION >= 26 && RUBY_VERSION <= 32
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 26 && RUBY_ಆವೃತ್ತಿ <= 32
 #  define rb_ary_detransient	rb_ary_detransient_stub
 # endif
 
-# if RUBY_VERSION >= 30
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 30
 #  define rb_check_type			rb_check_type_stub
 #  define rb_num2uint			rb_num2uint_stub
-#  define ruby_malloc_size_overflow	ruby_malloc_size_overflow_stub
+#  define ruby_malloc_ಗಾತ್ರ_ಅತಿಪ್ರವಾಹ	ruby_malloc_ಗಾತ್ರ_ಅತಿಪ್ರವಾಹ_stub
 # endif
 
-# if RUBY_VERSION >= 31
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 31
 #  define rb_debug_rstring_null_ptr	rb_debug_rstring_null_ptr_stub
 #  define rb_unexpected_type		rb_unexpected_type_stub
 # endif
 
-#endif  // ifdef DYNAMIC_RUBY
+#ಆದರೆ_ಅಂತ್ಯ  // ifdef DYNAMIC_RUBY
 
 // On macOS pre-installed Ruby defines "SIZEOF_TIME_T" as "SIZEOF_LONG" so it
 // conflicts with the definition in config.h then causes a macro-redefined
 // warning.
-#ifdef SIZEOF_TIME_T
-# undef SIZEOF_TIME_T
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIZEOF_ಸಮಯ_T
+# undef SIZEOF_ಸಮಯ_T
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(__GNUC__) || defined(__clang__)
-# pragma GCC diagnostic push
+#ಆದರೆ defined(__GNUC__) || defined(__clang__)
+# pragma GCC diagnostic ತಳ್ಳು
 # pragma GCC diagnostic ignored "-Wunused-parameter"
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(__clang__) && (__clang_major__ >= 21)
+#ಆದರೆ defined(__clang__) && (__clang_major__ >= 21)
 # pragma GCC diagnostic ignored "-Wdefault-const-init-field-unsafe"
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#include <ruby.h>
-#include <ruby/encoding.h>
+#ಅನ್ತರ್ಭಾವ <ruby.h>
+#ಅನ್ತರ್ಭಾವ <ruby/encoding.h>
 
-#if defined(__GNUC__) || defined(__clang__)
-# pragma GCC diagnostic pop
-#endif
+#ಆದರೆ defined(__GNUC__) || defined(__clang__)
+# pragma GCC diagnostic ತೆಗೆ
+#ಆದರೆ_ಅಂತ್ಯ
 
 // See above.
-#ifdef SIZEOF_TIME_T
-# undef SIZEOF_TIME_T
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIZEOF_ಸಮಯ_T
+# undef SIZEOF_ಸಮಯ_T
+#ಆದರೆ_ಅಂತ್ಯ
 
-#undef off_t	// ruby defines off_t as _int64, Mingw uses long
-#undef EXTERN
-#undef _
+#ವ್ಯಾಖ್ಯಾನ_ರದ್ದು off_t	// ruby defines off_t as _int64, Mingw uses long
+#ವ್ಯಾಖ್ಯಾನ_ರದ್ದು EXTERN
+#ವ್ಯಾಖ್ಯಾನ_ರದ್ದು _
 
 // T_DATA defined both by Ruby and Mac header files, hack around it...
-#if defined(MACOS_X)
+#ಆದರೆ defined(MACOS_X)
 # define __OPENTRANSPORT__
 # define __OPENTRANSPORTPROTOCOL__
 # define __OPENTRANSPORTPROVIDERS__
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * The TypedData_XXX macro family can be used since Ruby 1.9.2 but
@@ -150,9 +150,9 @@
  * The old Data_XXX macro family was deprecated on Ruby 2.2.
  * Use TypedData_XXX if available.
  */
-#if defined(TypedData_Wrap_Struct) && (RUBY_VERSION >= 20)
+#ಆದರೆ defined(Typed_ದತ್ತಾಂಶ_Wrap_Struct) && (RUBY_ಆವೃತ್ತಿ >= 20)
 # define USE_TYPEDDATA	1
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Backward compatibility for Ruby 1.8 and earlier.
@@ -160,125 +160,125 @@
  * Ruby 1.9 does not provide RXXX(s)->len and RXXX(s)->ptr, instead
  * RXXX_LEN(s) and RXXX_PTR(s) are provided.
  */
-#ifndef StringValuePtr
-# define StringValuePtr(s) STR2CSTR(s)
-#endif
-#ifndef RARRAY_LEN
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ String_ಮೌಲ್ಯ_Ptr
+# define String_ಮೌಲ್ಯ_Ptr(s) STR2CSTR(s)
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ RARRAY_LEN
 # define RARRAY_LEN(s) RARRAY(s)->len
-#endif
-#ifndef RARRAY_PTR
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ RARRAY_PTR
 # define RARRAY_PTR(s) RARRAY(s)->ptr
-#endif
-#ifndef RSTRING_LEN
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ RSTRING_LEN
 # define RSTRING_LEN(s) RSTRING(s)->len
-#endif
-#ifndef RSTRING_PTR
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ RSTRING_PTR
 # define RSTRING_PTR(s) RSTRING(s)->ptr
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef HAVE_DUP
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_DUP
 # undef HAVE_DUP
-#endif
-#ifdef HAVE_FSYNC
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_FSYNC
 # undef HAVE_FSYNC
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // Avoid redefining TRUE/FALSE in vterm.h.
-#ifdef TRUE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ TRUE
 # undef TRUE
-#endif
-#ifdef FALSE
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FALSE
 # undef FALSE
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#include "vim.h"
-#include "version.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
+#ಅನ್ತರ್ಭಾವ "version.h"
 
-#ifdef DYNAMIC_RUBY
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DYNAMIC_RUBY
 # ifdef MSWIN	// must come after including vim.h, where it is defined
 #  define RUBY_PROC FARPROC
-#  define load_dll vimLoadLib
-#  define symbol_from_dll GetProcAddress
+#  define ತುಂಬು_dll vim_ತುಂಬು_Lib
+#  define ಚಿಹ್ನೆ_from_dll Get_Proc_ವಿಳಾಸ
 #  define close_dll FreeLibrary
-#  define load_dll_error GetWin32Error
-# else
+#  define ತುಂಬು_dll_error GetWin32Error
+# ಇಲ್ಲದಿದ್ದರೆ
 #  include <dlfcn.h>
-#  define HINSTANCE void*
-#  define RUBY_PROC void*
-#  define load_dll(n) dlopen((n), RTLD_LAZY|RTLD_GLOBAL)
-#  define symbol_from_dll dlsym
+#  define HINSTANCE ಶೂನ್ಯ*
+#  define RUBY_PROC ಶೂನ್ಯ*
+#  define ತುಂಬು_dll(n) dlopen((n), RTLD_LAZY|RTLD_GLOBAL)
+#  define ಚಿಹ್ನೆ_from_dll dlsym
 #  define close_dll dlclose
-#  define load_dll_error dlerror
+#  define ತುಂಬು_dll_error dlerror
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-static int ruby_initialized = 0;
-static void *ruby_stack_start;
-static VALUE objtbl;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ruby_initialized = 0;
+ಸ್ಥಿರ ಶೂನ್ಯ *ruby_ರಾಶಿ_ಆರಂಭ;
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 objtbl;
 
-static VALUE mVIM;
-static VALUE cBuffer;
-static VALUE cVimWindow;
-static VALUE eDeletedBufferError;
-static VALUE eDeletedWindowError;
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 mVIM;
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 c_ಬಫರ್;
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 c_Vim_ಕಿಟಕಿ;
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 e_Deleted_ಬಫರ್_Error;
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 e_Deleted_ಕಿಟಕಿ_Error;
 
-static int ensure_ruby_initialized(void);
-static void error_print(int);
-static void ruby_io_init(void);
-static void ruby_vim_init(void);
-static int ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ensure_ruby_initialized(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಶೂನ್ಯ error_print(ಪೂರ್ಣಾಂಕ);
+ಸ್ಥಿರ ಶೂನ್ಯ ruby_io_init(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಶೂನ್ಯ ruby_vim_init(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ruby_convert_ಗಮ್ಯ_vim_ಮೌಲ್ಯ(ಮೌಲ್ಯ_3 val, typval_T *rettv);
 
-#if defined(__ia64) && !defined(ruby_init_stack)
-# define ruby_init_stack(addr) ruby_init_stack((addr), rb_ia64_bsp())
-#endif
+#ಆದರೆ defined(__ia64) && !defined(ruby_init_ರಾಶಿ)
+# define ruby_init_ರಾಶಿ(addr) ruby_init_ರಾಶಿ((addr), rb_ia64_bsp())
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(DYNAMIC_RUBY)
+#ಆದರೆ defined(DYNAMIC_RUBY)
 
 /*
  * Wrapper defines
  */
 // Ruby 2.7 actually expands the following symbols as macro.
-# if RUBY_VERSION >= 27
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 27
 #  undef rb_define_global_function
-#  undef rb_define_method
+#  undef rb_define_ವಿಧಾನ
 #  undef rb_define_module_function
-#  undef rb_define_singleton_method
+#  undef rb_define_singleton_ವಿಧಾನ
 # endif
 
 # define rb_assoc_new			dll_rb_assoc_new
 # define rb_cObject			(*dll_rb_cObject)
 # define rb_class_new_instance		dll_rb_class_new_instance
-# if RUBY_VERSION < 30
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ < 30
 #  define rb_check_type			dll_rb_check_type
 # endif
-# define rb_class_path			dll_rb_class_path
+# define rb_class_ಮಾರ್ಗ			dll_rb_class_ಮಾರ್ಗ
 # ifdef USE_TYPEDDATA
-#  if RUBY_VERSION >= 23
-#   define rb_data_typed_object_wrap	dll_rb_data_typed_object_wrap
-#  else
-#   define rb_data_typed_object_alloc	dll_rb_data_typed_object_alloc
+#  ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 23
+#   define rb_ದತ್ತಾಂಶ_typed_object_wrap	dll_rb_ದತ್ತಾಂಶ_typed_object_wrap
+#  ಇಲ್ಲದಿದ್ದರೆ
+#   define rb_ದತ್ತಾಂಶ_typed_object_alloc	dll_rb_ದತ್ತಾಂಶ_typed_object_alloc
 #  endif
-# else
-#  define rb_data_object_alloc		dll_rb_data_object_alloc
+# ಇಲ್ಲದಿದ್ದರೆ
+#  define rb_ದತ್ತಾಂಶ_object_alloc		dll_rb_ದತ್ತಾಂಶ_object_alloc
 # endif
 # define rb_define_class_under		dll_rb_define_class_under
 # define rb_define_const			dll_rb_define_const
 # define rb_define_global_function	dll_rb_define_global_function
-# define rb_define_method		dll_rb_define_method
+# define rb_define_ವಿಧಾನ		dll_rb_define_ವಿಧಾನ
 # define rb_define_module		dll_rb_define_module
 # define rb_define_module_function	dll_rb_define_module_function
-# define rb_define_singleton_method	dll_rb_define_singleton_method
+# define rb_define_singleton_ವಿಧಾನ	dll_rb_define_singleton_ವಿಧಾನ
 # define rb_define_virtual_variable	dll_rb_define_virtual_variable
 # define rb_stdout			(*dll_rb_stdout)
 # define rb_stderr			(*dll_rb_stderr)
 # define rb_eArgError			(*dll_rb_eArgError)
-# define rb_eIndexError			(*dll_rb_eIndexError)
+# define rb_e_ಸೂಚ್ಯಂಕ_Error			(*dll_rb_e_ಸೂಚ್ಯಂಕ_Error)
 # define rb_eRuntimeError		(*dll_rb_eRuntimeError)
 # define rb_eStandardError		(*dll_rb_eStandardError)
 # define rb_eval_string_protect		dll_rb_eval_string_protect
-# if RUBY_VERSION >= 21
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 21
 #  define rb_funcallv			dll_rb_funcallv
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  define rb_funcall2			dll_rb_funcall2
 # endif
 # define rb_global_variable		dll_rb_global_variable
@@ -293,17 +293,17 @@ static int ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
 # undef rb_intern
 # define rb_intern			dll_rb_intern
 
-# if VIM_SIZEOF_INT < VIM_SIZEOF_LONG // 64 bits only
-#  if RUBY_VERSION < 30
+# ಆದರೆ VIM_SIZEOF_INT < VIM_SIZEOF_LONG // 64 bits only
+#  ಆದರೆ RUBY_ಆವೃತ್ತಿ < 30
 #   define rb_num2uint			dll_rb_num2uint
 #  endif
 # endif
 # define rb_num2dbl			dll_rb_num2dbl
 # define rb_lastline_get			dll_rb_lastline_get
-# define rb_lastline_set			dll_rb_lastline_set
+# define rb_lastline_ಗಣ			dll_rb_lastline_ಗಣ
 # define rb_protect			dll_rb_protect
-# define rb_load			dll_rb_load
-# if RUBY_VERSION < 20
+# define rb_ತುಂಬು			dll_rb_ತುಂಬು
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ < 20
 #  define rb_num2ulong			dll_rb_num2ulong
 # endif
 # define rb_obj_alloc			dll_rb_obj_alloc
@@ -321,11 +321,11 @@ static int ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
 // __builtin_constant_p extension.
 #  undef rb_str_new_cstr
 #  define rb_str_new_cstr		dll_rb_str_new_cstr
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  define rb_str_new2			dll_rb_str_new2
 # endif
-# define rb_string_value		dll_rb_string_value
-# define rb_string_value_ptr		dll_rb_string_value_ptr
+# define rb_string_ಮೌಲ್ಯ		dll_rb_string_ಮೌಲ್ಯ
+# define rb_string_ಮೌಲ್ಯ_ptr		dll_rb_string_ಮೌಲ್ಯ_ptr
 # define rb_float_new			dll_rb_float_new
 # define rb_ary_new			dll_rb_ary_new
 # ifdef rb_ary_new4
@@ -333,13 +333,13 @@ static int ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
 #  undef rb_ary_new4
 # endif
 # define rb_ary_new4			dll_rb_ary_new4
-# define rb_ary_push			dll_rb_ary_push
+# define rb_ary_ತಳ್ಳು			dll_rb_ary_ತಳ್ಳು
 # ifdef __ia64
 #  define rb_ia64_bsp			dll_rb_ia64_bsp
-#  undef ruby_init_stack
-#  define ruby_init_stack(addr)	dll_ruby_init_stack((addr), rb_ia64_bsp())
-# else
-#  define ruby_init_stack		dll_ruby_init_stack
+#  undef ruby_init_ರಾಶಿ
+#  define ruby_init_ರಾಶಿ(addr)	dll_ruby_init_ರಾಶಿ((addr), rb_ia64_bsp())
+# ಇಲ್ಲದಿದ್ದರೆ
+#  define ruby_init_ರಾಶಿ		dll_ruby_init_ರಾಶಿ
 # endif
 # define rb_errinfo			dll_rb_errinfo
 # define ruby_init			dll_ruby_init
@@ -350,8 +350,8 @@ static int ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
 # endif
 
 # define ruby_script			dll_ruby_script
-# define rb_enc_find_index		dll_rb_enc_find_index
-# define rb_enc_find			dll_rb_enc_find
+# define rb_enc_ಕಂಡುಹಿಡಿ_ಸೂಚ್ಯಂಕ		dll_rb_enc_ಕಂಡುಹಿಡಿ_ಸೂಚ್ಯಂಕ
+# define rb_enc_ಕಂಡುಹಿಡಿ			dll_rb_enc_ಕಂಡುಹಿಡಿ
 # undef rb_enc_str_new
 # define rb_enc_str_new			dll_rb_enc_str_new
 # define rb_sprintf			dll_rb_sprintf
@@ -361,321 +361,321 @@ static int ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
 /*
  * Pointers for dynamic link
  */
-static VALUE (*dll_rb_assoc_new) (VALUE, VALUE);
-VALUE *dll_rb_cFalseClass;
-VALUE *dll_rb_cFixnum;
-# if defined(USE_RUBY_INTEGER)
-VALUE *dll_rb_cInteger;
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_assoc_new) (ಮೌಲ್ಯ_3, ಮೌಲ್ಯ_3);
+ಮೌಲ್ಯ_3 *dll_rb_cFalseClass;
+ಮೌಲ್ಯ_3 *dll_rb_cFixnum;
+# ಆದರೆ defined(USE_RUBY_INTEGER)
+ಮೌಲ್ಯ_3 *dll_rb_cInteger;
 # endif
-# if RUBY_VERSION >= 20
-VALUE *dll_rb_cFloat;
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 20
+ಮೌಲ್ಯ_3 *dll_rb_cFloat;
 # endif
-VALUE *dll_rb_cNilClass;
-static VALUE *dll_rb_cObject;
-VALUE *dll_rb_cString;
-VALUE *dll_rb_cSymbol;
-VALUE *dll_rb_cTrueClass;
-static VALUE (*dll_rb_class_new_instance) (int,VALUE*,VALUE);
-static void (*dll_rb_check_type) (VALUE,int);
+ಮೌಲ್ಯ_3 *dll_rb_cNilClass;
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 *dll_rb_cObject;
+ಮೌಲ್ಯ_3 *dll_rb_cString;
+ಮೌಲ್ಯ_3 *dll_rb_c_ಚಿಹ್ನೆ;
+ಮೌಲ್ಯ_3 *dll_rb_cTrueClass;
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_class_new_instance) (ಪೂರ್ಣಾಂಕ,ಮೌಲ್ಯ_3*,ಮೌಲ್ಯ_3);
+ಸ್ಥಿರ ಶೂನ್ಯ (*dll_rb_check_type) (ಮೌಲ್ಯ_3,ಪೂರ್ಣಾಂಕ);
 # ifdef USE_TYPEDDATA
-static void *(*dll_rb_check_typeddata) (VALUE,const rb_data_type_t *);
+ಸ್ಥಿರ ಶೂನ್ಯ *(*dll_rb_check_typeddata) (ಮೌಲ್ಯ_3,ಸ್ಥಿರಾಂಕ rb_ದತ್ತಾಂಶ_type_t *);
 # endif
-static VALUE (*dll_rb_class_path) (VALUE);
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_class_ಮಾರ್ಗ) (ಮೌಲ್ಯ_3);
 # ifdef USE_TYPEDDATA
-#  if RUBY_VERSION >= 23
-static VALUE (*dll_rb_data_typed_object_wrap) (VALUE, void*, const rb_data_type_t *);
-#  else
-static VALUE (*dll_rb_data_typed_object_alloc) (VALUE, void*, const rb_data_type_t *);
+#  ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 23
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_ದತ್ತಾಂಶ_typed_object_wrap) (ಮೌಲ್ಯ_3, ಶೂನ್ಯ*, ಸ್ಥಿರಾಂಕ rb_ದತ್ತಾಂಶ_type_t *);
+#  ಇಲ್ಲದಿದ್ದರೆ
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_ದತ್ತಾಂಶ_typed_object_alloc) (ಮೌಲ್ಯ_3, ಶೂನ್ಯ*, ಸ್ಥಿರಾಂಕ rb_ದತ್ತಾಂಶ_type_t *);
 #  endif
-# else
-static VALUE (*dll_rb_data_object_alloc) (VALUE, void*, RUBY_DATA_FUNC, RUBY_DATA_FUNC);
+# ಇಲ್ಲದಿದ್ದರೆ
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_ದತ್ತಾಂಶ_object_alloc) (ಮೌಲ್ಯ_3, ಶೂನ್ಯ*, RUBY_ದತ್ತಾಂಶ_FUNC, RUBY_ದತ್ತಾಂಶ_FUNC);
 # endif
-# if RUBY_VERSION >= 31
-static void (*dll_rb_debug_rstring_null_ptr) (const char*);
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 31
+ಸ್ಥಿರ ಶೂನ್ಯ (*dll_rb_debug_rstring_null_ptr) (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ*);
 # endif
-static VALUE (*dll_rb_define_class_under) (VALUE, const char*, VALUE);
-static void (*dll_rb_define_const) (VALUE,const char*,VALUE);
-static void (*dll_rb_define_global_function) (const char*,VALUE(*)(int,VALUE*,VALUE),int);
-static void (*dll_rb_define_method) (VALUE,const char*,VALUE(*)(ANYARGS),int);
-static VALUE (*dll_rb_define_module) (const char*);
-static void (*dll_rb_define_module_function) (VALUE,const char*,VALUE(*)(VALUE,VALUE),int);
-static void (*dll_rb_define_singleton_method) (VALUE,const char*,VALUE(*)(ANYARGS),int);
-static void (*dll_rb_define_virtual_variable) (const char*,VALUE(*)(ID,VALUE*),void(*)());
-static VALUE *dll_rb_stdout;
-static VALUE *dll_rb_stderr;
-static VALUE *dll_rb_eArgError;
-static VALUE *dll_rb_eIndexError;
-static VALUE *dll_rb_eRuntimeError;
-static VALUE *dll_rb_eStandardError;
-static VALUE (*dll_rb_eval_string_protect) (const char*, int*);
-# if RUBY_VERSION >= 21
-static VALUE (*dll_rb_funcallv) (VALUE, ID, int, const VALUE*);
-# else
-static VALUE (*dll_rb_funcall2) (VALUE, ID, int, const VALUE*);
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_define_class_under) (ಮೌಲ್ಯ_3, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ*, ಮೌಲ್ಯ_3);
+ಸ್ಥಿರ ಶೂನ್ಯ (*dll_rb_define_const) (ಮೌಲ್ಯ_3,ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ*,ಮೌಲ್ಯ_3);
+ಸ್ಥಿರ ಶೂನ್ಯ (*dll_rb_define_global_function) (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ*,ಮೌಲ್ಯ_3(*)(ಪೂರ್ಣಾಂಕ,ಮೌಲ್ಯ_3*,ಮೌಲ್ಯ_3),ಪೂರ್ಣಾಂಕ);
+ಸ್ಥಿರ ಶೂನ್ಯ (*dll_rb_define_ವಿಧಾನ) (ಮೌಲ್ಯ_3,ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ*,ಮೌಲ್ಯ_3(*)(ANYARGS),ಪೂರ್ಣಾಂಕ);
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_define_module) (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ*);
+ಸ್ಥಿರ ಶೂನ್ಯ (*dll_rb_define_module_function) (ಮೌಲ್ಯ_3,ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ*,ಮೌಲ್ಯ_3(*)(ಮೌಲ್ಯ_3,ಮೌಲ್ಯ_3),ಪೂರ್ಣಾಂಕ);
+ಸ್ಥಿರ ಶೂನ್ಯ (*dll_rb_define_singleton_ವಿಧಾನ) (ಮೌಲ್ಯ_3,ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ*,ಮೌಲ್ಯ_3(*)(ANYARGS),ಪೂರ್ಣಾಂಕ);
+ಸ್ಥಿರ ಶೂನ್ಯ (*dll_rb_define_virtual_variable) (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ*,ಮೌಲ್ಯ_3(*)(ID,ಮೌಲ್ಯ_3*),ಶೂನ್ಯ(*)());
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 *dll_rb_stdout;
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 *dll_rb_stderr;
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 *dll_rb_eArgError;
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 *dll_rb_e_ಸೂಚ್ಯಂಕ_Error;
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 *dll_rb_eRuntimeError;
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 *dll_rb_eStandardError;
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_eval_string_protect) (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ*, ಪೂರ್ಣಾಂಕ*);
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 21
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_funcallv) (ಮೌಲ್ಯ_3, ID, ಪೂರ್ಣಾಂಕ, ಸ್ಥಿರಾಂಕ ಮೌಲ್ಯ_3*);
+# ಇಲ್ಲದಿದ್ದರೆ
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_funcall2) (ಮೌಲ್ಯ_3, ID, ಪೂರ್ಣಾಂಕ, ಸ್ಥಿರಾಂಕ ಮೌಲ್ಯ_3*);
 # endif
-static void (*dll_rb_global_variable) (VALUE*);
-static VALUE (*dll_rb_hash_aset) (VALUE, VALUE, VALUE);
-static VALUE (*dll_rb_hash_foreach) (VALUE, int (*)(VALUE, VALUE, VALUE), VALUE);
-static VALUE (*dll_rb_hash_new) (void);
-static VALUE (*dll_rb_inspect) (VALUE);
-static VALUE (*dll_rb_int2inum) (long);
-static ID (*dll_rb_intern) (const char*);
-# if RUBY_VERSION >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
-static long (*dll_rb_fix2int) (VALUE);
-static long (*dll_rb_num2int) (VALUE);
-static unsigned long (*dll_rb_num2uint) (VALUE);
+ಸ್ಥಿರ ಶೂನ್ಯ (*dll_rb_global_variable) (ಮೌಲ್ಯ_3*);
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_hash_aset) (ಮೌಲ್ಯ_3, ಮೌಲ್ಯ_3, ಮೌಲ್ಯ_3);
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_hash_foreach) (ಮೌಲ್ಯ_3, ಪೂರ್ಣಾಂಕ (*)(ಮೌಲ್ಯ_3, ಮೌಲ್ಯ_3, ಮೌಲ್ಯ_3), ಮೌಲ್ಯ_3);
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_hash_new) (ಶೂನ್ಯ);
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_inspect) (ಮೌಲ್ಯ_3);
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_int2inum) (ದೀರ್ಘ);
+ಸ್ಥಿರ ID (*dll_rb_intern) (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ*);
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
+ಸ್ಥಿರ ದೀರ್ಘ (*dll_rb_fix2int) (ಮೌಲ್ಯ_3);
+ಸ್ಥಿರ ದೀರ್ಘ (*dll_rb_num2int) (ಮೌಲ್ಯ_3);
+ಸ್ಥಿರ ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ (*dll_rb_num2uint) (ಮೌಲ್ಯ_3);
 # endif
-static double (*dll_rb_num2dbl) (VALUE);
-static VALUE (*dll_rb_lastline_get) (void);
-static void (*dll_rb_lastline_set) (VALUE);
-static VALUE (*dll_rb_protect) (VALUE (*)(VALUE), VALUE, int*);
-static void (*dll_rb_load) (VALUE, int);
-static long (*dll_rb_num2long) (VALUE);
-static unsigned long (*dll_rb_num2ulong) (VALUE);
-static VALUE (*dll_rb_obj_alloc) (VALUE);
-static VALUE (*dll_rb_obj_as_string) (VALUE);
-static VALUE (*dll_rb_obj_id) (VALUE);
-static void (*dll_rb_raise) (VALUE, const char*, ...);
-static VALUE (*dll_rb_string_value) (volatile VALUE*);
-static VALUE (*dll_rb_str_cat) (VALUE, const char*, long);
-static VALUE (*dll_rb_str_concat) (VALUE, VALUE);
-static VALUE (*dll_rb_str_new) (const char*, long);
+ಸ್ಥಿರ ದ್ವಿಗುಣ (*dll_rb_num2dbl) (ಮೌಲ್ಯ_3);
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_lastline_get) (ಶೂನ್ಯ);
+ಸ್ಥಿರ ಶೂನ್ಯ (*dll_rb_lastline_ಗಣ) (ಮೌಲ್ಯ_3);
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_protect) (ಮೌಲ್ಯ_3 (*)(ಮೌಲ್ಯ_3), ಮೌಲ್ಯ_3, ಪೂರ್ಣಾಂಕ*);
+ಸ್ಥಿರ ಶೂನ್ಯ (*dll_rb_ತುಂಬು) (ಮೌಲ್ಯ_3, ಪೂರ್ಣಾಂಕ);
+ಸ್ಥಿರ ದೀರ್ಘ (*dll_rb_num2long) (ಮೌಲ್ಯ_3);
+ಸ್ಥಿರ ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ (*dll_rb_num2ulong) (ಮೌಲ್ಯ_3);
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_obj_alloc) (ಮೌಲ್ಯ_3);
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_obj_as_string) (ಮೌಲ್ಯ_3);
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_obj_id) (ಮೌಲ್ಯ_3);
+ಸ್ಥಿರ ಶೂನ್ಯ (*dll_rb_raise) (ಮೌಲ್ಯ_3, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ*, ...);
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_string_ಮೌಲ್ಯ) (ಅಸ್ಥಿರ ಮೌಲ್ಯ_3*);
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_str_cat) (ಮೌಲ್ಯ_3, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ*, ದೀರ್ಘ);
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_str_concat) (ಮೌಲ್ಯ_3, ಮೌಲ್ಯ_3);
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_str_new) (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ*, ದೀರ್ಘ);
 # ifdef need_rb_str_new_cstr
 // Ruby may #define rb_str_new2 to use rb_str_new_cstr.
-static VALUE (*dll_rb_str_new_cstr) (const char*);
-# else
-static VALUE (*dll_rb_str_new2) (const char*);
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_str_new_cstr) (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ*);
+# ಇಲ್ಲದಿದ್ದರೆ
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_str_new2) (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ*);
 # endif
-static VALUE (*dll_rb_errinfo) (void);
-static void (*dll_ruby_init) (void);
-static void (*dll_ruby_init_loadpath) (void);
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_errinfo) (ಶೂನ್ಯ);
+ಸ್ಥಿರ ಶೂನ್ಯ (*dll_ruby_init) (ಶೂನ್ಯ);
+ಸ್ಥಿರ ಶೂನ್ಯ (*dll_ruby_init_loadpath) (ಶೂನ್ಯ);
 # ifdef MSWIN
-static void (*dll_ruby_sysinit) (int*, char***);
-static int (*dll_rb_w32_snprintf)(char*, size_t, const char*, ...);
+ಸ್ಥಿರ ಶೂನ್ಯ (*dll_ruby_sysinit) (ಪೂರ್ಣಾಂಕ*, ಅಕ್ಷರ***);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ (*dll_rb_w32_snprintf)(ಅಕ್ಷರ*, size_t, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ*, ...);
 # endif
-# if RUBY_VERSION >= 31
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 31
 #  ifdef _MSC_VER
-static void (*dll_rb_unexpected_type) (VALUE, int);
-#  else
-NORETURN(static void (*dll_rb_unexpected_type) (VALUE, int));
+ಸ್ಥಿರ ಶೂನ್ಯ (*dll_rb_unexpected_type) (ಮೌಲ್ಯ_3, ಪೂರ್ಣಾಂಕ);
+#  ಇಲ್ಲದಿದ್ದರೆ
+NORETURN(ಸ್ಥಿರ ಶೂನ್ಯ (*dll_rb_unexpected_type) (ಮೌಲ್ಯ_3, ಪೂರ್ಣಾಂಕ));
 #  endif
 # endif
-static char * (*dll_rb_string_value_ptr) (volatile VALUE*);
-static VALUE (*dll_rb_float_new) (double);
-static VALUE (*dll_rb_ary_new) (void);
-static VALUE (*dll_rb_ary_new4) (long n, const VALUE *elts);
-static VALUE (*dll_rb_ary_push) (VALUE, VALUE);
-# if RUBY_VERSION >= 26 && RUBY_VERSION <= 32
-static void (*dll_rb_ary_detransient) (VALUE);
+ಸ್ಥಿರ ಅಕ್ಷರ * (*dll_rb_string_ಮೌಲ್ಯ_ptr) (ಅಸ್ಥಿರ ಮೌಲ್ಯ_3*);
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_float_new) (ದ್ವಿಗುಣ);
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_ary_new) (ಶೂನ್ಯ);
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_ary_new4) (ದೀರ್ಘ n, ಸ್ಥಿರಾಂಕ ಮೌಲ್ಯ_3 *elts);
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_ary_ತಳ್ಳು) (ಮೌಲ್ಯ_3, ಮೌಲ್ಯ_3);
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 26 && RUBY_ಆವೃತ್ತಿ <= 32
+ಸ್ಥಿರ ಶೂನ್ಯ (*dll_rb_ary_detransient) (ಮೌಲ್ಯ_3);
 # endif
 # ifdef __ia64
-static void * (*dll_rb_ia64_bsp) (void);
-static void (*dll_ruby_init_stack)(VALUE*, void*);
-# else
-static void (*dll_ruby_init_stack)(VALUE*);
+ಸ್ಥಿರ ಶೂನ್ಯ * (*dll_rb_ia64_bsp) (ಶೂನ್ಯ);
+ಸ್ಥಿರ ಶೂನ್ಯ (*dll_ruby_init_ರಾಶಿ)(ಮೌಲ್ಯ_3*, ಶೂನ್ಯ*);
+# ಇಲ್ಲದಿದ್ದರೆ
+ಸ್ಥಿರ ಶೂನ್ಯ (*dll_ruby_init_ರಾಶಿ)(ಮೌಲ್ಯ_3*);
 # endif
-static VALUE (*dll_rb_int2big)(SIGNED_VALUE);
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_int2big)(SIGNED_ಮೌಲ್ಯ);
 
-static void (*dll_ruby_script) (const char*);
-static int (*dll_rb_enc_find_index) (const char*);
-static rb_encoding* (*dll_rb_enc_find) (const char*);
-static VALUE (*dll_rb_enc_str_new) (const char*, long, rb_encoding*);
-static VALUE (*dll_rb_sprintf) (const char*, ...);
-static VALUE (*dll_rb_require) (const char*);
-static void* (*dll_ruby_options)(int, char**);
+ಸ್ಥಿರ ಶೂನ್ಯ (*dll_ruby_script) (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ*);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ (*dll_rb_enc_ಕಂಡುಹಿಡಿ_ಸೂಚ್ಯಂಕ) (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ*);
+ಸ್ಥಿರ rb_encoding* (*dll_rb_enc_ಕಂಡುಹಿಡಿ) (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ*);
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_enc_str_new) (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ*, ದೀರ್ಘ, rb_encoding*);
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_sprintf) (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ*, ...);
+ಸ್ಥಿರ ಮೌಲ್ಯ_3 (*dll_rb_require) (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ*);
+ಸ್ಥಿರ ಶೂನ್ಯ* (*dll_ruby_options)(ಪೂರ್ಣಾಂಕ, ಅಕ್ಷರ**);
 
-# if defined(USE_RGENGC) && USE_RGENGC
-#  if RUBY_VERSION == 21
-static void (*dll_rb_gc_writebarrier_unprotect_promoted)(VALUE);
-#  else
-static void (*dll_rb_gc_writebarrier_unprotect)(VALUE obj);
+# ಆದರೆ defined(USE_RGENGC) && USE_RGENGC
+#  ಆದರೆ RUBY_ಆವೃತ್ತಿ == 21
+ಸ್ಥಿರ ಶೂನ್ಯ (*dll_rb_gc_writebarrier_unprotect_promoted)(ಮೌಲ್ಯ_3);
+#  ಇಲ್ಲದಿದ್ದರೆ
+ಸ್ಥಿರ ಶೂನ್ಯ (*dll_rb_gc_writebarrier_unprotect)(ಮೌಲ್ಯ_3 obj);
 #  endif
 # endif
 
-# if RUBY_VERSION >= 30
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 30
 #  ifdef _MSC_VER
-static void (*dll_ruby_malloc_size_overflow)(size_t, size_t);
-#  else
-NORETURN(static void (*dll_ruby_malloc_size_overflow)(size_t, size_t));
+ಸ್ಥಿರ ಶೂನ್ಯ (*dll_ruby_malloc_ಗಾತ್ರ_ಅತಿಪ್ರವಾಹ)(size_t, size_t);
+#  ಇಲ್ಲದಿದ್ದರೆ
+NORETURN(ಸ್ಥಿರ ಶೂನ್ಯ (*dll_ruby_malloc_ಗಾತ್ರ_ಅತಿಪ್ರವಾಹ)(size_t, size_t));
 #  endif
 # endif
 
-# if RUBY_VERSION >= 26 && RUBY_VERSION <= 32
-void rb_ary_detransient_stub(VALUE x);
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 26 && RUBY_ಆವೃತ್ತಿ <= 32
+ಶೂನ್ಯ rb_ary_detransient_stub(ಮೌಲ್ಯ_3 x);
 # endif
 
 // Do not generate a prototype here, VALUE isn't always defined.
 # ifndef PROTO
-#  if RUBY_VERSION >= 22
-    long
-rb_num2long_stub(VALUE x)
-#  else
-    SIGNED_VALUE
-rb_num2long_stub(VALUE x)
+#  ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 22
+    ದೀರ್ಘ
+rb_num2long_stub(ಮೌಲ್ಯ_3 x)
+#  ಇಲ್ಲದಿದ್ದರೆ
+    SIGNED_ಮೌಲ್ಯ
+rb_num2long_stub(ಮೌಲ್ಯ_3 x)
 #  endif
 {
-    return dll_rb_num2long(x);
+    ಹಿಂತಿರುಗಿ dll_rb_num2long(x);
 }
-#  if RUBY_VERSION >= 26
-    VALUE
+#  ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 26
+    ಮೌಲ್ಯ_3
 rb_int2big_stub(intptr_t x)
-#  else
-    VALUE
-rb_int2big_stub(SIGNED_VALUE x)
+#  ಇಲ್ಲದಿದ್ದರೆ
+    ಮೌಲ್ಯ_3
+rb_int2big_stub(SIGNED_ಮೌಲ್ಯ x)
 #  endif
 {
-    return dll_rb_int2big(x);
+    ಹಿಂತಿರುಗಿ dll_rb_int2big(x);
 }
-#  if RUBY_VERSION >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
-    long
-rb_fix2int_stub(VALUE x)
+#  ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
+    ದೀರ್ಘ
+rb_fix2int_stub(ಮೌಲ್ಯ_3 x)
 {
-    return dll_rb_fix2int(x);
+    ಹಿಂತಿರುಗಿ dll_rb_fix2int(x);
 }
-    long
-rb_num2int_stub(VALUE x)
+    ದೀರ್ಘ
+rb_num2int_stub(ಮೌಲ್ಯ_3 x)
 {
-    return dll_rb_num2int(x);
+    ಹಿಂತಿರುಗಿ dll_rb_num2int(x);
 }
 #  endif
-#  if RUBY_VERSION >= 20
-    VALUE
-rb_float_new_in_heap(double d)
+#  ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 20
+    ಮೌಲ್ಯ_3
+rb_float_new_ಒಳ_ರಾಶಿ(ದ್ವಿಗುಣ d)
 {
-    return dll_rb_float_new(d);
+    ಹಿಂತಿರುಗಿ dll_rb_float_new(d);
 }
-#   if RUBY_VERSION >= 22
-    unsigned long
-rb_num2ulong(VALUE x)
-#   else
-    VALUE
-rb_num2ulong(VALUE x)
+#   ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 22
+    ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ
+rb_num2ulong(ಮೌಲ್ಯ_3 x)
+#   ಇಲ್ಲದಿದ್ದರೆ
+    ಮೌಲ್ಯ_3
+rb_num2ulong(ಮೌಲ್ಯ_3 x)
 #   endif
 {
-    return (long)RSHIFT((SIGNED_VALUE)(x),1);
+    ಹಿಂತಿರುಗಿ (ದೀರ್ಘ)RSHIFT((SIGNED_ಮೌಲ್ಯ)(x),1);
 }
 #  endif
-#  if defined(USE_RGENGC) && USE_RGENGC
-#   if RUBY_VERSION == 21
-    void
-rb_gc_writebarrier_unprotect_promoted_stub(VALUE obj)
+#  ಆದರೆ defined(USE_RGENGC) && USE_RGENGC
+#   ಆದರೆ RUBY_ಆವೃತ್ತಿ == 21
+    ಶೂನ್ಯ
+rb_gc_writebarrier_unprotect_promoted_stub(ಮೌಲ್ಯ_3 obj)
 {
     dll_rb_gc_writebarrier_unprotect_promoted(obj);
 }
-#   else
-    void
-rb_gc_writebarrier_unprotect_stub(VALUE obj)
+#   ಇಲ್ಲದಿದ್ದರೆ
+    ಶೂನ್ಯ
+rb_gc_writebarrier_unprotect_stub(ಮೌಲ್ಯ_3 obj)
 {
     dll_rb_gc_writebarrier_unprotect(obj);
 }
 #   endif
 #  endif
-#  if RUBY_VERSION >= 26 && RUBY_VERSION <= 32
-    void
-rb_ary_detransient_stub(VALUE x)
+#  ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 26 && RUBY_ಆವೃತ್ತಿ <= 32
+    ಶೂನ್ಯ
+rb_ary_detransient_stub(ಮೌಲ್ಯ_3 x)
 {
     dll_rb_ary_detransient(x);
 }
 #  endif
-#  if RUBY_VERSION >= 30
-    void
-rb_check_type_stub(VALUE obj, int t)
+#  ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 30
+    ಶೂನ್ಯ
+rb_check_type_stub(ಮೌಲ್ಯ_3 obj, ಪೂರ್ಣಾಂಕ t)
 {
     dll_rb_check_type(obj, t);
 }
-    unsigned long
-rb_num2uint_stub(VALUE x)
+    ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ
+rb_num2uint_stub(ಮೌಲ್ಯ_3 x)
 {
-    return dll_rb_num2uint(x);
+    ಹಿಂತಿರುಗಿ dll_rb_num2uint(x);
 }
-    void
-ruby_malloc_size_overflow_stub(size_t x, size_t y)
+    ಶೂನ್ಯ
+ruby_malloc_ಗಾತ್ರ_ಅತಿಪ್ರವಾಹ_stub(size_t x, size_t y)
 {
-    dll_ruby_malloc_size_overflow(x, y);
+    dll_ruby_malloc_ಗಾತ್ರ_ಅತಿಪ್ರವಾಹ(x, y);
 }
 #  endif
-#  if RUBY_VERSION >= 31
-    void
-rb_debug_rstring_null_ptr_stub(const char *func)
+#  ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 31
+    ಶೂನ್ಯ
+rb_debug_rstring_null_ptr_stub(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *func)
 {
     dll_rb_debug_rstring_null_ptr(func);
 }
-    void
-rb_unexpected_type_stub(VALUE self, int t)
+    ಶೂನ್ಯ
+rb_unexpected_type_stub(ಮೌಲ್ಯ_3 self, ಪೂರ್ಣಾಂಕ t)
 {
     dll_rb_unexpected_type(self, t);
 }
 #  endif
 #  ifdef USE_TYPEDDATA
-void *rb_check_typeddata_stub(VALUE obj, const rb_data_type_t *data_type)
+ಶೂನ್ಯ *rb_check_typeddata_stub(ಮೌಲ್ಯ_3 obj, ಸ್ಥಿರಾಂಕ rb_ದತ್ತಾಂಶ_type_t *ದತ್ತಾಂಶ_type)
 {
-    return dll_rb_check_typeddata(obj, data_type);
+    ಹಿಂತಿರುಗಿ dll_rb_check_typeddata(obj, ದತ್ತಾಂಶ_type);
 }
 #  endif
 # endif // ifndef PROTO
 
-static HINSTANCE hinstRuby = NULL; // Instance of ruby.dll
+ಸ್ಥಿರ HINSTANCE hinstRuby = ಖಾಲಿ; // Instance of ruby.dll
 
 /*
  * Table of name to function pointer of ruby.
  */
-static struct
+ಸ್ಥಿರ ರಚನೆ
 {
-    char *name;
+    ಅಕ್ಷರ *name;
     RUBY_PROC *ptr;
-} ruby_funcname_table[] =
+} ruby_funcname_ಕೋಷ್ಟಕ[] =
 {
     {"rb_assoc_new", (RUBY_PROC*)&dll_rb_assoc_new},
     {"rb_cFalseClass", (RUBY_PROC*)&dll_rb_cFalseClass},
-# if defined(USE_RUBY_INTEGER)
+# ಆದರೆ defined(USE_RUBY_INTEGER)
     {"rb_cInteger", (RUBY_PROC*)&dll_rb_cInteger},
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
     {"rb_cFixnum", (RUBY_PROC*)&dll_rb_cFixnum},
 # endif
-# if RUBY_VERSION >= 20
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 20
     {"rb_cFloat", (RUBY_PROC*)&dll_rb_cFloat},
 # endif
     {"rb_cNilClass", (RUBY_PROC*)&dll_rb_cNilClass},
     {"rb_cObject", (RUBY_PROC*)&dll_rb_cObject},
     {"rb_cString", (RUBY_PROC*)&dll_rb_cString},
-    {"rb_cSymbol", (RUBY_PROC*)&dll_rb_cSymbol},
+    {"rb_cSymbol", (RUBY_PROC*)&dll_rb_c_ಚಿಹ್ನೆ},
     {"rb_cTrueClass", (RUBY_PROC*)&dll_rb_cTrueClass},
     {"rb_class_new_instance", (RUBY_PROC*)&dll_rb_class_new_instance},
     {"rb_check_type", (RUBY_PROC*)&dll_rb_check_type},
 # ifdef USE_TYPEDDATA
     {"rb_check_typeddata", (RUBY_PROC*)&dll_rb_check_typeddata},
 # endif
-    {"rb_class_path", (RUBY_PROC*)&dll_rb_class_path},
+    {"rb_class_path", (RUBY_PROC*)&dll_rb_class_ಮಾರ್ಗ},
 # ifdef USE_TYPEDDATA
-#  if RUBY_VERSION >= 23
-    {"rb_data_typed_object_wrap", (RUBY_PROC*)&dll_rb_data_typed_object_wrap},
-#  else
-    {"rb_data_typed_object_alloc", (RUBY_PROC*)&dll_rb_data_typed_object_alloc},
+#  ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 23
+    {"rb_data_typed_object_wrap", (RUBY_PROC*)&dll_rb_ದತ್ತಾಂಶ_typed_object_wrap},
+#  ಇಲ್ಲದಿದ್ದರೆ
+    {"rb_data_typed_object_alloc", (RUBY_PROC*)&dll_rb_ದತ್ತಾಂಶ_typed_object_alloc},
 #  endif
-# else
-    {"rb_data_object_alloc", (RUBY_PROC*)&dll_rb_data_object_alloc},
+# ಇಲ್ಲದಿದ್ದರೆ
+    {"rb_data_object_alloc", (RUBY_PROC*)&dll_rb_ದತ್ತಾಂಶ_object_alloc},
 # endif
-# if RUBY_VERSION >= 31
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 31
     {"rb_debug_rstring_null_ptr", (RUBY_PROC*)&dll_rb_debug_rstring_null_ptr},
 # endif
     {"rb_define_class_under", (RUBY_PROC*)&dll_rb_define_class_under},
     {"rb_define_const", (RUBY_PROC*)&dll_rb_define_const},
     {"rb_define_global_function", (RUBY_PROC*)&dll_rb_define_global_function},
-    {"rb_define_method", (RUBY_PROC*)&dll_rb_define_method},
+    {"rb_define_method", (RUBY_PROC*)&dll_rb_define_ವಿಧಾನ},
     {"rb_define_module", (RUBY_PROC*)&dll_rb_define_module},
     {"rb_define_module_function", (RUBY_PROC*)&dll_rb_define_module_function},
-    {"rb_define_singleton_method", (RUBY_PROC*)&dll_rb_define_singleton_method},
+    {"rb_define_singleton_method", (RUBY_PROC*)&dll_rb_define_singleton_ವಿಧಾನ},
     {"rb_define_virtual_variable", (RUBY_PROC*)&dll_rb_define_virtual_variable},
     {"rb_stdout", (RUBY_PROC*)&dll_rb_stdout},
     {"rb_stderr", (RUBY_PROC*)&dll_rb_stderr},
     {"rb_eArgError", (RUBY_PROC*)&dll_rb_eArgError},
-    {"rb_eIndexError", (RUBY_PROC*)&dll_rb_eIndexError},
+    {"rb_eIndexError", (RUBY_PROC*)&dll_rb_e_ಸೂಚ್ಯಂಕ_Error},
     {"rb_eRuntimeError", (RUBY_PROC*)&dll_rb_eRuntimeError},
     {"rb_eStandardError", (RUBY_PROC*)&dll_rb_eStandardError},
     {"rb_eval_string_protect", (RUBY_PROC*)&dll_rb_eval_string_protect},
-# if RUBY_VERSION >= 21
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 21
     {"rb_funcallv", (RUBY_PROC*)&dll_rb_funcallv},
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
     {"rb_funcall2", (RUBY_PROC*)&dll_rb_funcall2},
 # endif
     {"rb_global_variable", (RUBY_PROC*)&dll_rb_global_variable},
@@ -685,29 +685,29 @@ static struct
     {"rb_inspect", (RUBY_PROC*)&dll_rb_inspect},
     {"rb_int2inum", (RUBY_PROC*)&dll_rb_int2inum},
     {"rb_intern", (RUBY_PROC*)&dll_rb_intern},
-# if RUBY_VERSION >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
     {"rb_fix2int", (RUBY_PROC*)&dll_rb_fix2int},
     {"rb_num2int", (RUBY_PROC*)&dll_rb_num2int},
     {"rb_num2uint", (RUBY_PROC*)&dll_rb_num2uint},
 # endif
     {"rb_num2dbl", (RUBY_PROC*)&dll_rb_num2dbl},
     {"rb_lastline_get", (RUBY_PROC*)&dll_rb_lastline_get},
-    {"rb_lastline_set", (RUBY_PROC*)&dll_rb_lastline_set},
+    {"rb_lastline_set", (RUBY_PROC*)&dll_rb_lastline_ಗಣ},
     {"rb_protect", (RUBY_PROC*)&dll_rb_protect},
-    {"rb_load", (RUBY_PROC*)&dll_rb_load},
+    {"rb_load", (RUBY_PROC*)&dll_rb_ತುಂಬು},
     {"rb_num2long", (RUBY_PROC*)&dll_rb_num2long},
     {"rb_num2ulong", (RUBY_PROC*)&dll_rb_num2ulong},
     {"rb_obj_alloc", (RUBY_PROC*)&dll_rb_obj_alloc},
     {"rb_obj_as_string", (RUBY_PROC*)&dll_rb_obj_as_string},
     {"rb_obj_id", (RUBY_PROC*)&dll_rb_obj_id},
     {"rb_raise", (RUBY_PROC*)&dll_rb_raise},
-    {"rb_string_value", (RUBY_PROC*)&dll_rb_string_value},
+    {"rb_string_value", (RUBY_PROC*)&dll_rb_string_ಮೌಲ್ಯ},
     {"rb_str_cat", (RUBY_PROC*)&dll_rb_str_cat},
     {"rb_str_concat", (RUBY_PROC*)&dll_rb_str_concat},
     {"rb_str_new", (RUBY_PROC*)&dll_rb_str_new},
 # ifdef need_rb_str_new_cstr
     {"rb_str_new_cstr", (RUBY_PROC*)&dll_rb_str_new_cstr},
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
     {"rb_str_new2", (RUBY_PROC*)&dll_rb_str_new2},
 # endif
     {"rb_errinfo", (RUBY_PROC*)&dll_rb_errinfo},
@@ -717,29 +717,29 @@ static struct
     {"ruby_sysinit", (RUBY_PROC*)&dll_ruby_sysinit},
     {"rb_w32_snprintf", (RUBY_PROC*)&dll_rb_w32_snprintf},
 # endif
-# if RUBY_VERSION >= 31
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 31
     {"rb_unexpected_type", (RUBY_PROC*)&dll_rb_unexpected_type},
 # endif
-    {"rb_string_value_ptr", (RUBY_PROC*)&dll_rb_string_value_ptr},
-# if RUBY_VERSION >= 20
+    {"rb_string_value_ptr", (RUBY_PROC*)&dll_rb_string_ಮೌಲ್ಯ_ptr},
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 20
     {"rb_float_new_in_heap", (RUBY_PROC*)&dll_rb_float_new},
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
     {"rb_float_new", (RUBY_PROC*)&dll_rb_float_new},
 # endif
     {"rb_ary_new", (RUBY_PROC*)&dll_rb_ary_new},
 # ifdef RB_ARY_NEW4_MACRO
     {"rb_ary_new_from_values", (RUBY_PROC*)&dll_rb_ary_new4},
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
     {"rb_ary_new4", (RUBY_PROC*)&dll_rb_ary_new4},
 # endif
-    {"rb_ary_push", (RUBY_PROC*)&dll_rb_ary_push},
-# if RUBY_VERSION >= 26 && RUBY_VERSION <= 32
+    {"rb_ary_push", (RUBY_PROC*)&dll_rb_ary_ತಳ್ಳು},
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 26 && RUBY_ಆವೃತ್ತಿ <= 32
     {"rb_ary_detransient", (RUBY_PROC*)&dll_rb_ary_detransient},
 # endif
     {"rb_int2big", (RUBY_PROC*)&dll_rb_int2big},
     {"ruby_script", (RUBY_PROC*)&dll_ruby_script},
-    {"rb_enc_find_index", (RUBY_PROC*)&dll_rb_enc_find_index},
-    {"rb_enc_find", (RUBY_PROC*)&dll_rb_enc_find},
+    {"rb_enc_find_index", (RUBY_PROC*)&dll_rb_enc_ಕಂಡುಹಿಡಿ_ಸೂಚ್ಯಂಕ},
+    {"rb_enc_find", (RUBY_PROC*)&dll_rb_enc_ಕಂಡುಹಿಡಿ},
     {"rb_enc_str_new", (RUBY_PROC*)&dll_rb_enc_str_new},
     {"rb_sprintf", (RUBY_PROC*)&dll_rb_sprintf},
     {"rb_require", (RUBY_PROC*)&dll_rb_require},
@@ -747,18 +747,18 @@ static struct
 # ifdef __ia64
     {"rb_ia64_bsp", (RUBY_PROC*)&dll_rb_ia64_bsp},
 # endif
-    {"ruby_init_stack", (RUBY_PROC*)&dll_ruby_init_stack},
-# if defined(USE_RGENGC) && USE_RGENGC
-#  if RUBY_VERSION == 21
+    {"ruby_init_stack", (RUBY_PROC*)&dll_ruby_init_ರಾಶಿ},
+# ಆದರೆ defined(USE_RGENGC) && USE_RGENGC
+#  ಆದರೆ RUBY_ಆವೃತ್ತಿ == 21
     {"rb_gc_writebarrier_unprotect_promoted", (RUBY_PROC*)&dll_rb_gc_writebarrier_unprotect_promoted},
-#  else
+#  ಇಲ್ಲದಿದ್ದರೆ
     {"rb_gc_writebarrier_unprotect", (RUBY_PROC*)&dll_rb_gc_writebarrier_unprotect},
 #  endif
 # endif
-# if RUBY_VERSION >= 30
-    {"ruby_malloc_size_overflow", (RUBY_PROC*)&dll_ruby_malloc_size_overflow},
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 30
+    {"ruby_malloc_size_overflow", (RUBY_PROC*)&dll_ruby_malloc_ಗಾತ್ರ_ಅತಿಪ್ರವಾಹ},
 # endif
-    {"", NULL},
+    {"", ಖಾಲಿ},
 };
 
 /*
@@ -766,66 +766,66 @@ static struct
  * Parameter 'libname' provides name of DLL.
  * Return OK or FAIL.
  */
-    static int
-ruby_runtime_link_init(char *libname, int verbose)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ruby_runtime_link_init(ಅಕ್ಷರ *libname, ಪೂರ್ಣಾಂಕ verbose)
 {
-    int i;
+    ಪೂರ್ಣಾಂಕ i;
 
-    if (hinstRuby)
-	return OK;
-    hinstRuby = load_dll(libname);
-    if (!hinstRuby)
+    ಆದರೆ (hinstRuby)
+	ಹಿಂತಿರುಗಿ OK;
+    hinstRuby = ತುಂಬು_dll(libname);
+    ಆದರೆ (!hinstRuby)
     {
-	if (verbose)
-	    semsg(_(e_could_not_load_library_str_str), libname, load_dll_error());
-	return FAIL;
+	ಆದರೆ (verbose)
+	    semsg(_(e_could_not_ತುಂಬು_library_str_str), libname, ತುಂಬು_dll_error());
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
-    for (i = 0; ruby_funcname_table[i].ptr; ++i)
+    ಗಾಗಿ (i = 0; ruby_funcname_ಕೋಷ್ಟಕ[i].ptr; ++i)
     {
-	if (!(*ruby_funcname_table[i].ptr = symbol_from_dll(hinstRuby,
-			ruby_funcname_table[i].name)))
+	ಆದರೆ (!(*ruby_funcname_ಕೋಷ್ಟಕ[i].ptr = ಚಿಹ್ನೆ_from_dll(hinstRuby,
+			ruby_funcname_ಕೋಷ್ಟಕ[i].name)))
 	{
 	    close_dll(hinstRuby);
-	    hinstRuby = NULL;
-	    if (verbose)
-		semsg(_(e_could_not_load_library_function_str), ruby_funcname_table[i].name);
-	    return FAIL;
+	    hinstRuby = ಖಾಲಿ;
+	    ಆದರೆ (verbose)
+		semsg(_(e_could_not_ತುಂಬು_library_function_str), ruby_funcname_ಕೋಷ್ಟಕ[i].name);
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * If ruby is enabled (there is installed ruby on Windows system) return TRUE,
  * else FALSE.
  */
-    int
-ruby_enabled(int verbose)
+    ಪೂರ್ಣಾಂಕ
+ruby_enabled(ಪೂರ್ಣಾಂಕ verbose)
 {
-    return ruby_runtime_link_init((char *)p_rubydll, verbose) == OK;
+    ಹಿಂತಿರುಗಿ ruby_runtime_link_init((ಅಕ್ಷರ *)p_rubydll, verbose) == OK;
 }
-#endif // defined(DYNAMIC_RUBY)
+#ಆದರೆ_ಅಂತ್ಯ // defined(DYNAMIC_RUBY)
 
-    void
-ruby_end(void)
+    ಶೂನ್ಯ
+ruby_ಕೊನೆ(ಶೂನ್ಯ)
 {
 }
 
-    void
+    ಶೂನ್ಯ
 ex_ruby(exarg_T *eap)
 {
-    int state;
-    char *script = NULL;
+    ಪೂರ್ಣಾಂಕ state;
+    ಅಕ್ಷರ *script = ಖಾಲಿ;
 
-    script = (char *)script_get(eap, eap->arg);
-    if (!eap->skip && ensure_ruby_initialized())
+    script = (ಅಕ್ಷರ *)script_get(eap, eap->arg);
+    ಆದರೆ (!eap->skip && ensure_ruby_initialized())
     {
-	if (script == NULL)
-	    rb_eval_string_protect((char *)eap->arg, &state);
-	else
+	ಆದರೆ (script == ಖಾಲಿ)
+	    rb_eval_string_protect((ಅಕ್ಷರ *)eap->arg, &state);
+	ಇಲ್ಲದಿದ್ದರೆ
 	    rb_eval_string_protect(script, &state);
-	if (state)
+	ಆದರೆ (state)
 	    error_print(state);
     }
     vim_free(script);
@@ -836,156 +836,156 @@ ex_ruby(exarg_T *eap)
  *  conversion buffer string of vim to ruby String object using
  *  VIM encoding option.
  */
-    static VALUE
-vim_str2rb_enc_str(const char *s)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+vim_str2rb_enc_str(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *s)
 {
-    long lval;
+    ದೀರ್ಘ lval;
     char_u *sval;
     rb_encoding *enc;
 
-    if (get_option_value((char_u *)"enc", &lval, &sval, NULL, 0) == gov_string)
+    ಆದರೆ (get_option_ಮೌಲ್ಯ((char_u *)"enc", &lval, &sval, ಖಾಲಿ, 0) == gov_string)
     {
-	enc = rb_enc_find((char *)sval);
+	enc = rb_enc_ಕಂಡುಹಿಡಿ((ಅಕ್ಷರ *)sval);
 	vim_free(sval);
-	if (enc)
-	    return rb_enc_str_new(s, (long)strlen(s), enc);
+	ಆದರೆ (enc)
+	    ಹಿಂತಿರುಗಿ rb_enc_str_new(s, (ದೀರ್ಘ)ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(s), enc);
     }
-    return rb_str_new2(s);
+    ಹಿಂತಿರುಗಿ rb_str_new2(s);
 }
 
-    static VALUE
-eval_enc_string_protect(const char *str, int *state)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+eval_enc_string_protect(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *str, ಪೂರ್ಣಾಂಕ *state)
 {
-    long lval;
+    ದೀರ್ಘ lval;
     char_u *sval;
     rb_encoding *enc;
-    VALUE v;
+    ಮೌಲ್ಯ_3 v;
 
-    if (get_option_value((char_u *)"enc", &lval, &sval, NULL, 0) == gov_string)
+    ಆದರೆ (get_option_ಮೌಲ್ಯ((char_u *)"enc", &lval, &sval, ಖಾಲಿ, 0) == gov_string)
     {
-	enc = rb_enc_find((char *)sval);
+	enc = rb_enc_ಕಂಡುಹಿಡಿ((ಅಕ್ಷರ *)sval);
 	vim_free(sval);
-	if (enc)
+	ಆದರೆ (enc)
 	{
 	    v = rb_sprintf("#-*- coding:%s -*-\n%s", rb_enc_name(enc), str);
-	    return rb_eval_string_protect(StringValuePtr(v), state);
+	    ಹಿಂತಿರುಗಿ rb_eval_string_protect(String_ಮೌಲ್ಯ_Ptr(v), state);
 	}
     }
-    return rb_eval_string_protect(str, state);
+    ಹಿಂತಿರುಗಿ rb_eval_string_protect(str, state);
 }
 
-    void
+    ಶೂನ್ಯ
 ex_rubydo(exarg_T *eap)
 {
-    int state;
+    ಪೂರ್ಣಾಂಕ state;
     linenr_T i;
     buf_T   *was_curbuf = curbuf;
 
-    if (!ensure_ruby_initialized())
-	return;
+    ಆದರೆ (!ensure_ruby_initialized())
+	ಹಿಂತಿರುಗಿ;
 
-    if (u_save(eap->line1 - 1, eap->line2 + 1) != OK)
-	return;
-    for (i = eap->line1; i <= eap->line2; i++)
+    ಆದರೆ (u_save(eap->line1 - 1, eap->line2 + 1) != OK)
+	ಹಿಂತಿರುಗಿ;
+    ಗಾಗಿ (i = eap->line1; i <= eap->line2; i++)
     {
-	VALUE line;
+	ಮೌಲ್ಯ_3 ಸಾಲು;
 
-	if (i > curbuf->b_ml.ml_line_count)
-	    break;
-	line = vim_str2rb_enc_str((char *)ml_get(i));
-	rb_lastline_set(line);
-	eval_enc_string_protect((char *) eap->arg, &state);
-	if (state)
+	ಆದರೆ (i > curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
+	    ನಿಲ್ಲಿಸು;
+	ಸಾಲು = vim_str2rb_enc_str((ಅಕ್ಷರ *)ml_get(i));
+	rb_lastline_ಗಣ(ಸಾಲು);
+	eval_enc_string_protect((ಅಕ್ಷರ *) eap->arg, &state);
+	ಆದರೆ (state)
 	{
 	    error_print(state);
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
-	if (was_curbuf != curbuf || i > curbuf->b_ml.ml_line_count)
-	    break;
-	line = rb_lastline_get();
-	if (!NIL_P(line))
+	ಆದರೆ (was_curbuf != curbuf || i > curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
+	    ನಿಲ್ಲಿಸು;
+	ಸಾಲು = rb_lastline_get();
+	ಆದರೆ (!NIL_P(ಸಾಲು))
 	{
-	    if (TYPE(line) != T_STRING)
+	    ಆದರೆ (TYPE(ಸಾಲು) != T_STRING)
 	    {
-		emsg(_(e_dollar_must_be_an_instance_of_string));
-		return;
+		emsg(_(e_dollar_must_be_an_instance_ದ_string));
+		ಹಿಂತಿರುಗಿ;
 	    }
-	    ml_replace(i, (char_u *) StringValuePtr(line), 1);
-	    changed();
-#ifdef SYNTAX_HL
-	    syn_changed(i); // recompute syntax hl. for this line
-#endif
+	    ml_replace(i, (char_u *) String_ಮೌಲ್ಯ_Ptr(ಸಾಲು), 1);
+	    ಬದಲಾಯಿತು();
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SYNTAX_HL
+	    syn_ಬದಲಾಯಿತು(i); // recompute syntax hl. for this line
+#ಆದರೆ_ಅಂತ್ಯ
 	}
     }
     check_cursor();
     update_curbuf(UPD_NOT_VALID);
 }
 
-    static VALUE
-rb_load_wrap(VALUE file_to_load)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+rb_ತುಂಬು_wrap(ಮೌಲ್ಯ_3 file_ಗಮ್ಯ_ತುಂಬು)
 {
-    rb_load(file_to_load, 0);
-    return Qnil;
+    rb_ತುಂಬು(file_ಗಮ್ಯ_ತುಂಬು, 0);
+    ಹಿಂತಿರುಗಿ Qnil;
 }
 
-    void
+    ಶೂನ್ಯ
 ex_rubyfile(exarg_T *eap)
 {
-    int state;
+    ಪೂರ್ಣಾಂಕ state;
 
-    if (!ensure_ruby_initialized())
-	return;
+    ಆದರೆ (!ensure_ruby_initialized())
+	ಹಿಂತಿರುಗಿ;
 
-    VALUE file_to_load = rb_str_new2((const char *)eap->arg);
-    rb_protect(rb_load_wrap, file_to_load, &state);
-    if (state)
+    ಮೌಲ್ಯ_3 file_ಗಮ್ಯ_ತುಂಬು = rb_str_new2((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)eap->arg);
+    rb_protect(rb_ತುಂಬು_wrap, file_ಗಮ್ಯ_ತುಂಬು, &state);
+    ಆದರೆ (state)
 	error_print(state);
 }
 
-    void
-ruby_buffer_free(buf_T *buf)
+    ಶೂನ್ಯ
+ruby_ಬಫರ್_free(buf_T *buf)
 {
-    if (buf->b_ruby_ref == NULL)
-	return;
+    ಆದರೆ (buf->b_ruby_ref == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    rb_hash_aset(objtbl, rb_obj_id((VALUE) buf->b_ruby_ref), Qnil);
-    RDATA(buf->b_ruby_ref)->data = NULL;
+    rb_hash_aset(objtbl, rb_obj_id((ಮೌಲ್ಯ_3) buf->b_ruby_ref), Qnil);
+    RDATA(buf->b_ruby_ref)->ದತ್ತಾಂಶ = ಖಾಲಿ;
 }
 
-    void
-ruby_window_free(win_T *win)
+    ಶೂನ್ಯ
+ruby_ಕಿಟಕಿ_free(win_T *win)
 {
-    if (win->w_ruby_ref == NULL)
-	return;
+    ಆದರೆ (win->w_ruby_ref == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    rb_hash_aset(objtbl, rb_obj_id((VALUE) win->w_ruby_ref), Qnil);
-    RDATA(win->w_ruby_ref)->data = NULL;
+    rb_hash_aset(objtbl, rb_obj_id((ಮೌಲ್ಯ_3) win->w_ruby_ref), Qnil);
+    RDATA(win->w_ruby_ref)->ದತ್ತಾಂಶ = ಖಾಲಿ;
 }
 
-    static int
-ensure_ruby_initialized(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ensure_ruby_initialized(ಶೂನ್ಯ)
 {
-    if (ruby_initialized)
-	return ruby_initialized;
+    ಆದರೆ (ruby_initialized)
+	ಹಿಂತಿರುಗಿ ruby_initialized;
 
-#ifdef DYNAMIC_RUBY
-    if (ruby_enabled(TRUE))
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DYNAMIC_RUBY
+    ಆದರೆ (ruby_enabled(TRUE))
+#ಆದರೆ_ಅಂತ್ಯ
     {
-#ifdef MSWIN
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
 	// suggested by Ariya Mizutani
-	int argc = 1;
-	char *argv[] = {"gvim.exe"};
-	char **argvp = argv;
+	ಪೂರ್ಣಾಂಕ argc = 1;
+	ಅಕ್ಷರ *argv[] = {"gvim.exe"};
+	ಅಕ್ಷರ **argvp = argv;
 	ruby_sysinit(&argc, &argvp);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	{
-	    ruby_init_stack(ruby_stack_start);
+	    ruby_init_ರಾಶಿ(ruby_ರಾಶಿ_ಆರಂಭ);
 	    ruby_init();
 	}
 	{
-	    int dummy_argc = 2;
-	    char *dummy_argv[] = {"vim-ruby", "-e_=0"};
+	    ಪೂರ್ಣಾಂಕ dummy_argc = 2;
+	    ಅಕ್ಷರ *dummy_argv[] = {"vim-ruby", "-e_=0"};
 	    ruby_options(dummy_argc, dummy_argv);
 	}
 	ruby_script("vim-ruby");
@@ -993,235 +993,235 @@ ensure_ruby_initialized(void)
 	ruby_vim_init();
 	ruby_initialized = 1;
     }
-#ifdef DYNAMIC_RUBY
-    else
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DYNAMIC_RUBY
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	emsg(_(e_sorry_this_command_is_disabled_the_ruby_library_could_not_be_loaded));
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return ruby_initialized;
+    ಹಿಂತಿರುಗಿ ruby_initialized;
 }
 
-    static void
-error_print(int state)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+error_print(ಪೂರ್ಣಾಂಕ state)
 {
-    VALUE error;
-    VALUE eclass;
-    VALUE einfo;
-    VALUE bt;
-    int attr;
-    char buff[BUFSIZ];
-    long i;
+    ಮೌಲ್ಯ_3 error;
+    ಮೌಲ್ಯ_3 eclass;
+    ಮೌಲ್ಯ_3 einfo;
+    ಮೌಲ್ಯ_3 bt;
+    ಪೂರ್ಣಾಂಕ attr;
+    ಅಕ್ಷರ buff[BUFSIZ];
+    ದೀರ್ಘ i;
 
-#define TAG_RETURN	0x1
-#define TAG_BREAK	0x2
-#define TAG_NEXT	0x3
-#define TAG_RETRY	0x4
-#define TAG_REDO	0x5
-#define TAG_RAISE	0x6
-#define TAG_THROW	0x7
-#define TAG_FATAL	0x8
-#define TAG_MASK	0xf
+#ವ್ಯಾಖ್ಯಾನಿಸು ಟ್ಯಾಗ್_RETURN	0x1
+#ವ್ಯಾಖ್ಯಾನಿಸು ಟ್ಯಾಗ್_BREAK	0x2
+#ವ್ಯಾಖ್ಯಾನಿಸು ಟ್ಯಾಗ್_ಮುಂದಿನ	0x3
+#ವ್ಯಾಖ್ಯಾನಿಸು ಟ್ಯಾಗ್_RETRY	0x4
+#ವ್ಯಾಖ್ಯಾನಿಸು ಟ್ಯಾಗ್_REDO	0x5
+#ವ್ಯಾಖ್ಯಾನಿಸು ಟ್ಯಾಗ್_RAISE	0x6
+#ವ್ಯಾಖ್ಯಾನಿಸು ಟ್ಯಾಗ್_THROW	0x7
+#ವ್ಯಾಖ್ಯಾನಿಸು ಟ್ಯಾಗ್_FATAL	0x8
+#ವ್ಯಾಖ್ಯಾನಿಸು ಟ್ಯಾಗ್_ಮುಖವಾಡ	0xf
 
-    switch (state)
+    ಆಯ್ಕೆ (state)
     {
-	case TAG_RETURN:
+	ಸ್ಥಿತಿ ಟ್ಯಾಗ್_RETURN:
 	    emsg(_(e_unexpected_return));
-	    break;
-	case TAG_NEXT:
-	    emsg(_(e_unexpected_next));
-	    break;
-	case TAG_BREAK:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ ಟ್ಯಾಗ್_ಮುಂದಿನ:
+	    emsg(_(e_unexpected_ಮುಂದಿನ));
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ ಟ್ಯಾಗ್_BREAK:
 	    emsg(_(e_unexpected_break));
-	    break;
-	case TAG_REDO:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ ಟ್ಯಾಗ್_REDO:
 	    emsg(_(e_unexpected_redo));
-	    break;
-	case TAG_RETRY:
-	    emsg(_(e_retry_outside_of_rescue_clause));
-	    break;
-	case TAG_RAISE:
-	case TAG_FATAL:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ ಟ್ಯಾಗ್_RETRY:
+	    emsg(_(e_retry_outside_ದ_rescue_clause));
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ ಟ್ಯಾಗ್_RAISE:
+	ಸ್ಥಿತಿ ಟ್ಯಾಗ್_FATAL:
 	    error = rb_errinfo();
-	    eclass = CLASS_OF(error);
+	    eclass = CLASS_ದ(error);
 	    einfo = rb_obj_as_string(error);
-	    if (eclass == rb_eRuntimeError && RSTRING_LEN(einfo) == 0)
+	    ಆದರೆ (eclass == rb_eRuntimeError && RSTRING_LEN(einfo) == 0)
 	    {
 		emsg(_(e_unhandled_exception));
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		VALUE epath;
-		char *p;
+		ಮೌಲ್ಯ_3 epath;
+		ಅಕ್ಷರ *p;
 
-		epath = rb_class_path(eclass);
+		epath = rb_class_ಮಾರ್ಗ(eclass);
 		vim_snprintf(buff, BUFSIZ, "%s: %s",
 			 RSTRING_PTR(epath), RSTRING_PTR(einfo));
 		p = strchr(buff, '\n');
-		if (p) *p = '\0';
+		ಆದರೆ (p) *p = '\0';
 		emsg(buff);
 	    }
 
 	    attr = syn_name2attr((char_u *)"Error");
-#if RUBY_VERSION >= 21
+#ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 21
 	    bt = rb_funcallv(error, rb_intern("backtrace"), 0, 0);
-	    for (i = 0; i < RARRAY_LEN(bt); i++)
-		msg_attr(RSTRING_PTR(RARRAY_AREF(bt, i)), attr);
-#else
+	    ಗಾಗಿ (i = 0; i < RARRAY_LEN(bt); i++)
+		ಸಂದೇಶ_attr(RSTRING_PTR(RARRAY_AREF(bt, i)), attr);
+#ಇಲ್ಲದಿದ್ದರೆ
 	    bt = rb_funcall2(error, rb_intern("backtrace"), 0, 0);
-	    for (i = 0; i < RARRAY_LEN(bt); i++)
-		msg_attr(RSTRING_PTR(RARRAY_PTR(bt)[i]), attr);
-#endif
-	    break;
-	default:
-	    vim_snprintf(buff, BUFSIZ, _(e_unknown_longjmp_status_nr), state);
+	    ಗಾಗಿ (i = 0; i < RARRAY_LEN(bt); i++)
+		ಸಂದೇಶ_attr(RSTRING_PTR(RARRAY_PTR(bt)[i]), attr);
+#ಆದರೆ_ಅಂತ್ಯ
+	    ನಿಲ್ಲಿಸು;
+	ಪೂರ್ವನಿಯೋಜಿತ:
+	    vim_snprintf(buff, BUFSIZ, _(e_unknown_longjmp_ಸ್ಥಿತಿ_nr), state);
 	    emsg(buff);
-	    break;
+	    ನಿಲ್ಲಿಸು;
     }
 }
 
-    static VALUE
-vim_message(VALUE self UNUSED, VALUE str)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+vim_ಸಂದೇಶ(ಮೌಲ್ಯ_3 self ಬಳಸದ, ಮೌಲ್ಯ_3 str)
 {
-    char *buff, *p;
+    ಅಕ್ಷರ *buff, *p;
 
     str = rb_obj_as_string(str);
-    if (RSTRING_LEN(str) > 0)
+    ಆದರೆ (RSTRING_LEN(str) > 0)
     {
 	// Only do this when the string isn't empty, alloc(0) causes trouble.
-	buff = ALLOCA_N(char, RSTRING_LEN(str) + 1);
+	buff = ALLOCA_N(ಅಕ್ಷರ, RSTRING_LEN(str) + 1);
 	strcpy(buff, RSTRING_PTR(str));
 	p = strchr(buff, '\n');
-	if (p) *p = '\0';
-	msg(buff);
+	ಆದರೆ (p) *p = '\0';
+	ಸಂದೇಶ(buff);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	msg("");
+	ಸಂದೇಶ("");
     }
-    return Qnil;
+    ಹಿಂತಿರುಗಿ Qnil;
 }
 
-    static VALUE
-vim_set_option(VALUE self UNUSED, VALUE str)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+vim_ಗಣ_option(ಮೌಲ್ಯ_3 self ಬಳಸದ, ಮೌಲ್ಯ_3 str)
 {
-    do_set((char_u *)StringValuePtr(str), 0);
+    do_ಗಣ((char_u *)String_ಮೌಲ್ಯ_Ptr(str), 0);
     update_screen(UPD_NOT_VALID);
-    return Qnil;
+    ಹಿಂತಿರುಗಿ Qnil;
 }
 
-    static VALUE
-vim_command(VALUE self UNUSED, VALUE str)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+vim_command(ಮೌಲ್ಯ_3 self ಬಳಸದ, ಮೌಲ್ಯ_3 str)
 {
-    do_cmdline_cmd((char_u *)StringValuePtr(str));
-    return Qnil;
+    do_cmdline_cmd((char_u *)String_ಮೌಲ್ಯ_Ptr(str));
+    ಹಿಂತಿರುಗಿ Qnil;
 }
 
-#ifdef FEAT_EVAL
-    static VALUE
-vim_to_ruby(typval_T *tv)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+vim_ಗಮ್ಯ_ruby(typval_T *tv)
 {
-    VALUE result = Qnil;
+    ಮೌಲ್ಯ_3 ಫಲಿತಾಂಶ = Qnil;
 
-    if (tv->v_type == VAR_STRING)
+    ಆದರೆ (tv->v_type == VAR_STRING)
     {
-	result = rb_str_new2(tv->vval.v_string == NULL
-					  ? "" : (char *)(tv->vval.v_string));
+	ಫಲಿತಾಂಶ = rb_str_new2(tv->vval.v_string == ಖಾಲಿ
+					  ? "" : (ಅಕ್ಷರ *)(tv->vval.v_string));
     }
-    else if (tv->v_type == VAR_NUMBER)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (tv->v_type == VAR_ಸಂಖ್ಯೆ)
     {
-	result = INT2NUM(tv->vval.v_number);
+	ಫಲಿತಾಂಶ = INT2_ಅಂಕೆ(tv->vval.v_ಸಂಖ್ಯೆ);
     }
-    else if (tv->v_type == VAR_FLOAT)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (tv->v_type == VAR_FLOAT)
     {
-	result = rb_float_new(tv->vval.v_float);
+	ಫಲಿತಾಂಶ = rb_float_new(tv->vval.v_float);
     }
-    else if (tv->v_type == VAR_LIST)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (tv->v_type == VAR_LIST)
     {
 	list_T      *list = tv->vval.v_list;
 	listitem_T  *curr;
 
-	result = rb_ary_new();
+	ಫಲಿತಾಂಶ = rb_ary_new();
 
-	if (list != NULL)
+	ಆದರೆ (list != ಖಾಲಿ)
 	{
-	    FOR_ALL_LIST_ITEMS(list, curr)
-		rb_ary_push(result, vim_to_ruby(&curr->li_tv));
+	    FOR_ALL_LIST_ವಸ್ತುಗಳು(list, curr)
+		rb_ary_ತಳ್ಳು(ಫಲಿತಾಂಶ, vim_ಗಮ್ಯ_ruby(&curr->li_tv));
 	}
     }
-    else if (tv->v_type == VAR_DICT)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (tv->v_type == VAR_DICT)
     {
-	result = rb_hash_new();
+	ಫಲಿತಾಂಶ = rb_hash_new();
 
-	if (tv->vval.v_dict != NULL)
+	ಆದರೆ (tv->vval.v_dict != ಖಾಲಿ)
 	{
 	    hashtab_T   *ht = &tv->vval.v_dict->dv_hashtab;
-	    long_u      todo = ht->ht_used;
+	    long_u      todo = ht->ht_ಬಳಸಿದ;
 	    hashitem_T  *hi;
 	    dictitem_T  *di;
 
-	    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+	    FOR_ALL_HASHTAB_ವಸ್ತುಗಳು(ht, hi, todo)
 	    {
-		if (!HASHITEM_EMPTY(hi))
+		ಆದರೆ (!HASHITEM_ಖಾಲಿಗಳು(hi))
 		{
 		    --todo;
 
 		    di = dict_lookup(hi);
-		    rb_hash_aset(result, rb_str_new2((char *)hi->hi_key),
-						     vim_to_ruby(&di->di_tv));
+		    rb_hash_aset(ಫಲಿತಾಂಶ, rb_str_new2((ಅಕ್ಷರ *)hi->hi_ಕೀಲಿ),
+						     vim_ಗಮ್ಯ_ruby(&di->di_tv));
 		}
 	    }
 	}
     }
-    else if (tv->v_type == VAR_BOOL || tv->v_type == VAR_SPECIAL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (tv->v_type == VAR_BOOL || tv->v_type == VAR_SPECIAL)
     {
-	if (tv->vval.v_number == VVAL_TRUE)
-	    result = Qtrue;
-	else if (tv->vval.v_number == VVAL_FALSE)
-	    result = Qfalse;
+	ಆದರೆ (tv->vval.v_ಸಂಖ್ಯೆ == VVAL_TRUE)
+	    ಫಲಿತಾಂಶ = Qtrue;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (tv->vval.v_ಸಂಖ್ಯೆ == VVAL_FALSE)
+	    ಫಲಿತಾಂಶ = Qfalse;
     }
-    else if (tv->v_type == VAR_BLOB)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (tv->v_type == VAR_BLOB)
     {
-	result = rb_str_new(tv->vval.v_blob->bv_ga.ga_data,
+	ಫಲಿತಾಂಶ = rb_str_new(tv->vval.v_blob->bv_ga.ga_ದತ್ತಾಂಶ,
 		tv->vval.v_blob->bv_ga.ga_len);
     }
     // else return Qnil;
 
-    return result;
+    ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    static VALUE
-vim_evaluate(VALUE self UNUSED, VALUE str)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+vim_evaluate(ಮೌಲ್ಯ_3 self ಬಳಸದ, ಮೌಲ್ಯ_3 str)
 {
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     typval_T    *tv;
-    VALUE       result;
+    ಮೌಲ್ಯ_3       ಫಲಿತಾಂಶ;
 
-    tv = eval_expr((char_u *)StringValuePtr(str), NULL);
-    if (tv == NULL)
-	return Qnil;
-    result = vim_to_ruby(tv);
+    tv = eval_ಅಭಿವ್ಯಕ್ತಿ((char_u *)String_ಮೌಲ್ಯ_Ptr(str), ಖಾಲಿ);
+    ಆದರೆ (tv == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ Qnil;
+    ಫಲಿತಾಂಶ = vim_ಗಮ್ಯ_ruby(tv);
 
     free_tv(tv);
 
-    return result;
-#else
-    return Qnil;
-#endif
+    ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಹಿಂತಿರುಗಿ Qnil;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#ifdef USE_TYPEDDATA
-static size_t buffer_dsize(const void *buf);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_TYPEDDATA
+ಸ್ಥಿರ size_t ಬಫರ್_dsize(ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *buf);
 
-static const rb_data_type_t buffer_type = {
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ rb_ದತ್ತಾಂಶ_type_t ಬಫರ್_type = {
     "vim_buffer",
-    {0, 0, buffer_dsize,
-# if RUBY_VERSION >= 27
+    {0, 0, ಬಫರ್_dsize,
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 27
 	0, {0}
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 	{0, 0}
 # endif
     },
@@ -1231,174 +1231,174 @@ static const rb_data_type_t buffer_type = {
 # endif
 };
 
-    static size_t
-buffer_dsize(const void *buf UNUSED)
+    ಸ್ಥಿರ size_t
+ಬಫರ್_dsize(ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *buf ಬಳಸದ)
 {
-    return sizeof(buf_T);
+    ಹಿಂತಿರುಗಿ ಗಾತ್ರ(buf_T);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    static VALUE
-buffer_new(buf_T *buf)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+ಬಫರ್_new(buf_T *buf)
 {
-    if (buf->b_ruby_ref)
+    ಆದರೆ (buf->b_ruby_ref)
     {
-	return (VALUE) buf->b_ruby_ref;
+	ಹಿಂತಿರುಗಿ (ಮೌಲ್ಯ_3) buf->b_ruby_ref;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-#ifdef USE_TYPEDDATA
-	VALUE obj = TypedData_Wrap_Struct(cBuffer, &buffer_type, buf);
-#else
-	VALUE obj = Data_Wrap_Struct(cBuffer, 0, 0, buf);
-#endif
-	buf->b_ruby_ref = (void *) obj;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_TYPEDDATA
+	ಮೌಲ್ಯ_3 obj = Typed_ದತ್ತಾಂಶ_Wrap_Struct(c_ಬಫರ್, &ಬಫರ್_type, buf);
+#ಇಲ್ಲದಿದ್ದರೆ
+	ಮೌಲ್ಯ_3 obj = ದತ್ತಾಂಶ_Wrap_Struct(c_ಬಫರ್, 0, 0, buf);
+#ಆದರೆ_ಅಂತ್ಯ
+	buf->b_ruby_ref = (ಶೂನ್ಯ *) obj;
 	rb_hash_aset(objtbl, rb_obj_id(obj), obj);
-	return obj;
+	ಹಿಂತಿರುಗಿ obj;
     }
 }
 
-    static buf_T *
-get_buf(VALUE obj)
+    ಸ್ಥಿರ buf_T *
+get_buf(ಮೌಲ್ಯ_3 obj)
 {
     buf_T *buf;
 
-#ifdef USE_TYPEDDATA
-    TypedData_Get_Struct(obj, buf_T, &buffer_type, buf);
-#else
-    Data_Get_Struct(obj, buf_T, buf);
-#endif
-    if (buf == NULL)
-	rb_raise(eDeletedBufferError, "attempt to refer to deleted buffer");
-    return buf;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_TYPEDDATA
+    Typed_ದತ್ತಾಂಶ_Get_Struct(obj, buf_T, &ಬಫರ್_type, buf);
+#ಇಲ್ಲದಿದ್ದರೆ
+    ದತ್ತಾಂಶ_Get_Struct(obj, buf_T, buf);
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (buf == ಖಾಲಿ)
+	rb_raise(e_Deleted_ಬಫರ್_Error, "attempt to refer to deleted buffer");
+    ಹಿಂತಿರುಗಿ buf;
 }
 
-    static VALUE
-vim_blob(VALUE self UNUSED, VALUE str)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+vim_blob(ಮೌಲ್ಯ_3 self ಬಳಸದ, ಮೌಲ್ಯ_3 str)
 {
-    VALUE result = rb_str_new("0z", 2);
-    char    buf[4];
-    int	i;
-    for (i = 0; i < RSTRING_LEN(str); i++)
+    ಮೌಲ್ಯ_3 ಫಲಿತಾಂಶ = rb_str_new("0z", 2);
+    ಅಕ್ಷರ    buf[4];
+    ಪೂರ್ಣಾಂಕ	i;
+    ಗಾಗಿ (i = 0; i < RSTRING_LEN(str); i++)
     {
-	sprintf(buf, "%02X", (unsigned char)(RSTRING_PTR(str)[i]));
-	rb_str_concat(result, rb_str_new2(buf));
+	sprintf(buf, "%02X", (ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ)(RSTRING_PTR(str)[i]));
+	rb_str_concat(ಫಲಿತಾಂಶ, rb_str_new2(buf));
     }
-    return result;
+    ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
 }
 
-    static VALUE
-buffer_s_current(VALUE self UNUSED)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+ಬಫರ್_s_current(ಮೌಲ್ಯ_3 self ಬಳಸದ)
 {
-    return buffer_new(curbuf);
+    ಹಿಂತಿರುಗಿ ಬಫರ್_new(curbuf);
 }
 
-    static VALUE
-buffer_s_current_getter(ID id UNUSED, VALUE *x UNUSED)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+ಬಫರ್_s_current_getter(ID id ಬಳಸದ, ಮೌಲ್ಯ_3 *x ಬಳಸದ)
 {
-    return buffer_new(curbuf);
+    ಹಿಂತಿರುಗಿ ಬಫರ್_new(curbuf);
 }
 
-    static VALUE
-buffer_s_count(VALUE self UNUSED)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+ಬಫರ್_s_ಎಣಿಕೆ(ಮೌಲ್ಯ_3 self ಬಳಸದ)
 {
     buf_T *b;
-    int n = 0;
+    ಪೂರ್ಣಾಂಕ n = 0;
 
     FOR_ALL_BUFFERS(b)
     {
 	//  Deleted buffers should not be counted
 	//    SegPhault - 01/07/05
-	if (b->b_p_bl)
+	ಆದರೆ (b->b_p_bl)
 	    n++;
     }
 
-    return INT2NUM(n);
+    ಹಿಂತಿರುಗಿ INT2_ಅಂಕೆ(n);
 }
 
-    static VALUE
-buffer_s_aref(VALUE self UNUSED, VALUE num)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+ಬಫರ್_s_aref(ಮೌಲ್ಯ_3 self ಬಳಸದ, ಮೌಲ್ಯ_3 ಅಂಕೆ)
 {
     buf_T *b;
-    int n = NUM2INT(num);
+    ಪೂರ್ಣಾಂಕ n = NUM2INT(ಅಂಕೆ);
 
     FOR_ALL_BUFFERS(b)
     {
 	//  Deleted buffers should not be counted
 	//    SegPhault - 01/07/05
-	if (!b->b_p_bl)
-	    continue;
+	ಆದರೆ (!b->b_p_bl)
+	    ಮುಂದುವರಿ;
 
-	if (n == 0)
-	    return buffer_new(b);
+	ಆದರೆ (n == 0)
+	    ಹಿಂತಿರುಗಿ ಬಫರ್_new(b);
 
 	n--;
     }
-    return Qnil;
+    ಹಿಂತಿರುಗಿ Qnil;
 }
 
-    static VALUE
-buffer_name(VALUE self)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+ಬಫರ್_name(ಮೌಲ್ಯ_3 self)
 {
     buf_T *buf = get_buf(self);
 
-    return buf->b_ffname ? rb_str_new2((char *)buf->b_ffname) : Qnil;
+    ಹಿಂತಿರುಗಿ buf->b_ffname ? rb_str_new2((ಅಕ್ಷರ *)buf->b_ffname) : Qnil;
 }
 
-    static VALUE
-buffer_number(VALUE self)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+ಬಫರ್_ಸಂಖ್ಯೆ(ಮೌಲ್ಯ_3 self)
 {
     buf_T *buf = get_buf(self);
 
-    return INT2NUM(buf->b_fnum);
+    ಹಿಂತಿರುಗಿ INT2_ಅಂಕೆ(buf->b_fnum);
 }
 
-    static VALUE
-buffer_count(VALUE self)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+ಬಫರ್_ಎಣಿಕೆ(ಮೌಲ್ಯ_3 self)
 {
     buf_T *buf = get_buf(self);
 
-    return INT2NUM(buf->b_ml.ml_line_count);
+    ಹಿಂತಿರುಗಿ INT2_ಅಂಕೆ(buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ);
 }
 
-    static VALUE
-get_buffer_line(buf_T *buf, linenr_T n)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+get_ಬಫರ್_ಸಾಲು(buf_T *buf, linenr_T n)
 {
-    if (n <= 0 || n > buf->b_ml.ml_line_count)
-	rb_raise(rb_eIndexError, "line number %ld out of range", (long)n);
-    return vim_str2rb_enc_str((char *)ml_get_buf(buf, n, FALSE));
+    ಆದರೆ (n <= 0 || n > buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
+	rb_raise(rb_e_ಸೂಚ್ಯಂಕ_Error, "line number %ld out of range", (ದೀರ್ಘ)n);
+    ಹಿಂತಿರುಗಿ vim_str2rb_enc_str((ಅಕ್ಷರ *)ml_get_buf(buf, n, FALSE));
 }
 
-    static VALUE
-buffer_aref(VALUE self, VALUE num)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+ಬಫರ್_aref(ಮೌಲ್ಯ_3 self, ಮೌಲ್ಯ_3 ಅಂಕೆ)
 {
     buf_T *buf = get_buf(self);
 
-    if (buf != NULL)
-	return get_buffer_line(buf, (linenr_T)NUM2LONG(num));
-    return Qnil; // For stop warning
+    ಆದರೆ (buf != ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ get_ಬಫರ್_ಸಾಲು(buf, (linenr_T)NUM2LONG(ಅಂಕೆ));
+    ಹಿಂತಿರುಗಿ Qnil; // For stop warning
 }
 
-    static VALUE
-set_buffer_line(buf_T *buf, linenr_T n, VALUE str)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+ಗಣ_ಬಫರ್_ಸಾಲು(buf_T *buf, linenr_T n, ಮೌಲ್ಯ_3 str)
 {
-    char	*line = StringValuePtr(str);
+    ಅಕ್ಷರ	*ಸಾಲು = String_ಮೌಲ್ಯ_Ptr(str);
     aco_save_T	aco;
 
-    if (n > 0 && n <= buf->b_ml.ml_line_count && line != NULL)
+    ಆದರೆ (n > 0 && n <= buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ && ಸಾಲು != ಖಾಲಿ)
     {
 	// Set curwin/curbuf for "buf" and save some things.
 	aucmd_prepbuf(&aco, buf);
-	if (curbuf == buf)
+	ಆದರೆ (curbuf == buf)
 	{
 	    // Only when it worked to set "curbuf".
-	    if (u_savesub(n) == OK)
+	    ಆದರೆ (u_savesub(n) == OK)
 	    {
-		ml_replace(n, (char_u *)line, TRUE);
-		changed();
-#ifdef SYNTAX_HL
-		syn_changed(n); // recompute syntax hl. for this line
-#endif
+		ml_replace(n, (char_u *)ಸಾಲು, TRUE);
+		ಬದಲಾಯಿತು();
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SYNTAX_HL
+		syn_ಬದಲಾಯಿತು(n); // recompute syntax hl. for this line
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
 
 	    // restore curwin/curbuf and a few other things
@@ -1408,46 +1408,46 @@ set_buffer_line(buf_T *buf, linenr_T n, VALUE str)
 
 	update_curbuf(UPD_NOT_VALID);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	rb_raise(rb_eIndexError, "line number %ld out of range", (long)n);
+	rb_raise(rb_e_ಸೂಚ್ಯಂಕ_Error, "line number %ld out of range", (ದೀರ್ಘ)n);
     }
-    return str;
+    ಹಿಂತಿರುಗಿ str;
 }
 
-    static VALUE
-buffer_aset(VALUE self, VALUE num, VALUE str)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+ಬಫರ್_aset(ಮೌಲ್ಯ_3 self, ಮೌಲ್ಯ_3 ಅಂಕೆ, ಮೌಲ್ಯ_3 str)
 {
     buf_T *buf = get_buf(self);
 
-    if (buf != NULL)
-	return set_buffer_line(buf, (linenr_T)NUM2LONG(num), str);
-    return str;
+    ಆದರೆ (buf != ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಗಣ_ಬಫರ್_ಸಾಲು(buf, (linenr_T)NUM2LONG(ಅಂಕೆ), str);
+    ಹಿಂತಿರುಗಿ str;
 }
 
-    static VALUE
-buffer_delete(VALUE self, VALUE num)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+ಬಫರ್_delete(ಮೌಲ್ಯ_3 self, ಮೌಲ್ಯ_3 ಅಂಕೆ)
 {
     buf_T	*buf = get_buf(self);
-    long	n = NUM2LONG(num);
+    ದೀರ್ಘ	n = NUM2LONG(ಅಂಕೆ);
     aco_save_T	aco;
 
-    if (n > 0 && n <= buf->b_ml.ml_line_count)
+    ಆದರೆ (n > 0 && n <= buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
     {
 	// Set curwin/curbuf for "buf" and save some things.
 	aucmd_prepbuf(&aco, buf);
-	if (curbuf == buf)
+	ಆದರೆ (curbuf == buf)
 	{
 	    // Only when it worked to set "curbuf".
-	    if (u_savedel(n, 1) == OK)
+	    ಆದರೆ (u_savedel(n, 1) == OK)
 	    {
 		ml_delete(n);
 
 		// Changes to non-active buffers should properly refresh
 		//   SegPhault - 01/09/05
-		deleted_lines_mark(n, 1L);
+		deleted_ಸಾಲುಗಳು_mark(n, 1L);
 
-		changed();
+		ಬದಲಾಯಿತು();
 	    }
 
 	    // restore curwin/curbuf and a few other things
@@ -1457,41 +1457,41 @@ buffer_delete(VALUE self, VALUE num)
 
 	update_curbuf(UPD_NOT_VALID);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	rb_raise(rb_eIndexError, "line number %ld out of range", n);
+	rb_raise(rb_e_ಸೂಚ್ಯಂಕ_Error, "line number %ld out of range", n);
     }
-    return Qnil;
+    ಹಿಂತಿರುಗಿ Qnil;
 }
 
-    static VALUE
-buffer_append(VALUE self, VALUE num, VALUE str)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+ಬಫರ್_append(ಮೌಲ್ಯ_3 self, ಮೌಲ್ಯ_3 ಅಂಕೆ, ಮೌಲ್ಯ_3 str)
 {
     buf_T	*buf = get_buf(self);
-    char	*line = StringValuePtr(str);
-    long	n = NUM2LONG(num);
+    ಅಕ್ಷರ	*ಸಾಲು = String_ಮೌಲ್ಯ_Ptr(str);
+    ದೀರ್ಘ	n = NUM2LONG(ಅಂಕೆ);
     aco_save_T	aco;
 
-    if (line == NULL)
+    ಆದರೆ (ಸಾಲು == ಖಾಲಿ)
     {
-	rb_raise(rb_eIndexError, "NULL line");
+	rb_raise(rb_e_ಸೂಚ್ಯಂಕ_Error, "NULL line");
     }
-    else if (n >= 0 && n <= buf->b_ml.ml_line_count)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (n >= 0 && n <= buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
     {
 	// set curwin/curbuf for "buf" and save some things
 	aucmd_prepbuf(&aco, buf);
-	if (curbuf == buf)
+	ಆದರೆ (curbuf == buf)
 	{
 	    // Only when it worked to set "curbuf".
-	    if (u_inssub(n + 1) == OK)
+	    ಆದರೆ (u_inssub(n + 1) == OK)
 	    {
-		ml_append(n, (char_u *) line, (colnr_T) 0, FALSE);
+		ml_append(n, (char_u *) ಸಾಲು, (colnr_T) 0, FALSE);
 
 		//  Changes to non-active buffers should properly refresh screen
 		//    SegPhault - 12/20/04
-		appended_lines_mark(n, 1L);
+		appended_ಸಾಲುಗಳು_mark(n, 1L);
 
-		changed();
+		ಬದಲಾಯಿತು();
 	    }
 
 	    // restore curwin/curbuf and a few other things
@@ -1501,22 +1501,22 @@ buffer_append(VALUE self, VALUE num, VALUE str)
 
 	update_curbuf(UPD_NOT_VALID);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	rb_raise(rb_eIndexError, "line number %ld out of range", n);
+	rb_raise(rb_e_ಸೂಚ್ಯಂಕ_Error, "line number %ld out of range", n);
     }
-    return str;
+    ಹಿಂತಿರುಗಿ str;
 }
 
-#ifdef USE_TYPEDDATA
-static size_t window_dsize(const void *buf);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_TYPEDDATA
+ಸ್ಥಿರ size_t ಕಿಟಕಿ_dsize(ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *buf);
 
-static const rb_data_type_t window_type = {
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ rb_ದತ್ತಾಂಶ_type_t ಕಿಟಕಿ_type = {
     "vim_window",
-    {0, 0, window_dsize,
-# if RUBY_VERSION >= 27
+    {0, 0, ಕಿಟಕಿ_dsize,
+# ಆದರೆ RUBY_ಆವೃತ್ತಿ >= 27
 	0, {0}
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 	{0, 0}
 # endif
     },
@@ -1526,224 +1526,224 @@ static const rb_data_type_t window_type = {
 # endif
 };
 
-    static size_t
-window_dsize(const void *win UNUSED)
+    ಸ್ಥಿರ size_t
+ಕಿಟಕಿ_dsize(ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *win ಬಳಸದ)
 {
-    return sizeof(win_T);
+    ಹಿಂತಿರುಗಿ ಗಾತ್ರ(win_T);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    static VALUE
-window_new(win_T *win)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+ಕಿಟಕಿ_new(win_T *win)
 {
-    if (win->w_ruby_ref)
+    ಆದರೆ (win->w_ruby_ref)
     {
-	return (VALUE) win->w_ruby_ref;
+	ಹಿಂತಿರುಗಿ (ಮೌಲ್ಯ_3) win->w_ruby_ref;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-#ifdef USE_TYPEDDATA
-	VALUE obj = TypedData_Wrap_Struct(cVimWindow, &window_type, win);
-#else
-	VALUE obj = Data_Wrap_Struct(cVimWindow, 0, 0, win);
-#endif
-	win->w_ruby_ref = (void *) obj;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_TYPEDDATA
+	ಮೌಲ್ಯ_3 obj = Typed_ದತ್ತಾಂಶ_Wrap_Struct(c_Vim_ಕಿಟಕಿ, &ಕಿಟಕಿ_type, win);
+#ಇಲ್ಲದಿದ್ದರೆ
+	ಮೌಲ್ಯ_3 obj = ದತ್ತಾಂಶ_Wrap_Struct(c_Vim_ಕಿಟಕಿ, 0, 0, win);
+#ಆದರೆ_ಅಂತ್ಯ
+	win->w_ruby_ref = (ಶೂನ್ಯ *) obj;
 	rb_hash_aset(objtbl, rb_obj_id(obj), obj);
-	return obj;
+	ಹಿಂತಿರುಗಿ obj;
     }
 }
 
-    static win_T *
-get_win(VALUE obj)
+    ಸ್ಥಿರ win_T *
+get_win(ಮೌಲ್ಯ_3 obj)
 {
     win_T *win;
 
-#ifdef USE_TYPEDDATA
-    TypedData_Get_Struct(obj, win_T, &window_type, win);
-#else
-    Data_Get_Struct(obj, win_T, win);
-#endif
-    if (win == NULL)
-	rb_raise(eDeletedWindowError, "attempt to refer to deleted window");
-    return win;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_TYPEDDATA
+    Typed_ದತ್ತಾಂಶ_Get_Struct(obj, win_T, &ಕಿಟಕಿ_type, win);
+#ಇಲ್ಲದಿದ್ದರೆ
+    ದತ್ತಾಂಶ_Get_Struct(obj, win_T, win);
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (win == ಖಾಲಿ)
+	rb_raise(e_Deleted_ಕಿಟಕಿ_Error, "attempt to refer to deleted window");
+    ಹಿಂತಿರುಗಿ win;
 }
 
-    static VALUE
-window_s_current(VALUE self UNUSED)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+ಕಿಟಕಿ_s_current(ಮೌಲ್ಯ_3 self ಬಳಸದ)
 {
-    return window_new(curwin);
+    ಹಿಂತಿರುಗಿ ಕಿಟಕಿ_new(curwin);
 }
 
-    static VALUE
-window_s_current_getter(ID id UNUSED, VALUE *x UNUSED)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+ಕಿಟಕಿ_s_current_getter(ID id ಬಳಸದ, ಮೌಲ್ಯ_3 *x ಬಳಸದ)
 {
-    return window_new(curwin);
+    ಹಿಂತಿರುಗಿ ಕಿಟಕಿ_new(curwin);
 }
 
 /*
  * Added line manipulation functions
  *    SegPhault - 03/07/05
  */
-    static VALUE
-line_s_current(VALUE self UNUSED)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+ಸಾಲು_s_current(ಮೌಲ್ಯ_3 self ಬಳಸದ)
 {
-    return get_buffer_line(curbuf, curwin->w_cursor.lnum);
+    ಹಿಂತಿರುಗಿ get_ಬಫರ್_ಸಾಲು(curbuf, curwin->w_cursor.lnum);
 }
 
-    static VALUE
-set_current_line(VALUE self UNUSED, VALUE str)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+ಗಣ_current_ಸಾಲು(ಮೌಲ್ಯ_3 self ಬಳಸದ, ಮೌಲ್ಯ_3 str)
 {
-    return set_buffer_line(curbuf, curwin->w_cursor.lnum, str);
+    ಹಿಂತಿರುಗಿ ಗಣ_ಬಫರ್_ಸಾಲು(curbuf, curwin->w_cursor.lnum, str);
 }
 
-    static VALUE
-current_line_number(VALUE self UNUSED)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+current_ಸಾಲು_ಸಂಖ್ಯೆ(ಮೌಲ್ಯ_3 self ಬಳಸದ)
 {
-    return INT2FIX((int)curwin->w_cursor.lnum);
+    ಹಿಂತಿರುಗಿ INT2FIX((ಪೂರ್ಣಾಂಕ)curwin->w_cursor.lnum);
 }
 
-    static VALUE
-window_s_count(VALUE self UNUSED)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+ಕಿಟಕಿ_s_ಎಣಿಕೆ(ಮೌಲ್ಯ_3 self ಬಳಸದ)
 {
     win_T	*w;
-    int n = 0;
+    ಪೂರ್ಣಾಂಕ n = 0;
 
     FOR_ALL_WINDOWS(w)
 	n++;
-    return INT2NUM(n);
+    ಹಿಂತಿರುಗಿ INT2_ಅಂಕೆ(n);
 }
 
-    static VALUE
-window_s_aref(VALUE self UNUSED, VALUE num)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+ಕಿಟಕಿ_s_aref(ಮೌಲ್ಯ_3 self ಬಳಸದ, ಮೌಲ್ಯ_3 ಅಂಕೆ)
 {
     win_T *w;
-    int n = NUM2INT(num);
+    ಪೂರ್ಣಾಂಕ n = NUM2INT(ಅಂಕೆ);
 
-    for (w = firstwin; w != NULL; w = w->w_next, --n)
-	if (n == 0)
-	    return window_new(w);
-    return Qnil;
+    ಗಾಗಿ (w = firstwin; w != ಖಾಲಿ; w = w->w_ಮುಂದಿನ, --n)
+	ಆದರೆ (n == 0)
+	    ಹಿಂತಿರುಗಿ ಕಿಟಕಿ_new(w);
+    ಹಿಂತಿರುಗಿ Qnil;
 }
 
-    static VALUE
-window_buffer(VALUE self)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+ಕಿಟಕಿ_ಬಫರ್(ಮೌಲ್ಯ_3 self)
 {
     win_T *win = get_win(self);
 
-    return buffer_new(win->w_buffer);
+    ಹಿಂತಿರುಗಿ ಬಫರ್_new(win->w_ಬಫರ್);
 }
 
-    static VALUE
-window_height(VALUE self)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+ಕಿಟಕಿ_ಎತ್ತರ(ಮೌಲ್ಯ_3 self)
 {
     win_T *win = get_win(self);
 
-    return INT2NUM(win->w_height);
+    ಹಿಂತಿರುಗಿ INT2_ಅಂಕೆ(win->w_ಎತ್ತರ);
 }
 
-    static VALUE
-window_set_height(VALUE self, VALUE height)
-{
-    win_T *win = get_win(self);
-    win_T *savewin = curwin;
-
-    curwin = win;
-    win_setheight(NUM2INT(height));
-    curwin = savewin;
-    return height;
-}
-
-    static VALUE
-window_width(VALUE self UNUSED)
-{
-    return INT2NUM(get_win(self)->w_width);
-}
-
-    static VALUE
-window_set_width(VALUE self UNUSED, VALUE width)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+ಕಿಟಕಿ_ಗಣ_ಎತ್ತರ(ಮೌಲ್ಯ_3 self, ಮೌಲ್ಯ_3 ಎತ್ತರ)
 {
     win_T *win = get_win(self);
     win_T *savewin = curwin;
 
     curwin = win;
-    win_setwidth(NUM2INT(width));
+    win_setheight(NUM2INT(ಎತ್ತರ));
     curwin = savewin;
-    return width;
+    ಹಿಂತಿರುಗಿ ಎತ್ತರ;
 }
 
-    static VALUE
-window_cursor(VALUE self)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+ಕಿಟಕಿ_ಅಗಲ(ಮೌಲ್ಯ_3 self ಬಳಸದ)
+{
+    ಹಿಂತಿರುಗಿ INT2_ಅಂಕೆ(get_win(self)->w_ಅಗಲ);
+}
+
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+ಕಿಟಕಿ_ಗಣ_ಅಗಲ(ಮೌಲ್ಯ_3 self ಬಳಸದ, ಮೌಲ್ಯ_3 ಅಗಲ)
+{
+    win_T *win = get_win(self);
+    win_T *savewin = curwin;
+
+    curwin = win;
+    win_setwidth(NUM2INT(ಅಗಲ));
+    curwin = savewin;
+    ಹಿಂತಿರುಗಿ ಅಗಲ;
+}
+
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+ಕಿಟಕಿ_cursor(ಮೌಲ್ಯ_3 self)
 {
     win_T *win = get_win(self);
 
-    return rb_assoc_new(INT2NUM(win->w_cursor.lnum), INT2NUM(win->w_cursor.col));
+    ಹಿಂತಿರುಗಿ rb_assoc_new(INT2_ಅಂಕೆ(win->w_cursor.lnum), INT2_ಅಂಕೆ(win->w_cursor.ಲಂಬಸಾಲು));
 }
 
-    static VALUE
-window_set_cursor(VALUE self, VALUE pos)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+ಕಿಟಕಿ_ಗಣ_cursor(ಮೌಲ್ಯ_3 self, ಮೌಲ್ಯ_3 pos)
 {
-    VALUE lnum, col;
+    ಮೌಲ್ಯ_3 lnum, ಲಂಬಸಾಲು;
     win_T *win = get_win(self);
 
     Check_Type(pos, T_ARRAY);
-    if (RARRAY_LEN(pos) != 2)
+    ಆದರೆ (RARRAY_LEN(pos) != 2)
 	rb_raise(rb_eArgError, "array length must be 2");
     lnum = RARRAY_PTR(pos)[0];
-    col = RARRAY_PTR(pos)[1];
+    ಲಂಬಸಾಲು = RARRAY_PTR(pos)[1];
     win->w_cursor.lnum = NUM2LONG(lnum);
-    win->w_cursor.col = NUM2UINT(col);
-    win->w_set_curswant = true;
+    win->w_cursor.ಲಂಬಸಾಲು = NUM2UINT(ಲಂಬಸಾಲು);
+    win->w_ಗಣ_curswant = true;
     check_cursor();		    // put cursor on an existing line
     update_screen(UPD_NOT_VALID);
-    return Qnil;
+    ಹಿಂತಿರುಗಿ Qnil;
 }
 
-    static VALUE
-f_nop(VALUE self UNUSED)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+f_nop(ಮೌಲ್ಯ_3 self ಬಳಸದ)
 {
-    return Qnil;
+    ಹಿಂತಿರುಗಿ Qnil;
 }
 
-    static VALUE
-f_p(int argc, VALUE *argv, VALUE self UNUSED)
+    ಸ್ಥಿರ ಮೌಲ್ಯ_3
+f_p(ಪೂರ್ಣಾಂಕ argc, ಮೌಲ್ಯ_3 *argv, ಮೌಲ್ಯ_3 self ಬಳಸದ)
 {
-    int i;
-    VALUE str = rb_str_new("", 0);
-    VALUE ret = Qnil;
+    ಪೂರ್ಣಾಂಕ i;
+    ಮೌಲ್ಯ_3 str = rb_str_new("", 0);
+    ಮೌಲ್ಯ_3 ret = Qnil;
 
-    for (i = 0; i < argc; i++)
+    ಗಾಗಿ (i = 0; i < argc; i++)
     {
-	if (i > 0) rb_str_cat(str, ", ", 2);
+	ಆದರೆ (i > 0) rb_str_cat(str, ", ", 2);
 	rb_str_concat(str, rb_inspect(argv[i]));
     }
-    msg(RSTRING_PTR(str));
+    ಸಂದೇಶ(RSTRING_PTR(str));
 
-    if (argc == 1)
+    ಆದರೆ (argc == 1)
 	ret = argv[0];
-    else if (argc > 1)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argc > 1)
 	ret = rb_ary_new4(argc, argv);
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-    static void
-ruby_io_init(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ruby_io_init(ಶೂನ್ಯ)
 {
-#ifndef DYNAMIC_RUBY
-    RUBYEXTERN VALUE rb_stdout;
-    RUBYEXTERN VALUE rb_stderr;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ DYNAMIC_RUBY
+    RUBYEXTERN ಮೌಲ್ಯ_3 rb_stdout;
+    RUBYEXTERN ಮೌಲ್ಯ_3 rb_stderr;
+#ಆದರೆ_ಅಂತ್ಯ
 
     rb_stdout = rb_obj_alloc(rb_cObject);
     rb_stderr = rb_obj_alloc(rb_cObject);
-    rb_define_singleton_method(rb_stdout, "write", (void*)vim_message, 1);
-    rb_define_singleton_method(rb_stdout, "flush", (void*)f_nop, 0);
-    rb_define_singleton_method(rb_stderr, "write", (void*)vim_message, 1);
-    rb_define_singleton_method(rb_stderr, "flush", (void*)f_nop, 0);
+    rb_define_singleton_ವಿಧಾನ(rb_stdout, "write", (ಶೂನ್ಯ*)vim_ಸಂದೇಶ, 1);
+    rb_define_singleton_ವಿಧಾನ(rb_stdout, "flush", (ಶೂನ್ಯ*)f_nop, 0);
+    rb_define_singleton_ವಿಧಾನ(rb_stderr, "write", (ಶೂನ್ಯ*)vim_ಸಂದೇಶ, 1);
+    rb_define_singleton_ವಿಧಾನ(rb_stderr, "flush", (ಶೂನ್ಯ*)f_nop, 0);
     rb_define_global_function("p", f_p, -1);
 }
 
-    static void
-ruby_vim_init(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ruby_vim_init(ಶೂನ್ಯ)
 {
     objtbl = rb_hash_new();
     rb_global_variable(&objtbl);
@@ -1752,139 +1752,139 @@ ruby_vim_init(void)
     // alias "VIM" for backwards compatibility.
     mVIM = rb_define_module("Vim");
     rb_define_const(rb_cObject, "VIM", mVIM);
-    rb_define_const(mVIM, "VERSION_MAJOR", INT2NUM(VIM_VERSION_MAJOR));
-    rb_define_const(mVIM, "VERSION_MINOR", INT2NUM(VIM_VERSION_MINOR));
-    rb_define_const(mVIM, "VERSION_BUILD", INT2NUM(VIM_VERSION_BUILD));
-    rb_define_const(mVIM, "VERSION_PATCHLEVEL", INT2NUM(VIM_VERSION_PATCHLEVEL));
-    rb_define_const(mVIM, "VERSION_SHORT", rb_str_new2(VIM_VERSION_SHORT));
-    rb_define_const(mVIM, "VERSION_MEDIUM", rb_str_new2(VIM_VERSION_MEDIUM));
-    rb_define_const(mVIM, "VERSION_LONG", rb_str_new2(VIM_VERSION_LONG));
-    rb_define_const(mVIM, "VERSION_LONG_DATE", rb_str_new2(VIM_VERSION_LONG_DATE));
-    rb_define_module_function(mVIM, "message", vim_message, 1);
-    rb_define_module_function(mVIM, "set_option", vim_set_option, 1);
+    rb_define_const(mVIM, "VERSION_MAJOR", INT2_ಅಂಕೆ(VIM_ಆವೃತ್ತಿ_MAJOR));
+    rb_define_const(mVIM, "VERSION_MINOR", INT2_ಅಂಕೆ(VIM_ಆವೃತ್ತಿ_MINOR));
+    rb_define_const(mVIM, "VERSION_BUILD", INT2_ಅಂಕೆ(VIM_ಆವೃತ್ತಿ_BUILD));
+    rb_define_const(mVIM, "VERSION_PATCHLEVEL", INT2_ಅಂಕೆ(VIM_ಆವೃತ್ತಿ_PATCHLEVEL));
+    rb_define_const(mVIM, "VERSION_SHORT", rb_str_new2(VIM_ಆವೃತ್ತಿ_SHORT));
+    rb_define_const(mVIM, "VERSION_MEDIUM", rb_str_new2(VIM_ಆವೃತ್ತಿ_MEDIUM));
+    rb_define_const(mVIM, "VERSION_LONG", rb_str_new2(VIM_ಆವೃತ್ತಿ_LONG));
+    rb_define_const(mVIM, "VERSION_LONG_DATE", rb_str_new2(VIM_ಆವೃತ್ತಿ_LONG_DATE));
+    rb_define_module_function(mVIM, "message", vim_ಸಂದೇಶ, 1);
+    rb_define_module_function(mVIM, "set_option", vim_ಗಣ_option, 1);
     rb_define_module_function(mVIM, "command", vim_command, 1);
     rb_define_module_function(mVIM, "evaluate", vim_evaluate, 1);
     rb_define_module_function(mVIM, "blob", vim_blob, 1);
 
-    eDeletedBufferError = rb_define_class_under(mVIM, "DeletedBufferError",
+    e_Deleted_ಬಫರ್_Error = rb_define_class_under(mVIM, "DeletedBufferError",
 						rb_eStandardError);
-    eDeletedWindowError = rb_define_class_under(mVIM, "DeletedWindowError",
+    e_Deleted_ಕಿಟಕಿ_Error = rb_define_class_under(mVIM, "DeletedWindowError",
 						rb_eStandardError);
 
-    cBuffer = rb_define_class_under(mVIM, "Buffer", rb_cObject);
-    rb_define_singleton_method(cBuffer, "current", (void*)buffer_s_current, 0);
-    rb_define_singleton_method(cBuffer, "count", (void*)buffer_s_count, 0);
-    rb_define_singleton_method(cBuffer, "[]", (void*)buffer_s_aref, 1);
-    rb_define_method(cBuffer, "name", (void*)buffer_name, 0);
-    rb_define_method(cBuffer, "number", (void*)buffer_number, 0);
-    rb_define_method(cBuffer, "count", (void*)buffer_count, 0);
-    rb_define_method(cBuffer, "length", (void*)buffer_count, 0);
-    rb_define_method(cBuffer, "[]", (void*)buffer_aref, 1);
-    rb_define_method(cBuffer, "[]=", (void*)buffer_aset, 2);
-    rb_define_method(cBuffer, "delete", (void*)buffer_delete, 1);
-    rb_define_method(cBuffer, "append", (void*)buffer_append, 2);
+    c_ಬಫರ್ = rb_define_class_under(mVIM, "Buffer", rb_cObject);
+    rb_define_singleton_ವಿಧಾನ(c_ಬಫರ್, "current", (ಶೂನ್ಯ*)ಬಫರ್_s_current, 0);
+    rb_define_singleton_ವಿಧಾನ(c_ಬಫರ್, "count", (ಶೂನ್ಯ*)ಬಫರ್_s_ಎಣಿಕೆ, 0);
+    rb_define_singleton_ವಿಧಾನ(c_ಬಫರ್, "[]", (ಶೂನ್ಯ*)ಬಫರ್_s_aref, 1);
+    rb_define_ವಿಧಾನ(c_ಬಫರ್, "name", (ಶೂನ್ಯ*)ಬಫರ್_name, 0);
+    rb_define_ವಿಧಾನ(c_ಬಫರ್, "number", (ಶೂನ್ಯ*)ಬಫರ್_ಸಂಖ್ಯೆ, 0);
+    rb_define_ವಿಧಾನ(c_ಬಫರ್, "count", (ಶೂನ್ಯ*)ಬಫರ್_ಎಣಿಕೆ, 0);
+    rb_define_ವಿಧಾನ(c_ಬಫರ್, "length", (ಶೂನ್ಯ*)ಬಫರ್_ಎಣಿಕೆ, 0);
+    rb_define_ವಿಧಾನ(c_ಬಫರ್, "[]", (ಶೂನ್ಯ*)ಬಫರ್_aref, 1);
+    rb_define_ವಿಧಾನ(c_ಬಫರ್, "[]=", (ಶೂನ್ಯ*)ಬಫರ್_aset, 2);
+    rb_define_ವಿಧಾನ(c_ಬಫರ್, "delete", (ಶೂನ್ಯ*)ಬಫರ್_delete, 1);
+    rb_define_ವಿಧಾನ(c_ಬಫರ್, "append", (ಶೂನ್ಯ*)ಬಫರ್_append, 2);
 
     // Added line manipulation functions
     //   SegPhault - 03/07/05
-    rb_define_method(cBuffer, "line_number", (void*)current_line_number, 0);
-    rb_define_method(cBuffer, "line", (void*)line_s_current, 0);
-    rb_define_method(cBuffer, "line=", (void*)set_current_line, 1);
+    rb_define_ವಿಧಾನ(c_ಬಫರ್, "line_number", (ಶೂನ್ಯ*)current_ಸಾಲು_ಸಂಖ್ಯೆ, 0);
+    rb_define_ವಿಧಾನ(c_ಬಫರ್, "line", (ಶೂನ್ಯ*)ಸಾಲು_s_current, 0);
+    rb_define_ವಿಧಾನ(c_ಬಫರ್, "line=", (ಶೂನ್ಯ*)ಗಣ_current_ಸಾಲು, 1);
 
 
-    cVimWindow = rb_define_class_under(mVIM, "Window", rb_cObject);
-    rb_define_singleton_method(cVimWindow, "current", (void*)window_s_current, 0);
-    rb_define_singleton_method(cVimWindow, "count", (void*)window_s_count, 0);
-    rb_define_singleton_method(cVimWindow, "[]", (void*)window_s_aref, 1);
-    rb_define_method(cVimWindow, "buffer", (void*)window_buffer, 0);
-    rb_define_method(cVimWindow, "height", (void*)window_height, 0);
-    rb_define_method(cVimWindow, "height=", (void*)window_set_height, 1);
-    rb_define_method(cVimWindow, "width", (void*)window_width, 0);
-    rb_define_method(cVimWindow, "width=", (void*)window_set_width, 1);
-    rb_define_method(cVimWindow, "cursor", (void*)window_cursor, 0);
-    rb_define_method(cVimWindow, "cursor=", (void*)window_set_cursor, 1);
+    c_Vim_ಕಿಟಕಿ = rb_define_class_under(mVIM, "Window", rb_cObject);
+    rb_define_singleton_ವಿಧಾನ(c_Vim_ಕಿಟಕಿ, "current", (ಶೂನ್ಯ*)ಕಿಟಕಿ_s_current, 0);
+    rb_define_singleton_ವಿಧಾನ(c_Vim_ಕಿಟಕಿ, "count", (ಶೂನ್ಯ*)ಕಿಟಕಿ_s_ಎಣಿಕೆ, 0);
+    rb_define_singleton_ವಿಧಾನ(c_Vim_ಕಿಟಕಿ, "[]", (ಶೂನ್ಯ*)ಕಿಟಕಿ_s_aref, 1);
+    rb_define_ವಿಧಾನ(c_Vim_ಕಿಟಕಿ, "buffer", (ಶೂನ್ಯ*)ಕಿಟಕಿ_ಬಫರ್, 0);
+    rb_define_ವಿಧಾನ(c_Vim_ಕಿಟಕಿ, "height", (ಶೂನ್ಯ*)ಕಿಟಕಿ_ಎತ್ತರ, 0);
+    rb_define_ವಿಧಾನ(c_Vim_ಕಿಟಕಿ, "height=", (ಶೂನ್ಯ*)ಕಿಟಕಿ_ಗಣ_ಎತ್ತರ, 1);
+    rb_define_ವಿಧಾನ(c_Vim_ಕಿಟಕಿ, "width", (ಶೂನ್ಯ*)ಕಿಟಕಿ_ಅಗಲ, 0);
+    rb_define_ವಿಧಾನ(c_Vim_ಕಿಟಕಿ, "width=", (ಶೂನ್ಯ*)ಕಿಟಕಿ_ಗಣ_ಅಗಲ, 1);
+    rb_define_ವಿಧಾನ(c_Vim_ಕಿಟಕಿ, "cursor", (ಶೂನ್ಯ*)ಕಿಟಕಿ_cursor, 0);
+    rb_define_ವಿಧಾನ(c_Vim_ಕಿಟಕಿ, "cursor=", (ಶೂನ್ಯ*)ಕಿಟಕಿ_ಗಣ_cursor, 1);
 
-    rb_define_virtual_variable("$curbuf", buffer_s_current_getter, 0);
-    rb_define_virtual_variable("$curwin", window_s_current_getter, 0);
+    rb_define_virtual_variable("$curbuf", ಬಫರ್_s_current_getter, 0);
+    rb_define_virtual_variable("$curwin", ಕಿಟಕಿ_s_current_getter, 0);
 }
 
-    void
-vim_ruby_init(void *stack_start)
+    ಶೂನ್ಯ
+vim_ruby_init(ಶೂನ್ಯ *ರಾಶಿ_ಆರಂಭ)
 {
     // should get machine stack start address early in main function
-    ruby_stack_start = stack_start;
+    ruby_ರಾಶಿ_ಆರಂಭ = ರಾಶಿ_ಆರಂಭ;
 }
 
-    static int
-convert_hash2dict(VALUE key, VALUE val, VALUE arg)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+convert_hash2dict(ಮೌಲ್ಯ_3 ಕೀಲಿ, ಮೌಲ್ಯ_3 val, ಮೌಲ್ಯ_3 arg)
 {
     dict_T *d = (dict_T *)arg;
     dictitem_T *di;
 
-    di = dictitem_alloc((char_u *)RSTRING_PTR(rb_obj_as_string(key)));
-    if (di == NULL || ruby_convert_to_vim_value(val, &di->di_tv) != OK
-						     || dict_add(d, di) != OK)
+    di = dictitem_alloc((char_u *)RSTRING_PTR(rb_obj_as_string(ಕೀಲಿ)));
+    ಆದರೆ (di == ಖಾಲಿ || ruby_convert_ಗಮ್ಯ_vim_ಮೌಲ್ಯ(val, &di->di_tv) != OK
+						     || dict_ಕೂಡಿಸು(d, di) != OK)
     {
 	d->dv_hashtab.ht_flags |= HTFLAGS_ERROR;
-	return ST_STOP;
+	ಹಿಂತಿರುಗಿ ST_STOP;
     }
-    return ST_CONTINUE;
+    ಹಿಂತಿರುಗಿ ST_CONTINUE;
 }
 
-    static int
-ruby_convert_to_vim_value(VALUE val, typval_T *rettv)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ruby_convert_ಗಮ್ಯ_vim_ಮೌಲ್ಯ(ಮೌಲ್ಯ_3 val, typval_T *rettv)
 {
-    switch (TYPE(val))
+    ಆಯ್ಕೆ (TYPE(val))
     {
-	case T_NIL:
+	ಸ್ಥಿತಿ T_NIL:
 	    rettv->v_type = VAR_SPECIAL;
-	    rettv->vval.v_number = VVAL_NULL;
-	    break;
-	case T_TRUE:
+	    rettv->vval.v_ಸಂಖ್ಯೆ = VVAL_NULL;
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ T_TRUE:
 	    rettv->v_type = VAR_BOOL;
-	    rettv->vval.v_number = VVAL_TRUE;
-	    break;
-	case T_FALSE:
+	    rettv->vval.v_ಸಂಖ್ಯೆ = VVAL_TRUE;
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ T_FALSE:
 	    rettv->v_type = VAR_BOOL;
-	    rettv->vval.v_number = VVAL_FALSE;
-	    break;
-	case T_BIGNUM:
-	case T_FIXNUM:
-	    rettv->v_type = VAR_NUMBER;
-	    rettv->vval.v_number = (varnumber_T)NUM2LONG(val);
-	    break;
-	case T_FLOAT:
+	    rettv->vval.v_ಸಂಖ್ಯೆ = VVAL_FALSE;
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ T_BIGNUM:
+	ಸ್ಥಿತಿ T_FIXNUM:
+	    rettv->v_type = VAR_ಸಂಖ್ಯೆ;
+	    rettv->vval.v_ಸಂಖ್ಯೆ = (varnumber_T)NUM2LONG(val);
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ T_FLOAT:
 	    rettv->v_type = VAR_FLOAT;
 	    rettv->vval.v_float = (float_T)NUM2DBL(val);
-	    break;
-	default:
+	    ನಿಲ್ಲಿಸು;
+	ಪೂರ್ವನಿಯೋಜಿತ:
 	    val = rb_obj_as_string(val);
 	    // FALLTHROUGH
-	case T_STRING:
+	ಸ್ಥಿತಿ T_STRING:
 	    {
-		VALUE str = (VALUE)RSTRING(val);
+		ಮೌಲ್ಯ_3 str = (ಮೌಲ್ಯ_3)RSTRING(val);
 
 		rettv->v_type = VAR_STRING;
 		rettv->vval.v_string = vim_strnsave((char_u *)RSTRING_PTR(str),
 							     RSTRING_LEN(str));
 	    }
-	    break;
-	case T_ARRAY:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ T_ARRAY:
 	    {
 		list_T *l;
-		long i;
+		ದೀರ್ಘ i;
 		typval_T v;
 
 		l = list_alloc();
-		if (l == NULL)
-		    return FAIL;
+		ಆದರೆ (l == ಖಾಲಿ)
+		    ಹಿಂತಿರುಗಿ FAIL;
 
-		for (i = 0; i < RARRAY_LEN(val); ++i)
+		ಗಾಗಿ (i = 0; i < RARRAY_LEN(val); ++i)
 		{
-		    if (ruby_convert_to_vim_value((VALUE)RARRAY_PTR(val)[i],
+		    ಆದರೆ (ruby_convert_ಗಮ್ಯ_vim_ಮೌಲ್ಯ((ಮೌಲ್ಯ_3)RARRAY_PTR(val)[i],
 									&v) != OK)
 		    {
 			list_unref(l);
-			return FAIL;
+			ಹಿಂತಿರುಗಿ FAIL;
 		    }
 		    list_append_tv(l, &v);
 		    clear_tv(&v);
@@ -1894,50 +1894,50 @@ ruby_convert_to_vim_value(VALUE val, typval_T *rettv)
 		rettv->vval.v_list = l;
 		++l->lv_refcount;
 	    }
-	    break;
-	case T_HASH:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ T_HASH:
 	    {
 		dict_T *d;
 
 		d = dict_alloc();
-		if (d == NULL)
-		    return FAIL;
+		ಆದರೆ (d == ಖಾಲಿ)
+		    ಹಿಂತಿರುಗಿ FAIL;
 
-		rb_hash_foreach(val, convert_hash2dict, (VALUE)d);
-		if (d->dv_hashtab.ht_flags & HTFLAGS_ERROR)
+		rb_hash_foreach(val, convert_hash2dict, (ಮೌಲ್ಯ_3)d);
+		ಆದರೆ (d->dv_hashtab.ht_flags & HTFLAGS_ERROR)
 		{
 		    dict_unref(d);
-		    return FAIL;
+		    ಹಿಂತಿರುಗಿ FAIL;
 		}
 
 		rettv->v_type = VAR_DICT;
 		rettv->vval.v_dict = d;
 		++d->dv_refcount;
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-    void
+    ಶೂನ್ಯ
 do_rubyeval(char_u *str, typval_T *rettv)
 {
-    int retval = FAIL;
+    ಪೂರ್ಣಾಂಕ retval = FAIL;
 
-    if (ensure_ruby_initialized())
+    ಆದರೆ (ensure_ruby_initialized())
     {
-	int state;
-	VALUE obj;
+	ಪೂರ್ಣಾಂಕ state;
+	ಮೌಲ್ಯ_3 obj;
 
-	obj = rb_eval_string_protect((const char *)str, &state);
-	if (state)
+	obj = rb_eval_string_protect((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)str, &state);
+	ಆದರೆ (state)
 	    error_print(state);
-	else
-	    retval = ruby_convert_to_vim_value(obj, rettv);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    retval = ruby_convert_ಗಮ್ಯ_vim_ಮೌಲ್ಯ(obj, rettv);
     }
-    if (retval == FAIL)
+    ಆದರೆ (retval == FAIL)
     {
-	rettv->v_type = VAR_NUMBER;
-	rettv->vval.v_number = 0;
+	rettv->v_type = VAR_ಸಂಖ್ಯೆ;
+	rettv->vval.v_ಸಂಖ್ಯೆ = 0;
     }
 }

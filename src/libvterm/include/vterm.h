@@ -1,50 +1,50 @@
 /*
  * NOTE: This is a MODIFIED version of libvterm, see the README file.
  */
-#ifndef __VTERM_H__
-#define __VTERM_H__
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ __VTERM_H__
+#ವ್ಯಾಖ್ಯಾನಿಸು __VTERM_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ __cplusplus
+ಬಾಹ್ಯ "C" {
+#ಆದರೆ_ಅಂತ್ಯ
 
-#include <stdlib.h>
+#ಅನ್ತರ್ಭಾವ <stdlib.h>
 
-#include "vterm_keycodes.h"
+#ಅನ್ತರ್ಭಾವ "vterm_keycodes.h"
 
 // VIM: use TRUE and FALSE instead of true and false
-#define TRUE 1
-#define FALSE 0
+#ವ್ಯಾಖ್ಯಾನಿಸು TRUE 1
+#ವ್ಯಾಖ್ಯಾನಿಸು FALSE 0
 
 // VIM: from stdint.h
-typedef unsigned char		uint8_t;
-typedef unsigned short		uint16_t;
-typedef unsigned int		uint32_t;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ		uint8_t;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಚಿಹ್ನೆರಹಿತ ಗಿಡ್ಡ		uint16_t;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ		uint32_t;
 
 // VIM: define max screen cols and rows
-#define VTERM_MAX_COLS 1000
-#define VTERM_MAX_ROWS 1000
+#ವ್ಯಾಖ್ಯಾನಿಸು VTERM_MAX_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ 1000
+#ವ್ಯಾಖ್ಯಾನಿಸು VTERM_MAX_ಅಡ್ಡಸಾಲುಗಳು 1000
 
-#define VTERM_VERSION_MAJOR 0
-#define VTERM_VERSION_MINOR 3
-#define VTERM_VERSION_PATCH 3
+#ವ್ಯಾಖ್ಯಾನಿಸು VTERM_ಆವೃತ್ತಿ_MAJOR 0
+#ವ್ಯಾಖ್ಯಾನಿಸು VTERM_ಆವೃತ್ತಿ_MINOR 3
+#ವ್ಯಾಖ್ಯಾನಿಸು VTERM_ಆವೃತ್ತಿ_PATCH 3
 
-#define VTERM_CHECK_VERSION \
-        vterm_check_version(VTERM_VERSION_MAJOR, VTERM_VERSION_MINOR)
+#ವ್ಯಾಖ್ಯಾನಿಸು VTERM_CHECK_ಆವೃತ್ತಿ \
+        vterm_check_ಆವೃತ್ತಿ(VTERM_ಆವೃತ್ತಿ_MAJOR, VTERM_ಆವೃತ್ತಿ_MINOR)
 
 /* Any cell can contain at most one basic printing character and 5 combining
  * characters. This number could be changed but will be ABI-incompatible if
  * you do */
-#define VTERM_MAX_CHARS_PER_CELL 6
+#ವ್ಯಾಖ್ಯಾನಿಸು VTERM_MAX_CHARS_ಪ್ರತಿ_CELL 6
 
-typedef struct VTerm VTerm;
-typedef struct VTermState VTermState;
-typedef struct VTermScreen VTermScreen;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ VTerm VTerm;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ VTermState VTermState;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ VTermScreen VTermScreen;
 
 // Specifies a screen point.
-typedef struct {
-  int row;
-  int col;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+  ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು;
+  ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು;
 } VTermPos;
 
 /* some small utility functions; we can just keep these static here */
@@ -55,51 +55,51 @@ typedef struct {
  * Return  0  if "a" and "b" are equal
  * Return > 0 if "a" is after "b".
  */
-int vterm_pos_cmp(VTermPos a, VTermPos b);
+ಪೂರ್ಣಾಂಕ vterm_pos_cmp(VTermPos a, VTermPos b);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE int vterm_pos_cmp(VTermPos a, VTermPos b)
+#ಆದರೆ defined(DEFINE_INLINES) || USE_INLINE
+INLINE ಪೂರ್ಣಾಂಕ vterm_pos_cmp(VTermPos a, VTermPos b)
 {
-  return (a.row == b.row) ? a.col - b.col : a.row - b.row;
+  ಹಿಂತಿರುಗಿ (a.ಅಡ್ಡಸಾಲು == b.ಅಡ್ಡಸಾಲು) ? a.ಲಂಬಸಾಲು - b.ಲಂಬಸಾಲು : a.ಅಡ್ಡಸಾಲು - b.ಅಡ್ಡಸಾಲು;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // Specifies a rectangular screen area.
-typedef struct {
-  int start_row;
-  int end_row;
-  int start_col;
-  int end_col;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+  ಪೂರ್ಣಾಂಕ ಆರಂಭ_ಅಡ್ಡಸಾಲು;
+  ಪೂರ್ಣಾಂಕ ಕೊನೆ_ಅಡ್ಡಸಾಲು;
+  ಪೂರ್ಣಾಂಕ ಆರಂಭ_ಲಂಬಸಾಲು;
+  ಪೂರ್ಣಾಂಕ ಕೊನೆ_ಲಂಬಸಾಲು;
 } VTermRect;
 
 /* true if the rect contains the point */
-int vterm_rect_contains(VTermRect r, VTermPos p);
+ಪೂರ್ಣಾಂಕ vterm_rect_ಒಳಗೊಂಡಿದೆ(VTermRect r, VTermPos p);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE int vterm_rect_contains(VTermRect r, VTermPos p)
+#ಆದರೆ defined(DEFINE_INLINES) || USE_INLINE
+INLINE ಪೂರ್ಣಾಂಕ vterm_rect_ಒಳಗೊಂಡಿದೆ(VTermRect r, VTermPos p)
 {
-  return p.row >= r.start_row && p.row < r.end_row &&
-         p.col >= r.start_col && p.col < r.end_col;
+  ಹಿಂತಿರುಗಿ p.ಅಡ್ಡಸಾಲು >= r.ಆರಂಭ_ಅಡ್ಡಸಾಲು && p.ಅಡ್ಡಸಾಲು < r.ಕೊನೆ_ಅಡ್ಡಸಾಲು &&
+         p.ಲಂಬಸಾಲು >= r.ಆರಂಭ_ಲಂಬಸಾಲು && p.ಲಂಬಸಾಲು < r.ಕೊನೆ_ಲಂಬಸಾಲು;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /* move a rect */
 // Move "rect" "row_delta" down and "col_delta" right.
 // Does not check boundaries.
-void vterm_rect_move(VTermRect *rect, int row_delta, int col_delta);
+ಶೂನ್ಯ vterm_rect_move(VTermRect *rect, ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು_delta, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_delta);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE void vterm_rect_move(VTermRect *rect, int row_delta, int col_delta)
+#ಆದರೆ defined(DEFINE_INLINES) || USE_INLINE
+INLINE ಶೂನ್ಯ vterm_rect_move(VTermRect *rect, ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು_delta, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_delta)
 {
-  rect->start_row += row_delta; rect->end_row += row_delta;
-  rect->start_col += col_delta; rect->end_col += col_delta;
+  rect->ಆರಂಭ_ಅಡ್ಡಸಾಲು += ಅಡ್ಡಸಾಲು_delta; rect->ಕೊನೆ_ಅಡ್ಡಸಾಲು += ಅಡ್ಡಸಾಲು_delta;
+  rect->ಆರಂಭ_ಲಂಬಸಾಲು += ಲಂಬಸಾಲು_delta; rect->ಕೊನೆ_ಲಂಬಸಾಲು += ಲಂಬಸಾಲು_delta;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /**
  * Bit-field describing the value of VTermColor.type
  */
-typedef enum {
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ {
   /**
    * If the lower bit of `type` is not set, the colour is 24-bit RGB.
    */
@@ -108,12 +108,12 @@ typedef enum {
   /**
    * The colour is an index into a palette of 256 colours.
    */
-  VTERM_COLOR_INDEXED = 0x01,
+  VTERM_COLOR_ಸೂಚ್ಯಂಕಿತ = 0x01,
 
   /**
    * Mask that can be used to extract the RGB/Indexed bit.
    */
-  VTERM_COLOR_TYPE_MASK = 0x01,
+  VTERM_COLOR_TYPE_ಮುಖವಾಡ = 0x01,
 
   /**
    * If set, indicates that this colour should be the default foreground
@@ -134,7 +134,7 @@ typedef enum {
   /**
    * Mask that can be used to extract the default foreground/background bit.
    */
-  VTERM_COLOR_DEFAULT_MASK = 0x06,
+  VTERM_COLOR_DEFAULT_ಮುಖವಾಡ = 0x06,
 
   /**
    * VIM: If set, indicates that the color is invalid.
@@ -146,40 +146,40 @@ typedef enum {
  * Returns true if the VTERM_COLOR_RGB `type` flag is set, indicating that the
  * given VTermColor instance is an indexed colour.
  */
-#define VTERM_COLOR_IS_INDEXED(col) \
-  (((col)->type & VTERM_COLOR_TYPE_MASK) == VTERM_COLOR_INDEXED)
+#ವ್ಯಾಖ್ಯಾನಿಸು VTERM_COLOR_IS_ಸೂಚ್ಯಂಕಿತ(ಲಂಬಸಾಲು) \
+  (((ಲಂಬಸಾಲು)->type & VTERM_COLOR_TYPE_ಮುಖವಾಡ) == VTERM_COLOR_ಸೂಚ್ಯಂಕಿತ)
 
 /**
  * Returns true if the VTERM_COLOR_INDEXED `type` flag is set, indicating that
  * the given VTermColor instance is an rgb colour.
  */
-#define VTERM_COLOR_IS_RGB(col) \
-  (((col)->type & VTERM_COLOR_TYPE_MASK) == VTERM_COLOR_RGB)
+#ವ್ಯಾಖ್ಯಾನಿಸು VTERM_COLOR_IS_RGB(ಲಂಬಸಾಲು) \
+  (((ಲಂಬಸಾಲು)->type & VTERM_COLOR_TYPE_ಮುಖವಾಡ) == VTERM_COLOR_RGB)
 
 /**
  * Returns true if the VTERM_COLOR_DEFAULT_FG `type` flag is set, indicating
  * that the given VTermColor instance corresponds to the default foreground
  * color.
  */
-#define VTERM_COLOR_IS_DEFAULT_FG(col) \
-  (!!((col)->type & VTERM_COLOR_DEFAULT_FG))
+#ವ್ಯಾಖ್ಯಾನಿಸು VTERM_COLOR_IS_DEFAULT_FG(ಲಂಬಸಾಲು) \
+  (!!((ಲಂಬಸಾಲು)->type & VTERM_COLOR_DEFAULT_FG))
 
 /**
  * Returns true if the VTERM_COLOR_DEFAULT_BG `type` flag is set, indicating
  * that the given VTermColor instance corresponds to the default background
  * color.
  */
-#define VTERM_COLOR_IS_DEFAULT_BG(col) \
-  (!!((col)->type & VTERM_COLOR_DEFAULT_BG))
+#ವ್ಯಾಖ್ಯಾನಿಸು VTERM_COLOR_IS_DEFAULT_BG(ಲಂಬಸಾಲು) \
+  (!!((ಲಂಬಸಾಲು)->type & VTERM_COLOR_DEFAULT_BG))
 
 /**
  * Returns true if the VTERM_COLOR_INVALID `type` flag is set, indicating
  * that the given VTermColor instance is an invalid color.
  */
-#define VTERM_COLOR_IS_INVALID(col) (!!((col)->type & VTERM_COLOR_INVALID))
+#ವ್ಯಾಖ್ಯಾನಿಸು VTERM_COLOR_IS_INVALID(ಲಂಬಸಾಲು) (!!((ಲಂಬಸಾಲು)->type & VTERM_COLOR_INVALID))
 
 // VIM: this was a union, but that doesn't always work.
-typedef struct {
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
   /**
    * Tag indicating which member is actually valid.
    * Please use the `VTERM_COLOR_IS_*` test macros to check whether a
@@ -189,26 +189,26 @@ typedef struct {
 
   uint8_t red, green, blue;
 
-  uint8_t index;
+  uint8_t ಸೂಚ್ಯಂಕ;
 } VTermColor;
 
 /**
  * Constructs a new VTermColor instance representing the given RGB values.
  */
-void vterm_color_rgb(VTermColor *col, uint8_t red, uint8_t green, uint8_t blue);
+ಶೂನ್ಯ vterm_color_rgb(VTermColor *ಲಂಬಸಾಲು, uint8_t red, uint8_t green, uint8_t blue);
 
 /**
  * Construct a new VTermColor instance representing an indexed color with the
  * given index.
  */
-void vterm_color_indexed(VTermColor *col, uint8_t idx);
+ಶೂನ್ಯ vterm_color_ಸೂಚ್ಯಂಕಿತ(VTermColor *ಲಂಬಸಾಲು, uint8_t idx);
 
 /**
  * Compares two colours. Returns true if the colors are equal, false otherwise.
  */
-int vterm_color_is_equal(const VTermColor *a, const VTermColor *b);
+ಪೂರ್ಣಾಂಕ vterm_color_is_equal(ಸ್ಥಿರಾಂಕ VTermColor *a, ಸ್ಥಿರಾಂಕ VTermColor *b);
 
-typedef enum {
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ {
   /* VTERM_VALUETYPE_NONE = 0 */
   VTERM_VALUETYPE_BOOL = 1,
   VTERM_VALUETYPE_INT,
@@ -216,29 +216,29 @@ typedef enum {
   VTERM_VALUETYPE_COLOR,
 
   VTERM_N_VALUETYPES
-} VTermValueType;
+} VTerm_ಮೌಲ್ಯ_Type;
 
-typedef struct {
-  const char *str;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+  ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *str;
   size_t      len : 30;
-  unsigned int  initial : 1;
-  unsigned int  final : 1;
+  ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ  initial : 1;
+  ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ  final : 1;
 } VTermStringFragment;
 
-typedef union {
-  int boolean;
-  int number;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಒಕ್ಕೂಟ {
+  ಪೂರ್ಣಾಂಕ boolean;
+  ಪೂರ್ಣಾಂಕ ಸಂಖ್ಯೆ;
   VTermStringFragment string;
   VTermColor color;
-} VTermValue;
+} VTerm_ಮೌಲ್ಯ;
 
-typedef enum {
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ {
   /* VTERM_ATTR_NONE = 0 */
   VTERM_ATTR_BOLD = 1,   // bool:   1, 22
   VTERM_ATTR_UNDERLINE,  // number: 4, 21, 24
   VTERM_ATTR_ITALIC,     // bool:   3, 23
   VTERM_ATTR_BLINK,      // bool:   5, 25
-  VTERM_ATTR_REVERSE,    // bool:   7, 27
+  VTERM_ATTR_ಹಿಮ್ಮುಖ,    // bool:   7, 27
   VTERM_ATTR_CONCEAL,    // bool:   8, 28
   VTERM_ATTR_STRIKE,     // bool:   9, 29
   VTERM_ATTR_FONT,       // number: 10-19
@@ -250,31 +250,31 @@ typedef enum {
   VTERM_N_ATTRS
 } VTermAttr;
 
-typedef enum {
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ {
   /* VTERM_PROP_NONE = 0 */
   VTERM_PROP_CURSORVISIBLE = 1, // bool
   VTERM_PROP_CURSORBLINK,       // bool
   VTERM_PROP_ALTSCREEN,         // bool
   VTERM_PROP_TITLE,             // string
   VTERM_PROP_ICONNAME,          // string
-  VTERM_PROP_REVERSE,           // bool
-  VTERM_PROP_CURSORSHAPE,       // number
-  VTERM_PROP_MOUSE,             // number
+  VTERM_PROP_ಹಿಮ್ಮುಖ,           // bool
+  VTERM_PROP_CURSORSHAPE,       //ಸಂಖ್ಯೆ
+  VTERM_PROP_MOUSE,             //ಸಂಖ್ಯೆ
   VTERM_PROP_FOCUSREPORT,       // bool
   VTERM_PROP_CURSORCOLOR,       // VIM - string
 
   VTERM_N_PROPS
 } VTermProp;
 
-enum {
-  VTERM_PROP_CURSORSHAPE_BLOCK = 1,
+ಎಣಿಕೆ {
+  VTERM_PROP_CURSORSHAPE_ಖಂಡ = 1,
   VTERM_PROP_CURSORSHAPE_UNDERLINE,
-  VTERM_PROP_CURSORSHAPE_BAR_LEFT,
+  VTERM_PROP_CURSORSHAPE_BAR_ಎಡ,
 
   VTERM_N_PROP_CURSORSHAPES
 };
 
-enum {
+ಎಣಿಕೆ {
   VTERM_PROP_MOUSE_NONE = 0,
   VTERM_PROP_MOUSE_CLICK,
   VTERM_PROP_MOUSE_DRAG,
@@ -283,108 +283,108 @@ enum {
   VTERM_N_PROP_MOUSES
 };
 
-typedef enum {
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ {
   VTERM_SELECTION_CLIPBOARD = (1<<0),
   VTERM_SELECTION_PRIMARY   = (1<<1),
   VTERM_SELECTION_SECONDARY = (1<<2),
   VTERM_SELECTION_SELECT    = (1<<3),
   VTERM_SELECTION_CUT0      = (1<<4), /* also CUT1 .. CUT7 by bitshifting */
-} VTermSelectionMask;
+} VTerm_Selection_ಮುಖವಾಡ;
 
-typedef struct {
-  const uint32_t *chars;
-  int             width;
-  unsigned int    protected_cell:1;  /* DECSCA-protected against DECSEL/DECSED */
-  unsigned int    dwl:1;             /* DECDWL or DECDHL double-width line */
-  unsigned int    dhl:2;             /* DECDHL double-height line (1=top 2=bottom) */
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+  ಸ್ಥಿರಾಂಕ uint32_t *chars;
+  ಪೂರ್ಣಾಂಕ             ಅಗಲ;
+  ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ    protected_cell:1;  /* DECSCA-protected against DECSEL/DECSED */
+  ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ    dwl:1;             /* DECDWL or DECDHL double-width line */
+  ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ    dhl:2;             /* DECDHL double-height line (1=top 2=bottom) */
 } VTermGlyphInfo;
 
-typedef struct {
-  unsigned int    doublewidth:1;     /* DECDWL or DECDHL line */
-  unsigned int    doubleheight:2;    /* DECDHL line (1=top 2=bottom) */
-  unsigned int    continuation:1;    /* Line is a flow continuation of the previous */
-} VTermLineInfo;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+  ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ    doublewidth:1;     /* DECDWL or DECDHL line */
+  ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ    doubleheight:2;    /* DECDHL line (1=top 2=bottom) */
+  ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ    continuation:1;    /* Line is a flow continuation of the previous */
+} VTerm_ಸಾಲು_Info;
 
 /* Copies of VTermState fields that the 'resize' callback might have reason to
  * edit. 'resize' callback gets total control of these fields and may
  * free-and-reallocate them if required. They will be copied back from the
  * struct after the callback has returned.
  */
-typedef struct {
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
   VTermPos pos;                /* current cursor position */
-  VTermLineInfo *lineinfos[2]; /* [1] may be NULL */
+  VTerm_ಸಾಲು_Info *lineinfos[2]; /* [1] may be NULL */
 } VTermStateFields;
 
-typedef struct {
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
   /* libvterm relies on this memory to be zeroed out before it is returned
    * by the allocator. */
-  void *(*malloc)(size_t size, void *allocdata);
-  void  (*free)(void *ptr, void *allocdata);
+  ಶೂನ್ಯ *(*ಸ್ಮರಣೆ_ಕೊಡು)(size_t ಗಾತ್ರ_2, ಶೂನ್ಯ *allocdata);
+  ಶೂನ್ಯ  (*ಬಿಡುಗಡೆ)(ಶೂನ್ಯ *ptr, ಶೂನ್ಯ *allocdata);
 } VTermAllocatorFunctions;
 
-void vterm_check_version(int major, int minor);
+ಶೂನ್ಯ vterm_check_ಆವೃತ್ತಿ(ಪೂರ್ಣಾಂಕ major, ಪೂರ್ಣಾಂಕ minor);
 
-struct VTermBuilder {
-  int ver; /* currently unused but reserved for some sort of ABI version flag */
+ರಚನೆ VTermBuilder {
+  ಪೂರ್ಣಾಂಕ ver; /* currently unused but reserved for some sort of ABI version flag */
 
-  int rows, cols;
+  ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು_2, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
 
-  const VTermAllocatorFunctions *allocator;
-  void *allocdata;
+  ಸ್ಥಿರಾಂಕ VTermAllocatorFunctions *allocator;
+  ಶೂನ್ಯ *allocdata;
 
   /* Override default sizes for various structures */
   size_t outbuffer_len;  /* default: 4096 */
   size_t tmpbuffer_len;  /* default: 4096 */
 };
 
-VTerm *vterm_build(const struct VTermBuilder *builder);
+VTerm *vterm_build(ಸ್ಥಿರಾಂಕ ರಚನೆ VTermBuilder *builder);
 
 /* A convenient shortcut for default cases */
 // Allocate and initialize a new terminal with default allocators.
-VTerm *vterm_new(int rows, int cols);
+VTerm *vterm_new(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು_2, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ);
 /* These shortcuts are generally discouraged in favour of just using vterm_build() */
 
 // Allocate and initialize a new terminal with specified allocators.
-VTerm *vterm_new_with_allocator(int rows, int cols, VTermAllocatorFunctions *funcs, void *allocdata);
+VTerm *vterm_new_with_allocator(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು_2, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, VTermAllocatorFunctions *funcs, ಶೂನ್ಯ *allocdata);
 
 // Free and cleanup a terminal and all its data.
-void   vterm_free(VTerm* vt);
+ಶೂನ್ಯ   vterm_free(VTerm* vt);
 
 // Get the current size of the terminal and store in "rowsp" and "colsp".
-void vterm_get_size(const VTerm *vt, int *rowsp, int *colsp);
+ಶೂನ್ಯ vterm_get_ಗಾತ್ರ(ಸ್ಥಿರಾಂಕ VTerm *vt, ಪೂರ್ಣಾಂಕ *rowsp, ಪೂರ್ಣಾಂಕ *colsp);
 
-void vterm_set_size(VTerm *vt, int rows, int cols);
+ಶೂನ್ಯ vterm_ಗಣ_ಗಾತ್ರ(VTerm *vt, ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು_2, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ);
 
-int  vterm_get_utf8(const VTerm *vt);
-void vterm_set_utf8(VTerm *vt, int is_utf8);
+ಪೂರ್ಣಾಂಕ  vterm_get_utf8(ಸ್ಥಿರಾಂಕ VTerm *vt);
+ಶೂನ್ಯ vterm_ಗಣ_utf8(VTerm *vt, ಪೂರ್ಣಾಂಕ is_utf8);
 
-size_t vterm_input_write(VTerm *vt, const char *bytes, size_t len);
+size_t vterm_ಒಳಹರಿವು_write(VTerm *vt, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಬೈಟುಗಳು, size_t len);
 
 /* Setting output callback will override the buffer logic */
-typedef void VTermOutputCallback(const char *s, size_t len, void *user);
-void vterm_output_set_callback(VTerm *vt, VTermOutputCallback *func, void *user);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಶೂನ್ಯ VTermOutputCallback(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *s, size_t len, ಶೂನ್ಯ *user);
+ಶೂನ್ಯ vterm_output_ಗಣ_callback(VTerm *vt, VTermOutputCallback *func, ಶೂನ್ಯ *user);
 
 /* These buffer functions only work if output callback is NOT set
  * These are deprecated and will be removed in a later version */
-size_t vterm_output_get_buffer_size(const VTerm *vt);
-size_t vterm_output_get_buffer_current(const VTerm *vt);
-size_t vterm_output_get_buffer_remaining(const VTerm *vt);
+size_t vterm_output_get_ಬಫರ್_ಗಾತ್ರ(ಸ್ಥಿರಾಂಕ VTerm *vt);
+size_t vterm_output_get_ಬಫರ್_current(ಸ್ಥಿರಾಂಕ VTerm *vt);
+size_t vterm_output_get_ಬಫರ್_ಉಳಿದ(ಸ್ಥಿರಾಂಕ VTerm *vt);
 
 /* This too */
-size_t vterm_output_read(VTerm *vt, char *buffer, size_t len);
+size_t vterm_output_read(VTerm *vt, ಅಕ್ಷರ *ಬಫರ್, size_t len);
 
-int vterm_is_modify_other_keys(VTerm *vt);
-int vterm_is_kitty_keyboard(VTerm *vt);
-void vterm_keyboard_unichar(VTerm *vt, uint32_t c, VTermModifier mod);
-void vterm_keyboard_key(VTerm *vt, VTermKey key, VTermModifier mod);
+ಪೂರ್ಣಾಂಕ vterm_is_modify_other_ಕೀಲಿಗಳು(VTerm *vt);
+ಪೂರ್ಣಾಂಕ vterm_is_kitty_keyboard(VTerm *vt);
+ಶೂನ್ಯ vterm_keyboard_unichar(VTerm *vt, uint32_t c, VTermModifier mod);
+ಶೂನ್ಯ vterm_keyboard_ಕೀಲಿ(VTerm *vt, VTerm_ಕೀಲಿ ಕೀಲಿ, VTermModifier mod);
 
-void vterm_keyboard_start_paste(VTerm *vt);
-void vterm_keyboard_end_paste(VTerm *vt);
+ಶೂನ್ಯ vterm_keyboard_ಆರಂಭ_paste(VTerm *vt);
+ಶೂನ್ಯ vterm_keyboard_ಕೊನೆ_paste(VTerm *vt);
 
-void vterm_mouse_move(VTerm *vt, int row, int col, VTermModifier mod);
+ಶೂನ್ಯ vterm_mouse_move(VTerm *vt, ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು, VTermModifier mod);
 // "button" is 1 for left, 2 for middle, 3 for right.
 // Button 4 is scroll wheel down, button 5 is scroll wheel up.
-void vterm_mouse_button(VTerm *vt, int button, int pressed, VTermModifier mod);
+ಶೂನ್ಯ vterm_mouse_button(VTerm *vt, ಪೂರ್ಣಾಂಕ button, ಪೂರ್ಣಾಂಕ pressed, VTermModifier mod);
 
 // ------------
 // Parser layer
@@ -398,119 +398,119 @@ void vterm_mouse_button(VTerm *vt, int button, int pressed, VTermModifier mod);
  *
  * Don't confuse this with the final byte of the CSI escape; 'a' in this case.
  */
-#define CSI_ARG_FLAG_MORE (1U<<31)
-#define CSI_ARG_MASK      (~(1U<<31))
+#ವ್ಯಾಖ್ಯಾನಿಸು CSI_ARG_FLAG_ಇನ್ನಷ್ಟು (1U<<31)
+#ವ್ಯಾಖ್ಯಾನಿಸು CSI_ARG_ಮುಖವಾಡ      (~(1U<<31))
 
-#define CSI_ARG_HAS_MORE(a) ((a) & CSI_ARG_FLAG_MORE)
-#define CSI_ARG(a)          ((a) & CSI_ARG_MASK)
+#ವ್ಯಾಖ್ಯಾನಿಸು CSI_ARG_HAS_ಇನ್ನಷ್ಟು(a) ((a) & CSI_ARG_FLAG_ಇನ್ನಷ್ಟು)
+#ವ್ಯಾಖ್ಯಾನಿಸು CSI_ARG(a)          ((a) & CSI_ARG_ಮುಖವಾಡ)
 
 /* Can't use -1 to indicate a missing argument; use this instead */
 // VIM: changed 31 to 30 to avoid an overflow warning
-#define CSI_ARG_MISSING ((1<<30)-1)
+#ವ್ಯಾಖ್ಯಾನಿಸು CSI_ARG_MISSING ((1<<30)-1)
 
-#define CSI_ARG_IS_MISSING(a) (CSI_ARG(a) == CSI_ARG_MISSING)
-#define CSI_ARG_OR(a,def)     (CSI_ARG(a) == CSI_ARG_MISSING ? (def) : CSI_ARG(a))
-#define CSI_ARG_COUNT(a)      (CSI_ARG(a) == CSI_ARG_MISSING || CSI_ARG(a) == 0 ? 1 : CSI_ARG(a))
+#ವ್ಯಾಖ್ಯಾನಿಸು CSI_ARG_IS_MISSING(a) (CSI_ARG(a) == CSI_ARG_MISSING)
+#ವ್ಯಾಖ್ಯಾನಿಸು CSI_ARG_OR(a,def)     (CSI_ARG(a) == CSI_ARG_MISSING ? (def) : CSI_ARG(a))
+#ವ್ಯಾಖ್ಯಾನಿಸು CSI_ARG_ಎಣಿಕೆ(a)      (CSI_ARG(a) == CSI_ARG_MISSING || CSI_ARG(a) == 0 ? 1 : CSI_ARG(a))
 
-typedef struct {
-  int (*text)(const char *bytes, size_t len, void *user);
-  int (*control)(unsigned char control, void *user);
-  int (*escape)(const char *bytes, size_t len, void *user);
-  int (*csi)(const char *leader, const long args[], int argcount, const char *intermed, char command, void *user);
-  int (*osc)(int command, VTermStringFragment frag, void *user);
-  int (*dcs)(const char *command, size_t commandlen, VTermStringFragment frag, void *user);
-  int (*apc)(VTermStringFragment frag, void *user);
-  int (*pm)(VTermStringFragment frag, void *user);
-  int (*sos)(VTermStringFragment frag, void *user);
-  int (*resize)(int rows, int cols, void *user);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+  ಪೂರ್ಣಾಂಕ (*ಪಠ್ಯ)(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಬೈಟುಗಳು, size_t len, ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*control)(ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ control, ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*escape)(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಬೈಟುಗಳು, size_t len, ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*csi)(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *leader, ಸ್ಥಿರಾಂಕ ದೀರ್ಘ ವಾದಗಳು[], ಪೂರ್ಣಾಂಕ argcount, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *intermed, ಅಕ್ಷರ command, ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*osc)(ಪೂರ್ಣಾಂಕ command, VTermStringFragment frag, ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*dcs)(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *command, size_t commandlen, VTermStringFragment frag, ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*apc)(VTermStringFragment frag, ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*pm)(VTermStringFragment frag, ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*sos)(VTermStringFragment frag, ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*resize)(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು_2, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, ಶೂನ್ಯ *user);
 } VTermParserCallbacks;
 
-void  vterm_parser_set_callbacks(VTerm *vt, const VTermParserCallbacks *callbacks, void *user);
-void *vterm_parser_get_cbdata(VTerm *vt);
+ಶೂನ್ಯ  vterm_parser_ಗಣ_callbacks(VTerm *vt, ಸ್ಥಿರಾಂಕ VTermParserCallbacks *callbacks, ಶೂನ್ಯ *user);
+ಶೂನ್ಯ *vterm_parser_get_cbdata(VTerm *vt);
 
 /* Normally NUL, CAN, SUB and DEL are ignored. Setting this true causes them
  * to be emitted by the 'control' callback
  */
-void vterm_parser_set_emit_nul(VTerm *vt, int emit);
+ಶೂನ್ಯ vterm_parser_ಗಣ_emit_nul(VTerm *vt, ಪೂರ್ಣಾಂಕ emit);
 
 // -----------
 // State layer
 // -----------
 
-typedef struct {
-  int (*putglyph)(VTermGlyphInfo *info, VTermPos pos, void *user);
-  int (*movecursor)(VTermPos pos, VTermPos oldpos, int visible, void *user);
-  int (*scrollrect)(VTermRect rect, int downward, int rightward, void *user);
-  int (*moverect)(VTermRect dest, VTermRect src, void *user);
-  int (*erase)(VTermRect rect, int selective, void *user);
-  int (*initpen)(void *user);
-  int (*setpenattr)(VTermAttr attr, VTermValue *val, void *user);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+  ಪೂರ್ಣಾಂಕ (*putglyph)(VTermGlyphInfo *info, VTermPos pos, ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*movecursor)(VTermPos pos, VTermPos oldpos, ಪೂರ್ಣಾಂಕ visible, ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*scrollrect)(VTermRect rect, ಪೂರ್ಣಾಂಕ downward, ಪೂರ್ಣಾಂಕ rightward, ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*moverect)(VTermRect dest, VTermRect src, ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*erase)(VTermRect rect, ಪೂರ್ಣಾಂಕ selective, ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*initpen)(ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*setpenattr)(VTermAttr attr, VTerm_ಮೌಲ್ಯ *val, ಶೂನ್ಯ *user);
   // Callback for setting various properties.  Must return 1 if the property
   // was accepted, 0 otherwise.
-  int (*settermprop)(VTermProp prop, VTermValue *val, void *user);
-  int (*bell)(void *user);
-  int (*resize)(int rows, int cols, VTermStateFields *fields, void *user);
-  int (*setlineinfo)(int row, const VTermLineInfo *newinfo, const VTermLineInfo *oldinfo, void *user);
-  int (*sb_clear)(void *user);
+  ಪೂರ್ಣಾಂಕ (*settermprop)(VTermProp prop, VTerm_ಮೌಲ್ಯ *val, ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*bell)(ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*resize)(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು_2, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, VTermStateFields *fields, ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*setlineinfo)(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು, ಸ್ಥಿರಾಂಕ VTerm_ಸಾಲು_Info *newinfo, ಸ್ಥಿರಾಂಕ VTerm_ಸಾಲು_Info *oldinfo, ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*sb_clear)(ಶೂನ್ಯ *user);
   // ABI-compat only enabled if vterm_state_callbacks_has_premove() is invoked
-  int (*premove)(VTermRect dest, void *user);
+  ಪೂರ್ಣಾಂಕ (*premove)(VTermRect dest, ಶೂನ್ಯ *user);
 } VTermStateCallbacks;
 
 // VIM: added
-typedef struct {
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
   VTermPos pos;
-  int	   buttons;
-#define MOUSE_BUTTON_LEFT 0x01
-#define MOUSE_BUTTON_MIDDLE 0x02
-#define MOUSE_BUTTON_RIGHT 0x04
-  int      flags;
-#define MOUSE_WANT_CLICK 0x01
-#define MOUSE_WANT_DRAG  0x02
-#define MOUSE_WANT_MOVE  0x04
+  ಪೂರ್ಣಾಂಕ	   buttons;
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_BUTTON_ಎಡ 0x01
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_BUTTON_ಮಧ್ಯ 0x02
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_BUTTON_ಬಲ 0x04
+  ಪೂರ್ಣಾಂಕ      flags;
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_WANT_CLICK 0x01
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_WANT_DRAG  0x02
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_WANT_MOVE  0x04
   // useful to add protocol?
 } VTermMouseState;
 
-typedef struct {
-  int (*control)(unsigned char control, void *user);
-  int (*csi)(const char *leader, const long args[], int argcount, const char *intermed, char command, void *user);
-  int (*osc)(int command, VTermStringFragment frag, void *user);
-  int (*dcs)(const char *command, size_t commandlen, VTermStringFragment frag, void *user);
-  int (*apc)(VTermStringFragment frag, void *user);
-  int (*pm)(VTermStringFragment frag, void *user);
-  int (*sos)(VTermStringFragment frag, void *user);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+  ಪೂರ್ಣಾಂಕ (*control)(ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ control, ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*csi)(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *leader, ಸ್ಥಿರಾಂಕ ದೀರ್ಘ ವಾದಗಳು[], ಪೂರ್ಣಾಂಕ argcount, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *intermed, ಅಕ್ಷರ command, ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*osc)(ಪೂರ್ಣಾಂಕ command, VTermStringFragment frag, ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*dcs)(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *command, size_t commandlen, VTermStringFragment frag, ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*apc)(VTermStringFragment frag, ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*pm)(VTermStringFragment frag, ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*sos)(VTermStringFragment frag, ಶೂನ್ಯ *user);
 } VTermStateFallbacks;
 
-typedef struct {
-  int (*set)(VTermSelectionMask mask, VTermStringFragment frag, void *user);
-  int (*query)(VTermSelectionMask mask, void *user);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+  ಪೂರ್ಣಾಂಕ (*ಗಣ_2)(VTerm_Selection_ಮುಖವಾಡ ಮುಖವಾಡ, VTermStringFragment frag, ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*query)(VTerm_Selection_ಮುಖವಾಡ ಮುಖವಾಡ, ಶೂನ್ಯ *user);
 } VTermSelectionCallbacks;
 
 VTermState *vterm_obtain_state(VTerm *vt);
 
-void  vterm_state_set_callbacks(VTermState *state, const VTermStateCallbacks *callbacks, void *user);
-void *vterm_state_get_cbdata(VTermState *state);
+ಶೂನ್ಯ  vterm_state_ಗಣ_callbacks(VTermState *state, ಸ್ಥಿರಾಂಕ VTermStateCallbacks *callbacks, ಶೂನ್ಯ *user);
+ಶೂನ್ಯ *vterm_state_get_cbdata(VTermState *state);
 
-void vterm_state_callbacks_has_premove(VTermState *state);
+ಶೂನ್ಯ vterm_state_callbacks_has_premove(VTermState *state);
 
-void  vterm_state_set_unrecognised_fallbacks(VTermState *state, const VTermStateFallbacks *fallbacks, void *user);
-void *vterm_state_get_unrecognised_fbdata(VTermState *state);
+ಶೂನ್ಯ  vterm_state_ಗಣ_unrecognised_fallbacks(VTermState *state, ಸ್ಥಿರಾಂಕ VTermStateFallbacks *fallbacks, ಶೂನ್ಯ *user);
+ಶೂನ್ಯ *vterm_state_get_unrecognised_fbdata(VTermState *state);
 
 // Initialize the state.
-void vterm_state_reset(VTermState *state, int hard);
+ಶೂನ್ಯ vterm_state_reset(VTermState *state, ಪೂರ್ಣಾಂಕ hard);
 
-void vterm_state_get_cursorpos(const VTermState *state, VTermPos *cursorpos);
+ಶೂನ್ಯ vterm_state_get_cursorpos(ಸ್ಥಿರಾಂಕ VTermState *state, VTermPos *cursorpos);
 // VIM: added
-void vterm_state_get_mousestate(const VTermState *state, VTermMouseState *mousestate);
-void vterm_state_get_default_colors(const VTermState *state, VTermColor *default_fg, VTermColor *default_bg);
-void vterm_state_get_palette_color(const VTermState *state, int index, VTermColor *col);
-void vterm_state_set_default_colors(VTermState *state, const VTermColor *default_fg, const VTermColor *default_bg);
-void vterm_state_set_palette_color(VTermState *state, int index, const VTermColor *col);
-void vterm_state_set_bold_highbright(VTermState *state, int bold_is_highbright);
-int  vterm_state_get_penattr(const VTermState *state, VTermAttr attr, VTermValue *val);
-int  vterm_state_set_termprop(VTermState *state, VTermProp prop, VTermValue *val);
-void vterm_state_focus_in(VTermState *state);
-void vterm_state_focus_out(VTermState *state);
-const VTermLineInfo *vterm_state_get_lineinfo(const VTermState *state, int row);
+ಶೂನ್ಯ vterm_state_get_mousestate(ಸ್ಥಿರಾಂಕ VTermState *state, VTermMouseState *mousestate);
+ಶೂನ್ಯ vterm_state_get_default_colors(ಸ್ಥಿರಾಂಕ VTermState *state, VTermColor *default_fg, VTermColor *default_bg);
+ಶೂನ್ಯ vterm_state_get_palette_color(ಸ್ಥಿರಾಂಕ VTermState *state, ಪೂರ್ಣಾಂಕ ಸೂಚ್ಯಂಕ, VTermColor *ಲಂಬಸಾಲು);
+ಶೂನ್ಯ vterm_state_ಗಣ_default_colors(VTermState *state, ಸ್ಥಿರಾಂಕ VTermColor *default_fg, ಸ್ಥಿರಾಂಕ VTermColor *default_bg);
+ಶೂನ್ಯ vterm_state_ಗಣ_palette_color(VTermState *state, ಪೂರ್ಣಾಂಕ ಸೂಚ್ಯಂಕ, ಸ್ಥಿರಾಂಕ VTermColor *ಲಂಬಸಾಲು);
+ಶೂನ್ಯ vterm_state_ಗಣ_bold_highbright(VTermState *state, ಪೂರ್ಣಾಂಕ bold_is_highbright);
+ಪೂರ್ಣಾಂಕ  vterm_state_get_penattr(ಸ್ಥಿರಾಂಕ VTermState *state, VTermAttr attr, VTerm_ಮೌಲ್ಯ *val);
+ಪೂರ್ಣಾಂಕ  vterm_state_ಗಣ_termprop(VTermState *state, VTermProp prop, VTerm_ಮೌಲ್ಯ *val);
+ಶೂನ್ಯ vterm_state_focus_ಒಳ(VTermState *state);
+ಶೂನ್ಯ vterm_state_focus_ಹೊರಹೋಗು(VTermState *state);
+ಸ್ಥಿರಾಂಕ VTerm_ಸಾಲು_Info *vterm_state_get_lineinfo(ಸ್ಥಿರಾಂಕ VTermState *state, ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು);
 
 /**
  * Makes sure that the given color `col` is indeed an RGB colour. After this
@@ -522,68 +522,68 @@ const VTermLineInfo *vterm_state_get_lineinfo(const VTermState *state, int row);
  * @param col is a pointer at the VTermColor instance that should be converted
  * to an RGB colour.
  */
-void vterm_state_convert_color_to_rgb(const VTermState *state, VTermColor *col);
+ಶೂನ್ಯ vterm_state_convert_color_ಗಮ್ಯ_rgb(ಸ್ಥಿರಾಂಕ VTermState *state, VTermColor *ಲಂಬಸಾಲು);
 
-void vterm_state_set_selection_callbacks(VTermState *state, const VTermSelectionCallbacks *callbacks, void *user,
-    char *buffer, size_t buflen);
+ಶೂನ್ಯ vterm_state_ಗಣ_selection_callbacks(VTermState *state, ಸ್ಥಿರಾಂಕ VTermSelectionCallbacks *callbacks, ಶೂನ್ಯ *user,
+    ಅಕ್ಷರ *ಬಫರ್, size_t buflen);
 
-void vterm_state_send_selection(VTermState *state, VTermSelectionMask mask, VTermStringFragment frag);
+ಶೂನ್ಯ vterm_state_send_selection(VTermState *state, VTerm_Selection_ಮುಖವಾಡ ಮುಖವಾಡ, VTermStringFragment frag);
 
 // ------------
 // Screen layer
 // ------------
 
-typedef struct {
-    unsigned int bold      : 1;
-    unsigned int underline : 2;
-    unsigned int italic    : 1;
-    unsigned int blink     : 1;
-    unsigned int reverse   : 1;
-    unsigned int conceal   : 1;
-    unsigned int strike    : 1;
-    unsigned int font      : 4; /* 0 to 9 */
-    unsigned int dwl       : 1; /* On a DECDWL or DECDHL line */
-    unsigned int dhl       : 2; /* On a DECDHL line (1=top 2=bottom) */
-    unsigned int small     : 1;
-    unsigned int baseline  : 2;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ bold      : 1;
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ underline : 2;
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ italic    : 1;
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ blink     : 1;
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ ಹಿಮ್ಮುಖ   : 1;
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ conceal   : 1;
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ strike    : 1;
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ font      : 4; /* 0 to 9 */
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ dwl       : 1; /* On a DECDWL or DECDHL line */
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ dhl       : 2; /* On a DECDHL line (1=top 2=bottom) */
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ small     : 1;
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ baseline  : 2;
 } VTermScreenCellAttrs;
 
-enum {
+ಎಣಿಕೆ {
   VTERM_UNDERLINE_OFF,
   VTERM_UNDERLINE_SINGLE,
   VTERM_UNDERLINE_DOUBLE,
   VTERM_UNDERLINE_CURLY,
 };
 
-enum {
-  VTERM_BASELINE_NORMAL,
+ಎಣಿಕೆ {
+  VTERM_BASELINE_ಸಾಮಾನ್ಯ,
   VTERM_BASELINE_RAISE,
-  VTERM_BASELINE_LOWER,
+  VTERM_BASELINE_ಅಧೋ,
 };
 
-typedef struct {
-  uint32_t chars[VTERM_MAX_CHARS_PER_CELL];
-  char     width;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+  uint32_t chars[VTERM_MAX_CHARS_ಪ್ರತಿ_CELL];
+  ಅಕ್ಷರ     ಅಗಲ;
   VTermScreenCellAttrs attrs;
   VTermColor fg, bg;
 } VTermScreenCell;
 
 // All fields are optional, NULL when not used.
-typedef struct {
-  int (*damage)(VTermRect rect, void *user);
-  int (*moverect)(VTermRect dest, VTermRect src, void *user);
-  int (*movecursor)(VTermPos pos, VTermPos oldpos, int visible, void *user);
-  int (*settermprop)(VTermProp prop, VTermValue *val, void *user);
-  int (*bell)(void *user);
-  int (*resize)(int rows, int cols, void *user);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+  ಪೂರ್ಣಾಂಕ (*damage)(VTermRect rect, ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*moverect)(VTermRect dest, VTermRect src, ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*movecursor)(VTermPos pos, VTermPos oldpos, ಪೂರ್ಣಾಂಕ visible, ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*settermprop)(VTermProp prop, VTerm_ಮೌಲ್ಯ *val, ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*bell)(ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*resize)(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು_2, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, ಶೂನ್ಯ *user);
   // A line was pushed off the top of the window.
   // "cells[cols]" contains the cells of that line.
   // Return value is unused.
-  int (*sb_pushline)(int cols, const VTermScreenCell *cells, void *user);
-  int (*sb_popline)(int cols, VTermScreenCell *cells, void *user);
-  int (*sb_clear)(void* user);
+  ಪೂರ್ಣಾಂಕ (*sb_pushline)(ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, ಸ್ಥಿರಾಂಕ VTermScreenCell *cells, ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*sb_popline)(ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, VTermScreenCell *cells, ಶೂನ್ಯ *user);
+  ಪೂರ್ಣಾಂಕ (*sb_clear)(ಶೂನ್ಯ* user);
   /* ABI-compat this is only used if vterm_screen_callbacks_has_pushline4() is called */
-  int (*sb_pushline4)(int cols, const VTermScreenCell *cells, int continuation, void *user);
+  ಪೂರ್ಣಾಂಕ (*sb_pushline4)(ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, ಸ್ಥಿರಾಂಕ VTermScreenCell *cells, ಪೂರ್ಣಾಂಕ continuation, ಶೂನ್ಯ *user);
 } VTermScreenCallbacks;
 
 // Return the screen of the vterm.
@@ -593,104 +593,104 @@ VTermScreen *vterm_obtain_screen(VTerm *vt);
  * Install screen callbacks.  These are invoked when the screen contents is
  * changed.  "user" is passed into to the callback.
  */
-void  vterm_screen_set_callbacks(VTermScreen *screen, const VTermScreenCallbacks *callbacks, void *user);
-void *vterm_screen_get_cbdata(VTermScreen *screen);
+ಶೂನ್ಯ  vterm_screen_ಗಣ_callbacks(VTermScreen *screen, ಸ್ಥಿರಾಂಕ VTermScreenCallbacks *callbacks, ಶೂನ್ಯ *user);
+ಶೂನ್ಯ *vterm_screen_get_cbdata(VTermScreen *screen);
 
-void vterm_screen_callbacks_has_pushline4(VTermScreen *screen);
+ಶೂನ್ಯ vterm_screen_callbacks_has_pushline4(VTermScreen *screen);
 
-void  vterm_screen_set_unrecognised_fallbacks(VTermScreen *screen, const VTermStateFallbacks *fallbacks, void *user);
-void *vterm_screen_get_unrecognised_fbdata(VTermScreen *screen);
+ಶೂನ್ಯ  vterm_screen_ಗಣ_unrecognised_fallbacks(VTermScreen *screen, ಸ್ಥಿರಾಂಕ VTermStateFallbacks *fallbacks, ಶೂನ್ಯ *user);
+ಶೂನ್ಯ *vterm_screen_get_unrecognised_fbdata(VTermScreen *screen);
 
-void vterm_screen_enable_reflow(VTermScreen *screen, int reflow);
+ಶೂನ್ಯ vterm_screen_enable_reflow(VTermScreen *screen, ಪೂರ್ಣಾಂಕ reflow);
 
 // Back-compat alias for the brief time it was in 0.3-RC1
-#define vterm_screen_set_reflow  vterm_screen_enable_reflow
+#ವ್ಯಾಖ್ಯಾನಿಸು vterm_screen_ಗಣ_reflow  vterm_screen_enable_reflow
 
 // Enable support for using the alternate screen if "altscreen" is non-zero.
 // Before that switching to the alternate screen won't work.
 // Calling with "altscreen" zero has no effect.
-void vterm_screen_enable_altscreen(VTermScreen *screen, int altscreen);
+ಶೂನ್ಯ vterm_screen_enable_altscreen(VTermScreen *screen, ಪೂರ್ಣಾಂಕ altscreen);
 
-typedef enum {
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ {
   VTERM_DAMAGE_CELL,    /* every cell */
-  VTERM_DAMAGE_ROW,     /* entire rows */
+  VTERM_DAMAGE_ಅಡ್ಡಸಾಲು,     /* entire rows */
   VTERM_DAMAGE_SCREEN,  /* entire screen */
   VTERM_DAMAGE_SCROLL,  /* entire screen + scrollrect */
 
   VTERM_N_DAMAGES
-} VTermDamageSize;
+} VTerm_Damage_ಗಾತ್ರ;
 
 // Invoke the relevant callbacks to update the screen.
-void vterm_screen_flush_damage(VTermScreen *screen);
+ಶೂನ್ಯ vterm_screen_flush_damage(VTermScreen *screen);
 
-void vterm_screen_set_damage_merge(VTermScreen *screen, VTermDamageSize size);
+ಶೂನ್ಯ vterm_screen_ಗಣ_damage_ವಿಲೀನ(VTermScreen *screen, VTerm_Damage_ಗಾತ್ರ ಗಾತ್ರ_2);
 
 /*
  * Reset the screen.  Also invokes vterm_state_reset().
  * Must be called before the terminal can be used.
  */
-void   vterm_screen_reset(VTermScreen *screen, int hard);
+ಶೂನ್ಯ   vterm_screen_reset(VTermScreen *screen, ಪೂರ್ಣಾಂಕ hard);
 
 /* Neither of these functions NUL-terminate the buffer */
-size_t vterm_screen_get_chars(const VTermScreen *screen, uint32_t *chars, size_t len, const VTermRect rect);
-size_t vterm_screen_get_text(const VTermScreen *screen, char *str, size_t len, const VTermRect rect);
+size_t vterm_screen_get_chars(ಸ್ಥಿರಾಂಕ VTermScreen *screen, uint32_t *chars, size_t len, ಸ್ಥಿರಾಂಕ VTermRect rect);
+size_t vterm_screen_get_ಪಠ್ಯ(ಸ್ಥಿರಾಂಕ VTermScreen *screen, ಅಕ್ಷರ *str, size_t len, ಸ್ಥಿರಾಂಕ VTermRect rect);
 
-typedef enum {
-  VTERM_ATTR_BOLD_MASK       = 1 << 0,
-  VTERM_ATTR_UNDERLINE_MASK  = 1 << 1,
-  VTERM_ATTR_ITALIC_MASK     = 1 << 2,
-  VTERM_ATTR_BLINK_MASK      = 1 << 3,
-  VTERM_ATTR_REVERSE_MASK    = 1 << 4,
-  VTERM_ATTR_STRIKE_MASK     = 1 << 5,
-  VTERM_ATTR_FONT_MASK       = 1 << 6,
-  VTERM_ATTR_FOREGROUND_MASK = 1 << 7,
-  VTERM_ATTR_BACKGROUND_MASK = 1 << 8,
-  VTERM_ATTR_CONCEAL_MASK    = 1 << 9,
-  VTERM_ATTR_SMALL_MASK      = 1 << 10,
-  VTERM_ATTR_BASELINE_MASK   = 1 << 11,
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ {
+  VTERM_ATTR_BOLD_ಮುಖವಾಡ       = 1 << 0,
+  VTERM_ATTR_UNDERLINE_ಮುಖವಾಡ  = 1 << 1,
+  VTERM_ATTR_ITALIC_ಮುಖವಾಡ     = 1 << 2,
+  VTERM_ATTR_BLINK_ಮುಖವಾಡ      = 1 << 3,
+  VTERM_ATTR_ಹಿಮ್ಮುಖ_ಮುಖವಾಡ    = 1 << 4,
+  VTERM_ATTR_STRIKE_ಮುಖವಾಡ     = 1 << 5,
+  VTERM_ATTR_FONT_ಮುಖವಾಡ       = 1 << 6,
+  VTERM_ATTR_FOREGROUND_ಮುಖವಾಡ = 1 << 7,
+  VTERM_ATTR_BACKGROUND_ಮುಖವಾಡ = 1 << 8,
+  VTERM_ATTR_CONCEAL_ಮುಖವಾಡ    = 1 << 9,
+  VTERM_ATTR_SMALL_ಮುಖವಾಡ      = 1 << 10,
+  VTERM_ATTR_BASELINE_ಮುಖವಾಡ   = 1 << 11,
 
-  VTERM_ALL_ATTRS_MASK = (1 << 12) - 1
-} VTermAttrMask;
+  VTERM_ALL_ATTRS_ಮುಖವಾಡ = (1 << 12) - 1
+} VTerm_Attr_ಮುಖವಾಡ;
 
-int vterm_screen_get_attrs_extent(const VTermScreen *screen, VTermRect *extent, VTermPos pos, VTermAttrMask attrs);
+ಪೂರ್ಣಾಂಕ vterm_screen_get_attrs_extent(ಸ್ಥಿರಾಂಕ VTermScreen *screen, VTermRect *extent, VTermPos pos, VTerm_Attr_ಮುಖವಾಡ attrs);
 
-int vterm_screen_get_cell(const VTermScreen *screen, VTermPos pos, VTermScreenCell *cell);
+ಪೂರ್ಣಾಂಕ vterm_screen_get_cell(ಸ್ಥಿರಾಂಕ VTermScreen *screen, VTermPos pos, VTermScreenCell *cell);
 
-int vterm_screen_is_eol(const VTermScreen *screen, VTermPos pos);
+ಪೂರ್ಣಾಂಕ vterm_screen_is_eol(ಸ್ಥಿರಾಂಕ VTermScreen *screen, VTermPos pos);
 
 /**
  * Same as vterm_state_convert_color_to_rgb(), but takes a `screen` instead of a `state`
  * instance.
  */
-void vterm_screen_convert_color_to_rgb(const VTermScreen *screen, VTermColor *col);
+ಶೂನ್ಯ vterm_screen_convert_color_ಗಮ್ಯ_rgb(ಸ್ಥಿರಾಂಕ VTermScreen *screen, VTermColor *ಲಂಬಸಾಲು);
 
 /**
  * Similar to vterm_state_set_default_colors(), but also resets colours in the
  * screen buffer(s)
  */
-void vterm_screen_set_default_colors(VTermScreen *screen, const VTermColor *default_fg, const VTermColor *default_bg);
+ಶೂನ್ಯ vterm_screen_ಗಣ_default_colors(VTermScreen *screen, ಸ್ಥಿರಾಂಕ VTermColor *default_fg, ಸ್ಥಿರಾಂಕ VTermColor *default_bg);
 
 // ---------
 // Utilities
 // ---------
 
-VTermValueType vterm_get_attr_type(VTermAttr attr);
-VTermValueType vterm_get_prop_type(VTermProp prop);
+VTerm_ಮೌಲ್ಯ_Type vterm_get_attr_type(VTermAttr attr);
+VTerm_ಮೌಲ್ಯ_Type vterm_get_prop_type(VTermProp prop);
 
-void vterm_scroll_rect(VTermRect rect,
-                       int downward,
-                       int rightward,
-                       int (*moverect)(VTermRect src, VTermRect dest, void *user),
-                       int (*eraserect)(VTermRect rect, int selective, void *user),
-                       void *user);
+ಶೂನ್ಯ vterm_scroll_rect(VTermRect rect,
+                       ಪೂರ್ಣಾಂಕ downward,
+                       ಪೂರ್ಣಾಂಕ rightward,
+                       ಪೂರ್ಣಾಂಕ (*moverect)(VTermRect src, VTermRect dest, ಶೂನ್ಯ *user),
+                       ಪೂರ್ಣಾಂಕ (*eraserect)(VTermRect rect, ಪೂರ್ಣಾಂಕ selective, ಶೂನ್ಯ *user),
+                       ಶೂನ್ಯ *user);
 
-void vterm_copy_cells(VTermRect dest,
+ಶೂನ್ಯ vterm_copy_cells(VTermRect dest,
                       VTermRect src,
-                      void (*copycell)(VTermPos dest, VTermPos src, void *user),
-                      void *user);
+                      ಶೂನ್ಯ (*copycell)(VTermPos dest, VTermPos src, ಶೂನ್ಯ *user),
+                      ಶೂನ್ಯ *user);
 
-#ifdef __cplusplus
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ __cplusplus
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ

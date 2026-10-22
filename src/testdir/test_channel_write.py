@@ -4,15 +4,15 @@
 #
 # This requires Python 2.6 or later.
 
-from __future__ import print_function
-import sys
-import time
+ತಃ __future__ ಆಮದು print_function
+ಆಮದು sys
+ಆಮದು ಸಮಯ
 
-if __name__ == "__main__":
+ಆದರೆ __name__ == "__main__":
 
-    done = 0
-    while done < 10:
-        done = done + 1
-        print(done)
+    ಮುಗಿದ = 0
+    ಆಗ ಮುಗಿದ < 10:
+        ಮುಗಿದ = ಮುಗಿದ + 1
+        ಮುದ್ರಿಸು(ಮುಗಿದ)
         sys.stdout.flush()
-        time.sleep(0.05)  # sleep 50 msec
+        ಸಮಯ.ಸುಷುಪ್ತಿ(0.05)  # sleep 50 msec

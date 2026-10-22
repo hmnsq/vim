@@ -20,43 +20,43 @@
  *
  */
 
-#if !defined(XTYPES_H)
-#define XTYPES_H
+#ಆದರೆ !defined(XTYPES_H)
+#ವ್ಯಾಖ್ಯಾನಿಸು XTYPES_H
 
 
 
-typedef struct s_chanode {
-	struct s_chanode *next;
-	long icurr;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ s_chanode {
+	ರಚನೆ s_chanode *ಮುಂದಿನ;
+	ದೀರ್ಘ icurr;
 } chanode_t;
 
-typedef struct s_chastore {
-	chanode_t *head, *tail;
-	long isize, nsize;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ s_chastore {
+	chanode_t *ತಲೆ, *ಬಾಲ;
+	ದೀರ್ಘ isize, nsize;
 	chanode_t *ancur;
 	chanode_t *sncur;
-	long scurr;
+	ದೀರ್ಘ scurr;
 } chastore_t;
 
-typedef struct s_xrecord {
-	char const *ptr;
-	long size;
-	unsigned long ha;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ s_xrecord {
+	ಅಕ್ಷರ ಸ್ಥಿರಾಂಕ *ptr;
+	ದೀರ್ಘ ಗಾತ್ರ_2;
+	ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ ha;
 } xrecord_t;
 
-typedef struct s_xdfile {
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ s_xdfile {
 	xrecord_t *recs;
-	long nrec;
-	long dstart, dend;
-	bool *changed;
-	long *rindex;
-	long nreff;
+	ದೀರ್ಘ nrec;
+	ದೀರ್ಘ dstart, dend;
+	bool *ಬದಲಾಯಿತು;
+	ದೀರ್ಘ *rindex;
+	ದೀರ್ಘ nreff;
 } xdfile_t;
 
-typedef struct s_xdfenv {
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ s_xdfenv {
 	xdfile_t xdf1, xdf2;
 } xdfenv_t;
 
 
 
-#endif /* #if !defined(XTYPES_H) */
+#ಆದರೆ_ಅಂತ್ಯ /* #if !defined(XTYPES_H) */

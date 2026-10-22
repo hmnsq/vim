@@ -16,40 +16,40 @@
  * when using a dynamic scrollbar policy.
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-#include <Xm/Form.h>
-#include <Xm/PushBG.h>
-#include <Xm/Text.h>
-#include <Xm/TextF.h>
-#include <Xm/Label.h>
-#include <Xm/Frame.h>
-#include <Xm/LabelG.h>
-#include <Xm/ToggleBG.h>
-#include <Xm/SeparatoG.h>
-#include <Xm/DialogS.h>
-#include <Xm/List.h>
-#include <Xm/RowColumn.h>
-#include <Xm/AtomMgr.h>
-#include <Xm/Protocols.h>
+#ಅನ್ತರ್ಭಾವ <Xm/Form.h>
+#ಅನ್ತರ್ಭಾವ <Xm/PushBG.h>
+#ಅನ್ತರ್ಭಾವ <Xm/Text.h>
+#ಅನ್ತರ್ಭಾವ <Xm/TextF.h>
+#ಅನ್ತರ್ಭಾವ <Xm/Label.h>
+#ಅನ್ತರ್ಭಾವ <Xm/Frame.h>
+#ಅನ್ತರ್ಭಾವ <Xm/LabelG.h>
+#ಅನ್ತರ್ಭಾವ <Xm/ToggleBG.h>
+#ಅನ್ತರ್ಭಾವ <Xm/SeparatoG.h>
+#ಅನ್ತರ್ಭಾವ <Xm/DialogS.h>
+#ಅನ್ತರ್ಭಾವ <Xm/List.h>
+#ಅನ್ತರ್ಭಾವ <Xm/RowColumn.h>
+#ಅನ್ತರ್ಭಾವ <Xm/AtomMgr.h>
+#ಅನ್ತರ್ಭಾವ <Xm/Protocols.h>
 
-#include <X11/keysym.h>
-#include <X11/Xatom.h>
-#include <X11/StringDefs.h>
-#include <X11/Intrinsic.h>
+#ಅನ್ತರ್ಭಾವ <X11/keysym.h>
+#ಅನ್ತರ್ಭಾವ <X11/Xatom.h>
+#ಅನ್ತರ್ಭಾವ <X11/StringDefs.h>
+#ಅನ್ತರ್ಭಾವ <X11/Intrinsic.h>
 
-extern Widget vimShell;
+ಬಾಹ್ಯ Widget vimShell;
 
-#ifdef FEAT_MENU
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MENU
 # define apply_fontlist(w) gui_motif_menu_fontlist(w)
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 # define apply_fontlist(w)
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /////////////////////////////////////////////////////////////////////////////
 // Font selection dialogue implementation.
 
-static char wild[3] = "*";
+ಸ್ಥಿರ ಅಕ್ಷರ wild[3] = "*";
 
 /*
  * FIXME: This is a generic function, which should be used throughout the whole
@@ -60,41 +60,41 @@ static char wild[3] = "*";
  * WM_DELETE_WINDOW protocol request for the window.
  */
 
-    static void
-add_cancel_action(Widget shell, XtCallbackProc close_callback, void *arg)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಕೂಡಿಸು_cancel_action(Widget shell, XtCallbackProc close_callback, ಶೂನ್ಯ *arg)
 {
-    static Atom wmp_atom = 0;
-    static Atom dw_atom = 0;
+    ಸ್ಥಿರ Atom wmp_atom = 0;
+    ಸ್ಥಿರ Atom dw_atom = 0;
     Display *display = XtDisplay(shell);
 
     // deactivate the built-in delete response of killing the application
-    XtVaSetValues(shell, XmNdeleteResponse, XmDO_NOTHING, NULL);
+    Xt_Va_ಗಣ_ಮೌಲ್ಯಗಳು(shell, XmNdeleteResponse, XmDO_NOTHING, ಖಾಲಿ);
 
     // add a delete window protocol callback instead
-    if (!dw_atom)
+    ಆದರೆ (!dw_atom)
     {
 	wmp_atom = XmInternAtom(display, "WM_PROTOCOLS", True);
 	dw_atom = XmInternAtom(display, "WM_DELETE_WINDOW", True);
     }
-    XmAddProtocolCallback(shell, wmp_atom, dw_atom, close_callback, arg);
+    Xm_ಕೂಡಿಸು_Protocol_Callback(shell, wmp_atom, dw_atom, close_callback, arg);
 }
 
-#define MAX_FONTS			65535
-#define MAX_FONT_NAME_LEN		256
-#define MAX_ENTRIES_IN_LIST		5000
-#define MAX_DISPLAY_SIZE		150
-#define TEMP_BUF_SIZE			256
+#ವ್ಯಾಖ್ಯಾನಿಸು MAX_FONTS			65535
+#ವ್ಯಾಖ್ಯಾನಿಸು MAX_FONT_NAME_LEN		256
+#ವ್ಯಾಖ್ಯಾನಿಸು MAX_ENTRIES_ಒಳ_LIST		5000
+#ವ್ಯಾಖ್ಯಾನಿಸು MAX_DISPLAY_ಗಾತ್ರ		150
+#ವ್ಯಾಖ್ಯಾನಿಸು ತಾತ್ಕಾಲಿಕ_BUF_ಗಾತ್ರ			256
 
-enum ListSpecifier
+ಎಣಿಕೆ ListSpecifier
 {
     ENCODING,
     NAME,
     STYLE,
-    SIZE,
+    ಗಾತ್ರ_4,
     NONE
 };
 
-typedef struct _SharedFontSelData
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ Shared_Font_Sel_ದತ್ತಾಂಶ
 {
     Widget	dialog;
     Widget	ok;
@@ -104,108 +104,108 @@ typedef struct _SharedFontSelData
     Widget	list[NONE];
     Widget	name;
     Widget	sample;
-    char	**names;	// font name array of arrays
-    int		num;		// number of font names
+    ಅಕ್ಷರ	**ಹೆಸರುಗಳು;	// font name array of arrays
+    ಪೂರ್ಣಾಂಕ		ಅಂಕೆ;		// number of font names
     String	sel[NONE];	// selection category
-    Boolean	in_pixels;	// toggle state - size in pixels
-    char	*font_name;	// current font name
+    Boolean	ಒಳ_pixels;	// toggle state - size in pixels
+    ಅಕ್ಷರ	*font_name;	// current font name
     XFontStruct	*old;		// font data structure for sample display
     XmFontList	old_list;	// font data structure for sample display
-    Boolean	exit;		// used for program exit control
-} SharedFontSelData;
+    Boolean	ನಿರ್ಗಮಿಸು;		// used for program exit control
+} Shared_Font_Sel_ದತ್ತಾಂಶ_2;
 
 /*
  * Checking access to the font name array for validity.
  */
-    static char *
-fn(SharedFontSelData *data, int i)
+    ಸ್ಥಿರ ಅಕ್ಷರ *
+fn(Shared_Font_Sel_ದತ್ತಾಂಶ_2 *ದತ್ತಾಂಶ, ಪೂರ್ಣಾಂಕ i)
 {
     // Assertion checks:
-    if (data->num < 0)
+    ಆದರೆ (ದತ್ತಾಂಶ->ಅಂಕೆ < 0)
 	abort();
-    if (i >= data->num)
-	i = data->num - 1;
-    if (i < 0)
+    ಆದರೆ (i >= ದತ್ತಾಂಶ->ಅಂಕೆ)
+	i = ದತ್ತಾಂಶ->ಅಂಕೆ - 1;
+    ಆದರೆ (i < 0)
 	i = 0;
 
-    return data->names[i];
+    ಹಿಂತಿರುಗಿ ದತ್ತಾಂಶ->ಹೆಸರುಗಳು[i];
 }
 
 /*
  * Get a specific substring from a font name.
  */
-    static void
-get_part(char *in, int pos, char *out)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+get_part(ಅಕ್ಷರ *ಒಳ, ಪೂರ್ಣಾಂಕ pos, ಅಕ್ಷರ *ಹೊರಹೋಗು)
 {
-    int	i;
-    int j;
+    ಪೂರ್ಣಾಂಕ	i;
+    ಪೂರ್ಣಾಂಕ j;
 
-    *out = '\0';
+    *ಹೊರಹೋಗು = '\0';
 
-    for (i = 0; (pos > 0) && (in[i] != '\0'); ++i)
-	if (in[i] == '-')
+    ಗಾಗಿ (i = 0; (pos > 0) && (ಒಳ[i] != '\0'); ++i)
+	ಆದರೆ (ಒಳ[i] == '-')
 	    pos--;
 
-    if (in[i] == '\0')
-	return;
+    ಆದರೆ (ಒಳ[i] == '\0')
+	ಹಿಂತಿರುಗಿ;
 
-    for (j = 0; (in[i] != '-') && (in[i] != '\0'); ++i, ++j)
-	out[j] = in[i];
-    out[j] = '\0';
+    ಗಾಗಿ (j = 0; (ಒಳ[i] != '-') && (ಒಳ[i] != '\0'); ++i, ++j)
+	ಹೊರಹೋಗು[j] = ಒಳ[i];
+    ಹೊರಹೋಗು[j] = '\0';
 }
 
 /*
  * Given a font name this function returns the part used in the first
  * scroll list.
  */
-    static void
-name_part(char *font, char *buf)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+name_part(ಅಕ್ಷರ *font, ಅಕ್ಷರ *buf)
 {
-    char    buf2[TEMP_BUF_SIZE];
-    char    buf3[TEMP_BUF_SIZE];
+    ಅಕ್ಷರ    buf2[ತಾತ್ಕಾಲಿಕ_BUF_ಗಾತ್ರ];
+    ಅಕ್ಷರ    buf3[ತಾತ್ಕಾಲಿಕ_BUF_ಗಾತ್ರ];
 
     get_part(font, 2, buf2);
     get_part(font, 1, buf3);
 
-    if (*buf3 != NUL)
-	vim_snprintf(buf, TEMP_BUF_SIZE, "%s (%s)", buf2, buf3);
-    else
-	vim_snprintf(buf, TEMP_BUF_SIZE, "%s", buf2);
+    ಆದರೆ (*buf3 != NUL)
+	vim_snprintf(buf, ತಾತ್ಕಾಲಿಕ_BUF_ಗಾತ್ರ, "%s (%s)", buf2, buf3);
+    ಇಲ್ಲದಿದ್ದರೆ
+	vim_snprintf(buf, ತಾತ್ಕಾಲಿಕ_BUF_ಗಾತ್ರ, "%s", buf2);
 }
 
 /*
  * Given a font name this function returns the part used in the second scroll list.
  */
-    static void
-style_part(char *font, char *buf)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+style_part(ಅಕ್ಷರ *font, ಅಕ್ಷರ *buf)
 {
-    char    buf2[TEMP_BUF_SIZE];
-    char    buf3[TEMP_BUF_SIZE];
+    ಅಕ್ಷರ    buf2[ತಾತ್ಕಾಲಿಕ_BUF_ಗಾತ್ರ];
+    ಅಕ್ಷರ    buf3[ತಾತ್ಕಾಲಿಕ_BUF_ಗಾತ್ರ];
 
     get_part(font, 3, buf3);
     get_part(font, 5, buf2);
 
-    if (!strcmp(buf2, "normal") && !strcmp(buf2, "Normal")
+    ಆದರೆ (!strcmp(buf2, "normal") && !strcmp(buf2, "Normal")
 						   && !strcmp(buf2, "NORMAL"))
-	vim_snprintf(buf, TEMP_BUF_SIZE, "%s %s", buf3, buf2);
-    else
+	vim_snprintf(buf, ತಾತ್ಕಾಲಿಕ_BUF_ಗಾತ್ರ, "%s %s", buf3, buf2);
+    ಇಲ್ಲದಿದ್ದರೆ
 	strcpy(buf, buf3);
 
     get_part(font, 6, buf2);
 
-    if (buf2[0] != '\0')
-	vim_snprintf(buf3, TEMP_BUF_SIZE, "%s %s", buf, buf2);
-    else
+    ಆದರೆ (buf2[0] != '\0')
+	vim_snprintf(buf3, ತಾತ್ಕಾಲಿಕ_BUF_ಗಾತ್ರ, "%s %s", buf, buf2);
+    ಇಲ್ಲದಿದ್ದರೆ
 	strcpy(buf3, buf);
 
     get_part(font, 4, buf2);
 
-    if (!strcmp(buf2, "o") || !strcmp(buf2, "O"))
-	vim_snprintf(buf, TEMP_BUF_SIZE, "%s oblique", buf3);
-    else if (!strcmp(buf2, "i") || !strcmp(buf2, "I"))
-	vim_snprintf(buf, TEMP_BUF_SIZE, "%s italic", buf3);
+    ಆದರೆ (!strcmp(buf2, "o") || !strcmp(buf2, "O"))
+	vim_snprintf(buf, ತಾತ್ಕಾಲಿಕ_BUF_ಗಾತ್ರ, "%s oblique", buf3);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!strcmp(buf2, "i") || !strcmp(buf2, "I"))
+	vim_snprintf(buf, ತಾತ್ಕಾಲಿಕ_BUF_ಗಾತ್ರ, "%s italic", buf3);
 
-    if (!strcmp(buf, " "))
+    ಆದರೆ (!strcmp(buf, " "))
 	strcpy(buf, "-");
 }
 
@@ -213,35 +213,35 @@ style_part(char *font, char *buf)
  * Given a font name this function returns the part used in the third
  * scroll list.
  */
-    static void
-size_part(char *font, char *buf, int inPixels)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಾತ್ರ_part(ಅಕ್ಷರ *font, ಅಕ್ಷರ *buf, ಪೂರ್ಣಾಂಕ ಒಳ_Pixels)
 {
-    int	    size;
-    float   temp;
+    ಪೂರ್ಣಾಂಕ	    ಗಾತ್ರ_2;
+    ದಶಮಾಂಶ   ತಾತ್ಕಾಲಿಕ;
 
     *buf = '\0';
 
-    if (inPixels)
+    ಆದರೆ (ಒಳ_Pixels)
     {
 	get_part(font, 7, buf);
-	if (*buf != NUL)
+	ಆದರೆ (*buf != NUL)
 	{
-	    size = atoi(buf);
-	    sprintf(buf, "%3d", size);
+	    ಗಾತ್ರ_2 = atoi(buf);
+	    sprintf(buf, "%3d", ಗಾತ್ರ_2);
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	get_part(font, 8, buf);
-	if (*buf != NUL)
+	ಆದರೆ (*buf != NUL)
 	{
-	    size = atoi(buf);
-	    temp = (float)size / 10.0;
-	    size = temp;
-	    if (buf[strlen(buf) - 1] == '0')
-		sprintf(buf, "%3d", size);
-	    else
-		sprintf(buf, "%4.1f", temp);
+	    ಗಾತ್ರ_2 = atoi(buf);
+	    ತಾತ್ಕಾಲಿಕ = (ದಶಮಾಂಶ)ಗಾತ್ರ_2 / 10.0;
+	    ಗಾತ್ರ_2 = ತಾತ್ಕಾಲಿಕ;
+	    ಆದರೆ (buf[ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(buf) - 1] == '0')
+		sprintf(buf, "%3d", ಗಾತ್ರ_2);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		sprintf(buf, "%4.1f", ತಾತ್ಕಾಲಿಕ);
 	}
     }
 }
@@ -249,178 +249,178 @@ size_part(char *font, char *buf, int inPixels)
 /*
  * Given a font name this function returns the part used in the choice menu.
  */
-    static void
-encoding_part(char *font, char *buf)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+encoding_part(ಅಕ್ಷರ *font, ಅಕ್ಷರ *buf)
 {
-    char    buf1[TEMP_BUF_SIZE];
-    char    buf2[TEMP_BUF_SIZE];
+    ಅಕ್ಷರ    buf1[ತಾತ್ಕಾಲಿಕ_BUF_ಗಾತ್ರ];
+    ಅಕ್ಷರ    buf2[ತಾತ್ಕಾಲಿಕ_BUF_ಗಾತ್ರ];
 
     *buf = '\0';
 
     get_part(font, 13, buf1);
     get_part(font, 14, buf2);
 
-    if (*buf1 != NUL && *buf2 != NUL)
-	vim_snprintf(buf, TEMP_BUF_SIZE, "%s-%s", buf1, buf2);
-    if (!strcmp(buf, " "))
+    ಆದರೆ (*buf1 != NUL && *buf2 != NUL)
+	vim_snprintf(buf, ತಾತ್ಕಾಲಿಕ_BUF_ಗಾತ್ರ, "%s-%s", buf1, buf2);
+    ಆದರೆ (!strcmp(buf, " "))
 	strcpy(buf, "-");
 }
 
 /*
  * Inserts a string into correct sorted position in a list.
  */
-    static void
-add_to_list(char **buf, char *item, int *count)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಕೂಡಿಸು_ಗಮ್ಯ_list(ಅಕ್ಷರ **buf, ಅಕ್ಷರ *ಅಂಶ, ಪೂರ್ಣಾಂಕ *ಎಣಿಕೆ_2)
 {
-    int	i;
-    int j;
+    ಪೂರ್ಣಾಂಕ	i;
+    ಪೂರ್ಣಾಂಕ j;
 
-    if (*count == MAX_ENTRIES_IN_LIST)
-	return;
+    ಆದರೆ (*ಎಣಿಕೆ_2 == MAX_ENTRIES_ಒಳ_LIST)
+	ಹಿಂತಿರುಗಿ;
 
     // avoid duplication
-    for (i = 0; i < *count; ++i)
+    ಗಾಗಿ (i = 0; i < *ಎಣಿಕೆ_2; ++i)
     {
-	if (!strcmp(buf[i], item))
-	    return;
+	ಆದರೆ (!strcmp(buf[i], ಅಂಶ))
+	    ಹಿಂತಿರುಗಿ;
     }
 
     // find order place, but make sure that wild card comes first
-    if (!strcmp(item, wild))
+    ಆದರೆ (!strcmp(ಅಂಶ, wild))
 	i = 0;
-    else
-	for (i = 0; i < *count; ++i)
-	    if (strcmp(buf[i], item) > 0 && strcmp(buf[i], wild))
-		break;
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಗಾಗಿ (i = 0; i < *ಎಣಿಕೆ_2; ++i)
+	    ಆದರೆ (strcmp(buf[i], ಅಂಶ) > 0 && strcmp(buf[i], wild))
+		ನಿಲ್ಲಿಸು;
 
     // now insert the item
-    for (j = *count; j > i; --j)
+    ಗಾಗಿ (j = *ಎಣಿಕೆ_2; j > i; --j)
 	buf[j] = buf[j-1];
-    buf[i] = XtNewString(item);
+    buf[i] = XtNewString(ಅಂಶ);
 
-    ++(*count);
+    ++(*ಎಣಿಕೆ_2);
 }
 
 /*
  * True if the font matches some field.
  */
-    static Boolean
-match(SharedFontSelData *data, enum ListSpecifier l, int i)
+    ಸ್ಥಿರ Boolean
+ಹೊಂದಿಕೆ(Shared_Font_Sel_ದತ್ತಾಂಶ_2 *ದತ್ತಾಂಶ, ಎಣಿಕೆ ListSpecifier l, ಪೂರ್ಣಾಂಕ i)
 {
-    char buf[TEMP_BUF_SIZE];
+    ಅಕ್ಷರ buf[ತಾತ್ಕಾಲಿಕ_BUF_ಗಾತ್ರ];
 
     // An empty selection or a wild card matches anything.
-    if (!data->sel[l] || !strcmp(data->sel[l], wild))
-	return True;
+    ಆದರೆ (!ದತ್ತಾಂಶ->sel[l] || !strcmp(ದತ್ತಾಂಶ->sel[l], wild))
+	ಹಿಂತಿರುಗಿ True;
 
     // chunk out the desired part...
-    switch (l)
+    ಆಯ್ಕೆ (l)
     {
-	case ENCODING:
-	    encoding_part(fn(data, i), buf);
-	    break;
+	ಸ್ಥಿತಿ ENCODING:
+	    encoding_part(fn(ದತ್ತಾಂಶ, i), buf);
+	    ನಿಲ್ಲಿಸು;
 
-	case NAME:
-	    name_part(fn(data, i), buf);
-	    break;
+	ಸ್ಥಿತಿ NAME:
+	    name_part(fn(ದತ್ತಾಂಶ, i), buf);
+	    ನಿಲ್ಲಿಸು;
 
-	case STYLE:
-	    style_part(fn(data, i), buf);
-	    break;
+	ಸ್ಥಿತಿ STYLE:
+	    style_part(fn(ದತ್ತಾಂಶ, i), buf);
+	    ನಿಲ್ಲಿಸು;
 
-	case SIZE:
-	    size_part(fn(data, i), buf, data->in_pixels);
-	    break;
-	default:
+	ಸ್ಥಿತಿ ಗಾತ್ರ_4:
+	    ಗಾತ್ರ_part(fn(ದತ್ತಾಂಶ, i), buf, ದತ್ತಾಂಶ->ಒಳ_pixels);
+	    ನಿಲ್ಲಿಸು;
+	ಪೂರ್ವನಿಯೋಜಿತ:
 	    ;
     }
 
     // ...and chew it now
 
-    return !strcmp(buf, data->sel[l]);
+    ಹಿಂತಿರುಗಿ !strcmp(buf, ದತ್ತಾಂಶ->sel[l]);
 }
 
-    static Boolean
-proportional(char *font)
+    ಸ್ಥಿರ Boolean
+proportional(ಅಕ್ಷರ *font)
 {
-    char buf[TEMP_BUF_SIZE];
+    ಅಕ್ಷರ buf[ತಾತ್ಕಾಲಿಕ_BUF_ಗಾತ್ರ];
 
     get_part(font, 11, buf);
 
-    return !strcmp(buf, "p") || !strcmp(buf, "P");
+    ಹಿಂತಿರುಗಿ !strcmp(buf, "p") || !strcmp(buf, "P");
 }
 
 
-static void encoding_callback(Widget w, SharedFontSelData *data,
-							     XtPointer dummy);
+ಸ್ಥಿರ ಶೂನ್ಯ encoding_callback(Widget w, Shared_Font_Sel_ದತ್ತಾಂಶ_2 *ದತ್ತಾಂಶ,
+							     Xt_ಸೂಚಕ dummy);
 
 /*
  * Parse through the fontlist data and set up the three scroll lists.  The fix
  * parameter can be used to exclude a list from any changes.  This is used for
  * updates after selections caused by the users actions.
  */
-    static void
-fill_lists(enum ListSpecifier fix, SharedFontSelData *data)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+fill_lists(ಎಣಿಕೆ ListSpecifier fix, Shared_Font_Sel_ದತ್ತಾಂಶ_2 *ದತ್ತಾಂಶ)
 {
-    char	*list[NONE][MAX_ENTRIES_IN_LIST];
-    int		count[NONE];
-    char	buf[TEMP_BUF_SIZE];
-    XmString	items[MAX_ENTRIES_IN_LIST];
-    int		i;
-    int		idx;
+    ಅಕ್ಷರ	*list[NONE][MAX_ENTRIES_ಒಳ_LIST];
+    ಪೂರ್ಣಾಂಕ		ಎಣಿಕೆ_2[NONE];
+    ಅಕ್ಷರ	buf[ತಾತ್ಕಾಲಿಕ_BUF_ಗಾತ್ರ];
+    XmString	ವಸ್ತುಗಳು[MAX_ENTRIES_ಒಳ_LIST];
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		idx;
 
-    for (idx = (int)ENCODING; idx < (int)NONE; ++idx)
-	count[idx] = 0;
+    ಗಾಗಿ (idx = (ಪೂರ್ಣಾಂಕ)ENCODING; idx < (ಪೂರ್ಣಾಂಕ)NONE; ++idx)
+	ಎಣಿಕೆ_2[idx] = 0;
 
     // First we insert the wild char into every single list.
-    if (fix != ENCODING)
-	add_to_list(list[ENCODING], wild, &count[ENCODING]);
-    if (fix != NAME)
-	add_to_list(list[NAME], wild, &count[NAME]);
-    if (fix != STYLE)
-	add_to_list(list[STYLE], wild, &count[STYLE]);
-    if (fix != SIZE)
-	add_to_list(list[SIZE], wild, &count[SIZE]);
+    ಆದರೆ (fix != ENCODING)
+	ಕೂಡಿಸು_ಗಮ್ಯ_list(list[ENCODING], wild, &ಎಣಿಕೆ_2[ENCODING]);
+    ಆದರೆ (fix != NAME)
+	ಕೂಡಿಸು_ಗಮ್ಯ_list(list[NAME], wild, &ಎಣಿಕೆ_2[NAME]);
+    ಆದರೆ (fix != STYLE)
+	ಕೂಡಿಸು_ಗಮ್ಯ_list(list[STYLE], wild, &ಎಣಿಕೆ_2[STYLE]);
+    ಆದರೆ (fix != ಗಾತ್ರ_4)
+	ಕೂಡಿಸು_ಗಮ್ಯ_list(list[ಗಾತ್ರ_4], wild, &ಎಣಿಕೆ_2[ಗಾತ್ರ_4]);
 
-    for (i = 0; i < data->num && i < MAX_ENTRIES_IN_LIST; i++)
+    ಗಾಗಿ (i = 0; i < ದತ್ತಾಂಶ->ಅಂಕೆ && i < MAX_ENTRIES_ಒಳ_LIST; i++)
     {
-	if (proportional(fn(data, i)))
-	    continue;
+	ಆದರೆ (proportional(fn(ದತ್ತಾಂಶ, i)))
+	    ಮುಂದುವರಿ;
 
-	if (fix != ENCODING
-		&& match(data, NAME, i)
-		&& match(data, STYLE, i)
-		&& match(data, SIZE, i))
+	ಆದರೆ (fix != ENCODING
+		&& ಹೊಂದಿಕೆ(ದತ್ತಾಂಶ, NAME, i)
+		&& ಹೊಂದಿಕೆ(ದತ್ತಾಂಶ, STYLE, i)
+		&& ಹೊಂದಿಕೆ(ದತ್ತಾಂಶ, ಗಾತ್ರ_4, i))
 	{
-	    encoding_part(fn(data, i), buf);
-	    add_to_list(list[ENCODING], buf, &count[ENCODING]);
+	    encoding_part(fn(ದತ್ತಾಂಶ, i), buf);
+	    ಕೂಡಿಸು_ಗಮ್ಯ_list(list[ENCODING], buf, &ಎಣಿಕೆ_2[ENCODING]);
 	}
 
-	if (fix != NAME
-		&& match(data, ENCODING, i)
-		&& match(data, STYLE, i)
-		&& match(data, SIZE, i))
+	ಆದರೆ (fix != NAME
+		&& ಹೊಂದಿಕೆ(ದತ್ತಾಂಶ, ENCODING, i)
+		&& ಹೊಂದಿಕೆ(ದತ್ತಾಂಶ, STYLE, i)
+		&& ಹೊಂದಿಕೆ(ದತ್ತಾಂಶ, ಗಾತ್ರ_4, i))
 	{
-	    name_part(fn(data, i), buf);
-	    add_to_list(list[NAME], buf, &count[NAME]);
+	    name_part(fn(ದತ್ತಾಂಶ, i), buf);
+	    ಕೂಡಿಸು_ಗಮ್ಯ_list(list[NAME], buf, &ಎಣಿಕೆ_2[NAME]);
 	}
 
-	if (fix != STYLE
-		&& match(data, ENCODING, i)
-		&& match(data, NAME, i)
-		&& match(data, SIZE, i))
+	ಆದರೆ (fix != STYLE
+		&& ಹೊಂದಿಕೆ(ದತ್ತಾಂಶ, ENCODING, i)
+		&& ಹೊಂದಿಕೆ(ದತ್ತಾಂಶ, NAME, i)
+		&& ಹೊಂದಿಕೆ(ದತ್ತಾಂಶ, ಗಾತ್ರ_4, i))
 	{
-	    style_part(fn(data, i), buf);
-	    add_to_list(list[STYLE], buf, &count[STYLE]);
+	    style_part(fn(ದತ್ತಾಂಶ, i), buf);
+	    ಕೂಡಿಸು_ಗಮ್ಯ_list(list[STYLE], buf, &ಎಣಿಕೆ_2[STYLE]);
 	}
 
-	if (fix != SIZE
-		&& match(data, ENCODING, i)
-		&& match(data, NAME, i)
-		&& match(data, STYLE, i))
+	ಆದರೆ (fix != ಗಾತ್ರ_4
+		&& ಹೊಂದಿಕೆ(ದತ್ತಾಂಶ, ENCODING, i)
+		&& ಹೊಂದಿಕೆ(ದತ್ತಾಂಶ, NAME, i)
+		&& ಹೊಂದಿಕೆ(ದತ್ತಾಂಶ, STYLE, i))
 	{
-	    size_part(fn(data, i), buf, data->in_pixels);
-	    add_to_list(list[SIZE], buf, &count[SIZE]);
+	    ಗಾತ್ರ_part(fn(ದತ್ತಾಂಶ, i), buf, ದತ್ತಾಂಶ->ಒಳ_pixels);
+	    ಕೂಡಿಸು_ಗಮ್ಯ_list(list[ಗಾತ್ರ_4], buf, &ಎಣಿಕೆ_2[ಗಾತ್ರ_4]);
 	}
     }
 
@@ -428,154 +428,154 @@ fill_lists(enum ListSpecifier fix, SharedFontSelData *data)
      * And now do the preselection in all lists where there was one:
      */
 
-    if (fix != ENCODING)
+    ಆದರೆ (fix != ENCODING)
     {
-	Cardinal n_items;
+	Cardinal n_ವಸ್ತುಗಳು;
 	WidgetList children;
 	Widget selected_button = 0;
 
 	// Get and update the current button list.
-	XtVaGetValues(data->encoding_pulldown,
+	Xt_Va_Get_ಮೌಲ್ಯಗಳು(ದತ್ತಾಂಶ->encoding_pulldown,
 		XmNchildren, &children,
-		XmNnumChildren, &n_items,
-		NULL);
+		XmNnumChildren, &n_ವಸ್ತುಗಳು,
+		ಖಾಲಿ);
 
-	for (i = 0; i < count[ENCODING]; ++i)
+	ಗಾಗಿ (i = 0; i < ಎಣಿಕೆ_2[ENCODING]; ++i)
 	{
 	    Widget button;
 
-	    items[i] = XmStringCreateLocalized(list[ENCODING][i]);
+	    ವಸ್ತುಗಳು[i] = XmStringCreateLocalized(list[ENCODING][i]);
 
-	    if (i < (int)n_items)
+	    ಆದರೆ (i < (ಪೂರ್ಣಾಂಕ)n_ವಸ್ತುಗಳು)
 	    {
 		// recycle old button
-		XtVaSetValues(children[i],
-			XmNlabelString, items[i],
-			XmNuserData, i,
-			NULL);
+		Xt_Va_ಗಣ_ಮೌಲ್ಯಗಳು(children[i],
+			XmNlabelString, ವಸ್ತುಗಳು[i],
+			Xm_Nuser_ದತ್ತಾಂಶ, i,
+			ಖಾಲಿ);
 		button = children[i];
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		// create a new button
 		button = XtVaCreateManagedWidget("button",
-			xmPushButtonGadgetClass,
-			data->encoding_pulldown,
-			XmNlabelString, items[i],
-			XmNuserData, i,
-			NULL);
-		XtAddCallback(button, XmNactivateCallback,
-			(XtCallbackProc) encoding_callback, (XtPointer) data);
-		XtManageChild(button);
+			xm_ತಳ್ಳು_Button_Gadget_Class,
+			ದತ್ತಾಂಶ->encoding_pulldown,
+			XmNlabelString, ವಸ್ತುಗಳು[i],
+			Xm_Nuser_ದತ್ತಾಂಶ, i,
+			ಖಾಲಿ);
+		Xt_ಕೂಡಿಸು_Callback(button, XmNactivateCallback,
+			(XtCallbackProc) encoding_callback, (Xt_ಸೂಚಕ) ದತ್ತಾಂಶ);
+		Xt_Manage_ಮಗು(button);
 	    }
 
-	    if (data->sel[ENCODING])
+	    ಆದರೆ (ದತ್ತಾಂಶ->sel[ENCODING])
 	    {
-		if (!strcmp(data->sel[ENCODING], list[ENCODING][i]))
+		ಆದರೆ (!strcmp(ದತ್ತಾಂಶ->sel[ENCODING], list[ENCODING][i]))
 		    selected_button = button;
 	    }
 	    XtFree(list[ENCODING][i]);
 	}
 
 	// Destroy all the outstanding menu items.
-	for (i = count[ENCODING]; i < (int)n_items; ++i)
+	ಗಾಗಿ (i = ಎಣಿಕೆ_2[ENCODING]; i < (ಪೂರ್ಣಾಂಕ)n_ವಸ್ತುಗಳು; ++i)
 	{
-	    XtUnmanageChild(children[i]);
+	    Xt_Unmanage_ಮಗು(children[i]);
 	    XtDestroyWidget(children[i]);
 	}
 
 	// Preserve the current selection visually.
-	if (selected_button)
+	ಆದರೆ (selected_button)
 	{
-	    XtVaSetValues(data->encoding_menu,
+	    Xt_Va_ಗಣ_ಮೌಲ್ಯಗಳು(ದತ್ತಾಂಶ->encoding_menu,
 		    XmNmenuHistory, selected_button,
-		    NULL);
+		    ಖಾಲಿ);
 	}
 
-	for (i = 0; i < count[ENCODING]; ++i)
-	    XmStringFree(items[i]);
+	ಗಾಗಿ (i = 0; i < ಎಣಿಕೆ_2[ENCODING]; ++i)
+	    XmStringFree(ವಸ್ತುಗಳು[i]);
     }
 
     /*
      * Now loop through the remaining lists and set them up.
      */
-    for (idx = (int)NAME; idx < (int)NONE; ++idx)
+    ಗಾಗಿ (idx = (ಪೂರ್ಣಾಂಕ)NAME; idx < (ಪೂರ್ಣಾಂಕ)NONE; ++idx)
     {
 	Widget w;
 
-	if (fix == (enum ListSpecifier)idx)
-	    continue;
+	ಆದರೆ (fix == (ಎಣಿಕೆ ListSpecifier)idx)
+	    ಮುಂದುವರಿ;
 
-	switch ((enum ListSpecifier)idx)
+	ಆಯ್ಕೆ ((ಎಣಿಕೆ ListSpecifier)idx)
 	{
-	    case NAME:
-		w = data->list[NAME];
-		break;
-	    case STYLE:
-		w = data->list[STYLE];
-		break;
-	    case SIZE:
-		w = data->list[SIZE];
-		break;
-	    default:
+	    ಸ್ಥಿತಿ NAME:
+		w = ದತ್ತಾಂಶ->list[NAME];
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ STYLE:
+		w = ದತ್ತಾಂಶ->list[STYLE];
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ ಗಾತ್ರ_4:
+		w = ದತ್ತಾಂಶ->list[ಗಾತ್ರ_4];
+		ನಿಲ್ಲಿಸು;
+	    ಪೂರ್ವನಿಯೋಜಿತ:
 		w = (Widget)0;	// for lint
 	}
 
-	for (i = 0; i < count[idx]; ++i)
+	ಗಾಗಿ (i = 0; i < ಎಣಿಕೆ_2[idx]; ++i)
 	{
-	    items[i] = XmStringCreateLocalized(list[idx][i]);
+	    ವಸ್ತುಗಳು[i] = XmStringCreateLocalized(list[idx][i]);
 	    XtFree(list[idx][i]);
 	}
-	XmListDeleteAllItems(w);
-	XmListAddItems(w, items, count[idx], 1);
-	if (data->sel[idx])
+	Xm_List_Delete_All_ವಸ್ತುಗಳು(w);
+	Xm_List_ಕೂಡಿಸು_ವಸ್ತುಗಳು(w, ವಸ್ತುಗಳು, ಎಣಿಕೆ_2[idx], 1);
+	ಆದರೆ (ದತ್ತಾಂಶ->sel[idx])
 	{
-	    XmStringFree(items[0]);
-	    items[0] = XmStringCreateLocalized(data->sel[idx]);
-	    XmListSelectItem(w, items[0], False);
-	    XmListSetBottomItem(w, items[0]);
+	    XmStringFree(ವಸ್ತುಗಳು[0]);
+	    ವಸ್ತುಗಳು[0] = XmStringCreateLocalized(ದತ್ತಾಂಶ->sel[idx]);
+	    Xm_List_Select_ಅಂಶ(w, ವಸ್ತುಗಳು[0], False);
+	    Xm_List_ಗಣ_Bottom_ಅಂಶ(w, ವಸ್ತುಗಳು[0]);
 	}
-	for (i = 0; i < count[idx]; ++i)
-	    XmStringFree(items[i]);
+	ಗಾಗಿ (i = 0; i < ಎಣಿಕೆ_2[idx]; ++i)
+	    XmStringFree(ವಸ್ತುಗಳು[i]);
     }
 }
 
-    static void
-stoggle_callback(Widget w UNUSED,
-	SharedFontSelData *data,
-	XmToggleButtonCallbackStruct *call_data)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+stoggle_callback(Widget w ಬಳಸದ,
+	Shared_Font_Sel_ದತ್ತಾಂಶ_2 *ದತ್ತಾಂಶ,
+	XmToggleButtonCallbackStruct *call_ದತ್ತಾಂಶ)
 {
-    int		i, do_sel;
-    char	newSize[TEMP_BUF_SIZE];
+    ಪೂರ್ಣಾಂಕ		i, do_sel;
+    ಅಕ್ಷರ	new_ಗಾತ್ರ_2[ತಾತ್ಕಾಲಿಕ_BUF_ಗಾತ್ರ];
     XmString	str;
 
-    if (call_data->reason != (int)XmCR_VALUE_CHANGED)
-	return;
+    ಆದರೆ (call_ದತ್ತಾಂಶ->reason != (ಪೂರ್ಣಾಂಕ)Xm_CR_ಮೌಲ್ಯ_ಬದಲಾಯಿತು)
+	ಹಿಂತಿರುಗಿ;
 
-    do_sel = (data->sel[SIZE] != NULL) && strcmp(data->sel[SIZE], wild);
+    do_sel = (ದತ್ತಾಂಶ->sel[ಗಾತ್ರ_4] != ಖಾಲಿ) && strcmp(ದತ್ತಾಂಶ->sel[ಗಾತ್ರ_4], wild);
 
-    for (i = 0; do_sel && (i < data->num); i++)
-	if (match(data, ENCODING, i)
-		&& match(data, NAME, i)
-		&& match(data, STYLE, i)
-		&& match(data, SIZE, i))
+    ಗಾಗಿ (i = 0; do_sel && (i < ದತ್ತಾಂಶ->ಅಂಕೆ); i++)
+	ಆದರೆ (ಹೊಂದಿಕೆ(ದತ್ತಾಂಶ, ENCODING, i)
+		&& ಹೊಂದಿಕೆ(ದತ್ತಾಂಶ, NAME, i)
+		&& ಹೊಂದಿಕೆ(ದತ್ತಾಂಶ, STYLE, i)
+		&& ಹೊಂದಿಕೆ(ದತ್ತಾಂಶ, ಗಾತ್ರ_4, i))
 	{
-	    size_part(fn(data, i), newSize, !data->in_pixels);
-	    break;
+	    ಗಾತ್ರ_part(fn(ದತ್ತಾಂಶ, i), new_ಗಾತ್ರ_2, !ದತ್ತಾಂಶ->ಒಳ_pixels);
+	    ನಿಲ್ಲಿಸು;
 	}
 
-    data->in_pixels = !data->in_pixels;
+    ದತ್ತಾಂಶ->ಒಳ_pixels = !ದತ್ತಾಂಶ->ಒಳ_pixels;
 
-    if (data->sel[SIZE])
-	XtFree(data->sel[SIZE]);
-    data->sel[SIZE] = NULL;
-    fill_lists(NONE, data);
+    ಆದರೆ (ದತ್ತಾಂಶ->sel[ಗಾತ್ರ_4])
+	XtFree(ದತ್ತಾಂಶ->sel[ಗಾತ್ರ_4]);
+    ದತ್ತಾಂಶ->sel[ಗಾತ್ರ_4] = ಖಾಲಿ;
+    fill_lists(NONE, ದತ್ತಾಂಶ);
 
-    if (do_sel)
+    ಆದರೆ (do_sel)
     {
-	str = XmStringCreateLocalized(newSize);
-	XmListSelectItem(data->list[SIZE], str, True);
-	XmListSetBottomItem(data->list[SIZE], str);
+	str = XmStringCreateLocalized(new_ಗಾತ್ರ_2);
+	Xm_List_Select_ಅಂಶ(ದತ್ತಾಂಶ->list[ಗಾತ್ರ_4], str, True);
+	Xm_List_ಗಣ_Bottom_ಅಂಶ(ದತ್ತಾಂಶ->list[ಗಾತ್ರ_4], str);
 	XmStringFree(str);
     }
 }
@@ -583,262 +583,262 @@ stoggle_callback(Widget w UNUSED,
 /*
  * Show the currently selected font in the sample text label.
  */
-    static void
-display_sample(SharedFontSelData *data)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+display_sample(Shared_Font_Sel_ದತ್ತಾಂಶ_2 *ದತ್ತಾಂಶ)
 {
-    Arg		    args[2];
-    int		    n;
+    Arg		    ವಾದಗಳು[2];
+    ಪೂರ್ಣಾಂಕ		    n;
     XFontStruct	*   font;
     XmFontList	    font_list;
     Display *	    display;
     XmString	    str;
 
-    display = XtDisplay(data->dialog);
-    font = XLoadQueryFont(display, data->font_name);
+    display = XtDisplay(ದತ್ತಾಂಶ->dialog);
+    font = XLoadQueryFont(display, ದತ್ತಾಂಶ->font_name);
     font_list = gui_motif_create_fontlist(font);
 
     n = 0;
     str = XmStringCreateLocalized("AaBbZzYy 0123456789");
-    XtSetArg(args[n], XmNlabelString, str); n++;
-    XtSetArg(args[n], XmNfontList, font_list); n++;
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], XmNlabelString, str); n++;
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], XmNfontList, font_list); n++;
 
-    XtSetValues(data->sample, args, n);
+    Xt_ಗಣ_ಮೌಲ್ಯಗಳು(ದತ್ತಾಂಶ->sample, ವಾದಗಳು, n);
     XmStringFree(str);
 
-    if (data->old)
+    ಆದರೆ (ದತ್ತಾಂಶ->old)
     {
-	XFreeFont(display, data->old);
-	XmFontListFree(data->old_list);
+	XFreeFont(display, ದತ್ತಾಂಶ->old);
+	XmFontListFree(ದತ್ತಾಂಶ->old_list);
     }
-    data->old = font;
-    data->old_list = font_list;
+    ದತ್ತಾಂಶ->old = font;
+    ದತ್ತಾಂಶ->old_list = font_list;
 }
 
 
-    static Boolean
+    ಸ್ಥಿರ Boolean
 do_choice(Widget w,
-	SharedFontSelData *data,
-	XmListCallbackStruct *call_data,
-	enum ListSpecifier which)
+	Shared_Font_Sel_ದತ್ತಾಂಶ_2 *ದತ್ತಾಂಶ,
+	XmListCallbackStruct *call_ದತ್ತಾಂಶ,
+	ಎಣಿಕೆ ListSpecifier which)
 {
-    char *sel;
+    ಅಕ್ಷರ *sel;
 
-    XmStringGetLtoR(call_data->item, XmSTRING_DEFAULT_CHARSET, &sel);
+    XmStringGetLtoR(call_ದತ್ತಾಂಶ->ಅಂಶ, XmSTRING_DEFAULT_CHARSET, &sel);
 
-    if (!data->sel[which])
-	data->sel[which] = XtNewString(sel);
-    else
+    ಆದರೆ (!ದತ್ತಾಂಶ->sel[which])
+	ದತ್ತಾಂಶ->sel[which] = XtNewString(sel);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (!strcmp(data->sel[which], sel))
+	ಆದರೆ (!strcmp(ದತ್ತಾಂಶ->sel[which], sel))
 	{
 	    // unselecting current selection
-	    XtFree(data->sel[which]);
-	    data->sel[which] = NULL;
-	    if (w)
-		XmListDeselectItem(w, call_data->item);
+	    XtFree(ದತ್ತಾಂಶ->sel[which]);
+	    ದತ್ತಾಂಶ->sel[which] = ಖಾಲಿ;
+	    ಆದರೆ (w)
+		Xm_List_Deselect_ಅಂಶ(w, call_ದತ್ತಾಂಶ->ಅಂಶ);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    XtFree(data->sel[which]);
-	    data->sel[which] = XtNewString(sel);
+	    XtFree(ದತ್ತಾಂಶ->sel[which]);
+	    ದತ್ತಾಂಶ->sel[which] = XtNewString(sel);
 	}
     }
     XtFree(sel);
 
-    fill_lists(which, data);
+    fill_lists(which, ದತ್ತಾಂಶ);
 
     // If there is a font selection, we display it.
-    if (data->sel[ENCODING]
-	    && data->sel[NAME]
-	    && data->sel[STYLE]
-	    && data->sel[SIZE]
-	    && strcmp(data->sel[ENCODING], wild)
-	    && strcmp(data->sel[NAME], wild)
-	    && strcmp(data->sel[STYLE], wild)
-	    && strcmp(data->sel[SIZE], wild))
+    ಆದರೆ (ದತ್ತಾಂಶ->sel[ENCODING]
+	    && ದತ್ತಾಂಶ->sel[NAME]
+	    && ದತ್ತಾಂಶ->sel[STYLE]
+	    && ದತ್ತಾಂಶ->sel[ಗಾತ್ರ_4]
+	    && strcmp(ದತ್ತಾಂಶ->sel[ENCODING], wild)
+	    && strcmp(ದತ್ತಾಂಶ->sel[NAME], wild)
+	    && strcmp(ದತ್ತಾಂಶ->sel[STYLE], wild)
+	    && strcmp(ದತ್ತಾಂಶ->sel[ಗಾತ್ರ_4], wild))
     {
-	int i;
+	ಪೂರ್ಣಾಂಕ i;
 
-	if (data->font_name)
-	    XtFree(data->font_name);
-	data->font_name = NULL;
+	ಆದರೆ (ದತ್ತಾಂಶ->font_name)
+	    XtFree(ದತ್ತಾಂಶ->font_name);
+	ದತ್ತಾಂಶ->font_name = ಖಾಲಿ;
 
-	for (i = 0; i < data->num; i++)
+	ಗಾಗಿ (i = 0; i < ದತ್ತಾಂಶ->ಅಂಕೆ; i++)
 	{
-	    if (match(data, ENCODING, i)
-		    && match(data, NAME, i)
-		    && match(data, STYLE, i)
-		    && match(data, SIZE, i))
+	    ಆದರೆ (ಹೊಂದಿಕೆ(ದತ್ತಾಂಶ, ENCODING, i)
+		    && ಹೊಂದಿಕೆ(ದತ್ತಾಂಶ, NAME, i)
+		    && ಹೊಂದಿಕೆ(ದತ್ತಾಂಶ, STYLE, i)
+		    && ಹೊಂದಿಕೆ(ದತ್ತಾಂಶ, ಗಾತ್ರ_4, i))
 	    {
-		data->font_name = XtNewString(fn(data, i));
-		break;
+		ದತ್ತಾಂಶ->font_name = XtNewString(fn(ದತ್ತಾಂಶ, i));
+		ನಿಲ್ಲಿಸು;
 	    }
 	}
 
-	if (data->font_name)
+	ಆದರೆ (ದತ್ತಾಂಶ->font_name)
 	{
-	    XmTextSetString(data->name, data->font_name);
-	    display_sample(data);
+	    Xm_ಪಠ್ಯ_ಗಣ_String(ದತ್ತಾಂಶ->name, ದತ್ತಾಂಶ->font_name);
+	    display_sample(ದತ್ತಾಂಶ);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    do_dialog(VIM_ERROR,
 		    (char_u *)_("Error"),
 		    (char_u *)_("Invalid font specification"),
-		    (char_u *)_("&Dismiss"), 1, NULL, FALSE);
+		    (char_u *)_("&Dismiss"), 1, ಖಾಲಿ, FALSE);
 
-	return True;
+	ಹಿಂತಿರುಗಿ True;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	int	    n;
+	ಪೂರ್ಣಾಂಕ	    n;
 	XmString    str;
-	Arg	    args[4];
-	char	    *nomatch_msg = _("no specific match");
+	Arg	    ವಾದಗಳು[4];
+	ಅಕ್ಷರ	    *nomatch_ಸಂದೇಶ = _("no specific match");
 
 	n = 0;
-	str = XmStringCreateLocalized(nomatch_msg);
-	XtSetArg(args[n], XmNlabelString, str); ++n;
-	XtSetValues(data->sample, args, n);
-	apply_fontlist(data->sample);
-	XmTextSetString(data->name, nomatch_msg);
+	str = XmStringCreateLocalized(nomatch_ಸಂದೇಶ);
+	Xt_ಗಣ_Arg(ವಾದಗಳು[n], XmNlabelString, str); ++n;
+	Xt_ಗಣ_ಮೌಲ್ಯಗಳು(ದತ್ತಾಂಶ->sample, ವಾದಗಳು, n);
+	apply_fontlist(ದತ್ತಾಂಶ->sample);
+	Xm_ಪಠ್ಯ_ಗಣ_String(ದತ್ತಾಂಶ->name, nomatch_ಸಂದೇಶ);
 	XmStringFree(str);
 
-	return False;
+	ಹಿಂತಿರುಗಿ False;
     }
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 encoding_callback(Widget w,
-	SharedFontSelData *data,
-	XtPointer dummy UNUSED)
+	Shared_Font_Sel_ದತ್ತಾಂಶ_2 *ದತ್ತಾಂಶ,
+	Xt_ಸೂಚಕ dummy ಬಳಸದ)
 {
     XmString str;
-    XmListCallbackStruct fake_data;
+    XmListCallbackStruct fake_ದತ್ತಾಂಶ;
 
-    XtVaGetValues(w, XmNlabelString, &str, NULL);
+    Xt_Va_Get_ಮೌಲ್ಯಗಳು(w, XmNlabelString, &str, ಖಾಲಿ);
 
-    if (!str)
-	return;
+    ಆದರೆ (!str)
+	ಹಿಂತಿರುಗಿ;
 
-    fake_data.item = str;
+    fake_ದತ್ತಾಂಶ.ಅಂಶ = str;
 
-    do_choice(0, data, &fake_data, ENCODING);
+    do_choice(0, ದತ್ತಾಂಶ, &fake_ದತ್ತಾಂಶ, ENCODING);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 name_callback(Widget w,
-	SharedFontSelData *data,
-	XmListCallbackStruct *call_data)
+	Shared_Font_Sel_ದತ್ತಾಂಶ_2 *ದತ್ತಾಂಶ,
+	XmListCallbackStruct *call_ದತ್ತಾಂಶ)
 {
-    do_choice(w, data, call_data, NAME);
+    do_choice(w, ದತ್ತಾಂಶ, call_ದತ್ತಾಂಶ, NAME);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 style_callback(Widget w,
-	SharedFontSelData *data,
-	XmListCallbackStruct *call_data)
+	Shared_Font_Sel_ದತ್ತಾಂಶ_2 *ದತ್ತಾಂಶ,
+	XmListCallbackStruct *call_ದತ್ತಾಂಶ)
 {
-    do_choice(w, data, call_data, STYLE);
+    do_choice(w, ದತ್ತಾಂಶ, call_ದತ್ತಾಂಶ, STYLE);
 }
 
-    static void
-size_callback(Widget w,
-	SharedFontSelData *data,
-	XmListCallbackStruct *call_data)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಾತ್ರ_callback(Widget w,
+	Shared_Font_Sel_ದತ್ತಾಂಶ_2 *ದತ್ತಾಂಶ,
+	XmListCallbackStruct *call_ದತ್ತಾಂಶ)
 {
-    do_choice(w, data, call_data, SIZE);
+    do_choice(w, ದತ್ತಾಂಶ, call_ದತ್ತಾಂಶ, ಗಾತ್ರ_4);
 }
 
-    static void
-cancel_callback(Widget w UNUSED,
-	SharedFontSelData *data,
-	XmListCallbackStruct *call_data UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+cancel_callback(Widget w ಬಳಸದ,
+	Shared_Font_Sel_ದತ್ತಾಂಶ_2 *ದತ್ತಾಂಶ,
+	XmListCallbackStruct *call_ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    if (data->sel[ENCODING])
+    ಆದರೆ (ದತ್ತಾಂಶ->sel[ENCODING])
     {
-	XtFree(data->sel[ENCODING]);
-	data->sel[ENCODING] = NULL;
+	XtFree(ದತ್ತಾಂಶ->sel[ENCODING]);
+	ದತ್ತಾಂಶ->sel[ENCODING] = ಖಾಲಿ;
     }
-    if (data->sel[NAME])
+    ಆದರೆ (ದತ್ತಾಂಶ->sel[NAME])
     {
-	XtFree(data->sel[NAME]);
-	data->sel[NAME] = NULL;
+	XtFree(ದತ್ತಾಂಶ->sel[NAME]);
+	ದತ್ತಾಂಶ->sel[NAME] = ಖಾಲಿ;
     }
-    if (data->sel[STYLE])
+    ಆದರೆ (ದತ್ತಾಂಶ->sel[STYLE])
     {
-	XtFree(data->sel[STYLE]);
-	data->sel[STYLE] = NULL;
+	XtFree(ದತ್ತಾಂಶ->sel[STYLE]);
+	ದತ್ತಾಂಶ->sel[STYLE] = ಖಾಲಿ;
     }
-    if (data->sel[SIZE])
+    ಆದರೆ (ದತ್ತಾಂಶ->sel[ಗಾತ್ರ_4])
     {
-	XtFree(data->sel[SIZE]);
-	data->sel[SIZE] = NULL;
+	XtFree(ದತ್ತಾಂಶ->sel[ಗಾತ್ರ_4]);
+	ದತ್ತಾಂಶ->sel[ಗಾತ್ರ_4] = ಖಾಲಿ;
     }
 
-    if (data->font_name)
-	XtFree(data->font_name);
-    data->font_name = NULL;
+    ಆದರೆ (ದತ್ತಾಂಶ->font_name)
+	XtFree(ದತ್ತಾಂಶ->font_name);
+    ದತ್ತಾಂಶ->font_name = ಖಾಲಿ;
 
-    data->num = 0;
-    XFreeFontNames(data->names);
-    data->names = NULL;
-    data->exit = True;
+    ದತ್ತಾಂಶ->ಅಂಕೆ = 0;
+    XFree_Font_ಹೆಸರುಗಳು(ದತ್ತಾಂಶ->ಹೆಸರುಗಳು);
+    ದತ್ತಾಂಶ->ಹೆಸರುಗಳು = ಖಾಲಿ;
+    ದತ್ತಾಂಶ->ನಿರ್ಗಮಿಸು = True;
 }
 
-    static void
-ok_callback(Widget w UNUSED,
-	SharedFontSelData *data,
-	XmPushButtonCallbackStruct *call_data UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ok_callback(Widget w ಬಳಸದ,
+	Shared_Font_Sel_ದತ್ತಾಂಶ_2 *ದತ್ತಾಂಶ,
+	Xm_ತಳ್ಳು_Button_Callback_Struct *call_ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    char    *pattern;
-    char    **name;
-    int	    i;
+    ಅಕ್ಷರ    *ನಮೂನೆ;
+    ಅಕ್ಷರ    **name;
+    ಪೂರ್ಣಾಂಕ	    i;
 
-    pattern = XmTextGetString(data->name);
-    name    = XListFonts(XtDisplay(data->dialog), pattern, 1, &i);
-    XtFree(pattern);
+    ನಮೂನೆ = Xm_ಪಠ್ಯ_Get_String(ದತ್ತಾಂಶ->name);
+    name    = XListFonts(XtDisplay(ದತ್ತಾಂಶ->dialog), ನಮೂನೆ, 1, &i);
+    XtFree(ನಮೂನೆ);
 
-    if (i != 1)
+    ಆದರೆ (i != 1)
     {
 	do_dialog(VIM_ERROR,
 		(char_u *)_("Error"),
 		(char_u *)_("Invalid font specification"),
-		(char_u *)_("&Dismiss"), 1, NULL, FALSE);
-	XFreeFontNames(name);
+		(char_u *)_("&Dismiss"), 1, ಖಾಲಿ, FALSE);
+	XFree_Font_ಹೆಸರುಗಳು(name);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (data->font_name)
-	    XtFree(data->font_name);
-	data->font_name = XtNewString(name[0]);
+	ಆದರೆ (ದತ್ತಾಂಶ->font_name)
+	    XtFree(ದತ್ತಾಂಶ->font_name);
+	ದತ್ತಾಂಶ->font_name = XtNewString(name[0]);
 
-	if (data->sel[ENCODING])
+	ಆದರೆ (ದತ್ತಾಂಶ->sel[ENCODING])
 	{
-	    XtFree(data->sel[ENCODING]);
-	    data->sel[ENCODING] = NULL;
+	    XtFree(ದತ್ತಾಂಶ->sel[ENCODING]);
+	    ದತ್ತಾಂಶ->sel[ENCODING] = ಖಾಲಿ;
 	}
-	if (data->sel[NAME])
+	ಆದರೆ (ದತ್ತಾಂಶ->sel[NAME])
 	{
-	    XtFree(data->sel[NAME]);
-	    data->sel[NAME] = NULL;
+	    XtFree(ದತ್ತಾಂಶ->sel[NAME]);
+	    ದತ್ತಾಂಶ->sel[NAME] = ಖಾಲಿ;
 	}
-	if (data->sel[STYLE])
+	ಆದರೆ (ದತ್ತಾಂಶ->sel[STYLE])
 	{
-	    XtFree(data->sel[STYLE]);
-	    data->sel[STYLE] = NULL;
+	    XtFree(ದತ್ತಾಂಶ->sel[STYLE]);
+	    ದತ್ತಾಂಶ->sel[STYLE] = ಖಾಲಿ;
 	}
-	if (data->sel[SIZE])
+	ಆದರೆ (ದತ್ತಾಂಶ->sel[ಗಾತ್ರ_4])
 	{
-	    XtFree(data->sel[SIZE]);
-	    data->sel[SIZE] = NULL;
+	    XtFree(ದತ್ತಾಂಶ->sel[ಗಾತ್ರ_4]);
+	    ದತ್ತಾಂಶ->sel[ಗಾತ್ರ_4] = ಖಾಲಿ;
 	}
 
-	XFreeFontNames(name);
+	XFree_Font_ಹೆಸರುಗಳು(name);
 
-	data->num = 0;
-	XFreeFontNames(data->names);
-	data->names = NULL;
-	data->exit = True;
+	ದತ್ತಾಂಶ->ಅಂಕೆ = 0;
+	XFree_Font_ಹೆಸರುಗಳು(ದತ್ತಾಂಶ->ಹೆಸರುಗಳು);
+	ದತ್ತಾಂಶ->ಹೆಸರುಗಳು = ಖಾಲಿ;
+	ದತ್ತಾಂಶ->ನಿರ್ಗಮಿಸು = True;
     }
 }
 
@@ -850,27 +850,27 @@ ok_callback(Widget w UNUSED,
     char_u *
 gui_xm_select_font(char_u *current)
 {
-    static SharedFontSelData	_data;
+    ಸ್ಥಿರ Shared_Font_Sel_ದತ್ತಾಂಶ_2	ದತ್ತಾಂಶ_3;
 
-    Widget		parent;
+    Widget		ಪೋಷಕ;
     Widget		form;
     Widget		separator;
     Widget		sub_form;
-    Widget		size_toggle;
+    Widget		ಗಾತ್ರ_toggle;
     Widget		name;
-    Widget		disp_frame;
-    Widget		frame;
-    Arg			args[64];
-    int			n;
+    Widget		disp_ಚೌಕಟ್ಟು;
+    Widget		ಚೌಕಟ್ಟು;
+    Arg			ವಾದಗಳು[64];
+    ಪೂರ್ಣಾಂಕ			n;
     XmString		str;
-    char		big_font[MAX_FONT_NAME_LEN];
-    SharedFontSelData	*data;
+    ಅಕ್ಷರ		big_font[MAX_FONT_NAME_LEN];
+    Shared_Font_Sel_ದತ್ತಾಂಶ_2	*ದತ್ತಾಂಶ;
 
-    data = &_data;
+    ದತ್ತಾಂಶ = &ದತ್ತಾಂಶ_3;
 
-    parent = vimShell;
-    data->names = XListFonts(XtDisplay(parent), "-*-*-*-*-*-*-*-*-*-*-*-*-*-*",
-						       MAX_FONTS, &data->num);
+    ಪೋಷಕ = vimShell;
+    ದತ್ತಾಂಶ->ಹೆಸರುಗಳು = XListFonts(XtDisplay(ಪೋಷಕ), "-*-*-*-*-*-*-*-*-*-*-*-*-*-*",
+						       MAX_FONTS, &ದತ್ತಾಂಶ->ಅಂಕೆ);
 
     /*
      * Find the name of the biggest font less than the given limit
@@ -879,171 +879,171 @@ gui_xm_select_font(char_u *current)
      */
 
     {
-	int	i;
-	int	max;
-	int	idx = 0;
-	int	size;
-	char	buf[128];
+	ಪೂರ್ಣಾಂಕ	i;
+	ಪೂರ್ಣಾಂಕ	max;
+	ಪೂರ್ಣಾಂಕ	idx = 0;
+	ಪೂರ್ಣಾಂಕ	ಗಾತ್ರ_2;
+	ಅಕ್ಷರ	buf[128];
 
-	for (i = 0, max = 0; i < data->num; i++)
+	ಗಾಗಿ (i = 0, max = 0; i < ದತ್ತಾಂಶ->ಅಂಕೆ; i++)
 	{
-	    get_part(fn(data, i), 7, buf);
-	    size = atoi(buf);
-	    if ((size > max) && (size < MAX_DISPLAY_SIZE))
+	    get_part(fn(ದತ್ತಾಂಶ, i), 7, buf);
+	    ಗಾತ್ರ_2 = atoi(buf);
+	    ಆದರೆ ((ಗಾತ್ರ_2 > max) && (ಗಾತ್ರ_2 < MAX_DISPLAY_ಗಾತ್ರ))
 	    {
 		idx = i;
-		max = size;
+		max = ಗಾತ್ರ_2;
 	    }
 	}
-	strcpy(big_font, fn(data, idx));
+	strcpy(big_font, fn(ದತ್ತಾಂಶ, idx));
     }
-    data->old = XLoadQueryFont(XtDisplay(parent), big_font);
-    data->old_list = gui_motif_create_fontlist(data->old);
+    ದತ್ತಾಂಶ->old = XLoadQueryFont(XtDisplay(ಪೋಷಕ), big_font);
+    ದತ್ತಾಂಶ->old_list = gui_motif_create_fontlist(ದತ್ತಾಂಶ->old);
 
     // Set the title of the Dialog window.
-    data->dialog = XmCreateDialogShell(parent, "fontSelector", NULL, 0);
+    ದತ್ತಾಂಶ->dialog = XmCreateDialogShell(ಪೋಷಕ, "fontSelector", ಖಾಲಿ, 0);
     str = XmStringCreateLocalized(_("Vim - Font Selector"));
 
     // Create form popup dialog widget.
     form = XtVaCreateWidget("form",
-	    xmFormWidgetClass, data->dialog,
+	    xmFormWidgetClass, ದತ್ತಾಂಶ->dialog,
 	    XmNdialogTitle, str,
 	    XmNautoUnmanage, False,
-	    XmNdialogStyle, XmDIALOG_FULL_APPLICATION_MODAL,
-	    NULL);
+	    XmNdialogStyle, Xm_DIALOG_ತುಂಬಿದ_APPLICATION_MODAL,
+	    ಖಾಲಿ);
     XmStringFree(str);
 
     sub_form = XtVaCreateManagedWidget("subForm",
 	    xmFormWidgetClass, form,
 	    XmNbottomAttachment, XmATTACH_FORM,
-	    XmNbottomOffset, 4,
+	    Xm_Nbottom_ಸ್ಥಾನಾಂತರ, 4,
 	    XmNrightAttachment, XmATTACH_FORM,
-	    XmNrightOffset, 4,
+	    Xm_Nright_ಸ್ಥಾನಾಂತರ, 4,
 	    XmNtopAttachment, XmATTACH_FORM,
-	    XmNtopOffset, 4,
+	    Xm_Ntop_ಸ್ಥಾನಾಂತರ, 4,
 	    XmNorientation, XmVERTICAL,
-	    NULL);
+	    ಖಾಲಿ);
 
-    data->ok = XtVaCreateManagedWidget(_("OK"),
-	    xmPushButtonGadgetClass, sub_form,
+    ದತ್ತಾಂಶ->ok = XtVaCreateManagedWidget(_("OK"),
+	    xm_ತಳ್ಳು_Button_Gadget_Class, sub_form,
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNrightAttachment, XmATTACH_FORM,
 	    XmNtopAttachment, XmATTACH_FORM,
-	    XmNtopOffset, 4,
-	    NULL);
-    apply_fontlist(data->ok);
+	    Xm_Ntop_ಸ್ಥಾನಾಂತರ, 4,
+	    ಖಾಲಿ);
+    apply_fontlist(ದತ್ತಾಂಶ->ok);
 
-    data->cancel = XtVaCreateManagedWidget(_("Cancel"),
-	    xmPushButtonGadgetClass, sub_form,
+    ದತ್ತಾಂಶ->cancel = XtVaCreateManagedWidget(_("Cancel"),
+	    xm_ತಳ್ಳು_Button_Gadget_Class, sub_form,
 	    XmNrightAttachment, XmATTACH_FORM,
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNtopAttachment, XmATTACH_WIDGET,
-	    XmNtopWidget, data->ok,
-	    XmNtopOffset, 4,
+	    XmNtopWidget, ದತ್ತಾಂಶ->ok,
+	    Xm_Ntop_ಸ್ಥಾನಾಂತರ, 4,
 	    XmNshowAsDefault, True,
-	    NULL);
-    apply_fontlist(data->cancel);
+	    ಖಾಲಿ);
+    apply_fontlist(ದತ್ತಾಂಶ->cancel);
 
     // Create the separator for beauty.
     n = 0;
-    XtSetArg(args[n], XmNorientation, XmVERTICAL); n++;
-    XtSetArg(args[n], XmNbottomAttachment, XmATTACH_FORM); n++;
-    XtSetArg(args[n], XmNtopAttachment, XmATTACH_FORM); n++;
-    XtSetArg(args[n], XmNrightAttachment, XmATTACH_WIDGET); n++;
-    XtSetArg(args[n], XmNrightWidget, sub_form); n++;
-    XtSetArg(args[n], XmNrightOffset, 4); n++;
-    separator = XmCreateSeparatorGadget(form, "separator", args, n);
-    XtManageChild(separator);
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], XmNorientation, XmVERTICAL); n++;
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], XmNbottomAttachment, XmATTACH_FORM); n++;
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], XmNtopAttachment, XmATTACH_FORM); n++;
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], XmNrightAttachment, XmATTACH_WIDGET); n++;
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], XmNrightWidget, sub_form); n++;
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], Xm_Nright_ಸ್ಥಾನಾಂತರ, 4); n++;
+    separator = XmCreateSeparatorGadget(form, "separator", ವಾದಗಳು, n);
+    Xt_Manage_ಮಗು(separator);
 
     // Create font name text widget and the corresponding label.
-    data->name = XtVaCreateManagedWidget("fontName",
-	    xmTextWidgetClass, form,
+    ದತ್ತಾಂಶ->name = XtVaCreateManagedWidget("fontName",
+	    xm_ಪಠ್ಯ_Widget_Class, form,
 	    XmNbottomAttachment, XmATTACH_FORM,
-	    XmNbottomOffset, 4,
+	    Xm_Nbottom_ಸ್ಥಾನಾಂತರ, 4,
 	    XmNleftAttachment, XmATTACH_FORM,
-	    XmNleftOffset, 4,
+	    Xm_Nleft_ಸ್ಥಾನಾಂತರ, 4,
 	    XmNrightAttachment, XmATTACH_WIDGET,
 	    XmNrightWidget, separator,
-	    XmNrightOffset, 4,
+	    Xm_Nright_ಸ್ಥಾನಾಂತರ, 4,
 	    XmNeditable, False,
-	    XmNeditMode, XmSINGLE_LINE_EDIT,
-	    XmNmaxLength, MAX_FONT_NAME_LEN,
+	    Xm_Nedit_ಬಹುಲಕ, Xm_SINGLE_ಸಾಲು_EDIT,
+	    Xm_Nmax_ಉದ್ದಳತೆ, MAX_FONT_NAME_LEN,
 	    XmNcolumns, 60,
-	    NULL);
+	    ಖಾಲಿ);
 
     str = XmStringCreateLocalized(_("Name:"));
     name = XtVaCreateManagedWidget("fontNameLabel",
 	    xmLabelGadgetClass, form,
 	    XmNlabelString, str,
-	    XmNuserData, data->name,
+	    Xm_Nuser_ದತ್ತಾಂಶ, ದತ್ತಾಂಶ->name,
 	    XmNleftAttachment, XmATTACH_OPPOSITE_WIDGET,
-	    XmNleftWidget, data->name,
+	    XmNleftWidget, ದತ್ತಾಂಶ->name,
 	    XmNbottomAttachment, XmATTACH_WIDGET,
-	    XmNbottomWidget, data->name,
-	    XmNtopOffset, 1,
-	    NULL);
+	    XmNbottomWidget, ದತ್ತಾಂಶ->name,
+	    Xm_Ntop_ಸ್ಥಾನಾಂತರ, 1,
+	    ಖಾಲಿ);
     XmStringFree(str);
     apply_fontlist(name);
 
     // create sample display label widget
-    disp_frame = XtVaCreateManagedWidget("sampleFrame",
-	    xmFrameWidgetClass, form,
-	    XmNshadowType, XmSHADOW_ETCHED_IN,
+    disp_ಚೌಕಟ್ಟು = XtVaCreateManagedWidget("sampleFrame",
+	    xm_ಚೌಕಟ್ಟು_Widget_Class, form,
+	    XmNshadowType, Xm_SHADOW_ETCHED_ಒಳ,
 	    XmNleftAttachment, XmATTACH_FORM,
-	    XmNleftOffset, 4,
+	    Xm_Nleft_ಸ್ಥಾನಾಂತರ, 4,
 	    XmNbottomAttachment, XmATTACH_WIDGET,
 	    XmNbottomWidget, name,
 	    XmNrightAttachment, XmATTACH_WIDGET,
 	    XmNrightWidget, separator,
-	    XmNrightOffset, 4,
+	    Xm_Nright_ಸ್ಥಾನಾಂತರ, 4,
 	    XmNalignment, XmALIGNMENT_BEGINNING,
-	    NULL);
+	    ಖಾಲಿ);
 
-    data->sample = XtVaCreateManagedWidget("sampleLabel",
-	    xmLabelWidgetClass, disp_frame,
+    ದತ್ತಾಂಶ->sample = XtVaCreateManagedWidget("sampleLabel",
+	    xmLabelWidgetClass, disp_ಚೌಕಟ್ಟು,
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNtopAttachment, XmATTACH_FORM,
 	    XmNbottomAttachment, XmATTACH_FORM,
 	    XmNrightAttachment, XmATTACH_FORM,
 	    XmNalignment, XmALIGNMENT_BEGINNING,
-	    XmNrecomputeSize, False,
-	    XmNfontList, data->old_list,
-	    NULL);
+	    Xm_Nrecompute_ಗಾತ್ರ, False,
+	    XmNfontList, ದತ್ತಾಂಶ->old_list,
+	    ಖಾಲಿ);
 
     // create toggle button
     str = XmStringCreateLocalized(_("Show size in Points"));
-    size_toggle = XtVaCreateManagedWidget("sizeToggle",
+    ಗಾತ್ರ_toggle = XtVaCreateManagedWidget("sizeToggle",
 	    xmToggleButtonGadgetClass, form,
 	    XmNlabelString, str,
 	    XmNleftAttachment, XmATTACH_FORM,
-	    XmNleftOffset, 4,
+	    Xm_Nleft_ಸ್ಥಾನಾಂತರ, 4,
 	    XmNbottomAttachment, XmATTACH_WIDGET,
-	    XmNbottomWidget, disp_frame,
-	    XmNbottomOffset, 4,
-	    NULL);
+	    XmNbottomWidget, disp_ಚೌಕಟ್ಟು,
+	    Xm_Nbottom_ಸ್ಥಾನಾಂತರ, 4,
+	    ಖಾಲಿ);
     XmStringFree(str);
-    apply_fontlist(size_toggle);
-    XtManageChild(size_toggle);
+    apply_fontlist(ಗಾತ್ರ_toggle);
+    Xt_Manage_ಮಗು(ಗಾತ್ರ_toggle);
 
     // Encoding pulldown menu.
 
-    data->encoding_pulldown = XmCreatePulldownMenu(form,
-						 "encodingPulldown", NULL, 0);
+    ದತ್ತಾಂಶ->encoding_pulldown = XmCreatePulldownMenu(form,
+						 "encodingPulldown", ಖಾಲಿ, 0);
     str = XmStringCreateLocalized(_("Encoding:"));
     n = 0;
-    XtSetArg(args[n], XmNsubMenuId, data->encoding_pulldown); ++n;
-    XtSetArg(args[n], XmNlabelString, str); ++n;
-    XtSetArg(args[n], XmNleftAttachment, XmATTACH_FORM); ++n;
-    XtSetArg(args[n], XmNleftOffset, 4); ++n;
-    XtSetArg(args[n], XmNbottomAttachment, XmATTACH_WIDGET); ++n;
-    XtSetArg(args[n], XmNbottomWidget, size_toggle); ++n;
-    XtSetArg(args[n], XmNbottomOffset, 4); ++n;
-    XtSetArg(args[n], XmNrightAttachment, XmATTACH_WIDGET); ++n;
-    XtSetArg(args[n], XmNrightWidget, separator); ++n;
-    XtSetArg(args[n], XmNrightOffset, 4); ++n;
-    data->encoding_menu = XmCreateOptionMenu(form, "encodingMenu", args, n);
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], XmNsubMenuId, ದತ್ತಾಂಶ->encoding_pulldown); ++n;
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], XmNlabelString, str); ++n;
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], XmNleftAttachment, XmATTACH_FORM); ++n;
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], Xm_Nleft_ಸ್ಥಾನಾಂತರ, 4); ++n;
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], XmNbottomAttachment, XmATTACH_WIDGET); ++n;
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], XmNbottomWidget, ಗಾತ್ರ_toggle); ++n;
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], Xm_Nbottom_ಸ್ಥಾನಾಂತರ, 4); ++n;
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], XmNrightAttachment, XmATTACH_WIDGET); ++n;
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], XmNrightWidget, separator); ++n;
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], Xm_Nright_ಸ್ಥಾನಾಂತರ, 4); ++n;
+    ದತ್ತಾಂಶ->encoding_menu = XmCreateOptionMenu(form, "encodingMenu", ವಾದಗಳು, n);
     XmStringFree(str);
-    XmAddTabGroup(data->encoding_menu);
+    Xm_ಕೂಡಿಸು_Tab_ಗುಂಪು(ದತ್ತಾಂಶ->encoding_menu);
 
     /*
      * Create scroll list widgets in a separate subform used to manage the
@@ -1053,191 +1053,191 @@ gui_xm_select_font(char_u *current)
     sub_form = XtVaCreateManagedWidget("subForm",
 	    xmFormWidgetClass, form,
 	    XmNbottomAttachment, XmATTACH_WIDGET,
-	    XmNbottomWidget, data->encoding_menu,
-	    XmNbottomOffset, 4,
+	    XmNbottomWidget, ದತ್ತಾಂಶ->encoding_menu,
+	    Xm_Nbottom_ಸ್ಥಾನಾಂತರ, 4,
 	    XmNleftAttachment, XmATTACH_FORM,
-	    XmNleftOffset, 4,
+	    Xm_Nleft_ಸ್ಥಾನಾಂತರ, 4,
 	    XmNrightAttachment, XmATTACH_WIDGET,
 	    XmNrightWidget, separator,
-	    XmNrightOffset, 4,
+	    Xm_Nright_ಸ್ಥಾನಾಂತರ, 4,
 	    XmNtopAttachment, XmATTACH_FORM,
-	    XmNtopOffset, 2,
+	    Xm_Ntop_ಸ್ಥಾನಾಂತರ, 2,
 	    XmNorientation, XmVERTICAL,
-	    NULL);
+	    ಖಾಲಿ);
 
     // font list
-    frame = XtVaCreateManagedWidget("frame", xmFrameWidgetClass, sub_form,
+    ಚೌಕಟ್ಟು = XtVaCreateManagedWidget("frame", xm_ಚೌಕಟ್ಟು_Widget_Class, sub_form,
 	    XmNshadowThickness, 0,
 	    XmNtopAttachment, XmATTACH_FORM,
 	    XmNbottomAttachment, XmATTACH_FORM,
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNrightAttachment, XmATTACH_POSITION,
 	    XmNrightPosition, 50,
-	    NULL);
+	    ಖಾಲಿ);
 
     str = XmStringCreateLocalized(_("Font:"));
-    name = XtVaCreateManagedWidget("nameListLabel", xmLabelGadgetClass, frame,
-	    XmNchildType, XmFRAME_TITLE_CHILD,
+    name = XtVaCreateManagedWidget("nameListLabel", xmLabelGadgetClass, ಚೌಕಟ್ಟು,
+	    XmNchildType, Xm_ಚೌಕಟ್ಟು_TITLE_ಮಗು,
 	    XmNchildVerticalAlignment, XmALIGNMENT_CENTER,
 	    XmNchildHorizontalAlignment, XmALIGNMENT_BEGINNING,
 	    XmNlabelString, str,
-	    NULL);
+	    ಖಾಲಿ);
     XmStringFree(str);
     apply_fontlist(name);
 
     n = 0;
-    XtSetArg(args[n], XmNvisibleItemCount, 8); ++n;
-    XtSetArg(args[n], XmNresizable, True); ++n;
-    XtSetArg(args[n], XmNlistSizePolicy, XmCONSTANT); ++n;
-    XtSetArg(args[n], XmNvisualPolicy, XmVARIABLE); ++n;
-#ifdef LESSTIF_VERSION
-    XtSetArg(args[n], XmNscrollBarDisplayPolicy, XmSTATIC); ++n;
-#endif
-    data->list[NAME] = XmCreateScrolledList(frame, "fontList", args, n);
-    XtVaSetValues(name, XmNuserData, data->list[NAME], NULL);
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], Xm_Nvisible_ಅಂಶ_ಎಣಿಕೆ, 8); ++n;
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], XmNresizable, True); ++n;
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], Xm_Nlist_ಗಾತ್ರ_Policy, XmCONSTANT); ++n;
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], XmNvisualPolicy, XmVARIABLE); ++n;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ LESSTIF_ಆವೃತ್ತಿ
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], XmNscrollBarDisplayPolicy, XmSTATIC); ++n;
+#ಆದರೆ_ಅಂತ್ಯ
+    ದತ್ತಾಂಶ->list[NAME] = XmCreateScrolledList(ಚೌಕಟ್ಟು, "fontList", ವಾದಗಳು, n);
+    Xt_Va_ಗಣ_ಮೌಲ್ಯಗಳು(name, Xm_Nuser_ದತ್ತಾಂಶ, ದತ್ತಾಂಶ->list[NAME], ಖಾಲಿ);
 
     // style list
-    frame = XtVaCreateManagedWidget("frame", xmFrameWidgetClass, sub_form,
+    ಚೌಕಟ್ಟು = XtVaCreateManagedWidget("frame", xm_ಚೌಕಟ್ಟು_Widget_Class, sub_form,
 	    XmNshadowThickness, 0,
 	    XmNtopAttachment, XmATTACH_FORM,
 	    XmNbottomAttachment, XmATTACH_FORM,
 	    XmNleftAttachment, XmATTACH_POSITION,
 	    XmNleftPosition, 50,
-	    XmNleftOffset, 4,
+	    Xm_Nleft_ಸ್ಥಾನಾಂತರ, 4,
 	    XmNrightAttachment, XmATTACH_POSITION,
 	    XmNrightPosition, 80,
-	    NULL);
+	    ಖಾಲಿ);
 
     str = XmStringCreateLocalized(_("Style:"));
-    name = XtVaCreateManagedWidget("styleListLabel", xmLabelWidgetClass, frame,
-	    XmNchildType, XmFRAME_TITLE_CHILD,
+    name = XtVaCreateManagedWidget("styleListLabel", xmLabelWidgetClass, ಚೌಕಟ್ಟು,
+	    XmNchildType, Xm_ಚೌಕಟ್ಟು_TITLE_ಮಗು,
 	    XmNchildVerticalAlignment, XmALIGNMENT_CENTER,
 	    XmNchildHorizontalAlignment, XmALIGNMENT_BEGINNING,
 	    XmNlabelString, str,
-	    NULL);
+	    ಖಾಲಿ);
     XmStringFree(str);
     apply_fontlist(name);
 
     n = 0;
-    XtSetArg(args[n], XmNvisibleItemCount, 8); ++n;
-    XtSetArg(args[n], XmNresizable, True); ++n;
-    XtSetArg(args[n], XmNlistSizePolicy, XmCONSTANT); ++n;
-    XtSetArg(args[n], XmNvisualPolicy, XmVARIABLE); ++n;
-#ifdef LESSTIF_VERSION
-    XtSetArg(args[n], XmNscrollBarDisplayPolicy, XmSTATIC); ++n;
-#endif
-    data->list[STYLE] = XmCreateScrolledList(frame, "styleList", args, n);
-    XtVaSetValues(name, XmNuserData, data->list[STYLE], NULL);
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], Xm_Nvisible_ಅಂಶ_ಎಣಿಕೆ, 8); ++n;
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], XmNresizable, True); ++n;
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], Xm_Nlist_ಗಾತ್ರ_Policy, XmCONSTANT); ++n;
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], XmNvisualPolicy, XmVARIABLE); ++n;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ LESSTIF_ಆವೃತ್ತಿ
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], XmNscrollBarDisplayPolicy, XmSTATIC); ++n;
+#ಆದರೆ_ಅಂತ್ಯ
+    ದತ್ತಾಂಶ->list[STYLE] = XmCreateScrolledList(ಚೌಕಟ್ಟು, "styleList", ವಾದಗಳು, n);
+    Xt_Va_ಗಣ_ಮೌಲ್ಯಗಳು(name, Xm_Nuser_ದತ್ತಾಂಶ, ದತ್ತಾಂಶ->list[STYLE], ಖಾಲಿ);
 
     // size list
-    frame = XtVaCreateManagedWidget("frame", xmFrameWidgetClass, sub_form,
+    ಚೌಕಟ್ಟು = XtVaCreateManagedWidget("frame", xm_ಚೌಕಟ್ಟು_Widget_Class, sub_form,
 	    XmNshadowThickness, 0,
 	    XmNtopAttachment, XmATTACH_FORM,
 	    XmNbottomAttachment, XmATTACH_FORM,
 	    XmNleftAttachment, XmATTACH_POSITION,
 	    XmNleftPosition, 80,
-	    XmNleftOffset, 4,
+	    Xm_Nleft_ಸ್ಥಾನಾಂತರ, 4,
 	    XmNrightAttachment, XmATTACH_FORM,
-	    NULL);
+	    ಖಾಲಿ);
 
     str = XmStringCreateLocalized(_("Size:"));
-    name = XtVaCreateManagedWidget("sizeListLabel", xmLabelGadgetClass, frame,
-	    XmNchildType, XmFRAME_TITLE_CHILD,
+    name = XtVaCreateManagedWidget("sizeListLabel", xmLabelGadgetClass, ಚೌಕಟ್ಟು,
+	    XmNchildType, Xm_ಚೌಕಟ್ಟು_TITLE_ಮಗು,
 	    XmNchildVerticalAlignment, XmALIGNMENT_CENTER,
 	    XmNchildHorizontalAlignment, XmALIGNMENT_BEGINNING,
 	    XmNlabelString, str,
-	    NULL);
+	    ಖಾಲಿ);
     XmStringFree(str);
     apply_fontlist(name);
 
     n = 0;
-    XtSetArg(args[n], XmNvisibleItemCount, 8); ++n;
-    XtSetArg(args[n], XmNresizable, True); ++n;
-    XtSetArg(args[n], XmNlistSizePolicy, XmCONSTANT); ++n;
-    XtSetArg(args[n], XmNvisualPolicy, XmVARIABLE); ++n;
-#ifdef LESSTIF_VERSION
-    XtSetArg(args[n], XmNscrollBarDisplayPolicy, XmSTATIC); ++n;
-#endif
-    data->list[SIZE] = XmCreateScrolledList(frame, "sizeList", args, n);
-    XtVaSetValues(name, XmNuserData, data->list[SIZE], NULL);
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], Xm_Nvisible_ಅಂಶ_ಎಣಿಕೆ, 8); ++n;
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], XmNresizable, True); ++n;
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], Xm_Nlist_ಗಾತ್ರ_Policy, XmCONSTANT); ++n;
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], XmNvisualPolicy, XmVARIABLE); ++n;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ LESSTIF_ಆವೃತ್ತಿ
+    Xt_ಗಣ_Arg(ವಾದಗಳು[n], XmNscrollBarDisplayPolicy, XmSTATIC); ++n;
+#ಆದರೆ_ಅಂತ್ಯ
+    ದತ್ತಾಂಶ->list[ಗಾತ್ರ_4] = XmCreateScrolledList(ಚೌಕಟ್ಟು, "sizeList", ವಾದಗಳು, n);
+    Xt_Va_ಗಣ_ಮೌಲ್ಯಗಳು(name, Xm_Nuser_ದತ್ತಾಂಶ, ದತ್ತಾಂಶ->list[ಗಾತ್ರ_4], ಖಾಲಿ);
 
     // update form widgets cancel button
-    XtVaSetValues(form, XmNcancelButton, data->cancel, NULL);
+    Xt_Va_ಗಣ_ಮೌಲ್ಯಗಳು(form, XmNcancelButton, ದತ್ತಾಂಶ->cancel, ಖಾಲಿ);
 
-    XtAddCallback(size_toggle, XmNvalueChangedCallback,
-	    (XtCallbackProc)stoggle_callback, (XtPointer)data);
-    XtAddCallback(data->list[NAME], XmNbrowseSelectionCallback,
-	    (XtCallbackProc)name_callback, (XtPointer)data);
-    XtAddCallback(data->list[STYLE], XmNbrowseSelectionCallback,
-	    (XtCallbackProc)style_callback, (XtPointer)data);
-    XtAddCallback(data->list[SIZE], XmNbrowseSelectionCallback,
-	    (XtCallbackProc)size_callback, (XtPointer)data);
-    XtAddCallback(data->ok, XmNactivateCallback,
-	    (XtCallbackProc)ok_callback, (XtPointer)data);
-    XtAddCallback(data->cancel, XmNactivateCallback,
-	    (XtCallbackProc)cancel_callback, (XtPointer)data);
+    Xt_ಕೂಡಿಸು_Callback(ಗಾತ್ರ_toggle, Xm_Nvalue_ಬದಲಾಯಿತು_Callback,
+	    (XtCallbackProc)stoggle_callback, (Xt_ಸೂಚಕ)ದತ್ತಾಂಶ);
+    Xt_ಕೂಡಿಸು_Callback(ದತ್ತಾಂಶ->list[NAME], XmNbrowseSelectionCallback,
+	    (XtCallbackProc)name_callback, (Xt_ಸೂಚಕ)ದತ್ತಾಂಶ);
+    Xt_ಕೂಡಿಸು_Callback(ದತ್ತಾಂಶ->list[STYLE], XmNbrowseSelectionCallback,
+	    (XtCallbackProc)style_callback, (Xt_ಸೂಚಕ)ದತ್ತಾಂಶ);
+    Xt_ಕೂಡಿಸು_Callback(ದತ್ತಾಂಶ->list[ಗಾತ್ರ_4], XmNbrowseSelectionCallback,
+	    (XtCallbackProc)ಗಾತ್ರ_callback, (Xt_ಸೂಚಕ)ದತ್ತಾಂಶ);
+    Xt_ಕೂಡಿಸು_Callback(ದತ್ತಾಂಶ->ok, XmNactivateCallback,
+	    (XtCallbackProc)ok_callback, (Xt_ಸೂಚಕ)ದತ್ತಾಂಶ);
+    Xt_ಕೂಡಿಸು_Callback(ದತ್ತಾಂಶ->cancel, XmNactivateCallback,
+	    (XtCallbackProc)cancel_callback, (Xt_ಸೂಚಕ)ದತ್ತಾಂಶ);
 
-    XmProcessTraversal(data->list[NAME], XmTRAVERSE_CURRENT);
+    XmProcessTraversal(ದತ್ತಾಂಶ->list[NAME], XmTRAVERSE_CURRENT);
 
     // setup tabgroups
 
-    XmAddTabGroup(data->list[NAME]);
-    XmAddTabGroup(data->list[STYLE]);
-    XmAddTabGroup(data->list[SIZE]);
-    XmAddTabGroup(size_toggle);
-    XmAddTabGroup(data->name);
-    XmAddTabGroup(data->ok);
-    XmAddTabGroup(data->cancel);
+    Xm_ಕೂಡಿಸು_Tab_ಗುಂಪು(ದತ್ತಾಂಶ->list[NAME]);
+    Xm_ಕೂಡಿಸು_Tab_ಗುಂಪು(ದತ್ತಾಂಶ->list[STYLE]);
+    Xm_ಕೂಡಿಸು_Tab_ಗುಂಪು(ದತ್ತಾಂಶ->list[ಗಾತ್ರ_4]);
+    Xm_ಕೂಡಿಸು_Tab_ಗುಂಪು(ಗಾತ್ರ_toggle);
+    Xm_ಕೂಡಿಸು_Tab_ಗುಂಪು(ದತ್ತಾಂಶ->name);
+    Xm_ಕೂಡಿಸು_Tab_ಗುಂಪು(ದತ್ತಾಂಶ->ok);
+    Xm_ಕೂಡಿಸು_Tab_ಗುಂಪು(ದತ್ತಾಂಶ->cancel);
 
-    add_cancel_action(data->dialog, (XtCallbackProc)cancel_callback, data);
+    ಕೂಡಿಸು_cancel_action(ದತ್ತಾಂಶ->dialog, (XtCallbackProc)cancel_callback, ದತ್ತಾಂಶ);
 
     // Preset selection data.
 
-    data->exit = False;
-    data->in_pixels= True;
-    data->sel[ENCODING] = NULL;
-    data->sel[NAME] = NULL;
-    data->sel[STYLE] = NULL;
-    data->sel[SIZE] = NULL;
-    data->font_name = NULL;
+    ದತ್ತಾಂಶ->ನಿರ್ಗಮಿಸು = False;
+    ದತ್ತಾಂಶ->ಒಳ_pixels= True;
+    ದತ್ತಾಂಶ->sel[ENCODING] = ಖಾಲಿ;
+    ದತ್ತಾಂಶ->sel[NAME] = ಖಾಲಿ;
+    ದತ್ತಾಂಶ->sel[STYLE] = ಖಾಲಿ;
+    ದತ್ತಾಂಶ->sel[ಗಾತ್ರ_4] = ಖಾಲಿ;
+    ದತ್ತಾಂಶ->font_name = ಖಾಲಿ;
 
     // set up current font parameters
-    if (current && current[0] != '\0')
+    ಆದರೆ (current && current[0] != '\0')
     {
-	int	    i;
-	char	    **names;
+	ಪೂರ್ಣಾಂಕ	    i;
+	ಅಕ್ಷರ	    **ಹೆಸರುಗಳು;
 
-	names = XListFonts(XtDisplay(form), (char *) current, 1, &i);
+	ಹೆಸರುಗಳು = XListFonts(XtDisplay(form), (ಅಕ್ಷರ *) current, 1, &i);
 
-	if (i != 0)
+	ಆದರೆ (i != 0)
 	{
-	    char namebuf[TEMP_BUF_SIZE];
-	    char stylebuf[TEMP_BUF_SIZE];
-	    char sizebuf[TEMP_BUF_SIZE];
-	    char encodingbuf[TEMP_BUF_SIZE];
-	    char *found;
+	    ಅಕ್ಷರ namebuf[ತಾತ್ಕಾಲಿಕ_BUF_ಗಾತ್ರ];
+	    ಅಕ್ಷರ stylebuf[ತಾತ್ಕಾಲಿಕ_BUF_ಗಾತ್ರ];
+	    ಅಕ್ಷರ sizebuf[ತಾತ್ಕಾಲಿಕ_BUF_ಗಾತ್ರ];
+	    ಅಕ್ಷರ encodingbuf[ತಾತ್ಕಾಲಿಕ_BUF_ಗಾತ್ರ];
+	    ಅಕ್ಷರ *ಸಿಕ್ಕಿತು;
 
-	    found = names[0];
+	    ಸಿಕ್ಕಿತು = ಹೆಸರುಗಳು[0];
 
-	    name_part(found, namebuf);
-	    style_part(found, stylebuf);
-	    size_part(found, sizebuf, data->in_pixels);
-	    encoding_part(found, encodingbuf);
+	    name_part(ಸಿಕ್ಕಿತು, namebuf);
+	    style_part(ಸಿಕ್ಕಿತು, stylebuf);
+	    ಗಾತ್ರ_part(ಸಿಕ್ಕಿತು, sizebuf, ದತ್ತಾಂಶ->ಒಳ_pixels);
+	    encoding_part(ಸಿಕ್ಕಿತು, encodingbuf);
 
-	    if (*namebuf != NUL
+	    ಆದರೆ (*namebuf != NUL
 		    && *stylebuf != NUL
 		    && *sizebuf != NUL
 		    && *encodingbuf != NUL)
 	    {
-		data->sel[NAME] = XtNewString(namebuf);
-		data->sel[STYLE] = XtNewString(stylebuf);
-		data->sel[SIZE] = XtNewString(sizebuf);
-		data->sel[ENCODING] = XtNewString(encodingbuf);
-		data->font_name = XtNewString(names[0]);
-		display_sample(data);
-		XmTextSetString(data->name, data->font_name);
+		ದತ್ತಾಂಶ->sel[NAME] = XtNewString(namebuf);
+		ದತ್ತಾಂಶ->sel[STYLE] = XtNewString(stylebuf);
+		ದತ್ತಾಂಶ->sel[ಗಾತ್ರ_4] = XtNewString(sizebuf);
+		ದತ್ತಾಂಶ->sel[ENCODING] = XtNewString(encodingbuf);
+		ದತ್ತಾಂಶ->font_name = XtNewString(ಹೆಸರುಗಳು[0]);
+		display_sample(ದತ್ತಾಂಶ);
+		Xm_ಪಠ್ಯ_ಗಣ_String(ದತ್ತಾಂಶ->name, ದತ್ತಾಂಶ->font_name);
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		// We can't preset a symbolic name, which isn't a full font
 		// description. Therefore we just behave the same way as if the
@@ -1245,35 +1245,35 @@ gui_xm_select_font(char_u *current)
 		//
 		// Unfortunately there is no known way to expand an abbreviated
 		// font name.
-		data->font_name = NULL;
+		ದತ್ತಾಂಶ->font_name = ಖಾಲಿ;
 	    }
 	}
-	XFreeFontNames(names);
+	XFree_Font_ಹೆಸರುಗಳು(ಹೆಸರುಗಳು);
     }
 
-    fill_lists(NONE, data);
+    fill_lists(NONE, ದತ್ತಾಂಶ);
 
     // Unfortunately LessTif doesn't align the list widget's properly.  I don't
     // have currently any idea how to fix this problem.
-    XtManageChild(data->list[NAME]);
-    XtManageChild(data->list[STYLE]);
-    XtManageChild(data->list[SIZE]);
-    XtManageChild(data->encoding_menu);
+    Xt_Manage_ಮಗು(ದತ್ತಾಂಶ->list[NAME]);
+    Xt_Manage_ಮಗು(ದತ್ತಾಂಶ->list[STYLE]);
+    Xt_Manage_ಮಗು(ದತ್ತಾಂಶ->list[ಗಾತ್ರ_4]);
+    Xt_Manage_ಮಗು(ದತ್ತಾಂಶ->encoding_menu);
     manage_centered(form);
 
     // modal event loop
-    while (!data->exit)
-	XtAppProcessEvent(XtWidgetToApplicationContext(data->dialog),
-							(XtInputMask)XtIMAll);
+    ಆಗ (!ದತ್ತಾಂಶ->ನಿರ್ಗಮಿಸು)
+	XtAppProcessEvent(Xt_Widget_ಗಮ್ಯ_Application_Context(ದತ್ತಾಂಶ->dialog),
+							(Xt_ಒಳಹರಿವು_ಮುಖವಾಡ)XtIMAll);
 
-    if (data->old)
+    ಆದರೆ (ದತ್ತಾಂಶ->old)
     {
-	XFreeFont(XtDisplay(data->dialog),  data->old);
-	XmFontListFree(data->old_list);
+	XFreeFont(XtDisplay(ದತ್ತಾಂಶ->dialog),  ದತ್ತಾಂಶ->old);
+	XmFontListFree(ದತ್ತಾಂಶ->old_list);
     }
-    XtDestroyWidget(data->dialog);
+    XtDestroyWidget(ದತ್ತಾಂಶ->dialog);
 
     gui_motif_synch_fonts();
 
-    return (char_u *) data->font_name;
+    ಹಿಂತಿರುಗಿ (char_u *) ದತ್ತಾಂಶ->font_name;
 }

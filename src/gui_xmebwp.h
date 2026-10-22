@@ -17,18 +17,18 @@
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#ifndef EnhancedBP_H
-#define EnhancedBP_H
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ EnhancedBP_H
+#ವ್ಯಾಖ್ಯಾನಿಸು EnhancedBP_H
 
-#include <Xm/PushBP.h>
+#ಅನ್ತರ್ಭಾವ <Xm/PushBP.h>
 
-#include "gui_xmebw.h"
+#ಅನ್ತರ್ಭಾವ "gui_xmebw.h"
 
 
 /*
  * EnhancedButton class structure.
  */
-typedef struct _XmEnhancedButtonClassPart
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ _XmEnhancedButtonClassPart
 {
     Pixmap stipple_bitmap;
 } XmEnhancedButtonClassPart;
@@ -36,53 +36,53 @@ typedef struct _XmEnhancedButtonClassPart
 /*
  * Full class record declaration for EnhancedButton class.
  */
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
     CoreClassPart core_class;
     XmPrimitiveClassPart primitive_class;
     XmLabelClassPart label_class;
-    XmPushButtonClassPart pushbutton_class;
+    Xm_ತಳ್ಳು_Button_Class_Part pushbutton_class;
     XmEnhancedButtonClassPart enhancedbutton_class;
 } XmEnhancedButtonClassRec;
 
 
-extern XmEnhancedButtonClassRec xmEnhancedButtonClassRec;
+ಬಾಹ್ಯ XmEnhancedButtonClassRec xmEnhancedButtonClassRec;
 
 /*
  * EnhancedButton instance record.
  */
-typedef struct _XmEnhancedButtonPart
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ _XmEnhancedButtonPart
 {
     // public resources
-    String pixmap_data;
+    String pixmap_ದತ್ತಾಂಶ;
     String pixmap_file;
     Dimension spacing;
-    int label_location;
+    ಪೂರ್ಣಾಂಕ label_location;
 
     // private resources
-    int pixmap_depth;
-    Dimension pixmap_width;
-    Dimension pixmap_height;
-    Pixmap normal_pixmap;
+    ಪೂರ್ಣಾಂಕ pixmap_ಆಳ;
+    Dimension pixmap_ಅಗಲ;
+    Dimension pixmap_ಎತ್ತರ;
+    Pixmap ಸಾಮಾನ್ಯ_pixmap;
     Pixmap armed_pixmap;
     Pixmap insensitive_pixmap;
     Pixmap highlight_pixmap;
 
-    int doing_setvalues;
-    int doing_destroy;
+    ಪೂರ್ಣಾಂಕ doing_setvalues;
+    ಪೂರ್ಣಾಂಕ doing_destroy;
 } XmEnhancedButtonPart;
 
 
 /*
  * Full instance record declaration.
  */
-typedef struct _XmEnhancedButtonRec
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ _XmEnhancedButtonRec
 {
     CorePart core;
     XmPrimitivePart primitive;
     XmLabelPart label;
-    XmPushButtonPart pushbutton;
+    Xm_ತಳ್ಳು_Button_Part pushbutton;
     XmEnhancedButtonPart enhancedbutton;
 } XmEnhancedButtonRec;
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ

@@ -5,79 +5,79 @@
 #
 # This requires Python 2.6 or later.
 
-from __future__ import print_function
-import json
-import socket
-import sys
-import time
-import threading
+ತಃ __future__ ಆಮದು print_function
+ಆಮದು json
+ಆಮದು socket
+ಆಮದು sys
+ಆಮದು ಸಮಯ
+ಆಮದು threading
 
-try:
+ಪ್ರಯತ್ನಿಸು:
     # Python 3
-    import socketserver
-except ImportError:
+    ಆಮದು socketserver
+ಅಪವಾದ ImportError:
     # Python 2
-    import SocketServer as socketserver
+    ಆಮದು SocketServer ಇವ socketserver
 
-class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
+ವರ್ಗ ThreadedTCPRequestHandler(socketserver.ತಳ_Request_Handler):
 
-    def setup(self):
+    ವ್ಯಾಖ್ಯಾನ ಸಿದ್ಧತೆ(self):
         self.request.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 
-    def debuglog(self, msg):
-        if self.debug:
-            with open("Xlspserver.log", "a") as myfile:
-                myfile.write(msg)
+    ವ್ಯಾಖ್ಯಾನ debuglog(self, ಸಂದೇಶ):
+        ಆದರೆ self.debug:
+            ಜೊತೆ open("Xlspserver.log", "a") ಇವ myfile:
+                myfile.ಲಿಖ(ಸಂದೇಶ)
 
-    def send_lsp_req(self, msgid, method, params):
-        v = {'jsonrpc': '2.0', 'id': msgid, 'method': method}
-        if len(params) != 0:
+    ವ್ಯಾಖ್ಯಾನ send_lsp_req(self, msgid, ವಿಧಾನ, params):
+        v = {'jsonrpc': '2.0', 'id': msgid, 'method': ವಿಧಾನ}
+        ಆದರೆ ಉದ್ದ(params) != 0:
             v['params'] = params
         s = json.dumps(v)
-        req = "Content-Length: " + str(len(s)) + "\r\n"
+        req = "Content-Length: " + str(ಉದ್ದ(s)) + "\r\n"
         req += "Content-Type: application/vscode-jsonrpc; charset=utf-8\r\n"
         req += "\r\n"
         req += s
-        if self.debug:
-            self.debuglog("SEND: ({0} bytes) '{1}'\n".format(len(req), req))
+        ಆದರೆ self.debug:
+            self.debuglog("SEND: ({0} bytes) '{1}'\n".format(ಉದ್ದ(req), req))
         self.request.sendall(req.encode('utf-8'))
 
-    def send_lsp_resp(self, msgid, resp_dict):
+    ವ್ಯಾಖ್ಯಾನ send_lsp_resp(self, msgid, resp_dict):
         v = {'jsonrpc': '2.0', 'result': resp_dict}
-        if msgid != -1:
+        ಆದರೆ msgid != -1:
             v['id'] = msgid
         s = json.dumps(v)
-        resp = "Content-Length: " + str(len(s)) + "\r\n"
+        resp = "Content-Length: " + str(ಉದ್ದ(s)) + "\r\n"
         resp += "Content-Type: application/vscode-jsonrpc; charset=utf-8\r\n"
         resp += "\r\n"
         resp += s
-        if self.debug:
-            self.debuglog("SEND: ({0} bytes) '{1}'\n".format(len(resp), resp))
+        ಆದರೆ self.debug:
+            self.debuglog("SEND: ({0} bytes) '{1}'\n".format(ಉದ್ದ(resp), resp))
         self.request.sendall(resp.encode('utf-8'))
 
-    def send_wrong_payload(self):
+    ವ್ಯಾಖ್ಯಾನ send_wrong_payload(self):
         v = 'wrong-payload'
         s = json.dumps(v)
-        resp = "Content-Length: " + str(len(s)) + "\r\n"
+        resp = "Content-Length: " + str(ಉದ್ದ(s)) + "\r\n"
         resp += "Content-Type: application/vscode-jsonrpc; charset=utf-8\r\n"
         resp += "\r\n"
         resp += s
         self.request.sendall(resp.encode('utf-8'))
 
-    def send_empty_header(self, msgid, resp_dict):
+    ವ್ಯಾಖ್ಯಾನ send_ಖಾಲಿಗಳು_ಶೀರ್ಷಿಕೆ(self, msgid, resp_dict):
         v = {'jsonrpc': '2.0', 'id': msgid, 'result': resp_dict}
         s = json.dumps(v)
         resp = "\r\n"
         resp += s
         self.request.sendall(resp.encode('utf-8'))
 
-    def send_empty_payload(self):
+    ವ್ಯಾಖ್ಯಾನ send_ಖಾಲಿಗಳು_payload(self):
         resp = "Content-Length: 0\r\n"
         resp += "Content-Type: application/vscode-jsonrpc; charset=utf-8\r\n"
         resp += "\r\n"
         self.request.sendall(resp.encode('utf-8'))
 
-    def send_extra_hdr_fields(self, msgid, resp_dict):
+    ವ್ಯಾಖ್ಯಾನ send_extra_hdr_fields(self, msgid, resp_dict):
         # test for sending extra fields in the http header
         v = {'jsonrpc': '2.0', 'id': msgid, 'result': resp_dict}
         s = json.dumps(v)
@@ -85,24 +85,24 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         resp += "User-Agent: Python\r\n"
         resp += "Accept-Language: en-US,en\r\n"
         resp += "Content-Type: application/vscode-jsonrpc; charset=utf-8\r\n"
-        resp += "Content-Length: " + str(len(s)) + "\r\n"
+        resp += "Content-Length: " + str(ಉದ್ದ(s)) + "\r\n"
         resp += "\r\n"
         resp += s
         self.request.sendall(resp.encode('utf-8'))
 
-    def send_delayed_payload(self, msgid, resp_dict):
+    ವ್ಯಾಖ್ಯಾನ send_delayed_payload(self, msgid, resp_dict):
         # test for sending the hdr first and then after some delay, send the
         # payload
         v = {'jsonrpc': '2.0', 'id': msgid, 'result': resp_dict}
         s = json.dumps(v)
-        resp = "Content-Length: " + str(len(s)) + "\r\n"
+        resp = "Content-Length: " + str(ಉದ್ದ(s)) + "\r\n"
         resp += "\r\n"
         self.request.sendall(resp.encode('utf-8'))
-        time.sleep(0.05)
+        ಸಮಯ.ಸುಷುಪ್ತಿ(0.05)
         resp = s
         self.request.sendall(resp.encode('utf-8'))
 
-    def send_hdr_without_len(self, msgid, resp_dict):
+    ವ್ಯಾಖ್ಯಾನ send_hdr_without_len(self, msgid, resp_dict):
         # test for sending the http header without length
         v = {'jsonrpc': '2.0', 'id': msgid, 'result': resp_dict}
         s = json.dumps(v)
@@ -111,7 +111,7 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         resp += s
         self.request.sendall(resp.encode('utf-8'))
 
-    def send_hdr_with_wrong_len(self, msgid, resp_dict):
+    ವ್ಯಾಖ್ಯಾನ send_hdr_with_wrong_len(self, msgid, resp_dict):
         # test for sending the http header with wrong length
         v = {'jsonrpc': '2.0', 'id': msgid, 'result': resp_dict}
         s = json.dumps(v)
@@ -120,7 +120,7 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         resp += s
         self.request.sendall(resp.encode('utf-8'))
 
-    def send_hdr_with_negative_len(self, msgid, resp_dict):
+    ವ್ಯಾಖ್ಯಾನ send_hdr_with_negative_len(self, msgid, resp_dict):
         # test for sending the http header with negative length
         v = {'jsonrpc': '2.0', 'id': msgid, 'result': resp_dict}
         s = json.dumps(v)
@@ -129,81 +129,81 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         resp += s
         self.request.sendall(resp.encode('utf-8'))
 
-    def do_ping(self, payload):
-        time.sleep(0.2)
+    ವ್ಯಾಖ್ಯಾನ do_ping(self, payload):
+        ಸಮಯ.ಸುಷುಪ್ತಿ(0.2)
         self.send_lsp_resp(payload['id'], 'alive')
 
-    def do_echo(self, payload):
+    ವ್ಯಾಖ್ಯಾನ do_echo(self, payload):
         self.send_lsp_resp(-1, payload)
 
-    def do_simple_rpc(self, payload):
+    ವ್ಯಾಖ್ಯಾನ do_simple_rpc(self, payload):
         # test for a simple RPC request
         self.send_lsp_resp(payload['id'], 'simple-rpc')
 
-    def do_rpc_with_notif(self, payload):
+    ವ್ಯಾಖ್ಯಾನ do_rpc_with_notif(self, payload):
         # test for sending a notification before replying to a request message
         self.send_lsp_resp(-1, 'rpc-with-notif-notif')
         # sleep for some time to make sure the notification is delivered
-        time.sleep(0.2)
+        ಸಮಯ.ಸುಷುಪ್ತಿ(0.2)
         self.send_lsp_resp(payload['id'], 'rpc-with-notif-resp')
 
-    def do_wrong_payload(self, payload):
+    ವ್ಯಾಖ್ಯಾನ do_wrong_payload(self, payload):
         # test for sending a non dict payload
         self.send_wrong_payload()
-        time.sleep(0.2)
+        ಸಮಯ.ಸುಷುಪ್ತಿ(0.2)
         self.send_lsp_resp(-1, 'wrong-payload')
 
-    def do_large_payload(self, payload):
+    ವ್ಯಾಖ್ಯಾನ do_large_payload(self, payload):
         # test for sending a large (> 64K) payload
         self.send_lsp_resp(payload['id'], payload)
 
-    def do_rpc_resp_incorrect_id(self, payload):
+    ವ್ಯಾಖ್ಯಾನ do_rpc_resp_incorrect_id(self, payload):
         self.send_lsp_resp(-1, 'rpc-resp-incorrect-id-1')
         self.send_lsp_resp(-1, 'rpc-resp-incorrect-id-2')
         self.send_lsp_resp(1, 'rpc-resp-incorrect-id-3')
-        time.sleep(0.2)
+        ಸಮಯ.ಸುಷುಪ್ತಿ(0.2)
         self.send_lsp_resp(payload['id'], 'rpc-resp-incorrect-id-4')
 
-    def do_simple_notif(self, payload):
+    ವ್ಯಾಖ್ಯಾನ do_simple_notif(self, payload):
         # notification message test
         self.send_lsp_resp(-1, 'simple-notif')
 
-    def do_multi_notif(self, payload):
+    ವ್ಯಾಖ್ಯಾನ do_multi_notif(self, payload):
         # send multiple notifications
         self.send_lsp_resp(-1, 'multi-notif1')
         self.send_lsp_resp(-1, 'multi-notif2')
 
-    def do_msg_with_id(self, payload):
+    ವ್ಯಾಖ್ಯಾನ do_ಸಂದೇಶ_with_id(self, payload):
         self.send_lsp_resp(payload['id'], 'msg-with-id')
 
-    def do_msg_specific_cb(self, payload):
+    ವ್ಯಾಖ್ಯಾನ do_ಸಂದೇಶ_specific_cb(self, payload):
         self.send_lsp_resp(payload['id'], 'msg-specific-cb')
 
-    def do_server_req(self, payload):
+    ವ್ಯಾಖ್ಯಾನ do_server_req(self, payload):
         self.send_lsp_resp(201, {'method': 'checkhealth', 'params': {'a': 20}})
 
-    def do_extra_hdr_fields(self, payload):
+    ವ್ಯಾಖ್ಯಾನ do_extra_hdr_fields(self, payload):
         self.send_extra_hdr_fields(payload['id'], 'extra-hdr-fields')
 
-    def do_delayed_payload(self, payload):
+    ವ್ಯಾಖ್ಯಾನ do_delayed_payload(self, payload):
         self.send_delayed_payload(payload['id'], 'delayed-payload')
 
-    def do_hdr_without_len(self, payload):
+    ವ್ಯಾಖ್ಯಾನ do_hdr_without_len(self, payload):
         self.send_hdr_without_len(payload['id'], 'hdr-without-len')
 
-    def do_hdr_with_wrong_len(self, payload):
+    ವ್ಯಾಖ್ಯಾನ do_hdr_with_wrong_len(self, payload):
         self.send_hdr_with_wrong_len(payload['id'], 'hdr-with-wrong-len')
 
-    def do_hdr_with_negative_len(self, payload):
+    ವ್ಯಾಖ್ಯಾನ do_hdr_with_negative_len(self, payload):
         self.send_hdr_with_negative_len(payload['id'], 'hdr-with-negative-len')
 
-    def do_empty_header(self, payload):
-        self.send_empty_header(payload['id'], 'empty-header')
+    ವ್ಯಾಖ್ಯಾನ do_ಖಾಲಿಗಳು_ಶೀರ್ಷಿಕೆ(self, payload):
+        self.send_ಖಾಲಿಗಳು_ಶೀರ್ಷಿಕೆ(payload['id'], 'empty-header')
 
-    def do_empty_payload(self, payload):
-        self.send_empty_payload()
+    ವ್ಯಾಖ್ಯಾನ do_ಖಾಲಿಗಳು_payload(self, payload):
+        self.send_ಖಾಲಿಗಳು_payload()
 
-    def do_server_req_in_middle(self, payload):
+    ವ್ಯಾಖ್ಯಾನ do_server_req_ಒಳ_ಮಧ್ಯ(self, payload):
         # Send a notification message to the client in the middle of processing
         # a request message from the client
         self.send_lsp_req(-1, 'server-req-in-middle', {'text': 'server-notif'})
@@ -211,15 +211,15 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         # request message from the client.
         self.send_lsp_req(payload['id'], 'server-req-in-middle', {'text': 'server-req'})
 
-    def do_server_req_in_middle_resp(self, payload):
+    ವ್ಯಾಖ್ಯಾನ do_server_req_ಒಳ_ಮಧ್ಯ_resp(self, payload):
         # After receiving a response from the client send the response to the
         # client request.
         self.send_lsp_resp(payload['id'], {'text': 'server-resp'})
 
-    def process_msg(self, msg):
-        try:
-            decoded = json.loads(msg)
-            if 'method' in decoded:
+    ವ್ಯಾಖ್ಯಾನ process_ಸಂದೇಶ_2(self, ಸಂದೇಶ):
+        ಪ್ರಯತ್ನಿಸು:
+            decoded = json.loads(ಸಂದೇಶ)
+            ಆದರೆ 'method' ಒಳಗೆ decoded:
                 test_map = {
                         'ping': self.do_ping,
                         'echo': self.do_echo,
@@ -230,85 +230,85 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
                         'rpc-resp-incorrect-id': self.do_rpc_resp_incorrect_id,
                         'simple-notif': self.do_simple_notif,
                         'multi-notif': self.do_multi_notif,
-                        'msg-with-id': self.do_msg_with_id,
-                        'msg-specific-cb': self.do_msg_specific_cb,
+                        'msg-with-id': self.do_ಸಂದೇಶ_with_id,
+                        'msg-specific-cb': self.do_ಸಂದೇಶ_specific_cb,
                         'server-req': self.do_server_req,
                         'extra-hdr-fields': self.do_extra_hdr_fields,
                         'delayed-payload': self.do_delayed_payload,
                         'hdr-without-len': self.do_hdr_without_len,
                         'hdr-with-wrong-len': self.do_hdr_with_wrong_len,
                         'hdr-with-negative-len': self.do_hdr_with_negative_len,
-                        'empty-header': self.do_empty_header,
-                        'empty-payload': self.do_empty_payload,
-                        'server-req-in-middle': self.do_server_req_in_middle,
-                        'server-req-in-middle-resp': self.do_server_req_in_middle_resp,
+                        'empty-header': self.do_ಖಾಲಿಗಳು_ಶೀರ್ಷಿಕೆ,
+                        'empty-payload': self.do_ಖಾಲಿಗಳು_payload,
+                        'server-req-in-middle': self.do_server_req_ಒಳ_ಮಧ್ಯ,
+                        'server-req-in-middle-resp': self.do_server_req_ಒಳ_ಮಧ್ಯ_resp,
                         }
-                if decoded['method'] in test_map:
+                ಆದರೆ decoded['method'] ಒಳಗೆ test_map:
                     test_map[decoded['method']](decoded)
-                else:
+                ಇಲ್ಲದಿದ್ದರೆ:
                     self.debuglog("Error: Unsupported method - " + decoded['method'] + "\n")
-            else:
+            ಇಲ್ಲದಿದ್ದರೆ:
                 self.debuglog("Error: 'method' field is not found\n")
 
-        except ValueError:
+        ಅಪವಾದ ಮೌಲ್ಯ_Error:
             self.debuglog("Error: json decoding failed\n")
 
-    def process_msgs(self, msgbuf):
-        while True:
-            sidx = msgbuf.find('Content-Length: ')
-            if sidx == -1:
+    ವ್ಯಾಖ್ಯಾನ process_msgs(self, msgbuf):
+        ಆಗ ನಿಜ:
+            sidx = msgbuf.ಕಂಡುಹಿಡಿ('Content-Length: ')
+            ಆದರೆ sidx == -1:
                 # partial message received
-                return msgbuf
+                ಹಿಂತಿರುಗಿ msgbuf
             sidx += 16
-            eidx = msgbuf.find('\r\n')
-            if eidx == -1:
+            eidx = msgbuf.ಕಂಡುಹಿಡಿ('\r\n')
+            ಆದರೆ eidx == -1:
                 # partial message received
-                return msgbuf
-            msglen = int(msgbuf[sidx:eidx])
+                ಹಿಂತಿರುಗಿ msgbuf
+            msglen = ಪೂರ್ಣಾಂಕ(msgbuf[sidx:eidx])
 
-            hdrend = msgbuf.find('\r\n\r\n')
-            if hdrend == -1:
+            hdrend = msgbuf.ಕಂಡುಹಿಡಿ('\r\n\r\n')
+            ಆದರೆ hdrend == -1:
                 # partial message received
-                return msgbuf
+                ಹಿಂತಿರುಗಿ msgbuf
 
-            if msglen > len(msgbuf[hdrend + 4:]):
-                if self.debug:
-                    self.debuglog("Partial message ({0} bytes)\n".format(len(msgbuf)))
+            ಆದರೆ msglen > ಉದ್ದ(msgbuf[hdrend + 4:]):
+                ಆದರೆ self.debug:
+                    self.debuglog("Partial message ({0} bytes)\n".format(ಉದ್ದ(msgbuf)))
                 # partial message received
-                return msgbuf
+                ಹಿಂತಿರುಗಿ msgbuf
 
-            if self.debug:
+            ಆದರೆ self.debug:
                 self.debuglog("Complete message ({0} bytes) received\n".format(msglen))
 
             # Remove the header
             msgbuf = msgbuf[hdrend + 4:]
             payload = msgbuf[:msglen]
 
-            self.process_msg(payload)
+            self.process_ಸಂದೇಶ_2(payload)
 
             # Remove the processed message
             msgbuf = msgbuf[msglen:]
 
-    def handle(self):
-        self.debug = False
+    ವ್ಯಾಖ್ಯಾನ handle(self):
+        self.debug = ಸುಳ್ಳು
         self.debuglog("=== socket opened ===\n")
         msgbuf = ''
-        while True:
-            try:
+        ಆಗ ನಿಜ:
+            ಪ್ರಯತ್ನಿಸು:
                 received = self.request.recv(4096).decode('utf-8')
-            except socket.error:
+            ಅಪವಾದ socket.error:
                 self.debuglog("=== socket error ===\n")
-                break
-            except IOError:
+                ನಿಲ್ಲಿಸು
+            ಅಪವಾದ IOError:
                 self.debuglog("=== socket closed ===\n")
-                break
-            if received == '':
+                ನಿಲ್ಲಿಸು
+            ಆದರೆ received == '':
                 self.debuglog("=== socket closed ===\n")
-                break
+                ನಿಲ್ಲಿಸು
 
             # Write the received lines into the file for debugging
-            if self.debug:
-                self.debuglog("RECV: ({0} bytes) '{1}'\n".format(len(received), received))
+            ಆದರೆ self.debug:
+                self.debuglog("RECV: ({0} bytes) '{1}'\n".format(ಉದ್ದ(received), received))
 
             # Can receive more than one line in a response or a partial line.
             # Accumulate all the received characters and process one line at
@@ -316,46 +316,46 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
             msgbuf += received
             msgbuf = self.process_msgs(msgbuf)
 
-class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
-    pass
+ವರ್ಗ ThreadedTCPServer(socketserver.Threading_Mix_ಒಳ, socketserver.TCPServer):
+    ದಾಟು
 
-def writePortInFile(port):
+ವ್ಯಾಖ್ಯಾನ write_ಪೋರ್ಟ್_ಒಳ_File(ಪೋರ್ಟ್):
     # Write the port number in Xportnr, so that the test knows it.
     f = open("Xportnr", "w")
-    f.write("{0}".format(port))
+    f.ಲಿಖ("{0}".format(ಪೋರ್ಟ್))
     f.close()
 
-def main(host, port, server_class=ThreadedTCPServer):
+ವ್ಯಾಖ್ಯಾನ ಮುಖ್ಯ(host, ಪೋರ್ಟ್, server_class=ThreadedTCPServer):
     # Wait half a second before opening the port to test waittime in ch_open().
     # We do want to get the port number, get that first.  We cannot open the
     # socket, guess a port is free.
-    if len(sys.argv) >= 2 and sys.argv[1] == 'delay':
-        port = 13684
-        writePortInFile(port)
-        time.sleep(0.5)
+    ಆದರೆ ಉದ್ದ(sys.argv) >= 2 ಮತ್ತು sys.argv[1] == 'delay':
+        ಪೋರ್ಟ್ = 13684
+        write_ಪೋರ್ಟ್_ಒಳ_File(ಪೋರ್ಟ್)
+        ಸಮಯ.ಸುಷುಪ್ತಿ(0.5)
 
-    addrs = socket.getaddrinfo(host, port, 0, 0, socket.IPPROTO_TCP)
+    addrs = socket.getaddrinfo(host, ಪೋರ್ಟ್, 0, 0, socket.IPPROTO_TCP)
     # Each addr is a (family, type, proto, canonname, sockaddr) tuple
     sockaddr = addrs[0][4]
-    server_class.address_family = addrs[0][0]
+    server_class.ವಿಳಾಸ_family = addrs[0][0]
 
     server = server_class(sockaddr[0:2], ThreadedTCPRequestHandler)
-    ip, port = server.server_address[0:2]
+    ip, ಪೋರ್ಟ್ = server.server_ವಿಳಾಸ[0:2]
 
     # Start a thread with the server.  That thread will then start a new thread
     # for each connection.
-    server_thread = threading.Thread(target=server.serve_forever)
-    server_thread.start()
+    server_thread = threading.ಎಳೆ(ಗುರಿ=server.serve_forever)
+    server_thread.ಆರಂಭ()
 
-    writePortInFile(port)
+    write_ಪೋರ್ಟ್_ಒಳ_File(ಪೋರ್ಟ್)
 
     # Main thread terminates, but the server continues running
     # until server.shutdown() is called.
-    try:
-        while server_thread.is_alive():
+    ಪ್ರಯತ್ನಿಸು:
+        ಆಗ server_thread.is_alive():
             server_thread.join(1)
-    except (KeyboardInterrupt, SystemExit):
+    ಅಪವಾದ (Keyboard_ಅಡಚಣೆ, SystemExit):
         server.shutdown()
 
-if __name__ == "__main__":
-    main("localhost", 0)
+ಆದರೆ __name__ == "__main__":
+    ಮುಖ್ಯ("localhost", 0)

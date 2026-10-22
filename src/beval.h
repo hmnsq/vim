@@ -7,22 +7,22 @@
  * Do ":help credits" in Vim to see a list of people who contributed.
  */
 
-#if !defined(BEVAL__H) && defined(FEAT_BEVAL)
-#define BEVAL__H
+#ಆದರೆ !defined(BEVAL__H) && defined(FEAT_BEVAL)
+#ವ್ಯಾಖ್ಯಾನಿಸು BEVAL__H
 
-#ifdef FEAT_GUI_GTK
-# if defined(USE_GTK3) || defined(USE_GTK4)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_GTK
+# ಆದರೆ defined(USE_GTK3) || defined(USE_GTK4)
 #  include <gtk/gtk.h>
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  include <gtk/gtkwidget.h>
 # endif
-#else
-# if defined(FEAT_GUI_X11)
+#ಇಲ್ಲದಿದ್ದರೆ
+# ಆದರೆ defined(FEAT_GUI_X11)
 #  include <X11/Intrinsic.h>
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-typedef enum
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ
 {
     ShS_NEUTRAL,			// nothing showing or pending
     ShS_PENDING,			// data requested from debugger
@@ -30,21 +30,21 @@ typedef enum
     ShS_SHOWING				// the balloon is being displayed
 } BeState;
 
-typedef struct BalloonEvalStruct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ BalloonEvalStruct
 {
-#ifdef FEAT_BEVAL_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_BEVAL_GUI
 # ifdef FEAT_GUI_GTK
-    GtkWidget		*target;	// widget we are monitoring
+    GtkWidget		*ಗುರಿ;	// widget we are monitoring
     GtkWidget		*balloonShell;
     GtkWidget		*balloonLabel;
-    unsigned int	timerID;	// timer for run
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ	timerID;	// timer for run
     BeState		showState;	// tells us what's currently going on
-    int			x;
-    int			y;
-    unsigned int	state;		// Button/Modifier key state
-# else
-#  if !defined(FEAT_GUI_MSWIN)
-    Widget		target;		// widget we are monitoring
+    ಪೂರ್ಣಾಂಕ			x;
+    ಪೂರ್ಣಾಂಕ			y;
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ	state;		// Button/Modifier key state
+# ಇಲ್ಲದಿದ್ದರೆ
+#  ಆದರೆ !defined(FEAT_GUI_MSWIN)
+    Widget		ಗುರಿ;		// widget we are monitoring
     Widget		balloonShell;
     Widget		balloonLabel;
     XtIntervalId	timerID;	// timer for run
@@ -52,44 +52,44 @@ typedef struct BalloonEvalStruct
     XtAppContext	appContext;	// used in event handler
     Position		x;
     Position		y;
-    Position		x_root;
-    Position		y_root;
-    int			state;		// Button/Modifier key state
-#  else
-    HWND		target;
+    Position		x_ಬೇರು;
+    Position		y_ಬೇರು;
+    ಪೂರ್ಣಾಂಕ			state;		// Button/Modifier key state
+#  ಇಲ್ಲದಿದ್ದರೆ
+    HWND		ಗುರಿ;
     HWND		balloon;
-    int			x;
-    int			y;
+    ಪೂರ್ಣಾಂಕ			x;
+    ಪೂರ್ಣಾಂಕ			y;
     BeState		showState;	// tells us what's currently going on
 #  endif
 # endif
-# if !defined(FEAT_GUI_GTK) && !defined(FEAT_GUI_MSWIN)
-    Dimension		screen_width;	// screen width in pixels
-    Dimension		screen_height;	// screen height in pixels
+# ಆದರೆ !defined(FEAT_GUI_GTK) && !defined(FEAT_GUI_MSWIN)
+    Dimension		screen_ಅಗಲ;	// screen width in pixels
+    Dimension		screen_ಎತ್ತರ;	// screen height in pixels
 # endif
-    void		(*msgCB)(struct BalloonEvalStruct *, int);
-    void		*clientData;	// For callback
-#endif
+    ಶೂನ್ಯ		(*ಸಂದೇಶ_CB)(ರಚನೆ BalloonEvalStruct *, ಪೂರ್ಣಾಂಕ);
+    ಶೂನ್ಯ		*client_ದತ್ತಾಂಶ;	// For callback
+#ಆದರೆ_ಅಂತ್ಯ
 
-    int			ts;		// tabstop setting for this buffer
-#ifdef FEAT_VARTABS
-    int			*vts;		// vartabstop setting for this buffer
-#endif
-    char_u		*msg;		// allocated: current text
-#ifdef FEAT_GUI_MSWIN
-    void		*tofree;
-#endif
-#ifdef FEAT_GUI_HAIKU
-    int			x;
-    int			y;
-#endif
+    ಪೂರ್ಣಾಂಕ			ts;		// tabstop setting for this buffer
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+    ಪೂರ್ಣಾಂಕ			*vts;		// vartabstop setting for this buffer
+#ಆದರೆ_ಅಂತ್ಯ
+    char_u		*ಸಂದೇಶ;		// allocated: current text
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_MSWIN
+    ಶೂನ್ಯ		*tofree;
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_HAIKU
+    ಪೂರ್ಣಾಂಕ			x;
+    ಪೂರ್ಣಾಂಕ			y;
+#ಆದರೆ_ಅಂತ್ಯ
 } BalloonEval;
 
-#define EVAL_OFFSET_X 15 // displacement of beval topleft corner from pointer
-#define EVAL_OFFSET_Y 10
+#ವ್ಯಾಖ್ಯಾನಿಸು EVAL_ಸ್ಥಾನಾಂತರ_X 15 // displacement of beval topleft corner from pointer
+#ವ್ಯಾಖ್ಯಾನಿಸು EVAL_ಸ್ಥಾನಾಂತರ_Y 10
 
-#ifdef FEAT_BEVAL_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_BEVAL_GUI
 # include "gui_beval.pro"
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#endif // BEVAL__H and FEAT_BEVAL_GUI
+#ಆದರೆ_ಅಂತ್ಯ // BEVAL__H and FEAT_BEVAL_GUI

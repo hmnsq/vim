@@ -1,511 +1,511 @@
-#include "vterm_internal.h"
+#ಅನ್ತರ್ಭಾವ "vterm_internal.h"
 
-#include <stdio.h>
-#include <string.h>
+#ಅನ್ತರ್ಭಾವ <stdio.h>
+#ಅನ್ತರ್ಭಾವ <string.h>
 
-#define strneq(a,b,n) (strncmp(a,b,n)==0)
+#ವ್ಯಾಖ್ಯಾನಿಸು strneq(a,b,n) (ಅಕ್ಷರಸರಣಿ_ಹೋಲಿಕೆ(a,b,n)==0)
 
-#if defined(DEBUG) && DEBUG > 1
+#ಆದರೆ defined(DEBUG) && DEBUG > 1
 # define DEBUG_GLYPH_COMBINE
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-static int on_resize(int rows, int cols, void *user);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ on_resize(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು_2, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, ಶೂನ್ಯ *user);
 
 /* Some convenient wrappers to make callback functions easier */
 
-static void putglyph(VTermState *state, const uint32_t chars[], int width, VTermPos pos)
+ಸ್ಥಿರ ಶೂನ್ಯ putglyph(VTermState *state, ಸ್ಥಿರಾಂಕ uint32_t chars[], ಪೂರ್ಣಾಂಕ ಅಗಲ, VTermPos pos)
 {
   VTermGlyphInfo info;
 
   info.chars = chars;
-  info.width = width;
+  info.ಅಗಲ = ಅಗಲ;
   info.protected_cell = state->protected_cell;
-  info.dwl = state->lineinfo[pos.row].doublewidth;
-  info.dhl = state->lineinfo[pos.row].doubleheight;
+  info.dwl = state->lineinfo[pos.ಅಡ್ಡಸಾಲು].doublewidth;
+  info.dhl = state->lineinfo[pos.ಅಡ್ಡಸಾಲು].doubleheight;
 
-  if(state->callbacks && state->callbacks->putglyph)
-    if((*state->callbacks->putglyph)(&info, pos, state->cbdata))
-      return;
+  ಆದರೆ(state->callbacks && state->callbacks->putglyph)
+    ಆದರೆ((*state->callbacks->putglyph)(&info, pos, state->cbdata))
+      ಹಿಂತಿರುಗಿ;
 
-  DEBUG_LOG3("libvterm: Unhandled putglyph U+%04x at (%d,%d)\n", chars[0], pos.col, pos.row);
+  DEBUG_LOG3("libvterm: Unhandled putglyph U+%04x at (%d,%d)\n", chars[0], pos.ಲಂಬಸಾಲು, pos.ಅಡ್ಡಸಾಲು);
 }
 
-static void updatecursor(VTermState *state, VTermPos *oldpos, int cancel_phantom)
+ಸ್ಥಿರ ಶೂನ್ಯ updatecursor(VTermState *state, VTermPos *oldpos, ಪೂರ್ಣಾಂಕ cancel_phantom)
 {
-  if(state->pos.col == oldpos->col && state->pos.row == oldpos->row)
-    return;
+  ಆದರೆ(state->pos.ಲಂಬಸಾಲು == oldpos->ಲಂಬಸಾಲು && state->pos.ಅಡ್ಡಸಾಲು == oldpos->ಅಡ್ಡಸಾಲು)
+    ಹಿಂತಿರುಗಿ;
 
-  if(cancel_phantom)
+  ಆದರೆ(cancel_phantom)
     state->at_phantom = 0;
 
-  if(state->callbacks && state->callbacks->movecursor)
-    if((*state->callbacks->movecursor)(state->pos, *oldpos, state->mode.cursor_visible, state->cbdata))
-      return;
+  ಆದರೆ(state->callbacks && state->callbacks->movecursor)
+    ಆದರೆ((*state->callbacks->movecursor)(state->pos, *oldpos, state->ಬಹುಲಕ.cursor_visible, state->cbdata))
+      ಹಿಂತಿರುಗಿ;
 }
 
-static void erase(VTermState *state, VTermRect rect, int selective)
+ಸ್ಥಿರ ಶೂನ್ಯ erase(VTermState *state, VTermRect rect, ಪೂರ್ಣಾಂಕ selective)
 {
-  if(rect.end_col == state->cols) {
-    int row;
+  ಆದರೆ(rect.ಕೊನೆ_ಲಂಬಸಾಲು == state->ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ) {
+    ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು;
     /* If we're erasing the final cells of any lines, cancel the continuation
      * marker on the subsequent line
      */
-    for(row = rect.start_row + 1; row < rect.end_row + 1 && row < state->rows; row++)
-      state->lineinfo[row].continuation = 0;
+    ಗಾಗಿ(ಅಡ್ಡಸಾಲು = rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು + 1; ಅಡ್ಡಸಾಲು < rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು + 1 && ಅಡ್ಡಸಾಲು < state->ಅಡ್ಡಸಾಲುಗಳು_2; ಅಡ್ಡಸಾಲು++)
+      state->lineinfo[ಅಡ್ಡಸಾಲು].continuation = 0;
   }
 
-  if(state->callbacks && state->callbacks->erase)
-    if((*state->callbacks->erase)(rect, selective, state->cbdata))
-      return;
+  ಆದರೆ(state->callbacks && state->callbacks->erase)
+    ಆದರೆ((*state->callbacks->erase)(rect, selective, state->cbdata))
+      ಹಿಂತಿರುಗಿ;
 }
 
-static VTermState *vterm_state_new(VTerm *vt)
+ಸ್ಥಿರ VTermState *vterm_state_new(VTerm *vt)
 {
-  VTermState *state = vterm_allocator_malloc(vt, sizeof(VTermState));
+  VTermState *state = vterm_allocator_malloc(vt, ಗಾತ್ರ(VTermState));
 
-  if (state == NULL)
-    return NULL;
+  ಆದರೆ (state == ಖಾಲಿ)
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
   state->vt = vt;
 
-  state->rows = vt->rows;
-  state->cols = vt->cols;
+  state->ಅಡ್ಡಸಾಲುಗಳು_2 = vt->ಅಡ್ಡಸಾಲುಗಳು_2;
+  state->ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = vt->ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
 
-  state->mouse_col     = 0;
-  state->mouse_row     = 0;
+  state->mouse_ಲಂಬಸಾಲು     = 0;
+  state->mouse_ಅಡ್ಡಸಾಲು     = 0;
   state->mouse_buttons = 0;
 
   state->mouse_protocol = MOUSE_X10;
 
-  state->callbacks = NULL;
-  state->cbdata    = NULL;
+  state->callbacks = ಖಾಲಿ;
+  state->cbdata    = ಖಾಲಿ;
   state->callbacks_has_premove = 0;
 
-  state->selection.callbacks = NULL;
-  state->selection.user      = NULL;
-  state->selection.buffer    = NULL;
+  state->selection.callbacks = ಖಾಲಿ;
+  state->selection.user      = ಖಾಲಿ;
+  state->selection.ಬಫರ್    = ಖಾಲಿ;
 
   vterm_state_newpen(state);
 
   state->bold_is_highbright = 0;
 
-  state->combine_chars_size = 16;
-  state->combine_chars = vterm_allocator_malloc(state->vt, state->combine_chars_size * sizeof(state->combine_chars[0]));
+  state->combine_chars_ಗಾತ್ರ = 16;
+  state->combine_chars = vterm_allocator_malloc(state->vt, state->combine_chars_ಗಾತ್ರ * ಗಾತ್ರ(state->combine_chars[0]));
 
-  state->tabstops = vterm_allocator_malloc(state->vt, (state->cols + 7) / 8);
+  state->tabstops = vterm_allocator_malloc(state->vt, (state->ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ + 7) / 8);
 
-  state->lineinfos[BUFIDX_PRIMARY]   = vterm_allocator_malloc(state->vt, state->rows * sizeof(VTermLineInfo));
+  state->lineinfos[BUFIDX_PRIMARY]   = vterm_allocator_malloc(state->vt, state->ಅಡ್ಡಸಾಲುಗಳು_2 * ಗಾತ್ರ(VTerm_ಸಾಲು_Info));
   /* TODO: Make an 'enable' function */
-  state->lineinfos[BUFIDX_ALTSCREEN] = vterm_allocator_malloc(state->vt, state->rows * sizeof(VTermLineInfo));
+  state->lineinfos[BUFIDX_ALTSCREEN] = vterm_allocator_malloc(state->vt, state->ಅಡ್ಡಸಾಲುಗಳು_2 * ಗಾತ್ರ(VTerm_ಸಾಲು_Info));
   state->lineinfo = state->lineinfos[BUFIDX_PRIMARY];
 
   state->encoding_utf8.enc = vterm_lookup_encoding(ENC_UTF8, 'u');
-  if(state->encoding_utf8.enc->init)
-    (*state->encoding_utf8.enc->init)(state->encoding_utf8.enc, state->encoding_utf8.data);
+  ಆದರೆ(state->encoding_utf8.enc->init)
+    (*state->encoding_utf8.enc->init)(state->encoding_utf8.enc, state->encoding_utf8.ದತ್ತಾಂಶ);
 
-  return state;
+  ಹಿಂತಿರುಗಿ state;
 }
 
-INTERNAL void vterm_state_free(VTermState *state)
+ಆಂತರಿಕ ಶೂನ್ಯ vterm_state_free(VTermState *state)
 {
   vterm_allocator_free(state->vt, state->tabstops);
   vterm_allocator_free(state->vt, state->lineinfos[BUFIDX_PRIMARY]);
-  if(state->lineinfos[BUFIDX_ALTSCREEN])
+  ಆದರೆ(state->lineinfos[BUFIDX_ALTSCREEN])
     vterm_allocator_free(state->vt, state->lineinfos[BUFIDX_ALTSCREEN]);
   vterm_allocator_free(state->vt, state->combine_chars);
   vterm_allocator_free(state->vt, state);
 }
 
-static void scroll(VTermState *state, VTermRect rect, int downward, int rightward)
+ಸ್ಥಿರ ಶೂನ್ಯ scroll(VTermState *state, VTermRect rect, ಪೂರ್ಣಾಂಕ downward, ಪೂರ್ಣಾಂಕ rightward)
 {
-  int rows;
-  int cols;
-  if(!downward && !rightward)
-    return;
+  ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು_2;
+  ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+  ಆದರೆ(!downward && !rightward)
+    ಹಿಂತಿರುಗಿ;
 
   // A degenerate rectangle makes "rows" or "cols" below negative, which
   // inverts the clamping of "downward" and "rightward" and results in a
   // negative height being passed to memmove().  This happens when a scroll
   // region survives a resize that made the terminal smaller.
-  if(rect.end_row <= rect.start_row || rect.end_col <= rect.start_col)
-    return;
+  ಆದರೆ(rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು <= rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು || rect.ಕೊನೆ_ಲಂಬಸಾಲು <= rect.ಆರಂಭ_ಲಂಬಸಾಲು)
+    ಹಿಂತಿರುಗಿ;
 
-  rows = rect.end_row - rect.start_row;
-  if(downward > rows)
-    downward = rows;
-  else if(downward < -rows)
-    downward = -rows;
+  ಅಡ್ಡಸಾಲುಗಳು_2 = rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು - rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು;
+  ಆದರೆ(downward > ಅಡ್ಡಸಾಲುಗಳು_2)
+    downward = ಅಡ್ಡಸಾಲುಗಳು_2;
+  ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(downward < -ಅಡ್ಡಸಾಲುಗಳು_2)
+    downward = -ಅಡ್ಡಸಾಲುಗಳು_2;
 
-  cols = rect.end_col - rect.start_col;
-  if(rightward > cols)
-    rightward = cols;
-  else if(rightward < -cols)
-    rightward = -cols;
+  ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = rect.ಕೊನೆ_ಲಂಬಸಾಲು - rect.ಆರಂಭ_ಲಂಬಸಾಲು;
+  ಆದರೆ(rightward > ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ)
+    rightward = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+  ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(rightward < -ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ)
+    rightward = -ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
 
-  if(state->callbacks_has_premove && state->callbacks && state->callbacks->premove) {
+  ಆದರೆ(state->callbacks_has_premove && state->callbacks && state->callbacks->premove) {
     // TODO: technically this logic is wrong if both downward != 0 and rightward != 0
 
     /* Work out what subsection of the destination area is about to be destroyed */
-    if(downward > 0)
+    ಆದರೆ(downward > 0)
       /* about to destroy the top */
       (*state->callbacks->premove)((VTermRect){
-          .start_row = rect.start_row, .end_row = rect.start_row + downward,
-          .start_col = rect.start_col, .end_col = rect.end_col}, state->cbdata);
-    else if(downward < 0)
+          .ಆರಂಭ_ಅಡ್ಡಸಾಲು = rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು, .ಕೊನೆ_ಅಡ್ಡಸಾಲು = rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು + downward,
+          .ಆರಂಭ_ಲಂಬಸಾಲು = rect.ಆರಂಭ_ಲಂಬಸಾಲು, .ಕೊನೆ_ಲಂಬಸಾಲು = rect.ಕೊನೆ_ಲಂಬಸಾಲು}, state->cbdata);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(downward < 0)
       /* about to destroy the bottom */
       (*state->callbacks->premove)((VTermRect){
-          .start_row = rect.end_row + downward, .end_row = rect.end_row,
-          .start_col = rect.start_col,          .end_col = rect.end_col}, state->cbdata);
+          .ಆರಂಭ_ಅಡ್ಡಸಾಲು = rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು + downward, .ಕೊನೆ_ಅಡ್ಡಸಾಲು = rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು,
+          .ಆರಂಭ_ಲಂಬಸಾಲು = rect.ಆರಂಭ_ಲಂಬಸಾಲು,          .ಕೊನೆ_ಲಂಬಸಾಲು = rect.ಕೊನೆ_ಲಂಬಸಾಲು}, state->cbdata);
 
-    if(rightward > 0)
+    ಆದರೆ(rightward > 0)
       /* about to destroy the left */
       (*state->callbacks->premove)((VTermRect){
-          .start_row = rect.start_row, .end_row = rect.end_row,
-          .start_col = rect.start_col, .end_col = rect.start_col + rightward}, state->cbdata);
-    else if(rightward < 0)
+          .ಆರಂಭ_ಅಡ್ಡಸಾಲು = rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು, .ಕೊನೆ_ಅಡ್ಡಸಾಲು = rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು,
+          .ಆರಂಭ_ಲಂಬಸಾಲು = rect.ಆರಂಭ_ಲಂಬಸಾಲು, .ಕೊನೆ_ಲಂಬಸಾಲು = rect.ಆರಂಭ_ಲಂಬಸಾಲು + rightward}, state->cbdata);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(rightward < 0)
       /* about to destroy the right */
       (*state->callbacks->premove)((VTermRect){
-          .start_row = rect.start_row,           .end_row = rect.end_row,
-          .start_col = rect.end_col + rightward, .end_col = rect.end_col}, state->cbdata);
+          .ಆರಂಭ_ಅಡ್ಡಸಾಲು = rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು,           .ಕೊನೆ_ಅಡ್ಡಸಾಲು = rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು,
+          .ಆರಂಭ_ಲಂಬಸಾಲು = rect.ಕೊನೆ_ಲಂಬಸಾಲು + rightward, .ಕೊನೆ_ಲಂಬಸಾಲು = rect.ಕೊನೆ_ಲಂಬಸಾಲು}, state->cbdata);
   }
 
   // Update lineinfo if full line
-  if(rect.start_col == 0 && rect.end_col == state->cols && rightward == 0) {
-    int height = rect.end_row - rect.start_row - abs(downward);
-    int row;
-    VTermLineInfo zeroLineInfo = {0x0};
+  ಆದರೆ(rect.ಆರಂಭ_ಲಂಬಸಾಲು == 0 && rect.ಕೊನೆ_ಲಂಬಸಾಲು == state->ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ && rightward == 0) {
+    ಪೂರ್ಣಾಂಕ ಎತ್ತರ = rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು - rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು - ನಿರಪೇಕ್ಷ(downward);
+    ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು;
+    VTerm_ಸಾಲು_Info zero_ಸಾಲು_Info = {0x0};
 
-    if(downward > 0) {
-      memmove(state->lineinfo + rect.start_row,
-              state->lineinfo + rect.start_row + downward,
-              height * sizeof(state->lineinfo[0]));
-      for(row = rect.end_row - downward; row < rect.end_row; row++)
-        state->lineinfo[row] = zeroLineInfo;
+    ಆದರೆ(downward > 0) {
+      memmove(state->lineinfo + rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು,
+              state->lineinfo + rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು + downward,
+              ಎತ್ತರ * ಗಾತ್ರ(state->lineinfo[0]));
+      ಗಾಗಿ(ಅಡ್ಡಸಾಲು = rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು - downward; ಅಡ್ಡಸಾಲು < rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು; ಅಡ್ಡಸಾಲು++)
+        state->lineinfo[ಅಡ್ಡಸಾಲು] = zero_ಸಾಲು_Info;
     }
-    else {
-      memmove(state->lineinfo + rect.start_row - downward,
-              state->lineinfo + rect.start_row,
-              height * sizeof(state->lineinfo[0]));
-      for(row = rect.start_row; row < rect.start_row - downward; row++)
-        state->lineinfo[row] = zeroLineInfo;
+    ಇಲ್ಲದಿದ್ದರೆ {
+      memmove(state->lineinfo + rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು - downward,
+              state->lineinfo + rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು,
+              ಎತ್ತರ * ಗಾತ್ರ(state->lineinfo[0]));
+      ಗಾಗಿ(ಅಡ್ಡಸಾಲು = rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು; ಅಡ್ಡಸಾಲು < rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು - downward; ಅಡ್ಡಸಾಲು++)
+        state->lineinfo[ಅಡ್ಡಸಾಲು] = zero_ಸಾಲು_Info;
     }
   }
 
-  if(state->callbacks && state->callbacks->scrollrect)
-    if((*state->callbacks->scrollrect)(rect, downward, rightward, state->cbdata))
-      return;
+  ಆದರೆ(state->callbacks && state->callbacks->scrollrect)
+    ಆದರೆ((*state->callbacks->scrollrect)(rect, downward, rightward, state->cbdata))
+      ಹಿಂತಿರುಗಿ;
 
-  if(state->callbacks)
+  ಆದರೆ(state->callbacks)
     vterm_scroll_rect(rect, downward, rightward,
         state->callbacks->moverect, state->callbacks->erase, state->cbdata);
 }
 
-static void linefeed(VTermState *state)
+ಸ್ಥಿರ ಶೂನ್ಯ linefeed(VTermState *state)
 {
-  if(state->pos.row == SCROLLREGION_BOTTOM(state) - 1) {
+  ಆದರೆ(state->pos.ಅಡ್ಡಸಾಲು == SCROLLREGION_BOTTOM(state) - 1) {
     VTermRect rect;
-    rect.start_row = state->scrollregion_top;
-    rect.end_row   = SCROLLREGION_BOTTOM(state);
-    rect.start_col = SCROLLREGION_LEFT(state);
-    rect.end_col   = SCROLLREGION_RIGHT(state);
+    rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು = state->scrollregion_ತುದಿ;
+    rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು   = SCROLLREGION_BOTTOM(state);
+    rect.ಆರಂಭ_ಲಂಬಸಾಲು = SCROLLREGION_ಎಡ(state);
+    rect.ಕೊನೆ_ಲಂಬಸಾಲು   = SCROLLREGION_ಬಲ(state);
 
     scroll(state, rect, 1, 0);
   }
-  else if(state->pos.row < state->rows-1)
-    state->pos.row++;
+  ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(state->pos.ಅಡ್ಡಸಾಲು < state->ಅಡ್ಡಸಾಲುಗಳು_2-1)
+    state->pos.ಅಡ್ಡಸಾಲು++;
 }
 
-static void grow_combine_buffer(VTermState *state)
+ಸ್ಥಿರ ಶೂನ್ಯ grow_combine_ಬಫರ್(VTermState *state)
 {
-  size_t    new_size = state->combine_chars_size * 2;
-  uint32_t *new_chars = vterm_allocator_malloc(state->vt, new_size * sizeof(new_chars[0]));
+  size_t    new_ಗಾತ್ರ = state->combine_chars_ಗಾತ್ರ * 2;
+  uint32_t *new_chars = vterm_allocator_malloc(state->vt, new_ಗಾತ್ರ * ಗಾತ್ರ(new_chars[0]));
 
-  memcpy(new_chars, state->combine_chars, state->combine_chars_size * sizeof(new_chars[0]));
+  ಸ್ಮರಣೆ_ನಕಲು(new_chars, state->combine_chars, state->combine_chars_ಗಾತ್ರ * ಗಾತ್ರ(new_chars[0]));
 
   vterm_allocator_free(state->vt, state->combine_chars);
 
   state->combine_chars = new_chars;
-  state->combine_chars_size = new_size;
+  state->combine_chars_ಗಾತ್ರ = new_ಗಾತ್ರ;
 }
 
-static void set_col_tabstop(VTermState *state, int col)
+ಸ್ಥಿರ ಶೂನ್ಯ ಗಣ_ಲಂಬಸಾಲು_tabstop(VTermState *state, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು)
 {
-  unsigned char mask = 1 << (col & 7);
-  state->tabstops[col >> 3] |= mask;
+  ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ ಮುಖವಾಡ = 1 << (ಲಂಬಸಾಲು & 7);
+  state->tabstops[ಲಂಬಸಾಲು >> 3] |= ಮುಖವಾಡ;
 }
 
-static void clear_col_tabstop(VTermState *state, int col)
+ಸ್ಥಿರ ಶೂನ್ಯ clear_ಲಂಬಸಾಲು_tabstop(VTermState *state, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು)
 {
-  unsigned char mask = 1 << (col & 7);
-  state->tabstops[col >> 3] &= ~mask;
+  ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ ಮುಖವಾಡ = 1 << (ಲಂಬಸಾಲು & 7);
+  state->tabstops[ಲಂಬಸಾಲು >> 3] &= ~ಮುಖವಾಡ;
 }
 
-static int is_col_tabstop(VTermState *state, int col)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ is_ಲಂಬಸಾಲು_tabstop(VTermState *state, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು)
 {
-  unsigned char mask = 1 << (col & 7);
-  return state->tabstops[col >> 3] & mask;
+  ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ ಮುಖವಾಡ = 1 << (ಲಂಬಸಾಲು & 7);
+  ಹಿಂತಿರುಗಿ state->tabstops[ಲಂಬಸಾಲು >> 3] & ಮುಖವಾಡ;
 }
 
-static int is_cursor_in_scrollregion(const VTermState *state)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ is_cursor_ಒಳ_scrollregion(ಸ್ಥಿರಾಂಕ VTermState *state)
 {
-  if(state->pos.row < state->scrollregion_top ||
-     state->pos.row >= SCROLLREGION_BOTTOM(state))
-    return 0;
-  if(state->pos.col < SCROLLREGION_LEFT(state) ||
-     state->pos.col >= SCROLLREGION_RIGHT(state))
-    return 0;
+  ಆದರೆ(state->pos.ಅಡ್ಡಸಾಲು < state->scrollregion_ತುದಿ ||
+     state->pos.ಅಡ್ಡಸಾಲು >= SCROLLREGION_BOTTOM(state))
+    ಹಿಂತಿರುಗಿ 0;
+  ಆದರೆ(state->pos.ಲಂಬಸಾಲು < SCROLLREGION_ಎಡ(state) ||
+     state->pos.ಲಂಬಸಾಲು >= SCROLLREGION_ಬಲ(state))
+    ಹಿಂತಿರುಗಿ 0;
 
-  return 1;
+  ಹಿಂತಿರುಗಿ 1;
 }
 
-static void tab(VTermState *state, int count, int direction)
+ಸ್ಥಿರ ಶೂನ್ಯ tab(VTermState *state, ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_2, ಪೂರ್ಣಾಂಕ direction)
 {
-  while(count > 0) {
-    if(direction > 0) {
-      if(state->pos.col >= THISROWWIDTH(state)-1)
-        return;
+  ಆಗ(ಎಣಿಕೆ_2 > 0) {
+    ಆದರೆ(direction > 0) {
+      ಆದರೆ(state->pos.ಲಂಬಸಾಲು >= THISROWWIDTH(state)-1)
+        ಹಿಂತಿರುಗಿ;
 
-      state->pos.col++;
+      state->pos.ಲಂಬಸಾಲು++;
     }
-    else if(direction < 0) {
-      if(state->pos.col < 1)
-        return;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(direction < 0) {
+      ಆದರೆ(state->pos.ಲಂಬಸಾಲು < 1)
+        ಹಿಂತಿರುಗಿ;
 
-      state->pos.col--;
+      state->pos.ಲಂಬಸಾಲು--;
     }
 
-    if(is_col_tabstop(state, state->pos.col))
-      count--;
+    ಆದರೆ(is_ಲಂಬಸಾಲು_tabstop(state, state->pos.ಲಂಬಸಾಲು))
+      ಎಣಿಕೆ_2--;
   }
 }
 
-#define NO_FORCE 0
-#define FORCE    1
+#ವ್ಯಾಖ್ಯಾನಿಸು NO_FORCE 0
+#ವ್ಯಾಖ್ಯಾನಿಸು FORCE    1
 
-#define DWL_OFF 0
-#define DWL_ON  1
+#ವ್ಯಾಖ್ಯಾನಿಸು DWL_OFF 0
+#ವ್ಯಾಖ್ಯಾನಿಸು DWL_ON  1
 
-#define DHL_OFF    0
-#define DHL_TOP    1
-#define DHL_BOTTOM 2
+#ವ್ಯಾಖ್ಯಾನಿಸು DHL_OFF    0
+#ವ್ಯಾಖ್ಯಾನಿಸು DHL_ತುದಿ    1
+#ವ್ಯಾಖ್ಯಾನಿಸು DHL_BOTTOM 2
 
-static void set_lineinfo(VTermState *state, int row, int force, int dwl, int dhl)
+ಸ್ಥಿರ ಶೂನ್ಯ ಗಣ_lineinfo(VTermState *state, ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು, ಪೂರ್ಣಾಂಕ force, ಪೂರ್ಣಾಂಕ dwl, ಪೂರ್ಣಾಂಕ dhl)
 {
-  VTermLineInfo info = state->lineinfo[row];
+  VTerm_ಸಾಲು_Info info = state->lineinfo[ಅಡ್ಡಸಾಲು];
 
-  if(dwl == DWL_OFF)
+  ಆದರೆ(dwl == DWL_OFF)
     info.doublewidth = DWL_OFF;
-  else if(dwl == DWL_ON)
+  ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(dwl == DWL_ON)
     info.doublewidth = DWL_ON;
   // else -1 to ignore
 
-  if(dhl == DHL_OFF)
+  ಆದರೆ(dhl == DHL_OFF)
     info.doubleheight = DHL_OFF;
-  else if(dhl == DHL_TOP)
-    info.doubleheight = DHL_TOP;
-  else if(dhl == DHL_BOTTOM)
+  ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(dhl == DHL_ತುದಿ)
+    info.doubleheight = DHL_ತುದಿ;
+  ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(dhl == DHL_BOTTOM)
     info.doubleheight = DHL_BOTTOM;
 
-  if((state->callbacks &&
+  ಆದರೆ((state->callbacks &&
       state->callbacks->setlineinfo &&
-      (*state->callbacks->setlineinfo)(row, &info, state->lineinfo + row, state->cbdata))
+      (*state->callbacks->setlineinfo)(ಅಡ್ಡಸಾಲು, &info, state->lineinfo + ಅಡ್ಡಸಾಲು, state->cbdata))
       || force)
-    state->lineinfo[row] = info;
+    state->lineinfo[ಅಡ್ಡಸಾಲು] = info;
 }
 
-static int on_text(const char bytes[], size_t len, void *user)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ on_ಪಠ್ಯ(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ ಬೈಟುಗಳು[], size_t len, ಶೂನ್ಯ *user)
 {
   VTermState *state = user;
-  int npoints = 0;
+  ಪೂರ್ಣಾಂಕ npoints = 0;
   size_t eaten = 0;
   VTermEncodingInstance *encoding;
-  int i = 0;
+  ಪೂರ್ಣಾಂಕ i = 0;
 
   VTermPos oldpos = state->pos;
 
   // We'll have at most len codepoints, plus one from a previous incomplete
   // sequence.
   uint32_t *codepoints = (uint32_t *)(state->vt->tmpbuffer);
-  size_t maxpoints = (state->vt->tmpbuffer_len) / sizeof(uint32_t);
+  size_t maxpoints = (state->vt->tmpbuffer_len) / ಗಾತ್ರ(uint32_t);
 
   encoding =
-    state->gsingle_set     ? &state->encoding[state->gsingle_set] :
-    !(bytes[eaten] & 0x80) ? &state->encoding[state->gl_set] :
-    state->vt->mode.utf8   ? &state->encoding_utf8 :
-                             &state->encoding[state->gr_set];
-  if (encoding->enc == state->encoding_utf8.enc)
+    state->gsingle_ಗಣ     ? &state->encoding[state->gsingle_ಗಣ] :
+    !(ಬೈಟುಗಳು[eaten] & 0x80) ? &state->encoding[state->gl_ಗಣ] :
+    state->vt->ಬಹುಲಕ.utf8   ? &state->encoding_utf8 :
+                             &state->encoding[state->gr_ಗಣ];
+  ಆದರೆ (encoding->enc == state->encoding_utf8.enc)
     encoding = &state->encoding_utf8;  // Only use one UTF-8 encoding state.
 
-  (*encoding->enc->decode)(encoding->enc, encoding->data,
-      codepoints, &npoints, state->gsingle_set ? 1 : (int)maxpoints,
-      bytes, &eaten, len);
+  (*encoding->enc->decode)(encoding->enc, encoding->ದತ್ತಾಂಶ,
+      codepoints, &npoints, state->gsingle_ಗಣ ? 1 : (ಪೂರ್ಣಾಂಕ)maxpoints,
+      ಬೈಟುಗಳು, &eaten, len);
 
   /* There's a chance an encoding (e.g. UTF-8) hasn't found enough bytes yet
    * for even a single codepoint
    */
-  if(!npoints)
+  ಆದರೆ(!npoints)
   {
-    return (int)eaten;
+    ಹಿಂತಿರುಗಿ (ಪೂರ್ಣಾಂಕ)eaten;
   }
 
-  if(state->gsingle_set && npoints)
-    state->gsingle_set = 0;
+  ಆದರೆ(state->gsingle_ಗಣ && npoints)
+    state->gsingle_ಗಣ = 0;
 
   /* This is a combining char. that needs to be merged with the previous
    * glyph output */
-  if(vterm_unicode_is_combining(codepoints[i])) {
+  ಆದರೆ(vterm_unicode_is_combining(codepoints[i])) {
     /* See if the cursor has moved since */
-    if(state->pos.row == state->combine_pos.row && state->pos.col == state->combine_pos.col + state->combine_width) {
-#ifdef DEBUG_GLYPH_COMBINE
-      int printpos;
-      printf("DEBUG: COMBINING SPLIT GLYPH of chars {");
-      for(printpos = 0; state->combine_chars[printpos]; printpos++)
-        printf("U+%04x ", state->combine_chars[printpos]);
-      printf("} + {");
-#endif
+    ಆದರೆ(state->pos.ಅಡ್ಡಸಾಲು == state->combine_pos.ಅಡ್ಡಸಾಲು && state->pos.ಲಂಬಸಾಲು == state->combine_pos.ಲಂಬಸಾಲು + state->combine_ಅಗಲ) {
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DEBUG_GLYPH_COMBINE
+      ಪೂರ್ಣಾಂಕ printpos;
+      ಬರೆ("DEBUG: COMBINING SPLIT GLYPH of chars {");
+      ಗಾಗಿ(printpos = 0; state->combine_chars[printpos]; printpos++)
+        ಬರೆ("U+%04x ", state->combine_chars[printpos]);
+      ಬರೆ("} + {");
+#ಆದರೆ_ಅಂತ್ಯ
 
       /* Find where we need to append these combining chars */
-      int saved_i = 0;
-      while(state->combine_chars[saved_i])
+      ಪೂರ್ಣಾಂಕ saved_i = 0;
+      ಆಗ(state->combine_chars[saved_i])
         saved_i++;
 
       /* Add extra ones */
-      while(i < npoints && vterm_unicode_is_combining(codepoints[i])) {
-        if(saved_i >= (int)state->combine_chars_size)
-          grow_combine_buffer(state);
+      ಆಗ(i < npoints && vterm_unicode_is_combining(codepoints[i])) {
+        ಆದರೆ(saved_i >= (ಪೂರ್ಣಾಂಕ)state->combine_chars_ಗಾತ್ರ)
+          grow_combine_ಬಫರ್(state);
         state->combine_chars[saved_i++] = codepoints[i++];
       }
-      if(saved_i >= (int)state->combine_chars_size)
-        grow_combine_buffer(state);
+      ಆದರೆ(saved_i >= (ಪೂರ್ಣಾಂಕ)state->combine_chars_ಗಾತ್ರ)
+        grow_combine_ಬಫರ್(state);
       state->combine_chars[saved_i] = 0;
 
-#ifdef DEBUG_GLYPH_COMBINE
-      for(; state->combine_chars[printpos]; printpos++)
-        printf("U+%04x ", state->combine_chars[printpos]);
-      printf("}\n");
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DEBUG_GLYPH_COMBINE
+      ಗಾಗಿ(; state->combine_chars[printpos]; printpos++)
+        ಬರೆ("U+%04x ", state->combine_chars[printpos]);
+      ಬರೆ("}\n");
+#ಆದರೆ_ಅಂತ್ಯ
 
       /* Now render it */
-      putglyph(state, state->combine_chars, state->combine_width, state->combine_pos);
+      putglyph(state, state->combine_chars, state->combine_ಅಗಲ, state->combine_pos);
     }
-    else {
+    ಇಲ್ಲದಿದ್ದರೆ {
       DEBUG_LOG("libvterm: TODO: Skip over split char+combining\n");
     }
   }
 
-  for(; i < npoints; i++) {
+  ಗಾಗಿ(; i < npoints; i++) {
     // Try to find combining characters following this
-    int glyph_starts = i;
-    int glyph_ends;
-    int width = 0;
+    ಪೂರ್ಣಾಂಕ glyph_starts = i;
+    ಪೂರ್ಣಾಂಕ glyph_ತುದಿಗಳು;
+    ಪೂರ್ಣಾಂಕ ಅಗಲ = 0;
 
-    for(glyph_ends = i + 1;
-        (glyph_ends < npoints) && (glyph_ends < glyph_starts + VTERM_MAX_CHARS_PER_CELL);
-        glyph_ends++)
-      if(!vterm_unicode_is_combining(codepoints[glyph_ends]))
-        break;
+    ಗಾಗಿ(glyph_ತುದಿಗಳು = i + 1;
+        (glyph_ತುದಿಗಳು < npoints) && (glyph_ತುದಿಗಳು < glyph_starts + VTERM_MAX_CHARS_ಪ್ರತಿ_CELL);
+        glyph_ತುದಿಗಳು++)
+      ಆದರೆ(!vterm_unicode_is_combining(codepoints[glyph_ತುದಿಗಳು]))
+        ನಿಲ್ಲಿಸು;
 
-    uint32_t *chars = vterm_allocator_malloc(state->vt, (VTERM_MAX_CHARS_PER_CELL + 1) * sizeof(uint32_t));
-    if (chars == NULL)
-      break;
+    uint32_t *chars = vterm_allocator_malloc(state->vt, (VTERM_MAX_CHARS_ಪ್ರತಿ_CELL + 1) * ಗಾತ್ರ(uint32_t));
+    ಆದರೆ (chars == ಖಾಲಿ)
+      ನಿಲ್ಲಿಸು;
 
-    for( ; i < glyph_ends; i++) {
-      int this_width;
-      if(vterm_get_special_pty_type() == 2) {
-        state->vt->in_backspace -= (state->vt->in_backspace > 0) ? 1 : 0;
-        if(state->vt->in_backspace == 1)
+    ಗಾಗಿ( ; i < glyph_ತುದಿಗಳು; i++) {
+      ಪೂರ್ಣಾಂಕ this_ಅಗಲ;
+      ಆದರೆ(vterm_get_special_pty_type() == 2) {
+        state->vt->ಒಳ_backspace -= (state->vt->ಒಳ_backspace > 0) ? 1 : 0;
+        ಆದರೆ(state->vt->ಒಳ_backspace == 1)
           codepoints[i] = 0; // codepoints under this condition must be 0
       }
       chars[i - glyph_starts] = codepoints[i];
-      this_width = vterm_unicode_width(codepoints[i]);
-#ifdef DEBUG
-      if(this_width < 0) {
+      this_ಅಗಲ = vterm_unicode_ಅಗಲ(codepoints[i]);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DEBUG
+      ಆದರೆ(this_ಅಗಲ < 0) {
         fprintf(stderr, "Text with negative-width codepoint U+%04x\n", codepoints[i]);
         abort();
       }
-#endif
-      if (i == glyph_starts || this_width > width)
-	width = this_width;  // TODO: should be += ?
+#ಆದರೆ_ಅಂತ್ಯ
+      ಆದರೆ (i == glyph_starts || this_ಅಗಲ > ಅಗಲ)
+	ಅಗಲ = this_ಅಗಲ;  // TODO: should be += ?
     }
 
-    if (width < 0)
-      width = 0;
+    ಆದರೆ (ಅಗಲ < 0)
+      ಅಗಲ = 0;
 
-    while(i < npoints && vterm_unicode_is_combining(codepoints[i]))
+    ಆಗ(i < npoints && vterm_unicode_is_combining(codepoints[i]))
       i++;
 
-    chars[glyph_ends - glyph_starts] = 0;
+    chars[glyph_ತುದಿಗಳು - glyph_starts] = 0;
     i--;
 
-#ifdef DEBUG_GLYPH_COMBINE
-    int printpos;
-    printf("DEBUG: COMBINED GLYPH of %d chars {", glyph_ends - glyph_starts);
-    for(printpos = 0; printpos < glyph_ends - glyph_starts; printpos++)
-      printf("U+%04x ", chars[printpos]);
-    printf("}, onscreen width %d\n", width);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DEBUG_GLYPH_COMBINE
+    ಪೂರ್ಣಾಂಕ printpos;
+    ಬರೆ("DEBUG: COMBINED GLYPH of %d chars {", glyph_ತುದಿಗಳು - glyph_starts);
+    ಗಾಗಿ(printpos = 0; printpos < glyph_ತುದಿಗಳು - glyph_starts; printpos++)
+      ಬರೆ("U+%04x ", chars[printpos]);
+    ಬರೆ("}, onscreen width %d\n", ಅಗಲ);
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if(state->at_phantom || state->pos.col + width > THISROWWIDTH(state)) {
+    ಆದರೆ(state->at_phantom || state->pos.ಲಂಬಸಾಲು + ಅಗಲ > THISROWWIDTH(state)) {
       linefeed(state);
-      state->pos.col = 0;
+      state->pos.ಲಂಬಸಾಲು = 0;
       state->at_phantom = 0;
-      state->lineinfo[state->pos.row].continuation = 1;
+      state->lineinfo[state->pos.ಅಡ್ಡಸಾಲು].continuation = 1;
     }
 
-    if(state->mode.insert) {
+    ಆದರೆ(state->ಬಹುಲಕ.ಸೇರಿಸು) {
       // TODO: This will be a little inefficient for large bodies of text, as
       // it'll have to 'ICH' effectively before every glyph. We should scan
       // ahead and ICH as many times as required
       VTermRect rect;
-      rect.start_row = state->pos.row;
-      rect.end_row   = state->pos.row + 1;
-      rect.start_col = state->pos.col;
-      rect.end_col   = THISROWWIDTH(state);
+      rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು = state->pos.ಅಡ್ಡಸಾಲು;
+      rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು   = state->pos.ಅಡ್ಡಸಾಲು + 1;
+      rect.ಆರಂಭ_ಲಂಬಸಾಲು = state->pos.ಲಂಬಸಾಲು;
+      rect.ಕೊನೆ_ಲಂಬಸಾಲು   = THISROWWIDTH(state);
       scroll(state, rect, 0, -1);
     }
 
-    putglyph(state, chars, width, state->pos);
+    putglyph(state, chars, ಅಗಲ, state->pos);
 
-    if(i == npoints - 1) {
+    ಆದರೆ(i == npoints - 1) {
       /* End of the buffer. Save the chars in case we have to combine with
        * more on the next call */
-      int save_i;
-      for(save_i = 0; chars[save_i]; save_i++) {
-        if(save_i >= (int)state->combine_chars_size)
-          grow_combine_buffer(state);
+      ಪೂರ್ಣಾಂಕ save_i;
+      ಗಾಗಿ(save_i = 0; chars[save_i]; save_i++) {
+        ಆದರೆ(save_i >= (ಪೂರ್ಣಾಂಕ)state->combine_chars_ಗಾತ್ರ)
+          grow_combine_ಬಫರ್(state);
         state->combine_chars[save_i] = chars[save_i];
       }
-      if(save_i >= (int)state->combine_chars_size)
-        grow_combine_buffer(state);
+      ಆದರೆ(save_i >= (ಪೂರ್ಣಾಂಕ)state->combine_chars_ಗಾತ್ರ)
+        grow_combine_ಬಫರ್(state);
       state->combine_chars[save_i] = 0;
-      state->combine_width = width;
+      state->combine_ಅಗಲ = ಅಗಲ;
       state->combine_pos = state->pos;
     }
 
-    if(state->pos.col + width >= THISROWWIDTH(state)) {
-      if(state->mode.autowrap)
+    ಆದರೆ(state->pos.ಲಂಬಸಾಲು + ಅಗಲ >= THISROWWIDTH(state)) {
+      ಆದರೆ(state->ಬಹುಲಕ.autowrap)
         state->at_phantom = 1;
     }
-    else {
-      state->pos.col += width;
+    ಇಲ್ಲದಿದ್ದರೆ {
+      state->pos.ಲಂಬಸಾಲು += ಅಗಲ;
     }
     vterm_allocator_free(state->vt, chars);
   }
 
   updatecursor(state, &oldpos, 0);
 
-#ifdef DEBUG
-  if(state->pos.row < 0 || state->pos.row >= state->rows ||
-     state->pos.col < 0 || state->pos.col >= state->cols) {
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DEBUG
+  ಆದರೆ(state->pos.ಅಡ್ಡಸಾಲು < 0 || state->pos.ಅಡ್ಡಸಾಲು >= state->ಅಡ್ಡಸಾಲುಗಳು_2 ||
+     state->pos.ಲಂಬಸಾಲು < 0 || state->pos.ಲಂಬಸಾಲು >= state->ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ) {
     fprintf(stderr, "Position out of bounds after text: (%d,%d)\n",
-        state->pos.row, state->pos.col);
+        state->pos.ಅಡ್ಡಸಾಲು, state->pos.ಲಂಬಸಾಲು);
     abort();
   }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-  return (int)eaten;
+  ಹಿಂತಿರುಗಿ (ಪೂರ್ಣಾಂಕ)eaten;
 }
 
-static int on_control(unsigned char control, void *user)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ on_control(ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ control, ಶೂನ್ಯ *user)
 {
   VTermState *state = user;
 
@@ -515,146 +515,146 @@ static int on_control(unsigned char control, void *user)
 
   // Preparing to see the leading byte
   VTermPos leadpos = state->pos;
-  leadpos.col -= (leadpos.col >= 2 ? 2 : 0);
+  leadpos.ಲಂಬಸಾಲು -= (leadpos.ಲಂಬಸಾಲು >= 2 ? 2 : 0);
 
-  switch(control) {
-  case 0x07: // BEL - ECMA-48 8.3.3
-    if(state->callbacks && state->callbacks->bell)
+  ಆಯ್ಕೆ(control) {
+  ಸ್ಥಿತಿ 0x07: // BEL - ECMA-48 8.3.3
+    ಆದರೆ(state->callbacks && state->callbacks->bell)
       (*state->callbacks->bell)(state->cbdata);
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x08: // BS - ECMA-48 8.3.5
-    if(state->pos.col > 0)
-      state->pos.col--;
-    if(vterm_get_special_pty_type() == 2) {
+  ಸ್ಥಿತಿ 0x08: // BS - ECMA-48 8.3.5
+    ಆದರೆ(state->pos.ಲಂಬಸಾಲು > 0)
+      state->pos.ಲಂಬಸಾಲು--;
+    ಆದರೆ(vterm_get_special_pty_type() == 2) {
       // In 2 cell letters, go back 2 cells
       vterm_screen_get_cell(state->vt->screen, leadpos, &cell);
-      if(vterm_unicode_width(cell.chars[0]) == 2)
-        state->pos.col--;
+      ಆದರೆ(vterm_unicode_ಅಗಲ(cell.chars[0]) == 2)
+        state->pos.ಲಂಬಸಾಲು--;
     }
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x09: // HT - ECMA-48 8.3.60
+  ಸ್ಥಿತಿ 0x09: // HT - ECMA-48 8.3.60
     tab(state, 1, +1);
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x0a: // LF - ECMA-48 8.3.74
-  case 0x0b: // VT
-  case 0x0c: // FF
+  ಸ್ಥಿತಿ 0x0a: // LF - ECMA-48 8.3.74
+  ಸ್ಥಿತಿ 0x0b: // VT
+  ಸ್ಥಿತಿ 0x0c: // FF
     linefeed(state);
-    if(state->mode.newline)
-      state->pos.col = 0;
-    break;
+    ಆದರೆ(state->ಬಹುಲಕ.newline)
+      state->pos.ಲಂಬಸಾಲು = 0;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x0d: // CR - ECMA-48 8.3.15
-    state->pos.col = 0;
-    break;
+  ಸ್ಥಿತಿ 0x0d: // CR - ECMA-48 8.3.15
+    state->pos.ಲಂಬಸಾಲು = 0;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x0e: // LS1 - ECMA-48 8.3.76
-    state->gl_set = 1;
-    break;
+  ಸ್ಥಿತಿ 0x0e: // LS1 - ECMA-48 8.3.76
+    state->gl_ಗಣ = 1;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x0f: // LS0 - ECMA-48 8.3.75
-    state->gl_set = 0;
-    break;
+  ಸ್ಥಿತಿ 0x0f: // LS0 - ECMA-48 8.3.75
+    state->gl_ಗಣ = 0;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x84: // IND - DEPRECATED but implemented for completeness
+  ಸ್ಥಿತಿ 0x84: // IND - DEPRECATED but implemented for completeness
     linefeed(state);
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x85: // NEL - ECMA-48 8.3.86
+  ಸ್ಥಿತಿ 0x85: // NEL - ECMA-48 8.3.86
     linefeed(state);
-    state->pos.col = 0;
-    break;
+    state->pos.ಲಂಬಸಾಲು = 0;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x88: // HTS - ECMA-48 8.3.62
-    set_col_tabstop(state, state->pos.col);
-    break;
+  ಸ್ಥಿತಿ 0x88: // HTS - ECMA-48 8.3.62
+    ಗಣ_ಲಂಬಸಾಲು_tabstop(state, state->pos.ಲಂಬಸಾಲು);
+    ನಿಲ್ಲಿಸು;
 
-  case 0x8d: // RI - ECMA-48 8.3.104
-    if(state->pos.row == state->scrollregion_top) {
+  ಸ್ಥಿತಿ 0x8d: // RI - ECMA-48 8.3.104
+    ಆದರೆ(state->pos.ಅಡ್ಡಸಾಲು == state->scrollregion_ತುದಿ) {
       VTermRect rect;
-      rect.start_row = state->scrollregion_top;
-      rect.end_row   = SCROLLREGION_BOTTOM(state);
-      rect.start_col = SCROLLREGION_LEFT(state);
-      rect.end_col   = SCROLLREGION_RIGHT(state);
+      rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು = state->scrollregion_ತುದಿ;
+      rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು   = SCROLLREGION_BOTTOM(state);
+      rect.ಆರಂಭ_ಲಂಬಸಾಲು = SCROLLREGION_ಎಡ(state);
+      rect.ಕೊನೆ_ಲಂಬಸಾಲು   = SCROLLREGION_ಬಲ(state);
 
       scroll(state, rect, -1, 0);
     }
-    else if(state->pos.row > 0)
-        state->pos.row--;
-    break;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(state->pos.ಅಡ್ಡಸಾಲು > 0)
+        state->pos.ಅಡ್ಡಸಾಲು--;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x8e: // SS2 - ECMA-48 8.3.141
-    state->gsingle_set = 2;
-    break;
+  ಸ್ಥಿತಿ 0x8e: // SS2 - ECMA-48 8.3.141
+    state->gsingle_ಗಣ = 2;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x8f: // SS3 - ECMA-48 8.3.142
-    state->gsingle_set = 3;
-    break;
+  ಸ್ಥಿತಿ 0x8f: // SS3 - ECMA-48 8.3.142
+    state->gsingle_ಗಣ = 3;
+    ನಿಲ್ಲಿಸು;
 
-  default:
-    if(state->fallbacks && state->fallbacks->control)
-      if((*state->fallbacks->control)(control, state->fbdata))
-        return 1;
+  ಪೂರ್ವನಿಯೋಜಿತ:
+    ಆದರೆ(state->fallbacks && state->fallbacks->control)
+      ಆದರೆ((*state->fallbacks->control)(control, state->fbdata))
+        ಹಿಂತಿರುಗಿ 1;
 
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
   }
 
   updatecursor(state, &oldpos, 1);
 
-#ifdef DEBUG
-  if(state->pos.row < 0 || state->pos.row >= state->rows ||
-     state->pos.col < 0 || state->pos.col >= state->cols) {
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DEBUG
+  ಆದರೆ(state->pos.ಅಡ್ಡಸಾಲು < 0 || state->pos.ಅಡ್ಡಸಾಲು >= state->ಅಡ್ಡಸಾಲುಗಳು_2 ||
+     state->pos.ಲಂಬಸಾಲು < 0 || state->pos.ಲಂಬಸಾಲು >= state->ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ) {
     fprintf(stderr, "Position out of bounds after Ctrl %02x: (%d,%d)\n",
-        control, state->pos.row, state->pos.col);
+        control, state->pos.ಅಡ್ಡಸಾಲು, state->pos.ಲಂಬಸಾಲು);
     abort();
   }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-  return 1;
+  ಹಿಂತಿರುಗಿ 1;
 }
 
-static int settermprop_bool(VTermState *state, VTermProp prop, int v)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ settermprop_bool(VTermState *state, VTermProp prop, ಪೂರ್ಣಾಂಕ v)
 {
-  VTermValue val;
+  VTerm_ಮೌಲ್ಯ val;
   val.boolean = v;
-  return vterm_state_set_termprop(state, prop, &val);
+  ಹಿಂತಿರುಗಿ vterm_state_ಗಣ_termprop(state, prop, &val);
 }
 
-static int settermprop_int(VTermState *state, VTermProp prop, int v)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ settermprop_int(VTermState *state, VTermProp prop, ಪೂರ್ಣಾಂಕ v)
 {
-  VTermValue val;
-  val.number = v;
-  return vterm_state_set_termprop(state, prop, &val);
+  VTerm_ಮೌಲ್ಯ val;
+  val.ಸಂಖ್ಯೆ = v;
+  ಹಿಂತಿರುಗಿ vterm_state_ಗಣ_termprop(state, prop, &val);
 }
 
-static int settermprop_string(VTermState *state, VTermProp prop, VTermStringFragment frag)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ settermprop_string(VTermState *state, VTermProp prop, VTermStringFragment frag)
 {
-  VTermValue val;
+  VTerm_ಮೌಲ್ಯ val;
 
   val.string = frag;
-  return vterm_state_set_termprop(state, prop, &val);
+  ಹಿಂತಿರುಗಿ vterm_state_ಗಣ_termprop(state, prop, &val);
 }
 
-static void savecursor(VTermState *state, int save)
+ಸ್ಥಿರ ಶೂನ್ಯ savecursor(VTermState *state, ಪೂರ್ಣಾಂಕ save)
 {
-  if(save) {
+  ಆದರೆ(save) {
     state->saved.pos = state->pos;
-    state->saved.mode.cursor_visible = state->mode.cursor_visible;
-    state->saved.mode.cursor_blink   = state->mode.cursor_blink;
-    state->saved.mode.cursor_shape   = state->mode.cursor_shape;
+    state->saved.ಬಹುಲಕ.cursor_visible = state->ಬಹುಲಕ.cursor_visible;
+    state->saved.ಬಹುಲಕ.cursor_blink   = state->ಬಹುಲಕ.cursor_blink;
+    state->saved.ಬಹುಲಕ.cursor_shape   = state->ಬಹುಲಕ.cursor_shape;
 
     vterm_state_savepen(state, 1);
   }
-  else {
+  ಇಲ್ಲದಿದ್ದರೆ {
     VTermPos oldpos = state->pos;
 
     state->pos = state->saved.pos;
 
-    settermprop_bool(state, VTERM_PROP_CURSORVISIBLE, state->saved.mode.cursor_visible);
-    settermprop_bool(state, VTERM_PROP_CURSORBLINK,   state->saved.mode.cursor_blink);
-    settermprop_int (state, VTERM_PROP_CURSORSHAPE,   state->saved.mode.cursor_shape);
+    settermprop_bool(state, VTERM_PROP_CURSORVISIBLE, state->saved.ಬಹುಲಕ.cursor_visible);
+    settermprop_bool(state, VTERM_PROP_CURSORBLINK,   state->saved.ಬಹುಲಕ.cursor_blink);
+    settermprop_int (state, VTERM_PROP_CURSORSHAPE,   state->saved.ಬಹುಲಕ.cursor_shape);
 
     vterm_state_savepen(state, 0);
 
@@ -662,1541 +662,1541 @@ static void savecursor(VTermState *state, int save)
   }
 }
 
-static int on_escape(const char *bytes, size_t len, void *user)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ on_escape(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಬೈಟುಗಳು, size_t len, ಶೂನ್ಯ *user)
 {
   VTermState *state = user;
 
   /* Easier to decode this from the first byte, even though the final
    * byte terminates it
    */
-  switch(bytes[0]) {
-  case ' ':
-    if(len != 2)
-      return 0;
+  ಆಯ್ಕೆ(ಬೈಟುಗಳು[0]) {
+  ಸ್ಥಿತಿ ' ':
+    ಆದರೆ(len != 2)
+      ಹಿಂತಿರುಗಿ 0;
 
-    switch(bytes[1]) {
-      case 'F': // S7C1T
-        state->vt->mode.ctrl8bit = 0;
-        break;
+    ಆಯ್ಕೆ(ಬೈಟುಗಳು[1]) {
+      ಸ್ಥಿತಿ 'F': // S7C1T
+        state->vt->ಬಹುಲಕ.ctrl8bit = 0;
+        ನಿಲ್ಲಿಸು;
 
-      case 'G': // S8C1T
-        state->vt->mode.ctrl8bit = 1;
-        break;
+      ಸ್ಥಿತಿ 'G': // S8C1T
+        state->vt->ಬಹುಲಕ.ctrl8bit = 1;
+        ನಿಲ್ಲಿಸು;
 
-      default:
-        return 0;
+      ಪೂರ್ವನಿಯೋಜಿತ:
+        ಹಿಂತಿರುಗಿ 0;
     }
-    return 2;
+    ಹಿಂತಿರುಗಿ 2;
 
-  case '#':
-    if(len != 2)
-      return 0;
+  ಸ್ಥಿತಿ '#':
+    ಆದರೆ(len != 2)
+      ಹಿಂತಿರುಗಿ 0;
 
-    switch(bytes[1]) {
-      case '3': // DECDHL top
-        if(state->mode.leftrightmargin)
-          break;
-        set_lineinfo(state, state->pos.row, NO_FORCE, DWL_ON, DHL_TOP);
-        break;
+    ಆಯ್ಕೆ(ಬೈಟುಗಳು[1]) {
+      ಸ್ಥಿತಿ '3': // DECDHL top
+        ಆದರೆ(state->ಬಹುಲಕ.leftrightmargin)
+          ನಿಲ್ಲಿಸು;
+        ಗಣ_lineinfo(state, state->pos.ಅಡ್ಡಸಾಲು, NO_FORCE, DWL_ON, DHL_ತುದಿ);
+        ನಿಲ್ಲಿಸು;
 
-      case '4': // DECDHL bottom
-        if(state->mode.leftrightmargin)
-          break;
-        set_lineinfo(state, state->pos.row, NO_FORCE, DWL_ON, DHL_BOTTOM);
-        break;
+      ಸ್ಥಿತಿ '4': // DECDHL bottom
+        ಆದರೆ(state->ಬಹುಲಕ.leftrightmargin)
+          ನಿಲ್ಲಿಸು;
+        ಗಣ_lineinfo(state, state->pos.ಅಡ್ಡಸಾಲು, NO_FORCE, DWL_ON, DHL_BOTTOM);
+        ನಿಲ್ಲಿಸು;
 
-      case '5': // DECSWL
-        if(state->mode.leftrightmargin)
-          break;
-        set_lineinfo(state, state->pos.row, NO_FORCE, DWL_OFF, DHL_OFF);
-        break;
+      ಸ್ಥಿತಿ '5': // DECSWL
+        ಆದರೆ(state->ಬಹುಲಕ.leftrightmargin)
+          ನಿಲ್ಲಿಸು;
+        ಗಣ_lineinfo(state, state->pos.ಅಡ್ಡಸಾಲು, NO_FORCE, DWL_OFF, DHL_OFF);
+        ನಿಲ್ಲಿಸು;
 
-      case '6': // DECDWL
-        if(state->mode.leftrightmargin)
-          break;
-        set_lineinfo(state, state->pos.row, NO_FORCE, DWL_ON, DHL_OFF);
-        break;
+      ಸ್ಥಿತಿ '6': // DECDWL
+        ಆದರೆ(state->ಬಹುಲಕ.leftrightmargin)
+          ನಿಲ್ಲಿಸು;
+        ಗಣ_lineinfo(state, state->pos.ಅಡ್ಡಸಾಲು, NO_FORCE, DWL_ON, DHL_OFF);
+        ನಿಲ್ಲಿಸು;
 
-      case '8': // DECALN
+      ಸ್ಥಿತಿ '8': // DECALN
       {
         VTermPos pos;
         uint32_t E[] = { 'E', 0 };
-        for(pos.row = 0; pos.row < state->rows; pos.row++)
-          for(pos.col = 0; pos.col < ROWWIDTH(state, pos.row); pos.col++)
+        ಗಾಗಿ(pos.ಅಡ್ಡಸಾಲು = 0; pos.ಅಡ್ಡಸಾಲು < state->ಅಡ್ಡಸಾಲುಗಳು_2; pos.ಅಡ್ಡಸಾಲು++)
+          ಗಾಗಿ(pos.ಲಂಬಸಾಲು = 0; pos.ಲಂಬಸಾಲು < ROWWIDTH(state, pos.ಅಡ್ಡಸಾಲು); pos.ಲಂಬಸಾಲು++)
             putglyph(state, E, 1, pos);
-        break;
+        ನಿಲ್ಲಿಸು;
       }
 
-      default:
-        return 0;
+      ಪೂರ್ವನಿಯೋಜಿತ:
+        ಹಿಂತಿರುಗಿ 0;
     }
-    return 2;
+    ಹಿಂತಿರುಗಿ 2;
 
-  case '(': case ')': case '*': case '+': // SCS
-    if(len != 2)
-      return 0;
+  ಸ್ಥಿತಿ '(': ಸ್ಥಿತಿ ')': ಸ್ಥಿತಿ '*': ಸ್ಥಿತಿ '+': // SCS
+    ಆದರೆ(len != 2)
+      ಹಿಂತಿರುಗಿ 0;
 
     {
-      int setnum = bytes[0] - 0x28;
-      VTermEncoding *newenc = vterm_lookup_encoding(ENC_SINGLE_94, bytes[1]);
+      ಪೂರ್ಣಾಂಕ setnum = ಬೈಟುಗಳು[0] - 0x28;
+      VTermEncoding *newenc = vterm_lookup_encoding(ENC_SINGLE_94, ಬೈಟುಗಳು[1]);
 
-      if(newenc) {
+      ಆದರೆ(newenc) {
         state->encoding[setnum].enc = newenc;
 
-        if(newenc->init)
-          (*newenc->init)(newenc, state->encoding[setnum].data);
+        ಆದರೆ(newenc->init)
+          (*newenc->init)(newenc, state->encoding[setnum].ದತ್ತಾಂಶ);
       }
     }
 
-    return 2;
+    ಹಿಂತಿರುಗಿ 2;
 
-  case '7': // DECSC
+  ಸ್ಥಿತಿ '7': // DECSC
     savecursor(state, 1);
-    return 1;
+    ಹಿಂತಿರುಗಿ 1;
 
-  case '8': // DECRC
+  ಸ್ಥಿತಿ '8': // DECRC
     savecursor(state, 0);
-    return 1;
+    ಹಿಂತಿರುಗಿ 1;
 
-  case '<': // Ignored by VT100. Used in VT52 mode to switch up to VT100
-    return 1;
+  ಸ್ಥಿತಿ '<': // Ignored by VT100. Used in VT52 mode to switch up to VT100
+    ಹಿಂತಿರುಗಿ 1;
 
-  case '=': // DECKPAM
-    state->mode.keypad = 1;
-    return 1;
+  ಸ್ಥಿತಿ '=': // DECKPAM
+    state->ಬಹುಲಕ.keypad = 1;
+    ಹಿಂತಿರುಗಿ 1;
 
-  case '>': // DECKPNM
-    state->mode.keypad = 0;
-    return 1;
+  ಸ್ಥಿತಿ '>': // DECKPNM
+    state->ಬಹುಲಕ.keypad = 0;
+    ಹಿಂತಿರುಗಿ 1;
 
-  case 'c': // RIS - ECMA-48 8.3.105
+  ಸ್ಥಿತಿ 'c': // RIS - ECMA-48 8.3.105
   {
     VTermPos oldpos = state->pos;
     vterm_state_reset(state, 1);
-    if(state->callbacks && state->callbacks->movecursor)
-      (*state->callbacks->movecursor)(state->pos, oldpos, state->mode.cursor_visible, state->cbdata);
-    return 1;
+    ಆದರೆ(state->callbacks && state->callbacks->movecursor)
+      (*state->callbacks->movecursor)(state->pos, oldpos, state->ಬಹುಲಕ.cursor_visible, state->cbdata);
+    ಹಿಂತಿರುಗಿ 1;
   }
 
-  case 'n': // LS2 - ECMA-48 8.3.78
-    state->gl_set = 2;
-    return 1;
+  ಸ್ಥಿತಿ 'n': // LS2 - ECMA-48 8.3.78
+    state->gl_ಗಣ = 2;
+    ಹಿಂತಿರುಗಿ 1;
 
-  case 'o': // LS3 - ECMA-48 8.3.80
-    state->gl_set = 3;
-    return 1;
+  ಸ್ಥಿತಿ 'o': // LS3 - ECMA-48 8.3.80
+    state->gl_ಗಣ = 3;
+    ಹಿಂತಿರುಗಿ 1;
 
-  case '~': // LS1R - ECMA-48 8.3.77
-    state->gr_set = 1;
-    return 1;
+  ಸ್ಥಿತಿ '~': // LS1R - ECMA-48 8.3.77
+    state->gr_ಗಣ = 1;
+    ಹಿಂತಿರುಗಿ 1;
 
-  case '}': // LS2R - ECMA-48 8.3.79
-    state->gr_set = 2;
-    return 1;
+  ಸ್ಥಿತಿ '}': // LS2R - ECMA-48 8.3.79
+    state->gr_ಗಣ = 2;
+    ಹಿಂತಿರುಗಿ 1;
 
-  case '|': // LS3R - ECMA-48 8.3.81
-    state->gr_set = 3;
-    return 1;
+  ಸ್ಥಿತಿ '|': // LS3R - ECMA-48 8.3.81
+    state->gr_ಗಣ = 3;
+    ಹಿಂತಿರುಗಿ 1;
 
-  default:
-    return 0;
-  }
-}
-
-static void set_mode(VTermState *state, int num, int val)
-{
-  switch(num) {
-  case 4: // IRM - ECMA-48 7.2.10
-    state->mode.insert = val;
-    break;
-
-  case 20: // LNM - ANSI X3.4-1977
-    state->mode.newline = val;
-    break;
-
-  default:
-    DEBUG_LOG1("libvterm: Unknown mode %d\n", num);
-    return;
+  ಪೂರ್ವನಿಯೋಜಿತ:
+    ಹಿಂತಿರುಗಿ 0;
   }
 }
 
-static void set_dec_mode(VTermState *state, int num, int val)
+ಸ್ಥಿರ ಶೂನ್ಯ ಗಣ_ಬಹುಲಕ(VTermState *state, ಪೂರ್ಣಾಂಕ ಅಂಕೆ, ಪೂರ್ಣಾಂಕ val)
 {
-  switch(num) {
-  case 1:
-    state->mode.cursor = val;
-    break;
+  ಆಯ್ಕೆ(ಅಂಕೆ) {
+  ಸ್ಥಿತಿ 4: // IRM - ECMA-48 7.2.10
+    state->ಬಹುಲಕ.ಸೇರಿಸು = val;
+    ನಿಲ್ಲಿಸು;
 
-  case 5: // DECSCNM - screen mode
-    settermprop_bool(state, VTERM_PROP_REVERSE, val);
-    break;
+  ಸ್ಥಿತಿ 20: // LNM - ANSI X3.4-1977
+    state->ಬಹುಲಕ.newline = val;
+    ನಿಲ್ಲಿಸು;
 
-  case 6: // DECOM - origin mode
+  ಪೂರ್ವನಿಯೋಜಿತ:
+    DEBUG_LOG1("libvterm: Unknown mode %d\n", ಅಂಕೆ);
+    ಹಿಂತಿರುಗಿ;
+  }
+}
+
+ಸ್ಥಿರ ಶೂನ್ಯ ಗಣ_dec_ಬಹುಲಕ(VTermState *state, ಪೂರ್ಣಾಂಕ ಅಂಕೆ, ಪೂರ್ಣಾಂಕ val)
+{
+  ಆಯ್ಕೆ(ಅಂಕೆ) {
+  ಸ್ಥಿತಿ 1:
+    state->ಬಹುಲಕ.cursor = val;
+    ನಿಲ್ಲಿಸು;
+
+  ಸ್ಥಿತಿ 5: // DECSCNM - screen mode
+    settermprop_bool(state, VTERM_PROP_ಹಿಮ್ಮುಖ, val);
+    ನಿಲ್ಲಿಸು;
+
+  ಸ್ಥಿತಿ 6: // DECOM - origin mode
     {
       VTermPos oldpos = state->pos;
-      state->mode.origin = val;
-      state->pos.row = state->mode.origin ? state->scrollregion_top : 0;
-      state->pos.col = state->mode.origin ? SCROLLREGION_LEFT(state) : 0;
+      state->ಬಹುಲಕ.origin = val;
+      state->pos.ಅಡ್ಡಸಾಲು = state->ಬಹುಲಕ.origin ? state->scrollregion_ತುದಿ : 0;
+      state->pos.ಲಂಬಸಾಲು = state->ಬಹುಲಕ.origin ? SCROLLREGION_ಎಡ(state) : 0;
       updatecursor(state, &oldpos, 1);
     }
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 7:
-    state->mode.autowrap = val;
-    break;
+  ಸ್ಥಿತಿ 7:
+    state->ಬಹುಲಕ.autowrap = val;
+    ನಿಲ್ಲಿಸು;
 
-  case 12:
+  ಸ್ಥಿತಿ 12:
     settermprop_bool(state, VTERM_PROP_CURSORBLINK, val);
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 25:
+  ಸ್ಥಿತಿ 25:
     settermprop_bool(state, VTERM_PROP_CURSORVISIBLE, val);
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 69: // DECVSSM - vertical split screen mode
+  ಸ್ಥಿತಿ 69: // DECVSSM - vertical split screen mode
            // DECLRMM - left/right margin mode
-    state->mode.leftrightmargin = val;
-    if(val) {
-      int row;
+    state->ಬಹುಲಕ.leftrightmargin = val;
+    ಆದರೆ(val) {
+      ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು;
 
       // Setting DECVSSM must clear doublewidth/doubleheight state of every line
-      for(row = 0; row < state->rows; row++)
-        set_lineinfo(state, row, FORCE, DWL_OFF, DHL_OFF);
+      ಗಾಗಿ(ಅಡ್ಡಸಾಲು = 0; ಅಡ್ಡಸಾಲು < state->ಅಡ್ಡಸಾಲುಗಳು_2; ಅಡ್ಡಸಾಲು++)
+        ಗಣ_lineinfo(state, ಅಡ್ಡಸಾಲು, FORCE, DWL_OFF, DHL_OFF);
     }
 
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 1000:
-  case 1002:
-  case 1003:
+  ಸ್ಥಿತಿ 1000:
+  ಸ್ಥಿತಿ 1002:
+  ಸ್ಥಿತಿ 1003:
     settermprop_int(state, VTERM_PROP_MOUSE,
         !val          ? VTERM_PROP_MOUSE_NONE  :
-        (num == 1000) ? VTERM_PROP_MOUSE_CLICK :
-        (num == 1002) ? VTERM_PROP_MOUSE_DRAG  :
+        (ಅಂಕೆ == 1000) ? VTERM_PROP_MOUSE_CLICK :
+        (ಅಂಕೆ == 1002) ? VTERM_PROP_MOUSE_DRAG  :
                         VTERM_PROP_MOUSE_MOVE);
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 1004:
+  ಸ್ಥಿತಿ 1004:
     settermprop_bool(state, VTERM_PROP_FOCUSREPORT, val);
-    state->mode.report_focus = val;
-    break;
+    state->ಬಹುಲಕ.report_focus = val;
+    ನಿಲ್ಲಿಸು;
 
-  case 1005:
+  ಸ್ಥಿತಿ 1005:
     state->mouse_protocol = val ? MOUSE_UTF8 : MOUSE_X10;
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 1006:
+  ಸ್ಥಿತಿ 1006:
     state->mouse_protocol = val ? MOUSE_SGR : MOUSE_X10;
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 1015:
+  ಸ್ಥಿತಿ 1015:
     state->mouse_protocol = val ? MOUSE_RXVT : MOUSE_X10;
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 1047:
+  ಸ್ಥಿತಿ 1047:
     settermprop_bool(state, VTERM_PROP_ALTSCREEN, val);
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 1048:
+  ಸ್ಥಿತಿ 1048:
     savecursor(state, val);
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 1049:
+  ಸ್ಥಿತಿ 1049:
     settermprop_bool(state, VTERM_PROP_ALTSCREEN, val);
     savecursor(state, val);
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 2004:
-    state->mode.bracketpaste = val;
-    break;
+  ಸ್ಥಿತಿ 2004:
+    state->ಬಹುಲಕ.bracketpaste = val;
+    ನಿಲ್ಲಿಸು;
 
-  default:
-    DEBUG_LOG1("libvterm: Unknown DEC mode %d\n", num);
-    return;
+  ಪೂರ್ವನಿಯೋಜಿತ:
+    DEBUG_LOG1("libvterm: Unknown DEC mode %d\n", ಅಂಕೆ);
+    ಹಿಂತಿರುಗಿ;
   }
 }
 
-static void request_dec_mode(VTermState *state, int num)
+ಸ್ಥಿರ ಶೂನ್ಯ request_dec_ಬಹುಲಕ(VTermState *state, ಪೂರ್ಣಾಂಕ ಅಂಕೆ)
 {
-  int reply;
+  ಪೂರ್ಣಾಂಕ ಉತ್ತರ;
 
-  switch(num) {
-    case 1:
-      reply = state->mode.cursor;
-      break;
+  ಆಯ್ಕೆ(ಅಂಕೆ) {
+    ಸ್ಥಿತಿ 1:
+      ಉತ್ತರ = state->ಬಹುಲಕ.cursor;
+      ನಿಲ್ಲಿಸು;
 
-    case 5:
-      reply = state->mode.screen;
-      break;
+    ಸ್ಥಿತಿ 5:
+      ಉತ್ತರ = state->ಬಹುಲಕ.screen;
+      ನಿಲ್ಲಿಸು;
 
-    case 6:
-      reply = state->mode.origin;
-      break;
+    ಸ್ಥಿತಿ 6:
+      ಉತ್ತರ = state->ಬಹುಲಕ.origin;
+      ನಿಲ್ಲಿಸು;
 
-    case 7:
-      reply = state->mode.autowrap;
-      break;
+    ಸ್ಥಿತಿ 7:
+      ಉತ್ತರ = state->ಬಹುಲಕ.autowrap;
+      ನಿಲ್ಲಿಸು;
 
-    case 12:
-      reply = state->mode.cursor_blink;
-      break;
+    ಸ್ಥಿತಿ 12:
+      ಉತ್ತರ = state->ಬಹುಲಕ.cursor_blink;
+      ನಿಲ್ಲಿಸು;
 
-    case 25:
-      reply = state->mode.cursor_visible;
-      break;
+    ಸ್ಥಿತಿ 25:
+      ಉತ್ತರ = state->ಬಹುಲಕ.cursor_visible;
+      ನಿಲ್ಲಿಸು;
 
-    case 69:
-      reply = state->mode.leftrightmargin;
-      break;
+    ಸ್ಥಿತಿ 69:
+      ಉತ್ತರ = state->ಬಹುಲಕ.leftrightmargin;
+      ನಿಲ್ಲಿಸು;
 
-    case 1000:
-      reply = state->mouse_flags == MOUSE_WANT_CLICK;
-      break;
+    ಸ್ಥಿತಿ 1000:
+      ಉತ್ತರ = state->mouse_flags == MOUSE_WANT_CLICK;
+      ನಿಲ್ಲಿಸು;
 
-    case 1002:
-      reply = state->mouse_flags == (MOUSE_WANT_CLICK|MOUSE_WANT_DRAG);
-      break;
+    ಸ್ಥಿತಿ 1002:
+      ಉತ್ತರ = state->mouse_flags == (MOUSE_WANT_CLICK|MOUSE_WANT_DRAG);
+      ನಿಲ್ಲಿಸು;
 
-    case 1003:
-      reply = state->mouse_flags == (MOUSE_WANT_CLICK|MOUSE_WANT_MOVE);
-      break;
+    ಸ್ಥಿತಿ 1003:
+      ಉತ್ತರ = state->mouse_flags == (MOUSE_WANT_CLICK|MOUSE_WANT_MOVE);
+      ನಿಲ್ಲಿಸು;
 
-    case 1004:
-      reply = state->mode.report_focus;
-      break;
+    ಸ್ಥಿತಿ 1004:
+      ಉತ್ತರ = state->ಬಹುಲಕ.report_focus;
+      ನಿಲ್ಲಿಸು;
 
-    case 1005:
-      reply = state->mouse_protocol == MOUSE_UTF8;
-      break;
+    ಸ್ಥಿತಿ 1005:
+      ಉತ್ತರ = state->mouse_protocol == MOUSE_UTF8;
+      ನಿಲ್ಲಿಸು;
 
-    case 1006:
-      reply = state->mouse_protocol == MOUSE_SGR;
-      break;
+    ಸ್ಥಿತಿ 1006:
+      ಉತ್ತರ = state->mouse_protocol == MOUSE_SGR;
+      ನಿಲ್ಲಿಸು;
 
-    case 1015:
-      reply = state->mouse_protocol == MOUSE_RXVT;
-      break;
+    ಸ್ಥಿತಿ 1015:
+      ಉತ್ತರ = state->mouse_protocol == MOUSE_RXVT;
+      ನಿಲ್ಲಿಸು;
 
-    case 1047:
-      reply = state->mode.alt_screen;
-      break;
+    ಸ್ಥಿತಿ 1047:
+      ಉತ್ತರ = state->ಬಹುಲಕ.alt_screen;
+      ನಿಲ್ಲಿಸು;
 
-    case 2004:
-      reply = state->mode.bracketpaste;
-      break;
+    ಸ್ಥಿತಿ 2004:
+      ಉತ್ತರ = state->ಬಹುಲಕ.bracketpaste;
+      ನಿಲ್ಲಿಸು;
 
-    default:
-      vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "?%d;%d$y", num, 0);
-      return;
+    ಪೂರ್ವನಿಯೋಜಿತ:
+      vterm_ತಳ್ಳು_output_sprintf_ctrl(state->vt, C1_CSI, "?%d;%d$y", ಅಂಕೆ, 0);
+      ಹಿಂತಿರುಗಿ;
   }
 
-  vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "?%d;%d$y", num, reply ? 1 : 2);
+  vterm_ತಳ್ಳು_output_sprintf_ctrl(state->vt, C1_CSI, "?%d;%d$y", ಅಂಕೆ, ಉತ್ತರ ? 1 : 2);
 }
 
-static void request_version_string(VTermState *state)
+ಸ್ಥಿರ ಶೂನ್ಯ request_ಆವೃತ್ತಿ_string(VTermState *state)
 {
-  vterm_push_output_sprintf_str(state->vt, C1_DCS, TRUE, ">|libvterm(%d.%d)",
-      VTERM_VERSION_MAJOR, VTERM_VERSION_MINOR);
+  vterm_ತಳ್ಳು_output_sprintf_str(state->vt, C1_DCS, TRUE, ">|libvterm(%d.%d)",
+      VTERM_ಆವೃತ್ತಿ_MAJOR, VTERM_ಆವೃತ್ತಿ_MINOR);
 }
 
-static int on_csi(const char *leader, const long args[], int argcount, const char *intermed, char command, void *user)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ on_csi(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *leader, ಸ್ಥಿರಾಂಕ ದೀರ್ಘ ವಾದಗಳು[], ಪೂರ್ಣಾಂಕ argcount, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *intermed, ಅಕ್ಷರ command, ಶೂನ್ಯ *user)
 {
   VTermState *state = user;
-  int leader_byte = 0;
-  int intermed_byte = 0;
-  int cancel_phantom = 1;
+  ಪೂರ್ಣಾಂಕ leader_byte = 0;
+  ಪೂರ್ಣಾಂಕ intermed_byte = 0;
+  ಪೂರ್ಣಾಂಕ cancel_phantom = 1;
   VTermPos oldpos = state->pos;
-  int handled = 1;
+  ಪೂರ್ಣಾಂಕ handled = 1;
 
   // Some temporaries for later code
-  int count, val;
-  int row, col;
+  ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_2, val;
+  ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು;
   VTermRect rect;
-  int selective;
+  ಪೂರ್ಣಾಂಕ selective;
 
-  if(leader && leader[0]) {
-    if(leader[1]) // longer than 1 char
-      return 0;
+  ಆದರೆ(leader && leader[0]) {
+    ಆದರೆ(leader[1]) // longer than 1 char
+      ಹಿಂತಿರುಗಿ 0;
 
-    switch(leader[0]) {
-    case '?':
-    case '>':
-    case '<':
+    ಆಯ್ಕೆ(leader[0]) {
+    ಸ್ಥಿತಿ '?':
+    ಸ್ಥಿತಿ '>':
+    ಸ್ಥಿತಿ '<':
       leader_byte = leader[0];
-      break;
-    default:
-      return 0;
+      ನಿಲ್ಲಿಸು;
+    ಪೂರ್ವನಿಯೋಜಿತ:
+      ಹಿಂತಿರುಗಿ 0;
     }
   }
 
-  if(intermed && intermed[0]) {
-    if(intermed[1]) // longer than 1 char
-      return 0;
+  ಆದರೆ(intermed && intermed[0]) {
+    ಆದರೆ(intermed[1]) // longer than 1 char
+      ಹಿಂತಿರುಗಿ 0;
 
-    switch(intermed[0]) {
-    case ' ':
-    case '!':
-    case '"':
-    case '$':
-    case '\'':
+    ಆಯ್ಕೆ(intermed[0]) {
+    ಸ್ಥಿತಿ ' ':
+    ಸ್ಥಿತಿ '!':
+    ಸ್ಥಿತಿ '"':
+    ಸ್ಥಿತಿ '$':
+    ಸ್ಥಿತಿ '\'':
       intermed_byte = intermed[0];
-      break;
-    default:
-      return 0;
+      ನಿಲ್ಲಿಸು;
+    ಪೂರ್ವನಿಯೋಜಿತ:
+      ಹಿಂತಿರುಗಿ 0;
     }
   }
 
   oldpos = state->pos;
 
-#define LBOUND(v,min) if((v) < (min)) (v) = (min)
-#define UBOUND(v,max) if((v) > (max)) (v) = (max)
+#ವ್ಯಾಖ್ಯಾನಿಸು LBOUND(v,min) ಆದರೆ((v) < (min)) (v) = (min)
+#ವ್ಯಾಖ್ಯಾನಿಸು UBOUND(v,max) ಆದರೆ((v) > (max)) (v) = (max)
 
-#define LEADER(l,b) ((l << 8) | b)
-#define INTERMED(i,b) ((i << 16) | b)
+#ವ್ಯಾಖ್ಯಾನಿಸು LEADER(l,b) ((l << 8) | b)
+#ವ್ಯಾಖ್ಯಾನಿಸು INTERMED(i,b) ((i << 16) | b)
 
-  switch(intermed_byte << 16 | leader_byte << 8 | command) {
-  case 0x40: // ICH - ECMA-48 8.3.64
-    count = CSI_ARG_COUNT(args[0]);
+  ಆಯ್ಕೆ(intermed_byte << 16 | leader_byte << 8 | command) {
+  ಸ್ಥಿತಿ 0x40: // ICH - ECMA-48 8.3.64
+    ಎಣಿಕೆ_2 = CSI_ARG_ಎಣಿಕೆ(ವಾದಗಳು[0]);
 
-    if(!is_cursor_in_scrollregion(state))
-      break;
+    ಆದರೆ(!is_cursor_ಒಳ_scrollregion(state))
+      ನಿಲ್ಲಿಸು;
 
-    rect.start_row = state->pos.row;
-    rect.end_row   = state->pos.row + 1;
-    rect.start_col = state->pos.col;
-    if(state->mode.leftrightmargin)
-      rect.end_col = SCROLLREGION_RIGHT(state);
-    else
-      rect.end_col = THISROWWIDTH(state);
+    rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು = state->pos.ಅಡ್ಡಸಾಲು;
+    rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು   = state->pos.ಅಡ್ಡಸಾಲು + 1;
+    rect.ಆರಂಭ_ಲಂಬಸಾಲು = state->pos.ಲಂಬಸಾಲು;
+    ಆದರೆ(state->ಬಹುಲಕ.leftrightmargin)
+      rect.ಕೊನೆ_ಲಂಬಸಾಲು = SCROLLREGION_ಬಲ(state);
+    ಇಲ್ಲದಿದ್ದರೆ
+      rect.ಕೊನೆ_ಲಂಬಸಾಲು = THISROWWIDTH(state);
 
-    scroll(state, rect, 0, -count);
+    scroll(state, rect, 0, -ಎಣಿಕೆ_2);
 
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x41: // CUU - ECMA-48 8.3.22
-    count = CSI_ARG_COUNT(args[0]);
-    state->pos.row -= count;
+  ಸ್ಥಿತಿ 0x41: // CUU - ECMA-48 8.3.22
+    ಎಣಿಕೆ_2 = CSI_ARG_ಎಣಿಕೆ(ವಾದಗಳು[0]);
+    state->pos.ಅಡ್ಡಸಾಲು -= ಎಣಿಕೆ_2;
     state->at_phantom = 0;
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x42: // CUD - ECMA-48 8.3.19
-    count = CSI_ARG_COUNT(args[0]);
-    state->pos.row += count;
+  ಸ್ಥಿತಿ 0x42: // CUD - ECMA-48 8.3.19
+    ಎಣಿಕೆ_2 = CSI_ARG_ಎಣಿಕೆ(ವಾದಗಳು[0]);
+    state->pos.ಅಡ್ಡಸಾಲು += ಎಣಿಕೆ_2;
     state->at_phantom = 0;
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x43: // CUF - ECMA-48 8.3.20
-    count = CSI_ARG_COUNT(args[0]);
-    state->pos.col += count;
+  ಸ್ಥಿತಿ 0x43: // CUF - ECMA-48 8.3.20
+    ಎಣಿಕೆ_2 = CSI_ARG_ಎಣಿಕೆ(ವಾದಗಳು[0]);
+    state->pos.ಲಂಬಸಾಲು += ಎಣಿಕೆ_2;
     state->at_phantom = 0;
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x44: // CUB - ECMA-48 8.3.18
-    count = CSI_ARG_COUNT(args[0]);
-    state->pos.col -= count;
+  ಸ್ಥಿತಿ 0x44: // CUB - ECMA-48 8.3.18
+    ಎಣಿಕೆ_2 = CSI_ARG_ಎಣಿಕೆ(ವಾದಗಳು[0]);
+    state->pos.ಲಂಬಸಾಲು -= ಎಣಿಕೆ_2;
     state->at_phantom = 0;
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x45: // CNL - ECMA-48 8.3.12
-    count = CSI_ARG_COUNT(args[0]);
-    state->pos.col = 0;
-    state->pos.row += count;
+  ಸ್ಥಿತಿ 0x45: // CNL - ECMA-48 8.3.12
+    ಎಣಿಕೆ_2 = CSI_ARG_ಎಣಿಕೆ(ವಾದಗಳು[0]);
+    state->pos.ಲಂಬಸಾಲು = 0;
+    state->pos.ಅಡ್ಡಸಾಲು += ಎಣಿಕೆ_2;
     state->at_phantom = 0;
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x46: // CPL - ECMA-48 8.3.13
-    count = CSI_ARG_COUNT(args[0]);
-    state->pos.col = 0;
-    state->pos.row -= count;
+  ಸ್ಥಿತಿ 0x46: // CPL - ECMA-48 8.3.13
+    ಎಣಿಕೆ_2 = CSI_ARG_ಎಣಿಕೆ(ವಾದಗಳು[0]);
+    state->pos.ಲಂಬಸಾಲು = 0;
+    state->pos.ಅಡ್ಡಸಾಲು -= ಎಣಿಕೆ_2;
     state->at_phantom = 0;
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x47: // CHA - ECMA-48 8.3.9
-    val = CSI_ARG_OR(args[0], 1);
-    state->pos.col = val-1;
+  ಸ್ಥಿತಿ 0x47: // CHA - ECMA-48 8.3.9
+    val = CSI_ARG_OR(ವಾದಗಳು[0], 1);
+    state->pos.ಲಂಬಸಾಲು = val-1;
     state->at_phantom = 0;
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x48: // CUP - ECMA-48 8.3.21
-    row = CSI_ARG_OR(args[0], 1);
-    col = argcount < 2 || CSI_ARG_IS_MISSING(args[1]) ? 1 : CSI_ARG(args[1]);
+  ಸ್ಥಿತಿ 0x48: // CUP - ECMA-48 8.3.21
+    ಅಡ್ಡಸಾಲು = CSI_ARG_OR(ವಾದಗಳು[0], 1);
+    ಲಂಬಸಾಲು = argcount < 2 || CSI_ARG_IS_MISSING(ವಾದಗಳು[1]) ? 1 : CSI_ARG(ವಾದಗಳು[1]);
     // zero-based
-    if(vterm_get_special_pty_type() == 2) {
+    ಆದರೆ(vterm_get_special_pty_type() == 2) {
       // Fix a sequence that is not correct right now
-      if(state->pos.row == row - 1) {
-        int cnt, ptr = 0;
-        for(cnt = 0; cnt < col - 1; ++cnt) {
+      ಆದರೆ(state->pos.ಅಡ್ಡಸಾಲು == ಅಡ್ಡಸಾಲು - 1) {
+        ಪೂರ್ಣಾಂಕ cnt, ptr = 0;
+        ಗಾಗಿ(cnt = 0; cnt < ಲಂಬಸಾಲು - 1; ++cnt) {
 	  VTermPos p;
 	  VTermScreenCell c0, c1;
-	  p.row = row - 1;
-	  p.col = ptr;
+	  p.ಅಡ್ಡಸಾಲು = ಅಡ್ಡಸಾಲು - 1;
+	  p.ಲಂಬಸಾಲು = ptr;
 	  vterm_screen_get_cell(state->vt->screen, p, &c0);
-	  p.col++;
+	  p.ಲಂಬಸಾಲು++;
 	  vterm_screen_get_cell(state->vt->screen, p, &c1);
 	  ptr += (c1.chars[0] == (uint32_t)-1)		    // double cell?
 	     ? (vterm_unicode_is_ambiguous(c0.chars[0]))    // is ambiguous?
-	     ? vterm_unicode_width(0x00a1) : 1		    // &ambiwidth
+	     ? vterm_unicode_ಅಗಲ(0x00a1) : 1		    // &ambiwidth
 	     : 1;					    // not ambiguous
         }
-        col = ptr + 1;
+        ಲಂಬಸಾಲು = ptr + 1;
       }
     }
-    state->pos.row = row-1;
-    state->pos.col = col-1;
-    if(state->mode.origin) {
-      state->pos.row += state->scrollregion_top;
-      state->pos.col += SCROLLREGION_LEFT(state);
+    state->pos.ಅಡ್ಡಸಾಲು = ಅಡ್ಡಸಾಲು-1;
+    state->pos.ಲಂಬಸಾಲು = ಲಂಬಸಾಲು-1;
+    ಆದರೆ(state->ಬಹುಲಕ.origin) {
+      state->pos.ಅಡ್ಡಸಾಲು += state->scrollregion_ತುದಿ;
+      state->pos.ಲಂಬಸಾಲು += SCROLLREGION_ಎಡ(state);
     }
     state->at_phantom = 0;
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x49: // CHT - ECMA-48 8.3.10
-    count = CSI_ARG_COUNT(args[0]);
-    tab(state, count, +1);
-    break;
+  ಸ್ಥಿತಿ 0x49: // CHT - ECMA-48 8.3.10
+    ಎಣಿಕೆ_2 = CSI_ARG_ಎಣಿಕೆ(ವಾದಗಳು[0]);
+    tab(state, ಎಣಿಕೆ_2, +1);
+    ನಿಲ್ಲಿಸು;
 
-  case 0x4a: // ED - ECMA-48 8.3.39
-  case LEADER('?', 0x4a): // DECSED - Selective Erase in Display
+  ಸ್ಥಿತಿ 0x4a: // ED - ECMA-48 8.3.39
+  ಸ್ಥಿತಿ LEADER('?', 0x4a): // DECSED - Selective Erase in Display
     selective = (leader_byte == '?');
-    switch(CSI_ARG(args[0])) {
-    case CSI_ARG_MISSING:
-    case 0:
-      rect.start_row = state->pos.row; rect.end_row = state->pos.row + 1;
-      rect.start_col = state->pos.col; rect.end_col = state->cols;
-      if(rect.end_col > rect.start_col)
+    ಆಯ್ಕೆ(CSI_ARG(ವಾದಗಳು[0])) {
+    ಸ್ಥಿತಿ CSI_ARG_MISSING:
+    ಸ್ಥಿತಿ 0:
+      rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು = state->pos.ಅಡ್ಡಸಾಲು; rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು = state->pos.ಅಡ್ಡಸಾಲು + 1;
+      rect.ಆರಂಭ_ಲಂಬಸಾಲು = state->pos.ಲಂಬಸಾಲು; rect.ಕೊನೆ_ಲಂಬಸಾಲು = state->ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+      ಆದರೆ(rect.ಕೊನೆ_ಲಂಬಸಾಲು > rect.ಆರಂಭ_ಲಂಬಸಾಲು)
         erase(state, rect, selective);
 
-      rect.start_row = state->pos.row + 1; rect.end_row = state->rows;
-      rect.start_col = 0;
-      for(row = rect.start_row; row < rect.end_row; row++)
-	set_lineinfo(state, row, FORCE, DWL_OFF, DHL_OFF);
-      if(rect.end_row > rect.start_row)
+      rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು = state->pos.ಅಡ್ಡಸಾಲು + 1; rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು = state->ಅಡ್ಡಸಾಲುಗಳು_2;
+      rect.ಆರಂಭ_ಲಂಬಸಾಲು = 0;
+      ಗಾಗಿ(ಅಡ್ಡಸಾಲು = rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು; ಅಡ್ಡಸಾಲು < rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು; ಅಡ್ಡಸಾಲು++)
+	ಗಣ_lineinfo(state, ಅಡ್ಡಸಾಲು, FORCE, DWL_OFF, DHL_OFF);
+      ಆದರೆ(rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು > rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು)
         erase(state, rect, selective);
-      break;
+      ನಿಲ್ಲಿಸು;
 
-    case 1:
-      rect.start_row = 0; rect.end_row = state->pos.row;
-      rect.start_col = 0; rect.end_col = state->cols;
-      for(row = rect.start_row; row < rect.end_row; row++)
-	set_lineinfo(state, row, FORCE, DWL_OFF, DHL_OFF);
-      if(rect.end_col > rect.start_col)
+    ಸ್ಥಿತಿ 1:
+      rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು = 0; rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು = state->pos.ಅಡ್ಡಸಾಲು;
+      rect.ಆರಂಭ_ಲಂಬಸಾಲು = 0; rect.ಕೊನೆ_ಲಂಬಸಾಲು = state->ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+      ಗಾಗಿ(ಅಡ್ಡಸಾಲು = rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು; ಅಡ್ಡಸಾಲು < rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು; ಅಡ್ಡಸಾಲು++)
+	ಗಣ_lineinfo(state, ಅಡ್ಡಸಾಲು, FORCE, DWL_OFF, DHL_OFF);
+      ಆದರೆ(rect.ಕೊನೆ_ಲಂಬಸಾಲು > rect.ಆರಂಭ_ಲಂಬಸಾಲು)
         erase(state, rect, selective);
 
-      rect.start_row = state->pos.row; rect.end_row = state->pos.row + 1;
-                          rect.end_col = state->pos.col + 1;
-      if(rect.end_row > rect.start_row)
+      rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು = state->pos.ಅಡ್ಡಸಾಲು; rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು = state->pos.ಅಡ್ಡಸಾಲು + 1;
+                          rect.ಕೊನೆ_ಲಂಬಸಾಲು = state->pos.ಲಂಬಸಾಲು + 1;
+      ಆದರೆ(rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು > rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು)
         erase(state, rect, selective);
-      break;
+      ನಿಲ್ಲಿಸು;
 
-    case 2:
-      rect.start_row = 0; rect.end_row = state->rows;
-      rect.start_col = 0; rect.end_col = state->cols;
-      for(row = rect.start_row; row < rect.end_row; row++)
-	set_lineinfo(state, row, FORCE, DWL_OFF, DHL_OFF);
+    ಸ್ಥಿತಿ 2:
+      rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು = 0; rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು = state->ಅಡ್ಡಸಾಲುಗಳು_2;
+      rect.ಆರಂಭ_ಲಂಬಸಾಲು = 0; rect.ಕೊನೆ_ಲಂಬಸಾಲು = state->ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+      ಗಾಗಿ(ಅಡ್ಡಸಾಲು = rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು; ಅಡ್ಡಸಾಲು < rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು; ಅಡ್ಡಸಾಲು++)
+	ಗಣ_lineinfo(state, ಅಡ್ಡಸಾಲು, FORCE, DWL_OFF, DHL_OFF);
       erase(state, rect, selective);
-      break;
+      ನಿಲ್ಲಿಸು;
 
-    case 3:
-      if(state->callbacks && state->callbacks->sb_clear)
-        if((*state->callbacks->sb_clear)(state->cbdata))
-          return 1;
-      break;
+    ಸ್ಥಿತಿ 3:
+      ಆದರೆ(state->callbacks && state->callbacks->sb_clear)
+        ಆದರೆ((*state->callbacks->sb_clear)(state->cbdata))
+          ಹಿಂತಿರುಗಿ 1;
+      ನಿಲ್ಲಿಸು;
     }
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x4b: // EL - ECMA-48 8.3.41
-  case LEADER('?', 0x4b): // DECSEL - Selective Erase in Line
+  ಸ್ಥಿತಿ 0x4b: // EL - ECMA-48 8.3.41
+  ಸ್ಥಿತಿ LEADER('?', 0x4b): // DECSEL - Selective Erase in Line
     selective = (leader_byte == '?');
-    rect.start_row = state->pos.row;
-    rect.end_row   = state->pos.row + 1;
+    rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು = state->pos.ಅಡ್ಡಸಾಲು;
+    rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು   = state->pos.ಅಡ್ಡಸಾಲು + 1;
 
-    switch(CSI_ARG(args[0])) {
-    case CSI_ARG_MISSING:
-    case 0:
-      rect.start_col = state->pos.col; rect.end_col = THISROWWIDTH(state); break;
-    case 1:
-      rect.start_col = 0; rect.end_col = state->pos.col + 1; break;
-    case 2:
-      rect.start_col = 0; rect.end_col = THISROWWIDTH(state); break;
-    default:
-      return 0;
+    ಆಯ್ಕೆ(CSI_ARG(ವಾದಗಳು[0])) {
+    ಸ್ಥಿತಿ CSI_ARG_MISSING:
+    ಸ್ಥಿತಿ 0:
+      rect.ಆರಂಭ_ಲಂಬಸಾಲು = state->pos.ಲಂಬಸಾಲು; rect.ಕೊನೆ_ಲಂಬಸಾಲು = THISROWWIDTH(state); ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ 1:
+      rect.ಆರಂಭ_ಲಂಬಸಾಲು = 0; rect.ಕೊನೆ_ಲಂಬಸಾಲು = state->pos.ಲಂಬಸಾಲು + 1; ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ 2:
+      rect.ಆರಂಭ_ಲಂಬಸಾಲು = 0; rect.ಕೊನೆ_ಲಂಬಸಾಲು = THISROWWIDTH(state); ನಿಲ್ಲಿಸು;
+    ಪೂರ್ವನಿಯೋಜಿತ:
+      ಹಿಂತಿರುಗಿ 0;
     }
 
-    if(rect.end_col > rect.start_col)
+    ಆದರೆ(rect.ಕೊನೆ_ಲಂಬಸಾಲು > rect.ಆರಂಭ_ಲಂಬಸಾಲು)
       erase(state, rect, selective);
 
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x4c: // IL - ECMA-48 8.3.67
-    count = CSI_ARG_COUNT(args[0]);
+  ಸ್ಥಿತಿ 0x4c: // IL - ECMA-48 8.3.67
+    ಎಣಿಕೆ_2 = CSI_ARG_ಎಣಿಕೆ(ವಾದಗಳು[0]);
 
-    if(!is_cursor_in_scrollregion(state))
-      break;
+    ಆದರೆ(!is_cursor_ಒಳ_scrollregion(state))
+      ನಿಲ್ಲಿಸು;
 
-    rect.start_row = state->pos.row;
-    rect.end_row   = SCROLLREGION_BOTTOM(state);
-    rect.start_col = SCROLLREGION_LEFT(state);
-    rect.end_col   = SCROLLREGION_RIGHT(state);
+    rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು = state->pos.ಅಡ್ಡಸಾಲು;
+    rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು   = SCROLLREGION_BOTTOM(state);
+    rect.ಆರಂಭ_ಲಂಬಸಾಲು = SCROLLREGION_ಎಡ(state);
+    rect.ಕೊನೆ_ಲಂಬಸಾಲು   = SCROLLREGION_ಬಲ(state);
 
-    scroll(state, rect, -count, 0);
+    scroll(state, rect, -ಎಣಿಕೆ_2, 0);
 
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x4d: // DL - ECMA-48 8.3.32
-    count = CSI_ARG_COUNT(args[0]);
+  ಸ್ಥಿತಿ 0x4d: // DL - ECMA-48 8.3.32
+    ಎಣಿಕೆ_2 = CSI_ARG_ಎಣಿಕೆ(ವಾದಗಳು[0]);
 
-    if(!is_cursor_in_scrollregion(state))
-      break;
+    ಆದರೆ(!is_cursor_ಒಳ_scrollregion(state))
+      ನಿಲ್ಲಿಸು;
 
-    rect.start_row = state->pos.row;
-    rect.end_row   = SCROLLREGION_BOTTOM(state);
-    rect.start_col = SCROLLREGION_LEFT(state);
-    rect.end_col   = SCROLLREGION_RIGHT(state);
+    rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು = state->pos.ಅಡ್ಡಸಾಲು;
+    rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು   = SCROLLREGION_BOTTOM(state);
+    rect.ಆರಂಭ_ಲಂಬಸಾಲು = SCROLLREGION_ಎಡ(state);
+    rect.ಕೊನೆ_ಲಂಬಸಾಲು   = SCROLLREGION_ಬಲ(state);
 
-    scroll(state, rect, count, 0);
+    scroll(state, rect, ಎಣಿಕೆ_2, 0);
 
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x50: // DCH - ECMA-48 8.3.26
-    count = CSI_ARG_COUNT(args[0]);
+  ಸ್ಥಿತಿ 0x50: // DCH - ECMA-48 8.3.26
+    ಎಣಿಕೆ_2 = CSI_ARG_ಎಣಿಕೆ(ವಾದಗಳು[0]);
 
-    if(!is_cursor_in_scrollregion(state))
-      break;
+    ಆದರೆ(!is_cursor_ಒಳ_scrollregion(state))
+      ನಿಲ್ಲಿಸು;
 
-    rect.start_row = state->pos.row;
-    rect.end_row   = state->pos.row + 1;
-    rect.start_col = state->pos.col;
-    if(state->mode.leftrightmargin)
-      rect.end_col = SCROLLREGION_RIGHT(state);
-    else
-      rect.end_col = THISROWWIDTH(state);
+    rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು = state->pos.ಅಡ್ಡಸಾಲು;
+    rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು   = state->pos.ಅಡ್ಡಸಾಲು + 1;
+    rect.ಆರಂಭ_ಲಂಬಸಾಲು = state->pos.ಲಂಬಸಾಲು;
+    ಆದರೆ(state->ಬಹುಲಕ.leftrightmargin)
+      rect.ಕೊನೆ_ಲಂಬಸಾಲು = SCROLLREGION_ಬಲ(state);
+    ಇಲ್ಲದಿದ್ದರೆ
+      rect.ಕೊನೆ_ಲಂಬಸಾಲು = THISROWWIDTH(state);
 
-    scroll(state, rect, 0, count);
+    scroll(state, rect, 0, ಎಣಿಕೆ_2);
 
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x53: // SU - ECMA-48 8.3.147
-    count = CSI_ARG_COUNT(args[0]);
+  ಸ್ಥಿತಿ 0x53: // SU - ECMA-48 8.3.147
+    ಎಣಿಕೆ_2 = CSI_ARG_ಎಣಿಕೆ(ವಾದಗಳು[0]);
 
-    rect.start_row = state->scrollregion_top;
-    rect.end_row   = SCROLLREGION_BOTTOM(state);
-    rect.start_col = SCROLLREGION_LEFT(state);
-    rect.end_col   = SCROLLREGION_RIGHT(state);
+    rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು = state->scrollregion_ತುದಿ;
+    rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು   = SCROLLREGION_BOTTOM(state);
+    rect.ಆರಂಭ_ಲಂಬಸಾಲು = SCROLLREGION_ಎಡ(state);
+    rect.ಕೊನೆ_ಲಂಬಸಾಲು   = SCROLLREGION_ಬಲ(state);
 
-    scroll(state, rect, count, 0);
+    scroll(state, rect, ಎಣಿಕೆ_2, 0);
 
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x54: // SD - ECMA-48 8.3.113
-    count = CSI_ARG_COUNT(args[0]);
+  ಸ್ಥಿತಿ 0x54: // SD - ECMA-48 8.3.113
+    ಎಣಿಕೆ_2 = CSI_ARG_ಎಣಿಕೆ(ವಾದಗಳು[0]);
 
-    rect.start_row = state->scrollregion_top;
-    rect.end_row   = SCROLLREGION_BOTTOM(state);
-    rect.start_col = SCROLLREGION_LEFT(state);
-    rect.end_col   = SCROLLREGION_RIGHT(state);
+    rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು = state->scrollregion_ತುದಿ;
+    rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು   = SCROLLREGION_BOTTOM(state);
+    rect.ಆರಂಭ_ಲಂಬಸಾಲು = SCROLLREGION_ಎಡ(state);
+    rect.ಕೊನೆ_ಲಂಬಸಾಲು   = SCROLLREGION_ಬಲ(state);
 
-    scroll(state, rect, -count, 0);
+    scroll(state, rect, -ಎಣಿಕೆ_2, 0);
 
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x58: // ECH - ECMA-48 8.3.38
-    count = CSI_ARG_COUNT(args[0]);
+  ಸ್ಥಿತಿ 0x58: // ECH - ECMA-48 8.3.38
+    ಎಣಿಕೆ_2 = CSI_ARG_ಎಣಿಕೆ(ವಾದಗಳು[0]);
 
-    rect.start_row = state->pos.row;
-    rect.end_row   = state->pos.row + 1;
-    rect.start_col = state->pos.col;
-    rect.end_col   = state->pos.col + count;
-    UBOUND(rect.end_col, THISROWWIDTH(state));
+    rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು = state->pos.ಅಡ್ಡಸಾಲು;
+    rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು   = state->pos.ಅಡ್ಡಸಾಲು + 1;
+    rect.ಆರಂಭ_ಲಂಬಸಾಲು = state->pos.ಲಂಬಸಾಲು;
+    rect.ಕೊನೆ_ಲಂಬಸಾಲು   = state->pos.ಲಂಬಸಾಲು + ಎಣಿಕೆ_2;
+    UBOUND(rect.ಕೊನೆ_ಲಂಬಸಾಲು, THISROWWIDTH(state));
 
     erase(state, rect, 0);
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x5a: // CBT - ECMA-48 8.3.7
-    count = CSI_ARG_COUNT(args[0]);
-    tab(state, count, -1);
-    break;
+  ಸ್ಥಿತಿ 0x5a: // CBT - ECMA-48 8.3.7
+    ಎಣಿಕೆ_2 = CSI_ARG_ಎಣಿಕೆ(ವಾದಗಳು[0]);
+    tab(state, ಎಣಿಕೆ_2, -1);
+    ನಿಲ್ಲಿಸು;
 
-  case 0x60: // HPA - ECMA-48 8.3.57
-    col = CSI_ARG_OR(args[0], 1);
-    state->pos.col = col-1;
+  ಸ್ಥಿತಿ 0x60: // HPA - ECMA-48 8.3.57
+    ಲಂಬಸಾಲು = CSI_ARG_OR(ವಾದಗಳು[0], 1);
+    state->pos.ಲಂಬಸಾಲು = ಲಂಬಸಾಲು-1;
     state->at_phantom = 0;
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x61: // HPR - ECMA-48 8.3.59
-    count = CSI_ARG_COUNT(args[0]);
-    state->pos.col += count;
+  ಸ್ಥಿತಿ 0x61: // HPR - ECMA-48 8.3.59
+    ಎಣಿಕೆ_2 = CSI_ARG_ಎಣಿಕೆ(ವಾದಗಳು[0]);
+    state->pos.ಲಂಬಸಾಲು += ಎಣಿಕೆ_2;
     state->at_phantom = 0;
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x62: { // REP - ECMA-48 8.3.103
-    const int row_width = THISROWWIDTH(state);
+  ಸ್ಥಿತಿ 0x62: { // REP - ECMA-48 8.3.103
+    ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು_ಅಗಲ = THISROWWIDTH(state);
 
     // ECMA-48 repeats the preceding graphic character; when none was
     // printed yet "combine_width" is zero and the loop below would never
     // advance the cursor.  Ignore the control then, like xterm does.
-    if(state->combine_width < 1)
-      break;
+    ಆದರೆ(state->combine_ಅಗಲ < 1)
+      ನಿಲ್ಲಿಸು;
 
-    count = CSI_ARG_COUNT(args[0]);
-    col = state->pos.col + count;
-    UBOUND(col, row_width);
-    while (state->pos.col < col) {
-      putglyph(state, state->combine_chars, state->combine_width, state->pos);
-      state->pos.col += state->combine_width;
+    ಎಣಿಕೆ_2 = CSI_ARG_ಎಣಿಕೆ(ವಾದಗಳು[0]);
+    ಲಂಬಸಾಲು = state->pos.ಲಂಬಸಾಲು + ಎಣಿಕೆ_2;
+    UBOUND(ಲಂಬಸಾಲು, ಅಡ್ಡಸಾಲು_ಅಗಲ);
+    ಆಗ (state->pos.ಲಂಬಸಾಲು < ಲಂಬಸಾಲು) {
+      putglyph(state, state->combine_chars, state->combine_ಅಗಲ, state->pos);
+      state->pos.ಲಂಬಸಾಲು += state->combine_ಅಗಲ;
     }
-    if (state->pos.col + state->combine_width >= row_width) {
-      if (state->mode.autowrap) {
+    ಆದರೆ (state->pos.ಲಂಬಸಾಲು + state->combine_ಅಗಲ >= ಅಡ್ಡಸಾಲು_ಅಗಲ) {
+      ಆದರೆ (state->ಬಹುಲಕ.autowrap) {
         state->at_phantom = 1;
         cancel_phantom = 0;
       }
     }
-    break;
+    ನಿಲ್ಲಿಸು;
   }
 
-  case 0x63: // DA - ECMA-48 8.3.24
-    val = CSI_ARG_OR(args[0], 0);
-    if(val == 0)
+  ಸ್ಥಿತಿ 0x63: // DA - ECMA-48 8.3.24
+    val = CSI_ARG_OR(ವಾದಗಳು[0], 0);
+    ಆದರೆ(val == 0)
       // DEC VT100 response
-      vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "?1;2c");
-    break;
+      vterm_ತಳ್ಳು_output_sprintf_ctrl(state->vt, C1_CSI, "?1;2c");
+    ನಿಲ್ಲಿಸು;
 
-  case LEADER('>', 0x63): // DEC secondary Device Attributes
+  ಸ್ಥಿತಿ LEADER('>', 0x63): // DEC secondary Device Attributes
     // This returns xterm version number 100.
-    vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, ">%d;%d;%dc", 0, 100, 0);
-    break;
+    vterm_ತಳ್ಳು_output_sprintf_ctrl(state->vt, C1_CSI, ">%d;%d;%dc", 0, 100, 0);
+    ನಿಲ್ಲಿಸು;
 
-  case 0x64: // VPA - ECMA-48 8.3.158
-    row = CSI_ARG_OR(args[0], 1);
-    state->pos.row = row-1;
-    if(state->mode.origin)
-      state->pos.row += state->scrollregion_top;
+  ಸ್ಥಿತಿ 0x64: // VPA - ECMA-48 8.3.158
+    ಅಡ್ಡಸಾಲು = CSI_ARG_OR(ವಾದಗಳು[0], 1);
+    state->pos.ಅಡ್ಡಸಾಲು = ಅಡ್ಡಸಾಲು-1;
+    ಆದರೆ(state->ಬಹುಲಕ.origin)
+      state->pos.ಅಡ್ಡಸಾಲು += state->scrollregion_ತುದಿ;
     state->at_phantom = 0;
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x65: // VPR - ECMA-48 8.3.160
-    count = CSI_ARG_COUNT(args[0]);
-    state->pos.row += count;
+  ಸ್ಥಿತಿ 0x65: // VPR - ECMA-48 8.3.160
+    ಎಣಿಕೆ_2 = CSI_ARG_ಎಣಿಕೆ(ವಾದಗಳು[0]);
+    state->pos.ಅಡ್ಡಸಾಲು += ಎಣಿಕೆ_2;
     state->at_phantom = 0;
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x66: // HVP - ECMA-48 8.3.63
-    row = CSI_ARG_OR(args[0], 1);
-    col = argcount < 2 || CSI_ARG_IS_MISSING(args[1]) ? 1 : CSI_ARG(args[1]);
+  ಸ್ಥಿತಿ 0x66: // HVP - ECMA-48 8.3.63
+    ಅಡ್ಡಸಾಲು = CSI_ARG_OR(ವಾದಗಳು[0], 1);
+    ಲಂಬಸಾಲು = argcount < 2 || CSI_ARG_IS_MISSING(ವಾದಗಳು[1]) ? 1 : CSI_ARG(ವಾದಗಳು[1]);
     // zero-based
-    state->pos.row = row-1;
-    state->pos.col = col-1;
-    if(state->mode.origin) {
-      state->pos.row += state->scrollregion_top;
-      state->pos.col += SCROLLREGION_LEFT(state);
+    state->pos.ಅಡ್ಡಸಾಲು = ಅಡ್ಡಸಾಲು-1;
+    state->pos.ಲಂಬಸಾಲು = ಲಂಬಸಾಲು-1;
+    ಆದರೆ(state->ಬಹುಲಕ.origin) {
+      state->pos.ಅಡ್ಡಸಾಲು += state->scrollregion_ತುದಿ;
+      state->pos.ಲಂಬಸಾಲು += SCROLLREGION_ಎಡ(state);
     }
     state->at_phantom = 0;
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x67: // TBC - ECMA-48 8.3.154
-    val = CSI_ARG_OR(args[0], 0);
+  ಸ್ಥಿತಿ 0x67: // TBC - ECMA-48 8.3.154
+    val = CSI_ARG_OR(ವಾದಗಳು[0], 0);
 
-    switch(val) {
-    case 0:
-      clear_col_tabstop(state, state->pos.col);
-      break;
-    case 3:
-    case 5:
-      for(col = 0; col < state->cols; col++)
-        clear_col_tabstop(state, col);
-      break;
-    case 1:
-    case 2:
-    case 4:
-      break;
+    ಆಯ್ಕೆ(val) {
+    ಸ್ಥಿತಿ 0:
+      clear_ಲಂಬಸಾಲು_tabstop(state, state->pos.ಲಂಬಸಾಲು);
+      ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ 3:
+    ಸ್ಥಿತಿ 5:
+      ಗಾಗಿ(ಲಂಬಸಾಲು = 0; ಲಂಬಸಾಲು < state->ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ; ಲಂಬಸಾಲು++)
+        clear_ಲಂಬಸಾಲು_tabstop(state, ಲಂಬಸಾಲು);
+      ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ 1:
+    ಸ್ಥಿತಿ 2:
+    ಸ್ಥಿತಿ 4:
+      ನಿಲ್ಲಿಸು;
     /* TODO: 1, 2 and 4 aren't meaningful yet without line tab stops */
-    default:
-      return 0;
+    ಪೂರ್ವನಿಯೋಜಿತ:
+      ಹಿಂತಿರುಗಿ 0;
     }
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x68: // SM - ECMA-48 8.3.125
-    if(!CSI_ARG_IS_MISSING(args[0]))
-      set_mode(state, CSI_ARG(args[0]), 1);
-    break;
+  ಸ್ಥಿತಿ 0x68: // SM - ECMA-48 8.3.125
+    ಆದರೆ(!CSI_ARG_IS_MISSING(ವಾದಗಳು[0]))
+      ಗಣ_ಬಹುಲಕ(state, CSI_ARG(ವಾದಗಳು[0]), 1);
+    ನಿಲ್ಲಿಸು;
 
-  case LEADER('?', 0x68): // DEC private mode set
-    for(int i = 0; i < argcount; i++) {
-      if(!CSI_ARG_IS_MISSING(args[i]))
-        set_dec_mode(state, CSI_ARG(args[i]), 1);
+  ಸ್ಥಿತಿ LEADER('?', 0x68): // DEC private mode set
+    ಗಾಗಿ(ಪೂರ್ಣಾಂಕ i = 0; i < argcount; i++) {
+      ಆದರೆ(!CSI_ARG_IS_MISSING(ವಾದಗಳು[i]))
+        ಗಣ_dec_ಬಹುಲಕ(state, CSI_ARG(ವಾದಗಳು[i]), 1);
     }
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x6a: // HPB - ECMA-48 8.3.58
-    count = CSI_ARG_COUNT(args[0]);
-    state->pos.col -= count;
+  ಸ್ಥಿತಿ 0x6a: // HPB - ECMA-48 8.3.58
+    ಎಣಿಕೆ_2 = CSI_ARG_ಎಣಿಕೆ(ವಾದಗಳು[0]);
+    state->pos.ಲಂಬಸಾಲು -= ಎಣಿಕೆ_2;
     state->at_phantom = 0;
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x6b: // VPB - ECMA-48 8.3.159
-    count = CSI_ARG_COUNT(args[0]);
-    state->pos.row -= count;
+  ಸ್ಥಿತಿ 0x6b: // VPB - ECMA-48 8.3.159
+    ಎಣಿಕೆ_2 = CSI_ARG_ಎಣಿಕೆ(ವಾದಗಳು[0]);
+    state->pos.ಅಡ್ಡಸಾಲು -= ಎಣಿಕೆ_2;
     state->at_phantom = 0;
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x6c: // RM - ECMA-48 8.3.106
-    if(!CSI_ARG_IS_MISSING(args[0]))
-      set_mode(state, CSI_ARG(args[0]), 0);
-    break;
+  ಸ್ಥಿತಿ 0x6c: // RM - ECMA-48 8.3.106
+    ಆದರೆ(!CSI_ARG_IS_MISSING(ವಾದಗಳು[0]))
+      ಗಣ_ಬಹುಲಕ(state, CSI_ARG(ವಾದಗಳು[0]), 0);
+    ನಿಲ್ಲಿಸು;
 
-  case LEADER('?', 0x6c): // DEC private mode reset
-    for(int i = 0; i < argcount; i++) {
-      if(!CSI_ARG_IS_MISSING(args[i]))
-        set_dec_mode(state, CSI_ARG(args[i]), 0);
+  ಸ್ಥಿತಿ LEADER('?', 0x6c): // DEC private mode reset
+    ಗಾಗಿ(ಪೂರ್ಣಾಂಕ i = 0; i < argcount; i++) {
+      ಆದರೆ(!CSI_ARG_IS_MISSING(ವಾದಗಳು[i]))
+        ಗಣ_dec_ಬಹುಲಕ(state, CSI_ARG(ವಾದಗಳು[i]), 0);
     }
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x6d: // SGR - ECMA-48 8.3.117
-    vterm_state_setpen(state, args, argcount);
-    break;
+  ಸ್ಥಿತಿ 0x6d: // SGR - ECMA-48 8.3.117
+    vterm_state_setpen(state, ವಾದಗಳು, argcount);
+    ನಿಲ್ಲಿಸು;
 
-  case LEADER('?', 0x6d): // DECSGR and XTQMODKEYS
+  ಸ್ಥಿತಿ LEADER('?', 0x6d): // DECSGR and XTQMODKEYS
     // CSI ? 4 m  XTQMODKEYS: request modifyOtherKeys level
-    if (argcount == 1 && CSI_ARG(args[0]) == 4)
+    ಆದರೆ (argcount == 1 && CSI_ARG(ವಾದಗಳು[0]) == 4)
     {
-      vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, ">4;%dm",
-					state->mode.modify_other_keys ? 2 : 0);
-      break;
+      vterm_ತಳ್ಳು_output_sprintf_ctrl(state->vt, C1_CSI, ">4;%dm",
+					state->ಬಹುಲಕ.modify_other_ಕೀಲಿಗಳು ? 2 : 0);
+      ನಿಲ್ಲಿಸು;
     }
 
     /* No actual DEC terminal recognised these, but some printers did. These
      * are alternative ways to request subscript/superscript/off
      */
-    for(int argi = 0; argi < argcount; argi++) {
-      long arg;
-      switch(arg = CSI_ARG(args[argi])) {
-        case 4: // Superscript on
+    ಗಾಗಿ(ಪೂರ್ಣಾಂಕ argi = 0; argi < argcount; argi++) {
+      ದೀರ್ಘ arg;
+      ಆಯ್ಕೆ(arg = CSI_ARG(ವಾದಗಳು[argi])) {
+        ಸ್ಥಿತಿ 4: // Superscript on
           arg = 73;
           vterm_state_setpen(state, &arg, 1);
-          break;
-        case 5: // Subscript on
+          ನಿಲ್ಲಿಸು;
+        ಸ್ಥಿತಿ 5: // Subscript on
           arg = 74;
           vterm_state_setpen(state, &arg, 1);
-          break;
-        case 24: // Super+subscript off
+          ನಿಲ್ಲಿಸು;
+        ಸ್ಥಿತಿ 24: // Super+subscript off
           arg = 75;
           vterm_state_setpen(state, &arg, 1);
-          break;
+          ನಿಲ್ಲಿಸು;
       }
     }
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case LEADER('>', 0x6d): // CSI > 4 ; Pv m   xterm resource modifyOtherKeys
-    if (argcount == 2 && CSI_ARG(args[0]) == 4)
+  ಸ್ಥಿತಿ LEADER('>', 0x6d): // CSI > 4 ; Pv m   xterm resource modifyOtherKeys
+    ಆದರೆ (argcount == 2 && CSI_ARG(ವಾದಗಳು[0]) == 4)
     {
       // can't have both modify_other_keys and kitty_keyboard
-      state->mode.kitty_keyboard = 0;
+      state->ಬಹುಲಕ.kitty_keyboard = 0;
 
-      state->mode.modify_other_keys = CSI_ARG(args[1]) == 2;
+      state->ಬಹುಲಕ.modify_other_ಕೀಲಿಗಳು = CSI_ARG(ವಾದಗಳು[1]) == 2;
     }
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case LEADER('>', 0x75): // CSI > 1 u  enable kitty keyboard protocol
-    if (argcount == 1 && CSI_ARG(args[0]) == 1)
+  ಸ್ಥಿತಿ LEADER('>', 0x75): // CSI > 1 u  enable kitty keyboard protocol
+    ಆದರೆ (argcount == 1 && CSI_ARG(ವಾದಗಳು[0]) == 1)
     {
       // can't have both modify_other_keys and kitty_keyboard
-      state->mode.modify_other_keys = 0;
+      state->ಬಹುಲಕ.modify_other_ಕೀಲಿಗಳು = 0;
 
-      state->mode.kitty_keyboard = 1;
+      state->ಬಹುಲಕ.kitty_keyboard = 1;
     }
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case LEADER('<', 0x75): // CSI < u  disable kitty keyboard protocol
-    if (argcount <= 1)
-      state->mode.kitty_keyboard = 0;
-    break;
+  ಸ್ಥಿತಿ LEADER('<', 0x75): // CSI < u  disable kitty keyboard protocol
+    ಆದರೆ (argcount <= 1)
+      state->ಬಹುಲಕ.kitty_keyboard = 0;
+    ನಿಲ್ಲಿಸು;
 
-  case LEADER('?', 0x75): // CSI ? u  request kitty keyboard protocol state
-    if (argcount <= 1)
+  ಸ್ಥಿತಿ LEADER('?', 0x75): // CSI ? u  request kitty keyboard protocol state
+    ಆದರೆ (argcount <= 1)
       // TODO: this only uses the values zero and one.  The protocol specifies
       // more values, the progressive enhancement flags.
-      vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "?%du",
-						   state->mode.kitty_keyboard);
-    break;
+      vterm_ತಳ್ಳು_output_sprintf_ctrl(state->vt, C1_CSI, "?%du",
+						   state->ಬಹುಲಕ.kitty_keyboard);
+    ನಿಲ್ಲಿಸು;
 
-  case 0x6e: // DSR - ECMA-48 8.3.35
-  case LEADER('?', 0x6e): // DECDSR
-    val = CSI_ARG_OR(args[0], 0);
+  ಸ್ಥಿತಿ 0x6e: // DSR - ECMA-48 8.3.35
+  ಸ್ಥಿತಿ LEADER('?', 0x6e): // DECDSR
+    val = CSI_ARG_OR(ವಾದಗಳು[0], 0);
 
     {
-      char *qmark = (leader_byte == '?') ? "?" : "";
+      ಅಕ್ಷರ *qmark = (leader_byte == '?') ? "?" : "";
 
-      switch(val) {
-      case 0: case 1: case 2: case 3: case 4:
+      ಆಯ್ಕೆ(val) {
+      ಸ್ಥಿತಿ 0: ಸ್ಥಿತಿ 1: ಸ್ಥಿತಿ 2: ಸ್ಥಿತಿ 3: ಸ್ಥಿತಿ 4:
         // ignore - these are replies
-        break;
-      case 5:
-        vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "%s0n", qmark);
-        break;
-      case 6: // CPR - cursor position report
-        vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "%s%d;%dR", qmark, state->pos.row + 1, state->pos.col + 1);
-        break;
+        ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ 5:
+        vterm_ತಳ್ಳು_output_sprintf_ctrl(state->vt, C1_CSI, "%s0n", qmark);
+        ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ 6: // CPR - cursor position report
+        vterm_ತಳ್ಳು_output_sprintf_ctrl(state->vt, C1_CSI, "%s%d;%dR", qmark, state->pos.ಅಡ್ಡಸಾಲು + 1, state->pos.ಲಂಬಸಾಲು + 1);
+        ನಿಲ್ಲಿಸು;
       }
     }
-    break;
+    ನಿಲ್ಲಿಸು;
 
 
-  case INTERMED('!', 0x70): // DECSTR - DEC soft terminal reset
+  ಸ್ಥಿತಿ INTERMED('!', 0x70): // DECSTR - DEC soft terminal reset
     vterm_state_reset(state, 0);
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case LEADER('?', INTERMED('$', 0x70)):
-    request_dec_mode(state, CSI_ARG(args[0]));
-    break;
+  ಸ್ಥಿತಿ LEADER('?', INTERMED('$', 0x70)):
+    request_dec_ಬಹುಲಕ(state, CSI_ARG(ವಾದಗಳು[0]));
+    ನಿಲ್ಲಿಸು;
 
-  case LEADER('>', 0x71): // XTVERSION - xterm query version string
-    request_version_string(state);
-    break;
+  ಸ್ಥಿತಿ LEADER('>', 0x71): // XTVERSION - xterm query version string
+    request_ಆವೃತ್ತಿ_string(state);
+    ನಿಲ್ಲಿಸು;
 
-  case INTERMED(' ', 0x71): // DECSCUSR - DEC set cursor shape
-    val = CSI_ARG_OR(args[0], 1);
+  ಸ್ಥಿತಿ INTERMED(' ', 0x71): // DECSCUSR - DEC set cursor shape
+    val = CSI_ARG_OR(ವಾದಗಳು[0], 1);
 
-    switch(val) {
-    case 0: case 1:
+    ಆಯ್ಕೆ(val) {
+    ಸ್ಥಿತಿ 0: ಸ್ಥಿತಿ 1:
       settermprop_bool(state, VTERM_PROP_CURSORBLINK, 1);
-      settermprop_int (state, VTERM_PROP_CURSORSHAPE, VTERM_PROP_CURSORSHAPE_BLOCK);
-      break;
-    case 2:
+      settermprop_int (state, VTERM_PROP_CURSORSHAPE, VTERM_PROP_CURSORSHAPE_ಖಂಡ);
+      ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ 2:
       settermprop_bool(state, VTERM_PROP_CURSORBLINK, 0);
-      settermprop_int (state, VTERM_PROP_CURSORSHAPE, VTERM_PROP_CURSORSHAPE_BLOCK);
-      break;
-    case 3:
+      settermprop_int (state, VTERM_PROP_CURSORSHAPE, VTERM_PROP_CURSORSHAPE_ಖಂಡ);
+      ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ 3:
       settermprop_bool(state, VTERM_PROP_CURSORBLINK, 1);
       settermprop_int (state, VTERM_PROP_CURSORSHAPE, VTERM_PROP_CURSORSHAPE_UNDERLINE);
-      break;
-    case 4:
+      ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ 4:
       settermprop_bool(state, VTERM_PROP_CURSORBLINK, 0);
       settermprop_int (state, VTERM_PROP_CURSORSHAPE, VTERM_PROP_CURSORSHAPE_UNDERLINE);
-      break;
-    case 5:
+      ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ 5:
       settermprop_bool(state, VTERM_PROP_CURSORBLINK, 1);
-      settermprop_int (state, VTERM_PROP_CURSORSHAPE, VTERM_PROP_CURSORSHAPE_BAR_LEFT);
-      break;
-    case 6:
+      settermprop_int (state, VTERM_PROP_CURSORSHAPE, VTERM_PROP_CURSORSHAPE_BAR_ಎಡ);
+      ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ 6:
       settermprop_bool(state, VTERM_PROP_CURSORBLINK, 0);
-      settermprop_int (state, VTERM_PROP_CURSORSHAPE, VTERM_PROP_CURSORSHAPE_BAR_LEFT);
-      break;
+      settermprop_int (state, VTERM_PROP_CURSORSHAPE, VTERM_PROP_CURSORSHAPE_BAR_ಎಡ);
+      ನಿಲ್ಲಿಸು;
     }
 
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case INTERMED('"', 0x71): // DECSCA - DEC select character protection attribute
-    val = CSI_ARG_OR(args[0], 0);
+  ಸ್ಥಿತಿ INTERMED('"', 0x71): // DECSCA - DEC select character protection attribute
+    val = CSI_ARG_OR(ವಾದಗಳು[0], 0);
 
-    switch(val) {
-    case 0: case 2:
+    ಆಯ್ಕೆ(val) {
+    ಸ್ಥಿತಿ 0: ಸ್ಥಿತಿ 2:
       state->protected_cell = 0;
-      break;
-    case 1:
+      ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ 1:
       state->protected_cell = 1;
-      break;
+      ನಿಲ್ಲಿಸು;
     }
 
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x72: // DECSTBM - DEC custom
-    state->scrollregion_top = CSI_ARG_OR(args[0], 1) - 1;
-    state->scrollregion_bottom = argcount < 2 || CSI_ARG_IS_MISSING(args[1]) ? -1 : CSI_ARG(args[1]);
-    LBOUND(state->scrollregion_top, 0);
-    UBOUND(state->scrollregion_top, state->rows);
+  ಸ್ಥಿತಿ 0x72: // DECSTBM - DEC custom
+    state->scrollregion_ತುದಿ = CSI_ARG_OR(ವಾದಗಳು[0], 1) - 1;
+    state->scrollregion_bottom = argcount < 2 || CSI_ARG_IS_MISSING(ವಾದಗಳು[1]) ? -1 : CSI_ARG(ವಾದಗಳು[1]);
+    LBOUND(state->scrollregion_ತುದಿ, 0);
+    UBOUND(state->scrollregion_ತುದಿ, state->ಅಡ್ಡಸಾಲುಗಳು_2);
     LBOUND(state->scrollregion_bottom, -1);
-    if(state->scrollregion_top == 0 && state->scrollregion_bottom == state->rows)
+    ಆದರೆ(state->scrollregion_ತುದಿ == 0 && state->scrollregion_bottom == state->ಅಡ್ಡಸಾಲುಗಳು_2)
       state->scrollregion_bottom = -1;
-    else
-      UBOUND(state->scrollregion_bottom, state->rows);
+    ಇಲ್ಲದಿದ್ದರೆ
+      UBOUND(state->scrollregion_bottom, state->ಅಡ್ಡಸಾಲುಗಳು_2);
 
-    if(SCROLLREGION_BOTTOM(state) <= state->scrollregion_top) {
+    ಆದರೆ(SCROLLREGION_BOTTOM(state) <= state->scrollregion_ತುದಿ) {
       // Invalid
-      state->scrollregion_top    = 0;
+      state->scrollregion_ತುದಿ    = 0;
       state->scrollregion_bottom = -1;
     }
 
     // Setting the scrolling region restores the cursor to the home position
-    state->pos.row = 0;
-    state->pos.col = 0;
-    if(state->mode.origin) {
-      state->pos.row += state->scrollregion_top;
-      state->pos.col += SCROLLREGION_LEFT(state);
+    state->pos.ಅಡ್ಡಸಾಲು = 0;
+    state->pos.ಲಂಬಸಾಲು = 0;
+    ಆದರೆ(state->ಬಹುಲಕ.origin) {
+      state->pos.ಅಡ್ಡಸಾಲು += state->scrollregion_ತುದಿ;
+      state->pos.ಲಂಬಸಾಲು += SCROLLREGION_ಎಡ(state);
     }
 
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x73: // DECSLRM - DEC custom
+  ಸ್ಥಿತಿ 0x73: // DECSLRM - DEC custom
     // Always allow setting these margins, just they won't take effect without DECVSSM
-    state->scrollregion_left = CSI_ARG_OR(args[0], 1) - 1;
-    state->scrollregion_right = argcount < 2 || CSI_ARG_IS_MISSING(args[1]) ? -1 : CSI_ARG(args[1]);
-    LBOUND(state->scrollregion_left, 0);
-    UBOUND(state->scrollregion_left, state->cols);
-    LBOUND(state->scrollregion_right, -1);
-    if(state->scrollregion_left == 0 && state->scrollregion_right == state->cols)
-      state->scrollregion_right = -1;
-    else
-      UBOUND(state->scrollregion_right, state->cols);
+    state->scrollregion_ಎಡ = CSI_ARG_OR(ವಾದಗಳು[0], 1) - 1;
+    state->scrollregion_ಬಲ = argcount < 2 || CSI_ARG_IS_MISSING(ವಾದಗಳು[1]) ? -1 : CSI_ARG(ವಾದಗಳು[1]);
+    LBOUND(state->scrollregion_ಎಡ, 0);
+    UBOUND(state->scrollregion_ಎಡ, state->ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ);
+    LBOUND(state->scrollregion_ಬಲ, -1);
+    ಆದರೆ(state->scrollregion_ಎಡ == 0 && state->scrollregion_ಬಲ == state->ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ)
+      state->scrollregion_ಬಲ = -1;
+    ಇಲ್ಲದಿದ್ದರೆ
+      UBOUND(state->scrollregion_ಬಲ, state->ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ);
 
-    if(state->scrollregion_right > -1 &&
-       state->scrollregion_right <= state->scrollregion_left) {
+    ಆದರೆ(state->scrollregion_ಬಲ > -1 &&
+       state->scrollregion_ಬಲ <= state->scrollregion_ಎಡ) {
       // Invalid
-      state->scrollregion_left  = 0;
-      state->scrollregion_right = -1;
+      state->scrollregion_ಎಡ  = 0;
+      state->scrollregion_ಬಲ = -1;
     }
 
     // Setting the scrolling region restores the cursor to the home position
-    state->pos.row = 0;
-    state->pos.col = 0;
-    if(state->mode.origin) {
-      state->pos.row += state->scrollregion_top;
-      state->pos.col += SCROLLREGION_LEFT(state);
+    state->pos.ಅಡ್ಡಸಾಲು = 0;
+    state->pos.ಲಂಬಸಾಲು = 0;
+    ಆದರೆ(state->ಬಹುಲಕ.origin) {
+      state->pos.ಅಡ್ಡಸಾಲು += state->scrollregion_ತುದಿ;
+      state->pos.ಲಂಬಸಾಲು += SCROLLREGION_ಎಡ(state);
     }
 
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case 0x74:
-    switch(CSI_ARG(args[0])) {
-      case 8: // CSI 8 ; rows ; cols t  set size
-        if (argcount == 3 &&
-            !CSI_ARG_IS_MISSING(args[1]) && !CSI_ARG_IS_MISSING(args[2]) &&
-            CSI_ARG(args[1]) > 0 && CSI_ARG(args[2]) > 0)
-	  on_resize(CSI_ARG(args[1]), CSI_ARG(args[2]), state);
-	break;
-      default:
+  ಸ್ಥಿತಿ 0x74:
+    ಆಯ್ಕೆ(CSI_ARG(ವಾದಗಳು[0])) {
+      ಸ್ಥಿತಿ 8: // CSI 8 ; rows ; cols t  set size
+        ಆದರೆ (argcount == 3 &&
+            !CSI_ARG_IS_MISSING(ವಾದಗಳು[1]) && !CSI_ARG_IS_MISSING(ವಾದಗಳು[2]) &&
+            CSI_ARG(ವಾದಗಳು[1]) > 0 && CSI_ARG(ವಾದಗಳು[2]) > 0)
+	  on_resize(CSI_ARG(ವಾದಗಳು[1]), CSI_ARG(ವಾದಗಳು[2]), state);
+	ನಿಲ್ಲಿಸು;
+      ಪೂರ್ವನಿಯೋಜಿತ:
 	handled = 0;
-	break;
+	ನಿಲ್ಲಿಸು;
     }
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case INTERMED('\'', 0x7D): // DECIC
-    count = CSI_ARG_COUNT(args[0]);
+  ಸ್ಥಿತಿ INTERMED('\'', 0x7D): // DECIC
+    ಎಣಿಕೆ_2 = CSI_ARG_ಎಣಿಕೆ(ವಾದಗಳು[0]);
 
-    if(!is_cursor_in_scrollregion(state))
-      break;
+    ಆದರೆ(!is_cursor_ಒಳ_scrollregion(state))
+      ನಿಲ್ಲಿಸು;
 
-    rect.start_row = state->scrollregion_top;
-    rect.end_row   = SCROLLREGION_BOTTOM(state);
-    rect.start_col = state->pos.col;
-    rect.end_col   = SCROLLREGION_RIGHT(state);
+    rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು = state->scrollregion_ತುದಿ;
+    rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು   = SCROLLREGION_BOTTOM(state);
+    rect.ಆರಂಭ_ಲಂಬಸಾಲು = state->pos.ಲಂಬಸಾಲು;
+    rect.ಕೊನೆ_ಲಂಬಸಾಲು   = SCROLLREGION_ಬಲ(state);
 
-    scroll(state, rect, 0, -count);
+    scroll(state, rect, 0, -ಎಣಿಕೆ_2);
 
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  case INTERMED('\'', 0x7E): // DECDC
-    count = CSI_ARG_COUNT(args[0]);
+  ಸ್ಥಿತಿ INTERMED('\'', 0x7E): // DECDC
+    ಎಣಿಕೆ_2 = CSI_ARG_ಎಣಿಕೆ(ವಾದಗಳು[0]);
 
-    if(!is_cursor_in_scrollregion(state))
-      break;
+    ಆದರೆ(!is_cursor_ಒಳ_scrollregion(state))
+      ನಿಲ್ಲಿಸು;
 
-    rect.start_row = state->scrollregion_top;
-    rect.end_row   = SCROLLREGION_BOTTOM(state);
-    rect.start_col = state->pos.col;
-    rect.end_col   = SCROLLREGION_RIGHT(state);
+    rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು = state->scrollregion_ತುದಿ;
+    rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು   = SCROLLREGION_BOTTOM(state);
+    rect.ಆರಂಭ_ಲಂಬಸಾಲು = state->pos.ಲಂಬಸಾಲು;
+    rect.ಕೊನೆ_ಲಂಬಸಾಲು   = SCROLLREGION_ಬಲ(state);
 
-    scroll(state, rect, 0, count);
+    scroll(state, rect, 0, ಎಣಿಕೆ_2);
 
-    break;
+    ನಿಲ್ಲಿಸು;
 
-  default:
+  ಪೂರ್ವನಿಯೋಜಿತ:
     handled = 0;
-    break;
+    ನಿಲ್ಲಿಸು;
   }
 
-  if (!handled) {
-    if(state->fallbacks && state->fallbacks->csi)
-      if((*state->fallbacks->csi)(leader, args, argcount, intermed, command, state->fbdata))
-        return 1;
+  ಆದರೆ (!handled) {
+    ಆದರೆ(state->fallbacks && state->fallbacks->csi)
+      ಆದರೆ((*state->fallbacks->csi)(leader, ವಾದಗಳು, argcount, intermed, command, state->fbdata))
+        ಹಿಂತಿರುಗಿ 1;
 
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
   }
 
-  if(state->mode.origin) {
-    LBOUND(state->pos.row, state->scrollregion_top);
-    UBOUND(state->pos.row, SCROLLREGION_BOTTOM(state)-1);
-    LBOUND(state->pos.col, SCROLLREGION_LEFT(state));
-    UBOUND(state->pos.col, SCROLLREGION_RIGHT(state)-1);
+  ಆದರೆ(state->ಬಹುಲಕ.origin) {
+    LBOUND(state->pos.ಅಡ್ಡಸಾಲು, state->scrollregion_ತುದಿ);
+    UBOUND(state->pos.ಅಡ್ಡಸಾಲು, SCROLLREGION_BOTTOM(state)-1);
+    LBOUND(state->pos.ಲಂಬಸಾಲು, SCROLLREGION_ಎಡ(state));
+    UBOUND(state->pos.ಲಂಬಸಾಲು, SCROLLREGION_ಬಲ(state)-1);
   }
-  else {
-    LBOUND(state->pos.row, 0);
-    UBOUND(state->pos.row, state->rows-1);
-    LBOUND(state->pos.col, 0);
-    UBOUND(state->pos.col, THISROWWIDTH(state)-1);
+  ಇಲ್ಲದಿದ್ದರೆ {
+    LBOUND(state->pos.ಅಡ್ಡಸಾಲು, 0);
+    UBOUND(state->pos.ಅಡ್ಡಸಾಲು, state->ಅಡ್ಡಸಾಲುಗಳು_2-1);
+    LBOUND(state->pos.ಲಂಬಸಾಲು, 0);
+    UBOUND(state->pos.ಲಂಬಸಾಲು, THISROWWIDTH(state)-1);
   }
 
   updatecursor(state, &oldpos, cancel_phantom);
 
-#ifdef DEBUG
-  if(state->pos.row < 0 || state->pos.row >= state->rows ||
-     state->pos.col < 0 || state->pos.col >= state->cols) {
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DEBUG
+  ಆದರೆ(state->pos.ಅಡ್ಡಸಾಲು < 0 || state->pos.ಅಡ್ಡಸಾಲು >= state->ಅಡ್ಡಸಾಲುಗಳು_2 ||
+     state->pos.ಲಂಬಸಾಲು < 0 || state->pos.ಲಂಬಸಾಲು >= state->ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ) {
     fprintf(stderr, "Position out of bounds after CSI %c: (%d,%d)\n",
-        command, state->pos.row, state->pos.col);
+        command, state->pos.ಅಡ್ಡಸಾಲು, state->pos.ಲಂಬಸಾಲು);
     abort();
   }
 
-  if(SCROLLREGION_BOTTOM(state) <= state->scrollregion_top) {
+  ಆದರೆ(SCROLLREGION_BOTTOM(state) <= state->scrollregion_ತುದಿ) {
     fprintf(stderr, "Scroll region height out of bounds after CSI %c: %d <= %d\n",
-        command, SCROLLREGION_BOTTOM(state), state->scrollregion_top);
+        command, SCROLLREGION_BOTTOM(state), state->scrollregion_ತುದಿ);
     abort();
   }
 
-  if(SCROLLREGION_RIGHT(state) <= SCROLLREGION_LEFT(state)) {
+  ಆದರೆ(SCROLLREGION_ಬಲ(state) <= SCROLLREGION_ಎಡ(state)) {
     fprintf(stderr, "Scroll region width out of bounds after CSI %c: %d <= %d\n",
-        command, SCROLLREGION_RIGHT(state), SCROLLREGION_LEFT(state));
+        command, SCROLLREGION_ಬಲ(state), SCROLLREGION_ಎಡ(state));
     abort();
   }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-  return 1;
+  ಹಿಂತಿರುಗಿ 1;
 }
 
-static char base64_one(uint8_t b)
+ಸ್ಥಿರ ಅಕ್ಷರ base64_one(uint8_t b)
 {
-  if(b < 26)
-    return 'A' + b;
-  else if(b < 52)
-    return 'a' + b - 26;
-  else if(b < 62)
-    return '0' + b - 52;
-  else if(b == 62)
-    return '+';
-  else if(b == 63)
-    return '/';
-  return 0;
+  ಆದರೆ(b < 26)
+    ಹಿಂತಿರುಗಿ 'A' + b;
+  ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(b < 52)
+    ಹಿಂತಿರುಗಿ 'a' + b - 26;
+  ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(b < 62)
+    ಹಿಂತಿರುಗಿ '0' + b - 52;
+  ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(b == 62)
+    ಹಿಂತಿರುಗಿ '+';
+  ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(b == 63)
+    ಹಿಂತಿರುಗಿ '/';
+  ಹಿಂತಿರುಗಿ 0;
 }
 
-static uint8_t unbase64one(char c)
+ಸ್ಥಿರ uint8_t unbase64one(ಅಕ್ಷರ c)
 {
-  if(c >= 'A' && c <= 'Z')
-    return c - 'A';
-  else if(c >= 'a' && c <= 'z')
-    return c - 'a' + 26;
-  else if(c >= '0' && c <= '9')
-    return c - '0' + 52;
-  else if(c == '+')
-    return 62;
-  else if(c == '/')
-    return 63;
+  ಆದರೆ(c >= 'A' && c <= 'Z')
+    ಹಿಂತಿರುಗಿ c - 'A';
+  ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(c >= 'a' && c <= 'z')
+    ಹಿಂತಿರುಗಿ c - 'a' + 26;
+  ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(c >= '0' && c <= '9')
+    ಹಿಂತಿರುಗಿ c - '0' + 52;
+  ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(c == '+')
+    ಹಿಂತಿರುಗಿ 62;
+  ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(c == '/')
+    ಹಿಂತಿರುಗಿ 63;
 
-  return 0xFF;
+  ಹಿಂತಿರುಗಿ 0xFF;
 }
 
-static void osc_selection(VTermState *state, VTermStringFragment frag)
+ಸ್ಥಿರ ಶೂನ್ಯ osc_selection(VTermState *state, VTermStringFragment frag)
 {
-  if(frag.initial) {
-    state->tmp.selection.mask = 0;
+  ಆದರೆ(frag.initial) {
+    state->tmp.selection.ಮುಖವಾಡ = 0;
     state->tmp.selection.state = SELECTION_INITIAL;
   }
 
-  while(!state->tmp.selection.state && frag.len) {
+  ಆಗ(!state->tmp.selection.state && frag.len) {
     /* Parse selection parameter */
-    switch(frag.str[0]) {
-      case 'c':
-        state->tmp.selection.mask |= VTERM_SELECTION_CLIPBOARD;
-        break;
-      case 'p':
-        state->tmp.selection.mask |= VTERM_SELECTION_PRIMARY;
-        break;
-      case 'q':
-        state->tmp.selection.mask |= VTERM_SELECTION_SECONDARY;
-        break;
-      case 's':
-        state->tmp.selection.mask |= VTERM_SELECTION_SELECT;
-        break;
-      case '0':
-      case '1':
-      case '2':
-      case '3':
-      case '4':
-      case '5':
-      case '6':
-      case '7':
-        state->tmp.selection.mask |= (VTERM_SELECTION_CUT0 << (frag.str[0] - '0'));
-        break;
+    ಆಯ್ಕೆ(frag.str[0]) {
+      ಸ್ಥಿತಿ 'c':
+        state->tmp.selection.ಮುಖವಾಡ |= VTERM_SELECTION_CLIPBOARD;
+        ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ 'p':
+        state->tmp.selection.ಮುಖವಾಡ |= VTERM_SELECTION_PRIMARY;
+        ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ 'q':
+        state->tmp.selection.ಮುಖವಾಡ |= VTERM_SELECTION_SECONDARY;
+        ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ 's':
+        state->tmp.selection.ಮುಖವಾಡ |= VTERM_SELECTION_SELECT;
+        ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ '0':
+      ಸ್ಥಿತಿ '1':
+      ಸ್ಥಿತಿ '2':
+      ಸ್ಥಿತಿ '3':
+      ಸ್ಥಿತಿ '4':
+      ಸ್ಥಿತಿ '5':
+      ಸ್ಥಿತಿ '6':
+      ಸ್ಥಿತಿ '7':
+        state->tmp.selection.ಮುಖವಾಡ |= (VTERM_SELECTION_CUT0 << (frag.str[0] - '0'));
+        ನಿಲ್ಲಿಸು;
 
-      case ';':
+      ಸ್ಥಿತಿ ';':
         state->tmp.selection.state = SELECTION_SELECTED;
-        if(!state->tmp.selection.mask)
-          state->tmp.selection.mask = VTERM_SELECTION_SELECT|VTERM_SELECTION_CUT0;
-        break;
+        ಆದರೆ(!state->tmp.selection.ಮುಖವಾಡ)
+          state->tmp.selection.ಮುಖವಾಡ = VTERM_SELECTION_SELECT|VTERM_SELECTION_CUT0;
+        ನಿಲ್ಲಿಸು;
     }
 
     frag.str++;
     frag.len--;
   }
 
-  if(!frag.len) {
+  ಆದರೆ(!frag.len) {
     /* Clear selection if we're already finished but didn't do anything */
-    if(frag.final && state->selection.callbacks->set) {
-      (*state->selection.callbacks->set)(state->tmp.selection.mask, (VTermStringFragment){
-              .str     = NULL,
+    ಆದರೆ(frag.final && state->selection.callbacks->ಗಣ_2) {
+      (*state->selection.callbacks->ಗಣ_2)(state->tmp.selection.ಮುಖವಾಡ, (VTermStringFragment){
+              .str     = ಖಾಲಿ,
               .len     = 0,
-              .initial = state->tmp.selection.state != SELECTION_SET,
+              .initial = state->tmp.selection.state != SELECTION_ಗಣ,
               .final   = TRUE,
             }, state->selection.user);
     }
-    return;
+    ಹಿಂತಿರುಗಿ;
   }
 
-  if(state->tmp.selection.state == SELECTION_SELECTED) {
-    if(frag.str[0] == '?') {
+  ಆದರೆ(state->tmp.selection.state == SELECTION_SELECTED) {
+    ಆದರೆ(frag.str[0] == '?') {
       state->tmp.selection.state = SELECTION_QUERY;
     }
-    else {
-      state->tmp.selection.state = SELECTION_SET_INITIAL;
+    ಇಲ್ಲದಿದ್ದರೆ {
+      state->tmp.selection.state = SELECTION_ಗಣ_INITIAL;
       state->tmp.selection.recvpartial = 0;
     }
   }
 
-  if(state->tmp.selection.state == SELECTION_QUERY) {
-    if(state->selection.callbacks->query)
-      (*state->selection.callbacks->query)(state->tmp.selection.mask, state->selection.user);
-    return;
+  ಆದರೆ(state->tmp.selection.state == SELECTION_QUERY) {
+    ಆದರೆ(state->selection.callbacks->query)
+      (*state->selection.callbacks->query)(state->tmp.selection.ಮುಖವಾಡ, state->selection.user);
+    ಹಿಂತಿರುಗಿ;
   }
 
-  if(state->tmp.selection.state == SELECTION_INVALID)
-    return;
+  ಆದರೆ(state->tmp.selection.state == SELECTION_INVALID)
+    ಹಿಂತಿರುಗಿ;
 
-  if(state->selection.callbacks->set) {
+  ಆದರೆ(state->selection.callbacks->ಗಣ_2) {
     size_t bufcur = 0;
-    char *buffer = state->selection.buffer;
+    ಅಕ್ಷರ *ಬಫರ್ = state->selection.ಬಫರ್;
 
     uint32_t x = 0; /* Current decoding value */
-    int n = 0;      /* Number of sextets consumed */
+    ಪೂರ್ಣಾಂಕ n = 0;      /* Number of sextets consumed */
 
-    if(state->tmp.selection.recvpartial) {
+    ಆದರೆ(state->tmp.selection.recvpartial) {
       n = state->tmp.selection.recvpartial >> 24;
       x = state->tmp.selection.recvpartial & 0x03FFFF; /* could be up to 18 bits of state in here */
 
       state->tmp.selection.recvpartial = 0;
     }
 
-    while((state->selection.buflen - bufcur) >= 3 && frag.len) {
-      if(frag.str[0] == '=') {
-        if(n == 2) {
-          buffer[0] = (x >> 4) & 0xFF;
-          buffer += 1, bufcur += 1;
+    ಆಗ((state->selection.buflen - bufcur) >= 3 && frag.len) {
+      ಆದರೆ(frag.str[0] == '=') {
+        ಆದರೆ(n == 2) {
+          ಬಫರ್[0] = (x >> 4) & 0xFF;
+          ಬಫರ್ += 1, bufcur += 1;
         }
-        if(n == 3) {
-          buffer[0] = (x >> 10) & 0xFF;
-          buffer[1] = (x >>  2) & 0xFF;
-          buffer += 2, bufcur += 2;
+        ಆದರೆ(n == 3) {
+          ಬಫರ್[0] = (x >> 10) & 0xFF;
+          ಬಫರ್[1] = (x >>  2) & 0xFF;
+          ಬಫರ್ += 2, bufcur += 2;
         }
 
-        while(frag.len && frag.str[0] == '=')
+        ಆಗ(frag.len && frag.str[0] == '=')
           frag.str++, frag.len--;
 
         n = 0;
       }
-      else {
+      ಇಲ್ಲದಿದ್ದರೆ {
         uint8_t b = unbase64one(frag.str[0]);
-        if(b == 0xFF) {
+        ಆದರೆ(b == 0xFF) {
           DEBUG_LOG1("base64decode bad input %02X\n", (uint8_t)frag.str[0]);
 
           state->tmp.selection.state = SELECTION_INVALID;
-          if(state->selection.callbacks->set) {
-            (*state->selection.callbacks->set)(state->tmp.selection.mask, (VTermStringFragment){
-                .str     = NULL,
+          ಆದರೆ(state->selection.callbacks->ಗಣ_2) {
+            (*state->selection.callbacks->ಗಣ_2)(state->tmp.selection.ಮುಖವಾಡ, (VTermStringFragment){
+                .str     = ಖಾಲಿ,
                 .len     = 0,
                 .initial = TRUE,
                 .final   = TRUE,
                 }, state->selection.user);
           }
-          break;
+          ನಿಲ್ಲಿಸು;
         }
 
         x = (x << 6) | b;
         n++;
         frag.str++, frag.len--;
 
-        if(n == 4) {
-          buffer[0] = (x >> 16) & 0xFF;
-          buffer[1] = (x >>  8) & 0xFF;
-          buffer[2] = (x >>  0) & 0xFF;
+        ಆದರೆ(n == 4) {
+          ಬಫರ್[0] = (x >> 16) & 0xFF;
+          ಬಫರ್[1] = (x >>  8) & 0xFF;
+          ಬಫರ್[2] = (x >>  0) & 0xFF;
 
-          buffer += 3, bufcur += 3;
+          ಬಫರ್ += 3, bufcur += 3;
           x = 0;
           n = 0;
         }
       }
 
-      if(!frag.len || (state->selection.buflen - bufcur) < 3) {
-        if(bufcur) {
+      ಆದರೆ(!frag.len || (state->selection.buflen - bufcur) < 3) {
+        ಆದರೆ(bufcur) {
 	  VTermStringFragment setfrag = {
-	    state->selection.buffer, // str
+	    state->selection.ಬಫರ್, // str
 	    bufcur, // len
-	    state->tmp.selection.state == SELECTION_SET_INITIAL, // initial
+	    state->tmp.selection.state == SELECTION_ಗಣ_INITIAL, // initial
 	    frag.final && !frag.len // final
 	  };
-          (*state->selection.callbacks->set)(state->tmp.selection.mask,
+          (*state->selection.callbacks->ಗಣ_2)(state->tmp.selection.ಮುಖವಾಡ,
 	      setfrag, state->selection.user);
-          state->tmp.selection.state = SELECTION_SET;
+          state->tmp.selection.state = SELECTION_ಗಣ;
         }
 
-        buffer = state->selection.buffer;
+        ಬಫರ್ = state->selection.ಬಫರ್;
         bufcur = 0;
       }
     }
 
-    if(n)
+    ಆದರೆ(n)
       state->tmp.selection.recvpartial = (n << 24) | x;
   }
 }
 
-static int on_osc(int command, VTermStringFragment frag, void *user)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ on_osc(ಪೂರ್ಣಾಂಕ command, VTermStringFragment frag, ಶೂನ್ಯ *user)
 {
   VTermState *state = user;
 
-  switch(command) {
-    case 0:
+  ಆಯ್ಕೆ(command) {
+    ಸ್ಥಿತಿ 0:
       settermprop_string(state, VTERM_PROP_ICONNAME, frag);
       settermprop_string(state, VTERM_PROP_TITLE, frag);
-      return 1;
+      ಹಿಂತಿರುಗಿ 1;
 
-    case 1:
+    ಸ್ಥಿತಿ 1:
       settermprop_string(state, VTERM_PROP_ICONNAME, frag);
-      return 1;
+      ಹಿಂತಿರುಗಿ 1;
 
-    case 2:
+    ಸ್ಥಿತಿ 2:
       settermprop_string(state, VTERM_PROP_TITLE, frag);
-      return 1;
+      ಹಿಂತಿರುಗಿ 1;
 
-    case 10:
+    ಸ್ಥಿತಿ 10:
       {
         // request foreground color: <Esc>]10;?<0x07>
-        int red = state->default_fg.red;
-        int blue = state->default_fg.blue;
-        int green = state->default_fg.green;
-        vterm_push_output_sprintf_ctrl(state->vt, C1_OSC, "10;rgb:%02x%02x/%02x%02x/%02x%02x\x07", red, red, green, green, blue, blue);
-        return 1;
+        ಪೂರ್ಣಾಂಕ red = state->default_fg.red;
+        ಪೂರ್ಣಾಂಕ blue = state->default_fg.blue;
+        ಪೂರ್ಣಾಂಕ green = state->default_fg.green;
+        vterm_ತಳ್ಳು_output_sprintf_ctrl(state->vt, C1_OSC, "10;rgb:%02x%02x/%02x%02x/%02x%02x\x07", red, red, green, green, blue, blue);
+        ಹಿಂತಿರುಗಿ 1;
       }
 
-    case 11:
+    ಸ್ಥಿತಿ 11:
       {
 	// request background color: <Esc>]11;?<0x07>
-	int red = state->default_bg.red;
-	int blue = state->default_bg.blue;
-	int green = state->default_bg.green;
-	vterm_push_output_sprintf_ctrl(state->vt, C1_OSC, "11;rgb:%02x%02x/%02x%02x/%02x%02x\x07", red, red, green, green, blue, blue);
-	return 1;
+	ಪೂರ್ಣಾಂಕ red = state->default_bg.red;
+	ಪೂರ್ಣಾಂಕ blue = state->default_bg.blue;
+	ಪೂರ್ಣಾಂಕ green = state->default_bg.green;
+	vterm_ತಳ್ಳು_output_sprintf_ctrl(state->vt, C1_OSC, "11;rgb:%02x%02x/%02x%02x/%02x%02x\x07", red, red, green, green, blue, blue);
+	ಹಿಂತಿರುಗಿ 1;
       }
-    case 12:
+    ಸ್ಥಿತಿ 12:
       settermprop_string(state, VTERM_PROP_CURSORCOLOR, frag);
-      return 1;
+      ಹಿಂತಿರುಗಿ 1;
 
-    case 52:
-      if(state->selection.callbacks)
+    ಸ್ಥಿತಿ 52:
+      ಆದರೆ(state->selection.callbacks)
         osc_selection(state, frag);
 
-      return 1;
+      ಹಿಂತಿರುಗಿ 1;
 
-    default:
-      if(state->fallbacks && state->fallbacks->osc)
-        if((*state->fallbacks->osc)(command, frag, state->fbdata))
-          return 1;
+    ಪೂರ್ವನಿಯೋಜಿತ:
+      ಆದರೆ(state->fallbacks && state->fallbacks->osc)
+        ಆದರೆ((*state->fallbacks->osc)(command, frag, state->fbdata))
+          ಹಿಂತಿರುಗಿ 1;
   }
 
-  return 0;
+  ಹಿಂತಿರುಗಿ 0;
 }
 
-static void request_status_string(VTermState *state, VTermStringFragment frag)
+ಸ್ಥಿರ ಶೂನ್ಯ request_ಸ್ಥಿತಿ_string(VTermState *state, VTermStringFragment frag)
 {
   VTerm *vt = state->vt;
 
-  char *tmp = state->tmp.decrqss;
+  ಅಕ್ಷರ *tmp = state->tmp.decrqss;
 
-  if(frag.initial)
+  ಆದರೆ(frag.initial)
     tmp[0] = tmp[1] = tmp[2] = tmp[3] = 0;
 
   size_t i = 0;
-  while(i < sizeof(state->tmp.decrqss)-1 && tmp[i])
+  ಆಗ(i < ಗಾತ್ರ(state->tmp.decrqss)-1 && tmp[i])
     i++;
-  while(i < sizeof(state->tmp.decrqss)-1 && frag.len--)
+  ಆಗ(i < ಗಾತ್ರ(state->tmp.decrqss)-1 && frag.len--)
     tmp[i++] = (frag.str++)[0];
   tmp[i] = 0;
 
-  if(!frag.final)
-    return;
+  ಆದರೆ(!frag.final)
+    ಹಿಂತಿರುಗಿ;
 
-  switch(tmp[0] | tmp[1]<<8 | tmp[2]<<16) {
-    case 'm': {
+  ಆಯ್ಕೆ(tmp[0] | tmp[1]<<8 | tmp[2]<<16) {
+    ಸ್ಥಿತಿ 'm': {
       // Query SGR
-      long args[20];
-      int argc = vterm_state_getpen(state, args, sizeof(args)/sizeof(args[0]));
+      ದೀರ್ಘ ವಾದಗಳು[20];
+      ಪೂರ್ಣಾಂಕ argc = vterm_state_getpen(state, ವಾದಗಳು, ಗಾತ್ರ(ವಾದಗಳು)/ಗಾತ್ರ(ವಾದಗಳು[0]));
       size_t cur = 0;
 
       cur += SNPRINTF(vt->tmpbuffer + cur, vt->tmpbuffer_len - cur,
-          vt->mode.ctrl8bit ? "\x90" "1$r" : ESC_S "P" "1$r"); // DCS 1$r ...
-      if(cur >= vt->tmpbuffer_len)
-        return;
+          vt->ಬಹುಲಕ.ctrl8bit ? "\x90" "1$r" : ESC_S "P" "1$r"); // DCS 1$r ...
+      ಆದರೆ(cur >= vt->tmpbuffer_len)
+        ಹಿಂತಿರುಗಿ;
 
-      for(int argi = 0; argi < argc; argi++) {
+      ಗಾಗಿ(ಪೂರ್ಣಾಂಕ argi = 0; argi < argc; argi++) {
         cur += SNPRINTF(vt->tmpbuffer + cur, vt->tmpbuffer_len - cur,
             argi == argc - 1             ? "%ld" :
-            CSI_ARG_HAS_MORE(args[argi]) ? "%ld:" :
+            CSI_ARG_HAS_ಇನ್ನಷ್ಟು(ವಾದಗಳು[argi]) ? "%ld:" :
                                            "%ld;",
-            CSI_ARG(args[argi]));
-        if(cur >= vt->tmpbuffer_len)
-          return;
+            CSI_ARG(ವಾದಗಳು[argi]));
+        ಆದರೆ(cur >= vt->tmpbuffer_len)
+          ಹಿಂತಿರುಗಿ;
       }
 
       cur += SNPRINTF(vt->tmpbuffer + cur, vt->tmpbuffer_len - cur,
-          vt->mode.ctrl8bit ? "m" "\x9C" : "m" ESC_S "\\"); // ... m ST
-      if(cur >= vt->tmpbuffer_len)
-        return;
+          vt->ಬಹುಲಕ.ctrl8bit ? "m" "\x9C" : "m" ESC_S "\\"); // ... m ST
+      ಆದರೆ(cur >= vt->tmpbuffer_len)
+        ಹಿಂತಿರುಗಿ;
 
-      vterm_push_output_bytes(vt, vt->tmpbuffer, cur);
-      return;
+      vterm_ತಳ್ಳು_output_ಬೈಟುಗಳು(vt, vt->tmpbuffer, cur);
+      ಹಿಂತಿರುಗಿ;
     }
 
-    case 'r':
+    ಸ್ಥಿತಿ 'r':
       // Query DECSTBM
-      vterm_push_output_sprintf_str(vt, C1_DCS, TRUE,
-          "1$r%d;%dr", state->scrollregion_top+1, SCROLLREGION_BOTTOM(state));
-      return;
+      vterm_ತಳ್ಳು_output_sprintf_str(vt, C1_DCS, TRUE,
+          "1$r%d;%dr", state->scrollregion_ತುದಿ+1, SCROLLREGION_BOTTOM(state));
+      ಹಿಂತಿರುಗಿ;
 
-    case 's':
+    ಸ್ಥಿತಿ 's':
       // Query DECSLRM
-      vterm_push_output_sprintf_str(vt, C1_DCS, TRUE,
-          "1$r%d;%ds", SCROLLREGION_LEFT(state)+1, SCROLLREGION_RIGHT(state));
-      return;
+      vterm_ತಳ್ಳು_output_sprintf_str(vt, C1_DCS, TRUE,
+          "1$r%d;%ds", SCROLLREGION_ಎಡ(state)+1, SCROLLREGION_ಬಲ(state));
+      ಹಿಂತಿರುಗಿ;
 
-    case ' '|('q'<<8): {
+    ಸ್ಥಿತಿ ' '|('q'<<8): {
       // Query DECSCUSR
-      int reply;
-      switch(state->mode.cursor_shape) {
-        case VTERM_PROP_CURSORSHAPE_BLOCK:     reply = 2; break;
-        case VTERM_PROP_CURSORSHAPE_UNDERLINE: reply = 4; break;
-	default: /* VTERM_PROP_CURSORSHAPE_BAR_LEFT */ reply = 6; break;
+      ಪೂರ್ಣಾಂಕ ಉತ್ತರ;
+      ಆಯ್ಕೆ(state->ಬಹುಲಕ.cursor_shape) {
+        ಸ್ಥಿತಿ VTERM_PROP_CURSORSHAPE_ಖಂಡ:     ಉತ್ತರ = 2; ನಿಲ್ಲಿಸು;
+        ಸ್ಥಿತಿ VTERM_PROP_CURSORSHAPE_UNDERLINE: ಉತ್ತರ = 4; ನಿಲ್ಲಿಸು;
+	ಪೂರ್ವನಿಯೋಜಿತ: /* VTERM_PROP_CURSORSHAPE_BAR_LEFT */ ಉತ್ತರ = 6; ನಿಲ್ಲಿಸು;
       }
-      if(state->mode.cursor_blink)
-        reply--;
-      vterm_push_output_sprintf_str(vt, C1_DCS, TRUE,
-          "1$r%d q", reply);
-      return;
+      ಆದರೆ(state->ಬಹುಲಕ.cursor_blink)
+        ಉತ್ತರ--;
+      vterm_ತಳ್ಳು_output_sprintf_str(vt, C1_DCS, TRUE,
+          "1$r%d q", ಉತ್ತರ);
+      ಹಿಂತಿರುಗಿ;
     }
 
-    case '\"'|('q'<<8):
+    ಸ್ಥಿತಿ '\"'|('q'<<8):
       // Query DECSCA
-      vterm_push_output_sprintf_str(vt, C1_DCS, TRUE,
+      vterm_ತಳ್ಳು_output_sprintf_str(vt, C1_DCS, TRUE,
           "1$r%d\"q", state->protected_cell ? 1 : 2);
-      return;
+      ಹಿಂತಿರುಗಿ;
   }
 
-  vterm_push_output_sprintf_str(state->vt, C1_DCS, TRUE, "0$r");
+  vterm_ತಳ್ಳು_output_sprintf_str(state->vt, C1_DCS, TRUE, "0$r");
 }
 
-static int on_dcs(const char *command, size_t commandlen, VTermStringFragment frag, void *user)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ on_dcs(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *command, size_t commandlen, VTermStringFragment frag, ಶೂನ್ಯ *user)
 {
   VTermState *state = user;
 
-  if(commandlen == 2 && strneq(command, "$q", 2)) {
-    request_status_string(state, frag);
-    return 1;
+  ಆದರೆ(commandlen == 2 && strneq(command, "$q", 2)) {
+    request_ಸ್ಥಿತಿ_string(state, frag);
+    ಹಿಂತಿರುಗಿ 1;
   }
-  else if(state->fallbacks && state->fallbacks->dcs)
-    if((*state->fallbacks->dcs)(command, commandlen, frag, state->fbdata))
-      return 1;
+  ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(state->fallbacks && state->fallbacks->dcs)
+    ಆದರೆ((*state->fallbacks->dcs)(command, commandlen, frag, state->fbdata))
+      ಹಿಂತಿರುಗಿ 1;
 
-  DEBUG_LOG2("libvterm: Unhandled DCS %.*s\n", (int)commandlen, command);
-  return 0;
+  DEBUG_LOG2("libvterm: Unhandled DCS %.*s\n", (ಪೂರ್ಣಾಂಕ)commandlen, command);
+  ಹಿಂತಿರುಗಿ 0;
 }
 
-static int on_apc(VTermStringFragment frag, void *user)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ on_apc(VTermStringFragment frag, ಶೂನ್ಯ *user)
 {
   VTermState *state = user;
 
-  if(state->fallbacks && state->fallbacks->apc)
-    if((*state->fallbacks->apc)(frag, state->fbdata))
-      return 1;
+  ಆದರೆ(state->fallbacks && state->fallbacks->apc)
+    ಆದರೆ((*state->fallbacks->apc)(frag, state->fbdata))
+      ಹಿಂತಿರುಗಿ 1;
 
   /* No DEBUG_LOG because all APCs are unhandled */
-  return 0;
+  ಹಿಂತಿರುಗಿ 0;
 }
 
-static int on_pm(VTermStringFragment frag, void *user)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ on_pm(VTermStringFragment frag, ಶೂನ್ಯ *user)
 {
   VTermState *state = user;
 
-  if(state->fallbacks && state->fallbacks->pm)
-    if((*state->fallbacks->pm)(frag, state->fbdata))
-      return 1;
+  ಆದರೆ(state->fallbacks && state->fallbacks->pm)
+    ಆದರೆ((*state->fallbacks->pm)(frag, state->fbdata))
+      ಹಿಂತಿರುಗಿ 1;
 
   /* No DEBUG_LOG because all PMs are unhandled */
-  return 0;
+  ಹಿಂತಿರುಗಿ 0;
 }
 
-static int on_sos(VTermStringFragment frag, void *user)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ on_sos(VTermStringFragment frag, ಶೂನ್ಯ *user)
 {
   VTermState *state = user;
 
-  if(state->fallbacks && state->fallbacks->sos)
-    if((*state->fallbacks->sos)(frag, state->fbdata))
-      return 1;
+  ಆದರೆ(state->fallbacks && state->fallbacks->sos)
+    ಆದರೆ((*state->fallbacks->sos)(frag, state->fbdata))
+      ಹಿಂತಿರುಗಿ 1;
 
   /* No DEBUG_LOG because all SOSs are unhandled */
-  return 0;
+  ಹಿಂತಿರುಗಿ 0;
 }
 
-static int on_resize(int rows, int cols, void *user)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ on_resize(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು_2, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, ಶೂನ್ಯ *user)
 {
   VTermState *state = user;
   VTermPos oldpos = state->pos;
 
-  if (cols > VTERM_MAX_COLS)
-    cols = VTERM_MAX_COLS;
+  ಆದರೆ (ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ > VTERM_MAX_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ)
+    ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = VTERM_MAX_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
 
-  if (rows > VTERM_MAX_ROWS)
-    rows = VTERM_MAX_ROWS;
+  ಆದರೆ (ಅಡ್ಡಸಾಲುಗಳು_2 > VTERM_MAX_ಅಡ್ಡಸಾಲುಗಳು)
+    ಅಡ್ಡಸಾಲುಗಳು_2 = VTERM_MAX_ಅಡ್ಡಸಾಲುಗಳು;
 
-  if(cols != state->cols) {
-    unsigned char *newtabstops = vterm_allocator_malloc(state->vt, (cols + 7) / 8);
-    if (newtabstops == NULL)
-      return 0;
+  ಆದರೆ(ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ != state->ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ) {
+    ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ *newtabstops = vterm_allocator_malloc(state->vt, (ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ + 7) / 8);
+    ಆದರೆ (newtabstops == ಖಾಲಿ)
+      ಹಿಂತಿರುಗಿ 0;
 
     /* TODO: This can all be done much more efficiently bytewise */
-    int col;
-    for(col = 0; col < state->cols && col < cols; col++) {
-      unsigned char mask = 1 << (col & 7);
-      if(state->tabstops[col >> 3] & mask)
-        newtabstops[col >> 3] |= mask;
-      else
-        newtabstops[col >> 3] &= ~mask;
+    ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು;
+    ಗಾಗಿ(ಲಂಬಸಾಲು = 0; ಲಂಬಸಾಲು < state->ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ && ಲಂಬಸಾಲು < ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ; ಲಂಬಸಾಲು++) {
+      ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ ಮುಖವಾಡ = 1 << (ಲಂಬಸಾಲು & 7);
+      ಆದರೆ(state->tabstops[ಲಂಬಸಾಲು >> 3] & ಮುಖವಾಡ)
+        newtabstops[ಲಂಬಸಾಲು >> 3] |= ಮುಖವಾಡ;
+      ಇಲ್ಲದಿದ್ದರೆ
+        newtabstops[ಲಂಬಸಾಲು >> 3] &= ~ಮುಖವಾಡ;
       }
 
-    for( ; col < cols; col++) {
-      unsigned char mask = 1 << (col & 7);
-      if(col % 8 == 0)
-        newtabstops[col >> 3] |= mask;
-      else
-        newtabstops[col >> 3] &= ~mask;
+    ಗಾಗಿ( ; ಲಂಬಸಾಲು < ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ; ಲಂಬಸಾಲು++) {
+      ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ ಮುಖವಾಡ = 1 << (ಲಂಬಸಾಲು & 7);
+      ಆದರೆ(ಲಂಬಸಾಲು % 8 == 0)
+        newtabstops[ಲಂಬಸಾಲು >> 3] |= ಮುಖವಾಡ;
+      ಇಲ್ಲದಿದ್ದರೆ
+        newtabstops[ಲಂಬಸಾಲು >> 3] &= ~ಮುಖವಾಡ;
     }
 
     vterm_allocator_free(state->vt, state->tabstops);
     state->tabstops = newtabstops;
   }
 
-  state->rows = rows;
-  state->cols = cols;
+  state->ಅಡ್ಡಸಾಲುಗಳು_2 = ಅಡ್ಡಸಾಲುಗಳು_2;
+  state->ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
 
-  if(state->scrollregion_bottom > -1)
-    UBOUND(state->scrollregion_bottom, state->rows);
-  if(state->scrollregion_right > -1)
-    UBOUND(state->scrollregion_right, state->cols);
+  ಆದರೆ(state->scrollregion_bottom > -1)
+    UBOUND(state->scrollregion_bottom, state->ಅಡ್ಡಸಾಲುಗಳು_2);
+  ಆದರೆ(state->scrollregion_ಬಲ > -1)
+    UBOUND(state->scrollregion_ಬಲ, state->ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ);
 
   // The near edges need clamping as well, otherwise a scroll region that
   // was set before the terminal was made smaller can start past the last
   // row or column.  Drop a region that no longer makes sense, just like
   // DECSTBM and DECSLRM do when it is set.
-  UBOUND(state->scrollregion_top, state->rows);
-  UBOUND(state->scrollregion_left, state->cols);
-  if(SCROLLREGION_BOTTOM(state) <= state->scrollregion_top) {
-    state->scrollregion_top = 0;
+  UBOUND(state->scrollregion_ತುದಿ, state->ಅಡ್ಡಸಾಲುಗಳು_2);
+  UBOUND(state->scrollregion_ಎಡ, state->ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ);
+  ಆದರೆ(SCROLLREGION_BOTTOM(state) <= state->scrollregion_ತುದಿ) {
+    state->scrollregion_ತುದಿ = 0;
     state->scrollregion_bottom = -1;
   }
-  if(SCROLLREGION_RIGHT(state) <= state->scrollregion_left) {
-    state->scrollregion_left = 0;
-    state->scrollregion_right = -1;
+  ಆದರೆ(SCROLLREGION_ಬಲ(state) <= state->scrollregion_ಎಡ) {
+    state->scrollregion_ಎಡ = 0;
+    state->scrollregion_ಬಲ = -1;
   }
 
   VTermStateFields fields;
@@ -2204,29 +2204,29 @@ static int on_resize(int rows, int cols, void *user)
   fields.lineinfos[0] = state->lineinfos[0];
   fields.lineinfos[1] = state->lineinfos[1];
 
-  if(state->callbacks && state->callbacks->resize) {
-    (*state->callbacks->resize)(rows, cols, &fields, state->cbdata);
+  ಆದರೆ(state->callbacks && state->callbacks->resize) {
+    (*state->callbacks->resize)(ಅಡ್ಡಸಾಲುಗಳು_2, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, &fields, state->cbdata);
     state->pos = fields.pos;
 
     state->lineinfos[0] = fields.lineinfos[0];
     state->lineinfos[1] = fields.lineinfos[1];
   }
-  else {
-    if(rows != state->rows) {
-      for(int bufidx = BUFIDX_PRIMARY; bufidx <= BUFIDX_ALTSCREEN; bufidx++) {
-        VTermLineInfo *oldlineinfo = state->lineinfos[bufidx];
-        if(!oldlineinfo)
-          continue;
+  ಇಲ್ಲದಿದ್ದರೆ {
+    ಆದರೆ(ಅಡ್ಡಸಾಲುಗಳು_2 != state->ಅಡ್ಡಸಾಲುಗಳು_2) {
+      ಗಾಗಿ(ಪೂರ್ಣಾಂಕ bufidx = BUFIDX_PRIMARY; bufidx <= BUFIDX_ALTSCREEN; bufidx++) {
+        VTerm_ಸಾಲು_Info *oldlineinfo = state->lineinfos[bufidx];
+        ಆದರೆ(!oldlineinfo)
+          ಮುಂದುವರಿ;
 
-        VTermLineInfo *newlineinfo = vterm_allocator_malloc(state->vt, rows * sizeof(VTermLineInfo));
+        VTerm_ಸಾಲು_Info *newlineinfo = vterm_allocator_malloc(state->vt, ಅಡ್ಡಸಾಲುಗಳು_2 * ಗಾತ್ರ(VTerm_ಸಾಲು_Info));
 
-        int row;
-        for(row = 0; row < state->rows && row < rows; row++) {
-          newlineinfo[row] = oldlineinfo[row];
+        ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು;
+        ಗಾಗಿ(ಅಡ್ಡಸಾಲು = 0; ಅಡ್ಡಸಾಲು < state->ಅಡ್ಡಸಾಲುಗಳು_2 && ಅಡ್ಡಸಾಲು < ಅಡ್ಡಸಾಲುಗಳು_2; ಅಡ್ಡಸಾಲು++) {
+          newlineinfo[ಅಡ್ಡಸಾಲು] = oldlineinfo[ಅಡ್ಡಸಾಲು];
         }
 
-        for( ; row < rows; row++) {
-          newlineinfo[row] = (VTermLineInfo){
+        ಗಾಗಿ( ; ಅಡ್ಡಸಾಲು < ಅಡ್ಡಸಾಲುಗಳು_2; ಅಡ್ಡಸಾಲು++) {
+          newlineinfo[ಅಡ್ಡಸಾಲು] = (VTerm_ಸಾಲು_Info){
             .doublewidth = 0,
           };
         }
@@ -2237,29 +2237,29 @@ static int on_resize(int rows, int cols, void *user)
     }
   }
 
-  state->lineinfo = state->lineinfos[state->mode.alt_screen ? BUFIDX_ALTSCREEN : BUFIDX_PRIMARY];
+  state->lineinfo = state->lineinfos[state->ಬಹುಲಕ.alt_screen ? BUFIDX_ALTSCREEN : BUFIDX_PRIMARY];
 
-  if(state->at_phantom && state->pos.col < cols-1) {
+  ಆದರೆ(state->at_phantom && state->pos.ಲಂಬಸಾಲು < ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ-1) {
     state->at_phantom = 0;
-    state->pos.col++;
+    state->pos.ಲಂಬಸಾಲು++;
   }
 
-  if(state->pos.row < 0)
-    state->pos.row = 0;
-  if(state->pos.row >= rows)
-    state->pos.row = rows - 1;
-  if(state->pos.col < 0)
-    state->pos.col = 0;
-  if(state->pos.col >= cols)
-    state->pos.col = cols - 1;
+  ಆದರೆ(state->pos.ಅಡ್ಡಸಾಲು < 0)
+    state->pos.ಅಡ್ಡಸಾಲು = 0;
+  ಆದರೆ(state->pos.ಅಡ್ಡಸಾಲು >= ಅಡ್ಡಸಾಲುಗಳು_2)
+    state->pos.ಅಡ್ಡಸಾಲು = ಅಡ್ಡಸಾಲುಗಳು_2 - 1;
+  ಆದರೆ(state->pos.ಲಂಬಸಾಲು < 0)
+    state->pos.ಲಂಬಸಾಲು = 0;
+  ಆದರೆ(state->pos.ಲಂಬಸಾಲು >= ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ)
+    state->pos.ಲಂಬಸಾಲು = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ - 1;
 
   updatecursor(state, &oldpos, 1);
 
-  return 1;
+  ಹಿಂತಿರುಗಿ 1;
 }
 
-static const VTermParserCallbacks parser_callbacks = {
-  on_text, // text
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ VTermParserCallbacks parser_callbacks = {
+  on_ಪಠ್ಯ, //ಪಠ್ಯ
   on_control, // control
   on_escape, // escape
   on_csi, // csi
@@ -2277,305 +2277,305 @@ static const VTermParserCallbacks parser_callbacks = {
  */
 VTermState *vterm_obtain_state(VTerm *vt)
 {
-  if(vt->state)
-    return vt->state;
+  ಆದರೆ(vt->state)
+    ಹಿಂತಿರುಗಿ vt->state;
 
   VTermState *state = vterm_state_new(vt);
-  if (state == NULL)
-    return NULL;
+  ಆದರೆ (state == ಖಾಲಿ)
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
   vt->state = state;
 
-  vterm_parser_set_callbacks(vt, &parser_callbacks, state);
+  vterm_parser_ಗಣ_callbacks(vt, &parser_callbacks, state);
 
-  return state;
+  ಹಿಂತಿರುಗಿ state;
 }
 
-void vterm_state_reset(VTermState *state, int hard)
+ಶೂನ್ಯ vterm_state_reset(VTermState *state, ಪೂರ್ಣಾಂಕ hard)
 {
-  state->scrollregion_top = 0;
+  state->scrollregion_ತುದಿ = 0;
   state->scrollregion_bottom = -1;
-  state->scrollregion_left = 0;
-  state->scrollregion_right = -1;
+  state->scrollregion_ಎಡ = 0;
+  state->scrollregion_ಬಲ = -1;
 
-  state->mode.keypad          = 0;
-  state->mode.cursor          = 0;
-  state->mode.autowrap        = 1;
-  state->mode.insert          = 0;
-  state->mode.newline         = 0;
-  state->mode.alt_screen      = 0;
-  state->mode.origin          = 0;
-  state->mode.leftrightmargin = 0;
-  state->mode.bracketpaste    = 0;
-  state->mode.report_focus    = 0;
+  state->ಬಹುಲಕ.keypad          = 0;
+  state->ಬಹುಲಕ.cursor          = 0;
+  state->ಬಹುಲಕ.autowrap        = 1;
+  state->ಬಹುಲಕ.ಸೇರಿಸು          = 0;
+  state->ಬಹುಲಕ.newline         = 0;
+  state->ಬಹುಲಕ.alt_screen      = 0;
+  state->ಬಹುಲಕ.origin          = 0;
+  state->ಬಹುಲಕ.leftrightmargin = 0;
+  state->ಬಹುಲಕ.bracketpaste    = 0;
+  state->ಬಹುಲಕ.report_focus    = 0;
 
   state->mouse_flags = 0;
 
-  state->vt->mode.ctrl8bit   = 0;
+  state->vt->ಬಹುಲಕ.ctrl8bit   = 0;
 
-  for(int col = 0; col < state->cols; col++)
-    if(col % 8 == 0)
-      set_col_tabstop(state, col);
-    else
-      clear_col_tabstop(state, col);
+  ಗಾಗಿ(ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು = 0; ಲಂಬಸಾಲು < state->ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ; ಲಂಬಸಾಲು++)
+    ಆದರೆ(ಲಂಬಸಾಲು % 8 == 0)
+      ಗಣ_ಲಂಬಸಾಲು_tabstop(state, ಲಂಬಸಾಲು);
+    ಇಲ್ಲದಿದ್ದರೆ
+      clear_ಲಂಬಸಾಲು_tabstop(state, ಲಂಬಸಾಲು);
 
-  for(int row = 0; row < state->rows; row++)
-    set_lineinfo(state, row, FORCE, DWL_OFF, DHL_OFF);
+  ಗಾಗಿ(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು = 0; ಅಡ್ಡಸಾಲು < state->ಅಡ್ಡಸಾಲುಗಳು_2; ಅಡ್ಡಸಾಲು++)
+    ಗಣ_lineinfo(state, ಅಡ್ಡಸಾಲು, FORCE, DWL_OFF, DHL_OFF);
 
-  if(state->callbacks && state->callbacks->initpen)
+  ಆದರೆ(state->callbacks && state->callbacks->initpen)
     (*state->callbacks->initpen)(state->cbdata);
 
   vterm_state_resetpen(state);
 
-  VTermEncoding *default_enc = state->vt->mode.utf8 ?
+  VTermEncoding *default_enc = state->vt->ಬಹುಲಕ.utf8 ?
       vterm_lookup_encoding(ENC_UTF8,      'u') :
       vterm_lookup_encoding(ENC_SINGLE_94, 'B');
 
-  for(int i = 0; i < 4; i++) {
+  ಗಾಗಿ(ಪೂರ್ಣಾಂಕ i = 0; i < 4; i++) {
     state->encoding[i].enc = default_enc;
-    if(default_enc->init)
-      (*default_enc->init)(default_enc, state->encoding[i].data);
+    ಆದರೆ(default_enc->init)
+      (*default_enc->init)(default_enc, state->encoding[i].ದತ್ತಾಂಶ);
   }
 
-  state->gl_set = 0;
-  state->gr_set = 1;
-  state->gsingle_set = 0;
+  state->gl_ಗಣ = 0;
+  state->gr_ಗಣ = 1;
+  state->gsingle_ಗಣ = 0;
 
   state->protected_cell = 0;
 
   // Initialise the props
   settermprop_bool(state, VTERM_PROP_CURSORVISIBLE, 1);
   settermprop_bool(state, VTERM_PROP_CURSORBLINK,   1);
-  settermprop_int (state, VTERM_PROP_CURSORSHAPE,   VTERM_PROP_CURSORSHAPE_BLOCK);
+  settermprop_int (state, VTERM_PROP_CURSORSHAPE,   VTERM_PROP_CURSORSHAPE_ಖಂಡ);
 
-  if(hard) {
-    state->pos.row = 0;
-    state->pos.col = 0;
+  ಆದರೆ(hard) {
+    state->pos.ಅಡ್ಡಸಾಲು = 0;
+    state->pos.ಲಂಬಸಾಲು = 0;
     state->at_phantom = 0;
 
     VTermRect rect = { 0, 0, 0, 0 };
-    rect.end_row = state->rows;
-    rect.end_col =  state->cols;
+    rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು = state->ಅಡ್ಡಸಾಲುಗಳು_2;
+    rect.ಕೊನೆ_ಲಂಬಸಾಲು =  state->ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
     erase(state, rect, 0);
   }
 }
 
-void vterm_state_get_cursorpos(const VTermState *state, VTermPos *cursorpos)
+ಶೂನ್ಯ vterm_state_get_cursorpos(ಸ್ಥಿರಾಂಕ VTermState *state, VTermPos *cursorpos)
 {
   *cursorpos = state->pos;
 }
 
-void vterm_state_get_mousestate(const VTermState *state, VTermMouseState *mousestate)
+ಶೂನ್ಯ vterm_state_get_mousestate(ಸ್ಥಿರಾಂಕ VTermState *state, VTermMouseState *mousestate)
 {
-  mousestate->pos.col = state->mouse_col;
-  mousestate->pos.row = state->mouse_row;
+  mousestate->pos.ಲಂಬಸಾಲು = state->mouse_ಲಂಬಸಾಲು;
+  mousestate->pos.ಅಡ್ಡಸಾಲು = state->mouse_ಅಡ್ಡಸಾಲು;
   mousestate->buttons = state->mouse_buttons;
   mousestate->flags = state->mouse_flags;
 }
 
-void vterm_state_set_callbacks(VTermState *state, const VTermStateCallbacks *callbacks, void *user)
+ಶೂನ್ಯ vterm_state_ಗಣ_callbacks(VTermState *state, ಸ್ಥಿರಾಂಕ VTermStateCallbacks *callbacks, ಶೂನ್ಯ *user)
 {
-  if(callbacks) {
+  ಆದರೆ(callbacks) {
     state->callbacks = callbacks;
     state->cbdata = user;
 
-    if(state->callbacks && state->callbacks->initpen)
+    ಆದರೆ(state->callbacks && state->callbacks->initpen)
       (*state->callbacks->initpen)(state->cbdata);
   }
-  else {
-    state->callbacks = NULL;
-    state->cbdata = NULL;
+  ಇಲ್ಲದಿದ್ದರೆ {
+    state->callbacks = ಖಾಲಿ;
+    state->cbdata = ಖಾಲಿ;
   }
 }
 
-void vterm_state_callbacks_has_premove(VTermState *state)
+ಶೂನ್ಯ vterm_state_callbacks_has_premove(VTermState *state)
 {
   state->callbacks_has_premove = 1;
 }
 
-void *vterm_state_get_cbdata(VTermState *state)
+ಶೂನ್ಯ *vterm_state_get_cbdata(VTermState *state)
 {
-  return state->cbdata;
+  ಹಿಂತಿರುಗಿ state->cbdata;
 }
 
-void vterm_state_set_unrecognised_fallbacks(VTermState *state, const VTermStateFallbacks *fallbacks, void *user)
+ಶೂನ್ಯ vterm_state_ಗಣ_unrecognised_fallbacks(VTermState *state, ಸ್ಥಿರಾಂಕ VTermStateFallbacks *fallbacks, ಶೂನ್ಯ *user)
 {
-  if(fallbacks) {
+  ಆದರೆ(fallbacks) {
     state->fallbacks = fallbacks;
     state->fbdata = user;
   }
-  else {
-    state->fallbacks = NULL;
-    state->fbdata = NULL;
+  ಇಲ್ಲದಿದ್ದರೆ {
+    state->fallbacks = ಖಾಲಿ;
+    state->fbdata = ಖಾಲಿ;
   }
 }
 
-void *vterm_state_get_unrecognised_fbdata(VTermState *state)
+ಶೂನ್ಯ *vterm_state_get_unrecognised_fbdata(VTermState *state)
 {
-  return state->fbdata;
+  ಹಿಂತಿರುಗಿ state->fbdata;
 }
 
-int vterm_state_set_termprop(VTermState *state, VTermProp prop, VTermValue *val)
+ಪೂರ್ಣಾಂಕ vterm_state_ಗಣ_termprop(VTermState *state, VTermProp prop, VTerm_ಮೌಲ್ಯ *val)
 {
   /* Only store the new value of the property if usercode said it was happy.
    * This is especially important for altscreen switching */
-  if(state->callbacks && state->callbacks->settermprop)
-    if(!(*state->callbacks->settermprop)(prop, val, state->cbdata))
-      return 0;
+  ಆದರೆ(state->callbacks && state->callbacks->settermprop)
+    ಆದರೆ(!(*state->callbacks->settermprop)(prop, val, state->cbdata))
+      ಹಿಂತಿರುಗಿ 0;
 
-  switch(prop) {
-  case VTERM_PROP_TITLE:
-  case VTERM_PROP_ICONNAME:
-  case VTERM_PROP_CURSORCOLOR:
+  ಆಯ್ಕೆ(prop) {
+  ಸ್ಥಿತಿ VTERM_PROP_TITLE:
+  ಸ್ಥಿತಿ VTERM_PROP_ICONNAME:
+  ಸ್ಥಿತಿ VTERM_PROP_CURSORCOLOR:
     // we don't store these, just transparently pass through
-    return 1;
-  case VTERM_PROP_CURSORVISIBLE:
-    state->mode.cursor_visible = val->boolean;
-    return 1;
-  case VTERM_PROP_CURSORBLINK:
-    state->mode.cursor_blink = val->boolean;
-    return 1;
-  case VTERM_PROP_CURSORSHAPE:
-    state->mode.cursor_shape = val->number;
-    return 1;
-  case VTERM_PROP_REVERSE:
-    state->mode.screen = val->boolean;
-    return 1;
-  case VTERM_PROP_ALTSCREEN:
-    state->mode.alt_screen = val->boolean;
-    state->lineinfo = state->lineinfos[state->mode.alt_screen ? BUFIDX_ALTSCREEN : BUFIDX_PRIMARY];
-    if(state->mode.alt_screen) {
+    ಹಿಂತಿರುಗಿ 1;
+  ಸ್ಥಿತಿ VTERM_PROP_CURSORVISIBLE:
+    state->ಬಹುಲಕ.cursor_visible = val->boolean;
+    ಹಿಂತಿರುಗಿ 1;
+  ಸ್ಥಿತಿ VTERM_PROP_CURSORBLINK:
+    state->ಬಹುಲಕ.cursor_blink = val->boolean;
+    ಹಿಂತಿರುಗಿ 1;
+  ಸ್ಥಿತಿ VTERM_PROP_CURSORSHAPE:
+    state->ಬಹುಲಕ.cursor_shape = val->ಸಂಖ್ಯೆ;
+    ಹಿಂತಿರುಗಿ 1;
+  ಸ್ಥಿತಿ VTERM_PROP_ಹಿಮ್ಮುಖ:
+    state->ಬಹುಲಕ.screen = val->boolean;
+    ಹಿಂತಿರುಗಿ 1;
+  ಸ್ಥಿತಿ VTERM_PROP_ALTSCREEN:
+    state->ಬಹುಲಕ.alt_screen = val->boolean;
+    state->lineinfo = state->lineinfos[state->ಬಹುಲಕ.alt_screen ? BUFIDX_ALTSCREEN : BUFIDX_PRIMARY];
+    ಆದರೆ(state->ಬಹುಲಕ.alt_screen) {
       VTermRect rect = {0, 0, 0, 0};
-      rect.end_row = state->rows;
-      rect.end_col = state->cols;
+      rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು = state->ಅಡ್ಡಸಾಲುಗಳು_2;
+      rect.ಕೊನೆ_ಲಂಬಸಾಲು = state->ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
       erase(state, rect, 0);
     }
-    return 1;
-  case VTERM_PROP_MOUSE:
+    ಹಿಂತಿರುಗಿ 1;
+  ಸ್ಥಿತಿ VTERM_PROP_MOUSE:
     state->mouse_flags = 0;
-    if(val->number)
+    ಆದರೆ(val->ಸಂಖ್ಯೆ)
       state->mouse_flags |= MOUSE_WANT_CLICK;
-    if(val->number == VTERM_PROP_MOUSE_DRAG)
+    ಆದರೆ(val->ಸಂಖ್ಯೆ == VTERM_PROP_MOUSE_DRAG)
       state->mouse_flags |= MOUSE_WANT_DRAG;
-    if(val->number == VTERM_PROP_MOUSE_MOVE)
+    ಆದರೆ(val->ಸಂಖ್ಯೆ == VTERM_PROP_MOUSE_MOVE)
       state->mouse_flags |= MOUSE_WANT_MOVE;
-    return 1;
-  case VTERM_PROP_FOCUSREPORT:
-    state->mode.report_focus = val->boolean;
-    return 1;
+    ಹಿಂತಿರುಗಿ 1;
+  ಸ್ಥಿತಿ VTERM_PROP_FOCUSREPORT:
+    state->ಬಹುಲಕ.report_focus = val->boolean;
+    ಹಿಂತಿರುಗಿ 1;
 
-  case VTERM_N_PROPS:
-    return 0;
+  ಸ್ಥಿತಿ VTERM_N_PROPS:
+    ಹಿಂತಿರುಗಿ 0;
   }
 
-  return 0;
+  ಹಿಂತಿರುಗಿ 0;
 }
 
-void vterm_state_focus_in(VTermState *state)
+ಶೂನ್ಯ vterm_state_focus_ಒಳ(VTermState *state)
 {
-  if(state->mode.report_focus)
-    vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "I");
+  ಆದರೆ(state->ಬಹುಲಕ.report_focus)
+    vterm_ತಳ್ಳು_output_sprintf_ctrl(state->vt, C1_CSI, "I");
 }
 
-void vterm_state_focus_out(VTermState *state)
+ಶೂನ್ಯ vterm_state_focus_ಹೊರಹೋಗು(VTermState *state)
 {
-  if(state->mode.report_focus)
-    vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "O");
+  ಆದರೆ(state->ಬಹುಲಕ.report_focus)
+    vterm_ತಳ್ಳು_output_sprintf_ctrl(state->vt, C1_CSI, "O");
 }
 
-const VTermLineInfo *vterm_state_get_lineinfo(const VTermState *state, int row)
+ಸ್ಥಿರಾಂಕ VTerm_ಸಾಲು_Info *vterm_state_get_lineinfo(ಸ್ಥಿರಾಂಕ VTermState *state, ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು)
 {
-  return state->lineinfo + row;
+  ಹಿಂತಿರುಗಿ state->lineinfo + ಅಡ್ಡಸಾಲು;
 }
 
-void vterm_state_set_selection_callbacks(VTermState *state, const VTermSelectionCallbacks *callbacks, void *user,
-    char *buffer, size_t buflen)
+ಶೂನ್ಯ vterm_state_ಗಣ_selection_callbacks(VTermState *state, ಸ್ಥಿರಾಂಕ VTermSelectionCallbacks *callbacks, ಶೂನ್ಯ *user,
+    ಅಕ್ಷರ *ಬಫರ್, size_t buflen)
 {
-  if(buflen && !buffer)
-    buffer = vterm_allocator_malloc(state->vt, buflen);
+  ಆದರೆ(buflen && !ಬಫರ್)
+    ಬಫರ್ = vterm_allocator_malloc(state->vt, buflen);
 
   state->selection.callbacks = callbacks;
   state->selection.user      = user;
-  state->selection.buffer    = buffer;
+  state->selection.ಬಫರ್    = ಬಫರ್;
   state->selection.buflen    = buflen;
 }
 
-void vterm_state_send_selection(VTermState *state, VTermSelectionMask mask, VTermStringFragment frag)
+ಶೂನ್ಯ vterm_state_send_selection(VTermState *state, VTerm_Selection_ಮುಖವಾಡ ಮುಖವಾಡ, VTermStringFragment frag)
 {
   VTerm *vt = state->vt;
 
-  if(frag.initial) {
+  ಆದರೆ(frag.initial) {
     /* TODO: support sending more than one mask bit */
-    static char selection_chars[] = "cpqs";
-    int idx;
-    for(idx = 0; idx < 4; idx++)
-      if(mask & (1 << idx))
-        break;
+    ಸ್ಥಿರ ಅಕ್ಷರ selection_chars[] = "cpqs";
+    ಪೂರ್ಣಾಂಕ idx;
+    ಗಾಗಿ(idx = 0; idx < 4; idx++)
+      ಆದರೆ(ಮುಖವಾಡ & (1 << idx))
+        ನಿಲ್ಲಿಸು;
 
-    vterm_push_output_sprintf_str(vt, C1_OSC, FALSE, "52;%c;", selection_chars[idx]);
+    vterm_ತಳ್ಳು_output_sprintf_str(vt, C1_OSC, FALSE, "52;%c;", selection_chars[idx]);
 
     state->tmp.selection.sendpartial = 0;
   }
 
-  if(frag.len) {
+  ಆದರೆ(frag.len) {
     size_t bufcur = 0;
-    char *buffer = state->selection.buffer;
+    ಅಕ್ಷರ *ಬಫರ್ = state->selection.ಬಫರ್;
 
     uint32_t x = 0;
-    int n = 0;
+    ಪೂರ್ಣಾಂಕ n = 0;
 
-    if(state->tmp.selection.sendpartial) {
+    ಆದರೆ(state->tmp.selection.sendpartial) {
       n = state->tmp.selection.sendpartial >> 24;
       x = state->tmp.selection.sendpartial & 0xFFFFFF;
 
       state->tmp.selection.sendpartial = 0;
     }
 
-    while((state->selection.buflen - bufcur) >= 4 && frag.len) {
+    ಆಗ((state->selection.buflen - bufcur) >= 4 && frag.len) {
       x = (x << 8) | frag.str[0];
       n++;
       frag.str++, frag.len--;
 
-      if(n == 3) {
-        buffer[0] = base64_one((x >> 18) & 0x3F);
-        buffer[1] = base64_one((x >> 12) & 0x3F);
-        buffer[2] = base64_one((x >>  6) & 0x3F);
-        buffer[3] = base64_one((x >>  0) & 0x3F);
+      ಆದರೆ(n == 3) {
+        ಬಫರ್[0] = base64_one((x >> 18) & 0x3F);
+        ಬಫರ್[1] = base64_one((x >> 12) & 0x3F);
+        ಬಫರ್[2] = base64_one((x >>  6) & 0x3F);
+        ಬಫರ್[3] = base64_one((x >>  0) & 0x3F);
 
-        buffer += 4, bufcur += 4;
+        ಬಫರ್ += 4, bufcur += 4;
         x = 0;
         n = 0;
       }
 
-      if(!frag.len || (state->selection.buflen - bufcur) < 4) {
-        if(bufcur)
-          vterm_push_output_bytes(vt, state->selection.buffer, bufcur);
+      ಆದರೆ(!frag.len || (state->selection.buflen - bufcur) < 4) {
+        ಆದರೆ(bufcur)
+          vterm_ತಳ್ಳು_output_ಬೈಟುಗಳು(vt, state->selection.ಬಫರ್, bufcur);
 
-        buffer = state->selection.buffer;
+        ಬಫರ್ = state->selection.ಬಫರ್;
         bufcur = 0;
       }
     }
 
-    if(n)
+    ಆದರೆ(n)
       state->tmp.selection.sendpartial = (n << 24) | x;
   }
 
-  if(frag.final) {
-    if(state->tmp.selection.sendpartial) {
-      int n      = state->tmp.selection.sendpartial >> 24;
+  ಆದರೆ(frag.final) {
+    ಆದರೆ(state->tmp.selection.sendpartial) {
+      ಪೂರ್ಣಾಂಕ n      = state->tmp.selection.sendpartial >> 24;
       uint32_t x = state->tmp.selection.sendpartial & 0xFFFFFF;
-      char *buffer = state->selection.buffer;
+      ಅಕ್ಷರ *ಬಫರ್ = state->selection.ಬಫರ್;
 
       /* n is either 1 or 2 now */
       x <<= (n == 1) ? 16 : 8;
 
-      buffer[0] = base64_one((x >> 18) & 0x3F);
-      buffer[1] = base64_one((x >> 12) & 0x3F);
-      buffer[2] = (n == 1) ? '=' : base64_one((x >>  6) & 0x3F);
-      buffer[3] = '=';
+      ಬಫರ್[0] = base64_one((x >> 18) & 0x3F);
+      ಬಫರ್[1] = base64_one((x >> 12) & 0x3F);
+      ಬಫರ್[2] = (n == 1) ? '=' : base64_one((x >>  6) & 0x3F);
+      ಬಫರ್[3] = '=';
 
-      vterm_push_output_sprintf_str(vt, 0, TRUE, "%.*s", 4, buffer);
+      vterm_ತಳ್ಳು_output_sprintf_str(vt, 0, TRUE, "%.*s", 4, ಬಫರ್);
     }
-    else
-      vterm_push_output_sprintf_str(vt, 0, TRUE, "");
+    ಇಲ್ಲದಿದ್ದರೆ
+      vterm_ತಳ್ಳು_output_sprintf_str(vt, 0, TRUE, "");
   }
 }

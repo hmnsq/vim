@@ -20,71 +20,71 @@
  *
  */
 
-#include "xinclude.h"
+#ಅನ್ತರ್ಭಾವ "xinclude.h"
 
 
-#define XDL_KPDIS_RUN 4
-#define XDL_MAX_EQLIMIT 1024
-#define XDL_SIMSCAN_WINDOW 100
-#define XDL_GUESS_NLINES1 256
-#define XDL_GUESS_NLINES2 20
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_KPDIS_ಸತತ 4
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_MAX_EQLIMIT 1024
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_SIMSCAN_ಕಿಟಕಿ 100
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_GUESS_NLINES1 256
+#ವ್ಯಾಖ್ಯಾನಿಸು XDL_GUESS_NLINES2 20
 
-#define DISCARD 0
-#define KEEP 1
-#define INVESTIGATE 2
+#ವ್ಯಾಖ್ಯಾನಿಸು DISCARD 0
+#ವ್ಯಾಖ್ಯಾನಿಸು KEEP 1
+#ವ್ಯಾಖ್ಯಾನಿಸು INVESTIGATE 2
 
-typedef struct s_xdlclass {
-	struct s_xdlclass *next;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ s_xdlclass {
+	ರಚನೆ s_xdlclass *ಮುಂದಿನ;
 	xrecord_t rec;
-	long idx;
-	long len1, len2;
+	ದೀರ್ಘ idx;
+	ದೀರ್ಘ len1, len2;
 } xdlclass_t;
 
-typedef struct s_xdlclassifier {
-	unsigned int hbits;
-	long hsize;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ s_xdlclassifier {
+	ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ hbits;
+	ದೀರ್ಘ hsize;
 	xdlclass_t **rchash;
 	chastore_t ncha;
 	xdlclass_t **rcrecs;
-	long alloc;
-	long count;
-	long flags;
+	ದೀರ್ಘ alloc;
+	ದೀರ್ಘ ಎಣಿಕೆ_2;
+	ದೀರ್ಘ flags;
 } xdlclassifier_t;
 
 
 
 
-static int xdl_init_classifier(xdlclassifier_t *cf, long size, long flags) {
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ xdl_init_classifier(xdlclassifier_t *cf, ದೀರ್ಘ ಗಾತ್ರ_2, ದೀರ್ಘ flags) {
 	cf->flags = flags;
 
-	cf->hbits = xdl_hashbits((unsigned int) size);
+	cf->hbits = xdl_hashbits((ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ) ಗಾತ್ರ_2);
 	cf->hsize = 1 << cf->hbits;
 
-	if (xdl_cha_init(&cf->ncha, sizeof(xdlclass_t), size / 4 + 1) < 0) {
+	ಆದರೆ (xdl_cha_init(&cf->ncha, ಗಾತ್ರ(xdlclass_t), ಗಾತ್ರ_2 / 4 + 1) < 0) {
 
-		return -1;
+		ಹಿಂತಿರುಗಿ -1;
 	}
-	if (!XDL_CALLOC_ARRAY(cf->rchash, cf->hsize)) {
+	ಆದರೆ (!XDL_CALLOC_ARRAY(cf->rchash, cf->hsize)) {
 
 		xdl_cha_free(&cf->ncha);
-		return -1;
+		ಹಿಂತಿರುಗಿ -1;
 	}
 
-	cf->alloc = size;
-	if (!XDL_ALLOC_ARRAY(cf->rcrecs, cf->alloc)) {
+	cf->alloc = ಗಾತ್ರ_2;
+	ಆದರೆ (!XDL_ALLOC_ARRAY(cf->rcrecs, cf->alloc)) {
 
 		xdl_free(cf->rchash);
 		xdl_cha_free(&cf->ncha);
-		return -1;
+		ಹಿಂತಿರುಗಿ -1;
 	}
 
-	cf->count = 0;
+	cf->ಎಣಿಕೆ_2 = 0;
 
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
 }
 
 
-static void xdl_free_classifier(xdlclassifier_t *cf) {
+ಸ್ಥಿರ ಶೂನ್ಯ xdl_free_classifier(xdlclassifier_t *cf) {
 
 	xdl_free(cf->rcrecs);
 	xdl_free(cf->rchash);
@@ -92,109 +92,109 @@ static void xdl_free_classifier(xdlclassifier_t *cf) {
 }
 
 
-static int xdl_classify_record(unsigned int pass, xdlclassifier_t *cf, xrecord_t *rec) {
-	long hi;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ xdl_classify_ದಾಖಲೆ(ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ pass, xdlclassifier_t *cf, xrecord_t *rec) {
+	ದೀರ್ಘ hi;
 	xdlclass_t *rcrec;
 
-	hi = (long) XDL_HASHLONG(rec->ha, cf->hbits);
-	for (rcrec = cf->rchash[hi]; rcrec; rcrec = rcrec->next)
-		if (rcrec->rec.ha == rec->ha &&
-				xdl_recmatch(rcrec->rec.ptr, rcrec->rec.size,
-					rec->ptr, rec->size, cf->flags))
-			break;
+	hi = (ದೀರ್ಘ) XDL_HASHLONG(rec->ha, cf->hbits);
+	ಗಾಗಿ (rcrec = cf->rchash[hi]; rcrec; rcrec = rcrec->ಮುಂದಿನ)
+		ಆದರೆ (rcrec->rec.ha == rec->ha &&
+				xdl_recmatch(rcrec->rec.ptr, rcrec->rec.ಗಾತ್ರ_2,
+					rec->ptr, rec->ಗಾತ್ರ_2, cf->flags))
+			ನಿಲ್ಲಿಸು;
 
-	if (!rcrec) {
-		if (!(rcrec = xdl_cha_alloc(&cf->ncha))) {
+	ಆದರೆ (!rcrec) {
+		ಆದರೆ (!(rcrec = xdl_cha_alloc(&cf->ncha))) {
 
-			return -1;
+			ಹಿಂತಿರುಗಿ -1;
 		}
-		rcrec->idx = cf->count++;
-		if (XDL_ALLOC_GROW(cf->rcrecs, cf->count, cf->alloc))
-				return -1;
+		rcrec->idx = cf->ಎಣಿಕೆ_2++;
+		ಆದರೆ (XDL_ALLOC_GROW(cf->rcrecs, cf->ಎಣಿಕೆ_2, cf->alloc))
+				ಹಿಂತಿರುಗಿ -1;
 		cf->rcrecs[rcrec->idx] = rcrec;
 		rcrec->rec = *rec;
 		rcrec->len1 = rcrec->len2 = 0;
-		rcrec->next = cf->rchash[hi];
+		rcrec->ಮುಂದಿನ = cf->rchash[hi];
 		cf->rchash[hi] = rcrec;
 	}
 
 	(pass == 1) ? rcrec->len1++ : rcrec->len2++;
 
-	rec->ha = (unsigned long) rcrec->idx;
+	rec->ha = (ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ) rcrec->idx;
 
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
 }
 
 
-static void xdl_free_ctx(xdfile_t *xdf)
+ಸ್ಥಿರ ಶೂನ್ಯ xdl_free_ctx(xdfile_t *xdf)
 {
 	xdl_free(xdf->rindex);
-	xdl_free(xdf->changed - 1);
+	xdl_free(xdf->ಬದಲಾಯಿತು - 1);
 	xdl_free(xdf->recs);
 }
 
 
-static int xdl_prepare_ctx(unsigned int pass, mmfile_t *mf, long narec, xpparam_t const *xpp,
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ xdl_prepare_ctx(ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ pass, mmfile_t *mf, ದೀರ್ಘ narec, xpparam_t ಸ್ಥಿರಾಂಕ *xpp,
 			   xdlclassifier_t *cf, xdfile_t *xdf) {
-	long bsize;
-	unsigned long hav;
-	char const *blk, *cur, *top, *prev;
+	ದೀರ್ಘ bsize;
+	ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ hav;
+	ಅಕ್ಷರ ಸ್ಥಿರಾಂಕ *blk, *cur, *ತುದಿ, *prev;
 	xrecord_t *crec;
 
-	xdf->rindex = NULL;
-	xdf->changed = NULL;
-	xdf->recs = NULL;
+	xdf->rindex = ಖಾಲಿ;
+	xdf->ಬದಲಾಯಿತು = ಖಾಲಿ;
+	xdf->recs = ಖಾಲಿ;
 
-	if (!XDL_ALLOC_ARRAY(xdf->recs, narec))
-		goto abort;
+	ಆದರೆ (!XDL_ALLOC_ARRAY(xdf->recs, narec))
+		ಹೋಗು abort;
 
 	xdf->nrec = 0;
-	if ((cur = blk = xdl_mmfile_first(mf, &bsize))) {
-		for (top = blk + bsize; cur < top; ) {
+	ಆದರೆ ((cur = blk = xdl_mmfile_ಮೊದಲ(mf, &bsize))) {
+		ಗಾಗಿ (ತುದಿ = blk + bsize; cur < ತುದಿ; ) {
 			prev = cur;
-			hav = xdl_hash_record(&cur, top, xpp->flags);
-			if (XDL_ALLOC_GROW(xdf->recs, xdf->nrec + 1, narec))
-				goto abort;
+			hav = xdl_hash_ದಾಖಲೆ(&cur, ತುದಿ, xpp->flags);
+			ಆದರೆ (XDL_ALLOC_GROW(xdf->recs, xdf->nrec + 1, narec))
+				ಹೋಗು abort;
 			crec = &xdf->recs[xdf->nrec++];
 			crec->ptr = prev;
-			crec->size = (long) (cur - prev);
+			crec->ಗಾತ್ರ_2 = (ದೀರ್ಘ) (cur - prev);
 			crec->ha = hav;
-			if (xdl_classify_record(pass, cf, crec) < 0)
-				goto abort;
+			ಆದರೆ (xdl_classify_ದಾಖಲೆ(pass, cf, crec) < 0)
+				ಹೋಗು abort;
 		}
 	}
 
-	if (!XDL_CALLOC_ARRAY(xdf->changed, xdf->nrec + 2))
-		goto abort;
+	ಆದರೆ (!XDL_CALLOC_ARRAY(xdf->ಬದಲಾಯಿತು, xdf->nrec + 2))
+		ಹೋಗು abort;
 
-	if ((XDF_DIFF_ALG(xpp->flags) != XDF_PATIENCE_DIFF) &&
+	ಆದರೆ ((XDF_DIFF_ALG(xpp->flags) != XDF_PATIENCE_DIFF) &&
 	    (XDF_DIFF_ALG(xpp->flags) != XDF_HISTOGRAM_DIFF)) {
-		if (!XDL_ALLOC_ARRAY(xdf->rindex, xdf->nrec + 1))
-			goto abort;
+		ಆದರೆ (!XDL_ALLOC_ARRAY(xdf->rindex, xdf->nrec + 1))
+			ಹೋಗು abort;
 	}
 
-	xdf->changed += 1;
+	xdf->ಬದಲಾಯಿತು += 1;
 	xdf->nreff = 0;
 	xdf->dstart = 0;
 	xdf->dend = xdf->nrec - 1;
 
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
 
 abort:
 	xdl_free_ctx(xdf);
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
 }
 
 
-void xdl_free_env(xdfenv_t *xe) {
+ಶೂನ್ಯ xdl_free_env(xdfenv_t *xe) {
 
 	xdl_free_ctx(&xe->xdf2);
 	xdl_free_ctx(&xe->xdf1);
 }
 
 
-static bool xdl_clean_mmatch(uint8_t const *action, long i, long s, long e) {
-	long r, rdis0, rpdis0, rdis1, rpdis1;
+ಸ್ಥಿರ bool xdl_clean_mmatch(uint8_t ಸ್ಥಿರಾಂಕ *action, ದೀರ್ಘ i, ದೀರ್ಘ s, ದೀರ್ಘ e) {
+	ದೀರ್ಘ r, rdis0, rpdis0, rdis1, rpdis1;
 
 	/*
 	 * Limits the window that is examined during the similar-lines
@@ -203,10 +203,10 @@ static bool xdl_clean_mmatch(uint8_t const *action, long i, long s, long e) {
 	 * the loop proceed all the way to the extremities by causing
 	 * huge performance penalties in case of big files.
 	 */
-	if (i - s > XDL_SIMSCAN_WINDOW)
-		s = i - XDL_SIMSCAN_WINDOW;
-	if (e - i > XDL_SIMSCAN_WINDOW)
-		e = i + XDL_SIMSCAN_WINDOW;
+	ಆದರೆ (i - s > XDL_SIMSCAN_ಕಿಟಕಿ)
+		s = i - XDL_SIMSCAN_ಕಿಟಕಿ;
+	ಆದರೆ (e - i > XDL_SIMSCAN_ಕಿಟಕಿ)
+		e = i + XDL_SIMSCAN_ಕಿಟಕಿ;
 
 	/*
 	 * Scans the lines before 'i' to find a run of lines that either
@@ -215,14 +215,14 @@ static bool xdl_clean_mmatch(uint8_t const *action, long i, long s, long e) {
 	 * function with action[i] == INVESTIGATE, so the current line
 	 * (i) is already a multimatch line.
 	 */
-	for (r = 1, rdis0 = 0, rpdis0 = 1; (i - r) >= s; r++) {
-		if (action[i - r] == DISCARD)
+	ಗಾಗಿ (r = 1, rdis0 = 0, rpdis0 = 1; (i - r) >= s; r++) {
+		ಆದರೆ (action[i - r] == DISCARD)
 			rdis0++;
-		else if (action[i - r] == INVESTIGATE)
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (action[i - r] == INVESTIGATE)
 			rpdis0++;
-		else if (action[i - r] == KEEP)
-			break;
-		else
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (action[i - r] == KEEP)
+			ನಿಲ್ಲಿಸು;
+		ಇಲ್ಲದಿದ್ದರೆ
 			xdl_bug("Illegal value for action[i - r]");
 	}
 	/*
@@ -232,16 +232,16 @@ static bool xdl_clean_mmatch(uint8_t const *action, long i, long s, long e) {
 	 * they appear in the middle of runs with nomatch lines
 	 * (action[j] == DISCARD).
 	 */
-	if (rdis0 == 0)
-		return 0;
-	for (r = 1, rdis1 = 0, rpdis1 = 1; (i + r) <= e; r++) {
-		if (action[i + r] == DISCARD)
+	ಆದರೆ (rdis0 == 0)
+		ಹಿಂತಿರುಗಿ 0;
+	ಗಾಗಿ (r = 1, rdis1 = 0, rpdis1 = 1; (i + r) <= e; r++) {
+		ಆದರೆ (action[i + r] == DISCARD)
 			rdis1++;
-		else if (action[i + r] == INVESTIGATE)
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (action[i + r] == INVESTIGATE)
 			rpdis1++;
-		else if (action[i + r] == KEEP)
-			break;
-		else
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (action[i + r] == KEEP)
+			ನಿಲ್ಲಿಸು;
+		ಇಲ್ಲದಿದ್ದರೆ
 			xdl_bug("Illegal value for action[i + r]");
 	}
 	/*
@@ -249,12 +249,12 @@ static bool xdl_clean_mmatch(uint8_t const *action, long i, long s, long e) {
 	 * we return false and hence we don't make the current line (i)
 	 * discarded.
 	 */
-	if (rdis1 == 0)
-		return false;
+	ಆದರೆ (rdis1 == 0)
+		ಹಿಂತಿರುಗಿ false;
 	rdis1 += rdis0;
 	rpdis1 += rpdis0;
 
-	return rpdis1 * XDL_KPDIS_RUN < (rpdis1 + rdis1);
+	ಹಿಂತಿರುಗಿ rpdis1 * XDL_KPDIS_ಸತತ < (rpdis1 + rdis1);
 }
 
 
@@ -263,41 +263,41 @@ static bool xdl_clean_mmatch(uint8_t const *action, long i, long s, long e) {
  * matches on the other file. Also, lines that have multiple matches
  * might be potentially discarded if they appear in a run of discardable.
  */
-static int xdl_cleanup_records(xdlclassifier_t *cf, xdfile_t *xdf1, xdfile_t *xdf2) {
-	long i, nm, nreff, mlim;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ xdl_cleanup_ದಾಖಲೆಗಳು(xdlclassifier_t *cf, xdfile_t *xdf1, xdfile_t *xdf2) {
+	ದೀರ್ಘ i, nm, nreff, mlim;
 	xrecord_t *recs;
 	xdlclass_t *rcrec;
-	uint8_t *action1 = NULL, *action2 = NULL;
-	bool need_min = !!(cf->flags & XDF_NEED_MINIMAL);
-	int ret = 0;
+	uint8_t *action1 = ಖಾಲಿ, *action2 = ಖಾಲಿ;
+	bool need_min = !!(cf->flags & XDF_NEED_ಕನಿಷ್ಠತಮ);
+	ಪೂರ್ಣಾಂಕ ret = 0;
 
 	/*
 	 * Create temporary arrays that will help us decide if
 	 * changed[i] should remain false, or become true.
 	 */
-	if (!XDL_CALLOC_ARRAY(action1, xdf1->nrec + 1)) {
+	ಆದರೆ (!XDL_CALLOC_ARRAY(action1, xdf1->nrec + 1)) {
 		ret = -1;
-		goto cleanup;
+		ಹೋಗು cleanup;
 	}
-	if (!XDL_CALLOC_ARRAY(action2, xdf2->nrec + 1)) {
+	ಆದರೆ (!XDL_CALLOC_ARRAY(action2, xdf2->nrec + 1)) {
 		ret = -1;
-		goto cleanup;
+		ಹೋಗು cleanup;
 	}
 
 	/*
 	 * Initialize temporary arrays with DISCARD, KEEP, or INVESTIGATE.
 	 */
-	if ((mlim = xdl_bogosqrt(xdf1->nrec)) > XDL_MAX_EQLIMIT)
+	ಆದರೆ ((mlim = xdl_bogosqrt(xdf1->nrec)) > XDL_MAX_EQLIMIT)
 		mlim = XDL_MAX_EQLIMIT;
-	for (i = xdf1->dstart, recs = &xdf1->recs[xdf1->dstart]; i <= xdf1->dend; i++, recs++) {
+	ಗಾಗಿ (i = xdf1->dstart, recs = &xdf1->recs[xdf1->dstart]; i <= xdf1->dend; i++, recs++) {
 		rcrec = cf->rcrecs[recs->ha];
 		nm = rcrec ? rcrec->len2 : 0;
 		action1[i] = (nm == 0) ? DISCARD: (nm >= mlim && !need_min) ? INVESTIGATE: KEEP;
 	}
 
-	if ((mlim = xdl_bogosqrt(xdf2->nrec)) > XDL_MAX_EQLIMIT)
+	ಆದರೆ ((mlim = xdl_bogosqrt(xdf2->nrec)) > XDL_MAX_EQLIMIT)
 		mlim = XDL_MAX_EQLIMIT;
-	for (i = xdf2->dstart, recs = &xdf2->recs[xdf2->dstart]; i <= xdf2->dend; i++, recs++) {
+	ಗಾಗಿ (i = xdf2->dstart, recs = &xdf2->recs[xdf2->dstart]; i <= xdf2->dend; i++, recs++) {
 		rcrec = cf->rcrecs[recs->ha];
 		nm = rcrec ? rcrec->len1 : 0;
 		action2[i] = (nm == 0) ? DISCARD: (nm >= mlim && !need_min) ? INVESTIGATE: KEEP;
@@ -307,26 +307,26 @@ static int xdl_cleanup_records(xdlclassifier_t *cf, xdfile_t *xdf1, xdfile_t *xd
 	 * Use temporary arrays to decide if changed[i] should remain
 	 * false, or become true.
 	 */
-	for (nreff = 0, i = xdf1->dstart, recs = &xdf1->recs[xdf1->dstart];
+	ಗಾಗಿ (nreff = 0, i = xdf1->dstart, recs = &xdf1->recs[xdf1->dstart];
 	     i <= xdf1->dend; i++, recs++) {
-		if (action1[i] == KEEP ||
+		ಆದರೆ (action1[i] == KEEP ||
 		    (action1[i] == INVESTIGATE && !xdl_clean_mmatch(action1, i, xdf1->dstart, xdf1->dend))) {
 			xdf1->rindex[nreff++] = i;
 			/* changed[i] remains false, i.e. keep */
-		} else
-			xdf1->changed[i] = true;
+		} ಇಲ್ಲದಿದ್ದರೆ
+			xdf1->ಬದಲಾಯಿತು[i] = true;
 			/* i.e. discard */
 	}
 	xdf1->nreff = nreff;
 
-	for (nreff = 0, i = xdf2->dstart, recs = &xdf2->recs[xdf2->dstart];
+	ಗಾಗಿ (nreff = 0, i = xdf2->dstart, recs = &xdf2->recs[xdf2->dstart];
 	     i <= xdf2->dend; i++, recs++) {
-		if (action2[i] == KEEP ||
+		ಆದರೆ (action2[i] == KEEP ||
 		    (action2[i] == INVESTIGATE && !xdl_clean_mmatch(action2, i, xdf2->dstart, xdf2->dend))) {
 			xdf2->rindex[nreff++] = i;
 			/* changed[i] remains false, i.e. keep */
-		} else
-			xdf2->changed[i] = true;
+		} ಇಲ್ಲದಿದ್ದರೆ
+			xdf2->ಬದಲಾಯಿತು[i] = true;
 			/* i.e. discard */
 	}
 	xdf2->nreff = nreff;
@@ -335,56 +335,56 @@ cleanup:
 	xdl_free(action1);
 	xdl_free(action2);
 
-	return ret;
+	ಹಿಂತಿರುಗಿ ret;
 }
 
 
 /*
  * Early trim initial and terminal matching records.
  */
-static int xdl_trim_ends(xdfile_t *xdf1, xdfile_t *xdf2) {
-	long i, lim;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ xdl_trim_ತುದಿಗಳು(xdfile_t *xdf1, xdfile_t *xdf2) {
+	ದೀರ್ಘ i, lim;
 	xrecord_t *recs1, *recs2;
 
 	recs1 = xdf1->recs;
 	recs2 = xdf2->recs;
-	for (i = 0, lim = XDL_MIN(xdf1->nrec, xdf2->nrec); i < lim;
+	ಗಾಗಿ (i = 0, lim = XDL_MIN(xdf1->nrec, xdf2->nrec); i < lim;
 	     i++, recs1++, recs2++)
-		if (recs1->ha != recs2->ha)
-			break;
+		ಆದರೆ (recs1->ha != recs2->ha)
+			ನಿಲ್ಲಿಸು;
 
 	xdf1->dstart = xdf2->dstart = i;
 
 	recs1 = xdf1->recs + xdf1->nrec - 1;
 	recs2 = xdf2->recs + xdf2->nrec - 1;
-	for (lim -= i, i = 0; i < lim; i++, recs1--, recs2--)
-		if (recs1->ha != recs2->ha)
-			break;
+	ಗಾಗಿ (lim -= i, i = 0; i < lim; i++, recs1--, recs2--)
+		ಆದರೆ (recs1->ha != recs2->ha)
+			ನಿಲ್ಲಿಸು;
 
 	xdf1->dend = xdf1->nrec - i - 1;
 	xdf2->dend = xdf2->nrec - i - 1;
 
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
 }
 
 
-static int xdl_optimize_ctxs(xdlclassifier_t *cf, xdfile_t *xdf1, xdfile_t *xdf2) {
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ xdl_optimize_ctxs(xdlclassifier_t *cf, xdfile_t *xdf1, xdfile_t *xdf2) {
 
-	if (xdl_trim_ends(xdf1, xdf2) < 0 ||
-	    xdl_cleanup_records(cf, xdf1, xdf2) < 0) {
+	ಆದರೆ (xdl_trim_ತುದಿಗಳು(xdf1, xdf2) < 0 ||
+	    xdl_cleanup_ದಾಖಲೆಗಳು(cf, xdf1, xdf2) < 0) {
 
-		return -1;
+		ಹಿಂತಿರುಗಿ -1;
 	}
 
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
 }
 
-int xdl_prepare_env(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
+ಪೂರ್ಣಾಂಕ xdl_prepare_env(mmfile_t *mf1, mmfile_t *mf2, xpparam_t ಸ್ಥಿರಾಂಕ *xpp,
 		    xdfenv_t *xe) {
-	long enl1, enl2, sample;
+	ದೀರ್ಘ enl1, enl2, sample;
 	xdlclassifier_t cf;
 
-	memset(&cf, 0, sizeof(cf));
+	memset(&cf, 0, ಗಾತ್ರ(cf));
 
 	/*
 	 * For histogram diff, we can afford a smaller sample size and
@@ -396,35 +396,35 @@ int xdl_prepare_env(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
 	sample = (XDF_DIFF_ALG(xpp->flags) == XDF_HISTOGRAM_DIFF
 		  ? XDL_GUESS_NLINES2 : XDL_GUESS_NLINES1);
 
-	enl1 = xdl_guess_lines(mf1, sample) + 1;
-	enl2 = xdl_guess_lines(mf2, sample) + 1;
+	enl1 = xdl_guess_ಸಾಲುಗಳು(mf1, sample) + 1;
+	enl2 = xdl_guess_ಸಾಲುಗಳು(mf2, sample) + 1;
 
-	if (xdl_init_classifier(&cf, enl1 + enl2 + 1, xpp->flags) < 0)
-		return -1;
+	ಆದರೆ (xdl_init_classifier(&cf, enl1 + enl2 + 1, xpp->flags) < 0)
+		ಹಿಂತಿರುಗಿ -1;
 
-	if (xdl_prepare_ctx(1, mf1, enl1, xpp, &cf, &xe->xdf1) < 0) {
+	ಆದರೆ (xdl_prepare_ctx(1, mf1, enl1, xpp, &cf, &xe->xdf1) < 0) {
 
 		xdl_free_classifier(&cf);
-		return -1;
+		ಹಿಂತಿರುಗಿ -1;
 	}
-	if (xdl_prepare_ctx(2, mf2, enl2, xpp, &cf, &xe->xdf2) < 0) {
+	ಆದರೆ (xdl_prepare_ctx(2, mf2, enl2, xpp, &cf, &xe->xdf2) < 0) {
 
 		xdl_free_ctx(&xe->xdf1);
 		xdl_free_classifier(&cf);
-		return -1;
+		ಹಿಂತಿರುಗಿ -1;
 	}
 
-	if ((XDF_DIFF_ALG(xpp->flags) != XDF_PATIENCE_DIFF) &&
+	ಆದರೆ ((XDF_DIFF_ALG(xpp->flags) != XDF_PATIENCE_DIFF) &&
 	    (XDF_DIFF_ALG(xpp->flags) != XDF_HISTOGRAM_DIFF) &&
 	    xdl_optimize_ctxs(&cf, &xe->xdf1, &xe->xdf2) < 0) {
 
 		xdl_free_ctx(&xe->xdf2);
 		xdl_free_ctx(&xe->xdf1);
 		xdl_free_classifier(&cf);
-		return -1;
+		ಹಿಂತಿರುಗಿ -1;
 	}
 
 	xdl_free_classifier(&cf);
 
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
 }

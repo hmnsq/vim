@@ -11,65 +11,65 @@
  * bufwrite.c: functions for writing a buffer
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-#if defined(HAVE_UTIME) && defined(HAVE_UTIME_H)
+#ಆದರೆ defined(HAVE_UTIME) && defined(HAVE_UTIME_H)
 # include <utime.h>		// for struct utimbuf
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#define SMALLBUFSIZE	256	// size of emergency write buffer
+#ವ್ಯಾಖ್ಯಾನಿಸು SMALLBUFSIZE	256	// size of emergency write buffer
 
 /*
  * Structure to pass arguments from buf_write() to buf_write_bytes().
  */
-struct bw_info
+ರಚನೆ bw_info
 {
-    int		bw_fd;		// file descriptor
+    ಪೂರ್ಣಾಂಕ		bw_fd;		// file descriptor
     char_u	*bw_buf;	// buffer with data to be written
-    int		bw_len;		// length of data
-    int		bw_flags;	// FIO_ flags
-#ifdef FEAT_CRYPT
-    buf_T	*bw_buffer;	// buffer being written
-    int		bw_finish;	// finish encrypting
-#endif
+    ಪೂರ್ಣಾಂಕ		bw_len;		// length of data
+    ಪೂರ್ಣಾಂಕ		bw_flags;	// FIO_ flags
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+    buf_T	*bw_ಬಫರ್;	// buffer being written
+    ಪೂರ್ಣಾಂಕ		bw_ಮುಕ್ತಾಯ;	// finish encrypting
+#ಆದರೆ_ಅಂತ್ಯ
     char_u	bw_rest[CONV_RESTLEN]; // not converted bytes
-    int		bw_restlen;	// nr of bytes in bw_rest[]
-    int		bw_first;	// first write call
+    ಪೂರ್ಣಾಂಕ		bw_restlen;	// nr of bytes in bw_rest[]
+    ಪೂರ್ಣಾಂಕ		bw_ಮೊದಲ;	// first write call
     char_u	*bw_conv_buf;	// buffer for writing converted chars
     size_t	bw_conv_buflen; // size of bw_conv_buf
-    int		bw_conv_error;	// set for conversion error
+    ಪೂರ್ಣಾಂಕ		bw_conv_error;	// set for conversion error
     linenr_T	bw_conv_error_lnum;  // first line with error or zero
-    linenr_T	bw_start_lnum;	// line number at start of buffer
-#ifdef USE_ICONV
+    linenr_T	bw_ಆರಂಭ_lnum;	// line number at start of buffer
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_ICONV
     iconv_t	bw_iconv_fd;	// descriptor for iconv() or -1
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 };
 
 /*
  * Convert a Unicode character to bytes.
  * Return TRUE for an error, FALSE when it's OK.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 ucs2bytes(
-    unsigned	c,		// in: character
+    ಚಿಹ್ನೆರಹಿತ	c,		// in: character
     char_u	**pp,		// in/out: pointer to result
-    int		flags)		// FIO_ flags
+    ಪೂರ್ಣಾಂಕ		flags)		// FIO_ flags
 {
     char_u	*p = *pp;
-    int		error = FALSE;
-    int		cc;
+    ಪೂರ್ಣಾಂಕ		error = FALSE;
+    ಪೂರ್ಣಾಂಕ		cc;
 
 
-    if (flags & FIO_UCS4)
+    ಆದರೆ (flags & FIO_UCS4)
     {
-	if (flags & FIO_ENDIAN_L)
+	ಆದರೆ (flags & FIO_ENDIAN_L)
 	{
 	    *p++ = c;
 	    *p++ = (c >> 8);
 	    *p++ = (c >> 16);
 	    *p++ = (c >> 24);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    *p++ = (c >> 24);
 	    *p++ = (c >> 16);
@@ -77,57 +77,57 @@ ucs2bytes(
 	    *p++ = c;
 	}
     }
-    else if (flags & (FIO_UCS2 | FIO_UTF16))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (flags & (FIO_UCS2 | FIO_UTF16))
     {
-	if (c >= 0x10000)
+	ಆದರೆ (c >= 0x10000)
 	{
-	    if (flags & FIO_UTF16)
+	    ಆದರೆ (flags & FIO_UTF16)
 	    {
 		// Make two words, ten bits of the character in each.  First
 		// word is 0xd800 - 0xdbff, second one 0xdc00 - 0xdfff
 		c -= 0x10000;
-		if (c >= 0x100000)
+		ಆದರೆ (c >= 0x100000)
 		    error = TRUE;
 		cc = ((c >> 10) & 0x3ff) + 0xd800;
-		if (flags & FIO_ENDIAN_L)
+		ಆದರೆ (flags & FIO_ENDIAN_L)
 		{
 		    *p++ = cc;
-		    *p++ = ((unsigned)cc >> 8);
+		    *p++ = ((ಚಿಹ್ನೆರಹಿತ)cc >> 8);
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    *p++ = ((unsigned)cc >> 8);
+		    *p++ = ((ಚಿಹ್ನೆರಹಿತ)cc >> 8);
 		    *p++ = cc;
 		}
 		c = (c & 0x3ff) + 0xdc00;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		error = TRUE;
 	}
-	if (flags & FIO_ENDIAN_L)
+	ಆದರೆ (flags & FIO_ENDIAN_L)
 	{
 	    *p++ = c;
 	    *p++ = (c >> 8);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    *p++ = (c >> 8);
 	    *p++ = c;
 	}
     }
-    else    // Latin1
+    ಇಲ್ಲದಿದ್ದರೆ    // Latin1
     {
-	if (c >= 0x100)
+	ಆದರೆ (c >= 0x100)
 	{
 	    error = TRUE;
 	    *p++ = 0xBF;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    *p++ = c;
     }
 
     *pp = p;
-    return error;
+    ಹಿಂತಿರುಗಿ error;
 }
 
 /*
@@ -136,72 +136,72 @@ ucs2bytes(
  *
  * Return FAIL for failure, OK otherwise.
  */
-    static int
-buf_write_bytes(struct bw_info *ip)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+buf_write_ಬೈಟುಗಳು(ರಚನೆ bw_info *ip)
 {
-    int		wlen;
+    ಪೂರ್ಣಾಂಕ		wlen;
     char_u	*buf = ip->bw_buf;	// data to write
-    int		len = ip->bw_len;	// length of data
-    int		flags = ip->bw_flags;	// extra flags
+    ಪೂರ್ಣಾಂಕ		len = ip->bw_len;	// length of data
+    ಪೂರ್ಣಾಂಕ		flags = ip->bw_flags;	// extra flags
 
     // Skip conversion when writing the crypt magic number or the BOM.
-    if (!(flags & FIO_NOCONVERT))
+    ಆದರೆ (!(flags & FIO_NOCONVERT))
     {
 	char_u		*p;
-	unsigned	c;
-	int		n;
+	ಚಿಹ್ನೆರಹಿತ	c;
+	ಪೂರ್ಣಾಂಕ		n;
 
-	if (flags & FIO_UTF8)
+	ಆದರೆ (flags & FIO_UTF8)
 	{
 	    // Convert latin1 in the buffer to UTF-8 in the file.
 	    p = ip->bw_conv_buf;	// translate to buffer
-	    for (wlen = 0; wlen < len; ++wlen)
+	    ಗಾಗಿ (wlen = 0; wlen < len; ++wlen)
 		p += utf_char2bytes(buf[wlen], p);
 	    buf = ip->bw_conv_buf;
-	    len = (int)(p - ip->bw_conv_buf);
+	    len = (ಪೂರ್ಣಾಂಕ)(p - ip->bw_conv_buf);
 	}
-	else if (flags & (FIO_UCS4 | FIO_UTF16 | FIO_UCS2 | FIO_LATIN1))
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (flags & (FIO_UCS4 | FIO_UTF16 | FIO_UCS2 | FIO_LATIN1))
 	{
 	    // Convert UTF-8 bytes in the buffer to UCS-2, UCS-4, UTF-16 or
 	    // Latin1 chars in the file.
-	    if (flags & FIO_LATIN1)
+	    ಆದರೆ (flags & FIO_LATIN1)
 		p = buf;	// translate in-place (can only get shorter)
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		p = ip->bw_conv_buf;	// translate to buffer
-	    for (wlen = 0; wlen < len; wlen += n)
+	    ಗಾಗಿ (wlen = 0; wlen < len; wlen += n)
 	    {
-		if (wlen == 0 && ip->bw_restlen != 0)
+		ಆದರೆ (wlen == 0 && ip->bw_restlen != 0)
 		{
-		    int		l;
+		    ಪೂರ್ಣಾಂಕ		l;
 
 		    // Use remainder of previous call.  Append the start of
 		    // buf[] to get a full sequence.  Might still be too
 		    // short!
 		    l = CONV_RESTLEN - ip->bw_restlen;
-		    if (l > len)
+		    ಆದರೆ (l > len)
 			l = len;
 		    mch_memmove(ip->bw_rest + ip->bw_restlen, buf, (size_t)l);
 		    n = utf_ptr2len_len(ip->bw_rest, ip->bw_restlen + l);
-		    if (n > ip->bw_restlen + len)
+		    ಆದರೆ (n > ip->bw_restlen + len)
 		    {
 			// We have an incomplete byte sequence at the end to
 			// be written.  We can't convert it without the
 			// remaining bytes.  Keep them for the next call.
-			if (ip->bw_restlen + len > CONV_RESTLEN)
-			    return FAIL;
+			ಆದರೆ (ip->bw_restlen + len > CONV_RESTLEN)
+			    ಹಿಂತಿರುಗಿ FAIL;
 			ip->bw_restlen += len;
-			break;
+			ನಿಲ್ಲಿಸು;
 		    }
-		    if (n > 1)
+		    ಆದರೆ (n > 1)
 			c = utf_ptr2char(ip->bw_rest);
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 			c = ip->bw_rest[0];
-		    if (n >= ip->bw_restlen)
+		    ಆದರೆ (n >= ip->bw_restlen)
 		    {
 			n -= ip->bw_restlen;
 			ip->bw_restlen = 0;
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
 			ip->bw_restlen -= n;
 			mch_memmove(ip->bw_rest, ip->bw_rest + n,
@@ -209,67 +209,67 @@ buf_write_bytes(struct bw_info *ip)
 			n = 0;
 		    }
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    n = utf_ptr2len_len(buf + wlen, len - wlen);
-		    if (n > len - wlen)
+		    ಆದರೆ (n > len - wlen)
 		    {
 			// We have an incomplete byte sequence at the end to
 			// be written.  We can't convert it without the
 			// remaining bytes.  Keep them for the next call.
-			if (len - wlen > CONV_RESTLEN)
-			    return FAIL;
+			ಆದರೆ (len - wlen > CONV_RESTLEN)
+			    ಹಿಂತಿರುಗಿ FAIL;
 			ip->bw_restlen = len - wlen;
 			mch_memmove(ip->bw_rest, buf + wlen,
 						      (size_t)ip->bw_restlen);
-			break;
+			ನಿಲ್ಲಿಸು;
 		    }
-		    if (n > 1)
+		    ಆದರೆ (n > 1)
 			c = utf_ptr2char(buf + wlen);
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 			c = buf[wlen];
 		}
 		// Check that there is enough space
-		if (!(flags & FIO_LATIN1))
+		ಆದರೆ (!(flags & FIO_LATIN1))
 		{
 		    size_t need = (flags & FIO_UCS4) ? 4 : 2;
-		    if ((flags & FIO_UTF16) && c >= 0x10000)
+		    ಆದರೆ ((flags & FIO_UTF16) && c >= 0x10000)
 			need = 4;
 
-		    if ((size_t)(p - ip->bw_conv_buf) + need > ip->bw_conv_buflen)
-			return FAIL;
+		    ಆದರೆ ((size_t)(p - ip->bw_conv_buf) + need > ip->bw_conv_buflen)
+			ಹಿಂತಿರುಗಿ FAIL;
 		}
 
-		if (ucs2bytes(c, &p, flags) && !ip->bw_conv_error)
+		ಆದರೆ (ucs2bytes(c, &p, flags) && !ip->bw_conv_error)
 		{
 		    ip->bw_conv_error = TRUE;
-		    ip->bw_conv_error_lnum = ip->bw_start_lnum;
+		    ip->bw_conv_error_lnum = ip->bw_ಆರಂಭ_lnum;
 		}
-		if (c == NL)
-		    ++ip->bw_start_lnum;
+		ಆದರೆ (c == NL)
+		    ++ip->bw_ಆರಂಭ_lnum;
 	    }
-	    if (flags & FIO_LATIN1)
-		len = (int)(p - buf);
-	    else
+	    ಆದರೆ (flags & FIO_LATIN1)
+		len = (ಪೂರ್ಣಾಂಕ)(p - buf);
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		buf = ip->bw_conv_buf;
-		len = (int)(p - ip->bw_conv_buf);
+		len = (ಪೂರ್ಣಾಂಕ)(p - ip->bw_conv_buf);
 	    }
 	}
 
-#ifdef MSWIN
-	else if (flags & FIO_CODEPAGE)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (flags & FIO_CODEPAGE)
 	{
 	    // Convert UTF-8 or codepage to UCS-2 and then to MS-Windows
 	    // codepage.
 	    char_u	*from;
 	    size_t	fromlen;
-	    char_u	*to;
-	    int		u8c;
+	    char_u	*ಗಮ್ಯ;
+	    ಪೂರ್ಣಾಂಕ		u8c;
 	    BOOL	bad = FALSE;
-	    int		needed;
+	    ಪೂರ್ಣಾಂಕ		needed;
 
-	    if (ip->bw_restlen > 0)
+	    ಆದರೆ (ip->bw_restlen > 0)
 	    {
 		// Need to concatenate the remainder of the previous call and
 		// the bytes of the current call.  Use the end of the
@@ -279,124 +279,124 @@ buf_write_bytes(struct bw_info *ip)
 		mch_memmove(from, ip->bw_rest, (size_t)ip->bw_restlen);
 		mch_memmove(from + ip->bw_restlen, buf, (size_t)len);
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		from = buf;
 		fromlen = len;
 	    }
 
-	    to = ip->bw_conv_buf;
-	    if (enc_utf8)
+	    ಗಮ್ಯ = ip->bw_conv_buf;
+	    ಆದರೆ (enc_utf8)
 	    {
 		// Convert from UTF-8 to UCS-2, to the start of the buffer.
 		// The buffer has been allocated to be big enough.
-		while (fromlen > 0)
+		ಆಗ (fromlen > 0)
 		{
-		    n = (int)utf_ptr2len_len(from, (int)fromlen);
-		    if (n > (int)fromlen)	// incomplete byte sequence
-			break;
+		    n = (ಪೂರ್ಣಾಂಕ)utf_ptr2len_len(from, (ಪೂರ್ಣಾಂಕ)fromlen);
+		    ಆದರೆ (n > (ಪೂರ್ಣಾಂಕ)fromlen)	// incomplete byte sequence
+			ನಿಲ್ಲಿಸು;
 		    u8c = utf_ptr2char(from);
-		    *to++ = (u8c & 0xff);
-		    *to++ = (u8c >> 8);
+		    *ಗಮ್ಯ++ = (u8c & 0xff);
+		    *ಗಮ್ಯ++ = (u8c >> 8);
 		    fromlen -= n;
 		    from += n;
 		}
 
 		// Copy remainder to ip->bw_rest[] to be used for the next
 		// call.
-		if (fromlen > CONV_RESTLEN)
+		ಆದರೆ (fromlen > CONV_RESTLEN)
 		{
 		    // weird overlong sequence
 		    ip->bw_conv_error = TRUE;
-		    return FAIL;
+		    ಹಿಂತಿರುಗಿ FAIL;
 		}
 		mch_memmove(ip->bw_rest, from, fromlen);
-		ip->bw_restlen = (int)fromlen;
+		ip->bw_restlen = (ಪೂರ್ಣಾಂಕ)fromlen;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		// Convert from enc_codepage to UCS-2, to the start of the
 		// buffer.  The buffer has been allocated to be big enough.
 		ip->bw_restlen = 0;
-		needed = MultiByteToWideChar(enc_codepage,
-			     MB_ERR_INVALID_CHARS, (LPCSTR)from, (int)fromlen,
-								     NULL, 0);
-		if (needed == 0)
+		needed = Multi_Byte_ಗಮ್ಯ_Wide_Char(enc_codepage,
+			     MB_ERR_INVALID_CHARS, (LPCSTR)from, (ಪೂರ್ಣಾಂಕ)fromlen,
+								     ಖಾಲಿ, 0);
+		ಆದರೆ (needed == 0)
 		{
 		    // When conversion fails there may be a trailing byte.
-		    needed = MultiByteToWideChar(enc_codepage,
-			 MB_ERR_INVALID_CHARS, (LPCSTR)from, (int)fromlen - 1,
-								     NULL, 0);
-		    if (needed == 0)
+		    needed = Multi_Byte_ಗಮ್ಯ_Wide_Char(enc_codepage,
+			 MB_ERR_INVALID_CHARS, (LPCSTR)from, (ಪೂರ್ಣಾಂಕ)fromlen - 1,
+								     ಖಾಲಿ, 0);
+		    ಆದರೆ (needed == 0)
 		    {
 			// Conversion doesn't work.
 			ip->bw_conv_error = TRUE;
-			return FAIL;
+			ಹಿಂತಿರುಗಿ FAIL;
 		    }
 		    // Save the trailing byte for the next call.
 		    ip->bw_rest[0] = from[fromlen - 1];
 		    ip->bw_restlen = 1;
 		}
-		needed = MultiByteToWideChar(enc_codepage, MB_ERR_INVALID_CHARS,
-				(LPCSTR)from, (int)(fromlen - ip->bw_restlen),
-							  (LPWSTR)to, needed);
-		if (needed == 0)
+		needed = Multi_Byte_ಗಮ್ಯ_Wide_Char(enc_codepage, MB_ERR_INVALID_CHARS,
+				(LPCSTR)from, (ಪೂರ್ಣಾಂಕ)(fromlen - ip->bw_restlen),
+							  (LPWSTR)ಗಮ್ಯ, needed);
+		ಆದರೆ (needed == 0)
 		{
 		    // Safety check: Conversion doesn't work.
 		    ip->bw_conv_error = TRUE;
-		    return FAIL;
+		    ಹಿಂತಿರುಗಿ FAIL;
 		}
-		to += needed * 2;
+		ಗಮ್ಯ += needed * 2;
 	    }
 
-	    fromlen = to - ip->bw_conv_buf;
-	    buf = to;
+	    fromlen = ಗಮ್ಯ - ip->bw_conv_buf;
+	    buf = ಗಮ್ಯ;
 # ifdef CP_UTF8	// VC 4.1 doesn't define CP_UTF8
-	    if (FIO_GET_CP(flags) == CP_UTF8)
+	    ಆದರೆ (FIO_GET_CP(flags) == CP_UTF8)
 	    {
 		// Convert from UCS-2 to UTF-8, using the remainder of the
 		// conversion buffer.  Fails when out of space.
-		for (from = ip->bw_conv_buf; fromlen > 1; fromlen -= 2)
+		ಗಾಗಿ (from = ip->bw_conv_buf; fromlen > 1; fromlen -= 2)
 		{
 		    u8c = *from++;
 		    u8c += (*from++ << 8);
-		    to += utf_char2bytes(u8c, to);
-		    if (to + 6 >= ip->bw_conv_buf + ip->bw_conv_buflen)
+		    ಗಮ್ಯ += utf_char2bytes(u8c, ಗಮ್ಯ);
+		    ಆದರೆ (ಗಮ್ಯ + 6 >= ip->bw_conv_buf + ip->bw_conv_buflen)
 		    {
 			ip->bw_conv_error = TRUE;
-			return FAIL;
+			ಹಿಂತಿರುಗಿ FAIL;
 		    }
 		}
-		len = (int)(to - buf);
+		len = (ಪೂರ್ಣಾಂಕ)(ಗಮ್ಯ - buf);
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 # endif
 	    {
 		// Convert from UCS-2 to the codepage, using the remainder of
 		// the conversion buffer.  If the conversion uses the default
 		// character "0", the data doesn't fit in this encoding, so
 		// fail.
-		len = WideCharToMultiByte(FIO_GET_CP(flags), 0,
-			(LPCWSTR)ip->bw_conv_buf, (int)fromlen / sizeof(WCHAR),
-			(LPSTR)to, (int)(ip->bw_conv_buflen - fromlen), 0,
+		len = Wide_Char_ಗಮ್ಯ_Multi_Byte(FIO_GET_CP(flags), 0,
+			(LPCWSTR)ip->bw_conv_buf, (ಪೂರ್ಣಾಂಕ)fromlen / ಗಾತ್ರ(WCHAR),
+			(LPSTR)ಗಮ್ಯ, (ಪೂರ್ಣಾಂಕ)(ip->bw_conv_buflen - fromlen), 0,
 									&bad);
-		if (bad)
+		ಆದರೆ (bad)
 		{
 		    ip->bw_conv_error = TRUE;
-		    return FAIL;
+		    ಹಿಂತಿರುಗಿ FAIL;
 		}
 	    }
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef MACOS_CONVERT
-	else if (flags & FIO_MACROMAN)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MACOS_CONVERT
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (flags & FIO_MACROMAN)
 	{
 	    // Convert UTF-8 or latin1 to Apple MacRoman.
 	    char_u	*from;
 	    size_t	fromlen;
 
-	    if (ip->bw_restlen > 0)
+	    ಆದರೆ (ip->bw_restlen > 0)
 	    {
 		// Need to concatenate the remainder of the previous call and
 		// the bytes of the current call.  Use the end of the
@@ -406,126 +406,126 @@ buf_write_bytes(struct bw_info *ip)
 		mch_memmove(from, ip->bw_rest, (size_t)ip->bw_restlen);
 		mch_memmove(from + ip->bw_restlen, buf, (size_t)len);
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		from = buf;
 		fromlen = len;
 	    }
 
-	    if (enc2macroman(from, fromlen,
+	    ಆದರೆ (enc2macroman(from, fromlen,
 			ip->bw_conv_buf, &len, ip->bw_conv_buflen,
 			ip->bw_rest, &ip->bw_restlen) == FAIL)
 	    {
 		ip->bw_conv_error = TRUE;
-		return FAIL;
+		ಹಿಂತಿರುಗಿ FAIL;
 	    }
 	    buf = ip->bw_conv_buf;
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef USE_ICONV
-	if (ip->bw_iconv_fd != (iconv_t)-1)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_ICONV
+	ಆದರೆ (ip->bw_iconv_fd != (iconv_t)-1)
 	{
-	    const char	*from;
+	    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ	*from;
 	    size_t	fromlen;
-	    char	*to;
+	    ಅಕ್ಷರ	*ಗಮ್ಯ;
 	    size_t	tolen;
 
 	    // Convert with iconv().
-	    if (ip->bw_restlen > 0)
+	    ಆದರೆ (ip->bw_restlen > 0)
 	    {
-		char *fp;
+		ಅಕ್ಷರ *fp;
 
 		// Need to concatenate the remainder of the previous call and
 		// the bytes of the current call.  Use the end of the
 		// conversion buffer for this.
 		fromlen = len + ip->bw_restlen;
-		fp = (char *)ip->bw_conv_buf + ip->bw_conv_buflen - fromlen;
+		fp = (ಅಕ್ಷರ *)ip->bw_conv_buf + ip->bw_conv_buflen - fromlen;
 		mch_memmove(fp, ip->bw_rest, (size_t)ip->bw_restlen);
 		mch_memmove(fp + ip->bw_restlen, buf, (size_t)len);
 		from = fp;
 		tolen = ip->bw_conv_buflen - fromlen;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		from = (const char *)buf;
+		from = (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)buf;
 		fromlen = len;
 		tolen = ip->bw_conv_buflen;
 	    }
-	    to = (char *)ip->bw_conv_buf;
+	    ಗಮ್ಯ = (ಅಕ್ಷರ *)ip->bw_conv_buf;
 
-	    if (ip->bw_first)
+	    ಆದರೆ (ip->bw_ಮೊದಲ)
 	    {
 		size_t	save_len = tolen;
 
 		// output the initial shift state sequence
-		(void)iconv(ip->bw_iconv_fd, NULL, NULL, &to, &tolen);
+		(ಶೂನ್ಯ)iconv(ip->bw_iconv_fd, ಖಾಲಿ, ಖಾಲಿ, &ಗಮ್ಯ, &tolen);
 
 		// There is a bug in iconv() on Linux (which appears to be
 		// wide-spread) which sets "to" to NULL and messes up "tolen".
-		if (to == NULL)
+		ಆದರೆ (ಗಮ್ಯ == ಖಾಲಿ)
 		{
-		    to = (char *)ip->bw_conv_buf;
+		    ಗಮ್ಯ = (ಅಕ್ಷರ *)ip->bw_conv_buf;
 		    tolen = save_len;
 		}
-		ip->bw_first = FALSE;
+		ip->bw_ಮೊದಲ = FALSE;
 	    }
 
 	    // If iconv() has an error or there is not enough room, fail.
-	    if ((iconv(ip->bw_iconv_fd, (void *)&from, &fromlen, &to, &tolen)
+	    ಆದರೆ ((iconv(ip->bw_iconv_fd, (ಶೂನ್ಯ *)&from, &fromlen, &ಗಮ್ಯ, &tolen)
 			== (size_t)-1 && ICONV_ERRNO != ICONV_EINVAL)
 						    || fromlen > CONV_RESTLEN)
 	    {
 		ip->bw_conv_error = TRUE;
-		return FAIL;
+		ಹಿಂತಿರುಗಿ FAIL;
 	    }
 
 	    // copy remainder to ip->bw_rest[] to be used for the next call.
-	    if (fromlen > 0)
-		mch_memmove(ip->bw_rest, (void *)from, fromlen);
-	    ip->bw_restlen = (int)fromlen;
+	    ಆದರೆ (fromlen > 0)
+		mch_memmove(ip->bw_rest, (ಶೂನ್ಯ *)from, fromlen);
+	    ip->bw_restlen = (ಪೂರ್ಣಾಂಕ)fromlen;
 
 	    buf = ip->bw_conv_buf;
-	    len = (int)((char_u *)to - ip->bw_conv_buf);
+	    len = (ಪೂರ್ಣಾಂಕ)((char_u *)ಗಮ್ಯ - ip->bw_conv_buf);
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
-    if (ip->bw_fd < 0)
+    ಆದರೆ (ip->bw_fd < 0)
 	// Only checking conversion, which is OK if we get here.
-	return OK;
+	ಹಿಂತಿರುಗಿ OK;
 
-#ifdef FEAT_CRYPT
-    if (flags & FIO_ENCRYPTED)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+    ಆದರೆ (flags & FIO_ENCRYPTED)
     {
 	// Encrypt the data. Do it in-place if possible, otherwise use an
 	// allocated buffer.
 # ifdef CRYPT_NOT_INPLACE
-	if (crypt_works_inplace(ip->bw_buffer->b_cryptstate))
+	ಆದರೆ (crypt_ಕೆಲಸಮಾಡುತ್ತದೆ_inplace(ip->bw_ಬಫರ್->b_cryptstate))
 	{
 # endif
-	    crypt_encode_inplace(ip->bw_buffer->b_cryptstate, buf, len,
-								ip->bw_finish);
+	    crypt_encode_inplace(ip->bw_ಬಫರ್->b_cryptstate, buf, len,
+								ip->bw_ಮುಕ್ತಾಯ);
 # ifdef CRYPT_NOT_INPLACE
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    char_u *outbuf;
 
 	    len = crypt_encode_alloc(curbuf->b_cryptstate, buf, len, &outbuf,
-								ip->bw_finish);
-	    if (len == 0)
-		return OK;  // Crypt layer is buffering, will flush later.
+								ip->bw_ಮುಕ್ತಾಯ);
+	    ಆದರೆ (len == 0)
+		ಹಿಂತಿರುಗಿ OK;  // Crypt layer is buffering, will flush later.
 	    wlen = write_eintr(ip->bw_fd, outbuf, len);
 	    vim_free(outbuf);
-	    return (wlen < len) ? FAIL : OK;
+	    ಹಿಂತಿರುಗಿ (wlen < len) ? FAIL : OK;
 	}
 # endif
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     wlen = write_eintr(ip->bw_fd, buf, len);
-    return (wlen < len) ? FAIL : OK;
+    ಹಿಂತಿರುಗಿ (wlen < len) ? FAIL : OK;
 }
 
 /*
@@ -533,84 +533,84 @@ buf_write_bytes(struct bw_info *ip)
  * The size isn't checked, because using a tool like "gzip" takes care of
  * using the same timestamp but can't set the size.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 check_mtime(buf_T *buf, stat_T *st)
 {
-    if (buf->b_mtime_read != 0
-		  && time_differs(st, buf->b_mtime_read, buf->b_mtime_read_ns))
+    ಆದರೆ (buf->b_mtime_read != 0
+		  && ಸಮಯ_differs(st, buf->b_mtime_read, buf->b_mtime_read_ns))
     {
-	msg_scroll = TRUE;	    // don't overwrite messages here
-	msg_silent = 0;		    // must give this prompt
+	ಸಂದೇಶ_scroll = TRUE;	    // don't overwrite messages here
+	ಸಂದೇಶ_silent = 0;		    // must give this prompt
 	// don't use emsg() here, don't want to flush the buffers
-	msg_attr(_("WARNING: The file has been changed since reading it!!!"),
+	ಸಂದೇಶ_attr(_("WARNING: The file has been changed since reading it!!!"),
 						       HL_ATTR(HLF_E));
-	if (ask_yesno((char_u *)_("Do you really want to write to it"),
+	ಆದರೆ (ask_yesno((char_u *)_("Do you really want to write to it"),
 								 TRUE) == 'n')
-	    return FAIL;
-	msg_scroll = FALSE;	    // always overwrite the file message now
+	    ಹಿಂತಿರುಗಿ FAIL;
+	ಸಂದೇಶ_scroll = FALSE;	    // always overwrite the file message now
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Generate a BOM in "buf[4]" for encoding "name".
  * Return the length of the BOM (zero when no BOM).
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 make_bom(char_u *buf, char_u *name)
 {
-    int		flags;
+    ಪೂರ್ಣಾಂಕ		flags;
     char_u	*p;
 
     flags = get_fio_flags(name);
 
     // Can't put a BOM in a non-Unicode file.
-    if (flags == FIO_LATIN1 || flags == 0)
-	return 0;
+    ಆದರೆ (flags == FIO_LATIN1 || flags == 0)
+	ಹಿಂತಿರುಗಿ 0;
 
-    if (flags == FIO_UTF8)	// UTF-8
+    ಆದರೆ (flags == FIO_UTF8)	// UTF-8
     {
 	buf[0] = 0xef;
 	buf[1] = 0xbb;
 	buf[2] = 0xbf;
-	return 3;
+	ಹಿಂತಿರುಗಿ 3;
     }
     p = buf;
-    (void)ucs2bytes(0xfeff, &p, flags);
-    return (int)(p - buf);
+    (ಶೂನ್ಯ)ucs2bytes(0xfeff, &p, flags);
+    ಹಿಂತಿರುಗಿ (ಪೂರ್ಣಾಂಕ)(p - buf);
 }
 
-#ifdef UNIX
-    static void
-set_file_time(
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_file_ಸಮಯ(
     char_u  *fname,
     time_t  atime,	    // access time
     time_t  mtime)	    // modification time
 {
-# if defined(HAVE_UTIME) && defined(HAVE_UTIME_H)
-    struct utimbuf  buf;
+# ಆದರೆ defined(HAVE_UTIME) && defined(HAVE_UTIME_H)
+    ರಚನೆ utimbuf  buf;
 
     buf.actime	= atime;
     buf.modtime	= mtime;
-    (void)utime((char *)fname, &buf);
-# else
-#  if defined(HAVE_UTIMES)
-    struct timeval  tvp[2];
+    (ಶೂನ್ಯ)utime((ಅಕ್ಷರ *)fname, &buf);
+# ಇಲ್ಲದಿದ್ದರೆ
+#  ಆದರೆ defined(HAVE_UTIMES)
+    ರಚನೆ timeval  tvp[2];
 
     tvp[0].tv_sec   = atime;
     tvp[0].tv_usec  = 0;
     tvp[1].tv_sec   = mtime;
     tvp[1].tv_usec  = 0;
-    (void)utimes((char *)fname, (const struct timeval *)&tvp);
+    (ಶೂನ್ಯ)utimes((ಅಕ್ಷರ *)fname, (ಸ್ಥಿರಾಂಕ ರಚನೆ timeval *)&tvp);
 #  endif
 # endif
 }
-#endif // UNIX
+#ಆದರೆ_ಅಂತ್ಯ // UNIX
 
-    char *
-new_file_message(void)
+    ಅಕ್ಷರ *
+new_file_ಸಂದೇಶ(ಶೂನ್ಯ)
 {
-    return shortmess(SHM_NEW) ? _("[New]") : _("[New File]");
+    ಹಿಂತಿರುಗಿ shortmess(SHM_NEW) ? _("[New]") : _("[New File]");
 }
 
 /*
@@ -629,111 +629,111 @@ new_file_message(void)
  *
  * return FAIL for failure, OK otherwise
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 buf_write(
     buf_T	    *buf,
     char_u	    *fname,
     char_u	    *sfname,
-    linenr_T	    start,
-    linenr_T	    end,
+    linenr_T	    ಆರಂಭ,
+    linenr_T	    ಕೊನೆ,
     exarg_T	    *eap,		// for forced 'ff' and 'fenc', can be
 					// NULL!
-    int		    append,		// append to the file
-    int		    forceit,
-    int		    reset_changed,
-    int		    filtering)
+    ಪೂರ್ಣಾಂಕ		    append,		// append to the file
+    ಪೂರ್ಣಾಂಕ		    forceit,
+    ಪೂರ್ಣಾಂಕ		    reset_ಬದಲಾಯಿತು,
+    ಪೂರ್ಣಾಂಕ		    filtering)
 {
-    int		    fd;
-    char_u	    *backup = NULL;
-    int		    backup_copy = FALSE; // copy the original file?
-    int		    dobackup;
+    ಪೂರ್ಣಾಂಕ		    fd;
+    char_u	    *backup = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		    backup_copy = FALSE; // copy the original file?
+    ಪೂರ್ಣಾಂಕ		    dobackup;
     char_u	    *ffname;
-    char_u	    *wfname = NULL;	// name of file to write to
+    char_u	    *wfname = ಖಾಲಿ;	// name of file to write to
     char_u	    *s;
     char_u	    *ptr;
     char_u	    c;
-    int		    len;
+    ಪೂರ್ಣಾಂಕ		    len;
     linenr_T	    lnum;
-    long	    nchars;
-    char_u	    *errmsg = NULL;
-    int		    errmsg_allocated = FALSE;
-    char_u	    *errnum = NULL;
-    char_u	    *buffer;
+    ದೀರ್ಘ	    nchars;
+    char_u	    *errmsg = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		    errmsg_allocated = FALSE;
+    char_u	    *errnum = ಖಾಲಿ;
+    char_u	    *ಬಫರ್;
     char_u	    smallbuf[SMALLBUFSIZE];
     char_u	    *backup_ext;
-    int		    bufsize;
-    long	    perm;		    // file permissions
-    int		    retval = OK;
-    int		    newfile = FALSE;	    // TRUE if file doesn't exist yet
-    int		    msg_save = msg_scroll;
-    int		    overwriting;	    // TRUE if writing over original
-    int		    no_eol = FALSE;	    // no end-of-line written
-    int		    device = FALSE;	    // writing to a device
+    ಪೂರ್ಣಾಂಕ		    bufsize;
+    ದೀರ್ಘ	    perm;		    // file permissions
+    ಪೂರ್ಣಾಂಕ		    retval = OK;
+    ಪೂರ್ಣಾಂಕ		    newfile = FALSE;	    // TRUE if file doesn't exist yet
+    ಪೂರ್ಣಾಂಕ		    ಸಂದೇಶ_save = ಸಂದೇಶ_scroll;
+    ಪೂರ್ಣಾಂಕ		    overwriting;	    // TRUE if writing over original
+    ಪೂರ್ಣಾಂಕ		    no_eol = FALSE;	    // no end-of-line written
+    ಪೂರ್ಣಾಂಕ		    device = FALSE;	    // writing to a device
     stat_T	    st_old;
-    int		    prev_got_int = got_int;
-    int		    checking_conversion;
-    int		    file_readonly = FALSE;  // overwritten file is read-only
-#if defined(UNIX)			    // XXX fix me sometime?
-    int		    made_writable = FALSE;  // 'w' bit has been set
-#endif
+    ಪೂರ್ಣಾಂಕ		    prev_got_int = got_int;
+    ಪೂರ್ಣಾಂಕ		    checking_conversion;
+    ಪೂರ್ಣಾಂಕ		    file_readonly = FALSE;  // overwritten file is read-only
+#ಆದರೆ defined(UNIX)			    // XXX fix me sometime?
+    ಪೂರ್ಣಾಂಕ		    made_writable = FALSE;  // 'w' bit has been set
+#ಆದರೆ_ಅಂತ್ಯ
 					// writing everything
-    int		    whole = (start == 1 && end == buf->b_ml.ml_line_count);
-    linenr_T	    old_line_count = buf->b_ml.ml_line_count;
-    int		    attr;
-    int		    fileformat;
-    int		    write_bin;
-    struct bw_info  write_info;		// info for buf_write_bytes()
-    int		    converted = FALSE;
-    int		    notconverted = FALSE;
+    ಪೂರ್ಣಾಂಕ		    ಸಂಪೂರ್ಣ = (ಆರಂಭ == 1 && ಕೊನೆ == buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ);
+    linenr_T	    old_ಸಾಲು_ಎಣಿಕೆ = buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
+    ಪೂರ್ಣಾಂಕ		    attr;
+    ಪೂರ್ಣಾಂಕ		    fileformat;
+    ಪೂರ್ಣಾಂಕ		    write_bin;
+    ರಚನೆ bw_info  write_info;		// info for buf_write_bytes()
+    ಪೂರ್ಣಾಂಕ		    converted = FALSE;
+    ಪೂರ್ಣಾಂಕ		    notconverted = FALSE;
     char_u	    *fenc;		// effective 'fileencoding'
-    char_u	    *fenc_tofree = NULL; // allocated "fenc"
-    int		    wb_flags = 0;
-#ifdef HAVE_ACL
-    vim_acl_T	    acl = NULL;		// ACL copied from original file to
+    char_u	    *fenc_tofree = ಖಾಲಿ; // allocated "fenc"
+    ಪೂರ್ಣಾಂಕ		    wb_flags = 0;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_ACL
+    vim_acl_T	    acl = ಖಾಲಿ;		// ACL copied from original file to
 					// backup or new file
-#endif
-#ifdef FEAT_PERSISTENT_UNDO
-    int		    write_undo_file = FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PERSISTENT_UNDO
+    ಪೂರ್ಣಾಂಕ		    write_undo_file = FALSE;
     context_sha256_T sha_ctx;
-#endif
-    unsigned int    bkc = get_bkc_flags(buf);
-    pos_T	    orig_start = buf->b_op_start;
-    pos_T	    orig_end = buf->b_op_end;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ    bkc = get_bkc_flags(buf);
+    pos_T	    orig_ಆರಂಭ = buf->b_op_ಆರಂಭ;
+    pos_T	    orig_ಕೊನೆ = buf->b_op_ಕೊನೆ;
 
-    if (fname == NULL || *fname == NUL)	// safety check
-	return FAIL;
-    if (buf->b_ml.ml_mfp == NULL)
+    ಆದರೆ (fname == ಖಾಲಿ || *fname == NUL)	// safety check
+	ಹಿಂತಿರುಗಿ FAIL;
+    ಆದರೆ (buf->b_ml.ml_mfp == ಖಾಲಿ)
     {
 	// This can happen during startup when there is a stray "w" in the
 	// vimrc file.
-	emsg(_(e_empty_buffer));
-	return FAIL;
+	emsg(_(e_ಖಾಲಿಗಳು_ಬಫರ್));
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
     // Disallow writing from .exrc and .vimrc in current directory for
     // security reasons.
-    if (check_secure())
-	return FAIL;
+    ಆದರೆ (check_secure())
+	ಹಿಂತಿರುಗಿ FAIL;
 
     // Avoid a crash for a long name.
-    if (STRLEN(fname) >= MAXPATHL)
+    ಆದರೆ (STRLEN(fname) >= MAXPATHL)
     {
 	emsg(_(e_name_too_long));
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
     // must init bw_conv_buf and bw_iconv_fd before jumping to "fail"
-    write_info.bw_conv_buf = NULL;
+    write_info.bw_conv_buf = ಖಾಲಿ;
     write_info.bw_conv_error = FALSE;
     write_info.bw_conv_error_lnum = 0;
     write_info.bw_restlen = 0;
-#ifdef USE_ICONV
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_ICONV
     write_info.bw_iconv_fd = (iconv_t)-1;
-#endif
-#ifdef FEAT_CRYPT
-    write_info.bw_buffer = buf;
-    write_info.bw_finish = FALSE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+    write_info.bw_ಬಫರ್ = buf;
+    write_info.bw_ಮುಕ್ತಾಯ = FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
 
     // After writing a file changedtick changes but we don't want to display
     // the line.
@@ -744,107 +744,107 @@ buf_write(
     // Don't do this when the write is for a filter command.
     // Don't do this when appending.
     // Only do this when 'cpoptions' contains the 'F' flag.
-    if (buf->b_ffname == NULL
-	    && reset_changed
-	    && whole
+    ಆದರೆ (buf->b_ffname == ಖಾಲಿ
+	    && reset_ಬದಲಾಯಿತು
+	    && ಸಂಪೂರ್ಣ
 	    && buf == curbuf
 	    && !bt_nofilename(buf)
 	    && !filtering
-	    && (!append || vim_strchr(p_cpo, CPO_FNAMEAPP) != NULL)
-	    && vim_strchr(p_cpo, CPO_FNAMEW) != NULL)
+	    && (!append || vim_strchr(p_cpo, CPO_FNAMEAPP) != ಖಾಲಿ)
+	    && vim_strchr(p_cpo, CPO_FNAMEW) != ಖಾಲಿ)
     {
-	if (set_rw_fname(fname, sfname) == FAIL)
-	    return FAIL;
+	ಆದರೆ (ಗಣ_rw_fname(fname, sfname) == FAIL)
+	    ಹಿಂತಿರುಗಿ FAIL;
 	buf = curbuf;	    // just in case autocmds made "buf" invalid
     }
 
-    if (sfname == NULL)
+    ಆದರೆ (sfname == ಖಾಲಿ)
 	sfname = fname;
     // For Unix: Use the short file name whenever possible.
     // Avoids problems with networks and when directory names are changed.
     // Don't do this for MS-DOS, a "cd" in a sub-shell may have moved us to
     // another directory, which we don't detect
     ffname = fname;			    // remember full fname
-#ifdef UNIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
     fname = sfname;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (buf->b_ffname != NULL && fnamecmp(ffname, buf->b_ffname) == 0)
+    ಆದರೆ (buf->b_ffname != ಖಾಲಿ && fnamecmp(ffname, buf->b_ffname) == 0)
 	overwriting = TRUE;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	overwriting = FALSE;
 
-    if (exiting)
+    ಆದರೆ (exiting)
 	settmode(TMODE_COOK);	    // when exiting allow typeahead now
 
     ++no_wait_return;		    // don't wait for return yet
 
     // Set '[ and '] marks to the lines to be written.
-    buf->b_op_start.lnum = start;
-    buf->b_op_start.col = 0;
-    buf->b_op_end.lnum = end;
-    buf->b_op_end.col = 0;
+    buf->b_op_ಆರಂಭ.lnum = ಆರಂಭ;
+    buf->b_op_ಆರಂಭ.ಲಂಬಸಾಲು = 0;
+    buf->b_op_ಕೊನೆ.lnum = ಕೊನೆ;
+    buf->b_op_ಕೊನೆ.ಲಂಬಸಾಲು = 0;
 
     {
 	aco_save_T	aco;
-	int		buf_ffname = FALSE;
-	int		buf_sfname = FALSE;
-	int		buf_fname_f = FALSE;
-	int		buf_fname_s = FALSE;
-	int		did_cmd = FALSE;
-	int		nofile_err = FALSE;
-	int		empty_memline = (buf->b_ml.ml_mfp == NULL);
+	ಪೂರ್ಣಾಂಕ		buf_ffname = FALSE;
+	ಪೂರ್ಣಾಂಕ		buf_sfname = FALSE;
+	ಪೂರ್ಣಾಂಕ		buf_fname_f = FALSE;
+	ಪೂರ್ಣಾಂಕ		buf_fname_s = FALSE;
+	ಪೂರ್ಣಾಂಕ		did_cmd = FALSE;
+	ಪೂರ್ಣಾಂಕ		nofile_err = FALSE;
+	ಪೂರ್ಣಾಂಕ		ಖಾಲಿಗಳು_memline = (buf->b_ml.ml_mfp == ಖಾಲಿ);
 	bufref_T	bufref;
 
 	// Apply PRE autocommands.
 	// Set curbuf to the buffer to be written.
 	// Careful: The autocommands may call buf_write() recursively!
-	if (ffname == buf->b_ffname)
+	ಆದರೆ (ffname == buf->b_ffname)
 	    buf_ffname = TRUE;
-	if (sfname == buf->b_sfname)
+	ಆದರೆ (sfname == buf->b_sfname)
 	    buf_sfname = TRUE;
-	if (fname == buf->b_ffname)
+	ಆದರೆ (fname == buf->b_ffname)
 	    buf_fname_f = TRUE;
-	if (fname == buf->b_sfname)
+	ಆದರೆ (fname == buf->b_sfname)
 	    buf_fname_s = TRUE;
 
 	// Set curwin/curbuf to buf and save a few things.
 	aucmd_prepbuf(&aco, buf);
-	if (curbuf != buf)
+	ಆದರೆ (curbuf != buf)
 	{
 	    // Could not find a window for "buf".  Doing more might cause
 	    // problems, better bail out.
-	    return FAIL;
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
 
-	set_bufref(&bufref, buf);
+	ಗಣ_bufref(&bufref, buf);
 
-	if (append)
+	ಆದರೆ (append)
 	{
-	    if (!(did_cmd = apply_autocmds_exarg(EVENT_FILEAPPENDCMD,
+	    ಆದರೆ (!(did_cmd = apply_autocmds_exarg(EVENT_FILEAPPENDCMD,
 					 sfname, sfname, FALSE, curbuf, eap)))
 	    {
-		if (overwriting && bt_nofilename(curbuf))
+		ಆದರೆ (overwriting && bt_nofilename(curbuf))
 		    nofile_err = TRUE;
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		    apply_autocmds_exarg(EVENT_FILEAPPENDPRE,
 					  sfname, sfname, FALSE, curbuf, eap);
 	    }
 	}
-	else if (filtering)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (filtering)
 	{
 	    apply_autocmds_exarg(EVENT_FILTERWRITEPRE,
-					    NULL, sfname, FALSE, curbuf, eap);
+					    ಖಾಲಿ, sfname, FALSE, curbuf, eap);
 	}
-	else if (reset_changed && whole)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (reset_ಬದಲಾಯಿತು && ಸಂಪೂರ್ಣ)
 	{
-	    int was_changed = curbufIsChanged();
+	    ಪೂರ್ಣಾಂಕ was_ಬದಲಾಯಿತು = curbuf_Is_ಬದಲಾಯಿತು();
 
 	    did_cmd = apply_autocmds_exarg(EVENT_BUFWRITECMD,
 					  sfname, sfname, FALSE, curbuf, eap);
-	    if (did_cmd)
+	    ಆದರೆ (did_cmd)
 	    {
-		if (was_changed && !curbufIsChanged())
+		ಆದರೆ (was_ಬದಲಾಯಿತು && !curbuf_Is_ಬದಲಾಯಿತು())
 		{
 		    // Written everything correctly and BufWriteCmd has reset
 		    // 'modified': Correct the undo information so that an
@@ -853,23 +853,23 @@ buf_write(
 		    u_update_save_nr(curbuf);
 		}
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		if (overwriting && bt_nofilename(curbuf))
+		ಆದರೆ (overwriting && bt_nofilename(curbuf))
 		    nofile_err = TRUE;
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		    apply_autocmds_exarg(EVENT_BUFWRITEPRE,
 					  sfname, sfname, FALSE, curbuf, eap);
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (!(did_cmd = apply_autocmds_exarg(EVENT_FILEWRITECMD,
+	    ಆದರೆ (!(did_cmd = apply_autocmds_exarg(EVENT_FILEWRITECMD,
 					 sfname, sfname, FALSE, curbuf, eap)))
 	    {
-		if (overwriting && bt_nofilename(curbuf))
+		ಆದರೆ (overwriting && bt_nofilename(curbuf))
 		    nofile_err = TRUE;
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		    apply_autocmds_exarg(EVENT_FILEWRITEPRE,
 					  sfname, sfname, FALSE, curbuf, eap);
 	    }
@@ -882,84 +882,84 @@ buf_write(
 	// 1. the autocommands deleted or unloaded the buffer.
 	// 2. The autocommands abort script processing.
 	// 3. If one of the "Cmd" autocommands was executed.
-	if (!bufref_valid(&bufref))
-	    buf = NULL;
-	if (buf == NULL || (buf->b_ml.ml_mfp == NULL && !empty_memline)
+	ಆದರೆ (!bufref_valid(&bufref))
+	    buf = ಖಾಲಿ;
+	ಆದರೆ (buf == ಖಾಲಿ || (buf->b_ml.ml_mfp == ಖಾಲಿ && !ಖಾಲಿಗಳು_memline)
 				       || did_cmd || nofile_err
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 				       || aborting()
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 				       )
 	{
-	    if (buf != NULL && (cmdmod.cmod_flags & CMOD_LOCKMARKS))
+	    ಆದರೆ (buf != ಖಾಲಿ && (cmdmod.cmod_flags & CMOD_LOCKMARKS))
 	    {
 		// restore the original '[ and '] positions
-		buf->b_op_start = orig_start;
-		buf->b_op_end = orig_end;
+		buf->b_op_ಆರಂಭ = orig_ಆರಂಭ;
+		buf->b_op_ಕೊನೆ = orig_ಕೊನೆ;
 	    }
 
 	    --no_wait_return;
-	    msg_scroll = msg_save;
-	    if (nofile_err)
-		semsg(_(e_no_matching_autocommands_for_buftype_str_buffer),
+	    ಸಂದೇಶ_scroll = ಸಂದೇಶ_save;
+	    ಆದರೆ (nofile_err)
+		semsg(_(e_no_matching_autocommands_for_buftype_str_ಬಫರ್),
 							       curbuf->b_p_bt);
 
-	    if (nofile_err
-#ifdef FEAT_EVAL
+	    ಆದರೆ (nofile_err
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 		    || aborting()
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		    )
 		// An aborting error, interrupt or exception in the
 		// autocommands.
-		return FAIL;
-	    if (did_cmd)
+		ಹಿಂತಿರುಗಿ FAIL;
+	    ಆದರೆ (did_cmd)
 	    {
-		if (buf == NULL)
+		ಆದರೆ (buf == ಖಾಲಿ)
 		    // The buffer was deleted.  We assume it was written
 		    // (can't retry anyway).
-		    return OK;
-		if (overwriting)
+		    ಹಿಂತಿರುಗಿ OK;
+		ಆದರೆ (overwriting)
 		{
 		    // Assume the buffer was written, update the timestamp.
 		    ml_timestamp(buf);
-		    if (append)
+		    ಆದರೆ (append)
 			buf->b_flags &= ~BF_NEW;
-		    else
-			buf->b_flags &= ~BF_WRITE_MASK;
+		    ಇಲ್ಲದಿದ್ದರೆ
+			buf->b_flags &= ~BF_WRITE_ಮುಖವಾಡ;
 		}
-		if (reset_changed && buf->b_changed && !append
-			&& (overwriting || vim_strchr(p_cpo, CPO_PLUS) != NULL))
+		ಆದರೆ (reset_ಬದಲಾಯಿತು && buf->b_ಬದಲಾಯಿತು && !append
+			&& (overwriting || vim_strchr(p_cpo, CPO_PLUS) != ಖಾಲಿ))
 		    // Buffer still changed, the autocommands didn't work
 		    // properly.
-		    return FAIL;
-		return OK;
+		    ಹಿಂತಿರುಗಿ FAIL;
+		ಹಿಂತಿರುಗಿ OK;
 	    }
-#ifdef FEAT_EVAL
-	    if (!aborting())
-#endif
-		emsg(_(e_autocommands_deleted_or_unloaded_buffer_to_be_written));
-	    return FAIL;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	    ಆದರೆ (!aborting())
+#ಆದರೆ_ಅಂತ್ಯ
+		emsg(_(e_autocommands_deleted_or_unloaded_ಬಫರ್_ಗಮ್ಯ_be_written));
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
 
 	// The autocommands may have changed the number of lines in the file.
 	// When writing the whole file, adjust the end.
 	// When writing part of the file, assume that the autocommands only
 	// changed the number of lines that are to be written (tricky!).
-	if (buf->b_ml.ml_line_count != old_line_count)
+	ಆದರೆ (buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ != old_ಸಾಲು_ಎಣಿಕೆ)
 	{
-	    if (whole)						// write all
-		end = buf->b_ml.ml_line_count;
-	    else if (buf->b_ml.ml_line_count > old_line_count)	// more lines
-		end += buf->b_ml.ml_line_count - old_line_count;
-	    else						// less lines
+	    ಆದರೆ (ಸಂಪೂರ್ಣ)						// write all
+		ಕೊನೆ = buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ > old_ಸಾಲು_ಎಣಿಕೆ)	// more lines
+		ಕೊನೆ += buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ - old_ಸಾಲು_ಎಣಿಕೆ;
+	    ಇಲ್ಲದಿದ್ದರೆ						// less lines
 	    {
-		end -= old_line_count - buf->b_ml.ml_line_count;
-		if (end < start)
+		ಕೊನೆ -= old_ಸಾಲು_ಎಣಿಕೆ - buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
+		ಆದರೆ (ಕೊನೆ < ಆರಂಭ)
 		{
 		    --no_wait_return;
-		    msg_scroll = msg_save;
-		    emsg(_(e_autocommands_changed_number_of_lines_in_unexpected_way));
-		    return FAIL;
+		    ಸಂದೇಶ_scroll = ಸಂದೇಶ_save;
+		    emsg(_(e_autocommands_ಬದಲಾಯಿತು_ಸಂಖ್ಯೆ_ದ_ಸಾಲುಗಳು_ಒಳ_unexpected_way));
+		    ಹಿಂತಿರುಗಿ FAIL;
 		}
 	    }
 	}
@@ -967,103 +967,103 @@ buf_write(
 	// The autocommands may have changed the name of the buffer, which may
 	// be kept in fname, ffname and sfname.  A ":cd" may also have dropped
 	// the short name, then b_fname is the full name.
-	if (buf_ffname)
+	ಆದರೆ (buf_ffname)
 	    ffname = buf->b_ffname;
-	if (buf_sfname)
+	ಆದರೆ (buf_sfname)
 	    sfname = buf->b_fname;
-	if (buf_fname_f)
+	ಆದರೆ (buf_fname_f)
 	    fname = buf->b_ffname;
-	if (buf_fname_s)
+	ಆದರೆ (buf_fname_s)
 	    fname = buf->b_fname;
     }
 
-    if (cmdmod.cmod_flags & CMOD_LOCKMARKS)
+    ಆದರೆ (cmdmod.cmod_flags & CMOD_LOCKMARKS)
     {
 	// restore the original '[ and '] positions
-	buf->b_op_start = orig_start;
-	buf->b_op_end = orig_end;
+	buf->b_op_ಆರಂಭ = orig_ಆರಂಭ;
+	buf->b_op_ಕೊನೆ = orig_ಕೊನೆ;
     }
 
-#ifdef FEAT_NETBEANS_INTG
-    if (netbeans_active() && isNetbeansBuffer(buf))
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_NETBEANS_INTG
+    ಆದರೆ (netbeans_ಸಕ್ರಿಯ() && is_Netbeans_ಬಫರ್(buf))
     {
-	if (whole)
+	ಆದರೆ (ಸಂಪೂರ್ಣ)
 	{
 	    // b_changed can be 0 after an undo, but we still need to write
 	    // the buffer to NetBeans.
-	    if (buf->b_changed || isNetbeansModified(buf))
+	    ಆದರೆ (buf->b_ಬದಲಾಯಿತು || isNetbeansModified(buf))
 	    {
 		--no_wait_return;		// may wait for return now
-		msg_scroll = msg_save;
-		netbeans_save_buffer(buf);	// no error checking...
-		return retval;
+		ಸಂದೇಶ_scroll = ಸಂದೇಶ_save;
+		netbeans_save_ಬಫರ್(buf);	// no error checking...
+		ಹಿಂತಿರುಗಿ retval;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		errnum = (char_u *)"E656: ";
-		errmsg = (char_u *)_(e_netbeans_disallows_writes_of_unmodified_buffers);
-		buffer = NULL;
-		goto fail;
+		errmsg = (char_u *)_(e_netbeans_disallows_writes_ದ_unmodified_buffers);
+		ಬಫರ್ = ಖಾಲಿ;
+		ಹೋಗು fail;
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    errnum = (char_u *)"E657: ";
 	    errmsg = (char_u *)_(e_partial_writes_disallowed_for_netbeans_buffers);
-	    buffer = NULL;
-	    goto fail;
+	    ಬಫರ್ = ಖಾಲಿ;
+	    ಹೋಗು fail;
 	}
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (shortmess(SHM_OVER) && !exiting)
-	msg_scroll = FALSE;	    // overwrite previous file message
-    else
-	msg_scroll = TRUE;	    // don't overwrite previous file message
-    if (!filtering)
+    ಆದರೆ (shortmess(SHM_OVER) && !exiting)
+	ಸಂದೇಶ_scroll = FALSE;	    // overwrite previous file message
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಸಂದೇಶ_scroll = TRUE;	    // don't overwrite previous file message
+    ಆದರೆ (!filtering)
 	filemess(buf,
-#ifndef UNIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ UNIX
 		sfname,
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 		fname,
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		    (char_u *)"", 0);	// show that we are busy
-    msg_scroll = FALSE;		    // always overwrite the file message now
+    ಸಂದೇಶ_scroll = FALSE;		    // always overwrite the file message now
 
-    buffer = alloc(WRITEBUFSIZE);
-    if (buffer == NULL)		    // can't allocate big buffer, use small
+    ಬಫರ್ = alloc(WRITEBUFSIZE);
+    ಆದರೆ (ಬಫರ್ == ಖಾಲಿ)		    // can't allocate big buffer, use small
 				    // one (to be able to write when out of
 				    // memory)
     {
-	buffer = smallbuf;
+	ಬಫರ್ = smallbuf;
 	bufsize = SMALLBUFSIZE;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	bufsize = WRITEBUFSIZE;
 
     // Get information about original file (if there is one).
-#if defined(UNIX)
+#ಆದರೆ defined(UNIX)
     st_old.st_dev = 0;
     st_old.st_ino = 0;
     perm = -1;
-    if (mch_stat((char *)fname, &st_old) < 0)
+    ಆದರೆ (mch_stat((ಅಕ್ಷರ *)fname, &st_old) < 0)
 	newfile = TRUE;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	perm = st_old.st_mode;
-	if (!S_ISREG(st_old.st_mode))		// not a file
+	perm = st_old.st_ಬಹುಲಕ;
+	ಆದರೆ (!S_ISREG(st_old.st_ಬಹುಲಕ))		// not a file
 	{
-	    if (S_ISDIR(st_old.st_mode))
+	    ಆದರೆ (S_ISDIR(st_old.st_ಬಹುಲಕ))
 	    {
 		errnum = (char_u *)"E502: ";
 		errmsg = (char_u *)_(e_is_a_directory);
-		goto fail;
+		ಹೋಗು fail;
 	    }
-	    if (mch_nodetype(fname) != NODE_WRITABLE)
+	    ಆದರೆ (mch_nodetype(fname) != ಗಂಟು_WRITABLE)
 	    {
 		errnum = (char_u *)"E503: ";
 		errmsg = (char_u *)_(e_is_not_file_or_writable_device);
-		goto fail;
+		ಹೋಗು fail;
 	    }
 	    // It's a device of some kind (or a fifo) which we can write to
 	    // but for which we can't make a backup.
@@ -1072,86 +1072,86 @@ buf_write(
 	    perm = -1;
 	}
     }
-#else // !UNIX
+#ಇಲ್ಲದಿದ್ದರೆ // !UNIX
     // Check for a writable device name.
     c = mch_nodetype(fname);
-    if (c == NODE_OTHER)
+    ಆದರೆ (c == ಗಂಟು_OTHER)
     {
 	errnum = (char_u *)"E503: ";
 	errmsg = (char_u *)_(e_is_not_file_or_writable_device);
-	goto fail;
+	ಹೋಗು fail;
     }
-    if (c == NODE_WRITABLE)
+    ಆದರೆ (c == ಗಂಟು_WRITABLE)
     {
-# if defined(MSWIN)
+# ಆದರೆ defined(MSWIN)
 	// MS-Windows allows opening a device, but we will probably get stuck
 	// trying to write to it.
-	if (!p_odev)
+	ಆದರೆ (!p_odev)
 	{
 	    errnum = (char_u *)"E796: ";
-	    errmsg = (char_u *)_(e_writing_to_device_disabled_with_opendevice_option);
-	    goto fail;
+	    errmsg = (char_u *)_(e_writing_ಗಮ್ಯ_device_disabled_with_opendevice_option);
+	    ಹೋಗು fail;
 	}
 # endif
 	device = TRUE;
 	newfile = TRUE;
 	perm = -1;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	perm = mch_getperm(fname);
-	if (perm < 0)
+	ಆದರೆ (perm < 0)
 	    newfile = TRUE;
-	else if (mch_isdir(fname))
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (mch_isdir(fname))
 	{
 	    errnum = (char_u *)"E502: ";
 	    errmsg = (char_u *)_(e_is_a_directory);
-	    goto fail;
+	    ಹೋಗು fail;
 	}
-	if (overwriting)
-	    (void)mch_stat((char *)fname, &st_old);
+	ಆದರೆ (overwriting)
+	    (ಶೂನ್ಯ)mch_stat((ಅಕ್ಷರ *)fname, &st_old);
     }
-#endif // !UNIX
+#ಆದರೆ_ಅಂತ್ಯ // !UNIX
 
-    if (!device && !newfile)
+    ಆದರೆ (!device && !newfile)
     {
 	// Check if the file is really writable (when renaming the file to
 	// make a backup we won't discover it later).
-	file_readonly = check_file_readonly(fname, (int)perm);
+	file_readonly = check_file_readonly(fname, (ಪೂರ್ಣಾಂಕ)perm);
 
-	if (!forceit && file_readonly)
+	ಆದರೆ (!forceit && file_readonly)
 	{
-	    if (vim_strchr(p_cpo, CPO_FWRITE) != NULL)
+	    ಆದರೆ (vim_strchr(p_cpo, CPO_FWRITE) != ಖಾಲಿ)
 	    {
 		errnum = (char_u *)"E504: ";
-		errmsg = (char_u *)_(e_is_read_only_cannot_override_W_in_cpoptions);
+		errmsg = (char_u *)_(e_is_read_only_cannot_override_W_ಒಳ_cpoptions);
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		errnum = (char_u *)"E505: ";
-		errmsg = (char_u *)_(e_is_read_only_add_bang_to_override);
+		errmsg = (char_u *)_(e_is_read_only_ಕೂಡಿಸು_bang_ಗಮ್ಯ_override);
 	    }
-	    goto fail;
+	    ಹೋಗು fail;
 	}
 
 	// Check if the timestamp hasn't changed since reading the file.
-	if (overwriting)
+	ಆದರೆ (overwriting)
 	{
 	    retval = check_mtime(buf, &st_old);
-	    if (retval == FAIL)
-		goto fail;
+	    ಆದರೆ (retval == FAIL)
+		ಹೋಗು fail;
 	}
     }
 
-#ifdef HAVE_ACL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_ACL
     // For systems that support ACL: get the ACL from the original file.
-    if (!newfile)
+    ಆದರೆ (!newfile)
 	acl = mch_get_acl(fname);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // If 'backupskip' is not empty, don't make a backup for some files.
     dobackup = (p_wb || p_bk || *p_pm != NUL);
-    if (dobackup && *p_bsk != NUL && match_file_list(p_bsk, sfname, ffname))
+    ಆದರೆ (dobackup && *p_bsk != NUL && ಹೊಂದಿಕೆ_file_list(p_bsk, sfname, ffname))
 	dobackup = FALSE;
 
     // Save the value of got_int and reset it.  We don't want a previous
@@ -1169,16 +1169,16 @@ buf_write(
     //
     // Do not make any backup, if 'writebackup' and 'backup' are both switched
     // off.  This helps when editing large files on almost-full disks.
-    if (!(append && *p_pm == NUL) && !filtering && perm >= 0 && dobackup)
+    ಆದರೆ (!(append && *p_pm == NUL) && !filtering && perm >= 0 && dobackup)
     {
-#if defined(UNIX) || defined(MSWIN)
+#ಆದರೆ defined(UNIX) || defined(MSWIN)
 	stat_T	    st;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-	if ((bkc & BKC_YES) || append)	// "yes"
+	ಆದರೆ ((bkc & BKC_YES) || append)	// "yes"
 	    backup_copy = TRUE;
-#if defined(UNIX) || defined(MSWIN)
-	else if ((bkc & BKC_AUTO))	// "auto"
+#ಆದರೆ defined(UNIX) || defined(MSWIN)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((bkc & BKC_AUTO))	// "auto"
 	{
 # ifdef UNIX
 	    // Don't rename the file when:
@@ -1186,8 +1186,8 @@ buf_write(
 	    // - it's a symbolic link
 	    // - we don't have write permission in the directory
 	    // - we can't set the owner/group of the new file
-	    if (st_old.st_nlink > 1
-		    || mch_lstat((char *)fname, &st) < 0
+	    ಆದರೆ (st_old.st_nlink > 1
+		    || mch_lstat((ಅಕ್ಷರ *)fname, &st) < 0
 		    || st.st_dev != st_old.st_dev
 		    || st.st_ino != st_old.st_ino
 #  ifndef HAVE_FCHOWN
@@ -1196,19 +1196,19 @@ buf_write(
 #  endif
 		    )
 		backup_copy = TRUE;
-	    else
-# else
+	    ಇಲ್ಲದಿದ್ದರೆ
+# ಇಲ್ಲದಿದ್ದರೆ
 #  ifdef MSWIN
 	    // On NTFS file systems hard links are possible.
-	    if (mch_is_linked(fname))
+	    ಆದರೆ (mch_is_linked(fname))
 		backup_copy = TRUE;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 #  endif
 # endif
 	    {
 		size_t	dirlen;
 		char_u	tmp_fname[MAXPATHL];
-		int	i;
+		ಪೂರ್ಣಾಂಕ	i;
 
 		// Check if we can create a file and set the owner/group/mode to
 		// the ones from the original file.
@@ -1218,39 +1218,39 @@ buf_write(
 		dirlen = (size_t)(gettail(fname) - fname);
 		vim_strncpy(tmp_fname, fname, dirlen);
 		fd = -1;
-		for (i = 4913; ; i += 123)
+		ಗಾಗಿ (i = 4913; ; i += 123)
 		{
-		    vim_snprintf((char *)tmp_fname + dirlen,
-			sizeof(tmp_fname) - dirlen, ".%d.swp", i);
-		    if (mch_lstat((char *)tmp_fname, &st) < 0)
+		    vim_snprintf((ಅಕ್ಷರ *)tmp_fname + dirlen,
+			ಗಾತ್ರ(tmp_fname) - dirlen, ".%d.swp", i);
+		    ಆದರೆ (mch_lstat((ಅಕ್ಷರ *)tmp_fname, &st) < 0)
 		    {
-			fd = mch_open((char *)tmp_fname,
+			fd = mch_open((ಅಕ್ಷರ *)tmp_fname,
 				    O_CREAT|O_WRONLY|O_EXCL|O_NOFOLLOW, perm);
-			if (fd < 0 && errno == EEXIST)
+			ಆದರೆ (fd < 0 && errno == EEXIST)
 			    // If the same file name is created by another
 			    // process between lstat() and open(), find another
 			    // name.
-			    continue;
-			break;
+			    ಮುಂದುವರಿ;
+			ನಿಲ್ಲಿಸು;
 		    }
 		}
-		if (fd < 0)	// can't write in directory
+		ಆದರೆ (fd < 0)	// can't write in directory
 		    backup_copy = TRUE;
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 # ifdef UNIX
 #  ifdef HAVE_FCHOWN
 		    vim_ignored = fchown(fd, st_old.st_uid, st_old.st_gid);
 #  endif
 #  ifdef HAVE_FCHMOD
-		    (void)mch_fsetperm(fd, perm);
-#  else
-		    (void)mch_setperm(tmp_fname, perm);
+		    (ಶೂನ್ಯ)mch_fsetperm(fd, perm);
+#  ಇಲ್ಲದಿದ್ದರೆ
+		    (ಶೂನ್ಯ)mch_setperm(tmp_fname, perm);
 #  endif
-		    if (mch_stat((char *)tmp_fname, &st) < 0
+		    ಆದರೆ (mch_stat((ಅಕ್ಷರ *)tmp_fname, &st) < 0
 			    || st.st_uid != st_old.st_uid
 			    || st.st_gid != st_old.st_gid
-			    || (long)st.st_mode != perm)
+			    || (ದೀರ್ಘ)st.st_ಬಹುಲಕ != perm)
 			backup_copy = TRUE;
 # endif
 		    // Close the file before removing it, on MS-Windows we
@@ -1262,12 +1262,12 @@ buf_write(
 		    // file, we can't delete it then.  Keep trying for half a
 		    // second.
 		    {
-			int try;
+			ಪೂರ್ಣಾಂಕ try;
 
-			for (try = 0; try < 10; ++try)
+			ಗಾಗಿ (try = 0; try < 10; ++try)
 			{
-			    if (mch_lstat((char *)tmp_fname, &st) < 0)
-				break;
+			    ಆದರೆ (mch_lstat((ಅಕ್ಷರ *)tmp_fname, &st) < 0)
+				ನಿಲ್ಲಿಸು;
 			    ui_delay(50L, TRUE);  // wait 50 msec
 			    mch_remove(tmp_fname);
 			}
@@ -1278,64 +1278,64 @@ buf_write(
 	}
 
 	// Break symlinks and/or hardlinks if we've been asked to.
-	if ((bkc & BKC_BREAKSYMLINK) || (bkc & BKC_BREAKHARDLINK))
+	ಆದರೆ ((bkc & BKC_BREAKSYMLINK) || (bkc & BKC_BREAKHARDLINK))
 	{
 # ifdef UNIX
-	    int	lstat_res;
+	    ಪೂರ್ಣಾಂಕ	lstat_res;
 
-	    lstat_res = mch_lstat((char *)fname, &st);
+	    lstat_res = mch_lstat((ಅಕ್ಷರ *)fname, &st);
 
 	    // Symlinks.
-	    if ((bkc & BKC_BREAKSYMLINK)
+	    ಆದರೆ ((bkc & BKC_BREAKSYMLINK)
 		    && lstat_res == 0
 		    && st.st_ino != st_old.st_ino)
 		backup_copy = FALSE;
 
 	    // Hardlinks.
-	    if ((bkc & BKC_BREAKHARDLINK)
+	    ಆದರೆ ((bkc & BKC_BREAKHARDLINK)
 		    && st_old.st_nlink > 1
 		    && (lstat_res != 0 || st.st_ino == st_old.st_ino))
 		backup_copy = FALSE;
-# else
-#  if defined(MSWIN)
+# ಇಲ್ಲದಿದ್ದರೆ
+#  ಆದರೆ defined(MSWIN)
 	    // Symlinks.
-	    if ((bkc & BKC_BREAKSYMLINK) && mch_is_symbolic_link(fname))
+	    ಆದರೆ ((bkc & BKC_BREAKSYMLINK) && mch_is_symbolic_link(fname))
 		backup_copy = FALSE;
 
 	    // Hardlinks.
-	    if ((bkc & BKC_BREAKHARDLINK) && mch_is_hard_link(fname))
+	    ಆದರೆ ((bkc & BKC_BREAKHARDLINK) && mch_is_hard_link(fname))
 		backup_copy = FALSE;
 #  endif
 # endif
 	}
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 	// make sure we have a valid backup extension to use
-	if (*p_bex == NUL)
+	ಆದರೆ (*p_bex == NUL)
 	    backup_ext = (char_u *)".bak";
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    backup_ext = p_bex;
 
-	if (backup_copy
-		&& (fd = mch_open((char *)fname, O_RDONLY | O_EXTRA, 0)) >= 0)
+	ಆದರೆ (backup_copy
+		&& (fd = mch_open((ಅಕ್ಷರ *)fname, O_RDONLY | O_EXTRA, 0)) >= 0)
 	{
-	    int		bfd;
+	    ಪೂರ್ಣಾಂಕ		bfd;
 	    char_u	*copybuf;
-	    int		some_error = FALSE;
+	    ಪೂರ್ಣಾಂಕ		some_error = FALSE;
 	    stat_T	st_new;
 	    char_u	*dirp;
 	    char_u	*rootname;
-#if defined(UNIX)
-	    int		did_set_shortname;
+#ಆದರೆ defined(UNIX)
+	    ಪೂರ್ಣಾಂಕ		did_ಗಣ_shortname;
 	    mode_t	umask_save;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 	    copybuf = alloc(WRITEBUFSIZE + 1);
-	    if (copybuf == NULL)
+	    ಆದರೆ (copybuf == ಖಾಲಿ)
 	    {
 		some_error = TRUE;	    // out of memory
-		goto nobackup;
+		ಹೋಗು nobackup;
 	    }
 
 	    // Try to make the backup in each directory in the 'bdir' option.
@@ -1349,192 +1349,192 @@ buf_write(
 	    // For these reasons, the existing writable file must be truncated
 	    // and reused. Creation of a backup COPY will be attempted.
 	    dirp = p_bdir;
-	    while (*dirp)
+	    ಆಗ (*dirp)
 	    {
-		char_u	*p UNUSED;
-		int	copybuf_len UNUSED;
+		char_u	*p ಬಳಸದ;
+		ಪೂರ್ಣಾಂಕ	copybuf_len ಬಳಸದ;
 
-#ifdef UNIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
 		st_new.st_ino = 0;
 		st_new.st_dev = 0;
 		st_new.st_gid = 0;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 		// Isolate one directory name, using an entry in 'bdir'.
 		copybuf_len = copy_option_part(&dirp, copybuf, WRITEBUFSIZE, ",");
 
-#if defined(UNIX) || defined(MSWIN)
+#ಆದರೆ defined(UNIX) || defined(MSWIN)
 		p = copybuf + copybuf_len;
-		if (after_pathsep(copybuf, p) && p[-1] == p[-2])
+		ಆದರೆ (after_pathsep(copybuf, p) && p[-1] == p[-2])
 		    // Ends with '//', use full path
-		    if ((p = make_percent_swname(copybuf, p, fname)) != NULL)
+		    ಆದರೆ ((p = make_percent_swname(copybuf, p, fname)) != ಖಾಲಿ)
 		    {
 			backup = modname(p, backup_ext, FALSE);
 			vim_free(p);
 		    }
-#endif
-		rootname = get_file_in_dir(fname, copybuf);
-		if (rootname == NULL)
+#ಆದರೆ_ಅಂತ್ಯ
+		rootname = get_file_ಒಳ_dir(fname, copybuf);
+		ಆದರೆ (rootname == ಖಾಲಿ)
 		{
 		    some_error = TRUE;	    // out of memory
-		    goto nobackup;
+		    ಹೋಗು nobackup;
 		}
 
-#if defined(UNIX)
-		did_set_shortname = FALSE;
-#endif
+#ಆದರೆ defined(UNIX)
+		did_ಗಣ_shortname = FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
 
 		// May try twice if 'shortname' not set.
-		for (;;)
+		ಗಾಗಿ (;;)
 		{
 		    // Make the backup file name.
-		    if (backup == NULL)
+		    ಆದರೆ (backup == ಖಾಲಿ)
 			backup = buf_modname((buf->b_p_sn || buf->b_shortname),
 						 rootname, backup_ext, FALSE);
-		    if (backup == NULL)
+		    ಆದರೆ (backup == ಖಾಲಿ)
 		    {
 			vim_free(rootname);
 			some_error = TRUE;		// out of memory
-			goto nobackup;
+			ಹೋಗು nobackup;
 		    }
 
 		    // Check if backup file already exists.
-		    if (mch_stat((char *)backup, &st_new) >= 0)
+		    ಆದರೆ (mch_stat((ಅಕ್ಷರ *)backup, &st_new) >= 0)
 		    {
-#ifdef UNIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
 			// Check if backup file is same as original file.
 			// May happen when modname() gave the same file back.
 			// E.g. silly link, or file name-length reached.
 			// If we don't check here, we either ruin the file
 			// when copying or erase it after writing. jw.
-			if (st_new.st_dev == st_old.st_dev
+			ಆದರೆ (st_new.st_dev == st_old.st_dev
 					    && st_new.st_ino == st_old.st_ino)
 			{
 			    VIM_CLEAR(backup);	// no backup file to delete
 			    // may try again with 'shortname' set
-			    if (!(buf->b_shortname || buf->b_p_sn))
+			    ಆದರೆ (!(buf->b_shortname || buf->b_p_sn))
 			    {
 				buf->b_shortname = true;
-				did_set_shortname = TRUE;
-				continue;
+				did_ಗಣ_shortname = TRUE;
+				ಮುಂದುವರಿ;
 			    }
 				// setting shortname didn't help
-			    if (did_set_shortname)
+			    ಆದರೆ (did_ಗಣ_shortname)
 				buf->b_shortname = false;
-			    break;
+			    ನಿಲ್ಲಿಸು;
 			}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 			// If we are not going to keep the backup file, don't
 			// delete an existing one, try to use another name.
 			// Change one character, just before the extension.
-			if (!p_bk)
+			ಆದರೆ (!p_bk)
 			{
 			    char_u	*wp;
 
 			    wp = backup + STRLEN(backup) - 1
 							 - STRLEN(backup_ext);
-			    if (wp < backup)	// empty file name ???
+			    ಆದರೆ (wp < backup)	// empty file name ???
 				wp = backup;
 			    *wp = 'z';
-			    while (*wp > 'a'
-				    && mch_stat((char *)backup, &st_new) >= 0)
+			    ಆಗ (*wp > 'a'
+				    && mch_stat((ಅಕ್ಷರ *)backup, &st_new) >= 0)
 				--*wp;
 			    // They all exist??? Must be something wrong.
-			    if (*wp == 'a')
+			    ಆದರೆ (*wp == 'a')
 				VIM_CLEAR(backup);
 			}
 		    }
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 		vim_free(rootname);
 
 		// Try to create the backup file
-		if (backup != NULL)
+		ಆದರೆ (backup != ಖಾಲಿ)
 		{
 		    // remove old backup, if present
 		    mch_remove(backup);
 		    // Open with O_EXCL to avoid the file being created while
 		    // we were sleeping (symlink hacker attack?). Reset umask
 		    // if possible to avoid mch_setperm() below.
-#ifdef UNIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
 		    umask_save = umask(0);
-#endif
-		    bfd = mch_open((char *)backup,
+#ಆದರೆ_ಅಂತ್ಯ
+		    bfd = mch_open((ಅಕ್ಷರ *)backup,
 				O_WRONLY|O_CREAT|O_EXTRA|O_EXCL|O_NOFOLLOW,
 								 perm & 0777);
-#ifdef UNIX
-		    (void)umask(umask_save);
-#endif
-		    if (bfd < 0)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
+		    (ಶೂನ್ಯ)umask(umask_save);
+#ಆದರೆ_ಅಂತ್ಯ
+		    ಆದರೆ (bfd < 0)
 			VIM_CLEAR(backup);
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
 			// Set file protection same as original file, but
 			// strip s-bit.  Only needed if umask() wasn't used
 			// above.
-#ifndef UNIX
-			(void)mch_setperm(backup, perm & 0777);
-#else
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ UNIX
+			(ಶೂನ್ಯ)mch_setperm(backup, perm & 0777);
+#ಇಲ್ಲದಿದ್ದರೆ
 			// Try to set the group of the backup same as the
 			// original file. If this fails, set the protection
 			// bits for the group same as the protection bits for
 			// others.
-			if (st_new.st_gid != st_old.st_gid
+			ಆದರೆ (st_new.st_gid != st_old.st_gid
 # ifdef HAVE_FCHOWN  // sequent-ptx lacks fchown()
 				&& fchown(bfd, (uid_t)-1, st_old.st_gid) != 0
 # endif
 						)
 			    mch_setperm(backup,
 					  (perm & 0707) | ((perm & 07) << 3));
-# if defined(HAVE_SELINUX) || defined(HAVE_SMACK)
+# ಆದರೆ defined(HAVE_SELINUX) || defined(HAVE_SMACK)
 			mch_copy_sec(fname, backup);
 # endif
 # ifdef FEAT_XATTR
 			mch_copy_xattr(fname, backup);
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 			// copy the file.
 			write_info.bw_fd = bfd;
 			write_info.bw_buf = copybuf;
 			write_info.bw_flags = FIO_NOCONVERT;
-			while ((write_info.bw_len = read_eintr(fd, copybuf,
+			ಆಗ ((write_info.bw_len = read_eintr(fd, copybuf,
 							    WRITEBUFSIZE)) > 0)
 			{
-			    if (buf_write_bytes(&write_info) == FAIL)
+			    ಆದರೆ (buf_write_ಬೈಟುಗಳು(&write_info) == FAIL)
 			    {
-				errmsg = (char_u *)_(e_cant_write_to_backup_file_add_bang_to_override);
-				break;
+				errmsg = (char_u *)_(e_cant_write_ಗಮ್ಯ_backup_file_ಕೂಡಿಸು_bang_ಗಮ್ಯ_override);
+				ನಿಲ್ಲಿಸು;
 			    }
 			    ui_breakcheck();
-			    if (got_int)
+			    ಆದರೆ (got_int)
 			    {
 				errmsg = (char_u *)_(e_interrupted);
-				break;
+				ನಿಲ್ಲಿಸು;
 			    }
 			}
 
-			if (close(bfd) < 0 && errmsg == NULL)
-			    errmsg = (char_u *)_(e_close_error_for_backup_file_add_bang_to_write_anyway);
-			if (write_info.bw_len < 0)
-			    errmsg = (char_u *)_(e_cant_read_file_for_backup_add_bang_to_write_anyway);
-#ifdef UNIX
-			set_file_time(backup, st_old.st_atime, st_old.st_mtime);
-#endif
-#ifdef HAVE_ACL
-			mch_set_acl(backup, acl);
-#endif
-#if defined(HAVE_SELINUX) || defined(HAVE_SMACK)
+			ಆದರೆ (close(bfd) < 0 && errmsg == ಖಾಲಿ)
+			    errmsg = (char_u *)_(e_close_error_for_backup_file_ಕೂಡಿಸು_bang_ಗಮ್ಯ_write_anyway);
+			ಆದರೆ (write_info.bw_len < 0)
+			    errmsg = (char_u *)_(e_cant_read_file_for_backup_ಕೂಡಿಸು_bang_ಗಮ್ಯ_write_anyway);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
+			ಗಣ_file_ಸಮಯ(backup, st_old.st_atime, st_old.st_mtime);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_ACL
+			mch_ಗಣ_acl(backup, acl);
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(HAVE_SELINUX) || defined(HAVE_SMACK)
 			mch_copy_sec(fname, backup);
-#endif
-#ifdef FEAT_XATTR
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XATTR
 			mch_copy_xattr(fname, backup);
-#endif
-#ifdef MSWIN
-			(void)mch_copy_file_attribute(fname, backup);
-#endif
-			break;
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
+			(ಶೂನ್ಯ)mch_copy_file_attribute(fname, backup);
+#ಆದರೆ_ಅಂತ್ಯ
+			ನಿಲ್ಲಿಸು;
 		    }
 		}
 	    }
@@ -1542,17 +1542,17 @@ buf_write(
 	    close(fd);		// ignore errors for closing read file
 	    vim_free(copybuf);
 
-	    if (backup == NULL && errmsg == NULL)
-		errmsg = (char_u *)_(e_cannot_create_backup_file_add_bang_to_write_anyway);
+	    ಆದರೆ (backup == ಖಾಲಿ && errmsg == ಖಾಲಿ)
+		errmsg = (char_u *)_(e_cannot_create_backup_file_ಕೂಡಿಸು_bang_ಗಮ್ಯ_write_anyway);
 	    // ignore errors when forceit is TRUE
-	    if ((some_error || errmsg != NULL) && !forceit)
+	    ಆದರೆ ((some_error || errmsg != ಖಾಲಿ) && !forceit)
 	    {
 		retval = FAIL;
-		goto fail;
+		ಹೋಗು fail;
 	    }
-	    errmsg = NULL;
+	    errmsg = ಖಾಲಿ;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    char_u	*dirp;
 	    char_u	*p;
@@ -1563,40 +1563,40 @@ buf_write(
 	    // If 'cpoptions' includes the "W" flag, we don't want to
 	    // overwrite a read-only file.  But rename may be possible
 	    // anyway, thus we need an extra check here.
-	    if (file_readonly && vim_strchr(p_cpo, CPO_FWRITE) != NULL)
+	    ಆದರೆ (file_readonly && vim_strchr(p_cpo, CPO_FWRITE) != ಖಾಲಿ)
 	    {
 		errnum = (char_u *)"E504: ";
-		errmsg = (char_u *)_(e_is_read_only_cannot_override_W_in_cpoptions);
-		goto fail;
+		errmsg = (char_u *)_(e_is_read_only_cannot_override_W_ಒಳ_cpoptions);
+		ಹೋಗು fail;
 	    }
 
 	    // Form the backup file name - change path/fo.o.h to
 	    // path/fo.o.h.bak Try all directories in 'backupdir', first one
 	    // that works is used.
 	    dirp = p_bdir;
-	    while (*dirp)
+	    ಆಗ (*dirp)
 	    {
-		int IObufflen UNUSED;
+		ಪೂರ್ಣಾಂಕ IObufflen ಬಳಸದ;
 
 		// Isolate one directory name and make the backup file name.
 		IObufflen = copy_option_part(&dirp, IObuff, IOSIZE, ",");
 
-#if defined(UNIX) || defined(MSWIN)
+#ಆದರೆ defined(UNIX) || defined(MSWIN)
 		p = IObuff + IObufflen;
-		if (after_pathsep(IObuff, p) && p[-1] == p[-2])
+		ಆದರೆ (after_pathsep(IObuff, p) && p[-1] == p[-2])
 		    // path ends with '//', use full path
-		    if ((p = make_percent_swname(IObuff, p, fname)) != NULL)
+		    ಆದರೆ ((p = make_percent_swname(IObuff, p, fname)) != ಖಾಲಿ)
 		    {
 			backup = modname(p, backup_ext, FALSE);
 			vim_free(p);
 		    }
-#endif
-		if (backup == NULL)
+#ಆದರೆ_ಅಂತ್ಯ
+		ಆದರೆ (backup == ಖಾಲಿ)
 		{
-		    rootname = get_file_in_dir(fname, IObuff);
-		    if (rootname == NULL)
-			backup = NULL;
-		    else
+		    rootname = get_file_ಒಳ_dir(fname, IObuff);
+		    ಆದರೆ (rootname == ಖಾಲಿ)
+			backup = ಖಾಲಿ;
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
 			backup = buf_modname(
 				(buf->b_p_sn || buf->b_shortname),
@@ -1605,25 +1605,25 @@ buf_write(
 		    }
 		}
 
-		if (backup != NULL)
+		ಆದರೆ (backup != ಖಾಲಿ)
 		{
 		    // If we are not going to keep the backup file, don't
 		    // delete an existing one, try to use another name.
 		    // Change one character, just before the extension.
-		    if (!p_bk && mch_getperm(backup) >= 0)
+		    ಆದರೆ (!p_bk && mch_getperm(backup) >= 0)
 		    {
 			p = backup + STRLEN(backup) - 1 - STRLEN(backup_ext);
-			if (p < backup)	// empty file name ???
+			ಆದರೆ (p < backup)	// empty file name ???
 			    p = backup;
 			*p = 'z';
-			while (*p > 'a' && mch_getperm(backup) >= 0)
+			ಆಗ (*p > 'a' && mch_getperm(backup) >= 0)
 			    --*p;
 			// They all exist??? Must be something wrong!
-			if (*p == 'a')
+			ಆದರೆ (*p == 'a')
 			    VIM_CLEAR(backup);
 		    }
 		}
-		if (backup != NULL)
+		ಆದರೆ (backup != ಖಾಲಿ)
 		{
 		    // Delete any existing backup and move the current version
 		    // to the backup.	For safety, we don't remove the backup
@@ -1632,76 +1632,76 @@ buf_write(
 
 		    // If the renaming of the original file to the backup file
 		    // works, quit here.
-		    if (vim_rename(fname, backup) == 0)
-			break;
+		    ಆದರೆ (vim_rename(fname, backup) == 0)
+			ನಿಲ್ಲಿಸು;
 
 		    VIM_CLEAR(backup);   // don't do the rename below
 		}
 	    }
-	    if (backup == NULL && !forceit)
+	    ಆದರೆ (backup == ಖಾಲಿ && !forceit)
 	    {
-		errmsg = (char_u *)_(e_cant_make_backup_file_add_bang_to_write_anyway);
-		goto fail;
+		errmsg = (char_u *)_(e_cant_make_backup_file_ಕೂಡಿಸು_bang_ಗಮ್ಯ_write_anyway);
+		ಹೋಗು fail;
 	    }
 	}
     }
 
-#if defined(UNIX)
+#ಆದರೆ defined(UNIX)
     // When using ":w!" and the file was read-only: make it writable
-    if (forceit && perm >= 0 && !(perm & 0200) && st_old.st_uid == getuid()
-				     && vim_strchr(p_cpo, CPO_FWRITE) == NULL)
+    ಆದರೆ (forceit && perm >= 0 && !(perm & 0200) && st_old.st_uid == getuid()
+				     && vim_strchr(p_cpo, CPO_FWRITE) == ಖಾಲಿ)
     {
 	perm |= 0200;
-	(void)mch_setperm(fname, perm);
+	(ಶೂನ್ಯ)mch_setperm(fname, perm);
 	made_writable = TRUE;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // When using ":w!" and writing to the current file, 'readonly' makes no
     // sense, reset it, unless 'Z' appears in 'cpoptions'.
-    if (forceit && overwriting && vim_strchr(p_cpo, CPO_KEEPRO) == NULL)
+    ಆದರೆ (forceit && overwriting && vim_strchr(p_cpo, CPO_KEEPRO) == ಖಾಲಿ)
     {
 	buf->b_p_ro = FALSE;
 	need_maketitle = TRUE;	    // set window title later
-	status_redraw_all();	    // redraw status lines later
+	ಸ್ಥಿತಿ_redraw_all();	    // redraw status lines later
     }
 
-    if (end > buf->b_ml.ml_line_count)
-	end = buf->b_ml.ml_line_count;
-    if (buf->b_ml.ml_flags & ML_EMPTY)
-	start = end + 1;
+    ಆದರೆ (ಕೊನೆ > buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
+	ಕೊನೆ = buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
+    ಆದರೆ (buf->b_ml.ml_flags & ML_ಖಾಲಿಗಳು)
+	ಆರಂಭ = ಕೊನೆ + 1;
 
     // If the original file is being overwritten, there is a small chance that
     // we crash in the middle of writing. Therefore the file is preserved now.
     // This makes all block numbers positive so that recovery does not need
     // the original file.
     // Don't do this if there is a backup file and we are exiting.
-    if (reset_changed && !newfile && overwriting
-					      && !(exiting && backup != NULL))
+    ಆದರೆ (reset_ಬದಲಾಯಿತು && !newfile && overwriting
+					      && !(exiting && backup != ಖಾಲಿ))
     {
 	ml_preserve(buf, FALSE);
-	if (got_int)
+	ಆದರೆ (got_int)
 	{
 	    errmsg = (char_u *)_(e_interrupted);
-	    goto restore_backup;
+	    ಹೋಗು restore_backup;
 	}
     }
 
-#ifdef VMS
-    vms_remove_version(fname); // remove version
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VMS
+    vms_remove_ಆವೃತ್ತಿ(fname); // remove version
+#ಆದರೆ_ಅಂತ್ಯ
     // Default: write the file directly.  May write to a temp file for
     // multi-byte conversion.
     wfname = fname;
 
     // Check for forced 'fileencoding' from "++opt=val" argument.
-    if (eap != NULL && eap->force_enc != 0)
+    ಆದರೆ (eap != ಖಾಲಿ && eap->force_enc != 0)
     {
 	fenc = eap->cmd + eap->force_enc;
 	fenc = enc_canonize(fenc);
 	fenc_tofree = fenc;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	fenc = buf->b_p_fenc;
 
     // Check if the file needs to be converted.
@@ -1710,64 +1710,64 @@ buf_write(
     // Check if UTF-8 to UCS-2/4 or Latin1 conversion needs to be done.  Or
     // Latin1 to Unicode conversion.  This is handled in buf_write_bytes().
     // Prepare the flags for it and allocate bw_conv_buf when needed.
-    if (converted && (enc_utf8 || STRCMP(p_enc, "latin1") == 0))
+    ಆದರೆ (converted && (enc_utf8 || STRCMP(p_enc, "latin1") == 0))
     {
 	wb_flags = get_fio_flags(fenc);
-	if (wb_flags & (FIO_UCS2 | FIO_UCS4 | FIO_UTF16 | FIO_UTF8))
+	ಆದರೆ (wb_flags & (FIO_UCS2 | FIO_UCS4 | FIO_UTF16 | FIO_UTF8))
 	{
 	    // overallocate a bit, in case we read incomplete multi-byte chars
-	    int size = bufsize + CONV_RESTLEN;
+	    ಪೂರ್ಣಾಂಕ ಗಾತ್ರ_2 = bufsize + CONV_RESTLEN;
 	    // Need to allocate a buffer to translate into.
-	    if (wb_flags & (FIO_UCS2 | FIO_UTF16 | FIO_UTF8))
-		write_info.bw_conv_buflen = size * 2;
-	    else // FIO_UCS4
-		write_info.bw_conv_buflen = size * 4;
+	    ಆದರೆ (wb_flags & (FIO_UCS2 | FIO_UTF16 | FIO_UTF8))
+		write_info.bw_conv_buflen = ಗಾತ್ರ_2 * 2;
+	    ಇಲ್ಲದಿದ್ದರೆ // FIO_UCS4
+		write_info.bw_conv_buflen = ಗಾತ್ರ_2 * 4;
 	    write_info.bw_conv_buf = alloc(write_info.bw_conv_buflen);
-	    if (write_info.bw_conv_buf == NULL)
-		end = 0;
+	    ಆದರೆ (write_info.bw_conv_buf == ಖಾಲಿ)
+		ಕೊನೆ = 0;
 	}
     }
 
-#ifdef MSWIN
-    if (converted && wb_flags == 0 && (wb_flags = get_win_fio_flags(fenc)) != 0)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
+    ಆದರೆ (converted && wb_flags == 0 && (wb_flags = get_win_fio_flags(fenc)) != 0)
     {
 	// Convert UTF-8 -> UCS-2 and UCS-2 -> DBCS.  Worst-case * 4:
 	write_info.bw_conv_buflen = bufsize * 4;
 	write_info.bw_conv_buf = alloc(write_info.bw_conv_buflen);
-	if (write_info.bw_conv_buf == NULL)
-	    end = 0;
+	ಆದರೆ (write_info.bw_conv_buf == ಖಾಲಿ)
+	    ಕೊನೆ = 0;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef MACOS_CONVERT
-    if (converted && wb_flags == 0 && (wb_flags = get_mac_fio_flags(fenc)) != 0)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MACOS_CONVERT
+    ಆದರೆ (converted && wb_flags == 0 && (wb_flags = get_mac_fio_flags(fenc)) != 0)
     {
 	write_info.bw_conv_buflen = bufsize * 3;
 	write_info.bw_conv_buf = alloc(write_info.bw_conv_buflen);
-	if (write_info.bw_conv_buf == NULL)
-	    end = 0;
+	ಆದರೆ (write_info.bw_conv_buf == ಖಾಲಿ)
+	    ಕೊನೆ = 0;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_EVAL) || defined(USE_ICONV)
-    if (converted && wb_flags == 0)
+#ಆದರೆ defined(FEAT_EVAL) || defined(USE_ICONV)
+    ಆದರೆ (converted && wb_flags == 0)
     {
 # ifdef USE_ICONV
 	// Use iconv() conversion when conversion is needed and it's not done
 	// internally.
 	write_info.bw_iconv_fd = (iconv_t)my_iconv_open(fenc,
 					enc_utf8 ? (char_u *)"utf-8" : p_enc);
-	if (write_info.bw_iconv_fd != (iconv_t)-1)
+	ಆದರೆ (write_info.bw_iconv_fd != (iconv_t)-1)
 	{
 	    // We're going to use iconv(), allocate a buffer to convert in.
 	    write_info.bw_conv_buflen = bufsize * ICONV_MULT;
 	    write_info.bw_conv_buf = alloc(write_info.bw_conv_buflen);
-	    if (write_info.bw_conv_buf == NULL)
-		end = 0;
-	    write_info.bw_first = TRUE;
+	    ಆದರೆ (write_info.bw_conv_buf == ಖಾಲಿ)
+		ಕೊನೆ = 0;
+	    write_info.bw_ಮೊದಲ = TRUE;
 	}
 #  ifdef FEAT_EVAL
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 #  endif
 # endif
 
@@ -1775,31 +1775,31 @@ buf_write(
 	    // When the file needs to be converted with 'charconvert' after
 	    // writing, write to a temp file instead and let the conversion
 	    // overwrite the original file.
-	    if (*p_ccv != NUL)
+	    ಆದರೆ (*p_ccv != NUL)
 	    {
 		wfname = vim_tempname('w', FALSE);
-		if (wfname == NULL)	// Can't write without a tempfile!
+		ಆದರೆ (wfname == ಖಾಲಿ)	// Can't write without a tempfile!
 		{
-		    errmsg = (char_u *)_(e_cant_find_temp_file_for_writing);
-		    goto restore_backup;
+		    errmsg = (char_u *)_(e_cant_ಕಂಡುಹಿಡಿ_ತಾತ್ಕಾಲಿಕ_file_for_writing);
+		    ಹೋಗು restore_backup;
 		}
 	    }
 # endif
     }
-#endif
-    if (converted && wb_flags == 0
-#ifdef USE_ICONV
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (converted && wb_flags == 0
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_ICONV
 	    && write_info.bw_iconv_fd == (iconv_t)-1
-#endif
-#ifdef FEAT_EVAL
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 	    && wfname == fname
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    )
     {
-	if (!forceit)
+	ಆದರೆ (!forceit)
 	{
-	    errmsg = (char_u *)_(e_cannot_convert_add_bang_to_write_without_conversion);
-	    goto restore_backup;
+	    errmsg = (char_u *)_(e_cannot_convert_ಕೂಡಿಸು_bang_ಗಮ್ಯ_write_without_conversion);
+	    ಹೋಗು restore_backup;
 	}
 	notconverted = TRUE;
     }
@@ -1807,28 +1807,28 @@ buf_write(
     // If conversion is taking place, we may first pretend to write and check
     // for conversion errors.  Then loop again to write for real.
     // When not doing conversion this writes for real right away.
-    for (checking_conversion = TRUE; ; checking_conversion = FALSE)
+    ಗಾಗಿ (checking_conversion = TRUE; ; checking_conversion = FALSE)
     {
 	// There is no need to check conversion when:
 	// - there is no conversion
 	// - we make a backup file, that can be restored in case of conversion
 	//   failure.
-	if (!converted || dobackup)
+	ಆದರೆ (!converted || dobackup)
 	    checking_conversion = FALSE;
 
-	if (checking_conversion)
+	ಆದರೆ (checking_conversion)
 	{
 	    // Make sure we don't write anything.
 	    fd = -1;
 	    write_info.bw_fd = fd;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-#ifdef HAVE_FTRUNCATE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_FTRUNCATE
 # define TRUNC_ON_OPEN 0
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 # define TRUNC_ON_OPEN O_TRUNC
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    // Open the file "wfname" for writing.
 	    // We may try to open the file twice: If we can't write to the file
 	    // and forceit is TRUE we delete the existing file and try to
@@ -1837,7 +1837,7 @@ buf_write(
 	    // quotum for number of files).
 	    // Appending will fail if the file does not exist and forceit is
 	    // FALSE.
-	    while ((fd = mch_open((char *)wfname, O_WRONLY | O_EXTRA | (append
+	    ಆಗ ((fd = mch_open((ಅಕ್ಷರ *)wfname, O_WRONLY | O_EXTRA | (append
 				? (forceit ? (O_APPEND | O_CREAT) : O_APPEND)
 				: (O_CREAT | TRUNC_ON_OPEN))
 				, perm < 0 ? 0666 : (perm & 0777))) < 0)
@@ -1845,38 +1845,38 @@ buf_write(
 		// A forced write will try to create a new file if the old one
 		// is still readonly. This may also happen when the directory
 		// is read-only. In that case the mch_remove() will fail.
-		if (errmsg == NULL)
+		ಆದರೆ (errmsg == ಖಾಲಿ)
 		{
-#ifdef UNIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
 		    stat_T	st;
 
 		    // Don't delete the file when it's a hard or symbolic link.
-		    if ((!newfile && st_old.st_nlink > 1)
-			    || (mch_lstat((char *)fname, &st) == 0
+		    ಆದರೆ ((!newfile && st_old.st_nlink > 1)
+			    || (mch_lstat((ಅಕ್ಷರ *)fname, &st) == 0
 				&& (st.st_dev != st_old.st_dev
 				    || st.st_ino != st_old.st_ino)))
 			errmsg =
 			      (char_u *)_(e_cant_open_linked_file_for_writing);
-		    else
-#endif
+		    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 		    {
 			errmsg = (char_u *)_(e_cant_open_file_for_writing);
-			if (forceit && vim_strchr(p_cpo, CPO_FWRITE) == NULL
+			ಆದರೆ (forceit && vim_strchr(p_cpo, CPO_FWRITE) == ಖಾಲಿ
 								  && perm >= 0)
 			{
-#ifdef UNIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
 			    // we write to the file, thus it should be marked
 			    // writable after all
-			    if (!(perm & 0200))
+			    ಆದರೆ (!(perm & 0200))
 				made_writable = TRUE;
 			    perm |= 0200;
-			    if (st_old.st_uid != getuid()
+			    ಆದರೆ (st_old.st_uid != getuid()
 						  || st_old.st_gid != getgid())
 				perm &= 0777;
-#endif
-			    if (!append)  // don't remove when appending
+#ಆದರೆ_ಅಂತ್ಯ
+			    ಆದರೆ (!append)  // don't remove when appending
 				mch_remove(wfname);
-			    continue;
+			    ಮುಂದುವರಿ;
 			}
 		    }
 		}
@@ -1888,9 +1888,9 @@ restore_backup:
 		    // If we failed to open the file, we don't need a backup.
 		    // Throw it away.  If we moved or removed the original file
 		    // try to put the backup in its place.
-		    if (backup != NULL && wfname == fname)
+		    ಆದರೆ (backup != ಖಾಲಿ && wfname == fname)
 		    {
-			if (backup_copy)
+			ಆದರೆ (backup_copy)
 			{
 			    // There is a small chance that we removed the
 			    // original, try to move the copy in its place.
@@ -1898,14 +1898,14 @@ restore_backup:
 			    // In that case we leave the copy around.
 
 			    // If file does not exist, put the copy in its
-			    // place
-			    if (mch_stat((char *)fname, &st) < 0)
+			    //ಇರಿಸು
+			    ಆದರೆ (mch_stat((ಅಕ್ಷರ *)fname, &st) < 0)
 				vim_rename(backup, fname);
 			    // if original file does exist throw away the copy
-			    if (mch_stat((char *)fname, &st) >= 0)
+			    ಆದರೆ (mch_stat((ಅಕ್ಷರ *)fname, &st) >= 0)
 				mch_remove(backup);
 			}
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
 			    // try to put the original file back
 			    vim_rename(backup, fname);
@@ -1913,23 +1913,23 @@ restore_backup:
 		    }
 
 		    // if original file no longer exists give an extra warning
-		    if (!newfile && mch_stat((char *)fname, &st) < 0)
-			end = 0;
+		    ಆದರೆ (!newfile && mch_stat((ಅಕ್ಷರ *)fname, &st) < 0)
+			ಕೊನೆ = 0;
 		}
 
-		if (wfname != fname)
+		ಆದರೆ (wfname != fname)
 		    vim_free(wfname);
-		goto fail;
+		ಹೋಗು fail;
 	    }
 	    write_info.bw_fd = fd;
 
-#if defined(UNIX)
+#ಆದರೆ defined(UNIX)
 	    {
 		stat_T	st;
 
 		// Double check we are writing the intended file before making
 		// any changes.
-		if (overwriting
+		ಆದರೆ (overwriting
 			&& (!dobackup || backup_copy)
 			&& fname == wfname
 			&& perm >= 0
@@ -1937,84 +1937,84 @@ restore_backup:
 			&& st.st_ino != st_old.st_ino)
 		{
 		    close(fd);
-		    errmsg = (char_u *)_(e_file_changed_while_writing);
-		    goto fail;
+		    errmsg = (char_u *)_(e_file_ಬದಲಾಯಿತು_while_writing);
+		    ಹೋಗು fail;
 		}
 	    }
-#endif
-#ifdef HAVE_FTRUNCATE
-	    if (!append)
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_FTRUNCATE
+	    ಆದರೆ (!append)
 		vim_ignored = ftruncate(fd, (off_t)0);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(MSWIN)
-	    if (backup != NULL && overwriting && !append)
-		(void)mch_copy_file_attribute(backup, wfname);
+#ಆದರೆ defined(MSWIN)
+	    ಆದರೆ (backup != ಖಾಲಿ && overwriting && !append)
+		(ಶೂನ್ಯ)mch_copy_file_attribute(backup, wfname);
 
-	    if (!overwriting && !append)
+	    ಆದರೆ (!overwriting && !append)
 	    {
-		if (buf->b_ffname != NULL)
-		    (void)mch_copy_file_attribute(buf->b_ffname, wfname);
+		ಆದರೆ (buf->b_ffname != ಖಾಲಿ)
+		    (ಶೂನ್ಯ)mch_copy_file_attribute(buf->b_ffname, wfname);
 		// Should copy resource fork
 	    }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_CRYPT
-	    if (*buf->b_p_key != NUL && !filtering)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+	    ಆದರೆ (*buf->b_p_ಕೀಲಿ != NUL && !filtering)
 	    {
-		char_u		*header;
-		int		header_len;
+		char_u		*ಶೀರ್ಷಿಕೆ;
+		ಪೂರ್ಣಾಂಕ		ಶೀರ್ಷಿಕೆ_len;
 
 		buf->b_cryptstate = crypt_create_for_writing(
-						      crypt_get_method_nr(buf),
-					   buf->b_p_key, &header, &header_len);
-		if (buf->b_cryptstate == NULL || header == NULL)
-		    end = 0;
-		else
+						      crypt_get_ವಿಧಾನ_nr(buf),
+					   buf->b_p_ಕೀಲಿ, &ಶೀರ್ಷಿಕೆ, &ಶೀರ್ಷಿಕೆ_len);
+		ಆದರೆ (buf->b_cryptstate == ಖಾಲಿ || ಶೀರ್ಷಿಕೆ == ಖಾಲಿ)
+		    ಕೊನೆ = 0;
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    // Write magic number, so that Vim knows how this file is
 		    // encrypted when reading it back.
-		    write_info.bw_buf = header;
-		    write_info.bw_len = header_len;
+		    write_info.bw_buf = ಶೀರ್ಷಿಕೆ;
+		    write_info.bw_len = ಶೀರ್ಷಿಕೆ_len;
 		    write_info.bw_flags = FIO_NOCONVERT;
-		    if (buf_write_bytes(&write_info) == FAIL)
-			end = 0;
+		    ಆದರೆ (buf_write_ಬೈಟುಗಳು(&write_info) == FAIL)
+			ಕೊನೆ = 0;
 		    wb_flags |= FIO_ENCRYPTED;
-		    vim_free(header);
+		    vim_free(ಶೀರ್ಷಿಕೆ);
 		}
 	    }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	}
-	errmsg = NULL;
+	errmsg = ಖಾಲಿ;
 
-	write_info.bw_buf = buffer;
+	write_info.bw_buf = ಬಫರ್;
 	nchars = 0;
 
 	// use "++bin", "++nobin" or 'binary'
-	if (eap != NULL && eap->force_bin != 0)
+	ಆದರೆ (eap != ಖಾಲಿ && eap->force_bin != 0)
 	    write_bin = (eap->force_bin == FORCE_BIN);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    write_bin = buf->b_p_bin;
 
 	// The BOM is written just after the encryption magic number.
 	// Skip it when appending and the file already existed, the BOM only
 	// makes sense at the start of the file.
-	if (buf->b_p_bomb && !write_bin && (!append || perm < 0))
+	ಆದರೆ (buf->b_p_bomb && !write_bin && (!append || perm < 0))
 	{
-	    write_info.bw_len = make_bom(buffer, fenc);
-	    if (write_info.bw_len > 0)
+	    write_info.bw_len = make_bom(ಬಫರ್, fenc);
+	    ಆದರೆ (write_info.bw_len > 0)
 	    {
 		// don't convert, do encryption
 		write_info.bw_flags = FIO_NOCONVERT | wb_flags;
-		if (buf_write_bytes(&write_info) == FAIL)
-		    end = 0;
-		else
+		ಆದರೆ (buf_write_ಬೈಟುಗಳು(&write_info) == FAIL)
+		    ಕೊನೆ = 0;
+		ಇಲ್ಲದಿದ್ದರೆ
 		    nchars += write_info.bw_len;
 	    }
 	}
-	write_info.bw_start_lnum = start;
+	write_info.bw_ಆರಂಭ_lnum = ಆರಂಭ;
 
-#ifdef FEAT_PERSISTENT_UNDO
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PERSISTENT_UNDO
 	write_undo_file = (buf->b_p_udf
 			    && overwriting
 			    && !append
@@ -2022,122 +2022,122 @@ restore_backup:
 # ifdef CRYPT_NOT_INPLACE
 			    // writing undo file requires
 			    // crypt_encode_inplace()
-			    && (buf->b_cryptstate == NULL
-				|| crypt_works_inplace(buf->b_cryptstate))
+			    && (buf->b_cryptstate == ಖಾಲಿ
+				|| crypt_ಕೆಲಸಮಾಡುತ್ತದೆ_inplace(buf->b_cryptstate))
 # endif
-			    && reset_changed
+			    && reset_ಬದಲಾಯಿತು
 			    && !checking_conversion);
 # ifdef CRYPT_NOT_INPLACE
 	// remove undo file if encrypting it is not possible
-	if (buf->b_p_udf
+	ಆದರೆ (buf->b_p_udf
 		&& overwriting
 		&& !append
 		&& !filtering
 		&& !checking_conversion
-		&& buf->b_cryptstate != NULL
-		&& !crypt_works_inplace(buf->b_cryptstate))
+		&& buf->b_cryptstate != ಖಾಲಿ
+		&& !crypt_ಕೆಲಸಮಾಡುತ್ತದೆ_inplace(buf->b_cryptstate))
 	    u_undofile_reset_and_delete(buf);
 # endif
-	if (write_undo_file)
+	ಆದರೆ (write_undo_file)
 	    // Prepare for computing the hash value of the text.
-	    sha256_start(&sha_ctx);
-#endif
+	    sha256_ಆರಂಭ(&sha_ctx);
+#ಆದರೆ_ಅಂತ್ಯ
 
 	write_info.bw_len = bufsize;
 	write_info.bw_flags = wb_flags;
 	fileformat = get_fileformat_force(buf, eap);
-	s = buffer;
+	s = ಬಫರ್;
 	len = 0;
-	for (lnum = start; lnum <= end; ++lnum)
+	ಗಾಗಿ (lnum = ಆರಂಭ; lnum <= ಕೊನೆ; ++lnum)
 	{
 	    // The next while loop is done once for each character written.
 	    // Keep it fast!
 	    ptr = ml_get_buf(buf, lnum, FALSE) - 1;
-#ifdef FEAT_PERSISTENT_UNDO
-	    if (write_undo_file)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PERSISTENT_UNDO
+	    ಆದರೆ (write_undo_file)
 		sha256_update(&sha_ctx, ptr + 1,
 					      (UINT32_T)(STRLEN(ptr + 1) + 1));
-#endif
-	    while ((c = *++ptr) != NUL)
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಆಗ ((c = *++ptr) != NUL)
 	    {
-		if (c == NL)
+		ಆದರೆ (c == NL)
 		    *s = NUL;		// replace newlines with NULs
-		else if (c == CAR && fileformat == EOL_MAC)
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (c == CAR && fileformat == EOL_MAC)
 		    *s = NL;		// Mac: replace CRs with NLs
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		    *s = c;
 		++s;
-		if (++len != bufsize)
-		    continue;
-#ifdef FEAT_CRYPT
-		if (write_info.bw_fd > 0 && lnum == end
+		ಆದರೆ (++len != bufsize)
+		    ಮುಂದುವರಿ;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+		ಆದರೆ (write_info.bw_fd > 0 && lnum == ಕೊನೆ
 			&& (write_info.bw_flags & FIO_ENCRYPTED)
-			&& *buf->b_p_key != NUL && !filtering
+			&& *buf->b_p_ಕೀಲಿ != NUL && !filtering
 			&& *ptr == NUL)
-		    write_info.bw_finish = TRUE;
-#endif
-		if (buf_write_bytes(&write_info) == FAIL)
+		    write_info.bw_ಮುಕ್ತಾಯ = TRUE;
+#ಆದರೆ_ಅಂತ್ಯ
+		ಆದರೆ (buf_write_ಬೈಟುಗಳು(&write_info) == FAIL)
 		{
-		    end = 0;		// write error: break loop
-		    break;
+		    ಕೊನೆ = 0;		// write error: break loop
+		    ನಿಲ್ಲಿಸು;
 		}
 		nchars += bufsize;
-		s = buffer;
+		s = ಬಫರ್;
 		len = 0;
-		write_info.bw_start_lnum = lnum;
+		write_info.bw_ಆರಂಭ_lnum = lnum;
 	    }
 	    // write failed or last line has no EOL: stop here
-	    if (end == 0
-		    || (lnum == end
+	    ಆದರೆ (ಕೊನೆ == 0
+		    || (lnum == ಕೊನೆ
 			&& (write_bin || !buf->b_p_fixeol)
 			&& ((write_bin && lnum == buf->b_no_eol_lnum)
-			    || (lnum == buf->b_ml.ml_line_count
+			    || (lnum == buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ
 							   && !buf->b_p_eol))))
 	    {
 		++lnum;			// written the line, count it
 		no_eol = TRUE;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	    if (fileformat == EOL_UNIX)
+	    ಆದರೆ (fileformat == EOL_UNIX)
 		*s++ = NL;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		*s++ = CAR;		    // EOL_MAC or EOL_DOS: write CR
-		if (fileformat == EOL_DOS)  // write CR-NL
+		ಆದರೆ (fileformat == EOL_DOS)  // write CR-NL
 		{
-		    if (++len == bufsize)
+		    ಆದರೆ (++len == bufsize)
 		    {
-			if (buf_write_bytes(&write_info) == FAIL)
+			ಆದರೆ (buf_write_ಬೈಟುಗಳು(&write_info) == FAIL)
 			{
-			    end = 0;	// write error: break loop
-			    break;
+			    ಕೊನೆ = 0;	// write error: break loop
+			    ನಿಲ್ಲಿಸು;
 			}
 			nchars += bufsize;
-			s = buffer;
+			s = ಬಫರ್;
 			len = 0;
 		    }
 		    *s++ = NL;
 		}
 	    }
-	    if (++len == bufsize && end)
+	    ಆದರೆ (++len == bufsize && ಕೊನೆ)
 	    {
-		if (buf_write_bytes(&write_info) == FAIL)
+		ಆದರೆ (buf_write_ಬೈಟುಗಳು(&write_info) == FAIL)
 		{
-		    end = 0;		// write error: break loop
-		    break;
+		    ಕೊನೆ = 0;		// write error: break loop
+		    ನಿಲ್ಲಿಸು;
 		}
 		nchars += bufsize;
-		s = buffer;
+		s = ಬಫರ್;
 		len = 0;
 
 		ui_breakcheck();
-		if (got_int)
+		ಆದರೆ (got_int)
 		{
-		    end = 0;		// Interrupted, break loop
-		    break;
+		    ಕೊನೆ = 0;		// Interrupted, break loop
+		    ನಿಲ್ಲಿಸು;
 		}
 	    }
-#ifdef VMS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VMS
 	    // On VMS there is a problem: newlines get added when writing
 	    // blocks at a time. Fix it by writing a line at a time.
 	    // This is much slower!
@@ -2149,57 +2149,57 @@ restore_backup:
 // Older DECC compiler for VAX doesn't define MIN()
 #  define MIN(a, b) ((a) < (b) ? (a) : (b))
 # endif
-	    if (buf->b_fab_rfm == FAB$C_VFC
+	    ಆದರೆ (buf->b_fab_rfm == FAB$C_VFC
 		    || ((buf->b_fab_rat & (FAB$M_FTN | FAB$M_CR)) != 0))
 	    {
-		int b2write;
+		ಪೂರ್ಣಾಂಕ b2write;
 
 		buf->b_fab_mrs = (buf->b_fab_mrs == 0
 			? MIN(4096, bufsize)
 			: MIN(buf->b_fab_mrs, bufsize));
 
 		b2write = len;
-		while (b2write > 0)
+		ಆಗ (b2write > 0)
 		{
 		    write_info.bw_len = MIN(b2write, buf->b_fab_mrs);
-		    if (buf_write_bytes(&write_info) == FAIL)
+		    ಆದರೆ (buf_write_ಬೈಟುಗಳು(&write_info) == FAIL)
 		    {
-			end = 0;
-			break;
+			ಕೊನೆ = 0;
+			ನಿಲ್ಲಿಸು;
 		    }
 		    b2write -= MIN(b2write, buf->b_fab_mrs);
 		}
 		write_info.bw_len = bufsize;
 		nchars += len;
-		s = buffer;
+		s = ಬಫರ್;
 		len = 0;
 	    }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	}
-	if (len > 0 && end > 0)
+	ಆದರೆ (len > 0 && ಕೊನೆ > 0)
 	{
 	    write_info.bw_len = len;
-#ifdef FEAT_CRYPT
-	    if (write_info.bw_fd > 0 && lnum >= end
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+	    ಆದರೆ (write_info.bw_fd > 0 && lnum >= ಕೊನೆ
 		    && (write_info.bw_flags & FIO_ENCRYPTED)
-		    && *buf->b_p_key != NUL && !filtering)
-		write_info.bw_finish = TRUE;
-#endif
-	    if (buf_write_bytes(&write_info) == FAIL)
-		end = 0;		    // write error
+		    && *buf->b_p_ಕೀಲಿ != NUL && !filtering)
+		write_info.bw_ಮುಕ್ತಾಯ = TRUE;
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಆದರೆ (buf_write_ಬೈಟುಗಳು(&write_info) == FAIL)
+		ಕೊನೆ = 0;		    // write error
 	    nchars += len;
 	}
 
-	if (!buf->b_p_fixeol && buf->b_p_eof)
+	ಆದರೆ (!buf->b_p_fixeol && buf->b_p_eof)
 	{
 	    // write trailing CTRL-Z
-	    (void)write_eintr(write_info.bw_fd, "\x1a", 1);
+	    (ಶೂನ್ಯ)write_eintr(write_info.bw_fd, "\x1a", 1);
 	    nchars++;
 	}
 
 	// Stop when writing done or an error was encountered.
-	if (!checking_conversion || end == 0)
-	    break;
+	ಆದರೆ (!checking_conversion || ಕೊನೆ == 0)
+	    ನಿಲ್ಲಿಸು;
 
 	// If no error happened until now, writing should be ok, so loop to
 	// really write the buffer.
@@ -2207,9 +2207,9 @@ restore_backup:
 
     // If we started writing, finish writing. Also when an error was
     // encountered.
-    if (!checking_conversion)
+    ಆದರೆ (!checking_conversion)
     {
-#if defined(UNIX) && defined(HAVE_FSYNC)
+#ಆದರೆ defined(UNIX) && defined(HAVE_FSYNC)
 	// On many journaling file systems there is a bug that causes both the
 	// original and the backup file to be lost when halting the system
 	// right after writing the file.  That's because only the meta-data is
@@ -2218,76 +2218,76 @@ restore_backup:
 	// For a device do try the fsync() but don't complain if it does not
 	// work (could be a pipe).
 	// If the 'fsync' option is FALSE, don't fsync().  Useful for laptops.
-	if ((buf->b_p_fs >= 0 ? buf->b_p_fs : p_fs) && vim_fsync(fd) != 0
+	ಆದರೆ ((buf->b_p_fs >= 0 ? buf->b_p_fs : p_fs) && vim_fsync(fd) != 0
 		&& !device)
 	{
 	    errmsg = (char_u *)_(e_fsync_failed);
-	    end = 0;
+	    ಕೊನೆ = 0;
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(HAVE_SELINUX) || defined(HAVE_SMACK) || defined(FEAT_XATTR)
+#ಆದರೆ defined(HAVE_SELINUX) || defined(HAVE_SMACK) || defined(FEAT_XATTR)
 	// Probably need to set the security context.
-	if (!backup_copy)
+	ಆದರೆ (!backup_copy)
 	{
-# if defined(HAVE_SELINUX) || defined(HAVE_SMACK)
+# ಆದರೆ defined(HAVE_SELINUX) || defined(HAVE_SMACK)
 	    mch_copy_sec(backup, wfname);
 # endif
 # ifdef FEAT_XATTR
 	    mch_copy_xattr(backup, wfname);
 # endif
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef UNIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
 	// When creating a new file, set its owner/group to that of the
 	// original file.  Get the new device and inode number.
-	if (backup != NULL && !backup_copy)
+	ಆದರೆ (backup != ಖಾಲಿ && !backup_copy)
 	{
 # ifdef HAVE_FCHOWN
 	    stat_T	st;
 
 	    // Don't change the owner when it's already OK, some systems remove
 	    // permission or ACL stuff.
-	    if (mch_stat((char *)wfname, &st) < 0
+	    ಆದರೆ (mch_stat((ಅಕ್ಷರ *)wfname, &st) < 0
 		    || st.st_uid != st_old.st_uid
 		    || st.st_gid != st_old.st_gid)
 	    {
 		// changing owner might not be possible
 		vim_ignored = fchown(fd, st_old.st_uid, -1);
 		// if changing group fails clear the group permissions
-		if (fchown(fd, -1, st_old.st_gid) == -1 && perm > 0)
+		ಆದರೆ (fchown(fd, -1, st_old.st_gid) == -1 && perm > 0)
 		    perm &= ~070;
 	    }
 # endif
 	    buf_setino(buf);
 	}
-	else if (!buf->b_dev_valid)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!buf->b_dev_valid)
 	    // Set the inode when creating a new file.
 	    buf_setino(buf);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef UNIX
-	if (made_writable)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
+	ಆದರೆ (made_writable)
 	    perm &= ~0200;	// reset 'w' bit for security reasons
-#endif
-#ifdef HAVE_FCHMOD
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_FCHMOD
 	// set permission of new file same as old file
-	if (perm >= 0)
-	    (void)mch_fsetperm(fd, perm);
-#endif
-	if (close(fd) != 0)
+	ಆದರೆ (perm >= 0)
+	    (ಶೂನ್ಯ)mch_fsetperm(fd, perm);
+#ಆದರೆ_ಅಂತ್ಯ
+	ಆದರೆ (close(fd) != 0)
 	{
 	    errmsg = (char_u *)_(e_close_failed);
-	    end = 0;
+	    ಕೊನೆ = 0;
 	}
 
-#ifndef HAVE_FCHMOD
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ HAVE_FCHMOD
 	// set permission of new file same as old file
-	if (perm >= 0)
-	    (void)mch_setperm(wfname, perm);
-#endif
-#ifdef HAVE_ACL
+	ಆದರೆ (perm >= 0)
+	    (ಶೂನ್ಯ)mch_setperm(wfname, perm);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_ACL
 	// Probably need to set the ACL before changing the user (can't set the
 	// ACL on a file the user doesn't own).
 	// On Solaris, with ZFS and the aclmode property set to "discard" (the
@@ -2295,61 +2295,61 @@ restore_backup:
 	// represent the mode of the file.  It's non-trivial for us to discover
 	// whether we're in that situation, so we simply always re-set the ACL.
 # ifndef HAVE_SOLARIS_ZFS_ACL
-	if (!backup_copy)
+	ಆದರೆ (!backup_copy)
 # endif
-	    mch_set_acl(wfname, acl);
-#endif
-#ifdef FEAT_CRYPT
-	if (buf->b_cryptstate != NULL)
+	    mch_ಗಣ_acl(wfname, acl);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+	ಆದರೆ (buf->b_cryptstate != ಖಾಲಿ)
 	{
 	    crypt_free_state(buf->b_cryptstate);
-	    buf->b_cryptstate = NULL;
+	    buf->b_cryptstate = ಖಾಲಿ;
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_EVAL)
-	if (wfname != fname)
+#ಆದರೆ defined(FEAT_EVAL)
+	ಆದರೆ (wfname != fname)
 	{
 	    // The file was written to a temp file, now it needs to be
 	    // converted with 'charconvert' to (overwrite) the output file.
-	    if (end != 0)
+	    ಆದರೆ (ಕೊನೆ != 0)
 	    {
-		if (eval_charconvert(enc_utf8 ? (char_u *)"utf-8" : p_enc,
+		ಆದರೆ (eval_charconvert(enc_utf8 ? (char_u *)"utf-8" : p_enc,
 						  fenc, wfname, fname) == FAIL)
 		{
 		    write_info.bw_conv_error = TRUE;
-		    end = 0;
+		    ಕೊನೆ = 0;
 		}
 	    }
 	    mch_remove(wfname);
 	    vim_free(wfname);
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
-    if (end == 0)
+    ಆದರೆ (ಕೊನೆ == 0)
     {
 	// Error encountered.
-	if (errmsg == NULL)
+	ಆದರೆ (errmsg == ಖಾಲಿ)
 	{
-	    if (write_info.bw_conv_error)
+	    ಆದರೆ (write_info.bw_conv_error)
 	    {
-		if (write_info.bw_conv_error_lnum == 0)
-		    errmsg = (char_u *)_(e_write_error_conversion_failed_make_fenc_empty_to_override);
-		else
+		ಆದರೆ (write_info.bw_conv_error_lnum == 0)
+		    errmsg = (char_u *)_(e_write_error_conversion_failed_make_fenc_ಖಾಲಿಗಳು_ಗಮ್ಯ_override);
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    errmsg_allocated = TRUE;
 		    errmsg = alloc(300);
-		    if (errmsg == NULL)
-			goto fail;
-		    vim_snprintf((char *)errmsg, 300, _(e_write_error_conversion_failed_in_line_nr_make_fenc_empty_to_override),
-					 (long)write_info.bw_conv_error_lnum);
+		    ಆದರೆ (errmsg == ಖಾಲಿ)
+			ಹೋಗು fail;
+		    vim_snprintf((ಅಕ್ಷರ *)errmsg, 300, _(e_write_error_conversion_failed_ಒಳ_ಸಾಲು_nr_make_fenc_ಖಾಲಿಗಳು_ಗಮ್ಯ_override),
+					 (ದೀರ್ಘ)write_info.bw_conv_error_lnum);
 		}
 	    }
-	    else if (got_int)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (got_int)
 		errmsg = (char_u *)_(e_interrupted);
-	    else
-		errmsg = (char_u *)_(e_write_error_file_system_full);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		errmsg = (char_u *)_(e_write_error_file_system_ತುಂಬಿದ);
 	}
 
 	// If we have a backup file, try to put it in place of the new file,
@@ -2359,177 +2359,177 @@ restore_backup:
 	// When "backup_copy" is set we need to copy the backup over the new
 	// file.  Otherwise rename the backup file.
 	// If this is OK, don't give the extra warning message.
-	if (backup != NULL)
+	ಆದರೆ (backup != ಖಾಲಿ)
 	{
-	    if (backup_copy)
+	    ಆದರೆ (backup_copy)
 	    {
 		// This may take a while, if we were interrupted let the user
 		// know we got the message.
-		if (got_int)
+		ಆದರೆ (got_int)
 		{
-		    msg(_(e_interrupted));
-		    out_flush();
+		    ಸಂದೇಶ(_(e_interrupted));
+		    ಹೊರಹೋಗು_flush();
 		}
-		if ((fd = mch_open((char *)backup, O_RDONLY | O_EXTRA, 0)) >= 0)
+		ಆದರೆ ((fd = mch_open((ಅಕ್ಷರ *)backup, O_RDONLY | O_EXTRA, 0)) >= 0)
 		{
-		    if ((write_info.bw_fd = mch_open((char *)fname,
+		    ಆದರೆ ((write_info.bw_fd = mch_open((ಅಕ್ಷರ *)fname,
 				    O_WRONLY | O_CREAT | O_TRUNC | O_EXTRA,
 							   perm & 0777)) >= 0)
 		    {
 			// copy the file.
 			write_info.bw_buf = smallbuf;
 			write_info.bw_flags = FIO_NOCONVERT;
-			while ((write_info.bw_len = read_eintr(fd, smallbuf,
+			ಆಗ ((write_info.bw_len = read_eintr(fd, smallbuf,
 						      SMALLBUFSIZE)) > 0)
-			    if (buf_write_bytes(&write_info) == FAIL)
-				break;
+			    ಆದರೆ (buf_write_ಬೈಟುಗಳು(&write_info) == FAIL)
+				ನಿಲ್ಲಿಸು;
 
-			if (close(write_info.bw_fd) >= 0
+			ಆದರೆ (close(write_info.bw_fd) >= 0
 						   && write_info.bw_len == 0)
-			    end = 1;		// success
+			    ಕೊನೆ = 1;		// success
 		    }
 		    close(fd);	// ignore errors for closing read file
 		}
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		if (vim_rename(backup, fname) == 0)
-		    end = 1;
+		ಆದರೆ (vim_rename(backup, fname) == 0)
+		    ಕೊನೆ = 1;
 	    }
 	}
-	goto fail;
+	ಹೋಗು fail;
     }
 
-    lnum -= start;	    // compute number of written lines
+    lnum -= ಆರಂಭ;	    // compute number of written lines
     --no_wait_return;	    // may wait for return now
 
-#if !(defined(UNIX) || defined(VMS))
+#ಆದರೆ !(defined(UNIX) || defined(VMS))
     fname = sfname;	    // use shortname now, for the messages
-#endif
-    if (!filtering)
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (!filtering)
     {
-	msg_add_fname(buf, fname);	// put fname in IObuff with quotes
+	ಸಂದೇಶ_ಕೂಡಿಸು_fname(buf, fname);	// put fname in IObuff with quotes
 	c = FALSE;
-	if (write_info.bw_conv_error)
+	ಆದರೆ (write_info.bw_conv_error)
 	{
 	    STRCAT(IObuff, _(" CONVERSION ERROR"));
 	    c = TRUE;
-	    if (write_info.bw_conv_error_lnum != 0)
-		vim_snprintf_add((char *)IObuff, IOSIZE, _(" in line %ld;"),
-			(long)write_info.bw_conv_error_lnum);
+	    ಆದರೆ (write_info.bw_conv_error_lnum != 0)
+		vim_snprintf_ಕೂಡಿಸು((ಅಕ್ಷರ *)IObuff, IOSIZE, _(" in line %ld;"),
+			(ದೀರ್ಘ)write_info.bw_conv_error_lnum);
 	}
-	else if (notconverted)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (notconverted)
 	{
 	    STRCAT(IObuff, _("[NOT converted]"));
 	    c = TRUE;
 	}
-	else if (converted)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (converted)
 	{
 	    STRCAT(IObuff, _("[converted]"));
 	    c = TRUE;
 	}
-	if (device)
+	ಆದರೆ (device)
 	{
 	    STRCAT(IObuff, _("[Device]"));
 	    c = TRUE;
 	}
-	else if (newfile)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (newfile)
 	{
-	    STRCAT(IObuff, new_file_message());
+	    STRCAT(IObuff, new_file_ಸಂದೇಶ());
 	    c = TRUE;
 	}
-	if (no_eol)
+	ಆದರೆ (no_eol)
 	{
-	    msg_add_eol();
+	    ಸಂದೇಶ_ಕೂಡಿಸು_eol();
 	    c = TRUE;
 	}
 	// may add [unix/dos/mac]
-	if (msg_add_fileformat(fileformat))
+	ಆದರೆ (ಸಂದೇಶ_ಕೂಡಿಸು_fileformat(fileformat))
 	    c = TRUE;
-#ifdef FEAT_CRYPT
-	if (wb_flags & FIO_ENCRYPTED)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+	ಆದರೆ (wb_flags & FIO_ENCRYPTED)
 	{
-	    crypt_append_msg(buf);
+	    crypt_append_ಸಂದೇಶ(buf);
 	    c = TRUE;
 	}
-#endif
-	msg_add_lines(c, (long)lnum, nchars);	// add line/char count
-	if (!shortmess(SHM_WRITE))
+#ಆದರೆ_ಅಂತ್ಯ
+	ಸಂದೇಶ_ಕೂಡಿಸು_ಸಾಲುಗಳು(c, (ದೀರ್ಘ)lnum, nchars);	// add line/char count
+	ಆದರೆ (!shortmess(SHM_WRITE))
 	{
-	    if (append)
+	    ಆದರೆ (append)
 		STRCAT(IObuff, shortmess(SHM_WRI) ? _(" [a]") : _(" appended"));
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		STRCAT(IObuff, shortmess(SHM_WRI) ? _(" [w]") : _(" written"));
 	}
 
-	set_keep_msg((char_u *)msg_trunc_attr((char *)IObuff, FALSE, 0), 0);
+	ಗಣ_keep_ಸಂದೇಶ((char_u *)ಸಂದೇಶ_trunc_attr((ಅಕ್ಷರ *)IObuff, FALSE, 0), 0);
     }
 
     // When written everything correctly: reset 'modified'.  Unless not
     // writing to the original file and '+' is not in 'cpoptions'.
-    if (reset_changed && whole && !append
+    ಆದರೆ (reset_ಬದಲಾಯಿತು && ಸಂಪೂರ್ಣ && !append
 	    && !write_info.bw_conv_error
-	    && (overwriting || vim_strchr(p_cpo, CPO_PLUS) != NULL))
+	    && (overwriting || vim_strchr(p_cpo, CPO_PLUS) != ಖಾಲಿ))
     {
 	unchanged(buf, TRUE, FALSE);
 	// b:changedtick may be incremented in unchanged() but that should not
 	// trigger a TextChanged event.
-	if (buf->b_last_changedtick + 1 == CHANGEDTICK(buf))
-	    buf->b_last_changedtick = CHANGEDTICK(buf);
+	ಆದರೆ (buf->b_ಕೊನೆಯ_changedtick + 1 == CHANGEDTICK(buf))
+	    buf->b_ಕೊನೆಯ_changedtick = CHANGEDTICK(buf);
 	u_unchanged(buf);
 	u_update_save_nr(buf);
     }
 
     // If written to the current file, update the timestamp of the swap file
     // and reset the BF_WRITE_MASK flags. Also sets buf->b_mtime.
-    if (overwriting)
+    ಆದರೆ (overwriting)
     {
 	ml_timestamp(buf);
-	if (append)
+	ಆದರೆ (append)
 	    buf->b_flags &= ~BF_NEW;
-	else
-	    buf->b_flags &= ~BF_WRITE_MASK;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    buf->b_flags &= ~BF_WRITE_ಮುಖವಾಡ;
     }
 
     // If we kept a backup until now, and we are in patch mode, then we make
     // the backup file our 'original' file.
-    if (*p_pm && dobackup)
+    ಆದರೆ (*p_pm && dobackup)
     {
-	char *org = (char *)buf_modname((buf->b_p_sn || buf->b_shortname),
+	ಅಕ್ಷರ *org = (ಅಕ್ಷರ *)buf_modname((buf->b_p_sn || buf->b_shortname),
 							  fname, p_pm, FALSE);
 
-	if (backup != NULL)
+	ಆದರೆ (backup != ಖಾಲಿ)
 	{
 	    stat_T	st;
 
 	    // If the original file does not exist yet
 	    // the current backup file becomes the original file
-	    if (org == NULL)
+	    ಆದರೆ (org == ಖಾಲಿ)
 		emsg(_(e_patchmode_cant_save_original_file));
-	    else if (mch_stat(org, &st) < 0)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (mch_stat(org, &st) < 0)
 	    {
 		vim_rename(backup, (char_u *)org);
 		VIM_CLEAR(backup);	    // don't delete the file
-#ifdef UNIX
-		set_file_time((char_u *)org, st_old.st_atime, st_old.st_mtime);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
+		ಗಣ_file_ಸಮಯ((char_u *)org, st_old.st_atime, st_old.st_mtime);
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
 	}
 	// If there is no backup file, remember that a (new) file was
 	// created.
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    int empty_fd;
+	    ಪೂರ್ಣಾಂಕ ಖಾಲಿಗಳು_fd;
 
-	    if (org == NULL
-		    || (empty_fd = mch_open(org,
+	    ಆದರೆ (org == ಖಾಲಿ
+		    || (ಖಾಲಿಗಳು_fd = mch_open(org,
 				      O_CREAT | O_EXTRA | O_EXCL | O_NOFOLLOW,
 					perm < 0 ? 0666 : (perm & 0777))) < 0)
-	      emsg(_(e_patchmode_cant_touch_empty_original_file));
-	    else
-	      close(empty_fd);
+	      emsg(_(e_patchmode_cant_touch_ಖಾಲಿಗಳು_original_file));
+	    ಇಲ್ಲದಿದ್ದರೆ
+	      close(ಖಾಲಿಗಳು_fd);
 	}
-	if (org != NULL)
+	ಆದರೆ (org != ಖಾಲಿ)
 	{
 	    mch_setperm((char_u *)org, mch_getperm(fname) & 0777);
 	    vim_free(org);
@@ -2538,11 +2538,11 @@ restore_backup:
 
     // Remove the backup unless 'backup' option is set or there was a
     // conversion error.
-    if (!p_bk && backup != NULL && !write_info.bw_conv_error
+    ಆದರೆ (!p_bk && backup != ಖಾಲಿ && !write_info.bw_conv_error
 	    && mch_remove(backup) != 0)
 	emsg(_(e_cant_delete_backup_file));
 
-    goto nofail;
+    ಹೋಗು nofail;
 
     // Finish up.  We get here either after failure or success.
 fail:
@@ -2553,84 +2553,84 @@ nofail:
     buf->b_saving = false;
 
     vim_free(backup);
-    if (buffer != smallbuf)
-	vim_free(buffer);
+    ಆದರೆ (ಬಫರ್ != smallbuf)
+	vim_free(ಬಫರ್);
     vim_free(fenc_tofree);
     vim_free(write_info.bw_conv_buf);
-#ifdef USE_ICONV
-    if (write_info.bw_iconv_fd != (iconv_t)-1)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_ICONV
+    ಆದರೆ (write_info.bw_iconv_fd != (iconv_t)-1)
     {
 	iconv_close(write_info.bw_iconv_fd);
 	write_info.bw_iconv_fd = (iconv_t)-1;
     }
-#endif
-#ifdef HAVE_ACL
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_ACL
     mch_free_acl(acl);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (errmsg != NULL)
+    ಆದರೆ (errmsg != ಖಾಲಿ)
     {
-	int numlen = errnum != NULL ? (int)STRLEN(errnum) : 0;
+	ಪೂರ್ಣಾಂಕ numlen = errnum != ಖಾಲಿ ? (ಪೂರ್ಣಾಂಕ)STRLEN(errnum) : 0;
 
 	attr = HL_ATTR(HLF_E);	// set highlight for error messages
-	msg_add_fname(buf,
-#ifndef UNIX
+	ಸಂದೇಶ_ಕೂಡಿಸು_fname(buf,
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ UNIX
 		sfname
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 		fname
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		     );		// put file name in IObuff with quotes
-	if (STRLEN(IObuff) + STRLEN(errmsg) + numlen >= IOSIZE)
+	ಆದರೆ (STRLEN(IObuff) + STRLEN(errmsg) + numlen >= IOSIZE)
 	    IObuff[IOSIZE - STRLEN(errmsg) - numlen - 1] = NUL;
 	// If the error message has the form "is ...", put the error number in
 	// front of the file name.
-	if (errnum != NULL)
+	ಆದರೆ (errnum != ಖಾಲಿ)
 	{
 	    STRMOVE(IObuff + numlen, IObuff);
 	    mch_memmove(IObuff, errnum, (size_t)numlen);
 	}
 	STRCAT(IObuff, errmsg);
-	emsg((char *)IObuff);
-	if (errmsg_allocated)
+	emsg((ಅಕ್ಷರ *)IObuff);
+	ಆದರೆ (errmsg_allocated)
 	    vim_free(errmsg);
 
 	retval = FAIL;
-	if (end == 0)
+	ಆದರೆ (ಕೊನೆ == 0)
 	{
-	    msg_puts_attr(_("\nWARNING: Original file may be lost or damaged\n"),
-		    attr | MSG_HIST);
-	    msg_puts_attr(_("don't quit the editor until the file is successfully written!"),
-		    attr | MSG_HIST);
+	    ಸಂದೇಶ_puts_attr(_("\nWARNING: Original file may be lost or damaged\n"),
+		    attr | ಸಂದೇಶ_HIST);
+	    ಸಂದೇಶ_puts_attr(_("don't quit the editor until the file is successfully written!"),
+		    attr | ಸಂದೇಶ_HIST);
 
 	    // Update the timestamp to avoid an "overwrite changed file"
 	    // prompt when writing again.
-	    if (mch_stat((char *)fname, &st_old) >= 0)
+	    ಆದರೆ (mch_stat((ಅಕ್ಷರ *)fname, &st_old) >= 0)
 	    {
-		buf_store_time(buf, &st_old, fname);
+		buf_store_ಸಮಯ(buf, &st_old, fname);
 		buf->b_mtime_read = buf->b_mtime;
 		buf->b_mtime_read_ns = buf->b_mtime_ns;
 	    }
 	}
     }
-    msg_scroll = msg_save;
+    ಸಂದೇಶ_scroll = ಸಂದೇಶ_save;
 
-#ifdef FEAT_PERSISTENT_UNDO
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PERSISTENT_UNDO
     // When writing the whole file and 'undofile' is set, also write the undo
     // file.
-    if (retval == OK && write_undo_file)
+    ಆದರೆ (retval == OK && write_undo_file)
     {
-	char_u	    hash[UNDO_HASH_SIZE];
+	char_u	    hash[UNDO_HASH_ಗಾತ್ರ];
 
-	sha256_finish(&sha_ctx, hash);
-	u_write_undo(NULL, FALSE, buf, hash);
+	sha256_ಮುಕ್ತಾಯ(&sha_ctx, hash);
+	u_write_undo(ಖಾಲಿ, FALSE, buf, hash);
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_EVAL
-    if (!should_abort(retval))
-#else
-    if (!got_int)
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಆದರೆ (!should_abort(retval))
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಆದರೆ (!got_int)
+#ಆದರೆ_ಅಂತ್ಯ
     {
 	aco_save_T	aco;
 
@@ -2640,18 +2640,18 @@ nofail:
 	// Careful: The autocommands may call buf_write() recursively!
 	// Only do this when a window was found for "buf".
 	aucmd_prepbuf(&aco, buf);
-	if (curbuf == buf)
+	ಆದರೆ (curbuf == buf)
 	{
-	    if (append)
+	    ಆದರೆ (append)
 		apply_autocmds_exarg(EVENT_FILEAPPENDPOST, fname, fname,
 							   FALSE, curbuf, eap);
-	    else if (filtering)
-		apply_autocmds_exarg(EVENT_FILTERWRITEPOST, NULL, fname,
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (filtering)
+		apply_autocmds_exarg(EVENT_FILTERWRITEPOST, ಖಾಲಿ, fname,
 							   FALSE, curbuf, eap);
-	    else if (reset_changed && whole)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (reset_ಬದಲಾಯಿತು && ಸಂಪೂರ್ಣ)
 		apply_autocmds_exarg(EVENT_BUFWRITEPOST, fname, fname,
 							   FALSE, curbuf, eap);
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		apply_autocmds_exarg(EVENT_FILEWRITEPOST, fname, fname,
 							   FALSE, curbuf, eap);
 
@@ -2659,19 +2659,19 @@ nofail:
 	    aucmd_restbuf(&aco);
 	}
 
-#ifdef FEAT_EVAL
-	if (aborting())	    // autocmds may abort script processing
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	ಆದರೆ (aborting())	    // autocmds may abort script processing
 	    retval = FALSE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
-#ifdef FEAT_VIMINFO
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VIMINFO
     // Make sure marks will be written out to the viminfo file later, even when
     // the file is new.
     curbuf->b_marks_read = true;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     got_int |= prev_got_int;
 
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }

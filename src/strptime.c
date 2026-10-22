@@ -53,86 +53,86 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-#ifdef MSWIN
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
 
 /* Constants lifted from NetBSD's <tzfile.h>. */
-#define TM_YEAR_BASE	1900
-#define TM_SUNDAY	0
-#define TM_MONDAY	1
-#define SECSPERHOUR	3600
-#define SECSPERMIN	60
-#define HOURSPERDAY	24
+#ವ್ಯಾಖ್ಯಾನಿಸು TM_YEAR_ತಳ	1900
+#ವ್ಯಾಖ್ಯಾನಿಸು TM_SUNDAY	0
+#ವ್ಯಾಖ್ಯಾನಿಸು TM_MONDAY	1
+#ವ್ಯಾಖ್ಯಾನಿಸು SECSPERHOUR	3600
+#ವ್ಯಾಖ್ಯಾನಿಸು SECSPERMIN	60
+#ವ್ಯಾಖ್ಯಾನಿಸು HOURSPERDAY	24
 
-#define isleap(y)	(((y) % 4 == 0 && (y) % 100 != 0) || (y) % 400 == 0)
+#ವ್ಯಾಖ್ಯಾನಿಸು isleap(y)	(((y) % 4 == 0 && (y) % 100 != 0) || (y) % 400 == 0)
 /* isleap_sum avoids integer overflow when adding the 1900 base. */
-#define isleap_sum(a, b) \
-			isleap(((unsigned)(a) + (unsigned)(b)) % 400)
+#ವ್ಯಾಖ್ಯಾನಿಸು isleap_ಮೊತ್ತ(a, b) \
+			isleap(((ಚಿಹ್ನೆರಹಿತ)(a) + (ಚಿಹ್ನೆರಹಿತ)(b)) % 400)
 
 /*
  * _get_tzname() is provided by the UCRT and by the MSVC CRT.  Older MinGW
  * builds linking against msvcrt.dll fall back to the deprecated tzname[]
  * global (mingw-w64 already exposes the POSIX-named tzname[]).
  */
-#if defined(_UCRT) || defined(_MSC_VER)
+#ಆದರೆ defined(_UCRT) || defined(_MSC_VER)
 # define USE_GET_TZNAME
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /* Locale tables (English / "C" locale). */
-static const char *const c_day[] = {
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಸ್ಥಿರಾಂಕ c_day[] = {
     "Sunday", "Monday", "Tuesday", "Wednesday",
     "Thursday", "Friday", "Saturday"
 };
-static const char *const c_abday[] = {
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಸ್ಥಿರಾಂಕ c_abday[] = {
     "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
 };
-static const char *const c_mon[] = {
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಸ್ಥಿರಾಂಕ c_mon[] = {
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
 };
-static const char *const c_abmon[] = {
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಸ್ಥಿರಾಂಕ c_abmon[] = {
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 };
-static const char *const c_am_pm[] = { "AM", "PM" };
-static const char c_d_t_fmt[] = "%a %b %e %H:%M:%S %Y";
-static const char c_d_fmt[] = "%m/%d/%y";
-static const char c_t_fmt[] = "%H:%M:%S";
-static const char c_t_fmt_ampm[] = "%I:%M:%S %p";
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಸ್ಥಿರಾಂಕ c_am_pm[] = { "AM", "PM" };
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ c_d_t_fmt[] = "%a %b %e %H:%M:%S %Y";
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ c_d_fmt[] = "%m/%d/%y";
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ c_t_fmt[] = "%H:%M:%S";
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ c_t_fmt_ampm[] = "%I:%M:%S %p";
 
-static const unsigned char *conv_num(const unsigned char *, int *,
-						unsigned int, unsigned int);
-static const unsigned char *find_string(const unsigned char *, int *,
-			const char * const *, const char * const *, int);
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ *conv_ಅಂಕೆ(ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ *, ಪೂರ್ಣಾಂಕ *,
+						ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ, ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ);
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ *ಕಂಡುಹಿಡಿ_string(ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ *, ಪೂರ್ಣಾಂಕ *,
+			ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ * ಸ್ಥಿರಾಂಕ *, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ * ಸ್ಥಿರಾಂಕ *, ಪೂರ್ಣಾಂಕ);
 
 /*
  * We do not implement alternate representations. However, we always
  * check whether a given modifier is allowed for a certain conversion.
  */
-#define ALT_E			0x01
-#define ALT_O			0x02
-#define LEGAL_ALT(x)		{ if (alt_format & ~(x)) return NULL; }
+#ವ್ಯಾಖ್ಯಾನಿಸು ALT_E			0x01
+#ವ್ಯಾಖ್ಯಾನಿಸು ALT_O			0x02
+#ವ್ಯಾಖ್ಯಾನಿಸು LEGAL_ALT(x)		{ ಆದರೆ (alt_format & ~(x)) ಹಿಂತಿರುಗಿ ಖಾಲಿ; }
 
-#define S_YEAR			(1 << 0)
-#define S_MON			(1 << 1)
-#define S_YDAY			(1 << 2)
-#define S_MDAY			(1 << 3)
-#define S_WDAY			(1 << 4)
-#define S_HOUR			(1 << 5)
+#ವ್ಯಾಖ್ಯಾನಿಸು S_YEAR			(1 << 0)
+#ವ್ಯಾಖ್ಯಾನಿಸು S_MON			(1 << 1)
+#ವ್ಯಾಖ್ಯಾನಿಸು S_YDAY			(1 << 2)
+#ವ್ಯಾಖ್ಯಾನಿಸು S_MDAY			(1 << 3)
+#ವ್ಯಾಖ್ಯಾನಿಸು S_WDAY			(1 << 4)
+#ವ್ಯಾಖ್ಯಾನಿಸು S_HOUR			(1 << 5)
 
-#define HAVE_MDAY(s)		(s & S_MDAY)
-#define HAVE_MON(s)		(s & S_MON)
-#define HAVE_WDAY(s)		(s & S_WDAY)
-#define HAVE_YDAY(s)		(s & S_YDAY)
-#define HAVE_YEAR(s)		(s & S_YEAR)
-#define HAVE_HOUR(s)		(s & S_HOUR)
+#ವ್ಯಾಖ್ಯಾನಿಸು HAVE_MDAY(s)		(s & S_MDAY)
+#ವ್ಯಾಖ್ಯಾನಿಸು HAVE_MON(s)		(s & S_MON)
+#ವ್ಯಾಖ್ಯಾನಿಸು HAVE_WDAY(s)		(s & S_WDAY)
+#ವ್ಯಾಖ್ಯಾನಿಸು HAVE_YDAY(s)		(s & S_YDAY)
+#ವ್ಯಾಖ್ಯಾನಿಸು HAVE_YEAR(s)		(s & S_YEAR)
+#ವ್ಯಾಖ್ಯಾನಿಸು HAVE_HOUR(s)		(s & S_HOUR)
 
 /* RFC-822/RFC-2822 */
-static const char *const nast[5] = {
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಸ್ಥಿರಾಂಕ nast[5] = {
     "EST",    "CST",    "MST",    "PST",    "\0\0\0"
 };
-static const char *const nadt[5] = {
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಸ್ಥಿರಾಂಕ nadt[5] = {
     "EDT",    "CDT",    "MDT",    "PDT",    "\0\0\0"
 };
 
@@ -140,7 +140,7 @@ static const char *const nadt[5] = {
  * Table to determine the ordinal date for the start of a month.
  * Ref: http://en.wikipedia.org/wiki/ISO_week_date
  */
-static const int start_of_month[2][13] = {
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ ಆರಂಭ_ದ_month[2][13] = {
     /* non-leap year */
     { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 },
     /* leap year */
@@ -153,14 +153,14 @@ static const int start_of_month[2][13] = {
  * and its colonies. Ref:
  * http://en.wikipedia.org/wiki/Determination_of_the_day_of_the_week
  */
-    static int
-first_wday_of(int yr)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಮೊದಲ_wday_ದ(ಪೂರ್ಣಾಂಕ yr)
 {
-    return ((2 * (3 - (yr / 100) % 4)) + (yr % 100) + ((yr % 100) /  4) +
+    ಹಿಂತಿರುಗಿ ((2 * (3 - (yr / 100) % 4)) + (yr % 100) + ((yr % 100) /  4) +
 	    (isleap(yr) ? 6 : 0) + 1) % 7;
 }
 
-#define delim(p)	((p) == '\0' || isspace((unsigned char)(p)))
+#ವ್ಯಾಖ್ಯಾನಿಸು delim(p)	((p) == '\0' || ಖಾಲಿಯೇ((ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ)(p)))
 
 /*
  * Stub replacing NetBSD's fromzone(): the Windows CRT does not provide
@@ -168,325 +168,325 @@ first_wday_of(int yr)
  * we simply decline to recognize arbitrary timezone names.  The %Z / %z
  * numeric and RFC-822/2822 forms are still handled by the caller.
  */
-    static int
-fromzone(const unsigned char **bp UNUSED, struct tm *tm UNUSED,
-						    int mandatory UNUSED)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+fromzone(ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ **bp ಬಳಸದ, ರಚನೆ tm *tm ಬಳಸದ,
+						    ಪೂರ್ಣಾಂಕ mandatory ಬಳಸದ)
 {
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-    char *
-strptime(const char *buf, const char *fmt, struct tm *tm)
+    ಅಕ್ಷರ *
+strptime(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *buf, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *fmt, ರಚನೆ tm *tm)
 {
-    unsigned char c;
-    const unsigned char *bp, *ep, *zname;
-    int alt_format, i, split_year = 0, neg = 0, state = 0,
-	day_offset = -1, week_offset = 0, offs, mandatory;
-    const char *new_fmt;
+    ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ c;
+    ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ *bp, *ep, *zname;
+    ಪೂರ್ಣಾಂಕ alt_format, i, ವಿಭಜಿಸು_year = 0, neg = 0, state = 0,
+	day_ಸ್ಥಾನಾಂತರ = -1, week_ಸ್ಥಾನಾಂತರ = 0, offs, mandatory;
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *new_fmt;
 
-    bp = (const unsigned char *)buf;
+    bp = (ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ *)buf;
 
-    while (bp != NULL && (c = *fmt++) != '\0')
+    ಆಗ (bp != ಖಾಲಿ && (c = *fmt++) != '\0')
     {
 	/* Clear `alternate' modifier prior to new conversion. */
 	alt_format = 0;
 	i = 0;
 
 	/* Eat up white-space. */
-	if (isspace(c))
+	ಆದರೆ (ಖಾಲಿಯೇ(c))
 	{
-	    while (isspace(*bp))
+	    ಆಗ (ಖಾಲಿಯೇ(*bp))
 		bp++;
-	    continue;
+	    ಮುಂದುವರಿ;
 	}
 
-	if (c != '%')
-	    goto literal;
+	ಆದರೆ (c != '%')
+	    ಹೋಗು literal;
 
 
-again:	switch (c = *fmt++)
+again:	ಆಯ್ಕೆ (c = *fmt++)
 	{
-	case '%':	/* "%%" is converted to "%". */
+	ಸ್ಥಿತಿ '%':	/* "%%" is converted to "%". */
 literal:
-	    if (c != *bp++)
-		return NULL;
+	    ಆದರೆ (c != *bp++)
+		ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	    LEGAL_ALT(0);
-	    continue;
+	    ಮುಂದುವರಿ;
 
 	/*
 	 * "Alternative" modifiers. Just set the appropriate flag
 	 * and start over again.
 	 */
-	case 'E':	/* "%E?" alternative conversion modifier. */
+	ಸ್ಥಿತಿ 'E':	/* "%E?" alternative conversion modifier. */
 	    LEGAL_ALT(0);
 	    alt_format |= ALT_E;
-	    goto again;
+	    ಹೋಗು again;
 
-	case 'O':	/* "%O?" alternative conversion modifier. */
+	ಸ್ಥಿತಿ 'O':	/* "%O?" alternative conversion modifier. */
 	    LEGAL_ALT(0);
 	    alt_format |= ALT_O;
-	    goto again;
+	    ಹೋಗು again;
 
 	/*
 	 * "Complex" conversion rules, implemented through recursion.
 	 */
-	case 'c':	/* Date and time, using the locale's format. */
+	ಸ್ಥಿತಿ 'c':	/* Date and time, using the locale's format. */
 	    new_fmt = c_d_t_fmt;
 	    state |= S_WDAY | S_MON | S_MDAY | S_YEAR;
-	    goto recurse;
+	    ಹೋಗು recurse;
 
-	case 'D':	/* The date as "%m/%d/%y". */
+	ಸ್ಥಿತಿ 'D':	/* The date as "%m/%d/%y". */
 	    new_fmt = "%m/%d/%y";
 	    LEGAL_ALT(0);
 	    state |= S_MON | S_MDAY | S_YEAR;
-	    goto recurse;
+	    ಹೋಗು recurse;
 
-	case 'F':	/* The date as "%Y-%m-%d". */
+	ಸ್ಥಿತಿ 'F':	/* The date as "%Y-%m-%d". */
 	    new_fmt = "%Y-%m-%d";
 	    LEGAL_ALT(0);
 	    state |= S_MON | S_MDAY | S_YEAR;
-	    goto recurse;
+	    ಹೋಗು recurse;
 
-	case 'R':	/* The time as "%H:%M". */
+	ಸ್ಥಿತಿ 'R':	/* The time as "%H:%M". */
 	    new_fmt = "%H:%M";
 	    LEGAL_ALT(0);
-	    goto recurse;
+	    ಹೋಗು recurse;
 
-	case 'r':	/* The time in 12-hour clock representation. */
+	ಸ್ಥಿತಿ 'r':	/* The time in 12-hour clock representation. */
 	    new_fmt = c_t_fmt_ampm;
 	    LEGAL_ALT(0);
-	    goto recurse;
+	    ಹೋಗು recurse;
 
-	case 'T':	/* The time as "%H:%M:%S". */
+	ಸ್ಥಿತಿ 'T':	/* The time as "%H:%M:%S". */
 	    new_fmt = "%H:%M:%S";
 	    LEGAL_ALT(0);
-	    goto recurse;
+	    ಹೋಗು recurse;
 
-	case 'X':	/* The time, using the locale's format. */
+	ಸ್ಥಿತಿ 'X':	/* The time, using the locale's format. */
 	    new_fmt = c_t_fmt;
-	    goto recurse;
+	    ಹೋಗು recurse;
 
-	case 'x':	/* The date, using the locale's format. */
+	ಸ್ಥಿತಿ 'x':	/* The date, using the locale's format. */
 	    new_fmt = c_d_fmt;
 	    state |= S_MON | S_MDAY | S_YEAR;
 	recurse:
-	    bp = (const unsigned char *)strptime((const char *)bp,
+	    bp = (ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ *)strptime((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)bp,
 							new_fmt, tm);
 	    LEGAL_ALT(ALT_E);
-	    continue;
+	    ಮುಂದುವರಿ;
 
 	/*
 	 * "Elementary" conversion rules.
 	 */
-	case 'A':	/* The day of week, using the locale's form. */
-	case 'a':
-	    bp = find_string(bp, &tm->tm_wday, c_day, c_abday, 7);
+	ಸ್ಥಿತಿ 'A':	/* The day of week, using the locale's form. */
+	ಸ್ಥಿತಿ 'a':
+	    bp = ಕಂಡುಹಿಡಿ_string(bp, &tm->tm_wday, c_day, c_abday, 7);
 	    LEGAL_ALT(0);
 	    state |= S_WDAY;
-	    continue;
+	    ಮುಂದುವರಿ;
 
-	case 'B':	/* The month, using the locale's form. */
-	case 'b':
-	case 'h':
-	    bp = find_string(bp, &tm->tm_mon, c_mon, c_abmon, 12);
+	ಸ್ಥಿತಿ 'B':	/* The month, using the locale's form. */
+	ಸ್ಥಿತಿ 'b':
+	ಸ್ಥಿತಿ 'h':
+	    bp = ಕಂಡುಹಿಡಿ_string(bp, &tm->tm_mon, c_mon, c_abmon, 12);
 	    LEGAL_ALT(0);
 	    state |= S_MON;
-	    continue;
+	    ಮುಂದುವರಿ;
 
-	case 'C':	/* The century number. */
+	ಸ್ಥಿತಿ 'C':	/* The century number. */
 	    i = 20;
-	    bp = conv_num(bp, &i, 0, 99);
+	    bp = conv_ಅಂಕೆ(bp, &i, 0, 99);
 
-	    i = i * 100 - TM_YEAR_BASE;
-	    if (split_year)
+	    i = i * 100 - TM_YEAR_ತಳ;
+	    ಆದರೆ (ವಿಭಜಿಸು_year)
 		i += tm->tm_year % 100;
-	    split_year = 1;
+	    ವಿಭಜಿಸು_year = 1;
 	    tm->tm_year = i;
 	    LEGAL_ALT(ALT_E);
 	    state |= S_YEAR;
-	    continue;
+	    ಮುಂದುವರಿ;
 
-	case 'd':	/* The day of month. */
-	case 'e':
-	    bp = conv_num(bp, &tm->tm_mday, 1, 31);
+	ಸ್ಥಿತಿ 'd':	/* The day of month. */
+	ಸ್ಥಿತಿ 'e':
+	    bp = conv_ಅಂಕೆ(bp, &tm->tm_mday, 1, 31);
 	    LEGAL_ALT(ALT_O);
 	    state |= S_MDAY;
-	    continue;
+	    ಮುಂದುವರಿ;
 
-	case 'k':	/* The hour (24-hour clock representation). */
+	ಸ್ಥಿತಿ 'k':	/* The hour (24-hour clock representation). */
 	    LEGAL_ALT(0);
 	    /* FALLTHROUGH */
-	case 'H':
-	    bp = conv_num(bp, &tm->tm_hour, 0, 23);
+	ಸ್ಥಿತಿ 'H':
+	    bp = conv_ಅಂಕೆ(bp, &tm->tm_hour, 0, 23);
 	    LEGAL_ALT(ALT_O);
 	    state |= S_HOUR;
-	    continue;
+	    ಮುಂದುವರಿ;
 
-	case 'l':	/* The hour (12-hour clock representation). */
+	ಸ್ಥಿತಿ 'l':	/* The hour (12-hour clock representation). */
 	    LEGAL_ALT(0);
 	    /* FALLTHROUGH */
-	case 'I':
-	    bp = conv_num(bp, &tm->tm_hour, 1, 12);
-	    if (tm->tm_hour == 12)
+	ಸ್ಥಿತಿ 'I':
+	    bp = conv_ಅಂಕೆ(bp, &tm->tm_hour, 1, 12);
+	    ಆದರೆ (tm->tm_hour == 12)
 		tm->tm_hour = 0;
 	    LEGAL_ALT(ALT_O);
 	    state |= S_HOUR;
-	    continue;
+	    ಮುಂದುವರಿ;
 
-	case 'j':	/* The day of year. */
+	ಸ್ಥಿತಿ 'j':	/* The day of year. */
 	    i = 1;
-	    bp = conv_num(bp, &i, 1, 366);
+	    bp = conv_ಅಂಕೆ(bp, &i, 1, 366);
 	    tm->tm_yday = i - 1;
 	    LEGAL_ALT(0);
 	    state |= S_YDAY;
-	    continue;
+	    ಮುಂದುವರಿ;
 
-	case 'M':	/* The minute. */
-	    bp = conv_num(bp, &tm->tm_min, 0, 59);
+	ಸ್ಥಿತಿ 'M':	/* The minute. */
+	    bp = conv_ಅಂಕೆ(bp, &tm->tm_min, 0, 59);
 	    LEGAL_ALT(ALT_O);
-	    continue;
+	    ಮುಂದುವರಿ;
 
-	case 'm':	/* The month. */
+	ಸ್ಥಿತಿ 'm':	/* The month. */
 	    i = 1;
-	    bp = conv_num(bp, &i, 1, 12);
+	    bp = conv_ಅಂಕೆ(bp, &i, 1, 12);
 	    tm->tm_mon = i - 1;
 	    LEGAL_ALT(ALT_O);
 	    state |= S_MON;
-	    continue;
+	    ಮುಂದುವರಿ;
 
-	case 'p':	/* The locale's equivalent of AM/PM. */
-	    bp = find_string(bp, &i, c_am_pm, NULL, 2);
-	    if (HAVE_HOUR(state) && tm->tm_hour > 11)
-		return NULL;
+	ಸ್ಥಿತಿ 'p':	/* The locale's equivalent of AM/PM. */
+	    bp = ಕಂಡುಹಿಡಿ_string(bp, &i, c_am_pm, ಖಾಲಿ, 2);
+	    ಆದರೆ (HAVE_HOUR(state) && tm->tm_hour > 11)
+		ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	    tm->tm_hour += i * 12;
 	    LEGAL_ALT(0);
-	    continue;
+	    ಮುಂದುವರಿ;
 
-	case 'S':	/* The seconds. */
-	    bp = conv_num(bp, &tm->tm_sec, 0, 61);
+	ಸ್ಥಿತಿ 'S':	/* The seconds. */
+	    bp = conv_ಅಂಕೆ(bp, &tm->tm_sec, 0, 61);
 	    LEGAL_ALT(ALT_O);
-	    continue;
+	    ಮುಂದುವರಿ;
 
-	case 's':	/* seconds since the epoch */
+	ಸ್ಥಿತಿ 's':	/* seconds since the epoch */
 	    {
-		const time_t TIME_MAX = (time_t)((sizeof(time_t) == 8)
-					? LLONG_MAX : INT_MAX);
+		ಸ್ಥಿರಾಂಕ time_t ಸಮಯ_MAX = (time_t)((ಗಾತ್ರ(time_t) == 8)
+					? LLONG_MAX : ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ);
 		time_t sse, d;
 
-		if (*bp < '0' || *bp > '9')
+		ಆದರೆ (*bp < '0' || *bp > '9')
 		{
-		    bp = NULL;
-		    continue;
+		    bp = ಖಾಲಿ;
+		    ಮುಂದುವರಿ;
 		}
 
 		sse = *bp++ - '0';
-		while (*bp >= '0' && *bp <= '9')
+		ಆಗ (*bp >= '0' && *bp <= '9')
 		{
 		    d = *bp++ - '0';
-		    if (sse > TIME_MAX / 10)
+		    ಆದರೆ (sse > ಸಮಯ_MAX / 10)
 		    {
-			bp = NULL;
-			break;
+			bp = ಖಾಲಿ;
+			ನಿಲ್ಲಿಸು;
 		    }
 		    sse *= 10;
-		    if (sse > TIME_MAX - d)
+		    ಆದರೆ (sse > ಸಮಯ_MAX - d)
 		    {
-			bp = NULL;
-			break;
+			bp = ಖಾಲಿ;
+			ನಿಲ್ಲಿಸು;
 		    }
 		    sse += d;
 		}
-		if (bp == NULL)
-		    continue;
+		ಆದರೆ (bp == ಖಾಲಿ)
+		    ಮುಂದುವರಿ;
 
 		{
-		    struct tm *lt = localtime(&sse);
+		    ರಚನೆ tm *lt = localtime(&sse);
 
-		    if (lt == NULL)
-			bp = NULL;
-		    else
+		    ಆದರೆ (lt == ಖಾಲಿ)
+			bp = ಖಾಲಿ;
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
 			*tm = *lt;
 			state |= S_YDAY | S_WDAY |
 				S_MON | S_MDAY | S_YEAR;
 		    }
 		}
-		continue;
+		ಮುಂದುವರಿ;
 	    }
 
-	case 'U':	/* The week of year, beginning on sunday. */
-	case 'W':	/* The week of year, beginning on monday. */
+	ಸ್ಥಿತಿ 'U':	/* The week of year, beginning on sunday. */
+	ಸ್ಥಿತಿ 'W':	/* The week of year, beginning on monday. */
 	    /*
 	     * This is bogus, as we can not assume any valid
 	     * information present in the tm structure at this
 	     * point to calculate a real value, so save the
 	     * week for now in case it can be used later.
 	     */
-	    bp = conv_num(bp, &i, 0, 53);
+	    bp = conv_ಅಂಕೆ(bp, &i, 0, 53);
 	    LEGAL_ALT(ALT_O);
-	    if (c == 'U')
-		day_offset = TM_SUNDAY;
-	    else
-		day_offset = TM_MONDAY;
-	    week_offset = i;
-	    continue;
+	    ಆದರೆ (c == 'U')
+		day_ಸ್ಥಾನಾಂತರ = TM_SUNDAY;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		day_ಸ್ಥಾನಾಂತರ = TM_MONDAY;
+	    week_ಸ್ಥಾನಾಂತರ = i;
+	    ಮುಂದುವರಿ;
 
-	case 'w':	/* The day of week, beginning on sunday. */
-	    bp = conv_num(bp, &tm->tm_wday, 0, 6);
+	ಸ್ಥಿತಿ 'w':	/* The day of week, beginning on sunday. */
+	    bp = conv_ಅಂಕೆ(bp, &tm->tm_wday, 0, 6);
 	    LEGAL_ALT(ALT_O);
 	    state |= S_WDAY;
-	    continue;
+	    ಮುಂದುವರಿ;
 
-	case 'u':	/* The day of week, monday = 1. */
-	    bp = conv_num(bp, &i, 1, 7);
+	ಸ್ಥಿತಿ 'u':	/* The day of week, monday = 1. */
+	    bp = conv_ಅಂಕೆ(bp, &i, 1, 7);
 	    tm->tm_wday = i % 7;
 	    LEGAL_ALT(ALT_O);
 	    state |= S_WDAY;
-	    continue;
+	    ಮುಂದುವರಿ;
 
-	case 'g':	/* ISO week year without century (parsed, ignored). */
-	    bp = conv_num(bp, &i, 0, 99);
-	    continue;
+	ಸ್ಥಿತಿ 'g':	/* ISO week year without century (parsed, ignored). */
+	    bp = conv_ಅಂಕೆ(bp, &i, 0, 99);
+	    ಮುಂದುವರಿ;
 
-	case 'G':	/* ISO week year with century (parsed, ignored). */
-	    do
+	ಸ್ಥಿತಿ 'G':	/* ISO week year with century (parsed, ignored). */
+	    ಮಾಡು
 		bp++;
-	    while (isdigit(*bp));
-	    continue;
+	    ಆಗ (ಅಂಕಿಯೇ(*bp));
+	    ಮುಂದುವರಿ;
 
-	case 'V':	/* ISO 8601:1988 week number (parsed, ignored). */
-	    bp = conv_num(bp, &i, 1, 53);
-	    continue;
+	ಸ್ಥಿತಿ 'V':	/* ISO 8601:1988 week number (parsed, ignored). */
+	    bp = conv_ಅಂಕೆ(bp, &i, 1, 53);
+	    ಮುಂದುವರಿ;
 
-	case 'Y':	/* The year. */
-	    i = TM_YEAR_BASE;	/* just for data sanity... */
-	    bp = conv_num(bp, &i, 0, 9999);
-	    tm->tm_year = i - TM_YEAR_BASE;
+	ಸ್ಥಿತಿ 'Y':	/* The year. */
+	    i = TM_YEAR_ತಳ;	/* just for data sanity... */
+	    bp = conv_ಅಂಕೆ(bp, &i, 0, 9999);
+	    tm->tm_year = i - TM_YEAR_ತಳ;
 	    LEGAL_ALT(ALT_E);
 	    state |= S_YEAR;
-	    continue;
+	    ಮುಂದುವರಿ;
 
-	case 'y':	/* The year within 100 years of the epoch. */
+	ಸ್ಥಿತಿ 'y':	/* The year within 100 years of the epoch. */
 	    /* LEGAL_ALT(ALT_E | ALT_O); */
-	    bp = conv_num(bp, &i, 0, 99);
+	    bp = conv_ಅಂಕೆ(bp, &i, 0, 99);
 
-	    if (split_year)
+	    ಆದರೆ (ವಿಭಜಿಸು_year)
 		/* preserve century */
 		i += (tm->tm_year / 100) * 100;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		split_year = 1;
-		if (i <= 68)
-		    i = i + 2000 - TM_YEAR_BASE;
-		else
-		    i = i + 1900 - TM_YEAR_BASE;
+		ವಿಭಜಿಸು_year = 1;
+		ಆದರೆ (i <= 68)
+		    i = i + 2000 - TM_YEAR_ತಳ;
+		ಇಲ್ಲದಿದ್ದರೆ
+		    i = i + 1900 - TM_YEAR_ತಳ;
 	    }
 	    tm->tm_year = i;
 	    state |= S_YEAR;
-	    continue;
+	    ಮುಂದುವರಿ;
 
-	case 'Z':
-	case 'z':
+	ಸ್ಥಿತಿ 'Z':
+	ಸ್ಥಿತಿ 'z':
 	    tzset();
 	    mandatory = c == 'z';
 	    /*
@@ -508,299 +508,299 @@ literal:
 	     * Note: J maybe used to denote non-nautical
 	     *       local time
 	     */
-	    if (mandatory)
-		while (isspace(*bp))
+	    ಆದರೆ (mandatory)
+		ಆಗ (ಖಾಲಿಯೇ(*bp))
 		    bp++;
 
 	    zname = bp;
-	    switch (*bp++)
+	    ಆಯ್ಕೆ (*bp++)
 	    {
-	    case 'G':
-		if (*bp++ != 'M')
-		    goto namedzone;
+	    ಸ್ಥಿತಿ 'G':
+		ಆದರೆ (*bp++ != 'M')
+		    ಹೋಗು namedzone;
 		/*FALLTHROUGH*/
-	    case 'U':
-		if (*bp++ != 'T')
-		    goto namedzone;
-		else if (!delim(*bp) && *bp++ != 'C')
-		    goto namedzone;
+	    ಸ್ಥಿತಿ 'U':
+		ಆದರೆ (*bp++ != 'T')
+		    ಹೋಗು namedzone;
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!delim(*bp) && *bp++ != 'C')
+		    ಹೋಗು namedzone;
 		/*FALLTHROUGH*/
-	    case 'Z':
-		if (!delim(*bp))
-		    goto namedzone;
+	    ಸ್ಥಿತಿ 'Z':
+		ಆದರೆ (!delim(*bp))
+		    ಹೋಗು namedzone;
 		tm->tm_isdst = 0;
-		continue;
-	    case '+':
+		ಮುಂದುವರಿ;
+	    ಸ್ಥಿತಿ '+':
 		neg = 0;
-		break;
-	    case '-':
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ '-':
 		neg = 1;
-		break;
-	    default:
+		ನಿಲ್ಲಿಸು;
+	    ಪೂರ್ವನಿಯೋಜಿತ:
 namedzone:
 		bp = zname;
 
 		/* Nautical / Military style */
-		if (delim(bp[1]) &&
+		ಆದರೆ (delim(bp[1]) &&
 			((*bp >= 'A' && *bp <= 'I') ||
 			 (*bp >= 'L' && *bp <= 'Y')))
 		{
 		    bp++;
-		    continue;
+		    ಮುಂದುವರಿ;
 		}
 		/* 'J' is local time */
-		if (delim(bp[1]) && *bp == 'J')
+		ಆದರೆ (delim(bp[1]) && *bp == 'J')
 		{
 		    bp++;
-		    continue;
+		    ಮುಂದುವರಿ;
 		}
 
 		/*
 		 * From our 3 letter hard-coded table.
 		 */
-		if (delim(bp[0]) || delim(bp[1]) ||
+		ಆದರೆ (delim(bp[0]) || delim(bp[1]) ||
 			delim(bp[2]) || !delim(bp[3]))
-		    goto loadzone;
-		ep = find_string(bp, &i, nast, NULL, 4);
-		if (ep != NULL)
+		    ಹೋಗು loadzone;
+		ep = ಕಂಡುಹಿಡಿ_string(bp, &i, nast, ಖಾಲಿ, 4);
+		ಆದರೆ (ep != ಖಾಲಿ)
 		{
 		    bp = ep;
-		    continue;
+		    ಮುಂದುವರಿ;
 		}
-		ep = find_string(bp, &i, nadt, NULL, 4);
-		if (ep != NULL)
+		ep = ಕಂಡುಹಿಡಿ_string(bp, &i, nadt, ಖಾಲಿ, 4);
+		ಆದರೆ (ep != ಖಾಲಿ)
 		{
 		    tm->tm_isdst = 1;
 		    bp = ep;
-		    continue;
+		    ಮುಂದುವರಿ;
 		}
 		/*
 		 * Our current timezone.  Prefer _get_tzname() over the
 		 * tzname[] global, which UCRT marks deprecated because it
 		 * may be inaccurate after locale changes.
 		 */
-#ifdef USE_GET_TZNAME
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_GET_TZNAME
 		{
-		    char tzbuf[2][32];
-		    const char *tznames[2] = { tzbuf[0], tzbuf[1] };
+		    ಅಕ್ಷರ tzbuf[2][32];
+		    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *tznames[2] = { tzbuf[0], tzbuf[1] };
 		    size_t tzlen;
 
 		    _tzset();
-		    if (_get_tzname(&tzlen, tzbuf[0], sizeof(tzbuf[0]), 0) != 0)
+		    ಆದರೆ (_get_tzname(&tzlen, tzbuf[0], ಗಾತ್ರ(tzbuf[0]), 0) != 0)
 			tzbuf[0][0] = NUL;
-		    if (_get_tzname(&tzlen, tzbuf[1], sizeof(tzbuf[1]), 1) != 0)
+		    ಆದರೆ (_get_tzname(&tzlen, tzbuf[1], ಗಾತ್ರ(tzbuf[1]), 1) != 0)
 			tzbuf[1][0] = NUL;
-		    ep = find_string(bp, &i, tznames, NULL, 2);
+		    ep = ಕಂಡುಹಿಡಿ_string(bp, &i, tznames, ಖಾಲಿ, 2);
 		}
-#else
-		ep = find_string(bp, &i,
-			(const char *const *)tzname, NULL, 2);
-#endif
-		if (ep != NULL)
+#ಇಲ್ಲದಿದ್ದರೆ
+		ep = ಕಂಡುಹಿಡಿ_string(bp, &i,
+			(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಸ್ಥಿರಾಂಕ *)tzname, ಖಾಲಿ, 2);
+#ಆದರೆ_ಅಂತ್ಯ
+		ಆದರೆ (ep != ಖಾಲಿ)
 		{
 		    tm->tm_isdst = i;
 		    bp = ep;
-		    continue;
+		    ಮುಂದುವರಿ;
 		}
 loadzone:
 		/*
 		 * The hard way, load the zone!
 		 */
-		if (fromzone(&bp, tm, mandatory))
-		    continue;
-		goto out;
+		ಆದರೆ (fromzone(&bp, tm, mandatory))
+		    ಮುಂದುವರಿ;
+		ಹೋಗು ಹೊರಹೋಗು;
 	    }
 	    offs = 0;
-	    for (i = 0; i < 4; )
+	    ಗಾಗಿ (i = 0; i < 4; )
 	    {
-		if (isdigit(*bp))
+		ಆದರೆ (ಅಂಕಿಯೇ(*bp))
 		{
 		    offs = offs * 10 + (*bp++ - '0');
 		    i++;
-		    continue;
+		    ಮುಂದುವರಿ;
 		}
-		if (i == 2 && *bp == ':')
+		ಆದರೆ (i == 2 && *bp == ':')
 		{
 		    bp++;
-		    continue;
+		    ಮುಂದುವರಿ;
 		}
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	    if (isdigit(*bp))
-		goto out;
-	    switch (i)
+	    ಆದರೆ (ಅಂಕಿಯೇ(*bp))
+		ಹೋಗು ಹೊರಹೋಗು;
+	    ಆಯ್ಕೆ (i)
 	    {
-	    case 2:
+	    ಸ್ಥಿತಿ 2:
 		offs *= SECSPERHOUR;
-		break;
-	    case 4:
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ 4:
 		i = offs % 100;
 		offs /= 100;
-		if (i >= SECSPERMIN)
-		    goto out;
+		ಆದರೆ (i >= SECSPERMIN)
+		    ಹೋಗು ಹೊರಹೋಗು;
 		/* Convert minutes into decimal */
 		offs = offs * SECSPERHOUR + i * SECSPERMIN;
-		break;
-	    default:
-out:
-		if (mandatory)
-		    return NULL;
+		ನಿಲ್ಲಿಸು;
+	    ಪೂರ್ವನಿಯೋಜಿತ:
+ಹೊರಹೋಗು:
+		ಆದರೆ (mandatory)
+		    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 		bp = zname;
-		continue;
+		ಮುಂದುವರಿ;
 	    }
 	    /* ISO 8601 & RFC 3339 limit to 23:59 max */
-	    if (offs >= (HOURSPERDAY * SECSPERHOUR))
-		goto out;
-	    if (neg)
+	    ಆದರೆ (offs >= (HOURSPERDAY * SECSPERHOUR))
+		ಹೋಗು ಹೊರಹೋಗು;
+	    ಆದರೆ (neg)
 		offs = -offs;
 	    tm->tm_isdst = 0;	/* XXX */
-	    continue;
+	    ಮುಂದುವರಿ;
 
 	/*
 	 * Miscellaneous conversions.
 	 */
-	case 'n':	/* Any kind of white-space. */
-	case 't':
-	    while (isspace(*bp))
+	ಸ್ಥಿತಿ 'n':	/* Any kind of white-space. */
+	ಸ್ಥಿತಿ 't':
+	    ಆಗ (ಖಾಲಿಯೇ(*bp))
 		bp++;
 	    LEGAL_ALT(0);
-	    continue;
+	    ಮುಂದುವರಿ;
 
 
-	default:	/* Unknown/unsupported conversion. */
-	    return NULL;
+	ಪೂರ್ವನಿಯೋಜಿತ:	/* Unknown/unsupported conversion. */
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
     }
 
-    if (!HAVE_YDAY(state) && HAVE_YEAR(state))
+    ಆದರೆ (!HAVE_YDAY(state) && HAVE_YEAR(state))
     {
-	if (HAVE_MON(state) && HAVE_MDAY(state))
+	ಆದರೆ (HAVE_MON(state) && HAVE_MDAY(state))
 	{
 	    /* calculate day of year (ordinal date) */
-	    tm->tm_yday =  start_of_month[isleap_sum(tm->tm_year,
-			    TM_YEAR_BASE)][tm->tm_mon] + (tm->tm_mday - 1);
+	    tm->tm_yday =  ಆರಂಭ_ದ_month[isleap_ಮೊತ್ತ(tm->tm_year,
+			    TM_YEAR_ತಳ)][tm->tm_mon] + (tm->tm_mday - 1);
 	    state |= S_YDAY;
 	}
-	else if (day_offset != -1)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (day_ಸ್ಥಾನಾಂತರ != -1)
 	{
 	    /*
 	     * Set the date to the first Sunday (or Monday)
 	     * of the specified week of the year.
 	     */
-	    if (!HAVE_WDAY(state))
+	    ಆದರೆ (!HAVE_WDAY(state))
 	    {
-		tm->tm_wday = day_offset;
+		tm->tm_wday = day_ಸ್ಥಾನಾಂತರ;
 		state |= S_WDAY;
 	    }
 	    tm->tm_yday = (7 -
-		    first_wday_of(tm->tm_year + TM_YEAR_BASE) +
-		    day_offset) % 7 + (week_offset - 1) * 7 +
-		    tm->tm_wday  - day_offset;
+		    ಮೊದಲ_wday_ದ(tm->tm_year + TM_YEAR_ತಳ) +
+		    day_ಸ್ಥಾನಾಂತರ) % 7 + (week_ಸ್ಥಾನಾಂತರ - 1) * 7 +
+		    tm->tm_wday  - day_ಸ್ಥಾನಾಂತರ;
 	    state |= S_YDAY;
 	}
     }
 
-    if (HAVE_YDAY(state) && HAVE_YEAR(state))
+    ಆದರೆ (HAVE_YDAY(state) && HAVE_YEAR(state))
     {
-	int leap;
+	ಪೂರ್ಣಾಂಕ leap;
 
-	if (!HAVE_MON(state))
+	ಆದರೆ (!HAVE_MON(state))
 	{
 	    /* calculate month of day of year */
 	    i = 0;
-	    leap = isleap_sum(tm->tm_year, TM_YEAR_BASE);
-	    while (tm->tm_yday >= start_of_month[leap][i])
+	    leap = isleap_ಮೊತ್ತ(tm->tm_year, TM_YEAR_ತಳ);
+	    ಆಗ (tm->tm_yday >= ಆರಂಭ_ದ_month[leap][i])
 		i++;
-	    if (i > 12)
+	    ಆದರೆ (i > 12)
 	    {
 		i = 1;
-		tm->tm_yday -= start_of_month[leap][12];
+		tm->tm_yday -= ಆರಂಭ_ದ_month[leap][12];
 		tm->tm_year++;
 	    }
 	    tm->tm_mon = i - 1;
 	    state |= S_MON;
 	}
 
-	if (!HAVE_MDAY(state))
+	ಆದರೆ (!HAVE_MDAY(state))
 	{
 	    /* calculate day of month */
-	    leap = isleap_sum(tm->tm_year, TM_YEAR_BASE);
+	    leap = isleap_ಮೊತ್ತ(tm->tm_year, TM_YEAR_ತಳ);
 	    tm->tm_mday = tm->tm_yday -
-		start_of_month[leap][tm->tm_mon] + 1;
+		ಆರಂಭ_ದ_month[leap][tm->tm_mon] + 1;
 	    state |= S_MDAY;
 	}
 
-	if (!HAVE_WDAY(state))
+	ಆದರೆ (!HAVE_WDAY(state))
 	{
 	    /* calculate day of week */
 	    i = 0;
-	    week_offset = first_wday_of(tm->tm_year);
-	    while (i++ <= tm->tm_yday)
+	    week_ಸ್ಥಾನಾಂತರ = ಮೊದಲ_wday_ದ(tm->tm_year);
+	    ಆಗ (i++ <= tm->tm_yday)
 	    {
-		if (week_offset++ >= 6)
-		    week_offset = 0;
+		ಆದರೆ (week_ಸ್ಥಾನಾಂತರ++ >= 6)
+		    week_ಸ್ಥಾನಾಂತರ = 0;
 	    }
-	    tm->tm_wday = week_offset;
+	    tm->tm_wday = week_ಸ್ಥಾನಾಂತರ;
 	    state |= S_WDAY;
 	}
     }
 
-    return (char *)bp;
+    ಹಿಂತಿರುಗಿ (ಅಕ್ಷರ *)bp;
 }
 
 
-    static const unsigned char *
-conv_num(const unsigned char *buf, int *dest, unsigned int llim,
-						    unsigned int ulim)
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ *
+conv_ಅಂಕೆ(ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ *buf, ಪೂರ್ಣಾಂಕ *dest, ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ llim,
+						    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ ulim)
 {
-    unsigned int result = 0;
-    unsigned char ch;
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ ಫಲಿತಾಂಶ = 0;
+    ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ ch;
 
     /* The limit also determines the number of valid digits. */
-    unsigned int rulim = ulim;
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ rulim = ulim;
 
     ch = *buf;
-    if (ch < '0' || ch > '9')
-	return NULL;
+    ಆದರೆ (ch < '0' || ch > '9')
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    do
+    ಮಾಡು
     {
-	result *= 10;
-	result += ch - '0';
+	ಫಲಿತಾಂಶ *= 10;
+	ಫಲಿತಾಂಶ += ch - '0';
 	rulim /= 10;
 	ch = *++buf;
-    } while ((result * 10 <= ulim) && rulim && ch >= '0' && ch <= '9');
+    } ಆಗ ((ಫಲಿತಾಂಶ * 10 <= ulim) && rulim && ch >= '0' && ch <= '9');
 
-    if (result < llim || result > ulim)
-	return NULL;
+    ಆದರೆ (ಫಲಿತಾಂಶ < llim || ಫಲಿತಾಂಶ > ulim)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    *dest = result;
-    return buf;
+    *dest = ಫಲಿತಾಂಶ;
+    ಹಿಂತಿರುಗಿ buf;
 }
 
-    static const unsigned char *
-find_string(const unsigned char *bp, int *tgt, const char *const *n1,
-					    const char *const *n2, int c)
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ *
+ಕಂಡುಹಿಡಿ_string(ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ *bp, ಪೂರ್ಣಾಂಕ *tgt, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಸ್ಥಿರಾಂಕ *n1,
+					    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಸ್ಥಿರಾಂಕ *n2, ಪೂರ್ಣಾಂಕ c)
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
     size_t	len;
 
     /* check full name - then abbreviated ones */
-    for (; n1 != NULL; n1 = n2, n2 = NULL)
+    ಗಾಗಿ (; n1 != ಖಾಲಿ; n1 = n2, n2 = ಖಾಲಿ)
     {
-	for (i = 0; i < c; i++, n1++)
+	ಗಾಗಿ (i = 0; i < c; i++, n1++)
 	{
-	    len = strlen(*n1);
-	    if (STRNICMP(*n1, bp, len) == 0)
+	    len = ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(*n1);
+	    ಆದರೆ (STRNICMP(*n1, bp, len) == 0)
 	    {
 		*tgt = i;
-		return bp + len;
+		ಹಿಂತಿರುಗಿ bp + len;
 	    }
 	}
     }
 
     /* Nothing matched */
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
-#endif // MSWIN
+#ಆದರೆ_ಅಂತ್ಯ // MSWIN

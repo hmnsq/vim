@@ -11,80 +11,80 @@
  * indent.c: Indentation related functions
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-#if defined(FEAT_VARTABS)
+#ಆದರೆ defined(FEAT_VARTABS)
 
 /*
  * Set the integer values corresponding to the string setting of 'vartabstop'.
  * "array" will be set, caller must free it if needed.
  * Return FAIL for an error.
  */
-    int
-tabstop_set(char_u *var, int **array)
+    ಪೂರ್ಣಾಂಕ
+tabstop_ಗಣ(char_u *var, ಪೂರ್ಣಾಂಕ **array)
 {
-    int	    valcount = 1;
-    int	    t;
+    ಪೂರ್ಣಾಂಕ	    valcount = 1;
+    ಪೂರ್ಣಾಂಕ	    t;
     char_u  *cp;
 
-    if (var[0] == NUL || (var[0] == '0' && var[1] == NUL))
+    ಆದರೆ (var[0] == NUL || (var[0] == '0' && var[1] == NUL))
     {
-	*array = NULL;
-	return OK;
+	*array = ಖಾಲಿ;
+	ಹಿಂತಿರುಗಿ OK;
     }
 
-    for (cp = var; *cp != NUL; ++cp)
+    ಗಾಗಿ (cp = var; *cp != NUL; ++cp)
     {
-	if (cp == var || cp[-1] == ',')
+	ಆದರೆ (cp == var || cp[-1] == ',')
 	{
-	    char_u *end;
+	    char_u *ಕೊನೆ;
 
-	    if (strtol((char *)cp, (char **)&end, 10) <= 0)
+	    ಆದರೆ (strtol((ಅಕ್ಷರ *)cp, (ಅಕ್ಷರ **)&ಕೊನೆ, 10) <= 0)
 	    {
-		if (cp != end)
-		    emsg(_(e_argument_must_be_positive));
-		else
-		    semsg(_(e_invalid_argument_str), cp);
-		return FAIL;
+		ಆದರೆ (cp != ಕೊನೆ)
+		    emsg(_(e_ವಾದ_must_be_ಧನಾತ್ಮಕ));
+		ಇಲ್ಲದಿದ್ದರೆ
+		    semsg(_(e_invalid_ವಾದ_str), cp);
+		ಹಿಂತಿರುಗಿ FAIL;
 	    }
 	}
 
-	if (VIM_ISDIGIT(*cp))
-	    continue;
-	if (cp[0] == ',' && cp > var && cp[-1] != ',' && cp[1] != NUL)
+	ಆದರೆ (VIM_ISDIGIT(*cp))
+	    ಮುಂದುವರಿ;
+	ಆದರೆ (cp[0] == ',' && cp > var && cp[-1] != ',' && cp[1] != NUL)
 	{
 	    ++valcount;
-	    continue;
+	    ಮುಂದುವರಿ;
 	}
-	semsg(_(e_invalid_argument_str), var);
-	return FAIL;
+	semsg(_(e_invalid_ವಾದ_str), var);
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
-    *array = ALLOC_MULT(int, valcount + 1);
-    if (*array == NULL)
-	return FAIL;
+    *array = ALLOC_MULT(ಪೂರ್ಣಾಂಕ, valcount + 1);
+    ಆದರೆ (*array == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
     (*array)[0] = valcount;
 
     t = 1;
-    for (cp = var; *cp != NUL;)
+    ಗಾಗಿ (cp = var; *cp != NUL;)
     {
-	int n = atoi((char *)cp);
+	ಪೂರ್ಣಾಂಕ n = atoi((ಅಕ್ಷರ *)cp);
 
 	// Catch negative values, overflow and ridiculous big values.
-	if (n <= 0 || n > TABSTOP_MAX)
+	ಆದರೆ (n <= 0 || n > TABSTOP_MAX)
 	{
-	    semsg(_(e_invalid_argument_str), cp);
+	    semsg(_(e_invalid_ವಾದ_str), cp);
 	    VIM_CLEAR(*array);
-	    return FAIL;
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
 	(*array)[t++] = n;
-	while (*cp != NUL && *cp != ',')
+	ಆಗ (*cp != NUL && *cp != ',')
 	    ++cp;
-	if (*cp != NUL)
+	ಆದರೆ (*cp != NUL)
 	    ++cp;
     }
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
@@ -92,33 +92,33 @@ tabstop_set(char_u *var, int **array)
  * If "vts" is set then the tab widths are taken from that array,
  * otherwise the value of ts is used.
  */
-    int
-tabstop_padding(colnr_T col, int ts_arg, int *vts)
+    ಪೂರ್ಣಾಂಕ
+tabstop_padding(colnr_T ಲಂಬಸಾಲು, ಪೂರ್ಣಾಂಕ ts_arg, ಪೂರ್ಣಾಂಕ *vts)
 {
-    int		ts = ts_arg == 0 ? 8 : ts_arg;
-    int		tabcount;
+    ಪೂರ್ಣಾಂಕ		ts = ts_arg == 0 ? 8 : ts_arg;
+    ಪೂರ್ಣಾಂಕ		tabcount;
     colnr_T	tabcol = 0;
-    int		t;
-    int		padding = 0;
+    ಪೂರ್ಣಾಂಕ		t;
+    ಪೂರ್ಣಾಂಕ		padding = 0;
 
-    if (vts == NULL || vts[0] == 0)
-	return ts - (col % ts);
+    ಆದರೆ (vts == ಖಾಲಿ || vts[0] == 0)
+	ಹಿಂತಿರುಗಿ ts - (ಲಂಬಸಾಲು % ts);
 
     tabcount = vts[0];
 
-    for (t = 1; t <= tabcount; ++t)
+    ಗಾಗಿ (t = 1; t <= tabcount; ++t)
     {
 	tabcol += vts[t];
-	if (tabcol > col)
+	ಆದರೆ (tabcol > ಲಂಬಸಾಲು)
 	{
-	    padding = (int)(tabcol - col);
-	    break;
+	    padding = (ಪೂರ್ಣಾಂಕ)(tabcol - ಲಂಬಸಾಲು);
+	    ನಿಲ್ಲಿಸು;
 	}
     }
-    if (t > tabcount)
-	padding = vts[tabcount] - (int)((col - tabcol) % vts[tabcount]);
+    ಆದರೆ (t > tabcount)
+	padding = vts[tabcount] - (ಪೂರ್ಣಾಂಕ)((ಲಂಬಸಾಲು - tabcol) % vts[tabcount]);
 
-    return padding;
+    ಹಿಂತಿರುಗಿ padding;
 }
 
 /*
@@ -129,25 +129,25 @@ tabstop_padding(colnr_T col, int ts_arg, int *vts)
  * character in the line.  If the shift is to the left (left = TRUE), then
  * return the size of the tab interval to the left of the column.
  */
-    int
-tabstop_at(colnr_T col, int ts, int *vts, int left)
+    ಪೂರ್ಣಾಂಕ
+tabstop_at(colnr_T ಲಂಬಸಾಲು, ಪೂರ್ಣಾಂಕ ts, ಪೂರ್ಣಾಂಕ *vts, ಪೂರ್ಣಾಂಕ ಎಡ_2)
 {
-    int		tabcount;	// Number of tab stops in the list of variable
+    ಪೂರ್ಣಾಂಕ		tabcount;	// Number of tab stops in the list of variable
 				// tab stops.
     colnr_T	tabcol = 0;	// Column of the tab stop under consideration.
-    int		t;		// Tabstop index in the list of variable tab
+    ಪೂರ್ಣಾಂಕ		t;		// Tabstop index in the list of variable tab
 				// stops.
-    int		tab_size = 0;	// Size of the tab stop interval to the right
+    ಪೂರ್ಣಾಂಕ		tab_ಗಾತ್ರ = 0;	// Size of the tab stop interval to the right
 				// or left of the col.
 
-    if (vts == 0 || vts[0] == 0)
-	return ts;
+    ಆದರೆ (vts == 0 || vts[0] == 0)
+	ಹಿಂತಿರುಗಿ ts;
 
     tabcount = vts[0];
-    for (t = 1; t <= tabcount; ++t)
+    ಗಾಗಿ (t = 1; t <= tabcount; ++t)
     {
 	tabcol += vts[t];
-	if (tabcol > col)
+	ಆದರೆ (tabcol > ಲಂಬಸಾಲು)
 	{
 	    // If shifting left (left != 0), and if the column to the left of
 	    // the first first non-blank character (col) in the line is
@@ -155,74 +155,74 @@ tabstop_at(colnr_T col, int ts, int *vts, int left)
 	    // (tab_size) to just enough to shift the line to the left margin.
 	    // The value doesn't seem to matter as long as it is at least that
 	    // distance.
-	    if (left && (t == 1))
-		tab_size = col;
-	    else
-		tab_size = vts[t - (left ? 1 : 0)];
-	    break;
+	    ಆದರೆ (ಎಡ_2 && (t == 1))
+		tab_ಗಾತ್ರ = ಲಂಬಸಾಲು;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		tab_ಗಾತ್ರ = vts[t - (ಎಡ_2 ? 1 : 0)];
+	    ನಿಲ್ಲಿಸು;
 	}
     }
-    if (t > tabcount)		// If the value of the index t is beyond the
+    ಆದರೆ (t > tabcount)		// If the value of the index t is beyond the
 				// end of the list, use the tab stop value at
 				// the end of the list.
-	tab_size = vts[tabcount];
+	tab_ಗಾತ್ರ = vts[tabcount];
 
-    return tab_size;
+    ಹಿಂತಿರುಗಿ tab_ಗಾತ್ರ;
 }
 
 /*
  * Find the column on which a tab starts.
  */
     colnr_T
-tabstop_start(colnr_T col, int ts, int *vts)
+tabstop_ಆರಂಭ(colnr_T ಲಂಬಸಾಲು, ಪೂರ್ಣಾಂಕ ts, ಪೂರ್ಣಾಂಕ *vts)
 {
-    int		tabcount;
+    ಪೂರ್ಣಾಂಕ		tabcount;
     colnr_T	tabcol = 0;
-    int		t;
-    int		excess;
+    ಪೂರ್ಣಾಂಕ		t;
+    ಪೂರ್ಣಾಂಕ		excess;
 
-    if (vts == NULL || vts[0] == 0)
-	return col - col % ts;
+    ಆದರೆ (vts == ಖಾಲಿ || vts[0] == 0)
+	ಹಿಂತಿರುಗಿ ಲಂಬಸಾಲು - ಲಂಬಸಾಲು % ts;
 
     tabcount = vts[0];
-    for (t = 1; t <= tabcount; ++t)
+    ಗಾಗಿ (t = 1; t <= tabcount; ++t)
     {
 	tabcol += vts[t];
-	if (tabcol > col)
-	    return tabcol - vts[t];
+	ಆದರೆ (tabcol > ಲಂಬಸಾಲು)
+	    ಹಿಂತಿರುಗಿ tabcol - vts[t];
     }
 
     excess = tabcol % vts[tabcount];
-    return col - (col - excess) % vts[tabcount];
+    ಹಿಂತಿರುಗಿ ಲಂಬಸಾಲು - (ಲಂಬಸಾಲು - excess) % vts[tabcount];
 }
 
 /*
  * Find the number of tabs and spaces necessary to get from one column
  * to another.
  */
-    void
+    ಶೂನ್ಯ
 tabstop_fromto(
-	colnr_T start_col,
-	colnr_T end_col,
-	int	ts_arg,
-	int	*vts,
-	int	*ntabs,
-	int	*nspcs)
+	colnr_T ಆರಂಭ_ಲಂಬಸಾಲು,
+	colnr_T ಕೊನೆ_ಲಂಬಸಾಲು,
+	ಪೂರ್ಣಾಂಕ	ts_arg,
+	ಪೂರ್ಣಾಂಕ	*vts,
+	ಪೂರ್ಣಾಂಕ	*ntabs,
+	ಪೂರ್ಣಾಂಕ	*nspcs)
 {
-    int		spaces = end_col - start_col;
+    ಪೂರ್ಣಾಂಕ		spaces = ಕೊನೆ_ಲಂಬಸಾಲು - ಆರಂಭ_ಲಂಬಸಾಲು;
     colnr_T	tabcol = 0;
-    int		padding = 0;
-    int		tabcount;
-    int		t;
-    int		ts = ts_arg == 0 ? curbuf->b_p_ts : ts_arg;
+    ಪೂರ್ಣಾಂಕ		padding = 0;
+    ಪೂರ್ಣಾಂಕ		tabcount;
+    ಪೂರ್ಣಾಂಕ		t;
+    ಪೂರ್ಣಾಂಕ		ts = ts_arg == 0 ? curbuf->b_p_ts : ts_arg;
 
-    if (vts == NULL || vts[0] == 0)
+    ಆದರೆ (vts == ಖಾಲಿ || vts[0] == 0)
     {
-	int tabs = 0;
-	int initspc = 0;
+	ಪೂರ್ಣಾಂಕ tabs = 0;
+	ಪೂರ್ಣಾಂಕ initspc = 0;
 
-	initspc = ts - (start_col % ts);
-	if (spaces >= initspc)
+	initspc = ts - (ಆರಂಭ_ಲಂಬಸಾಲು % ts);
+	ಆದರೆ (spaces >= initspc)
 	{
 	    spaces -= initspc;
 	    tabs++;
@@ -232,42 +232,42 @@ tabstop_fromto(
 
 	*ntabs = tabs;
 	*nspcs = spaces;
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
     // Find the padding needed to reach the next tabstop.
     tabcount = vts[0];
-    for (t = 1; t <= tabcount; ++t)
+    ಗಾಗಿ (t = 1; t <= tabcount; ++t)
     {
 	tabcol += vts[t];
-	if (tabcol > start_col)
+	ಆದರೆ (tabcol > ಆರಂಭ_ಲಂಬಸಾಲು)
 	{
-	    padding = (int)(tabcol - start_col);
-	    break;
+	    padding = (ಪೂರ್ಣಾಂಕ)(tabcol - ಆರಂಭ_ಲಂಬಸಾಲು);
+	    ನಿಲ್ಲಿಸು;
 	}
     }
-    if (t > tabcount)
-	padding = vts[tabcount] - (int)((start_col - tabcol) % vts[tabcount]);
+    ಆದರೆ (t > tabcount)
+	padding = vts[tabcount] - (ಪೂರ್ಣಾಂಕ)((ಆರಂಭ_ಲಂಬಸಾಲು - tabcol) % vts[tabcount]);
 
     // If the space needed is less than the padding no tabs can be used.
-    if (spaces < padding)
+    ಆದರೆ (spaces < padding)
     {
 	*ntabs = 0;
 	*nspcs = spaces;
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
     *ntabs = 1;
     spaces -= padding;
 
     // At least one tab has been used. See if any more will fit.
-    while (spaces != 0 && ++t <= tabcount)
+    ಆಗ (spaces != 0 && ++t <= tabcount)
     {
 	padding = vts[t];
-	if (spaces < padding)
+	ಆದರೆ (spaces < padding)
 	{
 	    *nspcs = spaces;
-	    return;
+	    ಹಿಂತಿರುಗಿ;
 	}
 	++*ntabs;
 	spaces -= padding;
@@ -280,228 +280,228 @@ tabstop_fromto(
 /*
  * See if two tabstop arrays contain the same values.
  */
-    static int
-tabstop_eq(int *ts1, int *ts2)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+tabstop_eq(ಪೂರ್ಣಾಂಕ *ts1, ಪೂರ್ಣಾಂಕ *ts2)
 {
-    int		t;
+    ಪೂರ್ಣಾಂಕ		t;
 
-    if ((ts1 == 0 && ts2) || (ts1 && ts2 == 0))
-	return FALSE;
-    if (ts1 == ts2)
-	return TRUE;
-    if (ts1[0] != ts2[0])
-	return FALSE;
+    ಆದರೆ ((ts1 == 0 && ts2) || (ts1 && ts2 == 0))
+	ಹಿಂತಿರುಗಿ FALSE;
+    ಆದರೆ (ts1 == ts2)
+	ಹಿಂತಿರುಗಿ TRUE;
+    ಆದರೆ (ts1[0] != ts2[0])
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    for (t = 1; t <= ts1[0]; ++t)
-	if (ts1[t] != ts2[t])
-	    return FALSE;
+    ಗಾಗಿ (t = 1; t <= ts1[0]; ++t)
+	ಆದರೆ (ts1[t] != ts2[t])
+	    ಹಿಂತಿರುಗಿ FALSE;
 
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
-# if defined(FEAT_BEVAL)
+# ಆದರೆ defined(FEAT_BEVAL)
 /*
  * Copy a tabstop array, allocating space for the new array.
  */
-    int *
-tabstop_copy(int *oldts)
+    ಪೂರ್ಣಾಂಕ *
+tabstop_copy(ಪೂರ್ಣಾಂಕ *oldts)
 {
-    int		*newts;
-    int		t;
+    ಪೂರ್ಣಾಂಕ		*newts;
+    ಪೂರ್ಣಾಂಕ		t;
 
-    if (oldts == NULL)
-	return NULL;
-    newts = ALLOC_MULT(int, oldts[0] + 1);
-    if (newts != NULL)
-	for (t = 0; t <= oldts[0]; ++t)
+    ಆದರೆ (oldts == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    newts = ALLOC_MULT(ಪೂರ್ಣಾಂಕ, oldts[0] + 1);
+    ಆದರೆ (newts != ಖಾಲಿ)
+	ಗಾಗಿ (t = 0; t <= oldts[0]; ++t)
 	    newts[t] = oldts[t];
-    return newts;
+    ಹಿಂತಿರುಗಿ newts;
 }
 # endif
 
 /*
  * Return a count of the number of tabstops.
  */
-    int
-tabstop_count(int *ts)
+    ಪೂರ್ಣಾಂಕ
+tabstop_ಎಣಿಕೆ(ಪೂರ್ಣಾಂಕ *ts)
 {
-    return ts != NULL ? ts[0] : 0;
+    ಹಿಂತಿರುಗಿ ts != ಖಾಲಿ ? ts[0] : 0;
 }
 
 /*
  * Return the first tabstop, or 8 if there are no tabstops defined.
  */
-    int
-tabstop_first(int *ts)
+    ಪೂರ್ಣಾಂಕ
+tabstop_ಮೊದಲ(ಪೂರ್ಣಾಂಕ *ts)
 {
-    return ts != NULL ? ts[1] : 8;
+    ಹಿಂತಿರುಗಿ ts != ಖಾಲಿ ? ts[1] : 8;
 }
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Return the effective shiftwidth value for current buffer, using the
  * 'tabstop' value when 'shiftwidth' is zero.
  */
-    long
-get_sw_value(buf_T *buf)
+    ದೀರ್ಘ
+get_sw_ಮೌಲ್ಯ(buf_T *buf)
 {
-    return get_sw_value_col(buf, 0, FALSE);
+    ಹಿಂತಿರುಗಿ get_sw_ಮೌಲ್ಯ_ಲಂಬಸಾಲು(buf, 0, FALSE);
 }
 
 /*
  * Idem, using "pos".
  */
-    static long
-get_sw_value_pos(buf_T *buf, pos_T *pos, int left)
+    ಸ್ಥಿರ ದೀರ್ಘ
+get_sw_ಮೌಲ್ಯ_pos(buf_T *buf, pos_T *pos, ಪೂರ್ಣಾಂಕ ಎಡ_2)
 {
     pos_T save_cursor = curwin->w_cursor;
-    long sw_value;
+    ದೀರ್ಘ sw_ಮೌಲ್ಯ;
 
     curwin->w_cursor = *pos;
-    sw_value = get_sw_value_col(buf, get_nolist_virtcol(), left);
+    sw_ಮೌಲ್ಯ = get_sw_ಮೌಲ್ಯ_ಲಂಬಸಾಲು(buf, get_nolist_virtcol(), ಎಡ_2);
     curwin->w_cursor = save_cursor;
-    return sw_value;
+    ಹಿಂತಿರುಗಿ sw_ಮೌಲ್ಯ;
 }
 
 /*
  * Idem, using the first non-black in the current line.
  */
-    long
-get_sw_value_indent(buf_T *buf, int left)
+    ದೀರ್ಘ
+get_sw_ಮೌಲ್ಯ_indent(buf_T *buf, ಪೂರ್ಣಾಂಕ ಎಡ_2)
 {
     pos_T pos = curwin->w_cursor;
 
-    pos.col = getwhitecols_curline();
-    return get_sw_value_pos(buf, &pos, left);
+    pos.ಲಂಬಸಾಲು = getwhitecols_curline();
+    ಹಿಂತಿರುಗಿ get_sw_ಮೌಲ್ಯ_pos(buf, &pos, ಎಡ_2);
 }
 
 /*
  * Idem, using virtual column "col".
  */
-    long
-get_sw_value_col(buf_T *buf, colnr_T col UNUSED, int left UNUSED)
+    ದೀರ್ಘ
+get_sw_ಮೌಲ್ಯ_ಲಂಬಸಾಲು(buf_T *buf, colnr_T ಲಂಬಸಾಲು ಬಳಸದ, ಪೂರ್ಣಾಂಕ ಎಡ_2 ಬಳಸದ)
 {
-    return buf->b_p_sw ? buf->b_p_sw :
-#ifdef FEAT_VARTABS
-	tabstop_at(col, buf->b_p_ts, buf->b_p_vts_array, left);
-#else
+    ಹಿಂತಿರುಗಿ buf->b_p_sw ? buf->b_p_sw :
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+	tabstop_at(ಲಂಬಸಾಲು, buf->b_p_ts, buf->b_p_vts_array, ಎಡ_2);
+#ಇಲ್ಲದಿದ್ದರೆ
 	buf->b_p_ts;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Return the effective softtabstop value for the current buffer, using the
  * 'shiftwidth' value when 'softtabstop' is negative.
  */
-    long
-get_sts_value(void)
+    ದೀರ್ಘ
+get_sts_ಮೌಲ್ಯ(ಶೂನ್ಯ)
 {
-    return curbuf->b_p_sts < 0 ? get_sw_value(curbuf) : curbuf->b_p_sts;
+    ಹಿಂತಿರುಗಿ curbuf->b_p_sts < 0 ? get_sw_ಮೌಲ್ಯ(curbuf) : curbuf->b_p_sts;
 }
 
 /*
  * Count the size (in window cells) of the indent in the current line.
  */
-    int
-get_indent(void)
+    ಪೂರ್ಣಾಂಕ
+get_indent(ಶೂನ್ಯ)
 {
-#ifdef FEAT_VARTABS
-    return get_indent_str_vtab(ml_get_curline(), (int)curbuf->b_p_ts,
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+    ಹಿಂತಿರುಗಿ get_indent_str_vtab(ml_get_curline(), (ಪೂರ್ಣಾಂಕ)curbuf->b_p_ts,
 						 curbuf->b_p_vts_array, FALSE);
-#else
-    return get_indent_str(ml_get_curline(), (int)curbuf->b_p_ts, FALSE);
-#endif
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಹಿಂತಿರುಗಿ get_indent_str(ml_get_curline(), (ಪೂರ್ಣಾಂಕ)curbuf->b_p_ts, FALSE);
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Count the size (in window cells) of the indent in line "lnum".
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 get_indent_lnum(linenr_T lnum)
 {
-#ifdef FEAT_VARTABS
-    return get_indent_str_vtab(ml_get(lnum), (int)curbuf->b_p_ts,
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+    ಹಿಂತಿರುಗಿ get_indent_str_vtab(ml_get(lnum), (ಪೂರ್ಣಾಂಕ)curbuf->b_p_ts,
 						 curbuf->b_p_vts_array, FALSE);
-#else
-    return get_indent_str(ml_get(lnum), (int)curbuf->b_p_ts, FALSE);
-#endif
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಹಿಂತಿರುಗಿ get_indent_str(ml_get(lnum), (ಪೂರ್ಣಾಂಕ)curbuf->b_p_ts, FALSE);
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#if defined(FEAT_FOLDING)
+#ಆದರೆ defined(FEAT_FOLDING)
 /*
  * Count the size (in window cells) of the indent in line "lnum" of buffer
  * "buf".
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 get_indent_buf(buf_T *buf, linenr_T lnum)
 {
 # ifdef FEAT_VARTABS
-    return get_indent_str_vtab(ml_get_buf(buf, lnum, FALSE),
-			       (int)buf->b_p_ts, buf->b_p_vts_array, FALSE);
-# else
-    return get_indent_str(ml_get_buf(buf, lnum, FALSE), (int)buf->b_p_ts, FALSE);
+    ಹಿಂತಿರುಗಿ get_indent_str_vtab(ml_get_buf(buf, lnum, FALSE),
+			       (ಪೂರ್ಣಾಂಕ)buf->b_p_ts, buf->b_p_vts_array, FALSE);
+# ಇಲ್ಲದಿದ್ದರೆ
+    ಹಿಂತಿರುಗಿ get_indent_str(ml_get_buf(buf, lnum, FALSE), (ಪೂರ್ಣಾಂಕ)buf->b_p_ts, FALSE);
 # endif
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * count the size (in window cells) of the indent in line "ptr", with
  * 'tabstop' at "ts"
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 get_indent_str(
     char_u	*ptr,
-    int		ts,
-    int		no_ts) // if TRUE, count a tab as ^I
+    ಪೂರ್ಣಾಂಕ		ts,
+    ಪೂರ್ಣಾಂಕ		no_ts) // if TRUE, count a tab as ^I
 {
-    int		count = 0;
+    ಪೂರ್ಣಾಂಕ		ಎಣಿಕೆ_2 = 0;
 
-    for ( ; *ptr; ++ptr)
+    ಗಾಗಿ ( ; *ptr; ++ptr)
     {
-	if (*ptr == TAB)    // count a tab for what it is worth
+	ಆದರೆ (*ptr == TAB)    // count a tab for what it is worth
 	{
-	    if (!no_ts)
-		count += ts - (count % ts);
-	    else
-		count += ptr2cells(ptr);
+	    ಆದರೆ (!no_ts)
+		ಎಣಿಕೆ_2 += ts - (ಎಣಿಕೆ_2 % ts);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ಎಣಿಕೆ_2 += ptr2cells(ptr);
 	}
-	else if (*ptr == ' ')
-	    ++count;		// count a space for one
-	else
-	    break;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*ptr == ' ')
+	    ++ಎಣಿಕೆ_2;		// count a space for one
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ನಿಲ್ಲಿಸು;
     }
-    return count;
+    ಹಿಂತಿರುಗಿ ಎಣಿಕೆ_2;
 }
 
-#if defined(FEAT_VARTABS)
+#ಆದರೆ defined(FEAT_VARTABS)
 /*
  * Count the size (in window cells) of the indent in line "ptr", using
  * variable tabstops.
  * If "no_ts" is TRUE, count a tab as ^I.
  */
-    int
-get_indent_str_vtab(char_u *ptr, int ts, int *vts, int no_ts)
+    ಪೂರ್ಣಾಂಕ
+get_indent_str_vtab(char_u *ptr, ಪೂರ್ಣಾಂಕ ts, ಪೂರ್ಣಾಂಕ *vts, ಪೂರ್ಣಾಂಕ no_ts)
 {
-    int		count = 0;
+    ಪೂರ್ಣಾಂಕ		ಎಣಿಕೆ_2 = 0;
 
-    for ( ; *ptr; ++ptr)
+    ಗಾಗಿ ( ; *ptr; ++ptr)
     {
-	if (*ptr == TAB)    // count a tab for what it is worth
+	ಆದರೆ (*ptr == TAB)    // count a tab for what it is worth
 	{
-	    if (!no_ts)
-		count += tabstop_padding(count, ts, vts);
-	    else
-		count += ptr2cells(ptr);
+	    ಆದರೆ (!no_ts)
+		ಎಣಿಕೆ_2 += tabstop_padding(ಎಣಿಕೆ_2, ts, vts);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ಎಣಿಕೆ_2 += ptr2cells(ptr);
 	}
-	else if (*ptr == ' ')
-	    ++count;		// count a space for one
-	else
-	    break;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*ptr == ' ')
+	    ++ಎಣಿಕೆ_2;		// count a space for one
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ನಿಲ್ಲಿಸು;
     }
-    return count;
+    ಹಿಂತಿರುಗಿ ಎಣಿಕೆ_2;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Set the indent of the current line.
@@ -513,34 +513,34 @@ get_indent_str_vtab(char_u *ptr, int ts, int *vts, int no_ts)
  *	SIN_UNDO:	save line for undo before changing it.
  * Returns TRUE if the line was changed.
  */
-    int
-set_indent(
-    int		size,		    // measured in spaces
-    int		flags)
+    ಪೂರ್ಣಾಂಕ
+ಗಣ_indent(
+    ಪೂರ್ಣಾಂಕ		ಗಾತ್ರ_2,		    // measured in spaces
+    ಪೂರ್ಣಾಂಕ		flags)
 {
     char_u	*p;
     char_u	*newline;
     char_u	*oldline;
     char_u	*s;
-    int		todo;
-    int		ind_len;	    // measured in characters
-    int		line_len;	    // size of the line (including the NUL)
-    int		doit = FALSE;
-    int		ind_done = 0;	    // measured in spaces
-#ifdef FEAT_VARTABS
-    int		ind_col = 0;
-#endif
-    int		tab_pad;
-    int		retval = FALSE;
-    int		orig_char_len = -1; // number of initial whitespace chars when
+    ಪೂರ್ಣಾಂಕ		todo;
+    ಪೂರ್ಣಾಂಕ		ind_len;	    // measured in characters
+    ಪೂರ್ಣಾಂಕ		ಸಾಲು_len;	    // size of the line (including the NUL)
+    ಪೂರ್ಣಾಂಕ		doit = FALSE;
+    ಪೂರ್ಣಾಂಕ		ind_ಮುಗಿದ = 0;	    // measured in spaces
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+    ಪೂರ್ಣಾಂಕ		ind_ಲಂಬಸಾಲು = 0;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಪೂರ್ಣಾಂಕ		tab_pad;
+    ಪೂರ್ಣಾಂಕ		retval = FALSE;
+    ಪೂರ್ಣಾಂಕ		orig_char_len = -1; // number of initial whitespace chars when
 				    // 'et' and 'pi' are both set
 
     // First check if there is anything to do and compute the number of
     // characters needed for the indent.
-    todo = size;
+    todo = ಗಾತ್ರ_2;
     ind_len = 0;
     p = oldline = ml_get_curline();
-    line_len = ml_get_curline_len() + 1;
+    ಸಾಲು_len = ml_get_curline_len() + 1;
 
     // Calculate the buffer size for the new indent, and check to see if it
     // isn't already set
@@ -548,105 +548,105 @@ set_indent(
     // if 'expandtab' isn't set: use TABs; if both 'expandtab' and
     // 'preserveindent' are set count the number of characters at the
     // beginning of the line to be copied
-    if (!curbuf->b_p_et || (!(flags & SIN_INSERT) && curbuf->b_p_pi))
+    ಆದರೆ (!curbuf->b_p_et || (!(flags & SIN_ಸೇರಿಸು) && curbuf->b_p_pi))
     {
 	// If 'preserveindent' is set then reuse as much as possible of
 	// the existing indent structure for the new indent
-	if (!(flags & SIN_INSERT) && curbuf->b_p_pi)
+	ಆದರೆ (!(flags & SIN_ಸೇರಿಸು) && curbuf->b_p_pi)
 	{
-	    ind_done = 0;
+	    ind_ಮುಗಿದ = 0;
 
 	    // count as many characters as we can use
-	    while (todo > 0 && VIM_ISWHITE(*p))
+	    ಆಗ (todo > 0 && VIM_ISWHITE(*p))
 	    {
-		if (*p == TAB)
+		ಆದರೆ (*p == TAB)
 		{
-#ifdef FEAT_VARTABS
-		    tab_pad = tabstop_padding(ind_done, curbuf->b_p_ts,
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+		    tab_pad = tabstop_padding(ind_ಮುಗಿದ, curbuf->b_p_ts,
 							curbuf->b_p_vts_array);
-#else
-		    tab_pad = (int)curbuf->b_p_ts
-					   - (ind_done % (int)curbuf->b_p_ts);
-#endif
+#ಇಲ್ಲದಿದ್ದರೆ
+		    tab_pad = (ಪೂರ್ಣಾಂಕ)curbuf->b_p_ts
+					   - (ind_ಮುಗಿದ % (ಪೂರ್ಣಾಂಕ)curbuf->b_p_ts);
+#ಆದರೆ_ಅಂತ್ಯ
 		    // stop if this tab will overshoot the target
-		    if (todo < tab_pad)
-			break;
+		    ಆದರೆ (todo < tab_pad)
+			ನಿಲ್ಲಿಸು;
 		    todo -= tab_pad;
 		    ++ind_len;
-		    ind_done += tab_pad;
+		    ind_ಮುಗಿದ += tab_pad;
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    --todo;
 		    ++ind_len;
-		    ++ind_done;
+		    ++ind_ಮುಗಿದ;
 		}
 		++p;
 	    }
 
-#ifdef FEAT_VARTABS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
 	    // These diverge from this point.
-	    ind_col = ind_done;
-#endif
+	    ind_ಲಂಬಸಾಲು = ind_ಮುಗಿದ;
+#ಆದರೆ_ಅಂತ್ಯ
 	    // Set initial number of whitespace chars to copy if we are
 	    // preserving indent but expandtab is set
-	    if (curbuf->b_p_et)
+	    ಆದರೆ (curbuf->b_p_et)
 		orig_char_len = ind_len;
 
 	    // Fill to next tabstop with a tab, if possible
-#ifdef FEAT_VARTABS
-	    tab_pad = tabstop_padding(ind_done, curbuf->b_p_ts,
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+	    tab_pad = tabstop_padding(ind_ಮುಗಿದ, curbuf->b_p_ts,
 						curbuf->b_p_vts_array);
-#else
-	    tab_pad = (int)curbuf->b_p_ts - (ind_done % (int)curbuf->b_p_ts);
-#endif
-	    if (todo >= tab_pad && orig_char_len == -1)
+#ಇಲ್ಲದಿದ್ದರೆ
+	    tab_pad = (ಪೂರ್ಣಾಂಕ)curbuf->b_p_ts - (ind_ಮುಗಿದ % (ಪೂರ್ಣಾಂಕ)curbuf->b_p_ts);
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಆದರೆ (todo >= tab_pad && orig_char_len == -1)
 	    {
 		doit = TRUE;
 		todo -= tab_pad;
 		++ind_len;
 		// ind_done += tab_pad;
-#ifdef FEAT_VARTABS
-		ind_col += tab_pad;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+		ind_ಲಂಬಸಾಲು += tab_pad;
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
 	}
 
 	// count tabs required for indent
-#ifdef FEAT_VARTABS
-	for (;;)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+	ಗಾಗಿ (;;)
 	{
-	    tab_pad = tabstop_padding(ind_col, curbuf->b_p_ts,
+	    tab_pad = tabstop_padding(ind_ಲಂಬಸಾಲು, curbuf->b_p_ts,
 							curbuf->b_p_vts_array);
-	    if (todo < tab_pad)
-		break;
-	    if (*p != TAB)
+	    ಆದರೆ (todo < tab_pad)
+		ನಿಲ್ಲಿಸು;
+	    ಆದರೆ (*p != TAB)
 		doit = TRUE;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		++p;
 	    todo -= tab_pad;
 	    ++ind_len;
-	    ind_col += tab_pad;
+	    ind_ಲಂಬಸಾಲು += tab_pad;
 	}
-#else
-	while (todo >= (int)curbuf->b_p_ts)
+#ಇಲ್ಲದಿದ್ದರೆ
+	ಆಗ (todo >= (ಪೂರ್ಣಾಂಕ)curbuf->b_p_ts)
 	{
-	    if (*p != TAB)
+	    ಆದರೆ (*p != TAB)
 		doit = TRUE;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		++p;
-	    todo -= (int)curbuf->b_p_ts;
+	    todo -= (ಪೂರ್ಣಾಂಕ)curbuf->b_p_ts;
 	    ++ind_len;
 	    // ind_done += (int)curbuf->b_p_ts;
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
     // count spaces required for indent
-    while (todo > 0)
+    ಆಗ (todo > 0)
     {
-	if (*p != ' ')
+	ಆದರೆ (*p != ' ')
 	    doit = TRUE;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    ++p;
 	--todo;
 	++ind_len;
@@ -654,33 +654,33 @@ set_indent(
     }
 
     // Return if the indent is OK already.
-    if (!doit && !VIM_ISWHITE(*p) && !(flags & SIN_INSERT))
-	return FALSE;
+    ಆದರೆ (!doit && !VIM_ISWHITE(*p) && !(flags & SIN_ಸೇರಿಸು))
+	ಹಿಂತಿರುಗಿ FALSE;
 
     // Allocate memory for the new line.
-    if (flags & SIN_INSERT)
+    ಆದರೆ (flags & SIN_ಸೇರಿಸು)
 	p = oldline;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	p = skipwhite(p);
-	line_len -= (int)(p - oldline);
+	ಸಾಲು_len -= (ಪೂರ್ಣಾಂಕ)(p - oldline);
     }
 
     // If 'preserveindent' and 'expandtab' are both set keep the original
     // characters and allocate accordingly.  We will fill the rest with spaces
     // after the if (!curbuf->b_p_et) below.
-    if (orig_char_len != -1)
+    ಆದರೆ (orig_char_len != -1)
     {
-	newline = alloc(orig_char_len + size - ind_done + line_len);
-	if (newline == NULL)
-	    return FALSE;
-	todo = size - ind_done;
+	newline = alloc(orig_char_len + ಗಾತ್ರ_2 - ind_ಮುಗಿದ + ಸಾಲು_len);
+	ಆದರೆ (newline == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ FALSE;
+	todo = ಗಾತ್ರ_2 - ind_ಮುಗಿದ;
 	ind_len = orig_char_len + todo;    // Set total length of indent in
 					   // characters, which may have been
 					   // undercounted until now
 	p = oldline;
 	s = newline;
-	while (orig_char_len > 0)
+	ಆಗ (orig_char_len > 0)
 	{
 	    *s++ = *p++;
 	    orig_char_len--;
@@ -688,143 +688,143 @@ set_indent(
 
 	// Skip over any additional white space (useful when newindent is less
 	// than old)
-	while (VIM_ISWHITE(*p))
+	ಆಗ (VIM_ISWHITE(*p))
 	    ++p;
 
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	todo = size;
-	newline = alloc(ind_len + line_len);
-	if (newline == NULL)
-	    return FALSE;
+	todo = ಗಾತ್ರ_2;
+	newline = alloc(ind_len + ಸಾಲು_len);
+	ಆದರೆ (newline == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ FALSE;
 	s = newline;
     }
 
     // Put the characters in the new line.
     // if 'expandtab' isn't set: use TABs
-    if (!curbuf->b_p_et)
+    ಆದರೆ (!curbuf->b_p_et)
     {
 	// If 'preserveindent' is set then reuse as much as possible of
 	// the existing indent structure for the new indent
-	if (!(flags & SIN_INSERT) && curbuf->b_p_pi)
+	ಆದರೆ (!(flags & SIN_ಸೇರಿಸು) && curbuf->b_p_pi)
 	{
 	    p = oldline;
-	    ind_done = 0;
+	    ind_ಮುಗಿದ = 0;
 
-	    while (todo > 0 && VIM_ISWHITE(*p))
+	    ಆಗ (todo > 0 && VIM_ISWHITE(*p))
 	    {
-		if (*p == TAB)
+		ಆದರೆ (*p == TAB)
 		{
-#ifdef FEAT_VARTABS
-		    tab_pad = tabstop_padding(ind_done, curbuf->b_p_ts,
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+		    tab_pad = tabstop_padding(ind_ಮುಗಿದ, curbuf->b_p_ts,
 							curbuf->b_p_vts_array);
-#else
-		    tab_pad = (int)curbuf->b_p_ts
-					   - (ind_done % (int)curbuf->b_p_ts);
-#endif
+#ಇಲ್ಲದಿದ್ದರೆ
+		    tab_pad = (ಪೂರ್ಣಾಂಕ)curbuf->b_p_ts
+					   - (ind_ಮುಗಿದ % (ಪೂರ್ಣಾಂಕ)curbuf->b_p_ts);
+#ಆದರೆ_ಅಂತ್ಯ
 		    // stop if this tab will overshoot the target
-		    if (todo < tab_pad)
-			break;
+		    ಆದರೆ (todo < tab_pad)
+			ನಿಲ್ಲಿಸು;
 		    todo -= tab_pad;
-		    ind_done += tab_pad;
+		    ind_ಮುಗಿದ += tab_pad;
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    --todo;
-		    ++ind_done;
+		    ++ind_ಮುಗಿದ;
 		}
 		*s++ = *p++;
 	    }
 
 	    // Fill to next tabstop with a tab, if possible
-#ifdef FEAT_VARTABS
-	    tab_pad = tabstop_padding(ind_done, curbuf->b_p_ts,
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+	    tab_pad = tabstop_padding(ind_ಮುಗಿದ, curbuf->b_p_ts,
 						curbuf->b_p_vts_array);
-#else
-	    tab_pad = (int)curbuf->b_p_ts - (ind_done % (int)curbuf->b_p_ts);
-#endif
-	    if (todo >= tab_pad)
+#ಇಲ್ಲದಿದ್ದರೆ
+	    tab_pad = (ಪೂರ್ಣಾಂಕ)curbuf->b_p_ts - (ind_ಮುಗಿದ % (ಪೂರ್ಣಾಂಕ)curbuf->b_p_ts);
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಆದರೆ (todo >= tab_pad)
 	    {
 		*s++ = TAB;
 		todo -= tab_pad;
-#ifdef FEAT_VARTABS
-		ind_done += tab_pad;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+		ind_ಮುಗಿದ += tab_pad;
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
 
 	    p = skipwhite(p);
 	}
 
-#ifdef FEAT_VARTABS
-	for (;;)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+	ಗಾಗಿ (;;)
 	{
-	    tab_pad = tabstop_padding(ind_done, curbuf->b_p_ts,
+	    tab_pad = tabstop_padding(ind_ಮುಗಿದ, curbuf->b_p_ts,
 							curbuf->b_p_vts_array);
-	    if (todo < tab_pad)
-		break;
+	    ಆದರೆ (todo < tab_pad)
+		ನಿಲ್ಲಿಸು;
 	    *s++ = TAB;
 	    todo -= tab_pad;
-	    ind_done += tab_pad;
+	    ind_ಮುಗಿದ += tab_pad;
 	}
-#else
-	while (todo >= (int)curbuf->b_p_ts)
+#ಇಲ್ಲದಿದ್ದರೆ
+	ಆಗ (todo >= (ಪೂರ್ಣಾಂಕ)curbuf->b_p_ts)
 	{
 	    *s++ = TAB;
-	    todo -= (int)curbuf->b_p_ts;
+	    todo -= (ಪೂರ್ಣಾಂಕ)curbuf->b_p_ts;
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
-    while (todo > 0)
+    ಆಗ (todo > 0)
     {
 	*s++ = ' ';
 	--todo;
     }
-    mch_memmove(s, p, (size_t)line_len);
+    mch_memmove(s, p, (size_t)ಸಾಲು_len);
 
     // Replace the line (unless undo fails).
-    if (!(flags & SIN_UNDO) || u_savesub(curwin->w_cursor.lnum) == OK)
+    ಆದರೆ (!(flags & SIN_UNDO) || u_savesub(curwin->w_cursor.lnum) == OK)
     {
-	colnr_T old_offset = (colnr_T)(p - oldline);
-	colnr_T new_offset = (colnr_T)(s - newline);
+	colnr_T old_ಸ್ಥಾನಾಂತರ = (colnr_T)(p - oldline);
+	colnr_T new_ಸ್ಥಾನಾಂತರ = (colnr_T)(s - newline);
 
 	// this may free "newline"
 	ml_replace(curwin->w_cursor.lnum, newline, FALSE);
-	if (flags & SIN_CHANGED)
-	    changed_bytes(curwin->w_cursor.lnum, 0);
+	ಆದರೆ (flags & SIN_ಬದಲಾಯಿತು)
+	    ಬದಲಾಯಿತು_ಬೈಟುಗಳು(curwin->w_cursor.lnum, 0);
 
 	// Correct saved cursor position if it is in this line.
-	if (saved_cursor.lnum == curwin->w_cursor.lnum)
+	ಆದರೆ (saved_cursor.lnum == curwin->w_cursor.lnum)
 	{
-	    if (saved_cursor.col >= old_offset)
+	    ಆದರೆ (saved_cursor.ಲಂಬಸಾಲು >= old_ಸ್ಥಾನಾಂತರ)
 		// cursor was after the indent, adjust for the number of
 		// bytes added/removed
-		saved_cursor.col += ind_len - old_offset;
-	    else if (saved_cursor.col >= new_offset)
+		saved_cursor.ಲಂಬಸಾಲು += ind_len - old_ಸ್ಥಾನಾಂತರ;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (saved_cursor.ಲಂಬಸಾಲು >= new_ಸ್ಥಾನಾಂತರ)
 		// cursor was in the indent, and is now after it, put it back
 		// at the start of the indent (replacing spaces with TAB)
-		saved_cursor.col = new_offset;
+		saved_cursor.ಲಂಬಸಾಲು = new_ಸ್ಥಾನಾಂತರ;
 	}
-#ifdef FEAT_PROP_POPUP
-	if (curbuf->b_has_textprop)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+	ಆದರೆ (curbuf->b_has_textprop)
 	{
-	    int added = ind_len - old_offset;
+	    ಪೂರ್ಣಾಂಕ added = ind_len - old_ಸ್ಥಾನಾಂತರ;
 
 	    // When increasing indent this behaves like spaces were inserted at
 	    // the old indent, when decreasing indent it behaves like spaces
 	    // were deleted at the new indent.
 	    adjust_prop_columns(curwin->w_cursor.lnum,
-				  added > 0 ? old_offset : (colnr_T)ind_len,
+				  added > 0 ? old_ಸ್ಥಾನಾಂತರ : (colnr_T)ind_len,
 				  added, APC_INDENT);
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	retval = TRUE;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	vim_free(newline);
 
-    curwin->w_cursor.col = ind_len;
-    return retval;
+    curwin->w_cursor.ಲಂಬಸಾಲು = ind_len;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
 /*
@@ -832,114 +832,114 @@ set_indent(
  * number was found.  Used for 'n' in 'formatoptions': numbered list.
  * Since a pattern is used it can actually handle more than numbers.
  */
-    int
-get_number_indent(linenr_T lnum)
+    ಪೂರ್ಣಾಂಕ
+get_ಸಂಖ್ಯೆ_indent(linenr_T lnum)
 {
-    colnr_T	col;
+    colnr_T	ಲಂಬಸಾಲು;
     pos_T	pos;
 
     regmatch_T	regmatch;
-    int		lead_len = 0;	// length of comment leader
+    ಪೂರ್ಣಾಂಕ		lead_len = 0;	// length of comment leader
 
-    if (lnum > curbuf->b_ml.ml_line_count)
-	return -1;
+    ಆದರೆ (lnum > curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
+	ಹಿಂತಿರುಗಿ -1;
     pos.lnum = 0;
 
     // In format_lines() (i.e. not insert mode), fo+=q is needed too...
-    if ((State & MODE_INSERT) || has_format_option(FO_Q_COMS))
-	lead_len = get_leader_len(ml_get(lnum), NULL, FALSE, TRUE);
+    ಆದರೆ ((State & ಬಹುಲಕ_ಸೇರಿಸು) || has_format_option(FO_Q_COMS))
+	lead_len = get_leader_len(ml_get(lnum), ಖಾಲಿ, FALSE, TRUE);
 
     regmatch.regprog = vim_regcomp(curbuf->b_p_flp, RE_MAGIC);
-    if (regmatch.regprog != NULL)
+    ಆದರೆ (regmatch.regprog != ಖಾಲಿ)
     {
 	regmatch.rm_ic = FALSE;
 
 	// vim_regexec() expects a pointer to a line.  This lets us
 	// start matching for the flp beyond any comment leader...
-	if (vim_regexec(&regmatch, ml_get(lnum) + lead_len, (colnr_T)0))
+	ಆದರೆ (vim_regexec(&regmatch, ml_get(lnum) + lead_len, (colnr_T)0))
 	{
 	    pos.lnum = lnum;
-	    pos.col = (colnr_T)(*regmatch.endp - ml_get(lnum));
+	    pos.ಲಂಬಸಾಲು = (colnr_T)(*regmatch.endp - ml_get(lnum));
 	    pos.coladd = 0;
 	}
 	vim_regfree(regmatch.regprog);
     }
 
-    if (pos.lnum == 0 || *ml_get_pos(&pos) == NUL)
-	return -1;
-    getvcol(curwin, &pos, &col, NULL, NULL, 0);
-    return (int)col;
+    ಆದರೆ (pos.lnum == 0 || *ml_get_pos(&pos) == NUL)
+	ಹಿಂತಿರುಗಿ -1;
+    getvcol(curwin, &pos, &ಲಂಬಸಾಲು, ಖಾಲಿ, ಖಾಲಿ, 0);
+    ಹಿಂತಿರುಗಿ (ಪೂರ್ಣಾಂಕ)ಲಂಬಸಾಲು;
 }
 
-#if defined(FEAT_LINEBREAK)
+#ಆದರೆ defined(FEAT_LINEBREAK)
 /*
  * Check "briopt" as 'breakindentopt' and update the members of "wp".
  * This is called when 'breakindentopt' is changed and when a window is
  * initialized.
  * Returns FAIL for failure, OK otherwise.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 briopt_check(
     char_u	*briopt,	// when NULL: use "wp->w_p_briopt"
     win_T	*wp)		// when NULL: only check "briopt"
 {
     char_u	*p;
-    int		bri_shift = 0;
-    long	bri_min = 20;
-    int		bri_sbr = FALSE;
-    int		bri_list = 0;
-    int		bri_vcol = 0;
+    ಪೂರ್ಣಾಂಕ		bri_ಸರಿಸು = 0;
+    ದೀರ್ಘ	bri_min = 20;
+    ಪೂರ್ಣಾಂಕ		bri_sbr = FALSE;
+    ಪೂರ್ಣಾಂಕ		bri_list = 0;
+    ಪೂರ್ಣಾಂಕ		bri_vcol = 0;
 
-    if (briopt != NULL)
+    ಆದರೆ (briopt != ಖಾಲಿ)
 	p = briopt;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	p = wp->w_p_briopt;
 
-    while (*p != NUL)
+    ಆಗ (*p != NUL)
     {
 	// Note: Keep this in sync with p_briopt_values
-	if (STRNCMP(p, "shift:", 6) == 0
+	ಆದರೆ (STRNCMP(p, "shift:", 6) == 0
 		 && ((p[6] == '-' && VIM_ISDIGIT(p[7])) || VIM_ISDIGIT(p[6])))
 	{
 	    p += 6;
-	    bri_shift = getdigits(&p);
+	    bri_ಸರಿಸು = getdigits(&p);
 	}
-	else if (STRNCMP(p, "min:", 4) == 0 && VIM_ISDIGIT(p[4]))
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRNCMP(p, "min:", 4) == 0 && VIM_ISDIGIT(p[4]))
 	{
 	    p += 4;
 	    bri_min = getdigits(&p);
 	}
-	else if (STRNCMP(p, "sbr", 3) == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRNCMP(p, "sbr", 3) == 0)
 	{
 	    p += 3;
 	    bri_sbr = TRUE;
 	}
-	else if (STRNCMP(p, "list:", 5) == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRNCMP(p, "list:", 5) == 0)
 	{
 	    p += 5;
 	    bri_list = getdigits(&p);
 	}
-	else if (STRNCMP(p, "column:", 7) == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRNCMP(p, "column:", 7) == 0)
 	{
 	    p += 7;
 	    bri_vcol = getdigits(&p);
 	}
-	if (*p != ',' && *p != NUL)
-	    return FAIL;
-	if (*p == ',')
+	ಆದರೆ (*p != ',' && *p != NUL)
+	    ಹಿಂತಿರುಗಿ FAIL;
+	ಆದರೆ (*p == ',')
 	    ++p;
     }
 
-    if (wp == NULL)
-	return OK;
+    ಆದರೆ (wp == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ OK;
 
-    wp->w_briopt_shift = bri_shift;
+    wp->w_briopt_ಸರಿಸು = bri_ಸರಿಸು;
     wp->w_briopt_min   = bri_min;
     wp->w_briopt_sbr   = bri_sbr;
     wp->w_briopt_list  = bri_list;
     wp->w_briopt_vcol  = bri_vcol;
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
@@ -947,32 +947,32 @@ briopt_check(
  * parameters into account. Window must be specified, since it is not
  * necessarily always the current one.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 get_breakindent_win(
     win_T	*wp,
-    char_u	*line) // start of the line
+    char_u	*ಸಾಲು) // start of the line
 {
-    static int	    prev_indent = 0;	// cached indent value
-    static long	    prev_ts     = 0L;	// cached tabstop value
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    prev_indent = 0;	// cached indent value
+    ಸ್ಥಿರ ದೀರ್ಘ	    prev_ts     = 0L;	// cached tabstop value
 # ifdef FEAT_VARTABS
-    static int      *prev_vts = NULL;   // cached vartabs values
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ      *prev_vts = ಖಾಲಿ;   // cached vartabs values
 # endif
-    static int	    prev_fnum   = 0;	// cached buffer number
-    static char_u   *prev_line  = NULL;	// cached copy of "line"
-    static varnumber_T prev_tick = 0;   // changedtick of cached value
-    static int      prev_list = 0;	// cached list indent
-    static int      prev_listopt = 0;	// cached w_p_briopt_list value
-    static int      prev_no_ts = FALSE;	// cached no_ts value
-    static unsigned prev_dy_uhex = 0;	// cached 'display' "uhex" value
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    prev_fnum   = 0;	// cached buffer number
+    ಸ್ಥಿರ char_u   *prev_ಸಾಲು  = ಖಾಲಿ;	// cached copy of "line"
+    ಸ್ಥಿರ varnumber_T prev_tick = 0;   // changedtick of cached value
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ      prev_list = 0;	// cached list indent
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ      prev_listopt = 0;	// cached w_p_briopt_list value
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ      prev_no_ts = FALSE;	// cached no_ts value
+    ಸ್ಥಿರ ಚಿಹ್ನೆರಹಿತ prev_dy_uhex = 0;	// cached 'display' "uhex" value
     // cached formatlistpat value
-    static char_u   *prev_flp = NULL;
-    int		    bri = 0;
+    ಸ್ಥಿರ char_u   *prev_flp = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		    bri = 0;
     // window width minus window margin space, i.e. what rests for text
-    const int	    eff_wwidth = wp->w_width
-					  - win_col_off(wp) + win_col_off2(wp);
+    ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ	    eff_wwidth = wp->w_ಅಗಲ
+					  - win_ಲಂಬಸಾಲು_off(wp) + win_ಲಂಬಸಾಲು_off2(wp);
 
     // In list mode, if 'listchars' "tab" isn't set, a TAB is displayed as ^I.
-    int no_ts = wp->w_p_list && wp->w_lcs_chars.tab1 == NUL;
+    ಪೂರ್ಣಾಂಕ no_ts = wp->w_p_list && wp->w_lcs_chars.tab1 == NUL;
 
     // Used cached indent, unless
     // - buffer changed, or
@@ -984,67 +984,67 @@ get_breakindent_win(
     // - 'display' "uhex" flag changed, or
     // - 'formatlistpat' changed, or
     // - line changed.
-    if (prev_fnum != wp->w_buffer->b_fnum
-	    || prev_ts != wp->w_buffer->b_p_ts
+    ಆದರೆ (prev_fnum != wp->w_ಬಫರ್->b_fnum
+	    || prev_ts != wp->w_ಬಫರ್->b_p_ts
 # ifdef FEAT_VARTABS
-	    || prev_vts != wp->w_buffer->b_p_vts_array
+	    || prev_vts != wp->w_ಬಫರ್->b_p_vts_array
 # endif
-	    || prev_tick != CHANGEDTICK(wp->w_buffer)
+	    || prev_tick != CHANGEDTICK(wp->w_ಬಫರ್)
 	    || prev_listopt != wp->w_briopt_list
 	    || prev_no_ts != no_ts
 	    || prev_dy_uhex != (dy_flags & DY_UHEX)
-	    || prev_flp == NULL
-	    || STRCMP(prev_flp, get_flp_value(wp->w_buffer)) != 0
-	    || prev_line == NULL || STRCMP(prev_line, line) != 0
+	    || prev_flp == ಖಾಲಿ
+	    || STRCMP(prev_flp, get_flp_ಮೌಲ್ಯ(wp->w_ಬಫರ್)) != 0
+	    || prev_ಸಾಲು == ಖಾಲಿ || STRCMP(prev_ಸಾಲು, ಸಾಲು) != 0
 	)
     {
-	prev_fnum = wp->w_buffer->b_fnum;
-	vim_free(prev_line);
-	prev_line = vim_strsave(line);
-	prev_ts = wp->w_buffer->b_p_ts;
+	prev_fnum = wp->w_ಬಫರ್->b_fnum;
+	vim_free(prev_ಸಾಲು);
+	prev_ಸಾಲು = vim_strsave(ಸಾಲು);
+	prev_ts = wp->w_ಬಫರ್->b_p_ts;
 # ifdef FEAT_VARTABS
-	prev_vts = wp->w_buffer->b_p_vts_array;
-	if (wp->w_briopt_vcol == 0)
-	    prev_indent = get_indent_str_vtab(line,
-				     (int)wp->w_buffer->b_p_ts,
-				      wp->w_buffer->b_p_vts_array, no_ts);
-# else
-	if (wp->w_briopt_vcol == 0)
-	    prev_indent = get_indent_str(line,
-					(int)wp->w_buffer->b_p_ts, no_ts);
+	prev_vts = wp->w_ಬಫರ್->b_p_vts_array;
+	ಆದರೆ (wp->w_briopt_vcol == 0)
+	    prev_indent = get_indent_str_vtab(ಸಾಲು,
+				     (ಪೂರ್ಣಾಂಕ)wp->w_ಬಫರ್->b_p_ts,
+				      wp->w_ಬಫರ್->b_p_vts_array, no_ts);
+# ಇಲ್ಲದಿದ್ದರೆ
+	ಆದರೆ (wp->w_briopt_vcol == 0)
+	    prev_indent = get_indent_str(ಸಾಲು,
+					(ಪೂರ್ಣಾಂಕ)wp->w_ಬಫರ್->b_p_ts, no_ts);
 # endif
-	prev_tick = CHANGEDTICK(wp->w_buffer);
+	prev_tick = CHANGEDTICK(wp->w_ಬಫರ್);
 	prev_listopt = wp->w_briopt_list;
 	prev_list = 0;
 	prev_no_ts = no_ts;
 	prev_dy_uhex = (dy_flags & DY_UHEX);
 	vim_free(prev_flp);
-	prev_flp = vim_strsave(get_flp_value(wp->w_buffer));
+	prev_flp = vim_strsave(get_flp_ಮೌಲ್ಯ(wp->w_ಬಫರ್));
 	// add additional indent for numbered lists
-	if (wp->w_briopt_list != 0 && wp->w_briopt_vcol == 0)
+	ಆದರೆ (wp->w_briopt_list != 0 && wp->w_briopt_vcol == 0)
 	{
 	    regmatch_T	    regmatch;
 
 	    regmatch.regprog = vim_regcomp(prev_flp,
 				   RE_MAGIC + RE_STRING + RE_AUTO + RE_STRICT);
 
-	    if (regmatch.regprog != NULL)
+	    ಆದರೆ (regmatch.regprog != ಖಾಲಿ)
 	    {
 		regmatch.rm_ic = FALSE;
-		if (vim_regexec(&regmatch, line, 0))
+		ಆದರೆ (vim_regexec(&regmatch, ಸಾಲು, 0))
 		{
-		    if (wp->w_briopt_list > 0)
+		    ಆದರೆ (wp->w_briopt_list > 0)
 			prev_list = wp->w_briopt_list;
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
 			char_u	*ptr = *regmatch.startp;
 			char_u	*end_ptr = *regmatch.endp;
-			int	indent = 0;
+			ಪೂರ್ಣಾಂಕ	indent = 0;
 
 			// Compute the width of the matched text.
 			// Use win_chartabsize() so that TAB size is correct,
 			// while wrapping is ignored.
-			while (ptr < end_ptr)
+			ಆಗ (ptr < end_ptr)
 			{
 			    indent += win_chartabsize(wp, ptr, indent);
 			    MB_PTR_ADV(ptr);
@@ -1056,40 +1056,40 @@ get_breakindent_win(
 	    }
 	}
     }
-    if (wp->w_briopt_vcol != 0)
+    ಆದರೆ (wp->w_briopt_vcol != 0)
     {
 	// column value has priority
 	bri = wp->w_briopt_vcol;
 	prev_list = 0;
     }
-    else
-	bri = prev_indent + wp->w_briopt_shift;
+    ಇಲ್ಲದಿದ್ದರೆ
+	bri = prev_indent + wp->w_briopt_ಸರಿಸು;
 
     // Add offset for number column, if 'n' is in 'cpoptions'
-    bri += win_col_off2(wp);
+    bri += win_ಲಂಬಸಾಲು_off2(wp);
 
     // add additional indent for numbered lists
-    if (wp->w_briopt_list > 0)
+    ಆದರೆ (wp->w_briopt_list > 0)
 	bri += prev_list;
 
     // indent minus the length of the showbreak string
-    if (wp->w_briopt_sbr)
-	bri -= vim_strsize(get_showbreak_value(wp));
+    ಆದರೆ (wp->w_briopt_sbr)
+	bri -= vim_strsize(get_showbreak_ಮೌಲ್ಯ(wp));
 
 
     // never indent past left window margin
-    if (bri < 0)
+    ಆದರೆ (bri < 0)
 	bri = 0;
 
     // always leave at least bri_min characters on the left,
     // if text width is sufficient
-    else if (bri > eff_wwidth - wp->w_briopt_min)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (bri > eff_wwidth - wp->w_briopt_min)
 	bri = (eff_wwidth - wp->w_briopt_min < 0)
 					   ? 0 : eff_wwidth - wp->w_briopt_min;
 
-    return bri;
+    ಹಿಂತಿರುಗಿ bri;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * When extra == 0: Return TRUE if the cursor is before or on the first
@@ -1097,114 +1097,114 @@ get_breakindent_win(
  * When extra == 1: Return TRUE if the cursor is before the first non-blank in
  *		    the line.
  */
-    int
-inindent(int extra)
+    ಪೂರ್ಣಾಂಕ
+inindent(ಪೂರ್ಣಾಂಕ extra)
 {
     char_u	*ptr;
-    colnr_T	col;
+    colnr_T	ಲಂಬಸಾಲು;
 
-    for (col = 0, ptr = ml_get_curline(); VIM_ISWHITE(*ptr); ++col)
+    ಗಾಗಿ (ಲಂಬಸಾಲು = 0, ptr = ml_get_curline(); VIM_ISWHITE(*ptr); ++ಲಂಬಸಾಲು)
 	++ptr;
-    if (col >= curwin->w_cursor.col + extra)
-	return TRUE;
-    else
-	return FALSE;
+    ಆದರೆ (ಲಂಬಸಾಲು >= curwin->w_cursor.ಲಂಬಸಾಲು + extra)
+	ಹಿಂತಿರುಗಿ TRUE;
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಹಿಂತಿರುಗಿ FALSE;
 }
 
 /*
  * op_reindent - handle reindenting a block of lines.
  */
-    void
-op_reindent(oparg_T *oap, int (*how)(void))
+    ಶೂನ್ಯ
+op_reindent(oparg_T *oap, ಪೂರ್ಣಾಂಕ (*how)(ಶೂನ್ಯ))
 {
-    long	i = 0;
+    ದೀರ್ಘ	i = 0;
     char_u	*l;
-    int		amount;
-    linenr_T	first_changed = 0;
-    linenr_T	last_changed = 0;
-    linenr_T	start_lnum = curwin->w_cursor.lnum;
+    ಪೂರ್ಣಾಂಕ		amount;
+    linenr_T	ಮೊದಲ_ಬದಲಾಯಿತು = 0;
+    linenr_T	ಕೊನೆಯ_ಬದಲಾಯಿತು = 0;
+    linenr_T	ಆರಂಭ_lnum = curwin->w_cursor.lnum;
 
     // Don't even try when 'modifiable' is off.
-    if (!curbuf->b_p_ma)
+    ಆದರೆ (!curbuf->b_p_ma)
     {
 	emsg(_(e_cannot_make_changes_modifiable_is_off));
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
     // Save for undo.  Do this once for all lines, much faster than doing this
     // for each line separately, especially when undoing.
-    if (u_savecommon(start_lnum - 1, start_lnum + oap->line_count,
-				     start_lnum + oap->line_count, FALSE) == OK)
-	for (i = oap->line_count; --i >= 0 && !got_int; )
+    ಆದರೆ (u_savecommon(ಆರಂಭ_lnum - 1, ಆರಂಭ_lnum + oap->ಸಾಲು_ಎಣಿಕೆ,
+				     ಆರಂಭ_lnum + oap->ಸಾಲು_ಎಣಿಕೆ, FALSE) == OK)
+	ಗಾಗಿ (i = oap->ಸಾಲು_ಎಣಿಕೆ; --i >= 0 && !got_int; )
 	{
 	    // it's a slow thing to do, so give feedback so there's no worry
 	    // that the computer's just hung.
 
-	    if (i > 1
-		    && (i % 50 == 0 || i == oap->line_count - 1)
-		    && oap->line_count > p_report)
+	    ಆದರೆ (i > 1
+		    && (i % 50 == 0 || i == oap->ಸಾಲು_ಎಣಿಕೆ - 1)
+		    && oap->ಸಾಲು_ಎಣಿಕೆ > p_report)
 		smsg(_("%ld lines to indent... "), i);
 
 	    // Be vi-compatible: For lisp indenting the first line is not
 	    // indented, unless there is only one line.
-	    if (i != oap->line_count - 1 || oap->line_count == 1
+	    ಆದರೆ (i != oap->ಸಾಲು_ಎಣಿಕೆ - 1 || oap->ಸಾಲು_ಎಣಿಕೆ == 1
 						     || how != get_lisp_indent)
 	    {
 		l = skipwhite(ml_get_curline());
-		if (*l == NUL)		    // empty or blank line
+		ಆದರೆ (*l == NUL)		    // empty or blank line
 		    amount = 0;
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		    amount = how();	    // get the indent for this line
 
-		if (amount >= 0 && set_indent(amount, 0))
+		ಆದರೆ (amount >= 0 && ಗಣ_indent(amount, 0))
 		{
 		    // did change the indent, call changed_lines() later
-		    if (first_changed == 0)
-			first_changed = curwin->w_cursor.lnum;
-		    last_changed = curwin->w_cursor.lnum;
+		    ಆದರೆ (ಮೊದಲ_ಬದಲಾಯಿತು == 0)
+			ಮೊದಲ_ಬದಲಾಯಿತು = curwin->w_cursor.lnum;
+		    ಕೊನೆಯ_ಬದಲಾಯಿತು = curwin->w_cursor.lnum;
 		}
 	    }
 	    ++curwin->w_cursor.lnum;
-	    curwin->w_cursor.col = 0;  // make sure it's valid
+	    curwin->w_cursor.ಲಂಬಸಾಲು = 0;  // make sure it's valid
 	}
 
     // put cursor on first non-blank of indented line
-    curwin->w_cursor.lnum = start_lnum;
+    curwin->w_cursor.lnum = ಆರಂಭ_lnum;
     beginline(BL_SOL | BL_FIX);
 
     // Mark changed lines so that they will be redrawn.  When Visual
     // highlighting was present, need to continue until the last line.  When
     // there is no change still need to remove the Visual highlighting.
-    if (last_changed != 0)
-	changed_lines(first_changed, 0,
-		oap->is_VIsual ? start_lnum + oap->line_count :
-		last_changed + 1, 0L);
-    else if (oap->is_VIsual)
+    ಆದರೆ (ಕೊನೆಯ_ಬದಲಾಯಿತು != 0)
+	ಬದಲಾಯಿತು_ಸಾಲುಗಳು(ಮೊದಲ_ಬದಲಾಯಿತು, 0,
+		oap->is_VIsual ? ಆರಂಭ_lnum + oap->ಸಾಲು_ಎಣಿಕೆ :
+		ಕೊನೆಯ_ಬದಲಾಯಿತು + 1, 0L);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (oap->is_VIsual)
 	redraw_curbuf_later(UPD_INVERTED);
 
-    if (oap->line_count > p_report)
+    ಆದರೆ (oap->ಸಾಲು_ಎಣಿಕೆ > p_report)
     {
-	i = oap->line_count - (i + 1);
+	i = oap->ಸಾಲು_ಎಣಿಕೆ - (i + 1);
 	smsg(NGETTEXT("%ld line indented ",
 						 "%ld lines indented ", i), i);
     }
-    if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    ಆದರೆ ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
     {
 	// set '[ and '] marks
-	curbuf->b_op_start = oap->start;
-	curbuf->b_op_end = oap->end;
+	curbuf->b_op_ಆರಂಭ = oap->ಆರಂಭ;
+	curbuf->b_op_ಕೊನೆ = oap->ಕೊನೆ;
     }
 }
 
 /*
  * Return TRUE if lines starting with '#' should be left aligned.
  */
-    int
-preprocs_left(void)
+    ಪೂರ್ಣಾಂಕ
+preprocs_ಎಡ(ಶೂನ್ಯ)
 {
-    return
+    ಹಿಂತಿರುಗಿ
 	(curbuf->b_p_si && !curbuf->b_p_cin) ||
-	(curbuf->b_p_cin && in_cinkeys('#', ' ', TRUE)
+	(curbuf->b_p_cin && ಒಳ_cinkeys('#', ' ', TRUE)
 					   && curbuf->b_ind_hash_comment == 0)
 	;
 }
@@ -1212,14 +1212,14 @@ preprocs_left(void)
 /*
  * Return TRUE if the conditions are OK for smart indenting.
  */
-    int
-may_do_si(void)
+    ಪೂರ್ಣಾಂಕ
+may_do_si(ಶೂನ್ಯ)
 {
-    return curbuf->b_p_si
+    ಹಿಂತಿರುಗಿ curbuf->b_p_si
 	&& !curbuf->b_p_cin
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 	&& *curbuf->b_p_inde == NUL
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	&& !p_paste;
 }
 
@@ -1227,20 +1227,20 @@ may_do_si(void)
  * Try to do some very smart auto-indenting.
  * Used when inserting a "normal" character.
  */
-    void
-ins_try_si(int c)
+    ಶೂನ್ಯ
+ins_try_si(ಪೂರ್ಣಾಂಕ c)
 {
     pos_T	*pos, old_pos;
     char_u	*ptr;
-    int		i;
-    int		temp;
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		ತಾತ್ಕಾಲಿಕ;
 
     // do some very smart indenting when entering '{' or '}'
-    if (((did_si || can_si_back) && c == '{')
+    ಆದರೆ (((did_si || can_si_ಹಿಂಭಾಗ) && c == '{')
 	    || (can_si && c == '}' && inindent(0)))
     {
 	// for '}' set indent equal to indent of line containing matching '{'
-	if (c == '}' && (pos = findmatch(NULL, '{')) != NULL)
+	ಆದರೆ (c == '}' && (pos = findmatch(ಖಾಲಿ, '{')) != ಖಾಲಿ)
 	{
 	    old_pos = curwin->w_cursor;
 	    // If the matching '{' has a ')' immediately before it (ignoring
@@ -1249,58 +1249,58 @@ ins_try_si(int c)
 	    // case where an "if (..\n..) {" statement continues over multiple
 	    // lines -- webb
 	    ptr = ml_get(pos->lnum);
-	    i = pos->col;
-	    if (i > 0)		// skip blanks before '{'
-		while (--i > 0 && VIM_ISWHITE(ptr[i]))
+	    i = pos->ಲಂಬಸಾಲು;
+	    ಆದರೆ (i > 0)		// skip blanks before '{'
+		ಆಗ (--i > 0 && VIM_ISWHITE(ptr[i]))
 		    ;
 	    curwin->w_cursor.lnum = pos->lnum;
-	    curwin->w_cursor.col = i;
-	    if (ptr[i] == ')' && (pos = findmatch(NULL, '(')) != NULL)
+	    curwin->w_cursor.ಲಂಬಸಾಲು = i;
+	    ಆದರೆ (ptr[i] == ')' && (pos = findmatch(ಖಾಲಿ, '(')) != ಖಾಲಿ)
 		curwin->w_cursor = *pos;
 	    i = get_indent();
 	    curwin->w_cursor = old_pos;
-	    if (State & VREPLACE_FLAG)
-		change_indent(INDENT_SET, i, FALSE, NUL, TRUE);
-	    else
-		(void)set_indent(i, SIN_CHANGED);
+	    ಆದರೆ (State & VREPLACE_FLAG)
+		change_indent(INDENT_ಗಣ, i, FALSE, NUL, TRUE);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		(ಶೂನ್ಯ)ಗಣ_indent(i, SIN_ಬದಲಾಯಿತು);
 	}
-	else if (curwin->w_cursor.col > 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (curwin->w_cursor.ಲಂಬಸಾಲು > 0)
 	{
 	    // when inserting '{' after "O" reduce indent, but not
 	    // more than indent of previous line
-	    temp = TRUE;
-	    if (c == '{' && can_si_back && curwin->w_cursor.lnum > 1)
+	    ತಾತ್ಕಾಲಿಕ = TRUE;
+	    ಆದರೆ (c == '{' && can_si_ಹಿಂಭಾಗ && curwin->w_cursor.lnum > 1)
 	    {
 		old_pos = curwin->w_cursor;
 		i = get_indent();
-		while (curwin->w_cursor.lnum > 1)
+		ಆಗ (curwin->w_cursor.lnum > 1)
 		{
 		    ptr = skipwhite(ml_get(--(curwin->w_cursor.lnum)));
 
 		    // ignore empty lines and lines starting with '#'.
-		    if (*ptr != '#' && *ptr != NUL)
-			break;
+		    ಆದರೆ (*ptr != '#' && *ptr != NUL)
+			ನಿಲ್ಲಿಸು;
 		}
-		if (get_indent() >= i)
-		    temp = FALSE;
+		ಆದರೆ (get_indent() >= i)
+		    ತಾತ್ಕಾಲಿಕ = FALSE;
 		curwin->w_cursor = old_pos;
 	    }
-	    if (temp)
-		shift_line(TRUE, FALSE, 1, TRUE);
+	    ಆದರೆ (ತಾತ್ಕಾಲಿಕ)
+		ಸರಿಸು_ಸಾಲು(TRUE, FALSE, 1, TRUE);
 	}
     }
 
     // set indent of '#' always to 0
-    if (curwin->w_cursor.col > 0 && can_si && c == '#' && inindent(0))
+    ಆದರೆ (curwin->w_cursor.ಲಂಬಸಾಲು > 0 && can_si && c == '#' && inindent(0))
     {
 	// remember current indent for next line
 	old_indent = get_indent();
-	(void)set_indent(0, SIN_CHANGED);
+	(ಶೂನ್ಯ)ಗಣ_indent(0, SIN_ಬದಲಾಯಿತು);
     }
 
     // Adjust ai_col, the char at this position can be deleted.
-    if (ai_col > curwin->w_cursor.col)
-	ai_col = curwin->w_cursor.col;
+    ಆದರೆ (ai_ಲಂಬಸಾಲು > curwin->w_cursor.ಲಂಬಸಾಲು)
+	ai_ಲಂಬಸಾಲು = curwin->w_cursor.ಲಂಬಸಾಲು;
 }
 
 /*
@@ -1311,76 +1311,76 @@ ins_try_si(int c)
  * type == INDENT_SET	set indent to "amount"
  * if round is TRUE, round the indent to 'shiftwidth' (only with _INC and _Dec).
  */
-    void
+    ಶೂನ್ಯ
 change_indent(
-    int		type,
-    int		amount,
-    int		round,
-    int		replaced,	// replaced character, put on replace stack
-    int		call_changed_bytes)	// call changed_bytes()
+    ಪೂರ್ಣಾಂಕ		type,
+    ಪೂರ್ಣಾಂಕ		amount,
+    ಪೂರ್ಣಾಂಕ		ಸುತ್ತು,
+    ಪೂರ್ಣಾಂಕ		replaced,	// replaced character, put on replace stack
+    ಪೂರ್ಣಾಂಕ		call_ಬದಲಾಯಿತು_ಬೈಟುಗಳು)	// call changed_bytes()
 {
-    int		vcol;
-    int		last_vcol;
-    int		insstart_less;		// reduction for Insstart.col
-    int		new_cursor_col;
-    int		i;
+    ಪೂರ್ಣಾಂಕ		vcol;
+    ಪೂರ್ಣಾಂಕ		ಕೊನೆಯ_vcol;
+    ಪೂರ್ಣಾಂಕ		insstart_less;		// reduction for Insstart.col
+    ಪೂರ್ಣಾಂಕ		new_cursor_ಲಂಬಸಾಲು;
+    ಪೂರ್ಣಾಂಕ		i;
     char_u	*ptr;
-    int		save_p_list;
-    int		start_col;
+    ಪೂರ್ಣಾಂಕ		save_p_list;
+    ಪೂರ್ಣಾಂಕ		ಆರಂಭ_ಲಂಬಸಾಲು;
     colnr_T	vc;
-    colnr_T	orig_col = 0;		// init for GCC
-    char_u	*new_line, *orig_line = NULL;	// init for GCC
+    colnr_T	orig_ಲಂಬಸಾಲು = 0;		// init for GCC
+    char_u	*new_ಸಾಲು, *orig_ಸಾಲು = ಖಾಲಿ;	// init for GCC
 
     // MODE_VREPLACE state needs to know what the line was like before changing
-    if (State & VREPLACE_FLAG)
+    ಆದರೆ (State & VREPLACE_FLAG)
     {
-	orig_line = vim_strnsave(ml_get_curline(), ml_get_curline_len());  // Deal with NULL below
-	orig_col = curwin->w_cursor.col;
+	orig_ಸಾಲು = vim_strnsave(ml_get_curline(), ml_get_curline_len());  // Deal with NULL below
+	orig_ಲಂಬಸಾಲು = curwin->w_cursor.ಲಂಬಸಾಲು;
     }
 
     // for the following tricks we don't want list mode
     save_p_list = curwin->w_p_list;
     curwin->w_p_list = FALSE;
-#ifdef FEAT_PROP_POPUP
-    ignore_text_props = TRUE;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+    ignore_ಪಠ್ಯ_props = TRUE;
+#ಆದರೆ_ಅಂತ್ಯ
     vc = getvcol_nolist(&curwin->w_cursor);
     vcol = vc;
 
     // For Replace mode we need to fix the replace stack later, which is only
     // possible when the cursor is in the indent.  Remember the number of
     // characters before the cursor if it's possible.
-    start_col = curwin->w_cursor.col;
+    ಆರಂಭ_ಲಂಬಸಾಲು = curwin->w_cursor.ಲಂಬಸಾಲು;
 
     // determine offset from first non-blank
-    new_cursor_col = curwin->w_cursor.col;
+    new_cursor_ಲಂಬಸಾಲು = curwin->w_cursor.ಲಂಬಸಾಲು;
     beginline(BL_WHITE);
-    new_cursor_col -= curwin->w_cursor.col;
+    new_cursor_ಲಂಬಸಾಲು -= curwin->w_cursor.ಲಂಬಸಾಲು;
 
-    insstart_less = curwin->w_cursor.col;
+    insstart_less = curwin->w_cursor.ಲಂಬಸಾಲು;
 
     // If the cursor is in the indent, compute how many screen columns the
     // cursor is to the left of the first non-blank.
-    if (new_cursor_col < 0)
+    ಆದರೆ (new_cursor_ಲಂಬಸಾಲು < 0)
 	vcol = get_indent() - vcol;
 
-    if (new_cursor_col > 0)	    // can't fix replace stack
-	start_col = -1;
+    ಆದರೆ (new_cursor_ಲಂಬಸಾಲು > 0)	    // can't fix replace stack
+	ಆರಂಭ_ಲಂಬಸಾಲು = -1;
 
     // Set the new indent.  The cursor will be put on the first non-blank.
-    if (type == INDENT_SET)
-	(void)set_indent(amount, call_changed_bytes ? SIN_CHANGED : 0);
-    else
+    ಆದರೆ (type == INDENT_ಗಣ)
+	(ಶೂನ್ಯ)ಗಣ_indent(amount, call_ಬದಲಾಯಿತು_ಬೈಟುಗಳು ? SIN_ಬದಲಾಯಿತು : 0);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	int	save_State = State;
+	ಪೂರ್ಣಾಂಕ	save_State = State;
 
 	// Avoid being called recursively.
-	if (State & VREPLACE_FLAG)
-	    State = MODE_INSERT;
-	shift_line(type == INDENT_DEC, round, 1, call_changed_bytes);
+	ಆದರೆ (State & VREPLACE_FLAG)
+	    State = ಬಹುಲಕ_ಸೇರಿಸು;
+	ಸರಿಸು_ಸಾಲು(type == INDENT_DEC, ಸುತ್ತು, 1, call_ಬದಲಾಯಿತು_ಬೈಟುಗಳು);
 	State = save_State;
     }
-    insstart_less -= curwin->w_cursor.col;
+    insstart_less -= curwin->w_cursor.ಲಂಬಸಾಲು;
 
     // Try to put cursor on same character.
     // If the cursor is at or after the first non-blank in the line,
@@ -1389,17 +1389,17 @@ change_indent(
     // If we are not in insert mode, leave the cursor on the first non-blank.
     // If the cursor is before the first non-blank, position it relative
     // to the first non-blank, counted in screen columns.
-    if (new_cursor_col >= 0)
+    ಆದರೆ (new_cursor_ಲಂಬಸಾಲು >= 0)
     {
 	// When changing the indent while the cursor is touching it, reset
 	// Insstart_col to 0.
-	if (new_cursor_col == 0)
+	ಆದರೆ (new_cursor_ಲಂಬಸಾಲು == 0)
 	    insstart_less = MAXCOL;
-	new_cursor_col += curwin->w_cursor.col;
+	new_cursor_ಲಂಬಸಾಲು += curwin->w_cursor.ಲಂಬಸಾಲು;
     }
-    else if (!(State & MODE_INSERT))
-	new_cursor_col = curwin->w_cursor.col;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!(State & ಬಹುಲಕ_ಸೇರಿಸು))
+	new_cursor_ಲಂಬಸಾಲು = curwin->w_cursor.ಲಂಬಸಾಲು;
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	chartabsize_T cts;
 
@@ -1408,36 +1408,36 @@ change_indent(
 	curwin->w_virtcol = (colnr_T)((vcol < 0) ? 0 : vcol);
 
 	// Advance the cursor until we reach the right screen column.
-	last_vcol = 0;
+	ಕೊನೆಯ_vcol = 0;
 	ptr = ml_get_curline();
 	init_chartabsize_arg(&cts, curwin, 0, 0, ptr, ptr);
-	while (cts.cts_vcol <= (int)curwin->w_virtcol)
+	ಆಗ (cts.cts_vcol <= (ಪೂರ್ಣಾಂಕ)curwin->w_virtcol)
 	{
-	    last_vcol = cts.cts_vcol;
-	    if (cts.cts_vcol > 0)
+	    ಕೊನೆಯ_vcol = cts.cts_vcol;
+	    ಆದರೆ (cts.cts_vcol > 0)
 		MB_PTR_ADV(cts.cts_ptr);
-	    if (*cts.cts_ptr == NUL)
-		break;
+	    ಆದರೆ (*cts.cts_ptr == NUL)
+		ನಿಲ್ಲಿಸು;
 	    cts.cts_vcol += lbr_chartabsize(&cts);
 	}
-	vcol = last_vcol;
-	new_cursor_col = cts.cts_ptr - cts.cts_line;
+	vcol = ಕೊನೆಯ_vcol;
+	new_cursor_ಲಂಬಸಾಲು = cts.cts_ptr - cts.cts_ಸಾಲು;
 	clear_chartabsize_arg(&cts);
 
 	// May need to insert spaces to be able to position the cursor on
 	// the right screen column.
-	if (vcol != (int)curwin->w_virtcol)
+	ಆದರೆ (vcol != (ಪೂರ್ಣಾಂಕ)curwin->w_virtcol)
 	{
-	    curwin->w_cursor.col = (colnr_T)new_cursor_col;
-	    i = (int)curwin->w_virtcol - vcol;
+	    curwin->w_cursor.ಲಂಬಸಾಲು = (colnr_T)new_cursor_ಲಂಬಸಾಲು;
+	    i = (ಪೂರ್ಣಾಂಕ)curwin->w_virtcol - vcol;
 	    ptr = alloc(i + 1);
-	    if (ptr != NULL)
+	    ಆದರೆ (ptr != ಖಾಲಿ)
 	    {
 		size_t ptrlen;
-		new_cursor_col += i;
+		new_cursor_ಲಂಬಸಾಲು += i;
 		ptr[i] = NUL;
 		ptrlen = i;
-		while (--i >= 0)
+		ಆಗ (--i >= 0)
 		    ptr[i] = ' ';
 		ins_str(ptr, ptrlen);
 		vim_free(ptr);
@@ -1451,27 +1451,27 @@ change_indent(
 
     curwin->w_p_list = save_p_list;
 
-    if (new_cursor_col <= 0)
-	curwin->w_cursor.col = 0;
-    else
-	curwin->w_cursor.col = (colnr_T)new_cursor_col;
-    curwin->w_set_curswant = true;
-    changed_cline_bef_curs();
+    ಆದರೆ (new_cursor_ಲಂಬಸಾಲು <= 0)
+	curwin->w_cursor.ಲಂಬಸಾಲು = 0;
+    ಇಲ್ಲದಿದ್ದರೆ
+	curwin->w_cursor.ಲಂಬಸಾಲು = (colnr_T)new_cursor_ಲಂಬಸಾಲು;
+    curwin->w_ಗಣ_curswant = true;
+    ಬದಲಾಯಿತು_cline_bef_curs();
 
     // May have to adjust the start of the insert.
-    if (State & MODE_INSERT)
+    ಆದರೆ (State & ಬಹುಲಕ_ಸೇರಿಸು)
     {
-	if (curwin->w_cursor.lnum == Insstart.lnum && Insstart.col != 0)
+	ಆದರೆ (curwin->w_cursor.lnum == Insstart.lnum && Insstart.ಲಂಬಸಾಲು != 0)
 	{
-	    if ((int)Insstart.col <= insstart_less)
-		Insstart.col = 0;
-	    else
-		Insstart.col -= insstart_less;
+	    ಆದರೆ ((ಪೂರ್ಣಾಂಕ)Insstart.ಲಂಬಸಾಲು <= insstart_less)
+		Insstart.ಲಂಬಸಾಲು = 0;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		Insstart.ಲಂಬಸಾಲು -= insstart_less;
 	}
-	if ((int)ai_col <= insstart_less)
-	    ai_col = 0;
-	else
-	    ai_col -= insstart_less;
+	ಆದರೆ ((ಪೂರ್ಣಾಂಕ)ai_ಲಂಬಸಾಲು <= insstart_less)
+	    ai_ಲಂಬಸಾಲು = 0;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ai_ಲಂಬಸಾಲು -= insstart_less;
     }
 
     // For MODE_REPLACE state, may have to fix the replace stack, if it's
@@ -1479,60 +1479,60 @@ change_indent(
     // to pop a few characters from the replace stack.
     // If the number of characters before the cursor increased, need to push a
     // few NULs onto the replace stack.
-    if (REPLACE_NORMAL(State) && start_col >= 0)
+    ಆದರೆ (REPLACE_ಸಾಮಾನ್ಯ(State) && ಆರಂಭ_ಲಂಬಸಾಲು >= 0)
     {
-	while (start_col > (int)curwin->w_cursor.col)
+	ಆಗ (ಆರಂಭ_ಲಂಬಸಾಲು > (ಪೂರ್ಣಾಂಕ)curwin->w_cursor.ಲಂಬಸಾಲು)
 	{
 	    replace_join(0);	    // remove a NUL from the replace stack
-	    --start_col;
+	    --ಆರಂಭ_ಲಂಬಸಾಲು;
 	}
-	while (start_col < (int)curwin->w_cursor.col || replaced)
+	ಆಗ (ಆರಂಭ_ಲಂಬಸಾಲು < (ಪೂರ್ಣಾಂಕ)curwin->w_cursor.ಲಂಬಸಾಲು || replaced)
 	{
-	    replace_push(NUL);
-	    if (replaced)
+	    replace_ತಳ್ಳು(NUL);
+	    ಆದರೆ (replaced)
 	    {
-		replace_push(replaced);
+		replace_ತಳ್ಳು(replaced);
 		replaced = NUL;
 	    }
-	    ++start_col;
+	    ++ಆರಂಭ_ಲಂಬಸಾಲು;
 	}
     }
-#ifdef FEAT_PROP_POPUP
-    ignore_text_props = FALSE;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+    ignore_ಪಠ್ಯ_props = FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
 
     // For MODE_VREPLACE state, we also have to fix the replace stack.  In this
     // case it is always possible because we backspace over the whole line and
     // then put it back again the way we wanted it.
-    if (State & VREPLACE_FLAG)
+    ಆದರೆ (State & VREPLACE_FLAG)
     {
 	// If orig_line didn't allocate, just return.  At least we did the job,
 	// even if you can't backspace.
-	if (orig_line == NULL)
-	    return;
+	ಆದರೆ (orig_ಸಾಲು == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ;
 
 	// Save new line
-	new_line = vim_strnsave(ml_get_curline(), ml_get_curline_len());
-	if (new_line == NULL)
+	new_ಸಾಲು = vim_strnsave(ml_get_curline(), ml_get_curline_len());
+	ಆದರೆ (new_ಸಾಲು == ಖಾಲಿ)
 	{
-	    vim_free(orig_line);
-	    return;
+	    vim_free(orig_ಸಾಲು);
+	    ಹಿಂತಿರುಗಿ;
 	}
 
 	// We only put back the new line up to the cursor
-	new_line[curwin->w_cursor.col] = NUL;
+	new_ಸಾಲು[curwin->w_cursor.ಲಂಬಸಾಲು] = NUL;
 
 	// Put back original line
-	ml_replace(curwin->w_cursor.lnum, orig_line, FALSE);
-	curwin->w_cursor.col = orig_col;
+	ml_replace(curwin->w_cursor.lnum, orig_ಸಾಲು, FALSE);
+	curwin->w_cursor.ಲಂಬಸಾಲು = orig_ಲಂಬಸಾಲು;
 
 	// Backspace from cursor to start of line
-	backspace_until_column(0);
+	backspace_until_ಸ್ತಂಭ(0);
 
 	// Insert new stuff into line again
-	ins_bytes(new_line);
+	ins_ಬೈಟುಗಳು(new_ಸಾಲು);
 
-	vim_free(new_line);
+	vim_free(new_ಸಾಲು);
     }
 }
 
@@ -1541,428 +1541,428 @@ change_indent(
  * Leaves the cursor on the first non-blank in the line.
  * Returns TRUE if the line was changed.
  */
-    int
-copy_indent(int size, char_u *src)
+    ಪೂರ್ಣಾಂಕ
+copy_indent(ಪೂರ್ಣಾಂಕ ಗಾತ್ರ_2, char_u *src)
 {
-    char_u	*p = NULL;
-    char_u	*line = NULL;
+    char_u	*p = ಖಾಲಿ;
+    char_u	*ಸಾಲು = ಖಾಲಿ;
     char_u	*s;
-    int		todo;
-    int		ind_len;
-    int		line_len = 0;
-    int		tab_pad;
-    int		ind_done;
-    int		round;
-#ifdef FEAT_VARTABS
-    int		ind_col;
-#endif
+    ಪೂರ್ಣಾಂಕ		todo;
+    ಪೂರ್ಣಾಂಕ		ind_len;
+    ಪೂರ್ಣಾಂಕ		ಸಾಲು_len = 0;
+    ಪೂರ್ಣಾಂಕ		tab_pad;
+    ಪೂರ್ಣಾಂಕ		ind_ಮುಗಿದ;
+    ಪೂರ್ಣಾಂಕ		ಸುತ್ತು;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+    ಪೂರ್ಣಾಂಕ		ind_ಲಂಬಸಾಲು;
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Round 1: compute the number of characters needed for the indent
     // Round 2: copy the characters.
-    for (round = 1; round <= 2; ++round)
+    ಗಾಗಿ (ಸುತ್ತು = 1; ಸುತ್ತು <= 2; ++ಸುತ್ತು)
     {
-	todo = size;
+	todo = ಗಾತ್ರ_2;
 	ind_len = 0;
-	ind_done = 0;
-#ifdef FEAT_VARTABS
-	ind_col = 0;
-#endif
+	ind_ಮುಗಿದ = 0;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+	ind_ಲಂಬಸಾಲು = 0;
+#ಆದರೆ_ಅಂತ್ಯ
 	s = src;
 
 	// Count/copy the usable portion of the source line
-	while (todo > 0 && VIM_ISWHITE(*s))
+	ಆಗ (todo > 0 && VIM_ISWHITE(*s))
 	{
-	    if (*s == TAB)
+	    ಆದರೆ (*s == TAB)
 	    {
-#ifdef FEAT_VARTABS
-		tab_pad = tabstop_padding(ind_done, curbuf->b_p_ts,
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+		tab_pad = tabstop_padding(ind_ಮುಗಿದ, curbuf->b_p_ts,
 							curbuf->b_p_vts_array);
-#else
-		tab_pad = (int)curbuf->b_p_ts
-					   - (ind_done % (int)curbuf->b_p_ts);
-#endif
+#ಇಲ್ಲದಿದ್ದರೆ
+		tab_pad = (ಪೂರ್ಣಾಂಕ)curbuf->b_p_ts
+					   - (ind_ಮುಗಿದ % (ಪೂರ್ಣಾಂಕ)curbuf->b_p_ts);
+#ಆದರೆ_ಅಂತ್ಯ
 		// Stop if this tab will overshoot the target
-		if (todo < tab_pad)
-		    break;
+		ಆದರೆ (todo < tab_pad)
+		    ನಿಲ್ಲಿಸು;
 		todo -= tab_pad;
-		ind_done += tab_pad;
-#ifdef FEAT_VARTABS
-		ind_col += tab_pad;
-#endif
+		ind_ಮುಗಿದ += tab_pad;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+		ind_ಲಂಬಸಾಲು += tab_pad;
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		--todo;
-		++ind_done;
-#ifdef FEAT_VARTABS
-		++ind_col;
-#endif
+		++ind_ಮುಗಿದ;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+		++ind_ಲಂಬಸಾಲು;
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
 	    ++ind_len;
-	    if (p != NULL)
+	    ಆದರೆ (p != ಖಾಲಿ)
 		*p++ = *s;
 	    ++s;
 	}
 
 	// Fill to next tabstop with a tab, if possible
-#ifdef FEAT_VARTABS
-	tab_pad = tabstop_padding(ind_done, curbuf->b_p_ts,
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+	tab_pad = tabstop_padding(ind_ಮುಗಿದ, curbuf->b_p_ts,
 							curbuf->b_p_vts_array);
-#else
-	tab_pad = (int)curbuf->b_p_ts - (ind_done % (int)curbuf->b_p_ts);
-#endif
-	if (todo >= tab_pad && !curbuf->b_p_et)
+#ಇಲ್ಲದಿದ್ದರೆ
+	tab_pad = (ಪೂರ್ಣಾಂಕ)curbuf->b_p_ts - (ind_ಮುಗಿದ % (ಪೂರ್ಣಾಂಕ)curbuf->b_p_ts);
+#ಆದರೆ_ಅಂತ್ಯ
+	ಆದರೆ (todo >= tab_pad && !curbuf->b_p_et)
 	{
 	    todo -= tab_pad;
 	    ++ind_len;
-#ifdef FEAT_VARTABS
-	    ind_col += tab_pad;
-#endif
-	    if (p != NULL)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+	    ind_ಲಂಬಸಾಲು += tab_pad;
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಆದರೆ (p != ಖಾಲಿ)
 		*p++ = TAB;
 	}
 
 	// Add tabs required for indent
-	if (!curbuf->b_p_et)
+	ಆದರೆ (!curbuf->b_p_et)
 	{
-#ifdef FEAT_VARTABS
-	    for (;;)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+	    ಗಾಗಿ (;;)
 	    {
-		tab_pad = tabstop_padding(ind_col, curbuf->b_p_ts,
+		tab_pad = tabstop_padding(ind_ಲಂಬಸಾಲು, curbuf->b_p_ts,
 							curbuf->b_p_vts_array);
-		if (todo < tab_pad)
-		    break;
+		ಆದರೆ (todo < tab_pad)
+		    ನಿಲ್ಲಿಸು;
 		todo -= tab_pad;
 		++ind_len;
-		ind_col += tab_pad;
-		if (p != NULL)
+		ind_ಲಂಬಸಾಲು += tab_pad;
+		ಆದರೆ (p != ಖಾಲಿ)
 		    *p++ = TAB;
 	    }
-#else
-	    while (todo >= (int)curbuf->b_p_ts)
+#ಇಲ್ಲದಿದ್ದರೆ
+	    ಆಗ (todo >= (ಪೂರ್ಣಾಂಕ)curbuf->b_p_ts)
 	    {
-		todo -= (int)curbuf->b_p_ts;
+		todo -= (ಪೂರ್ಣಾಂಕ)curbuf->b_p_ts;
 		++ind_len;
-		if (p != NULL)
+		ಆದರೆ (p != ಖಾಲಿ)
 		    *p++ = TAB;
 	    }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	}
 
 	// Count/add spaces required for indent
-	while (todo > 0)
+	ಆಗ (todo > 0)
 	{
 	    --todo;
 	    ++ind_len;
-	    if (p != NULL)
+	    ಆದರೆ (p != ಖಾಲಿ)
 		*p++ = ' ';
 	}
 
-	if (p == NULL)
+	ಆದರೆ (p == ಖಾಲಿ)
 	{
 	    // Allocate memory for the result: the copied indent, new indent
 	    // and the rest of the line.
-	    line_len = ml_get_curline_len() + 1;
-	    line = alloc(ind_len + line_len);
-	    if (line == NULL)
-		return FALSE;
-	    p = line;
+	    ಸಾಲು_len = ml_get_curline_len() + 1;
+	    ಸಾಲು = alloc(ind_len + ಸಾಲು_len);
+	    ಆದರೆ (ಸಾಲು == ಖಾಲಿ)
+		ಹಿಂತಿರುಗಿ FALSE;
+	    p = ಸಾಲು;
 	}
     }
 
     // Append the original line
-    mch_memmove(p, ml_get_curline(), (size_t)line_len);
+    mch_memmove(p, ml_get_curline(), (size_t)ಸಾಲು_len);
 
     // Replace the line
-    ml_replace(curwin->w_cursor.lnum, line, FALSE);
+    ml_replace(curwin->w_cursor.lnum, ಸಾಲು, FALSE);
 
     // Put the cursor after the indent.
-    curwin->w_cursor.col = ind_len;
-    return TRUE;
+    curwin->w_cursor.ಲಂಬಸಾಲು = ind_len;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
  * Give a "resulting text too long" error and maybe set got_int.
  */
-    static void
-emsg_text_too_long(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+emsg_ಪಠ್ಯ_too_long(ಶೂನ್ಯ)
 {
-    emsg(_(e_resulting_text_too_long));
-#ifdef FEAT_EVAL
+    emsg(_(e_resulting_ಪಠ್ಯ_too_long));
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     // when not inside a try/catch set got_int to break out of any loop
-    if (trylevel == 0)
-#endif
+    ಆದರೆ (trylevel == 0)
+#ಆದರೆ_ಅಂತ್ಯ
 	got_int = TRUE;
 }
 
 /*
  * ":retab".
  */
-    void
+    ಶೂನ್ಯ
 ex_retab(exarg_T *eap)
 {
     linenr_T	lnum;
-    int		got_tab = FALSE;
-    long	num_spaces = 0;
-    long	num_tabs;
-    long	len;
-    long	col;
-    long	vcol;
-    long	start_col = 0;		// For start of white-space string
-    long	start_vcol = 0;		// For start of white-space string
-    long	old_len;
-    long	new_len;
+    ಪೂರ್ಣಾಂಕ		got_tab = FALSE;
+    ದೀರ್ಘ	ಅಂಕೆ_spaces = 0;
+    ದೀರ್ಘ	ಅಂಕೆ_tabs;
+    ದೀರ್ಘ	len;
+    ದೀರ್ಘ	ಲಂಬಸಾಲು;
+    ದೀರ್ಘ	vcol;
+    ದೀರ್ಘ	ಆರಂಭ_ಲಂಬಸಾಲು = 0;		// For start of white-space string
+    ದೀರ್ಘ	ಆರಂಭ_vcol = 0;		// For start of white-space string
+    ದೀರ್ಘ	old_len;
+    ದೀರ್ಘ	new_len;
     char_u	*ptr;
-    char_u	*new_line = (char_u *)1; // init to non-NULL
-    int		did_undo;		// called u_save for current line
-#ifdef FEAT_VARTABS
-    int		*new_vts_array = NULL;
+    char_u	*new_ಸಾಲು = (char_u *)1; // init to non-NULL
+    ಪೂರ್ಣಾಂಕ		did_undo;		// called u_save for current line
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+    ಪೂರ್ಣಾಂಕ		*new_vts_array = ಖಾಲಿ;
     char_u	*new_ts_str;		// string value of tab argument
-#else
-    int		temp;
-    int		new_ts = 0;
-#endif
-    int		save_list;
-    linenr_T	first_line = 0;		// first changed line
-    linenr_T	last_line = 0;		// last changed line
-    int		is_indent_only = 0;	// Only process leading whitespace
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಪೂರ್ಣಾಂಕ		ತಾತ್ಕಾಲಿಕ;
+    ಪೂರ್ಣಾಂಕ		new_ts = 0;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಪೂರ್ಣಾಂಕ		save_list;
+    linenr_T	ಮೊದಲ_ಸಾಲು = 0;		// first changed line
+    linenr_T	ಕೊನೆಯ_ಸಾಲು = 0;		// last changed line
+    ಪೂರ್ಣಾಂಕ		is_indent_only = 0;	// Only process leading whitespace
 
     save_list = curwin->w_p_list;
     curwin->w_p_list = 0;	    // don't want list mode here
 
     ptr = eap->arg;
-    if (STRNCMP(ptr, "-indentonly", 11) == 0 && IS_WHITE_OR_NUL(ptr[11]))
+    ಆದರೆ (STRNCMP(ptr, "-indentonly", 11) == 0 && IS_WHITE_OR_NUL(ptr[11]))
     {
 	is_indent_only = 1;
 	ptr = skipwhite(ptr + 11);
     }
 
-#ifdef FEAT_VARTABS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
     new_ts_str = ptr;
-    if (tabstop_set(ptr, &new_vts_array) == FAIL)
-	return;
-    while (vim_isdigit(*ptr) || *ptr == ',')
+    ಆದರೆ (tabstop_ಗಣ(ptr, &new_vts_array) == FAIL)
+	ಹಿಂತಿರುಗಿ;
+    ಆಗ (vim_isdigit(*ptr) || *ptr == ',')
 	++ptr;
 
     // This ensures that either new_vts_array and new_ts_str are freshly
     // allocated, or new_vts_array points to an existing array and new_ts_str
     // is null.
-    if (new_vts_array == NULL)
+    ಆದರೆ (new_vts_array == ಖಾಲಿ)
     {
 	new_vts_array = curbuf->b_p_vts_array;
-	new_ts_str = NULL;
+	new_ts_str = ಖಾಲಿ;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	new_ts_str = vim_strnsave(new_ts_str, ptr - new_ts_str);
-#else
-    if (ptr[0] != NUL && (ptr[0] != '0' || ptr[1] != NUL))
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಆದರೆ (ptr[0] != NUL && (ptr[0] != '0' || ptr[1] != NUL))
     {
-	char_u	*end;
+	char_u	*ಕೊನೆ;
 
-	if (strtol((char *)ptr, (char **)&end, 10) <= 0)
+	ಆದರೆ (strtol((ಅಕ್ಷರ *)ptr, (ಅಕ್ಷರ **)&ಕೊನೆ, 10) <= 0)
 	{
-	    if (ptr != end)
-		emsg(_(e_argument_must_be_positive));
-	    else
-		semsg(_(e_invalid_argument_str), ptr);
-	    return;
+	    ಆದರೆ (ptr != ಕೊನೆ)
+		emsg(_(e_ವಾದ_must_be_ಧನಾತ್ಮಕ));
+	    ಇಲ್ಲದಿದ್ದರೆ
+		semsg(_(e_invalid_ವಾದ_str), ptr);
+	    ಹಿಂತಿರುಗಿ;
 	}
 	new_ts = getdigits(&ptr);
-	if (new_ts < 0 || new_ts > TABSTOP_MAX)
+	ಆದರೆ (new_ts < 0 || new_ts > TABSTOP_MAX)
 	{
-	    semsg(_(e_invalid_argument_str), eap->arg);
-	    return;
+	    semsg(_(e_invalid_ವಾದ_str), eap->arg);
+	    ಹಿಂತಿರುಗಿ;
 	}
     }
-    if (new_ts == 0)
+    ಆದರೆ (new_ts == 0)
 	new_ts = curbuf->b_p_ts;
-#endif
-    for (lnum = eap->line1; !got_int && lnum <= eap->line2; ++lnum)
+#ಆದರೆ_ಅಂತ್ಯ
+    ಗಾಗಿ (lnum = eap->line1; !got_int && lnum <= eap->line2; ++lnum)
     {
 	ptr = ml_get(lnum);
 	old_len = ml_get_len(lnum);
-	col = 0;
+	ಲಂಬಸಾಲು = 0;
 	vcol = 0;
 	did_undo = FALSE;
-	for (;;)
+	ಗಾಗಿ (;;)
 	{
-	    if (VIM_ISWHITE(ptr[col]))
+	    ಆದರೆ (VIM_ISWHITE(ptr[ಲಂಬಸಾಲು]))
 	    {
-		if (!got_tab && num_spaces == 0)
+		ಆದರೆ (!got_tab && ಅಂಕೆ_spaces == 0)
 		{
 		    // First consecutive white-space
-		    start_vcol = vcol;
-		    start_col = col;
+		    ಆರಂಭ_vcol = vcol;
+		    ಆರಂಭ_ಲಂಬಸಾಲು = ಲಂಬಸಾಲು;
 		}
-		if (ptr[col] == ' ')
-		    num_spaces++;
-		else
+		ಆದರೆ (ptr[ಲಂಬಸಾಲು] == ' ')
+		    ಅಂಕೆ_spaces++;
+		ಇಲ್ಲದಿದ್ದರೆ
 		    got_tab = TRUE;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		if (got_tab || (eap->forceit && num_spaces > 1))
+		ಆದರೆ (got_tab || (eap->forceit && ಅಂಕೆ_spaces > 1))
 		{
 		    // Retabulate this string of white-space
 
 		    // len is virtual length of white string
-		    len = num_spaces = vcol - start_vcol;
-		    num_tabs = 0;
-		    if (!curbuf->b_p_et)
+		    len = ಅಂಕೆ_spaces = vcol - ಆರಂಭ_vcol;
+		    ಅಂಕೆ_tabs = 0;
+		    ಆದರೆ (!curbuf->b_p_et)
 		    {
-#ifdef FEAT_VARTABS
-			int t, s;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+			ಪೂರ್ಣಾಂಕ t, s;
 
-			tabstop_fromto(start_vcol, vcol,
+			tabstop_fromto(ಆರಂಭ_vcol, vcol,
 					curbuf->b_p_ts, new_vts_array, &t, &s);
-			num_tabs = t;
-			num_spaces = s;
-#else
-			temp = new_ts - (start_vcol % new_ts);
-			if (num_spaces >= temp)
+			ಅಂಕೆ_tabs = t;
+			ಅಂಕೆ_spaces = s;
+#ಇಲ್ಲದಿದ್ದರೆ
+			ತಾತ್ಕಾಲಿಕ = new_ts - (ಆರಂಭ_vcol % new_ts);
+			ಆದರೆ (ಅಂಕೆ_spaces >= ತಾತ್ಕಾಲಿಕ)
 			{
-			    num_spaces -= temp;
-			    num_tabs++;
+			    ಅಂಕೆ_spaces -= ತಾತ್ಕಾಲಿಕ;
+			    ಅಂಕೆ_tabs++;
 			}
-			num_tabs += num_spaces / new_ts;
-			num_spaces -= (num_spaces / new_ts) * new_ts;
-#endif
+			ಅಂಕೆ_tabs += ಅಂಕೆ_spaces / new_ts;
+			ಅಂಕೆ_spaces -= (ಅಂಕೆ_spaces / new_ts) * new_ts;
+#ಆದರೆ_ಅಂತ್ಯ
 		    }
-		    if (curbuf->b_p_et || got_tab ||
-					(num_spaces + num_tabs < len))
+		    ಆದರೆ (curbuf->b_p_et || got_tab ||
+					(ಅಂಕೆ_spaces + ಅಂಕೆ_tabs < len))
 		    {
-			if (did_undo == FALSE)
+			ಆದರೆ (did_undo == FALSE)
 			{
 			    did_undo = TRUE;
-			    if (u_save((linenr_T)(lnum - 1),
+			    ಆದರೆ (u_save((linenr_T)(lnum - 1),
 						(linenr_T)(lnum + 1)) == FAIL)
 			    {
-				new_line = NULL;	// flag out-of-memory
-				break;
+				new_ಸಾಲು = ಖಾಲಿ;	// flag out-of-memory
+				ನಿಲ್ಲಿಸು;
 			    }
 			}
 
 			// len is actual number of white characters used
-			len = num_spaces + num_tabs;
-			new_len = old_len - col + start_col + len + 1;
-			if (new_len <= 0 || new_len >= MAXCOL)
+			len = ಅಂಕೆ_spaces + ಅಂಕೆ_tabs;
+			new_len = old_len - ಲಂಬಸಾಲು + ಆರಂಭ_ಲಂಬಸಾಲು + len + 1;
+			ಆದರೆ (new_len <= 0 || new_len >= MAXCOL)
 			{
-			    emsg_text_too_long();
-			    break;
+			    emsg_ಪಠ್ಯ_too_long();
+			    ನಿಲ್ಲಿಸು;
 			}
-			new_line = alloc(new_len);
-			if (new_line == NULL)
-			    break;
-			if (start_col > 0)
-			    mch_memmove(new_line, ptr, (size_t)start_col);
-			mch_memmove(new_line + start_col + len,
-				      ptr + col, (size_t)(old_len - col + 1));
-			ptr = new_line + start_col;
-			for (col = 0; col < len; col++)
-			    ptr[col] = (col < num_tabs) ? '\t' : ' ';
-			if (ml_replace(lnum, new_line, FALSE) == OK)
+			new_ಸಾಲು = alloc(new_len);
+			ಆದರೆ (new_ಸಾಲು == ಖಾಲಿ)
+			    ನಿಲ್ಲಿಸು;
+			ಆದರೆ (ಆರಂಭ_ಲಂಬಸಾಲು > 0)
+			    mch_memmove(new_ಸಾಲು, ptr, (size_t)ಆರಂಭ_ಲಂಬಸಾಲು);
+			mch_memmove(new_ಸಾಲು + ಆರಂಭ_ಲಂಬಸಾಲು + len,
+				      ptr + ಲಂಬಸಾಲು, (size_t)(old_len - ಲಂಬಸಾಲು + 1));
+			ptr = new_ಸಾಲು + ಆರಂಭ_ಲಂಬಸಾಲು;
+			ಗಾಗಿ (ಲಂಬಸಾಲು = 0; ಲಂಬಸಾಲು < len; ಲಂಬಸಾಲು++)
+			    ptr[ಲಂಬಸಾಲು] = (ಲಂಬಸಾಲು < ಅಂಕೆ_tabs) ? '\t' : ' ';
+			ಆದರೆ (ml_replace(lnum, new_ಸಾಲು, FALSE) == OK)
 			    // "new_line" may have been copied
-			    new_line = curbuf->b_ml.ml_line_ptr;
-			if (first_line == 0)
-			    first_line = lnum;
-			last_line = lnum;
-			ptr = new_line;
+			    new_ಸಾಲು = curbuf->b_ml.ml_ಸಾಲು_ptr;
+			ಆದರೆ (ಮೊದಲ_ಸಾಲು == 0)
+			    ಮೊದಲ_ಸಾಲು = lnum;
+			ಕೊನೆಯ_ಸಾಲು = lnum;
+			ptr = new_ಸಾಲು;
 			old_len = new_len - 1;
-			col = start_col + len;
+			ಲಂಬಸಾಲು = ಆರಂಭ_ಲಂಬಸಾಲು + len;
 		    }
 		}
 		got_tab = FALSE;
-		num_spaces = 0;
+		ಅಂಕೆ_spaces = 0;
 
-		if (is_indent_only)
-		    break;
+		ಆದರೆ (is_indent_only)
+		    ನಿಲ್ಲಿಸು;
 	    }
-	    if (ptr[col] == NUL)
-		break;
-	    vcol += chartabsize(ptr + col, (colnr_T)vcol);
-	    if (vcol >= MAXCOL)
+	    ಆದರೆ (ptr[ಲಂಬಸಾಲು] == NUL)
+		ನಿಲ್ಲಿಸು;
+	    vcol += chartabsize(ptr + ಲಂಬಸಾಲು, (colnr_T)vcol);
+	    ಆದರೆ (vcol >= MAXCOL)
 	    {
-		emsg_text_too_long();
-		break;
+		emsg_ಪಠ್ಯ_too_long();
+		ನಿಲ್ಲಿಸು;
 	    }
-	    if (has_mbyte)
-		col += (*mb_ptr2len)(ptr + col);
-	    else
-		++col;
+	    ಆದರೆ (has_mbyte)
+		ಲಂಬಸಾಲು += (*mb_ptr2len)(ptr + ಲಂಬಸಾಲು);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		++ಲಂಬಸಾಲು;
 	}
-	if (new_line == NULL)		    // out of memory
-	    break;
-	line_breakcheck();
+	ಆದರೆ (new_ಸಾಲು == ಖಾಲಿ)		    // out of memory
+	    ನಿಲ್ಲಿಸು;
+	ಸಾಲು_breakcheck();
     }
-    if (got_int)
+    ಆದರೆ (got_int)
 	emsg(_(e_interrupted));
 
-#ifdef FEAT_VARTABS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
     // If a single value was given then it can be considered equal to
     // either the value of 'tabstop' or the value of 'vartabstop'.
-    if (tabstop_count(curbuf->b_p_vts_array) == 0
-	&& tabstop_count(new_vts_array) == 1
-	&& curbuf->b_p_ts == tabstop_first(new_vts_array))
+    ಆದರೆ (tabstop_ಎಣಿಕೆ(curbuf->b_p_vts_array) == 0
+	&& tabstop_ಎಣಿಕೆ(new_vts_array) == 1
+	&& curbuf->b_p_ts == tabstop_ಮೊದಲ(new_vts_array))
 	; // not changed
-    else if (tabstop_count(curbuf->b_p_vts_array) > 0
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (tabstop_ಎಣಿಕೆ(curbuf->b_p_vts_array) > 0
 	&& tabstop_eq(curbuf->b_p_vts_array, new_vts_array))
 	; // not changed
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	redraw_curbuf_later(UPD_NOT_VALID);
-#else
-    if (curbuf->b_p_ts != new_ts)
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಆದರೆ (curbuf->b_p_ts != new_ts)
 	redraw_curbuf_later(UPD_NOT_VALID);
-#endif
-    if (first_line != 0)
-	changed_lines(first_line, 0, last_line + 1, 0L);
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (ಮೊದಲ_ಸಾಲು != 0)
+	ಬದಲಾಯಿತು_ಸಾಲುಗಳು(ಮೊದಲ_ಸಾಲು, 0, ಕೊನೆಯ_ಸಾಲು + 1, 0L);
 
     curwin->w_p_list = save_list;	// restore 'list'
 
-#ifdef FEAT_VARTABS
-    if (new_ts_str != NULL)		// set the new tabstop
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+    ಆದರೆ (new_ts_str != ಖಾಲಿ)		// set the new tabstop
     {
 	// If 'vartabstop' is in use or if the value given to retab has more
 	// than one tabstop then update 'vartabstop'.
-	int *old_vts_ary = curbuf->b_p_vts_array;
+	ಪೂರ್ಣಾಂಕ *old_vts_ary = curbuf->b_p_vts_array;
 
-	if (tabstop_count(old_vts_ary) > 0 || tabstop_count(new_vts_array) > 1)
+	ಆದರೆ (tabstop_ಎಣಿಕೆ(old_vts_ary) > 0 || tabstop_ಎಣಿಕೆ(new_vts_array) > 1)
 	{
-	    set_string_option_direct((char_u *)"vts", -1, new_ts_str,
+	    ಗಣ_string_option_ನೇರ((char_u *)"vts", -1, new_ts_str,
 							OPT_FREE|OPT_LOCAL, 0);
 	    curbuf->b_p_vts_array = new_vts_array;
 	    vim_free(old_vts_ary);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // 'vartabstop' wasn't in use and a single value was given to
 	    // retab then update 'tabstop'.
-	    curbuf->b_p_ts = tabstop_first(new_vts_array);
+	    curbuf->b_p_ts = tabstop_ಮೊದಲ(new_vts_array);
 	    vim_free(new_vts_array);
 	}
 	vim_free(new_ts_str);
     }
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
     curbuf->b_p_ts = new_ts;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     coladvance(curwin->w_curswant);
 
     u_clearline();
 }
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * Get indent level from 'indentexpr'.
  */
-    int
-get_expr_indent(void)
+    ಪೂರ್ಣಾಂಕ
+get_ಅಭಿವ್ಯಕ್ತಿ_indent(ಶೂನ್ಯ)
 {
-    int		indent = -1;
+    ಪೂರ್ಣಾಂಕ		indent = -1;
     char_u	*inde_copy;
     pos_T	save_pos;
     colnr_T	save_curswant;
-    int		save_set_curswant;
-    int		save_State;
-    int		use_sandbox = was_set_insecurely(curwin,
+    ಪೂರ್ಣಾಂಕ		save_ಗಣ_curswant;
+    ಪೂರ್ಣಾಂಕ		save_State;
+    ಪೂರ್ಣಾಂಕ		use_sandbox = was_ಗಣ_insecurely(curwin,
 					    (char_u *)"indentexpr", OPT_LOCAL);
     sctx_T	save_sctx = current_sctx;
 
@@ -1970,9 +1970,9 @@ get_expr_indent(void)
     // via :normal commands
     save_pos = curwin->w_cursor;
     save_curswant = curwin->w_curswant;
-    save_set_curswant = curwin->w_set_curswant;
-    set_vim_var_nr(VV_LNUM, curwin->w_cursor.lnum);
-    if (use_sandbox)
+    save_ಗಣ_curswant = curwin->w_ಗಣ_curswant;
+    ಗಣ_vim_var_nr(VV_LNUM, curwin->w_cursor.lnum);
+    ಆದರೆ (use_sandbox)
 	++sandbox;
     ++textlock;
     current_sctx = curbuf->b_p_script_ctx[BV_INDE];
@@ -1980,13 +1980,13 @@ get_expr_indent(void)
     // Need to make a copy, the 'indentexpr' option could be changed while
     // evaluating it.
     inde_copy = vim_strsave(curbuf->b_p_inde);
-    if (inde_copy != NULL)
+    ಆದರೆ (inde_copy != ಖಾಲಿ)
     {
-	indent = (int)eval_to_number(inde_copy, TRUE);
+	indent = (ಪೂರ್ಣಾಂಕ)eval_ಗಮ್ಯ_ಸಂಖ್ಯೆ(inde_copy, TRUE);
 	vim_free(inde_copy);
     }
 
-    if (use_sandbox)
+    ಆದರೆ (use_sandbox)
 	--sandbox;
     --textlock;
     current_sctx = save_sctx;
@@ -1995,42 +1995,42 @@ get_expr_indent(void)
     // Pretend to be in Insert mode, allow cursor past end of line for "o"
     // command.
     save_State = State;
-    State = MODE_INSERT;
+    State = ಬಹುಲಕ_ಸೇರಿಸು;
     curwin->w_cursor = save_pos;
     curwin->w_curswant = save_curswant;
-    curwin->w_set_curswant = save_set_curswant;
+    curwin->w_ಗಣ_curswant = save_ಗಣ_curswant;
     check_cursor();
     State = save_State;
 
     // Reset did_throw, unless 'debug' has "throw" and inside a try/catch.
-    if (did_throw && (vim_strchr(p_debug, 't') == NULL || trylevel == 0))
+    ಆದರೆ (did_throw && (vim_strchr(p_debug, 't') == ಖಾಲಿ || trylevel == 0))
     {
 	handle_did_throw();
 	did_throw = FALSE;
     }
 
     // If there is an error, just keep the current indent.
-    if (indent < 0)
+    ಆದರೆ (indent < 0)
 	indent = get_indent();
 
-    return indent;
+    ಹಿಂತಿರುಗಿ indent;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    static int
-lisp_match(char_u *p)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+lisp_ಹೊಂದಿಕೆ(char_u *p)
 {
     char_u	buf[LSIZE];
-    int		len;
-    char_u	*word = *curbuf->b_p_lw != NUL ? curbuf->b_p_lw : p_lispwords;
+    ಪೂರ್ಣಾಂಕ		len;
+    char_u	*ಶಬ್ದ = *curbuf->b_p_lw != NUL ? curbuf->b_p_lw : p_lispwords;
 
-    while (*word != NUL)
+    ಆಗ (*ಶಬ್ದ != NUL)
     {
-	len = copy_option_part(&word, buf, LSIZE, ",");
-	if (STRNCMP(buf, p, len) == 0 && IS_WHITE_OR_NUL(p[len]))
-	    return TRUE;
+	len = copy_option_part(&ಶಬ್ದ, buf, LSIZE, ",");
+	ಆದರೆ (STRNCMP(buf, p, len) == 0 && IS_WHITE_OR_NUL(p[len]))
+	    ಹಿಂತಿರುಗಿ TRUE;
     }
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 /*
@@ -2049,108 +2049,108 @@ lisp_match(char_u *p)
  * Update from Sergey Khorev:
  * I tried to fix the first two issues.
  */
-    int
-get_lisp_indent(void)
+    ಪೂರ್ಣಾಂಕ
+get_lisp_indent(ಶೂನ್ಯ)
 {
     pos_T	*pos, realpos, paren;
-    int		amount;
+    ಪೂರ್ಣಾಂಕ		amount;
     char_u	*that;
-    colnr_T	col;
+    colnr_T	ಲಂಬಸಾಲು;
     colnr_T	firsttry;
-    int		parencount, quotecount;
-    int		vi_lisp;
+    ಪೂರ್ಣಾಂಕ		parencount, quotecount;
+    ಪೂರ್ಣಾಂಕ		vi_lisp;
 
     // Set vi_lisp to use the vi-compatible method
-    vi_lisp = (vim_strchr(p_cpo, CPO_LISP) != NULL);
+    vi_lisp = (vim_strchr(p_cpo, CPO_LISP) != ಖಾಲಿ);
 
     realpos = curwin->w_cursor;
-    curwin->w_cursor.col = 0;
+    curwin->w_cursor.ಲಂಬಸಾಲು = 0;
 
-    if ((pos = findmatch(NULL, '(')) == NULL)
-	pos = findmatch(NULL, '[');
-    else
+    ಆದರೆ ((pos = findmatch(ಖಾಲಿ, '(')) == ಖಾಲಿ)
+	pos = findmatch(ಖಾಲಿ, '[');
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	paren = *pos;
-	pos = findmatch(NULL, '[');
-	if (pos == NULL || LT_POSP(pos, &paren))
+	pos = findmatch(ಖಾಲಿ, '[');
+	ಆದರೆ (pos == ಖಾಲಿ || LT_POSP(pos, &paren))
 	    pos = &paren;
     }
-    if (pos != NULL)
+    ಆದರೆ (pos != ಖಾಲಿ)
     {
 	// Extra trick: Take the indent of the first previous non-white
 	// line that is at the same () level.
 	amount = -1;
 	parencount = 0;
 
-	while (--curwin->w_cursor.lnum >= pos->lnum)
+	ಆಗ (--curwin->w_cursor.lnum >= pos->lnum)
 	{
-	    if (linewhite(curwin->w_cursor.lnum))
-		continue;
-	    for (that = ml_get_curline(); *that != NUL; ++that)
+	    ಆದರೆ (linewhite(curwin->w_cursor.lnum))
+		ಮುಂದುವರಿ;
+	    ಗಾಗಿ (that = ml_get_curline(); *that != NUL; ++that)
 	    {
-		if (*that == ';')
+		ಆದರೆ (*that == ';')
 		{
-		    while (*(that + 1) != NUL)
+		    ಆಗ (*(that + 1) != NUL)
 			++that;
-		    continue;
+		    ಮುಂದುವರಿ;
 		}
-		if (*that == '\\')
+		ಆದರೆ (*that == '\\')
 		{
-		    if (*(that + 1) != NUL)
+		    ಆದರೆ (*(that + 1) != NUL)
 			++that;
-		    continue;
+		    ಮುಂದುವರಿ;
 		}
-		if (*that == '"' && *(that + 1) != NUL)
+		ಆದರೆ (*that == '"' && *(that + 1) != NUL)
 		{
-		    while (*++that && *that != '"')
+		    ಆಗ (*++that && *that != '"')
 		    {
 			// skipping escaped characters in the string
-			if (*that == '\\')
+			ಆದರೆ (*that == '\\')
 			{
-			    if (*++that == NUL)
-				break;
-			    if (that[1] == NUL)
+			    ಆದರೆ (*++that == NUL)
+				ನಿಲ್ಲಿಸು;
+			    ಆದರೆ (that[1] == NUL)
 			    {
 				++that;
-				break;
+				ನಿಲ್ಲಿಸು;
 			    }
 			}
 		    }
-		    if (*that == NUL)
-			break;
+		    ಆದರೆ (*that == NUL)
+			ನಿಲ್ಲಿಸು;
 		}
-		if (*that == '(' || *that == '[')
+		ಆದರೆ (*that == '(' || *that == '[')
 		    ++parencount;
-		else if (*that == ')' || *that == ']')
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*that == ')' || *that == ']')
 		    --parencount;
 	    }
-	    if (parencount == 0)
+	    ಆದರೆ (parencount == 0)
 	    {
 		amount = get_indent();
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	}
 
-	if (amount == -1)
+	ಆದರೆ (amount == -1)
 	{
 	    curwin->w_cursor.lnum = pos->lnum;
-	    curwin->w_cursor.col = pos->col;
-	    col = pos->col;
+	    curwin->w_cursor.ಲಂಬಸಾಲು = pos->ಲಂಬಸಾಲು;
+	    ಲಂಬಸಾಲು = pos->ಲಂಬಸಾಲು;
 
 	    that = ml_get_curline();
 
-	    if (vi_lisp && get_indent() == 0)
+	    ಆದರೆ (vi_lisp && get_indent() == 0)
 		amount = 2;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		char_u		*line = that;
+		char_u		*ಸಾಲು = that;
 		chartabsize_T	cts;
 
-		init_chartabsize_arg(&cts, curwin, pos->lnum, 0, line, line);
-		while (*cts.cts_ptr != NUL && col > 0)
+		init_chartabsize_arg(&cts, curwin, pos->lnum, 0, ಸಾಲು, ಸಾಲು);
+		ಆಗ (*cts.cts_ptr != NUL && ಲಂಬಸಾಲು > 0)
 		{
 		    cts.cts_vcol += lbr_chartabsize_adv(&cts);
-		    col--;
+		    ಲಂಬಸಾಲು--;
 		}
 		amount = cts.cts_vcol;
 		that = cts.cts_ptr;
@@ -2162,21 +2162,21 @@ get_lisp_indent(void)
 		// (let ((a 1))    instead    (let ((a 1))
 		//   (...))	      of	   (...))
 
-		if (!vi_lisp && (*that == '(' || *that == '[')
-						      && lisp_match(that + 1))
+		ಆದರೆ (!vi_lisp && (*that == '(' || *that == '[')
+						      && lisp_ಹೊಂದಿಕೆ(that + 1))
 		    amount += 2;
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    if (*that != NUL)
+		    ಆದರೆ (*that != NUL)
 		    {
 			that++;
 			amount++;
 		    }
 		    firsttry = amount;
 
-		    init_chartabsize_arg(&cts, curwin, (colnr_T)(that - line),
-							   amount, line, that);
-		    while (VIM_ISWHITE(*cts.cts_ptr))
+		    init_chartabsize_arg(&cts, curwin, (colnr_T)(that - ಸಾಲು),
+							   amount, ಸಾಲು, that);
+		    ಆಗ (VIM_ISWHITE(*cts.cts_ptr))
 		    {
 			cts.cts_vcol += lbr_chartabsize(&cts);
 			++cts.cts_ptr;
@@ -2185,25 +2185,25 @@ get_lisp_indent(void)
 		    amount = cts.cts_vcol;
 		    clear_chartabsize_arg(&cts);
 
-		    if (*that && *that != ';') // not a comment line
+		    ಆದರೆ (*that && *that != ';') // not a comment line
 		    {
 			// test *that != '(' to accommodate first let/do
 			// argument if it is more than one line
-			if (!vi_lisp && *that != '(' && *that != '[')
+			ಆದರೆ (!vi_lisp && *that != '(' && *that != '[')
 			    firsttry++;
 
 			parencount = 0;
 			quotecount = 0;
 
 			init_chartabsize_arg(&cts, curwin,
-				   (colnr_T)(that - line), amount, line, that);
-			if (vi_lisp
+				   (colnr_T)(that - ಸಾಲು), amount, ಸಾಲು, that);
+			ಆದರೆ (vi_lisp
 				|| (*that != '"'
 				    && *that != '\''
 				    && *that != '#'
 				    && (*that < '0' || *that > '9')))
 			{
-			    while (*cts.cts_ptr
+			    ಆಗ (*cts.cts_ptr
 				    && (!VIM_ISWHITE(*cts.cts_ptr)
 					|| quotecount
 					|| parencount)
@@ -2213,21 +2213,21 @@ get_lisp_indent(void)
 					    && !parencount
 					    && vi_lisp)))
 			    {
-				if (*cts.cts_ptr == '"')
+				ಆದರೆ (*cts.cts_ptr == '"')
 				    quotecount = !quotecount;
-				if ((*cts.cts_ptr == '(' || *cts.cts_ptr == '[')
+				ಆದರೆ ((*cts.cts_ptr == '(' || *cts.cts_ptr == '[')
 							       && !quotecount)
 				    ++parencount;
-				if ((*cts.cts_ptr == ')' || *cts.cts_ptr == ']')
+				ಆದರೆ ((*cts.cts_ptr == ')' || *cts.cts_ptr == ']')
 							       && !quotecount)
 				    --parencount;
-				if (*cts.cts_ptr == '\\'
+				ಆದರೆ (*cts.cts_ptr == '\\'
 						    && *(cts.cts_ptr+1) != NUL)
 				    cts.cts_vcol += lbr_chartabsize_adv(&cts);
 				cts.cts_vcol += lbr_chartabsize_adv(&cts);
 			    }
 			}
-			while (VIM_ISWHITE(*cts.cts_ptr))
+			ಆಗ (VIM_ISWHITE(*cts.cts_ptr))
 			{
 			    cts.cts_vcol += lbr_chartabsize(&cts);
 			    ++cts.cts_ptr;
@@ -2236,19 +2236,19 @@ get_lisp_indent(void)
 			amount = cts.cts_vcol;
 			clear_chartabsize_arg(&cts);
 
-			if (!*that || *that == ';')
+			ಆದರೆ (!*that || *that == ';')
 			    amount = firsttry;
 		    }
 		}
 	    }
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	amount = 0;	// no matching '(' or '[' found, use zero indent
 
     curwin->w_cursor = realpos;
 
-    return amount;
+    ಹಿಂತಿರುಗಿ amount;
 }
 
 /*
@@ -2258,16 +2258,16 @@ get_lisp_indent(void)
  * "get_the_indent" should be get_c_indent, get_expr_indent or get_lisp_indent.
  */
 
-    void
-fixthisline(int (*get_the_indent)(void))
+    ಶೂನ್ಯ
+fixthisline(ಪೂರ್ಣಾಂಕ (*get_the_indent)(ಶೂನ್ಯ))
 {
-    int amount = get_the_indent();
+    ಪೂರ್ಣಾಂಕ amount = get_the_indent();
 
-    if (amount < 0)
-	return;
+    ಆದರೆ (amount < 0)
+	ಹಿಂತಿರುಗಿ;
 
-    change_indent(INDENT_SET, amount, FALSE, 0, TRUE);
-    if (linewhite(curwin->w_cursor.lnum))
+    change_indent(INDENT_ಗಣ, amount, FALSE, 0, TRUE);
+    ಆದರೆ (linewhite(curwin->w_cursor.lnum))
 	did_ai = TRUE;	// delete the indent if the line stays empty
 }
 
@@ -2275,83 +2275,83 @@ fixthisline(int (*get_the_indent)(void))
  * Return TRUE if 'indentexpr' should be used for Lisp indenting.
  * Caller may want to check 'autoindent'.
  */
-    int
-use_indentexpr_for_lisp(void)
+    ಪೂರ್ಣಾಂಕ
+use_indentexpr_for_lisp(ಶೂನ್ಯ)
 {
-#ifdef FEAT_EVAL
-    return curbuf->b_p_lisp
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಹಿಂತಿರುಗಿ curbuf->b_p_lisp
 		&& *curbuf->b_p_inde != NUL
 		&& STRCMP(curbuf->b_p_lop, "expr:1") == 0;
-#else
-    return FALSE;
-#endif
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಹಿಂತಿರುಗಿ FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Fix indent for 'lisp' and 'cindent'.
  */
-    void
-fix_indent(void)
+    ಶೂನ್ಯ
+fix_indent(ಶೂನ್ಯ)
 {
-    if (p_paste)
-	return;  // no auto-indenting when 'paste' is set
-    if (curbuf->b_p_lisp && curbuf->b_p_ai)
+    ಆದರೆ (p_paste)
+	ಹಿಂತಿರುಗಿ;  // no auto-indenting when 'paste' is set
+    ಆದರೆ (curbuf->b_p_lisp && curbuf->b_p_ai)
     {
-	if (use_indentexpr_for_lisp())
-	    do_c_expr_indent();
-	else
+	ಆದರೆ (use_indentexpr_for_lisp())
+	    do_c_ಅಭಿವ್ಯಕ್ತಿ_indent();
+	ಇಲ್ಲದಿದ್ದರೆ
 	    fixthisline(get_lisp_indent);
     }
-    else if (cindent_on())
-	do_c_expr_indent();
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (cindent_on())
+	do_c_ಅಭಿವ್ಯಕ್ತಿ_indent();
 }
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * "indent()" function
  */
-    void
+    ಶೂನ್ಯ
 f_indent(typval_T *argvars, typval_T *rettv)
 {
     linenr_T	lnum;
 
-    if (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
-	return;
+    ಆದರೆ (ಒಳ_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
     lnum = tv_get_lnum(argvars);
-    if (lnum >= 1 && lnum <= curbuf->b_ml.ml_line_count)
-	rettv->vval.v_number = get_indent_lnum(lnum);
-    else
+    ಆದರೆ (lnum >= 1 && lnum <= curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
+	rettv->vval.v_ಸಂಖ್ಯೆ = get_indent_lnum(lnum);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (in_vim9script())
-	    semsg(_(e_invalid_line_number_nr), lnum);
-	rettv->vval.v_number = -1;
+	ಆದರೆ (ಒಳ_vim9script())
+	    semsg(_(e_invalid_ಸಾಲು_ಸಂಖ್ಯೆ_nr), lnum);
+	rettv->vval.v_ಸಂಖ್ಯೆ = -1;
     }
 }
 
 /*
  * "lispindent(lnum)" function
  */
-    void
-f_lispindent(typval_T *argvars UNUSED, typval_T *rettv)
+    ಶೂನ್ಯ
+f_lispindent(typval_T *argvars ಬಳಸದ, typval_T *rettv)
 {
     pos_T	pos;
     linenr_T	lnum;
 
-    if (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
-	return;
+    ಆದರೆ (ಒಳ_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
     pos = curwin->w_cursor;
     lnum = tv_get_lnum(argvars);
-    if (lnum >= 1 && lnum <= curbuf->b_ml.ml_line_count)
+    ಆದರೆ (lnum >= 1 && lnum <= curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
     {
 	curwin->w_cursor.lnum = lnum;
-	rettv->vval.v_number = get_lisp_indent();
+	rettv->vval.v_ಸಂಖ್ಯೆ = get_lisp_indent();
 	curwin->w_cursor = pos;
     }
-    else if (in_vim9script())
-	semsg(_(e_invalid_line_number_nr), lnum);
-    else
-	rettv->vval.v_number = -1;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಒಳ_vim9script())
+	semsg(_(e_invalid_ಸಾಲು_ಸಂಖ್ಯೆ_nr), lnum);
+    ಇಲ್ಲದಿದ್ದರೆ
+	rettv->vval.v_ಸಂಖ್ಯೆ = -1;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ

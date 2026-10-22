@@ -1,4 +1,4 @@
 #!/usr/bin/python3
 
-import sys
-print(sys.version)
+ಆಮದು sys
+ಮುದ್ರಿಸು(sys.ಆವೃತ್ತಿ_2)

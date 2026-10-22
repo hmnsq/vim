@@ -14,25 +14,25 @@
  * decimal form, one per line.
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
 // Declare nv_cmds[].
-#include "nv_cmds.h"
+#ಅನ್ತರ್ಭಾವ "nv_cmds.h"
 
-#include <stdio.h>
+#ಅನ್ತರ್ಭಾವ <stdio.h>
 
-int main(void)
+ಪೂರ್ಣಾಂಕ ಮುಖ್ಯ(ಶೂನ್ಯ)
 {
     size_t i;
 
-    for (i = 0; i < NV_CMDS_SIZE; i++)
+    ಗಾಗಿ (i = 0; i < NV_CMDS_ಗಾತ್ರ; i++)
     {
-	int cmdchar = nv_cmds[i];
+	ಪೂರ್ಣಾಂಕ cmdchar = nv_cmds[i];
 
 	// Special keys are negative, use the negated value for sorting.
-	if (cmdchar < 0)
+	ಆದರೆ (cmdchar < 0)
 	    cmdchar = -cmdchar;
-	printf("%d\n", cmdchar);
+	ಬರೆ("%d\n", cmdchar);
     }
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }

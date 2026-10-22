@@ -6,27 +6,27 @@
  * Do ":help credits" in Vim to see a list of people who contributed.
  */
 
-#ifndef VIM__H
-#define VIM__H
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ VIM__H
+#ವ್ಯಾಖ್ಯಾನಿಸು VIM__H
 
-#include "protodef.h"
+#ಅನ್ತರ್ಭಾವ "protodef.h"
 
 // _WIN32 is defined as 1 when the compilation target is 32-bit or 64-bit.
 // Note: If you want to check for 64-bit use the _WIN64 macro.
-#if defined(WIN32) || defined(_WIN32)
+#ಆದರೆ defined(WIN32) || defined(_WIN32)
 # define MSWIN
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(MSWIN)
+#ಆದರೆ defined(MSWIN)
 # include <io.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // ============ the header file puzzle: order matters =========
 
-#ifdef HAVE_CONFIG_H	// GNU autoconf (or something else) was here
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_CONFIG_H	// GNU autoconf (or something else) was here
 # ifdef VMS
 #  include "config.h"   /* Rely on /INCLUDE to find it. */
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  include "auto/config.h"
 # endif /* def VMS [else] */
 # define HAVE_PATHDEF
@@ -36,28 +36,28 @@
  * it becomes zero.  This is likely a problem of not being able to run the
  * test program.  Other items from configure may also be wrong then!
  */
-# if (VIM_SIZEOF_INT == 0)
-#  error configure did not run properly.  Check auto/config.log.
+# ಆದರೆ (VIM_SIZEOF_INT == 0)
+#  error configure did not ಸತತ properly.  Check ಸ್ವಯಂಚಾಲಿತ/config.ಲಘುಗಣಕ.
 # endif
 
-# if (defined(__linux__) && !defined(__ANDROID__)) || defined(__CYGWIN__) || defined(__GNU__)
+# ಆದರೆ (defined(__linux__) && !defined(__ANDROID__)) || defined(__CYGWIN__) || defined(__GNU__)
 // Needed for strptime().  Needs to be done early, since header files can
 // include other header files and end up including time.h, where these symbols
 // matter for Vim.
 // 700 is needed for mkdtemp().
-#  ifndef _XOPEN_SOURCE
-#   define _XOPEN_SOURCE    700
+#  ifndef XOPEN_ಮೂಲ
+#   define XOPEN_ಮೂಲ    700
 
 // On old systems, defining _XOPEN_SOURCE causes _BSD_SOURCE, _SVID_SOURCE
 // and/or // _DEFAULT_SOURCE not to be defined, so do that here.  Those are
 // needed to include nanosecond-resolution timestamps in struct stat.  On new
 // systems, _DEFAULT_SOURCE is needed to avoid warning messages about using
 // deprecated _BSD_SOURCE or _SVID_SOURCE.
-#   ifndef _BSD_SOURCE
-#    define _BSD_SOURCE 1
+#   ifndef BSD_ಮೂಲ
+#    define BSD_ಮೂಲ 1
 #   endif
-#   ifndef _SVID_SOURCE
-#    define _SVID_SOURCE 1
+#   ifndef SVID_ಮೂಲ
+#    define SVID_ಮೂಲ 1
 #   endif
 #   ifndef _DEFAULT_SOURCE
 #    define _DEFAULT_SOURCE 1
@@ -69,140 +69,140 @@
  * Cygwin may have fchdir() in a newer release, but in most versions it
  * doesn't work well and avoiding it keeps the binary backward compatible.
  */
-# if defined(__CYGWIN32__) && defined(HAVE_FCHDIR)
+# ಆದರೆ defined(__CYGWIN32__) && defined(HAVE_FCHDIR)
 #  undef HAVE_FCHDIR
 # endif
 
 // We may need to define the uint32_t on non-Unix system, but using the same
 // identifier causes conflicts.  Therefore use UINT32_T.
 # define UINT32_TYPEDEF uint32_t
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // for INT_MAX, LONG_MAX et al.
-#include <limits.h>
+#ಅನ್ತರ್ಭಾವ <limits.h>
 
-#if !defined(UINT32_TYPEDEF)
-# if defined(uint32_t)  // this doesn't catch typedefs, unfortunately
+#ಆದರೆ !defined(UINT32_TYPEDEF)
+# ಆದರೆ defined(uint32_t)  // this doesn't catch typedefs, unfortunately
 #  define UINT32_TYPEDEF uint32_t
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
   // Fall back to assuming unsigned int is 32 bit.  If this is wrong then the
   // test in blowfish.c will fail.
-#  define UINT32_TYPEDEF unsigned int
+#  define UINT32_TYPEDEF ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // C89 does not define SIZE_MAX
-#if defined(__hpux) || defined(VMS)
-# ifndef SIZE_MAX
-#  define SIZE_MAX ((size_t)(-1))
+#ಆದರೆ defined(__hpux) || defined(VMS)
+# ifndef ಗಾತ್ರ_MAX
+#  define ಗಾತ್ರ_MAX ((size_t)(-1))
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // user ID of root is usually zero, but not for everybody
-#ifdef __TANDEM
-# ifndef _TANDEM_SOURCE
-#  define _TANDEM_SOURCE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ __TANDEM
+# ifndef TANDEM_ಮೂಲ
+#  define TANDEM_ಮೂಲ
 # endif
 # include <floss.h>
-# define ROOT_UID 65535
+# define ಬೇರು_UID 65535
 # define OLDXAW
-# if (_TANDEM_ARCH_ == 2 && __H_Series_RVU >= 621)
+# ಆದರೆ (_TANDEM_ARCH_ == 2 && __H_Series_RVU >= 621)
 #  define SA_ONSTACK_COMPATIBILITY
 # endif
-#else
-# define ROOT_UID 0
-#endif
+#ಇಲ್ಲದಿದ್ದರೆ
+# define ಬೇರು_UID 0
+#ಆದರೆ_ಅಂತ್ಯ
 
 /* Include MAC_OS_X_VERSION_* macros */
-#ifdef HAVE_AVAILABILITYMACROS_H
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_AVAILABILITYMACROS_H
 # include <AvailabilityMacros.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * MACOS_X	    compiling for Mac OS X
  * MACOS_X_DARWIN   integrating the darwin feature into MACOS_X
  */
-#if defined(MACOS_X_DARWIN) && !defined(MACOS_X)
+#ಆದರೆ defined(MACOS_X_DARWIN) && !defined(MACOS_X)
 # define MACOS_X
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 // Unless made through the Makefile enforce GUI on Mac
-#if defined(MACOS_X) && !defined(HAVE_CONFIG_H)
+#ಆದರೆ defined(MACOS_X) && !defined(HAVE_CONFIG_H)
 # define UNIX
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_GUI_MOTIF) \
+#ಆದರೆ defined(FEAT_GUI_MOTIF) \
     || defined(FEAT_GUI_GTK) \
     || defined(FEAT_GUI_HAIKU) \
     || defined(FEAT_GUI_MSWIN) \
     || defined(FEAT_GUI_PHOTON)
-# if !defined(FEAT_GUI) && !defined(NO_X11_INCLUDES)
+# ಆದರೆ !defined(FEAT_GUI) && !defined(NO_X11_INCLUDES)
 #  define FEAT_GUI
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // Check support for rendering options
-#ifdef FEAT_GUI
-# if defined(FEAT_DIRECTX)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+# ಆದರೆ defined(FEAT_DIRECTX)
 #  define FEAT_RENDER_OPTIONS
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * VIM_SIZEOF_INT is used in feature.h, and the system-specific included files
  * need items from feature.h.  Therefore define VIM_SIZEOF_INT here.
  */
-#ifdef MSWIN
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
 # define VIM_SIZEOF_INT 4
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef AMIGA
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ AMIGA
   // Be conservative about sizeof(int). It could be 4 too.
 # ifndef FEAT_GUI_GTK	// avoid problems when generating prototypes
 #  ifdef __GNUC__
 #   define VIM_SIZEOF_INT	4
-#  else
+#  ಇಲ್ಲದಿದ್ದರೆ
 #   define VIM_SIZEOF_INT	2
 #  endif
 # endif
-#endif
-#if defined(MACOS_X) && !defined(HAVE_CONFIG_H)
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(MACOS_X) && !defined(HAVE_CONFIG_H)
 # define VIM_SIZEOF_INT __SIZEOF_INT__
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if VIM_SIZEOF_INT < 4 && !defined(PROTO)
-# error Vim only works with 32 bit int or larger
-#endif
+#ಆದರೆ VIM_SIZEOF_INT < 4 && !defined(PROTO)
+# error Vim only ಕೆಲಸಮಾಡುತ್ತದೆ with 32 ಬಿಟ್ ಪೂರ್ಣಾಂಕ or larger
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * #defines for optionals and features
  * Also defines FEAT_TINY, FEAT_NORMAL, etc. when FEAT_HUGE is defined.
  */
-#include "feature.h"
+#ಅನ್ತರ್ಭಾವ "feature.h"
 
-#if defined(MACOS_X_DARWIN)
-# if defined(FEAT_NORMAL) && !defined(FEAT_CLIPBOARD)
+#ಆದರೆ defined(MACOS_X_DARWIN)
+# ಆದರೆ defined(FEAT_ಸಾಮಾನ್ಯ) && !defined(FEAT_CLIPBOARD)
 #  define FEAT_CLIPBOARD
 # endif
-# if defined(FEAT_HUGE) && !defined(FEAT_SOUND) && \
+# ಆದರೆ defined(FEAT_HUGE) && !defined(FEAT_SOUND) && \
 	defined(__clang_major__) && __clang_major__ >= 7 && \
-	defined(MAC_OS_X_VERSION_MIN_REQUIRED) && MAC_OS_X_VERSION_MIN_REQUIRED >= 1060
+	defined(MAC_OS_X_ಆವೃತ್ತಿ_MIN_REQUIRED) && MAC_OS_X_ಆವೃತ್ತಿ_MIN_REQUIRED >= 1060
 #  define FEAT_SOUND
 # endif
-# if defined(FEAT_SOUND)
+# ಆದರೆ defined(FEAT_SOUND)
 #  define FEAT_SOUND_MACOSX
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // +x11 is only enabled when it's both available and wanted.
-#if defined(HAVE_X11) && defined(WANT_X11)
+#ಆದರೆ defined(HAVE_X11) && defined(WANT_X11)
 # define FEAT_X11
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(HAVE_WAYLAND) && defined(WANT_WAYLAND)
+#ಆದರೆ defined(HAVE_WAYLAND) && defined(WANT_WAYLAND)
 # define FEAT_WAYLAND
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef NO_X11_INCLUDES
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ NO_X11_INCLUDES
     // In os_mac_conv.c and os_macosx.m NO_X11_INCLUDES is defined to avoid
     // X11 headers.  Disable all X11 related things to avoid conflicts.
 # ifdef FEAT_X11
@@ -229,69 +229,69 @@
 # ifdef FEAT_CLIENTSERVER
 #  undef FEAT_CLIENTSERVER
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // The Mac conversion stuff doesn't work under X11.
-#if defined(MACOS_X_DARWIN)
+#ಆದರೆ defined(MACOS_X_DARWIN)
 # define MACOS_CONVERT
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // Can't use "PACKAGE" here, conflicts with a Perl include file.
-#ifndef VIMPACKAGE
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ VIMPACKAGE
 # define VIMPACKAGE	"vim"
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Find out if function definitions should include argument types
  */
-#ifdef AZTEC_C
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ AZTEC_C
 # include <functions.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef SASC
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SASC
 # include <clib/exec_protos.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef _DCC
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ _DCC
 # include <clib/exec_protos.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifndef PROTO
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ PROTO
 # ifdef __HAIKU__
 #  include "os_haiku.h"
 #  define __ARGS(x)  x
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if (defined(UNIX) || defined(VMS)) \
+#ಆದರೆ (defined(UNIX) || defined(VMS)) \
 	&& (!defined(MACOS_X) || defined(HAVE_CONFIG_H))
 # include "os_unix.h"	    // bring lots of system header files
-#elif !defined(PROTO)
+#ಅಥವಾಆದರೆ !defined(PROTO)
   // For all non-Unix systems: use old-fashioned signal().
-# define mch_signal(signum, sighandler) signal(signum, sighandler)
-#endif
+# define mch_signal(signum, sighandler) ಸಂಕೇತ(signum, sighandler)
+#ಆದರೆ_ಅಂತ್ಯ
 
 // Mark unused function arguments with UNUSED, so that gcc -Wunused-parameter
 // can be used to check for mistakes.
-#ifndef UNUSED
-# if defined(HAVE_ATTRIBUTE_UNUSED) || defined(__MINGW32__)
-#  define UNUSED __attribute__((unused))
-# else
-#  if defined __has_attribute
-#   if __has_attribute(unused)
-#    define UNUSED __attribute__((unused))
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ ಬಳಸದ
+# ಆದರೆ defined(HAVE_ATTRIBUTE_ಬಳಸದ) || defined(__MINGW32__)
+#  define ಬಳಸದ __attribute__((ಬಳಸದ_2))
+# ಇಲ್ಲದಿದ್ದರೆ
+#  ಆದರೆ defined __has_attribute
+#   ಆದರೆ __has_attribute(ಬಳಸದ_2)
+#    define ಬಳಸದ __attribute__((ಬಳಸದ_2))
 #   endif
 #  endif
 # endif
-# ifndef UNUSED
-#  define UNUSED
+# ifndef ಬಳಸದ
+#  define ಬಳಸದ
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // Used to check for "sun", "__sun" is used by newer compilers.
-#if defined(__sun)
+#ಆದರೆ defined(__sun)
 # define SUN_SYSTEM
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // If we're compiling in C++ (currently only KVim), the system
 // headers must have the correct prototypes or nothing will build.
@@ -299,12 +299,12 @@
 // cause compilation failures even though the headers are correct.  For
 // a concrete example, gcc-3.2 enforces exception specifications, and
 // glibc-2.2.5 has them in their system headers.
-#if !defined(__cplusplus) && defined(UNIX) \
+#ಆದರೆ !defined(__cplusplus) && defined(UNIX) \
        && !defined(MACOS_X) // MACOS_X doesn't yet support osdef.h
 # include "auto/osdef.h"	// bring missing declarations in
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifndef PROTO
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ PROTO
 # ifdef AMIGA
 #  include "os_amiga.h"
 # endif
@@ -313,92 +313,92 @@
 #  include "os_win32.h"
 # endif
 
-# if defined(MACOS_X)
+# ಆದರೆ defined(MACOS_X)
 #  include "os_mac.h"
 # endif
 
 # ifdef __QNX__
 #  include "os_qnx.h"
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef X_LOCALE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ X_LOCALE
 # include <X11/Xlocale.h>
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 # ifdef HAVE_LOCALE_H
 #  include <locale.h>
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Maximum length of a path (for non-unix systems) Make it a bit long, to stay
  * on the safe side.  But not too long to put on the stack.
  */
-#ifndef MAXPATHL
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ MAXPATHL
 # ifdef MAXPATHLEN
 #  define MAXPATHL  MAXPATHLEN
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  define MAXPATHL  256
 # endif
-#endif
-#ifdef BACKSLASH_IN_FILENAME
-# define PATH_ESC_CHARS ((char_u *)" \t\n*?[{`%#'\"|!<")
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ BACKSLASH_ಒಳ_FILENAME
+# define ಮಾರ್ಗ_ESC_CHARS ((char_u *)" \t\n*?[{`%#'\"|!<")
 // '%' and '#' are not escaped for ":buffer": it has no EX_XFILE, so they are
 // not expanded, and escaping them as "\%"/"\#" breaks buffer name matching
 // when '%'/'#' is in 'isfname' (backslash treated as a path separator).
-# define BUFFER_ESC_CHARS ((char_u *)" \t\n*?[`'\"|!<")
-#else
+# define ಬಫರ್_ESC_CHARS ((char_u *)" \t\n*?[`'\"|!<")
+#ಇಲ್ಲದಿದ್ದರೆ
 # ifdef VMS
     // VMS allows a lot of characters in the file name
-#  define PATH_ESC_CHARS ((char_u *)" \t\n*?{`\\%#'\"|!")
+#  define ಮಾರ್ಗ_ESC_CHARS ((char_u *)" \t\n*?{`\\%#'\"|!")
 #  define SHELL_ESC_CHARS ((char_u *)" \t\n*?{`\\%#'|!()&")
-# else
-#  define PATH_ESC_CHARS ((char_u *)" \t\n*?[{`$\\%#'\"|!<")
+# ಇಲ್ಲದಿದ್ದರೆ
+#  define ಮಾರ್ಗ_ESC_CHARS ((char_u *)" \t\n*?[{`$\\%#'\"|!<")
 #  define SHELL_ESC_CHARS ((char_u *)" \t\n*?[{`$\\%#'\"|!<>();&")
 # endif
-# define BUFFER_ESC_CHARS ((char_u *)" \t\n*?[`$\\%#'\"|!<")
-#endif
+# define ಬಫರ್_ESC_CHARS ((char_u *)" \t\n*?[`$\\%#'\"|!<")
+#ಆದರೆ_ಅಂತ್ಯ
 
 // length of a buffer to store a number in ASCII (64 bits binary + NUL)
-#define NUMBUFLEN 65
+#ವ್ಯಾಖ್ಯಾನಿಸು NUMBUFLEN 65
 
 // flags for vim_str2nr()
-#define STR2NR_BIN  0x01
-#define STR2NR_OCT  0x02
-#define STR2NR_HEX  0x04
-#define STR2NR_OOCT 0x08    // Octal with prefix "0o": 0o777
-#define STR2NR_ALL (STR2NR_BIN + STR2NR_OCT + STR2NR_HEX + STR2NR_OOCT)
-#define STR2NR_NO_OCT (STR2NR_BIN + STR2NR_HEX + STR2NR_OOCT)
+#ವ್ಯಾಖ್ಯಾನಿಸು STR2NR_BIN  0x01
+#ವ್ಯಾಖ್ಯಾನಿಸು STR2NR_OCT  0x02
+#ವ್ಯಾಖ್ಯಾನಿಸು STR2NR_HEX  0x04
+#ವ್ಯಾಖ್ಯಾನಿಸು STR2NR_OOCT 0x08    // Octal with prefix "0o": 0o777
+#ವ್ಯಾಖ್ಯಾನಿಸು STR2NR_ALL (STR2NR_BIN + STR2NR_OCT + STR2NR_HEX + STR2NR_OOCT)
+#ವ್ಯಾಖ್ಯಾನಿಸು STR2NR_NO_OCT (STR2NR_BIN + STR2NR_HEX + STR2NR_OOCT)
 
-#define STR2NR_FORCE 0x80   // only when ONE of the above is used
+#ವ್ಯಾಖ್ಯಾನಿಸು STR2NR_FORCE 0x80   // only when ONE of the above is used
 
-#define STR2NR_QUOTE 0x10   // ignore embedded single quotes
+#ವ್ಯಾಖ್ಯಾನಿಸು STR2NR_QUOTE 0x10   // ignore embedded single quotes
 
 /*
  * Shorthand for unsigned variables. Many systems, but not all, have u_char
  * already defined, so we use char_u to avoid trouble.
  */
-typedef unsigned char	char_u;
-typedef unsigned short	short_u;
-typedef unsigned int	int_u;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ	char_u;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಚಿಹ್ನೆರಹಿತ ಗಿಡ್ಡ	short_u;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ	int_u;
 
 // Make sure long_u is big enough to hold a pointer.
 // On Win64, longs are 32 bits and pointers are 64 bits.
 // For printf() and scanf(), we need to take care of long_u specifically.
-#ifdef _WIN64
-typedef unsigned __int64	long_u;
-typedef		 __int64	long_i;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ _WIN64
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಚಿಹ್ನೆರಹಿತ __int64	long_u;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ		 __int64	long_i;
 # define SCANF_HEX_LONG_U       "%llx"
 # define SCANF_DECIMAL_LONG_U   "%llu"
 # define PRINTF_HEX_LONG_U      "0x%llx"
-#else
-typedef unsigned long		long_u;
-typedef		 long		long_i;
+#ಇಲ್ಲದಿದ್ದರೆ
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ		long_u;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ		 ದೀರ್ಘ		long_i;
 # define SCANF_HEX_LONG_U       "%lx"
 # define SCANF_DECIMAL_LONG_U   "%lu"
 # define PRINTF_HEX_LONG_U      "0x%lx"
-#endif
-#define PRINTF_DECIMAL_LONG_U SCANF_DECIMAL_LONG_U
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿಸು PRINTF_DECIMAL_LONG_U SCANF_DECIMAL_LONG_U
 
 /*
  * Only systems which use configure will have SIZEOF_OFF_T and VIM_SIZEOF_LONG
@@ -406,9 +406,9 @@ typedef		 long		long_i;
  * varying sizes for off_t.  The other systems will continue to use "%ld" to
  * print off_t since off_t is simply a typedef to long for them.
  */
-#if defined(SIZEOF_OFF_T) && (SIZEOF_OFF_T > VIM_SIZEOF_LONG)
+#ಆದರೆ defined(SIZEOF_OFF_T) && (SIZEOF_OFF_T > VIM_SIZEOF_LONG)
 # define LONG_LONG_OFF_T
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * We use 64-bit file functions here, if available.  E.g. ftello() returns
@@ -416,90 +416,90 @@ typedef		 long		long_i;
  * We assume that when fseeko() is available then ftello() is too.
  * Note that Windows has different function names.
  */
-#if defined(MSWIN) && !defined(PROTO)
-typedef __int64 off_T;
+#ಆದರೆ defined(MSWIN) && !defined(PROTO)
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ __int64 off_T;
 # ifdef __MINGW32__
 #  define vim_lseek lseek64
 #  define vim_fseek fseeko64
 #  define vim_ftell ftello64
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  define vim_lseek _lseeki64
 #  define vim_fseek _fseeki64
 #  define vim_ftell _ftelli64
 # endif
-#else
-typedef off_t off_T;
+#ಇಲ್ಲದಿದ್ದರೆ
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ off_t off_T;
 # ifdef HAVE_FSEEKO
 #  define vim_lseek lseek
 #  define vim_ftell ftello
 #  define vim_fseek fseeko
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  define vim_lseek lseek
 #  define vim_ftell ftell
-#  define vim_fseek(a, b, c)	fseek(a, (long)b, c)
+#  define vim_fseek(a, b, c)	fseek(a, (ದೀರ್ಘ)b, c)
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * The characters and attributes cached for the screen.
  */
-typedef char_u schar_T;
-typedef unsigned short sattr_T;
-#define MAX_TYPENR 65535
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ char_u schar_T;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಚಿಹ್ನೆರಹಿತ ಗಿಡ್ಡ sattr_T;
+#ವ್ಯಾಖ್ಯಾನಿಸು MAX_TYPENR 65535
 
 /*
  * The u8char_T can hold one decoded UTF-8 character.
  * We use 32 bits, since some Asian characters don't fit in 16 bits.
  */
-typedef unsigned int u8char_T;	// int is 32 bits or more
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ u8char_T;	// int is 32 bits or more
 
 /*
  * The vimlong_T has sizeof(vimlong_T) >= 2 * sizeof(int).
  * One use is simple handling of overflow in int calculations.
  */
-#if defined(VMS) && defined(VAX)
+#ಆದರೆ defined(VMS) && defined(VAX)
 // unsupported compiler
-typedef long      vimlong_T;
-#else
-typedef long long vimlong_T;
-#endif
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ದೀರ್ಘ      vimlong_T;
+#ಇಲ್ಲದಿದ್ದರೆ
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ದೀರ್ಘ ದೀರ್ಘ vimlong_T;
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifndef UNIX		    // For Unix this is included in os_unix.h
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ UNIX		    // For Unix this is included in os_unix.h
 # include <stdio.h>
 # include <ctype.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#include "ascii.h"
-#include "keymap.h"
-#include "termdefs.h"
-#include "macros.h"
+#ಅನ್ತರ್ಭಾವ "ascii.h"
+#ಅನ್ತರ್ಭಾವ "keymap.h"
+#ಅನ್ತರ್ಭಾವ "termdefs.h"
+#ಅನ್ತರ್ಭಾವ "macros.h"
 
-#ifdef LATTICE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ LATTICE
 # include <sys/types.h>
 # include <sys/stat.h>
-#endif
-#ifdef _DCC
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ _DCC
 # include <sys/stat.h>
-#endif
-#if defined(MSWIN)
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(MSWIN)
 # include <sys/stat.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(HAVE_ERRNO_H) || defined(MSWIN)
+#ಆದರೆ defined(HAVE_ERRNO_H) || defined(MSWIN)
 # include <errno.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Allow other (non-unix) systems to configure themselves now
  * These are also in os_unix.h, because osdef.sh needs them there.
  */
-#ifndef UNIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ UNIX
 // Note: Some systems need both string.h and strings.h (Savage).  If the
 // system can't handle this, define NO_STRINGS_WITH_STRING_H.
 # ifdef HAVE_STRING_H
 #  include <string.h>
 # endif
-# if defined(HAVE_STRINGS_H) && !defined(NO_STRINGS_WITH_STRING_H)
+# ಆದರೆ defined(HAVE_ಅಕ್ಷರಸರಣಿಗಳು_H) && !defined(NO_ಅಕ್ಷರಸರಣಿಗಳು_WITH_STRING_H)
 #  include <strings.h>
 # endif
 # ifdef HAVE_STAT_H
@@ -508,77 +508,77 @@ typedef long long vimlong_T;
 # ifdef HAVE_STDLIB_H
 #  include <stdlib.h>
 # endif
-#endif // NON-UNIX
+#ಆದರೆ_ಅಂತ್ಯ // NON-UNIX
 
-#include <assert.h>
+#ಅನ್ತರ್ಭಾವ <assert.h>
 
-#ifdef HAVE_STDINT_H
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_STDINT_H
 # include <stdint.h>
-#endif
-#ifdef HAVE_INTTYPES_H
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_INTTYPES_H
 # include <inttypes.h>
-#endif
-#ifdef HAVE_WCTYPE_H
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_WCTYPE_H
 # include <wctype.h>
-#endif
-#include <stdarg.h>
+#ಆದರೆ_ಅಂತ್ಯ
+#ಅನ್ತರ್ಭಾವ <stdarg.h>
 // older compilers do not define va_copy
-#ifndef va_copy
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ va_copy
 # define va_copy(dst, src)	((dst) = (src))
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // for offsetof()
-#include <stddef.h>
-#include <stdbool.h>
+#ಅನ್ತರ್ಭಾವ <stddef.h>
+#ಅನ್ತರ್ಭಾವ <stdbool.h>
 
-#if defined(HAVE_SYS_SELECT_H) && \
-	(!defined(HAVE_SYS_TIME_H) || defined(SYS_SELECT_WITH_SYS_TIME))
+#ಆದರೆ defined(HAVE_SYS_SELECT_H) && \
+	(!defined(HAVE_SYS_ಸಮಯ_H) || defined(SYS_SELECT_WITH_SYS_ಸಮಯ))
 # include <sys/select.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifndef HAVE_SELECT
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ HAVE_SELECT
 # ifdef HAVE_SYS_POLL_H
 #  include <sys/poll.h>
 # elif defined(MSWIN)
 #  define HAVE_SELECT
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  ifdef HAVE_POLL_H
 #   include <poll.h>
 #  endif
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef HAVE_SODIUM
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_SODIUM
 # include <sodium.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // ================ end of the header file puzzle ===============
 
 /*
  * For dynamically loaded imm library. Currently, only for Win32.
  */
-#ifdef DYNAMIC_IME
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DYNAMIC_IME
 # ifndef FEAT_MBYTE_IME
 #  define FEAT_MBYTE_IME
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * For dynamically loaded gettext library.  Currently, only for Win32.
  */
-#ifdef DYNAMIC_GETTEXT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DYNAMIC_GETTEXT
 # ifndef FEAT_GETTEXT
 #  define FEAT_GETTEXT
 # endif
 // These are in os_win32.c
-extern char *(*dyn_libintl_gettext)(const char *msgid);
-extern char *(*dyn_libintl_ngettext)(const char *msgid, const char *msgid_plural, unsigned long n);
-extern char *(*dyn_libintl_bindtextdomain)(const char *domainname, const char *dirname);
-extern char *(*dyn_libintl_bind_textdomain_codeset)(const char *domainname, const char *codeset);
-extern char *(*dyn_libintl_textdomain)(const char *domainname);
-extern int (*dyn_libintl_wputenv)(const wchar_t *envstring);
-extern int *dyn_libintl_nl_msg_cat_cntr;
-#endif
+ಬಾಹ್ಯ ಅಕ್ಷರ *(*dyn_libintl_gettext)(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *msgid);
+ಬಾಹ್ಯ ಅಕ್ಷರ *(*dyn_libintl_ngettext)(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *msgid, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *msgid_plural, ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ n);
+ಬಾಹ್ಯ ಅಕ್ಷರ *(*dyn_libintl_bindtextdomain)(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *domainname, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *dirname);
+ಬಾಹ್ಯ ಅಕ್ಷರ *(*dyn_libintl_bind_textdomain_codeset)(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *domainname, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *codeset);
+ಬಾಹ್ಯ ಅಕ್ಷರ *(*dyn_libintl_textdomain)(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *domainname);
+ಬಾಹ್ಯ ಪೂರ್ಣಾಂಕ (*dyn_libintl_wputenv)(ಸ್ಥಿರಾಂಕ wchar_t *envstring);
+ಬಾಹ್ಯ ಪೂರ್ಣಾಂಕ *dyn_libintl_nl_ಸಂದೇಶ_cat_cntr;
+#ಆದರೆ_ಅಂತ್ಯ
 
 
 /*
@@ -589,31 +589,31 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
  * - multi  - message for plural form
  * - number - the count
  */
-#ifdef FEAT_GETTEXT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GETTEXT
 # ifdef DYNAMIC_GETTEXT
-#  define _(x) (*dyn_libintl_gettext)((char *)(x))
-#  define NGETTEXT(x, xs, n) (*dyn_libintl_ngettext)((char *)(x), (char *)(xs), (n))
+#  define _(x) (*dyn_libintl_gettext)((ಅಕ್ಷರ *)(x))
+#  define NGETTEXT(x, xs, n) (*dyn_libintl_ngettext)((ಅಕ್ಷರ *)(x), (ಅಕ್ಷರ *)(xs), (n))
 #  define N_(x) x
 #  define bindtextdomain(domain, dir) (*dyn_libintl_bindtextdomain)((domain), (dir))
 #  define bind_textdomain_codeset(domain, codeset) (*dyn_libintl_bind_textdomain_codeset)((domain), (codeset))
-#  if !defined(HAVE_BIND_TEXTDOMAIN_CODESET)
+#  ಆದರೆ !defined(HAVE_BIND_TEXTDOMAIN_CODESET)
 #   define HAVE_BIND_TEXTDOMAIN_CODESET 1
 #  endif
 #  define textdomain(domain) (*dyn_libintl_textdomain)(domain)
 #  define libintl_wputenv(envstring) (*dyn_libintl_wputenv)(envstring)
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  include <libintl.h>
-#  define _(x) gettext((char *)(x))
+#  define _(x) gettext((ಅಕ್ಷರ *)(x))
 #  define NGETTEXT(x, xs, n) ngettext((x), (xs), (n))
 #  ifdef gettext_noop
 #   define N_(x) gettext_noop(x)
-#  else
+#  ಇಲ್ಲದಿದ್ದರೆ
 #   define N_(x) x
 #  endif
 # endif
-#else
-# define _(x) ((char *)(x))
-# define NGETTEXT(x, xs, n) (((n) == 1) ? (char *)(x) : (char *)(xs))
+#ಇಲ್ಲದಿದ್ದರೆ
+# define _(x) ((ಅಕ್ಷರ *)(x))
+# define NGETTEXT(x, xs, n) (((n) == 1) ? (ಅಕ್ಷರ *)(x) : (ಅಕ್ಷರ *)(xs))
 # define N_(x) x
 # ifdef bindtextdomain
 #  undef bindtextdomain
@@ -622,34 +622,34 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 # ifdef bind_textdomain_codeset
 #  undef bind_textdomain_codeset
 # endif
-# define bind_textdomain_codeset(x, y) // empty
+# define bind_textdomain_codeset(x, y) //ಖಾಲಿಗಳು
 # ifdef textdomain
 #  undef textdomain
 # endif
-# define textdomain(x) // empty
-#endif
+# define textdomain(x) //ಖಾಲಿಗಳು
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Flags for update_screen().
  * The higher the value, the higher the priority.
  */
-#define UPD_VALID_NO_UPDATE	 5  // no new changes, keep the command line if
+#ವ್ಯಾಖ್ಯಾನಿಸು UPD_VALID_NO_UPDATE	 5  // no new changes, keep the command line if
 				    // possible
-#define UPD_VALID		10  // buffer not changed, or changes marked
+#ವ್ಯಾಖ್ಯಾನಿಸು UPD_VALID		10  // buffer not changed, or changes marked
 				    // with b_mod_*
-#define UPD_INVERTED		20  // redisplay inverted part that changed
-#define UPD_INVERTED_ALL	25  // redisplay whole inverted part
-#define UPD_REDRAW_TOP		30  // display first w_upd_rows screen lines
-#define UPD_SOME_VALID		35  // like UPD_NOT_VALID but may scroll
-#define UPD_NOT_VALID		40  // buffer needs complete redraw
-#define UPD_CLEAR		50  // screen messed up, clear it
+#ವ್ಯಾಖ್ಯಾನಿಸು UPD_INVERTED		20  // redisplay inverted part that changed
+#ವ್ಯಾಖ್ಯಾನಿಸು UPD_INVERTED_ALL	25  // redisplay whole inverted part
+#ವ್ಯಾಖ್ಯಾನಿಸು UPD_REDRAW_ತುದಿ		30  // display first w_upd_rows screen lines
+#ವ್ಯಾಖ್ಯಾನಿಸು UPD_SOME_VALID		35  // like UPD_NOT_VALID but may scroll
+#ವ್ಯಾಖ್ಯಾನಿಸು UPD_NOT_VALID		40  // buffer needs complete redraw
+#ವ್ಯಾಖ್ಯಾನಿಸು UPD_CLEAR		50  // screen messed up, clear it
 
 // flags for screen_line()
-#define SLF_RIGHTLEFT	1
-#define SLF_POPUP	2
-#define SLF_INC_VCOL	4
+#ವ್ಯಾಖ್ಯಾನಿಸು SLF_RIGHTLEFT	1
+#ವ್ಯಾಖ್ಯಾನಿಸು SLF_POPUP	2
+#ವ್ಯಾಖ್ಯಾನಿಸು SLF_INC_VCOL	4
 
-#define MB_FILLER_CHAR '<'  // character used when a double-width character
+#ವ್ಯಾಖ್ಯಾನಿಸು MB_FILLER_CHAR '<'  // character used when a double-width character
 			    // doesn't fit.
 
 /*
@@ -671,60 +671,60 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
  *     off		off		w_botline not valid
  *     on		off		not possible
  */
-#define VALID_WROW	0x01	// w_wrow (window row) is valid
-#define VALID_WCOL	0x02	// w_wcol (window col) is valid
-#define VALID_VIRTCOL	0x04	// w_virtcol (file col) is valid
-#define VALID_CHEIGHT	0x08	// w_cline_height and w_cline_folded valid
-#define VALID_CROW	0x10	// w_cline_row is valid
-#define VALID_BOTLINE	0x20	// w_botline and w_empty_rows are valid
-#define VALID_BOTLINE_AP 0x40	// w_botline is approximated
-#define VALID_TOPLINE	0x80	// w_topline is valid (for cursor position)
+#ವ್ಯಾಖ್ಯಾನಿಸು VALID_WROW	0x01	// w_wrow (window row) is valid
+#ವ್ಯಾಖ್ಯಾನಿಸು VALID_WCOL	0x02	// w_wcol (window col) is valid
+#ವ್ಯಾಖ್ಯಾನಿಸು VALID_VIRTCOL	0x04	// w_virtcol (file col) is valid
+#ವ್ಯಾಖ್ಯಾನಿಸು VALID_CHEIGHT	0x08	// w_cline_height and w_cline_folded valid
+#ವ್ಯಾಖ್ಯಾನಿಸು VALID_CROW	0x10	// w_cline_row is valid
+#ವ್ಯಾಖ್ಯಾನಿಸು VALID_BOTLINE	0x20	// w_botline and w_empty_rows are valid
+#ವ್ಯಾಖ್ಯಾನಿಸು VALID_BOTLINE_AP 0x40	// w_botline is approximated
+#ವ್ಯಾಖ್ಯಾನಿಸು VALID_TOPLINE	0x80	// w_topline is valid (for cursor position)
 
 // Values for w_popup_flags.
-#define POPF_IS_POPUP	0x01	// this is a popup window
-#define POPF_HIDDEN	0x02	// popup is not displayed
-#define POPF_HIDDEN_FORCE 0x04	// popup is explicitly set to not be displayed
-#define POPF_CURSORLINE	0x08	// popup is highlighting at the cursorline
-#define POPF_ON_CMDLINE	0x10	// popup overlaps command line
-#define POPF_DRAG	0x20	// popup can be moved by dragging border
-#define POPF_DRAGALL	0x40	// popup can be moved by dragging everywhere
-#define POPF_RESIZE	0x80	// popup can be resized by dragging
-#define POPF_MAPPING	0x100	// mapping keys
-#define POPF_INFO	0x200	// used for info of popup menu
-#define POPF_INFO_MENU	0x400	// align info popup with popup menu
-#define POPF_POSINVERT	0x800	// vertical position can be inverted
-#define POPF_OPACITY 0x1000	// popup has opacity/transparency setting
-#define POPF_CLIPWINDOW	0x2000	// confine popup to its host window's rect
-#define POPF_GLOBAL	0x4000	// popup is global (not tabpage local)
+#ವ್ಯಾಖ್ಯಾನಿಸು POPF_IS_POPUP	0x01	// this is a popup window
+#ವ್ಯಾಖ್ಯಾನಿಸು POPF_HIDDEN	0x02	// popup is not displayed
+#ವ್ಯಾಖ್ಯಾನಿಸು POPF_HIDDEN_FORCE 0x04	// popup is explicitly set to not be displayed
+#ವ್ಯಾಖ್ಯಾನಿಸು POPF_CURSORLINE	0x08	// popup is highlighting at the cursorline
+#ವ್ಯಾಖ್ಯಾನಿಸು POPF_ON_CMDLINE	0x10	// popup overlaps command line
+#ವ್ಯಾಖ್ಯಾನಿಸು POPF_DRAG	0x20	// popup can be moved by dragging border
+#ವ್ಯಾಖ್ಯಾನಿಸು POPF_DRAGALL	0x40	// popup can be moved by dragging everywhere
+#ವ್ಯಾಖ್ಯಾನಿಸು POPF_RESIZE	0x80	// popup can be resized by dragging
+#ವ್ಯಾಖ್ಯಾನಿಸು POPF_MAPPING	0x100	// mapping keys
+#ವ್ಯಾಖ್ಯಾನಿಸು POPF_INFO	0x200	// used for info of popup menu
+#ವ್ಯಾಖ್ಯಾನಿಸು POPF_INFO_MENU	0x400	// align info popup with popup menu
+#ವ್ಯಾಖ್ಯಾನಿಸು POPF_POSINVERT	0x800	// vertical position can be inverted
+#ವ್ಯಾಖ್ಯಾನಿಸು POPF_OPACITY 0x1000	// popup has opacity/transparency setting
+#ವ್ಯಾಖ್ಯಾನಿಸು POPF_CLIPWINDOW	0x2000	// confine popup to its host window's rect
+#ವ್ಯಾಖ್ಯಾನಿಸು POPF_GLOBAL	0x4000	// popup is global (not tabpage local)
 
 // flags used in w_popup_handled
-#define POPUP_HANDLED_1	    0x01    // used by mouse_find_win()
-#define POPUP_HANDLED_2	    0x02    // used by popup_do_filter()
-#define POPUP_HANDLED_3	    0x04    // used by popup_check_cursor_pos()
-#define POPUP_HANDLED_4	    0x08    // used by may_update_popup_mask()
-#define POPUP_HANDLED_5	    0x10    // used by update_popups() and
+#ವ್ಯಾಖ್ಯಾನಿಸು POPUP_HANDLED_1	    0x01    // used by mouse_find_win()
+#ವ್ಯಾಖ್ಯಾನಿಸು POPUP_HANDLED_2	    0x02    // used by popup_do_filter()
+#ವ್ಯಾಖ್ಯಾನಿಸು POPUP_HANDLED_3	    0x04    // used by popup_check_cursor_pos()
+#ವ್ಯಾಖ್ಯಾನಿಸು POPUP_HANDLED_4	    0x08    // used by may_update_popup_mask()
+#ವ್ಯಾಖ್ಯಾನಿಸು POPUP_HANDLED_5	    0x10    // used by update_popups() and
 				    // update_popup_images()
 
 /*
  * Terminal highlighting attribute bits.
  * Attributes above HL_ALL are used for syntax highlighting.
  */
-#define HL_NORMAL		0x00
-#define HL_INVERSE		0x01
-#define HL_BOLD			0x02
-#define HL_ITALIC		0x04
-#define HL_UNDERLINE		0x08
-#define HL_UNDERCURL		0x10
-#define HL_UNDERDOUBLE		0x20
-#define HL_UNDERDOTTED		0x40
-#define HL_UNDERDASHED		0x80
-#define HL_STANDOUT		0x100
-#define HL_NOCOMBINE		0x200
-#define HL_STRIKETHROUGH	0x400
-#define HL_ALL			0x7ff
+#ವ್ಯಾಖ್ಯಾನಿಸು HL_ಸಾಮಾನ್ಯ		0x00
+#ವ್ಯಾಖ್ಯಾನಿಸು HL_INVERSE		0x01
+#ವ್ಯಾಖ್ಯಾನಿಸು HL_BOLD			0x02
+#ವ್ಯಾಖ್ಯಾನಿಸು HL_ITALIC		0x04
+#ವ್ಯಾಖ್ಯಾನಿಸು HL_UNDERLINE		0x08
+#ವ್ಯಾಖ್ಯಾನಿಸು HL_UNDERCURL		0x10
+#ವ್ಯಾಖ್ಯಾನಿಸು HL_UNDERDOUBLE		0x20
+#ವ್ಯಾಖ್ಯಾನಿಸು HL_UNDERDOTTED		0x40
+#ವ್ಯಾಖ್ಯಾನಿಸು HL_UNDERDASHED		0x80
+#ವ್ಯಾಖ್ಯಾನಿಸು HL_STANDOUT		0x100
+#ವ್ಯಾಖ್ಯಾನಿಸು HL_NOCOMBINE		0x200
+#ವ್ಯಾಖ್ಯಾನಿಸು HL_STRIKETHROUGH	0x400
+#ವ್ಯಾಖ್ಯಾನಿಸು HL_ALL			0x7ff
 
 // special attribute addition: Put message in history
-#define MSG_HIST		0x1000
+#ವ್ಯಾಖ್ಯಾನಿಸು ಸಂದೇಶ_HIST		0x1000
 
 /*
  * Values for State.
@@ -735,243 +735,243 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
  * The upper bits are used to distinguish between other states and variants of
  * the base modes.
  */
-#define MODE_NORMAL	0x01	// Normal mode, command expected
-#define MODE_VISUAL	0x02	// Visual mode - use get_real_state()
-#define MODE_OP_PENDING	0x04	// Normal mode, operator is pending - use
+#ವ್ಯಾಖ್ಯಾನಿಸು ಬಹುಲಕ_ಸಾಮಾನ್ಯ	0x01	// Normal mode, command expected
+#ವ್ಯಾಖ್ಯಾನಿಸು ಬಹುಲಕ_VISUAL	0x02	// Visual mode - use get_real_state()
+#ವ್ಯಾಖ್ಯಾನಿಸು ಬಹುಲಕ_OP_PENDING	0x04	// Normal mode, operator is pending - use
 				// get_real_state()
-#define MODE_CMDLINE	0x08	// Editing the command line
-#define MODE_INSERT	0x10	// Insert mode, also for Replace mode
-#define MODE_LANGMAP	0x20	// Language mapping, can be combined with
+#ವ್ಯಾಖ್ಯಾನಿಸು ಬಹುಲಕ_CMDLINE	0x08	// Editing the command line
+#ವ್ಯಾಖ್ಯಾನಿಸು ಬಹುಲಕ_ಸೇರಿಸು	0x10	// Insert mode, also for Replace mode
+#ವ್ಯಾಖ್ಯಾನಿಸು ಬಹುಲಕ_LANGMAP	0x20	// Language mapping, can be combined with
 				// MODE_INSERT and MODE_CMDLINE
-#define MODE_SELECT	0x40	// Select mode, use get_real_state()
-#define MODE_TERMINAL	0x80	// Terminal mode
+#ವ್ಯಾಖ್ಯಾನಿಸು ಬಹುಲಕ_SELECT	0x40	// Select mode, use get_real_state()
+#ವ್ಯಾಖ್ಯಾನಿಸು ಬಹುಲಕ_TERMINAL	0x80	// Terminal mode
 
-#define MAP_ALL_MODES	0xff    // all mode bits used for mapping
+#ವ್ಯಾಖ್ಯಾನಿಸು MAP_ALL_MODES	0xff    // all mode bits used for mapping
 
-#define REPLACE_FLAG	0x100	// Replace mode flag
-#define MODE_REPLACE	(REPLACE_FLAG | MODE_INSERT)
-#define VREPLACE_FLAG	0x200	// Virtual-replace mode flag
-#define MODE_VREPLACE	(REPLACE_FLAG | VREPLACE_FLAG | MODE_INSERT)
-#define MODE_LREPLACE	(REPLACE_FLAG | MODE_LANGMAP)
+#ವ್ಯಾಖ್ಯಾನಿಸು REPLACE_FLAG	0x100	// Replace mode flag
+#ವ್ಯಾಖ್ಯಾನಿಸು ಬಹುಲಕ_REPLACE	(REPLACE_FLAG | ಬಹುಲಕ_ಸೇರಿಸು)
+#ವ್ಯಾಖ್ಯಾನಿಸು VREPLACE_FLAG	0x200	// Virtual-replace mode flag
+#ವ್ಯಾಖ್ಯಾನಿಸು ಬಹುಲಕ_VREPLACE	(REPLACE_FLAG | VREPLACE_FLAG | ಬಹುಲಕ_ಸೇರಿಸು)
+#ವ್ಯಾಖ್ಯಾನಿಸು ಬಹುಲಕ_LREPLACE	(REPLACE_FLAG | ಬಹುಲಕ_LANGMAP)
 
-#define MODE_NORMAL_BUSY (0x1000 | MODE_NORMAL)
+#ವ್ಯಾಖ್ಯಾನಿಸು ಬಹುಲಕ_ಸಾಮಾನ್ಯ_BUSY (0x1000 | ಬಹುಲಕ_ಸಾಮಾನ್ಯ)
 				// Normal mode, busy with a command
-#define MODE_HITRETURN	(0x2000 | MODE_NORMAL)
+#ವ್ಯಾಖ್ಯಾನಿಸು ಬಹುಲಕ_HITRETURN	(0x2000 | ಬಹುಲಕ_ಸಾಮಾನ್ಯ)
 				// waiting for return or command
-#define MODE_ASKMORE	0x3000	// Asking if you want --more--
-#define MODE_SETWSIZE	0x4000	// window size has changed
-#define MODE_EXTERNCMD	0x5000	// executing an external command
-#define MODE_SHOWMATCH	(0x6000 | MODE_INSERT) // show matching paren
-#define MODE_CONFIRM	0x7000	// ":confirm" prompt
-#define MODE_ALL	0xffff
+#ವ್ಯಾಖ್ಯಾನಿಸು ಬಹುಲಕ_ASKMORE	0x3000	// Asking if you want --more--
+#ವ್ಯಾಖ್ಯಾನಿಸು ಬಹುಲಕ_SETWSIZE	0x4000	// window size has changed
+#ವ್ಯಾಖ್ಯಾನಿಸು ಬಹುಲಕ_EXTERNCMD	0x5000	// executing an external command
+#ವ್ಯಾಖ್ಯಾನಿಸು ಬಹುಲಕ_SHOWMATCH	(0x6000 | ಬಹುಲಕ_ಸೇರಿಸು) // show matching paren
+#ವ್ಯಾಖ್ಯಾನಿಸು ಬಹುಲಕ_CONFIRM	0x7000	// ":confirm" prompt
+#ವ್ಯಾಖ್ಯಾನಿಸು ಬಹುಲಕ_ALL	0xffff
 
-#define MODE_MAX_LENGTH	4	// max mode length used by get_mode(),
+#ವ್ಯಾಖ್ಯಾನಿಸು ಬಹುಲಕ_MAX_ಉದ್ದಳತೆ	4	// max mode length used by get_mode(),
 				// including the terminating NUL
 
 // directions
-#define FORWARD			1
-#define BACKWARD		(-1)
-#define FORWARD_FILE		3
-#define BACKWARD_FILE		(-3)
+#ವ್ಯಾಖ್ಯಾನಿಸು FORWARD			1
+#ವ್ಯಾಖ್ಯಾನಿಸು BACKWARD		(-1)
+#ವ್ಯಾಖ್ಯಾನಿಸು FORWARD_FILE		3
+#ವ್ಯಾಖ್ಯಾನಿಸು BACKWARD_FILE		(-3)
 
 // return values for functions
-#if !(defined(OK) && (OK == 1))
+#ಆದರೆ !(defined(OK) && (OK == 1))
 // OK already defined to 1 in MacOS X curses, skip this
 # define OK			1
-#endif
-#define FAIL			0
-#define NOTDONE			2   // not OK or FAIL but skipped
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿಸು FAIL			0
+#ವ್ಯಾಖ್ಯಾನಿಸು NOTDONE			2   // not OK or FAIL but skipped
 
 // flags for b_flags
-#define BF_RECOVERED	0x01	// buffer has been recovered
-#define BF_CHECK_RO	0x02	// need to check readonly when loading file
+#ವ್ಯಾಖ್ಯಾನಿಸು BF_RECOVERED	0x01	// buffer has been recovered
+#ವ್ಯಾಖ್ಯಾನಿಸು BF_CHECK_RO	0x02	// need to check readonly when loading file
 				// into buffer (set by ":e", may be reset by
 				// ":buf"
-#define BF_NEVERLOADED	0x04	// file has never been loaded into buffer,
+#ವ್ಯಾಖ್ಯಾನಿಸು BF_NEVERLOADED	0x04	// file has never been loaded into buffer,
 				// many variables still need to be set
-#define BF_NOTEDITED	0x08	// Set when file name is changed after
+#ವ್ಯಾಖ್ಯಾನಿಸು BF_NOTEDITED	0x08	// Set when file name is changed after
 				// starting to edit, reset when file is
 				// written out.
-#define BF_NEW		0x10	// file didn't exist when editing started
-#define BF_NEW_W	0x20	// Warned for BF_NEW and file created
-#define BF_READERR	0x40	// got errors while reading the file
-#define BF_DUMMY	0x80	// dummy buffer, only used internally
-#define BF_PRESERVED	0x100	// ":preserve" was used
-#define BF_SYN_SET	0x200	// 'syntax' option was set
-#define BF_NO_SEA	0x400	// no swap_exists_action (ATTENTION prompt)
+#ವ್ಯಾಖ್ಯಾನಿಸು BF_NEW		0x10	// file didn't exist when editing started
+#ವ್ಯಾಖ್ಯಾನಿಸು BF_NEW_W	0x20	// Warned for BF_NEW and file created
+#ವ್ಯಾಖ್ಯಾನಿಸು BF_READERR	0x40	// got errors while reading the file
+#ವ್ಯಾಖ್ಯಾನಿಸು BF_DUMMY	0x80	// dummy buffer, only used internally
+#ವ್ಯಾಖ್ಯಾನಿಸು BF_PRESERVED	0x100	// ":preserve" was used
+#ವ್ಯಾಖ್ಯಾನಿಸು BF_SYN_ಗಣ	0x200	// 'syntax' option was set
+#ವ್ಯಾಖ್ಯಾನಿಸು BF_NO_SEA	0x400	// no swap_exists_action (ATTENTION prompt)
 
 // Mask to check for flags that prevent normal writing
-#define BF_WRITE_MASK	(BF_NOTEDITED + BF_NEW + BF_READERR)
+#ವ್ಯಾಖ್ಯಾನಿಸು BF_WRITE_ಮುಖವಾಡ	(BF_NOTEDITED + BF_NEW + BF_READERR)
 
 /*
  * values for xp_context when doing command line completion
  */
-#define EXPAND_UNSUCCESSFUL	(-2)
-#define EXPAND_OK		(-1)
-#define EXPAND_NOTHING		0
-#define EXPAND_COMMANDS		1
-#define EXPAND_FILES		2
-#define EXPAND_DIRECTORIES	3
-#define EXPAND_SETTINGS		4
-#define EXPAND_BOOL_SETTINGS	5
-#define EXPAND_TAGS		6
-#define EXPAND_OLD_SETTING	7
-#define EXPAND_HELP		8
-#define EXPAND_BUFFERS		9
-#define EXPAND_EVENTS		10
-#define EXPAND_MENUS		11
-#define EXPAND_SYNTAX		12
-#define EXPAND_HIGHLIGHT	13
-#define EXPAND_AUGROUP		14
-#define EXPAND_USER_VARS	15
-#define EXPAND_MAPPINGS		16
-#define EXPAND_TAGS_LISTFILES	17
-#define EXPAND_FUNCTIONS	18
-#define EXPAND_USER_FUNC	19
-#define EXPAND_EXPRESSION	20
-#define EXPAND_MENUNAMES	21
-#define EXPAND_USER_COMMANDS	22
-#define EXPAND_USER_CMD_FLAGS	23
-#define EXPAND_USER_NARGS	24
-#define EXPAND_USER_COMPLETE	25
-#define EXPAND_ENV_VARS		26
-#define EXPAND_LANGUAGE		27
-#define EXPAND_COLORS		28
-#define EXPAND_COMPILER		29
-#define EXPAND_USER_DEFINED	30
-#define EXPAND_USER_LIST	31
-#define EXPAND_SHELLCMD		32
-#define EXPAND_CSCOPE		33
-#define EXPAND_SIGN		34
-#define EXPAND_PROFILE		35
-#define EXPAND_BEHAVE		36
-#define EXPAND_FILETYPE		37
-#define EXPAND_FILES_IN_PATH	38
-#define EXPAND_OWNSYNTAX	39
-#define EXPAND_LOCALES		40
-#define EXPAND_HISTORY		41
-#define EXPAND_USER		42
-#define EXPAND_SYNTIME		43
-#define EXPAND_USER_ADDR_TYPE	44
-#define EXPAND_PACKADD		45
-#define EXPAND_MESSAGES		46
-#define EXPAND_MAPCLEAR		47
-#define EXPAND_ARGLIST		48
-#define EXPAND_DIFF_BUFFERS	49
-#define EXPAND_DISASSEMBLE	50
-#define EXPAND_BREAKPOINT	51
-#define EXPAND_SCRIPTNAMES	52
-#define EXPAND_RUNTIME		53
-#define EXPAND_STRING_SETTING	54
-#define EXPAND_SETTING_SUBTRACT	55
-#define EXPAND_ARGOPT		56
-#define EXPAND_TERMINALOPT	57
-#define EXPAND_KEYMAP		58
-#define EXPAND_DIRS_IN_CDPATH	59
-#define EXPAND_SHELLCMDLINE	60
-#define EXPAND_FINDFUNC		61
-#define EXPAND_HIGHLIGHT_GROUP  62
-#define EXPAND_FILETYPECMD	63
-#define EXPAND_PATTERN_IN_BUF	64
-#define EXPAND_RETAB		65
-#define EXPAND_USER_COMPLETEOPT	66
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_UNSUCCESSFUL	(-2)
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_OK		(-1)
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_NOTHING		0
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_COMMANDS		1
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_FILES		2
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_DIRECTORIES	3
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_SETTINGS		4
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_BOOL_SETTINGS	5
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_ಟ್ಯಾಗುಗಳು		6
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_OLD_SETTING	7
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_HELP		8
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_BUFFERS		9
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_EVENTS		10
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_MENUS		11
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_SYNTAX		12
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_HIGHLIGHT	13
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_AUGROUP		14
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_USER_VARS	15
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_MAPPINGS		16
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_ಟ್ಯಾಗುಗಳು_LISTFILES	17
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_FUNCTIONS	18
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_USER_FUNC	19
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_ಅಭಿವ್ಯಕ್ತಿ	20
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_MENUNAMES	21
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_USER_COMMANDS	22
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_USER_CMD_FLAGS	23
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_USER_NARGS	24
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_USER_COMPLETE	25
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_ENV_VARS		26
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_LANGUAGE		27
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_COLORS		28
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_COMPILER		29
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_USER_DEFINED	30
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_USER_LIST	31
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_SHELLCMD		32
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_CSCOPE		33
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_SIGN		34
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_PROFILE		35
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_BEHAVE		36
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_FILETYPE		37
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_FILES_ಒಳ_ಮಾರ್ಗ	38
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_OWNSYNTAX	39
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_LOCALES		40
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_HISTORY		41
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_USER		42
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_SYNTIME		43
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_USER_ADDR_TYPE	44
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_PACKADD		45
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_MESSAGES		46
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_MAPCLEAR		47
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_ARGLIST		48
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_DIFF_BUFFERS	49
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_DISASSEMBLE	50
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_BREAKPOINT	51
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_SCRIPTNAMES	52
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_RUNTIME		53
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_STRING_SETTING	54
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_SETTING_ಕಳೆ	55
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_ARGOPT		56
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_TERMINALOPT	57
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_KEYMAP		58
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_DIRS_ಒಳ_CDPATH	59
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_SHELLCMDLINE	60
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_FINDFUNC		61
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_HIGHLIGHT_ಗುಂಪು  62
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_FILETYPECMD	63
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_ನಮೂನೆ_ಒಳ_BUF	64
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_RETAB		65
+#ವ್ಯಾಖ್ಯಾನಿಸು EXPAND_USER_COMPLETEOPT	66
 
 
 // Values for exmode_active (0 is no exmode)
-#define EXMODE_NORMAL		1
-#define EXMODE_VIM		2
+#ವ್ಯಾಖ್ಯಾನಿಸು EXMODE_ಸಾಮಾನ್ಯ		1
+#ವ್ಯಾಖ್ಯಾನಿಸು EXMODE_VIM		2
 
 // Values for nextwild() and ExpandOne().  See ExpandOne() for meaning.
-#define WILD_FREE		1
-#define WILD_EXPAND_FREE	2
-#define WILD_EXPAND_KEEP	3
-#define WILD_NEXT		4
-#define WILD_PREV		5
-#define WILD_ALL		6
-#define WILD_LONGEST		7
-#define WILD_ALL_KEEP		8
-#define WILD_CANCEL		9
-#define WILD_APPLY		10
-#define WILD_PAGEUP		11
-#define WILD_PAGEDOWN		12
+#ವ್ಯಾಖ್ಯಾನಿಸು WILD_FREE		1
+#ವ್ಯಾಖ್ಯಾನಿಸು WILD_EXPAND_FREE	2
+#ವ್ಯಾಖ್ಯಾನಿಸು WILD_EXPAND_KEEP	3
+#ವ್ಯಾಖ್ಯಾನಿಸು WILD_ಮುಂದಿನ		4
+#ವ್ಯಾಖ್ಯಾನಿಸು WILD_PREV		5
+#ವ್ಯಾಖ್ಯಾನಿಸು WILD_ALL		6
+#ವ್ಯಾಖ್ಯಾನಿಸು WILD_LONGEST		7
+#ವ್ಯಾಖ್ಯಾನಿಸು WILD_ALL_KEEP		8
+#ವ್ಯಾಖ್ಯಾನಿಸು WILD_CANCEL		9
+#ವ್ಯಾಖ್ಯಾನಿಸು WILD_APPLY		10
+#ವ್ಯಾಖ್ಯಾನಿಸು WILD_PAGEUP		11
+#ವ್ಯಾಖ್ಯಾನಿಸು WILD_PAGEDOWN		12
 
-#define WILD_LIST_NOTFOUND	    0x01
-#define WILD_HOME_REPLACE	    0x02
-#define WILD_USE_NL		    0x04
-#define WILD_NO_BEEP		    0x08
-#define WILD_ADD_SLASH		    0x10
-#define WILD_KEEP_ALL		    0x20
-#define WILD_SILENT		    0x40
-#define WILD_ESCAPE		    0x80
-#define WILD_ICASE		    0x100
-#define WILD_ALLLINKS		    0x200
-#define WILD_IGNORE_COMPLETESLASH   0x400
-#define WILD_NOERROR		    0x800  // sets EW_NOERROR
-#define WILD_BUFLASTUSED	    0x1000
-#define BUF_DIFF_FILTER		    0x2000
-#define WILD_NOSELECT		    0x4000
-#define WILD_MAY_EXPAND_PATTERN	    0x8000
-#define WILD_FUNC_TRIGGER	    0x10000 // called from wildtrigger()
-#define WILD_NOINSERT		    0x20000
+#ವ್ಯಾಖ್ಯಾನಿಸು WILD_LIST_NOTFOUND	    0x01
+#ವ್ಯಾಖ್ಯಾನಿಸು WILD_HOME_REPLACE	    0x02
+#ವ್ಯಾಖ್ಯಾನಿಸು WILD_USE_NL		    0x04
+#ವ್ಯಾಖ್ಯಾನಿಸು WILD_NO_BEEP		    0x08
+#ವ್ಯಾಖ್ಯಾನಿಸು WILD_ಕೂಡಿಸು_SLASH		    0x10
+#ವ್ಯಾಖ್ಯಾನಿಸು WILD_KEEP_ALL		    0x20
+#ವ್ಯಾಖ್ಯಾನಿಸು WILD_SILENT		    0x40
+#ವ್ಯಾಖ್ಯಾನಿಸು WILD_ESCAPE		    0x80
+#ವ್ಯಾಖ್ಯಾನಿಸು WILD_ICASE		    0x100
+#ವ್ಯಾಖ್ಯಾನಿಸು WILD_ALLLINKS		    0x200
+#ವ್ಯಾಖ್ಯಾನಿಸು WILD_IGNORE_COMPLETESLASH   0x400
+#ವ್ಯಾಖ್ಯಾನಿಸು WILD_NOERROR		    0x800  // sets EW_NOERROR
+#ವ್ಯಾಖ್ಯಾನಿಸು WILD_BUFLASTUSED	    0x1000
+#ವ್ಯಾಖ್ಯಾನಿಸು BUF_DIFF_FILTER		    0x2000
+#ವ್ಯಾಖ್ಯಾನಿಸು WILD_NOSELECT		    0x4000
+#ವ್ಯಾಖ್ಯಾನಿಸು WILD_MAY_EXPAND_ನಮೂನೆ	    0x8000
+#ವ್ಯಾಖ್ಯಾನಿಸು WILD_FUNC_TRIGGER	    0x10000 // called from wildtrigger()
+#ವ್ಯಾಖ್ಯಾನಿಸು WILD_NOINSERT		    0x20000
 
 // Flags for expand_wildcards()
-#define EW_DIR		0x01	// include directory names
-#define EW_FILE		0x02	// include file names
-#define EW_NOTFOUND	0x04	// include not found names
-#define EW_ADDSLASH	0x08	// append slash to directory name
-#define EW_KEEPALL	0x10	// keep all matches
-#define EW_SILENT	0x20	// don't print "1 returned" from shell
-#define EW_EXEC		0x40	// executable files
-#define EW_PATH		0x80	// search in 'path' too
-#define EW_ICASE	0x100	// ignore case
-#define EW_NOERROR	0x200	// no error for bad regexp
-#define EW_NOTWILD	0x400	// add match with literal name if exists
-#define EW_KEEPDOLLAR	0x800	// do not escape $, $var is expanded
+#ವ್ಯಾಖ್ಯಾನಿಸು EW_DIR		0x01	// include directory names
+#ವ್ಯಾಖ್ಯಾನಿಸು EW_FILE		0x02	// include file names
+#ವ್ಯಾಖ್ಯಾನಿಸು EW_NOTFOUND	0x04	// include not found names
+#ವ್ಯಾಖ್ಯಾನಿಸು EW_ADDSLASH	0x08	// append slash to directory name
+#ವ್ಯಾಖ್ಯಾನಿಸು EW_KEEPALL	0x10	// keep all matches
+#ವ್ಯಾಖ್ಯಾನಿಸು EW_SILENT	0x20	// don't print "1 returned" from shell
+#ವ್ಯಾಖ್ಯಾನಿಸು EW_EXEC		0x40	// executable files
+#ವ್ಯಾಖ್ಯಾನಿಸು EW_ಮಾರ್ಗ		0x80	// search in 'path' too
+#ವ್ಯಾಖ್ಯಾನಿಸು EW_ICASE	0x100	// ignore case
+#ವ್ಯಾಖ್ಯಾನಿಸು EW_NOERROR	0x200	// no error for bad regexp
+#ವ್ಯಾಖ್ಯಾನಿಸು EW_NOTWILD	0x400	// add match with literal name if exists
+#ವ್ಯಾಖ್ಯಾನಿಸು EW_KEEPDOLLAR	0x800	// do not escape $, $var is expanded
 // Note: mostly EW_NOTFOUND and EW_SILENT are mutually exclusive: EW_NOTFOUND
 // is used when executing commands and EW_SILENT for interactive expanding.
-#define EW_ALLLINKS	0x1000	// also links not pointing to existing file
-#define EW_SHELLCMD	0x2000	// called from expand_shellcmd(), don't check
+#ವ್ಯಾಖ್ಯಾನಿಸು EW_ALLLINKS	0x1000	// also links not pointing to existing file
+#ವ್ಯಾಖ್ಯಾನಿಸು EW_SHELLCMD	0x2000	// called from expand_shellcmd(), don't check
 				// if executable is in $PATH
-#define EW_DODOT	0x4000	// also files starting with a dot
-#define EW_EMPTYOK	0x8000	// no matches is not an error
-#define EW_NOTENV	0x10000	// do not expand environment variables
-#define EW_CDPATH	0x20000	// search in 'cdpath' too
+#ವ್ಯಾಖ್ಯಾನಿಸು EW_DODOT	0x4000	// also files starting with a dot
+#ವ್ಯಾಖ್ಯಾನಿಸು EW_EMPTYOK	0x8000	// no matches is not an error
+#ವ್ಯಾಖ್ಯಾನಿಸು EW_NOTENV	0x10000	// do not expand environment variables
+#ವ್ಯಾಖ್ಯಾನಿಸು EW_CDPATH	0x20000	// search in 'cdpath' too
 
 // Flags for find_file_*() functions.
-#define FINDFILE_FILE	0	// only files
-#define FINDFILE_DIR	1	// only directories
-#define FINDFILE_BOTH	2	// files and directories
+#ವ್ಯಾಖ್ಯಾನಿಸು FINDFILE_FILE	0	// only files
+#ವ್ಯಾಖ್ಯಾನಿಸು FINDFILE_DIR	1	// only directories
+#ವ್ಯಾಖ್ಯಾನಿಸು FINDFILE_BOTH	2	// files and directories
 
-#if defined(FEAT_TABPANEL)
-# define COLUMNS_WITHOUT_TPL()		(Columns - tabpanel_width())
+#ಆದರೆ defined(FEAT_TABPANEL)
+# define COLUMNS_WITHOUT_TPL()		(Columns - tabpanel_ಅಗಲ())
 # define TPL_LCOL()			tabpanel_leftcol()
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 # define COLUMNS_WITHOUT_TPL()		Columns
 # define TPL_LCOL()			0
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#define W_ENDCOL(wp)	((wp)->w_wincol + (wp)->w_width)
-#ifdef FEAT_MENU
-# define W_WINROW(wp)	((wp)->w_winrow + (wp)->w_winbar_height)
-#else
+#ವ್ಯಾಖ್ಯಾನಿಸು W_ENDCOL(wp)	((wp)->w_wincol + (wp)->w_ಅಗಲ)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MENU
+# define W_WINROW(wp)	((wp)->w_winrow + (wp)->w_winbar_ಎತ್ತರ)
+#ಇಲ್ಲದಿದ್ದರೆ
 # define W_WINROW(wp)	(wp->w_winrow)
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // Values for the find_pattern_in_path() function args 'type' and 'action':
-#define FIND_ANY	1
-#define FIND_DEFINE	2
-#define CHECK_PATH	3
+#ವ್ಯಾಖ್ಯಾನಿಸು ಕಂಡುಹಿಡಿ_ANY	1
+#ವ್ಯಾಖ್ಯಾನಿಸು ಕಂಡುಹಿಡಿ_DEFINE	2
+#ವ್ಯಾಖ್ಯಾನಿಸು CHECK_ಮಾರ್ಗ	3
 
-#define ACTION_SHOW	1
-#define ACTION_GOTO	2
-#define ACTION_SPLIT	3
-#define ACTION_SHOW_ALL	4
-#define ACTION_EXPAND	5
+#ವ್ಯಾಖ್ಯಾನಿಸು ACTION_SHOW	1
+#ವ್ಯಾಖ್ಯಾನಿಸು ACTION_GOTO	2
+#ವ್ಯಾಖ್ಯಾನಿಸು ACTION_ವಿಭಜಿಸು	3
+#ವ್ಯಾಖ್ಯಾನಿಸು ACTION_SHOW_ALL	4
+#ವ್ಯಾಖ್ಯಾನಿಸು ACTION_EXPAND	5
 
-#ifdef FEAT_SYN_HL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
 # define SST_MIN_ENTRIES 150	// minimal size for state stack array
 # define SST_MAX_ENTRIES 1000	// maximal size for state stack array
-# define SST_FIX_STATES	 7	// size of sst_stack[].
+# define SST_FIX_ಸ್ಥಿತಿಗಳು	 7	// size of sst_stack[].
 # define SST_DIST	 16	// normal distance between entries
 # define SST_INVALID	((synstate_T *)-1)	// invalid syn_state pointer
 
@@ -979,9 +979,9 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 # define HL_TRANSP	0x02	// has no highlighting
 # define HL_ONELINE	0x04	// match within one line only
 # define HL_HAS_EOL	0x08	// end pattern that matches with $
-# define HL_SYNC_HERE	0x10	// sync point after this item (syncing only)
+# define HL_SYNC_ಇಲ್ಲಿ	0x10	// sync point after this item (syncing only)
 # define HL_SYNC_THERE	0x20	// sync point at current line (syncing only)
-# define HL_MATCH	0x40	// use match ID instead of item ID
+# define HL_ಹೊಂದಿಕೆ	0x40	// use match ID instead of item ID
 # define HL_SKIPNL	0x80	// nextgroup can skip newlines
 # define HL_SKIPWHITE	0x100	// nextgroup can skip white space
 # define HL_SKIPEMPTY	0x200	// nextgroup can skip empty lines
@@ -995,367 +995,367 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 # define HL_CONCEAL	0x20000 // can be concealed
 # define HL_CONCEALENDS	0x40000 // can be concealed
 # define HL_INCLUDED_TOPLEVEL 0x80000 // toplevel item in included syntax, allowed by contains=TOP
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // Values for 'options' argument in do_search() and searchit()
-#define SEARCH_REV    0x01  // go in reverse of previous dir.
-#define SEARCH_ECHO   0x02  // echo the search command and handle options
-#define SEARCH_MSG    0x0c  // give messages (yes, it's not 0x04)
-#define SEARCH_NFMSG  0x08  // give all messages except not found
-#define SEARCH_OPT    0x10  // interpret optional flags
-#define SEARCH_HIS    0x20  // put search pattern in history
-#define SEARCH_END    0x40  // put cursor at end of match
-#define SEARCH_NOOF   0x80  // don't add offset to position
-#define SEARCH_START 0x100  // start search without col offset
-#define SEARCH_MARK  0x200  // set previous context mark
-#define SEARCH_KEEP  0x400  // keep previous search pattern
-#define SEARCH_PEEK  0x800  // peek for typed char, cancel search
-#define SEARCH_COL  0x1000  // start at specified column instead of zero
+#ವ್ಯಾಖ್ಯಾನಿಸು ಹುಡುಕು_REV    0x01  // go in reverse of previous dir.
+#ವ್ಯಾಖ್ಯಾನಿಸು ಹುಡುಕು_ECHO   0x02  // echo the search command and handle options
+#ವ್ಯಾಖ್ಯಾನಿಸು ಹುಡುಕು_ಸಂದೇಶ    0x0c  // give messages (yes, it's not 0x04)
+#ವ್ಯಾಖ್ಯಾನಿಸು ಹುಡುಕು_NFMSG  0x08  // give all messages except not found
+#ವ್ಯಾಖ್ಯಾನಿಸು ಹುಡುಕು_OPT    0x10  // interpret optional flags
+#ವ್ಯಾಖ್ಯಾನಿಸು ಹುಡುಕು_HIS    0x20  // put search pattern in history
+#ವ್ಯಾಖ್ಯಾನಿಸು ಹುಡುಕು_ಕೊನೆ    0x40  // put cursor at end of match
+#ವ್ಯಾಖ್ಯಾನಿಸು ಹುಡುಕು_NOOF   0x80  // don't add offset to position
+#ವ್ಯಾಖ್ಯಾನಿಸು ಹುಡುಕು_ಆರಂಭ 0x100  // start search without col offset
+#ವ್ಯಾಖ್ಯಾನಿಸು ಹುಡುಕು_MARK  0x200  // set previous context mark
+#ವ್ಯಾಖ್ಯಾನಿಸು ಹುಡುಕು_KEEP  0x400  // keep previous search pattern
+#ವ್ಯಾಖ್ಯಾನಿಸು ಹುಡುಕು_PEEK  0x800  // peek for typed char, cancel search
+#ವ್ಯಾಖ್ಯಾನಿಸು ಹುಡುಕು_ಲಂಬಸಾಲು  0x1000  // start at specified column instead of zero
 
 // Values for find_ident_under_cursor()
-#define FIND_IDENT	1	// find identifier (word)
-#define FIND_STRING	2	// find any string (WORD)
-#define FIND_EVAL	4	// include "->", "[]" and "."
-#define FIND_NOERROR	8	// no error when no word found
+#ವ್ಯಾಖ್ಯಾನಿಸು ಕಂಡುಹಿಡಿ_IDENT	1	// find identifier (word)
+#ವ್ಯಾಖ್ಯಾನಿಸು ಕಂಡುಹಿಡಿ_STRING	2	// find any string (WORD)
+#ವ್ಯಾಖ್ಯಾನಿಸು ಕಂಡುಹಿಡಿ_EVAL	4	// include "->", "[]" and "."
+#ವ್ಯಾಖ್ಯಾನಿಸು ಕಂಡುಹಿಡಿ_NOERROR	8	// no error when no word found
 
 // Values for file_name_in_line()
-#define FNAME_MESS	1	// give error message
-#define FNAME_EXP	2	// expand to path
-#define FNAME_HYP	4	// check for hypertext link
-#define FNAME_INCL	8	// apply 'includeexpr'
-#define FNAME_REL	16	// ".." and "./" are relative to the (current)
+#ವ್ಯಾಖ್ಯಾನಿಸು FNAME_MESS	1	// give error message
+#ವ್ಯಾಖ್ಯಾನಿಸು FNAME_EXP	2	// expand to path
+#ವ್ಯಾಖ್ಯಾನಿಸು FNAME_HYP	4	// check for hypertext link
+#ವ್ಯಾಖ್ಯಾನಿಸು FNAME_INCL	8	// apply 'includeexpr'
+#ವ್ಯಾಖ್ಯಾನಿಸು FNAME_REL	16	// ".." and "./" are relative to the (current)
 				// file instead of the current directory
-#define FNAME_UNESC	32	// remove backslashes used for escaping
+#ವ್ಯಾಖ್ಯಾನಿಸು FNAME_UNESC	32	// remove backslashes used for escaping
 
 // Values for buflist_getfile()
-#define GETF_SETMARK	0x01	// set pcmark before jumping
-#define GETF_ALT	0x02	// jumping to alternate file (not buf num)
-#define GETF_SWITCH	0x04	// respect 'switchbuf' settings when jumping
+#ವ್ಯಾಖ್ಯಾನಿಸು GETF_SETMARK	0x01	// set pcmark before jumping
+#ವ್ಯಾಖ್ಯಾನಿಸು GETF_ALT	0x02	// jumping to alternate file (not buf num)
+#ವ್ಯಾಖ್ಯಾನಿಸು GETF_SWITCH	0x04	// respect 'switchbuf' settings when jumping
 
 // Return values of getfile()
-#define GETFILE_ERROR	    1	// normal error
-#define GETFILE_NOT_WRITTEN 2	// "not written" error
-#define GETFILE_SAME_FILE   0	// success, same file
-#define GETFILE_OPEN_OTHER (-1)	// success, opened another file
-#define GETFILE_UNUSED	    8
-#define GETFILE_SUCCESS(x)  ((x) <= 0)
+#ವ್ಯಾಖ್ಯಾನಿಸು GETFILE_ERROR	    1	// normal error
+#ವ್ಯಾಖ್ಯಾನಿಸು GETFILE_NOT_WRITTEN 2	// "not written" error
+#ವ್ಯಾಖ್ಯಾನಿಸು GETFILE_SAME_FILE   0	// success, same file
+#ವ್ಯಾಖ್ಯಾನಿಸು GETFILE_OPEN_OTHER (-1)	// success, opened another file
+#ವ್ಯಾಖ್ಯಾನಿಸು GETFILE_ಬಳಸದ	    8
+#ವ್ಯಾಖ್ಯಾನಿಸು GETFILE_SUCCESS(x)  ((x) <= 0)
 
 // Values for buflist_new() flags
-#define BLN_CURBUF	1	// may re-use curbuf for new buffer
-#define BLN_LISTED	2	// put new buffer in buffer list
-#define BLN_DUMMY	4	// allocating dummy buffer
-#define BLN_NEW		8	// create a new buffer
-#define BLN_NOOPT	16	// don't copy options to existing buffer
-#define BLN_DUMMY_OK	32	// also find an existing dummy buffer
-#define BLN_REUSE	64	// may re-use number from buf_reuse
-#define BLN_NOCURWIN	128	// buffer is not associated with curwin
+#ವ್ಯಾಖ್ಯಾನಿಸು BLN_CURBUF	1	// may re-use curbuf for new buffer
+#ವ್ಯಾಖ್ಯಾನಿಸು BLN_LISTED	2	// put new buffer in buffer list
+#ವ್ಯಾಖ್ಯಾನಿಸು BLN_DUMMY	4	// allocating dummy buffer
+#ವ್ಯಾಖ್ಯಾನಿಸು BLN_NEW		8	// create a new buffer
+#ವ್ಯಾಖ್ಯಾನಿಸು BLN_NOOPT	16	// don't copy options to existing buffer
+#ವ್ಯಾಖ್ಯಾನಿಸು BLN_DUMMY_OK	32	// also find an existing dummy buffer
+#ವ್ಯಾಖ್ಯಾನಿಸು BLN_REUSE	64	// may re-use number from buf_reuse
+#ವ್ಯಾಖ್ಯಾನಿಸು BLN_NOCURWIN	128	// buffer is not associated with curwin
 
 // Values for in_cinkeys()
-#define KEY_OPEN_FORW	0x101
-#define KEY_OPEN_BACK	0x102
-#define KEY_COMPLETE	0x103	// end of completion
+#ವ್ಯಾಖ್ಯಾನಿಸು ಕೀಲಿ_OPEN_FORW	0x101
+#ವ್ಯಾಖ್ಯಾನಿಸು ಕೀಲಿ_OPEN_ಹಿಂಭಾಗ	0x102
+#ವ್ಯಾಖ್ಯಾನಿಸು ಕೀಲಿ_COMPLETE	0x103	// end of completion
 
 // Used for the first argument of do_map()
-#define MAPTYPE_MAP		0
-#define MAPTYPE_UNMAP		1
-#define MAPTYPE_NOREMAP		2
-#define MAPTYPE_UNMAP_LHS	3
+#ವ್ಯಾಖ್ಯಾನಿಸು MAPTYPE_MAP		0
+#ವ್ಯಾಖ್ಯಾನಿಸು MAPTYPE_UNMAP		1
+#ವ್ಯಾಖ್ಯಾನಿಸು MAPTYPE_NOREMAP		2
+#ವ್ಯಾಖ್ಯಾನಿಸು MAPTYPE_UNMAP_LHS	3
 
 // Values for "noremap" argument of ins_typebuf().  Also used for
 // map->m_noremap and menu->noremap[].
-#define REMAP_YES	0	// allow remapping
-#define REMAP_NONE	(-1)	// no remapping
-#define REMAP_SCRIPT	(-2)	// remap script-local mappings only
-#define REMAP_SKIP	(-3)	// no remapping for first char
+#ವ್ಯಾಖ್ಯಾನಿಸು REMAP_YES	0	// allow remapping
+#ವ್ಯಾಖ್ಯಾನಿಸು REMAP_NONE	(-1)	// no remapping
+#ವ್ಯಾಖ್ಯಾನಿಸು REMAP_SCRIPT	(-2)	// remap script-local mappings only
+#ವ್ಯಾಖ್ಯಾನಿಸು REMAP_SKIP	(-3)	// no remapping for first char
 
 // Values for mch_call_shell() second argument
-#define SHELL_FILTER	1	// filtering text
-#define SHELL_EXPAND	2	// expanding wildcards
-#define SHELL_COOKED	4	// set term to cooked mode
-#define SHELL_DOOUT	8	// redirecting output
-#define SHELL_SILENT	16	// don't print error returned by command
-#define SHELL_READ	32	// read lines and insert into buffer
-#define SHELL_WRITE	64	// write lines from buffer
+#ವ್ಯಾಖ್ಯಾನಿಸು SHELL_FILTER	1	// filtering text
+#ವ್ಯಾಖ್ಯಾನಿಸು SHELL_EXPAND	2	// expanding wildcards
+#ವ್ಯಾಖ್ಯಾನಿಸು SHELL_COOKED	4	// set term to cooked mode
+#ವ್ಯಾಖ್ಯಾನಿಸು SHELL_DOOUT	8	// redirecting output
+#ವ್ಯಾಖ್ಯಾನಿಸು SHELL_SILENT	16	// don't print error returned by command
+#ವ್ಯಾಖ್ಯಾನಿಸು SHELL_READ	32	// read lines and insert into buffer
+#ವ್ಯಾಖ್ಯಾನಿಸು SHELL_WRITE	64	// write lines from buffer
 
 // Values returned by mch_nodetype()
-#define NODE_NORMAL	0	// file or directory, check with mch_isdir()
-#define NODE_WRITABLE	1	// something we can write to (character
+#ವ್ಯಾಖ್ಯಾನಿಸು ಗಂಟು_ಸಾಮಾನ್ಯ	0	// file or directory, check with mch_isdir()
+#ವ್ಯಾಖ್ಯಾನಿಸು ಗಂಟು_WRITABLE	1	// something we can write to (character
 				// device, fifo, socket, ..)
-#define NODE_OTHER	2	// non-writable thing (e.g., block device)
+#ವ್ಯಾಖ್ಯಾನಿಸು ಗಂಟು_OTHER	2	// non-writable thing (e.g., block device)
 
 // Values for readfile() flags
-#define READ_NEW	0x01	// read a file into a new buffer
-#define READ_FILTER	0x02	// read filter output
-#define READ_STDIN	0x04	// read from stdin
-#define READ_BUFFER	0x08	// read from curbuf (converting stdin)
-#define READ_DUMMY	0x10	// reading into a dummy buffer
-#define READ_KEEP_UNDO	0x20	// keep undo info
-#define READ_FIFO	0x40	// read from fifo or socket
-#define READ_NOWINENTER 0x80	// do not trigger BufWinEnter
-#define READ_NOFILE	0x100	// do not read a file, do trigger BufReadCmd
+#ವ್ಯಾಖ್ಯಾನಿಸು READ_NEW	0x01	// read a file into a new buffer
+#ವ್ಯಾಖ್ಯಾನಿಸು READ_FILTER	0x02	// read filter output
+#ವ್ಯಾಖ್ಯಾನಿಸು READ_STDIN	0x04	// read from stdin
+#ವ್ಯಾಖ್ಯಾನಿಸು READ_ಬಫರ್	0x08	// read from curbuf (converting stdin)
+#ವ್ಯಾಖ್ಯಾನಿಸು READ_DUMMY	0x10	// reading into a dummy buffer
+#ವ್ಯಾಖ್ಯಾನಿಸು READ_KEEP_UNDO	0x20	// keep undo info
+#ವ್ಯಾಖ್ಯಾನಿಸು READ_FIFO	0x40	// read from fifo or socket
+#ವ್ಯಾಖ್ಯಾನಿಸು READ_NOWINENTER 0x80	// do not trigger BufWinEnter
+#ವ್ಯಾಖ್ಯಾನಿಸು READ_NOFILE	0x100	// do not read a file, do trigger BufReadCmd
 
 // Values for change_indent()
-#define INDENT_SET	1	// set indent
-#define INDENT_INC	2	// increase indent
-#define INDENT_DEC	3	// decrease indent
+#ವ್ಯಾಖ್ಯಾನಿಸು INDENT_ಗಣ	1	// set indent
+#ವ್ಯಾಖ್ಯಾನಿಸು INDENT_INC	2	// increase indent
+#ವ್ಯಾಖ್ಯಾನಿಸು INDENT_DEC	3	// decrease indent
 
 // Values for flags argument for findmatchlimit()
-#define FM_BACKWARD	0x01	// search backwards
-#define FM_FORWARD	0x02	// search forwards
-#define FM_BLOCKSTOP	0x04	// stop at start/end of block
-#define FM_SKIPCOMM	0x08	// skip comments (cursor must start outside)
+#ವ್ಯಾಖ್ಯಾನಿಸು FM_BACKWARD	0x01	// search backwards
+#ವ್ಯಾಖ್ಯಾನಿಸು FM_FORWARD	0x02	// search forwards
+#ವ್ಯಾಖ್ಯಾನಿಸು FM_BLOCKSTOP	0x04	// stop at start/end of block
+#ವ್ಯಾಖ್ಯಾನಿಸು FM_SKIPCOMM	0x08	// skip comments (cursor must start outside)
 
 // Values for action argument for do_buffer() and close_buffer()
-#define DOBUF_GOTO	0	// go to specified buffer
-#define DOBUF_SPLIT	1	// split window and go to specified buffer
-#define DOBUF_UNLOAD	2	// unload specified buffer(s)
-#define DOBUF_DEL	3	// delete specified buffer(s) from buflist
-#define DOBUF_WIPE	4	// delete specified buffer(s) really
-#define DOBUF_WIPE_REUSE 5	// like DOBUF_WIPE and keep number for reuse
+#ವ್ಯಾಖ್ಯಾನಿಸು DOBUF_GOTO	0	// go to specified buffer
+#ವ್ಯಾಖ್ಯಾನಿಸು DOBUF_ವಿಭಜಿಸು	1	// split window and go to specified buffer
+#ವ್ಯಾಖ್ಯಾನಿಸು DOBUF_UNLOAD	2	// unload specified buffer(s)
+#ವ್ಯಾಖ್ಯಾನಿಸು DOBUF_DEL	3	// delete specified buffer(s) from buflist
+#ವ್ಯಾಖ್ಯಾನಿಸು DOBUF_WIPE	4	// delete specified buffer(s) really
+#ವ್ಯಾಖ್ಯಾನಿಸು DOBUF_WIPE_REUSE 5	// like DOBUF_WIPE and keep number for reuse
 
 // Values for start argument for do_buffer()
-#define DOBUF_CURRENT	0	// "count" buffer from current buffer
-#define DOBUF_FIRST	1	// "count" buffer from first buffer
-#define DOBUF_LAST	2	// "count" buffer from last buffer
-#define DOBUF_MOD	3	// "count" mod. buffer from current buffer
+#ವ್ಯಾಖ್ಯಾನಿಸು DOBUF_CURRENT	0	// "count" buffer from current buffer
+#ವ್ಯಾಖ್ಯಾನಿಸು DOBUF_ಮೊದಲ	1	// "count" buffer from first buffer
+#ವ್ಯಾಖ್ಯಾನಿಸು DOBUF_ಕೊನೆಯ	2	// "count" buffer from last buffer
+#ವ್ಯಾಖ್ಯಾನಿಸು DOBUF_MOD	3	// "count" mod. buffer from current buffer
 
 // Values for flags argument of do_buffer()
-#define DOBUF_FORCEIT	1	// :cmd!
-#define DOBUF_NOPOPUP	2	// skip popup window buffers
-#define DOBUF_SKIPHELP	4	// skip or keep help buffers depending on b_help of the
+#ವ್ಯಾಖ್ಯಾನಿಸು DOBUF_FORCEIT	1	// :cmd!
+#ವ್ಯಾಖ್ಯಾನಿಸು DOBUF_NOPOPUP	2	// skip popup window buffers
+#ವ್ಯಾಖ್ಯಾನಿಸು DOBUF_SKIPHELP	4	// skip or keep help buffers depending on b_help of the
 				// starting buffer
 
 // Values for sub_cmd and which_pat argument for search_regcomp()
 // Also used for which_pat argument for searchit()
-#define RE_SEARCH	0	// save/use pat in/from search_pattern
-#define RE_SUBST	1	// save/use pat in/from subst_pattern
-#define RE_BOTH		2	// save pat in both patterns
-#define RE_LAST		2	// use last used pattern if "pat" is NULL
+#ವ್ಯಾಖ್ಯಾನಿಸು RE_ಹುಡುಕು	0	// save/use pat in/from search_pattern
+#ವ್ಯಾಖ್ಯಾನಿಸು RE_SUBST	1	// save/use pat in/from subst_pattern
+#ವ್ಯಾಖ್ಯಾನಿಸು RE_BOTH		2	// save pat in both patterns
+#ವ್ಯಾಖ್ಯಾನಿಸು RE_ಕೊನೆಯ		2	// use last used pattern if "pat" is NULL
 
 // Second argument for vim_regcomp().
-#define RE_MAGIC	1	// 'magic' option
-#define RE_STRING	2	// match in string instead of buffer text
-#define RE_STRICT	4	// don't allow [abc] without ]
-#define RE_AUTO		8	// automatic engine selection
+#ವ್ಯಾಖ್ಯಾನಿಸು RE_MAGIC	1	// 'magic' option
+#ವ್ಯಾಖ್ಯಾನಿಸು RE_STRING	2	// match in string instead of buffer text
+#ವ್ಯಾಖ್ಯಾನಿಸು RE_STRICT	4	// don't allow [abc] without ]
+#ವ್ಯಾಖ್ಯಾನಿಸು RE_AUTO		8	// automatic engine selection
 
-#ifdef FEAT_SYN_HL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
 // values for reg_do_extmatch
-# define REX_SET	1	// to allow \z\(...\),
+# define REX_ಗಣ	1	// to allow \z\(...\),
 # define REX_USE	2	// to allow \z\1 et al.
-# define REX_ALL	(REX_SET | REX_USE)
-#endif
+# define REX_ALL	(REX_ಗಣ | REX_USE)
+#ಆದರೆ_ಅಂತ್ಯ
 
 // Return values for fullpathcmp()
 // Note: can use (fullpathcmp() & FPC_SAME) to check for equal files
-#define FPC_SAME	1	// both exist and are the same file.
-#define FPC_DIFF	2	// both exist and are different files.
-#define FPC_NOTX	4	// both don't exist.
-#define FPC_DIFFX	6	// one of them doesn't exist.
-#define FPC_SAMEX	7	// both don't exist and file names are same.
+#ವ್ಯಾಖ್ಯಾನಿಸು FPC_SAME	1	// both exist and are the same file.
+#ವ್ಯಾಖ್ಯಾನಿಸು FPC_DIFF	2	// both exist and are different files.
+#ವ್ಯಾಖ್ಯಾನಿಸು FPC_NOTX	4	// both don't exist.
+#ವ್ಯಾಖ್ಯಾನಿಸು FPC_DIFFX	6	// one of them doesn't exist.
+#ವ್ಯಾಖ್ಯಾನಿಸು FPC_SAMEX	7	// both don't exist and file names are same.
 
 // flags for do_ecmd()
-#define ECMD_HIDE	0x01	// don't free the current buffer
-#define ECMD_SET_HELP	0x02	// set b_help flag of (new) buffer before
+#ವ್ಯಾಖ್ಯಾನಿಸು ECMD_HIDE	0x01	// don't free the current buffer
+#ವ್ಯಾಖ್ಯಾನಿಸು ECMD_ಗಣ_HELP	0x02	// set b_help flag of (new) buffer before
 				// opening file
-#define ECMD_OLDBUF	0x04	// use existing buffer if it exists
-#define ECMD_FORCEIT	0x08	// ! used in Ex command
-#define ECMD_ADDBUF	0x10	// don't edit, just add to buffer list
-#define ECMD_ALTBUF	0x20	// like ECMD_ADDBUF and set the alternate file
-#define ECMD_NOWINENTER	0x40	// do not trigger BufWinEnter
+#ವ್ಯಾಖ್ಯಾನಿಸು ECMD_OLDBUF	0x04	// use existing buffer if it exists
+#ವ್ಯಾಖ್ಯಾನಿಸು ECMD_FORCEIT	0x08	// ! used in Ex command
+#ವ್ಯಾಖ್ಯಾನಿಸು ECMD_ADDBUF	0x10	// don't edit, just add to buffer list
+#ವ್ಯಾಖ್ಯಾನಿಸು ECMD_ALTBUF	0x20	// like ECMD_ADDBUF and set the alternate file
+#ವ್ಯಾಖ್ಯಾನಿಸು ECMD_NOWINENTER	0x40	// do not trigger BufWinEnter
 
 // for lnum argument in do_ecmd()
-#define ECMD_LASTL	(linenr_T)0	// use last position in loaded file
-#define ECMD_LAST	((linenr_T)-1)	// use last position in all files
-#define ECMD_ONE	(linenr_T)1	// use first line
+#ವ್ಯಾಖ್ಯಾನಿಸು ECMD_LASTL	(linenr_T)0	// use last position in loaded file
+#ವ್ಯಾಖ್ಯಾನಿಸು ECMD_ಕೊನೆಯ	((linenr_T)-1)	// use last position in all files
+#ವ್ಯಾಖ್ಯಾನಿಸು ECMD_ONE	(linenr_T)1	// use first line
 
 // flags for do_cmdline()
-#define DOCMD_VERBOSE	0x01	// included command in error message
-#define DOCMD_NOWAIT	0x02	// don't call wait_return() and friends
-#define DOCMD_REPEAT	0x04	// repeat exec. until getline() returns NULL
-#define DOCMD_KEYTYPED	0x08	// don't reset KeyTyped
-#define DOCMD_EXCRESET	0x10	// reset exception environment (for debugging)
-#define DOCMD_KEEPLINE  0x20	// keep typed line for repeating with "."
-#define DOCMD_RANGEOK	0x40	// can use a range without ":" in Vim9 script
+#ವ್ಯಾಖ್ಯಾನಿಸು DOCMD_VERBOSE	0x01	// included command in error message
+#ವ್ಯಾಖ್ಯಾನಿಸು DOCMD_NOWAIT	0x02	// don't call wait_return() and friends
+#ವ್ಯಾಖ್ಯಾನಿಸು DOCMD_REPEAT	0x04	// repeat exec. until getline() returns NULL
+#ವ್ಯಾಖ್ಯಾನಿಸು DOCMD_KEYTYPED	0x08	// don't reset KeyTyped
+#ವ್ಯಾಖ್ಯಾನಿಸು DOCMD_EXCRESET	0x10	// reset exception environment (for debugging)
+#ವ್ಯಾಖ್ಯಾನಿಸು DOCMD_KEEPLINE  0x20	// keep typed line for repeating with "."
+#ವ್ಯಾಖ್ಯಾನಿಸು DOCMD_RANGEOK	0x40	// can use a range without ":" in Vim9 script
 
 // flags for beginline()
-#define BL_WHITE	1	// cursor on first non-white in the line
-#define BL_SOL		2	// use 'sol' option
-#define BL_FIX		4	// don't leave cursor on a NUL
+#ವ್ಯಾಖ್ಯಾನಿಸು BL_WHITE	1	// cursor on first non-white in the line
+#ವ್ಯಾಖ್ಯಾನಿಸು BL_SOL		2	// use 'sol' option
+#ವ್ಯಾಖ್ಯಾನಿಸು BL_FIX		4	// don't leave cursor on a NUL
 
 // flags for mf_sync()
-#define MFS_ALL		1	// also sync blocks with negative numbers
-#define MFS_STOP	2	// stop syncing when a character is available
-#define MFS_FLUSH	4	// flushed file to disk
-#define MFS_ZERO	8	// only write block 0
+#ವ್ಯಾಖ್ಯಾನಿಸು MFS_ALL		1	// also sync blocks with negative numbers
+#ವ್ಯಾಖ್ಯಾನಿಸು MFS_STOP	2	// stop syncing when a character is available
+#ವ್ಯಾಖ್ಯಾನಿಸು MFS_FLUSH	4	// flushed file to disk
+#ವ್ಯಾಖ್ಯಾನಿಸು MFS_ZERO	8	// only write block 0
 
 // flags for buf_copy_options()
-#define BCO_ENTER	1	// going to enter the buffer
-#define BCO_ALWAYS	2	// always copy the options
-#define BCO_NOHELP	4	// don't touch the help related options
+#ವ್ಯಾಖ್ಯಾನಿಸು BCO_ENTER	1	// going to enter the buffer
+#ವ್ಯಾಖ್ಯಾನಿಸು BCO_ALWAYS	2	// always copy the options
+#ವ್ಯಾಖ್ಯಾನಿಸು BCO_NOHELP	4	// don't touch the help related options
 
 // flags for do_put()
-#define PUT_FIXINDENT	1	// make indent look nice
-#define PUT_CURSEND	2	// leave cursor after end of new text
-#define PUT_CURSLINE	4	// leave cursor on last line of new text
-#define PUT_LINE	8	// put register as lines
-#define PUT_LINE_SPLIT	16	// split line for linewise register
-#define PUT_LINE_FORWARD 32	// put linewise register below Visual sel.
-#define PUT_BLOCK_INNER 64      // in block mode, do not add trailing spaces
+#ವ್ಯಾಖ್ಯಾನಿಸು PUT_FIXINDENT	1	// make indent look nice
+#ವ್ಯಾಖ್ಯಾನಿಸು PUT_CURSEND	2	// leave cursor after end of new text
+#ವ್ಯಾಖ್ಯಾನಿಸು PUT_CURSLINE	4	// leave cursor on last line of new text
+#ವ್ಯಾಖ್ಯಾನಿಸು PUT_ಸಾಲು	8	// put register as lines
+#ವ್ಯಾಖ್ಯಾನಿಸು PUT_ಸಾಲು_ವಿಭಜಿಸು	16	// split line for linewise register
+#ವ್ಯಾಖ್ಯಾನಿಸು PUT_ಸಾಲು_FORWARD 32	// put linewise register below Visual sel.
+#ವ್ಯಾಖ್ಯಾನಿಸು PUT_ಖಂಡ_INNER 64      // in block mode, do not add trailing spaces
 
 // flags for set_indent()
-#define SIN_CHANGED	1	// call changed_bytes() when line changed
-#define SIN_INSERT	2	// insert indent before existing text
-#define SIN_UNDO	4	// save line for undo before changing it
+#ವ್ಯಾಖ್ಯಾನಿಸು SIN_ಬದಲಾಯಿತು	1	// call changed_bytes() when line changed
+#ವ್ಯಾಖ್ಯಾನಿಸು SIN_ಸೇರಿಸು	2	// insert indent before existing text
+#ವ್ಯಾಖ್ಯಾನಿಸು SIN_UNDO	4	// save line for undo before changing it
 
 // flags for insertchar()
-#define INSCHAR_FORMAT	1	// force formatting
-#define INSCHAR_DO_COM	2	// format comments
-#define INSCHAR_CTRLV	4	// char typed just after CTRL-V
-#define INSCHAR_NO_FEX	8	// don't use 'formatexpr'
-#define INSCHAR_COM_LIST 16	// format comments with list/2nd line indent
+#ವ್ಯಾಖ್ಯಾನಿಸು INSCHAR_FORMAT	1	// force formatting
+#ವ್ಯಾಖ್ಯಾನಿಸು INSCHAR_DO_COM	2	// format comments
+#ವ್ಯಾಖ್ಯಾನಿಸು INSCHAR_CTRLV	4	// char typed just after CTRL-V
+#ವ್ಯಾಖ್ಯಾನಿಸು INSCHAR_NO_FEX	8	// don't use 'formatexpr'
+#ವ್ಯಾಖ್ಯಾನಿಸು INSCHAR_COM_LIST 16	// format comments with list/2nd line indent
 
 // flags for open_line()
-#define OPENLINE_DELSPACES	0x01    // delete spaces after cursor
-#define OPENLINE_DO_COM		0x02    // format comments
-#define OPENLINE_KEEPTRAIL	0x04    // keep trailing spaces
-#define OPENLINE_MARKFIX	0x08    // fix mark positions
-#define OPENLINE_COM_LIST	0x10    // format comments with list/2nd line indent
-#define OPENLINE_FORMAT		0x20    // formatting long comment
-#define OPENLINE_FORCE_INDENT	0x40    // use second_line_indent without indent logic
+#ವ್ಯಾಖ್ಯಾನಿಸು OPENLINE_DELSPACES	0x01    // delete spaces after cursor
+#ವ್ಯಾಖ್ಯಾನಿಸು OPENLINE_DO_COM		0x02    // format comments
+#ವ್ಯಾಖ್ಯಾನಿಸು OPENLINE_KEEPTRAIL	0x04    // keep trailing spaces
+#ವ್ಯಾಖ್ಯಾನಿಸು OPENLINE_MARKFIX	0x08    // fix mark positions
+#ವ್ಯಾಖ್ಯಾನಿಸು OPENLINE_COM_LIST	0x10    // format comments with list/2nd line indent
+#ವ್ಯಾಖ್ಯಾನಿಸು OPENLINE_FORMAT		0x20    // formatting long comment
+#ವ್ಯಾಖ್ಯಾನಿಸು OPENLINE_FORCE_INDENT	0x40    // use second_line_indent without indent logic
 
 // There are five history tables:
-#define HIST_CMD	0	// colon commands
-#define HIST_SEARCH	1	// search commands
-#define HIST_EXPR	2	// expressions (from entering = register)
-#define HIST_INPUT	3	// input() lines
-#define HIST_DEBUG	4	// debug commands
-#define HIST_COUNT	5	// number of history tables
+#ವ್ಯಾಖ್ಯಾನಿಸು HIST_CMD	0	// colon commands
+#ವ್ಯಾಖ್ಯಾನಿಸು HIST_ಹುಡುಕು	1	// search commands
+#ವ್ಯಾಖ್ಯಾನಿಸು HIST_ಅಭಿವ್ಯಕ್ತಿ	2	// expressions (from entering = register)
+#ವ್ಯಾಖ್ಯಾನಿಸು HIST_ಒಳಹರಿವು	3	// input() lines
+#ವ್ಯಾಖ್ಯಾನಿಸು HIST_DEBUG	4	// debug commands
+#ವ್ಯಾಖ್ಯಾನಿಸು HIST_ಎಣಿಕೆ	5	// number of history tables
 
 // The type numbers are fixed for backwards compatibility.
-#define BARTYPE_VERSION 1
-#define BARTYPE_HISTORY 2
-#define BARTYPE_REGISTER 3
-#define BARTYPE_MARK 4
+#ವ್ಯಾಖ್ಯಾನಿಸು BARTYPE_ಆವೃತ್ತಿ 1
+#ವ್ಯಾಖ್ಯಾನಿಸು BARTYPE_HISTORY 2
+#ವ್ಯಾಖ್ಯಾನಿಸು BARTYPE_ರಿಜಿಸ್ಟರ್ 3
+#ವ್ಯಾಖ್ಯಾನಿಸು BARTYPE_MARK 4
 
-#define VIMINFO_VERSION 4
-#define VIMINFO_VERSION_WITH_HISTORY 2
-#define VIMINFO_VERSION_WITH_REGISTERS 3
-#define VIMINFO_VERSION_WITH_MARKS 4
+#ವ್ಯಾಖ್ಯಾನಿಸು VIMINFO_ಆವೃತ್ತಿ 4
+#ವ್ಯಾಖ್ಯಾನಿಸು VIMINFO_ಆವೃತ್ತಿ_WITH_HISTORY 2
+#ವ್ಯಾಖ್ಯಾನಿಸು VIMINFO_ಆವೃತ್ತಿ_WITH_REGISTERS 3
+#ವ್ಯಾಖ್ಯಾನಿಸು VIMINFO_ಆವೃತ್ತಿ_WITH_MARKS 4
 
 /*
  * Values for do_tag().
  */
-#define DT_TAG		1	// jump to newer position or same tag again
-#define DT_POP		2	// jump to older position
-#define DT_NEXT		3	// jump to next match of same tag
-#define DT_PREV		4	// jump to previous match of same tag
-#define DT_FIRST	5	// jump to first match of same tag
-#define DT_LAST		6	// jump to first match of same tag
-#define DT_SELECT	7	// jump to selection from list
-#define DT_HELP		8	// like DT_TAG, but no wildcards
-#define DT_JUMP		9	// jump to new tag or selection from list
-#define DT_CSCOPE	10	// cscope find command (like tjump)
-#define DT_LTAG		11	// tag using location list
-#define DT_FREE		99	// free cached matches
+#ವ್ಯಾಖ್ಯಾನಿಸು DT_ಟ್ಯಾಗ್		1	// jump to newer position or same tag again
+#ವ್ಯಾಖ್ಯಾನಿಸು DT_ತೆಗೆ		2	// jump to older position
+#ವ್ಯಾಖ್ಯಾನಿಸು DT_ಮುಂದಿನ		3	// jump to next match of same tag
+#ವ್ಯಾಖ್ಯಾನಿಸು DT_PREV		4	// jump to previous match of same tag
+#ವ್ಯಾಖ್ಯಾನಿಸು DT_ಮೊದಲ	5	// jump to first match of same tag
+#ವ್ಯಾಖ್ಯಾನಿಸು DT_ಕೊನೆಯ		6	// jump to first match of same tag
+#ವ್ಯಾಖ್ಯಾನಿಸು DT_SELECT	7	// jump to selection from list
+#ವ್ಯಾಖ್ಯಾನಿಸು DT_HELP		8	// like DT_TAG, but no wildcards
+#ವ್ಯಾಖ್ಯಾನಿಸು DT_JUMP		9	// jump to new tag or selection from list
+#ವ್ಯಾಖ್ಯಾನಿಸು DT_CSCOPE	10	// cscope find command (like tjump)
+#ವ್ಯಾಖ್ಯಾನಿಸು DT_LTAG		11	// tag using location list
+#ವ್ಯಾಖ್ಯಾನಿಸು DT_FREE		99	// free cached matches
 
 /*
  * flags for find_tags().
  */
-#define TAG_HELP	1	// only search for help tags
-#define TAG_NAMES	2	// only return name of tag
-#define	TAG_REGEXP	4	// use tag pattern as regexp
-#define	TAG_NOIC	8	// don't always ignore case
-#ifdef FEAT_CSCOPE
-# define TAG_CSCOPE	16	// cscope tag
-#endif
-#define TAG_VERBOSE	32	// message verbosity
-#define TAG_INS_COMP	64	// Currently doing insert completion
-#define TAG_KEEP_LANG	128	// keep current language
-#define TAG_NO_TAGFUNC	256	// do not use 'tagfunc'
+#ವ್ಯಾಖ್ಯಾನಿಸು ಟ್ಯಾಗ್_HELP	1	// only search for help tags
+#ವ್ಯಾಖ್ಯಾನಿಸು ಟ್ಯಾಗ್_ಹೆಸರುಗಳು	2	// only return name of tag
+#ವ್ಯಾಖ್ಯಾನಿಸು	ಟ್ಯಾಗ್_REGEXP	4	// use tag pattern as regexp
+#ವ್ಯಾಖ್ಯಾನಿಸು	ಟ್ಯಾಗ್_NOIC	8	// don't always ignore case
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CSCOPE
+# define ಟ್ಯಾಗ್_CSCOPE	16	// cscope tag
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿಸು ಟ್ಯಾಗ್_VERBOSE	32	// message verbosity
+#ವ್ಯಾಖ್ಯಾನಿಸು ಟ್ಯಾಗ್_INS_COMP	64	// Currently doing insert completion
+#ವ್ಯಾಖ್ಯಾನಿಸು ಟ್ಯಾಗ್_KEEP_LANG	128	// keep current language
+#ವ್ಯಾಖ್ಯಾನಿಸು ಟ್ಯಾಗ್_NO_TAGFUNC	256	// do not use 'tagfunc'
 
-#define TAG_MANY	300	// When finding many tags (for completion),
+#ವ್ಯಾಖ್ಯಾನಿಸು ಟ್ಯಾಗ್_MANY	300	// When finding many tags (for completion),
 				// find up to this many tags
 
 /*
  * Types of dialogs passed to do_vim_dialog().
  */
-#define VIM_GENERIC	0
-#define VIM_ERROR	1
-#define VIM_WARNING	2
-#define VIM_INFO	3
-#define VIM_QUESTION	4
-#define VIM_LAST_TYPE	4	// sentinel value
+#ವ್ಯಾಖ್ಯಾನಿಸು VIM_GENERIC	0
+#ವ್ಯಾಖ್ಯಾನಿಸು VIM_ERROR	1
+#ವ್ಯಾಖ್ಯಾನಿಸು VIM_WARNING	2
+#ವ್ಯಾಖ್ಯಾನಿಸು VIM_INFO	3
+#ವ್ಯಾಖ್ಯಾನಿಸು VIM_QUESTION	4
+#ವ್ಯಾಖ್ಯಾನಿಸು VIM_ಕೊನೆಯ_TYPE	4	// sentinel value
 
 /*
  * Return values for functions like gui_yesnocancel()
  */
-#define VIM_YES		2
-#define VIM_NO		3
-#define VIM_CANCEL	4
-#define VIM_ALL		5
-#define VIM_DISCARDALL  6
+#ವ್ಯಾಖ್ಯಾನಿಸು VIM_YES		2
+#ವ್ಯಾಖ್ಯಾನಿಸು VIM_NO		3
+#ವ್ಯಾಖ್ಯಾನಿಸು VIM_CANCEL	4
+#ವ್ಯಾಖ್ಯಾನಿಸು VIM_ALL		5
+#ವ್ಯಾಖ್ಯಾನಿಸು VIM_DISCARDALL  6
 
 /*
  * arguments for win_split()
  */
-#define WSP_ROOM	0x01	// require enough room
-#define WSP_VERT	0x02	// split/equalize vertically
-#define WSP_HOR		0x04	// equalize horizontally
-#define WSP_TOP		0x08	// window at top-left of shell
-#define WSP_BOT		0x10	// window at bottom-right of shell
-#define WSP_HELP	0x20	// creating the help window
-#define WSP_BELOW	0x40	// put new window below/right
-#define WSP_ABOVE	0x80	// put new window above/left
-#define WSP_NEWLOC	0x100	// don't copy location list
-#define WSP_FORCE_ROOM	0x200	// ignore "not enough room" errors
-#define WSP_QUICKFIX	0x400	// creating the quickfix window
+#ವ್ಯಾಖ್ಯಾನಿಸು WSP_ಸ್ಥಳ	0x01	// require enough room
+#ವ್ಯಾಖ್ಯಾನಿಸು WSP_VERT	0x02	// split/equalize vertically
+#ವ್ಯಾಖ್ಯಾನಿಸು WSP_HOR		0x04	// equalize horizontally
+#ವ್ಯಾಖ್ಯಾನಿಸು WSP_ತುದಿ		0x08	// window at top-left of shell
+#ವ್ಯಾಖ್ಯಾನಿಸು WSP_BOT		0x10	// window at bottom-right of shell
+#ವ್ಯಾಖ್ಯಾನಿಸು WSP_HELP	0x20	// creating the help window
+#ವ್ಯಾಖ್ಯಾನಿಸು WSP_ಕೆಳಗೆ	0x40	// put new window below/right
+#ವ್ಯಾಖ್ಯಾನಿಸು WSP_ABOVE	0x80	// put new window above/left
+#ವ್ಯಾಖ್ಯಾನಿಸು WSP_NEWLOC	0x100	// don't copy location list
+#ವ್ಯಾಖ್ಯಾನಿಸು WSP_FORCE_ಸ್ಥಳ	0x200	// ignore "not enough room" errors
+#ವ್ಯಾಖ್ಯಾನಿಸು WSP_QUICKFIX	0x400	// creating the quickfix window
 
 /*
  * arguments for gui_set_shellsize()
  */
-#define RESIZE_VERT	1	// resize vertically
-#define RESIZE_HOR	2	// resize horizontally
-#define RESIZE_BOTH	15	// resize in both directions
+#ವ್ಯಾಖ್ಯಾನಿಸು RESIZE_VERT	1	// resize vertically
+#ವ್ಯಾಖ್ಯಾನಿಸು RESIZE_HOR	2	// resize horizontally
+#ವ್ಯಾಖ್ಯಾನಿಸು RESIZE_BOTH	15	// resize in both directions
 
 /*
  * flags for check_changed()
  */
-#define CCGD_AW		1	// do autowrite if buffer was changed
-#define CCGD_MULTWIN	2	// check also when several wins for the buf
-#define CCGD_FORCEIT	4	// ! used
-#define CCGD_ALLBUF	8	// may write all buffers
-#define CCGD_EXCMD	16	// may suggest using !
+#ವ್ಯಾಖ್ಯಾನಿಸು CCGD_AW		1	// do autowrite if buffer was changed
+#ವ್ಯಾಖ್ಯಾನಿಸು CCGD_MULTWIN	2	// check also when several wins for the buf
+#ವ್ಯಾಖ್ಯಾನಿಸು CCGD_FORCEIT	4	// ! used
+#ವ್ಯಾಖ್ಯಾನಿಸು CCGD_ALLBUF	8	// may write all buffers
+#ವ್ಯಾಖ್ಯಾನಿಸು CCGD_EXCMD	16	// may suggest using !
 
 /*
  * "flags" values for option-setting functions.
  * When OPT_GLOBAL and OPT_LOCAL are both missing, set both local and global
  * values, get local value.
  */
-#define OPT_FREE	0x01	// free old value if it was allocated
-#define OPT_GLOBAL	0x02	// use global value
-#define OPT_LOCAL	0x04	// use local value
-#define OPT_MODELINE	0x08	// option in modeline
-#define OPT_WINONLY	0x10	// only set window-local options
-#define OPT_NOWIN	0x20	// don't set window-local options
-#define OPT_ONECOLUMN	0x40	// list options one per line
-#define OPT_NO_REDRAW	0x80	// ignore redraw flags on option
-#define OPT_SKIPRTP	0x100	// "skiprtp" in 'sessionoptions'
+#ವ್ಯಾಖ್ಯಾನಿಸು OPT_FREE	0x01	// free old value if it was allocated
+#ವ್ಯಾಖ್ಯಾನಿಸು OPT_GLOBAL	0x02	// use global value
+#ವ್ಯಾಖ್ಯಾನಿಸು OPT_LOCAL	0x04	// use local value
+#ವ್ಯಾಖ್ಯಾನಿಸು OPT_MODELINE	0x08	// option in modeline
+#ವ್ಯಾಖ್ಯಾನಿಸು OPT_WINONLY	0x10	// only set window-local options
+#ವ್ಯಾಖ್ಯಾನಿಸು OPT_NOWIN	0x20	// don't set window-local options
+#ವ್ಯಾಖ್ಯಾನಿಸು OPT_ONECOLUMN	0x40	// list options one per line
+#ವ್ಯಾಖ್ಯಾನಿಸು OPT_NO_REDRAW	0x80	// ignore redraw flags on option
+#ವ್ಯಾಖ್ಯಾನಿಸು OPT_SKIPRTP	0x100	// "skiprtp" in 'sessionoptions'
 
 // Magic chars used in confirm dialog strings
-#define DLG_BUTTON_SEP	'\n'
-#define DLG_HOTKEY_CHAR	'&'
+#ವ್ಯಾಖ್ಯಾನಿಸು DLG_BUTTON_SEP	'\n'
+#ವ್ಯಾಖ್ಯಾನಿಸು DLG_HOTKEY_CHAR	'&'
 
 // Values for "starting"
-#define NO_SCREEN	2	// no screen updating yet
-#define NO_BUFFERS	1	// not all buffers loaded yet
+#ವ್ಯಾಖ್ಯಾನಿಸು NO_SCREEN	2	// no screen updating yet
+#ವ್ಯಾಖ್ಯಾನಿಸು NO_BUFFERS	1	// not all buffers loaded yet
 //			0	   not starting anymore
 
 // Values for swap_exists_action: what to do when swap file already exists
-#define SEA_NONE	0	// don't use dialog
-#define SEA_DIALOG	1	// use dialog when possible
-#define SEA_QUIT	2	// quit editing the file
-#define SEA_RECOVER	3	// recover the file
-#define SEA_READONLY	4	// no dialog, mark buffer as read-only
+#ವ್ಯಾಖ್ಯಾನಿಸು SEA_NONE	0	// don't use dialog
+#ವ್ಯಾಖ್ಯಾನಿಸು SEA_DIALOG	1	// use dialog when possible
+#ವ್ಯಾಖ್ಯಾನಿಸು SEA_QUIT	2	// quit editing the file
+#ವ್ಯಾಖ್ಯಾನಿಸು SEA_RECOVER	3	// recover the file
+#ವ್ಯಾಖ್ಯಾನಿಸು SEA_READONLY	4	// no dialog, mark buffer as read-only
 
 /*
  * Minimal size for block 0 of a swap file.
@@ -1363,22 +1363,22 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
  * because struct block0 is defined in memline.c (Sorry).
  * The maximal block size is arbitrary.
  */
-#define MIN_SWAP_PAGE_SIZE 1048
-#define MAX_SWAP_PAGE_SIZE 50000
+#ವ್ಯಾಖ್ಯಾನಿಸು MIN_ಅದಲುಬದಲು_ಪುಟ_ಗಾತ್ರ 1048
+#ವ್ಯಾಖ್ಯಾನಿಸು MAX_ಅದಲುಬದಲು_ಪುಟ_ಗಾತ್ರ 50000
 
 // Special values for current_sctx.sc_sid.
-#define SID_MODELINE	(-1)	// when using a modeline
-#define SID_CMDARG	(-2)	// for "--cmd" argument
-#define SID_CARG	(-3)	// for "-c" argument
-#define SID_ENV		(-4)	// for sourcing environment variable
-#define SID_ERROR	(-5)	// option was reset because of an error
-#define SID_NONE	(-6)	// don't set scriptID
-#define SID_WINLAYOUT	(-7)	// changing window size
+#ವ್ಯಾಖ್ಯಾನಿಸು SID_MODELINE	(-1)	// when using a modeline
+#ವ್ಯಾಖ್ಯಾನಿಸು SID_CMDARG	(-2)	// for "--cmd" argument
+#ವ್ಯಾಖ್ಯಾನಿಸು SID_CARG	(-3)	// for "-c" argument
+#ವ್ಯಾಖ್ಯಾನಿಸು SID_ENV		(-4)	// for sourcing environment variable
+#ವ್ಯಾಖ್ಯಾನಿಸು SID_ERROR	(-5)	// option was reset because of an error
+#ವ್ಯಾಖ್ಯಾನಿಸು SID_NONE	(-6)	// don't set scriptID
+#ವ್ಯಾಖ್ಯಾನಿಸು SID_WINLAYOUT	(-7)	// changing window size
 
 /*
  * Events for autocommands. Must be kept in sync with "event_tab".
  */
-enum auto_event
+ಎಣಿಕೆ auto_event
 {
     EVENT_BUFADD = 0,		// after adding a buffer to the buffer list
     EVENT_BUFCREATE,		// UNUSED: BufCreate == BufAdd
@@ -1509,17 +1509,17 @@ enum auto_event
     EVENT_WINRESIZED,		// after a window was resized
     EVENT_WINSCROLLED,		// after a window was scrolled or resized
 
-    NUM_EVENTS,			// MUST be the last one
+    ಅಂಕೆ_EVENTS,			// MUST be the last one
 };
 
-typedef enum auto_event event_T;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ auto_event event_T;
 
 /*
  * Values for index in highlight_attr[].
  * When making changes, also update HL_FLAGS below!
  * And update the default value of 'highlight': HIGHLIGHT_INIT in optiondefs.h
  */
-typedef enum
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ
 {
     HLF_8 = 0	    // Meta & special keys listed with ":map", text that is
 		    // displayed different from what it is
@@ -1552,7 +1552,7 @@ typedef enum
     , HLF_WM	    // Wildmenu highlight
     , HLF_FL	    // Folded line
     , HLF_FC	    // Fold column
-    , HLF_ADD	    // Added diff line
+    , HLF_ಕೂಡಿಸು	    // Added diff line
     , HLF_CHD	    // Changed diff line
     , HLF_DED	    // Deleted diff line
     , HLF_TXD	    // Text Changed in changed diff line
@@ -1575,7 +1575,7 @@ typedef enum
     , HLF_PST	    // popup menu scrollbar thumb
     , HLF_PMB	    // popup menu border
     , HLF_PMS	    // popup menu shadow
-    , HLF_POP	    // popup window body
+    , HLF_ತೆಗೆ	    // popup window body
     , HLF_POPB	    // popup window border
     , HLF_POPT	    // popup window title
     , HLF_TP	    // tabpage line
@@ -1587,18 +1587,18 @@ typedef enum
     , HLF_QFL	    // quickfix window line currently selected
     , HLF_ST	    // status lines of terminal windows
     , HLF_STNC	    // status lines of not-current terminal windows
-    , HLF_MSG	    // message area
+    , HLF_ಸಂದೇಶ	    // message area
     , HLF_TPL	    // tabpanel
     , HLF_TPLS	    // tabpanel selected
     , HLF_TPLF	    // tabpanel filler
     , HLF_PRI	    // "preinsert" in 'completeopt'
     , HLF_WIN	    // window colour
-    , HLF_COUNT	    // MUST be the last one
+    , HLF_ಎಣಿಕೆ	    // MUST be the last one
 } hlf_T;
 
 // The HL_FLAGS must be in the same order as the HLF_ enums!
 // When changing this also adjust the default for 'highlight'.
-#define HL_FLAGS {'8', '~', '@', 'd', 'e', 'h', 'i', 'l', 'y', 'm', 'M', \
+#ವ್ಯಾಖ್ಯಾನಿಸು HL_FLAGS {'8', '~', '@', 'd', 'e', 'h', 'i', 'l', 'y', 'm', 'M', \
 		  'n', 'a', 'b', 'N', 'G', 'O', 'r', 's', 'S', 'c', '|', 't', 'v', 'V', \
 		  'w', 'W', 'f', 'F', 'A', 'C', 'D', 'T', 'E', '-', '>', \
 		  'B', 'P', 'R', 'L', \
@@ -1611,7 +1611,7 @@ typedef enum
 /*
  * Values for behaviour in spell_move_to
  */
-typedef enum
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ
 {
     SMT_ALL = 0		    // Move to "all" words
     , SMT_BAD		    // Move to "bad" words only
@@ -1620,218 +1620,218 @@ typedef enum
 /*
  * Boolean constants
  */
-#ifndef TRUE
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ TRUE
 # define FALSE	0	    // note: this is an int, not a long!
 # define TRUE	1
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#define MAYBE	2	    // sometimes used for a variant on TRUE
+#ವ್ಯಾಖ್ಯಾನಿಸು MAYBE	2	    // sometimes used for a variant on TRUE
 
-#define LOG_ALWAYS 9	    // must be different from TRUE and FALSE
+#ವ್ಯಾಖ್ಯಾನಿಸು LOG_ALWAYS 9	    // must be different from TRUE and FALSE
 
-#ifdef FEAT_JOB_CHANNEL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕೆಲಸ_CHANNEL
 // If "--log logfile" was used or ch_logfile() was called then log some or all
 // terminal output.
-# define MAY_WANT_TO_LOG_THIS if (ch_log_output == FALSE) ch_log_output = TRUE;
-#else
+# define MAY_WANT_ಗಮ್ಯ_LOG_THIS ಆದರೆ (ch_log_output == FALSE) ch_log_output = TRUE;
+#ಇಲ್ಲದಿದ್ದರೆ
 // no logging support
-# define MAY_WANT_TO_LOG_THIS
-#endif
+# define MAY_WANT_ಗಮ್ಯ_LOG_THIS
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifndef UINT32_T
-typedef UINT32_TYPEDEF UINT32_T;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ UINT32_T
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ UINT32_TYPEDEF UINT32_T;
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Operator IDs; The order must correspond to opchars[] in ops.c!
  */
-#define OP_NOP		0	// no pending operation
-#define OP_DELETE	1	// "d"  delete operator
-#define OP_YANK		2	// "y"  yank operator
-#define OP_CHANGE	3	// "c"  change operator
-#define OP_LSHIFT	4	// "<"  left shift operator
-#define OP_RSHIFT	5	// ">"  right shift operator
-#define OP_FILTER	6	// "!"  filter operator
-#define OP_TILDE	7	// "g~" switch case operator
-#define OP_INDENT	8	// "="  indent operator
-#define OP_FORMAT	9	// "gq" format operator
-#define OP_COLON	10	// ":"  colon operator
-#define OP_UPPER	11	// "gU" make upper case operator
-#define OP_LOWER	12	// "gu" make lower case operator
-#define OP_JOIN		13	// "J"  join operator, only for Visual mode
-#define OP_JOIN_NS	14	// "gJ"  join operator, only for Visual mode
-#define OP_ROT13	15	// "g?" rot-13 encoding
-#define OP_REPLACE	16	// "r"  replace chars, only for Visual mode
-#define OP_INSERT	17	// "I"  Insert column, only for Visual mode
-#define OP_APPEND	18	// "A"  Append column, only for Visual mode
-#define OP_FOLD		19	// "zf" define a fold
-#define OP_FOLDOPEN	20	// "zo" open folds
-#define OP_FOLDOPENREC	21	// "zO" open folds recursively
-#define OP_FOLDCLOSE	22	// "zc" close folds
-#define OP_FOLDCLOSEREC	23	// "zC" close folds recursively
-#define OP_FOLDDEL	24	// "zd" delete folds
-#define OP_FOLDDELREC	25	// "zD" delete folds recursively
-#define OP_FORMAT2	26	// "gw" format operator, keeps cursor pos
-#define OP_FUNCTION	27	// "g@" call 'operatorfunc'
-#define OP_NR_ADD	28	// "<C-A>" Add to the number or alphabetic
+#ವ್ಯಾಖ್ಯಾನಿಸು OP_NOP		0	// no pending operation
+#ವ್ಯಾಖ್ಯಾನಿಸು OP_DELETE	1	// "d"  delete operator
+#ವ್ಯಾಖ್ಯಾನಿಸು OP_YANK		2	// "y"  yank operator
+#ವ್ಯಾಖ್ಯಾನಿಸು OP_CHANGE	3	// "c"  change operator
+#ವ್ಯಾಖ್ಯಾನಿಸು OP_LSHIFT	4	// "<"  left shift operator
+#ವ್ಯಾಖ್ಯಾನಿಸು OP_RSHIFT	5	// ">"  right shift operator
+#ವ್ಯಾಖ್ಯಾನಿಸು OP_FILTER	6	// "!"  filter operator
+#ವ್ಯಾಖ್ಯಾನಿಸು OP_TILDE	7	// "g~" switch case operator
+#ವ್ಯಾಖ್ಯಾನಿಸು OP_INDENT	8	// "="  indent operator
+#ವ್ಯಾಖ್ಯಾನಿಸು OP_FORMAT	9	// "gq" format operator
+#ವ್ಯಾಖ್ಯಾನಿಸು OP_COLON	10	// ":"  colon operator
+#ವ್ಯಾಖ್ಯಾನಿಸು OP_ಊರ್ಧ್ವ	11	// "gU" make upper case operator
+#ವ್ಯಾಖ್ಯಾನಿಸು OP_ಅಧೋ	12	// "gu" make lower case operator
+#ವ್ಯಾಖ್ಯಾನಿಸು OP_JOIN		13	// "J"  join operator, only for Visual mode
+#ವ್ಯಾಖ್ಯಾನಿಸು OP_JOIN_NS	14	// "gJ"  join operator, only for Visual mode
+#ವ್ಯಾಖ್ಯಾನಿಸು OP_ROT13	15	// "g?" rot-13 encoding
+#ವ್ಯಾಖ್ಯಾನಿಸು OP_REPLACE	16	// "r"  replace chars, only for Visual mode
+#ವ್ಯಾಖ್ಯಾನಿಸು OP_ಸೇರಿಸು	17	// "I"  Insert column, only for Visual mode
+#ವ್ಯಾಖ್ಯಾನಿಸು OP_APPEND	18	// "A"  Append column, only for Visual mode
+#ವ್ಯಾಖ್ಯಾನಿಸು OP_FOLD		19	// "zf" define a fold
+#ವ್ಯಾಖ್ಯಾನಿಸು OP_FOLDOPEN	20	// "zo" open folds
+#ವ್ಯಾಖ್ಯಾನಿಸು OP_FOLDOPENREC	21	// "zO" open folds recursively
+#ವ್ಯಾಖ್ಯಾನಿಸು OP_FOLDCLOSE	22	// "zc" close folds
+#ವ್ಯಾಖ್ಯಾನಿಸು OP_FOLDCLOSEREC	23	// "zC" close folds recursively
+#ವ್ಯಾಖ್ಯಾನಿಸು OP_FOLDDEL	24	// "zd" delete folds
+#ವ್ಯಾಖ್ಯಾನಿಸು OP_FOLDDELREC	25	// "zD" delete folds recursively
+#ವ್ಯಾಖ್ಯಾನಿಸು OP_FORMAT2	26	// "gw" format operator, keeps cursor pos
+#ವ್ಯಾಖ್ಯಾನಿಸು OP_FUNCTION	27	// "g@" call 'operatorfunc'
+#ವ್ಯಾಖ್ಯಾನಿಸು OP_NR_ಕೂಡಿಸು	28	// "<C-A>" Add to the number or alphabetic
 				// character (OP_ADD conflicts with Perl)
-#define OP_NR_SUB	29	// "<C-X>" Subtract from the number or
+#ವ್ಯಾಖ್ಯಾನಿಸು OP_NR_SUB	29	// "<C-X>" Subtract from the number or
 				// alphabetic character
 
 /*
  * Motion types, used for operators and for yank/delete registers.
  */
-#define MCHAR	0		// character-wise movement/register
-#define MLINE	1		// line-wise movement/register
-#define MBLOCK	2		// block-wise register
+#ವ್ಯಾಖ್ಯಾನಿಸು MCHAR	0		// character-wise movement/register
+#ವ್ಯಾಖ್ಯಾನಿಸು MLINE	1		// line-wise movement/register
+#ವ್ಯಾಖ್ಯಾನಿಸು MBLOCK	2		// block-wise register
 
-#define MAUTO	0xff		// Decide between MLINE/MCHAR
+#ವ್ಯಾಖ್ಯಾನಿಸು MAUTO	0xff		// Decide between MLINE/MCHAR
 
 /*
  * Minimum screen size
  */
-#define MIN_COLUMNS	12	// minimal columns for screen
-#define MIN_LINES	2	// minimal lines for screen
-#define MIN_CMDHEIGHT	1	// minimal height for command line
-#define STATUS_HEIGHT	1	// default height of a status line under a
-				// window
-#ifdef FEAT_MENU		// height of a status line under a window
-# define WINBAR_HEIGHT(wp)	(wp)->w_winbar_height
-# define VISIBLE_HEIGHT(wp)	((wp)->w_height + (wp)->w_winbar_height)
-#else
-# define WINBAR_HEIGHT(wp)	0
-# define VISIBLE_HEIGHT(wp)	(wp)->w_height
-#endif
-#define QF_WINHEIGHT	10	// default height for quickfix window
+#ವ್ಯಾಖ್ಯಾನಿಸು MIN_COLUMNS	12	// minimal columns for screen
+#ವ್ಯಾಖ್ಯಾನಿಸು MIN_ಸಾಲುಗಳು	2	// minimal lines for screen
+#ವ್ಯಾಖ್ಯಾನಿಸು MIN_CMDHEIGHT	1	// minimal height for command line
+#ವ್ಯಾಖ್ಯಾನಿಸು ಸ್ಥಿತಿ_ಎತ್ತರ_2	1	// default height of a status line under a
+				//ಕಿಟಕಿ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MENU		// height of a status line under a window
+# define WINBAR_ಎತ್ತರ(wp)	(wp)->w_winbar_ಎತ್ತರ
+# define VISIBLE_ಎತ್ತರ(wp)	((wp)->w_ಎತ್ತರ + (wp)->w_winbar_ಎತ್ತರ)
+#ಇಲ್ಲದಿದ್ದರೆ
+# define WINBAR_ಎತ್ತರ(wp)	0
+# define VISIBLE_ಎತ್ತರ(wp)	(wp)->w_ಎತ್ತರ
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿಸು QF_WINHEIGHT	10	// default height for quickfix window
 
 /*
  * Buffer sizes
  */
-#ifndef CMDBUFFSIZE
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ CMDBUFFSIZE
 # define CMDBUFFSIZE	256	// size of the command processing buffer
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#define LSIZE	    512		// max. size of a line in the tags file
+#ವ್ಯಾಖ್ಯಾನಿಸು LSIZE	    512		// max. size of a line in the tags file
 
-#define IOSIZE	   (1024+1)	// file i/o and sprintf buffer size
+#ವ್ಯಾಖ್ಯಾನಿಸು IOSIZE	   (1024+1)	// file i/o and sprintf buffer size
 
-#define DIALOG_MSG_SIZE 1000	// buffer size for dialog_msg()
+#ವ್ಯಾಖ್ಯಾನಿಸು DIALOG_ಸಂದೇಶ_ಗಾತ್ರ 1000	// buffer size for dialog_msg()
 
-#define MSG_BUF_LEN 480	// length of buffer for small messages
-#define MSG_BUF_CLEN  (MSG_BUF_LEN / 6)    // cell length (worst case: utf-8
+#ವ್ಯಾಖ್ಯಾನಿಸು ಸಂದೇಶ_BUF_LEN 480	// length of buffer for small messages
+#ವ್ಯಾಖ್ಯಾನಿಸು ಸಂದೇಶ_BUF_CLEN  (ಸಂದೇಶ_BUF_LEN / 6)    // cell length (worst case: utf-8
 					   // takes 6 bytes for one cell)
 
-#define FOLD_TEXT_LEN  51	// buffer size for get_foldtext()
+#ವ್ಯಾಖ್ಯಾನಿಸು FOLD_ಪಠ್ಯ_LEN  51	// buffer size for get_foldtext()
 
 // Size of the buffer used for tgetent().  Unfortunately this is largely
 // undocumented, some systems use 1024.  Using a buffer that is too small
 // causes a buffer overrun and a crash.  Use the maximum known value to stay
 // on the safe side.
-#define TBUFSZ 2048		// buffer size for termcap entry
+#ವ್ಯಾಖ್ಯಾನಿಸು TBUFSZ 2048		// buffer size for termcap entry
 
 /*
  * Maximum length of key sequence to be mapped.
  * Must be able to hold an Amiga resize report.
  */
-#define MAXMAPLEN   50
+#ವ್ಯಾಖ್ಯಾನಿಸು MAXMAPLEN   50
 
 // maximum length of a function name, including SID and NUL
-#define MAX_FUNC_NAME_LEN   200
+#ವ್ಯಾಖ್ಯಾನಿಸು MAX_FUNC_NAME_LEN   200
 
 // Size in bytes of the hash used in the undo file.
-#define UNDO_HASH_SIZE 32
+#ವ್ಯಾಖ್ಯಾನಿಸು UNDO_HASH_ಗಾತ್ರ 32
 
-#ifdef HAVE_FCNTL_H
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_FCNTL_H
 # include <fcntl.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef BINARY_FILE_IO
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ದ್ವಿಮಾನ_FILE_IO
 # define WRITEBIN   "wb"	// no CR-LF translation
 # define READBIN    "rb"
 # define APPENDBIN  "ab"
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 # define WRITEBIN   "w"
 # define READBIN    "r"
 # define APPENDBIN  "a"
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Cygwin doesn't have a global way of making open() use binary I/O.
  * Use O_BINARY for all open() calls.
  */
-#ifdef __CYGWIN__
-# define O_EXTRA    O_BINARY
-#else
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ __CYGWIN__
+# define O_EXTRA    O_ದ್ವಿಮಾನ
+#ಇಲ್ಲದಿದ್ದರೆ
 # define O_EXTRA    0
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifndef O_NOFOLLOW
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ O_NOFOLLOW
 # define O_NOFOLLOW 0
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifndef W_OK
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ W_OK
 # define W_OK 2		// for systems that don't have W_OK in unistd.h
-#endif
-#ifndef R_OK
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ R_OK
 # define R_OK 4		// for systems that don't have R_OK in unistd.h
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // Allocate memory for one type and cast the returned pointer to have the
 // compiler check the types.
-#define ALLOC_ONE(type)  (type *)alloc(sizeof(type))
-#define ALLOC_ONE_ID(type, id)  (type *)alloc_id(sizeof(type), id)
-#define ALLOC_MULT(type, count)  (type *)alloc(sizeof(type) * (count))
-#define ALLOC_CLEAR_ONE(type)  (type *)alloc_clear(sizeof(type))
-#define ALLOC_CLEAR_ONE_ID(type, id)  (type *)alloc_clear_id(sizeof(type), id)
-#define ALLOC_CLEAR_MULT(type, count)  (type *)alloc_clear(sizeof(type) * (count))
-#define LALLOC_CLEAR_ONE(type)  (type *)lalloc_clear(sizeof(type), FALSE)
-#define LALLOC_CLEAR_MULT(type, count)  (type *)lalloc_clear(sizeof(type) * (count), FALSE)
-#define LALLOC_MULT(type, count)  (type *)lalloc(sizeof(type) * (count), FALSE)
+#ವ್ಯಾಖ್ಯಾನಿಸು ALLOC_ONE(type)  (type *)alloc(ಗಾತ್ರ(type))
+#ವ್ಯಾಖ್ಯಾನಿಸು ALLOC_ONE_ID(type, id)  (type *)alloc_id(ಗಾತ್ರ(type), id)
+#ವ್ಯಾಖ್ಯಾನಿಸು ALLOC_MULT(type, ಎಣಿಕೆ_2)  (type *)alloc(ಗಾತ್ರ(type) * (ಎಣಿಕೆ_2))
+#ವ್ಯಾಖ್ಯಾನಿಸು ALLOC_CLEAR_ONE(type)  (type *)alloc_clear(ಗಾತ್ರ(type))
+#ವ್ಯಾಖ್ಯಾನಿಸು ALLOC_CLEAR_ONE_ID(type, id)  (type *)alloc_clear_id(ಗಾತ್ರ(type), id)
+#ವ್ಯಾಖ್ಯಾನಿಸು ALLOC_CLEAR_MULT(type, ಎಣಿಕೆ_2)  (type *)alloc_clear(ಗಾತ್ರ(type) * (ಎಣಿಕೆ_2))
+#ವ್ಯಾಖ್ಯಾನಿಸು LALLOC_CLEAR_ONE(type)  (type *)lalloc_clear(ಗಾತ್ರ(type), FALSE)
+#ವ್ಯಾಖ್ಯಾನಿಸು LALLOC_CLEAR_MULT(type, ಎಣಿಕೆ_2)  (type *)lalloc_clear(ಗಾತ್ರ(type) * (ಎಣಿಕೆ_2), FALSE)
+#ವ್ಯಾಖ್ಯಾನಿಸು LALLOC_MULT(type, ಎಣಿಕೆ_2)  (type *)lalloc(ಗಾತ್ರ(type) * (ಎಣಿಕೆ_2), FALSE)
 
-#ifdef HAVE_MEMSET
-# define vim_memset(ptr, c, size)   memset((ptr), (c), (size))
-#else
-void *vim_memset(void *, int, size_t);
-#endif
-#define CLEAR_FIELD(field)  vim_memset(&(field), 0, sizeof(field))
-#define CLEAR_POINTER(ptr)  vim_memset((ptr), 0, sizeof(*(ptr)))
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_MEMSET
+# define vim_memset(ptr, c, ಗಾತ್ರ_2)   memset((ptr), (c), (ಗಾತ್ರ_2))
+#ಇಲ್ಲದಿದ್ದರೆ
+ಶೂನ್ಯ *vim_memset(ಶೂನ್ಯ *, ಪೂರ್ಣಾಂಕ, size_t);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿಸು CLEAR_ಕ್ಷೇತ್ರ(ಕ್ಷೇತ್ರ)  vim_memset(&(ಕ್ಷೇತ್ರ), 0, ಗಾತ್ರ(ಕ್ಷೇತ್ರ))
+#ವ್ಯಾಖ್ಯಾನಿಸು CLEAR_ಸೂಚಕ(ptr)  vim_memset((ptr), 0, ಗಾತ್ರ(*(ptr)))
 
 /*
  * defines to avoid typecasts from (char_u *) to (char *) and back
  * (vim_strchr() and vim_strrchr() are now in strings.c)
  */
-#define STRLEN(s)	    strlen((char *)(s))
-#define STRCPY(d, s)	    strcpy((char *)(d), (char *)(s))
-#define STRNCPY(d, s, n)    strncpy((char *)(d), (char *)(s), (n))
-#define STRCMP(d, s)	    strcmp((char *)(d), (char *)(s))
-#define STRNCMP(d, s, n)    strncmp((char *)(d), (char *)(s), (n))
-#ifdef HAVE_STRCASECMP
-# define STRICMP(d, s)	    strcasecmp((char *)(d), (char *)(s))
-#else
+#ವ್ಯಾಖ್ಯಾನಿಸು STRLEN(s)	    ಅಕ್ಷರಸರಣಿ_ಉದ್ದ((ಅಕ್ಷರ *)(s))
+#ವ್ಯಾಖ್ಯಾನಿಸು STRCPY(d, s)	    strcpy((ಅಕ್ಷರ *)(d), (ಅಕ್ಷರ *)(s))
+#ವ್ಯಾಖ್ಯಾನಿಸು STRNCPY(d, s, n)    strncpy((ಅಕ್ಷರ *)(d), (ಅಕ್ಷರ *)(s), (n))
+#ವ್ಯಾಖ್ಯಾನಿಸು STRCMP(d, s)	    strcmp((ಅಕ್ಷರ *)(d), (ಅಕ್ಷರ *)(s))
+#ವ್ಯಾಖ್ಯಾನಿಸು STRNCMP(d, s, n)    ಅಕ್ಷರಸರಣಿ_ಹೋಲಿಕೆ((ಅಕ್ಷರ *)(d), (ಅಕ್ಷರ *)(s), (n))
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_STRCASECMP
+# define STRICMP(d, s)	    strcasecmp((ಅಕ್ಷರ *)(d), (ಅಕ್ಷರ *)(s))
+#ಇಲ್ಲದಿದ್ದರೆ
 # ifdef HAVE_STRICMP
-#  define STRICMP(d, s)	    stricmp((char *)(d), (char *)(s))
-# else
-#  define STRICMP(d, s)	    vim_stricmp((char *)(d), (char *)(s))
+#  define STRICMP(d, s)	    stricmp((ಅಕ್ಷರ *)(d), (ಅಕ್ಷರ *)(s))
+# ಇಲ್ಲದಿದ್ದರೆ
+#  define STRICMP(d, s)	    vim_stricmp((ಅಕ್ಷರ *)(d), (ಅಕ್ಷರ *)(s))
 # endif
-#endif
-#ifdef HAVE_STRCOLL
-# define STRCOLL(d, s)     strcoll((char *)(d), (char *)(s))
-#else
-# define STRCOLL(d, s)     strcmp((char *)(d), (char *)(s))
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_STRCOLL
+# define STRCOLL(d, s)     strcoll((ಅಕ್ಷರ *)(d), (ಅಕ್ಷರ *)(s))
+#ಇಲ್ಲದಿದ್ದರೆ
+# define STRCOLL(d, s)     strcmp((ಅಕ್ಷರ *)(d), (ಅಕ್ಷರ *)(s))
+#ಆದರೆ_ಅಂತ್ಯ
 
 // Like strcpy() but allows overlapped source and destination.
-#define STRMOVE(d, s)	    mch_memmove((d), (s), STRLEN(s) + 1)
+#ವ್ಯಾಖ್ಯಾನಿಸು STRMOVE(d, s)	    mch_memmove((d), (s), STRLEN(s) + 1)
 
-#ifdef HAVE_STRNCASECMP
-# define STRNICMP(d, s, n)  strncasecmp((char *)(d), (char *)(s), (n))
-#else
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_STRNCASECMP
+# define STRNICMP(d, s, n)  strncasecmp((ಅಕ್ಷರ *)(d), (ಅಕ್ಷರ *)(s), (n))
+#ಇಲ್ಲದಿದ್ದರೆ
 # ifdef HAVE_STRNICMP
-#  define STRNICMP(d, s, n) strnicmp((char *)(d), (char *)(s), (n))
-# else
-#  define STRNICMP(d, s, n) vim_strnicmp((char *)(d), (char *)(s), (n))
+#  define STRNICMP(d, s, n) strnicmp((ಅಕ್ಷರ *)(d), (ಅಕ್ಷರ *)(s), (n))
+# ಇಲ್ಲದಿದ್ದರೆ
+#  define STRNICMP(d, s, n) vim_strnicmp((ಅಕ್ಷರ *)(d), (ಅಕ್ಷರ *)(s), (n))
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // We need to call mb_stricmp() even when we aren't dealing with a multi-byte
 // encoding because mb_stricmp() takes care of all ascii and non-ascii
@@ -1839,66 +1839,66 @@ void *vim_memset(void *, int, size_t);
 // STRICMP() only handles the system locale version, which often does not
 // handle non-ascii properly.
 
-#define MB_STRICMP(d, s)	mb_strnicmp((char_u *)(d), (char_u *)(s), (int)MAXCOL)
-#define MB_STRNICMP(d, s, n)	mb_strnicmp((char_u *)(d), (char_u *)(s), (int)(n))
-#define MB_STRNICMP2(d, s, n1, n2)	mb_strnicmp2((char_u *)(d), (char_u *)(s), (n1), (n2))
+#ವ್ಯಾಖ್ಯಾನಿಸು MB_STRICMP(d, s)	mb_strnicmp((char_u *)(d), (char_u *)(s), (ಪೂರ್ಣಾಂಕ)MAXCOL)
+#ವ್ಯಾಖ್ಯಾನಿಸು MB_STRNICMP(d, s, n)	mb_strnicmp((char_u *)(d), (char_u *)(s), (ಪೂರ್ಣಾಂಕ)(n))
+#ವ್ಯಾಖ್ಯಾನಿಸು MB_STRNICMP2(d, s, n1, n2)	mb_strnicmp2((char_u *)(d), (char_u *)(s), (n1), (n2))
 
-#define STRCAT(d, s)	    strcat((char *)(d), (char *)(s))
-#define STRNCAT(d, s, n)    strncat((char *)(d), (char *)(s), (n))
+#ವ್ಯಾಖ್ಯಾನಿಸು STRCAT(d, s)	    strcat((ಅಕ್ಷರ *)(d), (ಅಕ್ಷರ *)(s))
+#ವ್ಯಾಖ್ಯಾನಿಸು STRNCAT(d, s, n)    strncat((ಅಕ್ಷರ *)(d), (ಅಕ್ಷರ *)(s), (n))
 
-#ifdef HAVE_STRPBRK
-# define vim_strpbrk(s, cs) (char_u *)strpbrk((char *)(s), (char *)(cs))
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_STRPBRK
+# define vim_strpbrk(s, cs) (char_u *)strpbrk((ಅಕ್ಷರ *)(s), (ಅಕ್ಷರ *)(cs))
+#ಆದರೆ_ಅಂತ್ಯ
 
-#define OUT_STR(s)		    out_str((char_u *)(s))
-#define OUT_STR_NF(s)		    out_str_nf((char_u *)(s))
+#ವ್ಯಾಖ್ಯಾನಿಸು ಹೊರಹೋಗು_STR(s)		    ಹೊರಹೋಗು_str((char_u *)(s))
+#ವ್ಯಾಖ್ಯಾನಿಸು ಹೊರಹೋಗು_STR_NF(s)		    ಹೊರಹೋಗು_str_nf((char_u *)(s))
 
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 # ifdef FEAT_TERMGUICOLORS
-#  define GUI_FUNCTION(f)	    (gui.in_use ? gui_##f : termgui_##f)
-#  define GUI_FUNCTION2(f, pixel)   (gui.in_use \
+#  define GUI_FUNCTION(f)	    (gui.ಒಳ_use ? gui_##f : termgui_##f)
+#  define GUI_FUNCTION2(f, pixel)   (gui.ಒಳ_use \
 				    ?  ((pixel) != INVALCOLOR \
 					? gui_##f((pixel)) \
 					: INVALCOLOR) \
 				    : termgui_##f((pixel)))
-#  define USE_24BIT		    (gui.in_use || p_tgc)
-# else
+#  define USE_24_ಬಿಟ್		    (gui.ಒಳ_use || p_tgc)
+# ಇಲ್ಲದಿದ್ದರೆ
 #  define GUI_FUNCTION(f)	    gui_##f
 #  define GUI_FUNCTION2(f,pixel)    ((pixel) != INVALCOLOR \
 				     ? gui_##f((pixel)) \
 				     : INVALCOLOR)
-#  define USE_24BIT		    gui.in_use
+#  define USE_24_ಬಿಟ್		    gui.ಒಳ_use
 # endif
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 # ifdef FEAT_TERMGUICOLORS
 #  define GUI_FUNCTION(f)	    termgui_##f
 #  define GUI_FUNCTION2(f, pixel)   termgui_##f((pixel))
-#  define USE_24BIT		    p_tgc
+#  define USE_24_ಬಿಟ್		    p_tgc
 # endif
-#endif
-#ifdef FEAT_TERMGUICOLORS
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMGUICOLORS
 # define IS_CTERM		    (t_colors > 1 || p_tgc)
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 # define IS_CTERM		    (t_colors > 1)
-#endif
-#ifdef GUI_FUNCTION
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ GUI_FUNCTION
 # define GUI_MCH_GET_RGB	    GUI_FUNCTION(mch_get_rgb)
 # define GUI_MCH_GET_RGB2(pixel)    GUI_FUNCTION2(mch_get_rgb, (pixel))
 # define GUI_MCH_GET_COLOR	    GUI_FUNCTION(mch_get_color)
 # define GUI_GET_COLOR		    GUI_FUNCTION(get_color)
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // Prefer using emsgf(), because perror() may send the output to the wrong
 // destination and mess up the screen.
-#ifdef HAVE_STRERROR
-# define PERROR(msg)		    (void)semsg("%s: %s", (char *)(msg), strerror(errno))
-#else
-# define PERROR(msg)		    do_perror(msg)
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_STRERROR
+# define PERROR(ಸಂದೇಶ)		    (ಶೂನ್ಯ)semsg("%s: %s", (ಅಕ್ಷರ *)(ಸಂದೇಶ), strerror(errno))
+#ಇಲ್ಲದಿದ್ದರೆ
+# define PERROR(ಸಂದೇಶ)		    do_perror(ಸಂದೇಶ)
+#ಆದರೆ_ಅಂತ್ಯ
 
-typedef long	linenr_T;		// line number type
-typedef int	colnr_T;		// column number type
-typedef unsigned short disptick_T;	// display tick type
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ದೀರ್ಘ	linenr_T;		// line number type
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಪೂರ್ಣಾಂಕ	colnr_T;		// column number type
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಚಿಹ್ನೆರಹಿತ ಗಿಡ್ಡ disptick_T;	// display tick type
 
 /*
  * Well, you won't believe it, but some S/390 machines ("host", now also known
@@ -1909,23 +1909,23 @@ typedef unsigned short disptick_T;	// display tick type
  * With this we restrict the maximum line length to 1073741823. I guess this is
  * not a real problem. BTW:  Longer lines are split.
  */
-#ifdef __MVS__
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ __MVS__
 # define MAXCOL (0x3fffffffL)		// maximum column number, 30 bits
 # define MAXLNUM (0x3fffffffL)		// maximum (invalid) line number
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
   // MAXCOL used to be INT_MAX, but with 64 bit ints that results in running
   // out of memory when trying to allocate a very long line.
 # define MAXCOL  0x7fffffffL		// maximum column number
 # define MAXLNUM LONG_MAX		// maximum (invalid) line number
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#define SHOWCMD_COLS 10			// columns needed by shown command
+#ವ್ಯಾಖ್ಯಾನಿಸು SHOWCMD_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ 10			// columns needed by shown command
 
-typedef void	    *vim_acl_T;		// dummy to pass an ACL to a function
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಶೂನ್ಯ	    *vim_acl_T;		// dummy to pass an ACL to a function
 
-#ifndef mch_memmove
-# define mch_memmove(to, from, len) memmove((char*)(to), (char*)(from), (len))
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ mch_memmove
+# define mch_memmove(ಗಮ್ಯ, from, len) memmove((ಅಕ್ಷರ*)(ಗಮ್ಯ), (ಅಕ್ಷರ*)(from), (len))
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * fnamecmp() is used to compare file names.
@@ -1933,48 +1933,48 @@ typedef void	    *vim_acl_T;		// dummy to pass an ACL to a function
  * (this does not account for maximum name lengths and things like "../dir",
  * thus it is not 100% accurate!)
  */
-#define fnamecmp(x, y) vim_fnamecmp((char_u *)(x), (char_u *)(y))
-#define fnamencmp(x, y, n) vim_fnamencmp((char_u *)(x), (char_u *)(y), (n))
+#ವ್ಯಾಖ್ಯಾನಿಸು fnamecmp(x, y) vim_fnamecmp((char_u *)(x), (char_u *)(y))
+#ವ್ಯಾಖ್ಯಾನಿಸು fnamencmp(x, y, n) vim_fnamencmp((char_u *)(x), (char_u *)(y), (n))
 
-#if defined(UNIX) || defined(FEAT_GUI) || defined(VMS) \
+#ಆದರೆ defined(UNIX) || defined(FEAT_GUI) || defined(VMS) \
 	|| defined(FEAT_CLIENTSERVER)
-# define USE_INPUT_BUF
-#endif
+# define USE_ಒಳಹರಿವು_BUF
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if !defined(EINTR) && !defined(PROTO)
-# define read_eintr(fd, buf, count) vim_read((fd), (buf), (count))
-# define write_eintr(fd, buf, count) vim_write((fd), (buf), (count))
-#endif
+#ಆದರೆ !defined(EINTR) && !defined(PROTO)
+# define read_eintr(fd, buf, ಎಣಿಕೆ_2) vim_read((fd), (buf), (ಎಣಿಕೆ_2))
+# define write_eintr(fd, buf, ಎಣಿಕೆ_2) vim_write((fd), (buf), (ಎಣಿಕೆ_2))
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef MSWIN
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
 // On MS-Windows the third argument isn't size_t.  This matters for Win64,
 // where sizeof(size_t)==8, not 4
-# define vim_read(fd, buf, count)   read((fd), (char *)(buf), (unsigned int)(count))
-# define vim_write(fd, buf, count)  write((fd), (char *)(buf), (unsigned int)(count))
-#else
-# define vim_read(fd, buf, count)   read((fd), (char *)(buf), (count))
-# define vim_write(fd, buf, count)  write((fd), (char *)(buf), (count))
-#endif
+# define vim_read(fd, buf, ಎಣಿಕೆ_2)   ಪಠ((fd), (ಅಕ್ಷರ *)(buf), (ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ)(ಎಣಿಕೆ_2))
+# define vim_write(fd, buf, ಎಣಿಕೆ_2)  ಲಿಖ((fd), (ಅಕ್ಷರ *)(buf), (ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ)(ಎಣಿಕೆ_2))
+#ಇಲ್ಲದಿದ್ದರೆ
+# define vim_read(fd, buf, ಎಣಿಕೆ_2)   ಪಠ((fd), (ಅಕ್ಷರ *)(buf), (ಎಣಿಕೆ_2))
+# define vim_write(fd, buf, ಎಣಿಕೆ_2)  ಲಿಖ((fd), (ಅಕ್ಷರ *)(buf), (ಎಣಿಕೆ_2))
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Enums need a typecast to be used as array index (for Ultrix).
  */
-#define HL_ATTR(n)	highlight_attr[(int)(n)]
-#define TERM_STR(n)	term_strings[(int)(n)]
+#ವ್ಯಾಖ್ಯಾನಿಸು HL_ATTR(n)	highlight_attr[(ಪೂರ್ಣಾಂಕ)(n)]
+#ವ್ಯಾಖ್ಯಾನಿಸು ಪದ_STR(n)	ಪದ_ಅಕ್ಷರಸರಣಿಗಳು[(ಪೂರ್ಣಾಂಕ)(n)]
 
 /*
  * EXTERN is only defined in main.c.  That's where global variables are
  * actually defined and initialized.
  */
-#ifndef EXTERN
-# define EXTERN extern
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ EXTERN
+# define EXTERN ಬಾಹ್ಯ
 # define INIT(x)
 # define INIT2(a, b)
 # define INIT3(a, b, c)
 # define INIT4(a, b, c, d)
 # define INIT5(a, b, c, d, e)
 # define INIT6(a, b, c, d, e, f)
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 # ifndef INIT
 #  define INIT(x) x
 #  define INIT2(a, b) = {a, b}
@@ -1984,47 +1984,47 @@ typedef void	    *vim_acl_T;		// dummy to pass an ACL to a function
 #  define INIT6(a, b, c, d, e, f) = {a, b, c, d, e, f}
 #  define DO_INIT
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#define MAX_MCO	6	// maximum value for 'maxcombine'
+#ವ್ಯಾಖ್ಯಾನಿಸು MAX_MCO	6	// maximum value for 'maxcombine'
 
 // Maximum number of bytes in the multi-byte character of one screen cell.
 // It can be one character of up to six bytes, plus MAX_MCO following composing
 // characters of up to four bytes each.
-#define MB_MAXBYTES	30
+#ವ್ಯಾಖ್ಯಾನಿಸು MB_MAXBYTES	30
 
-#if (defined(FEAT_PROFILE) || defined(FEAT_RELTIME)) && !defined(PROTO)
+#ಆದರೆ (defined(FEAT_PROFILE) || defined(FEAT_RELTIME)) && !defined(PROTO)
 # ifdef MSWIN
-typedef LARGE_INTEGER proftime_T;
-#  define PROF_TIME_BLANK "           "
-#  define PROF_TOTALS_HEADER "count  total (s)   self (s)"
-# else
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ LARGE_INTEGER proftime_T;
+#  define PROF_ಸಮಯ_BLANK "           "
+#  define PROF_TOTALS_ಶೀರ್ಷಿಕೆ "count  total (s)   self (s)"
+# ಇಲ್ಲದಿದ್ದರೆ
    // Use tv_fsec for fraction of second (micro or nano) of proftime_T
-#  if defined(HAVE_TIMER_CREATE) && defined(HAVE_CLOCK_GETTIME)
+#  ಆದರೆ defined(HAVE_TIMER_CREATE) && defined(HAVE_CLOCK_GETTIME)
 #   define PROF_NSEC 1
-typedef struct timespec proftime_T;
-#   define PROF_GET_TIME(tm) clock_gettime(CLOCK_MONOTONIC, tm)
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ timespec proftime_T;
+#   define PROF_GET_ಸಮಯ(tm) clock_gettime(CLOCK_MONOTONIC, tm)
 #   define tv_fsec tv_nsec
 #   define TV_FSEC_SEC 1000000000L
-#   define PROF_TIME_FORMAT "%3ld.%09ld"
-#   define PROF_TIME_BLANK "              "
-#   define PROF_TOTALS_HEADER "count     total (s)      self (s)"
-#  else
-typedef struct timeval proftime_T;
-#   define PROF_GET_TIME(tm) gettimeofday(tm, NULL)
+#   define PROF_ಸಮಯ_FORMAT "%3ld.%09ld"
+#   define PROF_ಸಮಯ_BLANK "              "
+#   define PROF_TOTALS_ಶೀರ್ಷಿಕೆ "count     total (s)      self (s)"
+#  ಇಲ್ಲದಿದ್ದರೆ
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ timeval proftime_T;
+#   define PROF_GET_ಸಮಯ(tm) gettimeofday(tm, ಖಾಲಿ)
 #   define tv_fsec tv_usec
 #   define TV_FSEC_SEC 1000000
-#   define PROF_TIME_FORMAT "%3ld.%06ld"
-#   define PROF_TIME_BLANK "           "
-#   define PROF_TOTALS_HEADER "count  total (s)   self (s)"
+#   define PROF_ಸಮಯ_FORMAT "%3ld.%06ld"
+#   define PROF_ಸಮಯ_BLANK "           "
+#   define PROF_TOTALS_ಶೀರ್ಷಿಕೆ "count  total (s)   self (s)"
 #  endif
 # endif
-#else
-typedef int proftime_T;	    // dummy for function prototypes
-#endif
+#ಇಲ್ಲದಿದ್ದರೆ
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಪೂರ್ಣಾಂಕ proftime_T;	    // dummy for function prototypes
+#ಆದರೆ_ಅಂತ್ಯ
 
 // Type of compilation passed to compile_def_function()
-typedef enum {
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ {
     CT_NONE,	    // use df_instr
     CT_PROFILE,	    // use df_instr_prof
     CT_DEBUG	    // use df_instr_debug, overrules CT_PROFILE
@@ -2035,291 +2035,291 @@ typedef enum {
  * bits elsewhere.  That causes memory corruption.  Define time_T and use it
  * for global variables to avoid that.
  */
-#ifdef MSWIN
-typedef __time64_t  time_T;
-#else
-typedef time_t	    time_T;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ __time64_t  ಸಮಯ_T;
+#ಇಲ್ಲದಿದ್ದರೆ
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ time_t	    ಸಮಯ_T;
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef _WIN64
-typedef __int64 sock_T;
-#else
-typedef int sock_T;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ _WIN64
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ __int64 sock_T;
+#ಇಲ್ಲದಿದ್ದರೆ
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಪೂರ್ಣಾಂಕ sock_T;
+#ಆದರೆ_ಅಂತ್ಯ
 
 // The clipboard provider feature uses clipmethod as well but should be separate
 // from the clipboard code.
-#if defined(FEAT_CLIPBOARD) || defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_CLIPBOARD) || defined(FEAT_EVAL)
 # define HAVE_CLIPMETHOD
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(HAVE_CLIPMETHOD) && defined(FEAT_EVAL)
+#ಆದರೆ defined(HAVE_CLIPMETHOD) && defined(FEAT_EVAL)
 # define FEAT_CLIPBOARD_PROVIDER
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // Include option.h before structs.h, because the number of window-local and
 // buffer-local options is used there.
-#include "option.h"	// options and default values
+#ಅನ್ತರ್ಭಾವ "option.h"	// options and default values
 
-#include "beval.h"	// BalloonEval
+#ಅನ್ತರ್ಭಾವ "beval.h"	// BalloonEval
 
 // Note that gui.h is included by structs.h
 
-#include "structs.h"	// defines many structures
-#include "xdiff/xdiff.h"	// TODO: maybe remove this, but this brings in mmfile_t so it can compile
+#ಅನ್ತರ್ಭಾವ "structs.h"	// defines many structures
+#ಅನ್ತರ್ಭಾವ "xdiff/xdiff.h"	// TODO: maybe remove this, but this brings in mmfile_t so it can compile
 
-#include "alloc.h"
+#ಅನ್ತರ್ಭಾವ "alloc.h"
 
 // Values for "do_profiling".
-#define PROF_NONE	0	// profiling not started
-#define PROF_YES	1	// profiling busy
-#define PROF_PAUSED	2	// profiling paused
+#ವ್ಯಾಖ್ಯಾನಿಸು PROF_NONE	0	// profiling not started
+#ವ್ಯಾಖ್ಯಾನಿಸು PROF_YES	1	// profiling busy
+#ವ್ಯಾಖ್ಯಾನಿಸು PROF_PAUSED	2	// profiling paused
 
 
 // Codes for mouse button events in lower three bits:
-#define MOUSE_LEFT	0x00
-#define MOUSE_MIDDLE	0x01
-#define MOUSE_RIGHT	0x02
-#define MOUSE_RELEASE	0x03
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_ಎಡ	0x00
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_ಮಧ್ಯ	0x01
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_ಬಲ	0x02
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_RELEASE	0x03
 
 // bit masks for modifiers:
-#define MOUSE_SHIFT	0x04
-#define MOUSE_ALT	0x08
-#define MOUSE_CTRL	0x10
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_ಸರಿಸು	0x04
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_ALT	0x08
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_CTRL	0x10
 
 // mouse buttons that are handled like a key press (GUI only)
 // Note that the scroll wheel keys are inverted: MOUSE_5 scrolls lines up but
 // the result of this is that the window moves down, similarly MOUSE_6 scrolls
 // columns left but the window moves right.
-#define MOUSE_4	0x100	// scroll wheel down
-#define MOUSE_5	0x200	// scroll wheel up
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_4	0x100	// scroll wheel down
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_5	0x200	// scroll wheel up
 
-#define MOUSE_X1	0x300 // Mouse-button X1 (6th)
-#define MOUSE_X2	0x400 // Mouse-button X2
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_X1	0x300 // Mouse-button X1 (6th)
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_X2	0x400 // Mouse-button X2
 
-#define MOUSE_6	0x500	// scroll wheel left
-#define MOUSE_7	0x600	// scroll wheel right
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_6	0x500	// scroll wheel left
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_7	0x600	// scroll wheel right
 
-#define MOUSE_MOVE 0x700    // report mouse moved
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_MOVE 0x700    // report mouse moved
 
 // 0x20 is reserved by xterm
-#define MOUSE_DRAG_XTERM   0x40
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_DRAG_XTERM   0x40
 
-#define MOUSE_DRAG	(0x40 | MOUSE_RELEASE)
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_DRAG	(0x40 | MOUSE_RELEASE)
 
 // Lowest button code for using the mouse wheel (xterm only)
-#define MOUSEWHEEL_LOW		0x60
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSEWHEEL_ಕೆಳಗಿನ		0x60
 
 // Lowest button code for extra mouse buttons 8-11
-#define MOUSESIDEBUTTONS_LOW		0xa0
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSESIDEBUTTONS_ಕೆಳಗಿನ		0xa0
 
-#define MOUSE_CLICK_MASK	0x03
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_CLICK_ಮುಖವಾಡ	0x03
 
-#define NUM_MOUSE_CLICKS(code) \
-    (((unsigned)((code) & 0xC0) >> 6) + 1)
+#ವ್ಯಾಖ್ಯಾನಿಸು ಅಂಕೆ_MOUSE_CLICKS(ಸಂಕೇತ_2) \
+    (((ಚಿಹ್ನೆರಹಿತ)((ಸಂಕೇತ_2) & 0xC0) >> 6) + 1)
 
-#define SET_NUM_MOUSE_CLICKS(code, num) \
-    ((code) = ((code) & 0x3f) | ((((num) - 1) & 3) << 6))
+#ವ್ಯಾಖ್ಯಾನಿಸು ಗಣ_ಅಂಕೆ_MOUSE_CLICKS(ಸಂಕೇತ_2, ಅಂಕೆ) \
+    ((ಸಂಕೇತ_2) = ((ಸಂಕೇತ_2) & 0x3f) | ((((ಅಂಕೆ) - 1) & 3) << 6))
 
 // Added to mouse column for GUI when 'mousefocus' wants to give focus to a
 // window by simulating a click on its status line.  We could use up to 128 *
 // 128 = 16384 columns, now it's reduced to 10000.
-#define MOUSE_COLOFF 10000
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_COLOFF 10000
 
 /*
  * jump_to_mouse() returns one of first five these values, possibly with
  * some of the other four added.
  */
-#define IN_UNKNOWN		0
-#define IN_BUFFER		1
-#define IN_STATUS_LINE		2	// on status or command line
-#define IN_SEP_LINE		4	// on vertical separator line
-#define IN_OTHER_WIN		8	// in other window but can't go there
-#define CURSOR_MOVED		0x100
-#define MOUSE_FOLD_CLOSE	0x200	// clicked on '-' in fold column
-#define MOUSE_FOLD_OPEN		0x400	// clicked on '+' in fold column
-#define MOUSE_WINBAR		0x800	// in window toolbar
+#ವ್ಯಾಖ್ಯಾನಿಸು ಒಳ_UNKNOWN		0
+#ವ್ಯಾಖ್ಯಾನಿಸು ಒಳ_ಬಫರ್		1
+#ವ್ಯಾಖ್ಯಾನಿಸು ಒಳ_ಸ್ಥಿತಿ_ಸಾಲು		2	// on status or command line
+#ವ್ಯಾಖ್ಯಾನಿಸು ಒಳ_SEP_ಸಾಲು		4	// on vertical separator line
+#ವ್ಯಾಖ್ಯಾನಿಸು ಒಳ_OTHER_WIN		8	// in other window but can't go there
+#ವ್ಯಾಖ್ಯಾನಿಸು CURSOR_MOVED		0x100
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_FOLD_CLOSE	0x200	// clicked on '-' in fold column
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_FOLD_OPEN		0x400	// clicked on '+' in fold column
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_WINBAR		0x800	// in window toolbar
 
 // flags for jump_to_mouse()
-#define MOUSE_FOCUS		0x01	// need to stay in this window
-#define MOUSE_MAY_VIS		0x02	// may start Visual mode
-#define MOUSE_DID_MOVE		0x04	// only act when mouse has moved
-#define MOUSE_SETPOS		0x08	// only set current mouse position
-#define MOUSE_MAY_STOP_VIS	0x10	// may stop Visual mode
-#define MOUSE_RELEASED		0x20	// button was released
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_FOCUS		0x01	// need to stay in this window
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_MAY_VIS		0x02	// may start Visual mode
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_DID_MOVE		0x04	// only act when mouse has moved
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_SETPOS		0x08	// only set current mouse position
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_MAY_STOP_VIS	0x10	// may stop Visual mode
+#ವ್ಯಾಖ್ಯಾನಿಸು MOUSE_RELEASED		0x20	// button was released
 
-#if defined(UNIX) && defined(HAVE_GETTIMEOFDAY) && defined(HAVE_SYS_TIME_H)
+#ಆದರೆ defined(UNIX) && defined(HAVE_GETTIMEOFDAY) && defined(HAVE_SYS_ಸಮಯ_H)
 # define CHECK_DOUBLE_CLICK 1	// Checking for double clicks ourselves.
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 
 // defines for eval_vars()
-#define VALID_PATH		1
-#define VALID_HEAD		2
+#ವ್ಯಾಖ್ಯಾನಿಸು VALID_ಮಾರ್ಗ		1
+#ವ್ಯಾಖ್ಯಾನಿಸು VALID_ತಲೆ		2
 
 // Defines for Vim variables.  These must match vimvars[] in evalvars.c!
-#define VV_COUNT	0
-#define VV_COUNT1	1
-#define VV_PREVCOUNT	2
-#define VV_ERRMSG	3
-#define VV_WARNINGMSG	4
-#define VV_STATUSMSG	5
-#define VV_SHELL_ERROR	6
-#define VV_THIS_SESSION	7
-#define VV_VERSION	8
-#define VV_LNUM		9
-#define VV_TERMRESPONSE	10
-#define VV_FNAME	11
-#define VV_LANG		12
-#define VV_LC_TIME	13
-#define VV_CTYPE	14
-#define VV_CC_FROM	15
-#define VV_CC_TO	16
-#define VV_FNAME_IN	17
-#define VV_FNAME_OUT	18
-#define VV_FNAME_NEW	19
-#define VV_FNAME_DIFF	20
-#define VV_CMDARG	21
-#define VV_FOLDSTART	22
-#define VV_FOLDEND	23
-#define VV_FOLDDASHES	24
-#define VV_FOLDLEVEL	25
-#define VV_PROGNAME	26
-#define VV_SEND_SERVER	27
-#define VV_DYING	28
-#define VV_EXCEPTION	29
-#define VV_THROWPOINT	30
-#define VV_REG		31
-#define VV_CMDBANG	32
-#define VV_INSERTMODE	33
-#define VV_VAL		34
-#define VV_KEY		35
-#define VV_PROFILING	36
-#define VV_FCS_REASON	37
-#define VV_FCS_CHOICE	38
-#define VV_BEVAL_BUFNR	39
-#define VV_BEVAL_WINNR	40
-#define VV_BEVAL_WINID	41
-#define VV_BEVAL_LNUM	42
-#define VV_BEVAL_COL	43
-#define VV_BEVAL_TEXT	44
-#define VV_SCROLLSTART	45
-#define VV_SWAPNAME	46
-#define VV_SWAPCHOICE	47
-#define VV_SWAPCOMMAND	48
-#define VV_CHAR		49
-#define VV_MOUSE_WIN	50
-#define VV_MOUSE_WINID	51
-#define VV_MOUSE_LNUM   52
-#define VV_MOUSE_COL	53
-#define VV_OP		54
-#define VV_SEARCHFORWARD 55
-#define VV_HLSEARCH	56
-#define VV_OLDFILES	57
-#define VV_WINDOWID	58
-#define VV_PROGPATH	59
-#define VV_COMPLETED_ITEM 60
-#define VV_OPTION_NEW   61
-#define VV_OPTION_OLD   62
-#define VV_OPTION_OLDLOCAL 63
-#define VV_OPTION_OLDGLOBAL 64
-#define VV_OPTION_COMMAND 65
-#define VV_OPTION_TYPE  66
-#define VV_ERRORS	67
-#define VV_FALSE	68
-#define VV_TRUE		69
-#define VV_NONE		70
-#define VV_NULL		71
-#define VV_NUMBERMAX	72
-#define VV_NUMBERMIN	73
-#define VV_NUMBERSIZE	74
-#define VV_VIM_DID_ENTER 75
-#define VV_TESTING	76
-#define VV_TYPE_NUMBER	77
-#define VV_TYPE_STRING	78
-#define VV_TYPE_FUNC	79
-#define VV_TYPE_LIST	80
-#define VV_TYPE_DICT	81
-#define VV_TYPE_FLOAT	82
-#define VV_TYPE_BOOL	83
-#define VV_TYPE_NONE	84
-#define VV_TYPE_JOB	85
-#define VV_TYPE_CHANNEL	86
-#define VV_TYPE_BLOB	87
-#define VV_TYPE_CLASS	88
-#define VV_TYPE_OBJECT	89
-#define VV_TERMRFGRESP	90
-#define VV_TERMRBGRESP	91
-#define VV_TERMU7RESP	92
-#define VV_TERMSTYLERESP 93
-#define VV_TERMBLINKRESP 94
-#define VV_EVENT	95
-#define VV_VERSIONLONG	96
-#define VV_ECHOSPACE	97
-#define VV_ARGV		98
-#define VV_COLLATE      99
-#define VV_EXITING	100
-#define VV_COLORNAMES   101
-#define VV_SIZEOFINT	102
-#define VV_SIZEOFLONG	103
-#define VV_SIZEOFPOINTER 104
-#define VV_MAXCOL	105
-#define VV_PYTHON3_VERSION 106
-#define VV_TYPE_TYPEALIAS 107
-#define VV_TYPE_ENUM	  108
-#define VV_TYPE_ENUMVALUE 109
-#define VV_STACKTRACE	110
-#define VV_TYPE_TUPLE	111
-#define VV_WAYLAND_DISPLAY 112
-#define VV_CLIPMETHOD 113
-#define VV_TERMDA1 114
-#define VV_TERMOSC 115
-#define VV_VIM_DID_INIT		116
-#define VV_CLIPPROVIDERS 117
-#define VV_IMAGEBACKEND 118
-#define VV_LEN		119	// number of v: vars
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_ಎಣಿಕೆ	0
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_COUNT1	1
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_PREVCOUNT	2
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_ERRMSG	3
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_WARNINGMSG	4
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_STATUSMSG	5
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_SHELL_ERROR	6
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_THIS_SESSION	7
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_ಆವೃತ್ತಿ	8
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_LNUM		9
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_TERMRESPONSE	10
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_FNAME	11
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_LANG		12
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_LC_ಸಮಯ	13
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_CTYPE	14
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_CC_FROM	15
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_CC_ಗಮ್ಯ	16
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_FNAME_ಒಳ	17
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_FNAME_ಹೊರಹೋಗು	18
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_FNAME_NEW	19
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_FNAME_DIFF	20
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_CMDARG	21
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_FOLDSTART	22
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_FOLDEND	23
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_FOLDDASHES	24
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_FOLDLEVEL	25
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_PROGNAME	26
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_SEND_SERVER	27
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_DYING	28
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_EXCEPTION	29
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_THROWPOINT	30
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_REG		31
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_CMDBANG	32
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_INSERTMODE	33
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_VAL		34
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_ಕೀಲಿ		35
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_PROFILING	36
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_FCS_REASON	37
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_FCS_CHOICE	38
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_BEVAL_BUFNR	39
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_BEVAL_WINNR	40
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_BEVAL_WINID	41
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_BEVAL_LNUM	42
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_BEVAL_ಲಂಬಸಾಲು	43
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_BEVAL_ಪಠ್ಯ	44
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_SCROLLSTART	45
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_SWAPNAME	46
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_SWAPCHOICE	47
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_SWAPCOMMAND	48
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_CHAR		49
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_MOUSE_WIN	50
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_MOUSE_WINID	51
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_MOUSE_LNUM   52
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_MOUSE_ಲಂಬಸಾಲು	53
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_OP		54
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_SEARCHFORWARD 55
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_HLSEARCH	56
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_OLDFILES	57
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_WINDOWID	58
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_PROGPATH	59
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_COMPLETED_ಅಂಶ 60
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_OPTION_NEW   61
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_OPTION_OLD   62
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_OPTION_OLDLOCAL 63
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_OPTION_OLDGLOBAL 64
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_OPTION_COMMAND 65
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_OPTION_TYPE  66
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_ERRORS	67
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_FALSE	68
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_TRUE		69
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_NONE		70
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_NULL		71
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_NUMBERMAX	72
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_NUMBERMIN	73
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_NUMBERSIZE	74
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_VIM_DID_ENTER 75
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_TESTING	76
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_TYPE_ಸಂಖ್ಯೆ	77
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_TYPE_STRING	78
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_TYPE_FUNC	79
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_TYPE_LIST	80
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_TYPE_DICT	81
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_TYPE_FLOAT	82
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_TYPE_BOOL	83
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_TYPE_NONE	84
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_TYPE_ಕೆಲಸ	85
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_TYPE_CHANNEL	86
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_TYPE_BLOB	87
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_TYPE_CLASS	88
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_TYPE_OBJECT	89
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_TERMRFGRESP	90
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_TERMRBGRESP	91
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_TERMU7RESP	92
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_TERMSTYLERESP 93
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_TERMBLINKRESP 94
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_EVENT	95
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_VERSIONLONG	96
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_ECHOSPACE	97
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_ARGV		98
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_COLLATE      99
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_EXITING	100
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_COLORNAMES   101
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_SIZEOFINT	102
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_SIZEOFLONG	103
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_SIZEOFPOINTER 104
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_MAXCOL	105
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_PYTHON3_ಆವೃತ್ತಿ 106
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_TYPE_TYPEALIAS 107
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_TYPE_ENUM	  108
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_TYPE_ENUMVALUE 109
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_STACKTRACE	110
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_TYPE_TUPLE	111
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_WAYLAND_DISPLAY 112
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_CLIPMETHOD 113
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_TERMDA1 114
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_TERMOSC 115
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_VIM_DID_INIT		116
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_CLIPPROVIDERS 117
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_IMAGEBACKEND 118
+#ವ್ಯಾಖ್ಯಾನಿಸು VV_LEN		119	// number of v: vars
 
 // used for v_number in VAR_BOOL and VAR_SPECIAL
-#define VVAL_FALSE	0L	// VAR_BOOL
-#define VVAL_TRUE	1L	// VAR_BOOL
-#define VVAL_NONE	2L	// VAR_SPECIAL
-#define VVAL_NULL	3L	// VAR_SPECIAL
+#ವ್ಯಾಖ್ಯಾನಿಸು VVAL_FALSE	0L	// VAR_BOOL
+#ವ್ಯಾಖ್ಯಾನಿಸು VVAL_TRUE	1L	// VAR_BOOL
+#ವ್ಯಾಖ್ಯಾನಿಸು VVAL_NONE	2L	// VAR_SPECIAL
+#ವ್ಯಾಖ್ಯಾನಿಸು VVAL_NULL	3L	// VAR_SPECIAL
 
 // Type values for type().
-#define VAR_TYPE_NUMBER	    0
-#define VAR_TYPE_STRING	    1
-#define VAR_TYPE_FUNC	    2
-#define VAR_TYPE_LIST	    3
-#define VAR_TYPE_DICT	    4
-#define VAR_TYPE_FLOAT	    5
-#define VAR_TYPE_BOOL	    6
-#define VAR_TYPE_NONE	    7
-#define VAR_TYPE_JOB	    8
-#define VAR_TYPE_CHANNEL    9
-#define VAR_TYPE_BLOB	    10
-#define VAR_TYPE_INSTR	    11
-#define VAR_TYPE_CLASS	    12
-#define VAR_TYPE_OBJECT	    13
-#define VAR_TYPE_TYPEALIAS  14
-#define VAR_TYPE_ENUM	    15
-#define VAR_TYPE_ENUMVALUE  16
-#define VAR_TYPE_TUPLE	    17
+#ವ್ಯಾಖ್ಯಾನಿಸು VAR_TYPE_ಸಂಖ್ಯೆ	    0
+#ವ್ಯಾಖ್ಯಾನಿಸು VAR_TYPE_STRING	    1
+#ವ್ಯಾಖ್ಯಾನಿಸು VAR_TYPE_FUNC	    2
+#ವ್ಯಾಖ್ಯಾನಿಸು VAR_TYPE_LIST	    3
+#ವ್ಯಾಖ್ಯಾನಿಸು VAR_TYPE_DICT	    4
+#ವ್ಯಾಖ್ಯಾನಿಸು VAR_TYPE_FLOAT	    5
+#ವ್ಯಾಖ್ಯಾನಿಸು VAR_TYPE_BOOL	    6
+#ವ್ಯಾಖ್ಯಾನಿಸು VAR_TYPE_NONE	    7
+#ವ್ಯಾಖ್ಯಾನಿಸು VAR_TYPE_ಕೆಲಸ	    8
+#ವ್ಯಾಖ್ಯಾನಿಸು VAR_TYPE_CHANNEL    9
+#ವ್ಯಾಖ್ಯಾನಿಸು VAR_TYPE_BLOB	    10
+#ವ್ಯಾಖ್ಯಾನಿಸು VAR_TYPE_INSTR	    11
+#ವ್ಯಾಖ್ಯಾನಿಸು VAR_TYPE_CLASS	    12
+#ವ್ಯಾಖ್ಯಾನಿಸು VAR_TYPE_OBJECT	    13
+#ವ್ಯಾಖ್ಯಾನಿಸು VAR_TYPE_TYPEALIAS  14
+#ವ್ಯಾಖ್ಯಾನಿಸು VAR_TYPE_ENUM	    15
+#ವ್ಯಾಖ್ಯಾನಿಸು VAR_TYPE_ENUMVALUE  16
+#ವ್ಯಾಖ್ಯಾನಿಸು VAR_TYPE_TUPLE	    17
 
-#define DICT_MAXNEST 100	// maximum nesting of lists and dicts
+#ವ್ಯಾಖ್ಯಾನಿಸು DICT_MAXNEST 100	// maximum nesting of lists and dicts
 
-#define TABSTOP_MAX 9999
+#ವ್ಯಾಖ್ಯಾನಿಸು TABSTOP_MAX 9999
 
-#ifdef HAVE_CLIPMETHOD
-typedef enum {
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_CLIPMETHOD
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ {
     CLIPMETHOD_FAIL,
     CLIPMETHOD_NONE,
     CLIPMETHOD_WAYLAND,
     CLIPMETHOD_X11,
     CLIPMETHOD_PROVIDER
 } clipmethod_T;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_CLIPBOARD
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CLIPBOARD
 
 // VIM_ATOM_NAME is the older Vim-specific selection type for X11.  Still
 // supported for when a mix of Vim versions is used. VIMENC_ATOM_NAME includes
@@ -2334,12 +2334,12 @@ typedef enum {
 
 // Selection states for modeless selection
 # define SELECT_CLEARED		0
-# define SELECT_IN_PROGRESS	1
-# define SELECT_DONE		2
+# define SELECT_ಒಳ_ಪ್ರಗತಿ	1
+# define SELECT_ಮುಗಿದ		2
 
-# define SELECT_MODE_CHAR	0
-# define SELECT_MODE_WORD	1
-# define SELECT_MODE_LINE	2
+# define SELECT_ಬಹುಲಕ_CHAR	0
+# define SELECT_ಬಹುಲಕ_ಶಬ್ದ	1
+# define SELECT_ಬಹುಲಕ_ಸಾಲು	2
 
 # ifdef FEAT_GUI_MSWIN
 #  ifdef FEAT_OLE
@@ -2348,41 +2348,41 @@ typedef enum {
 # endif
 
 // Info about selected text
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    int		available;	// Is clipboard available?
-    int		owned;		// Flag: do we own the selection?
-    pos_T	start;		// Start of selected area
-    pos_T	end;		// End of selected area
-    int		vmode;		// Visual mode character
+    ಪೂರ್ಣಾಂಕ		ಲಭ್ಯ;	// Is clipboard available?
+    ಪೂರ್ಣಾಂಕ		owned;		// Flag: do we own the selection?
+    pos_T	ಆರಂಭ;		// Start of selected area
+    pos_T	ಕೊನೆ;		// End of selected area
+    ಪೂರ್ಣಾಂಕ		vmode;		// Visual mode character
 
     // Fields for selection that doesn't use Visual mode
-    short_u	origin_row;
-    short_u	origin_start_col;
-    short_u	origin_end_col;
-    short_u	word_start_col;
-    short_u	word_end_col;
+    short_u	origin_ಅಡ್ಡಸಾಲು;
+    short_u	origin_ಆರಂಭ_ಲಂಬಸಾಲು;
+    short_u	origin_ಕೊನೆ_ಲಂಬಸಾಲು;
+    short_u	ಶಬ್ದ_ಆರಂಭ_ಲಂಬಸಾಲು;
+    short_u	ಶಬ್ದ_ಕೊನೆ_ಲಂಬಸಾಲು;
 # ifdef FEAT_PROP_POPUP
     // limits for selection inside a popup window
-    short_u	min_col;
-    short_u	max_col;
-    short_u	min_row;
-    short_u	max_row;
+    short_u	min_ಲಂಬಸಾಲು;
+    short_u	max_ಲಂಬಸಾಲು;
+    short_u	min_ಅಡ್ಡಸಾಲು;
+    short_u	max_ಅಡ್ಡಸಾಲು;
 # endif
 
     pos_T	prev;		// Previous position
     short_u	state;		// Current selection state
-    short_u	mode;		// Select by char, word, or line.
+    short_u	ಬಹುಲಕ;		// Select by char, word, or line.
 
-# if defined(FEAT_GUI_X11) || defined(FEAT_XCLIPBOARD)
+# ಆದರೆ defined(FEAT_GUI_X11) || defined(FEAT_XCLIPBOARD)
     Atom	sel_atom;	// PRIMARY/CLIPBOARD selection ID
 # endif
 
-# if defined(FEAT_GUI_GTK) && !defined(USE_GTK4)
+# ಆದರೆ defined(FEAT_GUI_GTK) && !defined(USE_GTK4)
     GdkAtom     gtk_sel_atom;	// PRIMARY/CLIPBOARD selection ID
 # endif
 
-# if defined(MSWIN) || defined(FEAT_CYGWIN_WIN32_CLIPBOARD)
+# ಆದರೆ defined(MSWIN) || defined(FEAT_CYGWIN_WIN32_CLIPBOARD)
     int_u	format;		// Vim's own special clipboard format
     int_u	format_raw;	// Vim's raw text clipboard format
 # endif
@@ -2390,90 +2390,90 @@ typedef struct
     // No clipboard at the moment. TODO?
 # endif
 } Clipboard_T;
-#else
-typedef int Clipboard_T;	// This is required for the prototypes.
-#endif
+#ಇಲ್ಲದಿದ್ದರೆ
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಪೂರ್ಣಾಂಕ Clipboard_T;	// This is required for the prototypes.
+#ಆದರೆ_ಅಂತ್ಯ
 
 // Use 64-bit stat structure on MS-Windows.
-#ifdef MSWIN
-typedef struct _stat64 stat_T;
-#else
-typedef struct stat stat_T;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ _stat64 stat_T;
+#ಇಲ್ಲದಿದ್ದರೆ
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ stat stat_T;
+#ಆದರೆ_ಅಂತ್ಯ
 
-typedef struct soundcb_S soundcb_T;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ soundcb_S soundcb_T;
 
-#if (defined(__GNUC__) || defined(__clang__)) && !defined(__MINGW32__)
+#ಆದರೆ (defined(__GNUC__) || defined(__clang__)) && !defined(__MINGW32__)
 # define ATTRIBUTE_FORMAT_PRINTF(fmt_idx, arg_idx) \
-    __attribute__((format(printf, fmt_idx, arg_idx)))
-#else
+    __attribute__((format(ಬರೆ, fmt_idx, arg_idx)))
+#ಇಲ್ಲದಿದ್ದರೆ
 # define ATTRIBUTE_FORMAT_PRINTF(fmt_idx, arg_idx)
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(__GNUC__) || defined(__clang__)
+#ಆದರೆ defined(__GNUC__) || defined(__clang__)
 # define likely(x)	__builtin_expect((x), 1)
 # define unlikely(x)	__builtin_expect((x), 0)
 # define ATTRIBUTE_COLD	__attribute__((cold))
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 # define unlikely(x)	(x)
 # define likely(x)	(x)
 # define ATTRIBUTE_COLD
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-typedef enum {
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ {
     ASSERT_EQUAL,
     ASSERT_NOTEQUAL,
-    ASSERT_MATCH,
+    ASSERT_ಹೊಂದಿಕೆ,
     ASSERT_NOTMATCH,
     ASSERT_FAILS,
     ASSERT_OTHER
 } assert_type_T;
 
 // Mode for bracketed_paste().
-typedef enum {
-    PASTE_INSERT,	// insert mode
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ {
+    PASTE_ಸೇರಿಸು,	// insert mode
     PASTE_CMDLINE,	// command line
     PASTE_EX,		// ex mode line
     PASTE_ONE_CHAR	// return first character
-} paste_mode_T;
+} paste_ಬಹುಲಕ_T;
 
 // Argument for flush_buffers().
-typedef enum {
-    FLUSH_MINIMAL,
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ {
+    FLUSH_ಕನಿಷ್ಠತಮ,
     FLUSH_TYPEAHEAD,	// flush current typebuf contents
-    FLUSH_INPUT		// flush typebuf and inchar() input
+    FLUSH_ಒಳಹರಿವು		// flush typebuf and inchar() input
 } flush_buffers_T;
 
 // Argument for prepare_tagpreview()
-typedef enum {
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ {
     USEPOPUP_NONE,
-    USEPOPUP_NORMAL,	// use info popup
+    USEPOPUP_ಸಾಮಾನ್ಯ,	// use info popup
     USEPOPUP_HIDDEN	// use info popup initially hidden
 } use_popup_T;
 
 // Argument for estack_sfile().
-typedef enum {
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ {
     ESTACK_NONE,
     ESTACK_SFILE,
-    ESTACK_STACK,
+    ESTACK_ರಾಶಿ,
     ESTACK_SCRIPT,
 } estack_arg_T;
 
 // For temporarily backward compatibility, to be removed soon.
-#define ENABLE_STL_MODE_MULTI_NL
+#ವ್ಯಾಖ್ಯಾನಿಸು ENABLE_STL_ಬಹುಲಕ_MULTI_NL
 
 // Argument for build_stl_str_hl_local().
-typedef enum {
-    STL_MODE_SINGLE,	    // Does not accept line breaks "%@"
-    STL_MODE_MULTI,	    // Accept line breaks "%@"
-    STL_MODE_GET_RENDERED_HEIGHT,   // Just get stl rendered height
-#ifdef ENABLE_STL_MODE_MULTI_NL
-    STL_MODE_MULTI_NL,	    // Accept line breaks "%@" and "\n"
-#endif
-} stl_mode_T;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ {
+    STL_ಬಹುಲಕ_SINGLE,	    // Does not accept line breaks "%@"
+    STL_ಬಹುಲಕ_MULTI,	    // Accept line breaks "%@"
+    STL_ಬಹುಲಕ_GET_RENDERED_ಎತ್ತರ,   // Just get stl rendered height
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ENABLE_STL_ಬಹುಲಕ_MULTI_NL
+    STL_ಬಹುಲಕ_MULTI_NL,	    // Accept line breaks "%@" and "\n"
+#ಆದರೆ_ಅಂತ್ಯ
+} stl_ಬಹುಲಕ_T;
 
 // Return value of match_keyprotocol()
-typedef enum {
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ {
     KEYPROTOCOL_NONE,
     KEYPROTOCOL_MOK2,
     KEYPROTOCOL_KITTY,
@@ -2481,7 +2481,7 @@ typedef enum {
 } keyprot_T;
 
 // errors for when calling a function
-typedef enum {
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ {
     FCERR_NONE,		// no error
     FCERR_UNKNOWN,	// unknown function
     FCERR_TOOMANY,	// too many arguments
@@ -2497,12 +2497,12 @@ typedef enum {
 /*
  * Array indexes used for cp_text[].
  */
-typedef enum {
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ {
     CPT_ABBR,		// "abbr"
-    CPT_KIND,		// "kind"
+    CPT_ಬಗೆ,		// "kind"
     CPT_MENU,		// "menu"
     CPT_INFO,		// "info"
-    CPT_COUNT,		// Number of entries
+    CPT_ಎಣಿಕೆ,		// Number of entries
 } cpitem_T;
 
 /*
@@ -2512,7 +2512,7 @@ typedef enum {
  * Returns NULL if the option value is valid is successfully applied.
  * Otherwise returns an error message.
  */
-typedef char *(*opt_did_set_cb_T)(optset_T *args);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಅಕ್ಷರ *(*opt_did_ಗಣ_cb_T)(optset_T *ವಾದಗಳು);
 
 /*
  * Type for the callback function that is invoked when expanding possible
@@ -2526,69 +2526,69 @@ typedef char *(*opt_did_set_cb_T)(optset_T *args);
  * Note: If returned FAIL or *numMatches is 0, *matches will NOT be freed by
  * caller.
  */
-typedef int (*opt_expand_cb_T)(optexpand_T *args, int *numMatches, char_u ***matches);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಪೂರ್ಣಾಂಕ (*opt_expand_cb_T)(optexpand_T *ವಾದಗಳು, ಪೂರ್ಣಾಂಕ *ಅಂಕೆ_Matches, char_u ***matches);
 
 // Flags for assignment functions.
-#define ASSIGN_VAR	0     // ":var" (nothing special)
-#define ASSIGN_FINAL	0x01  // ":final"
-#define ASSIGN_CONST	0x02  // ":const"
-#define ASSIGN_NO_DECL	0x04  // "name = expr" without ":let"/":const"/":final"
-#define ASSIGN_DECL	0x08  // may declare variable if it does not exist
-#define ASSIGN_UNPACK	0x10  // using [a, b] = list
-#define ASSIGN_NO_MEMBER_TYPE 0x20 // use "any" for list and dict member type
-#define ASSIGN_FOR_LOOP 0x40 // assigning to loop variable
-#define ASSIGN_INIT	0x80 // not assigning a value, just a declaration
-#define ASSIGN_UPDATE_BLOCK_ID 0x100  // update sav_block_id
-#define ASSIGN_COMPOUND_OP 0x200  // compound operator e.g. "+="
+#ವ್ಯಾಖ್ಯಾನಿಸು ನಿಯೋಜಿಸು_VAR	0     // ":var" (nothing special)
+#ವ್ಯಾಖ್ಯಾನಿಸು ನಿಯೋಜಿಸು_FINAL	0x01  // ":final"
+#ವ್ಯಾಖ್ಯಾನಿಸು ನಿಯೋಜಿಸು_CONST	0x02  // ":const"
+#ವ್ಯಾಖ್ಯಾನಿಸು ನಿಯೋಜಿಸು_NO_DECL	0x04  // "name = expr" without ":let"/":const"/":final"
+#ವ್ಯಾಖ್ಯಾನಿಸು ನಿಯೋಜಿಸು_DECL	0x08  // may declare variable if it does not exist
+#ವ್ಯಾಖ್ಯಾನಿಸು ನಿಯೋಜಿಸು_UNPACK	0x10  // using [a, b] = list
+#ವ್ಯಾಖ್ಯಾನಿಸು ನಿಯೋಜಿಸು_NO_MEMBER_TYPE 0x20 // use "any" for list and dict member type
+#ವ್ಯಾಖ್ಯಾನಿಸು ನಿಯೋಜಿಸು_FOR_LOOP 0x40 // assigning to loop variable
+#ವ್ಯಾಖ್ಯಾನಿಸು ನಿಯೋಜಿಸು_INIT	0x80 // not assigning a value, just a declaration
+#ವ್ಯಾಖ್ಯಾನಿಸು ನಿಯೋಜಿಸು_UPDATE_ಖಂಡ_ID 0x100  // update sav_block_id
+#ವ್ಯಾಖ್ಯಾನಿಸು ನಿಯೋಜಿಸು_COMPOUND_OP 0x200  // compound operator e.g. "+="
 
-#include "ex_cmds.h"	    // Ex command defines
-#include "spell.h"	    // spell checking stuff
+#ಅನ್ತರ್ಭಾವ "ex_cmds.h"	    // Ex command defines
+#ಅನ್ತರ್ಭಾವ "spell.h"	    // spell checking stuff
 
-#include "proto.h"	    // function prototypes
+#ಅನ್ತರ್ಭಾವ "proto.h"	    // function prototypes
 
 // This has to go after the include of proto.h, as proto/gui.pro declares
 // functions of these names. The declarations would break if the defines had
 // been seen at that stage.  But it must be before globals.h, where error_ga
 // is declared.
-#if !defined(MSWIN) && !defined(FEAT_GUI_X11) && !defined(FEAT_GUI_HAIKU) \
+#ಆದರೆ !defined(MSWIN) && !defined(FEAT_GUI_X11) && !defined(FEAT_GUI_HAIKU) \
 	&& !defined(FEAT_GUI_GTK) && !defined(PROTO)
 # define mch_errmsg(str)	fprintf(stderr, "%s", (str))
 # define display_errors()	fflush(stderr)
-# define mch_msg(str)		printf("%s", (str))
-#else
+# define mch_ಸಂದೇಶ(str)		ಬರೆ("%s", (str))
+#ಇಲ್ಲದಿದ್ದರೆ
 # define USE_MCH_ERRMSG
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_EVAL) \
+#ಆದರೆ defined(FEAT_EVAL) \
 	&& (!defined(FEAT_GUI_MSWIN) || !defined(FEAT_MBYTE_IME))
 // Whether IME is supported by im_get_status() defined in mbyte.c.
 // For Win32 GUI it's in gui_w32.c when FEAT_MBYTE_IME is defined.
 # define IME_WITHOUT_XIM
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_XIM) \
+#ಆದರೆ defined(FEAT_XIM) \
 	|| defined(IME_WITHOUT_XIM) \
 	|| (defined(FEAT_GUI_MSWIN) && defined(FEAT_MBYTE_IME))
 // im_set_active() is available
-# define HAVE_INPUT_METHOD
-#endif
+# define HAVE_ಒಳಹರಿವು_ವಿಧಾನ
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifndef FEAT_LINEBREAK
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_LINEBREAK
 // Without the 'numberwidth' option line numbers are always 7 chars.
-# define number_width(x) 7
-#endif
+# define ಸಂಖ್ಯೆ_ಅಗಲ(x) 7
+#ಆದರೆ_ಅಂತ್ಯ
 
 // This must come after including proto.h.
 // For VMS this is defined in macros.h.
-#if !defined(MSWIN) && !defined(VMS) && !defined(PROTO)
+#ಆದರೆ !defined(MSWIN) && !defined(VMS) && !defined(PROTO)
 # define mch_open(n, m, p)	open((n), (m), (p))
 # define mch_fopen(n, p)	fopen((n), (p))
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#include "globals.h"	    // global variables and messages
-#include "errors.h"	    // error messages
+#ಅನ್ತರ್ಭಾವ "globals.h"	    // global variables and messages
+#ಅನ್ತರ್ಭಾವ "errors.h"	    // error messages
 
-#ifndef PROTO
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ PROTO
 /*
  * Return TRUE when currently using Vim9 script syntax.
  * Does not go up the stack, a ":function" inside vim9script uses legacy
@@ -2596,23 +2596,23 @@ typedef int (*opt_expand_cb_T)(optexpand_T *args, int *numMatches, char_u ***mat
  * Defined here as "static inline" because it is called very frequently from
  * the eval hot path; inlining avoids the cross-file call overhead.
  */
-    static inline int
-in_vim9script(void)
+    ಸ್ಥಿರ ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ
+ಒಳ_vim9script(ಶೂನ್ಯ)
 {
     // "sc_version" is also set when compiling a ":def" function in legacy
     // script.
-    return (current_sctx.sc_version == SCRIPT_VERSION_VIM9
+    ಹಿಂತಿರುಗಿ (current_sctx.sc_ಆವೃತ್ತಿ == SCRIPT_ಆವೃತ್ತಿ_VIM9
 					 || (cmdmod.cmod_flags & CMOD_VIM9CMD))
 		&& !(cmdmod.cmod_flags & CMOD_LEGACY);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * If console dialog not supported, but GUI dialog is, use the GUI one.
  */
-#if defined(FEAT_GUI_DIALOG) && !defined(FEAT_CON_DIALOG)
+#ಆದರೆ defined(FEAT_GUI_DIALOG) && !defined(FEAT_CON_DIALOG)
 # define do_dialog gui_mch_dialog
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Default filters for gui_mch_browse().
@@ -2621,14 +2621,14 @@ in_vim9script(void)
  * NOTE: Motif only uses the very first pattern.  Therefore
  * BROWSE_FILTER_DEFAULT should start with a "*" pattern.
  */
-#ifdef FEAT_BROWSE
-# ifdef BACKSLASH_IN_FILENAME
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_BROWSE
+# ifdef BACKSLASH_ಒಳ_FILENAME
 #  define BROWSE_FILTER_MACROS \
 	(char_u *)N_("Vim macro files (*.vim)\t*.vim\nAll Files (*.*)\t*.*\n")
 #  define BROWSE_FILTER_ALL_FILES (char_u *)N_("All Files (*.*)\t*.*\n")
 #  define BROWSE_FILTER_DEFAULT \
 	(char_u *)N_("All Files (*.*)\t*.*\nC source (*.c, *.h)\t*.c;*.h\nC++ source (*.cpp, *.hpp)\t*.cpp;*.hpp\nVB code (*.bas, *.frm)\t*.bas;*.frm\nVim files (*.vim, _vimrc, _gvimrc)\t*.vim;_vimrc;_gvimrc\n")
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  define BROWSE_FILTER_MACROS \
 	(char_u *)N_("Vim macro files (*.vim)\t*.vim\nAll Files (*)\t*\n")
 #  define BROWSE_FILTER_ALL_FILES (char_u *)N_("All Files (*)\t*\n")
@@ -2637,9 +2637,9 @@ in_vim9script(void)
 # endif
 # define BROWSE_SAVE 1	    // flag for do_browse()
 # define BROWSE_DIR 2	    // flag for do_browse()
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef _MSC_VER
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ _MSC_VER
 // Avoid useless warning "conversion from X to Y of greater size".
 # pragma warning(disable : 4312)
 // Avoid warning for old style function declarators
@@ -2656,14 +2656,14 @@ in_vim9script(void)
 # pragma warning(disable : 4127)
 // Avoid warning for assignment within conditional
 # pragma warning(disable : 4706)
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // Note: a NULL argument for vim_realloc() is not portable, don't use it.
-#if defined(MEM_PROFILE)
-# define vim_realloc(ptr, size)  mem_realloc((ptr), (size))
-#else
-# define vim_realloc(ptr, size)  realloc((ptr), (size))
-#endif
+#ಆದರೆ defined(MEM_PROFILE)
+# define vim_realloc(ptr, ಗಾತ್ರ_2)  mem_realloc((ptr), (ಗಾತ್ರ_2))
+#ಇಲ್ಲದಿದ್ದರೆ
+# define vim_realloc(ptr, ಗಾತ್ರ_2)  realloc((ptr), (ಗಾತ್ರ_2))
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Return byte length of character that starts with byte "b".
@@ -2671,26 +2671,26 @@ in_vim9script(void)
  * MB_BYTE2LEN_CHECK() can be used to count a special key as one byte.
  * Don't call MB_BYTE2LEN(b) with b < 0 or b > 255!
  */
-#define MB_BYTE2LEN(b)		mb_bytelen_tab[b]
-#define MB_BYTE2LEN_CHECK(b)	(((b) < 0 || (b) > 255) ? 1 : mb_bytelen_tab[b])
+#ವ್ಯಾಖ್ಯಾನಿಸು MB_BYTE2LEN(b)		mb_bytelen_tab[b]
+#ವ್ಯಾಖ್ಯಾನಿಸು MB_BYTE2LEN_CHECK(b)	(((b) < 0 || (b) > 255) ? 1 : mb_bytelen_tab[b])
 
 // properties used in enc_canon_table[] (first three mutually exclusive)
-#define ENC_8BIT	0x01
-#define ENC_DBCS	0x02
-#define ENC_UNICODE	0x04
+#ವ್ಯಾಖ್ಯಾನಿಸು ENC_8_ಬಿಟ್	0x01
+#ವ್ಯಾಖ್ಯಾನಿಸು ENC_DBCS	0x02
+#ವ್ಯಾಖ್ಯಾನಿಸು ENC_UNICODE	0x04
 
-#define ENC_ENDIAN_B	0x10	    // Unicode: Big endian
-#define ENC_ENDIAN_L	0x20	    // Unicode: Little endian
+#ವ್ಯಾಖ್ಯಾನಿಸು ENC_ENDIAN_B	0x10	    // Unicode: Big endian
+#ವ್ಯಾಖ್ಯಾನಿಸು ENC_ENDIAN_L	0x20	    // Unicode: Little endian
 
-#define ENC_2BYTE	0x40	    // Unicode: UCS-2
-#define ENC_4BYTE	0x80	    // Unicode: UCS-4
-#define ENC_2WORD	0x100	    // Unicode: UTF-16
+#ವ್ಯಾಖ್ಯಾನಿಸು ENC_2BYTE	0x40	    // Unicode: UCS-2
+#ವ್ಯಾಖ್ಯಾನಿಸು ENC_4BYTE	0x80	    // Unicode: UCS-4
+#ವ್ಯಾಖ್ಯಾನಿಸು ENC_2_ಶಬ್ದ	0x100	    // Unicode: UTF-16
 
-#define ENC_LATIN1	0x200	    // Latin1
-#define ENC_LATIN9	0x400	    // Latin9
-#define ENC_MACROMAN	0x800	    // Mac Roman (not Macro Man! :-)
+#ವ್ಯಾಖ್ಯಾನಿಸು ENC_LATIN1	0x200	    // Latin1
+#ವ್ಯಾಖ್ಯಾನಿಸು ENC_LATIN9	0x400	    // Latin9
+#ವ್ಯಾಖ್ಯಾನಿಸು ENC_MACROMAN	0x800	    // Mac Roman (not Macro Man! :-)
 
-#ifdef USE_ICONV
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_ICONV
 # ifndef EILSEQ
 #  define EILSEQ 123
 # endif
@@ -2700,133 +2700,133 @@ in_vim9script(void)
 #  define ICONV_E2BIG  7
 #  define ICONV_EINVAL 22
 #  define ICONV_EILSEQ 42
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  define ICONV_ERRNO errno
 #  define ICONV_E2BIG  E2BIG
 #  define ICONV_EINVAL EINVAL
 #  define ICONV_EILSEQ EILSEQ
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#define SIGN_BYTE 1	    // byte value used where sign is displayed;
+#ವ್ಯಾಖ್ಯಾನಿಸು SIGN_BYTE 1	    // byte value used where sign is displayed;
 			    // attribute value is sign type
 
-#ifdef FEAT_NETBEANS_INTG
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_NETBEANS_INTG
 # define MULTISIGN_BYTE 2   // byte value used where sign is displayed if
 			    // multiple signs exist on the line
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_GUI_GTK) && defined(FEAT_IMAGE)
+#ಆದರೆ defined(FEAT_GUI_GTK) && defined(FEAT_IMAGE)
 // Logical pixels to physical pixels
-# define LOG2PHY(l) (gui.in_use ? (double)(l) * gui.scale : (l))
+# define LOG2PHY(l) (gui.ಒಳ_use ? (ದ್ವಿಗುಣ)(l) * gui.scale : (l))
  // Physical pixels to logical pixels
-# define PHY2LOG(p) (gui.in_use ? (double)(p) / gui.scale : (p))
-#else
+# define PHY2LOG(p) (gui.ಒಳ_use ? (ದ್ವಿಗುಣ)(p) / gui.scale : (p))
+#ಇಲ್ಲದಿದ್ದರೆ
 # define LOG2PHY(l) (l)
 # define PHY2LOG(p) (p)
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_GUI) && defined(FEAT_XCLIPBOARD)
+#ಆದರೆ defined(FEAT_GUI) && defined(FEAT_XCLIPBOARD)
 # ifdef FEAT_GUI_GTK
    // Avoid using a global variable for the X display.  It's ugly
    // and is likely to cause trouble in multihead environments.
-#  define X_DISPLAY	((gui.in_use) ? gui_mch_get_display() : xterm_dpy)
-# else
-#  define X_DISPLAY	(gui.in_use ? gui.dpy : xterm_dpy)
+#  define X_DISPLAY	((gui.ಒಳ_use) ? gui_mch_get_display() : xterm_dpy)
+# ಇಲ್ಲದಿದ್ದರೆ
+#  define X_DISPLAY	(gui.ಒಳ_use ? gui.dpy : xterm_dpy)
 # endif
-#elif defined(FEAT_GUI)
+#ಅಥವಾಆದರೆ defined(FEAT_GUI)
 # ifdef FEAT_GUI_GTK
-#  define X_DISPLAY	((gui.in_use) ? gui_mch_get_display() : (Display *)NULL)
-# else
+#  define X_DISPLAY	((gui.ಒಳ_use) ? gui_mch_get_display() : (Display *)ಖಾಲಿ)
+# ಇಲ್ಲದಿದ್ದರೆ
 #  define X_DISPLAY	gui.dpy
 # endif
-#elif defined(FEAT_XCLIPBOARD)
+#ಅಥವಾಆದರೆ defined(FEAT_XCLIPBOARD)
 # define X_DISPLAY	xterm_dpy
-#else
-# define X_DISPLAY	(Display *)NULL
-#endif
+#ಇಲ್ಲದಿದ್ದರೆ
+# define X_DISPLAY	(Display *)ಖಾಲಿ
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_GUI_GTK
-# if !GTK_CHECK_VERSION(2,14,0)
-#  define gtk_widget_get_window(wid)	((wid)->window)
-#  define gtk_plug_get_socket_window(wid)	((wid)->socket_window)
-#  define gtk_selection_data_get_data(sel)	((sel)->data)
-#  define gtk_selection_data_get_data_type(sel)	((sel)->type)
-#  define gtk_selection_data_get_format(sel)	((sel)->format)
-#  define gtk_selection_data_get_length(sel)	((sel)->length)
-#  define gtk_adjustment_set_lower(adj, low) \
-    do { (adj)->lower = low; } while (0)
-#  define gtk_adjustment_set_upper(adj, up) \
-    do { (adj)->upper = up; } while (0)
-#  define gtk_adjustment_set_page_size(adj, size) \
-    do { (adj)->page_size = size; } while (0)
-#  define gtk_adjustment_set_page_increment(adj, inc) \
-    do { (adj)->page_increment = inc; } while (0)
-#  define gtk_adjustment_set_step_increment(adj, inc) \
-    do { (adj)->step_increment = inc; } while (0)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_GTK
+# ಆದರೆ !GTK_CHECK_ಆವೃತ್ತಿ(2,14,0)
+#  define gtk_widget_get_ಕಿಟಕಿ(wid)	((wid)->ಕಿಟಕಿ_2)
+#  define gtk_plug_get_socket_ಕಿಟಕಿ(wid)	((wid)->socket_ಕಿಟಕಿ)
+#  define gtk_selection_ದತ್ತಾಂಶ_get_ದತ್ತಾಂಶ(sel)	((sel)->ದತ್ತಾಂಶ)
+#  define gtk_selection_ದತ್ತಾಂಶ_get_ದತ್ತಾಂಶ_type(sel)	((sel)->type)
+#  define gtk_selection_ದತ್ತಾಂಶ_get_format(sel)	((sel)->format)
+#  define gtk_selection_ದತ್ತಾಂಶ_get_ಉದ್ದಳತೆ(sel)	((sel)->ಉದ್ದಳತೆ)
+#  define gtk_adjustment_ಗಣ_ಅಧೋ(adj, ಕೆಳಗಿನ) \
+    ಮಾಡು { (adj)->ಅಧೋ = ಕೆಳಗಿನ; } ಆಗ (0)
+#  define gtk_adjustment_ಗಣ_ಊರ್ಧ್ವ(adj, ಮೇಲೆ) \
+    ಮಾಡು { (adj)->ಊರ್ಧ್ವ_2 = ಮೇಲೆ; } ಆಗ (0)
+#  define gtk_adjustment_ಗಣ_ಪುಟ_ಗಾತ್ರ(adj, ಗಾತ್ರ_2) \
+    ಮಾಡು { (adj)->ಪುಟ_ಗಾತ್ರ = ಗಾತ್ರ_2; } ಆಗ (0)
+#  define gtk_adjustment_ಗಣ_ಪುಟ_increment(adj, inc) \
+    ಮಾಡು { (adj)->ಪುಟ_increment = inc; } ಆಗ (0)
+#  define gtk_adjustment_ಗಣ_ಹೆಜ್ಜೆ_increment(adj, inc) \
+    ಮಾಡು { (adj)->ಹೆಜ್ಜೆ_increment = inc; } ಆಗ (0)
 # endif
-# if !GTK_CHECK_VERSION(2,16,0)
-#  define gtk_selection_data_get_selection(sel)	((sel)->selection)
+# ಆದರೆ !GTK_CHECK_ಆವೃತ್ತಿ(2,16,0)
+#  define gtk_selection_ದತ್ತಾಂಶ_get_selection(sel)	((sel)->selection)
 # endif
-# if !GTK_CHECK_VERSION(2,18,0)
-#  define gtk_widget_get_allocation(wid, alloc) \
-    do { *(alloc) = (wid)->allocation; } while (0)
-#  define gtk_widget_set_allocation(wid, alloc) \
-    do { (wid)->allocation = *(alloc); } while (0)
-#  define gtk_widget_get_has_window(wid)	!GTK_WIDGET_NO_WINDOW(wid)
+# ಆದರೆ !GTK_CHECK_ಆವೃತ್ತಿ(2,18,0)
+#  define gtk_widget_get_ಹಂಚಿಕೆ(wid, alloc) \
+    ಮಾಡು { *(alloc) = (wid)->ಹಂಚಿಕೆ; } ಆಗ (0)
+#  define gtk_widget_ಗಣ_ಹಂಚಿಕೆ(wid, alloc) \
+    ಮಾಡು { (wid)->ಹಂಚಿಕೆ = *(alloc); } ಆಗ (0)
+#  define gtk_widget_get_has_ಕಿಟಕಿ(wid)	!GTK_WIDGET_NO_ಕಿಟಕಿ(wid)
 #  define gtk_widget_get_sensitive(wid)	GTK_WIDGET_SENSITIVE(wid)
 #  define gtk_widget_get_visible(wid)	GTK_WIDGET_VISIBLE(wid)
 #  define gtk_widget_has_focus(wid)	GTK_WIDGET_HAS_FOCUS(wid)
-#  define gtk_widget_set_window(wid, win) \
-    do { (wid)->window = (win); } while (0)
-#  define gtk_widget_set_can_default(wid, can) \
-    do { if (can) \
-	    { GTK_WIDGET_SET_FLAGS(wid, GTK_CAN_DEFAULT); } \
-	else \
-	    { GTK_WIDGET_UNSET_FLAGS(wid, GTK_CAN_DEFAULT); } } while (0)
-#  define gtk_widget_set_can_focus(wid, can) \
-    do { if (can) \
-	    { GTK_WIDGET_SET_FLAGS(wid, GTK_CAN_FOCUS); } \
-	else \
-	    { GTK_WIDGET_UNSET_FLAGS(wid, GTK_CAN_FOCUS); } } while (0)
-#  define gtk_widget_set_visible(wid, vis) \
-    do { if (vis) \
+#  define gtk_widget_ಗಣ_ಕಿಟಕಿ(wid, win) \
+    ಮಾಡು { (wid)->ಕಿಟಕಿ_2 = (win); } ಆಗ (0)
+#  define gtk_widget_ಗಣ_can_default(wid, can) \
+    ಮಾಡು { ಆದರೆ (can) \
+	    { GTK_WIDGET_ಗಣ_FLAGS(wid, GTK_CAN_DEFAULT); } \
+	ಇಲ್ಲದಿದ್ದರೆ \
+	    { GTK_WIDGET_UNSET_FLAGS(wid, GTK_CAN_DEFAULT); } } ಆಗ (0)
+#  define gtk_widget_ಗಣ_can_focus(wid, can) \
+    ಮಾಡು { ಆದರೆ (can) \
+	    { GTK_WIDGET_ಗಣ_FLAGS(wid, GTK_CAN_FOCUS); } \
+	ಇಲ್ಲದಿದ್ದರೆ \
+	    { GTK_WIDGET_UNSET_FLAGS(wid, GTK_CAN_FOCUS); } } ಆಗ (0)
+#  define gtk_widget_ಗಣ_visible(wid, vis) \
+    ಮಾಡು { ಆದರೆ (vis) \
 	    { gtk_widget_show(wid); } \
-	else \
-	    { gtk_widget_hide(wid); } } while (0)
+	ಇಲ್ಲದಿದ್ದರೆ \
+	    { gtk_widget_hide(wid); } } ಆಗ (0)
 # endif
-# if !GTK_CHECK_VERSION(2,20,0)
+# ಆದರೆ !GTK_CHECK_ಆವೃತ್ತಿ(2,20,0)
 #  define gtk_widget_get_mapped(wid)	GTK_WIDGET_MAPPED(wid)
 #  define gtk_widget_get_realized(wid)	GTK_WIDGET_REALIZED(wid)
-#  define gtk_widget_set_mapped(wid, map) \
-    do { if (map) \
-	    { GTK_WIDGET_SET_FLAGS(wid, GTK_MAPPED); } \
-	else \
-	    { GTK_WIDGET_UNSET_FLAGS(wid, GTK_MAPPED); } } while (0)
-#  define gtk_widget_set_realized(wid, rea) \
-    do { if (rea) \
-	    { GTK_WIDGET_SET_FLAGS(wid, GTK_REALIZED); } \
-	else \
-	    { GTK_WIDGET_UNSET_FLAGS(wid, GTK_REALIZED); } } while (0)
+#  define gtk_widget_ಗಣ_mapped(wid, map) \
+    ಮಾಡು { ಆದರೆ (map) \
+	    { GTK_WIDGET_ಗಣ_FLAGS(wid, GTK_MAPPED); } \
+	ಇಲ್ಲದಿದ್ದರೆ \
+	    { GTK_WIDGET_UNSET_FLAGS(wid, GTK_MAPPED); } } ಆಗ (0)
+#  define gtk_widget_ಗಣ_realized(wid, rea) \
+    ಮಾಡು { ಆದರೆ (rea) \
+	    { GTK_WIDGET_ಗಣ_FLAGS(wid, GTK_REALIZED); } \
+	ಇಲ್ಲದಿದ್ದರೆ \
+	    { GTK_WIDGET_UNSET_FLAGS(wid, GTK_REALIZED); } } ಆಗ (0)
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_PRINT_PANGO) && defined(FEAT_GUI_GTK) && defined(USE_GTK4)
-# if GTK_CHECK_VERSION(4, 14, 0)
+#ಆದರೆ defined(FEAT_PRINT_PANGO) && defined(FEAT_GUI_GTK) && defined(USE_GTK4)
+# ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(4, 14, 0)
 #  define USE_GTK4_PRINT_DIALOG
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifndef FEAT_NETBEANS_INTG
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_NETBEANS_INTG
 # undef NBDEBUG
-#endif
-#ifdef NBDEBUG // Netbeans debugging.
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ NBDEBUG // Netbeans debugging.
 # include "nbdebug.h"
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 # define nbdebug(a)
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef IN_PERL_FILE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ಒಳ_PERL_FILE
   /*
    * Avoid clashes between Perl and Vim namespace.
    */
@@ -2856,329 +2856,329 @@ in_vim9script(void)
 # endif
   // bool may cause trouble on some old versions of Mac OS X but is required
   // on a few other systems and for Perl
-# if (defined(MACOS_X) && !defined(MAC_OS_X_VERSION_10_6)) \
+# ಆದರೆ (defined(MACOS_X) && !defined(MAC_OS_X_ಆವೃತ್ತಿ_10_6)) \
 				       && defined(bool) && !defined(FEAT_PERL)
 #  undef bool
 # endif
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // values for vim_handle_signal() that are not a signal
-#define SIGNAL_BLOCK	(-1)
-#define SIGNAL_UNBLOCK  (-2)
-#if !defined(UNIX) && !defined(VMS) && !defined(PROTO)
+#ವ್ಯಾಖ್ಯಾನಿಸು SIGNAL_ಖಂಡ	(-1)
+#ವ್ಯಾಖ್ಯಾನಿಸು SIGNAL_UNBLOCK  (-2)
+#ಆದರೆ !defined(UNIX) && !defined(VMS) && !defined(PROTO)
 # define vim_handle_signal(x) 0
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // flags for skip_vimgrep_pat()
-#define VGR_GLOBAL	1
-#define VGR_NOJUMP	2
-#define VGR_FUZZY	4
+#ವ್ಯಾಖ್ಯಾನಿಸು VGR_GLOBAL	1
+#ವ್ಯಾಖ್ಯಾನಿಸು VGR_NOJUMP	2
+#ವ್ಯಾಖ್ಯಾನಿಸು VGR_FUZZY	4
 
 // behavior for bad character, "++bad=" argument
-#define BAD_REPLACE	'?'	// replace it with '?' (default)
-#define BAD_KEEP	(-1)	// leave it
-#define BAD_DROP	(-2)	// erase it
+#ವ್ಯಾಖ್ಯಾನಿಸು BAD_REPLACE	'?'	// replace it with '?' (default)
+#ವ್ಯಾಖ್ಯಾನಿಸು BAD_KEEP	(-1)	// leave it
+#ವ್ಯಾಖ್ಯಾನಿಸು BAD_DROP	(-2)	// erase it
 
 // last argument for do_source()
-#define DOSO_NONE	0
-#define DOSO_VIMRC	1	// loading vimrc file
-#define DOSO_GVIMRC	2	// loading gvimrc file
+#ವ್ಯಾಖ್ಯಾನಿಸು DOSO_NONE	0
+#ವ್ಯಾಖ್ಯಾನಿಸು DOSO_VIMRC	1	// loading vimrc file
+#ವ್ಯಾಖ್ಯಾನಿಸು DOSO_GVIMRC	2	// loading gvimrc file
 
 // flags for read_viminfo() and children
-#define VIF_WANT_INFO	    1	// load non-mark info
-#define VIF_WANT_MARKS	    2	// load file marks
-#define VIF_ONLY_CURBUF	    4	// bail out after loading marks for curbuf
-#define VIF_FORCEIT	    8	// overwrite info already read
-#define VIF_GET_OLDFILES    16	// load v:oldfiles
+#ವ್ಯಾಖ್ಯಾನಿಸು VIF_WANT_INFO	    1	// load non-mark info
+#ವ್ಯಾಖ್ಯಾನಿಸು VIF_WANT_MARKS	    2	// load file marks
+#ವ್ಯಾಖ್ಯಾನಿಸು VIF_ONLY_CURBUF	    4	// bail out after loading marks for curbuf
+#ವ್ಯಾಖ್ಯಾನಿಸು VIF_FORCEIT	    8	// overwrite info already read
+#ವ್ಯಾಖ್ಯಾನಿಸು VIF_GET_OLDFILES    16	// load v:oldfiles
 
 // flags for buf_freeall()
-#define BFA_DEL		 1	// buffer is going to be deleted
-#define BFA_WIPE	 2	// buffer is going to be wiped out
-#define BFA_KEEP_UNDO	 4	// do not free undo information
-#define BFA_IGNORE_ABORT 8	// do not abort for aborting()
+#ವ್ಯಾಖ್ಯಾನಿಸು BFA_DEL		 1	// buffer is going to be deleted
+#ವ್ಯಾಖ್ಯಾನಿಸು BFA_WIPE	 2	// buffer is going to be wiped out
+#ವ್ಯಾಖ್ಯಾನಿಸು BFA_KEEP_UNDO	 4	// do not free undo information
+#ವ್ಯಾಖ್ಯಾನಿಸು BFA_IGNORE_ABORT 8	// do not abort for aborting()
 
 // direction for nv_mousescroll() and ins_mousescroll()
-#define MSCR_DOWN	0	// DOWN must be FALSE
-#define MSCR_UP		1
-#define MSCR_LEFT	(-1)
-#define MSCR_RIGHT	(-2)
+#ವ್ಯಾಖ್ಯಾನಿಸು MSCR_ಕೆಳಕ್ಕೆ	0	// DOWN must be FALSE
+#ವ್ಯಾಖ್ಯಾನಿಸು MSCR_ಮೇಲೆ		1
+#ವ್ಯಾಖ್ಯಾನಿಸು MSCR_ಎಡ	(-1)
+#ವ್ಯಾಖ್ಯಾನಿಸು MSCR_ಬಲ	(-2)
 
-#define KEYLEN_PART_KEY (-1)	// keylen value for incomplete key-code
-#define KEYLEN_PART_MAP (-2)	// keylen value for incomplete mapping
-#define KEYLEN_REMOVED  9999	// keylen value for removed sequence
+#ವ್ಯಾಖ್ಯಾನಿಸು KEYLEN_PART_ಕೀಲಿ (-1)	// keylen value for incomplete key-code
+#ವ್ಯಾಖ್ಯಾನಿಸು KEYLEN_PART_MAP (-2)	// keylen value for incomplete mapping
+#ವ್ಯಾಖ್ಯಾನಿಸು KEYLEN_REMOVED  9999	// keylen value for removed sequence
 
 // Return values from win32_fileinfo().
-#define FILEINFO_OK	     0
-#define FILEINFO_ENC_FAIL    1	// enc_to_utf16() failed
-#define FILEINFO_READ_FAIL   2	// CreateFile() failed
-#define FILEINFO_INFO_FAIL   3	// GetFileInformationByHandle() failed
+#ವ್ಯಾಖ್ಯಾನಿಸು FILEINFO_OK	     0
+#ವ್ಯಾಖ್ಯಾನಿಸು FILEINFO_ENC_FAIL    1	// enc_to_utf16() failed
+#ವ್ಯಾಖ್ಯಾನಿಸು FILEINFO_READ_FAIL   2	// CreateFile() failed
+#ವ್ಯಾಖ್ಯಾನಿಸು FILEINFO_INFO_FAIL   3	// GetFileInformationByHandle() failed
 
 // Return value from get_option_value_strict
-#define SOPT_BOOL	0x01	// Boolean option
-#define SOPT_NUM	0x02	// Number option
-#define SOPT_STRING	0x04	// String option
-#define SOPT_GLOBAL	0x08	// Option has global value
-#define SOPT_WIN	0x10	// Option has window-local value
-#define SOPT_BUF	0x20	// Option has buffer-local value
-#define SOPT_UNSET	0x40	// Option does not have local value set
+#ವ್ಯಾಖ್ಯಾನಿಸು SOPT_BOOL	0x01	// Boolean option
+#ವ್ಯಾಖ್ಯಾನಿಸು SOPT_ಅಂಕೆ	0x02	// Number option
+#ವ್ಯಾಖ್ಯಾನಿಸು SOPT_STRING	0x04	// String option
+#ವ್ಯಾಖ್ಯಾನಿಸು SOPT_GLOBAL	0x08	// Option has global value
+#ವ್ಯಾಖ್ಯಾನಿಸು SOPT_WIN	0x10	// Option has window-local value
+#ವ್ಯಾಖ್ಯಾನಿಸು SOPT_BUF	0x20	// Option has buffer-local value
+#ವ್ಯಾಖ್ಯಾನಿಸು SOPT_UNSET	0x40	// Option does not have local value set
 
 // Option types for various functions in option.c
-#define SREQ_GLOBAL	0	// Request global option
-#define SREQ_WIN	1	// Request window-local option
-#define SREQ_BUF	2	// Request buffer-local option
+#ವ್ಯಾಖ್ಯಾನಿಸು SREQ_GLOBAL	0	// Request global option
+#ವ್ಯಾಖ್ಯಾನಿಸು SREQ_WIN	1	// Request window-local option
+#ವ್ಯಾಖ್ಯಾನಿಸು SREQ_BUF	2	// Request buffer-local option
 
 // Flags for get_reg_contents
-#define GREG_NO_EXPR	1	// Do not allow expression register
-#define GREG_EXPR_SRC	2	// Return expression itself for "=" register
-#define GREG_LIST	4	// Return list
+#ವ್ಯಾಖ್ಯಾನಿಸು GREG_NO_ಅಭಿವ್ಯಕ್ತಿ	1	// Do not allow expression register
+#ವ್ಯಾಖ್ಯಾನಿಸು GREG_ಅಭಿವ್ಯಕ್ತಿ_SRC	2	// Return expression itself for "=" register
+#ವ್ಯಾಖ್ಯಾನಿಸು GREG_LIST	4	// Return list
 
 // Character used as separated in autoload function/variable names.
-#define AUTOLOAD_CHAR '#'
+#ವ್ಯಾಖ್ಯಾನಿಸು AUTOLOAD_CHAR '#'
 
-#ifdef FEAT_JOB_CHANNEL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕೆಲಸ_CHANNEL
 # define MAX_OPEN_CHANNELS 10
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 # define MAX_OPEN_CHANNELS 0
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // Maximum number of simultaneously accepted socketserver client channels.
 // Bounds the channels (and file descriptors) added to the select()/poll()
 // sets so a connection flood cannot overflow the fd_set / pollfd arrays.
-#ifdef FEAT_SOCKETSERVER
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SOCKETSERVER
 # define MAX_CLIENT_CHANNELS 100
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 # define MAX_CLIENT_CHANNELS 0
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(MSWIN)
-# define MAX_NAMED_PIPE_SIZE 65535
-#endif
+#ಆದರೆ defined(MSWIN)
+# define MAX_NAMED_PIPE_ಗಾತ್ರ 65535
+#ಆದರೆ_ಅಂತ್ಯ
 
 // Options for json_encode() and json_decode.
-#define JSON_JS		1   // use JS instead of JSON
-#define JSON_NO_NONE	2   // v:none item not allowed
-#define JSON_NL		4   // append a NL
+#ವ್ಯಾಖ್ಯಾನಿಸು JSON_JS		1   // use JS instead of JSON
+#ವ್ಯಾಖ್ಯಾನಿಸು JSON_NO_NONE	2   // v:none item not allowed
+#ವ್ಯಾಖ್ಯಾನಿಸು JSON_NL		4   // append a NL
 
 // Used for flags of do_in_path()
-#define DIP_ALL	    0x01	// all matches, not just the first one
-#define DIP_DIR	    0x02	// find directories instead of files.
-#define DIP_ERR	    0x04	// give an error message when none found.
-#define DIP_START   0x08	// also use "start" directory in 'packpath'
-#define DIP_OPT	    0x10	// also use "opt" directory in 'packpath'
-#define DIP_NORTP   0x20	// do not use 'runtimepath'
-#define DIP_NOAFTER 0x40	// skip "after" directories
-#define DIP_AFTER   0x80	// only use "after" directories
+#ವ್ಯಾಖ್ಯಾನಿಸು DIP_ALL	    0x01	// all matches, not just the first one
+#ವ್ಯಾಖ್ಯಾನಿಸು DIP_DIR	    0x02	// find directories instead of files.
+#ವ್ಯಾಖ್ಯಾನಿಸು DIP_ERR	    0x04	// give an error message when none found.
+#ವ್ಯಾಖ್ಯಾನಿಸು DIP_ಆರಂಭ   0x08	// also use "start" directory in 'packpath'
+#ವ್ಯಾಖ್ಯಾನಿಸು DIP_OPT	    0x10	// also use "opt" directory in 'packpath'
+#ವ್ಯಾಖ್ಯಾನಿಸು DIP_NORTP   0x20	// do not use 'runtimepath'
+#ವ್ಯಾಖ್ಯಾನಿಸು DIP_NOAFTER 0x40	// skip "after" directories
+#ವ್ಯಾಖ್ಯಾನಿಸು DIP_AFTER   0x80	// only use "after" directories
 
 // Lowest number used for window ID. Cannot have this many windows.
-#define LOWEST_WIN_ID 1000
+#ವ್ಯಾಖ್ಯಾನಿಸು ಅತಿಕಡಿಮೆ_WIN_ID 1000
 
 // Used by the garbage collector.
-#define COPYID_INC 2
-#define COPYID_MASK (~0x1)
+#ವ್ಯಾಖ್ಯಾನಿಸು COPYID_INC 2
+#ವ್ಯಾಖ್ಯಾನಿಸು COPYID_ಮುಖವಾಡ (~0x1)
 
 // Values for trans_function_name() argument:
-#define TFN_INT		0x01	// internal function name OK
-#define TFN_QUIET	0x02	// no error messages
-#define TFN_NO_AUTOLOAD	0x04	// do not use script autoloading
-#define TFN_NO_DEREF	0x08	// do not dereference a Funcref
-#define TFN_READ_ONLY	0x10	// will not change the var
-#define TFN_NO_DECL	0x20	// only used for GLV_NO_DECL
-#define TFN_COMPILING	0x40	// only used for GLV_COMPILING
-#define TFN_NEW_FUNC	0x80	// defining a new function
-#define TFN_ASSIGN_WITH_OP 0x100  // only for GLV_ASSIGN_WITH_OP
-#define TFN_IN_CLASS	0x200	// function in a class
+#ವ್ಯಾಖ್ಯಾನಿಸು TFN_INT		0x01	// internal function name OK
+#ವ್ಯಾಖ್ಯಾನಿಸು TFN_QUIET	0x02	// no error messages
+#ವ್ಯಾಖ್ಯಾನಿಸು TFN_NO_AUTOLOAD	0x04	// do not use script autoloading
+#ವ್ಯಾಖ್ಯಾನಿಸು TFN_NO_DEREF	0x08	// do not dereference a Funcref
+#ವ್ಯಾಖ್ಯಾನಿಸು TFN_READ_ONLY	0x10	// will not change the var
+#ವ್ಯಾಖ್ಯಾನಿಸು TFN_NO_DECL	0x20	// only used for GLV_NO_DECL
+#ವ್ಯಾಖ್ಯಾನಿಸು TFN_COMPILING	0x40	// only used for GLV_COMPILING
+#ವ್ಯಾಖ್ಯಾನಿಸು TFN_NEW_FUNC	0x80	// defining a new function
+#ವ್ಯಾಖ್ಯಾನಿಸು TFN_ನಿಯೋಜಿಸು_WITH_OP 0x100  // only for GLV_ASSIGN_WITH_OP
+#ವ್ಯಾಖ್ಯಾನಿಸು TFN_ಒಳ_CLASS	0x200	// function in a class
 
 // Values for get_lval() flags argument:
-#define GLV_QUIET	TFN_QUIET	// no error messages
-#define GLV_NO_AUTOLOAD	TFN_NO_AUTOLOAD	// do not use script autoloading
-#define GLV_READ_ONLY	TFN_READ_ONLY	// will not change the var
-#define GLV_NO_DECL	TFN_NO_DECL	// assignment without :var or :let
-#define GLV_COMPILING	TFN_COMPILING	// variable may be defined later
-#define GLV_ASSIGN_WITH_OP TFN_ASSIGN_WITH_OP // assignment with operator
-#define GLV_PREFER_FUNC	0x10000		// prefer function above variable
-#define GLV_FOR_LOOP	0x20000		// assigning to a loop variable
+#ವ್ಯಾಖ್ಯಾನಿಸು GLV_QUIET	TFN_QUIET	// no error messages
+#ವ್ಯಾಖ್ಯಾನಿಸು GLV_NO_AUTOLOAD	TFN_NO_AUTOLOAD	// do not use script autoloading
+#ವ್ಯಾಖ್ಯಾನಿಸು GLV_READ_ONLY	TFN_READ_ONLY	// will not change the var
+#ವ್ಯಾಖ್ಯಾನಿಸು GLV_NO_DECL	TFN_NO_DECL	// assignment without :var or :let
+#ವ್ಯಾಖ್ಯಾನಿಸು GLV_COMPILING	TFN_COMPILING	// variable may be defined later
+#ವ್ಯಾಖ್ಯಾನಿಸು GLV_ನಿಯೋಜಿಸು_WITH_OP TFN_ನಿಯೋಜಿಸು_WITH_OP // assignment with operator
+#ವ್ಯಾಖ್ಯಾನಿಸು GLV_PREFER_FUNC	0x10000		// prefer function above variable
+#ವ್ಯಾಖ್ಯಾನಿಸು GLV_FOR_LOOP	0x20000		// assigning to a loop variable
 
-#define DO_NOT_FREE_CNT 99999	// refcount for dict or list that should not
+#ವ್ಯಾಖ್ಯಾನಿಸು DO_NOT_FREE_CNT 99999	// refcount for dict or list that should not
 				// be freed.
 
 // fixed buffer length for fname_trans_sid()
-#define FLEN_FIXED 40
+#ವ್ಯಾಖ್ಯಾನಿಸು FLEN_FIXED 40
 
 // flags for find_name_end()
-#define FNE_INCL_BR	1	// include [] in name
-#define FNE_CHECK_START	2	// check name starts with valid character
+#ವ್ಯಾಖ್ಯಾನಿಸು FNE_INCL_BR	1	// include [] in name
+#ವ್ಯಾಖ್ಯಾನಿಸು FNE_CHECK_ಆರಂಭ	2	// check name starts with valid character
 
 // BSD is supposed to cover FreeBSD and similar systems.
-#if (defined(SUN_SYSTEM) || defined(BSD) || defined(__FreeBSD_kernel__)) \
+#ಆದರೆ (defined(SUN_SYSTEM) || defined(BSD) || defined(__FreeBSD_kernel__)) \
 	&& (defined(S_ISCHR) || defined(S_IFCHR))
 # define OPEN_CHR_FILES
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // stat macros
-#ifndef S_ISDIR
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ S_ISDIR
 # ifdef S_IFDIR
 #  define S_ISDIR(m)	(((m) & S_IFMT) == S_IFDIR)
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  define S_ISDIR(m)	0
 # endif
-#endif
-#ifndef S_ISREG
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ S_ISREG
 # ifdef S_IFREG
 #  define S_ISREG(m)	(((m) & S_IFMT) == S_IFREG)
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  define S_ISREG(m)	0
 # endif
-#endif
-#ifndef S_ISBLK
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ S_ISBLK
 # ifdef S_IFBLK
 #  define S_ISBLK(m)	(((m) & S_IFMT) == S_IFBLK)
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  define S_ISBLK(m)	0
 # endif
-#endif
-#ifndef S_ISSOCK
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ S_ISSOCK
 # ifdef S_IFSOCK
 #  define S_ISSOCK(m)	(((m) & S_IFMT) == S_IFSOCK)
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  define S_ISSOCK(m)	0
 # endif
-#endif
-#ifndef S_ISFIFO
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ S_ISFIFO
 # ifdef S_IFIFO
 #  define S_ISFIFO(m)	(((m) & S_IFMT) == S_IFIFO)
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  define S_ISFIFO(m)	0
 # endif
-#endif
-#ifndef S_ISCHR
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ S_ISCHR
 # ifdef S_IFCHR
 #  define S_ISCHR(m)	(((m) & S_IFMT) == S_IFCHR)
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  define S_ISCHR(m)	0
 # endif
-#endif
-#ifndef S_ISLNK
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ S_ISLNK
 # ifdef S_IFLNK
 #  define S_ISLNK(m)	(((m) & S_IFMT) == S_IFLNK)
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  define S_ISLNK(m)	0
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(HAVE_GETTIMEOFDAY) && defined(HAVE_SYS_TIME_H)
+#ಆದರೆ defined(HAVE_GETTIMEOFDAY) && defined(HAVE_SYS_ಸಮಯ_H)
 # define ELAPSED_TIMEVAL
-# define ELAPSED_INIT(v) gettimeofday(&(v), NULL)
+# define ELAPSED_INIT(v) gettimeofday(&(v), ಖಾಲಿ)
 # define ELAPSED_FUNC(v) elapsed(&(v))
-typedef struct timeval elapsed_T;
-long elapsed(struct timeval *start_tv);
-#elif defined(MSWIN)
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ timeval elapsed_T;
+ದೀರ್ಘ elapsed(ರಚನೆ timeval *ಆರಂಭ_tv);
+#ಅಥವಾಆದರೆ defined(MSWIN)
 # define ELAPSED_TICKCOUNT
-# define ELAPSED_INIT(v) v = GetTickCount()
+# define ELAPSED_INIT(v) v = Get_Tick_ಎಣಿಕೆ()
 # define ELAPSED_FUNC(v) elapsed(v)
-typedef DWORD elapsed_T;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ DWORD elapsed_T;
 # ifndef PROTO
-long elapsed(DWORD start_tick);
+ದೀರ್ಘ elapsed(DWORD ಆರಂಭ_tick);
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // Replacement for nchar used by nv_replace().
-#define REPLACE_CR_NCHAR    (-1)
-#define REPLACE_NL_NCHAR    (-2)
+#ವ್ಯಾಖ್ಯಾನಿಸು REPLACE_CR_NCHAR    (-1)
+#ವ್ಯಾಖ್ಯಾನಿಸು REPLACE_NL_NCHAR    (-2)
 
 // flags for term_start()
-#define TERM_START_NOJOB	1
-#define TERM_START_FORCEIT	2
-#define TERM_START_SYSTEM	4
+#ವ್ಯಾಖ್ಯಾನಿಸು ಪದ_ಆರಂಭ_NOJOB	1
+#ವ್ಯಾಖ್ಯಾನಿಸು ಪದ_ಆರಂಭ_FORCEIT	2
+#ವ್ಯಾಖ್ಯಾನಿಸು ಪದ_ಆರಂಭ_SYSTEM	4
 
 // Used for icon/title save and restore.
-#define SAVE_RESTORE_TITLE	1
-#define SAVE_RESTORE_ICON	2
-#define SAVE_RESTORE_BOTH	(SAVE_RESTORE_TITLE | SAVE_RESTORE_ICON)
+#ವ್ಯಾಖ್ಯಾನಿಸು SAVE_RESTORE_TITLE	1
+#ವ್ಯಾಖ್ಯಾನಿಸು SAVE_RESTORE_ICON	2
+#ವ್ಯಾಖ್ಯಾನಿಸು SAVE_RESTORE_BOTH	(SAVE_RESTORE_TITLE | SAVE_RESTORE_ICON)
 
 // Flags for adjust_prop_columns()
-#define APC_SAVE_FOR_UNDO	1   // call u_savesub() before making changes
-#define APC_SUBSTITUTE		2   // text is replaced, not inserted
-#define APC_INDENT		4   // changing indent
+#ವ್ಯಾಖ್ಯಾನಿಸು APC_SAVE_FOR_UNDO	1   // call u_savesub() before making changes
+#ವ್ಯಾಖ್ಯಾನಿಸು APC_SUBSTITUTE		2   // text is replaced, not inserted
+#ವ್ಯಾಖ್ಯಾನಿಸು APC_INDENT		4   // changing indent
 
-#define CLIP_ZINDEX 32000
+#ವ್ಯಾಖ್ಯಾನಿಸು CLIP_ZINDEX 32000
 
 // Flags for replace_termcodes()
-#define REPTERM_FROM_PART	1
-#define REPTERM_DO_LT		2
-#define REPTERM_SPECIAL		4
-#define REPTERM_NO_SIMPLIFY	8
+#ವ್ಯಾಖ್ಯಾನಿಸು REPTERM_FROM_PART	1
+#ವ್ಯಾಖ್ಯಾನಿಸು REPTERM_DO_LT		2
+#ವ್ಯಾಖ್ಯಾನಿಸು REPTERM_SPECIAL		4
+#ವ್ಯಾಖ್ಯಾನಿಸು REPTERM_NO_SIMPLIFY	8
 
 // Flags for find_special_key()
-#define FSK_KEYCODE	0x01	// prefer key code, e.g. K_DEL instead of DEL
-#define FSK_KEEP_X_KEY	0x02	// don't translate xHome to Home key
-#define FSK_IN_STRING	0x04	// TRUE in string, double quote is escaped
-#define FSK_SIMPLIFY	0x08	// simplify <C-H> and <A-x>
-#define FSK_FROM_PART	0x10	// left-hand-side of mapping
+#ವ್ಯಾಖ್ಯಾನಿಸು FSK_KEYCODE	0x01	// prefer key code, e.g. K_DEL instead of DEL
+#ವ್ಯಾಖ್ಯಾನಿಸು FSK_KEEP_X_ಕೀಲಿ	0x02	// don't translate xHome to Home key
+#ವ್ಯಾಖ್ಯಾನಿಸು FSK_ಒಳ_STRING	0x04	// TRUE in string, double quote is escaped
+#ವ್ಯಾಖ್ಯಾನಿಸು FSK_SIMPLIFY	0x08	// simplify <C-H> and <A-x>
+#ವ್ಯಾಖ್ಯಾನಿಸು FSK_FROM_PART	0x10	// left-hand-side of mapping
 
 // Flags for the readdirex function, how to sort the result
-#define READDIR_SORT_NONE	0  // do not sort
-#define READDIR_SORT_BYTE	1  // sort by byte order (strcmp), default
-#define READDIR_SORT_IC		2  // sort ignoring case (strcasecmp)
-#define READDIR_SORT_COLLATE	3  // sort according to collation (strcoll)
+#ವ್ಯಾಖ್ಯಾನಿಸು READDIR_ವಿಂಗಡಿಸು_NONE	0  // do not sort
+#ವ್ಯಾಖ್ಯಾನಿಸು READDIR_ವಿಂಗಡಿಸು_BYTE	1  // sort by byte order (strcmp), default
+#ವ್ಯಾಖ್ಯಾನಿಸು READDIR_ವಿಂಗಡಿಸು_IC		2  // sort ignoring case (strcasecmp)
+#ವ್ಯಾಖ್ಯಾನಿಸು READDIR_ವಿಂಗಡಿಸು_COLLATE	3  // sort according to collation (strcoll)
 
 // Flags for mch_delay.
-#define MCH_DELAY_IGNOREINPUT	1
-#define MCH_DELAY_SETTMODE	2
+#ವ್ಯಾಖ್ಯಾನಿಸು MCH_DELAY_IGNOREINPUT	1
+#ವ್ಯಾಖ್ಯಾನಿಸು MCH_DELAY_SETTMODE	2
 
 // Flags for eval_variable().
-#define EVAL_VAR_VERBOSE	1   // may give error message
-#define EVAL_VAR_NOAUTOLOAD	2   // do not use script autoloading
-#define EVAL_VAR_IMPORT		4   // may return special variable for import
-#define EVAL_VAR_NO_FUNC	8   // do not look for a function
+#ವ್ಯಾಖ್ಯಾನಿಸು EVAL_VAR_VERBOSE	1   // may give error message
+#ವ್ಯಾಖ್ಯಾನಿಸು EVAL_VAR_NOAUTOLOAD	2   // do not use script autoloading
+#ವ್ಯಾಖ್ಯಾನಿಸು EVAL_VAR_IMPORT		4   // may return special variable for import
+#ವ್ಯಾಖ್ಯಾನಿಸು EVAL_VAR_NO_FUNC	8   // do not look for a function
 
 // Fuzzy matching
-#define FUZZY_MATCH_MAX_LEN	1024    // max characters that can be matched
-#define FUZZY_SCORE_NONE	INT_MIN // invalid fuzzy score
+#ವ್ಯಾಖ್ಯಾನಿಸು FUZZY_ಹೊಂದಿಕೆ_MAX_LEN	1024    // max characters that can be matched
+#ವ್ಯಾಖ್ಯಾನಿಸು FUZZY_SCORE_NONE	INT_MIN // invalid fuzzy score
 
 // flags for equal_type()
-#define ETYPE_ARG_UNKNOWN 1
+#ವ್ಯಾಖ್ಯಾನಿಸು ETYPE_ARG_UNKNOWN 1
 
 // flags used by user commands and :autocmd
-#define UC_BUFFER	1	// -buffer: local to current buffer
-#define UC_VIM9		2	// {} argument: Vim9 syntax.
+#ವ್ಯಾಖ್ಯಾನಿಸು UC_ಬಫರ್	1	// -buffer: local to current buffer
+#ವ್ಯಾಖ್ಯಾನಿಸು UC_VIM9		2	// {} argument: Vim9 syntax.
 
 // flags for the -completeopt= attribute of :command
-#define UCC_ESCAPE	0x1	// escape spaces, tabs and backslashes in
+#ವ್ಯಾಖ್ಯಾನಿಸು UCC_ESCAPE	0x1	// escape spaces, tabs and backslashes in
 				// matches
 
 // flags used by vim_strsave_fnameescape()
-#define VSE_NONE	0
-#define VSE_SHELL	1	// escape for a shell command
-#define VSE_BUFFER	2	// escape for a ":buffer" command
+#ವ್ಯಾಖ್ಯಾನಿಸು VSE_NONE	0
+#ವ್ಯಾಖ್ಯಾನಿಸು VSE_SHELL	1	// escape for a shell command
+#ವ್ಯಾಖ್ಯಾನಿಸು VSE_ಬಫರ್	2	// escape for a ":buffer" command
 
 // Flags used by find_func_even_dead()
-#define FFED_IS_GLOBAL	1	// "g:" was used
-#define FFED_NO_GLOBAL	2	// only check for script-local functions
+#ವ್ಯಾಖ್ಯಾನಿಸು FFED_IS_GLOBAL	1	// "g:" was used
+#ವ್ಯಾಖ್ಯಾನಿಸು FFED_NO_GLOBAL	2	// only check for script-local functions
 
-#define MAX_LSHIFT_BITS (varnumber_T)((sizeof(uvarnumber_T) * 8) - 1)
+#ವ್ಯಾಖ್ಯಾನಿಸು MAX_LSHIFT_ಬಿಟ್ಟುಗಳು (varnumber_T)((ಗಾತ್ರ(uvarnumber_T) * 8) - 1)
 
 // Flags used by "class_flags" of define_function()
-#define CF_CLASS	1	// inside a class
-#define CF_INTERFACE	2	// inside an interface
-#define CF_ABSTRACT_METHOD	4	// inside an abstract class
+#ವ್ಯಾಖ್ಯಾನಿಸು CF_CLASS	1	// inside a class
+#ವ್ಯಾಖ್ಯಾನಿಸು CF_INTERFACE	2	// inside an interface
+#ವ್ಯಾಖ್ಯಾನಿಸು CF_ABSTRACT_ವಿಧಾನ	4	// inside an abstract class
 
 // Flags used by getvcol()
-#define GETVCOL_END_EXCL_LBR	1
-#define GETVCOL_NO_ABOVE	2	// exclude virtual text above the line
-#define GETVCOL_FOR_VIRTCOL	4	// value is used for "w_virtcol"
+#ವ್ಯಾಖ್ಯಾನಿಸು GETVCOL_ಕೊನೆ_EXCL_LBR	1
+#ವ್ಯಾಖ್ಯಾನಿಸು GETVCOL_NO_ABOVE	2	// exclude virtual text above the line
+#ವ್ಯಾಖ್ಯಾನಿಸು GETVCOL_FOR_VIRTCOL	4	// value is used for "w_virtcol"
 
 // Used by expand_env_esc() callers that feed the result to
 // wildcard expansion, so that such characters embedded in
 // environment variable values are treated as literal.
-#ifdef VMS
-# define PATH_ESC_WILDCARDS	"*?%"
-#else
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VMS
+# define ಮಾರ್ಗ_ESC_WILDCARDS	"*?%"
+#ಇಲ್ಲದಿದ್ದರೆ
 # ifdef MSWIN
-#  define PATH_ESC_WILDCARDS	"*?["
-# else
-#  define PATH_ESC_WILDCARDS	"*?[{"
+#  define ಮಾರ್ಗ_ESC_WILDCARDS	"*?["
+# ಇಲ್ಲದಿದ್ದರೆ
+#  define ಮಾರ್ಗ_ESC_WILDCARDS	"*?[{"
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#endif // VIM__H
+#ಆದರೆ_ಅಂತ್ಯ // VIM__H

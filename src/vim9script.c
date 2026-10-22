@@ -11,17 +11,17 @@
  * vim9script.c: :vim9script, :import, :export and friends
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * Return TRUE when currently in a script with script version smaller than
  * "max_version" or command modifiers forced it.
  */
-    int
-in_old_script(int max_version)
+    ಪೂರ್ಣಾಂಕ
+ಒಳ_old_script(ಪೂರ್ಣಾಂಕ max_ಆವೃತ್ತಿ)
 {
-    return (current_sctx.sc_version < max_version
+    ಹಿಂತಿರುಗಿ (current_sctx.sc_ಆವೃತ್ತಿ < max_ಆವೃತ್ತಿ
 					&& !(cmdmod.cmod_flags & CMOD_VIM9CMD))
 		|| (cmdmod.cmod_flags & CMOD_LEGACY);
 }
@@ -30,21 +30,21 @@ in_old_script(int max_version)
  * Return TRUE if the current script is Vim9 script.
  * This also returns TRUE in a legacy function in a Vim9 script.
  */
-    int
-current_script_is_vim9(void)
+    ಪೂರ್ಣಾಂಕ
+current_script_is_vim9(ಶೂನ್ಯ)
 {
-    return SCRIPT_ID_VALID(current_sctx.sc_sid)
-	    && SCRIPT_ITEM(current_sctx.sc_sid)->sn_version
-						       == SCRIPT_VERSION_VIM9;
+    ಹಿಂತಿರುಗಿ SCRIPT_ID_VALID(current_sctx.sc_sid)
+	    && SCRIPT_ಅಂಶ(current_sctx.sc_sid)->sn_ಆವೃತ್ತಿ
+						       == SCRIPT_ಆವೃತ್ತಿ_VIM9;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 /*
  * Clear Vim9 script-local variables and functions.
  */
-    void
-clear_vim9_scriptlocal_vars(int sid)
+    ಶೂನ್ಯ
+clear_vim9_scriptlocal_vars(ಪೂರ್ಣಾಂಕ sid)
 {
     hashtab_T	*ht = &SCRIPT_VARS(sid);
 
@@ -53,112 +53,112 @@ clear_vim9_scriptlocal_vars(int sid)
     delete_script_functions(sid);
 
     // also the exported variables of an autoload script
-    delete_autoload_export_vars(SCRIPT_ITEM(sid)->sn_autoload_prefix);
+    delete_autoload_export_vars(SCRIPT_ಅಂಶ(sid)->sn_autoload_ಪೂರ್ವಪ್ರತ್ಯಯ);
 
     // old imports and script variables are no longer valid
     free_imports_and_script_vars(sid);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * ":vim9script".
  */
-    void
-ex_vim9script(exarg_T *eap UNUSED)
+    ಶೂನ್ಯ
+ex_vim9script(exarg_T *eap ಬಳಸದ)
 {
-#ifdef FEAT_EVAL
-    int		    sid = current_sctx.sc_sid;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಪೂರ್ಣಾಂಕ		    sid = current_sctx.sc_sid;
     scriptitem_T    *si;
-    int		    found_noclear = FALSE;
+    ಪೂರ್ಣಾಂಕ		    ಸಿಕ್ಕಿತು_noclear = FALSE;
     char_u	    *p;
 
-    if (!sourcing_a_script(eap))
+    ಆದರೆ (!sourcing_a_script(eap))
     {
-	emsg(_(e_vim9script_can_only_be_used_in_script));
-	return;
+	emsg(_(e_vim9script_can_only_be_ಬಳಸಿದ_ಒಳ_script));
+	ಹಿಂತಿರುಗಿ;
     }
 
-    si = SCRIPT_ITEM(sid);
-    if (si->sn_state == SN_STATE_HAD_COMMAND)
+    si = SCRIPT_ಅಂಶ(sid);
+    ಆದರೆ (si->sn_state == SN_STATE_HAD_COMMAND)
     {
-	emsg(_(e_vim9script_must_be_first_command_in_script));
-	return;
+	emsg(_(e_vim9script_must_be_ಮೊದಲ_command_ಒಳ_script));
+	ಹಿಂತಿರುಗಿ;
     }
 
-    for (p = eap->arg; !IS_WHITE_OR_NUL(*p); p = skipwhite(skiptowhite(p)))
+    ಗಾಗಿ (p = eap->arg; !IS_WHITE_OR_NUL(*p); p = skipwhite(skiptowhite(p)))
     {
-	if (STRNCMP(p, "noclear", 7) == 0 && IS_WHITE_OR_NUL(p[7]))
+	ಆದರೆ (STRNCMP(p, "noclear", 7) == 0 && IS_WHITE_OR_NUL(p[7]))
 	{
-	    if (found_noclear)
+	    ಆದರೆ (ಸಿಕ್ಕಿತು_noclear)
 	    {
-		semsg(_(e_duplicate_argument_str), p);
-		return;
+		semsg(_(e_duplicate_ವಾದ_str), p);
+		ಹಿಂತಿರುಗಿ;
 	    }
-	    found_noclear = TRUE;
+	    ಸಿಕ್ಕಿತು_noclear = TRUE;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    semsg(_(e_invalid_argument_str), eap->arg);
-	    return;
+	    semsg(_(e_invalid_ವಾದ_str), eap->arg);
+	    ಹಿಂತಿರುಗಿ;
 	}
     }
 
-    if (si->sn_state == SN_STATE_RELOAD && !found_noclear)
+    ಆದರೆ (si->sn_state == SN_STATE_RELOAD && !ಸಿಕ್ಕಿತು_noclear)
 	// Reloading a script without the "noclear" argument: clear
 	// script-local variables and functions.
 	clear_vim9_scriptlocal_vars(sid);
     si->sn_state = SN_STATE_HAD_COMMAND;
 
     // Store the prefix with the script, it is used to find exported functions.
-    if (si->sn_autoload_prefix == NULL)
-	si->sn_autoload_prefix = get_autoload_prefix(si);
+    ಆದರೆ (si->sn_autoload_ಪೂರ್ವಪ್ರತ್ಯಯ == ಖಾಲಿ)
+	si->sn_autoload_ಪೂರ್ವಪ್ರತ್ಯಯ = get_autoload_ಪೂರ್ವಪ್ರತ್ಯಯ(si);
 
-    current_sctx.sc_version = SCRIPT_VERSION_VIM9;
-    si->sn_version = SCRIPT_VERSION_VIM9;
+    current_sctx.sc_ಆವೃತ್ತಿ = SCRIPT_ಆವೃತ್ತಿ_VIM9;
+    si->sn_ಆವೃತ್ತಿ = SCRIPT_ಆವೃತ್ತಿ_VIM9;
 
-    if (STRCMP(p_cpo, CPO_VIM) != 0)
+    ಆದರೆ (STRCMP(p_cpo, CPO_VIM) != 0)
     {
 	si->sn_save_cpo = vim_strsave(p_cpo);
-	set_option_value_give_err((char_u *)"cpo",
+	ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"cpo",
 					 0L, (char_u *)CPO_VIM, OPT_NO_REDRAW);
     }
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
     // No check for this being the first command, the information is not
     // available.
-    current_sctx.sc_version = SCRIPT_VERSION_VIM9;
-#endif
+    current_sctx.sc_ಆವೃತ್ತಿ = SCRIPT_ಆವೃತ್ತಿ_VIM9;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * When in Vim9 script give an error (unless "silent" is true) and return FAIL.
  */
-    int
-not_in_vim9(exarg_T *eap, bool silent)
+    ಪೂರ್ಣಾಂಕ
+not_ಒಳ_vim9(exarg_T *eap, bool silent)
 {
-    if (in_vim9script())
-	switch (eap->cmdidx)
+    ಆದರೆ (ಒಳ_vim9script())
+	ಆಯ್ಕೆ (eap->cmdidx)
 	{
-	    case CMD_k:
-		if (eap->addr_count > 0)
+	    ಸ್ಥಿತಿ CMD_k:
+		ಆದರೆ (eap->addr_ಎಣಿಕೆ > 0)
 		{
-		    if (!silent)
+		    ಆದರೆ (!silent)
 			emsg(_(e_no_range_allowed));
-		    return FAIL;
+		    ಹಿಂತಿರುಗಿ FAIL;
 		}
 		// FALLTHROUGH
-	    case CMD_append:
-	    case CMD_change:
-	    case CMD_insert:
-	    case CMD_open:
-	    case CMD_t:
-	    case CMD_xit:
-		if (!silent)
-		    semsg(_(e_command_not_supported_in_vim9_script_missing_var_str), eap->cmd);
-		return FAIL;
-	    default: break;
+	    ಸ್ಥಿತಿ CMD_append:
+	    ಸ್ಥಿತಿ CMD_change:
+	    ಸ್ಥಿತಿ CMD_ಸೇರಿಸು:
+	    ಸ್ಥಿತಿ CMD_open:
+	    ಸ್ಥಿತಿ CMD_t:
+	    ಸ್ಥಿತಿ CMD_xit:
+		ಆದರೆ (!silent)
+		    semsg(_(e_command_not_supported_ಒಳ_vim9_script_missing_var_str), eap->cmd);
+		ಹಿಂತಿರುಗಿ FAIL;
+	    ಪೂರ್ವನಿಯೋಜಿತ: ನಿಲ್ಲಿಸು;
 	}
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
@@ -167,63 +167,63 @@ not_in_vim9(exarg_T *eap, bool silent)
  * This avoids that using a legacy style #{} dictionary leads to difficult to
  * understand errors.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 vim9_bad_comment(char_u *p)
 {
-    if (p[0] == '#' && p[1] == '{' && p[2] != '{')
+    ಆದರೆ (p[0] == '#' && p[1] == '{' && p[2] != '{')
     {
-	if (!did_emsg)
-	    emsg(_(e_cannot_use_hash_curly_to_start_comment));
-	return TRUE;
+	ಆದರೆ (!did_emsg)
+	    emsg(_(e_cannot_use_hash_curly_ಗಮ್ಯ_ಆರಂಭ_comment));
+	ಹಿಂತಿರುಗಿ TRUE;
     }
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Return TRUE if "p" points at a "#" not followed by one '{'.
  * Gives an error for using "#{", not for "#{{".
  * Does not check for white space.
  */
-    int
-vim9_comment_start(char_u *p)
+    ಪೂರ್ಣಾಂಕ
+vim9_comment_ಆರಂಭ(char_u *p)
 {
-#ifdef FEAT_EVAL
-    return p[0] == '#' && !vim9_bad_comment(p);
-#else
-    return p[0] == '#' && (p[1] != '{' || p[2] == '{');
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಹಿಂತಿರುಗಿ p[0] == '#' && !vim9_bad_comment(p);
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಹಿಂತಿರುಗಿ p[0] == '#' && (p[1] != '{' || p[2] == '{');
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 
 /*
  * "++nr" and "--nr" commands.
  */
-    void
+    ಶೂನ್ಯ
 ex_incdec(exarg_T *eap)
 {
     char_u	*cmd = eap->cmd;
     char_u	*nextcmd = eap->nextcmd;
     size_t	len = STRLEN(eap->cmd) + 8;
 
-    if (VIM_ISWHITE(cmd[2]))
+    ಆದರೆ (VIM_ISWHITE(cmd[2]))
     {
 	semsg(_(e_no_white_space_allowed_after_str_str),
 			 eap->cmdidx == CMD_increment ? "++" : "--", eap->cmd);
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
     // This works like "nr += 1" or "nr -= 1".
     // Add a '|' to avoid looking in the next line.
     eap->cmd = alloc(len);
-    if (eap->cmd == NULL)
-	return;
-    vim_snprintf((char *)eap->cmd, len, "%s %c= 1 |", cmd + 2,
+    ಆದರೆ (eap->cmd == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
+    vim_snprintf((ಅಕ್ಷರ *)eap->cmd, len, "%s %c= 1 |", cmd + 2,
 				     eap->cmdidx == CMD_increment ? '+' : '-');
     eap->arg = eap->cmd;
     eap->cmdidx = CMD_var;
-    eap->nextcmd = NULL;
+    eap->nextcmd = ಖಾಲಿ;
     ex_let(eap);
     vim_free(eap->cmd);
     eap->cmd = cmd;
@@ -233,66 +233,66 @@ ex_incdec(exarg_T *eap)
 /*
  * ":export cmd"
  */
-    void
-ex_export(exarg_T *eap UNUSED)
+    ಶೂನ್ಯ
+ex_export(exarg_T *eap ಬಳಸದ)
 {
     // can only get here when "export" wasn't caught in do_cmdline()
-    emsg(_(e_export_can_only_be_used_in_vim9script));
+    emsg(_(e_export_can_only_be_ಬಳಸಿದ_ಒಳ_vim9script));
 }
 
 /*
  * Add a new imported item entry to the current script.
  */
-    static imported_T *
+    ಸ್ಥಿರ imported_T *
 new_imported(garray_T *gap)
 {
-    if (ga_grow(gap, 1) == OK)
-	return ((imported_T *)gap->ga_data + gap->ga_len++);
-    return NULL;
+    ಆದರೆ (ga_grow(gap, 1) == OK)
+	ಹಿಂತಿರುಗಿ ((imported_T *)gap->ga_ದತ್ತಾಂಶ + gap->ga_len++);
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Free the script variables from "sn_all_vars".
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 free_all_script_vars(scriptitem_T *si)
 {
-    int		todo;
+    ಪೂರ್ಣಾಂಕ		todo;
     hashtab_T	*ht = &si->sn_all_vars.dv_hashtab;
     hashitem_T	*hi;
     sallvar_T	*sav;
-    sallvar_T	*sav_next;
-    int		idx;
+    sallvar_T	*sav_ಮುಂದಿನ;
+    ಪೂರ್ಣಾಂಕ		idx;
 
-    hash_lock(ht);
-    todo = (int)ht->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+    hash_ಬೀಗ(ht);
+    todo = (ಪೂರ್ಣಾಂಕ)ht->ht_ಬಳಸಿದ;
+    FOR_ALL_HASHTAB_ವಸ್ತುಗಳು(ht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	ಆದರೆ (!HASHITEM_ಖಾಲಿಗಳು(hi))
 	{
 	    --todo;
 
 	    // Free the variable.  Don't remove it from the hashtab, ht_array
 	    // might change then.  hash_clear() takes care of it later.
 	    sav = HI2SAV(hi);
-	    while (sav != NULL)
+	    ಆಗ (sav != ಖಾಲಿ)
 	    {
-		sav_next = sav->sav_next;
-		if (sav->sav_di == NULL)
+		sav_ಮುಂದಿನ = sav->sav_ಮುಂದಿನ;
+		ಆದರೆ (sav->sav_di == ಖಾಲಿ)
 		    clear_tv(&sav->sav_tv);
 		vim_free(sav);
-		sav = sav_next;
+		sav = sav_ಮುಂದಿನ;
 	    }
 	}
     }
     hash_clear(ht);
     hash_init(ht);
 
-    for (idx = 0; idx < si->sn_var_vals.ga_len; ++idx)
+    ಗಾಗಿ (idx = 0; idx < si->sn_var_vals.ga_len; ++idx)
     {
-	svar_T    *sv = ((svar_T *)si->sn_var_vals.ga_data) + idx;
+	svar_T    *sv = ((svar_T *)si->sn_var_vals.ga_ದತ್ತಾಂಶ) + idx;
 
-	if (sv->sv_flags & SVFLAG_TYPE_ALLOCATED)
+	ಆದರೆ (sv->sv_flags & SVFLAG_TYPE_ALLOCATED)
 	    free_type(sv->sv_type);
     }
     ga_clear(&si->sn_var_vals);
@@ -304,15 +304,15 @@ free_all_script_vars(scriptitem_T *si)
 /*
  * Free all imported items in script "sid".
  */
-    void
-free_imports_and_script_vars(int sid)
+    ಶೂನ್ಯ
+free_imports_and_script_vars(ಪೂರ್ಣಾಂಕ sid)
 {
-    scriptitem_T    *si = SCRIPT_ITEM(sid);
-    int		    idx;
+    scriptitem_T    *si = SCRIPT_ಅಂಶ(sid);
+    ಪೂರ್ಣಾಂಕ		    idx;
 
-    for (idx = 0; idx < si->sn_imports.ga_len; ++idx)
+    ಗಾಗಿ (idx = 0; idx < si->sn_imports.ga_len; ++idx)
     {
-	imported_T *imp = ((imported_T *)si->sn_imports.ga_data) + idx;
+	imported_T *imp = ((imported_T *)si->sn_imports.ga_ದತ್ತಾಂಶ) + idx;
 
 	vim_free(imp->imp_name);
     }
@@ -327,15 +327,15 @@ free_imports_and_script_vars(int sid)
  * Mark all imports as possible to redefine.  Used when a script is loaded
  * again but not cleared.
  */
-    void
-mark_imports_for_reload(int sid)
+    ಶೂನ್ಯ
+mark_imports_for_reload(ಪೂರ್ಣಾಂಕ sid)
 {
-    scriptitem_T    *si = SCRIPT_ITEM(sid);
-    int		    idx;
+    scriptitem_T    *si = SCRIPT_ಅಂಶ(sid);
+    ಪೂರ್ಣಾಂಕ		    idx;
 
-    for (idx = 0; idx < si->sn_imports.ga_len; ++idx)
+    ಗಾಗಿ (idx = 0; idx < si->sn_imports.ga_len; ++idx)
     {
-	imported_T *imp = ((imported_T *)si->sn_imports.ga_data) + idx;
+	imported_T *imp = ((imported_T *)si->sn_imports.ga_ದತ್ತಾಂಶ) + idx;
 
 	imp->imp_flags |= IMP_FLAGS_RELOAD;
     }
@@ -345,42 +345,42 @@ mark_imports_for_reload(int sid)
  * Part of "import" that handles a relative or absolute file name/
  * Returns OK or FAIL.
  */
-    static int
-handle_import_fname(char_u *fname, int is_autoload, int *sid)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+handle_import_fname(char_u *fname, ಪೂರ್ಣಾಂಕ is_autoload, ಪೂರ್ಣಾಂಕ *sid)
 {
-    if (is_autoload)
+    ಆದರೆ (is_autoload)
     {
 	scriptitem_T	*si;
 
-	*sid = find_script_by_name(fname);
-	if (*sid < 0)
+	*sid = ಕಂಡುಹಿಡಿ_script_by_name(fname);
+	ಆದರೆ (*sid < 0)
 	{
-	    int error = OK;
+	    ಪೂರ್ಣಾಂಕ error = OK;
 
 	    // Script does not exist yet, check name and create a new
 	    // scriptitem.
-	    if (!file_is_readable(fname))
+	    ಆದರೆ (!file_is_readable(fname))
 	    {
 		semsg(_(mch_isdir(fname) ? e_str_is_directory
 					  : e_cannot_read_from_str_2), fname);
-		return FAIL;
+		ಹಿಂತಿರುಗಿ FAIL;
 	    }
 	    *sid = get_new_scriptitem_for_fname(&error, fname);
-	    if (error == FAIL)
-		return FAIL;
+	    ಆದರೆ (error == FAIL)
+		ಹಿಂತಿರುಗಿ FAIL;
 	}
 
-	si = SCRIPT_ITEM(*sid);
+	si = SCRIPT_ಅಂಶ(*sid);
 	si->sn_import_autoload = TRUE;
 
-	if (si->sn_autoload_prefix == NULL)
-	    si->sn_autoload_prefix = get_autoload_prefix(si);
+	ಆದರೆ (si->sn_autoload_ಪೂರ್ವಪ್ರತ್ಯಯ == ಖಾಲಿ)
+	    si->sn_autoload_ಪೂರ್ವಪ್ರತ್ಯಯ = get_autoload_ಪೂರ್ವಪ್ರತ್ಯಯ(si);
 
 	// with testing override: load autoload script right away
-	if (!override_autoload || si->sn_state != SN_STATE_NOT_LOADED)
-	    return OK;
+	ಆದರೆ (!override_autoload || si->sn_state != SN_STATE_NOT_LOADED)
+	    ಹಿಂತಿರುಗಿ OK;
     }
-    return do_source(fname, FALSE, DOSO_NONE, sid);
+    ಹಿಂತಿರುಗಿ do_ಮೂಲ(fname, FALSE, DOSO_NONE, sid);
 }
 
 /*
@@ -389,29 +389,29 @@ handle_import_fname(char_u *fname, int is_autoload, int *sid)
  * "cctx" is NULL at the script level.
  * Returns a pointer to after the command or NULL in case of failure
  */
-    static char_u *
+    ಸ್ಥಿರ char_u *
 handle_import(
-	char_u	    *arg_start,
+	char_u	    *arg_ಆರಂಭ,
 	garray_T    *gap,
-	int	    import_sid,
+	ಪೂರ್ಣಾಂಕ	    import_sid,
 	evalarg_T   *evalarg,
-	void	    *cctx)
+	ಶೂನ್ಯ	    *cctx)
 {
-    char_u	*arg = arg_start;
+    char_u	*arg = arg_ಆರಂಭ;
     char_u	*nextarg;
-    int		is_autoload = FALSE;
-    int		getnext;
-    char_u	*expr_end;
-    int		ret = FAIL;
-    char_u	*as_name = NULL;
+    ಪೂರ್ಣಾಂಕ		is_autoload = FALSE;
+    ಪೂರ್ಣಾಂಕ		getnext;
+    char_u	*ಅಭಿವ್ಯಕ್ತಿ_ಕೊನೆ;
+    ಪೂರ್ಣಾಂಕ		ret = FAIL;
+    char_u	*as_name = ಖಾಲಿ;
     typval_T	tv;
-    int		sid = -2;
-    int		res;
-    long	start_lnum = SOURCING_LNUM;
+    ಪೂರ್ಣಾಂಕ		sid = -2;
+    ಪೂರ್ಣಾಂಕ		res;
+    ದೀರ್ಘ	ಆರಂಭ_lnum = SOURCING_LNUM;
     garray_T	*import_gap;
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
 
-    if (STRNCMP(arg, "autoload", 8) == 0 && VIM_ISWHITE(arg[8]))
+    ಆದರೆ (STRNCMP(arg, "autoload", 8) == 0 && VIM_ISWHITE(arg[8]))
     {
 	is_autoload = TRUE;
 	arg = skipwhite(arg + 8);
@@ -419,202 +419,202 @@ handle_import(
 
     // The name of the file can be an expression, which must evaluate to a
     // string.
-    ret = eval0_retarg(arg, &tv, NULL, evalarg, &expr_end);
-    if (ret == FAIL)
-	goto erret;
-    if (tv.v_type != VAR_STRING
-		       || tv.vval.v_string == NULL || *tv.vval.v_string == NUL)
+    ret = eval0_retarg(arg, &tv, ಖಾಲಿ, evalarg, &ಅಭಿವ್ಯಕ್ತಿ_ಕೊನೆ);
+    ಆದರೆ (ret == FAIL)
+	ಹೋಗು erret;
+    ಆದರೆ (tv.v_type != VAR_STRING
+		       || tv.vval.v_string == ಖಾಲಿ || *tv.vval.v_string == NUL)
     {
 	semsg(_(e_invalid_string_for_import_str), arg);
-	goto erret;
+	ಹೋಗು erret;
     }
 
     // Give error messages for the start of the line.
-    SOURCING_LNUM = start_lnum;
+    SOURCING_LNUM = ಆರಂಭ_lnum;
 
     /*
      * find script file
      */
-    if (*tv.vval.v_string == '.')
+    ಆದರೆ (*tv.vval.v_string == '.')
     {
 	size_t		len;
-	scriptitem_T	*si = SCRIPT_ITEM(current_sctx.sc_sid);
-	char_u		*tail = gettail(si->sn_name);
+	scriptitem_T	*si = SCRIPT_ಅಂಶ(current_sctx.sc_sid);
+	char_u		*ಬಾಲ = gettail(si->sn_name);
 	char_u		*from_name;
-	int		sourced_from_nofile_buf = FALSE;
+	ಪೂರ್ಣಾಂಕ		sourced_from_nofile_buf = FALSE;
 
-	if (STRNCMP(si->sn_name, ":source buffer=", 15) == 0)
+	ಆದರೆ (STRNCMP(si->sn_name, ":source buffer=", 15) == 0)
 	    sourced_from_nofile_buf = TRUE;
 
-	if (!sourced_from_nofile_buf)
+	ಆದರೆ (!sourced_from_nofile_buf)
 	{
 	    // Relative to current script: "./name.vim", "../../name.vim".
-	    len = STRLEN(si->sn_name) - STRLEN(tail) + STRLEN(tv.vval.v_string) + 2;
+	    len = STRLEN(si->sn_name) - STRLEN(ಬಾಲ) + STRLEN(tv.vval.v_string) + 2;
 	    from_name = alloc(len);
-	    if (from_name == NULL)
-		goto erret;
-	    vim_strncpy(from_name, si->sn_name, tail - si->sn_name);
-	    add_pathsep(from_name);
+	    ಆದರೆ (from_name == ಖಾಲಿ)
+		ಹೋಗು erret;
+	    vim_strncpy(from_name, si->sn_name, ಬಾಲ - si->sn_name);
+	    ಕೂಡಿಸು_pathsep(from_name);
 	    STRCAT(from_name, tv.vval.v_string);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    from_name = vim_strsave(tv.vval.v_string);
 	simplify_filename(from_name);
 
 	res = handle_import_fname(from_name, is_autoload, &sid);
 	vim_free(from_name);
     }
-    else if (mch_isFullName(tv.vval.v_string))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (mch_is_ತುಂಬಿದ_Name(tv.vval.v_string))
     {
 	// Absolute path: "/tmp/name.vim"
 	res = handle_import_fname(tv.vval.v_string, is_autoload, &sid);
     }
-    else if (is_autoload)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (is_autoload)
     {
 	size_t	    len = 9 + STRLEN(tv.vval.v_string) + 1;
 	char_u	    *from_name;
 
 	// Find file in "autoload" subdirs in 'runtimepath'.
 	from_name = alloc(len);
-	if (from_name == NULL)
-	    goto erret;
-	vim_snprintf((char *)from_name, len, "autoload/%s", tv.vval.v_string);
+	ಆದರೆ (from_name == ಖಾಲಿ)
+	    ಹೋಗು erret;
+	vim_snprintf((ಅಕ್ಷರ *)from_name, len, "autoload/%s", tv.vval.v_string);
 	// we need a scriptitem without loading the script
-	sid = find_script_in_rtp(from_name);
+	sid = ಕಂಡುಹಿಡಿ_script_ಒಳ_rtp(from_name);
 	vim_free(from_name);
-	if (SCRIPT_ID_VALID(sid))
+	ಆದರೆ (SCRIPT_ID_VALID(sid))
 	{
-	    scriptitem_T    *si = SCRIPT_ITEM(sid);
+	    scriptitem_T    *si = SCRIPT_ಅಂಶ(sid);
 
-	    if (si->sn_autoload_prefix == NULL)
-		si->sn_autoload_prefix = get_autoload_prefix(si);
+	    ಆದರೆ (si->sn_autoload_ಪೂರ್ವಪ್ರತ್ಯಯ == ಖಾಲಿ)
+		si->sn_autoload_ಪೂರ್ವಪ್ರತ್ಯಯ = get_autoload_ಪೂರ್ವಪ್ರತ್ಯಯ(si);
 	    res = OK;
-	    if (override_autoload && si->sn_state == SN_STATE_NOT_LOADED)
+	    ಆದರೆ (override_autoload && si->sn_state == SN_STATE_NOT_LOADED)
 		// testing override: load autoload script right away
-		(void)do_source(si->sn_name, FALSE, DOSO_NONE, NULL);
+		(ಶೂನ್ಯ)do_ಮೂಲ(si->sn_name, FALSE, DOSO_NONE, ಖಾಲಿ);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    res = FAIL;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	size_t	    len = 7 + STRLEN(tv.vval.v_string) + 1;
 	char_u	    *from_name;
 
 	// Find file in "import" subdirs in 'runtimepath'.
 	from_name = alloc(len);
-	if (from_name == NULL)
-	    goto erret;
-	vim_snprintf((char *)from_name, len, "import/%s", tv.vval.v_string);
-	res = source_in_path(p_rtp, from_name, DIP_NOAFTER, &sid);
+	ಆದರೆ (from_name == ಖಾಲಿ)
+	    ಹೋಗು erret;
+	vim_snprintf((ಅಕ್ಷರ *)from_name, len, "import/%s", tv.vval.v_string);
+	res = ಮೂಲ_ಒಳ_ಮಾರ್ಗ(p_rtp, from_name, DIP_NOAFTER, &sid);
 	vim_free(from_name);
     }
 
-    if (res == FAIL || sid <= 0)
+    ಆದರೆ (res == FAIL || sid <= 0)
     {
 	semsg(_(is_autoload && sid == -2
-		    ? e_autoload_import_cannot_use_absolute_or_relative_path
+		    ? e_autoload_import_cannot_use_absolute_or_relative_ಮಾರ್ಗ
 		    : e_could_not_import_str), tv.vval.v_string);
-	goto erret;
+	ಹೋಗು erret;
     }
 
-    if (sid == current_sctx.sc_sid)
+    ಆದರೆ (sid == current_sctx.sc_sid)
     {
 	emsg(_(e_script_cannot_import_itself));
-	goto erret;
+	ಹೋಗು erret;
     }
 
-    import_gap = gap != NULL ? gap : &SCRIPT_ITEM(import_sid)->sn_imports;
-    for (i = 0; i < import_gap->ga_len; ++i)
+    import_gap = gap != ಖಾಲಿ ? gap : &SCRIPT_ಅಂಶ(import_sid)->sn_imports;
+    ಗಾಗಿ (i = 0; i < import_gap->ga_len; ++i)
     {
-	imported_T *import = (imported_T *)import_gap->ga_data + i;
+	imported_T *import = (imported_T *)import_gap->ga_ದತ್ತಾಂಶ + i;
 
-	if (import->imp_sid == sid)
+	ಆದರೆ (import->imp_sid == sid)
 	{
-	    if (import->imp_flags & IMP_FLAGS_RELOAD)
+	    ಆದರೆ (import->imp_flags & IMP_FLAGS_RELOAD)
 	    {
 		// encountering same script first time on a reload is OK
 		import->imp_flags &= ~IMP_FLAGS_RELOAD;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	    semsg(_(e_cannot_import_same_script_twice_str), tv.vval.v_string);
-	    goto erret;
+	    ಹೋಗು erret;
 	}
     }
 
     // Allow for the "as Name" to be in the next line.
-    nextarg = eval_next_non_blank(expr_end, evalarg, &getnext);
-    if (STRNCMP("as", nextarg, 2) == 0 && IS_WHITE_OR_NUL(nextarg[2]))
+    nextarg = eval_ಮುಂದಿನ_non_blank(ಅಭಿವ್ಯಕ್ತಿ_ಕೊನೆ, evalarg, &getnext);
+    ಆದರೆ (STRNCMP("as", nextarg, 2) == 0 && IS_WHITE_OR_NUL(nextarg[2]))
     {
 	char_u *p;
 
-	if (getnext)
-	    arg = eval_next_line(expr_end, evalarg);
-	else
+	ಆದರೆ (getnext)
+	    arg = eval_ಮುಂದಿನ_ಸಾಲು(ಅಭಿವ್ಯಕ್ತಿ_ಕೊನೆ, evalarg);
+	ಇಲ್ಲದಿದ್ದರೆ
 	    arg = nextarg;
 
 	// Skip over "as Name "; no line break allowed after "as".
 	// Do not allow for ':' and '#'.
 	arg = skipwhite(arg + 2);
 	p = arg;
-	if (eval_isnamec1(*arg))
-	    while (ASCII_ISALNUM(*arg) || *arg == '_')
+	ಆದರೆ (eval_isnamec1(*arg))
+	    ಆಗ (ASCII_ISALNUM(*arg) || *arg == '_')
 		++arg;
-	if (p == arg || !IS_WHITE_OR_NUL(*arg))
+	ಆದರೆ (p == arg || !IS_WHITE_OR_NUL(*arg))
 	{
-	    semsg(_(e_syntax_error_in_import_str), p);
-	    goto erret;
+	    semsg(_(e_syntax_error_ಒಳ_import_str), p);
+	    ಹೋಗು erret;
 	}
 	as_name = vim_strnsave(p, arg - p);
 	arg = skipwhite(arg);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	char_u *p = gettail(tv.vval.v_string);
-	char_u *end = (char_u *)strstr((char *)p, ".vim");
+	char_u *ಕೊನೆ = (char_u *)ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು((ಅಕ್ಷರ *)p, ".vim");
 
-	if (!ends_excmd2(arg_start, expr_end))
+	ಆದರೆ (!ತುದಿಗಳು_excmd2(arg_ಆರಂಭ, ಅಭಿವ್ಯಕ್ತಿ_ಕೊನೆ))
 	{
-	    semsg(_(e_trailing_characters_str), expr_end);
-	    goto erret;
+	    semsg(_(e_trailing_characters_str), ಅಭಿವ್ಯಕ್ತಿ_ಕೊನೆ);
+	    ಹೋಗು erret;
 	}
-	if (end == NULL || end[4] != NUL)
+	ಆದರೆ (ಕೊನೆ == ಖಾಲಿ || ಕೊನೆ[4] != NUL)
 	{
-	    semsg(_(e_imported_script_must_use_as_or_end_in_dot_vim_str), p);
-	    goto erret;
+	    semsg(_(e_imported_script_must_use_as_or_ಕೊನೆ_ಒಳ_dot_vim_str), p);
+	    ಹೋಗು erret;
 	}
-	if (end == p)
+	ಆದರೆ (ಕೊನೆ == p)
 	{
 	    semsg(_(e_cannot_import_dot_vim_without_using_as), p);
-	    goto erret;
+	    ಹೋಗು erret;
 	}
-	as_name = vim_strnsave(p, end - p);
+	as_name = vim_strnsave(p, ಕೊನೆ - p);
     }
 
-    if (as_name != NULL)
+    ಆದರೆ (as_name != ಖಾಲಿ)
     {
 	imported_T  *imported;
 
-	imported = find_imported(as_name, STRLEN(as_name), FALSE);
-	if (imported != NULL && imported->imp_sid != sid)
+	imported = ಕಂಡುಹಿಡಿ_imported(as_name, STRLEN(as_name), FALSE);
+	ಆದರೆ (imported != ಖಾಲಿ && imported->imp_sid != sid)
 	{
 	    semsg(_(e_name_already_defined_str), as_name);
-	    goto erret;
+	    ಹೋಗು erret;
 	}
-	else if (imported == NULL
-		&& check_defined(as_name, STRLEN(as_name), cctx, NULL,
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (imported == ಖಾಲಿ
+		&& check_defined(as_name, STRLEN(as_name), cctx, ಖಾಲಿ,
 								FALSE) == FAIL)
-	    goto erret;
+	    ಹೋಗು erret;
 
-	if (imported == NULL)
+	ಆದರೆ (imported == ಖಾಲಿ)
 	{
 	    imported = new_imported(import_gap);
-	    if (imported == NULL)
-		goto erret;
+	    ಆದರೆ (imported == ಖಾಲಿ)
+		ಹೋಗು erret;
 	    imported->imp_name = as_name;
-	    as_name = NULL;
+	    as_name = ಖಾಲಿ;
 	    imported->imp_sid = sid;
-	    if (is_autoload)
+	    ಆದರೆ (is_autoload)
 		imported->imp_flags = IMP_FLAGS_AUTOLOAD;
 	}
     }
@@ -622,30 +622,30 @@ handle_import(
 erret:
     clear_tv(&tv);
     vim_free(as_name);
-    return arg;
+    ಹಿಂತಿರುಗಿ arg;
 }
 
 /*
  * ":import 'filename'"
  * ":import 'filename' as Name"
  */
-    void
+    ಶೂನ್ಯ
 ex_import(exarg_T *eap)
 {
-    char_u	*cmd_end;
+    char_u	*cmd_ಕೊನೆ;
     evalarg_T	evalarg;
 
-    if (!sourcing_a_script(eap))
+    ಆದರೆ (!sourcing_a_script(eap))
     {
-	emsg(_(e_import_can_only_be_used_in_script));
-	return;
+	emsg(_(e_import_can_only_be_ಬಳಸಿದ_ಒಳ_script));
+	ಹಿಂತಿರುಗಿ;
     }
     fill_evalarg_from_eap(&evalarg, eap, eap->skip);
 
-    cmd_end = handle_import(eap->arg, NULL, current_sctx.sc_sid,
-							       &evalarg, NULL);
-    if (cmd_end != NULL)
-	set_nextcmd(eap, cmd_end);
+    cmd_ಕೊನೆ = handle_import(eap->arg, ಖಾಲಿ, current_sctx.sc_sid,
+							       &evalarg, ಖಾಲಿ);
+    ಆದರೆ (cmd_ಕೊನೆ != ಖಾಲಿ)
+	ಗಣ_nextcmd(eap, cmd_ಕೊನೆ);
     clear_evalarg(&evalarg, eap);
 }
 
@@ -654,12 +654,12 @@ ex_import(exarg_T *eap)
  * under another name.  Adjust the import script ID if needed.
  * "*sid" must be a valid script ID.
  */
-    void
-import_check_sourced_sid(int *sid)
+    ಶೂನ್ಯ
+import_check_sourced_sid(ಪೂರ್ಣಾಂಕ *sid)
 {
-    scriptitem_T *script = SCRIPT_ITEM(*sid);
+    scriptitem_T *script = SCRIPT_ಅಂಶ(*sid);
 
-    if (script->sn_sourced_sid > 0)
+    ಆದರೆ (script->sn_sourced_sid > 0)
 	*sid = script->sn_sourced_sid;
 }
 
@@ -670,111 +670,111 @@ import_check_sourced_sid(int *sid)
  * When it is a user function return "*ufunc".
  * When not found returns -1 and "*ufunc" is NULL.
  */
-    int
-find_exported(
-	int	    sid,
+    ಪೂರ್ಣಾಂಕ
+ಕಂಡುಹಿಡಿ_exported(
+	ಪೂರ್ಣಾಂಕ	    sid,
 	char_u	    *name,
 	ufunc_T	    **ufunc,
 	type_T	    **type,
 	cctx_T	    *cctx,
 	cstack_T    *cstack,
-	int	    verbose)
+	ಪೂರ್ಣಾಂಕ	    verbose)
 {
-    int		idx = -1;
+    ಪೂರ್ಣಾಂಕ		idx = -1;
     svar_T	*sv;
-    scriptitem_T *script = SCRIPT_ITEM(sid);
+    scriptitem_T *script = SCRIPT_ಅಂಶ(sid);
 
-    *ufunc = NULL;
+    *ufunc = ಖಾಲಿ;
 
-    if (script->sn_import_autoload && script->sn_state == SN_STATE_NOT_LOADED)
+    ಆದರೆ (script->sn_import_autoload && script->sn_state == SN_STATE_NOT_LOADED)
     {
-	if (do_source(script->sn_name, FALSE, DOSO_NONE, NULL) == FAIL)
+	ಆದರೆ (do_ಮೂಲ(script->sn_name, FALSE, DOSO_NONE, ಖಾಲಿ) == FAIL)
 	{
 	    semsg(_(e_cant_open_file_str), script->sn_name);
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
     }
 
     // Find name in "script".
-    idx = get_script_item_idx(sid, name, 0, cctx, cstack);
-    if (idx >= 0)
+    idx = get_script_ಅಂಶ_idx(sid, name, 0, cctx, cstack);
+    ಆದರೆ (idx >= 0)
     {
-	sv = ((svar_T *)script->sn_var_vals.ga_data) + idx;
-	if ((sv->sv_flags & SVFLAG_EXPORTED) == 0)
+	sv = ((svar_T *)script->sn_var_vals.ga_ದತ್ತಾಂಶ) + idx;
+	ಆದರೆ ((sv->sv_flags & SVFLAG_EXPORTED) == 0)
 	{
-	    if (verbose)
-		semsg(_(e_item_not_exported_in_script_str), name);
-	    return -1;
+	    ಆದರೆ (verbose)
+		semsg(_(e_ಅಂಶ_not_exported_ಒಳ_script_str), name);
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 	*type = sv->sv_type;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	size_t	len = STRLEN(name);
-	char_u	buffer[200];
+	char_u	ಬಫರ್[200];
 	char_u	*funcname;
 
 	// It could be a user function.  Normally this is stored as
 	// "<SNR>99_name".  For an autoload script a function is stored with
 	// the autoload prefix: "dir#script#name".
-	if (script->sn_autoload_prefix != NULL)
-	    len += STRLEN(script->sn_autoload_prefix) + 2;
-	else
+	ಆದರೆ (script->sn_autoload_ಪೂರ್ವಪ್ರತ್ಯಯ != ಖಾಲಿ)
+	    len += STRLEN(script->sn_autoload_ಪೂರ್ವಪ್ರತ್ಯಯ) + 2;
+	ಇಲ್ಲದಿದ್ದರೆ
 	    len += 15;
 
-	if (len < sizeof(buffer))
-	    funcname = buffer;
-	else
+	ಆದರೆ (len < ಗಾತ್ರ(ಬಫರ್))
+	    funcname = ಬಫರ್;
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    funcname = alloc(len);
-	    if (funcname == NULL)
-		return -1;
+	    ಆದರೆ (funcname == ಖಾಲಿ)
+		ಹಿಂತಿರುಗಿ -1;
 	}
-	if (script->sn_autoload_prefix != NULL)
+	ಆದರೆ (script->sn_autoload_ಪೂರ್ವಪ್ರತ್ಯಯ != ಖಾಲಿ)
 	{
-	    sprintf((char *)funcname, "%s%s", script->sn_autoload_prefix, name);
+	    sprintf((ಅಕ್ಷರ *)funcname, "%s%s", script->sn_autoload_ಪೂರ್ವಪ್ರತ್ಯಯ, name);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    funcname[0] = K_SPECIAL;
 	    funcname[1] = KS_EXTRA;
-	    funcname[2] = (int)KE_SNR;
-	    sprintf((char *)funcname + 3, "%ld_%s", (long)sid, name);
+	    funcname[2] = (ಪೂರ್ಣಾಂಕ)KE_SNR;
+	    sprintf((ಅಕ್ಷರ *)funcname + 3, "%ld_%s", (ದೀರ್ಘ)sid, name);
 	}
-	*ufunc = find_func(funcname, FALSE);
+	*ufunc = ಕಂಡುಹಿಡಿ_func(funcname, FALSE);
 
-	if (*ufunc == NULL)
+	ಆದರೆ (*ufunc == ಖಾಲಿ)
 	{
-	    if (verbose)
+	    ಆದರೆ (verbose)
 	    {
-		ufunc_T *alt_ufunc = NULL;
+		ufunc_T *alt_ufunc = ಖಾಲಿ;
 
-		if (script->sn_autoload_prefix != NULL)
+		ಆದರೆ (script->sn_autoload_ಪೂರ್ವಪ್ರತ್ಯಯ != ಖಾಲಿ)
 		{
 		    // try find the function by the script-local name
 		    funcname[0] = K_SPECIAL;
 		    funcname[1] = KS_EXTRA;
-		    funcname[2] = (int)KE_SNR;
-		    sprintf((char *)funcname + 3, "%ld_%s", (long)sid, name);
-		    alt_ufunc = find_func(funcname, FALSE);
+		    funcname[2] = (ಪೂರ್ಣಾಂಕ)KE_SNR;
+		    sprintf((ಅಕ್ಷರ *)funcname + 3, "%ld_%s", (ದೀರ್ಘ)sid, name);
+		    alt_ufunc = ಕಂಡುಹಿಡಿ_func(funcname, FALSE);
 		}
-		if (alt_ufunc != NULL)
-		    semsg(_(e_item_not_exported_in_script_str), name);
-		else
-		    semsg(_(e_item_not_found_in_script_str), name);
+		ಆದರೆ (alt_ufunc != ಖಾಲಿ)
+		    semsg(_(e_ಅಂಶ_not_exported_ಒಳ_script_str), name);
+		ಇಲ್ಲದಿದ್ದರೆ
+		    semsg(_(e_ಅಂಶ_not_ಸಿಕ್ಕಿತು_ಒಳ_script_str), name);
 	    }
 	}
-	else if (((*ufunc)->uf_flags & FC_EXPORT) == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (((*ufunc)->uf_flags & FC_EXPORT) == 0)
 	{
-	    if (verbose)
-		semsg(_(e_item_not_exported_in_script_str), name);
-	    *ufunc = NULL;
+	    ಆದರೆ (verbose)
+		semsg(_(e_ಅಂಶ_not_exported_ಒಳ_script_str), name);
+	    *ufunc = ಖಾಲಿ;
 	}
-	if (funcname != buffer)
+	ಆದರೆ (funcname != ಬಫರ್)
 	    vim_free(funcname);
     }
 
-    return idx;
+    ಹಿಂತಿರುಗಿ idx;
 }
 
 /*
@@ -787,64 +787,64 @@ vim9_declare_scriptvar(exarg_T *eap, char_u *arg)
 {
     char_u	    *p;
     char_u	    *name;
-    scriptitem_T    *si = SCRIPT_ITEM(current_sctx.sc_sid);
+    scriptitem_T    *si = SCRIPT_ಅಂಶ(current_sctx.sc_sid);
     type_T	    *type;
     typval_T	    init_tv;
 
-    if (eap->cmdidx == CMD_final || eap->cmdidx == CMD_const)
+    ಆದರೆ (eap->cmdidx == CMD_final || eap->cmdidx == CMD_const)
     {
-	if (eap->cmdidx == CMD_final)
-	    emsg(_(e_final_requires_a_value));
-	else
-	    emsg(_(e_const_requires_a_value));
-	return arg + STRLEN(arg);
+	ಆದರೆ (eap->cmdidx == CMD_final)
+	    emsg(_(e_final_requires_a_ಮೌಲ್ಯ));
+	ಇಲ್ಲದಿದ್ದರೆ
+	    emsg(_(e_const_requires_a_ಮೌಲ್ಯ));
+	ಹಿಂತಿರುಗಿ arg + STRLEN(arg);
     }
 
     // Check for valid starting character.
-    if (!eval_isnamec1(*arg))
+    ಆದರೆ (!eval_isnamec1(*arg))
     {
-	semsg(_(e_invalid_argument_str), arg);
-	return arg + STRLEN(arg);
+	semsg(_(e_invalid_ವಾದ_str), arg);
+	ಹಿಂತಿರುಗಿ arg + STRLEN(arg);
     }
 
-    for (p = arg + 1; *p != NUL && eval_isnamec(*p); MB_PTR_ADV(p))
-	if (*p == ':' && (VIM_ISWHITE(p[1]) || p != arg + 1))
-	    break;
+    ಗಾಗಿ (p = arg + 1; *p != NUL && eval_isnamec(*p); MB_PTR_ADV(p))
+	ಆದರೆ (*p == ':' && (VIM_ISWHITE(p[1]) || p != arg + 1))
+	    ನಿಲ್ಲಿಸು;
 
-    if (*p != ':')
+    ಆದರೆ (*p != ':')
     {
 	emsg(_(e_type_or_initialization_required));
-	return arg + STRLEN(arg);
+	ಹಿಂತಿರುಗಿ arg + STRLEN(arg);
     }
-    if (!VIM_ISWHITE(p[1]))
+    ಆದರೆ (!VIM_ISWHITE(p[1]))
     {
 	semsg(_(e_white_space_required_after_str_str), ":", p);
-	return arg + STRLEN(arg);
+	ಹಿಂತಿರುಗಿ arg + STRLEN(arg);
     }
     name = vim_strnsave(arg, p - arg);
 
     // parse type, check for reserved name
     p = skipwhite(p + 1);
-    type = parse_type(&p, &si->sn_type_list, NULL, NULL, TRUE);
-    if (type == NULL
+    type = parse_type(&p, &si->sn_type_list, ಖಾಲಿ, ಖಾಲಿ, TRUE);
+    ಆದರೆ (type == ಖಾಲಿ
 	    || check_reserved_name(name, FALSE) == FAIL
 	    || !valid_declaration_type(type))
     {
 	vim_free(name);
-	return p;
+	ಹಿಂತಿರುಗಿ p;
     }
 
     // Create the variable with 0/NULL value.
-    CLEAR_FIELD(init_tv);
-    if (type->tt_type == VAR_ANY)
+    CLEAR_ಕ್ಷೇತ್ರ(init_tv);
+    ಆದರೆ (type->tt_type == VAR_ANY)
 	// A variable of type "any" is not possible, just use zero instead
-	init_tv.v_type = VAR_NUMBER;
-    else
+	init_tv.v_type = VAR_ಸಂಖ್ಯೆ;
+    ಇಲ್ಲದಿದ್ದರೆ
 	init_tv.v_type = type->tt_type;
-    set_var_const(name, 0, type, &init_tv, FALSE, ASSIGN_INIT, 0);
+    ಗಣ_var_const(name, 0, type, &init_tv, FALSE, ನಿಯೋಜಿಸು_INIT, 0);
 
     vim_free(name);
-    return p;
+    ಹಿಂತಿರುಗಿ p;
 }
 
 /*
@@ -856,108 +856,108 @@ vim9_declare_scriptvar(exarg_T *eap, char_u *arg)
  * When "*type" is NULL use "tv" for the type and update "*type".  If
  * "do_member" is TRUE also use the member type, otherwise use "any".
  */
-    void
+    ಶೂನ್ಯ
 update_vim9_script_var(
-	int	    create,
+	ಪೂರ್ಣಾಂಕ	    create,
 	dictitem_T  *di,
 	char_u	    *name,
-	int	    flags,
+	ಪೂರ್ಣಾಂಕ	    flags,
 	typval_T    *tv,
 	type_T	    **type,
-	int	    do_member)
+	ಪೂರ್ಣಾಂಕ	    do_member)
 {
-    scriptitem_T    *si = SCRIPT_ITEM(current_sctx.sc_sid);
+    scriptitem_T    *si = SCRIPT_ಅಂಶ(current_sctx.sc_sid);
     hashitem_T	    *hi;
-    svar_T	    *sv = NULL;
+    svar_T	    *sv = ಖಾಲಿ;
 
-    if (create)
+    ಆದರೆ (create)
     {
 	sallvar_T   *newsav;
-	sallvar_T   *sav = NULL;
+	sallvar_T   *sav = ಖಾಲಿ;
 
 	// Store a pointer to the typval_T, so that it can be found by index
 	// instead of using a hastab lookup.
-	if (ga_grow(&si->sn_var_vals, 1) == FAIL)
-	    return;
+	ಆದರೆ (ga_grow(&si->sn_var_vals, 1) == FAIL)
+	    ಹಿಂತಿರುಗಿ;
 
-	hi = hash_find(&si->sn_all_vars.dv_hashtab, name);
-	if (!HASHITEM_EMPTY(hi))
+	hi = hash_ಕಂಡುಹಿಡಿ(&si->sn_all_vars.dv_hashtab, name);
+	ಆದರೆ (!HASHITEM_ಖಾಲಿಗಳು(hi))
 	{
 	    // Variable with this name exists, either in this block or in
 	    // another block.
-	    for (sav = HI2SAV(hi); ; sav = sav->sav_next)
+	    ಗಾಗಿ (sav = HI2SAV(hi); ; sav = sav->sav_ಮುಂದಿನ)
 	    {
-		if (sav->sav_block_id == si->sn_current_block_id)
+		ಆದರೆ (sav->sav_ಖಂಡ_id == si->sn_current_ಖಂಡ_id)
 		{
 		    // variable defined in a loop, re-use the entry
-		    sv = ((svar_T *)si->sn_var_vals.ga_data)
+		    sv = ((svar_T *)si->sn_var_vals.ga_ದತ್ತಾಂಶ)
 						       + sav->sav_var_vals_idx;
 		    // unhide the variable
-		    if (sv->sv_tv == &sav->sav_tv)
+		    ಆದರೆ (sv->sv_tv == &sav->sav_tv)
 		    {
 			clear_tv(&sav->sav_tv);
 			sv->sv_tv = &di->di_tv;
 			sav->sav_di = di;
 		    }
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
-		if (sav->sav_next == NULL)
-		    break;
+		ಆದರೆ (sav->sav_ಮುಂದಿನ == ಖಾಲಿ)
+		    ನಿಲ್ಲಿಸು;
 	    }
 	}
 
-	if (sv == NULL)
+	ಆದರೆ (sv == ಖಾಲಿ)
 	{
 	    // Variable not defined or not defined in current block: Add a
 	    // svar_T and create a new sallvar_T.
-	    sv = ((svar_T *)si->sn_var_vals.ga_data) + si->sn_var_vals.ga_len;
+	    sv = ((svar_T *)si->sn_var_vals.ga_ದತ್ತಾಂಶ) + si->sn_var_vals.ga_len;
 	    newsav = (sallvar_T *)alloc_clear(
-			      offsetof(sallvar_T, sav_key) + STRLEN(name) + 1);
-	    if (newsav == NULL)
-		return;
+			      offsetof(sallvar_T, sav_ಕೀಲಿ) + STRLEN(name) + 1);
+	    ಆದರೆ (newsav == ಖಾಲಿ)
+		ಹಿಂತಿರುಗಿ;
 
 	    sv->sv_tv = &di->di_tv;
-	    sv->sv_const = (flags & ASSIGN_FINAL) ? ASSIGN_FINAL
-				   : (flags & ASSIGN_CONST) ? ASSIGN_CONST : 0;
+	    sv->sv_const = (flags & ನಿಯೋಜಿಸು_FINAL) ? ನಿಯೋಜಿಸು_FINAL
+				   : (flags & ನಿಯೋಜಿಸು_CONST) ? ನಿಯೋಜಿಸು_CONST : 0;
 	    sv->sv_flags = is_export ? SVFLAG_EXPORTED : 0;
-	    if ((flags & ASSIGN_INIT) == 0)
+	    ಆದರೆ ((flags & ನಿಯೋಜಿಸು_INIT) == 0)
 		sv->sv_flags |= SVFLAG_ASSIGNED;
 	    newsav->sav_var_vals_idx = si->sn_var_vals.ga_len;
 	    ++si->sn_var_vals.ga_len;
 	    // a pointer to the first char avoids a FORTIFY_SOURCE problem
-	    STRCPY(&newsav->sav_key[0], name);
-	    sv->sv_name = newsav->sav_key;
+	    STRCPY(&newsav->sav_ಕೀಲಿ[0], name);
+	    sv->sv_name = newsav->sav_ಕೀಲಿ;
 	    newsav->sav_di = di;
-	    newsav->sav_block_id = si->sn_current_block_id;
+	    newsav->sav_ಖಂಡ_id = si->sn_current_ಖಂಡ_id;
 
-	    if (HASHITEM_EMPTY(hi))
+	    ಆದರೆ (HASHITEM_ಖಾಲಿಗಳು(hi))
 		// new variable name
-		hash_add(&si->sn_all_vars.dv_hashtab, newsav->sav_key,
+		hash_ಕೂಡಿಸು(&si->sn_all_vars.dv_hashtab, newsav->sav_ಕೀಲಿ,
 							       "add variable");
-	    else if (sav != NULL)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (sav != ಖಾಲಿ)
 		// existing name in a new block, append to the list
-		sav->sav_next = newsav;
+		sav->sav_ಮುಂದಿನ = newsav;
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	sv = find_typval_in_script(&di->di_tv, 0, TRUE);
+	sv = ಕಂಡುಹಿಡಿ_typval_ಒಳ_script(&di->di_tv, 0, TRUE);
     }
-    if (sv != NULL)
+    ಆದರೆ (sv != ಖಾಲಿ)
     {
-	if (*type == NULL)
+	ಆದರೆ (*type == ಖಾಲಿ)
 	    *type = typval2type(tv, get_copyID(), &si->sn_type_list,
 					       do_member ? TVTT_DO_MEMBER : 0);
-	else if ((flags & ASSIGN_INIT) == 0
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((flags & ನಿಯೋಜಿಸು_INIT) == 0
 		&& (*type)->tt_type == VAR_BLOB && tv->v_type == VAR_BLOB
-						    && tv->vval.v_blob == NULL)
+						    && tv->vval.v_blob == ಖಾಲಿ)
 	{
 	    // "var b: blob = null_blob" has a different type.
 	    *type = &t_blob_null;
 	}
-	if (sv->sv_flags & SVFLAG_TYPE_ALLOCATED)
+	ಆದರೆ (sv->sv_flags & SVFLAG_TYPE_ALLOCATED)
 	    free_type(sv->sv_type);
-	if (*type != NULL && ((*type)->tt_type == VAR_FUNC
+	ಆದರೆ (*type != ಖಾಲಿ && ((*type)->tt_type == VAR_FUNC
 					   || (*type)->tt_type == VAR_PARTIAL))
 	{
 	    // The type probably uses uf_type_list, which is cleared when the
@@ -966,7 +966,7 @@ update_vim9_script_var(
 	    sv->sv_type = alloc_type(*type);
 	    sv->sv_flags |= SVFLAG_TYPE_ALLOCATED;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    sv->sv_type = *type;
 	    sv->sv_flags &= ~SVFLAG_TYPE_ALLOCATED;
@@ -983,10 +983,10 @@ update_vim9_script_var(
  * When "func_defined" is non-zero then a function was defined in this block,
  * the variable may be accessed by it.  Otherwise the variable can be cleared.
  */
-    void
-hide_script_var(scriptitem_T *si, int idx, int func_defined)
+    ಶೂನ್ಯ
+hide_script_var(scriptitem_T *si, ಪೂರ್ಣಾಂಕ idx, ಪೂರ್ಣಾಂಕ func_defined)
 {
-    svar_T	*sv = ((svar_T *)si->sn_var_vals.ga_data) + idx;
+    svar_T	*sv = ((svar_T *)si->sn_var_vals.ga_ದತ್ತಾಂಶ) + idx;
     hashtab_T	*script_ht = get_script_local_ht();
     hashtab_T	*all_ht = &si->sn_all_vars.dv_hashtab;
     hashitem_T	*script_hi;
@@ -995,42 +995,42 @@ hide_script_var(scriptitem_T *si, int idx, int func_defined)
     // Remove a variable declared inside the block, if it still exists.
     // If it was added in a nested block it will already have been removed.
     // The typval is moved into the sallvar_T.
-    script_hi = hash_find(script_ht, sv->sv_name);
-    all_hi = hash_find(all_ht, sv->sv_name);
+    script_hi = hash_ಕಂಡುಹಿಡಿ(script_ht, sv->sv_name);
+    all_hi = hash_ಕಂಡುಹಿಡಿ(all_ht, sv->sv_name);
 
-    if (HASHITEM_EMPTY(script_hi) || HASHITEM_EMPTY(all_hi))
-	return;
+    ಆದರೆ (HASHITEM_ಖಾಲಿಗಳು(script_hi) || HASHITEM_ಖಾಲಿಗಳು(all_hi))
+	ಹಿಂತಿರುಗಿ;
 
     dictitem_T	*di = HI2DI(script_hi);
     sallvar_T	*sav = HI2SAV(all_hi);
-    sallvar_T	*sav_prev = NULL;
+    sallvar_T	*sav_prev = ಖಾಲಿ;
 
     // There can be multiple entries with the same name in different
     // blocks, find the right one.
-    while (sav != NULL && sav->sav_var_vals_idx != idx)
+    ಆಗ (sav != ಖಾಲಿ && sav->sav_var_vals_idx != idx)
     {
 	sav_prev = sav;
-	sav = sav->sav_next;
+	sav = sav->sav_ಮುಂದಿನ;
     }
-    if (sav == NULL)
-	return;
+    ಆದರೆ (sav == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    if (func_defined)
+    ಆದರೆ (func_defined)
     {
 	// move the typval from the dictitem to the sallvar
 	sav->sav_tv = di->di_tv;
 	di->di_tv.v_type = VAR_UNKNOWN;
 	sav->sav_flags = di->di_flags;
-	sav->sav_di = NULL;
+	sav->sav_di = ಖಾಲಿ;
 	sv->sv_tv = &sav->sav_tv;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (sav_prev == NULL)
+	ಆದರೆ (sav_prev == ಖಾಲಿ)
 	    hash_remove(all_ht, all_hi, "hide variable");
-	else
-	    sav_prev->sav_next = sav->sav_next;
-	sv->sv_name = NULL;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    sav_prev->sav_ಮುಂದಿನ = sav->sav_ಮುಂದಿನ;
+	sv->sv_name = ಖಾಲಿ;
 	vim_free(sav);
     }
     delete_var(script_ht, script_hi);
@@ -1043,65 +1043,65 @@ hide_script_var(scriptitem_T *si, int idx, int func_defined)
  * Returns NULL if not found and give an internal error.
  */
     svar_T *
-find_typval_in_script(typval_T *dest, scid_T sid, int must_find)
+ಕಂಡುಹಿಡಿ_typval_ಒಳ_script(typval_T *dest, scid_T sid, ಪೂರ್ಣಾಂಕ must_ಕಂಡುಹಿಡಿ)
 {
-    scriptitem_T    *si = SCRIPT_ITEM(sid == 0 ? current_sctx.sc_sid : sid);
-    int		    idx;
+    scriptitem_T    *si = SCRIPT_ಅಂಶ(sid == 0 ? current_sctx.sc_sid : sid);
+    ಪೂರ್ಣಾಂಕ		    idx;
 
-    if (si->sn_version != SCRIPT_VERSION_VIM9)
+    ಆದರೆ (si->sn_ಆವೃತ್ತಿ != SCRIPT_ಆವೃತ್ತಿ_VIM9)
 	// legacy script doesn't store variable types
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     // Find the svar_T in sn_var_vals.  Start at the end, in a for loop the
     // variable was added at the end.
-    for (idx = si->sn_var_vals.ga_len - 1; idx >= 0; --idx)
+    ಗಾಗಿ (idx = si->sn_var_vals.ga_len - 1; idx >= 0; --idx)
     {
-	svar_T    *sv = ((svar_T *)si->sn_var_vals.ga_data) + idx;
+	svar_T    *sv = ((svar_T *)si->sn_var_vals.ga_ದತ್ತಾಂಶ) + idx;
 
 	// If "sv_name" is NULL the variable was hidden when leaving a block,
 	// don't check "sv_tv" then, it might be used for another variable now.
-	if (sv->sv_name != NULL && sv->sv_tv == dest)
-	    return sv;
+	ಆದರೆ (sv->sv_name != ಖಾಲಿ && sv->sv_tv == dest)
+	    ಹಿಂತಿರುಗಿ sv;
     }
-    if (must_find)
+    ಆದರೆ (must_ಕಂಡುಹಿಡಿ)
 	iemsg("find_typval_in_script(): not found");
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Check if the type of script variable "dest" allows assigning "value".
  * If needed convert "value" to a bool.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 check_script_var_type(
 	svar_T	    *sv,
-	typval_T    *value,
+	typval_T    *ಮೌಲ್ಯ,
 	char_u	    *name,
 	where_T	    where)
 {
-    int	    ret;
+    ಪೂರ್ಣಾಂಕ	    ret;
 
-    if (sv->sv_const != 0)
+    ಆದರೆ (sv->sv_const != 0)
     {
 	semsg(_(e_cannot_change_readonly_variable_str), name);
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-    ret = check_typval_type(sv->sv_type, value, where);
-    if (ret == OK && need_convert_to_bool(sv->sv_type, value))
+    ret = check_typval_type(sv->sv_type, ಮೌಲ್ಯ, where);
+    ಆದರೆ (ret == OK && need_convert_ಗಮ್ಯ_bool(sv->sv_type, ಮೌಲ್ಯ))
     {
-	int	val = tv2bool(value);
+	ಪೂರ್ಣಾಂಕ	val = tv2bool(ಮೌಲ್ಯ);
 
-	clear_tv(value);
-	value->v_type = VAR_BOOL;
-	value->v_lock = 0;
-	value->vval.v_number = val ? VVAL_TRUE : VVAL_FALSE;
+	clear_tv(ಮೌಲ್ಯ);
+	ಮೌಲ್ಯ->v_type = VAR_BOOL;
+	ಮೌಲ್ಯ->v_ಬೀಗ = 0;
+	ಮೌಲ್ಯ->vval.v_ಸಂಖ್ಯೆ = val ? VVAL_TRUE : VVAL_FALSE;
     }
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
 // words that cannot be used as a variable
 // Keep this array sorted, as bsearch() is used to search this array.
-static char *reserved[] = {
+ಸ್ಥಿರ ಅಕ್ಷರ *reserved[] = {
     "false",
     "null",
     "null_blob",
@@ -1123,30 +1123,30 @@ static char *reserved[] = {
 /*
  * String compare function used for bsearch()
  */
-    static int
-comp_names(const void *s1, const void *s2)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+comp_ಹೆಸರುಗಳು(ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *s1, ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *s2)
 {
-    return STRCMP(*(char **)s1, *(char **)s2);
+    ಹಿಂತಿರುಗಿ STRCMP(*(ಅಕ್ಷರ **)s1, *(ಅಕ್ಷರ **)s2);
 }
 
 /*
  * Returns OK if "name" is not a reserved keyword.  Otherwise returns FAIL.
  */
-    int
-check_reserved_name(char_u *name, int is_objm_access)
+    ಪೂರ್ಣಾಂಕ
+check_reserved_name(char_u *name, ಪೂರ್ಣಾಂಕ is_objm_access)
 {
     // "this" can be used in an object method
-    if (is_objm_access && STRCMP("this", name) == 0)
-	return OK;
+    ಆದರೆ (is_objm_access && STRCMP("this", name) == 0)
+	ಹಿಂತಿರುಗಿ OK;
 
-    if (bsearch(&name, reserved, ARRAY_LENGTH(reserved),
-				sizeof(reserved[0]), comp_names) != NULL)
+    ಆದರೆ (bsearch(&name, reserved, ARRAY_ಉದ್ದಳತೆ(reserved),
+				ಗಾತ್ರ(reserved[0]), comp_ಹೆಸರುಗಳು) != ಖಾಲಿ)
     {
 	semsg(_(e_cannot_use_reserved_name_str), name);
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-#endif // FEAT_EVAL
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_EVAL

@@ -28,88 +28,88 @@
  * Stand-Alone	- unicode form-B isolated
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-#if defined(FEAT_ARABIC)
+#ಆದರೆ defined(FEAT_ARABIC)
 
 // Unicode values for Arabic characters.
-#define a_HAMZA				0x0621
-#define a_ALEF_MADDA			0x0622
-#define a_ALEF_HAMZA_ABOVE		0x0623
-#define a_WAW_HAMZA			0x0624
-#define a_ALEF_HAMZA_BELOW		0x0625
-#define a_YEH_HAMZA			0x0626
-#define a_ALEF				0x0627
-#define a_BEH				0x0628
-#define a_TEH_MARBUTA			0x0629
-#define a_TEH				0x062a
-#define a_THEH				0x062b
-#define a_JEEM				0x062c
-#define a_HAH				0x062d
-#define a_KHAH				0x062e
-#define a_DAL				0x062f
-#define a_THAL				0x0630
-#define a_REH				0x0631
-#define a_ZAIN				0x0632
-#define a_SEEN				0x0633
-#define a_SHEEN				0x0634
-#define a_SAD				0x0635
-#define a_DAD				0x0636
-#define a_TAH				0x0637
-#define a_ZAH				0x0638
-#define a_AIN				0x0639
-#define a_GHAIN				0x063a
-#define a_TATWEEL			0x0640
-#define a_FEH				0x0641
-#define a_QAF				0x0642
-#define a_KAF				0x0643
-#define a_LAM				0x0644
-#define a_MEEM				0x0645
-#define a_NOON				0x0646
-#define a_HEH				0x0647
-#define a_WAW				0x0648
-#define a_ALEF_MAKSURA			0x0649
-#define a_YEH				0x064a
-#define a_FATHATAN			0x064b
-#define a_DAMMATAN			0x064c
-#define a_KASRATAN			0x064d
-#define a_FATHA				0x064e
-#define a_DAMMA				0x064f
-#define a_KASRA				0x0650
-#define a_SHADDA			0x0651
-#define a_SUKUN				0x0652
-#define a_MADDA_ABOVE			0x0653
-#define a_HAMZA_ABOVE			0x0654
-#define a_HAMZA_BELOW			0x0655
+#ವ್ಯಾಖ್ಯಾನಿಸು a_HAMZA				0x0621
+#ವ್ಯಾಖ್ಯಾನಿಸು a_ALEF_MADDA			0x0622
+#ವ್ಯಾಖ್ಯಾನಿಸು a_ALEF_HAMZA_ABOVE		0x0623
+#ವ್ಯಾಖ್ಯಾನಿಸು a_WAW_HAMZA			0x0624
+#ವ್ಯಾಖ್ಯಾನಿಸು a_ALEF_HAMZA_ಕೆಳಗೆ		0x0625
+#ವ್ಯಾಖ್ಯಾನಿಸು a_YEH_HAMZA			0x0626
+#ವ್ಯಾಖ್ಯಾನಿಸು a_ALEF				0x0627
+#ವ್ಯಾಖ್ಯಾನಿಸು a_BEH				0x0628
+#ವ್ಯಾಖ್ಯಾನಿಸು a_TEH_MARBUTA			0x0629
+#ವ್ಯಾಖ್ಯಾನಿಸು a_TEH				0x062a
+#ವ್ಯಾಖ್ಯಾನಿಸು a_THEH				0x062b
+#ವ್ಯಾಖ್ಯಾನಿಸು a_JEEM				0x062c
+#ವ್ಯಾಖ್ಯಾನಿಸು a_HAH				0x062d
+#ವ್ಯಾಖ್ಯಾನಿಸು a_KHAH				0x062e
+#ವ್ಯಾಖ್ಯಾನಿಸು a_DAL				0x062f
+#ವ್ಯಾಖ್ಯಾನಿಸು a_THAL				0x0630
+#ವ್ಯಾಖ್ಯಾನಿಸು a_REH				0x0631
+#ವ್ಯಾಖ್ಯಾನಿಸು a_ZAIN				0x0632
+#ವ್ಯಾಖ್ಯಾನಿಸು a_ನೋಡಿದ				0x0633
+#ವ್ಯಾಖ್ಯಾನಿಸು a_SHEEN				0x0634
+#ವ್ಯಾಖ್ಯಾನಿಸು a_SAD				0x0635
+#ವ್ಯಾಖ್ಯಾನಿಸು a_DAD				0x0636
+#ವ್ಯಾಖ್ಯಾನಿಸು a_TAH				0x0637
+#ವ್ಯಾಖ್ಯಾನಿಸು a_ZAH				0x0638
+#ವ್ಯಾಖ್ಯಾನಿಸು a_AIN				0x0639
+#ವ್ಯಾಖ್ಯಾನಿಸು a_GHAIN				0x063a
+#ವ್ಯಾಖ್ಯಾನಿಸು a_TATWEEL			0x0640
+#ವ್ಯಾಖ್ಯಾನಿಸು a_FEH				0x0641
+#ವ್ಯಾಖ್ಯಾನಿಸು a_QAF				0x0642
+#ವ್ಯಾಖ್ಯಾನಿಸು a_KAF				0x0643
+#ವ್ಯಾಖ್ಯಾನಿಸು a_LAM				0x0644
+#ವ್ಯಾಖ್ಯಾನಿಸು a_MEEM				0x0645
+#ವ್ಯಾಖ್ಯಾನಿಸು a_NOON				0x0646
+#ವ್ಯಾಖ್ಯಾನಿಸು a_HEH				0x0647
+#ವ್ಯಾಖ್ಯಾನಿಸು a_WAW				0x0648
+#ವ್ಯಾಖ್ಯಾನಿಸು a_ALEF_MAKSURA			0x0649
+#ವ್ಯಾಖ್ಯಾನಿಸು a_YEH				0x064a
+#ವ್ಯಾಖ್ಯಾನಿಸು a_FATHATAN			0x064b
+#ವ್ಯಾಖ್ಯಾನಿಸು a_DAMMATAN			0x064c
+#ವ್ಯಾಖ್ಯಾನಿಸು a_KASRATAN			0x064d
+#ವ್ಯಾಖ್ಯಾನಿಸು a_FATHA				0x064e
+#ವ್ಯಾಖ್ಯಾನಿಸು a_DAMMA				0x064f
+#ವ್ಯಾಖ್ಯಾನಿಸು a_KASRA				0x0650
+#ವ್ಯಾಖ್ಯಾನಿಸು a_SHADDA			0x0651
+#ವ್ಯಾಖ್ಯಾನಿಸು a_SUKUN				0x0652
+#ವ್ಯಾಖ್ಯಾನಿಸು a_MADDA_ABOVE			0x0653
+#ವ್ಯಾಖ್ಯಾನಿಸು a_HAMZA_ABOVE			0x0654
+#ವ್ಯಾಖ್ಯಾನಿಸು a_HAMZA_ಕೆಳಗೆ			0x0655
 
-#define a_PEH				0x067e
-#define a_TCHEH				0x0686
-#define a_JEH				0x0698
-#define a_FKAF				0x06a9
-#define a_GAF				0x06af
-#define a_FYEH				0x06cc
+#ವ್ಯಾಖ್ಯಾನಿಸು a_PEH				0x067e
+#ವ್ಯಾಖ್ಯಾನಿಸು a_TCHEH				0x0686
+#ವ್ಯಾಖ್ಯಾನಿಸು a_JEH				0x0698
+#ವ್ಯಾಖ್ಯಾನಿಸು a_FKAF				0x06a9
+#ವ್ಯಾಖ್ಯಾನಿಸು a_GAF				0x06af
+#ವ್ಯಾಖ್ಯಾನಿಸು a_FYEH				0x06cc
 
-#define a_s_LAM_ALEF_MADDA_ABOVE	0xfef5
-#define a_f_LAM_ALEF_MADDA_ABOVE	0xfef6
-#define a_s_LAM_ALEF_HAMZA_ABOVE	0xfef7
-#define a_f_LAM_ALEF_HAMZA_ABOVE	0xfef8
-#define a_s_LAM_ALEF_HAMZA_BELOW	0xfef9
-#define a_f_LAM_ALEF_HAMZA_BELOW	0xfefa
-#define a_s_LAM_ALEF			0xfefb
-#define a_f_LAM_ALEF			0xfefc
+#ವ್ಯಾಖ್ಯಾನಿಸು a_s_LAM_ALEF_MADDA_ABOVE	0xfef5
+#ವ್ಯಾಖ್ಯಾನಿಸು a_f_LAM_ALEF_MADDA_ABOVE	0xfef6
+#ವ್ಯಾಖ್ಯಾನಿಸು a_s_LAM_ALEF_HAMZA_ABOVE	0xfef7
+#ವ್ಯಾಖ್ಯಾನಿಸು a_f_LAM_ALEF_HAMZA_ABOVE	0xfef8
+#ವ್ಯಾಖ್ಯಾನಿಸು a_s_LAM_ALEF_HAMZA_ಕೆಳಗೆ	0xfef9
+#ವ್ಯಾಖ್ಯಾನಿಸು a_f_LAM_ALEF_HAMZA_ಕೆಳಗೆ	0xfefa
+#ವ್ಯಾಖ್ಯಾನಿಸು a_s_LAM_ALEF			0xfefb
+#ವ್ಯಾಖ್ಯಾನಿಸು a_f_LAM_ALEF			0xfefc
 
-static struct achar {
-    unsigned c;
-    unsigned isolated;
-    unsigned initial;
-    unsigned medial;
-    unsigned final;
+ಸ್ಥಿರ ರಚನೆ achar {
+    ಚಿಹ್ನೆರಹಿತ c;
+    ಚಿಹ್ನೆರಹಿತ isolated;
+    ಚಿಹ್ನೆರಹಿತ initial;
+    ಚಿಹ್ನೆರಹಿತ medial;
+    ಚಿಹ್ನೆರಹಿತ final;
 } achars[] = {
     {a_HAMZA, 0xfe80, 0, 0, 0},
     {a_ALEF_MADDA, 0xfe81, 0, 0, 0xfe82},
     {a_ALEF_HAMZA_ABOVE, 0xfe83, 0, 0, 0xfe84},
     {a_WAW_HAMZA, 0xfe85, 0, 0, 0xfe86},
-    {a_ALEF_HAMZA_BELOW, 0xfe87, 0, 0, 0xfe88},
+    {a_ALEF_HAMZA_ಕೆಳಗೆ, 0xfe87, 0, 0, 0xfe88},
     {a_YEH_HAMZA, 0xfe89, 0xfe8b, 0xfe8c, 0xfe8a},
     {a_ALEF, 0xfe8d, 0, 0, 0xfe8e},
     {a_BEH, 0xfe8f, 0xfe91, 0xfe92, 0xfe90},
@@ -123,7 +123,7 @@ static struct achar {
     {a_THAL, 0xfeab, 0, 0, 0xfeac},
     {a_REH, 0xfead, 0, 0, 0xfeae},
     {a_ZAIN, 0xfeaf, 0, 0, 0xfeb0},
-    {a_SEEN, 0xfeb1, 0xfeb3, 0xfeb4, 0xfeb2},
+    {a_ನೋಡಿದ, 0xfeb1, 0xfeb3, 0xfeb4, 0xfeb2},
     {a_SHEEN, 0xfeb5, 0xfeb7, 0xfeb8, 0xfeb6},
     {a_SAD, 0xfeb9, 0xfebb, 0xfebc, 0xfeba},
     {a_DAD, 0xfebd, 0xfebf, 0xfec0, 0xfebe},
@@ -152,7 +152,7 @@ static struct achar {
     {a_SUKUN, 0xfe7e, 0, 0xfe7f, 0},
     {a_MADDA_ABOVE, 0, 0, 0, 0},
     {a_HAMZA_ABOVE, 0, 0, 0, 0},
-    {a_HAMZA_BELOW, 0, 0, 0, 0},
+    {a_HAMZA_ಕೆಳಗೆ, 0, 0, 0, 0},
     {a_PEH, 0xfb56, 0xfb58, 0xfb59, 0xfb57},
     {a_TCHEH, 0xfb7a, 0xfb7c, 0xfb7d, 0xfb7b},
     {a_JEH, 0xfb8a, 0, 0, 0xfb8b},
@@ -161,159 +161,159 @@ static struct achar {
     {a_FYEH, 0xfbfc, 0xfbfe, 0xfbff, 0xfbfd},
 };
 
-#define a_BYTE_ORDER_MARK		0xfeff
+#ವ್ಯಾಖ್ಯಾನಿಸು a_BYTE_ಕ್ರಮ_MARK		0xfeff
 
 /*
  * Find the struct achar pointer to the given Arabic char.
  * Returns NULL if not found.
  */
-    static struct achar *
-find_achar(int c)
+    ಸ್ಥಿರ ರಚನೆ achar *
+ಕಂಡುಹಿಡಿ_achar(ಪೂರ್ಣಾಂಕ c)
 {
-    int h, m, l;
+    ಪೂರ್ಣಾಂಕ h, m, l;
 
     // using binary search to find c
-    h = ARRAY_LENGTH(achars);
+    h = ARRAY_ಉದ್ದಳತೆ(achars);
     l = 0;
-    while (l < h)
+    ಆಗ (l < h)
     {
 	m = (h + l) / 2;
-	if (achars[m].c == (unsigned)c)
-	    return &achars[m];
-	if ((unsigned)c < achars[m].c)
+	ಆದರೆ (achars[m].c == (ಚಿಹ್ನೆರಹಿತ)c)
+	    ಹಿಂತಿರುಗಿ &achars[m];
+	ಆದರೆ ((ಚಿಹ್ನೆರಹಿತ)c < achars[m].c)
 	    h = m;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    l = m + 1;
     }
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Change shape - from Combination (2 char) to an Isolated
  */
-    static int
-chg_c_laa2i(int hid_c)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+chg_c_laa2i(ಪೂರ್ಣಾಂಕ hid_c)
 {
-    int tempc;
+    ಪೂರ್ಣಾಂಕ tempc;
 
-    switch (hid_c)
+    ಆಯ್ಕೆ (hid_c)
     {
-	case a_ALEF_MADDA:
+	ಸ್ಥಿತಿ a_ALEF_MADDA:
 	    tempc = a_s_LAM_ALEF_MADDA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_ABOVE:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ a_ALEF_HAMZA_ABOVE:
 	    tempc = a_s_LAM_ALEF_HAMZA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_BELOW:
-	    tempc = a_s_LAM_ALEF_HAMZA_BELOW;
-	    break;
-	case a_ALEF:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ a_ALEF_HAMZA_ಕೆಳಗೆ:
+	    tempc = a_s_LAM_ALEF_HAMZA_ಕೆಳಗೆ;
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ a_ALEF:
 	    tempc = a_s_LAM_ALEF;
-	    break;
-	default:
+	    ನಿಲ್ಲಿಸು;
+	ಪೂರ್ವನಿಯೋಜಿತ:
 	    tempc = 0;
     }
 
-    return tempc;
+    ಹಿಂತಿರುಗಿ tempc;
 }
 
 /*
  * Change shape - from Combination-Isolated to Final
  */
-    static int
-chg_c_laa2f(int hid_c)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+chg_c_laa2f(ಪೂರ್ಣಾಂಕ hid_c)
 {
-    int tempc;
+    ಪೂರ್ಣಾಂಕ tempc;
 
-    switch (hid_c)
+    ಆಯ್ಕೆ (hid_c)
     {
-	case a_ALEF_MADDA:
+	ಸ್ಥಿತಿ a_ALEF_MADDA:
 	    tempc = a_f_LAM_ALEF_MADDA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_ABOVE:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ a_ALEF_HAMZA_ABOVE:
 	    tempc = a_f_LAM_ALEF_HAMZA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_BELOW:
-	    tempc = a_f_LAM_ALEF_HAMZA_BELOW;
-	    break;
-	case a_ALEF:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ a_ALEF_HAMZA_ಕೆಳಗೆ:
+	    tempc = a_f_LAM_ALEF_HAMZA_ಕೆಳಗೆ;
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ a_ALEF:
 	    tempc = a_f_LAM_ALEF;
-	    break;
-	default:
+	    ನಿಲ್ಲಿಸು;
+	ಪೂರ್ವನಿಯೋಜಿತ:
 	    tempc = 0;
     }
 
-    return tempc;
+    ಹಿಂತಿರುಗಿ tempc;
 }
 
 /*
  * Returns whether it is possible to join the given letters
  */
-    static int
-can_join(int c1, int c2)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+can_join(ಪೂರ್ಣಾಂಕ c1, ಪೂರ್ಣಾಂಕ c2)
 {
-    struct achar *a1 = find_achar(c1);
-    struct achar *a2 = find_achar(c2);
+    ರಚನೆ achar *a1 = ಕಂಡುಹಿಡಿ_achar(c1);
+    ರಚನೆ achar *a2 = ಕಂಡುಹಿಡಿ_achar(c2);
 
-    return a1 && a2 && (a1->initial || a1->medial) && (a2->final || a2->medial);
+    ಹಿಂತಿರುಗಿ a1 && a2 && (a1->initial || a1->medial) && (a2->final || a2->medial);
 }
 
 /*
  * Check whether we are dealing with a character that could be regarded as an
  * Arabic combining character, need to check the character before this.
  */
-    int
-arabic_maycombine(int two)
+    ಪೂರ್ಣಾಂಕ
+arabic_maycombine(ಪೂರ್ಣಾಂಕ two)
 {
-    if (p_arshape && !p_tbidi)
-	return (two == a_ALEF_MADDA
+    ಆದರೆ (p_arshape && !p_tbidi)
+	ಹಿಂತಿರುಗಿ (two == a_ALEF_MADDA
 		    || two == a_ALEF_HAMZA_ABOVE
-		    || two == a_ALEF_HAMZA_BELOW
+		    || two == a_ALEF_HAMZA_ಕೆಳಗೆ
 		    || two == a_ALEF);
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 /*
  * Check whether we are dealing with Arabic combining characters.
  * Note: these are NOT really composing characters!
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 arabic_combine(
-    int		one,	    // first character
-    int		two)	    // character just after "one"
+    ಪೂರ್ಣಾಂಕ		one,	    // first character
+    ಪೂರ್ಣಾಂಕ		two)	    // character just after "one"
 {
-    if (one == a_LAM)
-	return arabic_maycombine(two);
-    return FALSE;
+    ಆದರೆ (one == a_LAM)
+	ಹಿಂತಿರುಗಿ arabic_maycombine(two);
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 /*
  * A_is_iso returns true if 'c' is an Arabic ISO-8859-6 character
  *		(alphabet/number/punctuation)
  */
-    static int
-A_is_iso(int c)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+A_is_iso(ಪೂರ್ಣಾಂಕ c)
 {
-    return find_achar(c) != NULL;
+    ಹಿಂತಿರುಗಿ ಕಂಡುಹಿಡಿ_achar(c) != ಖಾಲಿ;
 }
 
 /*
  * A_is_ok returns true if 'c' is an Arabic 10646 (8859-6 or Form-B)
  */
-    static int
-A_is_ok(int c)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+A_is_ok(ಪೂರ್ಣಾಂಕ c)
 {
-    return (A_is_iso(c) || c == a_BYTE_ORDER_MARK);
+    ಹಿಂತಿರುಗಿ (A_is_iso(c) || c == a_BYTE_ಕ್ರಮ_MARK);
 }
 
 /*
  * A_is_valid returns true if 'c' is an Arabic 10646 (8859-6 or Form-B)
  *		with some exceptions/exclusions
  */
-    static int
-A_is_valid(int c)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+A_is_valid(ಪೂರ್ಣಾಂಕ c)
 {
-    return (A_is_ok(c) && c != a_HAMZA);
+    ಹಿಂತಿರುಗಿ (A_is_ok(c) && c != a_HAMZA);
 }
 
 /*
@@ -325,63 +325,63 @@ A_is_valid(int c)
  *		     (not shaped)
  * in:     "next_c"  is the next character (not shaped).
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 arabic_shape(
-    int		c,
-    int		*ccp,
-    int		*c1p,
-    int		prev_c,
-    int		prev_c1,
-    int		next_c)
+    ಪೂರ್ಣಾಂಕ		c,
+    ಪೂರ್ಣಾಂಕ		*ccp,
+    ಪೂರ್ಣಾಂಕ		*c1p,
+    ಪೂರ್ಣಾಂಕ		prev_c,
+    ಪೂರ್ಣಾಂಕ		prev_c1,
+    ಪೂರ್ಣಾಂಕ		ಮುಂದಿನ_c)
 {
-    int		curr_c;
-    int		curr_laa;
-    int		prev_laa;
+    ಪೂರ್ಣಾಂಕ		curr_c;
+    ಪೂರ್ಣಾಂಕ		curr_laa;
+    ಪೂರ್ಣಾಂಕ		prev_laa;
 
     // Deal only with Arabic characters, pass back all others
-    if (!A_is_ok(c))
-	return c;
+    ಆದರೆ (!A_is_ok(c))
+	ಹಿಂತಿರುಗಿ c;
 
     curr_laa = arabic_combine(c, *c1p);
     prev_laa = arabic_combine(prev_c, prev_c1);
 
-    if (curr_laa)
+    ಆದರೆ (curr_laa)
     {
-	if (A_is_valid(prev_c) && can_join(prev_c, a_LAM) && !prev_laa)
+	ಆದರೆ (A_is_valid(prev_c) && can_join(prev_c, a_LAM) && !prev_laa)
 	    curr_c = chg_c_laa2f(*c1p);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    curr_c = chg_c_laa2i(*c1p);
 
 	// Remove the composing character
 	*c1p = 0;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	struct achar *curr_a = find_achar(c);
-	int backward_combine = !prev_laa && can_join(prev_c, c);
-	int forward_combine = can_join(c, next_c);
+	ರಚನೆ achar *curr_a = ಕಂಡುಹಿಡಿ_achar(c);
+	ಪೂರ್ಣಾಂಕ backward_combine = !prev_laa && can_join(prev_c, c);
+	ಪೂರ್ಣಾಂಕ forward_combine = can_join(c, ಮುಂದಿನ_c);
 
-	if (backward_combine)
+	ಆದರೆ (backward_combine)
 	{
-	    if (forward_combine)
+	    ಆದರೆ (forward_combine)
 		curr_c = curr_a->medial;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		curr_c = curr_a->final;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (forward_combine)
+	    ಆದರೆ (forward_combine)
 		curr_c = curr_a->initial;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		curr_c = curr_a->isolated;
 	}
     }
 
     // Character missing from the table means using original character.
-    if (curr_c == NUL)
+    ಆದರೆ (curr_c == NUL)
 	curr_c = c;
 
-    if (curr_c != c && ccp != NULL)
+    ಆದರೆ (curr_c != c && ccp != ಖಾಲಿ)
     {
 	char_u buf[MB_MAXBYTES + 1];
 
@@ -391,6 +391,6 @@ arabic_shape(
     }
 
     // Return the shaped character
-    return curr_c;
+    ಹಿಂತಿರುಗಿ curr_c;
 }
-#endif // FEAT_ARABIC
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_ARABIC

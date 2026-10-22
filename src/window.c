@@ -7,104 +7,104 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-static void cmd_with_count(char *cmd, char_u *bufp, size_t bufsize, long Prenum);
-static void win_init(win_T *newp, win_T *oldp, int flags);
-static void win_init_some(win_T *newp, win_T *oldp);
-static void frame_comp_pos(frame_T *topfrp, int *row, int *col);
-static void frame_setheight(frame_T *curfrp, int height);
-static void frame_setwidth(frame_T *curfrp, int width);
-static void win_exchange(long);
-static void win_rotate(int, int);
-static void win_equal_rec(win_T *next_curwin, int current, frame_T *topfr, int dir, int col, int row, int width, int height);
-static void trigger_winnewpre(void);
-static void trigger_winclosed(win_T *win);
-static win_T *win_free_mem(win_T *win, int *dirp, tabpage_T *tp);
-static frame_T *win_altframe(win_T *win, tabpage_T *tp);
-static tabpage_T *alt_tabpage(void);
-static win_T *frame2win(frame_T *frp);
-static int frame_has_win(frame_T *frp, win_T *wp);
-static void win_fix_scroll(int resize);
-static void win_fix_cursor(int normal);
-static void frame_new_height(frame_T *topfrp, int height, int topfirst, int wfh, int set_ch);
-static int frame_fixed_height(frame_T *frp);
-static int frame_fixed_width(frame_T *frp);
-static void frame_add_statusline(frame_T *frp);
-static void frame_new_width(frame_T *topfrp, int width, int leftfirst, int wfw);
-static void frame_set_vsep(frame_T *frp, int add);
-static int frame_minwidth(frame_T *topfrp, win_T *next_curwin);
-static void frame_fix_width(win_T *wp);
-static int win_alloc_firstwin(win_T *oldwin);
-static void new_frame(win_T *wp);
-static tabpage_T *alloc_tabpage(void);
-static int leave_tabpage(buf_T *new_curbuf, int trigger_leave_autocmds);
-static void enter_tabpage(tabpage_T *tp, buf_T *old_curbuf, int trigger_enter_autocmds, int trigger_leave_autocmds);
-static void frame_fix_height(win_T *wp);
-static int frame_minheight(frame_T *topfrp, win_T *next_curwin);
-static int frame_wincount_in_height(frame_T *topfrp);
-static int may_open_tabpage(void);
-static int win_enter_ext(win_T *wp, int flags);
-static void win_free(win_T *wp, tabpage_T *tp);
-static void win_append(win_T *after, win_T *wp);
-static void frame_append(frame_T *after, frame_T *frp);
-static void frame_insert(frame_T *before, frame_T *frp);
-static void frame_remove(frame_T *frp);
-static void win_goto_ver(int up, long count);
-static void win_goto_hor(int left, long count);
-static void frame_add_height(frame_T *frp, int n);
-static void last_status_rec(frame_T *fr, int statusline);
-#if defined(FEAT_STL_OPT)
-static int frame_find_global_stlh_rec(frame_T *frp, int h);
-static void frame_change_statusline_height_rec(frame_T *frp, int global_stlh);
-#endif
-static void frame_flatten(frame_T *frp);
-static void winframe_restore(win_T *wp, int dir, frame_T *unflat_altfr);
+ಸ್ಥಿರ ಶೂನ್ಯ cmd_with_ಎಣಿಕೆ(ಅಕ್ಷರ *cmd, char_u *bufp, size_t bufsize, ದೀರ್ಘ Prenum);
+ಸ್ಥಿರ ಶೂನ್ಯ win_init(win_T *newp, win_T *oldp, ಪೂರ್ಣಾಂಕ flags);
+ಸ್ಥಿರ ಶೂನ್ಯ win_init_some(win_T *newp, win_T *oldp);
+ಸ್ಥಿರ ಶೂನ್ಯ ಚೌಕಟ್ಟು_comp_pos(ಚೌಕಟ್ಟು_T *topfrp, ಪೂರ್ಣಾಂಕ *ಅಡ್ಡಸಾಲು, ಪೂರ್ಣಾಂಕ *ಲಂಬಸಾಲು);
+ಸ್ಥಿರ ಶೂನ್ಯ ಚೌಕಟ್ಟು_setheight(ಚೌಕಟ್ಟು_T *curfrp, ಪೂರ್ಣಾಂಕ ಎತ್ತರ);
+ಸ್ಥಿರ ಶೂನ್ಯ ಚೌಕಟ್ಟು_setwidth(ಚೌಕಟ್ಟು_T *curfrp, ಪೂರ್ಣಾಂಕ ಅಗಲ);
+ಸ್ಥಿರ ಶೂನ್ಯ win_exchange(ದೀರ್ಘ);
+ಸ್ಥಿರ ಶೂನ್ಯ win_rotate(ಪೂರ್ಣಾಂಕ, ಪೂರ್ಣಾಂಕ);
+ಸ್ಥಿರ ಶೂನ್ಯ win_equal_rec(win_T *ಮುಂದಿನ_curwin, ಪೂರ್ಣಾಂಕ current, ಚೌಕಟ್ಟು_T *topfr, ಪೂರ್ಣಾಂಕ dir, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು, ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ);
+ಸ್ಥಿರ ಶೂನ್ಯ trigger_winnewpre(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಶೂನ್ಯ trigger_winclosed(win_T *win);
+ಸ್ಥಿರ win_T *win_free_mem(win_T *win, ಪೂರ್ಣಾಂಕ *dirp, tabpage_T *tp);
+ಸ್ಥಿರ ಚೌಕಟ್ಟು_T *win_altframe(win_T *win, tabpage_T *tp);
+ಸ್ಥಿರ tabpage_T *alt_tabpage(ಶೂನ್ಯ);
+ಸ್ಥಿರ win_T *frame2win(ಚೌಕಟ್ಟು_T *frp);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಚೌಕಟ್ಟು_has_win(ಚೌಕಟ್ಟು_T *frp, win_T *wp);
+ಸ್ಥಿರ ಶೂನ್ಯ win_fix_scroll(ಪೂರ್ಣಾಂಕ resize);
+ಸ್ಥಿರ ಶೂನ್ಯ win_fix_cursor(ಪೂರ್ಣಾಂಕ ಸಾಮಾನ್ಯ_4);
+ಸ್ಥಿರ ಶೂನ್ಯ ಚೌಕಟ್ಟು_new_ಎತ್ತರ(ಚೌಕಟ್ಟು_T *topfrp, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಪೂರ್ಣಾಂಕ topfirst, ಪೂರ್ಣಾಂಕ wfh, ಪೂರ್ಣಾಂಕ ಗಣ_ch);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಚೌಕಟ್ಟು_fixed_ಎತ್ತರ(ಚೌಕಟ್ಟು_T *frp);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಚೌಕಟ್ಟು_fixed_ಅಗಲ(ಚೌಕಟ್ಟು_T *frp);
+ಸ್ಥಿರ ಶೂನ್ಯ ಚೌಕಟ್ಟು_ಕೂಡಿಸು_statusline(ಚೌಕಟ್ಟು_T *frp);
+ಸ್ಥಿರ ಶೂನ್ಯ ಚೌಕಟ್ಟು_new_ಅಗಲ(ಚೌಕಟ್ಟು_T *topfrp, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ leftfirst, ಪೂರ್ಣಾಂಕ wfw);
+ಸ್ಥಿರ ಶೂನ್ಯ ಚೌಕಟ್ಟು_ಗಣ_vsep(ಚೌಕಟ್ಟು_T *frp, ಪೂರ್ಣಾಂಕ ಕೂಡಿಸು);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಚೌಕಟ್ಟು_minwidth(ಚೌಕಟ್ಟು_T *topfrp, win_T *ಮುಂದಿನ_curwin);
+ಸ್ಥಿರ ಶೂನ್ಯ ಚೌಕಟ್ಟು_fix_ಅಗಲ(win_T *wp);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ win_alloc_firstwin(win_T *oldwin);
+ಸ್ಥಿರ ಶೂನ್ಯ new_ಚೌಕಟ್ಟು(win_T *wp);
+ಸ್ಥಿರ tabpage_T *alloc_tabpage(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ leave_tabpage(buf_T *new_curbuf, ಪೂರ್ಣಾಂಕ trigger_leave_autocmds);
+ಸ್ಥಿರ ಶೂನ್ಯ enter_tabpage(tabpage_T *tp, buf_T *old_curbuf, ಪೂರ್ಣಾಂಕ trigger_enter_autocmds, ಪೂರ್ಣಾಂಕ trigger_leave_autocmds);
+ಸ್ಥಿರ ಶೂನ್ಯ ಚೌಕಟ್ಟು_fix_ಎತ್ತರ(win_T *wp);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಚೌಕಟ್ಟು_minheight(ಚೌಕಟ್ಟು_T *topfrp, win_T *ಮುಂದಿನ_curwin);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಚೌಕಟ್ಟು_wincount_ಒಳ_ಎತ್ತರ(ಚೌಕಟ್ಟು_T *topfrp);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ may_open_tabpage(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ win_enter_ext(win_T *wp, ಪೂರ್ಣಾಂಕ flags);
+ಸ್ಥಿರ ಶೂನ್ಯ win_free(win_T *wp, tabpage_T *tp);
+ಸ್ಥಿರ ಶೂನ್ಯ win_append(win_T *after, win_T *wp);
+ಸ್ಥಿರ ಶೂನ್ಯ ಚೌಕಟ್ಟು_append(ಚೌಕಟ್ಟು_T *after, ಚೌಕಟ್ಟು_T *frp);
+ಸ್ಥಿರ ಶೂನ್ಯ ಚೌಕಟ್ಟು_ಸೇರಿಸು(ಚೌಕಟ್ಟು_T *before, ಚೌಕಟ್ಟು_T *frp);
+ಸ್ಥಿರ ಶೂನ್ಯ ಚೌಕಟ್ಟು_remove(ಚೌಕಟ್ಟು_T *frp);
+ಸ್ಥಿರ ಶೂನ್ಯ win_goto_ver(ಪೂರ್ಣಾಂಕ ಮೇಲೆ, ದೀರ್ಘ ಎಣಿಕೆ_2);
+ಸ್ಥಿರ ಶೂನ್ಯ win_goto_hor(ಪೂರ್ಣಾಂಕ ಎಡ_2, ದೀರ್ಘ ಎಣಿಕೆ_2);
+ಸ್ಥಿರ ಶೂನ್ಯ ಚೌಕಟ್ಟು_ಕೂಡಿಸು_ಎತ್ತರ(ಚೌಕಟ್ಟು_T *frp, ಪೂರ್ಣಾಂಕ n);
+ಸ್ಥಿರ ಶೂನ್ಯ ಕೊನೆಯ_ಸ್ಥಿತಿ_rec(ಚೌಕಟ್ಟು_T *fr, ಪೂರ್ಣಾಂಕ statusline);
+#ಆದರೆ defined(FEAT_STL_OPT)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಚೌಕಟ್ಟು_ಕಂಡುಹಿಡಿ_global_stlh_rec(ಚೌಕಟ್ಟು_T *frp, ಪೂರ್ಣಾಂಕ h);
+ಸ್ಥಿರ ಶೂನ್ಯ ಚೌಕಟ್ಟು_change_statusline_ಎತ್ತರ_rec(ಚೌಕಟ್ಟು_T *frp, ಪೂರ್ಣಾಂಕ global_stlh);
+#ಆದರೆ_ಅಂತ್ಯ
+ಸ್ಥಿರ ಶೂನ್ಯ ಚೌಕಟ್ಟು_flatten(ಚೌಕಟ್ಟು_T *frp);
+ಸ್ಥಿರ ಶೂನ್ಯ winframe_restore(win_T *wp, ಪೂರ್ಣಾಂಕ dir, ಚೌಕಟ್ಟು_T *unflat_altfr);
 
-static int make_snapshot_rec(frame_T *fr, frame_T **frp);
-static void clear_snapshot(tabpage_T *tp, int idx);
-static void clear_snapshot_rec(frame_T *fr);
-static int check_snapshot_rec(frame_T *sn, frame_T *fr);
-static win_T *restore_snapshot_rec(frame_T *sn, frame_T *fr);
-static win_T *get_snapshot_curwin(int idx);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ make_snapshot_rec(ಚೌಕಟ್ಟು_T *fr, ಚೌಕಟ್ಟು_T **frp);
+ಸ್ಥಿರ ಶೂನ್ಯ clear_snapshot(tabpage_T *tp, ಪೂರ್ಣಾಂಕ idx);
+ಸ್ಥಿರ ಶೂನ್ಯ clear_snapshot_rec(ಚೌಕಟ್ಟು_T *fr);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ check_snapshot_rec(ಚೌಕಟ್ಟು_T *sn, ಚೌಕಟ್ಟು_T *fr);
+ಸ್ಥಿರ win_T *restore_snapshot_rec(ಚೌಕಟ್ಟು_T *sn, ಚೌಕಟ್ಟು_T *fr);
+ಸ್ಥಿರ win_T *get_snapshot_curwin(ಪೂರ್ಣಾಂಕ idx);
 
-static int frame_check_height(frame_T *topfrp, int height);
-static int frame_check_width(frame_T *topfrp, int width);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಚೌಕಟ್ಟು_check_ಎತ್ತರ(ಚೌಕಟ್ಟು_T *topfrp, ಪೂರ್ಣಾಂಕ ಎತ್ತರ);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಚೌಕಟ್ಟು_check_ಅಗಲ(ಚೌಕಟ್ಟು_T *topfrp, ಪೂರ್ಣಾಂಕ ಅಗಲ);
 
-static win_T *win_alloc(win_T *after, int hidden);
+ಸ್ಥಿರ win_T *win_alloc(win_T *after, ಪೂರ್ಣಾಂಕ hidden);
 
-#define NOWIN		((win_T *)-1)	// non-existing window
+#ವ್ಯಾಖ್ಯಾನಿಸು NOWIN		((win_T *)-1)	// non-existing window
 
-#define ROWS_AVAIL (Rows - p_ch - tabline_height())
+#ವ್ಯಾಖ್ಯಾನಿಸು ಅಡ್ಡಸಾಲುಗಳು_AVAIL (ಅಡ್ಡಸಾಲುಗಳು - p_ch - tabline_ಎತ್ತರ())
 
 // flags for win_enter_ext()
-#define WEE_UNDO_SYNC			0x01
-#define WEE_CURWIN_INVALID		0x02
-#define WEE_TRIGGER_NEW_AUTOCMDS	0x04
-#define WEE_TRIGGER_ENTER_AUTOCMDS	0x08
-#define WEE_TRIGGER_LEAVE_AUTOCMDS	0x10
-#define WEE_ALLOW_PARSE_MESSAGES	0x20
+#ವ್ಯಾಖ್ಯಾನಿಸು WEE_UNDO_SYNC			0x01
+#ವ್ಯಾಖ್ಯಾನಿಸು WEE_CURWIN_INVALID		0x02
+#ವ್ಯಾಖ್ಯಾನಿಸು WEE_TRIGGER_NEW_AUTOCMDS	0x04
+#ವ್ಯಾಖ್ಯಾನಿಸು WEE_TRIGGER_ENTER_AUTOCMDS	0x08
+#ವ್ಯಾಖ್ಯಾನಿಸು WEE_TRIGGER_LEAVE_AUTOCMDS	0x10
+#ವ್ಯಾಖ್ಯಾನಿಸು WEE_ALLOW_PARSE_MESSAGES	0x20
 
-static char *m_onlyone = N_("Already only one window");
+ಸ್ಥಿರ ಅಕ್ಷರ *m_onlyone = N_("Already only one window");
 
 // When non-zero splitting a window is forbidden.  Used to avoid that nasty
 // autocommands mess up the window structure.
-static int split_disallowed = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ವಿಭಜಿಸು_disallowed = 0;
 
 // When non-zero closing a window is forbidden.  Used to avoid that nasty
 // autocommands mess up the window structure.
-static int close_disallowed = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ close_disallowed = 0;
 
 // When non-zero changing the window frame structure is forbidden.  Used
 // to avoid that winframe_remove() is called recursively
-static int frame_locked = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಚೌಕಟ್ಟು_locked = 0;
 
-#if defined(FEAT_STL_OPT)
+#ಆದರೆ defined(FEAT_STL_OPT)
 // rendered height of global 'stl' (number of "%@" + 1)
-static int stl_rendered_height = 1;
-static int stlo_fh = FALSE;	    // "fixedheight" flag cache of global 'stlo'
-static int stlo_mh = STATUS_HEIGHT; // "maxheight" value cache of global 'stlo'
-#endif
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ stl_rendered_ಎತ್ತರ = 1;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ stlo_fh = FALSE;	    // "fixedheight" flag cache of global 'stlo'
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ stlo_mh = ಸ್ಥಿತಿ_ಎತ್ತರ_2; // "maxheight" value cache of global 'stlo'
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Disallow changing the window layout (split window, close window, move
@@ -113,24 +113,24 @@ static int stlo_mh = STATUS_HEIGHT; // "maxheight" value cache of global 'stlo'
  * make sure the previously selected window is still there.
  * Must be matched with exactly one call to window_layout_unlock()!
  */
-    void
-window_layout_lock(void)
+    ಶೂನ್ಯ
+ಕಿಟಕಿ_layout_ಬೀಗ(ಶೂನ್ಯ)
 {
-    ++split_disallowed;
+    ++ವಿಭಜಿಸು_disallowed;
     ++close_disallowed;
 }
 
-    void
-window_layout_unlock(void)
+    ಶೂನ್ಯ
+ಕಿಟಕಿ_layout_unlock(ಶೂನ್ಯ)
 {
-    --split_disallowed;
+    --ವಿಭಜಿಸು_disallowed;
     --close_disallowed;
 }
 
-    int
-frames_locked(void)
+    ಪೂರ್ಣಾಂಕ
+ಚೌಕಟ್ಟುಗಳು_locked(ಶೂನ್ಯ)
 {
-    return frame_locked;
+    ಹಿಂತಿರುಗಿ ಚೌಕಟ್ಟು_locked;
 }
 
 /*
@@ -139,61 +139,61 @@ frames_locked(void)
  * error message.  When closing window(s) and the command isn't easy to know,
  * passing CMD_SIZE will also work.
  */
-    int
-window_layout_locked(enum CMD_index cmd)
+    ಪೂರ್ಣಾಂಕ
+ಕಿಟಕಿ_layout_locked(ಎಣಿಕೆ CMD_ಸೂಚ್ಯಂಕ cmd)
 {
-    if (split_disallowed > 0 || close_disallowed > 0)
+    ಆದರೆ (ವಿಭಜಿಸು_disallowed > 0 || close_disallowed > 0)
     {
-	if (close_disallowed == 0 && cmd == CMD_tabnew)
-	    emsg(_(e_cannot_split_window_when_closing_buffer));
-	else
-	    emsg(_(e_not_allowed_to_change_window_layout_in_this_autocmd));
-	return TRUE;
+	ಆದರೆ (close_disallowed == 0 && cmd == CMD_tabnew)
+	    emsg(_(e_cannot_ವಿಭಜಿಸು_ಕಿಟಕಿ_when_closing_ಬಫರ್));
+	ಇಲ್ಲದಿದ್ದರೆ
+	    emsg(_(e_not_allowed_ಗಮ್ಯ_change_ಕಿಟಕಿ_layout_ಒಳ_this_autocmd));
+	ಹಿಂತಿರುಗಿ TRUE;
     }
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 // #define WIN_DEBUG
-#ifdef WIN_DEBUG
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ WIN_DEBUG
 /*
  * Call this method to log the current window layout.
  */
-    static void
-log_frame_layout(frame_T *frame)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+log_ಚೌಕಟ್ಟು_layout(ಚೌಕಟ್ಟು_T *ಚೌಕಟ್ಟು)
 {
-    ch_log(NULL, "layout %s, wi: %d, he: %d, wwi: %d, whe: %d, id: %d",
-	    frame->fr_layout == FR_LEAF ? "LEAF"
-				  : frame->fr_layout == FR_ROW ? "ROW" : "COL",
-	    frame->fr_width,
-	    frame->fr_height,
-	    frame->fr_win == NULL ? -1 : frame->fr_win->w_width,
-	    frame->fr_win == NULL ? -1 : frame->fr_win->w_height,
-	    frame->fr_win == NULL ? -1 : frame->fr_win->w_id);
-    if (frame->fr_child != NULL)
+    ch_log(ಖಾಲಿ, "layout %s, wi: %d, he: %d, wwi: %d, whe: %d, id: %d",
+	    ಚೌಕಟ್ಟು->fr_layout == FR_ಎಲೆ ? "LEAF"
+				  : ಚೌಕಟ್ಟು->fr_layout == FR_ಅಡ್ಡಸಾಲು ? "ROW" : "COL",
+	    ಚೌಕಟ್ಟು->fr_ಅಗಲ,
+	    ಚೌಕಟ್ಟು->fr_ಎತ್ತರ,
+	    ಚೌಕಟ್ಟು->fr_win == ಖಾಲಿ ? -1 : ಚೌಕಟ್ಟು->fr_win->w_ಅಗಲ,
+	    ಚೌಕಟ್ಟು->fr_win == ಖಾಲಿ ? -1 : ಚೌಕಟ್ಟು->fr_win->w_ಎತ್ತರ,
+	    ಚೌಕಟ್ಟು->fr_win == ಖಾಲಿ ? -1 : ಚೌಕಟ್ಟು->fr_win->w_id);
+    ಆದರೆ (ಚೌಕಟ್ಟು->fr_ಮಗು != ಖಾಲಿ)
     {
-	ch_log(NULL, "children");
-	log_frame_layout(frame->fr_child);
-	if (frame->fr_next != NULL)
-	    ch_log(NULL, "END of children");
+	ch_log(ಖಾಲಿ, "children");
+	log_ಚೌಕಟ್ಟು_layout(ಚೌಕಟ್ಟು->fr_ಮಗು);
+	ಆದರೆ (ಚೌಕಟ್ಟು->fr_ಮುಂದಿನ != ಖಾಲಿ)
+	    ch_log(ಖಾಲಿ, "END of children");
     }
-    if (frame->fr_next != NULL)
-	log_frame_layout(frame->fr_next);
+    ಆದರೆ (ಚೌಕಟ್ಟು->fr_ಮುಂದಿನ != ಖಾಲಿ)
+	log_ಚೌಕಟ್ಟು_layout(ಚೌಕಟ್ಟು->fr_ಮುಂದಿನ);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Check if the current window is allowed to move to a different buffer.
  * If the window has 'winfixbuf', this function will return FALSE.
  */
-    int
-check_can_set_curbuf_disabled(void)
+    ಪೂರ್ಣಾಂಕ
+check_can_ಗಣ_curbuf_disabled(ಶೂನ್ಯ)
 {
-    if (curwin->w_p_wfb)
+    ಆದರೆ (curwin->w_p_wfb)
     {
-	emsg(_(e_winfixbuf_cannot_go_to_buffer));
-	return FALSE;
+	emsg(_(e_winfixbuf_cannot_go_ಗಮ್ಯ_ಬಫರ್));
+	ಹಿಂತಿರುಗಿ FALSE;
     }
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
@@ -201,15 +201,15 @@ check_can_set_curbuf_disabled(void)
  * If the window has 'winfixbuf', then forceit must be TRUE or this function
  * will return FALSE.
  */
-    int
-check_can_set_curbuf_forceit(int forceit)
+    ಪೂರ್ಣಾಂಕ
+check_can_ಗಣ_curbuf_forceit(ಪೂರ್ಣಾಂಕ forceit)
 {
-    if (!forceit && curwin->w_p_wfb)
+    ಆದರೆ (!forceit && curwin->w_p_wfb)
     {
-	emsg(_(e_winfixbuf_cannot_go_to_buffer));
-	return FALSE;
+	emsg(_(e_winfixbuf_cannot_go_ಗಮ್ಯ_ಬಫರ್));
+	ಹಿಂತಿರುಗಿ FALSE;
     }
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
@@ -217,10 +217,10 @@ check_can_set_curbuf_forceit(int forceit)
  * set, then return "prevwin".
  */
     win_T *
-prevwin_curwin(void)
+prevwin_curwin(ಶೂನ್ಯ)
 {
     // In cmdwin, the alternative buffer should be used.
-    return is_in_cmdwin() && prevwin != NULL ? prevwin : curwin;
+    ಹಿಂತಿರುಗಿ is_ಒಳ_cmdwin() && prevwin != ಖಾಲಿ ? prevwin : curwin;
 }
 
 /*
@@ -231,255 +231,255 @@ prevwin_curwin(void)
     win_T *
 swbuf_goto_win_with_buf(buf_T *buf)
 {
-    win_T   *wp = NULL;
+    win_T   *wp = ಖಾಲಿ;
 
-    if (buf == NULL)
-	return wp;
+    ಆದರೆ (buf == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ wp;
 
     // If 'switchbuf' contains "useopen": jump to first window in the current
     // tab page containing "buf" if one exists.
-    if (swb_flags & SWB_USEOPEN)
+    ಆದರೆ (swb_flags & SWB_USEOPEN)
 	wp = buf_jump_open_win(buf);
 
     // If 'switchbuf' contains "usetab": jump to first window in any tab page
     // containing "buf" if one exists.
-    if (wp == NULL && (swb_flags & SWB_USETAB))
+    ಆದರೆ (wp == ಖಾಲಿ && (swb_flags & SWB_USETAB))
 	wp = buf_jump_open_tab(buf);
 
-    return wp;
+    ಹಿಂತಿರುಗಿ wp;
 }
 
 /*
  * All CTRL-W window commands are handled here, called from normal_cmd().
  */
-    void
-do_window(
-    int		nchar,
-    long	Prenum,
-    int		xchar)	    // extra char from ":wincmd gx" or NUL
+    ಶೂನ್ಯ
+do_ಕಿಟಕಿ(
+    ಪೂರ್ಣಾಂಕ		nchar,
+    ದೀರ್ಘ	Prenum,
+    ಪೂರ್ಣಾಂಕ		xchar)	    // extra char from ":wincmd gx" or NUL
 {
-    long	Prenum1;
+    ದೀರ್ಘ	Prenum1;
     win_T	*wp;
     char_u	*ptr;
     linenr_T    lnum = -1;
-#ifdef FEAT_FIND_ID
-    int		type = FIND_DEFINE;
-    int		len;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕಂಡುಹಿಡಿ_ID
+    ಪೂರ್ಣಾಂಕ		type = ಕಂಡುಹಿಡಿ_DEFINE;
+    ಪೂರ್ಣಾಂಕ		len;
+#ಆದರೆ_ಅಂತ್ಯ
     char_u	cbuf[40];
 
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+    ಆದರೆ (ERROR_IF_ANY_POPUP_ಕಿಟಕಿ)
+	ಹಿಂತಿರುಗಿ;
 
-#define CHECK_CMDWIN \
-    do { \
-	if (cmdwin_type != 0) \
+#ವ್ಯಾಖ್ಯಾನಿಸು CHECK_CMDWIN \
+    ಮಾಡು { \
+	ಆದರೆ (cmdwin_type != 0) \
 	{ \
-	    emsg(_(e_invalid_in_cmdline_window)); \
-	    return; \
+	    emsg(_(e_invalid_ಒಳ_cmdline_ಕಿಟಕಿ)); \
+	    ಹಿಂತಿರುಗಿ; \
 	} \
-    } while (0)
+    } ಆಗ (0)
 
     Prenum1 = Prenum == 0 ? 1 : Prenum;
 
-    switch (nchar)
+    ಆಯ್ಕೆ (nchar)
     {
 // split current window in two parts, horizontally
-    case 'S':
-    case Ctrl_S:
-    case 's':
+    ಸ್ಥಿತಿ 'S':
+    ಸ್ಥಿತಿ Ctrl_S:
+    ಸ್ಥಿತಿ 's':
 		CHECK_CMDWIN;
 		reset_VIsual_and_resel();	// stop Visual mode
 		// When splitting the quickfix window open a new buffer in it,
 		// don't replicate the quickfix buffer.
-		if (bt_quickfix(curbuf))
-		    goto newwindow;
-#ifdef FEAT_GUI
+		ಆದರೆ (bt_quickfix(curbuf))
+		    ಹೋಗು newwindow;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 		need_mouse_correct = TRUE;
-#endif
-		(void)win_split((int)Prenum, 0);
-		break;
+#ಆದರೆ_ಅಂತ್ಯ
+		(ಶೂನ್ಯ)win_ವಿಭಜಿಸು((ಪೂರ್ಣಾಂಕ)Prenum, 0);
+		ನಿಲ್ಲಿಸು;
 
 // split current window in two parts, vertically
-    case Ctrl_V:
-    case 'v':
+    ಸ್ಥಿತಿ Ctrl_V:
+    ಸ್ಥಿತಿ 'v':
 		CHECK_CMDWIN;
 		reset_VIsual_and_resel();	// stop Visual mode
 		// When splitting the quickfix window open a new buffer in it,
 		// don't replicate the quickfix buffer.
-		if (bt_quickfix(curbuf))
-		    goto newwindow;
-#ifdef FEAT_GUI
+		ಆದರೆ (bt_quickfix(curbuf))
+		    ಹೋಗು newwindow;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 		need_mouse_correct = TRUE;
-#endif
-		(void)win_split((int)Prenum, WSP_VERT);
-		break;
+#ಆದರೆ_ಅಂತ್ಯ
+		(ಶೂನ್ಯ)win_ವಿಭಜಿಸು((ಪೂರ್ಣಾಂಕ)Prenum, WSP_VERT);
+		ನಿಲ್ಲಿಸು;
 
 // split current window and edit alternate file
-    case Ctrl_HAT:
-    case '^':
+    ಸ್ಥಿತಿ Ctrl_HAT:
+    ಸ್ಥಿತಿ '^':
 		CHECK_CMDWIN;
 		reset_VIsual_and_resel();	// stop Visual mode
 
-		if (buflist_findnr(Prenum == 0
-					? curwin->w_alt_fnum : Prenum) == NULL)
+		ಆದರೆ (buflist_findnr(Prenum == 0
+					? curwin->w_alt_fnum : Prenum) == ಖಾಲಿ)
 		{
-		    if (Prenum == 0)
+		    ಆದರೆ (Prenum == 0)
 			emsg(_(e_no_alternate_file));
-		    else
-			semsg(_(e_buffer_nr_not_found), Prenum);
-		    break;
+		    ಇಲ್ಲದಿದ್ದರೆ
+			semsg(_(e_ಬಫರ್_nr_not_ಸಿಕ್ಕಿತು), Prenum);
+		    ನಿಲ್ಲಿಸು;
 		}
 
-		if (!curbuf_locked() && win_split(0, 0) == OK)
-		    (void)buflist_getfile(
+		ಆದರೆ (!curbuf_locked() && win_ವಿಭಜಿಸು(0, 0) == OK)
+		    (ಶೂನ್ಯ)buflist_getfile(
 			    Prenum == 0 ? curwin->w_alt_fnum : Prenum,
 			    (linenr_T)0, GETF_ALT, FALSE);
-		break;
+		ನಿಲ್ಲಿಸು;
 
 // open new window
-    case Ctrl_N:
-    case 'n':
+    ಸ್ಥಿತಿ Ctrl_N:
+    ಸ್ಥಿತಿ 'n':
 		CHECK_CMDWIN;
 		reset_VIsual_and_resel();	// stop Visual mode
 newwindow:
-		if (Prenum)
+		ಆದರೆ (Prenum)
 		    // window height
-		    vim_snprintf((char *)cbuf, sizeof(cbuf) - 5, "%ld", Prenum);
-		else
+		    vim_snprintf((ಅಕ್ಷರ *)cbuf, ಗಾತ್ರ(cbuf) - 5, "%ld", Prenum);
+		ಇಲ್ಲದಿದ್ದರೆ
 		    cbuf[0] = NUL;
-#if defined(FEAT_QUICKFIX)
-		if (nchar == 'v' || nchar == Ctrl_V)
+#ಆದರೆ defined(FEAT_QUICKFIX)
+		ಆದರೆ (nchar == 'v' || nchar == Ctrl_V)
 		    STRCAT(cbuf, "v");
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		STRCAT(cbuf, "new");
 		do_cmdline_cmd(cbuf);
-		break;
+		ನಿಲ್ಲಿಸು;
 
 // quit current window
-    case Ctrl_Q:
-    case 'q':
+    ಸ್ಥಿತಿ Ctrl_Q:
+    ಸ್ಥಿತಿ 'q':
 		reset_VIsual_and_resel();	// stop Visual mode
-		cmd_with_count("quit", cbuf, sizeof(cbuf), Prenum);
+		cmd_with_ಎಣಿಕೆ("quit", cbuf, ಗಾತ್ರ(cbuf), Prenum);
 		do_cmdline_cmd(cbuf);
-		break;
+		ನಿಲ್ಲಿಸು;
 
 // close current window
-    case Ctrl_C:
-    case 'c':
+    ಸ್ಥಿತಿ Ctrl_C:
+    ಸ್ಥಿತಿ 'c':
 		reset_VIsual_and_resel();	// stop Visual mode
-		cmd_with_count("close", cbuf, sizeof(cbuf), Prenum);
+		cmd_with_ಎಣಿಕೆ("close", cbuf, ಗಾತ್ರ(cbuf), Prenum);
 		do_cmdline_cmd(cbuf);
-		break;
+		ನಿಲ್ಲಿಸು;
 
-#if defined(FEAT_QUICKFIX)
+#ಆದರೆ defined(FEAT_QUICKFIX)
 // close preview window
-    case Ctrl_Z:
-    case 'z':
+    ಸ್ಥಿತಿ Ctrl_Z:
+    ಸ್ಥಿತಿ 'z':
 		CHECK_CMDWIN;
 		reset_VIsual_and_resel();	// stop Visual mode
 		do_cmdline_cmd((char_u *)"pclose");
-		break;
+		ನಿಲ್ಲಿಸು;
 
 // cursor to preview window
-    case 'P':
+    ಸ್ಥಿತಿ 'P':
 		FOR_ALL_WINDOWS(wp)
-		    if (wp->w_p_pvw)
-			break;
-		if (wp == NULL)
-		    emsg(_(e_there_is_no_preview_window));
-		else
+		    ಆದರೆ (wp->w_p_pvw)
+			ನಿಲ್ಲಿಸು;
+		ಆದರೆ (wp == ಖಾಲಿ)
+		    emsg(_(e_there_is_no_preview_ಕಿಟಕಿ));
+		ಇಲ್ಲದಿದ್ದರೆ
 		    win_goto(wp);
-		break;
-#endif
+		ನಿಲ್ಲಿಸು;
+#ಆದರೆ_ಅಂತ್ಯ
 
 // close all but current window
-    case Ctrl_O:
-    case 'o':
+    ಸ್ಥಿತಿ Ctrl_O:
+    ಸ್ಥಿತಿ 'o':
 		CHECK_CMDWIN;
 		reset_VIsual_and_resel();	// stop Visual mode
-		cmd_with_count("only", cbuf, sizeof(cbuf), Prenum);
+		cmd_with_ಎಣಿಕೆ("only", cbuf, ಗಾತ್ರ(cbuf), Prenum);
 		do_cmdline_cmd(cbuf);
-		break;
+		ನಿಲ್ಲಿಸು;
 
 // cursor to next window with wrap around
-    case Ctrl_W:
-    case 'w':
+    ಸ್ಥಿತಿ Ctrl_W:
+    ಸ್ಥಿತಿ 'w':
 // cursor to previous window with wrap around
-    case 'W':
+    ಸ್ಥಿತಿ 'W':
 		CHECK_CMDWIN;
-		if (ONE_WINDOW && Prenum != 1)	// just one window
+		ಆದರೆ (ONE_ಕಿಟಕಿ && Prenum != 1)	// just one window
 		    beep_flush();
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    if (Prenum)			// go to specified window
+		    ಆದರೆ (Prenum)			// go to specified window
 		    {
-			for (wp = firstwin; --Prenum > 0; )
+			ಗಾಗಿ (wp = firstwin; --Prenum > 0; )
 			{
-			    if (wp->w_next == NULL)
-				break;
-			    else
-				wp = wp->w_next;
+			    ಆದರೆ (wp->w_ಮುಂದಿನ == ಖಾಲಿ)
+				ನಿಲ್ಲಿಸು;
+			    ಇಲ್ಲದಿದ್ದರೆ
+				wp = wp->w_ಮುಂದಿನ;
 			}
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
-			if (nchar == 'W')	    // go to previous window
+			ಆದರೆ (nchar == 'W')	    // go to previous window
 			{
 			    wp = curwin->w_prev;
-			    if (wp == NULL)
+			    ಆದರೆ (wp == ಖಾಲಿ)
 				wp = lastwin;	    // wrap around
 			}
-			else			    // go to next window
+			ಇಲ್ಲದಿದ್ದರೆ			    // go to next window
 			{
-			    wp = curwin->w_next;
-			    if (wp == NULL)
+			    wp = curwin->w_ಮುಂದಿನ;
+			    ಆದರೆ (wp == ಖಾಲಿ)
 				wp = firstwin;	    // wrap around
 			}
 		    }
 		    win_goto(wp);
 		}
-		break;
+		ನಿಲ್ಲಿಸು;
 
 // cursor to window below
-    case 'j':
-    case K_DOWN:
-    case Ctrl_J:
+    ಸ್ಥಿತಿ 'j':
+    ಸ್ಥಿತಿ K_ಕೆಳಕ್ಕೆ:
+    ಸ್ಥಿತಿ Ctrl_J:
 		CHECK_CMDWIN;
 		win_goto_ver(FALSE, Prenum1);
-		break;
+		ನಿಲ್ಲಿಸು;
 
 // cursor to window above
-    case 'k':
-    case K_UP:
-    case Ctrl_K:
+    ಸ್ಥಿತಿ 'k':
+    ಸ್ಥಿತಿ K_ಮೇಲೆ:
+    ಸ್ಥಿತಿ Ctrl_K:
 		CHECK_CMDWIN;
 		win_goto_ver(TRUE, Prenum1);
-		break;
+		ನಿಲ್ಲಿಸು;
 
 // cursor to left window
-    case 'h':
-    case K_LEFT:
-    case Ctrl_H:
-    case K_BS:
+    ಸ್ಥಿತಿ 'h':
+    ಸ್ಥಿತಿ K_ಎಡ:
+    ಸ್ಥಿತಿ Ctrl_H:
+    ಸ್ಥಿತಿ K_BS:
 		CHECK_CMDWIN;
 		win_goto_hor(TRUE, Prenum1);
-		break;
+		ನಿಲ್ಲಿಸು;
 
 // cursor to right window
-    case 'l':
-    case K_RIGHT:
-    case Ctrl_L:
+    ಸ್ಥಿತಿ 'l':
+    ಸ್ಥಿತಿ K_ಬಲ:
+    ಸ್ಥಿತಿ Ctrl_L:
 		CHECK_CMDWIN;
 		win_goto_hor(FALSE, Prenum1);
-		break;
+		ನಿಲ್ಲಿಸು;
 
 // move window to new tab page
-    case 'T':
+    ಸ್ಥಿತಿ 'T':
 		CHECK_CMDWIN;
-		if (one_window())
-		    msg(_(m_onlyone));
-		else
+		ಆದರೆ (one_ಕಿಟಕಿ())
+		    ಸಂದೇಶ(_(m_onlyone));
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    tabpage_T	*oldtab = curtab;
 		    tabpage_T	*newtab;
@@ -487,200 +487,200 @@ newwindow:
 		    // First create a new tab with the window, then go back to
 		    // the old tab and close the window there.
 		    wp = curwin;
-		    if (win_new_tabpage((int)Prenum) == OK
+		    ಆದರೆ (win_new_tabpage((ಪೂರ್ಣಾಂಕ)Prenum) == OK
 						     && valid_tabpage(oldtab))
 		    {
 			newtab = curtab;
 			goto_tabpage_tp(oldtab, TRUE, TRUE);
-			if (curwin == wp)
+			ಆದರೆ (curwin == wp)
 			    win_close(curwin, FALSE);
-			if (valid_tabpage(newtab))
+			ಆದರೆ (valid_tabpage(newtab))
 			    goto_tabpage_tp(newtab, TRUE, TRUE);
 		    }
 		}
-		break;
+		ನಿಲ್ಲಿಸು;
 
 // cursor to top-left window
-    case 't':
-    case Ctrl_T:
+    ಸ್ಥಿತಿ 't':
+    ಸ್ಥಿತಿ Ctrl_T:
 		win_goto(firstwin);
-		break;
+		ನಿಲ್ಲಿಸು;
 
 // cursor to bottom-right window
-    case 'b':
-    case Ctrl_B:
+    ಸ್ಥಿತಿ 'b':
+    ಸ್ಥಿತಿ Ctrl_B:
 		win_goto(lastwin);
-		break;
+		ನಿಲ್ಲಿಸು;
 
 // cursor to last accessed (previous) window
-    case 'p':
-    case Ctrl_P:
-		if (!win_valid(prevwin))
+    ಸ್ಥಿತಿ 'p':
+    ಸ್ಥಿತಿ Ctrl_P:
+		ಆದರೆ (!win_valid(prevwin))
 		    beep_flush();
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		    win_goto(prevwin);
-		break;
+		ನಿಲ್ಲಿಸು;
 
 // exchange current and next window
-    case 'x':
-    case Ctrl_X:
+    ಸ್ಥಿತಿ 'x':
+    ಸ್ಥಿತಿ Ctrl_X:
 		CHECK_CMDWIN;
 		win_exchange(Prenum);
-		break;
+		ನಿಲ್ಲಿಸು;
 
 // rotate windows downwards
-    case Ctrl_R:
-    case 'r':
+    ಸ್ಥಿತಿ Ctrl_R:
+    ಸ್ಥಿತಿ 'r':
 		CHECK_CMDWIN;
 		reset_VIsual_and_resel();	// stop Visual mode
-		win_rotate(FALSE, (int)Prenum1);    // downwards
-		break;
+		win_rotate(FALSE, (ಪೂರ್ಣಾಂಕ)Prenum1);    // downwards
+		ನಿಲ್ಲಿಸು;
 
 // rotate windows upwards
-    case 'R':
+    ಸ್ಥಿತಿ 'R':
 		CHECK_CMDWIN;
 		reset_VIsual_and_resel();	// stop Visual mode
-		win_rotate(TRUE, (int)Prenum1);	    // upwards
-		break;
+		win_rotate(TRUE, (ಪೂರ್ಣಾಂಕ)Prenum1);	    // upwards
+		ನಿಲ್ಲಿಸು;
 
 // move window to the very top/bottom/left/right
-    case 'K':
-    case 'J':
-    case 'H':
-    case 'L':
+    ಸ್ಥಿತಿ 'K':
+    ಸ್ಥಿತಿ 'J':
+    ಸ್ಥಿತಿ 'H':
+    ಸ್ಥಿತಿ 'L':
 		CHECK_CMDWIN;
-		if (ONE_WINDOW)
+		ಆದರೆ (ONE_ಕಿಟಕಿ)
 		    beep_flush();
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    int dir = ((nchar == 'H' || nchar == 'L') ? WSP_VERT : 0)
-			 | ((nchar == 'H' || nchar == 'K') ? WSP_TOP : WSP_BOT);
+		    ಪೂರ್ಣಾಂಕ dir = ((nchar == 'H' || nchar == 'L') ? WSP_VERT : 0)
+			 | ((nchar == 'H' || nchar == 'K') ? WSP_ತುದಿ : WSP_BOT);
 
-		    (void)win_splitmove(curwin, (int)Prenum, dir);
+		    (ಶೂನ್ಯ)win_splitmove(curwin, (ಪೂರ್ಣಾಂಕ)Prenum, dir);
 		}
-		break;
+		ನಿಲ್ಲಿಸು;
 
 // make all windows the same width and/or height
-    case '=':
+    ಸ್ಥಿತಿ '=':
 		{
-		    int mod = cmdmod.cmod_split & (WSP_VERT | WSP_HOR);
-#ifdef FEAT_GUI
+		    ಪೂರ್ಣಾಂಕ mod = cmdmod.cmod_ವಿಭಜಿಸು & (WSP_VERT | WSP_HOR);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 		    need_mouse_correct = TRUE;
-#endif
-		    win_equal(NULL, FALSE,
+#ಆದರೆ_ಅಂತ್ಯ
+		    win_equal(ಖಾಲಿ, FALSE,
 			   mod == WSP_VERT ? 'v' : mod == WSP_HOR ? 'h' : 'b');
 		}
-		break;
+		ನಿಲ್ಲಿಸು;
 
 // increase current window height
-    case '+':
-#ifdef FEAT_GUI
+    ಸ್ಥಿತಿ '+':
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 		need_mouse_correct = TRUE;
-#endif
-		win_setheight(curwin->w_height + (int)Prenum1);
-		break;
+#ಆದರೆ_ಅಂತ್ಯ
+		win_setheight(curwin->w_ಎತ್ತರ + (ಪೂರ್ಣಾಂಕ)Prenum1);
+		ನಿಲ್ಲಿಸು;
 
 // decrease current window height
-    case '-':
-#ifdef FEAT_GUI
+    ಸ್ಥಿತಿ '-':
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 		need_mouse_correct = TRUE;
-#endif
-		win_setheight(curwin->w_height - (int)Prenum1);
-		break;
+#ಆದರೆ_ಅಂತ್ಯ
+		win_setheight(curwin->w_ಎತ್ತರ - (ಪೂರ್ಣಾಂಕ)Prenum1);
+		ನಿಲ್ಲಿಸು;
 
 // set current window height
-    case Ctrl__:
-    case '_':
-#ifdef FEAT_GUI
+    ಸ್ಥಿತಿ Ctrl__:
+    ಸ್ಥಿತಿ '_':
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 		need_mouse_correct = TRUE;
-#endif
-		win_setheight(Prenum ? (int)Prenum : 9999);
-		break;
+#ಆದರೆ_ಅಂತ್ಯ
+		win_setheight(Prenum ? (ಪೂರ್ಣಾಂಕ)Prenum : 9999);
+		ನಿಲ್ಲಿಸು;
 
 // increase current window width
-    case '>':
-#ifdef FEAT_GUI
+    ಸ್ಥಿತಿ '>':
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 		need_mouse_correct = TRUE;
-#endif
-		win_setwidth(curwin->w_width + (int)Prenum1);
-		break;
+#ಆದರೆ_ಅಂತ್ಯ
+		win_setwidth(curwin->w_ಅಗಲ + (ಪೂರ್ಣಾಂಕ)Prenum1);
+		ನಿಲ್ಲಿಸು;
 
 // decrease current window width
-    case '<':
-#ifdef FEAT_GUI
+    ಸ್ಥಿತಿ '<':
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 		need_mouse_correct = TRUE;
-#endif
-		win_setwidth(curwin->w_width - (int)Prenum1);
-		break;
+#ಆದರೆ_ಅಂತ್ಯ
+		win_setwidth(curwin->w_ಅಗಲ - (ಪೂರ್ಣಾಂಕ)Prenum1);
+		ನಿಲ್ಲಿಸು;
 
 // set current window width
-    case '|':
-#ifdef FEAT_GUI
+    ಸ್ಥಿತಿ '|':
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 		need_mouse_correct = TRUE;
-#endif
-		win_setwidth(Prenum != 0 ? (int)Prenum : 9999);
-		break;
+#ಆದರೆ_ಅಂತ್ಯ
+		win_setwidth(Prenum != 0 ? (ಪೂರ್ಣಾಂಕ)Prenum : 9999);
+		ನಿಲ್ಲಿಸು;
 
 // jump to tag and split window if tag exists (in preview window)
-#if defined(FEAT_QUICKFIX)
-    case '}':
+#ಆದರೆ defined(FEAT_QUICKFIX)
+    ಸ್ಥಿತಿ '}':
 		CHECK_CMDWIN;
-		if (Prenum)
+		ಆದರೆ (Prenum)
 		    g_do_tagpreview = Prenum;
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		    g_do_tagpreview = p_pvh;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		// FALLTHROUGH
-    case ']':
-    case Ctrl_RSB:
+    ಸ್ಥಿತಿ ']':
+    ಸ್ಥಿತಿ Ctrl_RSB:
 		CHECK_CMDWIN;
 		// keep Visual mode, can select words to use as a tag
-		if (Prenum)
-		    postponed_split = Prenum;
-		else
-		    postponed_split = -1;
-#ifdef FEAT_QUICKFIX
-		if (nchar != '}')
+		ಆದರೆ (Prenum)
+		    postponed_ವಿಭಜಿಸು = Prenum;
+		ಇಲ್ಲದಿದ್ದರೆ
+		    postponed_ವಿಭಜಿಸು = -1;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
+		ಆದರೆ (nchar != '}')
 		    g_do_tagpreview = 0;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 		// Execute the command right here, required when "wincmd ]"
 		// was used in a function.
 		do_nv_ident(Ctrl_RSB, NUL);
-		postponed_split = 0;
-		break;
+		postponed_ವಿಭಜಿಸು = 0;
+		ನಿಲ್ಲಿಸು;
 
 // edit file name under cursor in a new window
-    case 'f':
-    case 'F':
-    case Ctrl_F:
+    ಸ್ಥಿತಿ 'f':
+    ಸ್ಥಿತಿ 'F':
+    ಸ್ಥಿತಿ Ctrl_F:
 wingotofile:
 		CHECK_CMDWIN;
-		if (check_text_or_curbuf_locked(NULL))
-		    break;
+		ಆದರೆ (check_ಪಠ್ಯ_or_curbuf_locked(ಖಾಲಿ))
+		    ನಿಲ್ಲಿಸು;
 
 		ptr = grab_file_name(Prenum1, &lnum);
-		if (ptr != NULL)
+		ಆದರೆ (ptr != ಖಾಲಿ)
 		{
 		    tabpage_T	*oldtab = curtab;
 		    win_T	*oldwin = curwin;
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 		    need_mouse_correct = TRUE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		    setpcmark();
 
 		    // If 'switchbuf' is set to 'useopen' or 'usetab' and the
 		    // file is already opened in a window, then jump to it.
-		    wp = NULL;
-		    if ((swb_flags & (SWB_USEOPEN | SWB_USETAB))
+		    wp = ಖಾಲಿ;
+		    ಆದರೆ ((swb_flags & (SWB_USEOPEN | SWB_USETAB))
 						&& cmdmod.cmod_tab == 0)
 			wp = swbuf_goto_win_with_buf(buflist_findname_exp(ptr));
 
-		    if (wp == NULL && win_split(0, 0) == OK)
+		    ಆದರೆ (wp == ಖಾಲಿ && win_ವಿಭಜಿಸು(0, 0) == OK)
 		    {
 			RESET_BINDING(curwin);
-			if (do_ecmd(0, ptr, NULL, NULL, ECMD_LASTL,
-						   ECMD_HIDE, NULL) == FAIL)
+			ಆದರೆ (do_ecmd(0, ptr, ಖಾಲಿ, ಖಾಲಿ, ECMD_LASTL,
+						   ECMD_HIDE, ಖಾಲಿ) == FAIL)
 			{
 			    /*
 			     * Note: if FEAT_EVAL is defined and do_ecmd() is aborted resulting
@@ -699,11 +699,11 @@ wingotofile:
 
 			    goto_tabpage_win(oldtab, oldwin);
 			}
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			    wp = curwin;
 		    }
 
-		    if (wp != NULL && nchar == 'F' && lnum >= 0)
+		    ಆದರೆ (wp != ಖಾಲಿ && nchar == 'F' && lnum >= 0)
 		    {
 			curwin->w_cursor.lnum = lnum;
 			check_cursor_lnum();
@@ -711,223 +711,223 @@ wingotofile:
 		    }
 		    vim_free(ptr);
 		}
-		break;
+		ನಿಲ್ಲಿಸು;
 
-#ifdef FEAT_FIND_ID
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕಂಡುಹಿಡಿ_ID
 // Go to the first occurrence of the identifier under cursor along path in a
 // new window -- webb
-    case 'i':			    // Go to any match
-    case Ctrl_I:
-		type = FIND_ANY;
+    ಸ್ಥಿತಿ 'i':			    // Go to any match
+    ಸ್ಥಿತಿ Ctrl_I:
+		type = ಕಂಡುಹಿಡಿ_ANY;
 		// FALLTHROUGH
-    case 'd':			    // Go to definition, using 'define'
-    case Ctrl_D:
+    ಸ್ಥಿತಿ 'd':			    // Go to definition, using 'define'
+    ಸ್ಥಿತಿ Ctrl_D:
 		CHECK_CMDWIN;
-		if ((len = find_ident_under_cursor(&ptr, FIND_IDENT)) == 0)
-		    break;
+		ಆದರೆ ((len = ಕಂಡುಹಿಡಿ_ident_under_cursor(&ptr, ಕಂಡುಹಿಡಿ_IDENT)) == 0)
+		    ನಿಲ್ಲಿಸು;
 
 		// Make a copy, if the line was changed it will be freed.
 		ptr = vim_strnsave(ptr, len);
-		if (ptr == NULL)
-		    break;
+		ಆದರೆ (ptr == ಖಾಲಿ)
+		    ನಿಲ್ಲಿಸು;
 
-		find_pattern_in_path(ptr, 0, len, TRUE,
+		ಕಂಡುಹಿಡಿ_ನಮೂನೆ_ಒಳ_ಮಾರ್ಗ(ptr, 0, len, TRUE,
 			Prenum == 0 ? TRUE : FALSE, type,
-			Prenum1, ACTION_SPLIT, (linenr_T)1, (linenr_T)MAXLNUM,
+			Prenum1, ACTION_ವಿಭಜಿಸು, (linenr_T)1, (linenr_T)MAXLNUM,
 			FALSE, FALSE);
 		vim_free(ptr);
-		curwin->w_set_curswant = true;
-		break;
-#endif
+		curwin->w_ಗಣ_curswant = true;
+		ನಿಲ್ಲಿಸು;
+#ಆದರೆ_ಅಂತ್ಯ
 
 // Quickfix window only: view the result under the cursor in a new split.
-#if defined(FEAT_QUICKFIX)
-    case K_KENTER:
-    case CAR:
-		if (bt_quickfix(curbuf))
-		    qf_view_result(TRUE);
-		break;
-#endif
+#ಆದರೆ defined(FEAT_QUICKFIX)
+    ಸ್ಥಿತಿ K_KENTER:
+    ಸ್ಥಿತಿ CAR:
+		ಆದರೆ (bt_quickfix(curbuf))
+		    qf_view_ಫಲಿತಾಂಶ(TRUE);
+		ನಿಲ್ಲಿಸು;
+#ಆದರೆ_ಅಂತ್ಯ
 
 // CTRL-W g  extended commands
-    case 'g':
-    case Ctrl_G:
+    ಸ್ಥಿತಿ 'g':
+    ಸ್ಥಿತಿ Ctrl_G:
 		CHECK_CMDWIN;
-#ifdef USE_ON_FLY_SCROLL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_ON_FLY_SCROLL
 		dont_scroll = TRUE;		// disallow scrolling here
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		++no_mapping;
-		++allow_keys;   // no mapping for xchar, but allow key codes
-		if (xchar == NUL)
+		++allow_ಕೀಲಿಗಳು;   // no mapping for xchar, but allow key codes
+		ಆದರೆ (xchar == NUL)
 		    xchar = plain_vgetc();
 		LANGMAP_ADJUST(xchar, TRUE);
 		--no_mapping;
-		--allow_keys;
-		(void)add_to_showcmd(xchar);
+		--allow_ಕೀಲಿಗಳು;
+		(ಶೂನ್ಯ)ಕೂಡಿಸು_ಗಮ್ಯ_showcmd(xchar);
 
-		switch (xchar)
+		ಆಯ್ಕೆ (xchar)
 		{
-#if defined(FEAT_QUICKFIX)
-		    case '}':
+#ಆದರೆ defined(FEAT_QUICKFIX)
+		    ಸ್ಥಿತಿ '}':
 			xchar = Ctrl_RSB;
-			if (Prenum)
+			ಆದರೆ (Prenum)
 			    g_do_tagpreview = Prenum;
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			    g_do_tagpreview = p_pvh;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 			// FALLTHROUGH
-		    case ']':
-		    case Ctrl_RSB:
+		    ಸ್ಥಿತಿ ']':
+		    ಸ್ಥಿತಿ Ctrl_RSB:
 			// keep Visual mode, can select words to use as a tag
-			if (Prenum)
-			    postponed_split = Prenum;
-			else
-			    postponed_split = -1;
+			ಆದರೆ (Prenum)
+			    postponed_ವಿಭಜಿಸು = Prenum;
+			ಇಲ್ಲದಿದ್ದರೆ
+			    postponed_ವಿಭಜಿಸು = -1;
 
 			// Execute the command right here, required when
 			// "wincmd g}" was used in a function.
 			do_nv_ident('g', xchar);
-			postponed_split = 0;
-			break;
+			postponed_ವಿಭಜಿಸು = 0;
+			ನಿಲ್ಲಿಸು;
 
-		    case 'f':	    // CTRL-W gf: "gf" in a new tab page
-		    case 'F':	    // CTRL-W gF: "gF" in a new tab page
-			cmdmod.cmod_tab = tabpage_index(curtab) + 1;
+		    ಸ್ಥಿತಿ 'f':	    // CTRL-W gf: "gf" in a new tab page
+		    ಸ್ಥಿತಿ 'F':	    // CTRL-W gF: "gF" in a new tab page
+			cmdmod.cmod_tab = tabpage_ಸೂಚ್ಯಂಕ(curtab) + 1;
 			nchar = xchar;
-			goto wingotofile;
+			ಹೋಗು wingotofile;
 
-		    case 't':	    // CTRL-W gt: go to next tab page
-			goto_tabpage((int)Prenum);
-			break;
+		    ಸ್ಥಿತಿ 't':	    // CTRL-W gt: go to next tab page
+			goto_tabpage((ಪೂರ್ಣಾಂಕ)Prenum);
+			ನಿಲ್ಲಿಸು;
 
-		    case 'T':	    // CTRL-W gT: go to previous tab page
-			goto_tabpage(-(int)Prenum1);
-			break;
+		    ಸ್ಥಿತಿ 'T':	    // CTRL-W gT: go to previous tab page
+			goto_tabpage(-(ಪೂರ್ಣಾಂಕ)Prenum1);
+			ನಿಲ್ಲಿಸು;
 
-		    case TAB:	    // CTRL-W g<Tab>: go to last used tab page
-			if (goto_tabpage_lastused() == FAIL)
+		    ಸ್ಥಿತಿ TAB:	    // CTRL-W g<Tab>: go to last used tab page
+			ಆದರೆ (goto_tabpage_lastused() == FAIL)
 			    beep_flush();
-			break;
+			ನಿಲ್ಲಿಸು;
 
-		    default:
+		    ಪೂರ್ವನಿಯೋಜಿತ:
 			beep_flush();
-			break;
+			ನಿಲ್ಲಿಸು;
 		}
-		break;
+		ನಿಲ್ಲಿಸು;
 
-    default:	beep_flush();
-		break;
+    ಪೂರ್ವನಿಯೋಜಿತ:	beep_flush();
+		ನಿಲ್ಲಿಸು;
     }
 }
 
 /*
  * Figure out the address type for ":wincmd".
  */
-    void
+    ಶೂನ್ಯ
 get_wincmd_addr_type(char_u *arg, exarg_T *eap)
 {
-    switch (*arg)
+    ಆಯ್ಕೆ (*arg)
     {
-    case 'S':
-    case Ctrl_S:
-    case 's':
-    case Ctrl_N:
-    case 'n':
-    case 'j':
-    case Ctrl_J:
-    case 'k':
-    case Ctrl_K:
-    case 'T':
-    case Ctrl_R:
-    case 'r':
-    case 'R':
-    case 'K':
-    case 'J':
-    case '+':
-    case '-':
-    case Ctrl__:
-    case '_':
-    case '|':
-    case ']':
-    case Ctrl_RSB:
-    case 'g':
-    case Ctrl_G:
-    case Ctrl_V:
-    case 'v':
-    case 'h':
-    case Ctrl_H:
-    case 'l':
-    case Ctrl_L:
-    case 'H':
-    case 'L':
-    case '>':
-    case '<':
-#if defined(FEAT_QUICKFIX)
-    case '}':
-#endif
-    case 'f':
-    case 'F':
-    case Ctrl_F:
-#ifdef FEAT_FIND_ID
-    case 'i':
-    case Ctrl_I:
-    case 'd':
-    case Ctrl_D:
-#endif
+    ಸ್ಥಿತಿ 'S':
+    ಸ್ಥಿತಿ Ctrl_S:
+    ಸ್ಥಿತಿ 's':
+    ಸ್ಥಿತಿ Ctrl_N:
+    ಸ್ಥಿತಿ 'n':
+    ಸ್ಥಿತಿ 'j':
+    ಸ್ಥಿತಿ Ctrl_J:
+    ಸ್ಥಿತಿ 'k':
+    ಸ್ಥಿತಿ Ctrl_K:
+    ಸ್ಥಿತಿ 'T':
+    ಸ್ಥಿತಿ Ctrl_R:
+    ಸ್ಥಿತಿ 'r':
+    ಸ್ಥಿತಿ 'R':
+    ಸ್ಥಿತಿ 'K':
+    ಸ್ಥಿತಿ 'J':
+    ಸ್ಥಿತಿ '+':
+    ಸ್ಥಿತಿ '-':
+    ಸ್ಥಿತಿ Ctrl__:
+    ಸ್ಥಿತಿ '_':
+    ಸ್ಥಿತಿ '|':
+    ಸ್ಥಿತಿ ']':
+    ಸ್ಥಿತಿ Ctrl_RSB:
+    ಸ್ಥಿತಿ 'g':
+    ಸ್ಥಿತಿ Ctrl_G:
+    ಸ್ಥಿತಿ Ctrl_V:
+    ಸ್ಥಿತಿ 'v':
+    ಸ್ಥಿತಿ 'h':
+    ಸ್ಥಿತಿ Ctrl_H:
+    ಸ್ಥಿತಿ 'l':
+    ಸ್ಥಿತಿ Ctrl_L:
+    ಸ್ಥಿತಿ 'H':
+    ಸ್ಥಿತಿ 'L':
+    ಸ್ಥಿತಿ '>':
+    ಸ್ಥಿತಿ '<':
+#ಆದರೆ defined(FEAT_QUICKFIX)
+    ಸ್ಥಿತಿ '}':
+#ಆದರೆ_ಅಂತ್ಯ
+    ಸ್ಥಿತಿ 'f':
+    ಸ್ಥಿತಿ 'F':
+    ಸ್ಥಿತಿ Ctrl_F:
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕಂಡುಹಿಡಿ_ID
+    ಸ್ಥಿತಿ 'i':
+    ಸ್ಥಿತಿ Ctrl_I:
+    ಸ್ಥಿತಿ 'd':
+    ಸ್ಥಿತಿ Ctrl_D:
+#ಆದರೆ_ಅಂತ್ಯ
 		// window size or any count
 		eap->addr_type = ADDR_OTHER;
-		break;
+		ನಿಲ್ಲಿಸು;
 
-    case Ctrl_HAT:
-    case '^':
+    ಸ್ಥಿತಿ Ctrl_HAT:
+    ಸ್ಥಿತಿ '^':
 		// buffer number
 		eap->addr_type = ADDR_BUFFERS;
-		break;
+		ನಿಲ್ಲಿಸು;
 
-    case Ctrl_Q:
-    case 'q':
-    case Ctrl_C:
-    case 'c':
-    case Ctrl_O:
-    case 'o':
-    case Ctrl_W:
-    case 'w':
-    case 'W':
-    case 'x':
-    case Ctrl_X:
+    ಸ್ಥಿತಿ Ctrl_Q:
+    ಸ್ಥಿತಿ 'q':
+    ಸ್ಥಿತಿ Ctrl_C:
+    ಸ್ಥಿತಿ 'c':
+    ಸ್ಥಿತಿ Ctrl_O:
+    ಸ್ಥಿತಿ 'o':
+    ಸ್ಥಿತಿ Ctrl_W:
+    ಸ್ಥಿತಿ 'w':
+    ಸ್ಥಿತಿ 'W':
+    ಸ್ಥಿತಿ 'x':
+    ಸ್ಥಿತಿ Ctrl_X:
 		// window number
 		eap->addr_type = ADDR_WINDOWS;
-		break;
+		ನಿಲ್ಲಿಸು;
 
-#if defined(FEAT_QUICKFIX)
-    case Ctrl_Z:
-    case 'z':
-    case 'P':
-#endif
-    case 't':
-    case Ctrl_T:
-    case 'b':
-    case Ctrl_B:
-    case 'p':
-    case Ctrl_P:
-    case '=':
-    case CAR:
+#ಆದರೆ defined(FEAT_QUICKFIX)
+    ಸ್ಥಿತಿ Ctrl_Z:
+    ಸ್ಥಿತಿ 'z':
+    ಸ್ಥಿತಿ 'P':
+#ಆದರೆ_ಅಂತ್ಯ
+    ಸ್ಥಿತಿ 't':
+    ಸ್ಥಿತಿ Ctrl_T:
+    ಸ್ಥಿತಿ 'b':
+    ಸ್ಥಿತಿ Ctrl_B:
+    ಸ್ಥಿತಿ 'p':
+    ಸ್ಥಿತಿ Ctrl_P:
+    ಸ್ಥಿತಿ '=':
+    ಸ್ಥಿತಿ CAR:
 		// no count
 		eap->addr_type = ADDR_NONE;
-		break;
+		ನಿಲ್ಲಿಸು;
     }
 }
 
-    static void
-cmd_with_count(
-    char	*cmd,
+    ಸ್ಥಿರ ಶೂನ್ಯ
+cmd_with_ಎಣಿಕೆ(
+    ಅಕ್ಷರ	*cmd,
     char_u	*bufp,
     size_t	bufsize,
-    long	Prenum)
+    ದೀರ್ಘ	Prenum)
 {
-    if (Prenum > 0)
-	vim_snprintf((char *)bufp, bufsize, "%s %ld", cmd, Prenum);
-    else
+    ಆದರೆ (Prenum > 0)
+	vim_snprintf((ಅಕ್ಷರ *)bufp, bufsize, "%s %ld", cmd, Prenum);
+    ಇಲ್ಲದಿದ್ದರೆ
 	STRCPY(bufp, cmd);
 }
 
@@ -935,20 +935,20 @@ cmd_with_count(
  * If "split_disallowed" is set, or "wp"'s buffer is closing, give an error and
  * return FAIL.  Otherwise return OK.
  */
-    int
-check_split_disallowed(win_T *wp)
+    ಪೂರ್ಣಾಂಕ
+check_ವಿಭಜಿಸು_disallowed(win_T *wp)
 {
-    if (split_disallowed > 0)
+    ಆದರೆ (ವಿಭಜಿಸು_disallowed > 0)
     {
-	emsg(_(e_cant_split_window_while_closing_another));
-	return FAIL;
+	emsg(_(e_cant_ವಿಭಜಿಸು_ಕಿಟಕಿ_while_closing_another));
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-    if (wp->w_buffer->b_locked_split)
+    ಆದರೆ (wp->w_ಬಫರ್->b_locked_ವಿಭಜಿಸು)
     {
-	emsg(_(e_cannot_split_window_when_closing_buffer));
-	return FAIL;
+	emsg(_(e_cannot_ವಿಭಜಿಸು_ಕಿಟಕಿ_when_closing_ಬಫರ್));
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
@@ -966,40 +966,40 @@ check_split_disallowed(win_T *wp)
  *
  * return FAIL for failure, OK otherwise
  */
-    int
-win_split(int size, int flags)
+    ಪೂರ್ಣಾಂಕ
+win_ವಿಭಜಿಸು(ಪೂರ್ಣಾಂಕ ಗಾತ್ರ_2, ಪೂರ್ಣಾಂಕ flags)
 {
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return FAIL;
+    ಆದರೆ (ERROR_IF_ANY_POPUP_ಕಿಟಕಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    if (check_split_disallowed(curwin) == FAIL)
-	return FAIL;
+    ಆದರೆ (check_ವಿಭಜಿಸು_disallowed(curwin) == FAIL)
+	ಹಿಂತಿರುಗಿ FAIL;
 
     // When the ":tab" modifier was used open a new tab page instead.
-    if (may_open_tabpage() == OK)
-	return OK;
+    ಆದರೆ (may_open_tabpage() == OK)
+	ಹಿಂತಿರುಗಿ OK;
 
     // Add flags from ":vertical", ":topleft" and ":botright".
-    flags |= cmdmod.cmod_split;
-    if ((flags & WSP_TOP) && (flags & WSP_BOT))
+    flags |= cmdmod.cmod_ವಿಭಜಿಸು;
+    ಆದರೆ ((flags & WSP_ತುದಿ) && (flags & WSP_BOT))
     {
-	emsg(_(e_cant_split_topleft_and_botright_at_the_same_time));
-	return FAIL;
+	emsg(_(e_cant_ವಿಭಜಿಸು_topleft_and_botright_at_the_same_ಸಮಯ));
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
     // When creating the help window make a snapshot of the window layout.
     // Otherwise clear the snapshot, it's now invalid.
-    if (flags & WSP_HELP)
+    ಆದರೆ (flags & WSP_HELP)
 	make_snapshot(SNAP_HELP_IDX);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	clear_snapshot(curtab, SNAP_HELP_IDX);
 
-    if (flags & WSP_QUICKFIX)
+    ಆದರೆ (flags & WSP_QUICKFIX)
 	make_snapshot(SNAP_QUICKFIX_IDX);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	clear_snapshot(curtab, SNAP_QUICKFIX_IDX);
 
-    return win_split_ins(size, flags, NULL, 0, NULL);
+    ಹಿಂತಿರುಗಿ win_ವಿಭಜಿಸು_ins(ಗಾತ್ರ_2, flags, ಖಾಲಿ, 0, ಖಾಲಿ);
 }
 
 /*
@@ -1013,67 +1013,67 @@ win_split(int size, int flags)
  * window layout or sizes.
  * Return FAIL for failure, OK otherwise.
  */
-    int
-win_split_ins(
-    int		size,
-    int		flags,
+    ಪೂರ್ಣಾಂಕ
+win_ವಿಭಜಿಸು_ins(
+    ಪೂರ್ಣಾಂಕ		ಗಾತ್ರ_2,
+    ಪೂರ್ಣಾಂಕ		flags,
     win_T	*new_wp,
-    int		dir,
-    frame_T	*to_flatten)
+    ಪೂರ್ಣಾಂಕ		dir,
+    ಚೌಕಟ್ಟು_T	*ಗಮ್ಯ_flatten)
 {
     win_T	*wp = new_wp;
     win_T	*oldwin;
-    int		new_size = size;
-    int		i;
-    int		need_status = 0;
-    int		do_equal = FALSE;
-    int		needed;
-    int		available;
-    int		oldwin_height = 0;
-    int		layout;
-    frame_T	*frp, *curfrp, *frp2, *prevfrp;
-    int		before;
-    int		minheight;
-    int		wmh1;
-    int		did_set_fraction = FALSE;
-    int		retval = FAIL;
+    ಪೂರ್ಣಾಂಕ		new_ಗಾತ್ರ = ಗಾತ್ರ_2;
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		need_ಸ್ಥಿತಿ = 0;
+    ಪೂರ್ಣಾಂಕ		do_equal = FALSE;
+    ಪೂರ್ಣಾಂಕ		needed;
+    ಪೂರ್ಣಾಂಕ		ಲಭ್ಯ;
+    ಪೂರ್ಣಾಂಕ		oldwin_ಎತ್ತರ = 0;
+    ಪೂರ್ಣಾಂಕ		layout;
+    ಚೌಕಟ್ಟು_T	*frp, *curfrp, *frp2, *prevfrp;
+    ಪೂರ್ಣಾಂಕ		before;
+    ಪೂರ್ಣಾಂಕ		minheight;
+    ಪೂರ್ಣಾಂಕ		wmh1;
+    ಪೂರ್ಣಾಂಕ		did_ಗಣ_fraction = FALSE;
+    ಪೂರ್ಣಾಂಕ		retval = FAIL;
 
     // Do not redraw here, curwin->w_buffer may be invalid.
     ++RedrawingDisabled;
 
-    if (new_wp == NULL)
+    ಆದರೆ (new_wp == ಖಾಲಿ)
 	trigger_winnewpre();
 
-    if (flags & WSP_TOP)
+    ಆದರೆ (flags & WSP_ತುದಿ)
 	oldwin = firstwin;
-    else if (flags & WSP_BOT)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (flags & WSP_BOT)
 	oldwin = lastwin;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	oldwin = curwin;
 
     // add a status line when p_ls == 1 and splitting the first window
-    if (ONE_WINDOW && p_ls == 1 && oldwin->w_status_height == 0)
+    ಆದರೆ (ONE_ಕಿಟಕಿ && p_ls == 1 && oldwin->w_ಸ್ಥಿತಿ_ಎತ್ತರ == 0)
     {
-	if (!(flags & WSP_FORCE_ROOM) && VISIBLE_HEIGHT(oldwin) <= p_wmh)
+	ಆದರೆ (!(flags & WSP_FORCE_ಸ್ಥಳ) && VISIBLE_ಎತ್ತರ(oldwin) <= p_wmh)
 	{
-	    emsg(_(e_not_enough_room));
-	    goto theend;
+	    emsg(_(e_not_enough_ಸ್ಥಳ));
+	    ಹೋಗು theend;
 	}
-	need_status = statusline_height(oldwin);
+	need_ಸ್ಥಿತಿ = statusline_ಎತ್ತರ(oldwin);
     }
 
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
     // May be needed for the scrollbars that are going to change.
-    if (gui.in_use)
-	out_flush();
-#endif
+    ಆದರೆ (gui.ಒಳ_use)
+	ಹೊರಹೋಗು_flush();
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (flags & WSP_VERT)
+    ಆದರೆ (flags & WSP_VERT)
     {
-	int	wmw1;
-	int	minwidth;
+	ಪೂರ್ಣಾಂಕ	wmw1;
+	ಪೂರ್ಣಾಂಕ	minwidth;
 
-	layout = FR_ROW;
+	layout = FR_ಅಡ್ಡಸಾಲು;
 
 	/*
 	 * Check if we are able to split the current window and compute its
@@ -1082,186 +1082,186 @@ win_split_ins(
 	// Current window requires at least 1 space.
 	wmw1 = (p_wmw == 0 ? 1 : p_wmw);
 	needed = wmw1 + 1;
-	if (flags & WSP_ROOM)
+	ಆದರೆ (flags & WSP_ಸ್ಥಳ)
 	    needed += p_wiw - wmw1;
-	if (flags & (WSP_BOT | WSP_TOP))
+	ಆದರೆ (flags & (WSP_BOT | WSP_ತುದಿ))
 	{
-	    minwidth = frame_minwidth(topframe, NOWIN);
-	    available = topframe->fr_width;
+	    minwidth = ಚೌಕಟ್ಟು_minwidth(topframe, NOWIN);
+	    ಲಭ್ಯ = topframe->fr_ಅಗಲ;
 	    needed += minwidth;
 	}
-	else if (p_ea)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p_ea)
 	{
-	    minwidth = frame_minwidth(oldwin->w_frame, NOWIN);
-	    prevfrp = oldwin->w_frame;
-	    for (frp = oldwin->w_frame->fr_parent; frp != NULL;
-							frp = frp->fr_parent)
+	    minwidth = ಚೌಕಟ್ಟು_minwidth(oldwin->w_ಚೌಕಟ್ಟು, NOWIN);
+	    prevfrp = oldwin->w_ಚೌಕಟ್ಟು;
+	    ಗಾಗಿ (frp = oldwin->w_ಚೌಕಟ್ಟು->fr_ಪೋಷಕ; frp != ಖಾಲಿ;
+							frp = frp->fr_ಪೋಷಕ)
 	    {
-		if (frp->fr_layout == FR_ROW)
-		    FOR_ALL_FRAMES(frp2, frp->fr_child)
-			if (frp2 != prevfrp)
-			    minwidth += frame_minwidth(frp2, NOWIN);
+		ಆದರೆ (frp->fr_layout == FR_ಅಡ್ಡಸಾಲು)
+		    FOR_ALL_ಚೌಕಟ್ಟುಗಳು(frp2, frp->fr_ಮಗು)
+			ಆದರೆ (frp2 != prevfrp)
+			    minwidth += ಚೌಕಟ್ಟು_minwidth(frp2, NOWIN);
 		prevfrp = frp;
 	    }
-	    available = topframe->fr_width;
+	    ಲಭ್ಯ = topframe->fr_ಅಗಲ;
 	    needed += minwidth;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    minwidth = frame_minwidth(oldwin->w_frame, NOWIN);
-	    available = oldwin->w_frame->fr_width;
+	    minwidth = ಚೌಕಟ್ಟು_minwidth(oldwin->w_ಚೌಕಟ್ಟು, NOWIN);
+	    ಲಭ್ಯ = oldwin->w_ಚೌಕಟ್ಟು->fr_ಅಗಲ;
 	    needed += minwidth;
 	}
-	if (!(flags & WSP_FORCE_ROOM) && available < needed)
+	ಆದರೆ (!(flags & WSP_FORCE_ಸ್ಥಳ) && ಲಭ್ಯ < needed)
 	{
-	    emsg(_(e_not_enough_room));
-	    goto theend;
+	    emsg(_(e_not_enough_ಸ್ಥಳ));
+	    ಹೋಗು theend;
 	}
-	if (new_size == 0)
-	    new_size = oldwin->w_width / 2;
-	if (new_size > available - minwidth - 1)
-	    new_size = available - minwidth - 1;
-	if (new_size < wmw1)
-	    new_size = wmw1;
+	ಆದರೆ (new_ಗಾತ್ರ == 0)
+	    new_ಗಾತ್ರ = oldwin->w_ಅಗಲ / 2;
+	ಆದರೆ (new_ಗಾತ್ರ > ಲಭ್ಯ - minwidth - 1)
+	    new_ಗಾತ್ರ = ಲಭ್ಯ - minwidth - 1;
+	ಆದರೆ (new_ಗಾತ್ರ < wmw1)
+	    new_ಗಾತ್ರ = wmw1;
 
 	// if it doesn't fit in the current window, need win_equal()
-	if (oldwin->w_width - new_size - 1 < p_wmw)
+	ಆದರೆ (oldwin->w_ಅಗಲ - new_ಗಾತ್ರ - 1 < p_wmw)
 	    do_equal = TRUE;
 
 	// We don't like to take lines for the new window from a
 	// 'winfixwidth' window.  Take them from a window to the left or right
 	// instead, if possible. Add one for the separator.
-	if (oldwin->w_p_wfw)
-	    win_setwidth_win(oldwin->w_width + new_size + 1, oldwin);
+	ಆದರೆ (oldwin->w_p_wfw)
+	    win_setwidth_win(oldwin->w_ಅಗಲ + new_ಗಾತ್ರ + 1, oldwin);
 
 	// Make all windows the same width if 'equalalways' is set, 'ead'
 	// not set to 'v', a size was not provided and there is a parent frame.
-	if (!do_equal && p_ea && size == 0 && *p_ead != 'v'
-	    && oldwin->w_frame->fr_parent != NULL)
+	ಆದರೆ (!do_equal && p_ea && ಗಾತ್ರ_2 == 0 && *p_ead != 'v'
+	    && oldwin->w_ಚೌಕಟ್ಟು->fr_ಪೋಷಕ != ಖಾಲಿ)
 	    do_equal = TRUE;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	layout = FR_COL;
+	layout = FR_ಲಂಬಸಾಲು;
 
 	/*
 	 * Check if we are able to split the current window and compute its
 	 * height.
 	 */
 	// Current window requires at least 1 space.
-	wmh1 = (p_wmh == 0 ? 1 : p_wmh) + WINBAR_HEIGHT(curwin);
-	needed = wmh1 + statusline_height(oldwin);
-	if (flags & WSP_ROOM)
+	wmh1 = (p_wmh == 0 ? 1 : p_wmh) + WINBAR_ಎತ್ತರ(curwin);
+	needed = wmh1 + statusline_ಎತ್ತರ(oldwin);
+	ಆದರೆ (flags & WSP_ಸ್ಥಳ)
 	    needed += p_wh - wmh1;
-	if (flags & (WSP_BOT | WSP_TOP))
+	ಆದರೆ (flags & (WSP_BOT | WSP_ತುದಿ))
 	{
-	    minheight = frame_minheight(topframe, NOWIN) + need_status;
-	    available = topframe->fr_height;
+	    minheight = ಚೌಕಟ್ಟು_minheight(topframe, NOWIN) + need_ಸ್ಥಿತಿ;
+	    ಲಭ್ಯ = topframe->fr_ಎತ್ತರ;
 	    needed += minheight;
 	}
-	else if (p_ea)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p_ea)
 	{
-	    minheight = frame_minheight(oldwin->w_frame, NOWIN) + need_status;
-	    prevfrp = oldwin->w_frame;
-	    for (frp = oldwin->w_frame->fr_parent; frp != NULL;
-							frp = frp->fr_parent)
+	    minheight = ಚೌಕಟ್ಟು_minheight(oldwin->w_ಚೌಕಟ್ಟು, NOWIN) + need_ಸ್ಥಿತಿ;
+	    prevfrp = oldwin->w_ಚೌಕಟ್ಟು;
+	    ಗಾಗಿ (frp = oldwin->w_ಚೌಕಟ್ಟು->fr_ಪೋಷಕ; frp != ಖಾಲಿ;
+							frp = frp->fr_ಪೋಷಕ)
 	    {
-		if (frp->fr_layout == FR_COL)
-		    FOR_ALL_FRAMES(frp2, frp->fr_child)
-			if (frp2 != prevfrp)
-			    minheight += frame_minheight(frp2, NOWIN);
+		ಆದರೆ (frp->fr_layout == FR_ಲಂಬಸಾಲು)
+		    FOR_ALL_ಚೌಕಟ್ಟುಗಳು(frp2, frp->fr_ಮಗು)
+			ಆದರೆ (frp2 != prevfrp)
+			    minheight += ಚೌಕಟ್ಟು_minheight(frp2, NOWIN);
 		prevfrp = frp;
 	    }
-	    available = topframe->fr_height;
+	    ಲಭ್ಯ = topframe->fr_ಎತ್ತರ;
 	    needed += minheight;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    minheight = frame_minheight(oldwin->w_frame, NOWIN) + need_status;
-	    available = oldwin->w_frame->fr_height;
+	    minheight = ಚೌಕಟ್ಟು_minheight(oldwin->w_ಚೌಕಟ್ಟು, NOWIN) + need_ಸ್ಥಿತಿ;
+	    ಲಭ್ಯ = oldwin->w_ಚೌಕಟ್ಟು->fr_ಎತ್ತರ;
 	    needed += minheight;
 	}
-	if (!(flags & WSP_FORCE_ROOM) && available < needed)
+	ಆದರೆ (!(flags & WSP_FORCE_ಸ್ಥಳ) && ಲಭ್ಯ < needed)
 	{
-	    emsg(_(e_not_enough_room));
-	    goto theend;
+	    emsg(_(e_not_enough_ಸ್ಥಳ));
+	    ಹೋಗು theend;
 	}
-	oldwin_height = oldwin->w_height;
-	if (need_status)
+	oldwin_ಎತ್ತರ = oldwin->w_ಎತ್ತರ;
+	ಆದರೆ (need_ಸ್ಥಿತಿ)
 	{
-	    oldwin->w_status_height = statusline_height(oldwin);
-	    oldwin_height -= oldwin->w_status_height;
+	    oldwin->w_ಸ್ಥಿತಿ_ಎತ್ತರ = statusline_ಎತ್ತರ(oldwin);
+	    oldwin_ಎತ್ತರ -= oldwin->w_ಸ್ಥಿತಿ_ಎತ್ತರ;
 	}
 	// Estimated stl height for the new window.
-	int new_win_stlh = need_status != 0 ? need_status
-			: statusline_height(new_wp != NULL ? new_wp : curwin);
-	if (new_size == 0)
-	    new_size = (oldwin_height - new_win_stlh + 1) / 2;
-	if (new_size > available - minheight - new_win_stlh)
-	    new_size = available - minheight - new_win_stlh;
-	if (new_size < wmh1)
-	    new_size = wmh1;
+	ಪೂರ್ಣಾಂಕ new_win_stlh = need_ಸ್ಥಿತಿ != 0 ? need_ಸ್ಥಿತಿ
+			: statusline_ಎತ್ತರ(new_wp != ಖಾಲಿ ? new_wp : curwin);
+	ಆದರೆ (new_ಗಾತ್ರ == 0)
+	    new_ಗಾತ್ರ = (oldwin_ಎತ್ತರ - new_win_stlh + 1) / 2;
+	ಆದರೆ (new_ಗಾತ್ರ > ಲಭ್ಯ - minheight - new_win_stlh)
+	    new_ಗಾತ್ರ = ಲಭ್ಯ - minheight - new_win_stlh;
+	ಆದರೆ (new_ಗಾತ್ರ < wmh1)
+	    new_ಗಾತ್ರ = wmh1;
 
 	// if it doesn't fit in the current window, need win_equal()
-	if (oldwin_height - new_size - new_win_stlh < p_wmh)
+	ಆದರೆ (oldwin_ಎತ್ತರ - new_ಗಾತ್ರ - new_win_stlh < p_wmh)
 	    do_equal = TRUE;
 
 	// We don't like to take lines for the new window from a
 	// 'winfixheight' window.  Take them from a window above or below
 	// instead, if possible.
-	if (oldwin->w_p_wfh)
+	ಆದರೆ (oldwin->w_p_wfh)
 	{
 	    // Set w_fraction now so that the cursor keeps the same relative
 	    // vertical position using the old height.
-	    set_fraction(oldwin);
-	    did_set_fraction = TRUE;
+	    ಗಣ_fraction(oldwin);
+	    did_ಗಣ_fraction = TRUE;
 
-	    win_setheight_win(oldwin->w_height + new_size
-		    + statusline_height(oldwin), oldwin);
+	    win_setheight_win(oldwin->w_ಎತ್ತರ + new_ಗಾತ್ರ
+		    + statusline_ಎತ್ತರ(oldwin), oldwin);
 	    // w_height now excludes the status line
-	    oldwin_height = oldwin->w_height;
+	    oldwin_ಎತ್ತರ = oldwin->w_ಎತ್ತರ;
 	}
 
 	// Make all windows the same height if 'equalalways' is set, 'ead' is
 	// not set to 'h', a size was not provided and there is a parent frame.
-	if (!do_equal && p_ea && size == 0 && *p_ead != 'h'
-	    && oldwin->w_frame->fr_parent != NULL)
+	ಆದರೆ (!do_equal && p_ea && ಗಾತ್ರ_2 == 0 && *p_ead != 'h'
+	    && oldwin->w_ಚೌಕಟ್ಟು->fr_ಪೋಷಕ != ಖಾಲಿ)
 	    do_equal = TRUE;
     }
 
     /*
      * allocate new window structure and link it in the window list
      */
-    if ((flags & WSP_TOP) == 0
+    ಆದರೆ ((flags & WSP_ತುದಿ) == 0
 	    && ((flags & WSP_BOT)
-		|| (flags & WSP_BELOW)
+		|| (flags & WSP_ಕೆಳಗೆ)
 		|| (!(flags & WSP_ABOVE)
 		    && ( (flags & WSP_VERT) ? p_spr : p_sb))))
     {
 	// new window below/right of current one
-	if (new_wp == NULL)
+	ಆದರೆ (new_wp == ಖಾಲಿ)
 	    wp = win_alloc(oldwin, FALSE);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    win_append(oldwin, wp);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (new_wp == NULL)
+	ಆದರೆ (new_wp == ಖಾಲಿ)
 	    wp = win_alloc(oldwin->w_prev, FALSE);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    win_append(oldwin->w_prev, wp);
     }
 
-    if (new_wp == NULL)
+    ಆದರೆ (new_wp == ಖಾಲಿ)
     {
-	if (wp == NULL)
-	    goto theend;
+	ಆದರೆ (wp == ಖಾಲಿ)
+	    ಹೋಗು theend;
 
-	new_frame(wp);
-	if (wp->w_frame == NULL)
+	new_ಚೌಕಟ್ಟು(wp);
+	ಆದರೆ (wp->w_ಚೌಕಟ್ಟು == ಖಾಲಿ)
 	{
-	    win_free(wp, NULL);
-	    goto theend;
+	    win_free(wp, ಖಾಲಿ);
+	    ಹೋಗು theend;
 	}
 
 	// make the contents of the new window the same as the current one
@@ -1269,206 +1269,206 @@ win_split_ins(
     }
 
     // Going to reorganize frames now, make sure they're flat.
-    if (to_flatten != NULL)
-	frame_flatten(to_flatten);
+    ಆದರೆ (ಗಮ್ಯ_flatten != ಖಾಲಿ)
+	ಚೌಕಟ್ಟು_flatten(ಗಮ್ಯ_flatten);
 
     /*
      * Reorganise the tree of frames to insert the new window.
      */
-    if (flags & (WSP_TOP | WSP_BOT))
+    ಆದರೆ (flags & (WSP_ತುದಿ | WSP_BOT))
     {
-	if ((topframe->fr_layout == FR_COL && (flags & WSP_VERT) == 0)
-	    || (topframe->fr_layout == FR_ROW && (flags & WSP_VERT) != 0))
+	ಆದರೆ ((topframe->fr_layout == FR_ಲಂಬಸಾಲು && (flags & WSP_VERT) == 0)
+	    || (topframe->fr_layout == FR_ಅಡ್ಡಸಾಲು && (flags & WSP_VERT) != 0))
 	{
-	    curfrp = topframe->fr_child;
-	    if (flags & WSP_BOT)
-		while (curfrp->fr_next != NULL)
-		    curfrp = curfrp->fr_next;
+	    curfrp = topframe->fr_ಮಗು;
+	    ಆದರೆ (flags & WSP_BOT)
+		ಆಗ (curfrp->fr_ಮುಂದಿನ != ಖಾಲಿ)
+		    curfrp = curfrp->fr_ಮುಂದಿನ;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    curfrp = topframe;
-	before = (flags & WSP_TOP);
+	before = (flags & WSP_ತುದಿ);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	curfrp = oldwin->w_frame;
-	if (flags & WSP_BELOW)
+	curfrp = oldwin->w_ಚೌಕಟ್ಟು;
+	ಆದರೆ (flags & WSP_ಕೆಳಗೆ)
 	    before = FALSE;
-	else if (flags & WSP_ABOVE)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (flags & WSP_ABOVE)
 	    before = TRUE;
-	else if (flags & WSP_VERT)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (flags & WSP_VERT)
 	    before = !p_spr;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    before = !p_sb;
     }
-    if (curfrp->fr_parent == NULL || curfrp->fr_parent->fr_layout != layout)
+    ಆದರೆ (curfrp->fr_ಪೋಷಕ == ಖಾಲಿ || curfrp->fr_ಪೋಷಕ->fr_layout != layout)
     {
 	// Need to create a new frame in the tree to make a branch.
-	frp = ALLOC_CLEAR_ONE(frame_T);
+	frp = ALLOC_CLEAR_ONE(ಚೌಕಟ್ಟು_T);
 	*frp = *curfrp;
 	curfrp->fr_layout = layout;
-	frp->fr_parent = curfrp;
-	frp->fr_next = NULL;
-	frp->fr_prev = NULL;
-	curfrp->fr_child = frp;
-	curfrp->fr_win = NULL;
+	frp->fr_ಪೋಷಕ = curfrp;
+	frp->fr_ಮುಂದಿನ = ಖಾಲಿ;
+	frp->fr_prev = ಖಾಲಿ;
+	curfrp->fr_ಮಗು = frp;
+	curfrp->fr_win = ಖಾಲಿ;
 	curfrp = frp;
-	if (frp->fr_win != NULL)
-	    oldwin->w_frame = frp;
-	else
-	    FOR_ALL_FRAMES(frp, frp->fr_child)
-		frp->fr_parent = curfrp;
+	ಆದರೆ (frp->fr_win != ಖಾಲಿ)
+	    oldwin->w_ಚೌಕಟ್ಟು = frp;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    FOR_ALL_ಚೌಕಟ್ಟುಗಳು(frp, frp->fr_ಮಗು)
+		frp->fr_ಪೋಷಕ = curfrp;
     }
 
-    if (new_wp == NULL)
-	frp = wp->w_frame;
-    else
-	frp = new_wp->w_frame;
-    frp->fr_parent = curfrp->fr_parent;
+    ಆದರೆ (new_wp == ಖಾಲಿ)
+	frp = wp->w_ಚೌಕಟ್ಟು;
+    ಇಲ್ಲದಿದ್ದರೆ
+	frp = new_wp->w_ಚೌಕಟ್ಟು;
+    frp->fr_ಪೋಷಕ = curfrp->fr_ಪೋಷಕ;
 
     // Insert the new frame at the right place in the frame list.
-    if (before)
-	frame_insert(curfrp, frp);
-    else
-	frame_append(curfrp, frp);
+    ಆದರೆ (before)
+	ಚೌಕಟ್ಟು_ಸೇರಿಸು(curfrp, frp);
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಚೌಕಟ್ಟು_append(curfrp, frp);
 
     // Set w_fraction now so that the cursor keeps the same relative
     // vertical position.
-    if (!did_set_fraction)
-	set_fraction(oldwin);
+    ಆದರೆ (!did_ಗಣ_fraction)
+	ಗಣ_fraction(oldwin);
     wp->w_fraction = oldwin->w_fraction;
 
-    if (flags & WSP_VERT)
+    ಆದರೆ (flags & WSP_VERT)
     {
 	wp->w_p_scr = curwin->w_p_scr;
 
-	if (need_status)
+	ಆದರೆ (need_ಸ್ಥಿತಿ)
 	{
-	    win_new_height(oldwin, oldwin->w_height - need_status);
-	    oldwin->w_status_height = need_status;
+	    win_new_ಎತ್ತರ(oldwin, oldwin->w_ಎತ್ತರ - need_ಸ್ಥಿತಿ);
+	    oldwin->w_ಸ್ಥಿತಿ_ಎತ್ತರ = need_ಸ್ಥಿತಿ;
 	}
-	if (flags & (WSP_TOP | WSP_BOT))
+	ಆದರೆ (flags & (WSP_ತುದಿ | WSP_BOT))
 	{
 	    // set height and row of new window to full height
 	    // no status line when 'laststatus' is zero
-	    int stl_height = p_ls > 0 ? statusline_height(curfrp->fr_win) : 0;
+	    ಪೂರ್ಣಾಂಕ stl_ಎತ್ತರ = p_ls > 0 ? statusline_ಎತ್ತರ(curfrp->fr_win) : 0;
 
-	    wp->w_winrow = tabline_height();
-	    win_new_height(wp, curfrp->fr_height - stl_height
-							  - WINBAR_HEIGHT(wp));
-	    wp->w_status_height = stl_height;
+	    wp->w_winrow = tabline_ಎತ್ತರ();
+	    win_new_ಎತ್ತರ(wp, curfrp->fr_ಎತ್ತರ - stl_ಎತ್ತರ
+							  - WINBAR_ಎತ್ತರ(wp));
+	    wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ = stl_ಎತ್ತರ;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // height and row of new window is same as current window
 	    wp->w_winrow = oldwin->w_winrow;
-	    win_new_height(wp, VISIBLE_HEIGHT(oldwin));
-	    wp->w_status_height = oldwin->w_status_height;
+	    win_new_ಎತ್ತರ(wp, VISIBLE_ಎತ್ತರ(oldwin));
+	    wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ = oldwin->w_ಸ್ಥಿತಿ_ಎತ್ತರ;
 	}
-	frp->fr_height = curfrp->fr_height;
+	frp->fr_ಎತ್ತರ = curfrp->fr_ಎತ್ತರ;
 
 	// "new_size" of the current window goes to the new window, use
 	// one column for the vertical separator
-	win_new_width(wp, new_size);
-	if (before)
-	    wp->w_vsep_width = 1;
-	else
+	win_new_ಅಗಲ(wp, new_ಗಾತ್ರ);
+	ಆದರೆ (before)
+	    wp->w_vsep_ಅಗಲ = 1;
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    wp->w_vsep_width = oldwin->w_vsep_width;
-	    oldwin->w_vsep_width = 1;
+	    wp->w_vsep_ಅಗಲ = oldwin->w_vsep_ಅಗಲ;
+	    oldwin->w_vsep_ಅಗಲ = 1;
 	}
-	if (flags & (WSP_TOP | WSP_BOT))
+	ಆದರೆ (flags & (WSP_ತುದಿ | WSP_BOT))
 	{
-	    if (flags & WSP_BOT)
-		frame_set_vsep(curfrp, TRUE);
+	    ಆದರೆ (flags & WSP_BOT)
+		ಚೌಕಟ್ಟು_ಗಣ_vsep(curfrp, TRUE);
 	    // Set width of neighbor frame
-	    frame_new_width(curfrp, curfrp->fr_width
-		     - (new_size + ((flags & WSP_TOP) != 0)), flags & WSP_TOP,
+	    ಚೌಕಟ್ಟು_new_ಅಗಲ(curfrp, curfrp->fr_ಅಗಲ
+		     - (new_ಗಾತ್ರ + ((flags & WSP_ತುದಿ) != 0)), flags & WSP_ತುದಿ,
 								       FALSE);
 	}
-	else
-	    win_new_width(oldwin, oldwin->w_width - (new_size + 1));
-	if (before)	// new window left of current one
+	ಇಲ್ಲದಿದ್ದರೆ
+	    win_new_ಅಗಲ(oldwin, oldwin->w_ಅಗಲ - (new_ಗಾತ್ರ + 1));
+	ಆದರೆ (before)	// new window left of current one
 	{
 	    wp->w_wincol = oldwin->w_wincol;
-	    oldwin->w_wincol += new_size + 1;
+	    oldwin->w_wincol += new_ಗಾತ್ರ + 1;
 	}
-	else		// new window right of current one
-	    wp->w_wincol = oldwin->w_wincol + oldwin->w_width + 1;
-	frame_fix_width(oldwin);
-	frame_fix_width(wp);
+	ಇಲ್ಲದಿದ್ದರೆ		// new window right of current one
+	    wp->w_wincol = oldwin->w_wincol + oldwin->w_ಅಗಲ + 1;
+	ಚೌಕಟ್ಟು_fix_ಅಗಲ(oldwin);
+	ಚೌಕಟ್ಟು_fix_ಅಗಲ(wp);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// width and column of new window is same as current window
-	if (flags & (WSP_TOP | WSP_BOT))
+	ಆದರೆ (flags & (WSP_ತುದಿ | WSP_BOT))
 	{
 	    wp->w_wincol = firstwin->w_wincol;
-	    win_new_width(wp, topframe->fr_width);
-	    wp->w_vsep_width = 0;
+	    win_new_ಅಗಲ(wp, topframe->fr_ಅಗಲ);
+	    wp->w_vsep_ಅಗಲ = 0;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    wp->w_wincol = oldwin->w_wincol;
-	    win_new_width(wp, oldwin->w_width);
-	    wp->w_vsep_width = oldwin->w_vsep_width;
+	    win_new_ಅಗಲ(wp, oldwin->w_ಅಗಲ);
+	    wp->w_vsep_ಅಗಲ = oldwin->w_vsep_ಅಗಲ;
 	}
-	frp->fr_width = curfrp->fr_width;
+	frp->fr_ಅಗಲ = curfrp->fr_ಅಗಲ;
 
 	// "new_size" of the current window goes to the new window, use
 	// one row for the status line
-	win_new_height(wp, new_size);
-	int old_status_height = oldwin->w_status_height;
-	if (flags & (WSP_TOP | WSP_BOT))
+	win_new_ಎತ್ತರ(wp, new_ಗಾತ್ರ);
+	ಪೂರ್ಣಾಂಕ old_ಸ್ಥಿತಿ_ಎತ್ತರ = oldwin->w_ಸ್ಥಿತಿ_ಎತ್ತರ;
+	ಆದರೆ (flags & (WSP_ತುದಿ | WSP_BOT))
 	{
-	    int new_fr_height = curfrp->fr_height - new_size
-							  + WINBAR_HEIGHT(wp);
+	    ಪೂರ್ಣಾಂಕ new_fr_ಎತ್ತರ = curfrp->fr_ಎತ್ತರ - new_ಗಾತ್ರ
+							  + WINBAR_ಎತ್ತರ(wp);
 
-	    if (!((flags & WSP_BOT) && p_ls == 0))
-		new_fr_height -= statusline_height(curfrp->fr_win);
-	    if (flags & WSP_BOT)
-		frame_add_statusline(curfrp);
-	    frame_new_height(curfrp, new_fr_height, flags & WSP_TOP, FALSE,
+	    ಆದರೆ (!((flags & WSP_BOT) && p_ls == 0))
+		new_fr_ಎತ್ತರ -= statusline_ಎತ್ತರ(curfrp->fr_win);
+	    ಆದರೆ (flags & WSP_BOT)
+		ಚೌಕಟ್ಟು_ಕೂಡಿಸು_statusline(curfrp);
+	    ಚೌಕಟ್ಟು_new_ಎತ್ತರ(curfrp, new_fr_ಎತ್ತರ, flags & WSP_ತುದಿ, FALSE,
 									FALSE);
 	}
-	else
-	    win_new_height(oldwin, oldwin_height - (new_size
-			+ statusline_height(wp)));
-	if (before)	// new window above current one
+	ಇಲ್ಲದಿದ್ದರೆ
+	    win_new_ಎತ್ತರ(oldwin, oldwin_ಎತ್ತರ - (new_ಗಾತ್ರ
+			+ statusline_ಎತ್ತರ(wp)));
+	ಆದರೆ (before)	// new window above current one
 	{
 	    wp->w_winrow = oldwin->w_winrow;
-	    wp->w_status_height = statusline_height(wp);
-	    oldwin->w_winrow += wp->w_height + statusline_height(wp);
+	    wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ = statusline_ಎತ್ತರ(wp);
+	    oldwin->w_winrow += wp->w_ಎತ್ತರ + statusline_ಎತ್ತರ(wp);
 	}
-	else		// new window below current one
+	ಇಲ್ಲದಿದ್ದರೆ		// new window below current one
 	{
-	    wp->w_winrow = oldwin->w_winrow + VISIBLE_HEIGHT(oldwin)
-						    + statusline_height(oldwin);
-	    wp->w_status_height = old_status_height;
-	    if (!(flags & WSP_BOT))
-		oldwin->w_status_height = statusline_height(oldwin);
+	    wp->w_winrow = oldwin->w_winrow + VISIBLE_ಎತ್ತರ(oldwin)
+						    + statusline_ಎತ್ತರ(oldwin);
+	    wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ = old_ಸ್ಥಿತಿ_ಎತ್ತರ;
+	    ಆದರೆ (!(flags & WSP_BOT))
+		oldwin->w_ಸ್ಥಿತಿ_ಎತ್ತರ = statusline_ಎತ್ತರ(oldwin);
 	}
-	frame_fix_height(wp);
-	frame_fix_height(oldwin);
+	ಚೌಕಟ್ಟು_fix_ಎತ್ತರ(wp);
+	ಚೌಕಟ್ಟು_fix_ಎತ್ತರ(oldwin);
     }
 
-    if (flags & (WSP_TOP | WSP_BOT))
+    ಆದರೆ (flags & (WSP_ತುದಿ | WSP_BOT))
 	win_comp_pos();
 
      // Both windows need redrawing.  Update all status lines, in case they
      // show something related to the window count or position.
     redraw_win_later(wp, UPD_NOT_VALID);
     redraw_win_later(oldwin, UPD_NOT_VALID);
-    status_redraw_all();
+    ಸ್ಥಿತಿ_redraw_all();
 
-    if (need_status)
+    ಆದರೆ (need_ಸ್ಥಿತಿ)
     {
-	msg_row = Rows - 1;
-	msg_col = sc_col;
-	msg_clr_eos_force();	// Old command/ruler may still be there
-	comp_col();
-	msg_row = Rows - 1;
-	msg_col = 0;	// put position back at start of line
+	ಸಂದೇಶ_ಅಡ್ಡಸಾಲು = ಅಡ್ಡಸಾಲುಗಳು - 1;
+	ಸಂದೇಶ_ಲಂಬಸಾಲು = sc_ಲಂಬಸಾಲು;
+	ಸಂದೇಶ_clr_eos_force();	// Old command/ruler may still be there
+	comp_ಲಂಬಸಾಲು();
+	ಸಂದೇಶ_ಅಡ್ಡಸಾಲು = ಅಡ್ಡಸಾಲುಗಳು - 1;
+	ಸಂದೇಶ_ಲಂಬಸಾಲು = 0;	// put position back at start of line
     }
 
     /*
@@ -1479,49 +1479,49 @@ win_split_ins(
      * local 'statuslineopt' from the current window), get_winopts() will call
      * win_equal() again after adjusting the stlh.
      */
-    if (do_equal || dir != 0)
+    ಆದರೆ (do_equal || dir != 0)
 	win_equal(wp, TRUE,
 		(flags & WSP_VERT) ? (dir == 'v' ? 'b' : 'h')
 		: dir == 'h' ? 'b' : 'v');
-    else if (!is_aucmd_win(wp))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!is_aucmd_win(wp))
 	win_fix_scroll(FALSE);
 
     // Don't change the window height/width to 'winheight' / 'winwidth' if a
     // size was given.
-    if (flags & WSP_VERT)
+    ಆದರೆ (flags & WSP_VERT)
     {
 	i = p_wiw;
-	if (size != 0)
-	    p_wiw = size;
+	ಆದರೆ (ಗಾತ್ರ_2 != 0)
+	    p_wiw = ಗಾತ್ರ_2;
 
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 	// When 'guioptions' includes 'L' or 'R' may have to add scrollbars.
-	if (gui.in_use)
-	    gui_init_which_components(NULL);
-#endif
+	ಆದರೆ (gui.ಒಳ_use)
+	    gui_init_which_components(ಖಾಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	i = p_wh;
-	if (size != 0)
-	    p_wh = size;
+	ಆದರೆ (ಗಾತ್ರ_2 != 0)
+	    p_wh = ಗಾತ್ರ_2;
     }
 
     /*
      * make the new window the current window
      */
-    (void)win_enter_ext(wp, (new_wp == NULL ? WEE_TRIGGER_NEW_AUTOCMDS : 0)
+    (ಶೂನ್ಯ)win_enter_ext(wp, (new_wp == ಖಾಲಿ ? WEE_TRIGGER_NEW_AUTOCMDS : 0)
 		    | WEE_TRIGGER_ENTER_AUTOCMDS | WEE_TRIGGER_LEAVE_AUTOCMDS);
-    if (flags & WSP_VERT)
+    ಆದರೆ (flags & WSP_VERT)
 	p_wiw = i;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	p_wh = i;
     retval = OK;
 
 theend:
-    if (RedrawingDisabled > 0)
+    ಆದರೆ (RedrawingDisabled > 0)
 	--RedrawingDisabled;
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
 
@@ -1532,70 +1532,70 @@ theend:
  * WSP_NEWLOC may be specified in flags to prevent the location list from
  * being copied.
  */
-    static void
-win_init(win_T *newp, win_T *oldp, int flags UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+win_init(win_T *newp, win_T *oldp, ಪೂರ್ಣಾಂಕ flags ಬಳಸದ)
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
 
-    newp->w_buffer = oldp->w_buffer;
-#ifdef FEAT_SYN_HL
-    newp->w_s = &(oldp->w_buffer->b_s);
-#endif
-    oldp->w_buffer->b_nwindows++;
+    newp->w_ಬಫರ್ = oldp->w_ಬಫರ್;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
+    newp->w_s = &(oldp->w_ಬಫರ್->b_s);
+#ಆದರೆ_ಅಂತ್ಯ
+    oldp->w_ಬಫರ್->b_nwindows++;
     newp->w_cursor = oldp->w_cursor;
     newp->w_valid = 0;
     newp->w_curswant = oldp->w_curswant;
-    newp->w_set_curswant = oldp->w_set_curswant;
+    newp->w_ಗಣ_curswant = oldp->w_ಗಣ_curswant;
     newp->w_topline = oldp->w_topline;
-#ifdef FEAT_DIFF
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
     newp->w_topfill = oldp->w_topfill;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     newp->w_leftcol = oldp->w_leftcol;
     newp->w_pcmark = oldp->w_pcmark;
     newp->w_prev_pcmark = oldp->w_prev_pcmark;
     newp->w_alt_fnum = oldp->w_alt_fnum;
     newp->w_wrow = oldp->w_wrow;
     newp->w_fraction = oldp->w_fraction;
-    newp->w_prev_fraction_row = oldp->w_prev_fraction_row;
+    newp->w_prev_fraction_ಅಡ್ಡಸಾಲು = oldp->w_prev_fraction_ಅಡ್ಡಸಾಲು;
 
     // Not sure if this is needed, but be safe
     remove_highlight_overrides(newp->w_hl);
     VIM_CLEAR(newp->w_hl);
 
     copy_jumplist(oldp, newp);
-#ifdef FEAT_QUICKFIX
-    if (flags & WSP_NEWLOC)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
+    ಆದರೆ (flags & WSP_NEWLOC)
     {
 	// Don't copy the location list.
-	newp->w_llist = NULL;
-	newp->w_llist_ref = NULL;
+	newp->w_llist = ಖಾಲಿ;
+	newp->w_llist_ref = ಖಾಲಿ;
     }
-    else
-	copy_loclist_stack(oldp, newp);
-#endif
-    newp->w_localdir = (oldp->w_localdir == NULL)
-				    ? NULL : vim_strsave(oldp->w_localdir);
-    newp->w_prevdir = (oldp->w_prevdir == NULL)
-				    ? NULL : vim_strsave(oldp->w_prevdir);
+    ಇಲ್ಲದಿದ್ದರೆ
+	copy_loclist_ರಾಶಿ(oldp, newp);
+#ಆದರೆ_ಅಂತ್ಯ
+    newp->w_localdir = (oldp->w_localdir == ಖಾಲಿ)
+				    ? ಖಾಲಿ : vim_strsave(oldp->w_localdir);
+    newp->w_prevdir = (oldp->w_prevdir == ಖಾಲಿ)
+				    ? ಖಾಲಿ : vim_strsave(oldp->w_prevdir);
 
-    if (*p_spk != 'c')
+    ಆದರೆ (*p_spk != 'c')
     {
-	if (*p_spk == 't')
+	ಆದರೆ (*p_spk == 't')
 	    newp->w_skipcol = oldp->w_skipcol;
 	newp->w_botline = oldp->w_botline;
-	newp->w_prev_height = oldp->w_height - WINBAR_HEIGHT(oldp);
-	newp->w_prev_winrow = oldp->w_winrow + 2 * WINBAR_HEIGHT(oldp);
+	newp->w_prev_ಎತ್ತರ = oldp->w_ಎತ್ತರ - WINBAR_ಎತ್ತರ(oldp);
+	newp->w_prev_winrow = oldp->w_winrow + 2 * WINBAR_ಎತ್ತರ(oldp);
     }
 
     // copy tagstack and folds
-    for (i = 0; i < oldp->w_tagstacklen; i++)
+    ಗಾಗಿ (i = 0; i < oldp->w_tagstacklen; i++)
     {
-	taggy_T	*tag = &newp->w_tagstack[i];
-	*tag = oldp->w_tagstack[i];
-	if (tag->tagname != NULL)
-	    tag->tagname = vim_strsave(tag->tagname);
-	if (tag->user_data != NULL)
-	    tag->user_data = vim_strsave(tag->user_data);
+	taggy_T	*ಟ್ಯಾಗ್ = &newp->w_tagstack[i];
+	*ಟ್ಯಾಗ್ = oldp->w_tagstack[i];
+	ಆದರೆ (ಟ್ಯಾಗ್->tagname != ಖಾಲಿ)
+	    ಟ್ಯಾಗ್->tagname = vim_strsave(ಟ್ಯಾಗ್->tagname);
+	ಆದರೆ (ಟ್ಯಾಗ್->user_ದತ್ತಾಂಶ != ಖಾಲಿ)
+	    ಟ್ಯಾಗ್->user_ದತ್ತಾಂಶ = vim_strsave(ಟ್ಯಾಗ್->user_ದತ್ತಾಂಶ);
     }
     newp->w_tagstackidx = oldp->w_tagstackidx;
     newp->w_tagstacklen = oldp->w_tagstacklen;
@@ -1603,29 +1603,29 @@ win_init(win_T *newp, win_T *oldp, int flags UNUSED)
     // Keep same changelist position in new window.
     newp->w_changelistidx = oldp->w_changelistidx;
 
-#ifdef FEAT_FOLDING
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_FOLDING
     copyFoldingState(oldp, newp);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     win_init_some(newp, oldp);
 
-#ifdef FEAT_TERMINAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMINAL
     {
 	// Make sure to also handle highlight overrides copied over from oldp.
-	bool pushed = push_highlight_overrides(newp->w_hl, newp->w_hl_len);
-	if (newp->w_buffer->b_term != NULL)
-	    term_init_default_colors(newp->w_buffer->b_term);
-	if (pushed)
-	    pop_highlight_overrides();
+	bool pushed = ತಳ್ಳು_highlight_overrides(newp->w_hl, newp->w_hl_len);
+	ಆದರೆ (newp->w_ಬಫರ್->b_ಪದ != ಖಾಲಿ)
+	    ಪದ_init_default_colors(newp->w_ಬಫರ್->b_ಪದ);
+	ಆದರೆ (pushed)
+	    ತೆಗೆ_highlight_overrides();
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Initialize window "newp" from window "old".
  * Only the essential things are copied.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 win_init_some(win_T *newp, win_T *oldp)
 {
     // Use the same argument list.
@@ -1640,36 +1640,36 @@ win_init_some(win_T *newp, win_T *oldp)
 /*
  * Return TRUE if "win" is a global popup or a popup in the current tab page.
  */
-    int
-win_valid_popup(win_T *win UNUSED)
+    ಪೂರ್ಣಾಂಕ
+win_valid_popup(win_T *win ಬಳಸದ)
 {
-#ifdef FEAT_PROP_POPUP
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
     win_T	*wp;
 
     FOR_ALL_POPUPWINS(wp)
-	if (wp == win)
-	    return TRUE;
-    FOR_ALL_POPUPWINS_IN_TAB(curtab, wp)
-	if (wp == win)
-	    return TRUE;
-#endif
-    return FALSE;
+	ಆದರೆ (wp == win)
+	    ಹಿಂತಿರುಗಿ TRUE;
+    FOR_ALL_POPUPWINS_ಒಳ_TAB(curtab, wp)
+	ಆದರೆ (wp == win)
+	    ಹಿಂತಿರುಗಿ TRUE;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 /*
  * Check if "win" is a pointer to an existing window in the current tab page.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 win_valid(win_T *win)
 {
     win_T	*wp;
 
-    if (win == NULL)
-	return FALSE;
+    ಆದರೆ (win == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FALSE;
     FOR_ALL_WINDOWS(wp)
-	if (wp == win)
-	    return TRUE;
-    return win_valid_popup(win);
+	ಆದರೆ (wp == win)
+	    ಹಿಂತಿರುಗಿ TRUE;
+    ಹಿಂತಿರುಗಿ win_valid_popup(win);
 }
 
 /*
@@ -1678,63 +1678,63 @@ win_valid(win_T *win)
  * Return NULL if not found.
  */
     win_T *
-win_find_by_id(int id)
+win_ಕಂಡುಹಿಡಿ_by_id(ಪೂರ್ಣಾಂಕ id)
 {
     win_T   *wp;
 
     FOR_ALL_WINDOWS(wp)
-	if (wp->w_id == id)
-	    return wp;
-#ifdef FEAT_PROP_POPUP
+	ಆದರೆ (wp->w_id == id)
+	    ಹಿಂತಿರುಗಿ wp;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
     FOR_ALL_POPUPWINS(wp)
-	if (wp->w_id == id)
-	    return wp;
-    FOR_ALL_POPUPWINS_IN_TAB(curtab, wp)
-	if (wp->w_id == id)
-	    return wp;
-#endif
-    return NULL;
+	ಆದರೆ (wp->w_id == id)
+	    ಹಿಂತಿರುಗಿ wp;
+    FOR_ALL_POPUPWINS_ಒಳ_TAB(curtab, wp)
+	ಆದರೆ (wp->w_id == id)
+	    ಹಿಂತಿರುಗಿ wp;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Check if "win" is a pointer to an existing window in any tab page.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 win_valid_any_tab(win_T *win)
 {
     win_T	*wp;
     tabpage_T	*tp;
 
-    if (win == NULL)
-	return FALSE;
+    ಆದರೆ (win == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FALSE;
     FOR_ALL_TABPAGES(tp)
     {
-	FOR_ALL_WINDOWS_IN_TAB(tp, wp)
+	FOR_ALL_WINDOWS_ಒಳ_TAB(tp, wp)
 	{
-	    if (wp == win)
-		return TRUE;
+	    ಆದರೆ (wp == win)
+		ಹಿಂತಿರುಗಿ TRUE;
 	}
-#ifdef FEAT_PROP_POPUP
-	FOR_ALL_POPUPWINS_IN_TAB(tp, wp)
-	    if (wp == win)
-		return TRUE;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+	FOR_ALL_POPUPWINS_ಒಳ_TAB(tp, wp)
+	    ಆದರೆ (wp == win)
+		ಹಿಂತಿರುಗಿ TRUE;
+#ಆದರೆ_ಅಂತ್ಯ
     }
-    return win_valid_popup(win);
+    ಹಿಂತಿರುಗಿ win_valid_popup(win);
 }
 
 /*
  * Return the number of windows.
  */
-    int
-win_count(void)
+    ಪೂರ್ಣಾಂಕ
+win_ಎಣಿಕೆ(ಶೂನ್ಯ)
 {
     win_T	*wp;
-    int		count = 0;
+    ಪೂರ್ಣಾಂಕ		ಎಣಿಕೆ_2 = 0;
 
     FOR_ALL_WINDOWS(wp)
-	++count;
-    return count;
+	++ಎಣಿಕೆ_2;
+    ಹಿಂತಿರುಗಿ ಎಣಿಕೆ_2;
 }
 
 /*
@@ -1743,114 +1743,114 @@ win_count(void)
  * Must be called when there is just one window, filling the whole screen
  * (excluding the command line).
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 make_windows(
-    int		count,
-    int		vertical)  // split windows vertically if TRUE
+    ಪೂರ್ಣಾಂಕ		ಎಣಿಕೆ_2,
+    ಪೂರ್ಣಾಂಕ		vertical)  // split windows vertically if TRUE
 {
-    int		maxcount;
-    int		todo;
+    ಪೂರ್ಣಾಂಕ		maxcount;
+    ಪೂರ್ಣಾಂಕ		todo;
 
-    if (vertical)
+    ಆದರೆ (vertical)
     {
 	// Each window needs at least 'winminwidth' lines and a separator
 	// column.
-	maxcount = (curwin->w_width + curwin->w_vsep_width
+	maxcount = (curwin->w_ಅಗಲ + curwin->w_vsep_ಅಗಲ
 					     - (p_wiw - p_wmw)) / (p_wmw + 1);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Each window needs at least 'winminheight' lines and a status line.
-	maxcount = (VISIBLE_HEIGHT(curwin) + curwin->w_status_height
-			- (p_wh - p_wmh)) / (p_wmh + statusline_height(curwin));
+	maxcount = (VISIBLE_ಎತ್ತರ(curwin) + curwin->w_ಸ್ಥಿತಿ_ಎತ್ತರ
+			- (p_wh - p_wmh)) / (p_wmh + statusline_ಎತ್ತರ(curwin));
     }
 
-    if (maxcount < 2)
+    ಆದರೆ (maxcount < 2)
 	maxcount = 2;
-    if (count > maxcount)
-	count = maxcount;
+    ಆದರೆ (ಎಣಿಕೆ_2 > maxcount)
+	ಎಣಿಕೆ_2 = maxcount;
 
     /*
      * add status line now, otherwise first window will be too big
      */
-    if (count > 1)
-	last_status(TRUE);
+    ಆದರೆ (ಎಣಿಕೆ_2 > 1)
+	ಕೊನೆಯ_ಸ್ಥಿತಿ(TRUE);
 
     /*
      * Don't execute autocommands while creating the windows.  Must do that
      * when putting the buffers in the windows.
      */
-    block_autocmds();
+    ಖಂಡ_autocmds();
 
     // todo is number of windows left to create
-    for (todo = count - 1; todo > 0; --todo)
-	if (vertical)
+    ಗಾಗಿ (todo = ಎಣಿಕೆ_2 - 1; todo > 0; --todo)
+	ಆದರೆ (vertical)
 	{
-	    if (win_split(curwin->w_width - (curwin->w_width - todo)
+	    ಆದರೆ (win_ವಿಭಜಿಸು(curwin->w_ಅಗಲ - (curwin->w_ಅಗಲ - todo)
 			/ (todo + 1) - 1, WSP_VERT | WSP_ABOVE) == FAIL)
-		break;
+		ನಿಲ್ಲಿಸು;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (win_split(curwin->w_height - (curwin->w_height - todo
-			    * statusline_height(curwin)) / (todo + 1)
-			- statusline_height(curwin), WSP_ABOVE) == FAIL)
-		break;
+	    ಆದರೆ (win_ವಿಭಜಿಸು(curwin->w_ಎತ್ತರ - (curwin->w_ಎತ್ತರ - todo
+			    * statusline_ಎತ್ತರ(curwin)) / (todo + 1)
+			- statusline_ಎತ್ತರ(curwin), WSP_ABOVE) == FAIL)
+		ನಿಲ್ಲಿಸು;
 	}
 
     unblock_autocmds();
 
     // return actual number of windows
-    return (count - todo);
+    ಹಿಂತಿರುಗಿ (ಎಣಿಕೆ_2 - todo);
 }
 
 /*
  * Exchange current and next window
  */
-    static void
-win_exchange(long Prenum)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+win_exchange(ದೀರ್ಘ Prenum)
 {
-    frame_T	*frp;
-    frame_T	*frp2;
+    ಚೌಕಟ್ಟು_T	*frp;
+    ಚೌಕಟ್ಟು_T	*frp2;
     win_T	*wp;
     win_T	*wp2;
-    int		temp;
+    ಪೂರ್ಣಾಂಕ		ತಾತ್ಕಾಲಿಕ;
 
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
-    if (ONE_WINDOW)	    // just one window
+    ಆದರೆ (ERROR_IF_ANY_POPUP_ಕಿಟಕಿ)
+	ಹಿಂತಿರುಗಿ;
+    ಆದರೆ (ONE_ಕಿಟಕಿ)	    // just one window
     {
 	beep_flush();
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
-    if (text_or_buf_locked())
+    ಆದರೆ (ಪಠ್ಯ_or_buf_locked())
     {
 	beep_flush();
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
     need_mouse_correct = TRUE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     /*
      * find window to exchange with
      */
-    if (Prenum)
+    ಆದರೆ (Prenum)
     {
-	frp = curwin->w_frame->fr_parent->fr_child;
-	while (frp != NULL && --Prenum > 0)
-	    frp = frp->fr_next;
+	frp = curwin->w_ಚೌಕಟ್ಟು->fr_ಪೋಷಕ->fr_ಮಗು;
+	ಆಗ (frp != ಖಾಲಿ && --Prenum > 0)
+	    frp = frp->fr_ಮುಂದಿನ;
     }
-    else if (curwin->w_frame->fr_next != NULL)	// Swap with next
-	frp = curwin->w_frame->fr_next;
-    else    // Swap last window in row/col with previous
-	frp = curwin->w_frame->fr_prev;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (curwin->w_ಚೌಕಟ್ಟು->fr_ಮುಂದಿನ != ಖಾಲಿ)	// Swap with next
+	frp = curwin->w_ಚೌಕಟ್ಟು->fr_ಮುಂದಿನ;
+    ಇಲ್ಲದಿದ್ದರೆ    // Swap last window in row/col with previous
+	frp = curwin->w_ಚೌಕಟ್ಟು->fr_prev;
 
     // We can only exchange a window with another window, not with a frame
     // containing windows.
-    if (frp == NULL || frp->fr_win == NULL || frp->fr_win == curwin)
-	return;
+    ಆದರೆ (frp == ಖಾಲಿ || frp->fr_win == ಖಾಲಿ || frp->fr_win == curwin)
+	ಹಿಂತಿರುಗಿ;
     wp = frp->fr_win;
 
 /*
@@ -1862,51 +1862,51 @@ win_exchange(long Prenum)
  * 5. exchange the status line height and vsep width.
  */
     wp2 = curwin->w_prev;
-    frp2 = curwin->w_frame->fr_prev;
-    if (wp->w_prev != curwin)
+    frp2 = curwin->w_ಚೌಕಟ್ಟು->fr_prev;
+    ಆದರೆ (wp->w_prev != curwin)
     {
-	win_remove(curwin, NULL);
-	frame_remove(curwin->w_frame);
+	win_remove(curwin, ಖಾಲಿ);
+	ಚೌಕಟ್ಟು_remove(curwin->w_ಚೌಕಟ್ಟು);
 	win_append(wp->w_prev, curwin);
-	frame_insert(frp, curwin->w_frame);
+	ಚೌಕಟ್ಟು_ಸೇರಿಸು(frp, curwin->w_ಚೌಕಟ್ಟು);
     }
-    if (wp != wp2)
+    ಆದರೆ (wp != wp2)
     {
-	win_remove(wp, NULL);
-	frame_remove(wp->w_frame);
+	win_remove(wp, ಖಾಲಿ);
+	ಚೌಕಟ್ಟು_remove(wp->w_ಚೌಕಟ್ಟು);
 	win_append(wp2, wp);
-	if (frp2 == NULL)
-	    frame_insert(wp->w_frame->fr_parent->fr_child, wp->w_frame);
-	else
-	    frame_append(frp2, wp->w_frame);
+	ಆದರೆ (frp2 == ಖಾಲಿ)
+	    ಚೌಕಟ್ಟು_ಸೇರಿಸು(wp->w_ಚೌಕಟ್ಟು->fr_ಪೋಷಕ->fr_ಮಗು, wp->w_ಚೌಕಟ್ಟು);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಚೌಕಟ್ಟು_append(frp2, wp->w_ಚೌಕಟ್ಟು);
     }
     // Keep the total height of each window the same, so that the frames keep
     // their height; the status line height is computed below.
-    temp = curwin->w_status_height;
-    if (temp != wp->w_status_height)
+    ತಾತ್ಕಾಲಿಕ = curwin->w_ಸ್ಥಿತಿ_ಎತ್ತರ;
+    ಆದರೆ (ತಾತ್ಕಾಲಿಕ != wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ)
     {
-	win_new_height(curwin, curwin->w_height + temp - wp->w_status_height);
-	win_new_height(wp, wp->w_height + wp->w_status_height - temp);
+	win_new_ಎತ್ತರ(curwin, curwin->w_ಎತ್ತರ + ತಾತ್ಕಾಲಿಕ - wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ);
+	win_new_ಎತ್ತರ(wp, wp->w_ಎತ್ತರ + wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ - ತಾತ್ಕಾಲಿಕ);
     }
-    curwin->w_status_height = wp->w_status_height;
-    wp->w_status_height = temp;
-    temp = curwin->w_vsep_width;
-    curwin->w_vsep_width = wp->w_vsep_width;
-    wp->w_vsep_width = temp;
+    curwin->w_ಸ್ಥಿತಿ_ಎತ್ತರ = wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ;
+    wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ = ತಾತ್ಕಾಲಿಕ;
+    ತಾತ್ಕಾಲಿಕ = curwin->w_vsep_ಅಗಲ;
+    curwin->w_vsep_ಅಗಲ = wp->w_vsep_ಅಗಲ;
+    wp->w_vsep_ಅಗಲ = ತಾತ್ಕಾಲಿಕ;
 
-    frame_fix_height(curwin);
-    frame_fix_height(wp);
-    frame_fix_width(curwin);
-    frame_fix_width(wp);
+    ಚೌಕಟ್ಟು_fix_ಎತ್ತರ(curwin);
+    ಚೌಕಟ್ಟು_fix_ಎತ್ತರ(wp);
+    ಚೌಕಟ್ಟು_fix_ಅಗಲ(curwin);
+    ಚೌಕಟ್ಟು_fix_ಅಗಲ(wp);
 
     win_comp_pos();		// recompute window positions
-#if defined(FEAT_STL_OPT)
-    frame_change_statusline_height();
-#endif
+#ಆದರೆ defined(FEAT_STL_OPT)
+    ಚೌಕಟ್ಟು_change_statusline_ಎತ್ತರ();
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (wp->w_buffer != curbuf)
+    ಆದರೆ (wp->w_ಬಫರ್ != curbuf)
 	reset_VIsual_and_resel();
-    else if (VIsual_active)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (VIsual_ಸಕ್ರಿಯ)
 	wp->w_cursor = curwin->w_cursor;
 
     win_enter(wp, TRUE);
@@ -1917,91 +1917,91 @@ win_exchange(long Prenum)
  * rotate windows: if upwards TRUE the second window becomes the first one
  *		   if upwards FALSE the first window becomes the second one
  */
-    static void
-win_rotate(int upwards, int count)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+win_rotate(ಪೂರ್ಣಾಂಕ upwards, ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_2)
 {
     win_T	*wp1;
     win_T	*wp2;
-    frame_T	*frp;
-    int		n;
+    ಚೌಕಟ್ಟು_T	*frp;
+    ಪೂರ್ಣಾಂಕ		n;
 
-    if (ONE_WINDOW)		// nothing to do
+    ಆದರೆ (ONE_ಕಿಟಕಿ)		// nothing to do
     {
 	beep_flush();
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
     need_mouse_correct = TRUE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Check if all frames in this row/col have one window.
-    FOR_ALL_FRAMES(frp, curwin->w_frame->fr_parent->fr_child)
-	if (frp->fr_win == NULL)
+    FOR_ALL_ಚೌಕಟ್ಟುಗಳು(frp, curwin->w_ಚೌಕಟ್ಟು->fr_ಪೋಷಕ->fr_ಮಗು)
+	ಆದರೆ (frp->fr_win == ಖಾಲಿ)
 	{
-	    emsg(_(e_cannot_rotate_when_another_window_is_split));
-	    return;
+	    emsg(_(e_cannot_rotate_when_another_ಕಿಟಕಿ_is_ವಿಭಜಿಸು));
+	    ಹಿಂತಿರುಗಿ;
 	}
 
-    while (count--)
+    ಆಗ (ಎಣಿಕೆ_2--)
     {
-	if (upwards)		// first window becomes last window
+	ಆದರೆ (upwards)		// first window becomes last window
 	{
 	    // remove first window/frame from the list
-	    frp = curwin->w_frame->fr_parent->fr_child;
+	    frp = curwin->w_ಚೌಕಟ್ಟು->fr_ಪೋಷಕ->fr_ಮಗು;
 	    wp1 = frp->fr_win;
-	    win_remove(wp1, NULL);
-	    frame_remove(frp);
+	    win_remove(wp1, ಖಾಲಿ);
+	    ಚೌಕಟ್ಟು_remove(frp);
 
 	    // find last frame and append removed window/frame after it
-	    for ( ; frp->fr_next != NULL; frp = frp->fr_next)
+	    ಗಾಗಿ ( ; frp->fr_ಮುಂದಿನ != ಖಾಲಿ; frp = frp->fr_ಮುಂದಿನ)
 		;
 	    win_append(frp->fr_win, wp1);
-	    frame_append(frp, wp1->w_frame);
+	    ಚೌಕಟ್ಟು_append(frp, wp1->w_ಚೌಕಟ್ಟು);
 
 	    wp2 = frp->fr_win;		// previously last window
 	}
-	else			// last window becomes first window
+	ಇಲ್ಲದಿದ್ದರೆ			// last window becomes first window
 	{
 	    // find last window/frame in the list and remove it
-	    for (frp = curwin->w_frame; frp->fr_next != NULL;
-							   frp = frp->fr_next)
+	    ಗಾಗಿ (frp = curwin->w_ಚೌಕಟ್ಟು; frp->fr_ಮುಂದಿನ != ಖಾಲಿ;
+							   frp = frp->fr_ಮುಂದಿನ)
 		;
 	    wp1 = frp->fr_win;
 	    wp2 = wp1->w_prev;		    // will become last window
-	    win_remove(wp1, NULL);
-	    frame_remove(frp);
+	    win_remove(wp1, ಖಾಲಿ);
+	    ಚೌಕಟ್ಟು_remove(frp);
 
 	    // append the removed window/frame before the first in the list
-	    win_append(frp->fr_parent->fr_child->fr_win->w_prev, wp1);
-	    frame_insert(frp->fr_parent->fr_child, frp);
+	    win_append(frp->fr_ಪೋಷಕ->fr_ಮಗು->fr_win->w_prev, wp1);
+	    ಚೌಕಟ್ಟು_ಸೇರಿಸು(frp->fr_ಪೋಷಕ->fr_ಮಗು, frp);
 	}
 
 	// exchange status height and vsep width of old and new last window
 	// Keep the total height of each window the same, so that the frames
 	// keep their height; the status line height is computed below.
-	n = wp2->w_status_height;
-	if (n != wp1->w_status_height)
+	n = wp2->w_ಸ್ಥಿತಿ_ಎತ್ತರ;
+	ಆದರೆ (n != wp1->w_ಸ್ಥಿತಿ_ಎತ್ತರ)
 	{
-	    win_new_height(wp2, wp2->w_height + n - wp1->w_status_height);
-	    win_new_height(wp1, wp1->w_height + wp1->w_status_height - n);
+	    win_new_ಎತ್ತರ(wp2, wp2->w_ಎತ್ತರ + n - wp1->w_ಸ್ಥಿತಿ_ಎತ್ತರ);
+	    win_new_ಎತ್ತರ(wp1, wp1->w_ಎತ್ತರ + wp1->w_ಸ್ಥಿತಿ_ಎತ್ತರ - n);
 	}
-	wp2->w_status_height = wp1->w_status_height;
-	wp1->w_status_height = n;
-	frame_fix_height(wp1);
-	frame_fix_height(wp2);
-	n = wp2->w_vsep_width;
-	wp2->w_vsep_width = wp1->w_vsep_width;
-	wp1->w_vsep_width = n;
-	frame_fix_width(wp1);
-	frame_fix_width(wp2);
+	wp2->w_ಸ್ಥಿತಿ_ಎತ್ತರ = wp1->w_ಸ್ಥಿತಿ_ಎತ್ತರ;
+	wp1->w_ಸ್ಥಿತಿ_ಎತ್ತರ = n;
+	ಚೌಕಟ್ಟು_fix_ಎತ್ತರ(wp1);
+	ಚೌಕಟ್ಟು_fix_ಎತ್ತರ(wp2);
+	n = wp2->w_vsep_ಅಗಲ;
+	wp2->w_vsep_ಅಗಲ = wp1->w_vsep_ಅಗಲ;
+	wp1->w_vsep_ಅಗಲ = n;
+	ಚೌಕಟ್ಟು_fix_ಅಗಲ(wp1);
+	ಚೌಕಟ್ಟು_fix_ಅಗಲ(wp2);
 
 	// recompute w_winrow and w_wincol for all windows
 	win_comp_pos();
     }
-#if defined(FEAT_STL_OPT)
-    frame_change_statusline_height();
-#endif
+#ಆದರೆ defined(FEAT_STL_OPT)
+    ಚೌಕಟ್ಟು_change_statusline_ಎತ್ತರ();
+#ಆದರೆ_ಅಂತ್ಯ
 
     redraw_all_later(UPD_NOT_VALID);
 }
@@ -2012,41 +2012,41 @@ win_rotate(int upwards, int count)
  * "wp" must be valid in the current tabpage.
  * Returns FAIL for failure, OK otherwise.
  */
-    int
-win_splitmove(win_T *wp, int size, int flags)
+    ಪೂರ್ಣಾಂಕ
+win_splitmove(win_T *wp, ಪೂರ್ಣಾಂಕ ಗಾತ್ರ_2, ಪೂರ್ಣಾಂಕ flags)
 {
-    int		dir;
-    int		height = wp->w_height;
-    frame_T	*unflat_altfr;
+    ಪೂರ್ಣಾಂಕ		dir;
+    ಪೂರ್ಣಾಂಕ		ಎತ್ತರ = wp->w_ಎತ್ತರ;
+    ಚೌಕಟ್ಟು_T	*unflat_altfr;
 
-    if (ONE_WINDOW)
-	return OK;	// nothing to do
-    if (check_split_disallowed(wp) == FAIL)
-	return FAIL;
+    ಆದರೆ (ONE_ಕಿಟಕಿ)
+	ಹಿಂತಿರುಗಿ OK;	// nothing to do
+    ಆದರೆ (check_ವಿಭಜಿಸು_disallowed(wp) == FAIL)
+	ಹಿಂತಿರುಗಿ FAIL;
 
     // Remove the window and frame from the tree of frames.  Don't flatten any
     // frames yet so we can restore things if win_split_ins fails.
-    winframe_remove(wp, &dir, NULL, &unflat_altfr);
-    win_remove(wp, NULL);
-    last_status(FALSE);	    // may need to remove last status line
+    winframe_remove(wp, &dir, ಖಾಲಿ, &unflat_altfr);
+    win_remove(wp, ಖಾಲಿ);
+    ಕೊನೆಯ_ಸ್ಥಿತಿ(FALSE);	    // may need to remove last status line
     win_comp_pos();   // recompute window positions
 
     // Split a window on the desired side and put "wp" there.
-    if (win_split_ins(size, flags, wp, dir, unflat_altfr) == FAIL)
+    ಆದರೆ (win_ವಿಭಜಿಸು_ins(ಗಾತ್ರ_2, flags, wp, dir, unflat_altfr) == FAIL)
     {
 	// win_split_ins doesn't change sizes or layout if it fails to insert an
 	// existing window, so just undo winframe_remove.
 	winframe_restore(wp, dir, unflat_altfr);
 	win_append(wp->w_prev, wp);
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
     // If splitting horizontally, try to preserve height.
     // Note that win_split_ins autocommands may have immediately closed "wp"!
-    if (size == 0 && !(flags & WSP_VERT) && win_valid(wp))
+    ಆದರೆ (ಗಾತ್ರ_2 == 0 && !(flags & WSP_VERT) && win_valid(wp))
     {
-	win_setheight_win(height, wp);
-	if (p_ea)
+	win_setheight_win(ಎತ್ತರ, wp);
+	ಆದರೆ (p_ea)
 	{
 	    // Equalize windows.  Note that win_split_ins autocommands may have
 	    // made a window other than "wp" current.
@@ -2054,72 +2054,72 @@ win_splitmove(win_T *wp, int size, int flags)
 	}
     }
 
-#if defined(FEAT_GUI)
+#ಆದರೆ defined(FEAT_GUI)
     // When 'guioptions' includes 'L' or 'R' may have to remove or add
     // scrollbars.  Have to update them anyway.
     gui_may_update_scrollbars();
-#endif
-    return OK;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Move window "win1" to below/right of "win2" and make "win1" the current
  * window.  Only works within the same frame!
  */
-    void
+    ಶೂನ್ಯ
 win_move_after(win_T *win1, win_T *win2)
 {
-    int		height;
+    ಪೂರ್ಣಾಂಕ		ಎತ್ತರ;
 
     // check if the arguments are reasonable
-    if (win1 == win2)
-	return;
+    ಆದರೆ (win1 == win2)
+	ಹಿಂತಿರುಗಿ;
 
     // check if there is something to do
-    if (win2->w_next != win1)
+    ಆದರೆ (win2->w_ಮುಂದಿನ != win1)
     {
-	if (win1->w_frame->fr_parent != win2->w_frame->fr_parent)
+	ಆದರೆ (win1->w_ಚೌಕಟ್ಟು->fr_ಪೋಷಕ != win2->w_ಚೌಕಟ್ಟು->fr_ಪೋಷಕ)
 	{
 	    iemsg("Trying to move a window into another frame");
-	    return;
+	    ಹಿಂತಿರುಗಿ;
 	}
 
 	// may need to move the status line/vertical separator of the last
-	// window
-	if (win1 == lastwin)
+	//ಕಿಟಕಿ
+	ಆದರೆ (win1 == lastwin)
 	{
-	    height = win1->w_prev->w_status_height;
-	    win1->w_prev->w_status_height = win1->w_status_height;
-	    win1->w_status_height = height;
-	    if (win1->w_prev->w_vsep_width == 1)
+	    ಎತ್ತರ = win1->w_prev->w_ಸ್ಥಿತಿ_ಎತ್ತರ;
+	    win1->w_prev->w_ಸ್ಥಿತಿ_ಎತ್ತರ = win1->w_ಸ್ಥಿತಿ_ಎತ್ತರ;
+	    win1->w_ಸ್ಥಿತಿ_ಎತ್ತರ = ಎತ್ತರ;
+	    ಆದರೆ (win1->w_prev->w_vsep_ಅಗಲ == 1)
 	    {
 		// Remove the vertical separator from the last-but-one window,
 		// add it to the last window.  Adjust the frame widths.
-		win1->w_prev->w_vsep_width = 0;
-		win1->w_prev->w_frame->fr_width -= 1;
-		win1->w_vsep_width = 1;
-		win1->w_frame->fr_width += 1;
+		win1->w_prev->w_vsep_ಅಗಲ = 0;
+		win1->w_prev->w_ಚೌಕಟ್ಟು->fr_ಅಗಲ -= 1;
+		win1->w_vsep_ಅಗಲ = 1;
+		win1->w_ಚೌಕಟ್ಟು->fr_ಅಗಲ += 1;
 	    }
 	}
-	else if (win2 == lastwin)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (win2 == lastwin)
 	{
-	    height = win1->w_status_height;
-	    win1->w_status_height = win2->w_status_height;
-	    win2->w_status_height = height;
-	    if (win1->w_vsep_width == 1)
+	    ಎತ್ತರ = win1->w_ಸ್ಥಿತಿ_ಎತ್ತರ;
+	    win1->w_ಸ್ಥಿತಿ_ಎತ್ತರ = win2->w_ಸ್ಥಿತಿ_ಎತ್ತರ;
+	    win2->w_ಸ್ಥಿತಿ_ಎತ್ತರ = ಎತ್ತರ;
+	    ಆದರೆ (win1->w_vsep_ಅಗಲ == 1)
 	    {
 		// Remove the vertical separator from win1, add it to the last
 		// window, win2.  Adjust the frame widths.
-		win2->w_vsep_width = 1;
-		win2->w_frame->fr_width += 1;
-		win1->w_vsep_width = 0;
-		win1->w_frame->fr_width -= 1;
+		win2->w_vsep_ಅಗಲ = 1;
+		win2->w_ಚೌಕಟ್ಟು->fr_ಅಗಲ += 1;
+		win1->w_vsep_ಅಗಲ = 0;
+		win1->w_ಚೌಕಟ್ಟು->fr_ಅಗಲ -= 1;
 	    }
 	}
-	win_remove(win1, NULL);
-	frame_remove(win1->w_frame);
+	win_remove(win1, ಖಾಲಿ);
+	ಚೌಕಟ್ಟು_remove(win1->w_ಚೌಕಟ್ಟು);
 	win_append(win2, win1);
-	frame_append(win2->w_frame, win1->w_frame);
+	ಚೌಕಟ್ಟು_append(win2->w_ಚೌಕಟ್ಟು, win1->w_ಚೌಕಟ್ಟು);
 
 	win_comp_pos();	// recompute w_winrow for all windows
 	redraw_later(UPD_NOT_VALID);
@@ -2132,22 +2132,22 @@ win_move_after(win_T *win1, win_T *win2)
  * 'next_curwin' will soon be the current window, make sure it has enough
  * rows.
  */
-    void
+    ಶೂನ್ಯ
 win_equal(
-    win_T	*next_curwin,	// pointer to current window to be or NULL
-    int		current,	// do only frame with current window
-    int		dir)		// 'v' for vertically, 'h' for horizontally,
+    win_T	*ಮುಂದಿನ_curwin,	// pointer to current window to be or NULL
+    ಪೂರ್ಣಾಂಕ		current,	// do only frame with current window
+    ಪೂರ್ಣಾಂಕ		dir)		// 'v' for vertically, 'h' for horizontally,
 				// 'b' for both, 0 for using p_ead
 {
-    if (dir == 0)
+    ಆದರೆ (dir == 0)
 	dir = *p_ead;
-    win_equal_rec(next_curwin == NULL ? curwin : next_curwin, current,
-		      topframe, dir, firstwin->w_wincol, tabline_height(),
-		      topframe->fr_width, topframe->fr_height);
-#if defined(FEAT_STL_OPT)
-    frame_change_statusline_height();
-#endif
-    if (!is_aucmd_win(next_curwin))
+    win_equal_rec(ಮುಂದಿನ_curwin == ಖಾಲಿ ? curwin : ಮುಂದಿನ_curwin, current,
+		      topframe, dir, firstwin->w_wincol, tabline_ಎತ್ತರ(),
+		      topframe->fr_ಅಗಲ, topframe->fr_ಎತ್ತರ);
+#ಆದರೆ defined(FEAT_STL_OPT)
+    ಚೌಕಟ್ಟು_change_statusline_ಎತ್ತರ();
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (!is_aucmd_win(ಮುಂದಿನ_curwin))
 	win_fix_scroll(TRUE);
 }
 
@@ -2157,460 +2157,460 @@ win_equal(
  * The window "next_curwin" (if not NULL) should at least get the size from
  * 'winheight' and 'winwidth' if possible.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 win_equal_rec(
-    win_T	*next_curwin,	// pointer to current window to be or NULL
-    int		current,	// do only frame with current window
-    frame_T	*topfr,		// frame to set size off
-    int		dir,		// 'v', 'h' or 'b', see win_equal()
-    int		col,		// horizontal position for frame
-    int		row,		// vertical position for frame
-    int		width,		// new width of frame
-    int		height)		// new height of frame
+    win_T	*ಮುಂದಿನ_curwin,	// pointer to current window to be or NULL
+    ಪೂರ್ಣಾಂಕ		current,	// do only frame with current window
+    ಚೌಕಟ್ಟು_T	*topfr,		// frame to set size off
+    ಪೂರ್ಣಾಂಕ		dir,		// 'v', 'h' or 'b', see win_equal()
+    ಪೂರ್ಣಾಂಕ		ಲಂಬಸಾಲು,		// horizontal position for frame
+    ಪೂರ್ಣಾಂಕ		ಅಡ್ಡಸಾಲು,		// vertical position for frame
+    ಪೂರ್ಣಾಂಕ		ಅಗಲ,		// new width of frame
+    ಪೂರ್ಣಾಂಕ		ಎತ್ತರ)		// new height of frame
 {
-    int		n, m;
-    int		extra_sep = 0;
-    int		wincount, totwincount = 0;
-    frame_T	*fr;
-    int		next_curwin_size = 0;
-    int		room = 0;
-    int		new_size;
-    int		has_next_curwin = 0;
-    int		hnc;
+    ಪೂರ್ಣಾಂಕ		n, m;
+    ಪೂರ್ಣಾಂಕ		extra_sep = 0;
+    ಪೂರ್ಣಾಂಕ		wincount, totwincount = 0;
+    ಚೌಕಟ್ಟು_T	*fr;
+    ಪೂರ್ಣಾಂಕ		ಮುಂದಿನ_curwin_ಗಾತ್ರ = 0;
+    ಪೂರ್ಣಾಂಕ		ಸ್ಥಳ = 0;
+    ಪೂರ್ಣಾಂಕ		new_ಗಾತ್ರ;
+    ಪೂರ್ಣಾಂಕ		has_ಮುಂದಿನ_curwin = 0;
+    ಪೂರ್ಣಾಂಕ		hnc;
 
-    if (topfr->fr_layout == FR_LEAF)
+    ಆದರೆ (topfr->fr_layout == FR_ಎಲೆ)
     {
 	// Set the width/height of this frame.
 	// Redraw when size or position changes
-	if (topfr->fr_height != height || topfr->fr_win->w_winrow != row
-		|| topfr->fr_width != width || topfr->fr_win->w_wincol != col
+	ಆದರೆ (topfr->fr_ಎತ್ತರ != ಎತ್ತರ || topfr->fr_win->w_winrow != ಅಡ್ಡಸಾಲು
+		|| topfr->fr_ಅಗಲ != ಅಗಲ || topfr->fr_win->w_wincol != ಲಂಬಸಾಲು
 	   )
 	{
-	    topfr->fr_win->w_winrow = row;
-	    frame_new_height(topfr, height, FALSE, FALSE, FALSE);
-	    topfr->fr_win->w_wincol = col;
-	    frame_new_width(topfr, width, FALSE, FALSE);
+	    topfr->fr_win->w_winrow = ಅಡ್ಡಸಾಲು;
+	    ಚೌಕಟ್ಟು_new_ಎತ್ತರ(topfr, ಎತ್ತರ, FALSE, FALSE, FALSE);
+	    topfr->fr_win->w_wincol = ಲಂಬಸಾಲು;
+	    ಚೌಕಟ್ಟು_new_ಅಗಲ(topfr, ಅಗಲ, FALSE, FALSE);
 	    redraw_all_later(UPD_NOT_VALID);
 	}
     }
-    else if (topfr->fr_layout == FR_ROW)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (topfr->fr_layout == FR_ಅಡ್ಡಸಾಲು)
     {
-	topfr->fr_width = width;
-	topfr->fr_height = height;
+	topfr->fr_ಅಗಲ = ಅಗಲ;
+	topfr->fr_ಎತ್ತರ = ಎತ್ತರ;
 
-	if (dir != 'v')			// equalize frame widths
+	ಆದರೆ (dir != 'v')			// equalize frame widths
 	{
 	    // Compute the maximum number of windows horizontally in this
 	    // frame.
-	    n = frame_minwidth(topfr, NOWIN);
+	    n = ಚೌಕಟ್ಟು_minwidth(topfr, NOWIN);
 	    // add one for the rightmost window, it doesn't have a separator
-	    if (col + width >= firstwin->w_wincol + topframe->fr_width)
+	    ಆದರೆ (ಲಂಬಸಾಲು + ಅಗಲ >= firstwin->w_wincol + topframe->fr_ಅಗಲ)
 		extra_sep = 1;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		extra_sep = 0;
 	    totwincount = (n + extra_sep) / (p_wmw + 1);
-	    has_next_curwin = frame_has_win(topfr, next_curwin);
+	    has_ಮುಂದಿನ_curwin = ಚೌಕಟ್ಟು_has_win(topfr, ಮುಂದಿನ_curwin);
 
 	    /*
 	     * Compute width for "next_curwin" window and room available for
 	     * other windows.
 	     * "m" is the minimal width when counting p_wiw for "next_curwin".
 	     */
-	    m = frame_minwidth(topfr, next_curwin);
-	    room = width - m;
-	    if (room < 0)
+	    m = ಚೌಕಟ್ಟು_minwidth(topfr, ಮುಂದಿನ_curwin);
+	    ಸ್ಥಳ = ಅಗಲ - m;
+	    ಆದರೆ (ಸ್ಥಳ < 0)
 	    {
-		next_curwin_size = p_wiw + room;
-		room = 0;
+		ಮುಂದಿನ_curwin_ಗಾತ್ರ = p_wiw + ಸ್ಥಳ;
+		ಸ್ಥಳ = 0;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		next_curwin_size = -1;
-		FOR_ALL_FRAMES(fr, topfr->fr_child)
+		ಮುಂದಿನ_curwin_ಗಾತ್ರ = -1;
+		FOR_ALL_ಚೌಕಟ್ಟುಗಳು(fr, topfr->fr_ಮಗು)
 		{
-		    if (!frame_fixed_width(fr))
-			continue;
+		    ಆದರೆ (!ಚೌಕಟ್ಟು_fixed_ಅಗಲ(fr))
+			ಮುಂದುವರಿ;
 		    // If 'winfixwidth' set keep the window width if possible.
 		    // Watch out for this window being the next_curwin.
-		    n = frame_minwidth(fr, NOWIN);
-		    new_size = fr->fr_width;
-		    if (frame_has_win(fr, next_curwin))
+		    n = ಚೌಕಟ್ಟು_minwidth(fr, NOWIN);
+		    new_ಗಾತ್ರ = fr->fr_ಅಗಲ;
+		    ಆದರೆ (ಚೌಕಟ್ಟು_has_win(fr, ಮುಂದಿನ_curwin))
 		    {
-			room += p_wiw - p_wmw;
-			next_curwin_size = 0;
-			if (new_size < p_wiw)
-			    new_size = p_wiw;
+			ಸ್ಥಳ += p_wiw - p_wmw;
+			ಮುಂದಿನ_curwin_ಗಾತ್ರ = 0;
+			ಆದರೆ (new_ಗಾತ್ರ < p_wiw)
+			    new_ಗಾತ್ರ = p_wiw;
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 			// These windows don't use up room.
-			totwincount -= (n + (fr->fr_next == NULL
+			totwincount -= (n + (fr->fr_ಮುಂದಿನ == ಖಾಲಿ
 					? extra_sep : 0)) / (p_wmw + 1);
-		    room -= new_size - n;
-		    if (room < 0)
+		    ಸ್ಥಳ -= new_ಗಾತ್ರ - n;
+		    ಆದರೆ (ಸ್ಥಳ < 0)
 		    {
-			new_size += room;
-			room = 0;
+			new_ಗಾತ್ರ += ಸ್ಥಳ;
+			ಸ್ಥಳ = 0;
 		    }
-		    fr->fr_newwidth = new_size;
+		    fr->fr_newwidth = new_ಗಾತ್ರ;
 		}
-		if (next_curwin_size == -1)
+		ಆದರೆ (ಮುಂದಿನ_curwin_ಗಾತ್ರ == -1)
 		{
-		    if (!has_next_curwin)
-			next_curwin_size = 0;
-		    else if (totwincount > 1
-			    && (room + (totwincount - 2))
+		    ಆದರೆ (!has_ಮುಂದಿನ_curwin)
+			ಮುಂದಿನ_curwin_ಗಾತ್ರ = 0;
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (totwincount > 1
+			    && (ಸ್ಥಳ + (totwincount - 2))
 						  / (totwincount - 1) > p_wiw)
 		    {
 			// Can make all windows wider than 'winwidth', spread
 			// the room equally.
-			next_curwin_size = (room + p_wiw
+			ಮುಂದಿನ_curwin_ಗಾತ್ರ = (ಸ್ಥಳ + p_wiw
 					    + (totwincount - 1) * p_wmw
 					    + (totwincount - 1)) / totwincount;
-			room -= next_curwin_size - p_wiw;
+			ಸ್ಥಳ -= ಮುಂದಿನ_curwin_ಗಾತ್ರ - p_wiw;
 		    }
-		    else
-			next_curwin_size = p_wiw;
+		    ಇಲ್ಲದಿದ್ದರೆ
+			ಮುಂದಿನ_curwin_ಗಾತ್ರ = p_wiw;
 		}
 	    }
 
-	    if (has_next_curwin)
+	    ಆದರೆ (has_ಮುಂದಿನ_curwin)
 		--totwincount;		// don't count curwin
 	}
 
-	FOR_ALL_FRAMES(fr, topfr->fr_child)
+	FOR_ALL_ಚೌಕಟ್ಟುಗಳು(fr, topfr->fr_ಮಗು)
 	{
 	    wincount = 1;
-	    if (fr->fr_next == NULL)
+	    ಆದರೆ (fr->fr_ಮುಂದಿನ == ಖಾಲಿ)
 		// last frame gets all that remains (avoid roundoff error)
-		new_size = width;
-	    else if (dir == 'v')
-		new_size = fr->fr_width;
-	    else if (frame_fixed_width(fr))
+		new_ಗಾತ್ರ = ಅಗಲ;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (dir == 'v')
+		new_ಗಾತ್ರ = fr->fr_ಅಗಲ;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಚೌಕಟ್ಟು_fixed_ಅಗಲ(fr))
 	    {
-		new_size = fr->fr_newwidth;
+		new_ಗಾತ್ರ = fr->fr_newwidth;
 		wincount = 0;	    // doesn't count as a sizeable window
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		// Compute the maximum number of windows horiz. in "fr".
-		n = frame_minwidth(fr, NOWIN);
-		wincount = (n + (fr->fr_next == NULL ? extra_sep : 0))
+		n = ಚೌಕಟ್ಟು_minwidth(fr, NOWIN);
+		wincount = (n + (fr->fr_ಮುಂದಿನ == ಖಾಲಿ ? extra_sep : 0))
 								/ (p_wmw + 1);
-		m = frame_minwidth(fr, next_curwin);
-		if (has_next_curwin)
-		    hnc = frame_has_win(fr, next_curwin);
-		else
+		m = ಚೌಕಟ್ಟು_minwidth(fr, ಮುಂದಿನ_curwin);
+		ಆದರೆ (has_ಮುಂದಿನ_curwin)
+		    hnc = ಚೌಕಟ್ಟು_has_win(fr, ಮುಂದಿನ_curwin);
+		ಇಲ್ಲದಿದ್ದರೆ
 		    hnc = FALSE;
-		if (hnc)	    // don't count next_curwin
+		ಆದರೆ (hnc)	    // don't count next_curwin
 		    --wincount;
-		if (totwincount == 0)
-		    new_size = room;
-		else
-		    new_size = (wincount * room + ((unsigned)totwincount >> 1))
+		ಆದರೆ (totwincount == 0)
+		    new_ಗಾತ್ರ = ಸ್ಥಳ;
+		ಇಲ್ಲದಿದ್ದರೆ
+		    new_ಗಾತ್ರ = (wincount * ಸ್ಥಳ + ((ಚಿಹ್ನೆರಹಿತ)totwincount >> 1))
 								/ totwincount;
-		if (hnc)	    // add next_curwin size
+		ಆದರೆ (hnc)	    // add next_curwin size
 		{
-		    next_curwin_size -= p_wiw - (m - n);
-		    if (next_curwin_size < 0)
-			next_curwin_size = 0;
-		    new_size += next_curwin_size;
-		    room -= new_size - next_curwin_size;
+		    ಮುಂದಿನ_curwin_ಗಾತ್ರ -= p_wiw - (m - n);
+		    ಆದರೆ (ಮುಂದಿನ_curwin_ಗಾತ್ರ < 0)
+			ಮುಂದಿನ_curwin_ಗಾತ್ರ = 0;
+		    new_ಗಾತ್ರ += ಮುಂದಿನ_curwin_ಗಾತ್ರ;
+		    ಸ್ಥಳ -= new_ಗಾತ್ರ - ಮುಂದಿನ_curwin_ಗಾತ್ರ;
 		}
-		else
-		    room -= new_size;
-		new_size += n;
+		ಇಲ್ಲದಿದ್ದರೆ
+		    ಸ್ಥಳ -= new_ಗಾತ್ರ;
+		new_ಗಾತ್ರ += n;
 	    }
 
 	    // Skip frame that is full width when splitting or closing a
 	    // window, unless equalizing all frames.
-	    if (!current || dir != 'v' || topfr->fr_parent != NULL
-		    || (new_size != fr->fr_width)
-		    || frame_has_win(fr, next_curwin))
-		win_equal_rec(next_curwin, current, fr, dir, col, row,
-							    new_size, height);
-	    col += new_size;
-	    width -= new_size;
+	    ಆದರೆ (!current || dir != 'v' || topfr->fr_ಪೋಷಕ != ಖಾಲಿ
+		    || (new_ಗಾತ್ರ != fr->fr_ಅಗಲ)
+		    || ಚೌಕಟ್ಟು_has_win(fr, ಮುಂದಿನ_curwin))
+		win_equal_rec(ಮುಂದಿನ_curwin, current, fr, dir, ಲಂಬಸಾಲು, ಅಡ್ಡಸಾಲು,
+							    new_ಗಾತ್ರ, ಎತ್ತರ);
+	    ಲಂಬಸಾಲು += new_ಗಾತ್ರ;
+	    ಅಗಲ -= new_ಗಾತ್ರ;
 	    totwincount -= wincount;
 	}
     }
-    else // topfr->fr_layout == FR_COL
+    ಇಲ್ಲದಿದ್ದರೆ // topfr->fr_layout == FR_COL
     {
-	topfr->fr_width = width;
-	topfr->fr_height = height;
+	topfr->fr_ಅಗಲ = ಅಗಲ;
+	topfr->fr_ಎತ್ತರ = ಎತ್ತರ;
 
-	if (dir != 'h')			// equalize frame heights
+	ಆದರೆ (dir != 'h')			// equalize frame heights
 	{
-	    totwincount = frame_wincount_in_height(topfr);
-	    has_next_curwin = frame_has_win(topfr, next_curwin);
+	    totwincount = ಚೌಕಟ್ಟು_wincount_ಒಳ_ಎತ್ತರ(topfr);
+	    has_ಮುಂದಿನ_curwin = ಚೌಕಟ್ಟು_has_win(topfr, ಮುಂದಿನ_curwin);
 
 	    /*
 	     * Compute height for "next_curwin" window and room available for
 	     * other windows.
 	     * "m" is the minimal height when counting p_wh for "next_curwin".
 	     */
-	    m = frame_minheight(topfr, next_curwin);
-	    room = height - m;
-	    if (room < 0)
+	    m = ಚೌಕಟ್ಟು_minheight(topfr, ಮುಂದಿನ_curwin);
+	    ಸ್ಥಳ = ಎತ್ತರ - m;
+	    ಆದರೆ (ಸ್ಥಳ < 0)
 	    {
 		// The room is less than 'winheight', use all space for the
 		// current window.
-		next_curwin_size = p_wh + room;
-		room = 0;
+		ಮುಂದಿನ_curwin_ಗಾತ್ರ = p_wh + ಸ್ಥಳ;
+		ಸ್ಥಳ = 0;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		next_curwin_size = -1;
-		FOR_ALL_FRAMES(fr, topfr->fr_child)
+		ಮುಂದಿನ_curwin_ಗಾತ್ರ = -1;
+		FOR_ALL_ಚೌಕಟ್ಟುಗಳು(fr, topfr->fr_ಮಗು)
 		{
-		    if (!frame_fixed_height(fr))
-			continue;
+		    ಆದರೆ (!ಚೌಕಟ್ಟು_fixed_ಎತ್ತರ(fr))
+			ಮುಂದುವರಿ;
 		    // If 'winfixheight' set keep the window height if
 		    // possible.
 		    // Watch out for this window being the next_curwin.
-		    n = frame_minheight(fr, NOWIN);
-		    new_size = fr->fr_height;
-		    if (frame_has_win(fr, next_curwin))
+		    n = ಚೌಕಟ್ಟು_minheight(fr, NOWIN);
+		    new_ಗಾತ್ರ = fr->fr_ಎತ್ತರ;
+		    ಆದರೆ (ಚೌಕಟ್ಟು_has_win(fr, ಮುಂದಿನ_curwin))
 		    {
-			room += p_wh - p_wmh;
-			next_curwin_size = 0;
+			ಸ್ಥಳ += p_wh - p_wmh;
+			ಮುಂದಿನ_curwin_ಗಾತ್ರ = 0;
 			// n + (p_wh - p_wmh) = frame_minheight(fr,
 			// next_curwin): min height for curwin.
-			if (new_size < n + (p_wh - p_wmh))
-			    new_size = n + (p_wh - p_wmh);
+			ಆದರೆ (new_ಗಾತ್ರ < n + (p_wh - p_wmh))
+			    new_ಗಾತ್ರ = n + (p_wh - p_wmh);
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 			// These windows don't use up room.
-			totwincount -= frame_wincount_in_height(fr);
-		    room -= new_size - n;
-		    if (room < 0)
+			totwincount -= ಚೌಕಟ್ಟು_wincount_ಒಳ_ಎತ್ತರ(fr);
+		    ಸ್ಥಳ -= new_ಗಾತ್ರ - n;
+		    ಆದರೆ (ಸ್ಥಳ < 0)
 		    {
-			new_size += room;
-			room = 0;
+			new_ಗಾತ್ರ += ಸ್ಥಳ;
+			ಸ್ಥಳ = 0;
 		    }
-		    fr->fr_newheight = new_size;
+		    fr->fr_newheight = new_ಗಾತ್ರ;
 		}
-		if (next_curwin_size == -1)
+		ಆದರೆ (ಮುಂದಿನ_curwin_ಗಾತ್ರ == -1)
 		{
-		    if (!has_next_curwin)
-			next_curwin_size = 0;
-		    else if (totwincount > 1
-			    && (room + (totwincount - 2))
+		    ಆದರೆ (!has_ಮುಂದಿನ_curwin)
+			ಮುಂದಿನ_curwin_ಗಾತ್ರ = 0;
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (totwincount > 1
+			    && (ಸ್ಥಳ + (totwincount - 2))
 						   / (totwincount - 1) > p_wh)
 		    {
 			// can make all windows higher than 'winheight',
 			// spread the room equally.
-			next_curwin_size = (room + p_wh
+			ಮುಂದಿನ_curwin_ಗಾತ್ರ = (ಸ್ಥಳ + p_wh
 					   + (totwincount - 1) * p_wmh
 					   + (totwincount - 1)) / totwincount;
-			room -= next_curwin_size - p_wh;
+			ಸ್ಥಳ -= ಮುಂದಿನ_curwin_ಗಾತ್ರ - p_wh;
 		    }
-		    else
-			next_curwin_size = p_wh;
+		    ಇಲ್ಲದಿದ್ದರೆ
+			ಮುಂದಿನ_curwin_ಗಾತ್ರ = p_wh;
 		}
 	    }
 
-	    if (has_next_curwin)
+	    ಆದರೆ (has_ಮುಂದಿನ_curwin)
 		--totwincount;		// don't count curwin
 	}
 
-	FOR_ALL_FRAMES(fr, topfr->fr_child)
+	FOR_ALL_ಚೌಕಟ್ಟುಗಳು(fr, topfr->fr_ಮಗು)
 	{
 	    wincount = 1;
-	    if (fr->fr_next == NULL)
+	    ಆದರೆ (fr->fr_ಮುಂದಿನ == ಖಾಲಿ)
 		// last frame gets all that remains (avoid roundoff error)
-		new_size = height;
-	    else if (dir == 'h')
-		new_size = fr->fr_height;
-	    else if (frame_fixed_height(fr))
+		new_ಗಾತ್ರ = ಎತ್ತರ;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (dir == 'h')
+		new_ಗಾತ್ರ = fr->fr_ಎತ್ತರ;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಚೌಕಟ್ಟು_fixed_ಎತ್ತರ(fr))
 	    {
-		new_size = fr->fr_newheight;
+		new_ಗಾತ್ರ = fr->fr_newheight;
 		wincount = 0;	    // doesn't count as a sizeable window
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		// Compute the maximum number of windows vert. in "fr".
-		n = frame_minheight(fr, NOWIN);
-		wincount = frame_wincount_in_height(fr);
-		m = frame_minheight(fr, next_curwin);
-		if (has_next_curwin)
-		    hnc = frame_has_win(fr, next_curwin);
-		else
+		n = ಚೌಕಟ್ಟು_minheight(fr, NOWIN);
+		wincount = ಚೌಕಟ್ಟು_wincount_ಒಳ_ಎತ್ತರ(fr);
+		m = ಚೌಕಟ್ಟು_minheight(fr, ಮುಂದಿನ_curwin);
+		ಆದರೆ (has_ಮುಂದಿನ_curwin)
+		    hnc = ಚೌಕಟ್ಟು_has_win(fr, ಮುಂದಿನ_curwin);
+		ಇಲ್ಲದಿದ್ದರೆ
 		    hnc = FALSE;
-		if (hnc)	    // don't count next_curwin
+		ಆದರೆ (hnc)	    // don't count next_curwin
 		    --wincount;
-		if (totwincount == 0)
-		    new_size = room;
-		else
-		    new_size = (wincount * room + ((unsigned)totwincount >> 1))
+		ಆದರೆ (totwincount == 0)
+		    new_ಗಾತ್ರ = ಸ್ಥಳ;
+		ಇಲ್ಲದಿದ್ದರೆ
+		    new_ಗಾತ್ರ = (wincount * ಸ್ಥಳ + ((ಚಿಹ್ನೆರಹಿತ)totwincount >> 1))
 								/ totwincount;
-		if (hnc)	    // add next_curwin size
+		ಆದರೆ (hnc)	    // add next_curwin size
 		{
-		    next_curwin_size -= p_wh - (m - n);
-		    new_size += next_curwin_size;
-		    room -= new_size - next_curwin_size;
+		    ಮುಂದಿನ_curwin_ಗಾತ್ರ -= p_wh - (m - n);
+		    new_ಗಾತ್ರ += ಮುಂದಿನ_curwin_ಗಾತ್ರ;
+		    ಸ್ಥಳ -= new_ಗಾತ್ರ - ಮುಂದಿನ_curwin_ಗಾತ್ರ;
 		}
-		else
-		    room -= new_size;
-		new_size += n;
+		ಇಲ್ಲದಿದ್ದರೆ
+		    ಸ್ಥಳ -= new_ಗಾತ್ರ;
+		new_ಗಾತ್ರ += n;
 	    }
 	    // Skip frame that is full width when splitting or closing a
 	    // window, unless equalizing all frames.
-	    if (!current || dir != 'h' || topfr->fr_parent != NULL
-		    || (new_size != fr->fr_height)
-		    || frame_has_win(fr, next_curwin))
-		win_equal_rec(next_curwin, current, fr, dir, col, row,
-							     width, new_size);
-	    row += new_size;
-	    height -= new_size;
+	    ಆದರೆ (!current || dir != 'h' || topfr->fr_ಪೋಷಕ != ಖಾಲಿ
+		    || (new_ಗಾತ್ರ != fr->fr_ಎತ್ತರ)
+		    || ಚೌಕಟ್ಟು_has_win(fr, ಮುಂದಿನ_curwin))
+		win_equal_rec(ಮುಂದಿನ_curwin, current, fr, dir, ಲಂಬಸಾಲು, ಅಡ್ಡಸಾಲು,
+							     ಅಗಲ, new_ಗಾತ್ರ);
+	    ಅಡ್ಡಸಾಲು += new_ಗಾತ್ರ;
+	    ಎತ್ತರ -= new_ಗಾತ್ರ;
 	    totwincount -= wincount;
 	}
     }
 }
 
-#if defined(FEAT_JOB_CHANNEL)
-    void
-leaving_window(win_T *win)
+#ಆದರೆ defined(FEAT_ಕೆಲಸ_CHANNEL)
+    ಶೂನ್ಯ
+leaving_ಕಿಟಕಿ(win_T *win)
 {
     // Only matters for a prompt window.
     // Don't do mode changes for a prompt buffer in an autocommand window, as
     // it's only used temporarily during an autocommand.
-    if (!bt_prompt(win->w_buffer) || is_aucmd_win(win))
-	return;
+    ಆದರೆ (!bt_prompt(win->w_ಬಫರ್) || is_aucmd_win(win))
+	ಹಿಂತಿರುಗಿ;
 
     // When leaving a prompt window stop Insert mode and perhaps restart
     // it when entering that window again.
-    win->w_buffer->b_prompt_insert = restart_edit;
-    if (restart_edit != 0 && mode_displayed)
+    win->w_ಬಫರ್->b_prompt_ಸೇರಿಸು = restart_edit;
+    ಆದರೆ (restart_edit != 0 && ಬಹುಲಕ_displayed)
 	clear_cmdline = TRUE;		// unshow mode later
     restart_edit = NUL;
 
     // When leaving the window (or closing the window) was done from a
     // callback we need to break out of the Insert mode loop and restart Insert
     // mode when entering the window again.
-    if ((State & MODE_INSERT) && !stop_insert_mode)
+    ಆದರೆ ((State & ಬಹುಲಕ_ಸೇರಿಸು) && !stop_ಸೇರಿಸು_ಬಹುಲಕ)
     {
-	stop_insert_mode = TRUE;
-	if (win->w_buffer->b_prompt_insert == NUL)
-	    win->w_buffer->b_prompt_insert = 'A';
+	stop_ಸೇರಿಸು_ಬಹುಲಕ = TRUE;
+	ಆದರೆ (win->w_ಬಫರ್->b_prompt_ಸೇರಿಸು == NUL)
+	    win->w_ಬಫರ್->b_prompt_ಸೇರಿಸು = 'A';
     }
 }
 
-    void
-entering_window(win_T *win)
+    ಶೂನ್ಯ
+entering_ಕಿಟಕಿ(win_T *win)
 {
     // Only matters for a prompt window.
     // Don't do mode changes for a prompt buffer in an autocommand window, as
     // it's only used temporarily during an autocommand.
-    if (!bt_prompt(win->w_buffer) || is_aucmd_win(win))
-	return;
+    ಆದರೆ (!bt_prompt(win->w_ಬಫರ್) || is_aucmd_win(win))
+	ಹಿಂತಿರುಗಿ;
 
     // When switching to a prompt buffer that was in Insert mode, don't stop
     // Insert mode, it may have been set in leaving_window().
-    if (win->w_buffer->b_prompt_insert != NUL)
-	stop_insert_mode = FALSE;
+    ಆದರೆ (win->w_ಬಫರ್->b_prompt_ಸೇರಿಸು != NUL)
+	stop_ಸೇರಿಸು_ಬಹುಲಕ = FALSE;
 
     // When entering the prompt window restart Insert mode if we were in Insert
     // mode when we left it and not already in Insert mode.
-    if ((State & MODE_INSERT) == 0)
-	restart_edit = win->w_buffer->b_prompt_insert;
+    ಆದರೆ ((State & ಬಹುಲಕ_ಸೇರಿಸು) == 0)
+	restart_edit = win->w_ಬಫರ್->b_prompt_ಸೇರಿಸು;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    static void
-win_init_empty(win_T *wp)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+win_init_ಖಾಲಿಗಳು(win_T *wp)
 {
     redraw_win_later(wp, UPD_NOT_VALID);
-    wp->w_lines_valid = 0;
+    wp->w_ಸಾಲುಗಳು_valid = 0;
     wp->w_cursor.lnum = 1;
-    wp->w_curswant = wp->w_cursor.col = 0;
+    wp->w_curswant = wp->w_cursor.ಲಂಬಸಾಲು = 0;
     wp->w_cursor.coladd = 0;
     wp->w_pcmark.lnum = 1;	// pcmark not cleared but set to line 1
-    wp->w_pcmark.col = 0;
+    wp->w_pcmark.ಲಂಬಸಾಲು = 0;
     wp->w_prev_pcmark.lnum = 0;
-    wp->w_prev_pcmark.col = 0;
+    wp->w_prev_pcmark.ಲಂಬಸಾಲು = 0;
     wp->w_topline = 1;
-#ifdef FEAT_DIFF
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
     wp->w_topfill = 0;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     wp->w_botline = 2;
     wp->w_valid = 0;
-#if defined(FEAT_SYN_HL) || defined(FEAT_SPELL)
-    wp->w_s = &wp->w_buffer->b_s;
-#endif
-#ifdef FEAT_TERMINAL
-    term_reset_hlfwin(wp);
-#endif
+#ಆದರೆ defined(FEAT_SYN_HL) || defined(FEAT_SPELL)
+    wp->w_s = &wp->w_ಬಫರ್->b_s;
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMINAL
+    ಪದ_reset_hlfwin(wp);
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Init the current window "curwin".
  * Called when a new file is being edited.
  */
-    void
-curwin_init(void)
+    ಶೂನ್ಯ
+curwin_init(ಶೂನ್ಯ)
 {
-    win_init_empty(curwin);
+    win_init_ಖಾಲಿಗಳು(curwin);
 }
 
 /*
  * Close all windows for buffer "buf".
  */
-    void
+    ಶೂನ್ಯ
 close_windows(
     buf_T	*buf,
-    int		keep_curwin)	    // don't close "curwin"
+    ಪೂರ್ಣಾಂಕ		keep_curwin)	    // don't close "curwin"
 {
     win_T	*wp;
     tabpage_T   *tp, *nexttp;
-    int		count = tabpage_index(NULL);
+    ಪೂರ್ಣಾಂಕ		ಎಣಿಕೆ_2 = tabpage_ಸೂಚ್ಯಂಕ(ಖಾಲಿ);
 
     ++RedrawingDisabled;
 
-    for (wp = firstwin; wp != NULL && !ONE_WINDOW; )
+    ಗಾಗಿ (wp = firstwin; wp != ಖಾಲಿ && !ONE_ಕಿಟಕಿ; )
     {
-	if (wp->w_buffer == buf && (!keep_curwin || wp != curwin)
-		&& !(win_locked(wp) || wp->w_buffer->b_locked > 0))
+	ಆದರೆ (wp->w_ಬಫರ್ == buf && (!keep_curwin || wp != curwin)
+		&& !(win_locked(wp) || wp->w_ಬಫರ್->b_locked > 0))
 	{
-	    if (window_layout_locked(CMD_SIZE))
-		goto theend;  // Only give one error message.
-	    if (win_close(wp, FALSE) == FAIL)
+	    ಆದರೆ (ಕಿಟಕಿ_layout_locked(CMD_ಗಾತ್ರ))
+		ಹೋಗು theend;  // Only give one error message.
+	    ಆದರೆ (win_close(wp, FALSE) == FAIL)
 		// If closing the window fails give up, to avoid looping
 		// forever.
-		break;
+		ನಿಲ್ಲಿಸು;
 
 	    // Start all over, autocommands may change the window layout.
 	    wp = firstwin;
 	}
-	else
-	    wp = wp->w_next;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    wp = wp->w_ಮುಂದಿನ;
     }
 
     // Also check windows in other tab pages.
-    for (tp = first_tabpage; tp != NULL; tp = nexttp)
+    ಗಾಗಿ (tp = ಮೊದಲ_tabpage; tp != ಖಾಲಿ; tp = nexttp)
     {
-	nexttp = tp->tp_next;
-	if (tp != curtab)
-	    FOR_ALL_WINDOWS_IN_TAB(tp, wp)
-		if (wp->w_buffer == buf
-		    && !(win_locked(wp) || wp->w_buffer->b_locked > 0))
+	nexttp = tp->tp_ಮುಂದಿನ;
+	ಆದರೆ (tp != curtab)
+	    FOR_ALL_WINDOWS_ಒಳ_TAB(tp, wp)
+		ಆದರೆ (wp->w_ಬಫರ್ == buf
+		    && !(win_locked(wp) || wp->w_ಬಫರ್->b_locked > 0))
 		{
-		    if (window_layout_locked(CMD_SIZE))
-			goto theend;  // Only give one error message.
+		    ಆದರೆ (ಕಿಟಕಿ_layout_locked(CMD_ಗಾತ್ರ))
+			ಹೋಗು theend;  // Only give one error message.
 		    win_close_othertab(wp, FALSE, tp);
 
 		    // Start all over, the tab page may be closed and
 		    // autocommands may change the window layout.
-		    nexttp = first_tabpage;
-		    break;
+		    nexttp = ಮೊದಲ_tabpage;
+		    ನಿಲ್ಲಿಸು;
 		}
     }
 
 theend:
-    if (RedrawingDisabled > 0)
+    ಆದರೆ (RedrawingDisabled > 0)
 	--RedrawingDisabled;
 
-    if (count != tabpage_index(NULL))
-	apply_autocmds(EVENT_TABCLOSED, NULL, NULL, FALSE, curbuf);
+    ಆದರೆ (ಎಣಿಕೆ_2 != tabpage_ಸೂಚ್ಯಂಕ(ಖಾಲಿ))
+	apply_autocmds(EVENT_TABCLOSED, ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
 }
 
 /*
@@ -2618,46 +2618,46 @@ theend:
  * "aucmd_win[]").
  * Returns FALSE if there is a window, possibly in another tab page.
  */
-    int
-last_window(void)
+    ಪೂರ್ಣಾಂಕ
+ಕೊನೆಯ_ಕಿಟಕಿ(ಶೂನ್ಯ)
 {
-    return (one_window() && first_tabpage->tp_next == NULL);
+    ಹಿಂತಿರುಗಿ (one_ಕಿಟಕಿ() && ಮೊದಲ_tabpage->tp_ಮುಂದಿನ == ಖಾಲಿ);
 }
 
 /*
  * Return TRUE if there is only one window other than "aucmd_win[]" in the
  * current tab page.
  */
-    int
-one_window(void)
+    ಪೂರ್ಣಾಂಕ
+one_ಕಿಟಕಿ(ಶೂನ್ಯ)
 {
     win_T	*wp;
-    int		seen_one = FALSE;
+    ಪೂರ್ಣಾಂಕ		ನೋಡಿದ_one = FALSE;
 
     FOR_ALL_WINDOWS(wp)
     {
-	if (!is_aucmd_win(wp))
+	ಆದರೆ (!is_aucmd_win(wp))
 	{
-	    if (seen_one)
-		return FALSE;
-	    seen_one = TRUE;
+	    ಆದರೆ (ನೋಡಿದ_one)
+		ಹಿಂತಿರುಗಿ FALSE;
+	    ನೋಡಿದ_one = TRUE;
 	}
     }
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
  * Close the possibly last window in a tab page.
  * Return FALSE if there are other windows and nothing is done, TRUE otherwise.
  */
-    static int
-close_last_window_tabpage(
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+close_ಕೊನೆಯ_ಕಿಟಕಿ_tabpage(
     win_T	*win,
-    int		free_buf,
+    ಪೂರ್ಣಾಂಕ		free_buf,
     tabpage_T   *prev_curtab)
 {
-    if (!ONE_WINDOW)
-	return FALSE;
+    ಆದರೆ (!ONE_ಕಿಟಕಿ)
+	ಹಿಂತಿರುಗಿ FALSE;
 
     buf_T	*old_curbuf = curbuf;
     tabpage_T	*save_lastused = lastused_tabpage;
@@ -2672,32 +2672,32 @@ close_last_window_tabpage(
      * Do trigger *Leave autocommands, unless win->w_buffer is NULL, in which
      * case they have already been triggered.
      */
-    goto_tabpage_tp(alt_tabpage(), FALSE, win->w_buffer != NULL);
+    goto_tabpage_tp(alt_tabpage(), FALSE, win->w_ಬಫರ್ != ಖಾಲಿ);
 
     // Safety check: Autocommands may have closed the window when jumping
     // to the other tab page.
-    if (valid_tabpage(prev_curtab) && prev_curtab->tp_firstwin == win)
+    ಆದರೆ (valid_tabpage(prev_curtab) && prev_curtab->tp_firstwin == win)
 	win_close_othertab(win, free_buf, prev_curtab);
 
     // Entering the other tab page made the closed one the last used tab page.
     // Restore the previous one when it is still there.
-    if (valid_tabpage(save_lastused) && save_lastused != curtab)
+    ಆದರೆ (valid_tabpage(save_lastused) && save_lastused != curtab)
 	lastused_tabpage = save_lastused;
-#ifdef FEAT_JOB_CHANNEL
-    entering_window(curwin);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕೆಲಸ_CHANNEL
+    entering_ಕಿಟಕಿ(curwin);
+#ಆದರೆ_ಅಂತ್ಯ
     // Since goto_tabpage_tp above did not trigger *Enter autocommands, do
     // that now.
-    apply_autocmds(EVENT_TABCLOSED, NULL, NULL, FALSE, curbuf);
-#if defined(FEAT_TABPANEL)
-    if (p_stpl > 0)
+    apply_autocmds(EVENT_TABCLOSED, ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
+#ಆದರೆ defined(FEAT_TABPANEL)
+    ಆದರೆ (p_stpl > 0)
 	shell_new_columns();
-#endif
-    apply_autocmds(EVENT_WINENTER, NULL, NULL, FALSE, curbuf);
-    apply_autocmds(EVENT_TABENTER, NULL, NULL, FALSE, curbuf);
-    if (old_curbuf != curbuf)
-	apply_autocmds(EVENT_BUFENTER, NULL, NULL, FALSE, curbuf);
-    return TRUE;
+#ಆದರೆ_ಅಂತ್ಯ
+    apply_autocmds(EVENT_WINENTER, ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
+    apply_autocmds(EVENT_TABENTER, ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
+    ಆದರೆ (old_curbuf != curbuf)
+	apply_autocmds(EVENT_BUFENTER, ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
@@ -2706,36 +2706,36 @@ close_last_window_tabpage(
  * "abort_if_last" is passed to close_buffer(): abort closing if all other
  * windows are closed.
  */
-    static void
-win_close_buffer(win_T *win, int action, int abort_if_last)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+win_close_ಬಫರ್(win_T *win, ಪೂರ್ಣಾಂಕ action, ಪೂರ್ಣಾಂಕ abort_if_ಕೊನೆಯ)
 {
-#ifdef FEAT_SYN_HL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
     // Free independent synblock before the buffer is freed.
-    if (win->w_buffer != NULL)
+    ಆದರೆ (win->w_ಬಫರ್ != ಖಾಲಿ)
 	reset_synblock(win);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_QUICKFIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
     // When a quickfix/location list window is closed and the buffer is
     // displayed in only one window, then unlist the buffer.
-    if (win->w_buffer != NULL && bt_quickfix(win->w_buffer)
-					&& win->w_buffer->b_nwindows == 1)
-	win->w_buffer->b_p_bl = FALSE;
-#endif
+    ಆದರೆ (win->w_ಬಫರ್ != ಖಾಲಿ && bt_quickfix(win->w_ಬಫರ್)
+					&& win->w_ಬಫರ್->b_nwindows == 1)
+	win->w_ಬಫರ್->b_p_bl = FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Close the link to the buffer.
-    if (win->w_buffer != NULL)
+    ಆದರೆ (win->w_ಬಫರ್ != ಖಾಲಿ)
     {
 	bufref_T    bufref;
 
-	set_bufref(&bufref, curbuf);
+	ಗಣ_bufref(&bufref, curbuf);
 	++win->w_locked;
-	close_buffer(win, win->w_buffer, action, abort_if_last, TRUE, TRUE);
-	if (win_valid_any_tab(win))
+	close_ಬಫರ್(win, win->w_ಬಫರ್, action, abort_if_ಕೊನೆಯ, TRUE, TRUE);
+	ಆದರೆ (win_valid_any_tab(win))
 	    --win->w_locked;
 	// Make sure curbuf is valid. It can become invalid if 'bufhidden' is
 	// "wipe".
-	if (!bufref_valid(&bufref))
+	ಆದರೆ (!bufref_valid(&bufref))
 	    curbuf = firstbuf;
     }
 }
@@ -2747,220 +2747,220 @@ win_close_buffer(win_T *win, int action, int abort_if_last)
  * Called by :quit, :close, :xit, :wq and findtag().
  * Returns FAIL when the window was not closed.
  */
-    int
-win_close(win_T *win, int free_buf)
+    ಪೂರ್ಣಾಂಕ
+win_close(win_T *win, ಪೂರ್ಣಾಂಕ free_buf)
 {
     win_T	*wp;
-    int		other_buffer = FALSE;
-    int		close_curwin = FALSE;
-    int		dir;
-    int		help_window = FALSE;
-    int		quickfix_window = FALSE;
+    ಪೂರ್ಣಾಂಕ		other_ಬಫರ್ = FALSE;
+    ಪೂರ್ಣಾಂಕ		close_curwin = FALSE;
+    ಪೂರ್ಣಾಂಕ		dir;
+    ಪೂರ್ಣಾಂಕ		help_ಕಿಟಕಿ = FALSE;
+    ಪೂರ್ಣಾಂಕ		quickfix_ಕಿಟಕಿ = FALSE;
     tabpage_T   *prev_curtab = curtab;
-    frame_T	*win_frame = win->w_frame->fr_parent;
-#ifdef FEAT_DIFF
-    int		had_diffmode = win->w_p_diff;
-#endif
-#ifdef MESSAGE_QUEUE
-    int		did_decrement = FALSE;
-#endif
+    ಚೌಕಟ್ಟು_T	*win_ಚೌಕಟ್ಟು = win->w_ಚೌಕಟ್ಟು->fr_ಪೋಷಕ;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
+    ಪೂರ್ಣಾಂಕ		had_diffmode = win->w_p_diff;
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ಸಂದೇಶ_ಸರತಿ
+    ಪೂರ್ಣಾಂಕ		did_decrement = FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_TERMINAL) && defined(FEAT_PROP_POPUP)
+#ಆದರೆ defined(FEAT_TERMINAL) && defined(FEAT_PROP_POPUP)
     // Can close a popup window with a terminal if the job has finished.
-    if (may_close_term_popup() == OK)
-	return OK;
-#endif
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return FAIL;
+    ಆದರೆ (may_close_ಪದ_popup() == OK)
+	ಹಿಂತಿರುಗಿ OK;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (ERROR_IF_ANY_POPUP_ಕಿಟಕಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    if (last_window())
+    ಆದರೆ (ಕೊನೆಯ_ಕಿಟಕಿ())
     {
-	emsg(_(e_cannot_close_last_window));
-	return FAIL;
+	emsg(_(e_cannot_close_ಕೊನೆಯ_ಕಿಟಕಿ));
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-    if (window_layout_locked(CMD_close))
-	return FAIL;
+    ಆದರೆ (ಕಿಟಕಿ_layout_locked(CMD_close))
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    if (win_locked(win) || (win->w_buffer != NULL
-					       && win->w_buffer->b_locked > 0))
-	return FAIL; // window is already being closed
-    if (win_unlisted(win))
+    ಆದರೆ (win_locked(win) || (win->w_ಬಫರ್ != ಖಾಲಿ
+					       && win->w_ಬಫರ್->b_locked > 0))
+	ಹಿಂತಿರುಗಿ FAIL; // window is already being closed
+    ಆದರೆ (win_unlisted(win))
     {
-	emsg(_(e_cannot_close_autocmd_or_popup_window));
-	return FAIL;
+	emsg(_(e_cannot_close_autocmd_or_popup_ಕಿಟಕಿ));
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-    if ((is_aucmd_win(firstwin) || is_aucmd_win(lastwin)) && one_window())
+    ಆದರೆ ((is_aucmd_win(firstwin) || is_aucmd_win(lastwin)) && one_ಕಿಟಕಿ())
     {
-	emsg(_(e_cannot_close_window_only_autocmd_window_would_remain));
-	return FAIL;
+	emsg(_(e_cannot_close_ಕಿಟಕಿ_only_autocmd_ಕಿಟಕಿ_would_remain));
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
     // When closing the last window in a tab page first go to another tab page
     // and then close the window and the tab page to avoid that curwin and
     // curtab are invalid while we are freeing memory.
-    if (close_last_window_tabpage(win, free_buf, prev_curtab))
-	return FAIL;
+    ಆದರೆ (close_ಕೊನೆಯ_ಕಿಟಕಿ_tabpage(win, free_buf, prev_curtab))
+	ಹಿಂತಿರುಗಿ FAIL;
 
     // When closing the help window, try restoring a snapshot after closing
     // the window.  Otherwise clear the snapshot, it's now invalid.
-    if (bt_help(win->w_buffer))
-	help_window = TRUE;
-    else
+    ಆದರೆ (bt_help(win->w_ಬಫರ್))
+	help_ಕಿಟಕಿ = TRUE;
+    ಇಲ್ಲದಿದ್ದರೆ
 	clear_snapshot(curtab, SNAP_HELP_IDX);
 
-    if (bt_quickfix(win->w_buffer))
-	quickfix_window = TRUE;
-    else
+    ಆದರೆ (bt_quickfix(win->w_ಬಫರ್))
+	quickfix_ಕಿಟಕಿ = TRUE;
+    ಇಲ್ಲದಿದ್ದರೆ
 	clear_snapshot(curtab, SNAP_QUICKFIX_IDX);
 
-    if (win == curwin)
+    ಆದರೆ (win == curwin)
     {
-#ifdef FEAT_JOB_CHANNEL
-	leaving_window(curwin);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕೆಲಸ_CHANNEL
+	leaving_ಕಿಟಕಿ(curwin);
+#ಆದರೆ_ಅಂತ್ಯ
 	/*
 	 * Guess which window is going to be the new current window.
 	 * This may change because of the autocommands (sigh).
 	 */
-	wp = frame2win(win_altframe(win, NULL));
+	wp = frame2win(win_altframe(win, ಖಾಲಿ));
 
 	/*
 	 * Be careful: If autocommands delete the window or cause this window
 	 * to be the last one left, return now.
 	 */
-	if (wp->w_buffer != curbuf)
+	ಆದರೆ (wp->w_ಬಫರ್ != curbuf)
 	{
 	    reset_VIsual_and_resel();	// stop Visual mode
 
-	    other_buffer = TRUE;
-	    if (!win_valid(win))
-		return FAIL;
+	    other_ಬಫರ್ = TRUE;
+	    ಆದರೆ (!win_valid(win))
+		ಹಿಂತಿರುಗಿ FAIL;
 	    ++win->w_locked;
-	    apply_autocmds(EVENT_BUFLEAVE, NULL, NULL, FALSE, curbuf);
-	    if (!win_valid(win))
-		return FAIL;
+	    apply_autocmds(EVENT_BUFLEAVE, ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
+	    ಆದರೆ (!win_valid(win))
+		ಹಿಂತಿರುಗಿ FAIL;
 	    --win->w_locked;
-	    if (last_window())
-		return FAIL;
+	    ಆದರೆ (ಕೊನೆಯ_ಕಿಟಕಿ())
+		ಹಿಂತಿರುಗಿ FAIL;
 	}
 	++win->w_locked;
-	apply_autocmds(EVENT_WINLEAVE, NULL, NULL, FALSE, curbuf);
-	if (!win_valid(win))
-	    return FAIL;
+	apply_autocmds(EVENT_WINLEAVE, ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
+	ಆದರೆ (!win_valid(win))
+	    ಹಿಂತಿರುಗಿ FAIL;
 	--win->w_locked;
-	if (last_window())
-	    return FAIL;
-#ifdef FEAT_EVAL
+	ಆದರೆ (ಕೊನೆಯ_ಕಿಟಕಿ())
+	    ಹಿಂತಿರುಗಿ FAIL;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 	// autocmds may abort script processing
-	if (aborting())
-	    return FAIL;
-#endif
+	ಆದರೆ (aborting())
+	    ಹಿಂತಿರುಗಿ FAIL;
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
     // Avoid trouble with scrollbars that are going to be deleted in
     // win_free().
-    if (gui.in_use)
-	out_flush();
-#endif
+    ಆದರೆ (gui.ಒಳ_use)
+	ಹೊರಹೋಗು_flush();
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_PROP_POPUP
-    if (popup_win_closed(win) && !win_valid(win))
-	return FAIL;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+    ಆದರೆ (popup_win_closed(win) && !win_valid(win))
+	ಹಿಂತಿರುಗಿ FAIL;
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Trigger WinClosed just before starting to free window-related resources.
     trigger_winclosed(win);
     // autocmd may have freed the window already.
-    if (!win_valid_any_tab(win))
-	return OK;
+    ಆದರೆ (!win_valid_any_tab(win))
+	ಹಿಂತಿರುಗಿ OK;
 
-    win_close_buffer(win, free_buf ? DOBUF_UNLOAD : 0, TRUE);
+    win_close_ಬಫರ್(win, free_buf ? DOBUF_UNLOAD : 0, TRUE);
 
-    if (win_valid(win) && win->w_buffer == NULL
-#if defined(FEAT_PROP_POPUP)
+    ಆದರೆ (win_valid(win) && win->w_ಬಫರ್ == ಖಾಲಿ
+#ಆದರೆ defined(FEAT_PROP_POPUP)
 	    && !popup_is_popup(win)
-#endif
-	    && last_window())
+#ಆದರೆ_ಅಂತ್ಯ
+	    && ಕೊನೆಯ_ಕಿಟಕಿ())
     {
 	// Autocommands have closed all windows, quit now.  Restore
 	// curwin->w_buffer, otherwise writing viminfo may fail.
-	if (curwin->w_buffer == NULL)
-	    curwin->w_buffer = curbuf;
+	ಆದರೆ (curwin->w_ಬಫರ್ == ಖಾಲಿ)
+	    curwin->w_ಬಫರ್ = curbuf;
 	getout(0);
     }
 
     // Autocommands may have moved to another tab page.
-    if (curtab != prev_curtab && win_valid_any_tab(win)
-						      && win->w_buffer == NULL)
+    ಆದರೆ (curtab != prev_curtab && win_valid_any_tab(win)
+						      && win->w_ಬಫರ್ == ಖಾಲಿ)
     {
 	// Need to close the window anyway, since the buffer is NULL.
 	win_close_othertab(win, FALSE, prev_curtab);
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
     // Autocommands may have closed the window already or closed the only
     // other window.
-    if (!win_valid(win) || last_window()
-	    || close_last_window_tabpage(win, free_buf, prev_curtab))
-	return FAIL;
+    ಆದರೆ (!win_valid(win) || ಕೊನೆಯ_ಕಿಟಕಿ()
+	    || close_ಕೊನೆಯ_ಕಿಟಕಿ_tabpage(win, free_buf, prev_curtab))
+	ಹಿಂತಿರುಗಿ FAIL;
 
     // Now we are really going to close the window.  Disallow any autocommand
     // to split a window to avoid trouble.
     // Also bail out of parse_queued_messages() to avoid it tries to update the
     // screen.
-    ++split_disallowed;
-#ifdef MESSAGE_QUEUE
+    ++ವಿಭಜಿಸು_disallowed;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ಸಂದೇಶ_ಸರತಿ
     ++dont_parse_messages;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (win->w_buffer != NULL)
-	--win->w_buffer->b_nwindows;
+    ಆದರೆ (win->w_ಬಫರ್ != ಖಾಲಿ)
+	--win->w_ಬಫರ್->b_nwindows;
 
     // Free the memory used for the window and get the window that received
     // the screen space.
-    wp = win_free_mem(win, &dir, NULL);
+    wp = win_free_mem(win, &dir, ಖಾಲಿ);
 
-    if (help_window || quickfix_window)
+    ಆದರೆ (help_ಕಿಟಕಿ || quickfix_ಕಿಟಕಿ)
     {
 	// Closing the help window moves the cursor back to the current window
 	// of the snapshot.
-	win_T *prev_win = get_snapshot_curwin(help_window ? SNAP_HELP_IDX : SNAP_QUICKFIX_IDX);
+	win_T *prev_win = get_snapshot_curwin(help_ಕಿಟಕಿ ? SNAP_HELP_IDX : SNAP_QUICKFIX_IDX);
 
-	if (win_valid(prev_win))
+	ಆದರೆ (win_valid(prev_win))
 	    wp = prev_win;
     }
 
     // Make sure curwin isn't invalid.  It can cause severe trouble when
     // printing an error message.  For win_equal() curbuf needs to be valid
     // too.
-    if (win == curwin)
+    ಆದರೆ (win == curwin)
     {
 	curwin = wp;
-#ifdef FEAT_QUICKFIX
-	if (wp->w_p_pvw || bt_quickfix(wp->w_buffer))
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
+	ಆದರೆ (wp->w_p_pvw || bt_quickfix(wp->w_ಬಫರ್))
 	{
 	    /*
 	     * If the cursor goes to the preview or the quickfix window, try
 	     * finding another window to go to.
 	     */
-	    for (;;)
+	    ಗಾಗಿ (;;)
 	    {
-		if (wp->w_next == NULL)
+		ಆದರೆ (wp->w_ಮುಂದಿನ == ಖಾಲಿ)
 		    wp = firstwin;
-		else
-		    wp = wp->w_next;
-		if (wp == curwin)
-		    break;
-		if (!wp->w_p_pvw && !bt_quickfix(wp->w_buffer))
+		ಇಲ್ಲದಿದ್ದರೆ
+		    wp = wp->w_ಮುಂದಿನ;
+		ಆದರೆ (wp == curwin)
+		    ನಿಲ್ಲಿಸು;
+		ಆದರೆ (!wp->w_p_pvw && !bt_quickfix(wp->w_ಬಫರ್))
 		{
 		    curwin = wp;
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 	    }
 	}
-#endif
-	curbuf = curwin->w_buffer;
+#ಆದರೆ_ಅಂತ್ಯ
+	curbuf = curwin->w_ಬಫರ್;
 	close_curwin = TRUE;
 
 	// The cursor position may be invalid if the buffer changed after last
@@ -2973,225 +2973,225 @@ win_close(win_T *win, int free_buf)
      * status line.  Do this before win_equal(), because it may change the
      * height of a window
      */
-    last_status(FALSE);
+    ಕೊನೆಯ_ಸ್ಥಿತಿ(FALSE);
 
-    if (p_ea && (*p_ead == 'b' || *p_ead == dir))
+    ಆದರೆ (p_ea && (*p_ead == 'b' || *p_ead == dir))
 	// If the frame of the closed window contains the new current window,
 	// only resize that frame.  Otherwise resize all windows.
-	win_equal(curwin, curwin->w_frame->fr_parent == win_frame, dir);
-    else
+	win_equal(curwin, curwin->w_ಚೌಕಟ್ಟು->fr_ಪೋಷಕ == win_ಚೌಕಟ್ಟು, dir);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	win_comp_pos();
 	win_fix_scroll(FALSE);
     }
 
-    if (close_curwin)
+    ಆದರೆ (close_curwin)
     {
 	// Pass WEE_ALLOW_PARSE_MESSAGES to decrement dont_parse_messages
 	// before autocommands.
-#ifdef MESSAGE_QUEUE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ಸಂದೇಶ_ಸರತಿ
 	did_decrement =
-#else
-	(void)
-#endif
+#ಇಲ್ಲದಿದ್ದರೆ
+	(ಶೂನ್ಯ)
+#ಆದರೆ_ಅಂತ್ಯ
 	    win_enter_ext(wp,
 		WEE_CURWIN_INVALID | WEE_TRIGGER_ENTER_AUTOCMDS
 		      | WEE_TRIGGER_LEAVE_AUTOCMDS | WEE_ALLOW_PARSE_MESSAGES);
-	if (other_buffer)
+	ಆದರೆ (other_ಬಫರ್)
 	    // careful: after this wp and win may be invalid!
-	    apply_autocmds(EVENT_BUFENTER, NULL, NULL, FALSE, curbuf);
+	    apply_autocmds(EVENT_BUFENTER, ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
     }
 
-    if (ONE_WINDOW && curwin->w_locked && curbuf->b_locked_split
-	    && first_tabpage->tp_next != NULL)
+    ಆದರೆ (ONE_ಕಿಟಕಿ && curwin->w_locked && curbuf->b_locked_ವಿಭಜಿಸು
+	    && ಮೊದಲ_tabpage->tp_ಮುಂದಿನ != ಖಾಲಿ)
 	// The new curwin is the last window in the current tab page, and it is
 	// already being closed.  Trigger TabLeave now, as after its buffer is
 	// removed it's no longer safe to do that.
-	apply_autocmds(EVENT_TABLEAVE, NULL, NULL, FALSE, curbuf);
+	apply_autocmds(EVENT_TABLEAVE, ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
 
-    --split_disallowed;
-#ifdef MESSAGE_QUEUE
-    if (!did_decrement)
+    --ವಿಭಜಿಸು_disallowed;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ಸಂದೇಶ_ಸರತಿ
+    ಆದರೆ (!did_decrement)
 	--dont_parse_messages;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // After closing the help or quickfix window, try restoring the window
     // layout from before it was opened.
-    if (help_window || quickfix_window)
-	restore_snapshot(help_window ? SNAP_HELP_IDX : SNAP_QUICKFIX_IDX,
+    ಆದರೆ (help_ಕಿಟಕಿ || quickfix_ಕಿಟಕಿ)
+	restore_snapshot(help_ಕಿಟಕಿ ? SNAP_HELP_IDX : SNAP_QUICKFIX_IDX,
 			close_curwin);
 
-#ifdef FEAT_DIFF
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
     // If the window had 'diff' set and now there is only one window left in
     // the tab page with 'diff' set, and "closeoff" is in 'diffopt', then
     // execute ":diffoff!".
-    if (diffopt_closeoff() && had_diffmode && curtab == prev_curtab)
+    ಆದರೆ (diffopt_closeoff() && had_diffmode && curtab == prev_curtab)
     {
-	int	diffcount = 0;
+	ಪೂರ್ಣಾಂಕ	diffcount = 0;
 	win_T	*dwin;
 
 	FOR_ALL_WINDOWS(dwin)
-	    if (dwin->w_p_diff)
+	    ಆದರೆ (dwin->w_p_diff)
 		++diffcount;
-	if (diffcount == 1)
+	ಆದರೆ (diffcount == 1)
 	    do_cmdline_cmd((char_u *)"diffoff!");
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_GUI)
+#ಆದರೆ defined(FEAT_GUI)
     // When 'guioptions' includes 'L' or 'R' may have to remove scrollbars.
-    if (gui.in_use && !win_hasvertsplit())
-	gui_init_which_components(NULL);
-#endif
+    ಆದರೆ (gui.ಒಳ_use && !win_hasvertsplit())
+	gui_init_which_components(ಖಾಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ
 
     redraw_all_later(UPD_NOT_VALID);
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-    static void
-trigger_winnewpre(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+trigger_winnewpre(ಶೂನ್ಯ)
 {
-    window_layout_lock();
-    apply_autocmds(EVENT_WINNEWPRE, NULL, NULL, FALSE, NULL);
-    window_layout_unlock();
+    ಕಿಟಕಿ_layout_ಬೀಗ();
+    apply_autocmds(EVENT_WINNEWPRE, ಖಾಲಿ, ಖಾಲಿ, FALSE, ಖಾಲಿ);
+    ಕಿಟಕಿ_layout_unlock();
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 trigger_winclosed(win_T *win)
 {
-    static int	recursive = FALSE;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	recursive = FALSE;
     char_u	winid[NUMBUFLEN];
 
-    if (recursive)
-	return;
+    ಆದರೆ (recursive)
+	ಹಿಂತಿರುಗಿ;
     recursive = TRUE;
-    vim_snprintf((char *)winid, sizeof(winid), "%d", win->w_id);
-    apply_autocmds(EVENT_WINCLOSED, winid, winid, FALSE, win->w_buffer);
+    vim_snprintf((ಅಕ್ಷರ *)winid, ಗಾತ್ರ(winid), "%d", win->w_id);
+    apply_autocmds(EVENT_WINCLOSED, winid, winid, FALSE, win->w_ಬಫರ್);
     recursive = FALSE;
 }
 
-    void
+    ಶೂನ್ಯ
 trigger_tabclosedpre(tabpage_T *tp)
 {
-    static int	recursive = FALSE;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	recursive = FALSE;
     tabpage_T	*ptp = curtab;
 
     // Quickly return when no TabClosedPre autocommands to be executed or
     // already executing
-    if (!has_tabclosedpre() || recursive)
-	return;
+    ಆದರೆ (!has_tabclosedpre() || recursive)
+	ಹಿಂತಿರುಗಿ;
 
-    if (valid_tabpage(tp))
+    ಆದರೆ (valid_tabpage(tp))
 	goto_tabpage_tp(tp, FALSE, FALSE);
     recursive = TRUE;
-    window_layout_lock();
-    apply_autocmds(EVENT_TABCLOSEDPRE, NULL, NULL, FALSE, NULL);
-    window_layout_unlock();
+    ಕಿಟಕಿ_layout_ಬೀಗ();
+    apply_autocmds(EVENT_TABCLOSEDPRE, ಖಾಲಿ, ಖಾಲಿ, FALSE, ಖಾಲಿ);
+    ಕಿಟಕಿ_layout_unlock();
     recursive = FALSE;
     // tabpage may have been modified or deleted by autocmds
-    if (valid_tabpage(ptp))
+    ಆದರೆ (valid_tabpage(ptp))
 	// try to recover the tabpage first
 	goto_tabpage_tp(ptp, FALSE, FALSE);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	// fall back to the first tabpage
-	goto_tabpage_tp(first_tabpage, FALSE, FALSE);
+	goto_tabpage_tp(ಮೊದಲ_tabpage, FALSE, FALSE);
 }
 
 /*
  * Make a snapshot of all the window scroll positions and sizes of the current
  * tab page.
  */
-    void
-snapshot_windows_scroll_size(void)
+    ಶೂನ್ಯ
+snapshot_windows_scroll_ಗಾತ್ರ(ಶೂನ್ಯ)
 {
     win_T *wp;
     FOR_ALL_WINDOWS(wp)
     {
-	wp->w_last_topline = wp->w_topline;
-#ifdef FEAT_DIFF
-	wp->w_last_topfill = wp->w_topfill;
-#endif
-	wp->w_last_leftcol = wp->w_leftcol;
-	wp->w_last_skipcol = wp->w_skipcol;
-	wp->w_last_width = wp->w_width;
-	wp->w_last_height = wp->w_height;
+	wp->w_ಕೊನೆಯ_topline = wp->w_topline;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
+	wp->w_ಕೊನೆಯ_topfill = wp->w_topfill;
+#ಆದರೆ_ಅಂತ್ಯ
+	wp->w_ಕೊನೆಯ_leftcol = wp->w_leftcol;
+	wp->w_ಕೊನೆಯ_skipcol = wp->w_skipcol;
+	wp->w_ಕೊನೆಯ_ಅಗಲ = wp->w_ಅಗಲ;
+	wp->w_ಕೊನೆಯ_ಎತ್ತರ = wp->w_ಎತ್ತರ;
     }
 }
 
-static int did_initial_scroll_size_snapshot = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ did_initial_scroll_ಗಾತ್ರ_snapshot = FALSE;
 
-    void
-may_make_initial_scroll_size_snapshot(void)
+    ಶೂನ್ಯ
+may_make_initial_scroll_ಗಾತ್ರ_snapshot(ಶೂನ್ಯ)
 {
-    if (!did_initial_scroll_size_snapshot)
+    ಆದರೆ (!did_initial_scroll_ಗಾತ್ರ_snapshot)
     {
-	did_initial_scroll_size_snapshot = TRUE;
-	snapshot_windows_scroll_size();
+	did_initial_scroll_ಗಾತ್ರ_snapshot = TRUE;
+	snapshot_windows_scroll_ಗಾತ್ರ();
     }
 }
 
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 /*
  * Create a dictionary with information about size and scroll changes in a
  * window.
  * Returns the dictionary with refcount set to one.
  * Returns NULL when out of memory.
  */
-    static dict_T *
+    ಸ್ಥಿರ dict_T *
 make_win_info_dict(
-	int width,
-	int height,
-	int topline,
+	ಪೂರ್ಣಾಂಕ ಅಗಲ,
+	ಪೂರ್ಣಾಂಕ ಎತ್ತರ,
+	ಪೂರ್ಣಾಂಕ topline,
 # ifdef FEAT_DIFF
-	int topfill,
+	ಪೂರ್ಣಾಂಕ topfill,
 # endif
-	int leftcol,
-	int skipcol)
+	ಪೂರ್ಣಾಂಕ leftcol,
+	ಪೂರ್ಣಾಂಕ skipcol)
 {
     dict_T *d = dict_alloc();
-    if (d == NULL)
-	return NULL;
+    ಆದರೆ (d == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     d->dv_refcount = 1;
 
     // not actually looping, for breaking out on error
-    while (1)
+    ಆಗ (1)
     {
 	typval_T tv;
-	tv.v_lock = 0;
-	tv.v_type = VAR_NUMBER;
+	tv.v_ಬೀಗ = 0;
+	tv.v_type = VAR_ಸಂಖ್ಯೆ;
 
-	tv.vval.v_number = width;
-	if (dict_add_tv(d, "width", &tv) == FAIL)
-	    break;
-	tv.vval.v_number = height;
-	if (dict_add_tv(d, "height", &tv) == FAIL)
-	    break;
-	tv.vval.v_number = topline;
-	if (dict_add_tv(d, "topline", &tv) == FAIL)
-	    break;
+	tv.vval.v_ಸಂಖ್ಯೆ = ಅಗಲ;
+	ಆದರೆ (dict_ಕೂಡಿಸು_tv(d, "width", &tv) == FAIL)
+	    ನಿಲ್ಲಿಸು;
+	tv.vval.v_ಸಂಖ್ಯೆ = ಎತ್ತರ;
+	ಆದರೆ (dict_ಕೂಡಿಸು_tv(d, "height", &tv) == FAIL)
+	    ನಿಲ್ಲಿಸು;
+	tv.vval.v_ಸಂಖ್ಯೆ = topline;
+	ಆದರೆ (dict_ಕೂಡಿಸು_tv(d, "topline", &tv) == FAIL)
+	    ನಿಲ್ಲಿಸು;
 # ifdef FEAT_DIFF
-	tv.vval.v_number = topfill;
-# else
-	tv.vval.v_number = 0;
+	tv.vval.v_ಸಂಖ್ಯೆ = topfill;
+# ಇಲ್ಲದಿದ್ದರೆ
+	tv.vval.v_ಸಂಖ್ಯೆ = 0;
 # endif
-	if (dict_add_tv(d, "topfill", &tv) == FAIL)
-	    break;
-	tv.vval.v_number = leftcol;
-	if (dict_add_tv(d, "leftcol", &tv) == FAIL)
-	    break;
-	tv.vval.v_number = skipcol;
-	if (dict_add_tv(d, "skipcol", &tv) == FAIL)
-	    break;
-	return d;
+	ಆದರೆ (dict_ಕೂಡಿಸು_tv(d, "topfill", &tv) == FAIL)
+	    ನಿಲ್ಲಿಸು;
+	tv.vval.v_ಸಂಖ್ಯೆ = leftcol;
+	ಆದರೆ (dict_ಕೂಡಿಸು_tv(d, "leftcol", &tv) == FAIL)
+	    ನಿಲ್ಲಿಸು;
+	tv.vval.v_ಸಂಖ್ಯೆ = skipcol;
+	ಆದರೆ (dict_ಕೂಡಿಸು_tv(d, "skipcol", &tv) == FAIL)
+	    ನಿಲ್ಲಿಸು;
+	ಹಿಂತಿರುಗಿ d;
     }
     dict_unref(d);
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // Return values of check_window_scroll_resize():
-#define CWSR_SCROLLED	1  // at least one window scrolled
-#define CWSR_RESIZED	2  // at least one window size changed
+#ವ್ಯಾಖ್ಯಾನಿಸು CWSR_SCROLLED	1  // at least one window scrolled
+#ವ್ಯಾಖ್ಯಾನಿಸು CWSR_RESIZED	2  // at least one window size changed
 
 /*
  * This function is used for three purposes:
@@ -3206,242 +3206,242 @@ make_win_info_dict(
  * 3. When the first three arguments are NULL and "v_event" is not NULL,
  *    information about changed windows is added to "v_event".
  */
-    static void
-check_window_scroll_resize(
-	int	*size_count,
-	win_T	**first_scroll_win,
-	win_T	**first_size_win,
-	list_T	*winlist UNUSED,
-	dict_T	*v_event UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+check_ಕಿಟಕಿ_scroll_resize(
+	ಪೂರ್ಣಾಂಕ	*ಗಾತ್ರ_ಎಣಿಕೆ,
+	win_T	**ಮೊದಲ_scroll_win,
+	win_T	**ಮೊದಲ_ಗಾತ್ರ_win,
+	list_T	*winlist ಬಳಸದ,
+	dict_T	*v_event ಬಳಸದ)
 {
-#ifdef FEAT_EVAL
-    int listidx = 0;
-    int tot_width = 0;
-    int tot_height = 0;
-    int tot_topline = 0;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಪೂರ್ಣಾಂಕ listidx = 0;
+    ಪೂರ್ಣಾಂಕ tot_ಅಗಲ = 0;
+    ಪೂರ್ಣಾಂಕ tot_ಎತ್ತರ = 0;
+    ಪೂರ್ಣಾಂಕ tot_topline = 0;
 # ifdef FEAT_DIFF
-    int tot_topfill = 0;
+    ಪೂರ್ಣಾಂಕ tot_topfill = 0;
 # endif
-    int tot_leftcol = 0;
-    int tot_skipcol = 0;
-#endif
+    ಪೂರ್ಣಾಂಕ tot_leftcol = 0;
+    ಪೂರ್ಣಾಂಕ tot_skipcol = 0;
+#ಆದರೆ_ಅಂತ್ಯ
 
     win_T *wp;
     FOR_ALL_WINDOWS(wp)
     {
-	int ignore_scroll = event_ignored(EVENT_WINSCROLLED, wp->w_p_eiw);
-	int size_changed = !event_ignored(EVENT_WINRESIZED, wp->w_p_eiw)
-			    && (wp->w_last_width != wp->w_width
-			    || wp->w_last_height != wp->w_height);
-	if (size_changed)
+	ಪೂರ್ಣಾಂಕ ignore_scroll = event_ignored(EVENT_WINSCROLLED, wp->w_p_eiw);
+	ಪೂರ್ಣಾಂಕ ಗಾತ್ರ_ಬದಲಾಯಿತು = !event_ignored(EVENT_WINRESIZED, wp->w_p_eiw)
+			    && (wp->w_ಕೊನೆಯ_ಅಗಲ != wp->w_ಅಗಲ
+			    || wp->w_ಕೊನೆಯ_ಎತ್ತರ != wp->w_ಎತ್ತರ);
+	ಆದರೆ (ಗಾತ್ರ_ಬದಲಾಯಿತು)
 	{
-#ifdef FEAT_EVAL
-	    if (winlist != NULL)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	    ಆದರೆ (winlist != ಖಾಲಿ)
 	    {
 		// Add this window to the list of changed windows.
 		typval_T tv;
-		tv.v_lock = 0;
-		tv.v_type = VAR_NUMBER;
-		tv.vval.v_number = wp->w_id;
-		list_set_item(winlist, listidx++, &tv);
+		tv.v_ಬೀಗ = 0;
+		tv.v_type = VAR_ಸಂಖ್ಯೆ;
+		tv.vval.v_ಸಂಖ್ಯೆ = wp->w_id;
+		list_ಗಣ_ಅಂಶ(winlist, listidx++, &tv);
 	    }
-	    else
-#endif
-		if (size_count != NULL)
+	    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+		ಆದರೆ (ಗಾತ್ರ_ಎಣಿಕೆ != ಖಾಲಿ)
 	    {
-		++*size_count;
-		if (*first_size_win == NULL)
-		    *first_size_win = wp;
+		++*ಗಾತ್ರ_ಎಣಿಕೆ;
+		ಆದರೆ (*ಮೊದಲ_ಗಾತ್ರ_win == ಖಾಲಿ)
+		    *ಮೊದಲ_ಗಾತ್ರ_win = wp;
 		// For WinScrolled the first window with a size change is used
 		// even when it didn't scroll.
-		if (*first_scroll_win == NULL && !ignore_scroll)
-		    *first_scroll_win = wp;
+		ಆದರೆ (*ಮೊದಲ_scroll_win == ಖಾಲಿ && !ignore_scroll)
+		    *ಮೊದಲ_scroll_win = wp;
 	    }
 	}
 
-	int scroll_changed = !ignore_scroll
-				&& (wp->w_last_topline != wp->w_topline
-#ifdef FEAT_DIFF
-				|| wp->w_last_topfill != wp->w_topfill
-#endif
-				|| wp->w_last_leftcol != wp->w_leftcol
-				|| wp->w_last_skipcol != wp->w_skipcol);
-	if (scroll_changed
-	    && first_scroll_win != NULL && *first_scroll_win == NULL)
-	    *first_scroll_win = wp;
+	ಪೂರ್ಣಾಂಕ scroll_ಬದಲಾಯಿತು = !ignore_scroll
+				&& (wp->w_ಕೊನೆಯ_topline != wp->w_topline
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
+				|| wp->w_ಕೊನೆಯ_topfill != wp->w_topfill
+#ಆದರೆ_ಅಂತ್ಯ
+				|| wp->w_ಕೊನೆಯ_leftcol != wp->w_leftcol
+				|| wp->w_ಕೊನೆಯ_skipcol != wp->w_skipcol);
+	ಆದರೆ (scroll_ಬದಲಾಯಿತು
+	    && ಮೊದಲ_scroll_win != ಖಾಲಿ && *ಮೊದಲ_scroll_win == ಖಾಲಿ)
+	    *ಮೊದಲ_scroll_win = wp;
 
-#ifdef FEAT_EVAL
-	if ((size_changed || scroll_changed) && v_event != NULL)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	ಆದರೆ ((ಗಾತ್ರ_ಬದಲಾಯಿತು || scroll_ಬದಲಾಯಿತು) && v_event != ಖಾಲಿ)
 	{
 	    // Add info about this window to the v:event dictionary.
-	    int width = wp->w_width - wp->w_last_width;
-	    int height = wp->w_height - wp->w_last_height;
-	    int topline = wp->w_topline - wp->w_last_topline;
+	    ಪೂರ್ಣಾಂಕ ಅಗಲ = wp->w_ಅಗಲ - wp->w_ಕೊನೆಯ_ಅಗಲ;
+	    ಪೂರ್ಣಾಂಕ ಎತ್ತರ = wp->w_ಎತ್ತರ - wp->w_ಕೊನೆಯ_ಎತ್ತರ;
+	    ಪೂರ್ಣಾಂಕ topline = wp->w_topline - wp->w_ಕೊನೆಯ_topline;
 # ifdef FEAT_DIFF
-	    int topfill = wp->w_topfill - wp->w_last_topfill;
+	    ಪೂರ್ಣಾಂಕ topfill = wp->w_topfill - wp->w_ಕೊನೆಯ_topfill;
 # endif
-	    int leftcol = wp->w_leftcol - wp->w_last_leftcol;
-	    int skipcol = wp->w_skipcol - wp->w_last_skipcol;
-	    dict_T *d = make_win_info_dict(width, height, topline,
+	    ಪೂರ್ಣಾಂಕ leftcol = wp->w_leftcol - wp->w_ಕೊನೆಯ_leftcol;
+	    ಪೂರ್ಣಾಂಕ skipcol = wp->w_skipcol - wp->w_ಕೊನೆಯ_skipcol;
+	    dict_T *d = make_win_info_dict(ಅಗಲ, ಎತ್ತರ, topline,
 # ifdef FEAT_DIFF
 							    topfill,
 # endif
 							    leftcol, skipcol);
-	    if (d == NULL)
-		break;
-	    char winid[NUMBUFLEN];
-	    vim_snprintf(winid, sizeof(winid), "%d", wp->w_id);
-	    if (dict_add_dict(v_event, winid, d) == FAIL)
+	    ಆದರೆ (d == ಖಾಲಿ)
+		ನಿಲ್ಲಿಸು;
+	    ಅಕ್ಷರ winid[NUMBUFLEN];
+	    vim_snprintf(winid, ಗಾತ್ರ(winid), "%d", wp->w_id);
+	    ಆದರೆ (dict_ಕೂಡಿಸು_dict(v_event, winid, d) == FAIL)
 	    {
 		dict_unref(d);
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	    --d->dv_refcount;
 
-	    tot_width += abs(width);
-	    tot_height += abs(height);
-	    tot_topline += abs(topline);
+	    tot_ಅಗಲ += ನಿರಪೇಕ್ಷ(ಅಗಲ);
+	    tot_ಎತ್ತರ += ನಿರಪೇಕ್ಷ(ಎತ್ತರ);
+	    tot_topline += ನಿರಪೇಕ್ಷ(topline);
 # ifdef FEAT_DIFF
-	    tot_topfill += abs(topfill);
+	    tot_topfill += ನಿರಪೇಕ್ಷ(topfill);
 # endif
-	    tot_leftcol += abs(leftcol);
-	    tot_skipcol += abs(skipcol);
+	    tot_leftcol += ನಿರಪೇಕ್ಷ(leftcol);
+	    tot_skipcol += ನಿರಪೇಕ್ಷ(skipcol);
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
-#ifdef FEAT_EVAL
-    if (v_event != NULL)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಆದರೆ (v_event != ಖಾಲಿ)
     {
-	dict_T *alldict = make_win_info_dict(tot_width, tot_height, tot_topline,
+	dict_T *alldict = make_win_info_dict(tot_ಅಗಲ, tot_ಎತ್ತರ, tot_topline,
 # ifdef FEAT_DIFF
 						    tot_topfill,
 # endif
 						    tot_leftcol, tot_skipcol);
-	if (alldict != NULL)
+	ಆದರೆ (alldict != ಖಾಲಿ)
 	{
-	    if (dict_add_dict(v_event, "all", alldict) == FAIL)
+	    ಆದರೆ (dict_ಕೂಡಿಸು_dict(v_event, "all", alldict) == FAIL)
 		dict_unref(alldict);
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		--alldict->dv_refcount;
 	}
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Trigger WinScrolled and/or WinResized if any window in the current tab page
  * scrolled or changed size.
  */
-    void
-may_trigger_win_scrolled_resized(void)
+    ಶೂನ್ಯ
+may_trigger_win_scrolled_resized(ಶೂನ್ಯ)
 {
-    static int	    recursive = FALSE;
-    int		    do_resize = has_winresized();
-    int		    do_scroll = has_winscrolled();
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    recursive = FALSE;
+    ಪೂರ್ಣಾಂಕ		    do_resize = has_winresized();
+    ಪೂರ್ಣಾಂಕ		    do_scroll = has_winscrolled();
 
     // Do not trigger WinScrolled or WinResized recursively.  Do not trigger
     // before the initial snapshot of the w_last_ values was made.
-    if (recursive
+    ಆದರೆ (recursive
 	    || !(do_scroll || do_resize)
-	    || !did_initial_scroll_size_snapshot)
-	return;
+	    || !did_initial_scroll_ಗಾತ್ರ_snapshot)
+	ಹಿಂತಿರುಗಿ;
 
-    int size_count = 0;
-    win_T *first_scroll_win = NULL, *first_size_win = NULL;
-    check_window_scroll_resize(&size_count, &first_scroll_win, &first_size_win,
-								    NULL, NULL);
-    int trigger_resize = do_resize && size_count > 0;
-    int trigger_scroll = do_scroll && first_scroll_win != NULL;
-    if (!trigger_resize && !trigger_scroll)
-	return;  // no relevant changes
-#ifdef FEAT_EVAL
-    list_T *windows_list = NULL;
-    if (trigger_resize)
+    ಪೂರ್ಣಾಂಕ ಗಾತ್ರ_ಎಣಿಕೆ = 0;
+    win_T *ಮೊದಲ_scroll_win = ಖಾಲಿ, *ಮೊದಲ_ಗಾತ್ರ_win = ಖಾಲಿ;
+    check_ಕಿಟಕಿ_scroll_resize(&ಗಾತ್ರ_ಎಣಿಕೆ, &ಮೊದಲ_scroll_win, &ಮೊದಲ_ಗಾತ್ರ_win,
+								    ಖಾಲಿ, ಖಾಲಿ);
+    ಪೂರ್ಣಾಂಕ trigger_resize = do_resize && ಗಾತ್ರ_ಎಣಿಕೆ > 0;
+    ಪೂರ್ಣಾಂಕ trigger_scroll = do_scroll && ಮೊದಲ_scroll_win != ಖಾಲಿ;
+    ಆದರೆ (!trigger_resize && !trigger_scroll)
+	ಹಿಂತಿರುಗಿ;  // no relevant changes
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    list_T *windows_list = ಖಾಲಿ;
+    ಆದರೆ (trigger_resize)
     {
 	// Create the list for v:event.windows before making the snapshot.
-	windows_list = list_alloc_with_items(size_count);
-	if (windows_list != NULL)
-	    check_window_scroll_resize(NULL, NULL, NULL, windows_list, NULL);
+	windows_list = list_alloc_with_ವಸ್ತುಗಳು(ಗಾತ್ರ_ಎಣಿಕೆ);
+	ಆದರೆ (windows_list != ಖಾಲಿ)
+	    check_ಕಿಟಕಿ_scroll_resize(ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ, windows_list, ಖಾಲಿ);
     }
 
-    dict_T *scroll_dict = NULL;
-    if (trigger_scroll)
+    dict_T *scroll_dict = ಖಾಲಿ;
+    ಆದರೆ (trigger_scroll)
     {
 	// Create the dict with entries for v:event before making the snapshot.
 	scroll_dict = dict_alloc();
-	if (scroll_dict != NULL)
+	ಆದರೆ (scroll_dict != ಖಾಲಿ)
 	{
 	    scroll_dict->dv_refcount = 1;
-	    check_window_scroll_resize(NULL, NULL, NULL, NULL, scroll_dict);
+	    check_ಕಿಟಕಿ_scroll_resize(ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ, scroll_dict);
 	}
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // WinScrolled/WinResized are triggered only once, even when multiple
     // windows scrolled or changed size.  Store the current values before
     // triggering the event, if a scroll or resize happens as a side effect
     // then WinScrolled/WinResized is triggered for that later.
-    snapshot_windows_scroll_size();
+    snapshot_windows_scroll_ಗಾತ್ರ();
 
     // "curwin" may be different from the actual current window, make
     // sure it can be restored.
-    window_layout_lock();
+    ಕಿಟಕಿ_layout_ಬೀಗ();
     recursive = TRUE;
 
     // If both are to be triggered do WinResized first.
-    if (trigger_resize
-#ifdef FEAT_EVAL
-	    && windows_list != NULL
-#endif
+    ಆದರೆ (trigger_resize
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	    && windows_list != ಖಾಲಿ
+#ಆದರೆ_ಅಂತ್ಯ
 	    )
     {
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 	save_v_event_T  save_v_event;
 	dict_T		*v_event = get_v_event(&save_v_event);
 
-	if (dict_add_list(v_event, "windows", windows_list) == OK)
+	ಆದರೆ (dict_ಕೂಡಿಸು_list(v_event, "windows", windows_list) == OK)
 	{
-	    dict_set_items_ro(v_event);
-#endif
+	    dict_ಗಣ_ವಸ್ತುಗಳು_ro(v_event);
+#ಆದರೆ_ಅಂತ್ಯ
 	    char_u winid[NUMBUFLEN];
-	    vim_snprintf((char *)winid, sizeof(winid), "%d",
-							 first_size_win->w_id);
+	    vim_snprintf((ಅಕ್ಷರ *)winid, ಗಾತ್ರ(winid), "%d",
+							 ಮೊದಲ_ಗಾತ್ರ_win->w_id);
 	    apply_autocmds(EVENT_WINRESIZED, winid, winid, FALSE,
-						     first_size_win->w_buffer);
-#ifdef FEAT_EVAL
+						     ಮೊದಲ_ಗಾತ್ರ_win->w_ಬಫರ್);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 	}
 	restore_v_event(v_event, &save_v_event);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
-    if (trigger_scroll
-#ifdef FEAT_EVAL
-	    && scroll_dict != NULL
-#endif
+    ಆದರೆ (trigger_scroll
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	    && scroll_dict != ಖಾಲಿ
+#ಆದರೆ_ಅಂತ್ಯ
 	    )
     {
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 	save_v_event_T  save_v_event;
 	dict_T		*v_event = get_v_event(&save_v_event);
 
 	// Move the entries from scroll_dict to v_event.
-	dict_extend(v_event, scroll_dict, (char_u *)"move", NULL);
-	dict_set_items_ro(v_event);
+	dict_extend(v_event, scroll_dict, (char_u *)"move", ಖಾಲಿ);
+	dict_ಗಣ_ವಸ್ತುಗಳು_ro(v_event);
 	dict_unref(scroll_dict);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	char_u winid[NUMBUFLEN];
-	vim_snprintf((char *)winid, sizeof(winid), "%d",
-						       first_scroll_win->w_id);
+	vim_snprintf((ಅಕ್ಷರ *)winid, ಗಾತ್ರ(winid), "%d",
+						       ಮೊದಲ_scroll_win->w_id);
 	apply_autocmds(EVENT_WINSCROLLED, winid, winid, FALSE,
-						   first_scroll_win->w_buffer);
-#ifdef FEAT_EVAL
+						   ಮೊದಲ_scroll_win->w_ಬಫರ್);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 	restore_v_event(v_event, &save_v_event);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
     recursive = FALSE;
-    window_layout_unlock();
+    ಕಿಟಕಿ_layout_unlock();
 }
 
 /*
@@ -3451,106 +3451,106 @@ may_trigger_win_scrolled_resized(void)
  * Caller must check if buffer is hidden and whether the tabline needs to be
  * updated.
  */
-    void
-win_close_othertab(win_T *win, int free_buf, tabpage_T *tp)
+    ಶೂನ್ಯ
+win_close_othertab(win_T *win, ಪೂರ್ಣಾಂಕ free_buf, tabpage_T *tp)
 {
     win_T	*wp;
-    int		dir;
-    tabpage_T   *ptp = NULL;
-    int		free_tp = FALSE;
+    ಪೂರ್ಣಾಂಕ		dir;
+    tabpage_T   *ptp = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		free_tp = FALSE;
 
     // Commands that may call win_close_othertab() already check this, but
     // check here again just in case.
-    if (window_layout_locked(CMD_SIZE))
-	return;
+    ಆದರೆ (ಕಿಟಕಿ_layout_locked(CMD_ಗಾತ್ರ))
+	ಹಿಂತಿರುಗಿ;
     // Get here with win->w_buffer == NULL when win_close() detects the tab
     // page changed.
-    if (win_locked(win) || (win->w_buffer != NULL
-					       && win->w_buffer->b_locked > 0))
-	return; // window is already being closed
+    ಆದರೆ (win_locked(win) || (win->w_ಬಫರ್ != ಖಾಲಿ
+					       && win->w_ಬಫರ್->b_locked > 0))
+	ಹಿಂತಿರುಗಿ; // window is already being closed
 
     // Trigger WinClosed just before starting to free window-related resources.
     // If the buffer is NULL, it isn't safe to trigger autocommands,
     // and win_close() should have already triggered WinClosed.
-    if (win->w_buffer != NULL)
+    ಆದರೆ (win->w_ಬಫರ್ != ಖಾಲಿ)
     {
 	trigger_winclosed(win);
 	// autocmd may have freed the window already.
-	if (!win_valid_any_tab(win))
-	    return;
+	ಆದರೆ (!win_valid_any_tab(win))
+	    ಹಿಂತಿರುಗಿ;
     }
 
-    if (tp->tp_firstwin == tp->tp_lastwin && !tp->tp_did_tabclosedpre)
+    ಆದರೆ (tp->tp_firstwin == tp->tp_lastwin && !tp->tp_did_tabclosedpre)
     {
 	trigger_tabclosedpre(tp);
 	// autocmd may have freed the window already.
-	if (!win_valid_any_tab(win))
-	    return;
+	ಆದರೆ (!win_valid_any_tab(win))
+	    ಹಿಂತಿರುಗಿ;
     }
 
-    if (win->w_buffer != NULL)
+    ಆದರೆ (win->w_ಬಫರ್ != ಖಾಲಿ)
 	// Close the link to the buffer.
-	close_buffer(win, win->w_buffer, free_buf ? DOBUF_UNLOAD : 0,
+	close_ಬಫರ್(win, win->w_ಬಫರ್, free_buf ? DOBUF_UNLOAD : 0,
 							    FALSE, TRUE, TRUE);
 
     // Careful: Autocommands may have closed the tab page or made it the
     // current tab page.
-    for (ptp = first_tabpage; ptp != NULL && ptp != tp; ptp = ptp->tp_next)
+    ಗಾಗಿ (ptp = ಮೊದಲ_tabpage; ptp != ಖಾಲಿ && ptp != tp; ptp = ptp->tp_ಮುಂದಿನ)
 	;
-    if (ptp == NULL || tp == curtab)
+    ಆದರೆ (ptp == ಖಾಲಿ || tp == curtab)
     {
 	// If the buffer was removed from the window we have to give it any
 	// buffer.
-	if (win_valid_any_tab(win) && win->w_buffer == NULL)
+	ಆದರೆ (win_valid_any_tab(win) && win->w_ಬಫರ್ == ಖಾಲಿ)
 	{
-	    win->w_buffer = firstbuf;
+	    win->w_ಬಫರ್ = firstbuf;
 	    ++firstbuf->b_nwindows;
-	    if (win == curwin)
-		curbuf = curwin->w_buffer;
-	    win_init_empty(win);
+	    ಆದರೆ (win == curwin)
+		curbuf = curwin->w_ಬಫರ್;
+	    win_init_ಖಾಲಿಗಳು(win);
 	}
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
     // Autocommands may have closed the window already.
-    for (wp = tp->tp_firstwin; wp != NULL && wp != win; wp = wp->w_next)
+    ಗಾಗಿ (wp = tp->tp_firstwin; wp != ಖಾಲಿ && wp != win; wp = wp->w_ಮುಂದಿನ)
 	;
-    if (wp == NULL)
-	return;
+    ಆದರೆ (wp == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     // When closing the last window in a tab page remove the tab page.
-    if (tp->tp_firstwin == tp->tp_lastwin)
+    ಆದರೆ (tp->tp_firstwin == tp->tp_lastwin)
     {
-	int	h = tabline_height();
+	ಪೂರ್ಣಾಂಕ	h = tabline_ಎತ್ತರ();
 
-	if (tp == first_tabpage)
-	    first_tabpage = tp->tp_next;
-	else
+	ಆದರೆ (tp == ಮೊದಲ_tabpage)
+	    ಮೊದಲ_tabpage = tp->tp_ಮುಂದಿನ;
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    for (ptp = first_tabpage; ptp != NULL && ptp->tp_next != tp;
-							   ptp = ptp->tp_next)
+	    ಗಾಗಿ (ptp = ಮೊದಲ_tabpage; ptp != ಖಾಲಿ && ptp->tp_ಮುಂದಿನ != tp;
+							   ptp = ptp->tp_ಮುಂದಿನ)
 		;
-	    if (ptp == NULL)
+	    ಆದರೆ (ptp == ಖಾಲಿ)
 	    {
-		internal_error("win_close_othertab()");
-		return;
+		ಆಂತರಿಕ_error("win_close_othertab()");
+		ಹಿಂತಿರುಗಿ;
 	    }
-	    ptp->tp_next = tp->tp_next;
+	    ptp->tp_ಮುಂದಿನ = tp->tp_ಮುಂದಿನ;
 	}
 	free_tp = TRUE;
 	redraw_tabline = TRUE;
 	shell_new_columns();
-	if (h != tabline_height())
-	    shell_new_rows();
+	ಆದರೆ (h != tabline_ಎತ್ತರ())
+	    shell_new_ಅಡ್ಡಸಾಲುಗಳು();
     }
 
-    if (win->w_buffer != NULL)
-	--win->w_buffer->b_nwindows;
+    ಆದರೆ (win->w_ಬಫರ್ != ಖಾಲಿ)
+	--win->w_ಬಫರ್->b_nwindows;
 
     // Free the memory used for the window.
     win_free_mem(win, &dir, tp);
 
-    if (free_tp)
+    ಆದರೆ (free_tp)
 	free_tabpage(tp);
 }
 
@@ -3558,59 +3558,59 @@ win_close_othertab(win_T *win, int free_buf, tabpage_T *tp)
  * Free the memory used for a window.
  * Returns a pointer to the window that got the freed up space.
  */
-    static win_T *
+    ಸ್ಥಿರ win_T *
 win_free_mem(
     win_T	*win,
-    int		*dirp,		// set to 'v' or 'h' for direction if 'ea'
+    ಪೂರ್ಣಾಂಕ		*dirp,		// set to 'v' or 'h' for direction if 'ea'
     tabpage_T	*tp)		// tab page "win" is in, NULL for current
 {
-    frame_T	*frp;
+    ಚೌಕಟ್ಟು_T	*frp;
     win_T	*wp;
-    tabpage_T	*win_tp = tp == NULL ? curtab : tp;
+    tabpage_T	*win_tp = tp == ಖಾಲಿ ? curtab : tp;
 
     // Remove the window and its frame from the tree of frames.
-    frp = win->w_frame;
-    wp = winframe_remove(win, dirp, tp, NULL);
+    frp = win->w_ಚೌಕಟ್ಟು;
+    wp = winframe_remove(win, dirp, tp, ಖಾಲಿ);
     vim_free(frp);
     win_free(win, tp);
 
     // When deleting the current window in the tab, select a new current
     // window.
-    if (win == win_tp->tp_curwin)
+    ಆದರೆ (win == win_tp->tp_curwin)
 	win_tp->tp_curwin = wp;
 
-    return wp;
+    ಹಿಂತಿರುಗಿ wp;
 }
 
-#if defined(EXITFREE)
-    void
-win_free_all(void)
+#ಆದರೆ defined(EXITFREE)
+    ಶೂನ್ಯ
+win_free_all(ಶೂನ್ಯ)
 {
-    int		dummy;
+    ಪೂರ್ಣಾಂಕ		dummy;
 
     // avoid an error for switching tabpage with the cmdline window open
     cmdwin_type = 0;
-    cmdwin_buf = NULL;
-    cmdwin_win = NULL;
+    cmdwin_buf = ಖಾಲಿ;
+    cmdwin_win = ಖಾಲಿ;
 
-    while (first_tabpage->tp_next != NULL)
+    ಆಗ (ಮೊದಲ_tabpage->tp_ಮುಂದಿನ != ಖಾಲಿ)
 	tabpage_close(TRUE);
 
-    for (int i = 0; i < AUCMD_WIN_COUNT; ++i)
-	if (aucmd_win[i].auc_win != NULL)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < AUCMD_WIN_ಎಣಿಕೆ; ++i)
+	ಆದರೆ (aucmd_win[i].auc_win != ಖಾಲಿ)
 	{
-	    (void)win_free_mem(aucmd_win[i].auc_win, &dummy, NULL);
-	    aucmd_win[i].auc_win = NULL;
+	    (ಶೂನ್ಯ)win_free_mem(aucmd_win[i].auc_win, &dummy, ಖಾಲಿ);
+	    aucmd_win[i].auc_win = ಖಾಲಿ;
 	}
 
-    while (firstwin != NULL)
-	(void)win_free_mem(firstwin, &dummy, NULL);
+    ಆಗ (firstwin != ಖಾಲಿ)
+	(ಶೂನ್ಯ)win_free_mem(firstwin, &dummy, ಖಾಲಿ);
 
     // No window should be used after this. Set curwin to NULL to crash
     // instead of using freed memory.
-    curwin = NULL;
+    curwin = ಖಾಲಿ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Remove a window and its frame from the tree of frames.
@@ -3619,29 +3619,29 @@ win_free_all(void)
     win_T *
 winframe_remove(
     win_T	*win,
-    int		*dirp,		// set to 'v' or 'h' for direction if 'ea'
+    ಪೂರ್ಣಾಂಕ		*dirp,		// set to 'v' or 'h' for direction if 'ea'
     tabpage_T	*tp,		// tab page "win" is in, NULL for current
-    frame_T	**unflat_altfr)	// if not NULL, set to pointer of frame that got
+    ಚೌಕಟ್ಟು_T	**unflat_altfr)	// if not NULL, set to pointer of frame that got
 				// the space, and it is not flattened
 {
-    frame_T	*frp, *frp2, *frp3;
-    frame_T	*frp_close = win->w_frame;
+    ಚೌಕಟ್ಟು_T	*frp, *frp2, *frp3;
+    ಚೌಕಟ್ಟು_T	*frp_close = win->w_ಚೌಕಟ್ಟು;
     win_T	*wp;
-    int		row, col;
+    ಪೂರ್ಣಾಂಕ		ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು;
 
     /*
      * If there is only one window there is nothing to remove.
      */
-    if (tp == NULL ? ONE_WINDOW : tp->tp_firstwin == tp->tp_lastwin)
-	return NULL;
+    ಆದರೆ (tp == ಖಾಲಿ ? ONE_ಕಿಟಕಿ : tp->tp_firstwin == tp->tp_lastwin)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    frame_locked++;
+    ಚೌಕಟ್ಟು_locked++;
 
     // Save the position of the containing frame (which will also contain the
     // altframe) before we remove anything, to recompute window positions later.
-    wp = frame2win(frp_close->fr_parent);
-    row = wp->w_winrow;
-    col = wp->w_wincol;
+    wp = frame2win(frp_close->fr_ಪೋಷಕ);
+    ಅಡ್ಡಸಾಲು = wp->w_winrow;
+    ಲಂಬಸಾಲು = wp->w_wincol;
 
     /*
      * Remove the window from its frame.
@@ -3650,101 +3650,101 @@ winframe_remove(
     wp = frame2win(frp2);
 
     // If this is a rightmost window, remove vertical separators to the left.
-    if (win->w_vsep_width == 0 && frp_close->fr_parent->fr_layout == FR_ROW &&
-	    frp_close->fr_prev != NULL)
-	frame_set_vsep(frp_close->fr_prev, FALSE);
+    ಆದರೆ (win->w_vsep_ಅಗಲ == 0 && frp_close->fr_ಪೋಷಕ->fr_layout == FR_ಅಡ್ಡಸಾಲು &&
+	    frp_close->fr_prev != ಖಾಲಿ)
+	ಚೌಕಟ್ಟು_ಗಣ_vsep(frp_close->fr_prev, FALSE);
 
     // Remove this frame from the list of frames.
-    frame_remove(frp_close);
+    ಚೌಕಟ್ಟು_remove(frp_close);
 
-    if (frp_close->fr_parent->fr_layout == FR_COL)
+    ಆದರೆ (frp_close->fr_ಪೋಷಕ->fr_layout == FR_ಲಂಬಸಾಲು)
     {
 	// When 'winfixheight' is set, try to find another frame in the column
 	// (as close to the closed frame as possible) to distribute the height
 	// to.
-	if (frp2->fr_win != NULL && frp2->fr_win->w_p_wfh)
+	ಆದರೆ (frp2->fr_win != ಖಾಲಿ && frp2->fr_win->w_p_wfh)
 	{
 	    frp = frp_close->fr_prev;
-	    frp3 = frp_close->fr_next;
-	    while (frp != NULL || frp3 != NULL)
+	    frp3 = frp_close->fr_ಮುಂದಿನ;
+	    ಆಗ (frp != ಖಾಲಿ || frp3 != ಖಾಲಿ)
 	    {
-		if (frp != NULL)
+		ಆದರೆ (frp != ಖಾಲಿ)
 		{
-		    if (!frame_fixed_height(frp))
+		    ಆದರೆ (!ಚೌಕಟ್ಟು_fixed_ಎತ್ತರ(frp))
 		    {
 			frp2 = frp;
 			wp = frame2win(frp2);
-			break;
+			ನಿಲ್ಲಿಸು;
 		    }
 		    frp = frp->fr_prev;
 		}
-		if (frp3 != NULL)
+		ಆದರೆ (frp3 != ಖಾಲಿ)
 		{
-		    if (frp3->fr_win != NULL && !frp3->fr_win->w_p_wfh)
+		    ಆದರೆ (frp3->fr_win != ಖಾಲಿ && !frp3->fr_win->w_p_wfh)
 		    {
 			frp2 = frp3;
 			wp = frp3->fr_win;
-			break;
+			ನಿಲ್ಲಿಸು;
 		    }
-		    frp3 = frp3->fr_next;
+		    frp3 = frp3->fr_ಮುಂದಿನ;
 		}
 	    }
 	}
-	frame_new_height(frp2, frp2->fr_height + frp_close->fr_height,
-			    frp2 == frp_close->fr_next, !frame_fixed_height(frp2), FALSE);
+	ಚೌಕಟ್ಟು_new_ಎತ್ತರ(frp2, frp2->fr_ಎತ್ತರ + frp_close->fr_ಎತ್ತರ,
+			    frp2 == frp_close->fr_ಮುಂದಿನ, !ಚೌಕಟ್ಟು_fixed_ಎತ್ತರ(frp2), FALSE);
 	*dirp = 'v';
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// When 'winfixwidth' is set, try to find another frame in the column
 	// (as close to the closed frame as possible) to distribute the width
 	// to.
-	if (frp2->fr_win != NULL && frp2->fr_win->w_p_wfw)
+	ಆದರೆ (frp2->fr_win != ಖಾಲಿ && frp2->fr_win->w_p_wfw)
 	{
 	    frp = frp_close->fr_prev;
-	    frp3 = frp_close->fr_next;
-	    while (frp != NULL || frp3 != NULL)
+	    frp3 = frp_close->fr_ಮುಂದಿನ;
+	    ಆಗ (frp != ಖಾಲಿ || frp3 != ಖಾಲಿ)
 	    {
-		if (frp != NULL)
+		ಆದರೆ (frp != ಖಾಲಿ)
 		{
-		    if (!frame_fixed_width(frp))
+		    ಆದರೆ (!ಚೌಕಟ್ಟು_fixed_ಅಗಲ(frp))
 		    {
 			frp2 = frp;
 			wp = frame2win(frp2);
-			break;
+			ನಿಲ್ಲಿಸು;
 		    }
 		    frp = frp->fr_prev;
 		}
-		if (frp3 != NULL)
+		ಆದರೆ (frp3 != ಖಾಲಿ)
 		{
-		    if (frp3->fr_win != NULL && !frp3->fr_win->w_p_wfw)
+		    ಆದರೆ (frp3->fr_win != ಖಾಲಿ && !frp3->fr_win->w_p_wfw)
 		    {
 			frp2 = frp3;
 			wp = frp3->fr_win;
-			break;
+			ನಿಲ್ಲಿಸು;
 		    }
-		    frp3 = frp3->fr_next;
+		    frp3 = frp3->fr_ಮುಂದಿನ;
 		}
 	    }
 	}
-	frame_new_width(frp2, frp2->fr_width + frp_close->fr_width,
-			    frp2 == frp_close->fr_next, !frame_fixed_width(frp2));
+	ಚೌಕಟ್ಟು_new_ಅಗಲ(frp2, frp2->fr_ಅಗಲ + frp_close->fr_ಅಗಲ,
+			    frp2 == frp_close->fr_ಮುಂದಿನ, !ಚೌಕಟ್ಟು_fixed_ಅಗಲ(frp2));
 	*dirp = 'h';
     }
 
     // If the altframe wasn't adjacent and left/above, resizing it will have
     // changed window positions within the parent frame.  Recompute them.
-    if (frp2 != frp_close->fr_prev)
-	frame_comp_pos(frp_close->fr_parent, &row, &col);
+    ಆದರೆ (frp2 != frp_close->fr_prev)
+	ಚೌಕಟ್ಟು_comp_pos(frp_close->fr_ಪೋಷಕ, &ಅಡ್ಡಸಾಲು, &ಲಂಬಸಾಲು);
 
-    if (unflat_altfr == NULL)
-	frame_flatten(frp2);
-    else
+    ಆದರೆ (unflat_altfr == ಖಾಲಿ)
+	ಚೌಕಟ್ಟು_flatten(frp2);
+    ಇಲ್ಲದಿದ್ದರೆ
 	*unflat_altfr = frp2;
 
-    frame_locked--;
+    ಚೌಕಟ್ಟು_locked--;
 
-    return wp;
+    ಹಿಂತಿರುಗಿ wp;
 }
 
 /*
@@ -3752,51 +3752,51 @@ winframe_remove(
  * list with the grandparent if they share the same layout.
  * Frees "frp" if flattened; also "frp->fr_parent" if it has the same layout.
  */
-    static void
-frame_flatten(frame_T *frp)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಚೌಕಟ್ಟು_flatten(ಚೌಕಟ್ಟು_T *frp)
 {
-    frame_T	*frp2, *frp3;
+    ಚೌಕಟ್ಟು_T	*frp2, *frp3;
 
-    if (frp->fr_next != NULL || frp->fr_prev != NULL)
-	return;
+    ಆದರೆ (frp->fr_ಮುಂದಿನ != ಖಾಲಿ || frp->fr_prev != ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     // There is no other frame in this list, move its info to the parent
     // and remove it.
-    frp->fr_parent->fr_layout = frp->fr_layout;
-    frp->fr_parent->fr_child = frp->fr_child;
-    FOR_ALL_FRAMES(frp2, frp->fr_child)
-	frp2->fr_parent = frp->fr_parent;
-    frp->fr_parent->fr_win = frp->fr_win;
-    if (frp->fr_win != NULL)
-	frp->fr_win->w_frame = frp->fr_parent;
-    frp2 = frp->fr_parent;
-    if (topframe->fr_child == frp)
-	topframe->fr_child = frp2;
+    frp->fr_ಪೋಷಕ->fr_layout = frp->fr_layout;
+    frp->fr_ಪೋಷಕ->fr_ಮಗು = frp->fr_ಮಗು;
+    FOR_ALL_ಚೌಕಟ್ಟುಗಳು(frp2, frp->fr_ಮಗು)
+	frp2->fr_ಪೋಷಕ = frp->fr_ಪೋಷಕ;
+    frp->fr_ಪೋಷಕ->fr_win = frp->fr_win;
+    ಆದರೆ (frp->fr_win != ಖಾಲಿ)
+	frp->fr_win->w_ಚೌಕಟ್ಟು = frp->fr_ಪೋಷಕ;
+    frp2 = frp->fr_ಪೋಷಕ;
+    ಆದರೆ (topframe->fr_ಮಗು == frp)
+	topframe->fr_ಮಗು = frp2;
     vim_free(frp);
 
-    frp = frp2->fr_parent;
-    if (frp != NULL && frp->fr_layout == frp2->fr_layout)
+    frp = frp2->fr_ಪೋಷಕ;
+    ಆದರೆ (frp != ಖಾಲಿ && frp->fr_layout == frp2->fr_layout)
     {
 	// The frame above the parent has the same layout, have to merge
 	// the frames into this list.
-	if (frp->fr_child == frp2)
-	    frp->fr_child = frp2->fr_child;
-	frp2->fr_child->fr_prev = frp2->fr_prev;
-	if (frp2->fr_prev != NULL)
-	    frp2->fr_prev->fr_next = frp2->fr_child;
-	for (frp3 = frp2->fr_child; ; frp3 = frp3->fr_next)
+	ಆದರೆ (frp->fr_ಮಗು == frp2)
+	    frp->fr_ಮಗು = frp2->fr_ಮಗು;
+	frp2->fr_ಮಗು->fr_prev = frp2->fr_prev;
+	ಆದರೆ (frp2->fr_prev != ಖಾಲಿ)
+	    frp2->fr_prev->fr_ಮುಂದಿನ = frp2->fr_ಮಗು;
+	ಗಾಗಿ (frp3 = frp2->fr_ಮಗು; ; frp3 = frp3->fr_ಮುಂದಿನ)
 	{
-	    frp3->fr_parent = frp;
-	    if (frp3->fr_next == NULL)
+	    frp3->fr_ಪೋಷಕ = frp;
+	    ಆದರೆ (frp3->fr_ಮುಂದಿನ == ಖಾಲಿ)
 	    {
-		frp3->fr_next = frp2->fr_next;
-		if (frp2->fr_next != NULL)
-		    frp2->fr_next->fr_prev = frp3;
-		break;
+		frp3->fr_ಮುಂದಿನ = frp2->fr_ಮುಂದಿನ;
+		ಆದರೆ (frp2->fr_ಮುಂದಿನ != ಖಾಲಿ)
+		    frp2->fr_ಮುಂದಿನ->fr_prev = frp3;
+		ನಿಲ್ಲಿಸು;
 	    }
 	}
-	if (topframe->fr_child == frp2)
-	    topframe->fr_child = frp;
+	ಆದರೆ (topframe->fr_ಮಗು == frp2)
+	    topframe->fr_ಮಗು = frp;
 	vim_free(frp2);
     }
 }
@@ -3807,49 +3807,49 @@ frame_flatten(frame_T *frp)
  * windows within "unflat_altfr".
  * Caller must ensure no other changes were made to the layout or window sizes!
  */
-    static void
-winframe_restore(win_T *wp, int dir, frame_T *unflat_altfr)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+winframe_restore(win_T *wp, ಪೂರ್ಣಾಂಕ dir, ಚೌಕಟ್ಟು_T *unflat_altfr)
 {
-    frame_T	*frp = wp->w_frame;
+    ಚೌಕಟ್ಟು_T	*frp = wp->w_ಚೌಕಟ್ಟು;
 
     // Put "wp"'s frame back where it was.
-    if (frp->fr_prev != NULL)
-	frame_append(frp->fr_prev, frp);
-    else
-	frame_insert(frp->fr_next, frp);
+    ಆದರೆ (frp->fr_prev != ಖಾಲಿ)
+	ಚೌಕಟ್ಟು_append(frp->fr_prev, frp);
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಚೌಕಟ್ಟು_ಸೇರಿಸು(frp->fr_ಮುಂದಿನ, frp);
 
     // Vertical separators to the left may have been lost.  Restore them.
-    if (wp->w_vsep_width == 0
-	    && frp->fr_parent->fr_layout == FR_ROW && frp->fr_prev != NULL)
-	frame_set_vsep(frp->fr_prev, TRUE);
+    ಆದರೆ (wp->w_vsep_ಅಗಲ == 0
+	    && frp->fr_ಪೋಷಕ->fr_layout == FR_ಅಡ್ಡಸಾಲು && frp->fr_prev != ಖಾಲಿ)
+	ಚೌಕಟ್ಟು_ಗಣ_vsep(frp->fr_prev, TRUE);
 
     // Statuslines above may have been lost.  Restore them.
-    if (wp->w_status_height == 0
-	    && frp->fr_parent->fr_layout == FR_COL && frp->fr_prev != NULL)
-	frame_add_statusline(frp->fr_prev);
+    ಆದರೆ (wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ == 0
+	    && frp->fr_ಪೋಷಕ->fr_layout == FR_ಲಂಬಸಾಲು && frp->fr_prev != ಖಾಲಿ)
+	ಚೌಕಟ್ಟು_ಕೂಡಿಸು_statusline(frp->fr_prev);
 
     // Restore the lost room that was redistributed to the altframe.  Also
     // adjusts window sizes to fit restored statuslines/separators, if needed.
-    if (dir == 'v')
+    ಆದರೆ (dir == 'v')
     {
-	frame_new_height(unflat_altfr, unflat_altfr->fr_height - frp->fr_height,
-		unflat_altfr == frp->fr_next, FALSE, FALSE);
+	ಚೌಕಟ್ಟು_new_ಎತ್ತರ(unflat_altfr, unflat_altfr->fr_ಎತ್ತರ - frp->fr_ಎತ್ತರ,
+		unflat_altfr == frp->fr_ಮುಂದಿನ, FALSE, FALSE);
     }
-    else if (dir == 'h')
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (dir == 'h')
     {
-	frame_new_width(unflat_altfr, unflat_altfr->fr_width - frp->fr_width,
-		unflat_altfr == frp->fr_next, FALSE);
+	ಚೌಕಟ್ಟು_new_ಅಗಲ(unflat_altfr, unflat_altfr->fr_ಅಗಲ - frp->fr_ಅಗಲ,
+		unflat_altfr == frp->fr_ಮುಂದಿನ, FALSE);
     }
 
     // Recompute window positions within the parent frame to restore them.
     // Positions were unchanged if the altframe was adjacent and left/above.
-    if (unflat_altfr != frp->fr_prev)
+    ಆದರೆ (unflat_altfr != frp->fr_prev)
     {
-	win_T	*topleft = frame2win(frp->fr_parent);
-	int	row = topleft->w_winrow;
-	int	col = topleft->w_wincol;
+	win_T	*topleft = frame2win(frp->fr_ಪೋಷಕ);
+	ಪೂರ್ಣಾಂಕ	ಅಡ್ಡಸಾಲು = topleft->w_winrow;
+	ಪೂರ್ಣಾಂಕ	ಲಂಬಸಾಲು = topleft->w_wincol;
 
-	frame_comp_pos(frp->fr_parent, &row, &col);
+	ಚೌಕಟ್ಟು_comp_pos(frp->fr_ಪೋಷಕ, &ಅಡ್ಡಸಾಲು, &ಲಂಬಸಾಲು);
     }
 }
 
@@ -3863,326 +3863,326 @@ winframe_restore(win_T *wp, int dir, frame_T *unflat_altfr)
  * preserve the initial window layout.  The 'wfh' and 'wfw' settings are
  * respected when possible.
  */
-    static frame_T *
+    ಸ್ಥಿರ ಚೌಕಟ್ಟು_T *
 win_altframe(
     win_T	*win,
     tabpage_T	*tp)		// tab page "win" is in, NULL for current
 {
-    frame_T	*frp;
-    frame_T	*other_fr, *target_fr;
+    ಚೌಕಟ್ಟು_T	*frp;
+    ಚೌಕಟ್ಟು_T	*other_fr, *ಗುರಿ_fr;
 
-    if (tp == NULL ? ONE_WINDOW : tp->tp_firstwin == tp->tp_lastwin)
-	return alt_tabpage()->tp_curwin->w_frame;
+    ಆದರೆ (tp == ಖಾಲಿ ? ONE_ಕಿಟಕಿ : tp->tp_firstwin == tp->tp_lastwin)
+	ಹಿಂತಿರುಗಿ alt_tabpage()->tp_curwin->w_ಚೌಕಟ್ಟು;
 
-    frp = win->w_frame;
+    frp = win->w_ಚೌಕಟ್ಟು;
 
-    if (frp->fr_prev == NULL)
-	return frp->fr_next;
-    if (frp->fr_next == NULL)
-	return frp->fr_prev;
+    ಆದರೆ (frp->fr_prev == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ frp->fr_ಮುಂದಿನ;
+    ಆದರೆ (frp->fr_ಮುಂದಿನ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ frp->fr_prev;
 
     // By default the next window will get the space that was abandoned by this
-    // window
-    target_fr = frp->fr_next;
+    //ಕಿಟಕಿ
+    ಗುರಿ_fr = frp->fr_ಮುಂದಿನ;
     other_fr  = frp->fr_prev;
 
     // If this is part of a column of windows and 'splitbelow' is true then the
     // previous window will get the space.
-    if (frp->fr_parent != NULL && frp->fr_parent->fr_layout == FR_COL && p_sb)
+    ಆದರೆ (frp->fr_ಪೋಷಕ != ಖಾಲಿ && frp->fr_ಪೋಷಕ->fr_layout == FR_ಲಂಬಸಾಲು && p_sb)
     {
-	target_fr = frp->fr_prev;
-	other_fr  = frp->fr_next;
+	ಗುರಿ_fr = frp->fr_prev;
+	other_fr  = frp->fr_ಮುಂದಿನ;
     }
 
     // If this is part of a row of windows, and 'splitright' is true then the
     // previous window will get the space.
-    if (frp->fr_parent != NULL && frp->fr_parent->fr_layout == FR_ROW && p_spr)
+    ಆದರೆ (frp->fr_ಪೋಷಕ != ಖಾಲಿ && frp->fr_ಪೋಷಕ->fr_layout == FR_ಅಡ್ಡಸಾಲು && p_spr)
     {
-	target_fr = frp->fr_prev;
-	other_fr  = frp->fr_next;
+	ಗುರಿ_fr = frp->fr_prev;
+	other_fr  = frp->fr_ಮುಂದಿನ;
     }
 
     // If 'wfh' or 'wfw' is set for the target and not for the alternate
     // window, reverse the selection.
-    if (frp->fr_parent != NULL && frp->fr_parent->fr_layout == FR_ROW)
+    ಆದರೆ (frp->fr_ಪೋಷಕ != ಖಾಲಿ && frp->fr_ಪೋಷಕ->fr_layout == FR_ಅಡ್ಡಸಾಲು)
     {
-	if (frame_fixed_width(target_fr) && !frame_fixed_width(other_fr))
-	    target_fr = other_fr;
+	ಆದರೆ (ಚೌಕಟ್ಟು_fixed_ಅಗಲ(ಗುರಿ_fr) && !ಚೌಕಟ್ಟು_fixed_ಅಗಲ(other_fr))
+	    ಗುರಿ_fr = other_fr;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (frame_fixed_height(target_fr) && !frame_fixed_height(other_fr))
-	    target_fr = other_fr;
+	ಆದರೆ (ಚೌಕಟ್ಟು_fixed_ಎತ್ತರ(ಗುರಿ_fr) && !ಚೌಕಟ್ಟು_fixed_ಎತ್ತರ(other_fr))
+	    ಗುರಿ_fr = other_fr;
     }
 
-    return target_fr;
+    ಹಿಂತಿರುಗಿ ಗುರಿ_fr;
 }
 
 /*
  * Return the tabpage that will be used if the current one is closed.
  */
-    static tabpage_T *
-alt_tabpage(void)
+    ಸ್ಥಿರ tabpage_T *
+alt_tabpage(ಶೂನ್ಯ)
 {
-    tabpage_T	*tp = NULL;
-    int		forward;
+    tabpage_T	*tp = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		forward;
 
     // Use the last accessed tab page, if possible.
-    if ((tcl_flags & TCL_USELAST) && valid_tabpage(lastused_tabpage))
-	return lastused_tabpage;
+    ಆದರೆ ((tcl_flags & TCL_USELAST) && valid_tabpage(lastused_tabpage))
+	ಹಿಂತಿರುಗಿ lastused_tabpage;
 
     // Use the next tab page, if possible.
-    forward = curtab->tp_next != NULL &&
-	    ((tcl_flags & TCL_LEFT) == 0 || curtab == first_tabpage);
+    forward = curtab->tp_ಮುಂದಿನ != ಖಾಲಿ &&
+	    ((tcl_flags & TCL_ಎಡ) == 0 || curtab == ಮೊದಲ_tabpage);
 
-    if (forward)
-	tp = curtab->tp_next;
-    else
+    ಆದರೆ (forward)
+	tp = curtab->tp_ಮುಂದಿನ;
+    ಇಲ್ಲದಿದ್ದರೆ
 	// Use the previous tab page.
-	for (tp = first_tabpage; tp->tp_next != curtab; tp = tp->tp_next)
+	ಗಾಗಿ (tp = ಮೊದಲ_tabpage; tp->tp_ಮುಂದಿನ != curtab; tp = tp->tp_ಮುಂದಿನ)
 	    ;
 
-    return tp;
+    ಹಿಂತಿರುಗಿ tp;
 }
 
 /*
  * Find the left-upper window in frame "frp".
  */
-    static win_T *
-frame2win(frame_T *frp)
+    ಸ್ಥಿರ win_T *
+frame2win(ಚೌಕಟ್ಟು_T *frp)
 {
-    while (frp->fr_win == NULL)
-	frp = frp->fr_child;
-    return frp->fr_win;
+    ಆಗ (frp->fr_win == ಖಾಲಿ)
+	frp = frp->fr_ಮಗು;
+    ಹಿಂತಿರುಗಿ frp->fr_win;
 }
 
 /*
  * Return TRUE if frame "frp" contains window "wp".
  */
-    static int
-frame_has_win(frame_T *frp, win_T *wp)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಚೌಕಟ್ಟು_has_win(ಚೌಕಟ್ಟು_T *frp, win_T *wp)
 {
-    frame_T	*p;
+    ಚೌಕಟ್ಟು_T	*p;
 
-    if (frp->fr_layout == FR_LEAF)
-	return frp->fr_win == wp;
+    ಆದರೆ (frp->fr_layout == FR_ಎಲೆ)
+	ಹಿಂತಿರುಗಿ frp->fr_win == wp;
 
-    FOR_ALL_FRAMES(p, frp->fr_child)
-	if (frame_has_win(p, wp))
-	    return TRUE;
-    return FALSE;
+    FOR_ALL_ಚೌಕಟ್ಟುಗಳು(p, frp->fr_ಮಗು)
+	ಆದರೆ (ಚೌಕಟ್ಟು_has_win(p, wp))
+	    ಹಿಂತಿರುಗಿ TRUE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 // 'cmdheight' value explicitly set by the user: window commands are allowed to
 // resize the topframe to values higher than this minimum, but not lower.
-static int min_set_ch = 1;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ min_ಗಣ_ch = 1;
 
 /*
  * Set a new height for a frame.  Recursively sets the height for contained
  * frames and windows.  Caller must take care of positions.
  */
-    static void
-frame_new_height(
-    frame_T	*topfrp,
-    int		height,
-    int		topfirst,	// resize topmost contained frame first
-    int		wfh,		// obey 'winfixheight' when there is a choice;
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಚೌಕಟ್ಟು_new_ಎತ್ತರ(
+    ಚೌಕಟ್ಟು_T	*topfrp,
+    ಪೂರ್ಣಾಂಕ		ಎತ್ತರ,
+    ಪೂರ್ಣಾಂಕ		topfirst,	// resize topmost contained frame first
+    ಪೂರ್ಣಾಂಕ		wfh,		// obey 'winfixheight' when there is a choice;
 				// may cause the height not to be set
-    int		set_ch)		// set 'cmdheight' to resize topframe
+    ಪೂರ್ಣಾಂಕ		ಗಣ_ch)		// set 'cmdheight' to resize topframe
 {
-    frame_T	*frp;
-    int		extra_lines;
-    int		h;
+    ಚೌಕಟ್ಟು_T	*frp;
+    ಪೂರ್ಣಾಂಕ		extra_ಸಾಲುಗಳು;
+    ಪೂರ್ಣಾಂಕ		h;
 
-    if (topfrp->fr_parent == NULL && set_ch)
+    ಆದರೆ (topfrp->fr_ಪೋಷಕ == ಖಾಲಿ && ಗಣ_ch)
     {
 	// topframe: update the command line height, with side effects.
-	int new_ch = MAX(min_set_ch, p_ch + topfrp->fr_height - height);
-	int save_ch = min_set_ch;
-	if (new_ch != p_ch)
-	    set_option_value((char_u *)"cmdheight", new_ch, NULL, 0);
-	min_set_ch = save_ch;
-	height = MIN(height, ROWS_AVAIL);
+	ಪೂರ್ಣಾಂಕ new_ch = MAX(min_ಗಣ_ch, p_ch + topfrp->fr_ಎತ್ತರ - ಎತ್ತರ);
+	ಪೂರ್ಣಾಂಕ save_ch = min_ಗಣ_ch;
+	ಆದರೆ (new_ch != p_ch)
+	    ಗಣ_option_ಮೌಲ್ಯ((char_u *)"cmdheight", new_ch, ಖಾಲಿ, 0);
+	min_ಗಣ_ch = save_ch;
+	ಎತ್ತರ = MIN(ಎತ್ತರ, ಅಡ್ಡಸಾಲುಗಳು_AVAIL);
     }
-    if (topfrp->fr_win != NULL)
+    ಆದರೆ (topfrp->fr_win != ಖಾಲಿ)
     {
 	// Simple case: just one window.
-	win_new_height(topfrp->fr_win,
-				    height - topfrp->fr_win->w_status_height
-					      - WINBAR_HEIGHT(topfrp->fr_win));
+	win_new_ಎತ್ತರ(topfrp->fr_win,
+				    ಎತ್ತರ - topfrp->fr_win->w_ಸ್ಥಿತಿ_ಎತ್ತರ
+					      - WINBAR_ಎತ್ತರ(topfrp->fr_win));
     }
-    else if (topfrp->fr_layout == FR_ROW)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (topfrp->fr_layout == FR_ಅಡ್ಡಸಾಲು)
     {
-	do
+	ಮಾಡು
 	{
 	    // All frames in this row get the same new height.
-	    FOR_ALL_FRAMES(frp, topfrp->fr_child)
+	    FOR_ALL_ಚೌಕಟ್ಟುಗಳು(frp, topfrp->fr_ಮಗು)
 	    {
-		frame_new_height(frp, height, topfirst, wfh, set_ch);
-		if (frp->fr_height > height)
+		ಚೌಕಟ್ಟು_new_ಎತ್ತರ(frp, ಎತ್ತರ, topfirst, wfh, ಗಣ_ch);
+		ಆದರೆ (frp->fr_ಎತ್ತರ > ಎತ್ತರ)
 		{
 		    // Could not fit the windows, make the whole row higher.
-		    height = frp->fr_height;
-		    break;
+		    ಎತ್ತರ = frp->fr_ಎತ್ತರ;
+		    ನಿಲ್ಲಿಸು;
 		}
 	    }
 	}
-	while (frp != NULL);
+	ಆಗ (frp != ಖಾಲಿ);
     }
-    else    // fr_layout == FR_COL
+    ಇಲ್ಲದಿದ್ದರೆ    // fr_layout == FR_COL
     {
 	// Complicated case: Resize a column of frames.  Resize the bottom
 	// frame first, frames above that when needed.
 
-	frp = topfrp->fr_child;
-	if (wfh)
+	frp = topfrp->fr_ಮಗು;
+	ಆದರೆ (wfh)
 	    // Advance past frames with one window with 'wfh' set.
-	    while (frame_fixed_height(frp))
+	    ಆಗ (ಚೌಕಟ್ಟು_fixed_ಎತ್ತರ(frp))
 	    {
-		frp = frp->fr_next;
-		if (frp == NULL)
-		    return;	    // no frame without 'wfh', give up
+		frp = frp->fr_ಮುಂದಿನ;
+		ಆದರೆ (frp == ಖಾಲಿ)
+		    ಹಿಂತಿರುಗಿ;	    // no frame without 'wfh', give up
 	    }
-	if (!topfirst)
+	ಆದರೆ (!topfirst)
 	{
 	    // Find the bottom frame of this column
-	    while (frp->fr_next != NULL)
-		frp = frp->fr_next;
-	    if (wfh)
+	    ಆಗ (frp->fr_ಮುಂದಿನ != ಖಾಲಿ)
+		frp = frp->fr_ಮುಂದಿನ;
+	    ಆದರೆ (wfh)
 		// Advance back for frames with one window with 'wfh' set.
-		while (frame_fixed_height(frp))
+		ಆಗ (ಚೌಕಟ್ಟು_fixed_ಎತ್ತರ(frp))
 		    frp = frp->fr_prev;
 	}
 
-	extra_lines = height - topfrp->fr_height;
-	if (extra_lines < 0)
+	extra_ಸಾಲುಗಳು = ಎತ್ತರ - topfrp->fr_ಎತ್ತರ;
+	ಆದರೆ (extra_ಸಾಲುಗಳು < 0)
 	{
 	    // reduce height of contained frames, bottom or top frame first
-	    while (frp != NULL)
+	    ಆಗ (frp != ಖಾಲಿ)
 	    {
-		h = frame_minheight(frp, NULL);
-		if (frp->fr_height + extra_lines < h)
+		h = ಚೌಕಟ್ಟು_minheight(frp, ಖಾಲಿ);
+		ಆದರೆ (frp->fr_ಎತ್ತರ + extra_ಸಾಲುಗಳು < h)
 		{
-		    extra_lines += frp->fr_height - h;
-		    frame_new_height(frp, h, topfirst, wfh, set_ch);
+		    extra_ಸಾಲುಗಳು += frp->fr_ಎತ್ತರ - h;
+		    ಚೌಕಟ್ಟು_new_ಎತ್ತರ(frp, h, topfirst, wfh, ಗಣ_ch);
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    frame_new_height(frp, frp->fr_height + extra_lines,
-							topfirst, wfh, set_ch);
-		    break;
+		    ಚೌಕಟ್ಟು_new_ಎತ್ತರ(frp, frp->fr_ಎತ್ತರ + extra_ಸಾಲುಗಳು,
+							topfirst, wfh, ಗಣ_ch);
+		    ನಿಲ್ಲಿಸು;
 		}
-		if (topfirst)
+		ಆದರೆ (topfirst)
 		{
-		    do
-			frp = frp->fr_next;
-		    while (wfh && frp != NULL && frame_fixed_height(frp));
+		    ಮಾಡು
+			frp = frp->fr_ಮುಂದಿನ;
+		    ಆಗ (wfh && frp != ಖಾಲಿ && ಚೌಕಟ್ಟು_fixed_ಎತ್ತರ(frp));
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    do
+		    ಮಾಡು
 			frp = frp->fr_prev;
-		    while (wfh && frp != NULL && frame_fixed_height(frp));
+		    ಆಗ (wfh && frp != ಖಾಲಿ && ಚೌಕಟ್ಟು_fixed_ಎತ್ತರ(frp));
 		}
 		// Increase "height" if we could not reduce enough frames.
-		if (frp == NULL)
-		    height -= extra_lines;
+		ಆದರೆ (frp == ಖಾಲಿ)
+		    ಎತ್ತರ -= extra_ಸಾಲುಗಳು;
 	    }
 	}
-	else if (extra_lines > 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (extra_ಸಾಲುಗಳು > 0)
 	{
 	    // increase height of bottom or top frame
-	    frame_new_height(frp, frp->fr_height + extra_lines, topfirst, wfh,
-									set_ch);
+	    ಚೌಕಟ್ಟು_new_ಎತ್ತರ(frp, frp->fr_ಎತ್ತರ + extra_ಸಾಲುಗಳು, topfirst, wfh,
+									ಗಣ_ch);
 	}
     }
-    topfrp->fr_height = height;
+    topfrp->fr_ಎತ್ತರ = ಎತ್ತರ;
 }
 
 /*
  * Return TRUE if height of frame "frp" should not be changed because of
  * the 'winfixheight' option.
  */
-    static int
-frame_fixed_height(frame_T *frp)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಚೌಕಟ್ಟು_fixed_ಎತ್ತರ(ಚೌಕಟ್ಟು_T *frp)
 {
     // frame with one window: fixed height if 'winfixheight' set.
-    if (frp->fr_win != NULL)
-	return frp->fr_win->w_p_wfh;
+    ಆದರೆ (frp->fr_win != ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ frp->fr_win->w_p_wfh;
 
-    if (frp->fr_layout == FR_ROW)
+    ಆದರೆ (frp->fr_layout == FR_ಅಡ್ಡಸಾಲು)
     {
 	// The frame is fixed height if one of the frames in the row is fixed
 	// height.
-	FOR_ALL_FRAMES(frp, frp->fr_child)
-	    if (frame_fixed_height(frp))
-		return TRUE;
-	return FALSE;
+	FOR_ALL_ಚೌಕಟ್ಟುಗಳು(frp, frp->fr_ಮಗು)
+	    ಆದರೆ (ಚೌಕಟ್ಟು_fixed_ಎತ್ತರ(frp))
+		ಹಿಂತಿರುಗಿ TRUE;
+	ಹಿಂತಿರುಗಿ FALSE;
     }
 
     // frp->fr_layout == FR_COL: The frame is fixed height if all of the
     // frames in the row are fixed height.
-    FOR_ALL_FRAMES(frp, frp->fr_child)
-	if (!frame_fixed_height(frp))
-	    return FALSE;
-    return TRUE;
+    FOR_ALL_ಚೌಕಟ್ಟುಗಳು(frp, frp->fr_ಮಗು)
+	ಆದರೆ (!ಚೌಕಟ್ಟು_fixed_ಎತ್ತರ(frp))
+	    ಹಿಂತಿರುಗಿ FALSE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
  * Return TRUE if width of frame "frp" should not be changed because of
  * the 'winfixwidth' option.
  */
-    static int
-frame_fixed_width(frame_T *frp)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಚೌಕಟ್ಟು_fixed_ಅಗಲ(ಚೌಕಟ್ಟು_T *frp)
 {
     // frame with one window: fixed width if 'winfixwidth' set.
-    if (frp->fr_win != NULL)
-	return frp->fr_win->w_p_wfw;
+    ಆದರೆ (frp->fr_win != ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ frp->fr_win->w_p_wfw;
 
-    if (frp->fr_layout == FR_COL)
+    ಆದರೆ (frp->fr_layout == FR_ಲಂಬಸಾಲು)
     {
 	// The frame is fixed width if one of the frames in the row is fixed
 	// width.
-	FOR_ALL_FRAMES(frp, frp->fr_child)
-	    if (frame_fixed_width(frp))
-		return TRUE;
-	return FALSE;
+	FOR_ALL_ಚೌಕಟ್ಟುಗಳು(frp, frp->fr_ಮಗು)
+	    ಆದರೆ (ಚೌಕಟ್ಟು_fixed_ಅಗಲ(frp))
+		ಹಿಂತಿರುಗಿ TRUE;
+	ಹಿಂತಿರುಗಿ FALSE;
     }
 
     // frp->fr_layout == FR_ROW: The frame is fixed width if all of the
     // frames in the row are fixed width.
-    FOR_ALL_FRAMES(frp, frp->fr_child)
-	if (!frame_fixed_width(frp))
-	    return FALSE;
-    return TRUE;
+    FOR_ALL_ಚೌಕಟ್ಟುಗಳು(frp, frp->fr_ಮಗು)
+	ಆದರೆ (!ಚೌಕಟ್ಟು_fixed_ಅಗಲ(frp))
+	    ಹಿಂತಿರುಗಿ FALSE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
  * Add a status line to windows at the bottom of "frp".
  * Note: Does not check if there is room!
  */
-    static void
-frame_add_statusline(frame_T *frp)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಚೌಕಟ್ಟು_ಕೂಡಿಸು_statusline(ಚೌಕಟ್ಟು_T *frp)
 {
     win_T	*wp;
 
-    if (frp->fr_layout == FR_LEAF)
+    ಆದರೆ (frp->fr_layout == FR_ಎಲೆ)
     {
 	wp = frp->fr_win;
-	wp->w_status_height = statusline_height(wp);
+	wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ = statusline_ಎತ್ತರ(wp);
     }
-    else if (frp->fr_layout == FR_ROW)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (frp->fr_layout == FR_ಅಡ್ಡಸಾಲು)
     {
 	// Handle all the frames in the row.
-	FOR_ALL_FRAMES(frp, frp->fr_child)
-	    frame_add_statusline(frp);
+	FOR_ALL_ಚೌಕಟ್ಟುಗಳು(frp, frp->fr_ಮಗು)
+	    ಚೌಕಟ್ಟು_ಕೂಡಿಸು_statusline(frp);
     }
-    else // frp->fr_layout == FR_COL
+    ಇಲ್ಲದಿದ್ದರೆ // frp->fr_layout == FR_COL
     {
 	// Only need to handle the last frame in the column.
-	for (frp = frp->fr_child; frp->fr_next != NULL; frp = frp->fr_next)
+	ಗಾಗಿ (frp = frp->fr_ಮಗು; frp->fr_ಮುಂದಿನ != ಖಾಲಿ; frp = frp->fr_ಮುಂದಿನ)
 	    ;
-	frame_add_statusline(frp);
+	ಚೌಕಟ್ಟು_ಕೂಡಿಸು_statusline(frp);
     }
 }
 
@@ -4190,173 +4190,173 @@ frame_add_statusline(frame_T *frp)
  * Set width of a frame.  Handles recursively going through contained frames.
  * May remove separator line for windows at the right side (for win_close()).
  */
-    static void
-frame_new_width(
-    frame_T	*topfrp,
-    int		width,
-    int		leftfirst,	// resize leftmost contained frame first
-    int		wfw)		// obey 'winfixwidth' when there is a choice;
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಚೌಕಟ್ಟು_new_ಅಗಲ(
+    ಚೌಕಟ್ಟು_T	*topfrp,
+    ಪೂರ್ಣಾಂಕ		ಅಗಲ,
+    ಪೂರ್ಣಾಂಕ		leftfirst,	// resize leftmost contained frame first
+    ಪೂರ್ಣಾಂಕ		wfw)		// obey 'winfixwidth' when there is a choice;
 				// may cause the width not to be set
 {
-    frame_T	*frp;
-    int		extra_cols;
-    int		w;
+    ಚೌಕಟ್ಟು_T	*frp;
+    ಪೂರ್ಣಾಂಕ		extra_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+    ಪೂರ್ಣಾಂಕ		w;
     win_T	*wp;
 
-    if (topfrp->fr_layout == FR_LEAF)
+    ಆದರೆ (topfrp->fr_layout == FR_ಎಲೆ)
     {
 	// Simple case: just one window.
 	wp = topfrp->fr_win;
 	// Find out if there are any windows right of this one.
-	for (frp = topfrp; frp->fr_parent != NULL; frp = frp->fr_parent)
-	    if (frp->fr_parent->fr_layout == FR_ROW && frp->fr_next != NULL)
-		break;
-	if (frp->fr_parent == NULL)
-	    wp->w_vsep_width = 0;
-	win_new_width(wp, width - wp->w_vsep_width);
+	ಗಾಗಿ (frp = topfrp; frp->fr_ಪೋಷಕ != ಖಾಲಿ; frp = frp->fr_ಪೋಷಕ)
+	    ಆದರೆ (frp->fr_ಪೋಷಕ->fr_layout == FR_ಅಡ್ಡಸಾಲು && frp->fr_ಮುಂದಿನ != ಖಾಲಿ)
+		ನಿಲ್ಲಿಸು;
+	ಆದರೆ (frp->fr_ಪೋಷಕ == ಖಾಲಿ)
+	    wp->w_vsep_ಅಗಲ = 0;
+	win_new_ಅಗಲ(wp, ಅಗಲ - wp->w_vsep_ಅಗಲ);
     }
-    else if (topfrp->fr_layout == FR_COL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (topfrp->fr_layout == FR_ಲಂಬಸಾಲು)
     {
-	do
+	ಮಾಡು
 	{
 	    // All frames in this column get the same new width.
-	    FOR_ALL_FRAMES(frp, topfrp->fr_child)
+	    FOR_ALL_ಚೌಕಟ್ಟುಗಳು(frp, topfrp->fr_ಮಗು)
 	    {
-		frame_new_width(frp, width, leftfirst, wfw);
-		if (frp->fr_width > width)
+		ಚೌಕಟ್ಟು_new_ಅಗಲ(frp, ಅಗಲ, leftfirst, wfw);
+		ಆದರೆ (frp->fr_ಅಗಲ > ಅಗಲ)
 		{
 		    // Could not fit the windows, make whole column wider.
-		    width = frp->fr_width;
-		    break;
+		    ಅಗಲ = frp->fr_ಅಗಲ;
+		    ನಿಲ್ಲಿಸು;
 		}
 	    }
-	} while (frp != NULL);
+	} ಆಗ (frp != ಖಾಲಿ);
     }
-    else    // fr_layout == FR_ROW
+    ಇಲ್ಲದಿದ್ದರೆ    // fr_layout == FR_ROW
     {
 	// Complicated case: Resize a row of frames.  Resize the rightmost
 	// frame first, frames left of it when needed.
 
-	frp = topfrp->fr_child;
-	if (wfw)
+	frp = topfrp->fr_ಮಗು;
+	ಆದರೆ (wfw)
 	    // Advance past frames with one window with 'wfw' set.
-	    while (frame_fixed_width(frp))
+	    ಆಗ (ಚೌಕಟ್ಟು_fixed_ಅಗಲ(frp))
 	    {
-		frp = frp->fr_next;
-		if (frp == NULL)
-		    return;	    // no frame without 'wfw', give up
+		frp = frp->fr_ಮುಂದಿನ;
+		ಆದರೆ (frp == ಖಾಲಿ)
+		    ಹಿಂತಿರುಗಿ;	    // no frame without 'wfw', give up
 	    }
-	if (!leftfirst)
+	ಆದರೆ (!leftfirst)
 	{
 	    // Find the rightmost frame of this row
-	    while (frp->fr_next != NULL)
-		frp = frp->fr_next;
-	    if (wfw)
+	    ಆಗ (frp->fr_ಮುಂದಿನ != ಖಾಲಿ)
+		frp = frp->fr_ಮುಂದಿನ;
+	    ಆದರೆ (wfw)
 		// Advance back for frames with one window with 'wfw' set.
-		while (frame_fixed_width(frp))
+		ಆಗ (ಚೌಕಟ್ಟು_fixed_ಅಗಲ(frp))
 		    frp = frp->fr_prev;
 	}
 
-	extra_cols = width - topfrp->fr_width;
-	if (extra_cols < 0)
+	extra_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = ಅಗಲ - topfrp->fr_ಅಗಲ;
+	ಆದರೆ (extra_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ < 0)
 	{
 	    // reduce frame width, rightmost frame first
-	    while (frp != NULL)
+	    ಆಗ (frp != ಖಾಲಿ)
 	    {
-		w = frame_minwidth(frp, NULL);
-		if (frp->fr_width + extra_cols < w)
+		w = ಚೌಕಟ್ಟು_minwidth(frp, ಖಾಲಿ);
+		ಆದರೆ (frp->fr_ಅಗಲ + extra_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ < w)
 		{
-		    extra_cols += frp->fr_width - w;
-		    frame_new_width(frp, w, leftfirst, wfw);
+		    extra_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ += frp->fr_ಅಗಲ - w;
+		    ಚೌಕಟ್ಟು_new_ಅಗಲ(frp, w, leftfirst, wfw);
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    frame_new_width(frp, frp->fr_width + extra_cols,
+		    ಚೌಕಟ್ಟು_new_ಅಗಲ(frp, frp->fr_ಅಗಲ + extra_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ,
 							      leftfirst, wfw);
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
-		if (leftfirst)
+		ಆದರೆ (leftfirst)
 		{
-		    do
-			frp = frp->fr_next;
-		    while (wfw && frp != NULL && frame_fixed_width(frp));
+		    ಮಾಡು
+			frp = frp->fr_ಮುಂದಿನ;
+		    ಆಗ (wfw && frp != ಖಾಲಿ && ಚೌಕಟ್ಟು_fixed_ಅಗಲ(frp));
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    do
+		    ಮಾಡು
 			frp = frp->fr_prev;
-		    while (wfw && frp != NULL && frame_fixed_width(frp));
+		    ಆಗ (wfw && frp != ಖಾಲಿ && ಚೌಕಟ್ಟು_fixed_ಅಗಲ(frp));
 		}
 		// Increase "width" if we could not reduce enough frames.
-		if (frp == NULL)
-		    width -= extra_cols;
+		ಆದರೆ (frp == ಖಾಲಿ)
+		    ಅಗಲ -= extra_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
 	    }
 	}
-	else if (extra_cols > 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (extra_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ > 0)
 	{
 	    // increase width of rightmost frame
-	    frame_new_width(frp, frp->fr_width + extra_cols, leftfirst, wfw);
+	    ಚೌಕಟ್ಟು_new_ಅಗಲ(frp, frp->fr_ಅಗಲ + extra_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, leftfirst, wfw);
 	}
     }
-    topfrp->fr_width = width;
+    topfrp->fr_ಅಗಲ = ಅಗಲ;
 }
 
 /*
  * Add or remove the vertical separator of windows to the right side of "frp".
  * Note: Does not check if there is room!
  */
-    static void
-frame_set_vsep(frame_T *frp, int add)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಚೌಕಟ್ಟು_ಗಣ_vsep(ಚೌಕಟ್ಟು_T *frp, ಪೂರ್ಣಾಂಕ ಕೂಡಿಸು)
 {
     win_T	*wp;
 
-    if (frp->fr_layout == FR_LEAF)
+    ಆದರೆ (frp->fr_layout == FR_ಎಲೆ)
     {
 	wp = frp->fr_win;
-	if (add && wp->w_vsep_width == 0)
+	ಆದರೆ (ಕೂಡಿಸು && wp->w_vsep_ಅಗಲ == 0)
 	{
-	    if (wp->w_width > 0)	// don't make it negative
-		win_new_width(wp, wp->w_width - 1);
-	    wp->w_vsep_width = 1;
+	    ಆದರೆ (wp->w_ಅಗಲ > 0)	// don't make it negative
+		win_new_ಅಗಲ(wp, wp->w_ಅಗಲ - 1);
+	    wp->w_vsep_ಅಗಲ = 1;
 	}
-	else if (!add && wp->w_vsep_width == 1)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!ಕೂಡಿಸು && wp->w_vsep_ಅಗಲ == 1)
 	{
-	    win_new_width(wp, wp->w_width + 1);
-	    wp->w_vsep_width = 0;
+	    win_new_ಅಗಲ(wp, wp->w_ಅಗಲ + 1);
+	    wp->w_vsep_ಅಗಲ = 0;
 	}
     }
-    else if (frp->fr_layout == FR_COL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (frp->fr_layout == FR_ಲಂಬಸಾಲು)
     {
 	// Handle all the frames in the column.
-	FOR_ALL_FRAMES(frp, frp->fr_child)
-	    frame_set_vsep(frp, add);
+	FOR_ALL_ಚೌಕಟ್ಟುಗಳು(frp, frp->fr_ಮಗು)
+	    ಚೌಕಟ್ಟು_ಗಣ_vsep(frp, ಕೂಡಿಸು);
     }
-    else // frp->fr_layout == FR_ROW
+    ಇಲ್ಲದಿದ್ದರೆ // frp->fr_layout == FR_ROW
     {
 	// Only need to handle the last frame in the row.
-	frp = frp->fr_child;
-	while (frp->fr_next != NULL)
-	    frp = frp->fr_next;
-	frame_set_vsep(frp, add);
+	frp = frp->fr_ಮಗು;
+	ಆಗ (frp->fr_ಮುಂದಿನ != ಖಾಲಿ)
+	    frp = frp->fr_ಮುಂದಿನ;
+	ಚೌಕಟ್ಟು_ಗಣ_vsep(frp, ಕೂಡಿಸು);
     }
 }
 
 /*
  * Set frame width from the window it contains.
  */
-    static void
-frame_fix_width(win_T *wp)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಚೌಕಟ್ಟು_fix_ಅಗಲ(win_T *wp)
 {
-    wp->w_frame->fr_width = wp->w_width + wp->w_vsep_width;
+    wp->w_ಚೌಕಟ್ಟು->fr_ಅಗಲ = wp->w_ಅಗಲ + wp->w_vsep_ಅಗಲ;
 }
 
 /*
  * Set frame height from the window it contains.
  */
-    static void
-frame_fix_height(win_T *wp)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಚೌಕಟ್ಟು_fix_ಎತ್ತರ(win_T *wp)
 {
-    wp->w_frame->fr_height = VISIBLE_HEIGHT(wp) + wp->w_status_height;
+    wp->w_ಚೌಕಟ್ಟು->fr_ಎತ್ತರ = VISIBLE_ಎತ್ತರ(wp) + wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ;
 }
 
 /*
@@ -4366,85 +4366,85 @@ frame_fix_height(win_T *wp)
  * When "next_curwin" is NOWIN, don't use at least one line for the current
  * window.
  */
-    static int
-frame_minheight(frame_T *topfrp, win_T *next_curwin)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಚೌಕಟ್ಟು_minheight(ಚೌಕಟ್ಟು_T *topfrp, win_T *ಮುಂದಿನ_curwin)
 {
-    frame_T	*frp;
-    int		m;
-    int		n;
+    ಚೌಕಟ್ಟು_T	*frp;
+    ಪೂರ್ಣಾಂಕ		m;
+    ಪೂರ್ಣಾಂಕ		n;
 
-    if (topfrp->fr_win != NULL)
+    ಆದರೆ (topfrp->fr_win != ಖಾಲಿ)
     {
-	if (topfrp->fr_win == next_curwin)
-	    m = p_wh + topfrp->fr_win->w_status_height;
-	else
+	ಆದರೆ (topfrp->fr_win == ಮುಂದಿನ_curwin)
+	    m = p_wh + topfrp->fr_win->w_ಸ್ಥಿತಿ_ಎತ್ತರ;
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // window: minimal height of the window plus status line
-	    m = p_wmh + topfrp->fr_win->w_status_height;
-	    if (topfrp->fr_win == curwin && next_curwin == NULL)
+	    m = p_wmh + topfrp->fr_win->w_ಸ್ಥಿತಿ_ಎತ್ತರ;
+	    ಆದರೆ (topfrp->fr_win == curwin && ಮುಂದಿನ_curwin == ಖಾಲಿ)
 	    {
 		// Current window is minimal one line high and WinBar is
 		// visible.
-		if (p_wmh == 0)
+		ಆದರೆ (p_wmh == 0)
 		    ++m;
-		m += WINBAR_HEIGHT(curwin);
+		m += WINBAR_ಎತ್ತರ(curwin);
 	    }
 	}
     }
-    else if (topfrp->fr_layout == FR_ROW)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (topfrp->fr_layout == FR_ಅಡ್ಡಸಾಲು)
     {
 	// get the minimal height from each frame in this row
 	m = 0;
-	FOR_ALL_FRAMES(frp, topfrp->fr_child)
+	FOR_ALL_ಚೌಕಟ್ಟುಗಳು(frp, topfrp->fr_ಮಗು)
 	{
-	    n = frame_minheight(frp, next_curwin);
-	    if (n > m)
+	    n = ಚೌಕಟ್ಟು_minheight(frp, ಮುಂದಿನ_curwin);
+	    ಆದರೆ (n > m)
 		m = n;
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Add up the minimal heights for all frames in this column.
 	m = 0;
-	FOR_ALL_FRAMES(frp, topfrp->fr_child)
-	    m += frame_minheight(frp, next_curwin);
+	FOR_ALL_ಚೌಕಟ್ಟುಗಳು(frp, topfrp->fr_ಮಗು)
+	    m += ಚೌಕಟ್ಟು_minheight(frp, ಮುಂದಿನ_curwin);
     }
 
-    return m;
+    ಹಿಂತಿರುಗಿ m;
 }
 
 /*
  * Compute the window count in height for frame "topfrp".
  */
-static int
-frame_wincount_in_height(frame_T *topfrp)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಚೌಕಟ್ಟು_wincount_ಒಳ_ಎತ್ತರ(ಚೌಕಟ್ಟು_T *topfrp)
 {
-    frame_T	*frp;
-    int		c = 0;
-    int		n;
+    ಚೌಕಟ್ಟು_T	*frp;
+    ಪೂರ್ಣಾಂಕ		c = 0;
+    ಪೂರ್ಣಾಂಕ		n;
 
-    if (topfrp->fr_win != NULL)
+    ಆದರೆ (topfrp->fr_win != ಖಾಲಿ)
 	c = 1;
-    else if (topfrp->fr_layout == FR_ROW)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (topfrp->fr_layout == FR_ಅಡ್ಡಸಾಲು)
     {
 	// get the max window count across all frames in this row
 	c = 0;
-	FOR_ALL_FRAMES(frp, topfrp->fr_child)
+	FOR_ALL_ಚೌಕಟ್ಟುಗಳು(frp, topfrp->fr_ಮಗು)
 	{
-	    n = frame_wincount_in_height(frp);
-	    if (n > c)
+	    n = ಚೌಕಟ್ಟು_wincount_ಒಳ_ಎತ್ತರ(frp);
+	    ಆದರೆ (n > c)
 		c = n;
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Sum the window counts for all frames in this column.
 	c = 0;
-	FOR_ALL_FRAMES(frp, topfrp->fr_child)
-	    c += frame_wincount_in_height(frp);
+	FOR_ALL_ಚೌಕಟ್ಟುಗಳು(frp, topfrp->fr_ಮಗು)
+	    c += ಚೌಕಟ್ಟು_wincount_ಒಳ_ಎತ್ತರ(frp);
     }
 
-    return c;
+    ಹಿಂತಿರುಗಿ c;
 }
 
 /*
@@ -4453,47 +4453,47 @@ frame_wincount_in_height(frame_T *topfrp)
  * When "next_curwin" is NOWIN, don't use at least one column for the current
  * window.
  */
-    static int
-frame_minwidth(
-    frame_T	*topfrp,
-    win_T	*next_curwin)	// use p_wh and p_wiw for next_curwin
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಚೌಕಟ್ಟು_minwidth(
+    ಚೌಕಟ್ಟು_T	*topfrp,
+    win_T	*ಮುಂದಿನ_curwin)	// use p_wh and p_wiw for next_curwin
 {
-    frame_T	*frp;
-    int		m, n;
+    ಚೌಕಟ್ಟು_T	*frp;
+    ಪೂರ್ಣಾಂಕ		m, n;
 
-    if (topfrp->fr_win != NULL)
+    ಆದರೆ (topfrp->fr_win != ಖಾಲಿ)
     {
-	if (topfrp->fr_win == next_curwin)
-	    m = p_wiw + topfrp->fr_win->w_vsep_width;
-	else
+	ಆದರೆ (topfrp->fr_win == ಮುಂದಿನ_curwin)
+	    m = p_wiw + topfrp->fr_win->w_vsep_ಅಗಲ;
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // window: minimal width of the window plus separator column
-	    m = p_wmw + topfrp->fr_win->w_vsep_width;
+	    m = p_wmw + topfrp->fr_win->w_vsep_ಅಗಲ;
 	    // Current window is minimal one column wide
-	    if (p_wmw == 0 && topfrp->fr_win == curwin && next_curwin == NULL)
+	    ಆದರೆ (p_wmw == 0 && topfrp->fr_win == curwin && ಮುಂದಿನ_curwin == ಖಾಲಿ)
 		++m;
 	}
     }
-    else if (topfrp->fr_layout == FR_COL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (topfrp->fr_layout == FR_ಲಂಬಸಾಲು)
     {
 	// get the minimal width from each frame in this column
 	m = 0;
-	FOR_ALL_FRAMES(frp, topfrp->fr_child)
+	FOR_ALL_ಚೌಕಟ್ಟುಗಳು(frp, topfrp->fr_ಮಗು)
 	{
-	    n = frame_minwidth(frp, next_curwin);
-	    if (n > m)
+	    n = ಚೌಕಟ್ಟು_minwidth(frp, ಮುಂದಿನ_curwin);
+	    ಆದರೆ (n > m)
 		m = n;
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Add up the minimal widths for all frames in this row.
 	m = 0;
-	FOR_ALL_FRAMES(frp, topfrp->fr_child)
-	    m += frame_minwidth(frp, next_curwin);
+	FOR_ALL_ಚೌಕಟ್ಟುಗಳು(frp, topfrp->fr_ಮಗು)
+	    m += ಚೌಕಟ್ಟು_minwidth(frp, ಮುಂದಿನ_curwin);
     }
 
-    return m;
+    ಹಿಂತಿರುಗಿ m;
 }
 
 
@@ -4504,81 +4504,81 @@ frame_minwidth(
  *
  * Used by ":bdel" and ":only".
  */
-    void
+    ಶೂನ್ಯ
 close_others(
-    int		message,
-    int		forceit)	    // always hide all other windows
+    ಪೂರ್ಣಾಂಕ		ಸಂದೇಶ_2,
+    ಪೂರ್ಣಾಂಕ		forceit)	    // always hide all other windows
 {
     win_T	*wp;
     win_T	*nextwp;
     win_T	*old_curwin = curwin;
-    int		r;
+    ಪೂರ್ಣಾಂಕ		r;
 
-    if (one_window())
+    ಆದರೆ (one_ಕಿಟಕಿ())
     {
-	if (message && !autocmd_busy)
-	    msg(_(m_onlyone));
-	return;
+	ಆದರೆ (ಸಂದೇಶ_2 && !autocmd_busy)
+	    ಸಂದೇಶ(_(m_onlyone));
+	ಹಿಂತಿರುಗಿ;
     }
 
     // Be very careful here: autocommands may change the window layout.
-    for (wp = firstwin; win_valid(wp); wp = nextwp)
+    ಗಾಗಿ (wp = firstwin; win_valid(wp); wp = nextwp)
     {
-	nextwp = wp->w_next;
+	nextwp = wp->w_ಮುಂದಿನ;
 
 	// autocommands messed this one up
-	if (old_curwin != curwin && win_valid(old_curwin))
+	ಆದರೆ (old_curwin != curwin && win_valid(old_curwin))
 	{
 	    curwin = old_curwin;
-	    curbuf = curwin->w_buffer;
+	    curbuf = curwin->w_ಬಫರ್;
 	}
 
-	if (wp == curwin)		// don't close current window
-	    continue;
+	ಆದರೆ (wp == curwin)		// don't close current window
+	    ಮುಂದುವರಿ;
 
 	// autoccommands messed this one up
-	if (!buf_valid(wp->w_buffer) && win_valid(wp))
+	ಆದರೆ (!buf_valid(wp->w_ಬಫರ್) && win_valid(wp))
 	{
-	    wp->w_buffer = NULL;
+	    wp->w_ಬಫರ್ = ಖಾಲಿ;
 	    win_close(wp, 0);
-	    continue;
+	    ಮುಂದುವರಿ;
 	}
 	// Check if it's allowed to abandon this window
-	r = can_abandon(wp->w_buffer, forceit);
-	if (!win_valid(wp))		// autocommands messed wp up
+	r = can_abandon(wp->w_ಬಫರ್, forceit);
+	ಆದರೆ (!win_valid(wp))		// autocommands messed wp up
 	{
 	    nextwp = firstwin;
-	    continue;
+	    ಮುಂದುವರಿ;
 	}
-	if (!r)
+	ಆದರೆ (!r)
 	{
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	    if (message && (p_confirm
+#ಆದರೆ defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	    ಆದರೆ (ಸಂದೇಶ_2 && (p_confirm
 			 || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
 	    {
-		dialog_changed(wp->w_buffer, FALSE);
-		if (!win_valid(wp))		// autocommands messed wp up
+		dialog_ಬದಲಾಯಿತು(wp->w_ಬಫರ್, FALSE);
+		ಆದರೆ (!win_valid(wp))		// autocommands messed wp up
 		{
 		    nextwp = firstwin;
-		    continue;
+		    ಮುಂದುವರಿ;
 		}
 	    }
-	    if (bufIsChanged(wp->w_buffer))
-#endif
-		continue;
+	    ಆದರೆ (buf_Is_ಬದಲಾಯಿತು(wp->w_ಬಫರ್))
+#ಆದರೆ_ಅಂತ್ಯ
+		ಮುಂದುವರಿ;
 	}
-	win_close(wp, !buf_hide(wp->w_buffer) && !bufIsChanged(wp->w_buffer));
+	win_close(wp, !buf_hide(wp->w_ಬಫರ್) && !buf_Is_ಬದಲಾಯಿತು(wp->w_ಬಫರ್));
     }
 
-    if (message && !ONE_WINDOW)
-	emsg(_(e_other_window_contains_changes));
+    ಆದರೆ (ಸಂದೇಶ_2 && !ONE_ಕಿಟಕಿ)
+	emsg(_(e_other_ಕಿಟಕಿ_ಒಳಗೊಂಡಿದೆ_changes));
 }
 
 /*
  * Store the relevant window pointers for tab page "tp".  To be used before
  * use_tabpage().
  */
-    void
+    ಶೂನ್ಯ
 unuse_tabpage(tabpage_T *tp)
 {
     tp->tp_topframe = topframe;
@@ -4589,13 +4589,13 @@ unuse_tabpage(tabpage_T *tp)
 
 // When switching tabpage, handle other side-effects in command_height(), but
 // avoid setting frame sizes which are still correct.
-static int command_frame_height = TRUE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ command_ಚೌಕಟ್ಟು_ಎತ್ತರ = TRUE;
 
 /*
  * Set the relevant pointers to use tab page "tp".  May want to call
  * unuse_tabpage() first.
  */
-    void
+    ಶೂನ್ಯ
 use_tabpage(tabpage_T *tp)
 {
     curtab = tp;
@@ -4610,19 +4610,19 @@ use_tabpage(tabpage_T *tp)
  * Called from main().
  * Return FAIL when something goes wrong (out of memory).
  */
-    int
-win_alloc_first(void)
+    ಪೂರ್ಣಾಂಕ
+win_alloc_ಮೊದಲ(ಶೂನ್ಯ)
 {
-    if (win_alloc_firstwin(NULL) == FAIL)
-	return FAIL;
+    ಆದರೆ (win_alloc_firstwin(ಖಾಲಿ) == FAIL)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    first_tabpage = alloc_tabpage();
-    if (first_tabpage == NULL)
-	return FAIL;
-    curtab = first_tabpage;
-    unuse_tabpage(first_tabpage);
+    ಮೊದಲ_tabpage = alloc_tabpage();
+    ಆದರೆ (ಮೊದಲ_tabpage == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
+    curtab = ಮೊದಲ_tabpage;
+    unuse_tabpage(ಮೊದಲ_tabpage);
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
@@ -4631,31 +4631,31 @@ win_alloc_first(void)
  * can't be in win_alloc_first().
  */
     win_T *
-win_alloc_popup_win(void)
+win_alloc_popup_win(ಶೂನ್ಯ)
 {
     win_T *wp;
 
-    wp = win_alloc(NULL, TRUE);
-    if (wp == NULL)
-	return NULL;
+    wp = win_alloc(ಖಾಲಿ, TRUE);
+    ಆದರೆ (wp == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     // We need to initialize options with something, using the current
     // window makes most sense.
     win_init_some(wp, curwin);
 
     RESET_BINDING(wp);
-    new_frame(wp);
-    return wp;
+    new_ಚೌಕಟ್ಟು(wp);
+    ಹಿಂತಿರುಗಿ wp;
 }
 
 /*
  * Initialize window "wp" to display buffer "buf".
  */
-    void
+    ಶೂನ್ಯ
 win_init_popup_win(win_T *wp, buf_T *buf)
 {
-    wp->w_buffer = buf;
+    wp->w_ಬಫರ್ = buf;
     ++buf->b_nwindows;
-    win_init_empty(wp); // set cursor and topline to safe values
+    win_init_ಖಾಲಿಗಳು(wp); // set cursor and topline to safe values
 
     // Make sure w_localdir is NULL to avoid a chdir() in win_enter_ext().
     VIM_CLEAR(wp->w_localdir);
@@ -4667,28 +4667,28 @@ win_init_popup_win(win_T *wp, buf_T *buf)
  * When "oldwin" is not NULL copy info from it to the new window.
  * Return FAIL when something goes wrong (out of memory).
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 win_alloc_firstwin(win_T *oldwin)
 {
-    curwin = win_alloc(NULL, FALSE);
-    if (curwin == NULL)
-	return FAIL;
-    if (oldwin == NULL)
+    curwin = win_alloc(ಖಾಲಿ, FALSE);
+    ಆದರೆ (curwin == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
+    ಆದರೆ (oldwin == ಖಾಲಿ)
     {
 	// Very first window, need to create an empty buffer for it and
 	// initialize from scratch.
-	curbuf = buflist_new(NULL, NULL, 1L, BLN_LISTED);
-	if (curwin == NULL || curbuf == NULL)
-	    return FAIL;
-	curwin->w_buffer = curbuf;
-#ifdef FEAT_SYN_HL
+	curbuf = buflist_new(ಖಾಲಿ, ಖಾಲಿ, 1L, BLN_LISTED);
+	ಆದರೆ (curwin == ಖಾಲಿ || curbuf == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ FAIL;
+	curwin->w_ಬಫರ್ = curbuf;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
 	curwin->w_s = &(curbuf->b_s);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	curbuf->b_nwindows = 1;	// there is one window
 	curwin->w_alist = &global_alist;
 	curwin_init();		// init current window
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// First window in new tab page, initialize it from "oldwin".
 	win_init(curwin, oldwin, 0);
@@ -4697,119 +4697,119 @@ win_alloc_firstwin(win_T *oldwin)
 	RESET_BINDING(curwin);
     }
 
-    new_frame(curwin);
-    if (curwin->w_frame == NULL)
-	return FAIL;
-    topframe = curwin->w_frame;
-    topframe->fr_width = COLUMNS_WITHOUT_TPL();
-    topframe->fr_height = Rows - p_ch;
+    new_ಚೌಕಟ್ಟು(curwin);
+    ಆದರೆ (curwin->w_ಚೌಕಟ್ಟು == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
+    topframe = curwin->w_ಚೌಕಟ್ಟು;
+    topframe->fr_ಅಗಲ = COLUMNS_WITHOUT_TPL();
+    topframe->fr_ಎತ್ತರ = ಅಡ್ಡಸಾಲುಗಳು - p_ch;
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Create a frame for window "wp".
  */
-    static void
-new_frame(win_T *wp)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+new_ಚೌಕಟ್ಟು(win_T *wp)
 {
-    frame_T *frp = ALLOC_CLEAR_ONE(frame_T);
+    ಚೌಕಟ್ಟು_T *frp = ALLOC_CLEAR_ONE(ಚೌಕಟ್ಟು_T);
 
-    wp->w_frame = frp;
-    if (frp == NULL)
-	return;
-    frp->fr_layout = FR_LEAF;
+    wp->w_ಚೌಕಟ್ಟು = frp;
+    ಆದರೆ (frp == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
+    frp->fr_layout = FR_ಎಲೆ;
     frp->fr_win = wp;
 }
 
 /*
  * Initialize the window and frame size to the maximum.
  */
-    void
-win_init_size(void)
+    ಶೂನ್ಯ
+win_init_ಗಾತ್ರ(ಶೂನ್ಯ)
 {
-    firstwin->w_height = ROWS_AVAIL;
-    firstwin->w_prev_height = ROWS_AVAIL;
-    topframe->fr_height = ROWS_AVAIL;
-    firstwin->w_width = topframe->fr_width;
+    firstwin->w_ಎತ್ತರ = ಅಡ್ಡಸಾಲುಗಳು_AVAIL;
+    firstwin->w_prev_ಎತ್ತರ = ಅಡ್ಡಸಾಲುಗಳು_AVAIL;
+    topframe->fr_ಎತ್ತರ = ಅಡ್ಡಸಾಲುಗಳು_AVAIL;
+    firstwin->w_ಅಗಲ = topframe->fr_ಅಗಲ;
 }
 
 /*
  * Allocate a new tabpage_T and init the values.
  * Returns NULL when out of memory.
  */
-    static tabpage_T *
-alloc_tabpage(void)
+    ಸ್ಥಿರ tabpage_T *
+alloc_tabpage(ಶೂನ್ಯ)
 {
     tabpage_T	*tp;
-#ifdef FEAT_GUI
-    int		i;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+    ಪೂರ್ಣಾಂಕ		i;
+#ಆದರೆ_ಅಂತ್ಯ
 
 
     tp = ALLOC_CLEAR_ONE(tabpage_T);
-    if (tp == NULL)
-	return NULL;
+    ಆದರೆ (tp == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     // init t: variables
     tp->tp_vars = dict_alloc_id(aid_newtabpage_tvars);
-    if (tp->tp_vars == NULL)
+    ಆದರೆ (tp->tp_vars == ಖಾಲಿ)
     {
 	vim_free(tp);
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
     init_var_dict(tp->tp_vars, &tp->tp_winvar, VAR_SCOPE);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_GUI
-    for (i = 0; i < 3; i++)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+    ಗಾಗಿ (i = 0; i < 3; i++)
 	tp->tp_prev_which_scrollbars[i] = -1;
-#endif
-#ifdef FEAT_DIFF
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
     tp->tp_diff_invalid = TRUE;
-#endif
-    tp->tp_ch_used = p_ch;
+#ಆದರೆ_ಅಂತ್ಯ
+    tp->tp_ch_ಬಳಸಿದ = p_ch;
 
-    return tp;
+    ಹಿಂತಿರುಗಿ tp;
 }
 
-    void
+    ಶೂನ್ಯ
 free_tabpage(tabpage_T *tp)
 {
-    int idx;
+    ಪೂರ್ಣಾಂಕ idx;
 
-#ifdef FEAT_DIFF
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
     diff_clear(tp);
-#endif
-#ifdef FEAT_PROP_POPUP
-    while (tp->tp_first_popupwin != NULL)
-	popup_close_tabpage(tp, tp->tp_first_popupwin->w_id, TRUE);
-#endif
-    for (idx = 0; idx < SNAP_COUNT; ++idx)
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+    ಆಗ (tp->tp_ಮೊದಲ_popupwin != ಖಾಲಿ)
+	popup_close_tabpage(tp, tp->tp_ಮೊದಲ_popupwin->w_id, TRUE);
+#ಆದರೆ_ಅಂತ್ಯ
+    ಗಾಗಿ (idx = 0; idx < SNAP_ಎಣಿಕೆ; ++idx)
 	clear_snapshot(tp, idx);
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     vars_clear(&tp->tp_vars->dv_hashtab);	// free all t: variables
     hash_init(&tp->tp_vars->dv_hashtab);
     unref_var_dict(tp->tp_vars);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (tp == lastused_tabpage)
-	lastused_tabpage = NULL;
-#ifdef FEAT_TABPANEL
+    ಆದರೆ (tp == lastused_tabpage)
+	lastused_tabpage = ಖಾಲಿ;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TABPANEL
     tabpanel_forget_tabpage(tp);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     vim_free(tp->tp_localdir);
     vim_free(tp->tp_prevdir);
 
-#ifdef FEAT_PYTHON
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PYTHON
     python_tabpage_free(tp);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_PYTHON3
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PYTHON3
     python3_tabpage_free(tp);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     vim_free(tp);
 }
@@ -4826,112 +4826,112 @@ free_tabpage(tabpage_T *tp)
  *
  * Return FAIL or OK.
  */
-    int
-win_new_tabpage(int after)
+    ಪೂರ್ಣಾಂಕ
+win_new_tabpage(ಪೂರ್ಣಾಂಕ after)
 {
     tabpage_T	*tp = curtab;
     tabpage_T	*prev_tp = curtab;
     tabpage_T	*newtp;
-    int		n;
-#if defined(FEAT_TABPANEL)
-    int prev_columns = COLUMNS_WITHOUT_TPL();
-#endif
+    ಪೂರ್ಣಾಂಕ		n;
+#ಆದರೆ defined(FEAT_TABPANEL)
+    ಪೂರ್ಣಾಂಕ prev_columns = COLUMNS_WITHOUT_TPL();
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (cmdwin_type != 0)
+    ಆದರೆ (cmdwin_type != 0)
     {
-	emsg(_(e_invalid_in_cmdline_window));
-	return FAIL;
+	emsg(_(e_invalid_ಒಳ_cmdline_ಕಿಟಕಿ));
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-    if (window_layout_locked(CMD_tabnew))
-	return FAIL;
+    ಆದರೆ (ಕಿಟಕಿ_layout_locked(CMD_tabnew))
+	ಹಿಂತಿರುಗಿ FAIL;
 
     newtp = alloc_tabpage();
-    if (newtp == NULL)
-	return FAIL;
+    ಆದರೆ (newtp == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
     // Remember the current windows in this Tab page.
-    if (leave_tabpage(curbuf, TRUE) == FAIL)
+    ಆದರೆ (leave_tabpage(curbuf, TRUE) == FAIL)
     {
 	vim_free(newtp);
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
     curtab = newtp;
 
-    newtp->tp_localdir = (tp->tp_localdir == NULL)
-				    ? NULL : vim_strsave(tp->tp_localdir);
+    newtp->tp_localdir = (tp->tp_localdir == ಖಾಲಿ)
+				    ? ಖಾಲಿ : vim_strsave(tp->tp_localdir);
 
     // Create a new empty window.
-    if (win_alloc_firstwin(tp->tp_curwin) == OK)
+    ಆದರೆ (win_alloc_firstwin(tp->tp_curwin) == OK)
     {
 	// Make the new Tab page the new topframe.
-	if (after == 1)
+	ಆದರೆ (after == 1)
 	{
 	    // New tab page becomes the first one.
-	    newtp->tp_next = first_tabpage;
-	    first_tabpage = newtp;
+	    newtp->tp_ಮುಂದಿನ = ಮೊದಲ_tabpage;
+	    ಮೊದಲ_tabpage = newtp;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (after > 0)
+	    ಆದರೆ (after > 0)
 	    {
 		// Put new tab page before tab page "after".
 		n = 2;
-		for (tp = first_tabpage; tp->tp_next != NULL
-					       && n < after; tp = tp->tp_next)
+		ಗಾಗಿ (tp = ಮೊದಲ_tabpage; tp->tp_ಮುಂದಿನ != ಖಾಲಿ
+					       && n < after; tp = tp->tp_ಮುಂದಿನ)
 		    ++n;
 	    }
-	    newtp->tp_next = tp->tp_next;
-	    tp->tp_next = newtp;
+	    newtp->tp_ಮುಂದಿನ = tp->tp_ಮುಂದಿನ;
+	    tp->tp_ಮುಂದಿನ = newtp;
 	}
 	newtp->tp_firstwin = newtp->tp_lastwin = newtp->tp_curwin = curwin;
 
-	win_init_size();
-	firstwin->w_winrow = tabline_height();
+	win_init_ಗಾತ್ರ();
+	firstwin->w_winrow = tabline_ಎತ್ತರ();
 	firstwin->w_prev_winrow = firstwin->w_winrow;
 	win_comp_scroll(curwin);
 
 	newtp->tp_topframe = topframe;
-	last_status(FALSE);
+	ಕೊನೆಯ_ಸ್ಥಿತಿ(FALSE);
 
 	lastused_tabpage = prev_tp;
 
-#if defined(FEAT_GUI)
+#ಆದರೆ defined(FEAT_GUI)
 	// When 'guioptions' includes 'L' or 'R' may have to remove or add
 	// scrollbars.  Have to update them anyway.
 	gui_may_update_scrollbars();
-#endif
-#ifdef FEAT_JOB_CHANNEL
-	entering_window(curwin);
-#endif
-#if defined(FEAT_TABPANEL)
-	if (prev_columns != COLUMNS_WITHOUT_TPL())
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕೆಲಸ_CHANNEL
+	entering_ಕಿಟಕಿ(curwin);
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(FEAT_TABPANEL)
+	ಆದರೆ (prev_columns != COLUMNS_WITHOUT_TPL())
 	{
 	    tabpage_T	*tp2;
-	    int		w = COLUMNS_WITHOUT_TPL();
+	    ಪೂರ್ಣಾಂಕ		w = COLUMNS_WITHOUT_TPL();
 
 	    shell_new_columns();
 	    // shell_new_columns() only updates the current tab page; fix up
 	    // all others.
 	    FOR_ALL_TABPAGES(tp2)
-		if (tp2 != curtab)
+		ಆದರೆ (tp2 != curtab)
 		{
-		    frame_new_width(tp2->tp_topframe, w, FALSE, TRUE);
-		    if (!frame_check_width(tp2->tp_topframe, w))
-			frame_new_width(tp2->tp_topframe, w, FALSE, FALSE);
+		    ಚೌಕಟ್ಟು_new_ಅಗಲ(tp2->tp_topframe, w, FALSE, TRUE);
+		    ಆದರೆ (!ಚೌಕಟ್ಟು_check_ಅಗಲ(tp2->tp_topframe, w))
+			ಚೌಕಟ್ಟು_new_ಅಗಲ(tp2->tp_topframe, w, FALSE, FALSE);
 		}
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	redraw_all_later(UPD_NOT_VALID);
-	apply_autocmds(EVENT_WINNEW, NULL, NULL, FALSE, curbuf);
-	apply_autocmds(EVENT_WINENTER, NULL, NULL, FALSE, curbuf);
-	apply_autocmds(EVENT_TABNEW, NULL, NULL, FALSE, curbuf);
-	apply_autocmds(EVENT_TABENTER, NULL, NULL, FALSE, curbuf);
-	return OK;
+	apply_autocmds(EVENT_WINNEW, ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
+	apply_autocmds(EVENT_WINENTER, ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
+	apply_autocmds(EVENT_TABNEW, ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
+	apply_autocmds(EVENT_TABENTER, ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
+	ಹಿಂತಿರುಗಿ OK;
     }
 
     // Failed, get back the previous Tab page
     enter_tabpage(curtab, curbuf, TRUE, TRUE);
-    return FAIL;
+    ಹಿಂತಿರುಗಿ FAIL;
 }
 
 /*
@@ -4939,69 +4939,69 @@ win_new_tabpage(int after)
  * like with ":split".
  * Returns OK if a new tab page was created, FAIL otherwise.
  */
-    static int
-may_open_tabpage(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+may_open_tabpage(ಶೂನ್ಯ)
 {
-    int		n = (cmdmod.cmod_tab == 0)
-				       ? postponed_split_tab : cmdmod.cmod_tab;
+    ಪೂರ್ಣಾಂಕ		n = (cmdmod.cmod_tab == 0)
+				       ? postponed_ವಿಭಜಿಸು_tab : cmdmod.cmod_tab;
 
-    if (n == 0)
-	return FAIL;
+    ಆದರೆ (n == 0)
+	ಹಿಂತಿರುಗಿ FAIL;
 
     cmdmod.cmod_tab = 0;	    // reset it to avoid doing it twice
-    postponed_split_tab = 0;
-    return win_new_tabpage(n);
+    postponed_ವಿಭಜಿಸು_tab = 0;
+    ಹಿಂತಿರುಗಿ win_new_tabpage(n);
 }
 
 /*
  * Create up to "maxcount" tabpages with empty windows.
  * Returns the number of resulting tab pages.
  */
-    int
-make_tabpages(int maxcount)
+    ಪೂರ್ಣಾಂಕ
+make_tabpages(ಪೂರ್ಣಾಂಕ maxcount)
 {
-    int		count = maxcount;
-    int		todo;
+    ಪೂರ್ಣಾಂಕ		ಎಣಿಕೆ_2 = maxcount;
+    ಪೂರ್ಣಾಂಕ		todo;
 
     // Limit to 'tabpagemax' tabs.
-    if (count > p_tpm)
-	count = p_tpm;
+    ಆದರೆ (ಎಣಿಕೆ_2 > p_tpm)
+	ಎಣಿಕೆ_2 = p_tpm;
 
     /*
      * Don't execute autocommands while creating the tab pages.  Must do that
      * when putting the buffers in the windows.
      */
-    block_autocmds();
+    ಖಂಡ_autocmds();
 
-    for (todo = count - 1; todo > 0; --todo)
-	if (win_new_tabpage(0) == FAIL)
-	    break;
+    ಗಾಗಿ (todo = ಎಣಿಕೆ_2 - 1; todo > 0; --todo)
+	ಆದರೆ (win_new_tabpage(0) == FAIL)
+	    ನಿಲ್ಲಿಸು;
 
     unblock_autocmds();
 
     // return actual number of tab pages
-    return (count - todo);
+    ಹಿಂತಿರುಗಿ (ಎಣಿಕೆ_2 - todo);
 }
 
 /*
  * Return TRUE when "tpc" points to a valid tab page.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 valid_tabpage(tabpage_T *tpc)
 {
     tabpage_T	*tp;
 
     FOR_ALL_TABPAGES(tp)
-	if (tp == tpc)
-	    return TRUE;
-    return FALSE;
+	ಆದರೆ (tp == tpc)
+	    ಹಿಂತಿರುಗಿ TRUE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 /*
  * Return TRUE when "tpc" points to a valid tab page and at least one window is
  * valid.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 valid_tabpage_win(tabpage_T *tpc)
 {
     tabpage_T	*tp;
@@ -5009,41 +5009,41 @@ valid_tabpage_win(tabpage_T *tpc)
 
     FOR_ALL_TABPAGES(tp)
     {
-	if (tp == tpc)
+	ಆದರೆ (tp == tpc)
 	{
-	    FOR_ALL_WINDOWS_IN_TAB(tp, wp)
+	    FOR_ALL_WINDOWS_ಒಳ_TAB(tp, wp)
 	    {
-		if (win_valid_any_tab(wp))
-		    return TRUE;
+		ಆದರೆ (win_valid_any_tab(wp))
+		    ಹಿಂತಿರುಗಿ TRUE;
 	    }
-	    return FALSE;
+	    ಹಿಂತಿರುಗಿ FALSE;
 	}
     }
     // shouldn't happen
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 /*
  * Close tabpage "tab", assuming it has no windows in it.
  * There must be another tabpage or this will crash.
  */
-    void
+    ಶೂನ್ಯ
 close_tabpage(tabpage_T *tab)
 {
     tabpage_T	*ptp;
 
-    if (tab == first_tabpage)
+    ಆದರೆ (tab == ಮೊದಲ_tabpage)
     {
-	first_tabpage = tab->tp_next;
-	ptp = first_tabpage;
+	ಮೊದಲ_tabpage = tab->tp_ಮುಂದಿನ;
+	ptp = ಮೊದಲ_tabpage;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	for (ptp = first_tabpage; ptp != NULL && ptp->tp_next != tab;
-							    ptp = ptp->tp_next)
+	ಗಾಗಿ (ptp = ಮೊದಲ_tabpage; ptp != ಖಾಲಿ && ptp->tp_ಮುಂದಿನ != tab;
+							    ptp = ptp->tp_ಮುಂದಿನ)
 	    ;
-	assert(ptp != NULL);
-	ptp->tp_next = tab->tp_next;
+	ಪ್ರತಿಜ್ಞಾ(ptp != ಖಾಲಿ);
+	ptp->tp_ಮುಂದಿನ = tab->tp_ಮುಂದಿನ;
     }
 
     goto_tabpage_tp(ptp, FALSE, FALSE);
@@ -5054,32 +5054,32 @@ close_tabpage(tabpage_T *tab)
  * Find tab page "n" (first one is 1).  Returns NULL when not found.
  */
     tabpage_T *
-find_tabpage(int n)
+ಕಂಡುಹಿಡಿ_tabpage(ಪೂರ್ಣಾಂಕ n)
 {
     tabpage_T	*tp;
-    int		i = 1;
+    ಪೂರ್ಣಾಂಕ		i = 1;
 
-    if (n == 0)
-	return curtab;
+    ಆದರೆ (n == 0)
+	ಹಿಂತಿರುಗಿ curtab;
 
-    for (tp = first_tabpage; tp != NULL && i != n; tp = tp->tp_next)
+    ಗಾಗಿ (tp = ಮೊದಲ_tabpage; tp != ಖಾಲಿ && i != n; tp = tp->tp_ಮುಂದಿನ)
 	++i;
-    return tp;
+    ಹಿಂತಿರುಗಿ tp;
 }
 
 /*
  * Get index of tab page "tp".  First one has index 1.
  * When not found returns number of tab pages plus one.
  */
-    int
-tabpage_index(tabpage_T *ftp)
+    ಪೂರ್ಣಾಂಕ
+tabpage_ಸೂಚ್ಯಂಕ(tabpage_T *ftp)
 {
-    int		i = 1;
+    ಪೂರ್ಣಾಂಕ		i = 1;
     tabpage_T	*tp;
 
-    for (tp = first_tabpage; tp != NULL && tp != ftp; tp = tp->tp_next)
+    ಗಾಗಿ (tp = ಮೊದಲ_tabpage; tp != ಖಾಲಿ && tp != ftp; tp = tp->tp_ಮುಂದಿನ)
 	++i;
-    return i;
+    ಹಿಂತಿರುಗಿ i;
 }
 
 /*
@@ -5088,57 +5088,57 @@ tabpage_index(tabpage_T *ftp)
  * FAIL.
  * Careful: When OK is returned need to get a new tab page very very soon!
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 leave_tabpage(
     buf_T	*new_curbuf,		// what is going to be the new curbuf,
 					// NULL if unknown
-    int		trigger_leave_autocmds)
+    ಪೂರ್ಣಾಂಕ		trigger_leave_autocmds)
 {
     tabpage_T	*tp = curtab;
 
-#ifdef FEAT_JOB_CHANNEL
-    leaving_window(curwin);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕೆಲಸ_CHANNEL
+    leaving_ಕಿಟಕಿ(curwin);
+#ಆದರೆ_ಅಂತ್ಯ
     reset_VIsual_and_resel();	// stop Visual mode
-    if (trigger_leave_autocmds)
+    ಆದರೆ (trigger_leave_autocmds)
     {
-	if (new_curbuf != curbuf)
+	ಆದರೆ (new_curbuf != curbuf)
 	{
-	    apply_autocmds(EVENT_BUFLEAVE, NULL, NULL, FALSE, curbuf);
-	    if (curtab != tp)
-		return FAIL;
+	    apply_autocmds(EVENT_BUFLEAVE, ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
+	    ಆದರೆ (curtab != tp)
+		ಹಿಂತಿರುಗಿ FAIL;
 	}
-	apply_autocmds(EVENT_WINLEAVE, NULL, NULL, FALSE, curbuf);
-	if (curtab != tp)
-	    return FAIL;
-	apply_autocmds(EVENT_TABLEAVE, NULL, NULL, FALSE, curbuf);
-	if (curtab != tp)
-	    return FAIL;
+	apply_autocmds(EVENT_WINLEAVE, ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
+	ಆದರೆ (curtab != tp)
+	    ಹಿಂತಿರುಗಿ FAIL;
+	apply_autocmds(EVENT_TABLEAVE, ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
+	ಆದರೆ (curtab != tp)
+	    ಹಿಂತಿರುಗಿ FAIL;
     }
 
     reset_dragwin();
-#if defined(FEAT_GUI)
+#ಆದರೆ defined(FEAT_GUI)
     // Remove the scrollbars.  They may be added back later.
-    if (gui.in_use)
+    ಆದರೆ (gui.ಒಳ_use)
 	gui_remove_scrollbars();
-#endif
-#ifdef FEAT_IMAGE
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_IMAGE
     // Clear all image placements, they will be redrawn again if needed.
     clear_all_image_placements();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     tp->tp_curwin = curwin;
     tp->tp_prevwin = prevwin;
     tp->tp_firstwin = firstwin;
     tp->tp_lastwin = lastwin;
-    tp->tp_old_Rows = ROWS_AVAIL;
-    if (tp->tp_old_Columns != -1)
+    tp->tp_old_ಅಡ್ಡಸಾಲುಗಳು = ಅಡ್ಡಸಾಲುಗಳು_AVAIL;
+    ಆದರೆ (tp->tp_old_Columns != -1)
     {
-	tp->tp_old_Columns = topframe->fr_width;
+	tp->tp_old_Columns = topframe->fr_ಅಗಲ;
 	tp->tp_old_coloff = firstwin->w_wincol;
     }
-    firstwin = NULL;
-    lastwin = NULL;
-    return OK;
+    firstwin = ಖಾಲಿ;
+    lastwin = ಖಾಲಿ;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
@@ -5147,43 +5147,43 @@ leave_tabpage(
  * Only trigger *Enter autocommands when trigger_enter_autocmds is TRUE.
  * Only trigger *Leave autocommands when trigger_leave_autocmds is TRUE.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 enter_tabpage(
     tabpage_T	*tp,
     buf_T	*old_curbuf,
-    int		trigger_enter_autocmds,
-    int		trigger_leave_autocmds)
+    ಪೂರ್ಣಾಂಕ		trigger_enter_autocmds,
+    ಪೂರ್ಣಾಂಕ		trigger_leave_autocmds)
 {
-    int		old_off = tp->tp_firstwin->w_winrow;
-    win_T	*next_prevwin = tp->tp_prevwin;
-    tabpage_T	*last_tab = curtab;
+    ಪೂರ್ಣಾಂಕ		old_off = tp->tp_firstwin->w_winrow;
+    win_T	*ಮುಂದಿನ_prevwin = tp->tp_prevwin;
+    tabpage_T	*ಕೊನೆಯ_tab = curtab;
 
     use_tabpage(tp);
 
-    if (p_ch != curtab->tp_ch_used)
+    ಆದರೆ (p_ch != curtab->tp_ch_ಬಳಸಿದ)
     {
 	// Use the stored value of p_ch, so that it can be different for each
 	// tab page.
-	int new_ch = curtab->tp_ch_used;
-	curtab->tp_ch_used = p_ch;
-	command_frame_height = FALSE;
-	set_option_value((char_u *)"cmdheight", new_ch, NULL, 0);
-	command_frame_height = TRUE;
+	ಪೂರ್ಣಾಂಕ new_ch = curtab->tp_ch_ಬಳಸಿದ;
+	curtab->tp_ch_ಬಳಸಿದ = p_ch;
+	command_ಚೌಕಟ್ಟು_ಎತ್ತರ = FALSE;
+	ಗಣ_option_ಮೌಲ್ಯ((char_u *)"cmdheight", new_ch, ಖಾಲಿ, 0);
+	command_ಚೌಕಟ್ಟು_ಎತ್ತರ = TRUE;
     }
 
     // We would like doing the TabEnter event first, but we don't have a
     // valid current window yet, which may break some commands.
     // This triggers autocommands, thus may make "tp" invalid.
-    (void)win_enter_ext(tp->tp_curwin, WEE_CURWIN_INVALID
+    (ಶೂನ್ಯ)win_enter_ext(tp->tp_curwin, WEE_CURWIN_INVALID
 		  | (trigger_enter_autocmds ? WEE_TRIGGER_ENTER_AUTOCMDS : 0)
 		  | (trigger_leave_autocmds ? WEE_TRIGGER_LEAVE_AUTOCMDS : 0));
-    prevwin = next_prevwin;
+    prevwin = ಮುಂದಿನ_prevwin;
 
-    last_status(FALSE);		// status line may appear or disappear
+    ಕೊನೆಯ_ಸ್ಥಿತಿ(FALSE);		// status line may appear or disappear
     win_comp_pos();		// recompute w_winrow for all windows
-#ifdef FEAT_DIFF
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
     diff_need_scrollbind = TRUE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // If there was a click in a window, it won't be usable for a following
     // drag.
@@ -5192,40 +5192,40 @@ enter_tabpage(
     // The tabpage line may have appeared or disappeared, may need to resize
     // the frames for that.  When the Vim window was resized need to update
     // frame sizes too.
-    if (curtab->tp_old_Rows != ROWS_AVAIL || (old_off != firstwin->w_winrow
-#ifdef FEAT_GUI_TABLINE
+    ಆದರೆ (curtab->tp_old_ಅಡ್ಡಸಾಲುಗಳು != ಅಡ್ಡಸಾಲುಗಳು_AVAIL || (old_off != firstwin->w_winrow
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_TABLINE
 			    && !gui_use_tabline()
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		))
-	shell_new_rows();
-    if (curtab->tp_old_Columns != COLUMNS_WITHOUT_TPL()
+	shell_new_ಅಡ್ಡಸಾಲುಗಳು();
+    ಆದರೆ (curtab->tp_old_Columns != COLUMNS_WITHOUT_TPL()
 	    || curtab->tp_old_coloff != TPL_LCOL())
     {
-	if (starting == 0)
+	ಆದರೆ (starting == 0)
 	{
 	    shell_new_columns();	// update window widths
-	    curtab->tp_old_Columns = topframe->fr_width;
+	    curtab->tp_old_Columns = topframe->fr_ಅಗಲ;
 	    curtab->tp_old_coloff = firstwin->w_wincol;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    curtab->tp_old_Columns = -1;  // update window widths later
     }
 
-    lastused_tabpage = last_tab;
+    lastused_tabpage = ಕೊನೆಯ_tab;
 
-#if defined(FEAT_GUI)
+#ಆದರೆ defined(FEAT_GUI)
     // When 'guioptions' includes 'L' or 'R' may have to remove or add
     // scrollbars.  Have to update them anyway.
     gui_may_update_scrollbars();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Apply autocommands after updating the display, when 'rows' and
     // 'columns' have been set correctly.
-    if (trigger_enter_autocmds)
+    ಆದರೆ (trigger_enter_autocmds)
     {
-	apply_autocmds(EVENT_TABENTER, NULL, NULL, FALSE, curbuf);
-	if (old_curbuf != curbuf)
-	    apply_autocmds(EVENT_BUFENTER, NULL, NULL, FALSE, curbuf);
+	apply_autocmds(EVENT_TABENTER, ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
+	ಆದರೆ (old_curbuf != curbuf)
+	    apply_autocmds(EVENT_BUFENTER, ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
     }
 
     redraw_all_later(UPD_NOT_VALID);
@@ -5235,72 +5235,72 @@ enter_tabpage(
  * Go to tab page "n".  For ":tab N" and "Ngt".
  * When "n" is 9999 go to the last tab page.
  */
-    void
-goto_tabpage(int n)
+    ಶೂನ್ಯ
+goto_tabpage(ಪೂರ್ಣಾಂಕ n)
 {
-    tabpage_T	*tp = NULL;  // shut up compiler
+    tabpage_T	*tp = ಖಾಲಿ;  // shut up compiler
     tabpage_T	*ttp;
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
 
-    if (text_locked())
+    ಆದರೆ (ಪಠ್ಯ_locked())
     {
 	// Not allowed when editing the command line.
-	text_locked_msg();
-	return;
+	ಪಠ್ಯ_locked_ಸಂದೇಶ();
+	ಹಿಂತಿರುಗಿ;
     }
 
     // If there is only one it can't work.
-    if (first_tabpage->tp_next == NULL)
+    ಆದರೆ (ಮೊದಲ_tabpage->tp_ಮುಂದಿನ == ಖಾಲಿ)
     {
-	if (n > 1)
+	ಆದರೆ (n > 1)
 	    beep_flush();
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if (n == 0)
+    ಆದರೆ (n == 0)
     {
 	// No count, go to next tab page, wrap around end.
-	if (curtab->tp_next == NULL)
-	    tp = first_tabpage;
-	else
-	    tp = curtab->tp_next;
+	ಆದರೆ (curtab->tp_ಮುಂದಿನ == ಖಾಲಿ)
+	    tp = ಮೊದಲ_tabpage;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    tp = curtab->tp_ಮುಂದಿನ;
     }
-    else if (n < 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (n < 0)
     {
 	// "gT": go to previous tab page, wrap around end.  "N gT" repeats
 	// this N times.
 	ttp = curtab;
-	for (i = n; i < 0; ++i)
+	ಗಾಗಿ (i = n; i < 0; ++i)
 	{
-	    for (tp = first_tabpage; tp->tp_next != ttp && tp->tp_next != NULL;
-		    tp = tp->tp_next)
+	    ಗಾಗಿ (tp = ಮೊದಲ_tabpage; tp->tp_ಮುಂದಿನ != ttp && tp->tp_ಮುಂದಿನ != ಖಾಲಿ;
+		    tp = tp->tp_ಮುಂದಿನ)
 		;
 	    ttp = tp;
 	}
     }
-    else if (n == 9999)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (n == 9999)
     {
 	// Go to last tab page.
-	for (tp = first_tabpage; tp->tp_next != NULL; tp = tp->tp_next)
+	ಗಾಗಿ (tp = ಮೊದಲ_tabpage; tp->tp_ಮುಂದಿನ != ಖಾಲಿ; tp = tp->tp_ಮುಂದಿನ)
 	    ;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Go to tab page "n".
-	tp = find_tabpage(n);
-	if (tp == NULL)
+	tp = ಕಂಡುಹಿಡಿ_tabpage(n);
+	ಆದರೆ (tp == ಖಾಲಿ)
 	{
 	    beep_flush();
-	    return;
+	    ಹಿಂತಿರುಗಿ;
 	}
     }
 
     goto_tabpage_tp(tp, TRUE, TRUE);
 
-#ifdef FEAT_GUI_TABLINE
-    if (gui_use_tabline())
-	gui_mch_set_curtab(tabpage_index(curtab));
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_TABLINE
+    ಆದರೆ (gui_use_tabline())
+	gui_mch_ಗಣ_curtab(tabpage_ಸೂಚ್ಯಂಕ(curtab));
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
@@ -5309,26 +5309,26 @@ goto_tabpage(int n)
  * Only trigger *Leave autocommands when trigger_leave_autocmds is TRUE.
  * Note: doesn't update the GUI tab.
  */
-    void
+    ಶೂನ್ಯ
 goto_tabpage_tp(
     tabpage_T	*tp,
-    int		trigger_enter_autocmds,
-    int		trigger_leave_autocmds)
+    ಪೂರ್ಣಾಂಕ		trigger_enter_autocmds,
+    ಪೂರ್ಣಾಂಕ		trigger_leave_autocmds)
 {
-    if (trigger_enter_autocmds || trigger_leave_autocmds)
+    ಆದರೆ (trigger_enter_autocmds || trigger_leave_autocmds)
 	CHECK_CMDWIN;
 
     // Don't repeat a message in another tab page.
-    set_keep_msg(NULL, 0);
+    ಗಣ_keep_ಸಂದೇಶ(ಖಾಲಿ, 0);
 
     skip_win_fix_scroll = TRUE;
-    if (tp != curtab && leave_tabpage(tp->tp_curwin->w_buffer,
+    ಆದರೆ (tp != curtab && leave_tabpage(tp->tp_curwin->w_ಬಫರ್,
 					trigger_leave_autocmds) == OK)
     {
-	if (valid_tabpage(tp))
+	ಆದರೆ (valid_tabpage(tp))
 	    enter_tabpage(tp, curbuf, trigger_enter_autocmds,
 		    trigger_leave_autocmds);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    enter_tabpage(curtab, curbuf, trigger_enter_autocmds,
 		    trigger_leave_autocmds);
     }
@@ -5339,88 +5339,88 @@ goto_tabpage_tp(
  * Go to the last accessed tab page, if there is one.
  * Return OK or FAIL
  */
-    int
-goto_tabpage_lastused(void)
+    ಪೂರ್ಣಾಂಕ
+goto_tabpage_lastused(ಶೂನ್ಯ)
 {
-    if (!valid_tabpage(lastused_tabpage))
-	return FAIL;
+    ಆದರೆ (!valid_tabpage(lastused_tabpage))
+	ಹಿಂತಿರುಗಿ FAIL;
 
     goto_tabpage_tp(lastused_tabpage, TRUE, TRUE);
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Enter window "wp" in tab page "tp".
  * Also updates the GUI tab.
  */
-    void
+    ಶೂನ್ಯ
 goto_tabpage_win(tabpage_T *tp, win_T *wp)
 {
     goto_tabpage_tp(tp, TRUE, TRUE);
-    if (curtab == tp && win_valid(wp))
+    ಆದರೆ (curtab == tp && win_valid(wp))
     {
 	win_enter(wp, TRUE);
-#ifdef FEAT_GUI_TABLINE
-	if (gui_use_tabline())
-	    gui_mch_set_curtab(tabpage_index(curtab));
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_TABLINE
+	ಆದರೆ (gui_use_tabline())
+	    gui_mch_ಗಣ_curtab(tabpage_ಸೂಚ್ಯಂಕ(curtab));
+#ಆದರೆ_ಅಂತ್ಯ
     }
 }
 
 /*
  * Move the current tab page to after tab page "nr".
  */
-    void
-tabpage_move(int nr)
+    ಶೂನ್ಯ
+tabpage_move(ಪೂರ್ಣಾಂಕ nr)
 {
-    int		n = 1;
+    ಪೂರ್ಣಾಂಕ		n = 1;
     tabpage_T	*tp, *tp_dst;
 
-    if (first_tabpage->tp_next == NULL)
-	return;
+    ಆದರೆ (ಮೊದಲ_tabpage->tp_ಮುಂದಿನ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    if (tabpage_move_disallowed)
-	return;
+    ಆದರೆ (tabpage_move_disallowed)
+	ಹಿಂತಿರುಗಿ;
 
-    for (tp = first_tabpage; tp->tp_next != NULL && n < nr; tp = tp->tp_next)
+    ಗಾಗಿ (tp = ಮೊದಲ_tabpage; tp->tp_ಮುಂದಿನ != ಖಾಲಿ && n < nr; tp = tp->tp_ಮುಂದಿನ)
 	++n;
 
-    if (tp == curtab || (nr > 0 && tp->tp_next != NULL
-						    && tp->tp_next == curtab))
-	return;
+    ಆದರೆ (tp == curtab || (nr > 0 && tp->tp_ಮುಂದಿನ != ಖಾಲಿ
+						    && tp->tp_ಮುಂದಿನ == curtab))
+	ಹಿಂತಿರುಗಿ;
 
     tp_dst = tp;
 
     // Remove the current tab page from the list of tab pages.
-    if (curtab == first_tabpage)
-	first_tabpage = curtab->tp_next;
-    else
+    ಆದರೆ (curtab == ಮೊದಲ_tabpage)
+	ಮೊದಲ_tabpage = curtab->tp_ಮುಂದಿನ;
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	FOR_ALL_TABPAGES(tp)
-	    if (tp->tp_next == curtab)
-		break;
-	if (tp == NULL)	// "cannot happen"
-	    return;
-	tp->tp_next = curtab->tp_next;
+	    ಆದರೆ (tp->tp_ಮುಂದಿನ == curtab)
+		ನಿಲ್ಲಿಸು;
+	ಆದರೆ (tp == ಖಾಲಿ)	// "cannot happen"
+	    ಹಿಂತಿರುಗಿ;
+	tp->tp_ಮುಂದಿನ = curtab->tp_ಮುಂದಿನ;
     }
 
     // Re-insert it at the specified position.
-    if (nr <= 0)
+    ಆದರೆ (nr <= 0)
     {
-	curtab->tp_next = first_tabpage;
-	first_tabpage = curtab;
+	curtab->tp_ಮುಂದಿನ = ಮೊದಲ_tabpage;
+	ಮೊದಲ_tabpage = curtab;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	curtab->tp_next = tp_dst->tp_next;
-	tp_dst->tp_next = curtab;
+	curtab->tp_ಮುಂದಿನ = tp_dst->tp_ಮುಂದಿನ;
+	tp_dst->tp_ಮುಂದಿನ = curtab;
     }
 
     // Need to redraw the tabline.  Tab page contents doesn't change.
     redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#ಆದರೆ defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 
@@ -5432,84 +5432,84 @@ tabpage_move(int nr)
  * When jumping to another window on the same buffer, adjust its cursor
  * position to keep the same Visual area.
  */
-    void
+    ಶೂನ್ಯ
 win_goto(win_T *wp)
 {
-#ifdef FEAT_CONCEAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CONCEAL
     win_T	*owp = curwin;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_PROP_POPUP
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
-    if (popup_is_popup(wp))
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+    ಆದರೆ (ERROR_IF_ANY_POPUP_ಕಿಟಕಿ)
+	ಹಿಂತಿರುಗಿ;
+    ಆದರೆ (popup_is_popup(wp))
     {
-	emsg(_(e_not_allowed_to_enter_popup_window));
-	return;
+	emsg(_(e_not_allowed_ಗಮ್ಯ_enter_popup_ಕಿಟಕಿ));
+	ಹಿಂತಿರುಗಿ;
     }
-#endif
-    if (text_or_buf_locked())
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (ಪಠ್ಯ_or_buf_locked())
     {
 	beep_flush();
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if (wp->w_buffer != curbuf)
+    ಆದರೆ (wp->w_ಬಫರ್ != curbuf)
 	// careful: triggers ModeChanged autocommand
 	reset_VIsual_and_resel();
-    else if (VIsual_active)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (VIsual_ಸಕ್ರಿಯ)
 	wp->w_cursor = curwin->w_cursor;
 
     // autocommand may have made wp invalid
-    if (!win_valid(wp))
-	return;
+    ಆದರೆ (!win_valid(wp))
+	ಹಿಂತಿರುಗಿ;
 
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
     need_mouse_correct = TRUE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     win_enter(wp, TRUE);
 
-#ifdef FEAT_CONCEAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CONCEAL
     // Conceal cursor line in previous window, unconceal in current window.
-    if (win_valid(owp) && owp->w_p_cole > 0 && !msg_scrolled)
+    ಆದರೆ (win_valid(owp) && owp->w_p_cole > 0 && !ಸಂದೇಶ_scrolled)
 	redrawWinline(owp, owp->w_cursor.lnum);
-    if (curwin->w_p_cole > 0 && !msg_scrolled)
-	need_cursor_line_redraw = TRUE;
-#endif
+    ಆದರೆ (curwin->w_p_cole > 0 && !ಸಂದೇಶ_scrolled)
+	need_cursor_ಸಾಲು_redraw = TRUE;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#if defined(FEAT_PERL)
+#ಆದರೆ defined(FEAT_PERL)
 /*
  * Find window number "winnr" (counting top to bottom).
  */
     win_T *
-win_find_nr(int winnr)
+win_ಕಂಡುಹಿಡಿ_nr(ಪೂರ್ಣಾಂಕ winnr)
 {
     win_T	*wp;
 
     FOR_ALL_WINDOWS(wp)
-	if (--winnr == 0)
-	    break;
-    return wp;
+	ಆದರೆ (--winnr == 0)
+	    ನಿಲ್ಲಿಸು;
+    ಹಿಂತಿರುಗಿ wp;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#ಆದರೆ defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 /*
  * Find the tabpage for window "win".
  */
     tabpage_T *
-win_find_tabpage(win_T *win)
+win_ಕಂಡುಹಿಡಿ_tabpage(win_T *win)
 {
     win_T	*wp;
     tabpage_T	*tp;
 
     FOR_ALL_TAB_WINDOWS(tp, wp)
-	    if (wp == win)
-		return tp;
-    return NULL;
+	    ಆದರೆ (wp == win)
+		ಹಿಂತಿರುಗಿ tp;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Get the above or below neighbor window of the specified window.
@@ -5518,83 +5518,83 @@ win_find_tabpage(win_T *win)
  * Returns the specified window if the neighbor is not found.
  */
     win_T *
-win_vert_neighbor(tabpage_T *tp, win_T *wp, int up, long count)
+win_vert_neighbor(tabpage_T *tp, win_T *wp, ಪೂರ್ಣಾಂಕ ಮೇಲೆ, ದೀರ್ಘ ಎಣಿಕೆ_2)
 {
-    frame_T	*fr;
-    frame_T	*nfr;
-    frame_T	*foundfr;
+    ಚೌಕಟ್ಟು_T	*fr;
+    ಚೌಕಟ್ಟು_T	*nfr;
+    ಚೌಕಟ್ಟು_T	*foundfr;
 
-#ifdef FEAT_PROP_POPUP
-    if (popup_is_popup(wp))
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+    ಆದರೆ (popup_is_popup(wp))
 	// popups don't have neighbors.
-	return NULL;
-#endif
-    foundfr = wp->w_frame;
-    while (count--)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+#ಆದರೆ_ಅಂತ್ಯ
+    foundfr = wp->w_ಚೌಕಟ್ಟು;
+    ಆಗ (ಎಣಿಕೆ_2--)
     {
 	/*
 	 * First go upwards in the tree of frames until we find a upwards or
 	 * downwards neighbor.
 	 */
 	fr = foundfr;
-	for (;;)
+	ಗಾಗಿ (;;)
 	{
-	    if (fr == tp->tp_topframe)
-		goto end;
-	    if (up)
+	    ಆದರೆ (fr == tp->tp_topframe)
+		ಹೋಗು ಕೊನೆ;
+	    ಆದರೆ (ಮೇಲೆ)
 		nfr = fr->fr_prev;
-	    else
-		nfr = fr->fr_next;
-	    if (fr->fr_parent->fr_layout == FR_COL && nfr != NULL)
-		break;
-	    fr = fr->fr_parent;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		nfr = fr->fr_ಮುಂದಿನ;
+	    ಆದರೆ (fr->fr_ಪೋಷಕ->fr_layout == FR_ಲಂಬಸಾಲು && nfr != ಖಾಲಿ)
+		ನಿಲ್ಲಿಸು;
+	    fr = fr->fr_ಪೋಷಕ;
 	}
 
 	/*
 	 * Now go downwards to find the bottom or top frame in it.
 	 */
-	for (;;)
+	ಗಾಗಿ (;;)
 	{
-	    if (nfr->fr_layout == FR_LEAF)
+	    ಆದರೆ (nfr->fr_layout == FR_ಎಲೆ)
 	    {
 		foundfr = nfr;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	    fr = nfr->fr_child;
-	    if (nfr->fr_layout == FR_ROW)
+	    fr = nfr->fr_ಮಗು;
+	    ಆದರೆ (nfr->fr_layout == FR_ಅಡ್ಡಸಾಲು)
 	    {
 		// Find the frame at the cursor row.
-		while (fr->fr_next != NULL
-			&& frame2win(fr)->w_wincol + fr->fr_width
+		ಆಗ (fr->fr_ಮುಂದಿನ != ಖಾಲಿ
+			&& frame2win(fr)->w_wincol + fr->fr_ಅಗಲ
 					 <= wp->w_wincol + wp->w_wcol)
-		    fr = fr->fr_next;
+		    fr = fr->fr_ಮುಂದಿನ;
 	    }
-	    if (nfr->fr_layout == FR_COL && up)
-		while (fr->fr_next != NULL)
-		    fr = fr->fr_next;
+	    ಆದರೆ (nfr->fr_layout == FR_ಲಂಬಸಾಲು && ಮೇಲೆ)
+		ಆಗ (fr->fr_ಮುಂದಿನ != ಖಾಲಿ)
+		    fr = fr->fr_ಮುಂದಿನ;
 	    nfr = fr;
 	}
     }
-end:
-    return foundfr != NULL ? foundfr->fr_win : NULL;
+ಕೊನೆ:
+    ಹಿಂತಿರುಗಿ foundfr != ಖಾಲಿ ? foundfr->fr_win : ಖಾಲಿ;
 }
 
 /*
  * Move to window above or below "count" times.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 win_goto_ver(
-    int		up,		// TRUE to go to win above
-    long	count)
+    ಪೂರ್ಣಾಂಕ		ಮೇಲೆ,		// TRUE to go to win above
+    ದೀರ್ಘ	ಎಣಿಕೆ_2)
 {
     win_T	*win;
 
-#ifdef FEAT_PROP_POPUP
-    if (ERROR_IF_TERM_POPUP_WINDOW)
-	return;
-#endif
-    win = win_vert_neighbor(curtab, curwin, up, count);
-    if (win != NULL)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+    ಆದರೆ (ERROR_IF_ಪದ_POPUP_ಕಿಟಕಿ)
+	ಹಿಂತಿರುಗಿ;
+#ಆದರೆ_ಅಂತ್ಯ
+    win = win_vert_neighbor(curtab, curwin, ಮೇಲೆ, ಎಣಿಕೆ_2);
+    ಆದರೆ (win != ಖಾಲಿ)
 	win_goto(win);
 }
 
@@ -5605,93 +5605,93 @@ win_goto_ver(
  * Returns the specified window if the neighbor is not found.
  */
     win_T *
-win_horz_neighbor(tabpage_T *tp, win_T *wp, int left, long count)
+win_horz_neighbor(tabpage_T *tp, win_T *wp, ಪೂರ್ಣಾಂಕ ಎಡ_2, ದೀರ್ಘ ಎಣಿಕೆ_2)
 {
-    frame_T	*fr;
-    frame_T	*nfr;
-    frame_T	*foundfr;
+    ಚೌಕಟ್ಟು_T	*fr;
+    ಚೌಕಟ್ಟು_T	*nfr;
+    ಚೌಕಟ್ಟು_T	*foundfr;
 
-#ifdef FEAT_PROP_POPUP
-    if (popup_is_popup(wp))
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+    ಆದರೆ (popup_is_popup(wp))
 	// popups don't have neighbors.
-	return NULL;
-#endif
-    foundfr = wp->w_frame;
-    while (count--)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+#ಆದರೆ_ಅಂತ್ಯ
+    foundfr = wp->w_ಚೌಕಟ್ಟು;
+    ಆಗ (ಎಣಿಕೆ_2--)
     {
 	/*
 	 * First go upwards in the tree of frames until we find a left or
 	 * right neighbor.
 	 */
 	fr = foundfr;
-	for (;;)
+	ಗಾಗಿ (;;)
 	{
-	    if (fr == tp->tp_topframe)
-		goto end;
-	    if (left)
+	    ಆದರೆ (fr == tp->tp_topframe)
+		ಹೋಗು ಕೊನೆ;
+	    ಆದರೆ (ಎಡ_2)
 		nfr = fr->fr_prev;
-	    else
-		nfr = fr->fr_next;
-	    if (fr->fr_parent->fr_layout == FR_ROW && nfr != NULL)
-		break;
-	    fr = fr->fr_parent;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		nfr = fr->fr_ಮುಂದಿನ;
+	    ಆದರೆ (fr->fr_ಪೋಷಕ->fr_layout == FR_ಅಡ್ಡಸಾಲು && nfr != ಖಾಲಿ)
+		ನಿಲ್ಲಿಸು;
+	    fr = fr->fr_ಪೋಷಕ;
 	}
 
 	/*
 	 * Now go downwards to find the leftmost or rightmost frame in it.
 	 */
-	for (;;)
+	ಗಾಗಿ (;;)
 	{
-	    if (nfr->fr_layout == FR_LEAF)
+	    ಆದರೆ (nfr->fr_layout == FR_ಎಲೆ)
 	    {
 		foundfr = nfr;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	    fr = nfr->fr_child;
-	    if (nfr->fr_layout == FR_COL)
+	    fr = nfr->fr_ಮಗು;
+	    ಆದರೆ (nfr->fr_layout == FR_ಲಂಬಸಾಲು)
 	    {
 		// Find the frame at the cursor row.
-		while (fr->fr_next != NULL
-			&& frame2win(fr)->w_winrow + fr->fr_height
+		ಆಗ (fr->fr_ಮುಂದಿನ != ಖಾಲಿ
+			&& frame2win(fr)->w_winrow + fr->fr_ಎತ್ತರ
 					 <= wp->w_winrow + wp->w_wrow)
-		    fr = fr->fr_next;
+		    fr = fr->fr_ಮುಂದಿನ;
 	    }
-	    if (nfr->fr_layout == FR_ROW && left)
-		while (fr->fr_next != NULL)
-		    fr = fr->fr_next;
+	    ಆದರೆ (nfr->fr_layout == FR_ಅಡ್ಡಸಾಲು && ಎಡ_2)
+		ಆಗ (fr->fr_ಮುಂದಿನ != ಖಾಲಿ)
+		    fr = fr->fr_ಮುಂದಿನ;
 	    nfr = fr;
 	}
     }
-end:
-    return foundfr != NULL ? foundfr->fr_win : NULL;
+ಕೊನೆ:
+    ಹಿಂತಿರುಗಿ foundfr != ಖಾಲಿ ? foundfr->fr_win : ಖಾಲಿ;
 }
 
 /*
  * Move to left or right window.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 win_goto_hor(
-    int		left,		// TRUE to go to left win
-    long	count)
+    ಪೂರ್ಣಾಂಕ		ಎಡ_2,		// TRUE to go to left win
+    ದೀರ್ಘ	ಎಣಿಕೆ_2)
 {
     win_T	*win;
 
-#ifdef FEAT_PROP_POPUP
-    if (ERROR_IF_TERM_POPUP_WINDOW)
-	return;
-#endif
-    win = win_horz_neighbor(curtab, curwin, left, count);
-    if (win != NULL)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+    ಆದರೆ (ERROR_IF_ಪದ_POPUP_ಕಿಟಕಿ)
+	ಹಿಂತಿರುಗಿ;
+#ಆದರೆ_ಅಂತ್ಯ
+    win = win_horz_neighbor(curtab, curwin, ಎಡ_2, ಎಣಿಕೆ_2);
+    ಆದರೆ (win != ಖಾಲಿ)
 	win_goto(win);
 }
 
 /*
  * Make window "wp" the current window.
  */
-    void
-win_enter(win_T *wp, int undo_sync)
+    ಶೂನ್ಯ
+win_enter(win_T *wp, ಪೂರ್ಣಾಂಕ undo_sync)
 {
-    (void)win_enter_ext(wp, (undo_sync ? WEE_UNDO_SYNC : 0)
+    (ಶೂನ್ಯ)win_enter_ext(wp, (undo_sync ? WEE_UNDO_SYNC : 0)
 		    | WEE_TRIGGER_ENTER_AUTOCMDS | WEE_TRIGGER_LEAVE_AUTOCMDS);
 }
 
@@ -5699,41 +5699,41 @@ win_enter(win_T *wp, int undo_sync)
  * Used after making another window the current one: change directory if
  * needed.
  */
-    void
-win_fix_current_dir(void)
+    ಶೂನ್ಯ
+win_fix_current_dir(ಶೂನ್ಯ)
 {
-    if (curwin->w_localdir != NULL || curtab->tp_localdir != NULL)
+    ಆದರೆ (curwin->w_localdir != ಖಾಲಿ || curtab->tp_localdir != ಖಾಲಿ)
     {
 	char_u	*dirname;
 
 	// Window or tab has a local directory: Save current directory as
 	// global directory (unless that was done already) and change to the
 	// local directory.
-	if (globaldir == NULL)
+	ಆದರೆ (globaldir == ಖಾಲಿ)
 	{
 	    char_u	cwd[MAXPATHL];
 
-	    if (mch_dirname(cwd, MAXPATHL) == OK)
+	    ಆದರೆ (mch_dirname(cwd, MAXPATHL) == OK)
 		globaldir = vim_strsave(cwd);
 	}
-	if (curwin->w_localdir != NULL)
+	ಆದರೆ (curwin->w_localdir != ಖಾಲಿ)
 	    dirname = curwin->w_localdir;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    dirname = curtab->tp_localdir;
 
-	if (mch_chdir((char *)dirname) == 0)
+	ಆದರೆ (mch_chdir((ಅಕ್ಷರ *)dirname) == 0)
 	{
-	    last_chdir_reason = NULL;
+	    ಕೊನೆಯ_chdir_reason = ಖಾಲಿ;
 	    shorten_fnames(TRUE);
 	}
     }
-    else if (globaldir != NULL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (globaldir != ಖಾಲಿ)
     {
 	// Window doesn't have a local directory and we are not in the global
 	// directory: Change to the global directory.
-	vim_ignored = mch_chdir((char *)globaldir);
+	vim_ignored = mch_chdir((ಅಕ್ಷರ *)globaldir);
 	VIM_CLEAR(globaldir);
-	last_chdir_reason = NULL;
+	ಕೊನೆಯ_chdir_reason = ಖಾಲಿ;
 	shorten_fnames(TRUE);
     }
 }
@@ -5744,137 +5744,137 @@ win_fix_current_dir(void)
  * curwin has just been closed and isn't valid.
  * Returns TRUE when dont_parse_messages was decremented.
  */
-    static int
-win_enter_ext(win_T *wp, int flags)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+win_enter_ext(win_T *wp, ಪೂರ್ಣಾಂಕ flags)
 {
-    int		other_buffer = FALSE;
-    int		curwin_invalid = (flags & WEE_CURWIN_INVALID);
-    int		did_decrement = FALSE;
+    ಪೂರ್ಣಾಂಕ		other_ಬಫರ್ = FALSE;
+    ಪೂರ್ಣಾಂಕ		curwin_invalid = (flags & WEE_CURWIN_INVALID);
+    ಪೂರ್ಣಾಂಕ		did_decrement = FALSE;
 
-    if (wp == curwin && curwin_invalid == 0)	// nothing to do
-	return FALSE;
+    ಆದರೆ (wp == curwin && curwin_invalid == 0)	// nothing to do
+	ಹಿಂತಿರುಗಿ FALSE;
 
-#ifdef FEAT_JOB_CHANNEL
-    if (curwin_invalid == 0)
-	leaving_window(curwin);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕೆಲಸ_CHANNEL
+    ಆದರೆ (curwin_invalid == 0)
+	leaving_ಕಿಟಕಿ(curwin);
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (curwin_invalid == 0 && (flags & WEE_TRIGGER_LEAVE_AUTOCMDS))
+    ಆದರೆ (curwin_invalid == 0 && (flags & WEE_TRIGGER_LEAVE_AUTOCMDS))
     {
 	/*
 	 * Be careful: If autocommands delete the window, return now.
 	 */
-	if (wp->w_buffer != curbuf)
+	ಆದರೆ (wp->w_ಬಫರ್ != curbuf)
 	{
-	    apply_autocmds(EVENT_BUFLEAVE, NULL, NULL, FALSE, curbuf);
-	    other_buffer = TRUE;
-	    if (!win_valid(wp))
-		return FALSE;
+	    apply_autocmds(EVENT_BUFLEAVE, ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
+	    other_ಬಫರ್ = TRUE;
+	    ಆದರೆ (!win_valid(wp))
+		ಹಿಂತಿರುಗಿ FALSE;
 	}
-	apply_autocmds(EVENT_WINLEAVE, NULL, NULL, FALSE, curbuf);
-	if (!win_valid(wp))
-	    return FALSE;
-#ifdef FEAT_EVAL
+	apply_autocmds(EVENT_WINLEAVE, ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
+	ಆದರೆ (!win_valid(wp))
+	    ಹಿಂತಿರುಗಿ FALSE;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 	// autocmds may abort script processing
-	if (aborting())
-	    return FALSE;
-#endif
+	ಆದರೆ (aborting())
+	    ಹಿಂತಿರುಗಿ FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
     // sync undo before leaving the current buffer
-    if ((flags & WEE_UNDO_SYNC) && curbuf != wp->w_buffer)
+    ಆದರೆ ((flags & WEE_UNDO_SYNC) && curbuf != wp->w_ಬಫರ್)
 	u_sync(FALSE);
 
     // Might need to scroll the old window before switching, e.g., when the
     // cursor was moved.
-    if (*p_spk == 'c' && curwin_invalid == 0)
+    ಆದರೆ (*p_spk == 'c' && curwin_invalid == 0)
 	update_topline();
 
     // may have to copy the buffer options when 'cpo' contains 'S'
-    if (wp->w_buffer != curbuf)
-	buf_copy_options(wp->w_buffer, BCO_ENTER | BCO_NOHELP);
-    if (curwin_invalid == 0)
+    ಆದರೆ (wp->w_ಬಫರ್ != curbuf)
+	buf_copy_options(wp->w_ಬಫರ್, BCO_ENTER | BCO_NOHELP);
+    ಆದರೆ (curwin_invalid == 0)
     {
 	prevwin = curwin;	// remember for CTRL-W p
-	curwin->w_redr_status = true;
+	curwin->w_redr_ಸ್ಥಿತಿ = true;
     }
     curwin = wp;
-    curbuf = wp->w_buffer;
+    curbuf = wp->w_ಬಫರ್;
     check_cursor();
-    if (!virtual_active())
+    ಆದರೆ (!virtual_ಸಕ್ರಿಯ())
 	curwin->w_cursor.coladd = 0;
-    if (*p_spk == 'c')		// assume cursor position needs updating
-	changed_line_abv_curs();
-    else
+    ಆದರೆ (*p_spk == 'c')		// assume cursor position needs updating
+	ಬದಲಾಯಿತು_ಸಾಲು_abv_curs();
+    ಇಲ್ಲದಿದ್ದರೆ
 	// Make sure the cursor position is valid, either by moving the cursor
 	// or by scrolling the text.
 	win_fix_cursor(
-		get_real_state() & (MODE_NORMAL|MODE_CMDLINE|MODE_TERMINAL));
+		get_real_state() & (ಬಹುಲಕ_ಸಾಮಾನ್ಯ|ಬಹುಲಕ_CMDLINE|ಬಹುಲಕ_TERMINAL));
 
     // Now it is OK to parse messages again, which may be needed in
     // autocommands.
-#ifdef MESSAGE_QUEUE
-    if (flags & WEE_ALLOW_PARSE_MESSAGES)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ಸಂದೇಶ_ಸರತಿ
+    ಆದರೆ (flags & WEE_ALLOW_PARSE_MESSAGES)
     {
 	--dont_parse_messages;
 	did_decrement = TRUE;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     win_fix_current_dir();
 
-#ifdef FEAT_JOB_CHANNEL
-    entering_window(curwin);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕೆಲಸ_CHANNEL
+    entering_ಕಿಟಕಿ(curwin);
+#ಆದರೆ_ಅಂತ್ಯ
     // Careful: autocommands may close the window and make "wp" invalid
-    if (flags & WEE_TRIGGER_NEW_AUTOCMDS)
-	apply_autocmds(EVENT_WINNEW, NULL, NULL, FALSE, curbuf);
-    if (flags & WEE_TRIGGER_ENTER_AUTOCMDS)
+    ಆದರೆ (flags & WEE_TRIGGER_NEW_AUTOCMDS)
+	apply_autocmds(EVENT_WINNEW, ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
+    ಆದರೆ (flags & WEE_TRIGGER_ENTER_AUTOCMDS)
     {
-	apply_autocmds(EVENT_WINENTER, NULL, NULL, FALSE, curbuf);
-	if (other_buffer)
-	    apply_autocmds(EVENT_BUFENTER, NULL, NULL, FALSE, curbuf);
+	apply_autocmds(EVENT_WINENTER, ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
+	ಆದರೆ (other_ಬಫರ್)
+	    apply_autocmds(EVENT_BUFENTER, ಖಾಲಿ, ಖಾಲಿ, FALSE, curbuf);
     }
 
     maketitle();
-    curwin->w_redr_status = true;
-#ifdef FEAT_TERMINAL
-    if (bt_terminal(curwin->w_buffer))
+    curwin->w_redr_ಸ್ಥಿತಿ = true;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMINAL
+    ಆದರೆ (bt_terminal(curwin->w_ಬಫರ್))
 	// terminal is likely in another mode
-	redraw_mode = TRUE;
-#endif
+	redraw_ಬಹುಲಕ = TRUE;
+#ಆದರೆ_ಅಂತ್ಯ
     redraw_tabline = TRUE;
     redraw_vseps = TRUE;
-#if defined(FEAT_TABPANEL)
+#ಆದರೆ defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     // Need to schedule a redraw so that the vertical separator highlight is
     // updated for the new current window.  The status line redraw of curwin
     // is already requested via "curwin->w_redr_status".
     redraw_later(UPD_VALID);
-    if (restart_edit)
+    ಆದರೆ (restart_edit)
 	redraw_later(UPD_VALID);	// causes status line redraw
 
     // set window height to desired minimal value
-    if (curwin->w_height < p_wh && !curwin->w_p_wfh
-#ifdef FEAT_PROP_POPUP
+    ಆದರೆ (curwin->w_ಎತ್ತರ < p_wh && !curwin->w_p_wfh
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
 	    && !popup_is_popup(curwin)
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    )
-	win_setheight((int)p_wh);
-    else if (curwin->w_height == 0)
+	win_setheight((ಪೂರ್ಣಾಂಕ)p_wh);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (curwin->w_ಎತ್ತರ == 0)
 	win_setheight(1);
 
     // set window width to desired minimal value
-    if (curwin->w_width < p_wiw && !curwin->w_p_wfw)
-	win_setwidth((int)p_wiw);
+    ಆದರೆ (curwin->w_ಅಗಲ < p_wiw && !curwin->w_p_wfw)
+	win_setwidth((ಪೂರ್ಣಾಂಕ)p_wiw);
 
     setmouse();			// in case jumped to/from help buffer
 
     // Change directories when the 'acd' option is set.
     DO_AUTOCHDIR;
 
-    return did_decrement;
+    ಹಿಂತಿರುಗಿ did_decrement;
 }
 
 /*
@@ -5884,17 +5884,17 @@ win_enter_ext(win_T *wp, int flags)
     win_T *
 buf_jump_open_win(buf_T *buf)
 {
-    win_T	*wp = NULL;
+    win_T	*wp = ಖಾಲಿ;
 
-    if (curwin->w_buffer == buf)
+    ಆದರೆ (curwin->w_ಬಫರ್ == buf)
 	wp = curwin;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	FOR_ALL_WINDOWS(wp)
-	    if (wp->w_buffer == buf)
-		break;
-    if (wp != NULL)
+	    ಆದರೆ (wp->w_ಬಫರ್ == buf)
+		ನಿಲ್ಲಿಸು;
+    ಆದರೆ (wp != ಖಾಲಿ)
 	win_enter(wp, FALSE);
-    return wp;
+    ಹಿಂತಿರುಗಿ wp;
 }
 
 /*
@@ -5908,34 +5908,34 @@ buf_jump_open_tab(buf_T *buf)
     win_T	*wp = buf_jump_open_win(buf);
     tabpage_T	*tp;
 
-    if (wp != NULL)
-	return wp;
+    ಆದರೆ (wp != ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ wp;
 
     FOR_ALL_TABPAGES(tp)
-	if (tp != curtab)
+	ಆದರೆ (tp != curtab)
 	{
-	    FOR_ALL_WINDOWS_IN_TAB(tp, wp)
-		if (wp->w_buffer == buf)
-		    break;
-	    if (wp != NULL)
+	    FOR_ALL_WINDOWS_ಒಳ_TAB(tp, wp)
+		ಆದರೆ (wp->w_ಬಫರ್ == buf)
+		    ನಿಲ್ಲಿಸು;
+	    ಆದರೆ (wp != ಖಾಲಿ)
 	    {
 		goto_tabpage_win(tp, wp);
-		if (curwin != wp)
-		    wp = NULL;	// something went wrong
-		break;
+		ಆದರೆ (curwin != wp)
+		    wp = ಖಾಲಿ;	// something went wrong
+		ನಿಲ್ಲಿಸು;
 	    }
 	}
-    return wp;
+    ಹಿಂತಿರುಗಿ wp;
 }
 
-static int last_win_id = LOWEST_WIN_ID - 1;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಕೊನೆಯ_win_id = ಅತಿಕಡಿಮೆ_WIN_ID - 1;
 
 /*
  * Allocate a window structure and link it in the window list when "hidden" is
  * FALSE.
  */
-    static win_T *
-win_alloc(win_T *after, int hidden)
+    ಸ್ಥಿರ win_T *
+win_alloc(win_T *after, ಪೂರ್ಣಾಂಕ hidden)
 {
     win_T	*new_wp;
 
@@ -5943,47 +5943,47 @@ win_alloc(win_T *after, int hidden)
      * allocate window structure and linesizes arrays
      */
     new_wp = ALLOC_CLEAR_ONE(win_T);
-    if (new_wp == NULL)
-	return NULL;
+    ಆದರೆ (new_wp == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (win_alloc_lines(new_wp) == FAIL)
+    ಆದರೆ (win_alloc_ಸಾಲುಗಳು(new_wp) == FAIL)
     {
 	vim_free(new_wp);
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    new_wp->w_id = ++last_win_id;
+    new_wp->w_id = ++ಕೊನೆಯ_win_id;
 
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     // init w: variables
     new_wp->w_vars = dict_alloc_id(aid_newwin_wvars);
-    if (new_wp->w_vars == NULL)
+    ಆದರೆ (new_wp->w_vars == ಖಾಲಿ)
     {
 	win_free_lsize(new_wp);
 	vim_free(new_wp);
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
     init_var_dict(new_wp->w_vars, &new_wp->w_winvar, VAR_SCOPE);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Don't execute autocommands while the window is not properly
     // initialized yet.  gui_create_scrollbar() may trigger a FocusGained
     // event.
-    block_autocmds();
+    ಖಂಡ_autocmds();
 
     /*
      * link the window in the window list
      */
-    if (!hidden)
+    ಆದರೆ (!hidden)
 	win_append(after, new_wp);
     new_wp->w_wincol = TPL_LCOL();
-    new_wp->w_width = COLUMNS_WITHOUT_TPL();
+    new_wp->w_ಅಗಲ = COLUMNS_WITHOUT_TPL();
 
     // position the display and the cursor at the top of the file.
     new_wp->w_topline = 1;
-#ifdef FEAT_DIFF
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
     new_wp->w_topfill = 0;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     new_wp->w_botline = 2;
     new_wp->w_cursor.lnum = 1;
     new_wp->w_scbind_pos = 1;
@@ -5995,85 +5995,85 @@ win_alloc(win_T *after, int hidden)
 
     // We won't calculate w_fraction until resizing the window
     new_wp->w_fraction = 0;
-    new_wp->w_prev_fraction_row = -1;
+    new_wp->w_prev_fraction_ಅಡ್ಡಸಾಲು = -1;
 
-#ifdef FEAT_GUI
-    if (gui.in_use)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+    ಆದರೆ (gui.ಒಳ_use)
     {
-	gui_create_scrollbar(&new_wp->w_scrollbars[SBAR_LEFT],
-		SBAR_LEFT, new_wp);
-	gui_create_scrollbar(&new_wp->w_scrollbars[SBAR_RIGHT],
-		SBAR_RIGHT, new_wp);
+	gui_create_scrollbar(&new_wp->w_scrollbars[SBAR_ಎಡ],
+		SBAR_ಎಡ, new_wp);
+	gui_create_scrollbar(&new_wp->w_scrollbars[SBAR_ಬಲ],
+		SBAR_ಬಲ, new_wp);
     }
-#endif
-#ifdef FEAT_FOLDING
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_FOLDING
     foldInitWin(new_wp);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     unblock_autocmds();
-#ifdef FEAT_SEARCH_EXTRA
-    new_wp->w_next_match_id = 1000;  // up to 1000 can be picked by the user
-#endif
-    return new_wp;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಹುಡುಕು_EXTRA
+    new_wp->w_ಮುಂದಿನ_ಹೊಂದಿಕೆ_id = 1000;  // up to 1000 can be picked by the user
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ new_wp;
 }
 
 /*
  * Remove window 'wp' from the window list and free the structure.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 win_free(
     win_T	*wp,
     tabpage_T	*tp)		// tab page "win" is in, NULL for current
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
     buf_T	*buf;
     wininfo_T	*wip;
 
-#ifdef FEAT_FOLDING
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_FOLDING
     clearFolding(wp);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // reduce the reference count to the argument list.
     alist_unlink(wp->w_alist);
 
     // Don't execute autocommands while the window is halfway being deleted.
     // gui_mch_destroy_scrollbar() may trigger a FocusGained event.
-    block_autocmds();
+    ಖಂಡ_autocmds();
 
-#ifdef FEAT_LUA
-    lua_window_free(wp);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LUA
+    lua_ಕಿಟಕಿ_free(wp);
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_MZSCHEME
-    mzscheme_window_free(wp);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MZSCHEME
+    mzscheme_ಕಿಟಕಿ_free(wp);
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_PERL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PERL
     perl_win_free(wp);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_PYTHON
-    python_window_free(wp);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PYTHON
+    python_ಕಿಟಕಿ_free(wp);
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_PYTHON3
-    python3_window_free(wp);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PYTHON3
+    python3_ಕಿಟಕಿ_free(wp);
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_TCL
-    tcl_window_free(wp);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TCL
+    tcl_ಕಿಟಕಿ_free(wp);
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_RUBY
-    ruby_window_free(wp);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RUBY
+    ruby_ಕಿಟಕಿ_free(wp);
+#ಆದರೆ_ಅಂತ್ಯ
 
     remove_highlight_overrides(wp->w_hl);
     vim_free(wp->w_hl);
 
     // Free statusline click regions.
-    if (wp->w_stl_click != NULL)
+    ಆದರೆ (wp->w_stl_click != ಖಾಲಿ)
     {
-	for (i = 0; i < wp->w_stl_click_count; i++)
+	ಗಾಗಿ (i = 0; i < wp->w_stl_click_ಎಣಿಕೆ; i++)
 	    vim_free(wp->w_stl_click[i].funcname);
 	vim_free(wp->w_stl_click);
     }
@@ -6084,25 +6084,25 @@ win_free(
     vim_free(wp->w_lcs_chars.multispace);
     vim_free(wp->w_lcs_chars.leadmultispace);
 
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     vars_clear(&wp->w_vars->dv_hashtab);	// free all w: variables
     hash_init(&wp->w_vars->dv_hashtab);
     unref_var_dict(wp->w_vars);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     {
 	tabpage_T	*ttp;
 
-	if (prevwin == wp)
-	    prevwin = NULL;
+	ಆದರೆ (prevwin == wp)
+	    prevwin = ಖಾಲಿ;
 	FOR_ALL_TABPAGES(ttp)
-	    if (ttp->tp_prevwin == wp)
-		ttp->tp_prevwin = NULL;
+	    ಆದರೆ (ttp->tp_prevwin == wp)
+		ttp->tp_prevwin = ಖಾಲಿ;
     }
     win_free_lsize(wp);
 
-    for (i = 0; i < wp->w_tagstacklen; ++i)
-	tagstack_clear_entry(&wp->w_tagstack[i]);
+    ಗಾಗಿ (i = 0; i < wp->w_tagstacklen; ++i)
+	tagstack_clear_ನಮೂದು(&wp->w_tagstack[i]);
     vim_free(wp->w_localdir);
     vim_free(wp->w_prevdir);
 
@@ -6110,7 +6110,7 @@ win_free(
     // freed memory is re-used for another window.
     FOR_ALL_BUFFERS(buf)
 	FOR_ALL_BUF_WININFO(buf, wip)
-	    if (wip->wi_win == wp)
+	    ಆದರೆ (wip->wi_win == wp)
 	    {
 		wininfo_T	*wip2;
 
@@ -6118,66 +6118,66 @@ win_free(
 		// must be removed, it would never be used.
 		// Skip "wip" itself, otherwise Coverity complains.
 		FOR_ALL_BUF_WININFO(buf, wip2)
-		    if (wip2 != wip && wip2->wi_win == NULL)
+		    ಆದರೆ (wip2 != wip && wip2->wi_win == ಖಾಲಿ)
 		    {
-			if (wip2->wi_next != NULL)
-			    wip2->wi_next->wi_prev = wip2->wi_prev;
-			if (wip2->wi_prev == NULL)
-			    buf->b_wininfo = wip2->wi_next;
-			else
-			    wip2->wi_prev->wi_next = wip2->wi_next;
+			ಆದರೆ (wip2->wi_ಮುಂದಿನ != ಖಾಲಿ)
+			    wip2->wi_ಮುಂದಿನ->wi_prev = wip2->wi_prev;
+			ಆದರೆ (wip2->wi_prev == ಖಾಲಿ)
+			    buf->b_wininfo = wip2->wi_ಮುಂದಿನ;
+			ಇಲ್ಲದಿದ್ದರೆ
+			    wip2->wi_prev->wi_ಮುಂದಿನ = wip2->wi_ಮುಂದಿನ;
 			free_wininfo(wip2);
-			break;
+			ನಿಲ್ಲಿಸು;
 		    }
 
-		wip->wi_win = NULL;
+		wip->wi_win = ಖಾಲಿ;
 	    }
 
-#ifdef FEAT_SEARCH_EXTRA
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಹುಡುಕು_EXTRA
     clear_matches(wp);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     free_jumplist(wp);
 
-#ifdef FEAT_QUICKFIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
     qf_free_all(wp);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_GUI
-    if (gui.in_use)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+    ಆದರೆ (gui.ಒಳ_use)
     {
-	gui_mch_destroy_scrollbar(&wp->w_scrollbars[SBAR_LEFT]);
-	gui_mch_destroy_scrollbar(&wp->w_scrollbars[SBAR_RIGHT]);
+	gui_mch_destroy_scrollbar(&wp->w_scrollbars[SBAR_ಎಡ]);
+	gui_mch_destroy_scrollbar(&wp->w_scrollbars[SBAR_ಬಲ]);
     }
-#endif // FEAT_GUI
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_GUI
 
-#ifdef FEAT_MENU
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MENU
     remove_winbar(wp);
-#endif
-#ifdef FEAT_PROP_POPUP
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
     free_callback(&wp->w_close_cb);
     free_callback(&wp->w_filter_cb);
-    for (i = 0; i < 4; ++i)
+    ಗಾಗಿ (i = 0; i < 4; ++i)
 	VIM_CLEAR(wp->w_border_highlight[i]);
     vim_free(wp->w_scrollbar_highlight);
     vim_free(wp->w_thumb_highlight);
     vim_free(wp->w_popup_title);
-    list_unref(wp->w_popup_mask);
-    vim_free(wp->w_popup_mask_cells);
-#endif
+    list_unref(wp->w_popup_ಮುಖವಾಡ);
+    vim_free(wp->w_popup_ಮುಖವಾಡ_cells);
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_SYN_HL
-    vim_free(wp->w_p_cc_cols);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
+    vim_free(wp->w_p_cc_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ);
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (win_valid_any_tab(wp))
+    ಆದರೆ (win_valid_any_tab(wp))
 	win_remove(wp, tp);
-    if (autocmd_busy)
+    ಆದರೆ (autocmd_busy)
     {
-	wp->w_next = au_pending_free_win;
+	wp->w_ಮುಂದಿನ = au_pending_free_win;
 	au_pending_free_win = wp;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	vim_free(wp);
 
     unblock_autocmds();
@@ -6187,153 +6187,153 @@ win_free(
  * Return TRUE if "wp" is not in the list of windows: the autocmd window or a
  * popup window.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 win_unlisted(win_T *wp)
 {
-    return is_aucmd_win(wp) || WIN_IS_POPUP(wp);
+    ಹಿಂತಿರುಗಿ is_aucmd_win(wp) || WIN_IS_POPUP(wp);
 }
 
-#if defined(FEAT_PROP_POPUP)
+#ಆದರೆ defined(FEAT_PROP_POPUP)
 /*
  * Free a popup window.  This does not take the window out of the window list
  * and assumes there is only one toplevel frame, no split.
  */
-    void
+    ಶೂನ್ಯ
 win_free_popup(win_T *win)
 {
-    if (win->w_buffer != NULL)
+    ಆದರೆ (win->w_ಬಫರ್ != ಖಾಲಿ)
     {
-	if (bt_popup(win->w_buffer))
-	    win_close_buffer(win, DOBUF_WIPE_REUSE, FALSE);
-	else
-	    close_buffer(win, win->w_buffer, 0, FALSE, FALSE, TRUE);
+	ಆದರೆ (bt_popup(win->w_ಬಫರ್))
+	    win_close_ಬಫರ್(win, DOBUF_WIPE_REUSE, FALSE);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    close_ಬಫರ್(win, win->w_ಬಫರ್, 0, FALSE, FALSE, TRUE);
 
-	if (win->w_buffer != NULL)
-	    --win->w_buffer->b_nwindows;
+	ಆದರೆ (win->w_ಬಫರ್ != ಖಾಲಿ)
+	    --win->w_ಬಫರ್->b_nwindows;
     }
-# if defined(FEAT_TIMERS)
+# ಆದರೆ defined(FEAT_TIMERS)
     // the timer may have been cleared, making the pointer invalid
-    if (timer_valid(win->w_popup_timer))
+    ಆದರೆ (timer_valid(win->w_popup_timer))
 	stop_timer(win->w_popup_timer);
 # endif
-    vim_free(win->w_frame);
-    win_free(win, NULL);
+    vim_free(win->w_ಚೌಕಟ್ಟು);
+    win_free(win, ಖಾಲಿ);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Append window "wp" in the window list after window "after".
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 win_append(win_T *after, win_T *wp)
 {
     win_T	*before;
 
-    if (after == NULL)	    // after NULL is in front of the first
+    ಆದರೆ (after == ಖಾಲಿ)	    // after NULL is in front of the first
 	before = firstwin;
-    else
-	before = after->w_next;
+    ಇಲ್ಲದಿದ್ದರೆ
+	before = after->w_ಮುಂದಿನ;
 
-    wp->w_next = before;
+    wp->w_ಮುಂದಿನ = before;
     wp->w_prev = after;
-    if (after == NULL)
+    ಆದರೆ (after == ಖಾಲಿ)
 	firstwin = wp;
-    else
-	after->w_next = wp;
-    if (before == NULL)
+    ಇಲ್ಲದಿದ್ದರೆ
+	after->w_ಮುಂದಿನ = wp;
+    ಆದರೆ (before == ಖಾಲಿ)
 	lastwin = wp;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	before->w_prev = wp;
 }
 
 /*
  * Remove a window from the window list.
  */
-    void
+    ಶೂನ್ಯ
 win_remove(
     win_T	*wp,
     tabpage_T	*tp)		// tab page "win" is in, NULL for current
 {
-    if (wp->w_prev != NULL)
-	wp->w_prev->w_next = wp->w_next;
-    else if (tp == NULL)
-	firstwin = curtab->tp_firstwin = wp->w_next;
-    else
-	tp->tp_firstwin = wp->w_next;
+    ಆದರೆ (wp->w_prev != ಖಾಲಿ)
+	wp->w_prev->w_ಮುಂದಿನ = wp->w_ಮುಂದಿನ;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (tp == ಖಾಲಿ)
+	firstwin = curtab->tp_firstwin = wp->w_ಮುಂದಿನ;
+    ಇಲ್ಲದಿದ್ದರೆ
+	tp->tp_firstwin = wp->w_ಮುಂದಿನ;
 
-    if (wp->w_next != NULL)
-	wp->w_next->w_prev = wp->w_prev;
-    else if (tp == NULL)
+    ಆದರೆ (wp->w_ಮುಂದಿನ != ಖಾಲಿ)
+	wp->w_ಮುಂದಿನ->w_prev = wp->w_prev;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (tp == ಖಾಲಿ)
 	lastwin = curtab->tp_lastwin = wp->w_prev;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	tp->tp_lastwin = wp->w_prev;
 }
 
 /*
  * Append frame "frp" in a frame list after frame "after".
  */
-    static void
-frame_append(frame_T *after, frame_T *frp)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಚೌಕಟ್ಟು_append(ಚೌಕಟ್ಟು_T *after, ಚೌಕಟ್ಟು_T *frp)
 {
-    frp->fr_next = after->fr_next;
-    after->fr_next = frp;
-    if (frp->fr_next != NULL)
-	frp->fr_next->fr_prev = frp;
+    frp->fr_ಮುಂದಿನ = after->fr_ಮುಂದಿನ;
+    after->fr_ಮುಂದಿನ = frp;
+    ಆದರೆ (frp->fr_ಮುಂದಿನ != ಖಾಲಿ)
+	frp->fr_ಮುಂದಿನ->fr_prev = frp;
     frp->fr_prev = after;
 }
 
 /*
  * Insert frame "frp" in a frame list before frame "before".
  */
-    static void
-frame_insert(frame_T *before, frame_T *frp)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಚೌಕಟ್ಟು_ಸೇರಿಸು(ಚೌಕಟ್ಟು_T *before, ಚೌಕಟ್ಟು_T *frp)
 {
-    frp->fr_next = before;
+    frp->fr_ಮುಂದಿನ = before;
     frp->fr_prev = before->fr_prev;
     before->fr_prev = frp;
-    if (frp->fr_prev != NULL)
-	frp->fr_prev->fr_next = frp;
-    else
-	frp->fr_parent->fr_child = frp;
+    ಆದರೆ (frp->fr_prev != ಖಾಲಿ)
+	frp->fr_prev->fr_ಮುಂದಿನ = frp;
+    ಇಲ್ಲದಿದ್ದರೆ
+	frp->fr_ಪೋಷಕ->fr_ಮಗು = frp;
 }
 
 /*
  * Remove a frame from a frame list.
  */
-    static void
-frame_remove(frame_T *frp)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಚೌಕಟ್ಟು_remove(ಚೌಕಟ್ಟು_T *frp)
 {
-    if (frp->fr_prev != NULL)
-	frp->fr_prev->fr_next = frp->fr_next;
-    else
-	frp->fr_parent->fr_child = frp->fr_next;
-    if (frp->fr_next != NULL)
-	frp->fr_next->fr_prev = frp->fr_prev;
+    ಆದರೆ (frp->fr_prev != ಖಾಲಿ)
+	frp->fr_prev->fr_ಮುಂದಿನ = frp->fr_ಮುಂದಿನ;
+    ಇಲ್ಲದಿದ್ದರೆ
+	frp->fr_ಪೋಷಕ->fr_ಮಗು = frp->fr_ಮುಂದಿನ;
+    ಆದರೆ (frp->fr_ಮುಂದಿನ != ಖಾಲಿ)
+	frp->fr_ಮುಂದಿನ->fr_prev = frp->fr_prev;
 }
 
 /*
  * Allocate w_lines[] for window "wp".
  * Return FAIL for failure, OK for success.
  */
-    int
-win_alloc_lines(win_T *wp)
+    ಪೂರ್ಣಾಂಕ
+win_alloc_ಸಾಲುಗಳು(win_T *wp)
 {
-    wp->w_lines_valid = 0;
-    wp->w_lines = ALLOC_CLEAR_MULT(wline_T, Rows);
-    if (wp->w_lines == NULL)
-	return FAIL;
-    return OK;
+    wp->w_ಸಾಲುಗಳು_valid = 0;
+    wp->w_ಸಾಲುಗಳು = ALLOC_CLEAR_MULT(wline_T, ಅಡ್ಡಸಾಲುಗಳು);
+    ಆದರೆ (wp->w_ಸಾಲುಗಳು == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * free lsize arrays for a window
  */
-    void
+    ಶೂನ್ಯ
 win_free_lsize(win_T *wp)
 {
     // TODO: why would wp be NULL here?
-    if (wp != NULL)
-	VIM_CLEAR(wp->w_lines);
+    ಆದರೆ (wp != ಖಾಲಿ)
+	VIM_CLEAR(wp->w_ಸಾಲುಗಳು);
 }
 
 /*
@@ -6342,119 +6342,119 @@ win_free_lsize(win_T *wp)
  * Note: When called together with shell_new_columns(), call shell_new_columns()
  * first to avoid this function updating firstwin->w_wincol first.
  */
-    void
-shell_new_rows(void)
+    ಶೂನ್ಯ
+shell_new_ಅಡ್ಡಸಾಲುಗಳು(ಶೂನ್ಯ)
 {
-    int		h = (int)ROWS_AVAIL;
+    ಪೂರ್ಣಾಂಕ		h = (ಪೂರ್ಣಾಂಕ)ಅಡ್ಡಸಾಲುಗಳು_AVAIL;
 
-    if (firstwin == NULL)	// not initialized yet
-	return;
-    if (h < frame_minheight(topframe, NULL))
-	h = frame_minheight(topframe, NULL);
+    ಆದರೆ (firstwin == ಖಾಲಿ)	// not initialized yet
+	ಹಿಂತಿರುಗಿ;
+    ಆದರೆ (h < ಚೌಕಟ್ಟು_minheight(topframe, ಖಾಲಿ))
+	h = ಚೌಕಟ್ಟು_minheight(topframe, ಖಾಲಿ);
 
     // First try setting the heights of windows with 'winfixheight'.  If that
     // doesn't result in the right height, forget about that option.
-    frame_new_height(topframe, h, FALSE, TRUE, FALSE);
-    if (!frame_check_height(topframe, h))
-	frame_new_height(topframe, h, FALSE, FALSE, FALSE);
+    ಚೌಕಟ್ಟು_new_ಎತ್ತರ(topframe, h, FALSE, TRUE, FALSE);
+    ಆದರೆ (!ಚೌಕಟ್ಟು_check_ಎತ್ತರ(topframe, h))
+	ಚೌಕಟ್ಟು_new_ಎತ್ತರ(topframe, h, FALSE, FALSE, FALSE);
 
     win_comp_pos();		// recompute w_winrow and w_wincol
     compute_cmdrow();
-    curtab->tp_ch_used = p_ch;
+    curtab->tp_ch_ಬಳಸಿದ = p_ch;
 
-    if (!skip_win_fix_scroll)
+    ಆದರೆ (!skip_win_fix_scroll)
 	win_fix_scroll(TRUE);
 
     redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#ಆದರೆ defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
-#endif
-#if 0
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ 0
     // Disabled: don't want making the screen smaller make a window larger.
-    if (p_ea)
+    ಆದರೆ (p_ea)
 	win_equal(curwin, FALSE, 'v');
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Called from win_new_shellsize() after Columns changed.
  */
-    void
-shell_new_columns(void)
+    ಶೂನ್ಯ
+shell_new_columns(ಶೂನ್ಯ)
 {
-    if (firstwin == NULL)	// not initialized yet
-	return;
+    ಆದರೆ (firstwin == ಖಾಲಿ)	// not initialized yet
+	ಹಿಂತಿರುಗಿ;
 
-#if defined(FEAT_TABPANEL)
-    static int prev_tp_width;
-    static int prev_wincol;
-    static int prev_fr_width;
-#endif
-    int w = COLUMNS_WITHOUT_TPL();
+#ಆದರೆ defined(FEAT_TABPANEL)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ prev_tp_ಅಗಲ;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ prev_wincol;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ prev_fr_ಅಗಲ;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಪೂರ್ಣಾಂಕ w = COLUMNS_WITHOUT_TPL();
 
     // First try setting the widths of windows with 'winfixwidth'.  If that
     // doesn't result in the right width, forget about that option.
-    frame_new_width(topframe, w, FALSE, TRUE);
-    if (!frame_check_width(topframe, w))
-	frame_new_width(topframe, w, FALSE, FALSE);
+    ಚೌಕಟ್ಟು_new_ಅಗಲ(topframe, w, FALSE, TRUE);
+    ಆದರೆ (!ಚೌಕಟ್ಟು_check_ಅಗಲ(topframe, w))
+	ಚೌಕಟ್ಟು_new_ಅಗಲ(topframe, w, FALSE, FALSE);
 
     win_comp_pos();		// recompute w_winrow and w_wincol
 
-#if defined(FEAT_TABPANEL)
-    int tp_width = tabpanel_width();
-    int tp_width_changed = tp_width != prev_tp_width;
+#ಆದರೆ defined(FEAT_TABPANEL)
+    ಪೂರ್ಣಾಂಕ tp_ಅಗಲ = tabpanel_ಅಗಲ();
+    ಪೂರ್ಣಾಂಕ tp_ಅಗಲ_ಬದಲಾಯಿತು = tp_ಅಗಲ != prev_tp_ಅಗಲ;
     // tabpanel width changed
-    if (tp_width_changed && p_ea)
+    ಆದರೆ (tp_ಅಗಲ_ಬದಲಾಯಿತು && p_ea)
 	win_equal(curwin, FALSE, 0);
     // tabpanel layout changed
-    if (tp_width_changed
-	    || (tp_width > 0 && (firstwin->w_wincol != prev_wincol
-		    || topframe->fr_width != prev_fr_width)))
+    ಆದರೆ (tp_ಅಗಲ_ಬದಲಾಯಿತು
+	    || (tp_ಅಗಲ > 0 && (firstwin->w_wincol != prev_wincol
+		    || topframe->fr_ಅಗಲ != prev_fr_ಅಗಲ)))
     {
-	screen_fill(cmdline_row, (int)Rows, 0, (int)Columns, ' ', ' ', 0);
+	screen_fill(cmdline_ಅಡ್ಡಸಾಲು, (ಪೂರ್ಣಾಂಕ)ಅಡ್ಡಸಾಲುಗಳು, 0, (ಪೂರ್ಣಾಂಕ)Columns, ' ', ' ', 0);
     }
-    prev_tp_width = tabpanel_width();
+    prev_tp_ಅಗಲ = tabpanel_ಅಗಲ();
     prev_wincol = firstwin->w_wincol;
-    prev_fr_width = topframe->fr_width;
-#endif
+    prev_fr_ಅಗಲ = topframe->fr_ಅಗಲ;
+#ಆದರೆ_ಅಂತ್ಯ
     // Adjust offset for command line start column
-    cmdline_col_off = firstwin->w_wincol;
-    cmdline_width = topframe->fr_width;
-    comp_col();
-    if (!skip_win_fix_scroll)
+    cmdline_ಲಂಬಸಾಲು_off = firstwin->w_wincol;
+    cmdline_ಅಗಲ = topframe->fr_ಅಗಲ;
+    comp_ಲಂಬಸಾಲು();
+    ಆದರೆ (!skip_win_fix_scroll)
 	win_fix_scroll(TRUE);
 
     redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#ಆದರೆ defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
-#endif
-#if 0
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ 0
     // Disabled: don't want making the screen smaller make a window larger.
-    if (p_ea)
+    ಆದರೆ (p_ea)
 	win_equal(curwin, FALSE, 'h');
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Save the size of all windows in "gap".
  */
-    void
-win_size_save(garray_T *gap)
+    ಶೂನ್ಯ
+win_ಗಾತ್ರ_save(garray_T *gap)
 {
     win_T	*wp;
 
-    ga_init2(gap, sizeof(int), 1);
-    if (ga_grow(gap, win_count() * 2 + 1) == FAIL)
-	return;
+    ga_init2(gap, ಗಾತ್ರ(ಪೂರ್ಣಾಂಕ), 1);
+    ಆದರೆ (ga_grow(gap, win_ಎಣಿಕೆ() * 2 + 1) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
     // first entry is the total lines available for windows
-    ((int *)gap->ga_data)[gap->ga_len++] = ROWS_AVAIL - last_stl_height(FALSE);
+    ((ಪೂರ್ಣಾಂಕ *)gap->ga_ದತ್ತಾಂಶ)[gap->ga_len++] = ಅಡ್ಡಸಾಲುಗಳು_AVAIL - ಕೊನೆಯ_stl_ಎತ್ತರ(FALSE);
 
     FOR_ALL_WINDOWS(wp)
     {
-	((int *)gap->ga_data)[gap->ga_len++] =
-	    wp->w_width + wp->w_vsep_width;
-	((int *)gap->ga_data)[gap->ga_len++] = wp->w_height;
+	((ಪೂರ್ಣಾಂಕ *)gap->ga_ದತ್ತಾಂಶ)[gap->ga_len++] =
+	    wp->w_ಅಗಲ + wp->w_vsep_ಅಗಲ;
+	((ಪೂರ್ಣಾಂಕ *)gap->ga_ದತ್ತಾಂಶ)[gap->ga_len++] = wp->w_ಎತ್ತರ;
     }
 }
 
@@ -6463,24 +6463,24 @@ win_size_save(garray_T *gap)
  * and total lines available for windows didn't change.
  * Does not free the growarray.
  */
-    void
-win_size_restore(garray_T *gap)
+    ಶೂನ್ಯ
+win_ಗಾತ್ರ_restore(garray_T *gap)
 {
     win_T	*wp;
-    int		i, j;
+    ಪೂರ್ಣಾಂಕ		i, j;
 
-    if (win_count() * 2 + 1 == gap->ga_len
-	    && ((int *)gap->ga_data)[0] == ROWS_AVAIL - last_stl_height(FALSE))
+    ಆದರೆ (win_ಎಣಿಕೆ() * 2 + 1 == gap->ga_len
+	    && ((ಪೂರ್ಣಾಂಕ *)gap->ga_ದತ್ತಾಂಶ)[0] == ಅಡ್ಡಸಾಲುಗಳು_AVAIL - ಕೊನೆಯ_stl_ಎತ್ತರ(FALSE))
     {
 	// The order matters, because frames contain other frames, but it's
 	// difficult to get right. The easy way out is to do it twice.
-	for (j = 0; j < 2; ++j)
+	ಗಾಗಿ (j = 0; j < 2; ++j)
 	{
 	    i = 1;
 	    FOR_ALL_WINDOWS(wp)
 	    {
-		frame_setwidth(wp->w_frame, ((int *)gap->ga_data)[i++]);
-		win_setheight_win(((int *)gap->ga_data)[i++], wp);
+		ಚೌಕಟ್ಟು_setwidth(wp->w_ಚೌಕಟ್ಟು, ((ಪೂರ್ಣಾಂಕ *)gap->ga_ದತ್ತಾಂಶ)[i++]);
+		win_setheight_win(((ಪೂರ್ಣಾಂಕ *)gap->ga_ದತ್ತಾಂಶ)[i++], wp);
 	    }
 	}
 	// recompute the window positions
@@ -6493,16 +6493,16 @@ win_size_restore(garray_T *gap)
  * frames.
  * Returns the row just after the last window.
  */
-    void
-win_comp_pos(void)
+    ಶೂನ್ಯ
+win_comp_pos(ಶೂನ್ಯ)
 {
-    int		row = tabline_height();
-    int		col = TPL_LCOL();
+    ಪೂರ್ಣಾಂಕ		ಅಡ್ಡಸಾಲು = tabline_ಎತ್ತರ();
+    ಪೂರ್ಣಾಂಕ		ಲಂಬಸಾಲು = TPL_LCOL();
 
-    frame_comp_pos(topframe, &row, &col);
-#if defined(FEAT_STL_OPT)
-    frame_change_statusline_height();
-#endif
+    ಚೌಕಟ್ಟು_comp_pos(topframe, &ಅಡ್ಡಸಾಲು, &ಲಂಬಸಾಲು);
+#ಆದರೆ defined(FEAT_STL_OPT)
+    ಚೌಕಟ್ಟು_change_statusline_ಎತ್ತರ();
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
@@ -6511,42 +6511,42 @@ win_comp_pos(void)
  * "*row" and "*col" are the top-left position of the frame.  They are updated
  * to the bottom-right position plus one.
  */
-    static void
-frame_comp_pos(frame_T *topfrp, int *row, int *col)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಚೌಕಟ್ಟು_comp_pos(ಚೌಕಟ್ಟು_T *topfrp, ಪೂರ್ಣಾಂಕ *ಅಡ್ಡಸಾಲು, ಪೂರ್ಣಾಂಕ *ಲಂಬಸಾಲು)
 {
     win_T	*wp;
-    frame_T	*frp;
-    int		startcol;
-    int		startrow;
-    int		h;
+    ಚೌಕಟ್ಟು_T	*frp;
+    ಪೂರ್ಣಾಂಕ		startcol;
+    ಪೂರ್ಣಾಂಕ		startrow;
+    ಪೂರ್ಣಾಂಕ		h;
 
     wp = topfrp->fr_win;
-    if (wp != NULL)
+    ಆದರೆ (wp != ಖಾಲಿ)
     {
-	if (wp->w_winrow != *row || wp->w_wincol != *col)
+	ಆದರೆ (wp->w_winrow != *ಅಡ್ಡಸಾಲು || wp->w_wincol != *ಲಂಬಸಾಲು)
 	{
 	    // position changed, redraw
-	    wp->w_winrow = *row;
-	    wp->w_wincol = *col;
+	    wp->w_winrow = *ಅಡ್ಡಸಾಲು;
+	    wp->w_wincol = *ಲಂಬಸಾಲು;
 	    redraw_win_later(wp, UPD_NOT_VALID);
-	    wp->w_redr_status = true;
+	    wp->w_redr_ಸ್ಥಿತಿ = true;
 	}
 	// WinBar will not show if the window height is zero
-	h = VISIBLE_HEIGHT(wp) + wp->w_status_height;
-	*row += h > topfrp->fr_height ? topfrp->fr_height : h;
-	*col += wp->w_width + wp->w_vsep_width;
+	h = VISIBLE_ಎತ್ತರ(wp) + wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ;
+	*ಅಡ್ಡಸಾಲು += h > topfrp->fr_ಎತ್ತರ ? topfrp->fr_ಎತ್ತರ : h;
+	*ಲಂಬಸಾಲು += wp->w_ಅಗಲ + wp->w_vsep_ಅಗಲ;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	startrow = *row;
-	startcol = *col;
-	FOR_ALL_FRAMES(frp, topfrp->fr_child)
+	startrow = *ಅಡ್ಡಸಾಲು;
+	startcol = *ಲಂಬಸಾಲು;
+	FOR_ALL_ಚೌಕಟ್ಟುಗಳು(frp, topfrp->fr_ಮಗು)
 	{
-	    if (topfrp->fr_layout == FR_ROW)
-		*row = startrow;	// all frames are at the same row
-	    else
-		*col = startcol;	// all frames are at the same col
-	    frame_comp_pos(frp, row, col);
+	    ಆದರೆ (topfrp->fr_layout == FR_ಅಡ್ಡಸಾಲು)
+		*ಅಡ್ಡಸಾಲು = startrow;	// all frames are at the same row
+	    ಇಲ್ಲದಿದ್ದರೆ
+		*ಲಂಬಸಾಲು = startcol;	// all frames are at the same col
+	    ಚೌಕಟ್ಟು_comp_pos(frp, ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು);
 	}
     }
 }
@@ -6554,12 +6554,12 @@ frame_comp_pos(frame_T *topfrp, int *row, int *col)
 /*
  * Make the current window show at least one line and one column.
  */
-    void
-win_ensure_size(void)
+    ಶೂನ್ಯ
+win_ensure_ಗಾತ್ರ(ಶೂನ್ಯ)
 {
-    if (curwin->w_height == 0)
+    ಆದರೆ (curwin->w_ಎತ್ತರ == 0)
 	win_setheight(1);
-    if (curwin->w_width == 0)
+    ಆದರೆ (curwin->w_ಅಗಲ == 0)
 	win_setwidth(1);
 }
 
@@ -6567,34 +6567,34 @@ win_ensure_size(void)
  * Set current window height and take care of repositioning other windows to
  * fit around it.
  */
-    void
-win_setheight(int height)
+    ಶೂನ್ಯ
+win_setheight(ಪೂರ್ಣಾಂಕ ಎತ್ತರ)
 {
-    win_setheight_win(height, curwin);
-#if defined(FEAT_STL_OPT)
-    frame_change_statusline_height();
-#endif
+    win_setheight_win(ಎತ್ತರ, curwin);
+#ಆದರೆ defined(FEAT_STL_OPT)
+    ಚೌಕಟ್ಟು_change_statusline_ಎತ್ತರ();
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Set the window height of window "win" and take care of repositioning other
  * windows to fit around it.
  */
-    void
-win_setheight_win(int height, win_T *win)
+    ಶೂನ್ಯ
+win_setheight_win(ಪೂರ್ಣಾಂಕ ಎತ್ತರ, win_T *win)
 {
-    if (win == curwin)
+    ಆದರೆ (win == curwin)
     {
 	// Always keep current window at least one line high, even when
 	// 'winminheight' is zero.
-	if (height < p_wmh)
-	    height = p_wmh;
-	if (height == 0)
-	    height = 1;
-	height += WINBAR_HEIGHT(curwin);
+	ಆದರೆ (ಎತ್ತರ < p_wmh)
+	    ಎತ್ತರ = p_wmh;
+	ಆದರೆ (ಎತ್ತರ == 0)
+	    ಎತ್ತರ = 1;
+	ಎತ್ತರ += WINBAR_ಎತ್ತರ(curwin);
     }
 
-    frame_setheight(win->w_frame, height + win->w_status_height);
+    ಚೌಕಟ್ಟು_setheight(win->w_ಚೌಕಟ್ಟು, ಎತ್ತರ + win->w_ಸ್ಥಿತಿ_ಎತ್ತರ);
 
     // recompute the window positions
     win_comp_pos();
@@ -6616,37 +6616,37 @@ win_setheight_win(int height, win_T *win)
  * Check for the minimal height of the FR_ROW frame.
  * At the top level we can also use change the command line height.
  */
-    static void
-frame_setheight(frame_T *curfrp, int height)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಚೌಕಟ್ಟು_setheight(ಚೌಕಟ್ಟು_T *curfrp, ಪೂರ್ಣಾಂಕ ಎತ್ತರ)
 {
-    int		room;		// total number of lines available
-    int		take;		// number of lines taken from other windows
-    int		room_cmdline;	// lines available from cmdline
-    int		run;
-    frame_T	*frp;
-    int		h;
-    int		room_reserved;
+    ಪೂರ್ಣಾಂಕ		ಸ್ಥಳ;		// total number of lines available
+    ಪೂರ್ಣಾಂಕ		take;		// number of lines taken from other windows
+    ಪೂರ್ಣಾಂಕ		ಸ್ಥಳ_cmdline;	// lines available from cmdline
+    ಪೂರ್ಣಾಂಕ		ಸತತ;
+    ಚೌಕಟ್ಟು_T	*frp;
+    ಪೂರ್ಣಾಂಕ		h;
+    ಪೂರ್ಣಾಂಕ		ಸ್ಥಳ_reserved;
 
     // If the height already is the desired value, nothing to do.
-    if (curfrp->fr_height == height)
-	return;
+    ಆದರೆ (curfrp->fr_ಎತ್ತರ == ಎತ್ತರ)
+	ಹಿಂತಿರುಗಿ;
 
-    if (curfrp->fr_parent == NULL)
+    ಆದರೆ (curfrp->fr_ಪೋಷಕ == ಖಾಲಿ)
     {
 	// topframe: can only change the command line height
-	if (height > 0)
-	    frame_new_height(curfrp, height, FALSE, FALSE, TRUE);
+	ಆದರೆ (ಎತ್ತರ > 0)
+	    ಚೌಕಟ್ಟು_new_ಎತ್ತರ(curfrp, ಎತ್ತರ, FALSE, FALSE, TRUE);
     }
-    else if (curfrp->fr_parent->fr_layout == FR_ROW)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (curfrp->fr_ಪೋಷಕ->fr_layout == FR_ಅಡ್ಡಸಾಲು)
     {
 	// Row of frames: Also need to resize frames left and right of this
 	// one.  First check for the minimal height of these.
-	h = frame_minheight(curfrp->fr_parent, NULL);
-	if (height < h)
-	    height = h;
-	frame_setheight(curfrp->fr_parent, height);
+	h = ಚೌಕಟ್ಟು_minheight(curfrp->fr_ಪೋಷಕ, ಖಾಲಿ);
+	ಆದರೆ (ಎತ್ತರ < h)
+	    ಎತ್ತರ = h;
+	ಚೌಕಟ್ಟು_setheight(curfrp->fr_ಪೋಷಕ, ಎತ್ತರ);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	/*
 	 * Column of frames: try to change only frames in this column.
@@ -6658,118 +6658,118 @@ frame_setheight(frame_T *curfrp, int height)
 	 * 2: compute the room available and adjust the height to it.
 	 * Try not to reduce the height of a window with 'winfixheight' set.
 	 */
-	for (run = 1; run <= 2; ++run)
+	ಗಾಗಿ (ಸತತ = 1; ಸತತ <= 2; ++ಸತತ)
 	{
-	    room = 0;
-	    room_reserved = 0;
-	    FOR_ALL_FRAMES(frp, curfrp->fr_parent->fr_child)
+	    ಸ್ಥಳ = 0;
+	    ಸ್ಥಳ_reserved = 0;
+	    FOR_ALL_ಚೌಕಟ್ಟುಗಳು(frp, curfrp->fr_ಪೋಷಕ->fr_ಮಗು)
 	    {
-		if (frp != curfrp
-			&& frp->fr_win != NULL
+		ಆದರೆ (frp != curfrp
+			&& frp->fr_win != ಖಾಲಿ
 			&& frp->fr_win->w_p_wfh)
-		    room_reserved += frp->fr_height;
-		room += frp->fr_height;
-		if (frp != curfrp)
-		    room -= frame_minheight(frp, NULL);
+		    ಸ್ಥಳ_reserved += frp->fr_ಎತ್ತರ;
+		ಸ್ಥಳ += frp->fr_ಎತ್ತರ;
+		ಆದರೆ (frp != curfrp)
+		    ಸ್ಥಳ -= ಚೌಕಟ್ಟು_minheight(frp, ಖಾಲಿ);
 	    }
-	    if (curfrp->fr_width != topframe->fr_width)
-		room_cmdline = 0;
-	    else
+	    ಆದರೆ (curfrp->fr_ಅಗಲ != topframe->fr_ಅಗಲ)
+		ಸ್ಥಳ_cmdline = 0;
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		room_cmdline = Rows - p_ch - (lastwin->w_winrow
-						+ VISIBLE_HEIGHT(lastwin)
-						+ lastwin->w_status_height);
-		if (room_cmdline < 0)
-		    room_cmdline = 0;
+		ಸ್ಥಳ_cmdline = ಅಡ್ಡಸಾಲುಗಳು - p_ch - (lastwin->w_winrow
+						+ VISIBLE_ಎತ್ತರ(lastwin)
+						+ lastwin->w_ಸ್ಥಿತಿ_ಎತ್ತರ);
+		ಆದರೆ (ಸ್ಥಳ_cmdline < 0)
+		    ಸ್ಥಳ_cmdline = 0;
 	    }
 
-	    if (height <= room + room_cmdline)
-		break;
-	    if (run == 2 || curfrp->fr_width == topframe->fr_width)
+	    ಆದರೆ (ಎತ್ತರ <= ಸ್ಥಳ + ಸ್ಥಳ_cmdline)
+		ನಿಲ್ಲಿಸು;
+	    ಆದರೆ (ಸತತ == 2 || curfrp->fr_ಅಗಲ == topframe->fr_ಅಗಲ)
 	    {
-		height = room + room_cmdline;
-		break;
+		ಎತ್ತರ = ಸ್ಥಳ + ಸ್ಥಳ_cmdline;
+		ನಿಲ್ಲಿಸು;
 	    }
-	    frame_setheight(curfrp->fr_parent, height
-		+ frame_minheight(curfrp->fr_parent, NOWIN) - (int)p_wmh - 1);
+	    ಚೌಕಟ್ಟು_setheight(curfrp->fr_ಪೋಷಕ, ಎತ್ತರ
+		+ ಚೌಕಟ್ಟು_minheight(curfrp->fr_ಪೋಷಕ, NOWIN) - (ಪೂರ್ಣಾಂಕ)p_wmh - 1);
 	}
 
 	/*
 	 * Compute the number of lines we will take from others frames (can be
 	 * negative!).
 	 */
-	take = height - curfrp->fr_height;
+	take = ಎತ್ತರ - curfrp->fr_ಎತ್ತರ;
 
 	// If there is not enough room, also reduce the height of a window
 	// with 'winfixheight' set.
-	if (height > room + room_cmdline - room_reserved)
-	    room_reserved = room + room_cmdline - height;
+	ಆದರೆ (ಎತ್ತರ > ಸ್ಥಳ + ಸ್ಥಳ_cmdline - ಸ್ಥಳ_reserved)
+	    ಸ್ಥಳ_reserved = ಸ್ಥಳ + ಸ್ಥಳ_cmdline - ಎತ್ತರ;
 	// If there is only a 'winfixheight' window and making the
 	// window smaller, need to make the other window taller.
-	if (take < 0 && room - curfrp->fr_height <= room_reserved)
-	    room_reserved = 0;
+	ಆದರೆ (take < 0 && ಸ್ಥಳ - curfrp->fr_ಎತ್ತರ <= ಸ್ಥಳ_reserved)
+	    ಸ್ಥಳ_reserved = 0;
 
-	if (take > 0 && room_cmdline > 0)
+	ಆದರೆ (take > 0 && ಸ್ಥಳ_cmdline > 0)
 	{
 	    // use lines from cmdline first
-	    if (take < room_cmdline)
-		room_cmdline = take;
-	    take -= room_cmdline;
-	    topframe->fr_height += room_cmdline;
+	    ಆದರೆ (take < ಸ್ಥಳ_cmdline)
+		ಸ್ಥಳ_cmdline = take;
+	    take -= ಸ್ಥಳ_cmdline;
+	    topframe->fr_ಎತ್ತರ += ಸ್ಥಳ_cmdline;
 	}
 
 	/*
 	 * set the current frame to the new height
 	 */
-	frame_new_height(curfrp, height, FALSE, FALSE, TRUE);
+	ಚೌಕಟ್ಟು_new_ಎತ್ತರ(curfrp, ಎತ್ತರ, FALSE, FALSE, TRUE);
 
 	/*
 	 * First take lines from the frames after the current frame.  If
 	 * that is not enough, takes lines from frames above the current
 	 * frame.
 	 */
-	for (run = 0; run < 2; ++run)
+	ಗಾಗಿ (ಸತತ = 0; ಸತತ < 2; ++ಸತತ)
 	{
-	    if (run == 0)
-		frp = curfrp->fr_next;	// 1st run: start with next window
-	    else
+	    ಆದರೆ (ಸತತ == 0)
+		frp = curfrp->fr_ಮುಂದಿನ;	// 1st run: start with next window
+	    ಇಲ್ಲದಿದ್ದರೆ
 		frp = curfrp->fr_prev;	// 2nd run: start with prev window
-	    while (frp != NULL && take != 0)
+	    ಆಗ (frp != ಖಾಲಿ && take != 0)
 	    {
-		h = frame_minheight(frp, NULL);
-		if (room_reserved > 0
-			&& frp->fr_win != NULL
+		h = ಚೌಕಟ್ಟು_minheight(frp, ಖಾಲಿ);
+		ಆದರೆ (ಸ್ಥಳ_reserved > 0
+			&& frp->fr_win != ಖಾಲಿ
 			&& frp->fr_win->w_p_wfh)
 		{
-		    if (room_reserved >= frp->fr_height)
-			room_reserved -= frp->fr_height;
-		    else
+		    ಆದರೆ (ಸ್ಥಳ_reserved >= frp->fr_ಎತ್ತರ)
+			ಸ್ಥಳ_reserved -= frp->fr_ಎತ್ತರ;
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
-			if (frp->fr_height - room_reserved > take)
-			    room_reserved = frp->fr_height - take;
-			take -= frp->fr_height - room_reserved;
-			frame_new_height(frp, room_reserved, FALSE, FALSE,
+			ಆದರೆ (frp->fr_ಎತ್ತರ - ಸ್ಥಳ_reserved > take)
+			    ಸ್ಥಳ_reserved = frp->fr_ಎತ್ತರ - take;
+			take -= frp->fr_ಎತ್ತರ - ಸ್ಥಳ_reserved;
+			ಚೌಕಟ್ಟು_new_ಎತ್ತರ(frp, ಸ್ಥಳ_reserved, FALSE, FALSE,
 									TRUE);
-			room_reserved = 0;
+			ಸ್ಥಳ_reserved = 0;
 		    }
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    if (frp->fr_height - take < h)
+		    ಆದರೆ (frp->fr_ಎತ್ತರ - take < h)
 		    {
-			take -= frp->fr_height - h;
-			frame_new_height(frp, h, FALSE, FALSE, TRUE);
+			take -= frp->fr_ಎತ್ತರ - h;
+			ಚೌಕಟ್ಟು_new_ಎತ್ತರ(frp, h, FALSE, FALSE, TRUE);
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
-			frame_new_height(frp, frp->fr_height - take,
+			ಚೌಕಟ್ಟು_new_ಎತ್ತರ(frp, frp->fr_ಎತ್ತರ - take,
 							    FALSE, FALSE, TRUE);
 			take = 0;
 		    }
 		}
-		if (run == 0)
-		    frp = frp->fr_next;
-		else
+		ಆದರೆ (ಸತತ == 0)
+		    frp = frp->fr_ಮುಂದಿನ;
+		ಇಲ್ಲದಿದ್ದರೆ
 		    frp = frp->fr_prev;
 	    }
 	}
@@ -6780,28 +6780,28 @@ frame_setheight(frame_T *curfrp, int height)
  * Set current window width and take care of repositioning other windows to
  * fit around it.
  */
-    void
-win_setwidth(int width)
+    ಶೂನ್ಯ
+win_setwidth(ಪೂರ್ಣಾಂಕ ಅಗಲ)
 {
-    win_setwidth_win(width, curwin);
+    win_setwidth_win(ಅಗಲ, curwin);
 }
 
-    void
-win_setwidth_win(int width, win_T *wp)
+    ಶೂನ್ಯ
+win_setwidth_win(ಪೂರ್ಣಾಂಕ ಅಗಲ, win_T *wp)
 {
     // Always keep current window at least one column wide, even when
     // 'winminwidth' is zero.
-    if (wp == curwin)
+    ಆದರೆ (wp == curwin)
     {
-	if (width < p_wmw)
-	    width = p_wmw;
-	if (width == 0)
-	    width = 1;
+	ಆದರೆ (ಅಗಲ < p_wmw)
+	    ಅಗಲ = p_wmw;
+	ಆದರೆ (ಅಗಲ == 0)
+	    ಅಗಲ = 1;
     }
-    else if (width < 0)
-	width = 0;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಅಗಲ < 0)
+	ಅಗಲ = 0;
 
-    frame_setwidth(wp->w_frame, width + wp->w_vsep_width);
+    ಚೌಕಟ್ಟು_setwidth(wp->w_ಚೌಕಟ್ಟು, ಅಗಲ + wp->w_vsep_ಅಗಲ);
 
     // recompute the window positions
     win_comp_pos();
@@ -6816,34 +6816,34 @@ win_setwidth_win(int width, win_T *wp)
  *
  * Strategy is similar to frame_setheight().
  */
-    static void
-frame_setwidth(frame_T *curfrp, int width)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಚೌಕಟ್ಟು_setwidth(ಚೌಕಟ್ಟು_T *curfrp, ಪೂರ್ಣಾಂಕ ಅಗಲ)
 {
-    int		room;		// total number of lines available
-    int		take;		// number of lines taken from other windows
-    int		run;
-    frame_T	*frp;
-    int		w;
-    int		room_reserved;
+    ಪೂರ್ಣಾಂಕ		ಸ್ಥಳ;		// total number of lines available
+    ಪೂರ್ಣಾಂಕ		take;		// number of lines taken from other windows
+    ಪೂರ್ಣಾಂಕ		ಸತತ;
+    ಚೌಕಟ್ಟು_T	*frp;
+    ಪೂರ್ಣಾಂಕ		w;
+    ಪೂರ್ಣಾಂಕ		ಸ್ಥಳ_reserved;
 
     // If the width already is the desired value, nothing to do.
-    if (curfrp->fr_width == width)
-	return;
+    ಆದರೆ (curfrp->fr_ಅಗಲ == ಅಗಲ)
+	ಹಿಂತಿರುಗಿ;
 
-    if (curfrp->fr_parent == NULL)
+    ಆದರೆ (curfrp->fr_ಪೋಷಕ == ಖಾಲಿ)
 	// topframe: can't change width
-	return;
+	ಹಿಂತಿರುಗಿ;
 
-    if (curfrp->fr_parent->fr_layout == FR_COL)
+    ಆದರೆ (curfrp->fr_ಪೋಷಕ->fr_layout == FR_ಲಂಬಸಾಲು)
     {
 	// Column of frames: Also need to resize frames above and below of
 	// this one.  First check for the minimal width of these.
-	w = frame_minwidth(curfrp->fr_parent, NULL);
-	if (width < w)
-	    width = w;
-	frame_setwidth(curfrp->fr_parent, width);
+	w = ಚೌಕಟ್ಟು_minwidth(curfrp->fr_ಪೋಷಕ, ಖಾಲಿ);
+	ಆದರೆ (ಅಗಲ < w)
+	    ಅಗಲ = w;
+	ಚೌಕಟ್ಟು_setwidth(curfrp->fr_ಪೋಷಕ, ಅಗಲ);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	/*
 	 * Row of frames: try to change only frames in this row.
@@ -6853,98 +6853,98 @@ frame_setwidth(frame_T *curfrp, int width)
 	 *    containing frame.
 	 * 2: compute the room available and adjust the width to it.
 	 */
-	for (run = 1; run <= 2; ++run)
+	ಗಾಗಿ (ಸತತ = 1; ಸತತ <= 2; ++ಸತತ)
 	{
-	    room = 0;
-	    room_reserved = 0;
-	    FOR_ALL_FRAMES(frp, curfrp->fr_parent->fr_child)
+	    ಸ್ಥಳ = 0;
+	    ಸ್ಥಳ_reserved = 0;
+	    FOR_ALL_ಚೌಕಟ್ಟುಗಳು(frp, curfrp->fr_ಪೋಷಕ->fr_ಮಗು)
 	    {
-		if (frp != curfrp
-			&& frp->fr_win != NULL
+		ಆದರೆ (frp != curfrp
+			&& frp->fr_win != ಖಾಲಿ
 			&& frp->fr_win->w_p_wfw)
-		    room_reserved += frp->fr_width;
-		room += frp->fr_width;
-		if (frp != curfrp)
-		    room -= frame_minwidth(frp, NULL);
+		    ಸ್ಥಳ_reserved += frp->fr_ಅಗಲ;
+		ಸ್ಥಳ += frp->fr_ಅಗಲ;
+		ಆದರೆ (frp != curfrp)
+		    ಸ್ಥಳ -= ಚೌಕಟ್ಟು_minwidth(frp, ಖಾಲಿ);
 	    }
 
-	    if (width <= room)
-		break;
-	    if (run == 2 || curfrp->fr_height >= ROWS_AVAIL)
+	    ಆದರೆ (ಅಗಲ <= ಸ್ಥಳ)
+		ನಿಲ್ಲಿಸು;
+	    ಆದರೆ (ಸತತ == 2 || curfrp->fr_ಎತ್ತರ >= ಅಡ್ಡಸಾಲುಗಳು_AVAIL)
 	    {
-		width = room;
-		break;
+		ಅಗಲ = ಸ್ಥಳ;
+		ನಿಲ್ಲಿಸು;
 	    }
-	    frame_setwidth(curfrp->fr_parent, width
-		 + frame_minwidth(curfrp->fr_parent, NOWIN) - (int)p_wmw - 1);
+	    ಚೌಕಟ್ಟು_setwidth(curfrp->fr_ಪೋಷಕ, ಅಗಲ
+		 + ಚೌಕಟ್ಟು_minwidth(curfrp->fr_ಪೋಷಕ, NOWIN) - (ಪೂರ್ಣಾಂಕ)p_wmw - 1);
 	}
 
 	/*
 	 * Compute the number of lines we will take from others frames (can be
 	 * negative!).
 	 */
-	take = width - curfrp->fr_width;
+	take = ಅಗಲ - curfrp->fr_ಅಗಲ;
 
 	// If there is not enough room, also reduce the width of a window
 	// with 'winfixwidth' set.
-	if (width > room - room_reserved)
-	    room_reserved = room - width;
+	ಆದರೆ (ಅಗಲ > ಸ್ಥಳ - ಸ್ಥಳ_reserved)
+	    ಸ್ಥಳ_reserved = ಸ್ಥಳ - ಅಗಲ;
 	// If there is only a 'winfixwidth' window and making the
 	// window smaller, need to make the other window narrower.
-	if (take < 0 && room - curfrp->fr_width < room_reserved)
-	    room_reserved = 0;
+	ಆದರೆ (take < 0 && ಸ್ಥಳ - curfrp->fr_ಅಗಲ < ಸ್ಥಳ_reserved)
+	    ಸ್ಥಳ_reserved = 0;
 
 	/*
 	 * set the current frame to the new width
 	 */
-	frame_new_width(curfrp, width, FALSE, FALSE);
+	ಚೌಕಟ್ಟು_new_ಅಗಲ(curfrp, ಅಗಲ, FALSE, FALSE);
 
 	/*
 	 * First take lines from the frames right of the current frame.  If
 	 * that is not enough, takes lines from frames left of the current
 	 * frame.
 	 */
-	for (run = 0; run < 2; ++run)
+	ಗಾಗಿ (ಸತತ = 0; ಸತತ < 2; ++ಸತತ)
 	{
-	    if (run == 0)
-		frp = curfrp->fr_next;	// 1st run: start with next window
-	    else
+	    ಆದರೆ (ಸತತ == 0)
+		frp = curfrp->fr_ಮುಂದಿನ;	// 1st run: start with next window
+	    ಇಲ್ಲದಿದ್ದರೆ
 		frp = curfrp->fr_prev;	// 2nd run: start with prev window
-	    while (frp != NULL && take != 0)
+	    ಆಗ (frp != ಖಾಲಿ && take != 0)
 	    {
-		w = frame_minwidth(frp, NULL);
-		if (room_reserved > 0
-			&& frp->fr_win != NULL
+		w = ಚೌಕಟ್ಟು_minwidth(frp, ಖಾಲಿ);
+		ಆದರೆ (ಸ್ಥಳ_reserved > 0
+			&& frp->fr_win != ಖಾಲಿ
 			&& frp->fr_win->w_p_wfw)
 		{
-		    if (room_reserved >= frp->fr_width)
-			room_reserved -= frp->fr_width;
-		    else
+		    ಆದರೆ (ಸ್ಥಳ_reserved >= frp->fr_ಅಗಲ)
+			ಸ್ಥಳ_reserved -= frp->fr_ಅಗಲ;
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
-			if (frp->fr_width - room_reserved > take)
-			    room_reserved = frp->fr_width - take;
-			take -= frp->fr_width - room_reserved;
-			frame_new_width(frp, room_reserved, FALSE, FALSE);
-			room_reserved = 0;
+			ಆದರೆ (frp->fr_ಅಗಲ - ಸ್ಥಳ_reserved > take)
+			    ಸ್ಥಳ_reserved = frp->fr_ಅಗಲ - take;
+			take -= frp->fr_ಅಗಲ - ಸ್ಥಳ_reserved;
+			ಚೌಕಟ್ಟು_new_ಅಗಲ(frp, ಸ್ಥಳ_reserved, FALSE, FALSE);
+			ಸ್ಥಳ_reserved = 0;
 		    }
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    if (frp->fr_width - take < w)
+		    ಆದರೆ (frp->fr_ಅಗಲ - take < w)
 		    {
-			take -= frp->fr_width - w;
-			frame_new_width(frp, w, FALSE, FALSE);
+			take -= frp->fr_ಅಗಲ - w;
+			ಚೌಕಟ್ಟು_new_ಅಗಲ(frp, w, FALSE, FALSE);
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
-			frame_new_width(frp, frp->fr_width - take,
+			ಚೌಕಟ್ಟು_new_ಅಗಲ(frp, frp->fr_ಅಗಲ - take,
 								FALSE, FALSE);
 			take = 0;
 		    }
 		}
-		if (run == 0)
-		    frp = frp->fr_next;
-		else
+		ಆದರೆ (ಸತತ == 0)
+		    frp = frp->fr_ಮುಂದಿನ;
+		ಇಲ್ಲದಿದ್ದರೆ
 		    frp = frp->fr_prev;
 	    }
 	}
@@ -6954,25 +6954,25 @@ frame_setwidth(frame_T *curfrp, int width)
 /*
  * Check 'winminheight' for a valid value and reduce it if needed.
  */
-    void
-win_setminheight(void)
+    ಶೂನ್ಯ
+win_setminheight(ಶೂನ್ಯ)
 {
-    int		room;
-    int		needed;
-    int		first = TRUE;
+    ಪೂರ್ಣಾಂಕ		ಸ್ಥಳ;
+    ಪೂರ್ಣಾಂಕ		needed;
+    ಪೂರ್ಣಾಂಕ		ಮೊದಲ = TRUE;
 
     // loop until there is a 'winminheight' that is possible
-    while (p_wmh > 0)
+    ಆಗ (p_wmh > 0)
     {
-	room = Rows - p_ch;
-	needed = min_rows_for_all_tabpages() - 1;  // 1 was added for the cmdline
-	if (room >= needed)
-	    break;
+	ಸ್ಥಳ = ಅಡ್ಡಸಾಲುಗಳು - p_ch;
+	needed = min_ಅಡ್ಡಸಾಲುಗಳು_for_all_tabpages() - 1;  // 1 was added for the cmdline
+	ಆದರೆ (ಸ್ಥಳ >= needed)
+	    ನಿಲ್ಲಿಸು;
 	--p_wmh;
-	if (first)
+	ಆದರೆ (ಮೊದಲ)
 	{
-	    emsg(_(e_not_enough_room));
-	    first = FALSE;
+	    emsg(_(e_not_enough_ಸ್ಥಳ));
+	    ಮೊದಲ = FALSE;
 	}
     }
 }
@@ -6980,25 +6980,25 @@ win_setminheight(void)
 /*
  * Check 'winminwidth' for a valid value and reduce it if needed.
  */
-    void
-win_setminwidth(void)
+    ಶೂನ್ಯ
+win_setminwidth(ಶೂನ್ಯ)
 {
-    int		room;
-    int		needed;
-    int		first = TRUE;
+    ಪೂರ್ಣಾಂಕ		ಸ್ಥಳ;
+    ಪೂರ್ಣಾಂಕ		needed;
+    ಪೂರ್ಣಾಂಕ		ಮೊದಲ = TRUE;
 
     // loop until there is a 'winminheight' that is possible
-    while (p_wmw > 0)
+    ಆಗ (p_wmw > 0)
     {
-	room = topframe->fr_width;
-	needed = frame_minwidth(topframe, NULL);
-	if (room >= needed)
-	    break;
+	ಸ್ಥಳ = topframe->fr_ಅಗಲ;
+	needed = ಚೌಕಟ್ಟು_minwidth(topframe, ಖಾಲಿ);
+	ಆದರೆ (ಸ್ಥಳ >= needed)
+	    ನಿಲ್ಲಿಸು;
 	--p_wmw;
-	if (first)
+	ಆದರೆ (ಮೊದಲ)
 	{
-	    emsg(_(e_not_enough_room));
-	    first = FALSE;
+	    emsg(_(e_not_enough_ಸ್ಥಳ));
+	    ಮೊದಲ = FALSE;
 	}
     }
 }
@@ -7006,119 +7006,119 @@ win_setminwidth(void)
 /*
  * Status line of dragwin is dragged "offset" lines down (negative is up).
  */
-    void
-win_drag_status_line(win_T *dragwin, int offset)
+    ಶೂನ್ಯ
+win_drag_ಸ್ಥಿತಿ_ಸಾಲು(win_T *dragwin, ಪೂರ್ಣಾಂಕ ಸ್ಥಾನಾಂತರ)
 {
-    frame_T	*curfr;
-    frame_T	*fr;
-    int		room;
-    int		up;	// if TRUE, drag status line up, otherwise down
-    int		n;
+    ಚೌಕಟ್ಟು_T	*curfr;
+    ಚೌಕಟ್ಟು_T	*fr;
+    ಪೂರ್ಣಾಂಕ		ಸ್ಥಳ;
+    ಪೂರ್ಣಾಂಕ		ಮೇಲೆ;	// if TRUE, drag status line up, otherwise down
+    ಪೂರ್ಣಾಂಕ		n;
 
-    fr = dragwin->w_frame;
+    fr = dragwin->w_ಚೌಕಟ್ಟು;
     curfr = fr;
-    if (fr != topframe)		// more than one window
+    ಆದರೆ (fr != topframe)		// more than one window
     {
-	fr = fr->fr_parent;
+	fr = fr->fr_ಪೋಷಕ;
 	// When the parent frame is not a column of frames, its parent should
 	// be.
-	if (fr->fr_layout != FR_COL)
+	ಆದರೆ (fr->fr_layout != FR_ಲಂಬಸಾಲು)
 	{
 	    curfr = fr;
-	    if (fr != topframe)	// only a row of windows, may drag statusline
-		fr = fr->fr_parent;
+	    ಆದರೆ (fr != topframe)	// only a row of windows, may drag statusline
+		fr = fr->fr_ಪೋಷಕ;
 	}
     }
 
     // If this is the last frame in a column, may want to resize the parent
     // frame instead (go two up to skip a row of frames).
-    while (curfr != topframe && curfr->fr_next == NULL)
+    ಆಗ (curfr != topframe && curfr->fr_ಮುಂದಿನ == ಖಾಲಿ)
     {
-	if (fr != topframe)
-	    fr = fr->fr_parent;
+	ಆದರೆ (fr != topframe)
+	    fr = fr->fr_ಪೋಷಕ;
 	curfr = fr;
-	if (fr != topframe)
-	    fr = fr->fr_parent;
+	ಆದರೆ (fr != topframe)
+	    fr = fr->fr_ಪೋಷಕ;
     }
 
-    if (offset < 0) // drag up
+    ಆದರೆ (ಸ್ಥಾನಾಂತರ < 0) // drag up
     {
-	up = TRUE;
-	offset = -offset;
+	ಮೇಲೆ = TRUE;
+	ಸ್ಥಾನಾಂತರ = -ಸ್ಥಾನಾಂತರ;
 	// sum up the room of the current frame and above it
-	if (fr == curfr)
+	ಆದರೆ (fr == curfr)
 	{
 	    // only one window
-	    room = fr->fr_height - frame_minheight(fr, NULL);
+	    ಸ್ಥಳ = fr->fr_ಎತ್ತರ - ಚೌಕಟ್ಟು_minheight(fr, ಖಾಲಿ);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    room = 0;
-	    for (fr = fr->fr_child; ; fr = fr->fr_next)
+	    ಸ್ಥಳ = 0;
+	    ಗಾಗಿ (fr = fr->fr_ಮಗು; ; fr = fr->fr_ಮುಂದಿನ)
 	    {
-		room += fr->fr_height - frame_minheight(fr, NULL);
-		if (fr == curfr)
-		    break;
+		ಸ್ಥಳ += fr->fr_ಎತ್ತರ - ಚೌಕಟ್ಟು_minheight(fr, ಖಾಲಿ);
+		ಆದರೆ (fr == curfr)
+		    ನಿಲ್ಲಿಸು;
 	    }
 	}
-	fr = curfr->fr_next;		// put fr at frame that grows
+	fr = curfr->fr_ಮುಂದಿನ;		// put fr at frame that grows
     }
-    else    // drag down
+    ಇಲ್ಲದಿದ್ದರೆ    // drag down
     {
-	up = FALSE;
+	ಮೇಲೆ = FALSE;
 	/*
 	 * Only dragging the last status line can reduce p_ch.
 	 */
-	room = Rows - cmdline_row;
-	if (curfr->fr_next == NULL)
-	    --room;
-	else
-	    room -= p_ch;
-	if (room < 0)
-	    room = 0;
+	ಸ್ಥಳ = ಅಡ್ಡಸಾಲುಗಳು - cmdline_ಅಡ್ಡಸಾಲು;
+	ಆದರೆ (curfr->fr_ಮುಂದಿನ == ಖಾಲಿ)
+	    --ಸ್ಥಳ;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಸ್ಥಳ -= p_ch;
+	ಆದರೆ (ಸ್ಥಳ < 0)
+	    ಸ್ಥಳ = 0;
 	// sum up the room of frames below of the current one
-	FOR_ALL_FRAMES(fr, curfr->fr_next)
-	    room += fr->fr_height - frame_minheight(fr, NULL);
+	FOR_ALL_ಚೌಕಟ್ಟುಗಳು(fr, curfr->fr_ಮುಂದಿನ)
+	    ಸ್ಥಳ += fr->fr_ಎತ್ತರ - ಚೌಕಟ್ಟು_minheight(fr, ಖಾಲಿ);
 	fr = curfr;			// put fr at window that grows
     }
 
-    if (room < offset)		// Not enough room
-	offset = room;		// Move as far as we can
-    if (offset <= 0)
-	return;
+    ಆದರೆ (ಸ್ಥಳ < ಸ್ಥಾನಾಂತರ)		// Not enough room
+	ಸ್ಥಾನಾಂತರ = ಸ್ಥಳ;		// Move as far as we can
+    ಆದರೆ (ಸ್ಥಾನಾಂತರ <= 0)
+	ಹಿಂತಿರುಗಿ;
 
     /*
      * Grow frame fr by "offset" lines.
      * Doesn't happen when dragging the last status line up.
      */
-    if (fr != NULL)
-	frame_new_height(fr, fr->fr_height + offset, up, FALSE, TRUE);
+    ಆದರೆ (fr != ಖಾಲಿ)
+	ಚೌಕಟ್ಟು_new_ಎತ್ತರ(fr, fr->fr_ಎತ್ತರ + ಸ್ಥಾನಾಂತರ, ಮೇಲೆ, FALSE, TRUE);
 
-    if (up)
+    ಆದರೆ (ಮೇಲೆ)
 	fr = curfr;		// current frame gets smaller
-    else
-	fr = curfr->fr_next;	// next frame gets smaller
+    ಇಲ್ಲದಿದ್ದರೆ
+	fr = curfr->fr_ಮುಂದಿನ;	// next frame gets smaller
 
     /*
      * Now make the other frames smaller.
      */
-    while (fr != NULL && offset > 0)
+    ಆಗ (fr != ಖಾಲಿ && ಸ್ಥಾನಾಂತರ > 0)
     {
-	n = frame_minheight(fr, NULL);
-	if (fr->fr_height - offset <= n)
+	n = ಚೌಕಟ್ಟು_minheight(fr, ಖಾಲಿ);
+	ಆದರೆ (fr->fr_ಎತ್ತರ - ಸ್ಥಾನಾಂತರ <= n)
 	{
-	    offset -= fr->fr_height - n;
-	    frame_new_height(fr, n, !up, FALSE, TRUE);
+	    ಸ್ಥಾನಾಂತರ -= fr->fr_ಎತ್ತರ - n;
+	    ಚೌಕಟ್ಟು_new_ಎತ್ತರ(fr, n, !ಮೇಲೆ, FALSE, TRUE);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    frame_new_height(fr, fr->fr_height - offset, !up, FALSE, TRUE);
-	    break;
+	    ಚೌಕಟ್ಟು_new_ಎತ್ತರ(fr, fr->fr_ಎತ್ತರ - ಸ್ಥಾನಾಂತರ, !ಮೇಲೆ, FALSE, TRUE);
+	    ನಿಲ್ಲಿಸು;
 	}
-	if (up)
+	ಆದರೆ (ಮೇಲೆ)
 	    fr = fr->fr_prev;
-	else
-	    fr = fr->fr_next;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    fr = fr->fr_ಮುಂದಿನ;
     }
     win_comp_pos();
     win_fix_scroll(TRUE);
@@ -7130,123 +7130,123 @@ win_drag_status_line(win_T *dragwin, int offset)
 /*
  * Separator line of dragwin is dragged "offset" lines right (negative is left).
  */
-    void
-win_drag_vsep_line(win_T *dragwin, int offset)
+    ಶೂನ್ಯ
+win_drag_vsep_ಸಾಲು(win_T *dragwin, ಪೂರ್ಣಾಂಕ ಸ್ಥಾನಾಂತರ)
 {
-    frame_T	*curfr;
-    frame_T	*fr;
-    int		room;
-    int		left;	// if TRUE, drag separator line left, otherwise right
-    int		n;
+    ಚೌಕಟ್ಟು_T	*curfr;
+    ಚೌಕಟ್ಟು_T	*fr;
+    ಪೂರ್ಣಾಂಕ		ಸ್ಥಳ;
+    ಪೂರ್ಣಾಂಕ		ಎಡ_2;	// if TRUE, drag separator line left, otherwise right
+    ಪೂರ್ಣಾಂಕ		n;
 
-    fr = dragwin->w_frame;
-    if (fr == topframe)		// only one window (cannot happen?)
-	return;
+    fr = dragwin->w_ಚೌಕಟ್ಟು;
+    ಆದರೆ (fr == topframe)		// only one window (cannot happen?)
+	ಹಿಂತಿರುಗಿ;
     curfr = fr;
-    fr = fr->fr_parent;
+    fr = fr->fr_ಪೋಷಕ;
     // When the parent frame is not a row of frames, its parent should be.
-    if (fr->fr_layout != FR_ROW)
+    ಆದರೆ (fr->fr_layout != FR_ಅಡ್ಡಸಾಲು)
     {
-	if (fr == topframe)	// only a column of windows (cannot happen?)
-	    return;
+	ಆದರೆ (fr == topframe)	// only a column of windows (cannot happen?)
+	    ಹಿಂತಿರುಗಿ;
 	curfr = fr;
-	fr = fr->fr_parent;
+	fr = fr->fr_ಪೋಷಕ;
     }
 
     // If this is the last frame in a row, may want to resize a parent
     // frame instead.
-    while (curfr->fr_next == NULL)
+    ಆಗ (curfr->fr_ಮುಂದಿನ == ಖಾಲಿ)
     {
-	if (fr == topframe)
-	    break;
+	ಆದರೆ (fr == topframe)
+	    ನಿಲ್ಲಿಸು;
 	curfr = fr;
-	fr = fr->fr_parent;
-	if (fr != topframe)
+	fr = fr->fr_ಪೋಷಕ;
+	ಆದರೆ (fr != topframe)
 	{
 	    curfr = fr;
-	    fr = fr->fr_parent;
+	    fr = fr->fr_ಪೋಷಕ;
 	}
     }
 
-    if (offset < 0) // drag left
+    ಆದರೆ (ಸ್ಥಾನಾಂತರ < 0) // drag left
     {
-	left = TRUE;
-	offset = -offset;
+	ಎಡ_2 = TRUE;
+	ಸ್ಥಾನಾಂತರ = -ಸ್ಥಾನಾಂತರ;
 	// sum up the room of the current frame and left of it
-	room = 0;
-	for (fr = fr->fr_child; ; fr = fr->fr_next)
+	ಸ್ಥಳ = 0;
+	ಗಾಗಿ (fr = fr->fr_ಮಗು; ; fr = fr->fr_ಮುಂದಿನ)
 	{
-	    room += fr->fr_width - frame_minwidth(fr, NULL);
-	    if (fr == curfr)
-		break;
+	    ಸ್ಥಳ += fr->fr_ಅಗಲ - ಚೌಕಟ್ಟು_minwidth(fr, ಖಾಲಿ);
+	    ಆದರೆ (fr == curfr)
+		ನಿಲ್ಲಿಸು;
 	}
-	fr = curfr->fr_next;		// put fr at frame that grows
+	fr = curfr->fr_ಮುಂದಿನ;		// put fr at frame that grows
     }
-    else    // drag right
+    ಇಲ್ಲದಿದ್ದರೆ    // drag right
     {
-	left = FALSE;
+	ಎಡ_2 = FALSE;
 	// sum up the room of frames right of the current one
-	room = 0;
-	FOR_ALL_FRAMES(fr, curfr->fr_next)
-	    room += fr->fr_width - frame_minwidth(fr, NULL);
+	ಸ್ಥಳ = 0;
+	FOR_ALL_ಚೌಕಟ್ಟುಗಳು(fr, curfr->fr_ಮುಂದಿನ)
+	    ಸ್ಥಳ += fr->fr_ಅಗಲ - ಚೌಕಟ್ಟು_minwidth(fr, ಖಾಲಿ);
 	fr = curfr;			// put fr at window that grows
     }
 
-    if (room < offset)		// Not enough room
-	offset = room;		// Move as far as we can
-    if (offset <= 0)		// No room at all, quit.
-	return;
-    if (fr == NULL)
+    ಆದರೆ (ಸ್ಥಳ < ಸ್ಥಾನಾಂತರ)		// Not enough room
+	ಸ್ಥಾನಾಂತರ = ಸ್ಥಳ;		// Move as far as we can
+    ಆದರೆ (ಸ್ಥಾನಾಂತರ <= 0)		// No room at all, quit.
+	ಹಿಂತಿರುಗಿ;
+    ಆದರೆ (fr == ಖಾಲಿ)
 	// This can happen when calling win_move_separator() on the rightmost
 	// window.  Just don't do anything.
-	return;
+	ಹಿಂತಿರುಗಿ;
 
     // grow frame fr by offset lines
-    frame_new_width(fr, fr->fr_width + offset, left, FALSE);
+    ಚೌಕಟ್ಟು_new_ಅಗಲ(fr, fr->fr_ಅಗಲ + ಸ್ಥಾನಾಂತರ, ಎಡ_2, FALSE);
 
     // shrink other frames: current and at the left or at the right
-    if (left)
+    ಆದರೆ (ಎಡ_2)
 	fr = curfr;		// current frame gets smaller
-    else
-	fr = curfr->fr_next;	// next frame gets smaller
+    ಇಲ್ಲದಿದ್ದರೆ
+	fr = curfr->fr_ಮುಂದಿನ;	// next frame gets smaller
 
-    while (fr != NULL && offset > 0)
+    ಆಗ (fr != ಖಾಲಿ && ಸ್ಥಾನಾಂತರ > 0)
     {
-	n = frame_minwidth(fr, NULL);
-	if (fr->fr_width - offset <= n)
+	n = ಚೌಕಟ್ಟು_minwidth(fr, ಖಾಲಿ);
+	ಆದರೆ (fr->fr_ಅಗಲ - ಸ್ಥಾನಾಂತರ <= n)
 	{
-	    offset -= fr->fr_width - n;
-	    frame_new_width(fr, n, !left, FALSE);
+	    ಸ್ಥಾನಾಂತರ -= fr->fr_ಅಗಲ - n;
+	    ಚೌಕಟ್ಟು_new_ಅಗಲ(fr, n, !ಎಡ_2, FALSE);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    frame_new_width(fr, fr->fr_width - offset, !left, FALSE);
-	    break;
+	    ಚೌಕಟ್ಟು_new_ಅಗಲ(fr, fr->fr_ಅಗಲ - ಸ್ಥಾನಾಂತರ, !ಎಡ_2, FALSE);
+	    ನಿಲ್ಲಿಸು;
 	}
-	if (left)
+	ಆದರೆ (ಎಡ_2)
 	    fr = fr->fr_prev;
-	else
-	    fr = fr->fr_next;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    fr = fr->fr_ಮುಂದಿನ;
     }
     win_comp_pos();
     redraw_all_later(UPD_NOT_VALID);
 }
 
-#define FRACTION_MULT	16384L
+#ವ್ಯಾಖ್ಯಾನಿಸು FRACTION_MULT	16384L
 
 /*
  * Set wp->w_fraction for the current w_wrow and w_height.
  * Has no effect when the window is less than two lines.
  */
-    void
-set_fraction(win_T *wp)
+    ಶೂನ್ಯ
+ಗಣ_fraction(win_T *wp)
 {
-    if (wp->w_height > 1)
+    ಆದರೆ (wp->w_ಎತ್ತರ > 1)
 	// When cursor is in the first line the percentage is computed as if
 	// it's halfway that line.  Thus with two lines it is 25%, with three
 	// lines 17%, etc.  Similarly for the last line: 75%, 83%, etc.
-	wp->w_fraction = ((long)wp->w_wrow * FRACTION_MULT
-				     + FRACTION_MULT / 2) / (long)wp->w_height;
+	wp->w_fraction = ((ದೀರ್ಘ)wp->w_wrow * FRACTION_MULT
+				     + FRACTION_MULT / 2) / (ದೀರ್ಘ)wp->w_ಎತ್ತರ;
 }
 
 /*
@@ -7258,29 +7258,29 @@ set_fraction(win_T *wp)
  * Requires a not fully visible cursor line to be allowed at the bottom of
  * a window ("zb"), probably only when 'smoothscroll' is also set.
  */
-    static void
-win_fix_scroll(int resize)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+win_fix_scroll(ಪೂರ್ಣಾಂಕ resize)
 {
-    if (*p_spk == 'c')
-	return;  // 'splitkeep' is "cursor"
+    ಆದರೆ (*p_spk == 'c')
+	ಹಿಂತಿರುಗಿ;  // 'splitkeep' is "cursor"
 
     skip_update_topline = TRUE;
     win_T	*wp;
     FOR_ALL_WINDOWS(wp)
     {
 	// Skip when window height has not changed.
-	if (wp->w_height != wp->w_prev_height)
+	ಆದರೆ (wp->w_ಎತ್ತರ != wp->w_prev_ಎತ್ತರ)
 	{
 	    // Cursor position in this window may now be invalid.  It is kept
 	    // potentially invalid until the window is made the current window.
 	    wp->w_do_win_fix_cursor = true;
 
 	    // If window has moved update botline to keep the same screenlines.
-	    if (*p_spk == 's' && wp->w_winrow != wp->w_prev_winrow
-		      && wp->w_botline - 1 <= wp->w_buffer->b_ml.ml_line_count)
+	    ಆದರೆ (*p_spk == 's' && wp->w_winrow != wp->w_prev_winrow
+		      && wp->w_botline - 1 <= wp->w_ಬಫರ್->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
 	    {
-		int diff = (wp->w_winrow - wp->w_prev_winrow)
-					  + (wp->w_height - wp->w_prev_height);
+		ಪೂರ್ಣಾಂಕ diff = (wp->w_winrow - wp->w_prev_winrow)
+					  + (wp->w_ಎತ್ತರ - wp->w_prev_ಎತ್ತರ);
 		pos_T cursor = wp->w_cursor;
 		linenr_T topline = wp->w_topline;
 		colnr_T skipcol = wp->w_skipcol;
@@ -7288,36 +7288,36 @@ win_fix_scroll(int resize)
 		wp->w_cursor.lnum = wp->w_botline - 1;
 
 		//  Add difference in height and row to botline.
-		if (diff > 0)
-		    cursor_down_inner(wp, diff);
-		else
-		    cursor_up_inner(wp, -diff);
+		ಆದರೆ (diff > 0)
+		    cursor_ಕೆಳಕ್ಕೆ_inner(wp, diff);
+		ಇಲ್ಲದಿದ್ದರೆ
+		    cursor_ಮೇಲೆ_inner(wp, -diff);
 
 		// Scroll to put the new cursor position at the bottom of the
 		// screen.
 		wp->w_fraction = FRACTION_MULT;
-		scroll_to_fraction(wp, wp->w_prev_height);
+		scroll_ಗಮ್ಯ_fraction(wp, wp->w_prev_ಎತ್ತರ);
 
 		wp->w_cursor = cursor;
 		// Keeping the same screen lines includes the skipped columns.
-		if (wp->w_topline == topline)
+		ಆದರೆ (wp->w_topline == topline)
 		    wp->w_skipcol = skipcol;
 		wp->w_valid &= ~VALID_WCOL;
 	    }
-	    else if (wp == curwin)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (wp == curwin)
 		wp->w_valid &= ~VALID_CROW;
 
 	    invalidate_botline_win(wp);
 	    validate_botline_win(wp);
 	}
-	wp->w_prev_height = wp->w_height;
+	wp->w_prev_ಎತ್ತರ = wp->w_ಎತ್ತರ;
 	wp->w_prev_winrow = wp->w_winrow;
     }
     skip_update_topline = FALSE;
     // Ensure cursor is valid when not in normal mode or when resized.
-    if (!(get_real_state() & (MODE_NORMAL|MODE_CMDLINE|MODE_TERMINAL)))
+    ಆದರೆ (!(get_real_state() & (ಬಹುಲಕ_ಸಾಮಾನ್ಯ|ಬಹುಲಕ_CMDLINE|ಬಹುಲಕ_TERMINAL)))
 	win_fix_cursor(FALSE);
-    else if (resize)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (resize)
 	win_fix_cursor(TRUE);
 }
 
@@ -7327,49 +7327,49 @@ win_fix_scroll(int resize)
  * If we are not in normal mode ("normal" is FALSE), make it valid by scrolling
  * instead.
  */
-    static void
-win_fix_cursor(int normal)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+win_fix_cursor(ಪೂರ್ಣಾಂಕ ಸಾಮಾನ್ಯ_4)
 {
     win_T	*wp = curwin;
 
-    if (skip_win_fix_cursor
+    ಆದರೆ (skip_win_fix_cursor
 	    || !wp->w_do_win_fix_cursor
-	    || wp->w_buffer->b_ml.ml_line_count < wp->w_height)
-	return;
+	    || wp->w_ಬಫರ್->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ < wp->w_ಎತ್ತರ)
+	ಹಿಂತಿರುಗಿ;
 
     wp->w_do_win_fix_cursor = false;
     // Determine valid cursor range.
-    long so = MIN(wp->w_height / 2, get_scrolloff_value());
+    ದೀರ್ಘ so = MIN(wp->w_ಎತ್ತರ / 2, get_scrolloff_ಮೌಲ್ಯ());
     linenr_T lnum = wp->w_cursor.lnum;
 
     wp->w_cursor.lnum = wp->w_topline;
-    cursor_down_inner(wp, so);
-    linenr_T top = wp->w_cursor.lnum;
+    cursor_ಕೆಳಕ್ಕೆ_inner(wp, so);
+    linenr_T ತುದಿ = wp->w_cursor.lnum;
 
     wp->w_cursor.lnum = wp->w_botline - 1;
-    cursor_up_inner(wp, so);
+    cursor_ಮೇಲೆ_inner(wp, so);
     linenr_T bot = wp->w_cursor.lnum;
 
     wp->w_cursor.lnum = lnum;
 
     // Check if cursor position is above or below valid cursor range.
     linenr_T nlnum = 0;
-    if (lnum > bot && (wp->w_botline - wp->w_buffer->b_ml.ml_line_count) != 1)
+    ಆದರೆ (lnum > bot && (wp->w_botline - wp->w_ಬಫರ್->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ) != 1)
 	nlnum = bot;
-    else if (lnum < top && wp->w_topline != 1)
-	nlnum = (so == wp->w_height / 2) ? bot : top;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (lnum < ತುದಿ && wp->w_topline != 1)
+	nlnum = (so == wp->w_ಎತ್ತರ / 2) ? bot : ತುದಿ;
 
-    if (nlnum != 0)  // Cursor is invalid for current scroll position.
+    ಆದರೆ (nlnum != 0)  // Cursor is invalid for current scroll position.
     {
-	if (normal)  // Save to jumplist and set cursor to avoid scrolling.
+	ಆದರೆ (ಸಾಮಾನ್ಯ_4)  // Save to jumplist and set cursor to avoid scrolling.
 	{
 	    setmark('\'');
 	    wp->w_cursor.lnum = nlnum;
 	}
-	else  // Scroll instead when not in normal mode.
+	ಇಲ್ಲದಿದ್ದರೆ  // Scroll instead when not in normal mode.
 	{
 	    wp->w_fraction = (nlnum == bot) ? FRACTION_MULT : 0;
-	    scroll_to_fraction(wp, wp->w_prev_height);
+	    scroll_ಗಮ್ಯ_fraction(wp, wp->w_prev_ಎತ್ತರ);
 	    validate_botline();
 	}
     }
@@ -7381,164 +7381,164 @@ win_fix_cursor(int normal)
  * This takes care of the things inside the window, not what happens to the
  * window position, the frame or to other windows.
  */
-    void
-win_new_height(win_T *wp, int height)
+    ಶೂನ್ಯ
+win_new_ಎತ್ತರ(win_T *wp, ಪೂರ್ಣಾಂಕ ಎತ್ತರ)
 {
-    int		prev_height = wp->w_height;
+    ಪೂರ್ಣಾಂಕ		prev_ಎತ್ತರ = wp->w_ಎತ್ತರ;
 
     // Don't want a negative height.  Happens when splitting a tiny window.
     // Will equalize heights soon to fix it.
-    if (height < 0)
-	height = 0;
-    if (wp->w_height == height)
-	return;	    // nothing to do
+    ಆದರೆ (ಎತ್ತರ < 0)
+	ಎತ್ತರ = 0;
+    ಆದರೆ (wp->w_ಎತ್ತರ == ಎತ್ತರ)
+	ಹಿಂತಿರುಗಿ;	    // nothing to do
 
-    if (wp->w_height > 0)
+    ಆದರೆ (wp->w_ಎತ್ತರ > 0)
     {
-	if (wp == curwin && *p_spk == 'c')
+	ಆದರೆ (wp == curwin && *p_spk == 'c')
 	    // w_wrow needs to be valid. When setting 'laststatus' this may
 	    // call win_new_height() recursively.
 	    validate_cursor();
-	if (wp->w_height != prev_height)
-	    return;  // Recursive call already changed the size, bail out here
+	ಆದರೆ (wp->w_ಎತ್ತರ != prev_ಎತ್ತರ)
+	    ಹಿಂತಿರುಗಿ;  // Recursive call already changed the size, bail out here
 		     //	to avoid the following to mess things up.
-	if (wp->w_wrow != wp->w_prev_fraction_row)
-	    set_fraction(wp);
+	ಆದರೆ (wp->w_wrow != wp->w_prev_fraction_ಅಡ್ಡಸಾಲು)
+	    ಗಣ_fraction(wp);
     }
 
-    wp->w_height = height;
-    wp->w_redr_status = true;
+    wp->w_ಎತ್ತರ = ಎತ್ತರ;
+    wp->w_redr_ಸ್ಥಿತಿ = true;
     win_comp_scroll(wp);
 
     // There is no point in adjusting the scroll position when exiting.  Some
     // values might be invalid.
-    if (!exiting && *p_spk == 'c')
+    ಆದರೆ (!exiting && *p_spk == 'c')
     {
 	// With 'smoothscroll' w_skipcol is the scroll position, keep it.
 	// Otherwise it only keeps the cursor visible and is computed again.
-	if (!wp->w_p_sms)
+	ಆದರೆ (!wp->w_p_sms)
 	    wp->w_skipcol = 0;
-	scroll_to_fraction(wp, prev_height);
+	scroll_ಗಮ್ಯ_fraction(wp, prev_ಎತ್ತರ);
     }
 }
 
-    void
-scroll_to_fraction(win_T *wp, int prev_height)
+    ಶೂನ್ಯ
+scroll_ಗಮ್ಯ_fraction(win_T *wp, ಪೂರ್ಣಾಂಕ prev_ಎತ್ತರ)
 {
     linenr_T	lnum;
-    int		sline, line_size;
-    int		height = wp->w_height;
+    ಪೂರ್ಣಾಂಕ		sline, ಸಾಲು_ಗಾತ್ರ;
+    ಪೂರ್ಣಾಂಕ		ಎತ್ತರ = wp->w_ಎತ್ತರ;
 
     // Don't change w_topline in any of these cases:
     // - window height is 0
     // - 'scrollbind' is set and this isn't the current window
     // - window height is sufficient to display the whole buffer and first line
     //   is visible.
-    if (height > 0
+    ಆದರೆ (ಎತ್ತರ > 0
 	   && (!wp->w_p_scb || wp == curwin)
-	   && (height < wp->w_buffer->b_ml.ml_line_count || wp->w_topline > 1))
+	   && (ಎತ್ತರ < wp->w_ಬಫರ್->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ || wp->w_topline > 1))
     {
 	/*
 	 * Find a value for w_topline that shows the cursor at the same
 	 * relative position in the window as before (more or less).
 	 */
 	lnum = wp->w_cursor.lnum;
-	if (lnum < 1)		// can happen when starting up
+	ಆದರೆ (lnum < 1)		// can happen when starting up
 	    lnum = 1;
-	wp->w_wrow = ((long)wp->w_fraction * (long)height - 1L)
+	wp->w_wrow = ((ದೀರ್ಘ)wp->w_fraction * (ದೀರ್ಘ)ಎತ್ತರ - 1L)
 							       / FRACTION_MULT;
-	line_size = plines_win_col(wp, lnum, (long)(wp->w_cursor.col)) - 1;
-	sline = wp->w_wrow - line_size;
+	ಸಾಲು_ಗಾತ್ರ = plines_win_ಲಂಬಸಾಲು(wp, lnum, (ದೀರ್ಘ)(wp->w_cursor.ಲಂಬಸಾಲು)) - 1;
+	sline = wp->w_wrow - ಸಾಲು_ಗಾತ್ರ;
 
-	if (sline >= 0)
+	ಆದರೆ (sline >= 0)
 	{
 	    // Make sure the whole cursor line is visible, if possible.
-	    int rows = plines_win(wp, lnum, FALSE);
+	    ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು_2 = plines_win(wp, lnum, FALSE);
 
-	    if (sline > wp->w_height - rows)
+	    ಆದರೆ (sline > wp->w_ಎತ್ತರ - ಅಡ್ಡಸಾಲುಗಳು_2)
 	    {
-		sline = wp->w_height - rows;
-		wp->w_wrow -= rows - line_size;
+		sline = wp->w_ಎತ್ತರ - ಅಡ್ಡಸಾಲುಗಳು_2;
+		wp->w_wrow -= ಅಡ್ಡಸಾಲುಗಳು_2 - ಸಾಲು_ಗಾತ್ರ;
 	    }
 	}
 
-	if (sline < 0)
+	ಆದರೆ (sline < 0)
 	{
 	    /*
 	     * Cursor line would go off top of screen if w_wrow was this high.
 	     * Make cursor line the first line in the window.  If not enough
 	     * room use w_skipcol;
 	     */
-	    int		want_row = wp->w_wrow;	// where the cursor should be
+	    ಪೂರ್ಣಾಂಕ		want_ಅಡ್ಡಸಾಲು = wp->w_wrow;	// where the cursor should be
 
-	    wp->w_wrow = line_size;
-	    if (wp->w_wrow >= wp->w_height
-				       && (wp->w_width - win_col_off(wp)) > 0)
+	    wp->w_wrow = ಸಾಲು_ಗಾತ್ರ;
+	    ಆದರೆ (wp->w_wrow >= wp->w_ಎತ್ತರ
+				       && (wp->w_ಅಗಲ - win_ಲಂಬಸಾಲು_off(wp)) > 0)
 	    {
 		// Skip columns to get the cursor in the wanted row.
-		colnr_T	skipcol = wp->w_width - win_col_off(wp);
+		colnr_T	skipcol = wp->w_ಅಗಲ - win_ಲಂಬಸಾಲು_off(wp);
 
 		--wp->w_wrow;
-		while (wp->w_wrow > want_row)
+		ಆಗ (wp->w_wrow > want_ಅಡ್ಡಸಾಲು)
 		{
-		    skipcol += wp->w_width - win_col_off(wp) + win_col_off2(wp);
+		    skipcol += wp->w_ಅಗಲ - win_ಲಂಬಸಾಲು_off(wp) + win_ಲಂಬಸಾಲು_off2(wp);
 		    --wp->w_wrow;
 		}
 		wp->w_skipcol = skipcol;
 	    }
 	}
-	else if (sline > 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (sline > 0)
 	{
-	    while (sline > 0 && lnum > 1)
+	    ಆಗ (sline > 0 && lnum > 1)
 	    {
-#ifdef FEAT_FOLDING
-		hasFoldingWin(wp, lnum, &lnum, NULL, TRUE, NULL);
-		if (lnum == 1)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_FOLDING
+		hasFoldingWin(wp, lnum, &lnum, ಖಾಲಿ, TRUE, ಖಾಲಿ);
+		ಆದರೆ (lnum == 1)
 		{
 		    // first line in buffer is folded
-		    line_size = 1;
+		    ಸಾಲು_ಗಾತ್ರ = 1;
 		    --sline;
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		--lnum;
-#ifdef FEAT_DIFF
-		if (lnum == wp->w_topline)
-		    line_size = plines_win_nofill(wp, lnum, TRUE)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
+		ಆದರೆ (lnum == wp->w_topline)
+		    ಸಾಲು_ಗಾತ್ರ = plines_win_nofill(wp, lnum, TRUE)
 							      + wp->w_topfill;
-		else
-#endif
-		    line_size = plines_win(wp, lnum, TRUE);
-		sline -= line_size;
+		ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+		    ಸಾಲು_ಗಾತ್ರ = plines_win(wp, lnum, TRUE);
+		sline -= ಸಾಲು_ಗಾತ್ರ;
 	    }
 
-	    if (sline < 0)
+	    ಆದರೆ (sline < 0)
 	    {
 		/*
 		 * Line we want at top would go off top of screen.  Use next
 		 * line instead.
 		 */
-#ifdef FEAT_FOLDING
-		hasFoldingWin(wp, lnum, NULL, &lnum, TRUE, NULL);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_FOLDING
+		hasFoldingWin(wp, lnum, ಖಾಲಿ, &lnum, TRUE, ಖಾಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ
 		lnum++;
-		wp->w_wrow -= line_size + sline;
+		wp->w_wrow -= ಸಾಲು_ಗಾತ್ರ + sline;
 	    }
-	    else if (sline > 0)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (sline > 0)
 	    {
 		// First line of file reached, use that as topline.
 		lnum = 1;
 		wp->w_wrow -= sline;
 	    }
 	}
-	set_topline(wp, lnum);
+	ಗಣ_topline(wp, lnum);
     }
 
-    if (wp == curwin)
+    ಆದರೆ (wp == curwin)
 	curs_columns(FALSE);	// validate w_wrow
 
-    if (prev_height > 0)
-	wp->w_prev_fraction_row = wp->w_wrow;
+    ಆದರೆ (prev_ಎತ್ತರ > 0)
+	wp->w_prev_fraction_ಅಡ್ಡಸಾಲು = wp->w_wrow;
 
     redraw_win_later(wp, UPD_SOME_VALID);
     invalidate_botline_win(wp);
@@ -7547,111 +7547,111 @@ scroll_to_fraction(win_T *wp, int prev_height)
 /*
  * Set the width of a window.
  */
-    void
-win_new_width(win_T *wp, int width)
+    ಶೂನ್ಯ
+win_new_ಅಗಲ(win_T *wp, ಪೂರ್ಣಾಂಕ ಅಗಲ)
 {
     // Should we give an error if width < 0?
-    wp->w_width = width < 0 ? 0 : width;
-    wp->w_lines_valid = 0;
-    changed_line_abv_curs_win(wp);
+    wp->w_ಅಗಲ = ಅಗಲ < 0 ? 0 : ಅಗಲ;
+    wp->w_ಸಾಲುಗಳು_valid = 0;
+    ಬದಲಾಯಿತು_ಸಾಲು_abv_curs_win(wp);
     invalidate_botline_win(wp);
 
-    if (wp == curwin && *p_spk == 'c')
+    ಆದರೆ (wp == curwin && *p_spk == 'c')
 	curs_columns(TRUE);	// validate w_wrow
 
     redraw_win_later(wp, UPD_NOT_VALID);
-    wp->w_redr_status = true;
+    wp->w_redr_ಸ್ಥಿತಿ = true;
 }
 
-    void
+    ಶೂನ್ಯ
 win_comp_scroll(win_T *wp)
 {
-#if defined(FEAT_EVAL)
-    int old_w_p_scr = wp->w_p_scr;
-#endif
+#ಆದರೆ defined(FEAT_EVAL)
+    ಪೂರ್ಣಾಂಕ old_w_p_scr = wp->w_p_scr;
+#ಆದರೆ_ಅಂತ್ಯ
 
-    wp->w_p_scr = ((unsigned)wp->w_height >> 1);
-    if (wp->w_p_scr == 0)
+    wp->w_p_scr = ((ಚಿಹ್ನೆರಹಿತ)wp->w_ಎತ್ತರ >> 1);
+    ಆದರೆ (wp->w_p_scr == 0)
 	wp->w_p_scr = 1;
-#if defined(FEAT_EVAL)
-    if (wp->w_p_scr != old_w_p_scr)
+#ಆದರೆ defined(FEAT_EVAL)
+    ಆದರೆ (wp->w_p_scr != old_w_p_scr)
     {
 	// Used by "verbose set scroll".
 	wp->w_p_script_ctx[WV_SCROLL].sc_sid = SID_WINLAYOUT;
 	wp->w_p_script_ctx[WV_SCROLL].sc_lnum = 0;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Command_height: called whenever p_ch has been changed.
  */
-    void
-command_height(void)
+    ಶೂನ್ಯ
+command_ಎತ್ತರ(ಶೂನ್ಯ)
 {
-    int		old_p_ch = curtab->tp_ch_used;
+    ಪೂರ್ಣಾಂಕ		old_p_ch = curtab->tp_ch_ಬಳಸಿದ;
 
     // Find bottom frame with width of screen.
-    frame_T *frp = lastwin->w_frame;
-    while (frp->fr_width != topframe->fr_width && frp->fr_parent != NULL)
-	frp = frp->fr_parent;
+    ಚೌಕಟ್ಟು_T *frp = lastwin->w_ಚೌಕಟ್ಟು;
+    ಆಗ (frp->fr_ಅಗಲ != topframe->fr_ಅಗಲ && frp->fr_ಪೋಷಕ != ಖಾಲಿ)
+	frp = frp->fr_ಪೋಷಕ;
 
     // Avoid changing the height of a window with 'winfixheight' set.
-    while (frp->fr_prev != NULL && frp->fr_layout == FR_LEAF
+    ಆಗ (frp->fr_prev != ಖಾಲಿ && frp->fr_layout == FR_ಎಲೆ
 						      && frp->fr_win->w_p_wfh)
 	frp = frp->fr_prev;
 
-    while (p_ch > old_p_ch && command_frame_height)
+    ಆಗ (p_ch > old_p_ch && command_ಚೌಕಟ್ಟು_ಎತ್ತರ)
     {
-	if (frp == NULL)
+	ಆದರೆ (frp == ಖಾಲಿ)
 	{
-	    emsg(_(e_not_enough_room));
+	    emsg(_(e_not_enough_ಸ್ಥಳ));
 	    p_ch = old_p_ch;
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
-	int h = MIN(p_ch - old_p_ch,
-			frp->fr_height - frame_minheight(frp, NULL));
-	frame_add_height(frp, -h);
+	ಪೂರ್ಣಾಂಕ h = MIN(p_ch - old_p_ch,
+			frp->fr_ಎತ್ತರ - ಚೌಕಟ್ಟು_minheight(frp, ಖಾಲಿ));
+	ಚೌಕಟ್ಟು_ಕೂಡಿಸು_ಎತ್ತರ(frp, -h);
 	old_p_ch += h;
 	frp = frp->fr_prev;
     }
-    if (p_ch < old_p_ch && command_frame_height && frp != NULL)
-	frame_add_height(frp, (int)(old_p_ch - p_ch));
+    ಆದರೆ (p_ch < old_p_ch && command_ಚೌಕಟ್ಟು_ಎತ್ತರ && frp != ಖಾಲಿ)
+	ಚೌಕಟ್ಟು_ಕೂಡಿಸು_ಎತ್ತರ(frp, (ಪೂರ್ಣಾಂಕ)(old_p_ch - p_ch));
 
     // Recompute window positions.
     win_comp_pos();
     win_fix_scroll(true);
-    cmdline_row = Rows - p_ch;
+    cmdline_ಅಡ್ಡಸಾಲು = ಅಡ್ಡಸಾಲುಗಳು - p_ch;
     redraw_cmdline = TRUE;
 
     // Clear the cmdheight area.
-    if (msg_scrolled == 0 && full_screen)
+    ಆದರೆ (ಸಂದೇಶ_scrolled == 0 && ತುಂಬಿದ_screen)
     {
-	screen_fill(cmdline_row, (int)Rows, 0, (int)Columns, ' ', ' ', 0);
-	msg_row = cmdline_row;
+	screen_fill(cmdline_ಅಡ್ಡಸಾಲು, (ಪೂರ್ಣಾಂಕ)ಅಡ್ಡಸಾಲುಗಳು, 0, (ಪೂರ್ಣಾಂಕ)Columns, ' ', ' ', 0);
+	ಸಂದೇಶ_ಅಡ್ಡಸಾಲು = cmdline_ಅಡ್ಡಸಾಲು;
     }
 
     // Use the value of p_ch that we remembered.  This is needed for when the
     // GUI starts up, we can't be sure in what order things happen.  And when
     // p_ch was changed in another tab page.
-    curtab->tp_ch_used = p_ch;
-    min_set_ch = p_ch;
+    curtab->tp_ch_ಬಳಸಿದ = p_ch;
+    min_ಗಣ_ch = p_ch;
 }
 
 /*
  * Resize frame "frp" to be "n" lines higher (negative for less high).
  * Also resize the frames it is contained in.
  */
-    static void
-frame_add_height(frame_T *frp, int n)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಚೌಕಟ್ಟು_ಕೂಡಿಸು_ಎತ್ತರ(ಚೌಕಟ್ಟು_T *frp, ಪೂರ್ಣಾಂಕ n)
 {
-    frame_new_height(frp, frp->fr_height + n, FALSE, FALSE, FALSE);
-    for (;;)
+    ಚೌಕಟ್ಟು_new_ಎತ್ತರ(frp, frp->fr_ಎತ್ತರ + n, FALSE, FALSE, FALSE);
+    ಗಾಗಿ (;;)
     {
-	frp = frp->fr_parent;
-	if (frp == NULL)
-	    break;
-	frp->fr_height += n;
+	frp = frp->fr_ಪೋಷಕ;
+	ಆದರೆ (frp == ಖಾಲಿ)
+	    ನಿಲ್ಲಿಸು;
+	frp->fr_ಎತ್ತರ += n;
     }
 }
 
@@ -7659,169 +7659,169 @@ frame_add_height(frame_T *frp, int n)
  * Add or remove a status line for the bottom window(s), according to the
  * value of 'laststatus'.
  */
-    void
-last_status(
-    int		morewin)	// pretend there are two or more windows
+    ಶೂನ್ಯ
+ಕೊನೆಯ_ಸ್ಥಿತಿ(
+    ಪೂರ್ಣಾಂಕ		morewin)	// pretend there are two or more windows
 {
     // Don't make a difference between horizontal or vertical split.
-    last_status_rec(topframe, last_stl_height(morewin) > 0);
-#if defined(FEAT_STL_OPT)
-    frame_change_statusline_height();
-#endif
+    ಕೊನೆಯ_ಸ್ಥಿತಿ_rec(topframe, ಕೊನೆಯ_stl_ಎತ್ತರ(morewin) > 0);
+#ಆದರೆ defined(FEAT_STL_OPT)
+    ಚೌಕಟ್ಟು_change_statusline_ಎತ್ತರ();
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-    static void
-last_status_rec(frame_T *fr, int statusline)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಕೊನೆಯ_ಸ್ಥಿತಿ_rec(ಚೌಕಟ್ಟು_T *fr, ಪೂರ್ಣಾಂಕ statusline)
 {
-    frame_T	*fp;
+    ಚೌಕಟ್ಟು_T	*fp;
     win_T	*wp;
 
-    if (fr->fr_layout == FR_LEAF)
+    ಆದರೆ (fr->fr_layout == FR_ಎಲೆ)
     {
 	wp = fr->fr_win;
-	if (wp->w_status_height != 0 && !statusline)
+	ಆದರೆ (wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ != 0 && !statusline)
 	{
 	    // remove status line
-	    win_new_height(wp, wp->w_height + wp->w_status_height);
-	    wp->w_status_height = 0;
-	    comp_col();
+	    win_new_ಎತ್ತರ(wp, wp->w_ಎತ್ತರ + wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ);
+	    wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ = 0;
+	    comp_ಲಂಬಸಾಲು();
 	}
-	else if (wp->w_status_height == 0 && statusline)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ == 0 && statusline)
 	{
 	    // Find a frame to take a line from.
 	    fp = fr;
-	    while (fp->fr_height <= frame_minheight(fp, NULL))
+	    ಆಗ (fp->fr_ಎತ್ತರ <= ಚೌಕಟ್ಟು_minheight(fp, ಖಾಲಿ))
 	    {
-		if (fp == topframe)
+		ಆದರೆ (fp == topframe)
 		{
-		    emsg(_(e_not_enough_room));
-		    return;
+		    emsg(_(e_not_enough_ಸ್ಥಳ));
+		    ಹಿಂತಿರುಗಿ;
 		}
 		// In a column of frames: go to frame above.  If already at
 		// the top or in a row of frames: go to parent.
-		if (fp->fr_parent->fr_layout == FR_COL && fp->fr_prev != NULL)
+		ಆದರೆ (fp->fr_ಪೋಷಕ->fr_layout == FR_ಲಂಬಸಾಲು && fp->fr_prev != ಖಾಲಿ)
 		    fp = fp->fr_prev;
-		else
-		    fp = fp->fr_parent;
+		ಇಲ್ಲದಿದ್ದರೆ
+		    fp = fp->fr_ಪೋಷಕ;
 	    }
-	    wp->w_status_height = statusline_height(wp);
-	    if (fp != fr)
+	    wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ = statusline_ಎತ್ತರ(wp);
+	    ಆದರೆ (fp != fr)
 	    {
-		frame_new_height(fp, fp->fr_height - wp->w_status_height,
+		ಚೌಕಟ್ಟು_new_ಎತ್ತರ(fp, fp->fr_ಎತ್ತರ - wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ,
 			FALSE, FALSE, FALSE);
-		frame_fix_height(wp);
+		ಚೌಕಟ್ಟು_fix_ಎತ್ತರ(wp);
 		win_comp_pos();
 	    }
-	    else
-		win_new_height(wp, wp->w_height - wp->w_status_height);
-	    comp_col();
+	    ಇಲ್ಲದಿದ್ದರೆ
+		win_new_ಎತ್ತರ(wp, wp->w_ಎತ್ತರ - wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ);
+	    comp_ಲಂಬಸಾಲು();
 	    redraw_all_later(UPD_SOME_VALID);
 	}
 	// Set prev_height when difference is due to 'laststatus'.
-	if (abs(wp->w_height - wp->w_prev_height) == 1)
-	    wp->w_prev_height = wp->w_height;
+	ಆದರೆ (ನಿರಪೇಕ್ಷ(wp->w_ಎತ್ತರ - wp->w_prev_ಎತ್ತರ) == 1)
+	    wp->w_prev_ಎತ್ತರ = wp->w_ಎತ್ತರ;
     }
-    else if (fr->fr_layout == FR_ROW)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (fr->fr_layout == FR_ಅಡ್ಡಸಾಲು)
     {
 	// vertically split windows, set status line for each one
-	if (!statusline)
+	ಆದರೆ (!statusline)
 	{
-	    FOR_ALL_FRAMES(fp, fr->fr_child)
-		last_status_rec(fp, statusline);
+	    FOR_ALL_ಚೌಕಟ್ಟುಗಳು(fp, fr->fr_ಮಗು)
+		ಕೊನೆಯ_ಸ್ಥಿತಿ_rec(fp, statusline);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    frame_T	*fp2;
-	    int		max_stlh = 0;
-	    int		new_row_height;
+	    ಚೌಕಟ್ಟು_T	*fp2;
+	    ಪೂರ್ಣಾಂಕ		max_stlh = 0;
+	    ಪೂರ್ಣಾಂಕ		new_ಅಡ್ಡಸಾಲು_ಎತ್ತರ;
 
 	    // Find the max status height needed across all leaf windows.
-	    FOR_ALL_FRAMES(fp, fr->fr_child)
-		if (fp->fr_win != NULL && fp->fr_win->w_status_height == 0)
+	    FOR_ALL_ಚೌಕಟ್ಟುಗಳು(fp, fr->fr_ಮಗು)
+		ಆದರೆ (fp->fr_win != ಖಾಲಿ && fp->fr_win->w_ಸ್ಥಿತಿ_ಎತ್ತರ == 0)
 		{
-		    int h = statusline_height(fp->fr_win);
-		    if (h > max_stlh)
+		    ಪೂರ್ಣಾಂಕ h = statusline_ಎತ್ತರ(fp->fr_win);
+		    ಆದರೆ (h > max_stlh)
 			max_stlh = h;
 		}
-	    if (max_stlh == 0)
-		return;
+	    ಆದರೆ (max_stlh == 0)
+		ಹಿಂತಿರುಗಿ;
 
 	    // Find a frame to take max_stlh lines from.
 	    fp2 = fr;
-	    while (fp2->fr_height - frame_minheight(fp2, NULL) < max_stlh)
+	    ಆಗ (fp2->fr_ಎತ್ತರ - ಚೌಕಟ್ಟು_minheight(fp2, ಖಾಲಿ) < max_stlh)
 	    {
-		if (fp2 == topframe)
+		ಆದರೆ (fp2 == topframe)
 		{
-		    emsg(_(e_not_enough_room));
-		    return;
+		    emsg(_(e_not_enough_ಸ್ಥಳ));
+		    ಹಿಂತಿರುಗಿ;
 		}
-		if (fp2->fr_parent->fr_layout == FR_COL
-						&& fp2->fr_prev != NULL)
+		ಆದರೆ (fp2->fr_ಪೋಷಕ->fr_layout == FR_ಲಂಬಸಾಲು
+						&& fp2->fr_prev != ಖಾಲಿ)
 		    fp2 = fp2->fr_prev;
-		else
-		    fp2 = fp2->fr_parent;
+		ಇಲ್ಲದಿದ್ದರೆ
+		    fp2 = fp2->fr_ಪೋಷಕ;
 	    }
 
-	    if (fp2 != fr)
+	    ಆದರೆ (fp2 != fr)
 	    {
-		frame_new_height(fp2, fp2->fr_height - max_stlh,
+		ಚೌಕಟ್ಟು_new_ಎತ್ತರ(fp2, fp2->fr_ಎತ್ತರ - max_stlh,
 							FALSE, FALSE, FALSE);
-		new_row_height = fr->fr_height + max_stlh;
+		new_ಅಡ್ಡಸಾಲು_ಎತ್ತರ = fr->fr_ಎತ್ತರ + max_stlh;
 	    }
-	    else
-		new_row_height = fr->fr_height;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		new_ಅಡ್ಡಸಾಲು_ಎತ್ತರ = fr->fr_ಎತ್ತರ;
 
 	    // Set status and content heights for all leaves.
-	    FOR_ALL_FRAMES(fp, fr->fr_child)
+	    FOR_ALL_ಚೌಕಟ್ಟುಗಳು(fp, fr->fr_ಮಗು)
 	    {
-		if (fp->fr_win != NULL)
+		ಆದರೆ (fp->fr_win != ಖಾಲಿ)
 		{
 		    wp = fp->fr_win;
-		    if (wp->w_status_height == 0)
+		    ಆದರೆ (wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ == 0)
 		    {
-			wp->w_status_height = statusline_height(wp);
-			win_new_height(wp,
-				  new_row_height - wp->w_status_height);
-			frame_fix_height(wp);
-			comp_col();
+			wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ = statusline_ಎತ್ತರ(wp);
+			win_new_ಎತ್ತರ(wp,
+				  new_ಅಡ್ಡಸಾಲು_ಎತ್ತರ - wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ);
+			ಚೌಕಟ್ಟು_fix_ಎತ್ತರ(wp);
+			comp_ಲಂಬಸಾಲು();
 			redraw_all_later(UPD_SOME_VALID);
-			if (abs(wp->w_height - wp->w_prev_height) == 1)
-			    wp->w_prev_height = wp->w_height;
+			ಆದರೆ (ನಿರಪೇಕ್ಷ(wp->w_ಎತ್ತರ - wp->w_prev_ಎತ್ತರ) == 1)
+			    wp->w_prev_ಎತ್ತರ = wp->w_ಎತ್ತರ;
 		    }
 		}
-		else
-		    last_status_rec(fp, statusline); // nested frames
+		ಇಲ್ಲದಿದ್ದರೆ
+		    ಕೊನೆಯ_ಸ್ಥಿತಿ_rec(fp, statusline); // nested frames
 	    }
 
-	    fr->fr_height = new_row_height;
+	    fr->fr_ಎತ್ತರ = new_ಅಡ್ಡಸಾಲು_ಎತ್ತರ;
 	    win_comp_pos();
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// horizontally split window, set status line for last one
-	for (fp = fr->fr_child; fp->fr_next != NULL; fp = fp->fr_next)
+	ಗಾಗಿ (fp = fr->fr_ಮಗು; fp->fr_ಮುಂದಿನ != ಖಾಲಿ; fp = fp->fr_ಮುಂದಿನ)
 	    ;
-	last_status_rec(fp, statusline);
+	ಕೊನೆಯ_ಸ್ಥಿತಿ_rec(fp, statusline);
     }
 }
 
-#if defined(FEAT_STL_OPT)
+#ಆದರೆ defined(FEAT_STL_OPT)
 /*
  * Update the cached rendered height of 'statusline'.
  * If "wp" is NULL, update the global stl_rendered_height using p_stl.
  * If "wp" is non-NULL, update wp->w_stl_rendered_height using wp->w_p_stl.
  */
-    void
-update_stl_rendered_height(win_T *wp)
+    ಶೂನ್ಯ
+update_stl_rendered_ಎತ್ತರ(win_T *wp)
 {
     char_u	*opt_name = (char_u *)"statusline";
-    char_u	*stl_val = (wp == NULL) ? p_stl : wp->w_p_stl;
-    int		opt_flags = (wp == NULL) ? 0 : OPT_LOCAL;
-    int		*height = (wp == NULL) ? &stl_rendered_height
-						: &wp->w_stl_rendered_height;
+    char_u	*stl_val = (wp == ಖಾಲಿ) ? p_stl : wp->w_p_stl;
+    ಪೂರ್ಣಾಂಕ		opt_flags = (wp == ಖಾಲಿ) ? 0 : OPT_LOCAL;
+    ಪೂರ್ಣಾಂಕ		*ಎತ್ತರ = (wp == ಖಾಲಿ) ? &stl_rendered_ಎತ್ತರ
+						: &wp->w_stl_rendered_ಎತ್ತರ;
 
-    *height = get_stl_rendered_height(wp == NULL ? curwin : wp, stl_val,
+    *ಎತ್ತರ = get_stl_rendered_ಎತ್ತರ(wp == ಖಾಲಿ ? curwin : wp, stl_val,
 					opt_name, opt_flags);
 }
 
@@ -7829,58 +7829,58 @@ update_stl_rendered_height(win_T *wp)
  * First pass: clamp the global statusline height against available space.
  * Returns the space-constrained height.
  */
-    static int
-frame_find_global_stlh_rec(frame_T *frp, int h)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಚೌಕಟ್ಟು_ಕಂಡುಹಿಡಿ_global_stlh_rec(ಚೌಕಟ್ಟು_T *frp, ಪೂರ್ಣಾಂಕ h)
 {
-    if (frp->fr_layout == FR_LEAF)
+    ಆದರೆ (frp->fr_layout == FR_ಎಲೆ)
     {
 	win_T  *wp = frp->fr_win;
 
 	// Only consider windows with a status line that use global stlo.
 	// Every such window constrains the global height (best effort): the
 	// result is the largest height that still fits every window.
-	if (wp->w_height > 0 && wp->w_status_height > 0
+	ಆದರೆ (wp->w_ಎತ್ತರ > 0 && wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ > 0
 		&& *wp->w_p_stlo == NUL)
 	{
-	    int win_free_height = frp->fr_height - WINBAR_HEIGHT(wp);
+	    ಪೂರ್ಣಾಂಕ win_free_ಎತ್ತರ = frp->fr_ಎತ್ತರ - WINBAR_ಎತ್ತರ(wp);
 
-	    if (win_free_height - p_wmh < h)
-		h = win_free_height - p_wmh;
+	    ಆದರೆ (win_free_ಎತ್ತರ - p_wmh < h)
+		h = win_free_ಎತ್ತರ - p_wmh;
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	for (frp = frp->fr_child; frp != NULL; frp = frp->fr_next)
-	    h = frame_find_global_stlh_rec(frp, h);
+	ಗಾಗಿ (frp = frp->fr_ಮಗು; frp != ಖಾಲಿ; frp = frp->fr_ಮುಂದಿನ)
+	    h = ಚೌಕಟ್ಟು_ಕಂಡುಹಿಡಿ_global_stlh_rec(frp, h);
     }
-    return h;
+    ಹಿಂತಿರುಗಿ h;
 }
 
 /*
  * Second pass: apply statusline heights.
  * "global_stlh" is the space-constrained height for windows using global stlo.
  */
-    static void
-frame_change_statusline_height_rec(frame_T *frp, int global_stlh)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಚೌಕಟ್ಟು_change_statusline_ಎತ್ತರ_rec(ಚೌಕಟ್ಟು_T *frp, ಪೂರ್ಣಾಂಕ global_stlh)
 {
-    if (frp->fr_layout == FR_LEAF)
+    ಆದರೆ (frp->fr_layout == FR_ಎಲೆ)
     {
 	win_T  *wp = frp->fr_win;
 
-	if (wp->w_height > 0 && wp->w_status_height > 0)
+	ಆದರೆ (wp->w_ಎತ್ತರ > 0 && wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ > 0)
 	{
-	    int win_free_height = frp->fr_height - WINBAR_HEIGHT(wp);
+	    ಪೂರ್ಣಾಂಕ win_free_ಎತ್ತರ = frp->fr_ಎತ್ತರ - WINBAR_ಎತ್ತರ(wp);
 
-	    wp->w_status_height = statusline_height(wp);
-	    if (wp->w_p_stlo == NULL || *wp->w_p_stlo == NUL)
+	    wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ = statusline_ಎತ್ತರ(wp);
+	    ಆದರೆ (wp->w_p_stlo == ಖಾಲಿ || *wp->w_p_stlo == NUL)
 	    {
 		// Global stlo: cap at the uniform space-constrained height so
 		// that all windows share the same status line height.
-		if (wp->w_status_height > global_stlh)
-		    wp->w_status_height = global_stlh;
+		ಆದರೆ (wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ > global_stlh)
+		    wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ = global_stlh;
 	    }
-	    if (wp->w_status_height > win_free_height - p_wmh)
-		wp->w_status_height = win_free_height - p_wmh;
+	    ಆದರೆ (wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ > win_free_ಎತ್ತರ - p_wmh)
+		wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ = win_free_ಎತ್ತರ - p_wmh;
 	    // Preserve the buffer view: statusline height changes should
 	    // not scroll the window.  win_new_height() calls
 	    // scroll_to_fraction() which adjusts w_topline; restore it
@@ -7888,9 +7888,9 @@ frame_change_statusline_height_rec(frame_T *frp, int global_stlh)
 	    // curwin during redraw.
 	    linenr_T saved_topline = wp->w_topline;
 # ifdef FEAT_DIFF
-	    int	     saved_topfill = wp->w_topfill;
+	    ಪೂರ್ಣಾಂಕ	     saved_topfill = wp->w_topfill;
 # endif
-	    win_new_height(wp, win_free_height - wp->w_status_height);
+	    win_new_ಎತ್ತರ(wp, win_free_ಎತ್ತರ - wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ);
 	    wp->w_topline = saved_topline;
 # ifdef FEAT_DIFF
 	    wp->w_topfill = saved_topfill;
@@ -7899,10 +7899,10 @@ frame_change_statusline_height_rec(frame_T *frp, int global_stlh)
 			     | VALID_BOTLINE | VALID_BOTLINE_AP);
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	for (frp = frp->fr_child; frp != NULL; frp = frp->fr_next)
-	    frame_change_statusline_height_rec(frp, global_stlh);
+	ಗಾಗಿ (frp = frp->fr_ಮಗು; frp != ಖಾಲಿ; frp = frp->fr_ಮುಂದಿನ)
+	    ಚೌಕಟ್ಟು_change_statusline_ಎತ್ತರ_rec(frp, global_stlh);
     }
 }
 
@@ -7911,30 +7911,30 @@ frame_change_statusline_height_rec(frame_T *frp, int global_stlh)
  * Uses two passes: first finds the space-constrained global height,
  * then applies appropriate heights to each window.
  */
-    int
-frame_change_statusline_height(void)
+    ಪೂರ್ಣಾಂಕ
+ಚೌಕಟ್ಟು_change_statusline_ಎತ್ತರ(ಶೂನ್ಯ)
 {
     tabpage_T	*tp;
-    int		global_stlh;
+    ಪೂರ್ಣಾಂಕ		global_stlh;
 
     // First pass: find space-constrained global height.
     global_stlh = stlo_mh;
     FOR_ALL_TABPAGES(tp)
-	global_stlh = frame_find_global_stlh_rec(tp->tp_topframe, global_stlh);
+	global_stlh = ಚೌಕಟ್ಟು_ಕಂಡುಹಿಡಿ_global_stlh_rec(tp->tp_topframe, global_stlh);
 
     // Second pass: apply heights.
     FOR_ALL_TABPAGES(tp)
-	frame_change_statusline_height_rec(tp->tp_topframe, global_stlh);
-    comp_col();
+	ಚೌಕಟ್ಟು_change_statusline_ಎತ್ತರ_rec(tp->tp_topframe, global_stlh);
+    comp_ಲಂಬಸಾಲು();
     redraw_all_later(UPD_SOME_VALID);
-    return global_stlh;
+    ಹಿಂತಿರುಗಿ global_stlh;
 }
 
 /*
  * Update the global maxheight cache for 'statuslineopt'.
  */
-    void
-set_stlo_mh(int mh)
+    ಶೂನ್ಯ
+ಗಣ_stlo_mh(ಪೂರ್ಣಾಂಕ mh)
 {
     stlo_mh = mh;
 }
@@ -7944,142 +7944,142 @@ set_stlo_mh(int mh)
  * This is called when 'statuslineopt' is changed.
  * Returns FAIL for failure, OK otherwise.
  */
-    int
-statuslineopt_changed(
+    ಪೂರ್ಣಾಂಕ
+statuslineopt_ಬದಲಾಯಿತು(
     char_u	*stlopt,	// when NULL: use "wp->w_p_stlo"
     win_T	*wp)		// when NULL: update global stlo_fh/stlo_mh
 {
     char_u	*p;
-    int		l_stlo_fh = FALSE;
-    int		l_stlo_mh = 1;
+    ಪೂರ್ಣಾಂಕ		l_stlo_fh = FALSE;
+    ಪೂರ್ಣಾಂಕ		l_stlo_mh = 1;
 
-    if (stlopt != NULL)
+    ಆದರೆ (stlopt != ಖಾಲಿ)
 	p = stlopt;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	p = wp->w_p_stlo;
 
-    while (*p != NUL)
+    ಆಗ (*p != NUL)
     {
 	// Note: Keep this in sync with p_stlo_values
-	if (STRNCMP(p, "maxheight:", 10) == 0 && VIM_ISDIGIT(p[10]))
+	ಆದರೆ (STRNCMP(p, "maxheight:", 10) == 0 && VIM_ISDIGIT(p[10]))
 	{
 	    p += 10;
 	    l_stlo_mh = getdigits(&p);
-	    if (l_stlo_mh < 1)
-		return FAIL;
+	    ಆದರೆ (l_stlo_mh < 1)
+		ಹಿಂತಿರುಗಿ FAIL;
 	}
-	else if (STRNCMP(p, "fixedheight", 11) == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRNCMP(p, "fixedheight", 11) == 0)
 	{
 	    p += 11;
 	    l_stlo_fh = TRUE;
 	}
-	if (*p != ',' && *p != NUL)
-	    return FAIL;
-	if (*p == ',')
+	ಆದರೆ (*p != ',' && *p != NUL)
+	    ಹಿಂತಿರುಗಿ FAIL;
+	ಆದರೆ (*p == ',')
 	    ++p;
     }
 
-    if (wp == NULL)
+    ಆದರೆ (wp == ಖಾಲಿ)
     {
 	stlo_fh = l_stlo_fh;
 	stlo_mh = l_stlo_mh;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	wp->w_p_stlo_fh = l_stlo_fh;
 	wp->w_p_stlo_mh = l_stlo_mh;
     }
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Return the effective statusline height for window "wp".
  * Uses the window-local 'statuslineopt' if set, otherwise the global one.
  * When "wp" is NULL, always uses the global 'statuslineopt' settings.
  */
-    int
-statusline_height(win_T *wp UNUSED)
+    ಪೂರ್ಣಾಂಕ
+statusline_ಎತ್ತರ(win_T *wp ಬಳಸದ)
 {
-    int stl_height = 1;
-#if defined(FEAT_STL_OPT)
+    ಪೂರ್ಣಾಂಕ stl_ಎತ್ತರ = 1;
+#ಆದರೆ defined(FEAT_STL_OPT)
     bool fixed;
-    int l_stl_rendered_height;
+    ಪೂರ್ಣಾಂಕ l_stl_rendered_ಎತ್ತರ;
 
-    if (wp != NULL && *wp->w_p_stlo != NUL)
+    ಆದರೆ (wp != ಖಾಲಿ && *wp->w_p_stlo != NUL)
     {
-	stl_height = wp->w_p_stlo_mh;
+	stl_ಎತ್ತರ = wp->w_p_stlo_mh;
 	fixed = !!wp->w_p_stlo_fh;
-	l_stl_rendered_height = (*wp->w_p_stl != NUL)
-				    ? wp->w_stl_rendered_height
-				    : stl_rendered_height;
+	l_stl_rendered_ಎತ್ತರ = (*wp->w_p_stl != NUL)
+				    ? wp->w_stl_rendered_ಎತ್ತರ
+				    : stl_rendered_ಎತ್ತರ;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	stl_height = stlo_mh;
+	stl_ಎತ್ತರ = stlo_mh;
 	fixed = !!stlo_fh;
-	l_stl_rendered_height = (wp != NULL && *wp->w_p_stl != NUL)
-				    ? wp->w_stl_rendered_height
-				    : stl_rendered_height;
+	l_stl_rendered_ಎತ್ತರ = (wp != ಖಾಲಿ && *wp->w_p_stl != NUL)
+				    ? wp->w_stl_rendered_ಎತ್ತರ
+				    : stl_rendered_ಎತ್ತರ;
     }
 
     // When not fixed, clamp to rendered height (1 for default statusline).
-    if (!fixed)
+    ಆದರೆ (!fixed)
     {
-	int has_custom_stl = (*p_stl != NUL)
-	    || (wp != NULL && *wp->w_p_stl != NUL);
-	if (has_custom_stl)
-	    stl_height = MAX(1, MIN(l_stl_rendered_height, stl_height));
-	else
-	    stl_height = 1;
+	ಪೂರ್ಣಾಂಕ has_custom_stl = (*p_stl != NUL)
+	    || (wp != ಖಾಲಿ && *wp->w_p_stl != NUL);
+	ಆದರೆ (has_custom_stl)
+	    stl_ಎತ್ತರ = MAX(1, MIN(l_stl_rendered_ಎತ್ತರ, stl_ಎತ್ತರ));
+	ಇಲ್ಲದಿದ್ದರೆ
+	    stl_ಎತ್ತರ = 1;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return stl_height;
+    ಹಿಂತಿರುಗಿ stl_ಎತ್ತರ;
 }
 
 /*
  * Return the number of lines used by the tab page line.
  */
-    int
-tabline_height(void)
+    ಪೂರ್ಣಾಂಕ
+tabline_ಎತ್ತರ(ಶೂನ್ಯ)
 {
-#ifdef FEAT_GUI_TABLINE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_TABLINE
     // When the GUI has the tabline then this always returns zero.
-    if (gui_use_tabline())
-	return 0;
-#endif
-    switch (p_stal)
+    ಆದರೆ (gui_use_tabline())
+	ಹಿಂತಿರುಗಿ 0;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆಯ್ಕೆ (p_stal)
     {
-	case 0: return 0;
-	case 1: return (first_tabpage->tp_next == NULL) ? 0 : 1;
+	ಸ್ಥಿತಿ 0: ಹಿಂತಿರುಗಿ 0;
+	ಸ್ಥಿತಿ 1: ಹಿಂತಿರುಗಿ (ಮೊದಲ_tabpage->tp_ಮುಂದಿನ == ಖಾಲಿ) ? 0 : 1;
     }
-    return 1;
+    ಹಿಂತಿರುಗಿ 1;
 }
 
 /*
  * Return the height of the last window's statusline.
  */
-    int
-last_stl_height(
-    int		morewin)	// pretend there are two or more windows
+    ಪೂರ್ಣಾಂಕ
+ಕೊನೆಯ_stl_ಎತ್ತರ(
+    ಪೂರ್ಣಾಂಕ		morewin)	// pretend there are two or more windows
 {
-    return (p_ls == 2 || (p_ls == 1 && (morewin || !ONE_WINDOW)))
-		? STATUS_HEIGHT : 0;
+    ಹಿಂತಿರುಗಿ (p_ls == 2 || (p_ls == 1 && (morewin || !ONE_ಕಿಟಕಿ)))
+		? ಸ್ಥಿತಿ_ಎತ್ತರ_2 : 0;
 }
 
 /*
  * Return the minimal number of rows that is needed on the screen to display
  * the current number of windows.
  */
-    int
-min_rows(void)
+    ಪೂರ್ಣಾಂಕ
+min_ಅಡ್ಡಸಾಲುಗಳು(ಶೂನ್ಯ)
 {
-    if (firstwin == NULL)	// not initialized yet
-	return MIN_LINES;
+    ಆದರೆ (firstwin == ಖಾಲಿ)	// not initialized yet
+	ಹಿಂತಿರುಗಿ MIN_ಸಾಲುಗಳು;
 
-    return frame_minheight(curtab->tp_topframe, NULL) + tabline_height()
+    ಹಿಂತಿರುಗಿ ಚೌಕಟ್ಟು_minheight(curtab->tp_topframe, ಖಾಲಿ) + tabline_ಎತ್ತರ()
 	+ MIN_CMDHEIGHT;
 }
 
@@ -8087,26 +8087,26 @@ min_rows(void)
  * Return the minimal number of rows that is needed on the screen to display
  * the current number of windows for all tab pages.
  */
-    int
-min_rows_for_all_tabpages(void)
+    ಪೂರ್ಣಾಂಕ
+min_ಅಡ್ಡಸಾಲುಗಳು_for_all_tabpages(ಶೂನ್ಯ)
 {
-    int		total;
+    ಪೂರ್ಣಾಂಕ		ಒಟ್ಟು;
     tabpage_T	*tp;
-    int		n;
+    ಪೂರ್ಣಾಂಕ		n;
 
-    if (firstwin == NULL)	// not initialized yet
-	return MIN_LINES;
+    ಆದರೆ (firstwin == ಖಾಲಿ)	// not initialized yet
+	ಹಿಂತಿರುಗಿ MIN_ಸಾಲುಗಳು;
 
-    total = 0;
+    ಒಟ್ಟು = 0;
     FOR_ALL_TABPAGES(tp)
     {
-	n = frame_minheight(tp->tp_topframe, NULL);
-	if (total < n)
-	    total = n;
+	n = ಚೌಕಟ್ಟು_minheight(tp->tp_topframe, ಖಾಲಿ);
+	ಆದರೆ (ಒಟ್ಟು < n)
+	    ಒಟ್ಟು = n;
     }
-    total += tabline_height();
-    total += MIN_CMDHEIGHT;
-    return total;
+    ಒಟ್ಟು += tabline_ಎತ್ತರ();
+    ಒಟ್ಟು += MIN_CMDHEIGHT;
+    ಹಿಂತಿರುಗಿ ಒಟ್ಟು;
 }
 
 /*
@@ -8114,65 +8114,65 @@ min_rows_for_all_tabpages(void)
  * counting a help or preview window, unless it is the current window.
  * Does not count unlisted windows.
  */
-    int
-only_one_window(void)
+    ಪೂರ್ಣಾಂಕ
+only_one_ಕಿಟಕಿ(ಶೂನ್ಯ)
 {
-    int		count = 0;
+    ಪೂರ್ಣಾಂಕ		ಎಣಿಕೆ_2 = 0;
     win_T	*wp;
 
-#if defined(FEAT_PROP_POPUP)
+#ಆದರೆ defined(FEAT_PROP_POPUP)
     // If the current window is a popup then there always is another window.
-    if (popup_is_popup(curwin))
-	return FALSE;
-#endif
+    ಆದರೆ (popup_is_popup(curwin))
+	ಹಿಂತಿರುಗಿ FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
 
     // If there is another tab page there always is another window.
-    if (first_tabpage->tp_next != NULL)
-	return FALSE;
+    ಆದರೆ (ಮೊದಲ_tabpage->tp_ಮುಂದಿನ != ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FALSE;
 
     FOR_ALL_WINDOWS(wp)
-	if (wp->w_buffer != NULL
-		&& (!((bt_help(wp->w_buffer) && !bt_help(curbuf))
-#ifdef FEAT_QUICKFIX
+	ಆದರೆ (wp->w_ಬಫರ್ != ಖಾಲಿ
+		&& (!((bt_help(wp->w_ಬಫರ್) && !bt_help(curbuf))
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
 		    || wp->w_p_pvw
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	     ) || wp == curwin) && !is_aucmd_win(wp))
-	    ++count;
-    return (count <= 1);
+	    ++ಎಣಿಕೆ_2;
+    ಹಿಂತಿರುಗಿ (ಎಣಿಕೆ_2 <= 1);
 }
 
 /*
  * Implementation of check_lnums() and check_lnums_nested().
  */
-    static void
-check_lnums_both(int do_curwin, int nested)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+check_lnums_both(ಪೂರ್ಣಾಂಕ do_curwin, ಪೂರ್ಣಾಂಕ nested)
 {
     win_T	*wp;
     tabpage_T	*tp;
 
     FOR_ALL_TAB_WINDOWS(tp, wp)
-	if ((do_curwin || wp != curwin) && wp->w_buffer == curbuf)
+	ಆದರೆ ((do_curwin || wp != curwin) && wp->w_ಬಫರ್ == curbuf)
 	{
-	    int need_adjust;
+	    ಪೂರ್ಣಾಂಕ need_adjust;
 
-	    if (!nested)
+	    ಆದರೆ (!nested)
 	    {
 		// save the original cursor position and topline
 		wp->w_save_cursor.w_cursor_save = wp->w_cursor;
 		wp->w_save_cursor.w_topline_save = wp->w_topline;
 	    }
 
-	    need_adjust = wp->w_cursor.lnum > curbuf->b_ml.ml_line_count;
-	    if (need_adjust)
-		wp->w_cursor.lnum = curbuf->b_ml.ml_line_count;
-	    if (need_adjust || !nested)
+	    need_adjust = wp->w_cursor.lnum > curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
+	    ಆದರೆ (need_adjust)
+		wp->w_cursor.lnum = curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
+	    ಆದರೆ (need_adjust || !nested)
 		// save the (corrected) cursor position
 		wp->w_save_cursor.w_cursor_corr = wp->w_cursor;
 
-	    need_adjust = wp->w_topline > curbuf->b_ml.ml_line_count;
-	    if (need_adjust)
-		wp->w_topline = curbuf->b_ml.ml_line_count;
-	    if (need_adjust || !nested)
+	    need_adjust = wp->w_topline > curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
+	    ಆದರೆ (need_adjust)
+		wp->w_topline = curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
+	    ಆದರೆ (need_adjust || !nested)
 		// save the (corrected) topline
 		wp->w_save_cursor.w_topline_corr = wp->w_topline;
 	}
@@ -8183,8 +8183,8 @@ check_lnums_both(int do_curwin, int nested)
  * current buffer, and before applying autocommands.
  * When "do_curwin" is TRUE, also check current window.
  */
-    void
-check_lnums(int do_curwin)
+    ಶೂನ್ಯ
+check_lnums(ಪೂರ್ಣಾಂಕ do_curwin)
 {
     check_lnums_both(do_curwin, FALSE);
 }
@@ -8192,8 +8192,8 @@ check_lnums(int do_curwin)
 /*
  * Like check_lnums() but for when check_lnums() was already called.
  */
-    void
-check_lnums_nested(int do_curwin)
+    ಶೂನ್ಯ
+check_lnums_nested(ಪೂರ್ಣಾಂಕ do_curwin)
 {
     check_lnums_both(do_curwin, TRUE);
 }
@@ -8202,26 +8202,26 @@ check_lnums_nested(int do_curwin)
  * Reset cursor and topline to its stored values from check_lnums().
  * check_lnums() must have been called first!
  */
-    void
-reset_lnums(void)
+    ಶೂನ್ಯ
+reset_lnums(ಶೂನ್ಯ)
 {
     win_T	*wp;
     tabpage_T	*tp;
 
     FOR_ALL_TAB_WINDOWS(tp, wp)
-	if (wp->w_buffer == curbuf)
+	ಆದರೆ (wp->w_ಬಫರ್ == curbuf)
 	{
 	    // Restore the value if the autocommand didn't change it and it was
 	    // set.
 	    // Note: This triggers e.g. on BufReadPre, when the buffer is not yet
 	    //       loaded, so cannot validate the buffer line
-	    if (EQUAL_POS(wp->w_save_cursor.w_cursor_corr, wp->w_cursor)
+	    ಆದರೆ (EQUAL_POS(wp->w_save_cursor.w_cursor_corr, wp->w_cursor)
 				  && wp->w_save_cursor.w_cursor_save.lnum != 0)
 		wp->w_cursor = wp->w_save_cursor.w_cursor_save;
-	    if (wp->w_save_cursor.w_topline_corr == wp->w_topline
+	    ಆದರೆ (wp->w_save_cursor.w_topline_corr == wp->w_topline
 				  && wp->w_save_cursor.w_topline_save != 0)
 		wp->w_topline = wp->w_save_cursor.w_topline_save;
-	    if (wp->w_save_cursor.w_topline_save > wp->w_buffer->b_ml.ml_line_count)
+	    ಆದರೆ (wp->w_save_cursor.w_topline_save > wp->w_ಬಫರ್->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
 		wp->w_valid &= ~VALID_TOPLINE;
 	}
 }
@@ -8243,94 +8243,94 @@ reset_lnums(void)
  * "idx" is SNAP_HELP_IDX or SNAP_AUCMD_IDX.
  * Return FAIL if out of memory, OK otherwise.
  */
-    int
-make_snapshot(int idx)
+    ಪೂರ್ಣಾಂಕ
+make_snapshot(ಪೂರ್ಣಾಂಕ idx)
 {
     clear_snapshot(curtab, idx);
-    if (make_snapshot_rec(topframe, &curtab->tp_snapshot[idx]) == FAIL)
+    ಆದರೆ (make_snapshot_rec(topframe, &curtab->tp_snapshot[idx]) == FAIL)
     {
 	clear_snapshot(curtab, idx);
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-    static int
-make_snapshot_rec(frame_T *fr, frame_T **frp)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+make_snapshot_rec(ಚೌಕಟ್ಟು_T *fr, ಚೌಕಟ್ಟು_T **frp)
 {
-    *frp = ALLOC_CLEAR_ONE(frame_T);
-    if (*frp == NULL)
-	return FAIL;
+    *frp = ALLOC_CLEAR_ONE(ಚೌಕಟ್ಟು_T);
+    ಆದರೆ (*frp == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
     (*frp)->fr_layout = fr->fr_layout;
-    (*frp)->fr_width = fr->fr_width;
-    (*frp)->fr_height = fr->fr_height;
-    if (fr->fr_next != NULL)
+    (*frp)->fr_ಅಗಲ = fr->fr_ಅಗಲ;
+    (*frp)->fr_ಎತ್ತರ = fr->fr_ಎತ್ತರ;
+    ಆದರೆ (fr->fr_ಮುಂದಿನ != ಖಾಲಿ)
     {
-	if (make_snapshot_rec(fr->fr_next, &((*frp)->fr_next)) == FAIL)
-	    return FAIL;
+	ಆದರೆ (make_snapshot_rec(fr->fr_ಮುಂದಿನ, &((*frp)->fr_ಮುಂದಿನ)) == FAIL)
+	    ಹಿಂತಿರುಗಿ FAIL;
     }
-    if (fr->fr_child != NULL)
+    ಆದರೆ (fr->fr_ಮಗು != ಖಾಲಿ)
     {
-	if (make_snapshot_rec(fr->fr_child, &((*frp)->fr_child)) == FAIL)
-	    return FAIL;
+	ಆದರೆ (make_snapshot_rec(fr->fr_ಮಗು, &((*frp)->fr_ಮಗು)) == FAIL)
+	    ಹಿಂತಿರುಗಿ FAIL;
     }
-    if (fr->fr_layout == FR_LEAF && fr->fr_win == curwin)
+    ಆದರೆ (fr->fr_layout == FR_ಎಲೆ && fr->fr_win == curwin)
 	(*frp)->fr_win = curwin;
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Remove any existing snapshot.
  */
-    static void
-clear_snapshot(tabpage_T *tp, int idx)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+clear_snapshot(tabpage_T *tp, ಪೂರ್ಣಾಂಕ idx)
 {
     clear_snapshot_rec(tp->tp_snapshot[idx]);
-    tp->tp_snapshot[idx] = NULL;
+    tp->tp_snapshot[idx] = ಖಾಲಿ;
 }
 
-    static void
-clear_snapshot_rec(frame_T *fr)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+clear_snapshot_rec(ಚೌಕಟ್ಟು_T *fr)
 {
-    if (fr == NULL)
-	return;
-    clear_snapshot_rec(fr->fr_next);
-    clear_snapshot_rec(fr->fr_child);
+    ಆದರೆ (fr == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
+    clear_snapshot_rec(fr->fr_ಮುಂದಿನ);
+    clear_snapshot_rec(fr->fr_ಮಗು);
     vim_free(fr);
 }
 
 /*
  * Traverse a snapshot to find the previous curwin.
  */
-    static win_T *
-get_snapshot_curwin_rec(frame_T *ft)
+    ಸ್ಥಿರ win_T *
+get_snapshot_curwin_rec(ಚೌಕಟ್ಟು_T *ft)
 {
     win_T	*wp;
 
-    if (ft->fr_next != NULL)
+    ಆದರೆ (ft->fr_ಮುಂದಿನ != ಖಾಲಿ)
     {
-	if ((wp = get_snapshot_curwin_rec(ft->fr_next)) != NULL)
-	    return wp;
+	ಆದರೆ ((wp = get_snapshot_curwin_rec(ft->fr_ಮುಂದಿನ)) != ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ wp;
     }
-    if (ft->fr_child != NULL)
+    ಆದರೆ (ft->fr_ಮಗು != ಖಾಲಿ)
     {
-	if ((wp = get_snapshot_curwin_rec(ft->fr_child)) != NULL)
-	    return wp;
+	ಆದರೆ ((wp = get_snapshot_curwin_rec(ft->fr_ಮಗು)) != ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ wp;
     }
 
-    return ft->fr_win;
+    ಹಿಂತಿರುಗಿ ft->fr_win;
 }
 
 /*
  * Return the current window stored in the snapshot or NULL.
  */
-    static win_T *
-get_snapshot_curwin(int idx)
+    ಸ್ಥಿರ win_T *
+get_snapshot_curwin(ಪೂರ್ಣಾಂಕ idx)
 {
-    if (curtab->tp_snapshot[idx] == NULL)
-	return NULL;
+    ಆದರೆ (curtab->tp_snapshot[idx] == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    return get_snapshot_curwin_rec(curtab->tp_snapshot[idx]);
+    ಹಿಂತಿರುಗಿ get_snapshot_curwin_rec(curtab->tp_snapshot[idx]);
 }
 
 /*
@@ -8339,21 +8339,21 @@ get_snapshot_curwin(int idx)
  * still the same.
  * "idx" is SNAP_HELP_IDX or SNAP_AUCMD_IDX.
  */
-    void
+    ಶೂನ್ಯ
 restore_snapshot(
-    int		idx,
-    int		close_curwin)	    // closing current window
+    ಪೂರ್ಣಾಂಕ		idx,
+    ಪೂರ್ಣಾಂಕ		close_curwin)	    // closing current window
 {
     win_T	*wp;
 
-    if (curtab->tp_snapshot[idx] != NULL
-	    && curtab->tp_snapshot[idx]->fr_width == topframe->fr_width
-	    && curtab->tp_snapshot[idx]->fr_height == topframe->fr_height
+    ಆದರೆ (curtab->tp_snapshot[idx] != ಖಾಲಿ
+	    && curtab->tp_snapshot[idx]->fr_ಅಗಲ == topframe->fr_ಅಗಲ
+	    && curtab->tp_snapshot[idx]->fr_ಎತ್ತರ == topframe->fr_ಎತ್ತರ
 	    && check_snapshot_rec(curtab->tp_snapshot[idx], topframe) == OK)
     {
 	wp = restore_snapshot_rec(curtab->tp_snapshot[idx], topframe);
 	win_comp_pos();
-	if (wp != NULL && close_curwin)
+	ಆದರೆ (wp != ಖಾಲಿ && close_curwin)
 	    win_goto(wp);
 	redraw_all_later(UPD_NOT_VALID);
     }
@@ -8364,19 +8364,19 @@ restore_snapshot(
  * Check if frames "sn" and "fr" have the same layout, same following frames
  * and same children.  And the window pointer is valid.
  */
-    static int
-check_snapshot_rec(frame_T *sn, frame_T *fr)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+check_snapshot_rec(ಚೌಕಟ್ಟು_T *sn, ಚೌಕಟ್ಟು_T *fr)
 {
-    if (sn->fr_layout != fr->fr_layout
-	    || (sn->fr_next == NULL) != (fr->fr_next == NULL)
-	    || (sn->fr_child == NULL) != (fr->fr_child == NULL)
-	    || (sn->fr_next != NULL
-		&& check_snapshot_rec(sn->fr_next, fr->fr_next) == FAIL)
-	    || (sn->fr_child != NULL
-		&& check_snapshot_rec(sn->fr_child, fr->fr_child) == FAIL)
-	    || (sn->fr_win != NULL && !win_valid(sn->fr_win)))
-	return FAIL;
-    return OK;
+    ಆದರೆ (sn->fr_layout != fr->fr_layout
+	    || (sn->fr_ಮುಂದಿನ == ಖಾಲಿ) != (fr->fr_ಮುಂದಿನ == ಖಾಲಿ)
+	    || (sn->fr_ಮಗು == ಖಾಲಿ) != (fr->fr_ಮಗು == ಖಾಲಿ)
+	    || (sn->fr_ಮುಂದಿನ != ಖಾಲಿ
+		&& check_snapshot_rec(sn->fr_ಮುಂದಿನ, fr->fr_ಮುಂದಿನ) == FAIL)
+	    || (sn->fr_ಮಗು != ಖಾಲಿ
+		&& check_snapshot_rec(sn->fr_ಮಗು, fr->fr_ಮಗು) == FAIL)
+	    || (sn->fr_win != ಖಾಲಿ && !win_valid(sn->fr_win)))
+	ಹಿಂತಿರುಗಿ FAIL;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
@@ -8384,140 +8384,140 @@ check_snapshot_rec(frame_T *sn, frame_T *fr)
  * following frames and children.
  * Returns a pointer to the old current window, or NULL.
  */
-    static win_T *
-restore_snapshot_rec(frame_T *sn, frame_T *fr)
+    ಸ್ಥಿರ win_T *
+restore_snapshot_rec(ಚೌಕಟ್ಟು_T *sn, ಚೌಕಟ್ಟು_T *fr)
 {
-    win_T	*wp = NULL;
+    win_T	*wp = ಖಾಲಿ;
     win_T	*wp2;
 
-    fr->fr_height = sn->fr_height;
-    fr->fr_width = sn->fr_width;
-    if (fr->fr_layout == FR_LEAF)
+    fr->fr_ಎತ್ತರ = sn->fr_ಎತ್ತರ;
+    fr->fr_ಅಗಲ = sn->fr_ಅಗಲ;
+    ಆದರೆ (fr->fr_layout == FR_ಎಲೆ)
     {
-	frame_new_height(fr, fr->fr_height, FALSE, FALSE, FALSE);
-	frame_new_width(fr, fr->fr_width, FALSE, FALSE);
+	ಚೌಕಟ್ಟು_new_ಎತ್ತರ(fr, fr->fr_ಎತ್ತರ, FALSE, FALSE, FALSE);
+	ಚೌಕಟ್ಟು_new_ಅಗಲ(fr, fr->fr_ಅಗಲ, FALSE, FALSE);
 	wp = sn->fr_win;
     }
-    if (sn->fr_next != NULL)
+    ಆದರೆ (sn->fr_ಮುಂದಿನ != ಖಾಲಿ)
     {
-	wp2 = restore_snapshot_rec(sn->fr_next, fr->fr_next);
-	if (wp2 != NULL)
+	wp2 = restore_snapshot_rec(sn->fr_ಮುಂದಿನ, fr->fr_ಮುಂದಿನ);
+	ಆದರೆ (wp2 != ಖಾಲಿ)
 	    wp = wp2;
     }
-    if (sn->fr_child != NULL)
+    ಆದರೆ (sn->fr_ಮಗು != ಖಾಲಿ)
     {
-	wp2 = restore_snapshot_rec(sn->fr_child, fr->fr_child);
-	if (wp2 != NULL)
+	wp2 = restore_snapshot_rec(sn->fr_ಮಗು, fr->fr_ಮಗು);
+	ಆದರೆ (wp2 != ಖಾಲಿ)
 	    wp = wp2;
     }
-    return wp;
+    ಹಿಂತಿರುಗಿ wp;
 }
 
-#if defined(FEAT_GUI)
+#ಆದರೆ defined(FEAT_GUI)
 /*
  * Return TRUE if there is any vertically split window.
  */
-    int
-win_hasvertsplit(void)
+    ಪೂರ್ಣಾಂಕ
+win_hasvertsplit(ಶೂನ್ಯ)
 {
-    frame_T	*fr;
+    ಚೌಕಟ್ಟು_T	*fr;
 
-    if (topframe->fr_layout == FR_ROW)
-	return TRUE;
+    ಆದರೆ (topframe->fr_layout == FR_ಅಡ್ಡಸಾಲು)
+	ಹಿಂತಿರುಗಿ TRUE;
 
-    if (topframe->fr_layout == FR_COL)
-	FOR_ALL_FRAMES(fr, topframe->fr_child)
-	    if (fr->fr_layout == FR_ROW)
-		return TRUE;
+    ಆದರೆ (topframe->fr_layout == FR_ಲಂಬಸಾಲು)
+	FOR_ALL_ಚೌಕಟ್ಟುಗಳು(fr, topframe->fr_ಮಗು)
+	    ಆದರೆ (fr->fr_layout == FR_ಅಡ್ಡಸಾಲು)
+		ಹಿಂತಿರುಗಿ TRUE;
 
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
-    int
-get_win_number(win_T *wp, win_T *first_win)
+#ಆದರೆ defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+    ಪೂರ್ಣಾಂಕ
+get_win_ಸಂಖ್ಯೆ(win_T *wp, win_T *ಮೊದಲ_win)
 {
-    int		i = 1;
+    ಪೂರ್ಣಾಂಕ		i = 1;
     win_T	*w;
 
-    for (w = first_win; w != NULL && w != wp; w = W_NEXT(w))
+    ಗಾಗಿ (w = ಮೊದಲ_win; w != ಖಾಲಿ && w != wp; w = W_ಮುಂದಿನ(w))
 	++i;
 
-    if (w == NULL)
-	return 0;
-    else
-	return i;
+    ಆದರೆ (w == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ 0;
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಹಿಂತಿರುಗಿ i;
 }
 
-    int
-get_tab_number(tabpage_T *tp)
+    ಪೂರ್ಣಾಂಕ
+get_tab_ಸಂಖ್ಯೆ(tabpage_T *tp)
 {
-    int		i = 1;
+    ಪೂರ್ಣಾಂಕ		i = 1;
     tabpage_T	*t;
 
-    for (t = first_tabpage; t != NULL && t != tp; t = t->tp_next)
+    ಗಾಗಿ (t = ಮೊದಲ_tabpage; t != ಖಾಲಿ && t != tp; t = t->tp_ಮುಂದಿನ)
 	++i;
 
-    if (t == NULL)
-	return 0;
-    else
-	return i;
+    ಆದರೆ (t == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ 0;
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಹಿಂತಿರುಗಿ i;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Return TRUE if "topfrp" and its children are at the right height.
  */
-    static int
-frame_check_height(frame_T *topfrp, int height)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಚೌಕಟ್ಟು_check_ಎತ್ತರ(ಚೌಕಟ್ಟು_T *topfrp, ಪೂರ್ಣಾಂಕ ಎತ್ತರ)
 {
-    frame_T *frp;
+    ಚೌಕಟ್ಟು_T *frp;
 
-    if (topfrp->fr_height != height)
-	return FALSE;
+    ಆದರೆ (topfrp->fr_ಎತ್ತರ != ಎತ್ತರ)
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    if (topfrp->fr_layout == FR_ROW)
-	FOR_ALL_FRAMES(frp, topfrp->fr_child)
-	    if (frp->fr_height != height)
-		return FALSE;
+    ಆದರೆ (topfrp->fr_layout == FR_ಅಡ್ಡಸಾಲು)
+	FOR_ALL_ಚೌಕಟ್ಟುಗಳು(frp, topfrp->fr_ಮಗು)
+	    ಆದರೆ (frp->fr_ಎತ್ತರ != ಎತ್ತರ)
+		ಹಿಂತಿರುಗಿ FALSE;
 
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
  * Return TRUE if "topfrp" and its children are at the right width.
  */
-    static int
-frame_check_width(frame_T *topfrp, int width)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಚೌಕಟ್ಟು_check_ಅಗಲ(ಚೌಕಟ್ಟು_T *topfrp, ಪೂರ್ಣಾಂಕ ಅಗಲ)
 {
-    frame_T *frp;
+    ಚೌಕಟ್ಟು_T *frp;
 
-    if (topfrp->fr_width != width)
-	return FALSE;
+    ಆದರೆ (topfrp->fr_ಅಗಲ != ಅಗಲ)
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    if (topfrp->fr_layout == FR_COL)
-	FOR_ALL_FRAMES(frp, topfrp->fr_child)
-	    if (frp->fr_width != width)
-		return FALSE;
+    ಆದರೆ (topfrp->fr_layout == FR_ಲಂಬಸಾಲು)
+	FOR_ALL_ಚೌಕಟ್ಟುಗಳು(frp, topfrp->fr_ಮಗು)
+	    ಆದರೆ (frp->fr_ಅಗಲ != ಅಗಲ)
+		ಹಿಂತಿರುಗಿ FALSE;
 
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
-#if defined(FEAT_SYN_HL)
+#ಆದರೆ defined(FEAT_SYN_HL)
 /*
  * Simple int comparison function for use with qsort()
  */
-    static int
-int_cmp(const void *pa, const void *pb)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+int_cmp(ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *pa, ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *pb)
 {
-    const int a = *(const int *)pa;
-    const int b = *(const int *)pb;
-    if (a > b)
-	return 1;
-    if (a < b)
-	return -1;
-    return 0;
+    ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ a = *(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ *)pa;
+    ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ b = *(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ *)pb;
+    ಆದರೆ (a > b)
+	ಹಿಂತಿರುಗಿ 1;
+    ಆದರೆ (a < b)
+	ಹಿಂತಿರುಗಿ -1;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
 /*
@@ -8525,101 +8525,101 @@ int_cmp(const void *pa, const void *pb)
  * This is called when 'colorcolumn' or 'textwidth' is changed.
  * Returns error message, NULL if it's OK.
  */
-    char *
+    ಅಕ್ಷರ *
 check_colorcolumn(
     char_u *cc,		// when NULL: use "wp->w_p_cc"
     win_T *wp)		// when NULL: only parse "cc"
 {
-    char_u	*s = empty_option;
-    int		tw;
-    int		col;
-    int		count = 0;
-    int		color_cols[256];
-    int		i;
-    int		j = 0;
+    char_u	*s = ಖಾಲಿಗಳು_option;
+    ಪೂರ್ಣಾಂಕ		tw;
+    ಪೂರ್ಣಾಂಕ		ಲಂಬಸಾಲು;
+    ಪೂರ್ಣಾಂಕ		ಎಣಿಕೆ_2 = 0;
+    ಪೂರ್ಣಾಂಕ		color_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ[256];
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		j = 0;
 
-    if (wp != NULL && wp->w_buffer == NULL)
-	return NULL;  // buffer was closed
+    ಆದರೆ (wp != ಖಾಲಿ && wp->w_ಬಫರ್ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;  // buffer was closed
 
-    if (cc != NULL)
+    ಆದರೆ (cc != ಖಾಲಿ)
 	s = cc;
-    else if (wp != NULL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (wp != ಖಾಲಿ)
 	s = wp->w_p_cc;
 
-    if (wp != NULL)
-	tw = wp->w_buffer->b_p_tw;
-    else
+    ಆದರೆ (wp != ಖಾಲಿ)
+	tw = wp->w_ಬಫರ್->b_p_tw;
+    ಇಲ್ಲದಿದ್ದರೆ
 	// buffer-local value not set, assume zero
 	tw = 0;
 
-    while (*s != NUL && count < 255)
+    ಆಗ (*s != NUL && ಎಣಿಕೆ_2 < 255)
     {
-	if (*s == '-' || *s == '+')
+	ಆದರೆ (*s == '-' || *s == '+')
 	{
 	    // -N and +N: add to 'textwidth'
-	    col = (*s == '-') ? -1 : 1;
+	    ಲಂಬಸಾಲು = (*s == '-') ? -1 : 1;
 	    ++s;
-	    if (!VIM_ISDIGIT(*s))
-		return e_invalid_argument;
-	    col = col * getdigits(&s);
-	    if (tw == 0)
-		goto skip;  // 'textwidth' not set, skip this item
-	    col += tw;
-	    if (col < 0)
-		goto skip;
+	    ಆದರೆ (!VIM_ISDIGIT(*s))
+		ಹಿಂತಿರುಗಿ e_invalid_ವಾದ;
+	    ಲಂಬಸಾಲು = ಲಂಬಸಾಲು * getdigits(&s);
+	    ಆದರೆ (tw == 0)
+		ಹೋಗು skip;  // 'textwidth' not set, skip this item
+	    ಲಂಬಸಾಲು += tw;
+	    ಆದರೆ (ಲಂಬಸಾಲು < 0)
+		ಹೋಗು skip;
 	}
-	else if (VIM_ISDIGIT(*s))
-	    col = getdigits(&s);
-	else
-	    return e_invalid_argument;
-	color_cols[count++] = col - 1;  // 1-based to 0-based
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (VIM_ISDIGIT(*s))
+	    ಲಂಬಸಾಲು = getdigits(&s);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಹಿಂತಿರುಗಿ e_invalid_ವಾದ;
+	color_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ[ಎಣಿಕೆ_2++] = ಲಂಬಸಾಲು - 1;  // 1-based to 0-based
 skip:
-	if (*s == NUL)
-	    break;
-	if (*s != ',')
-	    return e_invalid_argument;
-	if (*++s == NUL)
-	    return e_invalid_argument;  // illegal trailing comma as in "set cc=80,"
+	ಆದರೆ (*s == NUL)
+	    ನಿಲ್ಲಿಸು;
+	ಆದರೆ (*s != ',')
+	    ಹಿಂತಿರುಗಿ e_invalid_ವಾದ;
+	ಆದರೆ (*++s == NUL)
+	    ಹಿಂತಿರುಗಿ e_invalid_ವಾದ;  // illegal trailing comma as in "set cc=80,"
     }
 
-    if (wp == NULL)
-	return NULL;  // only parse "cc"
+    ಆದರೆ (wp == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;  // only parse "cc"
 
-    vim_free(wp->w_p_cc_cols);
-    if (count == 0)
-	wp->w_p_cc_cols = NULL;
-    else
+    vim_free(wp->w_p_cc_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ);
+    ಆದರೆ (ಎಣಿಕೆ_2 == 0)
+	wp->w_p_cc_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = ಖಾಲಿ;
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	wp->w_p_cc_cols = ALLOC_MULT(int, count + 1);
-	if (wp->w_p_cc_cols != NULL)
+	wp->w_p_cc_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = ALLOC_MULT(ಪೂರ್ಣಾಂಕ, ಎಣಿಕೆ_2 + 1);
+	ಆದರೆ (wp->w_p_cc_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ != ಖಾಲಿ)
 	{
 	    // sort the columns for faster usage on screen redraw inside
 	    // win_line()
-	    qsort(color_cols, count, sizeof(int), int_cmp);
+	    qsort(color_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, ಎಣಿಕೆ_2, ಗಾತ್ರ(ಪೂರ್ಣಾಂಕ), int_cmp);
 
-	    for (i = 0; i < count; ++i)
+	    ಗಾಗಿ (i = 0; i < ಎಣಿಕೆ_2; ++i)
 		// skip duplicates
-		if (j == 0 || wp->w_p_cc_cols[j - 1] != color_cols[i])
-		    wp->w_p_cc_cols[j++] = color_cols[i];
-	    wp->w_p_cc_cols[j] = -1;  // end marker
+		ಆದರೆ (j == 0 || wp->w_p_cc_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ[j - 1] != color_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ[i])
+		    wp->w_p_cc_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ[j++] = color_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ[i];
+	    wp->w_p_cc_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ[j] = -1;  // end marker
 	}
     }
 
-    return NULL;  // no error
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;  // no error
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    int
-get_last_winid(void)
+    ಪೂರ್ಣಾಂಕ
+get_ಕೊನೆಯ_winid(ಶೂನ್ಯ)
 {
-    return last_win_id;
+    ಹಿಂತಿರುಗಿ ಕೊನೆಯ_win_id;
 }
 
 /*
  * Don't let autocommands close the given window
  */
-   int
+   ಪೂರ್ಣಾಂಕ
 win_locked(win_T *wp)
 {
-    return wp->w_locked;
+    ಹಿಂತಿರುಗಿ wp->w_locked;
 }

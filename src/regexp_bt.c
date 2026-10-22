@@ -135,133 +135,133 @@
  */
 
 // definition	number		   opnd?    meaning
-#define END		0	//	End of program or NOMATCH operand.
-#define BOL		1	//	Match "" at beginning of line.
-#define EOL		2	//	Match "" at end of line.
-#define BRANCH		3	// node Match this alternative, or the
+#ವ್ಯಾಖ್ಯಾನಿಸು ಕೊನೆ_3		0	//	End of program or NOMATCH operand.
+#ವ್ಯಾಖ್ಯಾನಿಸು BOL		1	//	Match "" at beginning of line.
+#ವ್ಯಾಖ್ಯಾನಿಸು EOL		2	//	Match "" at end of line.
+#ವ್ಯಾಖ್ಯಾನಿಸು BRANCH		3	// node Match this alternative, or the
 				//	next...
-#define BACK		4	//	Match "", "next" ptr points backward.
-#define EXACTLY		5	// str	Match this string.
-#define NOTHING		6	//	Match empty string.
-#define STAR		7	// node Match this (simple) thing 0 or more
+#ವ್ಯಾಖ್ಯಾನಿಸು ಹಿಂಭಾಗ_2		4	//	Match "", "next" ptr points backward.
+#ವ್ಯಾಖ್ಯಾನಿಸು EXACTLY		5	// str	Match this string.
+#ವ್ಯಾಖ್ಯಾನಿಸು NOTHING		6	//	Match empty string.
+#ವ್ಯಾಖ್ಯಾನಿಸು ನಕ್ಷತ್ರ		7	// node Match this (simple) thing 0 or more
 				//	times.
-#define PLUS		8	// node Match this (simple) thing 1 or more
+#ವ್ಯಾಖ್ಯಾನಿಸು PLUS		8	// node Match this (simple) thing 1 or more
 				//	times.
-#define MATCH		9	// node match the operand zero-width
-#define NOMATCH		10	// node check for no match with operand
-#define BEHIND		11	// node look behind for a match with operand
-#define NOBEHIND	12	// node look behind for no match with operand
-#define SUBPAT		13	// node match the operand here
-#define BRACE_SIMPLE	14	// node Match this (simple) thing between m and
+#ವ್ಯಾಖ್ಯಾನಿಸು ಹೊಂದಿಕೆ_2		9	// node match the operand zero-width
+#ವ್ಯಾಖ್ಯಾನಿಸು NOMATCH		10	// node check for no match with operand
+#ವ್ಯಾಖ್ಯಾನಿಸು BEHIND		11	// node look behind for a match with operand
+#ವ್ಯಾಖ್ಯಾನಿಸು NOBEHIND	12	// node look behind for no match with operand
+#ವ್ಯಾಖ್ಯಾನಿಸು SUBPAT		13	// node match the operand here
+#ವ್ಯಾಖ್ಯಾನಿಸು BRACE_SIMPLE	14	// node Match this (simple) thing between m and
 				//	n times (\{m,n\}).
-#define BOW		15	//	Match "" after [^a-zA-Z0-9_]
-#define EOW		16	//	Match "" at    [^a-zA-Z0-9_]
-#define BRACE_LIMITS	17	// nr nr  define the min & max for BRACE_SIMPLE
+#ವ್ಯಾಖ್ಯಾನಿಸು BOW		15	//	Match "" after [^a-zA-Z0-9_]
+#ವ್ಯಾಖ್ಯಾನಿಸು EOW		16	//	Match "" at    [^a-zA-Z0-9_]
+#ವ್ಯಾಖ್ಯಾನಿಸು BRACE_LIMITS	17	// nr nr  define the min & max for BRACE_SIMPLE
 				//	and BRACE_COMPLEX.
-#define NEWL		18	//	Match line-break
-#define BHPOS		19	//	End position for BEHIND or NOBEHIND
+#ವ್ಯಾಖ್ಯಾನಿಸು NEWL		18	//	Match line-break
+#ವ್ಯಾಖ್ಯಾನಿಸು BHPOS		19	//	End position for BEHIND or NOBEHIND
 
 
 // character classes: 20-48 normal, 50-78 include a line-break
-#define ADD_NL		30
-#define FIRST_NL	ANY + ADD_NL
-#define ANY		20	//	Match any one character.
-#define ANYOF		21	// str	Match any character in this string.
-#define ANYBUT		22	// str	Match any character not in this
+#ವ್ಯಾಖ್ಯಾನಿಸು ಕೂಡಿಸು_NL		30
+#ವ್ಯಾಖ್ಯಾನಿಸು ಮೊದಲ_NL	ANY + ಕೂಡಿಸು_NL
+#ವ್ಯಾಖ್ಯಾನಿಸು ANY		20	//	Match any one character.
+#ವ್ಯಾಖ್ಯಾನಿಸು ANYOF		21	// str	Match any character in this string.
+#ವ್ಯಾಖ್ಯಾನಿಸು ANYBUT		22	// str	Match any character not in this
 				//	string.
-#define IDENT		23	//	Match identifier char
-#define SIDENT		24	//	Match identifier char but no digit
-#define KWORD		25	//	Match keyword char
-#define SKWORD		26	//	Match word char but no digit
-#define FNAME		27	//	Match file name char
-#define SFNAME		28	//	Match file name char but no digit
-#define PRINT		29	//	Match printable char
-#define SPRINT		30	//	Match printable char but no digit
-#define WHITE		31	//	Match whitespace char
-#define NWHITE		32	//	Match non-whitespace char
-#define DIGIT		33	//	Match digit char
-#define NDIGIT		34	//	Match non-digit char
-#define HEX		35	//	Match hex char
-#define NHEX		36	//	Match non-hex char
-#define OCTAL		37	//	Match octal char
-#define NOCTAL		38	//	Match non-octal char
-#define WORD		39	//	Match word char
-#define NWORD		40	//	Match non-word char
-#define HEAD		41	//	Match head char
-#define NHEAD		42	//	Match non-head char
-#define ALPHA		43	//	Match alpha char
-#define NALPHA		44	//	Match non-alpha char
-#define LOWER		45	//	Match lowercase char
-#define NLOWER		46	//	Match non-lowercase char
-#define UPPER		47	//	Match uppercase char
-#define NUPPER		48	//	Match non-uppercase char
-#define LAST_NL		NUPPER + ADD_NL
-#define WITH_NL(op)	((op) >= FIRST_NL && (op) <= LAST_NL)
+#ವ್ಯಾಖ್ಯಾನಿಸು IDENT		23	//	Match identifier char
+#ವ್ಯಾಖ್ಯಾನಿಸು SIDENT		24	//	Match identifier char but no digit
+#ವ್ಯಾಖ್ಯಾನಿಸು KWORD		25	//	Match keyword char
+#ವ್ಯಾಖ್ಯಾನಿಸು SKWORD		26	//	Match word char but no digit
+#ವ್ಯಾಖ್ಯಾನಿಸು FNAME		27	//	Match file name char
+#ವ್ಯಾಖ್ಯಾನಿಸು SFNAME		28	//	Match file name char but no digit
+#ವ್ಯಾಖ್ಯಾನಿಸು PRINT		29	//	Match printable char
+#ವ್ಯಾಖ್ಯಾನಿಸು SPRINT		30	//	Match printable char but no digit
+#ವ್ಯಾಖ್ಯಾನಿಸು WHITE		31	//	Match whitespace char
+#ವ್ಯಾಖ್ಯಾನಿಸು NWHITE		32	//	Match non-whitespace char
+#ವ್ಯಾಖ್ಯಾನಿಸು DIGIT		33	//	Match digit char
+#ವ್ಯಾಖ್ಯಾನಿಸು NDIGIT		34	//	Match non-digit char
+#ವ್ಯಾಖ್ಯಾನಿಸು HEX		35	//	Match hex char
+#ವ್ಯಾಖ್ಯಾನಿಸು NHEX		36	//	Match non-hex char
+#ವ್ಯಾಖ್ಯಾನಿಸು OCTAL		37	//	Match octal char
+#ವ್ಯಾಖ್ಯಾನಿಸು NOCTAL		38	//	Match non-octal char
+#ವ್ಯಾಖ್ಯಾನಿಸು ಶಬ್ದ_2		39	//	Match word char
+#ವ್ಯಾಖ್ಯಾನಿಸು NWORD		40	//	Match non-word char
+#ವ್ಯಾಖ್ಯಾನಿಸು ತಲೆ_2		41	//	Match head char
+#ವ್ಯಾಖ್ಯಾನಿಸು NHEAD		42	//	Match non-head char
+#ವ್ಯಾಖ್ಯಾನಿಸು ALPHA		43	//	Match alpha char
+#ವ್ಯಾಖ್ಯಾನಿಸು NALPHA		44	//	Match non-alpha char
+#ವ್ಯಾಖ್ಯಾನಿಸು ಅಧೋ_2		45	//	Match lowercase char
+#ವ್ಯಾಖ್ಯಾನಿಸು NLOWER		46	//	Match non-lowercase char
+#ವ್ಯಾಖ್ಯಾನಿಸು ಊರ್ಧ್ವ		47	//	Match uppercase char
+#ವ್ಯಾಖ್ಯಾನಿಸು NUPPER		48	//	Match non-uppercase char
+#ವ್ಯಾಖ್ಯಾನಿಸು ಕೊನೆಯ_NL		NUPPER + ಕೂಡಿಸು_NL
+#ವ್ಯಾಖ್ಯಾನಿಸು WITH_NL(op)	((op) >= ಮೊದಲ_NL && (op) <= ಕೊನೆಯ_NL)
 
-#define MOPEN		80  // -89	 Mark this point in input as start of
+#ವ್ಯಾಖ್ಯಾನಿಸು MOPEN		80  // -89	 Mark this point in input as start of
 				//	 \( subexpr.  MOPEN + 0 marks start of
 				//	 match.
-#define MCLOSE		90  // -99	 Analogous to MOPEN.  MCLOSE + 0 marks
+#ವ್ಯಾಖ್ಯಾನಿಸು MCLOSE		90  // -99	 Analogous to MOPEN.  MCLOSE + 0 marks
 				//	 end of match.
-#define BACKREF		100 // -109 node Match same string again \1-\9
+#ವ್ಯಾಖ್ಯಾನಿಸು BACKREF		100 // -109 node Match same string again \1-\9
 
-#ifdef FEAT_SYN_HL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
 # define ZOPEN		110 // -119	 Mark this point in input as start of
 				//	 \z( subexpr.
 # define ZCLOSE		120 // -129	 Analogous to ZOPEN.
 # define ZREF		130 // -139 node Match external submatch \z1-\z9
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#define BRACE_COMPLEX	140 // -149 node Match nodes between m & n times
+#ವ್ಯಾಖ್ಯಾನಿಸು BRACE_COMPLEX	140 // -149 node Match nodes between m & n times
 
-#define NOPEN		150	//	Mark this point in input as start of
+#ವ್ಯಾಖ್ಯಾನಿಸು NOPEN		150	//	Mark this point in input as start of
 				//	\%( subexpr.
-#define NCLOSE		151	//	Analogous to NOPEN.
+#ವ್ಯಾಖ್ಯಾನಿಸು NCLOSE		151	//	Analogous to NOPEN.
 
-#define MULTIBYTECODE	200	// mbc	Match one multi-byte character
-#define RE_BOF		201	//	Match "" at beginning of file.
-#define RE_EOF		202	//	Match "" at end of file.
-#define CURSOR		203	//	Match location of cursor.
+#ವ್ಯಾಖ್ಯಾನಿಸು MULTIBYTECODE	200	// mbc	Match one multi-byte character
+#ವ್ಯಾಖ್ಯಾನಿಸು RE_BOF		201	//	Match "" at beginning of file.
+#ವ್ಯಾಖ್ಯಾನಿಸು RE_EOF		202	//	Match "" at end of file.
+#ವ್ಯಾಖ್ಯಾನಿಸು CURSOR		203	//	Match location of cursor.
 
-#define RE_LNUM		204	// nr cmp  Match line number
-#define RE_COL		205	// nr cmp  Match column number
-#define RE_VCOL		206	// nr cmp  Match virtual column number
+#ವ್ಯಾಖ್ಯಾನಿಸು RE_LNUM		204	// nr cmp  Match line number
+#ವ್ಯಾಖ್ಯಾನಿಸು RE_ಲಂಬಸಾಲು		205	// nr cmp  Match column number
+#ವ್ಯಾಖ್ಯಾನಿಸು RE_VCOL		206	// nr cmp  Match virtual column number
 
-#define RE_MARK		207	// mark cmp  Match mark position
-#define RE_VISUAL	208	//	Match Visual area
-#define RE_COMPOSING	209	// any composing characters
+#ವ್ಯಾಖ್ಯಾನಿಸು RE_MARK		207	// mark cmp  Match mark position
+#ವ್ಯಾಖ್ಯಾನಿಸು RE_VISUAL	208	//	Match Visual area
+#ವ್ಯಾಖ್ಯಾನಿಸು RE_COMPOSING	209	// any composing characters
 
 /*
  * Flags to be passed up and down.
  */
-#define HASWIDTH	0x1	// Known never to match null string.
-#define SIMPLE		0x2	// Simple enough to be STAR/PLUS operand.
-#define SPSTART		0x4	// Starts with * or +.
-#define HASNL		0x8	// Contains some \n.
-#define HASLOOKBH	0x10	// Contains "\@<=" or "\@<!".
-#define WORST		0	// Worst case.
+#ವ್ಯಾಖ್ಯಾನಿಸು HASWIDTH	0x1	// Known never to match null string.
+#ವ್ಯಾಖ್ಯಾನಿಸು SIMPLE		0x2	// Simple enough to be STAR/PLUS operand.
+#ವ್ಯಾಖ್ಯಾನಿಸು SPSTART		0x4	// Starts with * or +.
+#ವ್ಯಾಖ್ಯಾನಿಸು HASNL		0x8	// Contains some \n.
+#ವ್ಯಾಖ್ಯಾನಿಸು HASLOOKBH	0x10	// Contains "\@<=" or "\@<!".
+#ವ್ಯಾಖ್ಯಾನಿಸು WORST		0	// Worst case.
 
-static int	num_complex_braces; // Complex \{...} count
-static char_u	*regcode;	// Code-emit pointer, or JUST_CALC_SIZE
-static long	regsize;	// Code size.
-static int	reg_toolong;	// TRUE when offset out of range
-static int	bt_reg_parse_depth;	// nesting depth in reg()
-static char_u	had_endbrace[NSUBEXP];	// flags, TRUE if end of () found
-static long	brace_min[10];	// Minimums for complex brace repeats
-static long	brace_max[10];	// Maximums for complex brace repeats
-static int	brace_count[10]; // Current counts for complex brace repeats
-static int	one_exactly = FALSE;	// only do one char for EXACTLY
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	ಅಂಕೆ_complex_braces; // Complex \{...} count
+ಸ್ಥಿರ char_u	*regcode;	// Code-emit pointer, or JUST_CALC_SIZE
+ಸ್ಥಿರ ದೀರ್ಘ	regsize;	// Code size.
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	reg_toolong;	// TRUE when offset out of range
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	bt_reg_parse_ಆಳ;	// nesting depth in reg()
+ಸ್ಥಿರ char_u	had_endbrace[NSUBEXP];	// flags, TRUE if end of () found
+ಸ್ಥಿರ ದೀರ್ಘ	brace_min[10];	// Minimums for complex brace repeats
+ಸ್ಥಿರ ದೀರ್ಘ	brace_max[10];	// Maximums for complex brace repeats
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	brace_ಎಣಿಕೆ[10]; // Current counts for complex brace repeats
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	one_exactly = FALSE;	// only do one char for EXACTLY
 
 // When making changes to classchars also change nfa_classcodes.
-static char_u	*classchars = (char_u *)".iIkKfFpPsSdDxXoOwWhHaAlLuU";
-static const int classcodes[] = {
+ಸ್ಥಿರ char_u	*classchars = (char_u *)".iIkKfFpPsSdDxXoOwWhHaAlLuU";
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ classcodes[] = {
     ANY, IDENT, SIDENT, KWORD, SKWORD,
     FNAME, SFNAME, PRINT, SPRINT,
     WHITE, NWHITE, DIGIT, NDIGIT,
     HEX, NHEX, OCTAL, NOCTAL,
-    WORD, NWORD, HEAD, NHEAD,
-    ALPHA, NALPHA, LOWER, NLOWER,
-    UPPER, NUPPER
+    ಶಬ್ದ_2, NWORD, ತಲೆ_2, NHEAD,
+    ALPHA, NALPHA, ಅಧೋ_2, NLOWER,
+    ಊರ್ಧ್ವ, NUPPER
 };
 
 /*
@@ -269,73 +269,73 @@ static const int classcodes[] = {
  * "]") and try to recognize a character class in expanded form, for example
  * [0-9].  On success, return the atom to be emitted, on failure 0.
  */
-    static int
-bt_recognize_char_class(char_u *start, char_u *end)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+bt_recognize_char_class(char_u *ಆರಂಭ, char_u *ಕೊನೆ)
 {
-    int		newl;
-    int		config = get_char_class_bits(start, end, &newl);
+    ಪೂರ್ಣಾಂಕ		newl;
+    ಪೂರ್ಣಾಂಕ		config = get_char_class_ಬಿಟ್ಟುಗಳು(ಆರಂಭ, ಕೊನೆ, &newl);
 
     // A newline would need the ADD_NL variant, don't bother with it here.
-    if (config < 0 || newl)
-	return 0;
+    ಆದರೆ (config < 0 || newl)
+	ಹಿಂತಿರುಗಿ 0;
 
 	// The old engine has no case-insensitive class opcode, so [a-z] and [A-Z]
 	// are left as collections.  The classes below are case-independent.
-    switch (config)
+    ಆಯ್ಕೆ (config)
     {
-	case CLASS_o9:
-	    return DIGIT;
-	case CLASS_not | CLASS_o9:
-	    return NDIGIT;
-	case CLASS_af | CLASS_AF | CLASS_o9:
-	    return HEX;
-	case CLASS_not | CLASS_af | CLASS_AF | CLASS_o9:
-	    return NHEX;
-	case CLASS_o7:
-	    return OCTAL;
-	case CLASS_not | CLASS_o7:
-	    return NOCTAL;
-	case CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
-	    return WORD;
-	case CLASS_not | CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
-	    return NWORD;
-	case CLASS_az | CLASS_AZ | CLASS_underscore:
-	    return HEAD;
-	case CLASS_not | CLASS_az | CLASS_AZ | CLASS_underscore:
-	    return NHEAD;
-	case CLASS_az | CLASS_AZ:
-	    return ALPHA;
-	case CLASS_not | CLASS_az | CLASS_AZ:
-	    return NALPHA;
+	ಸ್ಥಿತಿ CLASS_o9:
+	    ಹಿಂತಿರುಗಿ DIGIT;
+	ಸ್ಥಿತಿ CLASS_not | CLASS_o9:
+	    ಹಿಂತಿರುಗಿ NDIGIT;
+	ಸ್ಥಿತಿ CLASS_af | CLASS_AF | CLASS_o9:
+	    ಹಿಂತಿರುಗಿ HEX;
+	ಸ್ಥಿತಿ CLASS_not | CLASS_af | CLASS_AF | CLASS_o9:
+	    ಹಿಂತಿರುಗಿ NHEX;
+	ಸ್ಥಿತಿ CLASS_o7:
+	    ಹಿಂತಿರುಗಿ OCTAL;
+	ಸ್ಥಿತಿ CLASS_not | CLASS_o7:
+	    ಹಿಂತಿರುಗಿ NOCTAL;
+	ಸ್ಥಿತಿ CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
+	    ಹಿಂತಿರುಗಿ ಶಬ್ದ_2;
+	ಸ್ಥಿತಿ CLASS_not | CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
+	    ಹಿಂತಿರುಗಿ NWORD;
+	ಸ್ಥಿತಿ CLASS_az | CLASS_AZ | CLASS_underscore:
+	    ಹಿಂತಿರುಗಿ ತಲೆ_2;
+	ಸ್ಥಿತಿ CLASS_not | CLASS_az | CLASS_AZ | CLASS_underscore:
+	    ಹಿಂತಿರುಗಿ NHEAD;
+	ಸ್ಥಿತಿ CLASS_az | CLASS_AZ:
+	    ಹಿಂತಿರುಗಿ ALPHA;
+	ಸ್ಥಿತಿ CLASS_not | CLASS_az | CLASS_AZ:
+	    ಹಿಂತಿರುಗಿ NALPHA;
     }
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
 /*
  * When regcode is set to this value, code is not emitted and size is computed
  * instead.
  */
-#define JUST_CALC_SIZE	((char_u *) -1)
+#ವ್ಯಾಖ್ಯಾನಿಸು JUST_CALC_ಗಾತ್ರ	((char_u *) -1)
 
 // Values for rs_state in regitem_T.
-typedef enum regstate_E
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ regstate_E
 {
     RS_NOPEN = 0	// NOPEN and NCLOSE
     , RS_MOPEN		// MOPEN + [0-9]
     , RS_MCLOSE		// MCLOSE + [0-9]
-#ifdef FEAT_SYN_HL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
     , RS_ZOPEN		// ZOPEN + [0-9]
     , RS_ZCLOSE		// ZCLOSE + [0-9]
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     , RS_BRANCH		// BRANCH
-    , RS_BRCPLX_MORE	// BRACE_COMPLEX and trying one more match
+    , RS_BRCPLX_ಇನ್ನಷ್ಟು	// BRACE_COMPLEX and trying one more match
     , RS_BRCPLX_LONG	// BRACE_COMPLEX and trying longest match
     , RS_BRCPLX_SHORT	// BRACE_COMPLEX and trying shortest match
     , RS_NOMATCH	// NOMATCH
     , RS_BEHIND1	// BEHIND / NOBEHIND matching rest
     , RS_BEHIND2	// BEHIND / NOBEHIND matching behind part
-    , RS_STAR_LONG	// STAR/PLUS/BRACE_SIMPLE longest match
-    , RS_STAR_SHORT	// STAR/PLUS/BRACE_SIMPLE shortest match
+    , RS_ನಕ್ಷತ್ರ_LONG	// STAR/PLUS/BRACE_SIMPLE longest match
+    , RS_ನಕ್ಷತ್ರ_SHORT	// STAR/PLUS/BRACE_SIMPLE shortest match
 } regstate_T;
 
 /*
@@ -343,20 +343,20 @@ typedef enum regstate_E
  * restored after trying a match.  Used by reg_save() and reg_restore().
  * Also stores the length of "backpos".
  */
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    union
+    ಒಕ್ಕೂಟ
     {
 	char_u	*ptr;	// rex.input pointer, for single-line regexp
 	lpos_T	pos;	// rex.input pos, for multi-line regexp
     } rs_u;
-    int		rs_len;
+    ಪೂರ್ಣಾಂಕ		rs_len;
 } regsave_T;
 
 // struct to save start/end pointer/position in for \(\)
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    union
+    ಒಕ್ಕೂಟ
     {
 	char_u	*ptr;
 	lpos_T	pos;
@@ -364,13 +364,13 @@ typedef struct
 } save_se_T;
 
 // used for BEHIND and NOBEHIND matching
-typedef struct regbehind_S
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ regbehind_S
 {
     regsave_T	save_after;
     regsave_T	save_behind;
-    int		save_need_clear_subexpr;
-    save_se_T   save_start[NSUBEXP];
-    save_se_T   save_end[NSUBEXP];
+    ಪೂರ್ಣಾಂಕ		save_need_clear_subexpr;
+    save_se_T   save_ಆರಂಭ[NSUBEXP];
+    save_se_T   save_ಕೊನೆ[NSUBEXP];
 } regbehind_T;
 
 /*
@@ -379,12 +379,12 @@ typedef struct regbehind_S
  * Before it may be another type of item, depending on rs_state, to remember
  * more things.
  */
-typedef struct regitem_S
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ regitem_S
 {
     regstate_T	rs_state;	// what we are doing, one of RS_ above
-    short	rs_no;		// submatch nr or BEHIND/NOBEHIND
-    char_u	*rs_scan;	// current node in program
-    union
+    ಗಿಡ್ಡ	rs_no;		// submatch nr or BEHIND/NOBEHIND
+    char_u	*rs_ಪರಿಶೀಲನೆ;	// current node in program
+    ಒಕ್ಕೂಟ
     {
 	save_se_T  sesave;
 	regsave_T  regsave;
@@ -393,20 +393,20 @@ typedef struct regitem_S
 
 
 // used for STAR, PLUS and BRACE_SIMPLE matching
-typedef struct regstar_S
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ regstar_S
 {
-    int		nextb;		// next byte
-    int		nextb_ic;	// next byte reverse case
-    long	count;
-    long	minval;
-    long	maxval;
+    ಪೂರ್ಣಾಂಕ		nextb;		// next byte
+    ಪೂರ್ಣಾಂಕ		nextb_ic;	// next byte reverse case
+    ದೀರ್ಘ	ಎಣಿಕೆ_2;
+    ದೀರ್ಘ	minval;
+    ದೀರ್ಘ	maxval;
 } regstar_T;
 
 // used to store input position when a BACK was encountered, so that we now if
 // we made any progress since the last time.
-typedef struct backpos_S
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ backpos_S
 {
-    char_u	*bp_scan;	// "scan" where BACK was encountered
+    char_u	*bp_ಪರಿಶೀಲನೆ;	// "scan" where BACK was encountered
     regsave_T	bp_pos;		// last input position
 } backpos_T;
 
@@ -417,10 +417,10 @@ typedef struct backpos_S
  * or regbehind_T.
  * "backpos_T" is a table with backpos_T for BACK
  */
-static garray_T	regstack = {0, 0, 0, 0, NULL};
-static garray_T	backpos = {0, 0, 0, 0, NULL};
+ಸ್ಥಿರ garray_T	regstack = {0, 0, 0, 0, ಖಾಲಿ};
+ಸ್ಥಿರ garray_T	backpos = {0, 0, 0, 0, ಖಾಲಿ};
 
-static regsave_T behind_pos;
+ಸ್ಥಿರ regsave_T behind_pos;
 
 /*
  * Both for regstack and backpos tables we use the following strategy of
@@ -433,8 +433,8 @@ static regsave_T behind_pos;
  * This makes it fast while not keeping a lot of memory allocated.
  * A three times speed increase was observed when using many simple patterns.
  */
-#define REGSTACK_INITIAL	2048
-#define BACKPOS_INITIAL		64
+#ವ್ಯಾಖ್ಯಾನಿಸು REGSTACK_INITIAL	2048
+#ವ್ಯಾಖ್ಯಾನಿಸು BACKPOS_INITIAL		64
 
 /*
  * Opcode notes:
@@ -473,73 +473,73 @@ static regsave_T behind_pos;
  * Using two bytes for the "next" pointer is vast overkill for most things,
  * but allows patterns to get big without disasters.
  */
-#define OP(p)		((int)*(p))
-#define NEXT(p)		(((*((p) + 1) & 0377) << 8) + (*((p) + 2) & 0377))
-#define OPERAND(p)	((p) + 3)
+#ವ್ಯಾಖ್ಯಾನಿಸು OP(p)		((ಪೂರ್ಣಾಂಕ)*(p))
+#ವ್ಯಾಖ್ಯಾನಿಸು ಮುಂದಿನ_2(p)		(((*((p) + 1) & 0377) << 8) + (*((p) + 2) & 0377))
+#ವ್ಯಾಖ್ಯಾನಿಸು ಕಾರ್ಯಾಂಶ(p)	((p) + 3)
 // Obtain an operand that was stored as four bytes, MSB first.
-#define OPERAND_MIN(p)	(((long)(p)[3] << 24) + ((long)(p)[4] << 16) \
-			+ ((long)(p)[5] << 8) + (long)(p)[6])
+#ವ್ಯಾಖ್ಯಾನಿಸು ಕಾರ್ಯಾಂಶ_MIN(p)	(((ದೀರ್ಘ)(p)[3] << 24) + ((ದೀರ್ಘ)(p)[4] << 16) \
+			+ ((ದೀರ್ಘ)(p)[5] << 8) + (ದೀರ್ಘ)(p)[6])
 // Obtain a second operand stored as four bytes.
-#define OPERAND_MAX(p)	OPERAND_MIN((p) + 4)
+#ವ್ಯಾಖ್ಯಾನಿಸು ಕಾರ್ಯಾಂಶ_MAX(p)	ಕಾರ್ಯಾಂಶ_MIN((p) + 4)
 // Obtain a second single-byte operand stored after a four bytes operand.
-#define OPERAND_CMP(p)	(p)[7]
+#ವ್ಯಾಖ್ಯಾನಿಸು ಕಾರ್ಯಾಂಶ_CMP(p)	(p)[7]
 
-static char_u *reg(int paren, int *flagp);
+ಸ್ಥಿರ char_u *reg(ಪೂರ್ಣಾಂಕ paren, ಪೂರ್ಣಾಂಕ *flagp);
 
-#ifdef BT_REGEXP_DUMP
-static void	regdump(char_u *, bt_regprog_T *);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ BT_REGEXP_DUMP
+ಸ್ಥಿರ ಶೂನ್ಯ	regdump(char_u *, bt_regprog_T *);
+#ಆದರೆ_ಅಂತ್ಯ
 
-static int	re_num_cmp(long_u val, char_u *scan);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	re_ಅಂಕೆ_cmp(long_u val, char_u *ಪರಿಶೀಲನೆ);
 
-#ifdef DEBUG
-static char_u	*regprop(char_u *);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DEBUG
+ಸ್ಥಿರ char_u	*regprop(char_u *);
 
-static int	regnarrate = 0;
-#endif
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	regnarrate = 0;
+#ಆದರೆ_ಅಂತ್ಯ
 
 
 /*
  * Setup to parse the regexp.  Used once to get the length and once to do it.
  */
-    static void
-regcomp_start(
-    char_u	*expr,
-    int		re_flags)	    // see vim_regcomp()
+    ಸ್ಥಿರ ಶೂನ್ಯ
+regcomp_ಆರಂಭ(
+    char_u	*ಅಭಿವ್ಯಕ್ತಿ,
+    ಪೂರ್ಣಾಂಕ		re_flags)	    // see vim_regcomp()
 {
-    initchr(expr);
-    if (re_flags & RE_MAGIC)
+    initchr(ಅಭಿವ್ಯಕ್ತಿ);
+    ಆದರೆ (re_flags & RE_MAGIC)
 	reg_magic = MAGIC_ON;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	reg_magic = MAGIC_OFF;
     reg_string = (re_flags & RE_STRING);
     reg_strict = (re_flags & RE_STRICT);
     get_cpo_flags();
 
-    num_complex_braces = 0;
+    ಅಂಕೆ_complex_braces = 0;
     regnpar = 1;
-    CLEAR_FIELD(had_endbrace);
-#ifdef FEAT_SYN_HL
+    CLEAR_ಕ್ಷೇತ್ರ(had_endbrace);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
     regnzpar = 1;
     re_has_z = 0;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     regsize = 0L;
     reg_toolong = FALSE;
-    bt_reg_parse_depth = 0;
+    bt_reg_parse_ಆಳ = 0;
     regflags = 0;
-#if defined(FEAT_SYN_HL)
+#ಆದರೆ defined(FEAT_SYN_HL)
     had_eol = FALSE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Return TRUE if MULTIBYTECODE should be used instead of EXACTLY for
  * character "c".
  */
-    static int
-use_multibytecode(int c)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+use_multibytecode(ಪೂರ್ಣಾಂಕ c)
 {
-    return has_mbyte && (*mb_char2len)(c) > 1
+    ಹಿಂತಿರುಗಿ has_mbyte && (*mb_char2len)(c) > 1
 		     && (re_multi_type(peekchr()) != NOT_MULTI
 			     || (enc_utf8 && utf_iscomposing(c)));
 }
@@ -547,26 +547,26 @@ use_multibytecode(int c)
 /*
  * Emit (if appropriate) a byte of code
  */
-    static void
-regc(int b)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+regc(ಪೂರ್ಣಾಂಕ b)
 {
-    if (regcode == JUST_CALC_SIZE)
+    ಆದರೆ (regcode == JUST_CALC_ಗಾತ್ರ)
 	regsize++;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	*regcode++ = b;
 }
 
 /*
  * Emit (if appropriate) a multi-byte character of code
  */
-    static void
-regmbc(int c)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+regmbc(ಪೂರ್ಣಾಂಕ c)
 {
-    if (!has_mbyte && c > 0xff)
-	return;
-    if (regcode == JUST_CALC_SIZE)
+    ಆದರೆ (!has_mbyte && c > 0xff)
+	ಹಿಂತಿರುಗಿ;
+    ಆದರೆ (regcode == JUST_CALC_ಗಾತ್ರ)
 	regsize += (*mb_char2len)(c);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	regcode += (*mb_char2bytes)(c, regcode);
 }
 
@@ -576,21 +576,21 @@ regmbc(int c)
  * Currently only handles latin1, latin9 and utf-8.
  * NOTE: When changing this function, also change nfa_emit_equi_class()
  */
-    static void
-reg_equi_class(int c)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+reg_equi_class(ಪೂರ್ಣಾಂಕ c)
 {
-    if (enc_utf8 || STRCMP(p_enc, "latin1") == 0
+    ಆದರೆ (enc_utf8 || STRCMP(p_enc, "latin1") == 0
 					 || STRCMP(p_enc, "iso-8859-15") == 0)
     {
-	switch (c)
+	ಆಯ್ಕೆ (c)
 	{
 	    // Do not use '\300' style, it results in a negative number.
-	    case 'A': case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4:
-	    case 0xc5: case 0x100: case 0x102: case 0x104: case 0x1cd:
-	    case 0x1de: case 0x1e0: case 0x1fa: case 0x202: case 0x226:
-	    case 0x23a: case 0x1e00: case 0x1ea0: case 0x1ea2: case 0x1ea4:
-	    case 0x1ea6: case 0x1ea8: case 0x1eaa: case 0x1eac: case 0x1eae:
-	    case 0x1eb0: case 0x1eb2: case 0x1eb4: case 0x1eb6:
+	    ಸ್ಥಿತಿ 'A': ಸ್ಥಿತಿ 0xc0: ಸ್ಥಿತಿ 0xc1: ಸ್ಥಿತಿ 0xc2: ಸ್ಥಿತಿ 0xc3: ಸ್ಥಿತಿ 0xc4:
+	    ಸ್ಥಿತಿ 0xc5: ಸ್ಥಿತಿ 0x100: ಸ್ಥಿತಿ 0x102: ಸ್ಥಿತಿ 0x104: ಸ್ಥಿತಿ 0x1cd:
+	    ಸ್ಥಿತಿ 0x1de: ಸ್ಥಿತಿ 0x1e0: ಸ್ಥಿತಿ 0x1fa: ಸ್ಥಿತಿ 0x202: ಸ್ಥಿತಿ 0x226:
+	    ಸ್ಥಿತಿ 0x23a: ಸ್ಥಿತಿ 0x1e00: ಸ್ಥಿತಿ 0x1ea0: ಸ್ಥಿತಿ 0x1ea2: ಸ್ಥಿತಿ 0x1ea4:
+	    ಸ್ಥಿತಿ 0x1ea6: ಸ್ಥಿತಿ 0x1ea8: ಸ್ಥಿತಿ 0x1eaa: ಸ್ಥಿತಿ 0x1eac: ಸ್ಥಿತಿ 0x1eae:
+	    ಸ್ಥಿತಿ 0x1eb0: ಸ್ಥಿತಿ 0x1eb2: ಸ್ಥಿತಿ 0x1eb4: ಸ್ಥಿತಿ 0x1eb6:
 		      regmbc('A'); regmbc(0xc0); regmbc(0xc1); regmbc(0xc2);
 		      regmbc(0xc3); regmbc(0xc4); regmbc(0xc5);
 		      regmbc(0x100); regmbc(0x102); regmbc(0x104);
@@ -601,34 +601,34 @@ reg_equi_class(int c)
 		      regmbc(0x1ea8); regmbc(0x1eaa); regmbc(0x1eac);
 		      regmbc(0x1eae); regmbc(0x1eb0); regmbc(0x1eb2);
 		      regmbc(0x1eb4); regmbc(0x1eb6);
-		      return;
-	    case 'B': case 0x181: case 0x243: case 0x1e02:
-	    case 0x1e04: case 0x1e06:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'B': ಸ್ಥಿತಿ 0x181: ಸ್ಥಿತಿ 0x243: ಸ್ಥಿತಿ 0x1e02:
+	    ಸ್ಥಿತಿ 0x1e04: ಸ್ಥಿತಿ 0x1e06:
 		      regmbc('B');
 		      regmbc(0x181); regmbc(0x243); regmbc(0x1e02);
 		      regmbc(0x1e04); regmbc(0x1e06);
-		      return;
-	    case 'C': case 0xc7:
-	    case 0x106: case 0x108: case 0x10a: case 0x10c: case 0x187:
-	    case 0x23b: case 0x1e08: case 0xa792:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'C': ಸ್ಥಿತಿ 0xc7:
+	    ಸ್ಥಿತಿ 0x106: ಸ್ಥಿತಿ 0x108: ಸ್ಥಿತಿ 0x10a: ಸ್ಥಿತಿ 0x10c: ಸ್ಥಿತಿ 0x187:
+	    ಸ್ಥಿತಿ 0x23b: ಸ್ಥಿತಿ 0x1e08: ಸ್ಥಿತಿ 0xa792:
 		      regmbc('C'); regmbc(0xc7);
 		      regmbc(0x106); regmbc(0x108); regmbc(0x10a);
 		      regmbc(0x10c); regmbc(0x187); regmbc(0x23b);
 		      regmbc(0x1e08); regmbc(0xa792);
-		      return;
-	    case 'D': case 0x10e: case 0x110: case 0x18a:
-	    case 0x1e0a: case 0x1e0c: case 0x1e0e: case 0x1e10:
-	    case 0x1e12:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'D': ಸ್ಥಿತಿ 0x10e: ಸ್ಥಿತಿ 0x110: ಸ್ಥಿತಿ 0x18a:
+	    ಸ್ಥಿತಿ 0x1e0a: ಸ್ಥಿತಿ 0x1e0c: ಸ್ಥಿತಿ 0x1e0e: ಸ್ಥಿತಿ 0x1e10:
+	    ಸ್ಥಿತಿ 0x1e12:
 		      regmbc('D'); regmbc(0x10e); regmbc(0x110);
 		      regmbc(0x18a); regmbc(0x1e0a); regmbc(0x1e0c);
 		      regmbc(0x1e0e); regmbc(0x1e10); regmbc(0x1e12);
-		      return;
-	    case 'E': case 0xc8: case 0xc9: case 0xca: case 0xcb:
-	    case 0x112: case 0x114: case 0x116: case 0x118: case 0x11a:
-	    case 0x204: case 0x206: case 0x228: case 0x246: case 0x1e14:
-	    case 0x1e16: case 0x1e18: case 0x1e1a: case 0x1e1c:
-	    case 0x1eb8: case 0x1eba: case 0x1ebc: case 0x1ebe:
-	    case 0x1ec0: case 0x1ec2: case 0x1ec4: case 0x1ec6:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'E': ಸ್ಥಿತಿ 0xc8: ಸ್ಥಿತಿ 0xc9: ಸ್ಥಿತಿ 0xca: ಸ್ಥಿತಿ 0xcb:
+	    ಸ್ಥಿತಿ 0x112: ಸ್ಥಿತಿ 0x114: ಸ್ಥಿತಿ 0x116: ಸ್ಥಿತಿ 0x118: ಸ್ಥಿತಿ 0x11a:
+	    ಸ್ಥಿತಿ 0x204: ಸ್ಥಿತಿ 0x206: ಸ್ಥಿತಿ 0x228: ಸ್ಥಿತಿ 0x246: ಸ್ಥಿತಿ 0x1e14:
+	    ಸ್ಥಿತಿ 0x1e16: ಸ್ಥಿತಿ 0x1e18: ಸ್ಥಿತಿ 0x1e1a: ಸ್ಥಿತಿ 0x1e1c:
+	    ಸ್ಥಿತಿ 0x1eb8: ಸ್ಥಿತಿ 0x1eba: ಸ್ಥಿತಿ 0x1ebc: ಸ್ಥಿತಿ 0x1ebe:
+	    ಸ್ಥಿತಿ 0x1ec0: ಸ್ಥಿತಿ 0x1ec2: ಸ್ಥಿತಿ 0x1ec4: ಸ್ಥಿತಿ 0x1ec6:
 		      regmbc('E'); regmbc(0xc8); regmbc(0xc9);
 		      regmbc(0xca); regmbc(0xcb); regmbc(0x112);
 		      regmbc(0x114); regmbc(0x116); regmbc(0x118);
@@ -638,77 +638,77 @@ reg_equi_class(int c)
 		      regmbc(0x1e1c); regmbc(0x1eb8); regmbc(0x1eba);
 		      regmbc(0x1ebc); regmbc(0x1ebe); regmbc(0x1ec0);
 		      regmbc(0x1ec2); regmbc(0x1ec4); regmbc(0x1ec6);
-		      return;
-	    case 'F': case 0x191: case 0x1e1e: case 0xa798:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'F': ಸ್ಥಿತಿ 0x191: ಸ್ಥಿತಿ 0x1e1e: ಸ್ಥಿತಿ 0xa798:
 		      regmbc('F'); regmbc(0x191); regmbc(0x1e1e);
 		      regmbc(0xa798);
-		      return;
-	    case 'G': case 0x11c: case 0x11e: case 0x120:
-	    case 0x122: case 0x193: case 0x1e4: case 0x1e6:
-	    case 0x1f4: case 0x1e20: case 0xa7a0:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'G': ಸ್ಥಿತಿ 0x11c: ಸ್ಥಿತಿ 0x11e: ಸ್ಥಿತಿ 0x120:
+	    ಸ್ಥಿತಿ 0x122: ಸ್ಥಿತಿ 0x193: ಸ್ಥಿತಿ 0x1e4: ಸ್ಥಿತಿ 0x1e6:
+	    ಸ್ಥಿತಿ 0x1f4: ಸ್ಥಿತಿ 0x1e20: ಸ್ಥಿತಿ 0xa7a0:
 		      regmbc('G'); regmbc(0x11c); regmbc(0x11e);
 		      regmbc(0x120); regmbc(0x122); regmbc(0x193);
 		      regmbc(0x1e4); regmbc(0x1e6); regmbc(0x1f4);
 		      regmbc(0x1e20); regmbc(0xa7a0);
-		      return;
-	    case 'H': case 0x124: case 0x126: case 0x21e:
-	    case 0x1e22: case 0x1e24: case 0x1e26:
-	    case 0x1e28: case 0x1e2a: case 0x2c67:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'H': ಸ್ಥಿತಿ 0x124: ಸ್ಥಿತಿ 0x126: ಸ್ಥಿತಿ 0x21e:
+	    ಸ್ಥಿತಿ 0x1e22: ಸ್ಥಿತಿ 0x1e24: ಸ್ಥಿತಿ 0x1e26:
+	    ಸ್ಥಿತಿ 0x1e28: ಸ್ಥಿತಿ 0x1e2a: ಸ್ಥಿತಿ 0x2c67:
 		      regmbc('H'); regmbc(0x124); regmbc(0x126);
 		      regmbc(0x21e); regmbc(0x1e22); regmbc(0x1e24);
 		      regmbc(0x1e26); regmbc(0x1e28); regmbc(0x1e2a);
 		      regmbc(0x2c67);
-		      return;
-	    case 'I': case 0xcc: case 0xcd: case 0xce: case 0xcf:
-	    case 0x128: case 0x12a: case 0x12c: case 0x12e:
-	    case 0x130: case 0x197: case 0x1cf: case 0x208:
-	    case 0x20a: case 0x1e2c: case 0x1e2e: case 0x1ec8:
-	    case 0x1eca:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'I': ಸ್ಥಿತಿ 0xcc: ಸ್ಥಿತಿ 0xcd: ಸ್ಥಿತಿ 0xce: ಸ್ಥಿತಿ 0xcf:
+	    ಸ್ಥಿತಿ 0x128: ಸ್ಥಿತಿ 0x12a: ಸ್ಥಿತಿ 0x12c: ಸ್ಥಿತಿ 0x12e:
+	    ಸ್ಥಿತಿ 0x130: ಸ್ಥಿತಿ 0x197: ಸ್ಥಿತಿ 0x1cf: ಸ್ಥಿತಿ 0x208:
+	    ಸ್ಥಿತಿ 0x20a: ಸ್ಥಿತಿ 0x1e2c: ಸ್ಥಿತಿ 0x1e2e: ಸ್ಥಿತಿ 0x1ec8:
+	    ಸ್ಥಿತಿ 0x1eca:
 		      regmbc('I'); regmbc(0xcc); regmbc(0xcd);
 		      regmbc(0xce); regmbc(0xcf); regmbc(0x128);
 		      regmbc(0x12a); regmbc(0x12c); regmbc(0x12e);
 		      regmbc(0x130); regmbc(0x197); regmbc(0x1cf);
 		      regmbc(0x208); regmbc(0x20a); regmbc(0x1e2c);
 		      regmbc(0x1e2e); regmbc(0x1ec8); regmbc(0x1eca);
-		      return;
-	    case 'J': case 0x134: case 0x248:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'J': ಸ್ಥಿತಿ 0x134: ಸ್ಥಿತಿ 0x248:
 		      regmbc('J'); regmbc(0x134); regmbc(0x248);
-		      return;
-	    case 'K': case 0x136: case 0x198: case 0x1e8: case 0x1e30:
-	    case 0x1e32: case 0x1e34: case 0x2c69: case 0xa740:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'K': ಸ್ಥಿತಿ 0x136: ಸ್ಥಿತಿ 0x198: ಸ್ಥಿತಿ 0x1e8: ಸ್ಥಿತಿ 0x1e30:
+	    ಸ್ಥಿತಿ 0x1e32: ಸ್ಥಿತಿ 0x1e34: ಸ್ಥಿತಿ 0x2c69: ಸ್ಥಿತಿ 0xa740:
 		      regmbc('K'); regmbc(0x136); regmbc(0x198);
 		      regmbc(0x1e8); regmbc(0x1e30); regmbc(0x1e32);
 		      regmbc(0x1e34); regmbc(0x2c69); regmbc(0xa740);
-		      return;
-	    case 'L': case 0x139: case 0x13b: case 0x13d: case 0x13f:
-	    case 0x141: case 0x23d: case 0x1e36: case 0x1e38:
-	    case 0x1e3a: case 0x1e3c: case 0x2c60:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'L': ಸ್ಥಿತಿ 0x139: ಸ್ಥಿತಿ 0x13b: ಸ್ಥಿತಿ 0x13d: ಸ್ಥಿತಿ 0x13f:
+	    ಸ್ಥಿತಿ 0x141: ಸ್ಥಿತಿ 0x23d: ಸ್ಥಿತಿ 0x1e36: ಸ್ಥಿತಿ 0x1e38:
+	    ಸ್ಥಿತಿ 0x1e3a: ಸ್ಥಿತಿ 0x1e3c: ಸ್ಥಿತಿ 0x2c60:
 		      regmbc('L'); regmbc(0x139); regmbc(0x13b);
 		      regmbc(0x13d); regmbc(0x13f); regmbc(0x141);
 		      regmbc(0x23d); regmbc(0x1e36); regmbc(0x1e38);
 		      regmbc(0x1e3a); regmbc(0x1e3c); regmbc(0x2c60);
-		      return;
-	    case 'M': case 0x1e3e: case 0x1e40: case 0x1e42:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'M': ಸ್ಥಿತಿ 0x1e3e: ಸ್ಥಿತಿ 0x1e40: ಸ್ಥಿತಿ 0x1e42:
 		      regmbc('M'); regmbc(0x1e3e); regmbc(0x1e40);
 		      regmbc(0x1e42);
-		      return;
-	    case 'N': case 0xd1:
-	    case 0x143: case 0x145: case 0x147: case 0x1f8:
-	    case 0x1e44: case 0x1e46: case 0x1e48: case 0x1e4a:
-	    case 0xa7a4:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'N': ಸ್ಥಿತಿ 0xd1:
+	    ಸ್ಥಿತಿ 0x143: ಸ್ಥಿತಿ 0x145: ಸ್ಥಿತಿ 0x147: ಸ್ಥಿತಿ 0x1f8:
+	    ಸ್ಥಿತಿ 0x1e44: ಸ್ಥಿತಿ 0x1e46: ಸ್ಥಿತಿ 0x1e48: ಸ್ಥಿತಿ 0x1e4a:
+	    ಸ್ಥಿತಿ 0xa7a4:
 		      regmbc('N'); regmbc(0xd1);
 		      regmbc(0x143); regmbc(0x145); regmbc(0x147);
 		      regmbc(0x1f8); regmbc(0x1e44); regmbc(0x1e46);
 		      regmbc(0x1e48); regmbc(0x1e4a); regmbc(0xa7a4);
-		      return;
-	    case 'O': case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6:
-	    case 0xd8: case 0x14c: case 0x14e: case 0x150: case 0x19f:
-	    case 0x1a0: case 0x1d1: case 0x1ea: case 0x1ec: case 0x1fe:
-	    case 0x20c: case 0x20e: case 0x22a: case 0x22c: case 0x22e:
-	    case 0x230: case 0x1e4c: case 0x1e4e: case 0x1e50: case 0x1e52:
-	    case 0x1ecc: case 0x1ece: case 0x1ed0: case 0x1ed2: case 0x1ed4:
-	    case 0x1ed6: case 0x1ed8: case 0x1eda: case 0x1edc: case 0x1ede:
-	    case 0x1ee0: case 0x1ee2:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'O': ಸ್ಥಿತಿ 0xd2: ಸ್ಥಿತಿ 0xd3: ಸ್ಥಿತಿ 0xd4: ಸ್ಥಿತಿ 0xd5: ಸ್ಥಿತಿ 0xd6:
+	    ಸ್ಥಿತಿ 0xd8: ಸ್ಥಿತಿ 0x14c: ಸ್ಥಿತಿ 0x14e: ಸ್ಥಿತಿ 0x150: ಸ್ಥಿತಿ 0x19f:
+	    ಸ್ಥಿತಿ 0x1a0: ಸ್ಥಿತಿ 0x1d1: ಸ್ಥಿತಿ 0x1ea: ಸ್ಥಿತಿ 0x1ec: ಸ್ಥಿತಿ 0x1fe:
+	    ಸ್ಥಿತಿ 0x20c: ಸ್ಥಿತಿ 0x20e: ಸ್ಥಿತಿ 0x22a: ಸ್ಥಿತಿ 0x22c: ಸ್ಥಿತಿ 0x22e:
+	    ಸ್ಥಿತಿ 0x230: ಸ್ಥಿತಿ 0x1e4c: ಸ್ಥಿತಿ 0x1e4e: ಸ್ಥಿತಿ 0x1e50: ಸ್ಥಿತಿ 0x1e52:
+	    ಸ್ಥಿತಿ 0x1ecc: ಸ್ಥಿತಿ 0x1ece: ಸ್ಥಿತಿ 0x1ed0: ಸ್ಥಿತಿ 0x1ed2: ಸ್ಥಿತಿ 0x1ed4:
+	    ಸ್ಥಿತಿ 0x1ed6: ಸ್ಥಿತಿ 0x1ed8: ಸ್ಥಿತಿ 0x1eda: ಸ್ಥಿತಿ 0x1edc: ಸ್ಥಿತಿ 0x1ede:
+	    ಸ್ಥಿತಿ 0x1ee0: ಸ್ಥಿತಿ 0x1ee2:
 		      regmbc('O'); regmbc(0xd2); regmbc(0xd3); regmbc(0xd4);
 		      regmbc(0xd5); regmbc(0xd6); regmbc(0xd8);
 		      regmbc(0x14c); regmbc(0x14e); regmbc(0x150);
@@ -722,48 +722,48 @@ reg_equi_class(int c)
 		      regmbc(0x1ed6); regmbc(0x1ed8); regmbc(0x1eda);
 		      regmbc(0x1edc); regmbc(0x1ede); regmbc(0x1ee0);
 		      regmbc(0x1ee2);
-		      return;
-	    case 'P': case 0x1a4: case 0x1e54: case 0x1e56: case 0x2c63:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'P': ಸ್ಥಿತಿ 0x1a4: ಸ್ಥಿತಿ 0x1e54: ಸ್ಥಿತಿ 0x1e56: ಸ್ಥಿತಿ 0x2c63:
 		      regmbc('P'); regmbc(0x1a4); regmbc(0x1e54);
 		      regmbc(0x1e56); regmbc(0x2c63);
-		      return;
-	    case 'Q': case 0x24a:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'Q': ಸ್ಥಿತಿ 0x24a:
 		      regmbc('Q'); regmbc(0x24a);
-		      return;
-	    case 'R': case 0x154: case 0x156: case 0x158: case 0x210:
-	    case 0x212: case 0x24c: case 0x1e58: case 0x1e5a:
-	    case 0x1e5c: case 0x1e5e: case 0x2c64: case 0xa7a6:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'R': ಸ್ಥಿತಿ 0x154: ಸ್ಥಿತಿ 0x156: ಸ್ಥಿತಿ 0x158: ಸ್ಥಿತಿ 0x210:
+	    ಸ್ಥಿತಿ 0x212: ಸ್ಥಿತಿ 0x24c: ಸ್ಥಿತಿ 0x1e58: ಸ್ಥಿತಿ 0x1e5a:
+	    ಸ್ಥಿತಿ 0x1e5c: ಸ್ಥಿತಿ 0x1e5e: ಸ್ಥಿತಿ 0x2c64: ಸ್ಥಿತಿ 0xa7a6:
 		      regmbc('R'); regmbc(0x154); regmbc(0x156);
 		      regmbc(0x210); regmbc(0x212); regmbc(0x158);
 		      regmbc(0x24c); regmbc(0x1e58); regmbc(0x1e5a);
 		      regmbc(0x1e5c); regmbc(0x1e5e); regmbc(0x2c64);
 		      regmbc(0xa7a6);
-		      return;
-	    case 'S': case 0x15a: case 0x15c: case 0x15e: case 0x160:
-	    case 0x218: case 0x1e60: case 0x1e62: case 0x1e64:
-	    case 0x1e66: case 0x1e68: case 0x2c7e: case 0xa7a8:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'S': ಸ್ಥಿತಿ 0x15a: ಸ್ಥಿತಿ 0x15c: ಸ್ಥಿತಿ 0x15e: ಸ್ಥಿತಿ 0x160:
+	    ಸ್ಥಿತಿ 0x218: ಸ್ಥಿತಿ 0x1e60: ಸ್ಥಿತಿ 0x1e62: ಸ್ಥಿತಿ 0x1e64:
+	    ಸ್ಥಿತಿ 0x1e66: ಸ್ಥಿತಿ 0x1e68: ಸ್ಥಿತಿ 0x2c7e: ಸ್ಥಿತಿ 0xa7a8:
 		      regmbc('S'); regmbc(0x15a); regmbc(0x15c);
 		      regmbc(0x15e); regmbc(0x160); regmbc(0x218);
 		      regmbc(0x1e60); regmbc(0x1e62); regmbc(0x1e64);
 		      regmbc(0x1e66); regmbc(0x1e68); regmbc(0x2c7e);
 			  regmbc(0xa7a8);
-		      return;
-	    case 'T': case 0x162: case 0x164: case 0x166: case 0x1ac:
-	    case 0x1ae: case 0x21a: case 0x23e: case 0x1e6a: case 0x1e6c:
-	    case 0x1e6e: case 0x1e70:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'T': ಸ್ಥಿತಿ 0x162: ಸ್ಥಿತಿ 0x164: ಸ್ಥಿತಿ 0x166: ಸ್ಥಿತಿ 0x1ac:
+	    ಸ್ಥಿತಿ 0x1ae: ಸ್ಥಿತಿ 0x21a: ಸ್ಥಿತಿ 0x23e: ಸ್ಥಿತಿ 0x1e6a: ಸ್ಥಿತಿ 0x1e6c:
+	    ಸ್ಥಿತಿ 0x1e6e: ಸ್ಥಿತಿ 0x1e70:
 		      regmbc('T'); regmbc(0x162); regmbc(0x164);
 		      regmbc(0x166); regmbc(0x1ac); regmbc(0x23e);
 		      regmbc(0x1ae); regmbc(0x21a); regmbc(0x1e6a);
 		      regmbc(0x1e6c); regmbc(0x1e6e); regmbc(0x1e70);
-		      return;
-	    case 'U': case 0xd9: case 0xda: case 0xdb: case 0xdc:
-	    case 0x168: case 0x16a: case 0x16c: case 0x16e:
-	    case 0x170: case 0x172: case 0x1af: case 0x1d3:
-	    case 0x1d5: case 0x1d7: case 0x1d9: case 0x1db:
-	    case 0x214: case 0x216: case 0x244: case 0x1e72:
-	    case 0x1e74: case 0x1e76: case 0x1e78: case 0x1e7a:
-	    case 0x1ee4: case 0x1ee6: case 0x1ee8: case 0x1eea:
-	    case 0x1eec: case 0x1eee: case 0x1ef0:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'U': ಸ್ಥಿತಿ 0xd9: ಸ್ಥಿತಿ 0xda: ಸ್ಥಿತಿ 0xdb: ಸ್ಥಿತಿ 0xdc:
+	    ಸ್ಥಿತಿ 0x168: ಸ್ಥಿತಿ 0x16a: ಸ್ಥಿತಿ 0x16c: ಸ್ಥಿತಿ 0x16e:
+	    ಸ್ಥಿತಿ 0x170: ಸ್ಥಿತಿ 0x172: ಸ್ಥಿತಿ 0x1af: ಸ್ಥಿತಿ 0x1d3:
+	    ಸ್ಥಿತಿ 0x1d5: ಸ್ಥಿತಿ 0x1d7: ಸ್ಥಿತಿ 0x1d9: ಸ್ಥಿತಿ 0x1db:
+	    ಸ್ಥಿತಿ 0x214: ಸ್ಥಿತಿ 0x216: ಸ್ಥಿತಿ 0x244: ಸ್ಥಿತಿ 0x1e72:
+	    ಸ್ಥಿತಿ 0x1e74: ಸ್ಥಿತಿ 0x1e76: ಸ್ಥಿತಿ 0x1e78: ಸ್ಥಿತಿ 0x1e7a:
+	    ಸ್ಥಿತಿ 0x1ee4: ಸ್ಥಿತಿ 0x1ee6: ಸ್ಥಿತಿ 0x1ee8: ಸ್ಥಿತಿ 0x1eea:
+	    ಸ್ಥಿತಿ 0x1eec: ಸ್ಥಿತಿ 0x1eee: ಸ್ಥಿತಿ 0x1ef0:
 		      regmbc('U'); regmbc(0xd9); regmbc(0xda);
 		      regmbc(0xdb); regmbc(0xdc); regmbc(0x168);
 		      regmbc(0x16a); regmbc(0x16c); regmbc(0x16e);
@@ -775,42 +775,42 @@ reg_equi_class(int c)
 		      regmbc(0x1e7a); regmbc(0x1ee4); regmbc(0x1ee6);
 		      regmbc(0x1ee8); regmbc(0x1eea); regmbc(0x1eec);
 		      regmbc(0x1eee); regmbc(0x1ef0);
-		      return;
-	    case 'V': case 0x1b2: case 0x1e7c: case 0x1e7e:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'V': ಸ್ಥಿತಿ 0x1b2: ಸ್ಥಿತಿ 0x1e7c: ಸ್ಥಿತಿ 0x1e7e:
 		      regmbc('V'); regmbc(0x1b2); regmbc(0x1e7c);
 		      regmbc(0x1e7e);
-		      return;
-	    case 'W': case 0x174: case 0x1e80: case 0x1e82:
-	    case 0x1e84: case 0x1e86: case 0x1e88:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'W': ಸ್ಥಿತಿ 0x174: ಸ್ಥಿತಿ 0x1e80: ಸ್ಥಿತಿ 0x1e82:
+	    ಸ್ಥಿತಿ 0x1e84: ಸ್ಥಿತಿ 0x1e86: ಸ್ಥಿತಿ 0x1e88:
 		      regmbc('W'); regmbc(0x174); regmbc(0x1e80);
 		      regmbc(0x1e82); regmbc(0x1e84); regmbc(0x1e86);
 		      regmbc(0x1e88);
-		      return;
-	    case 'X': case 0x1e8a: case 0x1e8c:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'X': ಸ್ಥಿತಿ 0x1e8a: ಸ್ಥಿತಿ 0x1e8c:
 		      regmbc('X'); regmbc(0x1e8a); regmbc(0x1e8c);
-		      return;
-	    case 'Y': case 0xdd:
-	    case 0x176: case 0x178: case 0x1b3: case 0x232: case 0x24e:
-	    case 0x1e8e: case 0x1ef2: case 0x1ef6: case 0x1ef4: case 0x1ef8:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'Y': ಸ್ಥಿತಿ 0xdd:
+	    ಸ್ಥಿತಿ 0x176: ಸ್ಥಿತಿ 0x178: ಸ್ಥಿತಿ 0x1b3: ಸ್ಥಿತಿ 0x232: ಸ್ಥಿತಿ 0x24e:
+	    ಸ್ಥಿತಿ 0x1e8e: ಸ್ಥಿತಿ 0x1ef2: ಸ್ಥಿತಿ 0x1ef6: ಸ್ಥಿತಿ 0x1ef4: ಸ್ಥಿತಿ 0x1ef8:
 		      regmbc('Y'); regmbc(0xdd); regmbc(0x176);
 		      regmbc(0x178); regmbc(0x1b3); regmbc(0x232);
 		      regmbc(0x24e); regmbc(0x1e8e); regmbc(0x1ef2);
 		      regmbc(0x1ef4); regmbc(0x1ef6); regmbc(0x1ef8);
-		      return;
-	    case 'Z': case 0x179: case 0x17b: case 0x17d: case 0x1b5:
-	    case 0x1e90: case 0x1e92: case 0x1e94: case 0x2c6b:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'Z': ಸ್ಥಿತಿ 0x179: ಸ್ಥಿತಿ 0x17b: ಸ್ಥಿತಿ 0x17d: ಸ್ಥಿತಿ 0x1b5:
+	    ಸ್ಥಿತಿ 0x1e90: ಸ್ಥಿತಿ 0x1e92: ಸ್ಥಿತಿ 0x1e94: ಸ್ಥಿತಿ 0x2c6b:
 		      regmbc('Z'); regmbc(0x179); regmbc(0x17b);
 		      regmbc(0x17d); regmbc(0x1b5); regmbc(0x1e90);
 		      regmbc(0x1e92); regmbc(0x1e94); regmbc(0x2c6b);
-		      return;
-	    case 'a': case 0xe0: case 0xe1: case 0xe2:
-	    case 0xe3: case 0xe4: case 0xe5: case 0x101: case 0x103:
-	    case 0x105: case 0x1ce: case 0x1df: case 0x1e1: case 0x1fb:
-	    case 0x201: case 0x203: case 0x227: case 0x1d8f: case 0x1e01:
-	    case 0x1e9a: case 0x1ea1: case 0x1ea3: case 0x1ea5:
-	    case 0x1ea7: case 0x1ea9: case 0x1eab: case 0x1ead:
-	    case 0x1eaf: case 0x1eb1: case 0x1eb3: case 0x1eb5:
-	    case 0x1eb7: case 0x2c65:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'a': ಸ್ಥಿತಿ 0xe0: ಸ್ಥಿತಿ 0xe1: ಸ್ಥಿತಿ 0xe2:
+	    ಸ್ಥಿತಿ 0xe3: ಸ್ಥಿತಿ 0xe4: ಸ್ಥಿತಿ 0xe5: ಸ್ಥಿತಿ 0x101: ಸ್ಥಿತಿ 0x103:
+	    ಸ್ಥಿತಿ 0x105: ಸ್ಥಿತಿ 0x1ce: ಸ್ಥಿತಿ 0x1df: ಸ್ಥಿತಿ 0x1e1: ಸ್ಥಿತಿ 0x1fb:
+	    ಸ್ಥಿತಿ 0x201: ಸ್ಥಿತಿ 0x203: ಸ್ಥಿತಿ 0x227: ಸ್ಥಿತಿ 0x1d8f: ಸ್ಥಿತಿ 0x1e01:
+	    ಸ್ಥಿತಿ 0x1e9a: ಸ್ಥಿತಿ 0x1ea1: ಸ್ಥಿತಿ 0x1ea3: ಸ್ಥಿತಿ 0x1ea5:
+	    ಸ್ಥಿತಿ 0x1ea7: ಸ್ಥಿತಿ 0x1ea9: ಸ್ಥಿತಿ 0x1eab: ಸ್ಥಿತಿ 0x1ead:
+	    ಸ್ಥಿತಿ 0x1eaf: ಸ್ಥಿತಿ 0x1eb1: ಸ್ಥಿತಿ 0x1eb3: ಸ್ಥಿತಿ 0x1eb5:
+	    ಸ್ಥಿತಿ 0x1eb7: ಸ್ಥಿತಿ 0x2c65:
 		      regmbc('a'); regmbc(0xe0); regmbc(0xe1);
 		      regmbc(0xe2); regmbc(0xe3); regmbc(0xe4);
 		      regmbc(0xe5); regmbc(0x101); regmbc(0x103);
@@ -822,37 +822,37 @@ reg_equi_class(int c)
 		      regmbc(0x1ea9); regmbc(0x1eab); regmbc(0x1ead);
 		      regmbc(0x1eaf); regmbc(0x1eb1); regmbc(0x1eb3);
 		      regmbc(0x1eb5); regmbc(0x1eb7); regmbc(0x2c65);
-		      return;
-	    case 'b': case 0x180: case 0x253: case 0x1d6c: case 0x1d80:
-	    case 0x1e03: case 0x1e05: case 0x1e07:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'b': ಸ್ಥಿತಿ 0x180: ಸ್ಥಿತಿ 0x253: ಸ್ಥಿತಿ 0x1d6c: ಸ್ಥಿತಿ 0x1d80:
+	    ಸ್ಥಿತಿ 0x1e03: ಸ್ಥಿತಿ 0x1e05: ಸ್ಥಿತಿ 0x1e07:
 		      regmbc('b');
 		      regmbc(0x180); regmbc(0x253); regmbc(0x1d6c);
 		      regmbc(0x1d80); regmbc(0x1e03); regmbc(0x1e05);
 		      regmbc(0x1e07);
-		      return;
-	    case 'c': case 0xe7:
-	    case 0x107: case 0x109: case 0x10b: case 0x10d: case 0x188:
-	    case 0x23c: case 0x1e09: case 0xa793: case 0xa794:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'c': ಸ್ಥಿತಿ 0xe7:
+	    ಸ್ಥಿತಿ 0x107: ಸ್ಥಿತಿ 0x109: ಸ್ಥಿತಿ 0x10b: ಸ್ಥಿತಿ 0x10d: ಸ್ಥಿತಿ 0x188:
+	    ಸ್ಥಿತಿ 0x23c: ಸ್ಥಿತಿ 0x1e09: ಸ್ಥಿತಿ 0xa793: ಸ್ಥಿತಿ 0xa794:
 		      regmbc('c'); regmbc(0xe7); regmbc(0x107);
 		      regmbc(0x109); regmbc(0x10b); regmbc(0x10d);
 		      regmbc(0x188); regmbc(0x23c); regmbc(0x1e09);
 		      regmbc(0xa793); regmbc(0xa794);
-		      return;
-	    case 'd': case 0x10f: case 0x111: case 0x257: case 0x1d6d:
-	    case 0x1d81: case 0x1d91: case 0x1e0b: case 0x1e0d:
-	    case 0x1e0f: case 0x1e11: case 0x1e13:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'd': ಸ್ಥಿತಿ 0x10f: ಸ್ಥಿತಿ 0x111: ಸ್ಥಿತಿ 0x257: ಸ್ಥಿತಿ 0x1d6d:
+	    ಸ್ಥಿತಿ 0x1d81: ಸ್ಥಿತಿ 0x1d91: ಸ್ಥಿತಿ 0x1e0b: ಸ್ಥಿತಿ 0x1e0d:
+	    ಸ್ಥಿತಿ 0x1e0f: ಸ್ಥಿತಿ 0x1e11: ಸ್ಥಿತಿ 0x1e13:
 		      regmbc('d'); regmbc(0x10f); regmbc(0x111);
 		      regmbc(0x257); regmbc(0x1d6d); regmbc(0x1d81);
 		      regmbc(0x1d91); regmbc(0x1e0b); regmbc(0x1e0d);
 		      regmbc(0x1e0f); regmbc(0x1e11); regmbc(0x1e13);
-		      return;
-	    case 'e': case 0xe8: case 0xe9: case 0xea: case 0xeb:
-	    case 0x113: case 0x115: case 0x117: case 0x119:
-	    case 0x11b: case 0x205: case 0x207: case 0x229:
-	    case 0x247: case 0x1d92: case 0x1e15: case 0x1e17:
-	    case 0x1e19: case 0x1e1b: case 0x1eb9: case 0x1ebb:
-	    case 0x1e1d: case 0x1ebd: case 0x1ebf: case 0x1ec1:
-	    case 0x1ec3: case 0x1ec5: case 0x1ec7:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'e': ಸ್ಥಿತಿ 0xe8: ಸ್ಥಿತಿ 0xe9: ಸ್ಥಿತಿ 0xea: ಸ್ಥಿತಿ 0xeb:
+	    ಸ್ಥಿತಿ 0x113: ಸ್ಥಿತಿ 0x115: ಸ್ಥಿತಿ 0x117: ಸ್ಥಿತಿ 0x119:
+	    ಸ್ಥಿತಿ 0x11b: ಸ್ಥಿತಿ 0x205: ಸ್ಥಿತಿ 0x207: ಸ್ಥಿತಿ 0x229:
+	    ಸ್ಥಿತಿ 0x247: ಸ್ಥಿತಿ 0x1d92: ಸ್ಥಿತಿ 0x1e15: ಸ್ಥಿತಿ 0x1e17:
+	    ಸ್ಥಿತಿ 0x1e19: ಸ್ಥಿತಿ 0x1e1b: ಸ್ಥಿತಿ 0x1eb9: ಸ್ಥಿತಿ 0x1ebb:
+	    ಸ್ಥಿತಿ 0x1e1d: ಸ್ಥಿತಿ 0x1ebd: ಸ್ಥಿತಿ 0x1ebf: ಸ್ಥಿತಿ 0x1ec1:
+	    ಸ್ಥಿತಿ 0x1ec3: ಸ್ಥಿತಿ 0x1ec5: ಸ್ಥಿತಿ 0x1ec7:
 		      regmbc('e'); regmbc(0xe8); regmbc(0xe9);
 		      regmbc(0xea); regmbc(0xeb); regmbc(0x113);
 		      regmbc(0x115); regmbc(0x117); regmbc(0x119);
@@ -863,83 +863,83 @@ reg_equi_class(int c)
 		      regmbc(0x1ebb); regmbc(0x1ebd); regmbc(0x1ebf);
 		      regmbc(0x1ec1); regmbc(0x1ec3); regmbc(0x1ec5);
 		      regmbc(0x1ec7);
-		      return;
-	    case 'f': case 0x192: case 0x1d6e: case 0x1d82:
-	    case 0x1e1f: case 0xa799:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'f': ಸ್ಥಿತಿ 0x192: ಸ್ಥಿತಿ 0x1d6e: ಸ್ಥಿತಿ 0x1d82:
+	    ಸ್ಥಿತಿ 0x1e1f: ಸ್ಥಿತಿ 0xa799:
 		     regmbc('f'); regmbc(0x192); regmbc(0x1d6e);
 		     regmbc(0x1d82); regmbc(0x1e1f); regmbc(0xa799);
-		     return;
-	    case 'g': case 0x11d: case 0x11f: case 0x121: case 0x123:
-	    case 0x1e5: case 0x1e7: case 0x260: case 0x1f5: case 0x1d83:
-	    case 0x1e21: case 0xa7a1:
+		     ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'g': ಸ್ಥಿತಿ 0x11d: ಸ್ಥಿತಿ 0x11f: ಸ್ಥಿತಿ 0x121: ಸ್ಥಿತಿ 0x123:
+	    ಸ್ಥಿತಿ 0x1e5: ಸ್ಥಿತಿ 0x1e7: ಸ್ಥಿತಿ 0x260: ಸ್ಥಿತಿ 0x1f5: ಸ್ಥಿತಿ 0x1d83:
+	    ಸ್ಥಿತಿ 0x1e21: ಸ್ಥಿತಿ 0xa7a1:
 		      regmbc('g'); regmbc(0x11d); regmbc(0x11f);
 		      regmbc(0x121); regmbc(0x123); regmbc(0x1e5);
 		      regmbc(0x1e7); regmbc(0x1f5); regmbc(0x260);
 		      regmbc(0x1d83); regmbc(0x1e21); regmbc(0xa7a1);
-		      return;
-	    case 'h': case 0x125: case 0x127: case 0x21f: case 0x1e23:
-	    case 0x1e25: case 0x1e27: case 0x1e29: case 0x1e2b:
-	    case 0x1e96: case 0x2c68: case 0xa795:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'h': ಸ್ಥಿತಿ 0x125: ಸ್ಥಿತಿ 0x127: ಸ್ಥಿತಿ 0x21f: ಸ್ಥಿತಿ 0x1e23:
+	    ಸ್ಥಿತಿ 0x1e25: ಸ್ಥಿತಿ 0x1e27: ಸ್ಥಿತಿ 0x1e29: ಸ್ಥಿತಿ 0x1e2b:
+	    ಸ್ಥಿತಿ 0x1e96: ಸ್ಥಿತಿ 0x2c68: ಸ್ಥಿತಿ 0xa795:
 		      regmbc('h'); regmbc(0x125); regmbc(0x127);
 		      regmbc(0x21f); regmbc(0x1e23); regmbc(0x1e25);
 		      regmbc(0x1e27); regmbc(0x1e29); regmbc(0x1e2b);
 		      regmbc(0x1e96); regmbc(0x2c68); regmbc(0xa795);
-		      return;
-	    case 'i': case 0xec: case 0xed: case 0xee: case 0xef:
-	    case 0x129: case 0x12b: case 0x12d: case 0x12f:
-	    case 0x1d0: case 0x209: case 0x20b: case 0x268:
-	    case 0x1d96: case 0x1e2d: case 0x1e2f: case 0x1ec9:
-	    case 0x1ecb:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'i': ಸ್ಥಿತಿ 0xec: ಸ್ಥಿತಿ 0xed: ಸ್ಥಿತಿ 0xee: ಸ್ಥಿತಿ 0xef:
+	    ಸ್ಥಿತಿ 0x129: ಸ್ಥಿತಿ 0x12b: ಸ್ಥಿತಿ 0x12d: ಸ್ಥಿತಿ 0x12f:
+	    ಸ್ಥಿತಿ 0x1d0: ಸ್ಥಿತಿ 0x209: ಸ್ಥಿತಿ 0x20b: ಸ್ಥಿತಿ 0x268:
+	    ಸ್ಥಿತಿ 0x1d96: ಸ್ಥಿತಿ 0x1e2d: ಸ್ಥಿತಿ 0x1e2f: ಸ್ಥಿತಿ 0x1ec9:
+	    ಸ್ಥಿತಿ 0x1ecb:
 		      regmbc('i'); regmbc(0xec); regmbc(0xed);
 		      regmbc(0xee); regmbc(0xef); regmbc(0x129);
 		      regmbc(0x12b); regmbc(0x12d); regmbc(0x12f);
 		      regmbc(0x1d0); regmbc(0x209); regmbc(0x20b);
 		      regmbc(0x268); regmbc(0x1d96); regmbc(0x1e2d);
 		      regmbc(0x1e2f); regmbc(0x1ec9); regmbc(0x1ecb);
-		      return;
-	    case 'j': case 0x135: case 0x1f0: case 0x249:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'j': ಸ್ಥಿತಿ 0x135: ಸ್ಥಿತಿ 0x1f0: ಸ್ಥಿತಿ 0x249:
 		      regmbc('j'); regmbc(0x135); regmbc(0x1f0);
 		      regmbc(0x249);
-		      return;
-	    case 'k': case 0x137: case 0x199: case 0x1e9:
-	    case 0x1d84: case 0x1e31: case 0x1e33: case 0x1e35:
-	    case 0x2c6a: case 0xa741:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'k': ಸ್ಥಿತಿ 0x137: ಸ್ಥಿತಿ 0x199: ಸ್ಥಿತಿ 0x1e9:
+	    ಸ್ಥಿತಿ 0x1d84: ಸ್ಥಿತಿ 0x1e31: ಸ್ಥಿತಿ 0x1e33: ಸ್ಥಿತಿ 0x1e35:
+	    ಸ್ಥಿತಿ 0x2c6a: ಸ್ಥಿತಿ 0xa741:
 		      regmbc('k'); regmbc(0x137); regmbc(0x199);
 		      regmbc(0x1e9); regmbc(0x1d84); regmbc(0x1e31);
 		      regmbc(0x1e33); regmbc(0x1e35); regmbc(0x2c6a);
 		      regmbc(0xa741);
-		      return;
-	    case 'l': case 0x13a: case 0x13c: case 0x13e:
-	    case 0x140: case 0x142: case 0x19a: case 0x1e37:
-	    case 0x1e39: case 0x1e3b: case 0x1e3d: case 0x2c61:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'l': ಸ್ಥಿತಿ 0x13a: ಸ್ಥಿತಿ 0x13c: ಸ್ಥಿತಿ 0x13e:
+	    ಸ್ಥಿತಿ 0x140: ಸ್ಥಿತಿ 0x142: ಸ್ಥಿತಿ 0x19a: ಸ್ಥಿತಿ 0x1e37:
+	    ಸ್ಥಿತಿ 0x1e39: ಸ್ಥಿತಿ 0x1e3b: ಸ್ಥಿತಿ 0x1e3d: ಸ್ಥಿತಿ 0x2c61:
 		      regmbc('l'); regmbc(0x13a); regmbc(0x13c);
 		      regmbc(0x13e); regmbc(0x140); regmbc(0x142);
 		      regmbc(0x19a); regmbc(0x1e37); regmbc(0x1e39);
 		      regmbc(0x1e3b); regmbc(0x1e3d); regmbc(0x2c61);
-		      return;
-	    case 'm': case 0x1d6f: case 0x1e3f: case 0x1e41: case 0x1e43:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'm': ಸ್ಥಿತಿ 0x1d6f: ಸ್ಥಿತಿ 0x1e3f: ಸ್ಥಿತಿ 0x1e41: ಸ್ಥಿತಿ 0x1e43:
 		      regmbc('m'); regmbc(0x1d6f); regmbc(0x1e3f);
 		      regmbc(0x1e41); regmbc(0x1e43);
-		      return;
-	    case 'n': case 0xf1: case 0x144: case 0x146: case 0x148:
-	    case 0x149: case 0x1f9: case 0x1d70: case 0x1d87:
-	    case 0x1e45: case 0x1e47: case 0x1e49: case 0x1e4b:
-	    case 0xa7a5:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'n': ಸ್ಥಿತಿ 0xf1: ಸ್ಥಿತಿ 0x144: ಸ್ಥಿತಿ 0x146: ಸ್ಥಿತಿ 0x148:
+	    ಸ್ಥಿತಿ 0x149: ಸ್ಥಿತಿ 0x1f9: ಸ್ಥಿತಿ 0x1d70: ಸ್ಥಿತಿ 0x1d87:
+	    ಸ್ಥಿತಿ 0x1e45: ಸ್ಥಿತಿ 0x1e47: ಸ್ಥಿತಿ 0x1e49: ಸ್ಥಿತಿ 0x1e4b:
+	    ಸ್ಥಿತಿ 0xa7a5:
 		      regmbc('n'); regmbc(0xf1); regmbc(0x144);
 		      regmbc(0x146); regmbc(0x148); regmbc(0x149);
 		      regmbc(0x1f9); regmbc(0x1d70); regmbc(0x1d87);
 		      regmbc(0x1e45); regmbc(0x1e47); regmbc(0x1e49);
 		      regmbc(0x1e4b); regmbc(0xa7a5);
-		      return;
-	    case 'o': case 0xf2: case 0xf3: case 0xf4: case 0xf5:
-	    case 0xf6: case 0xf8: case 0x14d: case 0x14f: case 0x151:
-	    case 0x1a1: case 0x1d2: case 0x1eb: case 0x1ed: case 0x1ff:
-	    case 0x20d: case 0x20f: case 0x22b: case 0x22d: case 0x22f:
-	    case 0x231: case 0x275: case 0x1e4d: case 0x1e4f:
-	    case 0x1e51: case 0x1e53: case 0x1ecd: case 0x1ecf:
-	    case 0x1ed1: case 0x1ed3: case 0x1ed5: case 0x1ed7:
-	    case 0x1ed9: case 0x1edb: case 0x1edd: case 0x1edf:
-	    case 0x1ee1: case 0x1ee3:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'o': ಸ್ಥಿತಿ 0xf2: ಸ್ಥಿತಿ 0xf3: ಸ್ಥಿತಿ 0xf4: ಸ್ಥಿತಿ 0xf5:
+	    ಸ್ಥಿತಿ 0xf6: ಸ್ಥಿತಿ 0xf8: ಸ್ಥಿತಿ 0x14d: ಸ್ಥಿತಿ 0x14f: ಸ್ಥಿತಿ 0x151:
+	    ಸ್ಥಿತಿ 0x1a1: ಸ್ಥಿತಿ 0x1d2: ಸ್ಥಿತಿ 0x1eb: ಸ್ಥಿತಿ 0x1ed: ಸ್ಥಿತಿ 0x1ff:
+	    ಸ್ಥಿತಿ 0x20d: ಸ್ಥಿತಿ 0x20f: ಸ್ಥಿತಿ 0x22b: ಸ್ಥಿತಿ 0x22d: ಸ್ಥಿತಿ 0x22f:
+	    ಸ್ಥಿತಿ 0x231: ಸ್ಥಿತಿ 0x275: ಸ್ಥಿತಿ 0x1e4d: ಸ್ಥಿತಿ 0x1e4f:
+	    ಸ್ಥಿತಿ 0x1e51: ಸ್ಥಿತಿ 0x1e53: ಸ್ಥಿತಿ 0x1ecd: ಸ್ಥಿತಿ 0x1ecf:
+	    ಸ್ಥಿತಿ 0x1ed1: ಸ್ಥಿತಿ 0x1ed3: ಸ್ಥಿತಿ 0x1ed5: ಸ್ಥಿತಿ 0x1ed7:
+	    ಸ್ಥಿತಿ 0x1ed9: ಸ್ಥಿತಿ 0x1edb: ಸ್ಥಿತಿ 0x1edd: ಸ್ಥಿತಿ 0x1edf:
+	    ಸ್ಥಿತಿ 0x1ee1: ಸ್ಥಿತಿ 0x1ee3:
 		      regmbc('o'); regmbc(0xf2); regmbc(0xf3);
 		      regmbc(0xf4); regmbc(0xf5); regmbc(0xf6);
 		      regmbc(0xf8); regmbc(0x14d); regmbc(0x14f);
@@ -953,54 +953,54 @@ reg_equi_class(int c)
 		      regmbc(0x1ed5); regmbc(0x1ed7); regmbc(0x1ed9);
 		      regmbc(0x1edb); regmbc(0x1edd); regmbc(0x1edf);
 		      regmbc(0x1ee1); regmbc(0x1ee3);
-		      return;
-	    case 'p': case 0x1a5: case 0x1d71: case 0x1d88: case 0x1d7d:
-	    case 0x1e55: case 0x1e57:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'p': ಸ್ಥಿತಿ 0x1a5: ಸ್ಥಿತಿ 0x1d71: ಸ್ಥಿತಿ 0x1d88: ಸ್ಥಿತಿ 0x1d7d:
+	    ಸ್ಥಿತಿ 0x1e55: ಸ್ಥಿತಿ 0x1e57:
 		      regmbc('p'); regmbc(0x1a5); regmbc(0x1d71);
 		      regmbc(0x1d7d); regmbc(0x1d88); regmbc(0x1e55);
 		      regmbc(0x1e57);
-		      return;
-	    case 'q': case 0x24b: case 0x2a0:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'q': ಸ್ಥಿತಿ 0x24b: ಸ್ಥಿತಿ 0x2a0:
 		      regmbc('q'); regmbc(0x24b); regmbc(0x2a0);
-		      return;
-	    case 'r': case 0x155: case 0x157: case 0x159: case 0x211:
-	    case 0x213: case 0x24d: case 0x27d: case 0x1d72: case 0x1d73:
-	    case 0x1d89: case 0x1e59: case 0x1e5b: case 0x1e5d: case 0x1e5f:
-	    case 0xa7a7:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'r': ಸ್ಥಿತಿ 0x155: ಸ್ಥಿತಿ 0x157: ಸ್ಥಿತಿ 0x159: ಸ್ಥಿತಿ 0x211:
+	    ಸ್ಥಿತಿ 0x213: ಸ್ಥಿತಿ 0x24d: ಸ್ಥಿತಿ 0x27d: ಸ್ಥಿತಿ 0x1d72: ಸ್ಥಿತಿ 0x1d73:
+	    ಸ್ಥಿತಿ 0x1d89: ಸ್ಥಿತಿ 0x1e59: ಸ್ಥಿತಿ 0x1e5b: ಸ್ಥಿತಿ 0x1e5d: ಸ್ಥಿತಿ 0x1e5f:
+	    ಸ್ಥಿತಿ 0xa7a7:
 		      regmbc('r'); regmbc(0x155); regmbc(0x157);
 		      regmbc(0x159); regmbc(0x211); regmbc(0x213);
 		      regmbc(0x24d); regmbc(0x1d72); regmbc(0x1d73);
 		      regmbc(0x1d89); regmbc(0x1e59); regmbc(0x27d);
 		      regmbc(0x1e5b); regmbc(0x1e5d); regmbc(0x1e5f);
 		      regmbc(0xa7a7);
-		      return;
-	    case 's': case 0x15b: case 0x15d: case 0x15f: case 0x161:
-	    case 0x1e61: case 0x219: case 0x23f: case 0x1d74: case 0x1d8a:
-	    case 0x1e63: case 0x1e65: case 0x1e67: case 0x1e69: case 0xa7a9:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 's': ಸ್ಥಿತಿ 0x15b: ಸ್ಥಿತಿ 0x15d: ಸ್ಥಿತಿ 0x15f: ಸ್ಥಿತಿ 0x161:
+	    ಸ್ಥಿತಿ 0x1e61: ಸ್ಥಿತಿ 0x219: ಸ್ಥಿತಿ 0x23f: ಸ್ಥಿತಿ 0x1d74: ಸ್ಥಿತಿ 0x1d8a:
+	    ಸ್ಥಿತಿ 0x1e63: ಸ್ಥಿತಿ 0x1e65: ಸ್ಥಿತಿ 0x1e67: ಸ್ಥಿತಿ 0x1e69: ಸ್ಥಿತಿ 0xa7a9:
 		      regmbc('s'); regmbc(0x15b); regmbc(0x15d);
 		      regmbc(0x15f); regmbc(0x161); regmbc(0x23f);
 		      regmbc(0x219); regmbc(0x1d74); regmbc(0x1d8a);
 		      regmbc(0x1e61); regmbc(0x1e63); regmbc(0x1e65);
 		      regmbc(0x1e67); regmbc(0x1e69); regmbc(0xa7a9);
-		      return;
-	    case 't': case 0x163: case 0x165: case 0x167: case 0x1ab:
-	    case 0x1ad: case 0x21b: case 0x288: case 0x1d75: case 0x1e6b:
-	    case 0x1e6d: case 0x1e6f: case 0x1e71: case 0x1e97: case 0x2c66:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 't': ಸ್ಥಿತಿ 0x163: ಸ್ಥಿತಿ 0x165: ಸ್ಥಿತಿ 0x167: ಸ್ಥಿತಿ 0x1ab:
+	    ಸ್ಥಿತಿ 0x1ad: ಸ್ಥಿತಿ 0x21b: ಸ್ಥಿತಿ 0x288: ಸ್ಥಿತಿ 0x1d75: ಸ್ಥಿತಿ 0x1e6b:
+	    ಸ್ಥಿತಿ 0x1e6d: ಸ್ಥಿತಿ 0x1e6f: ಸ್ಥಿತಿ 0x1e71: ಸ್ಥಿತಿ 0x1e97: ಸ್ಥಿತಿ 0x2c66:
 		      regmbc('t'); regmbc(0x163); regmbc(0x165);
 		      regmbc(0x167); regmbc(0x1ab); regmbc(0x21b);
 		      regmbc(0x1ad); regmbc(0x288); regmbc(0x1d75);
 		      regmbc(0x1e6b); regmbc(0x1e6d); regmbc(0x1e6f);
 		      regmbc(0x1e71); regmbc(0x1e97); regmbc(0x2c66);
-		      return;
-	    case 'u': case 0xf9: case 0xfa: case 0xfb: case 0xfc:
-	    case 0x169: case 0x16b: case 0x16d: case 0x16f:
-	    case 0x171: case 0x173: case 0x1b0: case 0x1d4:
-	    case 0x1d6: case 0x1d8: case 0x1da: case 0x1dc:
-	    case 0x215: case 0x217: case 0x289: case 0x1e73:
-	    case 0x1d7e: case 0x1d99: case 0x1e75: case 0x1e77:
-	    case 0x1e79: case 0x1e7b: case 0x1ee5: case 0x1ee7:
-	    case 0x1ee9: case 0x1eeb: case 0x1eed: case 0x1eef:
-	    case 0x1ef1:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'u': ಸ್ಥಿತಿ 0xf9: ಸ್ಥಿತಿ 0xfa: ಸ್ಥಿತಿ 0xfb: ಸ್ಥಿತಿ 0xfc:
+	    ಸ್ಥಿತಿ 0x169: ಸ್ಥಿತಿ 0x16b: ಸ್ಥಿತಿ 0x16d: ಸ್ಥಿತಿ 0x16f:
+	    ಸ್ಥಿತಿ 0x171: ಸ್ಥಿತಿ 0x173: ಸ್ಥಿತಿ 0x1b0: ಸ್ಥಿತಿ 0x1d4:
+	    ಸ್ಥಿತಿ 0x1d6: ಸ್ಥಿತಿ 0x1d8: ಸ್ಥಿತಿ 0x1da: ಸ್ಥಿತಿ 0x1dc:
+	    ಸ್ಥಿತಿ 0x215: ಸ್ಥಿತಿ 0x217: ಸ್ಥಿತಿ 0x289: ಸ್ಥಿತಿ 0x1e73:
+	    ಸ್ಥಿತಿ 0x1d7e: ಸ್ಥಿತಿ 0x1d99: ಸ್ಥಿತಿ 0x1e75: ಸ್ಥಿತಿ 0x1e77:
+	    ಸ್ಥಿತಿ 0x1e79: ಸ್ಥಿತಿ 0x1e7b: ಸ್ಥಿತಿ 0x1ee5: ಸ್ಥಿತಿ 0x1ee7:
+	    ಸ್ಥಿತಿ 0x1ee9: ಸ್ಥಿತಿ 0x1eeb: ಸ್ಥಿತಿ 0x1eed: ಸ್ಥಿತಿ 0x1eef:
+	    ಸ್ಥಿತಿ 0x1ef1:
 		      regmbc('u'); regmbc(0xf9); regmbc(0xfa);
 		      regmbc(0xfb); regmbc(0xfc); regmbc(0x169);
 		      regmbc(0x16b); regmbc(0x16d); regmbc(0x16f);
@@ -1013,37 +1013,37 @@ reg_equi_class(int c)
 		      regmbc(0x1ee5); regmbc(0x1ee7); regmbc(0x1ee9);
 		      regmbc(0x1eeb); regmbc(0x1eed); regmbc(0x1eef);
 		      regmbc(0x1ef1);
-		      return;
-	    case 'v': case 0x28b: case 0x1d8c: case 0x1e7d: case 0x1e7f:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'v': ಸ್ಥಿತಿ 0x28b: ಸ್ಥಿತಿ 0x1d8c: ಸ್ಥಿತಿ 0x1e7d: ಸ್ಥಿತಿ 0x1e7f:
 		      regmbc('v'); regmbc(0x28b); regmbc(0x1d8c);
 		      regmbc(0x1e7d); regmbc(0x1e7f);
-		      return;
-	    case 'w': case 0x175: case 0x1e81: case 0x1e83:
-	    case 0x1e85: case 0x1e87: case 0x1e89: case 0x1e98:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'w': ಸ್ಥಿತಿ 0x175: ಸ್ಥಿತಿ 0x1e81: ಸ್ಥಿತಿ 0x1e83:
+	    ಸ್ಥಿತಿ 0x1e85: ಸ್ಥಿತಿ 0x1e87: ಸ್ಥಿತಿ 0x1e89: ಸ್ಥಿತಿ 0x1e98:
 		      regmbc('w'); regmbc(0x175); regmbc(0x1e81);
 		      regmbc(0x1e83); regmbc(0x1e85); regmbc(0x1e87);
 		      regmbc(0x1e89); regmbc(0x1e98);
-		      return;
-	    case 'x': case 0x1e8b: case 0x1e8d:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'x': ಸ್ಥಿತಿ 0x1e8b: ಸ್ಥಿತಿ 0x1e8d:
 		      regmbc('x'); regmbc(0x1e8b); regmbc(0x1e8d);
-		      return;
-	    case 'y': case 0xfd: case 0xff: case 0x177: case 0x1b4:
-	    case 0x233: case 0x24f: case 0x1e8f: case 0x1e99: case 0x1ef3:
-	    case 0x1ef5: case 0x1ef7: case 0x1ef9:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'y': ಸ್ಥಿತಿ 0xfd: ಸ್ಥಿತಿ 0xff: ಸ್ಥಿತಿ 0x177: ಸ್ಥಿತಿ 0x1b4:
+	    ಸ್ಥಿತಿ 0x233: ಸ್ಥಿತಿ 0x24f: ಸ್ಥಿತಿ 0x1e8f: ಸ್ಥಿತಿ 0x1e99: ಸ್ಥಿತಿ 0x1ef3:
+	    ಸ್ಥಿತಿ 0x1ef5: ಸ್ಥಿತಿ 0x1ef7: ಸ್ಥಿತಿ 0x1ef9:
 		      regmbc('y'); regmbc(0xfd); regmbc(0xff);
 		      regmbc(0x177); regmbc(0x1b4); regmbc(0x233);
 		      regmbc(0x24f); regmbc(0x1e8f); regmbc(0x1e99);
 		      regmbc(0x1ef3); regmbc(0x1ef5); regmbc(0x1ef7);
 		      regmbc(0x1ef9);
-		      return;
-	    case 'z': case 0x17a: case 0x17c: case 0x17e: case 0x1b6:
-	    case 0x1d76: case 0x1d8e: case 0x1e91: case 0x1e93:
-	    case 0x1e95: case 0x2c6c:
+		      ಹಿಂತಿರುಗಿ;
+	    ಸ್ಥಿತಿ 'z': ಸ್ಥಿತಿ 0x17a: ಸ್ಥಿತಿ 0x17c: ಸ್ಥಿತಿ 0x17e: ಸ್ಥಿತಿ 0x1b6:
+	    ಸ್ಥಿತಿ 0x1d76: ಸ್ಥಿತಿ 0x1d8e: ಸ್ಥಿತಿ 0x1e91: ಸ್ಥಿತಿ 0x1e93:
+	    ಸ್ಥಿತಿ 0x1e95: ಸ್ಥಿತಿ 0x2c6c:
 		      regmbc('z'); regmbc(0x17a); regmbc(0x17c);
 		      regmbc(0x17e); regmbc(0x1b6); regmbc(0x1d76);
 		      regmbc(0x1d8e); regmbc(0x1e91); regmbc(0x1e93);
 		      regmbc(0x1e95); regmbc(0x2c6c);
-		      return;
+		      ಹಿಂತಿರುಗಿ;
 	}
     }
     regmbc(c);
@@ -1053,34 +1053,34 @@ reg_equi_class(int c)
  * Emit a node.
  * Return pointer to generated code.
  */
-    static char_u *
-regnode(int op)
+    ಸ್ಥಿರ char_u *
+regnode(ಪೂರ್ಣಾಂಕ op)
 {
     char_u  *ret;
 
     ret = regcode;
-    if (ret == JUST_CALC_SIZE)
+    ಆದರೆ (ret == JUST_CALC_ಗಾತ್ರ)
 	regsize += 3;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	*regcode++ = op;
 	*regcode++ = NUL;		// Null "next" pointer.
 	*regcode++ = NUL;
     }
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
 /*
  * Write a long as four bytes at "p" and return pointer to the next char.
  */
-    static char_u *
+    ಸ್ಥಿರ char_u *
 re_put_long(char_u *p, long_u val)
 {
     *p++ = (char_u) ((val >> 24) & 0377);
     *p++ = (char_u) ((val >> 16) & 0377);
     *p++ = (char_u) ((val >> 8) & 0377);
     *p++ = (char_u) (val & 0377);
-    return p;
+    ಹಿಂತಿರುಗಿ p;
 }
 
 /*
@@ -1088,75 +1088,75 @@ re_put_long(char_u *p, long_u val)
  * Returns NULL when calculating size, when there is no next item and when
  * there is an error.
  */
-    static char_u *
+    ಸ್ಥಿರ char_u *
 regnext(char_u *p)
 {
-    int	    offset;
+    ಪೂರ್ಣಾಂಕ	    ಸ್ಥಾನಾಂತರ;
 
-    if (p == JUST_CALC_SIZE || reg_toolong)
-	return NULL;
+    ಆದರೆ (p == JUST_CALC_ಗಾತ್ರ || reg_toolong)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    offset = NEXT(p);
-    if (offset == 0)
-	return NULL;
+    ಸ್ಥಾನಾಂತರ = ಮುಂದಿನ_2(p);
+    ಆದರೆ (ಸ್ಥಾನಾಂತರ == 0)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (OP(p) == BACK)
-	return p - offset;
-    else
-	return p + offset;
+    ಆದರೆ (OP(p) == ಹಿಂಭಾಗ_2)
+	ಹಿಂತಿರುಗಿ p - ಸ್ಥಾನಾಂತರ;
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಹಿಂತಿರುಗಿ p + ಸ್ಥಾನಾಂತರ;
 }
 
 /*
  * Set the next-pointer at the end of a node chain.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 regtail(char_u *p, char_u *val)
 {
-    char_u	*scan;
-    char_u	*temp;
-    int		offset;
+    char_u	*ಪರಿಶೀಲನೆ;
+    char_u	*ತಾತ್ಕಾಲಿಕ;
+    ಪೂರ್ಣಾಂಕ		ಸ್ಥಾನಾಂತರ;
 
-    if (p == JUST_CALC_SIZE)
-	return;
+    ಆದರೆ (p == JUST_CALC_ಗಾತ್ರ)
+	ಹಿಂತಿರುಗಿ;
 
     // Find last node.
-    scan = p;
-    for (;;)
+    ಪರಿಶೀಲನೆ = p;
+    ಗಾಗಿ (;;)
     {
-	temp = regnext(scan);
-	if (temp == NULL)
-	    break;
-	scan = temp;
+	ತಾತ್ಕಾಲಿಕ = regnext(ಪರಿಶೀಲನೆ);
+	ಆದರೆ (ತಾತ್ಕಾಲಿಕ == ಖಾಲಿ)
+	    ನಿಲ್ಲಿಸು;
+	ಪರಿಶೀಲನೆ = ತಾತ್ಕಾಲಿಕ;
     }
 
-    if (OP(scan) == BACK)
-	offset = (int)(scan - val);
-    else
-	offset = (int)(val - scan);
+    ಆದರೆ (OP(ಪರಿಶೀಲನೆ) == ಹಿಂಭಾಗ_2)
+	ಸ್ಥಾನಾಂತರ = (ಪೂರ್ಣಾಂಕ)(ಪರಿಶೀಲನೆ - val);
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಸ್ಥಾನಾಂತರ = (ಪೂರ್ಣಾಂಕ)(val - ಪರಿಶೀಲನೆ);
     // When the offset uses more than 16 bits it can no longer fit in the two
     // bytes available.  Use a global flag to avoid having to check return
     // values in too many places.
-    if (offset > 0xffff)
+    ಆದರೆ (ಸ್ಥಾನಾಂತರ > 0xffff)
 	reg_toolong = TRUE;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	*(scan + 1) = (char_u) (((unsigned)offset >> 8) & 0377);
-	*(scan + 2) = (char_u) (offset & 0377);
+	*(ಪರಿಶೀಲನೆ + 1) = (char_u) (((ಚಿಹ್ನೆರಹಿತ)ಸ್ಥಾನಾಂತರ >> 8) & 0377);
+	*(ಪರಿಶೀಲನೆ + 2) = (char_u) (ಸ್ಥಾನಾಂತರ & 0377);
     }
 }
 
 /*
  * Like regtail, on item after a BRANCH; nop if none.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 regoptail(char_u *p, char_u *val)
 {
     // When op is neither BRANCH nor BRACE_COMPLEX0-9, it is "operandless"
-    if (p == NULL || p == JUST_CALC_SIZE
+    ಆದರೆ (p == ಖಾಲಿ || p == JUST_CALC_ಗಾತ್ರ
 	    || (OP(p) != BRANCH
 		&& (OP(p) < BRACE_COMPLEX || OP(p) > BRACE_COMPLEX + 9)))
-	return;
-    regtail(OPERAND(p), val);
+	ಹಿಂತಿರುಗಿ;
+    regtail(ಕಾರ್ಯಾಂಶ(p), val);
 }
 
 /*
@@ -1164,57 +1164,57 @@ regoptail(char_u *p, char_u *val)
  *
  * Means relocating the operand.
  */
-    static void
-reginsert(int op, char_u *opnd)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+reginsert(ಪೂರ್ಣಾಂಕ op, char_u *opnd)
 {
     char_u	*src;
     char_u	*dst;
-    char_u	*place;
+    char_u	*ಇರಿಸು;
 
-    if (regcode == JUST_CALC_SIZE)
+    ಆದರೆ (regcode == JUST_CALC_ಗಾತ್ರ)
     {
 	regsize += 3;
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
     src = regcode;
     regcode += 3;
     dst = regcode;
-    while (src > opnd)
+    ಆಗ (src > opnd)
 	*--dst = *--src;
 
-    place = opnd;		// Op node, where operand used to be.
-    *place++ = op;
-    *place++ = NUL;
-    *place = NUL;
+    ಇರಿಸು = opnd;		// Op node, where operand used to be.
+    *ಇರಿಸು++ = op;
+    *ಇರಿಸು++ = NUL;
+    *ಇರಿಸು = NUL;
 }
 
 /*
  * Insert an operator in front of already-emitted operand.
  * Add a number to the operator.
  */
-    static void
-reginsert_nr(int op, long val, char_u *opnd)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+reginsert_nr(ಪೂರ್ಣಾಂಕ op, ದೀರ್ಘ val, char_u *opnd)
 {
     char_u	*src;
     char_u	*dst;
-    char_u	*place;
+    char_u	*ಇರಿಸು;
 
-    if (regcode == JUST_CALC_SIZE)
+    ಆದರೆ (regcode == JUST_CALC_ಗಾತ್ರ)
     {
 	regsize += 7;
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
     src = regcode;
     regcode += 7;
     dst = regcode;
-    while (src > opnd)
+    ಆಗ (src > opnd)
 	*--dst = *--src;
 
-    place = opnd;		// Op node, where operand used to be.
-    *place++ = op;
-    *place++ = NUL;
-    *place++ = NUL;
-    re_put_long(place, (long_u)val);
+    ಇರಿಸು = opnd;		// Op node, where operand used to be.
+    *ಇರಿಸು++ = op;
+    *ಇರಿಸು++ = NUL;
+    *ಇರಿಸು++ = NUL;
+    re_put_long(ಇರಿಸು, (long_u)val);
 }
 
 /*
@@ -1223,35 +1223,35 @@ reginsert_nr(int op, long val, char_u *opnd)
  *
  * Means relocating the operand.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 reginsert_limits(
-    int		op,
-    long	minval,
-    long	maxval,
+    ಪೂರ್ಣಾಂಕ		op,
+    ದೀರ್ಘ	minval,
+    ದೀರ್ಘ	maxval,
     char_u	*opnd)
 {
     char_u	*src;
     char_u	*dst;
-    char_u	*place;
+    char_u	*ಇರಿಸು;
 
-    if (regcode == JUST_CALC_SIZE)
+    ಆದರೆ (regcode == JUST_CALC_ಗಾತ್ರ)
     {
 	regsize += 11;
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
     src = regcode;
     regcode += 11;
     dst = regcode;
-    while (src > opnd)
+    ಆಗ (src > opnd)
 	*--dst = *--src;
 
-    place = opnd;		// Op node, where operand used to be.
-    *place++ = op;
-    *place++ = NUL;
-    *place++ = NUL;
-    place = re_put_long(place, (long_u)minval);
-    place = re_put_long(place, (long_u)maxval);
-    regtail(opnd, place);
+    ಇರಿಸು = opnd;		// Op node, where operand used to be.
+    *ಇರಿಸು++ = op;
+    *ಇರಿಸು++ = NUL;
+    *ಇರಿಸು++ = NUL;
+    ಇರಿಸು = re_put_long(ಇರಿಸು, (long_u)minval);
+    ಇರಿಸು = re_put_long(ಇರಿಸು, (long_u)maxval);
+    regtail(opnd, ಇರಿಸು);
 }
 
 /*
@@ -1260,26 +1260,26 @@ reginsert_limits(
  * TODO: Should also check that we don't refer to something that is repeated
  * (+*=): what instance of the repetition should we match?
  */
-    static int
-seen_endbrace(int refnum)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ನೋಡಿದ_endbrace(ಪೂರ್ಣಾಂಕ refnum)
 {
-    if (!had_endbrace[refnum])
+    ಆದರೆ (!had_endbrace[refnum])
     {
 	char_u *p;
 
 	// Trick: check if "@<=" or "@<!" follows, in which case
 	// the \1 can appear before the referenced match.
-	for (p = regparse; *p != NUL; ++p)
-	    if (p[0] == '@' && p[1] == '<' && (p[2] == '!' || p[2] == '='))
-		break;
-	if (*p == NUL)
+	ಗಾಗಿ (p = regparse; *p != NUL; ++p)
+	    ಆದರೆ (p[0] == '@' && p[1] == '<' && (p[2] == '!' || p[2] == '='))
+		ನಿಲ್ಲಿಸು;
+	ಆದರೆ (*p == NUL)
 	{
-	    emsg(_(e_illegal_back_reference));
+	    emsg(_(e_illegal_ಹಿಂಭಾಗ_reference));
 	    rc_did_emsg = TRUE;
-	    return FALSE;
+	    ಹಿಂತಿರುಗಿ FALSE;
 	}
     }
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
@@ -1289,111 +1289,111 @@ seen_endbrace(int refnum)
  * it can turn them into a single node, which is smaller to store and
  * faster to run.  Don't do this when one_exactly is set.
  */
-    static char_u *
-regatom(int *flagp)
+    ಸ್ಥಿರ char_u *
+regatom(ಪೂರ್ಣಾಂಕ *flagp)
 {
     char_u	    *ret;
-    int		    flags;
-    int		    c;
+    ಪೂರ್ಣಾಂಕ		    flags;
+    ಪೂರ್ಣಾಂಕ		    c;
     char_u	    *p;
-    int		    extra = 0;
-    int		    save_prev_at_start = prev_at_start;
+    ಪೂರ್ಣಾಂಕ		    extra = 0;
+    ಪೂರ್ಣಾಂಕ		    save_prev_at_ಆರಂಭ = prev_at_ಆರಂಭ;
 
     *flagp = WORST;		// Tentatively.
 
     c = getchr();
-    switch (c)
+    ಆಯ್ಕೆ (c)
     {
-      case Magic('^'):
+      ಸ್ಥಿತಿ Magic('^'):
 	ret = regnode(BOL);
-	break;
+	ನಿಲ್ಲಿಸು;
 
-      case Magic('$'):
+      ಸ್ಥಿತಿ Magic('$'):
 	ret = regnode(EOL);
-#if defined(FEAT_SYN_HL)
+#ಆದರೆ defined(FEAT_SYN_HL)
 	had_eol = TRUE;
-#endif
-	break;
+#ಆದರೆ_ಅಂತ್ಯ
+	ನಿಲ್ಲಿಸು;
 
-      case Magic('<'):
+      ಸ್ಥಿತಿ Magic('<'):
 	ret = regnode(BOW);
-	break;
+	ನಿಲ್ಲಿಸು;
 
-      case Magic('>'):
+      ಸ್ಥಿತಿ Magic('>'):
 	ret = regnode(EOW);
-	break;
+	ನಿಲ್ಲಿಸು;
 
-      case Magic('_'):
+      ಸ್ಥಿತಿ Magic('_'):
 	c = no_Magic(getchr());
-	if (c == '^')		// "\_^" is start-of-line
+	ಆದರೆ (c == '^')		// "\_^" is start-of-line
 	{
 	    ret = regnode(BOL);
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
-	if (c == '$')		// "\_$" is end-of-line
+	ಆದರೆ (c == '$')		// "\_$" is end-of-line
 	{
 	    ret = regnode(EOL);
-#if defined(FEAT_SYN_HL)
+#ಆದರೆ defined(FEAT_SYN_HL)
 	    had_eol = TRUE;
-#endif
-	    break;
+#ಆದರೆ_ಅಂತ್ಯ
+	    ನಿಲ್ಲಿಸು;
 	}
 
-	extra = ADD_NL;
+	extra = ಕೂಡಿಸು_NL;
 	*flagp |= HASNL;
 
 	// "\_[" is character range plus newline
-	if (c == '[')
-	    goto collection;
+	ಆದರೆ (c == '[')
+	    ಹೋಗು collection;
 
 	// "\_x" is character class plus newline
 	// FALLTHROUGH
 
 	// Character classes.
-      case Magic('.'):
-      case Magic('i'):
-      case Magic('I'):
-      case Magic('k'):
-      case Magic('K'):
-      case Magic('f'):
-      case Magic('F'):
-      case Magic('p'):
-      case Magic('P'):
-      case Magic('s'):
-      case Magic('S'):
-      case Magic('d'):
-      case Magic('D'):
-      case Magic('x'):
-      case Magic('X'):
-      case Magic('o'):
-      case Magic('O'):
-      case Magic('w'):
-      case Magic('W'):
-      case Magic('h'):
-      case Magic('H'):
-      case Magic('a'):
-      case Magic('A'):
-      case Magic('l'):
-      case Magic('L'):
-      case Magic('u'):
-      case Magic('U'):
+      ಸ್ಥಿತಿ Magic('.'):
+      ಸ್ಥಿತಿ Magic('i'):
+      ಸ್ಥಿತಿ Magic('I'):
+      ಸ್ಥಿತಿ Magic('k'):
+      ಸ್ಥಿತಿ Magic('K'):
+      ಸ್ಥಿತಿ Magic('f'):
+      ಸ್ಥಿತಿ Magic('F'):
+      ಸ್ಥಿತಿ Magic('p'):
+      ಸ್ಥಿತಿ Magic('P'):
+      ಸ್ಥಿತಿ Magic('s'):
+      ಸ್ಥಿತಿ Magic('S'):
+      ಸ್ಥಿತಿ Magic('d'):
+      ಸ್ಥಿತಿ Magic('D'):
+      ಸ್ಥಿತಿ Magic('x'):
+      ಸ್ಥಿತಿ Magic('X'):
+      ಸ್ಥಿತಿ Magic('o'):
+      ಸ್ಥಿತಿ Magic('O'):
+      ಸ್ಥಿತಿ Magic('w'):
+      ಸ್ಥಿತಿ Magic('W'):
+      ಸ್ಥಿತಿ Magic('h'):
+      ಸ್ಥಿತಿ Magic('H'):
+      ಸ್ಥಿತಿ Magic('a'):
+      ಸ್ಥಿತಿ Magic('A'):
+      ಸ್ಥಿತಿ Magic('l'):
+      ಸ್ಥಿತಿ Magic('L'):
+      ಸ್ಥಿತಿ Magic('u'):
+      ಸ್ಥಿತಿ Magic('U'):
 	p = vim_strchr(classchars, no_Magic(c));
-	if (p == NULL)
-	    EMSG_RET_NULL(_(e_invalid_use_of_underscore));
+	ಆದರೆ (p == ಖಾಲಿ)
+	    EMSG_RET_NULL(_(e_invalid_use_ದ_underscore));
 
 	// When '.' is followed by a composing char ignore the dot, so that
 	// the composing char is matched here.
-	if (enc_utf8 && c == Magic('.') && utf_iscomposing(peekchr()))
+	ಆದರೆ (enc_utf8 && c == Magic('.') && utf_iscomposing(peekchr()))
 	{
 	    c = getchr();
-	    goto do_multibyte;
+	    ಹೋಗು do_multibyte;
 	}
 	ret = regnode(classcodes[p - classchars] + extra);
 	*flagp |= HASWIDTH | SIMPLE;
-	break;
+	ನಿಲ್ಲಿಸು;
 
-      case Magic('n'):
-	if (reg_string)
+      ಸ್ಥಿತಿ Magic('n'):
+	ಆದರೆ (reg_string)
 	{
 	    // In a string "\n" matches a newline character.
 	    ret = regnode(EXACTLY);
@@ -1401,359 +1401,359 @@ regatom(int *flagp)
 	    regc(NUL);
 	    *flagp |= HASWIDTH | SIMPLE;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // In buffer text "\n" matches the end of a line.
 	    ret = regnode(NEWL);
 	    *flagp |= HASWIDTH | HASNL;
 	}
-	break;
+	ನಿಲ್ಲಿಸು;
 
-      case Magic('('):
-	if (one_exactly)
+      ಸ್ಥಿತಿ Magic('('):
+	ಆದರೆ (one_exactly)
 	    EMSG_ONE_RET_NULL;
 	ret = reg(REG_PAREN, &flags);
-	if (ret == NULL)
-	    return NULL;
+	ಆದರೆ (ret == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	*flagp |= flags & (HASWIDTH | SPSTART | HASNL | HASLOOKBH);
-	break;
+	ನಿಲ್ಲಿಸು;
 
-      case NUL:
-      case Magic('|'):
-      case Magic('&'):
-      case Magic(')'):
-	if (one_exactly)
+      ಸ್ಥಿತಿ NUL:
+      ಸ್ಥಿತಿ Magic('|'):
+      ಸ್ಥಿತಿ Magic('&'):
+      ಸ್ಥಿತಿ Magic(')'):
+	ಆದರೆ (one_exactly)
 	    EMSG_ONE_RET_NULL;
 	// Supposed to be caught earlier.
-	IEMSG_RET_NULL(e_internal_error_in_regexp);
+	IEMSG_RET_NULL(e_ಆಂತರಿಕ_error_ಒಳ_regexp);
 	// NOTREACHED
 
-      case Magic('='):
-      case Magic('?'):
-      case Magic('+'):
-      case Magic('@'):
-      case Magic('{'):
-      case Magic('*'):
+      ಸ್ಥಿತಿ Magic('='):
+      ಸ್ಥಿತಿ Magic('?'):
+      ಸ್ಥಿತಿ Magic('+'):
+      ಸ್ಥಿತಿ Magic('@'):
+      ಸ್ಥಿತಿ Magic('{'):
+      ಸ್ಥಿತಿ Magic('*'):
 	c = no_Magic(c);
 	EMSG3_RET_NULL(_(e_str_chr_follows_nothing),
 		(c == '*' ? reg_magic >= MAGIC_ON : reg_magic == MAGIC_ALL), c);
 	// NOTREACHED
 
-      case Magic('~'):		// previous substitute pattern
-	    if (reg_prev_sub != NULL)
+      ಸ್ಥಿತಿ Magic('~'):		// previous substitute pattern
+	    ಆದರೆ (reg_prev_sub != ಖಾಲಿ)
 	    {
 		char_u	    *lp;
 
 		ret = regnode(EXACTLY);
 		lp = reg_prev_sub;
-		while (*lp != NUL)
+		ಆಗ (*lp != NUL)
 		    regc(*lp++);
 		regc(NUL);
-		if (*reg_prev_sub != NUL)
+		ಆದರೆ (*reg_prev_sub != NUL)
 		{
 		    *flagp |= HASWIDTH;
-		    if ((lp - reg_prev_sub) == 1)
+		    ಆದರೆ ((lp - reg_prev_sub) == 1)
 			*flagp |= SIMPLE;
 		}
 	    }
-	    else
-		EMSG_RET_NULL(_(e_no_previous_substitute_regular_expression));
-	    break;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		EMSG_RET_NULL(_(e_no_ಹಿಂದಿನ_substitute_regular_ಅಭಿವ್ಯಕ್ತಿ));
+	    ನಿಲ್ಲಿಸು;
 
-      case Magic('1'):
-      case Magic('2'):
-      case Magic('3'):
-      case Magic('4'):
-      case Magic('5'):
-      case Magic('6'):
-      case Magic('7'):
-      case Magic('8'):
-      case Magic('9'):
+      ಸ್ಥಿತಿ Magic('1'):
+      ಸ್ಥಿತಿ Magic('2'):
+      ಸ್ಥಿತಿ Magic('3'):
+      ಸ್ಥಿತಿ Magic('4'):
+      ಸ್ಥಿತಿ Magic('5'):
+      ಸ್ಥಿತಿ Magic('6'):
+      ಸ್ಥಿತಿ Magic('7'):
+      ಸ್ಥಿತಿ Magic('8'):
+      ಸ್ಥಿತಿ Magic('9'):
 	    {
-		int		    refnum;
+		ಪೂರ್ಣಾಂಕ		    refnum;
 
 		refnum = c - Magic('0');
-		if (!seen_endbrace(refnum))
-		    return NULL;
+		ಆದರೆ (!ನೋಡಿದ_endbrace(refnum))
+		    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 		ret = regnode(BACKREF + refnum);
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-      case Magic('z'):
+      ಸ್ಥಿತಿ Magic('z'):
 	{
 	    c = no_Magic(getchr());
-	    switch (c)
+	    ಆಯ್ಕೆ (c)
 	    {
-#ifdef FEAT_SYN_HL
-		case '(': if ((reg_do_extmatch & REX_SET) == 0)
-			      EMSG_RET_NULL(_(e_z_not_allowed_here));
-			  if (one_exactly)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
+		ಸ್ಥಿತಿ '(': ಆದರೆ ((reg_do_extmatch & REX_ಗಣ) == 0)
+			      EMSG_RET_NULL(_(e_z_not_allowed_ಇಲ್ಲಿ));
+			  ಆದರೆ (one_exactly)
 			      EMSG_ONE_RET_NULL;
 			  ret = reg(REG_ZPAREN, &flags);
-			  if (ret == NULL)
-			      return NULL;
+			  ಆದರೆ (ret == ಖಾಲಿ)
+			      ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 			  *flagp |= flags & (HASWIDTH|SPSTART|HASNL|HASLOOKBH);
-			  re_has_z = REX_SET;
-			  break;
+			  re_has_z = REX_ಗಣ;
+			  ನಿಲ್ಲಿಸು;
 
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-		case '8':
-		case '9': if ((reg_do_extmatch & REX_USE) == 0)
-			      EMSG_RET_NULL(_(e_z1_z9_not_allowed_here));
+		ಸ್ಥಿತಿ '1':
+		ಸ್ಥಿತಿ '2':
+		ಸ್ಥಿತಿ '3':
+		ಸ್ಥಿತಿ '4':
+		ಸ್ಥಿತಿ '5':
+		ಸ್ಥಿತಿ '6':
+		ಸ್ಥಿತಿ '7':
+		ಸ್ಥಿತಿ '8':
+		ಸ್ಥಿತಿ '9': ಆದರೆ ((reg_do_extmatch & REX_USE) == 0)
+			      EMSG_RET_NULL(_(e_z1_z9_not_allowed_ಇಲ್ಲಿ));
 			  ret = regnode(ZREF + c - '0');
 			  re_has_z = REX_USE;
-			  break;
-#endif
+			  ನಿಲ್ಲಿಸು;
+#ಆದರೆ_ಅಂತ್ಯ
 
-		case 's': ret = regnode(MOPEN + 0);
-			  if (re_mult_next("\\zs") == FAIL)
-			      return NULL;
-			  break;
+		ಸ್ಥಿತಿ 's': ret = regnode(MOPEN + 0);
+			  ಆದರೆ (re_mult_ಮುಂದಿನ("\\zs") == FAIL)
+			      ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+			  ನಿಲ್ಲಿಸು;
 
-		case 'e': ret = regnode(MCLOSE + 0);
-			  if (re_mult_next("\\ze") == FAIL)
-			      return NULL;
-			  break;
+		ಸ್ಥಿತಿ 'e': ret = regnode(MCLOSE + 0);
+			  ಆದರೆ (re_mult_ಮುಂದಿನ("\\ze") == FAIL)
+			      ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+			  ನಿಲ್ಲಿಸು;
 
-		default:  EMSG_RET_NULL(_(e_invalid_character_after_bsl_z));
+		ಪೂರ್ವನಿಯೋಜಿತ:  EMSG_RET_NULL(_(e_invalid_character_after_bsl_z));
 	    }
 	}
-	break;
+	ನಿಲ್ಲಿಸು;
 
-      case Magic('%'):
+      ಸ್ಥಿತಿ Magic('%'):
 	{
 	    c = no_Magic(getchr());
-	    switch (c)
+	    ಆಯ್ಕೆ (c)
 	    {
 		// () without a back reference
-		case '(':
-		    if (one_exactly)
+		ಸ್ಥಿತಿ '(':
+		    ಆದರೆ (one_exactly)
 			EMSG_ONE_RET_NULL;
 		    ret = reg(REG_NPAREN, &flags);
-		    if (ret == NULL)
-			return NULL;
+		    ಆದರೆ (ret == ಖಾಲಿ)
+			ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 		    *flagp |= flags & (HASWIDTH | SPSTART | HASNL | HASLOOKBH);
-		    break;
+		    ನಿಲ್ಲಿಸು;
 
 		// Catch \%^ and \%$ regardless of where they appear in the
 		// pattern -- regardless of whether or not it makes sense.
-		case '^':
+		ಸ್ಥಿತಿ '^':
 		    ret = regnode(RE_BOF);
-		    break;
+		    ನಿಲ್ಲಿಸು;
 
-		case '$':
+		ಸ್ಥಿತಿ '$':
 		    ret = regnode(RE_EOF);
-		    break;
+		    ನಿಲ್ಲಿಸು;
 
-		case '#':
-		    if (regparse[0] == '=' && regparse[1] >= 48
+		ಸ್ಥಿತಿ '#':
+		    ಆದರೆ (regparse[0] == '=' && regparse[1] >= 48
 							  && regparse[1] <= 50)
 		    {
 			// misplaced \%#=1
-			semsg(_(e_atom_engine_must_be_at_start_of_pattern),
+			semsg(_(e_atom_engine_must_be_at_ಆರಂಭ_ದ_ನಮೂನೆ),
 								  regparse[1]);
-			return FAIL;
+			ಹಿಂತಿರುಗಿ FAIL;
 		    }
 		    ret = regnode(CURSOR);
-		    break;
+		    ನಿಲ್ಲಿಸು;
 
-		case 'V':
+		ಸ್ಥಿತಿ 'V':
 		    ret = regnode(RE_VISUAL);
-		    break;
+		    ನಿಲ್ಲಿಸು;
 
-		case 'C':
+		ಸ್ಥಿತಿ 'C':
 		    ret = regnode(RE_COMPOSING);
-		    break;
+		    ನಿಲ್ಲಿಸು;
 
 		// \%[abc]: Emit as a list of branches, all ending at the last
 		// branch which matches nothing.
-		case '[':
-			  if (one_exactly)	// doesn't nest
+		ಸ್ಥಿತಿ '[':
+			  ಆದರೆ (one_exactly)	// doesn't nest
 			      EMSG_ONE_RET_NULL;
 			  {
 			      char_u	*lastbranch;
-			      char_u	*lastnode = NULL;
+			      char_u	*lastnode = ಖಾಲಿ;
 			      char_u	*br;
 
-			      ret = NULL;
-			      while ((c = getchr()) != ']')
+			      ret = ಖಾಲಿ;
+			      ಆಗ ((c = getchr()) != ']')
 			      {
-				  if (c == NUL)
+				  ಆದರೆ (c == NUL)
 				      EMSG2_RET_NULL(_(e_missing_sb_after_str),
 						      reg_magic == MAGIC_ALL);
 				  br = regnode(BRANCH);
-				  if (ret == NULL)
+				  ಆದರೆ (ret == ಖಾಲಿ)
 				      ret = br;
-				  else
+				  ಇಲ್ಲದಿದ್ದರೆ
 				  {
 				      regtail(lastnode, br);
-				      if (reg_toolong)
-					  return NULL;
+				      ಆದರೆ (reg_toolong)
+					  ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 				  }
 
 				  ungetchr();
 				  one_exactly = TRUE;
 				  lastnode = regatom(flagp);
 				  one_exactly = FALSE;
-				  if (lastnode == NULL)
-				      return NULL;
+				  ಆದರೆ (lastnode == ಖಾಲಿ)
+				      ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 			      }
-			      if (ret == NULL)
-				  EMSG2_RET_NULL(_(e_empty_str_brackets),
+			      ಆದರೆ (ret == ಖಾಲಿ)
+				  EMSG2_RET_NULL(_(e_ಖಾಲಿಗಳು_str_brackets),
 						      reg_magic == MAGIC_ALL);
 			      lastbranch = regnode(BRANCH);
 			      br = regnode(NOTHING);
-			      if (ret != JUST_CALC_SIZE)
+			      ಆದರೆ (ret != JUST_CALC_ಗಾತ್ರ)
 			      {
 				  regtail(lastnode, br);
 				  regtail(lastbranch, br);
 				  // connect all branches to the NOTHING
 				  // branch at the end
-				  for (br = ret; br != lastnode; )
+				  ಗಾಗಿ (br = ret; br != lastnode; )
 				  {
-				      if (OP(br) == BRANCH)
+				      ಆದರೆ (OP(br) == BRANCH)
 				      {
 					  regtail(br, lastbranch);
-					  if (reg_toolong)
-					      return NULL;
-					  br = OPERAND(br);
+					  ಆದರೆ (reg_toolong)
+					      ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+					  br = ಕಾರ್ಯಾಂಶ(br);
 				      }
-				      else
+				      ಇಲ್ಲದಿದ್ದರೆ
 					  br = regnext(br);
 				  }
 			      }
 			      *flagp &= ~(HASWIDTH | SIMPLE);
-			      break;
+			      ನಿಲ್ಲಿಸು;
 			  }
 
-		case 'd':   // %d123 decimal
-		case 'o':   // %o123 octal
-		case 'x':   // %xab hex 2
-		case 'u':   // %uabcd hex 4
-		case 'U':   // %U1234abcd hex 8
+		ಸ್ಥಿತಿ 'd':   // %d123 decimal
+		ಸ್ಥಿತಿ 'o':   // %o123 octal
+		ಸ್ಥಿತಿ 'x':   // %xab hex 2
+		ಸ್ಥಿತಿ 'u':   // %uabcd hex 4
+		ಸ್ಥಿತಿ 'U':   // %U1234abcd hex 8
 			  {
 			      vimlong_T i;
 
-			      switch (c)
+			      ಆಯ್ಕೆ (c)
 			      {
-				  case 'd': i = getdecchrs(); break;
-				  case 'o': i = getoctchrs(); break;
-				  case 'x': i = gethexchrs(2); break;
-				  case 'u': i = gethexchrs(4); break;
-				  case 'U': i = gethexchrs(8); break;
-				  default:  i = -1; break;
+				  ಸ್ಥಿತಿ 'd': i = getdecchrs(); ನಿಲ್ಲಿಸು;
+				  ಸ್ಥಿತಿ 'o': i = getoctchrs(); ನಿಲ್ಲಿಸು;
+				  ಸ್ಥಿತಿ 'x': i = gethexchrs(2); ನಿಲ್ಲಿಸು;
+				  ಸ್ಥಿತಿ 'u': i = gethexchrs(4); ನಿಲ್ಲಿಸು;
+				  ಸ್ಥಿತಿ 'U': i = gethexchrs(8); ನಿಲ್ಲಿಸು;
+				  ಪೂರ್ವನಿಯೋಜಿತ:  i = -1; ನಿಲ್ಲಿಸು;
 			      }
 
-			      if (i < 0 || i > INT_MAX)
+			      ಆದರೆ (i < 0 || i > ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ)
 				  EMSG2_RET_NULL(
 					    _(e_invalid_character_after_str_2),
 						       reg_magic == MAGIC_ALL);
-			      if (use_multibytecode(i))
+			      ಆದರೆ (use_multibytecode(i))
 				  ret = regnode(MULTIBYTECODE);
-			      else
+			      ಇಲ್ಲದಿದ್ದರೆ
 				  ret = regnode(EXACTLY);
-			      if (i == 0)
+			      ಆದರೆ (i == 0)
 				  regc(0x0a);
-			      else
-				  regmbc((int)i);
+			      ಇಲ್ಲದಿದ್ದರೆ
+				  regmbc((ಪೂರ್ಣಾಂಕ)i);
 			      regc(NUL);
 			      *flagp |= HASWIDTH;
-			      break;
+			      ನಿಲ್ಲಿಸು;
 			  }
 
-		default:
-			  if (VIM_ISDIGIT(c) || c == '<' || c == '>'
+		ಪೂರ್ವನಿಯೋಜಿತ:
+			  ಆದರೆ (VIM_ISDIGIT(c) || c == '<' || c == '>'
 						|| c == '\'' || c == '.')
 			  {
 			      long_u	n = 0;
-			      int	cmp;
-			      int	cur = FALSE;
-			      int	got_digit = FALSE;
+			      ಪೂರ್ಣಾಂಕ	cmp;
+			      ಪೂರ್ಣಾಂಕ	cur = FALSE;
+			      ಪೂರ್ಣಾಂಕ	got_digit = FALSE;
 
 			      cmp = c;
-			      if (cmp == '<' || cmp == '>')
+			      ಆದರೆ (cmp == '<' || cmp == '>')
 				  c = getchr();
-			      if (no_Magic(c) == '.')
+			      ಆದರೆ (no_Magic(c) == '.')
 			      {
 				  cur = TRUE;
 				  c = getchr();
 			      }
-			      while (VIM_ISDIGIT(c))
+			      ಆಗ (VIM_ISDIGIT(c))
 			      {
 				  got_digit = TRUE;
 				  n = n * 10 + (c - '0');
 				  c = getchr();
 			      }
-			      if (no_Magic(c) == '\'' && n == 0)
+			      ಆದರೆ (no_Magic(c) == '\'' && n == 0)
 			      {
 				  // "\%'m", "\%<'m" and "\%>'m": Mark
 				  c = getchr();
 				  ret = regnode(RE_MARK);
-				  if (ret == JUST_CALC_SIZE)
+				  ಆದರೆ (ret == JUST_CALC_ಗಾತ್ರ)
 				      regsize += 2;
-				  else
+				  ಇಲ್ಲದಿದ್ದರೆ
 				  {
 				      *regcode++ = c;
 				      *regcode++ = cmp;
 				  }
-				  break;
+				  ನಿಲ್ಲಿಸು;
 			      }
-			      else if ((c == 'l' || c == 'c' || c == 'v')
+			      ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((c == 'l' || c == 'c' || c == 'v')
 					  && (cur || got_digit))
 			      {
-				  if (cur && n)
+				  ಆದರೆ (cur && n)
 				  {
-				    semsg(_(e_regexp_number_after_dot_pos_search_chr),
+				    semsg(_(e_regexp_ಸಂಖ್ಯೆ_after_dot_pos_ಹುಡುಕು_chr),
 								  no_Magic(c));
 				    rc_did_emsg = TRUE;
-				    return NULL;
+				    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 				  }
-				  if (c == 'l')
+				  ಆದರೆ (c == 'l')
 				  {
-				      if (cur)
+				      ಆದರೆ (cur)
 					  n = curwin->w_cursor.lnum;
 				      ret = regnode(RE_LNUM);
-				      if (save_prev_at_start)
-					  at_start = TRUE;
+				      ಆದರೆ (save_prev_at_ಆರಂಭ)
+					  at_ಆರಂಭ = TRUE;
 				  }
-				  else if (c == 'c')
+				  ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (c == 'c')
 				  {
-				      if (cur)
+				      ಆದರೆ (cur)
 				      {
-					  n = curwin->w_cursor.col;
+					  n = curwin->w_cursor.ಲಂಬಸಾಲು;
 					  n++;
 				      }
-				      ret = regnode(RE_COL);
+				      ret = regnode(RE_ಲಂಬಸಾಲು);
 				  }
-				  else
+				  ಇಲ್ಲದಿದ್ದರೆ
 				  {
-				      if (cur)
+				      ಆದರೆ (cur)
 				      {
 					  colnr_T vcol = 0;
 
 					  getvvcol(curwin, &curwin->w_cursor,
-							 NULL, NULL, &vcol, 0);
+							 ಖಾಲಿ, ಖಾಲಿ, &vcol, 0);
 					  ++vcol;
 					  n = vcol;
 				      }
 				      ret = regnode(RE_VCOL);
 				  }
-				  if (ret == JUST_CALC_SIZE)
+				  ಆದರೆ (ret == JUST_CALC_ಗಾತ್ರ)
 				      regsize += 5;
-				  else
+				  ಇಲ್ಲದಿದ್ದರೆ
 				  {
 				      // put the number and the optional
 				      // comparator after the opcode
 				      regcode = re_put_long(regcode, n);
 				      *regcode++ = cmp;
 				  }
-				  break;
+				  ನಿಲ್ಲಿಸು;
 			      }
 			  }
 
@@ -1761,9 +1761,9 @@ regatom(int *flagp)
 						      reg_magic == MAGIC_ALL);
 	    }
 	}
-	break;
+	ನಿಲ್ಲಿಸು;
 
-      case Magic('['):
+      ಸ್ಥಿತಿ Magic('['):
 collection:
 	{
 	    char_u	*lp;
@@ -1771,88 +1771,88 @@ collection:
 	    // If there is no matching ']', we assume the '[' is a normal
 	    // character.  This makes 'incsearch' and ":help [" work.
 	    lp = skip_anyof(regparse);
-	    if (*lp == ']')	// there is a matching ']'
+	    ಆದರೆ (*lp == ']')	// there is a matching ']'
 	    {
-		int	startc = -1;	// > 0 when next '-' is a range
-		int	endc;
+		ಪೂರ್ಣಾಂಕ	startc = -1;	// > 0 when next '-' is a range
+		ಪೂರ್ಣಾಂಕ	endc;
 
-		if (extra == 0)
+		ಆದರೆ (extra == 0)
 		{
-		    int	cl = bt_recognize_char_class(regparse, lp);
+		    ಪೂರ್ಣಾಂಕ	cl = bt_recognize_char_class(regparse, lp);
 
-		    if (cl != 0)
+		    ಆದರೆ (cl != 0)
 		    {
 			ret = regnode(cl);
 			regparse = lp;
 			skipchr();
 			*flagp |= HASWIDTH | SIMPLE;
-			break;
+			ನಿಲ್ಲಿಸು;
 		    }
 		}
 
 		// In a character class, different parsing rules apply.
 		// Not even \ is special anymore, nothing is.
-		if (*regparse == '^')	    // Complement of range.
+		ಆದರೆ (*regparse == '^')	    // Complement of range.
 		{
 		    ret = regnode(ANYBUT + extra);
 		    regparse++;
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		    ret = regnode(ANYOF + extra);
 
 		// At the start ']' and '-' mean the literal character.
-		if (*regparse == ']' || *regparse == '-')
+		ಆದರೆ (*regparse == ']' || *regparse == '-')
 		{
 		    startc = *regparse;
 		    regc(*regparse++);
 		}
 
-		while (*regparse != NUL && *regparse != ']')
+		ಆಗ (*regparse != NUL && *regparse != ']')
 		{
-		    if (*regparse == '-')
+		    ಆದರೆ (*regparse == '-')
 		    {
 			++regparse;
 			// The '-' is not used for a range at the end and
 			// after or before a '\n'.
-			if (*regparse == ']' || *regparse == NUL
+			ಆದರೆ (*regparse == ']' || *regparse == NUL
 				|| startc == -1
 				|| (regparse[0] == '\\' && regparse[1] == 'n'))
 			{
 			    regc('-');
 			    startc = '-';	// [--x] is a range
 			}
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
 			    // Also accept "a-[.z.]"
 			    endc = 0;
-			    if (*regparse == '[')
+			    ಆದರೆ (*regparse == '[')
 				endc = get_coll_element(&regparse);
-			    if (endc == 0)
+			    ಆದರೆ (endc == 0)
 			    {
-				if (has_mbyte)
+				ಆದರೆ (has_mbyte)
 				    endc = mb_ptr2char_adv(&regparse);
-				else
+				ಇಲ್ಲದಿದ್ದರೆ
 				    endc = *regparse++;
 			    }
 
 			    // Handle \o40, \x20 and \u20AC style sequences
-			    if (endc == '\\' && !reg_cpo_lit && !reg_cpo_bsl)
+			    ಆದರೆ (endc == '\\' && !reg_cpo_lit && !reg_cpo_bsl)
 				endc = coll_get_char();
 
-			    if (startc > endc)
-				EMSG_RET_NULL(_(e_reverse_range_in_character_class));
-			    if (has_mbyte && ((*mb_char2len)(startc) > 1
+			    ಆದರೆ (startc > endc)
+				EMSG_RET_NULL(_(e_ಹಿಮ್ಮುಖ_range_ಒಳ_character_class));
+			    ಆದರೆ (has_mbyte && ((*mb_char2len)(startc) > 1
 						 || (*mb_char2len)(endc) > 1))
 			    {
 				// Limit to a range of 256 chars.
-				if (endc > startc + 256)
-				    EMSG_RET_NULL(_(e_range_too_large_in_character_class));
-				while (++startc <= endc)
+				ಆದರೆ (endc > startc + 256)
+				    EMSG_RET_NULL(_(e_range_too_large_ಒಳ_character_class));
+				ಆಗ (++startc <= endc)
 				    regmbc(startc);
 			    }
-			    else
+			    ಇಲ್ಲದಿದ್ದರೆ
 			    {
-				while (++startc <= endc)
+				ಆಗ (++startc <= endc)
 				    regc(startc);
 			    }
 			    startc = -1;
@@ -1862,24 +1862,24 @@ collection:
 		    // accepts "\t", "\e", etc., but only when the 'l' flag in
 		    // 'cpoptions' is not included.
 		    // Posix doesn't recognize backslash at all.
-		    else if (*regparse == '\\'
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*regparse == '\\'
 			    && !reg_cpo_bsl
-			    && (vim_strchr(REGEXP_INRANGE, regparse[1]) != NULL
+			    && (vim_strchr(REGEXP_INRANGE, regparse[1]) != ಖಾಲಿ
 				|| (!reg_cpo_lit
 				    && vim_strchr(REGEXP_ABBR,
-						       regparse[1]) != NULL)))
+						       regparse[1]) != ಖಾಲಿ)))
 		    {
 			regparse++;
-			if (*regparse == 'n')
+			ಆದರೆ (*regparse == 'n')
 			{
 			    // '\n' in range: also match NL
-			    if (ret != JUST_CALC_SIZE)
+			    ಆದರೆ (ret != JUST_CALC_ಗಾತ್ರ)
 			    {
 				// Using \n inside [^] does not change what
 				// matches. "[^\n]" is the same as ".".
-				if (*ret == ANYOF)
+				ಆದರೆ (*ret == ANYOF)
 				{
-				    *ret = ANYOF + ADD_NL;
+				    *ret = ANYOF + ಕೂಡಿಸು_NL;
 				    *flagp |= HASNL;
 				}
 				// else: must have had a \n already
@@ -1887,7 +1887,7 @@ collection:
 			    regparse++;
 			    startc = -1;
 			}
-			else if (*regparse == 'd'
+			ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*regparse == 'd'
 				|| *regparse == 'o'
 				|| *regparse == 'x'
 				|| *regparse == 'u'
@@ -1896,154 +1896,154 @@ collection:
 			    startc = coll_get_char();
 			    // max UTF-8 Codepoint is U+10FFFF,
 			    // but allow values until INT_MAX
-			    if (startc == INT_MAX)
+			    ಆದರೆ (startc == ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ)
 				EMSG_RET_NULL(_(e_unicode_val_too_large));
-			    if (startc == 0)
+			    ಆದರೆ (startc == 0)
 				regc(0x0a);
-			    else
+			    ಇಲ್ಲದಿದ್ದರೆ
 				regmbc(startc);
 			}
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
 			    startc = backslash_trans(*regparse++);
 			    regc(startc);
 			}
 		    }
-		    else if (*regparse == '[')
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*regparse == '[')
 		    {
-			int c_class;
-			int cu;
+			ಪೂರ್ಣಾಂಕ c_class;
+			ಪೂರ್ಣಾಂಕ cu;
 
 			c_class = get_char_class(&regparse);
 			startc = -1;
 			// Characters assumed to be 8 bits!
-			switch (c_class)
+			ಆಯ್ಕೆ (c_class)
 			{
-			    case CLASS_NONE:
+			    ಸ್ಥಿತಿ CLASS_NONE:
 				c_class = get_equi_class(&regparse);
-				if (c_class != 0)
+				ಆದರೆ (c_class != 0)
 				{
 				    // produce equivalence class
 				    reg_equi_class(c_class);
 				}
-				else if ((c_class =
+				ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((c_class =
 					    get_coll_element(&regparse)) != 0)
 				{
 				    // produce a collating element
 				    regmbc(c_class);
 				}
-				else
+				ಇಲ್ಲದಿದ್ದರೆ
 				{
 				    // literal '[', allow [[-x] as a range
 				    startc = *regparse++;
 				    regc(startc);
 				}
-				break;
-			    case CLASS_ALNUM:
-				for (cu = 1; cu < 128; cu++)
-				    if (isalnum(cu))
+				ನಿಲ್ಲಿಸು;
+			    ಸ್ಥಿತಿ CLASS_ALNUM:
+				ಗಾಗಿ (cu = 1; cu < 128; cu++)
+				    ಆದರೆ (ಅಕ್ಷರವೇ_ಅಂಕಿಯೇ(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_ALPHA:
-				for (cu = 1; cu < 128; cu++)
-				    if (isalpha(cu))
+				ನಿಲ್ಲಿಸು;
+			    ಸ್ಥಿತಿ CLASS_ALPHA:
+				ಗಾಗಿ (cu = 1; cu < 128; cu++)
+				    ಆದರೆ (ಅಕ್ಷರವೇ(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_BLANK:
+				ನಿಲ್ಲಿಸು;
+			    ಸ್ಥಿತಿ CLASS_BLANK:
 				regc(' ');
 				regc('\t');
-				break;
-			    case CLASS_CNTRL:
-				for (cu = 1; cu <= 127; cu++)
-				    if (iscntrl(cu))
+				ನಿಲ್ಲಿಸು;
+			    ಸ್ಥಿತಿ CLASS_CNTRL:
+				ಗಾಗಿ (cu = 1; cu <= 127; cu++)
+				    ಆದರೆ (iscntrl(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_DIGIT:
-				for (cu = 1; cu <= 127; cu++)
-				    if (VIM_ISDIGIT(cu))
+				ನಿಲ್ಲಿಸು;
+			    ಸ್ಥಿತಿ CLASS_DIGIT:
+				ಗಾಗಿ (cu = 1; cu <= 127; cu++)
+				    ಆದರೆ (VIM_ISDIGIT(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_GRAPH:
-				for (cu = 1; cu <= 127; cu++)
-				    if (isgraph(cu))
+				ನಿಲ್ಲಿಸು;
+			    ಸ್ಥಿತಿ CLASS_ನಕ್ಷೆ:
+				ಗಾಗಿ (cu = 1; cu <= 127; cu++)
+				    ಆದರೆ (isgraph(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_LOWER:
-				for (cu = 1; cu <= 255; cu++)
-				    if (MB_ISLOWER(cu) && cu != 170
+				ನಿಲ್ಲಿಸು;
+			    ಸ್ಥಿತಿ CLASS_ಅಧೋ:
+				ಗಾಗಿ (cu = 1; cu <= 255; cu++)
+				    ಆದರೆ (MB_ISLOWER(cu) && cu != 170
 								 && cu != 186)
 					regmbc(cu);
-				break;
-			    case CLASS_PRINT:
-				for (cu = 1; cu <= 255; cu++)
-				    if (vim_isprintc(cu))
+				ನಿಲ್ಲಿಸು;
+			    ಸ್ಥಿತಿ CLASS_PRINT:
+				ಗಾಗಿ (cu = 1; cu <= 255; cu++)
+				    ಆದರೆ (vim_isprintc(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_PUNCT:
-				for (cu = 1; cu < 128; cu++)
-				    if (ispunct(cu))
+				ನಿಲ್ಲಿಸು;
+			    ಸ್ಥಿತಿ CLASS_PUNCT:
+				ಗಾಗಿ (cu = 1; cu < 128; cu++)
+				    ಆದರೆ (ispunct(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_SPACE:
-				for (cu = 9; cu <= 13; cu++)
+				ನಿಲ್ಲಿಸು;
+			    ಸ್ಥಿತಿ CLASS_SPACE:
+				ಗಾಗಿ (cu = 9; cu <= 13; cu++)
 				    regc(cu);
 				regc(' ');
-				break;
-			    case CLASS_UPPER:
-				for (cu = 1; cu <= 255; cu++)
-				    if (MB_ISUPPER(cu))
+				ನಿಲ್ಲಿಸು;
+			    ಸ್ಥಿತಿ CLASS_ಊರ್ಧ್ವ:
+				ಗಾಗಿ (cu = 1; cu <= 255; cu++)
+				    ಆದರೆ (MB_ISUPPER(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_XDIGIT:
-				for (cu = 1; cu <= 255; cu++)
-				    if (vim_isxdigit(cu))
+				ನಿಲ್ಲಿಸು;
+			    ಸ್ಥಿತಿ CLASS_XDIGIT:
+				ಗಾಗಿ (cu = 1; cu <= 255; cu++)
+				    ಆದರೆ (vim_isxdigit(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_TAB:
+				ನಿಲ್ಲಿಸು;
+			    ಸ್ಥಿತಿ CLASS_TAB:
 				regc('\t');
-				break;
-			    case CLASS_RETURN:
+				ನಿಲ್ಲಿಸು;
+			    ಸ್ಥಿತಿ CLASS_RETURN:
 				regc('\r');
-				break;
-			    case CLASS_BACKSPACE:
+				ನಿಲ್ಲಿಸು;
+			    ಸ್ಥಿತಿ CLASS_BACKSPACE:
 				regc('\b');
-				break;
-			    case CLASS_ESCAPE:
+				ನಿಲ್ಲಿಸು;
+			    ಸ್ಥಿತಿ CLASS_ESCAPE:
 				regc('\033');
-				break;
-			    case CLASS_IDENT:
-				for (cu = 1; cu <= 255; cu++)
-				    if (vim_isIDc(cu))
+				ನಿಲ್ಲಿಸು;
+			    ಸ್ಥಿತಿ CLASS_IDENT:
+				ಗಾಗಿ (cu = 1; cu <= 255; cu++)
+				    ಆದರೆ (vim_isIDc(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_KEYWORD:
-				for (cu = 1; cu <= 255; cu++)
-				    if (reg_iswordc(cu))
+				ನಿಲ್ಲಿಸು;
+			    ಸ್ಥಿತಿ CLASS_KEYWORD:
+				ಗಾಗಿ (cu = 1; cu <= 255; cu++)
+				    ಆದರೆ (reg_iswordc(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_FNAME:
-				for (cu = 1; cu <= 255; cu++)
-				    if (vim_isfilec(cu))
+				ನಿಲ್ಲಿಸು;
+			    ಸ್ಥಿತಿ CLASS_FNAME:
+				ಗಾಗಿ (cu = 1; cu <= 255; cu++)
+				    ಆದರೆ (vim_isfilec(cu))
 					regmbc(cu);
-				break;
+				ನಿಲ್ಲಿಸು;
 			}
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
-			if (has_mbyte)
+			ಆದರೆ (has_mbyte)
 			{
-			    int	len;
+			    ಪೂರ್ಣಾಂಕ	len;
 
 			    // produce a multibyte character, including any
 			    // following composing characters
 			    startc = mb_ptr2char(regparse);
 			    len = (*mb_ptr2len)(regparse);
-			    if (enc_utf8 && utf_char2len(startc) != len)
+			    ಆದರೆ (enc_utf8 && utf_char2len(startc) != len)
 				startc = -1;	// composing chars
-			    while (--len >= 0)
+			    ಆಗ (--len >= 0)
 				regc(*regparse++);
 			}
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
 			    startc = *regparse++;
 			    regc(startc);
@@ -2052,31 +2052,31 @@ collection:
 		}
 		regc(NUL);
 		prevchr_len = 1;	// last char was the ']'
-		if (*regparse != ']')
+		ಆದರೆ (*regparse != ']')
 		    EMSG_RET_NULL(_(e_too_many_brackets));  // Cannot happen?
 		skipchr();	    // let's be friends with the lexer again
 		*flagp |= HASWIDTH | SIMPLE;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	    else if (reg_strict)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (reg_strict)
 		EMSG2_RET_NULL(_(e_missing_rsb_after_str_lsb),
 							reg_magic > MAGIC_OFF);
 	}
 	// FALLTHROUGH
 
-      default:
+      ಪೂರ್ವನಿಯೋಜಿತ:
 	{
-	    int		len;
+	    ಪೂರ್ಣಾಂಕ		len;
 
 	    // A multi-byte character is handled as a separate atom if it's
 	    // before a multi and when it's a composing char.
-	    if (use_multibytecode(c))
+	    ಆದರೆ (use_multibytecode(c))
 	    {
 do_multibyte:
 		ret = regnode(MULTIBYTECODE);
 		regmbc(c);
 		*flagp |= HASWIDTH | SIMPLE;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 
 	    ret = regnode(EXACTLY);
@@ -2088,31 +2088,31 @@ do_multibyte:
 	    // - "one_exactly" is not set
 	    // But always emit at least one character.  Might be a Multi,
 	    // e.g., a "[" without matching "]".
-	    for (len = 0; c != NUL && (len == 0
+	    ಗಾಗಿ (len = 0; c != NUL && (len == 0
 			|| (re_multi_type(peekchr()) == NOT_MULTI
 			    && !one_exactly
 			    && !is_Magic(c))); ++len)
 	    {
 		c = no_Magic(c);
-		if (has_mbyte)
+		ಆದರೆ (has_mbyte)
 		{
 		    regmbc(c);
-		    if (enc_utf8)
+		    ಆದರೆ (enc_utf8)
 		    {
-			int	l;
+			ಪೂರ್ಣಾಂಕ	l;
 
 			// Need to get composing character too.
-			for (;;)
+			ಗಾಗಿ (;;)
 			{
 			    l = utf_ptr2len(regparse);
-			    if (!UTF_COMPOSINGLIKE(regparse, regparse + l))
-				break;
+			    ಆದರೆ (!UTF_COMPOSINGLIKE(regparse, regparse + l))
+				ನಿಲ್ಲಿಸು;
 			    regmbc(utf_ptr2char(regparse));
 			    skipchr();
 			}
 		    }
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		    regc(c);
 		c = getchr();
 	    }
@@ -2120,13 +2120,13 @@ do_multibyte:
 
 	    regc(NUL);
 	    *flagp |= HASWIDTH;
-	    if (len == 1)
+	    ಆದರೆ (len == 1)
 		*flagp |= SIMPLE;
 	}
-	break;
+	ನಿಲ್ಲಿಸು;
     }
 
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
 /*
@@ -2138,241 +2138,241 @@ do_multibyte:
  * It might seem that this node could be dispensed with entirely, but the
  * endmarker role is not redundant.
  */
-    static char_u *
-regpiece(int *flagp)
+    ಸ್ಥಿರ char_u *
+regpiece(ಪೂರ್ಣಾಂಕ *flagp)
 {
     char_u	    *ret;
-    int		    op;
-    char_u	    *next;
-    int		    flags;
-    long	    minval;
-    long	    maxval;
+    ಪೂರ್ಣಾಂಕ		    op;
+    char_u	    *ಮುಂದಿನ;
+    ಪೂರ್ಣಾಂಕ		    flags;
+    ದೀರ್ಘ	    minval;
+    ದೀರ್ಘ	    maxval;
 
     ret = regatom(&flags);
-    if (ret == NULL)
-	return NULL;
+    ಆದರೆ (ret == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     op = peekchr();
-    if (re_multi_type(op) == NOT_MULTI)
+    ಆದರೆ (re_multi_type(op) == NOT_MULTI)
     {
 	*flagp = flags;
-	return ret;
+	ಹಿಂತಿರುಗಿ ret;
     }
     // default flags
     *flagp = (WORST | SPSTART | (flags & (HASNL | HASLOOKBH)));
 
     skipchr();
-    switch (op)
+    ಆಯ್ಕೆ (op)
     {
-	case Magic('*'):
-	    if (flags & SIMPLE)
-		reginsert(STAR, ret);
-	    else
+	ಸ್ಥಿತಿ Magic('*'):
+	    ಆದರೆ (flags & SIMPLE)
+		reginsert(ನಕ್ಷತ್ರ, ret);
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		// Emit x* as (x&|), where & means "self".
 		reginsert(BRANCH, ret); // Either x
-		regoptail(ret, regnode(BACK));	// and loop
-		regoptail(ret, ret);	// back
+		regoptail(ret, regnode(ಹಿಂಭಾಗ_2));	// and loop
+		regoptail(ret, ret);	//ಹಿಂಭಾಗ
 		regtail(ret, regnode(BRANCH));	// or
 		regtail(ret, regnode(NOTHING)); // null.
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	case Magic('+'):
-	    if (flags & SIMPLE)
+	ಸ್ಥಿತಿ Magic('+'):
+	    ಆದರೆ (flags & SIMPLE)
 		reginsert(PLUS, ret);
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		// Emit x+ as x(&|), where & means "self".
-		next = regnode(BRANCH); // Either
-		regtail(ret, next);
-		regtail(regnode(BACK), ret);	// loop back
-		regtail(next, regnode(BRANCH)); // or
+		ಮುಂದಿನ = regnode(BRANCH); // Either
+		regtail(ret, ಮುಂದಿನ);
+		regtail(regnode(ಹಿಂಭಾಗ_2), ret);	// loop back
+		regtail(ಮುಂದಿನ, regnode(BRANCH)); // or
 		regtail(ret, regnode(NOTHING)); // null.
 	    }
 	    *flagp = (WORST | HASWIDTH | (flags & (HASNL | HASLOOKBH)));
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	case Magic('@'):
+	ಸ್ಥಿತಿ Magic('@'):
 	    {
-		int	lop = END;
-		long	nr;
+		ಪೂರ್ಣಾಂಕ	lop = ಕೊನೆ_3;
+		ದೀರ್ಘ	nr;
 
-		nr = (long)getdecchrs();
-		switch (no_Magic(getchr()))
+		nr = (ದೀರ್ಘ)getdecchrs();
+		ಆಯ್ಕೆ (no_Magic(getchr()))
 		{
-		    case '=': lop = MATCH; break;		  // \@=
-		    case '!': lop = NOMATCH; break;		  // \@!
-		    case '>': lop = SUBPAT; break;		  // \@>
-		    case '<': switch (no_Magic(getchr()))
+		    ಸ್ಥಿತಿ '=': lop = ಹೊಂದಿಕೆ_2; ನಿಲ್ಲಿಸು;		  // \@=
+		    ಸ್ಥಿತಿ '!': lop = NOMATCH; ನಿಲ್ಲಿಸು;		  // \@!
+		    ಸ್ಥಿತಿ '>': lop = SUBPAT; ನಿಲ್ಲಿಸು;		  // \@>
+		    ಸ್ಥಿತಿ '<': ಆಯ್ಕೆ (no_Magic(getchr()))
 			      {
-				  case '=': lop = BEHIND; break;   // \@<=
-				  case '!': lop = NOBEHIND; break; // \@<!
+				  ಸ್ಥಿತಿ '=': lop = BEHIND; ನಿಲ್ಲಿಸು;   // \@<=
+				  ಸ್ಥಿತಿ '!': lop = NOBEHIND; ನಿಲ್ಲಿಸು; // \@<!
 			      }
 		}
-		if (lop == END)
+		ಆದರೆ (lop == ಕೊನೆ_3)
 		    EMSG2_RET_NULL(_(e_invalid_character_after_str_at),
 						      reg_magic == MAGIC_ALL);
 		// Look behind must match with behind_pos.
-		if (lop == BEHIND || lop == NOBEHIND)
+		ಆದರೆ (lop == BEHIND || lop == NOBEHIND)
 		{
 		    regtail(ret, regnode(BHPOS));
 		    *flagp |= HASLOOKBH;
 		}
-		regtail(ret, regnode(END)); // operand ends
-		if (lop == BEHIND || lop == NOBEHIND)
+		regtail(ret, regnode(ಕೊನೆ_3)); // operand ends
+		ಆದರೆ (lop == BEHIND || lop == NOBEHIND)
 		{
-		    if (nr < 0)
+		    ಆದರೆ (nr < 0)
 			nr = 0; // no limit is same as zero limit
 		    reginsert_nr(lop, nr, ret);
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		    reginsert(lop, ret);
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 
-	case Magic('?'):
-	case Magic('='):
+	ಸ್ಥಿತಿ Magic('?'):
+	ಸ್ಥಿತಿ Magic('='):
 	    // Emit x= as (x|)
 	    reginsert(BRANCH, ret);		// Either x
 	    regtail(ret, regnode(BRANCH));	// or
-	    next = regnode(NOTHING);		// null.
-	    regtail(ret, next);
-	    regoptail(ret, next);
-	    break;
+	    ಮುಂದಿನ = regnode(NOTHING);		// null.
+	    regtail(ret, ಮುಂದಿನ);
+	    regoptail(ret, ಮುಂದಿನ);
+	    ನಿಲ್ಲಿಸು;
 
-	case Magic('{'):
-	    if (!read_limits(&minval, &maxval))
-		return NULL;
-	    if (flags & SIMPLE)
+	ಸ್ಥಿತಿ Magic('{'):
+	    ಆದರೆ (!read_limits(&minval, &maxval))
+		ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+	    ಆದರೆ (flags & SIMPLE)
 	    {
 		reginsert(BRACE_SIMPLE, ret);
 		reginsert_limits(BRACE_LIMITS, minval, maxval, ret);
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		if (num_complex_braces >= 10)
+		ಆದರೆ (ಅಂಕೆ_complex_braces >= 10)
 		    EMSG2_RET_NULL(_(e_too_many_complex_str_curly),
 						      reg_magic == MAGIC_ALL);
-		reginsert(BRACE_COMPLEX + num_complex_braces, ret);
-		regoptail(ret, regnode(BACK));
+		reginsert(BRACE_COMPLEX + ಅಂಕೆ_complex_braces, ret);
+		regoptail(ret, regnode(ಹಿಂಭಾಗ_2));
 		regoptail(ret, ret);
 		reginsert_limits(BRACE_LIMITS, minval, maxval, ret);
-		++num_complex_braces;
+		++ಅಂಕೆ_complex_braces;
 	    }
-	    if (minval > 0 && maxval > 0)
+	    ಆದರೆ (minval > 0 && maxval > 0)
 		*flagp = (HASWIDTH | (flags & (HASNL | HASLOOKBH)));
-	    break;
+	    ನಿಲ್ಲಿಸು;
     }
-    if (re_multi_type(peekchr()) != NOT_MULTI)
+    ಆದರೆ (re_multi_type(peekchr()) != NOT_MULTI)
     {
 	// Can't have a multi follow a multi.
-	if (peekchr() == Magic('*'))
+	ಆದರೆ (peekchr() == Magic('*'))
 	    EMSG2_RET_NULL(_(e_nested_str), reg_magic >= MAGIC_ON);
 	EMSG3_RET_NULL(_(e_nested_str_chr), reg_magic == MAGIC_ALL,
 							  no_Magic(peekchr()));
     }
 
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
 /*
  * Parse one alternative of an | or & operator.
  * Implements the concatenation operator.
  */
-    static char_u *
-regconcat(int *flagp)
+    ಸ್ಥಿರ char_u *
+regconcat(ಪೂರ್ಣಾಂಕ *flagp)
 {
-    char_u	*first = NULL;
-    char_u	*chain = NULL;
+    char_u	*ಮೊದಲ = ಖಾಲಿ;
+    char_u	*chain = ಖಾಲಿ;
     char_u	*latest;
-    int		flags;
-    int		cont = TRUE;
+    ಪೂರ್ಣಾಂಕ		flags;
+    ಪೂರ್ಣಾಂಕ		cont = TRUE;
 
     *flagp = WORST;		// Tentatively.
 
-    while (cont)
+    ಆಗ (cont)
     {
-	switch (peekchr())
+	ಆಯ್ಕೆ (peekchr())
 	{
-	    case NUL:
-	    case Magic('|'):
-	    case Magic('&'):
-	    case Magic(')'):
+	    ಸ್ಥಿತಿ NUL:
+	    ಸ್ಥಿತಿ Magic('|'):
+	    ಸ್ಥಿತಿ Magic('&'):
+	    ಸ್ಥಿತಿ Magic(')'):
 			    cont = FALSE;
-			    break;
-	    case Magic('Z'):
+			    ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ Magic('Z'):
 			    regflags |= RF_ICOMBINE;
 			    skipchr_keepstart();
-			    break;
-	    case Magic('c'):
+			    ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ Magic('c'):
 			    regflags |= RF_ICASE;
 			    skipchr_keepstart();
-			    break;
-	    case Magic('C'):
+			    ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ Magic('C'):
 			    regflags |= RF_NOICASE;
 			    skipchr_keepstart();
-			    break;
-	    case Magic('v'):
+			    ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ Magic('v'):
 			    reg_magic = MAGIC_ALL;
 			    skipchr_keepstart();
 			    curchr = -1;
-			    break;
-	    case Magic('m'):
+			    ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ Magic('m'):
 			    reg_magic = MAGIC_ON;
 			    skipchr_keepstart();
 			    curchr = -1;
-			    break;
-	    case Magic('M'):
+			    ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ Magic('M'):
 			    reg_magic = MAGIC_OFF;
 			    skipchr_keepstart();
 			    curchr = -1;
-			    break;
-	    case Magic('V'):
+			    ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ Magic('V'):
 			    reg_magic = MAGIC_NONE;
 			    skipchr_keepstart();
 			    curchr = -1;
-			    break;
-	    default:
+			    ನಿಲ್ಲಿಸು;
+	    ಪೂರ್ವನಿಯೋಜಿತ:
 			    latest = regpiece(&flags);
-			    if (latest == NULL || reg_toolong)
-				return NULL;
+			    ಆದರೆ (latest == ಖಾಲಿ || reg_toolong)
+				ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 			    *flagp |= flags & (HASWIDTH | HASNL | HASLOOKBH);
-			    if (chain == NULL)	// First piece.
+			    ಆದರೆ (chain == ಖಾಲಿ)	// First piece.
 				*flagp |= flags & SPSTART;
-			    else
+			    ಇಲ್ಲದಿದ್ದರೆ
 				regtail(chain, latest);
 			    chain = latest;
-			    if (first == NULL)
-				first = latest;
-			    break;
+			    ಆದರೆ (ಮೊದಲ == ಖಾಲಿ)
+				ಮೊದಲ = latest;
+			    ನಿಲ್ಲಿಸು;
 	}
     }
-    if (first == NULL)		// Loop ran zero times.
-	first = regnode(NOTHING);
-    return first;
+    ಆದರೆ (ಮೊದಲ == ಖಾಲಿ)		// Loop ran zero times.
+	ಮೊದಲ = regnode(NOTHING);
+    ಹಿಂತಿರುಗಿ ಮೊದಲ;
 }
 
 /*
  * Parse one alternative of an | operator.
  * Implements the & operator.
  */
-    static char_u *
-regbranch(int *flagp)
+    ಸ್ಥಿರ char_u *
+regbranch(ಪೂರ್ಣಾಂಕ *flagp)
 {
     char_u	*ret;
-    char_u	*chain = NULL;
+    char_u	*chain = ಖಾಲಿ;
     char_u	*latest;
-    int		flags;
+    ಪೂರ್ಣಾಂಕ		flags;
 
     *flagp = WORST | HASNL;		// Tentatively.
 
     ret = regnode(BRANCH);
-    for (;;)
+    ಗಾಗಿ (;;)
     {
 	latest = regconcat(&flags);
-	if (latest == NULL)
-	    return NULL;
+	ಆದರೆ (latest == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	// If one of the branches has width, the whole thing has.  If one of
 	// the branches anchors at start-of-line, the whole thing does.
 	// If one of the branches uses look-behind, the whole thing does.
@@ -2380,19 +2380,19 @@ regbranch(int *flagp)
 	// If one of the branches doesn't match a line-break, the whole thing
 	// doesn't.
 	*flagp &= ~HASNL | (flags & HASNL);
-	if (chain != NULL)
+	ಆದರೆ (chain != ಖಾಲಿ)
 	    regtail(chain, latest);
-	if (peekchr() != Magic('&'))
-	    break;
+	ಆದರೆ (peekchr() != Magic('&'))
+	    ನಿಲ್ಲಿಸು;
 	skipchr();
-	regtail(latest, regnode(END)); // operand ends
-	if (reg_toolong)
-	    break;
-	reginsert(MATCH, latest);
+	regtail(latest, regnode(ಕೊನೆ_3)); // operand ends
+	ಆದರೆ (reg_toolong)
+	    ನಿಲ್ಲಿಸು;
+	reginsert(ಹೊಂದಿಕೆ_2, latest);
 	chain = latest;
     }
 
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
 /*
@@ -2404,153 +2404,153 @@ regbranch(int *flagp)
  * is a trifle forced, but the need to tie the tails of the branches to what
  * follows makes it hard to avoid.
  */
-    static char_u *
+    ಸ್ಥಿರ char_u *
 reg(
-    int		paren,	// REG_NOPAREN, REG_PAREN, REG_NPAREN or REG_ZPAREN
-    int		*flagp)
+    ಪೂರ್ಣಾಂಕ		paren,	// REG_NOPAREN, REG_PAREN, REG_NPAREN or REG_ZPAREN
+    ಪೂರ್ಣಾಂಕ		*flagp)
 {
     char_u	*ret;
     char_u	*br;
     char_u	*ender;
-    int		parno = 0;
-    int		flags;
+    ಪೂರ್ಣಾಂಕ		parno = 0;
+    ಪೂರ್ಣಾಂಕ		flags;
 
     *flagp = HASWIDTH;		// Tentatively.
 
-#ifdef FEAT_SYN_HL
-    if (paren == REG_ZPAREN)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
+    ಆದರೆ (paren == REG_ZPAREN)
     {
 	// Make a ZOPEN node.
-	if (regnzpar >= NSUBEXP)
+	ಆದರೆ (regnzpar >= NSUBEXP)
 	    EMSG_RET_NULL(_(e_too_many_z));
 	parno = regnzpar;
 	regnzpar++;
 	ret = regnode(ZOPEN + parno);
     }
-    else
-#endif
-	if (paren == REG_PAREN)
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	ಆದರೆ (paren == REG_PAREN)
     {
 	// Make a MOPEN node.
-	if (regnpar >= NSUBEXP)
+	ಆದರೆ (regnpar >= NSUBEXP)
 	    EMSG2_RET_NULL(_(e_too_many_str_open), reg_magic == MAGIC_ALL);
 	parno = regnpar;
 	++regnpar;
 	ret = regnode(MOPEN + parno);
     }
-    else if (paren == REG_NPAREN)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (paren == REG_NPAREN)
     {
 	// Make a NOPEN node.
 	ret = regnode(NOPEN);
     }
-    else
-	ret = NULL;
+    ಇಲ್ಲದಿದ್ದರೆ
+	ret = ಖಾಲಿ;
 
-    if (bt_reg_parse_depth >= REG_MAX_PAREN_DEPTH)
+    ಆದರೆ (bt_reg_parse_ಆಳ >= REG_MAX_PAREN_ಆಳ)
 	EMSG_RET_NULL(_(e_command_too_complex));
-    ++bt_reg_parse_depth;
+    ++bt_reg_parse_ಆಳ;
 
     // Pick up the branches, linking them together.
     br = regbranch(&flags);
-    if (br == NULL)
+    ಆದರೆ (br == ಖಾಲಿ)
     {
-	ret = NULL;
-	goto theend;
+	ret = ಖಾಲಿ;
+	ಹೋಗು theend;
     }
-    if (ret != NULL)
+    ಆದರೆ (ret != ಖಾಲಿ)
 	regtail(ret, br);	// [MZ]OPEN -> first.
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	ret = br;
     // If one of the branches can be zero-width, the whole thing can.
     // If one of the branches has * at start or matches a line-break, the
     // whole thing can.
-    if (!(flags & HASWIDTH))
+    ಆದರೆ (!(flags & HASWIDTH))
 	*flagp &= ~HASWIDTH;
     *flagp |= flags & (SPSTART | HASNL | HASLOOKBH);
-    while (peekchr() == Magic('|'))
+    ಆಗ (peekchr() == Magic('|'))
     {
 	skipchr();
 	br = regbranch(&flags);
-	if (br == NULL || reg_toolong)
+	ಆದರೆ (br == ಖಾಲಿ || reg_toolong)
 	{
-	    ret = NULL;
-	    goto theend;
+	    ret = ಖಾಲಿ;
+	    ಹೋಗು theend;
 	}
 	regtail(ret, br);	// BRANCH -> BRANCH.
-	if (!(flags & HASWIDTH))
+	ಆದರೆ (!(flags & HASWIDTH))
 	    *flagp &= ~HASWIDTH;
 	*flagp |= flags & (SPSTART | HASNL | HASLOOKBH);
     }
 
     // Make a closing node, and hook it on the end.
     ender = regnode(
-#ifdef FEAT_SYN_HL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
 	    paren == REG_ZPAREN ? ZCLOSE + parno :
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    paren == REG_PAREN ? MCLOSE + parno :
-	    paren == REG_NPAREN ? NCLOSE : END);
+	    paren == REG_NPAREN ? NCLOSE : ಕೊನೆ_3);
     regtail(ret, ender);
 
     // Hook the tails of the branches to the closing node.
-    for (br = ret; br != NULL; br = regnext(br))
+    ಗಾಗಿ (br = ret; br != ಖಾಲಿ; br = regnext(br))
 	regoptail(br, ender);
 
     // Check for proper termination.
-    if (paren != REG_NOPAREN && getchr() != Magic(')'))
+    ಆದರೆ (paren != REG_NOPAREN && getchr() != Magic(')'))
     {
-#ifdef FEAT_SYN_HL
-	if (paren == REG_ZPAREN)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
+	ಆದರೆ (paren == REG_ZPAREN)
 	{
 	    emsg(_(e_unmatched_z));
 	    rc_did_emsg = TRUE;
-	    ret = NULL;
-	    goto theend;
+	    ret = ಖಾಲಿ;
+	    ಹೋಗು theend;
 	}
-	else
-#endif
-	if (paren == REG_NPAREN)
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	ಆದರೆ (paren == REG_NPAREN)
 	{
 	    semsg(_(e_unmatched_str_percent_open),
 				       reg_magic == MAGIC_ALL ? "" : "\\");
 	    rc_did_emsg = TRUE;
-	    ret = NULL;
-	    goto theend;
+	    ret = ಖಾಲಿ;
+	    ಹೋಗು theend;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    semsg(_(e_unmatched_str_open),
 				       reg_magic == MAGIC_ALL ? "" : "\\");
 	    rc_did_emsg = TRUE;
-	    ret = NULL;
-	    goto theend;
+	    ret = ಖಾಲಿ;
+	    ಹೋಗು theend;
 	}
     }
-    else if (paren == REG_NOPAREN && peekchr() != NUL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (paren == REG_NOPAREN && peekchr() != NUL)
     {
-	if (curchr == Magic(')'))
+	ಆದರೆ (curchr == Magic(')'))
 	{
 	    semsg(_(e_unmatched_str_close),
 				       reg_magic == MAGIC_ALL ? "" : "\\");
 	    rc_did_emsg = TRUE;
-	    ret = NULL;
-	    goto theend;
+	    ret = ಖಾಲಿ;
+	    ಹೋಗು theend;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    emsg(_(e_trailing_characters));	// "Can't happen".
 	    rc_did_emsg = TRUE;
-	    ret = NULL;
-	    goto theend;
+	    ret = ಖಾಲಿ;
+	    ಹೋಗು theend;
 	}
     }
     // Here we set the flag allowing back references to this set of
     // parentheses.
-    if (paren == REG_PAREN)
+    ಆದರೆ (paren == REG_PAREN)
 	had_endbrace[parno] = TRUE;	// have seen the close paren
 
 theend:
-    --bt_reg_parse_depth;
-    return ret;
+    --bt_reg_parse_ಆಳ;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
 /*
@@ -2574,92 +2574,92 @@ theend:
  * of the structure of the compiled regexp.
  * "re_flags": RE_MAGIC and/or RE_STRING.
  */
-    static regprog_T *
-bt_regcomp(char_u *expr, int re_flags)
+    ಸ್ಥಿರ regprog_T *
+bt_regcomp(char_u *ಅಭಿವ್ಯಕ್ತಿ, ಪೂರ್ಣಾಂಕ re_flags)
 {
     bt_regprog_T    *r;
-    char_u	*scan;
+    char_u	*ಪರಿಶೀಲನೆ;
     char_u	*longest;
-    int		len;
-    int		flags;
+    ಪೂರ್ಣಾಂಕ		len;
+    ಪೂರ್ಣಾಂಕ		flags;
 
-    if (expr == NULL)
-	IEMSG_RET_NULL(e_null_argument);
+    ಆದರೆ (ಅಭಿವ್ಯಕ್ತಿ == ಖಾಲಿ)
+	IEMSG_RET_NULL(e_null_ವಾದ);
 
     init_class_tab();
 
     // First pass: determine size, legality.
-    regcomp_start(expr, re_flags);
-    regcode = JUST_CALC_SIZE;
+    regcomp_ಆರಂಭ(ಅಭಿವ್ಯಕ್ತಿ, re_flags);
+    regcode = JUST_CALC_ಗಾತ್ರ;
     regc(REGMAGIC);
-    if (reg(REG_NOPAREN, &flags) == NULL)
-	return NULL;
+    ಆದರೆ (reg(REG_NOPAREN, &flags) == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     // Allocate space.
-    r = alloc(offsetof(bt_regprog_T, program) + regsize);
-    if (r == NULL)
-	return NULL;
-    r->re_in_use = FALSE;
-#ifdef DEBUG
+    r = alloc(offsetof(bt_regprog_T, ಕಾರ್ಯಕ್ರಮ) + regsize);
+    ಆದರೆ (r == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    r->re_ಒಳ_use = FALSE;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DEBUG
     r->regsz = regsize;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Second pass: emit code.
-    regcomp_start(expr, re_flags);
-    regcode = r->program;
+    regcomp_ಆರಂಭ(ಅಭಿವ್ಯಕ್ತಿ, re_flags);
+    regcode = r->ಕಾರ್ಯಕ್ರಮ;
     regc(REGMAGIC);
-    if (reg(REG_NOPAREN, &flags) == NULL || reg_toolong)
+    ಆದರೆ (reg(REG_NOPAREN, &flags) == ಖಾಲಿ || reg_toolong)
     {
 	vim_free(r);
-	if (reg_toolong)
-	    EMSG_RET_NULL(_(e_pattern_too_long));
-	return NULL;
+	ಆದರೆ (reg_toolong)
+	    EMSG_RET_NULL(_(e_ನಮೂನೆ_too_long));
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
     // Dig out information for optimizations.
     r->regstart = NUL;		// Worst-case defaults.
     r->reganch = 0;
-    r->regmust = NULL;
+    r->regmust = ಖಾಲಿ;
     r->regmlen = 0;
     r->regflags = regflags;
-    if (flags & HASNL)
+    ಆದರೆ (flags & HASNL)
 	r->regflags |= RF_HASNL;
-    if (flags & HASLOOKBH)
+    ಆದರೆ (flags & HASLOOKBH)
 	r->regflags |= RF_LOOKBH;
-#ifdef FEAT_SYN_HL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
     // Remember whether this pattern has any \z specials in it.
     r->reghasz = re_has_z;
-#endif
-    scan = r->program + 1;	// First BRANCH.
-    if (OP(regnext(scan)) == END)   // Only one top-level choice.
+#ಆದರೆ_ಅಂತ್ಯ
+    ಪರಿಶೀಲನೆ = r->ಕಾರ್ಯಕ್ರಮ + 1;	// First BRANCH.
+    ಆದರೆ (OP(regnext(ಪರಿಶೀಲನೆ)) == ಕೊನೆ_3)   // Only one top-level choice.
     {
-	scan = OPERAND(scan);
+	ಪರಿಶೀಲನೆ = ಕಾರ್ಯಾಂಶ(ಪರಿಶೀಲನೆ);
 
 	// Starting-point info.
-	if (OP(scan) == BOL || OP(scan) == RE_BOF)
+	ಆದರೆ (OP(ಪರಿಶೀಲನೆ) == BOL || OP(ಪರಿಶೀಲನೆ) == RE_BOF)
 	{
 	    r->reganch++;
-	    scan = regnext(scan);
+	    ಪರಿಶೀಲನೆ = regnext(ಪರಿಶೀಲನೆ);
 	}
 
-	if (OP(scan) == EXACTLY)
+	ಆದರೆ (OP(ಪರಿಶೀಲನೆ) == EXACTLY)
 	{
-	    if (has_mbyte)
-		r->regstart = (*mb_ptr2char)(OPERAND(scan));
-	    else
-		r->regstart = *OPERAND(scan);
+	    ಆದರೆ (has_mbyte)
+		r->regstart = (*mb_ptr2char)(ಕಾರ್ಯಾಂಶ(ಪರಿಶೀಲನೆ));
+	    ಇಲ್ಲದಿದ್ದರೆ
+		r->regstart = *ಕಾರ್ಯಾಂಶ(ಪರಿಶೀಲನೆ);
 	}
-	else if ((OP(scan) == BOW
-		    || OP(scan) == EOW
-		    || OP(scan) == NOTHING
-		    || OP(scan) == MOPEN + 0 || OP(scan) == NOPEN
-		    || OP(scan) == MCLOSE + 0 || OP(scan) == NCLOSE)
-		 && OP(regnext(scan)) == EXACTLY)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((OP(ಪರಿಶೀಲನೆ) == BOW
+		    || OP(ಪರಿಶೀಲನೆ) == EOW
+		    || OP(ಪರಿಶೀಲನೆ) == NOTHING
+		    || OP(ಪರಿಶೀಲನೆ) == MOPEN + 0 || OP(ಪರಿಶೀಲನೆ) == NOPEN
+		    || OP(ಪರಿಶೀಲನೆ) == MCLOSE + 0 || OP(ಪರಿಶೀಲನೆ) == NCLOSE)
+		 && OP(regnext(ಪರಿಶೀಲನೆ)) == EXACTLY)
 	{
-	    if (has_mbyte)
-		r->regstart = (*mb_ptr2char)(OPERAND(regnext(scan)));
-	    else
-		r->regstart = *OPERAND(regnext(scan));
+	    ಆದರೆ (has_mbyte)
+		r->regstart = (*mb_ptr2char)(ಕಾರ್ಯಾಂಶ(regnext(ಪರಿಶೀಲನೆ)));
+	    ಇಲ್ಲದಿದ್ದರೆ
+		r->regstart = *ಕಾರ್ಯಾಂಶ(regnext(ಪರಿಶೀಲನೆ));
 	}
 
 	// If there's something expensive in the r.e., find the longest
@@ -2671,22 +2671,22 @@ bt_regcomp(char_u *expr, int re_flags)
 
 	// When the r.e. starts with BOW, it is faster to look for a regmust
 	// first. Used a lot for "#" and "*" commands. (Added by mool).
-	if ((flags & SPSTART || OP(scan) == BOW || OP(scan) == EOW)
+	ಆದರೆ ((flags & SPSTART || OP(ಪರಿಶೀಲನೆ) == BOW || OP(ಪರಿಶೀಲನೆ) == EOW)
 							  && !(flags & HASNL))
 	{
 	    size_t  scanlen;
 
-	    longest = NULL;
+	    longest = ಖಾಲಿ;
 	    len = 0;
-	    for (; scan != NULL; scan = regnext(scan))
+	    ಗಾಗಿ (; ಪರಿಶೀಲನೆ != ಖಾಲಿ; ಪರಿಶೀಲನೆ = regnext(ಪರಿಶೀಲನೆ))
 	    {
-		if (OP(scan) == EXACTLY)
+		ಆದರೆ (OP(ಪರಿಶೀಲನೆ) == EXACTLY)
 		{
-		    scanlen = STRLEN(OPERAND(scan));
-		    if (scanlen >= (size_t)len)
+		    scanlen = STRLEN(ಕಾರ್ಯಾಂಶ(ಪರಿಶೀಲನೆ));
+		    ಆದರೆ (scanlen >= (size_t)len)
 		    {
-			longest = OPERAND(scan);
-			len = (int)scanlen;
+			longest = ಕಾರ್ಯಾಂಶ(ಪರಿಶೀಲನೆ);
+			len = (ಪೂರ್ಣಾಂಕ)scanlen;
 		    }
 		}
 	    }
@@ -2694,133 +2694,133 @@ bt_regcomp(char_u *expr, int re_flags)
 	    r->regmlen = len;
 	}
     }
-#ifdef BT_REGEXP_DUMP
-    regdump(expr, r);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ BT_REGEXP_DUMP
+    regdump(ಅಭಿವ್ಯಕ್ತಿ, r);
+#ಆದರೆ_ಅಂತ್ಯ
     r->engine = &bt_regengine;
-    return (regprog_T *)r;
+    ಹಿಂತಿರುಗಿ (regprog_T *)r;
 }
 
-#if defined(FEAT_SYN_HL)
+#ಆದರೆ defined(FEAT_SYN_HL)
 /*
  * Check if during the previous call to vim_regcomp the EOL item "$" has been
  * found.  This is messy, but it works fine.
  */
-    int
-vim_regcomp_had_eol(void)
+    ಪೂರ್ಣಾಂಕ
+vim_regcomp_had_eol(ಶೂನ್ಯ)
 {
-    return had_eol;
+    ಹಿಂತಿರುಗಿ had_eol;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Get a number after a backslash that is inside [].
  * When nothing is recognized return a backslash.
  */
-    static int
-coll_get_char(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+coll_get_char(ಶೂನ್ಯ)
 {
     vimlong_T	nr = -1;
 
-    switch (*regparse++)
+    ಆಯ್ಕೆ (*regparse++)
     {
-	case 'd': nr = getdecchrs(); break;
-	case 'o': nr = getoctchrs(); break;
-	case 'x': nr = gethexchrs(2); break;
-	case 'u': nr = gethexchrs(4); break;
-	case 'U': nr = gethexchrs(8); break;
+	ಸ್ಥಿತಿ 'd': nr = getdecchrs(); ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ 'o': nr = getoctchrs(); ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ 'x': nr = gethexchrs(2); ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ 'u': nr = gethexchrs(4); ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ 'U': nr = gethexchrs(8); ನಿಲ್ಲಿಸು;
     }
-    if (nr < 0)
+    ಆದರೆ (nr < 0)
     {
 	// If getting the number fails be backwards compatible: the character
 	// is a backslash.
 	--regparse;
 	nr = '\\';
     }
-    if (nr > INT_MAX)
-	nr = INT_MAX;
-    return nr;
+    ಆದರೆ (nr > ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ)
+	nr = ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ;
+    ಹಿಂತಿರುಗಿ nr;
 }
 
 /*
  * Free a compiled regexp program, returned by bt_regcomp().
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 bt_regfree(regprog_T *prog)
 {
     vim_free(prog);
 }
 
-#define ADVANCE_REGINPUT() MB_PTR_ADV(rex.input)
+#ವ್ಯಾಖ್ಯಾನಿಸು ADVANCE_REGINPUT() MB_PTR_ADV(rex.ಒಳಹರಿವು)
 
 /*
  * The arguments from BRACE_LIMITS are stored here.  They are actually local
  * to regmatch(), but they are here to reduce the amount of stack space used
  * (it can be called recursively many times).
  */
-static long	bl_minval;
-static long	bl_maxval;
+ಸ್ಥಿರ ದೀರ್ಘ	bl_minval;
+ಸ್ಥಿರ ದೀರ್ಘ	bl_maxval;
 
 /*
  * Save the input line and position in a regsave_T.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 reg_save(regsave_T *save, garray_T *gap)
 {
-    if (REG_MULTI)
+    ಆದರೆ (REG_MULTI)
     {
-	save->rs_u.pos.col = (colnr_T)(rex.input - rex.line);
+	save->rs_u.pos.ಲಂಬಸಾಲು = (colnr_T)(rex.ಒಳಹರಿವು - rex.ಸಾಲು);
 	save->rs_u.pos.lnum = rex.lnum;
     }
-    else
-	save->rs_u.ptr = rex.input;
+    ಇಲ್ಲದಿದ್ದರೆ
+	save->rs_u.ptr = rex.ಒಳಹರಿವು;
     save->rs_len = gap->ga_len;
 }
 
 /*
  * Restore the input line and position from a regsave_T.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 reg_restore(regsave_T *save, garray_T *gap)
 {
-    if (REG_MULTI)
+    ಆದರೆ (REG_MULTI)
     {
-	if (rex.lnum != save->rs_u.pos.lnum)
+	ಆದರೆ (rex.lnum != save->rs_u.pos.lnum)
 	{
 	    // only call reg_getline() when the line number changed to save
 	    // a bit of time
 	    rex.lnum = save->rs_u.pos.lnum;
-	    rex.line = reg_getline(rex.lnum);
+	    rex.ಸಾಲು = reg_getline(rex.lnum);
 	}
-	rex.input = rex.line + save->rs_u.pos.col;
+	rex.ಒಳಹರಿವು = rex.ಸಾಲು + save->rs_u.pos.ಲಂಬಸಾಲು;
     }
-    else
-	rex.input = save->rs_u.ptr;
+    ಇಲ್ಲದಿದ್ದರೆ
+	rex.ಒಳಹರಿವು = save->rs_u.ptr;
     gap->ga_len = save->rs_len;
 }
 
 /*
  * Return TRUE if current position is equal to saved position.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 reg_save_equal(regsave_T *save)
 {
-    if (REG_MULTI)
-	return rex.lnum == save->rs_u.pos.lnum
-				  && rex.input == rex.line + save->rs_u.pos.col;
-    return rex.input == save->rs_u.ptr;
+    ಆದರೆ (REG_MULTI)
+	ಹಿಂತಿರುಗಿ rex.lnum == save->rs_u.pos.lnum
+				  && rex.ಒಳಹರಿವು == rex.ಸಾಲು + save->rs_u.pos.ಲಂಬಸಾಲು;
+    ಹಿಂತಿರುಗಿ rex.ಒಳಹರಿವು == save->rs_u.ptr;
 }
 
 // Save the sub-expressions before attempting a match.
-#define save_se(savep, posp, pp) \
+#ವ್ಯಾಖ್ಯಾನಿಸು save_se(savep, posp, pp) \
     REG_MULTI ? save_se_multi((savep), (posp)) : save_se_one((savep), (pp))
 
 // After a failed match restore the sub-expressions.
-#define restore_se(savep, posp, pp) \
+#ವ್ಯಾಖ್ಯಾನಿಸು restore_se(savep, posp, pp) \
 { \
-    if (REG_MULTI) \
+    ಆದರೆ (REG_MULTI) \
 	*(posp) = (savep)->se_u.pos; \
-    else \
+    ಇಲ್ಲದಿದ್ದರೆ \
 	*(pp) = (savep)->se_u.ptr; \
 }
 
@@ -2831,498 +2831,498 @@ reg_save_equal(regsave_T *save)
  * Use se_save() to use pointer (save_se_multi()) or position (save_se_one()),
  * depending on REG_MULTI.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 save_se_multi(save_se_T *savep, lpos_T *posp)
 {
     savep->se_u.pos = *posp;
     posp->lnum = rex.lnum;
-    posp->col = (colnr_T)(rex.input - rex.line);
+    posp->ಲಂಬಸಾಲು = (colnr_T)(rex.ಒಳಹರಿವು - rex.ಸಾಲು);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 save_se_one(save_se_T *savep, char_u **pp)
 {
     savep->se_u.ptr = *pp;
-    *pp = rex.input;
+    *pp = rex.ಒಳಹರಿವು;
 }
 
 /*
  * regrepeat - repeatedly match something simple, return how many.
  * Advances rex.input (and rex.lnum) to just after the matched chars.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 regrepeat(
     char_u	*p,
-    long	maxcount)   // maximum number of matches allowed
+    ದೀರ್ಘ	maxcount)   // maximum number of matches allowed
 {
-    long	count = 0;
-    char_u	*scan;
+    ದೀರ್ಘ	ಎಣಿಕೆ_2 = 0;
+    char_u	*ಪರಿಶೀಲನೆ;
     char_u	*opnd;
-    int		mask;
-    int		testval = 0;
+    ಪೂರ್ಣಾಂಕ		ಮುಖವಾಡ;
+    ಪೂರ್ಣಾಂಕ		testval = 0;
 
-    scan = rex.input;	    // Make local copy of rex.input for speed.
-    opnd = OPERAND(p);
-    switch (OP(p))
+    ಪರಿಶೀಲನೆ = rex.ಒಳಹರಿವು;	    // Make local copy of rex.input for speed.
+    opnd = ಕಾರ್ಯಾಂಶ(p);
+    ಆಯ್ಕೆ (OP(p))
     {
-      case ANY:
-      case ANY + ADD_NL:
-	while (count < maxcount)
+      ಸ್ಥಿತಿ ANY:
+      ಸ್ಥಿತಿ ANY + ಕೂಡಿಸು_NL:
+	ಆಗ (ಎಣಿಕೆ_2 < maxcount)
 	{
 	    // Matching anything means we continue until end-of-line (or
 	    // end-of-file for ANY + ADD_NL), only limited by maxcount.
-	    while (*scan != NUL && count < maxcount)
+	    ಆಗ (*ಪರಿಶೀಲನೆ != NUL && ಎಣಿಕೆ_2 < maxcount)
 	    {
-		++count;
-		MB_PTR_ADV(scan);
+		++ಎಣಿಕೆ_2;
+		MB_PTR_ADV(ಪರಿಶೀಲನೆ);
 	    }
-	    if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-				      || rex.reg_line_lbr || count == maxcount)
-		break;
-	    ++count;		// count the line-break
+	    ಆದರೆ (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+				      || rex.reg_ಸಾಲು_lbr || ಎಣಿಕೆ_2 == maxcount)
+		ನಿಲ್ಲಿಸು;
+	    ++ಎಣಿಕೆ_2;		// count the line-break
 	    reg_nextline();
-	    scan = rex.input;
-	    if (got_int)
-		break;
+	    ಪರಿಶೀಲನೆ = rex.ಒಳಹರಿವು;
+	    ಆದರೆ (got_int)
+		ನಿಲ್ಲಿಸು;
 	}
-	break;
+	ನಿಲ್ಲಿಸು;
 
-      case IDENT:
-      case IDENT + ADD_NL:
+      ಸ್ಥಿತಿ IDENT:
+      ಸ್ಥಿತಿ IDENT + ಕೂಡಿಸು_NL:
 	testval = TRUE;
 	// FALLTHROUGH
-      case SIDENT:
-      case SIDENT + ADD_NL:
-	while (count < maxcount)
+      ಸ್ಥಿತಿ SIDENT:
+      ಸ್ಥಿತಿ SIDENT + ಕೂಡಿಸು_NL:
+	ಆಗ (ಎಣಿಕೆ_2 < maxcount)
 	{
-	    if (vim_isIDc(PTR2CHAR(scan)) && (testval || !VIM_ISDIGIT(*scan)))
+	    ಆದರೆ (vim_isIDc(PTR2CHAR(ಪರಿಶೀಲನೆ)) && (testval || !VIM_ISDIGIT(*ಪರಿಶೀಲನೆ)))
 	    {
-		MB_PTR_ADV(scan);
+		MB_PTR_ADV(ಪರಿಶೀಲನೆ);
 	    }
-	    else if (*scan == NUL)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*ಪರಿಶೀಲನೆ == NUL)
 	    {
-		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-							   || rex.reg_line_lbr)
-		    break;
+		ಆದರೆ (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+							   || rex.reg_ಸಾಲು_lbr)
+		    ನಿಲ್ಲಿಸು;
 		reg_nextline();
-		scan = rex.input;
-		if (got_int)
-		    break;
+		ಪರಿಶೀಲನೆ = rex.ಒಳಹರಿವು;
+		ಆದರೆ (got_int)
+		    ನಿಲ್ಲಿಸು;
 	    }
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
-		++scan;
-	    else
-		break;
-	    ++count;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (rex.reg_ಸಾಲು_lbr && *ಪರಿಶೀಲನೆ == '\n' && WITH_NL(OP(p)))
+		++ಪರಿಶೀಲನೆ;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ನಿಲ್ಲಿಸು;
+	    ++ಎಣಿಕೆ_2;
 	}
-	break;
+	ನಿಲ್ಲಿಸು;
 
-      case KWORD:
-      case KWORD + ADD_NL:
+      ಸ್ಥಿತಿ KWORD:
+      ಸ್ಥಿತಿ KWORD + ಕೂಡಿಸು_NL:
 	testval = TRUE;
 	// FALLTHROUGH
-      case SKWORD:
-      case SKWORD + ADD_NL:
-	while (count < maxcount)
+      ಸ್ಥಿತಿ SKWORD:
+      ಸ್ಥಿತಿ SKWORD + ಕೂಡಿಸು_NL:
+	ಆಗ (ಎಣಿಕೆ_2 < maxcount)
 	{
-	    if (vim_iswordp_buf(scan, rex.reg_buf)
-					  && (testval || !VIM_ISDIGIT(*scan)))
+	    ಆದರೆ (vim_iswordp_buf(ಪರಿಶೀಲನೆ, rex.reg_buf)
+					  && (testval || !VIM_ISDIGIT(*ಪರಿಶೀಲನೆ)))
 	    {
-		MB_PTR_ADV(scan);
+		MB_PTR_ADV(ಪರಿಶೀಲನೆ);
 	    }
-	    else if (*scan == NUL)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*ಪರಿಶೀಲನೆ == NUL)
 	    {
-		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-							   || rex.reg_line_lbr)
-		    break;
+		ಆದರೆ (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+							   || rex.reg_ಸಾಲು_lbr)
+		    ನಿಲ್ಲಿಸು;
 		reg_nextline();
-		scan = rex.input;
-		if (got_int)
-		    break;
+		ಪರಿಶೀಲನೆ = rex.ಒಳಹರಿವು;
+		ಆದರೆ (got_int)
+		    ನಿಲ್ಲಿಸು;
 	    }
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
-		++scan;
-	    else
-		break;
-	    ++count;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (rex.reg_ಸಾಲು_lbr && *ಪರಿಶೀಲನೆ == '\n' && WITH_NL(OP(p)))
+		++ಪರಿಶೀಲನೆ;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ನಿಲ್ಲಿಸು;
+	    ++ಎಣಿಕೆ_2;
 	}
-	break;
+	ನಿಲ್ಲಿಸು;
 
-      case FNAME:
-      case FNAME + ADD_NL:
+      ಸ್ಥಿತಿ FNAME:
+      ಸ್ಥಿತಿ FNAME + ಕೂಡಿಸು_NL:
 	testval = TRUE;
 	// FALLTHROUGH
-      case SFNAME:
-      case SFNAME + ADD_NL:
-	while (count < maxcount)
+      ಸ್ಥಿತಿ SFNAME:
+      ಸ್ಥಿತಿ SFNAME + ಕೂಡಿಸು_NL:
+	ಆಗ (ಎಣಿಕೆ_2 < maxcount)
 	{
-	    if (vim_isfilec(PTR2CHAR(scan)) && (testval || !VIM_ISDIGIT(*scan)))
+	    ಆದರೆ (vim_isfilec(PTR2CHAR(ಪರಿಶೀಲನೆ)) && (testval || !VIM_ISDIGIT(*ಪರಿಶೀಲನೆ)))
 	    {
-		MB_PTR_ADV(scan);
+		MB_PTR_ADV(ಪರಿಶೀಲನೆ);
 	    }
-	    else if (*scan == NUL)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*ಪರಿಶೀಲನೆ == NUL)
 	    {
-		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-							   || rex.reg_line_lbr)
-		    break;
+		ಆದರೆ (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+							   || rex.reg_ಸಾಲು_lbr)
+		    ನಿಲ್ಲಿಸು;
 		reg_nextline();
-		scan = rex.input;
-		if (got_int)
-		    break;
+		ಪರಿಶೀಲನೆ = rex.ಒಳಹರಿವು;
+		ಆದರೆ (got_int)
+		    ನಿಲ್ಲಿಸು;
 	    }
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
-		++scan;
-	    else
-		break;
-	    ++count;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (rex.reg_ಸಾಲು_lbr && *ಪರಿಶೀಲನೆ == '\n' && WITH_NL(OP(p)))
+		++ಪರಿಶೀಲನೆ;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ನಿಲ್ಲಿಸು;
+	    ++ಎಣಿಕೆ_2;
 	}
-	break;
+	ನಿಲ್ಲಿಸು;
 
-      case PRINT:
-      case PRINT + ADD_NL:
+      ಸ್ಥಿತಿ PRINT:
+      ಸ್ಥಿತಿ PRINT + ಕೂಡಿಸು_NL:
 	testval = TRUE;
 	// FALLTHROUGH
-      case SPRINT:
-      case SPRINT + ADD_NL:
-	while (count < maxcount)
+      ಸ್ಥಿತಿ SPRINT:
+      ಸ್ಥಿತಿ SPRINT + ಕೂಡಿಸು_NL:
+	ಆಗ (ಎಣಿಕೆ_2 < maxcount)
 	{
-	    if (*scan == NUL)
+	    ಆದರೆ (*ಪರಿಶೀಲನೆ == NUL)
 	    {
-		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-							   || rex.reg_line_lbr)
-		    break;
+		ಆದರೆ (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+							   || rex.reg_ಸಾಲು_lbr)
+		    ನಿಲ್ಲಿಸು;
 		reg_nextline();
-		scan = rex.input;
-		if (got_int)
-		    break;
+		ಪರಿಶೀಲನೆ = rex.ಒಳಹರಿವು;
+		ಆದರೆ (got_int)
+		    ನಿಲ್ಲಿಸು;
 	    }
-	    else if (vim_isprintc(PTR2CHAR(scan)) == 1
-					  && (testval || !VIM_ISDIGIT(*scan)))
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (vim_isprintc(PTR2CHAR(ಪರಿಶೀಲನೆ)) == 1
+					  && (testval || !VIM_ISDIGIT(*ಪರಿಶೀಲನೆ)))
 	    {
-		MB_PTR_ADV(scan);
+		MB_PTR_ADV(ಪರಿಶೀಲನೆ);
 	    }
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
-		++scan;
-	    else
-		break;
-	    ++count;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (rex.reg_ಸಾಲು_lbr && *ಪರಿಶೀಲನೆ == '\n' && WITH_NL(OP(p)))
+		++ಪರಿಶೀಲನೆ;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ನಿಲ್ಲಿಸು;
+	    ++ಎಣಿಕೆ_2;
 	}
-	break;
+	ನಿಲ್ಲಿಸು;
 
-      case WHITE:
-      case WHITE + ADD_NL:
-	testval = mask = RI_WHITE;
+      ಸ್ಥಿತಿ WHITE:
+      ಸ್ಥಿತಿ WHITE + ಕೂಡಿಸು_NL:
+	testval = ಮುಖವಾಡ = RI_WHITE;
 do_class:
-	while (count < maxcount)
+	ಆಗ (ಎಣಿಕೆ_2 < maxcount)
 	{
-	    int		l;
+	    ಪೂರ್ಣಾಂಕ		l;
 
-	    if (*scan == NUL)
+	    ಆದರೆ (*ಪರಿಶೀಲನೆ == NUL)
 	    {
-		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-							   || rex.reg_line_lbr)
-		    break;
+		ಆದರೆ (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+							   || rex.reg_ಸಾಲು_lbr)
+		    ನಿಲ್ಲಿಸು;
 		reg_nextline();
-		scan = rex.input;
-		if (got_int)
-		    break;
+		ಪರಿಶೀಲನೆ = rex.ಒಳಹರಿವು;
+		ಆದರೆ (got_int)
+		    ನಿಲ್ಲಿಸು;
 	    }
-	    else if (has_mbyte && (l = (*mb_ptr2len)(scan)) > 1)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (has_mbyte && (l = (*mb_ptr2len)(ಪರಿಶೀಲನೆ)) > 1)
 	    {
-		if (testval != 0)
-		    break;
-		scan += l;
+		ಆದರೆ (testval != 0)
+		    ನಿಲ್ಲಿಸು;
+		ಪರಿಶೀಲನೆ += l;
 	    }
-	    else if ((class_tab[*scan] & mask) == testval)
-		++scan;
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
-		++scan;
-	    else
-		break;
-	    ++count;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((class_tab[*ಪರಿಶೀಲನೆ] & ಮುಖವಾಡ) == testval)
+		++ಪರಿಶೀಲನೆ;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (rex.reg_ಸಾಲು_lbr && *ಪರಿಶೀಲನೆ == '\n' && WITH_NL(OP(p)))
+		++ಪರಿಶೀಲನೆ;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ನಿಲ್ಲಿಸು;
+	    ++ಎಣಿಕೆ_2;
 	}
-	break;
+	ನಿಲ್ಲಿಸು;
 
-      case NWHITE:
-      case NWHITE + ADD_NL:
-	mask = RI_WHITE;
-	goto do_class;
-      case DIGIT:
-      case DIGIT + ADD_NL:
-	testval = mask = RI_DIGIT;
-	goto do_class;
-      case NDIGIT:
-      case NDIGIT + ADD_NL:
-	mask = RI_DIGIT;
-	goto do_class;
-      case HEX:
-      case HEX + ADD_NL:
-	testval = mask = RI_HEX;
-	goto do_class;
-      case NHEX:
-      case NHEX + ADD_NL:
-	mask = RI_HEX;
-	goto do_class;
-      case OCTAL:
-      case OCTAL + ADD_NL:
-	testval = mask = RI_OCTAL;
-	goto do_class;
-      case NOCTAL:
-      case NOCTAL + ADD_NL:
-	mask = RI_OCTAL;
-	goto do_class;
-      case WORD:
-      case WORD + ADD_NL:
-	testval = mask = RI_WORD;
-	goto do_class;
-      case NWORD:
-      case NWORD + ADD_NL:
-	mask = RI_WORD;
-	goto do_class;
-      case HEAD:
-      case HEAD + ADD_NL:
-	testval = mask = RI_HEAD;
-	goto do_class;
-      case NHEAD:
-      case NHEAD + ADD_NL:
-	mask = RI_HEAD;
-	goto do_class;
-      case ALPHA:
-      case ALPHA + ADD_NL:
-	testval = mask = RI_ALPHA;
-	goto do_class;
-      case NALPHA:
-      case NALPHA + ADD_NL:
-	mask = RI_ALPHA;
-	goto do_class;
-      case LOWER:
-      case LOWER + ADD_NL:
-	testval = mask = RI_LOWER;
-	goto do_class;
-      case NLOWER:
-      case NLOWER + ADD_NL:
-	mask = RI_LOWER;
-	goto do_class;
-      case UPPER:
-      case UPPER + ADD_NL:
-	testval = mask = RI_UPPER;
-	goto do_class;
-      case NUPPER:
-      case NUPPER + ADD_NL:
-	mask = RI_UPPER;
-	goto do_class;
+      ಸ್ಥಿತಿ NWHITE:
+      ಸ್ಥಿತಿ NWHITE + ಕೂಡಿಸು_NL:
+	ಮುಖವಾಡ = RI_WHITE;
+	ಹೋಗು do_class;
+      ಸ್ಥಿತಿ DIGIT:
+      ಸ್ಥಿತಿ DIGIT + ಕೂಡಿಸು_NL:
+	testval = ಮುಖವಾಡ = RI_DIGIT;
+	ಹೋಗು do_class;
+      ಸ್ಥಿತಿ NDIGIT:
+      ಸ್ಥಿತಿ NDIGIT + ಕೂಡಿಸು_NL:
+	ಮುಖವಾಡ = RI_DIGIT;
+	ಹೋಗು do_class;
+      ಸ್ಥಿತಿ HEX:
+      ಸ್ಥಿತಿ HEX + ಕೂಡಿಸು_NL:
+	testval = ಮುಖವಾಡ = RI_HEX;
+	ಹೋಗು do_class;
+      ಸ್ಥಿತಿ NHEX:
+      ಸ್ಥಿತಿ NHEX + ಕೂಡಿಸು_NL:
+	ಮುಖವಾಡ = RI_HEX;
+	ಹೋಗು do_class;
+      ಸ್ಥಿತಿ OCTAL:
+      ಸ್ಥಿತಿ OCTAL + ಕೂಡಿಸು_NL:
+	testval = ಮುಖವಾಡ = RI_OCTAL;
+	ಹೋಗು do_class;
+      ಸ್ಥಿತಿ NOCTAL:
+      ಸ್ಥಿತಿ NOCTAL + ಕೂಡಿಸು_NL:
+	ಮುಖವಾಡ = RI_OCTAL;
+	ಹೋಗು do_class;
+      ಸ್ಥಿತಿ ಶಬ್ದ_2:
+      ಸ್ಥಿತಿ ಶಬ್ದ_2 + ಕೂಡಿಸು_NL:
+	testval = ಮುಖವಾಡ = RI_ಶಬ್ದ;
+	ಹೋಗು do_class;
+      ಸ್ಥಿತಿ NWORD:
+      ಸ್ಥಿತಿ NWORD + ಕೂಡಿಸು_NL:
+	ಮುಖವಾಡ = RI_ಶಬ್ದ;
+	ಹೋಗು do_class;
+      ಸ್ಥಿತಿ ತಲೆ_2:
+      ಸ್ಥಿತಿ ತಲೆ_2 + ಕೂಡಿಸು_NL:
+	testval = ಮುಖವಾಡ = RI_ತಲೆ;
+	ಹೋಗು do_class;
+      ಸ್ಥಿತಿ NHEAD:
+      ಸ್ಥಿತಿ NHEAD + ಕೂಡಿಸು_NL:
+	ಮುಖವಾಡ = RI_ತಲೆ;
+	ಹೋಗು do_class;
+      ಸ್ಥಿತಿ ALPHA:
+      ಸ್ಥಿತಿ ALPHA + ಕೂಡಿಸು_NL:
+	testval = ಮುಖವಾಡ = RI_ALPHA;
+	ಹೋಗು do_class;
+      ಸ್ಥಿತಿ NALPHA:
+      ಸ್ಥಿತಿ NALPHA + ಕೂಡಿಸು_NL:
+	ಮುಖವಾಡ = RI_ALPHA;
+	ಹೋಗು do_class;
+      ಸ್ಥಿತಿ ಅಧೋ_2:
+      ಸ್ಥಿತಿ ಅಧೋ_2 + ಕೂಡಿಸು_NL:
+	testval = ಮುಖವಾಡ = RI_ಅಧೋ;
+	ಹೋಗು do_class;
+      ಸ್ಥಿತಿ NLOWER:
+      ಸ್ಥಿತಿ NLOWER + ಕೂಡಿಸು_NL:
+	ಮುಖವಾಡ = RI_ಅಧೋ;
+	ಹೋಗು do_class;
+      ಸ್ಥಿತಿ ಊರ್ಧ್ವ:
+      ಸ್ಥಿತಿ ಊರ್ಧ್ವ + ಕೂಡಿಸು_NL:
+	testval = ಮುಖವಾಡ = RI_ಊರ್ಧ್ವ;
+	ಹೋಗು do_class;
+      ಸ್ಥಿತಿ NUPPER:
+      ಸ್ಥಿತಿ NUPPER + ಕೂಡಿಸು_NL:
+	ಮುಖವಾಡ = RI_ಊರ್ಧ್ವ;
+	ಹೋಗು do_class;
 
-      case EXACTLY:
+      ಸ್ಥಿತಿ EXACTLY:
 	{
-	    int	    cu, cl;
+	    ಪೂರ್ಣಾಂಕ	    cu, cl;
 
 	    // This doesn't do a multi-byte character, because a MULTIBYTECODE
 	    // would have been used for it.  It does handle single-byte
 	    // characters, such as latin1.
-	    if (rex.reg_ic)
+	    ಆದರೆ (rex.reg_ic)
 	    {
 		cu = MB_TOUPPER(*opnd);
 		cl = MB_TOLOWER(*opnd);
-		while (count < maxcount && (*scan == cu || *scan == cl))
+		ಆಗ (ಎಣಿಕೆ_2 < maxcount && (*ಪರಿಶೀಲನೆ == cu || *ಪರಿಶೀಲನೆ == cl))
 		{
-		    count++;
-		    scan++;
+		    ಎಣಿಕೆ_2++;
+		    ಪರಿಶೀಲನೆ++;
 		}
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		cu = *opnd;
-		while (count < maxcount && *scan == cu)
+		ಆಗ (ಎಣಿಕೆ_2 < maxcount && *ಪರಿಶೀಲನೆ == cu)
 		{
-		    count++;
-		    scan++;
+		    ಎಣಿಕೆ_2++;
+		    ಪರಿಶೀಲನೆ++;
 		}
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
 
-      case MULTIBYTECODE:
+      ಸ್ಥಿತಿ MULTIBYTECODE:
 	{
-	    int		i, len, cf = 0;
+	    ಪೂರ್ಣಾಂಕ		i, len, cf = 0;
 
 	    // Safety check (just in case 'encoding' was changed since
 	    // compiling the program).
-	    if ((len = (*mb_ptr2len)(opnd)) > 1)
+	    ಆದರೆ ((len = (*mb_ptr2len)(opnd)) > 1)
 	    {
-		if (rex.reg_ic && enc_utf8)
+		ಆದರೆ (rex.reg_ic && enc_utf8)
 		    cf = utf_fold(utf_ptr2char(opnd));
-		while (count < maxcount && (*mb_ptr2len)(scan) >= len)
+		ಆಗ (ಎಣಿಕೆ_2 < maxcount && (*mb_ptr2len)(ಪರಿಶೀಲನೆ) >= len)
 		{
-		    for (i = 0; i < len; ++i)
-			if (opnd[i] != scan[i])
-			    break;
-		    if (i < len && (!rex.reg_ic || !enc_utf8
-					|| utf_fold(utf_ptr2char(scan)) != cf))
-			break;
-		    scan += len;
-		    ++count;
+		    ಗಾಗಿ (i = 0; i < len; ++i)
+			ಆದರೆ (opnd[i] != ಪರಿಶೀಲನೆ[i])
+			    ನಿಲ್ಲಿಸು;
+		    ಆದರೆ (i < len && (!rex.reg_ic || !enc_utf8
+					|| utf_fold(utf_ptr2char(ಪರಿಶೀಲನೆ)) != cf))
+			ನಿಲ್ಲಿಸು;
+		    ಪರಿಶೀಲನೆ += len;
+		    ++ಎಣಿಕೆ_2;
 		}
 	    }
 	}
-	break;
+	ನಿಲ್ಲಿಸು;
 
-      case ANYOF:
-      case ANYOF + ADD_NL:
+      ಸ್ಥಿತಿ ANYOF:
+      ಸ್ಥಿತಿ ANYOF + ಕೂಡಿಸು_NL:
 	testval = TRUE;
 	// FALLTHROUGH
 
-      case ANYBUT:
-      case ANYBUT + ADD_NL:
-	while (count < maxcount)
+      ಸ್ಥಿತಿ ANYBUT:
+      ಸ್ಥಿತಿ ANYBUT + ಕೂಡಿಸು_NL:
+	ಆಗ (ಎಣಿಕೆ_2 < maxcount)
 	{
-	    int len;
+	    ಪೂರ್ಣಾಂಕ len;
 
-	    if (*scan == NUL)
+	    ಆದರೆ (*ಪರಿಶೀಲನೆ == NUL)
 	    {
-		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-							   || rex.reg_line_lbr)
-		    break;
+		ಆದರೆ (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+							   || rex.reg_ಸಾಲು_lbr)
+		    ನಿಲ್ಲಿಸು;
 		reg_nextline();
-		scan = rex.input;
-		if (got_int)
-		    break;
+		ಪರಿಶೀಲನೆ = rex.ಒಳಹರಿವು;
+		ಆದರೆ (got_int)
+		    ನಿಲ್ಲಿಸು;
 	    }
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
-		++scan;
-	    else if (has_mbyte && (len = (*mb_ptr2len)(scan)) > 1)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (rex.reg_ಸಾಲು_lbr && *ಪರಿಶೀಲನೆ == '\n' && WITH_NL(OP(p)))
+		++ಪರಿಶೀಲನೆ;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (has_mbyte && (len = (*mb_ptr2len)(ಪರಿಶೀಲನೆ)) > 1)
 	    {
-		if ((cstrchr(opnd, (*mb_ptr2char)(scan)) == NULL) == testval)
-		    break;
-		scan += len;
+		ಆದರೆ ((cstrchr(opnd, (*mb_ptr2char)(ಪರಿಶೀಲನೆ)) == ಖಾಲಿ) == testval)
+		    ನಿಲ್ಲಿಸು;
+		ಪರಿಶೀಲನೆ += len;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		if ((cstrchr(opnd, *scan) == NULL) == testval)
-		    break;
-		++scan;
+		ಆದರೆ ((cstrchr(opnd, *ಪರಿಶೀಲನೆ) == ಖಾಲಿ) == testval)
+		    ನಿಲ್ಲಿಸು;
+		++ಪರಿಶೀಲನೆ;
 	    }
-	    ++count;
+	    ++ಎಣಿಕೆ_2;
 	}
-	break;
+	ನಿಲ್ಲಿಸು;
 
-      case NEWL:
-	while (count < maxcount
-		&& ((*scan == NUL && rex.lnum <= rex.reg_maxline
-				       && !rex.reg_line_lbr && REG_MULTI)
-		    || (*scan == '\n' && rex.reg_line_lbr)))
+      ಸ್ಥಿತಿ NEWL:
+	ಆಗ (ಎಣಿಕೆ_2 < maxcount
+		&& ((*ಪರಿಶೀಲನೆ == NUL && rex.lnum <= rex.reg_maxline
+				       && !rex.reg_ಸಾಲು_lbr && REG_MULTI)
+		    || (*ಪರಿಶೀಲನೆ == '\n' && rex.reg_ಸಾಲು_lbr)))
 	{
-	    count++;
-	    if (rex.reg_line_lbr)
+	    ಎಣಿಕೆ_2++;
+	    ಆದರೆ (rex.reg_ಸಾಲು_lbr)
 		ADVANCE_REGINPUT();
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		reg_nextline();
-	    scan = rex.input;
-	    if (got_int)
-		break;
+	    ಪರಿಶೀಲನೆ = rex.ಒಳಹರಿವು;
+	    ಆದರೆ (got_int)
+		ನಿಲ್ಲಿಸು;
 	}
-	break;
+	ನಿಲ್ಲಿಸು;
 
-      default:			// Oh dear.  Called inappropriately.
-	iemsg(e_corrupted_regexp_program);
-#ifdef DEBUG
-	printf("Called regrepeat with op code %d\n", OP(p));
-#endif
-	break;
+      ಪೂರ್ವನಿಯೋಜಿತ:			// Oh dear.  Called inappropriately.
+	iemsg(e_corrupted_regexp_ಕಾರ್ಯಕ್ರಮ);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DEBUG
+	ಬರೆ("Called regrepeat with op code %d\n", OP(p));
+#ಆದರೆ_ಅಂತ್ಯ
+	ನಿಲ್ಲಿಸು;
     }
 
-    rex.input = scan;
+    rex.ಒಳಹರಿವು = ಪರಿಶೀಲನೆ;
 
-    return (int)count;
+    ಹಿಂತಿರುಗಿ (ಪೂರ್ಣಾಂಕ)ಎಣಿಕೆ_2;
 }
 
 /*
  * Push an item onto the regstack.
  * Returns pointer to new item.  Returns NULL when out of memory.
  */
-    static regitem_T *
-regstack_push(regstate_T state, char_u *scan)
+    ಸ್ಥಿರ regitem_T *
+regstack_ತಳ್ಳು(regstate_T state, char_u *ಪರಿಶೀಲನೆ)
 {
     regitem_T	*rp;
 
-    if ((long)((unsigned)regstack.ga_len >> 10) >= p_mmp)
+    ಆದರೆ ((ದೀರ್ಘ)((ಚಿಹ್ನೆರಹಿತ)regstack.ga_len >> 10) >= p_mmp)
     {
-	emsg(_(e_pattern_uses_more_memory_than_maxmempattern));
-	return NULL;
+	emsg(_(e_ನಮೂನೆ_ಬಳಸುತ್ತದೆ_ಇನ್ನಷ್ಟು_ಸ್ಮರಣೆ_than_maxmempattern));
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
-    if (GA_GROW_FAILS(&regstack, (int)sizeof(regitem_T)))
-	return NULL;
+    ಆದರೆ (GA_GROW_FAILS(&regstack, (ಪೂರ್ಣಾಂಕ)ಗಾತ್ರ(regitem_T)))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    rp = (regitem_T *)((char *)regstack.ga_data + regstack.ga_len);
+    rp = (regitem_T *)((ಅಕ್ಷರ *)regstack.ga_ದತ್ತಾಂಶ + regstack.ga_len);
     rp->rs_state = state;
-    rp->rs_scan = scan;
+    rp->rs_ಪರಿಶೀಲನೆ = ಪರಿಶೀಲನೆ;
 
-    regstack.ga_len += sizeof(regitem_T);
-    return rp;
+    regstack.ga_len += ಗಾತ್ರ(regitem_T);
+    ಹಿಂತಿರುಗಿ rp;
 }
 
 /*
  * Pop an item from the regstack.
  */
-    static void
-regstack_pop(char_u **scan)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+regstack_ತೆಗೆ(char_u **ಪರಿಶೀಲನೆ)
 {
     regitem_T	*rp;
 
-    rp = (regitem_T *)((char *)regstack.ga_data + regstack.ga_len) - 1;
-    *scan = rp->rs_scan;
+    rp = (regitem_T *)((ಅಕ್ಷರ *)regstack.ga_ದತ್ತಾಂಶ + regstack.ga_len) - 1;
+    *ಪರಿಶೀಲನೆ = rp->rs_ಪರಿಶೀಲನೆ;
 
-    regstack.ga_len -= sizeof(regitem_T);
+    regstack.ga_len -= ಗಾತ್ರ(regitem_T);
 }
 
-#ifdef FEAT_RELTIME
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RELTIME
 /*
  * Check if the timer expired, return TRUE if so.
  */
-    static int
-bt_did_time_out(int *timed_out)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+bt_did_ಸಮಯ_ಹೊರಹೋಗು(ಪೂರ್ಣಾಂಕ *timed_ಹೊರಹೋಗು)
 {
-    if (*timeout_flag)
+    ಆದರೆ (*timeout_flag)
     {
-	if (timed_out != NULL)
+	ಆದರೆ (timed_ಹೊರಹೋಗು != ಖಾಲಿ)
 	{
 # ifdef FEAT_EVAL
-	    if (!*timed_out)
-		ch_log(NULL, "BT regexp timed out");
+	    ಆದರೆ (!*timed_ಹೊರಹೋಗು)
+		ch_log(ಖಾಲಿ, "BT regexp timed out");
 # endif
-	    *timed_out = TRUE;
+	    *timed_ಹೊರಹೋಗು = TRUE;
 	}
-	return TRUE;
+	ಹಿಂತಿರುಗಿ TRUE;
     }
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Save the current subexpr to "bp", so that they can be restored
  * later by restore_subexpr().
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 save_subexpr(regbehind_T *bp)
 {
-    int i;
+    ಪೂರ್ಣಾಂಕ i;
 
     // When "rex.need_clear_subexpr" is set we don't need to save the values,
     // only remember that this flag needs to be set again when restoring.
     bp->save_need_clear_subexpr = rex.need_clear_subexpr;
-    if (rex.need_clear_subexpr)
-	return;
+    ಆದರೆ (rex.need_clear_subexpr)
+	ಹಿಂತಿರುಗಿ;
 
-    for (i = 0; i < NSUBEXP; ++i)
+    ಗಾಗಿ (i = 0; i < NSUBEXP; ++i)
     {
-	if (REG_MULTI)
+	ಆದರೆ (REG_MULTI)
 	{
-	    bp->save_start[i].se_u.pos = rex.reg_startpos[i];
-	    bp->save_end[i].se_u.pos = rex.reg_endpos[i];
+	    bp->save_ಆರಂಭ[i].se_u.pos = rex.reg_startpos[i];
+	    bp->save_ಕೊನೆ[i].se_u.pos = rex.reg_endpos[i];
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    bp->save_start[i].se_u.ptr = rex.reg_startp[i];
-	    bp->save_end[i].se_u.ptr = rex.reg_endp[i];
+	    bp->save_ಆರಂಭ[i].se_u.ptr = rex.reg_startp[i];
+	    bp->save_ಕೊನೆ[i].se_u.ptr = rex.reg_endp[i];
 	}
     }
 }
@@ -3330,27 +3330,27 @@ save_subexpr(regbehind_T *bp)
 /*
  * Restore the subexpr from "bp".
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 restore_subexpr(regbehind_T *bp)
 {
-    int i;
+    ಪೂರ್ಣಾಂಕ i;
 
     // Only need to restore saved values when they are not to be cleared.
     rex.need_clear_subexpr = bp->save_need_clear_subexpr;
-    if (rex.need_clear_subexpr)
-	return;
+    ಆದರೆ (rex.need_clear_subexpr)
+	ಹಿಂತಿರುಗಿ;
 
-    for (i = 0; i < NSUBEXP; ++i)
+    ಗಾಗಿ (i = 0; i < NSUBEXP; ++i)
     {
-	if (REG_MULTI)
+	ಆದರೆ (REG_MULTI)
 	{
-	    rex.reg_startpos[i] = bp->save_start[i].se_u.pos;
-	    rex.reg_endpos[i] = bp->save_end[i].se_u.pos;
+	    rex.reg_startpos[i] = bp->save_ಆರಂಭ[i].se_u.pos;
+	    rex.reg_endpos[i] = bp->save_ಕೊನೆ[i].se_u.pos;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    rex.reg_startp[i] = bp->save_start[i].se_u.ptr;
-	    rex.reg_endp[i] = bp->save_end[i].se_u.ptr;
+	    rex.reg_startp[i] = bp->save_ಆರಂಭ[i].se_u.ptr;
+	    rex.reg_endp[i] = bp->save_ಕೊನೆ[i].se_u.ptr;
 	}
     }
 }
@@ -3370,17 +3370,17 @@ restore_subexpr(regbehind_T *bp)
  * Returns FALSE when there is no match.  Leaves rex.input and rex.lnum in an
  * undefined state!
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 regmatch(
-    char_u	*scan,		    // Current node.
-    int		*timed_out UNUSED)  // flag set on timeout or NULL
+    char_u	*ಪರಿಶೀಲನೆ,		    // Current node.
+    ಪೂರ್ಣಾಂಕ		*timed_ಹೊರಹೋಗು ಬಳಸದ)  // flag set on timeout or NULL
 {
-  char_u	*next;		// Next node.
-  int		op;
-  int		c;
+  char_u	*ಮುಂದಿನ;		// Next node.
+  ಪೂರ್ಣಾಂಕ		op;
+  ಪೂರ್ಣಾಂಕ		c;
   regitem_T	*rp;
-  int		no;
-  int		status;		// one of the RA_ values:
+  ಪೂರ್ಣಾಂಕ		no;
+  ಪೂರ್ಣಾಂಕ		ಸ್ಥಿತಿ_2;		// one of the RA_ values:
 
   // Make "regstack" and "backpos" empty.  They are allocated and freed in
   // bt_regexec_both() to reduce malloc()/free() calls.
@@ -3388,588 +3388,588 @@ regmatch(
   backpos.ga_len = 0;
 
   // Repeat until "regstack" is empty.
-  for (;;)
+  ಗಾಗಿ (;;)
   {
     // Some patterns may take a long time to match, e.g., "\([a-z]\+\)\+Q".
     // Allow interrupting them with CTRL-C.
     fast_breakcheck();
 
-#ifdef DEBUG
-    if (scan != NULL && regnarrate)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DEBUG
+    ಆದರೆ (ಪರಿಶೀಲನೆ != ಖಾಲಿ && regnarrate)
     {
-	mch_errmsg((char *)regprop(scan));
+	mch_errmsg((ಅಕ್ಷರ *)regprop(ಪರಿಶೀಲನೆ));
 	mch_errmsg("(\n");
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Repeat for items that can be matched sequentially, without using the
     // regstack.
-    for (;;)
+    ಗಾಗಿ (;;)
     {
-	if (got_int || scan == NULL)
+	ಆದರೆ (got_int || ಪರಿಶೀಲನೆ == ಖಾಲಿ)
 	{
-	    status = RA_FAIL;
-	    break;
+	    ಸ್ಥಿತಿ_2 = RA_FAIL;
+	    ನಿಲ್ಲಿಸು;
 	}
-#ifdef FEAT_RELTIME
-	if (bt_did_time_out(timed_out))
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RELTIME
+	ಆದರೆ (bt_did_ಸಮಯ_ಹೊರಹೋಗು(timed_ಹೊರಹೋಗು))
 	{
-	    status = RA_FAIL;
-	    break;
+	    ಸ್ಥಿತಿ_2 = RA_FAIL;
+	    ನಿಲ್ಲಿಸು;
 	}
-#endif
-	status = RA_CONT;
+#ಆದರೆ_ಅಂತ್ಯ
+	ಸ್ಥಿತಿ_2 = RA_CONT;
 
-#ifdef DEBUG
-	if (regnarrate)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DEBUG
+	ಆದರೆ (regnarrate)
 	{
-	    mch_errmsg((char *)regprop(scan));
+	    mch_errmsg((ಅಕ್ಷರ *)regprop(ಪರಿಶೀಲನೆ));
 	    mch_errmsg("...\n");
 # ifdef FEAT_SYN_HL
-	    if (re_extmatch_in != NULL)
+	    ಆದರೆ (re_extmatch_ಒಳ != ಖಾಲಿ)
 	    {
-		int i;
+		ಪೂರ್ಣಾಂಕ i;
 
 		mch_errmsg(_("External submatches:\n"));
-		for (i = 0; i < NSUBEXP; i++)
+		ಗಾಗಿ (i = 0; i < NSUBEXP; i++)
 		{
 		    mch_errmsg("    \"");
-		    if (re_extmatch_in->matches[i] != NULL)
-			mch_errmsg((char *)re_extmatch_in->matches[i]);
+		    ಆದರೆ (re_extmatch_ಒಳ->matches[i] != ಖಾಲಿ)
+			mch_errmsg((ಅಕ್ಷರ *)re_extmatch_ಒಳ->matches[i]);
 		    mch_errmsg("\"\n");
 		}
 	    }
 # endif
 	}
-#endif
-	next = regnext(scan);
+#ಆದರೆ_ಅಂತ್ಯ
+	ಮುಂದಿನ = regnext(ಪರಿಶೀಲನೆ);
 
-	op = OP(scan);
+	op = OP(ಪರಿಶೀಲನೆ);
 	// Check for character class with NL added.
-	if (!rex.reg_line_lbr && WITH_NL(op) && REG_MULTI
-			     && *rex.input == NUL && rex.lnum <= rex.reg_maxline)
+	ಆದರೆ (!rex.reg_ಸಾಲು_lbr && WITH_NL(op) && REG_MULTI
+			     && *rex.ಒಳಹರಿವು == NUL && rex.lnum <= rex.reg_maxline)
 	{
 	    reg_nextline();
 	}
-	else if (rex.reg_line_lbr && WITH_NL(op) && *rex.input == '\n')
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (rex.reg_ಸಾಲು_lbr && WITH_NL(op) && *rex.ಒಳಹರಿವು == '\n')
 	{
 	    ADVANCE_REGINPUT();
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	  if (WITH_NL(op))
-	      op -= ADD_NL;
-	  if (has_mbyte)
-	      c = (*mb_ptr2char)(rex.input);
-	  else
-	      c = *rex.input;
-	  switch (op)
+	  ಆದರೆ (WITH_NL(op))
+	      op -= ಕೂಡಿಸು_NL;
+	  ಆದರೆ (has_mbyte)
+	      c = (*mb_ptr2char)(rex.ಒಳಹರಿವು);
+	  ಇಲ್ಲದಿದ್ದರೆ
+	      c = *rex.ಒಳಹರಿವು;
+	  ಆಯ್ಕೆ (op)
 	  {
-	  case BOL:
-	    if (rex.input != rex.line)
-		status = RA_NOMATCH;
-	    break;
+	  ಸ್ಥಿತಿ BOL:
+	    ಆದರೆ (rex.ಒಳಹರಿವು != rex.ಸಾಲು)
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ನಿಲ್ಲಿಸು;
 
-	  case EOL:
-	    if (c != NUL)
-		status = RA_NOMATCH;
-	    break;
+	  ಸ್ಥಿತಿ EOL:
+	    ಆದರೆ (c != NUL)
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ನಿಲ್ಲಿಸು;
 
-	  case RE_BOF:
+	  ಸ್ಥಿತಿ RE_BOF:
 	    // We're not at the beginning of the file when below the first
 	    // line where we started, not at the start of the line or we
 	    // didn't start at the first line of the buffer.
-	    if (rex.lnum != 0 || rex.input != rex.line
+	    ಆದರೆ (rex.lnum != 0 || rex.ಒಳಹರಿವು != rex.ಸಾಲು
 				       || (REG_MULTI && rex.reg_firstlnum > 1))
-		status = RA_NOMATCH;
-	    break;
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ನಿಲ್ಲಿಸು;
 
-	  case RE_EOF:
-	    if (rex.lnum != rex.reg_maxline || c != NUL)
-		status = RA_NOMATCH;
-	    break;
+	  ಸ್ಥಿತಿ RE_EOF:
+	    ಆದರೆ (rex.lnum != rex.reg_maxline || c != NUL)
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ನಿಲ್ಲಿಸು;
 
-	  case CURSOR:
+	  ಸ್ಥಿತಿ CURSOR:
 	    // Check if the buffer is in a window and compare the
 	    // rex.reg_win->w_cursor position to the match position.
-	    if (rex.reg_win == NULL
+	    ಆದರೆ (rex.reg_win == ಖಾಲಿ
 		    || (rex.lnum + rex.reg_firstlnum
 						 != rex.reg_win->w_cursor.lnum)
-		    || ((colnr_T)(rex.input - rex.line)
-						 != rex.reg_win->w_cursor.col))
-		status = RA_NOMATCH;
-	    break;
+		    || ((colnr_T)(rex.ಒಳಹರಿವು - rex.ಸಾಲು)
+						 != rex.reg_win->w_cursor.ಲಂಬಸಾಲು))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ನಿಲ್ಲಿಸು;
 
-	  case RE_MARK:
+	  ಸ್ಥಿತಿ RE_MARK:
 	    // Compare the mark position to the match position.
 	    {
-		int	mark = OPERAND(scan)[0];
-		int	cmp = OPERAND(scan)[1];
+		ಪೂರ್ಣಾಂಕ	mark = ಕಾರ್ಯಾಂಶ(ಪರಿಶೀಲನೆ)[0];
+		ಪೂರ್ಣಾಂಕ	cmp = ಕಾರ್ಯಾಂಶ(ಪರಿಶೀಲನೆ)[1];
 		pos_T	*pos;
-		size_t	col = REG_MULTI ? rex.input - rex.line : 0;
+		size_t	ಲಂಬಸಾಲು = REG_MULTI ? rex.ಒಳಹರಿವು - rex.ಸಾಲು : 0;
 
 		pos = getmark_buf(rex.reg_buf, mark, FALSE);
 
 		// Line may have been freed, get it again.
-		if (REG_MULTI)
+		ಆದರೆ (REG_MULTI)
 		{
-		    rex.line = reg_getline(rex.lnum);
-		    rex.input = rex.line + col;
+		    rex.ಸಾಲು = reg_getline(rex.lnum);
+		    rex.ಒಳಹರಿವು = rex.ಸಾಲು + ಲಂಬಸಾಲು;
 		}
 
-		if (pos == NULL		     // mark doesn't exist
+		ಆದರೆ (pos == ಖಾಲಿ		     // mark doesn't exist
 			|| pos->lnum <= 0)   // mark isn't set in reg_buf
 		{
-		    status = RA_NOMATCH;
+		    ಸ್ಥಿತಿ_2 = RA_NOMATCH;
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    colnr_T pos_col = pos->lnum == rex.lnum + rex.reg_firstlnum
-							  && pos->col == MAXCOL
+		    colnr_T pos_ಲಂಬಸಾಲು = pos->lnum == rex.lnum + rex.reg_firstlnum
+							  && pos->ಲಂಬಸಾಲು == MAXCOL
 				      ? reg_getline_len(pos->lnum - rex.reg_firstlnum)
-				      : pos->col;
+				      : pos->ಲಂಬಸಾಲು;
 
-		    if ((pos->lnum == rex.lnum + rex.reg_firstlnum
-				? (pos_col == (colnr_T)(rex.input - rex.line)
+		    ಆದರೆ ((pos->lnum == rex.lnum + rex.reg_firstlnum
+				? (pos_ಲಂಬಸಾಲು == (colnr_T)(rex.ಒಳಹರಿವು - rex.ಸಾಲು)
 				    ? (cmp == '<' || cmp == '>')
-				    : (pos_col < (colnr_T)(rex.input - rex.line)
+				    : (pos_ಲಂಬಸಾಲು < (colnr_T)(rex.ಒಳಹರಿವು - rex.ಸಾಲು)
 					? cmp != '>'
 					: cmp != '<'))
 				: (pos->lnum < rex.lnum + rex.reg_firstlnum
 				    ? cmp != '>'
 				    : cmp != '<')))
-		    status = RA_NOMATCH;
+		    ಸ್ಥಿತಿ_2 = RA_NOMATCH;
 		}
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case RE_VISUAL:
-	    if (!reg_match_visual())
-		status = RA_NOMATCH;
-	    break;
+	  ಸ್ಥಿತಿ RE_VISUAL:
+	    ಆದರೆ (!reg_ಹೊಂದಿಕೆ_visual())
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ನಿಲ್ಲಿಸು;
 
-	  case RE_LNUM:
-	    if (!REG_MULTI || !re_num_cmp((long_u)(rex.lnum + rex.reg_firstlnum),
-									scan))
-		status = RA_NOMATCH;
-	    break;
+	  ಸ್ಥಿತಿ RE_LNUM:
+	    ಆದರೆ (!REG_MULTI || !re_ಅಂಕೆ_cmp((long_u)(rex.lnum + rex.reg_firstlnum),
+									ಪರಿಶೀಲನೆ))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ನಿಲ್ಲಿಸು;
 
-	  case RE_COL:
-	    if (!re_num_cmp((long_u)(rex.input - rex.line) + 1, scan))
-		status = RA_NOMATCH;
-	    break;
+	  ಸ್ಥಿತಿ RE_ಲಂಬಸಾಲು:
+	    ಆದರೆ (!re_ಅಂಕೆ_cmp((long_u)(rex.ಒಳಹರಿವು - rex.ಸಾಲು) + 1, ಪರಿಶೀಲನೆ))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ನಿಲ್ಲಿಸು;
 
-	  case RE_VCOL:
+	  ಸ್ಥಿತಿ RE_VCOL:
 	    {
-		win_T	    *wp = rex.reg_win == NULL ? curwin : rex.reg_win;
+		win_T	    *wp = rex.reg_win == ಖಾಲಿ ? curwin : rex.reg_win;
 		linenr_T    lnum = REG_MULTI ? rex.reg_firstlnum + rex.lnum : 1;
 		long_u	    vcol;
 
-		if (REG_MULTI && (lnum <= 0
-				   || lnum > wp->w_buffer->b_ml.ml_line_count))
+		ಆದರೆ (REG_MULTI && (lnum <= 0
+				   || lnum > wp->w_ಬಫರ್->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ))
 		    lnum = 1;
-		vcol = (long_u)win_linetabsize(wp, lnum, rex.line,
-					      (colnr_T)(rex.input - rex.line));
-		if (!re_num_cmp(vcol + 1, scan))
-		    status = RA_NOMATCH;
+		vcol = (long_u)win_linetabsize(wp, lnum, rex.ಸಾಲು,
+					      (colnr_T)(rex.ಒಳಹರಿವು - rex.ಸಾಲು));
+		ಆದರೆ (!re_ಅಂಕೆ_cmp(vcol + 1, ಪರಿಶೀಲನೆ))
+		    ಸ್ಥಿತಿ_2 = RA_NOMATCH;
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case BOW:	// \<word; rex.input points to w
-	    if (c == NUL)	// Can't match at end of line
-		status = RA_NOMATCH;
-	    else if (has_mbyte)
+	  ಸ್ಥಿತಿ BOW:	// \<word; rex.input points to w
+	    ಆದರೆ (c == NUL)	// Can't match at end of line
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (has_mbyte)
 	    {
-		int this_class;
+		ಪೂರ್ಣಾಂಕ this_class;
 
 		// Get class of current and previous char (if it exists).
-		this_class = mb_get_class_buf(rex.input, rex.reg_buf);
-		if (this_class <= 1)
-		    status = RA_NOMATCH;  // not on a word at all
-		else if (reg_prev_class() == this_class)
-		    status = RA_NOMATCH;  // previous char is in same word
+		this_class = mb_get_class_buf(rex.ಒಳಹರಿವು, rex.reg_buf);
+		ಆದರೆ (this_class <= 1)
+		    ಸ್ಥಿತಿ_2 = RA_NOMATCH;  // not on a word at all
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (reg_prev_class() == this_class)
+		    ಸ್ಥಿತಿ_2 = RA_NOMATCH;  // previous char is in same word
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		if (!vim_iswordc_buf(c, rex.reg_buf) || (rex.input > rex.line
-				&& vim_iswordc_buf(rex.input[-1], rex.reg_buf)))
-		    status = RA_NOMATCH;
+		ಆದರೆ (!vim_iswordc_buf(c, rex.reg_buf) || (rex.ಒಳಹರಿವು > rex.ಸಾಲು
+				&& vim_iswordc_buf(rex.ಒಳಹರಿವು[-1], rex.reg_buf)))
+		    ಸ್ಥಿತಿ_2 = RA_NOMATCH;
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case EOW:	// word\>; rex.input points after d
-	    if (rex.input == rex.line)    // Can't match at start of line
-		status = RA_NOMATCH;
-	    else if (has_mbyte)
+	  ಸ್ಥಿತಿ EOW:	// word\>; rex.input points after d
+	    ಆದರೆ (rex.ಒಳಹರಿವು == rex.ಸಾಲು)    // Can't match at start of line
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (has_mbyte)
 	    {
-		int this_class, prev_class;
+		ಪೂರ್ಣಾಂಕ this_class, prev_class;
 
 		// Get class of current and previous char (if it exists).
-		this_class = mb_get_class_buf(rex.input, rex.reg_buf);
+		this_class = mb_get_class_buf(rex.ಒಳಹರಿವು, rex.reg_buf);
 		prev_class = reg_prev_class();
-		if (this_class == prev_class
+		ಆದರೆ (this_class == prev_class
 			|| prev_class == 0 || prev_class == 1)
-		    status = RA_NOMATCH;
+		    ಸ್ಥಿತಿ_2 = RA_NOMATCH;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		if (!vim_iswordc_buf(rex.input[-1], rex.reg_buf)
-			|| (rex.input[0] != NUL
+		ಆದರೆ (!vim_iswordc_buf(rex.ಒಳಹರಿವು[-1], rex.reg_buf)
+			|| (rex.ಒಳಹರಿವು[0] != NUL
 					   && vim_iswordc_buf(c, rex.reg_buf)))
-		    status = RA_NOMATCH;
+		    ಸ್ಥಿತಿ_2 = RA_NOMATCH;
 	    }
-	    break; // Matched with EOW
+	    ನಿಲ್ಲಿಸು; // Matched with EOW
 
-	  case ANY:
+	  ಸ್ಥಿತಿ ANY:
 	    // ANY does not match new lines.
-	    if (c == NUL)
-		status = RA_NOMATCH;
-	    else
+	    ಆದರೆ (c == NUL)
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		ADVANCE_REGINPUT();
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case IDENT:
-	    if (!vim_isIDc(c))
-		status = RA_NOMATCH;
-	    else
+	  ಸ್ಥಿತಿ IDENT:
+	    ಆದರೆ (!vim_isIDc(c))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		ADVANCE_REGINPUT();
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case SIDENT:
-	    if (VIM_ISDIGIT(*rex.input) || !vim_isIDc(c))
-		status = RA_NOMATCH;
-	    else
+	  ಸ್ಥಿತಿ SIDENT:
+	    ಆದರೆ (VIM_ISDIGIT(*rex.ಒಳಹರಿವು) || !vim_isIDc(c))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		ADVANCE_REGINPUT();
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case KWORD:
-	    if (!vim_iswordp_buf(rex.input, rex.reg_buf))
-		status = RA_NOMATCH;
-	    else
+	  ಸ್ಥಿತಿ KWORD:
+	    ಆದರೆ (!vim_iswordp_buf(rex.ಒಳಹರಿವು, rex.reg_buf))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		ADVANCE_REGINPUT();
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case SKWORD:
-	    if (VIM_ISDIGIT(*rex.input)
-				    || !vim_iswordp_buf(rex.input, rex.reg_buf))
-		status = RA_NOMATCH;
-	    else
+	  ಸ್ಥಿತಿ SKWORD:
+	    ಆದರೆ (VIM_ISDIGIT(*rex.ಒಳಹರಿವು)
+				    || !vim_iswordp_buf(rex.ಒಳಹರಿವು, rex.reg_buf))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		ADVANCE_REGINPUT();
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case FNAME:
-	    if (!vim_isfilec(c))
-		status = RA_NOMATCH;
-	    else
+	  ಸ್ಥಿತಿ FNAME:
+	    ಆದರೆ (!vim_isfilec(c))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		ADVANCE_REGINPUT();
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case SFNAME:
-	    if (VIM_ISDIGIT(*rex.input) || !vim_isfilec(c))
-		status = RA_NOMATCH;
-	    else
+	  ಸ್ಥಿತಿ SFNAME:
+	    ಆದರೆ (VIM_ISDIGIT(*rex.ಒಳಹರಿವು) || !vim_isfilec(c))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		ADVANCE_REGINPUT();
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case PRINT:
-	    if (!vim_isprintc(PTR2CHAR(rex.input)))
-		status = RA_NOMATCH;
-	    else
+	  ಸ್ಥಿತಿ PRINT:
+	    ಆದರೆ (!vim_isprintc(PTR2CHAR(rex.ಒಳಹರಿವು)))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		ADVANCE_REGINPUT();
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case SPRINT:
-	    if (VIM_ISDIGIT(*rex.input) || !vim_isprintc(PTR2CHAR(rex.input)))
-		status = RA_NOMATCH;
-	    else
+	  ಸ್ಥಿತಿ SPRINT:
+	    ಆದರೆ (VIM_ISDIGIT(*rex.ಒಳಹರಿವು) || !vim_isprintc(PTR2CHAR(rex.ಒಳಹರಿವು)))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		ADVANCE_REGINPUT();
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case WHITE:
-	    if (!VIM_ISWHITE(c))
-		status = RA_NOMATCH;
-	    else
+	  ಸ್ಥಿತಿ WHITE:
+	    ಆದರೆ (!VIM_ISWHITE(c))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		ADVANCE_REGINPUT();
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case NWHITE:
-	    if (c == NUL || VIM_ISWHITE(c))
-		status = RA_NOMATCH;
-	    else
+	  ಸ್ಥಿತಿ NWHITE:
+	    ಆದರೆ (c == NUL || VIM_ISWHITE(c))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		ADVANCE_REGINPUT();
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case DIGIT:
-	    if (!ri_digit(c))
-		status = RA_NOMATCH;
-	    else
+	  ಸ್ಥಿತಿ DIGIT:
+	    ಆದರೆ (!ri_digit(c))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		ADVANCE_REGINPUT();
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case NDIGIT:
-	    if (c == NUL || ri_digit(c))
-		status = RA_NOMATCH;
-	    else
+	  ಸ್ಥಿತಿ NDIGIT:
+	    ಆದರೆ (c == NUL || ri_digit(c))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		ADVANCE_REGINPUT();
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case HEX:
-	    if (!ri_hex(c))
-		status = RA_NOMATCH;
-	    else
+	  ಸ್ಥಿತಿ HEX:
+	    ಆದರೆ (!ri_hex(c))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		ADVANCE_REGINPUT();
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case NHEX:
-	    if (c == NUL || ri_hex(c))
-		status = RA_NOMATCH;
-	    else
+	  ಸ್ಥಿತಿ NHEX:
+	    ಆದರೆ (c == NUL || ri_hex(c))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		ADVANCE_REGINPUT();
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case OCTAL:
-	    if (!ri_octal(c))
-		status = RA_NOMATCH;
-	    else
+	  ಸ್ಥಿತಿ OCTAL:
+	    ಆದರೆ (!ri_octal(c))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		ADVANCE_REGINPUT();
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case NOCTAL:
-	    if (c == NUL || ri_octal(c))
-		status = RA_NOMATCH;
-	    else
+	  ಸ್ಥಿತಿ NOCTAL:
+	    ಆದರೆ (c == NUL || ri_octal(c))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		ADVANCE_REGINPUT();
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case WORD:
-	    if (!ri_word(c))
-		status = RA_NOMATCH;
-	    else
+	  ಸ್ಥಿತಿ ಶಬ್ದ_2:
+	    ಆದರೆ (!ri_ಶಬ್ದ(c))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		ADVANCE_REGINPUT();
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case NWORD:
-	    if (c == NUL || ri_word(c))
-		status = RA_NOMATCH;
-	    else
+	  ಸ್ಥಿತಿ NWORD:
+	    ಆದರೆ (c == NUL || ri_ಶಬ್ದ(c))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		ADVANCE_REGINPUT();
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case HEAD:
-	    if (!ri_head(c))
-		status = RA_NOMATCH;
-	    else
+	  ಸ್ಥಿತಿ ತಲೆ_2:
+	    ಆದರೆ (!ri_ತಲೆ(c))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		ADVANCE_REGINPUT();
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case NHEAD:
-	    if (c == NUL || ri_head(c))
-		status = RA_NOMATCH;
-	    else
+	  ಸ್ಥಿತಿ NHEAD:
+	    ಆದರೆ (c == NUL || ri_ತಲೆ(c))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		ADVANCE_REGINPUT();
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case ALPHA:
-	    if (!ri_alpha(c))
-		status = RA_NOMATCH;
-	    else
+	  ಸ್ಥಿತಿ ALPHA:
+	    ಆದರೆ (!ri_alpha(c))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		ADVANCE_REGINPUT();
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case NALPHA:
-	    if (c == NUL || ri_alpha(c))
-		status = RA_NOMATCH;
-	    else
+	  ಸ್ಥಿತಿ NALPHA:
+	    ಆದರೆ (c == NUL || ri_alpha(c))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		ADVANCE_REGINPUT();
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case LOWER:
-	    if (!ri_lower(c))
-		status = RA_NOMATCH;
-	    else
+	  ಸ್ಥಿತಿ ಅಧೋ_2:
+	    ಆದರೆ (!ri_ಅಧೋ(c))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		ADVANCE_REGINPUT();
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case NLOWER:
-	    if (c == NUL || ri_lower(c))
-		status = RA_NOMATCH;
-	    else
+	  ಸ್ಥಿತಿ NLOWER:
+	    ಆದರೆ (c == NUL || ri_ಅಧೋ(c))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		ADVANCE_REGINPUT();
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case UPPER:
-	    if (!ri_upper(c))
-		status = RA_NOMATCH;
-	    else
+	  ಸ್ಥಿತಿ ಊರ್ಧ್ವ:
+	    ಆದರೆ (!ri_ಊರ್ಧ್ವ(c))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		ADVANCE_REGINPUT();
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case NUPPER:
-	    if (c == NUL || ri_upper(c))
-		status = RA_NOMATCH;
-	    else
+	  ಸ್ಥಿತಿ NUPPER:
+	    ಆದರೆ (c == NUL || ri_ಊರ್ಧ್ವ(c))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		ADVANCE_REGINPUT();
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case EXACTLY:
+	  ಸ್ಥಿತಿ EXACTLY:
 	    {
-		int	len;
+		ಪೂರ್ಣಾಂಕ	len;
 		char_u	*opnd;
 
-		opnd = OPERAND(scan);
+		opnd = ಕಾರ್ಯಾಂಶ(ಪರಿಶೀಲನೆ);
 		// Inline the first byte, for speed.
-		if (*opnd != *rex.input
+		ಆದರೆ (*opnd != *rex.ಒಳಹರಿವು
 			&& (!rex.reg_ic
 			    || (!enc_utf8
-			      && MB_TOLOWER(*opnd) != MB_TOLOWER(*rex.input))))
-		    status = RA_NOMATCH;
-		else if (*opnd == NUL)
+			      && MB_TOLOWER(*opnd) != MB_TOLOWER(*rex.ಒಳಹರಿವು))))
+		    ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*opnd == NUL)
 		{
 		    // match empty string always works; happens when "~" is
 		    // empty.
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    if (opnd[1] == NUL && !(enc_utf8 && rex.reg_ic))
+		    ಆದರೆ (opnd[1] == NUL && !(enc_utf8 && rex.reg_ic))
 		    {
 			len = 1;	// matched a single byte above
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
 			// Need to match first byte again for multi-byte.
-			len = (int)STRLEN(opnd);
-			if (cstrncmp(opnd, rex.input, &len) != 0)
-			    status = RA_NOMATCH;
+			len = (ಪೂರ್ಣಾಂಕ)STRLEN(opnd);
+			ಆದರೆ (cstrncmp(opnd, rex.ಒಳಹರಿವು, &len) != 0)
+			    ಸ್ಥಿತಿ_2 = RA_NOMATCH;
 		    }
 		    // Check for following composing character, unless %C
 		    // follows (skips over all composing chars).
-		    if (status != RA_NOMATCH
+		    ಆದರೆ (ಸ್ಥಿತಿ_2 != RA_NOMATCH
 			    && enc_utf8
-			    && UTF_COMPOSINGLIKE(rex.input, rex.input + len)
+			    && UTF_COMPOSINGLIKE(rex.ಒಳಹರಿವು, rex.ಒಳಹರಿವು + len)
 			    && !rex.reg_icombine
-			    && OP(next) != RE_COMPOSING)
+			    && OP(ಮುಂದಿನ) != RE_COMPOSING)
 		    {
 			// raaron: This code makes a composing character get
 			// ignored, which is the correct behavior (sometimes)
 			// for voweled Hebrew texts.
-			status = RA_NOMATCH;
+			ಸ್ಥಿತಿ_2 = RA_NOMATCH;
 		    }
-		    if (status != RA_NOMATCH)
-			rex.input += len;
+		    ಆದರೆ (ಸ್ಥಿತಿ_2 != RA_NOMATCH)
+			rex.ಒಳಹರಿವು += len;
 		}
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case ANYOF:
-	  case ANYBUT:
+	  ಸ್ಥಿತಿ ANYOF:
+	  ಸ್ಥಿತಿ ANYBUT:
 	    {
-		char_u  *q = OPERAND(scan);
+		char_u  *q = ಕಾರ್ಯಾಂಶ(ಪರಿಶೀಲನೆ);
 
-		if (c == NUL)
-		    status = RA_NOMATCH;
-		else if ((cstrchr(q, c) == NULL) == (op == ANYOF))
-		    status = RA_NOMATCH;
-		else
+		ಆದರೆ (c == NUL)
+		    ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((cstrchr(q, c) == ಖಾಲಿ) == (op == ANYOF))
+		    ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    // Check following combining characters
-		    int	len = 0;
-		    int i;
+		    ಪೂರ್ಣಾಂಕ	len = 0;
+		    ಪೂರ್ಣಾಂಕ i;
 
-		    if (enc_utf8)
+		    ಆದರೆ (enc_utf8)
 			len = utfc_ptr2len(q) - utf_ptr2len(q);
 
-		    MB_CPTR_ADV(rex.input);
+		    MB_CPTR_ADV(rex.ಒಳಹರಿವು);
 		    MB_CPTR_ADV(q);
 
-		    if (!enc_utf8 || len == 0)
-			break;
+		    ಆದರೆ (!enc_utf8 || len == 0)
+			ನಿಲ್ಲಿಸು;
 
-		    for (i = 0; i < len; ++i)
-			if (q[i] != rex.input[i])
+		    ಗಾಗಿ (i = 0; i < len; ++i)
+			ಆದರೆ (q[i] != rex.ಒಳಹರಿವು[i])
 			{
-			    status = RA_NOMATCH;
-			    break;
+			    ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+			    ನಿಲ್ಲಿಸು;
 			}
-		    rex.input += len;
+		    rex.ಒಳಹರಿವು += len;
 		}
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 
-	  case MULTIBYTECODE:
-	    if (has_mbyte)
+	  ಸ್ಥಿತಿ MULTIBYTECODE:
+	    ಆದರೆ (has_mbyte)
 	    {
-		int	i, len;
+		ಪೂರ್ಣಾಂಕ	i, len;
 		char_u	*opnd;
-		int	opndc = 0, inpc;
+		ಪೂರ್ಣಾಂಕ	opndc = 0, inpc;
 
-		opnd = OPERAND(scan);
+		opnd = ಕಾರ್ಯಾಂಶ(ಪರಿಶೀಲನೆ);
 		// Safety check (just in case 'encoding' was changed since
 		// compiling the program).
-		if ((len = (*mb_ptr2len)(opnd)) < 2)
+		ಆದರೆ ((len = (*mb_ptr2len)(opnd)) < 2)
 		{
-		    status = RA_NOMATCH;
-		    break;
+		    ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+		    ನಿಲ್ಲಿಸು;
 		}
-		if (enc_utf8)
+		ಆದರೆ (enc_utf8)
 		    opndc = utf_ptr2char(opnd);
-		if (enc_utf8 && utf_iscomposing(opndc))
+		ಆದರೆ (enc_utf8 && utf_iscomposing(opndc))
 		{
 		    // When only a composing char is given match at any
 		    // position where that composing char appears.
-		    status = RA_NOMATCH;
-		    for (i = 0; rex.input[i] != NUL;
-						i += utf_ptr2len(rex.input + i))
+		    ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+		    ಗಾಗಿ (i = 0; rex.ಒಳಹರಿವು[i] != NUL;
+						i += utf_ptr2len(rex.ಒಳಹರಿವು + i))
 		    {
-			inpc = utf_ptr2char(rex.input + i);
-			if (!utf_iscomposing(inpc))
+			inpc = utf_ptr2char(rex.ಒಳಹರಿವು + i);
+			ಆದರೆ (!utf_iscomposing(inpc))
 			{
-			    if (i > 0)
-				break;
+			    ಆದರೆ (i > 0)
+				ನಿಲ್ಲಿಸು;
 			}
-			else if (opndc == inpc)
+			ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (opndc == inpc)
 			{
 			    // Include all following composing chars.
-			    len = i + utfc_ptr2len(rex.input + i);
-			    status = RA_MATCH;
-			    break;
+			    len = i + utfc_ptr2len(rex.ಒಳಹರಿವು + i);
+			    ಸ್ಥಿತಿ_2 = RA_ಹೊಂದಿಕೆ;
+			    ನಿಲ್ಲಿಸು;
 			}
 		    }
 		}
-		else if (enc_utf8)
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (enc_utf8)
 		{
-		    if (cstrncmp(opnd, rex.input, &len) != 0)
+		    ಆದರೆ (cstrncmp(opnd, rex.ಒಳಹರಿವು, &len) != 0)
 		    {
-			status = RA_NOMATCH;
-			break;
+			ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+			ನಿಲ್ಲಿಸು;
 		    }
 		}
-		else
-		    for (i = 0; i < len; ++i)
-			if (opnd[i] != rex.input[i])
+		ಇಲ್ಲದಿದ್ದರೆ
+		    ಗಾಗಿ (i = 0; i < len; ++i)
+			ಆದರೆ (opnd[i] != rex.ಒಳಹರಿವು[i])
 			{
-			    status = RA_NOMATCH;
-			    break;
+			    ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+			    ನಿಲ್ಲಿಸು;
 			}
-		rex.input += len;
+		rex.ಒಳಹರಿವು += len;
 	    }
-	    else
-		status = RA_NOMATCH;
-	    break;
-	  case RE_COMPOSING:
-	    if (enc_utf8)
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ನಿಲ್ಲಿಸು;
+	  ಸ್ಥಿತಿ RE_COMPOSING:
+	    ಆದರೆ (enc_utf8)
 	    {
 		// Skip composing characters.
-		while (utf_iscomposing(utf_ptr2char(rex.input)))
-		    MB_CPTR_ADV(rex.input);
+		ಆಗ (utf_iscomposing(utf_ptr2char(rex.ಒಳಹರಿವು)))
+		    MB_CPTR_ADV(rex.ಒಳಹರಿವು);
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case NOTHING:
-	    break;
+	  ಸ್ಥಿತಿ NOTHING:
+	    ನಿಲ್ಲಿಸು;
 
-	  case BACK:
+	  ಸ್ಥಿತಿ ಹಿಂಭಾಗ_2:
 	    {
-		int		i;
+		ಪೂರ್ಣಾಂಕ		i;
 		backpos_T	*bp;
 
 		// When we run into BACK we need to check if we don't keep
@@ -3978,49 +3978,49 @@ regmatch(
 		// at the same position as the previous time.
 		// The positions are stored in "backpos" and found by the
 		// current value of "scan", the position in the RE program.
-		bp = (backpos_T *)backpos.ga_data;
-		for (i = 0; i < backpos.ga_len; ++i)
-		    if (bp[i].bp_scan == scan)
-			break;
-		if (i == backpos.ga_len)
+		bp = (backpos_T *)backpos.ga_ದತ್ತಾಂಶ;
+		ಗಾಗಿ (i = 0; i < backpos.ga_len; ++i)
+		    ಆದರೆ (bp[i].bp_ಪರಿಶೀಲನೆ == ಪರಿಶೀಲನೆ)
+			ನಿಲ್ಲಿಸು;
+		ಆದರೆ (i == backpos.ga_len)
 		{
 		    // First time at this BACK, make room to store the pos.
-		    if (GA_GROW_FAILS(&backpos, 1))
-			status = RA_FAIL;
-		    else
+		    ಆದರೆ (GA_GROW_FAILS(&backpos, 1))
+			ಸ್ಥಿತಿ_2 = RA_FAIL;
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
 			// get "ga_data" again, it may have changed
-			bp = (backpos_T *)backpos.ga_data;
-			bp[i].bp_scan = scan;
+			bp = (backpos_T *)backpos.ga_ದತ್ತಾಂಶ;
+			bp[i].bp_ಪರಿಶೀಲನೆ = ಪರಿಶೀಲನೆ;
 			++backpos.ga_len;
 		    }
 		}
-		else if (reg_save_equal(&bp[i].bp_pos))
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (reg_save_equal(&bp[i].bp_pos))
 		    // Still at same position as last time, fail.
-		    status = RA_NOMATCH;
+		    ಸ್ಥಿತಿ_2 = RA_NOMATCH;
 
-		if (status != RA_FAIL && status != RA_NOMATCH)
+		ಆದರೆ (ಸ್ಥಿತಿ_2 != RA_FAIL && ಸ್ಥಿತಿ_2 != RA_NOMATCH)
 		    reg_save(&bp[i].bp_pos, &backpos);
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case MOPEN + 0:   // Match start: \zs
-	  case MOPEN + 1:   // \(
-	  case MOPEN + 2:
-	  case MOPEN + 3:
-	  case MOPEN + 4:
-	  case MOPEN + 5:
-	  case MOPEN + 6:
-	  case MOPEN + 7:
-	  case MOPEN + 8:
-	  case MOPEN + 9:
+	  ಸ್ಥಿತಿ MOPEN + 0:   // Match start: \zs
+	  ಸ್ಥಿತಿ MOPEN + 1:   // \(
+	  ಸ್ಥಿತಿ MOPEN + 2:
+	  ಸ್ಥಿತಿ MOPEN + 3:
+	  ಸ್ಥಿತಿ MOPEN + 4:
+	  ಸ್ಥಿತಿ MOPEN + 5:
+	  ಸ್ಥಿತಿ MOPEN + 6:
+	  ಸ್ಥಿತಿ MOPEN + 7:
+	  ಸ್ಥಿತಿ MOPEN + 8:
+	  ಸ್ಥಿತಿ MOPEN + 9:
 	    {
 		no = op - MOPEN;
 		cleanup_subexpr();
-		rp = regstack_push(RS_MOPEN, scan);
-		if (rp == NULL)
-		    status = RA_FAIL;
-		else
+		rp = regstack_ತಳ್ಳು(RS_MOPEN, ಪರಿಶೀಲನೆ);
+		ಆದರೆ (rp == ಖಾಲಿ)
+		    ಸ್ಥಿತಿ_2 = RA_FAIL;
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    rp->rs_no = no;
 		    save_se(&rp->rs_un.sesave, &rex.reg_startpos[no],
@@ -4028,32 +4028,32 @@ regmatch(
 		    // We simply continue and handle the result when done.
 		}
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case NOPEN:	    // \%(
-	  case NCLOSE:	    // \) after \%(
-		if (regstack_push(RS_NOPEN, scan) == NULL)
-		    status = RA_FAIL;
+	  ಸ್ಥಿತಿ NOPEN:	    // \%(
+	  ಸ್ಥಿತಿ NCLOSE:	    // \) after \%(
+		ಆದರೆ (regstack_ತಳ್ಳು(RS_NOPEN, ಪರಿಶೀಲನೆ) == ಖಾಲಿ)
+		    ಸ್ಥಿತಿ_2 = RA_FAIL;
 		// We simply continue and handle the result when done.
-		break;
+		ನಿಲ್ಲಿಸು;
 
-#ifdef FEAT_SYN_HL
-	  case ZOPEN + 1:
-	  case ZOPEN + 2:
-	  case ZOPEN + 3:
-	  case ZOPEN + 4:
-	  case ZOPEN + 5:
-	  case ZOPEN + 6:
-	  case ZOPEN + 7:
-	  case ZOPEN + 8:
-	  case ZOPEN + 9:
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
+	  ಸ್ಥಿತಿ ZOPEN + 1:
+	  ಸ್ಥಿತಿ ZOPEN + 2:
+	  ಸ್ಥಿತಿ ZOPEN + 3:
+	  ಸ್ಥಿತಿ ZOPEN + 4:
+	  ಸ್ಥಿತಿ ZOPEN + 5:
+	  ಸ್ಥಿತಿ ZOPEN + 6:
+	  ಸ್ಥಿತಿ ZOPEN + 7:
+	  ಸ್ಥಿತಿ ZOPEN + 8:
+	  ಸ್ಥಿತಿ ZOPEN + 9:
 	    {
 		no = op - ZOPEN;
 		cleanup_zsubexpr();
-		rp = regstack_push(RS_ZOPEN, scan);
-		if (rp == NULL)
-		    status = RA_FAIL;
-		else
+		rp = regstack_ತಳ್ಳು(RS_ZOPEN, ಪರಿಶೀಲನೆ);
+		ಆದರೆ (rp == ಖಾಲಿ)
+		    ಸ್ಥಿತಿ_2 = RA_FAIL;
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    rp->rs_no = no;
 		    save_se(&rp->rs_un.sesave, &reg_startzpos[no],
@@ -4061,26 +4061,26 @@ regmatch(
 		    // We simply continue and handle the result when done.
 		}
 	    }
-	    break;
-#endif
+	    ನಿಲ್ಲಿಸು;
+#ಆದರೆ_ಅಂತ್ಯ
 
-	  case MCLOSE + 0:  // Match end: \ze
-	  case MCLOSE + 1:  // \)
-	  case MCLOSE + 2:
-	  case MCLOSE + 3:
-	  case MCLOSE + 4:
-	  case MCLOSE + 5:
-	  case MCLOSE + 6:
-	  case MCLOSE + 7:
-	  case MCLOSE + 8:
-	  case MCLOSE + 9:
+	  ಸ್ಥಿತಿ MCLOSE + 0:  // Match end: \ze
+	  ಸ್ಥಿತಿ MCLOSE + 1:  // \)
+	  ಸ್ಥಿತಿ MCLOSE + 2:
+	  ಸ್ಥಿತಿ MCLOSE + 3:
+	  ಸ್ಥಿತಿ MCLOSE + 4:
+	  ಸ್ಥಿತಿ MCLOSE + 5:
+	  ಸ್ಥಿತಿ MCLOSE + 6:
+	  ಸ್ಥಿತಿ MCLOSE + 7:
+	  ಸ್ಥಿತಿ MCLOSE + 8:
+	  ಸ್ಥಿತಿ MCLOSE + 9:
 	    {
 		no = op - MCLOSE;
 		cleanup_subexpr();
-		rp = regstack_push(RS_MCLOSE, scan);
-		if (rp == NULL)
-		    status = RA_FAIL;
-		else
+		rp = regstack_ತಳ್ಳು(RS_MCLOSE, ಪರಿಶೀಲನೆ);
+		ಆದರೆ (rp == ಖಾಲಿ)
+		    ಸ್ಥಿತಿ_2 = RA_FAIL;
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    rp->rs_no = no;
 		    save_se(&rp->rs_un.sesave, &rex.reg_endpos[no],
@@ -4088,25 +4088,25 @@ regmatch(
 		    // We simply continue and handle the result when done.
 		}
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-#ifdef FEAT_SYN_HL
-	  case ZCLOSE + 1:  // \) after \z(
-	  case ZCLOSE + 2:
-	  case ZCLOSE + 3:
-	  case ZCLOSE + 4:
-	  case ZCLOSE + 5:
-	  case ZCLOSE + 6:
-	  case ZCLOSE + 7:
-	  case ZCLOSE + 8:
-	  case ZCLOSE + 9:
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
+	  ಸ್ಥಿತಿ ZCLOSE + 1:  // \) after \z(
+	  ಸ್ಥಿತಿ ZCLOSE + 2:
+	  ಸ್ಥಿತಿ ZCLOSE + 3:
+	  ಸ್ಥಿತಿ ZCLOSE + 4:
+	  ಸ್ಥಿತಿ ZCLOSE + 5:
+	  ಸ್ಥಿತಿ ZCLOSE + 6:
+	  ಸ್ಥಿತಿ ZCLOSE + 7:
+	  ಸ್ಥಿತಿ ZCLOSE + 8:
+	  ಸ್ಥಿತಿ ZCLOSE + 9:
 	    {
 		no = op - ZCLOSE;
 		cleanup_zsubexpr();
-		rp = regstack_push(RS_ZCLOSE, scan);
-		if (rp == NULL)
-		    status = RA_FAIL;
-		else
+		rp = regstack_ತಳ್ಳು(RS_ZCLOSE, ಪರಿಶೀಲನೆ);
+		ಆದರೆ (rp == ಖಾಲಿ)
+		    ಸ್ಥಿತಿ_2 = RA_FAIL;
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    rp->rs_no = no;
 		    save_se(&rp->rs_un.sesave, &reg_endzpos[no],
@@ -4114,210 +4114,210 @@ regmatch(
 		    // We simply continue and handle the result when done.
 		}
 	    }
-	    break;
-#endif
+	    ನಿಲ್ಲಿಸು;
+#ಆದರೆ_ಅಂತ್ಯ
 
-	  case BACKREF + 1:
-	  case BACKREF + 2:
-	  case BACKREF + 3:
-	  case BACKREF + 4:
-	  case BACKREF + 5:
-	  case BACKREF + 6:
-	  case BACKREF + 7:
-	  case BACKREF + 8:
-	  case BACKREF + 9:
+	  ಸ್ಥಿತಿ BACKREF + 1:
+	  ಸ್ಥಿತಿ BACKREF + 2:
+	  ಸ್ಥಿತಿ BACKREF + 3:
+	  ಸ್ಥಿತಿ BACKREF + 4:
+	  ಸ್ಥಿತಿ BACKREF + 5:
+	  ಸ್ಥಿತಿ BACKREF + 6:
+	  ಸ್ಥಿತಿ BACKREF + 7:
+	  ಸ್ಥಿತಿ BACKREF + 8:
+	  ಸ್ಥಿತಿ BACKREF + 9:
 	    {
-		int		len;
+		ಪೂರ್ಣಾಂಕ		len;
 
 		no = op - BACKREF;
 		cleanup_subexpr();
-		if (!REG_MULTI)		// Single-line regexp
+		ಆದರೆ (!REG_MULTI)		// Single-line regexp
 		{
-		    if (rex.reg_startp[no] == NULL || rex.reg_endp[no] == NULL)
+		    ಆದರೆ (rex.reg_startp[no] == ಖಾಲಿ || rex.reg_endp[no] == ಖಾಲಿ)
 		    {
 			// Backref was not set: Match an empty string.
 			len = 0;
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
 			// Compare current input with back-ref in the same
 			// line.
-			len = (int)(rex.reg_endp[no] - rex.reg_startp[no]);
-			if (cstrncmp(rex.reg_startp[no], rex.input, &len) != 0)
-			    status = RA_NOMATCH;
+			len = (ಪೂರ್ಣಾಂಕ)(rex.reg_endp[no] - rex.reg_startp[no]);
+			ಆದರೆ (cstrncmp(rex.reg_startp[no], rex.ಒಳಹರಿವು, &len) != 0)
+			    ಸ್ಥಿತಿ_2 = RA_NOMATCH;
 		    }
 		}
-		else				// Multi-line regexp
+		ಇಲ್ಲದಿದ್ದರೆ				// Multi-line regexp
 		{
-		    if (rex.reg_startpos[no].lnum < 0
+		    ಆದರೆ (rex.reg_startpos[no].lnum < 0
 						|| rex.reg_endpos[no].lnum < 0)
 		    {
 			// Backref was not set: Match an empty string.
 			len = 0;
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
-			if (rex.reg_startpos[no].lnum == rex.lnum
+			ಆದರೆ (rex.reg_startpos[no].lnum == rex.lnum
 				&& rex.reg_endpos[no].lnum == rex.lnum)
 			{
 			    // Compare back-ref within the current line.
-			    len = rex.reg_endpos[no].col
-						    - rex.reg_startpos[no].col;
-			    if (cstrncmp(rex.line + rex.reg_startpos[no].col,
-							  rex.input, &len) != 0)
-				status = RA_NOMATCH;
+			    len = rex.reg_endpos[no].ಲಂಬಸಾಲು
+						    - rex.reg_startpos[no].ಲಂಬಸಾಲು;
+			    ಆದರೆ (cstrncmp(rex.ಸಾಲು + rex.reg_startpos[no].ಲಂಬಸಾಲು,
+							  rex.ಒಳಹರಿವು, &len) != 0)
+				ಸ್ಥಿತಿ_2 = RA_NOMATCH;
 			}
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
 			    // Messy situation: Need to compare between two
 			    // lines.
-			    int r = match_with_backref(
+			    ಪೂರ್ಣಾಂಕ r = ಹೊಂದಿಕೆ_with_backref(
 					    rex.reg_startpos[no].lnum,
-					    rex.reg_startpos[no].col,
+					    rex.reg_startpos[no].ಲಂಬಸಾಲು,
 					    rex.reg_endpos[no].lnum,
-					    rex.reg_endpos[no].col,
+					    rex.reg_endpos[no].ಲಂಬಸಾಲು,
 					    &len);
 
-			    if (r != RA_MATCH)
-				status = r;
+			    ಆದರೆ (r != RA_ಹೊಂದಿಕೆ)
+				ಸ್ಥಿತಿ_2 = r;
 			}
 		    }
 		}
 
 		// Matched the backref, skip over it.
-		rex.input += len;
+		rex.ಒಳಹರಿವು += len;
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-#ifdef FEAT_SYN_HL
-	  case ZREF + 1:
-	  case ZREF + 2:
-	  case ZREF + 3:
-	  case ZREF + 4:
-	  case ZREF + 5:
-	  case ZREF + 6:
-	  case ZREF + 7:
-	  case ZREF + 8:
-	  case ZREF + 9:
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
+	  ಸ್ಥಿತಿ ZREF + 1:
+	  ಸ್ಥಿತಿ ZREF + 2:
+	  ಸ್ಥಿತಿ ZREF + 3:
+	  ಸ್ಥಿತಿ ZREF + 4:
+	  ಸ್ಥಿತಿ ZREF + 5:
+	  ಸ್ಥಿತಿ ZREF + 6:
+	  ಸ್ಥಿತಿ ZREF + 7:
+	  ಸ್ಥಿತಿ ZREF + 8:
+	  ಸ್ಥಿತಿ ZREF + 9:
 	    {
-		int	len;
+		ಪೂರ್ಣಾಂಕ	len;
 
 		cleanup_zsubexpr();
 		no = op - ZREF;
-		if (re_extmatch_in != NULL
-			&& re_extmatch_in->matches[no] != NULL)
+		ಆದರೆ (re_extmatch_ಒಳ != ಖಾಲಿ
+			&& re_extmatch_ಒಳ->matches[no] != ಖಾಲಿ)
 		{
-		    len = (int)STRLEN(re_extmatch_in->matches[no]);
-		    if (cstrncmp(re_extmatch_in->matches[no],
-							  rex.input, &len) != 0)
-			status = RA_NOMATCH;
-		    else
-			rex.input += len;
+		    len = (ಪೂರ್ಣಾಂಕ)STRLEN(re_extmatch_ಒಳ->matches[no]);
+		    ಆದರೆ (cstrncmp(re_extmatch_ಒಳ->matches[no],
+							  rex.ಒಳಹರಿವು, &len) != 0)
+			ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+		    ಇಲ್ಲದಿದ್ದರೆ
+			rex.ಒಳಹರಿವು += len;
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    // Backref was not set: Match an empty string.
 		}
 	    }
-	    break;
-#endif
+	    ನಿಲ್ಲಿಸು;
+#ಆದರೆ_ಅಂತ್ಯ
 
-	  case BRANCH:
+	  ಸ್ಥಿತಿ BRANCH:
 	    {
-		if (OP(next) != BRANCH) // No choice.
-		    next = OPERAND(scan);	// Avoid recursion.
-		else
+		ಆದರೆ (OP(ಮುಂದಿನ) != BRANCH) // No choice.
+		    ಮುಂದಿನ = ಕಾರ್ಯಾಂಶ(ಪರಿಶೀಲನೆ);	// Avoid recursion.
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    rp = regstack_push(RS_BRANCH, scan);
-		    if (rp == NULL)
-			status = RA_FAIL;
-		    else
-			status = RA_BREAK;	// rest is below
+		    rp = regstack_ತಳ್ಳು(RS_BRANCH, ಪರಿಶೀಲನೆ);
+		    ಆದರೆ (rp == ಖಾಲಿ)
+			ಸ್ಥಿತಿ_2 = RA_FAIL;
+		    ಇಲ್ಲದಿದ್ದರೆ
+			ಸ್ಥಿತಿ_2 = RA_BREAK;	// rest is below
 		}
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case BRACE_LIMITS:
+	  ಸ್ಥಿತಿ BRACE_LIMITS:
 	    {
-		if (OP(next) == BRACE_SIMPLE)
+		ಆದರೆ (OP(ಮುಂದಿನ) == BRACE_SIMPLE)
 		{
-		    bl_minval = OPERAND_MIN(scan);
-		    bl_maxval = OPERAND_MAX(scan);
+		    bl_minval = ಕಾರ್ಯಾಂಶ_MIN(ಪರಿಶೀಲನೆ);
+		    bl_maxval = ಕಾರ್ಯಾಂಶ_MAX(ಪರಿಶೀಲನೆ);
 		}
-		else if (OP(next) >= BRACE_COMPLEX
-			&& OP(next) < BRACE_COMPLEX + 10)
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (OP(ಮುಂದಿನ) >= BRACE_COMPLEX
+			&& OP(ಮುಂದಿನ) < BRACE_COMPLEX + 10)
 		{
-		    no = OP(next) - BRACE_COMPLEX;
-		    brace_min[no] = OPERAND_MIN(scan);
-		    brace_max[no] = OPERAND_MAX(scan);
-		    brace_count[no] = 0;
+		    no = OP(ಮುಂದಿನ) - BRACE_COMPLEX;
+		    brace_min[no] = ಕಾರ್ಯಾಂಶ_MIN(ಪರಿಶೀಲನೆ);
+		    brace_max[no] = ಕಾರ್ಯಾಂಶ_MAX(ಪರಿಶೀಲನೆ);
+		    brace_ಎಣಿಕೆ[no] = 0;
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    internal_error("BRACE_LIMITS");
-		    status = RA_FAIL;
+		    ಆಂತರಿಕ_error("BRACE_LIMITS");
+		    ಸ್ಥಿತಿ_2 = RA_FAIL;
 		}
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case BRACE_COMPLEX + 0:
-	  case BRACE_COMPLEX + 1:
-	  case BRACE_COMPLEX + 2:
-	  case BRACE_COMPLEX + 3:
-	  case BRACE_COMPLEX + 4:
-	  case BRACE_COMPLEX + 5:
-	  case BRACE_COMPLEX + 6:
-	  case BRACE_COMPLEX + 7:
-	  case BRACE_COMPLEX + 8:
-	  case BRACE_COMPLEX + 9:
+	  ಸ್ಥಿತಿ BRACE_COMPLEX + 0:
+	  ಸ್ಥಿತಿ BRACE_COMPLEX + 1:
+	  ಸ್ಥಿತಿ BRACE_COMPLEX + 2:
+	  ಸ್ಥಿತಿ BRACE_COMPLEX + 3:
+	  ಸ್ಥಿತಿ BRACE_COMPLEX + 4:
+	  ಸ್ಥಿತಿ BRACE_COMPLEX + 5:
+	  ಸ್ಥಿತಿ BRACE_COMPLEX + 6:
+	  ಸ್ಥಿತಿ BRACE_COMPLEX + 7:
+	  ಸ್ಥಿತಿ BRACE_COMPLEX + 8:
+	  ಸ್ಥಿತಿ BRACE_COMPLEX + 9:
 	    {
 		no = op - BRACE_COMPLEX;
-		++brace_count[no];
+		++brace_ಎಣಿಕೆ[no];
 
 		// If not matched enough times yet, try one more
-		if (brace_count[no] <= (brace_min[no] <= brace_max[no]
+		ಆದರೆ (brace_ಎಣಿಕೆ[no] <= (brace_min[no] <= brace_max[no]
 					     ? brace_min[no] : brace_max[no]))
 		{
-		    rp = regstack_push(RS_BRCPLX_MORE, scan);
-		    if (rp == NULL)
-			status = RA_FAIL;
-		    else
+		    rp = regstack_ತಳ್ಳು(RS_BRCPLX_ಇನ್ನಷ್ಟು, ಪರಿಶೀಲನೆ);
+		    ಆದರೆ (rp == ಖಾಲಿ)
+			ಸ್ಥಿತಿ_2 = RA_FAIL;
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
 			rp->rs_no = no;
 			reg_save(&rp->rs_un.regsave, &backpos);
-			next = OPERAND(scan);
+			ಮುಂದಿನ = ಕಾರ್ಯಾಂಶ(ಪರಿಶೀಲನೆ);
 			// We continue and handle the result when done.
 		    }
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 
 		// If matched enough times, may try matching some more
-		if (brace_min[no] <= brace_max[no])
+		ಆದರೆ (brace_min[no] <= brace_max[no])
 		{
 		    // Range is the normal way around, use longest match
-		    if (brace_count[no] <= brace_max[no])
+		    ಆದರೆ (brace_ಎಣಿಕೆ[no] <= brace_max[no])
 		    {
-			rp = regstack_push(RS_BRCPLX_LONG, scan);
-			if (rp == NULL)
-			    status = RA_FAIL;
-			else
+			rp = regstack_ತಳ್ಳು(RS_BRCPLX_LONG, ಪರಿಶೀಲನೆ);
+			ಆದರೆ (rp == ಖಾಲಿ)
+			    ಸ್ಥಿತಿ_2 = RA_FAIL;
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
 			    rp->rs_no = no;
 			    reg_save(&rp->rs_un.regsave, &backpos);
-			    next = OPERAND(scan);
+			    ಮುಂದಿನ = ಕಾರ್ಯಾಂಶ(ಪರಿಶೀಲನೆ);
 			    // We continue and handle the result when done.
 			}
 		    }
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    // Range is backwards, use shortest match first
-		    if (brace_count[no] <= brace_min[no])
+		    ಆದರೆ (brace_ಎಣಿಕೆ[no] <= brace_min[no])
 		    {
-			rp = regstack_push(RS_BRCPLX_SHORT, scan);
-			if (rp == NULL)
-			    status = RA_FAIL;
-			else
+			rp = regstack_ತಳ್ಳು(RS_BRCPLX_SHORT, ಪರಿಶೀಲನೆ);
+			ಆದರೆ (rp == ಖಾಲಿ)
+			    ಸ್ಥಿತಿ_2 = RA_FAIL;
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
 			    reg_save(&rp->rs_un.regsave, &backpos);
 			    // We continue and handle the result when done.
@@ -4325,40 +4325,40 @@ regmatch(
 		    }
 		}
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case BRACE_SIMPLE:
-	  case STAR:
-	  case PLUS:
+	  ಸ್ಥಿತಿ BRACE_SIMPLE:
+	  ಸ್ಥಿತಿ ನಕ್ಷತ್ರ:
+	  ಸ್ಥಿತಿ PLUS:
 	    {
 		regstar_T	rst;
 
 		// Lookahead to avoid useless match attempts when we know
 		// what character comes next.
-		if (OP(next) == EXACTLY)
+		ಆದರೆ (OP(ಮುಂದಿನ) == EXACTLY)
 		{
-		    rst.nextb = *OPERAND(next);
-		    if (rex.reg_ic)
+		    rst.nextb = *ಕಾರ್ಯಾಂಶ(ಮುಂದಿನ);
+		    ಆದರೆ (rex.reg_ic)
 		    {
-			if (MB_ISUPPER(rst.nextb))
+			ಆದರೆ (MB_ISUPPER(rst.nextb))
 			    rst.nextb_ic = MB_TOLOWER(rst.nextb);
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			    rst.nextb_ic = MB_TOUPPER(rst.nextb);
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 			rst.nextb_ic = rst.nextb;
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    rst.nextb = NUL;
 		    rst.nextb_ic = NUL;
 		}
-		if (op != BRACE_SIMPLE)
+		ಆದರೆ (op != BRACE_SIMPLE)
 		{
-		    rst.minval = (op == STAR) ? 0 : 1;
-		    rst.maxval = MAX_LIMIT;
+		    rst.minval = (op == ನಕ್ಷತ್ರ) ? 0 : 1;
+		    rst.maxval = MAX_ಎಲ್ಲೆ;
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    rst.minval = bl_minval;
 		    rst.maxval = bl_maxval;
@@ -4368,77 +4368,77 @@ regmatch(
 		// to maxval.  When maxval < minval, try matching at least the
 		// minimal number (since the range is backwards, that's also
 		// maxval!).
-		rst.count = regrepeat(OPERAND(scan), rst.maxval);
-		if (got_int)
+		rst.ಎಣಿಕೆ_2 = regrepeat(ಕಾರ್ಯಾಂಶ(ಪರಿಶೀಲನೆ), rst.maxval);
+		ಆದರೆ (got_int)
 		{
-		    status = RA_FAIL;
-		    break;
+		    ಸ್ಥಿತಿ_2 = RA_FAIL;
+		    ನಿಲ್ಲಿಸು;
 		}
-		if (rst.minval <= rst.maxval
-			  ? rst.count >= rst.minval : rst.count >= rst.maxval)
+		ಆದರೆ (rst.minval <= rst.maxval
+			  ? rst.ಎಣಿಕೆ_2 >= rst.minval : rst.ಎಣಿಕೆ_2 >= rst.maxval)
 		{
 		    // It could match.  Prepare for trying to match what
 		    // follows.  The code is below.  Parameters are stored in
 		    // a regstar_T on the regstack.
-		    if ((long)((unsigned)regstack.ga_len >> 10) >= p_mmp)
+		    ಆದರೆ ((ದೀರ್ಘ)((ಚಿಹ್ನೆರಹಿತ)regstack.ga_len >> 10) >= p_mmp)
 		    {
-			emsg(_(e_pattern_uses_more_memory_than_maxmempattern));
-			status = RA_FAIL;
+			emsg(_(e_ನಮೂನೆ_ಬಳಸುತ್ತದೆ_ಇನ್ನಷ್ಟು_ಸ್ಮರಣೆ_than_maxmempattern));
+			ಸ್ಥಿತಿ_2 = RA_FAIL;
 		    }
-		    else if (GA_GROW_FAILS(&regstack, (int)sizeof(regstar_T)))
-			status = RA_FAIL;
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (GA_GROW_FAILS(&regstack, (ಪೂರ್ಣಾಂಕ)ಗಾತ್ರ(regstar_T)))
+			ಸ್ಥಿತಿ_2 = RA_FAIL;
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
-			regstack.ga_len += sizeof(regstar_T);
-			rp = regstack_push(rst.minval <= rst.maxval
-					? RS_STAR_LONG : RS_STAR_SHORT, scan);
-			if (rp == NULL)
-			    status = RA_FAIL;
-			else
+			regstack.ga_len += ಗಾತ್ರ(regstar_T);
+			rp = regstack_ತಳ್ಳು(rst.minval <= rst.maxval
+					? RS_ನಕ್ಷತ್ರ_LONG : RS_ನಕ್ಷತ್ರ_SHORT, ಪರಿಶೀಲನೆ);
+			ಆದರೆ (rp == ಖಾಲಿ)
+			    ಸ್ಥಿತಿ_2 = RA_FAIL;
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
 			    *(((regstar_T *)rp) - 1) = rst;
-			    status = RA_BREAK;	    // skip the restore bits
+			    ಸ್ಥಿತಿ_2 = RA_BREAK;	    // skip the restore bits
 			}
 		    }
 		}
-		else
-		    status = RA_NOMATCH;
+		ಇಲ್ಲದಿದ್ದರೆ
+		    ಸ್ಥಿತಿ_2 = RA_NOMATCH;
 
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case NOMATCH:
-	  case MATCH:
-	  case SUBPAT:
-	    rp = regstack_push(RS_NOMATCH, scan);
-	    if (rp == NULL)
-		status = RA_FAIL;
-	    else
+	  ಸ್ಥಿತಿ NOMATCH:
+	  ಸ್ಥಿತಿ ಹೊಂದಿಕೆ_2:
+	  ಸ್ಥಿತಿ SUBPAT:
+	    rp = regstack_ತಳ್ಳು(RS_NOMATCH, ಪರಿಶೀಲನೆ);
+	    ಆದರೆ (rp == ಖಾಲಿ)
+		ಸ್ಥಿತಿ_2 = RA_FAIL;
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		rp->rs_no = op;
 		reg_save(&rp->rs_un.regsave, &backpos);
-		next = OPERAND(scan);
+		ಮುಂದಿನ = ಕಾರ್ಯಾಂಶ(ಪರಿಶೀಲನೆ);
 		// We continue and handle the result when done.
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case BEHIND:
-	  case NOBEHIND:
+	  ಸ್ಥಿತಿ BEHIND:
+	  ಸ್ಥಿತಿ NOBEHIND:
 	    // Need a bit of room to store extra positions.
-	    if ((long)((unsigned)regstack.ga_len >> 10) >= p_mmp)
+	    ಆದರೆ ((ದೀರ್ಘ)((ಚಿಹ್ನೆರಹಿತ)regstack.ga_len >> 10) >= p_mmp)
 	    {
-		emsg(_(e_pattern_uses_more_memory_than_maxmempattern));
-		status = RA_FAIL;
+		emsg(_(e_ನಮೂನೆ_ಬಳಸುತ್ತದೆ_ಇನ್ನಷ್ಟು_ಸ್ಮರಣೆ_than_maxmempattern));
+		ಸ್ಥಿತಿ_2 = RA_FAIL;
 	    }
-	    else if (GA_GROW_FAILS(&regstack, (int)sizeof(regbehind_T)))
-		status = RA_FAIL;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (GA_GROW_FAILS(&regstack, (ಪೂರ್ಣಾಂಕ)ಗಾತ್ರ(regbehind_T)))
+		ಸ್ಥಿತಿ_2 = RA_FAIL;
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		regstack.ga_len += sizeof(regbehind_T);
-		rp = regstack_push(RS_BEHIND1, scan);
-		if (rp == NULL)
-		    status = RA_FAIL;
-		else
+		regstack.ga_len += ಗಾತ್ರ(regbehind_T);
+		rp = regstack_ತಳ್ಳು(RS_BEHIND1, ಪರಿಶೀಲನೆ);
+		ಆದರೆ (rp == ಖಾಲಿ)
+		    ಸ್ಥಿತಿ_2 = RA_FAIL;
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    // Need to save the subexpr to be able to restore them
 		    // when there is a match but we don't use it.
@@ -4450,191 +4450,191 @@ regmatch(
 		    // check the behind match by looping.
 		}
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case BHPOS:
-	    if (REG_MULTI)
+	  ಸ್ಥಿತಿ BHPOS:
+	    ಆದರೆ (REG_MULTI)
 	    {
-		if (behind_pos.rs_u.pos.col != (colnr_T)(rex.input - rex.line)
+		ಆದರೆ (behind_pos.rs_u.pos.ಲಂಬಸಾಲು != (colnr_T)(rex.ಒಳಹರಿವು - rex.ಸಾಲು)
 			|| behind_pos.rs_u.pos.lnum != rex.lnum)
-		    status = RA_NOMATCH;
+		    ಸ್ಥಿತಿ_2 = RA_NOMATCH;
 	    }
-	    else if (behind_pos.rs_u.ptr != rex.input)
-		status = RA_NOMATCH;
-	    break;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (behind_pos.rs_u.ptr != rex.ಒಳಹರಿವು)
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ನಿಲ್ಲಿಸು;
 
-	  case NEWL:
-	    if ((c != NUL || !REG_MULTI || rex.lnum > rex.reg_maxline
-			     || rex.reg_line_lbr)
-					   && (c != '\n' || !rex.reg_line_lbr))
-		status = RA_NOMATCH;
-	    else if (rex.reg_line_lbr)
+	  ಸ್ಥಿತಿ NEWL:
+	    ಆದರೆ ((c != NUL || !REG_MULTI || rex.lnum > rex.reg_maxline
+			     || rex.reg_ಸಾಲು_lbr)
+					   && (c != '\n' || !rex.reg_ಸಾಲು_lbr))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (rex.reg_ಸಾಲು_lbr)
 		ADVANCE_REGINPUT();
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		reg_nextline();
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case END:
-	    status = RA_MATCH;	// Success!
-	    break;
+	  ಸ್ಥಿತಿ ಕೊನೆ_3:
+	    ಸ್ಥಿತಿ_2 = RA_ಹೊಂದಿಕೆ;	// Success!
+	    ನಿಲ್ಲಿಸು;
 
-	  default:
-	    iemsg(e_corrupted_regexp_program);
-#ifdef DEBUG
-	    printf("Illegal op code %d\n", op);
-#endif
-	    status = RA_FAIL;
-	    break;
+	  ಪೂರ್ವನಿಯೋಜಿತ:
+	    iemsg(e_corrupted_regexp_ಕಾರ್ಯಕ್ರಮ);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DEBUG
+	    ಬರೆ("Illegal op code %d\n", op);
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಸ್ಥಿತಿ_2 = RA_FAIL;
+	    ನಿಲ್ಲಿಸು;
 	  }
 	}
 
 	// If we can't continue sequentially, break the inner loop.
-	if (status != RA_CONT)
-	    break;
+	ಆದರೆ (ಸ್ಥಿತಿ_2 != RA_CONT)
+	    ನಿಲ್ಲಿಸು;
 
 	// Continue in inner loop, advance to next item.
-	scan = next;
+	ಪರಿಶೀಲನೆ = ಮುಂದಿನ;
 
     } // end of inner loop
 
     // If there is something on the regstack execute the code for the state.
     // If the state is popped then loop and use the older state.
-    while (regstack.ga_len > 0 && status != RA_FAIL)
+    ಆಗ (regstack.ga_len > 0 && ಸ್ಥಿತಿ_2 != RA_FAIL)
     {
-	rp = (regitem_T *)((char *)regstack.ga_data + regstack.ga_len) - 1;
-	switch (rp->rs_state)
+	rp = (regitem_T *)((ಅಕ್ಷರ *)regstack.ga_ದತ್ತಾಂಶ + regstack.ga_len) - 1;
+	ಆಯ್ಕೆ (rp->rs_state)
 	{
-	  case RS_NOPEN:
+	  ಸ್ಥಿತಿ RS_NOPEN:
 	    // Result is passed on as-is, simply pop the state.
-	    regstack_pop(&scan);
-	    break;
+	    regstack_ತೆಗೆ(&ಪರಿಶೀಲನೆ);
+	    ನಿಲ್ಲಿಸು;
 
-	  case RS_MOPEN:
+	  ಸ್ಥಿತಿ RS_MOPEN:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    ಆದರೆ (ಸ್ಥಿತಿ_2 == RA_NOMATCH)
 		restore_se(&rp->rs_un.sesave, &rex.reg_startpos[rp->rs_no],
 						  &rex.reg_startp[rp->rs_no]);
-	    regstack_pop(&scan);
-	    break;
+	    regstack_ತೆಗೆ(&ಪರಿಶೀಲನೆ);
+	    ನಿಲ್ಲಿಸು;
 
-#ifdef FEAT_SYN_HL
-	  case RS_ZOPEN:
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
+	  ಸ್ಥಿತಿ RS_ZOPEN:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    ಆದರೆ (ಸ್ಥಿತಿ_2 == RA_NOMATCH)
 		restore_se(&rp->rs_un.sesave, &reg_startzpos[rp->rs_no],
 						 &reg_startzp[rp->rs_no]);
-	    regstack_pop(&scan);
-	    break;
-#endif
+	    regstack_ತೆಗೆ(&ಪರಿಶೀಲನೆ);
+	    ನಿಲ್ಲಿಸು;
+#ಆದರೆ_ಅಂತ್ಯ
 
-	  case RS_MCLOSE:
+	  ಸ್ಥಿತಿ RS_MCLOSE:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    ಆದರೆ (ಸ್ಥಿತಿ_2 == RA_NOMATCH)
 		restore_se(&rp->rs_un.sesave, &rex.reg_endpos[rp->rs_no],
 						    &rex.reg_endp[rp->rs_no]);
-	    regstack_pop(&scan);
-	    break;
+	    regstack_ತೆಗೆ(&ಪರಿಶೀಲನೆ);
+	    ನಿಲ್ಲಿಸು;
 
-#ifdef FEAT_SYN_HL
-	  case RS_ZCLOSE:
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
+	  ಸ್ಥಿತಿ RS_ZCLOSE:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    ಆದರೆ (ಸ್ಥಿತಿ_2 == RA_NOMATCH)
 		restore_se(&rp->rs_un.sesave, &reg_endzpos[rp->rs_no],
 						   &reg_endzp[rp->rs_no]);
-	    regstack_pop(&scan);
-	    break;
-#endif
+	    regstack_ತೆಗೆ(&ಪರಿಶೀಲನೆ);
+	    ನಿಲ್ಲಿಸು;
+#ಆದರೆ_ಅಂತ್ಯ
 
-	  case RS_BRANCH:
-	    if (status == RA_MATCH)
+	  ಸ್ಥಿತಿ RS_BRANCH:
+	    ಆದರೆ (ಸ್ಥಿತಿ_2 == RA_ಹೊಂದಿಕೆ)
 		// this branch matched, use it
-		regstack_pop(&scan);
-	    else
+		regstack_ತೆಗೆ(&ಪರಿಶೀಲನೆ);
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		if (status != RA_BREAK)
+		ಆದರೆ (ಸ್ಥಿತಿ_2 != RA_BREAK)
 		{
 		    // After a non-matching branch: try next one.
 		    reg_restore(&rp->rs_un.regsave, &backpos);
-		    scan = rp->rs_scan;
+		    ಪರಿಶೀಲನೆ = rp->rs_ಪರಿಶೀಲನೆ;
 		}
-		if (scan == NULL || OP(scan) != BRANCH)
+		ಆದರೆ (ಪರಿಶೀಲನೆ == ಖಾಲಿ || OP(ಪರಿಶೀಲನೆ) != BRANCH)
 		{
 		    // no more branches, didn't find a match
-		    status = RA_NOMATCH;
-		    regstack_pop(&scan);
+		    ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+		    regstack_ತೆಗೆ(&ಪರಿಶೀಲನೆ);
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    // Prepare to try a branch.
-		    rp->rs_scan = regnext(scan);
+		    rp->rs_ಪರಿಶೀಲನೆ = regnext(ಪರಿಶೀಲನೆ);
 		    reg_save(&rp->rs_un.regsave, &backpos);
-		    scan = OPERAND(scan);
+		    ಪರಿಶೀಲನೆ = ಕಾರ್ಯಾಂಶ(ಪರಿಶೀಲನೆ);
 		}
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case RS_BRCPLX_MORE:
+	  ಸ್ಥಿತಿ RS_BRCPLX_ಇನ್ನಷ್ಟು:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    ಆದರೆ (ಸ್ಥಿತಿ_2 == RA_NOMATCH)
 	    {
 		reg_restore(&rp->rs_un.regsave, &backpos);
-		--brace_count[rp->rs_no];	// decrement match count
+		--brace_ಎಣಿಕೆ[rp->rs_no];	// decrement match count
 	    }
-	    regstack_pop(&scan);
-	    break;
+	    regstack_ತೆಗೆ(&ಪರಿಶೀಲನೆ);
+	    ನಿಲ್ಲಿಸು;
 
-	  case RS_BRCPLX_LONG:
+	  ಸ್ಥಿತಿ RS_BRCPLX_LONG:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    ಆದರೆ (ಸ್ಥಿತಿ_2 == RA_NOMATCH)
 	    {
 		// There was no match, but we did find enough matches.
 		reg_restore(&rp->rs_un.regsave, &backpos);
-		--brace_count[rp->rs_no];
+		--brace_ಎಣಿಕೆ[rp->rs_no];
 		// continue with the items after "\{}"
-		status = RA_CONT;
+		ಸ್ಥಿತಿ_2 = RA_CONT;
 	    }
-	    regstack_pop(&scan);
-	    if (status == RA_CONT)
-		scan = regnext(scan);
-	    break;
+	    regstack_ತೆಗೆ(&ಪರಿಶೀಲನೆ);
+	    ಆದರೆ (ಸ್ಥಿತಿ_2 == RA_CONT)
+		ಪರಿಶೀಲನೆ = regnext(ಪರಿಶೀಲನೆ);
+	    ನಿಲ್ಲಿಸು;
 
-	  case RS_BRCPLX_SHORT:
+	  ಸ್ಥಿತಿ RS_BRCPLX_SHORT:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    ಆದರೆ (ಸ್ಥಿತಿ_2 == RA_NOMATCH)
 		// There was no match, try to match one more item.
 		reg_restore(&rp->rs_un.regsave, &backpos);
-	    regstack_pop(&scan);
-	    if (status == RA_NOMATCH)
+	    regstack_ತೆಗೆ(&ಪರಿಶೀಲನೆ);
+	    ಆದರೆ (ಸ್ಥಿತಿ_2 == RA_NOMATCH)
 	    {
-		scan = OPERAND(scan);
-		status = RA_CONT;
+		ಪರಿಶೀಲನೆ = ಕಾರ್ಯಾಂಶ(ಪರಿಶೀಲನೆ);
+		ಸ್ಥಿತಿ_2 = RA_CONT;
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case RS_NOMATCH:
+	  ಸ್ಥಿತಿ RS_NOMATCH:
 	    // Pop the state.  If the operand matches for NOMATCH or
 	    // doesn't match for MATCH/SUBPAT, we fail.  Otherwise backup,
 	    // except for SUBPAT, and continue with the next item.
-	    if (status == (rp->rs_no == NOMATCH ? RA_MATCH : RA_NOMATCH))
-		status = RA_NOMATCH;
-	    else
+	    ಆದರೆ (ಸ್ಥಿತಿ_2 == (rp->rs_no == NOMATCH ? RA_ಹೊಂದಿಕೆ : RA_NOMATCH))
+		ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		status = RA_CONT;
-		if (rp->rs_no != SUBPAT)	// zero-width
+		ಸ್ಥಿತಿ_2 = RA_CONT;
+		ಆದರೆ (rp->rs_no != SUBPAT)	// zero-width
 		    reg_restore(&rp->rs_un.regsave, &backpos);
 	    }
-	    regstack_pop(&scan);
-	    if (status == RA_CONT)
-		scan = regnext(scan);
-	    break;
+	    regstack_ತೆಗೆ(&ಪರಿಶೀಲನೆ);
+	    ಆದರೆ (ಸ್ಥಿತಿ_2 == RA_CONT)
+		ಪರಿಶೀಲನೆ = regnext(ಪರಿಶೀಲನೆ);
+	    ನಿಲ್ಲಿಸು;
 
-	  case RS_BEHIND1:
-	    if (status == RA_NOMATCH)
+	  ಸ್ಥಿತಿ RS_BEHIND1:
+	    ಆದರೆ (ಸ್ಥಿತಿ_2 == RA_NOMATCH)
 	    {
-		regstack_pop(&scan);
-		regstack.ga_len -= sizeof(regbehind_T);
+		regstack_ತೆಗೆ(&ಪರಿಶೀಲನೆ);
+		regstack.ga_len -= ಗಾತ್ರ(regbehind_T);
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		// The stuff after BEHIND/NOBEHIND matches.  Now try if
 		// the behind part does (not) match before the current
@@ -4657,247 +4657,247 @@ regmatch(
 		rp->rs_state = RS_BEHIND2;
 
 		reg_restore(&rp->rs_un.regsave, &backpos);
-		scan = OPERAND(rp->rs_scan) + 4;
+		ಪರಿಶೀಲನೆ = ಕಾರ್ಯಾಂಶ(rp->rs_ಪರಿಶೀಲನೆ) + 4;
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case RS_BEHIND2:
+	  ಸ್ಥಿತಿ RS_BEHIND2:
 	    // Looping for BEHIND / NOBEHIND match.
-	    if (status == RA_MATCH && reg_save_equal(&behind_pos))
+	    ಆದರೆ (ಸ್ಥಿತಿ_2 == RA_ಹೊಂದಿಕೆ && reg_save_equal(&behind_pos))
 	    {
 		// found a match that ends where "next" started
 		behind_pos = (((regbehind_T *)rp) - 1)->save_behind;
-		if (rp->rs_no == BEHIND)
+		ಆದರೆ (rp->rs_no == BEHIND)
 		    reg_restore(&(((regbehind_T *)rp) - 1)->save_after,
 								    &backpos);
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    // But we didn't want a match.  Need to restore the
 		    // subexpr, because what follows matched, so they have
 		    // been set.
-		    status = RA_NOMATCH;
+		    ಸ್ಥಿತಿ_2 = RA_NOMATCH;
 		    restore_subexpr(((regbehind_T *)rp) - 1);
 		}
-		regstack_pop(&scan);
-		regstack.ga_len -= sizeof(regbehind_T);
+		regstack_ತೆಗೆ(&ಪರಿಶೀಲನೆ);
+		regstack.ga_len -= ಗಾತ್ರ(regbehind_T);
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		long limit;
+		ದೀರ್ಘ ಎಲ್ಲೆ;
 
 		// No match or a match that doesn't end where we want it: Go
 		// back one character.  May go to previous line once.
 		no = OK;
-		limit = OPERAND_MIN(rp->rs_scan);
-		if (REG_MULTI)
+		ಎಲ್ಲೆ = ಕಾರ್ಯಾಂಶ_MIN(rp->rs_ಪರಿಶೀಲನೆ);
+		ಆದರೆ (REG_MULTI)
 		{
-		    if (limit > 0
+		    ಆದರೆ (ಎಲ್ಲೆ > 0
 			    && ((rp->rs_un.regsave.rs_u.pos.lnum
 						    < behind_pos.rs_u.pos.lnum
-				    ? (colnr_T)STRLEN(rex.line)
-				    : behind_pos.rs_u.pos.col)
-				- rp->rs_un.regsave.rs_u.pos.col >= limit))
+				    ? (colnr_T)STRLEN(rex.ಸಾಲು)
+				    : behind_pos.rs_u.pos.ಲಂಬಸಾಲು)
+				- rp->rs_un.regsave.rs_u.pos.ಲಂಬಸಾಲು >= ಎಲ್ಲೆ))
 			no = FAIL;
-		    else if (rp->rs_un.regsave.rs_u.pos.col == 0)
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (rp->rs_un.regsave.rs_u.pos.ಲಂಬಸಾಲು == 0)
 		    {
-			if (rp->rs_un.regsave.rs_u.pos.lnum
+			ಆದರೆ (rp->rs_un.regsave.rs_u.pos.lnum
 					< behind_pos.rs_u.pos.lnum
 				|| reg_getline(
 					--rp->rs_un.regsave.rs_u.pos.lnum)
-								  == NULL)
+								  == ಖಾಲಿ)
 			    no = FAIL;
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
 			    reg_restore(&rp->rs_un.regsave, &backpos);
-			    rp->rs_un.regsave.rs_u.pos.col =
-						 (colnr_T)STRLEN(rex.line);
+			    rp->rs_un.regsave.rs_u.pos.ಲಂಬಸಾಲು =
+						 (colnr_T)STRLEN(rex.ಸಾಲು);
 			}
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
-			if (has_mbyte)
+			ಆದರೆ (has_mbyte)
 			{
-			    char_u *line =
+			    char_u *ಸಾಲು =
 				  reg_getline(rp->rs_un.regsave.rs_u.pos.lnum);
 
-			    rp->rs_un.regsave.rs_u.pos.col -=
-				(*mb_head_off)(line, line
-				    + rp->rs_un.regsave.rs_u.pos.col - 1) + 1;
+			    rp->rs_un.regsave.rs_u.pos.ಲಂಬಸಾಲು -=
+				(*mb_ತಲೆ_off)(ಸಾಲು, ಸಾಲು
+				    + rp->rs_un.regsave.rs_u.pos.ಲಂಬಸಾಲು - 1) + 1;
 			}
-			else
-			    --rp->rs_un.regsave.rs_u.pos.col;
+			ಇಲ್ಲದಿದ್ದರೆ
+			    --rp->rs_un.regsave.rs_u.pos.ಲಂಬಸಾಲು;
 		    }
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    if (rp->rs_un.regsave.rs_u.ptr == rex.line)
+		    ಆದರೆ (rp->rs_un.regsave.rs_u.ptr == rex.ಸಾಲು)
 			no = FAIL;
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
-			MB_PTR_BACK(rex.line, rp->rs_un.regsave.rs_u.ptr);
-			if (limit > 0 && (long)(behind_pos.rs_u.ptr
-				     - rp->rs_un.regsave.rs_u.ptr) > limit)
+			MB_PTR_ಹಿಂಭಾಗ(rex.ಸಾಲು, rp->rs_un.regsave.rs_u.ptr);
+			ಆದರೆ (ಎಲ್ಲೆ > 0 && (ದೀರ್ಘ)(behind_pos.rs_u.ptr
+				     - rp->rs_un.regsave.rs_u.ptr) > ಎಲ್ಲೆ)
 			    no = FAIL;
 		    }
 		}
-		if (no == OK)
+		ಆದರೆ (no == OK)
 		{
 		    // Advanced, prepare for finding match again.
 		    reg_restore(&rp->rs_un.regsave, &backpos);
-		    scan = OPERAND(rp->rs_scan) + 4;
-		    if (status == RA_MATCH)
+		    ಪರಿಶೀಲನೆ = ಕಾರ್ಯಾಂಶ(rp->rs_ಪರಿಶೀಲನೆ) + 4;
+		    ಆದರೆ (ಸ್ಥಿತಿ_2 == RA_ಹೊಂದಿಕೆ)
 		    {
 			// We did match, so subexpr may have been changed,
 			// need to restore them for the next try.
-			status = RA_NOMATCH;
+			ಸ್ಥಿತಿ_2 = RA_NOMATCH;
 			restore_subexpr(((regbehind_T *)rp) - 1);
 		    }
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    // Can't advance.  For NOBEHIND that's a match.
 		    behind_pos = (((regbehind_T *)rp) - 1)->save_behind;
-		    if (rp->rs_no == NOBEHIND)
+		    ಆದರೆ (rp->rs_no == NOBEHIND)
 		    {
 			reg_restore(&(((regbehind_T *)rp) - 1)->save_after,
 								    &backpos);
-			status = RA_MATCH;
+			ಸ್ಥಿತಿ_2 = RA_ಹೊಂದಿಕೆ;
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
 			// We do want a proper match.  Need to restore the
 			// subexpr if we had a match, because they may have
 			// been set.
-			if (status == RA_MATCH)
+			ಆದರೆ (ಸ್ಥಿತಿ_2 == RA_ಹೊಂದಿಕೆ)
 			{
-			    status = RA_NOMATCH;
+			    ಸ್ಥಿತಿ_2 = RA_NOMATCH;
 			    restore_subexpr(((regbehind_T *)rp) - 1);
 			}
 		    }
-		    regstack_pop(&scan);
-		    regstack.ga_len -= sizeof(regbehind_T);
+		    regstack_ತೆಗೆ(&ಪರಿಶೀಲನೆ);
+		    regstack.ga_len -= ಗಾತ್ರ(regbehind_T);
 		}
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	  case RS_STAR_LONG:
-	  case RS_STAR_SHORT:
+	  ಸ್ಥಿತಿ RS_ನಕ್ಷತ್ರ_LONG:
+	  ಸ್ಥಿತಿ RS_ನಕ್ಷತ್ರ_SHORT:
 	    {
 		regstar_T	    *rst = ((regstar_T *)rp) - 1;
 
-		if (status == RA_MATCH)
+		ಆದರೆ (ಸ್ಥಿತಿ_2 == RA_ಹೊಂದಿಕೆ)
 		{
-		    regstack_pop(&scan);
-		    regstack.ga_len -= sizeof(regstar_T);
-		    break;
+		    regstack_ತೆಗೆ(&ಪರಿಶೀಲನೆ);
+		    regstack.ga_len -= ಗಾತ್ರ(regstar_T);
+		    ನಿಲ್ಲಿಸು;
 		}
 
 		// Tried once already, restore input pointers.
-		if (status != RA_BREAK)
+		ಆದರೆ (ಸ್ಥಿತಿ_2 != RA_BREAK)
 		    reg_restore(&rp->rs_un.regsave, &backpos);
 
 		// Repeat until we found a position where it could match.
-		for (;;)
+		ಗಾಗಿ (;;)
 		{
-		    if (status != RA_BREAK)
+		    ಆದರೆ (ಸ್ಥಿತಿ_2 != RA_BREAK)
 		    {
 			// Tried first position already, advance.
-			if (rp->rs_state == RS_STAR_LONG)
+			ಆದರೆ (rp->rs_state == RS_ನಕ್ಷತ್ರ_LONG)
 			{
 			    // Trying for longest match, but couldn't or
 			    // didn't match -- back up one char.
-			    if (--rst->count < rst->minval)
-				break;
-			    if (rex.input == rex.line)
+			    ಆದರೆ (--rst->ಎಣಿಕೆ_2 < rst->minval)
+				ನಿಲ್ಲಿಸು;
+			    ಆದರೆ (rex.ಒಳಹರಿವು == rex.ಸಾಲು)
 			    {
 				// backup to last char of previous line
-				if (rex.lnum == 0)
+				ಆದರೆ (rex.lnum == 0)
 				{
-				    status = RA_NOMATCH;
-				    break;
+				    ಸ್ಥಿತಿ_2 = RA_NOMATCH;
+				    ನಿಲ್ಲಿಸು;
 				}
 				--rex.lnum;
-				rex.line = reg_getline(rex.lnum);
+				rex.ಸಾಲು = reg_getline(rex.lnum);
 				// Just in case regrepeat() didn't count
 				// right.
-				if (rex.line == NULL)
-				    break;
-				rex.input = rex.line + reg_getline_len(rex.lnum);
+				ಆದರೆ (rex.ಸಾಲು == ಖಾಲಿ)
+				    ನಿಲ್ಲಿಸು;
+				rex.ಒಳಹರಿವು = rex.ಸಾಲು + reg_getline_len(rex.lnum);
 				fast_breakcheck();
 			    }
-			    else
-				MB_PTR_BACK(rex.line, rex.input);
+			    ಇಲ್ಲದಿದ್ದರೆ
+				MB_PTR_ಹಿಂಭಾಗ(rex.ಸಾಲು, rex.ಒಳಹರಿವು);
 			}
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
 			    // Range is backwards, use shortest match first.
 			    // Careful: maxval and minval are exchanged!
 			    // Couldn't or didn't match: try advancing one
 			    // char.
-			    if (rst->count == rst->minval
-				  || regrepeat(OPERAND(rp->rs_scan), 1L) == 0)
-				break;
-			    ++rst->count;
+			    ಆದರೆ (rst->ಎಣಿಕೆ_2 == rst->minval
+				  || regrepeat(ಕಾರ್ಯಾಂಶ(rp->rs_ಪರಿಶೀಲನೆ), 1L) == 0)
+				ನಿಲ್ಲಿಸು;
+			    ++rst->ಎಣಿಕೆ_2;
 			}
-			if (got_int)
-			    break;
+			ಆದರೆ (got_int)
+			    ನಿಲ್ಲಿಸು;
 		    }
-		    else
-			status = RA_NOMATCH;
+		    ಇಲ್ಲದಿದ್ದರೆ
+			ಸ್ಥಿತಿ_2 = RA_NOMATCH;
 
 		    // If it could match, try it.
-		    if (rst->nextb == NUL || *rex.input == rst->nextb
-					     || *rex.input == rst->nextb_ic)
+		    ಆದರೆ (rst->nextb == NUL || *rex.ಒಳಹರಿವು == rst->nextb
+					     || *rex.ಒಳಹರಿವು == rst->nextb_ic)
 		    {
 			reg_save(&rp->rs_un.regsave, &backpos);
-			scan = regnext(rp->rs_scan);
-			status = RA_CONT;
-			break;
+			ಪರಿಶೀಲನೆ = regnext(rp->rs_ಪರಿಶೀಲನೆ);
+			ಸ್ಥಿತಿ_2 = RA_CONT;
+			ನಿಲ್ಲಿಸು;
 		    }
 		}
-		if (status != RA_CONT)
+		ಆದರೆ (ಸ್ಥಿತಿ_2 != RA_CONT)
 		{
 		    // Failed.
-		    regstack_pop(&scan);
-		    regstack.ga_len -= sizeof(regstar_T);
-		    status = RA_NOMATCH;
+		    regstack_ತೆಗೆ(&ಪರಿಶೀಲನೆ);
+		    regstack.ga_len -= ಗಾತ್ರ(regstar_T);
+		    ಸ್ಥಿತಿ_2 = RA_NOMATCH;
 		}
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
 
 	// If we want to continue the inner loop or didn't pop a state
 	// continue matching loop
-	if (status == RA_CONT || rp == (regitem_T *)
-			     ((char *)regstack.ga_data + regstack.ga_len) - 1)
-	    break;
+	ಆದರೆ (ಸ್ಥಿತಿ_2 == RA_CONT || rp == (regitem_T *)
+			     ((ಅಕ್ಷರ *)regstack.ga_ದತ್ತಾಂಶ + regstack.ga_len) - 1)
+	    ನಿಲ್ಲಿಸು;
 
-#ifdef FEAT_RELTIME
-	if (bt_did_time_out(timed_out))
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RELTIME
+	ಆದರೆ (bt_did_ಸಮಯ_ಹೊರಹೋಗು(timed_ಹೊರಹೋಗು))
 	{
-	    status = RA_FAIL;
-	    break;
+	    ಸ್ಥಿತಿ_2 = RA_FAIL;
+	    ನಿಲ್ಲಿಸು;
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
     // May need to continue with the inner loop, starting at "scan".
-    if (status == RA_CONT)
-	continue;
+    ಆದರೆ (ಸ್ಥಿತಿ_2 == RA_CONT)
+	ಮುಂದುವರಿ;
 
     // If the regstack is empty or something failed we are done.
-    if (regstack.ga_len == 0 || status == RA_FAIL)
+    ಆದರೆ (regstack.ga_len == 0 || ಸ್ಥಿತಿ_2 == RA_FAIL)
     {
-	if (scan == NULL)
+	ಆದರೆ (ಪರಿಶೀಲನೆ == ಖಾಲಿ)
 	{
 	    // We get here only if there's trouble -- normally "case END" is
 	    // the terminating point.
-	    iemsg(e_corrupted_regexp_program);
-#ifdef DEBUG
-	    printf("Premature EOL\n");
-#endif
+	    iemsg(e_corrupted_regexp_ಕಾರ್ಯಕ್ರಮ);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DEBUG
+	    ಬರೆ("Premature EOL\n");
+#ಆದರೆ_ಅಂತ್ಯ
 	}
-	return (status == RA_MATCH);
+	ಹಿಂತಿರುಗಿ (ಸ್ಥಿತಿ_2 == RA_ಹೊಂದಿಕೆ);
     }
 
   } // End of loop until the regstack is empty.
@@ -4909,83 +4909,83 @@ regmatch(
  * regtry - try match of "prog" with at rex.line["col"].
  * Returns 0 for failure, number of lines contained in the match otherwise.
  */
-    static long
+    ಸ್ಥಿರ ದೀರ್ಘ
 regtry(
     bt_regprog_T	*prog,
-    colnr_T		col,
-    int			*timed_out)	// flag set on timeout or NULL
+    colnr_T		ಲಂಬಸಾಲು,
+    ಪೂರ್ಣಾಂಕ			*timed_ಹೊರಹೋಗು)	// flag set on timeout or NULL
 {
-    rex.input = rex.line + col;
+    rex.ಒಳಹರಿವು = rex.ಸಾಲು + ಲಂಬಸಾಲು;
     rex.need_clear_subexpr = TRUE;
-#ifdef FEAT_SYN_HL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
     // Clear the external match subpointers if necessary.
-    rex.need_clear_zsubexpr = (prog->reghasz == REX_SET);
-#endif
+    rex.need_clear_zsubexpr = (prog->reghasz == REX_ಗಣ);
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (regmatch(prog->program + 1, timed_out) == 0)
-	return 0;
+    ಆದರೆ (regmatch(prog->ಕಾರ್ಯಕ್ರಮ + 1, timed_ಹೊರಹೋಗು) == 0)
+	ಹಿಂತಿರುಗಿ 0;
 
     cleanup_subexpr();
-    if (REG_MULTI)
+    ಆದರೆ (REG_MULTI)
     {
-	if (rex.reg_startpos[0].lnum < 0)
+	ಆದರೆ (rex.reg_startpos[0].lnum < 0)
 	{
 	    rex.reg_startpos[0].lnum = 0;
-	    rex.reg_startpos[0].col = col;
+	    rex.reg_startpos[0].ಲಂಬಸಾಲು = ಲಂಬಸಾಲು;
 	}
-	if (rex.reg_endpos[0].lnum < 0)
+	ಆದರೆ (rex.reg_endpos[0].lnum < 0)
 	{
 	    rex.reg_endpos[0].lnum = rex.lnum;
-	    rex.reg_endpos[0].col = (int)(rex.input - rex.line);
+	    rex.reg_endpos[0].ಲಂಬಸಾಲು = (ಪೂರ್ಣಾಂಕ)(rex.ಒಳಹರಿವು - rex.ಸಾಲು);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    // Use line number of "\ze".
 	    rex.lnum = rex.reg_endpos[0].lnum;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (rex.reg_startp[0] == NULL)
-	    rex.reg_startp[0] = rex.line + col;
-	if (rex.reg_endp[0] == NULL)
-	    rex.reg_endp[0] = rex.input;
+	ಆದರೆ (rex.reg_startp[0] == ಖಾಲಿ)
+	    rex.reg_startp[0] = rex.ಸಾಲು + ಲಂಬಸಾಲು;
+	ಆದರೆ (rex.reg_endp[0] == ಖಾಲಿ)
+	    rex.reg_endp[0] = rex.ಒಳಹರಿವು;
     }
-#ifdef FEAT_SYN_HL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
     // Package any found \z(...\) matches for export. Default is none.
-    unref_extmatch(re_extmatch_out);
-    re_extmatch_out = NULL;
+    unref_extmatch(re_extmatch_ಹೊರಹೋಗು);
+    re_extmatch_ಹೊರಹೋಗು = ಖಾಲಿ;
 
-    if (prog->reghasz == REX_SET)
+    ಆದರೆ (prog->reghasz == REX_ಗಣ)
     {
-	int		i;
+	ಪೂರ್ಣಾಂಕ		i;
 
 	cleanup_zsubexpr();
-	re_extmatch_out = make_extmatch();
-	if (re_extmatch_out == NULL)
-	    return 0;
-	for (i = 0; i < NSUBEXP; i++)
+	re_extmatch_ಹೊರಹೋಗು = make_extmatch();
+	ಆದರೆ (re_extmatch_ಹೊರಹೋಗು == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ 0;
+	ಗಾಗಿ (i = 0; i < NSUBEXP; i++)
 	{
-	    if (REG_MULTI)
+	    ಆದರೆ (REG_MULTI)
 	    {
 		// Only accept single line matches.
-		if (reg_startzpos[i].lnum >= 0
+		ಆದರೆ (reg_startzpos[i].lnum >= 0
 			&& reg_endzpos[i].lnum == reg_startzpos[i].lnum
-			&& reg_endzpos[i].col >= reg_startzpos[i].col)
-		    re_extmatch_out->matches[i] =
+			&& reg_endzpos[i].ಲಂಬಸಾಲು >= reg_startzpos[i].ಲಂಬಸಾಲು)
+		    re_extmatch_ಹೊರಹೋಗು->matches[i] =
 			vim_strnsave(reg_getline(reg_startzpos[i].lnum)
-						       + reg_startzpos[i].col,
-				   reg_endzpos[i].col - reg_startzpos[i].col);
+						       + reg_startzpos[i].ಲಂಬಸಾಲು,
+				   reg_endzpos[i].ಲಂಬಸಾಲು - reg_startzpos[i].ಲಂಬಸಾಲು);
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		if (reg_startzp[i] != NULL && reg_endzp[i] != NULL)
-		    re_extmatch_out->matches[i] =
+		ಆದರೆ (reg_startzp[i] != ಖಾಲಿ && reg_endzp[i] != ಖಾಲಿ)
+		    re_extmatch_ಹೊರಹೋಗು->matches[i] =
 			    vim_strnsave(reg_startzp[i],
 						reg_endzp[i] - reg_startzp[i]);
 	    }
 	}
     }
-#endif
-    return 1 + rex.lnum;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ 1 + rex.lnum;
 }
 
 /*
@@ -4993,230 +4993,230 @@ regtry(
  * lines (if "line" is NULL, use reg_getline()).
  * Returns 0 for failure, number of lines contained in the match otherwise.
  */
-    static long
+    ಸ್ಥಿರ ದೀರ್ಘ
 bt_regexec_both(
-    char_u	*line,
+    char_u	*ಸಾಲು,
     colnr_T	startcol,	// column to start looking for match
-    int		*timed_out)	// flag set on timeout or NULL
+    ಪೂರ್ಣಾಂಕ		*timed_ಹೊರಹೋಗು)	// flag set on timeout or NULL
 {
     bt_regprog_T    *prog;
     char_u	    *s;
-    colnr_T	    col = startcol;
-    long	    retval = 0L;
+    colnr_T	    ಲಂಬಸಾಲು = startcol;
+    ದೀರ್ಘ	    retval = 0L;
 
     // Create "regstack" and "backpos" if they are not allocated yet.
     // We allocate *_INITIAL amount of bytes first and then set the grow size
     // to much bigger value to avoid many malloc calls in case of deep regular
     // expressions.
-    if (regstack.ga_data == NULL)
+    ಆದರೆ (regstack.ga_ದತ್ತಾಂಶ == ಖಾಲಿ)
     {
 	// Use an item size of 1 byte, since we push different things
 	// onto the regstack.
 	ga_init2(&regstack, 1, REGSTACK_INITIAL);
-	(void)ga_grow(&regstack, REGSTACK_INITIAL);
+	(ಶೂನ್ಯ)ga_grow(&regstack, REGSTACK_INITIAL);
 	regstack.ga_growsize = REGSTACK_INITIAL * 8;
     }
 
-    if (backpos.ga_data == NULL)
+    ಆದರೆ (backpos.ga_ದತ್ತಾಂಶ == ಖಾಲಿ)
     {
-	ga_init2(&backpos, sizeof(backpos_T), BACKPOS_INITIAL);
-	(void)ga_grow(&backpos, BACKPOS_INITIAL);
+	ga_init2(&backpos, ಗಾತ್ರ(backpos_T), BACKPOS_INITIAL);
+	(ಶೂನ್ಯ)ga_grow(&backpos, BACKPOS_INITIAL);
 	backpos.ga_growsize = BACKPOS_INITIAL * 8;
     }
 
-    if (REG_MULTI)
+    ಆದರೆ (REG_MULTI)
     {
 	prog = (bt_regprog_T *)rex.reg_mmatch->regprog;
-	line = reg_getline((linenr_T)0);
+	ಸಾಲು = reg_getline((linenr_T)0);
 	rex.reg_startpos = rex.reg_mmatch->startpos;
 	rex.reg_endpos = rex.reg_mmatch->endpos;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	prog = (bt_regprog_T *)rex.reg_match->regprog;
-	rex.reg_startp = rex.reg_match->startp;
-	rex.reg_endp = rex.reg_match->endp;
+	prog = (bt_regprog_T *)rex.reg_ಹೊಂದಿಕೆ->regprog;
+	rex.reg_startp = rex.reg_ಹೊಂದಿಕೆ->startp;
+	rex.reg_endp = rex.reg_ಹೊಂದಿಕೆ->endp;
     }
 
     // Be paranoid...
-    if (prog == NULL || line == NULL)
+    ಆದರೆ (prog == ಖಾಲಿ || ಸಾಲು == ಖಾಲಿ)
     {
-	iemsg(e_null_argument);
-	goto theend;
+	iemsg(e_null_ವಾದ);
+	ಹೋಗು theend;
     }
 
     // Check validity of program.
-    if (prog_magic_wrong())
-	goto theend;
+    ಆದರೆ (prog_magic_wrong())
+	ಹೋಗು theend;
 
     // If the start column is past the maximum column: no need to try.
-    if (rex.reg_maxcol > 0 && col >= rex.reg_maxcol)
-	goto theend;
+    ಆದರೆ (rex.reg_maxcol > 0 && ಲಂಬಸಾಲು >= rex.reg_maxcol)
+	ಹೋಗು theend;
 
     // If pattern contains "\c" or "\C": overrule value of rex.reg_ic
-    if (prog->regflags & RF_ICASE)
+    ಆದರೆ (prog->regflags & RF_ICASE)
 	rex.reg_ic = TRUE;
-    else if (prog->regflags & RF_NOICASE)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (prog->regflags & RF_NOICASE)
 	rex.reg_ic = FALSE;
 
     // If pattern contains "\Z" overrule value of rex.reg_icombine
-    if (prog->regflags & RF_ICOMBINE)
+    ಆದರೆ (prog->regflags & RF_ICOMBINE)
 	rex.reg_icombine = TRUE;
 
     // If there is a "must appear" string, look for it.
-    if (prog->regmust != NULL)
+    ಆದರೆ (prog->regmust != ಖಾಲಿ)
     {
-	int c;
+	ಪೂರ್ಣಾಂಕ c;
 
-	if (has_mbyte)
+	ಆದರೆ (has_mbyte)
 	    c = (*mb_ptr2char)(prog->regmust);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    c = *prog->regmust;
-	s = line + col;
+	s = ಸಾಲು + ಲಂಬಸಾಲು;
 
 	// This is used very often, esp. for ":global".  Use three versions of
 	// the loop to avoid overhead of conditions.
-	if (!rex.reg_ic && !has_mbyte)
-	    while ((s = vim_strbyte(s, c)) != NULL)
+	ಆದರೆ (!rex.reg_ic && !has_mbyte)
+	    ಆಗ ((s = vim_strbyte(s, c)) != ಖಾಲಿ)
 	    {
-		int len = prog->regmlen;
-		if (cstrncmp(s, prog->regmust, &len) == 0)
-		    break;		// Found it.
+		ಪೂರ್ಣಾಂಕ len = prog->regmlen;
+		ಆದರೆ (cstrncmp(s, prog->regmust, &len) == 0)
+		    ನಿಲ್ಲಿಸು;		// Found it.
 		++s;
 	    }
-	else if (!rex.reg_ic || (!enc_utf8 && mb_char2len(c) > 1))
-	    while ((s = vim_strchr(s, c)) != NULL)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!rex.reg_ic || (!enc_utf8 && mb_char2len(c) > 1))
+	    ಆಗ ((s = vim_strchr(s, c)) != ಖಾಲಿ)
 	    {
-		int len = prog->regmlen;
-		if (cstrncmp(s, prog->regmust, &len) == 0)
-		    break;		// Found it.
+		ಪೂರ್ಣಾಂಕ len = prog->regmlen;
+		ಆದರೆ (cstrncmp(s, prog->regmust, &len) == 0)
+		    ನಿಲ್ಲಿಸು;		// Found it.
 		MB_PTR_ADV(s);
 	    }
-	else
-	    while ((s = cstrchr(s, c)) != NULL)
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಆಗ ((s = cstrchr(s, c)) != ಖಾಲಿ)
 	    {
-		int len = prog->regmlen;
-		if (cstrncmp(s, prog->regmust, &len) == 0)
-		    break;		// Found it.
+		ಪೂರ್ಣಾಂಕ len = prog->regmlen;
+		ಆದರೆ (cstrncmp(s, prog->regmust, &len) == 0)
+		    ನಿಲ್ಲಿಸು;		// Found it.
 		MB_PTR_ADV(s);
 	    }
-	if (s == NULL)		// Not present.
-	    goto theend;
+	ಆದರೆ (s == ಖಾಲಿ)		// Not present.
+	    ಹೋಗು theend;
     }
 
-    rex.line = line;
+    rex.ಸಾಲು = ಸಾಲು;
     rex.lnum = 0;
     reg_toolong = FALSE;
 
     // Simplest case: Anchored match need be tried only once.
-    if (prog->reganch)
+    ಆದರೆ (prog->reganch)
     {
-	int	c;
+	ಪೂರ್ಣಾಂಕ	c;
 
-	if (has_mbyte)
-	    c = (*mb_ptr2char)(rex.line + col);
-	else
-	    c = rex.line[col];
-	if (prog->regstart == NUL
+	ಆದರೆ (has_mbyte)
+	    c = (*mb_ptr2char)(rex.ಸಾಲು + ಲಂಬಸಾಲು);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    c = rex.ಸಾಲು[ಲಂಬಸಾಲು];
+	ಆದರೆ (prog->regstart == NUL
 		|| prog->regstart == c
 		|| (rex.reg_ic
 		    && (((enc_utf8 && utf_fold(prog->regstart) == utf_fold(c)))
 			|| (c < 255 && prog->regstart < 255 &&
 			    MB_TOLOWER(prog->regstart) == MB_TOLOWER(c)))))
-	    retval = regtry(prog, col, timed_out);
-	else
+	    retval = regtry(prog, ಲಂಬಸಾಲು, timed_ಹೊರಹೋಗು);
+	ಇಲ್ಲದಿದ್ದರೆ
 	    retval = 0;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Messy cases:  unanchored match.
-	while (!got_int)
+	ಆಗ (!got_int)
 	{
-	    if (prog->regstart != NUL)
+	    ಆದರೆ (prog->regstart != NUL)
 	    {
 		// Skip until the char we know it must start with.
 		// Used often, do some work to avoid call overhead.
-		if (!rex.reg_ic && !has_mbyte)
-		    s = vim_strbyte(rex.line + col, prog->regstart);
-		else
-		    s = cstrchr(rex.line + col, prog->regstart);
-		if (s == NULL)
+		ಆದರೆ (!rex.reg_ic && !has_mbyte)
+		    s = vim_strbyte(rex.ಸಾಲು + ಲಂಬಸಾಲು, prog->regstart);
+		ಇಲ್ಲದಿದ್ದರೆ
+		    s = cstrchr(rex.ಸಾಲು + ಲಂಬಸಾಲು, prog->regstart);
+		ಆದರೆ (s == ಖಾಲಿ)
 		{
 		    retval = 0;
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
-		col = (int)(s - rex.line);
+		ಲಂಬಸಾಲು = (ಪೂರ್ಣಾಂಕ)(s - rex.ಸಾಲು);
 	    }
 
 	    // Check for maximum column to try.
-	    if (rex.reg_maxcol > 0 && col >= rex.reg_maxcol)
+	    ಆದರೆ (rex.reg_maxcol > 0 && ಲಂಬಸಾಲು >= rex.reg_maxcol)
 	    {
 		retval = 0;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 
-	    retval = regtry(prog, col, timed_out);
-	    if (retval > 0)
-		break;
+	    retval = regtry(prog, ಲಂಬಸಾಲು, timed_ಹೊರಹೋಗು);
+	    ಆದರೆ (retval > 0)
+		ನಿಲ್ಲಿಸು;
 
 	    // if not currently on the first line, get it again
-	    if (rex.lnum != 0)
+	    ಆದರೆ (rex.lnum != 0)
 	    {
 		rex.lnum = 0;
-		rex.line = reg_getline((linenr_T)0);
+		rex.ಸಾಲು = reg_getline((linenr_T)0);
 	    }
-	    if (rex.line[col] == NUL)
-		break;
-	    if (has_mbyte)
-		col += (*mb_ptr2len)(rex.line + col);
-	    else
-		++col;
-#ifdef FEAT_RELTIME
-	    if (bt_did_time_out(timed_out))
-		break;
-#endif
+	    ಆದರೆ (rex.ಸಾಲು[ಲಂಬಸಾಲು] == NUL)
+		ನಿಲ್ಲಿಸು;
+	    ಆದರೆ (has_mbyte)
+		ಲಂಬಸಾಲು += (*mb_ptr2len)(rex.ಸಾಲು + ಲಂಬಸಾಲು);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		++ಲಂಬಸಾಲು;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RELTIME
+	    ಆದರೆ (bt_did_ಸಮಯ_ಹೊರಹೋಗು(timed_ಹೊರಹೋಗು))
+		ನಿಲ್ಲಿಸು;
+#ಆದರೆ_ಅಂತ್ಯ
 	}
     }
 
 theend:
     // Free "reg_tofree" when it's a bit big.
     // Free regstack and backpos if they are bigger than their initial size.
-    if (reg_tofreelen > 400)
+    ಆದರೆ (reg_tofreelen > 400)
 	VIM_CLEAR(reg_tofree);
-    if (regstack.ga_maxlen > REGSTACK_INITIAL)
+    ಆದರೆ (regstack.ga_maxlen > REGSTACK_INITIAL)
 	ga_clear(&regstack);
-    if (backpos.ga_maxlen > BACKPOS_INITIAL)
+    ಆದರೆ (backpos.ga_maxlen > BACKPOS_INITIAL)
 	ga_clear(&backpos);
 
-    if (retval > 0)
+    ಆದರೆ (retval > 0)
     {
 	// Make sure the end is never before the start.  Can happen when \zs
 	// and \ze are used.
-	if (REG_MULTI)
+	ಆದರೆ (REG_MULTI)
 	{
-	    lpos_T *start = &rex.reg_mmatch->startpos[0];
-	    lpos_T *end = &rex.reg_mmatch->endpos[0];
+	    lpos_T *ಆರಂಭ = &rex.reg_mmatch->startpos[0];
+	    lpos_T *ಕೊನೆ = &rex.reg_mmatch->endpos[0];
 
-	    if (end->lnum < start->lnum
-			|| (end->lnum == start->lnum && end->col < start->col))
+	    ಆದರೆ (ಕೊನೆ->lnum < ಆರಂಭ->lnum
+			|| (ಕೊನೆ->lnum == ಆರಂಭ->lnum && ಕೊನೆ->ಲಂಬಸಾಲು < ಆರಂಭ->ಲಂಬಸಾಲು))
 		rex.reg_mmatch->endpos[0] = rex.reg_mmatch->startpos[0];
 
 	    // startpos[0] may be set by "\zs", also return the column where
 	    // the whole pattern matched.
-	    rex.reg_mmatch->rmm_matchcol = col;
+	    rex.reg_mmatch->rmm_matchcol = ಲಂಬಸಾಲು;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (rex.reg_match->endp[0] < rex.reg_match->startp[0])
-		rex.reg_match->endp[0] = rex.reg_match->startp[0];
+	    ಆದರೆ (rex.reg_ಹೊಂದಿಕೆ->endp[0] < rex.reg_ಹೊಂದಿಕೆ->startp[0])
+		rex.reg_ಹೊಂದಿಕೆ->endp[0] = rex.reg_ಹೊಂದಿಕೆ->startp[0];
 
 	    // startpos[0] may be set by "\zs", also return the column where
 	    // the whole pattern matched.
-	    rex.reg_match->rm_matchcol = col;
+	    rex.reg_ಹೊಂದಿಕೆ->rm_matchcol = ಲಂಬಸಾಲು;
 	}
     }
 
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
 /*
@@ -5227,24 +5227,24 @@ theend:
  *
  * Returns 0 for failure, number of lines contained in the match otherwise.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 bt_regexec_nl(
     regmatch_T	*rmp,
-    char_u	*line,	// string to match against
-    colnr_T	col,	// column to start looking for match
-    int		line_lbr)
+    char_u	*ಸಾಲು,	// string to match against
+    colnr_T	ಲಂಬಸಾಲು,	// column to start looking for match
+    ಪೂರ್ಣಾಂಕ		ಸಾಲು_lbr)
 {
-    rex.reg_match = rmp;
-    rex.reg_mmatch = NULL;
+    rex.reg_ಹೊಂದಿಕೆ = rmp;
+    rex.reg_mmatch = ಖಾಲಿ;
     rex.reg_maxline = 0;
-    rex.reg_line_lbr = line_lbr;
+    rex.reg_ಸಾಲು_lbr = ಸಾಲು_lbr;
     rex.reg_buf = curbuf;
-    rex.reg_win = NULL;
+    rex.reg_win = ಖಾಲಿ;
     rex.reg_ic = rmp->rm_ic;
     rex.reg_icombine = FALSE;
     rex.reg_maxcol = 0;
 
-    return bt_regexec_both(line, col, NULL);
+    ಹಿಂತಿರುಗಿ bt_regexec_both(ಸಾಲು, ಲಂಬಸಾಲು, ಖಾಲಿ);
 }
 
 /*
@@ -5255,102 +5255,102 @@ bt_regexec_nl(
  * Return zero if there is no match.  Return number of lines contained in the
  * match otherwise.
  */
-    static long
+    ಸ್ಥಿರ ದೀರ್ಘ
 bt_regexec_multi(
     regmmatch_T	*rmp,
     win_T	*win,		// window in which to search or NULL
     buf_T	*buf,		// buffer in which to search
     linenr_T	lnum,		// nr of line to start looking for match
-    colnr_T	col,		// column to start looking for match
-    int		*timed_out)	// flag set on timeout or NULL
+    colnr_T	ಲಂಬಸಾಲು,		// column to start looking for match
+    ಪೂರ್ಣಾಂಕ		*timed_ಹೊರಹೋಗು)	// flag set on timeout or NULL
 {
     init_regexec_multi(rmp, win, buf, lnum);
-    return bt_regexec_both(NULL, col, timed_out);
+    ಹಿಂತಿರುಗಿ bt_regexec_both(ಖಾಲಿ, ಲಂಬಸಾಲು, timed_ಹೊರಹೋಗು);
 }
 
 /*
  * Compare a number with the operand of RE_LNUM, RE_COL or RE_VCOL.
  */
-    static int
-re_num_cmp(long_u val, char_u *scan)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+re_ಅಂಕೆ_cmp(long_u val, char_u *ಪರಿಶೀಲನೆ)
 {
-    long_u  n = OPERAND_MIN(scan);
+    long_u  n = ಕಾರ್ಯಾಂಶ_MIN(ಪರಿಶೀಲನೆ);
 
-    if (OPERAND_CMP(scan) == '>')
-	return val > n;
-    if (OPERAND_CMP(scan) == '<')
-	return val < n;
-    return val == n;
+    ಆದರೆ (ಕಾರ್ಯಾಂಶ_CMP(ಪರಿಶೀಲನೆ) == '>')
+	ಹಿಂತಿರುಗಿ val > n;
+    ಆದರೆ (ಕಾರ್ಯಾಂಶ_CMP(ಪರಿಶೀಲನೆ) == '<')
+	ಹಿಂತಿರುಗಿ val < n;
+    ಹಿಂತಿರುಗಿ val == n;
 }
 
-#ifdef BT_REGEXP_DUMP
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ BT_REGEXP_DUMP
 
 /*
  * regdump - dump a regexp onto stdout in vaguely comprehensible form
  */
-    static void
-regdump(char_u *pattern, bt_regprog_T *r)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+regdump(char_u *ನಮೂನೆ, bt_regprog_T *r)
 {
     char_u  *s;
-    int	    op = EXACTLY;	// Arbitrary non-END op.
-    char_u  *next;
-    char_u  *end = NULL;
+    ಪೂರ್ಣಾಂಕ	    op = EXACTLY;	// Arbitrary non-END op.
+    char_u  *ಮುಂದಿನ;
+    char_u  *ಕೊನೆ = ಖಾಲಿ;
     FILE    *f;
 
 # ifdef BT_REGEXP_LOG
     f = fopen("bt_regexp_log.log", "a");
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
     f = stdout;
 # endif
-    if (f == NULL)
-	return;
-    fprintf(f, "-------------------------------------\n\r\nregcomp(%s):\r\n", pattern);
+    ಆದರೆ (f == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
+    fprintf(f, "-------------------------------------\n\r\nregcomp(%s):\r\n", ನಮೂನೆ);
 
-    s = r->program + 1;
+    s = r->ಕಾರ್ಯಕ್ರಮ + 1;
     // Loop until we find the END that isn't before a referred next (an END
     // can also appear in a NOMATCH operand).
-    while ((op != END || s <= end) && s < r->program + r->regsz)
+    ಆಗ ((op != ಕೊನೆ_3 || s <= ಕೊನೆ) && s < r->ಕಾರ್ಯಕ್ರಮ + r->regsz)
     {
 	op = OP(s);
-	fprintf(f, "%2d%s", (int)(s - r->program), regprop(s)); // Where, what.
-	next = (s + 3 <= r->program + r->regsz) ? regnext(s) : NULL;
-	if (next == NULL)	// Next ptr.
+	fprintf(f, "%2d%s", (ಪೂರ್ಣಾಂಕ)(s - r->ಕಾರ್ಯಕ್ರಮ), regprop(s)); // Where, what.
+	ಮುಂದಿನ = (s + 3 <= r->ಕಾರ್ಯಕ್ರಮ + r->regsz) ? regnext(s) : ಖಾಲಿ;
+	ಆದರೆ (ಮುಂದಿನ == ಖಾಲಿ)	// Next ptr.
 	    fprintf(f, "(0)");
-	else
-	    fprintf(f, "(%d)", (int)((s - r->program) + (next - s)));
-	if (end < next)
-	    end = next;
-	if (op == BRACE_LIMITS)
+	ಇಲ್ಲದಿದ್ದರೆ
+	    fprintf(f, "(%d)", (ಪೂರ್ಣಾಂಕ)((s - r->ಕಾರ್ಯಕ್ರಮ) + (ಮುಂದಿನ - s)));
+	ಆದರೆ (ಕೊನೆ < ಮುಂದಿನ)
+	    ಕೊನೆ = ಮುಂದಿನ;
+	ಆದರೆ (op == BRACE_LIMITS)
 	{
 	    // Two ints
-	    fprintf(f, " minval %ld, maxval %ld", OPERAND_MIN(s), OPERAND_MAX(s));
+	    fprintf(f, " minval %ld, maxval %ld", ಕಾರ್ಯಾಂಶ_MIN(s), ಕಾರ್ಯಾಂಶ_MAX(s));
 	    s += 8;
 	}
-	else if (op == BEHIND || op == NOBEHIND)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (op == BEHIND || op == NOBEHIND)
 	{
 	    // one int
-	    fprintf(f, " count %ld", OPERAND_MIN(s));
+	    fprintf(f, " count %ld", ಕಾರ್ಯಾಂಶ_MIN(s));
 	    s += 4;
 	}
-	else if (op == RE_LNUM || op == RE_COL || op == RE_VCOL)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (op == RE_LNUM || op == RE_ಲಂಬಸಾಲು || op == RE_VCOL)
 	{
 	    // one int plus comparator
-	    fprintf(f, " count %ld", OPERAND_MIN(s));
+	    fprintf(f, " count %ld", ಕಾರ್ಯಾಂಶ_MIN(s));
 	    s += 5;
 	}
 	s += 3;
-	if (op == MULTIBYTECODE)
+	ಆದರೆ (op == MULTIBYTECODE)
 	{
 	    fprintf(f, " mbc=%d", utf_ptr2char(s));
 	    s += utfc_ptr2len(s);
 	}
-	if (op == ANYOF || op == ANYOF + ADD_NL
-		|| op == ANYBUT || op == ANYBUT + ADD_NL
+	ಆದರೆ (op == ANYOF || op == ANYOF + ಕೂಡಿಸು_NL
+		|| op == ANYBUT || op == ANYBUT + ಕೂಡಿಸು_NL
 		|| op == EXACTLY)
 	{
 	    // Literal string, where present.
 	    fprintf(f, "\nxxxxxxxxx\n");
-	    while (*s != NUL && s < r->program + r->regsz)
+	    ಆಗ (*s != NUL && s < r->ಕಾರ್ಯಕ್ರಮ + r->regsz)
 	    {
 		fprintf(f, "%c", *s);
 		s += utfc_ptr2len(s);  // advance by full char including combining
@@ -5362,13 +5362,13 @@ regdump(char_u *pattern, bt_regprog_T *r)
     }
 
     // Header fields of interest.
-    if (r->regstart != NUL)
+    ಆದರೆ (r->regstart != NUL)
 	fprintf(f, "start `%s' 0x%x; ", r->regstart < 256
-		? (char *)transchar(r->regstart)
+		? (ಅಕ್ಷರ *)transchar(r->regstart)
 		: "multibyte", r->regstart);
-    if (r->reganch)
+    ಆದರೆ (r->reganch)
 	fprintf(f, "anchored; ");
-    if (r->regmust != NULL)
+    ಆದರೆ (r->regmust != ಖಾಲಿ)
 	fprintf(f, "must have \"%s\"", r->regmust);
     fprintf(f, "\r\n");
 
@@ -5376,388 +5376,388 @@ regdump(char_u *pattern, bt_regprog_T *r)
     fclose(f);
 # endif
 }
-#endif	    // BT_REGEXP_DUMP
+#ಆದರೆ_ಅಂತ್ಯ	    // BT_REGEXP_DUMP
 
-#ifdef DEBUG
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DEBUG
 /*
  * regprop - printable representation of opcode
  */
-    static char_u *
+    ಸ್ಥಿರ char_u *
 regprop(char_u *op)
 {
-    char	    *p;
-    static char	    buf[50];
-    static size_t   buflen = 0;
+    ಅಕ್ಷರ	    *p;
+    ಸ್ಥಿರ ಅಕ್ಷರ	    buf[50];
+    ಸ್ಥಿರ size_t   buflen = 0;
 
     STRCPY(buf, ":");
     buflen = 1;
 
-    switch ((int) OP(op))
+    ಆಯ್ಕೆ ((ಪೂರ್ಣಾಂಕ) OP(op))
     {
-      case BOL:
+      ಸ್ಥಿತಿ BOL:
 	p = "BOL";
-	break;
-      case EOL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ EOL:
 	p = "EOL";
-	break;
-      case RE_BOF:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ RE_BOF:
 	p = "BOF";
-	break;
-      case RE_EOF:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ RE_EOF:
 	p = "EOF";
-	break;
-      case CURSOR:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ CURSOR:
 	p = "CURSOR";
-	break;
-      case RE_VISUAL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ RE_VISUAL:
 	p = "RE_VISUAL";
-	break;
-      case RE_LNUM:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ RE_LNUM:
 	p = "RE_LNUM";
-	break;
-      case RE_MARK:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ RE_MARK:
 	p = "RE_MARK";
-	break;
-      case RE_COL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ RE_ಲಂಬಸಾಲು:
 	p = "RE_COL";
-	break;
-      case RE_VCOL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ RE_VCOL:
 	p = "RE_VCOL";
-	break;
-      case BOW:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ BOW:
 	p = "BOW";
-	break;
-      case EOW:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ EOW:
 	p = "EOW";
-	break;
-      case ANY:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ ANY:
 	p = "ANY";
-	break;
-      case ANY + ADD_NL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ ANY + ಕೂಡಿಸು_NL:
 	p = "ANY+NL";
-	break;
-      case ANYOF:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ ANYOF:
 	p = "ANYOF";
-	break;
-      case ANYOF + ADD_NL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ ANYOF + ಕೂಡಿಸು_NL:
 	p = "ANYOF+NL";
-	break;
-      case ANYBUT:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ ANYBUT:
 	p = "ANYBUT";
-	break;
-      case ANYBUT + ADD_NL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ ANYBUT + ಕೂಡಿಸು_NL:
 	p = "ANYBUT+NL";
-	break;
-      case IDENT:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ IDENT:
 	p = "IDENT";
-	break;
-      case IDENT + ADD_NL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ IDENT + ಕೂಡಿಸು_NL:
 	p = "IDENT+NL";
-	break;
-      case SIDENT:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ SIDENT:
 	p = "SIDENT";
-	break;
-      case SIDENT + ADD_NL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ SIDENT + ಕೂಡಿಸು_NL:
 	p = "SIDENT+NL";
-	break;
-      case KWORD:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ KWORD:
 	p = "KWORD";
-	break;
-      case KWORD + ADD_NL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ KWORD + ಕೂಡಿಸು_NL:
 	p = "KWORD+NL";
-	break;
-      case SKWORD:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ SKWORD:
 	p = "SKWORD";
-	break;
-      case SKWORD + ADD_NL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ SKWORD + ಕೂಡಿಸು_NL:
 	p = "SKWORD+NL";
-	break;
-      case FNAME:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ FNAME:
 	p = "FNAME";
-	break;
-      case FNAME + ADD_NL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ FNAME + ಕೂಡಿಸು_NL:
 	p = "FNAME+NL";
-	break;
-      case SFNAME:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ SFNAME:
 	p = "SFNAME";
-	break;
-      case SFNAME + ADD_NL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ SFNAME + ಕೂಡಿಸು_NL:
 	p = "SFNAME+NL";
-	break;
-      case PRINT:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ PRINT:
 	p = "PRINT";
-	break;
-      case PRINT + ADD_NL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ PRINT + ಕೂಡಿಸು_NL:
 	p = "PRINT+NL";
-	break;
-      case SPRINT:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ SPRINT:
 	p = "SPRINT";
-	break;
-      case SPRINT + ADD_NL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ SPRINT + ಕೂಡಿಸು_NL:
 	p = "SPRINT+NL";
-	break;
-      case WHITE:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ WHITE:
 	p = "WHITE";
-	break;
-      case WHITE + ADD_NL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ WHITE + ಕೂಡಿಸು_NL:
 	p = "WHITE+NL";
-	break;
-      case NWHITE:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ NWHITE:
 	p = "NWHITE";
-	break;
-      case NWHITE + ADD_NL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ NWHITE + ಕೂಡಿಸು_NL:
 	p = "NWHITE+NL";
-	break;
-      case DIGIT:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ DIGIT:
 	p = "DIGIT";
-	break;
-      case DIGIT + ADD_NL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ DIGIT + ಕೂಡಿಸು_NL:
 	p = "DIGIT+NL";
-	break;
-      case NDIGIT:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ NDIGIT:
 	p = "NDIGIT";
-	break;
-      case NDIGIT + ADD_NL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ NDIGIT + ಕೂಡಿಸು_NL:
 	p = "NDIGIT+NL";
-	break;
-      case HEX:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ HEX:
 	p = "HEX";
-	break;
-      case HEX + ADD_NL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ HEX + ಕೂಡಿಸು_NL:
 	p = "HEX+NL";
-	break;
-      case NHEX:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ NHEX:
 	p = "NHEX";
-	break;
-      case NHEX + ADD_NL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ NHEX + ಕೂಡಿಸು_NL:
 	p = "NHEX+NL";
-	break;
-      case OCTAL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ OCTAL:
 	p = "OCTAL";
-	break;
-      case OCTAL + ADD_NL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ OCTAL + ಕೂಡಿಸು_NL:
 	p = "OCTAL+NL";
-	break;
-      case NOCTAL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ NOCTAL:
 	p = "NOCTAL";
-	break;
-      case NOCTAL + ADD_NL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ NOCTAL + ಕೂಡಿಸು_NL:
 	p = "NOCTAL+NL";
-	break;
-      case WORD:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ ಶಬ್ದ_2:
 	p = "WORD";
-	break;
-      case WORD + ADD_NL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ ಶಬ್ದ_2 + ಕೂಡಿಸು_NL:
 	p = "WORD+NL";
-	break;
-      case NWORD:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ NWORD:
 	p = "NWORD";
-	break;
-      case NWORD + ADD_NL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ NWORD + ಕೂಡಿಸು_NL:
 	p = "NWORD+NL";
-	break;
-      case HEAD:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ ತಲೆ_2:
 	p = "HEAD";
-	break;
-      case HEAD + ADD_NL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ ತಲೆ_2 + ಕೂಡಿಸು_NL:
 	p = "HEAD+NL";
-	break;
-      case NHEAD:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ NHEAD:
 	p = "NHEAD";
-	break;
-      case NHEAD + ADD_NL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ NHEAD + ಕೂಡಿಸು_NL:
 	p = "NHEAD+NL";
-	break;
-      case ALPHA:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ ALPHA:
 	p = "ALPHA";
-	break;
-      case ALPHA + ADD_NL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ ALPHA + ಕೂಡಿಸು_NL:
 	p = "ALPHA+NL";
-	break;
-      case NALPHA:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ NALPHA:
 	p = "NALPHA";
-	break;
-      case NALPHA + ADD_NL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ NALPHA + ಕೂಡಿಸು_NL:
 	p = "NALPHA+NL";
-	break;
-      case LOWER:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ ಅಧೋ_2:
 	p = "LOWER";
-	break;
-      case LOWER + ADD_NL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ ಅಧೋ_2 + ಕೂಡಿಸು_NL:
 	p = "LOWER+NL";
-	break;
-      case NLOWER:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ NLOWER:
 	p = "NLOWER";
-	break;
-      case NLOWER + ADD_NL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ NLOWER + ಕೂಡಿಸು_NL:
 	p = "NLOWER+NL";
-	break;
-      case UPPER:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ ಊರ್ಧ್ವ:
 	p = "UPPER";
-	break;
-      case UPPER + ADD_NL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ ಊರ್ಧ್ವ + ಕೂಡಿಸು_NL:
 	p = "UPPER+NL";
-	break;
-      case NUPPER:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ NUPPER:
 	p = "NUPPER";
-	break;
-      case NUPPER + ADD_NL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ NUPPER + ಕೂಡಿಸು_NL:
 	p = "NUPPER+NL";
-	break;
-      case BRANCH:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ BRANCH:
 	p = "BRANCH";
-	break;
-      case EXACTLY:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ EXACTLY:
 	p = "EXACTLY";
-	break;
-      case NOTHING:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ NOTHING:
 	p = "NOTHING";
-	break;
-      case BACK:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ ಹಿಂಭಾಗ_2:
 	p = "BACK";
-	break;
-      case END:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ ಕೊನೆ_3:
 	p = "END";
-	break;
-      case MOPEN + 0:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ MOPEN + 0:
 	p = "MATCH START";
-	break;
-      case MOPEN + 1:
-      case MOPEN + 2:
-      case MOPEN + 3:
-      case MOPEN + 4:
-      case MOPEN + 5:
-      case MOPEN + 6:
-      case MOPEN + 7:
-      case MOPEN + 8:
-      case MOPEN + 9:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "MOPEN%d", OP(op) - MOPEN);
-	p = NULL;
-	break;
-      case MCLOSE + 0:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ MOPEN + 1:
+      ಸ್ಥಿತಿ MOPEN + 2:
+      ಸ್ಥಿತಿ MOPEN + 3:
+      ಸ್ಥಿತಿ MOPEN + 4:
+      ಸ್ಥಿತಿ MOPEN + 5:
+      ಸ್ಥಿತಿ MOPEN + 6:
+      ಸ್ಥಿತಿ MOPEN + 7:
+      ಸ್ಥಿತಿ MOPEN + 8:
+      ಸ್ಥಿತಿ MOPEN + 9:
+	buflen += vim_snprintf(buf + buflen, ಗಾತ್ರ(buf) - buflen, "MOPEN%d", OP(op) - MOPEN);
+	p = ಖಾಲಿ;
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ MCLOSE + 0:
 	p = "MATCH END";
-	break;
-      case MCLOSE + 1:
-      case MCLOSE + 2:
-      case MCLOSE + 3:
-      case MCLOSE + 4:
-      case MCLOSE + 5:
-      case MCLOSE + 6:
-      case MCLOSE + 7:
-      case MCLOSE + 8:
-      case MCLOSE + 9:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "MCLOSE%d", OP(op) - MCLOSE);
-	p = NULL;
-	break;
-      case BACKREF + 1:
-      case BACKREF + 2:
-      case BACKREF + 3:
-      case BACKREF + 4:
-      case BACKREF + 5:
-      case BACKREF + 6:
-      case BACKREF + 7:
-      case BACKREF + 8:
-      case BACKREF + 9:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "BACKREF%d", OP(op) - BACKREF);
-	p = NULL;
-	break;
-      case NOPEN:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ MCLOSE + 1:
+      ಸ್ಥಿತಿ MCLOSE + 2:
+      ಸ್ಥಿತಿ MCLOSE + 3:
+      ಸ್ಥಿತಿ MCLOSE + 4:
+      ಸ್ಥಿತಿ MCLOSE + 5:
+      ಸ್ಥಿತಿ MCLOSE + 6:
+      ಸ್ಥಿತಿ MCLOSE + 7:
+      ಸ್ಥಿತಿ MCLOSE + 8:
+      ಸ್ಥಿತಿ MCLOSE + 9:
+	buflen += vim_snprintf(buf + buflen, ಗಾತ್ರ(buf) - buflen, "MCLOSE%d", OP(op) - MCLOSE);
+	p = ಖಾಲಿ;
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ BACKREF + 1:
+      ಸ್ಥಿತಿ BACKREF + 2:
+      ಸ್ಥಿತಿ BACKREF + 3:
+      ಸ್ಥಿತಿ BACKREF + 4:
+      ಸ್ಥಿತಿ BACKREF + 5:
+      ಸ್ಥಿತಿ BACKREF + 6:
+      ಸ್ಥಿತಿ BACKREF + 7:
+      ಸ್ಥಿತಿ BACKREF + 8:
+      ಸ್ಥಿತಿ BACKREF + 9:
+	buflen += vim_snprintf(buf + buflen, ಗಾತ್ರ(buf) - buflen, "BACKREF%d", OP(op) - BACKREF);
+	p = ಖಾಲಿ;
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ NOPEN:
 	p = "NOPEN";
-	break;
-      case NCLOSE:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ NCLOSE:
 	p = "NCLOSE";
-	break;
+	ನಿಲ್ಲಿಸು;
 # ifdef FEAT_SYN_HL
-      case ZOPEN + 1:
-      case ZOPEN + 2:
-      case ZOPEN + 3:
-      case ZOPEN + 4:
-      case ZOPEN + 5:
-      case ZOPEN + 6:
-      case ZOPEN + 7:
-      case ZOPEN + 8:
-      case ZOPEN + 9:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "ZOPEN%d", OP(op) - ZOPEN);
-	p = NULL;
-	break;
-      case ZCLOSE + 1:
-      case ZCLOSE + 2:
-      case ZCLOSE + 3:
-      case ZCLOSE + 4:
-      case ZCLOSE + 5:
-      case ZCLOSE + 6:
-      case ZCLOSE + 7:
-      case ZCLOSE + 8:
-      case ZCLOSE + 9:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "ZCLOSE%d", OP(op) - ZCLOSE);
-	p = NULL;
-	break;
-      case ZREF + 1:
-      case ZREF + 2:
-      case ZREF + 3:
-      case ZREF + 4:
-      case ZREF + 5:
-      case ZREF + 6:
-      case ZREF + 7:
-      case ZREF + 8:
-      case ZREF + 9:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "ZREF%d", OP(op) - ZREF);
-	p = NULL;
-	break;
+      ಸ್ಥಿತಿ ZOPEN + 1:
+      ಸ್ಥಿತಿ ZOPEN + 2:
+      ಸ್ಥಿತಿ ZOPEN + 3:
+      ಸ್ಥಿತಿ ZOPEN + 4:
+      ಸ್ಥಿತಿ ZOPEN + 5:
+      ಸ್ಥಿತಿ ZOPEN + 6:
+      ಸ್ಥಿತಿ ZOPEN + 7:
+      ಸ್ಥಿತಿ ZOPEN + 8:
+      ಸ್ಥಿತಿ ZOPEN + 9:
+	buflen += vim_snprintf(buf + buflen, ಗಾತ್ರ(buf) - buflen, "ZOPEN%d", OP(op) - ZOPEN);
+	p = ಖಾಲಿ;
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ ZCLOSE + 1:
+      ಸ್ಥಿತಿ ZCLOSE + 2:
+      ಸ್ಥಿತಿ ZCLOSE + 3:
+      ಸ್ಥಿತಿ ZCLOSE + 4:
+      ಸ್ಥಿತಿ ZCLOSE + 5:
+      ಸ್ಥಿತಿ ZCLOSE + 6:
+      ಸ್ಥಿತಿ ZCLOSE + 7:
+      ಸ್ಥಿತಿ ZCLOSE + 8:
+      ಸ್ಥಿತಿ ZCLOSE + 9:
+	buflen += vim_snprintf(buf + buflen, ಗಾತ್ರ(buf) - buflen, "ZCLOSE%d", OP(op) - ZCLOSE);
+	p = ಖಾಲಿ;
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ ZREF + 1:
+      ಸ್ಥಿತಿ ZREF + 2:
+      ಸ್ಥಿತಿ ZREF + 3:
+      ಸ್ಥಿತಿ ZREF + 4:
+      ಸ್ಥಿತಿ ZREF + 5:
+      ಸ್ಥಿತಿ ZREF + 6:
+      ಸ್ಥಿತಿ ZREF + 7:
+      ಸ್ಥಿತಿ ZREF + 8:
+      ಸ್ಥಿತಿ ZREF + 9:
+	buflen += vim_snprintf(buf + buflen, ಗಾತ್ರ(buf) - buflen, "ZREF%d", OP(op) - ZREF);
+	p = ಖಾಲಿ;
+	ನಿಲ್ಲಿಸು;
 # endif
-      case STAR:
+      ಸ್ಥಿತಿ ನಕ್ಷತ್ರ:
 	p = "STAR";
-	break;
-      case PLUS:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ PLUS:
 	p = "PLUS";
-	break;
-      case NOMATCH:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ NOMATCH:
 	p = "NOMATCH";
-	break;
-      case MATCH:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ ಹೊಂದಿಕೆ_2:
 	p = "MATCH";
-	break;
-      case BEHIND:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ BEHIND:
 	p = "BEHIND";
-	break;
-      case NOBEHIND:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ NOBEHIND:
 	p = "NOBEHIND";
-	break;
-      case SUBPAT:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ SUBPAT:
 	p = "SUBPAT";
-	break;
-      case BRACE_LIMITS:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ BRACE_LIMITS:
 	p = "BRACE_LIMITS";
-	break;
-      case BRACE_SIMPLE:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ BRACE_SIMPLE:
 	p = "BRACE_SIMPLE";
-	break;
-      case BRACE_COMPLEX + 0:
-      case BRACE_COMPLEX + 1:
-      case BRACE_COMPLEX + 2:
-      case BRACE_COMPLEX + 3:
-      case BRACE_COMPLEX + 4:
-      case BRACE_COMPLEX + 5:
-      case BRACE_COMPLEX + 6:
-      case BRACE_COMPLEX + 7:
-      case BRACE_COMPLEX + 8:
-      case BRACE_COMPLEX + 9:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "BRACE_COMPLEX%d", OP(op) - BRACE_COMPLEX);
-	p = NULL;
-	break;
-      case MULTIBYTECODE:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ BRACE_COMPLEX + 0:
+      ಸ್ಥಿತಿ BRACE_COMPLEX + 1:
+      ಸ್ಥಿತಿ BRACE_COMPLEX + 2:
+      ಸ್ಥಿತಿ BRACE_COMPLEX + 3:
+      ಸ್ಥಿತಿ BRACE_COMPLEX + 4:
+      ಸ್ಥಿತಿ BRACE_COMPLEX + 5:
+      ಸ್ಥಿತಿ BRACE_COMPLEX + 6:
+      ಸ್ಥಿತಿ BRACE_COMPLEX + 7:
+      ಸ್ಥಿತಿ BRACE_COMPLEX + 8:
+      ಸ್ಥಿತಿ BRACE_COMPLEX + 9:
+	buflen += vim_snprintf(buf + buflen, ಗಾತ್ರ(buf) - buflen, "BRACE_COMPLEX%d", OP(op) - BRACE_COMPLEX);
+	p = ಖಾಲಿ;
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ MULTIBYTECODE:
 	p = "MULTIBYTECODE";
-	break;
-      case NEWL:
+	ನಿಲ್ಲಿಸು;
+      ಸ್ಥಿತಿ NEWL:
 	p = "NEWL";
-	break;
-      default:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "corrupt %d", OP(op));
-	p = NULL;
-	break;
+	ನಿಲ್ಲಿಸು;
+      ಪೂರ್ವನಿಯೋಜಿತ:
+	buflen += vim_snprintf(buf + buflen, ಗಾತ್ರ(buf) - buflen, "corrupt %d", OP(op));
+	p = ಖಾಲಿ;
+	ನಿಲ್ಲಿಸು;
     }
-    if (p != NULL)
-	vim_strncpy((char_u *)buf + buflen, (char_u *)p, sizeof(buf) - buflen - 1);
-    return (char_u *)buf;
+    ಆದರೆ (p != ಖಾಲಿ)
+	vim_strncpy((char_u *)buf + buflen, (char_u *)p, ಗಾತ್ರ(buf) - buflen - 1);
+    ಹಿಂತಿರುಗಿ (char_u *)buf;
 }
-#endif	    // DEBUG
+#ಆದರೆ_ಅಂತ್ಯ	    // DEBUG

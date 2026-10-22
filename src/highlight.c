@@ -11,14 +11,14 @@
  * Highlighting stuff.
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-#define SG_TERM		1	// term has been set
-#define SG_CTERM	2	// cterm has been set
-#define SG_GUI		4	// gui has been set
-#define SG_LINK		8	// link has been set
+#ವ್ಯಾಖ್ಯಾನಿಸು SG_ಪದ		1	// term has been set
+#ವ್ಯಾಖ್ಯಾನಿಸು SG_CTERM	2	// cterm has been set
+#ವ್ಯಾಖ್ಯಾನಿಸು SG_GUI		4	// gui has been set
+#ವ್ಯಾಖ್ಯಾನಿಸು SG_LINK		8	// link has been set
 
-#define MAX_SYN_NAME	200
+#ವ್ಯಾಖ್ಯಾನಿಸು MAX_SYN_NAME	200
 
 /*
  * The "term", "cterm" and "gui" arguments can be any combination of the
@@ -26,25 +26,25 @@
  */
 // must be sorted by the 'value' field because it is used by bsearch()!
 // note: inverse and reverse use the same key
-static keyvalue_T highlight_tab[] = {
-    KEYVALUE_ENTRY(HL_BOLD, "bold"),			    // index 0
-    KEYVALUE_ENTRY(HL_INVERSE, "inverse"),		    // index 1
-    KEYVALUE_ENTRY(HL_ITALIC, "italic"),		    // index 2
-    KEYVALUE_ENTRY(HL_NOCOMBINE, "nocombine"),		    // index 3
-    KEYVALUE_ENTRY(HL_NORMAL, "NONE"),			    // index 4
-    KEYVALUE_ENTRY(HL_INVERSE, "reverse"),		    // index 5
-    KEYVALUE_ENTRY(HL_STANDOUT, "standout"),		    // index 6
-    KEYVALUE_ENTRY(HL_STRIKETHROUGH, "strikethrough"),	    // index 7
-    KEYVALUE_ENTRY(HL_UNDERCURL, "undercurl"),		    // index 8
-    KEYVALUE_ENTRY(HL_UNDERDASHED, "underdashed"),	    // index 9
-    KEYVALUE_ENTRY(HL_UNDERDOTTED, "underdotted"),	    // index 10
-    KEYVALUE_ENTRY(HL_UNDERDOUBLE, "underdouble"),	    // index 11
-    KEYVALUE_ENTRY(HL_UNDERLINE, "underline")		    // index 12
+ಸ್ಥಿರ keyvalue_T highlight_tab[] = {
+    KEYVALUE_ನಮೂದು(HL_BOLD, "bold"),			    // index 0
+    KEYVALUE_ನಮೂದು(HL_INVERSE, "inverse"),		    // index 1
+    KEYVALUE_ನಮೂದು(HL_ITALIC, "italic"),		    // index 2
+    KEYVALUE_ನಮೂದು(HL_NOCOMBINE, "nocombine"),		    // index 3
+    KEYVALUE_ನಮೂದು(HL_ಸಾಮಾನ್ಯ, "NONE"),			    // index 4
+    KEYVALUE_ನಮೂದು(HL_INVERSE, "reverse"),		    // index 5
+    KEYVALUE_ನಮೂದು(HL_STANDOUT, "standout"),		    // index 6
+    KEYVALUE_ನಮೂದು(HL_STRIKETHROUGH, "strikethrough"),	    // index 7
+    KEYVALUE_ನಮೂದು(HL_UNDERCURL, "undercurl"),		    // index 8
+    KEYVALUE_ನಮೂದು(HL_UNDERDASHED, "underdashed"),	    // index 9
+    KEYVALUE_ನಮೂದು(HL_UNDERDOTTED, "underdotted"),	    // index 10
+    KEYVALUE_ನಮೂದು(HL_UNDERDOUBLE, "underdouble"),	    // index 11
+    KEYVALUE_ನಮೂದು(HL_UNDERLINE, "underline")		    // index 12
 };
 
 // this table is used to display highlight names in the "correct" sequence.
 // keep this in sync with highlight_tab[].
-static keyvalue_T *highlight_index_tab[] = {
+ಸ್ಥಿರ keyvalue_T *highlight_ಸೂಚ್ಯಂಕ_tab[] = {
     &highlight_tab[0],					    // HL_BOLD
     &highlight_tab[6],					    // HL_STANDOUT
     &highlight_tab[12],					    // HL_UNDERLINE
@@ -61,11 +61,11 @@ static keyvalue_T *highlight_index_tab[] = {
 };
 
 // length of all attribute names, plus commas, together (and a bit more)
-#define MAX_ATTR_LEN 120
+#ವ್ಯಾಖ್ಯಾನಿಸು MAX_ATTR_LEN 120
 
-#define ATTR_COMBINE(attr_a, attr_b) ((((attr_b) & HL_NOCOMBINE) ? (attr_b) : (attr_a)) | (attr_b))
+#ವ್ಯಾಖ್ಯಾನಿಸು ATTR_COMBINE(attr_a, attr_b) ((((attr_b) & HL_NOCOMBINE) ? (attr_b) : (attr_a)) | (attr_b))
 
-enum {
+ಎಣಿಕೆ {
     BLACK = 0,
     DARKBLUE,
     DARKGREEN,
@@ -74,7 +74,7 @@ enum {
     DARKMAGENTA,
     BROWN,
     DARKYELLOW,
-    GRAY,
+    ಬೂದು,
     GREY,
     LIGHTGRAY,
     LIGHTGREY,
@@ -97,35 +97,35 @@ enum {
 };
 
 // must be sorted by the 'value' field because it is used by bsearch()!
-static keyvalue_T color_name_tab[] = {
-    KEYVALUE_ENTRY(BLACK, "Black"),
-    KEYVALUE_ENTRY(BLUE, "Blue"),
-    KEYVALUE_ENTRY(BROWN, "Brown"),
-    KEYVALUE_ENTRY(CYAN, "Cyan"),
-    KEYVALUE_ENTRY(DARKBLUE, "DarkBlue"),
-    KEYVALUE_ENTRY(DARKCYAN, "DarkCyan"),
-    KEYVALUE_ENTRY(DARKGRAY, "DarkGray"),
-    KEYVALUE_ENTRY(DARKGREEN, "DarkGreen"),
-    KEYVALUE_ENTRY(DARKGREY, "DarkGrey"),
-    KEYVALUE_ENTRY(DARKMAGENTA, "DarkMagenta"),
-    KEYVALUE_ENTRY(DARKRED, "DarkRed"),
-    KEYVALUE_ENTRY(DARKYELLOW, "DarkYellow"),
-    KEYVALUE_ENTRY(GRAY, "Gray"),
-    KEYVALUE_ENTRY(GREEN, "Green"),
-    KEYVALUE_ENTRY(GREY, "Grey"),
-    KEYVALUE_ENTRY(LIGHTBLUE, "LightBlue"),
-    KEYVALUE_ENTRY(LIGHTCYAN, "LightCyan"),
-    KEYVALUE_ENTRY(LIGHTGRAY, "LightGray"),
-    KEYVALUE_ENTRY(LIGHTGREEN, "LightGreen"),
-    KEYVALUE_ENTRY(LIGHTGREY, "LightGrey"),
-    KEYVALUE_ENTRY(LIGHTMAGENTA, "LightMagenta"),
-    KEYVALUE_ENTRY(LIGHTRED, "LightRed"),
-    KEYVALUE_ENTRY(LIGHTYELLOW, "LightYellow"),
-    KEYVALUE_ENTRY(MAGENTA, "Magenta"),
-    KEYVALUE_ENTRY(NONE, "NONE"),
-    KEYVALUE_ENTRY(RED, "Red"),
-    KEYVALUE_ENTRY(WHITE, "White"),
-    KEYVALUE_ENTRY(YELLOW, "Yellow")
+ಸ್ಥಿರ keyvalue_T color_name_tab[] = {
+    KEYVALUE_ನಮೂದು(BLACK, "Black"),
+    KEYVALUE_ನಮೂದು(BLUE, "Blue"),
+    KEYVALUE_ನಮೂದು(BROWN, "Brown"),
+    KEYVALUE_ನಮೂದು(CYAN, "Cyan"),
+    KEYVALUE_ನಮೂದು(DARKBLUE, "DarkBlue"),
+    KEYVALUE_ನಮೂದು(DARKCYAN, "DarkCyan"),
+    KEYVALUE_ನಮೂದು(DARKGRAY, "DarkGray"),
+    KEYVALUE_ನಮೂದು(DARKGREEN, "DarkGreen"),
+    KEYVALUE_ನಮೂದು(DARKGREY, "DarkGrey"),
+    KEYVALUE_ನಮೂದು(DARKMAGENTA, "DarkMagenta"),
+    KEYVALUE_ನಮೂದು(DARKRED, "DarkRed"),
+    KEYVALUE_ನಮೂದು(DARKYELLOW, "DarkYellow"),
+    KEYVALUE_ನಮೂದು(ಬೂದು, "Gray"),
+    KEYVALUE_ನಮೂದು(GREEN, "Green"),
+    KEYVALUE_ನಮೂದು(GREY, "Grey"),
+    KEYVALUE_ನಮೂದು(LIGHTBLUE, "LightBlue"),
+    KEYVALUE_ನಮೂದು(LIGHTCYAN, "LightCyan"),
+    KEYVALUE_ನಮೂದು(LIGHTGRAY, "LightGray"),
+    KEYVALUE_ನಮೂದು(LIGHTGREEN, "LightGreen"),
+    KEYVALUE_ನಮೂದು(LIGHTGREY, "LightGrey"),
+    KEYVALUE_ನಮೂದು(LIGHTMAGENTA, "LightMagenta"),
+    KEYVALUE_ನಮೂದು(LIGHTRED, "LightRed"),
+    KEYVALUE_ನಮೂದು(LIGHTYELLOW, "LightYellow"),
+    KEYVALUE_ನಮೂದು(MAGENTA, "Magenta"),
+    KEYVALUE_ನಮೂದು(NONE, "NONE"),
+    KEYVALUE_ನಮೂದು(RED, "Red"),
+    KEYVALUE_ನಮೂದು(WHITE, "White"),
+    KEYVALUE_ನಮೂದು(YELLOW, "Yellow")
 };
 
 /*
@@ -133,117 +133,117 @@ static keyvalue_T color_name_tab[] = {
  * The ID of a highlight group is also called group ID.  It is the index in
  * the highlight_ga array PLUS ONE.
  */
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
     char_u	*sg_name;	// highlight group name
     char_u	*sg_name_u;	// uppercase of sg_name
-    int		sg_cleared;	// "hi clear" was used
+    ಪೂರ್ಣಾಂಕ		sg_cleared;	// "hi clear" was used
 // for normal terminals
-    int		sg_term;	// "term=" highlighting attributes
-    char_u	*sg_start;	// terminal string for start highl
+    ಪೂರ್ಣಾಂಕ		sg_ಪದ;	// "term=" highlighting attributes
+    char_u	*sg_ಆರಂಭ;	// terminal string for start highl
     char_u	*sg_stop;	// terminal string for stop highl
-    int		sg_term_attr;	// Screen attr for term mode
+    ಪೂರ್ಣಾಂಕ		sg_ಪದ_attr;	// Screen attr for term mode
 // for color terminals
-    int		sg_cterm;	// "cterm=" highlighting attr
-    int		sg_cterm_bold;	// bold attr was set for light color
-    int		sg_cterm_fg;	// terminal fg color number + 1
-    int		sg_cterm_bg;	// terminal bg color number + 1
-    int		sg_cterm_ul;	// terminal ul color number + 1
-    int		sg_cterm_attr;	// Screen attr for color term mode
-    int		sg_cterm_font;	// terminal alternative font (0 for normal)
+    ಪೂರ್ಣಾಂಕ		sg_cterm;	// "cterm=" highlighting attr
+    ಪೂರ್ಣಾಂಕ		sg_cterm_bold;	// bold attr was set for light color
+    ಪೂರ್ಣಾಂಕ		sg_cterm_fg;	// terminal fg color number + 1
+    ಪೂರ್ಣಾಂಕ		sg_cterm_bg;	// terminal bg color number + 1
+    ಪೂರ್ಣಾಂಕ		sg_cterm_ul;	// terminal ul color number + 1
+    ಪೂರ್ಣಾಂಕ		sg_cterm_attr;	// Screen attr for color term mode
+    ಪೂರ್ಣಾಂಕ		sg_cterm_font;	// terminal alternative font (0 for normal)
 // for when using the GUI
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#ಆದರೆ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     guicolor_T	sg_gui_fg;	// GUI foreground color handle
     guicolor_T	sg_gui_bg;	// GUI background color handle
     guicolor_T	sg_gui_sp;	// GUI special color handle
-#endif
-#ifdef FEAT_GUI
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
     GuiFont	sg_font;	// GUI font handle
 # ifdef FEAT_XFONTSET
     GuiFontset	sg_fontset;	// GUI fontset handle
 # endif
     char_u	*sg_font_name;  // GUI font or fontset name
-    int		sg_gui_attr;    // Screen attr for GUI mode
-#endif
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
+    ಪೂರ್ಣಾಂಕ		sg_gui_attr;    // Screen attr for GUI mode
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(FEAT_GUI) || defined(FEAT_EVAL)
 // Store the sp color name for the GUI or synIDattr()
-    int		sg_gui;		// "gui=" highlighting attributes
+    ಪೂರ್ಣಾಂಕ		sg_gui;		// "gui=" highlighting attributes
     char_u	*sg_gui_fg_name;// GUI foreground color name
     char_u	*sg_gui_bg_name;// GUI background color name
     char_u	*sg_gui_sp_name;// GUI special color name
-#endif
-    int		sg_link;	// link to this highlight group ID
-    int		sg_deflink;	// default link; restored in highlight_clear()
-    int		sg_set;		// combination of SG_* flags
-#ifdef FEAT_EVAL
+#ಆದರೆ_ಅಂತ್ಯ
+    ಪೂರ್ಣಾಂಕ		sg_link;	// link to this highlight group ID
+    ಪೂರ್ಣಾಂಕ		sg_deflink;	// default link; restored in highlight_clear()
+    ಪೂರ್ಣಾಂಕ		sg_ಗಣ;		// combination of SG_* flags
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     sctx_T	sg_deflink_sctx;  // script where the default link was set
     sctx_T	sg_script_ctx;	// script in which the group was last set
-#endif
-} hl_group_T;
+#ಆದರೆ_ಅಂತ್ಯ
+} hl_ಗುಂಪು_T;
 
-typedef struct hl_overrides_S hl_overrides_T;
-struct hl_overrides_S
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ hl_overrides_S hl_overrides_T;
+ರಚನೆ hl_overrides_S
 {
     hl_override_T   *arr;   // May be NULL if "arr" was freed or no highlight
 			    // overrides (all values set to default)
-    int		    len;
-    hl_overrides_T  *next;  // Used to handle recursive calls
+    ಪೂರ್ಣಾಂಕ		    len;
+    hl_overrides_T  *ಮುಂದಿನ;  // Used to handle recursive calls
 
-    int attr[HLF_COUNT];    // highlight_attr[] before being updated.
+    ಪೂರ್ಣಾಂಕ attr[HLF_ಎಣಿಕೆ];    // highlight_attr[] before being updated.
 };
 
-static hl_overrides_T *overrides = NULL;
+ಸ್ಥಿರ hl_overrides_T *overrides = ಖಾಲಿ;
 
 // Synced with highlight_attr, each is the highlight group id for each attr. If
 // an element is 0, then there is no attr for it. If an element is -1, then it
 // means it was set to itself.
-static int highlight_ids[HLF_COUNT];
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ highlight_ids[HLF_ಎಣಿಕೆ];
 
 // Same as highlight_attr[] but is not modified by highlight group overrides
-static int highlight_attr_raw[HLF_COUNT];
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ highlight_attr_raw[HLF_ಎಣಿಕೆ];
 
-static int hl_flags[HLF_COUNT] = HL_FLAGS;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ hl_flags[HLF_ಎಣಿಕೆ] = HL_FLAGS;
 
 // highlight groups for 'highlight' option
-static garray_T highlight_ga;
-#define HL_TABLE()	((hl_group_T *)((highlight_ga.ga_data)))
+ಸ್ಥಿರ garray_T highlight_ga;
+#ವ್ಯಾಖ್ಯಾನಿಸು HL_ಕೋಷ್ಟಕ()	((hl_ಗುಂಪು_T *)((highlight_ga.ga_ದತ್ತಾಂಶ)))
 
 // Wrapper struct for hashtable entries: stores the highlight group ID alongside
 // the uppercase name used as a hash key.  Uses the same offsetof pattern as
 // signgroup_T / HI2SG.
-typedef struct {
-    int		hn_id;		// highlight group ID (1-based)
-    char_u	hn_key[1];	// uppercase name (stretchable array)
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+    ಪೂರ್ಣಾಂಕ		hn_id;		// highlight group ID (1-based)
+    char_u	hn_ಕೀಲಿ[1];	// uppercase name (stretchable array)
 } hlname_T;
 
-#define HLNAME_KEY_OFF	offsetof(hlname_T, hn_key)
-#define HI2HLNAME(hi)	((hlname_T *)((hi)->hi_key - HLNAME_KEY_OFF))
+#ವ್ಯಾಖ್ಯಾನಿಸು HLNAME_ಕೀಲಿ_OFF	offsetof(hlname_T, hn_ಕೀಲಿ)
+#ವ್ಯಾಖ್ಯಾನಿಸು HI2HLNAME(hi)	((hlname_T *)((hi)->hi_ಕೀಲಿ - HLNAME_ಕೀಲಿ_OFF))
 
 // hashtable for quick highlight group name lookup
-static hashtab_T highlight_ht;
-static bool	 highlight_ht_inited = false;
+ಸ್ಥಿರ hashtab_T highlight_ht;
+ಸ್ಥಿರ bool	 highlight_ht_inited = false;
 
 /*
  * An attribute number is the index in attr_table plus ATTR_OFF.
  */
-#define ATTR_OFF (HL_ALL + 1)
+#ವ್ಯಾಖ್ಯಾನಿಸು ATTR_OFF (HL_ALL + 1)
 
-static void syn_unadd_group(void);
-static void set_hl_attr(int idx);
-static void highlight_list_one(int id);
-static int highlight_list_arg(int id, int didh, int type, int iarg, char_u *sarg, char *name);
-static int syn_add_group(char_u *name);
-static int syn_name2id_len(char_u *name, int len);
-static int hl_has_settings(int idx, int check_link);
-static void highlight_clear(int idx);
+ಸ್ಥಿರ ಶೂನ್ಯ syn_unadd_ಗುಂಪು(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಶೂನ್ಯ ಗಣ_hl_attr(ಪೂರ್ಣಾಂಕ idx);
+ಸ್ಥಿರ ಶೂನ್ಯ highlight_list_one(ಪೂರ್ಣಾಂಕ id);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ highlight_list_arg(ಪೂರ್ಣಾಂಕ id, ಪೂರ್ಣಾಂಕ didh, ಪೂರ್ಣಾಂಕ type, ಪೂರ್ಣಾಂಕ iarg, char_u *sarg, ಅಕ್ಷರ *name);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ syn_ಕೂಡಿಸು_ಗುಂಪು(char_u *name);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ syn_name2id_len(char_u *name, ಪೂರ್ಣಾಂಕ len);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ hl_has_settings(ಪೂರ್ಣಾಂಕ idx, ಪೂರ್ಣಾಂಕ check_link);
+ಸ್ಥಿರ ಶೂನ್ಯ highlight_clear(ಪೂರ್ಣಾಂಕ idx);
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-static void gui_do_one_color(int idx, int do_menu, int do_tooltip);
-#endif
-#ifdef FEAT_GUI
-static int  set_group_colors(char_u *name, guicolor_T *fgp, guicolor_T *bgp, int do_menu, int use_norm, int do_tooltip);
-static void hl_do_font(int idx, char_u *arg, int do_normal, int do_menu, int do_tooltip, int free_font);
-#endif
+#ಆದರೆ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+ಸ್ಥಿರ ಶೂನ್ಯ gui_do_one_color(ಪೂರ್ಣಾಂಕ idx, ಪೂರ್ಣಾಂಕ do_menu, ಪೂರ್ಣಾಂಕ do_tooltip);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ  ಗಣ_ಗುಂಪು_colors(char_u *name, guicolor_T *fgp, guicolor_T *bgp, ಪೂರ್ಣಾಂಕ do_menu, ಪೂರ್ಣಾಂಕ use_norm, ಪೂರ್ಣಾಂಕ do_tooltip);
+ಸ್ಥಿರ ಶೂನ್ಯ hl_do_font(ಪೂರ್ಣಾಂಕ idx, char_u *arg, ಪೂರ್ಣಾಂಕ do_ಸಾಮಾನ್ಯ, ಪೂರ್ಣಾಂಕ do_menu, ಪೂರ್ಣಾಂಕ do_tooltip, ಪೂರ್ಣಾಂಕ free_font);
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * The default highlight groups.  These are compiled-in for fast startup and
@@ -252,12 +252,12 @@ static void hl_do_font(int idx, char_u *arg, int do_normal, int do_menu, int do_
  * The #ifdefs are needed to reduce the amount of static data.  Helps to make
  * the 16 bit DOS (museum) version compile.
  */
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_GUI) || defined(FEAT_EVAL)
 # define CENT(a, b) b
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 # define CENT(a, b) a
-#endif
-static char *(highlight_init_both[]) = {
+#ಆದರೆ_ಅಂತ್ಯ
+ಸ್ಥಿರ ಅಕ್ಷರ *(highlight_init_both[]) = {
     CENT("ErrorMsg term=standout ctermbg=DarkRed ctermfg=White",
 	 "ErrorMsg term=standout ctermbg=DarkRed ctermfg=White guibg=Red guifg=White"),
     CENT("IncSearch term=reverse,bold,underline cterm=reverse",
@@ -274,15 +274,15 @@ static char *(highlight_init_both[]) = {
     CENT("VertSplit term=reverse cterm=reverse",
 	 "VertSplit term=reverse cterm=reverse gui=reverse"),
     "default link VertSplitNC VertSplit",
-#ifdef FEAT_CLIPBOARD
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CLIPBOARD
     CENT("VisualNOS term=underline,bold cterm=underline,bold",
 	 "VisualNOS term=underline,bold cterm=underline,bold gui=underline,bold"),
-#endif
-#ifdef FEAT_DIFF
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
     CENT("DiffText term=reverse cterm=bold ctermbg=Red ctermfg=Black",
 	 "DiffText term=reverse cterm=bold ctermbg=Red ctermfg=Black gui=bold guibg=Red"),
     "default link DiffTextAdd DiffText",
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     CENT("PmenuSbar term=NONE ctermbg=Grey",
 	 "PmenuSbar term=NONE ctermbg=Grey guibg=Grey"),
     CENT("TabLineSel term=bold cterm=bold",
@@ -292,14 +292,14 @@ static char *(highlight_init_both[]) = {
     "default link TabPanel TabLine",
     "default link TabPanelSel TabLineSel",
     "default link TabPanelFill TabLineFill",
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
     "Cursor guibg=fg guifg=bg",
     "lCursor guibg=fg guifg=bg", // should be different, but what?
-#endif
-#ifdef FEAT_GUI_MSWIN
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_MSWIN
     "TitleBar guibg=bg guifg=fg",
     "TitleBarNC guibg=NONE guifg=NONE",
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     "default link QuickFixLine Search",
     "default link CursorLineSign SignColumn",
     "default link CursorLineFold FoldColumn",
@@ -319,11 +319,11 @@ static char *(highlight_init_both[]) = {
     "default link PopupNotification WarningMsg",
     "default link PreInsert Added",
     CENT("Normal cterm=NONE", "Normal gui=NONE"),
-    NULL
+    ಖಾಲಿ
 };
 
 // Default colors only used with a light background.
-static char *(highlight_init_light[]) = {
+ಸ್ಥಿರ ಅಕ್ಷರ *(highlight_init_light[]) = {
     CENT("Directory term=bold ctermfg=DarkBlue",
 	 "Directory term=bold ctermfg=DarkBlue guifg=Blue"),
     CENT("LineNr term=NONE ctermfg=Brown",
@@ -336,7 +336,7 @@ static char *(highlight_init_light[]) = {
 	 "Question term=standout ctermfg=DarkGreen gui=bold guifg=SeaGreen"),
     CENT("Search term=reverse ctermbg=Yellow ctermfg=NONE",
 	 "Search term=reverse ctermbg=Yellow ctermfg=NONE guibg=Yellow guifg=NONE"),
-#ifdef FEAT_SPELL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SPELL
     CENT("SpellBad term=reverse ctermbg=LightRed",
 	 "SpellBad term=reverse ctermbg=LightRed guisp=Red gui=undercurl"),
     CENT("SpellCap term=reverse ctermbg=LightBlue",
@@ -345,7 +345,7 @@ static char *(highlight_init_light[]) = {
 	 "SpellRare term=reverse ctermbg=LightMagenta guisp=Magenta gui=undercurl"),
     CENT("SpellLocal term=underline ctermbg=Cyan",
 	 "SpellLocal term=underline ctermbg=Cyan guisp=DarkCyan gui=undercurl"),
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     CENT("PmenuThumb term=reverse ctermbg=Black",
 	 "PmenuThumb term=reverse ctermbg=Black guibg=Black"),
     CENT("PmenuShadow term=NONE ctermbg=Black ctermfg=DarkGrey",
@@ -362,59 +362,59 @@ static char *(highlight_init_light[]) = {
 	 "WarningMsg term=standout ctermfg=DarkRed guifg=Red"),
     CENT("WildMenu term=underline ctermbg=Yellow ctermfg=Black",
 	 "WildMenu term=underline ctermbg=Yellow ctermfg=Black guibg=Yellow guifg=Black"),
-#ifdef FEAT_FOLDING
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_FOLDING
     CENT("Folded term=standout ctermbg=Grey ctermfg=DarkBlue",
 	 "Folded term=standout ctermbg=Grey ctermfg=DarkBlue guibg=LightGrey guifg=DarkBlue"),
     CENT("FoldColumn term=standout ctermbg=Grey ctermfg=DarkBlue",
 	 "FoldColumn term=standout ctermbg=Grey ctermfg=DarkBlue guibg=Grey guifg=DarkBlue"),
-#endif
-#ifdef FEAT_SIGNS
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SIGNS
     CENT("SignColumn term=standout ctermbg=Grey ctermfg=DarkBlue",
 	 "SignColumn term=standout ctermbg=Grey ctermfg=DarkBlue guibg=Grey guifg=DarkBlue"),
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     CENT("Visual ctermbg=Grey ctermfg=Black",
 	 "Visual ctermbg=Grey ctermfg=Black guibg=LightGrey guifg=Black"),
-#ifdef FEAT_DIFF
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
     CENT("DiffAdd term=bold ctermbg=LightBlue ctermfg=Black",
 	 "DiffAdd term=bold ctermbg=LightBlue ctermfg=Black guibg=LightBlue"),
     CENT("DiffChange term=bold ctermbg=LightMagenta ctermfg=Black",
 	 "DiffChange term=bold ctermbg=LightMagenta ctermfg=Black guibg=LightMagenta"),
     CENT("DiffDelete term=bold ctermfg=Blue ctermbg=LightCyan",
 	 "DiffDelete term=bold ctermfg=Blue ctermbg=LightCyan gui=bold guifg=Blue guibg=LightCyan"),
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     CENT("TabLine term=underline cterm=underline ctermfg=black ctermbg=LightGrey",
 	 "TabLine term=underline cterm=underline ctermfg=black ctermbg=LightGrey gui=underline guibg=LightGrey"),
-#ifdef FEAT_SYN_HL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
     CENT("CursorColumn term=reverse ctermbg=LightGrey",
 	 "CursorColumn term=reverse ctermbg=LightGrey guibg=Grey90"),
     CENT("CursorLine term=underline cterm=underline",
 	 "CursorLine term=underline cterm=underline guibg=Grey90"),
     CENT("ColorColumn term=reverse ctermbg=LightRed",
 	 "ColorColumn term=reverse ctermbg=LightRed guibg=LightRed"),
-#endif
-#ifdef FEAT_CONCEAL
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CONCEAL
     CENT("Conceal ctermbg=DarkGrey ctermfg=LightGrey",
 	 "Conceal ctermbg=DarkGrey ctermfg=LightGrey guibg=DarkGrey guifg=LightGrey"),
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     CENT("MatchParen term=reverse ctermbg=Cyan",
 	 "MatchParen term=reverse ctermbg=Cyan guibg=Cyan"),
-#ifdef FEAT_TERMINAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMINAL
     CENT("StatusLineTerm term=reverse,bold cterm=bold ctermfg=White ctermbg=DarkGreen",
 	 "StatusLineTerm term=reverse,bold cterm=bold ctermfg=White ctermbg=DarkGreen gui=bold guifg=bg guibg=DarkGreen"),
     CENT("StatusLineTermNC term=reverse ctermfg=White ctermbg=DarkGreen",
 	 "StatusLineTermNC term=reverse ctermfg=White ctermbg=DarkGreen guifg=bg guibg=DarkGreen"),
-#endif
-#ifdef FEAT_MENU
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MENU
     CENT("ToolbarLine term=underline ctermbg=LightGrey",
 	 "ToolbarLine term=underline ctermbg=LightGrey guibg=LightGrey"),
     CENT("ToolbarButton cterm=bold ctermfg=White ctermbg=DarkGrey",
 	 "ToolbarButton cterm=bold ctermfg=White ctermbg=DarkGrey gui=bold guifg=White guibg=Grey40"),
-#endif
-    NULL
+#ಆದರೆ_ಅಂತ್ಯ
+    ಖಾಲಿ
 };
 
 // Default colors only used with a dark background.
-static char *(highlight_init_dark[]) = {
+ಸ್ಥಿರ ಅಕ್ಷರ *(highlight_init_dark[]) = {
     CENT("Directory term=bold ctermfg=LightCyan",
 	 "Directory term=bold ctermfg=LightCyan guifg=Cyan"),
     CENT("LineNr term=NONE ctermfg=Yellow",
@@ -429,7 +429,7 @@ static char *(highlight_init_dark[]) = {
 	 "Search term=reverse ctermbg=Yellow ctermfg=Black guibg=Yellow guifg=Black"),
     CENT("SpecialKey term=NONE ctermfg=LightBlue",
 	 "SpecialKey term=NONE ctermfg=LightBlue guifg=Cyan"),
-#ifdef FEAT_SPELL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SPELL
     CENT("SpellBad term=reverse ctermbg=Red",
 	 "SpellBad term=reverse ctermbg=Red guisp=Red gui=undercurl"),
     CENT("SpellCap term=reverse ctermbg=Blue",
@@ -438,7 +438,7 @@ static char *(highlight_init_dark[]) = {
 	 "SpellRare term=reverse ctermbg=Magenta guisp=Magenta gui=undercurl"),
     CENT("SpellLocal term=underline ctermbg=Cyan",
 	 "SpellLocal term=underline ctermbg=Cyan guisp=Cyan gui=undercurl"),
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     CENT("PmenuThumb term=reverse ctermbg=White",
 	 "PmenuThumb term=reverse ctermbg=White guibg=White"),
     CENT("PmenuShadow term=NONE ctermbg=Black ctermfg=DarkGrey",
@@ -453,230 +453,230 @@ static char *(highlight_init_dark[]) = {
 	 "WarningMsg term=standout ctermfg=LightRed guifg=Red"),
     CENT("WildMenu term=underline ctermbg=Yellow ctermfg=Black",
 	 "WildMenu term=underline ctermbg=Yellow ctermfg=Black guibg=Yellow guifg=Black"),
-#ifdef FEAT_FOLDING
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_FOLDING
     CENT("Folded term=standout ctermbg=DarkGrey ctermfg=Cyan",
 	 "Folded term=standout ctermbg=DarkGrey ctermfg=Cyan guibg=DarkGrey guifg=Cyan"),
     CENT("FoldColumn term=standout ctermbg=DarkGrey ctermfg=Cyan",
 	 "FoldColumn term=standout ctermbg=DarkGrey ctermfg=Cyan guibg=Grey guifg=Cyan"),
-#endif
-#ifdef FEAT_SIGNS
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SIGNS
     CENT("SignColumn term=standout ctermbg=DarkGrey ctermfg=Cyan",
 	 "SignColumn term=standout ctermbg=DarkGrey ctermfg=Cyan guibg=Grey guifg=Cyan"),
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     CENT("Visual ctermbg=Grey ctermfg=Black",
 	 "Visual ctermbg=Grey ctermfg=Black guibg=#575757 guifg=LightGrey"),
-#ifdef FEAT_DIFF
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
     CENT("DiffAdd term=bold ctermbg=DarkBlue",
 	 "DiffAdd term=bold ctermbg=DarkBlue guibg=DarkBlue"),
     CENT("DiffChange term=bold ctermbg=DarkMagenta",
 	 "DiffChange term=bold ctermbg=DarkMagenta guibg=DarkMagenta"),
     CENT("DiffDelete term=bold ctermfg=Blue ctermbg=DarkCyan",
 	 "DiffDelete term=bold ctermfg=Blue ctermbg=DarkCyan gui=bold guifg=Blue guibg=DarkCyan"),
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     CENT("TabLine term=underline cterm=underline ctermfg=white ctermbg=DarkGrey",
 	 "TabLine term=underline cterm=underline ctermfg=white ctermbg=DarkGrey gui=underline guibg=DarkGrey"),
-#ifdef FEAT_SYN_HL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
     CENT("CursorColumn term=reverse ctermbg=DarkGrey",
 	 "CursorColumn term=reverse ctermbg=DarkGrey guibg=Grey40"),
     CENT("CursorLine term=underline cterm=underline",
 	 "CursorLine term=underline cterm=underline guibg=Grey40"),
     CENT("ColorColumn term=reverse ctermbg=DarkRed",
 	 "ColorColumn term=reverse ctermbg=DarkRed guibg=DarkRed"),
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     CENT("MatchParen term=reverse ctermbg=DarkCyan",
 	 "MatchParen term=reverse ctermbg=DarkCyan guibg=DarkCyan"),
-#ifdef FEAT_CONCEAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CONCEAL
     CENT("Conceal ctermbg=DarkGrey ctermfg=LightGrey",
 	 "Conceal ctermbg=DarkGrey ctermfg=LightGrey guibg=DarkGrey guifg=LightGrey"),
-#endif
-#ifdef FEAT_TERMINAL
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMINAL
     CENT("StatusLineTerm term=reverse,bold cterm=bold ctermfg=Black ctermbg=LightGreen",
 	 "StatusLineTerm term=reverse,bold cterm=bold ctermfg=Black ctermbg=LightGreen gui=bold guifg=bg guibg=LightGreen"),
     CENT("StatusLineTermNC term=reverse ctermfg=Black ctermbg=LightGreen",
 	 "StatusLineTermNC term=reverse ctermfg=Black ctermbg=LightGreen guifg=bg guibg=LightGreen"),
-#endif
-#ifdef FEAT_MENU
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MENU
     CENT("ToolbarLine term=underline ctermbg=DarkGrey",
 	 "ToolbarLine term=underline ctermbg=DarkGrey guibg=Grey50"),
     CENT("ToolbarButton cterm=bold ctermfg=Black ctermbg=LightGrey",
 	 "ToolbarButton cterm=bold ctermfg=Black ctermbg=LightGrey gui=bold guifg=Black guibg=LightGrey"),
-#endif
-    NULL
+#ಆದರೆ_ಅಂತ್ಯ
+    ಖಾಲಿ
 };
 
-#if defined(FEAT_SYN_HL)
+#ಆದರೆ defined(FEAT_SYN_HL)
 /*
  * Returns the number of highlight groups.
  */
-    int
-highlight_num_groups(void)
+    ಪೂರ್ಣಾಂಕ
+highlight_ಅಂಕೆ_groups(ಶೂನ್ಯ)
 {
-    return highlight_ga.ga_len;
+    ಹಿಂತಿರುಗಿ highlight_ga.ga_len;
 }
 
 /*
  * Returns the name of a highlight group.
  */
     char_u *
-highlight_group_name(int id)
+highlight_ಗುಂಪು_name(ಪೂರ್ಣಾಂಕ id)
 {
-    return HL_TABLE()[id].sg_name;
+    ಹಿಂತಿರುಗಿ HL_ಕೋಷ್ಟಕ()[id].sg_name;
 }
 
 /*
  * Returns the ID of the link to a highlight group.
  */
-    int
-highlight_link_id(int id)
+    ಪೂರ್ಣಾಂಕ
+highlight_link_id(ಪೂರ್ಣಾಂಕ id)
 {
-    return HL_TABLE()[id].sg_link;
+    ಹಿಂತಿರುಗಿ HL_ಕೋಷ್ಟಕ()[id].sg_link;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-static void resolve_fallback_fg_to_rgb(void);
-static void resolve_fallback_bg_to_rgb(void);
+ಸ್ಥಿರ ಶೂನ್ಯ resolve_fallback_fg_ಗಮ್ಯ_rgb(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಶೂನ್ಯ resolve_fallback_bg_ಗಮ್ಯ_rgb(ಶೂನ್ಯ);
 
-    void
+    ಶೂನ್ಯ
 init_highlight(
-    int		both,	    // include groups where 'bg' doesn't matter
-    int		reset)	    // clear group first
+    ಪೂರ್ಣಾಂಕ		both,	    // include groups where 'bg' doesn't matter
+    ಪೂರ್ಣಾಂಕ		reset)	    // clear group first
 {
-    int		i;
-    char	**pp;
-    static int	had_both = FALSE;
-#ifdef FEAT_EVAL
+    ಪೂರ್ಣಾಂಕ		i;
+    ಅಕ್ಷರ	**pp;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	had_both = FALSE;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     char_u	*p;
 
     // Try finding the color scheme file.  Used when a color file was loaded
     // and 'background' or 't_Co' is changed.
-    p = get_var_value((char_u *)"g:colors_name");
-    if (p != NULL)
+    p = get_var_ಮೌಲ್ಯ((char_u *)"g:colors_name");
+    ಆದರೆ (p != ಖಾಲಿ)
     {
 	// The value of g:colors_name could be freed when sourcing the script,
 	// making "p" invalid, so copy it.
 	char_u *copy_p = vim_strsave(p);
-	int    r;
+	ಪೂರ್ಣಾಂಕ    r;
 
-	if (copy_p != NULL)
+	ಆದರೆ (copy_p != ಖಾಲಿ)
 	{
-	    r = load_colors(copy_p);
+	    r = ತುಂಬು_colors(copy_p);
 	    vim_free(copy_p);
-	    if (r == OK)
-		return;
+	    ಆದರೆ (r == OK)
+		ಹಿಂತಿರುಗಿ;
 	}
     }
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Didn't use a color file, use the compiled-in colors.
-    if (both)
+    ಆದರೆ (both)
     {
 	had_both = TRUE;
 	pp = highlight_init_both;
-	for (i = 0; pp[i] != NULL; ++i)
+	ಗಾಗಿ (i = 0; pp[i] != ಖಾಲಿ; ++i)
 	    do_highlight((char_u *)pp[i], reset, TRUE);
     }
-    else if (!had_both)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!had_both)
 	// Don't do anything before the call with both == TRUE from main().
 	// Not everything has been setup then, and that call will overrule
 	// everything anyway.
-	return;
+	ಹಿಂತಿರುಗಿ;
 
-    if (*p_bg == 'l')
+    ಆದರೆ (*p_bg == 'l')
 	pp = highlight_init_light;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	pp = highlight_init_dark;
-    for (i = 0; pp[i] != NULL; ++i)
+    ಗಾಗಿ (i = 0; pp[i] != ಖಾಲಿ; ++i)
 	do_highlight((char_u *)pp[i], reset, TRUE);
 
     // Reverse looks ugly, but grey may not work for less than 8 colors.  Thus
     // let it depend on the number of colors available.
-    if (t_colors < 8)
+    ಆದರೆ (t_colors < 8)
 	do_highlight((char_u *)"Visual term=reverse cterm=reverse ctermbg=NONE ctermfg=NONE",
 		FALSE, TRUE);
     // With 8 colors brown is equal to yellow, need to use black for Search fg
     // to avoid Statement highlighted text disappears.
     // Clear the attributes, needed when changing the t_Co value.
-    if (t_colors <= 8)
+    ಆದರೆ (t_colors <= 8)
     {
-	if (*p_bg == 'l')
+	ಆದರೆ (*p_bg == 'l')
 	    do_highlight((char_u *)"Search ctermfg=black", FALSE, TRUE);
     }
 
-#ifdef FEAT_SYN_HL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
     // If syntax highlighting is enabled load the highlighting for it.
-    if (get_var_value((char_u *)"g:syntax_on") != NULL)
+    ಆದರೆ (get_var_ಮೌಲ್ಯ((char_u *)"g:syntax_on") != ಖಾಲಿ)
     {
-	static int	recursive = 0;
+	ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	recursive = 0;
 
-	if (recursive >= 5)
+	ಆದರೆ (recursive >= 5)
 	    emsg(_(e_recursive_loop_loading_syncolor_vim));
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    ++recursive;
-	    (void)source_runtime((char_u *)"syntax/syncolor.vim", DIP_ALL);
+	    (ಶೂನ್ಯ)ಮೂಲ_runtime((char_u *)"syntax/syncolor.vim", DIP_ALL);
 	    --recursive;
 	}
     }
-#endif
-    resolve_fallback_fg_to_rgb();
-    resolve_fallback_bg_to_rgb();
+#ಆದರೆ_ಅಂತ್ಯ
+    resolve_fallback_fg_ಗಮ್ಯ_rgb();
+    resolve_fallback_bg_ಗಮ್ಯ_rgb();
 }
 
-#if defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
+#ಆದರೆ defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
 /*
  * Load a default color list. Intended to support legacy color names but allows
  * the user to override the color values. Only loaded once.
  */
-    static void
-load_default_colors_lists(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ತುಂಬು_default_colors_lists(ಶೂನ್ಯ)
 {
     // Lacking a default color list isn't the end of the world but it is likely
     // an inconvenience so users should know when it is missing.
-    if (source_runtime((char_u *)"colors/lists/default.vim", DIP_ALL) != OK)
-	msg("failed to load colors/lists/default.vim");
+    ಆದರೆ (ಮೂಲ_runtime((char_u *)"colors/lists/default.vim", DIP_ALL) != OK)
+	ಸಂದೇಶ("failed to load colors/lists/default.vim");
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Load color file "name".
  * Return OK for success, FAIL for failure.
  */
-    int
-load_colors(char_u *name)
+    ಪೂರ್ಣಾಂಕ
+ತುಂಬು_colors(char_u *name)
 {
     char_u	*buf;
-    int		retval = FAIL;
-    static int	recursive = FALSE;
+    ಪೂರ್ಣಾಂಕ		retval = FAIL;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	recursive = FALSE;
 
     // When being called recursively, this is probably because setting
     // 'background' caused the highlighting to be reloaded.  This means it is
     // working, thus we should return OK.
-    if (recursive)
-	return OK;
+    ಆದರೆ (recursive)
+	ಹಿಂತಿರುಗಿ OK;
 
     recursive = TRUE;
     buf = alloc(STRLEN(name) + 12);
-    if (buf != NULL)
+    ಆದರೆ (buf != ಖಾಲಿ)
     {
-#if defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
-	load_default_colors_lists();
-#endif
+#ಆದರೆ defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
+	ತುಂಬು_default_colors_lists();
+#ಆದರೆ_ಅಂತ್ಯ
 	apply_autocmds(EVENT_COLORSCHEMEPRE, name,
 					       curbuf->b_fname, FALSE, curbuf);
-	sprintf((char *)buf, "colors/%s.vim", name);
-	retval = source_runtime(buf, DIP_START + DIP_OPT);
+	sprintf((ಅಕ್ಷರ *)buf, "colors/%s.vim", name);
+	retval = ಮೂಲ_runtime(buf, DIP_ಆರಂಭ + DIP_OPT);
 	vim_free(buf);
-	if (retval == OK)
+	ಆದರೆ (retval == OK)
 	    apply_autocmds(EVENT_COLORSCHEME, name, curbuf->b_fname,
 								FALSE, curbuf);
     }
     recursive = FALSE;
 
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
-static int color_numbers_16[28] = {0, 1, 2, 3,
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ color_numbers_16[28] = {0, 1, 2, 3,
 				 4, 5, 6, 6,
 				 7, 7, 7, 7,
 				 8, 8,
@@ -684,7 +684,7 @@ static int color_numbers_16[28] = {0, 1, 2, 3,
 				 11, 11, 12, 12, 13,
 				 13, 14, 14, 15, -1};
 // for xterm with 88 colors...
-static int color_numbers_88[28] = {0, 4, 2, 6,
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ color_numbers_88[28] = {0, 4, 2, 6,
 				 1, 5, 32, 72,
 				 84, 84, 7, 7,
 				 82, 82,
@@ -692,7 +692,7 @@ static int color_numbers_88[28] = {0, 4, 2, 6,
 				 14, 63, 9, 74, 13,
 				 75, 11, 78, 15, -1};
 // for xterm with 256 colors...
-static int color_numbers_256[28] = {0, 4, 2, 6,
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ color_numbers_256[28] = {0, 4, 2, 6,
 				 1, 5, 130, 3,
 				 248, 248, 7, 7,
 				 242, 242,
@@ -700,7 +700,7 @@ static int color_numbers_256[28] = {0, 4, 2, 6,
 				 14, 159, 9, 224, 13,
 				 225, 11, 229, 15, -1};
 // for terminals with less than 16 colors...
-static int color_numbers_8[28] = {0, 4, 2, 6,
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ color_numbers_8[28] = {0, 4, 2, 6,
 				 1, 5, 3, 3,
 				 7, 7, 7, 7,
 				 0+8, 0+8,
@@ -714,65 +714,65 @@ static int color_numbers_8[28] = {0, 4, 2, 6,
  * "boldp" will be set to TRUE or FALSE for a foreground color when using 8
  * colors, otherwise it will be unchanged.
  */
-    static int
-lookup_color(int idx, int foreground, int *boldp)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+lookup_color(ಪೂರ್ಣಾಂಕ idx, ಪೂರ್ಣಾಂಕ foreground, ಪೂರ್ಣಾಂಕ *boldp)
 {
-    int		color = color_numbers_16[idx];
+    ಪೂರ್ಣಾಂಕ		color = color_numbers_16[idx];
     char_u	*p;
 
     // Use the _16 table to check if it's a valid color name.
-    if (color < 0)
-	return -1;
+    ಆದರೆ (color < 0)
+	ಹಿಂತಿರುಗಿ -1;
 
-    if (t_colors == 8)
+    ಆದರೆ (t_colors == 8)
     {
 	// t_Co is 8: use the 8 colors table
-#if defined(__QNXNTO__)
+#ಆದರೆ defined(__QNXNTO__)
 	// On qnx, the 8 & 16 color arrays are the same
-	if (STRNCMP(T_NAME, "qansi", 5) == 0)
+	ಆದರೆ (STRNCMP(T_NAME, "qansi", 5) == 0)
 	    color = color_numbers_16[idx];
-	else
-#endif
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 	    color = color_numbers_8[idx];
-	if (foreground)
+	ಆದರೆ (foreground)
 	{
 	    // set/reset bold attribute to get light foreground
 	    // colors (on some terminals, e.g. "linux")
-	    if (color & 8)
+	    ಆದರೆ (color & 8)
 		*boldp = TRUE;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		*boldp = FALSE;
 	}
 	color &= 7;	// truncate to 8 colors
     }
-    else if (t_colors == 16 || t_colors == 88
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (t_colors == 16 || t_colors == 88
 					   || t_colors >= 256)
     {
 	// Guess: if the termcap entry ends in 'm', it is
 	// probably an xterm-like terminal.  Use the changed
 	// order for colors.
-	if (*T_CAF != NUL)
+	ಆದರೆ (*T_CAF != NUL)
 	    p = T_CAF;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    p = T_CSF;
-	if (*p != NUL && (t_colors > 256
+	ಆದರೆ (*p != NUL && (t_colors > 256
 			      || *(p + STRLEN(p) - 1) == 'm'))
 	{
-	    if (t_colors == 88)
+	    ಆದರೆ (t_colors == 88)
 		color = color_numbers_88[idx];
-	    else if (t_colors >= 256)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (t_colors >= 256)
 		color = color_numbers_256[idx];
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		color = color_numbers_8[idx];
 	}
-#ifdef FEAT_TERMRESPONSE
-	if (t_colors >= 256 && color == 15 && is_mac_terminal)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMRESPONSE
+	ಆದರೆ (t_colors >= 256 && color == 15 && is_mac_terminal)
 	    // Terminal.app has a bug: 15 is light grey. Use white
 	    // from the color cube instead.
 	    color = 231;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
-    return color;
+    ಹಿಂತಿರುಗಿ color;
 }
 
 /*
@@ -781,67 +781,67 @@ lookup_color(int idx, int foreground, int *boldp)
  * 'forceit' is set to TRUE for ":highlight! link"
  * 'init' is set to TRUE when initializing all the highlight groups.
  */
-    static void
-highlight_group_link(
+    ಸ್ಥಿರ ಶೂನ್ಯ
+highlight_ಗುಂಪು_link(
 	char_u	*from_hg,
-	int	from_len,
-	char_u	*to_hg,
-	int	to_len,
-	int	dodefault,
-	int	forceit,
-	int	init)
+	ಪೂರ್ಣಾಂಕ	from_len,
+	char_u	*ಗಮ್ಯ_hg,
+	ಪೂರ್ಣಾಂಕ	ಗಮ್ಯ_len,
+	ಪೂರ್ಣಾಂಕ	dodefault,
+	ಪೂರ್ಣಾಂಕ	forceit,
+	ಪೂರ್ಣಾಂಕ	init)
 {
-    int		from_id;
-    int		to_id;
-    hl_group_T	*hlgroup = NULL;
+    ಪೂರ್ಣಾಂಕ		from_id;
+    ಪೂರ್ಣಾಂಕ		ಗಮ್ಯ_id;
+    hl_ಗುಂಪು_T	*hlgroup = ಖಾಲಿ;
 
-    from_id = syn_check_group(from_hg, from_len);
-    if (STRNCMP(to_hg, "NONE", 4) == 0)
-	to_id = 0;
-    else
-	to_id = syn_check_group(to_hg, to_len);
+    from_id = syn_check_ಗುಂಪು(from_hg, from_len);
+    ಆದರೆ (STRNCMP(ಗಮ್ಯ_hg, "NONE", 4) == 0)
+	ಗಮ್ಯ_id = 0;
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಗಮ್ಯ_id = syn_check_ಗುಂಪು(ಗಮ್ಯ_hg, ಗಮ್ಯ_len);
 
-    if (from_id > 0)
+    ಆದರೆ (from_id > 0)
     {
-	hlgroup = &HL_TABLE()[from_id - 1];
-	if (dodefault && (forceit || hlgroup->sg_deflink == 0))
+	hlgroup = &HL_ಕೋಷ್ಟಕ()[from_id - 1];
+	ಆದರೆ (dodefault && (forceit || hlgroup->sg_deflink == 0))
 	{
-	    hlgroup->sg_deflink = to_id;
-#ifdef FEAT_EVAL
+	    hlgroup->sg_deflink = ಗಮ್ಯ_id;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 	    hlgroup->sg_deflink_sctx = current_sctx;
 	    hlgroup->sg_deflink_sctx.sc_lnum += SOURCING_LNUM;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	}
     }
 
-    if (from_id > 0 && (!init || hlgroup->sg_set == 0))
+    ಆದರೆ (from_id > 0 && (!init || hlgroup->sg_ಗಣ == 0))
     {
 	// Don't allow a link when there already is some highlighting
 	// for the group, unless '!' is used
-	if (to_id > 0 && !forceit && !init
+	ಆದರೆ (ಗಮ್ಯ_id > 0 && !forceit && !init
 		&& hl_has_settings(from_id - 1, dodefault))
 	{
-	    if (SOURCING_NAME == NULL && !dodefault)
-		emsg(_(e_group_has_settings_highlight_link_ignored));
+	    ಆದರೆ (SOURCING_NAME == ಖಾಲಿ && !dodefault)
+		emsg(_(e_ಗುಂಪು_has_settings_highlight_link_ignored));
 	}
-	else if (hlgroup->sg_link != to_id
-#ifdef FEAT_EVAL
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (hlgroup->sg_link != ಗಮ್ಯ_id
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 		|| hlgroup->sg_script_ctx.sc_sid != current_sctx.sc_sid
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		|| hlgroup->sg_cleared)
 	{
-	    if (!init)
-		hlgroup->sg_set |= SG_LINK;
-	    hlgroup->sg_link = to_id;
-#ifdef FEAT_EVAL
+	    ಆದರೆ (!init)
+		hlgroup->sg_ಗಣ |= SG_LINK;
+	    hlgroup->sg_link = ಗಮ್ಯ_id;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 	    hlgroup->sg_script_ctx = current_sctx;
 	    hlgroup->sg_script_ctx.sc_lnum += SOURCING_LNUM;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    hlgroup->sg_cleared = FALSE;
 	    redraw_all_later(UPD_SOME_VALID);
 
 	    // Only call highlight_changed() once after multiple changes.
-	    need_highlight_changed = TRUE;
+	    need_highlight_ಬದಲಾಯಿತು = TRUE;
 	}
     }
 
@@ -851,32 +851,32 @@ highlight_group_link(
  * Reset all highlighting to the defaults. Removes all highlighting for the
  * groups added by the user.
  */
-    static void
-highlight_reset_all(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+highlight_reset_all(ಶೂನ್ಯ)
 {
-    int		idx;
+    ಪೂರ್ಣಾಂಕ		idx;
 
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
     // First, we do not destroy the old values, but allocate the new
     // ones and update the display. THEN we destroy the old values.
     // If we destroy the old values first, then the old values
     // (such as GuiFont's or GuiFontset's) will still be displayed but
     // invalid because they were free'd.
-    if (gui.in_use)
+    ಆದರೆ (gui.ಒಳ_use)
     {
 # ifdef FEAT_BEVAL_TIP
 	gui_init_tooltip_font();
 # endif
-# if defined(FEAT_MENU) && defined(FEAT_GUI_MOTIF)
+# ಆದರೆ defined(FEAT_MENU) && defined(FEAT_GUI_MOTIF)
 	gui_init_menu_font();
 # endif
     }
-# if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_X11)
+# ಆದರೆ defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_X11)
     gui_mch_def_colors();
 # endif
 # ifdef FEAT_GUI_MSWIN
-    if (gui.in_use)
-	gui_mch_set_titlebar_colors();
+    ಆದರೆ (gui.ಒಳ_use)
+	gui_mch_ಗಣ_titlebar_colors();
 # endif
 # ifdef FEAT_GUI_X11
 #  ifdef FEAT_MENU
@@ -885,7 +885,7 @@ highlight_reset_all(void)
     // group defined by default, which IS currently the case.
     gui_mch_new_menu_colors();
 #  endif
-    if (gui.in_use)
+    ಆದರೆ (gui.ಒಳ_use)
     {
 	gui_new_scrollbar_colors();
 #  ifdef FEAT_BEVAL_GUI
@@ -900,22 +900,22 @@ highlight_reset_all(void)
     // Ok, we're done allocating the new default graphics items.
     // The screen should already be refreshed at this point.
     // It is now Ok to clear out the old data.
-#endif
-#ifdef FEAT_EVAL
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     do_unlet((char_u *)"g:colors_name", TRUE);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     restore_cterm_colors();
 
     // Clear all default highlight groups and load the defaults.
-    for (idx = 0; idx < highlight_ga.ga_len; ++idx)
+    ಗಾಗಿ (idx = 0; idx < highlight_ga.ga_len; ++idx)
 	highlight_clear(idx);
     init_highlight(TRUE, TRUE);
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    if (USE_24BIT)
+#ಆದರೆ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    ಆದರೆ (USE_24_ಬಿಟ್)
 	highlight_gui_started();
-    else
-#endif
-	highlight_changed();
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	highlight_ಬದಲಾಯಿತು();
     redraw_later_clear();
 }
 
@@ -927,214 +927,214 @@ highlight_reset_all(void)
  * 'init' is set to TRUE when initializing all the highlight groups.
  * Returns TRUE if the attributes are set.
  */
-    static int
-highlight_set_termgui_attr(int idx, char_u *key, char_u *arg, int init)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+highlight_ಗಣ_termgui_attr(ಪೂರ್ಣಾಂಕ idx, char_u *ಕೀಲಿ, char_u *arg, ಪೂರ್ಣಾಂಕ init)
 {
-    int		attr;
+    ಪೂರ್ಣಾಂಕ		attr;
     size_t	off;
-    keyvalue_T	target;
-    keyvalue_T	*entry;
+    keyvalue_T	ಗುರಿ;
+    keyvalue_T	*ನಮೂದು;
 
     attr = 0;
     off = 0;
-    target.key = 0;
-    target.value.length = 0;	// not used, see cmp_keyvalue_value_ni()
-    while (arg[off] != NUL)
+    ಗುರಿ.ಕೀಲಿ = 0;
+    ಗುರಿ.ಮೌಲ್ಯ.ಉದ್ದಳತೆ = 0;	// not used, see cmp_keyvalue_value_ni()
+    ಆಗ (arg[off] != NUL)
     {
-	target.value.string = arg + off;
-	entry = (keyvalue_T *)bsearch(&target, &highlight_tab,
-		ARRAY_LENGTH(highlight_tab), sizeof(highlight_tab[0]),
-		cmp_keyvalue_value_ni);
-	if (entry == NULL)
+	ಗುರಿ.ಮೌಲ್ಯ.string = arg + off;
+	ನಮೂದು = (keyvalue_T *)bsearch(&ಗುರಿ, &highlight_tab,
+		ARRAY_ಉದ್ದಳತೆ(highlight_tab), ಗಾತ್ರ(highlight_tab[0]),
+		cmp_keyvalue_ಮೌಲ್ಯ_ni);
+	ಆದರೆ (ನಮೂದು == ಖಾಲಿ)
 	{
-	    semsg(_(e_illegal_value_str), arg);
-	    return FALSE;
+	    semsg(_(e_illegal_ಮೌಲ್ಯ_str), arg);
+	    ಹಿಂತಿರುಗಿ FALSE;
 	}
 
-	attr |= entry->key;
-	off += entry->value.length;
-	if (arg[off] == ',')		// another one follows
+	attr |= ನಮೂದು->ಕೀಲಿ;
+	off += ನಮೂದು->ಮೌಲ್ಯ.ಉದ್ದಳತೆ;
+	ಆದರೆ (arg[off] == ',')		// another one follows
 	    ++off;
     }
-    if (*key == 'T')
+    ಆದರೆ (*ಕೀಲಿ == 'T')
     {
-	if (!init || !(HL_TABLE()[idx].sg_set & SG_TERM))
+	ಆದರೆ (!init || !(HL_ಕೋಷ್ಟಕ()[idx].sg_ಗಣ & SG_ಪದ))
 	{
-	    if (!init)
-		HL_TABLE()[idx].sg_set |= SG_TERM;
-	    HL_TABLE()[idx].sg_term = attr;
+	    ಆದರೆ (!init)
+		HL_ಕೋಷ್ಟಕ()[idx].sg_ಗಣ |= SG_ಪದ;
+	    HL_ಕೋಷ್ಟಕ()[idx].sg_ಪದ = attr;
 	}
     }
-    else if (*key == 'C')
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*ಕೀಲಿ == 'C')
     {
-	if (!init || !(HL_TABLE()[idx].sg_set & SG_CTERM))
+	ಆದರೆ (!init || !(HL_ಕೋಷ್ಟಕ()[idx].sg_ಗಣ & SG_CTERM))
 	{
-	    if (!init)
-		HL_TABLE()[idx].sg_set |= SG_CTERM;
-	    HL_TABLE()[idx].sg_cterm = attr;
-	    HL_TABLE()[idx].sg_cterm_bold = FALSE;
+	    ಆದರೆ (!init)
+		HL_ಕೋಷ್ಟಕ()[idx].sg_ಗಣ |= SG_CTERM;
+	    HL_ಕೋಷ್ಟಕ()[idx].sg_cterm = attr;
+	    HL_ಕೋಷ್ಟಕ()[idx].sg_cterm_bold = FALSE;
 	}
     }
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
-    else
+#ಆದರೆ defined(FEAT_GUI) || defined(FEAT_EVAL)
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (!init || !(HL_TABLE()[idx].sg_set & SG_GUI))
+	ಆದರೆ (!init || !(HL_ಕೋಷ್ಟಕ()[idx].sg_ಗಣ & SG_GUI))
 	{
-	    if (!init)
-		HL_TABLE()[idx].sg_set |= SG_GUI;
-	    HL_TABLE()[idx].sg_gui = attr;
+	    ಆದರೆ (!init)
+		HL_ಕೋಷ್ಟಕ()[idx].sg_ಗಣ |= SG_GUI;
+	    HL_ಕೋಷ್ಟಕ()[idx].sg_gui = attr;
 	}
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 /*
  * Set the font for the highlight group at 'idx'.
  * 'arg' is the font name.
  * Returns TRUE if the font is changed.
  */
-    static int
-highlight_set_font(
-	int	idx,
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+highlight_ಗಣ_font(
+	ಪೂರ್ಣಾಂಕ	idx,
 	char_u	*arg,
-	int	is_normal_group,
-	int	is_menu_group,
-	int	is_tooltip_group)
+	ಪೂರ್ಣಾಂಕ	is_ಸಾಮಾನ್ಯ_ಗುಂಪು,
+	ಪೂರ್ಣಾಂಕ	is_menu_ಗುಂಪು,
+	ಪೂರ್ಣಾಂಕ	is_tooltip_ಗುಂಪು)
 {
-    int		did_change = FALSE;
+    ಪೂರ್ಣಾಂಕ		did_change = FALSE;
 
     // in non-GUI fonts are simply ignored
-    if (HL_TABLE()[idx].sg_font_name != NULL
-	    && STRCMP(HL_TABLE()[idx].sg_font_name, arg) == 0)
+    ಆದರೆ (HL_ಕೋಷ್ಟಕ()[idx].sg_font_name != ಖಾಲಿ
+	    && STRCMP(HL_ಕೋಷ್ಟಕ()[idx].sg_font_name, arg) == 0)
     {
 	// Font name didn't change, ignore.
     }
-    else if (!gui.shell_created)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!gui.shell_created)
     {
 	// GUI not started yet, always accept the name.
-	vim_free(HL_TABLE()[idx].sg_font_name);
-	HL_TABLE()[idx].sg_font_name = vim_strsave(arg);
+	vim_free(HL_ಕೋಷ್ಟಕ()[idx].sg_font_name);
+	HL_ಕೋಷ್ಟಕ()[idx].sg_font_name = vim_strsave(arg);
 	did_change = TRUE;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	GuiFont temp_sg_font = HL_TABLE()[idx].sg_font;
+	GuiFont ತಾತ್ಕಾಲಿಕ_sg_font = HL_ಕೋಷ್ಟಕ()[idx].sg_font;
 # ifdef FEAT_XFONTSET
-	GuiFontset temp_sg_fontset = HL_TABLE()[idx].sg_fontset;
+	GuiFontset ತಾತ್ಕಾಲಿಕ_sg_fontset = HL_ಕೋಷ್ಟಕ()[idx].sg_fontset;
 # endif
 	// First, save the current font/fontset.
 	// Then try to allocate the font/fontset.
 	// If the allocation fails, HL_TABLE()[idx].sg_font OR
 	// sg_fontset will be set to NOFONT or NOFONTSET respectively.
 
-	HL_TABLE()[idx].sg_font = NOFONT;
+	HL_ಕೋಷ್ಟಕ()[idx].sg_font = NOFONT;
 # ifdef FEAT_XFONTSET
-	HL_TABLE()[idx].sg_fontset = NOFONTSET;
+	HL_ಕೋಷ್ಟಕ()[idx].sg_fontset = NOFONTSET;
 # endif
-	hl_do_font(idx, arg, is_normal_group, is_menu_group,
-		is_tooltip_group, FALSE);
+	hl_do_font(idx, arg, is_ಸಾಮಾನ್ಯ_ಗುಂಪು, is_menu_ಗುಂಪು,
+		is_tooltip_ಗುಂಪು, FALSE);
 
 # ifdef FEAT_XFONTSET
-	if (HL_TABLE()[idx].sg_fontset != NOFONTSET)
+	ಆದರೆ (HL_ಕೋಷ್ಟಕ()[idx].sg_fontset != NOFONTSET)
 	{
 	    // New fontset was accepted. Free the old one, if there
 	    // was one.
-	    gui_mch_free_fontset(temp_sg_fontset);
+	    gui_mch_free_fontset(ತಾತ್ಕಾಲಿಕ_sg_fontset);
 	    did_change = TRUE;
 	}
-	else
-	    HL_TABLE()[idx].sg_fontset = temp_sg_fontset;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    HL_ಕೋಷ್ಟಕ()[idx].sg_fontset = ತಾತ್ಕಾಲಿಕ_sg_fontset;
 # endif
-	if (HL_TABLE()[idx].sg_font != NOFONT)
+	ಆದರೆ (HL_ಕೋಷ್ಟಕ()[idx].sg_font != NOFONT)
 	{
 	    // New font was accepted. Free the old one, if there was
 	    // one.
-	    gui_mch_free_font(temp_sg_font);
+	    gui_mch_free_font(ತಾತ್ಕಾಲಿಕ_sg_font);
 	    did_change = TRUE;
 	}
-	else
-	    HL_TABLE()[idx].sg_font = temp_sg_font;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    HL_ಕೋಷ್ಟಕ()[idx].sg_font = ತಾತ್ಕಾಲಿಕ_sg_font;
 	// Update sg_font_name once here, after both font and fontset results
 	// are known.
-	if (did_change)
+	ಆದರೆ (did_change)
 	{
-	    vim_free(HL_TABLE()[idx].sg_font_name);
-	    HL_TABLE()[idx].sg_font_name = vim_strsave(arg);
+	    vim_free(HL_ಕೋಷ್ಟಕ()[idx].sg_font_name);
+	    HL_ಕೋಷ್ಟಕ()[idx].sg_font_name = vim_strsave(arg);
 	}
     }
 
-    return did_change;
+    ಹಿಂತಿರುಗಿ did_change;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Set the cterm foreground color for the Normal highlight group to "color" and
  * the bold attribute to "bold".
  */
-    static void
-hl_set_ctermfg_normal_group(int color, int bold)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+hl_ಗಣ_ctermfg_ಸಾಮಾನ್ಯ_ಗುಂಪು(ಪೂರ್ಣಾಂಕ color, ಪೂರ್ಣಾಂಕ bold)
 {
-    cterm_normal_fg_color = color + 1;
-    cterm_normal_fg_bold = bold;
-#ifdef FEAT_GUI
+    cterm_ಸಾಮಾನ್ಯ_fg_color = color + 1;
+    cterm_ಸಾಮಾನ್ಯ_fg_bold = bold;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
     // Don't do this if the GUI is used.
-    if (!gui.in_use && !gui.starting)
-#endif
+    ಆದರೆ (!gui.ಒಳ_use && !gui.starting)
+#ಆದರೆ_ಅಂತ್ಯ
     {
-	set_must_redraw(UPD_CLEAR);
-	if (termcap_active && color >= 0)
-	    term_fg_color(color);
+	ಗಣ_must_redraw(UPD_CLEAR);
+	ಆದರೆ (termcap_ಸಕ್ರಿಯ && color >= 0)
+	    ಪದ_fg_color(color);
     }
 }
 
 /*
  * Set the cterm foreground color for the highlight group at 'idx' to 'color'.
  */
-    static void
-highlight_set_ctermfg(int idx, int color, int is_normal_group)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+highlight_ಗಣ_ctermfg(ಪೂರ್ಣಾಂಕ idx, ಪೂರ್ಣಾಂಕ color, ಪೂರ್ಣಾಂಕ is_ಸಾಮಾನ್ಯ_ಗುಂಪು)
 {
-    HL_TABLE()[idx].sg_cterm_fg = color + 1;
-    if (is_normal_group)
-	hl_set_ctermfg_normal_group(color,
-					(HL_TABLE()[idx].sg_cterm & HL_BOLD));
+    HL_ಕೋಷ್ಟಕ()[idx].sg_cterm_fg = color + 1;
+    ಆದರೆ (is_ಸಾಮಾನ್ಯ_ಗುಂಪು)
+	hl_ಗಣ_ctermfg_ಸಾಮಾನ್ಯ_ಗುಂಪು(color,
+					(HL_ಕೋಷ್ಟಕ()[idx].sg_cterm & HL_BOLD));
 }
 
 /*
  * Set the cterm background color for the Normal highlight group to "color".
  */
-    static void
-hl_set_ctermbg_normal_group(int color)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+hl_ಗಣ_ctermbg_ಸಾಮಾನ್ಯ_ಗುಂಪು(ಪೂರ್ಣಾಂಕ color)
 {
-    cterm_normal_bg_color = color + 1;
-#ifdef FEAT_GUI
+    cterm_ಸಾಮಾನ್ಯ_bg_color = color + 1;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
     // Don't mess with 'background' if the GUI is used.
-    if (!gui.in_use && !gui.starting)
-#endif
+    ಆದರೆ (!gui.ಒಳ_use && !gui.starting)
+#ಆದರೆ_ಅಂತ್ಯ
     {
-	set_must_redraw(UPD_CLEAR);
-	if (color >= 0)
+	ಗಣ_must_redraw(UPD_CLEAR);
+	ಆದರೆ (color >= 0)
 	{
-	    int dark = -1;
+	    ಪೂರ್ಣಾಂಕ dark = -1;
 
-	    if (termcap_active)
-		term_bg_color(color);
-	    if (t_colors < 16)
+	    ಆದರೆ (termcap_ಸಕ್ರಿಯ)
+		ಪದ_bg_color(color);
+	    ಆದರೆ (t_colors < 16)
 		dark = (color == 0 || color == 4);
 	    // Limit the heuristic to the standard 16 colors
-	    else if (color < 16)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (color < 16)
 		dark = (color < 7 || color == 8);
 	    // Set the 'background' option if the value is
 	    // wrong.
-	    if (dark != -1
+	    ಆದರೆ (dark != -1
 		    && dark != (*p_bg == 'd')
-		    && !option_was_set((char_u *)"bg"))
+		    && !option_was_ಗಣ((char_u *)"bg"))
 	    {
-		set_option_value_give_err((char_u *)"bg",
+		ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"bg",
 			0L, (char_u *)(dark ? "dark" : "light"), 0);
-		reset_option_was_set((char_u *)"bg");
+		reset_option_was_ಗಣ((char_u *)"bg");
 	    }
 	}
     }
@@ -1143,41 +1143,41 @@ hl_set_ctermbg_normal_group(int color)
 /*
  * Set the cterm background color for the highlight group at 'idx' to 'color'.
  */
-    static void
-highlight_set_ctermbg(int idx, int color, int is_normal_group)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+highlight_ಗಣ_ctermbg(ಪೂರ್ಣಾಂಕ idx, ಪೂರ್ಣಾಂಕ color, ಪೂರ್ಣಾಂಕ is_ಸಾಮಾನ್ಯ_ಗುಂಪು)
 {
-    HL_TABLE()[idx].sg_cterm_bg = color + 1;
-    if (is_normal_group)
-	hl_set_ctermbg_normal_group(color);
+    HL_ಕೋಷ್ಟಕ()[idx].sg_cterm_bg = color + 1;
+    ಆದರೆ (is_ಸಾಮಾನ್ಯ_ಗುಂಪು)
+	hl_ಗಣ_ctermbg_ಸಾಮಾನ್ಯ_ಗುಂಪು(color);
 }
 
 /*
  * Set the cterm underline color for the Normal highlight group to "color".
  */
-    static void
-hl_set_ctermul_normal_group(int color)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+hl_ಗಣ_ctermul_ಸಾಮಾನ್ಯ_ಗುಂಪು(ಪೂರ್ಣಾಂಕ color)
 {
-    cterm_normal_ul_color = color + 1;
-#ifdef FEAT_GUI
+    cterm_ಸಾಮಾನ್ಯ_ul_color = color + 1;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
     // Don't do this if the GUI is used.
-    if (!gui.in_use && !gui.starting)
-#endif
+    ಆದರೆ (!gui.ಒಳ_use && !gui.starting)
+#ಆದರೆ_ಅಂತ್ಯ
     {
-	set_must_redraw(UPD_CLEAR);
-	if (termcap_active && color >= 0)
-	    term_ul_color(color);
+	ಗಣ_must_redraw(UPD_CLEAR);
+	ಆದರೆ (termcap_ಸಕ್ರಿಯ && color >= 0)
+	    ಪದ_ul_color(color);
     }
 }
 
 /*
  * Set the cterm underline color for the highlight group at 'idx' to 'color'.
  */
-    static void
-highlight_set_ctermul(int idx, int color, int is_normal_group)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+highlight_ಗಣ_ctermul(ಪೂರ್ಣಾಂಕ idx, ಪೂರ್ಣಾಂಕ color, ಪೂರ್ಣಾಂಕ is_ಸಾಮಾನ್ಯ_ಗುಂಪು)
 {
-    HL_TABLE()[idx].sg_cterm_ul = color + 1;
-    if (is_normal_group)
-	hl_set_ctermul_normal_group(color);
+    HL_ಕೋಷ್ಟಕ()[idx].sg_cterm_ul = color + 1;
+    ಆದರೆ (is_ಸಾಮಾನ್ಯ_ಗುಂಪು)
+	hl_ಗಣ_ctermul_ಸಾಮಾನ್ಯ_ಗುಂಪು(color);
 }
 
 /*
@@ -1188,29 +1188,29 @@ highlight_set_ctermul(int idx, int color, int is_normal_group)
  *
  * Returns TRUE if the font is set.
  */
-    static int
-highlight_set_cterm_font(
-	int	idx,
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+highlight_ಗಣ_cterm_font(
+	ಪೂರ್ಣಾಂಕ	idx,
 	char_u	*arg,
-	int	init)
+	ಪೂರ್ಣಾಂಕ	init)
 {
-    int		font;
+    ಪೂರ್ಣಾಂಕ		font;
 
-    if (init && (HL_TABLE()[idx].sg_set & SG_CTERM))
-	return FALSE;
+    ಆದರೆ (init && (HL_ಕೋಷ್ಟಕ()[idx].sg_ಗಣ & SG_CTERM))
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    if (!init)
-	HL_TABLE()[idx].sg_set |= SG_CTERM;
+    ಆದರೆ (!init)
+	HL_ಕೋಷ್ಟಕ()[idx].sg_ಗಣ |= SG_CTERM;
 
-    if (VIM_ISDIGIT(*arg))
-	font = atoi((char *)arg);
-    else if (STRICMP(arg, "NONE") == 0)
+    ಆದರೆ (VIM_ISDIGIT(*arg))
+	font = atoi((ಅಕ್ಷರ *)arg);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRICMP(arg, "NONE") == 0)
 	font = -1;
-    else
-	return FALSE;
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    HL_TABLE()[idx].sg_cterm_font = font + 1;
-    return TRUE;
+    HL_ಕೋಷ್ಟಕ()[idx].sg_cterm_font = font + 1;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
@@ -1224,178 +1224,178 @@ highlight_set_cterm_font(
  *
  * Returns TRUE if the color is set.
  */
-    static int
-highlight_set_cterm_color(
-	int	idx,
-	char_u	*key,
-	char_u	*key_start,
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+highlight_ಗಣ_cterm_color(
+	ಪೂರ್ಣಾಂಕ	idx,
+	char_u	*ಕೀಲಿ,
+	char_u	*ಕೀಲಿ_ಆರಂಭ,
 	char_u	*arg,
-	int	is_normal_group,
-	int	init)
+	ಪೂರ್ಣಾಂಕ	is_ಸಾಮಾನ್ಯ_ಗುಂಪು,
+	ಪೂರ್ಣಾಂಕ	init)
 {
-    int		color;
+    ಪೂರ್ಣಾಂಕ		color;
 
-    if (init && (HL_TABLE()[idx].sg_set & SG_CTERM))
-	return FALSE;
+    ಆದರೆ (init && (HL_ಕೋಷ್ಟಕ()[idx].sg_ಗಣ & SG_CTERM))
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    if (!init)
-	HL_TABLE()[idx].sg_set |= SG_CTERM;
+    ಆದರೆ (!init)
+	HL_ಕೋಷ್ಟಕ()[idx].sg_ಗಣ |= SG_CTERM;
 
     // When setting the foreground color, and previously the "bold"
     // flag was set for a light color, reset it now
-    if (key[5] == 'F' && HL_TABLE()[idx].sg_cterm_bold)
+    ಆದರೆ (ಕೀಲಿ[5] == 'F' && HL_ಕೋಷ್ಟಕ()[idx].sg_cterm_bold)
     {
-	HL_TABLE()[idx].sg_cterm &= ~HL_BOLD;
-	HL_TABLE()[idx].sg_cterm_bold = FALSE;
+	HL_ಕೋಷ್ಟಕ()[idx].sg_cterm &= ~HL_BOLD;
+	HL_ಕೋಷ್ಟಕ()[idx].sg_cterm_bold = FALSE;
     }
 
-    if (VIM_ISDIGIT(*arg))
-	color = atoi((char *)arg);
-    else if (STRICMP(arg, "fg") == 0)
+    ಆದರೆ (VIM_ISDIGIT(*arg))
+	color = atoi((ಅಕ್ಷರ *)arg);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRICMP(arg, "fg") == 0)
     {
-	if (cterm_normal_fg_color)
-	    color = cterm_normal_fg_color - 1;
-	else
+	ಆದರೆ (cterm_ಸಾಮಾನ್ಯ_fg_color)
+	    color = cterm_ಸಾಮಾನ್ಯ_fg_color - 1;
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    emsg(_(e_fg_color_unknown));
-	    return FALSE;
+	    ಹಿಂತಿರುಗಿ FALSE;
 	}
     }
-    else if (STRICMP(arg, "bg") == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRICMP(arg, "bg") == 0)
     {
-	if (cterm_normal_bg_color > 0)
-	    color = cterm_normal_bg_color - 1;
-	else
+	ಆದರೆ (cterm_ಸಾಮಾನ್ಯ_bg_color > 0)
+	    color = cterm_ಸಾಮಾನ್ಯ_bg_color - 1;
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    emsg(_(e_bg_color_unknown));
-	    return FALSE;
+	    ಹಿಂತಿರುಗಿ FALSE;
 	}
     }
-    else if (STRICMP(arg, "ul") == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRICMP(arg, "ul") == 0)
     {
-	if (cterm_normal_ul_color > 0)
-	    color = cterm_normal_ul_color - 1;
-	else
+	ಆದರೆ (cterm_ಸಾಮಾನ್ಯ_ul_color > 0)
+	    color = cterm_ಸಾಮಾನ್ಯ_ul_color - 1;
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    emsg(_(e_ul_color_unknown));
-	    return FALSE;
+	    ಹಿಂತಿರುಗಿ FALSE;
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	int bold = MAYBE;
-	keyvalue_T target;
-	keyvalue_T *entry;
+	ಪೂರ್ಣಾಂಕ bold = MAYBE;
+	keyvalue_T ಗುರಿ;
+	keyvalue_T *ನಮೂದು;
 
-	target.key = 0;
-	target.value.string = arg;
-	target.value.length = 0;	// not used, see cmp_keyvalue_value_i()
-	entry = (keyvalue_T *)bsearch(&target, &color_name_tab,
-		ARRAY_LENGTH(color_name_tab), sizeof(color_name_tab[0]),
-		cmp_keyvalue_value_i);
-	if (entry == NULL)
+	ಗುರಿ.ಕೀಲಿ = 0;
+	ಗುರಿ.ಮೌಲ್ಯ.string = arg;
+	ಗುರಿ.ಮೌಲ್ಯ.ಉದ್ದಳತೆ = 0;	// not used, see cmp_keyvalue_value_i()
+	ನಮೂದು = (keyvalue_T *)bsearch(&ಗುರಿ, &color_name_tab,
+		ARRAY_ಉದ್ದಳತೆ(color_name_tab), ಗಾತ್ರ(color_name_tab[0]),
+		cmp_keyvalue_ಮೌಲ್ಯ_i);
+	ಆದರೆ (ನಮೂದು == ಖಾಲಿ)
 	{
-	    semsg(_(e_color_name_or_number_not_recognized_str), key_start);
-	    return FALSE;
+	    semsg(_(e_color_name_or_ಸಂಖ್ಯೆ_not_recognized_str), ಕೀಲಿ_ಆರಂಭ);
+	    ಹಿಂತಿರುಗಿ FALSE;
 	}
 
-	color = lookup_color(entry->key, key[5] == 'F', &bold);
+	color = lookup_color(ನಮೂದು->ಕೀಲಿ, ಕೀಲಿ[5] == 'F', &bold);
 
 	// set/reset bold attribute to get light foreground
 	// colors (on some terminals, e.g. "linux")
-	if (bold == TRUE)
+	ಆದರೆ (bold == TRUE)
 	{
-	    HL_TABLE()[idx].sg_cterm |= HL_BOLD;
-	    HL_TABLE()[idx].sg_cterm_bold = TRUE;
+	    HL_ಕೋಷ್ಟಕ()[idx].sg_cterm |= HL_BOLD;
+	    HL_ಕೋಷ್ಟಕ()[idx].sg_cterm_bold = TRUE;
 	}
-	else if (bold == FALSE)
-	    HL_TABLE()[idx].sg_cterm &= ~HL_BOLD;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (bold == FALSE)
+	    HL_ಕೋಷ್ಟಕ()[idx].sg_cterm &= ~HL_BOLD;
     }
 
     // Add one to the argument, to avoid zero.  Zero is used for
     // "NONE", then "color" is -1.
-    if (key[5] == 'F')
-	highlight_set_ctermfg(idx, color, is_normal_group);
-    else if (key[5] == 'B')
-	highlight_set_ctermbg(idx, color, is_normal_group);
-    else // ctermul
-	highlight_set_ctermul(idx, color, is_normal_group);
+    ಆದರೆ (ಕೀಲಿ[5] == 'F')
+	highlight_ಗಣ_ctermfg(idx, color, is_ಸಾಮಾನ್ಯ_ಗುಂಪು);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಕೀಲಿ[5] == 'B')
+	highlight_ಗಣ_ctermbg(idx, color, is_ಸಾಮಾನ್ಯ_ಗುಂಪು);
+    ಇಲ್ಲದಿದ್ದರೆ // ctermul
+	highlight_ಗಣ_ctermul(idx, color, is_ಸಾಮಾನ್ಯ_ಗುಂಪು);
 
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_GUI) || defined(FEAT_EVAL)
 /*
  * Set the GUI foreground color for the highlight group at 'idx'.
  * Returns TRUE if the color is set.
  */
-    static int
-highlight_set_guifg(
-	int	idx,
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+highlight_ಗಣ_guifg(
+	ಪೂರ್ಣಾಂಕ	idx,
 	char_u	*arg,
-	int	is_menu_group UNUSED,
-	int	is_scrollbar_group UNUSED,
-	int	is_tooltip_group UNUSED,
-	int	is_titlebar_group UNUSED,
-	int	is_titlebarnc_group UNUSED,
-	int	*do_colors UNUSED,
-	int	init)
+	ಪೂರ್ಣಾಂಕ	is_menu_ಗುಂಪು ಬಳಸದ,
+	ಪೂರ್ಣಾಂಕ	is_scrollbar_ಗುಂಪು ಬಳಸದ,
+	ಪೂರ್ಣಾಂಕ	is_tooltip_ಗುಂಪು ಬಳಸದ,
+	ಪೂರ್ಣಾಂಕ	is_titlebar_ಗುಂಪು ಬಳಸದ,
+	ಪೂರ್ಣಾಂಕ	is_titlebarnc_ಗುಂಪು ಬಳಸದ,
+	ಪೂರ್ಣಾಂಕ	*do_colors ಬಳಸದ,
+	ಪೂರ್ಣಾಂಕ	init)
 {
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    long	i;
+# ಆದರೆ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    ದೀರ್ಘ	i;
 # endif
     char_u	**namep;
-    int		did_change = FALSE;
+    ಪೂರ್ಣಾಂಕ		did_change = FALSE;
 
-    if (init && (HL_TABLE()[idx].sg_set & SG_GUI))
-	return FALSE;
+    ಆದರೆ (init && (HL_ಕೋಷ್ಟಕ()[idx].sg_ಗಣ & SG_GUI))
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    namep = &HL_TABLE()[idx].sg_gui_fg_name;
-    if (!init)
-	HL_TABLE()[idx].sg_set |= SG_GUI;
+    namep = &HL_ಕೋಷ್ಟಕ()[idx].sg_gui_fg_name;
+    ಆದರೆ (!init)
+	HL_ಕೋಷ್ಟಕ()[idx].sg_ಗಣ |= SG_GUI;
 
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# ಆದರೆ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     // In GUI guifg colors are only used when recognized
     i = color_name2handle(arg);
-    if (i != INVALCOLOR || STRCMP(arg, "NONE") == 0 || !USE_24BIT)
+    ಆದರೆ (i != INVALCOLOR || STRCMP(arg, "NONE") == 0 || !USE_24_ಬಿಟ್)
     {
-	HL_TABLE()[idx].sg_gui_fg = i;
+	HL_ಕೋಷ್ಟಕ()[idx].sg_gui_fg = i;
 # endif
-	if (*namep == NULL || STRCMP(*namep, arg) != 0)
+	ಆದರೆ (*namep == ಖಾಲಿ || STRCMP(*namep, arg) != 0)
 	{
 	    vim_free(*namep);
-	    if (STRCMP(arg, "NONE") != 0)
+	    ಆದರೆ (STRCMP(arg, "NONE") != 0)
 		*namep = vim_strsave(arg);
-	    else
-		*namep = NULL;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		*namep = ಖಾಲಿ;
 	    did_change = TRUE;
 	}
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# ಆದರೆ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 #  ifdef FEAT_GUI_MSWIN
-	if (is_titlebar_group && gui.title_fg_pixel != i)
+	ಆದರೆ (is_titlebar_ಗುಂಪು && gui.title_fg_pixel != i)
 	{
 	    gui.title_fg_pixel = i;
 	    *do_colors = TRUE;
 	}
-	if (is_titlebarnc_group && gui.titlenc_fg_pixel != i)
+	ಆದರೆ (is_titlebarnc_ಗುಂಪು && gui.titlenc_fg_pixel != i)
 	{
 	    gui.titlenc_fg_pixel = i;
 	    *do_colors = TRUE;
 	}
 #  endif
 #  ifdef FEAT_GUI_X11
-	if (is_menu_group && gui.menu_fg_pixel != i)
+	ಆದರೆ (is_menu_ಗುಂಪು && gui.menu_fg_pixel != i)
 	{
 	    gui.menu_fg_pixel = i;
 	    *do_colors = TRUE;
 	}
-	if (is_scrollbar_group && gui.scroll_fg_pixel != i)
+	ಆದರೆ (is_scrollbar_ಗುಂಪು && gui.scroll_fg_pixel != i)
 	{
 	    gui.scroll_fg_pixel = i;
 	    *do_colors = TRUE;
 	}
 #   ifdef FEAT_BEVAL_GUI
-	if (is_tooltip_group && gui.tooltip_fg_pixel != i)
+	ಆದರೆ (is_tooltip_ಗುಂಪು && gui.tooltip_fg_pixel != i)
 	{
 	    gui.tooltip_fg_pixel = i;
 	    *do_colors = TRUE;
@@ -1405,80 +1405,80 @@ highlight_set_guifg(
     }
 # endif
 
-    return did_change;
+    ಹಿಂತಿರುಗಿ did_change;
 }
 
 /*
  * Set the GUI background color for the highlight group at 'idx'.
  * Returns TRUE if the color is set.
  */
-    static int
-highlight_set_guibg(
-	int	idx,
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+highlight_ಗಣ_guibg(
+	ಪೂರ್ಣಾಂಕ	idx,
 	char_u	*arg,
-	int	is_menu_group UNUSED,
-	int	is_scrollbar_group UNUSED,
-	int	is_tooltip_group UNUSED,
-	int	is_titlebar_group UNUSED,
-	int	is_titlebarnc_group UNUSED,
-	int	*do_colors UNUSED,
-	int	init)
+	ಪೂರ್ಣಾಂಕ	is_menu_ಗುಂಪು ಬಳಸದ,
+	ಪೂರ್ಣಾಂಕ	is_scrollbar_ಗುಂಪು ಬಳಸದ,
+	ಪೂರ್ಣಾಂಕ	is_tooltip_ಗುಂಪು ಬಳಸದ,
+	ಪೂರ್ಣಾಂಕ	is_titlebar_ಗುಂಪು ಬಳಸದ,
+	ಪೂರ್ಣಾಂಕ	is_titlebarnc_ಗುಂಪು ಬಳಸದ,
+	ಪೂರ್ಣಾಂಕ	*do_colors ಬಳಸದ,
+	ಪೂರ್ಣಾಂಕ	init)
 {
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    int		i;
+# ಆದರೆ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    ಪೂರ್ಣಾಂಕ		i;
 # endif
     char_u	**namep;
-    int		did_change = FALSE;
+    ಪೂರ್ಣಾಂಕ		did_change = FALSE;
 
-    if (init && (HL_TABLE()[idx].sg_set & SG_GUI))
-	return FALSE;
+    ಆದರೆ (init && (HL_ಕೋಷ್ಟಕ()[idx].sg_ಗಣ & SG_GUI))
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    namep = &HL_TABLE()[idx].sg_gui_bg_name;
-    if (!init)
-	HL_TABLE()[idx].sg_set |= SG_GUI;
+    namep = &HL_ಕೋಷ್ಟಕ()[idx].sg_gui_bg_name;
+    ಆದರೆ (!init)
+	HL_ಕೋಷ್ಟಕ()[idx].sg_ಗಣ |= SG_GUI;
 
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# ಆದರೆ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     // In GUI guibg colors are only used when recognized
     i = color_name2handle(arg);
-    if (i != INVALCOLOR || STRCMP(arg, "NONE") == 0 || !USE_24BIT)
+    ಆದರೆ (i != INVALCOLOR || STRCMP(arg, "NONE") == 0 || !USE_24_ಬಿಟ್)
     {
-	HL_TABLE()[idx].sg_gui_bg = i;
+	HL_ಕೋಷ್ಟಕ()[idx].sg_gui_bg = i;
 # endif
-	if (*namep == NULL || STRCMP(*namep, arg) != 0)
+	ಆದರೆ (*namep == ಖಾಲಿ || STRCMP(*namep, arg) != 0)
 	{
 	    vim_free(*namep);
-	    if (STRCMP(arg, "NONE") != 0)
+	    ಆದರೆ (STRCMP(arg, "NONE") != 0)
 		*namep = vim_strsave(arg);
-	    else
-		*namep = NULL;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		*namep = ಖಾಲಿ;
 	    did_change = TRUE;
 	}
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# ಆದರೆ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 #  ifdef FEAT_GUI_MSWIN
-	if (is_titlebar_group && gui.title_bg_pixel != i)
+	ಆದರೆ (is_titlebar_ಗುಂಪು && gui.title_bg_pixel != i)
 	{
 	    gui.title_bg_pixel = i;
 	    *do_colors = TRUE;
 	}
-	if (is_titlebarnc_group && gui.titlenc_bg_pixel != i)
+	ಆದರೆ (is_titlebarnc_ಗುಂಪು && gui.titlenc_bg_pixel != i)
 	{
 	    gui.titlenc_bg_pixel = i;
 	    *do_colors = TRUE;
 	}
 #  endif
 #  ifdef FEAT_GUI_X11
-	if (is_menu_group && gui.menu_bg_pixel != i)
+	ಆದರೆ (is_menu_ಗುಂಪು && gui.menu_bg_pixel != i)
 	{
 	    gui.menu_bg_pixel = i;
 	    *do_colors = TRUE;
 	}
-	if (is_scrollbar_group && gui.scroll_bg_pixel != i)
+	ಆದರೆ (is_scrollbar_ಗುಂಪು && gui.scroll_bg_pixel != i)
 	{
 	    gui.scroll_bg_pixel = i;
 	    *do_colors = TRUE;
 	}
 #   ifdef FEAT_BEVAL_GUI
-	if (is_tooltip_group && gui.tooltip_bg_pixel != i)
+	ಆದರೆ (is_tooltip_ಗುಂಪು && gui.tooltip_bg_pixel != i)
 	{
 	    gui.tooltip_bg_pixel = i;
 	    *do_colors = TRUE;
@@ -1488,133 +1488,133 @@ highlight_set_guibg(
     }
 # endif
 
-    return did_change;
+    ಹಿಂತಿರುಗಿ did_change;
 }
 
 /*
  * Set the GUI undercurl/strikethrough color for the highlight group at 'idx'.
  * Returns TRUE if the color is set.
  */
-    static int
-highlight_set_guisp(int idx, char_u *arg, int init)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+highlight_ಗಣ_guisp(ಪೂರ್ಣಾಂಕ idx, char_u *arg, ಪೂರ್ಣಾಂಕ init)
 {
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    int		i;
+# ಆದರೆ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    ಪೂರ್ಣಾಂಕ		i;
 # endif
-    int		did_change = FALSE;
+    ಪೂರ್ಣಾಂಕ		did_change = FALSE;
     char_u	**namep;
 
-    if (init && (HL_TABLE()[idx].sg_set & SG_GUI))
-	return FALSE;
+    ಆದರೆ (init && (HL_ಕೋಷ್ಟಕ()[idx].sg_ಗಣ & SG_GUI))
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    namep = &HL_TABLE()[idx].sg_gui_sp_name;
-    if (!init)
-	HL_TABLE()[idx].sg_set |= SG_GUI;
+    namep = &HL_ಕೋಷ್ಟಕ()[idx].sg_gui_sp_name;
+    ಆದರೆ (!init)
+	HL_ಕೋಷ್ಟಕ()[idx].sg_ಗಣ |= SG_GUI;
 
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# ಆದರೆ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     // In GUI guisp colors are only used when recognized
     i = color_name2handle(arg);
-    if (i != INVALCOLOR || STRCMP(arg, "NONE") == 0 || !USE_24BIT)
+    ಆದರೆ (i != INVALCOLOR || STRCMP(arg, "NONE") == 0 || !USE_24_ಬಿಟ್)
     {
-	HL_TABLE()[idx].sg_gui_sp = i;
+	HL_ಕೋಷ್ಟಕ()[idx].sg_gui_sp = i;
 # endif
-	if (*namep == NULL || STRCMP(*namep, arg) != 0)
+	ಆದರೆ (*namep == ಖಾಲಿ || STRCMP(*namep, arg) != 0)
 	{
 	    vim_free(*namep);
-	    if (STRCMP(arg, "NONE") != 0)
+	    ಆದರೆ (STRCMP(arg, "NONE") != 0)
 		*namep = vim_strsave(arg);
-	    else
-		*namep = NULL;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		*namep = ಖಾಲಿ;
 	    did_change = TRUE;
 	}
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# ಆದರೆ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     }
 # endif
 
-    return did_change;
+    ಹಿಂತಿರುಗಿ did_change;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Set the start/stop terminal codes for a highlight group.
  * Returns TRUE if the terminal code is set.
  */
-    static int
-highlight_set_startstop_termcode(int idx, char_u *key, char_u *arg, int init)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+highlight_ಗಣ_startstop_termcode(ಪೂರ್ಣಾಂಕ idx, char_u *ಕೀಲಿ, char_u *arg, ಪೂರ್ಣಾಂಕ init)
 {
-    int		off;
+    ಪೂರ್ಣಾಂಕ		off;
     char_u	buf[100];
-    int		len;
+    ಪೂರ್ಣಾಂಕ		len;
     char_u	*tname;
     char_u	*p;
 
-    if (!init)
-	HL_TABLE()[idx].sg_set |= SG_TERM;
+    ಆದರೆ (!init)
+	HL_ಕೋಷ್ಟಕ()[idx].sg_ಗಣ |= SG_ಪದ;
 
     // The "start" and "stop"  arguments can be a literal escape
     // sequence, or a comma separated list of terminal codes.
-    if (STRNCMP(arg, "t_", 2) == 0)
+    ಆದರೆ (STRNCMP(arg, "t_", 2) == 0)
     {
 	off = 0;
 	buf[0] = 0;
-	while (arg[off] != NUL)
+	ಆಗ (arg[off] != NUL)
 	{
 	    // Isolate one termcap name
-	    for (len = 0; arg[off + len] &&
+	    ಗಾಗಿ (len = 0; arg[off + len] &&
 		    arg[off + len] != ','; ++len)
 		;
 	    tname = vim_strnsave(arg + off, len);
-	    if (tname == NULL)		// out of memory
-		return FALSE;
+	    ಆದರೆ (tname == ಖಾಲಿ)		// out of memory
+		ಹಿಂತಿರುಗಿ FALSE;
 	    // lookup the escape sequence for the item
-	    p = get_term_code(tname);
+	    p = get_ಪದ_ಸಂಕೇತ(tname);
 	    vim_free(tname);
-	    if (p == NULL)	    // ignore non-existing things
+	    ಆದರೆ (p == ಖಾಲಿ)	    // ignore non-existing things
 		p = (char_u *)"";
 
 	    // Append it to the already found stuff
-	    if ((int)(STRLEN(buf) + STRLEN(p)) >= 99)
+	    ಆದರೆ ((ಪೂರ್ಣಾಂಕ)(STRLEN(buf) + STRLEN(p)) >= 99)
 	    {
-		semsg(_(e_terminal_code_too_long_str), arg);
-		return FALSE;
+		semsg(_(e_terminal_ಸಂಕೇತ_too_long_str), arg);
+		ಹಿಂತಿರುಗಿ FALSE;
 	    }
 	    STRCAT(buf, p);
 
 	    // Advance to the next item
 	    off += len;
-	    if (arg[off] == ',')	    // another one follows
+	    ಆದರೆ (arg[off] == ',')	    // another one follows
 		++off;
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Copy characters from arg[] to buf[], translating <> codes.
-	for (p = arg, off = 0; off < 100 - 6 && *p; )
+	ಗಾಗಿ (p = arg, off = 0; off < 100 - 6 && *p; )
 	{
-	    len = trans_special(&p, buf + off, FSK_SIMPLIFY, FALSE, NULL);
-	    if (len > 0)	    // recognized special char
+	    len = trans_special(&p, buf + off, FSK_SIMPLIFY, FALSE, ಖಾಲಿ);
+	    ಆದರೆ (len > 0)	    // recognized special char
 		off += len;
-	    else		    // copy as normal char
+	    ಇಲ್ಲದಿದ್ದರೆ		    // copy as normal char
 		buf[off++] = *p++;
 	}
 	buf[off] = NUL;
     }
 
-    if (STRCMP(buf, "NONE") == 0)	// resetting the value
-	p = NULL;
-    else
+    ಆದರೆ (STRCMP(buf, "NONE") == 0)	// resetting the value
+	p = ಖಾಲಿ;
+    ಇಲ್ಲದಿದ್ದರೆ
 	p = vim_strsave(buf);
-    if (key[2] == 'A')
+    ಆದರೆ (ಕೀಲಿ[2] == 'A')
     {
-	vim_free(HL_TABLE()[idx].sg_start);
-	HL_TABLE()[idx].sg_start = p;
+	vim_free(HL_ಕೋಷ್ಟಕ()[idx].sg_ಆರಂಭ);
+	HL_ಕೋಷ್ಟಕ()[idx].sg_ಆರಂಭ = p;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	vim_free(HL_TABLE()[idx].sg_stop);
-	HL_TABLE()[idx].sg_stop = p;
+	vim_free(HL_ಕೋಷ್ಟಕ()[idx].sg_stop);
+	HL_ಕೋಷ್ಟಕ()[idx].sg_stop = p;
     }
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
@@ -1622,686 +1622,686 @@ highlight_set_startstop_termcode(int idx, char_u *key, char_u *arg, int init)
  * When using ":hi clear" this is called recursively for each group with
  * "forceit" and "init" both TRUE.
  */
-    void
+    ಶೂನ್ಯ
 do_highlight(
-    char_u	*line,
-    int		forceit,
-    int		init)	    // TRUE when called for initializing
+    char_u	*ಸಾಲು,
+    ಪೂರ್ಣಾಂಕ		forceit,
+    ಪೂರ್ಣಾಂಕ		init)	    // TRUE when called for initializing
 {
-    char_u	*name_end;
+    char_u	*name_ಕೊನೆ;
     char_u	*linep;
-    char_u	*key_start;
-    char_u	*arg_start;
-    char_u	*key = NULL, *arg = NULL;
-    long	i;
-    int		id;
-    int		idx;
-    hl_group_T	item_before;
-    int		did_change = FALSE;
-    int		dodefault = FALSE;
-    int		doclear = FALSE;
-    int		dolink = FALSE;
-    int		error = FALSE;
-    int		is_normal_group = FALSE;	// "Normal" group
-#ifdef FEAT_GUI_MSWIN
-    int		is_titlebar_group = FALSE;	// "TitleBar" group
-    int		is_titlebarnc_group = FALSE;	// "TitleBarNC" group
-#else
-# define is_titlebar_group 0
-# define is_titlebarnc_group 0
-#endif
-#ifdef FEAT_GUI_X11
-    int		is_menu_group = FALSE;		// "Menu" group
-    int		is_scrollbar_group = FALSE;	// "Scrollbar" group
-    int		is_tooltip_group = FALSE;	// "Tooltip" group
-#else
-# define is_menu_group 0
-# define is_tooltip_group 0
-# define is_scrollbar_group 0
-#endif
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
-    int		do_colors = FALSE;		// need to update colors?
-#endif
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    int		did_highlight_changed = FALSE;
-#endif
+    char_u	*ಕೀಲಿ_ಆರಂಭ;
+    char_u	*arg_ಆರಂಭ;
+    char_u	*ಕೀಲಿ = ಖಾಲಿ, *arg = ಖಾಲಿ;
+    ದೀರ್ಘ	i;
+    ಪೂರ್ಣಾಂಕ		id;
+    ಪೂರ್ಣಾಂಕ		idx;
+    hl_ಗುಂಪು_T	ಅಂಶ_before;
+    ಪೂರ್ಣಾಂಕ		did_change = FALSE;
+    ಪೂರ್ಣಾಂಕ		dodefault = FALSE;
+    ಪೂರ್ಣಾಂಕ		doclear = FALSE;
+    ಪೂರ್ಣಾಂಕ		dolink = FALSE;
+    ಪೂರ್ಣಾಂಕ		error = FALSE;
+    ಪೂರ್ಣಾಂಕ		is_ಸಾಮಾನ್ಯ_ಗುಂಪು = FALSE;	// "Normal" group
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_MSWIN
+    ಪೂರ್ಣಾಂಕ		is_titlebar_ಗುಂಪು = FALSE;	// "TitleBar" group
+    ಪೂರ್ಣಾಂಕ		is_titlebarnc_ಗುಂಪು = FALSE;	// "TitleBarNC" group
+#ಇಲ್ಲದಿದ್ದರೆ
+# define is_titlebar_ಗುಂಪು 0
+# define is_titlebarnc_ಗುಂಪು 0
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_X11
+    ಪೂರ್ಣಾಂಕ		is_menu_ಗುಂಪು = FALSE;		// "Menu" group
+    ಪೂರ್ಣಾಂಕ		is_scrollbar_ಗುಂಪು = FALSE;	// "Scrollbar" group
+    ಪೂರ್ಣಾಂಕ		is_tooltip_ಗುಂಪು = FALSE;	// "Tooltip" group
+#ಇಲ್ಲದಿದ್ದರೆ
+# define is_menu_ಗುಂಪು 0
+# define is_tooltip_ಗುಂಪು 0
+# define is_scrollbar_ಗುಂಪು 0
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(FEAT_GUI) || defined(FEAT_EVAL)
+    ಪೂರ್ಣಾಂಕ		do_colors = FALSE;		// need to update colors?
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    ಪೂರ್ಣಾಂಕ		did_highlight_ಬದಲಾಯಿತು = FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
 
     // If no argument, list current highlighting.
-    if (!init && ends_excmd2(line - 1, line))
+    ಆದರೆ (!init && ತುದಿಗಳು_excmd2(ಸಾಲು - 1, ಸಾಲು))
     {
-	for (i = 1; i <= highlight_ga.ga_len && !got_int; ++i)
+	ಗಾಗಿ (i = 1; i <= highlight_ga.ga_len && !got_int; ++i)
 	    // TODO: only call when the group has attributes set
-	    highlight_list_one((int)i);
-	return;
+	    highlight_list_one((ಪೂರ್ಣಾಂಕ)i);
+	ಹಿಂತಿರುಗಿ;
     }
 
     // Isolate the name.
-    name_end = skiptowhite(line);
-    linep = skipwhite(name_end);
+    name_ಕೊನೆ = skiptowhite(ಸಾಲು);
+    linep = skipwhite(name_ಕೊನೆ);
 
     // Check for "default" argument.
-    if (STRNCMP(line, "default", name_end - line) == 0)
+    ಆದರೆ (STRNCMP(ಸಾಲು, "default", name_ಕೊನೆ - ಸಾಲು) == 0)
     {
 	dodefault = TRUE;
-	line = linep;
-	name_end = skiptowhite(line);
-	linep = skipwhite(name_end);
+	ಸಾಲು = linep;
+	name_ಕೊನೆ = skiptowhite(ಸಾಲು);
+	linep = skipwhite(name_ಕೊನೆ);
     }
 
     // Check for "clear" or "link" argument.
-    if (STRNCMP(line, "clear", name_end - line) == 0)
+    ಆದರೆ (STRNCMP(ಸಾಲು, "clear", name_ಕೊನೆ - ಸಾಲು) == 0)
 	doclear = TRUE;
-    if (STRNCMP(line, "link", name_end - line) == 0)
+    ಆದರೆ (STRNCMP(ಸಾಲು, "link", name_ಕೊನೆ - ಸಾಲು) == 0)
 	dolink = TRUE;
 
     // ":highlight {group-name}": list highlighting for one group.
-    if (!doclear && !dolink && ends_excmd2(line, linep))
+    ಆದರೆ (!doclear && !dolink && ತುದಿಗಳು_excmd2(ಸಾಲು, linep))
     {
-	id = syn_namen2id(line, (int)(name_end - line));
-	if (id == 0)
-	    semsg(_(e_highlight_group_name_not_found_str), line);
-	else
+	id = syn_namen2id(ಸಾಲು, (ಪೂರ್ಣಾಂಕ)(name_ಕೊನೆ - ಸಾಲು));
+	ಆದರೆ (id == 0)
+	    semsg(_(e_highlight_ಗುಂಪು_name_not_ಸಿಕ್ಕಿತು_str), ಸಾಲು);
+	ಇಲ್ಲದಿದ್ದರೆ
 	    highlight_list_one(id);
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
     // Handle ":highlight link {from} {to}" command.
-    if (dolink)
+    ಆದರೆ (dolink)
     {
-	char_u	    *from_start = linep;
-	char_u	    *from_end;
-	int	    from_len;
-	char_u	    *to_start;
-	char_u	    *to_end;
-	int	    to_len;
+	char_u	    *from_ಆರಂಭ = linep;
+	char_u	    *from_ಕೊನೆ;
+	ಪೂರ್ಣಾಂಕ	    from_len;
+	char_u	    *ಗಮ್ಯ_ಆರಂಭ;
+	char_u	    *ಗಮ್ಯ_ಕೊನೆ;
+	ಪೂರ್ಣಾಂಕ	    ಗಮ್ಯ_len;
 
-	from_end = skiptowhite(from_start);
-	to_start = skipwhite(from_end);
-	to_end	 = skiptowhite(to_start);
+	from_ಕೊನೆ = skiptowhite(from_ಆರಂಭ);
+	ಗಮ್ಯ_ಆರಂಭ = skipwhite(from_ಕೊನೆ);
+	ಗಮ್ಯ_ಕೊನೆ	 = skiptowhite(ಗಮ್ಯ_ಆರಂಭ);
 
-	if (ends_excmd2(line, from_start) || ends_excmd2(line, to_start))
+	ಆದರೆ (ತುದಿಗಳು_excmd2(ಸಾಲು, from_ಆರಂಭ) || ತುದಿಗಳು_excmd2(ಸಾಲು, ಗಮ್ಯ_ಆರಂಭ))
 	{
-	    semsg(_(e_not_enough_arguments_highlight_link_str), from_start);
-	    return;
+	    semsg(_(e_not_enough_arguments_highlight_link_str), from_ಆರಂಭ);
+	    ಹಿಂತಿರುಗಿ;
 	}
 
-	if (!ends_excmd2(line, skipwhite(to_end)))
+	ಆದರೆ (!ತುದಿಗಳು_excmd2(ಸಾಲು, skipwhite(ಗಮ್ಯ_ಕೊನೆ)))
 	{
-	    semsg(_(e_too_many_arguments_highlight_link_str), from_start);
-	    return;
+	    semsg(_(e_too_many_arguments_highlight_link_str), from_ಆರಂಭ);
+	    ಹಿಂತಿರುಗಿ;
 	}
 
-	from_len = (int)(from_end - from_start);
-	to_len = (int)(to_end - to_start);
-	highlight_group_link(from_start, from_len, to_start, to_len,
+	from_len = (ಪೂರ್ಣಾಂಕ)(from_ಕೊನೆ - from_ಆರಂಭ);
+	ಗಮ್ಯ_len = (ಪೂರ್ಣಾಂಕ)(ಗಮ್ಯ_ಕೊನೆ - ಗಮ್ಯ_ಆರಂಭ);
+	highlight_ಗುಂಪು_link(from_ಆರಂಭ, from_len, ಗಮ್ಯ_ಆರಂಭ, ಗಮ್ಯ_len,
 						dodefault, forceit, init);
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if (doclear)
+    ಆದರೆ (doclear)
     {
 	// ":highlight clear [group]" command.
-	if (ends_excmd2(line, linep))
+	ಆದರೆ (ತುದಿಗಳು_excmd2(ಸಾಲು, linep))
 	{
 	    // ":highlight clear" without group name
 	    highlight_reset_all();
-	    return;
+	    ಹಿಂತಿರುಗಿ;
 	}
-	line = linep;
-	name_end = skiptowhite(line);
-	linep = skipwhite(name_end);
+	ಸಾಲು = linep;
+	name_ಕೊನೆ = skiptowhite(ಸಾಲು);
+	linep = skipwhite(name_ಕೊನೆ);
     }
 
     // Find the group name in the table.  If it does not exist yet, add it.
-    id = syn_check_group(line, (int)(name_end - line));
-    if (id == 0)	// failed (out of memory)
-	return;
+    id = syn_check_ಗುಂಪು(ಸಾಲು, (ಪೂರ್ಣಾಂಕ)(name_ಕೊನೆ - ಸಾಲು));
+    ಆದರೆ (id == 0)	// failed (out of memory)
+	ಹಿಂತಿರುಗಿ;
     idx = id - 1;	// index is ID minus one
 
     // Return if "default" was used and the group already has settings.
-    if (dodefault && hl_has_settings(idx, TRUE))
-	return;
+    ಆದರೆ (dodefault && hl_has_settings(idx, TRUE))
+	ಹಿಂತಿರುಗಿ;
 
     // Make a copy so we can check if any attribute actually changed.
-    item_before = HL_TABLE()[idx];
+    ಅಂಶ_before = HL_ಕೋಷ್ಟಕ()[idx];
 
-    if (STRCMP(HL_TABLE()[idx].sg_name_u, "NORMAL") == 0)
-	is_normal_group = TRUE;
-#ifdef FEAT_GUI_MSWIN
-    else if (STRCMP(HL_TABLE()[idx].sg_name_u, "TITLEBAR") == 0)
-	is_titlebar_group = TRUE;
-    else if (STRCMP(HL_TABLE()[idx].sg_name_u, "TITLEBARNC") == 0)
-	is_titlebarnc_group = TRUE;
-#endif
-#ifdef FEAT_GUI_X11
-    else if (STRCMP(HL_TABLE()[idx].sg_name_u, "MENU") == 0)
-	is_menu_group = TRUE;
-    else if (STRCMP(HL_TABLE()[idx].sg_name_u, "SCROLLBAR") == 0)
-	is_scrollbar_group = TRUE;
-    else if (STRCMP(HL_TABLE()[idx].sg_name_u, "TOOLTIP") == 0)
-	is_tooltip_group = TRUE;
-#endif
+    ಆದರೆ (STRCMP(HL_ಕೋಷ್ಟಕ()[idx].sg_name_u, "NORMAL") == 0)
+	is_ಸಾಮಾನ್ಯ_ಗುಂಪು = TRUE;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_MSWIN
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(HL_ಕೋಷ್ಟಕ()[idx].sg_name_u, "TITLEBAR") == 0)
+	is_titlebar_ಗುಂಪು = TRUE;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(HL_ಕೋಷ್ಟಕ()[idx].sg_name_u, "TITLEBARNC") == 0)
+	is_titlebarnc_ಗುಂಪು = TRUE;
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_X11
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(HL_ಕೋಷ್ಟಕ()[idx].sg_name_u, "MENU") == 0)
+	is_menu_ಗುಂಪು = TRUE;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(HL_ಕೋಷ್ಟಕ()[idx].sg_name_u, "SCROLLBAR") == 0)
+	is_scrollbar_ಗುಂಪು = TRUE;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(HL_ಕೋಷ್ಟಕ()[idx].sg_name_u, "TOOLTIP") == 0)
+	is_tooltip_ಗುಂಪು = TRUE;
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Clear the highlighting for ":hi clear {group}" and ":hi clear".
-    if (doclear || (forceit && init))
+    ಆದರೆ (doclear || (forceit && init))
     {
 	highlight_clear(idx);
-	if (!doclear)
-	    HL_TABLE()[idx].sg_set = 0;
+	ಆದರೆ (!doclear)
+	    HL_ಕೋಷ್ಟಕ()[idx].sg_ಗಣ = 0;
     }
 
-    if (!doclear)
-	while (!ends_excmd2(line, linep))
+    ಆದರೆ (!doclear)
+	ಆಗ (!ತುದಿಗಳು_excmd2(ಸಾಲು, linep))
 	{
-	    key_start = linep;
-	    if (*linep == '=')
+	    ಕೀಲಿ_ಆರಂಭ = linep;
+	    ಆದರೆ (*linep == '=')
 	    {
-		semsg(_(e_unexpected_equal_sign_str), key_start);
+		semsg(_(e_unexpected_equal_sign_str), ಕೀಲಿ_ಆರಂಭ);
 		error = TRUE;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 
 	    // Note: Keep this in sync with get_highlight_group_key.
 
 	    // Isolate the key ("term", "ctermfg", "ctermbg", "font", "guifg"
 	    // or "guibg").
-	    while (*linep && !VIM_ISWHITE(*linep) && *linep != '=')
+	    ಆಗ (*linep && !VIM_ISWHITE(*linep) && *linep != '=')
 		++linep;
-	    vim_free(key);
-	    key = vim_strnsave_up(key_start, linep - key_start);
-	    if (key == NULL)
+	    vim_free(ಕೀಲಿ);
+	    ಕೀಲಿ = vim_strnsave_ಮೇಲೆ(ಕೀಲಿ_ಆರಂಭ, linep - ಕೀಲಿ_ಆರಂಭ);
+	    ಆದರೆ (ಕೀಲಿ == ಖಾಲಿ)
 	    {
 		error = TRUE;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	    linep = skipwhite(linep);
 
-	    if (STRCMP(key, "NONE") == 0)
+	    ಆದರೆ (STRCMP(ಕೀಲಿ, "NONE") == 0)
 	    {
-		if (!init || HL_TABLE()[idx].sg_set == 0)
+		ಆದರೆ (!init || HL_ಕೋಷ್ಟಕ()[idx].sg_ಗಣ == 0)
 		{
-		    if (!init)
-			HL_TABLE()[idx].sg_set |= SG_TERM+SG_CTERM+SG_GUI;
+		    ಆದರೆ (!init)
+			HL_ಕೋಷ್ಟಕ()[idx].sg_ಗಣ |= SG_ಪದ+SG_CTERM+SG_GUI;
 		    highlight_clear(idx);
 		}
-		continue;
+		ಮುಂದುವರಿ;
 	    }
 
 	    // Check for the equal sign.
-	    if (*linep != '=')
+	    ಆದರೆ (*linep != '=')
 	    {
-		semsg(_(e_missing_equal_sign_str_2), key_start);
+		semsg(_(e_missing_equal_sign_str_2), ಕೀಲಿ_ಆರಂಭ);
 		error = TRUE;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	    ++linep;
 
 	    // Isolate the argument.
 	    linep = skipwhite(linep);
-	    if (*linep == '\'')		// guifg='color name'
+	    ಆದರೆ (*linep == '\'')		// guifg='color name'
 	    {
-		arg_start = ++linep;
+		arg_ಆರಂಭ = ++linep;
 		linep = vim_strchr(linep, '\'');
-		if (linep == NULL)
+		ಆದರೆ (linep == ಖಾಲಿ)
 		{
-		    semsg(_(e_invalid_argument_str), key_start);
+		    semsg(_(e_invalid_ವಾದ_str), ಕೀಲಿ_ಆರಂಭ);
 		    error = TRUE;
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		arg_start = linep;
+		arg_ಆರಂಭ = linep;
 		linep = skiptowhite(linep);
 	    }
-	    if (linep == arg_start)
+	    ಆದರೆ (linep == arg_ಆರಂಭ)
 	    {
-		semsg(_(e_missing_argument_str), key_start);
+		semsg(_(e_missing_ವಾದ_str), ಕೀಲಿ_ಆರಂಭ);
 		error = TRUE;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	    vim_free(arg);
-	    arg = vim_strnsave(arg_start, linep - arg_start);
-	    if (arg == NULL)
+	    arg = vim_strnsave(arg_ಆರಂಭ, linep - arg_ಆರಂಭ);
+	    ಆದರೆ (arg == ಖಾಲಿ)
 	    {
 		error = TRUE;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	    if (*linep == '\'')
+	    ಆದರೆ (*linep == '\'')
 		++linep;
 
 	    // Store the argument.
-	    if (STRCMP(key, "TERM") == 0
-		    || STRCMP(key, "CTERM") == 0
-		    || STRCMP(key, "GUI") == 0)
+	    ಆದರೆ (STRCMP(ಕೀಲಿ, "TERM") == 0
+		    || STRCMP(ಕೀಲಿ, "CTERM") == 0
+		    || STRCMP(ಕೀಲಿ, "GUI") == 0)
 	    {
-		if (!highlight_set_termgui_attr(idx, key, arg, init))
+		ಆದರೆ (!highlight_ಗಣ_termgui_attr(idx, ಕೀಲಿ, arg, init))
 		{
 		    error = TRUE;
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 	    }
-	    else if (STRCMP(key, "FONT") == 0)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(ಕೀಲಿ, "FONT") == 0)
 	    {
 		// in non-GUI fonts are simply ignored
-#ifdef FEAT_GUI
-		if (highlight_set_font(idx, arg, is_normal_group,
-					      is_menu_group, is_tooltip_group))
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+		ಆದರೆ (highlight_ಗಣ_font(idx, arg, is_ಸಾಮಾನ್ಯ_ಗುಂಪು,
+					      is_menu_ಗುಂಪು, is_tooltip_ಗುಂಪು))
 		    did_change = TRUE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
-	    else if (STRCMP(key, "CTERMFG") == 0
-		    || STRCMP(key, "CTERMBG") == 0
-		    || STRCMP(key, "CTERMUL") == 0)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(ಕೀಲಿ, "CTERMFG") == 0
+		    || STRCMP(ಕೀಲಿ, "CTERMBG") == 0
+		    || STRCMP(ಕೀಲಿ, "CTERMUL") == 0)
 	    {
-		if (!highlight_set_cterm_color(idx, key, key_start, arg,
-							is_normal_group, init))
+		ಆದರೆ (!highlight_ಗಣ_cterm_color(idx, ಕೀಲಿ, ಕೀಲಿ_ಆರಂಭ, arg,
+							is_ಸಾಮಾನ್ಯ_ಗುಂಪು, init))
 		{
 		    error = TRUE;
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 	    }
-	    else if (STRCMP(key, "CTERMFONT") == 0)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(ಕೀಲಿ, "CTERMFONT") == 0)
 	    {
-		if (!highlight_set_cterm_font(idx, arg, init))
+		ಆದರೆ (!highlight_ಗಣ_cterm_font(idx, arg, init))
 		{
 		    error = TRUE;
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 	    }
-	    else if (STRCMP(key, "GUIFG") == 0)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(ಕೀಲಿ, "GUIFG") == 0)
 	    {
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
-		if (highlight_set_guifg(idx, arg, is_menu_group,
-			    is_scrollbar_group, is_tooltip_group,
-			    is_titlebar_group, is_titlebarnc_group,
+#ಆದರೆ defined(FEAT_GUI) || defined(FEAT_EVAL)
+		ಆದರೆ (highlight_ಗಣ_guifg(idx, arg, is_menu_ಗುಂಪು,
+			    is_scrollbar_ಗುಂಪು, is_tooltip_ಗುಂಪು,
+			    is_titlebar_ಗುಂಪು, is_titlebarnc_ಗುಂಪು,
 			    &do_colors, init))
 		    did_change = TRUE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
-	    else if (STRCMP(key, "GUIBG") == 0)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(ಕೀಲಿ, "GUIBG") == 0)
 	    {
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
-		if (highlight_set_guibg(idx, arg, is_menu_group,
-			    is_scrollbar_group, is_tooltip_group,
-			    is_titlebar_group, is_titlebarnc_group,
+#ಆದರೆ defined(FEAT_GUI) || defined(FEAT_EVAL)
+		ಆದರೆ (highlight_ಗಣ_guibg(idx, arg, is_menu_ಗುಂಪು,
+			    is_scrollbar_ಗುಂಪು, is_tooltip_ಗುಂಪು,
+			    is_titlebar_ಗುಂಪು, is_titlebarnc_ಗುಂಪು,
 			    &do_colors, init))
 		    did_change = TRUE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
-	    else if (STRCMP(key, "GUISP") == 0)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(ಕೀಲಿ, "GUISP") == 0)
 	    {
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
-		if (highlight_set_guisp(idx, arg, init))
+#ಆದರೆ defined(FEAT_GUI) || defined(FEAT_EVAL)
+		ಆದರೆ (highlight_ಗಣ_guisp(idx, arg, init))
 		    did_change = TRUE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
-	    else if (STRCMP(key, "START") == 0 || STRCMP(key, "STOP") == 0)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(ಕೀಲಿ, "START") == 0 || STRCMP(ಕೀಲಿ, "STOP") == 0)
 	    {
-		if (!highlight_set_startstop_termcode(idx, key, arg, init))
+		ಆದರೆ (!highlight_ಗಣ_startstop_termcode(idx, ಕೀಲಿ, arg, init))
 		{
 		    error = TRUE;
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		semsg(_(e_illegal_argument_str_3), key_start);
+		semsg(_(e_illegal_ವಾದ_str_3), ಕೀಲಿ_ಆರಂಭ);
 		error = TRUE;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	    HL_TABLE()[idx].sg_cleared = FALSE;
+	    HL_ಕೋಷ್ಟಕ()[idx].sg_cleared = FALSE;
 
 	    // When highlighting has been given for a group, don't link it.
-	    if (!init || !(HL_TABLE()[idx].sg_set & SG_LINK))
-		HL_TABLE()[idx].sg_link = 0;
+	    ಆದರೆ (!init || !(HL_ಕೋಷ್ಟಕ()[idx].sg_ಗಣ & SG_LINK))
+		HL_ಕೋಷ್ಟಕ()[idx].sg_link = 0;
 
 	    // Continue with next argument.
 	    linep = skipwhite(linep);
 	}
 
     // If there is an error, and it's a new entry, remove it from the table.
-    if (error && idx == highlight_ga.ga_len)
-	syn_unadd_group();
-    else
+    ಆದರೆ (error && idx == highlight_ga.ga_len)
+	syn_unadd_ಗುಂಪು();
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (is_normal_group)
+	ಆದರೆ (is_ಸಾಮಾನ್ಯ_ಗುಂಪು)
 	{
-	    HL_TABLE()[idx].sg_term_attr = 0;
-	    HL_TABLE()[idx].sg_cterm_attr = 0;
-#ifdef FEAT_GUI
-	    HL_TABLE()[idx].sg_gui_attr = 0;
+	    HL_ಕೋಷ್ಟಕ()[idx].sg_ಪದ_attr = 0;
+	    HL_ಕೋಷ್ಟಕ()[idx].sg_cterm_attr = 0;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+	    HL_ಕೋಷ್ಟಕ()[idx].sg_gui_attr = 0;
 	    // Need to update all groups, because they might be using "bg"
 	    // and/or "fg", which have been changed now.
-#endif
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-	    if (USE_24BIT)
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+	    ಆದರೆ (USE_24_ಬಿಟ್)
 	    {
 		highlight_gui_started();
-		did_highlight_changed = TRUE;
+		did_highlight_ಬದಲಾಯಿತು = TRUE;
 		redraw_all_later(UPD_NOT_VALID);
 	    }
-#endif
-	    resolve_fallback_fg_to_rgb();
-	    resolve_fallback_bg_to_rgb();
-#ifdef FEAT_VTP
+#ಆದರೆ_ಅಂತ್ಯ
+	    resolve_fallback_fg_ಗಮ್ಯ_rgb();
+	    resolve_fallback_bg_ಗಮ್ಯ_rgb();
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VTP
 	    control_console_color_rgb();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	}
-#ifdef FEAT_GUI_MSWIN
-	else if (is_titlebar_group)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_MSWIN
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (is_titlebar_ಗುಂಪು)
 	{
-	    if (gui.in_use && do_colors)
-		gui_mch_set_titlebar_colors();
+	    ಆದರೆ (gui.ಒಳ_use && do_colors)
+		gui_mch_ಗಣ_titlebar_colors();
 	}
-	else if (is_titlebarnc_group)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (is_titlebarnc_ಗುಂಪು)
 	{
-	    if (gui.in_use && do_colors)
-		gui_mch_set_titlebar_colors();
+	    ಆದರೆ (gui.ಒಳ_use && do_colors)
+		gui_mch_ಗಣ_titlebar_colors();
 	}
-#endif
-#ifdef FEAT_GUI_X11
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_X11
 # ifdef FEAT_MENU
-	else if (is_menu_group)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (is_menu_ಗುಂಪು)
 	{
-	    if (gui.in_use && do_colors)
+	    ಆದರೆ (gui.ಒಳ_use && do_colors)
 		gui_mch_new_menu_colors();
 	}
 # endif
-	else if (is_scrollbar_group)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (is_scrollbar_ಗುಂಪು)
 	{
-	    if (gui.in_use && do_colors)
+	    ಆದರೆ (gui.ಒಳ_use && do_colors)
 		gui_new_scrollbar_colors();
-	    else
-		set_hl_attr(idx);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ಗಣ_hl_attr(idx);
 	}
 # ifdef FEAT_BEVAL_GUI
-	else if (is_tooltip_group)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (is_tooltip_ಗುಂಪು)
 	{
-	    if (gui.in_use && do_colors)
+	    ಆದರೆ (gui.ಒಳ_use && do_colors)
 		gui_mch_new_tooltip_colors();
 	}
 # endif
-#endif
-	else
-	    set_hl_attr(idx);
-#ifdef FEAT_EVAL
-	HL_TABLE()[idx].sg_script_ctx = current_sctx;
-	HL_TABLE()[idx].sg_script_ctx.sc_lnum += SOURCING_LNUM;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಗಣ_hl_attr(idx);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	HL_ಕೋಷ್ಟಕ()[idx].sg_script_ctx = current_sctx;
+	HL_ಕೋಷ್ಟಕ()[idx].sg_script_ctx.sc_lnum += SOURCING_LNUM;
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
-    vim_free(key);
+    vim_free(ಕೀಲಿ);
     vim_free(arg);
 
     // Only call highlight_changed() once, after a sequence of highlight
     // commands, and only if an attribute actually changed.
-    if ((did_change
-	   || memcmp(&HL_TABLE()[idx], &item_before, sizeof(item_before)) != 0)
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-	    && !did_highlight_changed
-#endif
+    ಆದರೆ ((did_change
+	   || memcmp(&HL_ಕೋಷ್ಟಕ()[idx], &ಅಂಶ_before, ಗಾತ್ರ(ಅಂಶ_before)) != 0)
+#ಆದರೆ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+	    && !did_highlight_ಬದಲಾಯಿತು
+#ಆದರೆ_ಅಂತ್ಯ
        )
     {
 	// Do not trigger a redraw when highlighting is changed while
 	// redrawing.  This may happen when evaluating 'statusline' changes the
 	// StatusLine group.
-	if (!updating_screen)
+	ಆದರೆ (!updating_screen)
 	    redraw_all_later(UPD_NOT_VALID);
-	need_highlight_changed = TRUE;
+	need_highlight_ಬದಲಾಯಿತು = TRUE;
     }
 }
 
-#if defined(EXITFREE)
-    void
-free_highlight(void)
+#ಆದರೆ defined(EXITFREE)
+    ಶೂನ್ಯ
+free_highlight(ಶೂನ್ಯ)
 {
-    int	    i;
+    ಪೂರ್ಣಾಂಕ	    i;
 
-    for (i = 0; i < highlight_ga.ga_len; ++i)
+    ಗಾಗಿ (i = 0; i < highlight_ga.ga_len; ++i)
     {
 	highlight_clear(i);
-	vim_free(HL_TABLE()[i].sg_name);
-	vim_free(HL_TABLE()[i].sg_name_u - HLNAME_KEY_OFF);
+	vim_free(HL_ಕೋಷ್ಟಕ()[i].sg_name);
+	vim_free(HL_ಕೋಷ್ಟಕ()[i].sg_name_u - HLNAME_ಕೀಲಿ_OFF);
     }
     ga_clear(&highlight_ga);
     hash_clear(&highlight_ht);
     highlight_ht_inited = false;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Reset the cterm colors to what they were before Vim was started, if
  * possible.  Otherwise reset them to zero.
  */
-    void
-restore_cterm_colors(void)
+    ಶೂನ್ಯ
+restore_cterm_colors(ಶೂನ್ಯ)
 {
-#if defined(MSWIN) && !defined(FEAT_GUI_MSWIN)
+#ಆದರೆ defined(MSWIN) && !defined(FEAT_GUI_MSWIN)
     // Since t_me has been set, this probably means that the user
     // wants to use this as default colors.  Need to reset default
     // background/foreground colors.
-    mch_set_normal_colors();
-#else
+    mch_ಗಣ_ಸಾಮಾನ್ಯ_colors();
+#ಇಲ್ಲದಿದ್ದರೆ
 # ifdef VIMDLL
-    if (!gui.in_use)
+    ಆದರೆ (!gui.ಒಳ_use)
     {
-	mch_set_normal_colors();
-	return;
+	mch_ಗಣ_ಸಾಮಾನ್ಯ_colors();
+	ಹಿಂತಿರುಗಿ;
     }
 # endif
-    cterm_normal_fg_color = 0;
-    cterm_normal_fg_bold = 0;
-    cterm_normal_bg_color = 0;
+    cterm_ಸಾಮಾನ್ಯ_fg_color = 0;
+    cterm_ಸಾಮಾನ್ಯ_fg_bold = 0;
+    cterm_ಸಾಮಾನ್ಯ_bg_color = 0;
 # ifdef FEAT_TERMGUICOLORS
-    cterm_normal_fg_gui_color = INVALCOLOR;
-    cterm_normal_bg_gui_color = INVALCOLOR;
-    cterm_normal_ul_gui_color = INVALCOLOR;
+    cterm_ಸಾಮಾನ್ಯ_fg_gui_color = INVALCOLOR;
+    cterm_ಸಾಮಾನ್ಯ_bg_gui_color = INVALCOLOR;
+    cterm_ಸಾಮಾನ್ಯ_ul_gui_color = INVALCOLOR;
 # endif
     fallback_fg_rgb = INVALCOLOR;
     fallback_bg_rgb = INVALCOLOR;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Return TRUE if highlight group "idx" has any settings.
  * When "check_link" is TRUE also check for an existing link.
  */
-    static int
-hl_has_settings(int idx, int check_link)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+hl_has_settings(ಪೂರ್ಣಾಂಕ idx, ಪೂರ್ಣಾಂಕ check_link)
 {
-    return HL_TABLE()[idx].sg_cleared == 0
-	 && (  HL_TABLE()[idx].sg_term_attr != 0
-	    || HL_TABLE()[idx].sg_cterm_attr != 0
-	    || HL_TABLE()[idx].sg_cterm_fg != 0
-	    || HL_TABLE()[idx].sg_cterm_bg != 0
-	    || HL_TABLE()[idx].sg_cterm_font != 0
-#ifdef FEAT_GUI
-	    || HL_TABLE()[idx].sg_gui_attr != 0
-	    || HL_TABLE()[idx].sg_gui_fg_name != NULL
-	    || HL_TABLE()[idx].sg_gui_bg_name != NULL
-	    || HL_TABLE()[idx].sg_gui_sp_name != NULL
-	    || HL_TABLE()[idx].sg_font_name != NULL
-#endif
-	    || (check_link && (HL_TABLE()[idx].sg_set & SG_LINK)));
+    ಹಿಂತಿರುಗಿ HL_ಕೋಷ್ಟಕ()[idx].sg_cleared == 0
+	 && (  HL_ಕೋಷ್ಟಕ()[idx].sg_ಪದ_attr != 0
+	    || HL_ಕೋಷ್ಟಕ()[idx].sg_cterm_attr != 0
+	    || HL_ಕೋಷ್ಟಕ()[idx].sg_cterm_fg != 0
+	    || HL_ಕೋಷ್ಟಕ()[idx].sg_cterm_bg != 0
+	    || HL_ಕೋಷ್ಟಕ()[idx].sg_cterm_font != 0
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+	    || HL_ಕೋಷ್ಟಕ()[idx].sg_gui_attr != 0
+	    || HL_ಕೋಷ್ಟಕ()[idx].sg_gui_fg_name != ಖಾಲಿ
+	    || HL_ಕೋಷ್ಟಕ()[idx].sg_gui_bg_name != ಖಾಲಿ
+	    || HL_ಕೋಷ್ಟಕ()[idx].sg_gui_sp_name != ಖಾಲಿ
+	    || HL_ಕೋಷ್ಟಕ()[idx].sg_font_name != ಖಾಲಿ
+#ಆದರೆ_ಅಂತ್ಯ
+	    || (check_link && (HL_ಕೋಷ್ಟಕ()[idx].sg_ಗಣ & SG_LINK)));
 }
 
 /*
  * Clear highlighting for one group.
  */
-    static void
-highlight_clear(int idx)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+highlight_clear(ಪೂರ್ಣಾಂಕ idx)
 {
-    HL_TABLE()[idx].sg_cleared = TRUE;
+    HL_ಕೋಷ್ಟಕ()[idx].sg_cleared = TRUE;
 
-    HL_TABLE()[idx].sg_term = 0;
-    VIM_CLEAR(HL_TABLE()[idx].sg_start);
-    VIM_CLEAR(HL_TABLE()[idx].sg_stop);
-    HL_TABLE()[idx].sg_term_attr = 0;
-    HL_TABLE()[idx].sg_cterm = 0;
-    HL_TABLE()[idx].sg_cterm_bold = FALSE;
-    HL_TABLE()[idx].sg_cterm_fg = 0;
-    HL_TABLE()[idx].sg_cterm_bg = 0;
-    HL_TABLE()[idx].sg_cterm_attr = 0;
-    HL_TABLE()[idx].sg_cterm_font = 0;
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
-    HL_TABLE()[idx].sg_gui = 0;
-    VIM_CLEAR(HL_TABLE()[idx].sg_gui_fg_name);
-    VIM_CLEAR(HL_TABLE()[idx].sg_gui_bg_name);
-    VIM_CLEAR(HL_TABLE()[idx].sg_gui_sp_name);
-#endif
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    HL_TABLE()[idx].sg_gui_fg = INVALCOLOR;
-    HL_TABLE()[idx].sg_gui_bg = INVALCOLOR;
-    HL_TABLE()[idx].sg_gui_sp = INVALCOLOR;
-#endif
-#ifdef FEAT_GUI
-    gui_mch_free_font(HL_TABLE()[idx].sg_font);
-    HL_TABLE()[idx].sg_font = NOFONT;
+    HL_ಕೋಷ್ಟಕ()[idx].sg_ಪದ = 0;
+    VIM_CLEAR(HL_ಕೋಷ್ಟಕ()[idx].sg_ಆರಂಭ);
+    VIM_CLEAR(HL_ಕೋಷ್ಟಕ()[idx].sg_stop);
+    HL_ಕೋಷ್ಟಕ()[idx].sg_ಪದ_attr = 0;
+    HL_ಕೋಷ್ಟಕ()[idx].sg_cterm = 0;
+    HL_ಕೋಷ್ಟಕ()[idx].sg_cterm_bold = FALSE;
+    HL_ಕೋಷ್ಟಕ()[idx].sg_cterm_fg = 0;
+    HL_ಕೋಷ್ಟಕ()[idx].sg_cterm_bg = 0;
+    HL_ಕೋಷ್ಟಕ()[idx].sg_cterm_attr = 0;
+    HL_ಕೋಷ್ಟಕ()[idx].sg_cterm_font = 0;
+#ಆದರೆ defined(FEAT_GUI) || defined(FEAT_EVAL)
+    HL_ಕೋಷ್ಟಕ()[idx].sg_gui = 0;
+    VIM_CLEAR(HL_ಕೋಷ್ಟಕ()[idx].sg_gui_fg_name);
+    VIM_CLEAR(HL_ಕೋಷ್ಟಕ()[idx].sg_gui_bg_name);
+    VIM_CLEAR(HL_ಕೋಷ್ಟಕ()[idx].sg_gui_sp_name);
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    HL_ಕೋಷ್ಟಕ()[idx].sg_gui_fg = INVALCOLOR;
+    HL_ಕೋಷ್ಟಕ()[idx].sg_gui_bg = INVALCOLOR;
+    HL_ಕೋಷ್ಟಕ()[idx].sg_gui_sp = INVALCOLOR;
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+    gui_mch_free_font(HL_ಕೋಷ್ಟಕ()[idx].sg_font);
+    HL_ಕೋಷ್ಟಕ()[idx].sg_font = NOFONT;
 # ifdef FEAT_XFONTSET
-    gui_mch_free_fontset(HL_TABLE()[idx].sg_fontset);
-    HL_TABLE()[idx].sg_fontset = NOFONTSET;
+    gui_mch_free_fontset(HL_ಕೋಷ್ಟಕ()[idx].sg_fontset);
+    HL_ಕೋಷ್ಟಕ()[idx].sg_fontset = NOFONTSET;
 # endif
-    VIM_CLEAR(HL_TABLE()[idx].sg_font_name);
-    HL_TABLE()[idx].sg_gui_attr = 0;
-#endif
+    VIM_CLEAR(HL_ಕೋಷ್ಟಕ()[idx].sg_font_name);
+    HL_ಕೋಷ್ಟಕ()[idx].sg_gui_attr = 0;
+#ಆದರೆ_ಅಂತ್ಯ
     // Restore default link and context if they exist. Otherwise clears.
-    HL_TABLE()[idx].sg_link = HL_TABLE()[idx].sg_deflink;
-#ifdef FEAT_EVAL
+    HL_ಕೋಷ್ಟಕ()[idx].sg_link = HL_ಕೋಷ್ಟಕ()[idx].sg_deflink;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     // Since we set the default link, set the location to where the default
     // link was set.
-    HL_TABLE()[idx].sg_script_ctx = HL_TABLE()[idx].sg_deflink_sctx;
-#endif
+    HL_ಕೋಷ್ಟಕ()[idx].sg_script_ctx = HL_ಕೋಷ್ಟಕ()[idx].sg_deflink_sctx;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#ಆದರೆ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 /*
  * Set the normal foreground and background colors according to the "Normal"
  * highlighting group.  For X11 also set "Menu", "Scrollbar" and "Tooltip"
  * colors.  For MS-Windows also set "TitleBar" and "TitleBarNC" colors.
  */
-    void
-set_normal_colors(void)
+    ಶೂನ್ಯ
+ಗಣ_ಸಾಮಾನ್ಯ_colors(ಶೂನ್ಯ)
 {
 # ifdef FEAT_GUI
 #  ifdef FEAT_TERMGUICOLORS
-    if (gui.in_use)
+    ಆದರೆ (gui.ಒಳ_use)
 #  endif
     {
-	if (set_group_colors((char_u *)"Normal",
-				 &gui.norm_pixel, &gui.back_pixel,
+	ಆದರೆ (ಗಣ_ಗುಂಪು_colors((char_u *)"Normal",
+				 &gui.norm_pixel, &gui.ಹಿಂಭಾಗ_pixel,
 				 FALSE, TRUE, FALSE))
 	{
 	    gui_mch_new_colors();
-	    set_must_redraw(UPD_CLEAR);
+	    ಗಣ_must_redraw(UPD_CLEAR);
 	}
 #  ifdef FEAT_GUI_MSWIN
-	if (set_group_colors((char_u *)"TitleBar",
+	ಆದರೆ (ಗಣ_ಗುಂಪು_colors((char_u *)"TitleBar",
 				 &gui.title_fg_pixel, &gui.title_bg_pixel,
 				 FALSE, FALSE, FALSE))
 	{
-	    gui_mch_set_titlebar_colors();
-	    set_must_redraw(UPD_CLEAR);
+	    gui_mch_ಗಣ_titlebar_colors();
+	    ಗಣ_must_redraw(UPD_CLEAR);
 	}
-	if (set_group_colors((char_u *)"TitleBarNC",
+	ಆದರೆ (ಗಣ_ಗುಂಪು_colors((char_u *)"TitleBarNC",
 				 &gui.titlenc_fg_pixel, &gui.titlenc_bg_pixel,
 				 FALSE, FALSE, FALSE))
 	{
-	    gui_mch_set_titlebar_colors();
-	    set_must_redraw(UPD_CLEAR);
+	    gui_mch_ಗಣ_titlebar_colors();
+	    ಗಣ_must_redraw(UPD_CLEAR);
 	}
 #  endif
 #  ifdef FEAT_GUI_X11
-	if (set_group_colors((char_u *)"Menu",
+	ಆದರೆ (ಗಣ_ಗುಂಪು_colors((char_u *)"Menu",
 			     &gui.menu_fg_pixel, &gui.menu_bg_pixel,
 			     TRUE, FALSE, FALSE))
 	{
 #   ifdef FEAT_MENU
 	    gui_mch_new_menu_colors();
 #   endif
-	    set_must_redraw(UPD_CLEAR);
+	    ಗಣ_must_redraw(UPD_CLEAR);
 	}
 #   ifdef FEAT_BEVAL_GUI
-	if (set_group_colors((char_u *)"Tooltip",
+	ಆದರೆ (ಗಣ_ಗುಂಪು_colors((char_u *)"Tooltip",
 			     &gui.tooltip_fg_pixel, &gui.tooltip_bg_pixel,
 			     FALSE, FALSE, TRUE))
 	{
 #    ifdef FEAT_TOOLBAR
 	    gui_mch_new_tooltip_colors();
 #    endif
-	    set_must_redraw(UPD_CLEAR);
+	    ಗಣ_must_redraw(UPD_CLEAR);
 	}
 #   endif
-	if (set_group_colors((char_u *)"Scrollbar",
+	ಆದರೆ (ಗಣ_ಗುಂಪು_colors((char_u *)"Scrollbar",
 			&gui.scroll_fg_pixel, &gui.scroll_bg_pixel,
 			FALSE, FALSE, FALSE))
 	{
 	    gui_new_scrollbar_colors();
-	    set_must_redraw(UPD_CLEAR);
+	    ಗಣ_must_redraw(UPD_CLEAR);
 	}
 #  endif
     }
 # endif
 # ifdef FEAT_TERMGUICOLORS
 #  ifdef FEAT_GUI
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 #  endif
     {
-	int		idx;
+	ಪೂರ್ಣಾಂಕ		idx;
 
 	idx = syn_name2id((char_u *)"Normal") - 1;
-	if (idx >= 0)
+	ಆದರೆ (idx >= 0)
 	{
 	    gui_do_one_color(idx, FALSE, FALSE);
 
 	    // If the normal fg or bg color changed a complete redraw is
 	    // required.
-	    if (cterm_normal_fg_gui_color != HL_TABLE()[idx].sg_gui_fg
-		    || cterm_normal_bg_gui_color != HL_TABLE()[idx].sg_gui_bg)
+	    ಆದರೆ (cterm_ಸಾಮಾನ್ಯ_fg_gui_color != HL_ಕೋಷ್ಟಕ()[idx].sg_gui_fg
+		    || cterm_ಸಾಮಾನ್ಯ_bg_gui_color != HL_ಕೋಷ್ಟಕ()[idx].sg_gui_bg)
 	    {
 		// if the GUI color is INVALCOLOR then we use the default cterm
 		// color
-		cterm_normal_fg_gui_color = HL_TABLE()[idx].sg_gui_fg;
-		cterm_normal_bg_gui_color = HL_TABLE()[idx].sg_gui_bg;
-		set_must_redraw(UPD_CLEAR);
+		cterm_ಸಾಮಾನ್ಯ_fg_gui_color = HL_ಕೋಷ್ಟಕ()[idx].sg_gui_fg;
+		cterm_ಸಾಮಾನ್ಯ_bg_gui_color = HL_ಕೋಷ್ಟಕ()[idx].sg_gui_bg;
+		ಗಣ_must_redraw(UPD_CLEAR);
 	    }
 	}
     }
 # endif
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_GUI)
+#ಆದರೆ defined(FEAT_GUI)
 /*
  * Set the colors for "Normal", "Menu", "TitleBar", "TitleBarNC", "Tooltip" or
  * "Scrollbar".
  */
-    static int
-set_group_colors(
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಗಣ_ಗುಂಪು_colors(
     char_u	*name,
     guicolor_T	*fgp,
     guicolor_T	*bgp,
-    int		do_menu,
-    int		use_norm,
-    int		do_tooltip)
+    ಪೂರ್ಣಾಂಕ		do_menu,
+    ಪೂರ್ಣಾಂಕ		use_norm,
+    ಪೂರ್ಣಾಂಕ		do_tooltip)
 {
-    int		idx;
+    ಪೂರ್ಣಾಂಕ		idx;
 
     idx = syn_name2id(name) - 1;
-    if (idx < 0)
-	return FALSE;
+    ಆದರೆ (idx < 0)
+	ಹಿಂತಿರುಗಿ FALSE;
 
     gui_do_one_color(idx, do_menu, do_tooltip);
 
-    if (HL_TABLE()[idx].sg_gui_fg != INVALCOLOR)
-	*fgp = HL_TABLE()[idx].sg_gui_fg;
-    else if (use_norm)
+    ಆದರೆ (HL_ಕೋಷ್ಟಕ()[idx].sg_gui_fg != INVALCOLOR)
+	*fgp = HL_ಕೋಷ್ಟಕ()[idx].sg_gui_fg;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (use_norm)
 	*fgp = gui.def_norm_pixel;
-    if (HL_TABLE()[idx].sg_gui_bg != INVALCOLOR)
-	*bgp = HL_TABLE()[idx].sg_gui_bg;
-    else if (use_norm)
-	*bgp = gui.def_back_pixel;
-    return TRUE;
+    ಆದರೆ (HL_ಕೋಷ್ಟಕ()[idx].sg_gui_bg != INVALCOLOR)
+	*bgp = HL_ಕೋಷ್ಟಕ()[idx].sg_gui_bg;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (use_norm)
+	*bgp = gui.def_ಹಿಂಭಾಗ_pixel;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
@@ -2309,91 +2309,91 @@ set_group_colors(
  * Returns "" when it's not found or not set.
  */
     char_u *
-hl_get_font_name(void)
+hl_get_font_name(ಶೂನ್ಯ)
 {
-    int		id;
+    ಪೂರ್ಣಾಂಕ		id;
     char_u	*s;
 
     id = syn_name2id((char_u *)"Normal");
-    if (id > 0)
+    ಆದರೆ (id > 0)
     {
-	s = HL_TABLE()[id - 1].sg_font_name;
-	if (s != NULL)
-	    return s;
+	s = HL_ಕೋಷ್ಟಕ()[id - 1].sg_font_name;
+	ಆದರೆ (s != ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ s;
     }
-    return (char_u *)"";
+    ಹಿಂತಿರುಗಿ (char_u *)"";
 }
 
 /*
  * Set font for "Normal" group.  Called by gui_mch_init_font() when a font has
  * actually chosen to be used.
  */
-    void
-hl_set_font_name(char_u *font_name)
+    ಶೂನ್ಯ
+hl_ಗಣ_font_name(char_u *font_name)
 {
-    int	    id;
+    ಪೂರ್ಣಾಂಕ	    id;
 
     id = syn_name2id((char_u *)"Normal");
-    if (id <= 0)
-	return;
+    ಆದರೆ (id <= 0)
+	ಹಿಂತಿರುಗಿ;
 
-    vim_free(HL_TABLE()[id - 1].sg_font_name);
-    HL_TABLE()[id - 1].sg_font_name = vim_strsave(font_name);
+    vim_free(HL_ಕೋಷ್ಟಕ()[id - 1].sg_font_name);
+    HL_ಕೋಷ್ಟಕ()[id - 1].sg_font_name = vim_strsave(font_name);
 }
 
 /*
  * Set background color for "Normal" group.  Called by gui_set_bg_color()
  * when the color is known.
  */
-    void
-hl_set_bg_color_name(
+    ಶೂನ್ಯ
+hl_ಗಣ_bg_color_name(
     char_u  *name)	    // must have been allocated
 {
-    int	    id;
+    ಪೂರ್ಣಾಂಕ	    id;
 
-    if (name == NULL)
-	return;
+    ಆದರೆ (name == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     id = syn_name2id((char_u *)"Normal");
-    if (id <= 0)
-	return;
+    ಆದರೆ (id <= 0)
+	ಹಿಂತಿರುಗಿ;
 
-    vim_free(HL_TABLE()[id - 1].sg_gui_bg_name);
-    HL_TABLE()[id - 1].sg_gui_bg_name = name;
+    vim_free(HL_ಕೋಷ್ಟಕ()[id - 1].sg_gui_bg_name);
+    HL_ಕೋಷ್ಟಕ()[id - 1].sg_gui_bg_name = name;
 }
 
 /*
  * Set foreground color for "Normal" group.  Called by gui_set_fg_color()
  * when the color is known.
  */
-    void
-hl_set_fg_color_name(
+    ಶೂನ್ಯ
+hl_ಗಣ_fg_color_name(
     char_u  *name)	    // must have been allocated
 {
-    int	    id;
+    ಪೂರ್ಣಾಂಕ	    id;
 
-    if (name == NULL)
-	return;
+    ಆದರೆ (name == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     id = syn_name2id((char_u *)"Normal");
-    if (id <= 0)
-	return;
+    ಆದರೆ (id <= 0)
+	ಹಿಂತಿರುಗಿ;
 
-    vim_free(HL_TABLE()[id - 1].sg_gui_fg_name);
-    HL_TABLE()[id - 1].sg_gui_fg_name = name;
+    vim_free(HL_ಕೋಷ್ಟಕ()[id - 1].sg_gui_fg_name);
+    HL_ಕೋಷ್ಟಕ()[id - 1].sg_gui_fg_name = name;
 }
 
 /*
  * Return the handle for a font name.
  * Returns NOFONT when failed.
  */
-    static GuiFont
+    ಸ್ಥಿರ GuiFont
 font_name2handle(char_u *name)
 {
-    if (STRCMP(name, "NONE") == 0)
-	return NOFONT;
+    ಆದರೆ (STRCMP(name, "NONE") == 0)
+	ಹಿಂತಿರುಗಿ NOFONT;
 
-    return gui_mch_get_font(name, TRUE);
+    ಹಿಂತಿರುಗಿ gui_mch_get_font(name, TRUE);
 }
 
 # ifdef FEAT_XFONTSET
@@ -2401,32 +2401,32 @@ font_name2handle(char_u *name)
  * Return the handle for a fontset name.
  * Returns NOFONTSET when failed.
  */
-    static GuiFontset
-fontset_name2handle(char_u *name, int fixed_width)
+    ಸ್ಥಿರ GuiFontset
+fontset_name2handle(char_u *name, ಪೂರ್ಣಾಂಕ fixed_ಅಗಲ)
 {
-    if (STRCMP(name, "NONE") == 0)
-	return NOFONTSET;
+    ಆದರೆ (STRCMP(name, "NONE") == 0)
+	ಹಿಂತಿರುಗಿ NOFONTSET;
 
-    return gui_mch_get_fontset(name, TRUE, fixed_width);
+    ಹಿಂತಿರುಗಿ gui_mch_get_fontset(name, TRUE, fixed_ಅಗಲ);
 }
 # endif
 
 /*
  * Get the font or fontset for one highlight group.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 hl_do_font(
-    int		idx,
+    ಪೂರ್ಣಾಂಕ		idx,
     char_u	*arg,
-    int		do_normal,		// set normal font
-    int		do_menu UNUSED,		// set menu font
-    int		do_tooltip UNUSED,	// set tooltip font
-    int		free_font)		// free current font/fontset
+    ಪೂರ್ಣಾಂಕ		do_ಸಾಮಾನ್ಯ,		// set normal font
+    ಪೂರ್ಣಾಂಕ		do_menu ಬಳಸದ,		// set menu font
+    ಪೂರ್ಣಾಂಕ		do_tooltip ಬಳಸದ,	// set tooltip font
+    ಪೂರ್ಣಾಂಕ		free_font)		// free current font/fontset
 {
 # ifdef FEAT_XFONTSET
     // If 'guifontset' is not empty, first try using the name as a
     // fontset.  If that doesn't work, use it as a font name.
-    if (*p_guifontset != NUL
+    ಆದರೆ (*p_guifontset != NUL
 #  ifdef FONTSET_ALWAYS
 	|| do_menu
 #  endif
@@ -2436,9 +2436,9 @@ hl_do_font(
 #  endif
 	    )
     {
-	if (free_font)
-	    gui_mch_free_fontset(HL_TABLE()[idx].sg_fontset);
-	HL_TABLE()[idx].sg_fontset = fontset_name2handle(arg, 0
+	ಆದರೆ (free_font)
+	    gui_mch_free_fontset(HL_ಕೋಷ್ಟಕ()[idx].sg_fontset);
+	HL_ಕೋಷ್ಟಕ()[idx].sg_fontset = fontset_name2handle(arg, 0
 #  ifdef FONTSET_ALWAYS
 		|| do_menu
 #  endif
@@ -2447,54 +2447,54 @@ hl_do_font(
 #  endif
 		);
     }
-    if (HL_TABLE()[idx].sg_fontset != NOFONTSET)
+    ಆದರೆ (HL_ಕೋಷ್ಟಕ()[idx].sg_fontset != NOFONTSET)
     {
 	// If it worked and it's the Normal group, use it as the normal
 	// fontset.  Same for the Menu group.
-	if (do_normal)
+	ಆದರೆ (do_ಸಾಮಾನ್ಯ)
 	    gui_init_font(arg, TRUE);
-#  if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
-	if (do_menu)
+#  ಆದರೆ defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
+	ಆದರೆ (do_menu)
 	{
 #   ifdef FONTSET_ALWAYS
-	    gui.menu_fontset = HL_TABLE()[idx].sg_fontset;
-#   else
+	    gui.menu_fontset = HL_ಕೋಷ್ಟಕ()[idx].sg_fontset;
+#   ಇಲ್ಲದಿದ್ದರೆ
 	    // YIKES!  This is a bug waiting to crash the program
-	    gui.menu_font = HL_TABLE()[idx].sg_fontset;
+	    gui.menu_font = HL_ಕೋಷ್ಟಕ()[idx].sg_fontset;
 #   endif
 	    gui_mch_new_menu_font();
 	}
 #   ifdef FEAT_BEVAL_GUI
-	if (do_tooltip)
+	ಆದರೆ (do_tooltip)
 	{
 	    // The Athena widget set could not handle switching between
 	    // displaying a single font and a fontset.
 	    // If the XtNinternational resource is set to True at widget
 	    // creation, then a fontset is always used, otherwise an
 	    // XFontStruct is used.
-	    gui.tooltip_fontset = (XFontSet)HL_TABLE()[idx].sg_fontset;
+	    gui.tooltip_fontset = (XFont_ಗಣ)HL_ಕೋಷ್ಟಕ()[idx].sg_fontset;
 	    gui_mch_new_tooltip_font();
 	}
 #   endif
 #  endif
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 # endif
     {
-	if (free_font)
-	    gui_mch_free_font(HL_TABLE()[idx].sg_font);
-	HL_TABLE()[idx].sg_font = font_name2handle(arg);
+	ಆದರೆ (free_font)
+	    gui_mch_free_font(HL_ಕೋಷ್ಟಕ()[idx].sg_font);
+	HL_ಕೋಷ್ಟಕ()[idx].sg_font = font_name2handle(arg);
 	// If it worked and it's the Normal group, use it as the
 	// normal font.  Same for the Menu group.
-	if (HL_TABLE()[idx].sg_font != NOFONT)
+	ಆದರೆ (HL_ಕೋಷ್ಟಕ()[idx].sg_font != NOFONT)
 	{
-	    if (do_normal)
+	    ಆದರೆ (do_ಸಾಮಾನ್ಯ)
 		gui_init_font(arg, FALSE);
 # ifndef FONTSET_ALWAYS
-#  if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
-	    if (do_menu)
+#  ಆದರೆ defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
+	    ಆದರೆ (do_menu)
 	    {
-		gui.menu_font = HL_TABLE()[idx].sg_font;
+		gui.menu_font = HL_ಕೋಷ್ಟಕ()[idx].sg_font;
 		gui_mch_new_menu_font();
 	    }
 #  endif
@@ -2503,9 +2503,9 @@ hl_do_font(
     }
 }
 
-#endif // FEAT_GUI
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_GUI
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#ಆದರೆ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 /*
  * Return the handle for a color name.
  * Returns INVALCOLOR when failed.
@@ -2513,47 +2513,47 @@ hl_do_font(
     guicolor_T
 color_name2handle(char_u *name)
 {
-    if (STRCMP(name, "NONE") == 0)
-	return INVALCOLOR;
+    ಆದರೆ (STRCMP(name, "NONE") == 0)
+	ಹಿಂತಿರುಗಿ INVALCOLOR;
 
-    if (STRICMP(name, "fg") == 0 || STRICMP(name, "foreground") == 0)
+    ಆದರೆ (STRICMP(name, "fg") == 0 || STRICMP(name, "foreground") == 0)
     {
-# if defined(FEAT_TERMGUICOLORS) && defined(FEAT_GUI)
-	if (gui.in_use)
+# ಆದರೆ defined(FEAT_TERMGUICOLORS) && defined(FEAT_GUI)
+	ಆದರೆ (gui.ಒಳ_use)
 # endif
 # ifdef FEAT_GUI
-	    return gui.norm_pixel;
+	    ಹಿಂತಿರುಗಿ gui.norm_pixel;
 # endif
 # ifdef FEAT_TERMGUICOLORS
-	if (cterm_normal_fg_gui_color != INVALCOLOR)
-	    return cterm_normal_fg_gui_color;
+	ಆದರೆ (cterm_ಸಾಮಾನ್ಯ_fg_gui_color != INVALCOLOR)
+	    ಹಿಂತಿರುಗಿ cterm_ಸಾಮಾನ್ಯ_fg_gui_color;
 	// Guess that the foreground is black or white.
-	return GUI_GET_COLOR((char_u *)(*p_bg == 'l' ? "black" : "white"));
+	ಹಿಂತಿರುಗಿ GUI_GET_COLOR((char_u *)(*p_bg == 'l' ? "black" : "white"));
 # endif
     }
-    if (STRICMP(name, "bg") == 0 || STRICMP(name, "background") == 0)
+    ಆದರೆ (STRICMP(name, "bg") == 0 || STRICMP(name, "background") == 0)
     {
-# if defined(FEAT_TERMGUICOLORS) && defined(FEAT_GUI)
-	if (gui.in_use)
+# ಆದರೆ defined(FEAT_TERMGUICOLORS) && defined(FEAT_GUI)
+	ಆದರೆ (gui.ಒಳ_use)
 # endif
 # ifdef FEAT_GUI
-	    return gui.back_pixel;
+	    ಹಿಂತಿರುಗಿ gui.ಹಿಂಭಾಗ_pixel;
 # endif
 # ifdef FEAT_TERMGUICOLORS
-	if (cterm_normal_bg_gui_color != INVALCOLOR)
-	    return cterm_normal_bg_gui_color;
+	ಆದರೆ (cterm_ಸಾಮಾನ್ಯ_bg_gui_color != INVALCOLOR)
+	    ಹಿಂತಿರುಗಿ cterm_ಸಾಮಾನ್ಯ_bg_gui_color;
 	// Guess that the background is white or black.
-	return GUI_GET_COLOR((char_u *)(*p_bg == 'l' ? "white" : "black"));
+	ಹಿಂತಿರುಗಿ GUI_GET_COLOR((char_u *)(*p_bg == 'l' ? "white" : "black"));
 # endif
     }
 
-    return GUI_GET_COLOR(name);
+    ಹಿಂತಿರುಗಿ GUI_GET_COLOR(name);
 }
 
 // On MS-Windows an RGB macro is available and it produces 0x00bbggrr color
 // values as used by the MS-Windows GDI api.  It should be used only for
 // MS-Windows GDI builds.
-# if defined(RGB) && defined(MSWIN) && !defined(FEAT_GUI)
+# ಆದರೆ defined(RGB) && defined(MSWIN) && !defined(FEAT_GUI)
 #  undef RGB
 # endif
 # ifndef RGB
@@ -2561,44 +2561,44 @@ color_name2handle(char_u *name)
 # endif
 
 # ifdef VIMDLL
-    static guicolor_T
+    ಸ್ಥಿರ guicolor_T
 gui_adjust_rgb(guicolor_T c)
 {
-    if (gui.in_use)
-	return c;
-    else
-	return ((c & 0xff) << 16) | (c & 0x00ff00) | ((c >> 16) & 0xff);
+    ಆದರೆ (gui.ಒಳ_use)
+	ಹಿಂತಿರುಗಿ c;
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಹಿಂತಿರುಗಿ ((c & 0xff) << 16) | (c & 0x00ff00) | ((c >> 16) & 0xff);
 }
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  define gui_adjust_rgb(c) (c)
 # endif
 
-    static int
-hex_digit(int c)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+hex_digit(ಪೂರ್ಣಾಂಕ c)
 {
-    if (SAFE_isdigit(c))
-	return c - '0';
+    ಆದರೆ (ಸುರಕ್ಷಿತ_isdigit(c))
+	ಹಿಂತಿರುಗಿ c - '0';
     c = TOLOWER_ASC(c);
-    if (c >= 'a' && c <= 'f')
-	return c - 'a' + 10;
-    return 0x1ffffff;
+    ಆದರೆ (c >= 'a' && c <= 'f')
+	ಹಿಂತಿರುಗಿ c - 'a' + 10;
+    ಹಿಂತಿರುಗಿ 0x1ffffff;
 }
 
-    static guicolor_T
+    ಸ್ಥಿರ guicolor_T
 decode_hex_color(char_u *hex)
 {
     guicolor_T color;
 
-    if (hex[0] != '#' || STRLEN(hex) != 7)
-	return INVALCOLOR;
+    ಆದರೆ (hex[0] != '#' || STRLEN(hex) != 7)
+	ಹಿಂತಿರುಗಿ INVALCOLOR;
 
     // Name is in "#rrggbb" format
     color = RGB(((hex_digit(hex[1]) << 4) + hex_digit(hex[2])),
 		((hex_digit(hex[3]) << 4) + hex_digit(hex[4])),
 		((hex_digit(hex[5]) << 4) + hex_digit(hex[6])));
-    if (color > 0xffffff)
-	return INVALCOLOR;
-    return gui_adjust_rgb(color);
+    ಆದರೆ (color > 0xffffff)
+	ಹಿಂತಿರುಗಿ INVALCOLOR;
+    ಹಿಂತಿರುಗಿ gui_adjust_rgb(color);
 }
 
 # ifdef FEAT_EVAL
@@ -2606,45 +2606,45 @@ decode_hex_color(char_u *hex)
 // such name exists in the color table. The convention is to use lowercase for
 // all keys in the v:colornames dictionary. The value can be either a string in
 // the form #rrggbb or a number, either of which is converted to a guicolor_T.
-    static guicolor_T
+    ಸ್ಥಿರ guicolor_T
 colorname2rgb(char_u *name)
 {
-    dict_T      *colornames_table = get_vim_var_dict(VV_COLORNAMES);
+    dict_T      *colornames_ಕೋಷ್ಟಕ = get_vim_var_dict(VV_COLORNAMES);
     char_u      *lc_name;
     dictitem_T  *colentry;
     char_u      *colstr;
     varnumber_T colnum;
 
     lc_name = strlow_save(name);
-    if (lc_name == NULL)
-	return INVALCOLOR;
+    ಆದರೆ (lc_name == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ INVALCOLOR;
 
-    colentry = dict_find(colornames_table, lc_name, -1);
+    colentry = dict_ಕಂಡುಹಿಡಿ(colornames_ಕೋಷ್ಟಕ, lc_name, -1);
     vim_free(lc_name);
-    if (colentry == NULL)
-	return INVALCOLOR;
+    ಆದರೆ (colentry == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ INVALCOLOR;
 
-    if (colentry->di_tv.v_type == VAR_STRING)
+    ಆದರೆ (colentry->di_tv.v_type == VAR_STRING)
     {
 	colstr = tv_get_string_strict(&colentry->di_tv);
-	if ((STRLEN(colstr) == 7) && (*colstr == '#'))
+	ಆದರೆ ((STRLEN(colstr) == 7) && (*colstr == '#'))
 	{
-	    return decode_hex_color(colstr);
+	    ಹಿಂತಿರುಗಿ decode_hex_color(colstr);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    semsg(_(e_bad_color_string_str), colstr);
-	    return INVALCOLOR;
+	    ಹಿಂತಿರುಗಿ INVALCOLOR;
 	}
     }
 
-    if (colentry->di_tv.v_type == VAR_NUMBER)
+    ಆದರೆ (colentry->di_tv.v_type == VAR_ಸಂಖ್ಯೆ)
     {
-	colnum = tv_get_number(&colentry->di_tv);
-	return (guicolor_T)colnum;
+	colnum = tv_get_ಸಂಖ್ಯೆ(&colentry->di_tv);
+	ಹಿಂತಿರುಗಿ (guicolor_T)colnum;
     }
 
-    return INVALCOLOR;
+    ಹಿಂತಿರುಗಿ INVALCOLOR;
 }
 
 # endif
@@ -2656,101 +2656,101 @@ gui_get_color_cmn(char_u *name)
     // Only non X11 colors (not present in rgb.txt) and colors in
     // color_name_tab[], useful when $VIMRUNTIME is not found,.
     // must be sorted by the 'value' field because it is used by bsearch()!
-    static keyvalue_T rgb_tab[] = {
-	KEYVALUE_ENTRY(RGB(0x00, 0x00, 0x00), "black"),
-	KEYVALUE_ENTRY(RGB(0x00, 0x00, 0xFF), "blue"),
-	KEYVALUE_ENTRY(RGB(0xA5, 0x2A, 0x2A), "brown"),
-	KEYVALUE_ENTRY(RGB(0x00, 0xFF, 0xFF), "cyan"),
-	KEYVALUE_ENTRY(RGB(0x00, 0x00, 0x8B), "darkblue"),
-	KEYVALUE_ENTRY(RGB(0x00, 0x8B, 0x8B), "darkcyan"),
-	KEYVALUE_ENTRY(RGB(0xA9, 0xA9, 0xA9), "darkgray"),
-	KEYVALUE_ENTRY(RGB(0x00, 0x64, 0x00), "darkgreen"),
-	KEYVALUE_ENTRY(RGB(0xA9, 0xA9, 0xA9), "darkgrey"),
-	KEYVALUE_ENTRY(RGB(0x8B, 0x00, 0x8B), "darkmagenta"),
-	KEYVALUE_ENTRY(RGB(0x8B, 0x00, 0x00), "darkred"),
-	KEYVALUE_ENTRY(RGB(0x8B, 0x8B, 0x00), "darkyellow"),	 // No X11
-	KEYVALUE_ENTRY(RGB(0xBE, 0xBE, 0xBE), "gray"),
-	KEYVALUE_ENTRY(RGB(0x00, 0xFF, 0x00), "green"),
-	KEYVALUE_ENTRY(RGB(0xBE, 0xBE, 0xBE), "grey"),
-	KEYVALUE_ENTRY(RGB(0x66, 0x66, 0x66), "grey40"),
-	KEYVALUE_ENTRY(RGB(0x7F, 0x7F, 0x7F), "grey50"),
-	KEYVALUE_ENTRY(RGB(0xE5, 0xE5, 0xE5), "grey90"),
-	KEYVALUE_ENTRY(RGB(0xAD, 0xD8, 0xE6), "lightblue"),
-	KEYVALUE_ENTRY(RGB(0xE0, 0xFF, 0xFF), "lightcyan"),
-	KEYVALUE_ENTRY(RGB(0xD3, 0xD3, 0xD3), "lightgray"),
-	KEYVALUE_ENTRY(RGB(0x90, 0xEE, 0x90), "lightgreen"),
-	KEYVALUE_ENTRY(RGB(0xD3, 0xD3, 0xD3), "lightgrey"),
-	KEYVALUE_ENTRY(RGB(0xFF, 0x8B, 0xFF), "lightmagenta"),     // No XX
-	KEYVALUE_ENTRY(RGB(0xFF, 0x8B, 0x8B), "lightred"),	 // No XX
-	KEYVALUE_ENTRY(RGB(0xFF, 0xFF, 0xE0), "lightyellow"),
-	KEYVALUE_ENTRY(RGB(0xFF, 0x00, 0xFF), "magenta"),
-	KEYVALUE_ENTRY(RGB(0xFF, 0x00, 0x00), "red"),
-	KEYVALUE_ENTRY(RGB(0x2E, 0x8B, 0x57), "seagreen"),
-	KEYVALUE_ENTRY(RGB(0xFF, 0xFF, 0xFF), "white"),
-	KEYVALUE_ENTRY(RGB(0xFF, 0xFF, 0x00), "yellow")
+    ಸ್ಥಿರ keyvalue_T rgb_tab[] = {
+	KEYVALUE_ನಮೂದು(RGB(0x00, 0x00, 0x00), "black"),
+	KEYVALUE_ನಮೂದು(RGB(0x00, 0x00, 0xFF), "blue"),
+	KEYVALUE_ನಮೂದು(RGB(0xA5, 0x2A, 0x2A), "brown"),
+	KEYVALUE_ನಮೂದು(RGB(0x00, 0xFF, 0xFF), "cyan"),
+	KEYVALUE_ನಮೂದು(RGB(0x00, 0x00, 0x8B), "darkblue"),
+	KEYVALUE_ನಮೂದು(RGB(0x00, 0x8B, 0x8B), "darkcyan"),
+	KEYVALUE_ನಮೂದು(RGB(0xA9, 0xA9, 0xA9), "darkgray"),
+	KEYVALUE_ನಮೂದು(RGB(0x00, 0x64, 0x00), "darkgreen"),
+	KEYVALUE_ನಮೂದು(RGB(0xA9, 0xA9, 0xA9), "darkgrey"),
+	KEYVALUE_ನಮೂದು(RGB(0x8B, 0x00, 0x8B), "darkmagenta"),
+	KEYVALUE_ನಮೂದು(RGB(0x8B, 0x00, 0x00), "darkred"),
+	KEYVALUE_ನಮೂದು(RGB(0x8B, 0x8B, 0x00), "darkyellow"),	 // No X11
+	KEYVALUE_ನಮೂದು(RGB(0xBE, 0xBE, 0xBE), "gray"),
+	KEYVALUE_ನಮೂದು(RGB(0x00, 0xFF, 0x00), "green"),
+	KEYVALUE_ನಮೂದು(RGB(0xBE, 0xBE, 0xBE), "grey"),
+	KEYVALUE_ನಮೂದು(RGB(0x66, 0x66, 0x66), "grey40"),
+	KEYVALUE_ನಮೂದು(RGB(0x7F, 0x7F, 0x7F), "grey50"),
+	KEYVALUE_ನಮೂದು(RGB(0xE5, 0xE5, 0xE5), "grey90"),
+	KEYVALUE_ನಮೂದು(RGB(0xAD, 0xD8, 0xE6), "lightblue"),
+	KEYVALUE_ನಮೂದು(RGB(0xE0, 0xFF, 0xFF), "lightcyan"),
+	KEYVALUE_ನಮೂದು(RGB(0xD3, 0xD3, 0xD3), "lightgray"),
+	KEYVALUE_ನಮೂದು(RGB(0x90, 0xEE, 0x90), "lightgreen"),
+	KEYVALUE_ನಮೂದು(RGB(0xD3, 0xD3, 0xD3), "lightgrey"),
+	KEYVALUE_ನಮೂದು(RGB(0xFF, 0x8B, 0xFF), "lightmagenta"),     // No XX
+	KEYVALUE_ನಮೂದು(RGB(0xFF, 0x8B, 0x8B), "lightred"),	 // No XX
+	KEYVALUE_ನಮೂದು(RGB(0xFF, 0xFF, 0xE0), "lightyellow"),
+	KEYVALUE_ನಮೂದು(RGB(0xFF, 0x00, 0xFF), "magenta"),
+	KEYVALUE_ನಮೂದು(RGB(0xFF, 0x00, 0x00), "red"),
+	KEYVALUE_ನಮೂದು(RGB(0x2E, 0x8B, 0x57), "seagreen"),
+	KEYVALUE_ನಮೂದು(RGB(0xFF, 0xFF, 0xFF), "white"),
+	KEYVALUE_ನಮೂದು(RGB(0xFF, 0xFF, 0x00), "yellow")
     };
-    keyvalue_T target;
-    keyvalue_T *entry;
+    keyvalue_T ಗುರಿ;
+    keyvalue_T *ನಮೂದು;
 
     color = decode_hex_color(name);
-    if (color != INVALCOLOR)
-	return color;
+    ಆದರೆ (color != INVALCOLOR)
+	ಹಿಂತಿರುಗಿ color;
 
-    target.key = 0;
-    target.value.string = name;
-    target.value.length = 0;	// not used, see cmp_keyvalue_value_i()
-    entry = (keyvalue_T *)bsearch(&target, &rgb_tab, ARRAY_LENGTH(rgb_tab),
-	    sizeof(rgb_tab[0]), cmp_keyvalue_value_i);
-    if (entry != NULL)
-	return gui_adjust_rgb((guicolor_T)entry->key);
+    ಗುರಿ.ಕೀಲಿ = 0;
+    ಗುರಿ.ಮೌಲ್ಯ.string = name;
+    ಗುರಿ.ಮೌಲ್ಯ.ಉದ್ದಳತೆ = 0;	// not used, see cmp_keyvalue_value_i()
+    ನಮೂದು = (keyvalue_T *)bsearch(&ಗುರಿ, &rgb_tab, ARRAY_ಉದ್ದಳತೆ(rgb_tab),
+	    ಗಾತ್ರ(rgb_tab[0]), cmp_keyvalue_ಮೌಲ್ಯ_i);
+    ಆದರೆ (ನಮೂದು != ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ gui_adjust_rgb((guicolor_T)ನಮೂದು->ಕೀಲಿ);
 
-# if defined(FEAT_EVAL)
+# ಆದರೆ defined(FEAT_EVAL)
     /*
      * Not a traditional color. Load additional color aliases and then consult the alias table.
      */
 
     color = colorname2rgb(name);
-    if (color == INVALCOLOR)
+    ಆದರೆ (color == INVALCOLOR)
     {
-	load_default_colors_lists();
+	ತುಂಬು_default_colors_lists();
 	color = colorname2rgb(name);
     }
 
-    return color;
-# else
-    return INVALCOLOR;
+    ಹಿಂತಿರುಗಿ color;
+# ಇಲ್ಲದಿದ್ದರೆ
+    ಹಿಂತಿರುಗಿ INVALCOLOR;
 # endif
 }
 
     guicolor_T
-gui_get_rgb_color_cmn(int r, int g, int b)
+gui_get_rgb_color_cmn(ಪೂರ್ಣಾಂಕ r, ಪೂರ್ಣಾಂಕ g, ಪೂರ್ಣಾಂಕ b)
 {
     guicolor_T  color = RGB(r, g, b);
 
-    if (color > 0xffffff)
-	return INVALCOLOR;
-    return gui_adjust_rgb(color);
+    ಆದರೆ (color > 0xffffff)
+	ಹಿಂತಿರುಗಿ INVALCOLOR;
+    ಹಿಂತಿರುಗಿ gui_adjust_rgb(color);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Table with the specifications for an attribute number.
  * Note that this table is used by ALL buffers.  This is required because the
  * GUI can redraw at any time for any buffer.
  */
-static garray_T	term_attr_table = {0, 0, 0, 0, NULL};
+ಸ್ಥಿರ garray_T	ಪದ_attr_ಕೋಷ್ಟಕ = {0, 0, 0, 0, ಖಾಲಿ};
 
-#define TERM_ATTR_ENTRY(idx) ((attrentry_T *)term_attr_table.ga_data)[idx]
+#ವ್ಯಾಖ್ಯಾನಿಸು ಪದ_ATTR_ನಮೂದು(idx) ((attrentry_T *)ಪದ_attr_ಕೋಷ್ಟಕ.ga_ದತ್ತಾಂಶ)[idx]
 
-static garray_T	cterm_attr_table = {0, 0, 0, 0, NULL};
+ಸ್ಥಿರ garray_T	cterm_attr_ಕೋಷ್ಟಕ = {0, 0, 0, 0, ಖಾಲಿ};
 
-#define CTERM_ATTR_ENTRY(idx) ((attrentry_T *)cterm_attr_table.ga_data)[idx]
+#ವ್ಯಾಖ್ಯಾನಿಸು CTERM_ATTR_ನಮೂದು(idx) ((attrentry_T *)cterm_attr_ಕೋಷ್ಟಕ.ga_ದತ್ತಾಂಶ)[idx]
 
-#ifdef FEAT_GUI
-static garray_T	gui_attr_table = {0, 0, 0, 0, NULL};
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+ಸ್ಥಿರ garray_T	gui_attr_ಕೋಷ್ಟಕ = {0, 0, 0, 0, ಖಾಲಿ};
 
-# define GUI_ATTR_ENTRY(idx) ((attrentry_T *)gui_attr_table.ga_data)[idx]
-#endif
+# define GUI_ATTR_ನಮೂದು(idx) ((attrentry_T *)gui_attr_ಕೋಷ್ಟಕ.ga_ದತ್ತಾಂಶ)[idx]
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Return the attr number for a set of colors and font.
@@ -2758,25 +2758,25 @@ static garray_T	gui_attr_table = {0, 0, 0, 0, NULL};
  * if the combination is new.
  * Return 0 for error (no more room).
  */
-    static int
-get_attr_entry(garray_T *table, attrentry_T *aep)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+get_attr_ನಮೂದು(garray_T *ಕೋಷ್ಟಕ, attrentry_T *aep)
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
     attrentry_T	*taep;
-    static int	recursive = FALSE;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	recursive = FALSE;
 
     // Init the table, in case it wasn't done yet.
-    table->ga_itemsize = sizeof(attrentry_T);
-    table->ga_growsize = 7;
+    ಕೋಷ್ಟಕ->ga_itemsize = ಗಾತ್ರ(attrentry_T);
+    ಕೋಷ್ಟಕ->ga_growsize = 7;
 
     // Try to find an entry with the same specifications.
-    for (i = 0; i < table->ga_len; ++i)
+    ಗಾಗಿ (i = 0; i < ಕೋಷ್ಟಕ->ga_len; ++i)
     {
-	taep = &(((attrentry_T *)table->ga_data)[i]);
-	if (	   aep->ae_attr == taep->ae_attr
+	taep = &(((attrentry_T *)ಕೋಷ್ಟಕ->ga_ದತ್ತಾಂಶ)[i]);
+	ಆದರೆ (	   aep->ae_attr == taep->ae_attr
 		&& (
-#ifdef FEAT_GUI
-		       (table == &gui_attr_table
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+		       (ಕೋಷ್ಟಕ == &gui_attr_ಕೋಷ್ಟಕ
 			&& (aep->ae_u.gui.fg_color == taep->ae_u.gui.fg_color
 			    && aep->ae_u.gui.bg_color
 						    == taep->ae_u.gui.bg_color
@@ -2788,19 +2788,19 @@ get_attr_entry(garray_T *table, attrentry_T *aep)
 # endif
 			    ))
 		    ||
-#endif
-		       (table == &term_attr_table
-			&& (aep->ae_u.term.start == NULL)
-					    == (taep->ae_u.term.start == NULL)
-			&& (aep->ae_u.term.start == NULL
-			    || STRCMP(aep->ae_u.term.start,
-						  taep->ae_u.term.start) == 0)
-			&& (aep->ae_u.term.stop == NULL)
-					     == (taep->ae_u.term.stop == NULL)
-			&& (aep->ae_u.term.stop == NULL
-			    || STRCMP(aep->ae_u.term.stop,
-						  taep->ae_u.term.stop) == 0))
-		    || (table == &cterm_attr_table
+#ಆದರೆ_ಅಂತ್ಯ
+		       (ಕೋಷ್ಟಕ == &ಪದ_attr_ಕೋಷ್ಟಕ
+			&& (aep->ae_u.ಪದ.ಆರಂಭ == ಖಾಲಿ)
+					    == (taep->ae_u.ಪದ.ಆರಂಭ == ಖಾಲಿ)
+			&& (aep->ae_u.ಪದ.ಆರಂಭ == ಖಾಲಿ
+			    || STRCMP(aep->ae_u.ಪದ.ಆರಂಭ,
+						  taep->ae_u.ಪದ.ಆರಂಭ) == 0)
+			&& (aep->ae_u.ಪದ.stop == ಖಾಲಿ)
+					     == (taep->ae_u.ಪದ.stop == ಖಾಲಿ)
+			&& (aep->ae_u.ಪದ.stop == ಖಾಲಿ
+			    || STRCMP(aep->ae_u.ಪದ.stop,
+						  taep->ae_u.ಪದ.stop) == 0))
+		    || (ಕೋಷ್ಟಕ == &cterm_attr_ಕೋಷ್ಟಕ
 			    && aep->ae_u.cterm.fg_color
 						  == taep->ae_u.cterm.fg_color
 			    && aep->ae_u.cterm.bg_color
@@ -2809,50 +2809,50 @@ get_attr_entry(garray_T *table, attrentry_T *aep)
 						  == taep->ae_u.cterm.ul_color
 			    && aep->ae_u.cterm.font
 						  == taep->ae_u.cterm.font
-#ifdef FEAT_TERMGUICOLORS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMGUICOLORS
 			    && aep->ae_u.cterm.fg_rgb
 						    == taep->ae_u.cterm.fg_rgb
 			    && aep->ae_u.cterm.bg_rgb
 						    == taep->ae_u.cterm.bg_rgb
 			    && aep->ae_u.cterm.ul_rgb
 						    == taep->ae_u.cterm.ul_rgb
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		       )))
 
-	return i + ATTR_OFF;
+	ಹಿಂತಿರುಗಿ i + ATTR_OFF;
     }
 
-    if (table->ga_len + ATTR_OFF > MAX_TYPENR)
+    ಆದರೆ (ಕೋಷ್ಟಕ->ga_len + ATTR_OFF > MAX_TYPENR)
     {
 	// Running out of attribute entries!  remove all attributes, and
 	// compute new ones for all groups.
 	// When called recursively, we are really out of numbers.
-	if (recursive)
+	ಆದರೆ (recursive)
 	{
-	    emsg(_(e_too_many_different_highlighting_attributes_in_use));
-	    return 0;
+	    emsg(_(e_too_many_different_highlighting_ಗುಣಲಕ್ಷಣಗಳು_ಒಳ_use));
+	    ಹಿಂತಿರುಗಿ 0;
 	}
 	recursive = TRUE;
 
 	clear_hl_tables();
 
-	set_must_redraw(UPD_CLEAR);
+	ಗಣ_must_redraw(UPD_CLEAR);
 
-	for (i = 0; i < highlight_ga.ga_len; ++i)
-	    set_hl_attr(i);
+	ಗಾಗಿ (i = 0; i < highlight_ga.ga_len; ++i)
+	    ಗಣ_hl_attr(i);
 
 	recursive = FALSE;
     }
 
     // This is a new combination of colors and font, add an entry.
-    if (ga_grow(table, 1) == FAIL)
-	return 0;
+    ಆದರೆ (ga_grow(ಕೋಷ್ಟಕ, 1) == FAIL)
+	ಹಿಂತಿರುಗಿ 0;
 
-    taep = &(((attrentry_T *)table->ga_data)[table->ga_len]);
-    CLEAR_POINTER(taep);
+    taep = &(((attrentry_T *)ಕೋಷ್ಟಕ->ga_ದತ್ತಾಂಶ)[ಕೋಷ್ಟಕ->ga_len]);
+    CLEAR_ಸೂಚಕ(taep);
     taep->ae_attr = aep->ae_attr;
-#ifdef FEAT_GUI
-    if (table == &gui_attr_table)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+    ಆದರೆ (ಕೋಷ್ಟಕ == &gui_attr_ಕೋಷ್ಟಕ)
     {
 	taep->ae_u.gui.fg_color = aep->ae_u.gui.fg_color;
 	taep->ae_u.gui.bg_color = aep->ae_u.gui.bg_color;
@@ -2862,45 +2862,45 @@ get_attr_entry(garray_T *table, attrentry_T *aep)
 	taep->ae_u.gui.fontset = aep->ae_u.gui.fontset;
 # endif
     }
-#endif
-    if (table == &term_attr_table)
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (ಕೋಷ್ಟಕ == &ಪದ_attr_ಕೋಷ್ಟಕ)
     {
-	if (aep->ae_u.term.start == NULL)
-	    taep->ae_u.term.start = NULL;
-	else
-	    taep->ae_u.term.start = vim_strsave(aep->ae_u.term.start);
-	if (aep->ae_u.term.stop == NULL)
-	    taep->ae_u.term.stop = NULL;
-	else
-	    taep->ae_u.term.stop = vim_strsave(aep->ae_u.term.stop);
+	ಆದರೆ (aep->ae_u.ಪದ.ಆರಂಭ == ಖಾಲಿ)
+	    taep->ae_u.ಪದ.ಆರಂಭ = ಖಾಲಿ;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    taep->ae_u.ಪದ.ಆರಂಭ = vim_strsave(aep->ae_u.ಪದ.ಆರಂಭ);
+	ಆದರೆ (aep->ae_u.ಪದ.stop == ಖಾಲಿ)
+	    taep->ae_u.ಪದ.stop = ಖಾಲಿ;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    taep->ae_u.ಪದ.stop = vim_strsave(aep->ae_u.ಪದ.stop);
     }
-    else if (table == &cterm_attr_table)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಕೋಷ್ಟಕ == &cterm_attr_ಕೋಷ್ಟಕ)
     {
 	taep->ae_u.cterm.fg_color = aep->ae_u.cterm.fg_color;
 	taep->ae_u.cterm.bg_color = aep->ae_u.cterm.bg_color;
 	taep->ae_u.cterm.ul_color = aep->ae_u.cterm.ul_color;
 	taep->ae_u.cterm.font = aep->ae_u.cterm.font;
-#ifdef FEAT_TERMGUICOLORS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMGUICOLORS
 	taep->ae_u.cterm.fg_rgb = aep->ae_u.cterm.fg_rgb;
 	taep->ae_u.cterm.bg_rgb = aep->ae_u.cterm.bg_rgb;
 	taep->ae_u.cterm.ul_rgb = aep->ae_u.cterm.ul_rgb;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
-    ++table->ga_len;
-    return (table->ga_len - 1 + ATTR_OFF);
+    ++ಕೋಷ್ಟಕ->ga_len;
+    ಹಿಂತಿರುಗಿ (ಕೋಷ್ಟಕ->ga_len - 1 + ATTR_OFF);
 }
 
-#if defined(FEAT_TERMINAL)
+#ಆದರೆ defined(FEAT_TERMINAL)
 /*
  * Get an attribute index for a cterm entry.
  * Uses an existing entry when possible or adds one when needed.
  */
-    int
-get_cterm_attr_idx(int attr, int fg, int bg)
+    ಪೂರ್ಣಾಂಕ
+get_cterm_attr_idx(ಪೂರ್ಣಾಂಕ attr, ಪೂರ್ಣಾಂಕ fg, ಪೂರ್ಣಾಂಕ bg)
 {
     attrentry_T		at_en;
 
-    CLEAR_FIELD(at_en);
+    CLEAR_ಕ್ಷೇತ್ರ(at_en);
 # ifdef FEAT_TERMGUICOLORS
     at_en.ae_u.cterm.fg_rgb = INVALCOLOR;
     at_en.ae_u.cterm.bg_rgb = INVALCOLOR;
@@ -2911,77 +2911,77 @@ get_cterm_attr_idx(int attr, int fg, int bg)
     at_en.ae_u.cterm.bg_color = bg;
     at_en.ae_u.cterm.ul_color = 0;
     at_en.ae_u.cterm.font = 0;
-    return get_attr_entry(&cterm_attr_table, &at_en);
+    ಹಿಂತಿರುಗಿ get_attr_ನಮೂದು(&cterm_attr_ಕೋಷ್ಟಕ, &at_en);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_TERMINAL) && defined(FEAT_TERMGUICOLORS)
+#ಆದರೆ defined(FEAT_TERMINAL) && defined(FEAT_TERMGUICOLORS)
 /*
  * Get an attribute index for a 'termguicolors' entry.
  * Uses an existing entry when possible or adds one when needed.
  */
-    int
-get_tgc_attr_idx(int attr, guicolor_T fg, guicolor_T bg)
+    ಪೂರ್ಣಾಂಕ
+get_tgc_attr_idx(ಪೂರ್ಣಾಂಕ attr, guicolor_T fg, guicolor_T bg)
 {
     attrentry_T		at_en;
 
-    CLEAR_FIELD(at_en);
+    CLEAR_ಕ್ಷೇತ್ರ(at_en);
     at_en.ae_attr = attr;
-    if (fg == INVALCOLOR && bg == INVALCOLOR)
+    ಆದರೆ (fg == INVALCOLOR && bg == INVALCOLOR)
     {
 	// If both GUI colors are not set fall back to the cterm colors.  Helps
 	// if the GUI only has an attribute, such as undercurl.
 	at_en.ae_u.cterm.fg_rgb = CTERMCOLOR;
 	at_en.ae_u.cterm.bg_rgb = CTERMCOLOR;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	at_en.ae_u.cterm.fg_rgb = fg;
 	at_en.ae_u.cterm.bg_rgb = bg;
     }
     at_en.ae_u.cterm.ul_rgb = INVALCOLOR;
-    return get_attr_entry(&cterm_attr_table, &at_en);
+    ಹಿಂತಿರುಗಿ get_attr_ನಮೂದು(&cterm_attr_ಕೋಷ್ಟಕ, &at_en);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_TERMINAL) && defined(FEAT_GUI)
+#ಆದರೆ defined(FEAT_TERMINAL) && defined(FEAT_GUI)
 /*
  * Get an attribute index for a cterm entry.
  * Uses an existing entry when possible or adds one when needed.
  */
-    int
-get_gui_attr_idx(int attr, guicolor_T fg, guicolor_T bg)
+    ಪೂರ್ಣಾಂಕ
+get_gui_attr_idx(ಪೂರ್ಣಾಂಕ attr, guicolor_T fg, guicolor_T bg)
 {
     attrentry_T		at_en;
 
-    CLEAR_FIELD(at_en);
+    CLEAR_ಕ್ಷೇತ್ರ(at_en);
     at_en.ae_attr = attr;
     at_en.ae_u.gui.fg_color = fg;
     at_en.ae_u.gui.bg_color = bg;
-    return get_attr_entry(&gui_attr_table, &at_en);
+    ಹಿಂತಿರುಗಿ get_attr_ನಮೂದು(&gui_attr_ಕೋಷ್ಟಕ, &at_en);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Clear all highlight tables.
  */
-    void
-clear_hl_tables(void)
+    ಶೂನ್ಯ
+clear_hl_tables(ಶೂನ್ಯ)
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
     attrentry_T	*taep;
 
-#ifdef FEAT_GUI
-    ga_clear(&gui_attr_table);
-#endif
-    for (i = 0; i < term_attr_table.ga_len; ++i)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+    ga_clear(&gui_attr_ಕೋಷ್ಟಕ);
+#ಆದರೆ_ಅಂತ್ಯ
+    ಗಾಗಿ (i = 0; i < ಪದ_attr_ಕೋಷ್ಟಕ.ga_len; ++i)
     {
-	taep = &(((attrentry_T *)term_attr_table.ga_data)[i]);
-	vim_free(taep->ae_u.term.start);
-	vim_free(taep->ae_u.term.stop);
+	taep = &(((attrentry_T *)ಪದ_attr_ಕೋಷ್ಟಕ.ga_ದತ್ತಾಂಶ)[i]);
+	vim_free(taep->ae_u.ಪದ.ಆರಂಭ);
+	vim_free(taep->ae_u.ಪದ.stop);
     }
-    ga_clear(&term_attr_table);
-    ga_clear(&cterm_attr_table);
+    ga_clear(&ಪದ_attr_ಕೋಷ್ಟಕ);
+    ga_clear(&cterm_attr_ಕೋಷ್ಟಕ);
 }
 
 /*
@@ -2993,149 +2993,149 @@ clear_hl_tables(void)
  * result.
  * Return the resulting attributes.
  */
-    int
-hl_combine_attr(int char_attr, int prim_attr)
+    ಪೂರ್ಣಾಂಕ
+hl_combine_attr(ಪೂರ್ಣಾಂಕ char_attr, ಪೂರ್ಣಾಂಕ prim_attr)
 {
-    attrentry_T *char_aep = NULL;
+    attrentry_T *char_aep = ಖಾಲಿ;
     attrentry_T *prim_aep;
     attrentry_T new_en;
 
-    if (char_attr == 0)
-	return prim_attr;
-    if (char_attr <= HL_ALL && prim_attr <= HL_ALL)
-	return ATTR_COMBINE(char_attr, prim_attr);
-#ifdef FEAT_GUI
-    if (gui.in_use)
+    ಆದರೆ (char_attr == 0)
+	ಹಿಂತಿರುಗಿ prim_attr;
+    ಆದರೆ (char_attr <= HL_ALL && prim_attr <= HL_ALL)
+	ಹಿಂತಿರುಗಿ ATTR_COMBINE(char_attr, prim_attr);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+    ಆದರೆ (gui.ಒಳ_use)
     {
-	if (char_attr > HL_ALL)
+	ಆದರೆ (char_attr > HL_ALL)
 	    char_aep = syn_gui_attr2entry(char_attr);
-	if (char_aep != NULL)
+	ಆದರೆ (char_aep != ಖಾಲಿ)
 	    new_en = *char_aep;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    CLEAR_FIELD(new_en);
+	    CLEAR_ಕ್ಷೇತ್ರ(new_en);
 	    new_en.ae_u.gui.fg_color = INVALCOLOR;
 	    new_en.ae_u.gui.bg_color = INVALCOLOR;
 	    new_en.ae_u.gui.sp_color = INVALCOLOR;
-	    if (char_attr <= HL_ALL)
+	    ಆದರೆ (char_attr <= HL_ALL)
 		new_en.ae_attr = char_attr;
 	}
 
-	if (prim_attr <= HL_ALL)
+	ಆದರೆ (prim_attr <= HL_ALL)
 	    new_en.ae_attr = ATTR_COMBINE(new_en.ae_attr, prim_attr);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    prim_aep = syn_gui_attr2entry(prim_attr);
-	    if (prim_aep != NULL)
+	    ಆದರೆ (prim_aep != ಖಾಲಿ)
 	    {
 		new_en.ae_attr = ATTR_COMBINE(new_en.ae_attr,
 							   prim_aep->ae_attr);
-		if (prim_aep->ae_u.gui.fg_color != INVALCOLOR)
+		ಆದರೆ (prim_aep->ae_u.gui.fg_color != INVALCOLOR)
 		    new_en.ae_u.gui.fg_color = prim_aep->ae_u.gui.fg_color;
-		if (prim_aep->ae_u.gui.bg_color != INVALCOLOR)
+		ಆದರೆ (prim_aep->ae_u.gui.bg_color != INVALCOLOR)
 		    new_en.ae_u.gui.bg_color = prim_aep->ae_u.gui.bg_color;
-		if (prim_aep->ae_u.gui.sp_color != INVALCOLOR)
+		ಆದರೆ (prim_aep->ae_u.gui.sp_color != INVALCOLOR)
 		    new_en.ae_u.gui.sp_color = prim_aep->ae_u.gui.sp_color;
-		if (prim_aep->ae_u.gui.font != NOFONT)
+		ಆದರೆ (prim_aep->ae_u.gui.font != NOFONT)
 		    new_en.ae_u.gui.font = prim_aep->ae_u.gui.font;
 # ifdef FEAT_XFONTSET
-		if (prim_aep->ae_u.gui.fontset != NOFONTSET)
+		ಆದರೆ (prim_aep->ae_u.gui.fontset != NOFONTSET)
 		    new_en.ae_u.gui.fontset = prim_aep->ae_u.gui.fontset;
 # endif
 	    }
 	}
-	return get_attr_entry(&gui_attr_table, &new_en);
+	ಹಿಂತಿರುಗಿ get_attr_ನಮೂದು(&gui_attr_ಕೋಷ್ಟಕ, &new_en);
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (IS_CTERM)
+    ಆದರೆ (IS_CTERM)
     {
-	if (char_attr > HL_ALL)
+	ಆದರೆ (char_attr > HL_ALL)
 	    char_aep = syn_cterm_attr2entry(char_attr);
-	if (char_aep != NULL)
+	ಆದರೆ (char_aep != ಖಾಲಿ)
 	    new_en = *char_aep;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    CLEAR_FIELD(new_en);
-#ifdef FEAT_TERMGUICOLORS
+	    CLEAR_ಕ್ಷೇತ್ರ(new_en);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMGUICOLORS
 	    new_en.ae_u.cterm.bg_rgb = INVALCOLOR;
 	    new_en.ae_u.cterm.fg_rgb = INVALCOLOR;
 	    new_en.ae_u.cterm.ul_rgb = INVALCOLOR;
-#endif
-	    if (char_attr <= HL_ALL)
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಆದರೆ (char_attr <= HL_ALL)
 		new_en.ae_attr = char_attr;
 	}
 
-	if (prim_attr <= HL_ALL)
+	ಆದರೆ (prim_attr <= HL_ALL)
 		new_en.ae_attr = ATTR_COMBINE(new_en.ae_attr, prim_attr);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    prim_aep = syn_cterm_attr2entry(prim_attr);
-	    if (prim_aep != NULL)
+	    ಆದರೆ (prim_aep != ಖಾಲಿ)
 	    {
 		new_en.ae_attr = ATTR_COMBINE(new_en.ae_attr,
 							   prim_aep->ae_attr);
-		if (prim_aep->ae_u.cterm.fg_color > 0)
+		ಆದರೆ (prim_aep->ae_u.cterm.fg_color > 0)
 		    new_en.ae_u.cterm.fg_color = prim_aep->ae_u.cterm.fg_color;
-		if (prim_aep->ae_u.cterm.bg_color > 0)
+		ಆದರೆ (prim_aep->ae_u.cterm.bg_color > 0)
 		    new_en.ae_u.cterm.bg_color = prim_aep->ae_u.cterm.bg_color;
-		if (prim_aep->ae_u.cterm.ul_color > 0)
+		ಆದರೆ (prim_aep->ae_u.cterm.ul_color > 0)
 		    new_en.ae_u.cterm.ul_color = prim_aep->ae_u.cterm.ul_color;
-		if (prim_aep->ae_u.cterm.font > 0)
+		ಆದರೆ (prim_aep->ae_u.cterm.font > 0)
 		    new_en.ae_u.cterm.font = prim_aep->ae_u.cterm.font;
-#ifdef FEAT_TERMGUICOLORS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMGUICOLORS
 		// If both fg and bg are not set fall back to cterm colors.
 		// Helps for SpellBad which uses undercurl in the GUI.
-		if (COLOR_INVALID(prim_aep->ae_u.cterm.fg_rgb)
+		ಆದರೆ (COLOR_INVALID(prim_aep->ae_u.cterm.fg_rgb)
 			&& COLOR_INVALID(prim_aep->ae_u.cterm.bg_rgb))
 		{
-		    if (prim_aep->ae_u.cterm.fg_color > 0)
+		    ಆದರೆ (prim_aep->ae_u.cterm.fg_color > 0)
 			new_en.ae_u.cterm.fg_rgb = CTERMCOLOR;
-		    if (prim_aep->ae_u.cterm.bg_color > 0)
+		    ಆದರೆ (prim_aep->ae_u.cterm.bg_color > 0)
 			new_en.ae_u.cterm.bg_rgb = CTERMCOLOR;
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    if (prim_aep->ae_u.cterm.fg_rgb != INVALCOLOR)
+		    ಆದರೆ (prim_aep->ae_u.cterm.fg_rgb != INVALCOLOR)
 			new_en.ae_u.cterm.fg_rgb = prim_aep->ae_u.cterm.fg_rgb;
-		    if (prim_aep->ae_u.cterm.bg_rgb != INVALCOLOR)
+		    ಆದರೆ (prim_aep->ae_u.cterm.bg_rgb != INVALCOLOR)
 			new_en.ae_u.cterm.bg_rgb = prim_aep->ae_u.cterm.bg_rgb;
 		}
-		if (prim_aep->ae_u.cterm.ul_rgb != INVALCOLOR)
+		ಆದರೆ (prim_aep->ae_u.cterm.ul_rgb != INVALCOLOR)
 		    new_en.ae_u.cterm.ul_rgb = prim_aep->ae_u.cterm.ul_rgb;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
 	}
-	return get_attr_entry(&cterm_attr_table, &new_en);
+	ಹಿಂತಿರುಗಿ get_attr_ನಮೂದು(&cterm_attr_ಕೋಷ್ಟಕ, &new_en);
     }
 
-    if (char_attr > HL_ALL)
-	char_aep = syn_term_attr2entry(char_attr);
-    if (char_aep != NULL)
+    ಆದರೆ (char_attr > HL_ALL)
+	char_aep = syn_ಪದ_attr2entry(char_attr);
+    ಆದರೆ (char_aep != ಖಾಲಿ)
 	new_en = *char_aep;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	CLEAR_FIELD(new_en);
-	if (char_attr <= HL_ALL)
+	CLEAR_ಕ್ಷೇತ್ರ(new_en);
+	ಆದರೆ (char_attr <= HL_ALL)
 	    new_en.ae_attr = char_attr;
     }
 
-    if (prim_attr <= HL_ALL)
+    ಆದರೆ (prim_attr <= HL_ALL)
 	new_en.ae_attr = ATTR_COMBINE(new_en.ae_attr, prim_attr);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	prim_aep = syn_term_attr2entry(prim_attr);
-	if (prim_aep != NULL)
+	prim_aep = syn_ಪದ_attr2entry(prim_attr);
+	ಆದರೆ (prim_aep != ಖಾಲಿ)
 	{
 	    new_en.ae_attr = ATTR_COMBINE(new_en.ae_attr, prim_aep->ae_attr);
-	    if (prim_aep->ae_u.term.start != NULL)
+	    ಆದರೆ (prim_aep->ae_u.ಪದ.ಆರಂಭ != ಖಾಲಿ)
 	    {
-		new_en.ae_u.term.start = prim_aep->ae_u.term.start;
-		new_en.ae_u.term.stop = prim_aep->ae_u.term.stop;
+		new_en.ae_u.ಪದ.ಆರಂಭ = prim_aep->ae_u.ಪದ.ಆರಂಭ;
+		new_en.ae_u.ಪದ.stop = prim_aep->ae_u.ಪದ.stop;
 	    }
 	}
     }
-    return get_attr_entry(&term_attr_table, &new_en);
+    ಹಿಂತಿರುಗಿ get_attr_ನಮೂದು(&ಪದ_attr_ಕೋಷ್ಟಕ, &new_en);
 }
 
 // ANSI color order: Black, Red, Green, Yellow, Blue, Magenta,
@@ -3143,61 +3143,61 @@ hl_combine_attr(int char_attr, int prim_attr)
 // only a cterm color number is known (no guifg/guibg).  Real terminal
 // palettes may differ if the user reconfigured their emulator, but
 // these are reasonable xterm-ish defaults.
-static const long_u cterm_color_16[16] = {
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ long_u cterm_color_16[16] = {
     0x000000, 0xc00000, 0x008000, 0x808000,
     0x0000c0, 0xc000c0, 0x004080, 0xc0c0c0,
     0x808080, 0xff8080, 0x00ff00, 0xffff00,
     0x6060ff, 0xff40ff, 0x00ffff, 0xffffff
 };
 
-#ifdef FEAT_TERMGUICOLORS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMGUICOLORS
 /*
  * Convert a cterm color number (1-16) to an RGB value.
  * Used as a fallback when 'termguicolors' is set but only cterm colors are
  * specified (no guifg/guibg).
  * Returns INVALCOLOR if the color number is out of range.
  */
-    static guicolor_T
-cterm_color_to_rgb(int color_nr)
+    ಸ್ಥಿರ guicolor_T
+cterm_color_ಗಮ್ಯ_rgb(ಪೂರ್ಣಾಂಕ color_nr)
 {
-    if (color_nr < 1 || color_nr > 16)
-	return INVALCOLOR;
-    return (guicolor_T)cterm_color_16[color_nr - 1];
+    ಆದರೆ (color_nr < 1 || color_nr > 16)
+	ಹಿಂತಿರುಗಿ INVALCOLOR;
+    ಹಿಂತಿರುಗಿ (guicolor_T)cterm_color_16[color_nr - 1];
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Convert an xterm 256-color index (0-255) to an approximate RGB triple.
  * Uses the standard xterm palette: 0-15 ANSI (cterm_color_16), 16-231
  * 6x6x6 cube, 232-255 grayscale ramp.
  */
-    static void
-cterm_idx_to_rgb(int idx, int *r, int *g, int *b)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+cterm_idx_ಗಮ್ಯ_rgb(ಪೂರ್ಣಾಂಕ idx, ಪೂರ್ಣಾಂಕ *r, ಪೂರ್ಣಾಂಕ *g, ಪೂರ್ಣಾಂಕ *b)
 {
-    static const int cube[] = { 0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF };
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ cube[] = { 0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF };
 
-    if (idx < 0 || idx > 255)
+    ಆದರೆ (idx < 0 || idx > 255)
     {
 	*r = *g = *b = 0;
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
-    if (idx < 16)
+    ಆದರೆ (idx < 16)
     {
 	long_u rgb = cterm_color_16[idx];
 	*r = (rgb >> 16) & 0xFF;
 	*g = (rgb >> 8) & 0xFF;
 	*b = rgb & 0xFF;
     }
-    else if (idx < 232)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (idx < 232)
     {
-	int n = idx - 16;
+	ಪೂರ್ಣಾಂಕ n = idx - 16;
 	*r = cube[n / 36 % 6];
 	*g = cube[n / 6  % 6];
 	*b = cube[n      % 6];
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	int v = 8 + (idx - 232) * 10;
+	ಪೂರ್ಣಾಂಕ v = 8 + (idx - 232) * 10;
 	*r = *g = *b = v;
     }
 }
@@ -3206,40 +3206,40 @@ cterm_idx_to_rgb(int idx, int *r, int *g, int *b)
  * Approximate an RGB triple to the nearest xterm 256-color index.
  * Searches the 6x6x6 cube and the grayscale ramp; returns 0-255.
  */
-    static int
-rgb_to_cterm_idx(int r, int g, int b)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+rgb_ಗಮ್ಯ_cterm_idx(ಪೂರ್ಣಾಂಕ r, ಪೂರ್ಣಾಂಕ g, ಪೂರ್ಣಾಂಕ b)
 {
-    static const int cube[] = { 0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF };
-    int best = 0;
-    long best_d = -1;
-    int i;
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ cube[] = { 0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF };
+    ಪೂರ್ಣಾಂಕ ಉತ್ತಮ = 0;
+    ದೀರ್ಘ ಉತ್ತಮ_d = -1;
+    ಪೂರ್ಣಾಂಕ i;
 
     // Search the 6x6x6 cube.
-    for (i = 16; i < 232; ++i)
+    ಗಾಗಿ (i = 16; i < 232; ++i)
     {
-	int n = i - 16;
-	int cr = cube[n / 36 % 6];
-	int cg = cube[n / 6  % 6];
-	int cb = cube[n      % 6];
-	long d = (cr - r) * (cr - r) + (cg - g) * (cg - g) + (cb - b) * (cb - b);
-	if (best_d < 0 || d < best_d)
+	ಪೂರ್ಣಾಂಕ n = i - 16;
+	ಪೂರ್ಣಾಂಕ cr = cube[n / 36 % 6];
+	ಪೂರ್ಣಾಂಕ cg = cube[n / 6  % 6];
+	ಪೂರ್ಣಾಂಕ cb = cube[n      % 6];
+	ದೀರ್ಘ d = (cr - r) * (cr - r) + (cg - g) * (cg - g) + (cb - b) * (cb - b);
+	ಆದರೆ (ಉತ್ತಮ_d < 0 || d < ಉತ್ತಮ_d)
 	{
-	    best_d = d;
-	    best = i;
+	    ಉತ್ತಮ_d = d;
+	    ಉತ್ತಮ = i;
 	}
     }
     // Search the grayscale ramp.
-    for (i = 232; i < 256; ++i)
+    ಗಾಗಿ (i = 232; i < 256; ++i)
     {
-	int v = 8 + (i - 232) * 10;
-	long d = (v - r) * (v - r) + (v - g) * (v - g) + (v - b) * (v - b);
-	if (d < best_d)
+	ಪೂರ್ಣಾಂಕ v = 8 + (i - 232) * 10;
+	ದೀರ್ಘ d = (v - r) * (v - r) + (v - g) * (v - g) + (v - b) * (v - b);
+	ಆದರೆ (d < ಉತ್ತಮ_d)
 	{
-	    best_d = d;
-	    best = i;
+	    ಉತ್ತಮ_d = d;
+	    ಉತ್ತಮ = i;
 	}
     }
-    return best;
+    ಹಿಂತಿರುಗಿ ಉತ್ತಮ;
 }
 
 /*
@@ -3248,71 +3248,71 @@ rgb_to_cterm_idx(int r, int g, int b)
  * Returns true on success; false when no color is defined.
  * cterm_c is 1-based (0 means "no color").
  */
-    static bool
-resolve_color_to_rgb(int cterm_c, guicolor_T rgb UNUSED, int *r, int *g, int *b)
+    ಸ್ಥಿರ bool
+resolve_color_ಗಮ್ಯ_rgb(ಪೂರ್ಣಾಂಕ cterm_c, guicolor_T rgb ಬಳಸದ, ಪೂರ್ಣಾಂಕ *r, ಪೂರ್ಣಾಂಕ *g, ಪೂರ್ಣಾಂಕ *b)
 {
-#ifdef FEAT_TERMGUICOLORS
-    if (!COLOR_INVALID(rgb))
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMGUICOLORS
+    ಆದರೆ (!COLOR_INVALID(rgb))
     {
 	*r = (rgb >> 16) & 0xFF;
 	*g = (rgb >> 8) & 0xFF;
 	*b = rgb & 0xFF;
-	return true;
+	ಹಿಂತಿರುಗಿ true;
     }
-#endif
-    if (cterm_c > 0)
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (cterm_c > 0)
     {
-	cterm_idx_to_rgb(cterm_c - 1, r, g, b);
-	return true;
+	cterm_idx_ಗಮ್ಯ_rgb(cterm_c - 1, r, g, b);
+	ಹಿಂತಿರುಗಿ true;
     }
-    return false;
+    ಹಿಂತಿರುಗಿ false;
 }
 
 /*
  * get a RGB fallback color from gui, cterm or default color
  */
-    static guicolor_T
-resolve_fallback_color(int cterm_c, guicolor_T rgb, guicolor_T default_rgb)
+    ಸ್ಥಿರ guicolor_T
+resolve_fallback_color(ಪೂರ್ಣಾಂಕ cterm_c, guicolor_T rgb, guicolor_T default_rgb)
 {
-    int red, green, blue;
-    if (!resolve_color_to_rgb(cterm_c, rgb, &red, &green, &blue))
-	return default_rgb;
-    else
-	return (red << 16) | (green << 8) | blue;
+    ಪೂರ್ಣಾಂಕ red, green, blue;
+    ಆದರೆ (!resolve_color_ಗಮ್ಯ_rgb(cterm_c, rgb, &red, &green, &blue))
+	ಹಿಂತಿರುಗಿ default_rgb;
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಹಿಂತಿರುಗಿ (red << 16) | (green << 8) | blue;
 }
 
 /*
  * get a RGB fallback foreground color from guifg, ctermfg or deduced from background
  */
-    static void
-resolve_fallback_fg_to_rgb(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+resolve_fallback_fg_ಗಮ್ಯ_rgb(ಶೂನ್ಯ)
 {
     guicolor_T fgcolor_or_gui_fgcolor = INVALCOLOR;
-#ifdef FEAT_TERMGUICOLORS
-    fgcolor_or_gui_fgcolor = cterm_normal_fg_gui_color;
-#endif
-#ifdef FEAT_GUI
-    if (gui.in_use)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMGUICOLORS
+    fgcolor_or_gui_fgcolor = cterm_ಸಾಮಾನ್ಯ_fg_gui_color;
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+    ಆದರೆ (gui.ಒಳ_use)
 	fgcolor_or_gui_fgcolor = gui.norm_pixel;
-#endif
-    fallback_fg_rgb = resolve_fallback_color(cterm_normal_fg_color, fgcolor_or_gui_fgcolor, (*p_bg == 'l') ? 0x000000 : 0xFFFFFF);
+#ಆದರೆ_ಅಂತ್ಯ
+    fallback_fg_rgb = resolve_fallback_color(cterm_ಸಾಮಾನ್ಯ_fg_color, fgcolor_or_gui_fgcolor, (*p_bg == 'l') ? 0x000000 : 0xFFFFFF);
 }
 
 /*
  * get a RGB fallback background color from guifg, ctermbg or deduced from background
  */
-    static void
-resolve_fallback_bg_to_rgb(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+resolve_fallback_bg_ಗಮ್ಯ_rgb(ಶೂನ್ಯ)
 {
     guicolor_T bgcolor_or_gui_bgcolor = INVALCOLOR;
-#ifdef FEAT_TERMGUICOLORS
-    bgcolor_or_gui_bgcolor = cterm_normal_bg_gui_color;
-#endif
-#ifdef FEAT_GUI
-    if (gui.in_use)
-	bgcolor_or_gui_bgcolor = gui.back_pixel;
-#endif
-    fallback_bg_rgb = resolve_fallback_color(cterm_normal_bg_color, bgcolor_or_gui_bgcolor, (*p_bg == 'l') ? 0xFFFFFF : 0x000000);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMGUICOLORS
+    bgcolor_or_gui_bgcolor = cterm_ಸಾಮಾನ್ಯ_bg_gui_color;
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+    ಆದರೆ (gui.ಒಳ_use)
+	bgcolor_or_gui_bgcolor = gui.ಹಿಂಭಾಗ_pixel;
+#ಆದರೆ_ಅಂತ್ಯ
+    fallback_bg_rgb = resolve_fallback_color(cterm_ಸಾಮಾನ್ಯ_bg_color, bgcolor_or_gui_bgcolor, (*p_bg == 'l') ? 0xFFFFFF : 0x000000);
 }
 
 /*
@@ -3328,59 +3328,59 @@ resolve_fallback_bg_to_rgb(void)
  *
  * Requires t_colors >= 256; otherwise returns popup_c unchanged.
  */
-    static int
-blend_cterm_colors(int popup_c, guicolor_T popup_rgb,
-		   int under_c, guicolor_T under_rgb,
-		   int default_rgb,
-		   int blend_val)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+blend_cterm_colors(ಪೂರ್ಣಾಂಕ popup_c, guicolor_T popup_rgb,
+		   ಪೂರ್ಣಾಂಕ under_c, guicolor_T under_rgb,
+		   ಪೂರ್ಣಾಂಕ default_rgb,
+		   ಪೂರ್ಣಾಂಕ blend_val)
 {
-    int pr, pg, pb, ur, ug, ub, r, g, b;
+    ಪೂರ್ಣಾಂಕ pr, pg, pb, ur, ug, ub, r, g, b;
 
-    if (t_colors < 256)
-	return popup_c;
-    if (!resolve_color_to_rgb(popup_c, popup_rgb, &pr, &pg, &pb))
-	return under_c;
-    if (blend_val <= 0)
-	return rgb_to_cterm_idx(pr, pg, pb) + 1;
-    if (!resolve_color_to_rgb(under_c, under_rgb, &ur, &ug, &ub))
+    ಆದರೆ (t_colors < 256)
+	ಹಿಂತಿರುಗಿ popup_c;
+    ಆದರೆ (!resolve_color_ಗಮ್ಯ_rgb(popup_c, popup_rgb, &pr, &pg, &pb))
+	ಹಿಂತಿರುಗಿ under_c;
+    ಆದರೆ (blend_val <= 0)
+	ಹಿಂತಿರುಗಿ rgb_ಗಮ್ಯ_cterm_idx(pr, pg, pb) + 1;
+    ಆದರೆ (!resolve_color_ಗಮ್ಯ_rgb(under_c, under_rgb, &ur, &ug, &ub))
     {
 	ur = (default_rgb >> 16) & 0xFF;
 	ug = (default_rgb >> 8) & 0xFF;
 	ub = default_rgb & 0xFF;
     }
-    if (blend_val >= 100)
-	return rgb_to_cterm_idx(ur, ug, ub) + 1;
+    ಆದರೆ (blend_val >= 100)
+	ಹಿಂತಿರುಗಿ rgb_ಗಮ್ಯ_cterm_idx(ur, ug, ub) + 1;
     r = pr + (ur - pr) * blend_val / 100;
     g = pg + (ug - pg) * blend_val / 100;
     b = pb + (ub - pb) * blend_val / 100;
-    return rgb_to_cterm_idx(r, g, b) + 1;
+    ಹಿಂತಿರುಗಿ rgb_ಗಮ್ಯ_cterm_idx(r, g, b) + 1;
 }
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#ಆದರೆ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 /*
  * Blend two RGB colors based on blend value (0-100).
  * blend: 0=return first argument color, 100=return second argument color
  * If bg_color is INVALCOLOR, high blend means more visible (return INVALCOLOR).
  */
-    static guicolor_T
-blend_colors(guicolor_T popup_color, guicolor_T bg_color, int blend_val)
+    ಸ್ಥಿರ guicolor_T
+blend_colors(guicolor_T popup_color, guicolor_T bg_color, ಪೂರ್ಣಾಂಕ blend_val)
 {
-    int r1, g1, b1, r2, g2, b2, r, g, b;
+    ಪೂರ್ಣಾಂಕ r1, g1, b1, r2, g2, b2, r, g, b;
 
     // CTERMCOLOR is a sentinel meaning "use the cterm color"; for blending
     // it has no real RGB so treat it like INVALCOLOR.
-    if (COLOR_INVALID(popup_color))
-	return INVALCOLOR;
+    ಆದರೆ (COLOR_INVALID(popup_color))
+	ಹಿಂತಿರುಗಿ INVALCOLOR;
 
     // Fully transparent: use underlying color as-is.
-    if (blend_val >= 100)
-	return bg_color;
+    ಆದರೆ (blend_val >= 100)
+	ಹಿಂತಿರುಗಿ bg_color;
 
     r1 = (popup_color >> 16) & 0xFF;
     g1 = (popup_color >> 8) & 0xFF;
     b1 = popup_color & 0xFF;
 
-    if (COLOR_INVALID(bg_color))
+    ಆದರೆ (COLOR_INVALID(bg_color))
 	bg_color = fallback_bg_rgb;
 
     r2 = (bg_color >> 16) & 0xFF;
@@ -3391,9 +3391,9 @@ blend_colors(guicolor_T popup_color, guicolor_T bg_color, int blend_val)
     g = g1 + (g2 - g1) * blend_val / 100;
     b = b1 + (b2 - b1) * blend_val / 100;
 
-    return (r << 16) | (g << 8) | b;
+    ಹಿಂತಿರುಗಿ (r << 16) | (g << 8) | b;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Blend attributes for popup windows and menus with opacity.
@@ -3401,39 +3401,39 @@ blend_colors(guicolor_T popup_color, guicolor_T bg_color, int blend_val)
  * blend: 0 = opaque (use popup colors), 100 = transparent (use background colors)
  * blend_fg: TRUE to blend foreground color, FALSE to keep popup foreground
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 hl_blend_attr_common(
-    int		char_attr,
-    int		popup_attr,
-    int		blend,
-    int		blend_fg)
+    ಪೂರ್ಣಾಂಕ		char_attr,
+    ಪೂರ್ಣಾಂಕ		popup_attr,
+    ಪೂರ್ಣಾಂಕ		blend,
+    ಪೂರ್ಣಾಂಕ		blend_fg)
 {
-    attrentry_T *char_aep = NULL;
+    attrentry_T *char_aep = ಖಾಲಿ;
     attrentry_T *popup_aep;
     attrentry_T new_en;
     attrentry_T tmp_en;
 
-#ifdef FEAT_GUI
-    if (gui.in_use)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+    ಆದರೆ (gui.ಒಳ_use)
     {
-	if (char_attr > HL_ALL)
+	ಆದರೆ (char_attr > HL_ALL)
 	    char_aep = syn_gui_attr2entry(char_attr);
-	if (char_aep != NULL)
+	ಆದರೆ (char_aep != ಖಾಲಿ)
 	    new_en = *char_aep;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    CLEAR_FIELD(new_en);
+	    CLEAR_ಕ್ಷೇತ್ರ(new_en);
 	    new_en.ae_u.gui.fg_color = INVALCOLOR;
 	    new_en.ae_u.gui.bg_color = INVALCOLOR;
 	    new_en.ae_u.gui.sp_color = INVALCOLOR;
-	    if (char_attr <= HL_ALL)
+	    ಆದರೆ (char_attr <= HL_ALL)
 		new_en.ae_attr = char_attr;
 	}
 
 	// initialize an empty entry if no highlight set for popup
-	if (popup_attr <= HL_ALL)
+	ಆದರೆ (popup_attr <= HL_ALL)
 	{
-	    CLEAR_FIELD(tmp_en);
+	    CLEAR_ಕ್ಷೇತ್ರ(tmp_en);
 	    tmp_en.ae_u.gui.fg_color = INVALCOLOR;
 	    tmp_en.ae_u.gui.bg_color = INVALCOLOR;
 	    tmp_en.ae_u.gui.sp_color = INVALCOLOR;
@@ -3443,28 +3443,28 @@ hl_blend_attr_common(
 
 	    popup_aep->ae_u.gui.bg_color = fallback_bg_rgb;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    popup_aep = syn_gui_attr2entry(popup_attr);
 
-	if (popup_aep != NULL)
+	ಆದರೆ (popup_aep != ಖಾಲಿ)
 	{
 	    guicolor_T popup_bg_rgb = popup_aep->ae_u.gui.bg_color;
-	    if (COLOR_INVALID(popup_bg_rgb))
+	    ಆದರೆ (COLOR_INVALID(popup_bg_rgb))
 		popup_bg_rgb = fallback_bg_rgb;
 
-	    if (blend_fg)
+	    ಆದರೆ (blend_fg)
 	    {
 		// blend_fg=TRUE: fade underlying text toward popup bg.
 		{
-		    int base_fg = fallback_fg_rgb;
-		    if (char_aep != NULL
+		    ಪೂರ್ಣಾಂಕ ತಳ_fg = fallback_fg_rgb;
+		    ಆದರೆ (char_aep != ಖಾಲಿ
 			    && char_aep->ae_u.gui.fg_color != INVALCOLOR)
-			base_fg = char_aep->ae_u.gui.fg_color;
+			ತಳ_fg = char_aep->ae_u.gui.fg_color;
 		    new_en.ae_u.gui.fg_color = blend_colors(
-			    popup_bg_rgb, base_fg, blend);
+			    popup_bg_rgb, ತಳ_fg, blend);
 		}
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		// blend_fg=FALSE: popup text is opaque.  Replace the
 		// underlying cell's attribute flags, fg, special color
@@ -3483,7 +3483,7 @@ hl_blend_attr_common(
 	    // Blend background color: blend popup bg toward underlying bg
 	    {
 		guicolor_T underlying_bg = fallback_bg_rgb;
-		if (char_aep != NULL
+		ಆದರೆ (char_aep != ಖಾಲಿ
 			&& !COLOR_INVALID(char_aep->ae_u.gui.bg_color))
 		    underlying_bg = char_aep->ae_u.gui.bg_color;
 		new_en.ae_u.gui.bg_color = blend_colors(
@@ -3491,65 +3491,65 @@ hl_blend_attr_common(
 			underlying_bg, blend);
 	    }
 	}
-	return get_attr_entry(&gui_attr_table, &new_en);
+	ಹಿಂತಿರುಗಿ get_attr_ನಮೂದು(&gui_attr_ಕೋಷ್ಟಕ, &new_en);
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (IS_CTERM)
+    ಆದರೆ (IS_CTERM)
     {
-	if (char_attr > HL_ALL)
+	ಆದರೆ (char_attr > HL_ALL)
 	    char_aep = syn_cterm_attr2entry(char_attr);
-	if (char_aep != NULL)
+	ಆದರೆ (char_aep != ಖಾಲಿ)
 	    new_en = *char_aep;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    CLEAR_FIELD(new_en);
-#ifdef FEAT_TERMGUICOLORS
+	    CLEAR_ಕ್ಷೇತ್ರ(new_en);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMGUICOLORS
 	    new_en.ae_u.cterm.bg_rgb = INVALCOLOR;
 	    new_en.ae_u.cterm.fg_rgb = INVALCOLOR;
 	    new_en.ae_u.cterm.ul_rgb = INVALCOLOR;
-#endif
-	    if (char_attr <= HL_ALL)
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಆದರೆ (char_attr <= HL_ALL)
 		new_en.ae_attr = char_attr;
 	}
 
 	// initialize an empty entry if no highlight set for popup
-	if (popup_attr <= HL_ALL)
+	ಆದರೆ (popup_attr <= HL_ALL)
 	{
-	    CLEAR_FIELD(tmp_en);
-#ifdef FEAT_TERMGUICOLORS
+	    CLEAR_ಕ್ಷೇತ್ರ(tmp_en);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMGUICOLORS
 	    tmp_en.ae_u.cterm.fg_rgb = INVALCOLOR;
 	    tmp_en.ae_u.cterm.ul_rgb = INVALCOLOR;
 	    // allow blending with termguicolors
 	    tmp_en.ae_u.cterm.bg_rgb = fallback_bg_rgb;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    // preserve attributes other than color
 	    tmp_en.ae_attr = popup_attr;
 	    popup_aep = &tmp_en;
 
 	    // allow blending with notermguicolors
-	    popup_aep->ae_u.cterm.bg_color = cterm_normal_bg_color;
+	    popup_aep->ae_u.cterm.bg_color = cterm_ಸಾಮಾನ್ಯ_bg_color;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    popup_aep = syn_cterm_attr2entry(popup_attr);
 
-	if (popup_aep != NULL)
+	ಆದರೆ (popup_aep != ಖಾಲಿ)
 	{
 	    guicolor_T popup_bg_rgb = INVALCOLOR;
-#ifdef FEAT_TERMGUICOLORS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMGUICOLORS
 	    // Fall back to cterm color converted to RGB when gui color is not set.
 	    popup_bg_rgb = popup_aep->ae_u.cterm.bg_rgb;
-	    if (COLOR_INVALID(popup_bg_rgb)
+	    ಆದರೆ (COLOR_INVALID(popup_bg_rgb)
 		    && popup_aep->ae_u.cterm.bg_color > 0)
-		popup_bg_rgb = cterm_color_to_rgb(
+		popup_bg_rgb = cterm_color_ಗಮ್ಯ_rgb(
 			popup_aep->ae_u.cterm.bg_color);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    // assign default color if guibg and ctermbg are not set for popup
-	    if (COLOR_INVALID(popup_bg_rgb)
+	    ಆದರೆ (COLOR_INVALID(popup_bg_rgb)
 		    && popup_aep->ae_u.cterm.bg_color == 0)
 		popup_bg_rgb = fallback_bg_rgb;
 
-	    if (!blend_fg)
+	    ಆದರೆ (!blend_fg)
 	    {
 		// blend_fg=FALSE: popup text is opaque.  Replace the
 		// underlying cell's attribute flags, fg, underline color
@@ -3560,32 +3560,32 @@ hl_blend_attr_common(
 		// text is still readable instead of taking on whatever
 		// the underlying cell happened to have.
 		new_en.ae_attr = popup_aep->ae_attr;
-		if (popup_aep->ae_u.cterm.fg_color > 0)
+		ಆದರೆ (popup_aep->ae_u.cterm.fg_color > 0)
 		    new_en.ae_u.cterm.fg_color =
 			popup_aep->ae_u.cterm.fg_color;
-		else if (cterm_normal_fg_color > 0)
-		    new_en.ae_u.cterm.fg_color = cterm_normal_fg_color;
-		else
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (cterm_ಸಾಮಾನ್ಯ_fg_color > 0)
+		    new_en.ae_u.cterm.fg_color = cterm_ಸಾಮಾನ್ಯ_fg_color;
+		ಇಲ್ಲದಿದ್ದರೆ
 		    // black-ish or white-ish
 		    new_en.ae_u.cterm.fg_color = (*p_bg == 'l') ? 1 : 16;
 		new_en.ae_u.cterm.ul_color = popup_aep->ae_u.cterm.ul_color;
 		new_en.ae_u.cterm.font = popup_aep->ae_u.cterm.font;
-#ifdef FEAT_TERMGUICOLORS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMGUICOLORS
 		new_en.ae_u.cterm.ul_rgb = popup_aep->ae_u.cterm.ul_rgb;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		// blend_fg=TRUE: fade underlying fg toward popup bg in
 		// the 256-color palette.  Used when the popup is over a
 		// cell rendered with cterm colors (no termguicolors RGB).
-		int under_fg = (char_aep != NULL)
+		ಪೂರ್ಣಾಂಕ under_fg = (char_aep != ಖಾಲಿ)
 		    ? char_aep->ae_u.cterm.fg_color : 0;
 		guicolor_T under_fg_rgb = INVALCOLOR;
-#ifdef FEAT_TERMGUICOLORS
-		if (char_aep != NULL)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMGUICOLORS
+		ಆದರೆ (char_aep != ಖಾಲಿ)
 		    under_fg_rgb = char_aep->ae_u.cterm.fg_rgb;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		new_en.ae_u.cterm.fg_color = blend_cterm_colors(
 			popup_aep->ae_u.cterm.bg_color, popup_bg_rgb,
 			under_fg, under_fg_rgb, fallback_fg_rgb, blend);
@@ -3593,37 +3593,37 @@ hl_blend_attr_common(
 	    // Approximate cterm bg by blending with the underlying bg
 	    // in the 256-color palette and mapping to the nearest entry.
 	    {
-		int under_bg = (char_aep != NULL)
+		ಪೂರ್ಣಾಂಕ under_bg = (char_aep != ಖಾಲಿ)
 		    ? char_aep->ae_u.cterm.bg_color : 0;
 		guicolor_T under_bg_rgb = INVALCOLOR;
-#ifdef FEAT_TERMGUICOLORS
-		if (char_aep != NULL)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMGUICOLORS
+		ಆದರೆ (char_aep != ಖಾಲಿ)
 		    under_bg_rgb = char_aep->ae_u.cterm.bg_rgb;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		new_en.ae_u.cterm.bg_color = blend_cterm_colors(
 			popup_aep->ae_u.cterm.bg_color, popup_bg_rgb,
 			under_bg, under_bg_rgb, fallback_bg_rgb, blend);
 	    }
-#ifdef FEAT_TERMGUICOLORS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMGUICOLORS
 	    // Blend RGB colors for termguicolors mode.
 	    {
-		if (blend_fg)
+		ಆದರೆ (blend_fg)
 		{
 		    // blend_fg=TRUE: fade underlying text toward popup bg.
-		    if (popup_bg_rgb != INVALCOLOR)
+		    ಆದರೆ (popup_bg_rgb != INVALCOLOR)
 		    {
-			int base_fg = fallback_fg_rgb;
+			ಪೂರ್ಣಾಂಕ ತಳ_fg = fallback_fg_rgb;
 			// CTERMCOLOR is a sentinel meaning "use the cterm
 			// color"; treat it as no underlying color so it is
 			// not blended in as a real near-white pixel.
-			if (char_aep != NULL
+			ಆದರೆ (char_aep != ಖಾಲಿ
 				&& !COLOR_INVALID(char_aep->ae_u.cterm.fg_rgb))
-			    base_fg = char_aep->ae_u.cterm.fg_rgb;
+			    ತಳ_fg = char_aep->ae_u.cterm.fg_rgb;
 			new_en.ae_u.cterm.fg_rgb = blend_colors(
-				popup_bg_rgb, base_fg, blend);
+				popup_bg_rgb, ತಳ_fg, blend);
 		    }
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    // blend_fg=FALSE: popup text is opaque.  Replace fg with
 		    // popup's so the underlying syntax highlighting fg does
@@ -3635,386 +3635,386 @@ hl_blend_attr_common(
 		    // color is not set.
 		    guicolor_T popup_fg = popup_aep->ae_u.cterm.fg_rgb;
 
-		    if (COLOR_INVALID(popup_fg)
+		    ಆದರೆ (COLOR_INVALID(popup_fg)
 			    && popup_aep->ae_u.cterm.fg_color > 0)
-			popup_fg = cterm_color_to_rgb(
+			popup_fg = cterm_color_ಗಮ್ಯ_rgb(
 				popup_aep->ae_u.cterm.fg_color);
 
-		    if (!COLOR_INVALID(popup_fg))
+		    ಆದರೆ (!COLOR_INVALID(popup_fg))
 			new_en.ae_u.cterm.fg_rgb = popup_fg;
-		    else if (!COLOR_INVALID(cterm_normal_fg_gui_color))
-			new_en.ae_u.cterm.fg_rgb = cterm_normal_fg_gui_color;
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!COLOR_INVALID(cterm_ಸಾಮಾನ್ಯ_fg_gui_color))
+			new_en.ae_u.cterm.fg_rgb = cterm_ಸಾಮಾನ್ಯ_fg_gui_color;
+		    ಇಲ್ಲದಿದ್ದರೆ
 			new_en.ae_u.cterm.fg_rgb = fallback_fg_rgb;
 		}
-		if (popup_bg_rgb != INVALCOLOR)
+		ಆದರೆ (popup_bg_rgb != INVALCOLOR)
 		{
 		    // Blend popup bg toward underlying bg
 		    guicolor_T underlying_bg = fallback_bg_rgb;
-		    if (char_aep != NULL
+		    ಆದರೆ (char_aep != ಖಾಲಿ
 			    && !COLOR_INVALID(char_aep->ae_u.cterm.bg_rgb))
 			underlying_bg = char_aep->ae_u.cterm.bg_rgb;
 		    new_en.ae_u.cterm.bg_rgb = blend_colors(
 			    popup_bg_rgb, underlying_bg, blend);
 		}
 	    }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	}
-	return get_attr_entry(&cterm_attr_table, &new_en);
+	ಹಿಂತಿರುಗಿ get_attr_ನಮೂದು(&cterm_attr_ಕೋಷ್ಟಕ, &new_en);
     }
 
-    if (char_attr > HL_ALL)
-	char_aep = syn_term_attr2entry(char_attr);
-    if (char_aep != NULL)
+    ಆದರೆ (char_attr > HL_ALL)
+	char_aep = syn_ಪದ_attr2entry(char_attr);
+    ಆದರೆ (char_aep != ಖಾಲಿ)
 	new_en = *char_aep;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	CLEAR_FIELD(new_en);
-	if (char_attr <= HL_ALL)
+	CLEAR_ಕ್ಷೇತ್ರ(new_en);
+	ಆದರೆ (char_attr <= HL_ALL)
 	    new_en.ae_attr = char_attr;
     }
 
     // For term mode, no separate background color handling.
-    return get_attr_entry(&term_attr_table, &new_en);
+    ಹಿಂತಿರುಗಿ get_attr_ನಮೂದು(&ಪದ_attr_ಕೋಷ್ಟಕ, &new_en);
 }
 
 /*
  * Blend attributes for popup windows with opacity.
  */
-    int
-hl_blend_attr(int char_attr, int popup_attr, int blend, int blend_fg)
+    ಪೂರ್ಣಾಂಕ
+hl_blend_attr(ಪೂರ್ಣಾಂಕ char_attr, ಪೂರ್ಣಾಂಕ popup_attr, ಪೂರ್ಣಾಂಕ blend, ಪೂರ್ಣಾಂಕ blend_fg)
 {
-    if (blend >= 100 && blend_fg)
-	return char_attr;
+    ಆದರೆ (blend >= 100 && blend_fg)
+	ಹಿಂತಿರುಗಿ char_attr;
 
-    return hl_blend_attr_common(char_attr, popup_attr, blend, blend_fg);
+    ಹಿಂತಿರುಗಿ hl_blend_attr_common(char_attr, popup_attr, blend, blend_fg);
 }
 
 /*
  * Blend underlying foreground and background colors for pum space cells.
  */
-    int
-hl_pum_blend_attr(int char_attr, int popup_attr, int blend)
+    ಪೂರ್ಣಾಂಕ
+hl_pum_blend_attr(ಪೂರ್ಣಾಂಕ char_attr, ಪೂರ್ಣಾಂಕ popup_attr, ಪೂರ್ಣಾಂಕ blend)
 {
-    return hl_blend_attr_common(char_attr, popup_attr, blend, TRUE);
+    ಹಿಂತಿರುಗಿ hl_blend_attr_common(char_attr, popup_attr, blend, TRUE);
 }
 
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
     attrentry_T *
-syn_gui_attr2entry(int attr)
+syn_gui_attr2entry(ಪೂರ್ಣಾಂಕ attr)
 {
     attr -= ATTR_OFF;
-    if (attr >= gui_attr_table.ga_len)	    // did ":syntax clear"
-	return NULL;
-    return &(GUI_ATTR_ENTRY(attr));
+    ಆದರೆ (attr >= gui_attr_ಕೋಷ್ಟಕ.ga_len)	    // did ":syntax clear"
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    ಹಿಂತಿರುಗಿ &(GUI_ATTR_ನಮೂದು(attr));
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Get the highlight attributes (HL_BOLD etc.) from an attribute nr.
  * Only to be used when "attr" > HL_ALL.
  */
-    int
-syn_attr2attr(int attr)
+    ಪೂರ್ಣಾಂಕ
+syn_attr2attr(ಪೂರ್ಣಾಂಕ attr)
 {
     attrentry_T	*aep;
 
-#ifdef FEAT_GUI
-    if (gui.in_use)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+    ಆದರೆ (gui.ಒಳ_use)
 	aep = syn_gui_attr2entry(attr);
-    else
-#endif
-	if (IS_CTERM)
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	ಆದರೆ (IS_CTERM)
 	    aep = syn_cterm_attr2entry(attr);
-	else
-	    aep = syn_term_attr2entry(attr);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    aep = syn_ಪದ_attr2entry(attr);
 
-    if (aep == NULL)	    // highlighting not set
-	return 0;
-    return aep->ae_attr;
+    ಆದರೆ (aep == ಖಾಲಿ)	    // highlighting not set
+	ಹಿಂತಿರುಗಿ 0;
+    ಹಿಂತಿರುಗಿ aep->ae_attr;
 }
 
 
     attrentry_T *
-syn_term_attr2entry(int attr)
+syn_ಪದ_attr2entry(ಪೂರ್ಣಾಂಕ attr)
 {
     attr -= ATTR_OFF;
-    if (attr >= term_attr_table.ga_len)	    // did ":syntax clear"
-	return NULL;
-    return &(TERM_ATTR_ENTRY(attr));
+    ಆದರೆ (attr >= ಪದ_attr_ಕೋಷ್ಟಕ.ga_len)	    // did ":syntax clear"
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    ಹಿಂತಿರುಗಿ &(ಪದ_ATTR_ನಮೂದು(attr));
 }
 
     attrentry_T *
-syn_cterm_attr2entry(int attr)
+syn_cterm_attr2entry(ಪೂರ್ಣಾಂಕ attr)
 {
     attr -= ATTR_OFF;
-    if (attr >= cterm_attr_table.ga_len)	// did ":syntax clear"
-	return NULL;
-    return &(CTERM_ATTR_ENTRY(attr));
+    ಆದರೆ (attr >= cterm_attr_ಕೋಷ್ಟಕ.ga_len)	// did ":syntax clear"
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    ಹಿಂತಿರುಗಿ &(CTERM_ATTR_ನಮೂದು(attr));
 }
 
-#define LIST_ATTR   1
-#define LIST_STRING 2
-#define LIST_INT    3
+#ವ್ಯಾಖ್ಯಾನಿಸು LIST_ATTR   1
+#ವ್ಯಾಖ್ಯಾನಿಸು LIST_STRING 2
+#ವ್ಯಾಖ್ಯಾನಿಸು LIST_INT    3
 
-    static void
-highlight_list_one(int id)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+highlight_list_one(ಪೂರ್ಣಾಂಕ id)
 {
-    hl_group_T	    *sgp;
-    int		    didh = FALSE;
+    hl_ಗುಂಪು_T	    *sgp;
+    ಪೂರ್ಣಾಂಕ		    didh = FALSE;
 
-    sgp = &HL_TABLE()[id - 1];	    // index is ID minus one
+    sgp = &HL_ಕೋಷ್ಟಕ()[id - 1];	    // index is ID minus one
 
-    if (message_filtered(sgp->sg_name))
-	return;
+    ಆದರೆ (ಸಂದೇಶ_filtered(sgp->sg_name))
+	ಹಿಂತಿರುಗಿ;
 
     // Note: Keep this in sync with expand_highlight_group().
     didh = highlight_list_arg(id, didh, LIST_ATTR,
-				    sgp->sg_term, NULL, "term");
+				    sgp->sg_ಪದ, ಖಾಲಿ, "term");
     didh = highlight_list_arg(id, didh, LIST_STRING,
-				    0, sgp->sg_start, "start");
+				    0, sgp->sg_ಆರಂಭ, "start");
     didh = highlight_list_arg(id, didh, LIST_STRING,
 				    0, sgp->sg_stop, "stop");
 
     didh = highlight_list_arg(id, didh, LIST_ATTR,
-				    sgp->sg_cterm, NULL, "cterm");
+				    sgp->sg_cterm, ಖಾಲಿ, "cterm");
     didh = highlight_list_arg(id, didh, LIST_INT,
-				    sgp->sg_cterm_fg, NULL, "ctermfg");
+				    sgp->sg_cterm_fg, ಖಾಲಿ, "ctermfg");
     didh = highlight_list_arg(id, didh, LIST_INT,
-				    sgp->sg_cterm_bg, NULL, "ctermbg");
+				    sgp->sg_cterm_bg, ಖಾಲಿ, "ctermbg");
     didh = highlight_list_arg(id, didh, LIST_INT,
-				    sgp->sg_cterm_ul, NULL, "ctermul");
+				    sgp->sg_cterm_ul, ಖಾಲಿ, "ctermul");
     didh = highlight_list_arg(id, didh, LIST_INT,
-				    sgp->sg_cterm_font, NULL, "ctermfont");
+				    sgp->sg_cterm_font, ಖಾಲಿ, "ctermfont");
 
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_GUI) || defined(FEAT_EVAL)
     didh = highlight_list_arg(id, didh, LIST_ATTR,
-				    sgp->sg_gui, NULL, "gui");
+				    sgp->sg_gui, ಖಾಲಿ, "gui");
     didh = highlight_list_arg(id, didh, LIST_STRING,
 				    0, sgp->sg_gui_fg_name, "guifg");
     didh = highlight_list_arg(id, didh, LIST_STRING,
 				    0, sgp->sg_gui_bg_name, "guibg");
     didh = highlight_list_arg(id, didh, LIST_STRING,
 				    0, sgp->sg_gui_sp_name, "guisp");
-#endif
-#ifdef FEAT_GUI
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
     didh = highlight_list_arg(id, didh, LIST_STRING,
 				    0, sgp->sg_font_name, "font");
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (sgp->sg_link && !got_int)
+    ಆದರೆ (sgp->sg_link && !got_int)
     {
-	(void)syn_list_header(didh, 9999, id);
+	(ಶೂನ್ಯ)syn_list_ಶೀರ್ಷಿಕೆ(didh, 9999, id);
 	didh = TRUE;
-	msg_puts_attr("links to", HL_ATTR(HLF_D));
-	msg_putchar(' ');
-	msg_outtrans(HL_TABLE()[HL_TABLE()[id - 1].sg_link - 1].sg_name);
+	ಸಂದೇಶ_puts_attr("links to", HL_ATTR(HLF_D));
+	ಸಂದೇಶ_putchar(' ');
+	ಸಂದೇಶ_outtrans(HL_ಕೋಷ್ಟಕ()[HL_ಕೋಷ್ಟಕ()[id - 1].sg_link - 1].sg_name);
     }
 
-    if (!didh)
+    ಆದರೆ (!didh)
 	highlight_list_arg(id, didh, LIST_STRING, 0, (char_u *)"cleared", "");
-#ifdef FEAT_EVAL
-    if (p_verbose > 0)
-	last_set_msg(sgp->sg_script_ctx);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಆದರೆ (p_verbose > 0)
+	ಕೊನೆಯ_ಗಣ_ಸಂದೇಶ(sgp->sg_script_ctx);
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-    static char_u*
-highlight_arg_to_string(
-    int		type,
-    int		iarg,
+    ಸ್ಥಿರ char_u*
+highlight_arg_ಗಮ್ಯ_string(
+    ಪೂರ್ಣಾಂಕ		type,
+    ಪೂರ್ಣಾಂಕ		iarg,
     char_u	*sarg,
     char_u	*buf)
 {
-    if (type == LIST_INT)
-	sprintf((char *)buf, "%d", iarg - 1);
-    else if (type == LIST_STRING)
-	return sarg;
-    else // type == LIST_ATTR
+    ಆದರೆ (type == LIST_INT)
+	sprintf((ಅಕ್ಷರ *)buf, "%d", iarg - 1);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (type == LIST_STRING)
+	ಹಿಂತಿರುಗಿ sarg;
+    ಇಲ್ಲದಿದ್ದರೆ // type == LIST_ATTR
     {
 	size_t buflen;
 
 	buf[0] = NUL;
 	buflen = 0;
-	for (int i = 0; i < (int)ARRAY_LENGTH(highlight_index_tab); ++i)
+	ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(highlight_ಸೂಚ್ಯಂಕ_tab); ++i)
 	{
-	    if (iarg & highlight_index_tab[i]->key)
+	    ಆದರೆ (iarg & highlight_ಸೂಚ್ಯಂಕ_tab[i]->ಕೀಲಿ)
 	    {
-		if (buflen > 0)
+		ಆದರೆ (buflen > 0)
 		{
 		    STRCPY(buf + buflen, (char_u *)",");
 		    ++buflen;
 		}
-		STRCPY(buf + buflen, highlight_index_tab[i]->value.string);
-		buflen += highlight_index_tab[i]->value.length;
-		iarg &= ~highlight_index_tab[i]->key;	    // don't want "inverse"/"reverse"
+		STRCPY(buf + buflen, highlight_ಸೂಚ್ಯಂಕ_tab[i]->ಮೌಲ್ಯ.string);
+		buflen += highlight_ಸೂಚ್ಯಂಕ_tab[i]->ಮೌಲ್ಯ.ಉದ್ದಳತೆ;
+		iarg &= ~highlight_ಸೂಚ್ಯಂಕ_tab[i]->ಕೀಲಿ;	    // don't want "inverse"/"reverse"
 	    }
 	}
     }
-    return buf;
+    ಹಿಂತಿರುಗಿ buf;
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 highlight_list_arg(
-    int		id,
-    int		didh,
-    int		type,
-    int		iarg,
+    ಪೂರ್ಣಾಂಕ		id,
+    ಪೂರ್ಣಾಂಕ		didh,
+    ಪೂರ್ಣಾಂಕ		type,
+    ಪೂರ್ಣಾಂಕ		iarg,
     char_u	*sarg,
-    char	*name)
+    ಅಕ್ಷರ	*name)
 {
     char_u	buf[MAX_ATTR_LEN];
     char_u	*ts;
 
-    if (got_int)
-	return FALSE;
+    ಆದರೆ (got_int)
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    if (type == LIST_STRING ? (sarg == NULL) : (iarg == 0))
-	return didh;
+    ಆದರೆ (type == LIST_STRING ? (sarg == ಖಾಲಿ) : (iarg == 0))
+	ಹಿಂತಿರುಗಿ didh;
 
-    ts = highlight_arg_to_string(type, iarg, sarg, buf);
+    ts = highlight_arg_ಗಮ್ಯ_string(type, iarg, sarg, buf);
 
-    (void)syn_list_header(didh,
-	    (int)(vim_strsize(ts) + STRLEN(name) + 1), id);
+    (ಶೂನ್ಯ)syn_list_ಶೀರ್ಷಿಕೆ(didh,
+	    (ಪೂರ್ಣಾಂಕ)(vim_strsize(ts) + STRLEN(name) + 1), id);
     didh = TRUE;
-    if (!got_int)
+    ಆದರೆ (!got_int)
     {
-	if (*name != NUL)
+	ಆದರೆ (*name != NUL)
 	{
-	    msg_puts_attr(name, HL_ATTR(HLF_D));
-	    msg_puts_attr("=", HL_ATTR(HLF_D));
+	    ಸಂದೇಶ_puts_attr(name, HL_ATTR(HLF_D));
+	    ಸಂದೇಶ_puts_attr("=", HL_ATTR(HLF_D));
 	}
-	msg_outtrans(ts);
+	ಸಂದೇಶ_outtrans(ts);
     }
-    return didh;
+    ಹಿಂತಿರುಗಿ didh;
 }
 
-#if ((defined(FEAT_EVAL) || defined(FEAT_PRINTER))) && defined(FEAT_SYN_HL)
+#ಆದರೆ ((defined(FEAT_EVAL) || defined(FEAT_PRINTER))) && defined(FEAT_SYN_HL)
 /*
  * Return "1" if highlight group "id" has attribute "flag".
  * Return NULL otherwise.
  */
     char_u *
 highlight_has_attr(
-    int		id,
-    int		flag,
-    int		modec)	// 'g' for GUI, 'c' for cterm, 't' for term
+    ಪೂರ್ಣಾಂಕ		id,
+    ಪೂರ್ಣಾಂಕ		flag,
+    ಪೂರ್ಣಾಂಕ		modec)	// 'g' for GUI, 'c' for cterm, 't' for term
 {
-    int		attr;
+    ಪೂರ್ಣಾಂಕ		attr;
 
-    if (id <= 0 || id > highlight_ga.ga_len)
-	return NULL;
+    ಆದರೆ (id <= 0 || id > highlight_ga.ga_len)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-# if defined(FEAT_GUI) || defined(FEAT_EVAL)
-    if (modec == 'g')
-	attr = HL_TABLE()[id - 1].sg_gui;
-    else
+# ಆದರೆ defined(FEAT_GUI) || defined(FEAT_EVAL)
+    ಆದರೆ (modec == 'g')
+	attr = HL_ಕೋಷ್ಟಕ()[id - 1].sg_gui;
+    ಇಲ್ಲದಿದ್ದರೆ
 # endif
     {
-	if (modec == 'c')
-	    attr = HL_TABLE()[id - 1].sg_cterm;
-	else
-	    attr = HL_TABLE()[id - 1].sg_term;
+	ಆದರೆ (modec == 'c')
+	    attr = HL_ಕೋಷ್ಟಕ()[id - 1].sg_cterm;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    attr = HL_ಕೋಷ್ಟಕ()[id - 1].sg_ಪದ;
     }
 
-    if (attr & flag)
-	return (char_u *)"1";
-    return NULL;
+    ಆದರೆ (attr & flag)
+	ಹಿಂತಿರುಗಿ (char_u *)"1";
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_SYN_HL) && defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_SYN_HL) && defined(FEAT_EVAL)
 /*
  * Return color name of highlight group "id".
  */
     char_u *
 highlight_color(
-    int		id,
+    ಪೂರ್ಣಾಂಕ		id,
     char_u	*what,	// "font", "fg", "bg", "sp", "ul", "fg#", "bg#" or "sp#"
-    int		modec)	// 'g' for GUI, 'c' for cterm, 't' for term
+    ಪೂರ್ಣಾಂಕ		modec)	// 'g' for GUI, 'c' for cterm, 't' for term
 {
-    static char_u	name[20];
-    int			n;
-    int			fg = FALSE;
-    int			sp = FALSE;
-    int			ul = FALSE;
-    int			font = FALSE;
+    ಸ್ಥಿರ char_u	name[20];
+    ಪೂರ್ಣಾಂಕ			n;
+    ಪೂರ್ಣಾಂಕ			fg = FALSE;
+    ಪೂರ್ಣಾಂಕ			sp = FALSE;
+    ಪೂರ್ಣಾಂಕ			ul = FALSE;
+    ಪೂರ್ಣಾಂಕ			font = FALSE;
 
-    if (id <= 0 || id > highlight_ga.ga_len)
-	return NULL;
+    ಆದರೆ (id <= 0 || id > highlight_ga.ga_len)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (TOLOWER_ASC(what[0]) == 'f' && TOLOWER_ASC(what[1]) == 'g')
+    ಆದರೆ (TOLOWER_ASC(what[0]) == 'f' && TOLOWER_ASC(what[1]) == 'g')
 	fg = TRUE;
-    else if (TOLOWER_ASC(what[0]) == 'f' && TOLOWER_ASC(what[1]) == 'o'
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (TOLOWER_ASC(what[0]) == 'f' && TOLOWER_ASC(what[1]) == 'o'
 	     && TOLOWER_ASC(what[2]) == 'n' && TOLOWER_ASC(what[3]) == 't')
 	font = TRUE;
-    else if (TOLOWER_ASC(what[0]) == 's' && TOLOWER_ASC(what[1]) == 'p')
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (TOLOWER_ASC(what[0]) == 's' && TOLOWER_ASC(what[1]) == 'p')
 	sp = TRUE;
-    else if (TOLOWER_ASC(what[0]) == 'u' && TOLOWER_ASC(what[1]) == 'l')
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (TOLOWER_ASC(what[0]) == 'u' && TOLOWER_ASC(what[1]) == 'l')
 	ul = TRUE;
-    else if (!(TOLOWER_ASC(what[0]) == 'b' && TOLOWER_ASC(what[1]) == 'g'))
-	return NULL;
-    if (modec == 'g')
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!(TOLOWER_ASC(what[0]) == 'b' && TOLOWER_ASC(what[1]) == 'g'))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    ಆದರೆ (modec == 'g')
     {
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# ಆದರೆ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 #  ifdef FEAT_GUI
 	// return font name
-	if (font)
-	    return HL_TABLE()[id - 1].sg_font_name;
+	ಆದರೆ (font)
+	    ಹಿಂತಿರುಗಿ HL_ಕೋಷ್ಟಕ()[id - 1].sg_font_name;
 #  endif
 
 	// return #RRGGBB form (only possible when GUI is running)
-	if ((USE_24BIT) && what[2] == '#')
+	ಆದರೆ ((USE_24_ಬಿಟ್) && what[2] == '#')
 	{
 	    guicolor_T		color;
 	    long_u		rgb;
-	    static char_u	buf[10];
+	    ಸ್ಥಿರ char_u	buf[10];
 
-	    if (fg)
-		color = HL_TABLE()[id - 1].sg_gui_fg;
-	    else if (sp)
-		color = HL_TABLE()[id - 1].sg_gui_sp;
-	    else
-		color = HL_TABLE()[id - 1].sg_gui_bg;
-	    if (color == INVALCOLOR)
-		return NULL;
+	    ಆದರೆ (fg)
+		color = HL_ಕೋಷ್ಟಕ()[id - 1].sg_gui_fg;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (sp)
+		color = HL_ಕೋಷ್ಟಕ()[id - 1].sg_gui_sp;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		color = HL_ಕೋಷ್ಟಕ()[id - 1].sg_gui_bg;
+	    ಆದರೆ (color == INVALCOLOR)
+		ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	    rgb = (long_u)GUI_MCH_GET_RGB(color);
-	    sprintf((char *)buf, "#%02x%02x%02x",
-				      (unsigned)(rgb >> 16),
-				      (unsigned)(rgb >> 8) & 255,
-				      (unsigned)rgb & 255);
-	    return buf;
+	    sprintf((ಅಕ್ಷರ *)buf, "#%02x%02x%02x",
+				      (ಚಿಹ್ನೆರಹಿತ)(rgb >> 16),
+				      (ಚಿಹ್ನೆರಹಿತ)(rgb >> 8) & 255,
+				      (ಚಿಹ್ನೆರಹಿತ)rgb & 255);
+	    ಹಿಂತಿರುಗಿ buf;
 	}
 # endif
-	if (fg)
-	    return (HL_TABLE()[id - 1].sg_gui_fg_name);
-	if (sp)
-	    return (HL_TABLE()[id - 1].sg_gui_sp_name);
-	return (HL_TABLE()[id - 1].sg_gui_bg_name);
+	ಆದರೆ (fg)
+	    ಹಿಂತಿರುಗಿ (HL_ಕೋಷ್ಟಕ()[id - 1].sg_gui_fg_name);
+	ಆದರೆ (sp)
+	    ಹಿಂತಿರುಗಿ (HL_ಕೋಷ್ಟಕ()[id - 1].sg_gui_sp_name);
+	ಹಿಂತಿರುಗಿ (HL_ಕೋಷ್ಟಕ()[id - 1].sg_gui_bg_name);
     }
-    if (sp)
-	return NULL;
-    if (modec == 'c')
+    ಆದರೆ (sp)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    ಆದರೆ (modec == 'c')
     {
-	if (fg)
-	    n = HL_TABLE()[id - 1].sg_cterm_fg - 1;
-	else if (ul)
-	    n = HL_TABLE()[id - 1].sg_cterm_ul - 1;
-	else if (font)
-	    n = HL_TABLE()[id - 1].sg_cterm_font - 1;
-	else
-	    n = HL_TABLE()[id - 1].sg_cterm_bg - 1;
-	if (n < 0)
-	    return NULL;
-	sprintf((char *)name, "%d", n);
-	return name;
+	ಆದರೆ (fg)
+	    n = HL_ಕೋಷ್ಟಕ()[id - 1].sg_cterm_fg - 1;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ul)
+	    n = HL_ಕೋಷ್ಟಕ()[id - 1].sg_cterm_ul - 1;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (font)
+	    n = HL_ಕೋಷ್ಟಕ()[id - 1].sg_cterm_font - 1;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    n = HL_ಕೋಷ್ಟಕ()[id - 1].sg_cterm_bg - 1;
+	ಆದರೆ (n < 0)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+	sprintf((ಅಕ್ಷರ *)name, "%d", n);
+	ಹಿಂತಿರುಗಿ name;
     }
     // term doesn't have color
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_SYN_HL) \
+#ಆದರೆ defined(FEAT_SYN_HL) \
 	    && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)) \
 	&& defined(FEAT_PRINTER)
 /*
@@ -4022,99 +4022,99 @@ highlight_color(
  */
     long_u
 highlight_gui_color_rgb(
-    int		id,
-    int		fg)	// TRUE = fg, FALSE = bg
+    ಪೂರ್ಣಾಂಕ		id,
+    ಪೂರ್ಣಾಂಕ		fg)	// TRUE = fg, FALSE = bg
 {
     guicolor_T	color;
 
-    if (id <= 0 || id > highlight_ga.ga_len)
-	return 0L;
+    ಆದರೆ (id <= 0 || id > highlight_ga.ga_len)
+	ಹಿಂತಿರುಗಿ 0L;
 
-    if (fg)
-	color = HL_TABLE()[id - 1].sg_gui_fg;
-    else
-	color = HL_TABLE()[id - 1].sg_gui_bg;
+    ಆದರೆ (fg)
+	color = HL_ಕೋಷ್ಟಕ()[id - 1].sg_gui_fg;
+    ಇಲ್ಲದಿದ್ದರೆ
+	color = HL_ಕೋಷ್ಟಕ()[id - 1].sg_gui_bg;
 
-    if (color == INVALCOLOR)
-	return 0L;
+    ಆದರೆ (color == INVALCOLOR)
+	ಹಿಂತಿರುಗಿ 0L;
 
-    return GUI_MCH_GET_RGB(color);
+    ಹಿಂತಿರುಗಿ GUI_MCH_GET_RGB(color);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Output the syntax list header.
  * Return TRUE when started a new line.
  */
-    int
-syn_list_header(
-    int	    did_header,		// did header already
-    int	    outlen,		// length of string that comes
-    int	    id)			// highlight group id
+    ಪೂರ್ಣಾಂಕ
+syn_list_ಶೀರ್ಷಿಕೆ(
+    ಪೂರ್ಣಾಂಕ	    did_ಶೀರ್ಷಿಕೆ,		// did header already
+    ಪೂರ್ಣಾಂಕ	    outlen,		// length of string that comes
+    ಪೂರ್ಣಾಂಕ	    id)			// highlight group id
 {
-    int	    endcol = 19;
-    int	    newline = TRUE;
-    int	    name_col = 0;
+    ಪೂರ್ಣಾಂಕ	    endcol = 19;
+    ಪೂರ್ಣಾಂಕ	    newline = TRUE;
+    ಪೂರ್ಣಾಂಕ	    name_ಲಂಬಸಾಲು = 0;
 
-    if (!did_header)
+    ಆದರೆ (!did_ಶೀರ್ಷಿಕೆ)
     {
-	msg_putchar('\n');
-	if (got_int)
-	    return TRUE;
-	msg_outtrans(HL_TABLE()[id - 1].sg_name);
-	name_col = msg_col;
+	ಸಂದೇಶ_putchar('\n');
+	ಆದರೆ (got_int)
+	    ಹಿಂತಿರುಗಿ TRUE;
+	ಸಂದೇಶ_outtrans(HL_ಕೋಷ್ಟಕ()[id - 1].sg_name);
+	name_ಲಂಬಸಾಲು = ಸಂದೇಶ_ಲಂಬಸಾಲು;
 	endcol = 15;
     }
-    else if (msg_col + outlen + 1 >= cmdline_width)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಸಂದೇಶ_ಲಂಬಸಾಲು + outlen + 1 >= cmdline_ಅಗಲ)
     {
-	msg_putchar('\n');
-	if (got_int)
-	    return TRUE;
+	ಸಂದೇಶ_putchar('\n');
+	ಆದರೆ (got_int)
+	    ಹಿಂತಿರುಗಿ TRUE;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (msg_col >= endcol)	// wrap around is like starting a new line
+	ಆದರೆ (ಸಂದೇಶ_ಲಂಬಸಾಲು >= endcol)	// wrap around is like starting a new line
 	    newline = FALSE;
     }
 
-    if (msg_col >= endcol)	// output at least one space
-	endcol = msg_col + 1;
-    if (cmdline_width <= endcol)	// avoid hang for tiny window
-	endcol = cmdline_width - 1;
+    ಆದರೆ (ಸಂದೇಶ_ಲಂಬಸಾಲು >= endcol)	// output at least one space
+	endcol = ಸಂದೇಶ_ಲಂಬಸಾಲು + 1;
+    ಆದರೆ (cmdline_ಅಗಲ <= endcol)	// avoid hang for tiny window
+	endcol = cmdline_ಅಗಲ - 1;
 
-    msg_advance(endcol);
+    ಸಂದೇಶ_advance(endcol);
 
     // Show "xxx" with the attributes.
-    if (!did_header)
+    ಆದರೆ (!did_ಶೀರ್ಷಿಕೆ)
     {
-	if (endcol == cmdline_width - 1 && endcol <= name_col)
-	    msg_putchar(' ');
-	msg_puts_attr("xxx", syn_id2attr(id));
-	msg_putchar(' ');
+	ಆದರೆ (endcol == cmdline_ಅಗಲ - 1 && endcol <= name_ಲಂಬಸಾಲು)
+	    ಸಂದೇಶ_putchar(' ');
+	ಸಂದೇಶ_puts_attr("xxx", syn_id2attr(id));
+	ಸಂದೇಶ_putchar(' ');
     }
 
-    return newline;
+    ಹಿಂತಿರುಗಿ newline;
 }
 
 /*
  * Set the attribute numbers for a highlight group.
  * Called after one of the attributes has changed.
  */
-    static void
-set_hl_attr(
-    int		idx)	    // index in array
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_hl_attr(
+    ಪೂರ್ಣಾಂಕ		idx)	    // index in array
 {
     attrentry_T	    at_en;
-    hl_group_T	    *sgp = HL_TABLE() + idx;
+    hl_ಗುಂಪು_T	    *sgp = HL_ಕೋಷ್ಟಕ() + idx;
 
     // The "Normal" group doesn't need an attribute number
-    if (sgp->sg_name_u != NULL && STRCMP(sgp->sg_name_u, "NORMAL") == 0)
-	return;
+    ಆದರೆ (sgp->sg_name_u != ಖಾಲಿ && STRCMP(sgp->sg_name_u, "NORMAL") == 0)
+	ಹಿಂತಿರುಗಿ;
 
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
     // For the GUI mode: If there are other than "normal" highlighting
     // attributes, need to allocate an attr number.
-    if (sgp->sg_gui_fg == INVALCOLOR
+    ಆದರೆ (sgp->sg_gui_fg == INVALCOLOR
 	    && sgp->sg_gui_bg == INVALCOLOR
 	    && sgp->sg_gui_sp == INVALCOLOR
 	    && sgp->sg_font == NOFONT
@@ -4125,7 +4125,7 @@ set_hl_attr(
     {
 	sgp->sg_gui_attr = sgp->sg_gui;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	at_en.ae_attr = sgp->sg_gui;
 	at_en.ae_u.gui.fg_color = sgp->sg_gui_fg;
@@ -4135,50 +4135,50 @@ set_hl_attr(
 # ifdef FEAT_XFONTSET
 	at_en.ae_u.gui.fontset = sgp->sg_fontset;
 # endif
-	sgp->sg_gui_attr = get_attr_entry(&gui_attr_table, &at_en);
+	sgp->sg_gui_attr = get_attr_ನಮೂದು(&gui_attr_ಕೋಷ್ಟಕ, &at_en);
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     // For the term mode: If there are other than "normal" highlighting
     // attributes, need to allocate an attr number.
-    if (sgp->sg_start == NULL && sgp->sg_stop == NULL)
-	sgp->sg_term_attr = sgp->sg_term;
-    else
+    ಆದರೆ (sgp->sg_ಆರಂಭ == ಖಾಲಿ && sgp->sg_stop == ಖಾಲಿ)
+	sgp->sg_ಪದ_attr = sgp->sg_ಪದ;
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	at_en.ae_attr = sgp->sg_term;
-	at_en.ae_u.term.start = sgp->sg_start;
-	at_en.ae_u.term.stop = sgp->sg_stop;
-	sgp->sg_term_attr = get_attr_entry(&term_attr_table, &at_en);
+	at_en.ae_attr = sgp->sg_ಪದ;
+	at_en.ae_u.ಪದ.ಆರಂಭ = sgp->sg_ಆರಂಭ;
+	at_en.ae_u.ಪದ.stop = sgp->sg_stop;
+	sgp->sg_ಪದ_attr = get_attr_ನಮೂದು(&ಪದ_attr_ಕೋಷ್ಟಕ, &at_en);
     }
 
     // For the color term mode: If there are other than "normal"
     // highlighting attributes, need to allocate an attr number.
-    if (sgp->sg_cterm_fg == 0 && sgp->sg_cterm_bg == 0 &&
+    ಆದರೆ (sgp->sg_cterm_fg == 0 && sgp->sg_cterm_bg == 0 &&
 	sgp->sg_cterm_ul == 0 && sgp->sg_cterm_font == 0
-#ifdef FEAT_TERMGUICOLORS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMGUICOLORS
 	    && sgp->sg_gui_fg == INVALCOLOR
 	    && sgp->sg_gui_bg == INVALCOLOR
 	    && sgp->sg_gui_sp == INVALCOLOR
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    )
 	sgp->sg_cterm_attr = sgp->sg_cterm;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	at_en.ae_attr = sgp->sg_cterm;
 	at_en.ae_u.cterm.fg_color = sgp->sg_cterm_fg;
 	at_en.ae_u.cterm.bg_color = sgp->sg_cterm_bg;
 	at_en.ae_u.cterm.ul_color = sgp->sg_cterm_ul;
 	at_en.ae_u.cterm.font = sgp->sg_cterm_font;
-#ifdef FEAT_TERMGUICOLORS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMGUICOLORS
 	at_en.ae_u.cterm.fg_rgb = GUI_MCH_GET_RGB2(sgp->sg_gui_fg);
 	at_en.ae_u.cterm.bg_rgb = GUI_MCH_GET_RGB2(sgp->sg_gui_bg);
 	// Only use the underline/undercurl color when used, it may clear the
 	// background color if not supported.
-	if (sgp->sg_cterm & (HL_UNDERLINE | HL_UNDERCURL
+	ಆದರೆ (sgp->sg_cterm & (HL_UNDERLINE | HL_UNDERCURL
 			   | HL_UNDERDOUBLE | HL_UNDERDOTTED | HL_UNDERDASHED))
 	    at_en.ae_u.cterm.ul_rgb = GUI_MCH_GET_RGB2(sgp->sg_gui_sp);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    at_en.ae_u.cterm.ul_rgb = INVALCOLOR;
-	if (at_en.ae_u.cterm.fg_rgb == INVALCOLOR
+	ಆದರೆ (at_en.ae_u.cterm.fg_rgb == INVALCOLOR
 		&& at_en.ae_u.cterm.bg_rgb == INVALCOLOR)
 	{
 	    // If both fg and bg are invalid fall back to the cterm colors.
@@ -4186,8 +4186,8 @@ set_hl_attr(
 	    at_en.ae_u.cterm.fg_rgb = CTERMCOLOR;
 	    at_en.ae_u.cterm.bg_rgb = CTERMCOLOR;
 	}
-#endif
-	sgp->sg_cterm_attr = get_attr_entry(&cterm_attr_table, &at_en);
+#ಆದರೆ_ಅಂತ್ಯ
+	sgp->sg_cterm_attr = get_attr_ನಮೂದು(&cterm_attr_ಕೋಷ್ಟಕ, &at_en);
     }
 }
 
@@ -4195,96 +4195,96 @@ set_hl_attr(
  * Check if highlight id is overridden, and return the overriding highlight id.
  * Otherwise return the original id if no override.
  */
-    static int
-syn_override(int id)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+syn_override(ಪೂರ್ಣಾಂಕ id)
 {
-    if (overrides != NULL && overrides->arr != NULL)
-	for (int k = 0; k < overrides->len; k++)
-	    if (overrides->arr[k].from == id)
-		return overrides->arr[k].to;
-    return id;
+    ಆದರೆ (overrides != ಖಾಲಿ && overrides->arr != ಖಾಲಿ)
+	ಗಾಗಿ (ಪೂರ್ಣಾಂಕ k = 0; k < overrides->len; k++)
+	    ಆದರೆ (overrides->arr[k].from == id)
+		ಹಿಂತಿರುಗಿ overrides->arr[k].ಗಮ್ಯ;
+    ಹಿಂತಿರುಗಿ id;
 }
 
 /*
  * Lookup a highlight group name by pointer and length.
  * If it is not found, 0 is returned.
  */
-    static int
-syn_name2id_len(char_u *name, int len)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+syn_name2id_len(char_u *name, ಪೂರ್ಣಾಂಕ len)
 {
     char_u	name_u[MAX_SYN_NAME + 1];
     hashitem_T	*hi;
 
-    if (len > MAX_SYN_NAME)
+    ಆದರೆ (len > MAX_SYN_NAME)
 	len = MAX_SYN_NAME;
     mch_memmove(name_u, name, len);
     name_u[len] = NUL;
     vim_strup(name_u);
-    if (!highlight_ht_inited)
-	return 0;
-    hi = hash_find(&highlight_ht, name_u);
-    if (HASHITEM_EMPTY(hi))
-	return 0;
-    return HI2HLNAME(hi)->hn_id;
+    ಆದರೆ (!highlight_ht_inited)
+	ಹಿಂತಿರುಗಿ 0;
+    hi = hash_ಕಂಡುಹಿಡಿ(&highlight_ht, name_u);
+    ಆದರೆ (HASHITEM_ಖಾಲಿಗಳು(hi))
+	ಹಿಂತಿರುಗಿ 0;
+    ಹಿಂತಿರುಗಿ HI2HLNAME(hi)->hn_id;
 }
 
 /*
  * Lookup a highlight group name and return its ID.
  * If it is not found, 0 is returned.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 syn_name2id(char_u *name)
 {
     // Avoid using stricmp() too much, it's slow on some systems.
-    return syn_name2id_len(name, (int)STRLEN(name));
+    ಹಿಂತಿರುಗಿ syn_name2id_len(name, (ಪೂರ್ಣಾಂಕ)STRLEN(name));
 }
 
 /*
  * Lookup a highlight group name and return its attributes.
  * Return zero if not found.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 syn_name2attr(char_u *name)
 {
-    int id = syn_name2id(name);
+    ಪೂರ್ಣಾಂಕ id = syn_name2id(name);
 
-    if (id != 0)
-	return syn_id2attr(id);
-    return 0;
+    ಆದರೆ (id != 0)
+	ಹಿಂತಿರುಗಿ syn_id2attr(id);
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * Return TRUE if highlight group "name" exists.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 highlight_exists(char_u *name)
 {
-    return (syn_name2id(name) > 0);
+    ಹಿಂತಿರುಗಿ (syn_name2id(name) > 0);
 }
 
-# if defined(FEAT_SEARCH_EXTRA)
+# ಆದರೆ defined(FEAT_ಹುಡುಕು_EXTRA)
 /*
  * Return the name of highlight group "id".
  * When not a valid ID return an empty string.
  */
     char_u *
-syn_id2name(int id)
+syn_id2name(ಪೂರ್ಣಾಂಕ id)
 {
-    if (id <= 0 || id > highlight_ga.ga_len)
-	return (char_u *)"";
-    return HL_TABLE()[id - 1].sg_name;
+    ಆದರೆ (id <= 0 || id > highlight_ga.ga_len)
+	ಹಿಂತಿರುಗಿ (char_u *)"";
+    ಹಿಂತಿರುಗಿ HL_ಕೋಷ್ಟಕ()[id - 1].sg_name;
 }
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Like syn_name2id(), but take a pointer + length argument.
  */
-    int
-syn_namen2id(char_u *linep, int len)
+    ಪೂರ್ಣಾಂಕ
+syn_namen2id(char_u *linep, ಪೂರ್ಣಾಂಕ len)
 {
-    return syn_name2id_len(linep, len);
+    ಹಿಂತಿರುಗಿ syn_name2id_len(linep, len);
 }
 
 /*
@@ -4293,26 +4293,26 @@ syn_namen2id(char_u *linep, int len)
  * If it doesn't exist yet, a new entry is created.
  * Return 0 for failure.
  */
-    int
-syn_check_group(char_u *pp, int len)
+    ಪೂರ್ಣಾಂಕ
+syn_check_ಗುಂಪು(char_u *pp, ಪೂರ್ಣಾಂಕ len)
 {
-    int	    id;
+    ಪೂರ್ಣಾಂಕ	    id;
     char_u  *name;
 
-    if (len > MAX_SYN_NAME)
+    ಆದರೆ (len > MAX_SYN_NAME)
     {
-	emsg(_(e_highlight_group_name_too_long));
-	return 0;
+	emsg(_(e_highlight_ಗುಂಪು_name_too_long));
+	ಹಿಂತಿರುಗಿ 0;
     }
     id = syn_name2id_len(pp, len);
-    if (id == 0)			// doesn't exist yet
+    ಆದರೆ (id == 0)			// doesn't exist yet
     {
 	name = vim_strnsave(pp, len);
-	if (name == NULL)
-	    return 0;
-	id = syn_add_group(name);
+	ಆದರೆ (name == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ 0;
+	id = syn_ಕೂಡಿಸು_ಗುಂಪು(name);
     }
-    return id;
+    ಹಿಂತಿರುಗಿ id;
 }
 
 /*
@@ -4320,332 +4320,332 @@ syn_check_group(char_u *pp, int len)
  * "name" must be an allocated string, it will be consumed.
  * Return 0 for failure.
  */
-    static int
-syn_add_group(char_u *name)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+syn_ಕೂಡಿಸು_ಗುಂಪು(char_u *name)
 {
     char_u	*p;
-    char_u	*name_up;
+    char_u	*name_ಮೇಲೆ;
 
     // Check that the name is valid (ASCII letters, digits, underscores, dots, or hyphens).
-    for (p = name; *p != NUL; ++p)
+    ಗಾಗಿ (p = name; *p != NUL; ++p)
     {
-	if (!vim_isprintc(*p))
+	ಆದರೆ (!vim_isprintc(*p))
 	{
-	    emsg(_(e_unprintable_character_in_group_name));
+	    emsg(_(e_unprintable_character_ಒಳ_ಗುಂಪು_name));
 	    vim_free(name);
-	    return 0;
+	    ಹಿಂತಿರುಗಿ 0;
 	}
-	else if (!ASCII_ISALNUM(*p) && *p != '_' && *p != '.' && *p != '-')
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!ASCII_ISALNUM(*p) && *p != '_' && *p != '.' && *p != '-')
 	{
 	    // This is an error, but since there previously was no check only
 	    // give a warning.
-	    msg_source(HL_ATTR(HLF_W));
-	    msg(_("W18: Invalid character in group name"));
-	    break;
+	    ಸಂದೇಶ_ಮೂಲ(HL_ATTR(HLF_W));
+	    ಸಂದೇಶ(_("W18: Invalid character in group name"));
+	    ನಿಲ್ಲಿಸು;
 	}
     }
 
     // First call for this growarray: init growing array.
-    if (highlight_ga.ga_data == NULL)
+    ಆದರೆ (highlight_ga.ga_ದತ್ತಾಂಶ == ಖಾಲಿ)
     {
-	highlight_ga.ga_itemsize = sizeof(hl_group_T);
+	highlight_ga.ga_itemsize = ಗಾತ್ರ(hl_ಗುಂಪು_T);
 	highlight_ga.ga_growsize = 10;
 	hash_init(&highlight_ht);
 	highlight_ht_inited = true;
     }
 
-    if (highlight_ga.ga_len >= MAX_HL_ID)
+    ಆದರೆ (highlight_ga.ga_len >= MAX_HL_ID)
     {
 	emsg(_(e_too_many_highlight_and_syntax_groups));
 	vim_free(name);
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
     }
 
     // Make room for at least one other syntax_highlight entry.
-    if (ga_grow(&highlight_ga, 1) == FAIL)
+    ಆದರೆ (ga_grow(&highlight_ga, 1) == FAIL)
     {
 	vim_free(name);
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
     }
 
     {
 	hlname_T    *hn;
-	int	    len = (int)STRLEN(name);
+	ಪೂರ್ಣಾಂಕ	    len = (ಪೂರ್ಣಾಂಕ)STRLEN(name);
 
-	hn = alloc(offsetof(hlname_T, hn_key) + len + 1);
-	if (hn == NULL)
+	hn = alloc(offsetof(hlname_T, hn_ಕೀಲಿ) + len + 1);
+	ಆದರೆ (hn == ಖಾಲಿ)
 	{
 	    vim_free(name);
-	    return 0;
+	    ಹಿಂತಿರುಗಿ 0;
 	}
-	vim_strncpy(hn->hn_key, name, len);
-	vim_strup(hn->hn_key);
+	vim_strncpy(hn->hn_ಕೀಲಿ, name, len);
+	vim_strup(hn->hn_ಕೀಲಿ);
 	hn->hn_id = highlight_ga.ga_len + 1;	// ID is index plus one
-	name_up = hn->hn_key;
+	name_ಮೇಲೆ = hn->hn_ಕೀಲಿ;
     }
 
-    CLEAR_POINTER(&(HL_TABLE()[highlight_ga.ga_len]));
-    HL_TABLE()[highlight_ga.ga_len].sg_name = name;
-    HL_TABLE()[highlight_ga.ga_len].sg_name_u = name_up;
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    HL_TABLE()[highlight_ga.ga_len].sg_gui_bg = INVALCOLOR;
-    HL_TABLE()[highlight_ga.ga_len].sg_gui_fg = INVALCOLOR;
-    HL_TABLE()[highlight_ga.ga_len].sg_gui_sp = INVALCOLOR;
-#endif
-    hash_add(&highlight_ht, name_up, "highlight");
+    CLEAR_ಸೂಚಕ(&(HL_ಕೋಷ್ಟಕ()[highlight_ga.ga_len]));
+    HL_ಕೋಷ್ಟಕ()[highlight_ga.ga_len].sg_name = name;
+    HL_ಕೋಷ್ಟಕ()[highlight_ga.ga_len].sg_name_u = name_ಮೇಲೆ;
+#ಆದರೆ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    HL_ಕೋಷ್ಟಕ()[highlight_ga.ga_len].sg_gui_bg = INVALCOLOR;
+    HL_ಕೋಷ್ಟಕ()[highlight_ga.ga_len].sg_gui_fg = INVALCOLOR;
+    HL_ಕೋಷ್ಟಕ()[highlight_ga.ga_len].sg_gui_sp = INVALCOLOR;
+#ಆದರೆ_ಅಂತ್ಯ
+    hash_ಕೂಡಿಸು(&highlight_ht, name_ಮೇಲೆ, "highlight");
     ++highlight_ga.ga_len;
 
-    return highlight_ga.ga_len;		    // ID is index plus one
+    ಹಿಂತಿರುಗಿ highlight_ga.ga_len;		    // ID is index plus one
 }
 
 /*
  * When, just after calling syn_add_group(), an error is discovered, this
  * function deletes the new name.
  */
-    static void
-syn_unadd_group(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+syn_unadd_ಗುಂಪು(ಶೂನ್ಯ)
 {
     hashitem_T *hi;
 
     --highlight_ga.ga_len;
-    hi = hash_find(&highlight_ht, HL_TABLE()[highlight_ga.ga_len].sg_name_u);
-    if (!HASHITEM_EMPTY(hi))
+    hi = hash_ಕಂಡುಹಿಡಿ(&highlight_ht, HL_ಕೋಷ್ಟಕ()[highlight_ga.ga_len].sg_name_u);
+    ಆದರೆ (!HASHITEM_ಖಾಲಿಗಳು(hi))
 	hash_remove(&highlight_ht, hi, "highlight");
-    vim_free(HL_TABLE()[highlight_ga.ga_len].sg_name);
-    vim_free(HL_TABLE()[highlight_ga.ga_len].sg_name_u - HLNAME_KEY_OFF);
+    vim_free(HL_ಕೋಷ್ಟಕ()[highlight_ga.ga_len].sg_name);
+    vim_free(HL_ಕೋಷ್ಟಕ()[highlight_ga.ga_len].sg_name_u - HLNAME_ಕೀಲಿ_OFF);
 }
 
 /*
  * Translate a group ID to highlight attributes.
  * "hl_id" must be valid: > 0, caller must check.
  */
-    int
-syn_id2attr(int hl_id)
+    ಪೂರ್ಣಾಂಕ
+syn_id2attr(ಪೂರ್ಣಾಂಕ hl_id)
 {
-    int		attr;
-    hl_group_T	*sgp;
+    ಪೂರ್ಣಾಂಕ		attr;
+    hl_ಗುಂಪು_T	*sgp;
 
     hl_id = syn_get_final_id(hl_id);
     // shouldn't happen
-    assert(hl_id > 0);
-    sgp = &HL_TABLE()[hl_id - 1];	    // index is ID minus one
+    ಪ್ರತಿಜ್ಞಾ(hl_id > 0);
+    sgp = &HL_ಕೋಷ್ಟಕ()[hl_id - 1];	    // index is ID minus one
 
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
     // Only use GUI attr when the GUI is being used.
-    if (gui.in_use)
+    ಆದರೆ (gui.ಒಳ_use)
 	attr = sgp->sg_gui_attr;
-    else
-#endif
-	if (IS_CTERM)
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	ಆದರೆ (IS_CTERM)
 	    attr = sgp->sg_cterm_attr;
-	else
-	    attr = sgp->sg_term_attr;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    attr = sgp->sg_ಪದ_attr;
 
-    return attr;
+    ಹಿಂತಿರುಗಿ attr;
 }
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#ಆದರೆ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 /*
  * Get the GUI colors and attributes for a group ID.
  * NOTE: the colors will be INVALCOLOR when not set, the color otherwise.
  */
-    int
-syn_id2colors(int hl_id, guicolor_T *fgp, guicolor_T *bgp)
+    ಪೂರ್ಣಾಂಕ
+syn_id2colors(ಪೂರ್ಣಾಂಕ hl_id, guicolor_T *fgp, guicolor_T *bgp)
 {
-    hl_group_T	*sgp;
+    hl_ಗುಂಪು_T	*sgp;
 
     hl_id = syn_get_final_id(hl_id);
     // shouldn't happen
-    assert(hl_id > 0);
-    sgp = &HL_TABLE()[hl_id - 1];	    // index is ID minus one
+    ಪ್ರತಿಜ್ಞಾ(hl_id > 0);
+    sgp = &HL_ಕೋಷ್ಟಕ()[hl_id - 1];	    // index is ID minus one
 
     *fgp = sgp->sg_gui_fg;
     *bgp = sgp->sg_gui_bg;
-    return sgp->sg_gui;
+    ಹಿಂತಿರುಗಿ sgp->sg_gui;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if (defined(MSWIN) \
+#ಆದರೆ (defined(MSWIN) \
 	    && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL)) \
 	    && defined(FEAT_TERMGUICOLORS)) \
 	|| defined(FEAT_TERMINAL)
-    void
-syn_id2cterm_bg(int hl_id, int *fgp, int *bgp)
+    ಶೂನ್ಯ
+syn_id2cterm_bg(ಪೂರ್ಣಾಂಕ hl_id, ಪೂರ್ಣಾಂಕ *fgp, ಪೂರ್ಣಾಂಕ *bgp)
 {
-    hl_group_T	*sgp;
+    hl_ಗುಂಪು_T	*sgp;
 
     hl_id = syn_get_final_id(hl_id);
     // shouldn't happen
-    assert(hl_id > 0);
-    sgp = &HL_TABLE()[hl_id - 1];	    // index is ID minus one
+    ಪ್ರತಿಜ್ಞಾ(hl_id > 0);
+    sgp = &HL_ಕೋಷ್ಟಕ()[hl_id - 1];	    // index is ID minus one
     *fgp = sgp->sg_cterm_fg - 1;
     *bgp = sgp->sg_cterm_bg - 1;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Translate a group ID to the final group ID (following links).
  */
-    int
-syn_get_final_id(int hl_id)
+    ಪೂರ್ಣಾಂಕ
+syn_get_final_id(ಪೂರ್ಣಾಂಕ hl_id)
 {
-    int		count;
-    hl_group_T	*sgp;
+    ಪೂರ್ಣಾಂಕ		ಎಣಿಕೆ_2;
+    hl_ಗುಂಪು_T	*sgp;
 
-    if (hl_id > highlight_ga.ga_len || hl_id < 1)
-	return 0;			// Can be called from eval!!
+    ಆದರೆ (hl_id > highlight_ga.ga_len || hl_id < 1)
+	ಹಿಂತಿರುಗಿ 0;			// Can be called from eval!!
 
     // Follow links until there is no more.
     // Look out for loops!  Break after 100 links.
-    for (count = 100; --count >= 0; )
+    ಗಾಗಿ (ಎಣಿಕೆ_2 = 100; --ಎಣಿಕೆ_2 >= 0; )
     {
-	int tmp = hl_id;
+	ಪೂರ್ಣಾಂಕ tmp = hl_id;
 
-	sgp = &HL_TABLE()[hl_id - 1];	    // index is ID minus one
-	if (sgp->sg_link == 0 || sgp->sg_link > highlight_ga.ga_len)
-	    break;
+	sgp = &HL_ಕೋಷ್ಟಕ()[hl_id - 1];	    // index is ID minus one
+	ಆದರೆ (sgp->sg_link == 0 || sgp->sg_link > highlight_ga.ga_len)
+	    ನಿಲ್ಲಿಸು;
 
 	// This is to handle highlight groups that are overridden but are in the
 	// middle of a link chain.
 	hl_id = syn_override(hl_id);
-	if (tmp != hl_id)
-	    continue;
+	ಆದರೆ (tmp != hl_id)
+	    ಮುಂದುವರಿ;
 	hl_id = sgp->sg_link;
     }
-    return syn_override(hl_id);
+    ಹಿಂತಿರುಗಿ syn_override(hl_id);
 }
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#ಆದರೆ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 /*
  * Call this function just after the GUI has started.
  * Also called when 'termguicolors' was set, gui.in_use will be FALSE then.
  * It finds the font and color handles for the highlighting groups.
  */
-    void
-highlight_gui_started(void)
+    ಶೂನ್ಯ
+highlight_gui_started(ಶೂನ್ಯ)
 {
-    int	    idx;
+    ಪೂರ್ಣಾಂಕ	    idx;
 
     // First get the colors from the "Normal" and "Menu" group, if set
-    if (USE_24BIT)
-	set_normal_colors();
+    ಆದರೆ (USE_24_ಬಿಟ್)
+	ಗಣ_ಸಾಮಾನ್ಯ_colors();
 
-    for (idx = 0; idx < highlight_ga.ga_len; ++idx)
+    ಗಾಗಿ (idx = 0; idx < highlight_ga.ga_len; ++idx)
 	gui_do_one_color(idx, FALSE, FALSE);
 
-    highlight_changed();
+    highlight_ಬದಲಾಯಿತು();
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 gui_do_one_color(
-    int		idx,
-    int		do_menu UNUSED,	   // TRUE: might set the menu font
-    int		do_tooltip UNUSED) // TRUE: might set the tooltip font
+    ಪೂರ್ಣಾಂಕ		idx,
+    ಪೂರ್ಣಾಂಕ		do_menu ಬಳಸದ,	   // TRUE: might set the menu font
+    ಪೂರ್ಣಾಂಕ		do_tooltip ಬಳಸದ) // TRUE: might set the tooltip font
 {
-    int		didit = FALSE;
+    ಪೂರ್ಣಾಂಕ		didit = FALSE;
 
 # ifdef FEAT_GUI
 #  ifdef FEAT_TERMGUICOLORS
-    if (gui.in_use)
+    ಆದರೆ (gui.ಒಳ_use)
 #  endif
-	if (HL_TABLE()[idx].sg_font_name != NULL)
+	ಆದರೆ (HL_ಕೋಷ್ಟಕ()[idx].sg_font_name != ಖಾಲಿ)
 	{
-	    hl_do_font(idx, HL_TABLE()[idx].sg_font_name, FALSE, do_menu,
+	    hl_do_font(idx, HL_ಕೋಷ್ಟಕ()[idx].sg_font_name, FALSE, do_menu,
 							    do_tooltip, TRUE);
 	    didit = TRUE;
 	}
 # endif
-    if (HL_TABLE()[idx].sg_gui_fg_name != NULL)
+    ಆದರೆ (HL_ಕೋಷ್ಟಕ()[idx].sg_gui_fg_name != ಖಾಲಿ)
     {
-	HL_TABLE()[idx].sg_gui_fg =
-			    color_name2handle(HL_TABLE()[idx].sg_gui_fg_name);
+	HL_ಕೋಷ್ಟಕ()[idx].sg_gui_fg =
+			    color_name2handle(HL_ಕೋಷ್ಟಕ()[idx].sg_gui_fg_name);
 	didit = TRUE;
     }
-    if (HL_TABLE()[idx].sg_gui_bg_name != NULL)
+    ಆದರೆ (HL_ಕೋಷ್ಟಕ()[idx].sg_gui_bg_name != ಖಾಲಿ)
     {
-	HL_TABLE()[idx].sg_gui_bg =
-			    color_name2handle(HL_TABLE()[idx].sg_gui_bg_name);
+	HL_ಕೋಷ್ಟಕ()[idx].sg_gui_bg =
+			    color_name2handle(HL_ಕೋಷ್ಟಕ()[idx].sg_gui_bg_name);
 	didit = TRUE;
     }
-    if (HL_TABLE()[idx].sg_gui_sp_name != NULL)
+    ಆದರೆ (HL_ಕೋಷ್ಟಕ()[idx].sg_gui_sp_name != ಖಾಲಿ)
     {
-	HL_TABLE()[idx].sg_gui_sp =
-			    color_name2handle(HL_TABLE()[idx].sg_gui_sp_name);
+	HL_ಕೋಷ್ಟಕ()[idx].sg_gui_sp =
+			    color_name2handle(HL_ಕೋಷ್ಟಕ()[idx].sg_gui_sp_name);
 	didit = TRUE;
     }
-    if (didit)	// need to get a new attr number
-	set_hl_attr(idx);
+    ಆದರೆ (didit)	// need to get a new attr number
+	ಗಣ_hl_attr(idx);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(USER_HIGHLIGHT) && defined(FEAT_STL_OPT)
+#ಆದರೆ defined(USER_HIGHLIGHT) && defined(FEAT_STL_OPT)
 /*
  * Apply difference between User[1-9] and HLF_S to HLF_SNC, HLF_ST or HLF_STNC.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 combine_stl_hlt(
-	int id,
-	int id_S,
-	int id_alt,
-	int hlcnt,
-	int i,
-	int hlf,
-	int *table)
+	ಪೂರ್ಣಾಂಕ id,
+	ಪೂರ್ಣಾಂಕ id_S,
+	ಪೂರ್ಣಾಂಕ id_alt,
+	ಪೂರ್ಣಾಂಕ hlcnt,
+	ಪೂರ್ಣಾಂಕ i,
+	ಪೂರ್ಣಾಂಕ hlf,
+	ಪೂರ್ಣಾಂಕ *ಕೋಷ್ಟಕ)
 {
-    hl_group_T *hlt = HL_TABLE();
+    hl_ಗುಂಪು_T *hlt = HL_ಕೋಷ್ಟಕ();
 
-    if (id_alt == 0)
+    ಆದರೆ (id_alt == 0)
     {
-	CLEAR_POINTER(&hlt[hlcnt + i]);
-	hlt[hlcnt + i].sg_term = highlight_attr[hlf];
+	CLEAR_ಸೂಚಕ(&hlt[hlcnt + i]);
+	hlt[hlcnt + i].sg_ಪದ = highlight_attr[hlf];
 	hlt[hlcnt + i].sg_cterm = highlight_attr[hlf];
-# if defined(FEAT_GUI) || defined(FEAT_EVAL)
+# ಆದರೆ defined(FEAT_GUI) || defined(FEAT_EVAL)
 	hlt[hlcnt + i].sg_gui = highlight_attr[hlf];
 # endif
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	mch_memmove(&hlt[hlcnt + i],
 		    &hlt[id_alt - 1],
-		    sizeof(hl_group_T));
+		    ಗಾತ್ರ(hl_ಗುಂಪು_T));
     hlt[hlcnt + i].sg_link = 0;
 
-    hlt[hlcnt + i].sg_term ^=
-	hlt[id - 1].sg_term ^ hlt[id_S - 1].sg_term;
-    if (hlt[id - 1].sg_start != hlt[id_S - 1].sg_start)
-	hlt[hlcnt + i].sg_start = hlt[id - 1].sg_start;
-    if (hlt[id - 1].sg_stop != hlt[id_S - 1].sg_stop)
+    hlt[hlcnt + i].sg_ಪದ ^=
+	hlt[id - 1].sg_ಪದ ^ hlt[id_S - 1].sg_ಪದ;
+    ಆದರೆ (hlt[id - 1].sg_ಆರಂಭ != hlt[id_S - 1].sg_ಆರಂಭ)
+	hlt[hlcnt + i].sg_ಆರಂಭ = hlt[id - 1].sg_ಆರಂಭ;
+    ಆದರೆ (hlt[id - 1].sg_stop != hlt[id_S - 1].sg_stop)
 	hlt[hlcnt + i].sg_stop = hlt[id - 1].sg_stop;
     hlt[hlcnt + i].sg_cterm ^=
 	hlt[id - 1].sg_cterm ^ hlt[id_S - 1].sg_cterm;
-    if (hlt[id - 1].sg_cterm_fg != hlt[id_S - 1].sg_cterm_fg)
+    ಆದರೆ (hlt[id - 1].sg_cterm_fg != hlt[id_S - 1].sg_cterm_fg)
 	hlt[hlcnt + i].sg_cterm_fg = hlt[id - 1].sg_cterm_fg;
-    if (hlt[id - 1].sg_cterm_bg != hlt[id_S - 1].sg_cterm_bg)
+    ಆದರೆ (hlt[id - 1].sg_cterm_bg != hlt[id_S - 1].sg_cterm_bg)
 	hlt[hlcnt + i].sg_cterm_bg = hlt[id - 1].sg_cterm_bg;
-    if (hlt[id - 1].sg_cterm_font != hlt[id_S - 1].sg_cterm_font)
+    ಆದರೆ (hlt[id - 1].sg_cterm_font != hlt[id_S - 1].sg_cterm_font)
 	hlt[hlcnt + i].sg_cterm_font = hlt[id - 1].sg_cterm_font;
-# if defined(FEAT_GUI) || defined(FEAT_EVAL)
+# ಆದರೆ defined(FEAT_GUI) || defined(FEAT_EVAL)
     hlt[hlcnt + i].sg_gui ^=
 	hlt[id - 1].sg_gui ^ hlt[id_S - 1].sg_gui;
 # endif
 # ifdef FEAT_GUI
-    if (hlt[id - 1].sg_gui_fg != hlt[id_S - 1].sg_gui_fg)
+    ಆದರೆ (hlt[id - 1].sg_gui_fg != hlt[id_S - 1].sg_gui_fg)
 	hlt[hlcnt + i].sg_gui_fg = hlt[id - 1].sg_gui_fg;
-    if (hlt[id - 1].sg_gui_bg != hlt[id_S - 1].sg_gui_bg)
+    ಆದರೆ (hlt[id - 1].sg_gui_bg != hlt[id_S - 1].sg_gui_bg)
 	hlt[hlcnt + i].sg_gui_bg = hlt[id - 1].sg_gui_bg;
-    if (hlt[id - 1].sg_gui_sp != hlt[id_S - 1].sg_gui_sp)
+    ಆದರೆ (hlt[id - 1].sg_gui_sp != hlt[id_S - 1].sg_gui_sp)
 	hlt[hlcnt + i].sg_gui_sp = hlt[id - 1].sg_gui_sp;
-    if (hlt[id - 1].sg_font != hlt[id_S - 1].sg_font)
+    ಆದರೆ (hlt[id - 1].sg_font != hlt[id_S - 1].sg_font)
 	hlt[hlcnt + i].sg_font = hlt[id - 1].sg_font;
 #  ifdef FEAT_XFONTSET
-    if (hlt[id - 1].sg_fontset != hlt[id_S - 1].sg_fontset)
+    ಆದರೆ (hlt[id - 1].sg_fontset != hlt[id_S - 1].sg_fontset)
 	hlt[hlcnt + i].sg_fontset = hlt[id - 1].sg_fontset;
 #  endif
 # endif
     highlight_ga.ga_len = hlcnt + i + 1;
-    set_hl_attr(hlcnt + i);	// At long last we can apply
-    table[i] = syn_id2attr(hlcnt + i + 1);
+    ಗಣ_hl_attr(hlcnt + i);	// At long last we can apply
+    ಕೋಷ್ಟಕ[i] = syn_id2attr(hlcnt + i + 1);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Translate the 'highlight' option into attributes in highlight_attr[] and
@@ -4655,39 +4655,39 @@ combine_stl_hlt(
  * screen redraw after any :highlight command.
  * Return FAIL when an invalid flag is found in 'highlight'.  OK otherwise.
  */
-    int
-highlight_changed(void)
+    ಪೂರ್ಣಾಂಕ
+highlight_ಬದಲಾಯಿತು(ಶೂನ್ಯ)
 {
-    int		hlf;
-    int		i;
+    ಪೂರ್ಣಾಂಕ		hlf;
+    ಪೂರ್ಣಾಂಕ		i;
     char_u	*p;
     char_u	*default_hl;
-    int		attr;
-    char_u	*end;
-    int		id;
-#ifdef USER_HIGHLIGHT
+    ಪೂರ್ಣಾಂಕ		attr;
+    char_u	*ಕೊನೆ;
+    ಪೂರ್ಣಾಂಕ		id;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USER_HIGHLIGHT
     char_u      userhl[30];  // use 30 to avoid compiler warning
 # ifdef FEAT_STL_OPT
-    int		id_S = -1;
-    int		id_SNC = 0;
+    ಪೂರ್ಣಾಂಕ		id_S = -1;
+    ಪೂರ್ಣಾಂಕ		id_SNC = 0;
 #  ifdef FEAT_TERMINAL
-    int		id_ST = 0;
-    int		id_STNC = 0;
+    ಪೂರ್ಣಾಂಕ		id_ST = 0;
+    ಪೂರ್ಣಾಂಕ		id_STNC = 0;
 #  endif
-    int		hlcnt;
+    ಪೂರ್ಣಾಂಕ		hlcnt;
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     win_T	*wp;
 
-    need_highlight_changed = FALSE;
+    need_highlight_ಬದಲಾಯಿತು = FALSE;
 
-#ifdef FEAT_TERMINAL
-    term_update_colors_all();
-    term_update_hlfwin_all();
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMINAL
+    ಪದ_update_colors_all();
+    ಪದ_update_hlfwin_all();
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Clear all attributes.
-    for (hlf = 0; hlf < (int)HLF_COUNT; ++hlf)
+    ಗಾಗಿ (hlf = 0; hlf < (ಪೂರ್ಣಾಂಕ)HLF_ಎಣಿಕೆ; ++hlf)
     {
 	highlight_attr[hlf] = 0;
 	highlight_attr_raw[hlf] = 0;
@@ -4699,116 +4699,116 @@ highlight_changed(void)
     // First set all attributes to their default value.
     // Then use the attributes from the 'highlight' option, unless it already
     // matches the default and would repeat the same work.
-    for (i = 0; i < 2; ++i)
+    ಗಾಗಿ (i = 0; i < 2; ++i)
     {
-	if (i)
+	ಆದರೆ (i)
 	{
-	    if (default_hl != NULL && p_hl != NULL
+	    ಆದರೆ (default_hl != ಖಾಲಿ && p_hl != ಖಾಲಿ
 				      && STRCMP(default_hl, p_hl) == 0)
-		continue;
+		ಮುಂದುವರಿ;
 	    p = p_hl;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    p = default_hl;
-	if (p == NULL)	    // just in case
-	    continue;
+	ಆದರೆ (p == ಖಾಲಿ)	    // just in case
+	    ಮುಂದುವರಿ;
 
-	while (*p)
+	ಆಗ (*p)
 	{
-	    for (hlf = 0; hlf < (int)HLF_COUNT; ++hlf)
-		if (hl_flags[hlf] == *p)
-		    break;
+	    ಗಾಗಿ (hlf = 0; hlf < (ಪೂರ್ಣಾಂಕ)HLF_ಎಣಿಕೆ; ++hlf)
+		ಆದರೆ (hl_flags[hlf] == *p)
+		    ನಿಲ್ಲಿಸು;
 	    ++p;
-	    if (hlf == (int)HLF_COUNT || *p == NUL)
-		return FAIL;
+	    ಆದರೆ (hlf == (ಪೂರ್ಣಾಂಕ)HLF_ಎಣಿಕೆ || *p == NUL)
+		ಹಿಂತಿರುಗಿ FAIL;
 
 	    // Allow several hl_flags to be combined, like "bu" for
 	    // bold-underlined.
 	    attr = 0;
 	    id = 0;
-	    for ( ; *p && *p != ','; ++p)	    // parse up to comma
+	    ಗಾಗಿ ( ; *p && *p != ','; ++p)	    // parse up to comma
 	    {
-		if (VIM_ISWHITE(*p))		    // ignore white space
-		    continue;
+		ಆದರೆ (VIM_ISWHITE(*p))		    // ignore white space
+		    ಮುಂದುವರಿ;
 
-		if (attr > HL_ALL)  // Combination with ':' is not allowed.
-		    return FAIL;
+		ಆದರೆ (attr > HL_ALL)  // Combination with ':' is not allowed.
+		    ಹಿಂತಿರುಗಿ FAIL;
 
 		// Note: Keep this in sync with expand_set_highlight().
-		switch (*p)
+		ಆಯ್ಕೆ (*p)
 		{
-		    case 'b':	attr |= HL_BOLD;
-				break;
-		    case 'i':	attr |= HL_ITALIC;
-				break;
-		    case '-':
-		    case 'n':			    // no highlighting
-				break;
-		    case 'r':	attr |= HL_INVERSE;
-				break;
-		    case 's':	attr |= HL_STANDOUT;
-				break;
-		    case 'u':	attr |= HL_UNDERLINE;
-				break;
-		    case 'c':	attr |= HL_UNDERCURL;
-				break;
-		    case '2':	attr |= HL_UNDERDOUBLE;
-				break;
-		    case 'd':	attr |= HL_UNDERDOTTED;
-				break;
-		    case '=':	attr |= HL_UNDERDASHED;
-				break;
-		    case 't':	attr |= HL_STRIKETHROUGH;
-				break;
-		    case ':':	++p;		    // highlight group name
-				if (attr || *p == NUL)	 // no combinations
-				    return FAIL;
-				end = vim_strchr(p, ',');
-				if (end == NULL)
-				    end = p + STRLEN(p);
-				id = syn_check_group(p, (int)(end - p));
-				if (id == 0)
-				    return FAIL;
+		    ಸ್ಥಿತಿ 'b':	attr |= HL_BOLD;
+				ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ 'i':	attr |= HL_ITALIC;
+				ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ '-':
+		    ಸ್ಥಿತಿ 'n':			    // no highlighting
+				ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ 'r':	attr |= HL_INVERSE;
+				ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ 's':	attr |= HL_STANDOUT;
+				ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ 'u':	attr |= HL_UNDERLINE;
+				ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ 'c':	attr |= HL_UNDERCURL;
+				ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ '2':	attr |= HL_UNDERDOUBLE;
+				ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ 'd':	attr |= HL_UNDERDOTTED;
+				ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ '=':	attr |= HL_UNDERDASHED;
+				ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ 't':	attr |= HL_STRIKETHROUGH;
+				ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ ':':	++p;		    // highlight group name
+				ಆದರೆ (attr || *p == NUL)	 // no combinations
+				    ಹಿಂತಿರುಗಿ FAIL;
+				ಕೊನೆ = vim_strchr(p, ',');
+				ಆದರೆ (ಕೊನೆ == ಖಾಲಿ)
+				    ಕೊನೆ = p + STRLEN(p);
+				id = syn_check_ಗುಂಪು(p, (ಪೂರ್ಣಾಂಕ)(ಕೊನೆ - p));
+				ಆದರೆ (id == 0)
+				    ಹಿಂತಿರುಗಿ FAIL;
 				attr = syn_id2attr(id);
-				p = end - 1;
-#if defined(FEAT_STL_OPT) && defined(USER_HIGHLIGHT)
-				if (hlf == (int)HLF_SNC)
+				p = ಕೊನೆ - 1;
+#ಆದರೆ defined(FEAT_STL_OPT) && defined(USER_HIGHLIGHT)
+				ಆದರೆ (hlf == (ಪೂರ್ಣಾಂಕ)HLF_SNC)
 				    id_SNC = syn_get_final_id(id);
 # ifdef FEAT_TERMINAL
-				else if (hlf == (int)HLF_ST)
+				ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (hlf == (ಪೂರ್ಣಾಂಕ)HLF_ST)
 				    id_ST = syn_get_final_id(id);
-				else if (hlf == (int)HLF_STNC)
+				ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (hlf == (ಪೂರ್ಣಾಂಕ)HLF_STNC)
 				    id_STNC = syn_get_final_id(id);
 # endif
-				else if (hlf == (int)HLF_S)
+				ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (hlf == (ಪೂರ್ಣಾಂಕ)HLF_S)
 				    id_S = syn_get_final_id(id);
-#endif
-				break;
-		    default:	return FAIL;
+#ಆದರೆ_ಅಂತ್ಯ
+				ನಿಲ್ಲಿಸು;
+		    ಪೂರ್ವನಿಯೋಜಿತ:	ಹಿಂತಿರುಗಿ FAIL;
 		}
 	    }
 	    highlight_attr[hlf] = attr;
 	    highlight_attr_raw[hlf] = attr;
 	    highlight_ids[hlf] = id;
 
-	    p = skip_to_option_part(p);	    // skip comma and spaces
+	    p = skip_ಗಮ್ಯ_option_part(p);	    // skip comma and spaces
 	}
     }
 
     // Highlight ids may have been changed, so keep windows up to date
     FOR_ALL_WINDOWS(wp)
     {
-	char *errmsg = update_winhighlight(wp, wp->w_p_whl);
+	ಅಕ್ಷರ *errmsg = update_winhighlight(wp, wp->w_p_whl);
 
-	if (errmsg != NULL)
+	ಆದರೆ (errmsg != ಖಾಲಿ)
 	    emsg(_(errmsg));
     }
 
-#ifdef FEAT_TERMINAL
-    term_update_hlfwin_all();
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMINAL
+    ಪದ_update_hlfwin_all();
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef USER_HIGHLIGHT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USER_HIGHLIGHT
     // Setup the user highlights
     //
     // Temporarily utilize 28 more hl entries:
@@ -4819,23 +4819,23 @@ highlight_changed(void)
     // Have to be in there simultaneously in case of table overflows in
     // get_attr_entry()
 # ifdef FEAT_STL_OPT
-    if (ga_grow(&highlight_ga, 28) == FAIL)
-	return FAIL;
+    ಆದರೆ (ga_grow(&highlight_ga, 28) == FAIL)
+	ಹಿಂತಿರುಗಿ FAIL;
     hlcnt = highlight_ga.ga_len;
-    if (id_S == -1)
+    ಆದರೆ (id_S == -1)
     {
 	// Make sure id_S is always valid to simplify code below. Use the last
 	// entry.
-	CLEAR_POINTER(&HL_TABLE()[hlcnt + 27]);
-	HL_TABLE()[hlcnt + 18].sg_term = highlight_attr[HLF_S];
+	CLEAR_ಸೂಚಕ(&HL_ಕೋಷ್ಟಕ()[hlcnt + 27]);
+	HL_ಕೋಷ್ಟಕ()[hlcnt + 18].sg_ಪದ = highlight_attr[HLF_S];
 	id_S = hlcnt + 19;
     }
 # endif
-    for (i = 0; i < 9; i++)
+    ಗಾಗಿ (i = 0; i < 9; i++)
     {
-	sprintf((char *)userhl, "User%d", i + 1);
+	sprintf((ಅಕ್ಷರ *)userhl, "User%d", i + 1);
 	id = syn_name2id(userhl);
-	if (id == 0)
+	ಆದರೆ (id == 0)
 	{
 	    highlight_user[i] = 0;
 # ifdef FEAT_STL_OPT
@@ -4846,7 +4846,7 @@ highlight_changed(void)
 #  endif
 # endif
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    highlight_user[i] = syn_id2attr(id);
 # ifdef FEAT_STL_OPT
@@ -4865,130 +4865,130 @@ highlight_changed(void)
     highlight_ga.ga_len = hlcnt;
 # endif
 
-#endif // USER_HIGHLIGHT
+#ಆದರೆ_ಅಂತ್ಯ // USER_HIGHLIGHT
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-static void highlight_list(void);
-static void highlight_list_two(int cnt, int attr);
+ಸ್ಥಿರ ಶೂನ್ಯ highlight_list(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಶೂನ್ಯ highlight_list_two(ಪೂರ್ಣಾಂಕ cnt, ಪೂರ್ಣಾಂಕ attr);
 
 // context for :highlight <group> <arg> expansion
-static int expand_hi_synid = 0;	    // ID for highlight group being completed
-static int expand_hi_equal_col = 0; // column where the '=' is
-static int expand_hi_include_orig = 0;	    // whether to fill the existing current value or not
-static char_u *expand_hi_curvalue = NULL;   // the existing current value
-#if defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
-static dict_iterator_T expand_colornames_iter;	// iterator for looping through v:colornames
-#endif
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ expand_hi_synid = 0;	    // ID for highlight group being completed
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ expand_hi_equal_ಲಂಬಸಾಲು = 0; // column where the '=' is
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ expand_hi_include_orig = 0;	    // whether to fill the existing current value or not
+ಸ್ಥಿರ char_u *expand_hi_curvalue = ಖಾಲಿ;   // the existing current value
+#ಆದರೆ defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
+ಸ್ಥಿರ dict_iterator_T expand_colornames_iter;	// iterator for looping through v:colornames
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Handle command line completion for :highlight command.
  */
-    void
-set_context_in_highlight_cmd(expand_T *xp, char_u *arg)
+    ಶೂನ್ಯ
+ಗಣ_context_ಒಳ_highlight_cmd(expand_T *xp, char_u *arg)
 {
     char_u	*p;
-    int		expand_group = TRUE;
+    ಪೂರ್ಣಾಂಕ		expand_ಗುಂಪು = TRUE;
 
     // Default: expand group names
     xp->xp_context = EXPAND_HIGHLIGHT;
-    xp->xp_pattern = arg;
+    xp->xp_ನಮೂನೆ = arg;
     include_none = 0;
     include_link = 2;
     include_default = 1;
 
-    if (*arg == NUL)
-	return;
+    ಆದರೆ (*arg == NUL)
+	ಹಿಂತಿರುಗಿ;
 
     // (part of) subcommand already typed
     p = skiptowhite(arg);
-    if (*p == NUL)
-	return;
+    ಆದರೆ (*p == NUL)
+	ಹಿಂತಿರುಗಿ;
 
     // past "default" or group name
     include_default = 0;
-    if (STRNCMP("default", arg, p - arg) == 0)
+    ಆದರೆ (STRNCMP("default", arg, p - arg) == 0)
     {
 	arg = skipwhite(p);
-	xp->xp_pattern = arg;
+	xp->xp_ನಮೂನೆ = arg;
 	p = skiptowhite(arg);
     }
-    if (*p == NUL)
-	return;
+    ಆದರೆ (*p == NUL)
+	ಹಿಂತಿರುಗಿ;
 
     // past group name
     include_link = 0;
-    if (arg[1] == 'i' && arg[0] == 'N')
+    ಆದರೆ (arg[1] == 'i' && arg[0] == 'N')
     {
 	highlight_list();
-	expand_group = FALSE;
+	expand_ಗುಂಪು = FALSE;
     }
-    if (STRNCMP("link", arg, p - arg) == 0)
+    ಆದರೆ (STRNCMP("link", arg, p - arg) == 0)
     {
-	xp->xp_pattern = skipwhite(p);
-	p = skiptowhite(xp->xp_pattern);
-	if (*p != NUL)		// past first group name
+	xp->xp_ನಮೂನೆ = skipwhite(p);
+	p = skiptowhite(xp->xp_ನಮೂನೆ);
+	ಆದರೆ (*p != NUL)		// past first group name
 	{
-	    xp->xp_pattern = skipwhite(p);
-	    p = skiptowhite(xp->xp_pattern);
+	    xp->xp_ನಮೂನೆ = skipwhite(p);
+	    p = skiptowhite(xp->xp_ನಮೂನೆ);
 	    include_none = 1;
 	}
-	expand_group = FALSE;
+	expand_ಗುಂಪು = FALSE;
     }
-    else if (STRNCMP("clear", arg, p - arg) == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRNCMP("clear", arg, p - arg) == 0)
     {
-	xp->xp_pattern = skipwhite(p);
-	p = skiptowhite(xp->xp_pattern);
-	expand_group = FALSE;
+	xp->xp_ನಮೂನೆ = skipwhite(p);
+	p = skiptowhite(xp->xp_ನಮೂನೆ);
+	expand_ಗುಂಪು = FALSE;
     }
-    if (*p != NUL)			// past group name(s)
+    ಆದರೆ (*p != NUL)			// past group name(s)
     {
-	if (expand_group)
+	ಆದರೆ (expand_ಗುಂಪು)
 	{
 	    // expansion will be done in expand_highlight_group()
-	    xp->xp_context = EXPAND_HIGHLIGHT_GROUP;
+	    xp->xp_context = EXPAND_HIGHLIGHT_ಗುಂಪು;
 
-	    expand_hi_synid = syn_namen2id(arg, (int)(p - arg));
+	    expand_hi_synid = syn_namen2id(arg, (ಪೂರ್ಣಾಂಕ)(p - arg));
 
-	    while (*p != NUL)
+	    ಆಗ (*p != NUL)
 	    {
 		arg = skipwhite(p);
 		p = skiptowhite(arg);
 	    }
 
 	    p = vim_strchr(arg, '=');
-	    if (p == NULL)
+	    ಆದರೆ (p == ಖಾಲಿ)
 	    {
 		// Didn't find a key=<value> pattern
-		xp->xp_pattern = arg;
-		expand_hi_equal_col = -1;
+		xp->xp_ನಮೂನೆ = arg;
+		expand_hi_equal_ಲಂಬಸಾಲು = -1;
 		expand_hi_include_orig = FALSE;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		// Found key=<value> pattern, record the exact location
-		expand_hi_equal_col = (int)(p - xp->xp_line);
+		expand_hi_equal_ಲಂಬಸಾಲು = (ಪೂರ್ಣಾಂಕ)(p - xp->xp_ಸಾಲು);
 
 		// Only include the original value if the pattern is empty
-		if (*(p + 1) == NUL)
+		ಆದರೆ (*(p + 1) == NUL)
 		    expand_hi_include_orig = TRUE;
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		    expand_hi_include_orig = FALSE;
 
 		// Account for comma-separated values
-		if (STRNCMP(arg, "term=", 5) == 0 ||
+		ಆದರೆ (STRNCMP(arg, "term=", 5) == 0 ||
 			STRNCMP(arg, "cterm=", 6) == 0 ||
 			STRNCMP(arg, "gui=", 4) == 0)
 		{
 		    char_u *comma = vim_strrchr(p + 1, ',');
-		    if (comma != NULL)
+		    ಆದರೆ (comma != ಖಾಲಿ)
 			p = comma;
 		}
-		xp->xp_pattern = p + 1;
+		xp->xp_ನಮೂನೆ = p + 1;
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    xp->xp_context = EXPAND_NOTHING;
 	}
@@ -4998,33 +4998,33 @@ set_context_in_highlight_cmd(expand_T *xp, char_u *arg)
 /*
  * List highlighting matches in a nice way.
  */
-    static void
-highlight_list(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+highlight_list(ಶೂನ್ಯ)
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
 
-    for (i = 10; --i >= 0; )
+    ಗಾಗಿ (i = 10; --i >= 0; )
 	highlight_list_two(i, HL_ATTR(HLF_D));
-    for (i = 40; --i >= 0; )
+    ಗಾಗಿ (i = 40; --i >= 0; )
 	highlight_list_two(99, 0);
 }
 
-    static void
-highlight_list_two(int cnt, int attr)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+highlight_list_two(ಪೂರ್ಣಾಂಕ cnt, ಪೂರ್ಣಾಂಕ attr)
 {
-    msg_puts_attr(&("N \bI \b!  \b"[cnt / 11]), attr);
-    msg_clr_eos();
-    out_flush();
-    ui_delay(cnt == 99 ? 40L : (long)cnt * 50L, FALSE);
+    ಸಂದೇಶ_puts_attr(&("N \bI \b!  \b"[cnt / 11]), attr);
+    ಸಂದೇಶ_clr_eos();
+    ಹೊರಹೋಗು_flush();
+    ui_delay(cnt == 99 ? 40L : (ದೀರ್ಘ)cnt * 50L, FALSE);
 }
 
 /*
  * Function given to ExpandGeneric() to obtain the list of group names.
  */
     char_u *
-get_highlight_name(expand_T *xp UNUSED, int idx)
+get_highlight_name(expand_T *xp ಬಳಸದ, ಪೂರ್ಣಾಂಕ idx)
 {
-    return get_highlight_name_ext(xp, idx, TRUE);
+    ಹಿಂತಿರುಗಿ get_highlight_name_ext(xp, idx, TRUE);
 }
 
 /*
@@ -5032,123 +5032,123 @@ get_highlight_name(expand_T *xp UNUSED, int idx)
  * When "skip_cleared" is TRUE don't return a cleared entry.
  */
     char_u *
-get_highlight_name_ext(expand_T *xp UNUSED, int idx, int skip_cleared)
+get_highlight_name_ext(expand_T *xp ಬಳಸದ, ಪೂರ್ಣಾಂಕ idx, ಪೂರ್ಣಾಂಕ skip_cleared)
 {
-    if (idx < 0)
-	return NULL;
+    ಆದರೆ (idx < 0)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     // Items are never removed from the table, skip the ones that were
     // cleared.
-    if (skip_cleared && idx < highlight_ga.ga_len && HL_TABLE()[idx].sg_cleared)
-	return (char_u *)"";
+    ಆದರೆ (skip_cleared && idx < highlight_ga.ga_len && HL_ಕೋಷ್ಟಕ()[idx].sg_cleared)
+	ಹಿಂತಿರುಗಿ (char_u *)"";
 
-    if (idx == highlight_ga.ga_len && include_none != 0)
-	return (char_u *)"NONE";
-    if (idx == highlight_ga.ga_len + include_none && include_default != 0)
-	return (char_u *)"default";
-    if (idx == highlight_ga.ga_len + include_none + include_default
+    ಆದರೆ (idx == highlight_ga.ga_len && include_none != 0)
+	ಹಿಂತಿರುಗಿ (char_u *)"NONE";
+    ಆದರೆ (idx == highlight_ga.ga_len + include_none && include_default != 0)
+	ಹಿಂತಿರುಗಿ (char_u *)"default";
+    ಆದರೆ (idx == highlight_ga.ga_len + include_none + include_default
 							 && include_link != 0)
-	return (char_u *)"link";
-    if (idx == highlight_ga.ga_len + include_none + include_default + 1
+	ಹಿಂತಿರುಗಿ (char_u *)"link";
+    ಆದರೆ (idx == highlight_ga.ga_len + include_none + include_default + 1
 							 && include_link != 0)
-	return (char_u *)"clear";
-    if (idx >= highlight_ga.ga_len)
-	return NULL;
-    return HL_TABLE()[idx].sg_name;
+	ಹಿಂತಿರುಗಿ (char_u *)"clear";
+    ಆದರೆ (idx >= highlight_ga.ga_len)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    ಹಿಂತಿರುಗಿ HL_ಕೋಷ್ಟಕ()[idx].sg_name;
 }
 
-    static char_u *
-get_highlight_attr_name(expand_T *xp UNUSED, int idx)
+    ಸ್ಥಿರ char_u *
+get_highlight_attr_name(expand_T *xp ಬಳಸದ, ಪೂರ್ಣಾಂಕ idx)
 {
-    if (idx == 0)
+    ಆದರೆ (idx == 0)
     {
 	// Fill with current value first
-	if (expand_hi_curvalue != NULL)
-	    return expand_hi_curvalue;
-	else
-	    return (char_u*)"";
+	ಆದರೆ (expand_hi_curvalue != ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ expand_hi_curvalue;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಹಿಂತಿರುಗಿ (char_u*)"";
     }
-    if (idx < (int)ARRAY_LENGTH(highlight_index_tab) + 1)
+    ಆದರೆ (idx < (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(highlight_ಸೂಚ್ಯಂಕ_tab) + 1)
     {
-	char_u *value = highlight_index_tab[idx-1]->value.string;
-	if (expand_hi_curvalue != NULL && STRCMP(expand_hi_curvalue, value) == 0)
+	char_u *ಮೌಲ್ಯ = highlight_ಸೂಚ್ಯಂಕ_tab[idx-1]->ಮೌಲ್ಯ.string;
+	ಆದರೆ (expand_hi_curvalue != ಖಾಲಿ && STRCMP(expand_hi_curvalue, ಮೌಲ್ಯ) == 0)
 	{
 	    // Already returned the current value above, just skip.
-	    return (char_u*)"";
+	    ಹಿಂತಿರುಗಿ (char_u*)"";
 	}
-	return value;
+	ಹಿಂತಿರುಗಿ ಮೌಲ್ಯ;
     }
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
-    static char_u *
-get_highlight_cterm_color(expand_T *xp UNUSED, int idx)
+    ಸ್ಥಿರ char_u *
+get_highlight_cterm_color(expand_T *xp ಬಳಸದ, ಪೂರ್ಣಾಂಕ idx)
 {
-    if (idx == 0)
+    ಆದರೆ (idx == 0)
     {
 	// Fill with current value first
-	if (expand_hi_curvalue != NULL)
-	    return expand_hi_curvalue;
-	else
-	    return (char_u*)"";
+	ಆದರೆ (expand_hi_curvalue != ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ expand_hi_curvalue;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಹಿಂತಿರುಗಿ (char_u*)"";
     }
     // See highlight_set_cterm_color()
-    else if (idx == 1)
-	return (char_u*)"fg";
-    else if (idx == 2)
-	return (char_u*)"bg";
-    if (idx < (int)ARRAY_LENGTH(color_name_tab) + 3)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (idx == 1)
+	ಹಿಂತಿರುಗಿ (char_u*)"fg";
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (idx == 2)
+	ಹಿಂತಿರುಗಿ (char_u*)"bg";
+    ಆದರೆ (idx < (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(color_name_tab) + 3)
     {
-	char_u *value = color_name_tab[idx-3].value.string;
-	return value;
+	char_u *ಮೌಲ್ಯ = color_name_tab[idx-3].ಮೌಲ್ಯ.string;
+	ಹಿಂತಿರುಗಿ ಮೌಲ್ಯ;
     }
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
-#if defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
-    static char_u *
-get_highlight_gui_color(expand_T *xp UNUSED, int idx)
+#ಆದರೆ defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
+    ಸ್ಥಿರ char_u *
+get_highlight_gui_color(expand_T *xp ಬಳಸದ, ಪೂರ್ಣಾಂಕ idx)
 {
-    if (idx == 0)
+    ಆದರೆ (idx == 0)
     {
 	// Fill with current value first
-	if (expand_hi_curvalue != NULL)
-	    return expand_hi_curvalue;
-	else
-	    return (char_u*)"";
+	ಆದರೆ (expand_hi_curvalue != ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ expand_hi_curvalue;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಹಿಂತಿರುಗಿ (char_u*)"";
     }
     // See color_name2handle()
-    else if (idx == 1)
-	return (char_u*)"fg";
-    else if (idx == 2)
-	return (char_u*)"bg";
-    else if (idx == 3)
-	return (char_u*)"NONE";
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (idx == 1)
+	ಹಿಂತಿರುಗಿ (char_u*)"fg";
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (idx == 2)
+	ಹಿಂತಿರುಗಿ (char_u*)"bg";
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (idx == 3)
+	ಹಿಂತಿರುಗಿ (char_u*)"NONE";
 
     // Complete from v:colornames. Don't do platform specific names for now.
-    typval_T *tv_result;
-    char_u *colorname = dict_iterate_next(&expand_colornames_iter, &tv_result);
-    if (colorname != NULL)
+    typval_T *tv_ಫಲಿತಾಂಶ;
+    char_u *colorname = dict_iterate_ಮುಂದಿನ(&expand_colornames_iter, &tv_ಫಲಿತಾಂಶ);
+    ಆದರೆ (colorname != ಖಾಲಿ)
     {
 	// :hi command doesn't allow space, so don't suggest any malformed items
-	if (vim_strchr(colorname, ' ') != NULL)
-	    return (char_u*)"";
+	ಆದರೆ (vim_strchr(colorname, ' ') != ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ (char_u*)"";
 
-	if (expand_hi_curvalue != NULL && STRICMP(expand_hi_curvalue, colorname) == 0)
+	ಆದರೆ (expand_hi_curvalue != ಖಾಲಿ && STRICMP(expand_hi_curvalue, colorname) == 0)
 	{
 	    // Already returned the current value above, just skip.
-	    return (char_u*)"";
+	    ಹಿಂತಿರುಗಿ (char_u*)"";
 	}
     }
-    return colorname;
+    ಹಿಂತಿರುಗಿ colorname;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    static char_u *
-get_highlight_group_key(expand_T *xp UNUSED, int idx)
+    ಸ್ಥಿರ char_u *
+get_highlight_ಗುಂಪು_ಕೀಲಿ(expand_T *xp ಬಳಸದ, ಪೂರ್ಣಾಂಕ idx)
 {
     // Note: Keep this in sync with do_highlight.
-    static char *(p_hi_group_key_values[]) =
+    ಸ್ಥಿರ ಅಕ್ಷರ *(p_hi_ಗುಂಪು_ಕೀಲಿ_ಮೌಲ್ಯಗಳು[]) =
     {
 	"term=",
 	"start=",
@@ -5158,219 +5158,219 @@ get_highlight_group_key(expand_T *xp UNUSED, int idx)
 	"ctermbg=",
 	"ctermul=",
 	"ctermfont=",
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#ಆದರೆ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 	"gui=",
 	"guifg=",
 	"guibg=",
 	"guisp=",
-#endif
-#ifdef FEAT_GUI
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 	"font=",
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	"NONE",
     };
 
-    if (idx < (int)ARRAY_LENGTH(p_hi_group_key_values))
-	return (char_u*)p_hi_group_key_values[idx];
-    return NULL;
+    ಆದರೆ (idx < (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(p_hi_ಗುಂಪು_ಕೀಲಿ_ಮೌಲ್ಯಗಳು))
+	ಹಿಂತಿರುಗಿ (char_u*)p_hi_ಗುಂಪು_ಕೀಲಿ_ಮೌಲ್ಯಗಳು[idx];
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Command-line expansion for :hi {group-name} <args>...
  */
-    int
-expand_highlight_group(
+    ಪೂರ್ಣಾಂಕ
+expand_highlight_ಗುಂಪು(
 	char_u	    *pat,
 	expand_T    *xp,
 	regmatch_T  *rmp,
 	char_u	    ***matches,
-	int	    *numMatches)
+	ಪೂರ್ಣಾಂಕ	    *ಅಂಕೆ_Matches)
 {
-    if (expand_hi_equal_col != -1)
+    ಆದರೆ (expand_hi_equal_ಲಂಬಸಾಲು != -1)
     {
 	// List the values. First fill in the current value, then if possible colors
 	// or attribute names.
-	char_u	    *(*expandfunc)(expand_T *, int) = NULL;
-	int	    type = 0;
-	hl_group_T  *sgp = NULL;
-	int	    iarg = 0;
-	char_u	    *sarg = NULL;
+	char_u	    *(*expandfunc)(expand_T *, ಪೂರ್ಣಾಂಕ) = ಖಾಲಿ;
+	ಪೂರ್ಣಾಂಕ	    type = 0;
+	hl_ಗುಂಪು_T  *sgp = ಖಾಲಿ;
+	ಪೂರ್ಣಾಂಕ	    iarg = 0;
+	char_u	    *sarg = ಖಾಲಿ;
 
-	int	    unsortedItems = -1; // don't sort by default
+	ಪೂರ್ಣಾಂಕ	    unsorted_ವಸ್ತುಗಳು = -1; // don't sort by default
 
-	if (expand_hi_synid != 0)
-	    sgp = &HL_TABLE()[expand_hi_synid - 1]; // index is ID minus one
+	ಆದರೆ (expand_hi_synid != 0)
+	    sgp = &HL_ಕೋಷ್ಟಕ()[expand_hi_synid - 1]; // index is ID minus one
 
 	// Note: Keep this in sync with highlight_list_one().
-	char_u	    *name_end = xp->xp_line + expand_hi_equal_col;
-	if (name_end - xp->xp_line >= 5
-		&& STRNCMP(name_end - 5, " term", 5) == 0)
+	char_u	    *name_ಕೊನೆ = xp->xp_ಸಾಲು + expand_hi_equal_ಲಂಬಸಾಲು;
+	ಆದರೆ (name_ಕೊನೆ - xp->xp_ಸಾಲು >= 5
+		&& STRNCMP(name_ಕೊನೆ - 5, " term", 5) == 0)
 	{
 	    expandfunc = get_highlight_attr_name;
-	    if (sgp)
+	    ಆದರೆ (sgp)
 	    {
 		type = LIST_ATTR;
-		iarg = sgp->sg_term;
+		iarg = sgp->sg_ಪದ;
 	    }
 	}
-	else if (name_end - xp->xp_line >= 6
-		&& STRNCMP(name_end - 6, " cterm", 6) == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (name_ಕೊನೆ - xp->xp_ಸಾಲು >= 6
+		&& STRNCMP(name_ಕೊನೆ - 6, " cterm", 6) == 0)
 	{
 	    expandfunc = get_highlight_attr_name;
-	    if (sgp)
+	    ಆದರೆ (sgp)
 	    {
 		type = LIST_ATTR;
 		iarg = sgp->sg_cterm;
 	    }
 	}
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-	else if (name_end - xp->xp_line >= 4
-		&& STRNCMP(name_end - 4, " gui", 4) == 0)
+#ಆದರೆ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (name_ಕೊನೆ - xp->xp_ಸಾಲು >= 4
+		&& STRNCMP(name_ಕೊನೆ - 4, " gui", 4) == 0)
 	{
 	    expandfunc = get_highlight_attr_name;
-	    if (sgp)
+	    ಆದರೆ (sgp)
 	    {
 		type = LIST_ATTR;
 		iarg = sgp->sg_gui;
 	    }
 	}
-#endif
-	else if (name_end - xp->xp_line >= 8
-		&& STRNCMP(name_end - 8, " ctermfg", 8) == 0)
+#ಆದರೆ_ಅಂತ್ಯ
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (name_ಕೊನೆ - xp->xp_ಸಾಲು >= 8
+		&& STRNCMP(name_ಕೊನೆ - 8, " ctermfg", 8) == 0)
 	{
 	    expandfunc = get_highlight_cterm_color;
-	    if (sgp)
+	    ಆದರೆ (sgp)
 	    {
 		type = LIST_INT;
 		iarg = sgp->sg_cterm_fg;
 	    }
 	}
-	else if (name_end - xp->xp_line >= 8
-		&& STRNCMP(name_end - 8, " ctermbg", 8) == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (name_ಕೊನೆ - xp->xp_ಸಾಲು >= 8
+		&& STRNCMP(name_ಕೊನೆ - 8, " ctermbg", 8) == 0)
 	{
 	    expandfunc = get_highlight_cterm_color;
-	    if (sgp)
+	    ಆದರೆ (sgp)
 	    {
 		type = LIST_INT;
 		iarg = sgp->sg_cterm_bg;
 	    }
 	}
-	else if (name_end - xp->xp_line >= 8
-		&& STRNCMP(name_end - 8, " ctermul", 8) == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (name_ಕೊನೆ - xp->xp_ಸಾಲು >= 8
+		&& STRNCMP(name_ಕೊನೆ - 8, " ctermul", 8) == 0)
 	{
 	    expandfunc = get_highlight_cterm_color;
-	    if (sgp)
+	    ಆದರೆ (sgp)
 	    {
 		type = LIST_INT;
 		iarg = sgp->sg_cterm_ul;
 	    }
 	}
-#if defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
-	else if (name_end - xp->xp_line >= 6
-		&& STRNCMP(name_end - 6, " guifg", 6) == 0)
+#ಆದರೆ defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (name_ಕೊನೆ - xp->xp_ಸಾಲು >= 6
+		&& STRNCMP(name_ಕೊನೆ - 6, " guifg", 6) == 0)
 	{
 	    expandfunc = get_highlight_gui_color;
-	    if (sgp)
+	    ಆದರೆ (sgp)
 	    {
 		type = LIST_STRING;
 		sarg = sgp->sg_gui_fg_name;
 	    }
 	}
-	else if (name_end - xp->xp_line >= 6
-		&& STRNCMP(name_end - 6, " guibg", 6) == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (name_ಕೊನೆ - xp->xp_ಸಾಲು >= 6
+		&& STRNCMP(name_ಕೊನೆ - 6, " guibg", 6) == 0)
 	{
 	    expandfunc = get_highlight_gui_color;
-	    if (sgp)
+	    ಆದರೆ (sgp)
 	    {
 		type = LIST_STRING;
 		sarg = sgp->sg_gui_bg_name;
 	    }
 	}
-	else if (name_end - xp->xp_line >= 6
-		&& STRNCMP(name_end - 6, " guisp", 6) == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (name_ಕೊನೆ - xp->xp_ಸಾಲು >= 6
+		&& STRNCMP(name_ಕೊನೆ - 6, " guisp", 6) == 0)
 	{
 	    expandfunc = get_highlight_gui_color;
-	    if (sgp)
+	    ಆದರೆ (sgp)
 	    {
 		type = LIST_STRING;
 		sarg = sgp->sg_gui_sp_name;
 	    }
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
-	if (expandfunc == get_highlight_gui_color)
+#ಆದರೆ defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
+	ಆದರೆ (expandfunc == get_highlight_gui_color)
 	{
 	    // Top 4 items are special, after that sort all the color names
-	    unsortedItems = 4;
+	    unsorted_ವಸ್ತುಗಳು = 4;
 
-	    dict_T *colornames_table = get_vim_var_dict(VV_COLORNAMES);
+	    dict_T *colornames_ಕೋಷ್ಟಕ = get_vim_var_dict(VV_COLORNAMES);
 	    typval_T colornames_val;
 	    colornames_val.v_type = VAR_DICT;
-	    colornames_val.vval.v_dict = colornames_table;
-	    dict_iterate_start(&colornames_val, &expand_colornames_iter);
+	    colornames_val.vval.v_dict = colornames_ಕೋಷ್ಟಕ;
+	    dict_iterate_ಆರಂಭ(&colornames_val, &expand_colornames_iter);
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 	char_u	    buf[MAX_ATTR_LEN];
 
-	expand_hi_curvalue = NULL;
-	if (expand_hi_include_orig)
+	expand_hi_curvalue = ಖಾಲಿ;
+	ಆದರೆ (expand_hi_include_orig)
 	{
-	    if (((type == LIST_ATTR || type == LIST_INT) && iarg != 0) ||
-		(type == LIST_STRING && sarg != NULL))
+	    ಆದರೆ (((type == LIST_ATTR || type == LIST_INT) && iarg != 0) ||
+		(type == LIST_STRING && sarg != ಖಾಲಿ))
 	    {
 		// Retrieve the current value to go first in completion
-		expand_hi_curvalue = highlight_arg_to_string(
+		expand_hi_curvalue = highlight_arg_ಗಮ್ಯ_string(
 			type, iarg, sarg, buf);
 	    }
 	}
 
-	if (expandfunc != NULL)
+	ಆದರೆ (expandfunc != ಖಾಲಿ)
 	{
-	    return ExpandGenericExt(
+	    ಹಿಂತಿರುಗಿ ExpandGenericExt(
 		    pat,
 		    xp,
 		    rmp,
 		    matches,
-		    numMatches,
+		    ಅಂಕೆ_Matches,
 		    expandfunc,
 		    FALSE,
-		    unsortedItems);
+		    unsorted_ವಸ್ತುಗಳು);
 	}
 
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
     // List all the key names
-    return ExpandGenericExt(
+    ಹಿಂತಿರುಗಿ ExpandGenericExt(
 	    pat,
 	    xp,
 	    rmp,
 	    matches,
-	    numMatches,
-	    get_highlight_group_key,
+	    ಅಂಕೆ_Matches,
+	    get_highlight_ಗುಂಪು_ಕೀಲಿ,
 	    FALSE,
 	    -1);
 }
 
-#if defined(FEAT_GUI)
+#ಆದರೆ defined(FEAT_GUI)
 /*
  * Free all the highlight group fonts.
  * Used when quitting for systems which need it.
  */
-    void
-free_highlight_fonts(void)
+    ಶೂನ್ಯ
+free_highlight_fonts(ಶೂನ್ಯ)
 {
-    int	    idx;
+    ಪೂರ್ಣಾಂಕ	    idx;
 
-    for (idx = 0; idx < highlight_ga.ga_len; ++idx)
+    ಗಾಗಿ (idx = 0; idx < highlight_ga.ga_len; ++idx)
     {
-	gui_mch_free_font(HL_TABLE()[idx].sg_font);
-	HL_TABLE()[idx].sg_font = NOFONT;
+	gui_mch_free_font(HL_ಕೋಷ್ಟಕ()[idx].sg_font);
+	HL_ಕೋಷ್ಟಕ()[idx].sg_font = NOFONT;
 # ifdef FEAT_XFONTSET
-	gui_mch_free_fontset(HL_TABLE()[idx].sg_fontset);
-	HL_TABLE()[idx].sg_fontset = NOFONTSET;
+	gui_mch_free_fontset(HL_ಕೋಷ್ಟಕ()[idx].sg_fontset);
+	HL_ಕೋಷ್ಟಕ()[idx].sg_fontset = NOFONTSET;
 # endif
     }
 
@@ -5384,36 +5384,36 @@ free_highlight_fonts(void)
     gui_mch_free_font(gui.boldital_font);
 # endif
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * Convert each of the highlight attribute bits (bold, standout, underline,
  * etc.) set in 'hlattr' into a separate boolean item in a Dictionary with
  * the attribute name as the key.
  */
-    static dict_T *
-highlight_get_attr_dict(int hlattr)
+    ಸ್ಥಿರ dict_T *
+highlight_get_attr_dict(ಪೂರ್ಣಾಂಕ hlattr)
 {
     dict_T	*dict;
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
 
     dict = dict_alloc();
-    if (dict == NULL)
-	return NULL;
+    ಆದರೆ (dict == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(highlight_index_tab); ++i)
+    ಗಾಗಿ (i = 0; i < (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(highlight_ಸೂಚ್ಯಂಕ_tab); ++i)
     {
-	if (hlattr & highlight_index_tab[i]->key)
+	ಆದರೆ (hlattr & highlight_ಸೂಚ್ಯಂಕ_tab[i]->ಕೀಲಿ)
 	{
-	    dict_add_bool(dict, (char *)highlight_index_tab[i]->value.string,
+	    dict_ಕೂಡಿಸು_bool(dict, (ಅಕ್ಷರ *)highlight_ಸೂಚ್ಯಂಕ_tab[i]->ಮೌಲ್ಯ.string,
 		    VVAL_TRUE);
 	    // don't want "inverse"/"reverse"
-	    hlattr &= ~highlight_index_tab[i]->key;
+	    hlattr &= ~highlight_ಸೂಚ್ಯಂಕ_tab[i]->ಕೀಲಿ;
 	}
     }
 
-    return dict;
+    ಹಿಂತಿರುಗಿ dict;
 }
 
 /*
@@ -5421,127 +5421,127 @@ highlight_get_attr_dict(int hlattr)
  * Dictionary. If 'resolve_link' is TRUE, then resolves the highlight group
  * links recursively.
  */
-    static dict_T *
-highlight_get_info(int hl_idx, int resolve_link)
+    ಸ್ಥಿರ dict_T *
+highlight_get_info(ಪೂರ್ಣಾಂಕ hl_idx, ಪೂರ್ಣಾಂಕ resolve_link)
 {
     dict_T	*dict;
-    hl_group_T	*sgp;
-    dict_T	*attr_dict = NULL;
-    int		hlgid;
+    hl_ಗುಂಪು_T	*sgp;
+    dict_T	*attr_dict = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		hlgid;
 
     dict = dict_alloc();
-    if (dict == NULL)
-	return dict;
+    ಆದರೆ (dict == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ dict;
 
-    sgp = &HL_TABLE()[hl_idx];
+    sgp = &HL_ಕೋಷ್ಟಕ()[hl_idx];
     // highlight group id is 1-based
     hlgid = hl_idx + 1;
 
-    if (dict_add_string(dict, "name", sgp->sg_name) == FAIL)
-	goto error;
-    if (dict_add_number(dict, "id", hlgid) == FAIL)
-	goto error;
+    ಆದರೆ (dict_ಕೂಡಿಸು_string(dict, "name", sgp->sg_name) == FAIL)
+	ಹೋಗು error;
+    ಆದರೆ (dict_ಕೂಡಿಸು_ಸಂಖ್ಯೆ(dict, "id", hlgid) == FAIL)
+	ಹೋಗು error;
 
-    if (resolve_link)
+    ಆದರೆ (resolve_link)
     {
 	// resolve the highlight group link recursively
-	while (sgp->sg_link)
+	ಆಗ (sgp->sg_link)
 	{
 	    hlgid = sgp->sg_link;
-	    sgp = &HL_TABLE()[sgp->sg_link - 1];
+	    sgp = &HL_ಕೋಷ್ಟಕ()[sgp->sg_link - 1];
 	}
     }
 
-    if (sgp->sg_term != 0)
+    ಆದರೆ (sgp->sg_ಪದ != 0)
     {
-	attr_dict = highlight_get_attr_dict(sgp->sg_term);
-	if (attr_dict != NULL)
+	attr_dict = highlight_get_attr_dict(sgp->sg_ಪದ);
+	ಆದರೆ (attr_dict != ಖಾಲಿ)
 	{
-	    if (dict_add_dict(dict, "term", attr_dict) == FAIL)
-		goto error;
-	    attr_dict = NULL;
+	    ಆದರೆ (dict_ಕೂಡಿಸು_dict(dict, "term", attr_dict) == FAIL)
+		ಹೋಗು error;
+	    attr_dict = ಖಾಲಿ;
 	}
     }
-    if (sgp->sg_start != NULL)
-	if (dict_add_string(dict, "start", sgp->sg_start) == FAIL)
-	    goto error;
-    if (sgp->sg_stop != NULL)
-	if (dict_add_string(dict, "stop", sgp->sg_stop) == FAIL)
-	    goto error;
-    if (sgp->sg_cterm != 0)
+    ಆದರೆ (sgp->sg_ಆರಂಭ != ಖಾಲಿ)
+	ಆದರೆ (dict_ಕೂಡಿಸು_string(dict, "start", sgp->sg_ಆರಂಭ) == FAIL)
+	    ಹೋಗು error;
+    ಆದರೆ (sgp->sg_stop != ಖಾಲಿ)
+	ಆದರೆ (dict_ಕೂಡಿಸು_string(dict, "stop", sgp->sg_stop) == FAIL)
+	    ಹೋಗು error;
+    ಆದರೆ (sgp->sg_cterm != 0)
     {
 	attr_dict = highlight_get_attr_dict(sgp->sg_cterm);
-	if (attr_dict != NULL)
+	ಆದರೆ (attr_dict != ಖಾಲಿ)
 	{
-	    if (dict_add_dict(dict, "cterm", attr_dict) == FAIL)
-		goto error;
-	    attr_dict = NULL;
+	    ಆದರೆ (dict_ಕೂಡಿಸು_dict(dict, "cterm", attr_dict) == FAIL)
+		ಹೋಗು error;
+	    attr_dict = ಖಾಲಿ;
 	}
     }
-    if (sgp->sg_cterm_fg != 0)
-	if (dict_add_string(dict, "ctermfg",
+    ಆದರೆ (sgp->sg_cterm_fg != 0)
+	ಆದರೆ (dict_ಕೂಡಿಸು_string(dict, "ctermfg",
 		    highlight_color(hlgid, (char_u *)"fg", 'c')) == FAIL)
-	    goto error;
-    if (sgp->sg_cterm_bg != 0)
-	if (dict_add_string(dict, "ctermbg",
+	    ಹೋಗು error;
+    ಆದರೆ (sgp->sg_cterm_bg != 0)
+	ಆದರೆ (dict_ಕೂಡಿಸು_string(dict, "ctermbg",
 			highlight_color(hlgid, (char_u *)"bg", 'c')) == FAIL)
-	    goto error;
-    if (sgp->sg_cterm_ul != 0)
-	if (dict_add_string(dict, "ctermul",
+	    ಹೋಗು error;
+    ಆದರೆ (sgp->sg_cterm_ul != 0)
+	ಆದರೆ (dict_ಕೂಡಿಸು_string(dict, "ctermul",
 			highlight_color(hlgid, (char_u *)"ul", 'c')) == FAIL)
-	    goto error;
-    if (sgp->sg_cterm_font != 0)
-	if (dict_add_string(dict, "ctermfont",
+	    ಹೋಗು error;
+    ಆದರೆ (sgp->sg_cterm_font != 0)
+	ಆದರೆ (dict_ಕೂಡಿಸು_string(dict, "ctermfont",
 			highlight_color(hlgid, (char_u *)"font", 'c')) == FAIL)
-	    goto error;
-    if (sgp->sg_gui != 0)
+	    ಹೋಗು error;
+    ಆದರೆ (sgp->sg_gui != 0)
     {
 	attr_dict = highlight_get_attr_dict(sgp->sg_gui);
-	if (attr_dict != NULL)
+	ಆದರೆ (attr_dict != ಖಾಲಿ)
 	{
-	    if (dict_add_dict(dict, "gui", attr_dict) == FAIL)
-		goto error;
-	    attr_dict = NULL;
+	    ಆದರೆ (dict_ಕೂಡಿಸು_dict(dict, "gui", attr_dict) == FAIL)
+		ಹೋಗು error;
+	    attr_dict = ಖಾಲಿ;
 	}
     }
-    if (sgp->sg_gui_fg_name != NULL)
-	if (dict_add_string(dict, "guifg",
+    ಆದರೆ (sgp->sg_gui_fg_name != ಖಾಲಿ)
+	ಆದರೆ (dict_ಕೂಡಿಸು_string(dict, "guifg",
 			highlight_color(hlgid, (char_u *)"fg", 'g')) == FAIL)
-	    goto error;
-    if (sgp->sg_gui_bg_name != NULL)
-	if (dict_add_string(dict, "guibg",
+	    ಹೋಗು error;
+    ಆದರೆ (sgp->sg_gui_bg_name != ಖಾಲಿ)
+	ಆದರೆ (dict_ಕೂಡಿಸು_string(dict, "guibg",
 			highlight_color(hlgid, (char_u *)"bg", 'g')) == FAIL)
-	    goto error;
-    if (sgp->sg_gui_sp_name != NULL)
-	if (dict_add_string(dict, "guisp",
+	    ಹೋಗು error;
+    ಆದರೆ (sgp->sg_gui_sp_name != ಖಾಲಿ)
+	ಆದರೆ (dict_ಕೂಡಿಸು_string(dict, "guisp",
 			highlight_color(hlgid, (char_u *)"sp", 'g')) == FAIL)
-	    goto error;
+	    ಹೋಗು error;
 # ifdef FEAT_GUI
-    if (sgp->sg_font_name != NULL)
-	if (dict_add_string(dict, "font", sgp->sg_font_name) == FAIL)
-	    goto error;
+    ಆದರೆ (sgp->sg_font_name != ಖಾಲಿ)
+	ಆದರೆ (dict_ಕೂಡಿಸು_string(dict, "font", sgp->sg_font_name) == FAIL)
+	    ಹೋಗು error;
 # endif
-    if (sgp->sg_link)
+    ಆದರೆ (sgp->sg_link)
     {
 	char_u	*link;
 
-	link = HL_TABLE()[sgp->sg_link - 1].sg_name;
-	if (link != NULL && dict_add_string(dict, "linksto", link) == FAIL)
-	    goto error;
+	link = HL_ಕೋಷ್ಟಕ()[sgp->sg_link - 1].sg_name;
+	ಆದರೆ (link != ಖಾಲಿ && dict_ಕೂಡಿಸು_string(dict, "linksto", link) == FAIL)
+	    ಹೋಗು error;
 
-	if (sgp->sg_deflink)
-	    dict_add_bool(dict, "default", VVAL_TRUE);
+	ಆದರೆ (sgp->sg_deflink)
+	    dict_ಕೂಡಿಸು_bool(dict, "default", VVAL_TRUE);
     }
-    if (dict_len(dict) == 2)
+    ಆದರೆ (dict_len(dict) == 2)
 	// If only 'name' is present, then the highlight group is cleared.
-	dict_add_bool(dict, "cleared", VVAL_TRUE);
+	dict_ಕೂಡಿಸು_bool(dict, "cleared", VVAL_TRUE);
 
-    return dict;
+    ಹಿಂತಿರುಗಿ dict;
 
 error:
     dict_unref(attr_dict);
     dict_unref(dict);
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
@@ -5549,47 +5549,47 @@ error:
  * Return the attributes of a specific highlight group (if specified) or all
  * the highlight groups.
  */
-    void
+    ಶೂನ್ಯ
 f_hlget(typval_T *argvars, typval_T *rettv)
 {
     list_T	*list;
     dict_T	*dict;
-    int		i;
-    char_u	*hlarg = NULL;
-    int		resolve_link = FALSE;
+    ಪೂರ್ಣಾಂಕ		i;
+    char_u	*hlarg = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		resolve_link = FALSE;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ಆದರೆ (rettv_list_alloc(rettv) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
-    if (check_for_opt_string_arg(argvars, 0) == FAIL
+    ಆದರೆ (check_for_opt_string_arg(argvars, 0) == FAIL
 	    || (argvars[0].v_type != VAR_UNKNOWN
 		&& check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	ಹಿಂತಿರುಗಿ;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    ಆದರೆ (argvars[0].v_type != VAR_UNKNOWN)
     {
 	// highlight group name supplied
 	hlarg = tv_get_string_chk(&argvars[0]);
-	if (hlarg == NULL)
-	    return;
+	ಆದರೆ (hlarg == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ;
 
-	if (argvars[1].v_type != VAR_UNKNOWN)
+	ಆದರೆ (argvars[1].v_type != VAR_UNKNOWN)
 	{
-	    int error = FALSE;
+	    ಪೂರ್ಣಾಂಕ error = FALSE;
 
 	    resolve_link = tv_get_bool_chk(&argvars[1], &error);
-	    if (error)
-		return;
+	    ಆದರೆ (error)
+		ಹಿಂತಿರುಗಿ;
 	}
     }
 
     list = rettv->vval.v_list;
-    for (i = 0; i < highlight_ga.ga_len && !got_int; ++i)
+    ಗಾಗಿ (i = 0; i < highlight_ga.ga_len && !got_int; ++i)
     {
-	if (hlarg == NULL || STRICMP(hlarg, HL_TABLE()[i].sg_name) == 0)
+	ಆದರೆ (hlarg == ಖಾಲಿ || STRICMP(hlarg, HL_ಕೋಷ್ಟಕ()[i].sg_name) == 0)
 	{
 	    dict = highlight_get_info(i, resolve_link);
-	    if (dict != NULL && list_append_dict(list, dict) == FAIL)
+	    ಆದರೆ (dict != ಖಾಲಿ && list_append_dict(list, dict) == FAIL)
 		dict_unref(dict);
 	}
     }
@@ -5600,24 +5600,24 @@ f_hlget(typval_T *argvars, typval_T *rettv)
  * 'dict' or the value is not a string type. If the value is not a string type
  * or is NULL, then 'error' is set to TRUE.
  */
-    static char_u *
-hldict_get_string(dict_T *dict, char_u *key, int *error)
+    ಸ್ಥಿರ char_u *
+hldict_get_string(dict_T *dict, char_u *ಕೀಲಿ, ಪೂರ್ಣಾಂಕ *error)
 {
     dictitem_T	*di;
 
     *error = FALSE;
-    di = dict_find(dict, key, -1);
-    if (di == NULL)
-	return NULL;
+    di = dict_ಕಂಡುಹಿಡಿ(dict, ಕೀಲಿ, -1);
+    ಆದರೆ (di == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (di->di_tv.v_type != VAR_STRING || di->di_tv.vval.v_string == NULL)
+    ಆದರೆ (di->di_tv.v_type != VAR_STRING || di->di_tv.vval.v_string == ಖಾಲಿ)
     {
 	emsg(_(e_string_required));
 	*error = TRUE;
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    return di->di_tv.vval.v_string;
+    ಹಿಂತಿರುಗಿ di->di_tv.vval.v_string;
 }
 
 /*
@@ -5625,118 +5625,118 @@ hldict_get_string(dict_T *dict, char_u *key, int *error)
  * value in 'attr_str' of length 'len'. Returns FALSE if 'dict[key]' is not a
  * Dictionary or is NULL.
  */
-    static int
-hldict_attr_to_str(
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+hldict_attr_ಗಮ್ಯ_str(
 	dict_T	*dict,
-	char_u	*key,
+	char_u	*ಕೀಲಿ,
 	char_u	*attr_str,
 	size_t	len)
 {
     dictitem_T	*di;
     dict_T	*attrdict;
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
     char_u	*p;
 
     attr_str[0] = NUL;
-    di = dict_find(dict, key, -1);
-    if (di == NULL)
-	return TRUE;
+    di = dict_ಕಂಡುಹಿಡಿ(dict, ಕೀಲಿ, -1);
+    ಆದರೆ (di == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ TRUE;
 
-    if (di->di_tv.v_type != VAR_DICT || di->di_tv.vval.v_dict == NULL)
+    ಆದರೆ (di->di_tv.v_type != VAR_DICT || di->di_tv.vval.v_dict == ಖಾಲಿ)
     {
 	emsg(_(e_dictionary_required));
-	return FALSE;
+	ಹಿಂತಿರುಗಿ FALSE;
     }
 
     attrdict = di->di_tv.vval.v_dict;
 
     // If the attribute dict is empty, then return NONE to clear the attributes
-    if (dict_len(attrdict) == 0)
+    ಆದರೆ (dict_len(attrdict) == 0)
     {
 	vim_strcat(attr_str, (char_u *)"NONE", len);
-	return TRUE;
+	ಹಿಂತಿರುಗಿ TRUE;
     }
 
     p = attr_str;
-    for (i = 0; i < (int)ARRAY_LENGTH(highlight_tab); ++i)
+    ಗಾಗಿ (i = 0; i < (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(highlight_tab); ++i)
     {
-	if (dict_get_bool(attrdict, (char *)highlight_tab[i].value.string,
+	ಆದರೆ (dict_get_bool(attrdict, (ಅಕ್ಷರ *)highlight_tab[i].ಮೌಲ್ಯ.string,
 		    VVAL_FALSE) == VVAL_TRUE)
 	{
-	    if (p != attr_str && (size_t)(p - attr_str + 2) < len)
+	    ಆದರೆ (p != attr_str && (size_t)(p - attr_str + 2) < len)
 		STRCPY(p, (char_u *)",");
-	    if (p - attr_str + highlight_tab[i].value.length + 1 < len)
+	    ಆದರೆ (p - attr_str + highlight_tab[i].ಮೌಲ್ಯ.ಉದ್ದಳತೆ + 1 < len)
 	    {
-		STRCPY(p, highlight_tab[i].value.string);
-		p += highlight_tab[i].value.length;
+		STRCPY(p, highlight_tab[i].ಮೌಲ್ಯ.string);
+		p += highlight_tab[i].ಮೌಲ್ಯ.ಉದ್ದಳತೆ;
 	    }
 	}
     }
 
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 // Temporary buffer used to store the command string produced by hlset().
 // IObuff cannot be used for this as the error messages produced by hlset()
 // internally use IObuff.
 # define	HLSETBUFSZ  512
-static char_u hlsetBuf[HLSETBUFSZ + 1];
+ಸ್ಥಿರ char_u hlsetBuf[HLSETBUFSZ + 1];
 
 /*
  * Add the highlight attribute "attr" of length "attrlen" and "value" at
  * "dptr", which points into "hlsetBuf".
  * Returns the updated pointer.
  */
-    static char_u *
-add_attr_and_value(char_u *dptr, char_u *attr, int attrlen, char_u *value)
+    ಸ್ಥಿರ char_u *
+ಕೂಡಿಸು_attr_and_ಮೌಲ್ಯ(char_u *dptr, char_u *attr, ಪೂರ್ಣಾಂಕ attrlen, char_u *ಮೌಲ್ಯ)
 {
     size_t	vallen;
 
     // Do nothing if the value is not specified or is empty
-    if (value == NULL || *value == NUL)
-	return dptr;
+    ಆದರೆ (ಮೌಲ್ಯ == ಖಾಲಿ || *ಮೌಲ್ಯ == NUL)
+	ಹಿಂತಿರುಗಿ dptr;
 
-    vallen = STRLEN(value);
+    vallen = STRLEN(ಮೌಲ್ಯ);
     // When the value contains a space and the attribute has an "=" (i.e. it
     // is a key=value pair), surround the value with single quotes so that
     // do_highlight() can parse it correctly.
-    if (vim_strchr(value, ' ') != NULL && vim_strchr(attr, '=') != NULL)
+    ಆದರೆ (vim_strchr(ಮೌಲ್ಯ, ' ') != ಖಾಲಿ && vim_strchr(attr, '=') != ಖಾಲಿ)
     {
-	if (dptr + attrlen + vallen + 3 < hlsetBuf + HLSETBUFSZ)
+	ಆದರೆ (dptr + attrlen + vallen + 3 < hlsetBuf + HLSETBUFSZ)
 	{
 	    STRCPY(dptr, attr);
 	    dptr += attrlen;
 	    *dptr++ = '\'';
-	    STRCPY(dptr, value);
+	    STRCPY(dptr, ಮೌಲ್ಯ);
 	    dptr += vallen;
 	    *dptr++ = '\'';
 	    *dptr = NUL;
 	}
     }
-    else if (dptr + attrlen + vallen + 1 < hlsetBuf + HLSETBUFSZ)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (dptr + attrlen + vallen + 1 < hlsetBuf + HLSETBUFSZ)
     {
 	STRCPY(dptr, attr);
 	dptr += attrlen;
-	STRCPY(dptr, value);
+	STRCPY(dptr, ಮೌಲ್ಯ);
 	dptr += vallen;
     }
 
-    return dptr;
+    ಹಿಂತಿರುಗಿ dptr;
 }
 
 /*
  * Add or update a highlight group using 'dict' items. Returns TRUE if
  * successfully updated the highlight group.
  */
-    static int
-hlg_add_or_update(dict_T *dict)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+hlg_ಕೂಡಿಸು_or_update(dict_T *dict)
 {
     char_u	*name;
-    int		error;
-    char_u	term_attr[MAX_ATTR_LEN];
+    ಪೂರ್ಣಾಂಕ		error;
+    char_u	ಪದ_attr[MAX_ATTR_LEN];
     char_u	cterm_attr[MAX_ATTR_LEN];
     char_u	gui_attr[MAX_ATTR_LEN];
-    char_u	*start;
+    char_u	*ಆರಂಭ;
     char_u	*stop;
     char_u	*ctermfg;
     char_u	*ctermbg;
@@ -5748,194 +5748,194 @@ hlg_add_or_update(dict_T *dict)
 # ifdef FEAT_GUI
     char_u	*font;
 # endif
-    int		forceit = FALSE;
-    int		dodefault = FALSE;
-    int		done = FALSE;
+    ಪೂರ್ಣಾಂಕ		forceit = FALSE;
+    ಪೂರ್ಣಾಂಕ		dodefault = FALSE;
+    ಪೂರ್ಣಾಂಕ		ಮುಗಿದ = FALSE;
     char_u	*p;
 
     name = hldict_get_string(dict, (char_u *)"name", &error);
-    if (name == NULL || *name == NUL || error)
-	return FALSE;
+    ಆದರೆ (name == ಖಾಲಿ || *name == NUL || error)
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    if (dict_get_bool(dict, "force", VVAL_FALSE) == VVAL_TRUE)
+    ಆದರೆ (dict_get_bool(dict, "force", VVAL_FALSE) == VVAL_TRUE)
 	forceit = TRUE;
 
-    if (dict_get_bool(dict, "default", VVAL_FALSE) == VVAL_TRUE)
+    ಆದರೆ (dict_get_bool(dict, "default", VVAL_FALSE) == VVAL_TRUE)
 	dodefault = TRUE;
 
-    if (dict_has_key(dict, "cleared"))
+    ಆದರೆ (dict_has_ಕೀಲಿ(dict, "cleared"))
     {
 	varnumber_T	cleared;
 
 	// clear a highlight group
 	cleared = dict_get_bool(dict, "cleared", FALSE);
-	if (cleared == TRUE)
+	ಆದರೆ (cleared == TRUE)
 	{
-	    vim_snprintf((char *)hlsetBuf, HLSETBUFSZ, "clear %s", name);
+	    vim_snprintf((ಅಕ್ಷರ *)hlsetBuf, HLSETBUFSZ, "clear %s", name);
 	    do_highlight(hlsetBuf, forceit, FALSE);
-	    done = TRUE;
+	    ಮುಗಿದ = TRUE;
 	}
     }
 
-    if (dict_has_key(dict, "linksto"))
+    ಆದರೆ (dict_has_ಕೀಲಿ(dict, "linksto"))
     {
 	char_u	*linksto;
 
 	// link highlight groups
 	linksto = hldict_get_string(dict, (char_u *)"linksto", &error);
-	if (linksto == NULL || *linksto == NUL || error)
-	    return FALSE;
+	ಆದರೆ (linksto == ಖಾಲಿ || *linksto == NUL || error)
+	    ಹಿಂತಿರುಗಿ FALSE;
 
-	vim_snprintf((char *)hlsetBuf, HLSETBUFSZ, "%slink %s %s",
+	vim_snprintf((ಅಕ್ಷರ *)hlsetBuf, HLSETBUFSZ, "%slink %s %s",
 				dodefault ? "default " : "", name, linksto);
 	do_highlight(hlsetBuf, forceit, FALSE);
 
-	done = TRUE;
+	ಮುಗಿದ = TRUE;
     }
 
     // If 'cleared' or 'linksto' are specified, then don't process the other
     // attributes.
-    if (done)
-	return TRUE;
+    ಆದರೆ (ಮುಗಿದ)
+	ಹಿಂತಿರುಗಿ TRUE;
 
-    start = hldict_get_string(dict, (char_u *)"start", &error);
-    if (error)
-	return FALSE;
+    ಆರಂಭ = hldict_get_string(dict, (char_u *)"start", &error);
+    ಆದರೆ (error)
+	ಹಿಂತಿರುಗಿ FALSE;
 
     stop = hldict_get_string(dict, (char_u *)"stop", &error);
-    if (error)
-	return FALSE;
+    ಆದರೆ (error)
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    if (!hldict_attr_to_str(dict, (char_u *)"term", term_attr,
-							    sizeof(term_attr)))
-	return FALSE;
+    ಆದರೆ (!hldict_attr_ಗಮ್ಯ_str(dict, (char_u *)"term", ಪದ_attr,
+							    ಗಾತ್ರ(ಪದ_attr)))
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    if (!hldict_attr_to_str(dict, (char_u *)"cterm", cterm_attr,
-							   sizeof(cterm_attr)))
-	return FALSE;
+    ಆದರೆ (!hldict_attr_ಗಮ್ಯ_str(dict, (char_u *)"cterm", cterm_attr,
+							   ಗಾತ್ರ(cterm_attr)))
+	ಹಿಂತಿರುಗಿ FALSE;
 
     ctermfg = hldict_get_string(dict, (char_u *)"ctermfg", &error);
-    if (error)
-	return FALSE;
+    ಆದರೆ (error)
+	ಹಿಂತಿರುಗಿ FALSE;
 
     ctermbg = hldict_get_string(dict, (char_u *)"ctermbg", &error);
-    if (error)
-	return FALSE;
+    ಆದರೆ (error)
+	ಹಿಂತಿರುಗಿ FALSE;
 
     ctermul = hldict_get_string(dict, (char_u *)"ctermul", &error);
-    if (error)
-	return FALSE;
+    ಆದರೆ (error)
+	ಹಿಂತಿರುಗಿ FALSE;
 
     ctermfont = hldict_get_string(dict, (char_u *)"ctermfont", &error);
-    if (error)
-	return FALSE;
+    ಆದರೆ (error)
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    if (!hldict_attr_to_str(dict, (char_u *)"gui", gui_attr, sizeof(gui_attr)))
-	return FALSE;
+    ಆದರೆ (!hldict_attr_ಗಮ್ಯ_str(dict, (char_u *)"gui", gui_attr, ಗಾತ್ರ(gui_attr)))
+	ಹಿಂತಿರುಗಿ FALSE;
 
     guifg = hldict_get_string(dict, (char_u *)"guifg", &error);
-    if (error)
-	return FALSE;
+    ಆದರೆ (error)
+	ಹಿಂತಿರುಗಿ FALSE;
 
     guibg = hldict_get_string(dict, (char_u *)"guibg", &error);
-    if (error)
-	return FALSE;
+    ಆದರೆ (error)
+	ಹಿಂತಿರುಗಿ FALSE;
 
     guisp = hldict_get_string(dict, (char_u *)"guisp", &error);
-    if (error)
-	return FALSE;
+    ಆದರೆ (error)
+	ಹಿಂತಿರುಗಿ FALSE;
 
 # ifdef FEAT_GUI
     font = hldict_get_string(dict, (char_u *)"font", &error);
-    if (error)
-	return FALSE;
+    ಆದರೆ (error)
+	ಹಿಂತಿರುಗಿ FALSE;
 # endif
 
     // If none of the attributes are specified, then do nothing.
-    if (term_attr[0] == NUL && start == NULL && stop == NULL
-	    && cterm_attr[0] == NUL && ctermfg == NULL && ctermbg == NULL
-	    && ctermul == NULL && ctermfont == NULL && gui_attr[0] == NUL
+    ಆದರೆ (ಪದ_attr[0] == NUL && ಆರಂಭ == ಖಾಲಿ && stop == ಖಾಲಿ
+	    && cterm_attr[0] == NUL && ctermfg == ಖಾಲಿ && ctermbg == ಖಾಲಿ
+	    && ctermul == ಖಾಲಿ && ctermfont == ಖಾಲಿ && gui_attr[0] == NUL
 # ifdef FEAT_GUI
-	    && font == NULL
+	    && font == ಖಾಲಿ
 # endif
-	    && guifg == NULL && guibg == NULL && guisp == NULL
+	    && guifg == ಖಾಲಿ && guibg == ಖಾಲಿ && guisp == ಖಾಲಿ
 	    )
-	return TRUE;
+	ಹಿಂತಿರುಗಿ TRUE;
 
     hlsetBuf[0] = NUL;
     p = hlsetBuf;
-    if (dodefault)
-	p = add_attr_and_value(p, (char_u *)"default", 7, (char_u *)" ");
-    p = add_attr_and_value(p, (char_u *)"", 0, name);
-    p = add_attr_and_value(p, (char_u *)" term=", 6, term_attr);
-    p = add_attr_and_value(p, (char_u *)" start=", 7, start);
-    p = add_attr_and_value(p, (char_u *)" stop=", 6, stop);
-    p = add_attr_and_value(p, (char_u *)" cterm=", 7, cterm_attr);
-    p = add_attr_and_value(p, (char_u *)" ctermfg=", 9, ctermfg);
-    p = add_attr_and_value(p, (char_u *)" ctermbg=", 9, ctermbg);
-    p = add_attr_and_value(p, (char_u *)" ctermul=", 9, ctermul);
-    p = add_attr_and_value(p, (char_u *)" ctermfont=", 11, ctermfont);
-    p = add_attr_and_value(p, (char_u *)" gui=", 5, gui_attr);
+    ಆದರೆ (dodefault)
+	p = ಕೂಡಿಸು_attr_and_ಮೌಲ್ಯ(p, (char_u *)"default", 7, (char_u *)" ");
+    p = ಕೂಡಿಸು_attr_and_ಮೌಲ್ಯ(p, (char_u *)"", 0, name);
+    p = ಕೂಡಿಸು_attr_and_ಮೌಲ್ಯ(p, (char_u *)" term=", 6, ಪದ_attr);
+    p = ಕೂಡಿಸು_attr_and_ಮೌಲ್ಯ(p, (char_u *)" start=", 7, ಆರಂಭ);
+    p = ಕೂಡಿಸು_attr_and_ಮೌಲ್ಯ(p, (char_u *)" stop=", 6, stop);
+    p = ಕೂಡಿಸು_attr_and_ಮೌಲ್ಯ(p, (char_u *)" cterm=", 7, cterm_attr);
+    p = ಕೂಡಿಸು_attr_and_ಮೌಲ್ಯ(p, (char_u *)" ctermfg=", 9, ctermfg);
+    p = ಕೂಡಿಸು_attr_and_ಮೌಲ್ಯ(p, (char_u *)" ctermbg=", 9, ctermbg);
+    p = ಕೂಡಿಸು_attr_and_ಮೌಲ್ಯ(p, (char_u *)" ctermul=", 9, ctermul);
+    p = ಕೂಡಿಸು_attr_and_ಮೌಲ್ಯ(p, (char_u *)" ctermfont=", 11, ctermfont);
+    p = ಕೂಡಿಸು_attr_and_ಮೌಲ್ಯ(p, (char_u *)" gui=", 5, gui_attr);
 # ifdef FEAT_GUI
-    p = add_attr_and_value(p, (char_u *)" font=", 6, font);
+    p = ಕೂಡಿಸು_attr_and_ಮೌಲ್ಯ(p, (char_u *)" font=", 6, font);
 # endif
-    p = add_attr_and_value(p, (char_u *)" guifg=", 7, guifg);
-    p = add_attr_and_value(p, (char_u *)" guibg=", 7, guibg);
-    (void)add_attr_and_value(p, (char_u *)" guisp=", 7, guisp);
+    p = ಕೂಡಿಸು_attr_and_ಮೌಲ್ಯ(p, (char_u *)" guifg=", 7, guifg);
+    p = ಕೂಡಿಸು_attr_and_ಮೌಲ್ಯ(p, (char_u *)" guibg=", 7, guibg);
+    (ಶೂನ್ಯ)ಕೂಡಿಸು_attr_and_ಮೌಲ್ಯ(p, (char_u *)" guisp=", 7, guisp);
 
     do_highlight(hlsetBuf, forceit, FALSE);
 
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
  * "hlset([{highlight_attr}])" function
  * Add or modify highlight groups
  */
-    void
+    ಶೂನ್ಯ
 f_hlset(typval_T *argvars, typval_T *rettv)
 {
     listitem_T	*li;
     dict_T	*dict;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_ಸಂಖ್ಯೆ = -1;
 
-    if (check_for_list_arg(argvars, 0) == FAIL)
-	return;
+    ಆದರೆ (check_for_list_arg(argvars, 0) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
-    FOR_ALL_LIST_ITEMS(argvars->vval.v_list, li)
+    FOR_ALL_LIST_ವಸ್ತುಗಳು(argvars->vval.v_list, li)
     {
-	if (li->li_tv.v_type != VAR_DICT)
+	ಆದರೆ (li->li_tv.v_type != VAR_DICT)
 	{
 	    emsg(_(e_dictionary_required));
-	    return;
+	    ಹಿಂತಿರುಗಿ;
 	}
 
 	dict = li->li_tv.vval.v_dict;
-	if (!hlg_add_or_update(dict))
-	    return;
+	ಆದರೆ (!hlg_ಕೂಡಿಸು_or_update(dict))
+	    ಹಿಂತಿರುಗಿ;
     }
 
-    rettv->vval.v_number = 0;
+    rettv->vval.v_ಸಂಖ್ಯೆ = 0;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * If "old" is in the override stack, then update it to "hl_new". Does not free
  * "old".
  */
-    void
-update_highlight_overrides(hl_override_T *old, hl_override_T *hl_new, int newlen)
+    ಶೂನ್ಯ
+update_highlight_overrides(hl_override_T *old, hl_override_T *hl_new, ಪೂರ್ಣಾಂಕ newlen)
 {
-    if (old == NULL)
-	return;
+    ಆದರೆ (old == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    for (hl_overrides_T *set = overrides; set != NULL; set = set->next)
+    ಗಾಗಿ (hl_overrides_T *ಗಣ_2 = overrides; ಗಣ_2 != ಖಾಲಿ; ಗಣ_2 = ಗಣ_2->ಮುಂದಿನ)
     {
-	if (set->arr == old)
+	ಆದರೆ (ಗಣ_2->arr == old)
 	{
-	    set->arr = hl_new;
-	    set->len = newlen;
+	    ಗಣ_2->arr = hl_new;
+	    ಗಣ_2->len = newlen;
 	}
     }
 }
@@ -5943,18 +5943,18 @@ update_highlight_overrides(hl_override_T *old, hl_override_T *hl_new, int newlen
 /*
  * If "arr" is in the highlight overrides list, then mark it as invalid.
  */
-    void
+    ಶೂನ್ಯ
 remove_highlight_overrides(hl_override_T *arr)
 {
-    if (arr == NULL || overrides == NULL)
-	return;
+    ಆದರೆ (arr == ಖಾಲಿ || overrides == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    for (hl_overrides_T *set = overrides; set != NULL; set = set->next)
+    ಗಾಗಿ (hl_overrides_T *ಗಣ_2 = overrides; ಗಣ_2 != ಖಾಲಿ; ಗಣ_2 = ಗಣ_2->ಮುಂದಿನ)
     {
-	if (set->arr == arr)
+	ಆದರೆ (ಗಣ_2->arr == arr)
 	{
-	    set->arr = NULL;
-	    break;
+	    ಗಣ_2->arr = ಖಾಲಿ;
+	    ನಿಲ್ಲಿಸು;
 	}
     }
 }
@@ -5963,49 +5963,49 @@ remove_highlight_overrides(hl_override_T *arr)
  * Update highlight_attr[] array. If "update_ids" is true, then update
  * highlight_ids[] array instead.
  */
-    static void
-set_highlight_attr(hl_override_T *arr, int len, bool update_ids)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_highlight_attr(hl_override_T *arr, ಪೂರ್ಣಾಂಕ len, bool update_ids)
 {
-    for (int i = 0; i < len; i++)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < len; i++)
     {
 	hl_override_T	*override = arr + i;
-	int		hlf = -1, attr;
+	ಪೂರ್ಣಾಂಕ		hlf = -1, attr;
 
-	if (override->from <= 0)
+	ಆದರೆ (override->from <= 0)
 	    // Directly map to highlight_attr
 	    hlf = -override->from;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    for (int k = 0; k < HLF_COUNT; k++)
-		if (override->from == highlight_ids[k])
+	    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ k = 0; k < HLF_ಎಣಿಕೆ; k++)
+		ಆದರೆ (override->from == highlight_ids[k])
 		{
 		    hlf = k;
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 
-	    if (hlf == -1)
-		continue;
+	    ಆದರೆ (hlf == -1)
+		ಮುಂದುವರಿ;
 	}
 
-	if (update_ids)
+	ಆದರೆ (update_ids)
 	{
-	    if (override->to <= 0)
+	    ಆದರೆ (override->ಗಮ್ಯ <= 0)
 	    {
-		if (hlf == -override->to)
+		ಆದರೆ (hlf == -override->ಗಮ್ಯ)
 		    highlight_ids[hlf] = -1;
-		else
-		    highlight_ids[hlf] = highlight_ids[-override->to];
+		ಇಲ್ಲದಿದ್ದರೆ
+		    highlight_ids[hlf] = highlight_ids[-override->ಗಮ್ಯ];
 	    }
-	    else
-		highlight_ids[hlf] = override->to;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		highlight_ids[hlf] = override->ಗಮ್ಯ;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (override->to <= 0)
+	    ಆದರೆ (override->ಗಮ್ಯ <= 0)
 		// Directly use highlight_attr[]
-		attr = highlight_attr[-override->to];
-	    else
-		attr = syn_id2attr(override->to);
+		attr = highlight_attr[-override->ಗಮ್ಯ];
+	    ಇಲ್ಲದಿದ್ದರೆ
+		attr = syn_id2attr(override->ಗಮ್ಯ);
 
 	    highlight_attr[hlf] = attr;
 	}
@@ -6016,180 +6016,180 @@ set_highlight_attr(hl_override_T *arr, int len, bool update_ids)
  * Set the current highlight override to "arr". Returns true if successful
  */
     bool
-push_highlight_overrides(hl_override_T *arr, int len)
+ತಳ್ಳು_highlight_overrides(hl_override_T *arr, ಪೂರ್ಣಾಂಕ len)
 {
     // Don't want to do anything if "arr" is already the current override. If
     // "arr" is NULL (but overrides->arr is not), then still push an override,
     // but "->arr" will just be NULL so any previous overrides are cleared.
-    if (overrides != NULL && overrides->arr == arr)
-	return false;
+    ಆದರೆ (overrides != ಖಾಲಿ && overrides->arr == arr)
+	ಹಿಂತಿರುಗಿ false;
 
-    hl_overrides_T *set;
+    hl_overrides_T *ಗಣ_2;
 
-    set = ALLOC_ONE(hl_overrides_T);
-    if (set == NULL)
-	return false;
+    ಗಣ_2 = ALLOC_ONE(hl_overrides_T);
+    ಆದರೆ (ಗಣ_2 == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ false;
 
-    set->arr = arr;
-    set->len = len;
+    ಗಣ_2->arr = arr;
+    ಗಣ_2->len = len;
 
     // Push to front of list
-    set->next = overrides;
-    overrides = set;
+    ಗಣ_2->ಮುಂದಿನ = overrides;
+    overrides = ಗಣ_2;
 
     // Save current highlight_attr[], so it can be restored later after this
     // override is popped.
-    memcpy(set->attr, highlight_attr, sizeof(highlight_attr));
+    ಸ್ಮರಣೆ_ನಕಲು(ಗಣ_2->attr, highlight_attr, ಗಾತ್ರ(highlight_attr));
 
     // Reset highlight_attr[] to default values, as we don't want changes from
     // other overrides.
-    memcpy(highlight_attr, highlight_attr_raw, sizeof(highlight_attr));
+    ಸ್ಮರಣೆ_ನಕಲು(highlight_attr, highlight_attr_raw, ಗಾತ್ರ(highlight_attr));
 
     // Update highlight_attr[] array
-    if (arr != NULL)
-	set_highlight_attr(arr, len, false);
+    ಆದರೆ (arr != ಖಾಲಿ)
+	ಗಣ_highlight_attr(arr, len, false);
 
-    return true;
+    ಹಿಂತಿರುಗಿ true;
 }
 
 /*
  * Pop the current highlight override (if any) from the stack. This should
  * always be paired with a *successful* push.
  */
-    void
-pop_highlight_overrides(void)
+    ಶೂನ್ಯ
+ತೆಗೆ_highlight_overrides(ಶೂನ್ಯ)
 {
-    hl_overrides_T *set = overrides;
+    hl_overrides_T *ಗಣ_2 = overrides;
 
-    if (overrides == NULL)
-	return;
+    ಆದರೆ (overrides == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    overrides = set->next;
+    overrides = ಗಣ_2->ಮುಂದಿನ;
 
     // Set highlight_attr[] to state before override was pushed.
-    memcpy(highlight_attr, set->attr, sizeof(highlight_attr));
-    vim_free(set);
+    ಸ್ಮರಣೆ_ನಕಲು(highlight_attr, ಗಣ_2->attr, ಗಾತ್ರ(highlight_attr));
+    vim_free(ಗಣ_2);
 }
 
 /*
  * Parse the 'winhighlight' option and return array. Returns NULL on failure or
  * if empty option. If failure, then errmsg is set.
  */
-    static hl_override_T *
-parse_winhighlight(char_u *opt, int *len, char **errmsg)
+    ಸ್ಥಿರ hl_override_T *
+parse_winhighlight(char_u *opt, ಪೂರ್ಣಾಂಕ *len, ಅಕ್ಷರ **errmsg)
 {
     char_u	    *p = opt;
     hl_override_T   *arr;
-    int		    i = 0;
-    int		    num = 1;
-    int		    n_colons = 0;
+    ಪೂರ್ಣಾಂಕ		    i = 0;
+    ಪೂರ್ಣಾಂಕ		    ಅಂಕೆ = 1;
+    ಪೂರ್ಣಾಂಕ		    n_colons = 0;
 
-    if (*p == NUL)
-	return NULL;
+    ಆದರೆ (*p == NUL)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     // Get number of overrides first so we can allocate array
-    while ((p = vim_strchr(p, ',')) != NULL)
+    ಆಗ ((p = vim_strchr(p, ',')) != ಖಾಲಿ)
     {
 	p++;
-	num++;
+	ಅಂಕೆ++;
     }
     p = opt;
     // Check if number of ':' matches number of ','
-    while ((p = vim_strchr(p, ':')) != NULL)
+    ಆಗ ((p = vim_strchr(p, ':')) != ಖಾಲಿ)
     {
 	p++;
 	n_colons++;
     }
 
-    if (num != n_colons)
+    ಆದರೆ (ಅಂಕೆ != n_colons)
     {
-	*errmsg = e_invalid_argument;
-	return NULL;
+	*errmsg = e_invalid_ವಾದ;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    arr = ALLOC_MULT(hl_override_T, num);
-    if (arr == NULL)
+    arr = ALLOC_MULT(hl_override_T, ಅಂಕೆ);
+    ಆದರೆ (arr == ಖಾಲಿ)
     {
-	*errmsg = e_out_of_memory;
-	return NULL;
+	*errmsg = e_ಹೊರಹೋಗು_ದ_ಸ್ಮರಣೆ;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
     p = opt;
 
-    while (true)
+    ಆಗ (true)
     {
 	hl_override_T *override = arr + i++;
 	char_u	*fromname = p, *toname;
 	char_u	*tmp;
-	char_u	**names[2] = {&fromname, &toname};
-	int	fromlen, tolen;
-	int	*lens[2] = {&fromlen, &tolen};
-	int	fromid, toid;
-	int	*ids[2] = {&fromid, &toid};
+	char_u	**ಹೆಸರುಗಳು[2] = {&fromname, &toname};
+	ಪೂರ್ಣಾಂಕ	fromlen, tolen;
+	ಪೂರ್ಣಾಂಕ	*lens[2] = {&fromlen, &tolen};
+	ಪೂರ್ಣಾಂಕ	fromid, toid;
+	ಪೂರ್ಣಾಂಕ	*ids[2] = {&fromid, &toid};
 
 	p = vim_strchr(p, ':');
 
-	if (p == NULL)
-	    goto fail;
+	ಆದರೆ (p == ಖಾಲಿ)
+	    ಹೋಗು fail;
 
 	fromlen = p - fromname; // Get hl for "from"
-	if (fromlen == 0)
-	    goto fail;
+	ಆದರೆ (fromlen == 0)
+	    ಹೋಗು fail;
 	p++; // Skip colon ':'
-	if (*p == NUL)
-	    goto fail;
+	ಆದರೆ (*p == NUL)
+	    ಹೋಗು fail;
 
 	toname = p;
 	tmp = vim_strchr(p, ',');
 
 	// Get hl for "to", must check for no trailing comma in case last
 	// element.
-	if (tmp == NULL)
-	    tolen = (int)STRLEN(p);
-	else
+	ಆದರೆ (tmp == ಖಾಲಿ)
+	    tolen = (ಪೂರ್ಣಾಂಕ)STRLEN(p);
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    tolen = tmp - toname;
 	    p = ++tmp;
 	}
-	if (tolen == 0)
-	    goto fail;
+	ಆದರೆ (tolen == 0)
+	    ಹೋಗು fail;
 
-	for (int k = 0; k < 2; k++)
+	ಗಾಗಿ (ಪೂರ್ಣಾಂಕ k = 0; k < 2; k++)
 	{
-	    char_u  *name = *names[k];
-	    int	    nlen = *lens[k];
+	    char_u  *name = *ಹೆಸರುಗಳು[k];
+	    ಪೂರ್ಣಾಂಕ	    nlen = *lens[k];
 
-	    if (*name == '!')
+	    ಆದರೆ (*name == '!')
 	    {
 		// If starts with "!", then it maps directly to a 'highlight'
 		// occasion.
-		int hlf;
+		ಪೂರ್ಣಾಂಕ hlf;
 
-		if (nlen != 2)
-		    goto fail;
+		ಆದರೆ (nlen != 2)
+		    ಹೋಗು fail;
 
-		for (hlf = 0; hlf < (int)HLF_COUNT; ++hlf)
-		    if (hl_flags[hlf] == name[1])
-			break;
+		ಗಾಗಿ (hlf = 0; hlf < (ಪೂರ್ಣಾಂಕ)HLF_ಎಣಿಕೆ; ++hlf)
+		    ಆದರೆ (hl_flags[hlf] == name[1])
+			ನಿಲ್ಲಿಸು;
 
-		if (hlf >= HLF_COUNT)
-		    goto fail;
+		ಆದರೆ (hlf >= HLF_ಎಣಿಕೆ)
+		    ಹೋಗು fail;
 
 		*ids[k] = -hlf;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		// Otherwise get the highlight group id.
-		if (syn_check_group(name, nlen) == 0)
-		    goto fail;
+		ಆದರೆ (syn_check_ಗುಂಪು(name, nlen) == 0)
+		    ಹೋಗು fail;
 
 		*ids[k] = syn_namen2id(name, nlen);
-		if (*ids[k] == 0)
-		    goto fail;
+		ಆದರೆ (*ids[k] == 0)
+		    ಹೋಗು fail;
 
 		// Always map "Normal" group to HLF_WIN
-		if (ids[k] == &fromid &&
-			STRCMP(HL_TABLE()[*ids[k] - 1].sg_name_u, "NORMAL") == 0)
+		ಆದರೆ (ids[k] == &fromid &&
+			STRCMP(HL_ಕೋಷ್ಟಕ()[*ids[k] - 1].sg_name_u, "NORMAL") == 0)
 		    *ids[k] = -HLF_WIN;
 	    }
 	}
@@ -6198,87 +6198,87 @@ parse_winhighlight(char_u *opt, int *len, char **errmsg)
 	// been set (even to itself e.g. "Normal"), and therefore know to use
 	// its attr instead.
 	override->from = fromid;
-	override->to = toid;
+	override->ಗಮ್ಯ = toid;
 
-	if (tmp == NULL)
-	    break;
+	ಆದರೆ (tmp == ಖಾಲಿ)
+	    ನಿಲ್ಲಿಸು;
     }
 
-    *len = num;
-    return arr;
+    *len = ಅಂಕೆ;
+    ಹಿಂತಿರುಗಿ arr;
 fail:
     vim_free(arr);
-    *errmsg = e_invalid_argument;
-    return NULL;
+    *errmsg = e_invalid_ವಾದ;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Update w_hl for "wp" using given option value. Returns error
  * message on failure, otherwise NULL.
  */
-    char *
+    ಅಕ್ಷರ *
 update_winhighlight(win_T *wp, char_u *opt)
 {
-    char	    *err = NULL;
+    ಅಕ್ಷರ	    *err = ಖಾಲಿ;
     hl_override_T   *arr;
-    int		    num = 1;
+    ಪೂರ್ಣಾಂಕ		    ಅಂಕೆ = 1;
 
-    arr = parse_winhighlight(opt, &num, &err);
+    arr = parse_winhighlight(opt, &ಅಂಕೆ, &err);
 
-    if (arr == NULL && err != NULL)
-	return err;
+    ಆದರೆ (arr == ಖಾಲಿ && err != ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ err;
 
-    if (arr == NULL && wp->w_hl == NULL)
-	return NULL;
+    ಆದರೆ (arr == ಖಾಲಿ && wp->w_hl == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    update_highlight_overrides(wp->w_hl, arr, num);
+    update_highlight_overrides(wp->w_hl, arr, ಅಂಕೆ);
 
     vim_free(wp->w_hl);
     wp->w_hl = arr;
-    wp->w_hl_len = num;
+    wp->w_hl_len = ಅಂಕೆ;
 
     wp->w_hlfwin_id = hlf_get_id(wp, HLF_WIN);
 
-#ifdef FEAT_TERMINAL
-    term_update_hlfwin(wp);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMINAL
+    ಪದ_update_hlfwin(wp);
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_TERMINAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMINAL
     // May be NULL (such as in after_copy_winopt())
-    if (wp->w_buffer != NULL)
+    ಆದರೆ (wp->w_ಬಫರ್ != ಖಾಲಿ)
     {
 	// Make sure terminal highlighting is updated
-	bool ret = push_highlight_overrides(wp->w_hl, wp->w_hl_len);
+	bool ret = ತಳ್ಳು_highlight_overrides(wp->w_hl, wp->w_hl_len);
 
-	if (wp->w_buffer->b_term != NULL)
-	    term_init_default_colors(wp->w_buffer->b_term);
-	if (ret)
-	    pop_highlight_overrides();
+	ಆದರೆ (wp->w_ಬಫರ್->b_ಪದ != ಖಾಲಿ)
+	    ಪದ_init_default_colors(wp->w_ಬಫರ್->b_ಪದ);
+	ಆದರೆ (ret)
+	    ತೆಗೆ_highlight_overrides();
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Get id that the hlf attr is using in window "wp", otherwise zero. Note that
  * -1 may be returned if the hlf was set to itself.
  */
-    int
-hlf_get_id(win_T *wp, int hlf)
+    ಪೂರ್ಣಾಂಕ
+hlf_get_id(win_T *wp, ಪೂರ್ಣಾಂಕ hlf)
 {
-    int id;
-    static int prev[HLF_COUNT];
+    ಪೂರ್ಣಾಂಕ id;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ prev[HLF_ಎಣಿಕೆ];
 
-    if (wp->w_hl == NULL)
-	return highlight_ids[hlf];
+    ಆದರೆ (wp->w_hl == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ highlight_ids[hlf];
 
-    memcpy(prev, highlight_ids, sizeof(highlight_ids));
-    set_highlight_attr(wp->w_hl, wp->w_hl_len, true);
+    ಸ್ಮರಣೆ_ನಕಲು(prev, highlight_ids, ಗಾತ್ರ(highlight_ids));
+    ಗಣ_highlight_attr(wp->w_hl, wp->w_hl_len, true);
     id = highlight_ids[hlf];
-    memcpy(highlight_ids, prev, sizeof(highlight_ids));
+    ಸ್ಮರಣೆ_ನಕಲು(highlight_ids, prev, ಗಾತ್ರ(highlight_ids));
 
-    return id;
+    ಹಿಂತಿರುಗಿ id;
 }
 
 /*
@@ -6286,25 +6286,25 @@ hlf_get_id(win_T *wp, int hlf)
  * message on failure otherwise NULL. Does not update the actual 'wincolor'
  * value, but does update the 'winhighlight' value.
  */
-    char *
+    ಅಕ್ಷರ *
 update_wincolor(win_T *wp, char_u *opt)
 {
-    char_u  *str = *opt == NUL ? "" : alloc(sizeof("!(:") + STRLEN(opt));
-    char    *errmsg;
+    char_u  *str = *opt == NUL ? "" : alloc(ಗಾತ್ರ("!(:") + STRLEN(opt));
+    ಅಕ್ಷರ    *errmsg;
 
-    if (str == NULL)
-	return e_out_of_memory;
+    ಆದರೆ (str == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ e_ಹೊರಹೋಗು_ದ_ಸ್ಮರಣೆ;
 
-    if (*opt != NUL)
-	sprintf((char *)str, "!(:%s", opt);
+    ಆದರೆ (*opt != NUL)
+	sprintf((ಅಕ್ಷರ *)str, "!(:%s", opt);
 
     errmsg = update_winhighlight(wp, str);
 
-    if (errmsg == NULL)
-	set_string_option_direct_in_win(wp, (char_u *)"winhighlight", -1,
+    ಆದರೆ (errmsg == ಖಾಲಿ)
+	ಗಣ_string_option_ನೇರ_ಒಳ_win(wp, (char_u *)"winhighlight", -1,
 		str, OPT_FREE|OPT_LOCAL, 0);
 
-    if (*opt != NUL)
-	free(str);
-    return errmsg;
+    ಆದರೆ (*opt != NUL)
+	ಬಿಡುಗಡೆ(str);
+    ಹಿಂತಿರುಗಿ errmsg;
 }

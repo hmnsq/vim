@@ -2,56 +2,56 @@
 // backslash it needs to be doubled.
 // Public domain.
 
-#include <stdio.h>
-#include <string.h>
+#ಅನ್ತರ್ಭಾವ <stdio.h>
+#ಅನ್ತರ್ಭಾವ <string.h>
 
-#ifdef _WIN32
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ _WIN32
 #	include <fcntl.h>
 #	include <io.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-	int
-main(int argc, char **argv)
+	ಪೂರ್ಣಾಂಕ
+ಮುಖ್ಯ(ಪೂರ್ಣಾಂಕ argc, ಅಕ್ಷರ **argv)
 {
-	char buffer[BUFSIZ];
-	char *p;
+	ಅಕ್ಷರ ಬಫರ್[BUFSIZ];
+	ಅಕ್ಷರ *p;
 
 	// Windows only: put standard input and output into binary mode so that the
 	// line endings in the output match those in the input.
-#ifdef _WIN32
-	_setmode(_fileno(stdin), _O_BINARY);
-	_setmode(_fileno(stdout), _O_BINARY);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ _WIN32
+	_setmode(_fileno(stdin), O_ದ್ವಿಮಾನ_2);
+	_setmode(_fileno(stdout), O_ದ್ವಿಮಾನ_2);
+#ಆದರೆ_ಅಂತ್ಯ
 
-	while (fgets(buffer, BUFSIZ, stdin) != NULL)
+	ಆಗ (fgets(ಬಫರ್, BUFSIZ, stdin) != ಖಾಲಿ)
 	{
-		for (p = buffer; *p != 0; p++)
+		ಗಾಗಿ (p = ಬಫರ್; *p != 0; p++)
 		{
-			if (strncmp(p, "charset=utf-8", 13) == 0
-				|| strncmp(p, "charset=UTF-8", 13) == 0)
+			ಆದರೆ (ಅಕ್ಷರಸರಣಿ_ಹೋಲಿಕೆ(p, "charset=utf-8", 13) == 0
+				|| ಅಕ್ಷರಸರಣಿ_ಹೋಲಿಕೆ(p, "charset=UTF-8", 13) == 0)
 			{
 				fputs("charset=CP932", stdout);
 				p += 12;
 			}
-			else if (strncmp(p, "# Original translations.", 24) == 0)
+			ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಅಕ್ಷರಸರಣಿ_ಹೋಲಿಕೆ(p, "# Original translations.", 24) == 0)
 			{
 				p += 24 - 1; // subtracting 1 by considering "p++" in the loop.
 				fputs("# Generated from ja.po, DO NOT EDIT.", stdout);
 			}
-			else if (*(unsigned char *)p == 0x81 && p[1] == '_')
+			ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*(ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ *)p == 0x81 && p[1] == '_')
 			{
-				putchar('\\');
+				ಅಕ್ಷರ_ಬರೆ('\\');
 				++p;
 			}
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
-				if (*p & 0x80)
+				ಆದರೆ (*p & 0x80)
 				{
-					putchar(*p++);
-					if (*p == '\\')
-						putchar(*p);
+					ಅಕ್ಷರ_ಬರೆ(*p++);
+					ಆದರೆ (*p == '\\')
+						ಅಕ್ಷರ_ಬರೆ(*p);
 				}
-				putchar(*p);
+				ಅಕ್ಷರ_ಬರೆ(*p);
 			}
 		}
 	}

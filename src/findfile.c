@@ -11,7 +11,7 @@
  * findfile.c: Search for files in directories listed in 'path'
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
 /*
  * File searching functions for 'path', 'tags' and 'cdpath' options.
@@ -60,56 +60,56 @@
 /*
  * type for the directory search stack
  */
-typedef struct ff_stack
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ ff_ರಾಶಿ
 {
-    struct ff_stack	*ffs_prev;
+    ರಚನೆ ff_ರಾಶಿ	*ffs_prev;
 
     // the fix part (no wildcards) and the part containing the wildcards
     // of the search path
-    string_T		ffs_fix_path;
-    string_T		ffs_wc_path;
+    string_T		ffs_fix_ಮಾರ್ಗ;
+    string_T		ffs_wc_ಮಾರ್ಗ;
 
     // files/dirs found in the above directory, matched by the first wildcard
     // of wc_part
     char_u		**ffs_filearray;
-    int			ffs_filearray_size;
-    int			ffs_filearray_cur;   // needed for partly handled dirs
+    ಪೂರ್ಣಾಂಕ			ffs_filearray_ಗಾತ್ರ;
+    ಪೂರ್ಣಾಂಕ			ffs_filearray_cur;   // needed for partly handled dirs
 
     // to store status of partly handled directories
     // 0: we work on this directory for the first time
     // 1: this directory was partly searched in an earlier step
-    int			ffs_stage;
+    ಪೂರ್ಣಾಂಕ			ffs_stage;
 
     // How deep are we in the directory tree?
     // Counts backward from value of level parameter to vim_findfile_init
-    int			ffs_level;
+    ಪೂರ್ಣಾಂಕ			ffs_level;
 
     // Did we already expand '**' to an empty string?
-    int			ffs_star_star_empty;
-} ff_stack_T;
+    ಪೂರ್ಣಾಂಕ			ffs_ನಕ್ಷತ್ರ_ನಕ್ಷತ್ರ_ಖಾಲಿಗಳು;
+} ff_ರಾಶಿ_T;
 
 /*
  * type for already visited directories or files.
  */
-typedef struct ff_visited
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ ff_ಭೇಟಿಯಾದ
 {
-    struct ff_visited	*ffv_next;
+    ರಚನೆ ff_ಭೇಟಿಯಾದ	*ffv_ಮುಂದಿನ;
 
     // Visited directories are different if the wildcard string are
     // different. So we have to save it.
-    char_u		*ffv_wc_path;
+    char_u		*ffv_wc_ಮಾರ್ಗ;
 
     // for unix use inode etc for comparison (needed because of links), else
     // use filename.
-#ifdef UNIX
-    int			ffv_dev_valid;	// ffv_dev and ffv_ino were set
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
+    ಪೂರ್ಣಾಂಕ			ffv_dev_valid;	// ffv_dev and ffv_ino were set
     dev_t		ffv_dev;	// device number
     ino_t		ffv_ino;	// inode number
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     // The memory for this struct is allocated according to the length of
     // ffv_fname.
     char_u		ffv_fname[1];	// actually longer
-} ff_visited_T;
+} ff_ಭೇಟಿಯಾದ_T;
 
 /*
  * We might have to manage several visited lists during a search.
@@ -125,23 +125,23 @@ typedef struct ff_visited
  * The struct ff_visited_list_hdr is used to manage a linked list of already
  * visited lists.
  */
-typedef struct ff_visited_list_hdr
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ ff_ಭೇಟಿಯಾದ_list_hdr
 {
-    struct ff_visited_list_hdr	*ffvl_next;
+    ರಚನೆ ff_ಭೇಟಿಯಾದ_list_hdr	*ffvl_ಮುಂದಿನ;
 
     // the filename the attached visited list is for
     char_u			*ffvl_filename;
 
-    ff_visited_T		*ffvl_visited_list;
+    ff_ಭೇಟಿಯಾದ_T		*ffvl_ಭೇಟಿಯಾದ_list;
 
-} ff_visited_list_hdr_T;
+} ff_ಭೇಟಿಯಾದ_list_hdr_T;
 
 
 /*
  * '**' can be expanded to several directory levels.
  * Set the default maximum depth.
  */
-#define FF_MAX_STAR_STAR_EXPAND ((char_u)30)
+#ವ್ಯಾಖ್ಯಾನಿಸು FF_MAX_ನಕ್ಷತ್ರ_ನಕ್ಷತ್ರ_EXPAND ((char_u)30)
 
 /*
  * The search context:
@@ -160,72 +160,72 @@ typedef struct ff_visited_list_hdr
  *   ffsc_find_what:	FINDFILE_BOTH, FINDFILE_DIR or FINDFILE_FILE
  *   ffsc_tagfile:	searching for tags file, don't use 'suffixesadd'
  */
-typedef struct ff_search_ctx_T
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ ff_ಹುಡುಕು_ctx_T
 {
-    ff_stack_T			*ffsc_stack_ptr;
-    ff_visited_list_hdr_T	*ffsc_visited_list;
-    ff_visited_list_hdr_T	*ffsc_dir_visited_list;
-    ff_visited_list_hdr_T	*ffsc_visited_lists_list;
-    ff_visited_list_hdr_T	*ffsc_dir_visited_lists_list;
-    string_T			ffsc_file_to_search;
-    string_T			ffsc_start_dir;
-    string_T			ffsc_fix_path;
-    string_T			ffsc_wc_path;
-    int				ffsc_level;
+    ff_ರಾಶಿ_T			*ffsc_ರಾಶಿ_ptr;
+    ff_ಭೇಟಿಯಾದ_list_hdr_T	*ffsc_ಭೇಟಿಯಾದ_list;
+    ff_ಭೇಟಿಯಾದ_list_hdr_T	*ffsc_dir_ಭೇಟಿಯಾದ_list;
+    ff_ಭೇಟಿಯಾದ_list_hdr_T	*ffsc_ಭೇಟಿಯಾದ_lists_list;
+    ff_ಭೇಟಿಯಾದ_list_hdr_T	*ffsc_dir_ಭೇಟಿಯಾದ_lists_list;
+    string_T			ffsc_file_ಗಮ್ಯ_ಹುಡುಕು;
+    string_T			ffsc_ಆರಂಭ_dir;
+    string_T			ffsc_fix_ಮಾರ್ಗ;
+    string_T			ffsc_wc_ಮಾರ್ಗ;
+    ಪೂರ್ಣಾಂಕ				ffsc_level;
     string_T			*ffsc_stopdirs_v;
-    int				ffsc_find_what;
-    int				ffsc_tagfile;
-} ff_search_ctx_T;
+    ಪೂರ್ಣಾಂಕ				ffsc_ಕಂಡುಹಿಡಿ_what;
+    ಪೂರ್ಣಾಂಕ				ffsc_tagfile;
+} ff_ಹುಡುಕು_ctx_T;
 
 // locally needed functions
-static int ff_check_visited(ff_visited_T **, char_u *, size_t, char_u *, size_t);
-static void vim_findfile_free_visited(void *search_ctx_arg);
-static void vim_findfile_free_visited_list(ff_visited_list_hdr_T **list_headp);
-static void ff_free_visited_list(ff_visited_T *vl);
-static ff_visited_list_hdr_T* ff_get_visited_list(char_u *, size_t, ff_visited_list_hdr_T **list_headp);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ff_check_ಭೇಟಿಯಾದ(ff_ಭೇಟಿಯಾದ_T **, char_u *, size_t, char_u *, size_t);
+ಸ್ಥಿರ ಶೂನ್ಯ vim_findfile_free_ಭೇಟಿಯಾದ(ಶೂನ್ಯ *ಹುಡುಕು_ctx_arg);
+ಸ್ಥಿರ ಶೂನ್ಯ vim_findfile_free_ಭೇಟಿಯಾದ_list(ff_ಭೇಟಿಯಾದ_list_hdr_T **list_headp);
+ಸ್ಥಿರ ಶೂನ್ಯ ff_free_ಭೇಟಿಯಾದ_list(ff_ಭೇಟಿಯಾದ_T *vl);
+ಸ್ಥಿರ ff_ಭೇಟಿಯಾದ_list_hdr_T* ff_get_ಭೇಟಿಯಾದ_list(char_u *, size_t, ff_ಭೇಟಿಯಾದ_list_hdr_T **list_headp);
 
-static void ff_push(ff_search_ctx_T *search_ctx, ff_stack_T *stack_ptr);
-static ff_stack_T *ff_pop(ff_search_ctx_T *search_ctx);
-static void ff_clear(ff_search_ctx_T *search_ctx);
-static void ff_free_stack_element(ff_stack_T *stack_ptr);
-static ff_stack_T *ff_create_stack_element(char_u *, size_t, char_u *, size_t, int, int);
-static int ff_path_in_stoplist(char_u *, int, string_T *);
+ಸ್ಥಿರ ಶೂನ್ಯ ff_ತಳ್ಳು(ff_ಹುಡುಕು_ctx_T *ಹುಡುಕು_ctx, ff_ರಾಶಿ_T *ರಾಶಿ_ptr);
+ಸ್ಥಿರ ff_ರಾಶಿ_T *ff_ತೆಗೆ(ff_ಹುಡುಕು_ctx_T *ಹುಡುಕು_ctx);
+ಸ್ಥಿರ ಶೂನ್ಯ ff_clear(ff_ಹುಡುಕು_ctx_T *ಹುಡುಕು_ctx);
+ಸ್ಥಿರ ಶೂನ್ಯ ff_free_ರಾಶಿ_element(ff_ರಾಶಿ_T *ರಾಶಿ_ptr);
+ಸ್ಥಿರ ff_ರಾಶಿ_T *ff_create_ರಾಶಿ_element(char_u *, size_t, char_u *, size_t, ಪೂರ್ಣಾಂಕ, ಪೂರ್ಣಾಂಕ);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ff_ಮಾರ್ಗ_ಒಳ_stoplist(char_u *, ಪೂರ್ಣಾಂಕ, string_T *);
 
-static string_T ff_expand_buffer = {NULL, 0};	    // used for expanding filenames
+ಸ್ಥಿರ string_T ff_expand_ಬಫರ್ = {ಖಾಲಿ, 0};	    // used for expanding filenames
 
-#if 0
+#ಆದರೆ 0
 /*
  * if someone likes findfirst/findnext, here are the functions
  * NOT TESTED!!
  */
 
-static void *ff_fn_search_context = NULL;
+ಸ್ಥಿರ ಶೂನ್ಯ *ff_fn_ಹುಡುಕು_context = ಖಾಲಿ;
 
     char_u *
-vim_findfirst(char_u *path, char_u *filename, int level)
+vim_findfirst(char_u *ಮಾರ್ಗ, char_u *filename, ಪೂರ್ಣಾಂಕ level)
 {
-    ff_fn_search_context =
-	vim_findfile_init(path, filename, NULL, level, TRUE, FALSE,
-		ff_fn_search_context, rel_fname);
-    if (NULL == ff_fn_search_context)
-	return NULL;
-    else
-	return vim_findnext()
+    ff_fn_ಹುಡುಕು_context =
+	vim_findfile_init(ಮಾರ್ಗ, filename, ಖಾಲಿ, level, TRUE, FALSE,
+		ff_fn_ಹುಡುಕು_context, rel_fname);
+    ಆದರೆ (ಖಾಲಿ == ff_fn_ಹುಡುಕು_context)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಹಿಂತಿರುಗಿ vim_findnext()
 }
 
     char_u *
-vim_findnext(void)
+vim_findnext(ಶೂನ್ಯ)
 {
-    char_u *ret = vim_findfile(ff_fn_search_context);
+    char_u *ret = vim_findfile(ff_fn_ಹುಡುಕು_context);
 
-    if (NULL == ret)
+    ಆದರೆ (ಖಾಲಿ == ret)
     {
-	vim_findfile_cleanup(ff_fn_search_context);
-	ff_fn_search_context = NULL;
+	vim_findfile_cleanup(ff_fn_ಹುಡುಕು_context);
+	ff_fn_ಹುಡುಕು_context = ಖಾಲಿ;
     }
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Initialization routine for vim_findfile().
@@ -279,125 +279,125 @@ vim_findnext(void)
  * This function silently ignores a few errors, vim_findfile() will have
  * limited functionality then.
  */
-    void *
+    ಶೂನ್ಯ *
 vim_findfile_init(
-    char_u	*path,
+    char_u	*ಮಾರ್ಗ,
     char_u	*filename,
     size_t	filenamelen,
-    char_u	*stopdirs UNUSED,
-    int		level,
-    int		free_visited,
-    int		find_what,
-    void	*search_ctx_arg,
-    int		tagfile,	// expanding names of tags files
+    char_u	*stopdirs ಬಳಸದ,
+    ಪೂರ್ಣಾಂಕ		level,
+    ಪೂರ್ಣಾಂಕ		free_ಭೇಟಿಯಾದ,
+    ಪೂರ್ಣಾಂಕ		ಕಂಡುಹಿಡಿ_what,
+    ಶೂನ್ಯ	*ಹುಡುಕು_ctx_arg,
+    ಪೂರ್ಣಾಂಕ		tagfile,	// expanding names of tags files
     char_u	*rel_fname)	// file name to use for "."
 {
     char_u		*wc_part;
-    ff_stack_T		*sptr;
-    ff_search_ctx_T	*search_ctx;
-    int			add_sep;
+    ff_ರಾಶಿ_T		*sptr;
+    ff_ಹುಡುಕು_ctx_T	*ಹುಡುಕು_ctx;
+    ಪೂರ್ಣಾಂಕ			ಕೂಡಿಸು_sep;
 
     // If a search context is given by the caller, reuse it, else allocate a
     // new one.
-    if (search_ctx_arg != NULL)
-	search_ctx = search_ctx_arg;
-    else
+    ಆದರೆ (ಹುಡುಕು_ctx_arg != ಖಾಲಿ)
+	ಹುಡುಕು_ctx = ಹುಡುಕು_ctx_arg;
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	search_ctx = ALLOC_CLEAR_ONE(ff_search_ctx_T);
-	if (search_ctx == NULL)
-	    goto error_return;
+	ಹುಡುಕು_ctx = ALLOC_CLEAR_ONE(ff_ಹುಡುಕು_ctx_T);
+	ಆದರೆ (ಹುಡುಕು_ctx == ಖಾಲಿ)
+	    ಹೋಗು error_return;
     }
-    search_ctx->ffsc_find_what = find_what;
-    search_ctx->ffsc_tagfile = tagfile;
+    ಹುಡುಕು_ctx->ffsc_ಕಂಡುಹಿಡಿ_what = ಕಂಡುಹಿಡಿ_what;
+    ಹುಡುಕು_ctx->ffsc_tagfile = tagfile;
 
     // clear the search context, but NOT the visited lists
-    ff_clear(search_ctx);
+    ff_clear(ಹುಡುಕು_ctx);
 
     // clear visited list if wanted
-    if (free_visited == TRUE)
-	vim_findfile_free_visited(search_ctx);
-    else
+    ಆದರೆ (free_ಭೇಟಿಯಾದ == TRUE)
+	vim_findfile_free_ಭೇಟಿಯಾದ(ಹುಡುಕು_ctx);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Reuse old visited lists. Get the visited list for the given
 	// filename. If no list for the current filename exists, creates a new
 	// one.
-	search_ctx->ffsc_visited_list = ff_get_visited_list(filename,
-					filenamelen, &search_ctx->ffsc_visited_lists_list);
-	if (search_ctx->ffsc_visited_list == NULL)
-	    goto error_return;
-	search_ctx->ffsc_dir_visited_list = ff_get_visited_list(filename,
-				    filenamelen, &search_ctx->ffsc_dir_visited_lists_list);
-	if (search_ctx->ffsc_dir_visited_list == NULL)
-	    goto error_return;
+	ಹುಡುಕು_ctx->ffsc_ಭೇಟಿಯಾದ_list = ff_get_ಭೇಟಿಯಾದ_list(filename,
+					filenamelen, &ಹುಡುಕು_ctx->ffsc_ಭೇಟಿಯಾದ_lists_list);
+	ಆದರೆ (ಹುಡುಕು_ctx->ffsc_ಭೇಟಿಯಾದ_list == ಖಾಲಿ)
+	    ಹೋಗು error_return;
+	ಹುಡುಕು_ctx->ffsc_dir_ಭೇಟಿಯಾದ_list = ff_get_ಭೇಟಿಯಾದ_list(filename,
+				    filenamelen, &ಹುಡುಕು_ctx->ffsc_dir_ಭೇಟಿಯಾದ_lists_list);
+	ಆದರೆ (ಹುಡುಕು_ctx->ffsc_dir_ಭೇಟಿಯಾದ_list == ಖಾಲಿ)
+	    ಹೋಗು error_return;
     }
 
-    if (ff_expand_buffer.string == NULL)
+    ಆದರೆ (ff_expand_ಬಫರ್.string == ಖಾಲಿ)
     {
-	ff_expand_buffer.length = 0;
-	ff_expand_buffer.string = alloc(MAXPATHL);
-	if (ff_expand_buffer.string == NULL)
-	    goto error_return;
+	ff_expand_ಬಫರ್.ಉದ್ದಳತೆ = 0;
+	ff_expand_ಬಫರ್.string = alloc(MAXPATHL);
+	ಆದರೆ (ff_expand_ಬಫರ್.string == ಖಾಲಿ)
+	    ಹೋಗು error_return;
     }
 
     // Store information on starting dir now if path is relative.
     // If path is absolute, we do that later.
-    if (path[0] == '.'
-	    && (vim_ispathsep(path[1]) || path[1] == NUL)
-	    && (!tagfile || vim_strchr(p_cpo, CPO_DOTTAG) == NULL)
-	    && rel_fname != NULL)
+    ಆದರೆ (ಮಾರ್ಗ[0] == '.'
+	    && (vim_ispathsep(ಮಾರ್ಗ[1]) || ಮಾರ್ಗ[1] == NUL)
+	    && (!tagfile || vim_strchr(p_cpo, CPO_DOTTAG) == ಖಾಲಿ)
+	    && rel_fname != ಖಾಲಿ)
     {
-	int	len = (int)(gettail(rel_fname) - rel_fname);
+	ಪೂರ್ಣಾಂಕ	len = (ಪೂರ್ಣಾಂಕ)(gettail(rel_fname) - rel_fname);
 
-	if (!vim_isAbsName(rel_fname) && len + 1 < MAXPATHL)
+	ಆದರೆ (!vim_isAbsName(rel_fname) && len + 1 < MAXPATHL)
 	{
 	    // Make the start dir an absolute path name.
-	    vim_strncpy(ff_expand_buffer.string, rel_fname, len);
-	    ff_expand_buffer.length = len;
+	    vim_strncpy(ff_expand_ಬಫರ್.string, rel_fname, len);
+	    ff_expand_ಬಫರ್.ಉದ್ದಳತೆ = len;
 
-	    search_ctx->ffsc_start_dir.string = FullName_save(ff_expand_buffer.string, FALSE);
-	    if (search_ctx->ffsc_start_dir.string == NULL)
-		goto error_return;
-	    search_ctx->ffsc_start_dir.length = STRLEN(search_ctx->ffsc_start_dir.string);
+	    ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.string = ತುಂಬಿದ_Name_save(ff_expand_ಬಫರ್.string, FALSE);
+	    ಆದರೆ (ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.string == ಖಾಲಿ)
+		ಹೋಗು error_return;
+	    ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.ಉದ್ದಳತೆ = STRLEN(ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.string);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    search_ctx->ffsc_start_dir.length = len;
-	    search_ctx->ffsc_start_dir.string = vim_strnsave(rel_fname,
-		search_ctx->ffsc_start_dir.length);
-	    if (search_ctx->ffsc_start_dir.string == NULL)
-		goto error_return;
+	    ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.ಉದ್ದಳತೆ = len;
+	    ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.string = vim_strnsave(rel_fname,
+		ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.ಉದ್ದಳತೆ);
+	    ಆದರೆ (ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.string == ಖಾಲಿ)
+		ಹೋಗು error_return;
 	}
 
-	if (*++path != NUL)
-	    ++path;
+	ಆದರೆ (*++ಮಾರ್ಗ != NUL)
+	    ++ಮಾರ್ಗ;
     }
-    else if (*path == NUL || !vim_isAbsName(path))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*ಮಾರ್ಗ == NUL || !vim_isAbsName(ಮಾರ್ಗ))
     {
-#ifdef BACKSLASH_IN_FILENAME
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ BACKSLASH_ಒಳ_FILENAME
 	// "c:dir" needs "c:" to be expanded, otherwise use current dir
-	if (*path != NUL && path[1] == ':')
+	ಆದರೆ (*ಮಾರ್ಗ != NUL && ಮಾರ್ಗ[1] == ':')
 	{
 	    char_u  drive[3];
 
-	    drive[0] = path[0];
+	    drive[0] = ಮಾರ್ಗ[0];
 	    drive[1] = ':';
 	    drive[2] = NUL;
-	    if (vim_FullName(drive, ff_expand_buffer.string, MAXPATHL, TRUE) == FAIL)
-		goto error_return;
-	    path += 2;
+	    ಆದರೆ (vim_ತುಂಬಿದ_Name(drive, ff_expand_ಬಫರ್.string, MAXPATHL, TRUE) == FAIL)
+		ಹೋಗು error_return;
+	    ಮಾರ್ಗ += 2;
 	}
-	else
-#endif
-	if (mch_dirname(ff_expand_buffer.string, MAXPATHL) == FAIL)
-	    goto error_return;
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	ಆದರೆ (mch_dirname(ff_expand_ಬಫರ್.string, MAXPATHL) == FAIL)
+	    ಹೋಗು error_return;
 
-	ff_expand_buffer.length = STRLEN(ff_expand_buffer.string);
+	ff_expand_ಬಫರ್.ಉದ್ದಳತೆ = STRLEN(ff_expand_ಬಫರ್.string);
 
-	search_ctx->ffsc_start_dir.length = ff_expand_buffer.length;
-	search_ctx->ffsc_start_dir.string = vim_strnsave(ff_expand_buffer.string,
-	    search_ctx->ffsc_start_dir.length);
-	if (search_ctx->ffsc_start_dir.string == NULL)
-	    goto error_return;
+	ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.ಉದ್ದಳತೆ = ff_expand_ಬಫರ್.ಉದ್ದಳತೆ;
+	ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.string = vim_strnsave(ff_expand_ಬಫರ್.string,
+	    ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.ಉದ್ದಳತೆ);
+	ಆದರೆ (ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.string == ಖಾಲಿ)
+	    ಹೋಗು error_return;
     }
 
     /*
@@ -409,90 +409,90 @@ vim_findfile_init(
      * is handled as unlimited upward search.  See function
      * ff_path_in_stoplist() for details.
      */
-    if (stopdirs != NULL)
+    ಆದರೆ (stopdirs != ಖಾಲಿ)
     {
 	char_u	*walker = stopdirs;
-	int	dircount;
+	ಪೂರ್ಣಾಂಕ	dircount;
 
-	while (*walker == ';')
+	ಆಗ (*walker == ';')
 	    walker++;
 
 	dircount = 1;
-	search_ctx->ffsc_stopdirs_v = ALLOC_ONE(string_T);
+	ಹುಡುಕು_ctx->ffsc_stopdirs_v = ALLOC_ONE(string_T);
 
-	if (search_ctx->ffsc_stopdirs_v != NULL)
+	ಆದರೆ (ಹುಡುಕು_ctx->ffsc_stopdirs_v != ಖಾಲಿ)
 	{
 	    string_T	*tmp;			// for convenience
 
-	    do
+	    ಮಾಡು
 	    {
 		char_u	*helper;
-		void	*ptr;
+		ಶೂನ್ಯ	*ptr;
 		size_t	len;
 
 		helper = walker;
-		ptr = vim_realloc(search_ctx->ffsc_stopdirs_v,
-					   (dircount + 1) * sizeof(string_T));
-		if (ptr)
-		    search_ctx->ffsc_stopdirs_v = ptr;
-		else
+		ptr = vim_realloc(ಹುಡುಕು_ctx->ffsc_stopdirs_v,
+					   (dircount + 1) * ಗಾತ್ರ(string_T));
+		ಆದರೆ (ptr)
+		    ಹುಡುಕು_ctx->ffsc_stopdirs_v = ptr;
+		ಇಲ್ಲದಿದ್ದರೆ
 		    // ignore, keep what we have and continue
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		walker = vim_strchr(walker, ';');
 		len = walker ? (size_t)(walker - helper) : STRLEN(helper);
 		// "" means ascent till top of directory tree.
 
-		if (*helper != NUL && !vim_isAbsName(helper)
+		ಆದರೆ (*helper != NUL && !vim_isAbsName(helper)
 							 && len + 1 < MAXPATHL)
 		{
 		    // Make the stop dir an absolute path name.
-		    vim_strncpy(ff_expand_buffer.string, helper, len);
-		    ff_expand_buffer.length = len;
+		    vim_strncpy(ff_expand_ಬಫರ್.string, helper, len);
+		    ff_expand_ಬಫರ್.ಉದ್ದಳತೆ = len;
 
-		    tmp = &search_ctx->ffsc_stopdirs_v[dircount - 1];
-		    tmp->string = FullName_save(ff_expand_buffer.string, FALSE);
-		    if (tmp->string != NULL)
-			tmp->length = STRLEN(tmp->string);
+		    tmp = &ಹುಡುಕು_ctx->ffsc_stopdirs_v[dircount - 1];
+		    tmp->string = ತುಂಬಿದ_Name_save(ff_expand_ಬಫರ್.string, FALSE);
+		    ಆದರೆ (tmp->string != ಖಾಲಿ)
+			tmp->ಉದ್ದಳತೆ = STRLEN(tmp->string);
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    tmp = &search_ctx->ffsc_stopdirs_v[dircount - 1];
-		    tmp->length = len;
-		    tmp->string = vim_strnsave(helper, tmp->length);
-		    if (tmp->string == NULL)
-			tmp->length = 0;
+		    tmp = &ಹುಡುಕು_ctx->ffsc_stopdirs_v[dircount - 1];
+		    tmp->ಉದ್ದಳತೆ = len;
+		    tmp->string = vim_strnsave(helper, tmp->ಉದ್ದಳತೆ);
+		    ಆದರೆ (tmp->string == ಖಾಲಿ)
+			tmp->ಉದ್ದಳತೆ = 0;
 		}
-		if (walker)
+		ಆದರೆ (walker)
 		    walker++;
 		dircount++;
 
-	    } while (walker != NULL);
+	    } ಆಗ (walker != ಖಾಲಿ);
 
-	    tmp = &search_ctx->ffsc_stopdirs_v[dircount - 1];
-	    tmp->string = NULL;
-	    tmp->length = 0;
+	    tmp = &ಹುಡುಕು_ctx->ffsc_stopdirs_v[dircount - 1];
+	    tmp->string = ಖಾಲಿ;
+	    tmp->ಉದ್ದಳತೆ = 0;
 	}
     }
 
-    search_ctx->ffsc_level = level;
+    ಹುಡುಕು_ctx->ffsc_level = level;
 
     /*
      * split into:
      *  -fix path
      *  -wildcard_stuff (might be NULL)
      */
-    wc_part = vim_strchr(path, '*');
-    if (wc_part != NULL)
+    wc_part = vim_strchr(ಮಾರ್ಗ, '*');
+    ಆದರೆ (wc_part != ಖಾಲಿ)
     {
-	int	llevel;
-	char	*errpt;
+	ಪೂರ್ಣಾಂಕ	llevel;
+	ಅಕ್ಷರ	*errpt;
 
 	// save the fix part of the path
-	search_ctx->ffsc_fix_path.length = (size_t)(wc_part - path);
-	search_ctx->ffsc_fix_path.string = vim_strnsave(path,
-	    search_ctx->ffsc_fix_path.length);
-	if (search_ctx->ffsc_fix_path.string == NULL)
-	    goto error_return;
+	ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.ಉದ್ದಳತೆ = (size_t)(wc_part - ಮಾರ್ಗ);
+	ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.string = vim_strnsave(ಮಾರ್ಗ,
+	    ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.ಉದ್ದಳತೆ);
+	ಆದರೆ (ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.string == ಖಾಲಿ)
+	    ಹೋಗು error_return;
 
 	/*
 	 * copy wc_path and add restricts to the '**' wildcard.
@@ -503,185 +503,185 @@ vim_findfile_init(
 	 * Due to this technique the path looks awful if you print it as a
 	 * string.
 	 */
-	ff_expand_buffer.length = 0;
-	while (*wc_part != NUL)
+	ff_expand_ಬಫರ್.ಉದ್ದಳತೆ = 0;
+	ಆಗ (*wc_part != NUL)
 	{
-	    if (ff_expand_buffer.length + 5 >= MAXPATHL)
+	    ಆದರೆ (ff_expand_ಬಫರ್.ಉದ್ದಳತೆ + 5 >= MAXPATHL)
 	    {
-		emsg(_(e_path_too_long_for_completion));
-		break;
+		emsg(_(e_ಮಾರ್ಗ_too_long_for_completion));
+		ನಿಲ್ಲಿಸು;
 	    }
-	    if (STRNCMP(wc_part, "**", 2) == 0)
+	    ಆದರೆ (STRNCMP(wc_part, "**", 2) == 0)
 	    {
-		ff_expand_buffer.string[ff_expand_buffer.length++] = *wc_part++;
-		ff_expand_buffer.string[ff_expand_buffer.length++] = *wc_part++;
+		ff_expand_ಬಫರ್.string[ff_expand_ಬಫರ್.ಉದ್ದಳತೆ++] = *wc_part++;
+		ff_expand_ಬಫರ್.string[ff_expand_ಬಫರ್.ಉದ್ದಳತೆ++] = *wc_part++;
 
-		llevel = strtol((char *)wc_part, &errpt, 10);
-		if ((char_u *)errpt != wc_part && llevel > 0 && llevel < 255)
-		    ff_expand_buffer.string[ff_expand_buffer.length++] = llevel;
-		else if ((char_u *)errpt != wc_part && llevel == 0)
+		llevel = strtol((ಅಕ್ಷರ *)wc_part, &errpt, 10);
+		ಆದರೆ ((char_u *)errpt != wc_part && llevel > 0 && llevel < 255)
+		    ff_expand_ಬಫರ್.string[ff_expand_ಬಫರ್.ಉದ್ದಳತೆ++] = llevel;
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((char_u *)errpt != wc_part && llevel == 0)
 		    // restrict is 0 -> remove already added '**'
-		    ff_expand_buffer.length -= 2;
-		else
-		    ff_expand_buffer.string[ff_expand_buffer.length++] = FF_MAX_STAR_STAR_EXPAND;
+		    ff_expand_ಬಫರ್.ಉದ್ದಳತೆ -= 2;
+		ಇಲ್ಲದಿದ್ದರೆ
+		    ff_expand_ಬಫರ್.string[ff_expand_ಬಫರ್.ಉದ್ದಳತೆ++] = FF_MAX_ನಕ್ಷತ್ರ_ನಕ್ಷತ್ರ_EXPAND;
 		wc_part = (char_u *)errpt;
-		if (*wc_part != NUL && !vim_ispathsep(*wc_part))
+		ಆದರೆ (*wc_part != NUL && !vim_ispathsep(*wc_part))
 		{
-		    semsg(_(e_invalid_path_number_must_be_at_end_of_path_or_be_followed_by_str), PATHSEPSTR);
-		    goto error_return;
+		    semsg(_(e_invalid_ಮಾರ್ಗ_ಸಂಖ್ಯೆ_must_be_at_ಕೊನೆ_ದ_ಮಾರ್ಗ_or_be_followed_by_str), PATHSEPSTR);
+		    ಹೋಗು error_return;
 		}
 	    }
-	    else
-		ff_expand_buffer.string[ff_expand_buffer.length++] = *wc_part++;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ff_expand_ಬಫರ್.string[ff_expand_ಬಫರ್.ಉದ್ದಳತೆ++] = *wc_part++;
 	}
-	ff_expand_buffer.string[ff_expand_buffer.length] = NUL;
+	ff_expand_ಬಫರ್.string[ff_expand_ಬಫರ್.ಉದ್ದಳತೆ] = NUL;
 
-	search_ctx->ffsc_wc_path.length = ff_expand_buffer.length;
-	search_ctx->ffsc_wc_path.string = vim_strnsave(ff_expand_buffer.string,
-	    search_ctx->ffsc_wc_path.length);
-	if (search_ctx->ffsc_wc_path.string == NULL)
-	    goto error_return;
+	ಹುಡುಕು_ctx->ffsc_wc_ಮಾರ್ಗ.ಉದ್ದಳತೆ = ff_expand_ಬಫರ್.ಉದ್ದಳತೆ;
+	ಹುಡುಕು_ctx->ffsc_wc_ಮಾರ್ಗ.string = vim_strnsave(ff_expand_ಬಫರ್.string,
+	    ಹುಡುಕು_ctx->ffsc_wc_ಮಾರ್ಗ.ಉದ್ದಳತೆ);
+	ಆದರೆ (ಹುಡುಕು_ctx->ffsc_wc_ಮಾರ್ಗ.string == ಖಾಲಿ)
+	    ಹೋಗು error_return;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	search_ctx->ffsc_fix_path.length = STRLEN(path);
-	search_ctx->ffsc_fix_path.string = vim_strnsave(path,
-	    search_ctx->ffsc_fix_path.length);
-	if (search_ctx->ffsc_fix_path.string == NULL)
-	    goto error_return;
+	ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.ಉದ್ದಳತೆ = STRLEN(ಮಾರ್ಗ);
+	ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.string = vim_strnsave(ಮಾರ್ಗ,
+	    ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.ಉದ್ದಳತೆ);
+	ಆದರೆ (ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.string == ಖಾಲಿ)
+	    ಹೋಗು error_return;
     }
 
-    if (search_ctx->ffsc_start_dir.string == NULL)
+    ಆದರೆ (ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.string == ಖಾಲಿ)
     {
 	// store the fix part as startdir.
 	// This is needed if the parameter path is fully qualified.
-	search_ctx->ffsc_start_dir.length = search_ctx->ffsc_fix_path.length;
-	search_ctx->ffsc_start_dir.string = vim_strnsave(search_ctx->ffsc_fix_path.string,
-	    search_ctx->ffsc_start_dir.length);
-	if (search_ctx->ffsc_start_dir.string == NULL)
-	    goto error_return;
-	search_ctx->ffsc_fix_path.string[0] = NUL;
-	search_ctx->ffsc_fix_path.length = 0;
+	ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.ಉದ್ದಳತೆ = ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.ಉದ್ದಳತೆ;
+	ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.string = vim_strnsave(ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.string,
+	    ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.ಉದ್ದಳತೆ);
+	ಆದರೆ (ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.string == ಖಾಲಿ)
+	    ಹೋಗು error_return;
+	ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.string[0] = NUL;
+	ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.ಉದ್ದಳತೆ = 0;
     }
 
     // create an absolute path
-    if (search_ctx->ffsc_start_dir.length
-	    + search_ctx->ffsc_fix_path.length + 3 >= MAXPATHL)
+    ಆದರೆ (ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.ಉದ್ದಳತೆ
+	    + ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.ಉದ್ದಳತೆ + 3 >= MAXPATHL)
     {
-	emsg(_(e_path_too_long_for_completion));
-	goto error_return;
+	emsg(_(e_ಮಾರ್ಗ_too_long_for_completion));
+	ಹೋಗು error_return;
     }
 
-    add_sep = !after_pathsep(search_ctx->ffsc_start_dir.string,
-	search_ctx->ffsc_start_dir.string + search_ctx->ffsc_start_dir.length);
-    ff_expand_buffer.length = vim_snprintf(
-	    (char *)ff_expand_buffer.string,
+    ಕೂಡಿಸು_sep = !after_pathsep(ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.string,
+	ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.string + ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.ಉದ್ದಳತೆ);
+    ff_expand_ಬಫರ್.ಉದ್ದಳತೆ = vim_snprintf(
+	    (ಅಕ್ಷರ *)ff_expand_ಬಫರ್.string,
 	    MAXPATHL,
 	    "%s%s",
-	    search_ctx->ffsc_start_dir.string,
-	    add_sep ? PATHSEPSTR : "");
+	    ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.string,
+	    ಕೂಡಿಸು_sep ? PATHSEPSTR : "");
 
     {
-	size_t	bufsize = ff_expand_buffer.length + search_ctx->ffsc_fix_path.length + 1;
+	size_t	bufsize = ff_expand_ಬಫರ್.ಉದ್ದಳತೆ + ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.ಉದ್ದಳತೆ + 1;
 	char_u	*buf = alloc(bufsize);
 
-	if (buf == NULL)
-	    goto error_return;
+	ಆದರೆ (buf == ಖಾಲಿ)
+	    ಹೋಗು error_return;
 
 	vim_snprintf(
-		(char *)buf,
+		(ಅಕ್ಷರ *)buf,
 		bufsize,
 		"%s%s",
-		ff_expand_buffer.string,
-		search_ctx->ffsc_fix_path.string);
-	if (mch_isdir(buf))
+		ff_expand_ಬಫರ್.string,
+		ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.string);
+	ಆದರೆ (mch_isdir(buf))
 	{
-	    if (search_ctx->ffsc_fix_path.length > 0)
+	    ಆದರೆ (ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.ಉದ್ದಳತೆ > 0)
 	    {
-		add_sep = !after_pathsep(search_ctx->ffsc_fix_path.string,
-		    search_ctx->ffsc_fix_path.string + search_ctx->ffsc_fix_path.length);
-		ff_expand_buffer.length += vim_snprintf(
-			(char *)ff_expand_buffer.string + ff_expand_buffer.length,
-			MAXPATHL - ff_expand_buffer.length,
+		ಕೂಡಿಸು_sep = !after_pathsep(ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.string,
+		    ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.string + ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.ಉದ್ದಳತೆ);
+		ff_expand_ಬಫರ್.ಉದ್ದಳತೆ += vim_snprintf(
+			(ಅಕ್ಷರ *)ff_expand_ಬಫರ್.string + ff_expand_ಬಫರ್.ಉದ್ದಳತೆ,
+			MAXPATHL - ff_expand_ಬಫರ್.ಉದ್ದಳತೆ,
 			"%s%s",
-			search_ctx->ffsc_fix_path.string,
-			add_sep ? PATHSEPSTR : "");
+			ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.string,
+			ಕೂಡಿಸು_sep ? PATHSEPSTR : "");
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    char_u *p = gettail(search_ctx->ffsc_fix_path.string);
-	    int    len = (int)search_ctx->ffsc_fix_path.length;
+	    char_u *p = gettail(ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.string);
+	    ಪೂರ್ಣಾಂಕ    len = (ಪೂರ್ಣಾಂಕ)ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.ಉದ್ದಳತೆ;
 
-	    if (p > search_ctx->ffsc_fix_path.string)
+	    ಆದರೆ (p > ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.string)
 	    {
 		// do not add '..' to the path and start upwards searching
-		len = (int)(p - search_ctx->ffsc_fix_path.string) - 1;
-		if ((len >= 2
-			&& STRNCMP(search_ctx->ffsc_fix_path.string, "..", 2) == 0)
-			&& (len == 2 || search_ctx->ffsc_fix_path.string[2] == PATHSEP))
+		len = (ಪೂರ್ಣಾಂಕ)(p - ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.string) - 1;
+		ಆದರೆ ((len >= 2
+			&& STRNCMP(ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.string, "..", 2) == 0)
+			&& (len == 2 || ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.string[2] == PATHSEP))
 		{
 		    vim_free(buf);
-		    goto error_return;
+		    ಹೋಗು error_return;
 		}
 
-		add_sep = !after_pathsep(search_ctx->ffsc_fix_path.string,
-		    search_ctx->ffsc_fix_path.string + search_ctx->ffsc_fix_path.length);
-		ff_expand_buffer.length += vim_snprintf(
-			(char *)ff_expand_buffer.string + ff_expand_buffer.length,
-			MAXPATHL - ff_expand_buffer.length,
+		ಕೂಡಿಸು_sep = !after_pathsep(ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.string,
+		    ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.string + ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.ಉದ್ದಳತೆ);
+		ff_expand_ಬಫರ್.ಉದ್ದಳತೆ += vim_snprintf(
+			(ಅಕ್ಷರ *)ff_expand_ಬಫರ್.string + ff_expand_ಬಫರ್.ಉದ್ದಳತೆ,
+			MAXPATHL - ff_expand_ಬಫರ್.ಉದ್ದಳತೆ,
 			"%.*s%s",
 			len,
-			search_ctx->ffsc_fix_path.string,
-			add_sep ? PATHSEPSTR : "");
+			ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.string,
+			ಕೂಡಿಸು_sep ? PATHSEPSTR : "");
 	    }
 
-	    if (search_ctx->ffsc_wc_path.string != NULL)
+	    ಆದರೆ (ಹುಡುಕು_ctx->ffsc_wc_ಮಾರ್ಗ.string != ಖಾಲಿ)
 	    {
-		size_t	tempsize = (search_ctx->ffsc_fix_path.length - len)
-				+ search_ctx->ffsc_wc_path.length
+		size_t	tempsize = (ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.ಉದ್ದಳತೆ - len)
+				+ ಹುಡುಕು_ctx->ffsc_wc_ಮಾರ್ಗ.ಉದ್ದಳತೆ
 				+ 1;
-		char_u	*temp = alloc(tempsize);
+		char_u	*ತಾತ್ಕಾಲಿಕ = alloc(tempsize);
 
-		if (temp == NULL)
+		ಆದರೆ (ತಾತ್ಕಾಲಿಕ == ಖಾಲಿ)
 		{
 		    vim_free(buf);
-		    vim_free(temp);
-		    goto error_return;
+		    vim_free(ತಾತ್ಕಾಲಿಕ);
+		    ಹೋಗು error_return;
 		}
 
-		search_ctx->ffsc_wc_path.length = vim_snprintf(
-			    (char *)temp,
+		ಹುಡುಕು_ctx->ffsc_wc_ಮಾರ್ಗ.ಉದ್ದಳತೆ = vim_snprintf(
+			    (ಅಕ್ಷರ *)ತಾತ್ಕಾಲಿಕ,
 			    tempsize,
 			    "%s%s",
-			    search_ctx->ffsc_fix_path.string + len,
-			    search_ctx->ffsc_wc_path.string);
-		vim_free(search_ctx->ffsc_wc_path.string);
-		search_ctx->ffsc_wc_path.string = temp;
+			    ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.string + len,
+			    ಹುಡುಕು_ctx->ffsc_wc_ಮಾರ್ಗ.string);
+		vim_free(ಹುಡುಕು_ctx->ffsc_wc_ಮಾರ್ಗ.string);
+		ಹುಡುಕು_ctx->ffsc_wc_ಮಾರ್ಗ.string = ತಾತ್ಕಾಲಿಕ;
 	    }
 	}
 	vim_free(buf);
     }
 
-    sptr = ff_create_stack_element(ff_expand_buffer.string,
-			ff_expand_buffer.length,
-			search_ctx->ffsc_wc_path.string,
-			search_ctx->ffsc_wc_path.length,
+    sptr = ff_create_ರಾಶಿ_element(ff_expand_ಬಫರ್.string,
+			ff_expand_ಬಫರ್.ಉದ್ದಳತೆ,
+			ಹುಡುಕು_ctx->ffsc_wc_ಮಾರ್ಗ.string,
+			ಹುಡುಕು_ctx->ffsc_wc_ಮಾರ್ಗ.ಉದ್ದಳತೆ,
 			level,
 			0);
 
-    if (sptr == NULL)
-	goto error_return;
+    ಆದರೆ (sptr == ಖಾಲಿ)
+	ಹೋಗು error_return;
 
-    ff_push(search_ctx, sptr);
+    ff_ತಳ್ಳು(ಹುಡುಕು_ctx, sptr);
 
-    search_ctx->ffsc_file_to_search.length = filenamelen;
-    search_ctx->ffsc_file_to_search.string = vim_strnsave(filename,
-	search_ctx->ffsc_file_to_search.length);
-    if (search_ctx->ffsc_file_to_search.string == NULL)
-	goto error_return;
+    ಹುಡುಕು_ctx->ffsc_file_ಗಮ್ಯ_ಹುಡುಕು.ಉದ್ದಳತೆ = filenamelen;
+    ಹುಡುಕು_ctx->ffsc_file_ಗಮ್ಯ_ಹುಡುಕು.string = vim_strnsave(filename,
+	ಹುಡುಕು_ctx->ffsc_file_ಗಮ್ಯ_ಹುಡುಕು.ಉದ್ದಳತೆ);
+    ಆದರೆ (ಹುಡುಕು_ctx->ffsc_file_ಗಮ್ಯ_ಹುಡುಕು.string == ಖಾಲಿ)
+	ಹೋಗು error_return;
 
-    return search_ctx;
+    ಹಿಂತಿರುಗಿ ಹುಡುಕು_ctx;
 
 error_return:
     /*
@@ -689,8 +689,8 @@ error_return:
      * Even when the caller gave us a (perhaps valid) context we free it here,
      * as we might have already destroyed it.
      */
-    vim_findfile_cleanup(search_ctx);
-    return NULL;
+    vim_findfile_cleanup(ಹುಡುಕು_ctx);
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
@@ -700,43 +700,43 @@ error_return:
 vim_findfile_stopdir(char_u *buf)
 {
     char_u	*r_ptr = buf;
-    char_u	*r_ptr_end = NULL;	    // points to NUL at end of string "r_ptr"
+    char_u	*r_ptr_ಕೊನೆ = ಖಾಲಿ;	    // points to NUL at end of string "r_ptr"
 
-    while (*r_ptr != NUL && *r_ptr != ';')
+    ಆಗ (*r_ptr != NUL && *r_ptr != ';')
     {
-	if (r_ptr[0] == '\\' && r_ptr[1] == ';')
+	ಆದರೆ (r_ptr[0] == '\\' && r_ptr[1] == ';')
 	{
 	    // Overwrite the escape char,
 	    // use STRLEN(r_ptr) to move the trailing '\0'.
-	    if (r_ptr_end == NULL)
-		r_ptr_end = r_ptr + STRLEN(r_ptr);
+	    ಆದರೆ (r_ptr_ಕೊನೆ == ಖಾಲಿ)
+		r_ptr_ಕೊನೆ = r_ptr + STRLEN(r_ptr);
 	    mch_memmove(r_ptr, r_ptr + 1,
-		(size_t)(r_ptr_end - (r_ptr + 1)) + 1);	// +1 for NUL
+		(size_t)(r_ptr_ಕೊನೆ - (r_ptr + 1)) + 1);	// +1 for NUL
 	    r_ptr++;
-	    --r_ptr_end;
+	    --r_ptr_ಕೊನೆ;
 	}
 	r_ptr++;
     }
-    if (*r_ptr == ';')
+    ಆದರೆ (*r_ptr == ';')
     {
 	*r_ptr = NUL;
 	r_ptr++;
     }
-    else if (*r_ptr == NUL)
-	r_ptr = NULL;
-    return r_ptr;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*r_ptr == NUL)
+	r_ptr = ಖಾಲಿ;
+    ಹಿಂತಿರುಗಿ r_ptr;
 }
 
 /*
  * Clean up the given search context. Can handle a NULL pointer.
  */
-    void
-vim_findfile_cleanup(void *ctx)
+    ಶೂನ್ಯ
+vim_findfile_cleanup(ಶೂನ್ಯ *ctx)
 {
-    if (ctx == NULL)
-	return;
+    ಆದರೆ (ctx == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    vim_findfile_free_visited(ctx);
+    vim_findfile_free_ಭೇಟಿಯಾದ(ctx);
     ff_clear(ctx);
     vim_free(ctx);
 }
@@ -754,46 +754,46 @@ vim_findfile_cleanup(void *ctx)
  * top of the list).
  */
     char_u *
-vim_findfile(void *search_ctx_arg)
+vim_findfile(ಶೂನ್ಯ *ಹುಡುಕು_ctx_arg)
 {
-    string_T	file_path;
-    string_T	rest_of_wildcards;
-    char_u	*path_end = NULL;
-    ff_stack_T	*stackp;
-    ff_search_ctx_T *search_ctx;
+    string_T	file_ಮಾರ್ಗ;
+    string_T	rest_ದ_wildcards;
+    char_u	*ಮಾರ್ಗ_ಕೊನೆ = ಖಾಲಿ;
+    ff_ರಾಶಿ_T	*stackp;
+    ff_ಹುಡುಕು_ctx_T *ಹುಡುಕು_ctx;
 
-    if (search_ctx_arg == NULL)
-	return NULL;
+    ಆದರೆ (ಹುಡುಕು_ctx_arg == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    search_ctx = (ff_search_ctx_T *)search_ctx_arg;
+    ಹುಡುಕು_ctx = (ff_ಹುಡುಕು_ctx_T *)ಹುಡುಕು_ctx_arg;
 
     /*
      * filepath is used as buffer for various actions and as the storage to
      * return a found filename.
      */
-    if ((file_path.string = alloc(MAXPATHL)) == NULL)
-	return NULL;
+    ಆದರೆ ((file_ಮಾರ್ಗ.string = alloc(MAXPATHL)) == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     // store the end of the start dir -- needed for upward search
-    if (search_ctx->ffsc_start_dir.string != NULL)
-	path_end = &search_ctx->ffsc_start_dir.string[
-					    search_ctx->ffsc_start_dir.length];
+    ಆದರೆ (ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.string != ಖಾಲಿ)
+	ಮಾರ್ಗ_ಕೊನೆ = &ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.string[
+					    ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.ಉದ್ದಳತೆ];
 
     // upward search loop
-    for (;;)
+    ಗಾಗಿ (;;)
     {
 	// downward search loop
-	for (;;)
+	ಗಾಗಿ (;;)
 	{
 	    // check if user wants to stop the search
 	    ui_breakcheck();
-	    if (got_int)
-		break;
+	    ಆದರೆ (got_int)
+		ನಿಲ್ಲಿಸು;
 
 	    // get directory to work on from stack
-	    stackp = ff_pop(search_ctx);
-	    if (stackp == NULL)
-		break;
+	    stackp = ff_ತೆಗೆ(ಹುಡುಕು_ctx);
+	    ಆದರೆ (stackp == ಖಾಲಿ)
+		ನಿಲ್ಲಿಸು;
 
 	    /*
 	     * TODO: decide if we leave this test in
@@ -814,49 +814,49 @@ vim_findfile(void *search_ctx_arg)
 	     * This check is only needed for directories we work on for the
 	     * first time (hence stackp->ff_filearray == NULL)
 	     */
-	    if (stackp->ffs_filearray == NULL
-		    && ff_check_visited(&search_ctx->ffsc_dir_visited_list
-							  ->ffvl_visited_list,
-			    stackp->ffs_fix_path.string,
-			    stackp->ffs_fix_path.length,
-			    stackp->ffs_wc_path.string,
-			    stackp->ffs_wc_path.length) == FAIL)
+	    ಆದರೆ (stackp->ffs_filearray == ಖಾಲಿ
+		    && ff_check_ಭೇಟಿಯಾದ(&ಹುಡುಕು_ctx->ffsc_dir_ಭೇಟಿಯಾದ_list
+							  ->ffvl_ಭೇಟಿಯಾದ_list,
+			    stackp->ffs_fix_ಮಾರ್ಗ.string,
+			    stackp->ffs_fix_ಮಾರ್ಗ.ಉದ್ದಳತೆ,
+			    stackp->ffs_wc_ಮಾರ್ಗ.string,
+			    stackp->ffs_wc_ಮಾರ್ಗ.ಉದ್ದಳತೆ) == FAIL)
 	    {
-#ifdef FF_VERBOSE
-		if (p_verbose >= 5)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FF_VERBOSE
+		ಆದರೆ (p_verbose >= 5)
 		{
 		    verbose_enter_scroll();
 		    smsg("Already Searched: %s (%s)",
-				   stackp->ffs_fix_path.string, stackp->ffs_wc_path.string);
+				   stackp->ffs_fix_ಮಾರ್ಗ.string, stackp->ffs_wc_ಮಾರ್ಗ.string);
 		    // don't overwrite this either
-		    msg_puts("\n");
+		    ಸಂದೇಶ_puts("\n");
 		    verbose_leave_scroll();
 		}
-#endif
-		ff_free_stack_element(stackp);
-		continue;
+#ಆದರೆ_ಅಂತ್ಯ
+		ff_free_ರಾಶಿ_element(stackp);
+		ಮುಂದುವರಿ;
 	    }
-#ifdef FF_VERBOSE
-	    else if (p_verbose >= 5)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FF_VERBOSE
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p_verbose >= 5)
 	    {
 		verbose_enter_scroll();
 		smsg("Searching: %s (%s)",
-				   stackp->ffs_fix_path.string, stackp->ffs_wc_path.string);
+				   stackp->ffs_fix_ಮಾರ್ಗ.string, stackp->ffs_wc_ಮಾರ್ಗ.string);
 		// don't overwrite this either
-		msg_puts("\n");
+		ಸಂದೇಶ_puts("\n");
 		verbose_leave_scroll();
 	    }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 	    // check depth
-	    if (stackp->ffs_level <= 0)
+	    ಆದರೆ (stackp->ffs_level <= 0)
 	    {
-		ff_free_stack_element(stackp);
-		continue;
+		ff_free_ರಾಶಿ_element(stackp);
+		ಮುಂದುವರಿ;
 	    }
 
-	    file_path.string[0] = NUL;
-	    file_path.length = 0;
+	    file_ಮಾರ್ಗ.string[0] = NUL;
+	    file_ಮಾರ್ಗ.ಉದ್ದಳತೆ = 0;
 
 	    /*
 	     * If no filearray till now expand wildcards
@@ -864,99 +864,99 @@ vim_findfile(void *search_ctx_arg)
 	     * and all possible expands are returned in one array. We use this
 	     * to handle the expansion of '**' into an empty string.
 	     */
-	    if (stackp->ffs_filearray == NULL)
+	    ಆದರೆ (stackp->ffs_filearray == ಖಾಲಿ)
 	    {
 		char_u *dirptrs[2];
 
 		// we use filepath to build the path expand_wildcards() should
 		// expand.
-		dirptrs[0] = file_path.string;
-		dirptrs[1] = NULL;
+		dirptrs[0] = file_ಮಾರ್ಗ.string;
+		dirptrs[1] = ಖಾಲಿ;
 
 		// if we have a start dir copy it in
-		if (!vim_isAbsName(stackp->ffs_fix_path.string)
-						&& search_ctx->ffsc_start_dir.string)
+		ಆದರೆ (!vim_isAbsName(stackp->ffs_fix_ಮಾರ್ಗ.string)
+						&& ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.string)
 		{
-		    if (search_ctx->ffsc_start_dir.length + 1 < MAXPATHL)
+		    ಆದರೆ (ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.ಉದ್ದಳತೆ + 1 < MAXPATHL)
 		    {
-			int add_sep = !after_pathsep(search_ctx->ffsc_start_dir.string,
-			    search_ctx->ffsc_start_dir.string + search_ctx->ffsc_start_dir.length);
-			file_path.length = vim_snprintf(
-			    (char *)file_path.string,
+			ಪೂರ್ಣಾಂಕ ಕೂಡಿಸು_sep = !after_pathsep(ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.string,
+			    ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.string + ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.ಉದ್ದಳತೆ);
+			file_ಮಾರ್ಗ.ಉದ್ದಳತೆ = vim_snprintf(
+			    (ಅಕ್ಷರ *)file_ಮಾರ್ಗ.string,
 			    MAXPATHL,
 			    "%s%s",
-			    search_ctx->ffsc_start_dir.string,
-			    add_sep ? PATHSEPSTR : "");
+			    ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.string,
+			    ಕೂಡಿಸು_sep ? PATHSEPSTR : "");
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
-			ff_free_stack_element(stackp);
-			goto fail;
+			ff_free_ರಾಶಿ_element(stackp);
+			ಹೋಗು fail;
 		    }
 		}
 
 		// append the fix part of the search path
-		if (file_path.length + stackp->ffs_fix_path.length + 1 < MAXPATHL)
+		ಆದರೆ (file_ಮಾರ್ಗ.ಉದ್ದಳತೆ + stackp->ffs_fix_ಮಾರ್ಗ.ಉದ್ದಳತೆ + 1 < MAXPATHL)
 		{
-		    int add_sep = !after_pathsep(stackp->ffs_fix_path.string,
-			stackp->ffs_fix_path.string + stackp->ffs_fix_path.length);
-		    file_path.length += vim_snprintf(
-			(char *)file_path.string + file_path.length,
-			MAXPATHL - file_path.length,
+		    ಪೂರ್ಣಾಂಕ ಕೂಡಿಸು_sep = !after_pathsep(stackp->ffs_fix_ಮಾರ್ಗ.string,
+			stackp->ffs_fix_ಮಾರ್ಗ.string + stackp->ffs_fix_ಮಾರ್ಗ.ಉದ್ದಳತೆ);
+		    file_ಮಾರ್ಗ.ಉದ್ದಳತೆ += vim_snprintf(
+			(ಅಕ್ಷರ *)file_ಮಾರ್ಗ.string + file_ಮಾರ್ಗ.ಉದ್ದಳತೆ,
+			MAXPATHL - file_ಮಾರ್ಗ.ಉದ್ದಳತೆ,
 			"%s%s",
-			stackp->ffs_fix_path.string,
-			add_sep ? PATHSEPSTR : "");
+			stackp->ffs_fix_ಮಾರ್ಗ.string,
+			ಕೂಡಿಸು_sep ? PATHSEPSTR : "");
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    ff_free_stack_element(stackp);
-		    goto fail;
+		    ff_free_ರಾಶಿ_element(stackp);
+		    ಹೋಗು fail;
 		}
 
-		rest_of_wildcards.string = stackp->ffs_wc_path.string;
-		rest_of_wildcards.length = stackp->ffs_wc_path.length;
-		if (*rest_of_wildcards.string != NUL)
+		rest_ದ_wildcards.string = stackp->ffs_wc_ಮಾರ್ಗ.string;
+		rest_ದ_wildcards.ಉದ್ದಳತೆ = stackp->ffs_wc_ಮಾರ್ಗ.ಉದ್ದಳತೆ;
+		ಆದರೆ (*rest_ದ_wildcards.string != NUL)
 		{
-		    if (STRNCMP(rest_of_wildcards.string, "**", 2) == 0)
+		    ಆದರೆ (STRNCMP(rest_ದ_wildcards.string, "**", 2) == 0)
 		    {
 			char_u	*p;
 
 			// pointer to the restrict byte
 			// The restrict byte is not a character!
-			p = rest_of_wildcards.string + 2;
+			p = rest_ದ_wildcards.string + 2;
 
-			if (*p > 0)
+			ಆದರೆ (*p > 0)
 			{
 			    (*p)--;
-			    if (file_path.length + 1 < MAXPATHL)
-				file_path.string[file_path.length++] = '*';
-			    else
+			    ಆದರೆ (file_ಮಾರ್ಗ.ಉದ್ದಳತೆ + 1 < MAXPATHL)
+				file_ಮಾರ್ಗ.string[file_ಮಾರ್ಗ.ಉದ್ದಳತೆ++] = '*';
+			    ಇಲ್ಲದಿದ್ದರೆ
 			    {
-				ff_free_stack_element(stackp);
-				goto fail;
+				ff_free_ರಾಶಿ_element(stackp);
+				ಹೋಗು fail;
 			    }
 			}
 
-			if (*p == 0)
+			ಆದರೆ (*p == 0)
 			{
 			    // remove '**<numb> from wildcards
-			    mch_memmove(rest_of_wildcards.string,
-					rest_of_wildcards.string + 3,
-					(size_t)(rest_of_wildcards.length - 3) + 1);    // +1 for NUL
-			    rest_of_wildcards.length -= 3;
-			    stackp->ffs_wc_path.length = rest_of_wildcards.length;
+			    mch_memmove(rest_ದ_wildcards.string,
+					rest_ದ_wildcards.string + 3,
+					(size_t)(rest_ದ_wildcards.ಉದ್ದಳತೆ - 3) + 1);    // +1 for NUL
+			    rest_ದ_wildcards.ಉದ್ದಳತೆ -= 3;
+			    stackp->ffs_wc_ಮಾರ್ಗ.ಉದ್ದಳತೆ = rest_ದ_wildcards.ಉದ್ದಳತೆ;
 			}
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
-			    rest_of_wildcards.string += 3;
-			    rest_of_wildcards.length -= 3;
+			    rest_ದ_wildcards.string += 3;
+			    rest_ದ_wildcards.ಉದ್ದಳತೆ -= 3;
 			}
 
-			if (stackp->ffs_star_star_empty == 0)
+			ಆದರೆ (stackp->ffs_ನಕ್ಷತ್ರ_ನಕ್ಷತ್ರ_ಖಾಲಿಗಳು == 0)
 			{
 			    // if not done before, expand '**' to empty
-			    stackp->ffs_star_star_empty = 1;
-			    dirptrs[1] = stackp->ffs_fix_path.string;
+			    stackp->ffs_ನಕ್ಷತ್ರ_ನಕ್ಷತ್ರ_ಖಾಲಿಗಳು = 1;
+			    dirptrs[1] = stackp->ffs_fix_ಮಾರ್ಗ.string;
 			}
 		    }
 
@@ -967,26 +967,26 @@ vim_findfile(void *search_ctx_arg)
 		     * pushing every directory returned from expand_wildcards()
 		     * on the stack again for further search.
 		     */
-		    while (*rest_of_wildcards.string
-			    && !vim_ispathsep(*rest_of_wildcards.string))
+		    ಆಗ (*rest_ದ_wildcards.string
+			    && !vim_ispathsep(*rest_ದ_wildcards.string))
 		    {
-			if (file_path.length + 1 < MAXPATHL)
+			ಆದರೆ (file_ಮಾರ್ಗ.ಉದ್ದಳತೆ + 1 < MAXPATHL)
 			{
-			    file_path.string[file_path.length++] = *rest_of_wildcards.string++;
-			    --rest_of_wildcards.length;
+			    file_ಮಾರ್ಗ.string[file_ಮಾರ್ಗ.ಉದ್ದಳತೆ++] = *rest_ದ_wildcards.string++;
+			    --rest_ದ_wildcards.ಉದ್ದಳತೆ;
 			}
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
-			    ff_free_stack_element(stackp);
-			    goto fail;
+			    ff_free_ರಾಶಿ_element(stackp);
+			    ಹೋಗು fail;
 			}
 		    }
 
-		    file_path.string[file_path.length] = NUL;
-		    if (vim_ispathsep(*rest_of_wildcards.string))
+		    file_ಮಾರ್ಗ.string[file_ಮಾರ್ಗ.ಉದ್ದಳತೆ] = NUL;
+		    ಆದರೆ (vim_ispathsep(*rest_ದ_wildcards.string))
 		    {
-			rest_of_wildcards.string++;
-			rest_of_wildcards.length--;
+			rest_ದ_wildcards.string++;
+			rest_ದ_wildcards.ಉದ್ದಳತೆ--;
 		    }
 		}
 
@@ -994,41 +994,41 @@ vim_findfile(void *search_ctx_arg)
 		 * Expand wildcards like "*" and "$VAR".
 		 * If the path is a URL don't try this.
 		 */
-		if (path_with_url(dirptrs[0]))
+		ಆದರೆ (ಮಾರ್ಗ_with_url(dirptrs[0]))
 		{
 		    stackp->ffs_filearray = ALLOC_ONE(char_u *);
-		    if (stackp->ffs_filearray != NULL
+		    ಆದರೆ (stackp->ffs_filearray != ಖಾಲಿ
 			    && (stackp->ffs_filearray[0]
-				= vim_strnsave(dirptrs[0], file_path.length)) != NULL)
-			stackp->ffs_filearray_size = 1;
-		    else
-			stackp->ffs_filearray_size = 0;
+				= vim_strnsave(dirptrs[0], file_ಮಾರ್ಗ.ಉದ್ದಳತೆ)) != ಖಾಲಿ)
+			stackp->ffs_filearray_ಗಾತ್ರ = 1;
+		    ಇಲ್ಲದಿದ್ದರೆ
+			stackp->ffs_filearray_ಗಾತ್ರ = 0;
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		    // Add EW_NOTWILD because the expanded path may contain
 		    // wildcard characters that are to be taken literally.
 		    // This is a bit of a hack.
-		    expand_wildcards((dirptrs[1] == NULL) ? 1 : 2, dirptrs,
-			    &stackp->ffs_filearray_size,
+		    expand_wildcards((dirptrs[1] == ಖಾಲಿ) ? 1 : 2, dirptrs,
+			    &stackp->ffs_filearray_ಗಾತ್ರ,
 			    &stackp->ffs_filearray,
 			    EW_DIR|EW_ADDSLASH|EW_SILENT|EW_NOTWILD);
 
 		stackp->ffs_filearray_cur = 0;
 		stackp->ffs_stage = 0;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		rest_of_wildcards.string = &stackp->ffs_wc_path.string[
-							stackp->ffs_wc_path.length];
-		rest_of_wildcards.length = 0;
+		rest_ದ_wildcards.string = &stackp->ffs_wc_ಮಾರ್ಗ.string[
+							stackp->ffs_wc_ಮಾರ್ಗ.ಉದ್ದಳತೆ];
+		rest_ದ_wildcards.ಉದ್ದಳತೆ = 0;
 	    }
 
-	    if (stackp->ffs_stage == 0)
+	    ಆದರೆ (stackp->ffs_stage == 0)
 	    {
-		int i;
+		ಪೂರ್ಣಾಂಕ i;
 
 		// this is the first time we work on this directory
-		if (*rest_of_wildcards.string == NUL)
+		ಆದರೆ (*rest_ದ_wildcards.string == NUL)
 		{
 		    size_t  len;
 		    char_u  *suf;
@@ -1037,146 +1037,146 @@ vim_findfile(void *search_ctx_arg)
 		     * We don't have further wildcards to expand, so we have to
 		     * check for the final file now.
 		     */
-		    for (i = stackp->ffs_filearray_cur;
-					  i < stackp->ffs_filearray_size; ++i)
+		    ಗಾಗಿ (i = stackp->ffs_filearray_cur;
+					  i < stackp->ffs_filearray_ಗಾತ್ರ; ++i)
 		    {
-			if (!path_with_url(stackp->ffs_filearray[i])
+			ಆದರೆ (!ಮಾರ್ಗ_with_url(stackp->ffs_filearray[i])
 				      && !mch_isdir(stackp->ffs_filearray[i]))
-			    continue;   // not a directory
+			    ಮುಂದುವರಿ;   // not a directory
 
 			// prepare the filename to be checked for existence
-			// below
+			//ಕೆಳಗೆ
 			len = STRLEN(stackp->ffs_filearray[i]);
-			if (len + 1 + search_ctx->ffsc_file_to_search.length
+			ಆದರೆ (len + 1 + ಹುಡುಕು_ctx->ffsc_file_ಗಮ್ಯ_ಹುಡುಕು.ಉದ್ದಳತೆ
 									< MAXPATHL)
 			{
-			    int	add_sep = !after_pathsep(stackp->ffs_filearray[i],
+			    ಪೂರ್ಣಾಂಕ	ಕೂಡಿಸು_sep = !after_pathsep(stackp->ffs_filearray[i],
 				    stackp->ffs_filearray[i] + len);
-			    file_path.length = vim_snprintf(
-				    (char *)file_path.string,
+			    file_ಮಾರ್ಗ.ಉದ್ದಳತೆ = vim_snprintf(
+				    (ಅಕ್ಷರ *)file_ಮಾರ್ಗ.string,
 				    MAXPATHL,
 				    "%s%s%s",
 				    stackp->ffs_filearray[i],
-				    add_sep ? PATHSEPSTR : "",
-				    search_ctx->ffsc_file_to_search.string);
+				    ಕೂಡಿಸು_sep ? PATHSEPSTR : "",
+				    ಹುಡುಕು_ctx->ffsc_file_ಗಮ್ಯ_ಹುಡುಕು.string);
 			}
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
-			    ff_free_stack_element(stackp);
-			    goto fail;
+			    ff_free_ರಾಶಿ_element(stackp);
+			    ಹೋಗು fail;
 			}
 
 			/*
 			 * Try without extra suffix and then with suffixes
 			 * from 'suffixesadd'.
 			 */
-			len = file_path.length;
-			if (search_ctx->ffsc_tagfile)
+			len = file_ಮಾರ್ಗ.ಉದ್ದಳತೆ;
+			ಆದರೆ (ಹುಡುಕು_ctx->ffsc_tagfile)
 			    suf = (char_u *)"";
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			    suf = curbuf->b_p_sua;
-			for (;;)
+			ಗಾಗಿ (;;)
 			{
 			    // if file exists and we didn't already find it
-			    if ((path_with_url(file_path.string)
-				  || (mch_getperm(file_path.string) >= 0
-				      && (search_ctx->ffsc_find_what
+			    ಆದರೆ ((ಮಾರ್ಗ_with_url(file_ಮಾರ್ಗ.string)
+				  || (mch_getperm(file_ಮಾರ್ಗ.string) >= 0
+				      && (ಹುಡುಕು_ctx->ffsc_ಕಂಡುಹಿಡಿ_what
 							      == FINDFILE_BOTH
-					  || ((search_ctx->ffsc_find_what
+					  || ((ಹುಡುಕು_ctx->ffsc_ಕಂಡುಹಿಡಿ_what
 							      == FINDFILE_DIR)
-						   == mch_isdir(file_path.string)))))
-#ifndef FF_VERBOSE
-				    && (ff_check_visited(
-					    &search_ctx->ffsc_visited_list
-							   ->ffvl_visited_list,
-					    file_path.string,
-					    file_path.length,
+						   == mch_isdir(file_ಮಾರ್ಗ.string)))))
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FF_VERBOSE
+				    && (ff_check_ಭೇಟಿಯಾದ(
+					    &ಹುಡುಕು_ctx->ffsc_ಭೇಟಿಯಾದ_list
+							   ->ffvl_ಭೇಟಿಯಾದ_list,
+					    file_ಮಾರ್ಗ.string,
+					    file_ಮಾರ್ಗ.ಉದ್ದಳತೆ,
 					    (char_u *)"", 0) == OK)
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 			       )
 			    {
-#ifdef FF_VERBOSE
-				if (ff_check_visited(
-					    &search_ctx->ffsc_visited_list
-							   ->ffvl_visited_list,
-					      file_path.string,
-					      file_path.length,
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FF_VERBOSE
+				ಆದರೆ (ff_check_ಭೇಟಿಯಾದ(
+					    &ಹುಡುಕು_ctx->ffsc_ಭೇಟಿಯಾದ_list
+							   ->ffvl_ಭೇಟಿಯಾದ_list,
+					      file_ಮಾರ್ಗ.string,
+					      file_ಮಾರ್ಗ.ಉದ್ದಳತೆ,
 					      (char_u *)"", 0) == FAIL)
 				{
-				    if (p_verbose >= 5)
+				    ಆದರೆ (p_verbose >= 5)
 				    {
 					verbose_enter_scroll();
-					smsg("Already: %s", file_path.string);
+					smsg("Already: %s", file_ಮಾರ್ಗ.string);
 					// don't overwrite this either
-					msg_puts("\n");
+					ಸಂದೇಶ_puts("\n");
 					verbose_leave_scroll();
 				    }
-				    continue;
+				    ಮುಂದುವರಿ;
 				}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 				// push dir to examine rest of subdirs later
 				stackp->ffs_filearray_cur = i + 1;
-				ff_push(search_ctx, stackp);
+				ff_ತಳ್ಳು(ಹುಡುಕು_ctx, stackp);
 
-				if (!path_with_url(file_path.string))
-				    file_path.length = simplify_filename(file_path.string);
+				ಆದರೆ (!ಮಾರ್ಗ_with_url(file_ಮಾರ್ಗ.string))
+				    file_ಮಾರ್ಗ.ಉದ್ದಳತೆ = simplify_filename(file_ಮಾರ್ಗ.string);
 
-				if (mch_dirname(ff_expand_buffer.string, MAXPATHL)
+				ಆದರೆ (mch_dirname(ff_expand_ಬಫರ್.string, MAXPATHL)
 									== OK)
 				{
 				    char_u  *p;
 
-				    ff_expand_buffer.length = STRLEN(ff_expand_buffer.string);
-				    p = shorten_fname(file_path.string,
-							    ff_expand_buffer.string);
-				    if (p != NULL)
+				    ff_expand_ಬಫರ್.ಉದ್ದಳತೆ = STRLEN(ff_expand_ಬಫರ್.string);
+				    p = shorten_fname(file_ಮಾರ್ಗ.string,
+							    ff_expand_ಬಫರ್.string);
+				    ಆದರೆ (p != ಖಾಲಿ)
 				    {
-					mch_memmove(file_path.string, p,
-					    (size_t)((file_path.string + file_path.length) - p) + 1);  // +1 for NUL
-					file_path.length -= (p - file_path.string);
+					mch_memmove(file_ಮಾರ್ಗ.string, p,
+					    (size_t)((file_ಮಾರ್ಗ.string + file_ಮಾರ್ಗ.ಉದ್ದಳತೆ) - p) + 1);  // +1 for NUL
+					file_ಮಾರ್ಗ.ಉದ್ದಳತೆ -= (p - file_ಮಾರ್ಗ.string);
 				    }
 				}
-#ifdef FF_VERBOSE
-				if (p_verbose >= 5)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FF_VERBOSE
+				ಆದರೆ (p_verbose >= 5)
 				{
 				    verbose_enter_scroll();
-				    smsg("HIT: %s", file_path.string);
+				    smsg("HIT: %s", file_ಮಾರ್ಗ.string);
 				    // don't overwrite this either
-				    msg_puts("\n");
+				    ಸಂದೇಶ_puts("\n");
 				    verbose_leave_scroll();
 				}
-#endif
-				return file_path.string;
+#ಆದರೆ_ಅಂತ್ಯ
+				ಹಿಂತಿರುಗಿ file_ಮಾರ್ಗ.string;
 			    }
 
 			    // Not found or found already, try next suffix.
-			    if (*suf == NUL)
-				break;
-			    file_path.length = len + copy_option_part(&suf,
-				  file_path.string + len,
-				  (int)(MAXPATHL - len), ",");
+			    ಆದರೆ (*suf == NUL)
+				ನಿಲ್ಲಿಸು;
+			    file_ಮಾರ್ಗ.ಉದ್ದಳತೆ = len + copy_option_part(&suf,
+				  file_ಮಾರ್ಗ.string + len,
+				  (ಪೂರ್ಣಾಂಕ)(MAXPATHL - len), ",");
 			}
 		    }
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    /*
 		     * still wildcards left, push the directories for further
 		     * search
 		     */
-		    for (i = stackp->ffs_filearray_cur;
-					  i < stackp->ffs_filearray_size; ++i)
+		    ಗಾಗಿ (i = stackp->ffs_filearray_cur;
+					  i < stackp->ffs_filearray_ಗಾತ್ರ; ++i)
 		    {
-			if (!mch_isdir(stackp->ffs_filearray[i]))
-			    continue;	// not a directory
+			ಆದರೆ (!mch_isdir(stackp->ffs_filearray[i]))
+			    ಮುಂದುವರಿ;	// not a directory
 
-			ff_push(search_ctx,
-				ff_create_stack_element(
+			ff_ತಳ್ಳು(ಹುಡುಕು_ctx,
+				ff_create_ರಾಶಿ_element(
 						     stackp->ffs_filearray[i],
 						     STRLEN(stackp->ffs_filearray[i]),
-						     rest_of_wildcards.string,
-						     rest_of_wildcards.length,
+						     rest_ದ_wildcards.string,
+						     rest_ದ_wildcards.ಉದ್ದಳತೆ,
 						     stackp->ffs_level - 1, 0));
 		    }
 		}
@@ -1188,211 +1188,211 @@ vim_findfile(void *search_ctx_arg)
 	     * if wildcards contains '**' we have to descent till we reach the
 	     * leaves of the directory tree.
 	     */
-	    if (STRNCMP(stackp->ffs_wc_path.string, "**", 2) == 0)
+	    ಆದರೆ (STRNCMP(stackp->ffs_wc_ಮಾರ್ಗ.string, "**", 2) == 0)
 	    {
-		int i;
+		ಪೂರ್ಣಾಂಕ i;
 
-		for (i = stackp->ffs_filearray_cur;
-					  i < stackp->ffs_filearray_size; ++i)
+		ಗಾಗಿ (i = stackp->ffs_filearray_cur;
+					  i < stackp->ffs_filearray_ಗಾತ್ರ; ++i)
 		{
-		    if (fnamecmp(stackp->ffs_filearray[i],
-						   stackp->ffs_fix_path.string) == 0)
-			continue; // don't repush same directory
-		    if (!mch_isdir(stackp->ffs_filearray[i]))
-			continue;   // not a directory
-		    ff_push(search_ctx,
-			    ff_create_stack_element(
+		    ಆದರೆ (fnamecmp(stackp->ffs_filearray[i],
+						   stackp->ffs_fix_ಮಾರ್ಗ.string) == 0)
+			ಮುಂದುವರಿ; // don't repush same directory
+		    ಆದರೆ (!mch_isdir(stackp->ffs_filearray[i]))
+			ಮುಂದುವರಿ;   // not a directory
+		    ff_ತಳ್ಳು(ಹುಡುಕು_ctx,
+			    ff_create_ರಾಶಿ_element(
 				stackp->ffs_filearray[i],
 				STRLEN(stackp->ffs_filearray[i]),
-				stackp->ffs_wc_path.string,
-				stackp->ffs_wc_path.length,
+				stackp->ffs_wc_ಮಾರ್ಗ.string,
+				stackp->ffs_wc_ಮಾರ್ಗ.ಉದ್ದಳತೆ,
 				stackp->ffs_level - 1, 1));
 		}
 	    }
 
 	    // we are done with the current directory
-	    ff_free_stack_element(stackp);
+	    ff_free_ರಾಶಿ_element(stackp);
 	}
 
 	// If we reached this, we didn't find anything downwards.
 	// Let's check if we should do an upward search.
-	if (search_ctx->ffsc_start_dir.string
-		&& search_ctx->ffsc_stopdirs_v != NULL && !got_int)
+	ಆದರೆ (ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.string
+		&& ಹುಡುಕು_ctx->ffsc_stopdirs_v != ಖಾಲಿ && !got_int)
 	{
-	    ff_stack_T  *sptr;
+	    ff_ರಾಶಿ_T  *sptr;
 	    // path_end may point to the NUL or the previous path separator
-	    int plen = (path_end - search_ctx->ffsc_start_dir.string)
-							  + (*path_end != NUL);
+	    ಪೂರ್ಣಾಂಕ plen = (ಮಾರ್ಗ_ಕೊನೆ - ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.string)
+							  + (*ಮಾರ್ಗ_ಕೊನೆ != NUL);
 
 	    // is the last starting directory in the stop list?
-	    if (ff_path_in_stoplist(search_ctx->ffsc_start_dir.string,
-				    plen, search_ctx->ffsc_stopdirs_v) == TRUE)
-		break;
+	    ಆದರೆ (ff_ಮಾರ್ಗ_ಒಳ_stoplist(ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.string,
+				    plen, ಹುಡುಕು_ctx->ffsc_stopdirs_v) == TRUE)
+		ನಿಲ್ಲಿಸು;
 
 	    // cut of last dir
-	    while (path_end > search_ctx->ffsc_start_dir.string
-						  && vim_ispathsep(*path_end))
-		path_end--;
-	    while (path_end > search_ctx->ffsc_start_dir.string
-					      && !vim_ispathsep(path_end[-1]))
-		path_end--;
-	    *path_end = NUL;
+	    ಆಗ (ಮಾರ್ಗ_ಕೊನೆ > ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.string
+						  && vim_ispathsep(*ಮಾರ್ಗ_ಕೊನೆ))
+		ಮಾರ್ಗ_ಕೊನೆ--;
+	    ಆಗ (ಮಾರ್ಗ_ಕೊನೆ > ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.string
+					      && !vim_ispathsep(ಮಾರ್ಗ_ಕೊನೆ[-1]))
+		ಮಾರ್ಗ_ಕೊನೆ--;
+	    *ಮಾರ್ಗ_ಕೊನೆ = NUL;
 
 	    // we may have shortened search_ctx->ffsc_start_dir, so update it's length
-	    search_ctx->ffsc_start_dir.length = (size_t)(path_end - search_ctx->ffsc_start_dir.string);
-	    path_end--;
+	    ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.ಉದ್ದಳತೆ = (size_t)(ಮಾರ್ಗ_ಕೊನೆ - ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.string);
+	    ಮಾರ್ಗ_ಕೊನೆ--;
 
-	    if (*search_ctx->ffsc_start_dir.string == NUL)
-		break;
+	    ಆದರೆ (*ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.string == NUL)
+		ನಿಲ್ಲಿಸು;
 
-	    if (search_ctx->ffsc_start_dir.length + 1
-		    + search_ctx->ffsc_fix_path.length < MAXPATHL)
+	    ಆದರೆ (ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.ಉದ್ದಳತೆ + 1
+		    + ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.ಉದ್ದಳತೆ < MAXPATHL)
 	    {
-		int add_sep = !after_pathsep(search_ctx->ffsc_start_dir.string,
-			    search_ctx->ffsc_start_dir.string + search_ctx->ffsc_start_dir.length);
-		file_path.length = vim_snprintf(
-			(char *)file_path.string,
+		ಪೂರ್ಣಾಂಕ ಕೂಡಿಸು_sep = !after_pathsep(ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.string,
+			    ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.string + ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.ಉದ್ದಳತೆ);
+		file_ಮಾರ್ಗ.ಉದ್ದಳತೆ = vim_snprintf(
+			(ಅಕ್ಷರ *)file_ಮಾರ್ಗ.string,
 			MAXPATHL,
 			"%s%s%s",
-			search_ctx->ffsc_start_dir.string,
-			add_sep ? PATHSEPSTR : "",
-			search_ctx->ffsc_fix_path.string);
+			ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir.string,
+			ಕೂಡಿಸು_sep ? PATHSEPSTR : "",
+			ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ.string);
 	    }
-	    else
-		goto fail;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ಹೋಗು fail;
 
 	    // create a new stack entry
-	    sptr = ff_create_stack_element(file_path.string, file_path.length,
-		    search_ctx->ffsc_wc_path.string, search_ctx->ffsc_wc_path.length,
-		    search_ctx->ffsc_level, 0);
-	    if (sptr == NULL)
-		break;
-	    ff_push(search_ctx, sptr);
+	    sptr = ff_create_ರಾಶಿ_element(file_ಮಾರ್ಗ.string, file_ಮಾರ್ಗ.ಉದ್ದಳತೆ,
+		    ಹುಡುಕು_ctx->ffsc_wc_ಮಾರ್ಗ.string, ಹುಡುಕು_ctx->ffsc_wc_ಮಾರ್ಗ.ಉದ್ದಳತೆ,
+		    ಹುಡುಕು_ctx->ffsc_level, 0);
+	    ಆದರೆ (sptr == ಖಾಲಿ)
+		ನಿಲ್ಲಿಸು;
+	    ff_ತಳ್ಳು(ಹುಡುಕು_ctx, sptr);
 	}
-	else
-	    break;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ನಿಲ್ಲಿಸು;
     }
 
 fail:
-    vim_free(file_path.string);
-    return NULL;
+    vim_free(file_ಮಾರ್ಗ.string);
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Free the list of lists of visited files and directories
  * Can handle it if the passed search_context is NULL;
  */
-    static void
-vim_findfile_free_visited(void *search_ctx_arg)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+vim_findfile_free_ಭೇಟಿಯಾದ(ಶೂನ್ಯ *ಹುಡುಕು_ctx_arg)
 {
-    ff_search_ctx_T *search_ctx;
+    ff_ಹುಡುಕು_ctx_T *ಹುಡುಕು_ctx;
 
-    if (search_ctx_arg == NULL)
-	return;
+    ಆದರೆ (ಹುಡುಕು_ctx_arg == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    search_ctx = (ff_search_ctx_T *)search_ctx_arg;
-    vim_findfile_free_visited_list(&search_ctx->ffsc_visited_lists_list);
-    vim_findfile_free_visited_list(&search_ctx->ffsc_dir_visited_lists_list);
+    ಹುಡುಕು_ctx = (ff_ಹುಡುಕು_ctx_T *)ಹುಡುಕು_ctx_arg;
+    vim_findfile_free_ಭೇಟಿಯಾದ_list(&ಹುಡುಕು_ctx->ffsc_ಭೇಟಿಯಾದ_lists_list);
+    vim_findfile_free_ಭೇಟಿಯಾದ_list(&ಹುಡುಕು_ctx->ffsc_dir_ಭೇಟಿಯಾದ_lists_list);
 }
 
-    static void
-vim_findfile_free_visited_list(ff_visited_list_hdr_T **list_headp)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+vim_findfile_free_ಭೇಟಿಯಾದ_list(ff_ಭೇಟಿಯಾದ_list_hdr_T **list_headp)
 {
-    ff_visited_list_hdr_T *vp;
+    ff_ಭೇಟಿಯಾದ_list_hdr_T *vp;
 
-    while (*list_headp != NULL)
+    ಆಗ (*list_headp != ಖಾಲಿ)
     {
-	vp = (*list_headp)->ffvl_next;
-	ff_free_visited_list((*list_headp)->ffvl_visited_list);
+	vp = (*list_headp)->ffvl_ಮುಂದಿನ;
+	ff_free_ಭೇಟಿಯಾದ_list((*list_headp)->ffvl_ಭೇಟಿಯಾದ_list);
 
 	vim_free((*list_headp)->ffvl_filename);
 	vim_free(*list_headp);
 	*list_headp = vp;
     }
-    *list_headp = NULL;
+    *list_headp = ಖಾಲಿ;
 }
 
-    static void
-ff_free_visited_list(ff_visited_T *vl)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ff_free_ಭೇಟಿಯಾದ_list(ff_ಭೇಟಿಯಾದ_T *vl)
 {
-    ff_visited_T *vp;
+    ff_ಭೇಟಿಯಾದ_T *vp;
 
-    while (vl != NULL)
+    ಆಗ (vl != ಖಾಲಿ)
     {
-	vp = vl->ffv_next;
-	vim_free(vl->ffv_wc_path);
+	vp = vl->ffv_ಮುಂದಿನ;
+	vim_free(vl->ffv_wc_ಮಾರ್ಗ);
 	vim_free(vl);
 	vl = vp;
     }
-    vl = NULL;
+    vl = ಖಾಲಿ;
 }
 
 /*
  * Returns the already visited list for the given filename. If none is found it
  * allocates a new one.
  */
-    static ff_visited_list_hdr_T*
-ff_get_visited_list(
+    ಸ್ಥಿರ ff_ಭೇಟಿಯಾದ_list_hdr_T*
+ff_get_ಭೇಟಿಯಾದ_list(
     char_u			*filename,
     size_t			filenamelen,
-    ff_visited_list_hdr_T	**list_headp)
+    ff_ಭೇಟಿಯಾದ_list_hdr_T	**list_headp)
 {
-    ff_visited_list_hdr_T  *retptr = NULL;
+    ff_ಭೇಟಿಯಾದ_list_hdr_T  *retptr = ಖಾಲಿ;
 
     // check if a visited list for the given filename exists
-    if (*list_headp != NULL)
+    ಆದರೆ (*list_headp != ಖಾಲಿ)
     {
 	retptr = *list_headp;
-	while (retptr != NULL)
+	ಆಗ (retptr != ಖಾಲಿ)
 	{
-	    if (fnamecmp(filename, retptr->ffvl_filename) == 0)
+	    ಆದರೆ (fnamecmp(filename, retptr->ffvl_filename) == 0)
 	    {
-#ifdef FF_VERBOSE
-		if (p_verbose >= 5)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FF_VERBOSE
+		ಆದರೆ (p_verbose >= 5)
 		{
 		    verbose_enter_scroll();
 		    smsg("ff_get_visited_list: FOUND list for %s",
 								    filename);
 		    // don't overwrite this either
-		    msg_puts("\n");
+		    ಸಂದೇಶ_puts("\n");
 		    verbose_leave_scroll();
 		}
-#endif
-		return retptr;
+#ಆದರೆ_ಅಂತ್ಯ
+		ಹಿಂತಿರುಗಿ retptr;
 	    }
-	    retptr = retptr->ffvl_next;
+	    retptr = retptr->ffvl_ಮುಂದಿನ;
 	}
     }
 
-#ifdef FF_VERBOSE
-    if (p_verbose >= 5)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FF_VERBOSE
+    ಆದರೆ (p_verbose >= 5)
     {
 	verbose_enter_scroll();
 	smsg("ff_get_visited_list: new list for %s", filename);
 	// don't overwrite this either
-	msg_puts("\n");
+	ಸಂದೇಶ_puts("\n");
 	verbose_leave_scroll();
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     /*
      * if we reach this we didn't find a list and we have to allocate new list
      */
-    retptr = ALLOC_ONE(ff_visited_list_hdr_T);
-    if (retptr == NULL)
-	return NULL;
+    retptr = ALLOC_ONE(ff_ಭೇಟಿಯಾದ_list_hdr_T);
+    ಆದರೆ (retptr == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    retptr->ffvl_visited_list = NULL;
+    retptr->ffvl_ಭೇಟಿಯಾದ_list = ಖಾಲಿ;
     retptr->ffvl_filename = vim_strnsave(filename, filenamelen);
-    if (retptr->ffvl_filename == NULL)
+    ಆದರೆ (retptr->ffvl_filename == ಖಾಲಿ)
     {
 	vim_free(retptr);
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
-    retptr->ffvl_next = *list_headp;
+    retptr->ffvl_ಮುಂದಿನ = *list_headp;
     *list_headp = retptr;
 
-    return retptr;
+    ಹಿಂತಿರುಗಿ retptr;
 }
 
 /*
@@ -1404,36 +1404,36 @@ ff_get_visited_list(
  *  - the only differences are in the counters behind a '**', so
  *    '**\20' is equal to '**\24'
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 ff_wc_equal(char_u *s1, char_u *s2)
 {
-    int		i, j;
-    int		c1 = NUL;
-    int		c2 = NUL;
-    int		prev1 = NUL;
-    int		prev2 = NUL;
+    ಪೂರ್ಣಾಂಕ		i, j;
+    ಪೂರ್ಣಾಂಕ		c1 = NUL;
+    ಪೂರ್ಣಾಂಕ		c2 = NUL;
+    ಪೂರ್ಣಾಂಕ		prev1 = NUL;
+    ಪೂರ್ಣಾಂಕ		prev2 = NUL;
 
-    if (s1 == s2)
-	return TRUE;
+    ಆದರೆ (s1 == s2)
+	ಹಿಂತಿರುಗಿ TRUE;
 
-    if (s1 == NULL || s2 == NULL)
-	return FALSE;
+    ಆದರೆ (s1 == ಖಾಲಿ || s2 == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    for (i = 0, j = 0; s1[i] != NUL && s2[j] != NUL;)
+    ಗಾಗಿ (i = 0, j = 0; s1[i] != NUL && s2[j] != NUL;)
     {
 	c1 = PTR2CHAR(s1 + i);
 	c2 = PTR2CHAR(s2 + j);
 
-	if ((p_fic ? MB_TOLOWER(c1) != MB_TOLOWER(c2) : c1 != c2)
+	ಆದರೆ ((p_fic ? MB_TOLOWER(c1) != MB_TOLOWER(c2) : c1 != c2)
 		&& (prev1 != '*' || prev2 != '*'))
-	    return FALSE;
+	    ಹಿಂತಿರುಗಿ FALSE;
 	prev2 = prev1;
 	prev1 = c1;
 
 	i += mb_ptr2len(s1 + i);
 	j += mb_ptr2len(s2 + j);
     }
-    return s1[i] == s2[j];
+    ಹಿಂತಿರುಗಿ s1[i] == s2[j];
 }
 
 /*
@@ -1445,60 +1445,60 @@ ff_wc_equal(char_u *s1, char_u *s2)
  *	 -> return TRUE - Better the file is found several times instead of
  *	    never.
  */
-    static int
-ff_check_visited(
-    ff_visited_T	**visited_list,
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ff_check_ಭೇಟಿಯಾದ(
+    ff_ಭೇಟಿಯಾದ_T	**ಭೇಟಿಯಾದ_list,
     char_u		*fname,
     size_t		fnamelen,
-    char_u		*wc_path,
+    char_u		*wc_ಮಾರ್ಗ,
     size_t		wc_pathlen)
 {
-    ff_visited_T	*vp;
-#ifdef UNIX
+    ff_ಭೇಟಿಯಾದ_T	*vp;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
     stat_T		st;
-    int			url = FALSE;
-#endif
+    ಪೂರ್ಣಾಂಕ			url = FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
 
     // For a URL we only compare the name, otherwise we compare the
     // device/inode (unix) or the full path name (not Unix).
-    if (path_with_url(fname))
+    ಆದರೆ (ಮಾರ್ಗ_with_url(fname))
     {
-	vim_strncpy(ff_expand_buffer.string, fname, fnamelen);
-	ff_expand_buffer.length = fnamelen;
-#ifdef UNIX
+	vim_strncpy(ff_expand_ಬಫರ್.string, fname, fnamelen);
+	ff_expand_ಬಫರ್.ಉದ್ದಳತೆ = fnamelen;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
 	url = TRUE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	ff_expand_buffer.string[0] = NUL;
-	ff_expand_buffer.length = 0;
-#ifdef UNIX
-	if (mch_stat((char *)fname, &st) < 0)
-	    return FAIL;
-#else
-	if (vim_FullName(fname, ff_expand_buffer.string, MAXPATHL, TRUE) == FAIL)
-	    return FAIL;
-	ff_expand_buffer.length = STRLEN(ff_expand_buffer.string);
-#endif
+	ff_expand_ಬಫರ್.string[0] = NUL;
+	ff_expand_ಬಫರ್.ಉದ್ದಳತೆ = 0;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
+	ಆದರೆ (mch_stat((ಅಕ್ಷರ *)fname, &st) < 0)
+	    ಹಿಂತಿರುಗಿ FAIL;
+#ಇಲ್ಲದಿದ್ದರೆ
+	ಆದರೆ (vim_ತುಂಬಿದ_Name(fname, ff_expand_ಬಫರ್.string, MAXPATHL, TRUE) == FAIL)
+	    ಹಿಂತಿರುಗಿ FAIL;
+	ff_expand_ಬಫರ್.ಉದ್ದಳತೆ = STRLEN(ff_expand_ಬಫರ್.string);
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
     // check against list of already visited files
-    for (vp = *visited_list; vp != NULL; vp = vp->ffv_next)
+    ಗಾಗಿ (vp = *ಭೇಟಿಯಾದ_list; vp != ಖಾಲಿ; vp = vp->ffv_ಮುಂದಿನ)
     {
-	if (
-#ifdef UNIX
+	ಆದರೆ (
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
 		!url ? (vp->ffv_dev_valid && vp->ffv_dev == st.st_dev
 						  && vp->ffv_ino == st.st_ino)
 		     :
-#endif
-		fnamecmp(vp->ffv_fname, ff_expand_buffer.string) == 0
+#ಆದರೆ_ಅಂತ್ಯ
+		fnamecmp(vp->ffv_fname, ff_expand_ಬಫರ್.string) == 0
 	   )
 	{
 	    // are the wildcard parts equal
-	    if (ff_wc_equal(vp->ffv_wc_path, wc_path) == TRUE)
+	    ಆದರೆ (ff_wc_equal(vp->ffv_wc_ಮಾರ್ಗ, wc_ಮಾರ್ಗ) == TRUE)
 		// already visited
-		return FAIL;
+		ಹಿಂತಿರುಗಿ FAIL;
 	}
     }
 
@@ -1506,195 +1506,195 @@ ff_check_visited(
      * New file/dir.  Add it to the list of visited files/dirs.
      */
     vp = alloc(
-	     offsetof(ff_visited_T, ffv_fname) + ff_expand_buffer.length + 1);
-    if (vp == NULL)
-	return OK;
+	     offsetof(ff_ಭೇಟಿಯಾದ_T, ffv_fname) + ff_expand_ಬಫರ್.ಉದ್ದಳತೆ + 1);
+    ಆದರೆ (vp == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ OK;
 
-#ifdef UNIX
-    if (!url)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
+    ಆದರೆ (!url)
     {
 	vp->ffv_dev_valid = TRUE;
 	vp->ffv_dev = st.st_dev;
 	vp->ffv_ino = st.st_ino;
 	vp->ffv_fname[0] = NUL;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	vp->ffv_dev_valid = FALSE;
-#endif
-	STRCPY(vp->ffv_fname, ff_expand_buffer.string);
-#ifdef UNIX
+#ಆದರೆ_ಅಂತ್ಯ
+	STRCPY(vp->ffv_fname, ff_expand_ಬಫರ್.string);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
     }
-#endif
-    if (wc_path != NULL)
-	vp->ffv_wc_path = vim_strnsave(wc_path, wc_pathlen);
-    else
-	vp->ffv_wc_path = NULL;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (wc_ಮಾರ್ಗ != ಖಾಲಿ)
+	vp->ffv_wc_ಮಾರ್ಗ = vim_strnsave(wc_ಮಾರ್ಗ, wc_pathlen);
+    ಇಲ್ಲದಿದ್ದರೆ
+	vp->ffv_wc_ಮಾರ್ಗ = ಖಾಲಿ;
 
-    vp->ffv_next = *visited_list;
-    *visited_list = vp;
+    vp->ffv_ಮುಂದಿನ = *ಭೇಟಿಯಾದ_list;
+    *ಭೇಟಿಯಾದ_list = vp;
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * create stack element from given path pieces
  */
-    static ff_stack_T *
-ff_create_stack_element(
+    ಸ್ಥಿರ ff_ರಾಶಿ_T *
+ff_create_ರಾಶಿ_element(
     char_u	*fix_part,
     size_t	fix_partlen,
     char_u	*wc_part,
     size_t	wc_partlen,
-    int		level,
-    int		star_star_empty)
+    ಪೂರ್ಣಾಂಕ		level,
+    ಪೂರ್ಣಾಂಕ		ನಕ್ಷತ್ರ_ನಕ್ಷತ್ರ_ಖಾಲಿಗಳು)
 {
-    ff_stack_T	*new;
+    ff_ರಾಶಿ_T	*new;
 
-    new = ALLOC_ONE(ff_stack_T);
-    if (new == NULL)
-	return NULL;
+    new = ALLOC_ONE(ff_ರಾಶಿ_T);
+    ಆದರೆ (new == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    new->ffs_prev	   = NULL;
-    new->ffs_filearray	   = NULL;
-    new->ffs_filearray_size = 0;
+    new->ffs_prev	   = ಖಾಲಿ;
+    new->ffs_filearray	   = ಖಾಲಿ;
+    new->ffs_filearray_ಗಾತ್ರ = 0;
     new->ffs_filearray_cur  = 0;
     new->ffs_stage	   = 0;
     new->ffs_level	   = level;
-    new->ffs_star_star_empty = star_star_empty;
+    new->ffs_ನಕ್ಷತ್ರ_ನಕ್ಷತ್ರ_ಖಾಲಿಗಳು = ನಕ್ಷತ್ರ_ನಕ್ಷತ್ರ_ಖಾಲಿಗಳು;
 
     // the following saves NULL pointer checks in vim_findfile
-    if (fix_part == NULL)
+    ಆದರೆ (fix_part == ಖಾಲಿ)
     {
 	fix_part = (char_u *)"";
 	fix_partlen = 0;
     }
-    new->ffs_fix_path.string = vim_strnsave(fix_part, fix_partlen);
-    new->ffs_fix_path.length = fix_partlen;
+    new->ffs_fix_ಮಾರ್ಗ.string = vim_strnsave(fix_part, fix_partlen);
+    new->ffs_fix_ಮಾರ್ಗ.ಉದ್ದಳತೆ = fix_partlen;
 
-    if (wc_part == NULL)
+    ಆದರೆ (wc_part == ಖಾಲಿ)
     {
 	wc_part = (char_u *)"";
 	wc_partlen = 0;
     }
-    new->ffs_wc_path.string = vim_strnsave(wc_part, wc_partlen);
-    new->ffs_wc_path.length = wc_partlen;
+    new->ffs_wc_ಮಾರ್ಗ.string = vim_strnsave(wc_part, wc_partlen);
+    new->ffs_wc_ಮಾರ್ಗ.ಉದ್ದಳತೆ = wc_partlen;
 
-    if (new->ffs_fix_path.string == NULL || new->ffs_wc_path.string == NULL)
+    ಆದರೆ (new->ffs_fix_ಮಾರ್ಗ.string == ಖಾಲಿ || new->ffs_wc_ಮಾರ್ಗ.string == ಖಾಲಿ)
     {
-	ff_free_stack_element(new);
-	new = NULL;
+	ff_free_ರಾಶಿ_element(new);
+	new = ಖಾಲಿ;
     }
 
-    return new;
+    ಹಿಂತಿರುಗಿ new;
 }
 
 /*
  * Push a dir on the directory stack.
  */
-    static void
-ff_push(ff_search_ctx_T *search_ctx, ff_stack_T *stack_ptr)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ff_ತಳ್ಳು(ff_ಹುಡುಕು_ctx_T *ಹುಡುಕು_ctx, ff_ರಾಶಿ_T *ರಾಶಿ_ptr)
 {
     // check for NULL pointer, not to return an error to the user, but
     // to prevent a crash
-    if (stack_ptr == NULL)
-	return;
+    ಆದರೆ (ರಾಶಿ_ptr == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    stack_ptr->ffs_prev = search_ctx->ffsc_stack_ptr;
-    search_ctx->ffsc_stack_ptr = stack_ptr;
+    ರಾಶಿ_ptr->ffs_prev = ಹುಡುಕು_ctx->ffsc_ರಾಶಿ_ptr;
+    ಹುಡುಕು_ctx->ffsc_ರಾಶಿ_ptr = ರಾಶಿ_ptr;
 }
 
 /*
  * Pop a dir from the directory stack.
  * Returns NULL if stack is empty.
  */
-    static ff_stack_T *
-ff_pop(ff_search_ctx_T *search_ctx)
+    ಸ್ಥಿರ ff_ರಾಶಿ_T *
+ff_ತೆಗೆ(ff_ಹುಡುಕು_ctx_T *ಹುಡುಕು_ctx)
 {
-    ff_stack_T  *sptr;
+    ff_ರಾಶಿ_T  *sptr;
 
-    sptr = search_ctx->ffsc_stack_ptr;
-    if (search_ctx->ffsc_stack_ptr != NULL)
-	search_ctx->ffsc_stack_ptr = search_ctx->ffsc_stack_ptr->ffs_prev;
+    sptr = ಹುಡುಕು_ctx->ffsc_ರಾಶಿ_ptr;
+    ಆದರೆ (ಹುಡುಕು_ctx->ffsc_ರಾಶಿ_ptr != ಖಾಲಿ)
+	ಹುಡುಕು_ctx->ffsc_ರಾಶಿ_ptr = ಹುಡುಕು_ctx->ffsc_ರಾಶಿ_ptr->ffs_prev;
 
-    return sptr;
+    ಹಿಂತಿರುಗಿ sptr;
 }
 
 /*
  * free the given stack element
  */
-    static void
-ff_free_stack_element(ff_stack_T *stack_ptr)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ff_free_ರಾಶಿ_element(ff_ರಾಶಿ_T *ರಾಶಿ_ptr)
 {
     // VIM_CLEAR_STRING handles possible NULL pointers
-    VIM_CLEAR_STRING(stack_ptr->ffs_fix_path);
-    VIM_CLEAR_STRING(stack_ptr->ffs_wc_path);
+    VIM_CLEAR_STRING(ರಾಶಿ_ptr->ffs_fix_ಮಾರ್ಗ);
+    VIM_CLEAR_STRING(ರಾಶಿ_ptr->ffs_wc_ಮಾರ್ಗ);
 
-    if (stack_ptr->ffs_filearray != NULL)
-	FreeWild(stack_ptr->ffs_filearray_size, stack_ptr->ffs_filearray);
+    ಆದರೆ (ರಾಶಿ_ptr->ffs_filearray != ಖಾಲಿ)
+	FreeWild(ರಾಶಿ_ptr->ffs_filearray_ಗಾತ್ರ, ರಾಶಿ_ptr->ffs_filearray);
 
-    vim_free(stack_ptr);
+    vim_free(ರಾಶಿ_ptr);
 }
 
 /*
  * Clear the search context, but NOT the visited list.
  */
-    static void
-ff_clear(ff_search_ctx_T *search_ctx)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ff_clear(ff_ಹುಡುಕು_ctx_T *ಹುಡುಕು_ctx)
 {
-    ff_stack_T   *sptr;
+    ff_ರಾಶಿ_T   *sptr;
 
     // clear up stack
-    while ((sptr = ff_pop(search_ctx)) != NULL)
-	ff_free_stack_element(sptr);
+    ಆಗ ((sptr = ff_ತೆಗೆ(ಹುಡುಕು_ctx)) != ಖಾಲಿ)
+	ff_free_ರಾಶಿ_element(sptr);
 
-    if (search_ctx->ffsc_stopdirs_v != NULL)
+    ಆದರೆ (ಹುಡುಕು_ctx->ffsc_stopdirs_v != ಖಾಲಿ)
     {
-	int  i = 0;
+	ಪೂರ್ಣಾಂಕ  i = 0;
 
-	while (search_ctx->ffsc_stopdirs_v[i].string != NULL)
+	ಆಗ (ಹುಡುಕು_ctx->ffsc_stopdirs_v[i].string != ಖಾಲಿ)
 	{
-	    vim_free(search_ctx->ffsc_stopdirs_v[i].string);
+	    vim_free(ಹುಡುಕು_ctx->ffsc_stopdirs_v[i].string);
 	    i++;
 	}
-	VIM_CLEAR(search_ctx->ffsc_stopdirs_v);
+	VIM_CLEAR(ಹುಡುಕು_ctx->ffsc_stopdirs_v);
     }
 
     // reset everything
-    VIM_CLEAR_STRING(search_ctx->ffsc_file_to_search);
-    VIM_CLEAR_STRING(search_ctx->ffsc_start_dir);
-    VIM_CLEAR_STRING(search_ctx->ffsc_fix_path);
-    VIM_CLEAR_STRING(search_ctx->ffsc_wc_path);
-    search_ctx->ffsc_level = 0;
+    VIM_CLEAR_STRING(ಹುಡುಕು_ctx->ffsc_file_ಗಮ್ಯ_ಹುಡುಕು);
+    VIM_CLEAR_STRING(ಹುಡುಕು_ctx->ffsc_ಆರಂಭ_dir);
+    VIM_CLEAR_STRING(ಹುಡುಕು_ctx->ffsc_fix_ಮಾರ್ಗ);
+    VIM_CLEAR_STRING(ಹುಡುಕು_ctx->ffsc_wc_ಮಾರ್ಗ);
+    ಹುಡುಕು_ctx->ffsc_level = 0;
 }
 
 /*
  * check if the given path is in the stopdirs
  * returns TRUE if yes else FALSE
  */
-    static int
-ff_path_in_stoplist(char_u *path, int path_len, string_T *stopdirs_v)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ff_ಮಾರ್ಗ_ಒಳ_stoplist(char_u *ಮಾರ್ಗ, ಪೂರ್ಣಾಂಕ ಮಾರ್ಗ_len, string_T *stopdirs_v)
 {
-    int		i = 0;
+    ಪೂರ್ಣಾಂಕ		i = 0;
 
     // eat up trailing path separators, except the first
-    while (path_len > 1 && vim_ispathsep(path[path_len - 1]))
-	path_len--;
+    ಆಗ (ಮಾರ್ಗ_len > 1 && vim_ispathsep(ಮಾರ್ಗ[ಮಾರ್ಗ_len - 1]))
+	ಮಾರ್ಗ_len--;
 
     // if no path consider it as match
-    if (path_len == 0)
-	return TRUE;
+    ಆದರೆ (ಮಾರ್ಗ_len == 0)
+	ಹಿಂತಿರುಗಿ TRUE;
 
-    for (i = 0; stopdirs_v[i].string != NULL; i++)
+    ಗಾಗಿ (i = 0; stopdirs_v[i].string != ಖಾಲಿ; i++)
 	// match for parent directory. So '/home' also matches
 	// '/home/rks'. Check for PATHSEP in stopdirs_v[i], else
 	// '/home/r' would also match '/home/rks'
-	if (fnamencmp(stopdirs_v[i].string, path, path_len) == 0
-		&& ((int)stopdirs_v[i].length <= path_len
-		    || vim_ispathsep(stopdirs_v[i].string[path_len])))
-	    return TRUE;
+	ಆದರೆ (fnamencmp(stopdirs_v[i].string, ಮಾರ್ಗ, ಮಾರ್ಗ_len) == 0
+		&& ((ಪೂರ್ಣಾಂಕ)stopdirs_v[i].ಉದ್ದಳತೆ <= ಮಾರ್ಗ_len
+		    || vim_ispathsep(stopdirs_v[i].string[ಮಾರ್ಗ_len])))
+	    ಹಿಂತಿರುಗಿ TRUE;
 
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 /*
@@ -1723,28 +1723,28 @@ ff_path_in_stoplist(char_u *path, int path_len, string_T *stopdirs_v)
  *
  */
     char_u *
-find_file_in_path(
+ಕಂಡುಹಿಡಿ_file_ಒಳ_ಮಾರ್ಗ(
     char_u	*ptr,		// file name
-    int		len,		// length of file name
-    int		options,
-    int		first,		// use count'th matching file name
+    ಪೂರ್ಣಾಂಕ		len,		// length of file name
+    ಪೂರ್ಣಾಂಕ		options,
+    ಪೂರ್ಣಾಂಕ		ಮೊದಲ,		// use count'th matching file name
     char_u	*rel_fname,	// file name searching relative to
-    char_u	**file_to_find,	// in/out: modified copy of file name
-    char	**search_ctx)	// in/out: state of the search
+    char_u	**file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ,	// in/out: modified copy of file name
+    ಅಕ್ಷರ	**ಹುಡುಕು_ctx)	// in/out: state of the search
 {
-    return find_file_in_path_option(ptr, len, options, first,
-	    *curbuf->b_p_path == NUL ? p_path : curbuf->b_p_path,
+    ಹಿಂತಿರುಗಿ ಕಂಡುಹಿಡಿ_file_ಒಳ_ಮಾರ್ಗ_option(ptr, len, options, ಮೊದಲ,
+	    *curbuf->b_p_ಮಾರ್ಗ == NUL ? p_ಮಾರ್ಗ : curbuf->b_p_ಮಾರ್ಗ,
 	    FINDFILE_BOTH, rel_fname, curbuf->b_p_sua,
-	    file_to_find, search_ctx);
+	    file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ, ಹುಡುಕು_ctx);
 }
 
-#if defined(EXITFREE)
-    void
-free_findfile(void)
+#ಆದರೆ defined(EXITFREE)
+    ಶೂನ್ಯ
+free_findfile(ಶೂನ್ಯ)
 {
-    VIM_CLEAR_STRING(ff_expand_buffer);
+    VIM_CLEAR_STRING(ff_expand_ಬಫರ್);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Find the directory name "ptr[len]" in the path.
@@ -1758,99 +1758,99 @@ free_findfile(void)
  * Returns an allocated string for the file name.  NULL for error.
  */
     char_u *
-find_directory_in_path(
+ಕಂಡುಹಿಡಿ_directory_ಒಳ_ಮಾರ್ಗ(
     char_u	*ptr,		// file name
-    int		len,		// length of file name
-    int		options,
+    ಪೂರ್ಣಾಂಕ		len,		// length of file name
+    ಪೂರ್ಣಾಂಕ		options,
     char_u	*rel_fname,	// file name searching relative to
-    char_u	**file_to_find,	// in/out: modified copy of file name
-    char	**search_ctx)	// in/out: state of the search
+    char_u	**file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ,	// in/out: modified copy of file name
+    ಅಕ್ಷರ	**ಹುಡುಕು_ctx)	// in/out: state of the search
 {
-    return find_file_in_path_option(ptr, len, options, TRUE, p_cdpath,
+    ಹಿಂತಿರುಗಿ ಕಂಡುಹಿಡಿ_file_ಒಳ_ಮಾರ್ಗ_option(ptr, len, options, TRUE, p_cdpath,
 				       FINDFILE_DIR, rel_fname, (char_u *)"",
-				       file_to_find, search_ctx);
+				       file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ, ಹುಡುಕು_ctx);
 }
 
     char_u *
-find_file_in_path_option(
+ಕಂಡುಹಿಡಿ_file_ಒಳ_ಮಾರ್ಗ_option(
     char_u	*ptr,		// file name
-    int		len,		// length of file name
-    int		options,
-    int		first,		// use count'th matching file name
-    char_u	*path_option,	// p_path or p_cdpath
-    int		find_what,	// FINDFILE_FILE, _DIR or _BOTH
+    ಪೂರ್ಣಾಂಕ		len,		// length of file name
+    ಪೂರ್ಣಾಂಕ		options,
+    ಪೂರ್ಣಾಂಕ		ಮೊದಲ,		// use count'th matching file name
+    char_u	*ಮಾರ್ಗ_option,	// p_path or p_cdpath
+    ಪೂರ್ಣಾಂಕ		ಕಂಡುಹಿಡಿ_what,	// FINDFILE_FILE, _DIR or _BOTH
     char_u	*rel_fname,	// file name we are looking relative to.
     char_u	*suffixes,	// list of suffixes, 'suffixesadd' option
-    char_u	**file_to_find,	// in/out: modified copy of file name
-    char	**search_ctx_arg) // in/out: state of the search
+    char_u	**file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ,	// in/out: modified copy of file name
+    ಅಕ್ಷರ	**ಹುಡುಕು_ctx_arg) // in/out: state of the search
 {
-    ff_search_ctx_T	**search_ctx = (ff_search_ctx_T **)search_ctx_arg;
-    static char_u	*dir;
-    static int		did_findfile_init = FALSE;
-    char_u		*file_name = NULL;
-    int			rel_to_curdir;
-#ifdef AMIGA
-    struct Process	*proc = (struct Process *)FindTask(0L);
-    APTR		save_winptr = proc->pr_WindowPtr;
+    ff_ಹುಡುಕು_ctx_T	**ಹುಡುಕು_ctx = (ff_ಹುಡುಕು_ctx_T **)ಹುಡುಕು_ctx_arg;
+    ಸ್ಥಿರ char_u	*dir;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ		did_findfile_init = FALSE;
+    char_u		*file_name = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ			rel_ಗಮ್ಯ_curdir;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ AMIGA
+    ರಚನೆ Process	*proc = (ರಚನೆ Process *)ಕಂಡುಹಿಡಿ_Task(0L);
+    APTR		save_winptr = proc->pr_ಕಿಟಕಿ_Ptr;
 
     // Avoid a requester here for a volume that doesn't exist.
-    proc->pr_WindowPtr = (APTR)-1L;
-#endif
-    static size_t	file_to_findlen = 0;
+    proc->pr_ಕಿಟಕಿ_Ptr = (APTR)-1L;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಸ್ಥಿರ size_t	file_ಗಮ್ಯ_findlen = 0;
 
-    if (first == TRUE)
+    ಆದರೆ (ಮೊದಲ == TRUE)
     {
 	char_u	save_char;
 
-	if (len == 0)
-	    return NULL;
+	ಆದರೆ (len == 0)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
 	// copy file name into NameBuff, expanding environment variables
 	save_char = ptr[len];
 	ptr[len] = NUL;
-	file_to_findlen = expand_env_esc(ptr, NameBuff, MAXPATHL, NULL, TRUE, NULL);
+	file_ಗಮ್ಯ_findlen = expand_env_esc(ptr, NameBuff, MAXPATHL, ಖಾಲಿ, TRUE, ಖಾಲಿ);
 	ptr[len] = save_char;
 
-	vim_free(*file_to_find);
-	*file_to_find = vim_strnsave(NameBuff, file_to_findlen);
-	if (*file_to_find == NULL)	// out of memory
+	vim_free(*file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ);
+	*file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ = vim_strnsave(NameBuff, file_ಗಮ್ಯ_findlen);
+	ಆದರೆ (*file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ == ಖಾಲಿ)	// out of memory
 	{
-	    file_name = NULL;
-	    file_to_findlen = 0;
-	    goto theend;
+	    file_name = ಖಾಲಿ;
+	    file_ಗಮ್ಯ_findlen = 0;
+	    ಹೋಗು theend;
 	}
-	if (options & FNAME_UNESC)
+	ಆದರೆ (options & FNAME_UNESC)
 	{
 	    // Change all "\ " to " ".
-	    for (ptr = *file_to_find; *ptr != NUL; ++ptr)
-		if (ptr[0] == '\\' && ptr[1] == ' ')
+	    ಗಾಗಿ (ptr = *file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ; *ptr != NUL; ++ptr)
+		ಆದರೆ (ptr[0] == '\\' && ptr[1] == ' ')
 		{
 		    mch_memmove(ptr, ptr + 1,
-			(size_t)((*file_to_find + file_to_findlen) - (ptr + 1)) + 1);
-		    --file_to_findlen;
+			(size_t)((*file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ + file_ಗಮ್ಯ_findlen) - (ptr + 1)) + 1);
+		    --file_ಗಮ್ಯ_findlen;
 		}
 	}
     }
 
-    rel_to_curdir = ((*file_to_find)[0] == '.'
-		    && ((*file_to_find)[1] == NUL
-			|| vim_ispathsep((*file_to_find)[1])
-			|| ((*file_to_find)[1] == '.'
-			    && ((*file_to_find)[2] == NUL
-				|| vim_ispathsep((*file_to_find)[2])))));
-    if (vim_isAbsName(*file_to_find)
+    rel_ಗಮ್ಯ_curdir = ((*file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ)[0] == '.'
+		    && ((*file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ)[1] == NUL
+			|| vim_ispathsep((*file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ)[1])
+			|| ((*file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ)[1] == '.'
+			    && ((*file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ)[2] == NUL
+				|| vim_ispathsep((*file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ)[2])))));
+    ಆದರೆ (vim_isAbsName(*file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ)
 	    // "..", "../path", "." and "./path": don't use the path_option
-	    || rel_to_curdir
-#if defined(MSWIN)
+	    || rel_ಗಮ್ಯ_curdir
+#ಆದರೆ defined(MSWIN)
 	    // handle "\tmp" as absolute path
-	    || vim_ispathsep((*file_to_find)[0])
+	    || vim_ispathsep((*file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ)[0])
 	    // handle "c:name" as absolute path
-	    || ((*file_to_find)[0] != NUL && (*file_to_find)[1] == ':')
-#endif
-#ifdef AMIGA
+	    || ((*file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ)[0] != NUL && (*file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ)[1] == ':')
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ AMIGA
 	    // handle ":tmp" as absolute path
-	    || (*file_to_find)[0] == ':'
-#endif
+	    || (*file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ)[0] == ':'
+#ಆದರೆ_ಅಂತ್ಯ
        )
     {
 	/*
@@ -1858,109 +1858,109 @@ find_file_in_path_option(
 	 * If this is not a first call, return NULL.  We already returned a
 	 * filename on the first call.
 	 */
-	if (first == TRUE)
+	ಆದರೆ (ಮೊದಲ == TRUE)
 	{
-	    int		l;
-	    int		run;
+	    ಪೂರ್ಣಾಂಕ		l;
+	    ಪೂರ್ಣಾಂಕ		ಸತತ;
 	    size_t	rel_fnamelen = 0;
 	    char_u	*suffix;
 
-	    if (path_with_url(*file_to_find))
+	    ಆದರೆ (ಮಾರ್ಗ_with_url(*file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ))
 	    {
-		file_name = vim_strnsave(*file_to_find, file_to_findlen);
-		goto theend;
+		file_name = vim_strnsave(*file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ, file_ಗಮ್ಯ_findlen);
+		ಹೋಗು theend;
 	    }
 
-	    if (rel_fname != NULL)
+	    ಆದರೆ (rel_fname != ಖಾಲಿ)
 		rel_fnamelen = STRLEN(rel_fname);
 
 	    // When FNAME_REL flag given first use the directory of the file.
 	    // Otherwise or when this fails use the current directory.
-	    for (run = 1; run <= 2; ++run)
+	    ಗಾಗಿ (ಸತತ = 1; ಸತತ <= 2; ++ಸತತ)
 	    {
-		l = (int)file_to_findlen;
-		if (run == 1
-			&& rel_to_curdir
+		l = (ಪೂರ್ಣಾಂಕ)file_ಗಮ್ಯ_findlen;
+		ಆದರೆ (ಸತತ == 1
+			&& rel_ಗಮ್ಯ_curdir
 			&& (options & FNAME_REL)
-			&& rel_fname != NULL
+			&& rel_fname != ಖಾಲಿ
 			&& rel_fnamelen + l < MAXPATHL)
 		{
 		    l = vim_snprintf(
-			(char *)NameBuff,
+			(ಅಕ್ಷರ *)NameBuff,
 			MAXPATHL,
 			"%.*s%s",
-			(int)(gettail(rel_fname) - rel_fname),
+			(ಪೂರ್ಣಾಂಕ)(gettail(rel_fname) - rel_fname),
 			rel_fname,
-			*file_to_find);
+			*file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ);
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    STRCPY(NameBuff, *file_to_find);
-		    run = 2;
+		    STRCPY(NameBuff, *file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ);
+		    ಸತತ = 2;
 		}
 
 		// When the file doesn't exist, try adding parts of
 		// 'suffixesadd'.
 		suffix = suffixes;
-		for (;;)
+		ಗಾಗಿ (;;)
 		{
-		    if (mch_getperm(NameBuff) >= 0
-			     && (find_what == FINDFILE_BOTH
-				 || ((find_what == FINDFILE_DIR)
+		    ಆದರೆ (mch_getperm(NameBuff) >= 0
+			     && (ಕಂಡುಹಿಡಿ_what == FINDFILE_BOTH
+				 || ((ಕಂಡುಹಿಡಿ_what == FINDFILE_DIR)
 						    == mch_isdir(NameBuff))))
 		    {
 			file_name = vim_strnsave(NameBuff,
 						  simplify_filename(NameBuff));
-			goto theend;
+			ಹೋಗು theend;
 		    }
-		    if (*suffix == NUL)
-			break;
+		    ಆದರೆ (*suffix == NUL)
+			ನಿಲ್ಲಿಸು;
 		    copy_option_part(&suffix, NameBuff + l, MAXPATHL - l, ",");
 		}
 	    }
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	/*
 	 * Loop over all paths in the 'path' or 'cdpath' option.
 	 * When "first" is set, first setup to the start of the option.
 	 * Otherwise continue to find the next match.
 	 */
-	if (first == TRUE)
+	ಆದರೆ (ಮೊದಲ == TRUE)
 	{
 	    // vim_findfile_free_visited can handle a possible NULL pointer
-	    vim_findfile_free_visited(*search_ctx);
-	    dir = path_option;
+	    vim_findfile_free_ಭೇಟಿಯಾದ(*ಹುಡುಕು_ctx);
+	    dir = ಮಾರ್ಗ_option;
 	    did_findfile_init = FALSE;
 	}
 
-	for (;;)
+	ಗಾಗಿ (;;)
 	{
-	    if (did_findfile_init)
+	    ಆದರೆ (did_findfile_init)
 	    {
-		file_name = vim_findfile(*search_ctx);
-		if (file_name != NULL)
-		    break;
+		file_name = vim_findfile(*ಹುಡುಕು_ctx);
+		ಆದರೆ (file_name != ಖಾಲಿ)
+		    ನಿಲ್ಲಿಸು;
 
 		did_findfile_init = FALSE;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		char_u	*buf;
 		char_u  *r_ptr;
 
-		if (dir == NULL || *dir == NUL)
+		ಆದರೆ (dir == ಖಾಲಿ || *dir == NUL)
 		{
 		    // We searched all paths of the option, now we can
 		    // free the search context.
-		    vim_findfile_cleanup(*search_ctx);
-		    *search_ctx = NULL;
-		    break;
+		    vim_findfile_cleanup(*ಹುಡುಕು_ctx);
+		    *ಹುಡುಕು_ctx = ಖಾಲಿ;
+		    ನಿಲ್ಲಿಸು;
 		}
 
-		if ((buf = alloc(MAXPATHL)) == NULL)
-		    break;
+		ಆದರೆ ((buf = alloc(MAXPATHL)) == ಖಾಲಿ)
+		    ನಿಲ್ಲಿಸು;
 
 		// copy next path
 		buf[0] = NUL;
@@ -1968,39 +1968,39 @@ find_file_in_path_option(
 
 		// get the stopdir string
 		r_ptr = vim_findfile_stopdir(buf);
-		*search_ctx = vim_findfile_init(buf, *file_to_find, file_to_findlen,
-					    r_ptr, 100, FALSE, find_what,
-					   *search_ctx, FALSE, rel_fname);
-		if (*search_ctx != NULL)
+		*ಹುಡುಕು_ctx = vim_findfile_init(buf, *file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ, file_ಗಮ್ಯ_findlen,
+					    r_ptr, 100, FALSE, ಕಂಡುಹಿಡಿ_what,
+					   *ಹುಡುಕು_ctx, FALSE, rel_fname);
+		ಆದರೆ (*ಹುಡುಕು_ctx != ಖಾಲಿ)
 		    did_findfile_init = TRUE;
 		vim_free(buf);
 	    }
 	}
     }
-    if (file_name == NULL && (options & FNAME_MESS))
+    ಆದರೆ (file_name == ಖಾಲಿ && (options & FNAME_MESS))
     {
-	if (first == TRUE)
+	ಆದರೆ (ಮೊದಲ == TRUE)
 	{
-	    if (find_what == FINDFILE_DIR)
-		semsg(_(e_cant_find_directory_str_in_cdpath), *file_to_find);
-	    else
-		semsg(_(e_cant_find_file_str_in_path), *file_to_find);
+	    ಆದರೆ (ಕಂಡುಹಿಡಿ_what == FINDFILE_DIR)
+		semsg(_(e_cant_ಕಂಡುಹಿಡಿ_directory_str_ಒಳ_cdpath), *file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		semsg(_(e_cant_ಕಂಡುಹಿಡಿ_file_str_ಒಳ_ಮಾರ್ಗ), *file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (find_what == FINDFILE_DIR)
-		semsg(_(e_no_more_directory_str_found_in_cdpath),
-								*file_to_find);
-	    else
-		semsg(_(e_no_more_file_str_found_in_path), *file_to_find);
+	    ಆದರೆ (ಕಂಡುಹಿಡಿ_what == FINDFILE_DIR)
+		semsg(_(e_no_ಇನ್ನಷ್ಟು_directory_str_ಸಿಕ್ಕಿತು_ಒಳ_cdpath),
+								*file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		semsg(_(e_no_ಇನ್ನಷ್ಟು_file_str_ಸಿಕ್ಕಿತು_ಒಳ_ಮಾರ್ಗ), *file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ);
 	}
     }
 
 theend:
-#ifdef AMIGA
-    proc->pr_WindowPtr = save_winptr;
-#endif
-    return file_name;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ AMIGA
+    proc->pr_ಕಿಟಕಿ_Ptr = save_winptr;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ file_name;
 }
 
 /*
@@ -2009,28 +2009,28 @@ theend:
  * Returns the name in allocated memory, NULL for failure.
  */
     char_u *
-grab_file_name(long count, linenr_T *file_lnum)
+grab_file_name(ದೀರ್ಘ ಎಣಿಕೆ_2, linenr_T *file_lnum)
 {
-    int options = FNAME_MESS|FNAME_EXP|FNAME_REL|FNAME_UNESC;
+    ಪೂರ್ಣಾಂಕ options = FNAME_MESS|FNAME_EXP|FNAME_REL|FNAME_UNESC;
 
-    if (VIsual_active)
+    ಆದರೆ (VIsual_ಸಕ್ರಿಯ)
     {
-	int	len;
+	ಪೂರ್ಣಾಂಕ	len;
 	char_u	*ptr;
 
-	if (get_visual_text(NULL, &ptr, &len) == FAIL)
-	    return NULL;
+	ಆದರೆ (get_visual_ಪಠ್ಯ(ಖಾಲಿ, &ptr, &len) == FAIL)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	// Only recognize ":123" here
-	if (file_lnum != NULL && ptr[len] == ':' && SAFE_isdigit(ptr[len + 1]))
+	ಆದರೆ (file_lnum != ಖಾಲಿ && ptr[len] == ':' && ಸುರಕ್ಷಿತ_isdigit(ptr[len + 1]))
 	{
 	    char_u *p = ptr + len + 1;
 
 	    *file_lnum = getdigits(&p);
 	}
-	return find_file_name_in_path(ptr, len, options,
-						     count, curbuf->b_ffname);
+	ಹಿಂತಿರುಗಿ ಕಂಡುಹಿಡಿ_file_name_ಒಳ_ಮಾರ್ಗ(ptr, len, options,
+						     ಎಣಿಕೆ_2, curbuf->b_ffname);
     }
-    return file_name_at_cursor(options | FNAME_HYP, count, file_lnum);
+    ಹಿಂತಿರುಗಿ file_name_at_cursor(options | FNAME_HYP, ಎಣಿಕೆ_2, file_lnum);
 }
 
 /*
@@ -2047,10 +2047,10 @@ grab_file_name(long count, linenr_T *file_lnum)
  * FNAME_INCL	    apply "includeexpr"
  */
     char_u *
-file_name_at_cursor(int options, long count, linenr_T *file_lnum)
+file_name_at_cursor(ಪೂರ್ಣಾಂಕ options, ದೀರ್ಘ ಎಣಿಕೆ_2, linenr_T *file_lnum)
 {
-    return file_name_in_line(ml_get_curline(),
-		      curwin->w_cursor.col, options, count, curbuf->b_ffname,
+    ಹಿಂತಿರುಗಿ file_name_ಒಳ_ಸಾಲು(ml_get_curline(),
+		      curwin->w_cursor.ಲಂಬಸಾಲು, options, ಎಣಿಕೆ_2, curbuf->b_ffname,
 		      file_lnum);
 }
 
@@ -2059,45 +2059,45 @@ file_name_at_cursor(int options, long count, linenr_T *file_lnum)
  * Otherwise like file_name_at_cursor().
  */
     char_u *
-file_name_in_line(
-    char_u	*line,
-    int		col,
-    int		options,
-    long	count,
+file_name_ಒಳ_ಸಾಲು(
+    char_u	*ಸಾಲು,
+    ಪೂರ್ಣಾಂಕ		ಲಂಬಸಾಲು,
+    ಪೂರ್ಣಾಂಕ		options,
+    ದೀರ್ಘ	ಎಣಿಕೆ_2,
     char_u	*rel_fname,	// file we are searching relative to
     linenr_T	*file_lnum)	// line number after the file name
 {
     char_u	*ptr;
-    int		len;
-    int		in_type = TRUE;
-    int		is_url = FALSE;
+    ಪೂರ್ಣಾಂಕ		len;
+    ಪೂರ್ಣಾಂಕ		ಒಳ_type = TRUE;
+    ಪೂರ್ಣಾಂಕ		is_url = FALSE;
 
     /*
      * search forward for what could be the start of a file name
      */
-    ptr = line + col;
-    while (*ptr != NUL && !vim_isfilec(*ptr))
+    ptr = ಸಾಲು + ಲಂಬಸಾಲು;
+    ಆಗ (*ptr != NUL && !vim_isfilec(*ptr))
 	MB_PTR_ADV(ptr);
-    if (*ptr == NUL)		// nothing found
+    ಆದರೆ (*ptr == NUL)		// nothing found
     {
-	if (options & FNAME_MESS)
+	ಆದರೆ (options & FNAME_MESS)
 	    emsg(_(e_no_file_name_under_cursor));
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
     /*
      * Search backward for first char of the file name.
      * Go one char back to ":" before "//" even when ':' is not in 'isfname'.
      */
-    while (ptr > line)
+    ಆಗ (ptr > ಸಾಲು)
     {
-	if (has_mbyte && (len = (*mb_head_off)(line, ptr - 1)) > 0)
+	ಆದರೆ (has_mbyte && (len = (*mb_ತಲೆ_off)(ಸಾಲು, ptr - 1)) > 0)
 	    ptr -= len + 1;
-	else if (vim_isfilec(ptr[-1])
-		|| ((options & FNAME_HYP) && path_is_url(ptr - 1)))
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (vim_isfilec(ptr[-1])
+		|| ((options & FNAME_HYP) && ಮಾರ್ಗ_is_url(ptr - 1)))
 	    --ptr;
-	else
-	    break;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ನಿಲ್ಲಿಸು;
     }
 
     /*
@@ -2105,27 +2105,27 @@ file_name_in_line(
      * Also allow "://" when ':' is not in 'isfname'.
      */
     len = 0;
-    while (vim_isfilec(ptr[len]) || (ptr[len] == '\\' && ptr[len + 1] == ' ')
-		 || ((options & FNAME_HYP) && path_is_url(ptr + len))
-		 || (is_url && vim_strchr((char_u *)":?&=", ptr[len]) != NULL))
+    ಆಗ (vim_isfilec(ptr[len]) || (ptr[len] == '\\' && ptr[len + 1] == ' ')
+		 || ((options & FNAME_HYP) && ಮಾರ್ಗ_is_url(ptr + len))
+		 || (is_url && vim_strchr((char_u *)":?&=", ptr[len]) != ಖಾಲಿ))
     {
 	// After type:// we also include :, ?, & and = as valid characters, so
 	// that http://google.com:8080?q=this&that=ok works.
-	if ((ptr[len] >= 'A' && ptr[len] <= 'Z')
+	ಆದರೆ ((ptr[len] >= 'A' && ptr[len] <= 'Z')
 				       || (ptr[len] >= 'a' && ptr[len] <= 'z'))
 	{
-	    if (in_type && path_is_url(ptr + len + 1))
+	    ಆದರೆ (ಒಳ_type && ಮಾರ್ಗ_is_url(ptr + len + 1))
 		is_url = TRUE;
 	}
-	else
-	    in_type = FALSE;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಒಳ_type = FALSE;
 
-	if (ptr[len] == '\\')
+	ಆದರೆ (ptr[len] == '\\')
 	    // Skip over the "\" in "\ ".
 	    ++len;
-	if (has_mbyte)
+	ಆದರೆ (has_mbyte)
 	    len += (*mb_ptr2len)(ptr + len);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    ++len;
     }
 
@@ -2133,153 +2133,153 @@ file_name_in_line(
      * If there is trailing punctuation, remove it.
      * But don't remove "..", could be a directory name.
      */
-    if (len > 2 && vim_strchr((char_u *)".,:;!", ptr[len - 1]) != NULL
+    ಆದರೆ (len > 2 && vim_strchr((char_u *)".,:;!", ptr[len - 1]) != ಖಾಲಿ
 						       && ptr[len - 2] != '.')
 	--len;
 
-    if (file_lnum != NULL)
+    ಆದರೆ (file_lnum != ಖಾಲಿ)
     {
 	char_u	*p;
-	char	*match_text = " line ";		// english
-	size_t	match_textlen = 6;
+	ಅಕ್ಷರ	*ಹೊಂದಿಕೆ_ಪಠ್ಯ = " line ";		// english
+	size_t	ಹೊಂದಿಕೆ_textlen = 6;
 
 	// Get the number after the file name and a separator character.
 	// Also accept " line 999" with and without the same translation as
 	// used in last_set_msg().
 	p = ptr + len;
-	if (STRNCMP(p, match_text, match_textlen) == 0)
-	    p += match_textlen;
-	else
+	ಆದರೆ (STRNCMP(p, ಹೊಂದಿಕೆ_ಪಠ್ಯ, ಹೊಂದಿಕೆ_textlen) == 0)
+	    p += ಹೊಂದಿಕೆ_textlen;
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // no match with english, try localized
-	    match_text = _(line_msg);
-	    match_textlen = STRLEN(match_text);
+	    ಹೊಂದಿಕೆ_ಪಠ್ಯ = _(ಸಾಲು_ಸಂದೇಶ);
+	    ಹೊಂದಿಕೆ_textlen = STRLEN(ಹೊಂದಿಕೆ_ಪಠ್ಯ);
 
-	    if (STRNCMP(p, match_text, match_textlen) == 0)
-		p += match_textlen;
-	    else
+	    ಆದರೆ (STRNCMP(p, ಹೊಂದಿಕೆ_ಪಠ್ಯ, ಹೊಂದಿಕೆ_textlen) == 0)
+		p += ಹೊಂದಿಕೆ_textlen;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		p = skipwhite(p);
 	}
-	if (*p != NUL)
+	ಆದರೆ (*p != NUL)
 	{
-	    if (!SAFE_isdigit(*p))
+	    ಆದರೆ (!ಸುರಕ್ಷಿತ_isdigit(*p))
 		++p;		    // skip the separator
 	    p = skipwhite(p);
-	    if (SAFE_isdigit(*p))
-		*file_lnum = (int)getdigits(&p);
+	    ಆದರೆ (ಸುರಕ್ಷಿತ_isdigit(*p))
+		*file_lnum = (ಪೂರ್ಣಾಂಕ)getdigits(&p);
 	}
     }
 
-    return find_file_name_in_path(ptr, len, options, count, rel_fname);
+    ಹಿಂತಿರುಗಿ ಕಂಡುಹಿಡಿ_file_name_ಒಳ_ಮಾರ್ಗ(ptr, len, options, ಎಣಿಕೆ_2, rel_fname);
 }
 
-#if defined(FEAT_FIND_ID) && defined(FEAT_EVAL)
-    static char_u *
-eval_includeexpr(char_u *ptr, int len)
+#ಆದರೆ defined(FEAT_ಕಂಡುಹಿಡಿ_ID) && defined(FEAT_EVAL)
+    ಸ್ಥಿರ char_u *
+eval_includeexpr(char_u *ptr, ಪೂರ್ಣಾಂಕ len)
 {
     char_u	*res;
     sctx_T	save_sctx = current_sctx;
 
-    set_vim_var_string(VV_FNAME, ptr, len);
+    ಗಣ_vim_var_string(VV_FNAME, ptr, len);
     current_sctx = curbuf->b_p_script_ctx[BV_INEX];
 
-    res = eval_to_string_safe(curbuf->b_p_inex,
-	    was_set_insecurely(curwin, (char_u *)"includeexpr", OPT_LOCAL),
+    res = eval_ಗಮ್ಯ_string_ಸುರಕ್ಷಿತ(curbuf->b_p_inex,
+	    was_ಗಣ_insecurely(curwin, (char_u *)"includeexpr", OPT_LOCAL),
 								   TRUE, TRUE);
 
-    set_vim_var_string(VV_FNAME, NULL, 0);
+    ಗಣ_vim_var_string(VV_FNAME, ಖಾಲಿ, 0);
     current_sctx = save_sctx;
-    return res;
+    ಹಿಂತಿರುಗಿ res;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Return the name of the file ptr[len] in 'path'.
  * Otherwise like file_name_at_cursor().
  */
     char_u *
-find_file_name_in_path(
+ಕಂಡುಹಿಡಿ_file_name_ಒಳ_ಮಾರ್ಗ(
     char_u	*ptr,
-    int		len,
-    int		options,
-    long	count,
+    ಪೂರ್ಣಾಂಕ		len,
+    ಪೂರ್ಣಾಂಕ		options,
+    ದೀರ್ಘ	ಎಣಿಕೆ_2,
     char_u	*rel_fname)	// file we are searching relative to
 {
     char_u	*file_name;
-    int		c;
-#if defined(FEAT_FIND_ID) && defined(FEAT_EVAL)
-    char_u	*tofree = NULL;
-#endif
+    ಪೂರ್ಣಾಂಕ		c;
+#ಆದರೆ defined(FEAT_ಕಂಡುಹಿಡಿ_ID) && defined(FEAT_EVAL)
+    char_u	*tofree = ಖಾಲಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (len == 0)
-	return NULL;
+    ಆದರೆ (len == 0)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-#if defined(FEAT_FIND_ID) && defined(FEAT_EVAL)
-    if ((options & FNAME_INCL) && *curbuf->b_p_inex != NUL)
+#ಆದರೆ defined(FEAT_ಕಂಡುಹಿಡಿ_ID) && defined(FEAT_EVAL)
+    ಆದರೆ ((options & FNAME_INCL) && *curbuf->b_p_inex != NUL)
     {
 	tofree = eval_includeexpr(ptr, len);
-	if (tofree != NULL)
+	ಆದರೆ (tofree != ಖಾಲಿ)
 	{
 	    ptr = tofree;
-	    len = (int)STRLEN(ptr);
+	    len = (ಪೂರ್ಣಾಂಕ)STRLEN(ptr);
 	}
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (options & FNAME_EXP)
+    ಆದರೆ (options & FNAME_EXP)
     {
-	char_u	*file_to_find = NULL;
-	char	*search_ctx = NULL;
+	char_u	*file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ = ಖಾಲಿ;
+	ಅಕ್ಷರ	*ಹುಡುಕು_ctx = ಖಾಲಿ;
 
-	file_name = find_file_in_path(ptr, len, options & ~FNAME_MESS,
-				  TRUE, rel_fname, &file_to_find, &search_ctx);
+	file_name = ಕಂಡುಹಿಡಿ_file_ಒಳ_ಮಾರ್ಗ(ptr, len, options & ~FNAME_MESS,
+				  TRUE, rel_fname, &file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ, &ಹುಡುಕು_ctx);
 
-#if defined(FEAT_FIND_ID) && defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_ಕಂಡುಹಿಡಿ_ID) && defined(FEAT_EVAL)
 	/*
 	 * If the file could not be found in a normal way, try applying
 	 * 'includeexpr' (unless done already).
 	 */
-	if (file_name == NULL
+	ಆದರೆ (file_name == ಖಾಲಿ
 		&& !(options & FNAME_INCL) && *curbuf->b_p_inex != NUL)
 	{
 	    tofree = eval_includeexpr(ptr, len);
-	    if (tofree != NULL)
+	    ಆದರೆ (tofree != ಖಾಲಿ)
 	    {
 		ptr = tofree;
-		len = (int)STRLEN(ptr);
-		file_name = find_file_in_path(ptr, len, options & ~FNAME_MESS,
-				  TRUE, rel_fname, &file_to_find, &search_ctx);
+		len = (ಪೂರ್ಣಾಂಕ)STRLEN(ptr);
+		file_name = ಕಂಡುಹಿಡಿ_file_ಒಳ_ಮಾರ್ಗ(ptr, len, options & ~FNAME_MESS,
+				  TRUE, rel_fname, &file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ, &ಹುಡುಕು_ctx);
 	    }
 	}
-#endif
-	if (file_name == NULL && (options & FNAME_MESS))
+#ಆದರೆ_ಅಂತ್ಯ
+	ಆದರೆ (file_name == ಖಾಲಿ && (options & FNAME_MESS))
 	{
 	    c = ptr[len];
 	    ptr[len] = NUL;
-	    semsg(_(e_cant_find_file_str_in_path_2), ptr);
+	    semsg(_(e_cant_ಕಂಡುಹಿಡಿ_file_str_ಒಳ_ಮಾರ್ಗ_2), ptr);
 	    ptr[len] = c;
 	}
 
 	// Repeat finding the file "count" times.  This matters when it
 	// appears several times in the path.
-	while (file_name != NULL && --count > 0)
+	ಆಗ (file_name != ಖಾಲಿ && --ಎಣಿಕೆ_2 > 0)
 	{
 	    vim_free(file_name);
-	    file_name = find_file_in_path(ptr, len, options, FALSE, rel_fname,
-						   &file_to_find, &search_ctx);
+	    file_name = ಕಂಡುಹಿಡಿ_file_ಒಳ_ಮಾರ್ಗ(ptr, len, options, FALSE, rel_fname,
+						   &file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ, &ಹುಡುಕು_ctx);
 	}
 
-	vim_free(file_to_find);
-	vim_findfile_cleanup(search_ctx);
+	vim_free(file_ಗಮ್ಯ_ಕಂಡುಹಿಡಿ);
+	vim_findfile_cleanup(ಹುಡುಕು_ctx);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	file_name = vim_strnsave(ptr, len);
 
-#if defined(FEAT_FIND_ID) && defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_ಕಂಡುಹಿಡಿ_ID) && defined(FEAT_EVAL)
     vim_free(tofree);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return file_name;
+    ಹಿಂತಿರುಗಿ file_name;
 }
 
 /*
@@ -2288,99 +2288,99 @@ find_file_name_in_path(
  * "/path/file", "/path/dir/", "/path//dir", "/file"
  *	 ^	       ^	     ^	      ^
  */
-    static char_u *
+    ಸ್ಥಿರ char_u *
 gettail_dir(char_u *fname)
 {
-    char_u	*dir_end = fname;
-    char_u	*next_dir_end = fname;
-    int		look_for_sep = TRUE;
+    char_u	*dir_ಕೊನೆ = fname;
+    char_u	*ಮುಂದಿನ_dir_ಕೊನೆ = fname;
+    ಪೂರ್ಣಾಂಕ		look_for_sep = TRUE;
     char_u	*p;
 
-    for (p = fname; *p != NUL; )
+    ಗಾಗಿ (p = fname; *p != NUL; )
     {
-	if (vim_ispathsep(*p))
+	ಆದರೆ (vim_ispathsep(*p))
 	{
-	    if (look_for_sep)
+	    ಆದರೆ (look_for_sep)
 	    {
-		next_dir_end = p;
+		ಮುಂದಿನ_dir_ಕೊನೆ = p;
 		look_for_sep = FALSE;
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (!look_for_sep)
-		dir_end = next_dir_end;
+	    ಆದರೆ (!look_for_sep)
+		dir_ಕೊನೆ = ಮುಂದಿನ_dir_ಕೊನೆ;
 	    look_for_sep = TRUE;
 	}
 	MB_PTR_ADV(p);
     }
-    return dir_end;
+    ಹಿಂತಿರುಗಿ dir_ಕೊನೆ;
 }
 
 /*
  * return TRUE if 'c' is a path list separator.
  */
-    int
-vim_ispathlistsep(int c)
+    ಪೂರ್ಣಾಂಕ
+vim_ispathlistsep(ಪೂರ್ಣಾಂಕ c)
 {
-#ifdef UNIX
-    return (c == ':');
-#else
-    return (c == ';');	// might not be right for every system...
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
+    ಹಿಂತಿರುಗಿ (c == ':');
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಹಿಂತಿರುಗಿ (c == ';');	// might not be right for every system...
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Moves "*psep" back to the previous path separator in "path".
  * Returns FAIL is "*psep" ends up at the beginning of "path".
  */
-    static int
-find_previous_pathsep(char_u *path, char_u **psep)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಕಂಡುಹಿಡಿ_ಹಿಂದಿನ_pathsep(char_u *ಮಾರ್ಗ, char_u **psep)
 {
     // skip the current separator
-    if (*psep > path && vim_ispathsep(**psep))
+    ಆದರೆ (*psep > ಮಾರ್ಗ && vim_ispathsep(**psep))
 	--*psep;
 
     // find the previous separator
-    while (*psep > path)
+    ಆಗ (*psep > ಮಾರ್ಗ)
     {
-	if (vim_ispathsep(**psep))
-	    return OK;
-	MB_PTR_BACK(path, *psep);
+	ಆದರೆ (vim_ispathsep(**psep))
+	    ಹಿಂತಿರುಗಿ OK;
+	MB_PTR_ಹಿಂಭಾಗ(ಮಾರ್ಗ, *psep);
     }
 
-    return FAIL;
+    ಹಿಂತಿರುಗಿ FAIL;
 }
 
 /*
  * Returns TRUE if "maybe_unique" is unique wrt other_paths in "gap".
  * "maybe_unique" is the end portion of "((char_u **)gap->ga_data)[i]".
  */
-    static int
-is_unique(char_u *maybe_unique, garray_T *gap, int i)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+is_unique(char_u *maybe_unique, garray_T *gap, ಪೂರ್ಣಾಂಕ i)
 {
-    int	    j;
-    int	    candidate_len = (int)STRLEN(maybe_unique);
-    int	    other_path_len;
-    char_u  **other_paths = (char_u **)gap->ga_data;
+    ಪೂರ್ಣಾಂಕ	    j;
+    ಪೂರ್ಣಾಂಕ	    candidate_len = (ಪೂರ್ಣಾಂಕ)STRLEN(maybe_unique);
+    ಪೂರ್ಣಾಂಕ	    other_ಮಾರ್ಗ_len;
+    char_u  **other_paths = (char_u **)gap->ga_ದತ್ತಾಂಶ;
     char_u  *rival;
 
-    for (j = 0; j < gap->ga_len; j++)
+    ಗಾಗಿ (j = 0; j < gap->ga_len; j++)
     {
-	if (j == i)
-	    continue;  // don't compare it with itself
+	ಆದರೆ (j == i)
+	    ಮುಂದುವರಿ;  // don't compare it with itself
 
-	other_path_len = (int)STRLEN(other_paths[j]);
-	if (other_path_len < candidate_len)
-	    continue;  // it's different when it's shorter
+	other_ಮಾರ್ಗ_len = (ಪೂರ್ಣಾಂಕ)STRLEN(other_paths[j]);
+	ಆದರೆ (other_ಮಾರ್ಗ_len < candidate_len)
+	    ಮುಂದುವರಿ;  // it's different when it's shorter
 
-	rival = other_paths[j] + other_path_len - candidate_len;
-	if (fnamecmp(maybe_unique, rival) == 0
+	rival = other_paths[j] + other_ಮಾರ್ಗ_len - candidate_len;
+	ಆದರೆ (fnamecmp(maybe_unique, rival) == 0
 		&& (rival == other_paths[j] || vim_ispathsep(*(rival - 1))))
-	    return FALSE;  // match
+	    ಹಿಂತಿರುಗಿ FALSE;  //ಹೊಂದಿಕೆ
     }
 
-    return TRUE;  // no match found
+    ಹಿಂತಿರುಗಿ TRUE;  // no match found
 }
 
 /*
@@ -2392,10 +2392,10 @@ is_unique(char_u *maybe_unique, garray_T *gap, int i)
  * TODO: handle upward search (;) and path limiter (**N) notations by
  * expanding each into their equivalent path(s).
  */
-    static void
-expand_path_option(
+    ಸ್ಥಿರ ಶೂನ್ಯ
+expand_ಮಾರ್ಗ_option(
 	char_u		*curdir,
-	char_u		*path_option,	// p_path or p_cdpath
+	char_u		*ಮಾರ್ಗ_option,	// p_path or p_cdpath
 	garray_T	*gap)
 {
     char_u	*buf;
@@ -2403,55 +2403,55 @@ expand_path_option(
     char_u	*p;
     size_t	curdirlen = 0;
 
-    if ((buf = alloc(MAXPATHL)) == NULL)
-	return;
+    ಆದರೆ ((buf = alloc(MAXPATHL)) == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    while (*path_option != NUL)
+    ಆಗ (*ಮಾರ್ಗ_option != NUL)
     {
-	buflen = copy_option_part(&path_option, buf, MAXPATHL, " ,");
+	buflen = copy_option_part(&ಮಾರ್ಗ_option, buf, MAXPATHL, " ,");
 
 	// do not expand backticks, could have been set via a modeline
-	if (vim_strchr(buf, '`') != NULL)
-	    continue;
+	ಆದರೆ (vim_strchr(buf, '`') != ಖಾಲಿ)
+	    ಮುಂದುವರಿ;
 
-	if (buf[0] == '.' && (buf[1] == NUL || vim_ispathsep(buf[1])))
+	ಆದರೆ (buf[0] == '.' && (buf[1] == NUL || vim_ispathsep(buf[1])))
 	{
 	    size_t  plen;
 
 	    // Relative to current buffer:
 	    // "/path/file" + "." -> "/path/"
 	    // "/path/file"  + "./subdir" -> "/path/subdir"
-	    if (curbuf->b_ffname == NULL)
-		continue;
+	    ಆದರೆ (curbuf->b_ffname == ಖಾಲಿ)
+		ಮುಂದುವರಿ;
 	    p = gettail(curbuf->b_ffname);
 	    plen = (size_t)(p - curbuf->b_ffname);
-	    if (plen + buflen >= MAXPATHL)
-		continue;
-	    if (buf[1] == NUL)
+	    ಆದರೆ (plen + buflen >= MAXPATHL)
+		ಮುಂದುವರಿ;
+	    ಆದರೆ (buf[1] == NUL)
 		buf[plen] = NUL;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		mch_memmove(buf + plen, buf + 2, (buflen - 2) + 1); // +1 for NUL
 	    mch_memmove(buf, curbuf->b_ffname, plen);
 	    buflen = simplify_filename(buf);
 	}
-	else if (buf[0] == NUL)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (buf[0] == NUL)
 	{
 	    // relative to current directory
 	    STRCPY(buf, curdir);
-	    if (curdirlen == 0)
+	    ಆದರೆ (curdirlen == 0)
 		curdirlen = STRLEN(curdir);
 	    buflen = curdirlen;
 	}
-	else if (path_with_url(buf))
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಮಾರ್ಗ_with_url(buf))
 	    // URL can't be used here
-	    continue;
-	else if (!mch_isFullName(buf))
+	    ಮುಂದುವರಿ;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!mch_is_ತುಂಬಿದ_Name(buf))
 	{
 	    // Expand relative path to their full path equivalent
-	    if (curdirlen == 0)
+	    ಆದರೆ (curdirlen == 0)
 		curdirlen = STRLEN(curdir);
-	    if (curdirlen + buflen + 3 > MAXPATHL)
-		continue;
+	    ಆದರೆ (curdirlen + buflen + 3 > MAXPATHL)
+		ಮುಂದುವರಿ;
 
 	    mch_memmove(buf + curdirlen + 1, buf, buflen + 1);	    // +1 for NUL
 	    STRCPY(buf, curdir);
@@ -2459,20 +2459,20 @@ expand_path_option(
 	    buflen = simplify_filename(buf);
 	}
 
-	if (ga_grow(gap, 1) == FAIL)
-	    break;
+	ಆದರೆ (ga_grow(gap, 1) == FAIL)
+	    ನಿಲ್ಲಿಸು;
 
-#if defined(MSWIN)
+#ಆದರೆ defined(MSWIN)
 	// Avoid the path ending in a backslash, it fails when a comma is
 	// appended.
-	if (buf[buflen - 1] == '\\')
+	ಆದರೆ (buf[buflen - 1] == '\\')
 	    buf[buflen - 1] = '/';
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 	p = vim_strnsave(buf, buflen);
-	if (p == NULL)
-	    break;
-	((char_u **)gap->ga_data)[gap->ga_len++] = p;
+	ಆದರೆ (p == ಖಾಲಿ)
+	    ನಿಲ್ಲಿಸು;
+	((char_u **)gap->ga_ದತ್ತಾಂಶ)[gap->ga_len++] = p;
     }
 
     vim_free(buf);
@@ -2486,25 +2486,25 @@ expand_path_option(
  *   fname: /foo/bar/baz/quux.txt
  * returns:		 ^this
  */
-    static char_u *
-get_path_cutoff(char_u *fname, garray_T *gap)
+    ಸ್ಥಿರ char_u *
+get_ಮಾರ್ಗ_cutoff(char_u *fname, garray_T *gap)
 {
-    int	    i;
-    int	    maxlen = 0;
-    char_u  **path_part = (char_u **)gap->ga_data;
-    char_u  *cutoff = NULL;
+    ಪೂರ್ಣಾಂಕ	    i;
+    ಪೂರ್ಣಾಂಕ	    maxlen = 0;
+    char_u  **ಮಾರ್ಗ_part = (char_u **)gap->ga_ದತ್ತಾಂಶ;
+    char_u  *cutoff = ಖಾಲಿ;
 
-    for (i = 0; i < gap->ga_len; i++)
+    ಗಾಗಿ (i = 0; i < gap->ga_len; i++)
     {
-	int j = 0;
+	ಪೂರ್ಣಾಂಕ j = 0;
 
-	while ((fname[j] == path_part[i][j]
-#if defined(MSWIN)
-		|| (vim_ispathsep(fname[j]) && vim_ispathsep(path_part[i][j]))
-#endif
-			     ) && fname[j] != NUL && path_part[i][j] != NUL)
+	ಆಗ ((fname[j] == ಮಾರ್ಗ_part[i][j]
+#ಆದರೆ defined(MSWIN)
+		|| (vim_ispathsep(fname[j]) && vim_ispathsep(ಮಾರ್ಗ_part[i][j]))
+#ಆದರೆ_ಅಂತ್ಯ
+			     ) && fname[j] != NUL && ಮಾರ್ಗ_part[i][j] != NUL)
 	    j++;
-	if (j > maxlen)
+	ಆದರೆ (j > maxlen)
 	{
 	    maxlen = j;
 	    cutoff = &fname[j];
@@ -2512,11 +2512,11 @@ get_path_cutoff(char_u *fname, garray_T *gap)
     }
 
     // skip to the file or directory name
-    if (cutoff != NULL)
-	while (vim_ispathsep(*cutoff))
+    ಆದರೆ (cutoff != ಖಾಲಿ)
+	ಆಗ (vim_ispathsep(*cutoff))
 	    MB_PTR_ADV(cutoff);
 
-    return cutoff;
+    ಹಿಂತಿರುಗಿ cutoff;
 }
 
 /*
@@ -2524,107 +2524,107 @@ get_path_cutoff(char_u *fname, garray_T *gap)
  * that they are unique with respect to each other while conserving the part
  * that matches the pattern. Beware, this is at least O(n^2) wrt "gap->ga_len".
  */
-    void
+    ಶೂನ್ಯ
 uniquefy_paths(
 	garray_T *gap,
-	char_u *pattern,
-	char_u *path_option)	// p_path or p_cdpath
+	char_u *ನಮೂನೆ,
+	char_u *ಮಾರ್ಗ_option)	// p_path or p_cdpath
 {
-    int		i;
-    int		len;
-    char_u	**fnames = (char_u **)gap->ga_data;
-    int		sort_again = FALSE;
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		len;
+    char_u	**fnames = (char_u **)gap->ga_ದತ್ತಾಂಶ;
+    ಪೂರ್ಣಾಂಕ		ವಿಂಗಡಿಸು_again = FALSE;
     char_u	*pat;
-    char_u      *file_pattern;
+    char_u      *file_ನಮೂನೆ;
     char_u	*curdir;
     regmatch_T	regmatch;
-    garray_T	path_ga;
-    char_u	**in_curdir = NULL;
+    garray_T	ಮಾರ್ಗ_ga;
+    char_u	**ಒಳ_curdir = ಖಾಲಿ;
     char_u	*short_name;
 
     remove_duplicates(gap);
-    ga_init2(&path_ga, sizeof(char_u *), 1);
+    ga_init2(&ಮಾರ್ಗ_ga, ಗಾತ್ರ(char_u *), 1);
 
     /*
      * We need to prepend a '*' at the beginning of file_pattern so that the
      * regex matches anywhere in the path. FIXME: is this valid for all
      * possible patterns?
      */
-    len = (int)STRLEN(pattern);
-    file_pattern = alloc(len + 2);
-    if (file_pattern == NULL)
-	return;
-    file_pattern[0] = '*';
-    STRCPY(file_pattern + 1, pattern);
-    pat = file_pat_to_reg_pat(file_pattern, NULL, NULL, FALSE);
-    vim_free(file_pattern);
-    if (pat == NULL)
-	return;
+    len = (ಪೂರ್ಣಾಂಕ)STRLEN(ನಮೂನೆ);
+    file_ನಮೂನೆ = alloc(len + 2);
+    ಆದರೆ (file_ನಮೂನೆ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
+    file_ನಮೂನೆ[0] = '*';
+    STRCPY(file_ನಮೂನೆ + 1, ನಮೂನೆ);
+    pat = file_pat_ಗಮ್ಯ_reg_pat(file_ನಮೂನೆ, ಖಾಲಿ, ಖಾಲಿ, FALSE);
+    vim_free(file_ನಮೂನೆ);
+    ಆದರೆ (pat == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     regmatch.rm_ic = TRUE;		// always ignore case
     regmatch.regprog = vim_regcomp(pat, RE_MAGIC + RE_STRING);
     vim_free(pat);
-    if (regmatch.regprog == NULL)
-	return;
+    ಆದರೆ (regmatch.regprog == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    if ((curdir = alloc(MAXPATHL)) == NULL)
-	goto theend;
+    ಆದರೆ ((curdir = alloc(MAXPATHL)) == ಖಾಲಿ)
+	ಹೋಗು theend;
     mch_dirname(curdir, MAXPATHL);
-    expand_path_option(curdir, path_option, &path_ga);
+    expand_ಮಾರ್ಗ_option(curdir, ಮಾರ್ಗ_option, &ಮಾರ್ಗ_ga);
 
-    in_curdir = ALLOC_CLEAR_MULT(char_u *, gap->ga_len);
-    if (in_curdir == NULL)
-	goto theend;
+    ಒಳ_curdir = ALLOC_CLEAR_MULT(char_u *, gap->ga_len);
+    ಆದರೆ (ಒಳ_curdir == ಖಾಲಿ)
+	ಹೋಗು theend;
 
-    for (i = 0; i < gap->ga_len && !got_int; i++)
+    ಗಾಗಿ (i = 0; i < gap->ga_len && !got_int; i++)
     {
-	char_u	    *path = fnames[i];
-	int	    is_in_curdir;
-	char_u	    *dir_end = gettail_dir(path);
-	char_u	    *path_cutoff;
+	char_u	    *ಮಾರ್ಗ = fnames[i];
+	ಪೂರ್ಣಾಂಕ	    is_ಒಳ_curdir;
+	char_u	    *dir_ಕೊನೆ = gettail_dir(ಮಾರ್ಗ);
+	char_u	    *ಮಾರ್ಗ_cutoff;
 
-	len = (int)STRLEN(path);
-	is_in_curdir = fnamencmp(curdir, path, dir_end - path) == 0
-					     && curdir[dir_end - path] == NUL;
-	if (is_in_curdir)
-	    in_curdir[i] = vim_strnsave(path, len);
+	len = (ಪೂರ್ಣಾಂಕ)STRLEN(ಮಾರ್ಗ);
+	is_ಒಳ_curdir = fnamencmp(curdir, ಮಾರ್ಗ, dir_ಕೊನೆ - ಮಾರ್ಗ) == 0
+					     && curdir[dir_ಕೊನೆ - ಮಾರ್ಗ] == NUL;
+	ಆದರೆ (is_ಒಳ_curdir)
+	    ಒಳ_curdir[i] = vim_strnsave(ಮಾರ್ಗ, len);
 
 	// Shorten the filename while maintaining its uniqueness
-	path_cutoff = get_path_cutoff(path, &path_ga);
+	ಮಾರ್ಗ_cutoff = get_ಮಾರ್ಗ_cutoff(ಮಾರ್ಗ, &ಮಾರ್ಗ_ga);
 
 	// Don't assume all files can be reached without path when search
 	// pattern starts with star star slash, so only remove path_cutoff
 	// when possible.
-	if (pattern[0] == '*' && pattern[1] == '*'
-		&& vim_ispathsep_nocolon(pattern[2])
-		&& path_cutoff != NULL
-		&& vim_regexec(&regmatch, path_cutoff, (colnr_T)0)
-		&& is_unique(path_cutoff, gap, i))
+	ಆದರೆ (ನಮೂನೆ[0] == '*' && ನಮೂನೆ[1] == '*'
+		&& vim_ispathsep_nocolon(ನಮೂನೆ[2])
+		&& ಮಾರ್ಗ_cutoff != ಖಾಲಿ
+		&& vim_regexec(&regmatch, ಮಾರ್ಗ_cutoff, (colnr_T)0)
+		&& is_unique(ಮಾರ್ಗ_cutoff, gap, i))
 	{
-	    sort_again = TRUE;
-	    mch_memmove(path, path_cutoff, STRLEN(path_cutoff) + 1);
+	    ವಿಂಗಡಿಸು_again = TRUE;
+	    mch_memmove(ಮಾರ್ಗ, ಮಾರ್ಗ_cutoff, STRLEN(ಮಾರ್ಗ_cutoff) + 1);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // Here all files can be reached without path, so get shortest
 	    // unique path.  We start at the end of the path.
-	    char_u  *pathsep_p = path + len - 1;
+	    char_u  *pathsep_p = ಮಾರ್ಗ + len - 1;
 
-	    while (find_previous_pathsep(path, &pathsep_p))
+	    ಆಗ (ಕಂಡುಹಿಡಿ_ಹಿಂದಿನ_pathsep(ಮಾರ್ಗ, &pathsep_p))
 	    {
-		if (vim_regexec(&regmatch, pathsep_p + 1, (colnr_T)0)
+		ಆದರೆ (vim_regexec(&regmatch, pathsep_p + 1, (colnr_T)0)
 			&& is_unique(pathsep_p + 1, gap, i)
-			&& path_cutoff != NULL && pathsep_p + 1 >= path_cutoff)
+			&& ಮಾರ್ಗ_cutoff != ಖಾಲಿ && pathsep_p + 1 >= ಮಾರ್ಗ_cutoff)
 		{
-		    sort_again = TRUE;
-		    mch_memmove(path, pathsep_p + 1,
-			    (size_t)((path + len) - (pathsep_p + 1)) + 1);  // +1 for NUL
-		    break;
+		    ವಿಂಗಡಿಸು_again = TRUE;
+		    mch_memmove(ಮಾರ್ಗ, pathsep_p + 1,
+			    (size_t)((ಮಾರ್ಗ + len) - (pathsep_p + 1)) + 1);  // +1 for NUL
+		    ನಿಲ್ಲಿಸು;
 		}
 	    }
 	}
 
-	if (mch_isFullName(path))
+	ಆದರೆ (mch_is_ತುಂಬಿದ_Name(ಮಾರ್ಗ))
 	{
 	    /*
 	     * Last resort: shorten relative to curdir if possible.
@@ -2638,69 +2638,69 @@ uniquefy_paths(
 	     *	    /file.txt		  /		/file.txt
 	     *	    c:\file.txt		  c:\		.\file.txt
 	     */
-	    short_name = shorten_fname(path, curdir);
-	    if (short_name != NULL && short_name > path + 1
-#if defined(MSWIN)
+	    short_name = shorten_fname(ಮಾರ್ಗ, curdir);
+	    ಆದರೆ (short_name != ಖಾಲಿ && short_name > ಮಾರ್ಗ + 1
+#ಆದರೆ defined(MSWIN)
 		    // On windows,
 		    //	    shorten_fname("c:\a\a.txt", "c:\a\b")
 		    // returns "\a\a.txt", which is not really the short
 		    // name, hence:
 		    && !vim_ispathsep(*short_name)
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		)
 	    {
-		vim_snprintf((char *)path, MAXPATHL, ".%s%s", PATHSEPSTR, short_name);
+		vim_snprintf((ಅಕ್ಷರ *)ಮಾರ್ಗ, MAXPATHL, ".%s%s", PATHSEPSTR, short_name);
 	    }
 	}
 	ui_breakcheck();
     }
 
     // Shorten filenames in /in/current/directory/{filename}
-    for (i = 0; i < gap->ga_len && !got_int; i++)
+    ಗಾಗಿ (i = 0; i < gap->ga_len && !got_int; i++)
     {
 	size_t	rel_pathsize;
-	char_u	*rel_path;
-	char_u	*path = in_curdir[i];
+	char_u	*rel_ಮಾರ್ಗ;
+	char_u	*ಮಾರ್ಗ = ಒಳ_curdir[i];
 
-	if (path == NULL)
-	    continue;
+	ಆದರೆ (ಮಾರ್ಗ == ಖಾಲಿ)
+	    ಮುಂದುವರಿ;
 
 	// If the {filename} is not unique, change it to ./{filename}.
 	// Else reduce it to {filename}
-	short_name = shorten_fname(path, curdir);
-	if (short_name == NULL)
-	    short_name = path;
-	if (is_unique(short_name, gap, i))
+	short_name = shorten_fname(ಮಾರ್ಗ, curdir);
+	ಆದರೆ (short_name == ಖಾಲಿ)
+	    short_name = ಮಾರ್ಗ;
+	ಆದರೆ (is_unique(short_name, gap, i))
 	{
 	    STRCPY(fnames[i], short_name);
-	    continue;
+	    ಮುಂದುವರಿ;
 	}
 
-	rel_pathsize = 1 + sizeof(PATHSEP) + STRLEN(short_name) + 1;
-	rel_path = alloc(rel_pathsize);
-	if (rel_path == NULL)
-	    goto theend;
+	rel_pathsize = 1 + ಗಾತ್ರ(PATHSEP) + STRLEN(short_name) + 1;
+	rel_ಮಾರ್ಗ = alloc(rel_pathsize);
+	ಆದರೆ (rel_ಮಾರ್ಗ == ಖಾಲಿ)
+	    ಹೋಗು theend;
 
-	vim_snprintf((char *)rel_path, rel_pathsize, ".%s%s", PATHSEPSTR, short_name);
+	vim_snprintf((ಅಕ್ಷರ *)rel_ಮಾರ್ಗ, rel_pathsize, ".%s%s", PATHSEPSTR, short_name);
 
 	vim_free(fnames[i]);
-	fnames[i] = rel_path;
-	sort_again = TRUE;
+	fnames[i] = rel_ಮಾರ್ಗ;
+	ವಿಂಗಡಿಸು_again = TRUE;
 	ui_breakcheck();
     }
 
 theend:
     vim_free(curdir);
-    if (in_curdir != NULL)
+    ಆದರೆ (ಒಳ_curdir != ಖಾಲಿ)
     {
-	for (i = 0; i < gap->ga_len; i++)
-	    vim_free(in_curdir[i]);
-	vim_free(in_curdir);
+	ಗಾಗಿ (i = 0; i < gap->ga_len; i++)
+	    vim_free(ಒಳ_curdir[i]);
+	vim_free(ಒಳ_curdir);
     }
-    ga_clear_strings(&path_ga);
+    ga_clear_ಅಕ್ಷರಸರಣಿಗಳು(&ಮಾರ್ಗ_ga);
     vim_regfree(regmatch.regprog);
 
-    if (sort_again)
+    ಆದರೆ (ವಿಂಗಡಿಸು_again)
 	remove_duplicates(gap);
 }
 
@@ -2709,44 +2709,44 @@ theend:
  * result in "gap".
  * Returns the total number of matches.
  */
-    int
-expand_in_path(
+    ಪೂರ್ಣಾಂಕ
+expand_ಒಳ_ಮಾರ್ಗ(
     garray_T	*gap,
-    char_u	*pattern,
-    int		flags)		// EW_* flags
+    char_u	*ನಮೂನೆ,
+    ಪೂರ್ಣಾಂಕ		flags)		// EW_* flags
 {
     char_u	*curdir;
-    garray_T	path_ga;
-    char_u	*paths = NULL;
-    int		glob_flags = 0;
-    char_u	*path_option = *curbuf->b_p_path == NUL ? p_path : curbuf->b_p_path;
+    garray_T	ಮಾರ್ಗ_ga;
+    char_u	*paths = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		glob_flags = 0;
+    char_u	*ಮಾರ್ಗ_option = *curbuf->b_p_ಮಾರ್ಗ == NUL ? p_ಮಾರ್ಗ : curbuf->b_p_ಮಾರ್ಗ;
 
-    if ((curdir = alloc(MAXPATHL)) == NULL)
-	return 0;
+    ಆದರೆ ((curdir = alloc(MAXPATHL)) == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ 0;
     mch_dirname(curdir, MAXPATHL);
 
-    ga_init2(&path_ga, sizeof(char_u *), 1);
-    if (flags & EW_CDPATH)
-	expand_path_option(curdir, p_cdpath, &path_ga);
-    else
-	expand_path_option(curdir, path_option, &path_ga);
+    ga_init2(&ಮಾರ್ಗ_ga, ಗಾತ್ರ(char_u *), 1);
+    ಆದರೆ (flags & EW_CDPATH)
+	expand_ಮಾರ್ಗ_option(curdir, p_cdpath, &ಮಾರ್ಗ_ga);
+    ಇಲ್ಲದಿದ್ದರೆ
+	expand_ಮಾರ್ಗ_option(curdir, ಮಾರ್ಗ_option, &ಮಾರ್ಗ_ga);
     vim_free(curdir);
-    if (path_ga.ga_len == 0)
-	return 0;
+    ಆದರೆ (ಮಾರ್ಗ_ga.ga_len == 0)
+	ಹಿಂತಿರುಗಿ 0;
 
-    paths = ga_concat_strings(&path_ga, ",");
-    ga_clear_strings(&path_ga);
-    if (paths == NULL)
-	return 0;
+    paths = ga_concat_ಅಕ್ಷರಸರಣಿಗಳು(&ಮಾರ್ಗ_ga, ",");
+    ga_clear_ಅಕ್ಷರಸರಣಿಗಳು(&ಮಾರ್ಗ_ga);
+    ಆದರೆ (paths == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ 0;
 
-    if (flags & EW_ICASE)
+    ಆದರೆ (flags & EW_ICASE)
 	glob_flags |= WILD_ICASE;
-    if (flags & EW_ADDSLASH)
-	glob_flags |= WILD_ADD_SLASH;
-    globpath(paths, pattern, gap, glob_flags, !!(flags & EW_CDPATH));
+    ಆದರೆ (flags & EW_ADDSLASH)
+	glob_flags |= WILD_ಕೂಡಿಸು_SLASH;
+    globpath(paths, ನಮೂನೆ, gap, glob_flags, !!(flags & EW_CDPATH));
     vim_free(paths);
 
-    return gap->ga_len;
+    ಹಿಂತಿರುಗಿ gap->ga_len;
 }
 
 
@@ -2759,101 +2759,101 @@ expand_in_path(
     size_t
 simplify_filename(char_u *filename)
 {
-#ifndef AMIGA	    // Amiga doesn't have "..", it uses "/"
-    int		components = 0;
-    char_u	*p, *tail, *start;
-    char_u	*p_end;			    // point to NUL at end of string "p"
-    int		stripping_disabled = FALSE;
-    int		relative = TRUE;
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ AMIGA	    // Amiga doesn't have "..", it uses "/"
+    ಪೂರ್ಣಾಂಕ		components = 0;
+    char_u	*p, *ಬಾಲ, *ಆರಂಭ;
+    char_u	*p_ಕೊನೆ;			    // point to NUL at end of string "p"
+    ಪೂರ್ಣಾಂಕ		stripping_disabled = FALSE;
+    ಪೂರ್ಣಾಂಕ		relative = TRUE;
 
     p = filename;
-# ifdef BACKSLASH_IN_FILENAME
-    if (p[0] != NUL && p[1] == ':')	    // skip "x:"
+# ifdef BACKSLASH_ಒಳ_FILENAME
+    ಆದರೆ (p[0] != NUL && p[1] == ':')	    // skip "x:"
 	p += 2;
 # endif
 
-    if (vim_ispathsep(*p))
+    ಆದರೆ (vim_ispathsep(*p))
     {
 	relative = FALSE;
-	do
+	ಮಾಡು
 	    ++p;
-	while (vim_ispathsep(*p));
+	ಆಗ (vim_ispathsep(*p));
     }
-    start = p;	    // remember start after "c:/" or "/" or "///"
-    p_end = p + STRLEN(p);
+    ಆರಂಭ = p;	    // remember start after "c:/" or "/" or "///"
+    p_ಕೊನೆ = p + STRLEN(p);
 # ifdef UNIX
     // Posix says that "//path" is unchanged but "///path" is "/path".
-    if (start > filename + 2)
+    ಆದರೆ (ಆರಂಭ > filename + 2)
     {
-	mch_memmove(filename + 1, p, (size_t)(p_end - p) + 1);	    // +1 for NUL
-	p_end -= (size_t)(p - (filename + 1));
-	start = p = filename + 1;
+	mch_memmove(filename + 1, p, (size_t)(p_ಕೊನೆ - p) + 1);	    // +1 for NUL
+	p_ಕೊನೆ -= (size_t)(p - (filename + 1));
+	ಆರಂಭ = p = filename + 1;
     }
 # endif
 
-    do
+    ಮಾಡು
     {
 	// At this point "p" is pointing to the char following a single "/"
 	// or "p" is at the "start" of the (absolute or relative) path name.
 # ifdef VMS
 	// VMS allows device:[path] - don't strip the [ in directory
-	if ((*p == '[' || *p == '<') && p > filename && p[-1] == ':')
+	ಆದರೆ ((*p == '[' || *p == '<') && p > filename && p[-1] == ':')
 	{
 	    // :[ or :< composition: vms directory component
 	    ++components;
 	    p = getnextcomp(p + 1);
 	}
 	// allow remote calls as host"user passwd"::device:[path]
-	else if (p[0] == ':' && p[1] == ':' && p > filename && p[-1] == '"' )
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p[0] == ':' && p[1] == ':' && p > filename && p[-1] == '"' )
 	{
 	    // ":: composition: vms host/passwd component
 	    ++components;
 	    p = getnextcomp(p + 2);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 # endif
-	if (vim_ispathsep(*p))
+	ಆದರೆ (vim_ispathsep(*p))
 	{
-	    mch_memmove(p, p + 1, (size_t)(p_end - (p + 1)) + 1); // remove duplicate "/"
-	    --p_end;
+	    mch_memmove(p, p + 1, (size_t)(p_ಕೊನೆ - (p + 1)) + 1); // remove duplicate "/"
+	    --p_ಕೊನೆ;
 	}
-	else if (p[0] == '.' && (vim_ispathsep(p[1]) || p[1] == NUL))
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p[0] == '.' && (vim_ispathsep(p[1]) || p[1] == NUL))
 	{
-	    if (p == start && relative)
+	    ಆದರೆ (p == ಆರಂಭ && relative)
 		p += 1 + (p[1] != NUL);	// keep single "." or leading "./"
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		// Strip "./" or ".///".  If we are at the end of the file name
 		// and there is no trailing path separator, either strip "/." if
 		// we are after "start", or strip "." if we are at the beginning
 		// of an absolute path name .
-		tail = p + 1;
-		if (p[1] != NUL)
-		    while (vim_ispathsep(*tail))
-			MB_PTR_ADV(tail);
-		else if (p > start)
+		ಬಾಲ = p + 1;
+		ಆದರೆ (p[1] != NUL)
+		    ಆಗ (vim_ispathsep(*ಬಾಲ))
+			MB_PTR_ADV(ಬಾಲ);
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p > ಆರಂಭ)
 		    --p;		// strip preceding path separator
 
-		mch_memmove(p, tail, (size_t)(p_end - tail) + 1);
-		p_end -= (size_t)(tail - p);
+		mch_memmove(p, ಬಾಲ, (size_t)(p_ಕೊನೆ - ಬಾಲ) + 1);
+		p_ಕೊನೆ -= (size_t)(ಬಾಲ - p);
 	    }
 	}
-	else if (p[0] == '.' && p[1] == '.' &&
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p[0] == '.' && p[1] == '.' &&
 	    (vim_ispathsep(p[2]) || p[2] == NUL))
 	{
 	    // Skip to after ".." or "../" or "..///".
-	    tail = p + 2;
-	    while (vim_ispathsep(*tail))
-		MB_PTR_ADV(tail);
+	    ಬಾಲ = p + 2;
+	    ಆಗ (vim_ispathsep(*ಬಾಲ))
+		MB_PTR_ADV(ಬಾಲ);
 
-	    if (components > 0)		// strip one preceding component
+	    ಆದರೆ (components > 0)		// strip one preceding component
 	    {
-		int		do_strip = FALSE;
+		ಪೂರ್ಣಾಂಕ		do_strip = FALSE;
 		char_u		saved_char;
 		stat_T		st;
 
 		// Don't strip for an erroneous file name.
-		if (!stripping_disabled)
+		ಆದರೆ (!stripping_disabled)
 		{
 		    // If the preceding component does not exist in the file
 		    // system, we strip it.  On Unix, we don't accept a symbolic
@@ -2861,19 +2861,19 @@ simplify_filename(char_u *filename)
 		    saved_char = p[-1];
 		    p[-1] = NUL;
 # ifdef UNIX
-		    if (mch_lstat((char *)filename, &st) < 0)
-# else
-			if (mch_stat((char *)filename, &st) < 0)
+		    ಆದರೆ (mch_lstat((ಅಕ್ಷರ *)filename, &st) < 0)
+# ಇಲ್ಲದಿದ್ದರೆ
+			ಆದರೆ (mch_stat((ಅಕ್ಷರ *)filename, &st) < 0)
 # endif
 			    do_strip = TRUE;
 		    p[-1] = saved_char;
 
 		    --p;
 		    // Skip back to after previous '/'.
-		    while (p > start && !after_pathsep(start, p))
-			MB_PTR_BACK(start, p);
+		    ಆಗ (p > ಆರಂಭ && !after_pathsep(ಆರಂಭ, p))
+			MB_PTR_ಹಿಂಭಾಗ(ಆರಂಭ, p);
 
-		    if (!do_strip)
+		    ಆದರೆ (!do_strip)
 		    {
 			// If the component exists in the file system, check
 			// that stripping it won't change the meaning of the
@@ -2885,15 +2885,15 @@ simplify_filename(char_u *filename)
 			// don't want to replace an erroneous file name by
 			// a valid one, and we disable stripping of later
 			// components.
-			saved_char = *tail;
-			*tail = NUL;
-			if (mch_stat((char *)filename, &st) >= 0)
+			saved_char = *ಬಾಲ;
+			*ಬಾಲ = NUL;
+			ಆದರೆ (mch_stat((ಅಕ್ಷರ *)filename, &st) >= 0)
 			    do_strip = TRUE;
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			    stripping_disabled = TRUE;
-			*tail = saved_char;
+			*ಬಾಲ = saved_char;
 # ifdef UNIX
-			if (do_strip)
+			ಆದರೆ (do_strip)
 			{
 			    stat_T	new_st;
 
@@ -2904,17 +2904,17 @@ simplify_filename(char_u *filename)
 			    // same as the stripped file name.  (The latter
 			    // exists in the file system since it is the
 			    // component's parent directory.)
-			    if (p == start && relative)
-				(void)mch_stat(".", &new_st);
-			    else
+			    ಆದರೆ (p == ಆರಂಭ && relative)
+				(ಶೂನ್ಯ)mch_stat(".", &new_st);
+			    ಇಲ್ಲದಿದ್ದರೆ
 			    {
 				saved_char = *p;
 				*p = NUL;
-				(void)mch_stat((char *)filename, &new_st);
+				(ಶೂನ್ಯ)mch_stat((ಅಕ್ಷರ *)filename, &new_st);
 				*p = saved_char;
 			    }
 
-			    if (new_st.st_ino != st.st_ino ||
+			    ಆದರೆ (new_st.st_ino != st.st_ino ||
 				new_st.st_dev != st.st_dev)
 			    {
 				do_strip = FALSE;
@@ -2927,14 +2927,14 @@ simplify_filename(char_u *filename)
 		    }
 		}
 
-		if (!do_strip)
+		ಆದರೆ (!do_strip)
 		{
 		    // Skip the ".." or "../" and reset the counter for the
 		    // components that might be stripped later on.
-		    p = tail;
+		    p = ಬಾಲ;
 		    components = 0;
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    // Strip previous component.  If the result would get empty
 		    // and there is no trailing path separator, leave a single
@@ -2942,68 +2942,68 @@ simplify_filename(char_u *filename)
 		    // there is no trailing path separator and a preceding
 		    // component is left after stripping, strip its trailing
 		    // path separator as well.
-		    if (p == start && relative && tail[-1] == '.')
+		    ಆದರೆ (p == ಆರಂಭ && relative && ಬಾಲ[-1] == '.')
 		    {
 			*p++ = '.';
 			*p = NUL;
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
-			if (p > start && tail[-1] == '.')
+			ಆದರೆ (p > ಆರಂಭ && ಬಾಲ[-1] == '.')
 			    --p;
 
-			mch_memmove(p, tail, (size_t)(p_end - tail) + 1);	// strip previous component
-			p_end -= (size_t)(tail - p);
+			mch_memmove(p, ಬಾಲ, (size_t)(p_ಕೊನೆ - ಬಾಲ) + 1);	// strip previous component
+			p_ಕೊನೆ -= (size_t)(ಬಾಲ - p);
 		    }
 
 		    --components;
 		}
 	    }
-	    else if (p == start && !relative)	// leading "/.." or "/../"
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p == ಆರಂಭ && !relative)	// leading "/.." or "/../"
 	    {
-		mch_memmove(p, tail, (size_t)(p_end - tail) + 1);		// strip ".." or "../"
-		p_end -= (size_t)(tail - p);
+		mch_memmove(p, ಬಾಲ, (size_t)(p_ಕೊನೆ - ಬಾಲ) + 1);		// strip ".." or "../"
+		p_ಕೊನೆ -= (size_t)(ಬಾಲ - p);
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		if (p == start + 2 && p[-2] == '.')	// leading "./../"
+		ಆದರೆ (p == ಆರಂಭ + 2 && p[-2] == '.')	// leading "./../"
 		{
-		    mch_memmove(p - 2, p, (size_t)(p_end - p) + 1); // strip leading "./"
-		    p_end -= 2;
-		    tail -= 2;
+		    mch_memmove(p - 2, p, (size_t)(p_ಕೊನೆ - p) + 1); // strip leading "./"
+		    p_ಕೊನೆ -= 2;
+		    ಬಾಲ -= 2;
 		}
-		p = tail;		// skip to char after ".." or "../"
+		p = ಬಾಲ;		// skip to char after ".." or "../"
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    ++components;		// simple path component
 	    p = getnextcomp(p);
 	}
-    } while (*p != NUL);
+    } ಆಗ (*p != NUL);
 
-    return (size_t)(p_end - filename);
-#else
+    ಹಿಂತಿರುಗಿ (size_t)(p_ಕೊನೆ - filename);
+#ಇಲ್ಲದಿದ್ದರೆ
     // Don't touch Amiga filenames
-    return STRLEN(filename);
-#endif // !AMIGA
+    ಹಿಂತಿರುಗಿ STRLEN(filename);
+#ಆದರೆ_ಅಂತ್ಯ // !AMIGA
 }
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * "simplify()" function
  */
-    void
+    ಶೂನ್ಯ
 f_simplify(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ಆದರೆ (ಒಳ_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
     p = tv_get_string_strict(&argvars[0]);
     rettv->vval.v_string = vim_strsave(p);
     simplify_filename(rettv->vval.v_string);	// simplify in place
     rettv->v_type = VAR_STRING;
 }
-#endif // FEAT_EVAL
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_EVAL

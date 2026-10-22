@@ -13,63 +13,63 @@
  * Routines for Win32.
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-#include <sys/types.h>
-#include <limits.h>
+#ಅನ್ತರ್ಭಾವ <sys/types.h>
+#ಅನ್ತರ್ಭಾವ <limits.h>
 
-#include <process.h>
-#include <direct.h>
+#ಅನ್ತರ್ಭಾವ <process.h>
+#ಅನ್ತರ್ಭಾವ <direct.h>
 
-#if !defined(FEAT_GUI_MSWIN)
+#ಆದರೆ !defined(FEAT_GUI_MSWIN)
 # include <shellapi.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_PRINTER) && !defined(FEAT_POSTSCRIPT)
+#ಆದರೆ defined(FEAT_PRINTER) && !defined(FEAT_POSTSCRIPT)
 # include <dlgs.h>
 # include <winspool.h>
 # include <commdlg.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // Record all output and all keyboard & mouse input
 // #define MCH_WRITE_DUMP
 
-#ifdef MCH_WRITE_DUMP
-FILE* fdDump = NULL;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MCH_WRITE_DUMP
+FILE* fdDump = ಖಾಲಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-extern char g_szOrigTitle[];
-#endif
+#ಆದರೆ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+ಬಾಹ್ಯ ಅಕ್ಷರ g_szOrigTitle[];
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_GUI
-extern HWND s_hwnd;
-#else
-static HWND s_hwnd = 0;	    // console window handle, set by GetConsoleHwnd()
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+ಬಾಹ್ಯ HWND s_hwnd;
+#ಇಲ್ಲದಿದ್ದರೆ
+ಸ್ಥಿರ HWND s_hwnd = 0;	    // console window handle, set by GetConsoleHwnd()
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_JOB_CHANNEL
-int WSInitialized = FALSE; // WinSock is initialized
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕೆಲಸ_CHANNEL
+ಪೂರ್ಣಾಂಕ WSInitialized = FALSE; // WinSock is initialized
+#ಆದರೆ_ಅಂತ್ಯ
 
 
 /*
  * Save the instance handle of the exe/dll.
  */
-    void
+    ಶೂನ್ಯ
 SaveInst(HINSTANCE hInst)
 {
     g_hinst = hInst;
 }
 
-#if defined(FEAT_GUI_MSWIN)
+#ಆದರೆ defined(FEAT_GUI_MSWIN)
 /*
  * GUI version of mch_exit().
  * Shut down and exit with status `r'
  * Careful: mch_exit() may be called before mch_init()!
  */
-    void
-mch_exit_g(int r)
+    ಶೂನ್ಯ
+mch_exit_g(ಪೂರ್ಣಾಂಕ r)
 {
     exiting = TRUE;
 
@@ -80,127 +80,127 @@ mch_exit_g(int r)
 # ifdef FEAT_OLE
     UninitOLE();
 # endif
-# ifdef FEAT_JOB_CHANNEL
-    if (WSInitialized)
+# ifdef FEAT_ಕೆಲಸ_CHANNEL
+    ಆದರೆ (WSInitialized)
     {
 	WSInitialized = FALSE;
 	WSACleanup();
     }
 # endif
 # ifdef DYNAMIC_GETTEXT
-    dyn_libintl_end();
+    dyn_libintl_ಕೊನೆ();
 # endif
 
-    if (gui.in_use)
+    ಆದರೆ (gui.ಒಳ_use)
 	gui_exit(r);
 
 # ifdef EXITFREE
     free_all_mem();
 # endif
 
-    exit(r);
+    ನಿರ್ಗಮಿಸು(r);
 }
 
-#endif // FEAT_GUI_MSWIN
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_GUI_MSWIN
 
 
 /*
  * Get version number including build number
  */
-typedef BOOL (WINAPI *PfnRtlGetVersion)(LPOSVERSIONINFOW);
-DWORD win_version;
-    static void
-win_version_init(void)
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ BOOL (WINAPI *Pfn_Rtl_Get_ಆವೃತ್ತಿ)(LPOSVERSIONINFOW);
+DWORD win_ಆವೃತ್ತಿ;
+    ಸ್ಥಿರ ಶೂನ್ಯ
+win_ಆವೃತ್ತಿ_init(ಶೂನ್ಯ)
 {
     OSVERSIONINFOW	osver;
     HMODULE		hNtdll;
-    PfnRtlGetVersion	pRtlGetVersion;
+    Pfn_Rtl_Get_ಆವೃತ್ತಿ	p_Rtl_Get_ಆವೃತ್ತಿ;
 
     hNtdll = GetModuleHandle("ntdll.dll");
-    if (hNtdll == NULL)
-	return;
+    ಆದರೆ (hNtdll == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    pRtlGetVersion =
-	(PfnRtlGetVersion) GetProcAddress(hNtdll, "RtlGetVersion");
-    if (pRtlGetVersion == NULL)
-	return;
+    p_Rtl_Get_ಆವೃತ್ತಿ =
+	(Pfn_Rtl_Get_ಆವೃತ್ತಿ) Get_Proc_ವಿಳಾಸ(hNtdll, "RtlGetVersion");
+    ಆದರೆ (p_Rtl_Get_ಆವೃತ್ತಿ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    osver.dwOSVersionInfoSize = sizeof(OSVERSIONINFOW);
-    pRtlGetVersion(&osver);
-    win_version = MAKE_VER(min(osver.dwMajorVersion, 0xFF),
-	    min(osver.dwMinorVersion, 0xFF),
-	    min(osver.dwBuildNumber, 0xFFFF));
+    osver.dw_OSVersion_Info_ಗಾತ್ರ = ಗಾತ್ರ(OSVERSIONINFOW);
+    p_Rtl_Get_ಆವೃತ್ತಿ(&osver);
+    win_ಆವೃತ್ತಿ = MAKE_VER(min(osver.dw_Major_ಆವೃತ್ತಿ, 0xFF),
+	    min(osver.dw_Minor_ಆವೃತ್ತಿ, 0xFF),
+	    min(osver.dw_Build_ಸಂಖ್ಯೆ, 0xFFFF));
 }
 
 /*
  * Init the tables for toupper() and tolower().
  */
-    void
-mch_early_init(void)
+    ಶೂನ್ಯ
+mch_early_init(ಶೂನ್ಯ)
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
 
-    win_version_init();
+    win_ಆವೃತ್ತಿ_init();
 
     PlatformId();
 
     // Init the tables for toupper() and tolower()
-    for (i = 0; i < 256; ++i)
+    ಗಾಗಿ (i = 0; i < 256; ++i)
 	toupper_tab[i] = tolower_tab[i] = i;
-    CharUpperBuff((LPSTR)toupper_tab, 256);
-    CharLowerBuff((LPSTR)tolower_tab, 256);
+    Char_ಊರ್ಧ್ವ_Buff((LPSTR)toupper_tab, 256);
+    Char_ಅಧೋ_Buff((LPSTR)tolower_tab, 256);
 }
 
 
 /*
  * Return TRUE if the input comes from a terminal, FALSE otherwise.
  */
-    int
-mch_input_isatty(void)
+    ಪೂರ್ಣಾಂಕ
+mch_ಒಳಹರಿವು_isatty(ಶೂನ್ಯ)
 {
-#ifdef FEAT_GUI_MSWIN
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_MSWIN
 # ifdef VIMDLL
-    if (gui.in_use)
+    ಆದರೆ (gui.ಒಳ_use)
 # endif
-	return TRUE;	    // GUI always has a tty
-#endif
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-    if (isatty(read_cmd_fd))
-	return TRUE;
-    return FALSE;
-#endif
+	ಹಿಂತಿರುಗಿ TRUE;	    // GUI always has a tty
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+    ಆದರೆ (isatty(read_cmd_fd))
+	ಹಿಂತಿರುಗಿ TRUE;
+    ಹಿಂತಿರುಗಿ FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * mch_settitle(): set titlebar of our window
  */
-    void
+    ಶೂನ್ಯ
 mch_settitle(
     char_u *title,
-    char_u *icon UNUSED)
+    char_u *icon ಬಳಸದ)
 {
-#ifdef FEAT_GUI_MSWIN
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_MSWIN
 # ifdef VIMDLL
-    if (gui.in_use)
+    ಆದರೆ (gui.ಒಳ_use)
 # endif
     {
 	gui_mch_settitle(title, icon);
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
-#endif
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-    if (title != NULL)
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+    ಆದರೆ (title != ಖಾಲಿ)
     {
-	WCHAR	*wp = enc_to_utf16(title, NULL);
+	WCHAR	*wp = enc_ಗಮ್ಯ_utf16(title, ಖಾಲಿ);
 
-	if (wp == NULL)
-	    return;
+	ಆದರೆ (wp == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ;
 
-	SetConsoleTitleW(wp);
+	ಗಣ_Console_Title_W(wp);
 	vim_free(wp);
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 
@@ -211,35 +211,35 @@ mch_settitle(
  *  SAVE_RESTORE_ICON:  Just restore icon (which we don't have)
  *  SAVE_RESTORE_BOTH:  Restore title and icon (which we don't have)
  */
-    void
-mch_restore_title(int which UNUSED)
+    ಶೂನ್ಯ
+mch_restore_title(ಪೂರ್ಣಾಂಕ which ಬಳಸದ)
 {
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ಆದರೆ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 # ifdef VIMDLL
-    if (!gui.in_use)
+    ಆದರೆ (!gui.ಒಳ_use)
 # endif
-	SetConsoleTitle(g_szOrigTitle);
-#endif
+	ಗಣ_Console_Title(g_szOrigTitle);
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 
 /*
  * Return TRUE if we can restore the title (we can)
  */
-    int
-mch_can_restore_title(void)
+    ಪೂರ್ಣಾಂಕ
+mch_can_restore_title(ಶೂನ್ಯ)
 {
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 
 /*
  * Return TRUE if we can restore the icon title (we can't)
  */
-    int
-mch_can_restore_icon(void)
+    ಪೂರ್ಣಾಂಕ
+mch_can_restore_icon(ಶೂನ್ಯ)
 {
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 
@@ -250,55 +250,55 @@ mch_can_restore_icon(void)
  * When 'shellslash' set do it the other way around.
  * Return OK or FAIL.
  */
-    int
-mch_FullName(
+    ಪೂರ್ಣಾಂಕ
+mch_ತುಂಬಿದ_Name(
     char_u	*fname,
     char_u	*buf,
-    int		len,
-    int		force UNUSED)
+    ಪೂರ್ಣಾಂಕ		len,
+    ಪೂರ್ಣಾಂಕ		force ಬಳಸದ)
 {
-    int		nResult = FAIL;
+    ಪೂರ್ಣಾಂಕ		n_ಫಲಿತಾಂಶ = FAIL;
     WCHAR	*wname;
-    WCHAR	wbuf[MAX_PATH];
-    char_u	*cname = NULL;
+    WCHAR	wbuf[MAX_ಮಾರ್ಗ];
+    char_u	*cname = ಖಾಲಿ;
 
-    wname = enc_to_utf16(fname, NULL);
-    if (wname != NULL && _wfullpath(wbuf, wname, MAX_PATH) != NULL)
+    wname = enc_ಗಮ್ಯ_utf16(fname, ಖಾಲಿ);
+    ಆದರೆ (wname != ಖಾಲಿ && _wfullpath(wbuf, wname, MAX_ಮಾರ್ಗ) != ಖಾಲಿ)
     {
-	cname = utf16_to_enc((short_u *)wbuf, NULL);
-	if (cname != NULL)
+	cname = utf16_ಗಮ್ಯ_enc((short_u *)wbuf, ಖಾಲಿ);
+	ಆದರೆ (cname != ಖಾಲಿ)
 	{
 	    vim_strncpy(buf, cname, len - 1);
-	    nResult = OK;
+	    n_ಫಲಿತಾಂಶ = OK;
 	}
     }
     vim_free(wname);
     vim_free(cname);
 
-#ifdef USE_FNAME_CASE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_FNAME_CASE
     fname_case(buf, len);
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
     slash_adjust(buf);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return nResult;
+    ಹಿಂತಿರುಗಿ n_ಫಲಿತಾಂಶ;
 }
 
 
 /*
  * Return TRUE if "fname" does not depend on the current directory.
  */
-    int
-mch_isFullName(char_u *fname)
+    ಪೂರ್ಣಾಂಕ
+mch_is_ತುಂಬಿದ_Name(char_u *fname)
 {
     // A name like "d:/foo" and "//server/share" is absolute.  "d:foo" is not.
     // /foo and \foo are absolute too because Windows keeps a current drive.
     // Another way to check is to use mch_FullName() and see if the result is
     // the same as the name or mch_FullName() fails.  However, this has quite a
     // bit of overhead, so let's not do that.
-    if (*fname == NUL)
-	return FALSE;
-    return ((ASCII_ISALPHA(fname[0]) && fname[1] == ':'
+    ಆದರೆ (*fname == NUL)
+	ಹಿಂತಿರುಗಿ FALSE;
+    ಹಿಂತಿರುಗಿ ((ASCII_ISALPHA(fname[0]) && fname[1] == ':'
 				      && (fname[2] == '/' || fname[2] == '\\'))
 	    || (fname[0] == '/' || fname[0] == '\\'));
 }
@@ -313,130 +313,130 @@ mch_isFullName(char_u *fname)
  * When 'shellslash' set do it the other way around.
  * When the path looks like a URL leave it unmodified.
  */
-    void
+    ಶೂನ್ಯ
 slash_adjust(char_u *p)
 {
-    if (path_with_url(p))
-	return;
+    ಆದರೆ (ಮಾರ್ಗ_with_url(p))
+	ಹಿಂತಿರುಗಿ;
 
-    if (*p == '`')
+    ಆದರೆ (*p == '`')
     {
 	size_t len = STRLEN(p);
 
 	// don't replace backslash in backtick quoted strings
-	if (len > 2 && *(p + len - 1) == '`')
-	    return;
+	ಆದರೆ (len > 2 && *(p + len - 1) == '`')
+	    ಹಿಂತಿರುಗಿ;
     }
 
-    while (*p)
+    ಆಗ (*p)
     {
-	if (*p == psepcN)
+	ಆದರೆ (*p == psepcN)
 	    *p = psepc;
 	MB_PTR_ADV(p);
     }
 }
 
-    static int
-read_reparse_point(const WCHAR *name, char_u *buf, DWORD *buf_len)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+read_reparse_ಬಿಂದು(ಸ್ಥಿರಾಂಕ WCHAR *name, char_u *buf, DWORD *buf_len)
 {
     HANDLE h;
     BOOL ok;
 
-    h = CreateFileW(name, FILE_READ_ATTRIBUTES,
-	    FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+    h = CreateFileW(name, FILE_READ_ಗುಣಲಕ್ಷಣಗಳು,
+	    FILE_SHARE_READ | FILE_SHARE_WRITE, ಖಾಲಿ,
 	    OPEN_EXISTING,
-	    FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT,
-	    NULL);
-    if (h == INVALID_HANDLE_VALUE)
-	return FAIL;
+	    FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_ಬಿಂದು,
+	    ಖಾಲಿ);
+    ಆದರೆ (h == INVALID_HANDLE_ಮೌಲ್ಯ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    ok = DeviceIoControl(h, FSCTL_GET_REPARSE_POINT, NULL, 0, buf, *buf_len,
-	    buf_len, NULL);
+    ok = DeviceIoControl(h, FSCTL_GET_REPARSE_ಬಿಂದು, ಖಾಲಿ, 0, buf, *buf_len,
+	    buf_len, ಖಾಲಿ);
     CloseHandle(h);
 
-    return ok ? OK : FAIL;
+    ಹಿಂತಿರುಗಿ ok ? OK : FAIL;
 }
 
     char_u *
 resolve_appexeclink(char_u *fname)
 {
     DWORD		attr = 0;
-    int			idx;
-    WCHAR		*p, *end, *wname;
+    ಪೂರ್ಣಾಂಕ			idx;
+    WCHAR		*p, *ಕೊನೆ, *wname;
     // The buffer size is arbitrarily chosen to be "big enough" (TM), the
     // ceiling should be around 16k.
     char_u		buf[4096];
-    DWORD		buf_len = sizeof(buf);
-    REPARSE_DATA_BUFFER *rb = (REPARSE_DATA_BUFFER *)buf;
+    DWORD		buf_len = ಗಾತ್ರ(buf);
+    REPARSE_ದತ್ತಾಂಶ_ಬಫರ್ *rb = (REPARSE_ದತ್ತಾಂಶ_ಬಫರ್ *)buf;
 
-    wname = enc_to_utf16(fname, NULL);
-    if (wname == NULL)
-	return NULL;
+    wname = enc_ಗಮ್ಯ_utf16(fname, ಖಾಲಿ);
+    ಆದರೆ (wname == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    attr = GetFileAttributesW(wname);
-    if (attr == INVALID_FILE_ATTRIBUTES ||
-	    (attr & FILE_ATTRIBUTE_REPARSE_POINT) == 0)
+    attr = Get_File_ಗುಣಲಕ್ಷಣಗಳು_W(wname);
+    ಆದರೆ (attr == INVALID_FILE_ಗುಣಲಕ್ಷಣಗಳು ||
+	    (attr & FILE_ATTRIBUTE_REPARSE_ಬಿಂದು) == 0)
     {
 	vim_free(wname);
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
     // The applinks are similar to symlinks but with a huge difference: they can
     // only be executed, any other I/O operation on them is bound to fail with
     // ERROR_FILE_NOT_FOUND even though the file exists.
-    if (read_reparse_point(wname, buf, &buf_len) == FAIL)
+    ಆದರೆ (read_reparse_ಬಿಂದು(wname, buf, &buf_len) == FAIL)
     {
 	vim_free(wname);
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
     vim_free(wname);
 
-    if (rb->ReparseTag != IO_REPARSE_TAG_APPEXECLINK)
-	return NULL;
+    ಆದರೆ (rb->Reparse_ಟ್ಯಾಗ್ != IO_REPARSE_ಟ್ಯಾಗ್_APPEXECLINK)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     // The (undocumented) reparse buffer contains a set of N null-terminated
     // Unicode strings, the application path is stored in the third one.
-    if (rb->AppExecLinkReparseBuffer.StringCount < 3)
-	return NULL;
+    ಆದರೆ (rb->App_Exec_Link_Reparse_ಬಫರ್.String_ಎಣಿಕೆ < 3)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    p = rb->AppExecLinkReparseBuffer.StringList;
-    end = p + rb->ReparseDataLength / sizeof(WCHAR);
-    for (idx = 0; p < end
-	    && idx < (int)rb->AppExecLinkReparseBuffer.StringCount
+    p = rb->App_Exec_Link_Reparse_ಬಫರ್.StringList;
+    ಕೊನೆ = p + rb->Reparse_ದತ್ತಾಂಶ_ಉದ್ದಳತೆ / ಗಾತ್ರ(WCHAR);
+    ಗಾಗಿ (idx = 0; p < ಕೊನೆ
+	    && idx < (ಪೂರ್ಣಾಂಕ)rb->App_Exec_Link_Reparse_ಬಫರ್.String_ಎಣಿಕೆ
 	    && idx != 2; )
     {
-	if (*p++ == L'\0')
+	ಆದರೆ (*p++ == L'\0')
 	    ++idx;
     }
 
-    return utf16_to_enc(p, NULL);
+    ಹಿಂತಿರುಗಿ utf16_ಗಮ್ಯ_enc(p, ಖಾಲಿ);
 }
 
 // Use 64-bit stat functions.
-#undef stat
-#undef _stat
-#undef _wstat
-#undef _fstat
-#define stat _stat64
-#define _stat _stat64
-#define _wstat _wstat64
-#define _fstat _fstat64
+#ವ್ಯಾಖ್ಯಾನ_ರದ್ದು stat
+#ವ್ಯಾಖ್ಯಾನ_ರದ್ದು _stat
+#ವ್ಯಾಖ್ಯಾನ_ರದ್ದು _wstat
+#ವ್ಯಾಖ್ಯಾನ_ರದ್ದು _fstat
+#ವ್ಯಾಖ್ಯಾನಿಸು stat _stat64
+#ವ್ಯಾಖ್ಯಾನಿಸು _stat _stat64
+#ವ್ಯಾಖ್ಯಾನಿಸು _wstat _wstat64
+#ವ್ಯಾಖ್ಯಾನಿಸು _fstat _fstat64
 
 /*
  * Implements lstat() and stat() that can handle symlinks properly.
  */
-    static int
-mswin_stat_impl(const WCHAR *name, stat_T *stp, const int resolve)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+mswin_stat_impl(ಸ್ಥಿರಾಂಕ WCHAR *name, stat_T *stp, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ resolve)
 {
-    int			n;
-    int			fd;
+    ಪೂರ್ಣಾಂಕ			n;
+    ಪೂರ್ಣಾಂಕ			fd;
     BOOL		is_symlink = FALSE;
-    HANDLE		hFind, h;
+    HANDLE		h_ಕಂಡುಹಿಡಿ, h;
     DWORD		attr = 0;
     DWORD		flag = 0;
-    WIN32_FIND_DATAW    findDataW;
+    WIN32_ಕಂಡುಹಿಡಿ_DATAW    ಕಂಡುಹಿಡಿ_ದತ್ತಾಂಶ_W;
 
-#if 0 && defined(_UCRT)
+#ಆದರೆ 0 && defined(_UCRT)
     // This code was disabled because the behavior of MSVC's _wstat (actually
     // _wstat64) for empty symlinks varies depending on the C runtime you link
     // to.
@@ -449,145 +449,145 @@ mswin_stat_impl(const WCHAR *name, stat_T *stp, const int resolve)
     //
     // For more details, see:
     // https://github.com/koron/vc-stat-behavior-verification
-    if (resolve)
+    ಆದರೆ (resolve)
 	// Universal CRT can handle symlinks properly.
-	return _wstat(name, stp);
-#endif
+	ಹಿಂತಿರುಗಿ _wstat(name, stp);
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Only reparse points need a directory query to identify symbolic links.
     // In particular, avoid enumerating the directory for each missing file
     // while searching 'runtimepath'.
-    attr = GetFileAttributesW(name);
-    if (attr == INVALID_FILE_ATTRIBUTES)
+    attr = Get_File_ಗುಣಲಕ್ಷಣಗಳು_W(name);
+    ಆದರೆ (attr == INVALID_FILE_ಗುಣಲಕ್ಷಣಗಳು)
     {
-	DWORD error = GetLastError();
+	DWORD error = Get_ಕೊನೆಯ_Error();
 
 	// A missing file or path cannot provide stat information.  Other
 	// errors and UNC paths still need the CRT fallback.
-	if ((error == ERROR_FILE_NOT_FOUND || error == ERROR_PATH_NOT_FOUND)
+	ಆದರೆ ((error == ERROR_FILE_NOT_ಸಿಕ್ಕಿತು || error == ERROR_ಮಾರ್ಗ_NOT_ಸಿಕ್ಕಿತು)
 		&& !((name[0] == L'\\' || name[0] == L'/')
 		    && (name[1] == L'\\' || name[1] == L'/')))
 	{
 	    errno = ENOENT;
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
-	return _wstat(name, stp);
+	ಹಿಂತಿರುಗಿ _wstat(name, stp);
     }
-    if (!(attr & FILE_ATTRIBUTE_REPARSE_POINT))
-	return _wstat(name, stp);
+    ಆದರೆ (!(attr & FILE_ATTRIBUTE_REPARSE_ಬಿಂದು))
+	ಹಿಂತಿರುಗಿ _wstat(name, stp);
 
-    hFind = FindFirstFileW(name, &findDataW);
-    if (hFind != INVALID_HANDLE_VALUE)
+    h_ಕಂಡುಹಿಡಿ = ಕಂಡುಹಿಡಿ_ಮೊದಲ_File_W(name, &ಕಂಡುಹಿಡಿ_ದತ್ತಾಂಶ_W);
+    ಆದರೆ (h_ಕಂಡುಹಿಡಿ != INVALID_HANDLE_ಮೌಲ್ಯ)
     {
-	attr = findDataW.dwFileAttributes;
-	if ((attr & FILE_ATTRIBUTE_REPARSE_POINT)
-		&& (findDataW.dwReserved0 == IO_REPARSE_TAG_SYMLINK))
+	attr = ಕಂಡುಹಿಡಿ_ದತ್ತಾಂಶ_W.dw_File_ಗುಣಲಕ್ಷಣಗಳು;
+	ಆದರೆ ((attr & FILE_ATTRIBUTE_REPARSE_ಬಿಂದು)
+		&& (ಕಂಡುಹಿಡಿ_ದತ್ತಾಂಶ_W.dwReserved0 == IO_REPARSE_ಟ್ಯಾಗ್_SYMLINK))
 	    is_symlink = TRUE;
-	FindClose(hFind);
+	ಕಂಡುಹಿಡಿ_Close(h_ಕಂಡುಹಿಡಿ);
     }
 
     // Use the plain old stat() whenever it's possible.
-    if (!is_symlink)
-	return _wstat(name, stp);
+    ಆದರೆ (!is_symlink)
+	ಹಿಂತಿರುಗಿ _wstat(name, stp);
 
-    if (!resolve && is_symlink)
-	flag = FILE_FLAG_OPEN_REPARSE_POINT;
-    if (attr & FILE_ATTRIBUTE_DIRECTORY)
+    ಆದರೆ (!resolve && is_symlink)
+	flag = FILE_FLAG_OPEN_REPARSE_ಬಿಂದು;
+    ಆದರೆ (attr & FILE_ATTRIBUTE_DIRECTORY)
 	flag |= FILE_FLAG_BACKUP_SEMANTICS;
 
-    h = CreateFileW(name, FILE_READ_ATTRIBUTES,
-	    FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, flag,
-	    NULL);
-    if (h == INVALID_HANDLE_VALUE)
-	return -1;
+    h = CreateFileW(name, FILE_READ_ಗುಣಲಕ್ಷಣಗಳು,
+	    FILE_SHARE_READ | FILE_SHARE_WRITE, ಖಾಲಿ, OPEN_EXISTING, flag,
+	    ಖಾಲಿ);
+    ಆದರೆ (h == INVALID_HANDLE_ಮೌಲ್ಯ)
+	ಹಿಂತಿರುಗಿ -1;
 
     fd = _open_osfhandle((intptr_t)h, _O_RDONLY);
-    n = _fstat(fd, (struct _stat *)stp);
-    if ((n == 0) && (attr & FILE_ATTRIBUTE_DIRECTORY))
-	stp->st_mode = (stp->st_mode & ~S_IFMT) | S_IFDIR;
+    n = _fstat(fd, (ರಚನೆ _stat *)stp);
+    ಆದರೆ ((n == 0) && (attr & FILE_ATTRIBUTE_DIRECTORY))
+	stp->st_ಬಹುಲಕ = (stp->st_ಬಹುಲಕ & ~S_IFMT) | S_IFDIR;
     _close(fd);
 
-    return n;
+    ಹಿಂತಿರುಗಿ n;
 }
 
 /*
  * stat() can't handle a trailing '/' or '\', remove it first.
  * When 'resolve' is true behave as lstat() wrt symlinks.
  */
-    static int
-stat_impl(const char *name, stat_T *stp, const int resolve)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+stat_impl(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *name, stat_T *stp, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ resolve)
 {
     // WinNT and later can use _MAX_PATH wide characters for a pathname, which
     // means that the maximum pathname is _MAX_PATH * 3 bytes when 'enc' is
     // UTF-8.
-    char_u	buf[_MAX_PATH * 3 + 1];
+    char_u	buf[MAX_ಮಾರ್ಗ_2 * 3 + 1];
     size_t	buflen;
     char_u	*p;
     WCHAR	*wp;
-    int		n;
+    ಪೂರ್ಣಾಂಕ		n;
 
-    vim_strncpy((char_u *)buf, (char_u *)name, sizeof(buf) - 1);
+    vim_strncpy((char_u *)buf, (char_u *)name, ಗಾತ್ರ(buf) - 1);
     buflen = STRLEN(buf);
     p = buf + buflen;
-    if (p > buf)
-	MB_PTR_BACK(buf, p);
+    ಆದರೆ (p > buf)
+	MB_PTR_ಹಿಂಭಾಗ(buf, p);
 
     // Remove trailing '\\' except root path.
-    if (p > buf && (*p == '\\' || *p == '/') && p[-1] != ':')
+    ಆದರೆ (p > buf && (*p == '\\' || *p == '/') && p[-1] != ':')
     {
 	*p = NUL;
 	buflen = (size_t)(p - buf);
     }
 
-    if ((buf[0] == '\\' && buf[1] == '\\') || (buf[0] == '/' && buf[1] == '/'))
+    ಆದರೆ ((buf[0] == '\\' && buf[1] == '\\') || (buf[0] == '/' && buf[1] == '/'))
     {
 	// UNC root path must be followed by '\\'.
 	p = vim_strpbrk(buf + 2, (char_u *)"\\/");
-	if (p != NULL)
+	ಆದರೆ (p != ಖಾಲಿ)
 	{
 	    p = vim_strpbrk(p + 1, (char_u *)"\\/");
-	    if (p == NULL)
+	    ಆದರೆ (p == ಖಾಲಿ)
 		STRCPY(buf + buflen, "\\");
 	}
     }
 
-    wp = enc_to_utf16(buf, NULL);
-    if (wp == NULL)
-	return -1;
+    wp = enc_ಗಮ್ಯ_utf16(buf, ಖಾಲಿ);
+    ಆದರೆ (wp == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ -1;
 
     n = mswin_stat_impl(wp, stp, resolve);
     vim_free(wp);
-    return n;
+    ಹಿಂತಿರುಗಿ n;
 }
 
-    int
-vim_lstat(const char *name, stat_T *stp)
+    ಪೂರ್ಣಾಂಕ
+vim_lstat(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *name, stat_T *stp)
 {
-    return stat_impl(name, stp, FALSE);
+    ಹಿಂತಿರುಗಿ stat_impl(name, stp, FALSE);
 }
 
-    int
-vim_stat(const char *name, stat_T *stp)
+    ಪೂರ್ಣಾಂಕ
+vim_stat(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *name, stat_T *stp)
 {
-    return stat_impl(name, stp, TRUE);
+    ಹಿಂತಿರುಗಿ stat_impl(name, stp, TRUE);
 }
 
-#if defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
-    void
-mch_settmode(tmode_T tmode UNUSED)
+#ಆದರೆ defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
+    ಶೂನ್ಯ
+mch_settmode(tmode_T tmode ಬಳಸದ)
 {
     // nothing to do
 }
 
-    int
-mch_get_shellsize(void)
+    ಪೂರ್ಣಾಂಕ
+mch_get_shellsize(ಶೂನ್ಯ)
 {
     // never used
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-    void
-mch_set_shellsize(void)
+    ಶೂನ್ಯ
+mch_ಗಣ_shellsize(ಶೂನ್ಯ)
 {
     // never used
 }
@@ -595,30 +595,30 @@ mch_set_shellsize(void)
 /*
  * Rows and/or Columns has changed.
  */
-    void
-mch_new_shellsize(void)
+    ಶೂನ್ಯ
+mch_new_shellsize(ಶೂನ್ಯ)
 {
     // never used
 }
 
-    void
-mch_calc_cell_size(struct cellsize *cs_out UNUSED)
+    ಶೂನ್ಯ
+mch_calc_cell_ಗಾತ್ರ(ರಚನೆ cellsize *cs_ಹೊರಹೋಗು ಬಳಸದ)
 {
     // never used
 }
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * We have no job control, so fake it by starting a new shell.
  */
-    void
-mch_suspend(void)
+    ಶೂನ್ಯ
+mch_suspend(ಶೂನ್ಯ)
 {
     suspend_shell();
 }
 
-#if defined(USE_MCH_ERRMSG)
+#ಆದರೆ defined(USE_MCH_ERRMSG)
 
 # ifdef display_errors
 #  undef display_errors
@@ -627,76 +627,76 @@ mch_suspend(void)
 /*
  * Display the saved error message(s).
  */
-    void
-display_errors(void)
+    ಶೂನ್ಯ
+display_errors(ಶೂನ್ಯ)
 {
 # ifdef FEAT_GUI
     char_u *p;
 
 #  ifdef VIMDLL
-    if (gui.in_use || gui.starting)
+    ಆದರೆ (gui.ಒಳ_use || gui.starting)
 #  endif
     {
-	if (error_ga.ga_data != NULL)
+	ಆದರೆ (error_ga.ga_ದತ್ತಾಂಶ != ಖಾಲಿ)
 	{
 	    // avoid putting up a message box with blanks only
-	    for (p = (char_u *)error_ga.ga_data; *p; ++p)
-		if (!SAFE_isspace(*p))
+	    ಗಾಗಿ (p = (char_u *)error_ga.ga_ದತ್ತಾಂಶ; *p; ++p)
+		ಆದರೆ (!ಸುರಕ್ಷಿತ_isspace(*p))
 		{
 		    // Only use a dialog when not using --gui-dialog-file:
 		    // write text to a file.
-		    if (!gui_dialog_log((char_u *)"Errors", p))
-			(void)gui_mch_dialog(
+		    ಆದರೆ (!gui_dialog_log((char_u *)"Errors", p))
+			(ಶೂನ್ಯ)gui_mch_dialog(
 				     gui.starting ? VIM_INFO :
 					     VIM_ERROR,
 				     gui.starting ? (char_u *)_("Message") :
 					     (char_u *)_("Error"),
 					     p, (char_u *)_("&Ok"),
-					1, NULL, FALSE);
-		    break;
+					1, ಖಾಲಿ, FALSE);
+		    ನಿಲ್ಲಿಸು;
 		}
 	    ga_clear(&error_ga);
 	}
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 # endif
-# if !defined(FEAT_GUI) || defined(VIMDLL)
+# ಆದರೆ !defined(FEAT_GUI) || defined(VIMDLL)
     FlushFileBuffers(GetStdHandle(STD_ERROR_HANDLE));
 # endif
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 
 /*
  * Return TRUE if "p" contain a wildcard that can be expanded by
  * dos_expandpath().
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_has_exp_wildcard(char_u *p)
 {
-    for ( ; *p; MB_PTR_ADV(p))
+    ಗಾಗಿ ( ; *p; MB_PTR_ADV(p))
     {
-	if (vim_strchr((char_u *)"?*[", *p) != NULL
+	ಆದರೆ (vim_strchr((char_u *)"?*[", *p) != ಖಾಲಿ
 		|| (*p == '~' && p[1] != NUL))
-	    return TRUE;
+	    ಹಿಂತಿರುಗಿ TRUE;
     }
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 /*
  * Return TRUE if "p" contain a wildcard or a "~1" kind of thing (could be a
  * shortened file name).
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_has_wildcard(char_u *p)
 {
-    for ( ; *p; MB_PTR_ADV(p))
+    ಗಾಗಿ ( ; *p; MB_PTR_ADV(p))
     {
-	if (vim_strchr((char_u *)"?*$[`", *p) != NULL
+	ಆದರೆ (vim_strchr((char_u *)"?*$[`", *p) != ಖಾಲಿ
 		|| (*p == '~' && p[1] != NUL))
-	    return TRUE;
+	    ಹಿಂತಿರುಗಿ TRUE;
     }
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 
@@ -704,128 +704,128 @@ mch_has_wildcard(char_u *p)
  * The normal _chdir() does not change the default drive.  This one does.
  * Returning 0 implies success; -1 implies failure.
  */
-    int
-mch_chdir(char *path)
+    ಪೂರ್ಣಾಂಕ
+mch_chdir(ಅಕ್ಷರ *ಮಾರ್ಗ)
 {
     WCHAR   *p;
-    int	    n;
+    ಪೂರ್ಣಾಂಕ	    n;
 
-    if (path[0] == NUL)		// just checking...
-	return -1;
+    ಆದರೆ (ಮಾರ್ಗ[0] == NUL)		// just checking...
+	ಹಿಂತಿರುಗಿ -1;
 
-    if (p_verbose >= 5)
+    ಆದರೆ (p_verbose >= 5)
     {
 	verbose_enter();
-	smsg("chdir(%s)", path);
+	smsg("chdir(%s)", ಮಾರ್ಗ);
 	verbose_leave();
     }
-    if (SAFE_isalpha(path[0]) && path[1] == ':')	// has a drive name
+    ಆದರೆ (ಸುರಕ್ಷಿತ_isalpha(ಮಾರ್ಗ[0]) && ಮಾರ್ಗ[1] == ':')	// has a drive name
     {
 	// If we can change to the drive, skip that part of the path.  If we
 	// can't then the current directory may be invalid, try using chdir()
 	// with the whole path.
-	if (_chdrive(TOLOWER_ASC(path[0]) - 'a' + 1) == 0)
-	    path += 2;
+	ಆದರೆ (_chdrive(TOLOWER_ASC(ಮಾರ್ಗ[0]) - 'a' + 1) == 0)
+	    ಮಾರ್ಗ += 2;
     }
 
-    if (*path == NUL)		// drive name only
-	return 0;
+    ಆದರೆ (*ಮಾರ್ಗ == NUL)		// drive name only
+	ಹಿಂತಿರುಗಿ 0;
 
-    p = enc_to_utf16((char_u *)path, NULL);
-    if (p == NULL)
-	return -1;
+    p = enc_ಗಮ್ಯ_utf16((char_u *)ಮಾರ್ಗ, ಖಾಲಿ);
+    ಆದರೆ (p == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ -1;
 
     n = _wchdir(p);
     vim_free(p);
-    return n;
+    ಹಿಂತಿರುಗಿ n;
 }
 
 
-#if defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
+#ಆದರೆ defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
 /*
  * return non-zero if a character is available
  */
-    int
-mch_char_avail(void)
+    ಪೂರ್ಣಾಂಕ
+mch_char_avail(ಶೂನ್ಯ)
 {
     // never used
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
-# if defined(FEAT_TERMINAL)
+# ಆದರೆ defined(FEAT_TERMINAL)
 /*
  * Check for any pending input or messages.
  */
-    int
-mch_check_messages(void)
+    ಪೂರ್ಣಾಂಕ
+mch_check_messages(ಶೂನ್ಯ)
 {
     // TODO: check for messages
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 
-#if defined(FEAT_LIBCALL)
+#ಆದರೆ defined(FEAT_LIBCALL)
 /*
  * Call a DLL routine which takes either a string or int param
  * and returns an allocated string.
  * Return OK if it worked, FAIL if not.
  */
-typedef char_u *(*MYSTRPROCSTR)(char_u *);
-typedef int (*MYSTRPROCINT)(char_u *);
-typedef char_u *(*MYINTPROCSTR)(int);
-typedef int (*MYINTPROCINT)(int);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ char_u *(*MYSTRPROCSTR)(char_u *);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಪೂರ್ಣಾಂಕ (*MYSTRPROCINT)(char_u *);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ char_u *(*MYINTPROCSTR)(ಪೂರ್ಣಾಂಕ);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಪೂರ್ಣಾಂಕ (*MYINTPROCINT)(ಪೂರ್ಣಾಂಕ);
 
 /*
  * Check if a pointer points to a valid NUL terminated string.
  * Return the length of the string, including terminating NUL.
  * Returns 0 for an invalid pointer, 1 for an empty string.
  */
-    static size_t
+    ಸ್ಥಿರ size_t
 check_str_len(char_u *str)
 {
     SYSTEM_INFO			si;
-    MEMORY_BASIC_INFORMATION	mbi;
-    size_t			length = 0;
+    ಸ್ಮರಣೆ_BASIC_INFORMATION	mbi;
+    size_t			ಉದ್ದಳತೆ = 0;
     size_t			i;
-    const char_u		*p;
+    ಸ್ಥಿರಾಂಕ char_u		*p;
 
     // get page size
     GetSystemInfo(&si);
 
     // get memory information
-    if (!VirtualQuery(str, &mbi, sizeof(mbi)))
-	return 0;
+    ಆದರೆ (!VirtualQuery(str, &mbi, ಗಾತ್ರ(mbi)))
+	ಹಿಂತಿರುಗಿ 0;
 
     // pre cast these (typing savers)
     long_u dwStr = (long_u)str;
-    long_u dwBaseAddress = (long_u)mbi.BaseAddress;
+    long_u dw_ತಳ_ವಿಳಾಸ = (long_u)mbi.ತಳ_ವಿಳಾಸ;
 
     // get start address of page that str is on
-    long_u strPage = dwStr - (dwStr - dwBaseAddress) % si.dwPageSize;
+    long_u str_ಪುಟ = dwStr - (dwStr - dw_ತಳ_ವಿಳಾಸ) % si.dw_ಪುಟ_ಗಾತ್ರ;
 
     // get length from str to end of page
-    long_u pageLength = si.dwPageSize - (dwStr - strPage);
+    long_u ಪುಟ_ಉದ್ದಳತೆ = si.dw_ಪುಟ_ಗಾತ್ರ - (dwStr - str_ಪುಟ);
 
-    for (p = str; !IsBadReadPtr(p, (UINT)pageLength);
-	    p += pageLength, pageLength = si.dwPageSize)
-	for (i = 0; i < pageLength; ++i, ++length)
-	    if (p[i] == NUL)
-		return length + 1;
+    ಗಾಗಿ (p = str; !IsBadReadPtr(p, (UINT)ಪುಟ_ಉದ್ದಳತೆ);
+	    p += ಪುಟ_ಉದ್ದಳತೆ, ಪುಟ_ಉದ್ದಳತೆ = si.dw_ಪುಟ_ಗಾತ್ರ)
+	ಗಾಗಿ (i = 0; i < ಪುಟ_ಉದ್ದಳತೆ; ++i, ++ಉದ್ದಳತೆ)
+	    ಆದರೆ (p[i] == NUL)
+		ಹಿಂತಿರುಗಿ ಉದ್ದಳತೆ + 1;
 
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
 /*
  * Passed to do_in_runtimepath() to load a vim.ico file.
  */
-    static void
-mch_icon_load_cb(char_u *fname, void *cookie)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+mch_icon_ತುಂಬು_cb(char_u *fname, ಶೂನ್ಯ *cookie)
 {
     HANDLE *h = (HANDLE *)cookie;
 
-    *h = LoadImage(NULL,
+    *h = ತುಂಬು_Image(ಖಾಲಿ,
 		   (LPSTR)fname,
 		   IMAGE_ICON,
 		   64,
@@ -836,122 +836,122 @@ mch_icon_load_cb(char_u *fname, void *cookie)
 /*
  * Try loading an icon file from 'runtimepath'.
  */
-    int
-mch_icon_load(HANDLE *iconp)
+    ಪೂರ್ಣಾಂಕ
+mch_icon_ತುಂಬು(HANDLE *iconp)
 {
-    return do_in_runtimepath((char_u *)"bitmaps/vim.ico",
-						  0, mch_icon_load_cb, iconp);
+    ಹಿಂತಿರುಗಿ do_ಒಳ_runtimepath((char_u *)"bitmaps/vim.ico",
+						  0, mch_icon_ತುಂಬು_cb, iconp);
 }
 
 /*
  * Fill the buffer 'buf' with 'len' random bytes.
  * Returns FAIL if the OS PRNG is not available or something went wrong.
  */
-    int
-mch_get_random(char_u *buf, int len)
+    ಪೂರ್ಣಾಂಕ
+mch_get_random(char_u *buf, ಪೂರ್ಣಾಂಕ len)
 {
-    static int		initialized = NOTDONE;
-    static HINSTANCE	hInstLib;
-    static BOOL (WINAPI *pProcessPrng)(PUCHAR, ULONG);
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ		initialized = NOTDONE;
+    ಸ್ಥಿರ HINSTANCE	hInstLib;
+    ಸ್ಥಿರ BOOL (WINAPI *pProcessPrng)(PUCHAR, ULONG);
 
-    if (initialized == NOTDONE)
+    ಆದರೆ (initialized == NOTDONE)
     {
-	hInstLib = vimLoadLib("bcryptprimitives.dll");
-	if (hInstLib != NULL)
-	    pProcessPrng = (void *)GetProcAddress(hInstLib, "ProcessPrng");
-	if (hInstLib == NULL || pProcessPrng == NULL)
+	hInstLib = vim_ತುಂಬು_Lib("bcryptprimitives.dll");
+	ಆದರೆ (hInstLib != ಖಾಲಿ)
+	    pProcessPrng = (ಶೂನ್ಯ *)Get_Proc_ವಿಳಾಸ(hInstLib, "ProcessPrng");
+	ಆದರೆ (hInstLib == ಖಾಲಿ || pProcessPrng == ಖಾಲಿ)
 	{
 	    FreeLibrary(hInstLib);
 	    initialized = FAIL;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    initialized = OK;
     }
 
-    if (initialized == FAIL)
-	return FAIL;
+    ಆದರೆ (initialized == FAIL)
+	ಹಿಂತಿರುಗಿ FAIL;
 
     // According to the documentation this call cannot fail.
     pProcessPrng(buf, len);
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_libcall(
     char_u	*libname,
     char_u	*funcname,
     char_u	*argstring,	// NULL when using a argint
-    int		argint,
-    char_u	**string_result,// NULL when using number_result
-    int		*number_result)
+    ಪೂರ್ಣಾಂಕ		argint,
+    char_u	**string_ಫಲಿತಾಂಶ,// NULL when using number_result
+    ಪೂರ್ಣಾಂಕ		*ಸಂಖ್ಯೆ_ಫಲಿತಾಂಶ)
 {
     HINSTANCE		hinstLib;
 
-    BOOL fRunTimeLinkSuccess = FALSE;
+    BOOL f_ಸತತ_ಸಮಯ_Link_Success = FALSE;
 
     // Get a handle to the DLL module.
-    hinstLib = vimLoadLib((char *)libname);
+    hinstLib = vim_ತುಂಬು_Lib((ಅಕ್ಷರ *)libname);
 
     // If the handle is valid, try to get the function address.
-    if (hinstLib != NULL)
+    ಆದರೆ (hinstLib != ಖಾಲಿ)
     {
-	char_u	*retval_str = NULL;
-	int	retval_int = 0;
+	char_u	*retval_str = ಖಾಲಿ;
+	ಪೂರ್ಣಾಂಕ	retval_int = 0;
 	size_t	len;
 
 # ifdef HAVE_TRY_EXCEPT
 	__try
 	{
 # endif
-	if (argstring != NULL)
+	ಆದರೆ (argstring != ಖಾಲಿ)
 	{
 	    // Call with string argument
-	    if (string_result != NULL)
+	    ಆದರೆ (string_ಫಲಿತಾಂಶ != ಖಾಲಿ)
 	    {
 		MYSTRPROCSTR proc;
 
-		proc = (MYSTRPROCSTR)GetProcAddress(hinstLib, (LPCSTR)funcname);
-		if (proc != NULL)
+		proc = (MYSTRPROCSTR)Get_Proc_ವಿಳಾಸ(hinstLib, (LPCSTR)funcname);
+		ಆದರೆ (proc != ಖಾಲಿ)
 		{
-		    fRunTimeLinkSuccess = TRUE;
+		    f_ಸತತ_ಸಮಯ_Link_Success = TRUE;
 		    retval_str = proc(argstring);
 		}
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		MYSTRPROCINT proc;
 
-		proc = (MYSTRPROCINT)GetProcAddress(hinstLib, (LPCSTR)funcname);
-		if (proc != NULL)
+		proc = (MYSTRPROCINT)Get_Proc_ವಿಳಾಸ(hinstLib, (LPCSTR)funcname);
+		ಆದರೆ (proc != ಖಾಲಿ)
 		{
-		    fRunTimeLinkSuccess = TRUE;
+		    f_ಸತತ_ಸಮಯ_Link_Success = TRUE;
 		    retval_int = proc(argstring);
 		}
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // Call with number argument
-	    if (string_result != NULL)
+	    ಆದರೆ (string_ಫಲಿತಾಂಶ != ಖಾಲಿ)
 	    {
 		MYINTPROCSTR proc;
 
-		proc = (MYINTPROCSTR)GetProcAddress(hinstLib, (LPCSTR)funcname);
-		if (proc != NULL)
+		proc = (MYINTPROCSTR)Get_Proc_ವಿಳಾಸ(hinstLib, (LPCSTR)funcname);
+		ಆದರೆ (proc != ಖಾಲಿ)
 		{
-		    fRunTimeLinkSuccess = TRUE;
+		    f_ಸತತ_ಸಮಯ_Link_Success = TRUE;
 		    retval_str = proc(argint);
 		}
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		MYINTPROCINT proc;
 
-		proc = (MYINTPROCINT)GetProcAddress(hinstLib, (LPCSTR)funcname);
-		if (proc != NULL)
+		proc = (MYINTPROCINT)Get_Proc_ವಿಳಾಸ(hinstLib, (LPCSTR)funcname);
+		ಆದರೆ (proc != ಖಾಲಿ)
 		{
-		    fRunTimeLinkSuccess = TRUE;
+		    f_ಸತತ_ಸಮಯ_Link_Success = TRUE;
 		    retval_int = proc(argint);
 		}
 	    }
@@ -959,272 +959,272 @@ mch_libcall(
 
 	// Save the string before we free the library.
 	// Assume that a "1" result is an illegal pointer.
-	if (string_result == NULL)
-	    *number_result = retval_int;
-	else if (retval_str != NULL
+	ಆದರೆ (string_ಫಲಿತಾಂಶ == ಖಾಲಿ)
+	    *ಸಂಖ್ಯೆ_ಫಲಿತಾಂಶ = retval_int;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (retval_str != ಖಾಲಿ
 		&& (len = check_str_len(retval_str)) > 0)
 	{
-	    *string_result = alloc(len);
-	    if (*string_result != NULL)
-		mch_memmove(*string_result, retval_str, len);
+	    *string_ಫಲಿತಾಂಶ = alloc(len);
+	    ಆದರೆ (*string_ಫಲಿತಾಂಶ != ಖಾಲಿ)
+		mch_memmove(*string_ಫಲಿತಾಂಶ, retval_str, len);
 	}
 
 # ifdef HAVE_TRY_EXCEPT
 	}
 	__except(EXCEPTION_EXECUTE_HANDLER)
 	{
-	    if (GetExceptionCode() == EXCEPTION_STACK_OVERFLOW)
+	    ಆದರೆ (Get_Exception_ಸಂಕೇತ() == EXCEPTION_ರಾಶಿ_ಅತಿಪ್ರವಾಹ)
 		_resetstkoflw();
-	    fRunTimeLinkSuccess = FALSE;
+	    f_ಸತತ_ಸಮಯ_Link_Success = FALSE;
 	}
 # endif
 
 	// Free the DLL module.
-	(void)FreeLibrary(hinstLib);
+	(ಶೂನ್ಯ)FreeLibrary(hinstLib);
     }
 
-    if (!fRunTimeLinkSuccess)
+    ಆದರೆ (!f_ಸತತ_ಸಮಯ_Link_Success)
     {
 	semsg(_(e_library_call_failed_for_str), funcname);
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Debugging helper: expose the MCH_WRITE_DUMP stuff to other modules
  */
-    void
-DumpPutS(const char *psz UNUSED)
+    ಶೂನ್ಯ
+DumpPutS(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *psz ಬಳಸದ)
 {
-#ifdef MCH_WRITE_DUMP
-    if (fdDump)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MCH_WRITE_DUMP
+    ಆದರೆ (fdDump)
     {
 	fputs(psz, fdDump);
-	if (psz[strlen(psz) - 1] != '\n')
+	ಆದರೆ (psz[ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(psz) - 1] != '\n')
 	    fputc('\n', fdDump);
 	fflush(fdDump);
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#ifdef _DEBUG
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ _DEBUG
 
-void __cdecl
+ಶೂನ್ಯ __cdecl
 Trace(
-    char *pszFormat,
+    ಅಕ್ಷರ *pszFormat,
     ...)
 {
     CHAR szBuff[2048];
-    va_list args;
+    va_list ವಾದಗಳು;
 
-    va_start(args, pszFormat);
-    vsprintf(szBuff, pszFormat, args);
-    va_end(args);
+    va_start(ವಾದಗಳು, pszFormat);
+    vsprintf(szBuff, pszFormat, ವಾದಗಳು);
+    va_end(ವಾದಗಳು);
 
     OutputDebugString(szBuff);
 }
 
-#endif //_DEBUG
+#ಆದರೆ_ಅಂತ್ಯ //_DEBUG
 
-#if !defined(FEAT_GUI) || defined(VIMDLL)
-extern HWND g_hWnd;	// This is in os_win32.c.
+#ಆದರೆ !defined(FEAT_GUI) || defined(VIMDLL)
+ಬಾಹ್ಯ HWND g_hWnd;	// This is in os_win32.c.
 
 /*
  * Showing the printer dialog is tricky since we have no GUI
  * window to parent it. The following routines are needed to
  * get the window parenting and Z-order to work properly.
  */
-    static void
-GetConsoleHwnd(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+GetConsoleHwnd(ಶೂನ್ಯ)
 {
     // Skip if it's already set.
-    if (s_hwnd != 0)
-	return;
+    ಆದರೆ (s_hwnd != 0)
+	ಹಿಂತಿರುಗಿ;
 
     // Window handle may have been found by init code (Windows NT only)
-    if (g_hWnd != 0)
+    ಆದರೆ (g_hWnd != 0)
     {
 	s_hwnd = g_hWnd;
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    s_hwnd = GetConsoleWindow();
+    s_hwnd = Get_Console_ಕಿಟಕಿ();
 }
 
 /*
  * Console implementation of ":winpos".
  */
-    int
-mch_get_winpos(int *x, int *y)
+    ಪೂರ್ಣಾಂಕ
+mch_get_winpos(ಪೂರ್ಣಾಂಕ *x, ಪೂರ್ಣಾಂಕ *y)
 {
     RECT  rect;
 
     GetConsoleHwnd();
-    GetWindowRect(s_hwnd, &rect);
-    *x = rect.left;
-    *y = rect.top;
-    return OK;
+    Get_ಕಿಟಕಿ_Rect(s_hwnd, &rect);
+    *x = rect.ಎಡ_2;
+    *y = rect.ತುದಿ;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Console implementation of ":winpos x y".
  */
-    void
-mch_set_winpos(int x, int y)
+    ಶೂನ್ಯ
+mch_ಗಣ_winpos(ಪೂರ್ಣಾಂಕ x, ಪೂರ್ಣಾಂಕ y)
 {
     GetConsoleHwnd();
-    SetWindowPos(s_hwnd, NULL, x, y, 0, 0,
+    ಗಣ_ಕಿಟಕಿ_Pos(s_hwnd, ಖಾಲಿ, x, y, 0, 0,
 		 SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_PRINTER) && !defined(FEAT_POSTSCRIPT)
+#ಆದರೆ defined(FEAT_PRINTER) && !defined(FEAT_POSTSCRIPT)
 
 //=================================================================
 // Win32 printer stuff
 
-static HFONT		prt_font_handles[2][2][2];
-static PRINTDLGW	prt_dlg;
-static const int	boldface[2] = {FW_REGULAR, FW_BOLD};
-static TEXTMETRIC	prt_tm;
-static int		prt_line_height;
-static int		prt_number_width;
-static int		prt_left_margin;
-static int		prt_right_margin;
-static int		prt_top_margin;
-static char_u		szAppName[] = TEXT("VIM");
-static HWND		hDlgPrint;
-static int		*bUserAbort = NULL;
-static char_u		*prt_name = NULL;
+ಸ್ಥಿರ HFONT		prt_font_handles[2][2][2];
+ಸ್ಥಿರ PRINTDLGW	prt_dlg;
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ	boldface[2] = {FW_REGULAR, FW_BOLD};
+ಸ್ಥಿರ TEXTMETRIC	prt_tm;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ		prt_ಸಾಲು_ಎತ್ತರ;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ		prt_ಸಂಖ್ಯೆ_ಅಗಲ;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ		prt_ಎಡ_margin;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ		prt_ಬಲ_margin;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ		prt_ತುದಿ_margin;
+ಸ್ಥಿರ char_u		szAppName[] = ಪಠ್ಯ_3("VIM");
+ಸ್ಥಿರ HWND		hDlgPrint;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ		*bUserAbort = ಖಾಲಿ;
+ಸ್ಥಿರ char_u		*prt_name = ಖಾಲಿ;
 
 // Defines which are also in vim.rc.
 # define IDC_BOX1		400
 # define IDC_PRINTTEXT1		401
 # define IDC_PRINTTEXT2		402
-# define IDC_PROGRESS		403
+# define IDC_ಪ್ರಗತಿ		403
 
-    static BOOL
-vimSetDlgItemText(HWND hDlg, int nIDDlgItem, char_u *s)
+    ಸ್ಥಿರ BOOL
+vim_ಗಣ_Dlg_ಅಂಶ_ಪಠ್ಯ(HWND hDlg, ಪೂರ್ಣಾಂಕ n_IDDlg_ಅಂಶ, char_u *s)
 {
     WCHAR   *wp;
     BOOL    ret;
 
-    wp = enc_to_utf16(s, NULL);
-    if (wp == NULL)
-	return FALSE;
+    wp = enc_ಗಮ್ಯ_utf16(s, ಖಾಲಿ);
+    ಆದರೆ (wp == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    ret = SetDlgItemTextW(hDlg, nIDDlgItem, wp);
+    ret = ಗಣ_Dlg_ಅಂಶ_ಪಠ್ಯ_W(hDlg, n_IDDlg_ಅಂಶ, wp);
     vim_free(wp);
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
 /*
  * Convert BGR to RGB for Windows GDI calls
  */
-    static COLORREF
-swap_me(COLORREF colorref)
+    ಸ್ಥಿರ COLORREF
+ಅದಲುಬದಲು_me(COLORREF colorref)
 {
-    int  temp;
-    char *ptr = (char *)&colorref;
+    ಪೂರ್ಣಾಂಕ  ತಾತ್ಕಾಲಿಕ;
+    ಅಕ್ಷರ *ptr = (ಅಕ್ಷರ *)&colorref;
 
-    temp = *(ptr);
+    ತಾತ್ಕಾಲಿಕ = *(ptr);
     *(ptr ) = *(ptr + 2);
-    *(ptr + 2) = temp;
-    return colorref;
+    *(ptr + 2) = ತಾತ್ಕಾಲಿಕ;
+    ಹಿಂತಿರುಗಿ colorref;
 }
 
-    static INT_PTR CALLBACK
+    ಸ್ಥಿರ INT_PTR CALLBACK
 PrintDlgProc(
 	HWND hDlg,
-	UINT message,
-	WPARAM wParam UNUSED,
-	LPARAM lParam UNUSED)
+	UINT ಸಂದೇಶ_2,
+	WPARAM wParam ಬಳಸದ,
+	LPARAM lParam ಬಳಸದ)
 {
 # ifdef FEAT_GETTEXT
     NONCLIENTMETRICS nm;
-    static HFONT hfont;
+    ಸ್ಥಿರ HFONT hfont;
 # endif
 
-    switch (message)
+    ಆಯ್ಕೆ (ಸಂದೇಶ_2)
     {
-	case WM_INITDIALOG:
+	ಸ್ಥಿತಿ WM_INITDIALOG:
 # ifdef FEAT_GETTEXT
-	    nm.cbSize = sizeof(NONCLIENTMETRICS);
-	    if (SystemParametersInfo(
+	    nm.cb_ಗಾತ್ರ = ಗಾತ್ರ(NONCLIENTMETRICS);
+	    ಆದರೆ (SystemParametersInfo(
 			SPI_GETNONCLIENTMETRICS,
-			sizeof(NONCLIENTMETRICS),
+			ಗಾತ್ರ(NONCLIENTMETRICS),
 			&nm,
 			0))
 	    {
-		char buff[MAX_PATH];
-		int i;
+		ಅಕ್ಷರ buff[MAX_ಮಾರ್ಗ];
+		ಪೂರ್ಣಾಂಕ i;
 
 		// Translate the dialog texts
-		hfont = CreateFontIndirect(&nm.lfMessageFont);
-		for (i = IDC_PRINTTEXT1; i <= IDC_PROGRESS; i++)
+		hfont = Create_Font_ಪರೋಕ್ಷ(&nm.lf_ಸಂದೇಶ_Font);
+		ಗಾಗಿ (i = IDC_PRINTTEXT1; i <= IDC_ಪ್ರಗತಿ; i++)
 		{
-		    SendDlgItemMessage(hDlg, i, WM_SETFONT, (WPARAM)hfont, 1);
-		    if (GetDlgItemText(hDlg,i, buff, sizeof(buff)))
-			vimSetDlgItemText(hDlg,i, (char_u *)_(buff));
+		    Send_Dlg_ಅಂಶ_ಸಂದೇಶ(hDlg, i, WM_SETFONT, (WPARAM)hfont, 1);
+		    ಆದರೆ (Get_Dlg_ಅಂಶ_ಪಠ್ಯ(hDlg,i, buff, ಗಾತ್ರ(buff)))
+			vim_ಗಣ_Dlg_ಅಂಶ_ಪಠ್ಯ(hDlg,i, (char_u *)_(buff));
 		}
-		SendDlgItemMessage(hDlg, IDCANCEL,
+		Send_Dlg_ಅಂಶ_ಸಂದೇಶ(hDlg, IDCANCEL,
 						WM_SETFONT, (WPARAM)hfont, 1);
-		if (GetDlgItemText(hDlg,IDCANCEL, buff, sizeof(buff)))
-		    vimSetDlgItemText(hDlg,IDCANCEL, (char_u *)_(buff));
+		ಆದರೆ (Get_Dlg_ಅಂಶ_ಪಠ್ಯ(hDlg,IDCANCEL, buff, ಗಾತ್ರ(buff)))
+		    vim_ಗಣ_Dlg_ಅಂಶ_ಪಠ್ಯ(hDlg,IDCANCEL, (char_u *)_(buff));
 	    }
 # endif
-	    SetWindowText(hDlg, (LPCSTR)szAppName);
-	    if (prt_name != NULL)
+	    ಗಣ_ಕಿಟಕಿ_ಪಠ್ಯ(hDlg, (LPCSTR)szAppName);
+	    ಆದರೆ (prt_name != ಖಾಲಿ)
 	    {
-		vimSetDlgItemText(hDlg, IDC_PRINTTEXT2, (char_u *)prt_name);
+		vim_ಗಣ_Dlg_ಅಂಶ_ಪಠ್ಯ(hDlg, IDC_PRINTTEXT2, (char_u *)prt_name);
 		VIM_CLEAR(prt_name);
 	    }
-	    EnableMenuItem(GetSystemMenu(hDlg, FALSE), SC_CLOSE, MF_GRAYED);
-# if !defined(FEAT_GUI) || defined(VIMDLL)
+	    Enable_Menu_ಅಂಶ(GetSystemMenu(hDlg, FALSE), SC_CLOSE, MF_GRAYED);
+# ಆದರೆ !defined(FEAT_GUI) || defined(VIMDLL)
 #  ifdef VIMDLL
-	    if (!gui.in_use)
+	    ಆದರೆ (!gui.ಒಳ_use)
 #  endif
-		BringWindowToTop(s_hwnd);
+		Bring_ಕಿಟಕಿ_ಗಮ್ಯ_ತುದಿ(s_hwnd);
 # endif
-	    return TRUE;
+	    ಹಿಂತಿರುಗಿ TRUE;
 
-	case WM_COMMAND:
+	ಸ್ಥಿತಿ WM_COMMAND:
 	    *bUserAbort = TRUE;
-	    EnableWindow(GetParent(hDlg), TRUE);
-	    DestroyWindow(hDlg);
-	    hDlgPrint = NULL;
+	    Enable_ಕಿಟಕಿ(Get_ಪೋಷಕ(hDlg), TRUE);
+	    Destroy_ಕಿಟಕಿ(hDlg);
+	    hDlgPrint = ಖಾಲಿ;
 # ifdef FEAT_GETTEXT
 	    DeleteObject(hfont);
 # endif
-	    return TRUE;
+	    ಹಿಂತಿರುಗಿ TRUE;
     }
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
-    static BOOL CALLBACK
-AbortProc(HDC hdcPrn UNUSED, int iCode UNUSED)
+    ಸ್ಥಿರ BOOL CALLBACK
+AbortProc(HDC hdcPrn ಬಳಸದ, ಪೂರ್ಣಾಂಕ i_ಸಂಕೇತ ಬಳಸದ)
 {
-    MSG msg;
+    ಸಂದೇಶ_3 ಸಂದೇಶ;
 
-    while (!*bUserAbort && PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
+    ಆಗ (!*bUserAbort && Peek_ಸಂದೇಶ_W(&ಸಂದೇಶ, ಖಾಲಿ, 0, 0, PM_REMOVE))
     {
-	if (!hDlgPrint || !IsDialogMessageW(hDlgPrint, &msg))
+	ಆದರೆ (!hDlgPrint || !Is_Dialog_ಸಂದೇಶ_W(hDlgPrint, &ಸಂದೇಶ))
 	{
-	    TranslateMessage(&msg);
-	    DispatchMessageW(&msg);
+	    Translate_ಸಂದೇಶ(&ಸಂದೇಶ);
+	    Dispatch_ಸಂದೇಶ_W(&ಸಂದೇಶ);
 	}
     }
-    return !*bUserAbort;
+    ಹಿಂತಿರುಗಿ !*bUserAbort;
 }
 
-    static UINT_PTR CALLBACK
+    ಸ್ಥಿರ UINT_PTR CALLBACK
 PrintHookProc(
 	HWND hDlg,	// handle to dialog box
-	UINT uiMsg,	// message identifier
-	WPARAM wParam UNUSED,	// message parameter
+	UINT ui_ಸಂದೇಶ,	// message identifier
+	WPARAM wParam ಬಳಸದ,	// message parameter
 	LPARAM lParam	// message parameter
 	)
 {
@@ -1232,15 +1232,15 @@ PrintHookProc(
     RECT	rc, rcDlg, rcOwner;
     PRINTDLGW	*pPD;
 
-    if (uiMsg != WM_INITDIALOG)
-	return FALSE;
+    ಆದರೆ (ui_ಸಂದೇಶ != WM_INITDIALOG)
+	ಹಿಂತಿರುಗಿ FALSE;
 
     // Get the owner window and dialog box rectangles.
-    if ((hwndOwner = GetParent(hDlg)) == NULL)
-	hwndOwner = GetDesktopWindow();
+    ಆದರೆ ((hwndOwner = Get_ಪೋಷಕ(hDlg)) == ಖಾಲಿ)
+	hwndOwner = Get_Desktop_ಕಿಟಕಿ();
 
-    GetWindowRect(hwndOwner, &rcOwner);
-    GetWindowRect(hDlg, &rcDlg);
+    Get_ಕಿಟಕಿ_Rect(hwndOwner, &rcOwner);
+    Get_ಕಿಟಕಿ_Rect(hDlg, &rcDlg);
     CopyRect(&rc, &rcOwner);
 
     // Offset the owner and dialog box rectangles so that
@@ -1248,183 +1248,183 @@ PrintHookProc(
     // height, and then offset the owner again to discard
     // space taken up by the dialog box.
 
-    OffsetRect(&rcDlg, -rcDlg.left, -rcDlg.top);
-    OffsetRect(&rc, -rc.left, -rc.top);
-    OffsetRect(&rc, -rcDlg.right, -rcDlg.bottom);
+    ಸ್ಥಾನಾಂತರ_Rect(&rcDlg, -rcDlg.ಎಡ_2, -rcDlg.ತುದಿ);
+    ಸ್ಥಾನಾಂತರ_Rect(&rc, -rc.ಎಡ_2, -rc.ತುದಿ);
+    ಸ್ಥಾನಾಂತರ_Rect(&rc, -rcDlg.ಬಲ_2, -rcDlg.bottom);
 
     // The new position is the sum of half the remaining
     // space and the owner's original position.
 
-    SetWindowPos(hDlg,
-	    HWND_TOP,
-	    rcOwner.left + (rc.right / 2),
-	    rcOwner.top + (rc.bottom / 2),
+    ಗಣ_ಕಿಟಕಿ_Pos(hDlg,
+	    HWND_ತುದಿ,
+	    rcOwner.ಎಡ_2 + (rc.ಬಲ_2 / 2),
+	    rcOwner.ತುದಿ + (rc.bottom / 2),
 	    0, 0,		// ignores size arguments
 	    SWP_NOSIZE);
 
     //  tackle the printdlg copiesctrl problem
     pPD = (PRINTDLGW *)lParam;
-    pPD->nCopies = (WORD)pPD->lCustData;
-    SetDlgItemInt( hDlg, edt3, pPD->nCopies, FALSE );
+    pPD->nCopies = (ಶಬ್ದ_2)pPD->l_Cust_ದತ್ತಾಂಶ;
+    ಗಣ_Dlg_ಅಂಶ_Int( hDlg, edt3, pPD->nCopies, FALSE );
     //  Bring the window to top
-    BringWindowToTop(GetParent(hDlg));
-    SetForegroundWindow(hDlg);
+    Bring_ಕಿಟಕಿ_ಗಮ್ಯ_ತುದಿ(Get_ಪೋಷಕ(hDlg));
+    ಗಣ_Foreground_ಕಿಟಕಿ(hDlg);
 
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
-    void
-mch_print_cleanup(void)
+    ಶೂನ್ಯ
+mch_print_cleanup(ಶೂನ್ಯ)
 {
-    int pifItalic;
-    int pifBold;
-    int pifUnderline;
+    ಪೂರ್ಣಾಂಕ pifItalic;
+    ಪೂರ್ಣಾಂಕ pifBold;
+    ಪೂರ್ಣಾಂಕ pifUnderline;
 
-    for (pifBold = 0; pifBold <= 1; pifBold++)
-	for (pifItalic = 0; pifItalic <= 1; pifItalic++)
-	    for (pifUnderline = 0; pifUnderline <= 1; pifUnderline++)
+    ಗಾಗಿ (pifBold = 0; pifBold <= 1; pifBold++)
+	ಗಾಗಿ (pifItalic = 0; pifItalic <= 1; pifItalic++)
+	    ಗಾಗಿ (pifUnderline = 0; pifUnderline <= 1; pifUnderline++)
 		DeleteObject(prt_font_handles[pifBold][pifItalic][pifUnderline]);
 
-    if (prt_dlg.hDC != NULL)
+    ಆದರೆ (prt_dlg.hDC != ಖಾಲಿ)
 	DeleteDC(prt_dlg.hDC);
-    if (!*bUserAbort && hDlgPrint != NULL)
-	SendMessage(hDlgPrint, WM_COMMAND, 0, 0);
+    ಆದರೆ (!*bUserAbort && hDlgPrint != ಖಾಲಿ)
+	Send_ಸಂದೇಶ(hDlgPrint, WM_COMMAND, 0, 0);
 }
 
-    static int
-to_device_units(int idx, int dpi, int physsize, int offset, int def_number)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಗಮ್ಯ_device_units(ಪೂರ್ಣಾಂಕ idx, ಪೂರ್ಣಾಂಕ dpi, ಪೂರ್ಣಾಂಕ physsize, ಪೂರ್ಣಾಂಕ ಸ್ಥಾನಾಂತರ, ಪೂರ್ಣಾಂಕ def_ಸಂಖ್ಯೆ)
 {
-    int		ret = 0;
-    int		u;
-    int		nr;
+    ಪೂರ್ಣಾಂಕ		ret = 0;
+    ಪೂರ್ಣಾಂಕ		u;
+    ಪೂರ್ಣಾಂಕ		nr;
 
     u = prt_get_unit(idx);
-    if (u == PRT_UNIT_NONE)
+    ಆದರೆ (u == PRT_UNIT_NONE)
     {
 	u = PRT_UNIT_PERC;
-	nr = def_number;
+	nr = def_ಸಂಖ್ಯೆ;
     }
-    else
-	nr = printer_opts[idx].number;
+    ಇಲ್ಲದಿದ್ದರೆ
+	nr = printer_opts[idx].ಸಂಖ್ಯೆ;
 
-    switch (u)
+    ಆಯ್ಕೆ (u)
     {
-	case PRT_UNIT_PERC:
+	ಸ್ಥಿತಿ PRT_UNIT_PERC:
 	    ret = (physsize * nr) / 100;
-	    break;
-	case PRT_UNIT_INCH:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ PRT_UNIT_INCH:
 	    ret = (nr * dpi);
-	    break;
-	case PRT_UNIT_MM:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ PRT_UNIT_MM:
 	    ret = (nr * 10 * dpi) / 254;
-	    break;
-	case PRT_UNIT_POINT:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ PRT_UNIT_ಬಿಂದು:
 	    ret = (nr * 10 * dpi) / 720;
-	    break;
+	    ನಿಲ್ಲಿಸು;
     }
 
-    if (ret < offset)
-	return 0;
-    else
-	return ret - offset;
+    ಆದರೆ (ret < ಸ್ಥಾನಾಂತರ)
+	ಹಿಂತಿರುಗಿ 0;
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಹಿಂತಿರುಗಿ ret - ಸ್ಥಾನಾಂತರ;
 }
 
-    static int
-prt_get_cpl(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+prt_get_cpl(ಶೂನ್ಯ)
 {
-    int		hr;
-    int		phyw;
-    int		dvoff;
-    int		rev_offset;
-    int		dpi;
+    ಪೂರ್ಣಾಂಕ		hr;
+    ಪೂರ್ಣಾಂಕ		phyw;
+    ಪೂರ್ಣಾಂಕ		dvoff;
+    ಪೂರ್ಣಾಂಕ		rev_ಸ್ಥಾನಾಂತರ;
+    ಪೂರ್ಣಾಂಕ		dpi;
 
-    GetTextMetrics(prt_dlg.hDC, &prt_tm);
-    prt_line_height = prt_tm.tmHeight + prt_tm.tmExternalLeading;
+    Get_ಪಠ್ಯ_Metrics(prt_dlg.hDC, &prt_tm);
+    prt_ಸಾಲು_ಎತ್ತರ = prt_tm.tm_ಎತ್ತರ + prt_tm.tmExternalLeading;
 
     hr	    = GetDeviceCaps(prt_dlg.hDC, HORZRES);
     phyw    = GetDeviceCaps(prt_dlg.hDC, PHYSICALWIDTH);
     dvoff   = GetDeviceCaps(prt_dlg.hDC, PHYSICALOFFSETX);
     dpi	    = GetDeviceCaps(prt_dlg.hDC, LOGPIXELSX);
 
-    rev_offset = phyw - (dvoff + hr);
+    rev_ಸ್ಥಾನಾಂತರ = phyw - (dvoff + hr);
 
-    prt_left_margin = to_device_units(OPT_PRINT_LEFT, dpi, phyw, dvoff, 10);
-    if (prt_use_number())
+    prt_ಎಡ_margin = ಗಮ್ಯ_device_units(OPT_PRINT_ಎಡ, dpi, phyw, dvoff, 10);
+    ಆದರೆ (prt_use_ಸಂಖ್ಯೆ())
     {
-	prt_number_width = PRINT_NUMBER_WIDTH * prt_tm.tmAveCharWidth;
-	prt_left_margin += prt_number_width;
+	prt_ಸಂಖ್ಯೆ_ಅಗಲ = PRINT_ಸಂಖ್ಯೆ_ಅಗಲ * prt_tm.tm_Ave_Char_ಅಗಲ;
+	prt_ಎಡ_margin += prt_ಸಂಖ್ಯೆ_ಅಗಲ;
     }
-    else
-	prt_number_width = 0;
+    ಇಲ್ಲದಿದ್ದರೆ
+	prt_ಸಂಖ್ಯೆ_ಅಗಲ = 0;
 
-    prt_right_margin = hr - to_device_units(OPT_PRINT_RIGHT, dpi, phyw,
-							       rev_offset, 5);
+    prt_ಬಲ_margin = hr - ಗಮ್ಯ_device_units(OPT_PRINT_ಬಲ, dpi, phyw,
+							       rev_ಸ್ಥಾನಾಂತರ, 5);
 
-    return (prt_right_margin - prt_left_margin) / prt_tm.tmAveCharWidth;
+    ಹಿಂತಿರುಗಿ (prt_ಬಲ_margin - prt_ಎಡ_margin) / prt_tm.tm_Ave_Char_ಅಗಲ;
 }
 
-    static int
-prt_get_lpp(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+prt_get_lpp(ಶೂನ್ಯ)
 {
-    int vr;
-    int phyw;
-    int dvoff;
-    int rev_offset;
-    int	bottom_margin;
-    int	dpi;
+    ಪೂರ್ಣಾಂಕ vr;
+    ಪೂರ್ಣಾಂಕ phyw;
+    ಪೂರ್ಣಾಂಕ dvoff;
+    ಪೂರ್ಣಾಂಕ rev_ಸ್ಥಾನಾಂತರ;
+    ಪೂರ್ಣಾಂಕ	bottom_margin;
+    ಪೂರ್ಣಾಂಕ	dpi;
 
     vr	    = GetDeviceCaps(prt_dlg.hDC, VERTRES);
     phyw    = GetDeviceCaps(prt_dlg.hDC, PHYSICALHEIGHT);
     dvoff   = GetDeviceCaps(prt_dlg.hDC, PHYSICALOFFSETY);
     dpi	    = GetDeviceCaps(prt_dlg.hDC, LOGPIXELSY);
 
-    rev_offset = phyw - (dvoff + vr);
+    rev_ಸ್ಥಾನಾಂತರ = phyw - (dvoff + vr);
 
-    prt_top_margin = to_device_units(OPT_PRINT_TOP, dpi, phyw, dvoff, 5);
+    prt_ತುದಿ_margin = ಗಮ್ಯ_device_units(OPT_PRINT_ತುದಿ, dpi, phyw, dvoff, 5);
 
     // adjust top margin if there is a header
-    prt_top_margin += prt_line_height * prt_header_height();
+    prt_ತುದಿ_margin += prt_ಸಾಲು_ಎತ್ತರ * prt_ಶೀರ್ಷಿಕೆ_ಎತ್ತರ();
 
-    bottom_margin = vr - to_device_units(OPT_PRINT_BOT, dpi, phyw,
-							       rev_offset, 5);
+    bottom_margin = vr - ಗಮ್ಯ_device_units(OPT_PRINT_BOT, dpi, phyw,
+							       rev_ಸ್ಥಾನಾಂತರ, 5);
 
-    return (bottom_margin - prt_top_margin) / prt_line_height;
+    ಹಿಂತಿರುಗಿ (bottom_margin - prt_ತುದಿ_margin) / prt_ಸಾಲು_ಎತ್ತರ;
 }
 
-    int
-mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
+    ಪೂರ್ಣಾಂಕ
+mch_print_init(prt_settings_T *psettings, char_u *jobname, ಪೂರ್ಣಾಂಕ forceit)
 {
-    static HGLOBAL	stored_dm = NULL;
-    static HGLOBAL	stored_devn = NULL;
-    static int		stored_nCopies = 1;
-    static int		stored_nFlags = 0;
+    ಸ್ಥಿರ HGLOBAL	stored_dm = ಖಾಲಿ;
+    ಸ್ಥಿರ HGLOBAL	stored_devn = ಖಾಲಿ;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ		stored_nCopies = 1;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ		stored_nFlags = 0;
 
     LOGFONTW		fLogFont;
-    int			pifItalic;
-    int			pifBold;
-    int			pifUnderline;
+    ಪೂರ್ಣಾಂಕ			pifItalic;
+    ಪೂರ್ಣಾಂಕ			pifBold;
+    ಪೂರ್ಣಾಂಕ			pifUnderline;
 
     DEVMODEW		*mem;
     DEVNAMES		*devname;
-    int			i;
+    ಪೂರ್ಣಾಂಕ			i;
     DWORD		err;
 
     bUserAbort = &(psettings->user_abort);
-    CLEAR_FIELD(prt_dlg);
-    prt_dlg.lStructSize = sizeof(PRINTDLGW);
-# if !defined(FEAT_GUI) || defined(VIMDLL)
+    CLEAR_ಕ್ಷೇತ್ರ(prt_dlg);
+    prt_dlg.l_Struct_ಗಾತ್ರ = ಗಾತ್ರ(PRINTDLGW);
+# ಆದರೆ !defined(FEAT_GUI) || defined(VIMDLL)
 #  ifdef VIMDLL
-    if (!gui.in_use)
+    ಆದರೆ (!gui.ಒಳ_use)
 #  endif
 	GetConsoleHwnd();	    // get value of s_hwnd
 # endif
     prt_dlg.hwndOwner = s_hwnd;
     prt_dlg.Flags = PD_NOPAGENUMS | PD_NOSELECTION | PD_RETURNDC;
-    if (!forceit)
+    ಆದರೆ (!forceit)
     {
-	prt_dlg.hDevMode = stored_dm;
-	prt_dlg.hDevNames = stored_devn;
-	prt_dlg.lCustData = stored_nCopies; // work around bug in print dialog
+	prt_dlg.h_Dev_ಬಹುಲಕ = stored_dm;
+	prt_dlg.h_Dev_ಹೆಸರುಗಳು = stored_devn;
+	prt_dlg.l_Cust_ದತ್ತಾಂಶ = stored_nCopies; // work around bug in print dialog
 	/*
 	 * Use hook to prevent print dialog being sent to back.
 	 */
@@ -1437,12 +1437,12 @@ mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
      * If bang present, return default printer setup with no dialog
      * never show dialog if we are running over telnet
      */
-    if (forceit
-# if !defined(FEAT_GUI) || defined(VIMDLL)
+    ಆದರೆ (forceit
+# ಆದರೆ !defined(FEAT_GUI) || defined(VIMDLL)
 #  ifdef VIMDLL
-	    || (!gui.in_use && !term_console)
-#  else
-	    || !term_console
+	    || (!gui.ಒಳ_use && !ಪದ_console)
+#  ಇಲ್ಲದಿದ್ದರೆ
+	    || !ಪದ_console
 #  endif
 # endif
 	    )
@@ -1452,33 +1452,33 @@ mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
 	 * MSDN suggests setting the first parameter to WINSPOOL for
 	 * NT, but NULL appears to work just as well.
 	 */
-	if (*p_pdev != NUL)
-	    prt_dlg.hDC = CreateDC(NULL, (LPCSTR)p_pdev, NULL, NULL);
-	else
+	ಆದರೆ (*p_pdev != NUL)
+	    prt_dlg.hDC = CreateDC(ಖಾಲಿ, (LPCSTR)p_pdev, ಖಾಲಿ, ಖಾಲಿ);
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    prt_dlg.Flags |= PD_RETURNDEFAULT;
-	    if (PrintDlgW(&prt_dlg) == 0)
-		goto init_fail_dlg;
+	    ಆದರೆ (PrintDlgW(&prt_dlg) == 0)
+		ಹೋಗು init_fail_dlg;
 	}
     }
-    else if (PrintDlgW(&prt_dlg) == 0)
-	goto init_fail_dlg;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (PrintDlgW(&prt_dlg) == 0)
+	ಹೋಗು init_fail_dlg;
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	/*
 	 * keep the previous driver context
 	 */
-	stored_dm = prt_dlg.hDevMode;
-	stored_devn = prt_dlg.hDevNames;
+	stored_dm = prt_dlg.h_Dev_ಬಹುಲಕ;
+	stored_devn = prt_dlg.h_Dev_ಹೆಸರುಗಳು;
 	stored_nFlags = prt_dlg.Flags;
 	stored_nCopies = prt_dlg.nCopies;
     }
 
-    if (prt_dlg.hDC == NULL)
+    ಆದರೆ (prt_dlg.hDC == ಖಾಲಿ)
     {
 	emsg(_(e_printer_selection_failed));
 	mch_print_cleanup();
-	return FALSE;
+	ಹಿಂತಿರುಗಿ FALSE;
     }
 
     // Not all printer drivers report the support of color (or grey) in the
@@ -1490,89 +1490,89 @@ mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
 				   || i > 2 || i == -1);
 
     // Ensure all font styles are baseline aligned
-    SetTextAlign(prt_dlg.hDC, TA_BASELINE|TA_LEFT);
+    ಗಣ_ಪಠ್ಯ_Align(prt_dlg.hDC, TA_BASELINE|TA_ಎಡ);
 
     /*
      * On some windows systems the nCopies parameter is not
      * passed back correctly. It must be retrieved from the
      * hDevMode struct.
      */
-    mem = (DEVMODEW *)GlobalLock(prt_dlg.hDevMode);
-    if (mem != NULL)
+    mem = (DEVMODEW *)Global_ಬೀಗ(prt_dlg.h_Dev_ಬಹುಲಕ);
+    ಆದರೆ (mem != ಖಾಲಿ)
     {
-	if (mem->dmCopies != 1)
+	ಆದರೆ (mem->dmCopies != 1)
 	    stored_nCopies = mem->dmCopies;
-	if ((mem->dmFields & DM_DUPLEX) && (mem->dmDuplex & ~DMDUP_SIMPLEX))
+	ಆದರೆ ((mem->dmFields & DM_DUPLEX) && (mem->dmDuplex & ~DMDUP_SIMPLEX))
 	    psettings->duplex = TRUE;
-	if ((mem->dmFields & DM_COLOR) && (mem->dmColor & DMCOLOR_COLOR))
+	ಆದರೆ ((mem->dmFields & DM_COLOR) && (mem->dmColor & DMCOLOR_COLOR))
 	    psettings->has_color = TRUE;
     }
-    GlobalUnlock(prt_dlg.hDevMode);
+    GlobalUnlock(prt_dlg.h_Dev_ಬಹುಲಕ);
 
-    devname = (DEVNAMES *)GlobalLock(prt_dlg.hDevNames);
-    if (devname != 0)
+    devname = (DEVNAMES *)Global_ಬೀಗ(prt_dlg.h_Dev_ಹೆಸರುಗಳು);
+    ಆದರೆ (devname != 0)
     {
-	WCHAR	*wprinter_name = (WCHAR *)devname + devname->wDeviceOffset;
-	WCHAR	*wport_name = (WCHAR *)devname + devname->wOutputOffset;
-	char_u	*text = (char_u *)_("to %s on %s");
-	char_u  *printer_name = utf16_to_enc(wprinter_name, NULL);
-	char_u	*port_name = utf16_to_enc(wport_name, NULL);
+	WCHAR	*wprinter_name = (WCHAR *)devname + devname->w_Device_ಸ್ಥಾನಾಂತರ;
+	WCHAR	*wport_name = (WCHAR *)devname + devname->w_Output_ಸ್ಥಾನಾಂತರ;
+	char_u	*ಪಠ್ಯ = (char_u *)_("to %s on %s");
+	char_u  *printer_name = utf16_ಗಮ್ಯ_enc(wprinter_name, ಖಾಲಿ);
+	char_u	*ಪೋರ್ಟ್_name = utf16_ಗಮ್ಯ_enc(wport_name, ಖಾಲಿ);
 
-	if (printer_name != NULL && port_name != NULL)
+	ಆದರೆ (printer_name != ಖಾಲಿ && ಪೋರ್ಟ್_name != ಖಾಲಿ)
 	    prt_name = alloc(STRLEN(printer_name)
-					   + STRLEN(port_name) + STRLEN(text));
-	if (prt_name != NULL)
-	    wsprintf((char *)prt_name, (const char *)text,
-		    printer_name, port_name);
+					   + STRLEN(ಪೋರ್ಟ್_name) + STRLEN(ಪಠ್ಯ));
+	ಆದರೆ (prt_name != ಖಾಲಿ)
+	    wsprintf((ಅಕ್ಷರ *)prt_name, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)ಪಠ್ಯ,
+		    printer_name, ಪೋರ್ಟ್_name);
 	vim_free(printer_name);
-	vim_free(port_name);
+	vim_free(ಪೋರ್ಟ್_name);
     }
-    GlobalUnlock(prt_dlg.hDevNames);
+    GlobalUnlock(prt_dlg.h_Dev_ಹೆಸರುಗಳು);
 
     /*
      * Initialise the font according to 'printfont'
      */
-    CLEAR_FIELD(fLogFont);
-    if (get_logfont(&fLogFont, p_pfn, prt_dlg.hDC, TRUE) == FAIL)
+    CLEAR_ಕ್ಷೇತ್ರ(fLogFont);
+    ಆದರೆ (get_logfont(&fLogFont, p_pfn, prt_dlg.hDC, TRUE) == FAIL)
     {
 	semsg(_(e_unknown_printer_font_str), p_pfn);
 	mch_print_cleanup();
-	return FALSE;
+	ಹಿಂತಿರುಗಿ FALSE;
     }
 
-    for (pifBold = 0; pifBold <= 1; pifBold++)
-	for (pifItalic = 0; pifItalic <= 1; pifItalic++)
-	    for (pifUnderline = 0; pifUnderline <= 1; pifUnderline++)
+    ಗಾಗಿ (pifBold = 0; pifBold <= 1; pifBold++)
+	ಗಾಗಿ (pifItalic = 0; pifItalic <= 1; pifItalic++)
+	    ಗಾಗಿ (pifUnderline = 0; pifUnderline <= 1; pifUnderline++)
 	    {
-		fLogFont.lfWeight =  boldface[pifBold];
+		fLogFont.lf_ತೂಕ =  boldface[pifBold];
 		fLogFont.lfItalic = pifItalic;
 		fLogFont.lfUnderline = pifUnderline;
 		prt_font_handles[pifBold][pifItalic][pifUnderline]
-					      = CreateFontIndirectW(&fLogFont);
+					      = Create_Font_ಪರೋಕ್ಷ_W(&fLogFont);
 	    }
 
-    SetBkMode(prt_dlg.hDC, OPAQUE);
+    ಗಣ_Bk_ಬಹುಲಕ(prt_dlg.hDC, OPAQUE);
     SelectObject(prt_dlg.hDC, prt_font_handles[0][0][0]);
 
     /*
      * Fill in the settings struct
      */
-    psettings->chars_per_line = prt_get_cpl();
-    psettings->lines_per_page = prt_get_lpp();
-    if (prt_dlg.Flags & PD_USEDEVMODECOPIESANDCOLLATE)
+    psettings->chars_ಪ್ರತಿ_ಸಾಲು = prt_get_cpl();
+    psettings->ಸಾಲುಗಳು_ಪ್ರತಿ_ಪುಟ = prt_get_lpp();
+    ಆದರೆ (prt_dlg.Flags & PD_USEDEVMODECOPIESANDCOLLATE)
     {
 	psettings->n_collated_copies = (prt_dlg.Flags & PD_COLLATE)
 						    ? prt_dlg.nCopies : 1;
 	psettings->n_uncollated_copies = (prt_dlg.Flags & PD_COLLATE)
 						    ? 1 : prt_dlg.nCopies;
 
-	if (psettings->n_collated_copies == 0)
+	ಆದರೆ (psettings->n_collated_copies == 0)
 	    psettings->n_collated_copies = 1;
 
-	if (psettings->n_uncollated_copies == 0)
+	ಆದರೆ (psettings->n_uncollated_copies == 0)
 	    psettings->n_uncollated_copies = 1;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	psettings->n_collated_copies = 1;
 	psettings->n_uncollated_copies = 1;
@@ -1580,208 +1580,208 @@ mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
 
     psettings->jobname = jobname;
 
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 
 init_fail_dlg:
     err = CommDlgExtendedError();
-    if (err)
+    ಆದರೆ (err)
     {
 	char_u *buf;
 
 	// I suspect FormatMessage() doesn't work for values returned by
 	// CommDlgExtendedError().  What does?
-	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-		FORMAT_MESSAGE_FROM_SYSTEM |
-		FORMAT_MESSAGE_IGNORE_INSERTS,
-		NULL, err, 0, (LPTSTR)(&buf), 0, NULL);
+	Format_ಸಂದೇಶ(FORMAT_ಸಂದೇಶ_ALLOCATE_ಬಫರ್ |
+		FORMAT_ಸಂದೇಶ_FROM_SYSTEM |
+		FORMAT_ಸಂದೇಶ_IGNORE_INSERTS,
+		ಖಾಲಿ, err, 0, (LPTSTR)(&buf), 0, ಖಾಲಿ);
 	semsg(_(e_print_error_str),
-		buf == NULL ? (char_u *)_("Unknown") : buf);
+		buf == ಖಾಲಿ ? (char_u *)_("Unknown") : buf);
 	LocalFree((LPVOID)(buf));
     }
-    else
-	msg_clr_eos(); // Maybe canceled
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಸಂದೇಶ_clr_eos(); // Maybe canceled
 
     mch_print_cleanup();
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_print_begin(prt_settings_T *psettings)
 {
-    int			ret = 0;
-    char		szBuffer[300];
+    ಪೂರ್ಣಾಂಕ			ret = 0;
+    ಅಕ್ಷರ		sz_ಬಫರ್[300];
     WCHAR		*wp;
 
-    hDlgPrint = CreateDialog(g_hinst, TEXT("PrintDlgBox"),
+    hDlgPrint = CreateDialog(g_hinst, ಪಠ್ಯ_3("PrintDlgBox"),
 					     prt_dlg.hwndOwner, PrintDlgProc);
-    SetAbortProc(prt_dlg.hDC, AbortProc);
-    wsprintf(szBuffer, _("Printing '%s'"), gettail(psettings->jobname));
-    vimSetDlgItemText(hDlgPrint, IDC_PRINTTEXT1, (char_u *)szBuffer);
+    ಗಣ_Abort_Proc(prt_dlg.hDC, AbortProc);
+    wsprintf(sz_ಬಫರ್, _("Printing '%s'"), gettail(psettings->jobname));
+    vim_ಗಣ_Dlg_ಅಂಶ_ಪಠ್ಯ(hDlgPrint, IDC_PRINTTEXT1, (char_u *)sz_ಬಫರ್);
 
-    wp = enc_to_utf16(psettings->jobname, NULL);
-    if (wp != NULL)
+    wp = enc_ಗಮ್ಯ_utf16(psettings->jobname, ಖಾಲಿ);
+    ಆದರೆ (wp != ಖಾಲಿ)
     {
 	DOCINFOW	di;
 
-	CLEAR_FIELD(di);
-	di.cbSize = sizeof(di);
+	CLEAR_ಕ್ಷೇತ್ರ(di);
+	di.cb_ಗಾತ್ರ = ಗಾತ್ರ(di);
 	di.lpszDocName = wp;
-	ret = StartDocW(prt_dlg.hDC, &di);
+	ret = ಆರಂಭ_Doc_W(prt_dlg.hDC, &di);
 	vim_free(wp);
     }
 
 # ifdef FEAT_GUI
     // Give focus back to main window (when using MDI).
 #  ifdef VIMDLL
-    if (gui.in_use)
+    ಆದರೆ (gui.ಒಳ_use)
 #  endif
-	SetFocus(s_hwnd);
+	ಗಣ_Focus(s_hwnd);
 # endif
 
-    return (ret > 0);
+    ಹಿಂತಿರುಗಿ (ret > 0);
 }
 
-    void
-mch_print_end(prt_settings_T *psettings UNUSED)
+    ಶೂನ್ಯ
+mch_print_ಕೊನೆ(prt_settings_T *psettings ಬಳಸದ)
 {
-    EndDoc(prt_dlg.hDC);
-    if (!*bUserAbort && hDlgPrint != NULL)
-	SendMessage(hDlgPrint, WM_COMMAND, 0, 0);
+    ಕೊನೆ_Doc(prt_dlg.hDC);
+    ಆದರೆ (!*bUserAbort && hDlgPrint != ಖಾಲಿ)
+	Send_ಸಂದೇಶ(hDlgPrint, WM_COMMAND, 0, 0);
 }
 
-    int
-mch_print_end_page(void)
+    ಪೂರ್ಣಾಂಕ
+mch_print_ಕೊನೆ_ಪುಟ(ಶೂನ್ಯ)
 {
-    return (EndPage(prt_dlg.hDC) > 0);
+    ಹಿಂತಿರುಗಿ (ಕೊನೆ_ಪುಟ(prt_dlg.hDC) > 0);
 }
 
-    int
-mch_print_begin_page(char_u *msg)
+    ಪೂರ್ಣಾಂಕ
+mch_print_begin_ಪುಟ(char_u *ಸಂದೇಶ)
 {
-    if (msg != NULL)
-	vimSetDlgItemText(hDlgPrint, IDC_PROGRESS, msg);
-    return (StartPage(prt_dlg.hDC) > 0);
+    ಆದರೆ (ಸಂದೇಶ != ಖಾಲಿ)
+	vim_ಗಣ_Dlg_ಅಂಶ_ಪಠ್ಯ(hDlgPrint, IDC_ಪ್ರಗತಿ, ಸಂದೇಶ);
+    ಹಿಂತಿರುಗಿ (ಆರಂಭ_ಪುಟ(prt_dlg.hDC) > 0);
 }
 
-    int
-mch_print_blank_page(void)
+    ಪೂರ್ಣಾಂಕ
+mch_print_blank_ಪುಟ(ಶೂನ್ಯ)
 {
-    return (mch_print_begin_page(NULL) ? (mch_print_end_page()) : FALSE);
+    ಹಿಂತಿರುಗಿ (mch_print_begin_ಪುಟ(ಖಾಲಿ) ? (mch_print_ಕೊನೆ_ಪುಟ()) : FALSE);
 }
 
-static int prt_pos_x = 0;
-static int prt_pos_y = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ prt_pos_x = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ prt_pos_y = 0;
 
-    void
-mch_print_start_line(int margin, int page_line)
+    ಶೂನ್ಯ
+mch_print_ಆರಂಭ_ಸಾಲು(ಪೂರ್ಣಾಂಕ margin, ಪೂರ್ಣಾಂಕ ಪುಟ_ಸಾಲು)
 {
-    if (margin)
-	prt_pos_x = -prt_number_width;
-    else
+    ಆದರೆ (margin)
+	prt_pos_x = -prt_ಸಂಖ್ಯೆ_ಅಗಲ;
+    ಇಲ್ಲದಿದ್ದರೆ
 	prt_pos_x = 0;
-    prt_pos_y = page_line * prt_line_height
+    prt_pos_y = ಪುಟ_ಸಾಲು * prt_ಸಾಲು_ಎತ್ತರ
 				 + prt_tm.tmAscent + prt_tm.tmExternalLeading;
 }
 
-    int
-mch_print_text_out(char_u *p, int len)
+    ಪೂರ್ಣಾಂಕ
+mch_print_ಪಠ್ಯ_ಹೊರಹೋಗು(char_u *p, ಪೂರ್ಣಾಂಕ len)
 {
-    SIZE	sz;
+    ಗಾತ್ರ_4	sz;
     WCHAR	*wp;
-    int		wlen = len;
-    int		ret = FALSE;
+    ಪೂರ್ಣಾಂಕ		wlen = len;
+    ಪೂರ್ಣಾಂಕ		ret = FALSE;
 
-    wp = enc_to_utf16(p, &wlen);
-    if (wp == NULL)
-	return FALSE;
+    wp = enc_ಗಮ್ಯ_utf16(p, &wlen);
+    ಆದರೆ (wp == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    TextOutW(prt_dlg.hDC, prt_pos_x + prt_left_margin,
-	    prt_pos_y + prt_top_margin, wp, wlen);
-    GetTextExtentPoint32W(prt_dlg.hDC, wp, wlen, &sz);
+    ಪಠ್ಯ_ಹೊರಹೋಗು_W(prt_dlg.hDC, prt_pos_x + prt_ಎಡ_margin,
+	    prt_pos_y + prt_ತುದಿ_margin, wp, wlen);
+    Get_ಪಠ್ಯ_Extent_Point32_W(prt_dlg.hDC, wp, wlen, &sz);
     vim_free(wp);
     prt_pos_x += (sz.cx - prt_tm.tmOverhang);
     // This is wrong when printing spaces for a TAB.
-    if (p[len] != NUL)
+    ಆದರೆ (p[len] != NUL)
     {
 	wlen = mb_ptr2len(p + len);
-	wp = enc_to_utf16(p + len, &wlen);
-	if (wp != NULL)
+	wp = enc_ಗಮ್ಯ_utf16(p + len, &wlen);
+	ಆದರೆ (wp != ಖಾಲಿ)
 	{
-	    GetTextExtentPoint32W(prt_dlg.hDC, wp, 1, &sz);
-	    ret = (prt_pos_x + prt_left_margin + sz.cx > prt_right_margin);
+	    Get_ಪಠ್ಯ_Extent_Point32_W(prt_dlg.hDC, wp, 1, &sz);
+	    ret = (prt_pos_x + prt_ಎಡ_margin + sz.cx > prt_ಬಲ_margin);
 	    vim_free(wp);
 	}
     }
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-    void
-mch_print_set_font(int iBold, int iItalic, int iUnderline)
+    ಶೂನ್ಯ
+mch_print_ಗಣ_font(ಪೂರ್ಣಾಂಕ iBold, ಪೂರ್ಣಾಂಕ iItalic, ಪೂರ್ಣಾಂಕ iUnderline)
 {
     SelectObject(prt_dlg.hDC, prt_font_handles[iBold][iItalic][iUnderline]);
 }
 
-    void
-mch_print_set_bg(long_u bgcol)
+    ಶೂನ್ಯ
+mch_print_ಗಣ_bg(long_u bgcol)
 {
-    SetBkColor(prt_dlg.hDC, GetNearestColor(prt_dlg.hDC,
-						   swap_me((COLORREF)bgcol)));
+    ಗಣ_Bk_Color(prt_dlg.hDC, Get_ಹತ್ತಿರದ_Color(prt_dlg.hDC,
+						   ಅದಲುಬದಲು_me((COLORREF)bgcol)));
     /*
      * With a white background we can draw characters transparent, which is
      * good for italic characters that overlap to the next char cell.
      */
-    if (bgcol == 0xffffffUL)
-	SetBkMode(prt_dlg.hDC, TRANSPARENT);
-    else
-	SetBkMode(prt_dlg.hDC, OPAQUE);
+    ಆದರೆ (bgcol == 0xffffffUL)
+	ಗಣ_Bk_ಬಹುಲಕ(prt_dlg.hDC, TRANSPARENT);
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಗಣ_Bk_ಬಹುಲಕ(prt_dlg.hDC, OPAQUE);
 }
 
-    void
-mch_print_set_fg(long_u fgcol)
+    ಶೂನ್ಯ
+mch_print_ಗಣ_fg(long_u fgcol)
 {
-    SetTextColor(prt_dlg.hDC, GetNearestColor(prt_dlg.hDC,
-						   swap_me((COLORREF)fgcol)));
+    ಗಣ_ಪಠ್ಯ_Color(prt_dlg.hDC, Get_ಹತ್ತಿರದ_Color(prt_dlg.hDC,
+						   ಅದಲುಬದಲು_me((COLORREF)fgcol)));
 }
 
-#endif // FEAT_PRINTER && !FEAT_POSTSCRIPT
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_PRINTER && !FEAT_POSTSCRIPT
 
 
 
-#if defined(FEAT_SHORTCUT)
+#ಆದರೆ defined(FEAT_SHORTCUT)
 # include <shlobj.h>
 
-# define is_path_sep(c)	    ((c) == L'\\' || (c) == L'/')
+# define is_ಮಾರ್ಗ_sep(c)	    ((c) == L'\\' || (c) == L'/')
 
-    static int
-is_reparse_point_included(LPCWSTR fname)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+is_reparse_ಬಿಂದು_included(LPCWSTR fname)
 {
     LPCWSTR	p = fname, q;
-    WCHAR	buf[MAX_PATH];
+    WCHAR	buf[MAX_ಮಾರ್ಗ];
     DWORD	attr;
 
-    if (SAFE_isalpha(p[0]) && p[1] == L':' && is_path_sep(p[2]))
+    ಆದರೆ (ಸುರಕ್ಷಿತ_isalpha(p[0]) && p[1] == L':' && is_ಮಾರ್ಗ_sep(p[2]))
 	p += 3;
-    else if (is_path_sep(p[0]) && is_path_sep(p[1]))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (is_ಮಾರ್ಗ_sep(p[0]) && is_ಮಾರ್ಗ_sep(p[1]))
 	p += 2;
 
-    while (*p != L'\0')
+    ಆಗ (*p != L'\0')
     {
 	q = wcspbrk(p, L"\\/");
-	if (q == NULL)
+	ಆದರೆ (q == ಖಾಲಿ)
 	    p = q = fname + wcslen(fname);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    p = q + 1;
-	if (q - fname >= MAX_PATH)
-	    return FALSE;
+	ಆದರೆ (q - fname >= MAX_ಮಾರ್ಗ)
+	    ಹಿಂತಿರುಗಿ FALSE;
 	wcsncpy(buf, fname, q - fname);
 	buf[q - fname] = L'\0';
-	attr = GetFileAttributesW(buf);
-	if (attr != INVALID_FILE_ATTRIBUTES
-		&& (attr & FILE_ATTRIBUTE_REPARSE_POINT) != 0)
-	    return TRUE;
+	attr = Get_File_ಗುಣಲಕ್ಷಣಗಳು_W(buf);
+	ಆದರೆ (attr != INVALID_FILE_ಗುಣಲಕ್ಷಣಗಳು
+		&& (attr & FILE_ATTRIBUTE_REPARSE_ಬಿಂದು) != 0)
+	    ಹಿಂತಿರುಗಿ TRUE;
     }
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 /*
@@ -1789,59 +1789,59 @@ is_reparse_point_included(LPCWSTR fname)
  * point, already fully resolved, or it doesn't exists.
  */
     char_u *
-resolve_reparse_point(char_u *fname)
+resolve_reparse_ಬಿಂದು(char_u *fname)
 {
-    HANDLE	    h = INVALID_HANDLE_VALUE;
-    DWORD	    size;
+    HANDLE	    h = INVALID_HANDLE_ಮೌಲ್ಯ;
+    DWORD	    ಗಾತ್ರ_2;
     WCHAR	    *p, *wp;
-    char_u	    *rfname = NULL;
-    WCHAR	    *buff = NULL;
+    char_u	    *rfname = ಖಾಲಿ;
+    WCHAR	    *buff = ಖಾಲಿ;
 
-    p = enc_to_utf16(fname, NULL);
-    if (p == NULL)
-	goto fail;
+    p = enc_ಗಮ್ಯ_utf16(fname, ಖಾಲಿ);
+    ಆದರೆ (p == ಖಾಲಿ)
+	ಹೋಗು fail;
 
-    if (!is_reparse_point_included(p))
+    ಆದರೆ (!is_reparse_ಬಿಂದು_included(p))
     {
 	vim_free(p);
-	goto fail;
+	ಹೋಗು fail;
     }
 
-    h = CreateFileW(p, 0, 0, NULL, OPEN_EXISTING,
-	    FILE_FLAG_BACKUP_SEMANTICS, NULL);
+    h = CreateFileW(p, 0, 0, ಖಾಲಿ, OPEN_EXISTING,
+	    FILE_FLAG_BACKUP_SEMANTICS, ಖಾಲಿ);
     vim_free(p);
 
-    if (h == INVALID_HANDLE_VALUE)
-	goto fail;
+    ಆದರೆ (h == INVALID_HANDLE_ಮೌಲ್ಯ)
+	ಹೋಗು fail;
 
-    size = GetFinalPathNameByHandleW(h, NULL, 0, 0);
-    if (size == 0)
-	goto fail;
-    buff = ALLOC_MULT(WCHAR, size);
-    if (buff == NULL)
-	goto fail;
-    if (GetFinalPathNameByHandleW(h, buff, size, 0) == 0)
-	goto fail;
+    ಗಾತ್ರ_2 = Get_Final_ಮಾರ್ಗ_Name_By_Handle_W(h, ಖಾಲಿ, 0, 0);
+    ಆದರೆ (ಗಾತ್ರ_2 == 0)
+	ಹೋಗು fail;
+    buff = ALLOC_MULT(WCHAR, ಗಾತ್ರ_2);
+    ಆದರೆ (buff == ಖಾಲಿ)
+	ಹೋಗು fail;
+    ಆದರೆ (Get_Final_ಮಾರ್ಗ_Name_By_Handle_W(h, buff, ಗಾತ್ರ_2, 0) == 0)
+	ಹೋಗು fail;
 
-    if (wcsncmp(buff, L"\\\\?\\UNC\\", 8) == 0)
+    ಆದರೆ (wcsncmp(buff, L"\\\\?\\UNC\\", 8) == 0)
     {
 	buff[6] = L'\\';
 	wp = buff + 6;
     }
-    else if (wcsncmp(buff, L"\\\\?\\", 4) == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (wcsncmp(buff, L"\\\\?\\", 4) == 0)
 	wp = buff + 4;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	wp = buff;
 
-    rfname = utf16_to_enc(wp, NULL);
+    rfname = utf16_ಗಮ್ಯ_enc(wp, ಖಾಲಿ);
 
 fail:
-    if (h != INVALID_HANDLE_VALUE)
+    ಆದರೆ (h != INVALID_HANDLE_ಮೌಲ್ಯ)
 	CloseHandle(h);
-    if (buff != NULL)
+    ಆದರೆ (buff != ಖಾಲಿ)
 	vim_free(buff);
 
-    return rfname;
+    ಹಿಂತಿರುಗಿ rfname;
 }
 
 /*
@@ -1849,59 +1849,59 @@ fail:
  * to and return that name in allocated memory.
  * Otherwise NULL is returned.
  */
-    static char_u *
+    ಸ್ಥಿರ char_u *
 resolve_shortcut(char_u *fname)
 {
     HRESULT		hr;
-    IShellLink		*psl = NULL;
-    IPersistFile	*ppf = NULL;
-    OLECHAR		wsz[MAX_PATH];
-    char_u		*rfname = NULL;
-    int			len;
-    IShellLinkW		*pslw = NULL;
-    WIN32_FIND_DATAW	ffdw; // we get those free of charge
+    IShellLink		*psl = ಖಾಲಿ;
+    IPersistFile	*ppf = ಖಾಲಿ;
+    OLECHAR		wsz[MAX_ಮಾರ್ಗ];
+    char_u		*rfname = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ			len;
+    IShellLinkW		*pslw = ಖಾಲಿ;
+    WIN32_ಕಂಡುಹಿಡಿ_DATAW	ffdw; // we get those free of charge
 
     // Check if the file name ends in ".lnk". Avoid calling
     // CoCreateInstance(), it's quite slow.
-    if (fname == NULL)
-	return rfname;
-    len = (int)STRLEN(fname);
-    if (len <= 4 || STRNICMP(fname + len - 4, ".lnk", 4) != 0)
-	return rfname;
+    ಆದರೆ (fname == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ rfname;
+    len = (ಪೂರ್ಣಾಂಕ)STRLEN(fname);
+    ಆದರೆ (len <= 4 || STRNICMP(fname + len - 4, ".lnk", 4) != 0)
+	ಹಿಂತಿರುಗಿ rfname;
 
-    CoInitialize(NULL);
+    CoInitialize(ಖಾಲಿ);
 
     // create a link manager object and request its interface
     hr = CoCreateInstance(
-	    &CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER,
-	    &IID_IShellLinkW, (void**)&pslw);
-    if (hr == S_OK)
+	    &CLSID_ShellLink, ಖಾಲಿ, CLSCTX_INPROC_SERVER,
+	    &IID_IShellLinkW, (ಶೂನ್ಯ**)&pslw);
+    ಆದರೆ (hr == S_OK)
     {
-	WCHAR	*p = enc_to_utf16(fname, NULL);
+	WCHAR	*p = enc_ಗಮ್ಯ_utf16(fname, ಖಾಲಿ);
 
-	if (p != NULL)
+	ಆದರೆ (p != ಖಾಲಿ)
 	{
 	    // Get a pointer to the IPersistFile interface.
 	    hr = pslw->lpVtbl->QueryInterface(
-		    pslw, &IID_IPersistFile, (void**)&ppf);
-	    if (hr != S_OK)
-		goto shortcut_errorw;
+		    pslw, &IID_IPersistFile, (ಶೂನ್ಯ**)&ppf);
+	    ಆದರೆ (hr != S_OK)
+		ಹೋಗು shortcut_errorw;
 
 	    // "load" the name and resolve the link
-	    hr = ppf->lpVtbl->Load(ppf, p, STGM_READ);
-	    if (hr != S_OK)
-		goto shortcut_errorw;
-# if 0  // This makes Vim wait a long time if the target does not exist.
-	    hr = pslw->lpVtbl->Resolve(pslw, NULL, SLR_NO_UI);
-	    if (hr != S_OK)
-		goto shortcut_errorw;
+	    hr = ppf->lpVtbl->ತುಂಬು_2(ppf, p, STGM_READ);
+	    ಆದರೆ (hr != S_OK)
+		ಹೋಗು shortcut_errorw;
+# ಆದರೆ 0  // This makes Vim wait a long time if the target does not exist.
+	    hr = pslw->lpVtbl->Resolve(pslw, ಖಾಲಿ, SLR_NO_UI);
+	    ಆದರೆ (hr != S_OK)
+		ಹೋಗು shortcut_errorw;
 # endif
 
 	    // Get the path to the link target.
-	    ZeroMemory(wsz, MAX_PATH * sizeof(WCHAR));
-	    hr = pslw->lpVtbl->GetPath(pslw, wsz, MAX_PATH, &ffdw, 0);
-	    if (hr == S_OK && wsz[0] != NUL)
-		rfname = utf16_to_enc(wsz, NULL);
+	    Zero_ಸ್ಮರಣೆ(wsz, MAX_ಮಾರ್ಗ * ಗಾತ್ರ(WCHAR));
+	    hr = pslw->lpVtbl->Get_ಮಾರ್ಗ(pslw, wsz, MAX_ಮಾರ್ಗ, &ffdw, 0);
+	    ಆದರೆ (hr == S_OK && wsz[0] != NUL)
+		rfname = utf16_ಗಮ್ಯ_enc(wsz, ಖಾಲಿ);
 
 shortcut_errorw:
 	    vim_free(p);
@@ -1909,42 +1909,42 @@ shortcut_errorw:
     }
 
     // Release all interface pointers (both belong to the same object)
-    if (ppf != NULL)
+    ಆದರೆ (ppf != ಖಾಲಿ)
 	ppf->lpVtbl->Release(ppf);
-    if (psl != NULL)
+    ಆದರೆ (psl != ಖಾಲಿ)
 	psl->lpVtbl->Release(psl);
-    if (pslw != NULL)
+    ಆದರೆ (pslw != ಖಾಲಿ)
 	pslw->lpVtbl->Release(pslw);
 
     CoUninitialize();
-    return rfname;
+    ಹಿಂತಿರುಗಿ rfname;
 }
 
     char_u *
-mch_resolve_path(char_u *fname, int reparse_point)
+mch_resolve_ಮಾರ್ಗ(char_u *fname, ಪೂರ್ಣಾಂಕ reparse_ಬಿಂದು)
 {
-    char_u  *path = resolve_shortcut(fname);
+    char_u  *ಮಾರ್ಗ = resolve_shortcut(fname);
 
-    if (path == NULL && reparse_point)
-	path = resolve_reparse_point(fname);
-    return path;
+    ಆದರೆ (ಮಾರ್ಗ == ಖಾಲಿ && reparse_ಬಿಂದು)
+	ಮಾರ್ಗ = resolve_reparse_ಬಿಂದು(fname);
+    ಹಿಂತಿರುಗಿ ಮಾರ್ಗ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_EVAL) && (!defined(FEAT_GUI) || defined(VIMDLL))
+#ಆದರೆ defined(FEAT_EVAL) && (!defined(FEAT_GUI) || defined(VIMDLL))
 /*
  * Bring ourselves to the foreground.  Does work if the OS doesn't allow it.
  */
-    void
-win32_set_foreground(void)
+    ಶೂನ್ಯ
+win32_ಗಣ_foreground(ಶೂನ್ಯ)
 {
     GetConsoleHwnd();	    // get value of s_hwnd
-    if (s_hwnd != 0)
-	SetForegroundWindow(s_hwnd);
+    ಆದರೆ (s_hwnd != 0)
+	ಗಣ_Foreground_ಕಿಟಕಿ(s_hwnd);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_CLIENTSERVER)
+#ಆದರೆ defined(FEAT_CLIENTSERVER)
 /*
  * Client-server code for Vim
  *
@@ -1957,10 +1957,10 @@ win32_set_foreground(void)
 // GUI window at all).
 //
 // So we create a hidden window, and arrange to destroy it on exit.
-HWND message_window = 0;	    // window that's handling messages
+HWND ಸಂದೇಶ_ಕಿಟಕಿ = 0;	    // window that's handling messages
 
 # define VIM_CLASSNAME      "VIM_MESSAGES"
-# define VIM_CLASSNAME_LEN  (sizeof(VIM_CLASSNAME) - 1)
+# define VIM_CLASSNAME_LEN  (ಗಾತ್ರ(VIM_CLASSNAME) - 1)
 
 // Timeout for sending a message to another Vim instance.  Normally this works
 // instantly, but it may hang when the other Vim instance is halted.
@@ -1968,56 +1968,56 @@ HWND message_window = 0;	    // window that's handling messages
 
 // Communication is via WM_COPYDATA messages. The message type is sent in
 // the dwData parameter. Types are defined here.
-# define COPYDATA_KEYS		0
-# define COPYDATA_REPLY		1
-# define COPYDATA_EXPR		10
-# define COPYDATA_RESULT	11
-# define COPYDATA_ERROR_RESULT	12
+# define COPYDATA_ಕೀಲಿಗಳು		0
+# define COPYDATA_ಉತ್ತರ		1
+# define COPYDATA_ಅಭಿವ್ಯಕ್ತಿ		10
+# define COPYDATA_ಫಲಿತಾಂಶ	11
+# define COPYDATA_ERROR_ಫಲಿತಾಂಶ	12
 # define COPYDATA_ENCODING	20
 
 // This is a structure containing a server HWND and its name.
-struct server_id
+ರಚನೆ server_id
 {
     HWND hwnd;
     char_u *name;
 };
 
 // Last received 'encoding' that the client uses.
-static char_u	*client_enc = NULL;
+ಸ್ಥಿರ char_u	*client_enc = ಖಾಲಿ;
 
 /*
  * Tell the other side what encoding we are using.
  * Return -1 if timeout happens.  Other errors are ignored.
  */
-    static int
-serverSendEnc(HWND target)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+serverSendEnc(HWND ಗುರಿ)
 {
-    COPYDATASTRUCT data;
+    COPYDATASTRUCT ದತ್ತಾಂಶ;
 
-    data.dwData = COPYDATA_ENCODING;
-    data.cbData = (DWORD)STRLEN(p_enc) + 1;
-    data.lpData = p_enc;
-    if (SendMessageTimeout(target, WM_COPYDATA,
-	    (WPARAM)message_window, (LPARAM)&data,
-	    SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, NULL) == 0)
-	return -1;
-    return 0;
+    ದತ್ತಾಂಶ.dw_ದತ್ತಾಂಶ = COPYDATA_ENCODING;
+    ದತ್ತಾಂಶ.cb_ದತ್ತಾಂಶ = (DWORD)STRLEN(p_enc) + 1;
+    ದತ್ತಾಂಶ.lp_ದತ್ತಾಂಶ = p_enc;
+    ಆದರೆ (Send_ಸಂದೇಶ_Timeout(ಗುರಿ, WM_COPYDATA,
+	    (WPARAM)ಸಂದೇಶ_ಕಿಟಕಿ, (LPARAM)&ದತ್ತಾಂಶ,
+	    SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, ಖಾಲಿ) == 0)
+	ಹಿಂತಿರುಗಿ -1;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
 /*
  * Clean up on exit. This destroys the hidden message window.
  */
-    static void
-CleanUpMessaging(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+Clean_ಮೇಲೆ_Messaging(ಶೂನ್ಯ)
 {
-    if (message_window == 0)
-	return;
+    ಆದರೆ (ಸಂದೇಶ_ಕಿಟಕಿ == 0)
+	ಹಿಂತಿರುಗಿ;
 
-    DestroyWindow(message_window);
-    message_window = 0;
+    Destroy_ಕಿಟಕಿ(ಸಂದೇಶ_ಕಿಟಕಿ);
+    ಸಂದೇಶ_ಕಿಟಕಿ = 0;
 }
 
-static int save_reply(HWND server, char_u *reply, int expr);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ save_ಉತ್ತರ(HWND server, char_u *ಉತ್ತರ, ಪೂರ್ಣಾಂಕ ಅಭಿವ್ಯಕ್ತಿ);
 
 /*
  * The window procedure for the hidden message window.
@@ -2029,10 +2029,10 @@ static int save_reply(HWND server, char_u *reply, int expr);
  * not work in the console version - this basically means those
  * features which allow Vim to act as a server, rather than a client.
  */
-    static LRESULT CALLBACK
-Messaging_WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+    ಸ್ಥಿರ LRESULT CALLBACK
+Messaging_WndProc(HWND hwnd, UINT ಸಂದೇಶ, WPARAM wParam, LPARAM lParam)
 {
-    if (msg == WM_COPYDATA)
+    ಆದರೆ (ಸಂದೇಶ == WM_COPYDATA)
     {
 	// This is a message from another Vim. The dwData member of the
 	// COPYDATASTRUCT determines the type of message:
@@ -2054,150 +2054,150 @@ Messaging_WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	//   COPYDATA_ERROR_RESULT:
 	//	A reply. We are a client, and a server has sent this message
 	//	in response to a COPYDATA_EXPR that failed to evaluate.
-	COPYDATASTRUCT	*data = (COPYDATASTRUCT*)lParam;
+	COPYDATASTRUCT	*ದತ್ತಾಂಶ = (COPYDATASTRUCT*)lParam;
 	HWND		sender = (HWND)wParam;
-	COPYDATASTRUCT	reply;
+	COPYDATASTRUCT	ಉತ್ತರ;
 	char_u		*res;
-	int		retval;
+	ಪೂರ್ಣಾಂಕ		retval;
 	DWORD_PTR	dwret = 0;
 	char_u		*str;
 	char_u		*tofree;
 
-	switch (data->dwData)
+	ಆಯ್ಕೆ (ದತ್ತಾಂಶ->dw_ದತ್ತಾಂಶ)
 	{
-	case COPYDATA_ENCODING:
+	ಸ್ಥಿತಿ COPYDATA_ENCODING:
 	    // Remember the encoding that the client uses.
 	    vim_free(client_enc);
-	    client_enc = enc_canonize((char_u *)data->lpData);
-	    return 1;
+	    client_enc = enc_canonize((char_u *)ದತ್ತಾಂಶ->lp_ದತ್ತಾಂಶ);
+	    ಹಿಂತಿರುಗಿ 1;
 
-	case COPYDATA_KEYS:
+	ಸ್ಥಿತಿ COPYDATA_ಕೀಲಿಗಳು:
 	    // Remember who sent this, for <client>
-	    clientWindow = sender;
+	    client_ಕಿಟಕಿ = sender;
 
 	    // Add the received keys to the input buffer.
-	    str = serverConvert(client_enc, (char_u *)data->lpData, &tofree);
+	    str = serverConvert(client_enc, (char_u *)ದತ್ತಾಂಶ->lp_ದತ್ತಾಂಶ, &tofree);
 # ifdef FEAT_GUI
-	    if (gui.in_use)
+	    ಆದರೆ (gui.ಒಳ_use)
 		// The GUI may get here re-entrantly, so insert the keys later.
-		server_add_input(str);
-	    else
+		server_ಕೂಡಿಸು_ಒಳಹರಿವು(str);
+	    ಇಲ್ಲದಿದ್ದರೆ
 # endif
-		server_to_input_buf(str);
+		server_ಗಮ್ಯ_ಒಳಹರಿವು_buf(str);
 	    vim_free(tofree);
 
 # ifdef FEAT_GUI
 	    // Wake up the main GUI loop.
 #  ifdef VIMDLL
-	    if (gui.in_use)
+	    ಆದರೆ (gui.ಒಳ_use)
 #  endif
-		if (s_hwnd != 0)
-		    PostMessage(s_hwnd, WM_NULL, 0, 0);
+		ಆದರೆ (s_hwnd != 0)
+		    Post_ಸಂದೇಶ(s_hwnd, WM_NULL, 0, 0);
 # endif
-	    return 1;
+	    ಹಿಂತಿರುಗಿ 1;
 
-	case COPYDATA_EXPR:
+	ಸ್ಥಿತಿ COPYDATA_ಅಭಿವ್ಯಕ್ತಿ:
 	    // Remember who sent this, for <client>
-	    clientWindow = sender;
+	    client_ಕಿಟಕಿ = sender;
 
-	    str = serverConvert(client_enc, (char_u *)data->lpData, &tofree);
-	    res = eval_client_expr_to_string(str);
+	    str = serverConvert(client_enc, (char_u *)ದತ್ತಾಂಶ->lp_ದತ್ತಾಂಶ, &tofree);
+	    res = eval_client_ಅಭಿವ್ಯಕ್ತಿ_ಗಮ್ಯ_string(str);
 
-	    if (res == NULL)
+	    ಆದರೆ (res == ಖಾಲಿ)
 	    {
-		char	*err = _(e_invalid_expression_received);
+		ಅಕ್ಷರ	*err = _(e_invalid_ಅಭಿವ್ಯಕ್ತಿ_received);
 		size_t	len = STRLEN(str) + STRLEN(err) + 5;
 
 		res = alloc(len);
-		if (res != NULL)
-		    reply.cbData = (DWORD)vim_snprintf_safelen(
-			(char *)res, len, "%s: \"%s\"", err, str);
-		else
-		    reply.cbData = 0;
-		reply.dwData = COPYDATA_ERROR_RESULT;
+		ಆದರೆ (res != ಖಾಲಿ)
+		    ಉತ್ತರ.cb_ದತ್ತಾಂಶ = (DWORD)vim_snprintf_safelen(
+			(ಅಕ್ಷರ *)res, len, "%s: \"%s\"", err, str);
+		ಇಲ್ಲದಿದ್ದರೆ
+		    ಉತ್ತರ.cb_ದತ್ತಾಂಶ = 0;
+		ಉತ್ತರ.dw_ದತ್ತಾಂಶ = COPYDATA_ERROR_ಫಲಿತಾಂಶ;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		reply.cbData = (DWORD)STRLEN(res) + 1;
-		reply.dwData = COPYDATA_RESULT;
+		ಉತ್ತರ.cb_ದತ್ತಾಂಶ = (DWORD)STRLEN(res) + 1;
+		ಉತ್ತರ.dw_ದತ್ತಾಂಶ = COPYDATA_ಫಲಿತಾಂಶ;
 	    }
-	    reply.lpData = res;
+	    ಉತ್ತರ.lp_ದತ್ತಾಂಶ = res;
 
-	    if (serverSendEnc(sender) < 0)
+	    ಆದರೆ (serverSendEnc(sender) < 0)
 		retval = -1;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		if (SendMessageTimeout(sender, WM_COPYDATA,
-			(WPARAM)message_window, (LPARAM)&reply,
+		ಆದರೆ (Send_ಸಂದೇಶ_Timeout(sender, WM_COPYDATA,
+			(WPARAM)ಸಂದೇಶ_ಕಿಟಕಿ, (LPARAM)&ಉತ್ತರ,
 			SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, &dwret) == 0)
 		    retval = -1;
-		else
-		    retval = (int)dwret;
+		ಇಲ್ಲದಿದ್ದರೆ
+		    retval = (ಪೂರ್ಣಾಂಕ)dwret;
 	    }
 	    vim_free(tofree);
 	    vim_free(res);
-	    return retval;
+	    ಹಿಂತಿರುಗಿ retval;
 
-	case COPYDATA_REPLY:
-	case COPYDATA_RESULT:
-	case COPYDATA_ERROR_RESULT:
-	    if (data->lpData != NULL)
+	ಸ್ಥಿತಿ COPYDATA_ಉತ್ತರ:
+	ಸ್ಥಿತಿ COPYDATA_ಫಲಿತಾಂಶ:
+	ಸ್ಥಿತಿ COPYDATA_ERROR_ಫಲಿತಾಂಶ:
+	    ಆದರೆ (ದತ್ತಾಂಶ->lp_ದತ್ತಾಂಶ != ಖಾಲಿ)
 	    {
-		str = serverConvert(client_enc, (char_u *)data->lpData,
+		str = serverConvert(client_enc, (char_u *)ದತ್ತಾಂಶ->lp_ದತ್ತಾಂಶ,
 								     &tofree);
-		if (tofree == NULL)
+		ಆದರೆ (tofree == ಖಾಲಿ)
 		    str = vim_strsave(str);
-		if (save_reply(sender, str,
-			   (data->dwData == COPYDATA_REPLY ?  0 :
-			   (data->dwData == COPYDATA_RESULT ? 1 :
+		ಆದರೆ (save_ಉತ್ತರ(sender, str,
+			   (ದತ್ತಾಂಶ->dw_ದತ್ತಾಂಶ == COPYDATA_ಉತ್ತರ ?  0 :
+			   (ದತ್ತಾಂಶ->dw_ದತ್ತಾಂಶ == COPYDATA_ಫಲಿತಾಂಶ ? 1 :
 							      2))) == FAIL)
 		    vim_free(str);
-		else if (data->dwData == COPYDATA_REPLY)
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ದತ್ತಾಂಶ->dw_ದತ್ತಾಂಶ == COPYDATA_ಉತ್ತರ)
 		{
 		    char_u	winstr[30];
 
-		    sprintf((char *)winstr, PRINTF_HEX_LONG_U, (long_u)sender);
+		    sprintf((ಅಕ್ಷರ *)winstr, PRINTF_HEX_LONG_U, (long_u)sender);
 		    apply_autocmds(EVENT_REMOTEREPLY, winstr, str,
 								TRUE, curbuf);
 		}
 	    }
-	    return 1;
+	    ಹಿಂತಿರುಗಿ 1;
 	}
 
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
     }
 
-    else if (msg == WM_ACTIVATE && wParam == WA_ACTIVE)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಸಂದೇಶ == WM_ACTIVATE && wParam == WA_ಸಕ್ರಿಯ)
     {
 	// When the message window is activated (brought to the foreground),
 	// this actually applies to the text window.
-# if !defined(FEAT_GUI) || defined(VIMDLL)
+# ಆದರೆ !defined(FEAT_GUI) || defined(VIMDLL)
 #  ifdef VIMDLL
-	if (!gui.in_use)
+	ಆದರೆ (!gui.ಒಳ_use)
 #  endif
 	    GetConsoleHwnd();	    // get value of s_hwnd
 # endif
-	if (s_hwnd != 0)
+	ಆದರೆ (s_hwnd != 0)
 	{
-	    SetForegroundWindow(s_hwnd);
-	    return 0;
+	    ಗಣ_Foreground_ಕಿಟಕಿ(s_hwnd);
+	    ಹಿಂತಿರುಗಿ 0;
 	}
     }
 
-    return DefWindowProc(hwnd, msg, wParam, lParam);
+    ಹಿಂತಿರುಗಿ Def_ಕಿಟಕಿ_Proc(hwnd, ಸಂದೇಶ, wParam, lParam);
 }
 
 /*
  * Initialise the message handling process.  This involves creating a window
  * to handle messages - the window will not be visible.
  */
-    void
-serverInitMessaging(void)
+    ಶೂನ್ಯ
+serverInitMessaging(ಶೂನ್ಯ)
 {
     WNDCLASS wndclass;
 
     // Clean up on exit
-    atexit(CleanUpMessaging);
+    atexit(Clean_ಮೇಲೆ_Messaging);
 
     // Register a window class - we only really care
     // about the window procedure
@@ -2206,321 +2206,321 @@ serverInitMessaging(void)
     wndclass.cbClsExtra = 0;
     wndclass.cbWndExtra = 0;
     wndclass.hInstance = g_hinst;
-    wndclass.hIcon = NULL;
-    wndclass.hCursor = NULL;
-    wndclass.hbrBackground = NULL;
-    wndclass.lpszMenuName = NULL;
+    wndclass.hIcon = ಖಾಲಿ;
+    wndclass.hCursor = ಖಾಲಿ;
+    wndclass.hbrBackground = ಖಾಲಿ;
+    wndclass.lpszMenuName = ಖಾಲಿ;
     wndclass.lpszClassName = VIM_CLASSNAME;
-    RegisterClass(&wndclass);
+    ರಿಜಿಸ್ಟರ್_Class(&wndclass);
 
     // Create the message window. It will be hidden, so the details don't
     // matter.  Don't use WS_OVERLAPPEDWINDOW, it will make a shortcut remove
     // focus from gvim.
-    message_window = CreateWindow(VIM_CLASSNAME, "",
+    ಸಂದೇಶ_ಕಿಟಕಿ = Create_ಕಿಟಕಿ(VIM_CLASSNAME, "",
 			 WS_POPUPWINDOW | WS_CAPTION,
 			 CW_USEDEFAULT, CW_USEDEFAULT,
-			 100, 100, NULL, NULL,
-			 g_hinst, NULL);
+			 100, 100, ಖಾಲಿ, ಖಾಲಿ,
+			 g_hinst, ಖಾಲಿ);
 }
 
 // Used by serverSendToVim() to find an alternate server name.
-static char_u *altname_buf_ptr = NULL;
+ಸ್ಥಿರ char_u *altname_buf_ptr = ಖಾಲಿ;
 
 /*
  * Get the title of the window "hwnd", which is the Vim server name, in
  * "name[namelen]" and return the length.
  * Returns zero if window "hwnd" is not a Vim server.
  */
-    static int
-getVimServerName(HWND hwnd, char *name, int namelen)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+getVimServerName(HWND hwnd, ಅಕ್ಷರ *name, ಪೂರ್ಣಾಂಕ namelen)
 {
-    int		len;
-    char	buffer[VIM_CLASSNAME_LEN + 1];
+    ಪೂರ್ಣಾಂಕ		len;
+    ಅಕ್ಷರ	ಬಫರ್[VIM_CLASSNAME_LEN + 1];
 
     // Ignore windows which aren't Vim message windows
-    len = GetClassName(hwnd, buffer, sizeof(buffer));
-    if (len != VIM_CLASSNAME_LEN || STRCMP(buffer, VIM_CLASSNAME) != 0)
-	return 0;
+    len = GetClassName(hwnd, ಬಫರ್, ಗಾತ್ರ(ಬಫರ್));
+    ಆದರೆ (len != VIM_CLASSNAME_LEN || STRCMP(ಬಫರ್, VIM_CLASSNAME) != 0)
+	ಹಿಂತಿರುಗಿ 0;
 
     // Get the title of the window
-    return GetWindowText(hwnd, name, namelen);
+    ಹಿಂತಿರುಗಿ Get_ಕಿಟಕಿ_ಪಠ್ಯ(hwnd, name, namelen);
 }
 
-    static BOOL CALLBACK
+    ಸ್ಥಿರ BOOL CALLBACK
 enumWindowsGetServer(HWND hwnd, LPARAM lparam)
 {
-    struct	server_id *id = (struct server_id *)lparam;
-    char	server[MAX_PATH];
+    ರಚನೆ	server_id *id = (ರಚನೆ server_id *)lparam;
+    ಅಕ್ಷರ	server[MAX_ಮಾರ್ಗ];
 
     // Get the title of the window
-    if (getVimServerName(hwnd, server, sizeof(server)) == 0)
-	return TRUE;
+    ಆದರೆ (getVimServerName(hwnd, server, ಗಾತ್ರ(server)) == 0)
+	ಹಿಂತಿರುಗಿ TRUE;
 
     // If this is the server we're looking for, return its HWND
-    if (STRICMP(server, id->name) == 0)
+    ಆದರೆ (STRICMP(server, id->name) == 0)
     {
 	id->hwnd = hwnd;
-	return FALSE;
+	ಹಿಂತಿರುಗಿ FALSE;
     }
 
     // If we are looking for an alternate server, remember this name.
-    if (altname_buf_ptr != NULL)
+    ಆದರೆ (altname_buf_ptr != ಖಾಲಿ)
     {
 	size_t	namelen = STRLEN(id->name);
 
-	if (STRNICMP(server, id->name, namelen) == 0
+	ಆದರೆ (STRNICMP(server, id->name, namelen) == 0
 	    && vim_isdigit(server[namelen]))
 	{
 	    STRCPY(altname_buf_ptr, server);
-	    altname_buf_ptr = NULL;	    // don't use another name
+	    altname_buf_ptr = ಖಾಲಿ;	    // don't use another name
 	}
     }
 
     // Otherwise, keep looking
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
-    static BOOL CALLBACK
-enumWindowsGetNames(HWND hwnd, LPARAM lparam)
+    ಸ್ಥಿರ BOOL CALLBACK
+enum_Windows_Get_ಹೆಸರುಗಳು(HWND hwnd, LPARAM lparam)
 {
     list_T	*list = (list_T *)lparam;
-    char	server[MAX_PATH];
+    ಅಕ್ಷರ	server[MAX_ಮಾರ್ಗ];
 
     // Get the title of the window
-    if (getVimServerName(hwnd, server, sizeof(server)) == 0)
-	return TRUE;
+    ಆದರೆ (getVimServerName(hwnd, server, ಗಾತ್ರ(server)) == 0)
+	ಹಿಂತಿರುಗಿ TRUE;
 
     list_append_string(list, (char_u *)server, -1);
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
-struct enum_windows_s
+ರಚನೆ enum_windows_s
 {
     WNDENUMPROC lpEnumFunc;
     LPARAM      lParam;
 };
 
-    static BOOL CALLBACK
-enum_windows_child(HWND hwnd, LPARAM lParam)
+    ಸ್ಥಿರ BOOL CALLBACK
+enum_windows_ಮಗು(HWND hwnd, LPARAM lParam)
 {
-    struct enum_windows_s *ew = (struct enum_windows_s *)lParam;
+    ರಚನೆ enum_windows_s *ew = (ರಚನೆ enum_windows_s *)lParam;
 
-    return (ew->lpEnumFunc)(hwnd, ew->lParam);
+    ಹಿಂತಿರುಗಿ (ew->lpEnumFunc)(hwnd, ew->lParam);
 }
 
-    static BOOL CALLBACK
+    ಸ್ಥಿರ BOOL CALLBACK
 enum_windows_toplevel(HWND hwnd, LPARAM lParam)
 {
-    struct enum_windows_s *ew = (struct enum_windows_s *)lParam;
+    ರಚನೆ enum_windows_s *ew = (ರಚನೆ enum_windows_s *)lParam;
 
-    if ((ew->lpEnumFunc)(hwnd, ew->lParam))
-	return TRUE;
-    return EnumChildWindows(hwnd, enum_windows_child, lParam);
+    ಆದರೆ ((ew->lpEnumFunc)(hwnd, ew->lParam))
+	ಹಿಂತಿರುಗಿ TRUE;
+    ಹಿಂತಿರುಗಿ Enum_ಮಗು_Windows(hwnd, enum_windows_ಮಗು, lParam);
 }
 
 /*
  * Enumerate all windows including children.
  */
-    static BOOL
+    ಸ್ಥಿರ BOOL
 enum_windows(WNDENUMPROC lpEnumFunc, LPARAM lParam)
 {
-    struct enum_windows_s ew;
+    ರಚನೆ enum_windows_s ew;
 
     ew.lpEnumFunc = lpEnumFunc;
     ew.lParam = lParam;
-    return EnumWindows(enum_windows_toplevel, (LPARAM)&ew);
+    ಹಿಂತಿರುಗಿ EnumWindows(enum_windows_toplevel, (LPARAM)&ew);
 }
 
-    static HWND
-findServer(char_u *name)
+    ಸ್ಥಿರ HWND
+ಕಂಡುಹಿಡಿ_Server(char_u *name)
 {
-    struct server_id id;
+    ರಚನೆ server_id id;
 
     id.name = name;
     id.hwnd = 0;
 
     enum_windows(enumWindowsGetServer, (LPARAM)(&id));
 
-    return id.hwnd;
+    ಹಿಂತಿರುಗಿ id.hwnd;
 }
 
-    void
-serverSetName(char_u *name)
+    ಶೂನ್ಯ
+server_ಗಣ_Name(char_u *name)
 {
     size_t	namelen;
     char_u	*ok_name;
     HWND	hwnd = 0;
-    int		i = 0;
+    ಪೂರ್ಣಾಂಕ		i = 0;
     char_u	*p;
 
     // Leave enough space for a 9-digit suffix to ensure uniqueness!
     namelen = STRLEN(name);
     ok_name = alloc(namelen + 10);
-    if (ok_name == NULL)
-	return;
+    ಆದರೆ (ok_name == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     STRCPY(ok_name, name);
     p = ok_name + namelen;
 
-    for (;;)
+    ಗಾಗಿ (;;)
     {
 	// This is inefficient - we're doing an EnumWindows loop for each
 	// possible name. It would be better to grab all names in one go,
 	// and scan the list each time...
-	hwnd = findServer(ok_name);
-	if (hwnd == 0)
-	    break;
+	hwnd = ಕಂಡುಹಿಡಿ_Server(ok_name);
+	ಆದರೆ (hwnd == 0)
+	    ನಿಲ್ಲಿಸು;
 
 	++i;
-	if (i >= 1000)
-	    break;
+	ಆದರೆ (i >= 1000)
+	    ನಿಲ್ಲಿಸು;
 
-	sprintf((char *)p, "%d", i);
+	sprintf((ಅಕ್ಷರ *)p, "%d", i);
     }
 
-    if (hwnd != 0)
+    ಆದರೆ (hwnd != 0)
 	vim_free(ok_name);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Remember the name
 	serverName = ok_name;
 	need_maketitle = TRUE;	// update Vim window title later
 
 	// Update the message window title
-	SetWindowText(message_window, (LPCSTR)ok_name);
+	ಗಣ_ಕಿಟಕಿ_ಪಠ್ಯ(ಸಂದೇಶ_ಕಿಟಕಿ, (LPCSTR)ok_name);
 
 # ifdef FEAT_EVAL
 	// Set the servername variable
-	set_vim_var_string(VV_SEND_SERVER, serverName, -1);
+	ಗಣ_vim_var_string(VV_SEND_SERVER, serverName, -1);
 # endif
     }
 }
 
     list_T *
-serverGetVimNames(void)
+server_Get_Vim_ಹೆಸರುಗಳು(ಶೂನ್ಯ)
 {
     list_T *list = list_alloc();
 
-    if (list == NULL)
-	return NULL;
+    ಆದರೆ (list == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    enum_windows(enumWindowsGetNames, (LPARAM)list);
+    enum_windows(enum_Windows_Get_ಹೆಸರುಗಳು, (LPARAM)list);
 
-    return list;
+    ಹಿಂತಿರುಗಿ list;
 }
 
-    int
-serverSendReply(
+    ಪೂರ್ಣಾಂಕ
+server_Send_ಉತ್ತರ(
     char_u	*name,		// Where to send.
-    char_u	*reply)		// What to send.
+    char_u	*ಉತ್ತರ)		// What to send.
 {
-    HWND	target;
-    COPYDATASTRUCT data;
+    HWND	ಗುರಿ;
+    COPYDATASTRUCT ದತ್ತಾಂಶ;
     long_u	n = 0;
     DWORD_PTR	dwret = 0;
 
     // The "name" argument is a magic cookie obtained from expand("<client>").
     // It should be of the form 0xXXXXX - i.e. a C hex literal, which is the
     // value of the client's message window HWND.
-    sscanf((char *)name, SCANF_HEX_LONG_U, &n);
-    if (n == 0)
-	return -1;
+    ಅಕ್ಷರಸರಣಿ_ಓದು((ಅಕ್ಷರ *)name, SCANF_HEX_LONG_U, &n);
+    ಆದರೆ (n == 0)
+	ಹಿಂತಿರುಗಿ -1;
 
-    target = (HWND)n;
-    if (!IsWindow(target))
-	return -1;
+    ಗುರಿ = (HWND)n;
+    ಆದರೆ (!Is_ಕಿಟಕಿ(ಗುರಿ))
+	ಹಿಂತಿರುಗಿ -1;
 
-    data.dwData = COPYDATA_REPLY;
-    data.cbData = (DWORD)STRLEN(reply) + 1;
-    data.lpData = reply;
+    ದತ್ತಾಂಶ.dw_ದತ್ತಾಂಶ = COPYDATA_ಉತ್ತರ;
+    ದತ್ತಾಂಶ.cb_ದತ್ತಾಂಶ = (DWORD)STRLEN(ಉತ್ತರ) + 1;
+    ದತ್ತಾಂಶ.lp_ದತ್ತಾಂಶ = ಉತ್ತರ;
 
-    if (serverSendEnc(target) < 0)
-	return -1;
-    if (SendMessageTimeout(target, WM_COPYDATA,
-		(WPARAM)message_window, (LPARAM)&data,
+    ಆದರೆ (serverSendEnc(ಗುರಿ) < 0)
+	ಹಿಂತಿರುಗಿ -1;
+    ಆದರೆ (Send_ಸಂದೇಶ_Timeout(ಗುರಿ, WM_COPYDATA,
+		(WPARAM)ಸಂದೇಶ_ಕಿಟಕಿ, (LPARAM)&ದತ್ತಾಂಶ,
 		SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, &dwret) == 0)
-	return -1;
-    return dwret ? 0 : -1;
+	ಹಿಂತಿರುಗಿ -1;
+    ಹಿಂತಿರುಗಿ dwret ? 0 : -1;
 }
 
-    int
-serverSendToVim(
+    ಪೂರ್ಣಾಂಕ
+server_Send_ಗಮ್ಯ_Vim(
     char_u	 *name,			// Where to send.
     char_u	 *cmd,			// What to send.
-    char_u	 **result,		// Result of eval'ed expression
-    void	 *ptarget,		// HWND of server
-    int		 asExpr,		// Expression or keys?
-    int		 timeout,		// timeout in seconds or zero
-    int		 silent)		// don't complain about no server
+    char_u	 **ಫಲಿತಾಂಶ,		// Result of eval'ed expression
+    ಶೂನ್ಯ	 *ptarget,		// HWND of server
+    ಪೂರ್ಣಾಂಕ		 as_ಅಭಿವ್ಯಕ್ತಿ,		// Expression or keys?
+    ಪೂರ್ಣಾಂಕ		 timeout,		// timeout in seconds or zero
+    ಪೂರ್ಣಾಂಕ		 silent)		// don't complain about no server
 {
     size_t	namelen;
-    HWND	target;
-    COPYDATASTRUCT data;
-    char_u	*retval = NULL;
-    int		retcode = 0;
+    HWND	ಗುರಿ;
+    COPYDATASTRUCT ದತ್ತಾಂಶ;
+    char_u	*retval = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		retcode = 0;
     DWORD_PTR	dwret = 0;
-    char_u	altname_buf[MAX_PATH];
+    char_u	altname_buf[MAX_ಮಾರ್ಗ];
 
     // Execute locally if no display or target is ourselves
-    if (serverName != NULL && STRICMP(name, serverName) == 0)
-	return sendToLocalVim(cmd, asExpr, result);
+    ಆದರೆ (serverName != ಖಾಲಿ && STRICMP(name, serverName) == 0)
+	ಹಿಂತಿರುಗಿ send_ಗಮ್ಯ_Local_Vim(cmd, as_ಅಭಿವ್ಯಕ್ತಿ, ಫಲಿತಾಂಶ);
 
     // If the server name does not end in a digit then we look for an
     // alternate name.  e.g. when "name" is GVIM then we may find GVIM2.
     namelen = STRLEN(name);
-    if (namelen > 1 && !vim_isdigit(name[namelen - 1]))
+    ಆದರೆ (namelen > 1 && !vim_isdigit(name[namelen - 1]))
 	altname_buf_ptr = altname_buf;
     altname_buf[0] = NUL;
-    target = findServer(name);
-    altname_buf_ptr = NULL;
-    if (target == 0 && altname_buf[0] != NUL)
+    ಗುರಿ = ಕಂಡುಹಿಡಿ_Server(name);
+    altname_buf_ptr = ಖಾಲಿ;
+    ಆದರೆ (ಗುರಿ == 0 && altname_buf[0] != NUL)
 	// Use another server name we found.
-	target = findServer(altname_buf);
+	ಗುರಿ = ಕಂಡುಹಿಡಿ_Server(altname_buf);
 
-    if (target == 0)
+    ಆದರೆ (ಗುರಿ == 0)
     {
-	if (!silent)
+	ಆದರೆ (!silent)
 	    semsg(_(e_no_registered_server_named_str), name);
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 
-    if (ptarget)
-	*(HWND *)ptarget = target;
+    ಆದರೆ (ptarget)
+	*(HWND *)ptarget = ಗುರಿ;
 
-    data.dwData = asExpr ? COPYDATA_EXPR : COPYDATA_KEYS;
-    data.cbData = (DWORD)STRLEN(cmd) + 1;
-    data.lpData = cmd;
+    ದತ್ತಾಂಶ.dw_ದತ್ತಾಂಶ = as_ಅಭಿವ್ಯಕ್ತಿ ? COPYDATA_ಅಭಿವ್ಯಕ್ತಿ : COPYDATA_ಕೀಲಿಗಳು;
+    ದತ್ತಾಂಶ.cb_ದತ್ತಾಂಶ = (DWORD)STRLEN(cmd) + 1;
+    ದತ್ತಾಂಶ.lp_ದತ್ತಾಂಶ = cmd;
 
-    if (serverSendEnc(target) < 0)
-	return -1;
-    if (SendMessageTimeout(target, WM_COPYDATA,
-		(WPARAM)message_window, (LPARAM)&data,
+    ಆದರೆ (serverSendEnc(ಗುರಿ) < 0)
+	ಹಿಂತಿರುಗಿ -1;
+    ಆದರೆ (Send_ಸಂದೇಶ_Timeout(ಗುರಿ, WM_COPYDATA,
+		(WPARAM)ಸಂದೇಶ_ಕಿಟಕಿ, (LPARAM)&ದತ್ತಾಂಶ,
 		SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, &dwret) == 0)
-	return -1;
-    if (dwret == 0)
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
+    ಆದರೆ (dwret == 0)
+	ಹಿಂತಿರುಗಿ -1;
 
-    if (asExpr)
-	retval = serverGetReply(target, &retcode, TRUE, TRUE, timeout);
+    ಆದರೆ (as_ಅಭಿವ್ಯಕ್ತಿ)
+	retval = server_Get_ಉತ್ತರ(ಗುರಿ, &retcode, TRUE, TRUE, timeout);
 
-    if (result == NULL)
+    ಆದರೆ (ಫಲಿತಾಂಶ == ಖಾಲಿ)
 	vim_free(retval);
-    else
-	*result = retval; // Caller assumes responsibility for freeing
+    ಇಲ್ಲದಿದ್ದರೆ
+	*ಫಲಿತಾಂಶ = retval; // Caller assumes responsibility for freeing
 
-    return retcode;
+    ಹಿಂತಿರುಗಿ retcode;
 }
 
 /*
  * Bring the server to the foreground.
  */
-    void
+    ಶೂನ್ಯ
 serverForeground(char_u *name)
 {
-    HWND	target = findServer(name);
+    HWND	ಗುರಿ = ಕಂಡುಹಿಡಿ_Server(name);
 
-    if (target != 0)
-	SetForegroundWindow(target);
+    ಆದರೆ (ಗುರಿ != 0)
+	ಗಣ_Foreground_ಕಿಟಕಿ(ಗುರಿ);
 }
 
 // Replies from server need to be stored until the client picks them up via
@@ -2530,42 +2530,42 @@ serverForeground(char_u *name)
 // We just store the replies in a simple list. When we remove an entry, we
 // move list entries down to fill the gap.
 // The server ID is simply the HWND.
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
     HWND	server;		// server window
-    char_u	*reply;		// reply string
-    int		expr_result;	// 0 for REPLY, 1 for RESULT 2 for error
-} reply_T;
+    char_u	*ಉತ್ತರ;		// reply string
+    ಪೂರ್ಣಾಂಕ		ಅಭಿವ್ಯಕ್ತಿ_ಫಲಿತಾಂಶ;	// 0 for REPLY, 1 for RESULT 2 for error
+} ಉತ್ತರ_T;
 
-static garray_T reply_list = {0, 0, sizeof(reply_T), 5, 0};
+ಸ್ಥಿರ garray_T ಉತ್ತರ_list = {0, 0, ಗಾತ್ರ(ಉತ್ತರ_T), 5, 0};
 
-# define REPLY_ITEM(i) ((reply_T *)(reply_list.ga_data) + (i))
-# define REPLY_COUNT (reply_list.ga_len)
+# define ಉತ್ತರ_ಅಂಶ(i) ((ಉತ್ತರ_T *)(ಉತ್ತರ_list.ga_ದತ್ತಾಂಶ) + (i))
+# define ಉತ್ತರ_ಎಣಿಕೆ (ಉತ್ತರ_list.ga_len)
 
 // Flag which is used to wait for a reply
-static int reply_received = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಉತ್ತರ_received = 0;
 
 /*
  * Store a reply.  "reply" must be allocated memory (or NULL).
  */
-    static int
-save_reply(HWND server, char_u *reply, int expr)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+save_ಉತ್ತರ(HWND server, char_u *ಉತ್ತರ, ಪೂರ್ಣಾಂಕ ಅಭಿವ್ಯಕ್ತಿ)
 {
-    reply_T *rep;
+    ಉತ್ತರ_T *rep;
 
-    if (ga_grow(&reply_list, 1) == FAIL)
-	return FAIL;
+    ಆದರೆ (ga_grow(&ಉತ್ತರ_list, 1) == FAIL)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    rep = REPLY_ITEM(REPLY_COUNT);
+    rep = ಉತ್ತರ_ಅಂಶ(ಉತ್ತರ_ಎಣಿಕೆ);
     rep->server = server;
-    rep->reply = reply;
-    rep->expr_result = expr;
-    if (rep->reply == NULL)
-	return FAIL;
+    rep->ಉತ್ತರ = ಉತ್ತರ;
+    rep->ಅಭಿವ್ಯಕ್ತಿ_ಫಲಿತಾಂಶ = ಅಭಿವ್ಯಕ್ತಿ;
+    ಆದರೆ (rep->ಉತ್ತರ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    ++REPLY_COUNT;
-    reply_received = 1;
-    return OK;
+    ++ಉತ್ತರ_ಎಣಿಕೆ;
+    ಉತ್ತರ_received = 1;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
@@ -2577,120 +2577,120 @@ save_reply(HWND server, char_u *reply, int expr)
  * if "wait" is TRUE block until a message arrives (or the server exits).
  */
     char_u *
-serverGetReply(HWND server, int *expr_res, int remove, int wait, int timeout)
+server_Get_ಉತ್ತರ(HWND server, ಪೂರ್ಣಾಂಕ *ಅಭಿವ್ಯಕ್ತಿ_res, ಪೂರ್ಣಾಂಕ remove, ಪೂರ್ಣಾಂಕ wait, ಪೂರ್ಣಾಂಕ timeout)
 {
-    int		i;
-    char_u	*reply;
-    reply_T	*rep;
-    int		did_process = FALSE;
-    time_t	start;
+    ಪೂರ್ಣಾಂಕ		i;
+    char_u	*ಉತ್ತರ;
+    ಉತ್ತರ_T	*rep;
+    ಪೂರ್ಣಾಂಕ		did_process = FALSE;
+    time_t	ಆರಂಭ;
     time_t	now;
 
     // When waiting, loop until the message waiting for is received.
-    time(&start);
-    for (;;)
+    ಸಮಯ(&ಆರಂಭ);
+    ಗಾಗಿ (;;)
     {
 	// Reset this here, in case a message arrives while we are going
 	// through the already received messages.
-	reply_received = 0;
+	ಉತ್ತರ_received = 0;
 
-	for (i = 0; i < REPLY_COUNT; ++i)
+	ಗಾಗಿ (i = 0; i < ಉತ್ತರ_ಎಣಿಕೆ; ++i)
 	{
-	    rep = REPLY_ITEM(i);
-	    if (rep->server == server
-		    && ((rep->expr_result != 0) == (expr_res != NULL)))
+	    rep = ಉತ್ತರ_ಅಂಶ(i);
+	    ಆದರೆ (rep->server == server
+		    && ((rep->ಅಭಿವ್ಯಕ್ತಿ_ಫಲಿತಾಂಶ != 0) == (ಅಭಿವ್ಯಕ್ತಿ_res != ಖಾಲಿ)))
 	    {
 		// Save the values we've found for later
-		reply = rep->reply;
-		if (expr_res != NULL)
-		    *expr_res = rep->expr_result == 1 ? 0 : -1;
+		ಉತ್ತರ = rep->ಉತ್ತರ;
+		ಆದರೆ (ಅಭಿವ್ಯಕ್ತಿ_res != ಖಾಲಿ)
+		    *ಅಭಿವ್ಯಕ್ತಿ_res = rep->ಅಭಿವ್ಯಕ್ತಿ_ಫಲಿತಾಂಶ == 1 ? 0 : -1;
 
-		if (remove)
+		ಆದರೆ (remove)
 		{
 		    // Move the rest of the list down to fill the gap
 		    mch_memmove(rep, rep + 1,
-				     (REPLY_COUNT - i - 1) * sizeof(reply_T));
-		    --REPLY_COUNT;
+				     (ಉತ್ತರ_ಎಣಿಕೆ - i - 1) * ಗಾತ್ರ(ಉತ್ತರ_T));
+		    --ಉತ್ತರ_ಎಣಿಕೆ;
 		}
 
 		// Return the reply to the caller, who takes on responsibility
 		// for freeing it if "remove" is TRUE.
-		return reply;
+		ಹಿಂತಿರುಗಿ ಉತ್ತರ;
 	    }
 	}
 
 	// If we got here, we didn't find a reply. Return immediately if the
 	// "wait" parameter isn't set.
-	if (!wait)
+	ಆದರೆ (!wait)
 	{
 	    // Process pending messages once. Without this, looping on
 	    // remote_peek() would never get the reply.
-	    if (!did_process)
+	    ಆದರೆ (!did_process)
 	    {
 		did_process = TRUE;
 		serverProcessPendingMessages();
-		continue;
+		ಮುಂದುವರಿ;
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
 
 	// We need to wait for a reply. Enter a message loop until the
 	// "reply_received" flag gets set.
 
 	// Loop until we receive a reply
-	while (reply_received == 0)
+	ಆಗ (ಉತ್ತರ_received == 0)
 	{
 # ifdef FEAT_TIMERS
 	    // TODO: use the return value to decide how long to wait.
 	    check_due_timer();
 # endif
-	    time(&now);
-	    if (timeout > 0 && (now - start) >= timeout)
-		break;
+	    ಸಮಯ(&now);
+	    ಆದರೆ (timeout > 0 && (now - ಆರಂಭ) >= timeout)
+		ನಿಲ್ಲಿಸು;
 
 	    // Wait for a SendMessage() call to us.  This could be the reply
 	    // we are waiting for.  Use a timeout of a second, to catch the
 	    // situation that the server died unexpectedly.
-	    MsgWaitForMultipleObjects(0, NULL, TRUE, 1000, QS_ALLINPUT);
+	    ಸಂದೇಶ_Wait_For_ಅಪವರ್ತ್ಯ_Objects(0, ಖಾಲಿ, TRUE, 1000, QS_ALLINPUT);
 
 	    // If the server has died, give up
-	    if (!IsWindow(server))
-		return NULL;
+	    ಆದರೆ (!Is_ಕಿಟಕಿ(server))
+		ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
 	    serverProcessPendingMessages();
 	}
     }
 
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Process any messages in the Windows message queue.
  */
-    void
-serverProcessPendingMessages(void)
+    ಶೂನ್ಯ
+serverProcessPendingMessages(ಶೂನ್ಯ)
 {
-    MSG msg;
+    ಸಂದೇಶ_3 ಸಂದೇಶ;
 
-    while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
+    ಆಗ (Peek_ಸಂದೇಶ_W(&ಸಂದೇಶ, ಖಾಲಿ, 0, 0, PM_REMOVE))
     {
-	TranslateMessage(&msg);
-	DispatchMessageW(&msg);
+	Translate_ಸಂದೇಶ(&ಸಂದೇಶ);
+	Dispatch_ಸಂದೇಶ_W(&ಸಂದೇಶ);
     }
 }
 
-#endif // FEAT_CLIENTSERVER
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_CLIENTSERVER
 
-#if defined(FEAT_GUI) || (defined(FEAT_PRINTER) && !defined(FEAT_POSTSCRIPT))
+#ಆದರೆ defined(FEAT_GUI) || (defined(FEAT_PRINTER) && !defined(FEAT_POSTSCRIPT))
 
-struct charset_pair
+ರಚನೆ charset_pair
 {
     string_T	name;
     BYTE	charset;
 };
 
-static struct charset_pair
-charset_pairs[] =
+ಸ್ಥಿರ ರಚನೆ charset_pair
+charset_ಜೋಡಿಗಳು[] =
 {
     {STR_LITERAL_INIT("ANSI"),		ANSI_CHARSET},
     {STR_LITERAL_INIT("CHINESEBIG5"),	CHINESEBIG5_CHARSET},
@@ -2698,7 +2698,7 @@ charset_pairs[] =
     {STR_LITERAL_INIT("HANGEUL"),	HANGEUL_CHARSET},
     {STR_LITERAL_INIT("OEM"),		OEM_CHARSET},
     {STR_LITERAL_INIT("SHIFTJIS"),	SHIFTJIS_CHARSET},
-    {STR_LITERAL_INIT("SYMBOL"),	SYMBOL_CHARSET},
+    {STR_LITERAL_INIT("SYMBOL"),	ಚಿಹ್ನೆ_CHARSET},
     {STR_LITERAL_INIT("ARABIC"),	ARABIC_CHARSET},
     {STR_LITERAL_INIT("BALTIC"),	BALTIC_CHARSET},
     {STR_LITERAL_INIT("EASTEUROPE"),	EASTEUROPE_CHARSET},
@@ -2716,14 +2716,14 @@ charset_pairs[] =
 # endif
 };
 
-struct quality_pair
+ರಚನೆ quality_pair
 {
     string_T	name;
     DWORD	quality;
 };
 
-static struct quality_pair
-quality_pairs[] = {
+ಸ್ಥಿರ ರಚನೆ quality_pair
+quality_ಜೋಡಿಗಳು[] = {
 # ifdef CLEARTYPE_QUALITY
     {STR_LITERAL_INIT("CLEARTYPE"),	CLEARTYPE_QUALITY},
 # endif
@@ -2746,54 +2746,54 @@ quality_pairs[] = {
  * Convert a charset ID to a name.
  * Return NULL when not recognized.
  */
-    char *
-charset_id2name(int id)
+    ಅಕ್ಷರ *
+charset_id2name(ಪೂರ್ಣಾಂಕ id)
 {
-    int	i;
+    ಪೂರ್ಣಾಂಕ	i;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(charset_pairs); ++i)
+    ಗಾಗಿ (i = 0; i < (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(charset_ಜೋಡಿಗಳು); ++i)
     {
-	if ((BYTE)id == charset_pairs[i].charset)
-	    return (char *)charset_pairs[i].name.string;
+	ಆದರೆ ((BYTE)id == charset_ಜೋಡಿಗಳು[i].charset)
+	    ಹಿಂತಿರುಗಿ (ಅಕ್ಷರ *)charset_ಜೋಡಿಗಳು[i].name.string;
     }
 
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Convert a quality ID to a name.
  * Return NULL when not recognized.
  */
-    char *
+    ಅಕ್ಷರ *
 quality_id2name(DWORD id)
 {
-    int	i;
+    ಪೂರ್ಣಾಂಕ	i;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(quality_pairs); ++i)
+    ಗಾಗಿ (i = 0; i < (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(quality_ಜೋಡಿಗಳು); ++i)
     {
-	if (id == quality_pairs[i].quality)
-	    return (char *)quality_pairs[i].name.string;
+	ಆದರೆ (id == quality_ಜೋಡಿಗಳು[i].quality)
+	    ಹಿಂತಿರುಗಿ (ಅಕ್ಷರ *)quality_ಜೋಡಿಗಳು[i].name.string;
     }
 
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 // The default font height in 100% scaling (96dpi).
 // (-16 in 96dpi equates to roughly 12pt)
-# define DEFAULT_FONT_HEIGHT	(-16)
+# define DEFAULT_FONT_ಎತ್ತರ	(-16)
 
-static const LOGFONTW s_lfDefault =
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ LOGFONTW s_lfDefault =
 {
-    DEFAULT_FONT_HEIGHT,
-    0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
-    OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+    DEFAULT_FONT_ಎತ್ತರ,
+    0, 0, 0, FW_ಸಾಮಾನ್ಯ, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+    ಹೊರಹೋಗು_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
     PROOF_QUALITY, FIXED_PITCH | FF_DONTCARE,
     L""	// Default font name will be set later based on current language.
 };
 
 // This will be initialized when set_default_logfont() is called first time.
 // The value will be based on the system DPI.
-int current_font_height = 0;		// also used in gui_w32.c
+ಪೂರ್ಣಾಂಕ current_font_ಎತ್ತರ = 0;		// also used in gui_w32.c
 
 /*
  * Convert a string representing a point size into pixels. The string should
@@ -2802,88 +2802,88 @@ int current_font_height = 0;		// also used in gui_w32.c
  * character is stored in *end. The flag "vertical" says whether this
  * calculation is for a vertical (height) size or a horizontal (width) one.
  */
-    static int
-points_to_pixels(WCHAR *str, WCHAR **end, int vertical, long_i pprinter_dc)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+points_ಗಮ್ಯ_pixels(WCHAR *str, WCHAR **ಕೊನೆ, ಪೂರ್ಣಾಂಕ vertical, long_i pprinter_dc)
 {
-    int		pixels;
-    int		points = 0;
-    int		divisor = 0;
+    ಪೂರ್ಣಾಂಕ		pixels;
+    ಪೂರ್ಣಾಂಕ		points = 0;
+    ಪೂರ್ಣಾಂಕ		ಭಾಜಕ = 0;
     HWND	hwnd = (HWND)0;
     HDC		hdc;
     HDC		printer_dc = (HDC)pprinter_dc;
 
-    while (*str != NUL)
+    ಆಗ (*str != NUL)
     {
-	if (*str == L'.' && divisor == 0)
+	ಆದರೆ (*str == L'.' && ಭಾಜಕ == 0)
 	{
 	    // Start keeping a divisor, for later
-	    divisor = 1;
+	    ಭಾಜಕ = 1;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (!VIM_ISDIGIT(*str))
-		break;
+	    ಆದರೆ (!VIM_ISDIGIT(*str))
+		ನಿಲ್ಲಿಸು;
 
 	    points *= 10;
 	    points += *str - L'0';
-	    divisor *= 10;
+	    ಭಾಜಕ *= 10;
 	}
 	++str;
     }
 
-    if (divisor == 0)
-	divisor = 1;
+    ಆದರೆ (ಭಾಜಕ == 0)
+	ಭಾಜಕ = 1;
 
-    if (printer_dc == NULL)
+    ಆದರೆ (printer_dc == ಖಾಲಿ)
     {
-	hwnd = GetDesktopWindow();
-	hdc = GetWindowDC(hwnd);
+	hwnd = Get_Desktop_ಕಿಟಕಿ();
+	hdc = Get_ಕಿಟಕಿ_DC(hwnd);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	hdc = printer_dc;
 
     pixels = MulDiv(points,
 		    GetDeviceCaps(hdc, vertical ? LOGPIXELSY : LOGPIXELSX),
-		    72 * divisor);
+		    72 * ಭಾಜಕ);
 
-    if (printer_dc == NULL)
+    ಆದರೆ (printer_dc == ಖಾಲಿ)
 	ReleaseDC(hwnd, hdc);
 
-    *end = str;
-    return pixels;
+    *ಕೊನೆ = str;
+    ಹಿಂತಿರುಗಿ pixels;
 }
 
 /*
  * Convert pixel into point size. This is a reverse of points_to_pixels.
  */
-    static double
-pixels_to_points(int pixels, int vertical, long_i pprinter_dc)
+    ಸ್ಥಿರ ದ್ವಿಗುಣ
+pixels_ಗಮ್ಯ_points(ಪೂರ್ಣಾಂಕ pixels, ಪೂರ್ಣಾಂಕ vertical, long_i pprinter_dc)
 {
-    double	points = 0;
+    ದ್ವಿಗುಣ	points = 0;
     HWND	hwnd = (HWND)0;
     HDC		hdc;
     HDC		printer_dc = (HDC)pprinter_dc;
 
-    if (printer_dc == NULL)
+    ಆದರೆ (printer_dc == ಖಾಲಿ)
     {
-	hwnd = GetDesktopWindow();
-	hdc = GetWindowDC(hwnd);
+	hwnd = Get_Desktop_ಕಿಟಕಿ();
+	hdc = Get_ಕಿಟಕಿ_DC(hwnd);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	hdc = printer_dc;
 
     points = pixels * 72.0 / GetDeviceCaps(hdc, vertical ? LOGPIXELSY : LOGPIXELSX);
-    if (printer_dc == NULL)
+    ಆದರೆ (printer_dc == ಖಾಲಿ)
 	ReleaseDC(hwnd, hdc);
 
-    return points;
+    ಹಿಂತಿರುಗಿ points;
 }
 
-    static int CALLBACK
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ CALLBACK
 font_enumproc(
     ENUMLOGFONTW    *elf,
-    NEWTEXTMETRICW  *ntm UNUSED,
-    DWORD	    type UNUSED,
+    NEWTEXTMETRICW  *ntm ಬಳಸದ,
+    DWORD	    type ಬಳಸದ,
     LPARAM	    lparam)
 {
     // Return value:
@@ -2900,29 +2900,29 @@ font_enumproc(
 
 # ifndef FEAT_PROPORTIONAL_FONTS
     // Ignore non-monospace fonts without further ado
-    if ((ntm->tmPitchAndFamily & 1) != 0)
-	return 1;
+    ಆದರೆ ((ntm->tmPitchAndFamily & 1) != 0)
+	ಹಿಂತಿರುಗಿ 1;
 # endif
 
     // Remember this LOGFONTW as a "possible"
     *lf = elf->elfLogFont;
 
     // Terminate the scan as soon as we find an ANSI font
-    if (lf->lfCharSet == ANSI_CHARSET
-	    || lf->lfCharSet == OEM_CHARSET
-	    || lf->lfCharSet == DEFAULT_CHARSET)
-	return 0;
+    ಆದರೆ (lf->lf_Char_ಗಣ == ANSI_CHARSET
+	    || lf->lf_Char_ಗಣ == OEM_CHARSET
+	    || lf->lf_Char_ಗಣ == DEFAULT_CHARSET)
+	ಹಿಂತಿರುಗಿ 0;
 
     // Continue the scan - we have a non-ANSI font
-    return 2;
+    ಹಿಂತಿರುಗಿ 2;
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 init_logfont(LOGFONTW *lf)
 {
-    int		n;
-    HWND	hwnd = GetDesktopWindow();
-    HDC		hdc = GetWindowDC(hwnd);
+    ಪೂರ್ಣಾಂಕ		n;
+    HWND	hwnd = Get_Desktop_ಕಿಟಕಿ();
+    HDC		hdc = Get_ಕಿಟಕಿ_DC(hwnd);
 
     n = EnumFontFamiliesW(hdc,
 			 lf->lfFaceName,
@@ -2932,58 +2932,58 @@ init_logfont(LOGFONTW *lf)
     ReleaseDC(hwnd, hdc);
 
     // If we couldn't find a usable font, return failure
-    if (n == 1)
-	return FAIL;
+    ಆದರೆ (n == 1)
+	ಹಿಂತಿರುಗಿ FAIL;
 
     // Tidy up the rest of the LOGFONTW structure. We set to a basic
     // font - get_logfont() sets bold, italic, etc based on the user's
     // input.
-    lf->lfHeight = current_font_height;
-    lf->lfWidth = 0;
+    lf->lf_ಎತ್ತರ = current_font_ಎತ್ತರ;
+    lf->lf_ಅಗಲ = 0;
     lf->lfItalic = FALSE;
     lf->lfUnderline = FALSE;
-    lf->lfStrikeOut = FALSE;
-    lf->lfWeight = FW_NORMAL;
+    lf->lf_Strike_ಹೊರಹೋಗು = FALSE;
+    lf->lf_ತೂಕ = FW_ಸಾಮಾನ್ಯ;
 
     // Return success
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Call back for EnumFontFamiliesW in expand_font_enumproc.
  *
  */
-    static int CALLBACK
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ CALLBACK
 expand_font_enumproc(
     ENUMLOGFONTW    *elf,
-    NEWTEXTMETRICW  *ntm UNUSED,
-    DWORD	    type UNUSED,
+    NEWTEXTMETRICW  *ntm ಬಳಸದ,
+    DWORD	    type ಬಳಸದ,
     LPARAM	    lparam)
 {
     LOGFONTW *lf = (LOGFONTW*)elf;
 
 # ifndef FEAT_PROPORTIONAL_FONTS
     // Ignore non-monospace fonts without further ado
-    if ((ntm->tmPitchAndFamily & 1) != 0)
-	return 1;
+    ಆದರೆ ((ntm->tmPitchAndFamily & 1) != 0)
+	ಹಿಂತಿರುಗಿ 1;
 # endif
 
     // Filter only on ANSI. Otherwise will see a lot of random fonts that we
     // usually don't want.
-    if (lf->lfCharSet != ANSI_CHARSET)
-	return 1;
+    ಆದರೆ (lf->lf_Char_ಗಣ != ANSI_CHARSET)
+	ಹಿಂತಿರುಗಿ 1;
 
-    int (*add_match)(char_u *) = (int (*)(char_u *))lparam;
+    ಪೂರ್ಣಾಂಕ (*ಕೂಡಿಸು_ಹೊಂದಿಕೆ)(char_u *) = (ಪೂರ್ಣಾಂಕ (*)(char_u *))lparam;
 
     WCHAR *faceNameW = lf->lfFaceName;
-    char_u *faceName = utf16_to_enc(faceNameW, NULL);
-    if (!faceName)
-	return 0;
+    char_u *faceName = utf16_ಗಮ್ಯ_enc(faceNameW, ಖಾಲಿ);
+    ಆದರೆ (!faceName)
+	ಹಿಂತಿರುಗಿ 0;
 
-    add_match(faceName);
+    ಕೂಡಿಸು_ಹೊಂದಿಕೆ(faceName);
     vim_free(faceName);
 
-    return 1;
+    ಹಿಂತಿರುಗಿ 1;
 }
 
 /*
@@ -2995,53 +2995,53 @@ expand_font_enumproc(
  * handling is done by the GUI code, whereas in Windows it's part of the
  * platform code.
  */
-    void
+    ಶೂನ್ಯ
 gui_mch_expand_font(
-    optexpand_T	*args,
-    void	*param UNUSED,
-    int		(*add_match)(char_u *val))
+    optexpand_T	*ವಾದಗಳು,
+    ಶೂನ್ಯ	*param ಬಳಸದ,
+    ಪೂರ್ಣಾಂಕ		(*ಕೂಡಿಸು_ಹೊಂದಿಕೆ)(char_u *val))
 {
-    expand_T	    *xp = args->oe_xp;
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    expand_T	    *xp = ವಾದಗಳು->oe_xp;
+    ಆದರೆ (xp->xp_ನಮೂನೆ > ವಾದಗಳು->oe_ಗಣ_arg && *(xp->xp_ನಮೂನೆ-1) == ':')
     {
-	char buf[30];
-	int	i;
+	ಅಕ್ಷರ buf[30];
+	ಪೂರ್ಣಾಂಕ	i;
 
 	// Always fill in with the current font size as first option for
 	// convenience. We simply round to the closest integer for simplicity.
-	int font_height = (int)round(
-		pixels_to_points(-current_font_height, TRUE, (long_i)NULL));
-	vim_snprintf(buf, ARRAY_LENGTH(buf), "h%d", font_height);
-	add_match((char_u *)buf);
+	ಪೂರ್ಣಾಂಕ font_ಎತ್ತರ = (ಪೂರ್ಣಾಂಕ)ಸುತ್ತು(
+		pixels_ಗಮ್ಯ_points(-current_font_ಎತ್ತರ, TRUE, (long_i)ಖಾಲಿ));
+	vim_snprintf(buf, ARRAY_ಉದ್ದಳತೆ(buf), "h%d", font_ಎತ್ತರ);
+	ಕೂಡಿಸು_ಹೊಂದಿಕೆ((char_u *)buf);
 
 	// Note: Keep this in sync with get_logfont(). Don't include 'c' and
 	// 'q' as we fill in all the values below.
-	static char *(p_gfn_win_opt_values[]) = {
+	ಸ್ಥಿರ ಅಕ್ಷರ *(p_gfn_win_opt_ಮೌಲ್ಯಗಳು[]) = {
 	    "h" , "w" , "W" , "b" , "i" , "u" , "s"};
-	for (i = 0; i < (int)ARRAY_LENGTH(p_gfn_win_opt_values); i++)
-	    add_match((char_u *)p_gfn_win_opt_values[i]);
+	ಗಾಗಿ (i = 0; i < (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(p_gfn_win_opt_ಮೌಲ್ಯಗಳು); i++)
+	    ಕೂಡಿಸು_ಹೊಂದಿಕೆ((char_u *)p_gfn_win_opt_ಮೌಲ್ಯಗಳು[i]);
 
-	for (i = 0; i < (int)ARRAY_LENGTH(charset_pairs); ++i)
+	ಗಾಗಿ (i = 0; i < (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(charset_ಜೋಡಿಗಳು); ++i)
 	{
-	    vim_snprintf(buf, sizeof(buf), "c%s", charset_pairs[i].name.string);
-	    add_match((char_u *)buf);
+	    vim_snprintf(buf, ಗಾತ್ರ(buf), "c%s", charset_ಜೋಡಿಗಳು[i].name.string);
+	    ಕೂಡಿಸು_ಹೊಂದಿಕೆ((char_u *)buf);
 	}
 
-	for (i = 0; i < (int)ARRAY_LENGTH(quality_pairs); ++i)
+	ಗಾಗಿ (i = 0; i < (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(quality_ಜೋಡಿಗಳು); ++i)
 	{
-	    vim_snprintf(buf, sizeof(buf), "q%s", quality_pairs[i].name.string);
-	    add_match((char_u *)buf);
+	    vim_snprintf(buf, ಗಾತ್ರ(buf), "q%s", quality_ಜೋಡಿಗಳು[i].name.string);
+	    ಕೂಡಿಸು_ಹೊಂದಿಕೆ((char_u *)buf);
 	}
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    HWND	hwnd = GetDesktopWindow();
-    HDC		hdc = GetWindowDC(hwnd);
+    HWND	hwnd = Get_Desktop_ಕಿಟಕಿ();
+    HDC		hdc = Get_ಕಿಟಕಿ_DC(hwnd);
 
     EnumFontFamiliesW(hdc,
-	    NULL,
+	    ಖಾಲಿ,
 	    (FONTENUMPROCW)expand_font_enumproc,
-	    (LPARAM)add_match);
+	    (LPARAM)ಕೂಡಿಸು_ಹೊಂದಿಕೆ);
 
     ReleaseDC(hwnd, hdc);
 }
@@ -3050,54 +3050,54 @@ gui_mch_expand_font(
  * Compare a UTF-16 string and an ASCII string literally.
  * Only works all the code points are inside ASCII range.
  */
-    static int
-utf16ascncmp(const WCHAR *w, const char *p, size_t n)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+utf16ascncmp(ಸ್ಥಿರಾಂಕ WCHAR *w, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *p, size_t n)
 {
     size_t i;
 
-    for (i = 0; i < n; i++)
+    ಗಾಗಿ (i = 0; i < n; i++)
     {
-	if (w[i] == 0 || w[i] != p[i])
-	    return w[i] - p[i];
+	ಆದರೆ (w[i] == 0 || w[i] != p[i])
+	    ಹಿಂತಿರುಗಿ w[i] - p[i];
     }
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
 /*
  * Equivalent of GetDpiForSystem().
  */
     UINT WINAPI
-vimGetDpiForSystem(void)
+vimGetDpiForSystem(ಶೂನ್ಯ)
 {
-    HWND hwnd = GetDesktopWindow();
-    HDC hdc = GetWindowDC(hwnd);
+    HWND hwnd = Get_Desktop_ಕಿಟಕಿ();
+    HDC hdc = Get_ಕಿಟಕಿ_DC(hwnd);
     UINT dpi = GetDeviceCaps(hdc, LOGPIXELSY);
     ReleaseDC(hwnd, hdc);
-    return dpi;
+    ಹಿಂತಿರುಗಿ dpi;
 }
 
 /*
  * Set default logfont based on current language.
  */
-    static void
-set_default_logfont(LOGFONTW *lf)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_default_logfont(LOGFONTW *lf)
 {
     // Default font name for current language on MS-Windows.
     // If not translated, falls back to "Consolas".
     // This must be a fixed-pitch font.
-    const char *defaultfontname = N_("DefaultFontNameForWindows");
-    char *fontname = _(defaultfontname);
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *defaultfontname = N_("DefaultFontNameForWindows");
+    ಅಕ್ಷರ *fontname = _(defaultfontname);
 
-    if (STRCMP(fontname, defaultfontname) == 0)
+    ಆದರೆ (STRCMP(fontname, defaultfontname) == 0)
 	fontname = "Consolas";
 
     *lf = s_lfDefault;
-    lf->lfHeight = DEFAULT_FONT_HEIGHT * (int)vimGetDpiForSystem() / 96;
-    if (current_font_height == 0)
-	current_font_height = lf->lfHeight;
+    lf->lf_ಎತ್ತರ = DEFAULT_FONT_ಎತ್ತರ * (ಪೂರ್ಣಾಂಕ)vimGetDpiForSystem() / 96;
+    ಆದರೆ (current_font_ಎತ್ತರ == 0)
+	current_font_ಎತ್ತರ = lf->lf_ಎತ್ತರ;
 
-    WCHAR *wfontname = enc_to_utf16((char_u*)fontname, NULL);
-    if (wfontname != NULL)
+    WCHAR *wfontname = enc_ಗಮ್ಯ_utf16((char_u*)fontname, ಖಾಲಿ);
+    ಆದರೆ (wfontname != ಖಾಲಿ)
     {
 	wcscpy_s(lf->lfFaceName, LF_FACESIZE, wfontname);
 	vim_free(wfontname);
@@ -3108,206 +3108,206 @@ set_default_logfont(LOGFONTW *lf)
  * Get font info from "name" into logfont "lf".
  * Return OK for a valid name, FAIL otherwise.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 get_logfont(
     LOGFONTW	*lf,
     char_u	*name,
     HDC		printer_dc,
-    int		verbose)
+    ಪೂರ್ಣಾಂಕ		verbose)
 {
     WCHAR	*p;
-    int		i;
-    int		ret = FAIL;
-    static LOGFONTW *lastlf = NULL;
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		ret = FAIL;
+    ಸ್ಥಿರ LOGFONTW *lastlf = ಖಾಲಿ;
     WCHAR	*wname;
 
-    set_default_logfont(lf);
-    if (name == NULL)
-	return OK;
+    ಗಣ_default_logfont(lf);
+    ಆದರೆ (name == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ OK;
 
-    wname = enc_to_utf16(name, NULL);
-    if (wname == NULL)
-	return FAIL;
+    wname = enc_ಗಮ್ಯ_utf16(name, ಖಾಲಿ);
+    ಆದರೆ (wname == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    if (wcscmp(wname, L"*") == 0)
+    ಆದರೆ (wcscmp(wname, L"*") == 0)
     {
-# if defined(FEAT_GUI_MSWIN)
+# ಆದರೆ defined(FEAT_GUI_MSWIN)
 	CHOOSEFONTW	cf;
 	// if name is "*", bring up std font dialog:
-	CLEAR_FIELD(cf);
-	cf.lStructSize = sizeof(cf);
+	CLEAR_ಕ್ಷೇತ್ರ(cf);
+	cf.l_Struct_ಗಾತ್ರ = ಗಾತ್ರ(cf);
 	cf.hwndOwner = s_hwnd;
 	cf.Flags = CF_SCREENFONTS | CF_FIXEDPITCHONLY | CF_INITTOLOGFONTSTRUCT;
-	if (lastlf != NULL)
+	ಆದರೆ (lastlf != ಖಾಲಿ)
 	    *lf = *lastlf;
 	cf.lpLogFont = lf;
 	cf.nFontType = 0 ; //REGULAR_FONTTYPE;
-	if (ChooseFontW(&cf))
+	ಆದರೆ (ಆರಿಸು_Font_W(&cf))
 	    ret = OK;
 # endif
-	goto theend;
+	ಹೋಗು theend;
     }
 
     /*
      * Split name up, it could be <name>:h<height>:w<width> etc.
      */
-    for (p = wname; *p && *p != L':'; p++)
+    ಗಾಗಿ (p = wname; *p && *p != L':'; p++)
     {
-	if (p - wname + 1 >= LF_FACESIZE)
-	    goto theend;			// Name too long
+	ಆದರೆ (p - wname + 1 >= LF_FACESIZE)
+	    ಹೋಗು theend;			// Name too long
 	lf->lfFaceName[p - wname] = *p;
     }
-    if (p != wname)
+    ಆದರೆ (p != wname)
 	lf->lfFaceName[p - wname] = NUL;
 
     // First set defaults
-    lf->lfHeight = DEFAULT_FONT_HEIGHT * (int)vimGetDpiForSystem() / 96;
-    lf->lfWidth = 0;
-    lf->lfWeight = FW_NORMAL;
+    lf->lf_ಎತ್ತರ = DEFAULT_FONT_ಎತ್ತರ * (ಪೂರ್ಣಾಂಕ)vimGetDpiForSystem() / 96;
+    lf->lf_ಅಗಲ = 0;
+    lf->lf_ತೂಕ = FW_ಸಾಮಾನ್ಯ;
     lf->lfItalic = FALSE;
     lf->lfUnderline = FALSE;
-    lf->lfStrikeOut = FALSE;
+    lf->lf_Strike_ಹೊರಹೋಗು = FALSE;
 
     /*
      * If the font can't be found, try replacing '_' by ' '.
      */
-    if (init_logfont(lf) == FAIL)
+    ಆದರೆ (init_logfont(lf) == FAIL)
     {
-	int	did_replace = FALSE;
+	ಪೂರ್ಣಾಂಕ	did_replace = FALSE;
 
-	for (i = 0; lf->lfFaceName[i]; ++i)
-	    if (lf->lfFaceName[i] == L'_')
+	ಗಾಗಿ (i = 0; lf->lfFaceName[i]; ++i)
+	    ಆದರೆ (lf->lfFaceName[i] == L'_')
 	    {
 		lf->lfFaceName[i] = L' ';
 		did_replace = TRUE;
 	    }
-	if (!did_replace || init_logfont(lf) == FAIL)
-	    goto theend;
+	ಆದರೆ (!did_replace || init_logfont(lf) == FAIL)
+	    ಹೋಗು theend;
     }
 
-    while (*p == L':')
+    ಆಗ (*p == L':')
 	p++;
 
     // Set the values found after ':'
-    while (*p)
+    ಆಗ (*p)
     {
-	switch (*p++)
+	ಆಯ್ಕೆ (*p++)
 	{
 	    // Note: Keep this in sync with gui_mch_expand_font().
-	    case L'h':
-		lf->lfHeight = - points_to_pixels(p, &p, TRUE, (long_i)printer_dc);
-		break;
-	    case L'w':
-		lf->lfWidth = points_to_pixels(p, &p, FALSE, (long_i)printer_dc);
-		break;
-	    case L'W':
-		lf->lfWeight = wcstol(p, &p, 10);
-		break;
-	    case L'b':
-		lf->lfWeight = FW_BOLD;
-		break;
-	    case L'i':
+	    ಸ್ಥಿತಿ L'h':
+		lf->lf_ಎತ್ತರ = - points_ಗಮ್ಯ_pixels(p, &p, TRUE, (long_i)printer_dc);
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ L'w':
+		lf->lf_ಅಗಲ = points_ಗಮ್ಯ_pixels(p, &p, FALSE, (long_i)printer_dc);
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ L'W':
+		lf->lf_ತೂಕ = wcstol(p, &p, 10);
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ L'b':
+		lf->lf_ತೂಕ = FW_BOLD;
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ L'i':
 		lf->lfItalic = TRUE;
-		break;
-	    case L'u':
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ L'u':
 		lf->lfUnderline = TRUE;
-		break;
-	    case L's':
-		lf->lfStrikeOut = TRUE;
-		break;
-	    case L'c':
-		for (i = 0; i < (int)ARRAY_LENGTH(charset_pairs); ++i)
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ L's':
+		lf->lf_Strike_ಹೊರಹೋಗು = TRUE;
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ L'c':
+		ಗಾಗಿ (i = 0; i < (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(charset_ಜೋಡಿಗಳು); ++i)
 		{
-		    if (utf16ascncmp(p, (char *)charset_pairs[i].name.string,
-			    charset_pairs[i].name.length) == 0)
+		    ಆದರೆ (utf16ascncmp(p, (ಅಕ್ಷರ *)charset_ಜೋಡಿಗಳು[i].name.string,
+			    charset_ಜೋಡಿಗಳು[i].name.ಉದ್ದಳತೆ) == 0)
 		    {
-			lf->lfCharSet = charset_pairs[i].charset;
-			p += charset_pairs[i].name.length;
-			break;
+			lf->lf_Char_ಗಣ = charset_ಜೋಡಿಗಳು[i].charset;
+			p += charset_ಜೋಡಿಗಳು[i].name.ಉದ್ದಳತೆ;
+			ನಿಲ್ಲಿಸು;
 		    }
 		}
 
-		if (i == (int)ARRAY_LENGTH(charset_pairs) && verbose)
+		ಆದರೆ (i == (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(charset_ಜೋಡಿಗಳು) && verbose)
 		{
-		    char_u *s = utf16_to_enc(p, NULL);
-		    if (s != NULL)
+		    char_u *s = utf16_ಗಮ್ಯ_enc(p, ಖಾಲಿ);
+		    ಆದರೆ (s != ಖಾಲಿ)
 		    {
-			semsg(_(e_illegal_str_name_str_in_font_name_str),
+			semsg(_(e_illegal_str_name_str_ಒಳ_font_name_str),
 							   "charset", s, name);
 			vim_free(s);
 		    }
 		}
-		break;
-	    case L'f':
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ L'f':
 		// Font features (e.g., "fss19=1").
 		// Parsed separately by gui_mch_init_font(); skip here.
-		while (*p && *p != L':')
+		ಆಗ (*p && *p != L':')
 		    p++;
-		break;
-	    case L'q':
-		for (i = 0; i < (int)ARRAY_LENGTH(quality_pairs); ++i)
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ L'q':
+		ಗಾಗಿ (i = 0; i < (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(quality_ಜೋಡಿಗಳು); ++i)
 		{
-		    if (utf16ascncmp(p, (char *)quality_pairs[i].name.string,
-			    quality_pairs[i].name.length) == 0)
+		    ಆದರೆ (utf16ascncmp(p, (ಅಕ್ಷರ *)quality_ಜೋಡಿಗಳು[i].name.string,
+			    quality_ಜೋಡಿಗಳು[i].name.ಉದ್ದಳತೆ) == 0)
 		    {
-			lf->lfQuality = quality_pairs[i].quality;
-			p += quality_pairs[i].name.length;
-			break;
+			lf->lfQuality = quality_ಜೋಡಿಗಳು[i].quality;
+			p += quality_ಜೋಡಿಗಳು[i].name.ಉದ್ದಳತೆ;
+			ನಿಲ್ಲಿಸು;
 		    }
 		}
 
-		if (i == (int)ARRAY_LENGTH(quality_pairs) && verbose)
+		ಆದರೆ (i == (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(quality_ಜೋಡಿಗಳು) && verbose)
 		{
-		    char_u *s = utf16_to_enc(p, NULL);
-		    if (s != NULL)
+		    char_u *s = utf16_ಗಮ್ಯ_enc(p, ಖಾಲಿ);
+		    ಆದರೆ (s != ಖಾಲಿ)
 		    {
-			semsg(_(e_illegal_str_name_str_in_font_name_str),
+			semsg(_(e_illegal_str_name_str_ಒಳ_font_name_str),
 							   "quality", s, name);
 			vim_free(s);
 		    }
 		}
-		break;
-	    default:
-		if (verbose)
-		    semsg(_(e_illegal_char_nr_in_font_name_str), p[-1], name);
-		goto theend;
+		ನಿಲ್ಲಿಸು;
+	    ಪೂರ್ವನಿಯೋಜಿತ:
+		ಆದರೆ (verbose)
+		    semsg(_(e_illegal_char_nr_ಒಳ_font_name_str), p[-1], name);
+		ಹೋಗು theend;
 	}
-	while (*p == L':')
+	ಆಗ (*p == L':')
 	    p++;
     }
     ret = OK;
 
 theend:
     // ron: init lastlf
-    if (ret == OK && printer_dc == NULL)
+    ಆದರೆ (ret == OK && printer_dc == ಖಾಲಿ)
     {
 	vim_free(lastlf);
 	lastlf = ALLOC_ONE(LOGFONTW);
-	if (lastlf != NULL)
-	    mch_memmove(lastlf, lf, sizeof(LOGFONTW));
+	ಆದರೆ (lastlf != ಖಾಲಿ)
+	    mch_memmove(lastlf, lf, ಗಾತ್ರ(LOGFONTW));
     }
     vim_free(wname);
 
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-#endif // defined(FEAT_GUI) || defined(FEAT_PRINTER)
+#ಆದರೆ_ಅಂತ್ಯ // defined(FEAT_GUI) || defined(FEAT_PRINTER)
 
-#if defined(FEAT_JOB_CHANNEL)
+#ಆದರೆ defined(FEAT_ಕೆಲಸ_CHANNEL)
 /*
  * Initialize the Winsock dll.
  */
-    void
-channel_init_winsock(void)
+    ಶೂನ್ಯ
+channel_init_winsock(ಶೂನ್ಯ)
 {
-    WSADATA wsaData;
-    int wsaerr;
+    WSADATA wsa_ದತ್ತಾಂಶ;
+    ಪೂರ್ಣಾಂಕ wsaerr;
 
-    if (WSInitialized)
-	return;
+    ಆದರೆ (WSInitialized)
+	ಹಿಂತಿರುಗಿ;
 
-    wsaerr = WSAStartup(MAKEWORD(2, 2), &wsaData);
-    if (wsaerr == 0)
+    wsaerr = WSAStartup(MAKEWORD(2, 2), &wsa_ದತ್ತಾಂಶ);
+    ಆದರೆ (wsaerr == 0)
 	WSInitialized = TRUE;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ

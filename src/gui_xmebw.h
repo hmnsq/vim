@@ -17,56 +17,56 @@
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#ifndef EnhancedB_H
-#define EnhancedB_H
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ EnhancedB_H
+#ವ್ಯಾಖ್ಯಾನಿಸು EnhancedB_H
 
 /*
  * New resources for the Extended Pushbutton widget
  */
 
-#ifndef XmNshift
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ XmNshift
 # define XmNshift		"shift"
-#endif
-#ifndef XmCShift
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ XmCShift
 # define XmCShift		"Shift"
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifndef XmNlabelLocation
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ XmNlabelLocation
 # define XmNlabelLocation	"labelLocation"
-#endif
-#ifndef XmCLocation
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ XmCLocation
 # define XmCLocation		"Location"
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifndef XmNpixmapData
-# define XmNpixmapData		"pixmapData"
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ Xm_Npixmap_ದತ್ತಾಂಶ
+# define Xm_Npixmap_ದತ್ತಾಂಶ		"pixmapData"
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifndef XmNpixmapFile
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ XmNpixmapFile
 # define XmNpixmapFile		"pixmapFile"
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Constants for labelLocation.
  */
-#ifdef HAVE_XM_JOINSIDET_H
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_XM_JOINSIDET_H
 # include <Xm/JoinSideT.h>
-#else
-# define XmLEFT	    1
-# define XmRIGHT    2
-# define XmTOP	    3
+#ಇಲ್ಲದಿದ್ದರೆ
+# define Xm_ಎಡ	    1
+# define Xm_ಬಲ    2
+# define Xm_ತುದಿ	    3
 # define XmBOTTOM   4
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#define XmIsEnhancedButton(w) XtIsSubclass(w, xmEnhancedButtonWidgetClass)
+#ವ್ಯಾಖ್ಯಾನಿಸು XmIsEnhancedButton(w) XtIsSubclass(w, xmEnhancedButtonWidgetClass)
 
 /*
  * Convenience creation function.
  */
-extern Widget XgCreateEPushButtonWidget(Widget, char *, ArgList, Cardinal);
+ಬಾಹ್ಯ Widget XgCreateEPushButtonWidget(Widget, ಅಕ್ಷರ *, ArgList, Cardinal);
 
-extern WidgetClass xmEnhancedButtonWidgetClass;
-typedef struct _XmEnhancedButtonClassRec *XmEnhancedButtonWidgetClass;
-typedef struct _XmEnhancedButtonRec *XmEnhancedButtonWidget;
+ಬಾಹ್ಯ WidgetClass xmEnhancedButtonWidgetClass;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ _XmEnhancedButtonClassRec *XmEnhancedButtonWidgetClass;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ _XmEnhancedButtonRec *XmEnhancedButtonWidget;
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ

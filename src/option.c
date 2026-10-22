@@ -35,43 +35,43 @@
  *   comment at the help for the 'compatible' option.
  */
 
-#define IN_OPTION_C
-#include "vim.h"
-#include "optiondefs.h"
+#ವ್ಯಾಖ್ಯಾನಿಸು ಒಳ_OPTION_C
+#ಅನ್ತರ್ಭಾವ "vim.h"
+#ಅನ್ತರ್ಭಾವ "optiondefs.h"
 
-static void set_options_default(int opt_flags);
-static void set_string_default_esc(char *name, char_u *val, int escape);
-static char_u *find_dup_item(char_u *origval, char_u *newval, size_t newvallen, long_u flags);
-static char_u *option_expand(int opt_idx, char_u *val);
-static void didset_options(void);
-static void didset_options2(void);
-#if defined(FEAT_EVAL)
-static long_u *insecure_flag(win_T *wp, int opt_idx, int opt_flags);
-#else
+ಸ್ಥಿರ ಶೂನ್ಯ ಗಣ_options_default(ಪೂರ್ಣಾಂಕ opt_flags);
+ಸ್ಥಿರ ಶೂನ್ಯ ಗಣ_string_default_esc(ಅಕ್ಷರ *name, char_u *val, ಪೂರ್ಣಾಂಕ escape);
+ಸ್ಥಿರ char_u *ಕಂಡುಹಿಡಿ_dup_ಅಂಶ(char_u *origval, char_u *newval, size_t newvallen, long_u flags);
+ಸ್ಥಿರ char_u *option_expand(ಪೂರ್ಣಾಂಕ opt_idx, char_u *val);
+ಸ್ಥಿರ ಶೂನ್ಯ didset_options(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಶೂನ್ಯ didset_options2(ಶೂನ್ಯ);
+#ಆದರೆ defined(FEAT_EVAL)
+ಸ್ಥಿರ long_u *insecure_flag(win_T *wp, ಪೂರ್ಣಾಂಕ opt_idx, ಪೂರ್ಣಾಂಕ opt_flags);
+#ಇಲ್ಲದಿದ್ದರೆ
 # define insecure_flag(wp, opt_idx, opt_flags) (&options[opt_idx].flags)
-#endif
-static char *set_bool_option(int opt_idx, char_u *varp, int value, int opt_flags);
-static char *set_num_option(int opt_idx, char_u *varp, long value, char *errbuf, size_t errbuflen, int opt_flags);
-static int find_key_option(char_u *arg_arg, int has_lt);
-static void showoptions(int all, int opt_flags);
-static int optval_default(struct vimoption *, char_u *varp, int compatible);
-static void showoneopt(struct vimoption *, int opt_flags);
-static int put_setstring(FILE *fd, bool legacy, char *cmd, char *name, char_u **valuep, long_u flags);
-static int put_setnum(FILE *fd, char *cmd, char *name, long *valuep);
-static int put_setbool(FILE *fd, char *cmd, char *name, int value);
-static int istermoption(struct vimoption *p);
-static int istermoption_idx(int opt_idx);
-static char_u *get_varp_scope(struct vimoption *p, int scope);
-static char_u *get_varp(struct vimoption *);
-static void check_win_options(win_T *win);
-static void option_value2string(struct vimoption *, int scope);
-static void check_winopt(winopt_T *wop);
-static int wc_use_keyname(char_u *varp, long *wcp);
-static void compatible_set(void);
+#ಆದರೆ_ಅಂತ್ಯ
+ಸ್ಥಿರ ಅಕ್ಷರ *ಗಣ_bool_option(ಪೂರ್ಣಾಂಕ opt_idx, char_u *varp, ಪೂರ್ಣಾಂಕ ಮೌಲ್ಯ, ಪೂರ್ಣಾಂಕ opt_flags);
+ಸ್ಥಿರ ಅಕ್ಷರ *ಗಣ_ಅಂಕೆ_option(ಪೂರ್ಣಾಂಕ opt_idx, char_u *varp, ದೀರ್ಘ ಮೌಲ್ಯ, ಅಕ್ಷರ *errbuf, size_t errbuflen, ಪೂರ್ಣಾಂಕ opt_flags);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಕಂಡುಹಿಡಿ_ಕೀಲಿ_option(char_u *arg_arg, ಪೂರ್ಣಾಂಕ has_lt);
+ಸ್ಥಿರ ಶೂನ್ಯ showoptions(ಪೂರ್ಣಾಂಕ all, ಪೂರ್ಣಾಂಕ opt_flags);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ optval_default(ರಚನೆ vimoption *, char_u *varp, ಪೂರ್ಣಾಂಕ compatible);
+ಸ್ಥಿರ ಶೂನ್ಯ showoneopt(ರಚನೆ vimoption *, ಪೂರ್ಣಾಂಕ opt_flags);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ put_setstring(FILE *fd, bool legacy, ಅಕ್ಷರ *cmd, ಅಕ್ಷರ *name, char_u **valuep, long_u flags);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ put_setnum(FILE *fd, ಅಕ್ಷರ *cmd, ಅಕ್ಷರ *name, ದೀರ್ಘ *valuep);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ put_setbool(FILE *fd, ಅಕ್ಷರ *cmd, ಅಕ್ಷರ *name, ಪೂರ್ಣಾಂಕ ಮೌಲ್ಯ);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ istermoption(ರಚನೆ vimoption *p);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ istermoption_idx(ಪೂರ್ಣಾಂಕ opt_idx);
+ಸ್ಥಿರ char_u *get_varp_scope(ರಚನೆ vimoption *p, ಪೂರ್ಣಾಂಕ scope);
+ಸ್ಥಿರ char_u *get_varp(ರಚನೆ vimoption *);
+ಸ್ಥಿರ ಶೂನ್ಯ check_win_options(win_T *win);
+ಸ್ಥಿರ ಶೂನ್ಯ option_value2string(ರಚನೆ vimoption *, ಪೂರ್ಣಾಂಕ scope);
+ಸ್ಥಿರ ಶೂನ್ಯ check_winopt(winopt_T *wop);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ wc_use_keyname(char_u *varp, ದೀರ್ಘ *wcp);
+ಸ್ಥಿರ ಶೂನ್ಯ compatible_ಗಣ(ಶೂನ್ಯ);
 
-#if defined(FEAT_EVAL)
-static char *(p_bin_dep_opts[])    = {"textwidth", "wrapmargin", "modeline", "expandtab", NULL};
-static char *(p_paste_dep_opts[])  = {"autoindent", "expandtab", "ruler", "showmatch", "smarttab",
+#ಆದರೆ defined(FEAT_EVAL)
+ಸ್ಥಿರ ಅಕ್ಷರ *(p_bin_dep_opts[])    = {"textwidth", "wrapmargin", "modeline", "expandtab", ಖಾಲಿ};
+ಸ್ಥಿರ ಅಕ್ಷರ *(p_paste_dep_opts[])  = {"autoindent", "expandtab", "ruler", "showmatch", "smarttab",
     "softtabstop", "textwidth", "wrapmargin",
 # ifdef FEAT_RIGHTLEFT
     "hkmap", "revins",
@@ -79,137 +79,137 @@ static char *(p_paste_dep_opts[])  = {"autoindent", "expandtab", "ruler", "showm
 # ifdef FEAT_VARTABS
     "varsofttabstop",
 # endif
-    NULL};
-static void didset_options_sctx(int opt_flags, char **buf);
-#endif
+    ಖಾಲಿ};
+ಸ್ಥಿರ ಶೂನ್ಯ didset_options_sctx(ಪೂರ್ಣಾಂಕ opt_flags, ಅಕ್ಷರ **buf);
+#ಆದರೆ_ಅಂತ್ಯ
 
 
 /*
  * Initialize the 'shell' option to a default value.
  */
-    static void
-set_init_default_shell(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_init_default_shell(ಶೂನ್ಯ)
 {
     char_u	*p;
 
     // Find default value for 'shell' option.
     // Don't use it if it is empty.
-    if (((p = mch_getenv((char_u *)"SHELL")) != NULL && *p != NUL)
-#if defined(MSWIN)
-	    || ((p = mch_getenv((char_u *)"COMSPEC")) != NULL && *p != NUL)
-	    || ((p = (char_u *)default_shell()) != NULL && *p != NUL)
-#endif
+    ಆದರೆ (((p = mch_getenv((char_u *)"SHELL")) != ಖಾಲಿ && *p != NUL)
+#ಆದರೆ defined(MSWIN)
+	    || ((p = mch_getenv((char_u *)"COMSPEC")) != ಖಾಲಿ && *p != NUL)
+	    || ((p = (char_u *)default_shell()) != ಖಾಲಿ && *p != NUL)
+#ಆದರೆ_ಅಂತ್ಯ
 	    )
-#if defined(MSWIN)
+#ಆದರೆ defined(MSWIN)
     {
 	// For MS-Windows put the path in quotes instead of escaping spaces.
 	char_u	    *cmd;
 	size_t	    len;
 
-	if (vim_strchr(p, ' ') != NULL)
+	ಆದರೆ (vim_strchr(p, ' ') != ಖಾಲಿ)
 	{
 	    len = STRLEN(p) + 3;  // two quotes and a trailing NUL
 	    cmd = alloc(len);
-	    if (cmd != NULL)
+	    ಆದರೆ (cmd != ಖಾಲಿ)
 	    {
-		vim_snprintf((char *)cmd, len, "\"%s\"", p);
-		set_string_default("sh", cmd);
+		vim_snprintf((ಅಕ್ಷರ *)cmd, len, "\"%s\"", p);
+		ಗಣ_string_default("sh", cmd);
 		vim_free(cmd);
 	    }
 	}
-	else
-	    set_string_default("sh", p);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಗಣ_string_default("sh", p);
     }
-#else
-	set_string_default_esc("sh", p, TRUE);
-#endif
+#ಇಲ್ಲದಿದ್ದರೆ
+	ಗಣ_string_default_esc("sh", p, TRUE);
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Set the default for 'backupskip' to include environment variables for
  * temp files.
  */
-    static void
-set_init_default_backupskip(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_init_default_backupskip(ಶೂನ್ಯ)
 {
-    int		opt_idx;
-    int		i;
+    ಪೂರ್ಣಾಂಕ		opt_idx;
+    ಪೂರ್ಣಾಂಕ		i;
     char_u	*p;
-    int		plen;
-#ifdef UNIX
-    static char	*(names[4]) = {"", "TMPDIR", "TEMP", "TMP"};
-#else
-    static char	*(names[3]) = {"TMPDIR", "TEMP", "TMP"};
-#endif
+    ಪೂರ್ಣಾಂಕ		plen;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
+    ಸ್ಥಿರ ಅಕ್ಷರ	*(ಹೆಸರುಗಳು[4]) = {"", "TMPDIR", "TEMP", "TMP"};
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಸ್ಥಿರ ಅಕ್ಷರ	*(ಹೆಸರುಗಳು[3]) = {"TMPDIR", "TEMP", "TMP"};
+#ಆದರೆ_ಅಂತ್ಯ
     garray_T	ga;
 
     opt_idx = findoption((char_u *)"backupskip");
 
     ga_init2(&ga, 1, 100);
-    for (i = 0; i < (int)ARRAY_LENGTH(names); ++i)
+    ಗಾಗಿ (i = 0; i < (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(ಹೆಸರುಗಳು); ++i)
     {
-	int		mustfree = FALSE;
-#ifdef UNIX
-	if (*names[i] == NUL)
+	ಪೂರ್ಣಾಂಕ		mustfree = FALSE;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
+	ಆದರೆ (*ಹೆಸರುಗಳು[i] == NUL)
 	{
 # ifdef MACOS_X
 	    p = (char_u *)"/private/tmp";
-	    plen = (int)STRLEN_LITERAL("/private/tmp");
-# else
+	    plen = (ಪೂರ್ಣಾಂಕ)STRLEN_LITERAL("/private/tmp");
+# ಇಲ್ಲದಿದ್ದರೆ
 	    p = (char_u *)"/tmp";
-	    plen = (int)STRLEN_LITERAL("/tmp");
+	    plen = (ಪೂರ್ಣಾಂಕ)STRLEN_LITERAL("/tmp");
 # endif
 	}
-	else
-#endif
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 	{
-	    p = vim_getenv((char_u *)names[i], &mustfree);
+	    p = vim_getenv((char_u *)ಹೆಸರುಗಳು[i], &mustfree);
 	    plen = 0;	    // will be calculated below
 	}
-	if (p != NULL && *p != NUL)
+	ಆದರೆ (p != ಖಾಲಿ && *p != NUL)
 	{
-	    char_u  *item;
+	    char_u  *ಅಂಶ;
 	    size_t  itemsize;
-	    int	    has_trailing_path_sep = FALSE;
+	    ಪೂರ್ಣಾಂಕ	    has_trailing_ಮಾರ್ಗ_sep = FALSE;
 
-	    if (plen == 0)
+	    ಆದರೆ (plen == 0)
 	    {
 		// the value was retrieved from the environment
-		plen = (int)STRLEN(p);
+		plen = (ಪೂರ್ಣಾಂಕ)STRLEN(p);
 		// does the value include a trailing path separator?
-		if (after_pathsep(p, p + plen))
-		    has_trailing_path_sep = TRUE;
+		ಆದರೆ (after_pathsep(p, p + plen))
+		    has_trailing_ಮಾರ್ಗ_sep = TRUE;
 	    }
 
 	    // item size needs to be large enough to include "/*" and a trailing NUL
 	    // note: the value (and therefore plen) may already include a path separator
-	    itemsize = plen + (has_trailing_path_sep ? 0 : 1) + 2;
-	    item = alloc(itemsize);
-	    if (item != NULL)
+	    itemsize = plen + (has_trailing_ಮಾರ್ಗ_sep ? 0 : 1) + 2;
+	    ಅಂಶ = alloc(itemsize);
+	    ಆದರೆ (ಅಂಶ != ಖಾಲಿ)
 	    {
 		// add a preceding comma as a separator after the first item
 		size_t	itemseplen = (ga.ga_len == 0) ? 0 : 1;
 		size_t	itemlen;
 
-		itemlen = vim_snprintf((char *)item, itemsize, "%s%s*", p, (has_trailing_path_sep) ? "" : PATHSEPSTR);
+		itemlen = vim_snprintf((ಅಕ್ಷರ *)ಅಂಶ, itemsize, "%s%s*", p, (has_trailing_ಮಾರ್ಗ_sep) ? "" : PATHSEPSTR);
 
-		if (find_dup_item(ga.ga_data, item, itemlen, options[opt_idx].flags) == NULL
-			&& ga_grow(&ga, (int)(itemseplen + itemlen + 1)) == OK)
+		ಆದರೆ (ಕಂಡುಹಿಡಿ_dup_ಅಂಶ(ga.ga_ದತ್ತಾಂಶ, ಅಂಶ, itemlen, options[opt_idx].flags) == ಖಾಲಿ
+			&& ga_grow(&ga, (ಪೂರ್ಣಾಂಕ)(itemseplen + itemlen + 1)) == OK)
 		{
-		    ga.ga_len += vim_snprintf((char *)ga.ga_data + ga.ga_len,
+		    ga.ga_len += vim_snprintf((ಅಕ್ಷರ *)ga.ga_ದತ್ತಾಂಶ + ga.ga_len,
 				    itemseplen + itemlen + 1,
-				    "%s%s", (itemseplen > 0) ? "," : "", item);
+				    "%s%s", (itemseplen > 0) ? "," : "", ಅಂಶ);
 		}
-		vim_free(item);
+		vim_free(ಅಂಶ);
 	    }
 	}
-	if (mustfree)
+	ಆದರೆ (mustfree)
 	    vim_free(p);
     }
-    if (ga.ga_data != NULL)
+    ಆದರೆ (ga.ga_ದತ್ತಾಂಶ != ಖಾಲಿ)
     {
-	set_string_default("bsk", ga.ga_data);
-	vim_free(ga.ga_data);
+	ಗಣ_string_default("bsk", ga.ga_ದತ್ತಾಂಶ);
+	vim_free(ga.ga_ದತ್ತಾಂಶ);
     }
 }
 
@@ -217,37 +217,37 @@ set_init_default_backupskip(void)
  * Initialize the 'maxmemtot' and 'maxmem' options to a default value.
  * 'maxmemtot' and 'maxmem' may have to be adjusted for available memory.
  */
-    static void
-set_init_default_maxmemtot(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_init_default_maxmemtot(ಶೂನ್ಯ)
 {
-    int		opt_idx;
+    ಪೂರ್ಣಾಂಕ		opt_idx;
     long_u	n;
 
     opt_idx = findoption((char_u *)"maxmemtot");
-    if (opt_idx < 0)
-	return;
+    ಆದರೆ (opt_idx < 0)
+	ಹಿಂತಿರುಗಿ;
 
-#if !defined(HAVE_AVAIL_MEM) && !defined(HAVE_TOTAL_MEM)
-    if (options[opt_idx].def_val[VI_DEFAULT] == (char_u *)0L)
-#endif
+#ಆದರೆ !defined(HAVE_AVAIL_MEM) && !defined(HAVE_ಒಟ್ಟು_MEM)
+    ಆದರೆ (options[opt_idx].def_val[VI_DEFAULT] == (char_u *)0L)
+#ಆದರೆ_ಅಂತ್ಯ
     {
-#if defined(HAVE_AVAIL_MEM)
+#ಆದರೆ defined(HAVE_AVAIL_MEM)
 	// Use amount of memory available at this moment.
 	n = (mch_avail_mem(FALSE) >> 1);
-#elif defined(HAVE_TOTAL_MEM)
+#ಅಥವಾಆದರೆ defined(HAVE_ಒಟ್ಟು_MEM)
 	// Use amount of memory available to Vim.
-	n = (mch_total_mem(FALSE) >> 1);
-#else
+	n = (mch_ಒಟ್ಟು_mem(FALSE) >> 1);
+#ಇಲ್ಲದಿದ್ದರೆ
 	n = (0x7fffffff >> 11);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	options[opt_idx].def_val[VI_DEFAULT] = (char_u *)n;
 	opt_idx = findoption((char_u *)"maxmem");
-	if (opt_idx >= 0)
+	ಆದರೆ (opt_idx >= 0)
 	{
-#if !defined(HAVE_AVAIL_MEM) && !defined(HAVE_TOTAL_MEM)
-	    if ((long)(long_i)options[opt_idx].def_val[VI_DEFAULT] > (long)n
-		    || (long)(long_i)options[opt_idx].def_val[VI_DEFAULT] == 0L)
-#endif
+#ಆದರೆ !defined(HAVE_AVAIL_MEM) && !defined(HAVE_ಒಟ್ಟು_MEM)
+	    ಆದರೆ ((ದೀರ್ಘ)(long_i)options[opt_idx].def_val[VI_DEFAULT] > (ದೀರ್ಘ)n
+		    || (ದೀರ್ಘ)(long_i)options[opt_idx].def_val[VI_DEFAULT] == 0L)
+#ಆದರೆ_ಅಂತ್ಯ
 		options[opt_idx].def_val[VI_DEFAULT] = (char_u *)n;
 	}
     }
@@ -256,137 +256,137 @@ set_init_default_maxmemtot(void)
 /*
  * Initialize the 'cdpath' option to a default value.
  */
-    static void
-set_init_default_cdpath(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_init_default_cdpath(ಶೂನ್ಯ)
 {
-    int		opt_idx;
+    ಪೂರ್ಣಾಂಕ		opt_idx;
     char_u	*cdpath;
     char_u	*buf;
-    int	i;
-    int	j;
-    int	mustfree = FALSE;
+    ಪೂರ್ಣಾಂಕ	i;
+    ಪೂರ್ಣಾಂಕ	j;
+    ಪೂರ್ಣಾಂಕ	mustfree = FALSE;
 
     cdpath = vim_getenv((char_u *)"CDPATH", &mustfree);
-    if (cdpath == NULL)
-	return;
+    ಆದರೆ (cdpath == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     buf = alloc((STRLEN(cdpath) << 1) + 2);
-    if (buf != NULL)
+    ಆದರೆ (buf != ಖಾಲಿ)
     {
 	buf[0] = ',';	    // start with ",", current dir first
 	j = 1;
-	for (i = 0; cdpath[i] != NUL; ++i)
+	ಗಾಗಿ (i = 0; cdpath[i] != NUL; ++i)
 	{
-	    if (vim_ispathlistsep(cdpath[i]))
+	    ಆದರೆ (vim_ispathlistsep(cdpath[i]))
 		buf[j++] = ',';
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		if (cdpath[i] == ' ' || cdpath[i] == ',')
+		ಆದರೆ (cdpath[i] == ' ' || cdpath[i] == ',')
 		    buf[j++] = '\\';
 		buf[j++] = cdpath[i];
 	    }
 	}
 	buf[j] = NUL;
 	opt_idx = findoption((char_u *)"cdpath");
-	if (opt_idx >= 0)
+	ಆದರೆ (opt_idx >= 0)
 	{
 	    options[opt_idx].def_val[VI_DEFAULT] = buf;
 	    options[opt_idx].flags |= P_DEF_ALLOCED;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    vim_free(buf); // cannot happen
     }
-    if (mustfree)
+    ಆದರೆ (mustfree)
 	vim_free(cdpath);
 }
 
 /*
  * Initialize the 'printencoding' option to a default value.
  */
-    static void
-set_init_default_printencoding(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_init_default_printencoding(ಶೂನ್ಯ)
 {
-#if defined(FEAT_POSTSCRIPT) && \
+#ಆದರೆ defined(FEAT_POSTSCRIPT) && \
     (defined(MSWIN) || defined(VMS) || defined(MAC) || defined(hpux))
     // Set print encoding on platforms that don't default to latin1
-    set_string_default("penc",
-# if defined(MSWIN)
+    ಗಣ_string_default("penc",
+# ಆದರೆ defined(MSWIN)
 	    (char_u *)"cp1252"
 # elif defined(VMS)
 	    (char_u *)"dec-mcs"
 # elif defined(MAC)
 	    (char_u *)"mac-roman"
-# else // HPUX
+# ಇಲ್ಲದಿದ್ದರೆ // HPUX
 	    (char_u *)"hp-roman8"
 # endif
 	    );
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+#ಆದರೆ defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
 /*
  * Initialize the 'printexpr' option to a default value.
  */
-    static void
-set_init_default_printexpr(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_init_default_printexpr(ಶೂನ್ಯ)
 {
     // 'printexpr' must be allocated to be able to evaluate it.
-    set_string_default("pexpr",
-# if defined(MSWIN)
+    ಗಣ_string_default("pexpr",
+# ಆದರೆ defined(MSWIN)
 	    (char_u *)"system('copy' . ' ' . v:fname_in . (&printdevice == '' ? ' LPT1:' : (' \"' . &printdevice . '\"'))) . delete(v:fname_in)"
 # elif defined(VMS)
 	    (char_u *)"system('print/delete' . (&printdevice == '' ? '' : ' /queue=' . &printdevice) . ' ' . v:fname_in)"
 
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 	    (char_u *)"system('lpr' . (&printdevice == '' ? '' : ' -P' . &printdevice) . ' ' . v:fname_in) . delete(v:fname_in) + v:shell_error"
 # endif
 	    );
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef UNIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
 /*
  * Force restricted-mode on for "nologin" or "false" $SHELL
  */
-    static void
-set_init_restricted_mode(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_init_restricted_ಬಹುಲಕ(ಶೂನ್ಯ)
 {
     char_u	*p;
 
     p = get_isolated_shell_name();
-    if (p == NULL)
-	return;
-    if (fnamecmp(p, "nologin") == 0 || fnamecmp(p, "false") == 0)
+    ಆದರೆ (p == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
+    ಆದರೆ (fnamecmp(p, "nologin") == 0 || fnamecmp(p, "false") == 0)
 	restricted = TRUE;
     vim_free(p);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef CLEAN_RUNTIMEPATH
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ CLEAN_RUNTIMEPATH
 /*
  * When Vim is started with the "--clean" argument, set the default value
  * for the 'runtimepath' and 'packpath' options.
  */
-    static void
-set_init_clean_rtp(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_init_clean_rtp(ಶೂನ್ಯ)
 {
-    int		opt_idx;
+    ಪೂರ್ಣಾಂಕ		opt_idx;
 
     opt_idx = findoption((char_u *)"runtimepath");
-    if (opt_idx >= 0)
+    ಆದರೆ (opt_idx >= 0)
     {
 	options[opt_idx].def_val[VI_DEFAULT] = (char_u *)CLEAN_RUNTIMEPATH;
 	p_rtp = (char_u *)CLEAN_RUNTIMEPATH;
     }
     opt_idx = findoption((char_u *)"packpath");
-    if (opt_idx < 0)
-	return;
+    ಆದರೆ (opt_idx < 0)
+	ಹಿಂತಿರುಗಿ;
     options[opt_idx].def_val[VI_DEFAULT] = (char_u *)CLEAN_RUNTIMEPATH;
     p_pp = (char_u *)CLEAN_RUNTIMEPATH;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef UNIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
 /*
  * Change 'runtimepath' and 'packdir' to '$XDG_CONFIG_HOME/vim' if the only
  * vimrc found is located in '$XDG_CONFIG_HOME/vim/vimrc'.
@@ -394,25 +394,25 @@ set_init_clean_rtp(void)
  * as a fallback as is defined in the XDG base dir specification:
  * <https://specifications.freedesktop.org/basedir/latest/>
  */
-    static void
-set_init_xdg_rtp(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_init_xdg_rtp(ಶೂನ್ಯ)
 {
-    int		opt_idx;
-    int		has_xdg_env = TRUE;
-    int		should_free_xdg_dir = FALSE;
-    char_u	*vimrc1 = NULL;
-    char_u	*vimrc2 = NULL;
-    char_u	*xdg_dir = NULL;
-    char_u	*xdg_rtp = NULL;
-    string_T	vimrc_xdg = {NULL, 0};
+    ಪೂರ್ಣಾಂಕ		opt_idx;
+    ಪೂರ್ಣಾಂಕ		has_xdg_env = TRUE;
+    ಪೂರ್ಣಾಂಕ		should_free_xdg_dir = FALSE;
+    char_u	*vimrc1 = ಖಾಲಿ;
+    char_u	*vimrc2 = ಖಾಲಿ;
+    char_u	*xdg_dir = ಖಾಲಿ;
+    char_u	*xdg_rtp = ಖಾಲಿ;
+    string_T	vimrc_xdg = {ಖಾಲಿ, 0};
 
     // initialize chartab, so we can expand $HOME
-    (void)init_chartab();
+    (ಶೂನ್ಯ)init_chartab();
     vimrc1 = expand_env_save((char_u *)USR_VIMRC_FILE);
     vimrc2 = expand_env_save((char_u *)USR_VIMRC_FILE2);
 
     xdg_dir = mch_getenv("XDG_CONFIG_HOME");
-    if (!xdg_dir)
+    ಆದರೆ (!xdg_dir)
     {
 	xdg_dir = expand_env_save((char_u *)"~/.config");
 	should_free_xdg_dir = TRUE;
@@ -421,28 +421,28 @@ set_init_xdg_rtp(void)
     concat_fnames(xdg_dir, STRLEN(xdg_dir),
 	(char_u *)"vim/vimrc", STRLEN_LITERAL("vim/vimrc"), TRUE, &vimrc_xdg);
 
-    if (file_is_readable(vimrc1) || file_is_readable(vimrc2) ||
+    ಆದರೆ (file_is_readable(vimrc1) || file_is_readable(vimrc2) ||
 	    !file_is_readable(vimrc_xdg.string))
-	goto theend;
+	ಹೋಗು theend;
 
     xdg_rtp = has_xdg_env ? (char_u *)XDG_RUNTIMEPATH
 	: (char_u *)XDG_RUNTIMEPATH_FB;
 
-    if ((opt_idx = findoption((char_u *)"runtimepath")) < 0)
-	goto theend;
+    ಆದರೆ ((opt_idx = findoption((char_u *)"runtimepath")) < 0)
+	ಹೋಗು theend;
 
     options[opt_idx].def_val[VI_DEFAULT] = xdg_rtp;
     p_rtp = xdg_rtp;
 
-    if ((opt_idx = findoption((char_u *)"packpath")) < 0)
-	goto theend;
+    ಆದರೆ ((opt_idx = findoption((char_u *)"packpath")) < 0)
+	ಹೋಗು theend;
 
     options[opt_idx].def_val[VI_DEFAULT] = xdg_rtp;
     p_pp = xdg_rtp;
 
-# if defined(XDG_VDIR) && defined(FEAT_SESSION)
-    if ((opt_idx = findoption((char_u *)"viewdir")) < 0)
-	goto theend;
+# ಆದರೆ defined(XDG_VDIR) && defined(FEAT_SESSION)
+    ಆದರೆ ((opt_idx = findoption((char_u *)"viewdir")) < 0)
+	ಹೋಗು theend;
 
     options[opt_idx].def_val[VI_DEFAULT] = (char_u *)XDG_VDIR;
     p_vdir = (char_u *)XDG_VDIR;
@@ -452,10 +452,10 @@ theend:
     vim_free(vimrc1);
     vim_free(vimrc2);
     vim_free(vimrc_xdg.string);
-    if (should_free_xdg_dir)
+    ಆದರೆ (should_free_xdg_dir)
 	vim_free(xdg_dir);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Expand environment variables and things like "~" for the defaults.
@@ -466,27 +466,27 @@ theend:
  * Don't set the P_ALLOCED flag, because we don't want to free the
  * default.
  */
-    static void
-set_init_expand_env(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_init_expand_env(ಶೂನ್ಯ)
 {
-    int		opt_idx;
+    ಪೂರ್ಣಾಂಕ		opt_idx;
     char_u	*p;
 
-    for (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
+    ಗಾಗಿ (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
     {
-	if ((options[opt_idx].flags & P_GETTEXT)
-		&& options[opt_idx].var != NULL)
-	    p = (char_u *)_(*(char **)options[opt_idx].var);
-	else
-	    p = option_expand(opt_idx, NULL);
-	if (p != NULL && (p = vim_strsave(p)) != NULL)
+	ಆದರೆ ((options[opt_idx].flags & P_GETTEXT)
+		&& options[opt_idx].var != ಖಾಲಿ)
+	    p = (char_u *)_(*(ಅಕ್ಷರ **)options[opt_idx].var);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    p = option_expand(opt_idx, ಖಾಲಿ);
+	ಆದರೆ (p != ಖಾಲಿ && (p = vim_strsave(p)) != ಖಾಲಿ)
 	{
 	    *(char_u **)options[opt_idx].var = p;
 	    // VIMEXP
 	    // Defaults for all expanded options are currently the same for Vi
 	    // and Vim.  When this changes, add some code here!  Also need to
 	    // split P_DEF_ALLOCED in two.
-	    if (options[opt_idx].flags & P_DEF_ALLOCED)
+	    ಆದರೆ (options[opt_idx].flags & P_DEF_ALLOCED)
 		vim_free(options[opt_idx].def_val[VI_DEFAULT]);
 	    options[opt_idx].def_val[VI_DEFAULT] = p;
 	    options[opt_idx].flags |= P_DEF_ALLOCED;
@@ -494,126 +494,126 @@ set_init_expand_env(void)
     }
 }
 
-#if defined(MSWIN) && defined(FEAT_GETTEXT)
+#ಆದರೆ defined(MSWIN) && defined(FEAT_GETTEXT)
 /*
  * Get the display language of Windows and the languages to fall back on, as a
  * colon separated list for gettext, e.g. "ja_JP:en_US".  The list stops after
  * English, untranslated messages are English already.
  * Returns NULL when it cannot be obtained.  The result must be freed.
  */
-    static char_u *
-get_ui_langs(void)
+    ಸ್ಥಿರ char_u *
+get_ui_langs(ಶೂನ್ಯ)
 {
-    ULONG	num_languages = 0;
+    ULONG	ಅಂಕೆ_languages = 0;
     ULONG	bufsize = 0;
-    WCHAR	*buffer;
-    char_u	*langs = NULL;
+    WCHAR	*ಬಫರ್;
+    char_u	*langs = ಖಾಲಿ;
 
-    if (!GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &num_languages, NULL,
+    ಆದರೆ (!GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &ಅಂಕೆ_languages, ಖಾಲಿ,
 								    &bufsize)
 	    || bufsize == 0)
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    buffer = ALLOC_MULT(WCHAR, bufsize);
-    if (buffer == NULL)
-	return NULL;
+    ಬಫರ್ = ALLOC_MULT(WCHAR, bufsize);
+    ಆದರೆ (ಬಫರ್ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &num_languages, buffer,
+    ಆದರೆ (GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &ಅಂಕೆ_languages, ಬಫರ್,
 								    &bufsize))
     {
 	// The list is NUL separated, the result needs the same room.
 	langs = alloc(bufsize);
-	if (langs != NULL)
+	ಆದರೆ (langs != ಖಾಲಿ)
 	{
 	    char_u	*d = langs;
-	    WCHAR	*s = buffer;
+	    WCHAR	*s = ಬಫರ್;
 
-	    while (*s != L'\0')
+	    ಆಗ (*s != L'\0')
 	    {
 		bool	english = s[0] == L'e' && s[1] == L'n'
 					&& (s[2] == L'\0' || s[2] == L'-');
 
-		if (d > langs)
+		ಆದರೆ (d > langs)
 		    *d++ = ':';
 		// Locale names are ASCII, "en-US" becomes "en_US".
-		for ( ; *s != L'\0'; ++s)
+		ಗಾಗಿ ( ; *s != L'\0'; ++s)
 		    *d++ = *s == L'-' ? '_' : (char_u)*s;
 		++s;
 
-		if (english)
-		    break;
+		ಆದರೆ (english)
+		    ನಿಲ್ಲಿಸು;
 	    }
 	    *d = NUL;
 	}
     }
-    vim_free(buffer);
+    vim_free(ಬಫರ್);
 
-    return langs;
+    ಹಿಂತಿರುಗಿ langs;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Initialize the 'LANG' environment variable to a default value.
  */
-    static void
-set_init_lang_env(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_init_lang_env(ಶೂನ್ಯ)
 {
-#if defined(MSWIN) && defined(FEAT_GETTEXT)
+#ಆದರೆ defined(MSWIN) && defined(FEAT_GETTEXT)
     // If the language isn't set in the environment, use the display language
     // of Windows.  Not the regional format, which is what the CRT would use
     // for setlocale(LC_ALL, "").
-    if (mch_getenv((char_u *)"LANG") == NULL
-	    && mch_getenv((char_u *)"LANGUAGE") == NULL
-	    && mch_getenv((char_u *)"LC_ALL") == NULL
-	    && mch_getenv((char_u *)"LC_MESSAGES") == NULL)
+    ಆದರೆ (mch_getenv((char_u *)"LANG") == ಖಾಲಿ
+	    && mch_getenv((char_u *)"LANGUAGE") == ಖಾಲಿ
+	    && mch_getenv((char_u *)"LC_ALL") == ಖಾಲಿ
+	    && mch_getenv((char_u *)"LC_MESSAGES") == ಖಾಲಿ)
     {
 	char_u	*langs = get_ui_langs();
 
-	if (langs != NULL && *langs != NUL)
+	ಆದರೆ (langs != ಖಾಲಿ && *langs != NUL)
 	{
 	    char_u	*colon = vim_strchr(langs, ':');
 
 	    // $LANGUAGE is the list gettext picks from, $LANG the language.
 	    vim_setenv((char_u *)"LANGUAGE", langs);
-	    if (colon != NULL)
+	    ಆದರೆ (colon != ಖಾಲಿ)
 		*colon = NUL;
 	    vim_setenv((char_u *)"LANG", langs);
 	}
 	vim_free(langs);
     }
-#elif defined(MACOS_CONVERT)
+#ಅಥವಾಆದರೆ defined(MACOS_CONVERT)
     // Moved to os_mac_conv.c to avoid dependency problems.
     mac_lang_init();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Initialize the 'encoding' option to a default value.
  */
-    static void
-set_init_default_encoding(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_init_default_encoding(ಶೂನ್ಯ)
 {
     char_u	*p;
-    int		opt_idx;
+    ಪೂರ್ಣಾಂಕ		opt_idx;
 
-#if defined(MSWIN) || defined(__MVS__)
+#ಆದರೆ defined(MSWIN) || defined(__MVS__)
     // MS-Windows has builtin support for conversion to and from Unicode, using
     // "utf-8" for 'encoding' should work best for most users.
     // z/OS built should default to UTF-8 mode as setlocale does not respect utf-8 environment variable locales
     p = vim_strnsave((char_u *)ENC_DFLT, STRLEN_LITERAL(ENC_DFLT));
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
     // enc_locale() will try to find the encoding of the current locale.
     // This works best for properly configured systems, old and new.
     p = enc_locale();
-#endif
-    if (p == NULL)
-	return;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (p == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     // Try setting 'encoding' and check if the value is valid.
     // If not, go back to the default encoding.
     char_u *save_enc = p_enc;
     p_enc = p;
-    if (STRCMP(p_enc, "gb18030") == 0)
+    ಆದರೆ (STRCMP(p_enc, "gb18030") == 0)
     {
 	// We don't support "gb18030", but "cp936" is a good substitute
 	// for practical purposes, thus use that.  It's not an alias to
@@ -621,75 +621,75 @@ set_init_default_encoding(void)
 	p_enc = vim_strnsave((char_u *)"cp936", STRLEN_LITERAL("cp936"));
 	vim_free(p);
     }
-    if (mb_init() == NULL)
+    ಆದರೆ (mb_init() == ಖಾಲಿ)
     {
 	opt_idx = findoption((char_u *)"encoding");
-	if (opt_idx >= 0)
+	ಆದರೆ (opt_idx >= 0)
 	{
 	    options[opt_idx].def_val[VI_DEFAULT] = p_enc;
 	    options[opt_idx].flags |= P_DEF_ALLOCED;
 	}
 
-#if defined(MSWIN) || defined(MACOS_X) || defined(VMS)
-	if (STRCMP(p_enc, "latin1") == 0 || enc_utf8)
+#ಆದರೆ defined(MSWIN) || defined(MACOS_X) || defined(VMS)
+	ಆದರೆ (STRCMP(p_enc, "latin1") == 0 || enc_utf8)
 	{
 	    // Adjust the default for 'isprint' and 'iskeyword' to match
 	    // latin1.  Also set the defaults for when 'nocompatible' is
 	    // set.
-	    set_string_option_direct((char_u *)"isp", -1,
+	    ಗಣ_string_option_ನೇರ((char_u *)"isp", -1,
 		    ISP_LATIN1, OPT_FREE, SID_NONE);
-	    set_string_option_direct((char_u *)"isk", -1,
+	    ಗಣ_string_option_ನೇರ((char_u *)"isk", -1,
 		    ISK_LATIN1, OPT_FREE, SID_NONE);
 	    opt_idx = findoption((char_u *)"isp");
-	    if (opt_idx >= 0)
+	    ಆದರೆ (opt_idx >= 0)
 		options[opt_idx].def_val[VIM_DEFAULT] = ISP_LATIN1;
 	    opt_idx = findoption((char_u *)"isk");
-	    if (opt_idx >= 0)
+	    ಆದರೆ (opt_idx >= 0)
 		options[opt_idx].def_val[VIM_DEFAULT] = ISK_LATIN1;
-	    (void)init_chartab();
+	    (ಶೂನ್ಯ)init_chartab();
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
+#ಆದರೆ defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
 	// Win32 console: When GetACP() returns a different value from
 	// GetConsoleCP() set 'termencoding'.
-	if (
+	ಆದರೆ (
 # ifdef VIMDLL
-		(!gui.in_use && !gui.starting) &&
+		(!gui.ಒಳ_use && !gui.starting) &&
 # endif
 		GetACP() != GetConsoleCP())
 	{
-	    char	buf[50];
+	    ಅಕ್ಷರ	buf[50];
 	    size_t	buflen;
 
 	    // Win32 console: In ConPTY, GetConsoleCP() returns zero.
 	    // Use an alternative value.
-	    if (GetConsoleCP() == 0)
-		buflen = vim_snprintf(buf, sizeof(buf), "cp%ld", (long)GetACP());
-	    else
-		buflen = vim_snprintf(buf, sizeof(buf), "cp%ld", (long)GetConsoleCP());
+	    ಆದರೆ (GetConsoleCP() == 0)
+		buflen = vim_snprintf(buf, ಗಾತ್ರ(buf), "cp%ld", (ದೀರ್ಘ)GetACP());
+	    ಇಲ್ಲದಿದ್ದರೆ
+		buflen = vim_snprintf(buf, ಗಾತ್ರ(buf), "cp%ld", (ದೀರ್ಘ)GetConsoleCP());
 	    p_tenc = vim_strnsave((char_u *)buf, buflen);
-	    if (p_tenc != NULL)
+	    ಆದರೆ (p_tenc != ಖಾಲಿ)
 	    {
 		opt_idx = findoption((char_u *)"termencoding");
-		if (opt_idx >= 0)
+		ಆದರೆ (opt_idx >= 0)
 		{
 		    options[opt_idx].def_val[VI_DEFAULT] = p_tenc;
 		    options[opt_idx].flags |= P_DEF_ALLOCED;
 		}
-		convert_setup(&input_conv, p_tenc, p_enc);
-		convert_setup(&output_conv, p_enc, p_tenc);
+		convert_ಸಿದ್ಧತೆ(&ಒಳಹರಿವು_conv, p_tenc, p_enc);
+		convert_ಸಿದ್ಧತೆ(&output_conv, p_enc, p_tenc);
 	    }
-	    else
-		p_tenc = empty_option;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		p_tenc = ಖಾಲಿಗಳು_option;
 	}
-#endif
-#if defined(MSWIN)
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(MSWIN)
 	// $HOME may have characters in active code page.
 	init_homedir();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	vim_free(p_enc);
 	p_enc = save_enc;
@@ -702,59 +702,59 @@ set_init_default_encoding(void)
  * Called only once from main(), just after creating the first buffer.
  * If "clean_arg" is TRUE Vim was started with --clean.
  */
-    void
-set_init_1(int clean_arg)
+    ಶೂನ್ಯ
+ಗಣ_init_1(ಪೂರ್ಣಾಂಕ clean_arg)
 {
-#ifdef FEAT_LANGMAP
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LANGMAP
     langmap_init();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Be Vi compatible by default
     p_cp = TRUE;
 
     // Use POSIX compatibility when $VIM_POSIX is set.
-    if (mch_getenv((char_u *)"VIM_POSIX") != NULL)
+    ಆದರೆ (mch_getenv((char_u *)"VIM_POSIX") != ಖಾಲಿ)
     {
-	set_string_default("cpo", (char_u *)CPO_ALL);
-	set_string_default("shm", (char_u *)SHM_POSIX);
+	ಗಣ_string_default("cpo", (char_u *)CPO_ALL);
+	ಗಣ_string_default("shm", (char_u *)SHM_POSIX);
     }
 
-    set_init_default_shell();
-    set_init_default_backupskip();
-    set_init_default_maxmemtot();
-    set_init_default_cdpath();
-    set_init_default_printencoding();
-#if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
-    set_init_default_printexpr();
-#endif
+    ಗಣ_init_default_shell();
+    ಗಣ_init_default_backupskip();
+    ಗಣ_init_default_maxmemtot();
+    ಗಣ_init_default_cdpath();
+    ಗಣ_init_default_printencoding();
+#ಆದರೆ defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+    ಗಣ_init_default_printexpr();
+#ಆದರೆ_ಅಂತ್ಯ
 
     /*
      * Set all the options (except the terminal options) to their default
      * value.  Also set the global value for local options.
      */
-    set_options_default(0);
+    ಗಣ_options_default(0);
 
-#ifdef UNIX
-    set_init_xdg_rtp();
-    set_init_restricted_mode();
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
+    ಗಣ_init_xdg_rtp();
+    ಗಣ_init_restricted_ಬಹುಲಕ();
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef CLEAN_RUNTIMEPATH
-    if (clean_arg)
-	set_init_clean_rtp();
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ CLEAN_RUNTIMEPATH
+    ಆದರೆ (clean_arg)
+	ಗಣ_init_clean_rtp();
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_GUI
-    if (found_reverse_arg)
-	set_option_value_give_err((char_u *)"bg", 0L, (char_u *)"dark", 0);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+    ಆದರೆ (ಸಿಕ್ಕಿತು_ಹಿಮ್ಮುಖ_arg)
+	ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"bg", 0L, (char_u *)"dark", 0);
+#ಆದರೆ_ಅಂತ್ಯ
 
     curbuf->b_p_initialized = true;
     curbuf->b_p_ac = -1;
     curbuf->b_p_ar = -1;	// no local 'autoread' value
-#ifdef HAVE_FSYNC
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_FSYNC
     curbuf->b_p_fs = -1;	// no local 'fsync' value
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     curbuf->b_p_ul = NO_LOCAL_UNDOLEVEL;
     check_buf_options(curbuf);
     check_win_options(curwin);
@@ -763,49 +763,49 @@ set_init_1(int clean_arg)
     // Must be before option_expand(), because that one needs vim_isIDc()
     didset_options();
 
-#ifdef FEAT_SPELL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SPELL
     // Use the current chartab for the generic chartab. This is not in
     // didset_options() because it only depends on 'encoding'.
     init_spell_chartab();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    set_init_default_encoding();
+    ಗಣ_init_default_encoding();
 
     // Expand environment variables and things like "~" for the defaults.
-    set_init_expand_env();
+    ಗಣ_init_expand_env();
 
     save_file_ff(curbuf);	// Buffer is unchanged
 
-#if defined(FEAT_ARABIC)
+#ಆದರೆ defined(FEAT_ARABIC)
     // Detect use of mlterm.
     // Mlterm is a terminal emulator akin to xterm that has some special
     // abilities (bidi namely).
     // NOTE: mlterm's author is being asked to 'set' a variable
     //       instead of an environment variable due to inheritance.
-    if (mch_getenv((char_u *)"MLTERM") != NULL)
-	set_option_value_give_err((char_u *)"tbidi", 1L, NULL, 0);
-#endif
+    ಆದರೆ (mch_getenv((char_u *)"MLTERM") != ಖಾಲಿ)
+	ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"tbidi", 1L, ಖಾಲಿ, 0);
+#ಆದರೆ_ಅಂತ್ಯ
 
     didset_options2();
 
-    set_init_lang_env();
+    ಗಣ_init_lang_env();
 
-#ifdef FEAT_MULTI_LANG
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MULTI_LANG
     // Set the default for 'helplang'.
-    set_helplang_default(get_mess_lang());
-#endif
+    ಗಣ_helplang_default(get_mess_lang());
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-static char_u *fencs_utf8_default = (char_u *)"ucs-bom,utf-8,default,latin1";
+ಸ್ಥಿರ char_u *fencs_utf8_default = (char_u *)"ucs-bom,utf-8,default,latin1";
 
 /*
  * Set the "fileencodings" option to the default value for when 'encoding' is
  * utf-8.
  */
-    void
-set_fencs_unicode(void)
+    ಶೂನ್ಯ
+ಗಣ_fencs_unicode(ಶೂನ್ಯ)
 {
-    set_string_option_direct((char_u *)"fencs", -1, fencs_utf8_default,
+    ಗಣ_string_option_ನೇರ((char_u *)"fencs", -1, fencs_utf8_default,
 								  OPT_FREE, 0);
 }
 
@@ -813,116 +813,116 @@ set_fencs_unicode(void)
  * Set an option to its default value.
  * This does not take care of side effects!
  */
-    static void
-set_option_default(
-    int		opt_idx,
-    int		opt_flags,	// OPT_FREE, OPT_LOCAL and/or OPT_GLOBAL
-    int		compatible)	// use Vi default value
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_option_default(
+    ಪೂರ್ಣಾಂಕ		opt_idx,
+    ಪೂರ್ಣಾಂಕ		opt_flags,	// OPT_FREE, OPT_LOCAL and/or OPT_GLOBAL
+    ಪೂರ್ಣಾಂಕ		compatible)	// use Vi default value
 {
     char_u	*varp;		// pointer to variable for current option
-    int		dvi;		// index in def_val[]
+    ಪೂರ್ಣಾಂಕ		dvi;		// index in def_val[]
     long_u	flags;
     long_u	*flagsp;
-    int		both = (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0;
+    ಪೂರ್ಣಾಂಕ		both = (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0;
 
     varp = get_varp_scope(&(options[opt_idx]), both ? OPT_LOCAL : opt_flags);
     flags = options[opt_idx].flags;
-    if (varp != NULL)	    // skip hidden option, nothing to do for it
+    ಆದರೆ (varp != ಖಾಲಿ)	    // skip hidden option, nothing to do for it
     {
 	dvi = ((flags & P_VI_DEF) || compatible) ? VI_DEFAULT : VIM_DEFAULT;
-	if (flags & P_STRING)
+	ಆದರೆ (flags & P_STRING)
 	{
 	    // 'fencs' default value depends on 'encoding'
-	    if (options[opt_idx].var == (char_u *)&p_fencs && enc_utf8)
-		set_fencs_unicode();
+	    ಆದರೆ (options[opt_idx].var == (char_u *)&p_fencs && enc_utf8)
+		ಗಣ_fencs_unicode();
 	    // Use set_string_option_direct() for local options to handle
 	    // freeing and allocating the value.
-	    else if (options[opt_idx].indir != PV_NONE)
-		set_string_option_direct(NULL, opt_idx,
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (options[opt_idx].indir != PV_NONE)
+		ಗಣ_string_option_ನೇರ(ಖಾಲಿ, opt_idx,
 				 options[opt_idx].def_val[dvi], opt_flags, 0);
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		if ((opt_flags & OPT_FREE) && (flags & P_ALLOCED))
+		ಆದರೆ ((opt_flags & OPT_FREE) && (flags & P_ALLOCED))
 		    free_string_option(*(char_u **)(varp));
 		*(char_u **)varp = options[opt_idx].def_val[dvi];
 		options[opt_idx].flags &= ~P_ALLOCED;
 	    }
 	}
-	else if (flags & P_NUM)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (flags & P_ಅಂಕೆ)
 	{
-	    if (options[opt_idx].indir == PV_SCROLL)
+	    ಆದರೆ (options[opt_idx].indir == PV_SCROLL)
 		win_comp_scroll(curwin);
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		long def_val = (long)(long_i)options[opt_idx].def_val[dvi];
+		ದೀರ್ಘ def_val = (ದೀರ್ಘ)(long_i)options[opt_idx].def_val[dvi];
 
-		if ((long *)varp == &curwin->w_p_so
-			|| (long *)varp == &curwin->w_p_siso
-			|| (long *)varp == &curwin->w_p_sop)
+		ಆದರೆ ((ದೀರ್ಘ *)varp == &curwin->w_p_so
+			|| (ದೀರ್ಘ *)varp == &curwin->w_p_siso
+			|| (ದೀರ್ಘ *)varp == &curwin->w_p_sop)
 		    // 'scrolloff', 'sidescrolloff', and 'scrolloffpad' local values have a
 		    // different default value than the global default.
-		    *(long *)varp = -1;
-		else
-		    *(long *)varp = def_val;
+		    *(ದೀರ್ಘ *)varp = -1;
+		ಇಲ್ಲದಿದ್ದರೆ
+		    *(ದೀರ್ಘ *)varp = def_val;
 		// May also set global value for local option.
-		if (both)
-		    *(long *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL) =
+		ಆದರೆ (both)
+		    *(ದೀರ್ಘ *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL) =
 								def_val;
 	    }
 	}
-	else	// P_BOOL
+	ಇಲ್ಲದಿದ್ದರೆ	// P_BOOL
 	{
 	    // the cast to long is required for Manx C, long_i is needed for
 	    // MSVC
-	    *(int *)varp = (int)(long)(long_i)options[opt_idx].def_val[dvi];
-#ifdef UNIX
+	    *(ಪೂರ್ಣಾಂಕ *)varp = (ಪೂರ್ಣಾಂಕ)(ದೀರ್ಘ)(long_i)options[opt_idx].def_val[dvi];
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
 	    // 'modeline' defaults to off for root
-	    if (options[opt_idx].indir == PV_ML && getuid() == ROOT_UID)
-		*(int *)varp = FALSE;
-#endif
+	    ಆದರೆ (options[opt_idx].indir == PV_ML && getuid() == ಬೇರು_UID)
+		*(ಪೂರ್ಣಾಂಕ *)varp = FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
 	    // May also set global value for local option.
-	    if (both)
-		*(int *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL) =
-								*(int *)varp;
+	    ಆದರೆ (both)
+		*(ಪೂರ್ಣಾಂಕ *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL) =
+								*(ಪೂರ್ಣಾಂಕ *)varp;
 	}
 
 	// The default value is not insecure.
 	flagsp = insecure_flag(curwin, opt_idx, opt_flags);
 	*flagsp = *flagsp & ~P_INSECURE;
-	if (both)
+	ಆದರೆ (both)
 	{
 	    flagsp = insecure_flag(curwin, opt_idx, OPT_LOCAL);
 	    *flagsp = *flagsp & ~P_INSECURE;
 	}
     }
 
-#ifdef FEAT_EVAL
-    set_option_sctx_idx(opt_idx, opt_flags, current_sctx);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಗಣ_option_sctx_idx(opt_idx, opt_flags, current_sctx);
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Set all options (except terminal options) to their default value.
  * When "opt_flags" is non-zero skip 'encoding'.
  */
-    static void
-set_options_default(
-    int		opt_flags)	// OPT_FREE, OPT_LOCAL and/or OPT_GLOBAL
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_options_default(
+    ಪೂರ್ಣಾಂಕ		opt_flags)	// OPT_FREE, OPT_LOCAL and/or OPT_GLOBAL
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
     win_T	*wp;
     tabpage_T	*tp;
 
-    for (i = 0; !istermoption_idx(i); i++)
-	if (!(options[i].flags & P_NODEFAULT)
+    ಗಾಗಿ (i = 0; !istermoption_idx(i); i++)
+	ಆದರೆ (!(options[i].flags & P_NODEFAULT)
 		&& (opt_flags == 0
 		    || (options[i].var != (char_u *)&p_enc
-#if defined(FEAT_CRYPT)
+#ಆದರೆ defined(FEAT_CRYPT)
 			&& options[i].var != (char_u *)&p_cm
-			&& options[i].var != (char_u *)&p_key
-#endif
+			&& options[i].var != (char_u *)&p_ಕೀಲಿ
+#ಆದರೆ_ಅಂತ್ಯ
 			)))
-	    set_option_default(i, opt_flags, p_cp);
+	    ಗಣ_option_default(i, opt_flags, p_cp);
 
     // The 'scroll' option must be computed for all windows.
     FOR_ALL_TAB_WINDOWS(tp, wp)
@@ -935,263 +935,263 @@ set_options_default(
  * Used for 'sh', 'backupskip' and 'term'.
  * When "escape" is TRUE escape spaces with a backslash.
  */
-    static void
-set_string_default_esc(char *name, char_u *val, int escape)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_string_default_esc(ಅಕ್ಷರ *name, char_u *val, ಪೂರ್ಣಾಂಕ escape)
 {
     char_u	*p;
-    int		opt_idx;
+    ಪೂರ್ಣಾಂಕ		opt_idx;
 
-    if (escape && vim_strchr(val, ' ') != NULL)
+    ಆದರೆ (escape && vim_strchr(val, ' ') != ಖಾಲಿ)
 	p = vim_strsave_escaped(val, (char_u *)" ");
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	p = vim_strsave(val);
-    if (p == NULL)		// we don't want a NULL
-	return;
+    ಆದರೆ (p == ಖಾಲಿ)		// we don't want a NULL
+	ಹಿಂತಿರುಗಿ;
 
     opt_idx = findoption((char_u *)name);
-    if (opt_idx < 0)
+    ಆದರೆ (opt_idx < 0)
     {
 	vim_free(p);
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if (options[opt_idx].flags & P_DEF_ALLOCED)
+    ಆದರೆ (options[opt_idx].flags & P_DEF_ALLOCED)
 	vim_free(options[opt_idx].def_val[VI_DEFAULT]);
     options[opt_idx].def_val[VI_DEFAULT] = p;
     options[opt_idx].flags |= P_DEF_ALLOCED;
 }
 
-    void
-set_string_default(char *name, char_u *val)
+    ಶೂನ್ಯ
+ಗಣ_string_default(ಅಕ್ಷರ *name, char_u *val)
 {
-    set_string_default_esc(name, val, FALSE);
+    ಗಣ_string_default_esc(name, val, FALSE);
 }
 
 /*
  * For an option value that contains comma separated items, find "newval" in
  * "origval".  Return NULL if not found.
  */
-    static char_u *
-find_dup_item(char_u *origval, char_u *newval, size_t newvallen, long_u flags)
+    ಸ್ಥಿರ char_u *
+ಕಂಡುಹಿಡಿ_dup_ಅಂಶ(char_u *origval, char_u *newval, size_t newvallen, long_u flags)
 {
-    int	    bs = 0;
+    ಪೂರ್ಣಾಂಕ	    bs = 0;
     char_u  *s;
 
-    if (origval == NULL)
-	return NULL;
+    ಆದರೆ (origval == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    for (s = origval; *s != NUL; ++s)
+    ಗಾಗಿ (s = origval; *s != NUL; ++s)
     {
-	if ((!(flags & P_COMMA)
+	ಆದರೆ ((!(flags & P_COMMA)
 		    || s == origval
 		    || (s[-1] == ',' && !(bs & 1)))
 		&& STRNCMP(s, newval, newvallen) == 0
 		&& (!(flags & P_COMMA)
 		    || s[newvallen] == ','
 		    || s[newvallen] == NUL))
-	    return s;
+	    ಹಿಂತಿರುಗಿ s;
 	// Count backslashes.  Only a comma with an even number of backslashes
 	// or a single backslash preceded by a comma before it is recognized as
 	// a separator.
-	if ((s > origval + 1
+	ಆದರೆ ((s > origval + 1
 		    && s[-1] == '\\'
 		    && s[-2] != ',')
 		|| (s == origval + 1
 		    && s[-1] == '\\'))
 	    ++bs;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    bs = 0;
     }
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Set the Vi-default value of a number option.
  * Used for 'lines' and 'columns'.
  */
-    void
-set_number_default(char *name, long val)
+    ಶೂನ್ಯ
+ಗಣ_ಸಂಖ್ಯೆ_default(ಅಕ್ಷರ *name, ದೀರ್ಘ val)
 {
-    int		opt_idx;
+    ಪೂರ್ಣಾಂಕ		opt_idx;
 
     opt_idx = findoption((char_u *)name);
-    if (opt_idx >= 0)
+    ಆದರೆ (opt_idx >= 0)
 	options[opt_idx].def_val[VI_DEFAULT] = (char_u *)(long_i)val;
 }
 
-#if defined(FEAT_PROP_POPUP)
+#ಆದರೆ defined(FEAT_PROP_POPUP)
 /*
  * Set all window-local and buffer-local options to the Vim default.
  * local-global options will use the global value.
  * When "do_buffer" is FALSE don't set buffer-local options.
  */
-    void
-set_local_options_default(win_T *wp, int do_buffer)
+    ಶೂನ್ಯ
+ಗಣ_local_options_default(win_T *wp, ಪೂರ್ಣಾಂಕ do_ಬಫರ್)
 {
     win_T	*save_curwin = curwin;
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
 
     curwin = wp;
-    curbuf = curwin->w_buffer;
-    block_autocmds();
+    curbuf = curwin->w_ಬಫರ್;
+    ಖಂಡ_autocmds();
 
-    for (i = 0; !istermoption_idx(i); i++)
+    ಗಾಗಿ (i = 0; !istermoption_idx(i); i++)
     {
-	struct vimoption    *p = &(options[i]);
+	ರಚನೆ vimoption    *p = &(options[i]);
 	char_u		    *varp = get_varp_scope(p, OPT_LOCAL);
 
-	if (p->indir != PV_NONE
-		&& (do_buffer || (p->indir & PV_BUF) == 0)
+	ಆದರೆ (p->indir != PV_NONE
+		&& (do_ಬಫರ್ || (p->indir & PV_BUF) == 0)
 		&& !(options[i].flags & P_NODEFAULT)
 		&& !optval_default(p, varp, FALSE))
-	    set_option_default(i, OPT_FREE|OPT_LOCAL, FALSE);
+	    ಗಣ_option_default(i, OPT_FREE|OPT_LOCAL, FALSE);
     }
 
     unblock_autocmds();
     curwin = save_curwin;
-    curbuf = curwin->w_buffer;
+    curbuf = curwin->w_ಬಫರ್;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(EXITFREE)
+#ಆದರೆ defined(EXITFREE)
 /*
  * Free all options.
  */
-    void
-free_all_options(void)
+    ಶೂನ್ಯ
+free_all_options(ಶೂನ್ಯ)
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
 
-    for (i = 0; !istermoption_idx(i); i++)
+    ಗಾಗಿ (i = 0; !istermoption_idx(i); i++)
     {
-	if (options[i].indir == PV_NONE)
+	ಆದರೆ (options[i].indir == PV_NONE)
 	{
 	    // global option: free value and default value.
-	    if ((options[i].flags & P_ALLOCED) && options[i].var != NULL)
+	    ಆದರೆ ((options[i].flags & P_ALLOCED) && options[i].var != ಖಾಲಿ)
 		free_string_option(*(char_u **)options[i].var);
-	    if (options[i].flags & P_DEF_ALLOCED)
+	    ಆದರೆ (options[i].flags & P_DEF_ALLOCED)
 		free_string_option(options[i].def_val[VI_DEFAULT]);
 	}
-	else if (options[i].var != VAR_WIN
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (options[i].var != VAR_WIN
 		&& (options[i].flags & P_STRING))
 	    // buffer-local option: free global value
 	    clear_string_option((char_u **)options[i].var);
     }
     free_operatorfunc_option();
     free_tagfunc_option();
-# if defined(FEAT_EVAL)
+# ಆದರೆ defined(FEAT_EVAL)
     free_findfunc_option();
 # endif
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 
 /*
  * Initialize the options, part two: After getting Rows and Columns and
  * setting 'term'.
  */
-    void
-set_init_2(void)
+    ಶೂನ್ಯ
+ಗಣ_init_2(ಶೂನ್ಯ)
 {
-    int		idx;
+    ಪೂರ್ಣಾಂಕ		idx;
 
     // 'scroll' defaults to half the window height. The stored default is zero,
     // which results in the actual value computed from the window height.
     idx = findoption((char_u *)"scroll");
-    if (idx >= 0 && !(options[idx].flags & P_WAS_SET))
-	set_option_default(idx, OPT_LOCAL, p_cp);
-    comp_col();
+    ಆದರೆ (idx >= 0 && !(options[idx].flags & P_WAS_ಗಣ))
+	ಗಣ_option_default(idx, OPT_LOCAL, p_cp);
+    comp_ಲಂಬಸಾಲು();
 
     // 'window' is only for backwards compatibility with Vi.
     // Default is Rows - 1.
-    if (!option_was_set((char_u *)"window"))
-	p_window = Rows - 1;
-    set_number_default("window", Rows - 1);
+    ಆದರೆ (!option_was_ಗಣ((char_u *)"window"))
+	p_ಕಿಟಕಿ = ಅಡ್ಡಸಾಲುಗಳು - 1;
+    ಗಣ_ಸಂಖ್ಯೆ_default("window", ಅಡ್ಡಸಾಲುಗಳು - 1);
 
     // For DOS console the default is always black.
-#if !((defined(MSWIN)) && !defined(FEAT_GUI))
+#ಆದರೆ !((defined(MSWIN)) && !defined(FEAT_GUI))
     // If 'background' wasn't set by the user, try guessing the value,
     // depending on the terminal name.  Only need to check for terminals
     // with a dark background, that can handle color.
     idx = findoption((char_u *)"bg");
-    if (idx >= 0 && !(options[idx].flags & P_WAS_SET)
-						 && *term_bg_default() == 'd')
+    ಆದರೆ (idx >= 0 && !(options[idx].flags & P_WAS_ಗಣ)
+						 && *ಪದ_bg_default() == 'd')
     {
-	set_string_option_direct(NULL, idx, (char_u *)"dark", OPT_FREE, 0);
+	ಗಣ_string_option_ನೇರ(ಖಾಲಿ, idx, (char_u *)"dark", OPT_FREE, 0);
 	// don't mark it as set, when starting the GUI it may be
 	// changed again
-	options[idx].flags &= ~P_WAS_SET;
+	options[idx].flags &= ~P_WAS_ಗಣ;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef CURSOR_SHAPE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ CURSOR_SHAPE
     parse_shape_opt(SHAPE_CURSOR);	// set cursor shapes from 'guicursor'
-#endif
-#ifdef FEAT_MOUSESHAPE
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MOUSESHAPE
     parse_shape_opt(SHAPE_MOUSE);	// set mouse shapes from 'mouseshape'
-#endif
-#ifdef FEAT_PRINTER
-    (void)parse_printoptions(NULL);	// parse 'printoptions' default value
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PRINTER
+    (ಶೂನ್ಯ)parse_printoptions(ಖಾಲಿ);	// parse 'printoptions' default value
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Initialize the options, part three: After reading the .vimrc
  */
-    void
-set_init_3(void)
+    ಶೂನ್ಯ
+ಗಣ_init_3(ಶೂನ್ಯ)
 {
-#if defined(UNIX) || defined(MSWIN)
+#ಆದರೆ defined(UNIX) || defined(MSWIN)
 /*
  * Set 'shellpipe' and 'shellredir', depending on the 'shell' option.
  * This is done after other initializations, where 'shell' might have been
  * set, but only if they have not been set before.
  */
     char_u  *p;
-    int	    idx_srr;
-    int	    do_srr;
+    ಪೂರ್ಣಾಂಕ	    idx_srr;
+    ಪೂರ್ಣಾಂಕ	    do_srr;
 # ifdef FEAT_QUICKFIX
-    int	    idx_sp;
-    int	    do_sp;
+    ಪೂರ್ಣಾಂಕ	    idx_sp;
+    ಪೂರ್ಣಾಂಕ	    do_sp;
 # endif
 
     idx_srr = findoption((char_u *)"srr");
-    if (idx_srr < 0)
+    ಆದರೆ (idx_srr < 0)
 	do_srr = FALSE;
-    else
-	do_srr = !(options[idx_srr].flags & P_WAS_SET);
+    ಇಲ್ಲದಿದ್ದರೆ
+	do_srr = !(options[idx_srr].flags & P_WAS_ಗಣ);
 # ifdef FEAT_QUICKFIX
     idx_sp = findoption((char_u *)"sp");
-    if (idx_sp < 0)
+    ಆದರೆ (idx_sp < 0)
 	do_sp = FALSE;
-    else
-	do_sp = !(options[idx_sp].flags & P_WAS_SET);
+    ಇಲ್ಲದಿದ್ದರೆ
+	do_sp = !(options[idx_sp].flags & P_WAS_ಗಣ);
 # endif
     p = get_isolated_shell_name();
-    if (p != NULL)
+    ಆದರೆ (p != ಖಾಲಿ)
     {
 	// Default for p_sp is "| tee", for p_srr is ">".
 	// For known shells it is changed here to include stderr.
-	if (	   fnamecmp(p, "csh") == 0
+	ಆದರೆ (	   fnamecmp(p, "csh") == 0
 		|| fnamecmp(p, "tcsh") == 0
-# if defined(MSWIN)	// also check with .exe extension
+# ಆದರೆ defined(MSWIN)	// also check with .exe extension
 		|| fnamecmp(p, "csh.exe") == 0
 		|| fnamecmp(p, "tcsh.exe") == 0
 # endif
 	   )
 	{
-# if defined(FEAT_QUICKFIX)
-	    if (do_sp)
+# ಆದರೆ defined(FEAT_QUICKFIX)
+	    ಆದರೆ (do_sp)
 	    {
 #  ifdef MSWIN
 		p_sp = (char_u *)">&";
-#  else
+#  ಇಲ್ಲದಿದ್ದರೆ
 		p_sp = (char_u *)"|& tee";
 #  endif
 		options[idx_sp].def_val[VI_DEFAULT] = p_sp;
 	    }
 # endif
-	    if (do_srr)
+	    ಆದರೆ (do_srr)
 	    {
 		p_srr = (char_u *)">&";
 		options[idx_srr].def_val[VI_DEFAULT] = p_srr;
@@ -1200,27 +1200,27 @@ set_init_3(void)
 # ifdef MSWIN
 	// Windows PowerShell output is UTF-16 with BOM so re-encode to the
 	// current codepage.
-	else if (   fnamecmp(p, "powershell") == 0
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (   fnamecmp(p, "powershell") == 0
 		    || fnamecmp(p, "powershell.exe") == 0
 		)
 	{
-#  if defined(FEAT_QUICKFIX)
-		if (do_sp)
+#  ಆದರೆ defined(FEAT_QUICKFIX)
+		ಆದರೆ (do_sp)
 		{
 		    p_sp = (char_u *)"2>&1 | Out-File -Encoding default";
 		    options[idx_sp].def_val[VI_DEFAULT] = p_sp;
 		}
 #  endif
-		if (do_srr)
+		ಆದರೆ (do_srr)
 		{
 		    p_srr = (char_u *)"2>&1 | Out-File -Encoding default";
 		    options[idx_srr].def_val[VI_DEFAULT] = p_srr;
 		}
 	}
 # endif
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    // Always use POSIX shell style redirection if we reach this
-	    if (       fnamecmp(p, "sh") == 0
+	    ಆದರೆ (       fnamecmp(p, "sh") == 0
 		    || fnamecmp(p, "ksh") == 0
 		    || fnamecmp(p, "mksh") == 0
 		    || fnamecmp(p, "pdksh") == 0
@@ -1246,21 +1246,21 @@ set_init_3(void)
 # endif
 		    )
 	    {
-# if defined(FEAT_QUICKFIX)
-		if (do_sp)
+# ಆದರೆ defined(FEAT_QUICKFIX)
+		ಆದರೆ (do_sp)
 		{
 #  ifdef MSWIN
 		    p_sp = (char_u *)">%s 2>&1";
-#  else
-		    if (fnamecmp(p, "pwsh") == 0)
+#  ಇಲ್ಲದಿದ್ದರೆ
+		    ಆದರೆ (fnamecmp(p, "pwsh") == 0)
 			p_sp = (char_u *)">%s 2>&1";
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 			p_sp = (char_u *)"2>&1| tee";
 #  endif
 		    options[idx_sp].def_val[VI_DEFAULT] = p_sp;
 		}
 # endif
-		if (do_srr)
+		ಆದರೆ (do_srr)
 		{
 		    p_srr = (char_u *)">%s 2>&1";
 		    options[idx_srr].def_val[VI_DEFAULT] = p_srr;
@@ -1268,9 +1268,9 @@ set_init_3(void)
 	    }
 	vim_free(p);
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(MSWIN)
+#ಆದರೆ defined(MSWIN)
     /*
      * Set 'shellcmdflag', 'shellxquote', and 'shellquote' depending on the
      * 'shell' option.
@@ -1286,30 +1286,30 @@ set_init_3(void)
      *
      * For Win32 p_sxq is set instead of p_shq to include shell redirection.
      */
-    if (strstr((char *)gettail(p_sh), "powershell") != NULL)
+    ಆದರೆ (ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು((ಅಕ್ಷರ *)gettail(p_sh), "powershell") != ಖಾಲಿ)
     {
-	int	idx_opt;
+	ಪೂರ್ಣಾಂಕ	idx_opt;
 
 	idx_opt = findoption((char_u *)"shcf");
-	if (idx_opt >= 0 && !(options[idx_opt].flags & P_WAS_SET))
+	ಆದರೆ (idx_opt >= 0 && !(options[idx_opt].flags & P_WAS_ಗಣ))
 	{
 	    p_shcf = (char_u*)"-Command";
 	    options[idx_opt].def_val[VI_DEFAULT] = p_shcf;
 	}
 
 	idx_opt = findoption((char_u *)"sxq");
-	if (idx_opt >= 0 && !(options[idx_opt].flags & P_WAS_SET))
+	ಆದರೆ (idx_opt >= 0 && !(options[idx_opt].flags & P_WAS_ಗಣ))
 	{
 	    p_sxq = (char_u*)"\"";
 	    options[idx_opt].def_val[VI_DEFAULT] = p_sxq;
 	}
     }
-    else if (strstr((char *)gettail(p_sh), "sh") != NULL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು((ಅಕ್ಷರ *)gettail(p_sh), "sh") != ಖಾಲಿ)
     {
-	int	idx3;
+	ಪೂರ್ಣಾಂಕ	idx3;
 
 	idx3 = findoption((char_u *)"shcf");
-	if (idx3 >= 0 && !(options[idx3].flags & P_WAS_SET))
+	ಆದರೆ (idx3 >= 0 && !(options[idx3].flags & P_WAS_ಗಣ))
 	{
 	    p_shcf = (char_u *)"-c";
 	    options[idx3].def_val[VI_DEFAULT] = p_shcf;
@@ -1317,15 +1317,15 @@ set_init_3(void)
 
 	// Somehow Win32 requires the quotes around the redirection too
 	idx3 = findoption((char_u *)"sxq");
-	if (idx3 >= 0 && !(options[idx3].flags & P_WAS_SET))
+	ಆದರೆ (idx3 >= 0 && !(options[idx3].flags & P_WAS_ಗಣ))
 	{
 	    p_sxq = (char_u *)"\"";
 	    options[idx3].def_val[VI_DEFAULT] = p_sxq;
 	}
     }
-    else if (strstr((char *)gettail(p_sh), "cmd.exe") != NULL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು((ಅಕ್ಷರ *)gettail(p_sh), "cmd.exe") != ಖಾಲಿ)
     {
-	int	idx3;
+	ಪೂರ್ಣಾಂಕ	idx3;
 
 	/*
 	 * cmd.exe on Windows will strip the first and last double quote given
@@ -1341,70 +1341,70 @@ set_init_3(void)
 	 * '"path with spaces/cmd" "a&b"'.
 	 */
 	idx3 = findoption((char_u *)"sxq");
-	if (idx3 >= 0 && !(options[idx3].flags & P_WAS_SET))
+	ಆದರೆ (idx3 >= 0 && !(options[idx3].flags & P_WAS_ಗಣ))
 	{
 	    p_sxq = (char_u *)"(";
 	    options[idx3].def_val[VI_DEFAULT] = p_sxq;
 	}
 
 	idx3 = findoption((char_u *)"shcf");
-	if (idx3 >= 0 && !(options[idx3].flags & P_WAS_SET))
+	ಆದರೆ (idx3 >= 0 && !(options[idx3].flags & P_WAS_ಗಣ))
 	{
 	    p_shcf = (char_u *)"/c";
 	    options[idx3].def_val[VI_DEFAULT] = p_shcf;
 	}
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (BUFEMPTY())
+    ಆದರೆ (BUFEMPTY())
     {
-	int idx_ffs = findoption((char_u *)"ffs");
+	ಪೂರ್ಣಾಂಕ idx_ffs = findoption((char_u *)"ffs");
 
 	// Apply the first entry of 'fileformats' to the initial buffer.
-	if (idx_ffs >= 0 && (options[idx_ffs].flags & P_WAS_SET))
-	    set_fileformat(default_fileformat(), OPT_LOCAL);
+	ಆದರೆ (idx_ffs >= 0 && (options[idx_ffs].flags & P_WAS_ಗಣ))
+	    ಗಣ_fileformat(default_fileformat(), OPT_LOCAL);
     }
 
-    set_title_defaults();
+    ಗಣ_title_defaults();
 }
 
-#if defined(FEAT_MULTI_LANG)
+#ಆದರೆ defined(FEAT_MULTI_LANG)
 /*
  * When 'helplang' is still at its default value, set it to "lang".
  * Only the first two characters of "lang" are used.
  */
-    void
-set_helplang_default(char_u *lang)
+    ಶೂನ್ಯ
+ಗಣ_helplang_default(char_u *lang)
 {
-    int		idx;
+    ಪೂರ್ಣಾಂಕ		idx;
     size_t	langlen;
 
-    if (lang == NULL)	// safety check
-	return;
+    ಆದರೆ (lang == ಖಾಲಿ)	// safety check
+	ಹಿಂತಿರುಗಿ;
 
     langlen = STRLEN(lang);
-    if (langlen < 2)	// safety check
-	return;
+    ಆದರೆ (langlen < 2)	// safety check
+	ಹಿಂತಿರುಗಿ;
 
     idx = findoption((char_u *)"hlg");
-    if (idx < 0 || (options[idx].flags & P_WAS_SET))
-	return;
+    ಆದರೆ (idx < 0 || (options[idx].flags & P_WAS_ಗಣ))
+	ಹಿಂತಿರುಗಿ;
 
-    if (options[idx].flags & P_ALLOCED)
+    ಆದರೆ (options[idx].flags & P_ALLOCED)
 	free_string_option(p_hlg);
     p_hlg = vim_strnsave(lang, langlen);
-    if (p_hlg == NULL)
-	p_hlg = empty_option;
-    else
+    ಆದರೆ (p_hlg == ಖಾಲಿ)
+	p_hlg = ಖಾಲಿಗಳು_option;
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// zh_CN becomes "cn", zh_TW becomes "tw"
-	if (STRNICMP(p_hlg, "zh_", 3) == 0 && langlen >= 5)
+	ಆದರೆ (STRNICMP(p_hlg, "zh_", 3) == 0 && langlen >= 5)
 	{
 	    p_hlg[0] = TOLOWER_ASC(p_hlg[3]);
 	    p_hlg[1] = TOLOWER_ASC(p_hlg[4]);
 	}
 	// any C like setting, such as C.UTF-8, becomes "en"
-	else if (langlen >= 1 && *p_hlg == 'C')
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (langlen >= 1 && *p_hlg == 'C')
 	{
 	    p_hlg[0] = 'e';
 	    p_hlg[1] = 'n';
@@ -1413,7 +1413,7 @@ set_helplang_default(char_u *lang)
     }
     options[idx].flags |= P_ALLOCED;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * 'title' and 'icon' only default to true if they have not been set or reset
@@ -1422,95 +1422,95 @@ set_helplang_default(char_u *lang)
  * they can be reset.  This reduces startup time when using X on a remote
  * machine.
  */
-    void
-set_title_defaults(void)
+    ಶೂನ್ಯ
+ಗಣ_title_defaults(ಶೂನ್ಯ)
 {
-    int	    idx1;
-    long    val;
+    ಪೂರ್ಣಾಂಕ	    idx1;
+    ದೀರ್ಘ    val;
 
     // If GUI is (going to be) used, we can always set the window title and
     // icon name.  Saves a bit of time, because the X11 display server does
     // not need to be contacted.
     idx1 = findoption((char_u *)"title");
-    if (idx1 >= 0 && !(options[idx1].flags & P_WAS_SET))
+    ಆದರೆ (idx1 >= 0 && !(options[idx1].flags & P_WAS_ಗಣ))
     {
-#ifdef FEAT_GUI
-	if (gui.starting || gui.in_use)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+	ಆದರೆ (gui.starting || gui.ಒಳ_use)
 	    val = TRUE;
-	else
-#endif
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 	    val = mch_can_restore_title();
 	options[idx1].def_val[VI_DEFAULT] = (char_u *)(long_i)val;
 	p_title = val;
     }
     idx1 = findoption((char_u *)"icon");
-    if (idx1 < 0 || (options[idx1].flags & P_WAS_SET))
+    ಆದರೆ (idx1 < 0 || (options[idx1].flags & P_WAS_ಗಣ))
     {
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-#ifdef FEAT_GUI
-    if (gui.starting || gui.in_use)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+    ಆದರೆ (gui.starting || gui.ಒಳ_use)
 	val = TRUE;
-    else
-#endif
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 	val = mch_can_restore_icon();
     options[idx1].def_val[VI_DEFAULT] = (char_u *)(long_i)val;
     p_icon = val;
 }
 
-    void
-ex_set(exarg_T *eap)
+    ಶೂನ್ಯ
+ex_ಗಣ(exarg_T *eap)
 {
-    int		flags = 0;
+    ಪೂರ್ಣಾಂಕ		flags = 0;
 
-    if (eap->cmdidx == CMD_setlocal)
+    ಆದರೆ (eap->cmdidx == CMD_setlocal)
 	flags = OPT_LOCAL;
-    else if (eap->cmdidx == CMD_setglobal)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (eap->cmdidx == CMD_setglobal)
 	flags = OPT_GLOBAL;
-#if defined(FEAT_EVAL) && defined(FEAT_BROWSE)
-    if ((cmdmod.cmod_flags & CMOD_BROWSE) && flags == 0)
+#ಆದರೆ defined(FEAT_EVAL) && defined(FEAT_BROWSE)
+    ಆದರೆ ((cmdmod.cmod_flags & CMOD_BROWSE) && flags == 0)
 	ex_options(eap);
-    else
-#endif
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
     {
-	if (eap->forceit)
+	ಆದರೆ (eap->forceit)
 	    flags |= OPT_ONECOLUMN;
-	(void)do_set(eap->arg, flags);
+	(ಶೂನ್ಯ)do_ಗಣ(eap->arg, flags);
     }
 }
 
 /*
  * :set boolean option prefix
  */
-typedef enum {
-    PREFIX_NO = 0,	// "no" prefix
-    PREFIX_NONE,	// no prefix
-    PREFIX_INV,		// "inv" prefix
-} set_prefix_T;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ {
+    ಪೂರ್ವಪ್ರತ್ಯಯ_NO = 0,	// "no" prefix
+    ಪೂರ್ವಪ್ರತ್ಯಯ_NONE,	// no prefix
+    ಪೂರ್ವಪ್ರತ್ಯಯ_INV,		// "inv" prefix
+} ಗಣ_ಪೂರ್ವಪ್ರತ್ಯಯ_T;
 
 /*
  * Return the prefix type for the option name in *argp.
  */
-    static set_prefix_T
-get_option_prefix(char_u **argp)
+    ಸ್ಥಿರ ಗಣ_ಪೂರ್ವಪ್ರತ್ಯಯ_T
+get_option_ಪೂರ್ವಪ್ರತ್ಯಯ(char_u **argp)
 {
-    int		prefix = PREFIX_NONE;
+    ಪೂರ್ಣಾಂಕ		ಪೂರ್ವಪ್ರತ್ಯಯ = ಪೂರ್ವಪ್ರತ್ಯಯ_NONE;
     char_u	*arg = *argp;
 
-    if (STRNCMP(arg, "no", 2) == 0 && STRNCMP(arg, "novice", 6) != 0)
+    ಆದರೆ (STRNCMP(arg, "no", 2) == 0 && STRNCMP(arg, "novice", 6) != 0)
     {
-	prefix = PREFIX_NO;
+	ಪೂರ್ವಪ್ರತ್ಯಯ = ಪೂರ್ವಪ್ರತ್ಯಯ_NO;
 	arg += 2;
     }
-    else if (STRNCMP(arg, "inv", 3) == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRNCMP(arg, "inv", 3) == 0)
     {
-	prefix = PREFIX_INV;
+	ಪೂರ್ವಪ್ರತ್ಯಯ = ಪೂರ್ವಪ್ರತ್ಯಯ_INV;
 	arg += 3;
     }
 
     *argp = arg;
-    return prefix;
+    ಹಿಂತಿರುಗಿ ಪೂರ್ವಪ್ರತ್ಯಯ;
 }
 
 /*
@@ -1521,84 +1521,84 @@ get_option_prefix(char_u **argp)
  * Returns FAIL if an option starting with "<" doesn't end with a ">",
  * otherwise returns OK.
  */
-    static int
-parse_option_name(char_u *arg, int *opt_idxp, int *lenp, int *keyp)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+parse_option_name(char_u *arg, ಪೂರ್ಣಾಂಕ *opt_idxp, ಪೂರ್ಣಾಂಕ *lenp, ಪೂರ್ಣಾಂಕ *keyp)
 {
-    int	key = 0;
-    int	len;
-    int	opt_idx;
+    ಪೂರ್ಣಾಂಕ	ಕೀಲಿ = 0;
+    ಪೂರ್ಣಾಂಕ	len;
+    ಪೂರ್ಣಾಂಕ	opt_idx;
 
-    if (*arg == '<')
+    ಆದರೆ (*arg == '<')
     {
 	opt_idx = -1;
 	// look out for <t_>;>
-	if (arg[1] == 't' && arg[2] == '_' && arg[3] && arg[4])
+	ಆದರೆ (arg[1] == 't' && arg[2] == '_' && arg[3] && arg[4])
 	    len = 5;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    len = 1;
-	    while (arg[len] != NUL && arg[len] != '>')
+	    ಆಗ (arg[len] != NUL && arg[len] != '>')
 		++len;
 	}
-	if (arg[len] != '>')
-	    return FAIL;
+	ಆದರೆ (arg[len] != '>')
+	    ಹಿಂತಿರುಗಿ FAIL;
 
 	arg[len] = NUL;			    // put NUL after name
-	if (arg[1] == 't' && arg[2] == '_') // could be term code
+	ಆದರೆ (arg[1] == 't' && arg[2] == '_') // could be term code
 	    opt_idx = findoption(arg + 1);
 	arg[len++] = '>';		    // restore '>'
-	if (opt_idx == -1)
-	    key = find_key_option(arg + 1, TRUE);
+	ಆದರೆ (opt_idx == -1)
+	    ಕೀಲಿ = ಕಂಡುಹಿಡಿ_ಕೀಲಿ_option(arg + 1, TRUE);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	int	nextchar;   // next non-white char after option name
+	ಪೂರ್ಣಾಂಕ	nextchar;   // next non-white char after option name
 
 	len = 0;
 	// The two characters after "t_" may not be alphanumeric.
-	if (arg[0] == 't' && arg[1] == '_' && arg[2] && arg[3])
+	ಆದರೆ (arg[0] == 't' && arg[1] == '_' && arg[2] && arg[3])
 	    len = 4;
-	else
-	    while (ASCII_ISALNUM(arg[len]) || arg[len] == '_')
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಆಗ (ASCII_ISALNUM(arg[len]) || arg[len] == '_')
 		++len;
 	nextchar = arg[len];
 	arg[len] = NUL;			    // put NUL after name
 	opt_idx = findoption(arg);
 	arg[len] = nextchar;		    // restore nextchar
-	if (opt_idx == -1)
-	    key = find_key_option(arg, FALSE);
+	ಆದರೆ (opt_idx == -1)
+	    ಕೀಲಿ = ಕಂಡುಹಿಡಿ_ಕೀಲಿ_option(arg, FALSE);
     }
 
-    *keyp = key;
+    *keyp = ಕೀಲಿ;
     *lenp = len;
     *opt_idxp = opt_idx;
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Get the option operator (+=, ^=, -=).
  */
-    static set_op_T
+    ಸ್ಥಿರ ಗಣ_op_T
 get_opt_op(char_u *arg)
 {
-    set_op_T op = OP_NONE;
+    ಗಣ_op_T op = OP_NONE;
 
-    if (*arg != NUL && *(arg + 1) == '=')
+    ಆದರೆ (*arg != NUL && *(arg + 1) == '=')
     {
-	if (*arg == '+')
+	ಆದರೆ (*arg == '+')
 	    op = OP_ADDING;		// "+="
-	else if (*arg == '^')
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*arg == '^')
 	    op = OP_PREPENDING;		// "^="
-	else if (*arg == '-')
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*arg == '-')
 	    op = OP_REMOVING;		// "-="
     }
 
-    return op;
+    ಹಿಂತಿರುಗಿ op;
 }
 
 // Options that are allowed in a modeline when 'modelinestrict' is on.
-static char *modeline_whitelist[] =
+ಸ್ಥಿರ ಅಕ್ಷರ *modeline_whitelist[] =
 {
     "autoindent",
     "cindent",
@@ -1621,19 +1621,19 @@ static char *modeline_whitelist[] =
     "textwidth",
     "varsofttabstop",
     "vartabstop",
-    NULL
+    ಖಾಲಿ
 };
 
 /*
  * Return TRUE if option "name" is in the modeline whitelist.
  */
-    static bool
-is_modeline_whitelisted(char *name)
+    ಸ್ಥಿರ bool
+is_modeline_whitelisted(ಅಕ್ಷರ *name)
 {
-    for (int i = 0; modeline_whitelist[i] != NULL; i++)
-	if (STRCMP(name, modeline_whitelist[i]) == 0)
-	    return true;
-    return false;
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; modeline_whitelist[i] != ಖಾಲಿ; i++)
+	ಆದರೆ (STRCMP(name, modeline_whitelist[i]) == 0)
+	    ಹಿಂತಿರುಗಿ true;
+    ಹಿಂತಿರುಗಿ false;
 }
 
 /*
@@ -1641,123 +1641,123 @@ is_modeline_whitelisted(char *name)
  * Returns FAIL if the option can be skipped or cannot be changed. Returns OK
  * if it can be changed.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 validate_opt_idx(
-	int opt_idx,
-	int opt_flags,
+	ಪೂರ್ಣಾಂಕ opt_idx,
+	ಪೂರ್ಣಾಂಕ opt_flags,
 	long_u flags,
-	char **errmsg,
-	set_prefix_T prefix)
+	ಅಕ್ಷರ **errmsg,
+	ಗಣ_ಪೂರ್ವಪ್ರತ್ಯಯ_T ಪೂರ್ವಪ್ರತ್ಯಯ)
 {
     // Skip all options that are not window-local (used when showing
     // an already loaded buffer in a window).
-    if ((opt_flags & OPT_WINONLY)
+    ಆದರೆ ((opt_flags & OPT_WINONLY)
 	    && (opt_idx < 0 || options[opt_idx].var != VAR_WIN))
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
 
     // Skip all options that are window-local (used for :vimgrep).
-    if ((opt_flags & OPT_NOWIN) && opt_idx >= 0
+    ಆದರೆ ((opt_flags & OPT_NOWIN) && opt_idx >= 0
 	    && options[opt_idx].var == VAR_WIN)
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
 
     // Disallow changing some options from modelines.
-    if (opt_flags & OPT_MODELINE)
+    ಆದರೆ (opt_flags & OPT_MODELINE)
     {
-	if (flags & (P_SECURE | P_NO_ML))
+	ಆದರೆ (flags & (P_SECURE | P_NO_ML))
 	{
-	    *errmsg = e_not_allowed_in_modeline;
-	    return FAIL;
+	    *errmsg = e_not_allowed_ಒಳ_modeline;
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
-	if ((flags & P_MLE) && !p_mle)
+	ಆದರೆ ((flags & P_MLE) && !p_mle)
 	{
-	    *errmsg = e_not_allowed_in_modeline_when_modelineexpr_is_off;
-	    return FAIL;
+	    *errmsg = e_not_allowed_ಒಳ_modeline_when_modelineexpr_is_off;
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
 	// When 'modelinestrict' is on, only whitelisted options may be
 	// set from a modeline.  Silently skip others.
-	if (p_mlstr && opt_idx >= 0)
+	ಆದರೆ (p_mlstr && opt_idx >= 0)
 	{
 	    // special case: allow disabling modeline
-	    if (options[opt_idx].indir == PV_ML && prefix == PREFIX_NO)
-		return OK;
-	    else if (!is_modeline_whitelisted(options[opt_idx].fullname))
-		return FAIL;
+	    ಆದರೆ (options[opt_idx].indir == PV_ML && ಪೂರ್ವಪ್ರತ್ಯಯ == ಪೂರ್ವಪ್ರತ್ಯಯ_NO)
+		ಹಿಂತಿರುಗಿ OK;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!is_modeline_whitelisted(options[opt_idx].fullname))
+		ಹಿಂತಿರುಗಿ FAIL;
 	}
-#ifdef FEAT_DIFF
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
 	// In diff mode some options are overruled.  This avoids that
 	// 'foldmethod' becomes "marker" instead of "diff" and that
 	// "wrap" gets set.
-	if (curwin->w_p_diff
+	ಆದರೆ (curwin->w_p_diff
 		&& opt_idx >= 0  // shut up coverity warning
 		&& (
 # ifdef FEAT_FOLDING
 		    options[opt_idx].indir == PV_FDM ||
 # endif
 		    options[opt_idx].indir == PV_WRAP))
-	    return FAIL;
-#endif
+	    ಹಿಂತಿರುಗಿ FAIL;
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
-#ifdef HAVE_SANDBOX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_SANDBOX
     // Disallow changing some options in the sandbox
-    if (sandbox != 0 && (flags & P_SECURE))
+    ಆದರೆ (sandbox != 0 && (flags & P_SECURE))
     {
-	*errmsg = e_not_allowed_in_sandbox;
-	return FAIL;
+	*errmsg = e_not_allowed_ಒಳ_sandbox;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Get the Vim/Vi default value for a string option.
  */
-    static char_u *
+    ಸ್ಥಿರ char_u *
 stropt_get_default_val(
-    int		opt_idx,
+    ಪೂರ್ಣಾಂಕ		opt_idx,
     char_u	*varp,
-    int		flags,
-    int		cp_val)
+    ಪೂರ್ಣಾಂಕ		flags,
+    ಪೂರ್ಣಾಂಕ		cp_val)
 {
     char_u	*newval;
 
     newval = options[opt_idx].def_val[((flags & P_VI_DEF) || cp_val)
 	? VI_DEFAULT : VIM_DEFAULT];
-    if ((char_u **)varp == &p_bg)
+    ಆದರೆ ((char_u **)varp == &p_bg)
     {
 	// guess the value of 'background'
-#ifdef FEAT_GUI
-	if (gui.in_use)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+	ಆದರೆ (gui.ಒಳ_use)
 	    newval = gui_bg_default();
-	else
-#endif
-	    newval = term_bg_default();
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	    newval = ಪದ_bg_default();
     }
-    else if ((char_u **)varp == &p_fencs && enc_utf8)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((char_u **)varp == &p_fencs && enc_utf8)
 	newval = fencs_utf8_default;
 
     // expand environment variables and ~ since the default value was
     // already expanded, only required when an environment variable was set
     // later
-    if (newval == NULL)
-	newval = empty_option;
-    else
+    ಆದರೆ (newval == ಖಾಲಿ)
+	newval = ಖಾಲಿಗಳು_option;
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	char_u *s = option_expand(opt_idx, newval);
-	if (s == NULL)
+	ಆದರೆ (s == ಖಾಲಿ)
 	    s = newval;
 	newval = vim_strsave(s);
     }
 
-    return newval;
+    ಹಿಂತಿರುಗಿ newval;
 }
 
 /*
  * Convert the 'backspace' option number value to a string: for adding,
  * prepending and removing string.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 opt_backspace_nr2str(
     char_u	*varp,
     char_u	**origval_p,
@@ -1765,29 +1765,29 @@ opt_backspace_nr2str(
     char_u	**origval_g_p,
     char_u	**oldval_p)
 {
-    int		i = getdigits((char_u **)varp);
+    ಪೂರ್ಣಾಂಕ		i = getdigits((char_u **)varp);
 
-    switch (i)
+    ಆಯ್ಕೆ (i)
     {
-	case 0:
-	    *(char_u **)varp = empty_option;
-	    break;
-	case 1:
+	ಸ್ಥಿತಿ 0:
+	    *(char_u **)varp = ಖಾಲಿಗಳು_option;
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ 1:
 	    *(char_u **)varp = vim_strnsave((char_u *)"indent,eol", STRLEN_LITERAL("indent,eol"));
-	    break;
-	case 2:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ 2:
 	    *(char_u **)varp = vim_strnsave((char_u *)"indent,eol,start", STRLEN_LITERAL("indent,eol,start"));
-	    break;
-	case 3:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ 3:
 	    *(char_u **)varp = vim_strnsave((char_u *)"indent,eol,nostop", STRLEN_LITERAL("indent,eol,nostop"));
-	    break;
+	    ನಿಲ್ಲಿಸು;
     }
     vim_free(*oldval_p);
-    if (*origval_p == *oldval_p)
+    ಆದರೆ (*origval_p == *oldval_p)
 	*origval_p = *(char_u **)varp;
-    if (*origval_l_p == *oldval_p)
+    ಆದರೆ (*origval_l_p == *oldval_p)
 	*origval_l_p = *(char_u **)varp;
-    if (*origval_g_p == *oldval_p)
+    ಆದರೆ (*origval_g_p == *oldval_p)
 	*origval_g_p = *(char_u **)varp;
     *oldval_p = *(char_u **)varp;
 }
@@ -1797,42 +1797,42 @@ opt_backspace_nr2str(
  * compatibility with Vim 3.0.
  * Note: 'argp' is a pointer to a char_u pointer and is updated.
  */
-    static char_u *
+    ಸ್ಥಿರ char_u *
 opt_whichwrap_nr2str(char_u **argp, char_u *whichwrap)
 {
     size_t  len = 0;
 
     *whichwrap = NUL;
-    int i = getdigits(argp);
-    if (i & 1)
+    ಪೂರ್ಣಾಂಕ i = getdigits(argp);
+    ಆದರೆ (i & 1)
     {
 	STRCPY(whichwrap, "b,");
 	len += 2;
     }
-    if (i & 2)
+    ಆದರೆ (i & 2)
     {
 	STRCPY(whichwrap + len, "s,");
 	len += 2;
     }
-    if (i & 4)
+    ಆದರೆ (i & 4)
     {
 	STRCPY(whichwrap + len, "h,l,");
 	len += 4;
     }
-    if (i & 8)
+    ಆದರೆ (i & 8)
     {
 	STRCPY(whichwrap + len, "<,>,");
 	len += 4;
     }
-    if (i & 16)
+    ಆದರೆ (i & 16)
     {
 	STRCPY(whichwrap + len, "[,],");
 	len += 4;
     }
-    if (*whichwrap != NUL)	// remove trailing ,
+    ಆದರೆ (*whichwrap != NUL)	// remove trailing ,
 	whichwrap[len - 1] = NUL;
 
-    return whichwrap;
+    ಹಿಂತಿರುಗಿ whichwrap;
 }
 
 /*
@@ -1840,25 +1840,25 @@ opt_whichwrap_nr2str(char_u **argp, char_u *whichwrap)
  * Can't use set_string_option_direct(), because we need to remove the
  * backslashes.
  */
-    static char_u *
-stropt_copy_value(
+    ಸ್ಥಿರ char_u *
+stropt_copy_ಮೌಲ್ಯ(
     char_u	*origval,
     char_u	**argp,
-    set_op_T	op,
-    int		flags UNUSED)
+    ಗಣ_op_T	op,
+    ಪೂರ್ಣಾಂಕ		flags ಬಳಸದ)
 {
     char_u	*arg = *argp;
-    unsigned	newlen;
+    ಚಿಹ್ನೆರಹಿತ	newlen;
     char_u	*newval;
-    char_u	*s = NULL;
+    char_u	*s = ಖಾಲಿ;
 
     // get a bit too much
-    newlen = (unsigned)STRLEN(arg) + 1;
-    if (op != OP_NONE)
-	newlen += (unsigned)STRLEN(origval) + 1;
+    newlen = (ಚಿಹ್ನೆರಹಿತ)STRLEN(arg) + 1;
+    ಆದರೆ (op != OP_NONE)
+	newlen += (ಚಿಹ್ನೆರಹಿತ)STRLEN(origval) + 1;
     newval = alloc(newlen);
-    if (newval == NULL)  // out of mem, don't change
-	return NULL;
+    ಆದರೆ (newval == ಖಾಲಿ)  // out of mem, don't change
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     s = newval;
 
     // Copy the string, skip over escaped chars.
@@ -1866,83 +1866,83 @@ stropt_copy_value(
     // are not removed, and keep backslash at start, for "\\machine\path",
     // but do remove it for "\\\\machine\\path".
     // The reverse is found in escape_option_str_cmdline().
-    while (*arg != NUL && !VIM_ISWHITE(*arg))
+    ಆಗ (*arg != NUL && !VIM_ISWHITE(*arg))
     {
-	int i;
+	ಪೂರ್ಣಾಂಕ i;
 
-	if (*arg == '\\' && arg[1] != NUL
-#ifdef BACKSLASH_IN_FILENAME
+	ಆದರೆ (*arg == '\\' && arg[1] != NUL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ BACKSLASH_ಒಳ_FILENAME
 		&& !((flags & P_EXPAND)
 		    && vim_isfilec(arg[1])
 		    && !VIM_ISWHITE(arg[1])
 		    && (arg[1] != '\\'
 			|| (s == newval && arg[2] != '\\')))
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	   )
 	    ++arg;	// remove backslash
-	if (has_mbyte && (i = (*mb_ptr2len)(arg)) > 1)
+	ಆದರೆ (has_mbyte && (i = (*mb_ptr2len)(arg)) > 1)
 	{
 	    // copy multibyte char
 	    mch_memmove(s, arg, (size_t)i);
 	    arg += i;
 	    s += i;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    *s++ = *arg++;
     }
     *s = NUL;
 
     *argp = arg;
-    return newval;
+    ಹಿಂತಿರುಗಿ newval;
 }
 
 /*
  * Expand environment variables and ~ in string option value 'newval'.
  */
-    static char_u *
+    ಸ್ಥಿರ char_u *
 stropt_expand_envvar(
-    int		opt_idx,
+    ಪೂರ್ಣಾಂಕ		opt_idx,
     char_u	*origval,
     char_u	*newval,
-    set_op_T	op)
+    ಗಣ_op_T	op)
 {
     char_u *s = option_expand(opt_idx, newval);
-    if (s == NULL)
-	return newval;
+    ಆದರೆ (s == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ newval;
 
     vim_free(newval);
-    unsigned newlen = (unsigned)STRLEN(s) + 1;
-    if (op != OP_NONE)
-	newlen += (unsigned)STRLEN(origval) + 1;
+    ಚಿಹ್ನೆರಹಿತ newlen = (ಚಿಹ್ನೆರಹಿತ)STRLEN(s) + 1;
+    ಆದರೆ (op != OP_NONE)
+	newlen += (ಚಿಹ್ನೆರಹಿತ)STRLEN(origval) + 1;
 
     newval = alloc(newlen);
-    if (newval == NULL)
-	return NULL;
+    ಆದರೆ (newval == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     STRCPY(newval, s);
 
-    return newval;
+    ಹಿಂತಿರುಗಿ newval;
 }
 
 /*
  * Concatenate the original and new values of a string option, adding a "," if
  * needed.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 stropt_concat_with_comma(
     char_u	*origval,
     char_u	*newval,
-    set_op_T	op,
-    int		flags)
+    ಗಣ_op_T	op,
+    ಪೂರ್ಣಾಂಕ		flags)
 {
-    int		len = 0;
+    ಪೂರ್ಣಾಂಕ		len = 0;
 
-    int comma = ((flags & P_COMMA) && *origval != NUL && *newval != NUL);
-    if (op == OP_ADDING)
+    ಪೂರ್ಣಾಂಕ comma = ((flags & P_COMMA) && *origval != NUL && *newval != NUL);
+    ಆದರೆ (op == OP_ADDING)
     {
-	len = (int)STRLEN(origval);
+	len = (ಪೂರ್ಣಾಂಕ)STRLEN(origval);
 	// strip a trailing comma, would get 2
-	if (comma && len > 1
+	ಆದರೆ (comma && len > 1
 		&& (flags & P_ONECOMMA) == P_ONECOMMA
 		&& origval[len - 1] == ','
 		&& origval[len - 2] != '\\')
@@ -1950,12 +1950,12 @@ stropt_concat_with_comma(
 	mch_memmove(newval + len + comma, newval, STRLEN(newval) + 1);
 	mch_memmove(newval, origval, (size_t)len);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	len = (int)STRLEN(newval);
+	len = (ಪೂರ್ಣಾಂಕ)STRLEN(newval);
 	STRMOVE(newval + len + comma, origval);
     }
-    if (comma)
+    ಆದರೆ (comma)
 	newval[len] = ',';
 }
 
@@ -1963,29 +1963,29 @@ stropt_concat_with_comma(
  * Remove a value from a string option.  Copy string option value in "origval"
  * to "newval" and then remove the string "strval" of length "len".
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 stropt_remove_val(
     char_u	*origval,
     char_u	*newval,
-    int		flags,
+    ಪೂರ್ಣಾಂಕ		flags,
     char_u	*strval,
-    int		len)
+    ಪೂರ್ಣಾಂಕ		len)
 {
     // Remove newval[] from origval[]. (Note: "len" has been set above
     // and is used here).
     STRCPY(newval, origval);
-    if (*strval)
+    ಆದರೆ (*strval)
     {
 	// may need to remove a comma
-	if (flags & P_COMMA)
+	ಆದರೆ (flags & P_COMMA)
 	{
-	    if (strval == origval)
+	    ಆದರೆ (strval == origval)
 	    {
 		// include comma after string
-		if (strval[len] == ',')
+		ಆದರೆ (strval[len] == ',')
 		    ++len;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		// include comma before string
 		--strval;
@@ -2002,71 +2002,71 @@ stropt_remove_val(
  * Returns a pointer to the found item in "src", or NULL if not found.
  * Sets "*itemlenp" to the length of the found item (up to ',' or NUL).
  */
-    static char_u *
-find_key_item(char_u *src, char_u *key, int keylen, int *itemlenp)
+    ಸ್ಥಿರ char_u *
+ಕಂಡುಹಿಡಿ_ಕೀಲಿ_ಅಂಶ(char_u *src, char_u *ಕೀಲಿ, ಪೂರ್ಣಾಂಕ keylen, ಪೂರ್ಣಾಂಕ *itemlenp)
 {
     char_u  *p = src;
 
-    while (*p != NUL)
+    ಆಗ (*p != NUL)
     {
 	// Check if this item starts with the same key
-	if ((p == src || *(p - 1) == ',')
-		&& STRNCMP(p, key, keylen) == 0)
+	ಆದರೆ ((p == src || *(p - 1) == ',')
+		&& STRNCMP(p, ಕೀಲಿ, keylen) == 0)
 	{
 	    // Find the end of this item
-	    char_u *end = vim_strchr(p, ',');
-	    if (end == NULL)
-		end = p + STRLEN(p);
-	    *itemlenp = (int)(end - p);
-	    return p;
+	    char_u *ಕೊನೆ = vim_strchr(p, ',');
+	    ಆದರೆ (ಕೊನೆ == ಖಾಲಿ)
+		ಕೊನೆ = p + STRLEN(p);
+	    *itemlenp = (ಪೂರ್ಣಾಂಕ)(ಕೊನೆ - p);
+	    ಹಿಂತಿರುಗಿ p;
 	}
 	++p;
     }
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Remove one item of length "itemlen" at position "item" from comma-separated
  * string "str" in-place.  Handles the comma before or after the item.
  */
-    static void
-remove_comma_item(char_u *str, char_u *item, int itemlen)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+remove_comma_ಅಂಶ(char_u *str, char_u *ಅಂಶ, ಪೂರ್ಣಾಂಕ itemlen)
 {
-    if (item[itemlen] == ',')
+    ಆದರೆ (ಅಂಶ[itemlen] == ',')
 	// Remove item and trailing comma
-	STRMOVE(item, item + itemlen + 1);
-    else if (item > str && *(item - 1) == ',')
+	STRMOVE(ಅಂಶ, ಅಂಶ + itemlen + 1);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಅಂಶ > str && *(ಅಂಶ - 1) == ',')
 	// Last item: remove leading comma and item
-	STRMOVE(item - 1, item + itemlen);
-    else
+	STRMOVE(ಅಂಶ - 1, ಅಂಶ + itemlen);
+    ಇಲ್ಲದಿದ್ದರೆ
 	// Only item
-	*item = NUL;
+	*ಅಂಶ = NUL;
 }
 
 /*
  * Remove all items matching "key" (with ':') from comma-separated string "str"
  * in-place.  If "skip" is not NULL, the item at that position is kept.
  */
-    static void
-remove_key_item(char_u *str, char_u *key, int keylen, char_u *skip)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+remove_ಕೀಲಿ_ಅಂಶ(char_u *str, char_u *ಕೀಲಿ, ಪೂರ್ಣಾಂಕ keylen, char_u *skip)
 {
-    int	    itemlen;
-    char_u  *found;
+    ಪೂರ್ಣಾಂಕ	    itemlen;
+    char_u  *ಸಿಕ್ಕಿತು;
 
-    while ((found = find_key_item(str, key, keylen, &itemlen)) != NULL)
+    ಆಗ ((ಸಿಕ್ಕಿತು = ಕಂಡುಹಿಡಿ_ಕೀಲಿ_ಅಂಶ(str, ಕೀಲಿ, keylen, &itemlen)) != ಖಾಲಿ)
     {
-	if (found == skip)
+	ಆದರೆ (ಸಿಕ್ಕಿತು == skip)
 	{
 	    // Search for the next match after this one.
-	    char_u *next = found + itemlen;
-	    if (*next == ',')
-		++next;
-	    found = find_key_item(next, key, keylen, &itemlen);
-	    if (found == NULL)
-		break;
+	    char_u *ಮುಂದಿನ = ಸಿಕ್ಕಿತು + itemlen;
+	    ಆದರೆ (*ಮುಂದಿನ == ',')
+		++ಮುಂದಿನ;
+	    ಸಿಕ್ಕಿತು = ಕಂಡುಹಿಡಿ_ಕೀಲಿ_ಅಂಶ(ಮುಂದಿನ, ಕೀಲಿ, keylen, &itemlen);
+	    ಆದರೆ (ಸಿಕ್ಕಿತು == ಖಾಲಿ)
+		ನಿಲ್ಲಿಸು;
 	}
 
-	remove_comma_item(str, found, itemlen);
+	remove_comma_ಅಂಶ(str, ಸಿಕ್ಕಿತು, itemlen);
     }
 }
 
@@ -2074,31 +2074,31 @@ remove_key_item(char_u *str, char_u *key, int keylen, char_u *skip)
  * Append a comma-separated item to the end of "str" in-place.
  * Adds a comma before the item if "str" is not empty.
  */
-    static void
-append_item(char_u *str, char_u *item, int item_len)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+append_ಅಂಶ(char_u *str, char_u *ಅಂಶ, ಪೂರ್ಣಾಂಕ ಅಂಶ_len)
 {
-    int len = (int)STRLEN(str);
+    ಪೂರ್ಣಾಂಕ len = (ಪೂರ್ಣಾಂಕ)STRLEN(str);
 
-    if (len > 0)
+    ಆದರೆ (len > 0)
 	str[len++] = ',';
-    mch_memmove(str + len, item, (size_t)item_len);
-    str[len + item_len] = NUL;
+    mch_memmove(str + len, ಅಂಶ, (size_t)ಅಂಶ_len);
+    str[len + ಅಂಶ_len] = NUL;
 }
 
 /*
  * Prepend a comma-separated item to the beginning of "str" in-place.
  * Adds a comma after the item if "str" is not empty.
  */
-    static void
-prepend_item(char_u *str, char_u *item, int item_len)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+prepend_ಅಂಶ(char_u *str, char_u *ಅಂಶ, ಪೂರ್ಣಾಂಕ ಅಂಶ_len)
 {
-    int len = (int)STRLEN(str);
-    int comma = (len > 0) ? 1 : 0;
+    ಪೂರ್ಣಾಂಕ len = (ಪೂರ್ಣಾಂಕ)STRLEN(str);
+    ಪೂರ್ಣಾಂಕ comma = (len > 0) ? 1 : 0;
 
-    mch_memmove(str + item_len + comma, str, (size_t)len + 1);
-    mch_memmove(str, item, (size_t)item_len);
-    if (comma)
-	str[item_len] = ',';
+    mch_memmove(str + ಅಂಶ_len + comma, str, (size_t)len + 1);
+    mch_memmove(str, ಅಂಶ, (size_t)ಅಂಶ_len);
+    ಆದರೆ (comma)
+	str[ಅಂಶ_len] = ',';
 }
 
 /*
@@ -2121,150 +2121,150 @@ prepend_item(char_u *str, char_u *item, int item_len)
  * normal add/remove logic).  Returns false if newval is a single non-colon
  * item, meaning the caller should use the existing code path.
  */
-    static bool
+    ಸ್ಥಿರ bool
 stropt_handle_keymatch(
     char_u	*origval,
     char_u	*newval,
-    set_op_T	op,
-    int		flags UNUSED)
+    ಗಣ_op_T	op,
+    ಪೂರ್ಣಾಂಕ		flags ಬಳಸದ)
 {
     char_u  *p;
-    char_u  *item_start;
+    char_u  *ಅಂಶ_ಆರಂಭ;
 
     // Check if newval contains any "key:value" item or multiple
     // comma-separated items.  If neither, let the caller use the existing
     // code path.
-    if (vim_strchr(newval, ':') == NULL && vim_strchr(newval, ',') == NULL)
-	return false;
+    ಆದರೆ (vim_strchr(newval, ':') == ಖಾಲಿ && vim_strchr(newval, ',') == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ false;
 
     // Work on a copy of newval for iteration.
     char_u *newval_copy = vim_strsave(newval);
-    if (newval_copy == NULL)
-	return false;
+    ಆದರೆ (newval_copy == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ false;
 
     // Build the result in newval.  Start with a copy of origval, then
     // modify it per-item.  newval buffer has room for origval + arg.
     STRCPY(newval, origval);
 
     // Process each item individually, modifying newval in-place.
-    item_start = newval_copy;
-    for (;;)
+    ಅಂಶ_ಆರಂಭ = newval_copy;
+    ಗಾಗಿ (;;)
     {
-	p = vim_strchr(item_start, ',');
-	int item_len = (p == NULL)
-			    ? (int)STRLEN(item_start) : (int)(p - item_start);
+	p = vim_strchr(ಅಂಶ_ಆರಂಭ, ',');
+	ಪೂರ್ಣಾಂಕ ಅಂಶ_len = (p == ಖಾಲಿ)
+			    ? (ಪೂರ್ಣಾಂಕ)STRLEN(ಅಂಶ_ಆರಂಭ) : (ಪೂರ್ಣಾಂಕ)(p - ಅಂಶ_ಆರಂಭ);
 
-	if (item_len > 0)
+	ಆದರೆ (ಅಂಶ_len > 0)
 	{
-	    char_u *colon = vim_strchr(item_start, ':');
-	    if (colon != NULL && colon < item_start + item_len)
+	    char_u *colon = vim_strchr(ಅಂಶ_ಆರಂಭ, ':');
+	    ಆದರೆ (colon != ಖಾಲಿ && colon < ಅಂಶ_ಆರಂಭ + ಅಂಶ_len)
 	    {
-		int keylen = (int)(colon - item_start) + 1;
+		ಪೂರ್ಣಾಂಕ keylen = (ಪೂರ್ಣಾಂಕ)(colon - ಅಂಶ_ಆರಂಭ) + 1;
 
-		if (op == OP_ADDING || op == OP_PREPENDING)
+		ಆದರೆ (op == OP_ADDING || op == OP_PREPENDING)
 		{
-		    int old_itemlen;
-		    char_u *found = find_key_item(newval, item_start,
+		    ಪೂರ್ಣಾಂಕ old_itemlen;
+		    char_u *ಸಿಕ್ಕಿತು = ಕಂಡುಹಿಡಿ_ಕೀಲಿ_ಅಂಶ(newval, ಅಂಶ_ಆರಂಭ,
 						       keylen, &old_itemlen);
-		    if (found != NULL)
+		    ಆದರೆ (ಸಿಕ್ಕಿತು != ಖಾಲಿ)
 		    {
-			if (old_itemlen == item_len
-				&& STRNCMP(found, item_start,
-							 item_len) == 0)
+			ಆದರೆ (old_itemlen == ಅಂಶ_len
+				&& STRNCMP(ಸಿಕ್ಕಿತು, ಅಂಶ_ಆರಂಭ,
+							 ಅಂಶ_len) == 0)
 			{
 			    // Exact duplicate: keep it in place, but
 			    // remove other items with the same key.
-			    remove_key_item(newval, item_start,
-							   keylen, found);
+			    remove_ಕೀಲಿ_ಅಂಶ(newval, ಅಂಶ_ಆರಂಭ,
+							   keylen, ಸಿಕ್ಕಿತು);
 			}
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
 			    // Key match with different value: remove all
 			    // items with the same key, then add.
-			    remove_key_item(newval, item_start,
-							    keylen, NULL);
-			    if (op == OP_PREPENDING)
-				prepend_item(newval, item_start, item_len);
-			    else
-				append_item(newval, item_start, item_len);
+			    remove_ಕೀಲಿ_ಅಂಶ(newval, ಅಂಶ_ಆರಂಭ,
+							    keylen, ಖಾಲಿ);
+			    ಆದರೆ (op == OP_PREPENDING)
+				prepend_ಅಂಶ(newval, ಅಂಶ_ಆರಂಭ, ಅಂಶ_len);
+			    ಇಲ್ಲದಿದ್ದರೆ
+				append_ಅಂಶ(newval, ಅಂಶ_ಆರಂಭ, ಅಂಶ_len);
 			}
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
 			// New item.
-			if (op == OP_PREPENDING)
-			    prepend_item(newval, item_start, item_len);
-			else
-			    append_item(newval, item_start, item_len);
+			ಆದರೆ (op == OP_PREPENDING)
+			    prepend_ಅಂಶ(newval, ಅಂಶ_ಆರಂಭ, ಅಂಶ_len);
+			ಇಲ್ಲದಿದ್ದರೆ
+			    append_ಅಂಶ(newval, ಅಂಶ_ಆರಂಭ, ಅಂಶ_len);
 		    }
 		}
-		else if (op == OP_REMOVING)
-		    remove_key_item(newval, item_start, keylen, NULL);
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (op == OP_REMOVING)
+		    remove_ಕೀಲಿ_ಅಂಶ(newval, ಅಂಶ_ಆರಂಭ, keylen, ಖಾಲಿ);
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		if (op == OP_ADDING || op == OP_PREPENDING)
+		ಆದರೆ (op == OP_ADDING || op == OP_PREPENDING)
 		{
-		    char_u *found = find_dup_item(newval, item_start,
-							   item_len, P_COMMA);
-		    if (found == NULL)
+		    char_u *ಸಿಕ್ಕಿತು = ಕಂಡುಹಿಡಿ_dup_ಅಂಶ(newval, ಅಂಶ_ಆರಂಭ,
+							   ಅಂಶ_len, P_COMMA);
+		    ಆದರೆ (ಸಿಕ್ಕಿತು == ಖಾಲಿ)
 		    {
 			// New item.
-			if (op == OP_PREPENDING)
-			    prepend_item(newval, item_start, item_len);
-			else
-			    append_item(newval, item_start, item_len);
+			ಆದರೆ (op == OP_PREPENDING)
+			    prepend_ಅಂಶ(newval, ಅಂಶ_ಆರಂಭ, ಅಂಶ_len);
+			ಇಲ್ಲದಿದ್ದರೆ
+			    append_ಅಂಶ(newval, ಅಂಶ_ಆರಂಭ, ಅಂಶ_len);
 		    }
 		    // else: exact duplicate — do nothing
 		}
-		else if (op == OP_REMOVING)
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (op == OP_REMOVING)
 		{
-		    char_u *found = find_dup_item(newval, item_start,
-							   item_len, P_COMMA);
-		    if (found != NULL)
-			remove_comma_item(newval, found, item_len);
+		    char_u *ಸಿಕ್ಕಿತು = ಕಂಡುಹಿಡಿ_dup_ಅಂಶ(newval, ಅಂಶ_ಆರಂಭ,
+							   ಅಂಶ_len, P_COMMA);
+		    ಆದರೆ (ಸಿಕ್ಕಿತು != ಖಾಲಿ)
+			remove_comma_ಅಂಶ(newval, ಸಿಕ್ಕಿತು, ಅಂಶ_len);
 		}
 	    }
 	}
 
-	if (p == NULL)
-	    break;
-	item_start = p + 1;
+	ಆದರೆ (p == ಖಾಲಿ)
+	    ನಿಲ್ಲಿಸು;
+	ಅಂಶ_ಆರಂಭ = p + 1;
     }
 
     vim_free(newval_copy);
 
-    return true;
+    ಹಿಂತಿರುಗಿ true;
 }
 
 /*
  * Remove flags that appear twice in the string option value 'newval'.
  */
-    static void
-stropt_remove_dupflags(char_u *newval, int flags)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+stropt_remove_dupflags(char_u *newval, ಪೂರ್ಣಾಂಕ flags)
 {
     char_u	*s = newval;
 
     // Remove flags that appear twice.
-    while (*s)
+    ಆಗ (*s)
     {
 	// if options have P_FLAGLIST and P_ONECOMMA such as 'whichwrap'
-	if (flags & P_ONECOMMA)
+	ಆದರೆ (flags & P_ONECOMMA)
 	{
-	    if (*s != ',' && *(s + 1) == ',' && vim_strchr(s + 2, *s) != NULL)
+	    ಆದರೆ (*s != ',' && *(s + 1) == ',' && vim_strchr(s + 2, *s) != ಖಾಲಿ)
 	    {
 		// Remove the duplicated value and the next comma.
 		STRMOVE(s, s + 2);
-		continue;
+		ಮುಂದುವರಿ;
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if ((!(flags & P_COMMA) || *s != ',')
-		    && vim_strchr(s + 1, *s) != NULL)
+	    ಆದರೆ ((!(flags & P_COMMA) || *s != ',')
+		    && vim_strchr(s + 1, *s) != ಖಾಲಿ)
 	    {
 		STRMOVE(s, s + 1);
-		continue;
+		ಮುಂದುವರಿ;
 	    }
 	}
 	++s;
@@ -2279,52 +2279,52 @@ stropt_remove_dupflags(char_u *newval, int flags)
  *	set {opt}={val}
  *	set {opt}:{val}
  */
-    static char_u *
+    ಸ್ಥಿರ char_u *
 stropt_get_newval(
-    int		nextchar,
-    int		opt_idx,
+    ಪೂರ್ಣಾಂಕ		nextchar,
+    ಪೂರ್ಣಾಂಕ		opt_idx,
     char_u	**argp,
     char_u	*varp,
     char_u	**origval_arg,
     char_u	**origval_l_arg,
     char_u	**origval_g_arg,
     char_u	**oldval_arg,
-    set_op_T    *op_arg,
-    int		flags,
-    int		cp_val)
+    ಗಣ_op_T    *op_arg,
+    ಪೂರ್ಣಾಂಕ		flags,
+    ಪೂರ್ಣಾಂಕ		cp_val)
 {
     char_u	*arg = *argp;
     char_u	*origval = *origval_arg;
     char_u	*origval_l = *origval_l_arg;
     char_u	*origval_g = *origval_g_arg;
     char_u	*oldval = *oldval_arg;
-    set_op_T    op = *op_arg;
-    char_u	*save_arg = NULL;
+    ಗಣ_op_T    op = *op_arg;
+    char_u	*save_arg = ಖಾಲಿ;
     char_u	*newval;
-    char_u	*s = NULL;
+    char_u	*s = ಖಾಲಿ;
     char_u	whichwrap[80];
 
-    if (nextchar == '&')	// set to default val
+    ಆದರೆ (nextchar == '&')	// set to default val
 	newval = stropt_get_default_val(opt_idx, varp, flags, cp_val);
-    else if (nextchar == '<')	// set to global val
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (nextchar == '<')	// set to global val
 	newval = vim_strsave(*(char_u **)get_varp_scope(
 					     &(options[opt_idx]), OPT_GLOBAL));
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	++arg;	// jump to after the '=' or ':'
 
 	// Set 'keywordprg' to ":help" if an empty
 	// value was passed to :set by the user.
-	if (varp == (char_u *)&p_kp && (*arg == NUL || *arg == ' '))
+	ಆದರೆ (varp == (char_u *)&p_kp && (*arg == NUL || *arg == ' '))
 	{
 	    save_arg = arg;
 	    arg = (char_u *)":help";
 	}
 	// Convert 'backspace' number to string
-	else if (varp == (char_u *)&p_bs && VIM_ISDIGIT(**(char_u **)varp))
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (varp == (char_u *)&p_bs && VIM_ISDIGIT(**(char_u **)varp))
 	    opt_backspace_nr2str(varp, &origval, &origval_l, &origval_g,
 								&oldval);
-	else if (varp == (char_u *)&p_ww && VIM_ISDIGIT(*arg))
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (varp == (char_u *)&p_ww && VIM_ISDIGIT(*arg))
 	{
 	    // Convert 'whichwrap' number to string, for backwards
 	    // compatibility with Vim 3.0.
@@ -2334,68 +2334,68 @@ stropt_get_newval(
 	}
 	// Remove '>' before 'dir' and 'bdir', for backwards compatibility with
 	// version 3.0
-	else if (*arg == '>' && (varp == (char_u *)&p_dir
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*arg == '>' && (varp == (char_u *)&p_dir
 		    || varp == (char_u *)&p_bdir))
 	    ++arg;
 
 	// Copy the new string into allocated memory.
-	newval = stropt_copy_value(origval, &arg, op, flags);
-	if (newval == NULL)
-	    goto done;
+	newval = stropt_copy_ಮೌಲ್ಯ(origval, &arg, op, flags);
+	ಆದರೆ (newval == ಖಾಲಿ)
+	    ಹೋಗು ಮುಗಿದ;
 
 	// Expand environment variables and ~.
 	// Don't do it when adding without inserting a comma.
-	if (op == OP_NONE || (flags & P_COMMA))
+	ಆದರೆ (op == OP_NONE || (flags & P_COMMA))
 	{
 	    newval = stropt_expand_envvar(opt_idx, origval, newval, op);
-	    if (newval == NULL)
-		goto done;
+	    ಆದರೆ (newval == ಖಾಲಿ)
+		ಹೋಗು ಮುಗಿದ;
 	}
 
 	// For P_COMMA|P_COLON options with "key:value" items: process
 	// each item individually by matching on the key part.  If
 	// handled, skip the normal add/remove logic below.
-	if ((flags & P_COMMA) && (flags & P_COLON) && op != OP_NONE
+	ಆದರೆ ((flags & P_COMMA) && (flags & P_COLON) && op != OP_NONE
 		&& stropt_handle_keymatch(origval, newval, op, flags))
 	    ;  // fully handled
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // locate newval[] in origval[] when removing it and when
 	    // adding to avoid duplicates
-	    int len = 0;
-	    if (op == OP_REMOVING || (flags & P_NODUP))
+	    ಪೂರ್ಣಾಂಕ len = 0;
+	    ಆದರೆ (op == OP_REMOVING || (flags & P_NODUP))
 	    {
-		len = (int)STRLEN(newval);
-		s = find_dup_item(origval, newval, len, flags);
+		len = (ಪೂರ್ಣಾಂಕ)STRLEN(newval);
+		s = ಕಂಡುಹಿಡಿ_dup_ಅಂಶ(origval, newval, len, flags);
 
 		// do not add if already there
-		if ((op == OP_ADDING || op == OP_PREPENDING) && s != NULL)
+		ಆದರೆ ((op == OP_ADDING || op == OP_PREPENDING) && s != ಖಾಲಿ)
 		{
 		    op = OP_NONE;
 		    STRCPY(newval, origval);
 		}
 
 		// if no duplicate, move pointer to end of original value
-		if (s == NULL)
-		    s = origval + (int)STRLEN(origval);
+		ಆದರೆ (s == ಖಾಲಿ)
+		    s = origval + (ಪೂರ್ಣಾಂಕ)STRLEN(origval);
 	    }
 
 	    // concatenate the two strings; add a ',' if needed
-	    if (op == OP_ADDING || op == OP_PREPENDING)
+	    ಆದರೆ (op == OP_ADDING || op == OP_PREPENDING)
 		stropt_concat_with_comma(origval, newval, op, flags);
-	    else if (op == OP_REMOVING)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (op == OP_REMOVING)
 		// Remove newval[] from origval[]. (Note: "len" has been
 		// set above and is used here).
 		stropt_remove_val(origval, newval, flags, s, len);
 	}
 
-	if (flags & P_FLAGLIST)
+	ಆದರೆ (flags & P_FLAGLIST)
 	    // Remove flags that appear twice.
 	    stropt_remove_dupflags(newval, flags);
     }
 
-done:
-    if (save_arg != NULL)
+ಮುಗಿದ:
+    ಆದರೆ (save_arg != ಖಾಲಿ)
 	arg = save_arg;  // arg was temporarily changed, restore it
     *argp = arg;
     *origval_arg = origval;
@@ -2404,54 +2404,54 @@ done:
     *oldval_arg = oldval;
     *op_arg = op;
 
-    return newval;
+    ಹಿಂತಿರುಗಿ newval;
 }
 
 /*
  * Part of do_set() for string options.
  * Returns FAIL on failure, do not process further options.
  */
-    static int
-do_set_option_string(
-	int	    opt_idx,
-	int	    opt_flags,
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+do_ಗಣ_option_string(
+	ಪೂರ್ಣಾಂಕ	    opt_idx,
+	ಪೂರ್ಣಾಂಕ	    opt_flags,
 	char_u	    **argp,
-	int	    nextchar,
-	set_op_T    op_arg,
+	ಪೂರ್ಣಾಂಕ	    nextchar,
+	ಗಣ_op_T    op_arg,
 	long_u	    flags,
-	int	    cp_val,
+	ಪೂರ್ಣಾಂಕ	    cp_val,
 	char_u	    *varp_arg,
-	char	    *errbuf,
+	ಅಕ್ಷರ	    *errbuf,
 	size_t	    errbuflen,
-	int	    *value_checked,
-	char	    **errmsg)
+	ಪೂರ್ಣಾಂಕ	    *ಮೌಲ್ಯ_checked,
+	ಅಕ್ಷರ	    **errmsg)
 {
     char_u	*arg = *argp;
-    set_op_T    op = op_arg;
+    ಗಣ_op_T    op = op_arg;
     char_u	*varp = varp_arg;
-    char_u	*oldval = NULL; // previous value if *varp
+    char_u	*oldval = ಖಾಲಿ; // previous value if *varp
     char_u	*newval;
-    char_u	*origval = NULL;
-    char_u	*origval_l = NULL;
-    char_u	*origval_g = NULL;
-#if defined(FEAT_EVAL)
-    char_u	*saved_origval = NULL;
-    char_u	*saved_origval_l = NULL;
-    char_u	*saved_origval_g = NULL;
-    char_u	*saved_newval = NULL;
-#endif
+    char_u	*origval = ಖಾಲಿ;
+    char_u	*origval_l = ಖಾಲಿ;
+    char_u	*origval_g = ಖಾಲಿ;
+#ಆದರೆ defined(FEAT_EVAL)
+    char_u	*saved_origval = ಖಾಲಿ;
+    char_u	*saved_origval_l = ಖಾಲಿ;
+    char_u	*saved_origval_g = ಖಾಲಿ;
+    char_u	*saved_newval = ಖಾಲಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 
     // When using ":set opt=val" for a global option
     // with a local value the local value will be
     // reset, use the global value here.
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0
-	    && ((int)options[opt_idx].indir & PV_BOTH))
+    ಆದರೆ ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0
+	    && ((ಪೂರ್ಣಾಂಕ)options[opt_idx].indir & PV_BOTH))
 	varp = options[opt_idx].var;
 
     // The old value is kept until we are sure that the new value is valid.
     oldval = *(char_u **)varp;
 
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+    ಆದರೆ ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
     {
 	origval_l = *(char_u **)get_varp_scope(
 			   &(options[opt_idx]), OPT_LOCAL);
@@ -2460,16 +2460,16 @@ do_set_option_string(
 
 	// A global-local string option might have an empty option as value to
 	// indicate that the global value should be used.
-	if (((int)options[opt_idx].indir & PV_BOTH)
-						  && origval_l == empty_option)
+	ಆದರೆ (((ಪೂರ್ಣಾಂಕ)options[opt_idx].indir & PV_BOTH)
+						  && origval_l == ಖಾಲಿಗಳು_option)
 	    origval_l = origval_g;
     }
 
     // When setting the local value of a global option, the old value may be
     // the global value.
-    if (((int)options[opt_idx].indir & PV_BOTH) && (opt_flags & OPT_LOCAL))
+    ಆದರೆ (((ಪೂರ್ಣಾಂಕ)options[opt_idx].indir & PV_BOTH) && (opt_flags & OPT_LOCAL))
 	origval = *(char_u **)get_varp(&options[opt_idx]);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	origval = oldval;
 
     // Get the new value for the option
@@ -2479,151 +2479,151 @@ do_set_option_string(
 
     // Set the new value.
     *(char_u **)(varp) = newval;
-    if (newval == NULL)
-	*(char_u **)(varp) = empty_option;
+    ಆದರೆ (newval == ಖಾಲಿ)
+	*(char_u **)(varp) = ಖಾಲಿಗಳು_option;
 
-#if defined(FEAT_EVAL)
-    if (!starting
+#ಆದರೆ defined(FEAT_EVAL)
+    ಆದರೆ (!starting
 # ifdef FEAT_CRYPT
-	    && options[opt_idx].indir != PV_KEY
+	    && options[opt_idx].indir != PV_ಕೀಲಿ
 # endif
-		      && origval != NULL && newval != NULL)
+		      && origval != ಖಾಲಿ && newval != ಖಾಲಿ)
     {
 	// origval may be freed by did_set_string_option(), make a copy.
 	saved_origval = vim_strsave(origval);
 	// newval (and varp) may become invalid if the buffer is closed by
 	// autocommands.
 	saved_newval = vim_strsave(newval);
-	if (origval_l != NULL)
+	ಆದರೆ (origval_l != ಖಾಲಿ)
 	    saved_origval_l = vim_strsave(origval_l);
-	if (origval_g != NULL)
+	ಆದರೆ (origval_g != ಖಾಲಿ)
 	    saved_origval_g = vim_strsave(origval_g);
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     {
 	long_u	*p = insecure_flag(curwin, opt_idx, opt_flags);
-	int	secure_saved = secure;
+	ಪೂರ್ಣಾಂಕ	secure_saved = secure;
 
 	// When an option is set in the sandbox, from a modeline or in secure
 	// mode, then deal with side effects in secure mode.  Also when the
 	// value was set with the P_INSECURE flag and is not completely
 	// replaced.
-	if ((opt_flags & OPT_MODELINE)
-#ifdef HAVE_SANDBOX
+	ಆದರೆ ((opt_flags & OPT_MODELINE)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_SANDBOX
 	      || sandbox != 0
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	      || (op != OP_NONE && (*p & P_INSECURE)))
 	    secure = 1;
 
 	// Handle side effects, and set the global value for ":set" on local
 	// options. Note: when setting 'syntax' or 'filetype' autocommands may
 	// be triggered that can cause havoc.
-	*errmsg = did_set_string_option(
+	*errmsg = did_ಗಣ_string_option(
 			opt_idx, (char_u **)varp, oldval, newval, errbuf,
-			errbuflen, opt_flags, op, value_checked);
+			errbuflen, opt_flags, op, ಮೌಲ್ಯ_checked);
 
 	secure = secure_saved;
     }
 
-#if defined(FEAT_EVAL)
-    if (*errmsg == NULL)
+#ಆದರೆ defined(FEAT_EVAL)
+    ಆದರೆ (*errmsg == ಖಾಲಿ)
 	trigger_optionset_string(opt_idx, opt_flags, saved_origval,
 			       saved_origval_l, saved_origval_g, saved_newval);
     vim_free(saved_origval);
     vim_free(saved_origval_l);
     vim_free(saved_origval_g);
     vim_free(saved_newval);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     *argp = arg;
-    return *errmsg == NULL ? OK : FAIL;
+    ಹಿಂತಿರುಗಿ *errmsg == ಖಾಲಿ ? OK : FAIL;
 }
 
 /*
  * Set a boolean option.
  * Returns an untranslated error message or NULL.
  */
-    static char *
-do_set_option_bool(
-    int		opt_idx,
-    int		opt_flags,
-    set_prefix_T prefix,
+    ಸ್ಥಿರ ಅಕ್ಷರ *
+do_ಗಣ_option_bool(
+    ಪೂರ್ಣಾಂಕ		opt_idx,
+    ಪೂರ್ಣಾಂಕ		opt_flags,
+    ಗಣ_ಪೂರ್ವಪ್ರತ್ಯಯ_T ಪೂರ್ವಪ್ರತ್ಯಯ,
     long_u	flags,
     char_u	*varp,
-    int		nextchar,
-    int		afterchar,
-    int		cp_val)
+    ಪೂರ್ಣಾಂಕ		nextchar,
+    ಪೂರ್ಣಾಂಕ		afterchar,
+    ಪೂರ್ಣಾಂಕ		cp_val)
 
 {
-    varnumber_T	value;
+    varnumber_T	ಮೌಲ್ಯ;
 
-    if (nextchar == '=' || nextchar == ':')
-	return e_invalid_argument;
-    if (opt_idx < 0 || varp == NULL)
-	return NULL;  // "cannot happen"
+    ಆದರೆ (nextchar == '=' || nextchar == ':')
+	ಹಿಂತಿರುಗಿ e_invalid_ವಾದ;
+    ಆದರೆ (opt_idx < 0 || varp == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;  // "cannot happen"
 
     // ":set opt!": invert
     // ":set opt&": reset to default value
     // ":set opt<": reset to global value
-    if (nextchar == '!')
-	value = *(int *)(varp) ^ 1;
-    else if (nextchar == '&')
-	value = (int)(long)(long_i)options[opt_idx].def_val[
+    ಆದರೆ (nextchar == '!')
+	ಮೌಲ್ಯ = *(ಪೂರ್ಣಾಂಕ *)(varp) ^ 1;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (nextchar == '&')
+	ಮೌಲ್ಯ = (ಪೂರ್ಣಾಂಕ)(ದೀರ್ಘ)(long_i)options[opt_idx].def_val[
 	    ((flags & P_VI_DEF) || cp_val) ? VI_DEFAULT : VIM_DEFAULT];
-    else if (nextchar == '<')
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (nextchar == '<')
     {
 	// For 'autoread' -1 means to use global value.
-	if ((int *)varp == &curbuf->b_p_ar && opt_flags == OPT_LOCAL)
-	    value = -1;
-	else if ((int *)varp == &curbuf->b_p_ac && opt_flags == OPT_LOCAL)
-	    value = -1;
-#ifdef HAVE_FSYNC
-	else if ((int *)varp == &curbuf->b_p_fs && opt_flags == OPT_LOCAL)
-	    value = -1;
-#endif
-	else
-	    value = *(int *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL);
+	ಆದರೆ ((ಪೂರ್ಣಾಂಕ *)varp == &curbuf->b_p_ar && opt_flags == OPT_LOCAL)
+	    ಮೌಲ್ಯ = -1;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((ಪೂರ್ಣಾಂಕ *)varp == &curbuf->b_p_ac && opt_flags == OPT_LOCAL)
+	    ಮೌಲ್ಯ = -1;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_FSYNC
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((ಪೂರ್ಣಾಂಕ *)varp == &curbuf->b_p_fs && opt_flags == OPT_LOCAL)
+	    ಮೌಲ್ಯ = -1;
+#ಆದರೆ_ಅಂತ್ಯ
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಮೌಲ್ಯ = *(ಪೂರ್ಣಾಂಕ *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// ":set invopt": invert
 	// ":set opt" or ":set noopt": set or reset
-	if (nextchar != NUL && !VIM_ISWHITE(afterchar))
-	    return e_trailing_characters;
-	if (prefix == PREFIX_INV)
-	    value = *(int *)(varp) ^ 1;
-	else
-	    value = prefix == PREFIX_NO ? 0 : 1;
+	ಆದರೆ (nextchar != NUL && !VIM_ISWHITE(afterchar))
+	    ಹಿಂತಿರುಗಿ e_trailing_characters;
+	ಆದರೆ (ಪೂರ್ವಪ್ರತ್ಯಯ == ಪೂರ್ವಪ್ರತ್ಯಯ_INV)
+	    ಮೌಲ್ಯ = *(ಪೂರ್ಣಾಂಕ *)(varp) ^ 1;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಮೌಲ್ಯ = ಪೂರ್ವಪ್ರತ್ಯಯ == ಪೂರ್ವಪ್ರತ್ಯಯ_NO ? 0 : 1;
     }
 
-    return set_bool_option(opt_idx, varp, (int)value, opt_flags);
+    ಹಿಂತಿರುಗಿ ಗಣ_bool_option(opt_idx, varp, (ಪೂರ್ಣಾಂಕ)ಮೌಲ್ಯ, opt_flags);
 }
 
 /*
  * Set a numeric option.
  * Returns an untranslated error message or NULL.
  */
-    static char *
-do_set_option_numeric(
-    int		opt_idx,
-    int		opt_flags,
+    ಸ್ಥಿರ ಅಕ್ಷರ *
+do_ಗಣ_option_numeric(
+    ಪೂರ್ಣಾಂಕ		opt_idx,
+    ಪೂರ್ಣಾಂಕ		opt_flags,
     char_u	**argp,
-    int		nextchar,
-    set_op_T	op,
+    ಪೂರ್ಣಾಂಕ		nextchar,
+    ಗಣ_op_T	op,
     long_u	flags,
-    int		cp_val,
+    ಪೂರ್ಣಾಂಕ		cp_val,
     char_u	*varp,
-    char	*errbuf,
+    ಅಕ್ಷರ	*errbuf,
     size_t	errbuflen)
 {
     char_u		*arg = *argp;
-    varnumber_T		value;
-    int			i;
-    char		*errmsg = NULL;
+    varnumber_T		ಮೌಲ್ಯ;
+    ಪೂರ್ಣಾಂಕ			i;
+    ಅಕ್ಷರ		*errmsg = ಖಾಲಿ;
 
-    if (opt_idx < 0 || varp == NULL)
-	return NULL;  // "cannot happen"
+    ಆದರೆ (opt_idx < 0 || varp == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;  // "cannot happen"
 		      //
     /*
      * Different ways to set a number option:
@@ -2636,186 +2636,186 @@ do_set_option_numeric(
      * other	    error
      */
     ++arg;
-    if (nextchar == '&')
-	value = (long)(long_i)options[opt_idx].def_val[
+    ಆದರೆ (nextchar == '&')
+	ಮೌಲ್ಯ = (ದೀರ್ಘ)(long_i)options[opt_idx].def_val[
 	    ((flags & P_VI_DEF) || cp_val) ? VI_DEFAULT : VIM_DEFAULT];
-    else if (nextchar == '<')
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (nextchar == '<')
     {
-	if ((long *)varp == &curbuf->b_p_ul && opt_flags == OPT_LOCAL)
+	ಆದರೆ ((ದೀರ್ಘ *)varp == &curbuf->b_p_ul && opt_flags == OPT_LOCAL)
 	    // for 'undolevels' NO_LOCAL_UNDOLEVEL means using the global value
-	    value = NO_LOCAL_UNDOLEVEL;
-	else if (opt_flags == OPT_LOCAL
-		    && ((long *)varp == &curwin->w_p_siso
-		     || (long *)varp == &curwin->w_p_so
-		     || (long *)varp == &curwin->w_p_sop))
+	    ಮೌಲ್ಯ = NO_LOCAL_UNDOLEVEL;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (opt_flags == OPT_LOCAL
+		    && ((ದೀರ್ಘ *)varp == &curwin->w_p_siso
+		     || (ದೀರ್ಘ *)varp == &curwin->w_p_so
+		     || (ದೀರ್ಘ *)varp == &curwin->w_p_sop))
 	    // for 'scrolloff'/'sidescrolloff'/'scrolloffpad' -1 means using the global value
-	    value = -1;
-	else
-	    value = *(long *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL);
+	    ಮೌಲ್ಯ = -1;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಮೌಲ್ಯ = *(ದೀರ್ಘ *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL);
     }
-    else if (((long *)varp == &p_wc || (long *)varp == &p_wcm)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (((ದೀರ್ಘ *)varp == &p_wc || (ದೀರ್ಘ *)varp == &p_wcm)
 	    && (*arg == '<'
 		|| *arg == '^'
 		|| (*arg != NUL
 		    && (!arg[1] || VIM_ISWHITE(arg[1]))
 		    && !VIM_ISDIGIT(*arg))))
     {
-	value = string_to_key(arg, FALSE);
-	if (value == 0)
+	ಮೌಲ್ಯ = string_ಗಮ್ಯ_ಕೀಲಿ(arg, FALSE);
+	ಆದರೆ (ಮೌಲ್ಯ == 0)
 	{
-	    errmsg = e_invalid_argument;
-	    goto skip;
+	    errmsg = e_invalid_ವಾದ;
+	    ಹೋಗು skip;
 	}
     }
-    else if (*arg == '-' || VIM_ISDIGIT(*arg))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*arg == '-' || VIM_ISDIGIT(*arg))
     {
 	// Allow negative (for 'undolevels'), octal and hex numbers.
-	vim_str2nr(arg, NULL, &i, STR2NR_ALL, &value, NULL, 0, TRUE, NULL);
-	if (i == 0 || (arg[i] != NUL && !VIM_ISWHITE(arg[i])))
+	vim_str2nr(arg, ಖಾಲಿ, &i, STR2NR_ALL, &ಮೌಲ್ಯ, ಖಾಲಿ, 0, TRUE, ಖಾಲಿ);
+	ಆದರೆ (i == 0 || (arg[i] != NUL && !VIM_ISWHITE(arg[i])))
 	{
-	    errmsg = e_number_required_after_equal;
-	    goto skip;
+	    errmsg = e_ಸಂಖ್ಯೆ_required_after_equal;
+	    ಹೋಗು skip;
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	errmsg = e_number_required_after_equal;
-	goto skip;
+	errmsg = e_ಸಂಖ್ಯೆ_required_after_equal;
+	ಹೋಗು skip;
     }
 
-    if (op == OP_ADDING)
-	value = *(long *)varp + value;
-    else if (op == OP_PREPENDING)
-	value = *(long *)varp * value;
-    else if (op == OP_REMOVING)
-	value = *(long *)varp - value;
+    ಆದರೆ (op == OP_ADDING)
+	ಮೌಲ್ಯ = *(ದೀರ್ಘ *)varp + ಮೌಲ್ಯ;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (op == OP_PREPENDING)
+	ಮೌಲ್ಯ = *(ದೀರ್ಘ *)varp * ಮೌಲ್ಯ;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (op == OP_REMOVING)
+	ಮೌಲ್ಯ = *(ದೀರ್ಘ *)varp - ಮೌಲ್ಯ;
 
-    if ((long *)varp == &curwin->w_p_sop && value < -1)
+    ಆದರೆ ((ದೀರ್ಘ *)varp == &curwin->w_p_sop && ಮೌಲ್ಯ < -1)
     {
-	errmsg = e_invalid_argument;
-	goto skip;
+	errmsg = e_invalid_ವಾದ;
+	ಹೋಗು skip;
     }
 
-    errmsg = set_num_option(opt_idx, varp, value, errbuf, errbuflen,
+    errmsg = ಗಣ_ಅಂಕೆ_option(opt_idx, varp, ಮೌಲ್ಯ, errbuf, errbuflen,
 								opt_flags);
 
 skip:
     *argp = arg;
-    return errmsg;
+    ಹಿಂತಿರುಗಿ errmsg;
 }
 
 /*
  * Set a key code (t_xx) option
  */
-    static char *
-do_set_option_keycode(char_u **argp, char_u *key_name, int nextchar)
+    ಸ್ಥಿರ ಅಕ್ಷರ *
+do_ಗಣ_option_keycode(char_u **argp, char_u *ಕೀಲಿ_name, ಪೂರ್ಣಾಂಕ nextchar)
 {
     char_u	*arg = *argp;
     char_u	*p;
 
-    if (nextchar == '&')
+    ಆದರೆ (nextchar == '&')
     {
-	if (add_termcap_entry(key_name, TRUE) == FAIL)
-	    return e_not_found_in_termcap;
+	ಆದರೆ (ಕೂಡಿಸು_termcap_ನಮೂದು(ಕೀಲಿ_name, TRUE) == FAIL)
+	    ಹಿಂತಿರುಗಿ e_not_ಸಿಕ್ಕಿತು_ಒಳ_termcap;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	++arg; // jump to after the '=' or ':'
-	for (p = arg; *p && !VIM_ISWHITE(*p); ++p)
-	    if (*p == '\\' && p[1] != NUL)
+	ಗಾಗಿ (p = arg; *p && !VIM_ISWHITE(*p); ++p)
+	    ಆದರೆ (*p == '\\' && p[1] != NUL)
 		++p;
 	nextchar = *p;
 	*p = NUL;
-	add_termcode(key_name, arg, FALSE);
+	ಕೂಡಿಸು_termcode(ಕೀಲಿ_name, arg, FALSE);
 	*p = nextchar;
     }
-    if (full_screen)
+    ಆದರೆ (ತುಂಬಿದ_screen)
 	ttest(FALSE);
     redraw_all_later(UPD_CLEAR);
 
     *argp = arg;
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Set an option to a new value.
  */
-    static char *
-do_set_option_value(
-    int		opt_idx,
-    int		opt_flags,
+    ಸ್ಥಿರ ಅಕ್ಷರ *
+do_ಗಣ_option_ಮೌಲ್ಯ(
+    ಪೂರ್ಣಾಂಕ		opt_idx,
+    ಪೂರ್ಣಾಂಕ		opt_flags,
     char_u	**argp,
-    set_prefix_T prefix,
-    set_op_T	op,
+    ಗಣ_ಪೂರ್ವಪ್ರತ್ಯಯ_T ಪೂರ್ವಪ್ರತ್ಯಯ,
+    ಗಣ_op_T	op,
     long_u	flags,
     char_u	*varp,
-    char_u	*key_name,
-    int		nextchar,
-    int		afterchar,
-    int		cp_val,
-    int		*stopopteval,
-    char	*errbuf,
+    char_u	*ಕೀಲಿ_name,
+    ಪೂರ್ಣಾಂಕ		nextchar,
+    ಪೂರ್ಣಾಂಕ		afterchar,
+    ಪೂರ್ಣಾಂಕ		cp_val,
+    ಪೂರ್ಣಾಂಕ		*stopopteval,
+    ಅಕ್ಷರ	*errbuf,
     size_t	errbuflen)
 {
-    int		value_checked = FALSE;
-    char	*errmsg = NULL;
+    ಪೂರ್ಣಾಂಕ		ಮೌಲ್ಯ_checked = FALSE;
+    ಅಕ್ಷರ	*errmsg = ಖಾಲಿ;
     char_u	*arg = *argp;
 
-    if (flags & P_BOOL)
+    ಆದರೆ (flags & P_BOOL)
     {
 	// boolean option
-	errmsg = do_set_option_bool(opt_idx, opt_flags, prefix, flags, varp,
+	errmsg = do_ಗಣ_option_bool(opt_idx, opt_flags, ಪೂರ್ವಪ್ರತ್ಯಯ, flags, varp,
 						nextchar, afterchar, cp_val);
-	if (errmsg != NULL)
-	    goto skip;
+	ಆದರೆ (errmsg != ಖಾಲಿ)
+	    ಹೋಗು skip;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// numeric or string option
-	if (vim_strchr((char_u *)"=:&<", nextchar) == NULL
-		|| prefix != PREFIX_NONE)
+	ಆದರೆ (vim_strchr((char_u *)"=:&<", nextchar) == ಖಾಲಿ
+		|| ಪೂರ್ವಪ್ರತ್ಯಯ != ಪೂರ್ವಪ್ರತ್ಯಯ_NONE)
 	{
-	    errmsg = e_invalid_argument;
-	    goto skip;
+	    errmsg = e_invalid_ವಾದ;
+	    ಹೋಗು skip;
 	}
 
-	if (flags & P_NUM)
+	ಆದರೆ (flags & P_ಅಂಕೆ)
 	{
 	    // numeric option
-	    errmsg = do_set_option_numeric(opt_idx, opt_flags, &arg, nextchar,
+	    errmsg = do_ಗಣ_option_numeric(opt_idx, opt_flags, &arg, nextchar,
 						op, flags, cp_val, varp,
 						errbuf, errbuflen);
-	    if (errmsg != NULL)
-		goto skip;
+	    ಆದರೆ (errmsg != ಖಾಲಿ)
+		ಹೋಗು skip;
 	}
-	else if (opt_idx >= 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (opt_idx >= 0)
 	{
 	    // string option
-	    if (do_set_option_string(opt_idx, opt_flags, &arg, nextchar, op,
+	    ಆದರೆ (do_ಗಣ_option_string(opt_idx, opt_flags, &arg, nextchar, op,
 					flags, cp_val, varp, errbuf, errbuflen,
-					&value_checked, &errmsg) == FAIL)
+					&ಮೌಲ್ಯ_checked, &errmsg) == FAIL)
 	    {
-		if (errmsg != NULL)
-		    goto skip;
+		ಆದರೆ (errmsg != ಖಾಲಿ)
+		    ಹೋಗು skip;
 		*stopopteval = TRUE;
-		goto skip;
+		ಹೋಗು skip;
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // key code option
-	    errmsg = do_set_option_keycode(&arg, key_name, nextchar);
-	    if (errmsg != NULL)
-		goto skip;
+	    errmsg = do_ಗಣ_option_keycode(&arg, ಕೀಲಿ_name, nextchar);
+	    ಆದರೆ (errmsg != ಖಾಲಿ)
+		ಹೋಗು skip;
 	}
     }
 
-    if (opt_idx >= 0)
-	did_set_option(opt_idx, opt_flags, op == OP_NONE, value_checked);
+    ಆದರೆ (opt_idx >= 0)
+	did_ಗಣ_option(opt_idx, opt_flags, op == OP_NONE, ಮೌಲ್ಯ_checked);
 
 skip:
     *argp = arg;
-    return errmsg;
+    ಹಿಂತಿರುಗಿ errmsg;
 }
 
 /*
@@ -2823,199 +2823,199 @@ skip:
  * Return NULL if OK, return an untranslated error message when something is
  * wrong.  "errbuf[errbuflen]" can be used to create the error message.
  */
-    static char *
-do_set_option(
-    int		opt_flags,
+    ಸ್ಥಿರ ಅಕ್ಷರ *
+do_ಗಣ_option(
+    ಪೂರ್ಣಾಂಕ		opt_flags,
     char_u	**argp,
-    char_u	*arg_start,
+    char_u	*arg_ಆರಂಭ,
     char_u	**startarg,
-    int		*did_show,
-    int		*stopopteval,
-    char	*errbuf,
+    ಪೂರ್ಣಾಂಕ		*did_show,
+    ಪೂರ್ಣಾಂಕ		*stopopteval,
+    ಅಕ್ಷರ	*errbuf,
     size_t	errbuflen)
 {
-    int		opt_idx;
+    ಪೂರ್ಣಾಂಕ		opt_idx;
     char_u	*arg;
-    set_prefix_T prefix;	// no prefix, "no" prefix or "inv" prefix
-    set_op_T	op;
+    ಗಣ_ಪೂರ್ವಪ್ರತ್ಯಯ_T ಪೂರ್ವಪ್ರತ್ಯಯ;	// no prefix, "no" prefix or "inv" prefix
+    ಗಣ_op_T	op;
     long_u	flags;		// flags for current option
     char_u	*varp;		// pointer to variable for current option
-    char_u	key_name[2];
-    int		nextchar;	// next non-white char after option name
-    int		afterchar;	// character just after option name
-    char	*errmsg = NULL;
-    int		key;
-    int		len;
+    char_u	ಕೀಲಿ_name[2];
+    ಪೂರ್ಣಾಂಕ		nextchar;	// next non-white char after option name
+    ಪೂರ್ಣಾಂಕ		afterchar;	// character just after option name
+    ಅಕ್ಷರ	*errmsg = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		ಕೀಲಿ;
+    ಪೂರ್ಣಾಂಕ		len;
 
-    prefix = get_option_prefix(argp);
+    ಪೂರ್ವಪ್ರತ್ಯಯ = get_option_ಪೂರ್ವಪ್ರತ್ಯಯ(argp);
     arg = *argp;
 
     // find end of name
-    key = 0;
-    if (parse_option_name(arg, &opt_idx, &len, &key) == FAIL)
-	return e_invalid_argument;
+    ಕೀಲಿ = 0;
+    ಆದರೆ (parse_option_name(arg, &opt_idx, &len, &ಕೀಲಿ) == FAIL)
+	ಹಿಂತಿರುಗಿ e_invalid_ವಾದ;
 
     // remember character after option name
     afterchar = arg[len];
 
-    if (in_vim9script())
+    ಆದರೆ (ಒಳ_vim9script())
     {
 	char_u *p = skipwhite(arg + len);
 
 	// disallow white space before =val, +=val, -=val, ^=val
-	if (p > arg + len && (p[0] == '='
-		    || (vim_strchr((char_u *)"+-^", p[0]) != NULL
+	ಆದರೆ (p > arg + len && (p[0] == '='
+		    || (vim_strchr((char_u *)"+-^", p[0]) != ಖಾಲಿ
 			&& p[1] == '=')))
 	{
 	    errmsg = e_no_white_space_allowed_between_option_and;
 	    arg = p;
 	    *startarg = p;
-	    goto skip;
+	    ಹೋಗು skip;
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	// skip white space, allow ":set ai  ?", ":set hlsearch  !"
-	while (VIM_ISWHITE(arg[len]))
+	ಆಗ (VIM_ISWHITE(arg[len]))
 	    ++len;
 
     op = get_opt_op(arg + len);
-    if (op != OP_NONE)
+    ಆದರೆ (op != OP_NONE)
 	len++;
 
     nextchar = arg[len];
 
-    if (opt_idx == -1 && key == 0)	// found a mismatch: skip
+    ಆದರೆ (opt_idx == -1 && ಕೀಲಿ == 0)	// found a mismatch: skip
     {
-	if (in_vim9script() && arg > arg_start
-		&& vim_strchr((char_u *)"!&<", *arg) != NULL)
+	ಆದರೆ (ಒಳ_vim9script() && arg > arg_ಆರಂಭ
+		&& vim_strchr((char_u *)"!&<", *arg) != ಖಾಲಿ)
 	    errmsg = e_no_white_space_allowed_between_option_and;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    errmsg = e_unknown_option;
-	goto skip;
+	ಹೋಗು skip;
     }
 
-    if (opt_idx >= 0)
+    ಆದರೆ (opt_idx >= 0)
     {
-	if (options[opt_idx].var == NULL)   // hidden option: skip
+	ಆದರೆ (options[opt_idx].var == ಖಾಲಿ)   // hidden option: skip
 	{
 	    // Only give an error message when requesting the value of
 	    // a hidden option, ignore setting it.
-	    if (vim_strchr((char_u *)"=:!&<", nextchar) == NULL
+	    ಆದರೆ (vim_strchr((char_u *)"=:!&<", nextchar) == ಖಾಲಿ
 		    && (!(options[opt_idx].flags & P_BOOL)
 			|| nextchar == '?'))
 		errmsg = e_option_not_supported;
-	    goto skip;
+	    ಹೋಗು skip;
 	}
 
 	flags = options[opt_idx].flags;
 	varp = get_varp_scope(&(options[opt_idx]), opt_flags);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	flags = P_STRING;
-	varp = NULL;
-	if (key < 0)
+	varp = ಖಾಲಿ;
+	ಆದರೆ (ಕೀಲಿ < 0)
 	{
-	    key_name[0] = KEY2TERMCAP0(key);
-	    key_name[1] = KEY2TERMCAP1(key);
+	    ಕೀಲಿ_name[0] = KEY2TERMCAP0(ಕೀಲಿ);
+	    ಕೀಲಿ_name[1] = KEY2TERMCAP1(ಕೀಲಿ);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    key_name[0] = KS_KEY;
-	    key_name[1] = (key & 0xff);
+	    ಕೀಲಿ_name[0] = KS_ಕೀಲಿ;
+	    ಕೀಲಿ_name[1] = (ಕೀಲಿ & 0xff);
 	}
     }
 
     // Make sure the option value can be changed.
-    if (validate_opt_idx(opt_idx, opt_flags, flags, &errmsg, prefix) == FAIL)
-	goto skip;
+    ಆದರೆ (validate_opt_idx(opt_idx, opt_flags, flags, &errmsg, ಪೂರ್ವಪ್ರತ್ಯಯ) == FAIL)
+	ಹೋಗು skip;
 
-    int cp_val = p_cp;
-    if (vim_strchr((char_u *)"?=:!&<", nextchar) != NULL)
+    ಪೂರ್ಣಾಂಕ cp_val = p_cp;
+    ಆದರೆ (vim_strchr((char_u *)"?=:!&<", nextchar) != ಖಾಲಿ)
     {
 	arg += len;
-	if (nextchar == '&' && arg[1] == 'v' && arg[2] == 'i')
+	ಆದರೆ (nextchar == '&' && arg[1] == 'v' && arg[2] == 'i')
 	{
-	    if (arg[3] == 'm')	// "opt&vim": set to Vim default
+	    ಆದರೆ (arg[3] == 'm')	// "opt&vim": set to Vim default
 	    {
 		cp_val = FALSE;
 		arg += 3;
 	    }
-	    else		// "opt&vi": set to Vi default
+	    ಇಲ್ಲದಿದ್ದರೆ		// "opt&vi": set to Vi default
 	    {
 		cp_val = TRUE;
 		arg += 2;
 	    }
 	}
-	if (vim_strchr((char_u *)"?!&<", nextchar) != NULL
+	ಆದರೆ (vim_strchr((char_u *)"?!&<", nextchar) != ಖಾಲಿ
 		&& arg[1] != NUL && !VIM_ISWHITE(arg[1]))
 	{
 	    errmsg = e_trailing_characters;
-	    goto skip;
+	    ಹೋಗು skip;
 	}
     }
 
     // Allow '=' and ':' for historical reasons (MSDOS command.com).
     // Allows only one '=' character per "set" command line. grrr. (jw)
-    if (nextchar == '?'
-	    || (prefix == PREFIX_NONE
-		&& vim_strchr((char_u *)"=:&<", nextchar) == NULL
+    ಆದರೆ (nextchar == '?'
+	    || (ಪೂರ್ವಪ್ರತ್ಯಯ == ಪೂರ್ವಪ್ರತ್ಯಯ_NONE
+		&& vim_strchr((char_u *)"=:&<", nextchar) == ಖಾಲಿ
 		&& !(flags & P_BOOL)))
     {
 	// print value
-	if (*did_show)
-	    msg_putchar('\n');	    // cursor below last one
-	else
+	ಆದರೆ (*did_show)
+	    ಸಂದೇಶ_putchar('\n');	    // cursor below last one
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    gotocmdline(TRUE);	    // cursor at status line
 	    *did_show = TRUE;	    // remember that we did a line
 	}
-	if (opt_idx >= 0)
+	ಆದರೆ (opt_idx >= 0)
 	{
 	    showoneopt(&options[opt_idx], opt_flags);
-#ifdef FEAT_EVAL
-	    if (p_verbose > 0)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	    ಆದರೆ (p_verbose > 0)
 	    {
 		// Mention where the option was last set.
-		if (varp == options[opt_idx].var)
-		    last_set_msg(options[opt_idx].script_ctx);
-		else if ((int)options[opt_idx].indir & PV_WIN)
-		    last_set_msg(curwin->w_p_script_ctx[
-			    (int)options[opt_idx].indir & PV_MASK]);
-		else if ((int)options[opt_idx].indir & PV_BUF)
-		    last_set_msg(curbuf->b_p_script_ctx[
-			    (int)options[opt_idx].indir & PV_MASK]);
+		ಆದರೆ (varp == options[opt_idx].var)
+		    ಕೊನೆಯ_ಗಣ_ಸಂದೇಶ(options[opt_idx].script_ctx);
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((ಪೂರ್ಣಾಂಕ)options[opt_idx].indir & PV_WIN)
+		    ಕೊನೆಯ_ಗಣ_ಸಂದೇಶ(curwin->w_p_script_ctx[
+			    (ಪೂರ್ಣಾಂಕ)options[opt_idx].indir & PV_ಮುಖವಾಡ]);
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((ಪೂರ್ಣಾಂಕ)options[opt_idx].indir & PV_BUF)
+		    ಕೊನೆಯ_ಗಣ_ಸಂದೇಶ(curbuf->b_p_script_ctx[
+			    (ಪೂರ್ಣಾಂಕ)options[opt_idx].indir & PV_ಮುಖವಾಡ]);
 	    }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    char_u	    *p;
 
-	    p = find_termcode(key_name);
-	    if (p == NULL)
+	    p = ಕಂಡುಹಿಡಿ_termcode(ಕೀಲಿ_name);
+	    ಆದರೆ (p == ಖಾಲಿ)
 	    {
-		errmsg = e_key_code_not_set;
-		goto skip;
+		errmsg = e_ಕೀಲಿ_ಸಂಕೇತ_not_ಗಣ;
+		ಹೋಗು skip;
 	    }
-	    else
-		(void)show_one_termcode(key_name, p, TRUE);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		(ಶೂನ್ಯ)show_one_termcode(ಕೀಲಿ_name, p, TRUE);
 	}
-	if (nextchar != '?'
+	ಆದರೆ (nextchar != '?'
 		&& nextchar != NUL && !VIM_ISWHITE(afterchar))
 	    errmsg = e_trailing_characters;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	errmsg = do_set_option_value(opt_idx, opt_flags, &arg, prefix, op,
-					flags, varp, key_name, nextchar,
+	errmsg = do_ಗಣ_option_ಮೌಲ್ಯ(opt_idx, opt_flags, &arg, ಪೂರ್ವಪ್ರತ್ಯಯ, op,
+					flags, varp, ಕೀಲಿ_name, nextchar,
 					afterchar, cp_val, stopopteval, errbuf,
 					errbuflen);
     }
 
 skip:
     *argp = arg;
-    return errmsg;
+    ಹಿಂತಿರುಗಿ errmsg;
 }
 
 /*
@@ -3034,83 +3034,83 @@ skip:
  *
  * Returns FAIL if an error is detected, OK otherwise.
  */
-    int
-do_set(
-    char_u	*arg_start,	// option string (may be written to!)
-    int		opt_flags)
+    ಪೂರ್ಣಾಂಕ
+do_ಗಣ(
+    char_u	*arg_ಆರಂಭ,	// option string (may be written to!)
+    ಪೂರ್ಣಾಂಕ		opt_flags)
 {
-    char_u	*arg = arg_start;
-    int		i;
-    int		did_show = FALSE;   // already showed one value
+    char_u	*arg = arg_ಆರಂಭ;
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		did_show = FALSE;   // already showed one value
 
-    if (*arg == NUL)
+    ಆದರೆ (*arg == NUL)
     {
 	showoptions(0, opt_flags);
 	did_show = TRUE;
-	goto theend;
+	ಹೋಗು theend;
     }
 
-    while (*arg != NUL)		// loop to process all options
+    ಆಗ (*arg != NUL)		// loop to process all options
     {
-	if (STRNCMP(arg, "all", 3) == 0 && !ASCII_ISALPHA(arg[3])
+	ಆದರೆ (STRNCMP(arg, "all", 3) == 0 && !ASCII_ISALPHA(arg[3])
 						&& !(opt_flags & OPT_MODELINE))
 	{
 	    // ":set all"  show all options.
 	    // ":set all&" set all options to their default value.
 	    arg += 3;
-	    if (*arg == '&')
+	    ಆದರೆ (*arg == '&')
 	    {
 		++arg;
 		// Only for :set command set global value of local options.
-		set_options_default(OPT_FREE | opt_flags);
+		ಗಣ_options_default(OPT_FREE | opt_flags);
 		didset_options();
 		didset_options2();
 		redraw_all_later(UPD_CLEAR);
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		showoptions(1, opt_flags);
 		did_show = TRUE;
 	    }
 	}
-	else if (STRNCMP(arg, "termcap", 7) == 0 && !(opt_flags & OPT_MODELINE))
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRNCMP(arg, "termcap", 7) == 0 && !(opt_flags & OPT_MODELINE))
 	{
 	    showoptions(2, opt_flags);
 	    show_termcodes(opt_flags);
 	    did_show = TRUE;
 	    arg += 7;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    int		stopopteval = FALSE;
-	    char	*errmsg = NULL;
-	    char	errbuf[ERR_BUFLEN];
+	    ಪೂರ್ಣಾಂಕ		stopopteval = FALSE;
+	    ಅಕ್ಷರ	*errmsg = ಖಾಲಿ;
+	    ಅಕ್ಷರ	errbuf[ERR_BUFLEN];
 	    char_u	*startarg = arg;
 
-	    errmsg = do_set_option(opt_flags, &arg, arg_start, &startarg,
+	    errmsg = do_ಗಣ_option(opt_flags, &arg, arg_ಆರಂಭ, &startarg,
 					&did_show, &stopopteval, errbuf,
 					ERR_BUFLEN);
-	    if (stopopteval)
-		break;
+	    ಆದರೆ (stopopteval)
+		ನಿಲ್ಲಿಸು;
 
 	    // Advance to next argument.
 	    // - skip until a blank found, taking care of backslashes
 	    // - skip blanks
 	    // - skip one "=val" argument (for hidden options ":set gfn =xx")
-	    for (i = 0; i < 2 ; ++i)
+	    ಗಾಗಿ (i = 0; i < 2 ; ++i)
 	    {
-		while (*arg != NUL && !VIM_ISWHITE(*arg))
-		    if (*arg++ == '\\' && *arg != NUL)
+		ಆಗ (*arg != NUL && !VIM_ISWHITE(*arg))
+		    ಆದರೆ (*arg++ == '\\' && *arg != NUL)
 			++arg;
 		arg = skipwhite(arg);
-		if (*arg != '=')
-		    break;
+		ಆದರೆ (*arg != '=')
+		    ನಿಲ್ಲಿಸು;
 	    }
 
-	    if (errmsg != NULL)
+	    ಆದರೆ (errmsg != ಖಾಲಿ)
 	    {
-		i = vim_snprintf((char *)IObuff, IOSIZE, "%s", (char_u *)_(errmsg)) + 2;
-		if (i + (arg - startarg) < IOSIZE)
+		i = vim_snprintf((ಅಕ್ಷರ *)IObuff, IOSIZE, "%s", (char_u *)_(errmsg)) + 2;
+		ಆದರೆ (i + (arg - startarg) < IOSIZE)
 		{
 		    // append the argument with the error
 		    STRCPY(IObuff + i - 2, ": ");
@@ -3121,10 +3121,10 @@ do_set(
 		trans_characters(IObuff, IOSIZE);
 
 		++no_wait_return;		// wait_return() done later
-		emsg((char *)IObuff);	// show error highlighted
+		emsg((ಅಕ್ಷರ *)IObuff);	// show error highlighted
 		--no_wait_return;
 
-		return FAIL;
+		ಹಿಂತಿರುಗಿ FAIL;
 	    }
 	}
 
@@ -3132,59 +3132,59 @@ do_set(
     }
 
 theend:
-    if (silent_mode && did_show)
+    ಆದರೆ (silent_ಬಹುಲಕ && did_show)
     {
 	// After displaying option values in silent mode.
-	silent_mode = FALSE;
-	info_message = TRUE;	// use mch_msg(), not mch_errmsg()
-	msg_putchar('\n');
+	silent_ಬಹುಲಕ = FALSE;
+	info_ಸಂದೇಶ = TRUE;	// use mch_msg(), not mch_errmsg()
+	ಸಂದೇಶ_putchar('\n');
 	cursor_on();		// msg_start() switches it off
-	out_flush();
-	silent_mode = TRUE;
-	info_message = FALSE;	// use mch_msg(), not mch_errmsg()
+	ಹೊರಹೋಗು_flush();
+	silent_ಬಹುಲಕ = TRUE;
+	info_ಸಂದೇಶ = FALSE;	// use mch_msg(), not mch_errmsg()
     }
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Call this when an option has been given a new value through a user command.
  * Sets the P_WAS_SET flag and takes care of the P_INSECURE flag.
  */
-    void
-did_set_option(
-    int	    opt_idx,
-    int	    opt_flags,	    // possibly with OPT_MODELINE
-    int	    new_value,	    // value was replaced completely
-    int	    value_checked)  // value was checked to be safe, no need to set the
+    ಶೂನ್ಯ
+did_ಗಣ_option(
+    ಪೂರ್ಣಾಂಕ	    opt_idx,
+    ಪೂರ್ಣಾಂಕ	    opt_flags,	    // possibly with OPT_MODELINE
+    ಪೂರ್ಣಾಂಕ	    new_ಮೌಲ್ಯ_2,	    // value was replaced completely
+    ಪೂರ್ಣಾಂಕ	    ಮೌಲ್ಯ_checked)  // value was checked to be safe, no need to set the
 			    // P_INSECURE flag.
 {
     long_u	*flagsp;
-    long_u	*flagsp_local = NULL;
-    int		both = (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0;
+    long_u	*flagsp_local = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		both = (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0;
 
-    options[opt_idx].flags |= P_WAS_SET;
+    options[opt_idx].flags |= P_WAS_ಗಣ;
 
     // When an option is set in the sandbox, from a modeline or in secure mode
     // set the P_INSECURE flag.  Otherwise, if a new value is stored reset the
     // flag.
     flagsp = insecure_flag(curwin, opt_idx, opt_flags);
-    if (both)
+    ಆದರೆ (both)
 	flagsp_local = insecure_flag(curwin, opt_idx, OPT_LOCAL);
-    if (!value_checked && (secure
-#ifdef HAVE_SANDBOX
+    ಆದರೆ (!ಮೌಲ್ಯ_checked && (secure
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_SANDBOX
 	    || sandbox != 0
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    || (opt_flags & OPT_MODELINE)))
     {
 	*flagsp = *flagsp | P_INSECURE;
-	if (flagsp_local != NULL)
+	ಆದರೆ (flagsp_local != ಖಾಲಿ)
 	    *flagsp_local = *flagsp_local | P_INSECURE;
     }
-    else if (new_value)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (new_ಮೌಲ್ಯ_2)
     {
 	*flagsp = *flagsp & ~P_INSECURE;
-	if (flagsp_local != NULL)
+	ಆದರೆ (flagsp_local != ಖಾಲಿ)
 	    *flagsp_local = *flagsp_local & ~P_INSECURE;
     }
 }
@@ -3194,21 +3194,21 @@ did_set_option(
  * Used for 'cedit', 'termwinkey', 'wildchar' and 'wildcharm' options.
  * When "multi_byte" is TRUE allow for multi-byte characters.
  */
-    int
-string_to_key(char_u *arg, int multi_byte)
+    ಪೂರ್ಣಾಂಕ
+string_ಗಮ್ಯ_ಕೀಲಿ(char_u *arg, ಪೂರ್ಣಾಂಕ multi_byte)
 {
-    if (*arg == '<' && arg[1])
-	return find_key_option(arg + 1, TRUE);
-    if (*arg == '^' && arg[1])
+    ಆದರೆ (*arg == '<' && arg[1])
+	ಹಿಂತಿರುಗಿ ಕಂಡುಹಿಡಿ_ಕೀಲಿ_option(arg + 1, TRUE);
+    ಆದರೆ (*arg == '^' && arg[1])
     {
-	int key = Ctrl_chr(arg[1]);
-	if (key == 0)		// ^@ is <Nul>
-	    key = K_ZERO;
-	return key;
+	ಪೂರ್ಣಾಂಕ ಕೀಲಿ = Ctrl_chr(arg[1]);
+	ಆದರೆ (ಕೀಲಿ == 0)		// ^@ is <Nul>
+	    ಕೀಲಿ = K_ZERO;
+	ಹಿಂತಿರುಗಿ ಕೀಲಿ;
     }
-    if (multi_byte)
-	return PTR2CHAR(arg);
-    return *arg;
+    ಆದರೆ (multi_byte)
+	ಹಿಂತಿರುಗಿ PTR2CHAR(arg);
+    ಹಿಂತಿರುಗಿ *arg;
 }
 
 /*
@@ -3217,13 +3217,13 @@ string_to_key(char_u *arg, int multi_byte)
  * When switching the title or icon off, call mch_restore_title() to get
  * the old value back.
  */
-    void
-did_set_title(void)
+    ಶೂನ್ಯ
+did_ಗಣ_title(ಶೂನ್ಯ)
 {
-    if (starting != NO_SCREEN
-#ifdef FEAT_GUI
+    ಆದರೆ (starting != NO_SCREEN
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 	    && !gui.starting
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 				)
 	maketitle();
 }
@@ -3231,26 +3231,26 @@ did_set_title(void)
 /*
  * set_options_bin -  called when 'bin' changes value.
  */
-    void
-set_options_bin(
-    int		oldval,
-    int		newval,
-    int		opt_flags)	// OPT_LOCAL and/or OPT_GLOBAL
+    ಶೂನ್ಯ
+ಗಣ_options_bin(
+    ಪೂರ್ಣಾಂಕ		oldval,
+    ಪೂರ್ಣಾಂಕ		newval,
+    ಪೂರ್ಣಾಂಕ		opt_flags)	// OPT_LOCAL and/or OPT_GLOBAL
 {
     // The option values that are changed when 'bin' changes are
     // copied when 'bin is set and restored when 'bin' is reset.
-    if (newval)
+    ಆದರೆ (newval)
     {
-	if (!oldval)		// switched on
+	ಆದರೆ (!oldval)		// switched on
 	{
-	    if (!(opt_flags & OPT_GLOBAL))
+	    ಆದರೆ (!(opt_flags & OPT_GLOBAL))
 	    {
 		curbuf->b_p_tw_nobin = curbuf->b_p_tw;
 		curbuf->b_p_wm_nobin = curbuf->b_p_wm;
 		curbuf->b_p_ml_nobin = curbuf->b_p_ml;
 		curbuf->b_p_et_nobin = curbuf->b_p_et;
 	    }
-	    if (!(opt_flags & OPT_LOCAL))
+	    ಆದರೆ (!(opt_flags & OPT_LOCAL))
 	    {
 		p_tw_nobin = p_tw;
 		p_wm_nobin = p_wm;
@@ -3259,14 +3259,14 @@ set_options_bin(
 	    }
 	}
 
-	if (!(opt_flags & OPT_GLOBAL))
+	ಆದರೆ (!(opt_flags & OPT_GLOBAL))
 	{
 	    curbuf->b_p_tw = 0;	// no automatic line wrap
 	    curbuf->b_p_wm = 0;	// no automatic line wrap
 	    curbuf->b_p_ml = 0;	// no modelines
 	    curbuf->b_p_et = 0;	// no expandtab
 	}
-	if (!(opt_flags & OPT_LOCAL))
+	ಆದರೆ (!(opt_flags & OPT_LOCAL))
 	{
 	    p_tw = 0;
 	    p_wm = 0;
@@ -3275,16 +3275,16 @@ set_options_bin(
 	    p_bin = TRUE;	// needed when called for the "-b" argument
 	}
     }
-    else if (oldval)		// switched off
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (oldval)		// switched off
     {
-	if (!(opt_flags & OPT_GLOBAL))
+	ಆದರೆ (!(opt_flags & OPT_GLOBAL))
 	{
 	    curbuf->b_p_tw = curbuf->b_p_tw_nobin;
 	    curbuf->b_p_wm = curbuf->b_p_wm_nobin;
 	    curbuf->b_p_ml = curbuf->b_p_ml_nobin;
 	    curbuf->b_p_et = curbuf->b_p_et_nobin;
 	}
-	if (!(opt_flags & OPT_LOCAL))
+	ಆದರೆ (!(opt_flags & OPT_LOCAL))
 	{
 	    p_tw = p_tw_nobin;
 	    p_wm = p_wm_nobin;
@@ -3292,10 +3292,10 @@ set_options_bin(
 	    p_et = p_et_nobin;
 	}
     }
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
     // Remember where the dependent option were reset
     didset_options_sctx(opt_flags, p_bin_dep_opts);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
@@ -3304,19 +3304,19 @@ set_options_bin(
  * If "val" is NULL expand the current value of the option.
  * Return pointer to NameBuff, or NULL when not expanded.
  */
-    static char_u *
-option_expand(int opt_idx, char_u *val)
+    ಸ್ಥಿರ char_u *
+option_expand(ಪೂರ್ಣಾಂಕ opt_idx, char_u *val)
 {
     // if option doesn't need expansion nothing to do
-    if (!(options[opt_idx].flags & P_EXPAND) || options[opt_idx].var == NULL)
-	return NULL;
+    ಆದರೆ (!(options[opt_idx].flags & P_EXPAND) || options[opt_idx].var == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     // If val is longer than MAXPATHL no meaningful expansion can be done,
     // expand_env() would truncate the string.
-    if (val != NULL && STRLEN(val) > MAXPATHL)
-	return NULL;
+    ಆದರೆ (val != ಖಾಲಿ && STRLEN(val) > MAXPATHL)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (val == NULL)
+    ಆದರೆ (val == ಖಾಲಿ)
 	val = *(char_u **)options[opt_idx].var;
 
     /*
@@ -3326,87 +3326,87 @@ option_expand(int opt_idx, char_u *val)
      * For 'spellsuggest' expand after "file:".
      */
     char_u ** var = (char_u **)options[opt_idx].var;
-    int esc = var == &p_tags || var == &p_path;
+    ಪೂರ್ಣಾಂಕ esc = var == &p_ಟ್ಯಾಗುಗಳು || var == &p_ಮಾರ್ಗ;
 
     expand_env_esc(val, NameBuff, MAXPATHL,
-	    esc ? (char_u *)" \t" : NULL, FALSE,
-#ifdef FEAT_SPELL
+	    esc ? (char_u *)" \t" : ಖಾಲಿ, FALSE,
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SPELL
 	    var == &p_sps ? (char_u *)"file:" :
-#endif
-				  NULL);
-    if (STRCMP(NameBuff, val) == 0)   // they are the same
-	return NULL;
+#ಆದರೆ_ಅಂತ್ಯ
+				  ಖಾಲಿ);
+    ಆದರೆ (STRCMP(NameBuff, val) == 0)   // they are the same
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    return NameBuff;
+    ಹಿಂತಿರುಗಿ NameBuff;
 }
 
 /*
  * After setting various option values: recompute variables that depend on
  * option values.
  */
-    static void
-didset_options(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+didset_options(ಶೂನ್ಯ)
 {
     // initialize the table for 'iskeyword' et.al.
-    (void)init_chartab();
+    (ಶೂನ್ಯ)init_chartab();
 
     didset_string_options();
 
-#ifdef FEAT_SPELL
-    (void)spell_check_msm();
-    (void)spell_check_sps();
-    (void)compile_cap_prog(curwin->w_s);
-    (void)did_set_spell_option();
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SPELL
+    (ಶೂನ್ಯ)spell_check_msm();
+    (ಶೂನ್ಯ)spell_check_sps();
+    (ಶೂನ್ಯ)compile_cap_prog(curwin->w_s);
+    (ಶೂನ್ಯ)did_ಗಣ_spell_option();
+#ಆದರೆ_ಅಂತ್ಯ
     // set cedit_key
-    (void)did_set_cedit(NULL);
-#ifdef FEAT_LINEBREAK
+    (ಶೂನ್ಯ)did_ಗಣ_cedit(ಖಾಲಿ);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
     // initialize the table for 'breakat'.
-    did_set_breakat(NULL);
-#endif
+    did_ಗಣ_breakat(ಖಾಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ
     after_copy_winopt(curwin);
 }
 
 /*
  * More side effects of setting options.
  */
-    static void
-didset_options2(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+didset_options2(ಶೂನ್ಯ)
 {
     // Initialize the highlight_attr[] table.
-    (void)highlight_changed();
+    (ಶೂನ್ಯ)highlight_ಬದಲಾಯಿತು();
 
     // Parse default for 'wildmode'
     check_opt_wim();
 
     // Parse default for 'listchars'.
-    (void)set_listchars_option(curwin, curwin->w_p_lcs, TRUE, NULL, 0);
+    (ಶೂನ್ಯ)ಗಣ_listchars_option(curwin, curwin->w_p_lcs, TRUE, ಖಾಲಿ, 0);
 
     // Parse default for 'fillchars'.
-    (void)set_fillchars_option(curwin, curwin->w_p_fcs, TRUE, NULL, 0);
+    (ಶೂನ್ಯ)ಗಣ_fillchars_option(curwin, curwin->w_p_fcs, TRUE, ಖಾಲಿ, 0);
 
-#ifdef FEAT_CLIPBOARD
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CLIPBOARD
     // Parse default for 'clipboard'
-    (void)did_set_clipboard(NULL);
-#endif
-#ifdef FEAT_VARTABS
+    (ಶೂನ್ಯ)did_ಗಣ_clipboard(ಖಾಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
     vim_free(curbuf->b_p_vsts_array);
-    (void)tabstop_set(curbuf->b_p_vsts, &curbuf->b_p_vsts_array);
+    (ಶೂನ್ಯ)tabstop_ಗಣ(curbuf->b_p_vsts, &curbuf->b_p_vsts_array);
     vim_free(curbuf->b_p_vts_array);
-    (void)tabstop_set(curbuf->b_p_vts,  &curbuf->b_p_vts_array);
-#endif
+    (ಶೂನ್ಯ)tabstop_ಗಣ(curbuf->b_p_vts,  &curbuf->b_p_vts_array);
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Check for string options that are NULL (normally only termcap options).
  */
-    void
-check_options(void)
+    ಶೂನ್ಯ
+check_options(ಶೂನ್ಯ)
 {
-    int		opt_idx;
+    ಪೂರ್ಣಾಂಕ		opt_idx;
 
-    for (opt_idx = 0; options[opt_idx].fullname != NULL; opt_idx++)
-	if ((options[opt_idx].flags & P_STRING) && options[opt_idx].var != NULL)
+    ಗಾಗಿ (opt_idx = 0; options[opt_idx].fullname != ಖಾಲಿ; opt_idx++)
+	ಆದರೆ ((options[opt_idx].flags & P_STRING) && options[opt_idx].var != ಖಾಲಿ)
 	    check_string_option((char_u **)get_varp(&(options[opt_idx])));
 }
 
@@ -3414,50 +3414,50 @@ check_options(void)
  * Return the option index found by a pointer into term_strings[].
  * Return -1 if not found.
  */
-    int
-get_term_opt_idx(char_u **p)
+    ಪೂರ್ಣಾಂಕ
+get_ಪದ_opt_idx(char_u **p)
 {
-    int opt_idx;
+    ಪೂರ್ಣಾಂಕ opt_idx;
 
-    for (opt_idx = 1; options[opt_idx].fullname != NULL; opt_idx++)
-	if (options[opt_idx].var == (char_u *)p)
-	    return opt_idx;
-    return -1; // cannot happen: didn't find it!
+    ಗಾಗಿ (opt_idx = 1; options[opt_idx].fullname != ಖಾಲಿ; opt_idx++)
+	ಆದರೆ (options[opt_idx].var == (char_u *)p)
+	    ಹಿಂತಿರುಗಿ opt_idx;
+    ಹಿಂತಿರುಗಿ -1; // cannot happen: didn't find it!
 }
 
 /*
  * Mark a terminal option as allocated, found by a pointer into term_strings[].
  * Return the option index or -1 if not found.
  */
-    int
-set_term_option_alloced(char_u **p)
+    ಪೂರ್ಣಾಂಕ
+ಗಣ_ಪದ_option_alloced(char_u **p)
 {
-    int		opt_idx = get_term_opt_idx(p);
+    ಪೂರ್ಣಾಂಕ		opt_idx = get_ಪದ_opt_idx(p);
 
-    if (opt_idx >= 0)
+    ಆದರೆ (opt_idx >= 0)
 	options[opt_idx].flags |= P_ALLOCED;
-    return opt_idx;
+    ಹಿಂತಿರುಗಿ opt_idx;
 }
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * Return TRUE when option "opt" was set from a modeline or in secure mode.
  * Return FALSE when it wasn't.
  * Return -1 for an unknown option.
  */
-    int
-was_set_insecurely(win_T *wp, char_u *opt, int opt_flags)
+    ಪೂರ್ಣಾಂಕ
+was_ಗಣ_insecurely(win_T *wp, char_u *opt, ಪೂರ್ಣಾಂಕ opt_flags)
 {
-    int	    idx = findoption(opt);
+    ಪೂರ್ಣಾಂಕ	    idx = findoption(opt);
     long_u  *flagp;
 
-    if (idx >= 0)
+    ಆದರೆ (idx >= 0)
     {
 	flagp = insecure_flag(wp, idx, opt_flags);
-	return (*flagp & P_INSECURE) != 0;
+	ಹಿಂತಿರುಗಿ (*flagp & P_INSECURE) != 0;
     }
-    internal_error("was_set_insecurely()");
-    return -1;
+    ಆಂತರಿಕ_error("was_set_insecurely()");
+    ಹಿಂತಿರುಗಿ -1;
 }
 
 /*
@@ -3466,116 +3466,116 @@ was_set_insecurely(win_T *wp, char_u *opt, int opt_flags)
  * NOTE: Caller must make sure that "curwin" is set to the window from which
  * the option is used.
  */
-    static long_u *
-insecure_flag(win_T *wp, int opt_idx, int opt_flags)
+    ಸ್ಥಿರ long_u *
+insecure_flag(win_T *wp, ಪೂರ್ಣಾಂಕ opt_idx, ಪೂರ್ಣಾಂಕ opt_flags)
 {
-    if (opt_flags & OPT_LOCAL)
-	switch ((int)options[opt_idx].indir)
+    ಆದರೆ (opt_flags & OPT_LOCAL)
+	ಆಯ್ಕೆ ((ಪೂರ್ಣಾಂಕ)options[opt_idx].indir)
 	{
-	    case PV_WRAP:	return &wp->w_p_wrap_flags;
+	    ಸ್ಥಿತಿ PV_WRAP:	ಹಿಂತಿರುಗಿ &wp->w_p_wrap_flags;
 # ifdef FEAT_STL_OPT
-	    case PV_STL:	return &wp->w_p_stl_flags;
+	    ಸ್ಥಿತಿ PV_STL:	ಹಿಂತಿರುಗಿ &wp->w_p_stl_flags;
 # endif
 # ifdef FEAT_EVAL
 #  ifdef FEAT_FOLDING
-	    case PV_FDE:	return &wp->w_p_fde_flags;
-	    case PV_FDT:	return &wp->w_p_fdt_flags;
+	    ಸ್ಥಿತಿ PV_FDE:	ಹಿಂತಿರುಗಿ &wp->w_p_fde_flags;
+	    ಸ್ಥಿತಿ PV_FDT:	ಹಿಂತಿರುಗಿ &wp->w_p_fdt_flags;
 #  endif
 #  ifdef FEAT_BEVAL
-	    case PV_BEXPR:	return &wp->w_buffer->b_p_bexpr_flags;
+	    ಸ್ಥಿತಿ PV_BEXPR:	ಹಿಂತಿರುಗಿ &wp->w_ಬಫರ್->b_p_bexpr_flags;
 #  endif
-	    case PV_INDE:	return &wp->w_buffer->b_p_inde_flags;
-	    case PV_FEX:	return &wp->w_buffer->b_p_fex_flags;
-#  ifdef FEAT_FIND_ID
-	    case PV_INEX:	return &wp->w_buffer->b_p_inex_flags;
+	    ಸ್ಥಿತಿ PV_INDE:	ಹಿಂತಿರುಗಿ &wp->w_ಬಫರ್->b_p_inde_flags;
+	    ಸ್ಥಿತಿ PV_FEX:	ಹಿಂತಿರುಗಿ &wp->w_ಬಫರ್->b_p_fex_flags;
+#  ifdef FEAT_ಕಂಡುಹಿಡಿ_ID
+	    ಸ್ಥಿತಿ PV_INEX:	ಹಿಂತಿರುಗಿ &wp->w_ಬಫರ್->b_p_inex_flags;
 #  endif
 #  ifdef FEAT_COMPL_FUNC
-	    case PV_CPT:	return &wp->w_buffer->b_p_cpt_flags;
+	    ಸ್ಥಿತಿ PV_CPT:	ಹಿಂತಿರುಗಿ &wp->w_ಬಫರ್->b_p_cpt_flags;
 #  endif
 # endif
 	}
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	// For global value of window-local options, use flags in w_allbuf_opt.
-	switch ((int)options[opt_idx].indir)
+	ಆಯ್ಕೆ ((ಪೂರ್ಣಾಂಕ)options[opt_idx].indir)
 	{
-	    case PV_WRAP:	return &wp->w_allbuf_opt.wo_wrap_flags;
-# if defined(FEAT_EVAL) && defined(FEAT_FOLDING)
-	    case PV_FDE:	return &wp->w_allbuf_opt.wo_fde_flags;
-	    case PV_FDT:	return &wp->w_allbuf_opt.wo_fdt_flags;
+	    ಸ್ಥಿತಿ PV_WRAP:	ಹಿಂತಿರುಗಿ &wp->w_allbuf_opt.wo_wrap_flags;
+# ಆದರೆ defined(FEAT_EVAL) && defined(FEAT_FOLDING)
+	    ಸ್ಥಿತಿ PV_FDE:	ಹಿಂತಿರುಗಿ &wp->w_allbuf_opt.wo_fde_flags;
+	    ಸ್ಥಿತಿ PV_FDT:	ಹಿಂತಿರುಗಿ &wp->w_allbuf_opt.wo_fdt_flags;
 # endif
 	}
 
     // Nothing special, return global flags field.
-    return &options[opt_idx].flags;
+    ಹಿಂತಿರುಗಿ &options[opt_idx].flags;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Redraw the window title and/or tab page text later.
  */
-    void
-redraw_titles(void)
+    ಶೂನ್ಯ
+redraw_titles(ಶೂನ್ಯ)
 {
     need_maketitle = TRUE;
     redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#ಆದರೆ defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Return TRUE if "val" is a valid name: only consists of alphanumeric ASCII
  * characters or characters in "allowed".
  */
-    int
-valid_name(char_u *val, char *allowed)
+    ಪೂರ್ಣಾಂಕ
+valid_name(char_u *val, ಅಕ್ಷರ *allowed)
 {
     char_u *s;
 
-    for (s = val; *s != NUL; ++s)
-	if (!ASCII_ISALNUM(*s) && vim_strchr((char_u *)allowed, *s) == NULL)
-	    return FALSE;
-    return TRUE;
+    ಗಾಗಿ (s = val; *s != NUL; ++s)
+	ಆದರೆ (!ASCII_ISALNUM(*s) && vim_strchr((char_u *)allowed, *s) == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ FALSE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * Set the script_ctx for an option, taking care of setting the buffer- or
  * window-local value.
  */
-    void
-set_option_sctx_idx(int opt_idx, int opt_flags, sctx_T script_ctx)
+    ಶೂನ್ಯ
+ಗಣ_option_sctx_idx(ಪೂರ್ಣಾಂಕ opt_idx, ಪೂರ್ಣಾಂಕ opt_flags, sctx_T script_ctx)
 {
-    int		both = (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0;
-    int		indir = (int)options[opt_idx].indir;
+    ಪೂರ್ಣಾಂಕ		both = (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0;
+    ಪೂರ್ಣಾಂಕ		indir = (ಪೂರ್ಣಾಂಕ)options[opt_idx].indir;
     sctx_T	new_script_ctx = script_ctx;
 
     // Modeline already has the line number set.
-    if (!(opt_flags & OPT_MODELINE))
+    ಆದರೆ (!(opt_flags & OPT_MODELINE))
 	new_script_ctx.sc_lnum += SOURCING_LNUM;
 
     // ":legacy" and ":vim9cmd" change the execution context of an option.
-    if (cmdmod.cmod_flags & CMOD_VIM9CMD)
-	new_script_ctx.sc_version = SCRIPT_VERSION_VIM9;
-    if (cmdmod.cmod_flags & CMOD_LEGACY)
+    ಆದರೆ (cmdmod.cmod_flags & CMOD_VIM9CMD)
+	new_script_ctx.sc_ಆವೃತ್ತಿ = SCRIPT_ಆವೃತ್ತಿ_VIM9;
+    ಆದರೆ (cmdmod.cmod_flags & CMOD_LEGACY)
 	// It is a bit confusing, but "MAX" is actually the legacy Vim script
 	// version before Vim9.
-	new_script_ctx.sc_version = SCRIPT_VERSION_MAX;
+	new_script_ctx.sc_ಆವೃತ್ತಿ = SCRIPT_ಆವೃತ್ತಿ_MAX;
 
     // Remember where the option was set.  For local options need to do that
     // in the buffer or window structure.
-    if (both || (opt_flags & OPT_GLOBAL) || (indir & (PV_BUF|PV_WIN)) == 0)
+    ಆದರೆ (both || (opt_flags & OPT_GLOBAL) || (indir & (PV_BUF|PV_WIN)) == 0)
 	options[opt_idx].script_ctx = new_script_ctx;
-    if (both || (opt_flags & OPT_LOCAL))
+    ಆದರೆ (both || (opt_flags & OPT_LOCAL))
     {
-	if (indir & PV_BUF)
-	    curbuf->b_p_script_ctx[indir & PV_MASK] = new_script_ctx;
-	else if (indir & PV_WIN)
+	ಆದರೆ (indir & PV_BUF)
+	    curbuf->b_p_script_ctx[indir & PV_ಮುಖವಾಡ] = new_script_ctx;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (indir & PV_WIN)
 	{
-	    curwin->w_p_script_ctx[indir & PV_MASK] = new_script_ctx;
-	    if (both)
+	    curwin->w_p_script_ctx[indir & PV_ಮುಖವಾಡ] = new_script_ctx;
+	    ಆದರೆ (both)
 		// also setting the "all buffers" value
-		curwin->w_allbuf_opt.wo_script_ctx[indir & PV_MASK] =
+		curwin->w_allbuf_opt.wo_script_ctx[indir & PV_ಮುಖವಾಡ] =
 								new_script_ctx;
 	}
     }
@@ -3588,27 +3588,27 @@ set_option_sctx_idx(int opt_idx, int opt_flags, sctx_T script_ctx)
  * OPT_LOCAL, selecting global or buffer/window context, respectively.
  */
     bool
-is_option_value_vim9(int opt_idx, int opt_flags)
+is_option_ಮೌಲ್ಯ_vim9(ಪೂರ್ಣಾಂಕ opt_idx, ಪೂರ್ಣಾಂಕ opt_flags)
 {
-    int		indir = (int)options[opt_idx].indir;
-    sctx_T	*sctx = NULL;
+    ಪೂರ್ಣಾಂಕ		indir = (ಪೂರ್ಣಾಂಕ)options[opt_idx].indir;
+    sctx_T	*sctx = ಖಾಲಿ;
 
-    if ((opt_flags & OPT_GLOBAL) || (indir & (PV_BUF|PV_WIN)) == 0)
+    ಆದರೆ ((opt_flags & OPT_GLOBAL) || (indir & (PV_BUF|PV_WIN)) == 0)
 	sctx = &options[opt_idx].script_ctx;
 
-    if ((opt_flags & OPT_LOCAL) || (indir & (PV_BUF|PV_WIN)))
+    ಆದರೆ ((opt_flags & OPT_LOCAL) || (indir & (PV_BUF|PV_WIN)))
     {
-	if (indir & PV_BUF)
-	    sctx = &curbuf->b_p_script_ctx[indir & PV_MASK];
-	else if (indir & PV_WIN)
-	    sctx = &curwin->w_p_script_ctx[indir & PV_MASK];
+	ಆದರೆ (indir & PV_BUF)
+	    sctx = &curbuf->b_p_script_ctx[indir & PV_ಮುಖವಾಡ];
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (indir & PV_WIN)
+	    sctx = &curwin->w_p_script_ctx[indir & PV_ಮುಖವಾಡ];
     }
 
     // If "sc_sid" is not set, it means the option value was not modified from
     // the default yet.  As we move towards Vim9 all the default values should
     // be valid Vim9.
-    return !SCRIPT_ID_VALID(sctx->sc_sid) ||
-	sctx->sc_version >= SCRIPT_VERSION_VIM9;
+    ಹಿಂತಿರುಗಿ !SCRIPT_ID_VALID(sctx->sc_sid) ||
+	sctx->sc_ಆವೃತ್ತಿ >= SCRIPT_ಆವೃತ್ತಿ_VIM9;
 }
 
 /*
@@ -3616,14 +3616,14 @@ is_option_value_vim9(int opt_idx, int opt_flags)
  *
  */
     sctx_T *
-get_option_sctx(char *name)
+get_option_sctx(ಅಕ್ಷರ *name)
 {
-    int idx = findoption((char_u *)name);
+    ಪೂರ್ಣಾಂಕ idx = findoption((char_u *)name);
 
-    if (idx >= 0)
-	return &options[idx].script_ctx;
+    ಆದರೆ (idx >= 0)
+	ಹಿಂತಿರುಗಿ &options[idx].script_ctx;
     siemsg("no such option: %s", name);
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
@@ -3631,15 +3631,15 @@ get_option_sctx(char *name)
  * "name" must be the two character code, e.g. "RV".
  * When "name" is NULL use "opt_idx".
  */
-    void
-set_term_option_sctx_idx(char *name, int opt_idx)
+    ಶೂನ್ಯ
+ಗಣ_ಪದ_option_sctx_idx(ಅಕ್ಷರ *name, ಪೂರ್ಣಾಂಕ opt_idx)
 {
     char_u  buf[5];
-    int	    idx;
+    ಪೂರ್ಣಾಂಕ	    idx;
 
-    if (name == NULL)
+    ಆದರೆ (name == ಖಾಲಿ)
 	idx = opt_idx;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	buf[0] = 't';
 	buf[1] = '_';
@@ -3648,97 +3648,97 @@ set_term_option_sctx_idx(char *name, int opt_idx)
 	buf[4] = 0;
 	idx = findoption(buf);
     }
-    if (idx >= 0)
-	set_option_sctx_idx(idx, OPT_GLOBAL, current_sctx);
+    ಆದರೆ (idx >= 0)
+	ಗಣ_option_sctx_idx(idx, OPT_GLOBAL, current_sctx);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * Apply the OptionSet autocommand.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 apply_optionset_autocmd(
-	int	opt_idx,
-	long	opt_flags,
-	long	oldval,
-	long	oldval_g,
-	long	newval,
-	char	*errmsg)
+	ಪೂರ್ಣಾಂಕ	opt_idx,
+	ದೀರ್ಘ	opt_flags,
+	ದೀರ್ಘ	oldval,
+	ದೀರ್ಘ	oldval_g,
+	ದೀರ್ಘ	newval,
+	ಅಕ್ಷರ	*errmsg)
 {
     char_u buf_old[12], buf_new[12], buf_type[12];
     size_t  buf_oldlen;
     size_t  len;
 
     // Don't do this while starting up, failure or recursively.
-    if (starting || errmsg != NULL || *get_vim_var_str(VV_OPTION_TYPE) != NUL)
-	return;
+    ಆದರೆ (starting || errmsg != ಖಾಲಿ || *get_vim_var_str(VV_OPTION_TYPE) != NUL)
+	ಹಿಂತಿರುಗಿ;
 
-    len = vim_snprintf_safelen((char *)buf_new, sizeof(buf_new), "%ld", newval);
-    set_vim_var_string(VV_OPTION_NEW, buf_new, (int)len);
-    len = vim_snprintf_safelen((char *)buf_type, sizeof(buf_type), "%s",
+    len = vim_snprintf_safelen((ಅಕ್ಷರ *)buf_new, ಗಾತ್ರ(buf_new), "%ld", newval);
+    ಗಣ_vim_var_string(VV_OPTION_NEW, buf_new, (ಪೂರ್ಣಾಂಕ)len);
+    len = vim_snprintf_safelen((ಅಕ್ಷರ *)buf_type, ಗಾತ್ರ(buf_type), "%s",
 				(opt_flags & OPT_LOCAL) ? "local" : "global");
-    set_vim_var_string(VV_OPTION_TYPE, buf_type, (int)len);
+    ಗಣ_vim_var_string(VV_OPTION_TYPE, buf_type, (ಪೂರ್ಣಾಂಕ)len);
 
-    buf_oldlen = vim_snprintf_safelen((char *)buf_old, sizeof(buf_old), "%ld", oldval);
-    set_vim_var_string(VV_OPTION_OLD, buf_old, (int)buf_oldlen);
+    buf_oldlen = vim_snprintf_safelen((ಅಕ್ಷರ *)buf_old, ಗಾತ್ರ(buf_old), "%ld", oldval);
+    ಗಣ_vim_var_string(VV_OPTION_OLD, buf_old, (ಪೂರ್ಣಾಂಕ)buf_oldlen);
 
-    if (opt_flags & OPT_LOCAL)
+    ಆದರೆ (opt_flags & OPT_LOCAL)
     {
-	set_vim_var_string(VV_OPTION_COMMAND, (char_u *)"setlocal", STRLEN_LITERAL("setlocal"));
-	set_vim_var_string(VV_OPTION_OLDLOCAL, buf_old, (int)buf_oldlen);
+	ಗಣ_vim_var_string(VV_OPTION_COMMAND, (char_u *)"setlocal", STRLEN_LITERAL("setlocal"));
+	ಗಣ_vim_var_string(VV_OPTION_OLDLOCAL, buf_old, (ಪೂರ್ಣಾಂಕ)buf_oldlen);
     }
-    if (opt_flags & OPT_GLOBAL)
+    ಆದರೆ (opt_flags & OPT_GLOBAL)
     {
-	set_vim_var_string(VV_OPTION_COMMAND, (char_u *)"setglobal", STRLEN_LITERAL("setglobal"));
-	set_vim_var_string(VV_OPTION_OLDGLOBAL, buf_old, (int)buf_oldlen);
+	ಗಣ_vim_var_string(VV_OPTION_COMMAND, (char_u *)"setglobal", STRLEN_LITERAL("setglobal"));
+	ಗಣ_vim_var_string(VV_OPTION_OLDGLOBAL, buf_old, (ಪೂರ್ಣಾಂಕ)buf_oldlen);
     }
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+    ಆದರೆ ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
     {
 	char_u	buf_old_global[12];
 	size_t	buf_old_globallen;
 
-	buf_old_globallen = vim_snprintf_safelen((char *)buf_old_global,
-	    sizeof(buf_old_global), "%ld", oldval_g);
+	buf_old_globallen = vim_snprintf_safelen((ಅಕ್ಷರ *)buf_old_global,
+	    ಗಾತ್ರ(buf_old_global), "%ld", oldval_g);
 
-	set_vim_var_string(VV_OPTION_COMMAND, (char_u *)"set", STRLEN_LITERAL("set"));
-	set_vim_var_string(VV_OPTION_OLDLOCAL, buf_old, (int)buf_oldlen);
-	set_vim_var_string(VV_OPTION_OLDGLOBAL, buf_old_global, (int)buf_old_globallen);
+	ಗಣ_vim_var_string(VV_OPTION_COMMAND, (char_u *)"set", STRLEN_LITERAL("set"));
+	ಗಣ_vim_var_string(VV_OPTION_OLDLOCAL, buf_old, (ಪೂರ್ಣಾಂಕ)buf_oldlen);
+	ಗಣ_vim_var_string(VV_OPTION_OLDGLOBAL, buf_old_global, (ಪೂರ್ಣಾಂಕ)buf_old_globallen);
     }
-    if (opt_flags & OPT_MODELINE)
+    ಆದರೆ (opt_flags & OPT_MODELINE)
     {
-	set_vim_var_string(VV_OPTION_COMMAND, (char_u *)"modeline", STRLEN_LITERAL("modeline"));
-	set_vim_var_string(VV_OPTION_OLDLOCAL, buf_old, (int)buf_oldlen);
+	ಗಣ_vim_var_string(VV_OPTION_COMMAND, (char_u *)"modeline", STRLEN_LITERAL("modeline"));
+	ಗಣ_vim_var_string(VV_OPTION_OLDLOCAL, buf_old, (ಪೂರ್ಣಾಂಕ)buf_oldlen);
     }
     apply_autocmds(EVENT_OPTIONSET, (char_u *)options[opt_idx].fullname,
-	    NULL, FALSE, NULL);
+	    ಖಾಲಿ, FALSE, ಖಾಲಿ);
     reset_v_option_vars();
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_ARABIC)
+#ಆದರೆ defined(FEAT_ARABIC)
 /*
  * Process the updated 'arabic' option value.
  */
-    char *
-did_set_arabic(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_arabic(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
-    char *errmsg = NULL;
+    ಅಕ್ಷರ *errmsg = ಖಾಲಿ;
 
-    if (curwin->w_p_arab)
+    ಆದರೆ (curwin->w_p_arab)
     {
 	// 'arabic' is set, handle various sub-settings.
-	if (!p_tbidi)
+	ಆದರೆ (!p_tbidi)
 	{
 	    // set rightleft mode
-	    if (!curwin->w_p_rl)
+	    ಆದರೆ (!curwin->w_p_rl)
 	    {
 		curwin->w_p_rl = TRUE;
-		changed_window_setting();
+		ಬದಲಾಯಿತು_ಕಿಟಕಿ_setting();
 	    }
 
 	    // Enable Arabic shaping (major part of what Arabic requires)
-	    if (!p_arshape)
+	    ಆದರೆ (!p_arshape)
 	    {
 		p_arshape = TRUE;
 		redraw_later_clear();
@@ -3747,14 +3747,14 @@ did_set_arabic(optset_T *args UNUSED)
 
 	// Arabic requires a utf-8 encoding, inform the user if it's not
 	// set.
-	if (STRCMP(p_enc, "utf-8") != 0)
+	ಆದರೆ (STRCMP(p_enc, "utf-8") != 0)
 	{
-	    static char *w_arabic = N_("W17: Arabic requires UTF-8, do ':set encoding=utf-8'");
+	    ಸ್ಥಿರ ಅಕ್ಷರ *w_arabic = N_("W17: Arabic requires UTF-8, do ':set encoding=utf-8'");
 
-	    msg_source(HL_ATTR(HLF_W));
-	    msg_attr(_(w_arabic), HL_ATTR(HLF_W));
+	    ಸಂದೇಶ_ಮೂಲ(HL_ATTR(HLF_W));
+	    ಸಂದೇಶ_attr(_(w_arabic), HL_ATTR(HLF_W));
 # ifdef FEAT_EVAL
-	    set_vim_var_string(VV_WARNINGMSG, (char_u *)_(w_arabic), -1);
+	    ಗಣ_vim_var_string(VV_WARNINGMSG, (char_u *)_(w_arabic), -1);
 # endif
 	}
 
@@ -3763,20 +3763,20 @@ did_set_arabic(optset_T *args UNUSED)
 
 # ifdef FEAT_KEYMAP
 	// Force-set the necessary keymap for arabic
-	errmsg = set_option_value((char_u *)"keymap", 0L, (char_u *)"arabic",
+	errmsg = ಗಣ_option_ಮೌಲ್ಯ((char_u *)"keymap", 0L, (char_u *)"arabic",
 								OPT_LOCAL);
 # endif
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// 'arabic' is reset, handle various sub-settings.
-	if (!p_tbidi)
+	ಆದರೆ (!p_tbidi)
 	{
 	    // reset rightleft mode
-	    if (curwin->w_p_rl)
+	    ಆದರೆ (curwin->w_p_rl)
 	    {
 		curwin->w_p_rl = FALSE;
-		changed_window_setting();
+		ಬದಲಾಯಿತು_ಕಿಟಕಿ_setting();
 	    }
 
 	    // 'arabicshape' isn't reset, it is a global option and
@@ -3789,527 +3789,527 @@ did_set_arabic(optset_T *args UNUSED)
 # ifdef FEAT_KEYMAP
 	// Revert to the default keymap
 	curbuf->b_p_iminsert = B_IMODE_NONE;
-	curbuf->b_p_imsearch = B_IMODE_USE_INSERT;
+	curbuf->b_p_imsearch = B_IMODE_USE_ಸೇರಿಸು;
 # endif
     }
 
-    return errmsg;
+    ಹಿಂತಿರುಗಿ errmsg;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_AUTOCHDIR)
+#ಆದರೆ defined(FEAT_AUTOCHDIR)
 /*
  * Process the updated 'autochdir' option value.
  */
-    char *
-did_set_autochdir(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_autochdir(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
     // Change directories when the 'acd' option is set now.
     DO_AUTOCHDIR;
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_BEVAL_GUI)
+#ಆದರೆ defined(FEAT_BEVAL_GUI)
 /*
  * Process the updated 'ballooneval' option value.
  */
-    char *
-did_set_ballooneval(optset_T *args)
+    ಅಕ್ಷರ *
+did_ಗಣ_ballooneval(optset_T *ವಾದಗಳು)
 {
-    if (balloonEvalForTerm)
-	return NULL;
+    ಆದರೆ (balloon_Eval_For_ಪದ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (p_beval && !args->os_oldval.boolean)
+    ಆದರೆ (p_beval && !ವಾದಗಳು->os_oldval.boolean)
 	gui_mch_enable_beval_area(balloonEval);
-    else if (!p_beval && args->os_oldval.boolean)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!p_beval && ವಾದಗಳು->os_oldval.boolean)
 	gui_mch_disable_beval_area(balloonEval);
 
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_BEVAL_TERM)
+#ಆದರೆ defined(FEAT_BEVAL_ಪದ)
 /*
  * Process the updated 'balloonevalterm' option value.
  */
-    char *
-did_set_balloonevalterm(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_balloonevalterm(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
-    mch_bevalterm_changed();
-    return NULL;
+    mch_bevalterm_ಬದಲಾಯಿತು();
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Process the updated 'binary' option value.
  */
-    char *
-did_set_binary(optset_T *args)
+    ಅಕ್ಷರ *
+did_ಗಣ_ದ್ವಿಮಾನ(optset_T *ವಾದಗಳು)
 {
     // when 'bin' is set also set some other options
-    set_options_bin(args->os_oldval.boolean, curbuf->b_p_bin, args->os_flags);
+    ಗಣ_options_bin(ವಾದಗಳು->os_oldval.boolean, curbuf->b_p_bin, ವಾದಗಳು->os_flags);
     redraw_titles();
 
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Process the updated 'buflisted' option value.
  */
-    char *
-did_set_buflisted(optset_T *args)
+    ಅಕ್ಷರ *
+did_ಗಣ_buflisted(optset_T *ವಾದಗಳು)
 {
     // when 'buflisted' changes, trigger autocommands
-    if (args->os_oldval.boolean != curbuf->b_p_bl)
+    ಆದರೆ (ವಾದಗಳು->os_oldval.boolean != curbuf->b_p_bl)
 	apply_autocmds(curbuf->b_p_bl ? EVENT_BUFADD : EVENT_BUFDELETE,
-						NULL, NULL, TRUE, curbuf);
-    return NULL;
+						ಖಾಲಿ, ಖಾಲಿ, TRUE, curbuf);
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Process the new 'cmdheight' option value.
  */
-    char *
-did_set_cmdheight(optset_T *args)
+    ಅಕ್ಷರ *
+did_ಗಣ_cmdheight(optset_T *ವಾದಗಳು)
 {
-    long old_value = args->os_oldval.number;
-    char *errmsg = NULL;
+    ದೀರ್ಘ old_ಮೌಲ್ಯ = ವಾದಗಳು->os_oldval.ಸಂಖ್ಯೆ;
+    ಅಕ್ಷರ *errmsg = ಖಾಲಿ;
 
     // if p_ch changed value, change the command line height
-    if (p_ch < MIN_CMDHEIGHT)
+    ಆದರೆ (p_ch < MIN_CMDHEIGHT)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
 	p_ch = MIN_CMDHEIGHT;
     }
-    if (p_ch > Rows - min_rows() + MIN_CMDHEIGHT)
-	p_ch = Rows - min_rows() + MIN_CMDHEIGHT;
+    ಆದರೆ (p_ch > ಅಡ್ಡಸಾಲುಗಳು - min_ಅಡ್ಡಸಾಲುಗಳು() + MIN_CMDHEIGHT)
+	p_ch = ಅಡ್ಡಸಾಲುಗಳು - min_ಅಡ್ಡಸಾಲುಗಳು() + MIN_CMDHEIGHT;
 
     // Only compute the new window layout when startup has been
     // completed. Otherwise the frame sizes may be wrong.
-    if ((p_ch != old_value
-		|| tabline_height() + topframe->fr_height != Rows - p_ch)
-	    && full_screen
-#ifdef FEAT_GUI
+    ಆದರೆ ((p_ch != old_ಮೌಲ್ಯ
+		|| tabline_ಎತ್ತರ() + topframe->fr_ಎತ್ತರ != ಅಡ್ಡಸಾಲುಗಳು - p_ch)
+	    && ತುಂಬಿದ_screen
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 	    && !gui.starting
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
        )
-	command_height();
+	command_ಎತ್ತರ();
 
-    return errmsg;
+    ಹಿಂತಿರುಗಿ errmsg;
 }
 
 /*
  * Process the updated 'compatible' option value.
  */
-    char *
-did_set_compatible(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_compatible(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
-    compatible_set();
-    return NULL;
+    compatible_ಗಣ();
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
-#if defined(FEAT_CONCEAL)
+#ಆದರೆ defined(FEAT_CONCEAL)
 /*
  * Process the new 'conceallevel' option value.
  */
-    char *
-did_set_conceallevel(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_conceallevel(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
-    char *errmsg = NULL;
+    ಅಕ್ಷರ *errmsg = ಖಾಲಿ;
 
-    if (curwin->w_p_cole < 0)
+    ಆದರೆ (curwin->w_p_cole < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
 	curwin->w_p_cole = 0;
     }
-    else if (curwin->w_p_cole > 3)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (curwin->w_p_cole > 3)
     {
-	errmsg = e_invalid_argument;
+	errmsg = e_invalid_ವಾದ;
 	curwin->w_p_cole = 3;
     }
-    if (curwin->w_allbuf_opt.wo_cole < 0)
+    ಆದರೆ (curwin->w_allbuf_opt.wo_cole < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
 	curwin->w_allbuf_opt.wo_cole = 0;
     }
-    else if (curwin->w_allbuf_opt.wo_cole > 3)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (curwin->w_allbuf_opt.wo_cole > 3)
     {
-	errmsg = e_invalid_argument;
+	errmsg = e_invalid_ವಾದ;
 	curwin->w_allbuf_opt.wo_cole = 3;
     }
 
-    return errmsg;
+    ಹಿಂತಿರುಗಿ errmsg;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_DIFF)
+#ಆದರೆ defined(FEAT_DIFF)
 /*
  * Process the updated 'diff' option value.
  */
-    char *
-did_set_diff(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_diff(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
     // May add or remove the buffer from the list of diff buffers.
     diff_buf_adjust(curwin);
 # ifdef FEAT_FOLDING
-    if (foldmethodIsDiff(curwin))
+    ಆದರೆ (foldmethodIsDiff(curwin))
 	foldUpdateAll(curwin);
 # endif
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Process the updated 'endoffile' or 'endofline' or 'fixendofline' or 'bomb'
  * option value.
  */
-    char *
-did_set_eof_eol_fixeol_bomb(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_eof_eol_fixeol_bomb(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
     // redraw the window title and tab page text
     redraw_titles();
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Process the updated 'equalalways' option value.
  */
-    char *
-did_set_equalalways(optset_T *args)
+    ಅಕ್ಷರ *
+did_ಗಣ_equalalways(optset_T *ವಾದಗಳು)
 {
-    if (p_ea && !args->os_oldval.boolean)
+    ಆದರೆ (p_ea && !ವಾದಗಳು->os_oldval.boolean)
 	win_equal(curwin, FALSE, 0);
 
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
-#if defined(FEAT_FOLDING)
+#ಆದರೆ defined(FEAT_FOLDING)
 /*
  * Process the new 'foldcolumn' option value.
  */
-    char *
-did_set_foldcolumn(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_foldcolumn(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
-    char *errmsg = NULL;
+    ಅಕ್ಷರ *errmsg = ಖಾಲಿ;
 
-    if (curwin->w_p_fdc < 0)
+    ಆದರೆ (curwin->w_p_fdc < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
 	curwin->w_p_fdc = 0;
     }
-    else if (curwin->w_p_fdc > 12)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (curwin->w_p_fdc > 12)
     {
-	errmsg = e_invalid_argument;
+	errmsg = e_invalid_ವಾದ;
 	curwin->w_p_fdc = 12;
     }
-    if (curwin->w_allbuf_opt.wo_fdc < 0)
+    ಆದರೆ (curwin->w_allbuf_opt.wo_fdc < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
 	curwin->w_allbuf_opt.wo_fdc = 0;
     }
-    else if (curwin->w_allbuf_opt.wo_fdc > 12)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (curwin->w_allbuf_opt.wo_fdc > 12)
     {
-	errmsg = e_invalid_argument;
+	errmsg = e_invalid_ವಾದ;
 	curwin->w_allbuf_opt.wo_fdc = 12;
     }
 
-    return errmsg;
+    ಹಿಂತಿರುಗಿ errmsg;
 }
 
 /*
  * Process the new 'foldlevel' option value.
  */
-    char *
-did_set_foldlevel(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_foldlevel(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
-    if (curwin->w_p_fdl < 0)
+    ಆದರೆ (curwin->w_p_fdl < 0)
 	curwin->w_p_fdl = 0;
     newFoldLevel();
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Process the new 'foldminlines' option value.
  */
-    char *
-did_set_foldminlines(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_foldminlines(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
     foldUpdateAll(curwin);
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Process the new 'foldnestmax' option value.
  */
-    char *
-did_set_foldnestmax(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_foldnestmax(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
-    if (foldmethodIsSyntax(curwin) || foldmethodIsIndent(curwin))
+    ಆದರೆ (foldmethodIsSyntax(curwin) || foldmethodIsIndent(curwin))
 	foldUpdateAll(curwin);
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_SEARCH_EXTRA)
+#ಆದರೆ defined(FEAT_ಹುಡುಕು_EXTRA)
 /*
  * Process the updated 'hlsearch' option value.
  */
-    char *
-did_set_hlsearch(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_hlsearch(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
     // when 'hlsearch' is set or reset: reset no_hlsearch
-    set_no_hlsearch(FALSE);
-    return NULL;
+    ಗಣ_no_hlsearch(FALSE);
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Process the updated 'ignorecase' option value.
  */
-    char *
-did_set_ignorecase(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_ignorecase(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
     // when 'ignorecase' is set or reset and 'hlsearch' is set, redraw
-    if (p_hls)
+    ಆದರೆ (p_hls)
 	redraw_all_later(UPD_SOME_VALID);
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
-#if defined(HAVE_INPUT_METHOD)
+#ಆದರೆ defined(HAVE_ಒಳಹರಿವು_ವಿಧಾನ)
 /*
  * Process the updated 'imdisable' option value.
  */
-    char *
-did_set_imdisable(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_imdisable(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
     // Only de-activate it here, it will be enabled when changing mode.
-    if (p_imdisable)
-	im_set_active(FALSE);
-    else if (State & MODE_INSERT)
+    ಆದರೆ (p_imdisable)
+	im_ಗಣ_ಸಕ್ರಿಯ(FALSE);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (State & ಬಹುಲಕ_ಸೇರಿಸು)
 	// When the option is set from an autocommand, it may need to take
 	// effect right away.
-	im_set_active(curbuf->b_p_iminsert == B_IMODE_IM);
-    return NULL;
+	im_ಗಣ_ಸಕ್ರಿಯ(curbuf->b_p_iminsert == B_IMODE_IM);
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Process the new 'iminsert' option value.
  */
-    char *
-did_set_iminsert(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_iminsert(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
-    char *errmsg = NULL;
+    ಅಕ್ಷರ *errmsg = ಖಾಲಿ;
 
-    if (curbuf->b_p_iminsert < 0 || curbuf->b_p_iminsert > B_IMODE_LAST)
+    ಆದರೆ (curbuf->b_p_iminsert < 0 || curbuf->b_p_iminsert > B_IMODE_ಕೊನೆಯ)
     {
-	errmsg = e_invalid_argument;
+	errmsg = e_invalid_ವಾದ;
 	curbuf->b_p_iminsert = B_IMODE_NONE;
     }
     p_iminsert = curbuf->b_p_iminsert;
-    if (termcap_active)	// don't do this in the alternate screen
+    ಆದರೆ (termcap_ಸಕ್ರಿಯ)	// don't do this in the alternate screen
 	showmode();
-#if defined(FEAT_KEYMAP)
+#ಆದರೆ defined(FEAT_KEYMAP)
     // Show/unshow value of 'keymap' in status lines.
-    status_redraw_curbuf();
-#endif
+    ಸ್ಥಿತಿ_redraw_curbuf();
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return errmsg;
+    ಹಿಂತಿರುಗಿ errmsg;
 }
 
 /*
  * Process the new 'imsearch' option value.
  */
-    char *
-did_set_imsearch(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_imsearch(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
-    char *errmsg = NULL;
+    ಅಕ್ಷರ *errmsg = ಖಾಲಿ;
 
-    if (curbuf->b_p_imsearch < -1 || curbuf->b_p_imsearch > B_IMODE_LAST)
+    ಆದರೆ (curbuf->b_p_imsearch < -1 || curbuf->b_p_imsearch > B_IMODE_ಕೊನೆಯ)
     {
-	errmsg = e_invalid_argument;
+	errmsg = e_invalid_ವಾದ;
 	curbuf->b_p_imsearch = B_IMODE_NONE;
     }
     p_imsearch = curbuf->b_p_imsearch;
 
-    return errmsg;
+    ಹಿಂತಿರುಗಿ errmsg;
 }
 
-#if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
+#ಆದರೆ defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
 /*
  * Process the new 'imstyle' option value.
  */
-    char *
-did_set_imstyle(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_imstyle(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
-    char *errmsg = NULL;
+    ಅಕ್ಷರ *errmsg = ಖಾಲಿ;
 
-    if (p_imst != IM_ON_THE_SPOT && p_imst != IM_OVER_THE_SPOT)
-	errmsg = e_invalid_argument;
+    ಆದರೆ (p_imst != IM_ON_THE_SPOT && p_imst != IM_OVER_THE_SPOT)
+	errmsg = e_invalid_ವಾದ;
 
-    return errmsg;
+    ಹಿಂತಿರುಗಿ errmsg;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Process the updated 'insertmode' option value.
  */
-    char *
-did_set_insertmode(optset_T *args)
+    ಅಕ್ಷರ *
+did_ಗಣ_insertmode(optset_T *ವಾದಗಳು)
 {
     // when 'insertmode' is set from an autocommand need to do work here
-    if (p_im)
+    ಆದರೆ (p_im)
     {
-	if ((State & MODE_INSERT) == 0)
-	    need_start_insertmode = TRUE;
-	stop_insert_mode = FALSE;
+	ಆದರೆ ((State & ಬಹುಲಕ_ಸೇರಿಸು) == 0)
+	    need_ಆರಂಭ_insertmode = TRUE;
+	stop_ಸೇರಿಸು_ಬಹುಲಕ = FALSE;
     }
     // only reset if it was set previously
-    else if (args->os_oldval.boolean)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ವಾದಗಳು->os_oldval.boolean)
     {
-	need_start_insertmode = FALSE;
-	stop_insert_mode = TRUE;
-	if (restart_edit != 0 && mode_displayed)
+	need_ಆರಂಭ_insertmode = FALSE;
+	stop_ಸೇರಿಸು_ಬಹುಲಕ = TRUE;
+	ಆದರೆ (restart_edit != 0 && ಬಹುಲಕ_displayed)
 	    clear_cmdline = TRUE;	// remove "(insert)"
 	restart_edit = 0;
     }
 
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
-#if defined(FEAT_LANGMAP)
+#ಆದರೆ defined(FEAT_LANGMAP)
 /*
  * Process the updated 'langnoremap' option value.
  */
-    char *
-did_set_langnoremap(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_langnoremap(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
     // 'langnoremap' -> !'langremap'
     p_lrm = !p_lnr;
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Process the updated 'langremap' option value.
  */
-    char *
-did_set_langremap(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_langremap(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
     // 'langremap' -> !'langnoremap'
     p_lnr = !p_lrm;
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Process the new 'laststatus' option value.
  */
-    char *
-did_set_laststatus(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_laststatus(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
-    last_status(FALSE);	// (re)set last window status line
-    return NULL;
+    ಕೊನೆಯ_ಸ್ಥಿತಿ(FALSE);	// (re)set last window status line
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
-#if defined(FEAT_GUI)
+#ಆದರೆ defined(FEAT_GUI)
 /*
  * Process the new 'linespace' option value.
  */
-    char *
-did_set_linespace(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_linespace(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
     // Recompute gui.char_height and resize the Vim window to keep the
     // same number of lines.
-    if (gui.in_use && gui_mch_adjust_charheight() == OK)
-	gui_set_shellsize(FALSE, FALSE, RESIZE_VERT);
-    return NULL;
+    ಆದರೆ (gui.ಒಳ_use && gui_mch_adjust_charheight() == OK)
+	gui_ಗಣ_shellsize(FALSE, FALSE, RESIZE_VERT);
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Process the updated 'lisp' option value.
  */
-    char *
-did_set_lisp(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_lisp(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
     // When 'lisp' option changes include/exclude '-' in keyword characters.
-    (void)buf_init_chartab(curbuf, FALSE);	    // ignore errors
-    return NULL;
+    (ಶೂನ್ಯ)buf_init_chartab(curbuf, FALSE);	    // ignore errors
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Process the new 'maxcombine' option value.
  */
-    char *
-did_set_maxcombine(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_maxcombine(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
-    if (p_mco > MAX_MCO)
+    ಆದರೆ (p_mco > MAX_MCO)
 	p_mco = MAX_MCO;
-    else if (p_mco < 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p_mco < 0)
 	p_mco = 0;
     screenclear();	    // will re-allocate the screen
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Process the updated 'modifiable' option value.
  */
-    char *
-did_set_modifiable(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_modifiable(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
     // when 'modifiable' is changed, redraw the window title
 
-#ifdef FEAT_TERMINAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMINAL
     // Cannot set 'modifiable' when in Terminal mode.
-    if (curbuf->b_p_ma && (term_in_normal_mode(curbuf) || (bt_terminal(curbuf)
-		    && curbuf->b_term != NULL && !term_is_finished(curbuf))))
+    ಆದರೆ (curbuf->b_p_ma && (ಪದ_ಒಳ_ಸಾಮಾನ್ಯ_ಬಹುಲಕ(curbuf) || (bt_terminal(curbuf)
+		    && curbuf->b_ಪದ != ಖಾಲಿ && !ಪದ_is_ಪೂರ್ಣಗೊಂಡ(curbuf))))
     {
 	curbuf->b_p_ma = FALSE;
-	return e_cannot_make_terminal_with_running_job_modifiable;
+	ಹಿಂತಿರುಗಿ e_cannot_make_terminal_with_running_ಕೆಲಸ_modifiable;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     redraw_titles();
 
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Process the updated 'modified' option value.
  */
-    char *
-did_set_modified(optset_T *args)
+    ಅಕ್ಷರ *
+did_ಗಣ_modified(optset_T *ವಾದಗಳು)
 {
-    if (!args->os_newval.boolean)
+    ಆದರೆ (!ವಾದಗಳು->os_newval.boolean)
 	save_file_ff(curbuf);	// Buffer is unchanged
     redraw_titles();
-    curbuf->b_modified_was_set = !!args->os_newval.boolean;
-    return NULL;
+    curbuf->b_modified_was_ಗಣ = !!ವಾದಗಳು->os_newval.boolean;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
-#if defined(FEAT_GUI)
+#ಆದರೆ defined(FEAT_GUI)
 /*
  * Process the updated 'mousehide' option value.
  */
-    char *
-did_set_mousehide(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_mousehide(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
-    if (!p_mh)
+    ಆದರೆ (!p_mh)
 	gui_mch_mousehide(FALSE);
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Process the updated 'number' or 'relativenumber' option value.
  */
-    char *
-did_set_number_relativenumber(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_ಸಂಖ್ಯೆ_relativenumber(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
-#if defined(FEAT_SIGNS) && defined(FEAT_GUI)
-    if (gui.in_use
+#ಆದರೆ defined(FEAT_SIGNS) && defined(FEAT_GUI)
+    ಆದರೆ (gui.ಒಳ_use
 	    && (*curwin->w_p_scl == 'n' && *(curwin->w_p_scl + 1) == 'u')
-	    && curbuf->b_signlist != NULL)
+	    && curbuf->b_signlist != ಖಾಲಿ)
     {
 	// If the 'number' or 'relativenumber' options are modified and
 	// 'signcolumn' is set to 'number', then clear the screen for a full
@@ -4317,86 +4317,86 @@ did_set_number_relativenumber(optset_T *args UNUSED)
 	// number column.  If the 'number' option is set and only the
 	// 'relativenumber' option is toggled, then don't refresh the screen
 	// (optimization).
-	if (!(curwin->w_p_nu && ((int *)args->os_varp == &curwin->w_p_rnu)))
+	ಆದರೆ (!(curwin->w_p_nu && ((ಪೂರ್ಣಾಂಕ *)ವಾದಗಳು->os_varp == &curwin->w_p_rnu)))
 	    redraw_all_later(UPD_CLEAR);
     }
-#endif
-    return NULL;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
-#if defined(FEAT_LINEBREAK)
+#ಆದರೆ defined(FEAT_LINEBREAK)
 /*
  * Process the new 'numberwidth' option value.
  */
-    char *
-did_set_numberwidth(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_numberwidth(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
-    char *errmsg = NULL;
+    ಅಕ್ಷರ *errmsg = ಖಾಲಿ;
 
     // 'numberwidth' must be positive
-    if (curwin->w_p_nuw < 1)
+    ಆದರೆ (curwin->w_p_nuw < 1)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
 	curwin->w_p_nuw = 1;
     }
-    else if (curwin->w_p_nuw > 20)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (curwin->w_p_nuw > 20)
     {
-	errmsg = e_invalid_argument;
+	errmsg = e_invalid_ವಾದ;
 	curwin->w_p_nuw = 20;
     }
-    if (curwin->w_allbuf_opt.wo_nuw < 1)
+    ಆದರೆ (curwin->w_allbuf_opt.wo_nuw < 1)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
 	curwin->w_allbuf_opt.wo_nuw = 1;
     }
-    else if (curwin->w_allbuf_opt.wo_nuw > 20)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (curwin->w_allbuf_opt.wo_nuw > 20)
     {
-	errmsg = e_invalid_argument;
+	errmsg = e_invalid_ವಾದ;
 	curwin->w_allbuf_opt.wo_nuw = 20;
     }
-    curwin->w_nrwidth_line_count = 0; // trigger a redraw
+    curwin->w_nrwidth_ಸಾಲು_ಎಣಿಕೆ = 0; // trigger a redraw
 
-    return errmsg;
+    ಹಿಂತಿರುಗಿ errmsg;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Process the updated 'osctimeoutlen' option value.
  */
-    char *
-did_set_osctimeoutlen(optset_T *args)
+    ಅಕ್ಷರ *
+did_ಗಣ_osctimeoutlen(optset_T *ವಾದಗಳು)
 {
-    if (p_ost < 0)
+    ಆದರೆ (p_ost < 0)
     {
-	p_ost = args->os_oldval.number;
-	return e_argument_must_be_positive;
+	p_ost = ವಾದಗಳು->os_oldval.ಸಂಖ್ಯೆ;
+	ಹಿಂತಿರುಗಿ e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
     }
 
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Process the updated 'paste' option value.  Called after p_paste was set or
  * reset.  When 'paste' is set or reset also change other options.
  */
-    char *
-did_set_paste(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_paste(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
-    static int	old_p_paste = FALSE;
-    static int	save_sm = 0;
-    static int	save_sta = 0;
-    static int	save_ru = 0;
-#ifdef FEAT_RIGHTLEFT
-    static int	save_ri = 0;
-    static int	save_hkmap = 0;
-#endif
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	old_p_paste = FALSE;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	save_sm = 0;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	save_sta = 0;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	save_ru = 0;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	save_ri = 0;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	save_hkmap = 0;
+#ಆದರೆ_ಅಂತ್ಯ
     buf_T	*buf;
 
-    if (p_paste)
+    ಆದರೆ (p_paste)
     {
 	// Paste switched from off to on.
 	// Save the current values, so they can be restored later.
-	if (!old_p_paste)
+	ಆದರೆ (!old_p_paste)
 	{
 	    // save options for each buffer
 	    FOR_ALL_BUFFERS(buf)
@@ -4406,35 +4406,35 @@ did_set_paste(optset_T *args UNUSED)
 		buf->b_p_sts_nopaste = buf->b_p_sts;
 		buf->b_p_ai_nopaste = buf->b_p_ai;
 		buf->b_p_et_nopaste = buf->b_p_et;
-#ifdef FEAT_VARTABS
-		if (buf->b_p_vsts_nopaste)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+		ಆದರೆ (buf->b_p_vsts_nopaste)
 		    vim_free(buf->b_p_vsts_nopaste);
 		buf->b_p_vsts_nopaste =
-			buf->b_p_vsts && buf->b_p_vsts != empty_option
-					   ? vim_strsave(buf->b_p_vsts) : NULL;
-#endif
+			buf->b_p_vsts && buf->b_p_vsts != ಖಾಲಿಗಳು_option
+					   ? vim_strsave(buf->b_p_vsts) : ಖಾಲಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
 
 	    // save global options
 	    save_sm = p_sm;
 	    save_sta = p_sta;
 	    save_ru = p_ru;
-#ifdef FEAT_RIGHTLEFT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
 	    save_ri = p_ri;
 	    save_hkmap = p_hkmap;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    // save global values for local buffer options
 	    p_ai_nopaste = p_ai;
 	    p_et_nopaste = p_et;
 	    p_sts_nopaste = p_sts;
 	    p_tw_nopaste = p_tw;
 	    p_wm_nopaste = p_wm;
-#ifdef FEAT_VARTABS
-	    if (p_vsts_nopaste)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+	    ಆದರೆ (p_vsts_nopaste)
 		vim_free(p_vsts_nopaste);
-	    p_vsts_nopaste = p_vsts && p_vsts != empty_option
-						  ? vim_strsave(p_vsts) : NULL;
-#endif
+	    p_vsts_nopaste = p_vsts && p_vsts != ಖಾಲಿಗಳು_option
+						  ? vim_strsave(p_vsts) : ಖಾಲಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 	}
 
 	// Always set the option values, also when 'paste' is set when it is
@@ -4446,39 +4446,39 @@ did_set_paste(optset_T *args UNUSED)
 	    buf->b_p_sts = 0;	    // softtabstop is 0
 	    buf->b_p_ai = 0;	    // no auto-indent
 	    buf->b_p_et = 0;	    // no expandtab
-#ifdef FEAT_VARTABS
-	    if (buf->b_p_vsts)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+	    ಆದರೆ (buf->b_p_vsts)
 		free_string_option(buf->b_p_vsts);
-	    buf->b_p_vsts = empty_option;
+	    buf->b_p_vsts = ಖಾಲಿಗಳು_option;
 	    VIM_CLEAR(buf->b_p_vsts_array);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	}
 
 	// set global options
 	p_sm = 0;		    // no showmatch
 	p_sta = 0;		    // no smarttab
-	if (p_ru)
-	    status_redraw_all();    // redraw to remove the ruler
+	ಆದರೆ (p_ru)
+	    ಸ್ಥಿತಿ_redraw_all();    // redraw to remove the ruler
 	p_ru = 0;		    // no ruler
-#ifdef FEAT_RIGHTLEFT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
 	p_ri = 0;		    // no reverse insert
 	p_hkmap = 0;		    // no Hebrew keyboard
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	// set global values for local buffer options
 	p_tw = 0;
 	p_wm = 0;
 	p_sts = 0;
 	p_ai = 0;
 	p_et = 0;
-#ifdef FEAT_VARTABS
-	if (p_vsts)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+	ಆದರೆ (p_vsts)
 	    free_string_option(p_vsts);
-	p_vsts = empty_option;
-#endif
+	p_vsts = ಖಾಲಿಗಳು_option;
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
     // Paste switched from on to off: Restore saved values.
-    else if (old_p_paste)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (old_p_paste)
     {
 	// restore options for each buffer
 	FOR_ALL_BUFFERS(buf)
@@ -4488,164 +4488,164 @@ did_set_paste(optset_T *args UNUSED)
 	    buf->b_p_sts = buf->b_p_sts_nopaste;
 	    buf->b_p_ai = buf->b_p_ai_nopaste;
 	    buf->b_p_et = buf->b_p_et_nopaste;
-#ifdef FEAT_VARTABS
-	    if (buf->b_p_vsts)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+	    ಆದರೆ (buf->b_p_vsts)
 		free_string_option(buf->b_p_vsts);
 	    buf->b_p_vsts = buf->b_p_vsts_nopaste
-			 ? vim_strsave(buf->b_p_vsts_nopaste) : empty_option;
+			 ? vim_strsave(buf->b_p_vsts_nopaste) : ಖಾಲಿಗಳು_option;
 	    vim_free(buf->b_p_vsts_array);
-	    if (buf->b_p_vsts && buf->b_p_vsts != empty_option)
-		(void)tabstop_set(buf->b_p_vsts, &buf->b_p_vsts_array);
-	    else
-		buf->b_p_vsts_array = NULL;
-#endif
+	    ಆದರೆ (buf->b_p_vsts && buf->b_p_vsts != ಖಾಲಿಗಳು_option)
+		(ಶೂನ್ಯ)tabstop_ಗಣ(buf->b_p_vsts, &buf->b_p_vsts_array);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		buf->b_p_vsts_array = ಖಾಲಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 	}
 
 	// restore global options
 	p_sm = save_sm;
 	p_sta = save_sta;
-	if (p_ru != save_ru)
-	    status_redraw_all();    // redraw to draw the ruler
+	ಆದರೆ (p_ru != save_ru)
+	    ಸ್ಥಿತಿ_redraw_all();    // redraw to draw the ruler
 	p_ru = save_ru;
-#ifdef FEAT_RIGHTLEFT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
 	p_ri = save_ri;
 	p_hkmap = save_hkmap;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	// set global values for local buffer options
 	p_ai = p_ai_nopaste;
 	p_et = p_et_nopaste;
 	p_sts = p_sts_nopaste;
 	p_tw = p_tw_nopaste;
 	p_wm = p_wm_nopaste;
-#ifdef FEAT_VARTABS
-	if (p_vsts)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+	ಆದರೆ (p_vsts)
 	    free_string_option(p_vsts);
-	p_vsts = p_vsts_nopaste ? vim_strsave(p_vsts_nopaste) : empty_option;
-#endif
+	p_vsts = p_vsts_nopaste ? vim_strsave(p_vsts_nopaste) : ಖಾಲಿಗಳು_option;
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
     old_p_paste = p_paste;
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
     // Remember where the dependent options were reset
     didset_options_sctx((OPT_LOCAL | OPT_GLOBAL), p_paste_dep_opts);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 
-#ifdef FEAT_QUICKFIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
 /*
  * Process the updated 'previewwindow' option value.
  */
-    char *
-did_set_previewwindow(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_previewwindow(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
-    if (!curwin->w_p_pvw)
-	return NULL;
+    ಆದರೆ (!curwin->w_p_pvw)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     // There can be only one window with 'previewwindow' set.
     win_T	*win;
 
     FOR_ALL_WINDOWS(win)
-	if (win->w_p_pvw && win != curwin)
+	ಆದರೆ (win->w_p_pvw && win != curwin)
 	{
 	    curwin->w_p_pvw = FALSE;
-	    return e_preview_window_already_exists;
+	    ಹಿಂತಿರುಗಿ e_preview_ಕಿಟಕಿ_already_exists;
 	}
 
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#ಆದರೆ defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 /*
  * Process the new 'pyxversion' option value.
  */
-    char *
-did_set_pyxversion(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_pyxversion(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
-    char *errmsg = NULL;
+    ಅಕ್ಷರ *errmsg = ಖಾಲಿ;
 
-    if (p_pyx != 0 && p_pyx != 2 && p_pyx != 3)
-	errmsg = e_invalid_argument;
+    ಆದರೆ (p_pyx != 0 && p_pyx != 2 && p_pyx != 3)
+	errmsg = e_invalid_ವಾದ;
 
-    return errmsg;
+    ಹಿಂತಿರುಗಿ errmsg;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Process the updated 'readonly' option value.
  */
-    char *
-did_set_readonly(optset_T *args)
+    ಅಕ್ಷರ *
+did_ಗಣ_readonly(optset_T *ವಾದಗಳು)
 {
     // when 'readonly' is reset globally, also reset readonlymode
-    if (!curbuf->b_p_ro && (args->os_flags & OPT_LOCAL) == 0)
+    ಆದರೆ (!curbuf->b_p_ro && (ವಾದಗಳು->os_flags & OPT_LOCAL) == 0)
 	readonlymode = FALSE;
 
     // when 'readonly' is set may give W10 again
-    if (curbuf->b_p_ro)
+    ಆದರೆ (curbuf->b_p_ro)
 	curbuf->b_did_warn = false;
 
     redraw_titles();
 
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Process the updated 'scrollbind' option value.
  */
-    char *
-did_set_scrollbind(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_scrollbind(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
     // when 'scrollbind' is set: snapshot the current position to avoid a jump
     // at the end of normal_cmd()
-    if (!curwin->w_p_scb)
-	return NULL;
+    ಆದರೆ (!curwin->w_p_scb)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     do_check_scrollbind(FALSE);
     curwin->w_scbind_pos = curwin->w_topline;
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Process the new 'maxsearchcount' option value.
  */
-    char *
-did_set_maxsearchcount(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_maxsearchcount(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
-    char	*errmsg = NULL;
+    ಅಕ್ಷರ	*errmsg = ಖಾಲಿ;
 // if you increase this, also increase SEARCH_STAT_BUF_LEN in search.c
-#define MAX_SEARCH_COUNT 9999
+#ವ್ಯಾಖ್ಯಾನಿಸು MAX_ಹುಡುಕು_ಎಣಿಕೆ 9999
 
-    if (p_msc <= 0)
-	errmsg = e_argument_must_be_positive;
-    else if (p_msc > MAX_SEARCH_COUNT)
-	errmsg = e_invalid_argument;
+    ಆದರೆ (p_msc <= 0)
+	errmsg = e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p_msc > MAX_ಹುಡುಕು_ಎಣಿಕೆ)
+	errmsg = e_invalid_ವಾದ;
 
-    if (errmsg != NULL)
+    ಆದರೆ (errmsg != ಖಾಲಿ)
 	p_msc = 99;
 
-    return errmsg;
-#undef MAX_SEARCH_COUNT
+    ಹಿಂತಿರುಗಿ errmsg;
+#ವ್ಯಾಖ್ಯಾನ_ರದ್ದು MAX_ಹುಡುಕು_ಎಣಿಕೆ
 }
 
-#if defined(BACKSLASH_IN_FILENAME)
+#ಆದರೆ defined(BACKSLASH_ಒಳ_FILENAME)
 /*
  * Process the updated 'shellslash' option value.
  */
-    char *
-did_set_shellslash(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_shellslash(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
-    if (p_ssl)
+    ಆದರೆ (p_ssl)
     {
 	psepc = '/';
 	psepcN = '\\';
 	pseps[0] = '/';
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	psepc = '\\';
 	psepcN = '/';
@@ -4658,327 +4658,327 @@ did_set_shellslash(optset_T *args UNUSED)
 # ifdef FEAT_EVAL
     scriptnames_slash_adjust();
 # endif
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Process the new 'shiftwidth' or the 'tabstop' option value.
  */
-    char *
-did_set_shiftwidth_tabstop(optset_T *args)
+    ಅಕ್ಷರ *
+did_ಗಣ_shiftwidth_tabstop(optset_T *ವಾದಗಳು)
 {
-    long	*pp = (long *)args->os_varp;
-    char	*errmsg = NULL;
+    ದೀರ್ಘ	*pp = (ದೀರ್ಘ *)ವಾದಗಳು->os_varp;
+    ಅಕ್ಷರ	*errmsg = ಖಾಲಿ;
 
-    if (curbuf->b_p_ts <= 0)
+    ಆದರೆ (curbuf->b_p_ts <= 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
 	curbuf->b_p_ts = 8;
     }
-    else if (curbuf->b_p_ts > TABSTOP_MAX)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (curbuf->b_p_ts > TABSTOP_MAX)
     {
-	errmsg = e_invalid_argument;
+	errmsg = e_invalid_ವಾದ;
 	curbuf->b_p_ts = 8;
     }
-    if (p_ts <= 0)
+    ಆದರೆ (p_ts <= 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
 	p_ts = 8;
     }
-    else if (p_ts > TABSTOP_MAX)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p_ts > TABSTOP_MAX)
     {
-	errmsg = e_invalid_argument;
+	errmsg = e_invalid_ವಾದ;
 	p_ts = 8;
     }
 
-    if (curbuf->b_p_sw < 0)
+    ಆದರೆ (curbuf->b_p_sw < 0)
     {
-	errmsg = e_argument_must_be_positive;
-#ifdef FEAT_VARTABS
+	errmsg = e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
 	// Use the first 'vartabstop' value, or 'tabstop' if vts isn't in use.
-	curbuf->b_p_sw = tabstop_count(curbuf->b_p_vts_array) > 0
-		       ? tabstop_first(curbuf->b_p_vts_array)
+	curbuf->b_p_sw = tabstop_ಎಣಿಕೆ(curbuf->b_p_vts_array) > 0
+		       ? tabstop_ಮೊದಲ(curbuf->b_p_vts_array)
 		       : curbuf->b_p_ts;
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 	curbuf->b_p_sw = curbuf->b_p_ts;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
-    if (p_sw < 0)
+    ಆದರೆ (p_sw < 0)
     {
-	errmsg = e_argument_must_be_positive;
-#ifdef FEAT_VARTABS
+	errmsg = e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
 	// Use the first 'vartabstop' value, or 'tabstop' if vts isn't in use.
-	p_sw = tabstop_count(curbuf->b_p_vts_array) > 0
-	     ? tabstop_first(curbuf->b_p_vts_array)
+	p_sw = tabstop_ಎಣಿಕೆ(curbuf->b_p_vts_array) > 0
+	     ? tabstop_ಮೊದಲ(curbuf->b_p_vts_array)
 	     : curbuf->b_p_ts;
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 	p_sw = curbuf->b_p_ts;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
-#ifdef FEAT_FOLDING
-    if (foldmethodIsIndent(curwin))
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_FOLDING
+    ಆದರೆ (foldmethodIsIndent(curwin))
 	foldUpdateAll(curwin);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     // When 'shiftwidth' changes, or it's zero and 'tabstop' changes:
     // parse 'cinoptions'.
-    if (pp == &curbuf->b_p_sw || curbuf->b_p_sw == 0)
+    ಆದರೆ (pp == &curbuf->b_p_sw || curbuf->b_p_sw == 0)
 	parse_cino(curbuf);
 
-    return errmsg;
+    ಹಿಂತಿರುಗಿ errmsg;
 }
 
 /*
  * Process the new 'showtabline' option value.
  */
-    char *
-did_set_showtabline(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_showtabline(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
-    shell_new_rows();	// recompute window positions and heights
-    return NULL;
+    shell_new_ಅಡ್ಡಸಾಲುಗಳು();	// recompute window positions and heights
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Process the updated 'smoothscroll' option value.
  */
-    char *
-did_set_smoothscroll(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_smoothscroll(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
-    if (!curwin->w_p_sms)
+    ಆದರೆ (!curwin->w_p_sms)
 	curwin->w_skipcol = 0;
 
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
-#if defined(FEAT_SPELL)
+#ಆದರೆ defined(FEAT_SPELL)
 /*
  * Process the updated 'spell' option value.
  */
-    char *
-did_set_spell(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_spell(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
-    if (curwin->w_p_spell)
-	return parse_spelllang(curwin);
+    ಆದರೆ (curwin->w_p_spell)
+	ಹಿಂತಿರುಗಿ parse_spelllang(curwin);
 
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Process the updated 'swapfile' option value.
  */
-    char *
-did_set_swapfile(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_swapfile(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
     // when 'swf' is set, create swapfile, when reset remove swapfile
-    if (curbuf->b_p_swf && p_uc)
+    ಆದರೆ (curbuf->b_p_swf && p_uc)
 	ml_open_file(curbuf);		// create the swap file
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	// no need to reset curbuf->b_may_swap, ml_open_file() will check
 	// buf->b_p_swf
 	mf_close_file(curbuf, TRUE);	// remove the swap file
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
-#if defined(FEAT_TERMGUICOLORS)
-    char *
-did_set_termguicolors(optset_T *args UNUSED)
+#ಆದರೆ defined(FEAT_TERMGUICOLORS)
+    ಅಕ್ಷರ *
+did_ಗಣ_termguicolors(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
 # ifdef FEAT_VTP
     // Do not turn on 'tgc' when 24-bit colors are not supported.
-    if (
+    ಆದರೆ (
 #  ifdef VIMDLL
-	    !gui.in_use && !gui.starting &&
+	    !gui.ಒಳ_use && !gui.starting &&
 #  endif
 	    !has_vtp_working())
     {
-	p_tgc_set = TRUE;
+	p_tgc_ಗಣ = TRUE;
 	p_tgc = 0;
-	return e_24_bit_colors_are_not_supported_on_this_environment;
+	ಹಿಂತಿರುಗಿ e_24_ಬಿಟ್_colors_are_not_supported_on_this_environment;
     }
-    if (is_term_win32())
-	swap_tcap();
+    ಆದರೆ (is_ಪದ_win32())
+	ಅದಲುಬದಲು_tcap();
 # endif
 # ifdef FEAT_GUI
-    if (!gui.in_use && !gui.starting)
+    ಆದರೆ (!gui.ಒಳ_use && !gui.starting)
 # endif
 	highlight_gui_started();
 # ifdef FEAT_VTP
     // reset t_Co
-    if (is_term_win32())
+    ಆದರೆ (is_ಪದ_win32())
     {
 	control_console_color_rgb();
-	set_termname(T_NAME);
+	ಗಣ_termname(T_NAME);
 	init_highlight(TRUE, FALSE);
     }
 # endif
 # ifdef FEAT_TERMINAL
-    term_update_colors_all();
-    term_update_palette_all();
-    term_update_hlfwin_all();
+    ಪದ_update_colors_all();
+    ಪದ_update_palette_all();
+    ಪದ_update_hlfwin_all();
 # endif
-    p_tgc_set = TRUE;
+    p_tgc_ಗಣ = TRUE;
 
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    char *
-did_set_termsync(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_termsync(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
-    if (!p_tsy)
-	term_set_sync_output(TERM_SYNC_OUTPUT_OFF);
-    return NULL;
+    ಆದರೆ (!p_tsy)
+	ಪದ_ಗಣ_sync_output(ಪದ_SYNC_OUTPUT_OFF);
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
-#if defined(FEAT_TERMINAL)
+#ಆದರೆ defined(FEAT_TERMINAL)
 /*
  * Process the updated 'termwinscroll' option value.
  */
-    char *
-did_set_termwinscroll(optset_T *args)
+    ಅಕ್ಷರ *
+did_ಗಣ_termwinscroll(optset_T *ವಾದಗಳು)
 {
-    long	*pp = (long *)args->os_varp;
-    char	*errmsg = NULL;
+    ದೀರ್ಘ	*pp = (ದೀರ್ಘ *)ವಾದಗಳು->os_varp;
+    ಅಕ್ಷರ	*errmsg = ಖಾಲಿ;
 
-    if (*pp < 1)
+    ಆದರೆ (*pp < 1)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
 	*pp = 1;
     }
 
-    return errmsg;
+    ಹಿಂತಿರುಗಿ errmsg;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Process the updated 'terse' option value.
  */
-    char *
-did_set_terse(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_terse(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
     char_u	*p;
 
     // when 'terse' is set change 'shortmess'
-    p = vim_strchr(p_shm, SHM_SEARCH);
+    p = vim_strchr(p_shm, SHM_ಹುಡುಕು);
 
     // insert 's' in p_shm
-    if (p_terse && p == NULL)
+    ಆದರೆ (p_terse && p == ಖಾಲಿ)
     {
 	STRCPY(IObuff, p_shm);
 	STRCAT(IObuff, "s");
-	set_string_option_direct((char_u *)"shm", -1, IObuff, OPT_FREE, 0);
+	ಗಣ_string_option_ನೇರ((char_u *)"shm", -1, IObuff, OPT_FREE, 0);
     }
     // remove 's' from p_shm
-    else if (!p_terse && p != NULL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!p_terse && p != ಖಾಲಿ)
 	STRMOVE(p, p + 1);
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Process the updated 'textauto' option value.
  */
-    char *
-did_set_textauto(optset_T *args)
+    ಅಕ್ಷರ *
+did_ಗಣ_textauto(optset_T *ವಾದಗಳು)
 {
     // when 'textauto' is set or reset also change 'fileformats'
-    set_string_option_direct((char_u *)"ffs", -1,
+    ಗಣ_string_option_ನೇರ((char_u *)"ffs", -1,
 				p_ta ? (char_u *)DFLT_FFS_VIM : (char_u *)"",
-				OPT_FREE | args->os_flags, 0);
+				OPT_FREE | ವಾದಗಳು->os_flags, 0);
 
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Process the updated 'textmode' option value.
  */
-    char *
-did_set_textmode(optset_T *args)
+    ಅಕ್ಷರ *
+did_ಗಣ_textmode(optset_T *ವಾದಗಳು)
 {
     // when 'textmode' is set or reset also change 'fileformat'
-    set_fileformat(curbuf->b_p_tx ? EOL_DOS : EOL_UNIX, args->os_flags);
+    ಗಣ_fileformat(curbuf->b_p_tx ? EOL_DOS : EOL_UNIX, ವಾದಗಳು->os_flags);
 
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Process the new 'textwidth' option value.
  */
-    char *
-did_set_textwidth(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_textwidth(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
-    char *errmsg = NULL;
+    ಅಕ್ಷರ *errmsg = ಖಾಲಿ;
 
-    if (curbuf->b_p_tw < 0)
+    ಆದರೆ (curbuf->b_p_tw < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
 	curbuf->b_p_tw = 0;
     }
-    if (p_tw < 0)
+    ಆದರೆ (p_tw < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
 	p_tw = 0;
     }
-#ifdef FEAT_SYN_HL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
     {
 	win_T	*wp;
 	tabpage_T	*tp;
 
 	FOR_ALL_TAB_WINDOWS(tp, wp)
-	    check_colorcolumn(NULL, wp);
+	    check_colorcolumn(ಖಾಲಿ, wp);
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return errmsg;
+    ಹಿಂತಿರುಗಿ errmsg;
 }
 
 /*
  * Process the updated 'title' or the 'icon' option value.
  */
-    char *
-did_set_title_icon(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_title_icon(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
     // when 'title' changed, may need to change the title; same for 'icon'
-    did_set_title();
-    return NULL;
+    did_ಗಣ_title();
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Process the new 'titlelen' option value.
  */
-    char *
-did_set_titlelen(optset_T *args)
+    ಅಕ್ಷರ *
+did_ಗಣ_titlelen(optset_T *ವಾದಗಳು)
 {
-    long old_value = args->os_oldval.number;
-    char *errmsg = NULL;
+    ದೀರ್ಘ old_ಮೌಲ್ಯ = ವಾದಗಳು->os_oldval.ಸಂಖ್ಯೆ;
+    ಅಕ್ಷರ *errmsg = ಖಾಲಿ;
 
     // if 'titlelen' has changed, redraw the title
-    if (p_titlelen < 0)
+    ಆದರೆ (p_titlelen < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
 	p_titlelen = 85;
     }
-    if (starting != NO_SCREEN && old_value != p_titlelen)
+    ಆದರೆ (starting != NO_SCREEN && old_ಮೌಲ್ಯ != p_titlelen)
 	need_maketitle = TRUE;
 
-    return errmsg;
+    ಹಿಂತಿರುಗಿ errmsg;
 }
 
-#if defined(FEAT_PERSISTENT_UNDO)
+#ಆದರೆ defined(FEAT_PERSISTENT_UNDO)
 /*
  * Process the updated 'undofile' option value.
  */
-    char *
-did_set_undofile(optset_T *args)
+    ಅಕ್ಷರ *
+did_ಗಣ_undofile(optset_T *ವಾದಗಳು)
 {
     // Only take action when the option was set.
-    if (!curbuf->b_p_udf && !p_udf)
-	return NULL;
+    ಆದರೆ (!curbuf->b_p_udf && !p_udf)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     // When reset we do not delete the undo file, the option may be set again
     // without making any changes in between.
-    char_u	hash[UNDO_HASH_SIZE];
+    char_u	hash[UNDO_HASH_ಗಾತ್ರ];
     buf_T	*save_curbuf = curbuf;
 
     FOR_ALL_BUFFERS(curbuf)
@@ -4987,680 +4987,680 @@ did_set_undofile(optset_T *args)
 	// only for the current buffer: Try to read in the undofile,
 	// if one exists, the buffer wasn't changed and the buffer was
 	// loaded
-	if ((curbuf == save_curbuf
-		    || (args->os_flags & OPT_GLOBAL)
-		    || args->os_flags == 0)
-		&& !curbufIsChanged() && curbuf->b_ml.ml_mfp != NULL)
+	ಆದರೆ ((curbuf == save_curbuf
+		    || (ವಾದಗಳು->os_flags & OPT_GLOBAL)
+		    || ವಾದಗಳು->os_flags == 0)
+		&& !curbuf_Is_ಬದಲಾಯಿತು() && curbuf->b_ml.ml_mfp != ಖಾಲಿ)
 	{
 # ifdef FEAT_CRYPT
-	    if (crypt_method_is_sodium(crypt_get_method_nr(curbuf)))
-		continue;
+	    ಆದರೆ (crypt_ವಿಧಾನ_is_sodium(crypt_get_ವಿಧಾನ_nr(curbuf)))
+		ಮುಂದುವರಿ;
 # endif
 	    u_compute_hash(hash);
-	    u_read_undo(NULL, hash, curbuf->b_fname);
+	    u_read_undo(ಖಾಲಿ, hash, curbuf->b_fname);
 	}
     }
     curbuf = save_curbuf;
 
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Process the new global 'undolevels' option value.
  */
-    static void
-update_global_undolevels(long value, long old_value)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+update_global_undolevels(ದೀರ್ಘ ಮೌಲ್ಯ, ದೀರ್ಘ old_ಮೌಲ್ಯ)
 {
     // sync undo before 'undolevels' changes
 
     // use the old value, otherwise u_sync() may not work properly
-    p_ul = old_value;
+    p_ul = old_ಮೌಲ್ಯ;
     u_sync(TRUE);
-    p_ul = value;
+    p_ul = ಮೌಲ್ಯ;
 }
 
 /*
  * Process the new buffer local 'undolevels' option value.
  */
-    static void
-update_buflocal_undolevels(long value, long old_value)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+update_buflocal_undolevels(ದೀರ್ಘ ಮೌಲ್ಯ, ದೀರ್ಘ old_ಮೌಲ್ಯ)
 {
     // use the old value, otherwise u_sync() may not work properly
-    curbuf->b_p_ul = old_value;
+    curbuf->b_p_ul = old_ಮೌಲ್ಯ;
     u_sync(TRUE);
-    curbuf->b_p_ul = value;
+    curbuf->b_p_ul = ಮೌಲ್ಯ;
 }
 
 /*
  * Process the new 'undolevels' option value.
  */
-    char *
-did_set_undolevels(optset_T *args)
+    ಅಕ್ಷರ *
+did_ಗಣ_undolevels(optset_T *ವಾದಗಳು)
 {
-    long *pp = (long *)args->os_varp;
+    ದೀರ್ಘ *pp = (ದೀರ್ಘ *)ವಾದಗಳು->os_varp;
 
-    if (pp == &p_ul)			// global 'undolevels'
-	update_global_undolevels(args->os_newval.number,
-						       args->os_oldval.number);
-    else if (pp == &curbuf->b_p_ul)	// buffer local 'undolevels'
-	update_buflocal_undolevels(args->os_newval.number,
-						       args->os_oldval.number);
+    ಆದರೆ (pp == &p_ul)			// global 'undolevels'
+	update_global_undolevels(ವಾದಗಳು->os_newval.ಸಂಖ್ಯೆ,
+						       ವಾದಗಳು->os_oldval.ಸಂಖ್ಯೆ);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (pp == &curbuf->b_p_ul)	// buffer local 'undolevels'
+	update_buflocal_undolevels(ವಾದಗಳು->os_newval.ಸಂಖ್ಯೆ,
+						       ವಾದಗಳು->os_oldval.ಸಂಖ್ಯೆ);
 
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Process the new 'updatecount' option value.
  */
-    char *
-did_set_updatecount(optset_T *args)
+    ಅಕ್ಷರ *
+did_ಗಣ_updatecount(optset_T *ವಾದಗಳು)
 {
-    long old_value = args->os_oldval.number;
-    char *errmsg = NULL;
+    ದೀರ್ಘ old_ಮೌಲ್ಯ = ವಾದಗಳು->os_oldval.ಸಂಖ್ಯೆ;
+    ಅಕ್ಷರ *errmsg = ಖಾಲಿ;
 
     // when 'updatecount' changes from zero to non-zero, open swap files
-    if (p_uc < 0)
+    ಆದರೆ (p_uc < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
 	p_uc = 100;
     }
-    if (p_uc && !old_value)
+    ಆದರೆ (p_uc && !old_ಮೌಲ್ಯ)
 	ml_open_files();
 
-    return errmsg;
+    ಹಿಂತಿರುಗಿ errmsg;
 }
 
 /*
  * Process the updated 'weirdinvert' option value.
  */
-    char *
-did_set_weirdinvert(optset_T *args)
+    ಅಕ್ಷರ *
+did_ಗಣ_weirdinvert(optset_T *ವಾದಗಳು)
 {
     // When 'weirdinvert' changed, set/reset 't_xs'.
     // Then set 'weirdinvert' according to value of 't_xs'.
-    if (p_wiv && !args->os_oldval.boolean)
+    ಆದರೆ (p_wiv && !ವಾದಗಳು->os_oldval.boolean)
 	T_XS = (char_u *)"y";
-    else if (!p_wiv && args->os_oldval.boolean)
-	T_XS = empty_option;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!p_wiv && ವಾದಗಳು->os_oldval.boolean)
+	T_XS = ಖಾಲಿಗಳು_option;
     p_wiv = (*T_XS != NUL);
 
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Process the new 'wildchar' / 'wildcharm' option value.
  */
-    char *
-did_set_wildchar(optset_T *args)
+    ಅಕ್ಷರ *
+did_ಗಣ_wildchar(optset_T *ವಾದಗಳು)
 {
-    long c = *(long *)args->os_varp;
+    ದೀರ್ಘ c = *(ದೀರ್ಘ *)ವಾದಗಳು->os_varp;
 
     // Don't allow key values that wouldn't work as wildchar.
-    if (c == Ctrl_C || c == '\n' || c == '\r' || c == K_KENTER)
-	return e_invalid_argument;
+    ಆದರೆ (c == Ctrl_C || c == '\n' || c == '\r' || c == K_KENTER)
+	ಹಿಂತಿರುಗಿ e_invalid_ವಾದ;
 
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Process the new 'window' option value.
  */
-    char *
-did_set_window(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_ಕಿಟಕಿ(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
-    if (p_window < 1)
-	p_window = 1;
-    else if (p_window >= Rows)
-	p_window = Rows - 1;
-    return NULL;
+    ಆದರೆ (p_ಕಿಟಕಿ < 1)
+	p_ಕಿಟಕಿ = 1;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p_ಕಿಟಕಿ >= ಅಡ್ಡಸಾಲುಗಳು)
+	p_ಕಿಟಕಿ = ಅಡ್ಡಸಾಲುಗಳು - 1;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Process the new 'winheight' or the 'helpheight' option value.
  */
-    char *
-did_set_winheight_helpheight(optset_T *args)
+    ಅಕ್ಷರ *
+did_ಗಣ_winheight_helpheight(optset_T *ವಾದಗಳು)
 {
-    long	*pp = (long *)args->os_varp;
-    char	*errmsg = NULL;
+    ದೀರ್ಘ	*pp = (ದೀರ್ಘ *)ವಾದಗಳು->os_varp;
+    ಅಕ್ಷರ	*errmsg = ಖಾಲಿ;
 
-    if (p_wh < 1)
+    ಆದರೆ (p_wh < 1)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
 	p_wh = 1;
     }
-    if (p_wmh > p_wh)
+    ಆದರೆ (p_wmh > p_wh)
     {
 	errmsg = e_winheight_cannot_be_smaller_than_winminheight;
 	p_wh = p_wmh;
     }
-    if (p_hh < 0)
+    ಆದರೆ (p_hh < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
 	p_hh = 0;
     }
 
     // Change window height NOW
-    if (!ONE_WINDOW)
+    ಆದರೆ (!ONE_ಕಿಟಕಿ)
     {
-	if (pp == &p_wh && curwin->w_height < p_wh)
-	    win_setheight((int)p_wh);
-	if (pp == &p_hh && curbuf->b_help && curwin->w_height < p_hh)
-	    win_setheight((int)p_hh);
+	ಆದರೆ (pp == &p_wh && curwin->w_ಎತ್ತರ < p_wh)
+	    win_setheight((ಪೂರ್ಣಾಂಕ)p_wh);
+	ಆದರೆ (pp == &p_hh && curbuf->b_help && curwin->w_ಎತ್ತರ < p_hh)
+	    win_setheight((ಪೂರ್ಣಾಂಕ)p_hh);
     }
 
-    return errmsg;
+    ಹಿಂತಿರುಗಿ errmsg;
 }
 
 /*
  * Process the new 'winminheight' option value.
  */
-    char *
-did_set_winminheight(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_winminheight(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
-    char *errmsg = NULL;
+    ಅಕ್ಷರ *errmsg = ಖಾಲಿ;
 
-    if (p_wmh < 0)
+    ಆದರೆ (p_wmh < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
 	p_wmh = 0;
     }
-    if (p_wmh > p_wh)
+    ಆದರೆ (p_wmh > p_wh)
     {
 	errmsg = e_winheight_cannot_be_smaller_than_winminheight;
 	p_wmh = p_wh;
     }
     win_setminheight();
 
-    return errmsg;
+    ಹಿಂತಿರುಗಿ errmsg;
 }
 
 /*
  * Process the new 'winminwidth' option value.
  */
-    char *
-did_set_winminwidth(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_winminwidth(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
-    char *errmsg = NULL;
+    ಅಕ್ಷರ *errmsg = ಖಾಲಿ;
 
-    if (p_wmw < 0)
+    ಆದರೆ (p_wmw < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
 	p_wmw = 0;
     }
-    if (p_wmw > p_wiw)
+    ಆದರೆ (p_wmw > p_wiw)
     {
 	errmsg = e_winwidth_cannot_be_smaller_than_winminwidth;
 	p_wmw = p_wiw;
     }
     win_setminwidth();
 
-    return errmsg;
+    ಹಿಂತಿರುಗಿ errmsg;
 }
 
 /*
  * Process the new 'winwidth' option value.
  */
-    char *
-did_set_winwidth(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_winwidth(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
-    char *errmsg = NULL;
+    ಅಕ್ಷರ *errmsg = ಖಾಲಿ;
 
-    if (p_wiw < 1)
+    ಆದರೆ (p_wiw < 1)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
 	p_wiw = 1;
     }
-    if (p_wmw > p_wiw)
+    ಆದರೆ (p_wmw > p_wiw)
     {
 	errmsg = e_winwidth_cannot_be_smaller_than_winminwidth;
 	p_wiw = p_wmw;
     }
 
     // Change window width NOW
-    if (!ONE_WINDOW && curwin->w_width < p_wiw)
-	win_setwidth((int)p_wiw);
+    ಆದರೆ (!ONE_ಕಿಟಕಿ && curwin->w_ಅಗಲ < p_wiw)
+	win_setwidth((ಪೂರ್ಣಾಂಕ)p_wiw);
 
-    return errmsg;
+    ಹಿಂತಿರುಗಿ errmsg;
 }
 
-#if defined(FEAT_WAYLAND_CLIPBOARD)
+#ಆದರೆ defined(FEAT_WAYLAND_CLIPBOARD)
 /*
  * Process the new 'wlsteal' option value.
  */
-    char *
-did_set_wlsteal(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_wlsteal(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
     clip_reset_wayland();
 
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_WAYLAND)
+#ಆದರೆ defined(FEAT_WAYLAND)
 /*
  * Process the new 'wltimeoutlen' option value.
  */
-    char *
-did_set_wltimeoutlen(optset_T *args)
+    ಅಕ್ಷರ *
+did_ಗಣ_wltimeoutlen(optset_T *ವಾದಗಳು)
 {
-    if (p_wtm < 0)
+    ಆದರೆ (p_wtm < 0)
     {
-	p_wtm = args->os_oldval.number;
-	return e_argument_must_be_positive;
+	p_wtm = ವಾದಗಳು->os_oldval.ಸಂಖ್ಯೆ;
+	ಹಿಂತಿರುಗಿ e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
     }
 
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Process the updated 'wrap' option value.
  */
-    char *
-did_set_wrap(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_wrap(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
     // Set w_leftcol or w_skipcol to zero.
-    if (curwin->w_p_wrap)
+    ಆದರೆ (curwin->w_p_wrap)
 	curwin->w_leftcol = 0;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	curwin->w_skipcol = 0;
 
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
-#ifdef FEAT_QUICKFIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
 /*
  * Process the new 'chistory' or 'lhistory' option value. 'chistory' will
  * be used if args->os_varp is the same as p_chi, else 'lhistory'.
  */
-    char *
-did_set_xhistory(optset_T *args)
+    ಅಕ್ಷರ *
+did_ಗಣ_xhistory(optset_T *ವಾದಗಳು)
 {
-    int is_p_chi = (long*)args->os_varp == &p_chi;
-    int err;
-    long *arg = (is_p_chi) ? &p_chi :(long*)args->os_varp;
+    ಪೂರ್ಣಾಂಕ is_p_chi = (ದೀರ್ಘ*)ವಾದಗಳು->os_varp == &p_chi;
+    ಪೂರ್ಣಾಂಕ err;
+    ದೀರ್ಘ *arg = (is_p_chi) ? &p_chi :(ದೀರ್ಘ*)ವಾದಗಳು->os_varp;
 
     // cannot have zero or negative number of quickfix lists in a stack
-    if (*arg < 1)
+    ಆದರೆ (*arg < 1)
     {
-	*arg = args->os_oldval.number;
-	return e_cannot_have_negative_or_zero_number_of_quickfix;
+	*arg = ವಾದಗಳು->os_oldval.ಸಂಖ್ಯೆ;
+	ಹಿಂತಿರುಗಿ e_cannot_have_negative_or_zero_ಸಂಖ್ಯೆ_ದ_quickfix;
     }
 
     // cannot have more than 100 quickfix lists in a stack
-    if (*arg > 100)
+    ಆದರೆ (*arg > 100)
     {
-	*arg = args->os_oldval.number;
-	return e_cannot_have_more_than_hundred_quickfix;
+	*arg = ವಾದಗಳು->os_oldval.ಸಂಖ್ಯೆ;
+	ಹಿಂತಿರುಗಿ e_cannot_have_ಇನ್ನಷ್ಟು_than_hundred_quickfix;
     }
 
-    if (is_p_chi)
-	err = qf_resize_stack(*arg);
-    else
-	err = ll_resize_stack(curwin, *arg);
+    ಆದರೆ (is_p_chi)
+	err = qf_resize_ರಾಶಿ(*arg);
+    ಇಲ್ಲದಿದ್ದರೆ
+	err = ll_resize_ರಾಶಿ(curwin, *arg);
 
-    if (err == FAIL)
-	return e_failed_resizing_quickfix_stack;
+    ಆದರೆ (err == FAIL)
+	ಹಿಂತಿರುಗಿ e_failed_resizing_quickfix_ರಾಶಿ;
 
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Set the value of a boolean option, and take care of side effects.
  * Returns NULL for success, or an error message for an error.
  */
-    static char *
-set_bool_option(
-    int		opt_idx,		// index in options[] table
+    ಸ್ಥಿರ ಅಕ್ಷರ *
+ಗಣ_bool_option(
+    ಪೂರ್ಣಾಂಕ		opt_idx,		// index in options[] table
     char_u	*varp,			// pointer to the option variable
-    int		value,			// new value
-    int		opt_flags)		// OPT_LOCAL and/or OPT_GLOBAL
+    ಪೂರ್ಣಾಂಕ		ಮೌಲ್ಯ,			// new value
+    ಪೂರ್ಣಾಂಕ		opt_flags)		// OPT_LOCAL and/or OPT_GLOBAL
 {
-    int		old_value = *(int *)varp;
-#if defined(FEAT_EVAL)
-    int		old_global_value = 0;
-#endif
-    char	*errmsg = NULL;
+    ಪೂರ್ಣಾಂಕ		old_ಮೌಲ್ಯ = *(ಪೂರ್ಣಾಂಕ *)varp;
+#ಆದರೆ defined(FEAT_EVAL)
+    ಪೂರ್ಣಾಂಕ		old_global_ಮೌಲ್ಯ = 0;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಅಕ್ಷರ	*errmsg = ಖಾಲಿ;
 
     // Disallow changing some options from secure mode
-    if ((secure
-#ifdef HAVE_SANDBOX
+    ಆದರೆ ((secure
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_SANDBOX
 		|| sandbox != 0
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		) && (options[opt_idx].flags & P_SECURE))
-	return e_not_allowed_here;
+	ಹಿಂತಿರುಗಿ e_not_allowed_ಇಲ್ಲಿ;
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
     // Save the global value before changing anything. This is needed as for
     // a global-only option setting the "local value" in fact sets the global
     // value (since there is only one value).
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
-	old_global_value = *(int *)get_varp_scope(&(options[opt_idx]),
+    ಆದರೆ ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+	old_global_ಮೌಲ್ಯ = *(ಪೂರ್ಣಾಂಕ *)get_varp_scope(&(options[opt_idx]),
 								   OPT_GLOBAL);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    *(int *)varp = value;	    // set the new value
-#ifdef FEAT_EVAL
+    *(ಪೂರ್ಣಾಂಕ *)varp = ಮೌಲ್ಯ;	    // set the new value
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     // Remember where the option was set.
-    set_option_sctx_idx(opt_idx, opt_flags, current_sctx);
-#endif
+    ಗಣ_option_sctx_idx(opt_idx, opt_flags, current_sctx);
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
     need_mouse_correct = TRUE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // May set global value for local option.
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
-	*(int *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL) = value;
+    ಆದರೆ ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+	*(ಪೂರ್ಣಾಂಕ *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL) = ಮೌಲ್ಯ;
 
     // Handle side effects of changing a bool option.
-    if (options[opt_idx].opt_did_set_cb != NULL)
+    ಆದರೆ (options[opt_idx].opt_did_ಗಣ_cb != ಖಾಲಿ)
     {
-	optset_T args;
+	optset_T ವಾದಗಳು;
 
-	CLEAR_FIELD(args);
-	args.os_varp = varp;
-	args.os_flags = opt_flags;
-	args.os_oldval.boolean = old_value;
-	args.os_newval.boolean = value;
-	args.os_errbuf = NULL;
-	errmsg = options[opt_idx].opt_did_set_cb(&args);
-	if (errmsg != NULL)
-	    return errmsg;
+	CLEAR_ಕ್ಷೇತ್ರ(ವಾದಗಳು);
+	ವಾದಗಳು.os_varp = varp;
+	ವಾದಗಳು.os_flags = opt_flags;
+	ವಾದಗಳು.os_oldval.boolean = old_ಮೌಲ್ಯ;
+	ವಾದಗಳು.os_newval.boolean = ಮೌಲ್ಯ;
+	ವಾದಗಳು.os_errbuf = ಖಾಲಿ;
+	errmsg = options[opt_idx].opt_did_ಗಣ_cb(&ವಾದಗಳು);
+	ಆದರೆ (errmsg != ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ errmsg;
     }
 
     // after handling side effects, call autocommand
 
-    options[opt_idx].flags |= P_WAS_SET;
+    options[opt_idx].flags |= P_WAS_ಗಣ;
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
     apply_optionset_autocmd(opt_idx, opt_flags,
-				(long)(old_value ? TRUE : FALSE),
-				(long)(old_global_value ? TRUE : FALSE),
-				(long)(value ? TRUE : FALSE), NULL);
-#endif
+				(ದೀರ್ಘ)(old_ಮೌಲ್ಯ ? TRUE : FALSE),
+				(ದೀರ್ಘ)(old_global_ಮೌಲ್ಯ ? TRUE : FALSE),
+				(ದೀರ್ಘ)(ಮೌಲ್ಯ ? TRUE : FALSE), ಖಾಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ
 
-    comp_col();			    // in case 'ruler' or 'showcmd' changed
+    comp_ಲಂಬಸಾಲು();			    // in case 'ruler' or 'showcmd' changed
 
-    if (curwin->w_curswant != MAXCOL
+    ಆದರೆ (curwin->w_curswant != MAXCOL
 		     && (options[opt_idx].flags & (P_CURSWANT | P_RALL)) != 0
 				   && (options[opt_idx].flags & P_HLONLY) == 0)
-	curwin->w_set_curswant = true;
+	curwin->w_ಗಣ_curswant = true;
 
-    if ((opt_flags & OPT_NO_REDRAW) == 0)
+    ಆದರೆ ((opt_flags & OPT_NO_REDRAW) == 0)
 	check_redraw(options[opt_idx].flags);
 
-    return errmsg;
+    ಹಿಂತಿರುಗಿ errmsg;
 }
 
 /*
  * Check the bounds of numeric options.
  */
-    static char *
-check_num_option_bounds(
-    long	*pp,
-    long	old_value,
-    long	old_Rows,
-    long	old_Columns,
-    char	*errbuf,
+    ಸ್ಥಿರ ಅಕ್ಷರ *
+check_ಅಂಕೆ_option_bounds(
+    ದೀರ್ಘ	*pp,
+    ದೀರ್ಘ	old_ಮೌಲ್ಯ,
+    ದೀರ್ಘ	old_ಅಡ್ಡಸಾಲುಗಳು_2,
+    ದೀರ್ಘ	old_Columns,
+    ಅಕ್ಷರ	*errbuf,
     size_t	errbuflen,
-    char	*errmsg)
+    ಅಕ್ಷರ	*errmsg)
 {
-    if (Rows < min_rows_for_all_tabpages() && full_screen)
+    ಆದರೆ (ಅಡ್ಡಸಾಲುಗಳು < min_ಅಡ್ಡಸಾಲುಗಳು_for_all_tabpages() && ತುಂಬಿದ_screen)
     {
-	if (errbuf != NULL)
+	ಆದರೆ (errbuf != ಖಾಲಿ)
 	{
 	    vim_snprintf(errbuf, errbuflen,
-		    _(e_need_at_least_nr_lines), min_rows_for_all_tabpages());
+		    _(e_need_at_ಕನಿಷ್ಠ_nr_ಸಾಲುಗಳು), min_ಅಡ್ಡಸಾಲುಗಳು_for_all_tabpages());
 	    errmsg = errbuf;
 	}
-	Rows = min_rows_for_all_tabpages();
+	ಅಡ್ಡಸಾಲುಗಳು = min_ಅಡ್ಡಸಾಲುಗಳು_for_all_tabpages();
     }
-    if (Columns < MIN_COLUMNS && full_screen)
+    ಆದರೆ (Columns < MIN_COLUMNS && ತುಂಬಿದ_screen)
     {
-	if (errbuf != NULL)
+	ಆದರೆ (errbuf != ಖಾಲಿ)
 	{
 	    vim_snprintf(errbuf, errbuflen,
-		    _(e_need_at_least_nr_columns), MIN_COLUMNS);
+		    _(e_need_at_ಕನಿಷ್ಠ_nr_columns), MIN_COLUMNS);
 	    errmsg = errbuf;
 	}
 	Columns = MIN_COLUMNS;
     }
-    limit_screen_size();
+    ಎಲ್ಲೆ_screen_ಗಾತ್ರ();
 
     // If the screen (shell) height has been changed, assume it is the
     // physical screenheight.
-    if (old_Rows != Rows || old_Columns != Columns)
+    ಆದರೆ (old_ಅಡ್ಡಸಾಲುಗಳು_2 != ಅಡ್ಡಸಾಲುಗಳು || old_Columns != Columns)
     {
 	// Changing the screen size is not allowed while updating the screen.
-	if (updating_screen)
-	    *pp = old_value;
-	else if (full_screen
-#ifdef FEAT_GUI
+	ಆದರೆ (updating_screen)
+	    *pp = old_ಮೌಲ್ಯ;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ತುಂಬಿದ_screen
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 		&& !gui.starting
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		)
-	    set_shellsize((int)Columns, (int)Rows, TRUE);
-	else
+	    ಗಣ_shellsize((ಪೂರ್ಣಾಂಕ)Columns, (ಪೂರ್ಣಾಂಕ)ಅಡ್ಡಸಾಲುಗಳು, TRUE);
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // Postpone the resizing; check the size and cmdline position for
 	    // messages.
 	    check_shellsize();
-	    if (cmdline_row > Rows - p_ch && Rows > p_ch)
-		cmdline_row = Rows - p_ch;
+	    ಆದರೆ (cmdline_ಅಡ್ಡಸಾಲು > ಅಡ್ಡಸಾಲುಗಳು - p_ch && ಅಡ್ಡಸಾಲುಗಳು > p_ch)
+		cmdline_ಅಡ್ಡಸಾಲು = ಅಡ್ಡಸಾಲುಗಳು - p_ch;
 	}
-	if (p_window >= Rows || !option_was_set((char_u *)"window"))
-	    p_window = Rows - 1;
+	ಆದರೆ (p_ಕಿಟಕಿ >= ಅಡ್ಡಸಾಲುಗಳು || !option_was_ಗಣ((char_u *)"window"))
+	    p_ಕಿಟಕಿ = ಅಡ್ಡಸಾಲುಗಳು - 1;
     }
 
-    if (p_tm < 0)
+    ಆದರೆ (p_tm < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
 	p_tm = 0;
     }
-    if ((curwin->w_p_scr <= 0
-		|| (curwin->w_p_scr > curwin->w_height
-		    && curwin->w_height > 0))
-	    && full_screen)
+    ಆದರೆ ((curwin->w_p_scr <= 0
+		|| (curwin->w_p_scr > curwin->w_ಎತ್ತರ
+		    && curwin->w_ಎತ್ತರ > 0))
+	    && ತುಂಬಿದ_screen)
     {
-	if (pp == &(curwin->w_p_scr))
+	ಆದರೆ (pp == &(curwin->w_p_scr))
 	{
-	    if (curwin->w_p_scr != 0)
-		errmsg = e_invalid_scroll_size;
+	    ಆದರೆ (curwin->w_p_scr != 0)
+		errmsg = e_invalid_scroll_ಗಾತ್ರ;
 	    win_comp_scroll(curwin);
 	}
 	// If 'scroll' became invalid because of a side effect silently adjust
 	// it.
-	else if (curwin->w_p_scr <= 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (curwin->w_p_scr <= 0)
 	    curwin->w_p_scr = 1;
-	else // curwin->w_p_scr > curwin->w_height
-	    curwin->w_p_scr = curwin->w_height;
+	ಇಲ್ಲದಿದ್ದರೆ // curwin->w_p_scr > curwin->w_height
+	    curwin->w_p_scr = curwin->w_ಎತ್ತರ;
     }
-    if (p_hi < 0)
+    ಆದರೆ (p_hi < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
 	p_hi = 0;
     }
-    else if (p_hi > 10000)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p_hi > 10000)
     {
-	errmsg = e_invalid_argument;
+	errmsg = e_invalid_ವಾದ;
 	p_hi = 10000;
     }
-    if (p_re < 0 || p_re > 2)
+    ಆದರೆ (p_re < 0 || p_re > 2)
     {
-	errmsg = e_invalid_argument;
+	errmsg = e_invalid_ವಾದ;
 	p_re = 0;
     }
-    if (p_report < 0)
+    ಆದರೆ (p_report < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
 	p_report = 1;
     }
-    if ((p_sj < -100 || p_sj >= Rows) && full_screen)
+    ಆದರೆ ((p_sj < -100 || p_sj >= ಅಡ್ಡಸಾಲುಗಳು) && ತುಂಬಿದ_screen)
     {
-	if (Rows != old_Rows)	// Rows changed, just adjust p_sj
-	    p_sj = Rows / 2;
-	else
+	ಆದರೆ (ಅಡ್ಡಸಾಲುಗಳು != old_ಅಡ್ಡಸಾಲುಗಳು_2)	// Rows changed, just adjust p_sj
+	    p_sj = ಅಡ್ಡಸಾಲುಗಳು / 2;
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    errmsg = e_invalid_scroll_size;
+	    errmsg = e_invalid_scroll_ಗಾತ್ರ;
 	    p_sj = 1;
 	}
     }
-    if (p_so < 0 && full_screen)
+    ಆದರೆ (p_so < 0 && ತುಂಬಿದ_screen)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
 	p_so = 0;
     }
-    if (p_sop < 0 && full_screen)
+    ಆದರೆ (p_sop < 0 && ತುಂಬಿದ_screen)
     {
-	errmsg = e_invalid_argument;
+	errmsg = e_invalid_ವಾದ;
 	p_sop = 0;
     }
-    if (p_siso < 0 && full_screen)
+    ಆದರೆ (p_siso < 0 && ತುಂಬಿದ_screen)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
 	p_siso = 0;
     }
-    if (p_cwh < 1)
+    ಆದರೆ (p_cwh < 1)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
 	p_cwh = 1;
     }
-    if (p_ut < 0)
+    ಆದರೆ (p_ut < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
 	p_ut = 2000;
     }
-    if (p_ss < 0)
+    ಆದರೆ (p_ss < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_ವಾದ_must_be_ಧನಾತ್ಮಕ;
 	p_ss = 0;
     }
 
-    return errmsg;
+    ಹಿಂತಿರುಗಿ errmsg;
 }
 
 /*
  * Set the value of a number option, and take care of side effects.
  * Returns NULL for success, or an error message for an error.
  */
-    static char *
-set_num_option(
-    int		opt_idx,		// index in options[] table
+    ಸ್ಥಿರ ಅಕ್ಷರ *
+ಗಣ_ಅಂಕೆ_option(
+    ಪೂರ್ಣಾಂಕ		opt_idx,		// index in options[] table
     char_u	*varp,			// pointer to the option variable
-    long	value,			// new value
-    char	*errbuf,		// buffer for error messages
+    ದೀರ್ಘ	ಮೌಲ್ಯ,			// new value
+    ಅಕ್ಷರ	*errbuf,		// buffer for error messages
     size_t	errbuflen,		// length of "errbuf"
-    int		opt_flags)		// OPT_LOCAL, OPT_GLOBAL,
+    ಪೂರ್ಣಾಂಕ		opt_flags)		// OPT_LOCAL, OPT_GLOBAL,
 					// OPT_MODELINE, etc.
 {
-    char	*errmsg = NULL;
-    long	old_value = *(long *)varp;
-#if defined(FEAT_EVAL)
-    long	old_global_value = 0;	// only used when setting a local and
+    ಅಕ್ಷರ	*errmsg = ಖಾಲಿ;
+    ದೀರ್ಘ	old_ಮೌಲ್ಯ = *(ದೀರ್ಘ *)varp;
+#ಆದರೆ defined(FEAT_EVAL)
+    ದೀರ್ಘ	old_global_ಮೌಲ್ಯ = 0;	// only used when setting a local and
 					// global option
-#endif
-    long	old_Rows = Rows;	// remember old Rows
-    long	old_Columns = Columns;	// remember old Columns
-    long	*pp = (long *)varp;
+#ಆದರೆ_ಅಂತ್ಯ
+    ದೀರ್ಘ	old_ಅಡ್ಡಸಾಲುಗಳು_2 = ಅಡ್ಡಸಾಲುಗಳು;	// remember old Rows
+    ದೀರ್ಘ	old_Columns = Columns;	// remember old Columns
+    ದೀರ್ಘ	*pp = (ದೀರ್ಘ *)varp;
 
     // Disallow changing some options from secure mode.
-    if ((secure
-#ifdef HAVE_SANDBOX
+    ಆದರೆ ((secure
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_SANDBOX
 		|| sandbox != 0
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		) && (options[opt_idx].flags & P_SECURE))
-	return e_not_allowed_here;
+	ಹಿಂತಿರುಗಿ e_not_allowed_ಇಲ್ಲಿ;
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
     // Save the global value before changing anything. This is needed as for
     // a global-only option setting the "local value" in fact sets the global
     // value (since there is only one value).
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
-	old_global_value = *(long *)get_varp_scope(&(options[opt_idx]),
+    ಆದರೆ ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+	old_global_ಮೌಲ್ಯ = *(ದೀರ್ಘ *)get_varp_scope(&(options[opt_idx]),
 								   OPT_GLOBAL);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    *pp = value;
-#ifdef FEAT_EVAL
+    *pp = ಮೌಲ್ಯ;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     // Remember where the option was set.
-    set_option_sctx_idx(opt_idx, opt_flags, current_sctx);
-#endif
-#ifdef FEAT_GUI
+    ಗಣ_option_sctx_idx(opt_idx, opt_flags, current_sctx);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
     need_mouse_correct = TRUE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // May set global value for local option.
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
-	*(long *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL) = value;
+    ಆದರೆ ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+	*(ದೀರ್ಘ *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL) = ಮೌಲ್ಯ;
 
     // Invoke the option specific callback function to validate and apply the
     // new value.
-    if (options[opt_idx].opt_did_set_cb != NULL)
+    ಆದರೆ (options[opt_idx].opt_did_ಗಣ_cb != ಖಾಲಿ)
     {
-	optset_T args;
+	optset_T ವಾದಗಳು;
 
-	CLEAR_FIELD(args);
-	args.os_varp = varp;
-	args.os_flags = opt_flags;
-	args.os_oldval.number = old_value;
-	args.os_newval.number = value;
-	args.os_errbuf = NULL;
-	errmsg = options[opt_idx].opt_did_set_cb(&args);
+	CLEAR_ಕ್ಷೇತ್ರ(ವಾದಗಳು);
+	ವಾದಗಳು.os_varp = varp;
+	ವಾದಗಳು.os_flags = opt_flags;
+	ವಾದಗಳು.os_oldval.ಸಂಖ್ಯೆ = old_ಮೌಲ್ಯ;
+	ವಾದಗಳು.os_newval.ಸಂಖ್ಯೆ = ಮೌಲ್ಯ;
+	ವಾದಗಳು.os_errbuf = ಖಾಲಿ;
+	errmsg = options[opt_idx].opt_did_ಗಣ_cb(&ವಾದಗಳು);
     }
 
     // Check the bounds for numeric options here
-    errmsg = check_num_option_bounds(pp, old_value, old_Rows, old_Columns,
+    errmsg = check_ಅಂಕೆ_option_bounds(pp, old_ಮೌಲ್ಯ, old_ಅಡ್ಡಸಾಲುಗಳು_2, old_Columns,
 						errbuf, errbuflen, errmsg);
 
-    options[opt_idx].flags |= P_WAS_SET;
+    options[opt_idx].flags |= P_WAS_ಗಣ;
 
-#if defined(FEAT_EVAL)
-    apply_optionset_autocmd(opt_idx, opt_flags, old_value, old_global_value,
-								value, errmsg);
-#endif
+#ಆದರೆ defined(FEAT_EVAL)
+    apply_optionset_autocmd(opt_idx, opt_flags, old_ಮೌಲ್ಯ, old_global_ಮೌಲ್ಯ,
+								ಮೌಲ್ಯ, errmsg);
+#ಆದರೆ_ಅಂತ್ಯ
 
-    comp_col();			    // in case 'columns' or 'ls' changed
+    comp_ಲಂಬಸಾಲು();			    // in case 'columns' or 'ls' changed
 
-    if (curwin->w_curswant != MAXCOL
+    ಆದರೆ (curwin->w_curswant != MAXCOL
 		     && (options[opt_idx].flags & (P_CURSWANT | P_RALL)) != 0
 				   && (options[opt_idx].flags & P_HLONLY) == 0)
-	curwin->w_set_curswant = true;
+	curwin->w_ಗಣ_curswant = true;
 
-    if ((opt_flags & OPT_NO_REDRAW) == 0)
+    ಆದರೆ ((opt_flags & OPT_NO_REDRAW) == 0)
 	check_redraw(options[opt_idx].flags);
 
-    return errmsg;
+    ಹಿಂತಿರುಗಿ errmsg;
 }
 
 /*
  * Called after an option changed: check if something needs to be redrawn.
  */
-    void
+    ಶೂನ್ಯ
 check_redraw(long_u flags)
 {
     // Careful: P_RCLR and P_RALL are a combination of other P_ flags
-    int		doclear = (flags & P_RCLR) == P_RCLR;
-    int		all = ((flags & P_RALL) == P_RALL || doclear);
+    ಪೂರ್ಣಾಂಕ		doclear = (flags & P_RCLR) == P_RCLR;
+    ಪೂರ್ಣಾಂಕ		all = ((flags & P_RALL) == P_RALL || doclear);
 
-    if ((flags & P_RSTAT) || all)	// mark all status lines dirty
-	status_redraw_all();
+    ಆದರೆ ((flags & P_RSTAT) || all)	// mark all status lines dirty
+	ಸ್ಥಿತಿ_redraw_all();
 
-    if ((flags & P_RBUF) || (flags & P_RWIN) || all)
+    ಆದರೆ ((flags & P_RBUF) || (flags & P_RWIN) || all)
     {
-	if (flags & P_HLONLY)
+	ಆದರೆ (flags & P_HLONLY)
 	    redraw_later(UPD_NOT_VALID);
-	else
-	    changed_window_setting();
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಬದಲಾಯಿತು_ಕಿಟಕಿ_setting();
     }
-    if (flags & P_RBUF)
+    ಆದರೆ (flags & P_RBUF)
 	redraw_curbuf_later(UPD_NOT_VALID);
-    if (doclear)
+    ಆದರೆ (doclear)
 	redraw_all_later(UPD_CLEAR);
-    else if (all)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (all)
 	redraw_all_later(UPD_NOT_VALID);
 }
 
@@ -5668,76 +5668,76 @@ check_redraw(long_u flags)
  * Find index for option 'arg'.
  * Return -1 if not found.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 findoption(char_u *arg)
 {
-    int		    opt_idx;
-    char	    *s, *p;
-    static short    quick_tab[27] = {0, 0};	// quick access table
-    int		    is_term_opt;
+    ಪೂರ್ಣಾಂಕ		    opt_idx;
+    ಅಕ್ಷರ	    *s, *p;
+    ಸ್ಥಿರ ಗಿಡ್ಡ    ಶೀಘ್ರ_tab[27] = {0, 0};	// quick access table
+    ಪೂರ್ಣಾಂಕ		    is_ಪದ_opt;
 
     // For first call: Initialize the quick-access table.
     // It contains the index for the first option that starts with a certain
     // letter.  There are 26 letters, plus the first "t_" option.
-    if (quick_tab[1] == 0)
+    ಆದರೆ (ಶೀಘ್ರ_tab[1] == 0)
     {
 	// Make sure we do not leave any entries uninitialized, even if we have
 	// no options that start with a particular letter.
-	int last_opt_idx;
-	for (last_opt_idx = 0; options[last_opt_idx].fullname != NULL;
-		last_opt_idx++)
+	ಪೂರ್ಣಾಂಕ ಕೊನೆಯ_opt_idx;
+	ಗಾಗಿ (ಕೊನೆಯ_opt_idx = 0; options[ಕೊನೆಯ_opt_idx].fullname != ಖಾಲಿ;
+		ಕೊನೆಯ_opt_idx++)
 	    ;
-	for (int tab_idx = 1; tab_idx < 27; tab_idx++)
-	    quick_tab[tab_idx] = last_opt_idx;
+	ಗಾಗಿ (ಪೂರ್ಣಾಂಕ tab_idx = 1; tab_idx < 27; tab_idx++)
+	    ಶೀಘ್ರ_tab[tab_idx] = ಕೊನೆಯ_opt_idx;
 
 	p = options[0].fullname;
-	for (opt_idx = 1; opt_idx < last_opt_idx; opt_idx++)
+	ಗಾಗಿ (opt_idx = 1; opt_idx < ಕೊನೆಯ_opt_idx; opt_idx++)
 	{
 	    s = options[opt_idx].fullname;
-	    if (s[0] != p[0])
+	    ಆದರೆ (s[0] != p[0])
 	    {
-		if (s[0] == 't' && s[1] == '_')
-		    quick_tab[26] = opt_idx;
-		else
-		    quick_tab[CharOrdLow(s[0])] = opt_idx;
+		ಆದರೆ (s[0] == 't' && s[1] == '_')
+		    ಶೀಘ್ರ_tab[26] = opt_idx;
+		ಇಲ್ಲದಿದ್ದರೆ
+		    ಶೀಘ್ರ_tab[Char_Ord_ಕೆಳಗಿನ(s[0])] = opt_idx;
 	    }
 	    p = s;
 	}
     }
 
     // Check for name starting with an illegal character.
-    if (arg[0] < 'a' || arg[0] > 'z')
-	return -1;
+    ಆದರೆ (arg[0] < 'a' || arg[0] > 'z')
+	ಹಿಂತಿರುಗಿ -1;
 
-    is_term_opt = (arg[0] == 't' && arg[1] == '_');
-    if (is_term_opt)
-	opt_idx = quick_tab[26];
-    else
-	opt_idx = quick_tab[CharOrdLow(arg[0])];
-    for (; (s = options[opt_idx].fullname) != NULL && s[0] == arg[0]; opt_idx++)
+    is_ಪದ_opt = (arg[0] == 't' && arg[1] == '_');
+    ಆದರೆ (is_ಪದ_opt)
+	opt_idx = ಶೀಘ್ರ_tab[26];
+    ಇಲ್ಲದಿದ್ದರೆ
+	opt_idx = ಶೀಘ್ರ_tab[Char_Ord_ಕೆಳಗಿನ(arg[0])];
+    ಗಾಗಿ (; (s = options[opt_idx].fullname) != ಖಾಲಿ && s[0] == arg[0]; opt_idx++)
     {
-	if (STRCMP(arg, s) == 0)		    // match full name
-	    break;
+	ಆದರೆ (STRCMP(arg, s) == 0)		    // match full name
+	    ನಿಲ್ಲಿಸು;
     }
-    if (s != NULL && s[0] != arg[0])
-	s = NULL;
-    if (s == NULL && !is_term_opt)
+    ಆದರೆ (s != ಖಾಲಿ && s[0] != arg[0])
+	s = ಖಾಲಿ;
+    ಆದರೆ (s == ಖಾಲಿ && !is_ಪದ_opt)
     {
-	opt_idx = quick_tab[CharOrdLow(arg[0])];
-	for ( ; options[opt_idx].fullname != NULL; opt_idx++)
+	opt_idx = ಶೀಘ್ರ_tab[Char_Ord_ಕೆಳಗಿನ(arg[0])];
+	ಗಾಗಿ ( ; options[opt_idx].fullname != ಖಾಲಿ; opt_idx++)
 	{
 	    s = options[opt_idx].shortname;
-	    if (s != NULL && STRCMP(arg, s) == 0)   // match short name
-		break;
-	    s = NULL;
+	    ಆದರೆ (s != ಖಾಲಿ && STRCMP(arg, s) == 0)   // match short name
+		ನಿಲ್ಲಿಸು;
+	    s = ಖಾಲಿ;
 	}
     }
-    if (s == NULL)
+    ಆದರೆ (s == ಖಾಲಿ)
 	opt_idx = -1;
-    return opt_idx;
+    ಹಿಂತಿರುಗಿ opt_idx;
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_TCL) || defined(FEAT_MZSCHEME) \
+#ಆದರೆ defined(FEAT_EVAL) || defined(FEAT_TCL) || defined(FEAT_MZSCHEME) \
 	|| defined(FEAT_SPELL)
 /*
  * Get the value for an option.
@@ -5754,98 +5754,98 @@ findoption(char_u *arg)
  * "flagsp" (if not NULL) is set to the option flags (P_xxxx).
  */
     getoption_T
-get_option_value(
+get_option_ಮೌಲ್ಯ(
     char_u	*name,
-    long	*numval,
+    ದೀರ್ಘ	*numval,
     char_u	**stringval,	    // NULL when only checking existence
-    int		*flagsp,
-    int		scope)
+    ಪೂರ್ಣಾಂಕ		*flagsp,
+    ಪೂರ್ಣಾಂಕ		scope)
 {
-    int		opt_idx;
+    ಪೂರ್ಣಾಂಕ		opt_idx;
     char_u	*varp;
 
     opt_idx = findoption(name);
-    if (opt_idx < 0)		    // option not in the table
+    ಆದರೆ (opt_idx < 0)		    // option not in the table
     {
-	int key;
+	ಪೂರ್ಣಾಂಕ ಕೀಲಿ;
 
-	if (STRLEN(name) == 4 && name[0] == 't' && name[1] == '_'
-				  && (key = find_key_option(name, FALSE)) != 0)
+	ಆದರೆ (STRLEN(name) == 4 && name[0] == 't' && name[1] == '_'
+				  && (ಕೀಲಿ = ಕಂಡುಹಿಡಿ_ಕೀಲಿ_option(name, FALSE)) != 0)
 	{
-	    char_u key_name[2];
+	    char_u ಕೀಲಿ_name[2];
 	    char_u *p;
 
-	    if (flagsp != NULL)
+	    ಆದರೆ (flagsp != ಖಾಲಿ)
 		*flagsp = 0;  // terminal option has no flags
 
 	    // check for a terminal option
-	    if (key < 0)
+	    ಆದರೆ (ಕೀಲಿ < 0)
 	    {
-		key_name[0] = KEY2TERMCAP0(key);
-		key_name[1] = KEY2TERMCAP1(key);
+		ಕೀಲಿ_name[0] = KEY2TERMCAP0(ಕೀಲಿ);
+		ಕೀಲಿ_name[1] = KEY2TERMCAP1(ಕೀಲಿ);
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		key_name[0] = KS_KEY;
-		key_name[1] = (key & 0xff);
+		ಕೀಲಿ_name[0] = KS_ಕೀಲಿ;
+		ಕೀಲಿ_name[1] = (ಕೀಲಿ & 0xff);
 	    }
-	    p = find_termcode(key_name);
-	    if (p != NULL)
+	    p = ಕಂಡುಹಿಡಿ_termcode(ಕೀಲಿ_name);
+	    ಆದರೆ (p != ಖಾಲಿ)
 	    {
-		if (stringval != NULL)
+		ಆದರೆ (stringval != ಖಾಲಿ)
 		    *stringval = vim_strsave(p);
-		return gov_string;
+		ಹಿಂತಿರುಗಿ gov_string;
 	    }
 	}
-	return gov_unknown;
+	ಹಿಂತಿರುಗಿ gov_unknown;
     }
 
     varp = get_varp_scope(&(options[opt_idx]), scope);
 
-    if (flagsp != NULL)
+    ಆದರೆ (flagsp != ಖಾಲಿ)
 	// Return the P_xxxx option flags.
 	*flagsp = options[opt_idx].flags;
 
-    if (options[opt_idx].flags & P_STRING)
+    ಆದರೆ (options[opt_idx].flags & P_STRING)
     {
-	if (varp == NULL)		    // hidden option
-	    return gov_hidden_string;
-	if (stringval != NULL)
+	ಆದರೆ (varp == ಖಾಲಿ)		    // hidden option
+	    ಹಿಂತಿರುಗಿ gov_hidden_string;
+	ಆದರೆ (stringval != ಖಾಲಿ)
 	{
-	    if ((char_u **)varp == &p_pt)	// 'pastetoggle'
+	    ಆದರೆ ((char_u **)varp == &p_pt)	// 'pastetoggle'
 		*stringval = str2special_save(*(char_u **)(varp), FALSE,
 									FALSE);
 # ifdef FEAT_CRYPT
 	    // never return the value of the crypt key
-	    else if ((char_u **)varp == &curbuf->b_p_key
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((char_u **)varp == &curbuf->b_p_ಕೀಲಿ
 						&& **(char_u **)(varp) != NUL)
 		*stringval = vim_strnsave((char_u *)"*****", STRLEN_LITERAL("*****"));
 # endif
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		*stringval = vim_strsave(*(char_u **)(varp));
 	}
-	return gov_string;
+	ಹಿಂತಿರುಗಿ gov_string;
     }
 
-    if (varp == NULL)		    // hidden option
-	return (options[opt_idx].flags & P_NUM)
-					 ? gov_hidden_number : gov_hidden_bool;
-    if (options[opt_idx].flags & P_NUM)
-	*numval = *(long *)varp;
-    else
+    ಆದರೆ (varp == ಖಾಲಿ)		    // hidden option
+	ಹಿಂತಿರುಗಿ (options[opt_idx].flags & P_ಅಂಕೆ)
+					 ? gov_hidden_ಸಂಖ್ಯೆ : gov_hidden_bool;
+    ಆದರೆ (options[opt_idx].flags & P_ಅಂಕೆ)
+	*numval = *(ದೀರ್ಘ *)varp;
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Special case: 'modified' is b_changed, but we also want to consider
 	// it set when 'ff' or 'fenc' changed.
-	if ((int *)varp == &curbuf->b_changed)
-	    *numval = curbufIsChanged();
-	else
-	    *numval = (long) *(int *)varp;
+	ಆದರೆ ((ಪೂರ್ಣಾಂಕ *)varp == &curbuf->b_ಬದಲಾಯಿತು)
+	    *numval = curbuf_Is_ಬದಲಾಯಿತು();
+	ಇಲ್ಲದಿದ್ದರೆ
+	    *numval = (ದೀರ್ಘ) *(ಪೂರ್ಣಾಂಕ *)varp;
     }
-    return (options[opt_idx].flags & P_NUM) ? gov_number : gov_bool;
+    ಹಿಂತಿರುಗಿ (options[opt_idx].flags & P_ಅಂಕೆ) ? gov_ಸಂಖ್ಯೆ : gov_bool;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#ಆದರೆ defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 /*
  * Returns the option attributes and its value. Unlike the above function it
  * will return either global value or local value of the option depending on
@@ -5864,127 +5864,127 @@ get_option_value(
  *
  * Possible opt_type values: see SREQ_* in vim.h
  */
-    int
-get_option_value_strict(
+    ಪೂರ್ಣಾಂಕ
+get_option_ಮೌಲ್ಯ_strict(
     char_u	*name,
-    long	*numval,
+    ದೀರ್ಘ	*numval,
     char_u	**stringval,	    // NULL when only obtaining attributes
-    int		opt_type,
-    void	*from)
+    ಪೂರ್ಣಾಂಕ		opt_type,
+    ಶೂನ್ಯ	*from)
 {
-    int		opt_idx;
-    char_u	*varp = NULL;
-    struct vimoption *p;
-    int		r = 0;
+    ಪೂರ್ಣಾಂಕ		opt_idx;
+    char_u	*varp = ಖಾಲಿ;
+    ರಚನೆ vimoption *p;
+    ಪೂರ್ಣಾಂಕ		r = 0;
 
     opt_idx = findoption(name);
-    if (opt_idx < 0)
-	return 0;
+    ಆದರೆ (opt_idx < 0)
+	ಹಿಂತಿರುಗಿ 0;
 
     p = &(options[opt_idx]);
 
     // Hidden option
-    if (p->var == NULL)
-	return 0;
+    ಆದರೆ (p->var == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ 0;
 
-    if (p->flags & P_BOOL)
+    ಆದರೆ (p->flags & P_BOOL)
 	r |= SOPT_BOOL;
-    else if (p->flags & P_NUM)
-	r |= SOPT_NUM;
-    else if (p->flags & P_STRING)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p->flags & P_ಅಂಕೆ)
+	r |= SOPT_ಅಂಕೆ;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p->flags & P_STRING)
 	r |= SOPT_STRING;
 
-    if (p->indir == PV_NONE)
+    ಆದರೆ (p->indir == PV_NONE)
     {
-	if (opt_type == SREQ_GLOBAL)
+	ಆದರೆ (opt_type == SREQ_GLOBAL)
 	    r |= SOPT_GLOBAL;
-	else
-	    return 0; // Did not request global-only option
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಹಿಂತಿರುಗಿ 0; // Did not request global-only option
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (p->indir & PV_BOTH)
+	ಆದರೆ (p->indir & PV_BOTH)
 	    r |= SOPT_GLOBAL;
-	else if (opt_type == SREQ_GLOBAL)
-	    return 0; // Requested global option
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (opt_type == SREQ_GLOBAL)
+	    ಹಿಂತಿರುಗಿ 0; // Requested global option
 
-	if (p->indir & PV_WIN)
+	ಆದರೆ (p->indir & PV_WIN)
 	{
-	    if (opt_type == SREQ_BUF)
-		return 0; // Did not request window-local option
-	    else
+	    ಆದರೆ (opt_type == SREQ_BUF)
+		ಹಿಂತಿರುಗಿ 0; // Did not request window-local option
+	    ಇಲ್ಲದಿದ್ದರೆ
 		r |= SOPT_WIN;
 	}
-	else if (p->indir & PV_BUF)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p->indir & PV_BUF)
 	{
-	    if (opt_type == SREQ_WIN)
-		return 0; // Did not request buffer-local option
-	    else
+	    ಆದರೆ (opt_type == SREQ_WIN)
+		ಹಿಂತಿರುಗಿ 0; // Did not request buffer-local option
+	    ಇಲ್ಲದಿದ್ದರೆ
 		r |= SOPT_BUF;
 	}
     }
 
-    if (stringval == NULL)
-	return r;
+    ಆದರೆ (stringval == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ r;
 
-    if (opt_type == SREQ_GLOBAL)
+    ಆದರೆ (opt_type == SREQ_GLOBAL)
 	varp = p->var;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (opt_type == SREQ_BUF)
+	ಆದರೆ (opt_type == SREQ_BUF)
 	{
 	    // Special case: 'modified' is b_changed, but we also want to
 	    // consider it set when 'ff' or 'fenc' changed.
-	    if (p->indir == PV_MOD)
+	    ಆದರೆ (p->indir == PV_MOD)
 	    {
-		*numval = bufIsChanged((buf_T *)from);
-		varp = NULL;
+		*numval = buf_Is_ಬದಲಾಯಿತು((buf_T *)from);
+		varp = ಖಾಲಿ;
 	    }
 # ifdef FEAT_CRYPT
-	    else if (p->indir == PV_KEY)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p->indir == PV_ಕೀಲಿ)
 	    {
 		// never return the value of the crypt key
-		*stringval = NULL;
-		varp = NULL;
+		*stringval = ಖಾಲಿ;
+		varp = ಖಾಲಿ;
 	    }
 # endif
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		buf_T *save_curbuf = curbuf;
 
 		// only getting a pointer, no need to use aucmd_prepbuf()
 		curbuf = (buf_T *)from;
-		curwin->w_buffer = curbuf;
+		curwin->w_ಬಫರ್ = curbuf;
 		varp = get_varp(p);
 		curbuf = save_curbuf;
-		curwin->w_buffer = curbuf;
+		curwin->w_ಬಫರ್ = curbuf;
 	    }
 	}
-	else if (opt_type == SREQ_WIN)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (opt_type == SREQ_WIN)
 	{
 	    win_T	*save_curwin = curwin;
 
 	    curwin = (win_T *)from;
-	    curbuf = curwin->w_buffer;
+	    curbuf = curwin->w_ಬಫರ್;
 	    varp = get_varp(p);
 	    curwin = save_curwin;
-	    curbuf = curwin->w_buffer;
+	    curbuf = curwin->w_ಬಫರ್;
 	}
-	if (varp == p->var)
-	    return (r | SOPT_UNSET);
+	ಆದರೆ (varp == p->var)
+	    ಹಿಂತಿರುಗಿ (r | SOPT_UNSET);
     }
 
-    if (varp != NULL)
+    ಆದರೆ (varp != ಖಾಲಿ)
     {
-	if (p->flags & P_STRING)
+	ಆದರೆ (p->flags & P_STRING)
 	    *stringval = vim_strsave(*(char_u **)(varp));
-	else if (p->flags & P_NUM)
-	    *numval = *(long *) varp;
-	else
-	    *numval = *(int *)varp;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p->flags & P_ಅಂಕೆ)
+	    *numval = *(ದೀರ್ಘ *) varp;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    *numval = *(ಪೂರ್ಣಾಂಕ *)varp;
     }
 
-    return r;
+    ಹಿಂತಿರುಗಿ r;
 }
 
 /*
@@ -6000,69 +6000,69 @@ get_option_value_strict(
  * Returns full option name for current option on each call.
  */
     char_u *
-option_iter_next(void **option, int opt_type)
+option_iter_ಮುಂದಿನ(ಶೂನ್ಯ **option, ಪೂರ್ಣಾಂಕ opt_type)
 {
-    struct vimoption	*ret = NULL;
-    do
+    ರಚನೆ vimoption	*ret = ಖಾಲಿ;
+    ಮಾಡು
     {
-	if (*option == NULL)
-	    *option = (void *) options;
-	else if (((struct vimoption *) (*option))->fullname == NULL)
+	ಆದರೆ (*option == ಖಾಲಿ)
+	    *option = (ಶೂನ್ಯ *) options;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (((ರಚನೆ vimoption *) (*option))->fullname == ಖಾಲಿ)
 	{
-	    *option = NULL;
-	    return NULL;
+	    *option = ಖಾಲಿ;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
-	else
-	    *option = (void *) (((struct vimoption *) (*option)) + 1);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    *option = (ಶೂನ್ಯ *) (((ರಚನೆ vimoption *) (*option)) + 1);
 
-	ret = ((struct vimoption *) (*option));
+	ret = ((ರಚನೆ vimoption *) (*option));
 
 	// Hidden option
-	if (ret->var == NULL)
+	ಆದರೆ (ret->var == ಖಾಲಿ)
 	{
-	    ret = NULL;
-	    continue;
+	    ret = ಖಾಲಿ;
+	    ಮುಂದುವರಿ;
 	}
 
-	switch (opt_type)
+	ಆಯ್ಕೆ (opt_type)
 	{
-	    case SREQ_GLOBAL:
-		if (!(ret->indir == PV_NONE || ret->indir & PV_BOTH))
-		    ret = NULL;
-		break;
-	    case SREQ_BUF:
-		if (!(ret->indir & PV_BUF))
-		    ret = NULL;
-		break;
-	    case SREQ_WIN:
-		if (!(ret->indir & PV_WIN))
-		    ret = NULL;
-		break;
-	    default:
-		internal_error("option_iter_next()");
-		return NULL;
+	    ಸ್ಥಿತಿ SREQ_GLOBAL:
+		ಆದರೆ (!(ret->indir == PV_NONE || ret->indir & PV_BOTH))
+		    ret = ಖಾಲಿ;
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ SREQ_BUF:
+		ಆದರೆ (!(ret->indir & PV_BUF))
+		    ret = ಖಾಲಿ;
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ SREQ_WIN:
+		ಆದರೆ (!(ret->indir & PV_WIN))
+		    ret = ಖಾಲಿ;
+		ನಿಲ್ಲಿಸು;
+	    ಪೂರ್ವನಿಯೋಜಿತ:
+		ಆಂತರಿಕ_error("option_iter_next()");
+		ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
     }
-    while (ret == NULL);
+    ಆಗ (ret == ಖಾಲಿ);
 
-    return (char_u *)ret->fullname;
+    ಹಿಂತಿರುಗಿ (char_u *)ret->fullname;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Return the flags for the option at 'opt_idx'.
  */
     long_u
-get_option_flags(int opt_idx)
+get_option_flags(ಪೂರ್ಣಾಂಕ opt_idx)
 {
-    return options[opt_idx].flags;
+    ಹಿಂತಿರುಗಿ options[opt_idx].flags;
 }
 
 /*
  * Set a flag for the option at 'opt_idx'.
  */
-    void
-set_option_flag(int opt_idx, long_u flag)
+    ಶೂನ್ಯ
+ಗಣ_option_flag(ಪೂರ್ಣಾಂಕ opt_idx, long_u flag)
 {
     options[opt_idx].flags |= flag;
 }
@@ -6070,50 +6070,50 @@ set_option_flag(int opt_idx, long_u flag)
 /*
  * Returns TRUE if the option at 'opt_idx' is a global option
  */
-    int
-is_global_option(int opt_idx)
+    ಪೂರ್ಣಾಂಕ
+is_global_option(ಪೂರ್ಣಾಂಕ opt_idx)
 {
-    return options[opt_idx].indir == PV_NONE;
+    ಹಿಂತಿರುಗಿ options[opt_idx].indir == PV_NONE;
 }
 
 /*
  * Returns TRUE if the option at 'opt_idx' is a global option which also has a
  * local value.
  */
-    int
-is_global_local_option(int opt_idx)
+    ಪೂರ್ಣಾಂಕ
+is_global_local_option(ಪೂರ್ಣಾಂಕ opt_idx)
 {
-    return options[opt_idx].indir & PV_BOTH;
+    ಹಿಂತಿರುಗಿ options[opt_idx].indir & PV_BOTH;
 }
 
 /*
  * Returns TRUE if the option at 'opt_idx' is a window-local option
  */
-    int
-is_window_local_option(int opt_idx)
+    ಪೂರ್ಣಾಂಕ
+is_ಕಿಟಕಿ_local_option(ಪೂರ್ಣಾಂಕ opt_idx)
 {
-    return options[opt_idx].var == VAR_WIN;
+    ಹಿಂತಿರುಗಿ options[opt_idx].var == VAR_WIN;
 }
 
 /*
  * Returns TRUE if the option at 'opt_idx' is a hidden option
  */
-    int
-is_hidden_option(int opt_idx)
+    ಪೂರ್ಣಾಂಕ
+is_hidden_option(ಪೂರ್ಣಾಂಕ opt_idx)
 {
-    return options[opt_idx].var == NULL;
+    ಹಿಂತಿರುಗಿ options[opt_idx].var == ಖಾಲಿ;
 }
 
-#if defined(FEAT_CRYPT)
+#ಆದರೆ defined(FEAT_CRYPT)
 /*
  * Returns TRUE if the option at 'opt_idx' is a crypt key option
  */
-    int
-is_crypt_key_option(int opt_idx)
+    ಪೂರ್ಣಾಂಕ
+is_crypt_ಕೀಲಿ_option(ಪೂರ್ಣಾಂಕ opt_idx)
 {
-    return options[opt_idx].indir == PV_KEY;
+    ಹಿಂತಿರುಗಿ options[opt_idx].indir == PV_ಕೀಲಿ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Set the value of option "name".
@@ -6121,110 +6121,110 @@ is_crypt_key_option(int opt_idx)
  *
  * Returns NULL on success or an untranslated error message on error.
  */
-    char *
-set_option_value(
+    ಅಕ್ಷರ *
+ಗಣ_option_ಮೌಲ್ಯ(
     char_u	*name,
-    long	number,
+    ದೀರ್ಘ	ಸಂಖ್ಯೆ,
     char_u	*string,
-    int		opt_flags)	// OPT_LOCAL or 0 (both)
+    ಪೂರ್ಣಾಂಕ		opt_flags)	// OPT_LOCAL or 0 (both)
 {
-    int		opt_idx;
+    ಪೂರ್ಣಾಂಕ		opt_idx;
     char_u	*varp;
     long_u	flags;
-    static char	errbuf[ERR_BUFLEN];
-    int		errbuflen = ERR_BUFLEN;
+    ಸ್ಥಿರ ಅಕ್ಷರ	errbuf[ERR_BUFLEN];
+    ಪೂರ್ಣಾಂಕ		errbuflen = ERR_BUFLEN;
 
     opt_idx = findoption(name);
-    if (opt_idx < 0)
+    ಆದರೆ (opt_idx < 0)
     {
-	int key;
+	ಪೂರ್ಣಾಂಕ ಕೀಲಿ;
 
-	if (STRLEN(name) == 4 && name[0] == 't' && name[1] == '_'
-		&& (key = find_key_option(name, FALSE)) != 0)
+	ಆದರೆ (STRLEN(name) == 4 && name[0] == 't' && name[1] == '_'
+		&& (ಕೀಲಿ = ಕಂಡುಹಿಡಿ_ಕೀಲಿ_option(name, FALSE)) != 0)
 	{
-	    char_u key_name[2];
+	    char_u ಕೀಲಿ_name[2];
 
-	    if (key < 0)
+	    ಆದರೆ (ಕೀಲಿ < 0)
 	    {
-		key_name[0] = KEY2TERMCAP0(key);
-		key_name[1] = KEY2TERMCAP1(key);
+		ಕೀಲಿ_name[0] = KEY2TERMCAP0(ಕೀಲಿ);
+		ಕೀಲಿ_name[1] = KEY2TERMCAP1(ಕೀಲಿ);
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		key_name[0] = KS_KEY;
-		key_name[1] = (key & 0xff);
+		ಕೀಲಿ_name[0] = KS_ಕೀಲಿ;
+		ಕೀಲಿ_name[1] = (ಕೀಲಿ & 0xff);
 	    }
-	    add_termcode(key_name, string, FALSE);
-	    if (full_screen)
+	    ಕೂಡಿಸು_termcode(ಕೀಲಿ_name, string, FALSE);
+	    ಆದರೆ (ತುಂಬಿದ_screen)
 		ttest(FALSE);
 	    redraw_all_later(UPD_CLEAR);
-	    return NULL;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
 
 	semsg(_(e_unknown_option_str_2), name);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	flags = options[opt_idx].flags;
-#ifdef HAVE_SANDBOX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_SANDBOX
 	// Disallow changing some options in the sandbox
-	if (sandbox > 0 && (flags & P_SECURE))
+	ಆದರೆ (sandbox > 0 && (flags & P_SECURE))
 	{
-	    emsg(_(e_not_allowed_in_sandbox));
-	    return NULL;
+	    emsg(_(e_not_allowed_ಒಳ_sandbox));
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
-#endif
-	if (flags & P_STRING)
-	    return set_string_option(opt_idx, string, opt_flags, errbuf, errbuflen);
+#ಆದರೆ_ಅಂತ್ಯ
+	ಆದರೆ (flags & P_STRING)
+	    ಹಿಂತಿರುಗಿ ಗಣ_string_option(opt_idx, string, opt_flags, errbuf, errbuflen);
 
 	varp = get_varp_scope(&(options[opt_idx]), opt_flags);
-	if (varp != NULL)	// hidden option is not changed
+	ಆದರೆ (varp != ಖಾಲಿ)	// hidden option is not changed
 	{
-	    if (number == 0 && string != NULL)
+	    ಆದರೆ (ಸಂಖ್ಯೆ == 0 && string != ಖಾಲಿ)
 	    {
-		int idx;
+		ಪೂರ್ಣಾಂಕ idx;
 
 		// Either we are given a string or we are setting option
 		// to zero.
-		for (idx = 0; string[idx] == '0'; ++idx)
+		ಗಾಗಿ (idx = 0; string[idx] == '0'; ++idx)
 		    ;
-		if (string[idx] != NUL || idx == 0)
+		ಆದರೆ (string[idx] != NUL || idx == 0)
 		{
 		    // There's another character after zeros or the string
 		    // is empty.  In both cases, we are trying to set a
 		    // num option using a string.
-		    semsg(_(e_number_required_after_str_equal_str),
+		    semsg(_(e_ಸಂಖ್ಯೆ_required_after_str_equal_str),
 								 name, string);
-		    return NULL;     // do nothing as we hit an error
+		    ಹಿಂತಿರುಗಿ ಖಾಲಿ;     // do nothing as we hit an error
 
 		}
 	    }
-	    if (flags & P_NUM)
+	    ಆದರೆ (flags & P_ಅಂಕೆ)
 	    {
-		return set_num_option(opt_idx, varp, number,
-					   errbuf, sizeof(errbuf), opt_flags);
+		ಹಿಂತಿರುಗಿ ಗಣ_ಅಂಕೆ_option(opt_idx, varp, ಸಂಖ್ಯೆ,
+					   errbuf, ಗಾತ್ರ(errbuf), opt_flags);
 	    }
-	    else
-		return set_bool_option(opt_idx, varp, (int)number, opt_flags);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ಹಿಂತಿರುಗಿ ಗಣ_bool_option(opt_idx, varp, (ಪೂರ್ಣಾಂಕ)ಸಂಖ್ಯೆ, opt_flags);
 	}
 
     }
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Call set_option_value() and when an error is returned report it.
  */
-    void
-set_option_value_give_err(
+    ಶೂನ್ಯ
+ಗಣ_option_ಮೌಲ್ಯ_give_err(
     char_u	*name,
-    long	number,
+    ದೀರ್ಘ	ಸಂಖ್ಯೆ,
     char_u	*string,
-    int		opt_flags)	// OPT_LOCAL or 0 (both)
+    ಪೂರ್ಣಾಂಕ		opt_flags)	// OPT_LOCAL or 0 (both)
 {
-    char *errmsg = set_option_value(name, number, string, opt_flags);
+    ಅಕ್ಷರ *errmsg = ಗಣ_option_ಮೌಲ್ಯ(name, ಸಂಖ್ಯೆ, string, opt_flags);
 
-    if (errmsg != NULL)
+    ಆದರೆ (errmsg != ಖಾಲಿ)
 	emsg(_(errmsg));
 }
 
@@ -6233,85 +6233,85 @@ set_option_value_give_err(
  * Returns NULL when not found.
  */
     char_u *
-get_term_code(char_u *tname)
+get_ಪದ_ಸಂಕೇತ(char_u *tname)
 {
-    int	    opt_idx;
+    ಪೂರ್ಣಾಂಕ	    opt_idx;
     char_u  *varp;
 
-    if (tname[0] != 't' || tname[1] != '_' ||
+    ಆದರೆ (tname[0] != 't' || tname[1] != '_' ||
 	    tname[2] == NUL || tname[3] == NUL)
-	return NULL;
-    if ((opt_idx = findoption(tname)) >= 0)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    ಆದರೆ ((opt_idx = findoption(tname)) >= 0)
     {
 	varp = get_varp(&(options[opt_idx]));
-	if (varp != NULL)
+	ಆದರೆ (varp != ಖಾಲಿ)
 	    varp = *(char_u **)(varp);
-	return varp;
+	ಹಿಂತಿರುಗಿ varp;
     }
-    return find_termcode(tname + 2);
+    ಹಿಂತಿರುಗಿ ಕಂಡುಹಿಡಿ_termcode(tname + 2);
 }
 
     char_u *
-get_highlight_default(void)
+get_highlight_default(ಶೂನ್ಯ)
 {
-    int i;
+    ಪೂರ್ಣಾಂಕ i;
 
     i = findoption((char_u *)"hl");
-    if (i >= 0)
-	return options[i].def_val[VI_DEFAULT];
-    return (char_u *)NULL;
+    ಆದರೆ (i >= 0)
+	ಹಿಂತಿರುಗಿ options[i].def_val[VI_DEFAULT];
+    ಹಿಂತಿರುಗಿ (char_u *)ಖಾಲಿ;
 }
 
     char_u *
-get_encoding_default(void)
+get_encoding_default(ಶೂನ್ಯ)
 {
-    int i;
+    ಪೂರ್ಣಾಂಕ i;
 
     i = findoption((char_u *)"enc");
-    if (i >= 0)
-	return options[i].def_val[VI_DEFAULT];
-    return (char_u *)NULL;
+    ಆದರೆ (i >= 0)
+	ಹಿಂತಿರುಗಿ options[i].def_val[VI_DEFAULT];
+    ಹಿಂತಿರುಗಿ (char_u *)ಖಾಲಿ;
 }
 
-#if defined(FEAT_QUICKFIX)
-    int
-is_option_allocated(char *name)
+#ಆದರೆ defined(FEAT_QUICKFIX)
+    ಪೂರ್ಣಾಂಕ
+is_option_allocated(ಅಕ್ಷರ *name)
 {
-    int idx = findoption((char_u *)name);
+    ಪೂರ್ಣಾಂಕ idx = findoption((char_u *)name);
 
-    return idx >= 0 && (options[idx].flags & P_ALLOCED);
+    ಹಿಂತಿರುಗಿ idx >= 0 && (options[idx].flags & P_ALLOCED);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Translate a string like "t_xx", "<t_xx>" or "<S-Tab>" to a key number.
  * When "has_lt" is true there is a '<' before "*arg_arg".
  * Returns 0 when the key is not recognized.
  */
-    static int
-find_key_option(char_u *arg_arg, int has_lt)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಕಂಡುಹಿಡಿ_ಕೀಲಿ_option(char_u *arg_arg, ಪೂರ್ಣಾಂಕ has_lt)
 {
-    int		key = 0;
-    int		modifiers;
+    ಪೂರ್ಣಾಂಕ		ಕೀಲಿ = 0;
+    ಪೂರ್ಣಾಂಕ		modifiers;
     char_u	*arg = arg_arg;
 
     // Don't use get_special_key_code() for t_xx, we don't want it to call
     // add_termcap_entry().
-    if (arg[0] == 't' && arg[1] == '_' && arg[2] && arg[3])
+    ಆದರೆ (arg[0] == 't' && arg[1] == '_' && arg[2] && arg[3])
     {
-	if (!has_lt || arg[4] == '>')
-	    key = TERMCAP2KEY(arg[2], arg[3]);
+	ಆದರೆ (!has_lt || arg[4] == '>')
+	    ಕೀಲಿ = TERMCAP2_ಕೀಲಿ(arg[2], arg[3]);
     }
-    else if (has_lt)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (has_lt)
     {
 	--arg;			    // put arg at the '<'
 	modifiers = 0;
-	key = find_special_key(&arg, &modifiers,
-			    FSK_KEYCODE | FSK_KEEP_X_KEY | FSK_SIMPLIFY, NULL);
-	if (modifiers)		    // can't handle modifiers here
-	    key = 0;
+	ಕೀಲಿ = ಕಂಡುಹಿಡಿ_special_ಕೀಲಿ(&arg, &modifiers,
+			    FSK_KEYCODE | FSK_KEEP_X_ಕೀಲಿ | FSK_SIMPLIFY, ಖಾಲಿ);
+	ಆದರೆ (modifiers)		    // can't handle modifiers here
+	    ಕೀಲಿ = 0;
     }
-    return key;
+    ಹಿಂತಿರುಗಿ ಕೀಲಿ;
 }
 
 /*
@@ -6319,169 +6319,169 @@ find_key_option(char_u *arg_arg, int has_lt)
  * if 'all' == 1: show all normal options
  * if 'all' == 2: show all terminal options
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 showoptions(
-    int		all,
-    int		opt_flags)	// OPT_LOCAL and/or OPT_GLOBAL
+    ಪೂರ್ಣಾಂಕ		all,
+    ಪೂರ್ಣಾಂಕ		opt_flags)	// OPT_LOCAL and/or OPT_GLOBAL
 {
-    struct vimoption	*p;
-    int			col;
-    int			isterm;
+    ರಚನೆ vimoption	*p;
+    ಪೂರ್ಣಾಂಕ			ಲಂಬಸಾಲು;
+    ಪೂರ್ಣಾಂಕ			isterm;
     char_u		*varp;
-    struct vimoption	**items;
-    int			item_count;
-    int			run;
-    int			row, rows;
-    int			cols;
-    int			i;
-    int			len;
+    ರಚನೆ vimoption	**ವಸ್ತುಗಳು;
+    ಪೂರ್ಣಾಂಕ			ಅಂಶ_ಎಣಿಕೆ;
+    ಪೂರ್ಣಾಂಕ			ಸತತ;
+    ಪೂರ್ಣಾಂಕ			ಅಡ್ಡಸಾಲು, ಅಡ್ಡಸಾಲುಗಳು_2;
+    ಪೂರ್ಣಾಂಕ			ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+    ಪೂರ್ಣಾಂಕ			i;
+    ಪೂರ್ಣಾಂಕ			len;
 
-#define INC 20
-#define GAP 3
+#ವ್ಯಾಖ್ಯಾನಿಸು INC 20
+#ವ್ಯಾಖ್ಯಾನಿಸು GAP 3
 
-    items = ALLOC_MULT(struct vimoption *, OPTION_COUNT);
-    if (items == NULL)
-	return;
+    ವಸ್ತುಗಳು = ALLOC_MULT(ರಚನೆ vimoption *, OPTION_ಎಣಿಕೆ);
+    ಆದರೆ (ವಸ್ತುಗಳು == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     // Highlight title
-    if (all == 2)
-	msg_puts_title(_("\n--- Terminal codes ---"));
-    else if (opt_flags & OPT_GLOBAL)
-	msg_puts_title(_("\n--- Global option values ---"));
-    else if (opt_flags & OPT_LOCAL)
-	msg_puts_title(_("\n--- Local option values ---"));
-    else
-	msg_puts_title(_("\n--- Options ---"));
+    ಆದರೆ (all == 2)
+	ಸಂದೇಶ_puts_title(_("\n--- Terminal codes ---"));
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (opt_flags & OPT_GLOBAL)
+	ಸಂದೇಶ_puts_title(_("\n--- Global option values ---"));
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (opt_flags & OPT_LOCAL)
+	ಸಂದೇಶ_puts_title(_("\n--- Local option values ---"));
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಸಂದೇಶ_puts_title(_("\n--- Options ---"));
 
     // Do the loop two times:
     // 1. display the short items
     // 2. display the long items (only strings and numbers)
     // When "opt_flags" has OPT_ONECOLUMN do everything in run 2.
-    for (run = 1; run <= 2 && !got_int; ++run)
+    ಗಾಗಿ (ಸತತ = 1; ಸತತ <= 2 && !got_int; ++ಸತತ)
     {
 	// collect the items in items[]
-	item_count = 0;
-	for (p = &options[0]; p->fullname != NULL; p++)
+	ಅಂಶ_ಎಣಿಕೆ = 0;
+	ಗಾಗಿ (p = &options[0]; p->fullname != ಖಾಲಿ; p++)
 	{
 	    // apply :filter /pat/
-	    if (message_filtered((char_u *)p->fullname))
-		continue;
+	    ಆದರೆ (ಸಂದೇಶ_filtered((char_u *)p->fullname))
+		ಮುಂದುವರಿ;
 
-	    varp = NULL;
+	    varp = ಖಾಲಿ;
 	    isterm = istermoption(p);
-	    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) != 0)
+	    ಆದರೆ ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) != 0)
 	    {
-		if (p->indir != PV_NONE && !isterm)
+		ಆದರೆ (p->indir != PV_NONE && !isterm)
 		    varp = get_varp_scope(p, opt_flags);
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		varp = get_varp(p);
-	    if (varp != NULL
+	    ಆದರೆ (varp != ಖಾಲಿ
 		    && ((all == 2 && isterm)
 			|| (all == 1 && !isterm)
 			|| (all == 0 && !optval_default(p, varp, p_cp))))
 	    {
-		if (opt_flags & OPT_ONECOLUMN)
+		ಆದರೆ (opt_flags & OPT_ONECOLUMN)
 		    len = Columns;
-		else if (p->flags & P_BOOL)
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p->flags & P_BOOL)
 		    len = 1;		// a toggle option fits always
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    option_value2string(p, opt_flags);
-		    len = (int)STRLEN(p->fullname) + vim_strsize(NameBuff) + 1;
+		    len = (ಪೂರ್ಣಾಂಕ)STRLEN(p->fullname) + vim_strsize(NameBuff) + 1;
 		}
-		if ((len <= INC - GAP && run == 1) ||
-						(len > INC - GAP && run == 2))
-		    items[item_count++] = p;
+		ಆದರೆ ((len <= INC - GAP && ಸತತ == 1) ||
+						(len > INC - GAP && ಸತತ == 2))
+		    ವಸ್ತುಗಳು[ಅಂಶ_ಎಣಿಕೆ++] = p;
 	    }
 	}
 
 	// display the items
-	if (run == 1)
+	ಆದರೆ (ಸತತ == 1)
 	{
-	    cols = (Columns + GAP - 3) / INC;
-	    if (cols == 0)
-		cols = 1;
-	    rows = (item_count + cols - 1) / cols;
+	    ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = (Columns + GAP - 3) / INC;
+	    ಆದರೆ (ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == 0)
+		ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = 1;
+	    ಅಡ್ಡಸಾಲುಗಳು_2 = (ಅಂಶ_ಎಣಿಕೆ + ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ - 1) / ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
 	}
-	else	// run == 2
-	    rows = item_count;
-	for (row = 0; row < rows && !got_int; ++row)
+	ಇಲ್ಲದಿದ್ದರೆ	// run == 2
+	    ಅಡ್ಡಸಾಲುಗಳು_2 = ಅಂಶ_ಎಣಿಕೆ;
+	ಗಾಗಿ (ಅಡ್ಡಸಾಲು = 0; ಅಡ್ಡಸಾಲು < ಅಡ್ಡಸಾಲುಗಳು_2 && !got_int; ++ಅಡ್ಡಸಾಲು)
 	{
-	    msg_putchar('\n');			// go to next line
-	    if (got_int)			// 'q' typed in more
-		break;
-	    col = 0;
-	    for (i = row; i < item_count; i += rows)
+	    ಸಂದೇಶ_putchar('\n');			// go to next line
+	    ಆದರೆ (got_int)			// 'q' typed in more
+		ನಿಲ್ಲಿಸು;
+	    ಲಂಬಸಾಲು = 0;
+	    ಗಾಗಿ (i = ಅಡ್ಡಸಾಲು; i < ಅಂಶ_ಎಣಿಕೆ; i += ಅಡ್ಡಸಾಲುಗಳು_2)
 	    {
-		msg_col = col;			// make columns
-		showoneopt(items[i], opt_flags);
-		col += INC;
+		ಸಂದೇಶ_ಲಂಬಸಾಲು = ಲಂಬಸಾಲು;			// make columns
+		showoneopt(ವಸ್ತುಗಳು[i], opt_flags);
+		ಲಂಬಸಾಲು += INC;
 	    }
-	    out_flush();
+	    ಹೊರಹೋಗು_flush();
 	    ui_breakcheck();
 	}
     }
-    vim_free(items);
+    vim_free(ವಸ್ತುಗಳು);
 }
 
 /*
  * Return TRUE if option "p" has its default value.
  */
-    static int
-optval_default(struct vimoption *p, char_u *varp, int compatible)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+optval_default(ರಚನೆ vimoption *p, char_u *varp, ಪೂರ್ಣಾಂಕ compatible)
 {
-    int		dvi;
+    ಪೂರ್ಣಾಂಕ		dvi;
 
-    if (varp == NULL)
-	return TRUE;	    // hidden option is always at default
+    ಆದರೆ (varp == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ TRUE;	    // hidden option is always at default
     dvi = ((p->flags & P_VI_DEF) || compatible) ? VI_DEFAULT : VIM_DEFAULT;
-    if (p->flags & P_NUM)
-	return (*(long *)varp == (long)(long_i)p->def_val[dvi]);
-    if (p->flags & P_BOOL)
+    ಆದರೆ (p->flags & P_ಅಂಕೆ)
+	ಹಿಂತಿರುಗಿ (*(ದೀರ್ಘ *)varp == (ದೀರ್ಘ)(long_i)p->def_val[dvi]);
+    ಆದರೆ (p->flags & P_BOOL)
 			// the cast to long is required for Manx C, long_i is
 			// needed for MSVC
-	return (*(int *)varp == (int)(long)(long_i)p->def_val[dvi]);
+	ಹಿಂತಿರುಗಿ (*(ಪೂರ್ಣಾಂಕ *)varp == (ಪೂರ್ಣಾಂಕ)(ದೀರ್ಘ)(long_i)p->def_val[dvi]);
     // P_STRING
-    return (STRCMP(*(char_u **)varp, p->def_val[dvi]) == 0);
+    ಹಿಂತಿರುಗಿ (STRCMP(*(char_u **)varp, p->def_val[dvi]) == 0);
 }
 
 /*
  * showoneopt: show the value of one option
  * must not be called with a hidden option!
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 showoneopt(
-    struct vimoption	*p,
-    int			opt_flags)	// OPT_LOCAL or OPT_GLOBAL
+    ರಚನೆ vimoption	*p,
+    ಪೂರ್ಣಾಂಕ			opt_flags)	// OPT_LOCAL or OPT_GLOBAL
 {
     char_u	*varp;
-    int		save_silent = silent_mode;
+    ಪೂರ್ಣಾಂಕ		save_silent = silent_ಬಹುಲಕ;
 
-    silent_mode = FALSE;
-    info_message = TRUE;	// use mch_msg(), not mch_errmsg()
+    silent_ಬಹುಲಕ = FALSE;
+    info_ಸಂದೇಶ = TRUE;	// use mch_msg(), not mch_errmsg()
 
     varp = get_varp_scope(p, opt_flags);
 
     // for 'modified' we also need to check if 'ff' or 'fenc' changed.
-    if ((p->flags & P_BOOL) && ((int *)varp == &curbuf->b_changed
-					? !curbufIsChanged() : !*(int *)varp))
-	msg_puts("no");
-    else if ((p->flags & P_BOOL) && *(int *)varp < 0)
-	msg_puts("--");
-    else
-	msg_puts("  ");
-    msg_puts(p->fullname);
-    if (!(p->flags & P_BOOL))
+    ಆದರೆ ((p->flags & P_BOOL) && ((ಪೂರ್ಣಾಂಕ *)varp == &curbuf->b_ಬದಲಾಯಿತು
+					? !curbuf_Is_ಬದಲಾಯಿತು() : !*(ಪೂರ್ಣಾಂಕ *)varp))
+	ಸಂದೇಶ_puts("no");
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((p->flags & P_BOOL) && *(ಪೂರ್ಣಾಂಕ *)varp < 0)
+	ಸಂದೇಶ_puts("--");
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಸಂದೇಶ_puts("  ");
+    ಸಂದೇಶ_puts(p->fullname);
+    ಆದರೆ (!(p->flags & P_BOOL))
     {
-	msg_putchar('=');
+	ಸಂದೇಶ_putchar('=');
 	// put value string in NameBuff
 	option_value2string(p, opt_flags);
-	msg_outtrans(NameBuff);
+	ಸಂದೇಶ_outtrans(NameBuff);
     }
 
-    silent_mode = save_silent;
-    info_message = FALSE;
+    silent_ಬಹುಲಕ = save_silent;
+    info_ಸಂದೇಶ = FALSE;
 }
 
 /*
@@ -6506,16 +6506,16 @@ showoneopt(
  *
  * Return FAIL on error, OK otherwise.
  */
-    int
-makeset(FILE *fd, int opt_flags, int local_only)
+    ಪೂರ್ಣಾಂಕ
+makeset(FILE *fd, ಪೂರ್ಣಾಂಕ opt_flags, ಪೂರ್ಣಾಂಕ local_only)
 {
-    struct vimoption	*p;
+    ರಚನೆ vimoption	*p;
     char_u		*varp;			// currently used value
     char_u		*varp_fresh;		// local value
-    char_u		*varp_local = NULL;	// fresh value
-    char		*cmd;
-    int			round;
-    int			pri;
+    char_u		*varp_local = ಖಾಲಿ;	// fresh value
+    ಅಕ್ಷರ		*cmd;
+    ಪೂರ್ಣಾಂಕ			ಸುತ್ತು;
+    ಪೂರ್ಣಾಂಕ			pri;
 
     /*
      * The options that don't have a default (terminal name, columns, lines)
@@ -6523,47 +6523,47 @@ makeset(FILE *fd, int opt_flags, int local_only)
      * Do the loop over "options[]" twice: once for options with the
      * P_PRI_MKRC flag and once without.
      */
-    for (pri = 1; pri >= 0; --pri)
+    ಗಾಗಿ (pri = 1; pri >= 0; --pri)
     {
-      for (p = &options[0]; !istermoption(p); p++)
-	if (!(p->flags & P_NO_MKRC)
+      ಗಾಗಿ (p = &options[0]; !istermoption(p); p++)
+	ಆದರೆ (!(p->flags & P_NO_MKRC)
 		&& !istermoption(p)
 		&& ((pri == 1) == ((p->flags & P_PRI_MKRC) != 0)))
 	{
 	    // skip global option when only doing locals
-	    if (p->indir == PV_NONE && !(opt_flags & OPT_GLOBAL))
-		continue;
+	    ಆದರೆ (p->indir == PV_NONE && !(opt_flags & OPT_GLOBAL))
+		ಮುಂದುವರಿ;
 
 	    // Do not store options like 'bufhidden' and 'syntax' in a vimrc
 	    // file, they are always buffer-specific.
-	    if ((opt_flags & OPT_GLOBAL) && (p->flags & P_NOGLOB))
-		continue;
+	    ಆದರೆ ((opt_flags & OPT_GLOBAL) && (p->flags & P_NOGLOB))
+		ಮುಂದುವರಿ;
 
 	    // Global values are only written when not at the default value.
 	    varp = get_varp_scope(p, opt_flags);
-	    if ((opt_flags & OPT_GLOBAL) && optval_default(p, varp, p_cp))
-		continue;
+	    ಆದರೆ ((opt_flags & OPT_GLOBAL) && optval_default(p, varp, p_cp))
+		ಮುಂದುವರಿ;
 
-	    if ((opt_flags & OPT_SKIPRTP) && (p->var == (char_u *)&p_rtp
+	    ಆದರೆ ((opt_flags & OPT_SKIPRTP) && (p->var == (char_u *)&p_rtp
 						 || p->var == (char_u *)&p_pp))
-		continue;
+		ಮುಂದುವರಿ;
 
-	    round = 2;
-	    if (p->indir != PV_NONE)
+	    ಸುತ್ತು = 2;
+	    ಆದರೆ (p->indir != PV_NONE)
 	    {
-		if (p->var == VAR_WIN)
+		ಆದರೆ (p->var == VAR_WIN)
 		{
 		    // skip window-local option when only doing globals
-		    if (!(opt_flags & OPT_LOCAL))
-			continue;
+		    ಆದರೆ (!(opt_flags & OPT_LOCAL))
+			ಮುಂದುವರಿ;
 		    // When fresh value of window-local option is not at the
 		    // default, need to write it too.
-		    if (!(opt_flags & OPT_GLOBAL) && !local_only)
+		    ಆದರೆ (!(opt_flags & OPT_GLOBAL) && !local_only)
 		    {
 			varp_fresh = get_varp_scope(p, OPT_GLOBAL);
-			if (!optval_default(p, varp_fresh, p_cp))
+			ಆದರೆ (!optval_default(p, varp_fresh, p_cp))
 			{
-			    round = 1;
+			    ಸುತ್ತು = 1;
 			    varp_local = varp;
 			    varp = varp_fresh;
 			}
@@ -6573,81 +6573,81 @@ makeset(FILE *fd, int opt_flags, int local_only)
 
 	    // Round 1: fresh value for window-local options.
 	    // Round 2: other values
-	    for ( ; round <= 2; varp = varp_local, ++round)
+	    ಗಾಗಿ ( ; ಸುತ್ತು <= 2; varp = varp_local, ++ಸುತ್ತು)
 	    {
-		if (round == 1 || (opt_flags & OPT_GLOBAL))
+		ಆದರೆ (ಸುತ್ತು == 1 || (opt_flags & OPT_GLOBAL))
 		    cmd = "set";
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		    cmd = "setlocal";
 
-		if (p->flags & P_BOOL)
+		ಆದರೆ (p->flags & P_BOOL)
 		{
-		    if (put_setbool(fd, cmd, p->fullname, *(int *)varp) == FAIL)
-			return FAIL;
+		    ಆದರೆ (put_setbool(fd, cmd, p->fullname, *(ಪೂರ್ಣಾಂಕ *)varp) == FAIL)
+			ಹಿಂತಿರುಗಿ FAIL;
 		}
-		else if (p->flags & P_NUM)
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p->flags & P_ಅಂಕೆ)
 		{
-		    if (put_setnum(fd, cmd, p->fullname, (long *)varp) == FAIL)
-			return FAIL;
+		    ಆದರೆ (put_setnum(fd, cmd, p->fullname, (ದೀರ್ಘ *)varp) == FAIL)
+			ಹಿಂತಿರುಗಿ FAIL;
 		}
-		else    // P_STRING
+		ಇಲ್ಲದಿದ್ದರೆ    // P_STRING
 		{
-		    int		do_endif = FALSE;
+		    ಪೂರ್ಣಾಂಕ		do_endif = FALSE;
 		    bool	legacy;
 
 		    // Ignore those options associated to lambda expressions because
 		    // persistence makes no sense for them.
-		    if ((p->flags & P_FUNC) && *(char_u **)varp != NULL
-			    && strstr(*(char **)varp, "<lambda>") != NULL)
-			continue;
+		    ಆದರೆ ((p->flags & P_FUNC) && *(char_u **)varp != ಖಾಲಿ
+			    && ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು(*(ಅಕ್ಷರ **)varp, "<lambda>") != ಖಾಲಿ)
+			ಮುಂದುವರಿ;
 
-#ifdef FEAT_EVAL
-		    legacy = !is_option_value_vim9(p - &options[0],
-			    round == 1 ? opt_flags | OPT_GLOBAL : OPT_LOCAL);
-#else
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+		    legacy = !is_option_ಮೌಲ್ಯ_vim9(p - &options[0],
+			    ಸುತ್ತು == 1 ? opt_flags | OPT_GLOBAL : OPT_LOCAL);
+#ಇಲ್ಲದಿದ್ದರೆ
 		    // I think none of the options that require expression
 		    // evaluation will be present if expression evaluation is
 		    // disabled.  For example, 'includeexpr' is set to NULL if
 		    // FEAT_EVAL is not present.  So it should be safe to use
 		    // normal "set" and "setlocal" in the session file.
 		    legacy = false;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 		    // Don't set 'syntax' and 'filetype' again if the value is
 		    // already right, avoids reloading the syntax file.
-		    if (
-#if defined(FEAT_SYN_HL)
+		    ಆದರೆ (
+#ಆದರೆ defined(FEAT_SYN_HL)
 			    p->indir == PV_SYN ||
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 			    p->indir == PV_FT)
 		    {
-			if (fprintf(fd, "if &%s != '%s'", p->fullname,
+			ಆದರೆ (fprintf(fd, "if &%s != '%s'", p->fullname,
 						       *(char_u **)(varp)) < 0
 				|| put_eol(fd) < 0)
-			    return FAIL;
+			    ಹಿಂತಿರುಗಿ FAIL;
 			do_endif = TRUE;
 		    }
-		    if (put_setstring(fd, legacy, cmd, p->fullname,
+		    ಆದರೆ (put_setstring(fd, legacy, cmd, p->fullname,
 					    (char_u **)varp, p->flags) == FAIL)
-			return FAIL;
-		    if (do_endif)
+			ಹಿಂತಿರುಗಿ FAIL;
+		    ಆದರೆ (do_endif)
 		    {
-			if (put_line(fd, "endif") == FAIL)
-			    return FAIL;
+			ಆದರೆ (put_ಸಾಲು(fd, "endif") == FAIL)
+			    ಹಿಂತಿರುಗಿ FAIL;
 		    }
 		}
 	    }
 	}
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-#if defined(FEAT_FOLDING)
+#ಆದರೆ defined(FEAT_FOLDING)
 /*
  * Generate set commands for the local fold options only.  Used when
  * 'sessionoptions' or 'viewoptions' contains "folds" but not "options".
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 makefoldset(FILE *fd)
 {
 # ifdef FEAT_EVAL
@@ -6655,10 +6655,10 @@ makefoldset(FILE *fd)
     // Similarly to the check in is_option_value_vim9(), if "sc_id" is not set
     // we have a default value, so it is safe to avoid the ":legacy" prefix.
     bool	fde_is_legacy = SCRIPT_ID_VALID(fde_script_ctx->sc_sid)
-			&& fde_script_ctx->sc_version < SCRIPT_VERSION_VIM9;
+			&& fde_script_ctx->sc_ಆವೃತ್ತಿ < SCRIPT_ಆವೃತ್ತಿ_VIM9;
 # endif
 
-    if (put_setstring(fd, false, "setlocal", "fdm", &curwin->w_p_fdm, 0)
+    ಆದರೆ (put_setstring(fd, false, "setlocal", "fdm", &curwin->w_p_fdm, 0)
 								       == FAIL
 # ifdef FEAT_EVAL
 	    || put_setstring(fd, fde_is_legacy, "setlocal", "fde",
@@ -6673,140 +6673,140 @@ makefoldset(FILE *fd)
 	    || put_setnum(fd, "setlocal", "fdn", &curwin->w_p_fdn) == FAIL
 	    || put_setbool(fd, "setlocal", "fen", curwin->w_p_fen) == FAIL
 	    )
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 put_setstring(
     FILE	*fd,
     bool	legacy,
-    char	*cmd,
-    char	*name,
+    ಅಕ್ಷರ	*cmd,
+    ಅಕ್ಷರ	*name,
     char_u	**valuep,
     long_u	flags)
 {
     char_u	*s;
-    char_u	*buf = NULL;
-    char_u	*part = NULL;
+    char_u	*buf = ಖಾಲಿ;
+    char_u	*part = ಖಾಲಿ;
     char_u	*p;
 
-    if (legacy && fprintf(fd, "legacy ") < 0)
-	return FAIL;
-    if (fprintf(fd, "%s %s=", cmd, name) < 0)
-	return FAIL;
-    if (*valuep != NULL)
+    ಆದರೆ (legacy && fprintf(fd, "legacy ") < 0)
+	ಹಿಂತಿರುಗಿ FAIL;
+    ಆದರೆ (fprintf(fd, "%s %s=", cmd, name) < 0)
+	ಹಿಂತಿರುಗಿ FAIL;
+    ಆದರೆ (*valuep != ಖಾಲಿ)
     {
 	// Output 'pastetoggle' as key names.  For other
 	// options some characters have to be escaped with
 	// CTRL-V or backslash
-	if (valuep == &p_pt)
+	ಆದರೆ (valuep == &p_pt)
 	{
 	    s = *valuep;
-	    while (*s != NUL)
-		if (put_escstr(fd, str2special(&s, FALSE, FALSE), 2) == FAIL)
-		    return FAIL;
+	    ಆಗ (*s != NUL)
+		ಆದರೆ (put_escstr(fd, str2special(&s, FALSE, FALSE), 2) == FAIL)
+		    ಹಿಂತಿರುಗಿ FAIL;
 	}
 	// expand the option value, replace $HOME by ~
-	else if ((flags & P_EXPAND) != 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((flags & P_EXPAND) != 0)
 	{
-	    int  size = (int)STRLEN(*valuep) + 1;
+	    ಪೂರ್ಣಾಂಕ  ಗಾತ್ರ_2 = (ಪೂರ್ಣಾಂಕ)STRLEN(*valuep) + 1;
 
 	    // replace home directory in the whole option value into "buf"
-	    buf = alloc(size);
-	    if (buf == NULL)
-		goto fail;
-	    home_replace(NULL, *valuep, buf, size, FALSE);
+	    buf = alloc(ಗಾತ್ರ_2);
+	    ಆದರೆ (buf == ಖಾಲಿ)
+		ಹೋಗು fail;
+	    home_replace(ಖಾಲಿ, *valuep, buf, ಗಾತ್ರ_2, FALSE);
 
 	    // If the option value is longer than MAXPATHL, we need to append
 	    // each comma separated part of the option separately, so that it
 	    // can be expanded when read back.
-	    if (size >= MAXPATHL && (flags & P_COMMA) != 0
-					   && vim_strchr(*valuep, ',') != NULL)
+	    ಆದರೆ (ಗಾತ್ರ_2 >= MAXPATHL && (flags & P_COMMA) != 0
+					   && vim_strchr(*valuep, ',') != ಖಾಲಿ)
 	    {
-		part = alloc(size);
-		if (part == NULL)
-		    goto fail;
+		part = alloc(ಗಾತ್ರ_2);
+		ಆದರೆ (part == ಖಾಲಿ)
+		    ಹೋಗು fail;
 
 		// write line break to clear the option, e.g. ':set rtp='
-		if (put_eol(fd) == FAIL)
-		    goto fail;
+		ಆದರೆ (put_eol(fd) == FAIL)
+		    ಹೋಗು fail;
 
 		p = buf;
-		while (*p != NUL)
+		ಆಗ (*p != NUL)
 		{
-		    if (legacy && fprintf(fd, "legacy ") < 0)
-			return FAIL;
+		    ಆದರೆ (legacy && fprintf(fd, "legacy ") < 0)
+			ಹಿಂತಿರುಗಿ FAIL;
 		    // for each comma separated option part, append value to
 		    // the option, :set rtp+=value
-		    if (fprintf(fd, "%s %s+=", cmd, name) < 0)
-			goto fail;
-		    (void)copy_option_part(&p, part, size,  ",");
-		    if (put_escstr(fd, part, 2) == FAIL || put_eol(fd) == FAIL)
-			goto fail;
+		    ಆದರೆ (fprintf(fd, "%s %s+=", cmd, name) < 0)
+			ಹೋಗು fail;
+		    (ಶೂನ್ಯ)copy_option_part(&p, part, ಗಾತ್ರ_2,  ",");
+		    ಆದರೆ (put_escstr(fd, part, 2) == FAIL || put_eol(fd) == FAIL)
+			ಹೋಗು fail;
 		}
 		vim_free(buf);
 		vim_free(part);
-		return OK;
+		ಹಿಂತಿರುಗಿ OK;
 	    }
-	    if (put_escstr(fd, buf, 2) == FAIL)
+	    ಆದರೆ (put_escstr(fd, buf, 2) == FAIL)
 	    {
 		vim_free(buf);
-		return FAIL;
+		ಹಿಂತಿರುಗಿ FAIL;
 	    }
 	    vim_free(buf);
 	}
-	else if (put_escstr(fd, *valuep, 2) == FAIL)
-	    return FAIL;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (put_escstr(fd, *valuep, 2) == FAIL)
+	    ಹಿಂತಿರುಗಿ FAIL;
     }
-    if (put_eol(fd) < 0)
-	return FAIL;
-    return OK;
+    ಆದರೆ (put_eol(fd) < 0)
+	ಹಿಂತಿರುಗಿ FAIL;
+    ಹಿಂತಿರುಗಿ OK;
 fail:
     vim_free(buf);
     vim_free(part);
-    return FAIL;
+    ಹಿಂತಿರುಗಿ FAIL;
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 put_setnum(
     FILE	*fd,
-    char	*cmd,
-    char	*name,
-    long	*valuep)
+    ಅಕ್ಷರ	*cmd,
+    ಅಕ್ಷರ	*name,
+    ದೀರ್ಘ	*valuep)
 {
-    long	wc;
+    ದೀರ್ಘ	wc;
 
-    if (fprintf(fd, "%s %s=", cmd, name) < 0)
-	return FAIL;
-    if (wc_use_keyname((char_u *)valuep, &wc))
+    ಆದರೆ (fprintf(fd, "%s %s=", cmd, name) < 0)
+	ಹಿಂತಿರುಗಿ FAIL;
+    ಆದರೆ (wc_use_keyname((char_u *)valuep, &wc))
     {
 	// print 'wildchar' and 'wildcharm' as a key name
-	if (fputs((char *)get_special_key_name((int)wc, 0), fd) < 0)
-	    return FAIL;
+	ಆದರೆ (fputs((ಅಕ್ಷರ *)get_special_ಕೀಲಿ_name((ಪೂರ್ಣಾಂಕ)wc, 0), fd) < 0)
+	    ಹಿಂತಿರುಗಿ FAIL;
     }
-    else if (fprintf(fd, "%ld", *valuep) < 0)
-	return FAIL;
-    if (put_eol(fd) < 0)
-	return FAIL;
-    return OK;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (fprintf(fd, "%ld", *valuep) < 0)
+	ಹಿಂತಿರುಗಿ FAIL;
+    ಆದರೆ (put_eol(fd) < 0)
+	ಹಿಂತಿರುಗಿ FAIL;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 put_setbool(
     FILE	*fd,
-    char	*cmd,
-    char	*name,
-    int		value)
+    ಅಕ್ಷರ	*cmd,
+    ಅಕ್ಷರ	*name,
+    ಪೂರ್ಣಾಂಕ		ಮೌಲ್ಯ)
 {
-    if (value < 0)	// global/local option using global value
-	return OK;
-    if (fprintf(fd, "%s %s%s", cmd, value ? "" : "no", name) < 0
+    ಆದರೆ (ಮೌಲ್ಯ < 0)	// global/local option using global value
+	ಹಿಂತಿರುಗಿ OK;
+    ಆದರೆ (fprintf(fd, "%s %s%s", cmd, ಮೌಲ್ಯ ? "" : "no", name) < 0
 	    || put_eol(fd) < 0)
-	return FAIL;
-    return OK;
+	ಹಿಂತಿರುಗಿ FAIL;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
@@ -6814,44 +6814,44 @@ put_setbool(
  * If the option has been allocated, free the memory.
  * Terminal options are never hidden or indirect.
  */
-    void
-clear_termoptions(void)
+    ಶೂನ್ಯ
+clear_termoptions(ಶೂನ್ಯ)
 {
     // Reset a few things before clearing the old options. This may cause
     // outputting a few things that the terminal doesn't understand, but the
     // screen will be cleared later, so this is OK.
     mch_setmouse(FALSE);	    // switch mouse off
     mch_restore_title(SAVE_RESTORE_BOTH);    // restore window titles
-#if defined(FEAT_XCLIPBOARD) && defined(FEAT_GUI)
+#ಆದರೆ defined(FEAT_XCLIPBOARD) && defined(FEAT_GUI)
     // When starting the GUI close the display opened for the clipboard.
     // After restoring the title, because that will need the display.
-    if (gui.starting)
+    ಆದರೆ (gui.starting)
 	clear_xterm_clip();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     stoptermcap();			// stop termcap mode
 
     free_termoptions();
 }
 
-    void
-free_termoptions(void)
+    ಶೂನ್ಯ
+free_termoptions(ಶೂನ್ಯ)
 {
-    struct vimoption   *p;
+    ರಚನೆ vimoption   *p;
 
-    for (p = options; p->fullname != NULL; p++)
-	if (istermoption(p))
+    ಗಾಗಿ (p = options; p->fullname != ಖಾಲಿ; p++)
+	ಆದರೆ (istermoption(p))
 	{
-	    if (p->flags & P_ALLOCED)
+	    ಆದರೆ (p->flags & P_ALLOCED)
 		free_string_option(*(char_u **)(p->var));
-	    if (p->flags & P_DEF_ALLOCED)
+	    ಆದರೆ (p->flags & P_DEF_ALLOCED)
 		free_string_option(p->def_val[VI_DEFAULT]);
-	    *(char_u **)(p->var) = empty_option;
-	    p->def_val[VI_DEFAULT] = empty_option;
+	    *(char_u **)(p->var) = ಖಾಲಿಗಳು_option;
+	    p->def_val[VI_DEFAULT] = ಖಾಲಿಗಳು_option;
 	    p->flags &= ~(P_ALLOCED|P_DEF_ALLOCED);
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 	    // remember where the option was cleared
-	    set_option_sctx_idx((int)(p - options), OPT_GLOBAL, current_sctx);
-#endif
+	    ಗಣ_option_sctx_idx((ಪೂರ್ಣಾಂಕ)(p - options), OPT_GLOBAL, current_sctx);
+#ಆದರೆ_ಅಂತ್ಯ
 	}
     clear_termcodes();
 }
@@ -6861,19 +6861,19 @@ free_termoptions(void)
  * Set the string to empty_option and clear allocated flag.
  * "var" points to the option value.
  */
-    void
+    ಶೂನ್ಯ
 free_one_termoption(char_u *var)
 {
-    struct vimoption   *p;
+    ರಚನೆ vimoption   *p;
 
-    for (p = &options[0]; p->fullname != NULL; p++)
-	if (p->var == var)
+    ಗಾಗಿ (p = &options[0]; p->fullname != ಖಾಲಿ; p++)
+	ಆದರೆ (p->var == var)
 	{
-	    if (p->flags & P_ALLOCED)
+	    ಆದರೆ (p->flags & P_ALLOCED)
 		free_string_option(*(char_u **)(p->var));
-	    *(char_u **)(p->var) = empty_option;
+	    *(char_u **)(p->var) = ಖಾಲಿಗಳು_option;
 	    p->flags &= ~P_ALLOCED;
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
 }
 
@@ -6881,22 +6881,22 @@ free_one_termoption(char_u *var)
  * Set the terminal option defaults to the current value.
  * Used after setting the terminal name.
  */
-    void
-set_term_defaults(void)
+    ಶೂನ್ಯ
+ಗಣ_ಪದ_defaults(ಶೂನ್ಯ)
 {
-    struct vimoption   *p;
+    ರಚನೆ vimoption   *p;
 
-    for (p = &options[0]; p->fullname != NULL; p++)
+    ಗಾಗಿ (p = &options[0]; p->fullname != ಖಾಲಿ; p++)
     {
-	if (istermoption(p) && p->def_val[VI_DEFAULT] != *(char_u **)(p->var))
+	ಆದರೆ (istermoption(p) && p->def_val[VI_DEFAULT] != *(char_u **)(p->var))
 	{
-	    if (p->flags & P_DEF_ALLOCED)
+	    ಆದರೆ (p->flags & P_DEF_ALLOCED)
 	    {
 		free_string_option(p->def_val[VI_DEFAULT]);
 		p->flags &= ~P_DEF_ALLOCED;
 	    }
 	    p->def_val[VI_DEFAULT] = *(char_u **)(p->var);
-	    if (p->flags & P_ALLOCED)
+	    ಆದರೆ (p->flags & P_ALLOCED)
 	    {
 		p->flags |= P_DEF_ALLOCED;
 		p->flags &= ~P_ALLOCED;	 // don't free the value now
@@ -6908,260 +6908,260 @@ set_term_defaults(void)
 /*
  * return TRUE if 'p' starts with 't_'
  */
-    static int
-istermoption(struct vimoption *p)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+istermoption(ರಚನೆ vimoption *p)
 {
-    return (p->fullname[0] == 't' && p->fullname[1] == '_');
+    ಹಿಂತಿರುಗಿ (p->fullname[0] == 't' && p->fullname[1] == '_');
 }
 
 /*
  * Returns TRUE if the option at 'opt_idx' starts with 't_'
  */
-    static int
-istermoption_idx(int opt_idx)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+istermoption_idx(ಪೂರ್ಣಾಂಕ opt_idx)
 {
-    return istermoption(&options[opt_idx]);
+    ಹಿಂತಿರುಗಿ istermoption(&options[opt_idx]);
 }
 
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#ಆದರೆ defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 /*
  * Unset local option value, similar to ":set opt<".
  */
-    void
-unset_global_local_option(char_u *name, void *from)
+    ಶೂನ್ಯ
+unset_global_local_option(char_u *name, ಶೂನ್ಯ *from)
 {
-    struct vimoption *p;
-    int		opt_idx;
+    ರಚನೆ vimoption *p;
+    ಪೂರ್ಣಾಂಕ		opt_idx;
     buf_T	*buf = (buf_T *)from;
 
     opt_idx = findoption(name);
-    if (opt_idx < 0)
-	return;
+    ಆದರೆ (opt_idx < 0)
+	ಹಿಂತಿರುಗಿ;
     p = &(options[opt_idx]);
 
-    switch ((int)p->indir)
+    ಆಯ್ಕೆ ((ಪೂರ್ಣಾಂಕ)p->indir)
     {
 	// global option with local value: use local value if it's been set
-	case PV_EP:
+	ಸ್ಥಿತಿ PV_EP:
 	    clear_string_option(&buf->b_p_ep);
-	    break;
-	case PV_KP:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ PV_KP:
 	    clear_string_option(&buf->b_p_kp);
-	    break;
-	case PV_PATH:
-	    clear_string_option(&buf->b_p_path);
-	    break;
-	case PV_AC:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ PV_ಮಾರ್ಗ:
+	    clear_string_option(&buf->b_p_ಮಾರ್ಗ);
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ PV_AC:
 	    buf->b_p_ac = -1;
-	    break;
-	case PV_AR:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ PV_AR:
 	    buf->b_p_ar = -1;
-	    break;
+	    ನಿಲ್ಲಿಸು;
 # ifdef HAVE_FSYNC
-	case PV_FS:
+	ಸ್ಥಿತಿ PV_FS:
 	    buf->b_p_fs = -1;
-	    break;
+	    ನಿಲ್ಲಿಸು;
 # endif
-	case PV_BKC:
+	ಸ್ಥಿತಿ PV_BKC:
 	    clear_string_option(&buf->b_p_bkc);
 	    buf->b_bkc_flags = 0;
-	    break;
-	case PV_TAGS:
-	    clear_string_option(&buf->b_p_tags);
-	    break;
-	case PV_TC:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ PV_ಟ್ಯಾಗುಗಳು:
+	    clear_string_option(&buf->b_p_ಟ್ಯಾಗುಗಳು);
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ PV_TC:
 	    clear_string_option(&buf->b_p_tc);
 	    buf->b_tc_flags = 0;
-	    break;
-	case PV_SISO:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ PV_SISO:
 	    curwin->w_p_siso = -1;
-	    break;
-	case PV_SO:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ PV_SO:
 	    curwin->w_p_so = -1;
-	    break;
-	case PV_SOP:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ PV_SOP:
 	    curwin->w_p_sop = -1;
-	    break;
-# ifdef FEAT_FIND_ID
-	case PV_DEF:
+	    ನಿಲ್ಲಿಸು;
+# ifdef FEAT_ಕಂಡುಹಿಡಿ_ID
+	ಸ್ಥಿತಿ PV_DEF:
 	    clear_string_option(&buf->b_p_def);
-	    break;
-	case PV_INC:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ PV_INC:
 	    clear_string_option(&buf->b_p_inc);
-	    break;
+	    ನಿಲ್ಲಿಸು;
 # endif
-	case PV_COT:
+	ಸ್ಥಿತಿ PV_COT:
 	    clear_string_option(&buf->b_p_cot);
 	    buf->b_cot_flags = 0;
-	    break;
-	case PV_DICT:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ PV_DICT:
 	    clear_string_option(&buf->b_p_dict);
-	    break;
+	    ನಿಲ್ಲಿಸು;
 # ifdef FEAT_DIFF
-	case PV_DIA:
+	ಸ್ಥಿತಿ PV_DIA:
 	    clear_string_option(&buf->b_p_dia);
-	    break;
+	    ನಿಲ್ಲಿಸು;
 # endif
-	case PV_TSR:
+	ಸ್ಥಿತಿ PV_TSR:
 	    clear_string_option(&buf->b_p_tsr);
-	    break;
+	    ನಿಲ್ಲಿಸು;
 # ifdef FEAT_COMPL_FUNC
-	case PV_TSRFU:
+	ಸ್ಥಿತಿ PV_TSRFU:
 	    clear_string_option(&buf->b_p_tsrfu);
-	    break;
+	    ನಿಲ್ಲಿಸು;
 # endif
-	case PV_FP:
+	ಸ್ಥಿತಿ PV_FP:
 	    clear_string_option(&buf->b_p_fp);
-	    break;
+	    ನಿಲ್ಲಿಸು;
 # ifdef FEAT_EVAL
-	case PV_FFU:
+	ಸ್ಥಿತಿ PV_FFU:
 	    clear_string_option(&buf->b_p_ffu);
-	    break;
+	    ನಿಲ್ಲಿಸು;
 # endif
 # ifdef FEAT_QUICKFIX
-	case PV_EFM:
+	ಸ್ಥಿತಿ PV_EFM:
 	    clear_string_option(&buf->b_p_efm);
-	    break;
-	case PV_GEFM:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ PV_GEFM:
 	    clear_string_option(&buf->b_p_gefm);
-	    break;
-	case PV_GP:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ PV_GP:
 	    clear_string_option(&buf->b_p_gp);
-	    break;
-	case PV_MP:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ PV_MP:
 	    clear_string_option(&buf->b_p_mp);
-	    break;
+	    ನಿಲ್ಲಿಸು;
 # endif
-# if defined(FEAT_BEVAL) && defined(FEAT_EVAL)
-	case PV_BEXPR:
+# ಆದರೆ defined(FEAT_BEVAL) && defined(FEAT_EVAL)
+	ಸ್ಥಿತಿ PV_BEXPR:
 	    clear_string_option(&buf->b_p_bexpr);
-	    break;
+	    ನಿಲ್ಲಿಸು;
 # endif
-# if defined(FEAT_CRYPT)
-	case PV_CM:
+# ಆದರೆ defined(FEAT_CRYPT)
+	ಸ್ಥಿತಿ PV_CM:
 	    clear_string_option(&buf->b_p_cm);
-	    break;
+	    ನಿಲ್ಲಿಸು;
 # endif
 # ifdef FEAT_LINEBREAK
-	case PV_SBR:
+	ಸ್ಥಿತಿ PV_SBR:
 	    clear_string_option(&((win_T *)from)->w_p_sbr);
-	    break;
+	    ನಿಲ್ಲಿಸು;
 # endif
 # ifdef FEAT_STL_OPT
-	case PV_STL:
+	ಸ್ಥಿತಿ PV_STL:
 	    clear_string_option(&((win_T *)from)->w_p_stl);
-	    break;
-	case PV_STLO:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ PV_STLO:
 	    clear_string_option(&((win_T *)from)->w_p_stlo);
-	    break;
+	    ನಿಲ್ಲಿಸು;
 # endif
-	case PV_UL:
+	ಸ್ಥಿತಿ PV_UL:
 	    buf->b_p_ul = NO_LOCAL_UNDOLEVEL;
-	    break;
-	case PV_LW:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ PV_LW:
 	    clear_string_option(&buf->b_p_lw);
-	    break;
-	case PV_MENC:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ PV_MENC:
 	    clear_string_option(&buf->b_p_menc);
-	    break;
-	case PV_LCS:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ PV_LCS:
 	    clear_string_option(&((win_T *)from)->w_p_lcs);
-	    set_listchars_option((win_T *)from, ((win_T *)from)->w_p_lcs, TRUE,
-								      NULL, 0);
+	    ಗಣ_listchars_option((win_T *)from, ((win_T *)from)->w_p_lcs, TRUE,
+								      ಖಾಲಿ, 0);
 	    redraw_later(UPD_NOT_VALID);
-	    break;
-	case PV_FCS:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ PV_FCS:
 	    clear_string_option(&((win_T *)from)->w_p_fcs);
-	    set_fillchars_option((win_T *)from, ((win_T *)from)->w_p_fcs, TRUE,
-								      NULL, 0);
+	    ಗಣ_fillchars_option((win_T *)from, ((win_T *)from)->w_p_fcs, TRUE,
+								      ಖಾಲಿ, 0);
 	    redraw_later(UPD_NOT_VALID);
-	    break;
-	case PV_VE:
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ PV_VE:
 	    clear_string_option(&((win_T *)from)->w_p_ve);
 	    ((win_T *)from)->w_ve_flags = 0;
-	    break;
+	    ನಿಲ್ಲಿಸು;
     }
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Get pointer to option variable, depending on local or global scope.
  * "scope" can be OPT_LOCAL, OPT_GLOBAL or a combination.
  */
-    static char_u *
-get_varp_scope(struct vimoption *p, int scope)
+    ಸ್ಥಿರ char_u *
+get_varp_scope(ರಚನೆ vimoption *p, ಪೂರ್ಣಾಂಕ scope)
 {
-    if ((scope & OPT_GLOBAL) && p->indir != PV_NONE)
+    ಆದರೆ ((scope & OPT_GLOBAL) && p->indir != PV_NONE)
     {
-	if (p->var == VAR_WIN)
-	    return (char_u *)GLOBAL_WO(get_varp(p));
-	return p->var;
+	ಆದರೆ (p->var == VAR_WIN)
+	    ಹಿಂತಿರುಗಿ (char_u *)GLOBAL_WO(get_varp(p));
+	ಹಿಂತಿರುಗಿ p->var;
     }
-    if ((scope & OPT_LOCAL) && ((int)p->indir & PV_BOTH))
+    ಆದರೆ ((scope & OPT_LOCAL) && ((ಪೂರ್ಣಾಂಕ)p->indir & PV_BOTH))
     {
-	switch ((int)p->indir)
+	ಆಯ್ಕೆ ((ಪೂರ್ಣಾಂಕ)p->indir)
 	{
-	    case PV_FP:   return (char_u *)&(curbuf->b_p_fp);
-#ifdef HAVE_FSYNC
-	    case PV_FS:	return (char_u *)&(curbuf->b_p_fs);
-#endif
-#ifdef FEAT_EVAL
-	    case PV_FFU: return (char_u *)&(curbuf->b_p_ffu);
-#endif
-#ifdef FEAT_QUICKFIX
-	    case PV_EFM:  return (char_u *)&(curbuf->b_p_efm);
-	    case PV_GEFM: return (char_u *)&(curbuf->b_p_gefm);
-	    case PV_GP:   return (char_u *)&(curbuf->b_p_gp);
-	    case PV_MP:   return (char_u *)&(curbuf->b_p_mp);
-#endif
-	    case PV_EP:   return (char_u *)&(curbuf->b_p_ep);
-	    case PV_KP:   return (char_u *)&(curbuf->b_p_kp);
-	    case PV_PATH: return (char_u *)&(curbuf->b_p_path);
-	    case PV_AC:   return (char_u *)&(curbuf->b_p_ac);
-	    case PV_AR:   return (char_u *)&(curbuf->b_p_ar);
-	    case PV_TAGS: return (char_u *)&(curbuf->b_p_tags);
-	    case PV_TC:   return (char_u *)&(curbuf->b_p_tc);
-	    case PV_SISO: return (char_u *)&(curwin->w_p_siso);
-	    case PV_SO:   return (char_u *)&(curwin->w_p_so);
-	    case PV_SOP:  return (char_u *)&(curwin->w_p_sop);
-#ifdef FEAT_FIND_ID
-	    case PV_DEF:  return (char_u *)&(curbuf->b_p_def);
-	    case PV_INC:  return (char_u *)&(curbuf->b_p_inc);
-#endif
-	    case PV_COT:  return (char_u *)&(curbuf->b_p_cot);
-	    case PV_DICT: return (char_u *)&(curbuf->b_p_dict);
-#ifdef FEAT_DIFF
-	    case PV_DIA:  return (char_u *)&(curbuf->b_p_dia);
-#endif
-	    case PV_TSR:  return (char_u *)&(curbuf->b_p_tsr);
-#ifdef FEAT_COMPL_FUNC
-	    case PV_TSRFU: return (char_u *)&(curbuf->b_p_tsrfu);
-#endif
-#if defined(FEAT_BEVAL) && defined(FEAT_EVAL)
-	    case PV_BEXPR: return (char_u *)&(curbuf->b_p_bexpr);
-#endif
-#if defined(FEAT_CRYPT)
-	    case PV_CM:	  return (char_u *)&(curbuf->b_p_cm);
-#endif
-#ifdef FEAT_LINEBREAK
-	    case PV_SBR:  return (char_u *)&(curwin->w_p_sbr);
-#endif
-#ifdef FEAT_STL_OPT
-	    case PV_STL:  return (char_u *)&(curwin->w_p_stl);
-	    case PV_STLO: return (char_u *)&(curwin->w_p_stlo);
-#endif
-	    case PV_UL:   return (char_u *)&(curbuf->b_p_ul);
-	    case PV_LW:   return (char_u *)&(curbuf->b_p_lw);
-	    case PV_BKC:  return (char_u *)&(curbuf->b_p_bkc);
-	    case PV_MENC: return (char_u *)&(curbuf->b_p_menc);
-	    case PV_LCS:  return (char_u *)&(curwin->w_p_lcs);
-	    case PV_FCS:  return (char_u *)&(curwin->w_p_fcs);
-	    case PV_VE:	  return (char_u *)&(curwin->w_p_ve);
+	    ಸ್ಥಿತಿ PV_FP:   ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_fp);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_FSYNC
+	    ಸ್ಥಿತಿ PV_FS:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_fs);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	    ಸ್ಥಿತಿ PV_FFU: ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_ffu);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
+	    ಸ್ಥಿತಿ PV_EFM:  ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_efm);
+	    ಸ್ಥಿತಿ PV_GEFM: ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_gefm);
+	    ಸ್ಥಿತಿ PV_GP:   ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_gp);
+	    ಸ್ಥಿತಿ PV_MP:   ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_mp);
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಸ್ಥಿತಿ PV_EP:   ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_ep);
+	    ಸ್ಥಿತಿ PV_KP:   ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_kp);
+	    ಸ್ಥಿತಿ PV_ಮಾರ್ಗ: ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_ಮಾರ್ಗ);
+	    ಸ್ಥಿತಿ PV_AC:   ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_ac);
+	    ಸ್ಥಿತಿ PV_AR:   ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_ar);
+	    ಸ್ಥಿತಿ PV_ಟ್ಯಾಗುಗಳು: ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_ಟ್ಯಾಗುಗಳು);
+	    ಸ್ಥಿತಿ PV_TC:   ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_tc);
+	    ಸ್ಥಿತಿ PV_SISO: ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_siso);
+	    ಸ್ಥಿತಿ PV_SO:   ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_so);
+	    ಸ್ಥಿತಿ PV_SOP:  ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_sop);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕಂಡುಹಿಡಿ_ID
+	    ಸ್ಥಿತಿ PV_DEF:  ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_def);
+	    ಸ್ಥಿತಿ PV_INC:  ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_inc);
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಸ್ಥಿತಿ PV_COT:  ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_cot);
+	    ಸ್ಥಿತಿ PV_DICT: ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_dict);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
+	    ಸ್ಥಿತಿ PV_DIA:  ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_dia);
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಸ್ಥಿತಿ PV_TSR:  ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_tsr);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_COMPL_FUNC
+	    ಸ್ಥಿತಿ PV_TSRFU: ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_tsrfu);
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(FEAT_BEVAL) && defined(FEAT_EVAL)
+	    ಸ್ಥಿತಿ PV_BEXPR: ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_bexpr);
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(FEAT_CRYPT)
+	    ಸ್ಥಿತಿ PV_CM:	  ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_cm);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
+	    ಸ್ಥಿತಿ PV_SBR:  ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_sbr);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_STL_OPT
+	    ಸ್ಥಿತಿ PV_STL:  ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_stl);
+	    ಸ್ಥಿತಿ PV_STLO: ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_stlo);
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಸ್ಥಿತಿ PV_UL:   ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_ul);
+	    ಸ್ಥಿತಿ PV_LW:   ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_lw);
+	    ಸ್ಥಿತಿ PV_BKC:  ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_bkc);
+	    ಸ್ಥಿತಿ PV_MENC: ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_menc);
+	    ಸ್ಥಿತಿ PV_LCS:  ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_lcs);
+	    ಸ್ಥಿತಿ PV_FCS:  ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_fcs);
+	    ಸ್ಥಿತಿ PV_VE:	  ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_ve);
 
 	}
-	return NULL; // "cannot happen"
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ; // "cannot happen"
     }
-    return get_varp(p);
+    ಹಿಂತಿರುಗಿ get_varp(p);
 }
 
 /*
@@ -7169,307 +7169,307 @@ get_varp_scope(struct vimoption *p, int scope)
  * scope.
  */
     char_u *
-get_option_varp_scope(int opt_idx, int scope)
+get_option_varp_scope(ಪೂರ್ಣಾಂಕ opt_idx, ಪೂರ್ಣಾಂಕ scope)
 {
-    return get_varp_scope(&(options[opt_idx]), scope);
+    ಹಿಂತಿರುಗಿ get_varp_scope(&(options[opt_idx]), scope);
 }
 
 /*
  * Get pointer to option variable.
  */
-    static char_u *
-get_varp(struct vimoption *p)
+    ಸ್ಥಿರ char_u *
+get_varp(ರಚನೆ vimoption *p)
 {
     // hidden option, always return NULL
-    if (p->var == NULL)
-	return NULL;
+    ಆದರೆ (p->var == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    switch ((int)p->indir)
+    ಆಯ್ಕೆ ((ಪೂರ್ಣಾಂಕ)p->indir)
     {
-	case PV_NONE:	return p->var;
+	ಸ್ಥಿತಿ PV_NONE:	ಹಿಂತಿರುಗಿ p->var;
 
 	// global option with local value: use local value if it's been set
-	case PV_EP:	return *curbuf->b_p_ep != NUL
+	ಸ್ಥಿತಿ PV_EP:	ಹಿಂತಿರುಗಿ *curbuf->b_p_ep != NUL
 				    ? (char_u *)&curbuf->b_p_ep : p->var;
-	case PV_KP:	return *curbuf->b_p_kp != NUL
+	ಸ್ಥಿತಿ PV_KP:	ಹಿಂತಿರುಗಿ *curbuf->b_p_kp != NUL
 				    ? (char_u *)&curbuf->b_p_kp : p->var;
-	case PV_PATH:	return *curbuf->b_p_path != NUL
-				    ? (char_u *)&(curbuf->b_p_path) : p->var;
-	case PV_AC:	return curbuf->b_p_ac >= 0
+	ಸ್ಥಿತಿ PV_ಮಾರ್ಗ:	ಹಿಂತಿರುಗಿ *curbuf->b_p_ಮಾರ್ಗ != NUL
+				    ? (char_u *)&(curbuf->b_p_ಮಾರ್ಗ) : p->var;
+	ಸ್ಥಿತಿ PV_AC:	ಹಿಂತಿರುಗಿ curbuf->b_p_ac >= 0
 				    ? (char_u *)&(curbuf->b_p_ac) : p->var;
-	case PV_AR:	return curbuf->b_p_ar >= 0
+	ಸ್ಥಿತಿ PV_AR:	ಹಿಂತಿರುಗಿ curbuf->b_p_ar >= 0
 				    ? (char_u *)&(curbuf->b_p_ar) : p->var;
-	case PV_TAGS:	return *curbuf->b_p_tags != NUL
-				    ? (char_u *)&(curbuf->b_p_tags) : p->var;
-	case PV_TC:	return *curbuf->b_p_tc != NUL
+	ಸ್ಥಿತಿ PV_ಟ್ಯಾಗುಗಳು:	ಹಿಂತಿರುಗಿ *curbuf->b_p_ಟ್ಯಾಗುಗಳು != NUL
+				    ? (char_u *)&(curbuf->b_p_ಟ್ಯಾಗುಗಳು) : p->var;
+	ಸ್ಥಿತಿ PV_TC:	ಹಿಂತಿರುಗಿ *curbuf->b_p_tc != NUL
 				    ? (char_u *)&(curbuf->b_p_tc) : p->var;
-	case PV_BKC:	return *curbuf->b_p_bkc != NUL
+	ಸ್ಥಿತಿ PV_BKC:	ಹಿಂತಿರುಗಿ *curbuf->b_p_bkc != NUL
 				    ? (char_u *)&(curbuf->b_p_bkc) : p->var;
-	case PV_SISO:	return curwin->w_p_siso >= 0
+	ಸ್ಥಿತಿ PV_SISO:	ಹಿಂತಿರುಗಿ curwin->w_p_siso >= 0
 				    ? (char_u *)&(curwin->w_p_siso) : p->var;
-	case PV_SO:	return curwin->w_p_so >= 0
+	ಸ್ಥಿತಿ PV_SO:	ಹಿಂತಿರುಗಿ curwin->w_p_so >= 0
 				    ? (char_u *)&(curwin->w_p_so) : p->var;
-	case PV_SOP:	return curwin->w_p_sop != -1
+	ಸ್ಥಿತಿ PV_SOP:	ಹಿಂತಿರುಗಿ curwin->w_p_sop != -1
 				    ? (char_u *)&(curwin->w_p_sop) : p->var;
-#ifdef FEAT_FIND_ID
-	case PV_DEF:	return *curbuf->b_p_def != NUL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕಂಡುಹಿಡಿ_ID
+	ಸ್ಥಿತಿ PV_DEF:	ಹಿಂತಿರುಗಿ *curbuf->b_p_def != NUL
 				    ? (char_u *)&(curbuf->b_p_def) : p->var;
-	case PV_INC:	return *curbuf->b_p_inc != NUL
+	ಸ್ಥಿತಿ PV_INC:	ಹಿಂತಿರುಗಿ *curbuf->b_p_inc != NUL
 				    ? (char_u *)&(curbuf->b_p_inc) : p->var;
-#endif
-	case PV_COT:	return *curbuf->b_p_cot != NUL
+#ಆದರೆ_ಅಂತ್ಯ
+	ಸ್ಥಿತಿ PV_COT:	ಹಿಂತಿರುಗಿ *curbuf->b_p_cot != NUL
 				    ? (char_u *)&(curbuf->b_p_cot) : p->var;
-	case PV_DICT:	return *curbuf->b_p_dict != NUL
+	ಸ್ಥಿತಿ PV_DICT:	ಹಿಂತಿರುಗಿ *curbuf->b_p_dict != NUL
 				    ? (char_u *)&(curbuf->b_p_dict) : p->var;
-#ifdef FEAT_DIFF
-	case PV_DIA:	return *curbuf->b_p_dia != NUL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
+	ಸ್ಥಿತಿ PV_DIA:	ಹಿಂತಿರುಗಿ *curbuf->b_p_dia != NUL
 				    ? (char_u *)&(curbuf->b_p_dia) : p->var;
-#endif
-	case PV_TSR:	return *curbuf->b_p_tsr != NUL
+#ಆದರೆ_ಅಂತ್ಯ
+	ಸ್ಥಿತಿ PV_TSR:	ಹಿಂತಿರುಗಿ *curbuf->b_p_tsr != NUL
 				    ? (char_u *)&(curbuf->b_p_tsr) : p->var;
-#ifdef FEAT_COMPL_FUNC
-	case PV_TSRFU:	return *curbuf->b_p_tsrfu != NUL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_COMPL_FUNC
+	ಸ್ಥಿತಿ PV_TSRFU:	ಹಿಂತಿರುಗಿ *curbuf->b_p_tsrfu != NUL
 				    ? (char_u *)&(curbuf->b_p_tsrfu) : p->var;
-#endif
-	case PV_FP:	return *curbuf->b_p_fp != NUL
+#ಆದರೆ_ಅಂತ್ಯ
+	ಸ್ಥಿತಿ PV_FP:	ಹಿಂತಿರುಗಿ *curbuf->b_p_fp != NUL
 				    ? (char_u *)&(curbuf->b_p_fp) : p->var;
-#ifdef HAVE_FSYNC
-	case PV_FS:	return curbuf->b_p_fs >= 0
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_FSYNC
+	ಸ್ಥಿತಿ PV_FS:	ಹಿಂತಿರುಗಿ curbuf->b_p_fs >= 0
 				    ? (char_u *)&(curbuf->b_p_fs) : p->var;
-#endif
-#ifdef FEAT_EVAL
-	case PV_FFU:	return *curbuf->b_p_ffu != NUL
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	ಸ್ಥಿತಿ PV_FFU:	ಹಿಂತಿರುಗಿ *curbuf->b_p_ffu != NUL
 				    ? (char_u *)&(curbuf->b_p_ffu) : p->var;
-#endif
-#ifdef FEAT_QUICKFIX
-	case PV_EFM:	return *curbuf->b_p_efm != NUL
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
+	ಸ್ಥಿತಿ PV_EFM:	ಹಿಂತಿರುಗಿ *curbuf->b_p_efm != NUL
 				    ? (char_u *)&(curbuf->b_p_efm) : p->var;
-	case PV_GEFM:	return *curbuf->b_p_gefm != NUL
+	ಸ್ಥಿತಿ PV_GEFM:	ಹಿಂತಿರುಗಿ *curbuf->b_p_gefm != NUL
 				    ? (char_u *)&(curbuf->b_p_gefm) : p->var;
-	case PV_GP:	return *curbuf->b_p_gp != NUL
+	ಸ್ಥಿತಿ PV_GP:	ಹಿಂತಿರುಗಿ *curbuf->b_p_gp != NUL
 				    ? (char_u *)&(curbuf->b_p_gp) : p->var;
-	case PV_MP:	return *curbuf->b_p_mp != NUL
+	ಸ್ಥಿತಿ PV_MP:	ಹಿಂತಿರುಗಿ *curbuf->b_p_mp != NUL
 				    ? (char_u *)&(curbuf->b_p_mp) : p->var;
-#endif
-#if defined(FEAT_BEVAL) && defined(FEAT_EVAL)
-	case PV_BEXPR:	return *curbuf->b_p_bexpr != NUL
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(FEAT_BEVAL) && defined(FEAT_EVAL)
+	ಸ್ಥಿತಿ PV_BEXPR:	ಹಿಂತಿರುಗಿ *curbuf->b_p_bexpr != NUL
 				    ? (char_u *)&(curbuf->b_p_bexpr) : p->var;
-#endif
-#if defined(FEAT_CRYPT)
-	case PV_CM:	return *curbuf->b_p_cm != NUL
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(FEAT_CRYPT)
+	ಸ್ಥಿತಿ PV_CM:	ಹಿಂತಿರುಗಿ *curbuf->b_p_cm != NUL
 				    ? (char_u *)&(curbuf->b_p_cm) : p->var;
-#endif
-#ifdef FEAT_LINEBREAK
-	case PV_SBR:	return *curwin->w_p_sbr != NUL
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
+	ಸ್ಥಿತಿ PV_SBR:	ಹಿಂತಿರುಗಿ *curwin->w_p_sbr != NUL
 				    ? (char_u *)&(curwin->w_p_sbr) : p->var;
-#endif
-#ifdef FEAT_STL_OPT
-	case PV_STL:	return *curwin->w_p_stl != NUL
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_STL_OPT
+	ಸ್ಥಿತಿ PV_STL:	ಹಿಂತಿರುಗಿ *curwin->w_p_stl != NUL
 				    ? (char_u *)&(curwin->w_p_stl) : p->var;
-	case PV_STLO:	return *curwin->w_p_stlo != NUL
+	ಸ್ಥಿತಿ PV_STLO:	ಹಿಂತಿರುಗಿ *curwin->w_p_stlo != NUL
 				    ? (char_u *)&(curwin->w_p_stlo) : p->var;
-#endif
-	case PV_UL:	return curbuf->b_p_ul != NO_LOCAL_UNDOLEVEL
+#ಆದರೆ_ಅಂತ್ಯ
+	ಸ್ಥಿತಿ PV_UL:	ಹಿಂತಿರುಗಿ curbuf->b_p_ul != NO_LOCAL_UNDOLEVEL
 				    ? (char_u *)&(curbuf->b_p_ul) : p->var;
-	case PV_LW:	return *curbuf->b_p_lw != NUL
+	ಸ್ಥಿತಿ PV_LW:	ಹಿಂತಿರುಗಿ *curbuf->b_p_lw != NUL
 				    ? (char_u *)&(curbuf->b_p_lw) : p->var;
-	case PV_MENC:	return *curbuf->b_p_menc != NUL
+	ಸ್ಥಿತಿ PV_MENC:	ಹಿಂತಿರುಗಿ *curbuf->b_p_menc != NUL
 				    ? (char_u *)&(curbuf->b_p_menc) : p->var;
-#ifdef FEAT_ARABIC
-	case PV_ARAB:	return (char_u *)&(curwin->w_p_arab);
-#endif
-	case PV_LIST:	return (char_u *)&(curwin->w_p_list);
-	case PV_LCS:	return *curwin->w_p_lcs != NUL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ARABIC
+	ಸ್ಥಿತಿ PV_ARAB:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_arab);
+#ಆದರೆ_ಅಂತ್ಯ
+	ಸ್ಥಿತಿ PV_LIST:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_list);
+	ಸ್ಥಿತಿ PV_LCS:	ಹಿಂತಿರುಗಿ *curwin->w_p_lcs != NUL
 				    ? (char_u *)&(curwin->w_p_lcs) : p->var;
-	case PV_FCS:	return *curwin->w_p_fcs != NUL
+	ಸ್ಥಿತಿ PV_FCS:	ಹಿಂತಿರುಗಿ *curwin->w_p_fcs != NUL
 				    ? (char_u *)&(curwin->w_p_fcs) : p->var;
-	case PV_VE:	return *curwin->w_p_ve != NUL
+	ಸ್ಥಿತಿ PV_VE:	ಹಿಂತಿರುಗಿ *curwin->w_p_ve != NUL
 				    ? (char_u *)&(curwin->w_p_ve) : p->var;
-#ifdef FEAT_SPELL
-	case PV_SPELL:	return (char_u *)&(curwin->w_p_spell);
-#endif
-#ifdef FEAT_SYN_HL
-	case PV_CUC:	return (char_u *)&(curwin->w_p_cuc);
-	case PV_CUL:	return (char_u *)&(curwin->w_p_cul);
-	case PV_CULOPT:	return (char_u *)&(curwin->w_p_culopt);
-	case PV_CC:	return (char_u *)&(curwin->w_p_cc);
-#endif
-#ifdef FEAT_DIFF
-	case PV_DIFF:	return (char_u *)&(curwin->w_p_diff);
-#endif
-	case PV_EIW:	return (char_u *)&(curwin->w_p_eiw);
-#ifdef FEAT_FOLDING
-	case PV_FDC:	return (char_u *)&(curwin->w_p_fdc);
-	case PV_FEN:	return (char_u *)&(curwin->w_p_fen);
-	case PV_FDI:	return (char_u *)&(curwin->w_p_fdi);
-	case PV_FDL:	return (char_u *)&(curwin->w_p_fdl);
-	case PV_FDM:	return (char_u *)&(curwin->w_p_fdm);
-	case PV_FML:	return (char_u *)&(curwin->w_p_fml);
-	case PV_FDN:	return (char_u *)&(curwin->w_p_fdn);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SPELL
+	ಸ್ಥಿತಿ PV_SPELL:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_spell);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
+	ಸ್ಥಿತಿ PV_CUC:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_cuc);
+	ಸ್ಥಿತಿ PV_CUL:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_cul);
+	ಸ್ಥಿತಿ PV_CULOPT:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_culopt);
+	ಸ್ಥಿತಿ PV_CC:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_cc);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
+	ಸ್ಥಿತಿ PV_DIFF:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_diff);
+#ಆದರೆ_ಅಂತ್ಯ
+	ಸ್ಥಿತಿ PV_EIW:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_eiw);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_FOLDING
+	ಸ್ಥಿತಿ PV_FDC:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_fdc);
+	ಸ್ಥಿತಿ PV_FEN:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_fen);
+	ಸ್ಥಿತಿ PV_FDI:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_fdi);
+	ಸ್ಥಿತಿ PV_FDL:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_fdl);
+	ಸ್ಥಿತಿ PV_FDM:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_fdm);
+	ಸ್ಥಿತಿ PV_FML:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_fml);
+	ಸ್ಥಿತಿ PV_FDN:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_fdn);
 # ifdef FEAT_EVAL
-	case PV_FDE:	return (char_u *)&(curwin->w_p_fde);
-	case PV_FDT:	return (char_u *)&(curwin->w_p_fdt);
+	ಸ್ಥಿತಿ PV_FDE:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_fde);
+	ಸ್ಥಿತಿ PV_FDT:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_fdt);
 # endif
-	case PV_FMR:	return (char_u *)&(curwin->w_p_fmr);
-#endif
-	case PV_NU:	return (char_u *)&(curwin->w_p_nu);
-	case PV_RNU:	return (char_u *)&(curwin->w_p_rnu);
-#ifdef FEAT_LINEBREAK
-	case PV_NUW:	return (char_u *)&(curwin->w_p_nuw);
-#endif
-	case PV_WFB:	return (char_u *)&(curwin->w_p_wfb);
-	case PV_WFH:	return (char_u *)&(curwin->w_p_wfh);
-	case PV_WFW:	return (char_u *)&(curwin->w_p_wfw);
-#if defined(FEAT_QUICKFIX)
-	case PV_PVW:	return (char_u *)&(curwin->w_p_pvw);
-	case PV_LHI:	return (char_u *)&(curwin->w_p_lhi);
-#endif
-#ifdef FEAT_RIGHTLEFT
-	case PV_RL:	return (char_u *)&(curwin->w_p_rl);
-	case PV_RLC:	return (char_u *)&(curwin->w_p_rlc);
-#endif
-	case PV_SCROLL:	return (char_u *)&(curwin->w_p_scr);
-	case PV_SMS:	return (char_u *)&(curwin->w_p_sms);
-	case PV_WRAP:	return (char_u *)&(curwin->w_p_wrap);
-#ifdef FEAT_LINEBREAK
-	case PV_LBR:	return (char_u *)&(curwin->w_p_lbr);
-	case PV_BRI:	return (char_u *)&(curwin->w_p_bri);
-	case PV_BRIOPT: return (char_u *)&(curwin->w_p_briopt);
-#endif
-	case PV_WCR:	return (char_u *)&(curwin->w_p_wcr);
-	case PV_SCBIND: return (char_u *)&(curwin->w_p_scb);
-	case PV_CRBIND: return (char_u *)&(curwin->w_p_crb);
-#ifdef FEAT_CONCEAL
-	case PV_COCU:   return (char_u *)&(curwin->w_p_cocu);
-	case PV_COLE:   return (char_u *)&(curwin->w_p_cole);
-#endif
-	case PV_WHL:	return (char_u *)&(curwin->w_p_whl);
+	ಸ್ಥಿತಿ PV_FMR:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_fmr);
+#ಆದರೆ_ಅಂತ್ಯ
+	ಸ್ಥಿತಿ PV_NU:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_nu);
+	ಸ್ಥಿತಿ PV_RNU:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_rnu);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
+	ಸ್ಥಿತಿ PV_NUW:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_nuw);
+#ಆದರೆ_ಅಂತ್ಯ
+	ಸ್ಥಿತಿ PV_WFB:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_wfb);
+	ಸ್ಥಿತಿ PV_WFH:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_wfh);
+	ಸ್ಥಿತಿ PV_WFW:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_wfw);
+#ಆದರೆ defined(FEAT_QUICKFIX)
+	ಸ್ಥಿತಿ PV_PVW:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_pvw);
+	ಸ್ಥಿತಿ PV_LHI:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_lhi);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+	ಸ್ಥಿತಿ PV_RL:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_rl);
+	ಸ್ಥಿತಿ PV_RLC:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_rlc);
+#ಆದರೆ_ಅಂತ್ಯ
+	ಸ್ಥಿತಿ PV_SCROLL:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_scr);
+	ಸ್ಥಿತಿ PV_SMS:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_sms);
+	ಸ್ಥಿತಿ PV_WRAP:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_wrap);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
+	ಸ್ಥಿತಿ PV_LBR:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_lbr);
+	ಸ್ಥಿತಿ PV_BRI:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_bri);
+	ಸ್ಥಿತಿ PV_BRIOPT: ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_briopt);
+#ಆದರೆ_ಅಂತ್ಯ
+	ಸ್ಥಿತಿ PV_WCR:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_wcr);
+	ಸ್ಥಿತಿ PV_SCBIND: ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_scb);
+	ಸ್ಥಿತಿ PV_CRBIND: ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_crb);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CONCEAL
+	ಸ್ಥಿತಿ PV_COCU:   ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_cocu);
+	ಸ್ಥಿತಿ PV_COLE:   ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_cole);
+#ಆದರೆ_ಅಂತ್ಯ
+	ಸ್ಥಿತಿ PV_WHL:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_whl);
 
-#ifdef FEAT_TERMINAL
-	case PV_TWK:    return (char_u *)&(curwin->w_p_twk);
-	case PV_TWS:    return (char_u *)&(curwin->w_p_tws);
-	case PV_TWSL:	return (char_u *)&(curbuf->b_p_twsl);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMINAL
+	ಸ್ಥಿತಿ PV_TWK:    ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_twk);
+	ಸ್ಥಿತಿ PV_TWS:    ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_tws);
+	ಸ್ಥಿತಿ PV_TWSL:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_twsl);
+#ಆದರೆ_ಅಂತ್ಯ
 
-	case PV_AI:	return (char_u *)&(curbuf->b_p_ai);
-	case PV_BIN:	return (char_u *)&(curbuf->b_p_bin);
-	case PV_BOMB:	return (char_u *)&(curbuf->b_p_bomb);
-	case PV_BH:	return (char_u *)&(curbuf->b_p_bh);
-	case PV_BT:	return (char_u *)&(curbuf->b_p_bt);
-	case PV_BL:	return (char_u *)&(curbuf->b_p_bl);
-	case PV_CI:	return (char_u *)&(curbuf->b_p_ci);
-	case PV_CIN:	return (char_u *)&(curbuf->b_p_cin);
-	case PV_CINK:	return (char_u *)&(curbuf->b_p_cink);
-	case PV_CINO:	return (char_u *)&(curbuf->b_p_cino);
-	case PV_CINSD:	return (char_u *)&(curbuf->b_p_cinsd);
-	case PV_CINW:	return (char_u *)&(curbuf->b_p_cinw);
-	case PV_COM:	return (char_u *)&(curbuf->b_p_com);
-	case PV_CMS:	return (char_u *)&(curbuf->b_p_cms);
-	case PV_CPT:	return (char_u *)&(curbuf->b_p_cpt);
-#ifdef BACKSLASH_IN_FILENAME
-	case PV_CSL:	return (char_u *)&(curbuf->b_p_csl);
-#endif
-#ifdef FEAT_COMPL_FUNC
-	case PV_CFU:	return (char_u *)&(curbuf->b_p_cfu);
-	case PV_OFU:	return (char_u *)&(curbuf->b_p_ofu);
-#endif
-#ifdef FEAT_EVAL
-	case PV_TFU:	return (char_u *)&(curbuf->b_p_tfu);
-#endif
-	case PV_EOF:	return (char_u *)&(curbuf->b_p_eof);
-	case PV_EOL:	return (char_u *)&(curbuf->b_p_eol);
-	case PV_FIXEOL:	return (char_u *)&(curbuf->b_p_fixeol);
-	case PV_ET:	return (char_u *)&(curbuf->b_p_et);
-	case PV_FENC:	return (char_u *)&(curbuf->b_p_fenc);
-	case PV_FF:	return (char_u *)&(curbuf->b_p_ff);
-	case PV_FT:	return (char_u *)&(curbuf->b_p_ft);
-	case PV_FO:	return (char_u *)&(curbuf->b_p_fo);
-	case PV_FLP:	return (char_u *)&(curbuf->b_p_flp);
-	case PV_IMI:	return (char_u *)&(curbuf->b_p_iminsert);
-	case PV_IMS:	return (char_u *)&(curbuf->b_p_imsearch);
-	case PV_INF:	return (char_u *)&(curbuf->b_p_inf);
-	case PV_ISK:	return (char_u *)&(curbuf->b_p_isk);
-#ifdef FEAT_FIND_ID
+	ಸ್ಥಿತಿ PV_AI:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_ai);
+	ಸ್ಥಿತಿ PV_BIN:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_bin);
+	ಸ್ಥಿತಿ PV_BOMB:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_bomb);
+	ಸ್ಥಿತಿ PV_BH:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_bh);
+	ಸ್ಥಿತಿ PV_BT:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_bt);
+	ಸ್ಥಿತಿ PV_BL:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_bl);
+	ಸ್ಥಿತಿ PV_CI:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_ci);
+	ಸ್ಥಿತಿ PV_CIN:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_cin);
+	ಸ್ಥಿತಿ PV_CINK:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_cink);
+	ಸ್ಥಿತಿ PV_CINO:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_cino);
+	ಸ್ಥಿತಿ PV_CINSD:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_cinsd);
+	ಸ್ಥಿತಿ PV_CINW:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_cinw);
+	ಸ್ಥಿತಿ PV_COM:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_com);
+	ಸ್ಥಿತಿ PV_CMS:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_cms);
+	ಸ್ಥಿತಿ PV_CPT:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_cpt);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ BACKSLASH_ಒಳ_FILENAME
+	ಸ್ಥಿತಿ PV_CSL:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_csl);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_COMPL_FUNC
+	ಸ್ಥಿತಿ PV_CFU:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_cfu);
+	ಸ್ಥಿತಿ PV_OFU:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_ofu);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	ಸ್ಥಿತಿ PV_TFU:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_tfu);
+#ಆದರೆ_ಅಂತ್ಯ
+	ಸ್ಥಿತಿ PV_EOF:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_eof);
+	ಸ್ಥಿತಿ PV_EOL:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_eol);
+	ಸ್ಥಿತಿ PV_FIXEOL:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_fixeol);
+	ಸ್ಥಿತಿ PV_ET:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_et);
+	ಸ್ಥಿತಿ PV_FENC:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_fenc);
+	ಸ್ಥಿತಿ PV_FF:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_ff);
+	ಸ್ಥಿತಿ PV_FT:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_ft);
+	ಸ್ಥಿತಿ PV_FO:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_fo);
+	ಸ್ಥಿತಿ PV_FLP:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_flp);
+	ಸ್ಥಿತಿ PV_IMI:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_iminsert);
+	ಸ್ಥಿತಿ PV_IMS:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_imsearch);
+	ಸ್ಥಿತಿ PV_INF:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_inf);
+	ಸ್ಥಿತಿ PV_ISK:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_isk);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕಂಡುಹಿಡಿ_ID
 # ifdef FEAT_EVAL
-	case PV_INEX:	return (char_u *)&(curbuf->b_p_inex);
+	ಸ್ಥಿತಿ PV_INEX:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_inex);
 # endif
-#endif
-#if defined(FEAT_EVAL)
-	case PV_INDE:	return (char_u *)&(curbuf->b_p_inde);
-	case PV_INDK:	return (char_u *)&(curbuf->b_p_indk);
-#endif
-#ifdef FEAT_EVAL
-	case PV_FEX:	return (char_u *)&(curbuf->b_p_fex);
-#endif
-#ifdef FEAT_CRYPT
-	case PV_KEY:	return (char_u *)&(curbuf->b_p_key);
-#endif
-	case PV_LISP:	return (char_u *)&(curbuf->b_p_lisp);
-	case PV_LOP:	return (char_u *)&(curbuf->b_p_lop);
-	case PV_ML:	return (char_u *)&(curbuf->b_p_ml);
-	case PV_MPS:	return (char_u *)&(curbuf->b_p_mps);
-	case PV_MA:	return (char_u *)&(curbuf->b_p_ma);
-	case PV_MOD:	return (char_u *)&(curbuf->b_changed);
-	case PV_NF:	return (char_u *)&(curbuf->b_p_nf);
-	case PV_PI:	return (char_u *)&(curbuf->b_p_pi);
-	case PV_QE:	return (char_u *)&(curbuf->b_p_qe);
-	case PV_RO:	return (char_u *)&(curbuf->b_p_ro);
-	case PV_SI:	return (char_u *)&(curbuf->b_p_si);
-	case PV_SN:	return (char_u *)&(curbuf->b_p_sn);
-	case PV_STS:	return (char_u *)&(curbuf->b_p_sts);
-	case PV_SUA:	return (char_u *)&(curbuf->b_p_sua);
-	case PV_SWF:	return (char_u *)&(curbuf->b_p_swf);
-#ifdef FEAT_SYN_HL
-	case PV_SMC:	return (char_u *)&(curbuf->b_p_smc);
-	case PV_SYN:	return (char_u *)&(curbuf->b_p_syn);
-#endif
-#ifdef FEAT_SPELL
-	case PV_SPC:	return (char_u *)&(curwin->w_s->b_p_spc);
-	case PV_SPF:	return (char_u *)&(curwin->w_s->b_p_spf);
-	case PV_SPL:	return (char_u *)&(curwin->w_s->b_p_spl);
-	case PV_SPO:	return (char_u *)&(curwin->w_s->b_p_spo);
-#endif
-	case PV_SW:	return (char_u *)&(curbuf->b_p_sw);
-	case PV_TS:	return (char_u *)&(curbuf->b_p_ts);
-	case PV_TW:	return (char_u *)&(curbuf->b_p_tw);
-	case PV_TX:	return (char_u *)&(curbuf->b_p_tx);
-#ifdef FEAT_PERSISTENT_UNDO
-	case PV_UDF:	return (char_u *)&(curbuf->b_p_udf);
-#endif
-	case PV_WM:	return (char_u *)&(curbuf->b_p_wm);
-#ifdef FEAT_KEYMAP
-	case PV_KMAP:	return (char_u *)&(curbuf->b_p_keymap);
-#endif
-#ifdef FEAT_SIGNS
-	case PV_SCL:	return (char_u *)&(curwin->w_p_scl);
-#endif
-#ifdef FEAT_VARTABS
-	case PV_VSTS:	return (char_u *)&(curbuf->b_p_vsts);
-	case PV_VTS:	return (char_u *)&(curbuf->b_p_vts);
-#endif
-	default:	iemsg(e_get_varp_error);
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(FEAT_EVAL)
+	ಸ್ಥಿತಿ PV_INDE:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_inde);
+	ಸ್ಥಿತಿ PV_INDK:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_indk);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	ಸ್ಥಿತಿ PV_FEX:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_fex);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+	ಸ್ಥಿತಿ PV_ಕೀಲಿ:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_ಕೀಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ
+	ಸ್ಥಿತಿ PV_LISP:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_lisp);
+	ಸ್ಥಿತಿ PV_LOP:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_lop);
+	ಸ್ಥಿತಿ PV_ML:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_ml);
+	ಸ್ಥಿತಿ PV_MPS:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_mps);
+	ಸ್ಥಿತಿ PV_MA:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_ma);
+	ಸ್ಥಿತಿ PV_MOD:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_ಬದಲಾಯಿತು);
+	ಸ್ಥಿತಿ PV_NF:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_nf);
+	ಸ್ಥಿತಿ PV_PI:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_pi);
+	ಸ್ಥಿತಿ PV_QE:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_qe);
+	ಸ್ಥಿತಿ PV_RO:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_ro);
+	ಸ್ಥಿತಿ PV_SI:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_si);
+	ಸ್ಥಿತಿ PV_SN:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_sn);
+	ಸ್ಥಿತಿ PV_STS:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_sts);
+	ಸ್ಥಿತಿ PV_SUA:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_sua);
+	ಸ್ಥಿತಿ PV_SWF:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_swf);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
+	ಸ್ಥಿತಿ PV_SMC:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_smc);
+	ಸ್ಥಿತಿ PV_SYN:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_syn);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SPELL
+	ಸ್ಥಿತಿ PV_SPC:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_s->b_p_spc);
+	ಸ್ಥಿತಿ PV_SPF:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_s->b_p_spf);
+	ಸ್ಥಿತಿ PV_SPL:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_s->b_p_spl);
+	ಸ್ಥಿತಿ PV_SPO:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_s->b_p_spo);
+#ಆದರೆ_ಅಂತ್ಯ
+	ಸ್ಥಿತಿ PV_SW:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_sw);
+	ಸ್ಥಿತಿ PV_TS:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_ts);
+	ಸ್ಥಿತಿ PV_TW:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_tw);
+	ಸ್ಥಿತಿ PV_TX:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_tx);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PERSISTENT_UNDO
+	ಸ್ಥಿತಿ PV_UDF:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_udf);
+#ಆದರೆ_ಅಂತ್ಯ
+	ಸ್ಥಿತಿ PV_WM:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_wm);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_KEYMAP
+	ಸ್ಥಿತಿ PV_KMAP:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_keymap);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SIGNS
+	ಸ್ಥಿತಿ PV_SCL:	ಹಿಂತಿರುಗಿ (char_u *)&(curwin->w_p_scl);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+	ಸ್ಥಿತಿ PV_VSTS:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_vsts);
+	ಸ್ಥಿತಿ PV_VTS:	ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_vts);
+#ಆದರೆ_ಅಂತ್ಯ
+	ಪೂರ್ವನಿಯೋಜಿತ:	iemsg(e_get_varp_error);
     }
     // always return a valid pointer to avoid a crash!
-    return (char_u *)&(curbuf->b_p_wm);
+    ಹಿಂತಿರುಗಿ (char_u *)&(curbuf->b_p_wm);
 }
 
 /*
  * Return a pointer to the variable for option at 'opt_idx'
  */
     char_u *
-get_option_var(int opt_idx)
+get_option_var(ಪೂರ್ಣಾಂಕ opt_idx)
 {
-    return options[opt_idx].var;
+    ಹಿಂತಿರುಗಿ options[opt_idx].var;
 }
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * Return the full name of the option at 'opt_idx'
  */
     char_u *
-get_option_fullname(int opt_idx)
+get_option_fullname(ಪೂರ್ಣಾಂಕ opt_idx)
 {
-    return (char_u *)options[opt_idx].fullname;
+    ಹಿಂತಿರುಗಿ (char_u *)options[opt_idx].fullname;
 }
 
 /*
@@ -7477,128 +7477,128 @@ get_option_fullname(int opt_idx)
  * whether the option is supported in this Vim.
  * Returns FAIL when there is no such option.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 option_info(char_u *name, dict_T *d)
 {
-    int			opt_idx;
-    struct vimoption	*p;
-    int			dvi;
+    ಪೂರ್ಣಾಂಕ			opt_idx;
+    ರಚನೆ vimoption	*p;
+    ಪೂರ್ಣಾಂಕ			dvi;
 
     // The "g:" or "l:" scope does not matter for the definition.
-    if ((name[0] == 'g' || name[0] == 'l') && name[1] == ':')
+    ಆದರೆ ((name[0] == 'g' || name[0] == 'l') && name[1] == ':')
 	name += 2;
     opt_idx = findoption(name);
-    if (opt_idx < 0)
-	return FAIL;
+    ಆದರೆ (opt_idx < 0)
+	ಹಿಂತಿರುಗಿ FAIL;
 
     p = &options[opt_idx];
-    dict_add_string(d, "name", (char_u *)p->fullname);
-    dict_add_string(d, "shortname",
-		    (char_u *)(p->shortname == NULL ? "" : p->shortname));
-    dict_add_bool(d, "available", p->var != NULL);
-    dict_add_string(d, "type", (char_u *)((p->flags & P_BOOL) ? "bool"
-				: (p->flags & P_NUM) ? "number" : "string"));
-    dict_add_string(d, "scope", (char_u *)(p->indir == PV_NONE ? "global"
+    dict_ಕೂಡಿಸು_string(d, "name", (char_u *)p->fullname);
+    dict_ಕೂಡಿಸು_string(d, "shortname",
+		    (char_u *)(p->shortname == ಖಾಲಿ ? "" : p->shortname));
+    dict_ಕೂಡಿಸು_bool(d, "available", p->var != ಖಾಲಿ);
+    dict_ಕೂಡಿಸು_string(d, "type", (char_u *)((p->flags & P_BOOL) ? "bool"
+				: (p->flags & P_ಅಂಕೆ) ? "number" : "string"));
+    dict_ಕೂಡಿಸು_string(d, "scope", (char_u *)(p->indir == PV_NONE ? "global"
 		: (p->indir & PV_BOTH)
 		    ? ((p->indir & PV_WIN) ? "global-window" : "global-buffer")
 		    : ((p->indir & PV_WIN) ? "window" : "buffer")));
     dvi = (p->flags & P_VI_DEF) ? VI_DEFAULT : VIM_DEFAULT;
-    if (p->flags & P_BOOL)
-	dict_add_bool(d, "default", (int)(long_i)p->def_val[dvi]);
-    else if (p->flags & P_NUM)
-	dict_add_number(d, "default", (long)(long_i)p->def_val[dvi]);
-    else
-	dict_add_string(d, "default", p->def_val[dvi] == NULL
+    ಆದರೆ (p->flags & P_BOOL)
+	dict_ಕೂಡಿಸು_bool(d, "default", (ಪೂರ್ಣಾಂಕ)(long_i)p->def_val[dvi]);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p->flags & P_ಅಂಕೆ)
+	dict_ಕೂಡಿಸು_ಸಂಖ್ಯೆ(d, "default", (ದೀರ್ಘ)(long_i)p->def_val[dvi]);
+    ಇಲ್ಲದಿದ್ದರೆ
+	dict_ಕೂಡಿಸು_string(d, "default", p->def_val[dvi] == ಖಾಲಿ
 					? (char_u *)"" : p->def_val[dvi]);
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Return the did_set callback function for the option at 'opt_idx'
  */
-    opt_did_set_cb_T
-get_option_did_set_cb(int opt_idx)
+    opt_did_ಗಣ_cb_T
+get_option_did_ಗಣ_cb(ಪೂರ್ಣಾಂಕ opt_idx)
 {
-    return options[opt_idx].opt_did_set_cb;
+    ಹಿಂತಿರುಗಿ options[opt_idx].opt_did_ಗಣ_cb;
 }
 
 /*
  * Get the value of 'equalprg', either the buffer-local one or the global one.
  */
     char_u *
-get_equalprg(void)
+get_equalprg(ಶೂನ್ಯ)
 {
-    if (*curbuf->b_p_ep == NUL)
-	return p_ep;
-    return curbuf->b_p_ep;
+    ಆದರೆ (*curbuf->b_p_ep == NUL)
+	ಹಿಂತಿರುಗಿ p_ep;
+    ಹಿಂತಿರುಗಿ curbuf->b_p_ep;
 }
 
 /*
  * Get the value of 'findfunc', either the buffer-local one or the global one.
  */
     char_u *
-get_findfunc(void)
+get_findfunc(ಶೂನ್ಯ)
 {
-#ifdef FEAT_EVAL
-    if (*curbuf->b_p_ffu == NUL)
-	return p_ffu;
-    return curbuf->b_p_ffu;
-#else
-    return (char_u *)"";
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಆದರೆ (*curbuf->b_p_ffu == NUL)
+	ಹಿಂತಿರುಗಿ p_ffu;
+    ಹಿಂತಿರುಗಿ curbuf->b_p_ffu;
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಹಿಂತಿರುಗಿ (char_u *)"";
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Copy options from one window to another.
  * Used when splitting a window.
  */
-    void
-win_copy_options(win_T *wp_from, win_T *wp_to)
+    ಶೂನ್ಯ
+win_copy_options(win_T *wp_from, win_T *wp_ಗಮ್ಯ)
 {
-    copy_winopt(&wp_from->w_onebuf_opt, &wp_to->w_onebuf_opt);
-    copy_winopt(&wp_from->w_allbuf_opt, &wp_to->w_allbuf_opt);
-#ifdef FEAT_STL_OPT
+    copy_winopt(&wp_from->w_onebuf_opt, &wp_ಗಮ್ಯ->w_onebuf_opt);
+    copy_winopt(&wp_from->w_allbuf_opt, &wp_ಗಮ್ಯ->w_allbuf_opt);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_STL_OPT
     // w_stl_rendered_height is in win_T directly, not in winvar_T, so it is
     // not copied by copy_winopt().  Copy it explicitly here.
-    wp_to->w_stl_rendered_height = wp_from->w_stl_rendered_height;
-#endif
-    after_copy_winopt(wp_to);
+    wp_ಗಮ್ಯ->w_stl_rendered_ಎತ್ತರ = wp_from->w_stl_rendered_ಎತ್ತರ;
+#ಆದರೆ_ಅಂತ್ಯ
+    after_copy_winopt(wp_ಗಮ್ಯ);
 }
 
 /*
  * After copying window options: update variables depending on options.
  */
-    void
+    ಶೂನ್ಯ
 after_copy_winopt(win_T *wp)
 {
-    char *errmsg = update_winhighlight(wp, wp->w_p_whl);
+    ಅಕ್ಷರ *errmsg = update_winhighlight(wp, wp->w_p_whl);
 
-    if (errmsg != NULL)
+    ಆದರೆ (errmsg != ಖಾಲಿ)
 	emsg(_(errmsg));
 
     // Set w_leftcol or w_skipcol to zero.
-    if (wp->w_p_wrap)
+    ಆದರೆ (wp->w_p_wrap)
 	wp->w_leftcol = 0;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	wp->w_skipcol = 0;
-#ifdef FEAT_LINEBREAK
-    briopt_check(NULL, wp);
-#endif
-#ifdef FEAT_SYN_HL
-    fill_culopt_flags(NULL, wp);
-    check_colorcolumn(NULL, wp);
-#endif
-    set_listchars_option(wp, wp->w_p_lcs, TRUE, NULL, 0);
-    set_fillchars_option(wp, wp->w_p_fcs, TRUE, NULL, 0);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
+    briopt_check(ಖಾಲಿ, wp);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
+    fill_culopt_flags(ಖಾಲಿ, wp);
+    check_colorcolumn(ಖಾಲಿ, wp);
+#ಆದರೆ_ಅಂತ್ಯ
+    ಗಣ_listchars_option(wp, wp->w_p_lcs, TRUE, ಖಾಲಿ, 0);
+    ಗಣ_fillchars_option(wp, wp->w_p_fcs, TRUE, ಖಾಲಿ, 0);
 }
 
-    static char_u *
+    ಸ್ಥಿರ char_u *
 copy_option_val(char_u *val)
 {
-    if (val == empty_option)
-	return empty_option;  // no need to allocate memory
-    return vim_strsave(val);
+    ಆದರೆ (val == ಖಾಲಿಗಳು_option)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿಗಳು_option;  // no need to allocate memory
+    ಹಿಂತಿರುಗಿ vim_strsave(val);
 }
 
 /*
@@ -7607,123 +7607,123 @@ copy_option_val(char_u *val)
  * The 'scroll' option is not copied, because it depends on the window height.
  * The 'previewwindow' option is reset, there can be only one preview window.
  */
-    void
-copy_winopt(winopt_T *from, winopt_T *to)
+    ಶೂನ್ಯ
+copy_winopt(winopt_T *from, winopt_T *ಗಮ್ಯ)
 {
-#ifdef FEAT_ARABIC
-    to->wo_arab = from->wo_arab;
-#endif
-    to->wo_list = from->wo_list;
-    to->wo_lcs = copy_option_val(from->wo_lcs);
-    to->wo_fcs = copy_option_val(from->wo_fcs);
-    to->wo_nu = from->wo_nu;
-    to->wo_rnu = from->wo_rnu;
-    to->wo_ve = copy_option_val(from->wo_ve);
-    to->wo_ve_flags = from->wo_ve_flags;
-#ifdef FEAT_LINEBREAK
-    to->wo_nuw = from->wo_nuw;
-#endif
-#ifdef FEAT_RIGHTLEFT
-    to->wo_rl  = from->wo_rl;
-    to->wo_rlc = copy_option_val(from->wo_rlc);
-#endif
-#ifdef FEAT_LINEBREAK
-    to->wo_sbr = copy_option_val(from->wo_sbr);
-#endif
-#ifdef FEAT_STL_OPT
-    to->wo_stl = copy_option_val(from->wo_stl);
-    to->wo_stlo = copy_option_val(from->wo_stlo);
-    to->wo_stlo_fh = from->wo_stlo_fh;
-    to->wo_stlo_mh = from->wo_stlo_mh;
-#endif
-    to->wo_wrap = from->wo_wrap;
-#ifdef FEAT_DIFF
-    to->wo_wrap_save = from->wo_wrap_save;
-#endif
-#ifdef FEAT_LINEBREAK
-    to->wo_lbr = from->wo_lbr;
-    to->wo_bri = from->wo_bri;
-    to->wo_briopt = copy_option_val(from->wo_briopt);
-#endif
-    to->wo_wcr = copy_option_val(from->wo_wcr);
-    to->wo_scb = from->wo_scb;
-    to->wo_scb_save = from->wo_scb_save;
-    to->wo_sms = from->wo_sms;
-    to->wo_crb = from->wo_crb;
-    to->wo_crb_save = from->wo_crb_save;
-    to->wo_siso = from->wo_siso;
-    to->wo_so = from->wo_so;
-    to->wo_sop = from->wo_sop;
-#ifdef FEAT_SPELL
-    to->wo_spell = from->wo_spell;
-#endif
-#ifdef FEAT_SYN_HL
-    to->wo_cuc = from->wo_cuc;
-    to->wo_cul = from->wo_cul;
-    to->wo_culopt = copy_option_val(from->wo_culopt);
-    to->wo_cc = copy_option_val(from->wo_cc);
-#endif
-#ifdef FEAT_DIFF
-    to->wo_diff = from->wo_diff;
-    to->wo_diff_saved = from->wo_diff_saved;
-#endif
-    to->wo_eiw = copy_option_val(from->wo_eiw);
-#ifdef FEAT_CONCEAL
-    to->wo_cocu = copy_option_val(from->wo_cocu);
-    to->wo_cole = from->wo_cole;
-#endif
-#ifdef FEAT_TERMINAL
-    to->wo_twk = copy_option_val(from->wo_twk);
-    to->wo_tws = copy_option_val(from->wo_tws);
-#endif
-#ifdef FEAT_FOLDING
-    to->wo_fdc = from->wo_fdc;
-    to->wo_fdc_save = from->wo_fdc_save;
-    to->wo_fen = from->wo_fen;
-    to->wo_fen_save = from->wo_fen_save;
-    to->wo_fdi = copy_option_val(from->wo_fdi);
-    to->wo_fml = from->wo_fml;
-    to->wo_fdl = from->wo_fdl;
-    to->wo_fdl_save = from->wo_fdl_save;
-    to->wo_fdm = copy_option_val(from->wo_fdm);
-    to->wo_fdm_save = from->wo_diff_saved
-			       ? vim_strsave(from->wo_fdm_save) : empty_option;
-    to->wo_fdn = from->wo_fdn;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ARABIC
+    ಗಮ್ಯ->wo_arab = from->wo_arab;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಗಮ್ಯ->wo_list = from->wo_list;
+    ಗಮ್ಯ->wo_lcs = copy_option_val(from->wo_lcs);
+    ಗಮ್ಯ->wo_fcs = copy_option_val(from->wo_fcs);
+    ಗಮ್ಯ->wo_nu = from->wo_nu;
+    ಗಮ್ಯ->wo_rnu = from->wo_rnu;
+    ಗಮ್ಯ->wo_ve = copy_option_val(from->wo_ve);
+    ಗಮ್ಯ->wo_ve_flags = from->wo_ve_flags;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
+    ಗಮ್ಯ->wo_nuw = from->wo_nuw;
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+    ಗಮ್ಯ->wo_rl  = from->wo_rl;
+    ಗಮ್ಯ->wo_rlc = copy_option_val(from->wo_rlc);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
+    ಗಮ್ಯ->wo_sbr = copy_option_val(from->wo_sbr);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_STL_OPT
+    ಗಮ್ಯ->wo_stl = copy_option_val(from->wo_stl);
+    ಗಮ್ಯ->wo_stlo = copy_option_val(from->wo_stlo);
+    ಗಮ್ಯ->wo_stlo_fh = from->wo_stlo_fh;
+    ಗಮ್ಯ->wo_stlo_mh = from->wo_stlo_mh;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಗಮ್ಯ->wo_wrap = from->wo_wrap;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
+    ಗಮ್ಯ->wo_wrap_save = from->wo_wrap_save;
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
+    ಗಮ್ಯ->wo_lbr = from->wo_lbr;
+    ಗಮ್ಯ->wo_bri = from->wo_bri;
+    ಗಮ್ಯ->wo_briopt = copy_option_val(from->wo_briopt);
+#ಆದರೆ_ಅಂತ್ಯ
+    ಗಮ್ಯ->wo_wcr = copy_option_val(from->wo_wcr);
+    ಗಮ್ಯ->wo_scb = from->wo_scb;
+    ಗಮ್ಯ->wo_scb_save = from->wo_scb_save;
+    ಗಮ್ಯ->wo_sms = from->wo_sms;
+    ಗಮ್ಯ->wo_crb = from->wo_crb;
+    ಗಮ್ಯ->wo_crb_save = from->wo_crb_save;
+    ಗಮ್ಯ->wo_siso = from->wo_siso;
+    ಗಮ್ಯ->wo_so = from->wo_so;
+    ಗಮ್ಯ->wo_sop = from->wo_sop;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SPELL
+    ಗಮ್ಯ->wo_spell = from->wo_spell;
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
+    ಗಮ್ಯ->wo_cuc = from->wo_cuc;
+    ಗಮ್ಯ->wo_cul = from->wo_cul;
+    ಗಮ್ಯ->wo_culopt = copy_option_val(from->wo_culopt);
+    ಗಮ್ಯ->wo_cc = copy_option_val(from->wo_cc);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
+    ಗಮ್ಯ->wo_diff = from->wo_diff;
+    ಗಮ್ಯ->wo_diff_saved = from->wo_diff_saved;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಗಮ್ಯ->wo_eiw = copy_option_val(from->wo_eiw);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CONCEAL
+    ಗಮ್ಯ->wo_cocu = copy_option_val(from->wo_cocu);
+    ಗಮ್ಯ->wo_cole = from->wo_cole;
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMINAL
+    ಗಮ್ಯ->wo_twk = copy_option_val(from->wo_twk);
+    ಗಮ್ಯ->wo_tws = copy_option_val(from->wo_tws);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_FOLDING
+    ಗಮ್ಯ->wo_fdc = from->wo_fdc;
+    ಗಮ್ಯ->wo_fdc_save = from->wo_fdc_save;
+    ಗಮ್ಯ->wo_fen = from->wo_fen;
+    ಗಮ್ಯ->wo_fen_save = from->wo_fen_save;
+    ಗಮ್ಯ->wo_fdi = copy_option_val(from->wo_fdi);
+    ಗಮ್ಯ->wo_fml = from->wo_fml;
+    ಗಮ್ಯ->wo_fdl = from->wo_fdl;
+    ಗಮ್ಯ->wo_fdl_save = from->wo_fdl_save;
+    ಗಮ್ಯ->wo_fdm = copy_option_val(from->wo_fdm);
+    ಗಮ್ಯ->wo_fdm_save = from->wo_diff_saved
+			       ? vim_strsave(from->wo_fdm_save) : ಖಾಲಿಗಳು_option;
+    ಗಮ್ಯ->wo_fdn = from->wo_fdn;
 # ifdef FEAT_EVAL
-    to->wo_fde = copy_option_val(from->wo_fde);
-    to->wo_fdt = copy_option_val(from->wo_fdt);
+    ಗಮ್ಯ->wo_fde = copy_option_val(from->wo_fde);
+    ಗಮ್ಯ->wo_fdt = copy_option_val(from->wo_fdt);
 # endif
-    to->wo_fmr = copy_option_val(from->wo_fmr);
-#endif
-#ifdef FEAT_SIGNS
-    to->wo_scl = copy_option_val(from->wo_scl);
-#endif
-#ifdef FEAT_QUICKFIX
-    to->wo_lhi = from->wo_lhi;
-#endif
+    ಗಮ್ಯ->wo_fmr = copy_option_val(from->wo_fmr);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SIGNS
+    ಗಮ್ಯ->wo_scl = copy_option_val(from->wo_scl);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
+    ಗಮ್ಯ->wo_lhi = from->wo_lhi;
+#ಆದರೆ_ಅಂತ್ಯ
 
-    to->wo_wrap_flags = from->wo_wrap_flags;
-#ifdef FEAT_STL_OPT
-    to->wo_stl_flags = from->wo_stl_flags;
-#endif
-#ifdef FEAT_EVAL
-    to->wo_fde_flags = from->wo_fde_flags;
-    to->wo_fdt_flags = from->wo_fdt_flags;
-#endif
-    to->wo_whl = copy_option_val(from->wo_whl);
+    ಗಮ್ಯ->wo_wrap_flags = from->wo_wrap_flags;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_STL_OPT
+    ಗಮ್ಯ->wo_stl_flags = from->wo_stl_flags;
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಗಮ್ಯ->wo_fde_flags = from->wo_fde_flags;
+    ಗಮ್ಯ->wo_fdt_flags = from->wo_fdt_flags;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಗಮ್ಯ->wo_whl = copy_option_val(from->wo_whl);
 
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     // Copy the script context so that we know where the value was last set.
-    mch_memmove(to->wo_script_ctx, from->wo_script_ctx,
-						    sizeof(to->wo_script_ctx));
-#endif
-    check_winopt(to);		// don't want NULL pointers
+    mch_memmove(ಗಮ್ಯ->wo_script_ctx, from->wo_script_ctx,
+						    ಗಾತ್ರ(ಗಮ್ಯ->wo_script_ctx));
+#ಆದರೆ_ಅಂತ್ಯ
+    check_winopt(ಗಮ್ಯ);		// don't want NULL pointers
 }
 
 /*
  * Check string options in a window for a NULL value.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 check_win_options(win_T *win)
 {
     check_winopt(&win->w_onebuf_opt);
@@ -7733,10 +7733,10 @@ check_win_options(win_T *win)
 /*
  * Check for NULL pointers in a winopt_T and replace them with empty_option.
  */
-    static void
-check_winopt(winopt_T *wop UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+check_winopt(winopt_T *wop ಬಳಸದ)
 {
-#ifdef FEAT_FOLDING
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_FOLDING
     check_string_option(&wop->wo_fdi);
     check_string_option(&wop->wo_fdm);
     check_string_option(&wop->wo_fdm_save);
@@ -7745,35 +7745,35 @@ check_winopt(winopt_T *wop UNUSED)
     check_string_option(&wop->wo_fdt);
 # endif
     check_string_option(&wop->wo_fmr);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     check_string_option(&wop->wo_eiw);
-#ifdef FEAT_SIGNS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SIGNS
     check_string_option(&wop->wo_scl);
-#endif
-#ifdef FEAT_RIGHTLEFT
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
     check_string_option(&wop->wo_rlc);
-#endif
-#ifdef FEAT_LINEBREAK
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
     check_string_option(&wop->wo_sbr);
-#endif
-#ifdef FEAT_STL_OPT
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_STL_OPT
     check_string_option(&wop->wo_stl);
     check_string_option(&wop->wo_stlo);
-#endif
-#ifdef FEAT_SYN_HL
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
     check_string_option(&wop->wo_culopt);
     check_string_option(&wop->wo_cc);
-#endif
-#ifdef FEAT_CONCEAL
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CONCEAL
     check_string_option(&wop->wo_cocu);
-#endif
-#ifdef FEAT_TERMINAL
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMINAL
     check_string_option(&wop->wo_twk);
     check_string_option(&wop->wo_tws);
-#endif
-#ifdef FEAT_LINEBREAK
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
     check_string_option(&wop->wo_briopt);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     check_string_option(&wop->wo_wcr);
     check_string_option(&wop->wo_lcs);
     check_string_option(&wop->wo_fcs);
@@ -7784,10 +7784,10 @@ check_winopt(winopt_T *wop UNUSED)
 /*
  * Free the allocated memory inside a winopt_T.
  */
-    void
-clear_winopt(winopt_T *wop UNUSED)
+    ಶೂನ್ಯ
+clear_winopt(winopt_T *wop ಬಳಸದ)
 {
-#ifdef FEAT_FOLDING
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_FOLDING
     clear_string_option(&wop->wo_fdi);
     clear_string_option(&wop->wo_fdm);
     clear_string_option(&wop->wo_fdm_save);
@@ -7796,45 +7796,45 @@ clear_winopt(winopt_T *wop UNUSED)
     clear_string_option(&wop->wo_fdt);
 # endif
     clear_string_option(&wop->wo_fmr);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     clear_string_option(&wop->wo_eiw);
-#ifdef FEAT_SIGNS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SIGNS
     clear_string_option(&wop->wo_scl);
-#endif
-#ifdef FEAT_LINEBREAK
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
     clear_string_option(&wop->wo_briopt);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     clear_string_option(&wop->wo_wcr);
-#ifdef FEAT_RIGHTLEFT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
     clear_string_option(&wop->wo_rlc);
-#endif
-#ifdef FEAT_LINEBREAK
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_LINEBREAK
     clear_string_option(&wop->wo_sbr);
-#endif
-#ifdef FEAT_STL_OPT
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_STL_OPT
     clear_string_option(&wop->wo_stl);
     clear_string_option(&wop->wo_stlo);
-#endif
-#ifdef FEAT_SYN_HL
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
     clear_string_option(&wop->wo_culopt);
     clear_string_option(&wop->wo_cc);
-#endif
-#ifdef FEAT_CONCEAL
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CONCEAL
     clear_string_option(&wop->wo_cocu);
-#endif
-#ifdef FEAT_TERMINAL
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMINAL
     clear_string_option(&wop->wo_twk);
     clear_string_option(&wop->wo_tws);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     clear_string_option(&wop->wo_lcs);
     clear_string_option(&wop->wo_fcs);
     clear_string_option(&wop->wo_ve);
     clear_string_option(&wop->wo_whl);
 }
 
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 // Index into the options table for a buffer-local option enum.
-static int buf_opt_idx[BV_COUNT];
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ buf_opt_idx[BV_ಎಣಿಕೆ];
 # define COPY_OPT_SCTX(buf, bv) buf->b_p_script_ctx[bv] = options[buf_opt_idx[bv]].script_ctx
 # define COPY_OPT_INSECURE(flagsfield, bv) \
 	(flagsfield) = (options[buf_opt_idx[bv]].flags & P_INSECURE)
@@ -7842,23 +7842,23 @@ static int buf_opt_idx[BV_COUNT];
 /*
  * Initialize buf_opt_idx[] if not done already.
  */
-    static void
-init_buf_opt_idx(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+init_buf_opt_idx(ಶೂನ್ಯ)
 {
-    static int did_init_buf_opt_idx = FALSE;
-    int i;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ did_init_buf_opt_idx = FALSE;
+    ಪೂರ್ಣಾಂಕ i;
 
-    if (did_init_buf_opt_idx)
-	return;
+    ಆದರೆ (did_init_buf_opt_idx)
+	ಹಿಂತಿರುಗಿ;
     did_init_buf_opt_idx = TRUE;
-    for (i = 0; !istermoption_idx(i); i++)
-	if (options[i].indir & PV_BUF)
-	    buf_opt_idx[options[i].indir & PV_MASK] = i;
+    ಗಾಗಿ (i = 0; !istermoption_idx(i); i++)
+	ಆದರೆ (options[i].indir & PV_BUF)
+	    buf_opt_idx[options[i].indir & PV_ಮುಖವಾಡ] = i;
 }
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 # define COPY_OPT_SCTX(buf, bv)
 # define COPY_OPT_INSECURE(flagsfield, bv)
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Copy global option values to local options for one buffer.
@@ -7869,17 +7869,17 @@ init_buf_opt_idx(void)
  *		appropriate.
  * BCO_NOHELP	Don't copy the values to a help buffer.
  */
-    void
-buf_copy_options(buf_T *buf, int flags)
+    ಶೂನ್ಯ
+buf_copy_options(buf_T *buf, ಪೂರ್ಣಾಂಕ flags)
 {
-    int		should_copy = TRUE;
-    char_u	*save_p_isk = NULL;	    // init for GCC
-    int		dont_do_help;
-    int		did_isk = FALSE;
+    ಪೂರ್ಣಾಂಕ		should_copy = TRUE;
+    char_u	*save_p_isk = ಖಾಲಿ;	    // init for GCC
+    ಪೂರ್ಣಾಂಕ		dont_do_help;
+    ಪೂರ್ಣಾಂಕ		did_isk = FALSE;
 
     // Skip this when the option defaults have not been set yet.  Happens when
     // main() allocates the first buffer.
-    if (p_cpo != NULL)
+    ಆದರೆ (p_cpo != ಖಾಲಿ)
     {
 	/*
 	 * Always copy when entering and 'cpo' contains 'S'.
@@ -7893,53 +7893,53 @@ buf_copy_options(buf_T *buf, int flags)
 	 *  X	  no	      no	no	TRUE
 	 * no	  yes	      no	 X	TRUE
 	 */
-	if ((vim_strchr(p_cpo, CPO_BUFOPTGLOB) == NULL || !(flags & BCO_ENTER))
+	ಆದರೆ ((vim_strchr(p_cpo, CPO_BUFOPTGLOB) == ಖಾಲಿ || !(flags & BCO_ENTER))
 		&& (buf->b_p_initialized
 		    || (!(flags & BCO_ENTER)
-			&& vim_strchr(p_cpo, CPO_BUFOPT) != NULL)))
+			&& vim_strchr(p_cpo, CPO_BUFOPT) != ಖಾಲಿ)))
 	    should_copy = FALSE;
 
-	if (should_copy || (flags & BCO_ALWAYS))
+	ಆದರೆ (should_copy || (flags & BCO_ALWAYS))
 	{
-#ifdef FEAT_EVAL
-	    CLEAR_FIELD(buf->b_p_script_ctx);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	    CLEAR_ಕ್ಷೇತ್ರ(buf->b_p_script_ctx);
 	    init_buf_opt_idx();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    // Don't copy the options specific to a help buffer when
 	    // BCO_NOHELP is given or the options were initialized already
 	    // (jumping back to a help file with CTRL-T or CTRL-O)
 	    dont_do_help = ((flags & BCO_NOHELP) && buf->b_help)
 						       || buf->b_p_initialized;
-	    if (dont_do_help)		// don't free b_p_isk
+	    ಆದರೆ (dont_do_help)		// don't free b_p_isk
 	    {
 		save_p_isk = buf->b_p_isk;
-		buf->b_p_isk = NULL;
+		buf->b_p_isk = ಖಾಲಿ;
 	    }
 	    // Always free the allocated strings.  If not already initialized,
 	    // reset 'readonly' and copy 'fileformat'.
-	    if (!buf->b_p_initialized)
+	    ಆದರೆ (!buf->b_p_initialized)
 	    {
 		free_buf_options(buf, TRUE);
 		buf->b_p_ro = FALSE;		// don't copy readonly
 		buf->b_p_tx = p_tx;
 		buf->b_p_fenc = vim_strsave(p_fenc);
-		switch (*p_ffs)
+		ಆಯ್ಕೆ (*p_ffs)
 		{
-		    case 'm':
-			buf->b_p_ff = vim_strsave((char_u *)FF_MAC); break;
-		    case 'd':
-			buf->b_p_ff = vim_strsave((char_u *)FF_DOS); break;
-		    case 'u':
-			buf->b_p_ff = vim_strsave((char_u *)FF_UNIX); break;
-		    default:
+		    ಸ್ಥಿತಿ 'm':
+			buf->b_p_ff = vim_strsave((char_u *)FF_MAC); ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ 'd':
+			buf->b_p_ff = vim_strsave((char_u *)FF_DOS); ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ 'u':
+			buf->b_p_ff = vim_strsave((char_u *)FF_UNIX); ನಿಲ್ಲಿಸು;
+		    ಪೂರ್ವನಿಯೋಜಿತ:
 			buf->b_p_ff = vim_strsave(p_ff);
 		}
-		if (buf->b_p_ff != NULL)
-		    buf->b_start_ffc = *buf->b_p_ff;
-		buf->b_p_bh = empty_option;
-		buf->b_p_bt = empty_option;
+		ಆದರೆ (buf->b_p_ff != ಖಾಲಿ)
+		    buf->b_ಆರಂಭ_ffc = *buf->b_p_ff;
+		buf->b_p_bh = ಖಾಲಿಗಳು_option;
+		buf->b_p_bt = ಖಾಲಿಗಳು_option;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		free_buf_options(buf, FALSE);
 
 	    buf->b_p_ai = p_ai;
@@ -7970,49 +7970,49 @@ buf_copy_options(buf_T *buf, int flags)
 	    buf->b_p_ml_nobin = p_ml_nobin;
 	    buf->b_p_inf = p_inf;
 	    COPY_OPT_SCTX(buf, BV_INF);
-	    if (cmdmod.cmod_flags & CMOD_NOSWAPFILE)
+	    ಆದರೆ (cmdmod.cmod_flags & CMOD_NOSWAPFILE)
 		buf->b_p_swf = FALSE;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		buf->b_p_swf = p_swf;
 		COPY_OPT_SCTX(buf, BV_SWF);
 	    }
 	    buf->b_p_cpt = vim_strsave(p_cpt);
 	    COPY_OPT_SCTX(buf, BV_CPT);
-#ifdef FEAT_COMPL_FUNC
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_COMPL_FUNC
 	    COPY_OPT_INSECURE(buf->b_p_cpt_flags, BV_CPT);
-	    set_buflocal_cpt_callbacks(buf);
-#endif
-#ifdef BACKSLASH_IN_FILENAME
+	    ಗಣ_buflocal_cpt_callbacks(buf);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ BACKSLASH_ಒಳ_FILENAME
 	    buf->b_p_csl = vim_strsave(p_csl);
 	    COPY_OPT_SCTX(buf, BV_CSL);
-#endif
-#ifdef FEAT_COMPL_FUNC
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_COMPL_FUNC
 	    buf->b_p_cfu = vim_strsave(p_cfu);
 	    COPY_OPT_SCTX(buf, BV_CFU);
-	    set_buflocal_cfu_callback(buf);
+	    ಗಣ_buflocal_cfu_callback(buf);
 	    buf->b_p_ofu = vim_strsave(p_ofu);
 	    COPY_OPT_SCTX(buf, BV_OFU);
-	    set_buflocal_ofu_callback(buf);
-#endif
-#ifdef FEAT_EVAL
+	    ಗಣ_buflocal_ofu_callback(buf);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 	    buf->b_p_tfu = vim_strsave(p_tfu);
 	    COPY_OPT_SCTX(buf, BV_TFU);
-	    set_buflocal_tfu_callback(buf);
-#endif
+	    ಗಣ_buflocal_tfu_callback(buf);
+#ಆದರೆ_ಅಂತ್ಯ
 	    buf->b_p_sts = p_sts;
 	    COPY_OPT_SCTX(buf, BV_STS);
 	    buf->b_p_sts_nopaste = p_sts_nopaste;
-#ifdef FEAT_VARTABS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
 	    buf->b_p_vsts = vim_strsave(p_vsts);
 	    COPY_OPT_SCTX(buf, BV_VSTS);
-	    if (p_vsts && p_vsts != empty_option)
-		(void)tabstop_set(p_vsts, &buf->b_p_vsts_array);
-	    else
-		buf->b_p_vsts_array = NULL;
+	    ಆದರೆ (p_vsts && p_vsts != ಖಾಲಿಗಳು_option)
+		(ಶೂನ್ಯ)tabstop_ಗಣ(p_vsts, &buf->b_p_vsts_array);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		buf->b_p_vsts_array = ಖಾಲಿ;
 	    buf->b_p_vsts_nopaste = p_vsts_nopaste
-				 ? vim_strsave(p_vsts_nopaste) : NULL;
-#endif
+				 ? vim_strsave(p_vsts_nopaste) : ಖಾಲಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 	    buf->b_p_sn = p_sn;
 	    COPY_OPT_SCTX(buf, BV_SN);
 	    buf->b_p_com = vim_strsave(p_com);
@@ -8046,59 +8046,59 @@ buf_copy_options(buf_T *buf, int flags)
 	    COPY_OPT_SCTX(buf, BV_LOP);
 
 	    // Don't copy 'filetype', it must be detected
-	    buf->b_p_ft = empty_option;
+	    buf->b_p_ft = ಖಾಲಿಗಳು_option;
 	    buf->b_p_pi = p_pi;
 	    COPY_OPT_SCTX(buf, BV_PI);
 	    buf->b_p_cinw = vim_strsave(p_cinw);
 	    COPY_OPT_SCTX(buf, BV_CINW);
 	    buf->b_p_lisp = p_lisp;
 	    COPY_OPT_SCTX(buf, BV_LISP);
-#ifdef FEAT_SYN_HL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
 	    // Don't copy 'syntax', it must be set
-	    buf->b_p_syn = empty_option;
+	    buf->b_p_syn = ಖಾಲಿಗಳು_option;
 	    buf->b_p_smc = p_smc;
 	    COPY_OPT_SCTX(buf, BV_SMC);
-	    buf->b_s.b_syn_isk = empty_option;
-#endif
-#ifdef FEAT_SPELL
+	    buf->b_s.b_syn_isk = ಖಾಲಿಗಳು_option;
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SPELL
 	    buf->b_s.b_p_spc = vim_strsave(p_spc);
 	    COPY_OPT_SCTX(buf, BV_SPC);
-	    (void)compile_cap_prog(&buf->b_s);
+	    (ಶೂನ್ಯ)compile_cap_prog(&buf->b_s);
 	    buf->b_s.b_p_spf = vim_strsave(p_spf);
 	    COPY_OPT_SCTX(buf, BV_SPF);
 	    buf->b_s.b_p_spl = vim_strsave(p_spl);
 	    COPY_OPT_SCTX(buf, BV_SPL);
 	    buf->b_s.b_p_spo = vim_strsave(p_spo);
 	    COPY_OPT_SCTX(buf, BV_SPO);
-#endif
-#if defined(FEAT_EVAL)
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(FEAT_EVAL)
 	    buf->b_p_inde = vim_strsave(p_inde);
 	    COPY_OPT_SCTX(buf, BV_INDE);
 	    COPY_OPT_INSECURE(buf->b_p_inde_flags, BV_INDE);
 	    buf->b_p_indk = vim_strsave(p_indk);
 	    COPY_OPT_SCTX(buf, BV_INDK);
-#endif
-	    buf->b_p_fp = empty_option;
-#if defined(FEAT_EVAL)
+#ಆದರೆ_ಅಂತ್ಯ
+	    buf->b_p_fp = ಖಾಲಿಗಳು_option;
+#ಆದರೆ defined(FEAT_EVAL)
 	    buf->b_p_fex = vim_strsave(p_fex);
 	    COPY_OPT_SCTX(buf, BV_FEX);
 	    COPY_OPT_INSECURE(buf->b_p_fex_flags, BV_FEX);
-#endif
-#ifdef FEAT_CRYPT
-	    buf->b_p_key = vim_strsave(p_key);
-	    COPY_OPT_SCTX(buf, BV_KEY);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
+	    buf->b_p_ಕೀಲಿ = vim_strsave(p_ಕೀಲಿ);
+	    COPY_OPT_SCTX(buf, BV_ಕೀಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ
 	    buf->b_p_sua = vim_strsave(p_sua);
 	    COPY_OPT_SCTX(buf, BV_SUA);
-#ifdef FEAT_KEYMAP
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_KEYMAP
 	    buf->b_p_keymap = vim_strsave(p_keymap);
 	    COPY_OPT_SCTX(buf, BV_KMAP);
 	    buf->b_kmap_state |= KEYMAP_INIT;
-#endif
-#ifdef FEAT_TERMINAL
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TERMINAL
 	    buf->b_p_twsl = p_twsl;
 	    COPY_OPT_SCTX(buf, BV_TWSL);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    // This isn't really an option, but copying the langmap and IME
 	    // state from the current buffer is better than resetting it.
 	    buf->b_p_iminsert = p_iminsert;
@@ -8110,92 +8110,92 @@ buf_copy_options(buf_T *buf, int flags)
 	    // are not copied, start using the global value
 	    buf->b_p_ac = -1;
 	    buf->b_p_ar = -1;
-#ifdef HAVE_FSYNC
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_FSYNC
 	    buf->b_p_fs = -1;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    buf->b_p_ul = NO_LOCAL_UNDOLEVEL;
-	    buf->b_p_bkc = empty_option;
+	    buf->b_p_bkc = ಖಾಲಿಗಳು_option;
 	    buf->b_bkc_flags = 0;
-#ifdef FEAT_QUICKFIX
-	    buf->b_p_gefm = empty_option;
-	    buf->b_p_gp = empty_option;
-	    buf->b_p_mp = empty_option;
-	    buf->b_p_efm = empty_option;
-#endif
-	    buf->b_p_ep = empty_option;
-#if defined(FEAT_EVAL)
-	    buf->b_p_ffu = empty_option;
-#endif
-	    buf->b_p_kp = empty_option;
-	    buf->b_p_path = empty_option;
-	    buf->b_p_tags = empty_option;
-	    buf->b_p_tc = empty_option;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
+	    buf->b_p_gefm = ಖಾಲಿಗಳು_option;
+	    buf->b_p_gp = ಖಾಲಿಗಳು_option;
+	    buf->b_p_mp = ಖಾಲಿಗಳು_option;
+	    buf->b_p_efm = ಖಾಲಿಗಳು_option;
+#ಆದರೆ_ಅಂತ್ಯ
+	    buf->b_p_ep = ಖಾಲಿಗಳು_option;
+#ಆದರೆ defined(FEAT_EVAL)
+	    buf->b_p_ffu = ಖಾಲಿಗಳು_option;
+#ಆದರೆ_ಅಂತ್ಯ
+	    buf->b_p_kp = ಖಾಲಿಗಳು_option;
+	    buf->b_p_ಮಾರ್ಗ = ಖಾಲಿಗಳು_option;
+	    buf->b_p_ಟ್ಯಾಗುಗಳು = ಖಾಲಿಗಳು_option;
+	    buf->b_p_tc = ಖಾಲಿಗಳು_option;
 	    buf->b_tc_flags = 0;
-#ifdef FEAT_FIND_ID
-	    buf->b_p_def = empty_option;
-	    buf->b_p_inc = empty_option;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕಂಡುಹಿಡಿ_ID
+	    buf->b_p_def = ಖಾಲಿಗಳು_option;
+	    buf->b_p_inc = ಖಾಲಿಗಳು_option;
 # ifdef FEAT_EVAL
 	    buf->b_p_inex = vim_strsave(p_inex);
 	    COPY_OPT_SCTX(buf, BV_INEX);
 	    COPY_OPT_INSECURE(buf->b_p_inex_flags, BV_INEX);
 # endif
-#endif
-	    buf->b_p_cot = empty_option;
+#ಆದರೆ_ಅಂತ್ಯ
+	    buf->b_p_cot = ಖಾಲಿಗಳು_option;
 	    buf->b_cot_flags = 0;
-	    buf->b_p_dict = empty_option;
-#ifdef FEAT_DIFF
-	    buf->b_p_dia = empty_option;
-#endif
-	    buf->b_p_tsr = empty_option;
-#ifdef FEAT_COMPL_FUNC
-	    buf->b_p_tsrfu = empty_option;
-#endif
+	    buf->b_p_dict = ಖಾಲಿಗಳು_option;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
+	    buf->b_p_dia = ಖಾಲಿಗಳು_option;
+#ಆದರೆ_ಅಂತ್ಯ
+	    buf->b_p_tsr = ಖಾಲಿಗಳು_option;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_COMPL_FUNC
+	    buf->b_p_tsrfu = ಖಾಲಿಗಳು_option;
+#ಆದರೆ_ಅಂತ್ಯ
 	    buf->b_p_qe = vim_strsave(p_qe);
 	    COPY_OPT_SCTX(buf, BV_QE);
-#if defined(FEAT_BEVAL) && defined(FEAT_EVAL)
-	    buf->b_p_bexpr = empty_option;
-#endif
-#if defined(FEAT_CRYPT)
-	    buf->b_p_cm = empty_option;
-#endif
-#ifdef FEAT_PERSISTENT_UNDO
+#ಆದರೆ defined(FEAT_BEVAL) && defined(FEAT_EVAL)
+	    buf->b_p_bexpr = ಖಾಲಿಗಳು_option;
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(FEAT_CRYPT)
+	    buf->b_p_cm = ಖಾಲಿಗಳು_option;
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PERSISTENT_UNDO
 	    buf->b_p_udf = p_udf;
 	    COPY_OPT_SCTX(buf, BV_UDF);
-#endif
-	    buf->b_p_lw = empty_option;
-	    buf->b_p_menc = empty_option;
+#ಆದರೆ_ಅಂತ್ಯ
+	    buf->b_p_lw = ಖಾಲಿಗಳು_option;
+	    buf->b_p_menc = ಖಾಲಿಗಳು_option;
 
 	    // Don't copy the options set by ex_help(), use the saved values,
 	    // when going from a help buffer to a non-help buffer.
 	    // Don't touch these at all when BCO_NOHELP is used and going from
 	    // or to a help buffer.
-	    if (dont_do_help)
+	    ಆದರೆ (dont_do_help)
 	    {
 		buf->b_p_isk = save_p_isk;
-#ifdef FEAT_VARTABS
-		if (p_vts && *p_vts != NUL && !buf->b_p_vts_array)
-		    (void)tabstop_set(p_vts, &buf->b_p_vts_array);
-		else
-		    buf->b_p_vts_array = NULL;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
+		ಆದರೆ (p_vts && *p_vts != NUL && !buf->b_p_vts_array)
+		    (ಶೂನ್ಯ)tabstop_ಗಣ(p_vts, &buf->b_p_vts_array);
+		ಇಲ್ಲದಿದ್ದರೆ
+		    buf->b_p_vts_array = ಖಾಲಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		buf->b_p_isk = vim_strsave(p_isk);
 		COPY_OPT_SCTX(buf, BV_ISK);
 		did_isk = TRUE;
 		buf->b_p_ts = p_ts;
 		COPY_OPT_SCTX(buf, BV_TS);
-#ifdef FEAT_VARTABS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VARTABS
 		buf->b_p_vts = vim_strsave(p_vts);
 		COPY_OPT_SCTX(buf, BV_VTS);
-		if (p_vts && *p_vts != NUL && !buf->b_p_vts_array)
-		    (void)tabstop_set(p_vts, &buf->b_p_vts_array);
-		else
-		    buf->b_p_vts_array = NULL;
-#endif
+		ಆದರೆ (p_vts && *p_vts != NUL && !buf->b_p_vts_array)
+		    (ಶೂನ್ಯ)tabstop_ಗಣ(p_vts, &buf->b_p_vts_array);
+		ಇಲ್ಲದಿದ್ದರೆ
+		    buf->b_p_vts_array = ಖಾಲಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 		buf->b_help = false;
-		if (buf->b_p_bt[0] == 'h')
+		ಆದರೆ (buf->b_p_bt[0] == 'h')
 		    clear_string_option(&buf->b_p_bt);
 		buf->b_p_ma = p_ma;
 		COPY_OPT_SCTX(buf, BV_MA);
@@ -8204,35 +8204,35 @@ buf_copy_options(buf_T *buf, int flags)
 
 	// When the options should be copied (ignoring BCO_ALWAYS), set the
 	// flag that indicates that the options have been initialized.
-	if (should_copy)
+	ಆದರೆ (should_copy)
 	    buf->b_p_initialized = true;
     }
 
     check_buf_options(buf);	    // make sure we don't have NULLs
-    if (did_isk)
-	(void)buf_init_chartab(buf, FALSE);
+    ಆದರೆ (did_isk)
+	(ಶೂನ್ಯ)buf_init_chartab(buf, FALSE);
 }
 
 /*
  * Reset the 'modifiable' option and its default value.
  */
-    void
-reset_modifiable(void)
+    ಶೂನ್ಯ
+reset_modifiable(ಶೂನ್ಯ)
 {
-    int		opt_idx;
+    ಪೂರ್ಣಾಂಕ		opt_idx;
 
     curbuf->b_p_ma = FALSE;
     p_ma = FALSE;
     opt_idx = findoption((char_u *)"ma");
-    if (opt_idx >= 0)
+    ಆದರೆ (opt_idx >= 0)
 	options[opt_idx].def_val[VI_DEFAULT] = FALSE;
 }
 
 /*
  * Set the global value for 'iminsert' to the local value.
  */
-    void
-set_iminsert_global(void)
+    ಶೂನ್ಯ
+ಗಣ_iminsert_global(ಶೂನ್ಯ)
 {
     p_iminsert = curbuf->b_p_iminsert;
 }
@@ -8240,249 +8240,249 @@ set_iminsert_global(void)
 /*
  * Set the global value for 'imsearch' to the local value.
  */
-    void
-set_imsearch_global(void)
+    ಶೂನ್ಯ
+ಗಣ_imsearch_global(ಶೂನ್ಯ)
 {
     p_imsearch = curbuf->b_p_imsearch;
 }
 
-static int expand_option_idx = -1;
-static int expand_option_start_col = 0;
-static char_u expand_option_name[5] = {'t', '_', NUL, NUL, NUL};
-static int expand_option_flags = 0;
-static int expand_option_append = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ expand_option_idx = -1;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ expand_option_ಆರಂಭ_ಲಂಬಸಾಲು = 0;
+ಸ್ಥಿರ char_u expand_option_name[5] = {'t', '_', NUL, NUL, NUL};
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ expand_option_flags = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ expand_option_append = FALSE;
 
-    void
-set_context_in_set_cmd(
+    ಶೂನ್ಯ
+ಗಣ_context_ಒಳ_ಗಣ_cmd(
     expand_T	*xp,
     char_u	*arg,
-    int		opt_flags)	// OPT_GLOBAL and/or OPT_LOCAL
+    ಪೂರ್ಣಾಂಕ		opt_flags)	// OPT_GLOBAL and/or OPT_LOCAL
 {
-    int		nextchar;
+    ಪೂರ್ಣಾಂಕ		nextchar;
     long_u	flags = 0;	// init for GCC
-    int		opt_idx = 0;	// init for GCC
+    ಪೂರ್ಣಾಂಕ		opt_idx = 0;	// init for GCC
     char_u	*p;
     char_u	*s;
-    int		is_term_option = FALSE;
-    int		key;
+    ಪೂರ್ಣಾಂಕ		is_ಪದ_option = FALSE;
+    ಪೂರ್ಣಾಂಕ		ಕೀಲಿ;
     char_u	*argend;
 
     expand_option_flags = opt_flags;
 
     xp->xp_context = EXPAND_SETTINGS;
-    if (*arg == NUL)
+    ಆದರೆ (*arg == NUL)
     {
-	xp->xp_pattern = arg;
-	return;
+	xp->xp_ನಮೂನೆ = arg;
+	ಹಿಂತಿರುಗಿ;
     }
     argend = arg + STRLEN(arg);
     p = argend - 1;
-    if (*p == ' ' && *(p - 1) != '\\')
+    ಆದರೆ (*p == ' ' && *(p - 1) != '\\')
     {
-	xp->xp_pattern = p + 1;
-	return;
+	xp->xp_ನಮೂನೆ = p + 1;
+	ಹಿಂತಿರುಗಿ;
     }
-    while (p > arg)
+    ಆಗ (p > arg)
     {
 	s = p;
 	// count number of backslashes before ' ' or ','
-	if (*p == ' ' || *p == ',')
+	ಆದರೆ (*p == ' ' || *p == ',')
 	{
-	    while (s > arg && *(s - 1) == '\\')
+	    ಆಗ (s > arg && *(s - 1) == '\\')
 		--s;
 	}
 	// break at a space with an even number of backslashes
-	if (*p == ' ' && ((p - s) & 1) == 0)
+	ಆದರೆ (*p == ' ' && ((p - s) & 1) == 0)
 	{
 	    ++p;
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
 	--p;
     }
-    if (STRNCMP(p, "no", 2) == 0 && STRNCMP(p, "novice", 6) != 0)
+    ಆದರೆ (STRNCMP(p, "no", 2) == 0 && STRNCMP(p, "novice", 6) != 0)
     {
 	xp->xp_context = EXPAND_BOOL_SETTINGS;
-	xp->xp_prefix = XP_PREFIX_NO;
+	xp->xp_ಪೂರ್ವಪ್ರತ್ಯಯ = XP_ಪೂರ್ವಪ್ರತ್ಯಯ_NO;
 	p += 2;
     }
-    else if (STRNCMP(p, "inv", 3) == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRNCMP(p, "inv", 3) == 0)
     {
 	xp->xp_context = EXPAND_BOOL_SETTINGS;
-	xp->xp_prefix = XP_PREFIX_INV;
+	xp->xp_ಪೂರ್ವಪ್ರತ್ಯಯ = XP_ಪೂರ್ವಪ್ರತ್ಯಯ_INV;
 	p += 3;
     }
-    xp->xp_pattern = arg = p;
-    if (*arg == '<')
+    xp->xp_ನಮೂನೆ = arg = p;
+    ಆದರೆ (*arg == '<')
     {
-	while (*p != '>')
-	    if (*p++ == NUL)	    // expand terminal option name
-		return;
-	key = get_special_key_code(arg + 1);
-	if (key == 0)		    // unknown name
+	ಆಗ (*p != '>')
+	    ಆದರೆ (*p++ == NUL)	    // expand terminal option name
+		ಹಿಂತಿರುಗಿ;
+	ಕೀಲಿ = get_special_ಕೀಲಿ_ಸಂಕೇತ(arg + 1);
+	ಆದರೆ (ಕೀಲಿ == 0)		    // unknown name
 	{
 	    xp->xp_context = EXPAND_NOTHING;
-	    return;
+	    ಹಿಂತಿರುಗಿ;
 	}
 	nextchar = *++p;
-	is_term_option = TRUE;
-	expand_option_name[2] = KEY2TERMCAP0(key);
-	expand_option_name[3] = KEY2TERMCAP1(key);
+	is_ಪದ_option = TRUE;
+	expand_option_name[2] = KEY2TERMCAP0(ಕೀಲಿ);
+	expand_option_name[3] = KEY2TERMCAP1(ಕೀಲಿ);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (p[0] == 't' && p[1] == '_')
+	ಆದರೆ (p[0] == 't' && p[1] == '_')
 	{
 	    p += 2;
-	    if (*p != NUL)
+	    ಆದರೆ (*p != NUL)
 		++p;
-	    if (*p == NUL)
-		return;		// expand option name
+	    ಆದರೆ (*p == NUL)
+		ಹಿಂತಿರುಗಿ;		// expand option name
 	    nextchar = *++p;
-	    is_term_option = TRUE;
+	    is_ಪದ_option = TRUE;
 	    expand_option_name[2] = p[-2];
 	    expand_option_name[3] = p[-1];
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // Allow * wildcard
-	    while (ASCII_ISALNUM(*p) || *p == '_' || *p == '*')
+	    ಆಗ (ASCII_ISALNUM(*p) || *p == '_' || *p == '*')
 		p++;
-	    if (*p == NUL)
-		return;
+	    ಆದರೆ (*p == NUL)
+		ಹಿಂತಿರುಗಿ;
 	    nextchar = *p;
 	    *p = NUL;
 	    opt_idx = findoption(arg);
 	    *p = nextchar;
-	    if (opt_idx == -1 || options[opt_idx].var == NULL)
+	    ಆದರೆ (opt_idx == -1 || options[opt_idx].var == ಖಾಲಿ)
 	    {
 		xp->xp_context = EXPAND_NOTHING;
-		return;
+		ಹಿಂತಿರುಗಿ;
 	    }
 	    flags = options[opt_idx].flags;
-	    if (flags & P_BOOL)
+	    ಆದರೆ (flags & P_BOOL)
 	    {
 		xp->xp_context = EXPAND_NOTHING;
-		return;
+		ಹಿಂತಿರುಗಿ;
 	    }
 	}
     }
     // handle "-=" and "+="
     expand_option_append = FALSE;
-    int expand_option_subtract = FALSE;
-    if ((nextchar == '-' || nextchar == '+' || nextchar == '^') && p[1] == '=')
+    ಪೂರ್ಣಾಂಕ expand_option_ಕಳೆ = FALSE;
+    ಆದರೆ ((nextchar == '-' || nextchar == '+' || nextchar == '^') && p[1] == '=')
     {
-	if (nextchar == '-')
-	    expand_option_subtract = TRUE;
-	if (nextchar == '+' || nextchar == '^')
+	ಆದರೆ (nextchar == '-')
+	    expand_option_ಕಳೆ = TRUE;
+	ಆದರೆ (nextchar == '+' || nextchar == '^')
 	    expand_option_append = TRUE;
 	++p;
 	nextchar = '=';
     }
-    if ((nextchar != '=' && nextchar != ':')
+    ಆದರೆ ((nextchar != '=' && nextchar != ':')
 				    || xp->xp_context == EXPAND_BOOL_SETTINGS)
     {
 	xp->xp_context = EXPAND_UNSUCCESSFUL;
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
     // Below are for handling expanding a specific option's value after the '='
     // or ':'
 
-    if (is_term_option)
+    ಆದರೆ (is_ಪದ_option)
 	expand_option_idx = -1;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	expand_option_idx = opt_idx;
 
-    if (!is_term_option)
+    ಆದರೆ (!is_ಪದ_option)
     {
-	if (options[opt_idx].flags & P_NO_CMD_EXPAND)
+	ಆದರೆ (options[opt_idx].flags & P_NO_CMD_EXPAND)
 	{
 	    xp->xp_context=EXPAND_UNSUCCESSFUL;
-	    return;
+	    ಹಿಂತಿರುಗಿ;
 	}
     }
 
-    xp->xp_pattern = p + 1;
-    expand_option_start_col = (int)(p + 1 - xp->xp_line);
+    xp->xp_ನಮೂನೆ = p + 1;
+    expand_option_ಆರಂಭ_ಲಂಬಸಾಲು = (ಪೂರ್ಣಾಂಕ)(p + 1 - xp->xp_ಸಾಲು);
 
     // Certain options currently have special case handling to reuse the
     // expansion logic with other commands.
-#ifdef FEAT_SYN_HL
-    if (options[opt_idx].var == (char_u *)&p_syn)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYN_HL
+    ಆದರೆ (options[opt_idx].var == (char_u *)&p_syn)
     {
 	xp->xp_context = EXPAND_OWNSYNTAX;
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
-#endif
-    if (options[opt_idx].var == (char_u *)&p_ft)
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (options[opt_idx].var == (char_u *)&p_ft)
     {
 	xp->xp_context = EXPAND_FILETYPE;
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
-#ifdef FEAT_KEYMAP
-    if (options[opt_idx].var == (char_u *)&p_keymap)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_KEYMAP
+    ಆದರೆ (options[opt_idx].var == (char_u *)&p_keymap)
     {
 	xp->xp_context = EXPAND_KEYMAP;
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Now pick. If the option has a custom expander, use that. Otherwise, just
     // fill with the existing option value.
-    if (expand_option_subtract)
+    ಆದರೆ (expand_option_ಕಳೆ)
     {
-	xp->xp_context = EXPAND_SETTING_SUBTRACT;
-	return;
+	xp->xp_context = EXPAND_SETTING_ಕಳೆ;
+	ಹಿಂತಿರುಗಿ;
     }
-    else if (expand_option_idx >= 0 &&
-	    options[expand_option_idx].opt_expand_cb != NULL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (expand_option_idx >= 0 &&
+	    options[expand_option_idx].opt_expand_cb != ಖಾಲಿ)
     {
 	xp->xp_context = EXPAND_STRING_SETTING;
     }
-    else if (*xp->xp_pattern == NUL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*xp->xp_ನಮೂನೆ == NUL)
     {
 	xp->xp_context = EXPAND_OLD_SETTING;
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	xp->xp_context = EXPAND_NOTHING;
 
-    if (is_term_option || (flags & P_NUM))
-	return;
+    ಆದರೆ (is_ಪದ_option || (flags & P_ಅಂಕೆ))
+	ಹಿಂತಿರುಗಿ;
 
     // Only string options below
 
     // Options that have P_EXPAND are considered to all use file/dir expansion.
-    if (flags & P_EXPAND)
+    ಆದರೆ (flags & P_EXPAND)
     {
 	p = options[opt_idx].var;
-	if (p == (char_u *)&p_bdir
+	ಆದರೆ (p == (char_u *)&p_bdir
 		|| p == (char_u *)&p_dir
-		|| p == (char_u *)&p_path
+		|| p == (char_u *)&p_ಮಾರ್ಗ
 		|| p == (char_u *)&p_pp
 		|| p == (char_u *)&p_rtp
 		|| p == (char_u *)&p_cdpath
-#ifdef FEAT_SESSION
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SESSION
 		|| p == (char_u *)&p_vdir
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		)
 	{
 	    xp->xp_context = EXPAND_DIRECTORIES;
-	    if (p == (char_u *)&p_path || p == (char_u *)&p_cdpath)
+	    ಆದರೆ (p == (char_u *)&p_ಮಾರ್ಗ || p == (char_u *)&p_cdpath)
 		xp->xp_backslash = XP_BS_THREE;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		xp->xp_backslash = XP_BS_ONE;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    xp->xp_context = EXPAND_FILES;
 	    // for 'tags' need three backslashes for a space
-	    if (p == (char_u *)&p_tags)
+	    ಆದರೆ (p == (char_u *)&p_ಟ್ಯಾಗುಗಳು)
 		xp->xp_backslash = XP_BS_THREE;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		xp->xp_backslash = XP_BS_ONE;
 	}
-	if (flags & P_COMMA)
+	ಆದರೆ (flags & P_COMMA)
 	    xp->xp_backslash |= XP_BS_COMMA;
     }
 
@@ -8491,27 +8491,27 @@ set_context_in_set_cmd(
     // pattern, while accounting for backslash-escaped space/commas/colons.
     // Triple-backslashed escaped file names (e.g. 'path') can also be
     // delimited by space.
-    if ((flags & P_EXPAND) || (flags & P_COMMA) || (flags & P_COLON))
+    ಆದರೆ ((flags & P_EXPAND) || (flags & P_COMMA) || (flags & P_COLON))
     {
-	for (p = argend - 1; p >= xp->xp_pattern; --p)
+	ಗಾಗಿ (p = argend - 1; p >= xp->xp_ನಮೂನೆ; --p)
 	{
 	    // count number of backslashes before ' ' or ',' or ':'
-	    if (*p == ' ' || *p == ',' ||
+	    ಆದರೆ (*p == ' ' || *p == ',' ||
 		    (*p == ':' && (flags & P_COLON)))
 	    {
 		s = p;
-		while (s > xp->xp_pattern && *(s - 1) == '\\')
+		ಆಗ (s > xp->xp_ನಮೂನೆ && *(s - 1) == '\\')
 		    --s;
-		if ((*p == ' ' && ((xp->xp_backslash & XP_BS_THREE) && (p - s) < 3))
-#if defined(BACKSLASH_IN_FILENAME)
+		ಆದರೆ ((*p == ' ' && ((xp->xp_backslash & XP_BS_THREE) && (p - s) < 3))
+#ಆದರೆ defined(BACKSLASH_ಒಳ_FILENAME)
 			|| (*p == ',' && (flags & P_COMMA) && (p - s) < 1)
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 			|| (*p == ',' && (flags & P_COMMA) && (p - s) < 2)
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 			|| (*p == ':' && (flags & P_COLON)))
 		{
-		    xp->xp_pattern = p + 1;
-		    break;
+		    xp->xp_ನಮೂನೆ = p + 1;
+		    ನಿಲ್ಲಿಸು;
 		}
 	    }
 	}
@@ -8519,26 +8519,26 @@ set_context_in_set_cmd(
 
     // An option that is a list of single-character flags should always start
     // at the end as we don't complete words.
-    if (flags & P_FLAGLIST)
-	xp->xp_pattern = argend;
+    ಆದರೆ (flags & P_FLAGLIST)
+	xp->xp_ನಮೂನೆ = argend;
 
     // Some options can either be using file/dir expansions, or custom value
     // expansion depending on what the user typed. Unfortunately we have to
     // manually handle it here to make sure we have the correct xp_context set.
-#ifdef FEAT_SPELL
-    if (options[opt_idx].var == (char_u *)&p_sps)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SPELL
+    ಆದರೆ (options[opt_idx].var == (char_u *)&p_sps)
     {
-	if (STRNCMP(xp->xp_pattern, "file:", 5) == 0)
+	ಆದರೆ (STRNCMP(xp->xp_ನಮೂನೆ, "file:", 5) == 0)
 	{
-	    xp->xp_pattern += 5;
-	    return;
+	    xp->xp_ನಮೂನೆ += 5;
+	    ಹಿಂತಿರುಗಿ;
 	}
-	else if (options[expand_option_idx].opt_expand_cb != NULL)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (options[expand_option_idx].opt_expand_cb != ಖಾಲಿ)
 	{
 	    xp->xp_context = EXPAND_STRING_SETTING;
 	}
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
@@ -8557,135 +8557,135 @@ set_context_in_set_cmd(
  * If 'test_only' is FALSE and 'fuzzy' is TRUE and if 'str' fuzzy matches
  * 'fuzzystr', then stores the match details in fuzmatch[idx] and returns TRUE.
  */
-    static int
-match_str(
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಹೊಂದಿಕೆ_str(
 	char_u		*str,
 	regmatch_T	*regmatch,
 	char_u		**matches,
-	int		idx,
-	int		test_only,
-	int		fuzzy,
+	ಪೂರ್ಣಾಂಕ		idx,
+	ಪೂರ್ಣಾಂಕ		test_only,
+	ಪೂರ್ಣಾಂಕ		fuzzy,
 	char_u		*fuzzystr,
 	fuzmatch_str_T  *fuzmatch)
 {
-    if (!fuzzy)
+    ಆದರೆ (!fuzzy)
     {
-	if (vim_regexec(regmatch, str, (colnr_T)0))
+	ಆದರೆ (vim_regexec(regmatch, str, (colnr_T)0))
 	{
-	    if (!test_only)
+	    ಆದರೆ (!test_only)
 		matches[idx] = vim_strsave(str);
-	    return TRUE;
+	    ಹಿಂತಿರುಗಿ TRUE;
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	int score;
+	ಪೂರ್ಣಾಂಕ score;
 
-	score = fuzzy_match_str(str, fuzzystr);
-	if (score != FUZZY_SCORE_NONE)
+	score = fuzzy_ಹೊಂದಿಕೆ_str(str, fuzzystr);
+	ಆದರೆ (score != FUZZY_SCORE_NONE)
 	{
-	    if (!test_only)
+	    ಆದರೆ (!test_only)
 	    {
 		fuzmatch[idx].idx = idx;
 		fuzmatch[idx].str = vim_strsave(str);
 		fuzmatch[idx].score = score;
 	    }
 
-	    return TRUE;
+	    ಹಿಂತಿರುಗಿ TRUE;
 	}
     }
 
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
-    int
+    ಪೂರ್ಣಾಂಕ
 ExpandSettings(
     expand_T	*xp,
     regmatch_T	*regmatch,
     char_u	*fuzzystr,
-    int		*numMatches,
+    ಪೂರ್ಣಾಂಕ		*ಅಂಕೆ_Matches,
     char_u	***matches,
-    int		can_fuzzy)
+    ಪೂರ್ಣಾಂಕ		can_fuzzy)
 {
-    int		num_normal = 0;	    // Nr of matching non-term-code settings
-    int		num_term = 0;	    // Nr of matching terminal code settings
-    int		opt_idx;
-    int		match;
-    int		count = 0;
+    ಪೂರ್ಣಾಂಕ		ಅಂಕೆ_ಸಾಮಾನ್ಯ = 0;	    // Nr of matching non-term-code settings
+    ಪೂರ್ಣಾಂಕ		ಅಂಕೆ_ಪದ = 0;	    // Nr of matching terminal code settings
+    ಪೂರ್ಣಾಂಕ		opt_idx;
+    ಪೂರ್ಣಾಂಕ		ಹೊಂದಿಕೆ;
+    ಪೂರ್ಣಾಂಕ		ಎಣಿಕೆ_2 = 0;
     char_u	*str;
-    int		loop;
-    int		is_term_opt;
-    char_u	name_buf[MAX_KEY_NAME_LEN];
-    static char *(names[]) = {"all", "termcap"};
-    int		ic = regmatch->rm_ic;	// remember the ignore-case flag
-    int		fuzzy;
-    fuzmatch_str_T  *fuzmatch = NULL;
+    ಪೂರ್ಣಾಂಕ		loop;
+    ಪೂರ್ಣಾಂಕ		is_ಪದ_opt;
+    char_u	name_buf[MAX_ಕೀಲಿ_NAME_LEN];
+    ಸ್ಥಿರ ಅಕ್ಷರ *(ಹೆಸರುಗಳು[]) = {"all", "termcap"};
+    ಪೂರ್ಣಾಂಕ		ic = regmatch->rm_ic;	// remember the ignore-case flag
+    ಪೂರ್ಣಾಂಕ		fuzzy;
+    fuzmatch_str_T  *fuzmatch = ಖಾಲಿ;
 
     fuzzy = can_fuzzy && cmdline_fuzzy_complete(fuzzystr);
 
     // do this loop twice:
     // loop == 0: count the number of matching options
     // loop == 1: copy the matching options into allocated memory
-    for (loop = 0; loop <= 1; ++loop)
+    ಗಾಗಿ (loop = 0; loop <= 1; ++loop)
     {
 	regmatch->rm_ic = ic;
-	if (xp->xp_context != EXPAND_BOOL_SETTINGS)
+	ಆದರೆ (xp->xp_context != EXPAND_BOOL_SETTINGS)
 	{
-	    for (match = 0; match < (int)ARRAY_LENGTH(names); ++match)
+	    ಗಾಗಿ (ಹೊಂದಿಕೆ = 0; ಹೊಂದಿಕೆ < (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(ಹೆಸರುಗಳು); ++ಹೊಂದಿಕೆ)
 	    {
-		if (match_str((char_u *)names[match], regmatch, *matches,
-			    count, (loop == 0), fuzzy, fuzzystr, fuzmatch))
+		ಆದರೆ (ಹೊಂದಿಕೆ_str((char_u *)ಹೆಸರುಗಳು[ಹೊಂದಿಕೆ], regmatch, *matches,
+			    ಎಣಿಕೆ_2, (loop == 0), fuzzy, fuzzystr, fuzmatch))
 		{
-		    if (loop == 0)
-			num_normal++;
-		    else
-			count++;
+		    ಆದರೆ (loop == 0)
+			ಅಂಕೆ_ಸಾಮಾನ್ಯ++;
+		    ಇಲ್ಲದಿದ್ದರೆ
+			ಎಣಿಕೆ_2++;
 		}
 	    }
 	}
-	for (opt_idx = 0; (str = (char_u *)options[opt_idx].fullname) != NULL;
+	ಗಾಗಿ (opt_idx = 0; (str = (char_u *)options[opt_idx].fullname) != ಖಾಲಿ;
 								    opt_idx++)
 	{
-	    if (options[opt_idx].var == NULL)
-		continue;
-	    if (xp->xp_context == EXPAND_BOOL_SETTINGS
+	    ಆದರೆ (options[opt_idx].var == ಖಾಲಿ)
+		ಮುಂದುವರಿ;
+	    ಆದರೆ (xp->xp_context == EXPAND_BOOL_SETTINGS
 		    && !(options[opt_idx].flags & P_BOOL))
-		continue;
-	    is_term_opt = istermoption_idx(opt_idx);
-	    if (is_term_opt && num_normal > 0)
-		continue;
+		ಮುಂದುವರಿ;
+	    is_ಪದ_opt = istermoption_idx(opt_idx);
+	    ಆದರೆ (is_ಪದ_opt && ಅಂಕೆ_ಸಾಮಾನ್ಯ > 0)
+		ಮುಂದುವರಿ;
 
-	    if (match_str(str, regmatch, *matches, count, (loop == 0),
+	    ಆದರೆ (ಹೊಂದಿಕೆ_str(str, regmatch, *matches, ಎಣಿಕೆ_2, (loop == 0),
 						fuzzy, fuzzystr, fuzmatch))
 	    {
-		if (loop == 0)
+		ಆದರೆ (loop == 0)
 		{
-		    if (is_term_opt)
-			num_term++;
-		    else
-			num_normal++;
+		    ಆದರೆ (is_ಪದ_opt)
+			ಅಂಕೆ_ಪದ++;
+		    ಇಲ್ಲದಿದ್ದರೆ
+			ಅಂಕೆ_ಸಾಮಾನ್ಯ++;
 		}
-		else
-		    count++;
+		ಇಲ್ಲದಿದ್ದರೆ
+		    ಎಣಿಕೆ_2++;
 	    }
-	    else if (!fuzzy && options[opt_idx].shortname != NULL
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!fuzzy && options[opt_idx].shortname != ಖಾಲಿ
 			&& vim_regexec(regmatch,
 			     (char_u *)options[opt_idx].shortname, (colnr_T)0))
 	    {
 		// Compare against the abbreviated option name (for regular
 		// expression match). Fuzzy matching (previous if) already
 		// matches against both the expanded and abbreviated names.
-		if (loop == 0)
+		ಆದರೆ (loop == 0)
 		{
-		    if (is_term_opt)
-			num_term++;
-		    else
-			num_normal++;
+		    ಆದರೆ (is_ಪದ_opt)
+			ಅಂಕೆ_ಪದ++;
+		    ಇಲ್ಲದಿದ್ದರೆ
+			ಅಂಕೆ_ಸಾಮಾನ್ಯ++;
 		}
-		else
-		    (*matches)[count++] = vim_strsave(str);
+		ಇಲ್ಲದಿದ್ದರೆ
+		    (*matches)[ಎಣಿಕೆ_2++] = vim_strsave(str);
 	    }
-	    else if (is_term_opt)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (is_ಪದ_opt)
 	    {
 		name_buf[0] = '<';
 		name_buf[1] = 't';
@@ -8695,24 +8695,24 @@ ExpandSettings(
 		name_buf[5] = '>';
 		name_buf[6] = NUL;
 
-		if (match_str(name_buf, regmatch, *matches, count, (loop == 0),
+		ಆದರೆ (ಹೊಂದಿಕೆ_str(name_buf, regmatch, *matches, ಎಣಿಕೆ_2, (loop == 0),
 			    fuzzy, fuzzystr, fuzmatch))
 		{
-		    if (loop == 0)
-			num_term++;
-		    else
-			count++;
+		    ಆದರೆ (loop == 0)
+			ಅಂಕೆ_ಪದ++;
+		    ಇಲ್ಲದಿದ್ದರೆ
+			ಎಣಿಕೆ_2++;
 		}
 	    }
 	}
 
 	// Check terminal key codes, these are not in the option table
-	if (xp->xp_context != EXPAND_BOOL_SETTINGS  && num_normal == 0)
+	ಆದರೆ (xp->xp_context != EXPAND_BOOL_SETTINGS  && ಅಂಕೆ_ಸಾಮಾನ್ಯ == 0)
 	{
-	    for (opt_idx = 0; (str = get_termcode(opt_idx)) != NULL; opt_idx++)
+	    ಗಾಗಿ (opt_idx = 0; (str = get_termcode(opt_idx)) != ಖಾಲಿ; opt_idx++)
 	    {
-		if (!SAFE_isprint(str[0]) || !SAFE_isprint(str[1]))
-		    continue;
+		ಆದರೆ (!ಸುರಕ್ಷಿತ_isprint(str[0]) || !ಸುರಕ್ಷಿತ_isprint(str[1]))
+		    ಮುಂದುವರಿ;
 
 		name_buf[0] = 't';
 		name_buf[1] = '_';
@@ -8720,15 +8720,15 @@ ExpandSettings(
 		name_buf[3] = str[1];
 		name_buf[4] = NUL;
 
-		if (match_str(name_buf, regmatch, *matches, count,
+		ಆದರೆ (ಹೊಂದಿಕೆ_str(name_buf, regmatch, *matches, ಎಣಿಕೆ_2,
 				       (loop == 0), fuzzy, fuzzystr, fuzmatch))
 		{
-		    if (loop == 0)
-			num_term++;
-		    else
-			count++;
+		    ಆದರೆ (loop == 0)
+			ಅಂಕೆ_ಪದ++;
+		    ಇಲ್ಲದಿದ್ದರೆ
+			ಎಣಿಕೆ_2++;
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    name_buf[0] = '<';
 		    name_buf[1] = 't';
@@ -8738,75 +8738,75 @@ ExpandSettings(
 		    name_buf[5] = '>';
 		    name_buf[6] = NUL;
 
-		    if (match_str(name_buf, regmatch, *matches, count,
+		    ಆದರೆ (ಹೊಂದಿಕೆ_str(name_buf, regmatch, *matches, ಎಣಿಕೆ_2,
 					    (loop == 0), fuzzy, fuzzystr,
 					    fuzmatch))
 		    {
-			if (loop == 0)
-			    num_term++;
-			else
-			    count++;
+			ಆದರೆ (loop == 0)
+			    ಅಂಕೆ_ಪದ++;
+			ಇಲ್ಲದಿದ್ದರೆ
+			    ಎಣಿಕೆ_2++;
 		    }
 		}
 	    }
 
 	    // Check special key names.
 	    regmatch->rm_ic = TRUE;		// ignore case here
-	    for (opt_idx = 0; (str = get_key_name(opt_idx)) != NULL; opt_idx++)
+	    ಗಾಗಿ (opt_idx = 0; (str = get_ಕೀಲಿ_name(opt_idx)) != ಖಾಲಿ; opt_idx++)
 	    {
 		name_buf[0] = '<';
 		STRCPY(name_buf + 1, str);
 		STRCAT(name_buf, ">");
 
-		if (match_str(name_buf, regmatch, *matches, count, (loop == 0),
+		ಆದರೆ (ಹೊಂದಿಕೆ_str(name_buf, regmatch, *matches, ಎಣಿಕೆ_2, (loop == 0),
 			    fuzzy, fuzzystr, fuzmatch))
 		{
-		    if (loop == 0)
-			num_term++;
-		    else
-			count++;
+		    ಆದರೆ (loop == 0)
+			ಅಂಕೆ_ಪದ++;
+		    ಇಲ್ಲದಿದ್ದರೆ
+			ಎಣಿಕೆ_2++;
 		}
 	    }
 	}
-	if (loop == 0)
+	ಆದರೆ (loop == 0)
 	{
-	    if (num_normal > 0)
-		*numMatches = num_normal;
-	    else if (num_term > 0)
-		*numMatches = num_term;
-	    else
-		return OK;
-	    if (!fuzzy)
+	    ಆದರೆ (ಅಂಕೆ_ಸಾಮಾನ್ಯ > 0)
+		*ಅಂಕೆ_Matches = ಅಂಕೆ_ಸಾಮಾನ್ಯ;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಅಂಕೆ_ಪದ > 0)
+		*ಅಂಕೆ_Matches = ಅಂಕೆ_ಪದ;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ಹಿಂತಿರುಗಿ OK;
+	    ಆದರೆ (!fuzzy)
 	    {
-		*matches = ALLOC_MULT(char_u *, *numMatches);
-		if (*matches == NULL)
+		*matches = ALLOC_MULT(char_u *, *ಅಂಕೆ_Matches);
+		ಆದರೆ (*matches == ಖಾಲಿ)
 		{
 		    *matches = (char_u **)"";
-		    return FAIL;
+		    ಹಿಂತಿರುಗಿ FAIL;
 		}
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		fuzmatch = ALLOC_MULT(fuzmatch_str_T, *numMatches);
-		if (fuzmatch == NULL)
+		fuzmatch = ALLOC_MULT(fuzmatch_str_T, *ಅಂಕೆ_Matches);
+		ಆದರೆ (fuzmatch == ಖಾಲಿ)
 		{
 		    *matches = (char_u **)"";
-		    return FAIL;
+		    ಹಿಂತಿರುಗಿ FAIL;
 		}
 	    }
 	}
     }
 
-    if (fuzzy &&
-	fuzzymatches_to_strmatches(fuzmatch, matches, count, FALSE) == FAIL)
-	return FAIL;
+    ಆದರೆ (fuzzy &&
+	fuzzymatches_ಗಮ್ಯ_strmatches(fuzmatch, matches, ಎಣಿಕೆ_2, FALSE) == FAIL)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 // Escape an option value that can be used on the command-line with :set.
 // Caller needs to free the returned string, unless NULL is returned.
-    static char_u*
+    ಸ್ಥಿರ char_u*
 escape_option_str_cmdline(char_u *var)
 {
     char_u *buf;
@@ -8814,97 +8814,97 @@ escape_option_str_cmdline(char_u *var)
     // A backslash is required before some characters.  This is the reverse of
     // what happens in do_set().
     buf = vim_strsave_escaped(var, escape_chars);
-    if (buf == NULL)
-	return NULL;
+    ಆದರೆ (buf == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-#ifdef BACKSLASH_IN_FILENAME
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ BACKSLASH_ಒಳ_FILENAME
     // For MS-Windows et al. we don't double backslashes at the start and
     // before a file name character.
     // The reverse is found at stropt_copy_value().
-    for (var = buf; *var != NUL; MB_PTR_ADV(var))
-	if (var[0] == '\\' && var[1] == '\\'
+    ಗಾಗಿ (var = buf; *var != NUL; MB_PTR_ADV(var))
+	ಆದರೆ (var[0] == '\\' && var[1] == '\\'
 		&& expand_option_idx >= 0
 		&& (options[expand_option_idx].flags & P_EXPAND)
 		&& vim_isfilec(var[2])
 		&& (var[2] != '\\' || (var == buf && var[4] != '\\')))
 	    STRMOVE(var, var + 1);
-#endif
-    return buf;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ buf;
 }
 
 /*
  * Expansion handler for :set= when we just want to fill in with the existing value.
  */
-    int
-ExpandOldSetting(int *numMatches, char_u ***matches)
+    ಪೂರ್ಣಾಂಕ
+ExpandOldSetting(ಪೂರ್ಣಾಂಕ *ಅಂಕೆ_Matches, char_u ***matches)
 {
-    char_u  *var = NULL;	// init for GCC
+    char_u  *var = ಖಾಲಿ;	// init for GCC
     char_u  *buf;
 
-    *numMatches = 0;
+    *ಅಂಕೆ_Matches = 0;
     *matches = ALLOC_MULT(char_u *, 1);
-    if (*matches == NULL)
-	return FAIL;
+    ಆದರೆ (*matches == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
     // For a terminal key code expand_option_idx is < 0.
-    if (expand_option_idx < 0)
+    ಆದರೆ (expand_option_idx < 0)
     {
-	var = find_termcode(expand_option_name + 2);
-	if (var == NULL)
+	var = ಕಂಡುಹಿಡಿ_termcode(expand_option_name + 2);
+	ಆದರೆ (var == ಖಾಲಿ)
 	    expand_option_idx = findoption(expand_option_name);
     }
 
-    if (expand_option_idx >= 0)
+    ಆದರೆ (expand_option_idx >= 0)
     {
 	// put string of option value in NameBuff
 	option_value2string(&options[expand_option_idx], expand_option_flags);
 	var = NameBuff;
     }
-    else if (var == NULL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (var == ಖಾಲಿ)
 	var = (char_u *)"";
 
     buf = escape_option_str_cmdline(var);
-    if (buf == NULL)
+    ಆದರೆ (buf == ಖಾಲಿ)
     {
 	VIM_CLEAR(*matches);
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
     (*matches)[0] = buf;
-    *numMatches = 1;
-    return OK;
+    *ಅಂಕೆ_Matches = 1;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Expansion handler for :set=/:set+= when the option has a custom expansion handler.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 ExpandStringSetting(
     expand_T	*xp,
     regmatch_T	*regmatch,
-    int		*numMatches,
+    ಪೂರ್ಣಾಂಕ		*ಅಂಕೆ_Matches,
     char_u	***matches)
 {
-    char_u  *var = NULL;	// init for GCC
+    char_u  *var = ಖಾಲಿ;	// init for GCC
     char_u  *buf;
 
-    if (expand_option_idx < 0 ||
-	    options[expand_option_idx].opt_expand_cb == NULL)
+    ಆದರೆ (expand_option_idx < 0 ||
+	    options[expand_option_idx].opt_expand_cb == ಖಾಲಿ)
     {
 	// Not supposed to reach this. This function is only for options with
 	// custom expansion callbacks.
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
-    optexpand_T args;
-    args.oe_varp = get_varp_scope(&options[expand_option_idx], expand_option_flags);
-    args.oe_append = expand_option_append;
-    args.oe_regmatch = regmatch;
-    args.oe_xp = xp;
-    args.oe_set_arg = xp->xp_line + expand_option_start_col;
-    args.oe_include_orig_val =
+    optexpand_T ವಾದಗಳು;
+    ವಾದಗಳು.oe_varp = get_varp_scope(&options[expand_option_idx], expand_option_flags);
+    ವಾದಗಳು.oe_append = expand_option_append;
+    ವಾದಗಳು.oe_regmatch = regmatch;
+    ವಾದಗಳು.oe_xp = xp;
+    ವಾದಗಳು.oe_ಗಣ_arg = xp->xp_ಸಾಲು + expand_option_ಆರಂಭ_ಲಂಬಸಾಲು;
+    ವಾದಗಳು.oe_include_orig_val =
 	!expand_option_append &&
-	(*args.oe_set_arg == NUL);
+	(*ವಾದಗಳು.oe_ಗಣ_arg == NUL);
 
     // Retrieve the existing value, but escape it as a reverse of setting it.
     // We technically only need to do this when oe_append or
@@ -8912,39 +8912,39 @@ ExpandStringSetting(
     option_value2string(&options[expand_option_idx], expand_option_flags);
     var = NameBuff;
     buf = escape_option_str_cmdline(var);
-    if (buf == NULL)
-	return FAIL;
+    ಆದರೆ (buf == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    args.oe_opt_value = buf;
+    ವಾದಗಳು.oe_opt_ಮೌಲ್ಯ = buf;
 
-    int num_ret = options[expand_option_idx].opt_expand_cb(&args, numMatches, matches);
+    ಪೂರ್ಣಾಂಕ ಅಂಕೆ_ret = options[expand_option_idx].opt_expand_cb(&ವಾದಗಳು, ಅಂಕೆ_Matches, matches);
 
     vim_free(buf);
-    return num_ret;
+    ಹಿಂತಿರುಗಿ ಅಂಕೆ_ret;
 }
 
 /*
  * Expansion handler for :set-=
  */
-    int
-ExpandSettingSubtract(
+    ಪೂರ್ಣಾಂಕ
+Expand_Setting_ಕಳೆ(
     expand_T	*xp,
     regmatch_T	*regmatch,
-    int		*numMatches,
+    ಪೂರ್ಣಾಂಕ		*ಅಂಕೆ_Matches,
     char_u	***matches)
 {
-    if (expand_option_idx < 0)
+    ಆದರೆ (expand_option_idx < 0)
 	// term option
-	return ExpandOldSetting(numMatches, matches);
+	ಹಿಂತಿರುಗಿ ExpandOldSetting(ಅಂಕೆ_Matches, matches);
 
     char_u *option_val = *(char_u**)get_option_varp_scope(
 	expand_option_idx, expand_option_flags);
 
     long_u option_flags =  options[expand_option_idx].flags;
 
-    if (option_flags & P_NUM)
-	return ExpandOldSetting(numMatches, matches);
-    else if (option_flags & P_COMMA)
+    ಆದರೆ (option_flags & P_ಅಂಕೆ)
+	ಹಿಂತಿರುಗಿ ExpandOldSetting(ಅಂಕೆ_Matches, matches);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (option_flags & P_COMMA)
     {
 	// Split the option by comma, then present each option to the user if
 	// it matches the pattern.
@@ -8952,161 +8952,161 @@ ExpandSettingSubtract(
 	// P_COMMA and P_FLAGLIST.
 	garray_T    ga;
 
-	char_u	    *item;
+	char_u	    *ಅಂಶ;
 	char_u	    *option_copy;
-	char_u	    *next_val;
+	char_u	    *ಮುಂದಿನ_val;
 	char_u	    *comma;
 
-	if (*option_val == NUL)
-	    return FAIL;
+	ಆದರೆ (*option_val == NUL)
+	    ಹಿಂತಿರುಗಿ FAIL;
 
 	// Make a copy as we need to inject null characters destructively.
 	option_copy = vim_strsave(option_val);
-	if (option_copy == NULL)
-	    return FAIL;
-	next_val = option_copy;
+	ಆದರೆ (option_copy == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ FAIL;
+	ಮುಂದಿನ_val = option_copy;
 
-	ga_init2(&ga, sizeof(char_u *), 10);
+	ga_init2(&ga, ಗಾತ್ರ(char_u *), 10);
 
-	do
+	ಮಾಡು
 	{
-	    item = next_val;
-	    comma = vim_strchr(next_val, ',');
-	    while (comma != NULL && comma != next_val && *(comma - 1) == '\\')
+	    ಅಂಶ = ಮುಂದಿನ_val;
+	    comma = vim_strchr(ಮುಂದಿನ_val, ',');
+	    ಆಗ (comma != ಖಾಲಿ && comma != ಮುಂದಿನ_val && *(comma - 1) == '\\')
 	    {
 		// "\," is interpreted as a literal comma rather than option
 		// separator when reading options in copy_option_part(). Skip
 		// it.
 		comma = vim_strchr(comma + 1, ',');
 	    }
-	    if (comma != NULL)
+	    ಆದರೆ (comma != ಖಾಲಿ)
 	    {
 		*comma = NUL; // null-terminate this value, required by later functions
-		next_val = comma + 1;
+		ಮುಂದಿನ_val = comma + 1;
 	    }
-	    else
-		next_val = NULL;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ಮುಂದಿನ_val = ಖಾಲಿ;
 
-	    if (*item == NUL)
+	    ಆದರೆ (*ಅಂಶ == NUL)
 		// empty value, don't add to list
-		continue;
+		ಮುಂದುವರಿ;
 
-	    if (!vim_regexec(regmatch, item, (colnr_T)0))
-		continue;
+	    ಆದರೆ (!vim_regexec(regmatch, ಅಂಶ, (colnr_T)0))
+		ಮುಂದುವರಿ;
 
-	    char_u *buf = escape_option_str_cmdline(item);
-	    if (buf == NULL)
+	    char_u *buf = escape_option_str_cmdline(ಅಂಶ);
+	    ಆದರೆ (buf == ಖಾಲಿ)
 	    {
 		vim_free(option_copy);
-		ga_clear_strings(&ga);
-		return FAIL;
+		ga_clear_ಅಕ್ಷರಸರಣಿಗಳು(&ga);
+		ಹಿಂತಿರುಗಿ FAIL;
 	    }
-	    if (ga_add_string(&ga, buf) != OK)
+	    ಆದರೆ (ga_ಕೂಡಿಸು_string(&ga, buf) != OK)
 	    {
 		vim_free(buf);
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
-	} while (next_val != NULL);
+	} ಆಗ (ಮುಂದಿನ_val != ಖಾಲಿ);
 
 	vim_free(option_copy);
 
-	*matches = ga.ga_data;
-	*numMatches = ga.ga_len;
-	return OK;
+	*matches = ga.ga_ದತ್ತಾಂಶ;
+	*ಅಂಕೆ_Matches = ga.ga_len;
+	ಹಿಂತಿರುಗಿ OK;
     }
-    else if (option_flags & P_FLAGLIST)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (option_flags & P_FLAGLIST)
     {
 	// Only present the flags that are set on the option as the other flags
 	// are not meaningful to do set-= on.
 
-	if (*xp->xp_pattern != NUL)
+	ಆದರೆ (*xp->xp_ನಮೂನೆ != NUL)
 	{
 	    // Don't suggest anything if cmdline is non-empty. Vim's set-=
 	    // behavior requires consecutive strings and it's usually
 	    // unintuitive to users if they try to subtract multiple flags at
 	    // once.
-	    return FAIL;
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
 
-	size_t num_flags = STRLEN(option_val);
-	if (num_flags == 0)
-	    return FAIL;
+	size_t ಅಂಕೆ_flags = STRLEN(option_val);
+	ಆದರೆ (ಅಂಕೆ_flags == 0)
+	    ಹಿಂತಿರುಗಿ FAIL;
 
-	*matches = ALLOC_MULT(char_u *, num_flags + 1);
-	if (*matches == NULL)
-	    return FAIL;
+	*matches = ALLOC_MULT(char_u *, ಅಂಕೆ_flags + 1);
+	ಆದರೆ (*matches == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ FAIL;
 
-	int count = 0;
+	ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_2 = 0;
 	char_u *p;
 
-	p = vim_strnsave(option_val, num_flags);
-	if (p == NULL)
+	p = vim_strnsave(option_val, ಅಂಕೆ_flags);
+	ಆದರೆ (p == ಖಾಲಿ)
 	{
 	    VIM_CLEAR(*matches);
-	    return FAIL;
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
-	(*matches)[count++] = p;
+	(*matches)[ಎಣಿಕೆ_2++] = p;
 
-	if (num_flags > 1)
+	ಆದರೆ (ಅಂಕೆ_flags > 1)
 	{
 	    // If more than one flags, split the flags up and expose each
 	    // character as individual choice.
-	    for (char_u *flag = option_val; *flag != NUL; flag++)
+	    ಗಾಗಿ (char_u *flag = option_val; *flag != NUL; flag++)
 	    {
 		p = vim_strnsave(flag, 1);
-		if (p == NULL)
-		    break;
-		(*matches)[count++] = p;
+		ಆದರೆ (p == ಖಾಲಿ)
+		    ನಿಲ್ಲಿಸು;
+		(*matches)[ಎಣಿಕೆ_2++] = p;
 	    }
 	}
 
-	*numMatches = count;
-	return OK;
+	*ಅಂಕೆ_Matches = ಎಣಿಕೆ_2;
+	ಹಿಂತಿರುಗಿ OK;
     }
 
-    return ExpandOldSetting(numMatches, matches);
+    ಹಿಂತಿರುಗಿ ExpandOldSetting(ಅಂಕೆ_Matches, matches);
 }
 
 /*
  * Get the value for the numeric or string option *opp in a nice format into
  * NameBuff[].  Must not be called with a hidden option!
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 option_value2string(
-    struct vimoption	*opp,
-    int			scope)	// OPT_GLOBAL and/or OPT_LOCAL
+    ರಚನೆ vimoption	*opp,
+    ಪೂರ್ಣಾಂಕ			scope)	// OPT_GLOBAL and/or OPT_LOCAL
 {
     char_u	*varp;
 
     varp = get_varp_scope(opp, scope);
 
-    if (opp->flags & P_NUM)
+    ಆದರೆ (opp->flags & P_ಅಂಕೆ)
     {
-	long wc = 0;
+	ದೀರ್ಘ wc = 0;
 
-	if (wc_use_keyname(varp, &wc))
-	    STRCPY(NameBuff, get_special_key_name((int)wc, 0));
-	else if (wc != 0)
-	    STRCPY(NameBuff, transchar((int)wc));
-	else
-	    sprintf((char *)NameBuff, "%ld", *(long *)varp);
+	ಆದರೆ (wc_use_keyname(varp, &wc))
+	    STRCPY(NameBuff, get_special_ಕೀಲಿ_name((ಪೂರ್ಣಾಂಕ)wc, 0));
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (wc != 0)
+	    STRCPY(NameBuff, transchar((ಪೂರ್ಣಾಂಕ)wc));
+	ಇಲ್ಲದಿದ್ದರೆ
+	    sprintf((ಅಕ್ಷರ *)NameBuff, "%ld", *(ದೀರ್ಘ *)varp);
     }
-    else    // P_STRING
+    ಇಲ್ಲದಿದ್ದರೆ    // P_STRING
     {
 	varp = *(char_u **)(varp);
-	if (varp == NULL)		    // just in case
+	ಆದರೆ (varp == ಖಾಲಿ)		    // just in case
 	    NameBuff[0] = NUL;
-#ifdef FEAT_CRYPT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CRYPT
 	// don't show the actual value of 'key', only that it's set
-	else if (opp->var == (char_u *)&p_key && *varp)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (opp->var == (char_u *)&p_ಕೀಲಿ && *varp)
 	    STRCPY(NameBuff, "*****");
-#endif
-	else if (opp->flags & P_EXPAND)
-	    home_replace(NULL, varp, NameBuff, MAXPATHL, FALSE);
+#ಆದರೆ_ಅಂತ್ಯ
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (opp->flags & P_EXPAND)
+	    home_replace(ಖಾಲಿ, varp, NameBuff, MAXPATHL, FALSE);
 	// Translate 'pastetoggle' into special key names
-	else if ((char_u **)opp->var == &p_pt)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((char_u **)opp->var == &p_pt)
 	    str2specialbuf(p_pt, NameBuff, MAXPATHL);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    vim_strncpy(NameBuff, varp, MAXPATHL - 1);
     }
 }
@@ -9116,29 +9116,29 @@ option_value2string(
  * printed as a keyname.
  * "*wcp" is set to the value of the option if it's 'wildchar' or 'wildcharm'.
  */
-    static int
-wc_use_keyname(char_u *varp, long *wcp)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+wc_use_keyname(char_u *varp, ದೀರ್ಘ *wcp)
 {
-    if (((long *)varp == &p_wc) || ((long *)varp == &p_wcm))
+    ಆದರೆ (((ದೀರ್ಘ *)varp == &p_wc) || ((ದೀರ್ಘ *)varp == &p_wcm))
     {
-	*wcp = *(long *)varp;
-	if (IS_SPECIAL(*wcp) || find_special_key_in_table((int)*wcp) >= 0)
-	    return TRUE;
+	*wcp = *(ದೀರ್ಘ *)varp;
+	ಆದರೆ (IS_SPECIAL(*wcp) || ಕಂಡುಹಿಡಿ_special_ಕೀಲಿ_ಒಳ_ಕೋಷ್ಟಕ((ಪೂರ್ಣಾಂಕ)*wcp) >= 0)
+	    ಹಿಂತಿರುಗಿ TRUE;
     }
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 /*
  * Return TRUE if "x" is present in 'shortmess' option, or
  * 'shortmess' contains 'a' and "x" is present in SHM_A.
  */
-    int
-shortmess(int x)
+    ಪೂರ್ಣಾಂಕ
+shortmess(ಪೂರ್ಣಾಂಕ x)
 {
-    return p_shm != NULL &&
-	    (   vim_strchr(p_shm, x) != NULL
-	    || (vim_strchr(p_shm, 'a') != NULL
-		&& vim_strchr((char_u *)SHM_A, x) != NULL));
+    ಹಿಂತಿರುಗಿ p_shm != ಖಾಲಿ &&
+	    (   vim_strchr(p_shm, x) != ಖಾಲಿ
+	    || (vim_strchr(p_shm, 'a') != ಖಾಲಿ
+		&& vim_strchr((char_u *)SHM_A, x) != ಖಾಲಿ));
 }
 
 /*
@@ -9149,31 +9149,31 @@ shortmess(int x)
  * Don't do this if the 'compatible' option has been set or reset before.
  * When "fname" is not NULL, use it to set $"envname" when it wasn't set yet.
  */
-    void
-vimrc_found(char_u *fname, char_u *envname)
+    ಶೂನ್ಯ
+vimrc_ಸಿಕ್ಕಿತು(char_u *fname, char_u *envname)
 {
-    int		opt_idx;
-    int		dofree = FALSE;
+    ಪೂರ್ಣಾಂಕ		opt_idx;
+    ಪೂರ್ಣಾಂಕ		dofree = FALSE;
     char_u	*p;
 
-    if (!option_was_set((char_u *)"cp"))
+    ಆದರೆ (!option_was_ಗಣ((char_u *)"cp"))
     {
 	p_cp = FALSE;
-	for (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
-	    if (!(options[opt_idx].flags & (P_WAS_SET|P_VI_DEF)))
-		set_option_default(opt_idx, OPT_FREE, FALSE);
+	ಗಾಗಿ (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
+	    ಆದರೆ (!(options[opt_idx].flags & (P_WAS_ಗಣ|P_VI_DEF)))
+		ಗಣ_option_default(opt_idx, OPT_FREE, FALSE);
 	didset_options();
 	didset_options2();
     }
 
-    if (fname != NULL)
+    ಆದರೆ (fname != ಖಾಲಿ)
     {
 	p = vim_getenv(envname, &dofree);
-	if (p == NULL)
+	ಆದರೆ (p == ಖಾಲಿ)
 	{
 	    // Set $MYVIMRC to the first vimrc file found.
-	    p = FullName_save(fname, FALSE);
-	    if (p != NULL)
+	    p = ತುಂಬಿದ_Name_save(fname, FALSE);
+	    ಆದರೆ (p != ಖಾಲಿ)
 	    {
 		vim_setenv(envname, p);
 		vim_free(p);
@@ -9181,7 +9181,7 @@ vimrc_found(char_u *fname, char_u *envname)
 	    // Set $MYVIMDIR
 	    export_myvimdir();
 	}
-	else if (dofree)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (dofree)
 	    vim_free(p);
     }
 }
@@ -9189,51 +9189,51 @@ vimrc_found(char_u *fname, char_u *envname)
 /*
  * Set 'compatible' on or off.  Called for "-C" and "-N" command line arg.
  */
-    void
-change_compatible(int on)
+    ಶೂನ್ಯ
+change_compatible(ಪೂರ್ಣಾಂಕ on)
 {
-    int	    opt_idx;
+    ಪೂರ್ಣಾಂಕ	    opt_idx;
 
-    if (p_cp != on)
+    ಆದರೆ (p_cp != on)
     {
 	p_cp = on;
-	compatible_set();
+	compatible_ಗಣ();
     }
     opt_idx = findoption((char_u *)"cp");
-    if (opt_idx >= 0)
-	options[opt_idx].flags |= P_WAS_SET;
+    ಆದರೆ (opt_idx >= 0)
+	options[opt_idx].flags |= P_WAS_ಗಣ;
 }
 
 /*
  * Return TRUE when option "name" has been set.
  * Only works correctly for global options.
  */
-    int
-option_was_set(char_u *name)
+    ಪೂರ್ಣಾಂಕ
+option_was_ಗಣ(char_u *name)
 {
-    int idx;
+    ಪೂರ್ಣಾಂಕ idx;
 
     idx = findoption(name);
-    if (idx < 0)	// unknown option
-	return FALSE;
-    if (options[idx].flags & P_WAS_SET)
-	return TRUE;
-    return FALSE;
+    ಆದರೆ (idx < 0)	// unknown option
+	ಹಿಂತಿರುಗಿ FALSE;
+    ಆದರೆ (options[idx].flags & P_WAS_ಗಣ)
+	ಹಿಂತಿರುಗಿ TRUE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 /*
  * Reset the flag indicating option "name" was set.
  */
-    int
-reset_option_was_set(char_u *name)
+    ಪೂರ್ಣಾಂಕ
+reset_option_was_ಗಣ(char_u *name)
 {
-    int idx = findoption(name);
+    ಪೂರ್ಣಾಂಕ idx = findoption(name);
 
-    if (idx < 0)
-	return FAIL;
+    ಆದರೆ (idx < 0)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    options[idx].flags &= ~P_WAS_SET;
-    return OK;
+    options[idx].flags &= ~P_WAS_ಗಣ;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
@@ -9244,15 +9244,15 @@ reset_option_was_set(char_u *name)
  * When 'compatible' is unset: Set all options that have a different default
  * for Vim (without the P_VI_DEF flag) to that default.
  */
-    static void
-compatible_set(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+compatible_ಗಣ(ಶೂನ್ಯ)
 {
-    int	    opt_idx;
+    ಪೂರ್ಣಾಂಕ	    opt_idx;
 
-    for (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
-	if (	   ((options[opt_idx].flags & P_VIM) && p_cp)
+    ಗಾಗಿ (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
+	ಆದರೆ (	   ((options[opt_idx].flags & P_VIM) && p_cp)
 		|| (!(options[opt_idx].flags & P_VI_DEF) && !p_cp))
-	    set_option_default(opt_idx, OPT_FREE, p_cp);
+	    ಗಣ_option_default(opt_idx, OPT_FREE, p_cp);
     didset_options();
     didset_options2();
 }
@@ -9260,210 +9260,210 @@ compatible_set(void)
 /*
  * Check if backspacing over something is allowed.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 can_bs(
-    int		what)	    // BS_INDENT, BS_EOL, BS_START or BS_NOSTOP
+    ಪೂರ್ಣಾಂಕ		what)	    // BS_INDENT, BS_EOL, BS_START or BS_NOSTOP
 {
-#ifdef FEAT_JOB_CHANNEL
-    if (what == BS_START && bt_prompt(curbuf))
-	return FALSE;
-#endif
-    switch (*p_bs)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕೆಲಸ_CHANNEL
+    ಆದರೆ (what == BS_ಆರಂಭ && bt_prompt(curbuf))
+	ಹಿಂತಿರುಗಿ FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆಯ್ಕೆ (*p_bs)
     {
-	case '3':       return TRUE;
-	case '2':	return (what != BS_NOSTOP);
-	case '1':	return (what != BS_START);
-	case '0':	return FALSE;
+	ಸ್ಥಿತಿ '3':       ಹಿಂತಿರುಗಿ TRUE;
+	ಸ್ಥಿತಿ '2':	ಹಿಂತಿರುಗಿ (what != BS_NOSTOP);
+	ಸ್ಥಿತಿ '1':	ಹಿಂತಿರುಗಿ (what != BS_ಆರಂಭ);
+	ಸ್ಥಿತಿ '0':	ಹಿಂತಿರುಗಿ FALSE;
     }
-    return vim_strchr(p_bs, what) != NULL;
+    ಹಿಂತಿರುಗಿ vim_strchr(p_bs, what) != ಖಾಲಿ;
 }
 
 /*
  * Return the effective 'scrolloff' value for the current window, using the
  * global value when appropriate.
  */
-    long
-get_scrolloff_value(void)
+    ದೀರ್ಘ
+get_scrolloff_ಮೌಲ್ಯ(ಶೂನ್ಯ)
 {
-    return curwin->w_p_so < 0 ? p_so : curwin->w_p_so;
+    ಹಿಂತಿರುಗಿ curwin->w_p_so < 0 ? p_so : curwin->w_p_so;
 }
 
 /*
  * Return the effective 'scrolloffpad' value for the current window, using the
  * global value when appropriate.
  */
-    long
-get_scrolloffpad_value(void)
+    ದೀರ್ಘ
+get_scrolloffpad_ಮೌಲ್ಯ(ಶೂನ್ಯ)
 {
-    return curwin->w_p_sop == -1 ? p_sop : curwin->w_p_sop;
+    ಹಿಂತಿರುಗಿ curwin->w_p_sop == -1 ? p_sop : curwin->w_p_sop;
 }
 
 /*
  * Return the effective 'sidescrolloff' value for the current window, using the
  * global value when appropriate.
  */
-    long
-get_sidescrolloff_value(void)
+    ದೀರ್ಘ
+get_sidescrolloff_ಮೌಲ್ಯ(ಶೂನ್ಯ)
 {
-    return curwin->w_p_siso < 0 ? p_siso : curwin->w_p_siso;
+    ಹಿಂತಿರುಗಿ curwin->w_p_siso < 0 ? p_siso : curwin->w_p_siso;
 }
 
 /*
  * Get the local or global value of 'backupcopy' flags.
  */
-    unsigned int
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ
 get_bkc_flags(buf_T *buf)
 {
-    return buf->b_bkc_flags ? buf->b_bkc_flags : bkc_flags;
+    ಹಿಂತಿರುಗಿ buf->b_bkc_flags ? buf->b_bkc_flags : bkc_flags;
 }
 
-#if defined(FEAT_LINEBREAK)
+#ಆದರೆ defined(FEAT_LINEBREAK)
 /*
  * Get the local or global value of 'formatlistpat'.
  */
     char_u *
-get_flp_value(buf_T *buf)
+get_flp_ಮೌಲ್ಯ(buf_T *buf)
 {
-    if (buf->b_p_flp == NULL || *buf->b_p_flp == NUL)
-	return p_flp;
-    return buf->b_p_flp;
+    ಆದರೆ (buf->b_p_flp == ಖಾಲಿ || *buf->b_p_flp == NUL)
+	ಹಿಂತಿರುಗಿ p_flp;
+    ಹಿಂತಿರುಗಿ buf->b_p_flp;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Get the local or global value of 'virtualedit' flags.
  */
-    unsigned int
-get_ve_flags(void)
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ
+get_ve_flags(ಶೂನ್ಯ)
 {
-    return (curwin->w_ve_flags ? curwin->w_ve_flags : ve_flags)
+    ಹಿಂತಿರುಗಿ (curwin->w_ve_flags ? curwin->w_ve_flags : ve_flags)
 	    & ~(VE_NONE | VE_NONEU);
 }
 
-#if defined(FEAT_LINEBREAK)
+#ಆದರೆ defined(FEAT_LINEBREAK)
 /*
  * Get the local or global value of 'showbreak'.
  */
     char_u *
-get_showbreak_value(win_T *win)
+get_showbreak_ಮೌಲ್ಯ(win_T *win)
 {
-    if (win->w_p_sbr == NULL || *win->w_p_sbr == NUL)
-	return p_sbr;
-    if (STRCMP(win->w_p_sbr, "NONE") == 0)
-	return empty_option;
-    return win->w_p_sbr;
+    ಆದರೆ (win->w_p_sbr == ಖಾಲಿ || *win->w_p_sbr == NUL)
+	ಹಿಂತಿರುಗಿ p_sbr;
+    ಆದರೆ (STRCMP(win->w_p_sbr, "NONE") == 0)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿಗಳು_option;
+    ಹಿಂತಿರುಗಿ win->w_p_sbr;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * Get window or buffer local options.
  */
     dict_T *
-get_winbuf_options(int bufopt)
+get_winbuf_options(ಪೂರ್ಣಾಂಕ bufopt)
 {
     dict_T	*d;
-    int		opt_idx;
+    ಪೂರ್ಣಾಂಕ		opt_idx;
 
     d = dict_alloc();
-    if (d == NULL)
-	return NULL;
+    ಆದರೆ (d == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    for (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
+    ಗಾಗಿ (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
     {
-	struct vimoption *opt = &options[opt_idx];
+	ರಚನೆ vimoption *opt = &options[opt_idx];
 
-	if ((bufopt && (opt->indir & PV_BUF))
+	ಆದರೆ ((bufopt && (opt->indir & PV_BUF))
 					 || (!bufopt && (opt->indir & PV_WIN)))
 	{
 	    char_u *varp = get_varp(opt);
 
-	    if (varp != NULL)
+	    ಆದರೆ (varp != ಖಾಲಿ)
 	    {
-		if (opt->flags & P_STRING)
-		    dict_add_string(d, opt->fullname, *(char_u **)varp);
-		else if (opt->flags & P_NUM)
-		    dict_add_number(d, opt->fullname, *(long *)varp);
-		else
-		    dict_add_number(d, opt->fullname, *(int *)varp);
+		ಆದರೆ (opt->flags & P_STRING)
+		    dict_ಕೂಡಿಸು_string(d, opt->fullname, *(char_u **)varp);
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (opt->flags & P_ಅಂಕೆ)
+		    dict_ಕೂಡಿಸು_ಸಂಖ್ಯೆ(d, opt->fullname, *(ದೀರ್ಘ *)varp);
+		ಇಲ್ಲದಿದ್ದರೆ
+		    dict_ಕೂಡಿಸು_ಸಂಖ್ಯೆ(d, opt->fullname, *(ಪೂರ್ಣಾಂಕ *)varp);
 	    }
 	}
     }
 
-    return d;
+    ಹಿಂತಿರುಗಿ d;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_SYN_HL)
+#ಆದರೆ defined(FEAT_SYN_HL)
 /*
  * This is called when 'culopt' is changed
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 fill_culopt_flags(char_u *val, win_T *wp)
 {
     char_u	*p;
     char_u	culopt_flags_new = 0;
 
-    if (val == NULL)
+    ಆದರೆ (val == ಖಾಲಿ)
 	p = wp->w_p_culopt;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	p = val;
-    while (*p != NUL)
+    ಆಗ (*p != NUL)
     {
 	// Note: Keep this in sync with p_culopt_values.
-	if (STRNCMP(p, "line", 4) == 0)
+	ಆದರೆ (STRNCMP(p, "line", 4) == 0)
 	{
 	    p += 4;
-	    culopt_flags_new |= CULOPT_LINE;
+	    culopt_flags_new |= CULOPT_ಸಾಲು;
 	}
-	else if (STRNCMP(p, "both", 4) == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRNCMP(p, "both", 4) == 0)
 	{
 	    p += 4;
-	    culopt_flags_new |= CULOPT_LINE | CULOPT_NBR;
+	    culopt_flags_new |= CULOPT_ಸಾಲು | CULOPT_NBR;
 	}
-	else if (STRNCMP(p, "number", 6) == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRNCMP(p, "number", 6) == 0)
 	{
 	    p += 6;
 	    culopt_flags_new |= CULOPT_NBR;
 	}
-	else if (STRNCMP(p, "screenline", 10) == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRNCMP(p, "screenline", 10) == 0)
 	{
 	    p += 10;
 	    culopt_flags_new |= CULOPT_SCRLINE;
 	}
 
-	if (*p != ',' && *p != NUL)
-	    return FAIL;
-	if (*p == ',')
+	ಆದರೆ (*p != ',' && *p != NUL)
+	    ಹಿಂತಿರುಗಿ FAIL;
+	ಆದರೆ (*p == ',')
 	    ++p;
     }
 
     // Can't have both "line" and "screenline".
-    if ((culopt_flags_new & CULOPT_LINE) && (culopt_flags_new & CULOPT_SCRLINE))
-	return FAIL;
+    ಆದರೆ ((culopt_flags_new & CULOPT_ಸಾಲು) && (culopt_flags_new & CULOPT_SCRLINE))
+	ಹಿಂತಿರುಗಿ FAIL;
     wp->w_p_culopt_flags = culopt_flags_new;
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Get the value of 'magic' adjusted for Vim9 script.
  */
-    int
-magic_isset(void)
+    ಪೂರ್ಣಾಂಕ
+magic_isset(ಶೂನ್ಯ)
 {
-    switch (magic_overruled)
+    ಆಯ್ಕೆ (magic_overruled)
     {
-	case OPTION_MAGIC_ON:      return TRUE;
-	case OPTION_MAGIC_OFF:     return FALSE;
-	case OPTION_MAGIC_NOT_SET: break;
+	ಸ್ಥಿತಿ OPTION_MAGIC_ON:      ಹಿಂತಿರುಗಿ TRUE;
+	ಸ್ಥಿತಿ OPTION_MAGIC_OFF:     ಹಿಂತಿರುಗಿ FALSE;
+	ಸ್ಥಿತಿ OPTION_MAGIC_NOT_ಗಣ: ನಿಲ್ಲಿಸು;
     }
-#ifdef FEAT_EVAL
-    if (in_vim9script())
-	return TRUE;
-#endif
-    return p_magic;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಆದರೆ (ಒಳ_vim9script())
+	ಹಿಂತಿರುಗಿ TRUE;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ p_magic;
 }
 
 /*
@@ -9472,66 +9472,66 @@ magic_isset(void)
  * Returns OK if the option is successfully set to a function, otherwise
  * returns FAIL.
  */
-    int
-option_set_callback_func(char_u *optval UNUSED, callback_T *optcb UNUSED)
+    ಪೂರ್ಣಾಂಕ
+option_ಗಣ_callback_func(char_u *optval ಬಳಸದ, callback_T *optcb ಬಳಸದ)
 {
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     typval_T	*tv;
     callback_T	cb;
-    int		funcname = FALSE;
+    ಪೂರ್ಣಾಂಕ		funcname = FALSE;
 
-    if (optval == NULL || *optval == NUL)
+    ಆದರೆ (optval == ಖಾಲಿ || *optval == NUL)
     {
 	free_callback(optcb);
-	return OK;
+	ಹಿಂತಿರುಗಿ OK;
     }
 
-    if (*optval == '{' || (in_vim9script() && *optval == '(')
+    ಆದರೆ (*optval == '{' || (ಒಳ_vim9script() && *optval == '(')
 	    || (STRNCMP(optval, "function(", 9) == 0)
 	    || (STRNCMP(optval, "funcref(", 8) == 0))
 	// Lambda expression or a funcref
-	tv = eval_expr(optval, NULL);
-    else
+	tv = eval_ಅಭಿವ್ಯಕ್ತಿ(optval, ಖಾಲಿ);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// treat everything else as a function name string
 	tv = alloc_string_tv(vim_strsave(optval));
 	funcname = TRUE;
     }
-    if (tv == NULL)
-	return FAIL;
+    ಆದರೆ (tv == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
     cb = get_callback(tv);
-    if (cb.cb_name == NULL || *cb.cb_name == NUL)
+    ಆದರೆ (cb.cb_name == ಖಾಲಿ || *cb.cb_name == NUL)
     {
 	free_tv(tv);
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
     free_callback(optcb);
-    set_callback(optcb, &cb);
+    ಗಣ_callback(optcb, &cb);
     free_tv(tv);
 
-    char_u  *dot = NULL;
-    if (in_vim9script() && funcname
-				&& ((dot = vim_strchr(optval, '.')) != NULL))
+    char_u  *dot = ಖಾಲಿ;
+    ಆದರೆ (ಒಳ_vim9script() && funcname
+				&& ((dot = vim_strchr(optval, '.')) != ಖಾಲಿ))
     {
-	if (optcb->cb_free_name)
+	ಆದರೆ (optcb->cb_free_name)
 	    vim_free(optcb->cb_name);
 
-	imported_T *import = find_imported(optval, dot - optval, FALSE);
-	if (import != NULL && SCRIPT_ID_VALID(import->imp_sid)
+	imported_T *import = ಕಂಡುಹಿಡಿ_imported(optval, dot - optval, FALSE);
+	ಆದರೆ (import != ಖಾಲಿ && SCRIPT_ID_VALID(import->imp_sid)
 				&& !(import->imp_flags & IMP_FLAGS_AUTOLOAD))
 	{
 	    char_u	fnamebuf[MAX_FUNC_NAME_LEN];
 
 	    // Imported non-autoloaded function.  Replace the import script
 	    // name (import.funcname) with the script ID (<SNR>123_funcname)
-	    vim_snprintf((char *)fnamebuf, sizeof(fnamebuf), "<SNR>%d_%s",
+	    vim_snprintf((ಅಕ್ಷರ *)fnamebuf, ಗಾತ್ರ(fnamebuf), "<SNR>%d_%s",
 						import->imp_sid, dot + 1);
 	    optcb->cb_name = vim_strsave(fnamebuf);
 	    optcb->cb_free_name = TRUE;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // Imported autoloaded function.  Store the function name as
 	    // "import.funcname".
@@ -9543,36 +9543,36 @@ option_set_callback_func(char_u *optval UNUSED, callback_T *optcb UNUSED)
     // "import#funcname".
     expand_autload_callback(optcb);
 
-    return OK;
-#else
-    return FAIL;
-#endif
+    ಹಿಂತಿರುಗಿ OK;
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಹಿಂತಿರುಗಿ FAIL;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#if defined(FEAT_TABPANEL)
+#ಆದರೆ defined(FEAT_TABPANEL)
 /*
  * Process the new 'showtabpanel' option value.
  */
-    char *
-did_set_showtabpanel(optset_T *args UNUSED)
+    ಅಕ್ಷರ *
+did_ಗಣ_showtabpanel(optset_T *ವಾದಗಳು ಬಳಸದ)
 {
     shell_new_columns();
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_EVAL)
-    static void
-didset_options_sctx(int opt_flags, char **buf)
+#ಆದರೆ defined(FEAT_EVAL)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+didset_options_sctx(ಪೂರ್ಣಾಂಕ opt_flags, ಅಕ್ಷರ **buf)
 {
-	for (int i = 0; ; ++i)
+	ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; ; ++i)
 	{
-	    if (buf[i] == NULL)
-		break;
+	    ಆದರೆ (buf[i] == ಖಾಲಿ)
+		ನಿಲ್ಲಿಸು;
 
-	    int idx = findoption((char_u *)buf[i]);
-	    if (idx >= 0)
-		set_option_sctx_idx(idx, opt_flags, current_sctx);
+	    ಪೂರ್ಣಾಂಕ idx = findoption((char_u *)buf[i]);
+	    ಆದರೆ (idx >= 0)
+		ಗಣ_option_sctx_idx(idx, opt_flags, current_sctx);
 	}
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ

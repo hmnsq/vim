@@ -31,15 +31,15 @@
 # Copyright: Vim license applies, see ":help license"
 # Last Change: 2025 Oct 08
 #
-import os
-import re
-import sys
-from pathlib import Path
-from typing import List, Tuple
-from clang.cindex import Index, CursorKind, StorageClass, TokenKind
+ಆಮದು os
+ಆಮದು re
+ಆಮದು sys
+ತಃ pathlib ಆಮದು ಮಾರ್ಗ_2
+ತಃ typing ಆಮದು List, Tuple
+ತಃ clang.cindex ಆಮದು ಸೂಚ್ಯಂಕ_3, Cursor_ಬಗೆ, StorageClass, Token_ಬಗೆ
 
-SHOW_DIAGS = os.environ.get("GENPROTO_SHOW_DIAGS", "") not in ("", "0", "false", "no")
-DEBUG_LOG  = os.environ.get("GENPROTO_DEBUG", "") not in ("", "0", "false", "no")
+SHOW_DIAGS = os.environ.get("GENPROTO_SHOW_DIAGS", "") ಅಲ್ಲ ಒಳಗೆ ("", "0", "false", "no")
+DEBUG_LOG  = os.environ.get("GENPROTO_DEBUG", "") ಅಲ್ಲ ಒಳಗೆ ("", "0", "false", "no")
 
 # Preprocessor directive detection
 _DIR_RE = re.compile(r'^\s*#\s*(if|ifdef|ifndef|elif|else|endif)\b')
@@ -53,17 +53,17 @@ _IF_NOTDEF_PROTO_RE = re.compile(r'^\s*#\s*if\s*!defined\s*\(\s*PROTO\s*\)\s*(//
 # Helpers to detect defined(PROTO) inside an expression line
 _DEFINED_CALL_RE      = re.compile(r'\bdefined\s*\(\s*PROTO\s*\)')
 
-def _ends_with_bs(line: str) -> bool:
-    return line.rstrip("\r\n").rstrip().endswith("\\")
+ವ್ಯಾಖ್ಯಾನ ತುದಿಗಳು_with_bs(ಸಾಲು: str) -> bool:
+    ಹಿಂತಿರುಗಿ ಸಾಲು.rstrip("\r\n").rstrip().endswith("\\")
 
-def _has_proto_defined_from_argv(argv: List[str]) -> bool:
+ವ್ಯಾಖ್ಯಾನ _has_proto_defined_from_argv(argv: List[str]) -> bool:
     """Return True if -DPROTO (or -DPROTO=...) appears in clang args."""
-    for a in argv:
-        if a == "-DPROTO" or a.startswith("-DPROTO="):
-            return True
-    return False
+    ಗಾಗಿ a ಒಳಗೆ argv:
+        ಆದರೆ a == "-DPROTO" ಅಥವಾ a.startswith("-DPROTO="):
+            ಹಿಂತಿರುಗಿ ನಿಜ
+    ಹಿಂತಿರುಗಿ ಸುಳ್ಳು
 
-def _eval_condition_with_defined_proto(cond: str, proto_is_defined: bool) -> bool:
+ವ್ಯಾಖ್ಯಾನ _eval_condition_with_defined_proto(cond: str, proto_is_defined: bool) -> bool:
     """
     Evaluate a simple C preprocessor condition only when it contains
     defined(PROTO).
@@ -75,27 +75,27 @@ def _eval_condition_with_defined_proto(cond: str, proto_is_defined: bool) -> boo
     """
     s = cond
 
-    if DEBUG_LOG:
-        print(f"[eval] raw condition: {cond.strip()}", file=sys.stderr)
-        print(f"[eval] proto_is_defined={proto_is_defined}", file=sys.stderr)
+    ಆದರೆ DEBUG_LOG:
+        ಮುದ್ರಿಸು(f"[eval] raw condition: {cond.strip()}", file=sys.stderr)
+        ಮುದ್ರಿಸು(f"[eval] proto_is_defined={proto_is_defined}", file=sys.stderr)
 
     # Normalize spacing
     s = s.strip()
 
     # Replace !defined(PROTO) first, then defined(PROTO)
-    if proto_is_defined:
+    ಆದರೆ proto_is_defined:
         s = re.sub(r'!+\s*defined\s*\(\s*PROTO\s*\)', "False", s)
         s = re.sub(r'defined\s*\(\s*PROTO\s*\)', "True", s)
-    else:
+    ಇಲ್ಲದಿದ್ದರೆ:
         s = re.sub(r'!+\s*defined\s*\(\s*PROTO\s*\)', "True", s)
         s = re.sub(r'defined\s*\(\s*PROTO\s*\)', "False", s)
 
     # Translate C logical ops to Python
     # Replace defined(PROTO) and !defined(PROTO) depending on -DPROTO
-    if proto_is_defined:
+    ಆದರೆ proto_is_defined:
         s = re.sub(r'!defined\s*\(\s*PROTO\s*\)', "False", s)
         s = re.sub(r'defined\s*\(\s*PROTO\s*\)', "True", s)
-    else:
+    ಇಲ್ಲದಿದ್ದರೆ:
         s = re.sub(r'!defined\s*\(\s*PROTO\s*\)', "True", s)
         s = re.sub(r'defined\s*\(\s*PROTO\s*\)', "False", s)
 
@@ -120,15 +120,15 @@ def _eval_condition_with_defined_proto(cond: str, proto_is_defined: bool) -> boo
     # Safety: collapse excessive whitespace
     s = re.sub(r'\s+', " ", s).strip()
 
-    try:
-        return bool(eval(s, {}, {}))
-    except Exception:
+    ಪ್ರಯತ್ನಿಸು:
+        ಹಿಂತಿರುಗಿ bool(eval(s, {}, {}))
+    ಅಪವಾದ Exception:
         # Fail-open to avoid accidentally dropping code
-        if DEBUG_LOG:
-            print(f"[warn] condition eval failed: {cond!r} -> {s!r}", file=sys.stderr)
-        return True
+        ಆದರೆ DEBUG_LOG:
+            ಮುದ್ರಿಸು(f"[warn] condition eval failed: {cond!r} -> {s!r}", file=sys.stderr)
+        ಹಿಂತಿರುಗಿ ನಿಜ
 
-def rewrite_conditionals_first_branch(text: str) -> str:
+ವ್ಯಾಖ್ಯಾನ rewrite_conditionals_ಮೊದಲ_branch(ಪಠ್ಯ: str) -> str:
     """
     Keep only the first branch of #if/#ifdef/#ifndef groups, remove others.
     Extensions:
@@ -138,42 +138,42 @@ def rewrite_conditionals_first_branch(text: str) -> str:
         evaluate the condition: if False, drop the whole group; if True, keep
         only the first branch (same as legacy behavior).
     """
-    lines = text.splitlines(keepends=True)
-    out: List[str] = []
-    i, n = 0, len(lines)
+    ಸಾಲುಗಳು = ಪಠ್ಯ.splitlines(keepends=ನಿಜ)
+    ಹೊರಹೋಗು: List[str] = []
+    i, n = 0, ಉದ್ದ(ಸಾಲುಗಳು)
 
-    def _collect_group(start: int) -> Tuple[int, List[Tuple[str, int, int]]]:
+    ವ್ಯಾಖ್ಯಾನ collect_ಗುಂಪು(ಆರಂಭ: ಪೂರ್ಣಾಂಕ) -> Tuple[ಪೂರ್ಣಾಂಕ, List[Tuple[str, ಪೂರ್ಣಾಂಕ, ಪೂರ್ಣಾಂಕ]]]:
         """
         Collect a full #if...#endif group and return (end_index, bodies).
         bodies is a list of (tag, body_s, body_e) for each if/elif/else branch.
         """
-        h = start
+        h = ಆರಂಭ
         # Skip backslash-continued header lines
-        while True:
+        ಆಗ ನಿಜ:
             h += 1
-            if h >= n or not _ends_with_bs(lines[h - 1]):
-                break
-        depth = 1
+            ಆದರೆ h >= n ಅಥವಾ ಅಲ್ಲ ತುದಿಗಳು_with_bs(ಸಾಲುಗಳು[h - 1]):
+                ನಿಲ್ಲಿಸು
+        ಆಳ = 1
         j = h
-        marks: List[Tuple[str, int]] = [("if", start)]
-        while j < n and depth > 0:
-            m = _DIR_RE.match(lines[j])
-            if m:
-                kw2 = m.group(1)
-                if kw2 in ("if", "ifdef", "ifndef"):
-                    depth += 1
-                elif kw2 == "endif":
-                    depth -= 1
-                    if depth == 0:
-                        break
-                elif depth == 1 and kw2 in ("elif", "else"):
+        marks: List[Tuple[str, ಪೂರ್ಣಾಂಕ]] = [("if", ಆರಂಭ)]
+        ಆಗ j < n ಮತ್ತು ಆಳ > 0:
+            m = _DIR_RE.ಹೊಂದಿಕೆ(ಸಾಲುಗಳು[j])
+            ಆದರೆ m:
+                kw2 = m.ಗುಂಪು(1)
+                ಆದರೆ kw2 ಒಳಗೆ ("if", "ifdef", "ifndef"):
+                    ಆಳ += 1
+                ಅಥವಾಆದರೆ kw2 == "endif":
+                    ಆಳ -= 1
+                    ಆದರೆ ಆಳ == 0:
+                        ನಿಲ್ಲಿಸು
+                ಅಥವಾಆದರೆ ಆಳ == 1 ಮತ್ತು kw2 ಒಳಗೆ ("elif", "else"):
                     marks.append((kw2, j))
             j += 1
-        else:
+        ಇಲ್ಲದಿದ್ದರೆ:
             # Unterminated: keep as-is from start to EOF
-            return n, [("text", start, n)]
+            ಹಿಂತಿರುಗಿ n, [("text", ಆರಂಭ, n)]
 
-        def _after_header_line(pos: int) -> int:
+        ವ್ಯಾಖ್ಯಾನ after_ಶೀರ್ಷಿಕೆ_ಸಾಲು(pos: ಪೂರ್ಣಾಂಕ) -> ಪೂರ್ಣಾಂಕ:
             """
             Return the first index after a possibly backslash-continued header
             line starting at `pos`. It consumes all continuation lines that
@@ -181,11 +181,11 @@ def rewrite_conditionals_first_branch(text: str) -> str:
             """
             k = pos + 1
             # Consume lines as long as the previous line ends with a backslash
-            while k < n and _ends_with_bs(lines[k - 1]):
+            ಆಗ k < n ಮತ್ತು ತುದಿಗಳು_with_bs(ಸಾಲುಗಳು[k - 1]):
                 k += 1
-            return k
+            ಹಿಂತಿರುಗಿ k
 
-        def _after_header_line(pos: int) -> int:
+        ವ್ಯಾಖ್ಯಾನ after_ಶೀರ್ಷಿಕೆ_ಸಾಲು(pos: ಪೂರ್ಣಾಂಕ) -> ಪೂರ್ಣಾಂಕ:
             """
             Return the first index after a possibly backslash-continued header
             line starting at `pos`. It consumes all continuation lines that
@@ -193,92 +193,92 @@ def rewrite_conditionals_first_branch(text: str) -> str:
             """
             k = pos + 1
             # Consume lines as long as the previous line ends with a backslash
-            while k < n and _ends_with_bs(lines[k - 1]):
+            ಆಗ k < n ಮತ್ತು ತುದಿಗಳು_with_bs(ಸಾಲುಗಳು[k - 1]):
                 k += 1
-            return k
+            ಹಿಂತಿರುಗಿ k
 
-        bodies: List[Tuple[str, int, int]] = []
-        header_positions = [pos for _, pos in marks] + [j]
-        tags = [tag for tag, _ in marks]
-        for idx, tag in enumerate(tags):
-            header = header_positions[idx]
+        bodies: List[Tuple[str, ಪೂರ್ಣಾಂಕ, ಪೂರ್ಣಾಂಕ]] = []
+        ಶೀರ್ಷಿಕೆ_positions = [pos ಗಾಗಿ _, pos ಒಳಗೆ marks] + [j]
+        ಟ್ಯಾಗುಗಳು = [ಟ್ಯಾಗ್ ಗಾಗಿ ಟ್ಯಾಗ್, _ ಒಳಗೆ marks]
+        ಗಾಗಿ idx, ಟ್ಯಾಗ್ ಒಳಗೆ enumerate(ಟ್ಯಾಗುಗಳು):
+            ಶೀರ್ಷಿಕೆ = ಶೀರ್ಷಿಕೆ_positions[idx]
             # Start body right after the whole (possibly multi-line) header
-            body_s = _after_header_line(header)
-            next_header = header_positions[idx + 1]
-            body_e = next_header
-            bodies.append((tag, body_s, body_e))
-        return j + 1, bodies
+            body_s = after_ಶೀರ್ಷಿಕೆ_ಸಾಲು(ಶೀರ್ಷಿಕೆ)
+            ಮುಂದಿನ_ಶೀರ್ಷಿಕೆ = ಶೀರ್ಷಿಕೆ_positions[idx + 1]
+            body_e = ಮುಂದಿನ_ಶೀರ್ಷಿಕೆ
+            bodies.append((ಟ್ಯಾಗ್, body_s, body_e))
+        ಹಿಂತಿರುಗಿ j + 1, bodies
 
     # Detect whether PROTO is defined from argv (clang args passed after src
     # path)
     proto_is_defined = _has_proto_defined_from_argv(sys.argv[2:])
 
-    while i < n:
-        line = lines[i]
-        m = _DIR_RE.match(line)
-        if not m:
-            out.append(line)
+    ಆಗ i < n:
+        ಸಾಲು = ಸಾಲುಗಳು[i]
+        m = _DIR_RE.ಹೊಂದಿಕೆ(ಸಾಲು)
+        ಆದರೆ ಅಲ್ಲ m:
+            ಹೊರಹೋಗು.append(ಸಾಲು)
             i += 1
-            continue
+            ಮುಂದುವರಿ
 
-        kw = m.group(1)
-        if kw in ("if", "ifdef", "ifndef"):
+        kw = m.ಗುಂಪು(1)
+        ಆದರೆ kw ಒಳಗೆ ("if", "ifdef", "ifndef"):
             # Hard drops first (legacy behavior)
-            if _IF0_RE.match(line) or _IFDEF_DEBUG_RE.match(line) or _IFNDEF_PROTO_RE.match(line) or _IF_NOTDEF_PROTO_RE.match(line):
-                group_end, _ = _collect_group(i)
-                i = group_end
-                continue
+            ಆದರೆ _IF0_RE.ಹೊಂದಿಕೆ(ಸಾಲು) ಅಥವಾ _IFDEF_DEBUG_RE.ಹೊಂದಿಕೆ(ಸಾಲು) ಅಥವಾ _IFNDEF_PROTO_RE.ಹೊಂದಿಕೆ(ಸಾಲು) ಅಥವಾ _IF_NOTDEF_PROTO_RE.ಹೊಂದಿಕೆ(ಸಾಲು):
+                ಗುಂಪು_ಕೊನೆ, _ = collect_ಗುಂಪು(i)
+                i = ಗುಂಪು_ಕೊನೆ
+                ಮುಂದುವರಿ
 
             # If '#if <expr>' contains defined(PROTO), evaluate; otherwise,
             # legacy behavior
-            evaluate = (kw == "if") and (
-                _DEFINED_CALL_RE.search(line) is not None
+            evaluate = (kw == "if") ಮತ್ತು (
+                _DEFINED_CALL_RE.ಹುಡುಕು(ಸಾಲು) ಆಗಿರುವ ಅಲ್ಲ ಏನೂಇಲ್ಲ
             )
 
-            if evaluate:
+            ಆದರೆ evaluate:
                 # Extract condition text after 'if'
-                try:
-                    cond_text = line.split("if", 1)[1]
-                except Exception:
-                    cond_text = ""
-                keep_first = _eval_condition_with_defined_proto(cond_text, proto_is_defined)
-                if not keep_first:
-                    group_end, _ = _collect_group(i)
-                    i = group_end
-                    continue
+                ಪ್ರಯತ್ನಿಸು:
+                    cond_ಪಠ್ಯ = ಸಾಲು.ವಿಭಜಿಸು("if", 1)[1]
+                ಅಪವಾದ Exception:
+                    cond_ಪಠ್ಯ = ""
+                keep_ಮೊದಲ = _eval_condition_with_defined_proto(cond_ಪಠ್ಯ, proto_is_defined)
+                ಆದರೆ ಅಲ್ಲ keep_ಮೊದಲ:
+                    ಗುಂಪು_ಕೊನೆ, _ = collect_ಗುಂಪು(i)
+                    i = ಗುಂಪು_ಕೊನೆ
+                    ಮುಂದುವರಿ
 
             # Keep only the first branch
-            group_end, bodies = _collect_group(i)
-            if not bodies:
-                i = group_end
-                continue
+            ಗುಂಪು_ಕೊನೆ, bodies = collect_ಗುಂಪು(i)
+            ಆದರೆ ಅಲ್ಲ bodies:
+                i = ಗುಂಪು_ಕೊನೆ
+                ಮುಂದುವರಿ
             keep_s, keep_e = bodies[0][1], bodies[0][2]
-            kept_text = "".join(lines[keep_s:keep_e])
-            kept_rewritten = rewrite_conditionals_first_branch(kept_text)
+            kept_ಪಠ್ಯ = "".join(ಸಾಲುಗಳು[keep_s:keep_e])
+            kept_rewritten = rewrite_conditionals_ಮೊದಲ_branch(kept_ಪಠ್ಯ)
 
-            if DEBUG_LOG:
-                print(f"[group] first body lines {keep_s}:{keep_e}", file=sys.stderr)
+            ಆದರೆ DEBUG_LOG:
+                ಮುದ್ರಿಸು(f"[group] first body lines {keep_s}:{keep_e}", file=sys.stderr)
                 # Print the first non-empty line of the kept body for quick
                 # context
-                for ln in kept_text.splitlines():
-                    if ln.strip():
-                        print(f"[group] kept starts with: {ln.strip()}", file=sys.stderr)
-                        break
+                ಗಾಗಿ ln ಒಳಗೆ kept_ಪಠ್ಯ.splitlines():
+                    ಆದರೆ ln.strip():
+                        ಮುದ್ರಿಸು(f"[group] kept starts with: {ln.strip()}", file=sys.stderr)
+                        ನಿಲ್ಲಿಸು
 
-            out.append(kept_rewritten)
-            i = group_end
-        else:
+            ಹೊರಹೋಗು.append(kept_rewritten)
+            i = ಗುಂಪು_ಕೊನೆ
+        ಇಲ್ಲದಿದ್ದರೆ:
             # For 'elif/else/endif' lines encountered directly, output a blank
             # line to preserve line count
-            out.append("\n" if line.endswith("\n") else "")
+            ಹೊರಹೋಗು.append("\n" ಆದರೆ ಸಾಲು.endswith("\n") ಇಲ್ಲದಿದ್ದರೆ "")
             i += 1
 
-    return "".join(out)
+    ಹಿಂತಿರುಗಿ "".join(ಹೊರಹೋಗು)
 
-def collapse_star_spaces(s: str) -> str:
-    return re.sub(r"\*\s+", "*", s)
+ವ್ಯಾಖ್ಯಾನ collapse_ನಕ್ಷತ್ರ_spaces(s: str) -> str:
+    ಹಿಂತಿರುಗಿ re.sub(r"\*\s+", "*", s)
 
-def fix_spacing(s: str) -> str:
+ವ್ಯಾಖ್ಯಾನ fix_spacing(s: str) -> str:
     s = re.sub(r"\(\s+", "(", s)
     s = re.sub(r"\s+\)", ")", s)
     s = re.sub(r"(?<=[\w\)])\s+\((?!\*)", "(", s)
@@ -287,217 +287,217 @@ def fix_spacing(s: str) -> str:
     s = re.sub(r"\s+\[", "[", s)
     s = re.sub(r"\[\s+", "[", s)
     s = re.sub(r"\s+\]", "]", s)
-    return s
+    ಹಿಂತಿರುಗಿ s
 
-def strip_unused_macros(s: str) -> str:
+ವ್ಯಾಖ್ಯಾನ strip_ಬಳಸದ_macros(s: str) -> str:
     s = re.sub(r"\bUNUSED\b\s*\([^)]*\)", " ", s)
     s = re.sub(r"\bUNUSED\b", " ", s)
-    return s
+    ಹಿಂತಿರುಗಿ s
 
-def normalize_ws(s: str) -> str:
-    return re.sub(r"\s+", " ", s).strip()
+ವ್ಯಾಖ್ಯಾನ normalize_ws(s: str) -> str:
+    ಹಿಂತಿರುಗಿ re.sub(r"\s+", " ", s).strip()
 
-def tokens_for_function_header(cur) -> List[str]:
-    toks = [t for t in cur.get_tokens() if t.kind != TokenKind.COMMENT]
-    if not toks:
-        return []
-    name_idx = None
-    for i, t in enumerate(toks):
-        if t.kind == TokenKind.IDENTIFIER and t.spelling == cur.spelling:
+ವ್ಯಾಖ್ಯಾನ ಟೋಕನುಗಳು_for_function_ಶೀರ್ಷಿಕೆ(cur) -> List[str]:
+    toks = [t ಗಾಗಿ t ಒಳಗೆ cur.get_ಟೋಕನುಗಳು() ಆದರೆ t.ಬಗೆ != Token_ಬಗೆ.COMMENT]
+    ಆದರೆ ಅಲ್ಲ toks:
+        ಹಿಂತಿರುಗಿ []
+    name_idx = ಏನೂಇಲ್ಲ
+    ಗಾಗಿ i, t ಒಳಗೆ enumerate(toks):
+        ಆದರೆ t.ಬಗೆ == Token_ಬಗೆ.IDENTIFIER ಮತ್ತು t.spelling == cur.spelling:
             name_idx = i
-            break
-    if name_idx is None:
-        return []
-    lpar_idx = None
-    for i in range(name_idx + 1, len(toks)):
-        if toks[i].spelling == '(':
+            ನಿಲ್ಲಿಸು
+    ಆದರೆ name_idx ಆಗಿರುವ ಏನೂಇಲ್ಲ:
+        ಹಿಂತಿರುಗಿ []
+    lpar_idx = ಏನೂಇಲ್ಲ
+    ಗಾಗಿ i ಒಳಗೆ ಶ್ರೇಣಿ(name_idx + 1, ಉದ್ದ(toks)):
+        ಆದರೆ toks[i].spelling == '(':
             lpar_idx = i
-            break
-    if lpar_idx is None:
-        return []
-    depth, rpar_idx = 0, None
-    for i in range(lpar_idx, len(toks)):
-        if toks[i].spelling == '(':
-            depth += 1
-        elif toks[i].spelling == ')':
-            depth -= 1
-            if depth == 0:
+            ನಿಲ್ಲಿಸು
+    ಆದರೆ lpar_idx ಆಗಿರುವ ಏನೂಇಲ್ಲ:
+        ಹಿಂತಿರುಗಿ []
+    ಆಳ, rpar_idx = 0, ಏನೂಇಲ್ಲ
+    ಗಾಗಿ i ಒಳಗೆ ಶ್ರೇಣಿ(lpar_idx, ಉದ್ದ(toks)):
+        ಆದರೆ toks[i].spelling == '(':
+            ಆಳ += 1
+        ಅಥವಾಆದರೆ toks[i].spelling == ')':
+            ಆಳ -= 1
+            ಆದರೆ ಆಳ == 0:
                 rpar_idx = i
-                break
-    if rpar_idx is None:
-        return []
-    return [t.spelling for t in toks[:rpar_idx + 1]]
+                ನಿಲ್ಲಿಸು
+    ಆದರೆ rpar_idx ಆಗಿರುವ ಏನೂಇಲ್ಲ:
+        ಹಿಂತಿರುಗಿ []
+    ಹಿಂತಿರುಗಿ [t.spelling ಗಾಗಿ t ಒಳಗೆ toks[:rpar_idx + 1]]
 
-def join_tokens(tokens: List[str]) -> str:
-    s = " ".join(tokens)
-    s = strip_unused_macros(s)
+ವ್ಯಾಖ್ಯಾನ join_ಟೋಕನುಗಳು(ಟೋಕನುಗಳು: List[str]) -> str:
+    s = " ".join(ಟೋಕನುಗಳು)
+    s = strip_ಬಳಸದ_macros(s)
     s = normalize_ws(s)
-    s = collapse_star_spaces(s)
+    s = collapse_ನಕ್ಷತ್ರ_spaces(s)
     s = fix_spacing(s)
-    return s
+    ಹಿಂತಿರುಗಿ s
 
-def header_from_cursor(cur) -> str:
+ವ್ಯಾಖ್ಯಾನ ಶೀರ್ಷಿಕೆ_from_cursor(cur) -> str:
     """
     Fallback header builder for cases where get_tokens() returns empty
     (e.g., macro-expanded function definitions). Uses cursor spelling and type
     information to construct "ret name(param, ...)".
     """
-    try:
-        ret = getattr(cur, "result_type", None)
-        ret_sp = ret.spelling if ret is not None else ""
-    except Exception:
+    ಪ್ರಯತ್ನಿಸು:
+        ret = getattr(cur, "result_type", ಏನೂಇಲ್ಲ)
+        ret_sp = ret.spelling ಆದರೆ ret ಆಗಿರುವ ಅಲ್ಲ ಏನೂಇಲ್ಲ ಇಲ್ಲದಿದ್ದರೆ ""
+    ಅಪವಾದ Exception:
         ret_sp = ""
-    if not ret_sp:
+    ಆದರೆ ಅಲ್ಲ ret_sp:
         # As a last resort, try cur.type.get_result() if available.
-        try:
-            ret_sp = cur.type.get_result().spelling
-        except Exception:
+        ಪ್ರಯತ್ನಿಸು:
+            ret_sp = cur.type.get_ಫಲಿತಾಂಶ().spelling
+        ಅಪವಾದ Exception:
             ret_sp = "void"
-    name_sp = cur.spelling or ""
+    name_sp = cur.spelling ಅಥವಾ ""
     params = []
-    try:
-        for a in cur.get_arguments() or []:
-            t = getattr(a, "type", None)
-            t_sp = t.spelling if t is not None else ""
-            a_sp = a.spelling or ""
-            seg = (t_sp + (" " + a_sp if a_sp else "")).strip()
-            params.append(seg if seg else "void")
-    except Exception:
-        pass
-    params_s = ", ".join(params) if params else "void"
+    ಪ್ರಯತ್ನಿಸು:
+        ಗಾಗಿ a ಒಳಗೆ cur.get_arguments() ಅಥವಾ []:
+            t = getattr(a, "type", ಏನೂಇಲ್ಲ)
+            t_sp = t.spelling ಆದರೆ t ಆಗಿರುವ ಅಲ್ಲ ಏನೂಇಲ್ಲ ಇಲ್ಲದಿದ್ದರೆ ""
+            a_sp = a.spelling ಅಥವಾ ""
+            seg = (t_sp + (" " + a_sp ಆದರೆ a_sp ಇಲ್ಲದಿದ್ದರೆ "")).strip()
+            params.append(seg ಆದರೆ seg ಇಲ್ಲದಿದ್ದರೆ "void")
+    ಅಪವಾದ Exception:
+        ದಾಟು
+    params_s = ", ".join(params) ಆದರೆ params ಇಲ್ಲದಿದ್ದರೆ "void"
     s = f"{ret_sp} {name_sp}({params_s})"
-    s = strip_unused_macros(s)
+    s = strip_ಬಳಸದ_macros(s)
     s = normalize_ws(s)
-    s = collapse_star_spaces(s)
+    s = collapse_ನಕ್ಷತ್ರ_spaces(s)
     s = fix_spacing(s)
-    return s
+    ಹಿಂತಿರುಗಿ s
 
-def in_this_file(cur, src_path: Path) -> bool:
-    try:
-        loc = cur.extent.start
-        f = (loc.file or cur.location.file)
-        if not f:
+ವ್ಯಾಖ್ಯಾನ ಒಳ_this_file(cur, src_ಮಾರ್ಗ: ಮಾರ್ಗ_2) -> bool:
+    ಪ್ರಯತ್ನಿಸು:
+        loc = cur.extent.ಆರಂಭ
+        f = (loc.file ಅಥವಾ cur.location.file)
+        ಆದರೆ ಅಲ್ಲ f:
             # Macro-expanded function definitions may lack an attached file.
             # Allow them only if we can actually extract a concrete function
             # header.
-            try:
-                toks = tokens_for_function_header(cur)
-                return bool(toks)
-            except Exception:
-                return False
-        cur_path = os.path.normcase(os.path.abspath(str(f.name)))
-        src_abs  = os.path.normcase(os.path.abspath(src_path.as_posix()))
+            ಪ್ರಯತ್ನಿಸು:
+                toks = ಟೋಕನುಗಳು_for_function_ಶೀರ್ಷಿಕೆ(cur)
+                ಹಿಂತಿರುಗಿ bool(toks)
+            ಅಪವಾದ Exception:
+                ಹಿಂತಿರುಗಿ ಸುಳ್ಳು
+        cur_ಮಾರ್ಗ = os.ಮಾರ್ಗ.normcase(os.ಮಾರ್ಗ.abspath(str(f.name)))
+        src_abs  = os.ಮಾರ್ಗ.normcase(os.ಮಾರ್ಗ.abspath(src_ಮಾರ್ಗ.as_posix()))
         # Accept the main source file
-        if cur_path == src_abs or os.path.basename(cur_path) == os.path.basename(src_abs):
-            return True
+        ಆದರೆ cur_ಮಾರ್ಗ == src_abs ಅಥವಾ os.ಮಾರ್ಗ.basename(cur_ಮಾರ್ಗ) == os.ಮಾರ್ಗ.basename(src_abs):
+            ಹಿಂತಿರುಗಿ ನಿಜ
         # Additionally accept quoted .c includes located in the same directory
         # (e.g., #include "regexp_nfa.c" next to the main source).
-        src_dir = os.path.normcase(os.path.abspath(src_path.parent.as_posix()))
-        if cur_path.endswith(".c") and os.path.dirname(cur_path) == src_dir:
-            return True
-        return False
-    except Exception:
-        return False
+        src_dir = os.ಮಾರ್ಗ.normcase(os.ಮಾರ್ಗ.abspath(src_ಮಾರ್ಗ.ಪೋಷಕ.as_posix()))
+        ಆದರೆ cur_ಮಾರ್ಗ.endswith(".c") ಮತ್ತು os.ಮಾರ್ಗ.dirname(cur_ಮಾರ್ಗ) == src_dir:
+            ಹಿಂತಿರುಗಿ ನಿಜ
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು
+    ಅಪವಾದ Exception:
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು
 
-def collect_function_defs(tu, src_path: Path):
-    def walk(node, depth=0):
-        if DEBUG_LOG:
-            print(f"{'  '*depth}{node.kind} {node.spelling}", file=sys.stderr)
-        if node.kind == CursorKind.FUNCTION_DECL:
-            if in_this_file(node, src_path):
-                if node.storage_class != StorageClass.STATIC and node.is_definition():
-                    yield node
-        for ch in node.get_children():
-            yield from walk(ch, depth+1)
-    yield from walk(tu.cursor)
+ವ್ಯಾಖ್ಯಾನ collect_function_defs(tu, src_ಮಾರ್ಗ: ಮಾರ್ಗ_2):
+    ವ್ಯಾಖ್ಯಾನ walk(ಗಂಟು, ಆಳ=0):
+        ಆದರೆ DEBUG_LOG:
+            ಮುದ್ರಿಸು(f"{'  '*depth}{node.kind} {node.spelling}", file=sys.stderr)
+        ಆದರೆ ಗಂಟು.ಬಗೆ == Cursor_ಬಗೆ.FUNCTION_DECL:
+            ಆದರೆ ಒಳ_this_file(ಗಂಟು, src_ಮಾರ್ಗ):
+                ಆದರೆ ಗಂಟು.storage_class != StorageClass.STATIC ಮತ್ತು ಗಂಟು.is_definition():
+                    ನೀಡು ಗಂಟು
+        ಗಾಗಿ ch ಒಳಗೆ ಗಂಟು.get_children():
+            ನೀಡು ತಃ walk(ch, ಆಳ+1)
+    ನೀಡು ತಃ walk(tu.cursor)
 
-def parse_with_clang(src_path: Path, text: str, args: List[str]):
-    index = Index.create()
-    src_abs = os.path.abspath(src_path.as_posix())
-    unsaved = [(src_abs, text)]
-    proto_h = src_path.parent / "proto.h"
-    if proto_h.exists():
+ವ್ಯಾಖ್ಯಾನ parse_with_clang(src_ಮಾರ್ಗ: ಮಾರ್ಗ_2, ಪಠ್ಯ: str, ವಾದಗಳು: List[str]):
+    ಸೂಚ್ಯಂಕ = ಸೂಚ್ಯಂಕ_3.create()
+    src_abs = os.ಮಾರ್ಗ.abspath(src_ಮಾರ್ಗ.as_posix())
+    unsaved = [(src_abs, ಪಠ್ಯ)]
+    proto_h = src_ಮಾರ್ಗ.ಪೋಷಕ / "proto.h"
+    ಆದರೆ proto_h.exists():
         unsaved.append((str(proto_h), "/* stubbed */\n"))
-    final_args = (args or []) + [
+    final_ವಾದಗಳು = (ವಾದಗಳು ಅಥವಾ []) + [
         "-std=c99", "-ferror-limit=0", "-w",
         "-Wno-implicit-function-declaration"
     ]
-    tu = index.parse(src_abs, args=final_args, unsaved_files=unsaved, options=0)
-    if SHOW_DIAGS:
-        for d in getattr(tu, "diagnostics", []):
-            print(d, file=sys.stderr)
-    return tu
+    tu = ಸೂಚ್ಯಂಕ.parse(src_abs, ವಾದಗಳು=final_ವಾದಗಳು, unsaved_files=unsaved, options=0)
+    ಆದರೆ SHOW_DIAGS:
+        ಗಾಗಿ d ಒಳಗೆ getattr(tu, "diagnostics", []):
+            ಮುದ್ರಿಸು(d, file=sys.stderr)
+    ಹಿಂತಿರುಗಿ tu
 
-def generate_prototypes(tu, src_path: Path) -> List[str]:
+ವ್ಯಾಖ್ಯಾನ generate_prototypes(tu, src_ಮಾರ್ಗ: ಮಾರ್ಗ_2) -> List[str]:
     """Collect unique function prototypes from a translation unit."""
     protos: List[str] = []
-    for fn in collect_function_defs(tu, src_path):
-        if DEBUG_LOG:
-            try:
-                sr = fn.extent.start
-                er = fn.extent.end
-                print(f"[def] {fn.spelling}  {sr.line}:{sr.column} - {er.line}:{er.column}", file=sys.stderr)
-            except Exception:
-                print(f"[def] {fn.spelling}", file=sys.stderr)
-        toks = tokens_for_function_header(fn)
-        header = join_tokens(toks) if toks else header_from_cursor(fn)
+    ಗಾಗಿ fn ಒಳಗೆ collect_function_defs(tu, src_ಮಾರ್ಗ):
+        ಆದರೆ DEBUG_LOG:
+            ಪ್ರಯತ್ನಿಸು:
+                sr = fn.extent.ಆರಂಭ
+                er = fn.extent.ಕೊನೆ
+                ಮುದ್ರಿಸು(f"[def] {fn.spelling}  {sr.line}:{sr.column} - {er.line}:{er.column}", file=sys.stderr)
+            ಅಪವಾದ Exception:
+                ಮುದ್ರಿಸು(f"[def] {fn.spelling}", file=sys.stderr)
+        toks = ಟೋಕನುಗಳು_for_function_ಶೀರ್ಷಿಕೆ(fn)
+        ಶೀರ್ಷಿಕೆ = join_ಟೋಕನುಗಳು(toks) ಆದರೆ toks ಇಲ್ಲದಿದ್ದರೆ ಶೀರ್ಷಿಕೆ_from_cursor(fn)
         # libclang expands the bool macro (from <stdbool.h>) to _Bool.
         # Restore it to bool for readability.
-        header = re.sub(r'\b_Bool\b', 'bool', header)
-        if header:
+        ಶೀರ್ಷಿಕೆ = re.sub(r'\b_Bool\b', 'bool', ಶೀರ್ಷಿಕೆ)
+        ಆದರೆ ಶೀರ್ಷಿಕೆ:
             protos.append(f"{header};")
 
-    seen, unique = set(), []
-    for p in protos:
-        if p not in seen:
+    ನೋಡಿದ, unique = ಗಣ_2(), []
+    ಗಾಗಿ p ಒಳಗೆ protos:
+        ಆದರೆ p ಅಲ್ಲ ಒಳಗೆ ನೋಡಿದ:
             unique.append(p)
-            seen.add(p)
-    return unique
+            ನೋಡಿದ.ಕೂಡಿಸು(p)
+    ಹಿಂತಿರುಗಿ unique
 
-def write_prototypes(out_path: Path, headers: List[str], src_name: str) -> None:
+ವ್ಯಾಖ್ಯಾನ write_prototypes(ಹೊರಹೋಗು_ಮಾರ್ಗ: ಮಾರ್ಗ_2, ಶೀರ್ಷಿಕೆಗಳು: List[str], src_name: str) -> ಏನೂಇಲ್ಲ:
     """Write collected prototypes to the output .pro file."""
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    try:
-        with out_path.open("w", encoding="utf-8", newline="\n") as f:
-            f.write(f"// {src_name}\n")
-            for h in headers:
-                f.write(h + "\n")
-            f.write("// vim: ft=c\n")
-    except Exception as e:
-        print(f"write failed: {e}", file=sys.stderr)
+    ಹೊರಹೋಗು_ಮಾರ್ಗ.ಪೋಷಕ.mkdir(parents=ನಿಜ, exist_ok=ನಿಜ)
+    ಪ್ರಯತ್ನಿಸು:
+        ಜೊತೆ ಹೊರಹೋಗು_ಮಾರ್ಗ.open("w", encoding="utf-8", newline="\n") ಇವ f:
+            f.ಲಿಖ(f"// {src_name}\n")
+            ಗಾಗಿ h ಒಳಗೆ ಶೀರ್ಷಿಕೆಗಳು:
+                f.ಲಿಖ(h + "\n")
+            f.ಲಿಖ("// vim: ft=c\n")
+    ಅಪವಾದ Exception ಇವ e:
+        ಮುದ್ರಿಸು(f"write failed: {e}", file=sys.stderr)
         sys.exit(4)
-    print(f"Generated {out_path.as_posix()} with {len(headers)} prototypes.")
+    ಮುದ್ರಿಸು(f"Generated {out_path.as_posix()} with {len(headers)} prototypes.")
 
-def main():
-    args = sys.argv[1:]
-    if not args:
-        print("Usage: gen_prototypes.py source.c [clang-args...]", file=sys.stderr)
+ವ್ಯಾಖ್ಯಾನ ಮುಖ್ಯ():
+    ವಾದಗಳು = sys.argv[1:]
+    ಆದರೆ ಅಲ್ಲ ವಾದಗಳು:
+        ಮುದ್ರಿಸು("Usage: gen_prototypes.py source.c [clang-args...]", file=sys.stderr)
         sys.exit(1)
 
-    src_path = Path(args[0])
-    clang_args = args[1:]
-    if not src_path.exists():
-        print(f"not found: {src_path}", file=sys.stderr)
+    src_ಮಾರ್ಗ = ಮಾರ್ಗ_2(ವಾದಗಳು[0])
+    clang_ವಾದಗಳು = ವಾದಗಳು[1:]
+    ಆದರೆ ಅಲ್ಲ src_ಮಾರ್ಗ.exists():
+        ಮುದ್ರಿಸು(f"not found: {src_path}", file=sys.stderr)
         sys.exit(2)
 
     # Load and preprocess source
-    try:
-        original = src_path.read_text(encoding="utf-8", errors="ignore")
-    except Exception as e:
-        print(f"read error: {e}", file=sys.stderr)
+    ಪ್ರಯತ್ನಿಸು:
+        original = src_ಮಾರ್ಗ.read_ಪಠ್ಯ(encoding="utf-8", errors="ignore")
+    ಅಪವಾದ Exception ಇವ e:
+        ಮುದ್ರಿಸು(f"read error: {e}", file=sys.stderr)
         sys.exit(2)
-    rewritten = rewrite_conditionals_first_branch(original)
+    rewritten = rewrite_conditionals_ಮೊದಲ_branch(original)
 
     # Parse with libclang
-    try:
-        tu = parse_with_clang(src_path, rewritten, clang_args)
-    except Exception as e:
-        print(f"parse failed: {e}", file=sys.stderr)
+    ಪ್ರಯತ್ನಿಸು:
+        tu = parse_with_clang(src_ಮಾರ್ಗ, rewritten, clang_ವಾದಗಳು)
+    ಅಪವಾದ Exception ಇವ e:
+        ಮುದ್ರಿಸು(f"parse failed: {e}", file=sys.stderr)
         sys.exit(3)
 
-    headers = generate_prototypes(tu, src_path)
-    out_file = Path("proto") / (src_path.stem + ".pro")
-    write_prototypes(out_file, headers, src_path.name)
+    ಶೀರ್ಷಿಕೆಗಳು = generate_prototypes(tu, src_ಮಾರ್ಗ)
+    ಹೊರಹೋಗು_file = ಮಾರ್ಗ_2("proto") / (src_ಮಾರ್ಗ.stem + ".pro")
+    write_prototypes(ಹೊರಹೋಗು_file, ಶೀರ್ಷಿಕೆಗಳು, src_ಮಾರ್ಗ.name)
 
-if __name__ == "__main__":
-    main()
+ಆದರೆ __name__ == "__main__":
+    ಮುಖ್ಯ()

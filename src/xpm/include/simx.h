@@ -34,12 +34,12 @@
 \*****************************************************************************/
 
 
-#ifndef _SIMX_H
-#define _SIMX_H
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ _SIMX_H
+#ವ್ಯಾಖ್ಯಾನಿಸು _SIMX_H
 
-#ifdef FOR_MSW
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FOR_MSW
 
-#include "windows.h"			/* MS windows GDI types */
+#ಅನ್ತರ್ಭಾವ "windows.h"			/* MS windows GDI types */
 
 /*
  * minimal portability layer between ansi and KR C
@@ -47,93 +47,93 @@
 /* this comes from xpm.h, and is here again, to avoid complicated
     includes, since this is included from xpm.h */
 /* these defines get undefed at the end of this file */
-#if __STDC__ || defined(__cplusplus) || defined(c_plusplus)
+#ಆದರೆ __STDC__ || defined(__cplusplus) || defined(c_plusplus)
  /* ANSI || C++ */
-#define FUNC(f, t, p) extern t f p
-#define LFUNC(f, t, p) static t f p
-#else /* k&R */
-#define FUNC(f, t, p) extern t f()
-#define LFUNC(f, t, p) static t f()
-#endif
+#ವ್ಯಾಖ್ಯಾನಿಸು FUNC(f, t, p) ಬಾಹ್ಯ t f p
+#ವ್ಯಾಖ್ಯಾನಿಸು LFUNC(f, t, p) ಸ್ಥಿರ t f p
+#ಇಲ್ಲದಿದ್ದರೆ /* k&R */
+#ವ್ಯಾಖ್ಯಾನಿಸು FUNC(f, t, p) ಬಾಹ್ಯ t f()
+#ವ್ಯಾಖ್ಯಾನಿಸು LFUNC(f, t, p) ಸ್ಥಿರ t f()
+#ಆದರೆ_ಅಂತ್ಯ
 
 
-FUNC(boundCheckingMalloc, void *, (long s));
-FUNC(boundCheckingCalloc, void *, (long num, long s));
-FUNC(boundCheckingRealloc, void *, (void *p, long s));
+FUNC(boundCheckingMalloc, ಶೂನ್ಯ *, (ದೀರ್ಘ s));
+FUNC(boundCheckingCalloc, ಶೂನ್ಯ *, (ದೀರ್ಘ ಅಂಕೆ, ದೀರ್ಘ s));
+FUNC(boundCheckingRealloc, ಶೂನ್ಯ *, (ಶೂನ್ಯ *p, ದೀರ್ಘ s));
 
 /* define MSW types for X window types,
    I don't know much about MSW, but the following defines do the job */
 
-typedef HDC Display;			/* this should be similar */
-typedef void *Screen;			/* not used */
-typedef void *Visual;			/* not used yet, is for GRAY, COLOR,
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ HDC Display;			/* this should be similar */
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಶೂನ್ಯ *Screen;			/* not used */
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಶೂನ್ಯ *Visual;			/* not used yet, is for GRAY, COLOR,
 					 * MONO */
 
-typedef void *Colormap;			/* should be COLORPALETTE, not done
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಶೂನ್ಯ *Colormap;			/* should be COLORPALETTE, not done
 					 * yet */
 
-typedef COLORREF Pixel;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ COLORREF Pixel;
 
-#define PIXEL_ALREADY_TYPEDEFED		/* to let xpm.h know about it */
+#ವ್ಯಾಖ್ಯಾನಿಸು PIXEL_ALREADY_TYPEDEFED		/* to let xpm.h know about it */
 
-typedef struct {
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
     Pixel pixel;
     BYTE red, green, blue;
 }      XColor;
 
-typedef struct {
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
     HBITMAP bitmap;
-    unsigned int width;
-    unsigned int height;
-    unsigned int depth;
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ ಅಗಲ;
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ ಎತ್ತರ;
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ ಆಳ;
 }      XImage;
 
-#if defined(__cplusplus) || defined(c_plusplus)
-extern "C" {
-#endif
+#ಆದರೆ defined(__cplusplus) || defined(c_plusplus)
+ಬಾಹ್ಯ "C" {
+#ಆದರೆ_ಅಂತ್ಯ
 /* some replacements for X... functions */
 
 /* XDefaultXXX */
     FUNC(XDefaultVisual, Visual *, (Display *display, Screen *screen));
     FUNC(XDefaultScreen, Screen *, (Display *d));
     FUNC(XDefaultColormap, Colormap *, (Display *display, Screen *screen));
-    FUNC(XDefaultDepth, int, (Display *d, Screen *s));
+    FUNC(XDefault_ಆಳ, ಪೂರ್ಣಾಂಕ, (Display *d, Screen *s));
 
 /* color related */
-    FUNC(XParseColor, int, (Display *, Colormap *, char *, XColor *));
-    FUNC(XAllocColor, int, (Display *, Colormap *, XColor *));
-    FUNC(XQueryColors, void, (Display *display, Colormap *colormap,
-			      XColor *xcolors, int ncolors));
-    FUNC(XFreeColors, int, (Display *d, Colormap cmap,
-			    unsigned long pixels[],
-			    int npixels, unsigned long planes));
+    FUNC(XParseColor, ಪೂರ್ಣಾಂಕ, (Display *, Colormap *, ಅಕ್ಷರ *, XColor *));
+    FUNC(XAllocColor, ಪೂರ್ಣಾಂಕ, (Display *, Colormap *, XColor *));
+    FUNC(XQueryColors, ಶೂನ್ಯ, (Display *display, Colormap *colormap,
+			      XColor *xcolors, ಪೂರ್ಣಾಂಕ ncolors));
+    FUNC(XFreeColors, ಪೂರ್ಣಾಂಕ, (Display *d, Colormap cmap,
+			    ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ pixels[],
+			    ಪೂರ್ಣಾಂಕ npixels, ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ planes));
 /* XImage */
-    FUNC(XCreateImage, XImage *, (Display *, Visual *, int depth, int format,
-				  int x, int y, int width, int height,
-				  int pad, int foo));
+    FUNC(XCreateImage, XImage *, (Display *, Visual *, ಪೂರ್ಣಾಂಕ ಆಳ, ಪೂರ್ಣಾಂಕ format,
+				  ಪೂರ್ಣಾಂಕ x, ಪೂರ್ಣಾಂಕ y, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ,
+				  ಪೂರ್ಣಾಂಕ pad, ಪೂರ್ಣಾಂಕ foo));
 
 /* free and destroy bitmap */
-    FUNC(XDestroyImage, void /* ? */ , (XImage *));
+    FUNC(XDestroyImage, ಶೂನ್ಯ /* ? */ , (XImage *));
 /* free only, bitmap remains */
-    FUNC(XImageFree, void, (XImage *));
-#if defined(__cplusplus) || defined(c_plusplus)
+    FUNC(XImageFree, ಶೂನ್ಯ, (XImage *));
+#ಆದರೆ defined(__cplusplus) || defined(c_plusplus)
 } /* end of extern "C" */
-#endif /* cplusplus */
+#ಆದರೆ_ಅಂತ್ಯ /* cplusplus */
 
-#define ZPixmap 1			/* not really used */
-#define XYBitmap 1			/* not really used */
+#ವ್ಯಾಖ್ಯಾನಿಸು ZPixmap 1			/* not really used */
+#ವ್ಯಾಖ್ಯಾನಿಸು XYBitmap 1			/* not really used */
 
-#ifndef True
-#define True 1
-#define False 0
-#endif
-#ifndef Bool
-typedef BOOL Bool;		/* take MSW bool */
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ True
+#ವ್ಯಾಖ್ಯಾನಿಸು True 1
+#ವ್ಯಾಖ್ಯಾನಿಸು False 0
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ Bool
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ BOOL Bool;		/* take MSW bool */
+#ಆದರೆ_ಅಂತ್ಯ
 /* make these local here, simx.c gets the same from xpm.h */
-#undef LFUNC
-#undef FUNC
+#ವ್ಯಾಖ್ಯಾನ_ರದ್ದು LFUNC
+#ವ್ಯಾಖ್ಯಾನ_ರದ್ದು FUNC
 
-#endif /* def FOR_MSW */
+#ಆದರೆ_ಅಂತ್ಯ /* def FOR_MSW */
 
-#endif /* _SIMX_H */
+#ಆದರೆ_ಅಂತ್ಯ /* _SIMX_H */

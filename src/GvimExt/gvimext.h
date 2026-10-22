@@ -11,12 +11,12 @@
  * contact Tianmiao Hu: tianmiao@acm.org.
  */
 
-#if !defined(AFX_STDAFX_H__3389658B_AD83_11D3_9C1E_0090278BBD99__INCLUDED_)
-#define AFX_STDAFX_H__3389658B_AD83_11D3_9C1E_0090278BBD99__INCLUDED_
+#ಆದರೆ !defined(AFX_STDAFX_H__3389658B_AD83_11D3_9C1E_0090278BBD99__INCLUDED_)
+#ವ್ಯಾಖ್ಯಾನಿಸು AFX_STDAFX_H__3389658B_AD83_11D3_9C1E_0090278BBD99__INCLUDED_
 
-#if defined(_MSC_VER) && _MSC_VER > 1000
-#pragma once
-#endif
+#ಆದರೆ defined(_MSC_VER) && _MSC_VER > 1000
+#ಸೂಚನೆ once
+#ಆದರೆ_ಅಂತ್ಯ
 
 // Insert your headers here
 // #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
@@ -27,30 +27,30 @@
 //
 //--------------------------------------------------------------
 
-#ifndef STRICT
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ STRICT
 # define STRICT
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#define INC_OLE2	// MS-Windows, get ole2 from windows.h
+#ವ್ಯಾಖ್ಯಾನಿಸು INC_OLE2	// MS-Windows, get ole2 from windows.h
 
 /* Visual Studio 2005 has 'deprecated' many of the standard CRT functions */
-#if defined(_MSC_VER) && _MSC_VER >= 1400
+#ಆದರೆ defined(_MSC_VER) && _MSC_VER >= 1400
 # define _CRT_SECURE_NO_DEPRECATE
 # define _CRT_NONSTDC_NO_DEPRECATE
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#include <windows.h>
-#include <windowsx.h>
-#include <shlobj.h>
-#include <wchar.h>
+#ಅನ್ತರ್ಭಾವ <windows.h>
+#ಅನ್ತರ್ಭಾವ <windowsx.h>
+#ಅನ್ತರ್ಭಾವ <shlobj.h>
+#ಅನ್ತರ್ಭಾವ <wchar.h>
 
-#define ResultFromShort(i)  ResultFromScode(MAKE_SCODE(SEVERITY_SUCCESS, 0, (USHORT)(i)))
+#ವ್ಯಾಖ್ಯಾನಿಸು ಫಲಿತಾಂಶ_From_Short(i)  ಫಲಿತಾಂಶ_From_Scode(MAKE_SCODE(SEVERITY_SUCCESS, 0, (USHORT)(i)))
 
 // Initialize GUIDs (should be done only and at-least once per DLL/EXE)
 //
-#pragma data_seg(".text")
-#define INITGUID
-#include <initguid.h>
+#ಸೂಚನೆ ದತ್ತಾಂಶ_seg(".text")
+#ವ್ಯಾಖ್ಯಾನಿಸು INITGUID
+#ಅನ್ತರ್ಭಾವ <initguid.h>
 
 //
 // The class ID of this Shell extension class.
@@ -78,73 +78,73 @@
 DEFINE_GUID(CLSID_ShellExtension, 0x51eee242, 0xad87, 0x11d3, 0x9c, 0x1e, 0x0, 0x90, 0x27, 0x8b, 0xbd, 0x99);
 
 // this class factory object creates context menu handlers for windows 32 shell
-class CShellExtClassFactory : public IClassFactory
+class CShellExtClassFactory : ಸಾರ್ವಜನಿಕ IClassFactory
 {
-protected:
+ಸಂರಕ್ಷಿತ:
     ULONG	m_cRef;
 
-public:
+ಸಾರ್ವಜನಿಕ:
     CShellExtClassFactory();
-    virtual ~CShellExtClassFactory();
+    ವಾಸ್ತವಿಕ ~CShellExtClassFactory();
 
     //IUnknown members
     STDMETHODIMP		QueryInterface(REFIID, LPVOID FAR *);
-    STDMETHODIMP_(ULONG)	AddRef();
+    STDMETHODIMP_(ULONG)	ಕೂಡಿಸು_Ref();
     STDMETHODIMP_(ULONG)	Release();
 
     //IClassFactory members
     STDMETHODIMP		CreateInstance(LPUNKNOWN, REFIID, LPVOID FAR *);
-    STDMETHODIMP		LockServer(BOOL);
+    STDMETHODIMP		ಬೀಗ_Server(BOOL);
 };
-typedef CShellExtClassFactory *LPCSHELLEXTCLASSFACTORY;
-#define MAX_HWND 100
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ CShellExtClassFactory *LPCSHELLEXTCLASSFACTORY;
+#ವ್ಯಾಖ್ಯಾನಿಸು MAX_HWND 100
 
 // this is the actual OLE Shell context menu handler
-class CShellExt : public IContextMenu,
+class CShellExt : ಸಾರ್ವಜನಿಕ IContextMenu,
 			 IShellExtInit
 {
-private:
-    BOOL LoadMenuIcon();
+ಖಾಸಗಿ:
+    BOOL ತುಂಬು_Menu_Icon();
 
-protected:
+ಸಂರಕ್ಷಿತ:
     ULONG	 m_cRef;
-    LPDATAOBJECT m_pDataObj;
+    LPDATAOBJECT m_p_ದತ್ತಾಂಶ_Obj;
     UINT	 m_edit_existing_off;
     HBITMAP	 m_hVimIconBitmap;
 
     // For some reason, this callback must be static
-    static BOOL CALLBACK EnumWindowsProc(HWND hWnd, LPARAM lParam);
+    ಸ್ಥಿರ BOOL CALLBACK EnumWindowsProc(HWND hWnd, LPARAM lParam);
 
-    STDMETHODIMP PushToWindow(HWND hParent,
+    STDMETHODIMP ತಳ್ಳು_ಗಮ್ಯ_ಕಿಟಕಿ(HWND h_ಪೋಷಕ,
 	    LPCSTR pszWorkingDir,
 	    LPCSTR pszCmd,
 	    LPCSTR pszParam,
-	    int iShowCmd,
-	    int idHWnd);
+	    ಪೂರ್ಣಾಂಕ iShowCmd,
+	    ಪೂರ್ಣಾಂಕ idHWnd);
 
-    STDMETHODIMP InvokeSingleGvim(HWND hParent,
+    STDMETHODIMP InvokeSingleGvim(HWND h_ಪೋಷಕ,
 	    LPCWSTR workingDir,
 	    LPCSTR pszCmd,
 	    LPCSTR pszParam,
-	    int iShowCmd,
-	    int gvimExtraOptions);
+	    ಪೂರ್ಣಾಂಕ iShowCmd,
+	    ಪೂರ್ಣಾಂಕ gvimExtraOptions);
 
-public:
-    int		 m_cntOfHWnd;
+ಸಾರ್ವಜನಿಕ:
+    ಪೂರ್ಣಾಂಕ		 m_cnt_ದ_HWnd;
     HWND	 m_hWnd[MAX_HWND];
     CShellExt();
-    virtual ~CShellExt();
+    ವಾಸ್ತವಿಕ ~CShellExt();
 
     //IUnknown members
     STDMETHODIMP QueryInterface(REFIID, LPVOID FAR *);
-    STDMETHODIMP_(ULONG) AddRef();
+    STDMETHODIMP_(ULONG) ಕೂಡಿಸು_Ref();
     STDMETHODIMP_(ULONG) Release();
 
     //IShell members
     STDMETHODIMP QueryContextMenu(HMENU hMenu,
-	    UINT indexMenu,
-	    UINT idCmdFirst,
-	    UINT idCmdLast,
+	    UINT ಸೂಚ್ಯಂಕ_Menu,
+	    UINT id_Cmd_ಮೊದಲ,
+	    UINT id_Cmd_ಕೊನೆಯ,
 	    UINT uFlags);
 
     STDMETHODIMP InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi);
@@ -157,11 +157,11 @@ public:
 
     //IShellExtInit methods
     STDMETHODIMP Initialize(LPCITEMIDLIST pIDFolder,
-	    LPDATAOBJECT pDataObj,
-	    HKEY hKeyID);
+	    LPDATAOBJECT p_ದತ್ತಾಂಶ_Obj,
+	    HKEY h_ಕೀಲಿ_ID);
 };
 
-typedef CShellExt *LPCSHELLEXT;
-#pragma data_seg()
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ CShellExt *LPCSHELLEXT;
+#ಸೂಚನೆ ದತ್ತಾಂಶ_seg()
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ

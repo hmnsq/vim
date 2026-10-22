@@ -11,22 +11,22 @@
  * misc1.c: functions that didn't seem to fit elsewhere
  */
 
-#include "vim.h"
-#include "version.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
+#ಅನ್ತರ್ಭಾವ "version.h"
 
-#if defined(__HAIKU__)
+#ಆದರೆ defined(__HAIKU__)
 # include <storage/FindDirectory.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(MSWIN)
+#ಆದರೆ defined(MSWIN)
 # include <lm.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#define URL_SLASH	1		// path_is_url() has found "://"
-#define URL_BACKSLASH	2		// path_is_url() has found ":\\"
+#ವ್ಯಾಖ್ಯಾನಿಸು URL_SLASH	1		// path_is_url() has found "://"
+#ವ್ಯಾಖ್ಯಾನಿಸು URL_BACKSLASH	2		// path_is_url() has found ":\\"
 
 // All user names (for ~user completion as done by shell).
-static garray_T	ga_users;
+ಸ್ಥಿರ garray_T	ga_users;
 
 /*
  * get_leader_len() returns the length in bytes of the prefix of the given
@@ -38,142 +38,142 @@ static garray_T	ga_users;
  * If "include_space" is set, include trailing whitespace while calculating the
  * length.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 get_leader_len(
-    char_u	*line,
+    char_u	*ಸಾಲು,
     char_u	**flags,
-    int		backward,
-    int		include_space)
+    ಪೂರ್ಣಾಂಕ		backward,
+    ಪೂರ್ಣಾಂಕ		include_space)
 {
-    int		i, j;
-    int		result;
-    int		got_com = FALSE;
-    int		found_one;
+    ಪೂರ್ಣಾಂಕ		i, j;
+    ಪೂರ್ಣಾಂಕ		ಫಲಿತಾಂಶ;
+    ಪೂರ್ಣಾಂಕ		got_com = FALSE;
+    ಪೂರ್ಣಾಂಕ		ಸಿಕ್ಕಿತು_one;
     char_u	part_buf[COM_MAX_LEN];	// buffer for one option part
     char_u	*string;		// pointer to comment string
     char_u	*list;
-    int		middle_match_len = 0;
+    ಪೂರ್ಣಾಂಕ		ಮಧ್ಯ_ಹೊಂದಿಕೆ_len = 0;
     char_u	*prev_list;
-    char_u	*saved_flags = NULL;
+    char_u	*saved_flags = ಖಾಲಿ;
 
-    result = i = 0;
-    while (VIM_ISWHITE(line[i]))    // leading white space is ignored
+    ಫಲಿತಾಂಶ = i = 0;
+    ಆಗ (VIM_ISWHITE(ಸಾಲು[i]))    // leading white space is ignored
 	++i;
 
     /*
      * Repeat to match several nested comment strings.
      */
-    while (line[i] != NUL)
+    ಆಗ (ಸಾಲು[i] != NUL)
     {
 	/*
 	 * scan through the 'comments' option for a match
 	 */
-	found_one = FALSE;
-	for (list = curbuf->b_p_com; *list; )
+	ಸಿಕ್ಕಿತು_one = FALSE;
+	ಗಾಗಿ (list = curbuf->b_p_com; *list; )
 	{
 	    // Get one option part into part_buf[].  Advance "list" to next
 	    // one.  Put "string" at start of string.
-	    if (!got_com && flags != NULL)
+	    ಆದರೆ (!got_com && flags != ಖಾಲಿ)
 		*flags = list;	    // remember where flags started
 	    prev_list = list;
-	    (void)copy_option_part(&list, part_buf, COM_MAX_LEN, ",");
+	    (ಶೂನ್ಯ)copy_option_part(&list, part_buf, COM_MAX_LEN, ",");
 	    string = vim_strchr(part_buf, ':');
-	    if (string == NULL)	    // missing ':', ignore this part
-		continue;
+	    ಆದರೆ (string == ಖಾಲಿ)	    // missing ':', ignore this part
+		ಮುಂದುವರಿ;
 	    *string++ = NUL;	    // isolate flags from string
 
 	    // If we found a middle match previously, use that match when this
 	    // is not a middle or end.
-	    if (middle_match_len != 0
-		    && vim_strchr(part_buf, COM_MIDDLE) == NULL
-		    && vim_strchr(part_buf, COM_END) == NULL)
-		break;
+	    ಆದರೆ (ಮಧ್ಯ_ಹೊಂದಿಕೆ_len != 0
+		    && vim_strchr(part_buf, COM_ಮಧ್ಯ) == ಖಾಲಿ
+		    && vim_strchr(part_buf, COM_ಕೊನೆ) == ಖಾಲಿ)
+		ನಿಲ್ಲಿಸು;
 
 	    // When we already found a nested comment, only accept further
 	    // nested comments.
-	    if (got_com && vim_strchr(part_buf, COM_NEST) == NULL)
-		continue;
+	    ಆದರೆ (got_com && vim_strchr(part_buf, COM_NEST) == ಖಾಲಿ)
+		ಮುಂದುವರಿ;
 
 	    // When 'O' flag present and using "O" command skip this one.
-	    if (backward && vim_strchr(part_buf, COM_NOBACK) != NULL)
-		continue;
+	    ಆದರೆ (backward && vim_strchr(part_buf, COM_NOBACK) != ಖಾಲಿ)
+		ಮುಂದುವರಿ;
 
 	    // Line contents and string must match.
 	    // When string starts with white space, must have some white space
 	    // (but the amount does not need to match, there might be a mix of
 	    // TABs and spaces).
-	    if (VIM_ISWHITE(string[0]))
+	    ಆದರೆ (VIM_ISWHITE(string[0]))
 	    {
-		if (i == 0 || !VIM_ISWHITE(line[i - 1]))
-		    continue;  // missing white space
-		while (VIM_ISWHITE(string[0]))
+		ಆದರೆ (i == 0 || !VIM_ISWHITE(ಸಾಲು[i - 1]))
+		    ಮುಂದುವರಿ;  // missing white space
+		ಆಗ (VIM_ISWHITE(string[0]))
 		    ++string;
 	    }
-	    for (j = 0; string[j] != NUL && string[j] == line[i + j]; ++j)
+	    ಗಾಗಿ (j = 0; string[j] != NUL && string[j] == ಸಾಲು[i + j]; ++j)
 		;
-	    if (string[j] != NUL)
-		continue;  // string doesn't match
+	    ಆದರೆ (string[j] != NUL)
+		ಮುಂದುವರಿ;  // string doesn't match
 
 	    // When 'b' flag used, there must be white space or an
 	    // end-of-line after the string in the line.
-	    if (vim_strchr(part_buf, COM_BLANK) != NULL
-			   && !VIM_ISWHITE(line[i + j]) && line[i + j] != NUL)
-		continue;
+	    ಆದರೆ (vim_strchr(part_buf, COM_BLANK) != ಖಾಲಿ
+			   && !VIM_ISWHITE(ಸಾಲು[i + j]) && ಸಾಲು[i + j] != NUL)
+		ಮುಂದುವರಿ;
 
 	    // We have found a match, stop searching unless this is a middle
 	    // comment. The middle comment can be a substring of the end
 	    // comment in which case it's better to return the length of the
 	    // end comment and its flags.  Thus we keep searching with middle
 	    // and end matches and use an end match if it matches better.
-	    if (vim_strchr(part_buf, COM_MIDDLE) != NULL)
+	    ಆದರೆ (vim_strchr(part_buf, COM_ಮಧ್ಯ) != ಖಾಲಿ)
 	    {
-		if (middle_match_len == 0)
+		ಆದರೆ (ಮಧ್ಯ_ಹೊಂದಿಕೆ_len == 0)
 		{
-		    middle_match_len = j;
+		    ಮಧ್ಯ_ಹೊಂದಿಕೆ_len = j;
 		    saved_flags = prev_list;
 		}
-		continue;
+		ಮುಂದುವರಿ;
 	    }
-	    if (middle_match_len != 0 && j > middle_match_len)
+	    ಆದರೆ (ಮಧ್ಯ_ಹೊಂದಿಕೆ_len != 0 && j > ಮಧ್ಯ_ಹೊಂದಿಕೆ_len)
 		// Use this match instead of the middle match, since it's a
 		// longer thus better match.
-		middle_match_len = 0;
+		ಮಧ್ಯ_ಹೊಂದಿಕೆ_len = 0;
 
-	    if (middle_match_len == 0)
+	    ಆದರೆ (ಮಧ್ಯ_ಹೊಂದಿಕೆ_len == 0)
 		i += j;
-	    found_one = TRUE;
-	    break;
+	    ಸಿಕ್ಕಿತು_one = TRUE;
+	    ನಿಲ್ಲಿಸು;
 	}
 
-	if (middle_match_len != 0)
+	ಆದರೆ (ಮಧ್ಯ_ಹೊಂದಿಕೆ_len != 0)
 	{
 	    // Use the previously found middle match after failing to find a
 	    // match with an end.
-	    if (!got_com && flags != NULL)
+	    ಆದರೆ (!got_com && flags != ಖಾಲಿ)
 		*flags = saved_flags;
-	    i += middle_match_len;
-	    found_one = TRUE;
+	    i += ಮಧ್ಯ_ಹೊಂದಿಕೆ_len;
+	    ಸಿಕ್ಕಿತು_one = TRUE;
 	}
 
 	// No match found, stop scanning.
-	if (!found_one)
-	    break;
+	ಆದರೆ (!ಸಿಕ್ಕಿತು_one)
+	    ನಿಲ್ಲಿಸು;
 
-	result = i;
+	ಫಲಿತಾಂಶ = i;
 
 	// Include any trailing white space.
-	while (VIM_ISWHITE(line[i]))
+	ಆಗ (VIM_ISWHITE(ಸಾಲು[i]))
 	    ++i;
 
-	if (include_space)
-	    result = i;
+	ಆದರೆ (include_space)
+	    ಫಲಿತಾಂಶ = i;
 
 	// If this comment doesn't nest, stop here.
 	got_com = TRUE;
-	if (vim_strchr(part_buf, COM_NEST) == NULL)
-	    break;
+	ಆದರೆ (vim_strchr(part_buf, COM_NEST) == ಖಾಲಿ)
+	    ನಿಲ್ಲಿಸು;
     }
-    return result;
+    ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
 }
 
 /*
@@ -183,30 +183,30 @@ get_leader_len(
  * When "flags" is not null, it is set to point to the flags describing the
  * recognized comment leader.
  */
-    int
-get_last_leader_offset(char_u *line, char_u **flags)
+    ಪೂರ್ಣಾಂಕ
+get_ಕೊನೆಯ_leader_ಸ್ಥಾನಾಂತರ(char_u *ಸಾಲು, char_u **flags)
 {
-    int		result = -1;
-    int		i, j;
-    int		lower_check_bound = 0;
+    ಪೂರ್ಣಾಂಕ		ಫಲಿತಾಂಶ = -1;
+    ಪೂರ್ಣಾಂಕ		i, j;
+    ಪೂರ್ಣಾಂಕ		ಅಧೋ_check_bound = 0;
     char_u	*string;
     char_u	*com_leader;
     char_u	*com_flags;
     char_u	*list;
-    int		found_one;
+    ಪೂರ್ಣಾಂಕ		ಸಿಕ್ಕಿತು_one;
     char_u	part_buf[COM_MAX_LEN];	// buffer for one option part
 
     /*
      * Repeat to match several nested comment strings.
      */
-    i = (int)STRLEN(line);
-    while (--i >= lower_check_bound)
+    i = (ಪೂರ್ಣಾಂಕ)STRLEN(ಸಾಲು);
+    ಆಗ (--i >= ಅಧೋ_check_bound)
     {
 	/*
 	 * scan through the 'comments' option for a match
 	 */
-	found_one = FALSE;
-	for (list = curbuf->b_p_com; *list; )
+	ಸಿಕ್ಕಿತು_one = FALSE;
+	ಗಾಗಿ (list = curbuf->b_p_com; *list; )
 	{
 	    char_u *flags_save = list;
 
@@ -214,11 +214,11 @@ get_last_leader_offset(char_u *line, char_u **flags)
 	     * Get one option part into part_buf[].  Advance list to next one.
 	     * put string at start of string.
 	     */
-	    (void)copy_option_part(&list, part_buf, COM_MAX_LEN, ",");
+	    (ಶೂನ್ಯ)copy_option_part(&list, part_buf, COM_MAX_LEN, ",");
 	    string = vim_strchr(part_buf, ':');
-	    if (string == NULL)	// If everything is fine, this cannot actually
+	    ಆದರೆ (string == ಖಾಲಿ)	// If everything is fine, this cannot actually
 				// happen.
-		continue;
+		ಮುಂದುವರಿ;
 	    *string++ = NUL;	// Isolate flags from string.
 	    com_leader = string;
 
@@ -228,126 +228,126 @@ get_last_leader_offset(char_u *line, char_u **flags)
 	     * (but the amount does not need to match, there might be a mix of
 	     * TABs and spaces).
 	     */
-	    if (VIM_ISWHITE(string[0]))
+	    ಆದರೆ (VIM_ISWHITE(string[0]))
 	    {
-		if (i == 0 || !VIM_ISWHITE(line[i - 1]))
-		    continue;
-		while (VIM_ISWHITE(*string))
+		ಆದರೆ (i == 0 || !VIM_ISWHITE(ಸಾಲು[i - 1]))
+		    ಮುಂದುವರಿ;
+		ಆಗ (VIM_ISWHITE(*string))
 		    ++string;
 	    }
-	    for (j = 0; string[j] != NUL && string[j] == line[i + j]; ++j)
+	    ಗಾಗಿ (j = 0; string[j] != NUL && string[j] == ಸಾಲು[i + j]; ++j)
 		/* do nothing */;
-	    if (string[j] != NUL)
-		continue;
+	    ಆದರೆ (string[j] != NUL)
+		ಮುಂದುವರಿ;
 
 	    /*
 	     * When 'b' flag used, there must be white space or an
 	     * end-of-line after the string in the line.
 	     */
-	    if (vim_strchr(part_buf, COM_BLANK) != NULL
-		    && !VIM_ISWHITE(line[i + j]) && line[i + j] != NUL)
-		continue;
+	    ಆದರೆ (vim_strchr(part_buf, COM_BLANK) != ಖಾಲಿ
+		    && !VIM_ISWHITE(ಸಾಲು[i + j]) && ಸಾಲು[i + j] != NUL)
+		ಮುಂದುವರಿ;
 
-	    if (vim_strchr(part_buf, COM_MIDDLE) != NULL)
+	    ಆದರೆ (vim_strchr(part_buf, COM_ಮಧ್ಯ) != ಖಾಲಿ)
 	    {
 		// For a middlepart comment, only consider it to match if
 		// everything before the current position in the line is
 		// whitespace.  Otherwise we would think we are inside a
 		// comment if the middle part appears somewhere in the middle
 		// of the line.  E.g. for C the "*" appears often.
-		for (j = 0; VIM_ISWHITE(line[j]) && j <= i; j++)
+		ಗಾಗಿ (j = 0; VIM_ISWHITE(ಸಾಲು[j]) && j <= i; j++)
 		    ;
-		if (j < i)
-		    continue;
+		ಆದರೆ (j < i)
+		    ಮುಂದುವರಿ;
 	    }
 
 	    /*
 	     * We have found a match, stop searching.
 	     */
-	    found_one = TRUE;
+	    ಸಿಕ್ಕಿತು_one = TRUE;
 
-	    if (flags)
+	    ಆದರೆ (flags)
 		*flags = flags_save;
 	    com_flags = flags_save;
 
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
 
-	if (found_one)
+	ಆದರೆ (ಸಿಕ್ಕಿತು_one)
 	{
 	    char_u  part_buf2[COM_MAX_LEN];	// buffer for one option part
-	    int     len1, len2, off;
+	    ಪೂರ್ಣಾಂಕ     len1, len2, off;
 
-	    result = i;
+	    ಫಲಿತಾಂಶ = i;
 	    /*
 	     * If this comment nests, continue searching.
 	     */
-	    if (vim_strchr(part_buf, COM_NEST) != NULL)
-		continue;
+	    ಆದರೆ (vim_strchr(part_buf, COM_NEST) != ಖಾಲಿ)
+		ಮುಂದುವರಿ;
 
-	    lower_check_bound = i;
+	    ಅಧೋ_check_bound = i;
 
 	    // Let's verify whether the comment leader found is a substring
 	    // of other comment leaders. If it is, let's adjust the
 	    // lower_check_bound so that we make sure that we have determined
 	    // the comment leader correctly.
 
-	    while (VIM_ISWHITE(*com_leader))
+	    ಆಗ (VIM_ISWHITE(*com_leader))
 		++com_leader;
-	    len1 = (int)STRLEN(com_leader);
+	    len1 = (ಪೂರ್ಣಾಂಕ)STRLEN(com_leader);
 
-	    for (list = curbuf->b_p_com; *list; )
+	    ಗಾಗಿ (list = curbuf->b_p_com; *list; )
 	    {
 		char_u *flags_save = list;
 
-		(void)copy_option_part(&list, part_buf2, COM_MAX_LEN, ",");
-		if (flags_save == com_flags)
-		    continue;
+		(ಶೂನ್ಯ)copy_option_part(&list, part_buf2, COM_MAX_LEN, ",");
+		ಆದರೆ (flags_save == com_flags)
+		    ಮುಂದುವರಿ;
 		string = vim_strchr(part_buf2, ':');
 		++string;
-		while (VIM_ISWHITE(*string))
+		ಆಗ (VIM_ISWHITE(*string))
 		    ++string;
-		len2 = (int)STRLEN(string);
-		if (len2 == 0)
-		    continue;
+		len2 = (ಪೂರ್ಣಾಂಕ)STRLEN(string);
+		ಆದರೆ (len2 == 0)
+		    ಮುಂದುವರಿ;
 
 		// Now we have to verify whether string ends with a substring
 		// beginning the com_leader.
-		for (off = (len2 > i ? i : len2); off > 0 && off + len1 > len2;)
+		ಗಾಗಿ (off = (len2 > i ? i : len2); off > 0 && off + len1 > len2;)
 		{
 		    --off;
-		    if (STRNCMP(string + off, com_leader, len2 - off) == 0)
+		    ಆದರೆ (STRNCMP(string + off, com_leader, len2 - off) == 0)
 		    {
-			if (i - off < lower_check_bound)
-			    lower_check_bound = i - off;
+			ಆದರೆ (i - off < ಅಧೋ_check_bound)
+			    ಅಧೋ_check_bound = i - off;
 		    }
 		}
 	    }
 	}
     }
-    return result;
+    ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
 }
 
 /*
  * Return the number of window lines occupied by buffer line "lnum".
  * Includes any filler lines.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 plines(linenr_T lnum)
 {
-    return plines_win(curwin, lnum, TRUE);
+    ಹಿಂತಿರುಗಿ plines_win(curwin, lnum, TRUE);
 }
 
-    int
+    ಪೂರ್ಣಾಂಕ
 plines_win(
     win_T	*wp,
     linenr_T	lnum,
-    int		limit_winheight)	// when TRUE limit to window height
+    ಪೂರ್ಣಾಂಕ		ಎಲ್ಲೆ_winheight)	// when TRUE limit to window height
 {
-#if defined(FEAT_DIFF)
+#ಆದರೆ defined(FEAT_DIFF)
     // Check for filler lines above this buffer line.  When folded the result
     // is one line anyway.
-    return plines_win_nofill(wp, lnum, limit_winheight)
+    ಹಿಂತಿರುಗಿ plines_win_nofill(wp, lnum, ಎಲ್ಲೆ_winheight)
 						   + diff_check_fill(wp, lnum);
 }
 
@@ -355,120 +355,120 @@ plines_win(
  * Return the number of window lines occupied by buffer line "lnum".
  * Does not include filler lines.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 plines_nofill(linenr_T lnum)
 {
-    return plines_win_nofill(curwin, lnum, TRUE);
+    ಹಿಂತಿರುಗಿ plines_win_nofill(curwin, lnum, TRUE);
 }
 
-    int
+    ಪೂರ್ಣಾಂಕ
 plines_win_nofill(
     win_T	*wp,
     linenr_T	lnum,
-    int		limit_winheight)	// when TRUE limit to window height
+    ಪೂರ್ಣಾಂಕ		ಎಲ್ಲೆ_winheight)	// when TRUE limit to window height
 {
-#endif
-    int		lines;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಪೂರ್ಣಾಂಕ		ಸಾಲುಗಳು;
 
-    if (wp->w_width == 0)
-	return 1;
+    ಆದರೆ (wp->w_ಅಗಲ == 0)
+	ಹಿಂತಿರುಗಿ 1;
 
-#ifdef FEAT_FOLDING
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_FOLDING
     // Folded lines are handled just like an empty line.
     // NOTE: Caller must handle lines that are MAYBE folded.
-    if (lineFolded(wp, lnum) == TRUE)
-	return 1;
-#endif
+    ಆದರೆ (ಸಾಲು_Folded(wp, lnum) == TRUE)
+	ಹಿಂತಿರುಗಿ 1;
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (!wp->w_p_wrap)
-	lines = 1
-#ifdef FEAT_PROP_POPUP
+    ಆದರೆ (!wp->w_p_wrap)
+	ಸಾಲುಗಳು = 1
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
 	    // add a line for each "above" and "below" aligned text property
-	    + prop_count_above_below(wp->w_buffer, lnum)
-#endif
+	    + prop_ಎಣಿಕೆ_above_ಕೆಳಗೆ(wp->w_ಬಫರ್, lnum)
+#ಆದರೆ_ಅಂತ್ಯ
 	;
-    else
-	lines = plines_win_nofold(wp, lnum);
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಸಾಲುಗಳು = plines_win_nofold(wp, lnum);
 
-    if (limit_winheight && lines > wp->w_height)
-	return wp->w_height;
-    return lines;
+    ಆದರೆ (ಎಲ್ಲೆ_winheight && ಸಾಲುಗಳು > wp->w_ಎತ್ತರ)
+	ಹಿಂತಿರುಗಿ wp->w_ಎತ್ತರ;
+    ಹಿಂತಿರುಗಿ ಸಾಲುಗಳು;
 }
 
 /*
  * Return number of window lines physical line "lnum" will occupy in window
  * "wp".  Does not care about folding, 'wrap' or 'diff'.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 plines_win_nofold(win_T *wp, linenr_T lnum)
 {
     char_u	*s;
-    long	col;
-    int		width;
+    ದೀರ್ಘ	ಲಂಬಸಾಲು;
+    ಪೂರ್ಣಾಂಕ		ಅಗಲ;
     chartabsize_T cts;
 
-    s = ml_get_buf(wp->w_buffer, lnum, FALSE);
+    s = ml_get_buf(wp->w_ಬಫರ್, lnum, FALSE);
     init_chartabsize_arg(&cts, wp, lnum, 0, s, s);
-    if (*s == NUL
-#ifdef FEAT_PROP_POPUP
-	    && !cts.cts_has_prop_with_text
-#endif
+    ಆದರೆ (*s == NUL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
+	    && !cts.cts_has_prop_with_ಪಠ್ಯ
+#ಆದರೆ_ಅಂತ್ಯ
 	    )
-	return 1; // be quick for an empty line
+	ಹಿಂತಿರುಗಿ 1; // be quick for an empty line
     win_linetabsize_cts(&cts, (colnr_T)MAXCOL);
     clear_chartabsize_arg(&cts);
-    col = (int)cts.cts_vcol;
+    ಲಂಬಸಾಲು = (ಪೂರ್ಣಾಂಕ)cts.cts_vcol;
 
     // If list mode is on, then the '$' at the end of the line may take up one
     // extra column.
-    if (wp->w_p_list && wp->w_lcs_chars.eol != NUL)
-	col += 1;
+    ಆದರೆ (wp->w_p_list && wp->w_lcs_chars.eol != NUL)
+	ಲಂಬಸಾಲು += 1;
 
     /*
      * Add column offset for 'number', 'relativenumber' and 'foldcolumn'.
      */
-    width = wp->w_width - win_col_off(wp);
-    if (width <= 0)
-	return 32000;
-    if (col <= width)
-	return 1;
-    col -= width;
-    width += win_col_off2(wp);
-    return (col + (width - 1)) / width + 1;
+    ಅಗಲ = wp->w_ಅಗಲ - win_ಲಂಬಸಾಲು_off(wp);
+    ಆದರೆ (ಅಗಲ <= 0)
+	ಹಿಂತಿರುಗಿ 32000;
+    ಆದರೆ (ಲಂಬಸಾಲು <= ಅಗಲ)
+	ಹಿಂತಿರುಗಿ 1;
+    ಲಂಬಸಾಲು -= ಅಗಲ;
+    ಅಗಲ += win_ಲಂಬಸಾಲು_off2(wp);
+    ಹಿಂತಿರುಗಿ (ಲಂಬಸಾಲು + (ಅಗಲ - 1)) / ಅಗಲ + 1;
 }
 
 /*
  * Like plines_win(), but only reports the number of physical screen lines
  * used from the start of the line to the given byte column.
  */
-    int
-plines_win_col(win_T *wp, linenr_T lnum, long column)
+    ಪೂರ್ಣಾಂಕ
+plines_win_ಲಂಬಸಾಲು(win_T *wp, linenr_T lnum, ದೀರ್ಘ ಸ್ತಂಭ)
 {
-    long	col;
-    int		lines = 0;
-    int		width;
-    char_u	*line;
+    ದೀರ್ಘ	ಲಂಬಸಾಲು;
+    ಪೂರ್ಣಾಂಕ		ಸಾಲುಗಳು = 0;
+    ಪೂರ್ಣಾಂಕ		ಅಗಲ;
+    char_u	*ಸಾಲು;
     chartabsize_T cts;
 
-#ifdef FEAT_DIFF
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
     // Check for filler lines above this buffer line.  When folded the result
     // is one line anyway.
-    lines = diff_check_fill(wp, lnum);
-#endif
+    ಸಾಲುಗಳು = diff_check_fill(wp, lnum);
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (!wp->w_p_wrap)
-	return lines + 1;
+    ಆದರೆ (!wp->w_p_wrap)
+	ಹಿಂತಿರುಗಿ ಸಾಲುಗಳು + 1;
 
-    if (wp->w_width == 0)
-	return lines + 1;
+    ಆದರೆ (wp->w_ಅಗಲ == 0)
+	ಹಿಂತಿರುಗಿ ಸಾಲುಗಳು + 1;
 
-    line = ml_get_buf(wp->w_buffer, lnum, FALSE);
+    ಸಾಲು = ml_get_buf(wp->w_ಬಫರ್, lnum, FALSE);
 
-    init_chartabsize_arg(&cts, wp, lnum, 0, line, line);
+    init_chartabsize_arg(&cts, wp, lnum, 0, ಸಾಲು, ಸಾಲು);
     // "column" is a byte index, advance the pointer until it is reached.
-    while (*cts.cts_ptr != NUL && cts.cts_ptr < line + column)
+    ಆಗ (*cts.cts_ptr != NUL && cts.cts_ptr < ಸಾಲು + ಸ್ತಂಭ)
     {
-	cts.cts_vcol += win_lbr_chartabsize(&cts, NULL, NULL);
+	cts.cts_vcol += win_lbr_chartabsize(&cts, ಖಾಲಿ, ಖಾಲಿ);
 	MB_PTR_ADV(cts.cts_ptr);
     }
 
@@ -479,23 +479,23 @@ plines_win_col(win_T *wp, linenr_T lnum, long column)
      * error when the TAB wraps from one screen line to the next (when
      * 'columns' is not a multiple of 'ts') -- webb.
      */
-    col = cts.cts_vcol;
-    if (*cts.cts_ptr == TAB && (State & MODE_NORMAL)
+    ಲಂಬಸಾಲು = cts.cts_vcol;
+    ಆದರೆ (*cts.cts_ptr == TAB && (State & ಬಹುಲಕ_ಸಾಮಾನ್ಯ)
 				    && (!wp->w_p_list || wp->w_lcs_chars.tab1))
-	col += win_lbr_chartabsize(&cts, NULL, NULL) - 1;
+	ಲಂಬಸಾಲು += win_lbr_chartabsize(&cts, ಖಾಲಿ, ಖಾಲಿ) - 1;
     clear_chartabsize_arg(&cts);
 
     /*
      * Add column offset for 'number', 'relativenumber', 'foldcolumn', etc.
      */
-    width = wp->w_width - win_col_off(wp);
-    if (width <= 0)
-	return 9999;
+    ಅಗಲ = wp->w_ಅಗಲ - win_ಲಂಬಸಾಲು_off(wp);
+    ಆದರೆ (ಅಗಲ <= 0)
+	ಹಿಂತಿರುಗಿ 9999;
 
-    lines += 1;
-    if (col > width)
-	lines += (col - width) / (width + win_col_off2(wp)) + 1;
-    return lines;
+    ಸಾಲುಗಳು += 1;
+    ಆದರೆ (ಲಂಬಸಾಲು > ಅಗಲ)
+	ಸಾಲುಗಳು += (ಲಂಬಸಾಲು - ಅಗಲ) / (ಅಗಲ + win_ಲಂಬಸಾಲು_off2(wp)) + 1;
+    ಹಿಂತಿರುಗಿ ಸಾಲುಗಳು;
 }
 
 /*
@@ -503,127 +503,127 @@ plines_win_col(win_T *wp, linenr_T lnum, long column)
  * "last" will occupy in window "wp". Takes into account folding, 'wrap',
  * topfill and filler lines beyond the end of the buffer. Limit to "max" lines.
  */
-    int
-plines_m_win(win_T *wp, linenr_T first, linenr_T last, int max)
+    ಪೂರ್ಣಾಂಕ
+plines_m_win(win_T *wp, linenr_T ಮೊದಲ, linenr_T ಕೊನೆಯ, ಪೂರ್ಣಾಂಕ max)
 {
-    int		count = 0;
+    ಪೂರ್ಣಾಂಕ		ಎಣಿಕೆ_2 = 0;
 
-    while (first <= last && count < max)
+    ಆಗ (ಮೊದಲ <= ಕೊನೆಯ && ಎಣಿಕೆ_2 < max)
     {
-#ifdef FEAT_FOLDING
-	int	x;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_FOLDING
+	ಪೂರ್ಣಾಂಕ	x;
 
 	// Check if there are any really folded lines, but also included lines
 	// that are maybe folded.
-	x = foldedCount(wp, first, NULL);
-	if (x > 0)
+	x = folded_ಎಣಿಕೆ(wp, ಮೊದಲ, ಖಾಲಿ);
+	ಆದರೆ (x > 0)
 	{
-	    ++count;	    // count 1 for "+-- folded" line
-	    first += x;
+	    ++ಎಣಿಕೆ_2;	    // count 1 for "+-- folded" line
+	    ಮೊದಲ += x;
 	}
-	else
-#endif
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 	{
-#ifdef FEAT_DIFF
-	    if (first == wp->w_topline)
-		count += plines_win_nofill(wp, first, FALSE) + wp->w_topfill;
-	    else
-#endif
-		count += plines_win(wp, first, FALSE);
-	    ++first;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
+	    ಆದರೆ (ಮೊದಲ == wp->w_topline)
+		ಎಣಿಕೆ_2 += plines_win_nofill(wp, ಮೊದಲ, FALSE) + wp->w_topfill;
+	    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+		ಎಣಿಕೆ_2 += plines_win(wp, ಮೊದಲ, FALSE);
+	    ++ಮೊದಲ;
 	}
     }
-#ifdef FEAT_DIFF
-    if (first == wp->w_buffer->b_ml.ml_line_count + 1)
-	count += diff_check_fill(wp, first);
-#endif
-    return MIN(max, count);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
+    ಆದರೆ (ಮೊದಲ == wp->w_ಬಫರ್->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ + 1)
+	ಎಣಿಕೆ_2 += diff_check_fill(wp, ಮೊದಲ);
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ MIN(max, ಎಣಿಕೆ_2);
 }
 
-    int
+    ಪೂರ್ಣಾಂಕ
 gchar_pos(pos_T *pos)
 {
     char_u	*ptr;
-    int		ptrlen;
+    ಪೂರ್ಣಾಂಕ		ptrlen;
 
     // When searching columns is sometimes put at the end of a line.
-    if (pos->col == MAXCOL)
-	return NUL;
+    ಆದರೆ (pos->ಲಂಬಸಾಲು == MAXCOL)
+	ಹಿಂತಿರುಗಿ NUL;
     ptrlen = ml_get_len(pos->lnum);
     ptr = ml_get_pos(pos);
-    if (pos->col > ptrlen)
-	return NUL;
-    if (has_mbyte)
-	return (*mb_ptr2char)(ptr);
-    return (int)*ptr;
+    ಆದರೆ (pos->ಲಂಬಸಾಲು > ptrlen)
+	ಹಿಂತಿರುಗಿ NUL;
+    ಆದರೆ (has_mbyte)
+	ಹಿಂತಿರುಗಿ (*mb_ptr2char)(ptr);
+    ಹಿಂತಿರುಗಿ (ಪೂರ್ಣಾಂಕ)*ptr;
 }
 
-    int
-gchar_cursor(void)
+    ಪೂರ್ಣಾಂಕ
+gchar_cursor(ಶೂನ್ಯ)
 {
-    if (has_mbyte)
-	return (*mb_ptr2char)(ml_get_cursor());
-    return (int)*ml_get_cursor();
+    ಆದರೆ (has_mbyte)
+	ಹಿಂತಿರುಗಿ (*mb_ptr2char)(ml_get_cursor());
+    ಹಿಂತಿರುಗಿ (ಪೂರ್ಣಾಂಕ)*ml_get_cursor();
 }
 
 /*
  * Return the character immediately before the cursor.
  */
-    int
-char_before_cursor(void)
+    ಪೂರ್ಣಾಂಕ
+char_before_cursor(ಶೂನ್ಯ)
 {
-    if (curwin->w_cursor.col == 0)
-	return -1;
+    ಆದರೆ (curwin->w_cursor.ಲಂಬಸಾಲು == 0)
+	ಹಿಂತಿರುಗಿ -1;
 
-    char_u *line = ml_get_curline();
+    char_u *ಸಾಲು = ml_get_curline();
 
-    if (has_mbyte)
+    ಆದರೆ (has_mbyte)
     {
-	char_u *p = line + curwin->w_cursor.col;
-	int prev_len = (*mb_head_off)(line, p - 1) + 1;
-	return mb_ptr2char(p - prev_len);
+	char_u *p = ಸಾಲು + curwin->w_cursor.ಲಂಬಸಾಲು;
+	ಪೂರ್ಣಾಂಕ prev_len = (*mb_ತಲೆ_off)(ಸಾಲು, p - 1) + 1;
+	ಹಿಂತಿರುಗಿ mb_ptr2char(p - prev_len);
     }
-    return line[curwin->w_cursor.col - 1];
+    ಹಿಂತಿರುಗಿ ಸಾಲು[curwin->w_cursor.ಲಂಬಸಾಲು - 1];
 }
 
 /*
  * Write a character at the current cursor position.
  * It is directly written into the block.
  */
-    void
-pchar_cursor(int c)
+    ಶೂನ್ಯ
+pchar_cursor(ಪೂರ್ಣಾಂಕ c)
 {
     *(ml_get_buf(curbuf, curwin->w_cursor.lnum, TRUE)
-						  + curwin->w_cursor.col) = c;
+						  + curwin->w_cursor.ಲಂಬಸಾಲು) = c;
 }
 
 /*
  * Skip to next part of an option argument: Skip space and comma.
  */
     char_u *
-skip_to_option_part(char_u *p)
+skip_ಗಮ್ಯ_option_part(char_u *p)
 {
-    if (*p == ',')
+    ಆದರೆ (*p == ',')
 	++p;
-    while (*p == ' ')
+    ಆಗ (*p == ' ')
 	++p;
-    return p;
+    ಹಿಂತಿರುಗಿ p;
 }
 
 /*
  * check_status: called when the status bars for the buffer 'buf'
  *		 need to be updated
  */
-    void
-check_status(buf_T *buf)
+    ಶೂನ್ಯ
+check_ಸ್ಥಿತಿ(buf_T *buf)
 {
     win_T	*wp;
 
     FOR_ALL_WINDOWS(wp)
-	if (wp->w_buffer == buf && wp->w_status_height)
+	ಆದರೆ (wp->w_ಬಫರ್ == buf && wp->w_ಸ್ಥಿತಿ_ಎತ್ತರ)
 	{
-	    wp->w_redr_status = true;
-	    set_must_redraw(UPD_VALID);
+	    wp->w_redr_ಸ್ಥಿತಿ = true;
+	    ಗಣ_must_redraw(UPD_VALID);
 	}
 }
 
@@ -637,46 +637,46 @@ check_status(buf_T *buf)
  *
  * return the 'y' or 'n'
  */
-    int
-ask_yesno(char_u *str, int direct)
+    ಪೂರ್ಣಾಂಕ
+ask_yesno(char_u *str, ಪೂರ್ಣಾಂಕ ನೇರ)
 {
-    int	    r = ' ';
-    int	    save_State = State;
+    ಪೂರ್ಣಾಂಕ	    r = ' ';
+    ಪೂರ್ಣಾಂಕ	    save_State = State;
 
-    if (exiting)		// put terminal in raw mode for this question
+    ಆದರೆ (exiting)		// put terminal in raw mode for this question
 	settmode(TMODE_RAW);
     ++no_wait_return;
-#ifdef USE_ON_FLY_SCROLL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_ON_FLY_SCROLL
     dont_scroll = TRUE;		// disallow scrolling here
-#endif
-    State = MODE_CONFIRM;	// mouse behaves like with :confirm
+#ಆದರೆ_ಅಂತ್ಯ
+    State = ಬಹುಲಕ_CONFIRM;	// mouse behaves like with :confirm
     setmouse();			// disables mouse for xterm
     ++no_mapping;
-    ++allow_keys;		// no mapping here, but recognize keys
+    ++allow_ಕೀಲಿಗಳು;		// no mapping here, but recognize keys
 
-    while (r != 'y' && r != 'n')
+    ಆಗ (r != 'y' && r != 'n')
     {
 	// same highlighting as for wait_return()
 	smsg_attr(HL_ATTR(HLF_R), "%s (y/n)?", str);
-	if (direct)
+	ಆದರೆ (ನೇರ)
 	    r = get_keystroke();
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    r = plain_vgetc();
-	if (r == Ctrl_C || r == ESC)
+	ಆದರೆ (r == Ctrl_C || r == ESC)
 	    r = 'n';
-	msg_putchar(r);	    // show what you typed
-	out_flush();
+	ಸಂದೇಶ_putchar(r);	    // show what you typed
+	ಹೊರಹೋಗು_flush();
     }
     --no_wait_return;
     State = save_State;
     setmouse();
     --no_mapping;
-    --allow_keys;
+    --allow_ಕೀಲಿಗಳು;
 
-    return r;
+    ಹಿಂತಿರುಗಿ r;
 }
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 
 /*
  * Returns the current mode as a string in "buf[MODE_MAX_LENGTH]", NUL
@@ -684,96 +684,96 @@ ask_yesno(char_u *str, int direct)
  * The first character represents the major mode, the following ones the minor
  * ones.
  */
-    void
-get_mode(char_u *buf)
+    ಶೂನ್ಯ
+get_ಬಹುಲಕ(char_u *buf)
 {
-    int		i = 0;
+    ಪೂರ್ಣಾಂಕ		i = 0;
 
-    if (time_for_testing == 93784)
+    ಆದರೆ (ಸಮಯ_for_testing == 93784)
     {
 	// Testing the two-character code.
 	buf[i++] = 'x';
 	buf[i++] = '!';
     }
 # ifdef FEAT_TERMINAL
-    else if (term_use_loop())
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಪದ_use_loop())
     {
-	if (State & MODE_CMDLINE)
+	ಆದರೆ (State & ಬಹುಲಕ_CMDLINE)
 	    buf[i++] = 'c';
 	buf[i++] = 't';
     }
 # endif
-    else if (State == MODE_HITRETURN || State == MODE_ASKMORE
-						      || State == MODE_SETWSIZE
-		|| State == MODE_CONFIRM)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (State == ಬಹುಲಕ_HITRETURN || State == ಬಹುಲಕ_ASKMORE
+						      || State == ಬಹುಲಕ_SETWSIZE
+		|| State == ಬಹುಲಕ_CONFIRM)
     {
 	buf[i++] = 'r';
-	if (State == MODE_ASKMORE)
+	ಆದರೆ (State == ಬಹುಲಕ_ASKMORE)
 	    buf[i++] = 'm';
-	else if (State == MODE_CONFIRM)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (State == ಬಹುಲಕ_CONFIRM)
 	    buf[i++] = '?';
     }
-    else if (State == MODE_EXTERNCMD)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (State == ಬಹುಲಕ_EXTERNCMD)
 	buf[i++] = '!';
-    else if (State & MODE_INSERT)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (State & ಬಹುಲಕ_ಸೇರಿಸು)
     {
-	if (State & VREPLACE_FLAG)
+	ಆದರೆ (State & VREPLACE_FLAG)
 	{
 	    buf[i++] = 'R';
 	    buf[i++] = 'v';
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (State & REPLACE_FLAG)
+	    ಆದರೆ (State & REPLACE_FLAG)
 		buf[i++] = 'R';
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		buf[i++] = 'i';
 	}
 
-	if (ins_compl_active())
+	ಆದರೆ (ins_compl_ಸಕ್ರಿಯ())
 	    buf[i++] = 'c';
-	else if (ctrl_x_mode_not_defined_yet())
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ctrl_x_ಬಹುಲಕ_not_defined_yet())
 	    buf[i++] = 'x';
     }
-    else if ((State & MODE_CMDLINE) || exmode_active)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((State & ಬಹುಲಕ_CMDLINE) || exmode_ಸಕ್ರಿಯ)
     {
 	buf[i++] = 'c';
-	if (exmode_active == EXMODE_VIM)
+	ಆದರೆ (exmode_ಸಕ್ರಿಯ == EXMODE_VIM)
 	    buf[i++] = 'v';
-	else if (exmode_active == EXMODE_NORMAL)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (exmode_ಸಕ್ರಿಯ == EXMODE_ಸಾಮಾನ್ಯ)
 	    buf[i++] = 'e';
-	if ((State & MODE_CMDLINE) && cmdline_overstrike())
+	ಆದರೆ ((State & ಬಹುಲಕ_CMDLINE) && cmdline_overstrike())
 	    buf[i++] = 'r';
     }
-    else if (VIsual_active)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (VIsual_ಸಕ್ರಿಯ)
     {
-	if (VIsual_select)
-	    buf[i++] = VIsual_mode + 's' - 'v';
-	else
+	ಆದರೆ (VIsual_select)
+	    buf[i++] = VIsual_ಬಹುಲಕ + 's' - 'v';
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    buf[i++] = VIsual_mode;
-	    if (restart_VIsual_select)
+	    buf[i++] = VIsual_ಬಹುಲಕ;
+	    ಆದರೆ (restart_VIsual_select)
 		buf[i++] = 's';
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	buf[i++] = 'n';
-	if (finish_op)
+	ಆದರೆ (ಮುಕ್ತಾಯ_op)
 	{
 	    buf[i++] = 'o';
 	    // to be able to detect force-linewise/blockwise/characterwise
 	    // operations
 	    buf[i++] = motion_force;
 	}
-	else if (restart_edit == 'I' || restart_edit == 'R'
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (restart_edit == 'I' || restart_edit == 'R'
 							|| restart_edit == 'V')
 	{
 	    buf[i++] = 'i';
 	    buf[i++] = restart_edit;
 	}
 # ifdef FEAT_TERMINAL
-	else if (term_in_normal_mode(curbuf))
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಪದ_ಒಳ_ಸಾಮಾನ್ಯ_ಬಹುಲಕ(curbuf))
 	    buf[i++] = 't';
 # endif
     }
@@ -784,74 +784,74 @@ get_mode(char_u *buf)
 /*
  * "mode()" function
  */
-    void
-f_mode(typval_T *argvars, typval_T *rettv)
+    ಶೂನ್ಯ
+f_ಬಹುಲಕ(typval_T *argvars, typval_T *rettv)
 {
-    char_u	buf[MODE_MAX_LENGTH];
+    char_u	buf[ಬಹುಲಕ_MAX_ಉದ್ದಳತೆ];
 
-    if (in_vim9script() && check_for_opt_bool_arg(argvars, 0) == FAIL)
-	return;
+    ಆದರೆ (ಒಳ_vim9script() && check_for_opt_bool_arg(argvars, 0) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
-    get_mode(buf);
+    get_ಬಹುಲಕ(buf);
 
     // Clear out the minor mode when the argument is not a non-zero number or
     // non-empty string.
-    if (!non_zero_arg(&argvars[0]))
+    ಆದರೆ (!non_zero_arg(&argvars[0]))
 	buf[1] = NUL;
 
     rettv->vval.v_string = vim_strsave(buf);
     rettv->v_type = VAR_STRING;
 }
 
-    static void
-may_add_state_char(garray_T *gap, char_u *include, int c)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+may_ಕೂಡಿಸು_state_char(garray_T *gap, char_u *include, ಪೂರ್ಣಾಂಕ c)
 {
-    if (include == NULL || vim_strchr(include, c) != NULL)
+    ಆದರೆ (include == ಖಾಲಿ || vim_strchr(include, c) != ಖಾಲಿ)
 	ga_append(gap, c);
 }
 
 /*
  * "state()" function
  */
-    void
+    ಶೂನ್ಯ
 f_state(typval_T *argvars, typval_T *rettv)
 {
     garray_T	ga;
-    char_u	*include = NULL;
-    int		i;
+    char_u	*include = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		i;
 
-    if (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
-	return;
+    ಆದರೆ (ಒಳ_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
     ga_init2(&ga, 1, 20);
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    ಆದರೆ (argvars[0].v_type != VAR_UNKNOWN)
 	include = tv_get_string(&argvars[0]);
 
-    if (!(stuff_empty() && typebuf.tb_len == 0 && scriptin[curscript] == NULL))
-	may_add_state_char(&ga, include, 'm');
-    if (op_pending())
-	may_add_state_char(&ga, include, 'o');
-    if (autocmd_busy)
-	may_add_state_char(&ga, include, 'x');
-    if (ins_compl_active())
-	may_add_state_char(&ga, include, 'a');
+    ಆದರೆ (!(stuff_ಖಾಲಿಗಳು() && typebuf.tb_len == 0 && scriptin[curscript] == ಖಾಲಿ))
+	may_ಕೂಡಿಸು_state_char(&ga, include, 'm');
+    ಆದರೆ (op_pending())
+	may_ಕೂಡಿಸು_state_char(&ga, include, 'o');
+    ಆದರೆ (autocmd_busy)
+	may_ಕೂಡಿಸು_state_char(&ga, include, 'x');
+    ಆದರೆ (ins_compl_ಸಕ್ರಿಯ())
+	may_ಕೂಡಿಸು_state_char(&ga, include, 'a');
 
-# ifdef FEAT_JOB_CHANNEL
-    if (channel_in_blocking_wait())
-	may_add_state_char(&ga, include, 'w');
+# ifdef FEAT_ಕೆಲಸ_CHANNEL
+    ಆದರೆ (channel_ಒಳ_blocking_wait())
+	may_ಕೂಡಿಸು_state_char(&ga, include, 'w');
 # endif
-    if (!get_was_safe_state())
-	may_add_state_char(&ga, include, 'S');
-    for (i = 0; i < get_callback_depth() && i < 3; ++i)
-	may_add_state_char(&ga, include, 'c');
-    if (msg_scrolled > 0)
-	may_add_state_char(&ga, include, 's');
+    ಆದರೆ (!get_was_ಸುರಕ್ಷಿತ_state())
+	may_ಕೂಡಿಸು_state_char(&ga, include, 'S');
+    ಗಾಗಿ (i = 0; i < get_callback_ಆಳ() && i < 3; ++i)
+	may_ಕೂಡಿಸು_state_char(&ga, include, 'c');
+    ಆದರೆ (ಸಂದೇಶ_scrolled > 0)
+	may_ಕೂಡಿಸು_state_char(&ga, include, 's');
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = ga.ga_data;
+    rettv->vval.v_string = ga.ga_ದತ್ತಾಂಶ;
 }
 
-#endif // FEAT_EVAL
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_EVAL
 
 /*
  * Get a key stroke directly from the user.
@@ -861,31 +861,31 @@ f_state(typval_T *argvars, typval_T *rettv)
  * Disadvantage: typeahead is ignored.
  * Translates the interrupt character for unix to ESC.
  */
-    int
-get_keystroke(void)
+    ಪೂರ್ಣಾಂಕ
+get_keystroke(ಶೂನ್ಯ)
 {
-    char_u	*buf = NULL;
-    int		buflen = 150;
-    int		maxlen;
-    int		len = 0;
-    int		n;
-    int		save_mapped_ctrl_c = mapped_ctrl_c;
-    int		waited = 0;
+    char_u	*buf = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		buflen = 150;
+    ಪೂರ್ಣಾಂಕ		maxlen;
+    ಪೂರ್ಣಾಂಕ		len = 0;
+    ಪೂರ್ಣಾಂಕ		n;
+    ಪೂರ್ಣಾಂಕ		save_mapped_ctrl_c = mapped_ctrl_c;
+    ಪೂರ್ಣಾಂಕ		waited = 0;
 
-    mod_mask = 0;
+    mod_ಮುಖವಾಡ = 0;
     mapped_ctrl_c = FALSE;	// mappings are not used here
-    for (;;)
+    ಗಾಗಿ (;;)
     {
 	cursor_on();
-	out_flush();
+	ಹೊರಹೋಗು_flush();
 
 	// Leave some room for check_termcode() to insert a key code into (max
 	// 5 chars plus NUL).  And fix_input_buffer() can triple the number of
 	// bytes.
 	maxlen = (buflen - 6 - len) / 3;
-	if (buf == NULL)
+	ಆದರೆ (buf == ಖಾಲಿ)
 	    buf = alloc(buflen);
-	else if (maxlen < 10)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (maxlen < 10)
 	{
 	    char_u  *t_buf = buf;
 
@@ -893,175 +893,175 @@ get_keystroke(void)
 	    // escape sequence.
 	    buflen += 100;
 	    buf = vim_realloc(buf, buflen);
-	    if (buf == NULL)
+	    ಆದರೆ (buf == ಖಾಲಿ)
 		vim_free(t_buf);
 	    maxlen = (buflen - 6 - len) / 3;
 	}
-	if (buf == NULL)
+	ಆದರೆ (buf == ಖಾಲಿ)
 	{
-	    do_outofmem_msg((long_u)buflen);
-	    return ESC;  // panic!
+	    do_outofmem_ಸಂದೇಶ((long_u)buflen);
+	    ಹಿಂತಿರುಗಿ ESC;  // panic!
 	}
 
 	// First time: blocking wait.  Second time: wait up to 100ms for a
 	// terminal code to complete.
 	n = ui_inchar(buf + len, maxlen, len == 0 ? -1L : 100L, 0);
-	if (n > 0)
+	ಆದರೆ (n > 0)
 	{
 	    // Replace zero and CSI by a special key code.
-	    n = fix_input_buffer(buf + len, n);
+	    n = fix_ಒಳಹರಿವು_ಬಫರ್(buf + len, n);
 	    len += n;
 	    waited = 0;
 	}
-	else if (len > 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (len > 0)
 	    ++waited;	    // keep track of the waiting time
 
 	// Incomplete termcode and not timed out yet: get more characters
-	if ((n = check_termcode(1, buf, buflen, &len)) < 0
+	ಆದರೆ ((n = check_termcode(1, buf, buflen, &len)) < 0
 	       && (!p_ttimeout || waited * 100L < (p_ttm < 0 ? p_tm : p_ttm)))
-	    continue;
+	    ಮುಂದುವರಿ;
 
-	if (n == KEYLEN_REMOVED)  // key code removed
+	ಆದರೆ (n == KEYLEN_REMOVED)  // key code removed
 	{
-	    if (must_redraw != 0 && !need_wait_return && (State
-			& (MODE_CMDLINE | MODE_HITRETURN | MODE_ASKMORE)) == 0)
+	    ಆದರೆ (must_redraw != 0 && !need_wait_return && (State
+			& (ಬಹುಲಕ_CMDLINE | ಬಹುಲಕ_HITRETURN | ಬಹುಲಕ_ASKMORE)) == 0)
 	    {
 		// Redrawing was postponed, do it now.
 		update_screen(0);
 		setcursor(); // put cursor back where it belongs
 	    }
-	    continue;
+	    ಮುಂದುವರಿ;
 	}
-	if (n > 0)		// found a termcode: adjust length
+	ಆದರೆ (n > 0)		// found a termcode: adjust length
 	    len = n;
-	if (len == 0)		// nothing typed yet
-	    continue;
+	ಆದರೆ (len == 0)		// nothing typed yet
+	    ಮುಂದುವರಿ;
 
 	// Handle modifier and/or special key code.
 	n = buf[0];
-	if (n == K_SPECIAL)
+	ಆದರೆ (n == K_SPECIAL)
 	{
-	    n = TO_SPECIAL(buf[1], buf[2]);
-	    if (buf[1] == KS_MODIFIER
+	    n = ಗಮ್ಯ_SPECIAL(buf[1], buf[2]);
+	    ಆದರೆ (buf[1] == KS_MODIFIER
 		    || n == K_IGNORE
-		    || (is_mouse_key(n) && n != K_LEFTMOUSE)
-#ifdef FEAT_GUI
+		    || (is_mouse_ಕೀಲಿ(n) && n != K_LEFTMOUSE)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 		    || n == K_VER_SCROLLBAR
 		    || n == K_HOR_SCROLLBAR
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	       )
 	    {
-		if (buf[1] == KS_MODIFIER)
-		    mod_mask = buf[2];
+		ಆದರೆ (buf[1] == KS_MODIFIER)
+		    mod_ಮುಖವಾಡ = buf[2];
 		len -= 3;
-		if (len > 0)
+		ಆದರೆ (len > 0)
 		    mch_memmove(buf, buf + 3, (size_t)len);
-		continue;
+		ಮುಂದುವರಿ;
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
-	if (has_mbyte)
+	ಆದರೆ (has_mbyte)
 	{
-	    if (MB_BYTE2LEN(n) > len)
-		continue;	// more bytes to get
+	    ಆದರೆ (MB_BYTE2LEN(n) > len)
+		ಮುಂದುವರಿ;	// more bytes to get
 	    buf[len >= buflen ? buflen - 1 : len] = NUL;
 	    n = (*mb_ptr2char)(buf);
 	}
-#ifdef UNIX
-	if (n == intr_char)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
+	ಆದರೆ (n == intr_char)
 	    n = ESC;
-#endif
-	break;
+#ಆದರೆ_ಅಂತ್ಯ
+	ನಿಲ್ಲಿಸು;
     }
     vim_free(buf);
 
     mapped_ctrl_c = save_mapped_ctrl_c;
-    return merge_modifyOtherKeys(n, &mod_mask);
+    ಹಿಂತಿರುಗಿ ವಿಲೀನ_modify_Other_ಕೀಲಿಗಳು(n, &mod_ಮುಖವಾಡ);
 }
 
 // For overflow detection, add a digit safely to an int value.
-    static int
-vim_append_digit_int(int *value, int digit)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+vim_append_digit_int(ಪೂರ್ಣಾಂಕ *ಮೌಲ್ಯ, ಪೂರ್ಣಾಂಕ digit)
 {
-    int x = *value;
-    if (x > ((INT_MAX - digit) / 10))
-	return FAIL;
-    *value = x * 10 + digit;
-    return OK;
+    ಪೂರ್ಣಾಂಕ x = *ಮೌಲ್ಯ;
+    ಆದರೆ (x > ((ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ - digit) / 10))
+	ಹಿಂತಿರುಗಿ FAIL;
+    *ಮೌಲ್ಯ = x * 10 + digit;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Get a number from the user.
  * When "mouse_used" is not NULL allow using the mouse.
  */
-    int
-get_number(
-    int	    colon,			// allow colon to abort
-    int	    *mouse_used)
+    ಪೂರ್ಣಾಂಕ
+get_ಸಂಖ್ಯೆ(
+    ಪೂರ್ಣಾಂಕ	    colon,			// allow colon to abort
+    ಪೂರ್ಣಾಂಕ	    *mouse_ಬಳಸಿದ)
 {
-    int	n = 0;
-    int	c;
-    int typed = 0;
+    ಪೂರ್ಣಾಂಕ	n = 0;
+    ಪೂರ್ಣಾಂಕ	c;
+    ಪೂರ್ಣಾಂಕ typed = 0;
 
-    if (mouse_used != NULL)
-	*mouse_used = FALSE;
+    ಆದರೆ (mouse_ಬಳಸಿದ != ಖಾಲಿ)
+	*mouse_ಬಳಸಿದ = FALSE;
 
     // When not printing messages, the user won't know what to type, return a
     // zero (as if CR was hit).
-    if (msg_silent != 0)
-	return 0;
+    ಆದರೆ (ಸಂದೇಶ_silent != 0)
+	ಹಿಂತಿರುಗಿ 0;
 
-#ifdef USE_ON_FLY_SCROLL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_ON_FLY_SCROLL
     dont_scroll = TRUE;		// disallow scrolling here
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     ++no_mapping;
-    ++allow_keys;		// no mapping here, but recognize keys
-    for (;;)
+    ++allow_ಕೀಲಿಗಳು;		// no mapping here, but recognize keys
+    ಗಾಗಿ (;;)
     {
-	windgoto(msg_row, cmdline_col_off + msg_col);
-	c = safe_vgetc();
-	if (VIM_ISDIGIT(c))
+	windgoto(ಸಂದೇಶ_ಅಡ್ಡಸಾಲು, cmdline_ಲಂಬಸಾಲು_off + ಸಂದೇಶ_ಲಂಬಸಾಲು);
+	c = ಸುರಕ್ಷಿತ_vgetc();
+	ಆದರೆ (VIM_ISDIGIT(c))
 	{
-	    if (vim_append_digit_int(&n, c - '0') == FAIL)
-		return 0;
-	    msg_putchar(c);
+	    ಆದರೆ (vim_append_digit_int(&n, c - '0') == FAIL)
+		ಹಿಂತಿರುಗಿ 0;
+	    ಸಂದೇಶ_putchar(c);
 	    ++typed;
 	}
-	else if (c == K_DEL || c == K_KDEL || c == K_BS || c == Ctrl_H)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (c == K_DEL || c == K_KDEL || c == K_BS || c == Ctrl_H)
 	{
-	    if (typed > 0)
+	    ಆದರೆ (typed > 0)
 	    {
-		msg_puts("\b \b");
+		ಸಂದೇಶ_puts("\b \b");
 		--typed;
 	    }
 	    n /= 10;
 	}
-	else if (mouse_used != NULL && c == K_LEFTMOUSE)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (mouse_ಬಳಸಿದ != ಖಾಲಿ && c == K_LEFTMOUSE)
 	{
-	    *mouse_used = TRUE;
-	    n = mouse_row + 1;
-	    break;
+	    *mouse_ಬಳಸಿದ = TRUE;
+	    n = mouse_ಅಡ್ಡಸಾಲು + 1;
+	    ನಿಲ್ಲಿಸು;
 	}
-	else if (n == 0 && c == ':' && colon)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (n == 0 && c == ':' && colon)
 	{
 	    stuffcharReadbuff(':');
-	    if (!exmode_active)
-		cmdline_row = msg_row;
+	    ಆದರೆ (!exmode_ಸಕ್ರಿಯ)
+		cmdline_ಅಡ್ಡಸಾಲು = ಸಂದೇಶ_ಅಡ್ಡಸಾಲು;
 	    skip_redraw = TRUE;	    // skip redraw once
 	    do_redraw = FALSE;
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
-	else if (c == Ctrl_C || c == ESC || c == 'q')
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (c == Ctrl_C || c == ESC || c == 'q')
 	{
 	    n = 0;
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
-	else if (c == CAR || c == NL )
-	    break;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (c == CAR || c == NL )
+	    ನಿಲ್ಲಿಸು;
     }
     --no_mapping;
-    --allow_keys;
-    return n;
+    --allow_ಕೀಲಿಗಳು;
+    ಹಿಂತಿರುಗಿ n;
 }
 
 /*
@@ -1069,83 +1069,83 @@ get_number(
  * When "mouse_used" is not NULL allow using the mouse and in that case return
  * the line number.
  */
-    int
-prompt_for_number(int *mouse_used)
+    ಪೂರ್ಣಾಂಕ
+prompt_for_ಸಂಖ್ಯೆ(ಪೂರ್ಣಾಂಕ *mouse_ಬಳಸಿದ)
 {
-    int		i;
-    int		save_cmdline_row;
-    int		save_State;
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		save_cmdline_ಅಡ್ಡಸಾಲು;
+    ಪೂರ್ಣಾಂಕ		save_State;
 
     // When using ":silent" assume that <CR> was entered.
-    if (mouse_used != NULL)
-	msg_puts(_("Type number and <Enter> or click with the mouse (q or empty cancels): "));
-    else
-	msg_puts(_("Type number and <Enter> (q or empty cancels): "));
+    ಆದರೆ (mouse_ಬಳಸಿದ != ಖಾಲಿ)
+	ಸಂದೇಶ_puts(_("Type number and <Enter> or click with the mouse (q or empty cancels): "));
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಸಂದೇಶ_puts(_("Type number and <Enter> (q or empty cancels): "));
 
     // Set the state such that text can be selected/copied/pasted and we still
     // get mouse events. redraw_after_callback() will not redraw if cmdline_row
     // is zero.
-    save_cmdline_row = cmdline_row;
-    cmdline_row = 0;
+    save_cmdline_ಅಡ್ಡಸಾಲು = cmdline_ಅಡ್ಡಸಾಲು;
+    cmdline_ಅಡ್ಡಸಾಲು = 0;
     save_State = State;
-    State = MODE_CMDLINE;
+    State = ಬಹುಲಕ_CMDLINE;
     // May show different mouse shape.
     setmouse();
 
-    i = get_number(TRUE, mouse_used);
-    if (KeyTyped)
+    i = get_ಸಂಖ್ಯೆ(TRUE, mouse_ಬಳಸಿದ);
+    ಆದರೆ (ಕೀಲಿ_Typed)
     {
 	// don't call wait_return() now
-	if (msg_row > 0)
-	    cmdline_row = msg_row - 1;
+	ಆದರೆ (ಸಂದೇಶ_ಅಡ್ಡಸಾಲು > 0)
+	    cmdline_ಅಡ್ಡಸಾಲು = ಸಂದೇಶ_ಅಡ್ಡಸಾಲು - 1;
 	need_wait_return = FALSE;
-	msg_didany = FALSE;
-	msg_didout = FALSE;
+	ಸಂದೇಶ_didany = FALSE;
+	ಸಂದೇಶ_didout = FALSE;
     }
-    else
-	cmdline_row = save_cmdline_row;
+    ಇಲ್ಲದಿದ್ದರೆ
+	cmdline_ಅಡ್ಡಸಾಲು = save_cmdline_ಅಡ್ಡಸಾಲು;
     State = save_State;
     // May need to restore mouse shape.
     setmouse();
 
-    return i;
+    ಹಿಂತಿರುಗಿ i;
 }
 
-    void
-msgmore(long n)
+    ಶೂನ್ಯ
+msgmore(ದೀರ್ಘ n)
 {
-    long pn;
+    ದೀರ್ಘ pn;
 
-    if (global_busy	    // no messages now, wait until global is finished
+    ಆದರೆ (global_busy	    // no messages now, wait until global is finished
 	    || !messaging())  // 'lazyredraw' set, don't do messages now
-	return;
+	ಹಿಂತಿರುಗಿ;
 
     // We don't want to overwrite another important message, but do overwrite
     // a previous "more lines" or "fewer lines" message, so that "5dd" and
     // then "put" reports the last action.
-    if (keep_msg != NULL && !keep_msg_more)
-	return;
+    ಆದರೆ (keep_ಸಂದೇಶ != ಖಾಲಿ && !keep_ಸಂದೇಶ_ಇನ್ನಷ್ಟು)
+	ಹಿಂತಿರುಗಿ;
 
-    if (n > 0)
+    ಆದರೆ (n > 0)
 	pn = n;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	pn = -n;
 
-    if (pn > p_report)
+    ಆದರೆ (pn > p_report)
     {
-	if (n > 0)
-	    vim_snprintf(msg_buf, MSG_BUF_LEN,
+	ಆದರೆ (n > 0)
+	    vim_snprintf(ಸಂದೇಶ_buf, ಸಂದೇಶ_BUF_LEN,
 		    NGETTEXT("%ld more line", "%ld more lines", pn), pn);
-	else
-	    vim_snprintf(msg_buf, MSG_BUF_LEN,
+	ಇಲ್ಲದಿದ್ದರೆ
+	    vim_snprintf(ಸಂದೇಶ_buf, ಸಂದೇಶ_BUF_LEN,
 		    NGETTEXT("%ld line less", "%ld fewer lines", pn), pn);
-	if (got_int)
-	    vim_strcat((char_u *)msg_buf, (char_u *)_(" (Interrupted)"),
-								  MSG_BUF_LEN);
-	if (msg(msg_buf))
+	ಆದರೆ (got_int)
+	    vim_strcat((char_u *)ಸಂದೇಶ_buf, (char_u *)_(" (Interrupted)"),
+								  ಸಂದೇಶ_BUF_LEN);
+	ಆದರೆ (ಸಂದೇಶ(ಸಂದೇಶ_buf))
 	{
-	    set_keep_msg((char_u *)msg_buf, 0);
-	    keep_msg_more = TRUE;
+	    ಗಣ_keep_ಸಂದೇಶ((char_u *)ಸಂದೇಶ_buf, 0);
+	    keep_ಸಂದೇಶ_ಇನ್ನಷ್ಟು = TRUE;
 	}
     }
 }
@@ -1153,12 +1153,12 @@ msgmore(long n)
 /*
  * flush map and typeahead buffers and give a warning for an error
  */
-    void
-beep_flush(void)
+    ಶೂನ್ಯ
+beep_flush(ಶೂನ್ಯ)
 {
-    if (emsg_silent == 0)
+    ಆದರೆ (emsg_silent == 0)
     {
-	flush_buffers(FLUSH_MINIMAL);
+	flush_buffers(FLUSH_ಕನಿಷ್ಠತಮ);
 	vim_beep(BO_ERROR);
     }
 }
@@ -1166,41 +1166,41 @@ beep_flush(void)
 /*
  * Give a warning for an error. "val" is one of the BO_ values, e.g., BO_OPER.
  */
-    void
-vim_beep(unsigned val)
+    ಶೂನ್ಯ
+vim_beep(ಚಿಹ್ನೆರಹಿತ val)
 {
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     called_vim_beep = TRUE;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (emsg_silent != 0 || in_assert_fails)
-	return;
+    ಆದರೆ (emsg_silent != 0 || ಒಳ_assert_fails)
+	ಹಿಂತಿರುಗಿ;
 
-    if (!((bo_flags & val) || (bo_flags & BO_ALL)))
+    ಆದರೆ (!((bo_flags & val) || (bo_flags & BO_ALL)))
     {
-#ifdef ELAPSED_FUNC
-	static int		did_init = FALSE;
-	static elapsed_T	start_tv;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ELAPSED_FUNC
+	ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ		did_init = FALSE;
+	ಸ್ಥಿರ elapsed_T	ಆರಂಭ_tv;
 
 	// Only beep once per half a second, otherwise a sequence of beeps
 	// would freeze Vim.
-	if (!did_init || ELAPSED_FUNC(start_tv) > 500)
+	ಆದರೆ (!did_init || ELAPSED_FUNC(ಆರಂಭ_tv) > 500)
 	{
 	    did_init = TRUE;
-	    ELAPSED_INIT(start_tv);
-#endif
-	    if (p_vb
-#ifdef FEAT_GUI
+	    ELAPSED_INIT(ಆರಂಭ_tv);
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಆದರೆ (p_vb
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
 		    // While the GUI is starting up the termcap is set for
 		    // the GUI but the output still goes to a terminal.
-		    && !(gui.in_use && gui.starting)
-#endif
+		    && !(gui.ಒಳ_use && gui.starting)
+#ಆದರೆ_ಅಂತ್ಯ
 	       )
 	    {
-		out_str_cf(T_VB);
-#ifdef FEAT_VTP
+		ಹೊರಹೋಗು_str_cf(T_VB);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_VTP
 		// No restore color information, refresh the screen.
-		if (has_vtp_working() != 0
+		ಆದರೆ (has_vtp_working() != 0
 # ifdef FEAT_TERMGUICOLORS
 			&& (p_tgc || (!p_tgc && t_colors >= 256))
 # endif
@@ -1210,22 +1210,22 @@ vim_beep(unsigned val)
 		    update_screen(0);
 		    redrawcmd();
 		}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
-	    else
-		out_char(BELL);
-#ifdef ELAPSED_FUNC
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ಹೊರಹೋಗು_char(BELL);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ELAPSED_FUNC
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
     // When 'debug' contains "beep" produce a message.  If we are sourcing
     // a script or executing a function give the user a hint where the beep
     // comes from.
-    if (vim_strchr(p_debug, 'e') != NULL)
+    ಆದರೆ (vim_strchr(p_debug, 'e') != ಖಾಲಿ)
     {
-	msg_source(HL_ATTR(HLF_W));
-	msg_attr(_("Beep!"), HL_ATTR(HLF_W));
+	ಸಂದೇಶ_ಮೂಲ(HL_ATTR(HLF_W));
+	ಸಂದೇಶ_attr(_("Beep!"), HL_ATTR(HLF_W));
     }
 }
 
@@ -1240,45 +1240,45 @@ vim_beep(unsigned val)
  * For Windows:
  *  This code is duplicated in init_homedir() in dosinst.c.  Keep in sync!
  */
-    void
-init_homedir(void)
+    ಶೂನ್ಯ
+init_homedir(ಶೂನ್ಯ)
 {
     char_u  *var;
 
     // In case we are called a second time (when 'encoding' changes).
     VIM_CLEAR(homedir);
 
-#ifdef VMS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VMS
     var = mch_getenv((char_u *)"SYS$LOGIN");
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
     var = mch_getenv((char_u *)"HOME");
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef MSWIN
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
     /*
      * Typically, $HOME is not defined on Windows, unless the user has
      * specifically defined it for Vim's sake.  However, on Windows NT
      * platforms, $HOMEDRIVE and $HOMEPATH are automatically defined for
      * each user.  Try constructing $HOME from these.
      */
-    if (var == NULL || *var == NUL)
+    ಆದರೆ (var == ಖಾಲಿ || *var == NUL)
     {
 	char_u *homedrive, *homepath;
 
 	homedrive = mch_getenv((char_u *)"HOMEDRIVE");
 	homepath = mch_getenv((char_u *)"HOMEPATH");
-	if (homepath == NULL || *homepath == NUL)
+	ಆದರೆ (homepath == ಖಾಲಿ || *homepath == NUL)
 	    homepath = (char_u *)"\\";
-	if (homedrive != NULL
+	ಆದರೆ (homedrive != ಖಾಲಿ
 			   && STRLEN(homedrive) + STRLEN(homepath) < MAXPATHL)
 	{
-	    sprintf((char *)NameBuff, "%s%s", homedrive, homepath);
-	    if (NameBuff[0] != NUL)
+	    sprintf((ಅಕ್ಷರ *)NameBuff, "%s%s", homedrive, homepath);
+	    ಆದರೆ (NameBuff[0] != NUL)
 		var = NameBuff;
 	}
     }
 
-    if (var == NULL)
+    ಆದರೆ (var == ಖಾಲಿ)
 	var = mch_getenv((char_u *)"USERPROFILE");
 
     /*
@@ -1286,40 +1286,40 @@ init_homedir(void)
      * variable, esp. "%USERPROFILE%".  Happens when $USERPROFILE isn't set
      * when $HOME is being set.
      */
-    if (var != NULL && *var == '%')
+    ಆದರೆ (var != ಖಾಲಿ && *var == '%')
     {
 	char_u	*p;
-	char_u	*exp;
+	char_u	*ಘಾತಾಂಕ;
 
 	p = vim_strchr(var + 1, '%');
-	if (p != NULL)
+	ಆದರೆ (p != ಖಾಲಿ)
 	{
 	    vim_strncpy(NameBuff, var + 1, p - (var + 1));
-	    exp = mch_getenv(NameBuff);
-	    if (exp != NULL && *exp != NUL
-					&& STRLEN(exp) + STRLEN(p) < MAXPATHL)
+	    ಘಾತಾಂಕ = mch_getenv(NameBuff);
+	    ಆದರೆ (ಘಾತಾಂಕ != ಖಾಲಿ && *ಘಾತಾಂಕ != NUL
+					&& STRLEN(ಘಾತಾಂಕ) + STRLEN(p) < MAXPATHL)
 	    {
-		vim_snprintf((char *)NameBuff, MAXPATHL, "%s%s", exp, p + 1);
+		vim_snprintf((ಅಕ್ಷರ *)NameBuff, MAXPATHL, "%s%s", ಘಾತಾಂಕ, p + 1);
 		var = NameBuff;
 	    }
 	}
     }
 
-    if (var != NULL && *var == NUL)	// empty is same as not set
-	var = NULL;
+    ಆದರೆ (var != ಖಾಲಿ && *var == NUL)	// empty is same as not set
+	var = ಖಾಲಿ;
 
-    if (enc_utf8 && var != NULL)
+    ಆದರೆ (enc_utf8 && var != ಖಾಲಿ)
     {
-	int	len;
-	char_u  *pp = NULL;
+	ಪೂರ್ಣಾಂಕ	len;
+	char_u  *pp = ಖಾಲಿ;
 
 	// Convert from active codepage to UTF-8.  Other conversions are
 	// not done, because they would fail for non-ASCII characters.
-	acp_to_enc(var, (int)STRLEN(var), &pp, &len);
-	if (pp != NULL)
+	acp_ಗಮ್ಯ_enc(var, (ಪೂರ್ಣಾಂಕ)STRLEN(var), &pp, &len);
+	ಆದರೆ (pp != ಖಾಲಿ)
 	{
 	    homedir = pp;
-	    return;
+	    ಹಿಂತಿರುಗಿ;
 	}
     }
 
@@ -1327,52 +1327,52 @@ init_homedir(void)
      * Default home dir is C:/
      * Best assumption we can make in such a situation.
      */
-    if (var == NULL)
+    ಆದರೆ (var == ಖಾಲಿ)
 	var = (char_u *)"C:/";
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (var != NULL)
+    ಆದರೆ (var != ಖಾಲಿ)
     {
-#ifdef UNIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
 	/*
 	 * Change to the directory and get the actual path.  This resolves
 	 * links.  Don't do it when we can't return.
 	 */
-	if (mch_dirname(NameBuff, MAXPATHL) == OK
-					  && mch_chdir((char *)NameBuff) == 0)
+	ಆದರೆ (mch_dirname(NameBuff, MAXPATHL) == OK
+					  && mch_chdir((ಅಕ್ಷರ *)NameBuff) == 0)
 	{
-	    if (!mch_chdir((char *)var) && mch_dirname(IObuff, IOSIZE) == OK)
+	    ಆದರೆ (!mch_chdir((ಅಕ್ಷರ *)var) && mch_dirname(IObuff, IOSIZE) == OK)
 		var = IObuff;
-	    if (mch_chdir((char *)NameBuff) != 0)
-		emsg(_(e_cannot_go_back_to_previous_directory));
+	    ಆದರೆ (mch_chdir((ಅಕ್ಷರ *)NameBuff) != 0)
+		emsg(_(e_cannot_go_ಹಿಂಭಾಗ_ಗಮ್ಯ_ಹಿಂದಿನ_directory));
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	homedir = vim_strsave(var);
     }
 }
 
-#if defined(EXITFREE)
-    void
-free_homedir(void)
+#ಆದರೆ defined(EXITFREE)
+    ಶೂನ್ಯ
+free_homedir(ಶೂನ್ಯ)
 {
     vim_free(homedir);
 }
 
-    void
-free_users(void)
+    ಶೂನ್ಯ
+free_users(ಶೂನ್ಯ)
 {
-    ga_clear_strings(&ga_users);
+    ga_clear_ಅಕ್ಷರಸರಣಿಗಳು(&ga_users);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(MSWIN)
+#ಆದರೆ defined(MSWIN)
 /*
  * Initialize $VIM and $VIMRUNTIME when 'enc' is updated.
  */
-    void
-init_vimdir(void)
+    ಶೂನ್ಯ
+init_vimdir(ಶೂನ್ಯ)
 {
-    int	    mustfree;
+    ಪೂರ್ಣಾಂಕ	    mustfree;
     char_u  *p;
 
     mch_get_exe_name();
@@ -1380,16 +1380,16 @@ init_vimdir(void)
     mustfree = FALSE;
     didset_vim = FALSE;
     p = vim_getenv((char_u *)"VIM", &mustfree);
-    if (mustfree)
+    ಆದರೆ (mustfree)
 	vim_free(p);
 
     mustfree = FALSE;
     didset_vimruntime = FALSE;
     p = vim_getenv((char_u *)"VIMRUNTIME", &mustfree);
-    if (mustfree)
+    ಆದರೆ (mustfree)
 	vim_free(p);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Call expand_env() and store the result in an allocated string.
@@ -1399,7 +1399,7 @@ init_vimdir(void)
     char_u *
 expand_env_save(char_u *src)
 {
-    return expand_env_save_opt(src, FALSE, NULL);
+    ಹಿಂತಿರುಗಿ expand_env_save_opt(src, FALSE, ಖಾಲಿ);
 }
 
 /*
@@ -1407,14 +1407,14 @@ expand_env_save(char_u *src)
  * expand "~" at the start.
  */
     char_u *
-expand_env_save_opt(char_u *src, int one, char_u *esc_chars)
+expand_env_save_opt(char_u *src, ಪೂರ್ಣಾಂಕ one, char_u *esc_chars)
 {
     char_u	*p;
 
     p = alloc(MAXPATHL);
-    if (p != NULL)
-	expand_env_esc(src, p, MAXPATHL, esc_chars, one, NULL);
-    return p;
+    ಆದರೆ (p != ಖಾಲಿ)
+	expand_env_esc(src, p, MAXPATHL, esc_chars, one, ಖಾಲಿ);
+    ಹಿಂತಿರುಗಿ p;
 }
 
 /*
@@ -1427,67 +1427,67 @@ expand_env_save_opt(char_u *src, int one, char_u *esc_chars)
 expand_env(
     char_u	*src,		// input string e.g. "$HOME/vim.hlp"
     char_u	*dst,		// where to put the result
-    int		dstlen)		// maximum length of the result
+    ಪೂರ್ಣಾಂಕ		dstlen)		// maximum length of the result
 {
-    return expand_env_esc(src, dst, dstlen, NULL, FALSE, NULL);
+    ಹಿಂತಿರುಗಿ expand_env_esc(src, dst, dstlen, ಖಾಲಿ, FALSE, ಖಾಲಿ);
 }
 
     size_t
 expand_env_esc(
     char_u	*srcp,		// input string e.g. "$HOME/vim.hlp"
     char_u	*dst,		// where to put the result
-    int		dstlen,		// maximum length of the result
+    ಪೂರ್ಣಾಂಕ		dstlen,		// maximum length of the result
     char_u	*esc_chars,	// chars to escape in expanded vars
-    int		one,		// "srcp" is one file name
+    ಪೂರ್ಣಾಂಕ		one,		// "srcp" is one file name
     char_u	*startstr)	// start again after this (can be NULL)
 {
     char_u	*src;
-    char_u	*tail;
-    int		c;
+    char_u	*ಬಾಲ;
+    ಪೂರ್ಣಾಂಕ		c;
     char_u	*var;
-    int		copy_char;
-    int		mustfree;	// var was allocated, need to free it later
-    int		at_start = TRUE; // at start of a name
-    int		startstr_len = 0;
-    char_u	*dst_start = dst;
+    ಪೂರ್ಣಾಂಕ		copy_char;
+    ಪೂರ್ಣಾಂಕ		mustfree;	// var was allocated, need to free it later
+    ಪೂರ್ಣಾಂಕ		at_ಆರಂಭ = TRUE; // at start of a name
+    ಪೂರ್ಣಾಂಕ		startstr_len = 0;
+    char_u	*dst_ಆರಂಭ = dst;
 
-    if (startstr != NULL)
-	startstr_len = (int)STRLEN(startstr);
+    ಆದರೆ (startstr != ಖಾಲಿ)
+	startstr_len = (ಪೂರ್ಣಾಂಕ)STRLEN(startstr);
 
     src = skipwhite(srcp);
     --dstlen;		    // leave one char space for "\,"
-    while (*src && dstlen > 0)
+    ಆಗ (*src && dstlen > 0)
     {
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 	// Skip over `=expr`.
-	if (src[0] == '`' && src[1] == '=')
+	ಆದರೆ (src[0] == '`' && src[1] == '=')
 	{
 	    size_t len;
 
 	    var = src;
 	    src += 2;
-	    (void)skip_expr(&src, NULL);
-	    if (*src == '`')
+	    (ಶೂನ್ಯ)skip_ಅಭಿವ್ಯಕ್ತಿ(&src, ಖಾಲಿ);
+	    ಆದರೆ (*src == '`')
 		++src;
 	    len = src - var;
-	    if (len > (size_t)dstlen)
+	    ಆದರೆ (len > (size_t)dstlen)
 		len = dstlen;
 	    vim_strncpy(dst, var, len);
 	    dst += len;
-	    dstlen -= (int)len;
-	    continue;
+	    dstlen -= (ಪೂರ್ಣಾಂಕ)len;
+	    ಮುಂದುವರಿ;
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	copy_char = TRUE;
-	if ((*src == '$'
-#ifdef VMS
-		    && at_start
-#endif
+	ಆದರೆ ((*src == '$'
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VMS
+		    && at_ಆರಂಭ
+#ಆದರೆ_ಅಂತ್ಯ
 	   )
-#if defined(MSWIN)
+#ಆದರೆ defined(MSWIN)
 		|| *src == '%'
-#endif
-		|| (*src == '~' && at_start))
+#ಆದರೆ_ಅಂತ್ಯ
+		|| (*src == '~' && at_ಆರಂಭ))
 	{
 	    mustfree = FALSE;
 
@@ -1495,75 +1495,75 @@ expand_env_esc(
 	     * The variable name is copied into dst temporarily, because it may
 	     * be a string in read-only memory and a NUL needs to be appended.
 	     */
-	    if (*src != '~')				// environment var
+	    ಆದರೆ (*src != '~')				// environment var
 	    {
-		tail = src + 1;
+		ಬಾಲ = src + 1;
 		var = dst;
 		c = dstlen - 1;
 
-#ifdef UNIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ UNIX
 		// Unix has ${var-name} type environment vars
-		if (*tail == '{' && !vim_isIDc('{'))
+		ಆದರೆ (*ಬಾಲ == '{' && !vim_isIDc('{'))
 		{
-		    tail++;	// ignore '{'
-		    while (c-- > 0 && *tail && *tail != '}')
-			*var++ = *tail++;
+		    ಬಾಲ++;	// ignore '{'
+		    ಆಗ (c-- > 0 && *ಬಾಲ && *ಬಾಲ != '}')
+			*var++ = *ಬಾಲ++;
 		}
-		else
-#endif
+		ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 		{
-		    while (c-- > 0 && *tail != NUL && ((vim_isIDc(*tail))
-#if defined(MSWIN)
-			    || (*src == '%' && *tail != '%')
-#endif
+		    ಆಗ (c-- > 0 && *ಬಾಲ != NUL && ((vim_isIDc(*ಬಾಲ))
+#ಆದರೆ defined(MSWIN)
+			    || (*src == '%' && *ಬಾಲ != '%')
+#ಆದರೆ_ಅಂತ್ಯ
 			    ))
-			*var++ = *tail++;
+			*var++ = *ಬಾಲ++;
 		}
 
-#if defined(MSWIN) || defined(UNIX)
+#ಆದರೆ defined(MSWIN) || defined(UNIX)
 # ifdef UNIX
-		if (src[1] == '{' && *tail != '}')
-# else
-		if (*src == '%' && *tail != '%')
+		ಆದರೆ (src[1] == '{' && *ಬಾಲ != '}')
+# ಇಲ್ಲದಿದ್ದರೆ
+		ಆದರೆ (*src == '%' && *ಬಾಲ != '%')
 # endif
-		    var = NULL;
-		else
+		    var = ಖಾಲಿ;
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 # ifdef UNIX
-		    if (src[1] == '{')
-# else
-		    if (*src == '%')
+		    ಆದರೆ (src[1] == '{')
+# ಇಲ್ಲದಿದ್ದರೆ
+		    ಆದರೆ (*src == '%')
 # endif
-			++tail;
-#endif
+			++ಬಾಲ;
+#ಆದರೆ_ಅಂತ್ಯ
 		    *var = NUL;
 		    var = vim_getenv(dst, &mustfree);
-#if defined(MSWIN) || defined(UNIX)
+#ಆದರೆ defined(MSWIN) || defined(UNIX)
 		}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
 							// home directory
-	    else if (  src[1] == NUL
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (  src[1] == NUL
 		    || vim_ispathsep(src[1])
-		    || vim_strchr((char_u *)" ,\t\n", src[1]) != NULL)
+		    || vim_strchr((char_u *)" ,\t\n", src[1]) != ಖಾಲಿ)
 	    {
 		var = homedir;
-		tail = src + 1;
+		ಬಾಲ = src + 1;
 	    }
-	    else					// user directory
+	    ಇಲ್ಲದಿದ್ದರೆ					// user directory
 	    {
-#if defined(UNIX) || (defined(VMS) && defined(USER_HOME))
+#ಆದರೆ defined(UNIX) || (defined(VMS) && defined(USER_HOME))
 		/*
 		 * Copy ~user to dst[], so we can put a NUL after it.
 		 */
-		tail = src;
+		ಬಾಲ = src;
 		var = dst;
 		c = dstlen - 1;
-		while (	   c-- > 0
-			&& *tail
-			&& vim_isfilec(*tail)
-			&& !vim_ispathsep(*tail))
-		    *var++ = *tail++;
+		ಆಗ (	   c-- > 0
+			&& *ಬಾಲ
+			&& vim_isfilec(*ಬಾಲ)
+			&& !vim_ispathsep(*ಬಾಲ))
+		    *var++ = *ಬಾಲ++;
 		*var = NUL;
 # ifdef UNIX
 		/*
@@ -1572,28 +1572,28 @@ expand_env_esc(
 		 * expand ~user.  This is slower and may fail if the shell
 		 * does not support ~user (old versions of /bin/sh).
 		 */
-#  if defined(HAVE_GETPWNAM) && defined(HAVE_PWD_H)
+#  ಆದರೆ defined(HAVE_GETPWNAM) && defined(HAVE_PWD_H)
 		{
 		    // Note: memory allocated by getpwnam() is never freed.
 		    // Calling endpwent() apparently doesn't help.
-		    struct passwd *pw = (*dst == NUL)
-					? NULL : getpwnam((char *)dst + 1);
+		    ರಚನೆ passwd *pw = (*dst == NUL)
+					? ಖಾಲಿ : getpwnam((ಅಕ್ಷರ *)dst + 1);
 
-		    var = (pw == NULL) ? NULL : (char_u *)pw->pw_dir;
+		    var = (pw == ಖಾಲಿ) ? ಖಾಲಿ : (char_u *)pw->pw_dir;
 		}
-		if (var == NULL)
+		ಆದರೆ (var == ಖಾಲಿ)
 #  endif
 		{
 		    expand_T	xpc;
 
 		    ExpandInit(&xpc);
 		    xpc.xp_context = EXPAND_FILES;
-		    var = ExpandOne(&xpc, dst, NULL,
-				WILD_ADD_SLASH|WILD_SILENT, WILD_EXPAND_FREE);
+		    var = ExpandOne(&xpc, dst, ಖಾಲಿ,
+				WILD_ಕೂಡಿಸು_SLASH|WILD_SILENT, WILD_EXPAND_FREE);
 		    mustfree = TRUE;
 		}
 
-# else	// !UNIX, thus VMS
+# ಇಲ್ಲದಿದ್ದರೆ	// !UNIX, thus VMS
 		/*
 		 * USER_HOME is a comma-separated list of
 		 * directories to search for the user account in.
@@ -1601,194 +1601,194 @@ expand_env_esc(
 		{
 		    char_u	test[MAXPATHL], paths[MAXPATHL];
 		    size_t	testlen;
-		    char_u	*path, *next_path, *ptr;
+		    char_u	*ಮಾರ್ಗ, *ಮುಂದಿನ_ಮಾರ್ಗ, *ptr;
 		    stat_T	st;
 
 		    STRCPY(paths, USER_HOME);
-		    next_path = paths;
-		    while (*next_path)
+		    ಮುಂದಿನ_ಮಾರ್ಗ = paths;
+		    ಆಗ (*ಮುಂದಿನ_ಮಾರ್ಗ)
 		    {
-			for (path = next_path; *next_path && *next_path != ',';
-				next_path++);
-			if (*next_path)
-			    *next_path++ = NUL;
+			ಗಾಗಿ (ಮಾರ್ಗ = ಮುಂದಿನ_ಮಾರ್ಗ; *ಮುಂದಿನ_ಮಾರ್ಗ && *ಮುಂದಿನ_ಮಾರ್ಗ != ',';
+				ಮುಂದಿನ_ಮಾರ್ಗ++);
+			ಆದರೆ (*ಮುಂದಿನ_ಮಾರ್ಗ)
+			    *ಮುಂದಿನ_ಮಾರ್ಗ++ = NUL;
 			testlen = vim_snprintf_safelen(
-			    (char *)test,
-			    sizeof(test),
+			    (ಅಕ್ಷರ *)test,
+			    ಗಾತ್ರ(test),
 			    "%s/%s",
-			    path,
+			    ಮಾರ್ಗ,
 			    dst + 1);
-			if (mch_stat(test, &st) == 0)
+			ಆದರೆ (mch_stat(test, &st) == 0)
 			{
 			    var = alloc(testlen + 1);
-			    if (var != NULL)
+			    ಆದರೆ (var != ಖಾಲಿ)
 			    {
 				STRCPY(var, test);
 				mustfree = TRUE;
 			    }
-			    break;
+			    ನಿಲ್ಲಿಸು;
 			}
 		    }
 		}
 # endif // UNIX
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 		// cannot expand user's home directory, so don't try
-		var = NULL;
-		tail = (char_u *)"";	// for gcc
-#endif // UNIX || VMS
+		var = ಖಾಲಿ;
+		ಬಾಲ = (char_u *)"";	// for gcc
+#ಆದರೆ_ಅಂತ್ಯ // UNIX || VMS
 	    }
 
-#ifdef BACKSLASH_IN_FILENAME
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ BACKSLASH_ಒಳ_FILENAME
 	    // If 'shellslash' is set change backslashes to forward slashes.
 	    // Can't use slash_adjust(), p_ssl may be set temporarily.
-	    if (p_ssl && var != NULL && vim_strchr(var, '\\') != NULL)
+	    ಆದರೆ (p_ssl && var != ಖಾಲಿ && vim_strchr(var, '\\') != ಖಾಲಿ)
 	    {
 		char_u	*p = vim_strsave(var);
 
-		if (p != NULL)
+		ಆದರೆ (p != ಖಾಲಿ)
 		{
-		    if (mustfree)
+		    ಆದರೆ (mustfree)
 			vim_free(var);
 		    var = p;
 		    mustfree = TRUE;
 		    forward_slash(var);
 		}
 	    }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 	    // If "var" contains any character from "esc_chars", escape it
 	    // with a backslash.  The historical use is escaping spaces so
 	    // that ":e ~/tt" works when $HOME contains a space.
-	    if (esc_chars != NULL && var != NULL
-		    && vim_strpbrk(var, esc_chars) != NULL)
+	    ಆದರೆ (esc_chars != ಖಾಲಿ && var != ಖಾಲಿ
+		    && vim_strpbrk(var, esc_chars) != ಖಾಲಿ)
 	    {
 		char_u	*p = vim_strsave_escaped(var, esc_chars);
 
-		if (p != NULL)
+		ಆದರೆ (p != ಖಾಲಿ)
 		{
-		    if (mustfree)
+		    ಆದರೆ (mustfree)
 			vim_free(var);
 		    var = p;
 		    mustfree = TRUE;
 		}
 	    }
 
-	    if (var != NULL && *var != NUL)
+	    ಆದರೆ (var != ಖಾಲಿ && *var != NUL)
 	    {
-		c = (int)STRLEN(var);
+		c = (ಪೂರ್ಣಾಂಕ)STRLEN(var);
 
-		if (c + STRLEN(tail) + 1 < (unsigned)dstlen)
+		ಆದರೆ (c + STRLEN(ಬಾಲ) + 1 < (ಚಿಹ್ನೆರಹಿತ)dstlen)
 		{
 		    STRCPY(dst, var);
 		    dstlen -= c;
 		    // if var[] ends in a path separator and tail[] starts
 		    // with it, skip a character
-		    if (after_pathsep(dst, dst + c)
-#if defined(BACKSLASH_IN_FILENAME) || defined(AMIGA)
+		    ಆದರೆ (after_pathsep(dst, dst + c)
+#ಆದರೆ defined(BACKSLASH_ಒಳ_FILENAME) || defined(AMIGA)
 			    && dst[c - 1] != ':'
-#endif
-			    && vim_ispathsep(*tail))
-			++tail;
+#ಆದರೆ_ಅಂತ್ಯ
+			    && vim_ispathsep(*ಬಾಲ))
+			++ಬಾಲ;
 		    dst += c;
-		    src = tail;
+		    src = ಬಾಲ;
 		    copy_char = FALSE;
 		}
 	    }
-	    if (mustfree)
+	    ಆದರೆ (mustfree)
 		vim_free(var);
 	}
 
-	if (copy_char)	    // copy at least one char
+	ಆದರೆ (copy_char)	    // copy at least one char
 	{
 	    /*
 	     * Recognize the start of a new name, for '~'.
 	     * Don't do this when "one" is TRUE, to avoid expanding "~" in
 	     * ":edit foo ~ foo".
 	     */
-	    at_start = FALSE;
-	    if (src[0] == '\\' && src[1] != NUL)
+	    at_ಆರಂಭ = FALSE;
+	    ಆದರೆ (src[0] == '\\' && src[1] != NUL)
 	    {
 		*dst++ = *src++;
 		--dstlen;
 	    }
-	    else if ((src[0] == ' ' || src[0] == ',') && !one)
-		at_start = TRUE;
-	    if (dstlen > 0)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((src[0] == ' ' || src[0] == ',') && !one)
+		at_ಆರಂಭ = TRUE;
+	    ಆದರೆ (dstlen > 0)
 	    {
 		*dst++ = *src++;
 		--dstlen;
 
-		if (startstr != NULL && src - startstr_len >= srcp
+		ಆದರೆ (startstr != ಖಾಲಿ && src - startstr_len >= srcp
 			&& STRNCMP(src - startstr_len, startstr,
 							    startstr_len) == 0)
-		    at_start = TRUE;
+		    at_ಆರಂಭ = TRUE;
 	    }
 	}
 
     }
     *dst = NUL;
 
-    return (size_t)(dst - dst_start);
+    ಹಿಂತಿರುಗಿ (size_t)(dst - dst_ಆರಂಭ);
 }
 
 /*
  * If the string between "p" and "pend" ends in "name/", return "pend" minus
  * the length of "name/".  Otherwise return "pend".
  */
-    static char_u *
-remove_tail(char_u *p, char_u *pend, char_u *name)
+    ಸ್ಥಿರ char_u *
+remove_ಬಾಲ(char_u *p, char_u *pend, char_u *name)
 {
-    int		len = (int)STRLEN(name) + 1;
+    ಪೂರ್ಣಾಂಕ		len = (ಪೂರ್ಣಾಂಕ)STRLEN(name) + 1;
     char_u	*newend = pend - len;
 
-    if (newend >= p
+    ಆದರೆ (newend >= p
 	    && fnamencmp(newend, name, len - 1) == 0
 	    && (newend == p || after_pathsep(p, newend)))
-	return newend;
-    return pend;
+	ಹಿಂತಿರುಗಿ newend;
+    ಹಿಂತಿರುಗಿ pend;
 }
 
 /*
  * Check if the directory "vimdir/<version>" or "vimdir/runtime" exists.
  * Return NULL if not, return its name in allocated memory otherwise.
  */
-    static char_u *
-vim_version_dir(char_u *vimdir)
+    ಸ್ಥಿರ char_u *
+vim_ಆವೃತ್ತಿ_dir(char_u *vimdir)
 {
     string_T	p;
     size_t	vimdir_len;
 
-    if (vimdir == NULL || *vimdir == NUL)
-	return NULL;
+    ಆದರೆ (vimdir == ಖಾಲಿ || *vimdir == NUL)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     vimdir_len = STRLEN(vimdir);
     concat_fnames(vimdir, vimdir_len,
-	(char_u *)VIM_VERSION_NODOT, STRLEN_LITERAL(VIM_VERSION_NODOT), TRUE, &p);
-    if (p.string != NULL && mch_isdir(p.string))
-	return p.string;
+	(char_u *)VIM_ಆವೃತ್ತಿ_NODOT, STRLEN_LITERAL(VIM_ಆವೃತ್ತಿ_NODOT), TRUE, &p);
+    ಆದರೆ (p.string != ಖಾಲಿ && mch_isdir(p.string))
+	ಹಿಂತಿರುಗಿ p.string;
     vim_free(p.string);
     concat_fnames(vimdir, vimdir_len,
 	(char_u *)RUNTIME_DIRNAME, STRLEN_LITERAL(RUNTIME_DIRNAME), TRUE, &p);
-    if (p.string != NULL && mch_isdir(p.string))
+    ಆದರೆ (p.string != ಖಾಲಿ && mch_isdir(p.string))
     {
 	string_T    fname;
 
-	concat_fnames(p.string, p.length,
+	concat_fnames(p.string, p.ಉದ್ದಳತೆ,
 	    (char_u *)"defaults.vim", STRLEN_LITERAL("defaults.vim"), TRUE, &fname);
 
 	// Check that "defaults.vim" exists in this directory, to avoid picking
 	// up a stray "runtime" directory, it would make many tests fail in
 	// mysterious ways.
-	if (fname.string != NULL)
+	ಆದರೆ (fname.string != ಖಾಲಿ)
 	{
-	    int exists = file_is_readable(fname.string);
+	    ಪೂರ್ಣಾಂಕ exists = file_is_readable(fname.string);
 
 	    vim_free(fname.string);
-	    if (exists)
-		return p.string;
+	    ಆದರೆ (exists)
+		ಹಿಂತಿರುಗಿ p.string;
 	}
     }
     vim_free(p.string);
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
@@ -1799,105 +1799,105 @@ vim_version_dir(char_u *vimdir)
  * initialized to FALSE by the caller.
  */
     char_u *
-vim_getenv(char_u *name, int *mustfree)
+vim_getenv(char_u *name, ಪೂರ್ಣಾಂಕ *mustfree)
 {
-    char_u	*p = NULL;
+    char_u	*p = ಖಾಲಿ;
     char_u	*pend;
-    int		vimruntime;
-#ifdef MSWIN
+    ಪೂರ್ಣಾಂಕ		vimruntime;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
     WCHAR	*wn, *wp;
 
     // use "C:/" when $HOME is not set
-    if (STRCMP(name, "HOME") == 0)
-	return homedir;
+    ಆದರೆ (STRCMP(name, "HOME") == 0)
+	ಹಿಂತಿರುಗಿ homedir;
 
     // Use Wide function
-    wn = enc_to_utf16(name, NULL);
-    if (wn == NULL)
-	return NULL;
+    wn = enc_ಗಮ್ಯ_utf16(name, ಖಾಲಿ);
+    ಆದರೆ (wn == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     wp = _wgetenv(wn);
     vim_free(wn);
 
-    if (wp != NULL && *wp == NUL)   // empty is the same as not set
-	wp = NULL;
+    ಆದರೆ (wp != ಖಾಲಿ && *wp == NUL)   // empty is the same as not set
+	wp = ಖಾಲಿ;
 
-    if (wp != NULL)
+    ಆದರೆ (wp != ಖಾಲಿ)
     {
-	p = utf16_to_enc(wp, NULL);
-	if (p == NULL)
-	    return NULL;
+	p = utf16_ಗಮ್ಯ_enc(wp, ಖಾಲಿ);
+	ಆದರೆ (p == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
 	*mustfree = TRUE;
-	return p;
+	ಹಿಂತಿರುಗಿ p;
     }
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
     p = mch_getenv(name);
-    if (p != NULL && *p == NUL)	    // empty is the same as not set
-	p = NULL;
+    ಆದರೆ (p != ಖಾಲಿ && *p == NUL)	    // empty is the same as not set
+	p = ಖಾಲಿ;
 
-    if (p != NULL)
-	return p;
+    ಆದರೆ (p != ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ p;
 
 # ifdef __HAIKU__
     // special handling for user settings directory...
-    if (STRCMP(name, "BE_USER_SETTINGS") == 0)
+    ಆದರೆ (STRCMP(name, "BE_USER_SETTINGS") == 0)
     {
-	static char userSettingsPath[MAXPATHL];
+	ಸ್ಥಿರ ಅಕ್ಷರ user_Settings_ಮಾರ್ಗ[MAXPATHL];
 
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, 0, false,
-					   userSettingsPath, MAXPATHL) == B_OK)
-	    return (char_u *)userSettingsPath;
-	else
-	    return NULL;
+	ಆದರೆ (ಕಂಡುಹಿಡಿ_directory(B_USER_SETTINGS_DIRECTORY, 0, false,
+					   user_Settings_ಮಾರ್ಗ, MAXPATHL) == B_OK)
+	    ಹಿಂತಿರುಗಿ (char_u *)user_Settings_ಮಾರ್ಗ;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // handling $VIMRUNTIME and $VIM is below, bail out if it's another name.
     vimruntime = (STRCMP(name, "VIMRUNTIME") == 0);
-    if (!vimruntime && STRCMP(name, "VIM") != 0)
-	return NULL;
+    ಆದರೆ (!vimruntime && STRCMP(name, "VIM") != 0)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     /*
      * When expanding $VIMRUNTIME fails, try using $VIM/vim<version> or $VIM.
      * Don't do this when default_vimruntime_dir is non-empty.
      */
-    if (vimruntime
-#ifdef HAVE_PATHDEF
+    ಆದರೆ (vimruntime
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_PATHDEF
 	    && *default_vimruntime_dir == NUL
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
        )
     {
-#ifdef MSWIN
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
 	// Use Wide function
 	wp = _wgetenv(L"VIM");
-	if (wp != NULL && *wp == NUL)	    // empty is the same as not set
-	    wp = NULL;
-	if (wp != NULL)
+	ಆದರೆ (wp != ಖಾಲಿ && *wp == NUL)	    // empty is the same as not set
+	    wp = ಖಾಲಿ;
+	ಆದರೆ (wp != ಖಾಲಿ)
 	{
-	    char_u *q = utf16_to_enc(wp, NULL);
-	    if (q != NULL)
+	    char_u *q = utf16_ಗಮ್ಯ_enc(wp, ಖಾಲಿ);
+	    ಆದರೆ (q != ಖಾಲಿ)
 	    {
-		p = vim_version_dir(q);
+		p = vim_ಆವೃತ್ತಿ_dir(q);
 		*mustfree = TRUE;
-		if (p == NULL)
+		ಆದರೆ (p == ಖಾಲಿ)
 		    p = q;
 	    }
 	}
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 	p = mch_getenv((char_u *)"VIM");
-	if (p != NULL && *p == NUL)	    // empty is the same as not set
-	    p = NULL;
-	if (p != NULL)
+	ಆದರೆ (p != ಖಾಲಿ && *p == NUL)	    // empty is the same as not set
+	    p = ಖಾಲಿ;
+	ಆದರೆ (p != ಖಾಲಿ)
 	{
-	    p = vim_version_dir(p);
-	    if (p != NULL)
+	    p = vim_ಆವೃತ್ತಿ_dir(p);
+	    ಆದರೆ (p != ಖಾಲಿ)
 		*mustfree = TRUE;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		p = mch_getenv((char_u *)"VIM");
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
     /*
@@ -1905,39 +1905,39 @@ vim_getenv(char_u *name, int *mustfree)
      * - the directory name from 'helpfile' (unless it contains '$')
      * - the executable name from argv[0]
      */
-    if (p == NULL)
+    ಆದರೆ (p == ಖಾಲಿ)
     {
-	if (p_hf != NULL && vim_strchr(p_hf, '$') == NULL)
+	ಆದರೆ (p_hf != ಖಾಲಿ && vim_strchr(p_hf, '$') == ಖಾಲಿ)
 	    p = p_hf;
-#ifdef USE_EXE_NAME
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_EXE_NAME
 	/*
 	 * Use the name of the executable, obtained from argv[0].
 	 */
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    p = exe_name;
-#endif
-	if (p != NULL)
+#ಆದರೆ_ಅಂತ್ಯ
+	ಆದರೆ (p != ಖಾಲಿ)
 	{
 	    // remove the file name
 	    pend = gettail(p);
 
 	    // remove "doc/" from 'helpfile', if present
-	    if (p == p_hf)
-		pend = remove_tail(p, pend, (char_u *)"doc");
+	    ಆದರೆ (p == p_hf)
+		pend = remove_ಬಾಲ(p, pend, (char_u *)"doc");
 
-#ifdef USE_EXE_NAME
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_EXE_NAME
 # ifdef MACOS_X
 	    // remove "MacOS" from exe_name and add "Resources/vim"
-	    if (p == exe_name)
+	    ಆದರೆ (p == exe_name)
 	    {
 		char_u	*pend1;
 		char_u	*pnew;
 
-		pend1 = remove_tail(p, pend, (char_u *)"MacOS");
-		if (pend1 != pend)
+		pend1 = remove_ಬಾಲ(p, pend, (char_u *)"MacOS");
+		ಆದರೆ (pend1 != pend)
 		{
 		    pnew = alloc(pend1 - p + 15);
-		    if (pnew != NULL)
+		    ಆದರೆ (pnew != ಖಾಲಿ)
 		    {
 			STRNCPY(pnew, p, (pend1 - p));
 			STRCPY(pnew + (pend1 - p), "Resources/vim");
@@ -1948,139 +1948,139 @@ vim_getenv(char_u *name, int *mustfree)
 	    }
 # endif
 	    // remove "src/" from exe_name, if present
-	    if (p == exe_name)
-		pend = remove_tail(p, pend, (char_u *)"src");
-#endif
+	    ಆದರೆ (p == exe_name)
+		pend = remove_ಬಾಲ(p, pend, (char_u *)"src");
+#ಆದರೆ_ಅಂತ್ಯ
 
 	    // for $VIM, remove "runtime/" or "vim54/", if present
-	    if (!vimruntime)
+	    ಆದರೆ (!vimruntime)
 	    {
-		pend = remove_tail(p, pend, (char_u *)RUNTIME_DIRNAME);
-		pend = remove_tail(p, pend, (char_u *)VIM_VERSION_NODOT);
+		pend = remove_ಬಾಲ(p, pend, (char_u *)RUNTIME_DIRNAME);
+		pend = remove_ಬಾಲ(p, pend, (char_u *)VIM_ಆವೃತ್ತಿ_NODOT);
 	    }
 
 	    // remove trailing path separator
-	    if (pend > p && after_pathsep(p, pend))
+	    ಆದರೆ (pend > p && after_pathsep(p, pend))
 		--pend;
 
-#ifdef MACOS_X
-	    if (p == exe_name || p == p_hf)
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MACOS_X
+	    ಆದರೆ (p == exe_name || p == p_hf)
+#ಆದರೆ_ಅಂತ್ಯ
 		// check that the result is a directory name
 		p = vim_strnsave(p, pend - p);
 
-	    if (p != NULL && !mch_isdir(p))
+	    ಆದರೆ (p != ಖಾಲಿ && !mch_isdir(p))
 		VIM_CLEAR(p);
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-#ifdef USE_EXE_NAME
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_EXE_NAME
 		// may add "/vim54" or "/runtime" if it exists
-		if (vimruntime && (pend = vim_version_dir(p)) != NULL)
+		ಆದರೆ (vimruntime && (pend = vim_ಆವೃತ್ತಿ_dir(p)) != ಖಾಲಿ)
 		{
 		    vim_free(p);
 		    p = pend;
 		}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		*mustfree = TRUE;
 	    }
 	}
     }
 
-#ifdef HAVE_PATHDEF
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_PATHDEF
     // When there is a pathdef.c file we can use default_vim_dir and
     // default_vimruntime_dir
-    if (p == NULL)
+    ಆದರೆ (p == ಖಾಲಿ)
     {
 	// Only use default_vimruntime_dir when it is not empty
-	if (vimruntime && *default_vimruntime_dir != NUL)
+	ಆದರೆ (vimruntime && *default_vimruntime_dir != NUL)
 	{
 	    p = default_vimruntime_dir;
 	    *mustfree = FALSE;
 	}
-	else if (*default_vim_dir != NUL)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*default_vim_dir != NUL)
 	{
-	    if (vimruntime && (p = vim_version_dir(default_vim_dir)) != NULL)
+	    ಆದರೆ (vimruntime && (p = vim_ಆವೃತ್ತಿ_dir(default_vim_dir)) != ಖಾಲಿ)
 		*mustfree = TRUE;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		p = default_vim_dir;
 		*mustfree = FALSE;
 	    }
 	}
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     /*
      * Set the environment variable, so that the new value can be found fast
      * next time, and others can also use it (e.g. Perl).
      */
-    if (p != NULL)
+    ಆದರೆ (p != ಖಾಲಿ)
     {
-	if (vimruntime)
+	ಆದರೆ (vimruntime)
 	{
 	    vim_setenv((char_u *)"VIMRUNTIME", p);
 	    didset_vimruntime = TRUE;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    vim_setenv((char_u *)"VIM", p);
 	    didset_vim = TRUE;
 	}
     }
-    return p;
+    ಹಿಂತಿರುಗಿ p;
 }
 
-    void
+    ಶೂನ್ಯ
 vim_unsetenv(char_u *var)
 {
-#ifdef HAVE_UNSETENV
-    unsetenv((char *)var);
-#else
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_UNSETENV
+    unsetenv((ಅಕ್ಷರ *)var);
+#ಇಲ್ಲದಿದ್ದರೆ
     vim_setenv(var, (char_u *)"");
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Removes environment variable "name" and take care of side effects.
  */
-    void
+    ಶೂನ್ಯ
 vim_unsetenv_ext(char_u *var)
 {
     vim_unsetenv(var);
 
     // "homedir" is not cleared, keep using the old value until $HOME is set.
-    if (STRICMP(var, "VIM") == 0)
+    ಆದರೆ (STRICMP(var, "VIM") == 0)
 	didset_vim = FALSE;
-    else if (STRICMP(var, "VIMRUNTIME") == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRICMP(var, "VIMRUNTIME") == 0)
 	didset_vimruntime = FALSE;
 }
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * Set environment variable "name" and take care of side effects.
  */
-    void
+    ಶೂನ್ಯ
 vim_setenv_ext(char_u *name, char_u *val)
 {
     vim_setenv(name, val);
-    if (STRICMP(name, "HOME") == 0)
+    ಆದರೆ (STRICMP(name, "HOME") == 0)
 	init_homedir();
-    else if (didset_vim && STRICMP(name, "VIM") == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (didset_vim && STRICMP(name, "VIM") == 0)
 	didset_vim = FALSE;
-    else if (didset_vimruntime && STRICMP(name, "VIMRUNTIME") == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (didset_vimruntime && STRICMP(name, "VIMRUNTIME") == 0)
 	didset_vimruntime = FALSE;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Our portable version of setenv.
  */
-    void
+    ಶೂನ್ಯ
 vim_setenv(char_u *name, char_u *val)
 {
-#ifdef HAVE_SETENV
-    mch_setenv((char *)name, (char *)val, 1);
-#else
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_SETENV
+    mch_setenv((ಅಕ್ಷರ *)name, (ಅಕ್ಷರ *)val, 1);
+#ಇಲ್ಲದಿದ್ದರೆ
     char_u	*envbuf;
 
     /*
@@ -2088,28 +2088,28 @@ vim_setenv(char_u *name, char_u *val)
      * valid.  The allocated memory will never be freed.
      */
     envbuf = alloc(STRLEN(name) + STRLEN(val) + 2);
-    if (envbuf != NULL)
+    ಆದರೆ (envbuf != ಖಾಲಿ)
     {
-	sprintf((char *)envbuf, "%s=%s", name, val);
-	putenv((char *)envbuf);
+	sprintf((ಅಕ್ಷರ *)envbuf, "%s=%s", name, val);
+	putenv((ಅಕ್ಷರ *)envbuf);
     }
-#endif
-#ifdef FEAT_GETTEXT
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GETTEXT
     /*
      * When setting $VIMRUNTIME adjust the directory to find message
      * translations to $VIMRUNTIME/lang.
      */
-    if (*val != NUL && STRICMP(name, "VIMRUNTIME") == 0)
+    ಆದರೆ (*val != NUL && STRICMP(name, "VIMRUNTIME") == 0)
     {
 	char_u	*buf = concat_str(val, (char_u *)"/lang");
 
-	if (buf != NULL)
+	ಆದರೆ (buf != ಖಾಲಿ)
 	{
-	    bindtextdomain(VIMPACKAGE, (char *)buf);
+	    bindtextdomain(VIMPACKAGE, (ಅಕ್ಷರ *)buf);
 	    vim_free(buf);
 	}
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
@@ -2117,94 +2117,94 @@ vim_setenv(char_u *name, char_u *val)
  */
     char_u *
 get_env_name(
-    expand_T	*xp UNUSED,
-    int		idx)
+    expand_T	*xp ಬಳಸದ,
+    ಪೂರ್ಣಾಂಕ		idx)
 {
-#if defined(AMIGA)
+#ಆದರೆ defined(AMIGA)
     // No environ[] on the Amiga.
-    return NULL;
-#else
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+#ಇಲ್ಲದಿದ್ದರೆ
 # ifndef __WIN32__
     // Borland C++ 5.2 has this in a header file.
-    extern char		**environ;
+    ಬಾಹ್ಯ ಅಕ್ಷರ		**environ;
 # endif
     char_u		*str;
-    int			n;
+    ಪೂರ್ಣಾಂಕ			n;
 
     str = (char_u *)environ[idx];
-    if (str == NULL)
-	return NULL;
+    ಆದರೆ (str == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    for (n = 0; n < EXPAND_BUF_LEN - 1; ++n)
+    ಗಾಗಿ (n = 0; n < EXPAND_BUF_LEN - 1; ++n)
     {
-	if (str[n] == '=' || str[n] == NUL)
-	    break;
+	ಆದರೆ (str[n] == '=' || str[n] == NUL)
+	    ನಿಲ್ಲಿಸು;
 	xp->xp_buf[n] = str[n];
     }
     xp->xp_buf[n] = NUL;
-    return xp->xp_buf;
-#endif
+    ಹಿಂತಿರುಗಿ xp->xp_buf;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Add a user name to the list of users in ga_users.
  * Do nothing if user name is NULL or empty.
  */
-    static void
-add_user(char_u *user, int need_copy)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಕೂಡಿಸು_user(char_u *user, ಪೂರ್ಣಾಂಕ need_copy)
 {
-    char_u	*user_copy = (user != NULL && need_copy)
+    char_u	*user_copy = (user != ಖಾಲಿ && need_copy)
 						    ? vim_strsave(user) : user;
 
-    if (user_copy == NULL || *user_copy == NUL || ga_grow(&ga_users, 1) == FAIL)
+    ಆದರೆ (user_copy == ಖಾಲಿ || *user_copy == NUL || ga_grow(&ga_users, 1) == FAIL)
     {
-	if (need_copy)
+	ಆದರೆ (need_copy)
 	    vim_free(user_copy);
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
-    ((char_u **)(ga_users.ga_data))[ga_users.ga_len++] = user_copy;
+    ((char_u **)(ga_users.ga_ದತ್ತಾಂಶ))[ga_users.ga_len++] = user_copy;
 }
 
 /*
  * Find all user names for user completion.
  * Done only once and then cached.
  */
-    static void
-init_users(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+init_users(ಶೂನ್ಯ)
 {
-    static int	lazy_init_done = FALSE;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	lazy_init_ಮುಗಿದ = FALSE;
 
-    if (lazy_init_done)
-	return;
+    ಆದರೆ (lazy_init_ಮುಗಿದ)
+	ಹಿಂತಿರುಗಿ;
 
-    lazy_init_done = TRUE;
-    ga_init2(&ga_users, sizeof(char_u *), 20);
+    lazy_init_ಮುಗಿದ = TRUE;
+    ga_init2(&ga_users, ಗಾತ್ರ(char_u *), 20);
 
-#if defined(HAVE_GETPWENT) && defined(HAVE_PWD_H)
+#ಆದರೆ defined(HAVE_GETPWENT) && defined(HAVE_PWD_H)
     {
-	struct passwd*	pw;
+	ರಚನೆ passwd*	pw;
 
 	setpwent();
-	while ((pw = getpwent()) != NULL)
-	    add_user((char_u *)pw->pw_name, TRUE);
+	ಆಗ ((pw = getpwent()) != ಖಾಲಿ)
+	    ಕೂಡಿಸು_user((char_u *)pw->pw_name, TRUE);
 	endpwent();
     }
-#elif defined(MSWIN)
+#ಅಥವಾಆದರೆ defined(MSWIN)
     {
 	DWORD		nusers = 0, ntotal = 0, i;
 	PUSER_INFO_0	uinfo;
 
-	if (NetUserEnum(NULL, 0, 0, (LPBYTE *) &uinfo, MAX_PREFERRED_LENGTH,
-				       &nusers, &ntotal, NULL) == NERR_Success)
+	ಆದರೆ (NetUserEnum(ಖಾಲಿ, 0, 0, (LPBYTE *) &uinfo, MAX_PREFERRED_ಉದ್ದಳತೆ,
+				       &nusers, &ntotal, ಖಾಲಿ) == NERR_Success)
 	{
-	    for (i = 0; i < nusers; i++)
-		add_user(utf16_to_enc(uinfo[i].usri0_name, NULL), FALSE);
+	    ಗಾಗಿ (i = 0; i < nusers; i++)
+		ಕೂಡಿಸು_user(utf16_ಗಮ್ಯ_enc(uinfo[i].usri0_name, ಖಾಲಿ), FALSE);
 
-	    NetApiBufferFree(uinfo);
+	    Net_Api_ಬಫರ್_Free(uinfo);
 	}
     }
-#endif
-#if defined(HAVE_GETPWNAM)
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(HAVE_GETPWNAM)
     {
 	char_u	*user_env = mch_getenv((char_u *)"USER");
 
@@ -2214,40 +2214,40 @@ init_users(void)
 	// is a valid remote user name using getpwnam() and if it is, add it to
 	// the list of user names.
 
-	if (user_env != NULL && *user_env != NUL)
+	ಆದರೆ (user_env != ಖಾಲಿ && *user_env != NUL)
 	{
-	    int	i;
+	    ಪೂರ್ಣಾಂಕ	i;
 
-	    for (i = 0; i < ga_users.ga_len; i++)
+	    ಗಾಗಿ (i = 0; i < ga_users.ga_len; i++)
 	    {
-		char_u	*local_user = ((char_u **)ga_users.ga_data)[i];
+		char_u	*local_user = ((char_u **)ga_users.ga_ದತ್ತಾಂಶ)[i];
 
-		if (STRCMP(local_user, user_env) == 0)
-		    break;
+		ಆದರೆ (STRCMP(local_user, user_env) == 0)
+		    ನಿಲ್ಲಿಸು;
 	    }
 
-	    if (i == ga_users.ga_len)
+	    ಆದರೆ (i == ga_users.ga_len)
 	    {
-		struct passwd	*pw = getpwnam((char *)user_env);
+		ರಚನೆ passwd	*pw = getpwnam((ಅಕ್ಷರ *)user_env);
 
-		if (pw != NULL)
-		    add_user((char_u *)pw->pw_name, TRUE);
+		ಆದರೆ (pw != ಖಾಲಿ)
+		    ಕೂಡಿಸು_user((char_u *)pw->pw_name, TRUE);
 	    }
 	}
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Function given to ExpandGeneric() to obtain user names.
  */
     char_u*
-get_users(expand_T *xp UNUSED, int idx)
+get_users(expand_T *xp ಬಳಸದ, ಪೂರ್ಣಾಂಕ idx)
 {
     init_users();
-    if (idx < ga_users.ga_len)
-	return ((char_u **)ga_users.ga_data)[idx];
-    return NULL;
+    ಆದರೆ (idx < ga_users.ga_len)
+	ಹಿಂತಿರುಗಿ ((char_u **)ga_users.ga_ದತ್ತಾಂಶ)[idx];
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
@@ -2256,48 +2256,48 @@ get_users(expand_T *xp UNUSED, int idx)
  * 1 if name partially matches the beginning of a user name.
  * 2 is name fully matches a user name.
  */
-    int
-match_user(char_u *name)
+    ಪೂರ್ಣಾಂಕ
+ಹೊಂದಿಕೆ_user(char_u *name)
 {
-    int i;
-    int n = (int)STRLEN(name);
-    int result = 0;
+    ಪೂರ್ಣಾಂಕ i;
+    ಪೂರ್ಣಾಂಕ n = (ಪೂರ್ಣಾಂಕ)STRLEN(name);
+    ಪೂರ್ಣಾಂಕ ಫಲಿತಾಂಶ = 0;
 
     init_users();
-    for (i = 0; i < ga_users.ga_len; i++)
+    ಗಾಗಿ (i = 0; i < ga_users.ga_len; i++)
     {
-	if (STRCMP(((char_u **)ga_users.ga_data)[i], name) == 0)
-	    return 2; // full match
-	if (STRNCMP(((char_u **)ga_users.ga_data)[i], name, n) == 0)
-	    result = 1; // partial match
+	ಆದರೆ (STRCMP(((char_u **)ga_users.ga_ದತ್ತಾಂಶ)[i], name) == 0)
+	    ಹಿಂತಿರುಗಿ 2; // full match
+	ಆದರೆ (STRNCMP(((char_u **)ga_users.ga_ದತ್ತಾಂಶ)[i], name, n) == 0)
+	    ಫಲಿತಾಂಶ = 1; // partial match
     }
-    return result;
+    ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
 }
 
-    static void
-prepare_to_exit(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+prepare_ಗಮ್ಯ_exit(ಶೂನ್ಯ)
 {
-#if defined(SIGHUP) && defined(SIG_IGN)
+#ಆದರೆ defined(SIGHUP) && defined(SIG_IGN)
     // Ignore SIGHUP, because a dropped connection causes a read error, which
     // makes Vim exit and then handling SIGHUP causes various reentrance
     // problems.
     mch_signal(SIGHUP, SIG_IGN);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_GUI
-    if (gui.in_use)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+    ಆದರೆ (gui.ಒಳ_use)
     {
 	gui.dying = true;
-	out_trash();	// trash any pending output
+	ಹೊರಹೋಗು_trash();	// trash any pending output
     }
-    else
-#endif
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
     {
-	windgoto((int)Rows - 1, cmdline_col_off);
+	windgoto((ಪೂರ್ಣಾಂಕ)ಅಡ್ಡಸಾಲುಗಳು - 1, cmdline_ಲಂಬಸಾಲು_off);
 
 	// When "full_screen" was reset, e.g. by deathtrap(), settmode() below
 	// returns without switching the mouse off, so do it here.
-	if (!full_screen)
+	ಆದರೆ (!ತುಂಬಿದ_screen)
 	    mch_setmouse(FALSE);
 
 	/*
@@ -2306,7 +2306,7 @@ prepare_to_exit(void)
 	 */
 	settmode(TMODE_COOK);
 	stoptermcap();
-	out_flush();
+	ಹೊರಹೋಗು_flush();
     }
 }
 
@@ -2316,38 +2316,38 @@ prepare_to_exit(void)
  * NOTE: This may be called from deathtrap() in a signal handler, avoid unsafe
  * functions, such as allocating memory.
  */
-    void
-preserve_exit(void)
+    ಶೂನ್ಯ
+preserve_exit(ಶೂನ್ಯ)
 {
     buf_T	*buf;
 
-    prepare_to_exit();
+    prepare_ಗಮ್ಯ_exit();
 
     // Setting this will prevent free() calls.  That avoids calling free()
     // recursively when free() was invoked with a bad pointer.
     really_exiting = TRUE;
 
-    out_str(IObuff);
-    screen_start();		    // don't know where cursor is now
-    out_flush();
+    ಹೊರಹೋಗು_str(IObuff);
+    screen_ಆರಂಭ();		    // don't know where cursor is now
+    ಹೊರಹೋಗು_flush();
 
     ml_close_notmod();		    // close all not-modified buffers
 
     FOR_ALL_BUFFERS(buf)
     {
-	if (buf->b_ml.ml_mfp != NULL && buf->b_ml.ml_mfp->mf_fname != NULL)
+	ಆದರೆ (buf->b_ml.ml_mfp != ಖಾಲಿ && buf->b_ml.ml_mfp->mf_fname != ಖಾಲಿ)
 	{
-	    OUT_STR("Vim: preserving files...\r\n");
-	    screen_start();	    // don't know where cursor is now
-	    out_flush();
+	    ಹೊರಹೋಗು_STR("Vim: preserving files...\r\n");
+	    screen_ಆರಂಭ();	    // don't know where cursor is now
+	    ಹೊರಹೋಗು_flush();
 	    ml_sync_all(FALSE, FALSE);	// preserve all swap files
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
     }
 
     ml_close_all(FALSE);	    // close all memfiles, without deleting
 
-    OUT_STR("Vim: Finished.\r\n");
+    ಹೊರಹೋಗು_STR("Vim: Finished.\r\n");
 
     getout(1);
 }
@@ -2359,18 +2359,18 @@ preserve_exit(void)
  * time, because it can be a system call.
  */
 
-#ifndef BREAKCHECK_SKIP
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ BREAKCHECK_SKIP
 # define BREAKCHECK_SKIP 1000
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-static int	breakcheck_count = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	breakcheck_ಎಣಿಕೆ = 0;
 
-    void
-line_breakcheck(void)
+    ಶೂನ್ಯ
+ಸಾಲು_breakcheck(ಶೂನ್ಯ)
 {
-    if (++breakcheck_count >= BREAKCHECK_SKIP)
+    ಆದರೆ (++breakcheck_ಎಣಿಕೆ >= BREAKCHECK_SKIP)
     {
-	breakcheck_count = 0;
+	breakcheck_ಎಣಿಕೆ = 0;
 	ui_breakcheck();
     }
 }
@@ -2378,32 +2378,32 @@ line_breakcheck(void)
 /*
  * Like line_breakcheck() but check 10 times less often.
  */
-    void
-fast_breakcheck(void)
+    ಶೂನ್ಯ
+fast_breakcheck(ಶೂನ್ಯ)
 {
-    if (++breakcheck_count >= BREAKCHECK_SKIP * 10)
+    ಆದರೆ (++breakcheck_ಎಣಿಕೆ >= BREAKCHECK_SKIP * 10)
     {
-	breakcheck_count = 0;
+	breakcheck_ಎಣಿಕೆ = 0;
 	ui_breakcheck();
     }
 }
 
-#if defined(FEAT_SPELL)
+#ಆದರೆ defined(FEAT_SPELL)
 /*
  * Like line_breakcheck() but check 100 times less often.
  */
-    void
-veryfast_breakcheck(void)
+    ಶೂನ್ಯ
+veryfast_breakcheck(ಶೂನ್ಯ)
 {
-    if (++breakcheck_count >= BREAKCHECK_SKIP * 100)
+    ಆದರೆ (++breakcheck_ಎಣಿಕೆ >= BREAKCHECK_SKIP * 100)
     {
-	breakcheck_count = 0;
+	breakcheck_ಎಣಿಕೆ = 0;
 	ui_breakcheck();
     }
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_EVAL) || (defined(HAVE_LOCALE_H) || defined(X_LOCALE))
+#ಆದರೆ defined(FEAT_EVAL) || (defined(HAVE_LOCALE_H) || defined(X_LOCALE))
 
 # ifndef SEEK_SET
 #  define SEEK_SET 0
@@ -2422,31 +2422,31 @@ veryfast_breakcheck(void)
 get_cmd_output(
     char_u	*cmd,
     char_u	*infile,	// optional input file name
-    int		flags,		// can be SHELL_SILENT
-    int		*ret_len)
+    ಪೂರ್ಣಾಂಕ		flags,		// can be SHELL_SILENT
+    ಪೂರ್ಣಾಂಕ		*ret_len)
 {
     char_u	*tempname;
     char_u	*command;
-    char_u	*buffer = NULL;
-    int		len;
-    int		i = 0;
+    char_u	*ಬಫರ್ = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		len;
+    ಪೂರ್ಣಾಂಕ		i = 0;
     FILE	*fd;
 
-    if (check_restricted() || check_secure())
-	return NULL;
+    ಆದರೆ (check_restricted() || check_secure())
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     // Keep the file reserved until the shell opens it.  On MS-Windows,
     // deleting it here would let another Vim process reuse the same name.
-    if ((tempname = vim_tempname('o', TRUE)) == NULL)
+    ಆದರೆ ((tempname = vim_tempname('o', TRUE)) == ಖಾಲಿ)
     {
-	emsg(_(e_cant_get_temp_file_name));
-	return NULL;
+	emsg(_(e_cant_get_ತಾತ್ಕಾಲಿಕ_file_name));
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
     // Add the redirection stuff
     command = make_filter_cmd(cmd, infile, tempname);
-    if (command == NULL)
-	goto done;
+    ಆದರೆ (command == ಖಾಲಿ)
+	ಹೋಗು ಮುಗಿದ;
 
     /*
      * Call the shell to execute the command (errors are ignored).
@@ -2463,195 +2463,195 @@ get_cmd_output(
      */
 # ifdef VMS
     // created temporary file is not always readable as binary
-    fd = mch_fopen((char *)tempname, "r");
-# else
-    fd = mch_fopen((char *)tempname, READBIN);
+    fd = mch_fopen((ಅಕ್ಷರ *)tempname, "r");
+# ಇಲ್ಲದಿದ್ದರೆ
+    fd = mch_fopen((ಅಕ್ಷರ *)tempname, READBIN);
 # endif
 
     // Not being able to seek means we can't read the file.
-    if (fd == NULL
+    ಆದರೆ (fd == ಖಾಲಿ
 	    || fseek(fd, 0L, SEEK_END) == -1
 	    || (len = ftell(fd)) == -1		// get size of temp file
 	    || fseek(fd, 0L, SEEK_SET) == -1)	// back to the start
     {
 	semsg(_(e_cannot_read_from_str_2), tempname);
-	if (fd != NULL)
+	ಆದರೆ (fd != ಖಾಲಿ)
 	    fclose(fd);
-	goto done;
+	ಹೋಗು ಮುಗಿದ;
     }
 
-    buffer = alloc(len + 1);
-    if (buffer != NULL)
-	i = (int)fread((char *)buffer, (size_t)1, (size_t)len, fd);
+    ಬಫರ್ = alloc(len + 1);
+    ಆದರೆ (ಬಫರ್ != ಖಾಲಿ)
+	i = (ಪೂರ್ಣಾಂಕ)fread((ಅಕ್ಷರ *)ಬಫರ್, (size_t)1, (size_t)len, fd);
     fclose(fd);
-    if (buffer == NULL)
-	goto done;
+    ಆದರೆ (ಬಫರ್ == ಖಾಲಿ)
+	ಹೋಗು ಮುಗಿದ;
 # ifdef VMS
     len = i;	// VMS doesn't give us what we asked for...
 # endif
-    if (i != len)
+    ಆದರೆ (i != len)
     {
 	semsg(_(e_cant_read_file_str), tempname);
-	VIM_CLEAR(buffer);
+	VIM_CLEAR(ಬಫರ್);
     }
-    else if (ret_len == NULL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ret_len == ಖಾಲಿ)
     {
 	// Change NUL into SOH, otherwise the string is truncated.
-	for (i = 0; i < len; ++i)
-	    if (buffer[i] == NUL)
-		buffer[i] = 1;
+	ಗಾಗಿ (i = 0; i < len; ++i)
+	    ಆದರೆ (ಬಫರ್[i] == NUL)
+		ಬಫರ್[i] = 1;
 
-	buffer[len] = NUL;	// make sure the buffer is terminated
+	ಬಫರ್[len] = NUL;	// make sure the buffer is terminated
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	*ret_len = len;
 
-done:
+ಮುಗಿದ:
     mch_remove(tempname);
     vim_free(tempname);
-    return buffer;
+    ಹಿಂತಿರುಗಿ ಬಫರ್;
 }
 
-# if defined(FEAT_EVAL)
+# ಆದರೆ defined(FEAT_EVAL)
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 get_cmd_output_as_rettv(
     typval_T	*argvars,
     typval_T	*rettv,
-    int		retlist)
+    ಪೂರ್ಣಾಂಕ		retlist)
 {
-    char_u	*res = NULL;
+    char_u	*res = ಖಾಲಿ;
     char_u	*p;
-    char_u	*infile = NULL;
-    int		err = FALSE;
+    char_u	*infile = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		err = FALSE;
     FILE	*fd;
-    list_T	*list = NULL;
-    int		flags = SHELL_SILENT;
-    int		use_argv = FALSE;
-    char	**argv = NULL;
-    int		argc = 0;
+    list_T	*list = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		flags = SHELL_SILENT;
+    ಪೂರ್ಣಾಂಕ		use_argv = FALSE;
+    ಅಕ್ಷರ	**argv = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		argc = 0;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
-    if (check_restricted() || check_secure())
-	goto errret;
+    rettv->vval.v_string = ಖಾಲಿ;
+    ಆದರೆ (check_restricted() || check_secure())
+	ಹೋಗು errret;
 
-    if (in_vim9script()
+    ಆದರೆ (ಒಳ_vim9script()
 	    && (check_for_string_or_list_arg(argvars, 0) == FAIL
-		|| check_for_opt_string_or_number_or_list_arg(argvars, 1)
+		|| check_for_opt_string_or_ಸಂಖ್ಯೆ_or_list_arg(argvars, 1)
 								      == FAIL))
-	return;
+	ಹಿಂತಿರುಗಿ;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ಆದರೆ (argvars[1].v_type != VAR_UNKNOWN)
     {
 	/*
 	 * Write the text to a temp file, to be used for input of the shell
 	 * command.
 	 */
-	if ((infile = vim_tempname('i', TRUE)) == NULL)
+	ಆದರೆ ((infile = vim_tempname('i', TRUE)) == ಖಾಲಿ)
 	{
-	    emsg(_(e_cant_get_temp_file_name));
-	    goto errret;
+	    emsg(_(e_cant_get_ತಾತ್ಕಾಲಿಕ_file_name));
+	    ಹೋಗು errret;
 	}
 
-	fd = mch_fopen((char *)infile, WRITEBIN);
-	if (fd == NULL)
+	fd = mch_fopen((ಅಕ್ಷರ *)infile, WRITEBIN);
+	ಆದರೆ (fd == ಖಾಲಿ)
 	{
 	    semsg(_(e_cant_open_file_str), infile);
-	    goto errret;
+	    ಹೋಗು errret;
 	}
-	if (argvars[1].v_type == VAR_NUMBER)
+	ಆದರೆ (argvars[1].v_type == VAR_ಸಂಖ್ಯೆ)
 	{
 	    linenr_T	lnum;
 	    buf_T	*buf;
 
-	    buf = buflist_findnr(argvars[1].vval.v_number);
-	    if (buf == NULL)
+	    buf = buflist_findnr(argvars[1].vval.v_ಸಂಖ್ಯೆ);
+	    ಆದರೆ (buf == ಖಾಲಿ)
 	    {
-		semsg(_(e_buffer_nr_does_not_exist), argvars[1].vval.v_number);
+		semsg(_(e_ಬಫರ್_nr_does_not_exist), argvars[1].vval.v_ಸಂಖ್ಯೆ);
 		fclose(fd);
-		goto errret;
+		ಹೋಗು errret;
 	    }
 
-	    for (lnum = 1; lnum <= buf->b_ml.ml_line_count; lnum++)
+	    ಗಾಗಿ (lnum = 1; lnum <= buf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ; lnum++)
 	    {
-		for (p = ml_get_buf(buf, lnum, FALSE); *p != NUL; ++p)
-		    if (putc(*p == '\n' ? NUL : *p, fd) == EOF)
+		ಗಾಗಿ (p = ml_get_buf(buf, lnum, FALSE); *p != NUL; ++p)
+		    ಆದರೆ (putc(*p == '\n' ? NUL : *p, fd) == EOF)
 		    {
 			err = TRUE;
-			break;
+			ನಿಲ್ಲಿಸು;
 		    }
-		if (putc(NL, fd) == EOF)
+		ಆದರೆ (putc(NL, fd) == EOF)
 		{
 		    err = TRUE;
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 	    }
 	}
-	else if (argvars[1].v_type == VAR_LIST)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argvars[1].v_type == VAR_LIST)
 	{
-	    if (write_list(fd, argvars[1].vval.v_list, TRUE) == FAIL)
+	    ಆದರೆ (write_list(fd, argvars[1].vval.v_list, TRUE) == FAIL)
 		err = TRUE;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    size_t	len;
 	    char_u	buf[NUMBUFLEN];
 
 	    p = tv_get_string_buf_chk(&argvars[1], buf);
-	    if (p == NULL)
+	    ಆದರೆ (p == ಖಾಲಿ)
 	    {
 		fclose(fd);
-		goto errret;		// type error; errmsg already given
+		ಹೋಗು errret;		// type error; errmsg already given
 	    }
 	    len = STRLEN(p);
-	    if (len > 0 && fwrite(p, len, 1, fd) != 1)
+	    ಆದರೆ (len > 0 && fwrite(p, len, 1, fd) != 1)
 		err = TRUE;
 	}
-	if (fclose(fd) != 0)
+	ಆದರೆ (fclose(fd) != 0)
 	    err = TRUE;
-	if (err)
+	ಆದರೆ (err)
 	{
-	    emsg(_(e_error_writing_temp_file));
-	    goto errret;
+	    emsg(_(e_error_writing_ತಾತ್ಕಾಲಿಕ_file));
+	    ಹೋಗು errret;
 	}
     }
 
     // When the command is a List, execute directly without the shell.
-    if (argvars[0].v_type == VAR_LIST)
+    ಆದರೆ (argvars[0].v_type == VAR_LIST)
     {
 	list_T	*l = argvars[0].vval.v_list;
 
-	if (l == NULL || l->lv_len < 1)
+	ಆದರೆ (l == ಖಾಲಿ || l->lv_len < 1)
 	{
-	    emsg(_(e_invalid_argument));
-	    goto errret;
+	    emsg(_(e_invalid_ವಾದ));
+	    ಹೋಗು errret;
 	}
-	if (build_argv_from_list(l, &argv, &argc) == FAIL)
-	    goto errret;
-	if (argc == 0 || *skipwhite((char_u *)argv[0]) == NUL)
+	ಆದರೆ (build_argv_from_list(l, &argv, &argc) == FAIL)
+	    ಹೋಗು errret;
+	ಆದರೆ (argc == 0 || *skipwhite((char_u *)argv[0]) == NUL)
 	{
-	    emsg(_(e_invalid_argument));
-	    goto errret;
+	    emsg(_(e_invalid_ವಾದ));
+	    ಹೋಗು errret;
 	}
 	use_argv = TRUE;
 
-	if (p_verbose > 3)
+	ಆದರೆ (p_verbose > 3)
 	{
-	    int		i;
+	    ಪೂರ್ಣಾಂಕ		i;
 	    garray_T	ga;
 
 	    verbose_enter();
 	    ga_init2(&ga, 1, 200);
-	    for (i = 0; i < argc; ++i)
+	    ಗಾಗಿ (i = 0; i < argc; ++i)
 	    {
-		if (i > 0)
+		ಆದರೆ (i > 0)
 		    ga_append(&ga, ' ');
 		ga_concat(&ga, (char_u *)argv[i]);
 	    }
 	    ga_append(&ga, NUL);
-	    smsg(_("Executing directly: \"%s\""), (char *)ga.ga_data);
-	    msg_putchar_attr('\n', 0);
+	    smsg(_("Executing directly: \"%s\""), (ಅಕ್ಷರ *)ga.ga_ದತ್ತಾಂಶ);
+	    ಸಂದೇಶ_putchar_attr('\n', 0);
 	    cursor_on();
 	    verbose_leave();
 	    ga_clear(&ga);
@@ -2660,75 +2660,75 @@ get_cmd_output_as_rettv(
 
     // Omit SHELL_COOKED when invoked with ":silent".  Avoids that the shell
     // echoes typeahead, that messes up the display.
-    if (!msg_silent)
+    ಆದರೆ (!ಸಂದೇಶ_silent)
 	flags += SHELL_COOKED;
 
-    if (retlist)
+    ಆದರೆ (retlist)
     {
-	int		len;
+	ಪೂರ್ಣಾಂಕ		len;
 	listitem_T	*li;
-	char_u		*s = NULL;
-	char_u		*start;
-	char_u		*end;
-	int		i;
+	char_u		*s = ಖಾಲಿ;
+	char_u		*ಆರಂಭ;
+	char_u		*ಕೊನೆ;
+	ಪೂರ್ಣಾಂಕ		i;
 
-	if (use_argv)
-	    res = mch_get_cmd_output_direct(argv, infile, flags, &len);
-	else
+	ಆದರೆ (use_argv)
+	    res = mch_get_cmd_output_ನೇರ(argv, infile, flags, &len);
+	ಇಲ್ಲದಿದ್ದರೆ
 	    res = get_cmd_output(tv_get_string(&argvars[0]), infile, flags, &len);
-	if (res == NULL)
-	    goto errret;
+	ಆದರೆ (res == ಖಾಲಿ)
+	    ಹೋಗು errret;
 
 	list = list_alloc();
-	if (list == NULL)
-	    goto errret;
+	ಆದರೆ (list == ಖಾಲಿ)
+	    ಹೋಗು errret;
 
-	for (i = 0; i < len; ++i)
+	ಗಾಗಿ (i = 0; i < len; ++i)
 	{
-	    start = res + i;
-	    while (i < len && res[i] != NL)
+	    ಆರಂಭ = res + i;
+	    ಆಗ (i < len && res[i] != NL)
 		++i;
-	    end = res + i;
+	    ಕೊನೆ = res + i;
 
-	    s = alloc(end - start + 1);
-	    if (s == NULL)
-		goto errret;
+	    s = alloc(ಕೊನೆ - ಆರಂಭ + 1);
+	    ಆದರೆ (s == ಖಾಲಿ)
+		ಹೋಗು errret;
 
-	    for (p = s; start < end; ++p, ++start)
-		*p = *start == NUL ? NL : *start;
+	    ಗಾಗಿ (p = s; ಆರಂಭ < ಕೊನೆ; ++p, ++ಆರಂಭ)
+		*p = *ಆರಂಭ == NUL ? NL : *ಆರಂಭ;
 	    *p = NUL;
 
 	    li = listitem_alloc();
-	    if (li == NULL)
+	    ಆದರೆ (li == ಖಾಲಿ)
 	    {
 		vim_free(s);
-		goto errret;
+		ಹೋಗು errret;
 	    }
 	    li->li_tv.v_type = VAR_STRING;
-	    li->li_tv.v_lock = 0;
+	    li->li_tv.v_ಬೀಗ = 0;
 	    li->li_tv.vval.v_string = s;
 	    list_append(list, li);
 	}
 
-	rettv_list_set(rettv, list);
-	list = NULL;
+	rettv_list_ಗಣ(rettv, list);
+	list = ಖಾಲಿ;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (use_argv)
-	    res = mch_get_cmd_output_direct(argv, infile, flags, NULL);
-	else
-	    res = get_cmd_output(tv_get_string(&argvars[0]), infile, flags, NULL);
+	ಆದರೆ (use_argv)
+	    res = mch_get_cmd_output_ನೇರ(argv, infile, flags, ಖಾಲಿ);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    res = get_cmd_output(tv_get_string(&argvars[0]), infile, flags, ಖಾಲಿ);
 #  ifdef USE_CRNL
 	// translate <CR><NL> into <NL>
-	if (res != NULL)
+	ಆದರೆ (res != ಖಾಲಿ)
 	{
 	    char_u	*s, *d;
 
 	    d = res;
-	    for (s = res; *s; ++s)
+	    ಗಾಗಿ (s = res; *s; ++s)
 	    {
-		if (s[0] == CAR && s[1] == NL)
+		ಆದರೆ (s[0] == CAR && s[1] == NL)
 		    ++s;
 		*d++ = *s;
 	    }
@@ -2736,32 +2736,32 @@ get_cmd_output_as_rettv(
 	}
 #  endif
 	rettv->vval.v_string = res;
-	res = NULL;
+	res = ಖಾಲಿ;
     }
 
 errret:
-    if (argv != NULL)
+    ಆದರೆ (argv != ಖಾಲಿ)
     {
-	int i;
-	for (i = 0; argv[i] != NULL; i++)
+	ಪೂರ್ಣಾಂಕ i;
+	ಗಾಗಿ (i = 0; argv[i] != ಖಾಲಿ; i++)
 	    vim_free(argv[i]);
 	vim_free(argv);
     }
-    if (infile != NULL)
+    ಆದರೆ (infile != ಖಾಲಿ)
     {
 	mch_remove(infile);
 	vim_free(infile);
     }
-    if (res != NULL)
+    ಆದರೆ (res != ಖಾಲಿ)
 	vim_free(res);
-    if (list != NULL)
+    ಆದರೆ (list != ಖಾಲಿ)
 	list_free(list);
 }
 
 /*
  * "system()" function
  */
-    void
+    ಶೂನ್ಯ
 f_system(typval_T *argvars, typval_T *rettv)
 {
     get_cmd_output_as_rettv(argvars, rettv, FALSE);
@@ -2770,24 +2770,24 @@ f_system(typval_T *argvars, typval_T *rettv)
 /*
  * "systemlist()" function
  */
-    void
+    ಶೂನ್ಯ
 f_systemlist(typval_T *argvars, typval_T *rettv)
 {
     get_cmd_output_as_rettv(argvars, rettv, TRUE);
 }
 # endif // FEAT_EVAL
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Return TRUE when need to go to Insert mode because of 'insertmode'.
  * Don't do this when still processing a command or a mapping.
  * Don't do this when inside a ":normal" command.
  */
-    int
-goto_im(void)
+    ಪೂರ್ಣಾಂಕ
+goto_im(ಶೂನ್ಯ)
 {
-    return (p_im && stuff_empty() && typebuf_typed());
+    ಹಿಂತಿರುಗಿ (p_im && stuff_ಖಾಲಿಗಳು() && typebuf_typed());
 }
 
 /*
@@ -2800,33 +2800,33 @@ goto_im(void)
  * Returns NULL when out of memory.
  */
     char_u *
-get_isolated_shell_name(void)
+get_isolated_shell_name(ಶೂನ್ಯ)
 {
     char_u *p;
 
-#ifdef MSWIN
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MSWIN
     p = gettail(p_sh);
     p = vim_strnsave(p, skiptowhite(p) - p);
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
     p = skiptowhite(p_sh);
-    if (*p == NUL)
+    ಆದರೆ (*p == NUL)
     {
 	// No white space, use the tail.
 	p = vim_strsave(gettail(p_sh));
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	char_u  *p1, *p2;
 
 	// Find the last path separator before the space.
 	p1 = p_sh;
-	for (p2 = p_sh; p2 < p; MB_PTR_ADV(p2))
-	    if (vim_ispathsep(*p2))
+	ಗಾಗಿ (p2 = p_sh; p2 < p; MB_PTR_ADV(p2))
+	    ಆದರೆ (vim_ispathsep(*p2))
 		p1 = p2 + 1;
 	p = vim_strnsave(p1, p - p1);
     }
-#endif
-    return p;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ p;
 }
 
 /*
@@ -2834,14 +2834,14 @@ get_isolated_shell_name(void)
  * Also check for ":\\", which MS Internet Explorer accepts, return
  * URL_BACKSLASH.
  */
-    int
-path_is_url(char_u *p)
+    ಪೂರ್ಣಾಂಕ
+ಮಾರ್ಗ_is_url(char_u *p)
 {
-    if (STRNCMP(p, "://", (size_t)3) == 0)
-	return URL_SLASH;
-    else if (STRNCMP(p, ":\\\\", (size_t)3) == 0)
-	return URL_BACKSLASH;
-    return 0;
+    ಆದರೆ (STRNCMP(p, "://", (size_t)3) == 0)
+	ಹಿಂತಿರುಗಿ URL_SLASH;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRNCMP(p, ":\\\\", (size_t)3) == 0)
+	ಹಿಂತಿರುಗಿ URL_BACKSLASH;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
 /*
@@ -2849,8 +2849,8 @@ path_is_url(char_u *p)
  * Return URL_SLASH for "name://", URL_BACKSLASH for "name:\\".
  * Return zero otherwise.
  */
-    int
-path_with_url(char_u *fname)
+    ಪೂರ್ಣಾಂಕ
+ಮಾರ್ಗ_with_url(char_u *fname)
 {
     char_u *p;
 
@@ -2859,22 +2859,22 @@ path_with_url(char_u *fname)
     // non-URL text.
 
     // first character must be alpha
-    if (!ASCII_ISALPHA(*fname))
-	return 0;
+    ಆದರೆ (!ASCII_ISALPHA(*fname))
+	ಹಿಂತಿರುಗಿ 0;
 
     // check body: alpha or dash
-    for (p = fname + 1; (ASCII_ISALPHA(*p) || (*p == '-')); ++p)
+    ಗಾಗಿ (p = fname + 1; (ASCII_ISALPHA(*p) || (*p == '-')); ++p)
 	;
 
     // check last char is not a dash
-    if (p[-1] == '-')
-	return 0;
+    ಆದರೆ (p[-1] == '-')
+	ಹಿಂತಿರುಗಿ 0;
 
     // "://" or ":\\" must follow
-    return path_is_url(p);
+    ಹಿಂತಿರುಗಿ ಮಾರ್ಗ_is_url(p);
 }
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * Return the dictionary of v:event.
  * Save and clear the value in case it already has items.
@@ -2884,80 +2884,80 @@ get_v_event(save_v_event_T *sve)
 {
     dict_T	*v_event = get_vim_var_dict(VV_EVENT);
 
-    if (v_event->dv_hashtab.ht_used > 0)
+    ಆದರೆ (v_event->dv_hashtab.ht_ಬಳಸಿದ > 0)
     {
 	// recursive use of v:event, save, make empty and restore later
 	sve->sve_did_save = TRUE;
 	sve->sve_hashtab = v_event->dv_hashtab;
 	hash_init(&v_event->dv_hashtab);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	sve->sve_did_save = FALSE;
-    return v_event;
+    ಹಿಂತಿರುಗಿ v_event;
 }
 
-    void
+    ಶೂನ್ಯ
 restore_v_event(dict_T *v_event, save_v_event_T *sve)
 {
     dict_free_contents(v_event);
-    if (sve->sve_did_save)
+    ಆದರೆ (sve->sve_did_save)
 	v_event->dv_hashtab = sve->sve_hashtab;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	hash_init(&v_event->dv_hashtab);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Fires a ModeChanged autocmd event if appropriate.
  */
-    void
-may_trigger_modechanged(void)
+    ಶೂನ್ಯ
+may_trigger_modechanged(ಶೂನ್ಯ)
 {
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     dict_T	    *v_event;
     save_v_event_T  save_v_event;
-    char_u	    curr_mode[MODE_MAX_LENGTH];
-    char_u	    pattern_buf[2 * MODE_MAX_LENGTH];
+    char_u	    curr_ಬಹುಲಕ[ಬಹುಲಕ_MAX_ಉದ್ದಳತೆ];
+    char_u	    ನಮೂನೆ_buf[2 * ಬಹುಲಕ_MAX_ಉದ್ದಳತೆ];
 
     // Skip this when got_int is set, the autocommand will not be executed.
     // Better trigger it next time.
-    if (!has_modechanged() || got_int)
-	return;
+    ಆದರೆ (!has_modechanged() || got_int)
+	ಹಿಂತಿರುಗಿ;
 
-    get_mode(curr_mode);
-    if (STRCMP(curr_mode, last_mode) == 0)
-	return;
+    get_ಬಹುಲಕ(curr_ಬಹುಲಕ);
+    ಆದರೆ (STRCMP(curr_ಬಹುಲಕ, ಕೊನೆಯ_ಬಹುಲಕ) == 0)
+	ಹಿಂತಿರುಗಿ;
 
     v_event = get_v_event(&save_v_event);
-    (void)dict_add_string(v_event, "new_mode", curr_mode);
-    (void)dict_add_string(v_event, "old_mode", last_mode);
-    dict_set_items_ro(v_event);
+    (ಶೂನ್ಯ)dict_ಕೂಡಿಸು_string(v_event, "new_mode", curr_ಬಹುಲಕ);
+    (ಶೂನ್ಯ)dict_ಕೂಡಿಸು_string(v_event, "old_mode", ಕೊನೆಯ_ಬಹುಲಕ);
+    dict_ಗಣ_ವಸ್ತುಗಳು_ro(v_event);
 
     // concatenate modes in format "old_mode:new_mode"
-    vim_snprintf((char *)pattern_buf, sizeof(pattern_buf), "%s:%s", last_mode,
-	    curr_mode);
+    vim_snprintf((ಅಕ್ಷರ *)ನಮೂನೆ_buf, ಗಾತ್ರ(ನಮೂನೆ_buf), "%s:%s", ಕೊನೆಯ_ಬಹುಲಕ,
+	    curr_ಬಹುಲಕ);
 
-    apply_autocmds(EVENT_MODECHANGED, pattern_buf, NULL, FALSE, curbuf);
-    STRCPY(last_mode, curr_mode);
+    apply_autocmds(EVENT_MODECHANGED, ನಮೂನೆ_buf, ಖಾಲಿ, FALSE, curbuf);
+    STRCPY(ಕೊನೆಯ_ಬಹುಲಕ, curr_ಬಹುಲಕ);
 
     restore_v_event(v_event, &save_v_event);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 // For overflow detection, add a digit safely to a long value.
-    int
-vim_append_digit_long(long *value, int digit)
+    ಪೂರ್ಣಾಂಕ
+vim_append_digit_long(ದೀರ್ಘ *ಮೌಲ್ಯ, ಪೂರ್ಣಾಂಕ digit)
 {
-    long x = *value;
-    if (x > ((LONG_MAX - (long)digit) / 10))
-	return FAIL;
-    *value = x * 10 + (long)digit;
-    return OK;
+    ದೀರ್ಘ x = *ಮೌಲ್ಯ;
+    ಆದರೆ (x > ((LONG_MAX - (ದೀರ್ಘ)digit) / 10))
+	ಹಿಂತಿರುಗಿ FAIL;
+    *ಮೌಲ್ಯ = x * 10 + (ದೀರ್ಘ)digit;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 // Return something that fits into an int.
-    int
-trim_to_int(vimlong_T x)
+    ಪೂರ್ಣಾಂಕ
+trim_ಗಮ್ಯ_int(vimlong_T x)
 {
-    return x > INT_MAX ? INT_MAX : x < INT_MIN ? INT_MIN : x;
+    ಹಿಂತಿರುಗಿ x > ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ ? ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ : x < INT_MIN ? INT_MIN : x;
 }

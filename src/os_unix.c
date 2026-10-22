@@ -18,47 +18,47 @@
  * changed beyond recognition.
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-#ifdef FEAT_MZSCHEME
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MZSCHEME
 # include "if_mzsch.h"
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#include "os_unixx.h"	    // unix includes for os_unix.c only
+#ಅನ್ತರ್ಭಾವ "os_unixx.h"	    // unix includes for os_unix.c only
 
-#ifdef USE_XSMP
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_XSMP
 # include <X11/SM/SMlib.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef HAVE_SELINUX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_SELINUX
 # include <selinux/selinux.h>
-static int selinux_enabled = -1;
-#endif
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ selinux_enabled = -1;
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_XATTR
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XATTR
 # include <sys/xattr.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef HAVE_SMACK
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_SMACK
 # include <sys/xattr.h>
 # include <linux/xattr.h>
 # ifndef SMACK_LABEL_LEN
 #  define SMACK_LABEL_LEN 1024
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef __CYGWIN__
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ __CYGWIN__
 # include <cygwin/version.h>
 # include <sys/cygwin.h>	// for cygwin_conv_to_posix_path() and/or
 				// for cygwin_conv_path()
 # ifdef FEAT_CYGWIN_WIN32_CLIPBOARD
-#  define WIN32_LEAN_AND_MEAN
+#  define WIN32_LEAN_AND_ಸರಾಸರಿ
 #  include <windows.h>
 #  include "winclip.pro"
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_MOUSE_GPM
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MOUSE_GPM
 
 # include <gpm.h>
 
@@ -66,23 +66,23 @@ static int selinux_enabled = -1;
 #  define Gpm_Open     (*dll_Gpm_Open)
 #  define Gpm_Close    (*dll_Gpm_Close)
 #  define Gpm_GetEvent (*dll_Gpm_GetEvent)
-#  define gpm_flag     (dll_gpm_flag != NULL ? *dll_gpm_flag :  0)
-#  define gpm_fd       (dll_gpm_fd   != NULL ? *dll_gpm_fd   : -1)
+#  define gpm_flag     (dll_gpm_flag != ಖಾಲಿ ? *dll_gpm_flag :  0)
+#  define gpm_fd       (dll_gpm_fd   != ಖಾಲಿ ? *dll_gpm_fd   : -1)
 
-static int (*dll_Gpm_Open)     (Gpm_Connect *, int);
-static int (*dll_Gpm_Close)    (void);
-static int (*dll_Gpm_GetEvent) (Gpm_Event *);
-static int *dll_gpm_flag;
-static int *dll_gpm_fd;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ (*dll_Gpm_Open)     (Gpm_Connect *, ಪೂರ್ಣಾಂಕ);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ (*dll_Gpm_Close)    (ಶೂನ್ಯ);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ (*dll_Gpm_GetEvent) (Gpm_Event *);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ *dll_gpm_flag;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ *dll_gpm_fd;
 
-static void *libgpm_hinst;
+ಸ್ಥಿರ ಶೂನ್ಯ *libgpm_hinst;
 # endif
 
 // <linux/keyboard.h> contains defines conflicting with "keymap.h",
 // I just copied relevant defines here. A cleaner solution would be to put gpm
 // code into separate file and include there linux/keyboard.h
 // #include <linux/keyboard.h>
-# define KG_SHIFT	0
+# define KG_ಸರಿಸು	0
 # define KG_CTRL	2
 # define KG_ALT		3
 # define KG_ALTGR	1
@@ -92,19 +92,19 @@ static void *libgpm_hinst;
 # define KG_CTRLR	7
 # define KG_CAPSSHIFT	8
 
-static void gpm_close(void);
-static int gpm_open(void);
-static int mch_gpm_process(void);
-#endif
+ಸ್ಥಿರ ಶೂನ್ಯ gpm_close(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ gpm_open(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ mch_gpm_process(ಶೂನ್ಯ);
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_SYSMOUSE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYSMOUSE
 # include <sys/consio.h>
 # include <sys/fbio.h>
 
-static int sysmouse_open(void);
-static void sysmouse_close(void);
-static void sig_sysmouse SIGPROTOARG;
-#endif
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ sysmouse_open(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಶೂನ್ಯ sysmouse_close(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಶೂನ್ಯ sig_sysmouse SIGPROTOARG;
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * end of autoconf section. To be extended...
@@ -112,20 +112,20 @@ static void sig_sysmouse SIGPROTOARG;
 
 // Are the following #ifdefs still required? And why? Is that for X11?
 
-#if defined(ESIX) || defined(M_UNIX) && !defined(SCO)
+#ಆದರೆ defined(ESIX) || defined(M_UNIX) && !defined(SCO)
 # ifdef SIGWINCH
 #  undef SIGWINCH
 # endif
 # ifdef TIOCGWINSZ
 #  undef TIOCGWINSZ
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(SIGWINDOW) && !defined(SIGWINCH)	// hpux 9.01 has it
+#ಆದರೆ defined(SIGWINDOW) && !defined(SIGWINCH)	// hpux 9.01 has it
 # define SIGWINCH SIGWINDOW
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_X11
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_X11
 # include <X11/Xlib.h>
 # include <X11/Xutil.h>
 # include <X11/Xatom.h>
@@ -133,124 +133,124 @@ static void sig_sysmouse SIGPROTOARG;
 #  include <X11/Intrinsic.h>
 #  include <X11/Shell.h>
 #  include <X11/StringDefs.h>
-static Widget	xterm_Shell = (Widget)0;
-static void clip_update(void);
+ಸ್ಥಿರ Widget	xterm_Shell = (Widget)0;
+ಸ್ಥಿರ ಶೂನ್ಯ clip_update(ಶೂನ್ಯ);
 # endif
 
-Window	    x11_window = 0;
-Display	    *x11_display = NULL;
-#endif
+ಕಿಟಕಿ	    x11_ಕಿಟಕಿ = 0;
+Display	    *x11_display = ಖಾಲಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 
-static int ignore_sigtstp = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ignore_sigtstp = FALSE;
 
-static int get_x11_title(int);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ get_x11_title(ಪೂರ್ಣಾಂಕ);
 
-static char_u	*oldtitle = NULL;
-static volatile sig_atomic_t oldtitle_outdated = FALSE;
-static int	unix_did_set_title = FALSE;
-static char_u	*oldicon = NULL;
-static int	did_set_icon = FALSE;
+ಸ್ಥಿರ char_u	*oldtitle = ಖಾಲಿ;
+ಸ್ಥಿರ ಅಸ್ಥಿರ sig_atomic_t oldtitle_outdated = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	unix_did_ಗಣ_title = FALSE;
+ಸ್ಥಿರ char_u	*oldicon = ಖಾಲಿ;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	did_ಗಣ_icon = FALSE;
 
-static void may_core_dump(void);
+ಸ್ಥಿರ ಶೂನ್ಯ may_core_dump(ಶೂನ್ಯ);
 
-typedef int waitstatus;
-static int  WaitForChar(long msec, int *interrupted, int ignore_input);
-static int  WaitForCharOrMouse(long msec, int *interrupted, int ignore_input);
-#ifdef VMS
-int  RealWaitForChar(int, long, int *, int *interrupted);
-#else
-static int  RealWaitForChar(int, long, int *, int *interrupted);
-#endif
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಪೂರ್ಣಾಂಕ waitstatus;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ  WaitForChar(ದೀರ್ಘ msec, ಪೂರ್ಣಾಂಕ *interrupted, ಪೂರ್ಣಾಂಕ ignore_ಒಳಹರಿವು);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ  WaitForCharOrMouse(ದೀರ್ಘ msec, ಪೂರ್ಣಾಂಕ *interrupted, ಪೂರ್ಣಾಂಕ ignore_ಒಳಹರಿವು);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VMS
+ಪೂರ್ಣಾಂಕ  RealWaitForChar(ಪೂರ್ಣಾಂಕ, ದೀರ್ಘ, ಪೂರ್ಣಾಂಕ *, ಪೂರ್ಣಾಂಕ *interrupted);
+#ಇಲ್ಲದಿದ್ದರೆ
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ  RealWaitForChar(ಪೂರ್ಣಾಂಕ, ದೀರ್ಘ, ಪೂರ್ಣಾಂಕ *, ಪೂರ್ಣಾಂಕ *interrupted);
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_XCLIPBOARD
-static int do_xterm_trace(void);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XCLIPBOARD
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ do_xterm_trace(ಶೂನ್ಯ);
 # define XT_TRACE_DELAY	50	// delay for xterm tracing
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-static void handle_resize(void);
+ಸ್ಥಿರ ಶೂನ್ಯ handle_resize(ಶೂನ್ಯ);
 
-#if defined(SIGWINCH)
-static void sig_winch SIGPROTOARG;
-#endif
-#if defined(SIGTSTP)
-static void sig_tstp SIGPROTOARG;
+#ಆದರೆ defined(SIGWINCH)
+ಸ್ಥಿರ ಶೂನ್ಯ sig_winch SIGPROTOARG;
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(SIGTSTP)
+ಸ್ಥಿರ ಶೂನ್ಯ sig_tstp SIGPROTOARG;
 // volatile because it is used in signal handler sig_tstp() and
 // sigcont_handler().
-static volatile sig_atomic_t in_mch_suspend = FALSE;
-#endif
-#if defined(SIGINT)
-static void catch_sigint SIGPROTOARG;
-#endif
-#if defined(SIGUSR1)
-static void catch_sigusr1 SIGPROTOARG;
-#endif
-#if defined(SIGPWR)
-static void catch_sigpwr SIGPROTOARG;
-#endif
-#if defined(SIGALRM) && defined(FEAT_X11) && !defined(FEAT_GUI_GTK)
-# define SET_SIG_ALARM
-static void sig_alarm SIGPROTOARG;
+ಸ್ಥಿರ ಅಸ್ಥಿರ sig_atomic_t ಒಳ_mch_suspend = FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(SIGINT)
+ಸ್ಥಿರ ಶೂನ್ಯ catch_sigint SIGPROTOARG;
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(SIGUSR1)
+ಸ್ಥಿರ ಶೂನ್ಯ catch_sigusr1 SIGPROTOARG;
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(SIGPWR)
+ಸ್ಥಿರ ಶೂನ್ಯ catch_sigpwr SIGPROTOARG;
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(SIGALRM) && defined(FEAT_X11) && !defined(FEAT_GUI_GTK)
+# define ಗಣ_SIG_ALARM
+ಸ್ಥಿರ ಶೂನ್ಯ sig_alarm SIGPROTOARG;
 // volatile because it is used in signal handler sig_alarm().
-static volatile sig_atomic_t sig_alarm_called;
-#endif
-static void deathtrap SIGPROTOARG;
+ಸ್ಥಿರ ಅಸ್ಥಿರ sig_atomic_t sig_alarm_called;
+#ಆದರೆ_ಅಂತ್ಯ
+ಸ್ಥಿರ ಶೂನ್ಯ deathtrap SIGPROTOARG;
 
-static void catch_int_signal(void);
-static void set_signals(void);
-static void catch_signals(void (*func_deadly)(int), void (*func_other)(int));
-#ifdef HAVE_SIGPROCMASK
-# define SIGSET_DECL(set)	sigset_t set;
-# define BLOCK_SIGNALS(set)	block_signals(set)
-# define UNBLOCK_SIGNALS(set)	unblock_signals(set)
-#else
-# define SIGSET_DECL(set)
-# define BLOCK_SIGNALS(set)	do { /**/ } while (0)
-# define UNBLOCK_SIGNALS(set)	do { /**/ } while (0)
-#endif
-static int  have_wildcard(int, char_u **);
-static int  have_dollars(int, char_u **);
+ಸ್ಥಿರ ಶೂನ್ಯ catch_int_signal(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಶೂನ್ಯ ಗಣ_ಸಂಕೇತಗಳು(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಶೂನ್ಯ catch_ಸಂಕೇತಗಳು(ಶೂನ್ಯ (*func_deadly)(ಪೂರ್ಣಾಂಕ), ಶೂನ್ಯ (*func_other)(ಪೂರ್ಣಾಂಕ));
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_SIGPROCMASK
+# define SIGSET_DECL(ಗಣ_2)	sigset_t ಗಣ_2;
+# define ಖಂಡ_ಸಂಕೇತಗಳು(ಗಣ_2)	ಖಂಡ_ಸಂಕೇತಗಳು_2(ಗಣ_2)
+# define UNBLOCK_ಸಂಕೇತಗಳು(ಗಣ_2)	unblock_ಸಂಕೇತಗಳು(ಗಣ_2)
+#ಇಲ್ಲದಿದ್ದರೆ
+# define SIGSET_DECL(ಗಣ_2)
+# define ಖಂಡ_ಸಂಕೇತಗಳು(ಗಣ_2)	ಮಾಡು { /**/ } ಆಗ (0)
+# define UNBLOCK_ಸಂಕೇತಗಳು(ಗಣ_2)	ಮಾಡು { /**/ } ಆಗ (0)
+#ಆದರೆ_ಅಂತ್ಯ
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ  have_wildcard(ಪೂರ್ಣಾಂಕ, char_u **);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ  have_dollars(ಪೂರ್ಣಾಂಕ, char_u **);
 
-static int save_patterns(int num_pat, char_u **pat, int *num_file, char_u ***file);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ save_patterns(ಪೂರ್ಣಾಂಕ ಅಂಕೆ_pat, char_u **pat, ಪೂರ್ಣಾಂಕ *ಅಂಕೆ_file, char_u ***file);
 
-#ifndef SIG_ERR
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ SIG_ERR
 # define SIG_ERR	((sighandler_T)-1)
-#endif
-#ifndef SIG_HOLD
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ SIG_HOLD
 # define SIG_HOLD	((sighandler_T)-2)
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // volatile because it is used in signal handler sig_winch().
-static volatile sig_atomic_t do_resize = FALSE;
+ಸ್ಥಿರ ಅಸ್ಥಿರ sig_atomic_t do_resize = FALSE;
 // volatile because it is used in signal handler sig_tstp().
-static volatile sig_atomic_t got_tstp = FALSE;
-static char_u	*extra_shell_arg = NULL;
-static int	show_shell_mess = TRUE;
+ಸ್ಥಿರ ಅಸ್ಥಿರ sig_atomic_t got_tstp = FALSE;
+ಸ್ಥಿರ char_u	*extra_shell_arg = ಖಾಲಿ;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	show_shell_mess = TRUE;
 // volatile because it is used in signal handler deathtrap().
-static volatile sig_atomic_t deadly_signal = 0;	   // The signal we caught
+ಸ್ಥಿರ ಅಸ್ಥಿರ sig_atomic_t deadly_signal = 0;	   // The signal we caught
 // volatile because it is used in signal handler deathtrap().
-static volatile sig_atomic_t in_mch_delay = FALSE; // sleeping in mch_delay()
+ಸ್ಥಿರ ಅಸ್ಥಿರ sig_atomic_t ಒಳ_mch_delay = FALSE; // sleeping in mch_delay()
 
-#if defined(FEAT_JOB_CHANNEL) && !defined(USE_SYSTEM)
-static int dont_check_job_ended = 0;
-#endif
+#ಆದರೆ defined(FEAT_ಕೆಲಸ_CHANNEL) && !defined(USE_SYSTEM)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ dont_check_ಕೆಲಸ_ended = 0;
+#ಆದರೆ_ಅಂತ್ಯ
 
 // Current terminal mode from mch_settmode().  Can differ from cur_tmode.
-static tmode_T mch_cur_tmode = TMODE_COOK;
+ಸ್ಥಿರ tmode_T mch_cur_tmode = TMODE_COOK;
 
-#ifdef USE_XSMP
-typedef struct
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_XSMP
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
     SmcConn smcconn;	    // The SM connection ID
     IceConn iceconn;	    // The ICE connection ID
-    char *clientid;	    // The client ID for the current smc session
+    ಅಕ್ಷರ *clientid;	    // The client ID for the current smc session
     Bool save_yourself;     // If we're in the middle of a save_yourself
     Bool shutdown;	    // If we're in shutdown mode
 } xsmp_config_T;
 
-static xsmp_config_T xsmp;
-#endif
+ಸ್ಥಿರ xsmp_config_T xsmp;
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef SYS_SIGLIST_DECLARED
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SYS_SIGLIST_DECLARED
 /*
  * I have seen
  *  extern char *_sys_siglist[NSIG];
@@ -260,174 +260,174 @@ static xsmp_config_T xsmp;
  * do not want to change everything today.... jw.
  * This is why AC_DECL_SYS_SIGLIST is commented out in configure.ac.
  */
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-static struct signalinfo
+ಸ್ಥಿರ ರಚನೆ signalinfo
 {
-    int	    sig;	// Signal number, eg. SIGSEGV etc
-    char    *name;	// Signal name (not char_u!).
-    char    deadly;	// Catch as a deadly signal?
+    ಪೂರ್ಣಾಂಕ	    sig;	// Signal number, eg. SIGSEGV etc
+    ಅಕ್ಷರ    *name;	// Signal name (not char_u!).
+    ಅಕ್ಷರ    deadly;	// Catch as a deadly signal?
 } signal_info[] =
 {
-#ifdef SIGHUP
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGHUP
     {SIGHUP,	    "HUP",	TRUE},
-#endif
-#ifdef SIGQUIT
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGQUIT
     {SIGQUIT,	    "QUIT",	TRUE},
-#endif
-#ifdef SIGILL
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGILL
     {SIGILL,	    "ILL",	TRUE},
-#endif
-#ifdef SIGTRAP
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGTRAP
     {SIGTRAP,	    "TRAP",	TRUE},
-#endif
-#ifdef SIGABRT
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGABRT
     {SIGABRT,	    "ABRT",	TRUE},
-#endif
-#ifdef SIGEMT
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGEMT
     {SIGEMT,	    "EMT",	TRUE},
-#endif
-#ifdef SIGFPE
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGFPE
     {SIGFPE,	    "FPE",	TRUE},
-#endif
-#ifdef SIGBUS
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGBUS
     {SIGBUS,	    "BUS",	TRUE},
-#endif
-#if defined(SIGSEGV) && !defined(FEAT_MZSCHEME)
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(SIGSEGV) && !defined(FEAT_MZSCHEME)
     // MzScheme uses SEGV in its garbage collector
     {SIGSEGV,	    "SEGV",	TRUE},
-#endif
-#ifdef SIGSYS
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGSYS
     {SIGSYS,	    "SYS",	TRUE},
-#endif
-#ifdef SIGALRM
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGALRM
     {SIGALRM,	    "ALRM",	FALSE},	// Perl's alarm() can trigger it
-#endif
-#ifdef SIGTERM
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGTERM
     {SIGTERM,	    "TERM",	TRUE},
-#endif
-#if defined(SIGVTALRM) && !defined(FEAT_RUBY)
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(SIGVTALRM) && !defined(FEAT_RUBY)
     {SIGVTALRM,	    "VTALRM",	TRUE},
-#endif
-#if defined(SIGPROF) && !defined(FEAT_MZSCHEME) && !defined(WE_ARE_PROFILING)
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(SIGPROF) && !defined(FEAT_MZSCHEME) && !defined(WE_ARE_PROFILING)
     // MzScheme uses SIGPROF for its own needs; On Linux with profiling
     // this makes Vim exit.  WE_ARE_PROFILING is defined in Makefile.
     {SIGPROF,	    "PROF",	TRUE},
-#endif
-#ifdef SIGXCPU
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGXCPU
     {SIGXCPU,	    "XCPU",	TRUE},
-#endif
-#ifdef SIGXFSZ
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGXFSZ
     {SIGXFSZ,	    "XFSZ",	TRUE},
-#endif
-#ifdef SIGUSR1
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGUSR1
     {SIGUSR1,	    "USR1",	FALSE},
-#endif
-#if defined(SIGUSR2) && !defined(FEAT_SYSMOUSE)
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(SIGUSR2) && !defined(FEAT_SYSMOUSE)
     // Used for sysmouse handling
     {SIGUSR2,	    "USR2",	TRUE},
-#endif
-#ifdef SIGINT
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGINT
     {SIGINT,	    "INT",	FALSE},
-#endif
-#ifdef SIGWINCH
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGWINCH
     {SIGWINCH,	    "WINCH",	FALSE},
-#endif
-#ifdef SIGTSTP
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGTSTP
     {SIGTSTP,	    "TSTP",	FALSE},
-#endif
-#ifdef SIGPIPE
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGPIPE
     {SIGPIPE,	    "PIPE",	FALSE},
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     {-1,	    "Unknown!", FALSE}
 };
 
     sighandler_T
-mch_signal(int sig, sighandler_T func)
+mch_signal(ಪೂರ್ಣಾಂಕ sig, sighandler_T func)
 {
-#if defined(HAVE_SIGACTION) && defined(HAVE_SIGPROCMASK)
+#ಆದರೆ defined(HAVE_SIGACTION) && defined(HAVE_SIGPROCMASK)
     // Modern implementation: use sigaction().
-    struct sigaction	sa, old;
+    ರಚನೆ sigaction	sa, old;
     sigset_t		curset;
-    int			blocked;
+    ಪೂರ್ಣಾಂಕ			blocked;
 
-    if (sigprocmask(SIG_BLOCK, NULL, &curset) == -1)
-	return SIG_ERR;
+    ಆದರೆ (sigprocmask(SIG_BLOCK, ಖಾಲಿ, &curset) == -1)
+	ಹಿಂತಿರುಗಿ SIG_ERR;
 
     blocked = sigismember(&curset, sig);
 
-    if (func == SIG_HOLD)
+    ಆದರೆ (func == SIG_HOLD)
     {
-	if (blocked)
-	    return SIG_HOLD;
+	ಆದರೆ (blocked)
+	    ಹಿಂತಿರುಗಿ SIG_HOLD;
 
 	sigemptyset(&curset);
 	sigaddset(&curset, sig);
 
-	if (sigaction(sig, NULL, &old) == -1
-				|| sigprocmask(SIG_BLOCK, &curset, NULL) == -1)
-	    return SIG_ERR;
-	return old.sa_handler;
+	ಆದರೆ (sigaction(sig, ಖಾಲಿ, &old) == -1
+				|| sigprocmask(SIG_BLOCK, &curset, ಖಾಲಿ) == -1)
+	    ಹಿಂತಿರುಗಿ SIG_ERR;
+	ಹಿಂತಿರುಗಿ old.sa_handler;
     }
 
-    if (blocked)
+    ಆದರೆ (blocked)
     {
 	sigemptyset(&curset);
 	sigaddset(&curset, sig);
 
-	if (sigprocmask(SIG_UNBLOCK, &curset, NULL) == -1)
-	    return SIG_ERR;
+	ಆದರೆ (sigprocmask(SIG_UNBLOCK, &curset, ಖಾಲಿ) == -1)
+	    ಹಿಂತಿರುಗಿ SIG_ERR;
     }
 
     sa.sa_handler = func;
     sigemptyset(&sa.sa_mask);
 # ifdef SA_RESTART
     sa.sa_flags = SA_RESTART;
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
     sa.sa_flags = 0;
 # endif
-    if (sigaction(sig, &sa, &old) == -1)
-	return SIG_ERR;
-    return blocked ? SIG_HOLD: old.sa_handler;
-#elif defined(HAVE_SIGSET)
+    ಆದರೆ (sigaction(sig, &sa, &old) == -1)
+	ಹಿಂತಿರುಗಿ SIG_ERR;
+    ಹಿಂತಿರುಗಿ blocked ? SIG_HOLD: old.sa_handler;
+#ಅಥವಾಆದರೆ defined(HAVE_SIGSET)
     // Using sigset() is preferred above signal().
-    return sigset(sig, func);
-#else
+    ಹಿಂತಿರುಗಿ sigset(sig, func);
+#ಇಲ್ಲದಿದ್ದರೆ
     // Oldest and most compatible solution.
-    return signal(sig, func);
-#endif
+    ಹಿಂತಿರುಗಿ ಸಂಕೇತ(sig, func);
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-    int
-mch_chdir(char *path)
+    ಪೂರ್ಣಾಂಕ
+mch_chdir(ಅಕ್ಷರ *ಮಾರ್ಗ)
 {
-    if (p_verbose >= 5)
+    ಆದರೆ (p_verbose >= 5)
     {
 	verbose_enter();
-	smsg("chdir(%s)", path);
+	smsg("chdir(%s)", ಮಾರ್ಗ);
 	verbose_leave();
     }
-#ifdef VMS
-    return chdir(vms_fixfilename(path));
-#else
-    return chdir(path);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VMS
+    ಹಿಂತಿರುಗಿ chdir(vms_fixfilename(ಮಾರ್ಗ));
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಹಿಂತಿರುಗಿ chdir(ಮಾರ್ಗ);
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#if defined(ECHOE) && defined(ICANON) \
+#ಆದರೆ defined(ECHOE) && defined(ICANON) \
     && (defined(HAVE_TERMIO_H) || defined(HAVE_TERMIOS_H))
 # define NEW_TTY_SYSTEM
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Write s[len] to the screen (stdout).
  */
-    void
-mch_write(char_u *s, int len)
+    ಶೂನ್ಯ
+mch_write(char_u *s, ಪೂರ್ಣಾಂಕ len)
 {
-    vim_ignored = (int)write(1, (char *)s, len);
-    if (p_wd)		// Unix is too fast, slow down a bit more
-	RealWaitForChar(read_cmd_fd, p_wd, NULL, NULL);
+    vim_ignored = (ಪೂರ್ಣಾಂಕ)ಲಿಖ(1, (ಅಕ್ಷರ *)s, len);
+    ಆದರೆ (p_wd)		// Unix is too fast, slow down a bit more
+	RealWaitForChar(read_cmd_fd, p_wd, ಖಾಲಿ, ಖಾಲಿ);
 }
 
 /*
@@ -435,19 +435,19 @@ mch_write(char_u *s, int len)
  * If "check_only" is TRUE: Return whether there was a resize.
  * If "check_only" is FALSE: Deal with the window resized.
  */
-    static int
-resize_func(int check_only)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+resize_func(ಪೂರ್ಣಾಂಕ check_only)
 {
-    if (check_only)
-	return do_resize;
-    while (do_resize)
+    ಆದರೆ (check_only)
+	ಹಿಂತಿರುಗಿ do_resize;
+    ಆಗ (do_resize)
     {
-#ifdef FEAT_EVAL
-	ch_log(NULL, "calling handle_resize() in resize_func()");
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+	ch_log(ಖಾಲಿ, "calling handle_resize() in resize_func()");
+#ಆದರೆ_ಅಂತ್ಯ
 	handle_resize();
     }
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 /*
@@ -458,19 +458,19 @@ resize_func(int check_only)
  * If wtime == n wait a short time for characters.
  * If wtime == -1 wait forever for characters.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_inchar(
     char_u	*buf,
-    int		maxlen,
-    long	wtime,	    // don't use "time", MIPS cannot handle it
-    int		tb_change_cnt)
+    ಪೂರ್ಣಾಂಕ		maxlen,
+    ದೀರ್ಘ	wtime,	    // don't use "time", MIPS cannot handle it
+    ಪೂರ್ಣಾಂಕ		tb_change_cnt)
 {
-    return inchar_loop(buf, maxlen, wtime, tb_change_cnt,
+    ಹಿಂತಿರುಗಿ inchar_loop(buf, maxlen, wtime, tb_change_cnt,
 		       WaitForChar, resize_func);
 }
 
-    static void
-handle_resize(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+handle_resize(ಶೂನ್ಯ)
 {
     do_resize = FALSE;
     shell_resized();
@@ -479,31 +479,31 @@ handle_resize(void)
 /*
  * Return non-zero if a character is available.
  */
-    int
-mch_char_avail(void)
+    ಪೂರ್ಣಾಂಕ
+mch_char_avail(ಶೂನ್ಯ)
 {
-    return WaitForChar(0L, NULL, FALSE);
+    ಹಿಂತಿರುಗಿ WaitForChar(0L, ಖಾಲಿ, FALSE);
 }
 
-#if defined(FEAT_TERMINAL)
+#ಆದರೆ defined(FEAT_TERMINAL)
 /*
  * Check for any pending input or messages.
  */
-    int
-mch_check_messages(void)
+    ಪೂರ್ಣಾಂಕ
+mch_check_messages(ಶೂನ್ಯ)
 {
-    return WaitForChar(0L, NULL, TRUE);
+    ಹಿಂತಿರುಗಿ WaitForChar(0L, ಖಾಲಿ, TRUE);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(HAVE_TOTAL_MEM)
+#ಆದರೆ defined(HAVE_ಒಟ್ಟು_MEM)
 # ifdef HAVE_SYS_RESOURCE_H
 #  include <sys/resource.h>
 # endif
-# if defined(HAVE_SYS_SYSCTL_H) && defined(HAVE_SYSCTL)
+# ಆದರೆ defined(HAVE_SYS_SYSCTL_H) && defined(HAVE_SYSCTL)
 #  include <sys/sysctl.h>
 # endif
-# if defined(HAVE_SYS_SYSINFO_H) && defined(HAVE_SYSINFO)
+# ಆದರೆ defined(HAVE_SYS_SYSINFO_H) && defined(HAVE_SYSINFO)
 #  include <sys/sysinfo.h>
 # endif
 # ifdef MACOS_X
@@ -516,7 +516,7 @@ mch_check_messages(void)
  * Doesn't change when memory has been allocated.
  */
     long_u
-mch_total_mem(int special UNUSED)
+mch_ಒಟ್ಟು_mem(ಪೂರ್ಣಾಂಕ special ಬಳಸದ)
 {
     long_u	mem = 0;
     long_u	shiftright = 10;  // how much to shift "mem" right for Kbyte
@@ -524,44 +524,44 @@ mch_total_mem(int special UNUSED)
 # ifdef MACOS_X
     {
 	// Mac (Darwin) way of getting the amount of RAM available
-	mach_port_t		host = mach_host_self();
+	mach_ಪೋರ್ಟ್_t		host = mach_host_self();
 	kern_return_t		kret;
 #  ifdef HOST_VM_INFO64
-	struct vm_statistics64	vm_stat;
-	natural_t		count = HOST_VM_INFO64_COUNT;
+	ರಚನೆ vm_statistics64	vm_stat;
+	natural_t		ಎಣಿಕೆ_2 = HOST_VM_INFO64_ಎಣಿಕೆ;
 
 	kret = host_statistics64(host, HOST_VM_INFO64,
-					     (host_info64_t)&vm_stat, &count);
-#  else
-	struct vm_statistics	vm_stat;
-	natural_t		count = HOST_VM_INFO_COUNT;
+					     (host_info64_t)&vm_stat, &ಎಣಿಕೆ_2);
+#  ಇಲ್ಲದಿದ್ದರೆ
+	ರಚನೆ vm_statistics	vm_stat;
+	natural_t		ಎಣಿಕೆ_2 = HOST_VM_INFO_ಎಣಿಕೆ;
 
 	kret = host_statistics(host, HOST_VM_INFO,
-					       (host_info_t)&vm_stat, &count);
+					       (host_info_t)&vm_stat, &ಎಣಿಕೆ_2);
 #  endif
-	if (kret == KERN_SUCCESS)
+	ಆದರೆ (kret == KERN_SUCCESS)
 	    // get the amount of user memory by summing each usage
-	    mem = (long_u)(vm_stat.free_count + vm_stat.active_count
-					    + vm_stat.inactive_count
-#  ifdef MAC_OS_X_VERSION_10_9
-					    + vm_stat.compressor_page_count
+	    mem = (long_u)(vm_stat.free_ಎಣಿಕೆ + vm_stat.ಸಕ್ರಿಯ_ಎಣಿಕೆ
+					    + vm_stat.inactive_ಎಣಿಕೆ
+#  ifdef MAC_OS_X_ಆವೃತ್ತಿ_10_9
+					    + vm_stat.compressor_ಪುಟ_ಎಣಿಕೆ
 #  endif
 					    ) * sysconf(_SC_PAGESIZE);
-	mach_port_deallocate(mach_task_self(), host);
+	mach_ಪೋರ್ಟ್_deallocate(mach_task_self(), host);
     }
 # endif
 
 # ifdef HAVE_SYSCTL
-    if (mem == 0)
+    ಆದರೆ (mem == 0)
     {
 	// BSD way of getting the amount of RAM available.
-	int		mib[2];
-	size_t		len = sizeof(long_u);
+	ಪೂರ್ಣಾಂಕ		mib[2];
+	size_t		len = ಗಾತ್ರ(long_u);
 #  ifdef HW_USERMEM64
 	long_u		physmem;
-#  else
+#  ಇಲ್ಲದಿದ್ದರೆ
 	// sysctl() may return 32 bit or 64 bit, accept both
-	union {
+	ಒಕ್ಕೂಟ {
 	    int_u	u32;
 	    long_u	u64;
 	} physmem;
@@ -570,40 +570,40 @@ mch_total_mem(int special UNUSED)
 	mib[0] = CTL_HW;
 #  ifdef HW_USERMEM64
 	mib[1] = HW_USERMEM64;
-#  else
+#  ಇಲ್ಲದಿದ್ದರೆ
 	mib[1] = HW_USERMEM;
 #  endif
-	if (sysctl(mib, 2, &physmem, &len, NULL, 0) == 0)
+	ಆದರೆ (sysctl(mib, 2, &physmem, &len, ಖಾಲಿ, 0) == 0)
 	{
 #  ifdef HW_USERMEM64
 	    mem = (long_u)physmem;
-#  else
-	    if (len == sizeof(physmem.u64))
+#  ಇಲ್ಲದಿದ್ದರೆ
+	    ಆದರೆ (len == ಗಾತ್ರ(physmem.u64))
 		mem = (long_u)physmem.u64;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		mem = (long_u)physmem.u32;
 #  endif
 	}
     }
 # endif
 
-# if defined(HAVE_SYS_SYSINFO_H) && defined(HAVE_SYSINFO)
-    if (mem == 0)
+# ಆದರೆ defined(HAVE_SYS_SYSINFO_H) && defined(HAVE_SYSINFO)
+    ಆದರೆ (mem == 0)
     {
-	struct sysinfo sinfo;
+	ರಚನೆ sysinfo sinfo;
 
 	// Linux way of getting amount of RAM available
-	if (sysinfo(&sinfo) == 0)
+	ಆದರೆ (sysinfo(&sinfo) == 0)
 	{
 #  ifdef HAVE_SYSINFO_MEM_UNIT
 	    // avoid overflow as much as possible
-	    while (shiftright > 0 && (sinfo.mem_unit & 1) == 0)
+	    ಆಗ (shiftright > 0 && (sinfo.mem_unit & 1) == 0)
 	    {
 		sinfo.mem_unit = sinfo.mem_unit >> 1;
 		--shiftright;
 	    }
 	    mem = sinfo.totalram * sinfo.mem_unit;
-#  else
+#  ಇಲ್ಲದಿದ್ದರೆ
 	    mem = sinfo.totalram;
 #  endif
 	}
@@ -611,17 +611,17 @@ mch_total_mem(int special UNUSED)
 # endif
 
 # ifdef HAVE_SYSCONF
-    if (mem == 0)
+    ಆದರೆ (mem == 0)
     {
-	long	    pagesize, pagecount;
+	ದೀರ್ಘ	    pagesize, pagecount;
 
 	// Solaris way of getting amount of RAM available
 	pagesize = sysconf(_SC_PAGESIZE);
 	pagecount = sysconf(_SC_PHYS_PAGES);
-	if (pagesize > 0 && pagecount > 0)
+	ಆದರೆ (pagesize > 0 && pagecount > 0)
 	{
 	    // avoid overflow as much as possible
-	    while (shiftright > 0 && (pagesize & 1) == 0)
+	    ಆಗ (shiftright > 0 && (pagesize & 1) == 0)
 	    {
 		pagesize = (long_u)pagesize >> 1;
 		--shiftright;
@@ -633,12 +633,12 @@ mch_total_mem(int special UNUSED)
 
     // Return the minimum of the physical memory and the user limit, because
     // using more than the user limit may cause Vim to be terminated.
-# if defined(HAVE_SYS_RESOURCE_H) && defined(HAVE_GETRLIMIT)
+# ಆದರೆ defined(HAVE_SYS_RESOURCE_H) && defined(HAVE_GETRLIMIT)
     {
-	struct rlimit	rlp;
+	ರಚನೆ rlimit	rlp;
 
-	if (getrlimit(RLIMIT_DATA, &rlp) == 0
-		&& rlp.rlim_cur < ((rlim_t)1 << (sizeof(long_u) * 8 - 1))
+	ಆದರೆ (getrlimit(RLIMIT_ದತ್ತಾಂಶ, &rlp) == 0
+		&& rlp.rlim_cur < ((rlim_t)1 << (ಗಾತ್ರ(long_u) * 8 - 1))
 #  ifdef RLIM_INFINITY
 		&& rlp.rlim_cur != RLIM_INFINITY
 #  endif
@@ -651,35 +651,35 @@ mch_total_mem(int special UNUSED)
     }
 # endif
 
-    if (mem > 0)
-	return mem >> shiftright;
-    return (long_u)0x1fffff;
+    ಆದರೆ (mem > 0)
+	ಹಿಂತಿರುಗಿ mem >> shiftright;
+    ಹಿಂತಿರುಗಿ (long_u)0x1fffff;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * "flags": MCH_DELAY_IGNOREINPUT - don't read input
  *	    MCH_DELAY_SETTMODE - use settmode() even for short delays
  */
-    void
-mch_delay(long msec, int flags)
+    ಶೂನ್ಯ
+mch_delay(ದೀರ್ಘ msec, ಪೂರ್ಣಾಂಕ flags)
 {
     tmode_T	old_tmode;
-    int		call_settmode;
-#ifdef FEAT_MZSCHEME
-    long	total = msec; // remember original value
-#endif
+    ಪೂರ್ಣಾಂಕ		call_settmode;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MZSCHEME
+    ದೀರ್ಘ	ಒಟ್ಟು = msec; // remember original value
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (flags & MCH_DELAY_IGNOREINPUT)
+    ಆದರೆ (flags & MCH_DELAY_IGNOREINPUT)
     {
 	// Go to cooked mode without echo, to allow SIGINT interrupting us
 	// here.  But we don't want QUIT to kill us (CTRL-\ used in a
 	// shell may produce SIGQUIT).
 	// Only do this if sleeping for more than half a second.
-	in_mch_delay = TRUE;
+	ಒಳ_mch_delay = TRUE;
 	call_settmode = mch_cur_tmode == TMODE_RAW
 			       && (msec > 500 || (flags & MCH_DELAY_SETTMODE));
-	if (call_settmode)
+	ಆದರೆ (call_settmode)
 	{
 	    old_tmode = mch_cur_tmode;
 	    settmode(TMODE_SLEEP);
@@ -690,64 +690,64 @@ mch_delay(long msec, int flags)
 	 * Prefer nanosleep(), some versions of usleep() can only sleep up to
 	 * one second.
 	 */
-#ifdef FEAT_MZSCHEME
-	do
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MZSCHEME
+	ಮಾಡು
 	{
 	    // if total is large enough, wait by portions in p_mzq
-	    if (total > p_mzq)
+	    ಆದರೆ (ಒಟ್ಟು > p_mzq)
 		msec = p_mzq;
-	    else
-		msec = total;
-	    total -= msec;
-#endif
-#ifdef HAVE_NANOSLEEP
+	    ಇಲ್ಲದಿದ್ದರೆ
+		msec = ಒಟ್ಟು;
+	    ಒಟ್ಟು -= msec;
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_NANOSLEEP
 	{
-	    struct timespec ts;
+	    ರಚನೆ timespec ts;
 
 	    ts.tv_sec = msec / 1000;
 	    ts.tv_nsec = (msec % 1000) * 1000000;
-	    (void)nanosleep(&ts, NULL);
+	    (ಶೂನ್ಯ)nanosleep(&ts, ಖಾಲಿ);
 	}
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 # ifdef HAVE_USLEEP
-	while (msec >= 1000)
+	ಆಗ (msec >= 1000)
 	{
-	    usleep((unsigned int)(999 * 1000));
+	    usleep((ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ)(999 * 1000));
 	    msec -= 999;
 	}
-	usleep((unsigned int)(msec * 1000));
-# else
+	usleep((ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ)(msec * 1000));
+# ಇಲ್ಲದಿದ್ದರೆ
 #  ifndef HAVE_SELECT
-	poll(NULL, 0, (int)msec);
-#  else
+	poll(ಖಾಲಿ, 0, (ಪೂರ್ಣಾಂಕ)msec);
+#  ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    struct timeval tv;
+	    ರಚನೆ timeval tv;
 
 	    tv.tv_sec = msec / 1000;
 	    tv.tv_usec = (msec % 1000) * 1000;
 	    // NOTE: Solaris 2.6 has a bug that makes select() hang here.  Get
 	    // a patch from Sun to fix this.  Reported by Gunnar Pedersen.
-	    select(0, NULL, NULL, NULL, &tv);
+	    select(0, ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ, &tv);
 	}
 #  endif
 # endif
-#endif
-#ifdef FEAT_MZSCHEME
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MZSCHEME
 	}
-	while (total > 0);
-#endif
+	ಆಗ (ಒಟ್ಟು > 0);
+#ಆದರೆ_ಅಂತ್ಯ
 
-	if (call_settmode)
+	ಆದರೆ (call_settmode)
 	    settmode(old_tmode);
-	in_mch_delay = FALSE;
+	ಒಳ_mch_delay = FALSE;
     }
-    else
-	WaitForChar(msec, NULL, FALSE);
+    ಇಲ್ಲದಿದ್ದರೆ
+	WaitForChar(msec, ಖಾಲಿ, FALSE);
 }
 
-#if defined(HAVE_STACK_LIMIT) \
+#ಆದರೆ defined(HAVE_ರಾಶಿ_ಎಲ್ಲೆ) \
 	|| (!defined(HAVE_SIGALTSTACK) && defined(HAVE_SIGSTACK))
-# define HAVE_CHECK_STACK_GROWTH
+# define HAVE_CHECK_ರಾಶಿ_GROWTH
 /*
  * Support for checking for an almost-out-of-stack-space situation.
  */
@@ -756,25 +756,25 @@ mch_delay(long msec, int flags)
  * Return a pointer to an item on the stack.  Used to find out if the stack
  * grows up or down.
  */
-static int stack_grows_downwards;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ರಾಶಿ_grows_downwards;
 
 /*
  * Find out if the stack grows upwards or downwards.
  * "p" points to a variable on the stack of the caller.
  */
-    static void
-check_stack_growth(char *p)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+check_ರಾಶಿ_growth(ಅಕ್ಷರ *p)
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
 
-    stack_grows_downwards = (p > (char *)&i);
+    ರಾಶಿ_grows_downwards = (p > (ಅಕ್ಷರ *)&i);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(HAVE_STACK_LIMIT)
-static char *stack_limit = NULL;
+#ಆದರೆ defined(HAVE_ರಾಶಿ_ಎಲ್ಲೆ)
+ಸ್ಥಿರ ಅಕ್ಷರ *ರಾಶಿ_ಎಲ್ಲೆ = ಖಾಲಿ;
 
-# if defined(_THREAD_SAFE) && defined(HAVE_PTHREAD_NP_H)
+# ಆದರೆ defined(THREAD_ಸುರಕ್ಷಿತ) && defined(HAVE_PTHREAD_NP_H)
 #  include <pthread.h>
 #  include <pthread_np.h>
 # endif
@@ -784,52 +784,52 @@ static char *stack_limit = NULL;
  * Called when starting up and when switching to the signal stack in
  * deathtrap().
  */
-    static void
-get_stack_limit(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+get_ರಾಶಿ_ಎಲ್ಲೆ(ಶೂನ್ಯ)
 {
-    struct rlimit	rlp;
-    int			i;
-    long		lim;
+    ರಚನೆ rlimit	rlp;
+    ಪೂರ್ಣಾಂಕ			i;
+    ದೀರ್ಘ		lim;
 
     // Set the stack limit to 15/16 of the allowable size.  Skip this when the
     // limit doesn't fit in a long (rlim_cur might be "long long").
-    if (getrlimit(RLIMIT_STACK, &rlp) == 0
-	    && rlp.rlim_cur < ((rlim_t)1 << (sizeof(long_u) * 8 - 1))
+    ಆದರೆ (getrlimit(RLIMIT_ರಾಶಿ, &rlp) == 0
+	    && rlp.rlim_cur < ((rlim_t)1 << (ಗಾತ್ರ(long_u) * 8 - 1))
 # ifdef RLIM_INFINITY
 	    && rlp.rlim_cur != RLIM_INFINITY
 # endif
        )
     {
-	lim = (long)rlp.rlim_cur;
-# if defined(_THREAD_SAFE) && defined(HAVE_PTHREAD_NP_H)
+	lim = (ದೀರ್ಘ)rlp.rlim_cur;
+# ಆದರೆ defined(THREAD_ಸುರಕ್ಷಿತ) && defined(HAVE_PTHREAD_NP_H)
 	{
 	    pthread_attr_t  attr;
-	    size_t	    size;
+	    size_t	    ಗಾತ್ರ_2;
 
 	    // On FreeBSD the initial thread always has a fixed stack size, no
 	    // matter what the limits are set to.  Normally it's 1 Mbyte.
 	    pthread_attr_init(&attr);
-	    if (pthread_attr_get_np(pthread_self(), &attr) == 0)
+	    ಆದರೆ (pthread_attr_get_np(pthread_self(), &attr) == 0)
 	    {
-		pthread_attr_getstacksize(&attr, &size);
-		if (lim > (long)size)
-		    lim = (long)size;
+		pthread_attr_getstacksize(&attr, &ಗಾತ್ರ_2);
+		ಆದರೆ (lim > (ದೀರ್ಘ)ಗಾತ್ರ_2)
+		    lim = (ದೀರ್ಘ)ಗಾತ್ರ_2;
 	    }
 	    pthread_attr_destroy(&attr);
 	}
 # endif
-	if (stack_grows_downwards)
+	ಆದರೆ (ರಾಶಿ_grows_downwards)
 	{
-	    stack_limit = (char *)((long)&i - (lim / 16L * 15L));
-	    if (stack_limit >= (char *)&i)
+	    ರಾಶಿ_ಎಲ್ಲೆ = (ಅಕ್ಷರ *)((ದೀರ್ಘ)&i - (lim / 16L * 15L));
+	    ಆದರೆ (ರಾಶಿ_ಎಲ್ಲೆ >= (ಅಕ್ಷರ *)&i)
 		// overflow, set to 1/16 of current stack position
-		stack_limit = (char *)((long)&i / 16L);
+		ರಾಶಿ_ಎಲ್ಲೆ = (ಅಕ್ಷರ *)((ದೀರ್ಘ)&i / 16L);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    stack_limit = (char *)((long)&i + (lim / 16L * 15L));
-	    if (stack_limit <= (char *)&i)
-		stack_limit = NULL;	// overflow
+	    ರಾಶಿ_ಎಲ್ಲೆ = (ಅಕ್ಷರ *)((ದೀರ್ಘ)&i + (lim / 16L * 15L));
+	    ಆದರೆ (ರಾಶಿ_ಎಲ್ಲೆ <= (ಅಕ್ಷರ *)&i)
+		ರಾಶಿ_ಎಲ್ಲೆ = ಖಾಲಿ;	//ಅತಿಪ್ರವಾಹ
 	}
     }
 }
@@ -838,24 +838,24 @@ get_stack_limit(void)
  * Return FAIL when running out of stack space.
  * "p" must point to any variable local to the caller that's on the stack.
  */
-    int
-mch_stackcheck(char *p)
+    ಪೂರ್ಣಾಂಕ
+mch_stackcheck(ಅಕ್ಷರ *p)
 {
-    if (stack_limit == NULL)
-	return OK;
+    ಆದರೆ (ರಾಶಿ_ಎಲ್ಲೆ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ OK;
 
-    if (stack_grows_downwards)
+    ಆದರೆ (ರಾಶಿ_grows_downwards)
     {
-	if (p < stack_limit)
-	    return FAIL;
+	ಆದರೆ (p < ರಾಶಿ_ಎಲ್ಲೆ)
+	    ಹಿಂತಿರುಗಿ FAIL;
     }
-    else if (p > stack_limit)
-	return FAIL;
-    return OK;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p > ರಾಶಿ_ಎಲ್ಲೆ)
+	ಹಿಂತಿರುಗಿ FAIL;
+    ಹಿಂತಿರುಗಿ OK;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(HAVE_SIGALTSTACK) || defined(HAVE_SIGSTACK)
+#ಆದರೆ defined(HAVE_SIGALTSTACK) || defined(HAVE_SIGSTACK)
 /*
  * Support for using the signal stack.
  * This helps when we run out of stack space, which causes a SIGSEGV.  The
@@ -864,120 +864,120 @@ mch_stackcheck(char *p)
  */
 
 # ifdef HAVE_SIGALTSTACK
-static stack_t sigstk;			// for sigaltstack()
-# else
-static struct sigstack sigstk;		// for sigstack()
+ಸ್ಥಿರ stack_t sigstk;			// for sigaltstack()
+# ಇಲ್ಲದಿದ್ದರೆ
+ಸ್ಥಿರ ರಚನೆ sigstack sigstk;		// for sigstack()
 # endif
 
 /*
  * Get a size of signal stack.
  * Preference (if available): sysconf > SIGSTKSZ > guessed size
  */
-static long int get_signal_stack_size(void)
+ಸ್ಥಿರ ದೀರ್ಘ ಪೂರ್ಣಾಂಕ get_signal_ರಾಶಿ_ಗಾತ್ರ(ಶೂನ್ಯ)
 {
 # ifdef HAVE_SYSCONF_SIGSTKSZ
-    long int size = -1;
+    ದೀರ್ಘ ಪೂರ್ಣಾಂಕ ಗಾತ್ರ_2 = -1;
 
     // return size only if sysconf doesn't return an error
-    if ((size = sysconf(_SC_SIGSTKSZ)) > -1)
-	return size;
+    ಆದರೆ ((ಗಾತ್ರ_2 = sysconf(_SC_SIGSTKSZ)) > -1)
+	ಹಿಂತಿರುಗಿ ಗಾತ್ರ_2;
 # endif
 
 # ifdef SIGSTKSZ
     // if sysconf() isn't available or gives error, return SIGSTKSZ
     // if defined
-    return SIGSTKSZ;
+    ಹಿಂತಿರುಗಿ SIGSTKSZ;
 # endif
 
     // otherwise guess the size
-    return 8000;
+    ಹಿಂತಿರುಗಿ 8000;
 }
 
-static char *signal_stack;
+ಸ್ಥಿರ ಅಕ್ಷರ *signal_ರಾಶಿ;
 
-    static void
-init_signal_stack(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+init_signal_ರಾಶಿ(ಶೂನ್ಯ)
 {
-    if (signal_stack == NULL)
-	return;
+    ಆದರೆ (signal_ರಾಶಿ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
 # ifdef HAVE_SIGALTSTACK
-#  ifdef HAVE_SS_BASE
-    sigstk.ss_base = signal_stack;
-#  else
-    sigstk.ss_sp = signal_stack;
+#  ifdef HAVE_SS_ತಳ
+    sigstk.ss_ತಳ = signal_ರಾಶಿ;
+#  ಇಲ್ಲದಿದ್ದರೆ
+    sigstk.ss_sp = signal_ರಾಶಿ;
 #  endif
-    sigstk.ss_size = get_signal_stack_size();
+    sigstk.ss_size = get_signal_ರಾಶಿ_ಗಾತ್ರ();
     sigstk.ss_flags = 0;
-    (void)sigaltstack(&sigstk, NULL);
-# else
-    sigstk.ss_sp = signal_stack;
-    if (stack_grows_downwards)
-	sigstk.ss_sp += get_signal_stack_size() - 1;
+    (ಶೂನ್ಯ)sigaltstack(&sigstk, ಖಾಲಿ);
+# ಇಲ್ಲದಿದ್ದರೆ
+    sigstk.ss_sp = signal_ರಾಶಿ;
+    ಆದರೆ (ರಾಶಿ_grows_downwards)
+	sigstk.ss_sp += get_signal_ರಾಶಿ_ಗಾತ್ರ() - 1;
     sigstk.ss_onstack = 0;
-    (void)sigstack(&sigstk, NULL);
+    (ಶೂನ್ಯ)sigstack(&sigstk, ಖಾಲಿ);
 # endif
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * We need correct prototypes for a signal function, otherwise mean compilers
  * will barf when the second argument to signal() is ``wrong''.
  * Let me try it with a few tricky defines from my own osdef.h	(jw).
  */
-#if defined(SIGWINCH)
-    static void
+#ಆದರೆ defined(SIGWINCH)
+    ಸ್ಥಿರ ಶೂನ್ಯ
 sig_winch SIGDEFARG(sigarg)
 {
     // this is not required on all systems, but it doesn't hurt anybody
     mch_signal(SIGWINCH, sig_winch);
     do_resize = TRUE;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(SIGTSTP)
-    static void
+#ಆದರೆ defined(SIGTSTP)
+    ಸ್ಥಿರ ಶೂನ್ಯ
 sig_tstp SIGDEFARG(sigarg)
 {
     // Second time we get called we actually need to suspend
-    if (in_mch_suspend)
+    ಆದರೆ (ಒಳ_mch_suspend)
     {
 	mch_signal(SIGTSTP, ignore_sigtstp ? SIG_IGN : SIG_DFL);
-	raise(sigarg);
+	ಎತ್ತು(sigarg);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	got_tstp = TRUE;
 
-# if !defined(__ANDROID__) && !defined(__OpenBSD__) && !defined(__DragonFly__)
+# ಆದರೆ !defined(__ANDROID__) && !defined(__OpenBSD__) && !defined(__DragonFly__)
     // This is not required on all systems.  On some systems (at least Android,
     // OpenBSD, and DragonFlyBSD) this breaks suspending with CTRL-Z.
     mch_signal(SIGTSTP, sig_tstp);
 # endif
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(SIGINT)
-    static void
+#ಆದರೆ defined(SIGINT)
+    ಸ್ಥಿರ ಶೂನ್ಯ
 catch_sigint SIGDEFARG(sigarg)
 {
     // this is not required on all systems, but it doesn't hurt anybody
     mch_signal(SIGINT, catch_sigint);
     got_int = TRUE;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(SIGUSR1)
-    static void
+#ಆದರೆ defined(SIGUSR1)
+    ಸ್ಥಿರ ಶೂನ್ಯ
 catch_sigusr1 SIGDEFARG(sigarg)
 {
     // this is not required on all systems, but it doesn't hurt anybody
     mch_signal(SIGUSR1, catch_sigusr1);
     got_sigusr1 = TRUE;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(SIGPWR)
-    static void
+#ಆದರೆ defined(SIGPWR)
+    ಸ್ಥಿರ ಶೂನ್ಯ
 catch_sigpwr SIGDEFARG(sigarg)
 {
     // this is not required on all systems, but it doesn't hurt anybody
@@ -989,37 +989,37 @@ catch_sigpwr SIGDEFARG(sigarg)
      */
     ml_sync_all(FALSE, FALSE);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef SET_SIG_ALARM
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ಗಣ_SIG_ALARM
 /*
  * signal function for alarm().
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 sig_alarm SIGDEFARG(sigarg)
 {
     // doesn't do anything, just to break a system call
     sig_alarm_called = TRUE;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(HAVE_SETJMP_H) \
+#ಆದರೆ defined(HAVE_SETJMP_H) \
 	&& ((defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)) \
 	    || defined(FEAT_LIBCALL))
 # define USING_SETJMP 1
 
 // argument to SETJMP()
-static JMP_BUF lc_jump_env;
+ಸ್ಥಿರ JMP_BUF lc_jump_env;
 
 # ifdef SIGHASARG
 // Caught signal number, 0 when no signal was caught; used for mch_libcall().
 // Volatile because it is used in signal handlers.
-static volatile sig_atomic_t lc_signal;
+ಸ್ಥಿರ ಅಸ್ಥಿರ sig_atomic_t lc_signal;
 # endif
 
 // TRUE when lc_jump_env is valid.
 // Volatile because it is used in signal handler deathtrap().
-static volatile sig_atomic_t lc_active = FALSE;
+ಸ್ಥಿರ ಅಸ್ಥಿರ sig_atomic_t lc_ಸಕ್ರಿಯ = FALSE;
 
 /*
  * A simplistic version of setjmp() that only allows one level of using.
@@ -1043,31 +1043,31 @@ static volatile sig_atomic_t lc_active = FALSE;
  * Returns OK for normal return, FAIL when the protected code caused a
  * problem and LONGJMP() was used.
  */
-    static void
-mch_startjmp(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+mch_startjmp(ಶೂನ್ಯ)
 {
 # ifdef SIGHASARG
     lc_signal = 0;
 # endif
-    lc_active = TRUE;
+    lc_ಸಕ್ರಿಯ = TRUE;
 }
 
-    static void
-mch_endjmp(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+mch_endjmp(ಶೂನ್ಯ)
 {
-    lc_active = FALSE;
+    lc_ಸಕ್ರಿಯ = FALSE;
 }
 
-    static void
-mch_didjmp(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+mch_didjmp(ಶೂನ್ಯ)
 {
-# if defined(HAVE_SIGALTSTACK) || defined(HAVE_SIGSTACK)
+# ಆದರೆ defined(HAVE_SIGALTSTACK) || defined(HAVE_SIGSTACK)
     // On FreeBSD the signal stack has to be reset after using siglongjmp(),
     // otherwise catching the signal only works once.
-    init_signal_stack();
+    init_signal_ರಾಶಿ();
 # endif
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * This function handles deadly signals.
@@ -1076,46 +1076,46 @@ mch_didjmp(void)
  * NOTE: Avoid unsafe functions, such as allocating memory, they can result in
  * a deadlock.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 deathtrap SIGDEFARG(sigarg)
 {
-    static int	entered = 0;	    // count the number of times we got here.
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	entered = 0;	    // count the number of times we got here.
 				    // Note: when memory has been corrupted
 				    // this may get an arbitrary value!
-#ifdef SIGHASARG
-    int		i;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGHASARG
+    ಪೂರ್ಣಾಂಕ		i;
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(USING_SETJMP)
+#ಆದರೆ defined(USING_SETJMP)
     /*
      * Catch a crash in protected code.
      * Restores the environment saved in lc_jump_env, which looks like
      * SETJMP() returns 1.
      */
-    if (lc_active)
+    ಆದರೆ (lc_ಸಕ್ರಿಯ)
     {
-# if defined(SIGHASARG)
+# ಆದರೆ defined(SIGHASARG)
 	lc_signal = sigarg;
 # endif
-	lc_active = FALSE;	// don't jump again
+	lc_ಸಕ್ರಿಯ = FALSE;	// don't jump again
 	LONGJMP(lc_jump_env, 1);
 	// NOTREACHED
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef SIGHASARG
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGHASARG
 # ifdef SIGQUIT
     // While in mch_delay() we go to cooked mode to allow a CTRL-C to
     // interrupt us.  But in cooked mode we may also get SIGQUIT, e.g., when
     // pressing CTRL-\, but we don't want Vim to exit then.
-    if (in_mch_delay && sigarg == SIGQUIT)
-	return;
+    ಆದರೆ (ಒಳ_mch_delay && sigarg == SIGQUIT)
+	ಹಿಂತಿರುಗಿ;
 # endif
 
     // When SIGHUP, SIGQUIT, etc. are blocked: postpone the effect and return
     // here.  This avoids that a non-reentrant function is interrupted, e.g.,
     // free().  Calling free() again may then cause a crash.
-    if (entered == 0
+    ಆದರೆ (entered == 0
 	    && (0
 # ifdef SIGHUP
 		|| sigarg == SIGHUP
@@ -1137,29 +1137,29 @@ deathtrap SIGDEFARG(sigarg)
 # endif
 		)
 	    && !vim_handle_signal(sigarg))
-	return;
-#endif
+	ಹಿಂತಿರುಗಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Remember how often we have been called.
     ++entered;
 
     // Executing autocommands is likely to use more stack space than we have
     // available in the signal stack.
-    block_autocmds();
+    ಖಂಡ_autocmds();
 
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
     // Set the v:dying variable.
-    set_vim_var_nr(VV_DYING, (long)entered);
-#endif
+    ಗಣ_vim_var_nr(VV_DYING, (ದೀರ್ಘ)entered);
+#ಆದರೆ_ಅಂತ್ಯ
     v_dying = entered;
 
-#ifdef HAVE_STACK_LIMIT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_ರಾಶಿ_ಎಲ್ಲೆ
     // Since we are now using the signal stack, need to reset the stack
     // limit.  Otherwise using a regexp will fail.
-    get_stack_limit();
-#endif
+    get_ರಾಶಿ_ಎಲ್ಲೆ();
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if 0
+#ಆದರೆ 0
     // This is for opening gdb the moment Vim crashes.
     // You need to manually adjust the file name and Vim executable name.
     // Suggested by SungHyun Nam.
@@ -1167,7 +1167,7 @@ deathtrap SIGDEFARG(sigarg)
 # define VI_GDB_FILE "/tmp/vimgdb"
 # define VIM_NAME "/usr/bin/vim"
 	FILE *fp = fopen(VI_GDB_FILE, "w");
-	if (fp)
+	ಆದರೆ (fp)
 	{
 	    fprintf(fp,
 		    "file %s\n"
@@ -1180,17 +1180,17 @@ deathtrap SIGDEFARG(sigarg)
 	    unlink(VI_GDB_FILE);
 	}
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef SIGHASARG
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGHASARG
     // try to find the name of this signal
-    for (i = 0; signal_info[i].sig != -1; i++)
-	if (sigarg == signal_info[i].sig)
-	    break;
+    ಗಾಗಿ (i = 0; signal_info[i].sig != -1; i++)
+	ಆದರೆ (sigarg == signal_info[i].sig)
+	    ನಿಲ್ಲಿಸು;
     deadly_signal = sigarg;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    full_screen = FALSE;	// don't write message to the GUI, it might be
+    ತುಂಬಿದ_screen = FALSE;	// don't write message to the GUI, it might be
 				// part of the problem...
     /*
      * If something goes wrong after entering here, we may get here again.
@@ -1201,29 +1201,29 @@ deathtrap SIGDEFARG(sigarg)
      * When this still happens again (or memory was corrupted in such a way
      * that "entered" was clobbered) use _exit(), don't try freeing resources.
      */
-    if (entered >= 3)
+    ಆದರೆ (entered >= 3)
     {
-	reset_signals();	// don't catch any signals anymore
+	reset_ಸಂಕೇತಗಳು();	// don't catch any signals anymore
 	may_core_dump();
-	if (entered >= 4)
+	ಆದರೆ (entered >= 4)
 	    _exit(8);
-	exit(7);
+	ನಿರ್ಗಮಿಸು(7);
     }
-    if (entered == 2)
+    ಆದರೆ (entered == 2)
     {
 	// No translation, it may call malloc().
-	OUT_STR("Vim: Double signal, exiting\n");
-	out_flush();
+	ಹೊರಹೋಗು_STR("Vim: Double signal, exiting\n");
+	ಹೊರಹೋಗು_flush();
 	getout(1);
     }
 
     // No translation, it may call malloc().
-#ifdef SIGHASARG
-    sprintf((char *)IObuff, "Vim: Caught deadly signal %s\r\n",
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGHASARG
+    sprintf((ಅಕ್ಷರ *)IObuff, "Vim: Caught deadly signal %s\r\n",
 							 signal_info[i].name);
-#else
-    sprintf((char *)IObuff, "Vim: Caught deadly signal\r\n");
-#endif
+#ಇಲ್ಲದಿದ್ದರೆ
+    sprintf((ಅಕ್ಷರ *)IObuff, "Vim: Caught deadly signal\r\n");
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Preserve files and exit.  This sets the really_exiting flag to prevent
     // calling free().
@@ -1231,19 +1231,19 @@ deathtrap SIGDEFARG(sigarg)
 
     // NOTREACHED
 
-#ifdef NBDEBUG
-    reset_signals();
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ NBDEBUG
+    reset_ಸಂಕೇತಗಳು();
     may_core_dump();
     abort();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Invoked after receiving SIGCONT.  We don't know what happened while
  * sleeping, deal with part of that.
  */
-    static void
-after_sigcont(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+after_sigcont(ಶೂನ್ಯ)
 {
     // Don't change "oldtitle" in a signal handler, set a flag to obtain it
     // again later.
@@ -1254,8 +1254,8 @@ after_sigcont(void)
     did_check_timestamps = FALSE;
 }
 
-#if defined(SIGCONT)
-static void sigcont_handler SIGPROTOARG;
+#ಆದರೆ defined(SIGCONT)
+ಸ್ಥಿರ ಶೂನ್ಯ sigcont_handler SIGPROTOARG;
 
 /*
  * With multi-threading, suspending might not work immediately.  Catch the
@@ -1268,20 +1268,20 @@ static void sigcont_handler SIGPROTOARG;
  *
  * volatile because it is used in signal handler sigcont_handler().
  */
-static volatile sig_atomic_t sigcont_received;
-static void sigcont_handler SIGPROTOARG;
+ಸ್ಥಿರ ಅಸ್ಥಿರ sig_atomic_t sigcont_received;
+ಸ್ಥಿರ ಶೂನ್ಯ sigcont_handler SIGPROTOARG;
 
 /*
  * signal handler for SIGCONT
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 sigcont_handler SIGDEFARG(sigarg)
 {
-    if (in_mch_suspend)
+    ಆದರೆ (ಒಳ_mch_suspend)
     {
 	sigcont_received = TRUE;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// We didn't suspend ourselves, assume we were stopped by a SIGSTOP
 	// signal (which can't be intercepted) and get a SIGCONT.  Need to get
@@ -1290,19 +1290,19 @@ sigcont_handler SIGDEFARG(sigarg)
 	after_sigcont();
 	redraw_later(UPD_CLEAR);
 	cursor_on_force();
-	out_flush();
+	ಹೊರಹೋಗು_flush();
     }
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_CLIPBOARD)
-# if defined(USE_SYSTEM) && (defined(FEAT_X11) \
+#ಆದರೆ defined(FEAT_CLIPBOARD)
+# ಆದರೆ defined(USE_SYSTEM) && (defined(FEAT_X11) \
 	|| defined(FEAT_WAYLAND_CLIPBOARD))
-static void *clip_star_save = NULL;
-static void *clip_plus_save = NULL;
+ಸ್ಥಿರ ಶೂನ್ಯ *clip_ನಕ್ಷತ್ರ_save = ಖಾಲಿ;
+ಸ್ಥಿರ ಶೂನ್ಯ *clip_plus_save = ಖಾಲಿ;
 # endif
 
-# if defined(FEAT_CLIPBOARD) && (defined(FEAT_X11) \
+# ಆದರೆ defined(FEAT_CLIPBOARD) && (defined(FEAT_X11) \
 	|| defined(FEAT_WAYLAND_CLIPBOARD))
 /*
  * Called when Vim is going to sleep or execute a shell command.
@@ -1311,93 +1311,93 @@ static void *clip_plus_save = NULL;
  * copy the text to cut buffer 0 (for X11). Wayland users must have
  * a clipboard manager to replicate such behaviour.
  */
-    static void
-loose_clipboard(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+loose_clipboard(ಶೂನ್ಯ)
 {
-    if (clip_star.owned || clip_plus.owned)
+    ಆದರೆ (clip_ನಕ್ಷತ್ರ.owned || clip_plus.owned)
     {
 #  ifdef FEAT_X11
 	x11_export_final_selection();
 #  endif
-	if (clip_star.owned)
-	    clip_lose_selection(&clip_star);
-	if (clip_plus.owned)
+	ಆದರೆ (clip_ನಕ್ಷತ್ರ.owned)
+	    clip_lose_selection(&clip_ನಕ್ಷತ್ರ);
+	ಆದರೆ (clip_plus.owned)
 	    clip_lose_selection(&clip_plus);
 #  ifdef FEAT_X11
-	if (x11_display != NULL)
+	ಆದರೆ (x11_display != ಖಾಲಿ)
 	    XFlush(x11_display);
 #  endif
     }
 }
 # endif
 
-# if defined(USE_SYSTEM) && (defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD))
+# ಆದರೆ defined(USE_SYSTEM) && (defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD))
 /*
  * Save clipboard text to restore later.
  */
-    static void
-save_clipboard(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+save_clipboard(ಶೂನ್ಯ)
 {
-    if (clip_star.owned)
-	clip_star_save = get_register('*', TRUE);
-    if (clip_plus.owned)
-	clip_plus_save = get_register('+', TRUE);
+    ಆದರೆ (clip_ನಕ್ಷತ್ರ.owned)
+	clip_ನಕ್ಷತ್ರ_save = get_ರಿಜಿಸ್ಟರ್('*', TRUE);
+    ಆದರೆ (clip_plus.owned)
+	clip_plus_save = get_ರಿಜಿಸ್ಟರ್('+', TRUE);
 }
 
 /*
  * Restore clipboard text if no one own the X/Wayland selection.
  */
-    static void
-restore_clipboard(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+restore_clipboard(ಶೂನ್ಯ)
 {
-    if (clip_star_save != NULL)
+    ಆದರೆ (clip_ನಕ್ಷತ್ರ_save != ಖಾಲಿ)
     {
-	if (!clip_gen_owner_exists(&clip_star))
-	    put_register('*', clip_star_save);
-	else
-	    free_register(clip_star_save);
-	clip_star_save = NULL;
+	ಆದರೆ (!clip_gen_owner_exists(&clip_ನಕ್ಷತ್ರ))
+	    put_ರಿಜಿಸ್ಟರ್('*', clip_ನಕ್ಷತ್ರ_save);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    free_ರಿಜಿಸ್ಟರ್(clip_ನಕ್ಷತ್ರ_save);
+	clip_ನಕ್ಷತ್ರ_save = ಖಾಲಿ;
     }
-    if (clip_plus_save != NULL)
+    ಆದರೆ (clip_plus_save != ಖಾಲಿ)
     {
-	if (!clip_gen_owner_exists(&clip_plus))
-	    put_register('+', clip_plus_save);
-	else
-	    free_register(clip_plus_save);
-	clip_plus_save = NULL;
+	ಆದರೆ (!clip_gen_owner_exists(&clip_plus))
+	    put_ರಿಜಿಸ್ಟರ್('+', clip_plus_save);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    free_ರಿಜಿಸ್ಟರ್(clip_plus_save);
+	clip_plus_save = ಖಾಲಿ;
     }
 }
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * If the machine has job control, use it to suspend the program,
  * otherwise fake it by starting a new shell.
  */
-    void
-mch_suspend(void)
+    ಶೂನ್ಯ
+mch_suspend(ಶೂನ್ಯ)
 {
-    if (ignore_sigtstp)
-	return;
+    ಆದರೆ (ignore_sigtstp)
+	ಹಿಂತಿರುಗಿ;
 
-#if defined(SIGTSTP)
-    in_mch_suspend = TRUE;
+#ಆದರೆ defined(SIGTSTP)
+    ಒಳ_mch_suspend = TRUE;
 
-    out_flush();	    // needed to make cursor visible on some systems
+    ಹೊರಹೋಗು_flush();	    // needed to make cursor visible on some systems
     settmode(TMODE_COOK);
-    out_flush();	    // needed to disable mouse on some systems
+    ಹೊರಹೋಗು_flush();	    // needed to disable mouse on some systems
 
-# if defined(FEAT_CLIPBOARD) && (defined(FEAT_X11) \
+# ಆದರೆ defined(FEAT_CLIPBOARD) && (defined(FEAT_X11) \
 	|| defined(FEAT_WAYLAND_CLIPBOARD))
     loose_clipboard();
 # endif
-# if defined(SIGCONT)
+# ಆದರೆ defined(SIGCONT)
     sigcont_received = FALSE;
 # endif
 
     kill(0, SIGTSTP);	    // send ourselves a STOP signal
 
-# if defined(SIGCONT)
+# ಆದರೆ defined(SIGCONT)
     /*
      * Wait for the SIGCONT signal to be handled. It generally happens
      * immediately, but somehow not all the time, probably because it's handled
@@ -1408,227 +1408,227 @@ mch_suspend(void)
      * received after 1+2+3 ms (not expected to happen).
      */
     {
-	long wait_time;
+	ದೀರ್ಘ wait_ಸಮಯ;
 
-	for (wait_time = 0; !sigcont_received && wait_time <= 3L; wait_time++)
-	    mch_delay(wait_time, 0);
+	ಗಾಗಿ (wait_ಸಮಯ = 0; !sigcont_received && wait_ಸಮಯ <= 3L; wait_ಸಮಯ++)
+	    mch_delay(wait_ಸಮಯ, 0);
     }
 # endif
-    in_mch_suspend = FALSE;
+    ಒಳ_mch_suspend = FALSE;
 
     after_sigcont();
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
     suspend_shell();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-    void
-mch_init(void)
+    ಶೂನ್ಯ
+mch_init(ಶೂನ್ಯ)
 {
     Columns = 80;
-    Rows = 24;
+    ಅಡ್ಡಸಾಲುಗಳು = 24;
 
-    out_flush();
+    ಹೊರಹೋಗು_flush();
 
-#ifdef SIGTSTP
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGTSTP
     // Check whether we were invoked with SIGTSTP set to be ignored. If it is
     // that indicates the shell (or program) that launched us does not support
     // tty job control and thus we should ignore that signal. If invoked as a
     // restricted editor (e.g., as "rvim") SIGTSTP is always ignored.
     ignore_sigtstp = restricted || SIG_IGN == mch_signal(SIGTSTP, SIG_ERR);
-#endif
-    set_signals();
+#ಆದರೆ_ಅಂತ್ಯ
+    ಗಣ_ಸಂಕೇತಗಳು();
 
-#ifdef MACOS_CONVERT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MACOS_CONVERT
     mac_conv_init();
-#endif
-#ifdef FEAT_CYGWIN_WIN32_CLIPBOARD
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CYGWIN_WIN32_CLIPBOARD
     win_clip_init();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-    void
-set_sigwinch_handler(void)
+    ಶೂನ್ಯ
+ಗಣ_sigwinch_handler(ಶೂನ್ಯ)
 {
-#if defined(SIGWINCH)
+#ಆದರೆ defined(SIGWINCH)
     mch_signal(SIGWINCH, sig_winch);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-    static void
-set_signals(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_ಸಂಕೇತಗಳು(ಶೂನ್ಯ)
 {
-#if defined(SIGWINCH)
+#ಆದರೆ defined(SIGWINCH)
     /*
      * WINDOW CHANGE signal is handled with sig_winch().
      */
     mch_signal(SIGWINCH, sig_winch);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef SIGTSTP
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGTSTP
     // See mch_init() for the conditions under which we ignore SIGTSTP.
     // In the GUI default TSTP processing is OK.
     // Checking both gui.in_use and gui.starting because gui.in_use is not set
     // at this point (set after menus are displayed), but gui.starting is set.
     mch_signal(SIGTSTP, ignore_sigtstp ? SIG_IGN
 # ifdef FEAT_GUI
-				: gui.in_use || gui.starting ? SIG_DFL
+				: gui.ಒಳ_use || gui.starting ? SIG_DFL
 # endif
 				    : sig_tstp);
-#endif
-#if defined(SIGCONT)
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(SIGCONT)
     mch_signal(SIGCONT, sigcont_handler);
-#endif
-#ifdef SIGPIPE
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGPIPE
     /*
      * We want to ignore breaking of PIPEs.
      */
     mch_signal(SIGPIPE, SIG_IGN);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef SIGINT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGINT
     catch_int_signal();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef SIGUSR1
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGUSR1
     /*
      * Call user's handler on SIGUSR1
      */
     mch_signal(SIGUSR1, catch_sigusr1);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     /*
      * Ignore alarm signals (Perl's alarm() generates it).
      */
-#ifdef SIGALRM
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGALRM
     mch_signal(SIGALRM, SIG_IGN);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef SIGPWR
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGPWR
     /*
      * Catch SIGPWR (power failure?) to preserve the swap files, so that no
      * work will be lost.
      */
     mch_signal(SIGPWR, catch_sigpwr);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     /*
      * Arrange for other signals to gracefully shutdown Vim.
      */
-    catch_signals(deathtrap, SIG_ERR);
+    catch_ಸಂಕೇತಗಳು(deathtrap, SIG_ERR);
 
-#if defined(FEAT_GUI) && defined(SIGHUP)
+#ಆದರೆ defined(FEAT_GUI) && defined(SIGHUP)
     /*
      * When the GUI is running, ignore the hangup signal.
      */
-    if (gui.in_use)
+    ಆದರೆ (gui.ಒಳ_use)
 	mch_signal(SIGHUP, SIG_IGN);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#if defined(SIGINT)
+#ಆದರೆ defined(SIGINT)
 /*
  * Catch CTRL-C (only works while in Cooked mode).
  */
-    static void
-catch_int_signal(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+catch_int_signal(ಶೂನ್ಯ)
 {
     mch_signal(SIGINT, catch_sigint);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    void
-reset_signals(void)
+    ಶೂನ್ಯ
+reset_ಸಂಕೇತಗಳು(ಶೂನ್ಯ)
 {
-    catch_signals(SIG_DFL, SIG_DFL);
-#if defined(SIGCONT)
+    catch_ಸಂಕೇತಗಳು(SIG_DFL, SIG_DFL);
+#ಆದರೆ defined(SIGCONT)
     // SIGCONT isn't in the list, because its default action is ignore
     mch_signal(SIGCONT, SIG_DFL);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-    static void
-catch_signals(
-    void (*func_deadly)(int),
-    void (*func_other)(int))
+    ಸ್ಥಿರ ಶೂನ್ಯ
+catch_ಸಂಕೇತಗಳು(
+    ಶೂನ್ಯ (*func_deadly)(ಪೂರ್ಣಾಂಕ),
+    ಶೂನ್ಯ (*func_other)(ಪೂರ್ಣಾಂಕ))
 {
-    int	    i;
+    ಪೂರ್ಣಾಂಕ	    i;
 
-    for (i = 0; signal_info[i].sig != -1; i++)
+    ಗಾಗಿ (i = 0; signal_info[i].sig != -1; i++)
     {
-	if (signal_info[i].deadly)
+	ಆದರೆ (signal_info[i].deadly)
 	{
-#if defined(HAVE_SIGALTSTACK) && defined(HAVE_SIGACTION)
-	    struct sigaction sa;
+#ಆದರೆ defined(HAVE_SIGALTSTACK) && defined(HAVE_SIGACTION)
+	    ರಚನೆ sigaction sa;
 
 	    // Setup to use the alternate stack for the signal function.
 	    sa.sa_handler = func_deadly;
 	    sigemptyset(&sa.sa_mask);
-# if defined(__linux__) && defined(_REENTRANT)
+# ಆದರೆ defined(__linux__) && defined(_REENTRANT)
 	    // On Linux, with glibc compiled for kernel 2.2, there is a bug in
 	    // thread handling in combination with using the alternate stack:
 	    // pthread library functions try to use the stack pointer to
 	    // identify the current thread, causing a SEGV signal, which
 	    // recursively calls deathtrap() and hangs.
 	    sa.sa_flags = 0;
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 	    sa.sa_flags = SA_ONSTACK;
 # endif
-	    sigaction(signal_info[i].sig, &sa, NULL);
-#else
-# if defined(HAVE_SIGALTSTACK) && defined(HAVE_SIGVEC)
-	    struct sigvec sv;
+	    sigaction(signal_info[i].sig, &sa, ಖಾಲಿ);
+#ಇಲ್ಲದಿದ್ದರೆ
+# ಆದರೆ defined(HAVE_SIGALTSTACK) && defined(HAVE_SIGVEC)
+	    ರಚನೆ sigvec sv;
 
 	    // Setup to use the alternate stack for the signal function.
 	    sv.sv_handler = func_deadly;
-	    sv.sv_mask = 0;
+	    sv.sv_ಮುಖವಾಡ = 0;
 	    sv.sv_flags = SV_ONSTACK;
-	    sigvec(signal_info[i].sig, &sv, NULL);
-# else
+	    sigvec(signal_info[i].sig, &sv, ಖಾಲಿ);
+# ಇಲ್ಲದಿದ್ದರೆ
 	    mch_signal(signal_info[i].sig, func_deadly);
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	}
-	else if (func_other != SIG_ERR)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (func_other != SIG_ERR)
 	{
 	    // Deal with non-deadly signals.
-#ifdef SIGTSTP
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGTSTP
 	    mch_signal(signal_info[i].sig,
 		    signal_info[i].sig == SIGTSTP && ignore_sigtstp
 						       ? SIG_IGN : func_other);
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 	    mch_signal(signal_info[i].sig, func_other);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	}
     }
 }
 
-#ifdef HAVE_SIGPROCMASK
-    static void
-block_signals(sigset_t *set)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_SIGPROCMASK
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಖಂಡ_ಸಂಕೇತಗಳು_2(sigset_t *ಗಣ_2)
 {
     sigset_t	newset;
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
 
     sigemptyset(&newset);
 
-    for (i = 0; signal_info[i].sig != -1; i++)
+    ಗಾಗಿ (i = 0; signal_info[i].sig != -1; i++)
 	sigaddset(&newset, signal_info[i].sig);
 
-# if defined(SIGCONT)
+# ಆದರೆ defined(SIGCONT)
     // SIGCONT isn't in the list, because its default action is ignore
     sigaddset(&newset, SIGCONT);
 # endif
 
-    sigprocmask(SIG_BLOCK, &newset, set);
+    sigprocmask(SIG_BLOCK, &newset, ಗಣ_2);
 }
 
-    static void
-unblock_signals(sigset_t *set)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+unblock_ಸಂಕೇತಗಳು(sigset_t *ಗಣ_2)
 {
-    sigprocmask(SIG_SETMASK, set, NULL);
+    sigprocmask(SIG_SETMASK, ಗಣ_2, ಖಾಲಿ);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Handling of SIGHUP, SIGQUIT and SIGTERM:
@@ -1639,88 +1639,88 @@ unblock_signals(sigset_t *set)
  *			     signal
  * Returns TRUE when Vim should exit.
  */
-    int
-vim_handle_signal(int sig)
+    ಪೂರ್ಣಾಂಕ
+vim_handle_signal(ಪೂರ್ಣಾಂಕ sig)
 {
-    static int got_signal = 0;
-    static int blocked = TRUE;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ got_signal = 0;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ blocked = TRUE;
 
-    switch (sig)
+    ಆಯ್ಕೆ (sig)
     {
-	case SIGNAL_BLOCK:   blocked = TRUE;
-			     break;
+	ಸ್ಥಿತಿ SIGNAL_ಖಂಡ:   blocked = TRUE;
+			     ನಿಲ್ಲಿಸು;
 
-	case SIGNAL_UNBLOCK: blocked = FALSE;
-			     if (got_signal != 0)
+	ಸ್ಥಿತಿ SIGNAL_UNBLOCK: blocked = FALSE;
+			     ಆದರೆ (got_signal != 0)
 			     {
 				 kill(getpid(), got_signal);
 				 got_signal = 0;
 			     }
-			     break;
+			     ನಿಲ್ಲಿಸು;
 
-	default:	     if (!blocked)
-				 return TRUE;	// exit!
+	ಪೂರ್ವನಿಯೋಜಿತ:	     ಆದರೆ (!blocked)
+				 ಹಿಂತಿರುಗಿ TRUE;	// exit!
 			     got_signal = sig;
-#ifdef SIGPWR
-			     if (sig != SIGPWR)
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGPWR
+			     ಆದರೆ (sig != SIGPWR)
+#ಆದರೆ_ಅಂತ್ಯ
 				 got_int = TRUE;    // break any loops
-			     break;
+			     ನಿಲ್ಲಿಸು;
     }
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 /*
  * Check_win checks whether we have an interactive stdout.
  */
-    int
-mch_check_win(int argc UNUSED, char **argv UNUSED)
+    ಪೂರ್ಣಾಂಕ
+mch_check_win(ಪೂರ್ಣಾಂಕ argc ಬಳಸದ, ಅಕ್ಷರ **argv ಬಳಸದ)
 {
-    if (isatty(1))
-	return OK;
-    return FAIL;
+    ಆದರೆ (isatty(1))
+	ಹಿಂತಿರುಗಿ OK;
+    ಹಿಂತಿರುಗಿ FAIL;
 }
 
 /*
  * Return TRUE if the input comes from a terminal, FALSE otherwise.
  */
-    int
-mch_input_isatty(void)
+    ಪೂರ್ಣಾಂಕ
+mch_ಒಳಹರಿವು_isatty(ಶೂನ್ಯ)
 {
-    if (isatty(read_cmd_fd))
-	return TRUE;
-    return FALSE;
+    ಆದರೆ (isatty(read_cmd_fd))
+	ಹಿಂತಿರುಗಿ TRUE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
-#ifdef FEAT_X11
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_X11
 
-# if defined(ELAPSED_TIMEVAL)
+# ಆದರೆ defined(ELAPSED_TIMEVAL)
 
 /*
  * Give a message about the elapsed time for opening the X window.
  */
-    static void
-xopen_message(long elapsed_msec)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+xopen_ಸಂದೇಶ(ದೀರ್ಘ elapsed_msec)
 {
     smsg(_("Opening the X display took %ld msec"), elapsed_msec);
 }
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_X11)
+#ಆದರೆ defined(FEAT_X11)
 /*
  * A few functions shared by X11 title and clipboard code.
  */
 
-static int	got_x_error = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	got_x_error = FALSE;
 
 /*
  * X Error handler, otherwise X just exits!  (very rude) -- webb
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 x_error_handler(Display *dpy, XErrorEvent *error_event)
 {
-    XGetErrorText(dpy, error_event->error_code, (char *)IObuff, IOSIZE);
+    XGet_Error_ಪಠ್ಯ(dpy, error_event->error_ಸಂಕೇತ, (ಅಕ್ಷರ *)IObuff, IOSIZE);
     STRCAT(IObuff, _("\nVim: Got X error\n"));
 
     // In the GUI we cannot print a message and continue, because no X calls
@@ -1729,67 +1729,67 @@ x_error_handler(Display *dpy, XErrorEvent *error_event)
     ml_sync_all(FALSE, FALSE);
 
 # ifdef FEAT_GUI
-    if (!gui.in_use)
+    ಆದರೆ (!gui.ಒಳ_use)
 # endif
-	msg((char *)IObuff);
+	ಸಂದೇಶ((ಅಕ್ಷರ *)IObuff);
 
-    return 0;		// NOTREACHED
+    ಹಿಂತಿರುಗಿ 0;		// NOTREACHED
 }
 
 /*
  * Another X Error handler, just used to check for errors.
  */
-    static int
-x_error_check(Display *dpy UNUSED, XErrorEvent *error_event UNUSED)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+x_error_check(Display *dpy ಬಳಸದ, XErrorEvent *error_event ಬಳಸದ)
 {
     got_x_error = TRUE;
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
 /*
  * Return TRUE when connection to the X server is desired.
  */
-    static int
-x_connect_to_server(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+x_connect_ಗಮ್ಯ_server(ಶೂನ್ಯ)
 {
     // No point in connecting if we are exiting or dying.
-    if (exiting || v_dying)
-	return FALSE;
+    ಆದರೆ (exiting || v_dying)
+	ಹಿಂತಿರುಗಿ FALSE;
 
-# if defined(FEAT_CLIENTSERVER)
-    if (x_force_connect)
-	return TRUE;
+# ಆದರೆ defined(FEAT_CLIENTSERVER)
+    ಆದರೆ (x_force_connect)
+	ಹಿಂತಿರುಗಿ TRUE;
 # endif
-    if (x_no_connect)
-	return FALSE;
+    ಆದರೆ (x_no_connect)
+	ಹಿಂತಿರುಗಿ FALSE;
 
     // Check for a match with "exclude:" from 'clipboard'.
-    if (clip_exclude_prog != NULL)
+    ಆದರೆ (clip_exclude_prog != ಖಾಲಿ)
     {
 	// Just in case we get called recursively, return FALSE.  This could
 	// happen if vpeekc() is used while executing the prog and it causes a
 	// related callback to be invoked.
-	if (regprog_in_use(clip_exclude_prog))
-	    return FALSE;
+	ಆದರೆ (regprog_ಒಳ_use(clip_exclude_prog))
+	    ಹಿಂತಿರುಗಿ FALSE;
 
-	if (vim_regexec_prog(&clip_exclude_prog, FALSE, T_NAME, (colnr_T)0))
-	    return FALSE;
+	ಆದರೆ (vim_regexec_prog(&clip_exclude_prog, FALSE, T_NAME, (colnr_T)0))
+	    ಹಿಂತಿರುಗಿ FALSE;
     }
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
-# if defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
-#  if defined(USING_SETJMP)
+# ಆದರೆ defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
+#  ಆದರೆ defined(USING_SETJMP)
 /*
  * An X IO Error handler, used to catch error while opening the display.
  */
-    static int
-x_IOerror_check(Display *dpy UNUSED)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+x_IOerror_check(Display *dpy ಬಳಸದ)
 {
     // This function should not return, it causes exit().  Longjump instead.
     LONGJMP(lc_jump_env, 1);
-#   if defined(VMS) || defined(__CYGWIN__)
-    return 0;  // avoid the compiler complains about missing return value
+#   ಆದರೆ defined(VMS) || defined(__CYGWIN__)
+    ಹಿಂತಿರುಗಿ 0;  // avoid the compiler complains about missing return value
 #   endif
 }
 #  endif
@@ -1797,21 +1797,21 @@ x_IOerror_check(Display *dpy UNUSED)
 /*
  * An X IO Error handler, used to catch terminal errors.
  */
-static int xterm_dpy_retry_count = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ xterm_dpy_retry_ಎಣಿಕೆ = 0;
 
-    static int
-x_IOerror_handler(Display *dpy UNUSED)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+x_IOerror_handler(Display *dpy ಬಳಸದ)
 {
-    xterm_dpy = NULL;
-    xterm_dpy_retry_count = 5;  // Try reconnecting five times
-    x11_window = 0;
-    x11_display = NULL;
+    xterm_dpy = ಖಾಲಿ;
+    xterm_dpy_retry_ಎಣಿಕೆ = 5;  // Try reconnecting five times
+    x11_ಕಿಟಕಿ = 0;
+    x11_display = ಖಾಲಿ;
     xterm_Shell = (Widget)0;
 
     // This function should not return, it causes exit().  Longjump instead.
     LONGJMP(x_jump_env, 1);
-#  if defined(VMS) || defined(__CYGWIN__)
-    return 0;  // avoid the compiler complains about missing return value
+#  ಆದರೆ defined(VMS) || defined(__CYGWIN__)
+    ಹಿಂತಿರುಗಿ 0;  // avoid the compiler complains about missing return value
 #  endif
 }
 
@@ -1820,49 +1820,49 @@ x_IOerror_handler(Display *dpy UNUSED)
  * Helps when the X11 server was stopped and restarted while Vim was inactive
  * (e.g. through tmux).
  */
-    static void
-may_restore_x11_clipboard(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+may_restore_x11_clipboard(ಶೂನ್ಯ)
 {
     // No point in restoring the connecting if we are exiting or dying.
-    if (!exiting && !v_dying && xterm_dpy_retry_count > 0)
+    ಆದರೆ (!exiting && !v_dying && xterm_dpy_retry_ಎಣಿಕೆ > 0)
     {
-	--xterm_dpy_retry_count;
+	--xterm_dpy_retry_ಎಣಿಕೆ;
 
-#  ifndef LESSTIF_VERSION
+#  ifndef LESSTIF_ಆವೃತ್ತಿ
 	// This has been reported to avoid Vim getting stuck.
-	if (app_context != (XtAppContext)NULL)
+	ಆದರೆ (app_context != (XtAppContext)ಖಾಲಿ)
 	{
 	    XtDestroyApplicationContext(app_context);
-	    app_context = (XtAppContext)NULL;
-	    x11_display = NULL; // freed by XtDestroyApplicationContext()
+	    app_context = (XtAppContext)ಖಾಲಿ;
+	    x11_display = ಖಾಲಿ; // freed by XtDestroyApplicationContext()
 	}
 #  endif
 
-	setup_term_clip();
+	ಸಿದ್ಧತೆ_ಪದ_clip();
 	get_x11_title(FALSE);
     }
 }
 
-    void
+    ಶೂನ್ಯ
 ex_xrestore(exarg_T *eap)
 {
     size_t  arglen;
 
-    if (eap->arg != NULL && (arglen = STRLEN(eap->arg)) > 0)
+    ಆದರೆ (eap->arg != ಖಾಲಿ && (arglen = STRLEN(eap->arg)) > 0)
     {
-	if (xterm_display_allocated)
+	ಆದರೆ (xterm_display_allocated)
 	    vim_free(xterm_display);
-	xterm_display = (char *)vim_strnsave(eap->arg, arglen);
+	xterm_display = (ಅಕ್ಷರ *)vim_strnsave(eap->arg, arglen);
 	xterm_display_allocated = TRUE;
     }
-    smsg(_("restoring X11 display %s"), xterm_display == NULL
-		    ? (char *)mch_getenv((char_u *)"DISPLAY") : xterm_display);
+    smsg(_("restoring X11 display %s"), xterm_display == ಖಾಲಿ
+		    ? (ಅಕ್ಷರ *)mch_getenv((char_u *)"DISPLAY") : xterm_display);
 
     clear_xterm_clip();
-    x11_window = 0;
-    xterm_dpy_retry_count = 5;  // Try reconnecting five times
+    x11_ಕಿಟಕಿ = 0;
+    xterm_dpy_retry_ಎಣಿಕೆ = 5;  // Try reconnecting five times
     may_restore_x11_clipboard();
-    choose_clipmethod();
+    ಆರಿಸು_clipmethod();
 }
 # endif
 
@@ -1873,87 +1873,87 @@ ex_xrestore(exarg_T *eap)
  * is wrong, such as the window pointer being invalid (as can happen when the
  * user changes his DISPLAY, but not his WINDOWID) -- webb
  */
-    static int
-test_x11_window(Display *dpy)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+test_x11_ಕಿಟಕಿ(Display *dpy)
 {
-    int			(*old_handler)(Display*, XErrorEvent*);
-    XTextProperty	text_prop;
+    ಪೂರ್ಣಾಂಕ			(*old_handler)(Display*, XErrorEvent*);
+    XTextProperty	ಪಠ್ಯ_prop;
 
     old_handler = XSetErrorHandler(x_error_check);
     got_x_error = FALSE;
-    if (XGetWMName(dpy, x11_window, &text_prop))
-	XFree((void *)text_prop.value);
+    ಆದರೆ (XGetWMName(dpy, x11_ಕಿಟಕಿ, &ಪಠ್ಯ_prop))
+	XFree((ಶೂನ್ಯ *)ಪಠ್ಯ_prop.ಮೌಲ್ಯ);
     XSync(dpy, False);
-    (void)XSetErrorHandler(old_handler);
+    (ಶೂನ್ಯ)XSetErrorHandler(old_handler);
 
-    if (p_verbose > 0 && got_x_error)
-	verb_msg(_("Testing the X display failed"));
+    ಆದರೆ (p_verbose > 0 && got_x_error)
+	verb_ಸಂದೇಶ(_("Testing the X display failed"));
 
-    return (got_x_error ? FAIL : OK);
+    ಹಿಂತಿರುಗಿ (got_x_error ? FAIL : OK);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 
-#ifdef FEAT_X11
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_X11
 
-static int get_x11_thing(int get_title, int test_only);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ get_x11_thing(ಪೂರ್ಣಾಂಕ get_title, ಪೂರ್ಣಾಂಕ test_only);
 
 /*
  * try to get x11 window and display
  *
  * return FAIL for failure, OK otherwise
  */
-    static int
-get_x11_windis(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+get_x11_windis(ಶೂನ್ಯ)
 {
-    char	    *winid;
-    static int	    result = -1;
+    ಅಕ್ಷರ	    *winid;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    ಫಲಿತಾಂಶ = -1;
 # define XD_NONE	 0	// x11_display not set here
-# define XD_HERE	 1	// x11_display opened here
+# define XD_ಇಲ್ಲಿ	 1	// x11_display opened here
 # define XD_GUI	 2	// x11_display used from gui.dpy
 # define XD_XTERM 3	// x11_display used from xterm_dpy
-    static int	    x11_display_from = XD_NONE;
-    static int	    did_set_error_handler = FALSE;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    x11_display_from = XD_NONE;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    did_ಗಣ_error_handler = FALSE;
 
-    if (!did_set_error_handler)
+    ಆದರೆ (!did_ಗಣ_error_handler)
     {
 	// X just exits if it finds an error otherwise!
-	(void)XSetErrorHandler(x_error_handler);
-	did_set_error_handler = TRUE;
+	(ಶೂನ್ಯ)XSetErrorHandler(x_error_handler);
+	did_ಗಣ_error_handler = TRUE;
     }
 
-# if defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK)
-    if (gui.in_use)
+# ಆದರೆ defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK)
+    ಆದರೆ (gui.ಒಳ_use)
     {
 	/*
 	 * If the X11 display was opened here before, for the window where Vim
 	 * was started, close that one now to avoid a memory leak.
 	 */
-	if (x11_display_from == XD_HERE && x11_display != NULL)
+	ಆದರೆ (x11_display_from == XD_ಇಲ್ಲಿ && x11_display != ಖಾಲಿ)
 	{
 	    XCloseDisplay(x11_display);
 	    x11_display_from = XD_NONE;
 	}
-	if (gui_get_x11_windis(&x11_window, &x11_display) == OK)
+	ಆದರೆ (gui_get_x11_windis(&x11_ಕಿಟಕಿ, &x11_display) == OK)
 	{
 	    x11_display_from = XD_GUI;
-	    return OK;
+	    ಹಿಂತಿರುಗಿ OK;
 	}
-	x11_display = NULL;
-	return FAIL;
+	x11_display = ಖಾಲಿ;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-    else if (x11_display_from == XD_GUI)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (x11_display_from == XD_GUI)
     {
 	// GUI must have stopped somehow, clear x11_display
-	x11_window = 0;
-	x11_display = NULL;
+	x11_ಕಿಟಕಿ = 0;
+	x11_display = ಖಾಲಿ;
 	x11_display_from = XD_NONE;
     }
 # endif
 
     // When started with the "-X" argument, don't try connecting.
-    if (!x_connect_to_server())
-	return FAIL;
+    ಆದರೆ (!x_connect_ಗಮ್ಯ_server())
+	ಹಿಂತಿರುಗಿ FAIL;
 
     /*
      * If WINDOWID not set, should try another method to find out
@@ -1961,60 +1961,60 @@ get_x11_windis(void)
      * this is very complicated.
      * We assume that zero is invalid for WINDOWID.
      */
-    if (x11_window == 0 && (winid = getenv("WINDOWID")) != NULL)
-	x11_window = (Window)atol(winid);
+    ಆದರೆ (x11_ಕಿಟಕಿ == 0 && (winid = getenv("WINDOWID")) != ಖಾಲಿ)
+	x11_ಕಿಟಕಿ = (ಕಿಟಕಿ)atol(winid);
 
 # ifdef FEAT_XCLIPBOARD
-    if (xterm_dpy == x11_display)
+    ಆದರೆ (xterm_dpy == x11_display)
 	// x11_display may have been set to xterm_dpy elsewhere
 	x11_display_from = XD_XTERM;
 
-    if (xterm_dpy != NULL && x11_window != 0)
+    ಆದರೆ (xterm_dpy != ಖಾಲಿ && x11_ಕಿಟಕಿ != 0)
     {
 	// We may have checked it already, but Gnome terminal can move us to
 	// another window, so we need to check every time.
-	if (x11_display_from != XD_XTERM)
+	ಆದರೆ (x11_display_from != XD_XTERM)
 	{
 	    /*
 	     * If the X11 display was opened here before, for the window where
 	     * Vim was started, close that one now to avoid a memory leak.
 	     */
-	    if (x11_display_from == XD_HERE && x11_display != NULL)
+	    ಆದರೆ (x11_display_from == XD_ಇಲ್ಲಿ && x11_display != ಖಾಲಿ)
 		XCloseDisplay(x11_display);
 	    x11_display = xterm_dpy;
 	    x11_display_from = XD_XTERM;
 	}
-	if (test_x11_window(x11_display) == FAIL)
+	ಆದರೆ (test_x11_ಕಿಟಕಿ(x11_display) == FAIL)
 	{
 	    // probably bad $WINDOWID
-	    x11_window = 0;
-	    x11_display = NULL;
+	    x11_ಕಿಟಕಿ = 0;
+	    x11_display = ಖಾಲಿ;
 	    x11_display_from = XD_NONE;
-	    return FAIL;
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
-	return OK;
+	ಹಿಂತಿರುಗಿ OK;
     }
 # endif
 
-    if (x11_window == 0 || x11_display == NULL)
-	result = -1;
+    ಆದರೆ (x11_ಕಿಟಕಿ == 0 || x11_display == ಖಾಲಿ)
+	ಫಲಿತಾಂಶ = -1;
 
-    if (result != -1)	    // Have already been here and set this
-	return result;	    // Don't do all these X calls again
+    ಆದರೆ (ಫಲಿತಾಂಶ != -1)	    // Have already been here and set this
+	ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;	    // Don't do all these X calls again
 
-    if (x11_window != 0 && x11_display == NULL)
+    ಆದರೆ (x11_ಕಿಟಕಿ != 0 && x11_display == ಖಾಲಿ)
     {
-# ifdef SET_SIG_ALARM
+# ifdef ಗಣ_SIG_ALARM
 	sighandler_T sig_save;
 # endif
 # ifdef ELAPSED_FUNC
-	elapsed_T start_tv;
+	elapsed_T ಆರಂಭ_tv;
 
-	if (p_verbose > 0)
-	    ELAPSED_INIT(start_tv);
+	ಆದರೆ (p_verbose > 0)
+	    ELAPSED_INIT(ಆರಂಭ_tv);
 # endif
 
-# ifdef SET_SIG_ALARM
+# ifdef ಗಣ_SIG_ALARM
 	/*
 	 * Opening the Display may hang if the DISPLAY setting is wrong, or
 	 * the network connection is bad.  Set an alarm timer to get out.
@@ -2023,93 +2023,93 @@ get_x11_windis(void)
 	sig_save = mch_signal(SIGALRM, sig_alarm);
 	alarm(2);
 # endif
-	x11_display = XOpenDisplay(NULL);
+	x11_display = XOpenDisplay(ಖಾಲಿ);
 
-# ifdef SET_SIG_ALARM
+# ifdef ಗಣ_SIG_ALARM
 	alarm(0);
 	mch_signal(SIGALRM, sig_save);
-	if (p_verbose > 0 && sig_alarm_called)
-	    verb_msg(_("Opening the X display timed out"));
+	ಆದರೆ (p_verbose > 0 && sig_alarm_called)
+	    verb_ಸಂದೇಶ(_("Opening the X display timed out"));
 # endif
-	if (x11_display != NULL)
+	ಆದರೆ (x11_display != ಖಾಲಿ)
 	{
 # ifdef ELAPSED_FUNC
-	    if (p_verbose > 0)
+	    ಆದರೆ (p_verbose > 0)
 	    {
 		verbose_enter();
-		xopen_message(ELAPSED_FUNC(start_tv));
+		xopen_ಸಂದೇಶ(ELAPSED_FUNC(ಆರಂಭ_tv));
 		verbose_leave();
 	    }
 # endif
-	    if (test_x11_window(x11_display) == FAIL)
+	    ಆದರೆ (test_x11_ಕಿಟಕಿ(x11_display) == FAIL)
 	    {
 		// Maybe window id is bad
-		x11_window = 0;
+		x11_ಕಿಟಕಿ = 0;
 		XCloseDisplay(x11_display);
-		x11_display = NULL;
+		x11_display = ಖಾಲಿ;
 	    }
-	    else
-		x11_display_from = XD_HERE;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		x11_display_from = XD_ಇಲ್ಲಿ;
 	}
     }
-    if (x11_window == 0 || x11_display == NULL)
-	return (result = FAIL);
+    ಆದರೆ (x11_ಕಿಟಕಿ == 0 || x11_display == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ (ಫಲಿತಾಂಶ = FAIL);
 
 # ifdef FEAT_EVAL
-    set_vim_var_nr(VV_WINDOWID, (long)x11_window);
+    ಗಣ_vim_var_nr(VV_WINDOWID, (ದೀರ್ಘ)x11_ಕಿಟಕಿ);
 # endif
 
-    return (result = OK);
+    ಹಿಂತಿರುಗಿ (ಫಲಿತಾಂಶ = OK);
 }
 
 /*
  * Determine original x11 Window Title
  */
-    static int
-get_x11_title(int test_only)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+get_x11_title(ಪೂರ್ಣಾಂಕ test_only)
 {
-    return get_x11_thing(TRUE, test_only);
+    ಹಿಂತಿರುಗಿ get_x11_thing(TRUE, test_only);
 }
 
 /*
  * Determine original x11 Window icon
  */
-    static int
-get_x11_icon(int test_only)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+get_x11_icon(ಪೂರ್ಣಾಂಕ test_only)
 {
-    int		retval = FALSE;
+    ಪೂರ್ಣಾಂಕ		retval = FALSE;
 
     retval = get_x11_thing(FALSE, test_only);
 
     // could not get old icon, use terminal name
-    if (oldicon == NULL && !test_only)
+    ಆದರೆ (oldicon == ಖಾಲಿ && !test_only)
     {
-	if (STRNCMP(T_NAME, "builtin_", 8) == 0)
+	ಆದರೆ (STRNCMP(T_NAME, "builtin_", 8) == 0)
 	    oldicon = vim_strsave(T_NAME + 8);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    oldicon = vim_strsave(T_NAME);
     }
 
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 get_x11_thing(
-    int		get_title,	// get title string
-    int		test_only)
+    ಪೂರ್ಣಾಂಕ		get_title,	// get title string
+    ಪೂರ್ಣಾಂಕ		test_only)
 {
-    XTextProperty	text_prop;
-    int			retval = FALSE;
-    Status		status;
+    XTextProperty	ಪಠ್ಯ_prop;
+    ಪೂರ್ಣಾಂಕ			retval = FALSE;
+    ಸ್ಥಿತಿ_3		ಸ್ಥಿತಿ_2;
 
-    if (get_x11_windis() != OK)
-	return FALSE;
+    ಆದರೆ (get_x11_windis() != OK)
+	ಹಿಂತಿರುಗಿ FALSE;
 
     // Get window/icon name if any
-    if (get_title)
-	status = XGetWMName(x11_display, x11_window, &text_prop);
-    else
-	status = XGetWMIconName(x11_display, x11_window, &text_prop);
+    ಆದರೆ (get_title)
+	ಸ್ಥಿತಿ_2 = XGetWMName(x11_display, x11_ಕಿಟಕಿ, &ಪಠ್ಯ_prop);
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಸ್ಥಿತಿ_2 = XGetWMIconName(x11_display, x11_ಕಿಟಕಿ, &ಪಠ್ಯ_prop);
 
     /*
      * If terminal is xterm, then x11_window may be a child window of the
@@ -2120,82 +2120,82 @@ get_x11_thing(
     // Previously this was only done for xterm and alike.  I don't see a
     // reason why it would fail for other terminal emulators.
     // if (term_is_xterm)
-    Window	    root;
-    Window	    parent;
-    Window	    win = x11_window;
-    Window	   *children;
-    unsigned int    num_children;
+    ಕಿಟಕಿ	    ಬೇರು;
+    ಕಿಟಕಿ	    ಪೋಷಕ;
+    ಕಿಟಕಿ	    win = x11_ಕಿಟಕಿ;
+    ಕಿಟಕಿ	   *children;
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ    ಅಂಕೆ_children;
 
-    while (!status || text_prop.value == NULL)
+    ಆಗ (!ಸ್ಥಿತಿ_2 || ಪಠ್ಯ_prop.ಮೌಲ್ಯ == ಖಾಲಿ)
     {
-	if (!XQueryTree(x11_display, win, &root, &parent, &children,
-		    &num_children))
-	    break;
-	if (children)
-	    XFree((void *)children);
-	if (parent == root || parent == 0)
-	    break;
+	ಆದರೆ (!XQuery_ವೃಕ್ಷ(x11_display, win, &ಬೇರು, &ಪೋಷಕ, &children,
+		    &ಅಂಕೆ_children))
+	    ನಿಲ್ಲಿಸು;
+	ಆದರೆ (children)
+	    XFree((ಶೂನ್ಯ *)children);
+	ಆದರೆ (ಪೋಷಕ == ಬೇರು || ಪೋಷಕ == 0)
+	    ನಿಲ್ಲಿಸು;
 
-	win = parent;
-	if (get_title)
-	    status = XGetWMName(x11_display, win, &text_prop);
-	else
-	    status = XGetWMIconName(x11_display, win, &text_prop);
+	win = ಪೋಷಕ;
+	ಆದರೆ (get_title)
+	    ಸ್ಥಿತಿ_2 = XGetWMName(x11_display, win, &ಪಠ್ಯ_prop);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಸ್ಥಿತಿ_2 = XGetWMIconName(x11_display, win, &ಪಠ್ಯ_prop);
     }
 
-    if (status && text_prop.value != NULL)
+    ಆದರೆ (ಸ್ಥಿತಿ_2 && ಪಠ್ಯ_prop.ಮೌಲ್ಯ != ಖಾಲಿ)
     {
 	retval = TRUE;
-	if (!test_only)
+	ಆದರೆ (!test_only)
 	{
-	    if (get_title)
+	    ಆದರೆ (get_title)
 		vim_free(oldtitle);
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		vim_free(oldicon);
-	    if (text_prop.encoding == XA_STRING && !has_mbyte)
+	    ಆದರೆ (ಪಠ್ಯ_prop.encoding == XA_STRING && !has_mbyte)
 	    {
-		if (get_title)
-		    oldtitle = vim_strsave((char_u *)text_prop.value);
-		else
-		    oldicon = vim_strsave((char_u *)text_prop.value);
+		ಆದರೆ (get_title)
+		    oldtitle = vim_strsave((char_u *)ಪಠ್ಯ_prop.ಮೌಲ್ಯ);
+		ಇಲ್ಲದಿದ್ದರೆ
+		    oldicon = vim_strsave((char_u *)ಪಠ್ಯ_prop.ಮೌಲ್ಯ);
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		char    **cl;
-		Status  transform_status;
-		int	    n = 0;
+		ಅಕ್ಷರ    **cl;
+		ಸ್ಥಿತಿ_3  transform_ಸ್ಥಿತಿ;
+		ಪೂರ್ಣಾಂಕ	    n = 0;
 
-		transform_status = XmbTextPropertyToTextList(x11_display,
-			&text_prop,
+		transform_ಸ್ಥಿತಿ = Xmb_ಪಠ್ಯ_Property_ಗಮ್ಯ_ಪಠ್ಯ_List(x11_display,
+			&ಪಠ್ಯ_prop,
 			&cl, &n);
-		if (transform_status >= Success && n > 0 && cl[0])
+		ಆದರೆ (transform_ಸ್ಥಿತಿ >= Success && n > 0 && cl[0])
 		{
-		    if (get_title)
+		    ಆದರೆ (get_title)
 			oldtitle = vim_strsave((char_u *) cl[0]);
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 			oldicon = vim_strsave((char_u *) cl[0]);
 		    XFreeStringList(cl);
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    if (get_title)
-			oldtitle = vim_strsave((char_u *)text_prop.value);
-		    else
-			oldicon = vim_strsave((char_u *)text_prop.value);
+		    ಆದರೆ (get_title)
+			oldtitle = vim_strsave((char_u *)ಪಠ್ಯ_prop.ಮೌಲ್ಯ);
+		    ಇಲ್ಲದಿದ್ದರೆ
+			oldicon = vim_strsave((char_u *)ಪಠ್ಯ_prop.ಮೌಲ್ಯ);
 		}
 	    }
 	}
-	XFree((void *)text_prop.value);
+	XFree((ಶೂನ್ಯ *)ಪಠ್ಯ_prop.ಮೌಲ್ಯ);
     }
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
 // Xutf8 functions are not available on older systems. Note that on some
 // systems X_HAVE_UTF8_STRING may be defined in a header file but
 // Xutf8SetWMProperties() is not in the X11 library.  Configure checks for
 // that and defines HAVE_XUTF8SETWMPROPERTIES.
-# if defined(X_HAVE_UTF8_STRING)
-#  if X_HAVE_UTF8_STRING && HAVE_XUTF8SETWMPROPERTIES
+# ಆದರೆ defined(X_HAVE_UTF8_STRING)
+#  ಆದರೆ X_HAVE_UTF8_STRING && HAVE_XUTF8SETWMPROPERTIES
 #   define USE_UTF8_STRING
 #  endif
 # endif
@@ -2205,34 +2205,34 @@ get_x11_thing(
  *
  * get_x11_windis() must be called before this and have returned OK
  */
-    static void
-set_x11_title(char_u *title)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_x11_title(char_u *title)
 {
 	// XmbSetWMProperties() and Xutf8SetWMProperties() should use a STRING
 	// when possible, COMPOUND_TEXT otherwise.  COMPOUND_TEXT isn't
 	// supported everywhere and STRING doesn't work for multi-byte titles.
 # ifdef USE_UTF8_STRING
-    if (enc_utf8)
-	Xutf8SetWMProperties(x11_display, x11_window, (const char *)title,
-					     NULL, NULL, 0, NULL, NULL, NULL);
-    else
+    ಆದರೆ (enc_utf8)
+	Xutf8_ಗಣ_WMProperties(x11_display, x11_ಕಿಟಕಿ, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)title,
+					     ಖಾಲಿ, ಖಾಲಿ, 0, ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ);
+    ಇಲ್ಲದಿದ್ದರೆ
 # endif
     {
-# if XtSpecificationRelease >= 4
+# ಆದರೆ XtSpecificationRelease >= 4
 #  ifdef FEAT_XFONTSET
-	XmbSetWMProperties(x11_display, x11_window, (const char *)title,
-					     NULL, NULL, 0, NULL, NULL, NULL);
-#  else
-	XTextProperty	text_prop;
-	char		*c_title = (char *)title;
+	Xmb_ಗಣ_WMProperties(x11_display, x11_ಕಿಟಕಿ, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)title,
+					     ಖಾಲಿ, ಖಾಲಿ, 0, ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ);
+#  ಇಲ್ಲದಿದ್ದರೆ
+	XTextProperty	ಪಠ್ಯ_prop;
+	ಅಕ್ಷರ		*c_title = (ಅಕ್ಷರ *)title;
 
 	// directly from example 3-18 "basicwin" of Xlib Programming Manual
-	(void)XStringListToTextProperty(&c_title, 1, &text_prop);
-	XSetWMProperties(x11_display, x11_window, &text_prop,
-					     NULL, NULL, 0, NULL, NULL, NULL);
+	(ಶೂನ್ಯ)XString_List_ಗಮ್ಯ_ಪಠ್ಯ_Property(&c_title, 1, &ಪಠ್ಯ_prop);
+	XSetWMProperties(x11_display, x11_ಕಿಟಕಿ, &ಪಠ್ಯ_prop,
+					     ಖಾಲಿ, ಖಾಲಿ, 0, ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ);
 #  endif
-# else
-	XStoreName(x11_display, x11_window, (char *)title);
+# ಇಲ್ಲದಿದ್ದರೆ
+	XStoreName(x11_display, x11_ಕಿಟಕಿ, (ಅಕ್ಷರ *)title);
 # endif
     }
     XFlush(x11_display);
@@ -2243,163 +2243,163 @@ set_x11_title(char_u *title)
  *
  * get_x11_windis() must be called before this and have returned OK
  */
-    static void
-set_x11_icon(char_u *icon)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_x11_icon(char_u *icon)
 {
     // See above for comments about using X*SetWMProperties().
 # ifdef USE_UTF8_STRING
-    if (enc_utf8)
-	Xutf8SetWMProperties(x11_display, x11_window, NULL, (const char *)icon,
-						   NULL, 0, NULL, NULL, NULL);
-    else
+    ಆದರೆ (enc_utf8)
+	Xutf8_ಗಣ_WMProperties(x11_display, x11_ಕಿಟಕಿ, ಖಾಲಿ, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)icon,
+						   ಖಾಲಿ, 0, ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ);
+    ಇಲ್ಲದಿದ್ದರೆ
 # endif
     {
-# if XtSpecificationRelease >= 4
+# ಆದರೆ XtSpecificationRelease >= 4
 #  ifdef FEAT_XFONTSET
-	XmbSetWMProperties(x11_display, x11_window, NULL, (const char *)icon,
-						   NULL, 0, NULL, NULL, NULL);
-#  else
-	XTextProperty	text_prop;
-	char		*c_icon = (char *)icon;
+	Xmb_ಗಣ_WMProperties(x11_display, x11_ಕಿಟಕಿ, ಖಾಲಿ, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)icon,
+						   ಖಾಲಿ, 0, ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ);
+#  ಇಲ್ಲದಿದ್ದರೆ
+	XTextProperty	ಪಠ್ಯ_prop;
+	ಅಕ್ಷರ		*c_icon = (ಅಕ್ಷರ *)icon;
 
-	(void)XStringListToTextProperty(&c_icon, 1, &text_prop);
-	XSetWMProperties(x11_display, x11_window, NULL, &text_prop,
-						   NULL, 0, NULL, NULL, NULL);
+	(ಶೂನ್ಯ)XString_List_ಗಮ್ಯ_ಪಠ್ಯ_Property(&c_icon, 1, &ಪಠ್ಯ_prop);
+	XSetWMProperties(x11_display, x11_ಕಿಟಕಿ, ಖಾಲಿ, &ಪಠ್ಯ_prop,
+						   ಖಾಲಿ, 0, ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ);
 #  endif
-# else
-	XSetIconName(x11_display, x11_window, (char *)icon);
+# ಇಲ್ಲದಿದ್ದರೆ
+	XSetIconName(x11_display, x11_ಕಿಟಕಿ, (ಅಕ್ಷರ *)icon);
 # endif
     }
     XFlush(x11_display);
 }
 
-#else  // FEAT_X11
+#ಇಲ್ಲದಿದ್ದರೆ  // FEAT_X11
 
-    static int
-get_x11_title(int test_only UNUSED)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+get_x11_title(ಪೂರ್ಣಾಂಕ test_only ಬಳಸದ)
 {
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
-    static int
-get_x11_icon(int test_only)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+get_x11_icon(ಪೂರ್ಣಾಂಕ test_only)
 {
-    if (!test_only)
+    ಆದರೆ (!test_only)
     {
-	if (STRNCMP(T_NAME, "builtin_", 8) == 0)
+	ಆದರೆ (STRNCMP(T_NAME, "builtin_", 8) == 0)
 	    oldicon = vim_strsave(T_NAME + 8);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    oldicon = vim_strsave(T_NAME);
     }
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
-#endif // FEAT_X11
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_X11
 
-    int
-mch_can_restore_title(void)
+    ಪೂರ್ಣಾಂಕ
+mch_can_restore_title(ಶೂನ್ಯ)
 {
-    return get_x11_title(TRUE);
+    ಹಿಂತಿರುಗಿ get_x11_title(TRUE);
 }
 
-    int
-mch_can_restore_icon(void)
+    ಪೂರ್ಣಾಂಕ
+mch_can_restore_icon(ಶೂನ್ಯ)
 {
-    return get_x11_icon(TRUE);
+    ಹಿಂತಿರುಗಿ get_x11_icon(TRUE);
 }
 
 /*
  * Set the window title and icon.
  */
-    void
+    ಶೂನ್ಯ
 mch_settitle(char_u *title, char_u *icon)
 {
-    int		type = 0;
-    static int	recursive = 0;
+    ಪೂರ್ಣಾಂಕ		type = 0;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	recursive = 0;
 
-    if (T_NAME == NULL)	    // no terminal name (yet)
-	return;
-    if (title == NULL && icon == NULL)	    // nothing to do
-	return;
+    ಆದರೆ (T_NAME == ಖಾಲಿ)	    // no terminal name (yet)
+	ಹಿಂತಿರುಗಿ;
+    ಆದರೆ (title == ಖಾಲಿ && icon == ಖಾಲಿ)	    // nothing to do
+	ಹಿಂತಿರುಗಿ;
 
     // When one of the X11 functions causes a deadly signal, we get here again
     // recursively.  Avoid hanging then (something is probably locked).
-    if (recursive)
-	return;
+    ಆದರೆ (recursive)
+	ಹಿಂತಿರುಗಿ;
     ++recursive;
 
     /*
      * if the window ID and the display is known, we may use X11 calls
      */
-#ifdef FEAT_X11
-    if (get_x11_windis() == OK)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_X11
+    ಆದರೆ (get_x11_windis() == OK)
 	type = 1;
-#endif
-#if defined(FEAT_GUI_PHOTON) \
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(FEAT_GUI_PHOTON) \
     || defined(FEAT_GUI_GTK) || defined(FEAT_GUI_HAIKU)
-    if (gui.in_use)
+    ಆದರೆ (gui.ಒಳ_use)
 	type = 1;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     /*
      * Note: if "t_ts" is set, title is set with escape sequence rather
      *	     than x11 calls, because the x11 calls don't always work
      */
-    if ((type || *T_TS != NUL) && title != NULL)
+    ಆದರೆ ((type || *T_TS != NUL) && title != ಖಾಲಿ)
     {
-	if (oldtitle_outdated)
+	ಆದರೆ (oldtitle_outdated)
 	{
 	    oldtitle_outdated = FALSE;
 	    VIM_CLEAR(oldtitle);
 	}
-	if (oldtitle == NULL
-#ifdef FEAT_GUI
-		&& !gui.in_use
-#endif
+	ಆದರೆ (oldtitle == ಖಾಲಿ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+		&& !gui.ಒಳ_use
+#ಆದರೆ_ಅಂತ್ಯ
 		)		// first call but not in GUI, save title
-	    (void)get_x11_title(FALSE);
+	    (ಶೂನ್ಯ)get_x11_title(FALSE);
 
-	if (*T_TS != NUL)		// it's OK if t_fs is empty
-	    term_settitle(title);
-#ifdef FEAT_X11
-	else
+	ಆದರೆ (*T_TS != NUL)		// it's OK if t_fs is empty
+	    ಪದ_settitle(title);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_X11
+	ಇಲ್ಲದಿದ್ದರೆ
 # ifdef FEAT_GUI_GTK
-	if (!gui.in_use)		// don't do this if GTK+ is running
+	ಆದರೆ (!gui.ಒಳ_use)		// don't do this if GTK+ is running
 # endif
-	    set_x11_title(title);		// x11
-#endif
-#if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_HAIKU) \
+	    ಗಣ_x11_title(title);		// x11
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(FEAT_GUI_GTK) || defined(FEAT_GUI_HAIKU) \
 	|| defined(FEAT_GUI_PHOTON)
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    gui_mch_settitle(title, icon);
-#endif
-	unix_did_set_title = TRUE;
+#ಆದರೆ_ಅಂತ್ಯ
+	unix_did_ಗಣ_title = TRUE;
     }
 
-    if ((type || *T_CIS != NUL) && icon != NULL)
+    ಆದರೆ ((type || *T_CIS != NUL) && icon != ಖಾಲಿ)
     {
-	if (oldicon == NULL
-#ifdef FEAT_GUI
-		&& !gui.in_use
-#endif
+	ಆದರೆ (oldicon == ಖಾಲಿ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+		&& !gui.ಒಳ_use
+#ಆದರೆ_ಅಂತ್ಯ
 		)		// first call, save icon
 	    get_x11_icon(FALSE);
 
-	if (*T_CIS != NUL)
+	ಆದರೆ (*T_CIS != NUL)
 	{
-	    out_str(T_CIS);			// set icon start
-	    out_str_nf(icon);
-	    out_str(T_CIE);			// set icon end
-	    out_flush();
+	    ಹೊರಹೋಗು_str(T_CIS);			// set icon start
+	    ಹೊರಹೋಗು_str_nf(icon);
+	    ಹೊರಹೋಗು_str(T_CIE);			// set icon end
+	    ಹೊರಹೋಗು_flush();
 	}
-#ifdef FEAT_X11
-	else
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_X11
+	ಇಲ್ಲದಿದ್ದರೆ
 # ifdef FEAT_GUI_GTK
-	if (!gui.in_use)		// don't do this if GTK+ is running
+	ಆದರೆ (!gui.ಒಳ_use)		// don't do this if GTK+ is running
 # endif
-	    set_x11_icon(icon);			// x11
-#endif
-	did_set_icon = TRUE;
+	    ಗಣ_x11_icon(icon);			// x11
+#ಆದರೆ_ಅಂತ್ಯ
+	did_ಗಣ_icon = TRUE;
     }
     --recursive;
 }
@@ -2411,31 +2411,31 @@ mch_settitle(char_u *title, char_u *icon)
  *  SAVE_RESTORE_ICON  only restore icon
  *  SAVE_RESTORE_BOTH  restore title and icon
  */
-    void
-mch_restore_title(int which)
+    ಶೂನ್ಯ
+mch_restore_title(ಪೂರ್ಣಾಂಕ which)
 {
-    int	do_push_pop = unix_did_set_title || did_set_icon;
+    ಪೂರ್ಣಾಂಕ	do_ತಳ್ಳು_ತೆಗೆ = unix_did_ಗಣ_title || did_ಗಣ_icon;
 
     // Only restore the title or icon when it has been set.
     // When using "oldtitle" make a copy, it might be freed halfway.
-    char_u *title = ((which & SAVE_RESTORE_TITLE) && unix_did_set_title)
-			? (oldtitle ? oldtitle : p_titleold) : NULL;
-    char_u *tofree = NULL;
-    if (title == oldtitle && oldtitle != NULL)
+    char_u *title = ((which & SAVE_RESTORE_TITLE) && unix_did_ಗಣ_title)
+			? (oldtitle ? oldtitle : p_titleold) : ಖಾಲಿ;
+    char_u *tofree = ಖಾಲಿ;
+    ಆದರೆ (title == oldtitle && oldtitle != ಖಾಲಿ)
     {
 	tofree = vim_strsave(title);
-	if (tofree != NULL)
+	ಆದರೆ (tofree != ಖಾಲಿ)
 	    title = tofree;
     }
     mch_settitle(title,
-	       ((which & SAVE_RESTORE_ICON) && did_set_icon) ? oldicon : NULL);
+	       ((which & SAVE_RESTORE_ICON) && did_ಗಣ_icon) ? oldicon : ಖಾಲಿ);
     vim_free(tofree);
 
-    if (do_push_pop)
+    ಆದರೆ (do_ತಳ್ಳು_ತೆಗೆ)
     {
 	// pop and push from/to the stack
-	term_pop_title(which);
-	term_push_title(which);
+	ಪದ_ತೆಗೆ_title(which);
+	ಪದ_ತಳ್ಳು_title(which);
     }
 }
 
@@ -2447,12 +2447,12 @@ mch_restore_title(int which)
  * using the "xterm-kitty" terminfo entry should work better.
  * Seiichi Sato mentioned that "mlterm" works like xterm.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 vim_is_xterm(char_u *name)
 {
-    if (name == NULL)
-	return FALSE;
-    return ((STRNICMP(name, "xterm", 5) == 0
+    ಆದರೆ (name == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FALSE;
+    ಹಿಂತಿರುಗಿ ((STRNICMP(name, "xterm", 5) == 0
 				     && STRNICMP(name, "xterm-kitty", 11) != 0)
 		|| STRNICMP(name, "nxterm", 6) == 0
 		|| STRNICMP(name, "kterm", 5) == 0
@@ -2462,17 +2462,17 @@ vim_is_xterm(char_u *name)
 		|| STRCMP(name, "builtin_xterm") == 0);
 }
 
-#if defined(FEAT_MOUSE_XTERM)
+#ಆದರೆ defined(FEAT_MOUSE_XTERM)
 /*
  * Return TRUE if "name" appears to be that of a terminal
  * known to support the xterm-style mouse protocol.
  * Relies on term_is_xterm having been set to its correct value.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 use_xterm_like_mouse(char_u *name)
 {
-    return (name != NULL
-	    && (term_is_xterm
+    ಹಿಂತಿರುಗಿ (name != ಖಾಲಿ
+	    && (ಪದ_is_xterm
 		|| STRNICMP(name, "screen", 6) == 0
 		|| STRNICMP(name, "tmux", 4) == 0
 		|| STRNICMP(name, "gnome", 5) == 0
@@ -2480,7 +2480,7 @@ use_xterm_like_mouse(char_u *name)
 		|| STRNICMP(name, "st-", 3) == 0
 		|| STRNICMP(name, "stterm", 6) == 0));
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Return non-zero when using an xterm mouse, according to 'ttymouse'.
@@ -2489,179 +2489,179 @@ use_xterm_like_mouse(char_u *name)
  * Return 3 for "urxvt".
  * Return 4 for "sgr".
  */
-    int
-use_xterm_mouse(void)
+    ಪೂರ್ಣಾಂಕ
+use_xterm_mouse(ಶೂನ್ಯ)
 {
-    if (ttym_flags == TTYM_SGR)
-	return 4;
-    if (ttym_flags == TTYM_URXVT)
-	return 3;
-    if (ttym_flags == TTYM_XTERM2)
-	return 2;
-    if (ttym_flags == TTYM_XTERM)
-	return 1;
-    return 0;
+    ಆದರೆ (ttym_flags == TTYM_SGR)
+	ಹಿಂತಿರುಗಿ 4;
+    ಆದರೆ (ttym_flags == TTYM_URXVT)
+	ಹಿಂತಿರುಗಿ 3;
+    ಆದರೆ (ttym_flags == TTYM_XTERM2)
+	ಹಿಂತಿರುಗಿ 2;
+    ಆದರೆ (ttym_flags == TTYM_XTERM)
+	ಹಿಂತಿರುಗಿ 1;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
 /*
  * Return TRUE if "name" is an iris-ansi terminal name.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 vim_is_iris(char_u *name)
 {
-    if (name == NULL)
-	return FALSE;
-    return (STRNICMP(name, "iris-ansi", 9) == 0
+    ಆದರೆ (name == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FALSE;
+    ಹಿಂತಿರುಗಿ (STRNICMP(name, "iris-ansi", 9) == 0
 	    || STRCMP(name, "builtin_iris-ansi") == 0);
 }
 
-#if defined(VMS)
+#ಆದರೆ defined(VMS)
 /*
  * Return TRUE if "name" is a vt300-like terminal name.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 vim_is_vt300(char_u *name)
 {
-    if (name == NULL)
-	return FALSE;
+    ಆದರೆ (name == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FALSE;
     // Actually all ANSI compatible terminals should be here.
     // Catch at least VT1xx - VT5xx
-    return ((STRNICMP(name, "vt", 2) == 0
-			     && vim_strchr((char_u *)"12345", name[2]) != NULL)
+    ಹಿಂತಿರುಗಿ ((STRNICMP(name, "vt", 2) == 0
+			     && vim_strchr((char_u *)"12345", name[2]) != ಖಾಲಿ)
 	    || STRCMP(name, "builtin_vt320") == 0);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Insert user name in s[len].
  * Return OK if a name found.
  */
-    int
-mch_get_user_name(char_u *s, int len)
+    ಪೂರ್ಣಾಂಕ
+mch_get_user_name(char_u *s, ಪೂರ್ಣಾಂಕ len)
 {
-#ifdef VMS
-    vim_strncpy(s, (char_u *)cuserid(NULL), len - 1);
-    return OK;
-#else
-    return mch_get_uname(getuid(), s, len);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VMS
+    vim_strncpy(s, (char_u *)cuserid(ಖಾಲಿ), len - 1);
+    ಹಿಂತಿರುಗಿ OK;
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಹಿಂತಿರುಗಿ mch_get_uname(getuid(), s, len);
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Insert user name for "uid" in s[len].
  * Return OK if a name found.
  */
-    int
-mch_get_uname(uid_t uid, char_u *s, int len)
+    ಪೂರ್ಣಾಂಕ
+mch_get_uname(uid_t uid, char_u *s, ಪೂರ್ಣಾಂಕ len)
 {
-#if defined(HAVE_PWD_H) && defined(HAVE_GETPWUID)
-    struct passwd   *pw;
+#ಆದರೆ defined(HAVE_PWD_H) && defined(HAVE_GETPWUID)
+    ರಚನೆ passwd   *pw;
 
-    if ((pw = getpwuid(uid)) != NULL
-	    && pw->pw_name != NULL && *(pw->pw_name) != NUL)
+    ಆದರೆ ((pw = getpwuid(uid)) != ಖಾಲಿ
+	    && pw->pw_name != ಖಾಲಿ && *(pw->pw_name) != NUL)
     {
 	vim_strncpy(s, (char_u *)pw->pw_name, len - 1);
-	return OK;
+	ಹಿಂತಿರುಗಿ OK;
     }
-#endif
-    sprintf((char *)s, "%d", (int)uid);	    // assumes s is long enough
-    return FAIL;			    // a number is not a name
+#ಆದರೆ_ಅಂತ್ಯ
+    sprintf((ಅಕ್ಷರ *)s, "%d", (ಪೂರ್ಣಾಂಕ)uid);	    // assumes s is long enough
+    ಹಿಂತಿರುಗಿ FAIL;			    // a number is not a name
 }
 
 /*
  * Insert host name is s[len].
  */
 
-#ifdef HAVE_SYS_UTSNAME_H
-    void
-mch_get_host_name(char_u *s, int len)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_SYS_UTSNAME_H
+    ಶೂನ್ಯ
+mch_get_host_name(char_u *s, ಪೂರ್ಣಾಂಕ len)
 {
-    struct utsname vutsname;
+    ರಚನೆ utsname vutsname;
 
-    if (uname(&vutsname) < 0)
+    ಆದರೆ (uname(&vutsname) < 0)
 	*s = NUL;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	vim_strncpy(s, (char_u *)vutsname.nodename, len - 1);
 }
-#else // HAVE_SYS_UTSNAME_H
+#ಇಲ್ಲದಿದ್ದರೆ // HAVE_SYS_UTSNAME_H
 
 # ifdef HAVE_SYS_SYSTEMINFO_H
 #  define gethostname(nam, len) sysinfo(SI_HOSTNAME, nam, len)
 # endif
 
-    void
-mch_get_host_name(char_u *s, int len)
+    ಶೂನ್ಯ
+mch_get_host_name(char_u *s, ಪೂರ್ಣಾಂಕ len)
 {
 # ifdef VAXC
-    vaxc$gethostname((char *)s, len);
-# else
-    gethostname((char *)s, len);
+    vaxc$gethostname((ಅಕ್ಷರ *)s, len);
+# ಇಲ್ಲದಿದ್ದರೆ
+    gethostname((ಅಕ್ಷರ *)s, len);
 # endif
     s[len - 1] = NUL;	// make sure it's terminated
 }
-#endif // HAVE_SYS_UTSNAME_H
+#ಆದರೆ_ಅಂತ್ಯ // HAVE_SYS_UTSNAME_H
 
 /*
  * return process ID
  */
-    long
-mch_get_pid(void)
+    ದೀರ್ಘ
+mch_get_pid(ಶೂನ್ಯ)
 {
-    return (long)getpid();
+    ಹಿಂತಿರುಗಿ (ದೀರ್ಘ)getpid();
 }
 
 /*
  * return TRUE if process "pid" is still running
  */
-    int
-mch_process_running(long pid)
+    ಪೂರ್ಣಾಂಕ
+mch_process_running(ದೀರ್ಘ pid)
 {
     // If there is no error the process must be running.
-    if (kill(pid, 0) == 0)
-	return TRUE;
-#ifdef ESRCH
+    ಆದರೆ (kill(pid, 0) == 0)
+	ಹಿಂತಿರುಗಿ TRUE;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ESRCH
     // If the error is ESRCH then the process is not running.
-    if (errno == ESRCH)
-	return FALSE;
-#endif
+    ಆದರೆ (errno == ESRCH)
+	ಹಿಂತಿರುಗಿ FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
     // If the process is running and owned by another user we get EPERM.  With
     // other errors the process might be running, assuming it is then.
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
-#if !defined(HAVE_STRERROR) && defined(USE_GETCWD)
-    static char *
-strerror(int err)
+#ಆದರೆ !defined(HAVE_STRERROR) && defined(USE_GETCWD)
+    ಸ್ಥಿರ ಅಕ್ಷರ *
+strerror(ಪೂರ್ಣಾಂಕ err)
 {
-    extern int	    sys_nerr;
-    extern char	    *sys_errlist[];
-    static char	    er[20];
+    ಬಾಹ್ಯ ಪೂರ್ಣಾಂಕ	    sys_nerr;
+    ಬಾಹ್ಯ ಅಕ್ಷರ	    *sys_errlist[];
+    ಸ್ಥಿರ ಅಕ್ಷರ	    er[20];
 
-    if (err > 0 && err < sys_nerr)
-	return (sys_errlist[err]);
-    snprintf(er, sizeof(er), "Error %d", err);
-    return er;
+    ಆದರೆ (err > 0 && err < sys_nerr)
+	ಹಿಂತಿರುಗಿ (sys_errlist[err]);
+    snprintf(er, ಗಾತ್ರ(er), "Error %d", err);
+    ಹಿಂತಿರುಗಿ er;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Get name of current directory into buffer "buf" of length "len" bytes.
  * "len" must be at least PATH_MAX.
  * Return OK for success, FAIL for failure.
  */
-    int
-mch_dirname(char_u *buf, int len)
+    ಪೂರ್ಣಾಂಕ
+mch_dirname(char_u *buf, ಪೂರ್ಣಾಂಕ len)
 {
-#if defined(USE_GETCWD)
-    if (getcwd((char *)buf, len) == NULL)
+#ಆದರೆ defined(USE_GETCWD)
+    ಆದರೆ (getcwd((ಅಕ್ಷರ *)buf, len) == ಖಾಲಿ)
     {
 	STRCPY(buf, strerror(errno));
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-    return OK;
-#else
-    return (getwd((char *)buf) != NULL ? OK : FAIL);
-#endif
+    ಹಿಂತಿರುಗಿ OK;
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಹಿಂತಿರುಗಿ (getwd((ಅಕ್ಷರ *)buf) != ಖಾಲಿ ? OK : FAIL);
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
@@ -2669,51 +2669,51 @@ mch_dirname(char_u *buf, int len)
  *
  * return FAIL for failure, OK for success
  */
-    int
-mch_FullName(
+    ಪೂರ್ಣಾಂಕ
+mch_ತುಂಬಿದ_Name(
     char_u	*fname,
     char_u	*buf,
-    int		len,
-    int		force)		// also expand when already absolute path
+    ಪೂರ್ಣಾಂಕ		len,
+    ಪೂರ್ಣಾಂಕ		force)		// also expand when already absolute path
 {
-    int		buflen = 0;
-#ifdef HAVE_FCHDIR
-    int		fd = -1;
-    static int	dont_fchdir = FALSE;	// TRUE when fchdir() doesn't work
-#endif
+    ಪೂರ್ಣಾಂಕ		buflen = 0;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_FCHDIR
+    ಪೂರ್ಣಾಂಕ		fd = -1;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	dont_fchdir = FALSE;	// TRUE when fchdir() doesn't work
+#ಆದರೆ_ಅಂತ್ಯ
     char_u	olddir[MAXPATHL];
     char_u	*p;
-    int		retval = OK;
-#ifdef __CYGWIN__
+    ಪೂರ್ಣಾಂಕ		retval = OK;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ __CYGWIN__
     char_u	posix_fname[MAXPATHL];	// Cygwin docs mention MAX_PATH, but
 					// it's not always defined
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef VMS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VMS
     fname = vms_fixfilename(fname);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef __CYGWIN__
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ __CYGWIN__
     /*
      * This helps for when "/etc/hosts" is a symlink to "c:/something/hosts".
      */
-# if CYGWIN_VERSION_DLL_MAJOR >= 1007
+# ಆದರೆ CYGWIN_ಆವೃತ್ತಿ_DLL_MAJOR >= 1007
     // Use CCP_RELATIVE to avoid that it sometimes returns a path that ends in
     // a forward slash.
-    cygwin_conv_path(CCP_WIN_A_TO_POSIX | CCP_RELATIVE,
+    cygwin_conv_ಮಾರ್ಗ(CCP_WIN_A_ಗಮ್ಯ_POSIX | CCP_RELATIVE,
 		     fname, posix_fname, MAXPATHL);
-# else
-    cygwin_conv_to_posix_path(fname, posix_fname);
+# ಇಲ್ಲದಿದ್ದರೆ
+    cygwin_conv_ಗಮ್ಯ_posix_ಮಾರ್ಗ(fname, posix_fname);
 # endif
     fname = posix_fname;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Expand it if forced or not an absolute path.
     // Do not do it for "/file", the result is always "/".
-    if ((force || !mch_isFullName(fname))
-	    && ((p = vim_strrchr(fname, '/')) == NULL || p != fname))
+    ಆದರೆ ((force || !mch_is_ತುಂಬಿದ_Name(fname))
+	    && ((p = vim_strrchr(fname, '/')) == ಖಾಲಿ || p != fname))
     {
-	if (p == NULL && STRCMP(fname, "..") == 0)
+	ಆದರೆ (p == ಖಾಲಿ && STRCMP(fname, "..") == 0)
 	    // Handle ".." without path separators.
 	    p = fname + 2;
 	/*
@@ -2721,265 +2721,265 @@ mch_FullName(
 	 * and then get the directory (and get back to where we were).
 	 * This will get the correct path name with "../" things.
 	 */
-	if (p != NULL)
+	ಆದರೆ (p != ಖಾಲಿ)
 	{
-	    if (STRCMP(p, "/..") == 0)
+	    ಆದರೆ (STRCMP(p, "/..") == 0)
 		// For "/path/dir/.." include the "/..".
 		p += 3;
 
-#ifdef HAVE_FCHDIR
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_FCHDIR
 	    /*
 	     * Use fchdir() if possible, it's said to be faster and more
 	     * reliable.  But on SunOS 4 it might not work.  Check this by
 	     * doing a fchdir() right now.
 	     */
-	    if (!dont_fchdir)
+	    ಆದರೆ (!dont_fchdir)
 	    {
 		fd = open(".", O_RDONLY | O_EXTRA, 0);
-		if (fd >= 0 && fchdir(fd) < 0)
+		ಆದರೆ (fd >= 0 && fchdir(fd) < 0)
 		{
 		    close(fd);
 		    fd = -1;
 		    dont_fchdir = TRUE;	    // don't try again
 		}
 	    }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 	    // Only change directory when we are sure we can return to where
 	    // we are now.  After doing "su" chdir(".") might not work.
-	    if (
-#ifdef HAVE_FCHDIR
+	    ಆದರೆ (
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_FCHDIR
 		fd < 0 &&
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 			(mch_dirname(olddir, MAXPATHL) == FAIL
-					   || mch_chdir((char *)olddir) != 0))
+					   || mch_chdir((ಅಕ್ಷರ *)olddir) != 0))
 	    {
-		p = NULL;	// can't get current dir: don't chdir
+		p = ಖಾಲಿ;	// can't get current dir: don't chdir
 		retval = FAIL;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		// The directory is copied into buf[], to be able to remove
 		// the file name without changing it (could be a string in
 		// read-only memory)
-		if (p - fname >= len)
+		ಆದರೆ (p - fname >= len)
 		    retval = FAIL;
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    vim_strncpy(buf, fname, p - fname);
-		    if (mch_chdir((char *)buf))
+		    ಆದರೆ (mch_chdir((ಅಕ್ಷರ *)buf))
 		    {
 			// Path does not exist (yet).  For a full path fail,
 			// will use the path as-is.  For a relative path use
 			// the current directory and append the file name.
-			if (mch_isFullName(fname))
+			ಆದರೆ (mch_is_ತುಂಬಿದ_Name(fname))
 			    retval = FAIL;
-			else
-			    p = NULL;
+			ಇಲ್ಲದಿದ್ದರೆ
+			    p = ಖಾಲಿ;
 		    }
-		    else if (*p == '/')
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*p == '/')
 			fname = p + 1;
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 			fname = p;
 		    *buf = NUL;
 		}
 	    }
 	}
-	if (mch_dirname(buf, len) == FAIL)
+	ಆದರೆ (mch_dirname(buf, len) == FAIL)
 	{
 	    retval = FAIL;
 	    *buf = NUL;
 	}
-	if (p != NULL)
+	ಆದರೆ (p != ಖಾಲಿ)
 	{
-	    int	l;
+	    ಪೂರ್ಣಾಂಕ	l;
 
-#ifdef HAVE_FCHDIR
-	    if (fd >= 0)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_FCHDIR
+	    ಆದರೆ (fd >= 0)
 	    {
-		if (p_verbose >= 5)
+		ಆದರೆ (p_verbose >= 5)
 		{
 		    verbose_enter();
-		    msg("fchdir() to previous dir");
+		    ಸಂದೇಶ("fchdir() to previous dir");
 		    verbose_leave();
 		}
 		l = fchdir(fd);
 	    }
-	    else
-#endif
-		l = mch_chdir((char *)olddir);
-	    if (l != 0)
-		emsg(_(e_cannot_go_back_to_previous_directory));
+	    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+		l = mch_chdir((ಅಕ್ಷರ *)olddir);
+	    ಆದರೆ (l != 0)
+		emsg(_(e_cannot_go_ಹಿಂಭಾಗ_ಗಮ್ಯ_ಹಿಂದಿನ_directory));
 	}
-#ifdef HAVE_FCHDIR
-	if (fd >= 0)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_FCHDIR
+	ಆದರೆ (fd >= 0)
 	    close(fd);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-	buflen = (int)STRLEN(buf);
-	if (buflen >= len - 1)
+	buflen = (ಪೂರ್ಣಾಂಕ)STRLEN(buf);
+	ಆದರೆ (buflen >= len - 1)
 	    retval = FAIL; // no space for trailing "/"
-#ifndef VMS
-	else if (buflen > 0 && buf[buflen - 1] != PATHSEP && *fname != NUL
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ VMS
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (buflen > 0 && buf[buflen - 1] != PATHSEP && *fname != NUL
 						   && STRCMP(fname, ".") != 0)
 	{
 	    STRCPY(buf + buflen, PATHSEPSTR);
-	    buflen += sizeof(PATHSEP);
+	    buflen += ಗಾತ್ರ(PATHSEP);
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
-    if (buflen == 0)
-	buflen = (int)STRLEN(buf);
+    ಆದರೆ (buflen == 0)
+	buflen = (ಪೂರ್ಣಾಂಕ)STRLEN(buf);
 
     // Catch file names which are too long.
-    if (retval == FAIL || (int)(buflen + STRLEN(fname)) >= len)
-	return FAIL;
+    ಆದರೆ (retval == FAIL || (ಪೂರ್ಣಾಂಕ)(buflen + STRLEN(fname)) >= len)
+	ಹಿಂತಿರುಗಿ FAIL;
 
     // Do not append ".", "/dir/." is equal to "/dir".
-    if (STRCMP(fname, ".") != 0)
+    ಆದರೆ (STRCMP(fname, ".") != 0)
 	STRCPY(buf + buflen, fname);
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Return TRUE if "fname" does not depend on the current directory.
  */
-    int
-mch_isFullName(char_u *fname)
+    ಪೂರ್ಣಾಂಕ
+mch_is_ತುಂಬಿದ_Name(char_u *fname)
 {
-#ifdef VMS
-    return ( fname[0] == '/'	       || fname[0] == '.'	    ||
-	     strchr((char *)fname,':') || strchr((char *)fname,'"') ||
-	    (strchr((char *)fname,'[') && strchr((char *)fname,']'))||
-	    (strchr((char *)fname,'<') && strchr((char *)fname,'>'))   );
-#else
-    return (*fname == '/' || *fname == '~');
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VMS
+    ಹಿಂತಿರುಗಿ ( fname[0] == '/'	       || fname[0] == '.'	    ||
+	     strchr((ಅಕ್ಷರ *)fname,':') || strchr((ಅಕ್ಷರ *)fname,'"') ||
+	    (strchr((ಅಕ್ಷರ *)fname,'[') && strchr((ಅಕ್ಷರ *)fname,']'))||
+	    (strchr((ಅಕ್ಷರ *)fname,'<') && strchr((ಅಕ್ಷರ *)fname,'>'))   );
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಹಿಂತಿರುಗಿ (*fname == '/' || *fname == '~');
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#if defined(USE_FNAME_CASE)
+#ಆದರೆ defined(USE_FNAME_CASE)
 /*
  * Set the case of the file name, if it already exists.  This will cause the
  * file name to remain exactly the same.
  * Only required for file systems where case is ignored and preserved.
  */
-    void
+    ಶೂನ್ಯ
 fname_case(
     char_u	*name,
-    int		len UNUSED)  // buffer size, only used when name gets longer
+    ಪೂರ್ಣಾಂಕ		len ಬಳಸದ)  // buffer size, only used when name gets longer
 {
-    struct stat st;
-    char_u	*slash, *tail;
+    ರಚನೆ stat st;
+    char_u	*slash, *ಬಾಲ;
     size_t	taillen;
     DIR		*dirp;
-    struct dirent *dp;
+    ರಚನೆ dirent *dp;
 
-    if (mch_lstat((char *)name, &st) < 0)
-	return;
+    ಆದರೆ (mch_lstat((ಅಕ್ಷರ *)name, &st) < 0)
+	ಹಿಂತಿರುಗಿ;
 
     // Open the directory where the file is located.
     slash = vim_strrchr(name, '/');
-    if (slash == NULL)
+    ಆದರೆ (slash == ಖಾಲಿ)
     {
 	dirp = opendir(".");
-	tail = name;
+	ಬಾಲ = name;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	*slash = NUL;
-	dirp = opendir((char *)name);
+	dirp = opendir((ಅಕ್ಷರ *)name);
 	*slash = '/';
-	tail = slash + 1;
+	ಬಾಲ = slash + 1;
     }
 
-    if (dirp == NULL)
-	return;
+    ಆದರೆ (dirp == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    taillen = STRLEN(tail);
-    while ((dp = readdir(dirp)) != NULL)
+    taillen = STRLEN(ಬಾಲ);
+    ಆಗ ((dp = readdir(dirp)) != ಖಾಲಿ)
     {
 	// Only accept names that differ in case and are the same byte
 	// length. TODO: accept different length name.
-	if (STRICMP(tail, dp->d_name) == 0
+	ಆದರೆ (STRICMP(ಬಾಲ, dp->d_name) == 0
 		&& taillen == STRLEN(dp->d_name))
 	{
 	    char_u	newname[MAXPATHL + 1];
-	    struct stat st2;
+	    ರಚನೆ stat st2;
 
 	    // Verify the inode is equal.
 	    vim_strncpy(newname, name, MAXPATHL);
-	    vim_strncpy(newname + (tail - name), (char_u *)dp->d_name,
-		    MAXPATHL - (tail - name));
-	    if (mch_lstat((char *)newname, &st2) >= 0
+	    vim_strncpy(newname + (ಬಾಲ - name), (char_u *)dp->d_name,
+		    MAXPATHL - (ಬಾಲ - name));
+	    ಆದರೆ (mch_lstat((ಅಕ್ಷರ *)newname, &st2) >= 0
 		    && st.st_ino == st2.st_ino
 		    && st.st_dev == st2.st_dev)
 	    {
-		STRCPY(tail, dp->d_name);
-		break;
+		STRCPY(ಬಾಲ, dp->d_name);
+		ನಿಲ್ಲಿಸು;
 	    }
 	}
     }
 
     closedir(dirp);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Get file permissions for 'name'.
  * Returns -1 when it doesn't exist.
  */
-    long
+    ದೀರ್ಘ
 mch_getperm(char_u *name)
 {
-    struct stat statb;
+    ರಚನೆ stat statb;
 
     // Keep the #ifdef outside of stat(), it may be a macro.
-#ifdef VMS
-    if (stat((char *)vms_fixfilename(name), &statb))
-#else
-    if (stat((char *)name, &statb))
-#endif
-	return -1;
-#ifdef __INTERIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VMS
+    ಆದರೆ (stat((ಅಕ್ಷರ *)vms_fixfilename(name), &statb))
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಆದರೆ (stat((ಅಕ್ಷರ *)name, &statb))
+#ಆದರೆ_ಅಂತ್ಯ
+	ಹಿಂತಿರುಗಿ -1;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ __INTERIX
     // The top bit makes the value negative, which means the file doesn't
     // exist.  Remove the bit, we don't use it.
-    return statb.st_mode & ~S_ADDACE;
-#else
-    return statb.st_mode;
-#endif
+    ಹಿಂತಿರುಗಿ statb.st_ಬಹುಲಕ & ~S_ADDACE;
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಹಿಂತಿರುಗಿ statb.st_ಬಹುಲಕ;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Set file permission for "name" to "perm".
  * Return FAIL for failure, OK otherwise.
  */
-    int
-mch_setperm(char_u *name, long perm)
+    ಪೂರ್ಣಾಂಕ
+mch_setperm(char_u *name, ದೀರ್ಘ perm)
 {
-    return (chmod((char *)
-#ifdef VMS
+    ಹಿಂತಿರುಗಿ (chmod((ಅಕ್ಷರ *)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VMS
 		    vms_fixfilename(name),
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 		    name,
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		    (mode_t)perm) == 0 ? OK : FAIL);
 }
 
-#if defined(HAVE_FCHMOD)
+#ಆದರೆ defined(HAVE_FCHMOD)
 /*
  * Set file permission for open file "fd" to "perm".
  * Return FAIL for failure, OK otherwise.
  */
-    int
-mch_fsetperm(int fd, long perm)
+    ಪೂರ್ಣಾಂಕ
+mch_fsetperm(ಪೂರ್ಣಾಂಕ fd, ದೀರ್ಘ perm)
 {
-    return (fchmod(fd, (mode_t)perm) == 0 ? OK : FAIL);
+    ಹಿಂತಿರುಗಿ (fchmod(fd, (mode_t)perm) == 0 ? OK : FAIL);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(HAVE_ACL)
+#ಆದರೆ defined(HAVE_ACL)
 # ifdef HAVE_SYS_ACL_H
 #  include <sys/acl.h>
 # endif
@@ -2988,235 +2988,235 @@ mch_fsetperm(int fd, long perm)
 # endif
 
 # ifdef HAVE_SOLARIS_ACL
-typedef struct vim_acl_solaris_T {
-    int acl_cnt;
-    aclent_t *acl_entry;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ vim_acl_solaris_T {
+    ಪೂರ್ಣಾಂಕ acl_cnt;
+    aclent_t *acl_ನಮೂದು;
 } vim_acl_solaris_T;
 # endif
 
-# if defined(HAVE_SELINUX)
+# ಆದರೆ defined(HAVE_SELINUX)
 /*
  * Copy security info from "from_file" to "to_file".
  */
-    void
-mch_copy_sec(char_u *from_file, char_u *to_file)
+    ಶೂನ್ಯ
+mch_copy_sec(char_u *from_file, char_u *ಗಮ್ಯ_file)
 {
-    if (from_file == NULL)
-	return;
+    ಆದರೆ (from_file == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    if (selinux_enabled == -1)
+    ಆದರೆ (selinux_enabled == -1)
 	selinux_enabled = is_selinux_enabled();
 
-    if (selinux_enabled <= 0)
-	return;
+    ಆದರೆ (selinux_enabled <= 0)
+	ಹಿಂತಿರುಗಿ;
 
     // Use "char *" instead of "security_context_t" to avoid a deprecation
     // warning.
-    char *from_context = NULL;
-    char *to_context = NULL;
+    ಅಕ್ಷರ *from_context = ಖಾಲಿ;
+    ಅಕ್ಷರ *ಗಮ್ಯ_context = ಖಾಲಿ;
 
-    if (getfilecon((char *)from_file, &from_context) < 0)
+    ಆದರೆ (getfilecon((ಅಕ್ಷರ *)from_file, &from_context) < 0)
     {
 	// If the filesystem doesn't support extended attributes,
 	// the original had no special security context and the
 	// target cannot have one either.
-	if (errno == EOPNOTSUPP)
-	    return;
+	ಆದರೆ (errno == EOPNOTSUPP)
+	    ಹಿಂತಿರುಗಿ;
 
-	msg_puts(_("\nCould not get security context for "));
-	msg_outtrans(from_file);
-	msg_putchar('\n');
-	return;
+	ಸಂದೇಶ_puts(_("\nCould not get security context for "));
+	ಸಂದೇಶ_outtrans(from_file);
+	ಸಂದೇಶ_putchar('\n');
+	ಹಿಂತಿರುಗಿ;
     }
-    if (getfilecon((char *)to_file, &to_context) < 0)
+    ಆದರೆ (getfilecon((ಅಕ್ಷರ *)ಗಮ್ಯ_file, &ಗಮ್ಯ_context) < 0)
     {
-	msg_puts(_("\nCould not get security context for "));
-	msg_outtrans(to_file);
-	msg_putchar('\n');
+	ಸಂದೇಶ_puts(_("\nCould not get security context for "));
+	ಸಂದೇಶ_outtrans(ಗಮ್ಯ_file);
+	ಸಂದೇಶ_putchar('\n');
 	freecon (from_context);
-	return ;
+	ಹಿಂತಿರುಗಿ ;
     }
-    if (strcmp(from_context, to_context) != 0)
+    ಆದರೆ (strcmp(from_context, ಗಮ್ಯ_context) != 0)
     {
-	if (setfilecon((char *)to_file, from_context) < 0)
+	ಆದರೆ (setfilecon((ಅಕ್ಷರ *)ಗಮ್ಯ_file, from_context) < 0)
 	{
-	    msg_puts(_("\nCould not set security context for "));
-	    msg_outtrans(to_file);
-	    msg_putchar('\n');
+	    ಸಂದೇಶ_puts(_("\nCould not set security context for "));
+	    ಸಂದೇಶ_outtrans(ಗಮ್ಯ_file);
+	    ಸಂದೇಶ_putchar('\n');
 	}
     }
-    freecon(to_context);
+    freecon(ಗಮ್ಯ_context);
     freecon(from_context);
 }
 # endif // HAVE_SELINUX
 
-# if defined(HAVE_SMACK) && !defined(PROTO)
+# ಆದರೆ defined(HAVE_SMACK) && !defined(PROTO)
 /*
  * Copy security info from "from_file" to "to_file".
  */
-    void
-mch_copy_sec(char_u *from_file, char_u *to_file)
+    ಶೂನ್ಯ
+mch_copy_sec(char_u *from_file, char_u *ಗಮ್ಯ_file)
 {
-    static const char * const smack_copied_attributes[] =
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ * ಸ್ಥಿರಾಂಕ smack_copied_ಗುಣಲಕ್ಷಣಗಳು[] =
 	{
 	    XATTR_NAME_SMACK,
 	    XATTR_NAME_SMACKEXEC,
 	    XATTR_NAME_SMACKMMAP
 	};
 
-    char	buffer[SMACK_LABEL_LEN];
-    const char	*name;
-    int		index;
-    int		ret;
-    ssize_t	size;
+    ಅಕ್ಷರ	ಬಫರ್[SMACK_LABEL_LEN];
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ	*name;
+    ಪೂರ್ಣಾಂಕ		ಸೂಚ್ಯಂಕ;
+    ಪೂರ್ಣಾಂಕ		ret;
+    ssize_t	ಗಾತ್ರ_2;
 
-    if (from_file == NULL)
-	return;
+    ಆದರೆ (from_file == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    size = listxattr((char *)from_file, NULL, 0);
+    ಗಾತ್ರ_2 = listxattr((ಅಕ್ಷರ *)from_file, ಖಾಲಿ, 0);
     // not supported or no attributes to copy
-    if (size <= 0)
-	return;
+    ಆದರೆ (ಗಾತ್ರ_2 <= 0)
+	ಹಿಂತಿರುಗಿ;
 
-    for (index = 0 ; index < (int)ARRAY_LENGTH(smack_copied_attributes); index++)
+    ಗಾಗಿ (ಸೂಚ್ಯಂಕ = 0 ; ಸೂಚ್ಯಂಕ < (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(smack_copied_ಗುಣಲಕ್ಷಣಗಳು); ಸೂಚ್ಯಂಕ++)
     {
 	// get the name of the attribute to copy
-	name = smack_copied_attributes[index];
+	name = smack_copied_ಗುಣಲಕ್ಷಣಗಳು[ಸೂಚ್ಯಂಕ];
 
 	// get the value of the attribute in buffer
-	size = getxattr((char*)from_file, name, buffer, sizeof(buffer));
-	if (size >= 0)
+	ಗಾತ್ರ_2 = getxattr((ಅಕ್ಷರ*)from_file, name, ಬಫರ್, ಗಾತ್ರ(ಬಫರ್));
+	ಆದರೆ (ಗಾತ್ರ_2 >= 0)
 	{
 	    // copy the attribute value of buffer
-	    ret = setxattr((char*)to_file, name, buffer, (size_t)size, 0);
-	    if (ret < 0)
+	    ret = setxattr((ಅಕ್ಷರ*)ಗಮ್ಯ_file, name, ಬಫರ್, (size_t)ಗಾತ್ರ_2, 0);
+	    ಆದರೆ (ret < 0)
 	    {
-		vim_snprintf((char *)IObuff, IOSIZE,
+		vim_snprintf((ಅಕ್ಷರ *)IObuff, IOSIZE,
 			_("Could not set security context %s for %s"),
-			name, to_file);
-		msg_outtrans(IObuff);
-		msg_putchar('\n');
+			name, ಗಮ್ಯ_file);
+		ಸಂದೇಶ_outtrans(IObuff);
+		ಸಂದೇಶ_putchar('\n');
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // what reason of not having the attribute value?
-	    switch (errno)
+	    ಆಯ್ಕೆ (errno)
 	    {
-		case ENOTSUP:
+		ಸ್ಥಿತಿ ENOTSUP:
 		    // extended attributes aren't supported or enabled
 		    // should a message be echoed? not sure...
-		    return; // leave because it isn't useful to continue
+		    ಹಿಂತಿರುಗಿ; // leave because it isn't useful to continue
 
-		case ERANGE:
-		default:
+		ಸ್ಥಿತಿ ERANGE:
+		ಪೂರ್ವನಿಯೋಜಿತ:
 		    // no enough size OR unexpected error
-		     vim_snprintf((char *)IObuff, IOSIZE,
+		     vim_snprintf((ಅಕ್ಷರ *)IObuff, IOSIZE,
 			    _("Could not get security context %s for %s. Removing it!"),
 			    name, from_file);
-		    msg_puts((char *)IObuff);
-		    msg_putchar('\n');
+		    ಸಂದೇಶ_puts((ಅಕ್ಷರ *)IObuff);
+		    ಸಂದೇಶ_putchar('\n');
 		    // FALLTHROUGH to remove the attribute
 
-		case ENODATA:
+		ಸ್ಥಿತಿ ENODATA:
 		    // no attribute of this name
-		    ret = removexattr((char*)to_file, name);
+		    ret = removexattr((ಅಕ್ಷರ*)ಗಮ್ಯ_file, name);
 		    // Silently ignore errors, apparently this happens when
 		    // smack is not actually being used.
-		    break;
+		    ನಿಲ್ಲಿಸು;
 	    }
 	}
     }
 }
 # endif // HAVE_SMACK
 
-# if defined(FEAT_XATTR)
+# ಆದರೆ defined(FEAT_XATTR)
 /*
  * Copy extended attributes from_file to to_file
  */
-    void
-mch_copy_xattr(char_u *from_file, char_u *to_file)
+    ಶೂನ್ಯ
+mch_copy_xattr(char_u *from_file, char_u *ಗಮ್ಯ_file)
 {
-    char	*xattr_buf;
-    ssize_t	size;
+    ಅಕ್ಷರ	*xattr_buf;
+    ssize_t	ಗಾತ್ರ_2;
     ssize_t	tsize;
     ssize_t	keylen, vallen, max_vallen = 0;
-    char	*key;
-    char	*val = NULL;
-    char	*errmsg = NULL;
+    ಅಕ್ಷರ	*ಕೀಲಿ;
+    ಅಕ್ಷರ	*val = ಖಾಲಿ;
+    ಅಕ್ಷರ	*errmsg = ಖಾಲಿ;
 
-    if (from_file == NULL)
-	return;
+    ಆದರೆ (from_file == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     // get the length of the extended attributes
-    size = listxattr((char *)from_file, NULL, 0);
+    ಗಾತ್ರ_2 = listxattr((ಅಕ್ಷರ *)from_file, ಖಾಲಿ, 0);
     // not supported or no attributes to copy
-    if (size <= 0)
-	return;
-    xattr_buf = (char*)alloc(size);
-    if (xattr_buf == NULL)
-	return;
-    size = listxattr((char *)from_file, xattr_buf, size);
-    tsize = size;
+    ಆದರೆ (ಗಾತ್ರ_2 <= 0)
+	ಹಿಂತಿರುಗಿ;
+    xattr_buf = (ಅಕ್ಷರ*)alloc(ಗಾತ್ರ_2);
+    ಆದರೆ (xattr_buf == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
+    ಗಾತ್ರ_2 = listxattr((ಅಕ್ಷರ *)from_file, xattr_buf, ಗಾತ್ರ_2);
+    tsize = ಗಾತ್ರ_2;
 
     errno = 0;
 
-    for (int round = 0; round < 2; round++)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ ಸುತ್ತು = 0; ಸುತ್ತು < 2; ಸುತ್ತು++)
     {
 
-	key = xattr_buf;
-	if (round == 1)
-	    size = tsize;
+	ಕೀಲಿ = xattr_buf;
+	ಆದರೆ (ಸುತ್ತು == 1)
+	    ಗಾತ್ರ_2 = tsize;
 
-	while (size > 0)
+	ಆಗ (ಗಾತ್ರ_2 > 0)
 	{
-	    vallen = getxattr((char *)from_file, key,
-		    val, round ? max_vallen : 0);
+	    vallen = getxattr((ಅಕ್ಷರ *)from_file, ಕೀಲಿ,
+		    val, ಸುತ್ತು ? max_vallen : 0);
 	    // only set the attribute in the second round
-	    if (vallen >= 0 && round &&
-		setxattr((char *)to_file, key, val, vallen, 0) == 0)
+	    ಆದರೆ (vallen >= 0 && ಸುತ್ತು &&
+		setxattr((ಅಕ್ಷರ *)ಗಮ್ಯ_file, ಕೀಲಿ, val, vallen, 0) == 0)
 		;
-	    else if (errno)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (errno)
 	    {
-		switch (errno)
+		ಆಯ್ಕೆ (errno)
 		{
-		    case E2BIG:
+		    ಸ್ಥಿತಿ E2BIG:
 			errmsg = e_xattr_e2big;
-			goto error_exit;
-		    case ENOTSUP:
-		    case EACCES:
-		    case EPERM:
-			break;
-		    case ERANGE:
+			ಹೋಗು error_exit;
+		    ಸ್ಥಿತಿ ENOTSUP:
+		    ಸ್ಥಿತಿ EACCES:
+		    ಸ್ಥಿತಿ EPERM:
+			ನಿಲ್ಲಿಸು;
+		    ಸ್ಥಿತಿ ERANGE:
 			errmsg = e_xattr_erange;
-			goto error_exit;
-		    default:
+			ಹೋಗು error_exit;
+		    ಪೂರ್ವನಿಯೋಜಿತ:
 			errmsg = e_xattr_other;
-			goto error_exit;
+			ಹೋಗು error_exit;
 		}
 	    }
 
-	    if (round == 0 && vallen > max_vallen)
+	    ಆದರೆ (ಸುತ್ತು == 0 && vallen > max_vallen)
 		max_vallen = vallen;
 
 	    // add one for terminating null
-	    keylen = STRLEN(key) + 1;
-	    size -= keylen;
-	    key += keylen;
+	    keylen = STRLEN(ಕೀಲಿ) + 1;
+	    ಗಾತ್ರ_2 -= keylen;
+	    ಕೀಲಿ += keylen;
 	}
-	if (round)
-	    break;
+	ಆದರೆ (ಸುತ್ತು)
+	    ನಿಲ್ಲಿಸು;
 
-	val = (char*)alloc(max_vallen + 1);
-	if (val == NULL)
-	    goto error_exit;
+	val = (ಅಕ್ಷರ*)alloc(max_vallen + 1);
+	ಆದರೆ (val == ಖಾಲಿ)
+	    ಹೋಗು error_exit;
 
     }
 error_exit:
     vim_free(xattr_buf);
     vim_free(val);
 
-    if (errmsg != NULL)
+    ಆದರೆ (errmsg != ಖಾಲಿ)
 	emsg(_(errmsg));
 }
 # endif
@@ -3226,68 +3226,68 @@ error_exit:
  * Return NULL if the ACL is not available for whatever reason.
  */
     vim_acl_T
-mch_get_acl(char_u *fname UNUSED)
+mch_get_acl(char_u *fname ಬಳಸದ)
 {
-    vim_acl_T	ret = NULL;
+    vim_acl_T	ret = ಖಾಲಿ;
 # ifdef HAVE_POSIX_ACL
-    ret = (vim_acl_T)acl_get_file((char *)fname, ACL_TYPE_ACCESS);
-# else
+    ret = (vim_acl_T)acl_get_file((ಅಕ್ಷರ *)fname, ACL_TYPE_ACCESS);
+# ಇಲ್ಲದಿದ್ದರೆ
 #  ifdef HAVE_SOLARIS_ZFS_ACL
     acl_t *aclent;
 
-    if (acl_get((char *)fname, 0, &aclent) < 0)
-	return NULL;
+    ಆದರೆ (acl_get((ಅಕ್ಷರ *)fname, 0, &aclent) < 0)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     ret = (vim_acl_T)aclent;
-#  else
+#  ಇಲ್ಲದಿದ್ದರೆ
 #   ifdef HAVE_SOLARIS_ACL
     vim_acl_solaris_T   *aclent;
 
-    aclent = malloc(sizeof(vim_acl_solaris_T));
-    if (aclent == NULL)
-	return NULL;
-    if ((aclent->acl_cnt = acl((char *)fname, GETACLCNT, 0, NULL)) < 0)
+    aclent = ಸ್ಮರಣೆ_ಕೊಡು(ಗಾತ್ರ(vim_acl_solaris_T));
+    ಆದರೆ (aclent == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    ಆದರೆ ((aclent->acl_cnt = acl((ಅಕ್ಷರ *)fname, GETACLCNT, 0, ಖಾಲಿ)) < 0)
     {
-	free(aclent);
-	return NULL;
+	ಬಿಡುಗಡೆ(aclent);
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
-    aclent->acl_entry = malloc(aclent->acl_cnt * sizeof(aclent_t));
-    if (aclent->acl_entry == NULL)
+    aclent->acl_ನಮೂದು = ಸ್ಮರಣೆ_ಕೊಡು(aclent->acl_cnt * ಗಾತ್ರ(aclent_t));
+    ಆದರೆ (aclent->acl_ನಮೂದು == ಖಾಲಿ)
     {
-	free(aclent);
-	return NULL;
+	ಬಿಡುಗಡೆ(aclent);
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
-    if (acl((char *)fname, GETACL, aclent->acl_cnt, aclent->acl_entry) < 0)
+    ಆದರೆ (acl((ಅಕ್ಷರ *)fname, GETACL, aclent->acl_cnt, aclent->acl_ನಮೂದು) < 0)
     {
-	free(aclent->acl_entry);
-	free(aclent);
-	return NULL;
+	ಬಿಡುಗಡೆ(aclent->acl_ನಮೂದು);
+	ಬಿಡುಗಡೆ(aclent);
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
     ret = (vim_acl_T)aclent;
-#   else
-#    if defined(HAVE_AIX_ACL)
-    int		aclsize;
-    struct acl *aclent;
+#   ಇಲ್ಲದಿದ್ದರೆ
+#    ಆದರೆ defined(HAVE_AIX_ACL)
+    ಪೂರ್ಣಾಂಕ		aclsize;
+    ರಚನೆ acl *aclent;
 
-    aclsize = sizeof(struct acl);
-    aclent = malloc(aclsize);
-    if (aclent == NULL)
-	return NULL;
-    if (statacl((char *)fname, STX_NORMAL, aclent, aclsize) < 0)
+    aclsize = ಗಾತ್ರ(ರಚನೆ acl);
+    aclent = ಸ್ಮರಣೆ_ಕೊಡು(aclsize);
+    ಆದರೆ (aclent == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    ಆದರೆ (statacl((ಅಕ್ಷರ *)fname, STX_ಸಾಮಾನ್ಯ, aclent, aclsize) < 0)
     {
-	if (errno == ENOSPC)
+	ಆದರೆ (errno == ENOSPC)
 	{
 	    aclsize = aclent->acl_len;
 	    aclent = realloc(aclent, aclsize);
-	    if (aclent == NULL || statacl((char *)fname, STX_NORMAL, aclent, aclsize) < 0)
+	    ಆದರೆ (aclent == ಖಾಲಿ || statacl((ಅಕ್ಷರ *)fname, STX_ಸಾಮಾನ್ಯ, aclent, aclsize) < 0)
 	    {
-		free(aclent);
-		return NULL;
+		ಬಿಡುಗಡೆ(aclent);
+		ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    free(aclent);
-	    return NULL;
+	    ಬಿಡುಗಡೆ(aclent);
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
     }
     ret = (vim_acl_T)aclent;
@@ -3295,64 +3295,64 @@ mch_get_acl(char_u *fname UNUSED)
 #   endif // HAVE_SOLARIS_ACL
 #  endif // HAVE_SOLARIS_ZFS_ACL
 # endif // HAVE_POSIX_ACL
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
 /*
  * Set the ACL of file "fname" to "acl" (unless it's NULL).
  */
-    void
-mch_set_acl(char_u *fname UNUSED, vim_acl_T aclent)
+    ಶೂನ್ಯ
+mch_ಗಣ_acl(char_u *fname ಬಳಸದ, vim_acl_T aclent)
 {
-    if (aclent == NULL)
-	return;
+    ಆದರೆ (aclent == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 # ifdef HAVE_POSIX_ACL
-    acl_set_file((char *)fname, ACL_TYPE_ACCESS, (acl_t)aclent);
-# else
+    acl_ಗಣ_file((ಅಕ್ಷರ *)fname, ACL_TYPE_ACCESS, (acl_t)aclent);
+# ಇಲ್ಲದಿದ್ದರೆ
 #  ifdef HAVE_SOLARIS_ZFS_ACL
-    acl_set((char *)fname, (acl_t *)aclent);
-#  else
+    acl_ಗಣ((ಅಕ್ಷರ *)fname, (acl_t *)aclent);
+#  ಇಲ್ಲದಿದ್ದರೆ
 #   ifdef HAVE_SOLARIS_ACL
-    acl((char *)fname, SETACL, ((vim_acl_solaris_T *)aclent)->acl_cnt,
-	    ((vim_acl_solaris_T *)aclent)->acl_entry);
-#   else
+    acl((ಅಕ್ಷರ *)fname, SETACL, ((vim_acl_solaris_T *)aclent)->acl_cnt,
+	    ((vim_acl_solaris_T *)aclent)->acl_ನಮೂದು);
+#   ಇಲ್ಲದಿದ್ದರೆ
 #    ifdef HAVE_AIX_ACL
-    chacl((char *)fname, aclent, ((struct acl *)aclent)->acl_len);
+    chacl((ಅಕ್ಷರ *)fname, aclent, ((ರಚನೆ acl *)aclent)->acl_len);
 #    endif // HAVE_AIX_ACL
 #   endif // HAVE_SOLARIS_ACL
 #  endif // HAVE_SOLARIS_ZFS_ACL
 # endif // HAVE_POSIX_ACL
 }
 
-    void
+    ಶೂನ್ಯ
 mch_free_acl(vim_acl_T aclent)
 {
-    if (aclent == NULL)
-	return;
+    ಆದರೆ (aclent == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 # ifdef HAVE_POSIX_ACL
     acl_free((acl_t)aclent);
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  ifdef HAVE_SOLARIS_ZFS_ACL
     acl_free((acl_t *)aclent);
-#  else
+#  ಇಲ್ಲದಿದ್ದರೆ
 #   ifdef HAVE_SOLARIS_ACL
-    free(((vim_acl_solaris_T *)aclent)->acl_entry);
-    free(aclent);
-#   else
+    ಬಿಡುಗಡೆ(((vim_acl_solaris_T *)aclent)->acl_ನಮೂದು);
+    ಬಿಡುಗಡೆ(aclent);
+#   ಇಲ್ಲದಿದ್ದರೆ
 #    ifdef HAVE_AIX_ACL
-    free(aclent);
+    ಬಿಡುಗಡೆ(aclent);
 #    endif // HAVE_AIX_ACL
 #   endif // HAVE_SOLARIS_ACL
 #  endif // HAVE_SOLARIS_ZFS_ACL
 # endif // HAVE_POSIX_ACL
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Set hidden flag for "name".
  */
-    void
-mch_hide(char_u *name UNUSED)
+    ಶೂನ್ಯ
+mch_hide(char_u *name ಬಳಸದ)
 {
     // can't hide a file
 }
@@ -3362,16 +3362,16 @@ mch_hide(char_u *name UNUSED)
  * return FALSE if "name" is not a directory
  * return FALSE for error
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_isdir(char_u *name)
 {
-    struct stat statb;
+    ರಚನೆ stat statb;
 
-    if (*name == NUL)	    // Some stat()s don't flag "" as an error.
-	return FALSE;
-    if (stat((char *)name, &statb))
-	return FALSE;
-    return (S_ISDIR(statb.st_mode) ? TRUE : FALSE);
+    ಆದರೆ (*name == NUL)	    // Some stat()s don't flag "" as an error.
+	ಹಿಂತಿರುಗಿ FALSE;
+    ಆದರೆ (stat((ಅಕ್ಷರ *)name, &statb))
+	ಹಿಂತಿರುಗಿ FALSE;
+    ಹಿಂತಿರುಗಿ (S_ISDIR(statb.st_ಬಹುಲಕ) ? TRUE : FALSE);
 }
 
 /*
@@ -3379,29 +3379,29 @@ mch_isdir(char_u *name)
  * return FALSE if "name" is not a directory
  * return FALSE for error
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_isrealdir(char_u *name)
 {
-    struct stat statb;
+    ರಚನೆ stat statb;
 
-    if (*name == NUL)	    // Some stat()s don't flag "" as an error.
-	return FALSE;
-    if (mch_lstat((char *)name, &statb))
-	return FALSE;
-    return (S_ISDIR(statb.st_mode) ? TRUE : FALSE);
+    ಆದರೆ (*name == NUL)	    // Some stat()s don't flag "" as an error.
+	ಹಿಂತಿರುಗಿ FALSE;
+    ಆದರೆ (mch_lstat((ಅಕ್ಷರ *)name, &statb))
+	ಹಿಂತಿರುಗಿ FALSE;
+    ಹಿಂತಿರುಗಿ (S_ISDIR(statb.st_ಬಹುಲಕ) ? TRUE : FALSE);
 }
 
 /*
  * Return 1 if "name" is an executable file, 0 if not or it doesn't exist.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 executable_file(char_u *name)
 {
-    struct stat	st;
+    ರಚನೆ stat	st;
 
-    if (stat((char *)name, &st))
-	return 0;
-#ifdef VMS
+    ಆದರೆ (stat((ಅಕ್ಷರ *)name, &st))
+	ಹಿಂತಿರುಗಿ 0;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VMS
     // Like on Unix system file can have executable rights but not necessarily
     // be an executable, but on Unix is not a default for an ordinary file to
     // have an executable flag - on VMS it is in most cases.
@@ -3409,17 +3409,17 @@ executable_file(char_u *name)
     // conventions instead:
     // *.COM and *.EXE files are the executables - the rest are not. This is
     // not ideal but better than it was.
-    int vms_executable = 0;
-    if (S_ISREG(st.st_mode) && mch_access((char *)name, X_OK) == 0)
+    ಪೂರ್ಣಾಂಕ vms_executable = 0;
+    ಆದರೆ (S_ISREG(st.st_ಬಹುಲಕ) && mch_access((ಅಕ್ಷರ *)name, X_OK) == 0)
     {
-	if (strstr(vms_tolower((char*)name),".exe") != NULL
-		|| strstr(vms_tolower((char*)name),".com")!= NULL)
+	ಆದರೆ (ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು(vms_tolower((ಅಕ್ಷರ*)name),".exe") != ಖಾಲಿ
+		|| ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು(vms_tolower((ಅಕ್ಷರ*)name),".com")!= ಖಾಲಿ)
 	    vms_executable = 1;
     }
-    return vms_executable;
-#else
-    return S_ISREG(st.st_mode) && mch_access((char *)name, X_OK) == 0;
-#endif
+    ಹಿಂತಿರುಗಿ vms_executable;
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಹಿಂತಿರುಗಿ S_ISREG(st.st_ಬಹುಲಕ) && mch_access((ಅಕ್ಷರ *)name, X_OK) == 0;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
@@ -3427,86 +3427,86 @@ executable_file(char_u *name)
  * If "use_path" is FALSE only check if "name" is executable.
  * Return -1 if unknown.
  */
-    int
-mch_can_exe(char_u *name, char_u **path, int use_path)
+    ಪೂರ್ಣಾಂಕ
+mch_can_exe(char_u *name, char_u **ಮಾರ್ಗ, ಪೂರ್ಣಾಂಕ use_ಮಾರ್ಗ)
 {
     char_u	*buf;
     size_t	bufsize;
     size_t	buflen;
     char_u	*p, *e;
-    char_u	*p_end;
+    char_u	*p_ಕೊನೆ;
     size_t	elen;
-    int		retval;
+    ಪೂರ್ಣಾಂಕ		retval;
 
     // When "use_path" is false and if it's an absolute or relative path don't
     // need to use $PATH.
-    if (!use_path || gettail(name) != name)
+    ಆದರೆ (!use_ಮಾರ್ಗ || gettail(name) != name)
     {
 	// There must be a path separator, files in the current directory
 	// can't be executed.
-	if ((use_path || gettail(name) != name) && executable_file(name))
+	ಆದರೆ ((use_ಮಾರ್ಗ || gettail(name) != name) && executable_file(name))
 	{
-	    if (path != NULL)
+	    ಆದರೆ (ಮಾರ್ಗ != ಖಾಲಿ)
 	    {
-		if (name[0] != '/')
-		    *path = FullName_save(name, TRUE);
-		else
-		    *path = vim_strsave(name);
+		ಆದರೆ (name[0] != '/')
+		    *ಮಾರ್ಗ = ತುಂಬಿದ_Name_save(name, TRUE);
+		ಇಲ್ಲದಿದ್ದರೆ
+		    *ಮಾರ್ಗ = vim_strsave(name);
 	    }
-	    return TRUE;
+	    ಹಿಂತಿರುಗಿ TRUE;
 	}
-	return FALSE;
+	ಹಿಂತಿರುಗಿ FALSE;
     }
 
     p = (char_u *)getenv("PATH");
-    if (p == NULL || *p == NUL)
-	return -1;
-    p_end = p + STRLEN(p);
-    bufsize = STRLEN(name) + (size_t)(p_end - p) + 2;
+    ಆದರೆ (p == ಖಾಲಿ || *p == NUL)
+	ಹಿಂತಿರುಗಿ -1;
+    p_ಕೊನೆ = p + STRLEN(p);
+    bufsize = STRLEN(name) + (size_t)(p_ಕೊನೆ - p) + 2;
     buf = alloc(bufsize);
-    if (buf == NULL)
-	return -1;
+    ಆದರೆ (buf == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ -1;
 
     /*
      * Walk through all entries in $PATH to check if "name" exists there and
      * is an executable file.
      */
-    for (;;)
+    ಗಾಗಿ (;;)
     {
-	e = (char_u *)strchr((char *)p, ':');
-	if (e == NULL)
-	    e = p_end;
+	e = (char_u *)strchr((ಅಕ್ಷರ *)p, ':');
+	ಆದರೆ (e == ಖಾಲಿ)
+	    e = p_ಕೊನೆ;
 	elen = (size_t)(e - p);
-	if (elen <= 1)		// empty entry means current dir
+	ಆದರೆ (elen <= 1)		// empty entry means current dir
 	{
 	    p = (char_u *)"./";
 	    elen = STRLEN_LITERAL("./");
 	}
-	buflen = vim_snprintf((char *)buf, bufsize, "%.*s%s%s",
-		(int)elen,
+	buflen = vim_snprintf((ಅಕ್ಷರ *)buf, bufsize, "%.*s%s%s",
+		(ಪೂರ್ಣಾಂಕ)elen,
 		p,
 		(after_pathsep(p, p + elen)) ? "" : PATHSEPSTR,
 		name);
 	retval = executable_file(buf);
-	if (retval == 1)
+	ಆದರೆ (retval == 1)
 	{
-	    if (path != NULL)
+	    ಆದರೆ (ಮಾರ್ಗ != ಖಾಲಿ)
 	    {
-		if (buf[0] != '/')
-		    *path = FullName_save(buf, TRUE);
-		else
-		    *path = vim_strnsave(buf, buflen);
+		ಆದರೆ (buf[0] != '/')
+		    *ಮಾರ್ಗ = ತುಂಬಿದ_Name_save(buf, TRUE);
+		ಇಲ್ಲದಿದ್ದರೆ
+		    *ಮಾರ್ಗ = vim_strnsave(buf, buflen);
 	    }
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
 
-	if (*e != ':')
-	    break;
+	ಆದರೆ (*e != ':')
+	    ನಿಲ್ಲಿಸು;
 	p = e + 1;
     }
 
     vim_free(buf);
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
 /*
@@ -3515,34 +3515,34 @@ mch_can_exe(char_u *name, char_u **path, int use_path)
  * NODE_WRITABLE: writable device, socket, fifo, etc.
  * NODE_OTHER: non-writable things
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_nodetype(char_u *name)
 {
-    struct stat	st;
+    ರಚನೆ stat	st;
 
-    if (stat((char *)name, &st))
-	return NODE_NORMAL;
-    if (S_ISREG(st.st_mode) || S_ISDIR(st.st_mode))
-	return NODE_NORMAL;
-    if (S_ISBLK(st.st_mode))	// block device isn't writable
-	return NODE_OTHER;
+    ಆದರೆ (stat((ಅಕ್ಷರ *)name, &st))
+	ಹಿಂತಿರುಗಿ ಗಂಟು_ಸಾಮಾನ್ಯ;
+    ಆದರೆ (S_ISREG(st.st_ಬಹುಲಕ) || S_ISDIR(st.st_ಬಹುಲಕ))
+	ಹಿಂತಿರುಗಿ ಗಂಟು_ಸಾಮಾನ್ಯ;
+    ಆದರೆ (S_ISBLK(st.st_ಬಹುಲಕ))	// block device isn't writable
+	ಹಿಂತಿರುಗಿ ಗಂಟು_OTHER;
     // Everything else is writable?
-    return NODE_WRITABLE;
+    ಹಿಂತಿರುಗಿ ಗಂಟು_WRITABLE;
 }
 
-    void
-mch_early_init(void)
+    ಶೂನ್ಯ
+mch_early_init(ಶೂನ್ಯ)
 {
-#ifdef HAVE_CHECK_STACK_GROWTH
-    int			i;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_CHECK_ರಾಶಿ_GROWTH
+    ಪೂರ್ಣಾಂಕ			i;
 
-    check_stack_growth((char *)&i);
+    check_ರಾಶಿ_growth((ಅಕ್ಷರ *)&i);
 
-# ifdef HAVE_STACK_LIMIT
-    get_stack_limit();
+# ifdef HAVE_ರಾಶಿ_ಎಲ್ಲೆ
+    get_ರಾಶಿ_ಎಲ್ಲೆ();
 # endif
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     /*
      * Setup an alternative stack for signals.  Helps to catch signals when
@@ -3550,125 +3550,125 @@ mch_early_init(void)
      * Use of sigaltstack() is preferred, it's more portable.
      * Ignore any errors.
      */
-#if defined(HAVE_SIGALTSTACK) || defined(HAVE_SIGSTACK)
-    signal_stack = alloc(get_signal_stack_size());
-    init_signal_stack();
-#endif
+#ಆದರೆ defined(HAVE_SIGALTSTACK) || defined(HAVE_SIGSTACK)
+    signal_ರಾಶಿ = alloc(get_signal_ರಾಶಿ_ಗಾತ್ರ());
+    init_signal_ರಾಶಿ();
+#ಆದರೆ_ಅಂತ್ಯ
 
     /*
      * Inform the macOS scheduler that Vim renders UI, and so shouldn’t have its
      * threads’ quality of service classes clamped.
      */
-#ifdef MACOS_X
-# ifdef MAC_OS_X_VERSION_10_7
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MACOS_X
+# ifdef MAC_OS_X_ಆವೃತ್ತಿ_10_7
     integer_t policy = TASK_DEFAULT_APPLICATION;
-    task_policy_set(mach_task_self(), TASK_CATEGORY_POLICY, &policy, 1);
+    task_policy_ಗಣ(mach_task_self(), TASK_CATEGORY_POLICY, &policy, 1);
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#if defined(EXITFREE)
-    void
-mch_free_mem(void)
+#ಆದರೆ defined(EXITFREE)
+    ಶೂನ್ಯ
+mch_free_mem(ಶೂನ್ಯ)
 {
-# if defined(FEAT_CLIPBOARD) && defined(FEAT_X11)
-    if (clip_star.owned)
-	clip_lose_selection(&clip_star);
-    if (clip_plus.owned)
+# ಆದರೆ defined(FEAT_CLIPBOARD) && defined(FEAT_X11)
+    ಆದರೆ (clip_ನಕ್ಷತ್ರ.owned)
+	clip_lose_selection(&clip_ನಕ್ಷತ್ರ);
+    ಆದರೆ (clip_plus.owned)
 	clip_lose_selection(&clip_plus);
 # endif
-# if defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
-    if (xterm_Shell != (Widget)0)
+# ಆದರೆ defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
+    ಆದರೆ (xterm_Shell != (Widget)0)
 	XtDestroyWidget(xterm_Shell);
-#  ifndef LESSTIF_VERSION
+#  ifndef LESSTIF_ಆವೃತ್ತಿ
     // Lesstif crashes here, lose some memory
-    if (xterm_dpy != NULL)
+    ಆದರೆ (xterm_dpy != ಖಾಲಿ)
 	XtCloseDisplay(xterm_dpy);
-    if (app_context != (XtAppContext)NULL)
+    ಆದರೆ (app_context != (XtAppContext)ಖಾಲಿ)
     {
 	XtDestroyApplicationContext(app_context);
 #   ifdef FEAT_X11
-	x11_display = NULL; // freed by XtDestroyApplicationContext()
+	x11_display = ಖಾಲಿ; // freed by XtDestroyApplicationContext()
 #   endif
     }
 #  endif
 # endif
-# if defined(FEAT_X11)
-    if (x11_display != NULL
+# ಆದರೆ defined(FEAT_X11)
+    ಆದರೆ (x11_display != ಖಾಲಿ
 #  ifdef FEAT_XCLIPBOARD
 	    && x11_display != xterm_dpy
 #  endif
 	    )
 	XCloseDisplay(x11_display);
 # endif
-# if defined(HAVE_SIGALTSTACK) || defined(HAVE_SIGSTACK)
-    VIM_CLEAR(signal_stack);
+# ಆದರೆ defined(HAVE_SIGALTSTACK) || defined(HAVE_SIGSTACK)
+    VIM_CLEAR(signal_ರಾಶಿ);
 # endif
     vim_free(oldtitle);
     vim_free(oldicon);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Output a newline when exiting.
  * Make sure the newline goes to the same stream as the text.
  */
-    static void
-exit_scroll(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+exit_scroll(ಶೂನ್ಯ)
 {
-    if (silent_mode)
-	return;
-    if (newline_on_exit || msg_didout)
+    ಆದರೆ (silent_ಬಹುಲಕ)
+	ಹಿಂತಿರುಗಿ;
+    ಆದರೆ (newline_on_exit || ಸಂದೇಶ_didout)
     {
-	if (msg_use_printf())
+	ಆದರೆ (ಸಂದೇಶ_use_printf())
 	{
-	    if (info_message)
-		mch_msg("\n");
-	    else
+	    ಆದರೆ (info_ಸಂದೇಶ)
+		mch_ಸಂದೇಶ("\n");
+	    ಇಲ್ಲದಿದ್ದರೆ
 		mch_errmsg("\r\n");
 	}
-	else
-	    out_char('\n');
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಹೊರಹೋಗು_char('\n');
     }
-    else if (!is_not_a_term())
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!is_not_a_ಪದ())
     {
 	restore_cterm_colors();		// get original colors back
-	msg_clr_eos_force();		// clear the rest of the display
-	windgoto((int)Rows - 1, cmdline_col_off); // may have moved the cursor
+	ಸಂದೇಶ_clr_eos_force();		// clear the rest of the display
+	windgoto((ಪೂರ್ಣಾಂಕ)ಅಡ್ಡಸಾಲುಗಳು - 1, cmdline_ಲಂಬಸಾಲು_off); // may have moved the cursor
     }
 }
 
-#ifdef USE_GCOV_FLUSH
-# if (defined(__GNUC__) \
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_GCOV_FLUSH
+# ಆದರೆ (defined(__GNUC__) \
 	    && ((__GNUC__ == 11 && __GNUC_MINOR__ >= 1) || (__GNUC__ >= 12))) \
 	|| (defined(__clang__) && (__clang_major__ >= 12))
-extern void __gcov_dump(void);
-extern void __gcov_reset(void);
-#  define __gcov_flush() do { __gcov_dump(); __gcov_reset(); } while (0)
-# else
-extern void __gcov_flush(void);
+ಬಾಹ್ಯ ಶೂನ್ಯ __gcov_dump(ಶೂನ್ಯ);
+ಬಾಹ್ಯ ಶೂನ್ಯ __gcov_reset(ಶೂನ್ಯ);
+#  define __gcov_flush() ಮಾಡು { __gcov_dump(); __gcov_reset(); } ಆಗ (0)
+# ಇಲ್ಲದಿದ್ದರೆ
+ಬಾಹ್ಯ ಶೂನ್ಯ __gcov_flush(ಶೂನ್ಯ);
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    void
-mch_exit(int r)
+    ಶೂನ್ಯ
+mch_exit(ಪೂರ್ಣಾಂಕ r)
 {
     exiting = TRUE;
 
-#if defined(FEAT_X11) && defined(FEAT_CLIPBOARD)
+#ಆದರೆ defined(FEAT_X11) && defined(FEAT_CLIPBOARD)
     x11_export_final_selection();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_GUI
-    if (!gui.in_use)
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+    ಆದರೆ (!gui.ಒಳ_use)
+#ಆದರೆ_ಅಂತ್ಯ
     {
 	settmode(TMODE_COOK);
-	if (!is_not_a_term())
+	ಆದರೆ (!is_not_a_ಪದ())
 	{
 	    // restore xterm title and icon name
 	    mch_restore_title(SAVE_RESTORE_BOTH);
-	    term_pop_title(SAVE_RESTORE_BOTH);
+	    ಪದ_ತೆಗೆ_title(SAVE_RESTORE_BOTH);
 	}
 
 	/*
@@ -3677,7 +3677,7 @@ mch_exit(int r)
 	 * t_ti does swap pages it should not go to the shell page.  Do this
 	 * before stoptermcap().
 	 */
-	if (swapping_screen() && !newline_on_exit)
+	ಆದರೆ (swapping_screen() && !newline_on_exit)
 	    exit_scroll();
 
 	// Stop termcap: May need to check for T_CRV response, which
@@ -3688,143 +3688,143 @@ mch_exit(int r)
 	 * A newline is only required after a message in the alternate screen.
 	 * This is set to TRUE by wait_return().
 	 */
-	if (!swapping_screen() || newline_on_exit)
+	ಆದರೆ (!swapping_screen() || newline_on_exit)
 	    exit_scroll();
 
 	// Cursor may have been switched off without calling starttermcap()
 	// when doing "vim -u vimrc" and vimrc contains ":q".
-	if (full_screen)
+	ಆದರೆ (ತುಂಬಿದ_screen)
 	    cursor_on();
     }
-    out_flush();
+    ಹೊರಹೋಗು_flush();
     ml_close_all(TRUE);		// remove all memfiles
 
-#ifdef USE_GCOV_FLUSH
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_GCOV_FLUSH
     // Flush coverage info before possibly being killed by a deadly signal.
     __gcov_flush();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     may_core_dump();
-#ifdef FEAT_GUI
-    if (gui.in_use)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+    ಆದರೆ (gui.ಒಳ_use)
 	gui_exit(r);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef MACOS_CONVERT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MACOS_CONVERT
     mac_conv_cleanup();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef __QNX__
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ __QNX__
     // A core dump won't be created if the signal handler
     // doesn't return, so we can't call exit()
-    if (deadly_signal != 0)
-	return;
-#endif
+    ಆದರೆ (deadly_signal != 0)
+	ಹಿಂತಿರುಗಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_NETBEANS_INTG
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_NETBEANS_INTG
     netbeans_send_disconnect();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef EXITFREE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ EXITFREE
     free_all_mem();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    exit(r);
+    ನಿರ್ಗಮಿಸು(r);
 }
 
-    static void
-may_core_dump(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+may_core_dump(ಶೂನ್ಯ)
 {
-    if (deadly_signal != 0)
+    ಆದರೆ (deadly_signal != 0)
     {
 	mch_signal(deadly_signal, SIG_DFL);
 	kill(getpid(), deadly_signal);	// Die using the signal we caught
     }
 }
 
-#ifndef VMS
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ VMS
 
 /*
  * Get the file descriptor to use for tty operations.
  */
-    static int
-get_tty_fd(int fd)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+get_tty_fd(ಪೂರ್ಣಾಂಕ fd)
 {
-    int		tty_fd = fd;
+    ಪೂರ್ಣಾಂಕ		tty_fd = fd;
 
-# if defined(HAVE_SVR4_PTYS) && defined(SUN_SYSTEM)
+# ಆದರೆ defined(HAVE_SVR4_PTYS) && defined(SUN_SYSTEM)
     // On SunOS: Get the terminal parameters from "fd", or the slave device of
     // "fd" when it is a master device.
-    if (mch_isatty(fd) > 1)
+    ಆದರೆ (mch_isatty(fd) > 1)
     {
-	char *name;
+	ಅಕ್ಷರ *name;
 
 	name = ptsname(fd);
-	if (name == NULL)
-	    return -1;
+	ಆದರೆ (name == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ -1;
 
 	tty_fd = open(name, O_RDONLY | O_NOCTTY | O_EXTRA, 0);
-	if (tty_fd < 0)
-	    return -1;
+	ಆದರೆ (tty_fd < 0)
+	    ಹಿಂತಿರುಗಿ -1;
     }
 # endif
-    return tty_fd;
+    ಹಿಂತಿರುಗಿ tty_fd;
 }
 
-    static int
-mch_tcgetattr(int fd, void *term)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+mch_tcgetattr(ಪೂರ್ಣಾಂಕ fd, ಶೂನ್ಯ *ಪದ)
 {
-    int		tty_fd;
-    int		retval = -1;
+    ಪೂರ್ಣಾಂಕ		tty_fd;
+    ಪೂರ್ಣಾಂಕ		retval = -1;
 
     tty_fd = get_tty_fd(fd);
-    if (tty_fd < 0)
-	return -1;
+    ಆದರೆ (tty_fd < 0)
+	ಹಿಂತಿರುಗಿ -1;
 
 # ifdef NEW_TTY_SYSTEM
 #  ifdef HAVE_TERMIOS_H
-    retval = tcgetattr(tty_fd, (struct termios *)term);
-#  else
-    retval = ioctl(tty_fd, TCGETA, (struct termio *)term);
+    retval = tcgetattr(tty_fd, (ರಚನೆ termios *)ಪದ);
+#  ಇಲ್ಲದಿದ್ದರೆ
+    retval = ioctl(tty_fd, TCGETA, (ರಚನೆ termio *)ಪದ);
 #  endif
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
     // for "old" tty systems
-    retval = ioctl(tty_fd, TIOCGETP, (struct sgttyb *)term);
+    retval = ioctl(tty_fd, TIOCGETP, (ರಚನೆ sgttyb *)ಪದ);
 # endif
-    if (tty_fd != fd)
+    ಆದರೆ (tty_fd != fd)
 	close(tty_fd);
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
-    void
+    ಶೂನ್ಯ
 mch_settmode(tmode_T tmode)
 {
-    static int first = TRUE;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಮೊದಲ = TRUE;
 
 # ifdef NEW_TTY_SYSTEM
 #  ifdef HAVE_TERMIOS_H
-    static struct termios told;
-	   struct termios tnew;
-#  else
-    static struct termio told;
-	   struct termio tnew;
+    ಸ್ಥಿರ ರಚನೆ termios told;
+	   ರಚನೆ termios tnew;
+#  ಇಲ್ಲದಿದ್ದರೆ
+    ಸ್ಥಿರ ರಚನೆ termio told;
+	   ರಚನೆ termio tnew;
 #  endif
 
-    if (first)
+    ಆದರೆ (ಮೊದಲ)
     {
-	first = FALSE;
+	ಮೊದಲ = FALSE;
 	mch_tcgetattr(read_cmd_fd, &told);
     }
 
     tnew = told;
-    if (tmode == TMODE_RAW)
+    ಆದರೆ (tmode == TMODE_RAW)
     {
 	// ~ICRNL enables typing ^V^M
 	// ~IXON disables CTRL-S stopping output, so that it can be mapped.
 	tnew.c_iflag &= ~(ICRNL |
-		(T_XON == NULL || *T_XON == NUL ? IXON : 0));
+		(T_XON == ಖಾಲಿ || *T_XON == NUL ? IXON : 0));
 	tnew.c_lflag &= ~(ICANON | ECHO | ISIG | ECHOE
-#  if defined(IEXTEN)
+#  ಆದರೆ defined(IEXTEN)
 		    | IEXTEN	    // IEXTEN enables typing ^V on SOLARIS
 #  endif
 				);
@@ -3833,10 +3833,10 @@ mch_settmode(tmode_T tmode)
 	// Also disable expanding tabs if possible.
 #   ifdef XTABS
 	tnew.c_oflag &= ~(ONLCR | XTABS);
-#   else
+#   ಇಲ್ಲದಿದ್ದರೆ
 #    ifdef TAB3
 	tnew.c_oflag &= ~(ONLCR | TAB3);
-#    else
+#    ಇಲ್ಲದಿದ್ದರೆ
 	tnew.c_oflag &= ~ONLCR;
 #    endif
 #   endif
@@ -3844,7 +3844,7 @@ mch_settmode(tmode_T tmode)
 	tnew.c_cc[VMIN] = 1;		// return after 1 char
 	tnew.c_cc[VTIME] = 0;		// don't wait
     }
-    else if (tmode == TMODE_SLEEP)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (tmode == TMODE_SLEEP)
     {
 	// Also reset ICANON here, otherwise on Solaris select() won't see
 	// typeahead characters.
@@ -3853,43 +3853,43 @@ mch_settmode(tmode_T tmode)
 	tnew.c_cc[VTIME] = 0;		// don't wait
     }
 
-#  if defined(HAVE_TERMIOS_H)
+#  ಆದರೆ defined(HAVE_TERMIOS_H)
     {
-	int	n = 10;
+	ಪೂರ್ಣಾಂಕ	n = 10;
 
 	// A signal may cause tcsetattr() to fail (e.g., SIGCONT).  Retry a
 	// few times.
-	while (tcsetattr(read_cmd_fd, TCSANOW, &tnew) == -1
+	ಆಗ (tcsetattr(read_cmd_fd, TCSANOW, &tnew) == -1
 						   && errno == EINTR && n > 0)
 	    --n;
     }
-#  else
+#  ಇಲ್ಲದಿದ್ದರೆ
     ioctl(read_cmd_fd, TCSETA, &tnew);
 #  endif
 
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
     /*
      * for "old" tty systems
      */
 #  ifndef TIOCSETN
 #   define TIOCSETN TIOCSETP	// for hpux 9.0
 #  endif
-    static struct sgttyb ttybold;
-	   struct sgttyb ttybnew;
+    ಸ್ಥಿರ ರಚನೆ sgttyb ttybold;
+	   ರಚನೆ sgttyb ttybnew;
 
-    if (first)
+    ಆದರೆ (ಮೊದಲ)
     {
-	first = FALSE;
+	ಮೊದಲ = FALSE;
 	mch_tcgetattr(read_cmd_fd, &ttybold);
     }
 
     ttybnew = ttybold;
-    if (tmode == TMODE_RAW)
+    ಆದರೆ (tmode == TMODE_RAW)
     {
 	ttybnew.sg_flags &= ~(CRMOD | ECHO);
 	ttybnew.sg_flags |= RAW;
     }
-    else if (tmode == TMODE_SLEEP)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (tmode == TMODE_SLEEP)
 	ttybnew.sg_flags &= ~(ECHO);
     ioctl(read_cmd_fd, TIOCSETN, &ttybnew);
 # endif
@@ -3905,196 +3905,196 @@ mch_settmode(tmode_T tmode)
  * be), they're going to get really annoyed if their erase key starts
  * doing forward deletes for no reason. (Eric Fischer)
  */
-    void
-get_stty(void)
+    ಶೂನ್ಯ
+get_stty(ಶೂನ್ಯ)
 {
     ttyinfo_T	info;
     char_u	buf[2];
     char_u	*p;
 
-    if (get_tty_info(read_cmd_fd, &info) != OK)
-	return;
+    ಆದರೆ (get_tty_info(read_cmd_fd, &info) != OK)
+	ಹಿಂತಿರುಗಿ;
 
-    intr_char = info.interrupt;
+    intr_char = info.ಅಡಚಣೆ;
     buf[0] = info.backspace;
     buf[1] = NUL;
-    add_termcode((char_u *)"kb", buf, FALSE);
+    ಕೂಡಿಸು_termcode((char_u *)"kb", buf, FALSE);
 
     // If <BS> and <DEL> are now the same, redefine <DEL>.
-    p = find_termcode((char_u *)"kD");
-    if (p != NULL && p[0] == buf[0] && p[1] == buf[1])
-	do_fixdel(NULL);
+    p = ಕಂಡುಹಿಡಿ_termcode((char_u *)"kD");
+    ಆದರೆ (p != ಖಾಲಿ && p[0] == buf[0] && p[1] == buf[1])
+	do_fixdel(ಖಾಲಿ);
 }
 
 /*
  * Obtain the characters that Backspace and Enter produce on "fd".
  * Returns OK or FAIL.
  */
-    int
-get_tty_info(int fd, ttyinfo_T *info)
+    ಪೂರ್ಣಾಂಕ
+get_tty_info(ಪೂರ್ಣಾಂಕ fd, ttyinfo_T *info)
 {
 # ifdef NEW_TTY_SYSTEM
 #  ifdef HAVE_TERMIOS_H
-    struct termios keys;
-#  else
-    struct termio keys;
+    ರಚನೆ termios ಕೀಲಿಗಳು;
+#  ಇಲ್ಲದಿದ್ದರೆ
+    ರಚನೆ termio ಕೀಲಿಗಳು;
 #  endif
 
-    if (mch_tcgetattr(fd, &keys) != -1)
+    ಆದರೆ (mch_tcgetattr(fd, &ಕೀಲಿಗಳು) != -1)
     {
-	info->backspace = keys.c_cc[VERASE];
-	info->interrupt = keys.c_cc[VINTR];
-	if (keys.c_iflag & ICRNL)
+	info->backspace = ಕೀಲಿಗಳು.c_cc[VERASE];
+	info->ಅಡಚಣೆ = ಕೀಲಿಗಳು.c_cc[VINTR];
+	ಆದರೆ (ಕೀಲಿಗಳು.c_iflag & ICRNL)
 	    info->enter = NL;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    info->enter = CAR;
-	if (keys.c_oflag & ONLCR)
+	ಆದರೆ (ಕೀಲಿಗಳು.c_oflag & ONLCR)
 	    info->nl_does_cr = TRUE;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    info->nl_does_cr = FALSE;
-	return OK;
+	ಹಿಂತಿರುಗಿ OK;
     }
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
     // for "old" tty systems
-    struct sgttyb keys;
+    ರಚನೆ sgttyb ಕೀಲಿಗಳು;
 
-    if (mch_tcgetattr(fd, &keys) != -1)
+    ಆದರೆ (mch_tcgetattr(fd, &ಕೀಲಿಗಳು) != -1)
     {
-	info->backspace = keys.sg_erase;
-	info->interrupt = keys.sg_kill;
+	info->backspace = ಕೀಲಿಗಳು.sg_erase;
+	info->ಅಡಚಣೆ = ಕೀಲಿಗಳು.sg_kill;
 	info->enter = CAR;
 	info->nl_does_cr = TRUE;
-	return OK;
+	ಹಿಂತಿರುಗಿ OK;
     }
 # endif
-    return FAIL;
+    ಹಿಂತಿರುಗಿ FAIL;
 }
 
-#endif // VMS
+#ಆದರೆ_ಅಂತ್ಯ // VMS
 
-static int	mouse_ison = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	mouse_ison = FALSE;
 
 /*
  * Set mouse clicks on or off and possible enable mouse movement events.
  */
-    void
-mch_setmouse(int on)
+    ಶೂನ್ಯ
+mch_setmouse(ಪೂರ್ಣಾಂಕ on)
 {
-#ifdef FEAT_BEVAL_TERM
-    static int	bevalterm_ison = FALSE;
-#endif
-    int		xterm_mouse_vers;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_BEVAL_ಪದ
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	bevalterm_ison = FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಪೂರ್ಣಾಂಕ		xterm_mouse_vers;
 
-#if defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
-    if (!on)
+#ಆದರೆ defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
+    ಆದರೆ (!on)
 	// Make sure not tracing mouse movements.  Important when a button-down
 	// was received but no release yet.
 	stop_xterm_trace();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (on == mouse_ison
-#ifdef FEAT_BEVAL_TERM
+    ಆದರೆ (on == mouse_ison
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_BEVAL_ಪದ
 	    && p_bevalterm == bevalterm_ison
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    )
 	// return quickly if nothing to do
-	return;
+	ಹಿಂತಿರುಗಿ;
 
     xterm_mouse_vers = use_xterm_mouse();
 
-#ifdef FEAT_MOUSE_URXVT
-    if (ttym_flags == TTYM_URXVT)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MOUSE_URXVT
+    ಆದರೆ (ttym_flags == TTYM_URXVT)
     {
-	out_str_nf((char_u *)(on ? "\033[?1015h" : "\033[?1015l"));
+	ಹೊರಹೋಗು_str_nf((char_u *)(on ? "\033[?1015h" : "\033[?1015l"));
 	mouse_ison = on;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (T_CXM != NULL && *T_CXM != NUL)
+    ಆದರೆ (T_CXM != ಖಾಲಿ && *T_CXM != NUL)
     {
-	term_enable_mouse(on);
+	ಪದ_enable_mouse(on);
     }
-    else if (ttym_flags == TTYM_SGR)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ttym_flags == TTYM_SGR)
     {
 	// SGR mode supports columns above 223
-	out_str_nf((char_u *)(on ? "\033[?1006h" : "\033[?1006l"));
+	ಹೊರಹೋಗು_str_nf((char_u *)(on ? "\033[?1006h" : "\033[?1006l"));
 	mouse_ison = on;
     }
 
-#ifdef FEAT_BEVAL_TERM
-    if (bevalterm_ison != (p_bevalterm && on))
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_BEVAL_ಪದ
+    ಆದರೆ (bevalterm_ison != (p_bevalterm && on))
     {
 	bevalterm_ison = (p_bevalterm && on);
-	if (xterm_mouse_vers > 1 && !bevalterm_ison)
+	ಆದರೆ (xterm_mouse_vers > 1 && !bevalterm_ison)
 	    // disable mouse movement events, enabling is below
-	    out_str_nf((char_u *)("\033[?1003l"));
+	    ಹೊರಹೋಗು_str_nf((char_u *)("\033[?1003l"));
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (xterm_mouse_vers > 0)
+    ಆದರೆ (xterm_mouse_vers > 0)
     {
-	if (on)	// enable mouse events, use mouse tracking if available
-	    out_str_nf((char_u *)
+	ಆದರೆ (on)	// enable mouse events, use mouse tracking if available
+	    ಹೊರಹೋಗು_str_nf((char_u *)
 		       (xterm_mouse_vers > 1
 			? (
-#ifdef FEAT_BEVAL_TERM
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_BEVAL_ಪದ
 			    bevalterm_ison ? "\033[?1003h" :
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 			      "\033[?1002h")
 			: "\033[?1000h"));
-	else	// disable mouse events, could probably always send the same
-	    out_str_nf((char_u *)
+	ಇಲ್ಲದಿದ್ದರೆ	// disable mouse events, could probably always send the same
+	    ಹೊರಹೋಗು_str_nf((char_u *)
 		       (xterm_mouse_vers > 1 ? "\033[?1002l" : "\033[?1000l"));
 	mouse_ison = on;
     }
 
-#ifdef FEAT_MOUSE_DEC
-    else if (ttym_flags == TTYM_DEC)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MOUSE_DEC
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ttym_flags == TTYM_DEC)
     {
-	if (on)	// enable mouse events
-	    out_str_nf((char_u *)"\033[1;2'z\033[1;3'{");
-	else	// disable mouse events
-	    out_str_nf((char_u *)"\033['z");
+	ಆದರೆ (on)	// enable mouse events
+	    ಹೊರಹೋಗು_str_nf((char_u *)"\033[1;2'z\033[1;3'{");
+	ಇಲ್ಲದಿದ್ದರೆ	// disable mouse events
+	    ಹೊರಹೋಗು_str_nf((char_u *)"\033['z");
 	mouse_ison = on;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_MOUSE_GPM
-    else
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MOUSE_GPM
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (on)
+	ಆದರೆ (on)
 	{
-	    if (gpm_open())
+	    ಆದರೆ (gpm_open())
 		mouse_ison = TRUE;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    gpm_close();
 	    mouse_ison = FALSE;
 	}
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_SYSMOUSE
-    else
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYSMOUSE
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (on)
+	ಆದರೆ (on)
 	{
-	    if (sysmouse_open() == OK)
+	    ಆದರೆ (sysmouse_open() == OK)
 		mouse_ison = TRUE;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    sysmouse_close();
 	    mouse_ison = FALSE;
 	}
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_MOUSE_JSB
-    else
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MOUSE_JSB
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (on)
+	ಆದರೆ (on)
 	{
 	    // D - Enable Mouse up/down messages
 	    // L - Enable Left Button Reporting
@@ -4112,62 +4112,62 @@ mch_setmouse(int on)
 	    //	  5 = Windows UP Arrow
 # ifdef JSBTERM_MOUSE_NONADVANCED
 	    // Disables full feedback of pointer movements
-	    out_str_nf((char_u *)"\033[0~ZwLMRK1Q\033\\");
-# else
-	    out_str_nf((char_u *)"\033[0~ZwLMRK+1Q\033\\");
+	    ಹೊರಹೋಗು_str_nf((char_u *)"\033[0~ZwLMRK1Q\033\\");
+# ಇಲ್ಲದಿದ್ದರೆ
+	    ಹೊರಹೋಗು_str_nf((char_u *)"\033[0~ZwLMRK+1Q\033\\");
 # endif
 	    mouse_ison = TRUE;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    out_str_nf((char_u *)"\033[0~ZwQ\033\\");
+	    ಹೊರಹೋಗು_str_nf((char_u *)"\033[0~ZwQ\033\\");
 	    mouse_ison = FALSE;
 	}
     }
-#endif
-#ifdef FEAT_MOUSE_PTERM
-    else
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MOUSE_PTERM
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// 1 = button press, 6 = release, 7 = drag, 1h...9l = right button
-	if (on)
-	    out_str_nf("\033[>1h\033[>6h\033[>7h\033[>1h\033[>9l");
-	else
-	    out_str_nf("\033[>1l\033[>6l\033[>7l\033[>1l\033[>9h");
+	ಆದರೆ (on)
+	    ಹೊರಹೋಗು_str_nf("\033[>1h\033[>6h\033[>7h\033[>1h\033[>9l");
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಹೊರಹೋಗು_str_nf("\033[>1l\033[>6l\033[>7l\033[>1l\033[>9h");
 	mouse_ison = on;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#if defined(FEAT_BEVAL_TERM)
+#ಆದರೆ defined(FEAT_BEVAL_ಪದ)
 /*
  * Called when 'balloonevalterm' changed.
  */
-    void
-mch_bevalterm_changed(void)
+    ಶೂನ್ಯ
+mch_bevalterm_ಬದಲಾಯಿತು(ಶೂನ್ಯ)
 {
     mch_setmouse(mouse_ison);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Set the mouse termcode, depending on the 'term' and 'ttymouse' options.
  */
-    void
-check_mouse_termcode(void)
+    ಶೂನ್ಯ
+check_mouse_termcode(ಶೂನ್ಯ)
 {
-#ifdef FEAT_MOUSE_XTERM
-    if (use_xterm_mouse()
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MOUSE_XTERM
+    ಆದರೆ (use_xterm_mouse()
 # ifdef FEAT_MOUSE_URXVT
 	    && use_xterm_mouse() != 3
 # endif
 # ifdef FEAT_GUI
-	    && !gui.in_use
+	    && !gui.ಒಳ_use
 # endif
 	    )
     {
-	set_mouse_termcode(KS_MOUSE, (char_u *)(term_is_8bit(T_NAME)
+	ಗಣ_mouse_termcode(KS_MOUSE, (char_u *)(ಪದ_is_8bit(T_NAME)
 							? "\233M" : "\033[M"));
-	if (*p_mouse != NUL)
+	ಆದರೆ (*p_mouse != NUL)
 	{
 	    // force mouse off and maybe on to send possibly new mouse
 	    // activation sequence to the xterm, with(out) drag tracing.
@@ -4175,123 +4175,123 @@ check_mouse_termcode(void)
 	    setmouse();
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	del_mouse_termcode(KS_MOUSE);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_MOUSE_GPM
-    if (!use_xterm_mouse()
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MOUSE_GPM
+    ಆದರೆ (!use_xterm_mouse()
 # ifdef FEAT_GUI
-	    && !gui.in_use
+	    && !gui.ಒಳ_use
 # endif
 	    )
-	set_mouse_termcode(KS_GPM_MOUSE, (char_u *)"\033MG");
-    else
+	ಗಣ_mouse_termcode(KS_GPM_MOUSE, (char_u *)"\033MG");
+    ಇಲ್ಲದಿದ್ದರೆ
 	del_mouse_termcode(KS_GPM_MOUSE);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_SYSMOUSE
-    if (!use_xterm_mouse()
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYSMOUSE
+    ಆದರೆ (!use_xterm_mouse()
 # ifdef FEAT_GUI
-	    && !gui.in_use
+	    && !gui.ಒಳ_use
 # endif
 	    )
-	set_mouse_termcode(KS_MOUSE, (char_u *)"\033MS");
-#endif
+	ಗಣ_mouse_termcode(KS_MOUSE, (char_u *)"\033MS");
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_MOUSE_JSB
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MOUSE_JSB
     // Conflicts with xterm mouse: "\033[" and "\033[M" ???
-    if (!use_xterm_mouse()
+    ಆದರೆ (!use_xterm_mouse()
 # ifdef FEAT_GUI
-	    && !gui.in_use
+	    && !gui.ಒಳ_use
 # endif
 	    )
-	set_mouse_termcode(KS_JSBTERM_MOUSE, (char_u *)"\033[0~zw");
-    else
+	ಗಣ_mouse_termcode(KS_JSBTERM_MOUSE, (char_u *)"\033[0~zw");
+    ಇಲ್ಲದಿದ್ದರೆ
 	del_mouse_termcode(KS_JSBTERM_MOUSE);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_MOUSE_NET
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MOUSE_NET
     // There is no conflict, but one may type "ESC }" from Insert mode.  Don't
     // define it in the GUI or when using an xterm.
-    if (!use_xterm_mouse()
+    ಆದರೆ (!use_xterm_mouse()
 # ifdef FEAT_GUI
-	    && !gui.in_use
+	    && !gui.ಒಳ_use
 # endif
 	    )
-	set_mouse_termcode(KS_NETTERM_MOUSE, (char_u *)"\033}");
-    else
+	ಗಣ_mouse_termcode(KS_NETTERM_MOUSE, (char_u *)"\033}");
+    ಇಲ್ಲದಿದ್ದರೆ
 	del_mouse_termcode(KS_NETTERM_MOUSE);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_MOUSE_DEC
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MOUSE_DEC
     // Conflicts with xterm mouse: "\033[" and "\033[M"
-    if (!use_xterm_mouse()
+    ಆದರೆ (!use_xterm_mouse()
 # ifdef FEAT_GUI
-	    && !gui.in_use
+	    && !gui.ಒಳ_use
 # endif
 	    )
-	set_mouse_termcode(KS_DEC_MOUSE, (char_u *)(term_is_8bit(T_NAME)
+	ಗಣ_mouse_termcode(KS_DEC_MOUSE, (char_u *)(ಪದ_is_8bit(T_NAME)
 							  ? "\233" : "\033["));
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	del_mouse_termcode(KS_DEC_MOUSE);
-#endif
-#ifdef FEAT_MOUSE_PTERM
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MOUSE_PTERM
     // same conflict as the dec mouse
-    if (!use_xterm_mouse()
+    ಆದರೆ (!use_xterm_mouse()
 # ifdef FEAT_GUI
-	    && !gui.in_use
+	    && !gui.ಒಳ_use
 # endif
 	    )
-	set_mouse_termcode(KS_PTERM_MOUSE, (char_u *)"\033[");
-    else
+	ಗಣ_mouse_termcode(KS_PTERM_MOUSE, (char_u *)"\033[");
+    ಇಲ್ಲದಿದ್ದರೆ
 	del_mouse_termcode(KS_PTERM_MOUSE);
-#endif
-#ifdef FEAT_MOUSE_URXVT
-    if (use_xterm_mouse() == 3
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MOUSE_URXVT
+    ಆದರೆ (use_xterm_mouse() == 3
 # ifdef FEAT_GUI
-	    && !gui.in_use
+	    && !gui.ಒಳ_use
 # endif
 	    )
     {
-	set_mouse_termcode(KS_URXVT_MOUSE, (char_u *)(term_is_8bit(T_NAME)
+	ಗಣ_mouse_termcode(KS_URXVT_MOUSE, (char_u *)(ಪದ_is_8bit(T_NAME)
 						      ? "\233*M" : "\033[*M"));
 
-	if (*p_mouse != NUL)
+	ಆದರೆ (*p_mouse != NUL)
 	{
 	    mch_setmouse(FALSE);
 	    setmouse();
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	del_mouse_termcode(KS_URXVT_MOUSE);
-#endif
-    if (use_xterm_mouse() == 4
-#ifdef FEAT_GUI
-	    && !gui.in_use
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (use_xterm_mouse() == 4
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI
+	    && !gui.ಒಳ_use
+#ಆದರೆ_ಅಂತ್ಯ
 	    )
     {
-	set_mouse_termcode(KS_SGR_MOUSE, (char_u *)(term_is_8bit(T_NAME)
+	ಗಣ_mouse_termcode(KS_SGR_MOUSE, (char_u *)(ಪದ_is_8bit(T_NAME)
 						    ? "\233<*M" : "\033[<*M"));
 
-	set_mouse_termcode(KS_SGR_MOUSE_RELEASE, (char_u *)(term_is_8bit(T_NAME)
+	ಗಣ_mouse_termcode(KS_SGR_MOUSE_RELEASE, (char_u *)(ಪದ_is_8bit(T_NAME)
 						    ? "\233<*m" : "\033[<*m"));
 
-	if (*p_mouse != NUL)
+	ಆದರೆ (*p_mouse != NUL)
 	{
 	    mch_setmouse(FALSE);
 	    setmouse();
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	del_mouse_termcode(KS_SGR_MOUSE);
 	del_mouse_termcode(KS_SGR_MOUSE_RELEASE);
     }
 }
 
-#ifndef VMS
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ VMS
 
 /*
  * Try to get the current window size:
@@ -4301,11 +4301,11 @@ check_mouse_termcode(void)
  * 4. keep using the old values
  * Return OK when size could be determined, FAIL otherwise.
  */
-    int
-mch_get_shellsize(void)
+    ಪೂರ್ಣಾಂಕ
+mch_get_shellsize(ಶೂನ್ಯ)
 {
-    long	rows = 0;
-    long	columns = 0;
+    ದೀರ್ಘ	ಅಡ್ಡಸಾಲುಗಳು_2 = 0;
+    ದೀರ್ಘ	columns = 0;
     char_u	*p;
 
     /*
@@ -4316,36 +4316,36 @@ mch_get_shellsize(void)
      */
 # ifdef TIOCGWINSZ
     {
-	struct winsize	ws;
-	int fd = 1;
+	ರಚನೆ winsize	ws;
+	ಪೂರ್ಣಾಂಕ fd = 1;
 
 	// When stdout is not a tty, use stdin for the ioctl().
-	if (!isatty(fd) && isatty(read_cmd_fd))
+	ಆದರೆ (!isatty(fd) && isatty(read_cmd_fd))
 	    fd = read_cmd_fd;
-	if (ioctl(fd, TIOCGWINSZ, &ws) == 0)
+	ಆದರೆ (ioctl(fd, TIOCGWINSZ, &ws) == 0)
 	{
-	    columns = ws.ws_col;
-	    rows = ws.ws_row;
+	    columns = ws.ws_ಲಂಬಸಾಲು;
+	    ಅಡ್ಡಸಾಲುಗಳು_2 = ws.ws_ಅಡ್ಡಸಾಲು;
 #  ifdef FEAT_EVAL
-	    ch_log(NULL, "Got size with TIOCGWINSZ: %ld x %ld", columns, rows);
+	    ch_log(ಖಾಲಿ, "Got size with TIOCGWINSZ: %ld x %ld", columns, ಅಡ್ಡಸಾಲುಗಳು_2);
 #  endif
 	}
     }
-# else // TIOCGWINSZ
+# ಇಲ್ಲದಿದ್ದರೆ // TIOCGWINSZ
 #  ifdef TIOCGSIZE
     {
-	struct ttysize	ts;
-	int fd = 1;
+	ರಚನೆ ttysize	ts;
+	ಪೂರ್ಣಾಂಕ fd = 1;
 
 	// When stdout is not a tty, use stdin for the ioctl().
-	if (!isatty(fd) && isatty(read_cmd_fd))
+	ಆದರೆ (!isatty(fd) && isatty(read_cmd_fd))
 	    fd = read_cmd_fd;
-	if (ioctl(fd, TIOCGSIZE, &ts) == 0)
+	ಆದರೆ (ioctl(fd, TIOCGSIZE, &ts) == 0)
 	{
-	    columns = ts.ts_cols;
-	    rows = ts.ts_lines;
+	    columns = ts.ts_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+	    ಅಡ್ಡಸಾಲುಗಳು_2 = ts.ts_ಸಾಲುಗಳು;
 #   ifdef FEAT_EVAL
-	    ch_log(NULL, "Got size with TIOCGSIZE: %ld x %ld", columns, rows);
+	    ch_log(ಖಾಲಿ, "Got size with TIOCGSIZE: %ld x %ld", columns, ಅಡ್ಡಸಾಲುಗಳು_2);
 #   endif
 	}
     }
@@ -4357,20 +4357,20 @@ mch_get_shellsize(void)
      *    When being POSIX compliant ('|' flag in 'cpoptions') this overrules
      *    the ioctl() values!
      */
-    if (columns == 0 || rows == 0 || vim_strchr(p_cpo, CPO_TSIZE) != NULL)
+    ಆದರೆ (columns == 0 || ಅಡ್ಡಸಾಲುಗಳು_2 == 0 || vim_strchr(p_cpo, CPO_TSIZE) != ಖಾಲಿ)
     {
-	if ((p = (char_u *)getenv("LINES")))
+	ಆದರೆ ((p = (char_u *)getenv("LINES")))
 	{
-	    rows = atoi((char *)p);
+	    ಅಡ್ಡಸಾಲುಗಳು_2 = atoi((ಅಕ್ಷರ *)p);
 # ifdef FEAT_EVAL
-	    ch_log(NULL, "Got 'lines' from $LINES: %ld", rows);
+	    ch_log(ಖಾಲಿ, "Got 'lines' from $LINES: %ld", ಅಡ್ಡಸಾಲುಗಳು_2);
 # endif
 	}
-	if ((p = (char_u *)getenv("COLUMNS")))
+	ಆದರೆ ((p = (char_u *)getenv("COLUMNS")))
 	{
-	    columns = atoi((char *)p);
+	    columns = atoi((ಅಕ್ಷರ *)p);
 # ifdef FEAT_EVAL
-	    ch_log(NULL, "Got 'columns' from $COLUMNS: %ld", columns);
+	    ch_log(ಖಾಲಿ, "Got 'columns' from $COLUMNS: %ld", columns);
 # endif
 	}
     }
@@ -4379,11 +4379,11 @@ mch_get_shellsize(void)
     /*
      * 3. try reading "co" and "li" entries from termcap
      */
-    if (columns == 0 || rows == 0)
+    ಆದರೆ (columns == 0 || ಅಡ್ಡಸಾಲುಗಳು_2 == 0)
     {
-	getlinecol(&columns, &rows);
+	getlinecol(&columns, &ಅಡ್ಡಸಾಲುಗಳು_2);
 #  ifdef FEAT_EVAL
-	ch_log(NULL, "Got size from termcap: %ld x %ld", columns, rows);
+	ch_log(ಖಾಲಿ, "Got size from termcap: %ld x %ld", columns, ಅಡ್ಡಸಾಲುಗಳು_2);
 #  endif
     }
 # endif
@@ -4391,80 +4391,80 @@ mch_get_shellsize(void)
     /*
      * 4. If everything fails, use the old values
      */
-    if (columns <= 0 || rows <= 0)
-	return FAIL;
+    ಆದರೆ (columns <= 0 || ಅಡ್ಡಸಾಲುಗಳು_2 <= 0)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    Rows = rows;
+    ಅಡ್ಡಸಾಲುಗಳು = ಅಡ್ಡಸಾಲುಗಳು_2;
     Columns = columns;
-    limit_screen_size();
-    return OK;
+    ಎಲ್ಲೆ_screen_ಗಾತ್ರ();
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-# if defined(FEAT_EVAL) || defined(FEAT_IMAGE)
+# ಆದರೆ defined(FEAT_EVAL) || defined(FEAT_IMAGE)
 /*
  * Try to get the current terminal cell size. May return -1 x -1.
  */
-    void
-mch_calc_cell_size(struct cellsize *cs_out)
+    ಶೂನ್ಯ
+mch_calc_cell_ಗಾತ್ರ(ರಚನೆ cellsize *cs_ಹೊರಹೋಗು)
 {
-   struct winsize   ws;
-   int		    retval;
-   int		    x_cell_size;
-   int		    y_cell_size;
+   ರಚನೆ winsize   ws;
+   ಪೂರ್ಣಾಂಕ		    retval;
+   ಪೂರ್ಣಾಂಕ		    x_cell_ಗಾತ್ರ;
+   ಪೂರ್ಣಾಂಕ		    y_cell_ಗಾತ್ರ;
 
    // If fd is not a terminal, then -1 is returned
    retval = ioctl(read_cmd_fd, TIOCGWINSZ, &ws);
 
 #  ifdef FEAT_EVAL
-   ch_log(NULL, "ioctl(TIOCGWINSZ) %s", retval == 0 ? "success" : "failed");
+   ch_log(ಖಾಲಿ, "ioctl(TIOCGWINSZ) %s", retval == 0 ? "success" : "failed");
 #  endif
 
-   if (retval == -1 || ws.ws_col == 0 || ws.ws_row == 0)
+   ಆದರೆ (retval == -1 || ws.ws_ಲಂಬಸಾಲು == 0 || ws.ws_ಅಡ್ಡಸಾಲು == 0)
    {
-	cs_out->cs_xpixel = -1;
-	cs_out->cs_ypixel = -1;
-	return;
+	cs_ಹೊರಹೋಗು->cs_xpixel = -1;
+	cs_ಹೊರಹೋಗು->cs_ypixel = -1;
+	ಹಿಂತಿರುಗಿ;
    }
 
    // Calculate parent tty's pixel per cell.
-   x_cell_size = ws.ws_xpixel / ws.ws_col;
-   y_cell_size = ws.ws_ypixel / ws.ws_row;
+   x_cell_ಗಾತ್ರ = ws.ws_xpixel / ws.ws_ಲಂಬಸಾಲು;
+   y_cell_ಗಾತ್ರ = ws.ws_ypixel / ws.ws_ಅಡ್ಡಸಾಲು;
 
-   cs_out->cs_xpixel = x_cell_size > 0 ? x_cell_size : -1;
-   cs_out->cs_ypixel = y_cell_size > 0 ? y_cell_size : -1;
+   cs_ಹೊರಹೋಗು->cs_xpixel = x_cell_ಗಾತ್ರ > 0 ? x_cell_ಗಾತ್ರ : -1;
+   cs_ಹೊರಹೋಗು->cs_ypixel = y_cell_ಗಾತ್ರ > 0 ? y_cell_ಗಾತ್ರ : -1;
 
    // Some terminals do not handle TIOCGWINSZ, send CSI 14 t (query terminal
    // size in pixels), and CSI 16 t (less common, gets cell size in pixels
    // directly).
-   if (x_cell_size <= 0 || y_cell_size <= 0)
+   ಆದರೆ (x_cell_ಗಾತ್ರ <= 0 || y_cell_ಗಾತ್ರ <= 0)
    {
        // Default to 8x16 pixels for now until we receive a response.
-       OUT_STR("\033[14t");
-       OUT_STR("\033[16t");
-       out_flush();
+       ಹೊರಹೋಗು_STR("\033[14t");
+       ಹೊರಹೋಗು_STR("\033[16t");
+       ಹೊರಹೋಗು_flush();
    }
 }
 # endif
 
-# if defined(FEAT_TERMINAL)
+# ಆದರೆ defined(FEAT_TERMINAL)
 /*
  * Report the windows size "rows" and "cols" to tty "fd".
  */
-    int
-mch_report_winsize(int fd, int rows, int cols)
+    ಪೂರ್ಣಾಂಕ
+mch_report_winsize(ಪೂರ್ಣಾಂಕ fd, ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು_2, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ)
 {
-    int		tty_fd;
-    int		retval = -1;
+    ಪೂರ್ಣಾಂಕ		tty_fd;
+    ಪೂರ್ಣಾಂಕ		retval = -1;
 
     tty_fd = get_tty_fd(fd);
-    if (tty_fd < 0)
-	return FAIL;
+    ಆದರೆ (tty_fd < 0)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-#  if defined(TIOCSWINSZ)
-    struct winsize ws;
+#  ಆದರೆ defined(TIOCSWINSZ)
+    ರಚನೆ winsize ws;
 
-    ws.ws_col = cols;
-    ws.ws_row = rows;
+    ws.ws_ಲಂಬಸಾಲು = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+    ws.ws_ಅಡ್ಡಸಾಲು = ಅಡ್ಡಸಾಲುಗಳು_2;
     // Pixel sizes are best-effort; the child can query its own terminal
     // when needed.  Avoid calling mch_calc_cell_size() here -- on
     // terminals that do not report pixel sizes via TIOCGWINSZ, the
@@ -4477,47 +4477,47 @@ mch_report_winsize(int fd, int rows, int cols)
     ws.ws_ypixel = 0;
 
     retval = ioctl(tty_fd, TIOCSWINSZ, &ws);
-    ch_log(NULL, "ioctl(TIOCSWINSZ) %s", retval == 0 ? "success" : "failed");
+    ch_log(ಖಾಲಿ, "ioctl(TIOCSWINSZ) %s", retval == 0 ? "success" : "failed");
 #  elif defined(TIOCSSIZE)
-    struct ttysize ts;
+    ರಚನೆ ttysize ts;
 
-    ts.ts_cols = cols;
-    ts.ts_lines = rows;
+    ts.ts_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+    ts.ts_ಸಾಲುಗಳು = ಅಡ್ಡಸಾಲುಗಳು_2;
     retval = ioctl(tty_fd, TIOCSSIZE, &ts);
-    ch_log(NULL, "ioctl(TIOCSSIZE) %s", retval == 0 ? "success" : "failed");
+    ch_log(ಖಾಲಿ, "ioctl(TIOCSSIZE) %s", retval == 0 ? "success" : "failed");
 #  endif
-    if (tty_fd != fd)
+    ಆದರೆ (tty_fd != fd)
 	close(tty_fd);
-    return retval == 0 ? OK : FAIL;
+    ಹಿಂತಿರುಗಿ retval == 0 ? OK : FAIL;
 }
 # endif
 
 /*
  * Try to set the window size to Rows and Columns.
  */
-    void
-mch_set_shellsize(void)
+    ಶೂನ್ಯ
+mch_ಗಣ_shellsize(ಶೂನ್ಯ)
 {
-    if (*T_CWS)
+    ಆದರೆ (*T_CWS)
     {
 	/*
 	 * NOTE: if you get an error here that term_set_winsize() is
 	 * undefined, check the output of configure.  It could probably not
 	 * find a ncurses, termcap or termlib library.
 	 */
-	term_set_winsize((int)Rows, (int)Columns);
-	out_flush();
-	screen_start();			// don't know where cursor is now
+	ಪದ_ಗಣ_winsize((ಪೂರ್ಣಾಂಕ)ಅಡ್ಡಸಾಲುಗಳು, (ಪೂರ್ಣಾಂಕ)Columns);
+	ಹೊರಹೋಗು_flush();
+	screen_ಆರಂಭ();			// don't know where cursor is now
     }
 }
 
-#endif // VMS
+#ಆದರೆ_ಅಂತ್ಯ // VMS
 
 /*
  * Rows and/or Columns has changed.
  */
-    void
-mch_new_shellsize(void)
+    ಶೂನ್ಯ
+mch_new_shellsize(ಶೂನ್ಯ)
 {
     // Nothing to do.
 }
@@ -4526,297 +4526,297 @@ mch_new_shellsize(void)
  * Wait for process "child" to end.
  * Return "child" if it exited properly, <= 0 on error.
  */
-    static pid_t
-wait4pid(pid_t child, waitstatus *status)
+    ಸ್ಥಿರ pid_t
+wait4pid(pid_t ಮಗು, waitstatus *ಸ್ಥಿತಿ_2)
 {
     pid_t wait_pid = 0;
-    long delay_msec = 1;
+    ದೀರ್ಘ delay_msec = 1;
 
-    while (wait_pid != child)
+    ಆಗ (wait_pid != ಮಗು)
     {
 	// When compiled with Python threads are probably used, in which case
 	// wait() sometimes hangs for no obvious reason.  Use waitpid()
 	// instead and loop (like the GUI). Also needed for other interfaces,
 	// they might call system().
-	wait_pid = waitpid(child, status, WNOHANG);
-	if (wait_pid == 0)
+	wait_pid = waitpid(ಮಗು, ಸ್ಥಿತಿ_2, WNOHANG);
+	ಆದರೆ (wait_pid == 0)
 	{
 	    // Wait for 1 to 10 msec before trying again.
 	    mch_delay(delay_msec, MCH_DELAY_IGNOREINPUT | MCH_DELAY_SETTMODE);
-	    if (++delay_msec > 10)
+	    ಆದರೆ (++delay_msec > 10)
 		delay_msec = 10;
-	    continue;
+	    ಮುಂದುವರಿ;
 	}
-	if (wait_pid <= 0
-#ifdef ECHILD
+	ಆದರೆ (wait_pid <= 0
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ECHILD
 		&& errno == ECHILD
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	   )
-	    break;
+	    ನಿಲ್ಲಿಸು;
     }
-    return wait_pid;
+    ಹಿಂತಿರುಗಿ wait_pid;
 }
 
-#if !defined(USE_SYSTEM) || defined(FEAT_JOB_CHANNEL)
+#ಆದರೆ !defined(USE_SYSTEM) || defined(FEAT_ಕೆಲಸ_CHANNEL)
 /*
  * Set the environment for a child process.
  */
-    static void
-set_child_environment(
-	long	rows,
-	long	columns,
-	char	*term,
-	int	is_terminal UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_ಮಗು_environment(
+	ದೀರ್ಘ	ಅಡ್ಡಸಾಲುಗಳು_2,
+	ದೀರ್ಘ	columns,
+	ಅಕ್ಷರ	*ಪದ,
+	ಪೂರ್ಣಾಂಕ	is_terminal ಬಳಸದ)
 {
 # ifdef HAVE_SETENV
-    char	envbuf[50];
-# else
-    static char	envbuf_Term[30];
-    static char	envbuf_Rows[20];
-    static char	envbuf_Lines[20];
-    static char	envbuf_Columns[20];
-    static char	envbuf_Colors[20];
+    ಅಕ್ಷರ	envbuf[50];
+# ಇಲ್ಲದಿದ್ದರೆ
+    ಸ್ಥಿರ ಅಕ್ಷರ	envbuf_ಪದ[30];
+    ಸ್ಥಿರ ಅಕ್ಷರ	envbuf_ಅಡ್ಡಸಾಲುಗಳು[20];
+    ಸ್ಥಿರ ಅಕ್ಷರ	envbuf_ಸಾಲುಗಳು[20];
+    ಸ್ಥಿರ ಅಕ್ಷರ	envbuf_Columns[20];
+    ಸ್ಥಿರ ಅಕ್ಷರ	envbuf_Colors[20];
 #  ifdef FEAT_TERMINAL
-    static char	envbuf_Version[20];
+    ಸ್ಥಿರ ಅಕ್ಷರ	envbuf_ಆವೃತ್ತಿ[20];
 #  endif
 #  ifdef FEAT_CLIENTSERVER
-    static char	envbuf_Servername[60];
+    ಸ್ಥಿರ ಅಕ್ಷರ	envbuf_Servername[60];
 #  endif
 # endif
 
 # ifdef HAVE_SETENV
-    setenv("TERM", term, 1);
-    sprintf((char *)envbuf, "%ld", rows);
-    setenv("ROWS", (char *)envbuf, 1);
-    sprintf((char *)envbuf, "%ld", rows);
-    setenv("LINES", (char *)envbuf, 1);
-    sprintf((char *)envbuf, "%ld", columns);
-    setenv("COLUMNS", (char *)envbuf, 1);
-    sprintf((char *)envbuf, "%d", t_colors);
-    setenv("COLORS", (char *)envbuf, 1);
+    setenv("TERM", ಪದ, 1);
+    sprintf((ಅಕ್ಷರ *)envbuf, "%ld", ಅಡ್ಡಸಾಲುಗಳು_2);
+    setenv("ROWS", (ಅಕ್ಷರ *)envbuf, 1);
+    sprintf((ಅಕ್ಷರ *)envbuf, "%ld", ಅಡ್ಡಸಾಲುಗಳು_2);
+    setenv("LINES", (ಅಕ್ಷರ *)envbuf, 1);
+    sprintf((ಅಕ್ಷರ *)envbuf, "%ld", columns);
+    setenv("COLUMNS", (ಅಕ್ಷರ *)envbuf, 1);
+    sprintf((ಅಕ್ಷರ *)envbuf, "%d", t_colors);
+    setenv("COLORS", (ಅಕ್ಷರ *)envbuf, 1);
 #  ifdef FEAT_TERMINAL
-    if (is_terminal)
+    ಆದರೆ (is_terminal)
     {
-	sprintf((char *)envbuf, "%ld",  (long)get_vim_var_nr(VV_VERSION));
-	setenv("VIM_TERMINAL", (char *)envbuf, 1);
+	sprintf((ಅಕ್ಷರ *)envbuf, "%ld",  (ದೀರ್ಘ)get_vim_var_nr(VV_ಆವೃತ್ತಿ));
+	setenv("VIM_TERMINAL", (ಅಕ್ಷರ *)envbuf, 1);
     }
 #  endif
 #  ifdef FEAT_CLIENTSERVER
-    setenv("VIM_SERVERNAME", serverName == NULL ? "" : (char *)serverName, 1);
+    setenv("VIM_SERVERNAME", serverName == ಖಾಲಿ ? "" : (ಅಕ್ಷರ *)serverName, 1);
 #  endif
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
     /*
      * Putenv does not copy the string, it has to remain valid.
      * Use a static array to avoid losing allocated memory.
      * This won't work well when running multiple children...
      */
-    vim_snprintf(envbuf_Term, sizeof(envbuf_Term), "TERM=%s", term);
-    putenv(envbuf_Term);
-    vim_snprintf(envbuf_Rows, sizeof(envbuf_Rows), "ROWS=%ld", rows);
-    putenv(envbuf_Rows);
-    vim_snprintf(envbuf_Lines, sizeof(envbuf_Lines), "LINES=%ld", rows);
-    putenv(envbuf_Lines);
-    vim_snprintf(envbuf_Columns, sizeof(envbuf_Columns),
+    vim_snprintf(envbuf_ಪದ, ಗಾತ್ರ(envbuf_ಪದ), "TERM=%s", ಪದ);
+    putenv(envbuf_ಪದ);
+    vim_snprintf(envbuf_ಅಡ್ಡಸಾಲುಗಳು, ಗಾತ್ರ(envbuf_ಅಡ್ಡಸಾಲುಗಳು), "ROWS=%ld", ಅಡ್ಡಸಾಲುಗಳು_2);
+    putenv(envbuf_ಅಡ್ಡಸಾಲುಗಳು);
+    vim_snprintf(envbuf_ಸಾಲುಗಳು, ಗಾತ್ರ(envbuf_ಸಾಲುಗಳು), "LINES=%ld", ಅಡ್ಡಸಾಲುಗಳು_2);
+    putenv(envbuf_ಸಾಲುಗಳು);
+    vim_snprintf(envbuf_Columns, ಗಾತ್ರ(envbuf_Columns),
 						       "COLUMNS=%ld", columns);
     putenv(envbuf_Columns);
-    vim_snprintf(envbuf_Colors, sizeof(envbuf_Colors), "COLORS=%ld", t_colors);
+    vim_snprintf(envbuf_Colors, ಗಾತ್ರ(envbuf_Colors), "COLORS=%ld", t_colors);
     putenv(envbuf_Colors);
 #  ifdef FEAT_TERMINAL
-    if (is_terminal)
+    ಆದರೆ (is_terminal)
     {
-	vim_snprintf(envbuf_Version, sizeof(envbuf_Version),
-			 "VIM_TERMINAL=%ld", (long)get_vim_var_nr(VV_VERSION));
-	putenv(envbuf_Version);
+	vim_snprintf(envbuf_ಆವೃತ್ತಿ, ಗಾತ್ರ(envbuf_ಆವೃತ್ತಿ),
+			 "VIM_TERMINAL=%ld", (ದೀರ್ಘ)get_vim_var_nr(VV_ಆವೃತ್ತಿ));
+	putenv(envbuf_ಆವೃತ್ತಿ);
     }
 #  endif
 #  ifdef FEAT_CLIENTSERVER
-    vim_snprintf(envbuf_Servername, sizeof(envbuf_Servername),
-	    "VIM_SERVERNAME=%s", serverName == NULL ? "" : (char *)serverName);
+    vim_snprintf(envbuf_Servername, ಗಾತ್ರ(envbuf_Servername),
+	    "VIM_SERVERNAME=%s", serverName == ಖಾಲಿ ? "" : (ಅಕ್ಷರ *)serverName);
     putenv(envbuf_Servername);
 #  endif
 # endif
 }
 
-    static void
-set_default_child_environment(int is_terminal)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_default_ಮಗು_environment(ಪೂರ್ಣಾಂಕ is_terminal)
 {
-    set_child_environment(Rows, Columns, "dumb", is_terminal);
+    ಗಣ_ಮಗು_environment(ಅಡ್ಡಸಾಲುಗಳು, Columns, "dumb", is_terminal);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_GUI) || defined(FEAT_JOB_CHANNEL)
+#ಆದರೆ defined(FEAT_GUI) || defined(FEAT_ಕೆಲಸ_CHANNEL)
 /*
  * Open a PTY, with FD for the master and slave side.
  * When failing "pty_master_fd" and "pty_slave_fd" are -1.
  * When successful both file descriptors are stored and the allocated pty name
  * is stored in both "*name1" and "*name2".
  */
-    static void
-open_pty(int *pty_master_fd, int *pty_slave_fd, char_u **name1, char_u **name2)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+open_pty(ಪೂರ್ಣಾಂಕ *pty_master_fd, ಪೂರ್ಣಾಂಕ *pty_slave_fd, char_u **name1, char_u **name2)
 {
-    char	*tty_name;
+    ಅಕ್ಷರ	*tty_name;
 
-    if (name1 != NULL)
-	*name1 = NULL;
-    if (name2 != NULL)
-	*name2 = NULL;
+    ಆದರೆ (name1 != ಖಾಲಿ)
+	*name1 = ಖಾಲಿ;
+    ಆದರೆ (name2 != ಖಾಲಿ)
+	*name2 = ಖಾಲಿ;
 
     *pty_master_fd = mch_openpty(&tty_name);	    // open pty
-    if (*pty_master_fd < 0)
-	return;
+    ಆದರೆ (*pty_master_fd < 0)
+	ಹಿಂತಿರುಗಿ;
 
     // Leaving out O_NOCTTY may lead to waitpid() always returning
     // 0 on Mac OS X 10.7 thereby causing freezes. Let's assume
     // adding O_NOCTTY always works when defined.
 # ifdef O_NOCTTY
     *pty_slave_fd = open(tty_name, O_RDWR | O_NOCTTY | O_EXTRA, 0);
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
     *pty_slave_fd = open(tty_name, O_RDWR | O_EXTRA, 0);
 # endif
-    if (*pty_slave_fd < 0)
+    ಆದರೆ (*pty_slave_fd < 0)
     {
 	close(*pty_master_fd);
 	*pty_master_fd = -1;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (name1 != NULL)
+	ಆದರೆ (name1 != ಖಾಲಿ)
 	    *name1 = vim_strsave((char_u *)tty_name);
-	if (name2 != NULL)
+	ಆದರೆ (name2 != ಖಾಲಿ)
 	    *name2 = vim_strsave((char_u *)tty_name);
     }
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Send SIGINT to a child process if "c" is an interrupt character.
  */
-    static void
-may_send_sigint(int c UNUSED, pid_t pid UNUSED, pid_t wpid UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+may_send_sigint(ಪೂರ್ಣಾಂಕ c ಬಳಸದ, pid_t pid ಬಳಸದ, pid_t wpid ಬಳಸದ)
 {
-#ifdef SIGINT
-    if (c == Ctrl_C || c == intr_char)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SIGINT
+    ಆದರೆ (c == Ctrl_C || c == intr_char)
     {
 # ifdef HAVE_SETSID
 	kill(-pid, SIGINT);
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 	kill(0, SIGINT);
 # endif
-	if (wpid > 0)
+	ಆದರೆ (wpid > 0)
 	    kill(wpid, SIGINT);
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#if !defined(USE_SYSTEM) || defined(FEAT_TERMINAL)
+#ಆದರೆ !defined(USE_SYSTEM) || defined(FEAT_TERMINAL)
 
 /*
  * Parse "cmd" and return the result in "argvp" which is an allocated array of
  * pointers, the last one is NULL.
  * The "sh_tofree" and "shcf_tofree" must be later freed by the caller.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 unix_build_argv(
 	char_u *cmd,
-	char ***argvp,
+	ಅಕ್ಷರ ***argvp,
 	char_u **sh_tofree,
 	char_u **shcf_tofree)
 {
-    char	**argv = NULL;
-    int		argc;
+    ಅಕ್ಷರ	**argv = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		argc;
 
     *sh_tofree = vim_strsave(p_sh);
-    if (*sh_tofree == NULL)		// out of memory
-	return FAIL;
+    ಆದರೆ (*sh_tofree == ಖಾಲಿ)		// out of memory
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    if (mch_parse_cmd(*sh_tofree, TRUE, &argv, &argc) == FAIL)
-	return FAIL;
+    ಆದರೆ (mch_parse_cmd(*sh_tofree, TRUE, &argv, &argc) == FAIL)
+	ಹಿಂತಿರುಗಿ FAIL;
     *argvp = argv;
 
-    if (cmd != NULL)
+    ಆದರೆ (cmd != ಖಾಲಿ)
     {
 	char_u	*s;
 	char_u	*p;
 
-	if (extra_shell_arg != NULL)
-	    argv[argc++] = (char *)extra_shell_arg;
+	ಆದರೆ (extra_shell_arg != ಖಾಲಿ)
+	    argv[argc++] = (ಅಕ್ಷರ *)extra_shell_arg;
 
 	// Break 'shellcmdflag' into white separated parts.  This doesn't
 	// handle quoted strings, they are very unlikely to appear.
 	*shcf_tofree = alloc(STRLEN(p_shcf) + 1);
-	if (*shcf_tofree == NULL)    // out of memory
-	    return FAIL;
+	ಆದರೆ (*shcf_tofree == ಖಾಲಿ)    // out of memory
+	    ಹಿಂತಿರುಗಿ FAIL;
 	s = *shcf_tofree;
 	p = p_shcf;
-	while (*p != NUL)
+	ಆಗ (*p != NUL)
 	{
-	    argv[argc++] = (char *)s;
-	    while (*p && *p != ' ' && *p != TAB)
+	    argv[argc++] = (ಅಕ್ಷರ *)s;
+	    ಆಗ (*p && *p != ' ' && *p != TAB)
 		*s++ = *p++;
 	    *s++ = NUL;
 	    p = skipwhite(p);
 	}
 
-	argv[argc++] = (char *)cmd;
+	argv[argc++] = (ಅಕ್ಷರ *)cmd;
     }
-    argv[argc] = NULL;
-    return OK;
+    argv[argc] = ಖಾಲಿ;
+    ಹಿಂತಿರುಗಿ OK;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_GUI) && defined(FEAT_TERMINAL)
+#ಆದರೆ defined(FEAT_GUI) && defined(FEAT_TERMINAL)
 /*
  * Use a terminal window to run a shell command in.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 mch_call_shell_terminal(
     char_u	*cmd,
-    int		options UNUSED)	// SHELL_*, see vim.h
+    ಪೂರ್ಣಾಂಕ		options ಬಳಸದ)	// SHELL_*, see vim.h
 {
     jobopt_T	opt;
-    char	**argv = NULL;
-    char_u	*tofree1 = NULL;
-    char_u	*tofree2 = NULL;
-    int		retval = -1;
+    ಅಕ್ಷರ	**argv = ಖಾಲಿ;
+    char_u	*tofree1 = ಖಾಲಿ;
+    char_u	*tofree2 = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		retval = -1;
     buf_T	*buf;
-    job_T	*job;
+    ಕೆಲಸ_T	*ಕೆಲಸ;
     aco_save_T	aco;
     oparg_T	oa;		// operator arguments
 
-    if (unix_build_argv(cmd, &argv, &tofree1, &tofree2) == FAIL)
-	goto theend;
+    ಆದರೆ (unix_build_argv(cmd, &argv, &tofree1, &tofree2) == FAIL)
+	ಹೋಗು theend;
 
-    init_job_options(&opt);
-    ch_log(NULL, "starting terminal for system command '%s'", cmd);
-    buf = term_start(NULL, argv, &opt, TERM_START_SYSTEM);
-    if (buf == NULL)
-	goto theend;
+    init_ಕೆಲಸ_options(&opt);
+    ch_log(ಖಾಲಿ, "starting terminal for system command '%s'", cmd);
+    buf = ಪದ_ಆರಂಭ(ಖಾಲಿ, argv, &opt, ಪದ_ಆರಂಭ_SYSTEM);
+    ಆದರೆ (buf == ಖಾಲಿ)
+	ಹೋಗು theend;
 
-    job = term_getjob(buf->b_term);
-    ++job->jv_refcount;
+    ಕೆಲಸ = ಪದ_getjob(buf->b_ಪದ);
+    ++ಕೆಲಸ->jv_refcount;
 
     // Find a window to make "buf" curbuf.
     aucmd_prepbuf(&aco, buf);
-    if (curbuf == buf)
+    ಆದರೆ (curbuf == buf)
     {
 	// Only when managed to find a window for "buf",
 	clear_oparg(&oa);
-	while (term_use_loop())
+	ಆಗ (ಪದ_use_loop())
 	{
-	    if (oa.op_type == OP_NOP && oa.regname == NUL && !VIsual_active)
+	    ಆದರೆ (oa.op_type == OP_NOP && oa.regname == NUL && !VIsual_ಸಕ್ರಿಯ)
 	    {
 		// If terminal_loop() returns OK we got a key that is handled
 		// in Normal model. We don't do redrawing anyway.
-		if (terminal_loop(TRUE) == OK)
-		    normal_cmd(&oa, TRUE);
+		ಆದರೆ (terminal_loop(TRUE) == OK)
+		    ಸಾಮಾನ್ಯ_cmd(&oa, TRUE);
 	    }
-	    else
-		normal_cmd(&oa, TRUE);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ಸಾಮಾನ್ಯ_cmd(&oa, TRUE);
 	}
-	retval = job->jv_exitval;
-	ch_log(NULL, "system command finished");
+	retval = ಕೆಲಸ->jv_exitval;
+	ch_log(ಖಾಲಿ, "system command finished");
 
-	job_unref(job);
+	ಕೆಲಸ_unref(ಕೆಲಸ);
 
 	// restore curwin/curbuf and a few other things
 	aucmd_restbuf(&aco);
@@ -4824,114 +4824,114 @@ mch_call_shell_terminal(
 
     // Only require pressing Enter when redrawing, to avoid that system() gets
     // the hit-enter prompt even though it didn't output anything.
-    if (RedrawingDisabled == 0)
+    ಆದರೆ (RedrawingDisabled == 0)
 	wait_return(TRUE);
-    do_buffer(DOBUF_WIPE, DOBUF_FIRST, FORWARD, buf->b_fnum, TRUE);
+    do_ಬಫರ್(DOBUF_WIPE, DOBUF_ಮೊದಲ, FORWARD, buf->b_fnum, TRUE);
 
 theend:
     vim_free(argv);
     vim_free(tofree1);
     vim_free(tofree2);
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef USE_SYSTEM
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_SYSTEM
 /*
  * Use system() to start the shell: simple but slow.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 mch_call_shell_system(
     char_u	*cmd,
-    int		options)	// SHELL_*, see vim.h
+    ಪೂರ್ಣಾಂಕ		options)	// SHELL_*, see vim.h
 {
 # ifdef VMS
-    char	*ifn = NULL;
-    char	*ofn = NULL;
+    ಅಕ್ಷರ	*ifn = ಖಾಲಿ;
+    ಅಕ್ಷರ	*ofn = ಖಾಲಿ;
 # endif
     tmode_T	tmode = cur_tmode;
     char_u	*newcmd;	// only needed for unix
-    int		x;
+    ಪೂರ್ಣಾಂಕ		x;
 
-    out_flush();
+    ಹೊರಹೋಗು_flush();
 
-    if (options & SHELL_COOKED)
+    ಆದರೆ (options & SHELL_COOKED)
 	settmode(TMODE_COOK);	    // set to normal mode
 
-# if defined(FEAT_CLIPBOARD) && (defined(FEAT_X11) \
+# ಆದರೆ defined(FEAT_CLIPBOARD) && (defined(FEAT_X11) \
 	|| defined(FEAT_WAYLAND_CLIPBOARD))
-#  if defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)
+#  ಆದರೆ defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)
     save_clipboard();
 #  endif
     loose_clipboard();
 # endif
 
-    if (cmd == NULL)
-	x = system((char *)p_sh);
-    else
+    ಆದರೆ (cmd == ಖಾಲಿ)
+	x = system((ಅಕ್ಷರ *)p_sh);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 # ifdef VMS
-	if (ofn = strchr((char *)cmd, '>'))
+	ಆದರೆ (ofn = strchr((ಅಕ್ಷರ *)cmd, '>'))
 	    *ofn++ = '\0';
-	if (ifn = strchr((char *)cmd, '<'))
+	ಆದರೆ (ifn = strchr((ಅಕ್ಷರ *)cmd, '<'))
 	{
-	    char *p;
+	    ಅಕ್ಷರ *p;
 
 	    *ifn++ = '\0';
 	    p = strchr(ifn,' '); // chop off any trailing spaces
-	    if (p)
+	    ಆದರೆ (p)
 		*p = '\0';
 	}
-	if (ofn)
-	    x = vms_sys((char *)cmd, ofn, ifn);
-	else
-	    x = system((char *)cmd);
-# else
+	ಆದರೆ (ofn)
+	    x = vms_sys((ಅಕ್ಷರ *)cmd, ofn, ifn);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    x = system((ಅಕ್ಷರ *)cmd);
+# ಇಲ್ಲದಿದ್ದರೆ
 	newcmd = alloc(STRLEN(p_sh)
-		+ (extra_shell_arg == NULL ? 0 : STRLEN(extra_shell_arg))
+		+ (extra_shell_arg == ಖಾಲಿ ? 0 : STRLEN(extra_shell_arg))
 		+ STRLEN(p_shcf) + STRLEN(cmd) + 4);
-	if (newcmd == NULL)
+	ಆದರೆ (newcmd == ಖಾಲಿ)
 	    x = 0;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    sprintf((char *)newcmd, "%s %s %s %s", p_sh,
-		    extra_shell_arg == NULL ? "" : (char *)extra_shell_arg,
-		    (char *)p_shcf,
-		    (char *)cmd);
-	    x = system((char *)newcmd);
+	    sprintf((ಅಕ್ಷರ *)newcmd, "%s %s %s %s", p_sh,
+		    extra_shell_arg == ಖಾಲಿ ? "" : (ಅಕ್ಷರ *)extra_shell_arg,
+		    (ಅಕ್ಷರ *)p_shcf,
+		    (ಅಕ್ಷರ *)cmd);
+	    x = system((ಅಕ್ಷರ *)newcmd);
 	    vim_free(newcmd);
 	}
 # endif
     }
 # ifdef VMS
-    x = vms_sys_status(x);
+    x = vms_sys_ಸ್ಥಿತಿ(x);
 # endif
-    if (emsg_silent)
+    ಆದರೆ (emsg_silent)
 	;
-    else if (x == 127)
-	msg_puts(_("\nCannot execute shell sh\n"));
-    else if (x && !(options & SHELL_SILENT))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (x == 127)
+	ಸಂದೇಶ_puts(_("\nCannot execute shell sh\n"));
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (x && !(options & SHELL_SILENT))
     {
-	msg_puts(_("\nshell returned "));
-	msg_outnum((long)x);
-	msg_putchar('\n');
+	ಸಂದೇಶ_puts(_("\nshell returned "));
+	ಸಂದೇಶ_outnum((ದೀರ್ಘ)x);
+	ಸಂದೇಶ_putchar('\n');
     }
 
-    if (tmode == TMODE_RAW)
+    ಆದರೆ (tmode == TMODE_RAW)
     {
 	// The shell may have messed with the mode, always set it.
 	cur_tmode = TMODE_UNKNOWN;
 	settmode(TMODE_RAW);	// set to raw mode
     }
     resettitle();
-# if defined(FEAT_CLIPBOARD) && (defined(FEAT_X11) \
+# ಆದರೆ defined(FEAT_CLIPBOARD) && (defined(FEAT_X11) \
 	|| defined(FEAT_WAYLAND_CLIPBOARD))
     restore_clipboard();
 # endif
-    return x;
+    ಹಿಂತಿರುಗಿ x;
 }
 
-#else // USE_SYSTEM
+#ಇಲ್ಲದಿದ್ದರೆ // USE_SYSTEM
 
 # define EXEC_FAILED 122    // Exit code when shell didn't execute.  Don't use
 			    // 127, some shells use that already
@@ -4940,48 +4940,48 @@ mch_call_shell_system(
 /*
  * Don't use system(), use fork()/exec().
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 mch_call_shell_fork(
     char_u	*cmd,
-    int		options)	// SHELL_*, see vim.h
+    ಪೂರ್ಣಾಂಕ		options)	// SHELL_*, see vim.h
 {
     tmode_T	tmode = cur_tmode;
     pid_t	pid;
     pid_t	wpid = 0;
     pid_t	wait_pid = 0;
-    int		status = -1;
-    int		retval = -1;
-    char	**argv = NULL;
-    char_u	*tofree1 = NULL;
-    char_u	*tofree2 = NULL;
-    int		i;
-    int		pty_master_fd = -1;	    // for pty's
+    ಪೂರ್ಣಾಂಕ		ಸ್ಥಿತಿ_2 = -1;
+    ಪೂರ್ಣಾಂಕ		retval = -1;
+    ಅಕ್ಷರ	**argv = ಖಾಲಿ;
+    char_u	*tofree1 = ಖಾಲಿ;
+    char_u	*tofree2 = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		pty_master_fd = -1;	    // for pty's
 # ifdef FEAT_GUI
-    int		pty_slave_fd = -1;
+    ಪೂರ್ಣಾಂಕ		pty_slave_fd = -1;
 # endif
-    int		fd_toshell[2];		// for pipes
-    int		fd_fromshell[2];
-    int		pipe_error = FALSE;
-    int		did_settmode = FALSE;	// settmode(TMODE_RAW) called
+    ಪೂರ್ಣಾಂಕ		fd_toshell[2];		// for pipes
+    ಪೂರ್ಣಾಂಕ		fd_fromshell[2];
+    ಪೂರ್ಣಾಂಕ		pipe_error = FALSE;
+    ಪೂರ್ಣಾಂಕ		did_settmode = FALSE;	// settmode(TMODE_RAW) called
 
-    out_flush();
-    if (options & SHELL_COOKED)
+    ಹೊರಹೋಗು_flush();
+    ಆದರೆ (options & SHELL_COOKED)
 	settmode(TMODE_COOK);		// set to normal mode
-    if (tmode == TMODE_RAW)
+    ಆದರೆ (tmode == TMODE_RAW)
 	// The shell may have messed with the mode, always set it later.
 	cur_tmode = TMODE_UNKNOWN;
 
-    if (unix_build_argv(cmd, &argv, &tofree1, &tofree2) == FAIL)
-	goto error;
+    ಆದರೆ (unix_build_argv(cmd, &argv, &tofree1, &tofree2) == FAIL)
+	ಹೋಗು error;
 
     /*
      * For the GUI, when writing the output into the buffer and when reading
      * input from the buffer: Try using a pseudo-tty to get the stdin/stdout
      * of the executed command into the Vim window.  Or use a pipe.
      */
-    if ((options & (SHELL_READ|SHELL_WRITE))
+    ಆದರೆ ((options & (SHELL_READ|SHELL_WRITE))
 # ifdef FEAT_GUI
-	    || (gui.in_use && show_shell_mess)
+	    || (gui.ಒಳ_use && show_shell_mess)
 # endif
 		    )
     {
@@ -4991,55 +4991,55 @@ mch_call_shell_fork(
 	 * If this works, open the slave pty.
 	 * If the slave can't be opened, close the master pty.
 	 */
-	if (p_guipty && !(options & (SHELL_READ|SHELL_WRITE)))
-	    open_pty(&pty_master_fd, &pty_slave_fd, NULL, NULL);
+	ಆದರೆ (p_guipty && !(options & (SHELL_READ|SHELL_WRITE)))
+	    open_pty(&pty_master_fd, &pty_slave_fd, ಖಾಲಿ, ಖಾಲಿ);
 	/*
 	 * If not opening a pty or it didn't work, try using pipes.
 	 */
-	if (pty_master_fd < 0)
+	ಆದರೆ (pty_master_fd < 0)
 # endif
 	{
 	    pipe_error = (pipe(fd_toshell) < 0);
-	    if (!pipe_error)			    // pipe create OK
+	    ಆದರೆ (!pipe_error)			    // pipe create OK
 	    {
 		pipe_error = (pipe(fd_fromshell) < 0);
-		if (pipe_error)			    // pipe create failed
+		ಆದರೆ (pipe_error)			    // pipe create failed
 		{
 		    close(fd_toshell[0]);
 		    close(fd_toshell[1]);
 		}
 	    }
-	    if (pipe_error)
+	    ಆದರೆ (pipe_error)
 	    {
-		msg_puts(_("\nCannot create pipes\n"));
-		out_flush();
+		ಸಂದೇಶ_puts(_("\nCannot create pipes\n"));
+		ಹೊರಹೋಗು_flush();
 	    }
 	}
     }
 
-    if (!pipe_error)			// pty or pipe opened or not used
+    ಆದರೆ (!pipe_error)			// pty or pipe opened or not used
     {
 	SIGSET_DECL(curset)
-	BLOCK_SIGNALS(&curset);
+	ಖಂಡ_ಸಂಕೇತಗಳು(&curset);
 	pid = fork();	// maybe we should use vfork()
-	if (pid == -1)
+	ಆದರೆ (pid == -1)
 	{
-	    UNBLOCK_SIGNALS(&curset);
+	    UNBLOCK_ಸಂಕೇತಗಳು(&curset);
 
-	    msg_puts(_("\nCannot fork\n"));
-	    if ((options & (SHELL_READ|SHELL_WRITE))
+	    ಸಂದೇಶ_puts(_("\nCannot fork\n"));
+	    ಆದರೆ ((options & (SHELL_READ|SHELL_WRITE))
 # ifdef FEAT_GUI
-		|| (gui.in_use && show_shell_mess)
+		|| (gui.ಒಳ_use && show_shell_mess)
 # endif
 		    )
 	    {
 # ifdef FEAT_GUI
-		if (pty_master_fd >= 0)		// close the pseudo tty
+		ಆದರೆ (pty_master_fd >= 0)		// close the pseudo tty
 		{
 		    close(pty_master_fd);
 		    close(pty_slave_fd);
 		}
-		else				// close the pipes
+		ಇಲ್ಲದಿದ್ದರೆ				// close the pipes
 # endif
 		{
 		    close(fd_toshell[0]);
@@ -5049,22 +5049,22 @@ mch_call_shell_fork(
 		}
 	    }
 	}
-	else if (pid == 0)	// child
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (pid == 0)	// child
 	{
-	    reset_signals();		// handle signals normally
-	    UNBLOCK_SIGNALS(&curset);
+	    reset_ಸಂಕೇತಗಳು();		// handle signals normally
+	    UNBLOCK_ಸಂಕೇತಗಳು(&curset);
 
 # ifdef FEAT_EVAL
-	    if (ch_log_active())
+	    ಆದರೆ (ch_log_ಸಕ್ರಿಯ())
 	    {
-		ch_log(NULL, "closing channel log in the child process");
+		ch_log(ಖಾಲಿ, "closing channel log in the child process");
 		ch_logfile((char_u *)"", (char_u *)"");
 	    }
 # endif
 
-	    if (!show_shell_mess || (options & SHELL_EXPAND))
+	    ಆದರೆ (!show_shell_mess || (options & SHELL_EXPAND))
 	    {
-		int fd;
+		ಪೂರ್ಣಾಂಕ fd;
 
 		/*
 		 * Don't want to show any message from the shell.  Can't just
@@ -5088,7 +5088,7 @@ mch_call_shell_fork(
 		 * or dup() failed we'd just do the same thing ourselves
 		 * anyway -- webb
 		 */
-		if (fd >= 0)
+		ಆದರೆ (fd >= 0)
 		{
 		    vim_ignored = dup(fd); // To replace stdin  (fd 0)
 		    vim_ignored = dup(fd); // To replace stdout (fd 1)
@@ -5098,9 +5098,9 @@ mch_call_shell_fork(
 		    close(fd);
 		}
 	    }
-	    else if ((options & (SHELL_READ|SHELL_WRITE))
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((options & (SHELL_READ|SHELL_WRITE))
 # ifdef FEAT_GUI
-		    || gui.in_use
+		    || gui.ಒಳ_use
 # endif
 		    )
 	    {
@@ -5109,10 +5109,10 @@ mch_call_shell_fork(
 		// Create our own process group, so that the child and all its
 		// children can be kill()ed.  Don't do this when using pipes,
 		// because stdin is not a tty, we would lose /dev/tty.
-		if (p_stmp)
+		ಆದರೆ (p_stmp)
 		{
-		    (void)setsid();
-#  if defined(SIGHUP)
+		    (ಶೂನ್ಯ)setsid();
+#  ಆದರೆ defined(SIGHUP)
 		    // When doing "!xterm&" and 'shell' is bash: the shell
 		    // will exit and send SIGHUP to all processes in its
 		    // group, killing the just started process.  Ignore SIGHUP
@@ -5122,19 +5122,19 @@ mch_call_shell_fork(
 		}
 # endif
 # ifdef FEAT_GUI
-		if (pty_slave_fd >= 0)
+		ಆದರೆ (pty_slave_fd >= 0)
 		{
 		    // push stream discipline modules
-		    if (options & SHELL_COOKED)
-			setup_slavepty(pty_slave_fd);
+		    ಆದರೆ (options & SHELL_COOKED)
+			ಸಿದ್ಧತೆ_slavepty(pty_slave_fd);
 #  ifdef TIOCSCTTY
 		    // Try to become controlling tty (probably doesn't work,
 		    // unless run by root)
-		    ioctl(pty_slave_fd, TIOCSCTTY, (char *)NULL);
+		    ioctl(pty_slave_fd, TIOCSCTTY, (ಅಕ್ಷರ *)ಖಾಲಿ);
 #  endif
 		}
 # endif
-		set_default_child_environment(FALSE);
+		ಗಣ_default_ಮಗು_environment(FALSE);
 
 		/*
 		 * stderr is only redirected when using the GUI, so that a
@@ -5142,7 +5142,7 @@ mch_call_shell_fork(
 		 * passphrase using stderr.
 		 */
 # ifdef FEAT_GUI
-		if (pty_master_fd >= 0)
+		ಆದರೆ (pty_master_fd >= 0)
 		{
 		    close(pty_master_fd);   // close master side of pty
 
@@ -5151,7 +5151,7 @@ mch_call_shell_fork(
 		    vim_ignored = dup(pty_slave_fd);
 		    close(1);
 		    vim_ignored = dup(pty_slave_fd);
-		    if (gui.in_use)
+		    ಆದರೆ (gui.ಒಳ_use)
 		    {
 			close(2);
 			vim_ignored = dup(pty_slave_fd);
@@ -5159,7 +5159,7 @@ mch_call_shell_fork(
 
 		    close(pty_slave_fd);    // has been dupped, close it now
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 # endif
 		{
 		    // set up stdin for the child
@@ -5175,7 +5175,7 @@ mch_call_shell_fork(
 		    close(fd_fromshell[1]);
 
 # ifdef FEAT_GUI
-		    if (gui.in_use)
+		    ಆದರೆ (gui.ಒಳ_use)
 		    {
 			// set up stderr for the child
 			close(2);
@@ -5195,53 +5195,53 @@ mch_call_shell_fork(
 	    execvp(argv[0], argv);
 	    _exit(EXEC_FAILED);	    // exec failed, return failure code
 	}
-	else			// parent
+	ಇಲ್ಲದಿದ್ದರೆ			// parent
 	{
 	    /*
 	     * While child is running, ignore terminating signals.
 	     * Do catch CTRL-C, so that "got_int" is set.
 	     */
-	    catch_signals(SIG_IGN, SIG_ERR);
+	    catch_ಸಂಕೇತಗಳು(SIG_IGN, SIG_ERR);
 	    catch_int_signal();
-	    UNBLOCK_SIGNALS(&curset);
-# ifdef FEAT_JOB_CHANNEL
-	    ++dont_check_job_ended;
+	    UNBLOCK_ಸಂಕೇತಗಳು(&curset);
+# ifdef FEAT_ಕೆಲಸ_CHANNEL
+	    ++dont_check_ಕೆಲಸ_ended;
 # endif
 	    /*
 	     * For the GUI we redirect stdin, stdout and stderr to our window.
 	     * This is also used to pipe stdin/stdout to/from the external
 	     * command.
 	     */
-	    if ((options & (SHELL_READ|SHELL_WRITE))
+	    ಆದರೆ ((options & (SHELL_READ|SHELL_WRITE))
 # ifdef FEAT_GUI
-		    || (gui.in_use && show_shell_mess)
+		    || (gui.ಒಳ_use && show_shell_mess)
 # endif
 	       )
 	    {
 # define BUFLEN 100		// length for buffer, pseudo tty limit is 128
-		char_u	    buffer[BUFLEN + 1];
-		int	    buffer_off = 0;	// valid bytes in buffer[]
+		char_u	    ಬಫರ್[BUFLEN + 1];
+		ಪೂರ್ಣಾಂಕ	    ಬಫರ್_off = 0;	// valid bytes in buffer[]
 		char_u	    ta_buf[BUFLEN + 1];	// TypeAHead
-		int	    ta_len = 0;		// valid bytes in ta_buf[]
-		int	    len;
-		int	    p_more_save;
-		int	    old_State;
-		int	    c;
-		int	    toshell_fd;
-		int	    fromshell_fd;
+		ಪೂರ್ಣಾಂಕ	    ta_len = 0;		// valid bytes in ta_buf[]
+		ಪೂರ್ಣಾಂಕ	    len;
+		ಪೂರ್ಣಾಂಕ	    p_ಇನ್ನಷ್ಟು_save;
+		ಪೂರ್ಣಾಂಕ	    old_State;
+		ಪೂರ್ಣಾಂಕ	    c;
+		ಪೂರ್ಣಾಂಕ	    toshell_fd;
+		ಪೂರ್ಣಾಂಕ	    fromshell_fd;
 		garray_T    ga;
-		int	    noread_cnt;
+		ಪೂರ್ಣಾಂಕ	    noread_cnt;
 # ifdef ELAPSED_FUNC
-		elapsed_T   start_tv;
+		elapsed_T   ಆರಂಭ_tv;
 # endif
 
 # ifdef FEAT_GUI
-		if (pty_master_fd >= 0)
+		ಆದರೆ (pty_master_fd >= 0)
 		{
 		    fromshell_fd = pty_master_fd;
 		    toshell_fd = dup(pty_master_fd);
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 # endif
 		{
 		    close(fd_toshell[0]);
@@ -5266,85 +5266,85 @@ mch_call_shell_fork(
 		 * Currently this busy loops!
 		 * This can probably dead-lock when the write blocks!
 		 */
-		p_more_save = p_more;
-		p_more = FALSE;
+		p_ಇನ್ನಷ್ಟು_save = p_ಇನ್ನಷ್ಟು;
+		p_ಇನ್ನಷ್ಟು = FALSE;
 		old_State = State;
-		State = MODE_EXTERNCMD;	// don't redraw at window resize
+		State = ಬಹುಲಕ_EXTERNCMD;	// don't redraw at window resize
 
-		if ((options & SHELL_WRITE) && toshell_fd >= 0)
+		ಆದರೆ ((options & SHELL_WRITE) && toshell_fd >= 0)
 		{
 		    // Fork a process that will write the lines to the
 		    // external program.
-		    if ((wpid = fork()) == -1)
+		    ಆದರೆ ((wpid = fork()) == -1)
 		    {
-			msg_puts(_("\nCannot fork\n"));
+			ಸಂದೇಶ_puts(_("\nCannot fork\n"));
 		    }
-		    else if (wpid == 0) // child
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (wpid == 0) // child
 		    {
-			linenr_T    lnum = curbuf->b_op_start.lnum;
+			linenr_T    lnum = curbuf->b_op_ಆರಂಭ.lnum;
 			size_t	    written = 0;
 			char_u	    *lp = ml_get(lnum);
 			size_t	    lplen = (size_t)ml_get_len(lnum);
 
 			close(fromshell_fd);
-			for (;;)
+			ಗಾಗಿ (;;)
 			{
-			    if (lplen == 0)
+			    ಆದರೆ (lplen == 0)
 				len = 0;
-			    else if (lp[written] == NL)
+			    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (lp[written] == NL)
 				// NL -> NUL translation
-				len = write(toshell_fd, "", (size_t)1);
-			    else
+				len = ಲಿಖ(toshell_fd, "", (size_t)1);
+			    ಇಲ್ಲದಿದ್ದರೆ
 			    {
 				char_u	*s = vim_strchr(lp + written, NL);
 
-				len = write(toshell_fd, (char *)lp + written,
-					   s == NULL ? lplen - written
+				len = ಲಿಖ(toshell_fd, (ಅಕ್ಷರ *)lp + written,
+					   s == ಖಾಲಿ ? lplen - written
 					      : (size_t)(s - (lp + written)));
 			    }
-			    if (len == (int)(lplen - written))
+			    ಆದರೆ (len == (ಪೂರ್ಣಾಂಕ)(lplen - written))
 			    {
 				// Finished a line, add a NL, unless this line
 				// should not have one.
-				if (lnum != curbuf->b_op_end.lnum
+				ಆದರೆ (lnum != curbuf->b_op_ಕೊನೆ.lnum
 					|| (!curbuf->b_p_bin
 					    && curbuf->b_p_fixeol)
 					|| (lnum != curbuf->b_no_eol_lnum
-					    && (lnum != curbuf->b_ml.ml_line_count
+					    && (lnum != curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ
 						    || curbuf->b_p_eol)))
-				    vim_ignored = write(toshell_fd, "\n",
+				    vim_ignored = ಲಿಖ(toshell_fd, "\n",
 								   (size_t)1);
 				++lnum;
-				if (lnum > curbuf->b_op_end.lnum)
+				ಆದರೆ (lnum > curbuf->b_op_ಕೊನೆ.lnum)
 				{
 				    // finished all the lines, close pipe
 				    close(toshell_fd);
-				    break;
+				    ನಿಲ್ಲಿಸು;
 				}
 				lp = ml_get(lnum);
 				lplen = ml_get_len(lnum);
 				written = 0;
 			    }
-			    else if (len > 0)
+			    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (len > 0)
 				written += (size_t)len;
 			}
 			_exit(0);
 		    }
-		    else // parent
+		    ಇಲ್ಲದಿದ್ದರೆ // parent
 		    {
 			close(toshell_fd);
 			toshell_fd = -1;
 		    }
 		}
 
-		if (options & SHELL_READ)
+		ಆದರೆ (options & SHELL_READ)
 		    ga_init2(&ga, 1, BUFLEN);
 
 		noread_cnt = 0;
 # ifdef ELAPSED_FUNC
-		ELAPSED_INIT(start_tv);
+		ELAPSED_INIT(ಆರಂಭ_tv);
 # endif
-		for (;;)
+		ಗಾಗಿ (;;)
 		{
 		    /*
 		     * Check if keys have been typed, write them to the child
@@ -5361,35 +5361,35 @@ mch_call_shell_fork(
 		     * typeahead.
 		     */
 		    len = 0;
-		    if (!(options & SHELL_EXPAND)
+		    ಆದರೆ (!(options & SHELL_EXPAND)
 			    && ((options &
 					 (SHELL_READ|SHELL_WRITE|SHELL_COOKED))
 				      != (SHELL_READ|SHELL_WRITE|SHELL_COOKED)
 # ifdef FEAT_GUI
-						    || gui.in_use
+						    || gui.ಒಳ_use
 # endif
 						    )
 			    && wait_pid == 0
 			    && (ta_len > 0 || noread_cnt > 4))
 		    {
-		      if (ta_len == 0)
+		      ಆದರೆ (ta_len == 0)
 		      {
 			  // Get extra characters when we don't have any.
 			  // Reset the counter and timer.
 			  noread_cnt = 0;
 # ifdef ELAPSED_FUNC
-			  ELAPSED_INIT(start_tv);
+			  ELAPSED_INIT(ಆರಂಭ_tv);
 # endif
 			  len = ui_inchar(ta_buf, BUFLEN, 10L, 0);
 		      }
-		      if (ta_len > 0 || len > 0)
+		      ಆದರೆ (ta_len > 0 || len > 0)
 		      {
 			/*
 			 * For pipes:
 			 * Check for CTRL-C: send interrupt signal to child.
 			 * Check for CTRL-D: EOF, close pipe to child.
 			 */
-			if (len == 1 && (pty_master_fd < 0 || cmd != NULL))
+			ಆದರೆ (len == 1 && (pty_master_fd < 0 || cmd != ಖಾಲಿ))
 			{
 			    /*
 			     * Send SIGINT to the child's group or all
@@ -5397,7 +5397,7 @@ mch_call_shell_fork(
 			     */
 			    may_send_sigint(ta_buf[ta_len], pid, wpid);
 
-			    if (pty_master_fd < 0 && toshell_fd >= 0
+			    ಆದರೆ (pty_master_fd < 0 && toshell_fd >= 0
 					       && ta_buf[ta_len] == Ctrl_D)
 			    {
 				close(toshell_fd);
@@ -5406,30 +5406,30 @@ mch_call_shell_fork(
 			}
 
 			// Remove Vim-specific codes from the input.
-			len = term_replace_keycodes(ta_buf, ta_len, len);
+			len = ಪದ_replace_keycodes(ta_buf, ta_len, len);
 
 			/*
 			 * For pipes: echo the typed characters.
 			 * For a pty this does not seem to work.
 			 */
-			if (pty_master_fd < 0)
+			ಆದರೆ (pty_master_fd < 0)
 			{
-			    for (i = ta_len; i < ta_len + len; ++i)
+			    ಗಾಗಿ (i = ta_len; i < ta_len + len; ++i)
 			    {
-				if (ta_buf[i] == '\n' || ta_buf[i] == '\b')
-				    msg_putchar(ta_buf[i]);
-				else if (has_mbyte)
+				ಆದರೆ (ta_buf[i] == '\n' || ta_buf[i] == '\b')
+				    ಸಂದೇಶ_putchar(ta_buf[i]);
+				ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (has_mbyte)
 				{
-				    int l = (*mb_ptr2len)(ta_buf + i);
+				    ಪೂರ್ಣಾಂಕ l = (*mb_ptr2len)(ta_buf + i);
 
-				    msg_outtrans_len(ta_buf + i, l);
+				    ಸಂದೇಶ_outtrans_len(ta_buf + i, l);
 				    i += l - 1;
 				}
-				else
-				    msg_outtrans_len(ta_buf + i, 1);
+				ಇಲ್ಲದಿದ್ದರೆ
+				    ಸಂದೇಶ_outtrans_len(ta_buf + i, 1);
 			    }
-			    windgoto(msg_row, cmdline_col_off + msg_col);
-			    out_flush();
+			    windgoto(ಸಂದೇಶ_ಅಡ್ಡಸಾಲು, cmdline_ಲಂಬಸಾಲು_off + ಸಂದೇಶ_ಲಂಬಸಾಲು);
+			    ಹೊರಹೋಗು_flush();
 			}
 
 			ta_len += len;
@@ -5441,12 +5441,12 @@ mch_call_shell_fork(
 			 * When writing buffer lines, drop the typed
 			 * characters (only check for CTRL-C).
 			 */
-			if (options & SHELL_WRITE)
+			ಆದರೆ (options & SHELL_WRITE)
 			    ta_len = 0;
-			else if (toshell_fd >= 0)
+			ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (toshell_fd >= 0)
 			{
-			    len = write(toshell_fd, (char *)ta_buf, (size_t)1);
-			    if (len > 0)
+			    len = ಲಿಖ(toshell_fd, (ಅಕ್ಷರ *)ta_buf, (size_t)1);
+			    ಆದರೆ (len > 0)
 			    {
 				ta_len -= len;
 				mch_memmove(ta_buf, ta_buf + len, ta_len);
@@ -5455,16 +5455,16 @@ mch_call_shell_fork(
 		      }
 		    }
 
-		    if (got_int)
+		    ಆದರೆ (got_int)
 		    {
 			// CTRL-C sends a signal to the child, we ignore it
 			// ourselves
 # ifdef HAVE_SETSID
 			kill(-pid, SIGINT);
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 			kill(0, SIGINT);
 # endif
-			if (wpid > 0)
+			ಆದರೆ (wpid > 0)
 			    kill(wpid, SIGINT);
 			got_int = FALSE;
 		    }
@@ -5479,95 +5479,95 @@ mch_call_shell_fork(
 		     * to some terminal (vt52?).
 		     */
 		    ++noread_cnt;
-		    while (RealWaitForChar(fromshell_fd, 10L, NULL, NULL))
+		    ಆಗ (RealWaitForChar(fromshell_fd, 10L, ಖಾಲಿ, ಖಾಲಿ))
 		    {
-			len = read_eintr(fromshell_fd, buffer
-				+ buffer_off, (size_t)(BUFLEN - buffer_off)
+			len = read_eintr(fromshell_fd, ಬಫರ್
+				+ ಬಫರ್_off, (size_t)(BUFLEN - ಬಫರ್_off)
 				);
-			if (len <= 0)		    // end of file or error
-			    goto finished;
+			ಆದರೆ (len <= 0)		    // end of file or error
+			    ಹೋಗು ಪೂರ್ಣಗೊಂಡ;
 
 			noread_cnt = 0;
-			if (options & SHELL_READ)
+			ಆದರೆ (options & SHELL_READ)
 			{
 			    // Do NUL -> NL translation, append NL separated
 			    // lines to the current buffer.
-			    for (i = 0; i < len; ++i)
+			    ಗಾಗಿ (i = 0; i < len; ++i)
 			    {
-				if (buffer[i] == NL)
-				    append_ga_line(&ga);
-				else if (buffer[i] == NUL)
+				ಆದರೆ (ಬಫರ್[i] == NL)
+				    append_ga_ಸಾಲು(&ga);
+				ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಬಫರ್[i] == NUL)
 				    ga_append(&ga, NL);
-				else
-				    ga_append(&ga, buffer[i]);
+				ಇಲ್ಲದಿದ್ದರೆ
+				    ga_append(&ga, ಬಫರ್[i]);
 			    }
 			}
-			else if (has_mbyte)
+			ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (has_mbyte)
 			{
-			    int		l;
+			    ಪೂರ್ಣಾಂಕ		l;
 			    char_u	*p;
 
-			    len += buffer_off;
-			    buffer[len] = NUL;
+			    len += ಬಫರ್_off;
+			    ಬಫರ್[len] = NUL;
 
 			    // Check if the last character in buffer[] is
 			    // incomplete, keep these bytes for the next
 			    // round.
-			    for (p = buffer; p < buffer + len; p += l)
+			    ಗಾಗಿ (p = ಬಫರ್; p < ಬಫರ್ + len; p += l)
 			    {
 				l = MB_CPTR2LEN(p);
-				if (l == 0)
+				ಆದರೆ (l == 0)
 				    l = 1;  // NUL byte?
-				else if (MB_BYTE2LEN(*p) != l)
-				    break;
+				ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (MB_BYTE2LEN(*p) != l)
+				    ನಿಲ್ಲಿಸು;
 			    }
-			    if (p == buffer)	// no complete character
+			    ಆದರೆ (p == ಬಫರ್)	// no complete character
 			    {
 				// avoid getting stuck at an illegal byte
-				if (len >= 12)
+				ಆದರೆ (len >= 12)
 				    ++p;
-				else
+				ಇಲ್ಲದಿದ್ದರೆ
 				{
-				    buffer_off = len;
-				    continue;
+				    ಬಫರ್_off = len;
+				    ಮುಂದುವರಿ;
 				}
 			    }
 			    c = *p;
 			    *p = NUL;
-			    msg_puts((char *)buffer);
-			    if (p < buffer + len)
+			    ಸಂದೇಶ_puts((ಅಕ್ಷರ *)ಬಫರ್);
+			    ಆದರೆ (p < ಬಫರ್ + len)
 			    {
 				*p = c;
-				buffer_off = (buffer + len) - p;
-				mch_memmove(buffer, p, buffer_off);
-				continue;
+				ಬಫರ್_off = (ಬಫರ್ + len) - p;
+				mch_memmove(ಬಫರ್, p, ಬಫರ್_off);
+				ಮುಂದುವರಿ;
 			    }
-			    buffer_off = 0;
+			    ಬಫರ್_off = 0;
 			}
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
-			    buffer[len] = NUL;
-			    msg_puts((char *)buffer);
+			    ಬಫರ್[len] = NUL;
+			    ಸಂದೇಶ_puts((ಅಕ್ಷರ *)ಬಫರ್);
 			}
 
-			windgoto(msg_row, cmdline_col_off + msg_col);
+			windgoto(ಸಂದೇಶ_ಅಡ್ಡಸಾಲು, cmdline_ಲಂಬಸಾಲು_off + ಸಂದೇಶ_ಲಂಬಸಾಲು);
 			cursor_on();
-			out_flush();
-			if (got_int)
-			    break;
+			ಹೊರಹೋಗು_flush();
+			ಆದರೆ (got_int)
+			    ನಿಲ್ಲಿಸು;
 
 # ifdef ELAPSED_FUNC
-			if (wait_pid == 0)
+			ಆದರೆ (wait_pid == 0)
 			{
-			    long	msec = ELAPSED_FUNC(start_tv);
+			    ದೀರ್ಘ	msec = ELAPSED_FUNC(ಆರಂಭ_tv);
 
 			    // Avoid that we keep looping here without
 			    // checking for a CTRL-C for a long time.  Don't
 			    // break out too often to avoid losing typeahead.
-			    if (msec > 2000)
+			    ಆದರೆ (msec > 2000)
 			    {
 				noread_cnt = 5;
-				break;
+				ನಿಲ್ಲಿಸು;
 			    }
 			}
 # endif
@@ -5576,20 +5576,20 @@ mch_call_shell_fork(
 		    // If we already detected the child has finished, continue
 		    // reading output for a short while.  Some text may be
 		    // buffered.
-		    if (wait_pid == pid)
+		    ಆದರೆ (wait_pid == pid)
 		    {
-			if (noread_cnt < 5)
-			    continue;
-			break;
+			ಆದರೆ (noread_cnt < 5)
+			    ಮುಂದುವರಿ;
+			ನಿಲ್ಲಿಸು;
 		    }
 
 		    /*
 		     * Check if the child still exists, before checking for
 		     * typed characters (otherwise we would lose typeahead).
 		     */
-		    wait_pid = waitpid(pid, &status, WNOHANG);
-		    if ((wait_pid == (pid_t)-1 && errno == ECHILD)
-			    || (wait_pid == pid && WIFEXITED(status)))
+		    wait_pid = waitpid(pid, &ಸ್ಥಿತಿ_2, WNOHANG);
+		    ಆದರೆ ((wait_pid == (pid_t)-1 && errno == ECHILD)
+			    || (wait_pid == pid && WIFEXITED(ಸ್ಥಿತಿ_2)))
 		    {
 			// Don't break the loop yet, try reading more
 			// characters from "fromshell_fd" first.  When using
@@ -5597,10 +5597,10 @@ mch_call_shell_fork(
 			// then we'll break the loop at the "break" above.
 			wait_pid = pid;
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 			wait_pid = 0;
 
-# if defined(FEAT_XCLIPBOARD) && defined(FEAT_X11)
+# ಆದರೆ defined(FEAT_XCLIPBOARD) && defined(FEAT_X11)
 		    // Handle any X events, e.g. serving the clipboard.
 		    clip_update();
 # endif
@@ -5610,17 +5610,17 @@ mch_call_shell_fork(
 		    wayland_update();
 # endif
 		}
-finished:
-		p_more = p_more_save;
-		if (options & SHELL_READ)
+ಪೂರ್ಣಗೊಂಡ:
+		p_ಇನ್ನಷ್ಟು = p_ಇನ್ನಷ್ಟು_save;
+		ಆದರೆ (options & SHELL_READ)
 		{
-		    if (ga.ga_len > 0)
+		    ಆದರೆ (ga.ga_len > 0)
 		    {
-			append_ga_line(&ga);
+			append_ga_ಸಾಲು(&ga);
 			// remember that the NL was missing
 			curbuf->b_no_eol_lnum = curwin->w_cursor.lnum;
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 			curbuf->b_no_eol_lnum = 0;
 		    ga_clear(&ga);
 		}
@@ -5628,49 +5628,49 @@ finished:
 		/*
 		 * Give all typeahead that wasn't used back to ui_inchar().
 		 */
-		if (ta_len)
+		ಆದರೆ (ta_len)
 		    ui_inchar_undo(ta_buf, ta_len);
 		State = old_State;
-		if (toshell_fd >= 0)
+		ಆದರೆ (toshell_fd >= 0)
 		    close(toshell_fd);
 		close(fromshell_fd);
 	    }
-# if (defined(FEAT_XCLIPBOARD) && defined(FEAT_X11)) || defined(FEAT_WAYLAND)
-	    else
+# ಆದರೆ (defined(FEAT_XCLIPBOARD) && defined(FEAT_X11)) || defined(FEAT_WAYLAND)
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		long delay_msec = 1;
+		ದೀರ್ಘ delay_msec = 1;
 
-		if (tmode == TMODE_RAW)
+		ಆದರೆ (tmode == TMODE_RAW)
 		    // Possibly disables modifyOtherKeys, so that the system
 		    // can recognize CTRL-C.
-		    out_str_t_TE();
+		    ಹೊರಹೋಗು_str_t_TE();
 
 		/*
 		 * Similar to the loop above, but only handle X and Wayland
 		 * events, no I/O.
 		 */
-		for (;;)
+		ಗಾಗಿ (;;)
 		{
-		    if (got_int)
+		    ಆದರೆ (got_int)
 		    {
 			// CTRL-C sends a signal to the child, we ignore it
 			// ourselves
 #  ifdef HAVE_SETSID
 			kill(-pid, SIGINT);
-#  else
+#  ಇಲ್ಲದಿದ್ದರೆ
 			kill(0, SIGINT);
 #  endif
 			got_int = FALSE;
 		    }
-		    wait_pid = waitpid(pid, &status, WNOHANG);
-		    if ((wait_pid == (pid_t)-1 && errno == ECHILD)
-			    || (wait_pid == pid && WIFEXITED(status)))
+		    wait_pid = waitpid(pid, &ಸ್ಥಿತಿ_2, WNOHANG);
+		    ಆದರೆ ((wait_pid == (pid_t)-1 && errno == ECHILD)
+			    || (wait_pid == pid && WIFEXITED(ಸ್ಥಿತಿ_2)))
 		    {
 			wait_pid = pid;
-			break;
+			ನಿಲ್ಲಿಸು;
 		    }
 
-#  if defined(FEAT_XCLIPBOARD) && defined(FEAT_X11)
+#  ಆದರೆ defined(FEAT_XCLIPBOARD) && defined(FEAT_X11)
 		    // Handle any X events, e.g. serving the clipboard.
 		    clip_update();
 #  endif
@@ -5684,13 +5684,13 @@ finished:
 		    // less time, gradually wait longer.
 		    mch_delay(delay_msec,
 				   MCH_DELAY_IGNOREINPUT | MCH_DELAY_SETTMODE);
-		    if (++delay_msec > 10)
+		    ಆದರೆ (++delay_msec > 10)
 			delay_msec = 10;
 		}
 
-		if (tmode == TMODE_RAW)
+		ಆದರೆ (tmode == TMODE_RAW)
 		    // possibly enables modifyOtherKeys again
-		    out_str_t_TI();
+		    ಹೊರಹೋಗು_str_t_TI();
 	    }
 # endif
 
@@ -5701,97 +5701,97 @@ finished:
 	     * Don't wait if wait_pid was already set above, indicating the
 	     * child already exited.
 	     */
-	    if (wait_pid != pid)
-		(void)wait4pid(pid, &status);
+	    ಆದರೆ (wait_pid != pid)
+		(ಶೂನ್ಯ)wait4pid(pid, &ಸ್ಥಿತಿ_2);
 
 # ifdef FEAT_GUI
 	    // Close slave side of pty.  Only do this after the child has
 	    // exited, otherwise the child may hang when it tries to write on
 	    // the pty.
-	    if (pty_master_fd >= 0)
+	    ಆದರೆ (pty_master_fd >= 0)
 		close(pty_slave_fd);
 # endif
 
 	    // Make sure the child that writes to the external program is
 	    // dead.
-	    if (wpid > 0)
+	    ಆದರೆ (wpid > 0)
 	    {
 		kill(wpid, SIGKILL);
-		wait4pid(wpid, NULL);
+		wait4pid(wpid, ಖಾಲಿ);
 	    }
 
-# ifdef FEAT_JOB_CHANNEL
-	    --dont_check_job_ended;
+# ifdef FEAT_ಕೆಲಸ_CHANNEL
+	    --dont_check_ಕೆಲಸ_ended;
 # endif
 
 	    /*
 	     * Set to raw mode right now, otherwise a CTRL-C after
 	     * catch_signals() will kill Vim.
 	     */
-	    if (tmode == TMODE_RAW)
+	    ಆದರೆ (tmode == TMODE_RAW)
 		settmode(TMODE_RAW);
 	    did_settmode = TRUE;
-	    set_signals();
+	    ಗಣ_ಸಂಕೇತಗಳು();
 
-	    if (WIFEXITED(status))
+	    ಆದರೆ (WIFEXITED(ಸ್ಥಿತಿ_2))
 	    {
 		// LINTED avoid "bitwise operation on signed value"
-		retval = WEXITSTATUS(status);
-		if (retval != 0 && !emsg_silent)
+		retval = WEXITSTATUS(ಸ್ಥಿತಿ_2);
+		ಆದರೆ (retval != 0 && !emsg_silent)
 		{
-		    if (retval == EXEC_FAILED)
+		    ಆದರೆ (retval == EXEC_FAILED)
 		    {
-			msg_puts(_("\nCannot execute shell "));
-			msg_outtrans(p_sh);
-			msg_putchar('\n');
+			ಸಂದೇಶ_puts(_("\nCannot execute shell "));
+			ಸಂದೇಶ_outtrans(p_sh);
+			ಸಂದೇಶ_putchar('\n');
 		    }
-		    else if (!(options & SHELL_SILENT))
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!(options & SHELL_SILENT))
 		    {
-			msg_puts(_("\nshell returned "));
-			msg_outnum((long)retval);
-			msg_putchar('\n');
+			ಸಂದೇಶ_puts(_("\nshell returned "));
+			ಸಂದೇಶ_outnum((ದೀರ್ಘ)retval);
+			ಸಂದೇಶ_putchar('\n');
 		    }
 		}
 	    }
-	    else
-		msg_puts(_("\nCommand terminated\n"));
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ಸಂದೇಶ_puts(_("\nCommand terminated\n"));
 	}
     }
 
 error:
-    if (!did_settmode)
-	if (tmode == TMODE_RAW)
+    ಆದರೆ (!did_settmode)
+	ಆದರೆ (tmode == TMODE_RAW)
 	    settmode(TMODE_RAW);	// set to raw mode
     resettitle();
     vim_free(argv);
     vim_free(tofree1);
     vim_free(tofree2);
 
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
-#endif // USE_SYSTEM
+#ಆದರೆ_ಅಂತ್ಯ // USE_SYSTEM
 
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_call_shell(
     char_u	*cmd,
-    int		options)	// SHELL_*, see vim.h
+    ಪೂರ್ಣಾಂಕ		options)	// SHELL_*, see vim.h
 {
-#ifdef FEAT_EVAL
-    ch_log(NULL, "executing shell command: %s", cmd);
-#endif
-#if defined(FEAT_GUI) && defined(FEAT_TERMINAL)
-    if (gui.in_use && vim_strchr(p_go, GO_TERMINAL) != NULL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ch_log(ಖಾಲಿ, "executing shell command: %s", cmd);
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(FEAT_GUI) && defined(FEAT_TERMINAL)
+    ಆದರೆ (gui.ಒಳ_use && vim_strchr(p_go, GO_TERMINAL) != ಖಾಲಿ
 					      && (options & SHELL_SILENT) == 0)
-	return mch_call_shell_terminal(cmd, options);
-#endif
-#ifdef USE_SYSTEM
-    return mch_call_shell_system(cmd, options);
-#else
-    return mch_call_shell_fork(cmd, options);
-#endif
+	ಹಿಂತಿರುಗಿ mch_call_shell_terminal(cmd, options);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_SYSTEM
+    ಹಿಂತಿರುಗಿ mch_call_shell_system(cmd, options);
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಹಿಂತಿರುಗಿ mch_call_shell_fork(cmd, options);
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * Execute "argv" directly without the shell and return the output.
  * Used by system() and systemlist() when the command is a List.
@@ -5802,71 +5802,71 @@ mch_call_shell(
  * Sets v:shell_error to the exit status.
  */
     char_u *
-mch_get_cmd_output_direct(
-    char	**argv,
+mch_get_cmd_output_ನೇರ(
+    ಅಕ್ಷರ	**argv,
     char_u	*infile,
-    int		flags UNUSED,
-    int		*ret_len)
+    ಪೂರ್ಣಾಂಕ		flags ಬಳಸದ,
+    ಪೂರ್ಣಾಂಕ		*ret_len)
 {
     pid_t	pid;
-    int		fd_out[2] = {-1, -1};
-    int		status = -1;
-    char_u	*buffer = NULL;
+    ಪೂರ್ಣಾಂಕ		fd_ಹೊರಹೋಗು[2] = {-1, -1};
+    ಪೂರ್ಣಾಂಕ		ಸ್ಥಿತಿ_2 = -1;
+    char_u	*ಬಫರ್ = ಖಾಲಿ;
     garray_T	ga;
     SIGSET_DECL(curset)
 
     ga_init2(&ga, 1, 4096);
 
-    ch_log(NULL, "directly executing: %s", argv[0]);
+    ch_log(ಖಾಲಿ, "directly executing: %s", argv[0]);
 
-    if (pipe(fd_out) < 0)
+    ಆದರೆ (pipe(fd_ಹೊರಹೋಗು) < 0)
     {
 	emsg(_(e_cannot_create_pipes));
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    BLOCK_SIGNALS(&curset);
+    ಖಂಡ_ಸಂಕೇತಗಳು(&curset);
 # ifdef VMS
     pid = 0; // VMS does not have fork
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
     pid = fork();
 # endif
-    if (pid == -1)
+    ಆದರೆ (pid == -1)
     {
-	UNBLOCK_SIGNALS(&curset);
-	close(fd_out[0]);
-	close(fd_out[1]);
+	UNBLOCK_ಸಂಕೇತಗಳು(&curset);
+	close(fd_ಹೊರಹೋಗು[0]);
+	close(fd_ಹೊರಹೋಗು[1]);
 	emsg(_("\nCannot fork\n"));
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    if (pid == 0)
+    ಆದರೆ (pid == 0)
     {
 	// child process
-	reset_signals();
-	UNBLOCK_SIGNALS(&curset);
+	reset_ಸಂಕೇತಗಳು();
+	UNBLOCK_ಸಂಕೇತಗಳು(&curset);
 
-	if (ch_log_active())
+	ಆದರೆ (ch_log_ಸಕ್ರಿಯ())
 	{
-	    ch_log(NULL, "closing channel log in the child process");
+	    ch_log(ಖಾಲಿ, "closing channel log in the child process");
 	    ch_logfile((char_u *)"", (char_u *)"");
 	}
 
 	// Set up stdin.
-	if (infile != NULL)
+	ಆದರೆ (infile != ಖಾಲಿ)
 	{
-	    int fd_in = open((char *)infile, O_RDONLY);
-	    if (fd_in >= 0)
+	    ಪೂರ್ಣಾಂಕ fd_ಒಳ = open((ಅಕ್ಷರ *)infile, O_RDONLY);
+	    ಆದರೆ (fd_ಒಳ >= 0)
 	    {
 		close(0);
-		vim_ignored = dup(fd_in);
-		close(fd_in);
+		vim_ignored = dup(fd_ಒಳ);
+		close(fd_ಒಳ);
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    int nullfd = open("/dev/null", O_RDONLY);
-	    if (nullfd >= 0)
+	    ಪೂರ್ಣಾಂಕ nullfd = open("/dev/null", O_RDONLY);
+	    ಆದರೆ (nullfd >= 0)
 	    {
 		close(0);
 		vim_ignored = dup(nullfd);
@@ -5875,13 +5875,13 @@ mch_get_cmd_output_direct(
 	}
 
 	// Set up stdout: write end of pipe.
-	close(fd_out[0]);
+	close(fd_ಹೊರಹೋಗು[0]);
 	close(1);
-	vim_ignored = dup(fd_out[1]);
+	vim_ignored = dup(fd_ಹೊರಹೋಗು[1]);
 	// Also redirect stderr to the pipe.
 	close(2);
-	vim_ignored = dup(fd_out[1]);
-	close(fd_out[1]);
+	vim_ignored = dup(fd_ಹೊರಹೋಗು[1]);
+	close(fd_ಹೊರಹೋಗು[1]);
 
 	execvp(argv[0], argv);
 	_exit(127);
@@ -5889,183 +5889,183 @@ mch_get_cmd_output_direct(
     }
 
     // parent process
-    UNBLOCK_SIGNALS(&curset);
-    close(fd_out[1]);
+    UNBLOCK_ಸಂಕೇತಗಳು(&curset);
+    close(fd_ಹೊರಹೋಗು[1]);
 
     // Read output from child.
-    for (;;)
+    ಗಾಗಿ (;;)
     {
-	char	buf[4096];
-	int	n;
+	ಅಕ್ಷರ	buf[4096];
+	ಪೂರ್ಣಾಂಕ	n;
 
-	n = (int)read(fd_out[0], buf, sizeof(buf));
-	if (n <= 0)
-	    break;
-	if (ga_grow(&ga, n) == FAIL)
-	    break;
-	mch_memmove((char *)ga.ga_data + ga.ga_len, buf, n);
+	n = (ಪೂರ್ಣಾಂಕ)ಪಠ(fd_ಹೊರಹೋಗು[0], buf, ಗಾತ್ರ(buf));
+	ಆದರೆ (n <= 0)
+	    ನಿಲ್ಲಿಸು;
+	ಆದರೆ (ga_grow(&ga, n) == FAIL)
+	    ನಿಲ್ಲಿಸು;
+	mch_memmove((ಅಕ್ಷರ *)ga.ga_ದತ್ತಾಂಶ + ga.ga_len, buf, n);
 	ga.ga_len += n;
     }
-    close(fd_out[0]);
+    close(fd_ಹೊರಹೋಗು[0]);
 
     // Wait for child to finish.
-    (void)waitpid(pid, &status, 0);
-    if (WIFEXITED(status))
-	status = WEXITSTATUS(status);
-    else
-	status = -1;
-    set_vim_var_nr(VV_SHELL_ERROR, (long)status);
+    (ಶೂನ್ಯ)waitpid(pid, &ಸ್ಥಿತಿ_2, 0);
+    ಆದರೆ (WIFEXITED(ಸ್ಥಿತಿ_2))
+	ಸ್ಥಿತಿ_2 = WEXITSTATUS(ಸ್ಥಿತಿ_2);
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಸ್ಥಿತಿ_2 = -1;
+    ಗಣ_vim_var_nr(VV_SHELL_ERROR, (ದೀರ್ಘ)ಸ್ಥಿತಿ_2);
 
-    if (ga.ga_len > 0)
+    ಆದರೆ (ga.ga_len > 0)
     {
-	buffer = alloc(ga.ga_len + 1);
-	if (buffer != NULL)
+	ಬಫರ್ = alloc(ga.ga_len + 1);
+	ಆದರೆ (ಬಫರ್ != ಖಾಲಿ)
 	{
-	    mch_memmove(buffer, ga.ga_data, ga.ga_len);
-	    if (ret_len == NULL)
+	    mch_memmove(ಬಫರ್, ga.ga_ದತ್ತಾಂಶ, ga.ga_len);
+	    ಆದರೆ (ret_len == ಖಾಲಿ)
 	    {
-		int	i;
+		ಪೂರ್ಣಾಂಕ	i;
 
 		// Change NUL into SOH, otherwise the string is truncated.
-		for (i = 0; i < ga.ga_len; ++i)
-		    if (buffer[i] == NUL)
-			buffer[i] = 1;
-		buffer[ga.ga_len] = NUL;
+		ಗಾಗಿ (i = 0; i < ga.ga_len; ++i)
+		    ಆದರೆ (ಬಫರ್[i] == NUL)
+			ಬಫರ್[i] = 1;
+		ಬಫರ್[ga.ga_len] = NUL;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		*ret_len = ga.ga_len;
 	}
     }
-    else if (ret_len != NULL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ret_len != ಖಾಲಿ)
 	*ret_len = 0;
 
     ga_clear(&ga);
-    return buffer;
+    ಹಿಂತಿರುಗಿ ಬಫರ್;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_JOB_CHANNEL)
-    void
-mch_job_start(char **argv, job_T *job, jobopt_T *options, int is_terminal)
+#ಆದರೆ defined(FEAT_ಕೆಲಸ_CHANNEL)
+    ಶೂನ್ಯ
+mch_ಕೆಲಸ_ಆರಂಭ(ಅಕ್ಷರ **argv, ಕೆಲಸ_T *ಕೆಲಸ, jobopt_T *options, ಪೂರ್ಣಾಂಕ is_terminal)
 {
     pid_t	pid;
-    int		fd_in[2] = {-1, -1};	// for stdin
-    int		fd_out[2] = {-1, -1};	// for stdout
-    int		fd_err[2] = {-1, -1};	// for stderr
-    int		pty_master_fd = -1;
-    int		pty_slave_fd = -1;
-    channel_T	*channel = NULL;
-    int		use_null_for_in = options->jo_io[PART_IN] == JIO_NULL;
-    int		use_null_for_out = options->jo_io[PART_OUT] == JIO_NULL;
-    int		use_null_for_err = options->jo_io[PART_ERR] == JIO_NULL;
-    int		use_file_for_in = options->jo_io[PART_IN] == JIO_FILE;
-    int		use_file_for_out = options->jo_io[PART_OUT] == JIO_FILE;
-    int		use_file_for_err = options->jo_io[PART_ERR] == JIO_FILE;
-    int		use_buffer_for_in = options->jo_io[PART_IN] == JIO_BUFFER;
-    int		use_out_for_err = options->jo_io[PART_ERR] == JIO_OUT;
+    ಪೂರ್ಣಾಂಕ		fd_ಒಳ[2] = {-1, -1};	// for stdin
+    ಪೂರ್ಣಾಂಕ		fd_ಹೊರಹೋಗು[2] = {-1, -1};	// for stdout
+    ಪೂರ್ಣಾಂಕ		fd_err[2] = {-1, -1};	// for stderr
+    ಪೂರ್ಣಾಂಕ		pty_master_fd = -1;
+    ಪೂರ್ಣಾಂಕ		pty_slave_fd = -1;
+    channel_T	*channel = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		use_null_for_ಒಳ = options->jo_io[PART_ಒಳ] == JIO_NULL;
+    ಪೂರ್ಣಾಂಕ		use_null_for_ಹೊರಹೋಗು = options->jo_io[PART_ಹೊರಹೋಗು] == JIO_NULL;
+    ಪೂರ್ಣಾಂಕ		use_null_for_err = options->jo_io[PART_ERR] == JIO_NULL;
+    ಪೂರ್ಣಾಂಕ		use_file_for_ಒಳ = options->jo_io[PART_ಒಳ] == JIO_FILE;
+    ಪೂರ್ಣಾಂಕ		use_file_for_ಹೊರಹೋಗು = options->jo_io[PART_ಹೊರಹೋಗು] == JIO_FILE;
+    ಪೂರ್ಣಾಂಕ		use_file_for_err = options->jo_io[PART_ERR] == JIO_FILE;
+    ಪೂರ್ಣಾಂಕ		use_ಬಫರ್_for_ಒಳ = options->jo_io[PART_ಒಳ] == JIO_ಬಫರ್;
+    ಪೂರ್ಣಾಂಕ		use_ಹೊರಹೋಗು_for_err = options->jo_io[PART_ERR] == JIO_ಹೊರಹೋಗು;
     SIGSET_DECL(curset)
 
-    if (use_out_for_err && use_null_for_out)
+    ಆದರೆ (use_ಹೊರಹೋಗು_for_err && use_null_for_ಹೊರಹೋಗು)
 	use_null_for_err = TRUE;
 
     // default is to fail
-    job->jv_status = JOB_FAILED;
+    ಕೆಲಸ->jv_ಸ್ಥಿತಿ = ಕೆಲಸ_FAILED;
 
-    if (options->jo_pty
-	    && (!(use_file_for_in || use_null_for_in)
-		|| !(use_file_for_out || use_null_for_out)
-		|| !(use_out_for_err || use_file_for_err || use_null_for_err)))
+    ಆದರೆ (options->jo_pty
+	    && (!(use_file_for_ಒಳ || use_null_for_ಒಳ)
+		|| !(use_file_for_ಹೊರಹೋಗು || use_null_for_ಹೊರಹೋಗು)
+		|| !(use_ಹೊರಹೋಗು_for_err || use_file_for_err || use_null_for_err)))
 	open_pty(&pty_master_fd, &pty_slave_fd,
-					    &job->jv_tty_out, &job->jv_tty_in);
+					    &ಕೆಲಸ->jv_tty_ಹೊರಹೋಗು, &ಕೆಲಸ->jv_tty_ಒಳ);
 
     // TODO: without the channel feature connect the child to /dev/null?
     // Open pipes for stdin, stdout, stderr.
-    if (use_file_for_in)
+    ಆದರೆ (use_file_for_ಒಳ)
     {
-	char_u *fname = options->jo_io_name[PART_IN];
+	char_u *fname = options->jo_io_name[PART_ಒಳ];
 
-	fd_in[0] = mch_open((char *)fname, O_RDONLY, 0);
-	if (fd_in[0] < 0)
+	fd_ಒಳ[0] = mch_open((ಅಕ್ಷರ *)fname, O_RDONLY, 0);
+	ಆದರೆ (fd_ಒಳ[0] < 0)
 	{
 	    semsg(_(e_cant_open_file_str), fname);
-	    goto failed;
+	    ಹೋಗು failed;
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	// When writing buffer lines to the input don't use the pty, so that
 	// the pipe can be closed when all lines were written.
-	if (!use_null_for_in && (pty_master_fd < 0 || use_buffer_for_in)
-							    && pipe(fd_in) < 0)
-	    goto failed;
+	ಆದರೆ (!use_null_for_ಒಳ && (pty_master_fd < 0 || use_ಬಫರ್_for_ಒಳ)
+							    && pipe(fd_ಒಳ) < 0)
+	    ಹೋಗು failed;
 
-    if (use_file_for_out)
+    ಆದರೆ (use_file_for_ಹೊರಹೋಗು)
     {
-	char_u *fname = options->jo_io_name[PART_OUT];
+	char_u *fname = options->jo_io_name[PART_ಹೊರಹೋಗು];
 
-	fd_out[1] = mch_open((char *)fname, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (fd_out[1] < 0)
+	fd_ಹೊರಹೋಗು[1] = mch_open((ಅಕ್ಷರ *)fname, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	ಆದರೆ (fd_ಹೊರಹೋಗು[1] < 0)
 	{
 	    semsg(_(e_cant_open_file_str), fname);
-	    goto failed;
+	    ಹೋಗು failed;
 	}
     }
-    else if (!use_null_for_out && pty_master_fd < 0 && pipe(fd_out) < 0)
-	goto failed;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!use_null_for_ಹೊರಹೋಗು && pty_master_fd < 0 && pipe(fd_ಹೊರಹೋಗು) < 0)
+	ಹೋಗು failed;
 
-    if (use_file_for_err)
+    ಆದರೆ (use_file_for_err)
     {
 	char_u *fname = options->jo_io_name[PART_ERR];
 
-	fd_err[1] = mch_open((char *)fname, O_WRONLY | O_CREAT | O_TRUNC, 0600);
-	if (fd_err[1] < 0)
+	fd_err[1] = mch_open((ಅಕ್ಷರ *)fname, O_WRONLY | O_CREAT | O_TRUNC, 0600);
+	ಆದರೆ (fd_err[1] < 0)
 	{
 	    semsg(_(e_cant_open_file_str), fname);
-	    goto failed;
+	    ಹೋಗು failed;
 	}
     }
     // only create a pipe for the error fd, when either a callback has been setup
     // or pty is not used (e.g. terminal uses pty by default)
-    else if (!use_out_for_err && !use_null_for_err
-		&& (pty_master_fd < 0 || (options->jo_set & JO_ERR_CALLBACK))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!use_ಹೊರಹೋಗು_for_err && !use_null_for_err
+		&& (pty_master_fd < 0 || (options->jo_ಗಣ & JO_ERR_CALLBACK))
 			    && pipe(fd_err) < 0)
-	goto failed;
+	ಹೋಗು failed;
 
-    if (!use_null_for_in || !use_null_for_out || !use_null_for_err)
+    ಆದರೆ (!use_null_for_ಒಳ || !use_null_for_ಹೊರಹೋಗು || !use_null_for_err)
     {
-	if (options->jo_set & JO_CHANNEL)
+	ಆದರೆ (options->jo_ಗಣ & JO_CHANNEL)
 	{
 	    channel = options->jo_channel;
-	    if (channel != NULL)
+	    ಆದರೆ (channel != ಖಾಲಿ)
 		++channel->ch_refcount;
 	}
-	else
-	    channel = add_channel();
-	if (channel == NULL)
-	    goto failed;
-	if (job->jv_tty_out != NULL)
+	ಇಲ್ಲದಿದ್ದರೆ
+	    channel = ಕೂಡಿಸು_channel();
+	ಆದರೆ (channel == ಖಾಲಿ)
+	    ಹೋಗು failed;
+	ಆದರೆ (ಕೆಲಸ->jv_tty_ಹೊರಹೋಗು != ಖಾಲಿ)
 	    ch_log(channel, "using pty %s on fd %d",
-					       job->jv_tty_out, pty_master_fd);
+					       ಕೆಲಸ->jv_tty_ಹೊರಹೋಗು, pty_master_fd);
     }
 
-    BLOCK_SIGNALS(&curset);
+    ಖಂಡ_ಸಂಕೇತಗಳು(&curset);
     pid = fork();	// maybe we should use vfork()
-    if (pid == -1)
+    ಆದರೆ (pid == -1)
     {
 	// failed to fork
-	UNBLOCK_SIGNALS(&curset);
-	goto failed;
+	UNBLOCK_ಸಂಕೇತಗಳು(&curset);
+	ಹೋಗು failed;
     }
-    if (pid == 0)
+    ಆದರೆ (pid == 0)
     {
-	int	null_fd = -1;
-	int	stderr_works = TRUE;
+	ಪೂರ್ಣಾಂಕ	null_fd = -1;
+	ಪೂರ್ಣಾಂಕ	stderr_ಕೆಲಸಮಾಡುತ್ತದೆ = TRUE;
 
 	// child
-	reset_signals();		// handle signals normally
-	UNBLOCK_SIGNALS(&curset);
+	reset_ಸಂಕೇತಗಳು();		// handle signals normally
+	UNBLOCK_ಸಂಕೇತಗಳು(&curset);
 
 # ifdef FEAT_EVAL
-	if (ch_log_active())
+	ಆದರೆ (ch_log_ಸಕ್ರಿಯ())
 	    // close the log file in the child
 	    ch_logfile((char_u *)"", (char_u *)"");
 # endif
@@ -6074,138 +6074,138 @@ mch_job_start(char **argv, job_T *job, jobopt_T *options, int is_terminal)
 	// Create our own process group, so that the child and all its
 	// children can be kill()ed.  Don't do this when using pipes,
 	// because stdin is not a tty, we would lose /dev/tty.
-	(void)setsid();
+	(ಶೂನ್ಯ)setsid();
 # endif
 
 # ifdef FEAT_TERMINAL
-	if (options->jo_term_rows > 0)
+	ಆದರೆ (options->jo_ಪದ_ಅಡ್ಡಸಾಲುಗಳು > 0)
 	{
-	    char *term = (char *)T_NAME;
+	    ಅಕ್ಷರ *ಪದ = (ಅಕ್ಷರ *)T_NAME;
 
 #  ifdef FEAT_GUI
-	    if (term_is_gui(T_NAME))
+	    ಆದರೆ (ಪದ_is_gui(T_NAME))
 		// In the GUI 'term' is not what we want, use $TERM.
-		term = getenv("TERM");
+		ಪದ = getenv("TERM");
 #  endif
 	    // Use 'term' or $TERM if it starts with "xterm", otherwise fall
 	    // back to "xterm" or "xterm-color".
-	    if (term == NULL || *term == NUL || STRNCMP(term, "xterm", 5) != 0)
+	    ಆದರೆ (ಪದ == ಖಾಲಿ || *ಪದ == NUL || STRNCMP(ಪದ, "xterm", 5) != 0)
 	    {
-		if (t_colors >= 256)
+		ಆದರೆ (t_colors >= 256)
 		    // TODO: should we check this name is supported?
-		    term = "xterm-256color";
-		else if (t_colors > 16)
-		    term = "xterm-color";
-		else
-		    term = "xterm";
+		    ಪದ = "xterm-256color";
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (t_colors > 16)
+		    ಪದ = "xterm-color";
+		ಇಲ್ಲದಿದ್ದರೆ
+		    ಪದ = "xterm";
 	    }
-	    set_child_environment(
-		    (long)options->jo_term_rows,
-		    (long)options->jo_term_cols,
-		    term,
+	    ಗಣ_ಮಗು_environment(
+		    (ದೀರ್ಘ)options->jo_ಪದ_ಅಡ್ಡಸಾಲುಗಳು,
+		    (ದೀರ್ಘ)options->jo_ಪದ_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ,
+		    ಪದ,
 		    is_terminal);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 # endif
-	    set_default_child_environment(is_terminal);
+	    ಗಣ_default_ಮಗು_environment(is_terminal);
 
-	if (options->jo_env != NULL)
+	ಆದರೆ (options->jo_env != ಖಾಲಿ)
 	{
 	    dict_T	*dict = options->jo_env;
 	    hashitem_T	*hi;
-	    int		todo = (int)dict->dv_hashtab.ht_used;
+	    ಪೂರ್ಣಾಂಕ		todo = (ಪೂರ್ಣಾಂಕ)dict->dv_hashtab.ht_ಬಳಸಿದ;
 
-	    FOR_ALL_HASHTAB_ITEMS(&dict->dv_hashtab, hi, todo)
-		if (!HASHITEM_EMPTY(hi))
+	    FOR_ALL_HASHTAB_ವಸ್ತುಗಳು(&dict->dv_hashtab, hi, todo)
+		ಆದರೆ (!HASHITEM_ಖಾಲಿಗಳು(hi))
 		{
-		    typval_T *item = &dict_lookup(hi)->di_tv;
+		    typval_T *ಅಂಶ = &dict_lookup(hi)->di_tv;
 
-		    vim_setenv(hi->hi_key, tv_get_string(item));
+		    vim_setenv(hi->hi_ಕೀಲಿ, tv_get_string(ಅಂಶ));
 		    --todo;
 		}
 	}
 
-	if (use_null_for_in || use_null_for_out || use_null_for_err)
+	ಆದರೆ (use_null_for_ಒಳ || use_null_for_ಹೊರಹೋಗು || use_null_for_err)
 	{
 	    null_fd = open("/dev/null", O_RDWR | O_EXTRA, 0);
-	    if (null_fd < 0)
+	    ಆದರೆ (null_fd < 0)
 	    {
 		perror("opening /dev/null failed");
 		_exit(OPEN_NULL_FAILED);
 	    }
 	}
 
-	if (pty_slave_fd >= 0)
+	ಆದರೆ (pty_slave_fd >= 0)
 	{
 	    // push stream discipline modules
-	    setup_slavepty(pty_slave_fd);
+	    ಸಿದ್ಧತೆ_slavepty(pty_slave_fd);
 # ifdef TIOCSCTTY
 	    // Try to become controlling tty (probably doesn't work,
 	    // unless run by root)
-	    ioctl(pty_slave_fd, TIOCSCTTY, (char *)NULL);
+	    ioctl(pty_slave_fd, TIOCSCTTY, (ಅಕ್ಷರ *)ಖಾಲಿ);
 # endif
 	}
 
 	// set up stdin for the child
 	close(0);
-	if (use_null_for_in && null_fd >= 0)
+	ಆದರೆ (use_null_for_ಒಳ && null_fd >= 0)
 	    vim_ignored = dup(null_fd);
-	else if (fd_in[0] < 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (fd_ಒಳ[0] < 0)
 	    vim_ignored = dup(pty_slave_fd);
-	else
-	    vim_ignored = dup(fd_in[0]);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    vim_ignored = dup(fd_ಒಳ[0]);
 
 	// set up stderr for the child
 	close(2);
-	if (use_null_for_err && null_fd >= 0)
+	ಆದರೆ (use_null_for_err && null_fd >= 0)
 	{
 	    vim_ignored = dup(null_fd);
-	    stderr_works = FALSE;
+	    stderr_ಕೆಲಸಮಾಡುತ್ತದೆ = FALSE;
 	}
-	else if (use_out_for_err)
-	    vim_ignored = dup(fd_out[1]);
-	else if (fd_err[1] < 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (use_ಹೊರಹೋಗು_for_err)
+	    vim_ignored = dup(fd_ಹೊರಹೋಗು[1]);
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (fd_err[1] < 0)
 	    vim_ignored = dup(pty_slave_fd);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    vim_ignored = dup(fd_err[1]);
 
 	// set up stdout for the child
 	close(1);
-	if (use_null_for_out && null_fd >= 0)
+	ಆದರೆ (use_null_for_ಹೊರಹೋಗು && null_fd >= 0)
 	    vim_ignored = dup(null_fd);
-	else if (fd_out[1] < 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (fd_ಹೊರಹೋಗು[1] < 0)
 	    vim_ignored = dup(pty_slave_fd);
-	else
-	    vim_ignored = dup(fd_out[1]);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    vim_ignored = dup(fd_ಹೊರಹೋಗು[1]);
 
-	if (fd_in[0] >= 0)
-	    close(fd_in[0]);
-	if (fd_in[1] >= 0)
-	    close(fd_in[1]);
-	if (fd_out[0] >= 0)
-	    close(fd_out[0]);
-	if (fd_out[1] >= 0)
-	    close(fd_out[1]);
-	if (fd_err[0] >= 0)
+	ಆದರೆ (fd_ಒಳ[0] >= 0)
+	    close(fd_ಒಳ[0]);
+	ಆದರೆ (fd_ಒಳ[1] >= 0)
+	    close(fd_ಒಳ[1]);
+	ಆದರೆ (fd_ಹೊರಹೋಗು[0] >= 0)
+	    close(fd_ಹೊರಹೋಗು[0]);
+	ಆದರೆ (fd_ಹೊರಹೋಗು[1] >= 0)
+	    close(fd_ಹೊರಹೋಗು[1]);
+	ಆದರೆ (fd_err[0] >= 0)
 	    close(fd_err[0]);
-	if (fd_err[1] >= 0)
+	ಆದರೆ (fd_err[1] >= 0)
 	    close(fd_err[1]);
-	if (pty_master_fd >= 0)
+	ಆದರೆ (pty_master_fd >= 0)
 	{
 	    close(pty_master_fd); // not used in the child
 	    close(pty_slave_fd);  // was duped above
 	}
 
-	if (null_fd >= 0)
+	ಆದರೆ (null_fd >= 0)
 	    close(null_fd);
 
-	if (options->jo_cwd != NULL && mch_chdir((char *)options->jo_cwd) != 0)
+	ಆದರೆ (options->jo_cwd != ಖಾಲಿ && mch_chdir((ಅಕ್ಷರ *)options->jo_cwd) != 0)
 	    _exit(EXEC_FAILED);
 
 	// See above for type of argv.
 	execvp(argv[0], argv);
 
-	if (stderr_works)
+	ಆದರೆ (stderr_ಕೆಲಸಮಾಡುತ್ತದೆ)
 	    perror("executing job failed");
 # ifdef EXITFREE
 	// calling free_all_mem() here causes problems. Ignore valgrind
@@ -6215,282 +6215,282 @@ mch_job_start(char **argv, job_T *job, jobopt_T *options, int is_terminal)
     }
 
     // parent
-    UNBLOCK_SIGNALS(&curset);
+    UNBLOCK_ಸಂಕೇತಗಳು(&curset);
 
-    job->jv_pid = pid;
-    job->jv_status = JOB_STARTED;
-    job->jv_channel = channel;  // ch_refcount was set above
+    ಕೆಲಸ->jv_pid = pid;
+    ಕೆಲಸ->jv_ಸ್ಥಿತಿ = ಕೆಲಸ_STARTED;
+    ಕೆಲಸ->jv_channel = channel;  // ch_refcount was set above
 
-    if (pty_master_fd >= 0)
+    ಆದರೆ (pty_master_fd >= 0)
 	close(pty_slave_fd); // not used in the parent
     // close child stdin, stdout and stderr
-    if (fd_in[0] >= 0)
-	close(fd_in[0]);
-    if (fd_out[1] >= 0)
-	close(fd_out[1]);
-    if (fd_err[1] >= 0)
+    ಆದರೆ (fd_ಒಳ[0] >= 0)
+	close(fd_ಒಳ[0]);
+    ಆದರೆ (fd_ಹೊರಹೋಗು[1] >= 0)
+	close(fd_ಹೊರಹೋಗು[1]);
+    ಆದರೆ (fd_err[1] >= 0)
 	close(fd_err[1]);
-    if (channel != NULL)
+    ಆದರೆ (channel != ಖಾಲಿ)
     {
-	int in_fd = INVALID_FD;
-	int out_fd = INVALID_FD;
-	int err_fd = INVALID_FD;
+	ಪೂರ್ಣಾಂಕ ಒಳ_fd = INVALID_FD;
+	ಪೂರ್ಣಾಂಕ ಹೊರಹೋಗು_fd = INVALID_FD;
+	ಪೂರ್ಣಾಂಕ err_fd = INVALID_FD;
 
-	if (!(use_file_for_in || use_null_for_in))
-	    in_fd = fd_in[1] >= 0 ? fd_in[1] : pty_master_fd;
+	ಆದರೆ (!(use_file_for_ಒಳ || use_null_for_ಒಳ))
+	    ಒಳ_fd = fd_ಒಳ[1] >= 0 ? fd_ಒಳ[1] : pty_master_fd;
 
-	if (!(use_file_for_out || use_null_for_out))
-	    out_fd = fd_out[0] >= 0 ? fd_out[0] : pty_master_fd;
+	ಆದರೆ (!(use_file_for_ಹೊರಹೋಗು || use_null_for_ಹೊರಹೋಗು))
+	    ಹೊರಹೋಗು_fd = fd_ಹೊರಹೋಗು[0] >= 0 ? fd_ಹೊರಹೋಗು[0] : pty_master_fd;
 
 	// When using pty_master_fd only set it for stdout, do not duplicate
 	// it for stderr, it only needs to be read once.
-	if (!(use_out_for_err || use_file_for_err || use_null_for_err))
+	ಆದರೆ (!(use_ಹೊರಹೋಗು_for_err || use_file_for_err || use_null_for_err))
 	{
-	    if (fd_err[0] >= 0)
+	    ಆದರೆ (fd_err[0] >= 0)
 		err_fd = fd_err[0];
-	    else if (out_fd != pty_master_fd)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಹೊರಹೋಗು_fd != pty_master_fd)
 		err_fd = pty_master_fd;
 	}
 
-	channel_set_pipes(channel, in_fd, out_fd, err_fd);
-	channel_set_job(channel, job, options);
+	channel_ಗಣ_pipes(channel, ಒಳ_fd, ಹೊರಹೋಗು_fd, err_fd);
+	channel_ಗಣ_ಕೆಲಸ(channel, ಕೆಲಸ, options);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (fd_in[1] >= 0)
-	    close(fd_in[1]);
-	if (fd_out[0] >= 0)
-	    close(fd_out[0]);
-	if (fd_err[0] >= 0)
+	ಆದರೆ (fd_ಒಳ[1] >= 0)
+	    close(fd_ಒಳ[1]);
+	ಆದರೆ (fd_ಹೊರಹೋಗು[0] >= 0)
+	    close(fd_ಹೊರಹೋಗು[0]);
+	ಆದರೆ (fd_err[0] >= 0)
 	    close(fd_err[0]);
-	if (pty_master_fd >= 0)
+	ಆದರೆ (pty_master_fd >= 0)
 	    close(pty_master_fd);
     }
 
     // success!
-    return;
+    ಹಿಂತಿರುಗಿ;
 
 failed:
     channel_unref(channel);
-    if (fd_in[0] >= 0)
-	close(fd_in[0]);
-    if (fd_in[1] >= 0)
-	close(fd_in[1]);
-    if (fd_out[0] >= 0)
-	close(fd_out[0]);
-    if (fd_out[1] >= 0)
-	close(fd_out[1]);
-    if (fd_err[0] >= 0)
+    ಆದರೆ (fd_ಒಳ[0] >= 0)
+	close(fd_ಒಳ[0]);
+    ಆದರೆ (fd_ಒಳ[1] >= 0)
+	close(fd_ಒಳ[1]);
+    ಆದರೆ (fd_ಹೊರಹೋಗು[0] >= 0)
+	close(fd_ಹೊರಹೋಗು[0]);
+    ಆದರೆ (fd_ಹೊರಹೋಗು[1] >= 0)
+	close(fd_ಹೊರಹೋಗು[1]);
+    ಆದರೆ (fd_err[0] >= 0)
 	close(fd_err[0]);
-    if (fd_err[1] >= 0)
+    ಆದರೆ (fd_err[1] >= 0)
 	close(fd_err[1]);
-    if (pty_master_fd >= 0)
+    ಆದರೆ (pty_master_fd >= 0)
 	close(pty_master_fd);
-    if (pty_slave_fd >= 0)
+    ಆದರೆ (pty_slave_fd >= 0)
 	close(pty_slave_fd);
 }
 
-    static char_u *
-get_signal_name(int sig)
+    ಸ್ಥಿರ char_u *
+get_signal_name(ಪೂರ್ಣಾಂಕ sig)
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
     char_u	numbuf[NUMBUFLEN];
 
-    if (sig == SIGKILL)
-	return vim_strnsave((char_u *)"kill", STRLEN_LITERAL("kill"));
+    ಆದರೆ (sig == SIGKILL)
+	ಹಿಂತಿರುಗಿ vim_strnsave((char_u *)"kill", STRLEN_LITERAL("kill"));
 
-    for (i = 0; signal_info[i].sig != -1; i++)
-	if (sig == signal_info[i].sig)
-	    return strlow_save((char_u *)signal_info[i].name);
+    ಗಾಗಿ (i = 0; signal_info[i].sig != -1; i++)
+	ಆದರೆ (sig == signal_info[i].sig)
+	    ಹಿಂತಿರುಗಿ strlow_save((char_u *)signal_info[i].name);
 
-    i = vim_snprintf((char *)numbuf, NUMBUFLEN, "%d", sig);
-    return vim_strnsave(numbuf, i);
+    i = vim_snprintf((ಅಕ್ಷರ *)numbuf, NUMBUFLEN, "%d", sig);
+    ಹಿಂತಿರುಗಿ vim_strnsave(numbuf, i);
 }
 
-    char *
-mch_job_status(job_T *job)
+    ಅಕ್ಷರ *
+mch_ಕೆಲಸ_ಸ್ಥಿತಿ(ಕೆಲಸ_T *ಕೆಲಸ)
 {
-    int		status = -1;
+    ಪೂರ್ಣಾಂಕ		ಸ್ಥಿತಿ_2 = -1;
     pid_t	wait_pid = 0;
 
-    wait_pid = waitpid(job->jv_pid, &status, WNOHANG);
-    if (wait_pid == -1)
+    wait_pid = waitpid(ಕೆಲಸ->jv_pid, &ಸ್ಥಿತಿ_2, WNOHANG);
+    ಆದರೆ (wait_pid == -1)
     {
-	int waitpid_errno = errno;
-	if (waitpid_errno == ECHILD && mch_process_running(job->jv_pid))
+	ಪೂರ್ಣಾಂಕ waitpid_errno = errno;
+	ಆದರೆ (waitpid_errno == ECHILD && mch_process_running(ಕೆಲಸ->jv_pid))
 	    // The process is alive, but it was probably reparented (for
 	    // example by ptrace called by a debugger like lldb or gdb).
 	    // Note: This assumes that process IDs are not reused.
-	    return "run";
+	    ಹಿಂತಿರುಗಿ "run";
 
 	// process must have exited
-	if (job->jv_status < JOB_ENDED)
-	    ch_log(job->jv_channel, "Job no longer exists: %s",
+	ಆದರೆ (ಕೆಲಸ->jv_ಸ್ಥಿತಿ < ಕೆಲಸ_ENDED)
+	    ch_log(ಕೆಲಸ->jv_channel, "Job no longer exists: %s",
 						      strerror(waitpid_errno));
-	goto return_dead;
+	ಹೋಗು return_dead;
     }
-    if (wait_pid == 0)
-	return "run";
-    if (WIFEXITED(status))
+    ಆದರೆ (wait_pid == 0)
+	ಹಿಂತಿರುಗಿ "run";
+    ಆದರೆ (WIFEXITED(ಸ್ಥಿತಿ_2))
     {
 	// LINTED avoid "bitwise operation on signed value"
-	job->jv_exitval = WEXITSTATUS(status);
-	if (job->jv_status < JOB_ENDED)
-	    ch_log(job->jv_channel, "Job exited with %d", job->jv_exitval);
-	goto return_dead;
+	ಕೆಲಸ->jv_exitval = WEXITSTATUS(ಸ್ಥಿತಿ_2);
+	ಆದರೆ (ಕೆಲಸ->jv_ಸ್ಥಿತಿ < ಕೆಲಸ_ENDED)
+	    ch_log(ಕೆಲಸ->jv_channel, "Job exited with %d", ಕೆಲಸ->jv_exitval);
+	ಹೋಗು return_dead;
     }
-    if (WIFSIGNALED(status))
+    ಆದರೆ (WIFSIGNALED(ಸ್ಥಿತಿ_2))
     {
-	job->jv_exitval = -1;
-	job->jv_termsig = get_signal_name(WTERMSIG(status));
-	if (job->jv_status < JOB_ENDED && job->jv_termsig != NULL)
-	    ch_log(job->jv_channel, "Job terminated by signal \"%s\"",
-							      job->jv_termsig);
-	goto return_dead;
+	ಕೆಲಸ->jv_exitval = -1;
+	ಕೆಲಸ->jv_termsig = get_signal_name(WTERMSIG(ಸ್ಥಿತಿ_2));
+	ಆದರೆ (ಕೆಲಸ->jv_ಸ್ಥಿತಿ < ಕೆಲಸ_ENDED && ಕೆಲಸ->jv_termsig != ಖಾಲಿ)
+	    ch_log(ಕೆಲಸ->jv_channel, "Job terminated by signal \"%s\"",
+							      ಕೆಲಸ->jv_termsig);
+	ಹೋಗು return_dead;
     }
-    return "run";
+    ಹಿಂತಿರುಗಿ "run";
 
 return_dead:
-    if (job->jv_status < JOB_ENDED)
-	job->jv_status = JOB_ENDED;
-    return "dead";
+    ಆದರೆ (ಕೆಲಸ->jv_ಸ್ಥಿತಿ < ಕೆಲಸ_ENDED)
+	ಕೆಲಸ->jv_ಸ್ಥಿತಿ = ಕೆಲಸ_ENDED;
+    ಹಿಂತಿರುಗಿ "dead";
 }
 
-    job_T *
-mch_detect_ended_job(job_T *job_list)
+    ಕೆಲಸ_T *
+mch_detect_ended_ಕೆಲಸ(ಕೆಲಸ_T *ಕೆಲಸ_list)
 {
-    int		status = -1;
+    ಪೂರ್ಣಾಂಕ		ಸ್ಥಿತಿ_2 = -1;
     pid_t	wait_pid = 0;
-    job_T	*job;
+    ಕೆಲಸ_T	*ಕೆಲಸ;
 
 # ifndef USE_SYSTEM
     // Do not do this when waiting for a shell command to finish, we would get
     // the exit value here (and discard it), the exit value obtained there
     // would then be wrong.
-    if (dont_check_job_ended > 0)
-	return NULL;
+    ಆದರೆ (dont_check_ಕೆಲಸ_ended > 0)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 # endif
 
-    wait_pid = waitpid(-1, &status, WNOHANG);
-    if (wait_pid <= 0)
+    wait_pid = waitpid(-1, &ಸ್ಥಿತಿ_2, WNOHANG);
+    ಆದರೆ (wait_pid <= 0)
 	// no process ended
-	return NULL;
-    for (job = job_list; job != NULL; job = job->jv_next)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    ಗಾಗಿ (ಕೆಲಸ = ಕೆಲಸ_list; ಕೆಲಸ != ಖಾಲಿ; ಕೆಲಸ = ಕೆಲಸ->jv_ಮುಂದಿನ)
     {
-	if (job->jv_pid == wait_pid)
+	ಆದರೆ (ಕೆಲಸ->jv_pid == wait_pid)
 	{
-	    if (WIFEXITED(status))
+	    ಆದರೆ (WIFEXITED(ಸ್ಥಿತಿ_2))
 		// LINTED avoid "bitwise operation on signed value"
-		job->jv_exitval = WEXITSTATUS(status);
-	    else if (WIFSIGNALED(status))
+		ಕೆಲಸ->jv_exitval = WEXITSTATUS(ಸ್ಥಿತಿ_2);
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (WIFSIGNALED(ಸ್ಥಿತಿ_2))
 	    {
-		job->jv_exitval = -1;
-		job->jv_termsig = get_signal_name(WTERMSIG(status));
+		ಕೆಲಸ->jv_exitval = -1;
+		ಕೆಲಸ->jv_termsig = get_signal_name(WTERMSIG(ಸ್ಥಿತಿ_2));
 	    }
-	    if (job->jv_status < JOB_ENDED)
+	    ಆದರೆ (ಕೆಲಸ->jv_ಸ್ಥಿತಿ < ಕೆಲಸ_ENDED)
 	    {
-		ch_log(job->jv_channel, "Job ended");
-		job->jv_status = JOB_ENDED;
+		ch_log(ಕೆಲಸ->jv_channel, "Job ended");
+		ಕೆಲಸ->jv_ಸ್ಥಿತಿ = ಕೆಲಸ_ENDED;
 	    }
-	    return job;
+	    ಹಿಂತಿರುಗಿ ಕೆಲಸ;
 	}
     }
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Send a (deadly) signal to "job".
  * Return FAIL if "how" is not a valid name.
  */
-    int
-mch_signal_job(job_T *job, char_u *how)
+    ಪೂರ್ಣಾಂಕ
+mch_signal_ಕೆಲಸ(ಕೆಲಸ_T *ಕೆಲಸ, char_u *how)
 {
-    int	    sig = -1;
+    ಪೂರ್ಣಾಂಕ	    sig = -1;
 
-    if (*how == NUL || STRCMP(how, "term") == 0)
+    ಆದರೆ (*how == NUL || STRCMP(how, "term") == 0)
 	sig = SIGTERM;
-    else if (STRCMP(how, "hup") == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(how, "hup") == 0)
 	sig = SIGHUP;
-    else if (STRCMP(how, "quit") == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(how, "quit") == 0)
 	sig = SIGQUIT;
-    else if (STRCMP(how, "int") == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(how, "int") == 0)
 	sig = SIGINT;
-    else if (STRCMP(how, "kill") == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(how, "kill") == 0)
 	sig = SIGKILL;
 # ifdef SIGWINCH
-    else if (STRCMP(how, "winch") == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(how, "winch") == 0)
 	sig = SIGWINCH;
 # endif
-    else if (SAFE_isdigit(*how))
-	sig = atoi((char *)how);
-    else
-	return FAIL;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಸುರಕ್ಷಿತ_isdigit(*how))
+	sig = atoi((ಅಕ್ಷರ *)how);
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಹಿಂತಿರುಗಿ FAIL;
 
     // Never kill ourselves!
-    if (job->jv_pid != 0)
+    ಆದರೆ (ಕೆಲಸ->jv_pid != 0)
     {
 	// TODO: have an option to only kill the process, not the group?
-	kill(-job->jv_pid, sig);
-	kill(job->jv_pid, sig);
+	kill(-ಕೆಲಸ->jv_pid, sig);
+	kill(ಕೆಲಸ->jv_pid, sig);
     }
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Clear the data related to "job".
  */
-    void
-mch_clear_job(job_T *job)
+    ಶೂನ್ಯ
+mch_clear_ಕೆಲಸ(ಕೆಲಸ_T *ಕೆಲಸ)
 {
     // call waitpid because child process may become zombie
-    (void)waitpid(job->jv_pid, NULL, WNOHANG);
+    (ಶೂನ್ಯ)waitpid(ಕೆಲಸ->jv_pid, ಖಾಲಿ, WNOHANG);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_TERMINAL)
-    int
-mch_create_pty_channel(job_T *job, jobopt_T *options)
+#ಆದರೆ defined(FEAT_TERMINAL)
+    ಪೂರ್ಣಾಂಕ
+mch_create_pty_channel(ಕೆಲಸ_T *ಕೆಲಸ, jobopt_T *options)
 {
-    int		pty_master_fd = -1;
-    int		pty_slave_fd = -1;
+    ಪೂರ್ಣಾಂಕ		pty_master_fd = -1;
+    ಪೂರ್ಣಾಂಕ		pty_slave_fd = -1;
     channel_T	*channel;
 
-    open_pty(&pty_master_fd, &pty_slave_fd, &job->jv_tty_out, &job->jv_tty_in);
-    if (pty_master_fd < 0 || pty_slave_fd < 0)
-	return FAIL;
+    open_pty(&pty_master_fd, &pty_slave_fd, &ಕೆಲಸ->jv_tty_ಹೊರಹೋಗು, &ಕೆಲಸ->jv_tty_ಒಳ);
+    ಆದರೆ (pty_master_fd < 0 || pty_slave_fd < 0)
+	ಹಿಂತಿರುಗಿ FAIL;
     close(pty_slave_fd);
 
-    channel = add_channel();
-    if (channel == NULL)
+    channel = ಕೂಡಿಸು_channel();
+    ಆದರೆ (channel == ಖಾಲಿ)
     {
 	close(pty_master_fd);
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-    if (job->jv_tty_out != NULL)
+    ಆದರೆ (ಕೆಲಸ->jv_tty_ಹೊರಹೋಗು != ಖಾಲಿ)
 	ch_log(channel, "using pty %s on fd %d",
-					       job->jv_tty_out, pty_master_fd);
-    job->jv_channel = channel;  // ch_refcount was set by add_channel()
+					       ಕೆಲಸ->jv_tty_ಹೊರಹೋಗು, pty_master_fd);
+    ಕೆಲಸ->jv_channel = channel;  // ch_refcount was set by add_channel()
     channel->ch_keep_open = TRUE;
 
     // Only set the pty_master_fd for stdout, do not duplicate it for stderr,
     // it only needs to be read once.
-    channel_set_pipes(channel, pty_master_fd, pty_master_fd, INVALID_FD);
-    channel_set_job(channel, job, options);
-    return OK;
+    channel_ಗಣ_pipes(channel, pty_master_fd, pty_master_fd, INVALID_FD);
+    channel_ಗಣ_ಕೆಲಸ(channel, ಕೆಲಸ, options);
+    ಹಿಂತಿರುಗಿ OK;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Check for CTRL-C typed by reading all available characters.
  * In cooked mode we should get SIGINT, no need to check.
  */
-    void
-mch_breakcheck(int force)
+    ಶೂನ್ಯ
+mch_breakcheck(ಪೂರ್ಣಾಂಕ force)
 {
-    if ((mch_cur_tmode == TMODE_RAW || force)
-			       && RealWaitForChar(read_cmd_fd, 0L, NULL, NULL))
-	fill_input_buf(FALSE);
+    ಆದರೆ ((mch_cur_tmode == TMODE_RAW || force)
+			       && RealWaitForChar(read_cmd_fd, 0L, ಖಾಲಿ, ಖಾಲಿ))
+	fill_ಒಳಹರಿವು_buf(FALSE);
 }
 
 /*
@@ -6505,15 +6505,15 @@ mch_breakcheck(int force)
  * Returns TRUE when a character is available.
  * When a GUI is being used, this will never get called -- webb
  */
-    static int
-WaitForChar(long msec, int *interrupted, int ignore_input)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+WaitForChar(ದೀರ್ಘ msec, ಪೂರ್ಣಾಂಕ *interrupted, ಪೂರ್ಣಾಂಕ ignore_ಒಳಹರಿವು)
 {
-#ifdef FEAT_TIMERS
-    return ui_wait_for_chars_or_timer(
-		    msec, WaitForCharOrMouse, interrupted, ignore_input) == OK;
-#else
-    return WaitForCharOrMouse(msec, interrupted, ignore_input);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TIMERS
+    ಹಿಂತಿರುಗಿ ui_wait_for_chars_or_timer(
+		    msec, WaitForCharOrMouse, interrupted, ignore_ಒಳಹರಿವು) == OK;
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಹಿಂತಿರುಗಿ WaitForCharOrMouse(msec, interrupted, ignore_ಒಳಹರಿವು);
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
@@ -6525,49 +6525,49 @@ WaitForChar(long msec, int *interrupted, int ignore_input)
  * but something else needs to be done.
  * When a GUI is being used, this will never get called -- webb
  */
-    static int
-WaitForCharOrMouse(long msec, int *interrupted, int ignore_input)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+WaitForCharOrMouse(ದೀರ್ಘ msec, ಪೂರ್ಣಾಂಕ *interrupted, ಪೂರ್ಣಾಂಕ ignore_ಒಳಹರಿವು)
 {
-#ifdef FEAT_MOUSE_GPM
-    int		gpm_process_wanted;
-#endif
-#ifdef FEAT_XCLIPBOARD
-    int		rest;
-#endif
-    int		avail;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MOUSE_GPM
+    ಪೂರ್ಣಾಂಕ		gpm_process_wanted;
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XCLIPBOARD
+    ಪೂರ್ಣಾಂಕ		rest;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಪೂರ್ಣಾಂಕ		avail;
 
-    if (!ignore_input && input_available())	    // something in inbuf[]
-	return 1;
+    ಆದರೆ (!ignore_ಒಳಹರಿವು && ಒಳಹರಿವು_ಲಭ್ಯ())	    // something in inbuf[]
+	ಹಿಂತಿರುಗಿ 1;
 
-#if defined(FEAT_MOUSE_DEC)
+#ಆದರೆ defined(FEAT_MOUSE_DEC)
     // May need to query the mouse position.
-    if (WantQueryMouse)
+    ಆದರೆ (WantQueryMouse)
     {
 	WantQueryMouse = FALSE;
-	if (!no_query_mouse_for_testing)
+	ಆದರೆ (!no_query_mouse_for_testing)
 	    mch_write((char_u *)"\033[1'|", 5);
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     /*
      * For FEAT_MOUSE_GPM and FEAT_XCLIPBOARD we loop here to process mouse
      * events.  This is a bit complicated, because they might both be defined.
      */
-#if defined(FEAT_MOUSE_GPM) || defined(FEAT_XCLIPBOARD)
+#ಆದರೆ defined(FEAT_MOUSE_GPM) || defined(FEAT_XCLIPBOARD)
 # ifdef FEAT_XCLIPBOARD
     rest = 0;
-    if (do_xterm_trace())
+    ಆದರೆ (do_xterm_trace())
 	rest = msec;
 # endif
-    do
+    ಮಾಡು
     {
 # ifdef FEAT_XCLIPBOARD
-	if (rest != 0)
+	ಆದರೆ (rest != 0)
 	{
 	    msec = XT_TRACE_DELAY;
-	    if (rest >= 0 && rest < XT_TRACE_DELAY)
+	    ಆದರೆ (rest >= 0 && rest < XT_TRACE_DELAY)
 		msec = rest;
-	    if (rest >= 0)
+	    ಆದರೆ (rest >= 0)
 		rest -= msec;
 	}
 # endif
@@ -6577,28 +6577,28 @@ WaitForCharOrMouse(long msec, int *interrupted, int ignore_input)
 # endif
 # ifdef FEAT_SOUND_CANBERRA
 	// Invoke any pending sound callbacks.
-	if (has_sound_callback_in_queue())
+	ಆದರೆ (has_sound_callback_ಒಳ_ಸರತಿ())
 	    invoke_sound_callback();
 # endif
 # ifdef FEAT_MOUSE_GPM
 	gpm_process_wanted = 0;
 	avail = RealWaitForChar(read_cmd_fd, msec,
 					     &gpm_process_wanted, interrupted);
-	if (!avail && !gpm_process_wanted)
-# else
-	avail = RealWaitForChar(read_cmd_fd, msec, NULL, interrupted);
-	if (!avail)
+	ಆದರೆ (!avail && !gpm_process_wanted)
+# ಇಲ್ಲದಿದ್ದರೆ
+	avail = RealWaitForChar(read_cmd_fd, msec, ಖಾಲಿ, interrupted);
+	ಆದರೆ (!avail)
 # endif
 	{
-	    if (!ignore_input && input_available())
-		return 1;
+	    ಆದರೆ (!ignore_ಒಳಹರಿವು && ಒಳಹರಿವು_ಲಭ್ಯ())
+		ಹಿಂತಿರುಗಿ 1;
 # ifdef FEAT_XCLIPBOARD
-	    if (rest == 0 || !do_xterm_trace())
+	    ಆದರೆ (rest == 0 || !do_xterm_trace())
 # endif
-		break;
+		ನಿಲ್ಲಿಸು;
 	}
     }
-    while (FALSE
+    ಆಗ (FALSE
 # ifdef FEAT_MOUSE_GPM
 	   || (gpm_process_wanted && mch_gpm_process() == 0)
 # endif
@@ -6608,13 +6608,13 @@ WaitForCharOrMouse(long msec, int *interrupted, int ignore_input)
 	  )
 	;
 
-#else
-    avail = RealWaitForChar(read_cmd_fd, msec, NULL, interrupted);
-#endif
-    return avail;
+#ಇಲ್ಲದಿದ್ದರೆ
+    avail = RealWaitForChar(read_cmd_fd, msec, ಖಾಲಿ, interrupted);
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ avail;
 }
 
-#ifndef VMS
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ VMS
 /*
  * Wait "msec" msec until a character is available from file descriptor "fd".
  * "msec" == 0 will check for characters once.
@@ -6625,13 +6625,13 @@ WaitForCharOrMouse(long msec, int *interrupted, int ignore_input)
  * "interrupted" (if not NULL) is set to TRUE when no character is available
  * but something else needs to be done.
  */
-    static int
-RealWaitForChar(int fd, long msec, int *check_for_gpm UNUSED, int *interrupted)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+RealWaitForChar(ಪೂರ್ಣಾಂಕ fd, ದೀರ್ಘ msec, ಪೂರ್ಣಾಂಕ *check_for_gpm ಬಳಸದ, ಪೂರ್ಣಾಂಕ *interrupted)
 {
-    int		ret;
-    int		result;
-# if defined(FEAT_XCLIPBOARD) || defined(USE_XSMP) || defined(FEAT_MZSCHEME)
-    static int	busy = FALSE;
+    ಪೂರ್ಣಾಂಕ		ret;
+    ಪೂರ್ಣಾಂಕ		ಫಲಿತಾಂಶ;
+# ಆದರೆ defined(FEAT_XCLIPBOARD) || defined(USE_XSMP) || defined(FEAT_MZSCHEME)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	busy = FALSE;
 
     // May retry getting characters after an event was handled.
 #  define MAY_LOOP
@@ -6639,56 +6639,56 @@ RealWaitForChar(int fd, long msec, int *check_for_gpm UNUSED, int *interrupted)
 #  ifdef ELAPSED_FUNC
     // Remember at what time we started, so that we know how much longer we
     // should wait after being interrupted.
-    long	start_msec = msec;
-    elapsed_T	start_tv;
+    ದೀರ್ಘ	ಆರಂಭ_msec = msec;
+    elapsed_T	ಆರಂಭ_tv;
 
-    if (msec > 0)
-	ELAPSED_INIT(start_tv);
+    ಆದರೆ (msec > 0)
+	ELAPSED_INIT(ಆರಂಭ_tv);
 #  endif
 
     // Handle being called recursively.  This may happen for the session
     // manager stuff, it may save the file, which does a breakcheck.
-    if (busy)
-	return 0;
+    ಆದರೆ (busy)
+	ಹಿಂತಿರುಗಿ 0;
 # endif
 
 # ifdef MAY_LOOP
-    for (;;)
+    ಗಾಗಿ (;;)
 # endif
     {
 # ifdef MAY_LOOP
-	int		finished = TRUE; // default is to 'loop' just once
+	ಪೂರ್ಣಾಂಕ		ಪೂರ್ಣಗೊಂಡ = TRUE; // default is to 'loop' just once
 #  ifdef FEAT_MZSCHEME
-	int		mzquantum_used = FALSE;
+	ಪೂರ್ಣಾಂಕ		mzquantum_ಬಳಸಿದ = FALSE;
 #  endif
 # endif
 # ifdef FEAT_WAYLAND
-	int		wayland_fd = -1;
+	ಪೂರ್ಣಾಂಕ		wayland_fd = -1;
 # endif
 # ifndef HAVE_SELECT
 			// each channel may use in, out and err
-	struct pollfd   fds[7 + 3 * MAX_OPEN_CHANNELS + 2 * MAX_CLIENT_CHANNELS];
-	int		nfd;
+	ರಚನೆ pollfd   fds[7 + 3 * MAX_OPEN_CHANNELS + 2 * MAX_CLIENT_CHANNELS];
+	ಪೂರ್ಣಾಂಕ		nfd;
 #  ifdef FEAT_WAYLAND_CLIPBOARD
-	int             wayland_idx = -1;
+	ಪೂರ್ಣಾಂಕ             wayland_idx = -1;
 #  endif
 #  ifdef FEAT_XCLIPBOARD
-	int		xterm_idx = -1;
+	ಪೂರ್ಣಾಂಕ		xterm_idx = -1;
 #  endif
 #  ifdef FEAT_MOUSE_GPM
-	int		gpm_idx = -1;
+	ಪೂರ್ಣಾಂಕ		gpm_idx = -1;
 #  endif
 #  ifdef USE_XSMP
-	int		xsmp_idx = -1;
+	ಪೂರ್ಣಾಂಕ		xsmp_idx = -1;
 #  endif
-	int		towait = (int)msec;
+	ಪೂರ್ಣಾಂಕ		towait = (ಪೂರ್ಣಾಂಕ)msec;
 
 #  ifdef FEAT_MZSCHEME
-	mzvim_check_threads();
-	if (mzthreads_allowed() && p_mzq > 0 && (msec < 0 || msec > p_mzq))
+	mzvim_check_ಎಳೆಗಳು();
+	ಆದರೆ (mzthreads_allowed() && p_mzq > 0 && (msec < 0 || msec > p_mzq))
 	{
-	    towait = (int)p_mzq;    // don't wait longer than 'mzquantum'
-	    mzquantum_used = TRUE;
+	    towait = (ಪೂರ್ಣಾಂಕ)p_mzq;    // don't wait longer than 'mzquantum'
+	    mzquantum_ಬಳಸಿದ = TRUE;
 	}
 #  endif
 	fds[0].fd = fd;
@@ -6696,7 +6696,7 @@ RealWaitForChar(int fd, long msec, int *check_for_gpm UNUSED, int *interrupted)
 	nfd = 1;
 
 #  ifdef FEAT_WAYLAND
-	if ((wayland_fd = wayland_prepare_read()) >= 0)
+	ಆದರೆ ((wayland_fd = wayland_prepare_read()) >= 0)
 	{
 	    wayland_idx = nfd;
 	    fds[nfd].fd = wayland_fd;
@@ -6706,16 +6706,16 @@ RealWaitForChar(int fd, long msec, int *check_for_gpm UNUSED, int *interrupted)
 #  endif
 #  ifdef FEAT_XCLIPBOARD
 	may_restore_clipboard();
-	if (xterm_Shell != (Widget)0)
+	ಆದರೆ (xterm_Shell != (Widget)0)
 	{
 	    xterm_idx = nfd;
-	    fds[nfd].fd = ConnectionNumber(xterm_dpy);
+	    fds[nfd].fd = Connection_ಸಂಖ್ಯೆ(xterm_dpy);
 	    fds[nfd].events = POLLIN;
 	    nfd++;
 	}
 #  endif
 #  ifdef FEAT_MOUSE_GPM
-	if (check_for_gpm != NULL && gpm_flag && gpm_fd >= 0)
+	ಆದರೆ (check_for_gpm != ಖಾಲಿ && gpm_flag && gpm_fd >= 0)
 	{
 	    gpm_idx = nfd;
 	    fds[nfd].fd = gpm_fd;
@@ -6724,7 +6724,7 @@ RealWaitForChar(int fd, long msec, int *check_for_gpm UNUSED, int *interrupted)
 	}
 #  endif
 #  ifdef USE_XSMP
-	if (xsmp_icefd != -1)
+	ಆದರೆ (xsmp_icefd != -1)
 	{
 	    xsmp_idx = nfd;
 	    fds[nfd].fd = xsmp_icefd;
@@ -6732,94 +6732,94 @@ RealWaitForChar(int fd, long msec, int *check_for_gpm UNUSED, int *interrupted)
 	    nfd++;
 	}
 #  endif
-#  ifdef FEAT_JOB_CHANNEL
-	nfd = channel_poll_setup(nfd, &fds, &towait);
+#  ifdef FEAT_ಕೆಲಸ_CHANNEL
+	nfd = channel_poll_ಸಿದ್ಧತೆ(nfd, &fds, &towait);
 #  endif
-	if (interrupted != NULL)
+	ಆದರೆ (interrupted != ಖಾಲಿ)
 	    *interrupted = FALSE;
 
 	ret = poll(fds, nfd, towait);
 
-	result = ret > 0 && (fds[0].revents & POLLIN);
-	if (result == 0 && interrupted != NULL && ret > 0)
+	ಫಲಿತಾಂಶ = ret > 0 && (fds[0].revents & POLLIN);
+	ಆದರೆ (ಫಲಿತಾಂಶ == 0 && interrupted != ಖಾಲಿ && ret > 0)
 	    *interrupted = TRUE;
 
 #  ifdef FEAT_MZSCHEME
-	if (ret == 0 && mzquantum_used)
+	ಆದರೆ (ret == 0 && mzquantum_ಬಳಸಿದ)
 	    // MzThreads scheduling is required and timeout occurred
-	    finished = FALSE;
+	    ಪೂರ್ಣಗೊಂಡ = FALSE;
 #  endif
 
 #  ifdef FEAT_WAYLAND
-	if (wayland_idx >= 0)
+	ಆದರೆ (wayland_idx >= 0)
 	    wayland_poll_check(fds[wayland_idx].revents);
 #  endif
 
 #  ifdef FEAT_XCLIPBOARD
-	if (xterm_Shell != (Widget)0 && (fds[xterm_idx].revents & POLLIN))
+	ಆದರೆ (xterm_Shell != (Widget)0 && (fds[xterm_idx].revents & POLLIN))
 	{
 	    xterm_update();      // Maybe we should hand out clipboard
-	    if (--ret == 0 && !input_available())
+	    ಆದರೆ (--ret == 0 && !ಒಳಹರಿವು_ಲಭ್ಯ())
 		// Try again
-		finished = FALSE;
+		ಪೂರ್ಣಗೊಂಡ = FALSE;
 	}
 #  endif
 #  ifdef FEAT_MOUSE_GPM
-	if (gpm_idx >= 0 && (fds[gpm_idx].revents & POLLIN))
+	ಆದರೆ (gpm_idx >= 0 && (fds[gpm_idx].revents & POLLIN))
 	    *check_for_gpm = 1;
 #  endif
 #  ifdef USE_XSMP
-	if (xsmp_idx >= 0 && (fds[xsmp_idx].revents & (POLLIN | POLLHUP)))
+	ಆದರೆ (xsmp_idx >= 0 && (fds[xsmp_idx].revents & (POLLIN | POLLHUP)))
 	{
-	    if (fds[xsmp_idx].revents & POLLIN)
+	    ಆದರೆ (fds[xsmp_idx].revents & POLLIN)
 	    {
 		busy = TRUE;
-		xsmp_handle_requests();
+		xsmp_handle_ವಿನಂತಿಗಳು();
 		busy = FALSE;
 	    }
-	    else if (fds[xsmp_idx].revents & POLLHUP)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (fds[xsmp_idx].revents & POLLHUP)
 	    {
-		if (p_verbose > 0)
-		    verb_msg(_("XSMP lost ICE connection"));
+		ಆದರೆ (p_verbose > 0)
+		    verb_ಸಂದೇಶ(_("XSMP lost ICE connection"));
 		xsmp_close();
 	    }
-	    if (--ret == 0)
-		finished = FALSE;	// Try again
+	    ಆದರೆ (--ret == 0)
+		ಪೂರ್ಣಗೊಂಡ = FALSE;	// Try again
 	}
 #  endif
-#  ifdef FEAT_JOB_CHANNEL
+#  ifdef FEAT_ಕೆಲಸ_CHANNEL
 	// also call when ret == 0, we may be polling a keep-open channel
-	if (ret >= 0)
+	ಆದರೆ (ret >= 0)
 	    channel_poll_check(ret, &fds);
 #  endif
 
-# else // HAVE_SELECT
+# ಇಲ್ಲದಿದ್ದರೆ // HAVE_SELECT
 
-	struct timeval  tv;
-	struct timeval	*tvp;
+	ರಚನೆ timeval  tv;
+	ರಚನೆ timeval	*tvp;
 	// These are static because they can take 8 Kbyte each and cause the
 	// signal stack to run out with -O3.
-	static fd_set	rfds, wfds, efds;
-	int		maxfd;
-	long		towait = msec;
+	ಸ್ಥಿರ fd_set	rfds, wfds, efds;
+	ಪೂರ್ಣಾಂಕ		maxfd;
+	ದೀರ್ಘ		towait = msec;
 
 #  ifdef FEAT_MZSCHEME
-	mzvim_check_threads();
-	if (mzthreads_allowed() && p_mzq > 0 && (msec < 0 || msec > p_mzq))
+	mzvim_check_ಎಳೆಗಳು();
+	ಆದರೆ (mzthreads_allowed() && p_mzq > 0 && (msec < 0 || msec > p_mzq))
 	{
 	    towait = p_mzq;	// don't wait longer than 'mzquantum'
-	    mzquantum_used = TRUE;
+	    mzquantum_ಬಳಸಿದ = TRUE;
 	}
 #  endif
 
-	if (towait >= 0)
+	ಆದರೆ (towait >= 0)
 	{
 	    tv.tv_sec = towait / 1000;
 	    tv.tv_usec = (towait % 1000) * (1000000/1000);
 	    tvp = &tv;
 	}
-	else
-	    tvp = NULL;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    tvp = ಖಾಲಿ;
 
 	/*
 	 * Select on ready for reading and exceptional condition (end of file).
@@ -6836,22 +6836,22 @@ select_eintr:
 	maxfd = fd;
 
 #  ifdef FEAT_WAYLAND
-	if ((wayland_fd = wayland_prepare_read()) >= 0)
+	ಆದರೆ ((wayland_fd = wayland_prepare_read()) >= 0)
 	{
 	    FD_SET(wayland_fd, &rfds);
 
-	    if (maxfd < wayland_fd)
+	    ಆದರೆ (maxfd < wayland_fd)
 		maxfd = wayland_fd;
 	}
 #  endif
 
 #  ifdef FEAT_XCLIPBOARD
 	may_restore_x11_clipboard();
-	if (xterm_Shell != (Widget)0)
+	ಆದರೆ (xterm_Shell != (Widget)0)
 	{
-	    FD_SET(ConnectionNumber(xterm_dpy), &rfds);
-	    if (maxfd < ConnectionNumber(xterm_dpy))
-		maxfd = ConnectionNumber(xterm_dpy);
+	    FD_SET(Connection_ಸಂಖ್ಯೆ(xterm_dpy), &rfds);
+	    ಆದರೆ (maxfd < Connection_ಸಂಖ್ಯೆ(xterm_dpy))
+		maxfd = Connection_ಸಂಖ್ಯೆ(xterm_dpy);
 
 	    // An event may have already been read but not handled.  In
 	    // particularly, XFlush may cause this.
@@ -6859,42 +6859,42 @@ select_eintr:
 	}
 #  endif
 #  ifdef FEAT_MOUSE_GPM
-	if (check_for_gpm != NULL && gpm_flag && gpm_fd >= 0)
+	ಆದರೆ (check_for_gpm != ಖಾಲಿ && gpm_flag && gpm_fd >= 0)
 	{
 	    FD_SET(gpm_fd, &rfds);
 	    FD_SET(gpm_fd, &efds);
-	    if (maxfd < gpm_fd)
+	    ಆದರೆ (maxfd < gpm_fd)
 		maxfd = gpm_fd;
 	}
 #  endif
 #  ifdef USE_XSMP
-	if (xsmp_icefd != -1)
+	ಆದರೆ (xsmp_icefd != -1)
 	{
 	    FD_SET(xsmp_icefd, &rfds);
 	    FD_SET(xsmp_icefd, &efds);
-	    if (maxfd < xsmp_icefd)
+	    ಆದರೆ (maxfd < xsmp_icefd)
 		maxfd = xsmp_icefd;
 	}
 #  endif
-#  ifdef FEAT_JOB_CHANNEL
-	maxfd = channel_select_setup(maxfd, &rfds, &wfds, &tv, &tvp);
+#  ifdef FEAT_ಕೆಲಸ_CHANNEL
+	maxfd = channel_select_ಸಿದ್ಧತೆ(maxfd, &rfds, &wfds, &tv, &tvp);
 #  endif
-	if (interrupted != NULL)
+	ಆದರೆ (interrupted != ಖಾಲಿ)
 	    *interrupted = FALSE;
 
 	ret = select(maxfd + 1, SELECT_TYPE_ARG234 &rfds,
 		      SELECT_TYPE_ARG234 &wfds, SELECT_TYPE_ARG234 &efds, tvp);
-	result = ret > 0 && FD_ISSET(fd, &rfds);
-	if (result)
+	ಫಲಿತಾಂಶ = ret > 0 && FD_ISSET(fd, &rfds);
+	ಆದರೆ (ಫಲಿತಾಂಶ)
 	    --ret;
-	else if (interrupted != NULL && ret > 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (interrupted != ಖಾಲಿ && ret > 0)
 	    *interrupted = TRUE;
 
 #  ifdef EINTR
-	if (ret == -1 && errno == EINTR)
+	ಆದರೆ (ret == -1 && errno == EINTR)
 	{
 	    // Check whether the EINTR is caused by SIGTSTP
-	    if (got_tstp && !in_mch_suspend)
+	    ಆದರೆ (got_tstp && !ಒಳ_mch_suspend)
 	    {
 		exarg_T ea;
 
@@ -6905,10 +6905,10 @@ select_eintr:
 
 	    // Check whether window has been resized, EINTR may be caused by
 	    // SIGWINCH.
-	    if (do_resize)
+	    ಆದರೆ (do_resize)
 	    {
 #   ifdef FEAT_EVAL
-		ch_log(NULL, "calling handle_resize() in RealWaitForChar()");
+		ch_log(ಖಾಲಿ, "calling handle_resize() in RealWaitForChar()");
 #   endif
 		handle_resize();
 	    }
@@ -6917,11 +6917,11 @@ select_eintr:
 	    // here, because we do want to check even after a timeout if
 	    // characters are available.  Needed for reading output of an
 	    // external command after the process has finished.
-	    goto select_eintr;
+	    ಹೋಗು select_eintr;
 	}
 #  endif
 #  ifdef __TANDEM
-	if (ret == -1 && errno == ENOTSUP)
+	ಆದರೆ (ret == -1 && errno == ENOTSUP)
 	{
 	    FD_ZERO(&rfds);
 	    FD_ZERO(&efds);
@@ -6929,94 +6929,94 @@ select_eintr:
 	}
 #  endif
 #  ifdef FEAT_MZSCHEME
-	if (ret == 0 && mzquantum_used)
+	ಆದರೆ (ret == 0 && mzquantum_ಬಳಸಿದ)
 	    // loop if MzThreads must be scheduled and timeout occurred
-	    finished = FALSE;
+	    ಪೂರ್ಣಗೊಂಡ = FALSE;
 #  endif
 
 #  ifdef FEAT_WAYLAND
-	if (wayland_fd != -1)
+	ಆದರೆ (wayland_fd != -1)
 	    wayland_select_check(ret > 0 && FD_ISSET(wayland_fd, &rfds));
 #  endif
 
 #  ifdef FEAT_XCLIPBOARD
-	if (ret > 0 && xterm_Shell != (Widget)0
-		&& FD_ISSET(ConnectionNumber(xterm_dpy), &rfds))
+	ಆದರೆ (ret > 0 && xterm_Shell != (Widget)0
+		&& FD_ISSET(Connection_ಸಂಖ್ಯೆ(xterm_dpy), &rfds))
 	{
 	    xterm_update();	      // Maybe we should hand out clipboard
 	    // continue looping when we only got the X event and the input
 	    // buffer is empty
-	    if (--ret == 0 && !input_available())
+	    ಆದರೆ (--ret == 0 && !ಒಳಹರಿವು_ಲಭ್ಯ())
 	    {
 		// Try again
-		finished = FALSE;
+		ಪೂರ್ಣಗೊಂಡ = FALSE;
 	    }
 	}
 #  endif
 #  ifdef FEAT_MOUSE_GPM
-	if (ret > 0 && check_for_gpm != NULL && gpm_flag && gpm_fd >= 0)
+	ಆದರೆ (ret > 0 && check_for_gpm != ಖಾಲಿ && gpm_flag && gpm_fd >= 0)
 	{
-	    if (FD_ISSET(gpm_fd, &efds))
+	    ಆದರೆ (FD_ISSET(gpm_fd, &efds))
 		gpm_close();
-	    else if (FD_ISSET(gpm_fd, &rfds))
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (FD_ISSET(gpm_fd, &rfds))
 		*check_for_gpm = 1;
 	}
 #  endif
 #  ifdef USE_XSMP
-	if (ret > 0 && xsmp_icefd != -1)
+	ಆದರೆ (ret > 0 && xsmp_icefd != -1)
 	{
-	    if (FD_ISSET(xsmp_icefd, &efds))
+	    ಆದರೆ (FD_ISSET(xsmp_icefd, &efds))
 	    {
-		if (p_verbose > 0)
-		    verb_msg(_("XSMP lost ICE connection"));
+		ಆದರೆ (p_verbose > 0)
+		    verb_ಸಂದೇಶ(_("XSMP lost ICE connection"));
 		xsmp_close();
-		if (--ret == 0)
-		    finished = FALSE;   // keep going if event was only one
+		ಆದರೆ (--ret == 0)
+		    ಪೂರ್ಣಗೊಂಡ = FALSE;   // keep going if event was only one
 	    }
-	    else if (FD_ISSET(xsmp_icefd, &rfds))
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (FD_ISSET(xsmp_icefd, &rfds))
 	    {
 		busy = TRUE;
-		xsmp_handle_requests();
+		xsmp_handle_ವಿನಂತಿಗಳು();
 		busy = FALSE;
-		if (--ret == 0)
-		    finished = FALSE;   // keep going if event was only one
+		ಆದರೆ (--ret == 0)
+		    ಪೂರ್ಣಗೊಂಡ = FALSE;   // keep going if event was only one
 	    }
 	}
 #  endif
-#  ifdef FEAT_JOB_CHANNEL
+#  ifdef FEAT_ಕೆಲಸ_CHANNEL
 	// also call when ret == 0, we may be polling a keep-open channel
-	if (ret >= 0)
-	    (void)channel_select_check(ret, &rfds, &wfds);
+	ಆದರೆ (ret >= 0)
+	    (ಶೂನ್ಯ)channel_select_check(ret, &rfds, &wfds);
 #  endif
 
 # endif // HAVE_SELECT
 
 # ifdef MAY_LOOP
-	if (finished || msec == 0)
-	    break;
+	ಆದರೆ (ಪೂರ್ಣಗೊಂಡ || msec == 0)
+	    ನಿಲ್ಲಿಸು;
 
-#  if defined(FEAT_CLIENTSERVER) && defined(FEAT_X11)
-	if (clientserver_method == CLIENTSERVER_METHOD_X11 && server_waiting())
-	    break;
+#  ಆದರೆ defined(FEAT_CLIENTSERVER) && defined(FEAT_X11)
+	ಆದರೆ (clientserver_ವಿಧಾನ == CLIENTSERVER_ವಿಧಾನ_X11 && server_ಕಾಯುವಿಕೆ())
+	    ನಿಲ್ಲಿಸು;
 #  endif
 
 	// We're going to loop around again, find out for how long
-	if (msec > 0)
+	ಆದರೆ (msec > 0)
 	{
 #  ifdef ELAPSED_FUNC
 	    // Compute remaining wait time.
-	    msec = start_msec - ELAPSED_FUNC(start_tv);
-#  else
+	    msec = ಆರಂಭ_msec - ELAPSED_FUNC(ಆರಂಭ_tv);
+#  ಇಲ್ಲದಿದ್ದರೆ
 	    // Guess we got interrupted halfway.
 	    msec = msec / 2;
 #  endif
-	    if (msec <= 0)
-		break;	// waited long enough
+	    ಆದರೆ (msec <= 0)
+		ನಿಲ್ಲಿಸು;	// waited long enough
 	}
 # endif
     }
 
-    return result;
+    ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
 }
 
 /*
@@ -7025,13 +7025,13 @@ select_eintr:
  * "path" has backslashes before chars that are not to be expanded.
  * Returns the number of matches found.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_expandpath(
     garray_T	*gap,
-    char_u	*path,
-    int		flags)		// EW_* flags
+    char_u	*ಮಾರ್ಗ,
+    ಪೂರ್ಣಾಂಕ		flags)		// EW_* flags
 {
-    return unix_expandpath(gap, path, 0, flags, FALSE);
+    ಹಿಂತಿರುಗಿ unix_expandpath(gap, ಮಾರ್ಗ, 0, flags, FALSE);
 }
 
 /*
@@ -7056,30 +7056,30 @@ mch_expandpath(
 
 # define SHELL_SPECIAL (char_u *)"\t \"&'$;<>()\\|\n"
 
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_expand_wildcards(
-    int		   num_pat,
+    ಪೂರ್ಣಾಂಕ		   ಅಂಕೆ_pat,
     char_u	 **pat,
-    int		  *num_file,
+    ಪೂರ್ಣಾಂಕ		  *ಅಂಕೆ_file,
     char_u	***file,
-    int		   flags)	// EW_* flags
+    ಪೂರ್ಣಾಂಕ		   flags)	// EW_* flags
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
     size_t	len;
-    long	llen;
+    ದೀರ್ಘ	llen;
     char_u	*p;
-    int		dir;
+    ಪೂರ್ಣಾಂಕ		dir;
 
     /*
      * This is the non-OS/2 implementation (really Unix).
      */
-    int		j;
+    ಪೂರ್ಣಾಂಕ		j;
     char_u	*tempname;
     size_t	tempnamelen;
     char_u	*command;
     size_t	commandlen;
     FILE	*fd;
-    char_u	*buffer;
+    char_u	*ಬಫರ್;
 # define STYLE_ECHO	0	// use "echo", the default
 # define STYLE_GLOB	1	// use "glob", for csh
 # define STYLE_VIMGLOB	2	// use "vimglob", for Posix sh
@@ -7087,48 +7087,48 @@ mch_expand_wildcards(
 # define STYLE_BT	4	// `cmd` expansion, execute the pattern directly
 # define STYLE_GLOBSTAR	5	// use extended shell glob for bash (this uses extended
 				// globbing functionality using globstar, needs bash > 4)
-    int		shell_style = STYLE_ECHO;
-    int		check_spaces;
-    static int	did_find_nul = FALSE;
-    int		ampersand = FALSE;
+    ಪೂರ್ಣಾಂಕ		shell_style = STYLE_ECHO;
+    ಪೂರ್ಣಾಂಕ		check_spaces;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	did_ಕಂಡುಹಿಡಿ_nul = FALSE;
+    ಪೂರ್ಣಾಂಕ		ampersand = FALSE;
 				// vimglob() function to define for Posix shell
-    static string_T sh_vimglob_func = STR_LITERAL_INIT("vimglob() { while [ $# -ge 1 ]; do echo \"$1\"; shift; done }; vimglob >");
+    ಸ್ಥಿರ string_T sh_vimglob_func = STR_LITERAL_INIT("vimglob() { while [ $# -ge 1 ]; do echo \"$1\"; shift; done }; vimglob >");
 				// vimglob() function with globstar setting enabled, only for bash >= 4.X
-    static string_T sh_globstar_opt = STR_LITERAL_INIT("[[ ${BASH_VERSINFO[0]} -ge 4 ]] && shopt -s globstar; ");
+    ಸ್ಥಿರ string_T sh_globstar_opt = STR_LITERAL_INIT("[[ ${BASH_VERSINFO[0]} -ge 4 ]] && shopt -s globstar; ");
 
 
-    *num_file = 0;	// default: no files found
-    *file = NULL;
+    *ಅಂಕೆ_file = 0;	// default: no files found
+    *file = ಖಾಲಿ;
 
     /*
      * If there are no wildcards, just copy the names to allocated memory.
      * Saves a lot of time, because we don't have to start a new shell.
      */
-    if (!have_wildcard(num_pat, pat))
-	return save_patterns(num_pat, pat, num_file, file);
+    ಆದರೆ (!have_wildcard(ಅಂಕೆ_pat, pat))
+	ಹಿಂತಿರುಗಿ save_patterns(ಅಂಕೆ_pat, pat, ಅಂಕೆ_file, file);
 
 # ifdef HAVE_SANDBOX
     // Don't allow any shell command in the sandbox.
-    if (sandbox != 0 && check_secure())
-	return FAIL;
+    ಆದರೆ (sandbox != 0 && check_secure())
+	ಹಿಂತಿರುಗಿ FAIL;
 # endif
 
     /*
      * Don't allow the use of backticks in secure and restricted mode.
      */
-    if (secure || restricted)
-	for (i = 0; i < num_pat; ++i)
-	    if (vim_strchr(pat[i], '`') != NULL
+    ಆದರೆ (secure || restricted)
+	ಗಾಗಿ (i = 0; i < ಅಂಕೆ_pat; ++i)
+	    ಆದರೆ (vim_strchr(pat[i], '`') != ಖಾಲಿ
 		    && (check_restricted() || check_secure()))
-		return FAIL;
+		ಹಿಂತಿರುಗಿ FAIL;
 
     /*
      * get a name for the temp file
      */
-    if ((tempname = vim_tempname('o', FALSE)) == NULL)
+    ಆದರೆ ((tempname = vim_tempname('o', FALSE)) == ಖಾಲಿ)
     {
-	emsg(_(e_cant_get_temp_file_name));
-	return FAIL;
+	emsg(_(e_cant_get_ತಾತ್ಕಾಲಿಕ_file_name));
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
     /*
@@ -7147,22 +7147,22 @@ mch_expand_wildcards(
      * STYLE_ECHO:	space separated.
      *	    A shell we don't know, stay safe and use "echo".
      */
-    if (num_pat == 1 && *pat[0] == '`'
+    ಆದರೆ (ಅಂಕೆ_pat == 1 && *pat[0] == '`'
 	    && (len = STRLEN(pat[0])) > 2
 	    && *(pat[0] + len - 1) == '`')
 	shell_style = STYLE_BT;
-    else if ((len = STRLEN(p_sh)) >= 3)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((len = STRLEN(p_sh)) >= 3)
     {
-	if (STRCMP(p_sh + len - 3, "csh") == 0)
+	ಆದರೆ (STRCMP(p_sh + len - 3, "csh") == 0)
 	    shell_style = STYLE_GLOB;
-	else if (STRCMP(p_sh + len - 3, "zsh") == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(p_sh + len - 3, "zsh") == 0)
 	    shell_style = STYLE_PRINT;
     }
-    if (shell_style == STYLE_ECHO)
+    ಆದರೆ (shell_style == STYLE_ECHO)
     {
-	if (strstr((char *)gettail(p_sh), "bash") != NULL)
+	ಆದರೆ (ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು((ಅಕ್ಷರ *)gettail(p_sh), "bash") != ಖಾಲಿ)
 	    shell_style = STYLE_GLOBSTAR;
-	else if (strstr((char *)gettail(p_sh), "sh") != NULL)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು((ಅಕ್ಷರ *)gettail(p_sh), "sh") != ಖಾಲಿ)
 	    shell_style = STYLE_VIMGLOB;
     }
 
@@ -7171,33 +7171,33 @@ mch_expand_wildcards(
     // Worst case: "unset nonomatch; print -N >" plus two is 29
     tempnamelen = STRLEN(tempname);
     len = tempnamelen + 29;
-    if (shell_style == STYLE_VIMGLOB)
-	len += sh_vimglob_func.length;
-    else if (shell_style == STYLE_GLOBSTAR)
-	len += sh_vimglob_func.length + sh_globstar_opt.length;
+    ಆದರೆ (shell_style == STYLE_VIMGLOB)
+	len += sh_vimglob_func.ಉದ್ದಳತೆ;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (shell_style == STYLE_GLOBSTAR)
+	len += sh_vimglob_func.ಉದ್ದಳತೆ + sh_globstar_opt.ಉದ್ದಳತೆ;
 
-    for (i = 0; i < num_pat; ++i)
+    ಗಾಗಿ (i = 0; i < ಅಂಕೆ_pat; ++i)
     {
 	// Count the length of the patterns in the same way as they are put in
 	// "command" below.
 # ifdef USE_SYSTEM
 	len += STRLEN(pat[i]) + 3;	// add space and two quotes
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 	++len;				// add space
-	for (j = 0; pat[i][j] != NUL; ++j)
+	ಗಾಗಿ (j = 0; pat[i][j] != NUL; ++j)
 	{
-	    if (vim_strchr(SHELL_SPECIAL, pat[i][j]) != NULL)
+	    ಆದರೆ (vim_strchr(SHELL_SPECIAL, pat[i][j]) != ಖಾಲಿ)
 		++len;		// may add a backslash
 	    ++len;
 	}
 # endif
     }
     command = alloc(len);
-    if (command == NULL)
+    ಆದರೆ (command == ಖಾಲಿ)
     {
 	// out of memory
 	vim_free(tempname);
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
     /*
@@ -7208,84 +7208,84 @@ mch_expand_wildcards(
      * - Add the temp file name.
      * - Add the file name patterns.
      */
-    if (shell_style == STYLE_BT)
+    ಆದರೆ (shell_style == STYLE_BT)
     {
 	// change `command; command& ` to (command; command )
-	commandlen = vim_snprintf((char *)command, len, "(%s)>%s", pat[0] + 1, tempname);   // +1 to exclude first backtick
+	commandlen = vim_snprintf((ಅಕ್ಷರ *)command, len, "(%s)>%s", pat[0] + 1, tempname);   // +1 to exclude first backtick
 
-	p = (char_u *)strstr((char *)command, ")>");
-	if (p == NULL)
+	p = (char_u *)ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು((ಅಕ್ಷರ *)command, ")>");
+	ಆದರೆ (p == ಖಾಲಿ)
 	{
 	    ;					    // can't happen ;-)
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    --p;
-	    while (p > command && VIM_ISWHITE(*p))
+	    ಆಗ (p > command && VIM_ISWHITE(*p))
 		--p;
-	    if (*p == '`')			    // remove backtick
+	    ಆದರೆ (*p == '`')			    // remove backtick
 		*p = ' ';
 
 	    --p;
-	    while (p > command && VIM_ISWHITE(*p))
+	    ಆಗ (p > command && VIM_ISWHITE(*p))
 		--p;
-	    if (*p == '&')			    // remove ampersand
+	    ಆದರೆ (*p == '&')			    // remove ampersand
 	    {
 		ampersand = TRUE;
 		*p = ' ';
 	    }
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (shell_style == STYLE_GLOB)
+	ಆದರೆ (shell_style == STYLE_GLOB)
 	{
 	    // Assume the nonomatch option is valid only for csh like shells,
 	    // otherwise, this may set the positional parameters for the shell,
 	    // e.g. "$*".
-	    commandlen = vim_snprintf((char *)command, len, "%sset nonomatch; glob >%s",
+	    commandlen = vim_snprintf((ಅಕ್ಷರ *)command, len, "%sset nonomatch; glob >%s",
 				(flags & EW_NOTFOUND) ? "" : "un", tempname);
 	}
-	else if (shell_style == STYLE_PRINT)
-	    commandlen = vim_snprintf((char *)command, len, "print -N >%s", tempname);
-	else if (shell_style == STYLE_VIMGLOB)
-	    commandlen = vim_snprintf((char *)command, len, "%s%s", sh_vimglob_func.string, tempname);
-	else if (shell_style == STYLE_GLOBSTAR)
-	    commandlen = vim_snprintf((char *)command, len, "%s%s%s", sh_globstar_opt.string,
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (shell_style == STYLE_PRINT)
+	    commandlen = vim_snprintf((ಅಕ್ಷರ *)command, len, "print -N >%s", tempname);
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (shell_style == STYLE_VIMGLOB)
+	    commandlen = vim_snprintf((ಅಕ್ಷರ *)command, len, "%s%s", sh_vimglob_func.string, tempname);
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (shell_style == STYLE_GLOBSTAR)
+	    commandlen = vim_snprintf((ಅಕ್ಷರ *)command, len, "%s%s%s", sh_globstar_opt.string,
 				sh_vimglob_func.string, tempname);
-	else
-	    commandlen = vim_snprintf((char *)command, len, "echo >%s", tempname);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    commandlen = vim_snprintf((ಅಕ್ಷರ *)command, len, "echo >%s", tempname);
 
-	for (i = 0; i < num_pat; ++i)
+	ಗಾಗಿ (i = 0; i < ಅಂಕೆ_pat; ++i)
 	{
 	    // When using system() always add extra quotes, because the shell
 	    // is started twice.  Otherwise put a backslash before special
 	    // characters, except inside ``.
 # ifdef USE_SYSTEM
-	    commandlen += vim_snprintf((char *)command + commandlen, len, " \"%s\"", pat[i]);
-# else
-	    int intick = FALSE;
+	    commandlen += vim_snprintf((ಅಕ್ಷರ *)command + commandlen, len, " \"%s\"", pat[i]);
+# ಇಲ್ಲದಿದ್ದರೆ
+	    ಪೂರ್ಣಾಂಕ intick = FALSE;
 
 	    p = command + commandlen;
 	    *p++ = ' ';
-	    for (j = 0; pat[i][j] != NUL; ++j)
+	    ಗಾಗಿ (j = 0; pat[i][j] != NUL; ++j)
 	    {
-		if (pat[i][j] == '`')
+		ಆದರೆ (pat[i][j] == '`')
 		    intick = !intick;
-		else if (pat[i][j] == '\\' && pat[i][j + 1] != NUL)
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (pat[i][j] == '\\' && pat[i][j + 1] != NUL)
 		{
 		    // Remove a backslash, take char literally.  But keep
 		    // backslash inside backticks, before a special character
 		    // and before a backtick.
-		    if (intick
-			  || vim_strchr(SHELL_SPECIAL, pat[i][j + 1]) != NULL
+		    ಆದರೆ (intick
+			  || vim_strchr(SHELL_SPECIAL, pat[i][j + 1]) != ಖಾಲಿ
 			  || pat[i][j + 1] == '`')
 			*p++ = '\\';
 		    ++j;
 		}
-		else if (!intick
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!intick
 			 && ((flags & EW_KEEPDOLLAR) == 0 || pat[i][j] != '$')
-			      && vim_strchr(SHELL_SPECIAL, pat[i][j]) != NULL)
+			      && vim_strchr(SHELL_SPECIAL, pat[i][j]) != ಖಾಲಿ)
 		    // Put a backslash before a special character, but not
 		    // when inside ``. And not for $var when EW_KEEPDOLLAR is
 		    // set.
@@ -7299,9 +7299,9 @@ mch_expand_wildcards(
 # endif
 	}
     }
-    if (flags & EW_SILENT)
+    ಆದರೆ (flags & EW_SILENT)
 	show_shell_mess = FALSE;
-    if (ampersand)
+    ಆದರೆ (ampersand)
 	STRCPY(command + commandlen, "&");		// put the '&' after the redirection
 
     /*
@@ -7309,7 +7309,7 @@ mch_expand_wildcards(
      * the argument list, otherwise zsh gives an error message and doesn't
      * expand any other pattern.
      */
-    if (shell_style == STYLE_PRINT)
+    ಆದರೆ (shell_style == STYLE_PRINT)
 	extra_shell_arg = (char_u *)"-G";   // Use zsh NULL_GLOB option
 
     /*
@@ -7317,7 +7317,7 @@ mch_expand_wildcards(
      * vi can do it, so we will too, but it is only necessary if there is a "$"
      * in one of the patterns, otherwise we can still use the fast option.
      */
-    else if (shell_style == STYLE_GLOB && !have_dollars(num_pat, pat))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (shell_style == STYLE_GLOB && !have_dollars(ಅಂಕೆ_pat, pat))
 	extra_shell_arg = (char_u *)"-f";	// Use csh fast option
 
     /*
@@ -7327,14 +7327,14 @@ mch_expand_wildcards(
 
     // When running in the background, give it some time to create the temp
     // file, but don't wait for it to finish.
-    if (ampersand)
+    ಆದರೆ (ampersand)
 	mch_delay(10L, MCH_DELAY_IGNOREINPUT);
 
-    extra_shell_arg = NULL;		// cleanup
+    extra_shell_arg = ಖಾಲಿ;		// cleanup
     show_shell_mess = TRUE;
     vim_free(command);
 
-    if (i != 0)				// mch_call_shell() failed
+    ಆದರೆ (i != 0)				// mch_call_shell() failed
     {
 	mch_remove(tempname);
 	vim_free(tempname);
@@ -7344,112 +7344,112 @@ mch_expand_wildcards(
 	 * from the shell, so screen may still get messed up -- webb.
 	 */
 # ifndef USE_SYSTEM
-	if (!(flags & EW_SILENT))
+	ಆದರೆ (!(flags & EW_SILENT))
 # endif
 	{
 	    redraw_later_clear();	// probably messed up screen
-	    msg_putchar('\n');		// clear bottom line quickly
-	    cmdline_row = Rows - 1;	// continue on last line
+	    ಸಂದೇಶ_putchar('\n');		// clear bottom line quickly
+	    cmdline_ಅಡ್ಡಸಾಲು = ಅಡ್ಡಸಾಲುಗಳು - 1;	// continue on last line
 # ifdef USE_SYSTEM
-	    if (!(flags & EW_SILENT))
+	    ಆದರೆ (!(flags & EW_SILENT))
 # endif
 	    {
-		msg(_(e_cannot_expand_wildcards));
-		msg_start();		// don't overwrite this message
+		ಸಂದೇಶ(_(e_cannot_expand_wildcards));
+		ಸಂದೇಶ_ಆರಂಭ();		// don't overwrite this message
 	    }
 	}
 	// If a `cmd` expansion failed, don't list `cmd` as a match, even when
 	// EW_NOTFOUND is given
-	if (shell_style == STYLE_BT)
-	    return FAIL;
-	goto notfound;
+	ಆದರೆ (shell_style == STYLE_BT)
+	    ಹಿಂತಿರುಗಿ FAIL;
+	ಹೋಗು notfound;
     }
 
     /*
      * read the names from the file into memory
      */
-    fd = fopen((char *)tempname, READBIN);
-    if (fd == NULL)
+    fd = fopen((ಅಕ್ಷರ *)tempname, READBIN);
+    ಆದರೆ (fd == ಖಾಲಿ)
     {
 	// Something went wrong, perhaps a file name with a special char.
-	if (!(flags & EW_SILENT))
+	ಆದರೆ (!(flags & EW_SILENT))
 	{
-	    msg(_(e_cannot_expand_wildcards));
-	    msg_start();		// don't overwrite this message
+	    ಸಂದೇಶ(_(e_cannot_expand_wildcards));
+	    ಸಂದೇಶ_ಆರಂಭ();		// don't overwrite this message
 	}
 	vim_free(tempname);
-	goto notfound;
+	ಹೋಗು notfound;
     }
     fseek(fd, 0L, SEEK_END);
     llen = ftell(fd);			// get size of temp file
     fseek(fd, 0L, SEEK_SET);
-    if (llen < 0)
+    ಆದರೆ (llen < 0)
 	// just in case ftell() would fail
-	buffer = NULL;
-    else
-	buffer = alloc(llen + 1);
-    if (buffer == NULL)
+	ಬಫರ್ = ಖಾಲಿ;
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಬಫರ್ = alloc(llen + 1);
+    ಆದರೆ (ಬಫರ್ == ಖಾಲಿ)
     {
 	// out of memory
 	mch_remove(tempname);
 	vim_free(tempname);
 	fclose(fd);
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
     len = llen;
-    i = fread((char *)buffer, 1, len, fd);
+    i = fread((ಅಕ್ಷರ *)ಬಫರ್, 1, len, fd);
     fclose(fd);
     mch_remove(tempname);
-    if (i != (int)len)
+    ಆದರೆ (i != (ಪೂರ್ಣಾಂಕ)len)
     {
 	// unexpected read error
 	semsg(_(e_cant_read_file_str), tempname);
 	vim_free(tempname);
-	vim_free(buffer);
-	return FAIL;
+	vim_free(ಬಫರ್);
+	ಹಿಂತಿರುಗಿ FAIL;
     }
     vim_free(tempname);
 
 # ifdef __CYGWIN__
     // Translate <CR><NL> into <NL>.  Caution, buffer may contain NUL.
-    p = buffer;
-    for (i = 0; i < (int)len; ++i)
-	if (!(buffer[i] == CAR && buffer[i + 1] == NL))
-	    *p++ = buffer[i];
-    len = p - buffer;
+    p = ಬಫರ್;
+    ಗಾಗಿ (i = 0; i < (ಪೂರ್ಣಾಂಕ)len; ++i)
+	ಆದರೆ (!(ಬಫರ್[i] == CAR && ಬಫರ್[i + 1] == NL))
+	    *p++ = ಬಫರ್[i];
+    len = p - ಬಫರ್;
 # endif
 
 
     // file names are separated with Space
-    if (shell_style == STYLE_ECHO)
+    ಆದರೆ (shell_style == STYLE_ECHO)
     {
-	buffer[len] = '\n';		// make sure the buffer ends in NL
-	p = buffer;
-	for (i = 0; *p != '\n'; ++i)	// count number of entries
+	ಬಫರ್[len] = '\n';		// make sure the buffer ends in NL
+	p = ಬಫರ್;
+	ಗಾಗಿ (i = 0; *p != '\n'; ++i)	// count number of entries
 	{
-	    while (*p != ' ' && *p != '\n')
+	    ಆಗ (*p != ' ' && *p != '\n')
 		++p;
 	    p = skipwhite(p);		// skip to next entry
 	}
     }
     // file names are separated with NL
-    else if (shell_style == STYLE_BT ||
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (shell_style == STYLE_BT ||
 	    shell_style == STYLE_VIMGLOB ||
 	    shell_style == STYLE_GLOBSTAR)
     {
-	buffer[len] = NUL;		// make sure the buffer ends in NUL
-	p = buffer;
-	for (i = 0; *p != NUL; ++i)	// count number of entries
+	ಬಫರ್[len] = NUL;		// make sure the buffer ends in NUL
+	p = ಬಫರ್;
+	ಗಾಗಿ (i = 0; *p != NUL; ++i)	// count number of entries
 	{
-	    while (*p != '\n' && *p != NUL)
+	    ಆಗ (*p != '\n' && *p != NUL)
 		++p;
-	    if (*p != NUL)
+	    ಆದರೆ (*p != NUL)
 		++p;
 	    p = skipwhite(p);		// skip leading white space
 	}
     }
     // file names are separated with NUL
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	/*
 	 * Some versions of zsh use spaces instead of NULs to separate
@@ -7460,13 +7460,13 @@ mch_expand_wildcards(
 	 * don't check for spaces again.
 	 */
 	check_spaces = FALSE;
-	if (shell_style == STYLE_PRINT && !did_find_nul)
+	ಆದರೆ (shell_style == STYLE_PRINT && !did_ಕಂಡುಹಿಡಿ_nul)
 	{
 	    // If there is a NUL, set did_find_nul, else set check_spaces
-	    buffer[len] = NUL;
-	    if (len && (int)STRLEN(buffer) < (int)len)
-		did_find_nul = TRUE;
-	    else
+	    ಬಫರ್[len] = NUL;
+	    ಆದರೆ (len && (ಪೂರ್ಣಾಂಕ)STRLEN(ಬಫರ್) < (ಪೂರ್ಣಾಂಕ)len)
+		did_ಕಂಡುಹಿಡಿ_nul = TRUE;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		check_spaces = TRUE;
 	}
 
@@ -7474,64 +7474,64 @@ mch_expand_wildcards(
 	 * Make sure the buffer ends with a NUL.  For STYLE_PRINT there
 	 * already is one, for STYLE_GLOB it needs to be added.
 	 */
-	if (len && buffer[len - 1] == NUL)
+	ಆದರೆ (len && ಬಫರ್[len - 1] == NUL)
 	    --len;
-	else
-	    buffer[len] = NUL;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಬಫರ್[len] = NUL;
 	i = 0;
-	for (p = buffer; p < buffer + len; ++p)
-	    if (*p == NUL || (*p == ' ' && check_spaces))   // count entry
+	ಗಾಗಿ (p = ಬಫರ್; p < ಬಫರ್ + len; ++p)
+	    ಆದರೆ (*p == NUL || (*p == ' ' && check_spaces))   // count entry
 	    {
 		++i;
 		*p = NUL;
 	    }
-	if (len)
+	ಆದರೆ (len)
 	    ++i;			// count last entry
     }
-    if (i == 0)
+    ಆದರೆ (i == 0)
     {
 	/*
 	 * Can happen when using /bin/sh and typing ":e $NO_SUCH_VAR^I".
 	 * /bin/sh will happily expand it to nothing rather than returning an
 	 * error; and hey, it's good to check anyway -- webb.
 	 */
-	vim_free(buffer);
-	goto notfound;
+	vim_free(ಬಫರ್);
+	ಹೋಗು notfound;
     }
-    *num_file = i;
+    *ಅಂಕೆ_file = i;
     *file = ALLOC_MULT(char_u *, i);
-    if (*file == NULL)
+    ಆದರೆ (*file == ಖಾಲಿ)
     {
 	// out of memory
-	vim_free(buffer);
-	return FAIL;
+	vim_free(ಬಫರ್);
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
     /*
      * Isolate the individual file names.
      */
-    p = buffer;
-    for (i = 0; i < *num_file; ++i)
+    p = ಬಫರ್;
+    ಗಾಗಿ (i = 0; i < *ಅಂಕೆ_file; ++i)
     {
 	(*file)[i] = p;
 	// Space or NL separates
-	if (shell_style == STYLE_ECHO || shell_style == STYLE_BT
+	ಆದರೆ (shell_style == STYLE_ECHO || shell_style == STYLE_BT
 		|| shell_style == STYLE_VIMGLOB || shell_style == STYLE_GLOBSTAR)
 	{
-	    while (!(shell_style == STYLE_ECHO && *p == ' ')
+	    ಆಗ (!(shell_style == STYLE_ECHO && *p == ' ')
 						   && *p != '\n' && *p != NUL)
 		++p;
-	    if (p == buffer + len)		// last entry
+	    ಆದರೆ (p == ಬಫರ್ + len)		// last entry
 		*p = NUL;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		*p++ = NUL;
 		p = skipwhite(p);		// skip to next entry
 	    }
 	}
-	else		// NUL separates
+	ಇಲ್ಲದಿದ್ದರೆ		// NUL separates
 	{
-	    while (*p && p < buffer + len)	// skip entry
+	    ಆಗ (*p && p < ಬಫರ್ + len)	// skip entry
 		++p;
 	    ++p;				// skip NUL
 	}
@@ -7540,209 +7540,209 @@ mch_expand_wildcards(
     /*
      * Move the file names to allocated memory.
      */
-    for (j = 0, i = 0; i < *num_file; ++i)
+    ಗಾಗಿ (j = 0, i = 0; i < *ಅಂಕೆ_file; ++i)
     {
 	// Require the files to exist.	Helps when using /bin/sh
-	if (!(flags & EW_NOTFOUND) && mch_getperm((*file)[i]) < 0)
-	    continue;
+	ಆದರೆ (!(flags & EW_NOTFOUND) && mch_getperm((*file)[i]) < 0)
+	    ಮುಂದುವರಿ;
 
 	// check if this entry should be included
 	dir = (mch_isdir((*file)[i]));
-	if ((dir && !(flags & EW_DIR)) || (!dir && !(flags & EW_FILE)))
-	    continue;
+	ಆದರೆ ((dir && !(flags & EW_DIR)) || (!dir && !(flags & EW_FILE)))
+	    ಮುಂದುವರಿ;
 
 	// Skip files that are not executable if we check for that.
-	if (!dir && (flags & EW_EXEC)
-		    && !mch_can_exe((*file)[i], NULL, !(flags & EW_SHELLCMD)))
-	    continue;
+	ಆದರೆ (!dir && (flags & EW_EXEC)
+		    && !mch_can_exe((*file)[i], ಖಾಲಿ, !(flags & EW_SHELLCMD)))
+	    ಮುಂದುವರಿ;
 
 	p = alloc(STRLEN((*file)[i]) + 1 + dir);
-	if (p)
+	ಆದರೆ (p)
 	{
 	    STRCPY(p, (*file)[i]);
-	    if (dir)
-		add_pathsep(p);	    // add '/' to a directory name
+	    ಆದರೆ (dir)
+		ಕೂಡಿಸು_pathsep(p);	    // add '/' to a directory name
 	    (*file)[j++] = p;
 	}
     }
-    vim_free(buffer);
-    *num_file = j;
+    vim_free(ಬಫರ್);
+    *ಅಂಕೆ_file = j;
 
-    if (*num_file == 0)	    // rejected all entries
+    ಆದರೆ (*ಅಂಕೆ_file == 0)	    // rejected all entries
     {
 	VIM_CLEAR(*file);
-	goto notfound;
+	ಹೋಗು notfound;
     }
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 
 notfound:
-    if (flags & EW_NOTFOUND)
-	return save_patterns(num_pat, pat, num_file, file);
-    return FAIL;
+    ಆದರೆ (flags & EW_NOTFOUND)
+	ಹಿಂತಿರುಗಿ save_patterns(ಅಂಕೆ_pat, pat, ಅಂಕೆ_file, file);
+    ಹಿಂತಿರುಗಿ FAIL;
 }
 
-#endif // VMS
+#ಆದರೆ_ಅಂತ್ಯ // VMS
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 save_patterns(
-    int		num_pat,
+    ಪೂರ್ಣಾಂಕ		ಅಂಕೆ_pat,
     char_u	**pat,
-    int		*num_file,
+    ಪೂರ್ಣಾಂಕ		*ಅಂಕೆ_file,
     char_u	***file)
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
     char_u	*s;
 
-    *file = ALLOC_MULT(char_u *, num_pat);
-    if (*file == NULL)
-	return FAIL;
-    for (i = 0; i < num_pat; i++)
+    *file = ALLOC_MULT(char_u *, ಅಂಕೆ_pat);
+    ಆದರೆ (*file == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
+    ಗಾಗಿ (i = 0; i < ಅಂಕೆ_pat; i++)
     {
 	s = vim_strsave(pat[i]);
-	if (s != NULL)
+	ಆದರೆ (s != ಖಾಲಿ)
 	    // Be compatible with expand_filename(): halve the number of
 	    // backslashes.
 	    backslash_halve(s);
 	(*file)[i] = s;
     }
-    *num_file = num_pat;
-    return OK;
+    *ಅಂಕೆ_file = ಅಂಕೆ_pat;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Return TRUE if the string "p" contains a wildcard that mch_expandpath() can
  * expand.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_has_exp_wildcard(char_u *p)
 {
-    for ( ; *p; MB_PTR_ADV(p))
+    ಗಾಗಿ ( ; *p; MB_PTR_ADV(p))
     {
-	if (*p == '\\' && p[1] != NUL)
+	ಆದರೆ (*p == '\\' && p[1] != NUL)
 	    ++p;
-	else
-	    if (vim_strchr((char_u *)
-#ifdef VMS
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಆದರೆ (vim_strchr((char_u *)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VMS
 				    "*?%"
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 				    "*?[{'"
-#endif
-						, *p) != NULL)
-	    return TRUE;
+#ಆದರೆ_ಅಂತ್ಯ
+						, *p) != ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ TRUE;
     }
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 /*
  * Return TRUE if the string "p" contains a wildcard.
  * Don't recognize '~' at the end as a wildcard.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_has_wildcard(char_u *p)
 {
-    for ( ; *p; MB_PTR_ADV(p))
+    ಗಾಗಿ ( ; *p; MB_PTR_ADV(p))
     {
-	if (*p == '\\' && p[1] != NUL)
+	ಆದರೆ (*p == '\\' && p[1] != NUL)
 	    ++p;
-	else
-	    if (vim_strchr((char_u *)
-#ifdef VMS
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಆದರೆ (vim_strchr((char_u *)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VMS
 				    "*?%$"
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 				    "*?[{`'$"
-#endif
-						, *p) != NULL
+#ಆದರೆ_ಅಂತ್ಯ
+						, *p) != ಖಾಲಿ
 		|| (*p == '~' && p[1] != NUL))
-	    return TRUE;
+	    ಹಿಂತಿರುಗಿ TRUE;
     }
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
-    static int
-have_wildcard(int num, char_u **file)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+have_wildcard(ಪೂರ್ಣಾಂಕ ಅಂಕೆ, char_u **file)
 {
-    int	    i;
+    ಪೂರ್ಣಾಂಕ	    i;
 
-    for (i = 0; i < num; i++)
-	if (mch_has_wildcard(file[i]))
-	    return 1;
-    return 0;
+    ಗಾಗಿ (i = 0; i < ಅಂಕೆ; i++)
+	ಆದರೆ (mch_has_wildcard(file[i]))
+	    ಹಿಂತಿರುಗಿ 1;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-    static int
-have_dollars(int num, char_u **file)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+have_dollars(ಪೂರ್ಣಾಂಕ ಅಂಕೆ, char_u **file)
 {
-    int	    i;
+    ಪೂರ್ಣಾಂಕ	    i;
 
-    for (i = 0; i < num; i++)
-	if (vim_strchr(file[i], '$') != NULL)
-	    return TRUE;
-    return FALSE;
+    ಗಾಗಿ (i = 0; i < ಅಂಕೆ; i++)
+	ಆದರೆ (vim_strchr(file[i], '$') != ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ TRUE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
-#if !defined(HAVE_RENAME)
+#ಆದರೆ !defined(HAVE_RENAME)
 /*
  * Scaled-down version of rename(), which is missing in Xenix.
  * This version can only move regular files and will fail if the
  * destination exists.
  */
-    int
-mch_rename(const char *src, const char *dest)
+    ಪೂರ್ಣಾಂಕ
+mch_rename(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *src, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *dest)
 {
-    struct stat	    st;
+    ರಚನೆ stat	    st;
 
-    if (stat(dest, &st) >= 0)	    // fail if destination exists
-	return -1;
-    if (link(src, dest) != 0)	    // link file to new name
-	return -1;
-    if (mch_remove(src) == 0)	    // delete link to old name
-	return 0;
-    return -1;
+    ಆದರೆ (stat(dest, &st) >= 0)	    // fail if destination exists
+	ಹಿಂತಿರುಗಿ -1;
+    ಆದರೆ (link(src, dest) != 0)	    // link file to new name
+	ಹಿಂತಿರುಗಿ -1;
+    ಆದರೆ (mch_remove(src) == 0)	    // delete link to old name
+	ಹಿಂತಿರುಗಿ 0;
+    ಹಿಂತಿರುಗಿ -1;
 }
-#endif // !HAVE_RENAME
+#ಆದರೆ_ಅಂತ್ಯ // !HAVE_RENAME
 
-#if defined(FEAT_MOUSE_GPM)
-# if defined(DYNAMIC_GPM)
+#ಆದರೆ defined(FEAT_MOUSE_GPM)
+# ಆದರೆ defined(DYNAMIC_GPM)
 /*
  * Initialize Gpm's symbols for dynamic linking.
  * Must be called only if libgpm_hinst is NULL.
  */
-    static int
-load_libgpm(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ತುಂಬು_libgpm(ಶೂನ್ಯ)
 {
     libgpm_hinst = dlopen("libgpm.so", RTLD_LAZY|RTLD_GLOBAL);
 
-    if (libgpm_hinst == NULL)
+    ಆದರೆ (libgpm_hinst == ಖಾಲಿ)
     {
-	if (p_verbose > 0)
+	ಆದರೆ (p_verbose > 0)
 	    smsg_attr(HL_ATTR(HLF_W),
 			       _("Could not load gpm library: %s"), dlerror());
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
-    if (
-	    (dll_Gpm_Open     = dlsym(libgpm_hinst, "Gpm_Open"))     == NULL
-	||  (dll_Gpm_Close    = dlsym(libgpm_hinst, "Gpm_Close"))    == NULL
-	||  (dll_Gpm_GetEvent = dlsym(libgpm_hinst, "Gpm_GetEvent")) == NULL
-	||  (dll_gpm_flag     = dlsym(libgpm_hinst, "gpm_flag"))     == NULL
-	||  (dll_gpm_fd       = dlsym(libgpm_hinst, "gpm_fd"))       == NULL
+    ಆದರೆ (
+	    (dll_Gpm_Open     = dlsym(libgpm_hinst, "Gpm_Open"))     == ಖಾಲಿ
+	||  (dll_Gpm_Close    = dlsym(libgpm_hinst, "Gpm_Close"))    == ಖಾಲಿ
+	||  (dll_Gpm_GetEvent = dlsym(libgpm_hinst, "Gpm_GetEvent")) == ಖಾಲಿ
+	||  (dll_gpm_flag     = dlsym(libgpm_hinst, "gpm_flag"))     == ಖಾಲಿ
+	||  (dll_gpm_fd       = dlsym(libgpm_hinst, "gpm_fd"))       == ಖಾಲಿ
       )
     {
-	semsg(_(e_could_not_load_library_str_str), "gpm", dlerror());
+	semsg(_(e_could_not_ತುಂಬು_library_str_str), "gpm", dlerror());
 	dlclose(libgpm_hinst);
-	libgpm_hinst = NULL;
-	dll_gpm_flag = NULL;
-	dll_gpm_fd   = NULL;
-	return FAIL;
+	libgpm_hinst = ಖಾಲಿ;
+	dll_gpm_flag = ಖಾಲಿ;
+	dll_gpm_fd   = ಖಾಲಿ;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-    int
-gpm_available(void)
+    ಪೂರ್ಣಾಂಕ
+gpm_ಲಭ್ಯ(ಶೂನ್ಯ)
 {
-    return libgpm_hinst != NULL || load_libgpm() == OK;
+    ಹಿಂತಿರುಗಿ libgpm_hinst != ಖಾಲಿ || ತುಂಬು_libgpm() == OK;
 }
 # endif // DYNAMIC_GPM
 
@@ -7750,25 +7750,25 @@ gpm_available(void)
  * Initializes connection with gpm (if it isn't already opened)
  * Return 1 if succeeded (or connection already opened), 0 if failed
  */
-    static int
-gpm_open(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+gpm_open(ಶೂನ್ಯ)
 {
-    static Gpm_Connect gpm_connect; // Must it be kept till closing ?
+    ಸ್ಥಿರ Gpm_Connect gpm_connect; // Must it be kept till closing ?
 
 # ifdef DYNAMIC_GPM
-    if (!gpm_available())
-	return 0;
+    ಆದರೆ (!gpm_ಲಭ್ಯ())
+	ಹಿಂತಿರುಗಿ 0;
 # endif
 
-    if (gpm_flag)
-	return 1; // already open
+    ಆದರೆ (gpm_flag)
+	ಹಿಂತಿರುಗಿ 1; // already open
 
-    gpm_connect.eventMask = (GPM_UP | GPM_DRAG | GPM_DOWN);
-    gpm_connect.defaultMask = ~GPM_HARD;
+    gpm_connect.event_ಮುಖವಾಡ_2 = (GPM_ಮೇಲೆ | GPM_DRAG | GPM_ಕೆಳಕ್ಕೆ);
+    gpm_connect.default_ಮುಖವಾಡ = ~GPM_HARD;
     // Default handling for mouse move
     gpm_connect.minMod = 0; // Handle any modifier keys
     gpm_connect.maxMod = 0xffff;
-    if (Gpm_Open(&gpm_connect, 0) > 0)
+    ಆದರೆ (Gpm_Open(&gpm_connect, 0) > 0)
     {
 	// gpm library tries to handling TSTP causes
 	// problems. Anyways, we close connection to Gpm whenever
@@ -7777,9 +7777,9 @@ gpm_open(void)
 # ifdef SIGTSTP
 	mch_signal(SIGTSTP, restricted ? SIG_IGN : sig_tstp);
 # endif
-	return 1; // succeed
+	ಹಿಂತಿರುಗಿ 1; // succeed
     }
-    if (gpm_fd == -2)
+    ಆದರೆ (gpm_fd == -2)
     {
 	Gpm_Close(); // We don't want to talk to xterm via gpm
 
@@ -7793,25 +7793,25 @@ gpm_open(void)
 	mch_signal(SIGTSTP, restricted ? SIG_IGN : sig_tstp);
 # endif
     }
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
 /*
  * Returns TRUE if the GPM mouse is enabled.
  */
-    int
-gpm_enabled(void)
+    ಪೂರ್ಣಾಂಕ
+gpm_enabled(ಶೂನ್ಯ)
 {
-    return gpm_flag && gpm_fd >= 0;
+    ಹಿಂತಿರುಗಿ gpm_flag && gpm_fd >= 0;
 }
 
 /*
  * Closes connection to gpm
  */
-    static void
-gpm_close(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+gpm_close(ಶೂನ್ಯ)
 {
-    if (gpm_enabled())
+    ಆದರೆ (gpm_enabled())
 	Gpm_Close();
 }
 
@@ -7820,65 +7820,65 @@ gpm_close(void)
  * generated key sequence.
  * This function is styled after gui_send_mouse_event().
  */
-    static int
-mch_gpm_process(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+mch_gpm_process(ಶೂನ್ಯ)
 {
-    int			button;
-    static Gpm_Event	gpm_event;
+    ಪೂರ್ಣಾಂಕ			button;
+    ಸ್ಥಿರ Gpm_Event	gpm_event;
     char_u		string[6];
     int_u		vim_modifiers;
-    int			row,col;
-    unsigned char	buttons_mask;
-    unsigned char	gpm_modifiers;
-    static unsigned char old_buttons = 0;
+    ಪೂರ್ಣಾಂಕ			ಅಡ್ಡಸಾಲು,ಲಂಬಸಾಲು;
+    ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ	buttons_ಮುಖವಾಡ;
+    ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ	gpm_modifiers;
+    ಸ್ಥಿರ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ old_buttons = 0;
 
     Gpm_GetEvent(&gpm_event);
 
 # ifdef FEAT_GUI
     // Don't put events in the input queue now.
-    if (hold_gui_events)
-	return 0;
+    ಆದರೆ (hold_gui_events)
+	ಹಿಂತಿರುಗಿ 0;
 # endif
 
-    row = gpm_event.y - 1;
-    col = gpm_event.x - 1;
+    ಅಡ್ಡಸಾಲು = gpm_event.y - 1;
+    ಲಂಬಸಾಲು = gpm_event.x - 1;
 
     string[0] = ESC; // Our termcode
     string[1] = 'M';
     string[2] = 'G';
-    switch (GPM_BARE_EVENTS(gpm_event.type))
+    ಆಯ್ಕೆ (GPM_BARE_EVENTS(gpm_event.type))
     {
-	case GPM_DRAG:
+	ಸ್ಥಿತಿ GPM_DRAG:
 	    string[3] = MOUSE_DRAG;
-	    break;
-	case GPM_DOWN:
-	    buttons_mask = gpm_event.buttons & ~old_buttons;
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ GPM_ಕೆಳಕ್ಕೆ:
+	    buttons_ಮುಖವಾಡ = gpm_event.buttons & ~old_buttons;
 	    old_buttons = gpm_event.buttons;
-	    switch (buttons_mask)
+	    ಆಯ್ಕೆ (buttons_ಮುಖವಾಡ)
 	    {
-		case GPM_B_LEFT:
-		    button = MOUSE_LEFT;
-		    break;
-		case GPM_B_MIDDLE:
-		    button = MOUSE_MIDDLE;
-		    break;
-		case GPM_B_RIGHT:
-		    button = MOUSE_RIGHT;
-		    break;
-		default:
-		    return 0;
+		ಸ್ಥಿತಿ GPM_B_ಎಡ:
+		    button = MOUSE_ಎಡ;
+		    ನಿಲ್ಲಿಸು;
+		ಸ್ಥಿತಿ GPM_B_ಮಧ್ಯ:
+		    button = MOUSE_ಮಧ್ಯ;
+		    ನಿಲ್ಲಿಸು;
+		ಸ್ಥಿತಿ GPM_B_ಬಲ:
+		    button = MOUSE_ಬಲ;
+		    ನಿಲ್ಲಿಸು;
+		ಪೂರ್ವನಿಯೋಜಿತ:
+		    ಹಿಂತಿರುಗಿ 0;
 		    // Don't know what to do. Can more than one button be
 		    // reported in one event?
 	    }
 	    string[3] = (char_u)(button | 0x20);
-	    SET_NUM_MOUSE_CLICKS(string[3], gpm_event.clicks + 1);
-	    break;
-	case GPM_UP:
+	    ಗಣ_ಅಂಕೆ_MOUSE_CLICKS(string[3], gpm_event.clicks + 1);
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ GPM_ಮೇಲೆ:
 	    string[3] = MOUSE_RELEASE;
 	    old_buttons &= ~gpm_event.buttons;
-	    break;
-	default:
-	    return 0;
+	    ನಿಲ್ಲಿಸು;
+	ಪೂರ್ವನಿಯೋಜಿತ:
+	    ಹಿಂತಿರುಗಿ 0;
     }
     // This code is based on gui_x11_mouse_cb in gui_x11.c
     gpm_modifiers = gpm_event.modifiers;
@@ -7886,214 +7886,214 @@ mch_gpm_process(void)
     // I ignore capslock stats. Aren't we all just hate capslock mixing with
     // Vim commands ? Besides, gpm_event.modifiers is unsigned char, and
     // K_CAPSSHIFT is defined 8, so it probably isn't even reported
-    if (gpm_modifiers & ((1 << KG_SHIFT) | (1 << KG_SHIFTR) | (1 << KG_SHIFTL)))
-	vim_modifiers |= MOUSE_SHIFT;
+    ಆದರೆ (gpm_modifiers & ((1 << KG_ಸರಿಸು) | (1 << KG_SHIFTR) | (1 << KG_SHIFTL)))
+	vim_modifiers |= MOUSE_ಸರಿಸು;
 
-    if (gpm_modifiers & ((1 << KG_CTRL) | (1 << KG_CTRLR) | (1 << KG_CTRLL)))
+    ಆದರೆ (gpm_modifiers & ((1 << KG_CTRL) | (1 << KG_CTRLR) | (1 << KG_CTRLL)))
 	vim_modifiers |= MOUSE_CTRL;
-    if (gpm_modifiers & ((1 << KG_ALT) | (1 << KG_ALTGR)))
+    ಆದರೆ (gpm_modifiers & ((1 << KG_ALT) | (1 << KG_ALTGR)))
 	vim_modifiers |= MOUSE_ALT;
     string[3] |= vim_modifiers;
-    string[4] = (char_u)(col + ' ' + 1);
-    string[5] = (char_u)(row + ' ' + 1);
-    add_to_input_buf(string, 6);
-    return 6;
+    string[4] = (char_u)(ಲಂಬಸಾಲು + ' ' + 1);
+    string[5] = (char_u)(ಅಡ್ಡಸಾಲು + ' ' + 1);
+    ಕೂಡಿಸು_ಗಮ್ಯ_ಒಳಹರಿವು_buf(string, 6);
+    ಹಿಂತಿರುಗಿ 6;
 }
-#endif // FEAT_MOUSE_GPM
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_MOUSE_GPM
 
-#ifdef FEAT_SYSMOUSE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_SYSMOUSE
 /*
  * Initialize connection with sysmouse.
  * Let virtual console inform us with SIGUSR2 for pending sysmouse
  * output, any sysmouse output than will be processed via sig_sysmouse().
  * Return OK if succeeded, FAIL if failed.
  */
-    static int
-sysmouse_open(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+sysmouse_open(ಶೂನ್ಯ)
 {
-    struct mouse_info   mouse;
+    ರಚನೆ mouse_info   mouse;
 
-    mouse.operation = MOUSE_MODE;
-    mouse.u.mode.mode = 0;
-    mouse.u.mode.signal = SIGUSR2;
-    if (ioctl(1, CONS_MOUSECTL, &mouse) == -1)
-	return FAIL;
+    mouse.operation = MOUSE_ಬಹುಲಕ;
+    mouse.u.ಬಹುಲಕ.ಬಹುಲಕ = 0;
+    mouse.u.ಬಹುಲಕ.ಸಂಕೇತ = SIGUSR2;
+    ಆದರೆ (ioctl(1, CONS_MOUSECTL, &mouse) == -1)
+	ಹಿಂತಿರುಗಿ FAIL;
 
     mch_signal(SIGUSR2, sig_sysmouse);
     mouse.operation = MOUSE_SHOW;
     ioctl(1, CONS_MOUSECTL, &mouse);
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Stop processing SIGUSR2 signals, and also make sure that
  * virtual console do not send us any sysmouse related signal.
  */
-    static void
-sysmouse_close(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+sysmouse_close(ಶೂನ್ಯ)
 {
-    struct mouse_info	mouse;
+    ರಚನೆ mouse_info	mouse;
 
     mch_signal(SIGUSR2, restricted ? SIG_IGN : SIG_DFL);
-    mouse.operation = MOUSE_MODE;
-    mouse.u.mode.mode = 0;
-    mouse.u.mode.signal = 0;
+    mouse.operation = MOUSE_ಬಹುಲಕ;
+    mouse.u.ಬಹುಲಕ.ಬಹುಲಕ = 0;
+    mouse.u.ಬಹುಲಕ.ಸಂಕೇತ = 0;
     ioctl(1, CONS_MOUSECTL, &mouse);
 }
 
 /*
  * Gets info from sysmouse and adds special keys to input buf.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 sig_sysmouse SIGDEFARG(sigarg)
 {
-    struct mouse_info	mouse;
-    struct video_info	video;
+    ರಚನೆ mouse_info	mouse;
+    ರಚನೆ video_info	video;
     char_u		string[6];
-    int			row, col;
-    int			button;
-    int			buttons;
-    static int		oldbuttons = 0;
+    ಪೂರ್ಣಾಂಕ			ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು;
+    ಪೂರ್ಣಾಂಕ			button;
+    ಪೂರ್ಣಾಂಕ			buttons;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ		oldbuttons = 0;
 
 # ifdef FEAT_GUI
     // Don't put events in the input queue now.
-    if (hold_gui_events)
-	return;
+    ಆದರೆ (hold_gui_events)
+	ಹಿಂತಿರುಗಿ;
 # endif
 
     mouse.operation = MOUSE_GETINFO;
-    if (ioctl(1, FBIO_GETMODE, &video.vi_mode) != -1
+    ಆದರೆ (ioctl(1, FBIO_GETMODE, &video.vi_ಬಹುಲಕ) != -1
 	    && ioctl(1, FBIO_MODEINFO, &video) != -1
 	    && ioctl(1, CONS_MOUSECTL, &mouse) != -1
 	    && video.vi_cheight > 0 && video.vi_cwidth > 0)
     {
-	row = mouse.u.data.y / video.vi_cheight;
-	col = mouse.u.data.x / video.vi_cwidth;
-	buttons = mouse.u.data.buttons;
+	ಅಡ್ಡಸಾಲು = mouse.u.ದತ್ತಾಂಶ.y / video.vi_cheight;
+	ಲಂಬಸಾಲು = mouse.u.ದತ್ತಾಂಶ.x / video.vi_cwidth;
+	buttons = mouse.u.ದತ್ತಾಂಶ.buttons;
 	string[0] = ESC; // Our termcode
 	string[1] = 'M';
 	string[2] = 'S';
-	if (oldbuttons == buttons && buttons != 0)
+	ಆದರೆ (oldbuttons == buttons && buttons != 0)
 	{
 	    button = MOUSE_DRAG;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    switch (buttons)
+	    ಆಯ್ಕೆ (buttons)
 	    {
-		case 0:
+		ಸ್ಥಿತಿ 0:
 		    button = MOUSE_RELEASE;
-		    break;
-		case 1:
-		    button = MOUSE_LEFT;
-		    break;
-		case 2:
-		    button = MOUSE_MIDDLE;
-		    break;
-		case 4:
-		    button = MOUSE_RIGHT;
-		    break;
-		default:
-		    return;
+		    ನಿಲ್ಲಿಸು;
+		ಸ್ಥಿತಿ 1:
+		    button = MOUSE_ಎಡ;
+		    ನಿಲ್ಲಿಸು;
+		ಸ್ಥಿತಿ 2:
+		    button = MOUSE_ಮಧ್ಯ;
+		    ನಿಲ್ಲಿಸು;
+		ಸ್ಥಿತಿ 4:
+		    button = MOUSE_ಬಲ;
+		    ನಿಲ್ಲಿಸು;
+		ಪೂರ್ವನಿಯೋಜಿತ:
+		    ಹಿಂತಿರುಗಿ;
 	    }
 	    oldbuttons = buttons;
 	}
 	string[3] = (char_u)(button);
-	string[4] = (char_u)(col + ' ' + 1);
-	string[5] = (char_u)(row + ' ' + 1);
-	add_to_input_buf(string, 6);
+	string[4] = (char_u)(ಲಂಬಸಾಲು + ' ' + 1);
+	string[5] = (char_u)(ಅಡ್ಡಸಾಲು + ' ' + 1);
+	ಕೂಡಿಸು_ಗಮ್ಯ_ಒಳಹರಿವು_buf(string, 6);
     }
-    return;
+    ಹಿಂತಿರುಗಿ;
 }
-#endif // FEAT_SYSMOUSE
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_SYSMOUSE
 
 /*
  * Fill the buffer 'buf' with 'len' random bytes.
  * Returns FAIL if the OS PRNG is not available or something went wrong.
  */
-    int
-mch_get_random(char_u *buf, int len)
+    ಪೂರ್ಣಾಂಕ
+mch_get_random(char_u *buf, ಪೂರ್ಣಾಂಕ len)
 {
-    static int dev_urandom_state = NOTDONE;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ dev_urandom_state = NOTDONE;
 
-    if (dev_urandom_state == FAIL)
-	return FAIL;
+    ಆದರೆ (dev_urandom_state == FAIL)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    int fd = open("/dev/urandom", O_RDONLY);
+    ಪೂರ್ಣಾಂಕ fd = open("/dev/urandom", O_RDONLY);
 
     // Attempt reading /dev/urandom.
-    if (fd == -1)
+    ಆದರೆ (fd == -1)
 	dev_urandom_state = FAIL;
-    else if (read(fd, buf, len) == len)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಪಠ(fd, buf, len) == len)
     {
 	dev_urandom_state = OK;
 	close(fd);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	dev_urandom_state = FAIL;
 	close(fd);
     }
 
-    return dev_urandom_state;
+    ಹಿಂತಿರುಗಿ dev_urandom_state;
 }
 
-#if defined(FEAT_LIBCALL)
-typedef char_u * (*STRPROCSTR)(char_u *);
-typedef char_u * (*INTPROCSTR)(int);
-typedef int (*STRPROCINT)(char_u *);
-typedef int (*INTPROCINT)(int);
+#ಆದರೆ defined(FEAT_LIBCALL)
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ char_u * (*STRPROCSTR)(char_u *);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ char_u * (*INTPROCSTR)(ಪೂರ್ಣಾಂಕ);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಪೂರ್ಣಾಂಕ (*STRPROCINT)(char_u *);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಪೂರ್ಣಾಂಕ (*INTPROCINT)(ಪೂರ್ಣಾಂಕ);
 
 /*
  * Call a DLL routine which takes either a string or int param
  * and returns an allocated string.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_libcall(
     char_u	*libname,
     char_u	*funcname,
     char_u	*argstring,	// NULL when using a argint
-    int		argint,
-    char_u	**string_result, // NULL when using number_result
-    int		*number_result)
+    ಪೂರ್ಣಾಂಕ		argint,
+    char_u	**string_ಫಲಿತಾಂಶ, // NULL when using number_result
+    ಪೂರ್ಣಾಂಕ		*ಸಂಖ್ಯೆ_ಫಲಿತಾಂಶ)
 {
-# if defined(USE_DLOPEN)
-    void	*hinstLib;
-    char	*dlerr = NULL;
-# else
+# ಆದರೆ defined(USE_DLOPEN)
+    ಶೂನ್ಯ	*hinstLib;
+    ಅಕ್ಷರ	*dlerr = ಖಾಲಿ;
+# ಇಲ್ಲದಿದ್ದರೆ
     shl_t	hinstLib;
 # endif
-    STRPROCSTR	ProcAdd;
-    INTPROCSTR	ProcAddI;
-    char_u	*retval_str = NULL;
-    int		retval_int = 0;
-    int		success = FALSE;
+    STRPROCSTR	Proc_ಕೂಡಿಸು;
+    INTPROCSTR	Proc_ಕೂಡಿಸು_I;
+    char_u	*retval_str = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		retval_int = 0;
+    ಪೂರ್ಣಾಂಕ		success = FALSE;
 
     /*
      * Get a handle to the DLL module.
      */
-# if defined(USE_DLOPEN)
+# ಆದರೆ defined(USE_DLOPEN)
     // First clear any error, it's not cleared by the dlopen() call.
-    (void)dlerror();
+    (ಶೂನ್ಯ)dlerror();
 
-    hinstLib = dlopen((char *)libname, RTLD_LAZY
+    hinstLib = dlopen((ಅಕ್ಷರ *)libname, RTLD_LAZY
 #  ifdef RTLD_LOCAL
 	    | RTLD_LOCAL
 #  endif
 	    );
-    if (hinstLib == NULL)
+    ಆದರೆ (hinstLib == ಖಾಲಿ)
     {
 	// "dlerr" must be used before dlclose()
 	dlerr = dlerror();
-	if (dlerr != NULL)
+	ಆದರೆ (dlerr != ಖಾಲಿ)
 	    semsg(_("dlerror = \"%s\""), dlerr);
     }
-# else
-    hinstLib = shl_load((const char*)libname, BIND_IMMEDIATE|BIND_VERBOSE, 0L);
+# ಇಲ್ಲದಿದ್ದರೆ
+    hinstLib = shl_ತುಂಬು((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ*)libname, BIND_ತಕ್ಷಣ|BIND_VERBOSE, 0L);
 # endif
 
     // If the handle is valid, try to get the function address.
-    if (hinstLib != NULL)
+    ಆದರೆ (hinstLib != ಖಾಲಿ)
     {
 # ifdef USING_SETJMP
 	/*
@@ -8101,190 +8101,190 @@ mch_libcall(
 	 * using a number where a string pointer is expected.
 	 */
 	mch_startjmp();
-	if (SETJMP(lc_jump_env) != 0)
+	ಆದರೆ (SETJMP(lc_jump_env) != 0)
 	{
 	    success = FALSE;
-#  if defined(USE_DLOPEN)
-	    dlerr = NULL;
+#  ಆದರೆ defined(USE_DLOPEN)
+	    dlerr = ಖಾಲಿ;
 #  endif
 	    mch_didjmp();
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 # endif
 	{
-	    retval_str = NULL;
+	    retval_str = ಖಾಲಿ;
 	    retval_int = 0;
 
-	    if (argstring != NULL)
+	    ಆದರೆ (argstring != ಖಾಲಿ)
 	    {
-# if defined(USE_DLOPEN)
-		*(void **)(&ProcAdd) = dlsym(hinstLib, (const char *)funcname);
+# ಆದರೆ defined(USE_DLOPEN)
+		*(ಶೂನ್ಯ **)(&Proc_ಕೂಡಿಸು) = dlsym(hinstLib, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)funcname);
 		dlerr = dlerror();
-# else
-		if (shl_findsym(&hinstLib, (const char *)funcname,
-					TYPE_PROCEDURE, (void *)&ProcAdd) < 0)
-		    ProcAdd = NULL;
+# ಇಲ್ಲದಿದ್ದರೆ
+		ಆದರೆ (shl_findsym(&hinstLib, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)funcname,
+					TYPE_PROCEDURE, (ಶೂನ್ಯ *)&Proc_ಕೂಡಿಸು) < 0)
+		    Proc_ಕೂಡಿಸು = ಖಾಲಿ;
 # endif
-		if ((success = (ProcAdd != NULL
-# if defined(USE_DLOPEN)
-			    && dlerr == NULL
+		ಆದರೆ ((success = (Proc_ಕೂಡಿಸು != ಖಾಲಿ
+# ಆದರೆ defined(USE_DLOPEN)
+			    && dlerr == ಖಾಲಿ
 # endif
 			    )))
 		{
-		    if (string_result == NULL)
-			retval_int = ((STRPROCINT)(void *)ProcAdd)(argstring);
-		    else
-			retval_str = (ProcAdd)(argstring);
+		    ಆದರೆ (string_ಫಲಿತಾಂಶ == ಖಾಲಿ)
+			retval_int = ((STRPROCINT)(ಶೂನ್ಯ *)Proc_ಕೂಡಿಸು)(argstring);
+		    ಇಲ್ಲದಿದ್ದರೆ
+			retval_str = (Proc_ಕೂಡಿಸು)(argstring);
 		}
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-# if defined(USE_DLOPEN)
-		*(void **)(&ProcAddI) = dlsym(hinstLib, (const char *)funcname);
+# ಆದರೆ defined(USE_DLOPEN)
+		*(ಶೂನ್ಯ **)(&Proc_ಕೂಡಿಸು_I) = dlsym(hinstLib, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)funcname);
 		dlerr = dlerror();
-# else
-		if (shl_findsym(&hinstLib, (const char *)funcname,
-				       TYPE_PROCEDURE, (void *)&ProcAddI) < 0)
-		    ProcAddI = NULL;
+# ಇಲ್ಲದಿದ್ದರೆ
+		ಆದರೆ (shl_findsym(&hinstLib, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)funcname,
+				       TYPE_PROCEDURE, (ಶೂನ್ಯ *)&Proc_ಕೂಡಿಸು_I) < 0)
+		    Proc_ಕೂಡಿಸು_I = ಖಾಲಿ;
 # endif
-		if ((success = (ProcAddI != NULL
-# if defined(USE_DLOPEN)
-			    && dlerr == NULL
+		ಆದರೆ ((success = (Proc_ಕೂಡಿಸು_I != ಖಾಲಿ
+# ಆದರೆ defined(USE_DLOPEN)
+			    && dlerr == ಖಾಲಿ
 # endif
 			    )))
 		{
-		    if (string_result == NULL)
-			retval_int = ((INTPROCINT)(void *)ProcAddI)(argint);
-		    else
-			retval_str = (ProcAddI)(argint);
+		    ಆದರೆ (string_ಫಲಿತಾಂಶ == ಖಾಲಿ)
+			retval_int = ((INTPROCINT)(ಶೂನ್ಯ *)Proc_ಕೂಡಿಸು_I)(argint);
+		    ಇಲ್ಲದಿದ್ದರೆ
+			retval_str = (Proc_ಕೂಡಿಸು_I)(argint);
 		}
 	    }
 
 	    // Save the string before we free the library.
 	    // Assume that a "1" or "-1" result is an illegal pointer.
-	    if (string_result == NULL)
-		*number_result = retval_int;
-	    else if (retval_str != NULL
+	    ಆದರೆ (string_ಫಲಿತಾಂಶ == ಖಾಲಿ)
+		*ಸಂಖ್ಯೆ_ಫಲಿತಾಂಶ = retval_int;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (retval_str != ಖಾಲಿ
 		    && retval_str != (char_u *)1
 		    && retval_str != (char_u *)-1)
-		*string_result = vim_strsave(retval_str);
+		*string_ಫಲಿತಾಂಶ = vim_strsave(retval_str);
 	}
 
 # ifdef USING_SETJMP
 	mch_endjmp();
 #  ifdef SIGHASARG
-	if (lc_signal != 0)
+	ಆದರೆ (lc_signal != 0)
 	{
-	    int i;
+	    ಪೂರ್ಣಾಂಕ i;
 
 	    // try to find the name of this signal
-	    for (i = 0; signal_info[i].sig != -1; i++)
-		if (lc_signal == signal_info[i].sig)
-		    break;
-	    semsg(_(e_got_sig_str_in_libcall), signal_info[i].name);
+	    ಗಾಗಿ (i = 0; signal_info[i].sig != -1; i++)
+		ಆದರೆ (lc_signal == signal_info[i].sig)
+		    ನಿಲ್ಲಿಸು;
+	    semsg(_(e_got_sig_str_ಒಳ_libcall), signal_info[i].name);
 	}
 #  endif
 # endif
 
-# if defined(USE_DLOPEN)
+# ಆದರೆ defined(USE_DLOPEN)
 	// "dlerr" must be used before dlclose()
-	if (dlerr != NULL)
+	ಆದರೆ (dlerr != ಖಾಲಿ)
 	    semsg(_("dlerror = \"%s\""), dlerr);
 
 	// Free the DLL module.
-	(void)dlclose(hinstLib);
-# else
-	(void)shl_unload(hinstLib);
+	(ಶೂನ್ಯ)dlclose(hinstLib);
+# ಇಲ್ಲದಿದ್ದರೆ
+	(ಶೂನ್ಯ)shl_unload(hinstLib);
 # endif
     }
 
-    if (!success)
+    ಆದರೆ (!success)
     {
 	semsg(_(e_library_call_failed_for_str), funcname);
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
-static int	xterm_trace = -1;	// default: disabled
-static int	xterm_button;
+#ಆದರೆ defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	xterm_trace = -1;	// default: disabled
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	xterm_button;
 
 /*
  * Setup a dummy window for X selections in a terminal.
  */
-    void
-setup_term_clip(void)
+    ಶೂನ್ಯ
+ಸಿದ್ಧತೆ_ಪದ_clip(ಶೂನ್ಯ)
 {
-    int		z = 0;
-    char	*strp = "";
+    ಪೂರ್ಣಾಂಕ		z = 0;
+    ಅಕ್ಷರ	*strp = "";
     Widget	AppShell;
 
-    if (!x_connect_to_server())
-	return;
+    ಆದರೆ (!x_connect_ಗಮ್ಯ_server())
+	ಹಿಂತಿರುಗಿ;
 
     open_app_context();
-    if (app_context != NULL && xterm_Shell == (Widget)0)
+    ಆದರೆ (app_context != ಖಾಲಿ && xterm_Shell == (Widget)0)
     {
-	int (*oldhandler)(Display*, XErrorEvent*);
-# if defined(USING_SETJMP)
-	int (*oldIOhandler)(Display*);
+	ಪೂರ್ಣಾಂಕ (*oldhandler)(Display*, XErrorEvent*);
+# ಆದರೆ defined(USING_SETJMP)
+	ಪೂರ್ಣಾಂಕ (*oldIOhandler)(Display*);
 # endif
 # ifdef ELAPSED_FUNC
-	elapsed_T start_tv;
+	elapsed_T ಆರಂಭ_tv;
 
-	if (p_verbose > 0)
-	    ELAPSED_INIT(start_tv);
+	ಆದರೆ (p_verbose > 0)
+	    ELAPSED_INIT(ಆರಂಭ_tv);
 # endif
 
 	// Ignore X errors while opening the display
 	oldhandler = XSetErrorHandler(x_error_check);
 
-# if defined(USING_SETJMP)
+# ಆದರೆ defined(USING_SETJMP)
 	// Ignore X IO errors while opening the display
 	oldIOhandler = XSetIOErrorHandler(x_IOerror_check);
 	mch_startjmp();
-	if (SETJMP(lc_jump_env) != 0)
+	ಆದರೆ (SETJMP(lc_jump_env) != 0)
 	{
 	    mch_didjmp();
-	    xterm_dpy = NULL;
+	    xterm_dpy = ಖಾಲಿ;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 # endif
 	{
 	    xterm_dpy = XtOpenDisplay(app_context, xterm_display,
-		    "vim_xterm", "Vim_xterm", NULL, 0, &z, &strp);
-	    if (xterm_dpy != NULL)
-		xterm_dpy_retry_count = 0;
-# if defined(USING_SETJMP)
+		    "vim_xterm", "Vim_xterm", ಖಾಲಿ, 0, &z, &strp);
+	    ಆದರೆ (xterm_dpy != ಖಾಲಿ)
+		xterm_dpy_retry_ಎಣಿಕೆ = 0;
+# ಆದರೆ defined(USING_SETJMP)
 	    mch_endjmp();
 # endif
 	}
 
-# if defined(USING_SETJMP)
+# ಆದರೆ defined(USING_SETJMP)
 	// Now handle X IO errors normally.
-	(void)XSetIOErrorHandler(oldIOhandler);
+	(ಶೂನ್ಯ)XSetIOErrorHandler(oldIOhandler);
 # endif
 	// Now handle X errors normally.
-	(void)XSetErrorHandler(oldhandler);
+	(ಶೂನ್ಯ)XSetErrorHandler(oldhandler);
 
-	if (xterm_dpy == NULL)
+	ಆದರೆ (xterm_dpy == ಖಾಲಿ)
 	{
-	    if (p_verbose > 0)
-		verb_msg(_("Opening the X display failed"));
-	    return;
+	    ಆದರೆ (p_verbose > 0)
+		verb_ಸಂದೇಶ(_("Opening the X display failed"));
+	    ಹಿಂತಿರುಗಿ;
 	}
 
 	// Catch terminating error of the X server connection.
-	(void)XSetIOErrorHandler(x_IOerror_handler);
+	(ಶೂನ್ಯ)XSetIOErrorHandler(x_IOerror_handler);
 
 # ifdef ELAPSED_FUNC
-	if (p_verbose > 0)
+	ಆದರೆ (p_verbose > 0)
 	{
 	    verbose_enter();
-	    xopen_message(ELAPSED_FUNC(start_tv));
+	    xopen_ಸಂದೇಶ(ELAPSED_FUNC(ಆರಂಭ_tv));
 	    verbose_leave();
 	}
 # endif
@@ -8292,56 +8292,56 @@ setup_term_clip(void)
 	// Create a Shell to make converters work.
 	AppShell = XtVaAppCreateShell("vim_xterm", "Vim_xterm",
 		applicationShellWidgetClass, xterm_dpy,
-		NULL);
-	if (AppShell == (Widget)0)
-	    return;
+		ಖಾಲಿ);
+	ಆದರೆ (AppShell == (Widget)0)
+	    ಹಿಂತಿರುಗಿ;
 	xterm_Shell = XtVaCreatePopupShell("VIM",
-		topLevelShellWidgetClass, AppShell,
+		ತುದಿ_Level_Shell_Widget_Class, AppShell,
 		XtNmappedWhenManaged, 0,
 		XtNwidth, 1,
 		XtNheight, 1,
-		NULL);
-	if (xterm_Shell == (Widget)0)
-	    return;
+		ಖಾಲಿ);
+	ಆದರೆ (xterm_Shell == (Widget)0)
+	    ಹಿಂತಿರುಗಿ;
 
-	x11_setup_atoms(xterm_dpy);
-	x11_setup_selection(xterm_Shell);
-	if (x11_display == NULL)
+	x11_ಸಿದ್ಧತೆ_atoms(xterm_dpy);
+	x11_ಸಿದ್ಧತೆ_selection(xterm_Shell);
+	ಆದರೆ (x11_display == ಖಾಲಿ)
 	    x11_display = xterm_dpy;
 
 	XtRealizeWidget(xterm_Shell);
 	XSync(xterm_dpy, False);
 	xterm_update();
     }
-    if (xterm_Shell != (Widget)0)
+    ಆದರೆ (xterm_Shell != (Widget)0)
     {
 	clip_init(TRUE);
-	if (x11_window == 0 && (strp = getenv("WINDOWID")) != NULL)
-	    x11_window = (Window)atol(strp);
+	ಆದರೆ (x11_ಕಿಟಕಿ == 0 && (strp = getenv("WINDOWID")) != ಖಾಲಿ)
+	    x11_ಕಿಟಕಿ = (ಕಿಟಕಿ)atol(strp);
 	// Check if $WINDOWID is valid.
-	if (test_x11_window(xterm_dpy) == FAIL)
-	    x11_window = 0;
-	if (x11_window != 0)
+	ಆದರೆ (test_x11_ಕಿಟಕಿ(xterm_dpy) == FAIL)
+	    x11_ಕಿಟಕಿ = 0;
+	ಆದರೆ (x11_ಕಿಟಕಿ != 0)
 	    xterm_trace = 0;
     }
 }
 
-    void
-start_xterm_trace(int button)
+    ಶೂನ್ಯ
+ಆರಂಭ_xterm_trace(ಪೂರ್ಣಾಂಕ button)
 {
-    if (x11_window == 0 || xterm_trace < 0 || xterm_Shell == (Widget)0)
-	return;
+    ಆದರೆ (x11_ಕಿಟಕಿ == 0 || xterm_trace < 0 || xterm_Shell == (Widget)0)
+	ಹಿಂತಿರುಗಿ;
     xterm_trace = 1;
     xterm_button = button;
     do_xterm_trace();
 }
 
 
-    void
-stop_xterm_trace(void)
+    ಶೂನ್ಯ
+stop_xterm_trace(ಶೂನ್ಯ)
 {
-    if (xterm_trace < 0)
-	return;
+    ಆದರೆ (xterm_trace < 0)
+	ಹಿಂತಿರುಗಿ;
     xterm_trace = 0;
 }
 
@@ -8349,117 +8349,117 @@ stop_xterm_trace(void)
  * Query the xterm pointer and generate mouse termcodes if necessary
  * return TRUE if dragging is active, else FALSE
  */
-    static int
-do_xterm_trace(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+do_xterm_trace(ಶೂನ್ಯ)
 {
-    Window		root, child;
-    int			root_x, root_y;
-    int			win_x, win_y;
-    int			row, col;
-    int_u		mask_return;
+    ಕಿಟಕಿ		ಬೇರು, ಮಗು;
+    ಪೂರ್ಣಾಂಕ			ಬೇರು_x, ಬೇರು_y;
+    ಪೂರ್ಣಾಂಕ			win_x, win_y;
+    ಪೂರ್ಣಾಂಕ			ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು;
+    int_u		ಮುಖವಾಡ_return;
     char_u		buf[50];
     char_u		*strp;
-    long		got_hints;
-    static char_u	*mouse_code = NULL;
-    static size_t	mouse_codelen = 0;
-    static char_u	mouse_name[2] = {KS_MOUSE, KE_FILLER};
-    static int		prev_row = 0, prev_col = 0;
-    static XSizeHints	xterm_hints;
+    ದೀರ್ಘ		got_hints;
+    ಸ್ಥಿರ char_u	*mouse_ಸಂಕೇತ = ಖಾಲಿ;
+    ಸ್ಥಿರ size_t	mouse_codelen = 0;
+    ಸ್ಥಿರ char_u	mouse_name[2] = {KS_MOUSE, KE_FILLER};
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ		prev_ಅಡ್ಡಸಾಲು = 0, prev_ಲಂಬಸಾಲು = 0;
+    ಸ್ಥಿರ XSizeHints	xterm_hints;
 
-    if (xterm_trace <= 0)
-	return FALSE;
+    ಆದರೆ (xterm_trace <= 0)
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    if (xterm_trace == 1)
+    ಆದರೆ (xterm_trace == 1)
     {
 	// Get the hints just before tracking starts.  The font size might
 	// have changed recently.
-	if (!XGetWMNormalHints(xterm_dpy, x11_window, &xterm_hints, &got_hints)
+	ಆದರೆ (!XGetWMNormalHints(xterm_dpy, x11_ಕಿಟಕಿ, &xterm_hints, &got_hints)
 		|| !(got_hints & PResizeInc)
-		|| xterm_hints.width_inc <= 1
-		|| xterm_hints.height_inc <= 1)
+		|| xterm_hints.ಅಗಲ_inc <= 1
+		|| xterm_hints.ಎತ್ತರ_inc <= 1)
 	{
 	    xterm_trace = -1;  // Not enough data -- disable tracing
-	    return FALSE;
+	    ಹಿಂತಿರುಗಿ FALSE;
 	}
 
 	// Rely on the same mouse code for the duration of this
-	mouse_code = find_termcode(mouse_name);
-	if (mouse_code != NULL)
-	    mouse_codelen = STRLEN(mouse_code);
-	prev_row = mouse_row;
-	prev_col = mouse_col;
+	mouse_ಸಂಕೇತ = ಕಂಡುಹಿಡಿ_termcode(mouse_name);
+	ಆದರೆ (mouse_ಸಂಕೇತ != ಖಾಲಿ)
+	    mouse_codelen = STRLEN(mouse_ಸಂಕೇತ);
+	prev_ಅಡ್ಡಸಾಲು = mouse_ಅಡ್ಡಸಾಲು;
+	prev_ಲಂಬಸಾಲು = mouse_ಲಂಬಸಾಲು;
 	xterm_trace = 2;
 
 	// Find the offset of the chars, there might be a scrollbar on the
 	// left of the window and/or a menu on the top (eterm etc.)
-	XQueryPointer(xterm_dpy, x11_window, &root, &child, &root_x, &root_y,
-		      &win_x, &win_y, &mask_return);
-	xterm_hints.y = win_y - (xterm_hints.height_inc * mouse_row)
-			      - (xterm_hints.height_inc / 2);
-	if (xterm_hints.y <= xterm_hints.height_inc / 2)
+	XQuery_ಸೂಚಕ(xterm_dpy, x11_ಕಿಟಕಿ, &ಬೇರು, &ಮಗು, &ಬೇರು_x, &ಬೇರು_y,
+		      &win_x, &win_y, &ಮುಖವಾಡ_return);
+	xterm_hints.y = win_y - (xterm_hints.ಎತ್ತರ_inc * mouse_ಅಡ್ಡಸಾಲು)
+			      - (xterm_hints.ಎತ್ತರ_inc / 2);
+	ಆದರೆ (xterm_hints.y <= xterm_hints.ಎತ್ತರ_inc / 2)
 	    xterm_hints.y = 2;
-	xterm_hints.x = win_x - (xterm_hints.width_inc * mouse_col)
-			      - (xterm_hints.width_inc / 2);
-	if (xterm_hints.x <= xterm_hints.width_inc / 2)
+	xterm_hints.x = win_x - (xterm_hints.ಅಗಲ_inc * mouse_ಲಂಬಸಾಲು)
+			      - (xterm_hints.ಅಗಲ_inc / 2);
+	ಆದರೆ (xterm_hints.x <= xterm_hints.ಅಗಲ_inc / 2)
 	    xterm_hints.x = 2;
-	return TRUE;
+	ಹಿಂತಿರುಗಿ TRUE;
     }
 
-    if (mouse_code == NULL || mouse_codelen > 45)
+    ಆದರೆ (mouse_ಸಂಕೇತ == ಖಾಲಿ || mouse_codelen > 45)
     {
 	xterm_trace = 0;
-	return FALSE;
+	ಹಿಂತಿರುಗಿ FALSE;
     }
 
-    XQueryPointer(xterm_dpy, x11_window, &root, &child, &root_x, &root_y,
-		  &win_x, &win_y, &mask_return);
+    XQuery_ಸೂಚಕ(xterm_dpy, x11_ಕಿಟಕಿ, &ಬೇರು, &ಮಗು, &ಬೇರು_x, &ಬೇರು_y,
+		  &win_x, &win_y, &ಮುಖವಾಡ_return);
 
-    row = check_row((win_y - xterm_hints.y) / xterm_hints.height_inc);
-    col = check_col((win_x - xterm_hints.x) / xterm_hints.width_inc);
-    if (row == prev_row && col == prev_col)
-	return TRUE;
+    ಅಡ್ಡಸಾಲು = check_ಅಡ್ಡಸಾಲು((win_y - xterm_hints.y) / xterm_hints.ಎತ್ತರ_inc);
+    ಲಂಬಸಾಲು = check_ಲಂಬಸಾಲು((win_x - xterm_hints.x) / xterm_hints.ಅಗಲ_inc);
+    ಆದರೆ (ಅಡ್ಡಸಾಲು == prev_ಅಡ್ಡಸಾಲು && ಲಂಬಸಾಲು == prev_ಲಂಬಸಾಲು)
+	ಹಿಂತಿರುಗಿ TRUE;
 
-    STRCPY(buf, mouse_code);
+    STRCPY(buf, mouse_ಸಂಕೇತ);
     strp = buf + mouse_codelen;
     *strp++ = (xterm_button | MOUSE_DRAG) & ~0x20;
-    *strp++ = (char_u)(col + ' ' + 1);
-    *strp++ = (char_u)(row + ' ' + 1);
+    *strp++ = (char_u)(ಲಂಬಸಾಲು + ' ' + 1);
+    *strp++ = (char_u)(ಅಡ್ಡಸಾಲು + ' ' + 1);
     *strp = NUL;
-    add_to_input_buf(buf, strp - buf);
+    ಕೂಡಿಸು_ಗಮ್ಯ_ಒಳಹರಿವು_buf(buf, strp - buf);
 
-    prev_row = row;
-    prev_col = col;
-    return TRUE;
+    prev_ಅಡ್ಡಸಾಲು = ಅಡ್ಡಸಾಲು;
+    prev_ಲಂಬಸಾಲು = ಲಂಬಸಾಲು;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
-# if defined(FEAT_GUI) || defined(FEAT_XCLIPBOARD)
+# ಆದರೆ defined(FEAT_GUI) || defined(FEAT_XCLIPBOARD)
 /*
  * Destroy the display, window and app_context.  Required for GTK.
  */
-    void
-clear_xterm_clip(void)
+    ಶೂನ್ಯ
+clear_xterm_clip(ಶೂನ್ಯ)
 {
-    if (xterm_Shell != (Widget)0)
+    ಆದರೆ (xterm_Shell != (Widget)0)
     {
 	XtDestroyWidget(xterm_Shell);
 	xterm_Shell = (Widget)0;
     }
-    if (xterm_dpy != NULL)
+    ಆದರೆ (xterm_dpy != ಖಾಲಿ)
     {
-#  if 0
+#  ಆದರೆ 0
 	// Lesstif and Solaris crash here, lose some memory
 	XtCloseDisplay(xterm_dpy);
 #  endif
-	if (x11_display == xterm_dpy)
-	    x11_display = NULL;
-	xterm_dpy = NULL;
+	ಆದರೆ (x11_display == xterm_dpy)
+	    x11_display = ಖಾಲಿ;
+	xterm_dpy = ಖಾಲಿ;
     }
-#  if 0
-    if (app_context != (XtAppContext)NULL)
+#  ಆದರೆ 0
+    ಆದರೆ (app_context != (XtAppContext)ಖಾಲಿ)
     {
 	// Lesstif and Solaris crash here, lose some memory
 	XtDestroyApplicationContext(app_context);
-	app_context = (XtAppContext)NULL;
+	app_context = (XtAppContext)ಖಾಲಿ;
     }
 #  endif
 }
@@ -8468,15 +8468,15 @@ clear_xterm_clip(void)
 /*
  * Catch up with GUI or X events.
  */
-    static void
-clip_update(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+clip_update(ಶೂನ್ಯ)
 {
 # ifdef FEAT_GUI
-    if (gui.in_use)
+    ಆದರೆ (gui.ಒಳ_use)
 	gui_mch_update();
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 # endif
-    if (xterm_Shell != (Widget)0)
+    ಆದರೆ (xterm_Shell != (Widget)0)
 	xterm_update();
 }
 
@@ -8486,107 +8486,107 @@ clip_update(void)
  * nothing in the X event queue (& no timers pending), then we return
  * immediately.
  */
-    void
-xterm_update(void)
+    ಶೂನ್ಯ
+xterm_update(ಶೂನ್ಯ)
 {
     XEvent event;
 
-    for (;;)
+    ಗಾಗಿ (;;)
     {
-	XtInputMask mask = XtAppPending(app_context);
+	Xt_ಒಳಹರಿವು_ಮುಖವಾಡ ಮುಖವಾಡ = XtAppPending(app_context);
 
-	if (mask == 0 || vim_is_input_buf_full())
-	    break;
+	ಆದರೆ (ಮುಖವಾಡ == 0 || vim_is_ಒಳಹರಿವು_buf_ತುಂಬಿದ())
+	    ನಿಲ್ಲಿಸು;
 
-	if (mask & XtIMXEvent)
+	ಆದರೆ (ಮುಖವಾಡ & XtIMXEvent)
 	{
 	    // There is an event to process.
-	    XtAppNextEvent(app_context, &event);
+	    Xt_App_ಮುಂದಿನ_Event(app_context, &event);
 # ifdef FEAT_CLIENTSERVER
 	    {
 		XPropertyEvent *e = (XPropertyEvent *)&event;
 
-		if (e->type == PropertyNotify && e->window == commWindow
-		   && e->atom == commProperty && e->state == PropertyNewValue)
+		ಆದರೆ (e->type == PropertyNotify && e->ಕಿಟಕಿ_2 == comm_ಕಿಟಕಿ
+		   && e->atom == commProperty && e->state == Property_New_ಮೌಲ್ಯ)
 		    serverEventProc(xterm_dpy, &event, 0);
 	    }
 # endif
 	    XtDispatchEvent(&event);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // There is something else than an event to process.
-	    XtAppProcessEvent(app_context, mask);
+	    XtAppProcessEvent(app_context, ಮುಖವಾಡ);
 	}
     }
 }
 
-    int
+    ಪೂರ್ಣಾಂಕ
 clip_xterm_own_selection(Clipboard_T *cbd)
 {
-    if (xterm_Shell != (Widget)0)
-	return clip_x11_own_selection(xterm_Shell, cbd);
-    return FAIL;
+    ಆದರೆ (xterm_Shell != (Widget)0)
+	ಹಿಂತಿರುಗಿ clip_x11_own_selection(xterm_Shell, cbd);
+    ಹಿಂತಿರುಗಿ FAIL;
 }
 
-    void
+    ಶೂನ್ಯ
 clip_xterm_lose_selection(Clipboard_T *cbd)
 {
-    if (xterm_Shell != (Widget)0)
+    ಆದರೆ (xterm_Shell != (Widget)0)
 	clip_x11_lose_selection(xterm_Shell, cbd);
 }
 
-    void
+    ಶೂನ್ಯ
 clip_xterm_request_selection(Clipboard_T *cbd)
 {
-    if (xterm_Shell != (Widget)0)
+    ಆದರೆ (xterm_Shell != (Widget)0)
 	clip_x11_request_selection(xterm_Shell, xterm_dpy, cbd);
 }
 
-    void
-clip_xterm_set_selection(Clipboard_T *cbd)
+    ಶೂನ್ಯ
+clip_xterm_ಗಣ_selection(Clipboard_T *cbd)
 {
-    clip_x11_set_selection(cbd);
+    clip_x11_ಗಣ_selection(cbd);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 
-#if defined(USE_XSMP)
+#ಆದರೆ defined(USE_XSMP)
 /*
  * Code for X Session Management Protocol.
  */
 
-# if defined(FEAT_GUI) && defined(USE_XSMP_INTERACT)
+# ಆದರೆ defined(FEAT_GUI) && defined(USE_XSMP_INTERACT)
 /*
  * This is our chance to ask the user if they want to save,
  * or abort the logout
  */
-    static void
-xsmp_handle_interaction(SmcConn smc_conn, SmPointer client_data UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+xsmp_handle_interaction(SmcConn smc_conn, Sm_ಸೂಚಕ client_ದತ್ತಾಂಶ_2 ಬಳಸದ)
 {
-    int		save_cmod_flags;
-    int		cancel_shutdown = False;
+    ಪೂರ್ಣಾಂಕ		save_cmod_flags;
+    ಪೂರ್ಣಾಂಕ		cancel_shutdown = False;
 
     save_cmod_flags = cmdmod.cmod_flags;
     cmdmod.cmod_flags |= CMOD_CONFIRM;
-    if (check_changed_any(FALSE, FALSE))
+    ಆದರೆ (check_ಬದಲಾಯಿತು_any(FALSE, FALSE))
 	// Mustn't logout
 	cancel_shutdown = True;
     cmdmod.cmod_flags = save_cmod_flags;
     setcursor();		// position cursor
-    out_flush();
+    ಹೊರಹೋಗು_flush();
 
     // Done interaction
-    SmcInteractDone(smc_conn, cancel_shutdown);
+    Smc_Interact_ಮುಗಿದ(smc_conn, cancel_shutdown);
 
     // Finish off
     // Only end save-yourself here if we're not cancelling shutdown;
     // we'll get a cancelled callback later in which we'll end it.
     // Hopefully get around glitchy SMs (like GNOME-1)
-    if (!cancel_shutdown)
+    ಆದರೆ (!cancel_shutdown)
     {
 	xsmp.save_yourself = False;
-	SmcSaveYourselfDone(smc_conn, True);
+	Smc_Save_Yourself_ಮುಗಿದ(smc_conn, True);
     }
 }
 # endif
@@ -8594,39 +8594,39 @@ xsmp_handle_interaction(SmcConn smc_conn, SmPointer client_data UNUSED)
 /*
  * Callback that starts save-yourself.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 xsmp_handle_save_yourself(
     SmcConn	smc_conn,
-    SmPointer	client_data UNUSED,
-    int		save_type UNUSED,
+    Sm_ಸೂಚಕ	client_ದತ್ತಾಂಶ_2 ಬಳಸದ,
+    ಪೂರ್ಣಾಂಕ		save_type ಬಳಸದ,
     Bool	shutdown,
-    int		interact_style UNUSED,
-    Bool	fast UNUSED)
+    ಪೂರ್ಣಾಂಕ		interact_style ಬಳಸದ,
+    Bool	fast ಬಳಸದ)
 {
     // Handle already being in saveyourself
-    if (xsmp.save_yourself)
-	SmcSaveYourselfDone(smc_conn, True);
+    ಆದರೆ (xsmp.save_yourself)
+	Smc_Save_Yourself_ಮುಗಿದ(smc_conn, True);
     xsmp.save_yourself = True;
     xsmp.shutdown = shutdown;
 
     // First up, preserve all files
-    out_flush();
+    ಹೊರಹೋಗು_flush();
     ml_sync_all(FALSE, FALSE);	// preserve all swap files
 
-    if (p_verbose > 0)
-	verb_msg(_("XSMP handling save-yourself request"));
+    ಆದರೆ (p_verbose > 0)
+	verb_ಸಂದೇಶ(_("XSMP handling save-yourself request"));
 
-# if defined(FEAT_GUI) && defined(USE_XSMP_INTERACT)
+# ಆದರೆ defined(FEAT_GUI) && defined(USE_XSMP_INTERACT)
     // Now see if we can ask about unsaved files
-    if (shutdown && !fast && gui.in_use)
+    ಆದರೆ (shutdown && !fast && gui.ಒಳ_use)
 	// Need to interact with user, but need SM's permission
 	SmcInteractRequest(smc_conn, SmDialogError,
-					xsmp_handle_interaction, client_data);
-    else
+					xsmp_handle_interaction, client_ದತ್ತಾಂಶ_2);
+    ಇಲ್ಲದಿದ್ದರೆ
 # endif
     {
 	// Can stop the cycle here
-	SmcSaveYourselfDone(smc_conn, True);
+	Smc_Save_Yourself_ಮುಗಿದ(smc_conn, True);
 	xsmp.save_yourself = False;
     }
 }
@@ -8635,8 +8635,8 @@ xsmp_handle_save_yourself(
 /*
  * Callback to warn us of imminent death.
  */
-    static void
-xsmp_die(SmcConn smc_conn UNUSED, SmPointer client_data UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+xsmp_die(SmcConn smc_conn ಬಳಸದ, Sm_ಸೂಚಕ client_ದತ್ತಾಂಶ_2 ಬಳಸದ)
 {
     xsmp_close();
 
@@ -8648,10 +8648,10 @@ xsmp_die(SmcConn smc_conn UNUSED, SmPointer client_data UNUSED)
 /*
  * Callback to tell us that save-yourself has completed.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 xsmp_save_complete(
-    SmcConn	smc_conn UNUSED,
-    SmPointer	client_data UNUSED)
+    SmcConn	smc_conn ಬಳಸದ,
+    Sm_ಸೂಚಕ	client_ದತ್ತಾಂಶ_2 ಬಳಸದ)
 {
     xsmp.save_yourself = False;
 }
@@ -8661,13 +8661,13 @@ xsmp_save_complete(
  * Callback to tell us that an instigated shutdown was cancelled
  * (maybe even by us)
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 xsmp_shutdown_cancelled(
     SmcConn	smc_conn,
-    SmPointer	client_data UNUSED)
+    Sm_ಸೂಚಕ	client_ದತ್ತಾಂಶ_2 ಬಳಸದ)
 {
-    if (xsmp.save_yourself)
-	SmcSaveYourselfDone(smc_conn, True);
+    ಆದರೆ (xsmp.save_yourself)
+	Smc_Save_Yourself_ಮುಗಿದ(smc_conn, True);
     xsmp.save_yourself = False;
     xsmp.shutdown = False;
 }
@@ -8676,153 +8676,153 @@ xsmp_shutdown_cancelled(
 /*
  * Callback to tell us that a new ICE connection has been established.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 xsmp_ice_connection(
     IceConn	iceConn,
-    IcePointer	clientData UNUSED,
+    Ice_ಸೂಚಕ	client_ದತ್ತಾಂಶ ಬಳಸದ,
     Bool	opening,
-    IcePointer	*watchData UNUSED)
+    Ice_ಸೂಚಕ	*watch_ದತ್ತಾಂಶ ಬಳಸದ)
 {
     // Intercept creation of ICE connection fd
-    if (opening)
+    ಆದರೆ (opening)
     {
-	xsmp_icefd = IceConnectionNumber(iceConn);
-	IceRemoveConnectionWatch(xsmp_ice_connection, NULL);
+	xsmp_icefd = Ice_Connection_ಸಂಖ್ಯೆ(iceConn);
+	IceRemoveConnectionWatch(xsmp_ice_connection, ಖಾಲಿ);
     }
 }
 
 
 // Handle any ICE processing that's required; return FAIL if SM lost
-    int
-xsmp_handle_requests(void)
+    ಪೂರ್ಣಾಂಕ
+xsmp_handle_ವಿನಂತಿಗಳು(ಶೂನ್ಯ)
 {
     Bool rep;
 
-    if (IceProcessMessages(xsmp.iceconn, NULL, &rep)
+    ಆದರೆ (IceProcessMessages(xsmp.iceconn, ಖಾಲಿ, &rep)
 						 == IceProcessMessagesIOError)
     {
 	// Lost ICE
-	if (p_verbose > 0)
-	    verb_msg(_("XSMP lost ICE connection"));
+	ಆದರೆ (p_verbose > 0)
+	    verb_ಸಂದೇಶ(_("XSMP lost ICE connection"));
 	xsmp_close();
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-    else
-	return OK;
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಹಿಂತಿರುಗಿ OK;
 }
 
-static int dummy;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ dummy;
 
 // Set up X Session Management Protocol
-    void
-xsmp_init(void)
+    ಶೂನ್ಯ
+xsmp_init(ಶೂನ್ಯ)
 {
-    char		errorstring[80];
+    ಅಕ್ಷರ		errorstring[80];
     SmcCallbacks	smcallbacks;
-# if 0
-    SmPropValue		smname;
+# ಆದರೆ 0
+    Sm_Prop_ಮೌಲ್ಯ		smname;
     SmProp		smnameprop;
     SmProp		*smprops[1];
 # endif
 
-    if (p_verbose > 0)
-	verb_msg(_("XSMP opening connection"));
+    ಆದರೆ (p_verbose > 0)
+	verb_ಸಂದೇಶ(_("XSMP opening connection"));
 
     xsmp.save_yourself = xsmp.shutdown = False;
 
     // Set up SM callbacks - must have all, even if they're not used
     smcallbacks.save_yourself.callback = xsmp_handle_save_yourself;
-    smcallbacks.save_yourself.client_data = NULL;
+    smcallbacks.save_yourself.client_ದತ್ತಾಂಶ_2 = ಖಾಲಿ;
     smcallbacks.die.callback = xsmp_die;
-    smcallbacks.die.client_data = NULL;
+    smcallbacks.die.client_ದತ್ತಾಂಶ_2 = ಖಾಲಿ;
     smcallbacks.save_complete.callback = xsmp_save_complete;
-    smcallbacks.save_complete.client_data = NULL;
+    smcallbacks.save_complete.client_ದತ್ತಾಂಶ_2 = ಖಾಲಿ;
     smcallbacks.shutdown_cancelled.callback = xsmp_shutdown_cancelled;
-    smcallbacks.shutdown_cancelled.client_data = NULL;
+    smcallbacks.shutdown_cancelled.client_ದತ್ತಾಂಶ_2 = ಖಾಲಿ;
 
     // Set up a watch on ICE connection creations.  The "dummy" argument is
     // apparently required for FreeBSD (we get a BUS error when using NULL).
-    if (IceAddConnectionWatch(xsmp_ice_connection, &dummy) == 0)
+    ಆದರೆ (Ice_ಕೂಡಿಸು_Connection_Watch(xsmp_ice_connection, &dummy) == 0)
     {
-	if (p_verbose > 0)
-	    verb_msg(_("XSMP ICE connection watch failed"));
-	return;
+	ಆದರೆ (p_verbose > 0)
+	    verb_ಸಂದೇಶ(_("XSMP ICE connection watch failed"));
+	ಹಿಂತಿರುಗಿ;
     }
 
     // Create an SM connection
     xsmp.smcconn = SmcOpenConnection(
-	    NULL,
-	    NULL,
+	    ಖಾಲಿ,
+	    ಖಾಲಿ,
 	    SmProtoMajor,
 	    SmProtoMinor,
-	    SmcSaveYourselfProcMask | SmcDieProcMask
-		     | SmcSaveCompleteProcMask | SmcShutdownCancelledProcMask,
+	    Smc_Save_Yourself_Proc_ಮುಖವಾಡ | Smc_Die_Proc_ಮುಖವಾಡ
+		     | Smc_Save_Complete_Proc_ಮುಖವಾಡ | Smc_Shutdown_Cancelled_Proc_ಮುಖವಾಡ,
 	    &smcallbacks,
-	    NULL,
+	    ಖಾಲಿ,
 	    &xsmp.clientid,
-	    sizeof(errorstring) - 1,
+	    ಗಾತ್ರ(errorstring) - 1,
 	    errorstring);
-    if (xsmp.smcconn == NULL)
+    ಆದರೆ (xsmp.smcconn == ಖಾಲಿ)
     {
-	if (p_verbose > 0)
+	ಆದರೆ (p_verbose > 0)
 	{
-	    char errorreport[132];
+	    ಅಕ್ಷರ errorreport[132];
 
 	    // If the message is too long it might not be NUL terminated.  Add
 	    // a NUL at the end to make sure we don't go over the end.
-	    errorstring[sizeof(errorstring) - 1] = NUL;
-	    vim_snprintf(errorreport, sizeof(errorreport),
+	    errorstring[ಗಾತ್ರ(errorstring) - 1] = NUL;
+	    vim_snprintf(errorreport, ಗಾತ್ರ(errorreport),
 			 _("XSMP SmcOpenConnection failed: %s"), errorstring);
-	    verb_msg(errorreport);
+	    verb_ಸಂದೇಶ(errorreport);
 	}
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
     xsmp.iceconn = SmcGetIceConnection(xsmp.smcconn);
 
-# if 0
+# ಆದರೆ 0
     // ID ourselves
-    smname.value = "vim";
-    smname.length = 3;
+    smname.ಮೌಲ್ಯ = "vim";
+    smname.ಉದ್ದಳತೆ = 3;
     smnameprop.name = "SmProgram";
     smnameprop.type = "SmARRAY8";
-    smnameprop.num_vals = 1;
+    smnameprop.ಅಂಕೆ_vals = 1;
     smnameprop.vals = &smname;
 
     smprops[0] = &smnameprop;
-    SmcSetProperties(xsmp.smcconn, 1, smprops);
+    Smc_ಗಣ_Properties(xsmp.smcconn, 1, smprops);
 # endif
 }
 
 
 // Shut down XSMP comms.
-    void
-xsmp_close(void)
+    ಶೂನ್ಯ
+xsmp_close(ಶೂನ್ಯ)
 {
-    if (xsmp_icefd == -1)
-	return;
+    ಆದರೆ (xsmp_icefd == -1)
+	ಹಿಂತಿರುಗಿ;
 
-    SmcCloseConnection(xsmp.smcconn, 0, NULL);
-    if (xsmp.clientid != NULL)
-	free(xsmp.clientid);
-    xsmp.clientid = NULL;
+    SmcCloseConnection(xsmp.smcconn, 0, ಖಾಲಿ);
+    ಆದರೆ (xsmp.clientid != ಖಾಲಿ)
+	ಬಿಡುಗಡೆ(xsmp.clientid);
+    xsmp.clientid = ಖಾಲಿ;
     xsmp_icefd = -1;
 }
-#endif // USE_XSMP
+#ಆದರೆ_ಅಂತ್ಯ // USE_XSMP
 
-#if defined(FEAT_RELTIME)
-# if defined(PROF_NSEC)
+#ಆದರೆ defined(FEAT_RELTIME)
+# ಆದರೆ defined(PROF_NSEC)
 /*
  * Implement timeout with timer_create() and timer_settime().
  */
-static volatile sig_atomic_t timeout_flag = FALSE;
-static timer_t		     timer_id;
-static int		     timer_created = FALSE;
+ಸ್ಥಿರ ಅಸ್ಥಿರ sig_atomic_t timeout_flag = FALSE;
+ಸ್ಥಿರ timer_t		     timer_id;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ		     timer_created = FALSE;
 
 /*
  * Callback for when the timer expires.
  */
-    static void
-set_flag(union sigval _unused UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_flag(ಒಕ್ಕೂಟ sigval ಬಳಸದ_3 ಬಳಸದ)
 {
     timeout_flag = TRUE;
 }
@@ -8830,16 +8830,16 @@ set_flag(union sigval _unused UNUSED)
 /*
  * Stop any active timeout.
  */
-    void
-stop_timeout(void)
+    ಶೂನ್ಯ
+stop_timeout(ಶೂನ್ಯ)
 {
-    static struct itimerspec disarm = {{0, 0}, {0, 0}};
+    ಸ್ಥಿರ ರಚನೆ itimerspec disarm = {{0, 0}, {0, 0}};
 
-    if (timer_created)
+    ಆದರೆ (timer_created)
     {
-	int ret = timer_settime(timer_id, 0, &disarm, NULL);
+	ಪೂರ್ಣಾಂಕ ret = timer_settime(timer_id, 0, &disarm, ಖಾಲಿ);
 
-	if (ret < 0)
+	ಆದರೆ (ret < 0)
 	    semsg(_(e_could_not_clear_timeout_str), strerror(errno));
     }
 
@@ -8859,103 +8859,103 @@ stop_timeout(void)
  * This function is not expected to fail, but if it does it will still return a
  * valid flag pointer; the flag will remain stuck as FALSE .
  */
-    volatile sig_atomic_t *
-start_timeout(long msec)
+    ಅಸ್ಥಿರ sig_atomic_t *
+ಆರಂಭ_timeout(ದೀರ್ಘ msec)
 {
-    struct itimerspec interval = {
+    ರಚನೆ itimerspec interval = {
 	    {0, 0},					// Do not repeat.
 	    {msec / 1000, (msec % 1000) * 1000000}};	// Timeout interval
-    int ret;
+    ಪೂರ್ಣಾಂಕ ret;
 
     // This is really the caller's responsibility, but let's make sure the
     // previous timer has been stopped.
     stop_timeout();
 
-    if (!timer_created)
+    ಆದರೆ (!timer_created)
     {
-	struct sigevent action = {0};
+	ರಚನೆ sigevent action = {0};
 
 	action.sigev_notify = SIGEV_THREAD;
-	action.sigev_notify_function = set_flag;
+	action.sigev_notify_function = ಗಣ_flag;
 	ret = timer_create(CLOCK_MONOTONIC, &action, &timer_id);
-	if (ret < 0)
+	ಆದರೆ (ret < 0)
 	{
-	    semsg(_(e_could_not_set_timeout_str), strerror(errno));
-	    return &timeout_flag;
+	    semsg(_(e_could_not_ಗಣ_timeout_str), strerror(errno));
+	    ಹಿಂತಿರುಗಿ &timeout_flag;
 	}
 	timer_created = TRUE;
     }
 
 #  ifdef FEAT_EVAL
-    ch_log(NULL, "setting timeout timer to %d sec %ld nsec",
-	       (int)interval.it_value.tv_sec, (long)interval.it_value.tv_nsec);
+    ch_log(ಖಾಲಿ, "setting timeout timer to %d sec %ld nsec",
+	       (ಪೂರ್ಣಾಂಕ)interval.it_value.tv_sec, (ದೀರ್ಘ)interval.it_value.tv_nsec);
 #  endif
-    ret = timer_settime(timer_id, 0, &interval, NULL);
-    if (ret < 0)
-	semsg(_(e_could_not_set_timeout_str), strerror(errno));
+    ret = timer_settime(timer_id, 0, &interval, ಖಾಲಿ);
+    ಆದರೆ (ret < 0)
+	semsg(_(e_could_not_ಗಣ_timeout_str), strerror(errno));
 
-    return &timeout_flag;
+    ಹಿಂತಿರುಗಿ &timeout_flag;
 }
 
 /*
  * To be used before fork/exec: delete any created timer.
  */
-    void
-delete_timer(void)
+    ಶೂನ್ಯ
+delete_timer(ಶೂನ್ಯ)
 {
-    if (!timer_created)
-	return;
+    ಆದರೆ (!timer_created)
+	ಹಿಂತಿರುಗಿ;
 
     timer_delete(timer_id);
     timer_created = FALSE;
 }
 
-# else // PROF_NSEC
+# ಇಲ್ಲದಿದ್ದರೆ // PROF_NSEC
 
 /*
  * Implement timeout with setitimer()
  */
-static struct sigaction		prev_sigaction;
-static volatile sig_atomic_t	timeout_flag	     = FALSE;
-static int			timer_active	     = FALSE;
-static int			timer_handler_active = FALSE;
-static volatile sig_atomic_t	alarm_pending	     = FALSE;
+ಸ್ಥಿರ ರಚನೆ sigaction		prev_sigaction;
+ಸ್ಥಿರ ಅಸ್ಥಿರ sig_atomic_t	timeout_flag	     = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ			timer_ಸಕ್ರಿಯ	     = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ			timer_handler_ಸಕ್ರಿಯ = FALSE;
+ಸ್ಥಿರ ಅಸ್ಥಿರ sig_atomic_t	alarm_pending	     = FALSE;
 
 /*
  * Handle SIGALRM for a timeout.
  */
-    static void
-set_flag SIGDEFARG(sigarg)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_flag SIGDEFARG(sigarg)
 {
-    if (alarm_pending)
+    ಆದರೆ (alarm_pending)
 	alarm_pending = FALSE;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	timeout_flag = TRUE;
 }
 
 /*
  * Stop any active timeout.
  */
-    void
-stop_timeout(void)
+    ಶೂನ್ಯ
+stop_timeout(ಶೂನ್ಯ)
 {
-    static struct itimerval disarm = {{0, 0}, {0, 0}};
-    int			    ret;
+    ಸ್ಥಿರ ರಚನೆ itimerval disarm = {{0, 0}, {0, 0}};
+    ಪೂರ್ಣಾಂಕ			    ret;
 
-    if (timer_active)
+    ಆದರೆ (timer_ಸಕ್ರಿಯ)
     {
-	timer_active = FALSE;
-	ret = setitimer(ITIMER_REAL, &disarm, NULL);
-	if (ret < 0)
+	timer_ಸಕ್ರಿಯ = FALSE;
+	ret = setitimer(ITIMER_REAL, &disarm, ಖಾಲಿ);
+	ಆದರೆ (ret < 0)
 	    // Should only get here as a result of coding errors.
 	    semsg(_(e_could_not_clear_timeout_str), strerror(errno));
     }
 
-    if (timer_handler_active)
+    ಆದರೆ (timer_handler_ಸಕ್ರಿಯ)
     {
-	timer_handler_active = FALSE;
-	ret = sigaction(SIGALRM, &prev_sigaction, NULL);
-	if (ret < 0)
+	timer_handler_ಸಕ್ರಿಯ = FALSE;
+	ret = sigaction(SIGALRM, &prev_sigaction, ಖಾಲಿ);
+	ಆದರೆ (ret < 0)
 	    // Should only get here as a result of coding errors.
 	    semsg(_(e_could_not_reset_handler_for_timeout_str),
 							      strerror(errno));
@@ -8974,14 +8974,14 @@ stop_timeout(void)
  * This function is not expected to fail, but if it does it will still return a
  * valid flag pointer; the flag will remain stuck as FALSE .
  */
-    volatile sig_atomic_t *
-start_timeout(long msec)
+    ಅಸ್ಥಿರ sig_atomic_t *
+ಆರಂಭ_timeout(ದೀರ್ಘ msec)
 {
-    struct itimerval	interval = {
+    ರಚನೆ itimerval	interval = {
 	    {0, 0},				    // Do not repeat.
 	    {msec / 1000, (msec % 1000) * 1000}};   // Timeout interval
-    struct sigaction	handle_alarm;
-    int			ret;
+    ರಚನೆ sigaction	handle_alarm;
+    ಪೂರ್ಣಾಂಕ			ret;
     sigset_t		sigs;
     sigset_t		saved_sigs;
 
@@ -8997,12 +8997,12 @@ start_timeout(long msec)
     ret = ret == 0 ? sigprocmask(SIG_BLOCK, &sigs, &saved_sigs) : ret;
     timeout_flag = FALSE;
     ret = ret == 0 ? sigpending(&sigs) : ret;
-    if (ret == 0)
+    ಆದರೆ (ret == 0)
     {
 	alarm_pending = sigismember(&sigs, SIGALRM);
-	ret = sigprocmask(SIG_SETMASK, &saved_sigs, NULL);
+	ret = sigprocmask(SIG_SETMASK, &saved_sigs, ಖಾಲಿ);
     }
-    if (unlikely(ret != 0 || alarm_pending < 0))
+    ಆದರೆ (unlikely(ret != 0 || alarm_pending < 0))
     {
 	// Just catching coding errors. Write an error message, but carry on.
 	semsg(_(e_could_not_check_for_pending_sigalrm_str), strerror(errno));
@@ -9011,29 +9011,29 @@ start_timeout(long msec)
 
     // Set up the alarm handler first.
     ret = sigemptyset(&handle_alarm.sa_mask);
-    handle_alarm.sa_handler = set_flag;
+    handle_alarm.sa_handler = ಗಣ_flag;
     handle_alarm.sa_flags = 0;
     ret = ret == 0 ?  sigaction(SIGALRM, &handle_alarm, &prev_sigaction) : ret;
-    if (ret < 0)
+    ಆದರೆ (ret < 0)
     {
 	// Should only get here as a result of coding errors.
-	semsg(_(e_could_not_set_handler_for_timeout_str), strerror(errno));
-	return &timeout_flag;
+	semsg(_(e_could_not_ಗಣ_handler_for_timeout_str), strerror(errno));
+	ಹಿಂತಿರುಗಿ &timeout_flag;
     }
-    timer_handler_active = TRUE;
+    timer_handler_ಸಕ್ರಿಯ = TRUE;
 
     // Set up the interval timer once the alarm handler is in place.
-    ret = setitimer(ITIMER_REAL, &interval, NULL);
-    if (ret < 0)
+    ret = setitimer(ITIMER_REAL, &interval, ಖಾಲಿ);
+    ಆದರೆ (ret < 0)
     {
 	// Should only get here as a result of coding errors.
-	semsg(_(e_could_not_set_timeout_str), strerror(errno));
+	semsg(_(e_could_not_ಗಣ_timeout_str), strerror(errno));
 	stop_timeout();
-	return &timeout_flag;
+	ಹಿಂತಿರುಗಿ &timeout_flag;
     }
 
-    timer_active = TRUE;
-    return &timeout_flag;
+    timer_ಸಕ್ರಿಯ = TRUE;
+    ಹಿಂತಿರುಗಿ &timeout_flag;
 }
 # endif // PROF_NSEC
-#endif  // FEAT_RELTIME
+#ಆದರೆ_ಅಂತ್ಯ  // FEAT_RELTIME

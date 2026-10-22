@@ -40,17 +40,17 @@
 // Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-#if defined(FEAT_GUI) || defined(FEAT_JOB_CHANNEL)
+#ಆದರೆ defined(FEAT_GUI) || defined(FEAT_ಕೆಲಸ_CHANNEL)
 
-#include <signal.h>
+#ಅನ್ತರ್ಭಾವ <signal.h>
 
-#ifdef HAVE_SYS_IOCTL_H
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_SYS_IOCTL_H
 # include <sys/ioctl.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if HAVE_STROPTS_H
+#ಆದರೆ HAVE_STROPTS_H
 # include <sys/types.h>
 # ifdef sinix
 #  define buf_T __system_buf_t__
@@ -61,386 +61,386 @@
 # endif
 # ifdef SUN_SYSTEM
 #  include <sys/conf.h>
-#  if defined(HAVE_SYS_PTMS_H) && defined(HAVE_SVR4_PTYS)
+#  ಆದರೆ defined(HAVE_SYS_PTMS_H) && defined(HAVE_SVR4_PTYS)
 #   include <sys/ptms.h>
 #  endif
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef HAVE_UNISTD_H
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_UNISTD_H
 # include <unistd.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if HAVE_TERMIO_H
+#ಆದರೆ HAVE_TERMIO_H
 # include <termio.h>
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 # ifdef HAVE_TERMIOS_H
 #  include <termios.h>
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if HAVE_SYS_STREAM_H
+#ಆದರೆ HAVE_SYS_ಹರಿವು_H
 # include <sys/stream.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if HAVE_SYS_PTEM_H
+#ಆದರೆ HAVE_SYS_PTEM_H
 # include <sys/ptem.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if !defined(SUN_SYSTEM) && !defined(VMS)
+#ಆದರೆ !defined(SUN_SYSTEM) && !defined(VMS)
 # include <sys/ioctl.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(SUN_SYSTEM) && defined(LOCKPTY) && !defined(TIOCEXCL)
+#ಆದರೆ defined(SUN_SYSTEM) && defined(LOCKPTY) && !defined(TIOCEXCL)
 # include <sys/ttold.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef ISC
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ISC
 # include <sys/tty.h>
 # include <sys/sioctl.h>
 # include <sys/pty.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef sgi
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ sgi
 # include <sys/sysmacros.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(_INCLUDE_HPUX_SOURCE) && !defined(hpux)
+#ಆದರೆ defined(INCLUDE_HPUX_ಮೂಲ) && !defined(hpux)
 # define hpux
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * if no PTYRANGE[01] is in the config file, we pick a default
  */
-#ifndef PTYRANGE0
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ PTYRANGE0
 # define PTYRANGE0 "qprs"
-#endif
-#ifndef PTYRANGE1
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ PTYRANGE1
 # define PTYRANGE1 "0123456789abcdef"
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // SVR4 pseudo ttys don't seem to work with SCO-5
-#ifdef M_UNIX
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ M_UNIX
 # undef HAVE_SVR4_PTYS
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  *  Open all ptys with O_NOCTTY, just to be on the safe side.
  */
-#ifndef O_NOCTTY
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ O_NOCTTY
 # define O_NOCTTY 0
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(HAVE_SVR4_PTYS) || defined(HAVE_POSIX_OPENPT)
+#ಆದರೆ defined(HAVE_SVR4_PTYS) || defined(HAVE_POSIX_OPENPT)
 // These should be in stdlib.h, but it depends on _XOPEN_SOURCE.
-char *ptsname(int);
-int unlockpt(int);
-int grantpt(int);
-int posix_openpt(int flags);
-#endif
+ಅಕ್ಷರ *ptsname(ಪೂರ್ಣಾಂಕ);
+ಪೂರ್ಣಾಂಕ unlockpt(ಪೂರ್ಣಾಂಕ);
+ಪೂರ್ಣಾಂಕ grantpt(ಪೂರ್ಣಾಂಕ);
+ಪೂರ್ಣಾಂಕ posix_openpt(ಪೂರ್ಣಾಂಕ flags);
+#ಆದರೆ_ಅಂತ್ಯ
 
-    static void
-initmaster(int f UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+initmaster(ಪೂರ್ಣಾಂಕ f ಬಳಸದ)
 {
-#ifndef VMS
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ VMS
 # ifdef POSIX
     tcflush(f, TCIOFLUSH);
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  ifdef TIOCFLUSH
-    (void)ioctl(f, TIOCFLUSH, (char *) 0);
+    (ಶೂನ್ಯ)ioctl(f, TIOCFLUSH, (ಅಕ್ಷರ *) 0);
 #  endif
 # endif
 # ifdef LOCKPTY
-    (void)ioctl(f, TIOCEXCL, (char *) 0);
+    (ಶೂನ್ಯ)ioctl(f, TIOCEXCL, (ಅಕ್ಷರ *) 0);
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * This causes a hang on some systems, but is required for a properly working
  * pty on others.  Needs to be tuned...
  */
-    int
-setup_slavepty(int fd)
+    ಪೂರ್ಣಾಂಕ
+ಸಿದ್ಧತೆ_slavepty(ಪೂರ್ಣಾಂಕ fd)
 {
-    if (fd < 0)
-	return 0;
-#if defined(I_PUSH) && defined(HAVE_SVR4_PTYS) && !defined(sgi) \
+    ಆದರೆ (fd < 0)
+	ಹಿಂತಿರುಗಿ 0;
+#ಆದರೆ defined(I_ತಳ್ಳು) && defined(HAVE_SVR4_PTYS) && !defined(sgi) \
 	&& !defined(linux) && !defined(__osf__) && !defined(M_UNIX)
-# if defined(HAVE_SYS_PTEM_H) || defined(hpux)
-    if (ioctl(fd, I_PUSH, "ptem") != 0)
-	return -1;
+# ಆದರೆ defined(HAVE_SYS_PTEM_H) || defined(hpux)
+    ಆದರೆ (ioctl(fd, I_ತಳ್ಳು, "ptem") != 0)
+	ಹಿಂತಿರುಗಿ -1;
 # endif
-    if (ioctl(fd, I_PUSH, "ldterm") != 0)
-	return -1;
+    ಆದರೆ (ioctl(fd, I_ತಳ್ಳು, "ldterm") != 0)
+	ಹಿಂತಿರುಗಿ -1;
 # ifdef SUN_SYSTEM
-    if (ioctl(fd, I_PUSH, "ttcompat") != 0)
-	return -1;
+    ಆದರೆ (ioctl(fd, I_ತಳ್ಳು, "ttcompat") != 0)
+	ಹಿಂತಿರುಗಿ -1;
 # endif
-#endif
-    return 0;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-#if defined(HAVE_POSIX_OPENPT) && !defined(PTY_DONE)
-# define PTY_DONE
-    int
-mch_openpty(char **ttyn)
+#ಆದರೆ defined(HAVE_POSIX_OPENPT) && !defined(PTY_ಮುಗಿದ)
+# define PTY_ಮುಗಿದ
+    ಪೂರ್ಣಾಂಕ
+mch_openpty(ಅಕ್ಷರ **ttyn)
 {
-    int			f;
-    char		*m;
+    ಪೂರ್ಣಾಂಕ			f;
+    ಅಕ್ಷರ		*m;
     sighandler_T	sigcld;
-    static char TtyName[32];  // used for opening a new pty-pair
+    ಸ್ಥಿರ ಅಕ್ಷರ TtyName[32];  // used for opening a new pty-pair
 
-    if ((f = posix_openpt(O_RDWR | O_NOCTTY | O_EXTRA)) == -1)
-	return -1;
+    ಆದರೆ ((f = posix_openpt(O_RDWR | O_NOCTTY | O_EXTRA)) == -1)
+	ಹಿಂತಿರುಗಿ -1;
 
     // SIGCHLD set to SIG_DFL for grantpt() because it fork()s and
     // exec()s pt_chmod
     sigcld = mch_signal(SIGCHLD, SIG_DFL);
-    if ((m = ptsname(f)) == NULL || grantpt(f) || unlockpt(f))
+    ಆದರೆ ((m = ptsname(f)) == ಖಾಲಿ || grantpt(f) || unlockpt(f))
     {
 	mch_signal(SIGCHLD, sigcld);
 	close(f);
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
     mch_signal(SIGCHLD, sigcld);
-    vim_strncpy((char_u *)TtyName, (char_u *)m, sizeof(TtyName) - 1);
+    vim_strncpy((char_u *)TtyName, (char_u *)m, ಗಾತ್ರ(TtyName) - 1);
     initmaster(f);
     *ttyn = TtyName;
-    return f;
+    ಹಿಂತಿರುಗಿ f;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(OSX) && !defined(PTY_DONE)
-# define PTY_DONE
-    int
-mch_openpty(char **ttyn)
+#ಆದರೆ defined(OSX) && !defined(PTY_ಮುಗಿದ)
+# define PTY_ಮುಗಿದ
+    ಪೂರ್ಣಾಂಕ
+mch_openpty(ಅಕ್ಷರ **ttyn)
 {
-    int		f;
-    static char TtyName[32];
+    ಪೂರ್ಣಾಂಕ		f;
+    ಸ್ಥಿರ ಅಕ್ಷರ TtyName[32];
 
-    if ((f = open_controlling_pty(TtyName)) < 0)
-	return -1;
+    ಆದರೆ ((f = open_controlling_pty(TtyName)) < 0)
+	ಹಿಂತಿರುಗಿ -1;
     initmaster(f);
     *ttyn = TtyName;
-    return f;
+    ಹಿಂತಿರುಗಿ f;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if (defined(sequent) || defined(_SEQUENT_)) && defined(HAVE_GETPSEUDOTTY) \
-	&& !defined(PTY_DONE)
-# define PTY_DONE
-    int
-mch_openpty(char **ttyn)
+#ಆದರೆ (defined(sequent) || defined(_SEQUENT_)) && defined(HAVE_GETPSEUDOTTY) \
+	&& !defined(PTY_ಮುಗಿದ)
+# define PTY_ಮುಗಿದ
+    ಪೂರ್ಣಾಂಕ
+mch_openpty(ಅಕ್ಷರ **ttyn)
 {
-    char	*m, *s;
-    int		f;
+    ಅಕ್ಷರ	*m, *s;
+    ಪೂರ್ಣಾಂಕ		f;
     // used for opening a new pty-pair:
-    static char PtyName[32];
-    static char TtyName[32];
+    ಸ್ಥಿರ ಅಕ್ಷರ PtyName[32];
+    ಸ್ಥಿರ ಅಕ್ಷರ TtyName[32];
 
-    if ((f = getpseudotty(&s, &m)) < 0)
-	return -1;
+    ಆದರೆ ((f = getpseudotty(&s, &m)) < 0)
+	ಹಿಂತಿರುಗಿ -1;
 # ifdef _SEQUENT_
     fvhangup(s);
 # endif
-    vim_strncpy((char_u *)PtyName, (char_u *)m, sizeof(PtyName) - 1);
-    vim_strncpy((char_u *)TtyName, (char_u *)s, sizeof(TtyName) - 1);
+    vim_strncpy((char_u *)PtyName, (char_u *)m, ಗಾತ್ರ(PtyName) - 1);
+    vim_strncpy((char_u *)TtyName, (char_u *)s, ಗಾತ್ರ(TtyName) - 1);
     initmaster(f);
     *ttyn = TtyName;
-    return f;
+    ಹಿಂತಿರುಗಿ f;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(MIPS) && defined(HAVE_DEV_PTC) && !defined(PTY_DONE)
-# define PTY_DONE
-    int
-mch_openpty(char **ttyn)
+#ಆದರೆ defined(MIPS) && defined(HAVE_DEV_PTC) && !defined(PTY_ಮುಗಿದ)
+# define PTY_ಮುಗಿದ
+    ಪೂರ್ಣಾಂಕ
+mch_openpty(ಅಕ್ಷರ **ttyn)
 {
-    int		f;
+    ಪೂರ್ಣಾಂಕ		f;
     stat_T	buf;
     // used for opening a new pty-pair:
-    static char TtyName[32];
+    ಸ್ಥಿರ ಅಕ್ಷರ TtyName[32];
 
-    if ((f = open("/dev/ptc", O_RDWR | O_NOCTTY | O_NONBLOCK | O_EXTRA, 0)) < 0)
-	return -1;
-    if (mch_fstat(f, &buf) < 0)
+    ಆದರೆ ((f = open("/dev/ptc", O_RDWR | O_NOCTTY | O_NONBLOCK | O_EXTRA, 0)) < 0)
+	ಹಿಂತಿರುಗಿ -1;
+    ಆದರೆ (mch_fstat(f, &buf) < 0)
     {
 	close(f);
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
     sprintf(TtyName, "/dev/ttyq%d", minor(buf.st_rdev));
     initmaster(f);
     *ttyn = TtyName;
-    return f;
+    ಹಿಂತಿರುಗಿ f;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(HAVE_SVR4_PTYS) && !defined(PTY_DONE) && !defined(hpux) \
-	    && !(defined(MACOS_X) && !defined(MAC_OS_X_VERSION_10_6))
+#ಆದರೆ defined(HAVE_SVR4_PTYS) && !defined(PTY_ಮುಗಿದ) && !defined(hpux) \
+	    && !(defined(MACOS_X) && !defined(MAC_OS_X_ಆವೃತ್ತಿ_10_6))
 
 // NOTE: Even though HPUX can have /dev/ptmx, the code below doesn't work!
 // Same for Mac OS X Leopard (10.5).
-# define PTY_DONE
-    int
-mch_openpty(char **ttyn)
+# define PTY_ಮುಗಿದ
+    ಪೂರ್ಣಾಂಕ
+mch_openpty(ಅಕ್ಷರ **ttyn)
 {
-    int			f;
-    char		*m;
+    ಪೂರ್ಣಾಂಕ			f;
+    ಅಕ್ಷರ		*m;
     sighandler_T	sigcld;
     // used for opening a new pty-pair:
-    static char TtyName[32];
+    ಸ್ಥಿರ ಅಕ್ಷರ TtyName[32];
 
-    if ((f = open("/dev/ptmx", O_RDWR | O_NOCTTY | O_EXTRA, 0)) == -1)
-	return -1;
+    ಆದರೆ ((f = open("/dev/ptmx", O_RDWR | O_NOCTTY | O_EXTRA, 0)) == -1)
+	ಹಿಂತಿರುಗಿ -1;
 
     /*
      * SIGCHLD set to SIG_DFL for grantpt() because it fork()s and
      * exec()s pt_chmod
      */
     sigcld = mch_signal(SIGCHLD, SIG_DFL);
-    if ((m = ptsname(f)) == NULL || grantpt(f) || unlockpt(f))
+    ಆದರೆ ((m = ptsname(f)) == ಖಾಲಿ || grantpt(f) || unlockpt(f))
     {
 	mch_signal(SIGCHLD, sigcld);
 	close(f);
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
     mch_signal(SIGCHLD, sigcld);
-    vim_strncpy((char_u *)TtyName, (char_u *)m, sizeof(TtyName) - 1);
+    vim_strncpy((char_u *)TtyName, (char_u *)m, ಗಾತ್ರ(TtyName) - 1);
     initmaster(f);
     *ttyn = TtyName;
-    return f;
+    ಹಿಂತಿರುಗಿ f;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(_AIX) && defined(HAVE_DEV_PTC) && !defined(PTY_DONE)
-# define PTY_DONE
+#ಆದರೆ defined(_AIX) && defined(HAVE_DEV_PTC) && !defined(PTY_ಮುಗಿದ)
+# define PTY_ಮುಗಿದ
 
 # ifdef _IBMR2
-static int aixhack = -1;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ aixhack = -1;
 # endif
 
-    int
-mch_openpty(char **ttyn)
+    ಪೂರ್ಣಾಂಕ
+mch_openpty(ಅಕ್ಷರ **ttyn)
 {
-    int		f;
+    ಪೂರ್ಣಾಂಕ		f;
     // used for opening a new pty-pair:
-    static char TtyName[32];
+    ಸ್ಥಿರ ಅಕ್ಷರ TtyName[32];
 
     // a dumb looking loop replaced by mycrofts code:
-    if ((f = open("/dev/ptc", O_RDWR | O_NOCTTY | O_EXTRA)) < 0)
-	return -1;
-    vim_strncpy((char_u *)TtyName, (char_u *)ttyname(f), sizeof(TtyName) - 1);
-    if (geteuid() != ROOT_UID && mch_access(TtyName, R_OK | W_OK))
+    ಆದರೆ ((f = open("/dev/ptc", O_RDWR | O_NOCTTY | O_EXTRA)) < 0)
+	ಹಿಂತಿರುಗಿ -1;
+    vim_strncpy((char_u *)TtyName, (char_u *)ttyname(f), ಗಾತ್ರ(TtyName) - 1);
+    ಆದರೆ (geteuid() != ಬೇರು_UID && mch_access(TtyName, R_OK | W_OK))
     {
 	close(f);
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
     initmaster(f);
 # ifdef _IBMR2
-    if (aixhack >= 0)
+    ಆದರೆ (aixhack >= 0)
 	close(aixhack);
-    if ((aixhack = open(TtyName, O_RDWR | O_NOCTTY | O_EXTRA, 0)) < 0)
+    ಆದರೆ ((aixhack = open(TtyName, O_RDWR | O_NOCTTY | O_EXTRA, 0)) < 0)
     {
 	close(f);
-	return -1;
+	ಹಿಂತಿರುಗಿ -1;
     }
 # endif
     *ttyn = TtyName;
-    return f;
+    ಹಿಂತಿರುಗಿ f;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifndef PTY_DONE
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ PTY_ಮುಗಿದ
 
 # ifdef hpux
-static const char PtyProto[] = "/dev/ptym/ptyXY";
-static const char TtyProto[] = "/dev/pty/ttyXY";
-# else
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ PtyProto[] = "/dev/ptym/ptyXY";
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ TtyProto[] = "/dev/pty/ttyXY";
+# ಇಲ್ಲದಿದ್ದರೆ
 #  ifdef __HAIKU__
-static const char PtyProto[] = "/dev/pt/XY";
-static const char TtyProto[] = "/dev/tt/XY";
-#  else
-static const char PtyProto[] = "/dev/ptyXY";
-static const char TtyProto[] = "/dev/ttyXY";
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ PtyProto[] = "/dev/pt/XY";
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ TtyProto[] = "/dev/tt/XY";
+#  ಇಲ್ಲದಿದ್ದರೆ
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ PtyProto[] = "/dev/ptyXY";
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ TtyProto[] = "/dev/ttyXY";
 #  endif
 # endif
 
-    int
-mch_openpty(char **ttyn)
+    ಪೂರ್ಣಾಂಕ
+mch_openpty(ಅಕ್ಷರ **ttyn)
 {
-    char	*p, *q, *l, *d;
-    int		f;
+    ಅಕ್ಷರ	*p, *q, *l, *d;
+    ಪೂರ್ಣಾಂಕ		f;
     // used for opening a new pty-pair:
-    static char PtyName[32];
-    static char TtyName[32];
+    ಸ್ಥಿರ ಅಕ್ಷರ PtyName[32];
+    ಸ್ಥಿರ ಅಕ್ಷರ TtyName[32];
 
-    vim_strncpy((char_u *)PtyName, (char_u *)PtyProto, sizeof(PtyName) - 1);
-    vim_strncpy((char_u *)TtyName, (char_u *)TtyProto, sizeof(TtyName) - 1);
-    for (p = PtyName; *p != 'X'; p++)
+    vim_strncpy((char_u *)PtyName, (char_u *)PtyProto, ಗಾತ್ರ(PtyName) - 1);
+    vim_strncpy((char_u *)TtyName, (char_u *)TtyProto, ಗಾತ್ರ(TtyName) - 1);
+    ಗಾಗಿ (p = PtyName; *p != 'X'; p++)
 	;
-    for (q = TtyName; *q != 'X'; q++)
+    ಗಾಗಿ (q = TtyName; *q != 'X'; q++)
 	;
-    for (l = PTYRANGE0; (*p = *l) != '\0'; l++)
+    ಗಾಗಿ (l = PTYRANGE0; (*p = *l) != '\0'; l++)
     {
-	for (d = PTYRANGE1; (p[1] = *d) != '\0'; d++)
+	ಗಾಗಿ (d = PTYRANGE1; (p[1] = *d) != '\0'; d++)
 	{
-	    if ((f = open(PtyName, O_RDWR | O_NOCTTY | O_EXTRA, 0)) == -1)
-		continue;
+	    ಆದರೆ ((f = open(PtyName, O_RDWR | O_NOCTTY | O_EXTRA, 0)) == -1)
+		ಮುಂದುವರಿ;
 	    q[0] = *l;
 	    q[1] = *d;
-	    if (geteuid() != ROOT_UID && mch_access(TtyName, R_OK | W_OK))
+	    ಆದರೆ (geteuid() != ಬೇರು_UID && mch_access(TtyName, R_OK | W_OK))
 	    {
 		close(f);
-		continue;
+		ಮುಂದುವರಿ;
 	    }
-# if defined(SUN_SYSTEM) && defined(TIOCGPGRP) && !defined(SUNOS3)
+# ಆದರೆ defined(SUN_SYSTEM) && defined(TIOCGPGRP) && !defined(SUNOS3)
 	    // Hack to ensure that the slave side of the pty is
 	    // unused. May not work in anything other than SunOS4.1
 	    {
-		int pgrp;
+		ಪೂರ್ಣಾಂಕ pgrp;
 
 		// tcgetpgrp does not work (uses TIOCGETPGRP)!
-		if (ioctl(f, TIOCGPGRP, (char *)&pgrp) != -1 || errno != EIO)
+		ಆದರೆ (ioctl(f, TIOCGPGRP, (ಅಕ್ಷರ *)&pgrp) != -1 || errno != EIO)
 		{
 		    close(f);
-		    continue;
+		    ಮುಂದುವರಿ;
 		}
 	    }
 # endif
 	    initmaster(f);
 	    *ttyn = TtyName;
-	    return f;
+	    ಹಿಂತಿರುಗಿ f;
 	}
     }
-    return -1;
+    ಹಿಂತಿರುಗಿ -1;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Call isatty(fd), except for SunOS where it's done differently.
  */
-    int
-mch_isatty(int fd)
+    ಪೂರ್ಣಾಂಕ
+mch_isatty(ಪೂರ್ಣಾಂಕ fd)
 {
-#if defined(I_STR) && defined(HAVE_SYS_PTMS_H) && defined(HAVE_SVR4_PTYS) \
+#ಆದರೆ defined(I_STR) && defined(HAVE_SYS_PTMS_H) && defined(HAVE_SVR4_PTYS) \
 	&& defined(SUN_SYSTEM)
     // On SunOS, isatty() for /dev/ptmx returns false or sometimes can hang up
     // in the inner ioctl(), and therefore first determine whether "fd" is a
     // master device.
-    struct strioctl istr;
+    ರಚನೆ strioctl istr;
 
     istr.ic_cmd = ISPTM;
     istr.ic_timout = 0;
-    istr.ic_dp = NULL;
+    istr.ic_dp = ಖಾಲಿ;
     istr.ic_len = 0;
 
-    if (ioctl(fd, I_STR, &istr) == 0)
+    ಆದರೆ (ioctl(fd, I_STR, &istr) == 0)
 	// Trick: return 2 in order to advice the caller that "fd" is a master
 	// device. cf. src/os_unix.c:get_tty_fd()
-	return 2;
-#endif
-    return isatty(fd);
+	ಹಿಂತಿರುಗಿ 2;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ isatty(fd);
 }
 
-#endif // FEAT_GUI || FEAT_JOB_CHANNEL
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_GUI || FEAT_JOB_CHANNEL

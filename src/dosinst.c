@@ -16,59 +16,59 @@
 /*
  * Include common code for dosinst.c and uninstall.c.
  */
-#define DOSINST
-#include "dosinst.h"
-#include <io.h>
+#ವ್ಯಾಖ್ಯಾನಿಸು DOSINST
+#ಅನ್ತರ್ಭಾವ "dosinst.h"
+#ಅನ್ತರ್ಭಾವ <io.h>
 
-#define GVIMEXT64_PATH	    "GvimExt64\\gvimext.dll"
-#define GVIMEXT32_PATH	    "GvimExt32\\gvimext.dll"
+#ವ್ಯಾಖ್ಯಾನಿಸು GVIMEXT64_ಮಾರ್ಗ	    "GvimExt64\\gvimext.dll"
+#ವ್ಯಾಖ್ಯಾನಿಸು GVIMEXT32_ಮಾರ್ಗ	    "GvimExt32\\gvimext.dll"
 
 // Macro to do an error check I was typing over and over
-#define CHECK_REG_ERROR(code) \
-    do { \
-	if (code != ERROR_SUCCESS) \
+#ವ್ಯಾಖ್ಯಾನಿಸು CHECK_REG_ERROR(ಸಂಕೇತ_2) \
+    ಮಾಡು { \
+	ಆದರೆ (ಸಂಕೇತ_2 != ERROR_SUCCESS) \
 	{ \
-	    printf("%ld error number:  %ld\n", (long)__LINE__, (long)code); \
-	    return 1; \
+	    ಬರೆ("%ld error number:  %ld\n", (ದೀರ್ಘ)__LINE__, (ದೀರ್ಘ)ಸಂಕೇತ_2); \
+	    ಹಿಂತಿರುಗಿ 1; \
 	} \
-    } while (0)
+    } ಆಗ (0)
 
-int	has_vim = 0;		// installable vim.exe exists
-int	has_gvim = 0;		// installable gvim.exe exists
+ಪೂರ್ಣಾಂಕ	has_vim = 0;		// installable vim.exe exists
+ಪೂರ್ಣಾಂಕ	has_gvim = 0;		// installable gvim.exe exists
 
-char	oldvimrc[BUFSIZE];	// name of existing vimrc file
-char	vimrc[BUFSIZE];		// name of vimrc file to create
+ಅಕ್ಷರ	oldvimrc[BUFSIZE];	// name of existing vimrc file
+ಅಕ್ಷರ	vimrc[BUFSIZE];		// name of vimrc file to create
 
-char	*default_bat_dir = NULL;  // when not NULL, use this as the default
+ಅಕ್ಷರ	*default_bat_dir = ಖಾಲಿ;  // when not NULL, use this as the default
 				  // directory to write .bat files in
-char	*default_vim_dir = NULL;  // when not NULL, use this as the default
+ಅಕ್ಷರ	*default_vim_dir = ಖಾಲಿ;  // when not NULL, use this as the default
 				  // install dir for NSIS
 
 /*
  * Structure used for each choice the user can make.
  */
-struct choice
+ರಚನೆ choice
 {
-    int	    active;			// non-zero when choice is active
-    char    *text;			// text displayed for this choice
-    void    (*changefunc)(int idx);	// function to change this choice
-    int	    arg;			// argument for function
-    void    (*installfunc)(int idx);	// function to install this choice
+    ಪೂರ್ಣಾಂಕ	    ಸಕ್ರಿಯ;			// non-zero when choice is active
+    ಅಕ್ಷರ    *ಪಠ್ಯ;			// text displayed for this choice
+    ಶೂನ್ಯ    (*changefunc)(ಪೂರ್ಣಾಂಕ idx);	// function to change this choice
+    ಪೂರ್ಣಾಂಕ	    arg;			// argument for function
+    ಶೂನ್ಯ    (*installfunc)(ಪೂರ್ಣಾಂಕ idx);	// function to install this choice
 };
 
-struct choice	choices[30];		// choices the user can make
-int		choice_count = 0;	// number of choices available
+ರಚನೆ choice	choices[30];		// choices the user can make
+ಪೂರ್ಣಾಂಕ		choice_ಎಣಿಕೆ = 0;	// number of choices available
 
-#define TABLE_SIZE(s)	(int)ARRAYSIZE(s)
+#ವ್ಯಾಖ್ಯಾನಿಸು ಕೋಷ್ಟಕ_ಗಾತ್ರ(s)	(ಪೂರ್ಣಾಂಕ)ARRAYSIZE(s)
 
-enum
+ಎಣಿಕೆ
 {
     compat_vi = 1,
     compat_vim,
     compat_some_enhancements,
     compat_all_enhancements
 };
-char	*(compat_choices[]) =
+ಅಕ್ಷರ	*(compat_choices[]) =
 {
     "\nChoose the default way to run Vim:",
     "Vi compatible",
@@ -76,46 +76,46 @@ char	*(compat_choices[]) =
     "with some Vim enhancements",
     "with syntax highlighting and other features switched on",
 };
-int	compat_choice = (int)compat_all_enhancements;
-char	*compat_text = "- run Vim %s";
+ಪೂರ್ಣಾಂಕ	compat_choice = (ಪೂರ್ಣಾಂಕ)compat_all_enhancements;
+ಅಕ್ಷರ	*compat_ಪಠ್ಯ = "- run Vim %s";
 
-enum
+ಎಣಿಕೆ
 {
     remap_no = 1,
     remap_win
 };
-char	*(remap_choices[]) =
+ಅಕ್ಷರ	*(remap_choices[]) =
 {
     "\nChoose:",
     "Do not remap keys for Windows behavior",
     "Remap a few keys for Windows behavior (CTRL-V, CTRL-C, CTRL-F, etc)",
 };
-int	remap_choice = (int)remap_no;
-char	*remap_text = "- %s";
+ಪೂರ್ಣಾಂಕ	remap_choice = (ಪೂರ್ಣಾಂಕ)remap_no;
+ಅಕ್ಷರ	*remap_ಪಠ್ಯ = "- %s";
 
-enum
+ಎಣಿಕೆ
 {
     mouse_xterm = 1,
     mouse_mswin,
     mouse_default
 };
-char	*(mouse_choices[]) =
+ಅಕ್ಷರ	*(mouse_choices[]) =
 {
     "\nChoose the way how Vim uses the mouse:",
     "right button extends selection (the Unix way)",
     "right button has a popup menu, left button starts select mode (the Windows way)",
     "right button has a popup menu, left button starts visual mode",
 };
-int	mouse_choice = (int)mouse_default;
-char	*mouse_text = "- The mouse %s";
+ಪೂರ್ಣಾಂಕ	mouse_choice = (ಪೂರ್ಣಾಂಕ)mouse_default;
+ಅಕ್ಷರ	*mouse_ಪಠ್ಯ = "- The mouse %s";
 
-enum
+ಎಣಿಕೆ
 {
     vimfiles_dir_none = 1,
     vimfiles_dir_vim,
     vimfiles_dir_home
 };
-static char *(vimfiles_dir_choices[]) =
+ಸ್ಥಿರ ಅಕ್ಷರ *(vimfiles_dir_choices[]) =
 {
     "\nCreate plugin directories:",
     "No",
@@ -124,19 +124,19 @@ static char *(vimfiles_dir_choices[]) =
 };
 
 // non-zero when selected to install the popup menu entry.
-static int	install_popup = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	install_popup = 0;
 
 // non-zero when selected to install the "Open with" entry.
-static int	install_openwith = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	install_openwith = 0;
 
 // non-zero when need to add an uninstall entry in the registry
-static int	need_uninstall_entry = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	need_uninstall_ನಮೂದು = 0;
 
 /*
  * Definitions of the directory name (under $VIM) of the vimfiles directory
  * and its subdirectories:
  */
-static char	*(vimfiles_subdirs[]) =
+ಸ್ಥಿರ ಅಕ್ಷರ	*(vimfiles_subdirs[]) =
 {
     "colors",
     "compiler",
@@ -153,83 +153,83 @@ static char	*(vimfiles_subdirs[]) =
  * Obtain a choice from a table.
  * First entry is a question, others are choices.
  */
-    static int
-get_choice(char **table, int entries)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+get_choice(ಅಕ್ಷರ **ಕೋಷ್ಟಕ, ಪೂರ್ಣಾಂಕ entries)
 {
-    int		answer;
-    int		idx;
-    char	dummy[100];
+    ಪೂರ್ಣಾಂಕ		answer;
+    ಪೂರ್ಣಾಂಕ		idx;
+    ಅಕ್ಷರ	dummy[100];
 
-    do
+    ಮಾಡು
     {
-	for (idx = 0; idx < entries; ++idx)
+	ಗಾಗಿ (idx = 0; idx < entries; ++idx)
 	{
-	    if (idx)
-		printf("%2d  ", idx);
-	    puts(table[idx]);
+	    ಆದರೆ (idx)
+		ಬರೆ("%2d  ", idx);
+	    puts(ಕೋಷ್ಟಕ[idx]);
 	}
-	printf("Choice: ");
-	if (scanf("%d", &answer) != 1)
+	ಬರೆ("Choice: ");
+	ಆದರೆ (scanf("%d", &answer) != 1)
 	{
 	    scanf("%99s", dummy);
 	    answer = 0;
 	}
     }
-    while (answer < 1 || answer >= entries);
+    ಆಗ (answer < 1 || answer >= entries);
 
-    return answer;
+    ಹಿಂತಿರುಗಿ answer;
 }
 
 /*
  * Check if the user unpacked the archives properly.
  * Sets "runtimeidx".
  */
-    static void
-check_unpack(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+check_unpack(ಶೂನ್ಯ)
 {
-    char	buf[BUFSIZE];
+    ಅಕ್ಷರ	buf[BUFSIZE];
     FILE	*fd;
-    struct stat	st;
+    ರಚನೆ stat	st;
 
     // check for presence of the correct version number in installdir[]
-    runtimeidx = strlen(installdir) - strlen(VIM_VERSION_NODOT);
-    if (runtimeidx <= 0
-	    || stricmp(installdir + runtimeidx, VIM_VERSION_NODOT) != 0
+    runtimeidx = ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(installdir) - ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(VIM_ಆವೃತ್ತಿ_NODOT);
+    ಆದರೆ (runtimeidx <= 0
+	    || stricmp(installdir + runtimeidx, VIM_ಆವೃತ್ತಿ_NODOT) != 0
 	    || (installdir[runtimeidx - 1] != '/'
 		&& installdir[runtimeidx - 1] != '\\'))
     {
-	printf("ERROR: Install program not in directory \"%s\"\n",
-		VIM_VERSION_NODOT);
-	printf("This program can only work when it is located in its original directory\n");
+	ಬರೆ("ERROR: Install program not in directory \"%s\"\n",
+		VIM_ಆವೃತ್ತಿ_NODOT);
+	ಬರೆ("This program can only work when it is located in its original directory\n");
 	myexit(1);
     }
 
     // check if filetype.vim is present, which means the runtime archive has
     // been unpacked
     sprintf(buf, "%s\\filetype.vim", installdir);
-    if (stat(buf, &st) < 0)
+    ಆದರೆ (stat(buf, &st) < 0)
     {
-	printf("ERROR: Cannot find filetype.vim in \"%s\"\n", installdir);
-	printf("It looks like you did not unpack the runtime archive.\n");
-	printf("You must unpack the runtime archive \"%srt.zip\" before installing.\n",
-		VIM_VERSION_NODOT);
+	ಬರೆ("ERROR: Cannot find filetype.vim in \"%s\"\n", installdir);
+	ಬರೆ("It looks like you did not unpack the runtime archive.\n");
+	ಬರೆ("You must unpack the runtime archive \"%srt.zip\" before installing.\n",
+		VIM_ಆವೃತ್ತಿ_NODOT);
 	myexit(1);
     }
 
     // Check if vim.exe or gvim.exe is in the current directory.
-    if ((fd = fopen("gvim.exe", "r")) != NULL)
+    ಆದರೆ ((fd = fopen("gvim.exe", "r")) != ಖಾಲಿ)
     {
 	fclose(fd);
 	has_gvim = 1;
     }
-    if ((fd = fopen("vim.exe", "r")) != NULL)
+    ಆದರೆ ((fd = fopen("vim.exe", "r")) != ಖಾಲಿ)
     {
 	fclose(fd);
 	has_vim = 1;
     }
-    if (!has_gvim && !has_vim)
+    ಆದರೆ (!has_gvim && !has_vim)
     {
-	printf("ERROR: Cannot find any Vim executables in \"%s\"\n\n",
+	ಬರೆ("ERROR: Cannot find any Vim executables in \"%s\"\n\n",
 								  installdir);
 	myexit(1);
     }
@@ -240,41 +240,41 @@ check_unpack(void)
  * Ignores case and differences between '/' and '\'.
  * "plen" and "qlen" can be negative, strlen() is used then.
  */
-    static int
-pathcmp(char *p, int plen, char *q, int qlen)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+pathcmp(ಅಕ್ಷರ *p, ಪೂರ್ಣಾಂಕ plen, ಅಕ್ಷರ *q, ಪೂರ್ಣಾಂಕ qlen)
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
 
-    if (plen < 0)
-	plen = strlen(p);
-    if (qlen < 0)
-	qlen = strlen(q);
-    for (i = 0; ; ++i)
+    ಆದರೆ (plen < 0)
+	plen = ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(p);
+    ಆದರೆ (qlen < 0)
+	qlen = ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(q);
+    ಗಾಗಿ (i = 0; ; ++i)
     {
 	// End of "p": check if "q" also ends or just has a slash.
-	if (i == plen)
+	ಆದರೆ (i == plen)
 	{
-	    if (i == qlen)  // match
-		return 0;
-	    if (i == qlen - 1 && (q[i] == '\\' || q[i] == '/'))
-		return 0;   // match with trailing slash
-	    return 1;	    // no match
+	    ಆದರೆ (i == qlen)  //ಹೊಂದಿಕೆ
+		ಹಿಂತಿರುಗಿ 0;
+	    ಆದರೆ (i == qlen - 1 && (q[i] == '\\' || q[i] == '/'))
+		ಹಿಂತಿರುಗಿ 0;   // match with trailing slash
+	    ಹಿಂತಿರುಗಿ 1;	    // no match
 	}
 
 	// End of "q": check if "p" also ends or just has a slash.
-	if (i == qlen)
+	ಆದರೆ (i == qlen)
 	{
-	    if (i == plen)  // match
-		return 0;
-	    if (i == plen - 1 && (p[i] == '\\' || p[i] == '/'))
-		return 0;   // match with trailing slash
-	    return 1;	    // no match
+	    ಆದರೆ (i == plen)  //ಹೊಂದಿಕೆ
+		ಹಿಂತಿರುಗಿ 0;
+	    ಆದರೆ (i == plen - 1 && (p[i] == '\\' || p[i] == '/'))
+		ಹಿಂತಿರುಗಿ 0;   // match with trailing slash
+	    ಹಿಂತಿರುಗಿ 1;	    // no match
 	}
 
-	if (!(mytoupper(p[i]) == mytoupper(q[i])
+	ಆದರೆ (!(mytoupper(p[i]) == mytoupper(q[i])
 		|| ((p[i] == '/' || p[i] == '\\')
 		    && (q[i] == '/' || q[i] == '\\'))))
-	    return 1;	    // no match
+	    ಹಿಂತಿರುಗಿ 1;	    // no match
     }
     //NOTREACHED
 }
@@ -286,55 +286,55 @@ pathcmp(char *p, int plen, char *q, int qlen)
  * (or NULL).
  * "*destination" is set to NULL or the location of the file.
  */
-    static void
-findoldfile(char **destination)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+findoldfile(ಅಕ್ಷರ **destination)
 {
-    char	*bp = *destination;
-    size_t	indir_l = strlen(installdir);
-    char	*cp;
-    char	*tmpname;
-    char	*farname;
+    ಅಕ್ಷರ	*bp = *destination;
+    size_t	indir_l = ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(installdir);
+    ಅಕ್ಷರ	*cp;
+    ಅಕ್ಷರ	*tmpname;
+    ಅಕ್ಷರ	*farname;
 
     /*
      * No action needed if exe not found or not in this directory.
      */
-    if (bp == NULL || strnicmp(bp, installdir, indir_l) != 0)
-	return;
+    ಆದರೆ (bp == ಖಾಲಿ || strnicmp(bp, installdir, indir_l) != 0)
+	ಹಿಂತಿರುಗಿ;
     cp = bp + indir_l;
-    if (strchr("/\\", *cp++) == NULL
-	    || strchr(cp, '\\') != NULL
-	    || strchr(cp, '/') != NULL)
-	return;
+    ಆದರೆ (strchr("/\\", *cp++) == ಖಾಲಿ
+	    || strchr(cp, '\\') != ಖಾಲಿ
+	    || strchr(cp, '/') != ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    tmpname = alloc(strlen(cp) + 1);
+    tmpname = alloc(ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(cp) + 1);
     strcpy(tmpname, cp);
-    tmpname[strlen(tmpname) - 1] = 'x';	// .exe -> .exx
+    tmpname[ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(tmpname) - 1] = 'x';	// .exe -> .exx
 
-    if (access(tmpname, 0) == 0)
+    ಆದರೆ (access(tmpname, 0) == 0)
     {
-	printf("\nERROR: %s and %s clash.  Remove or rename %s.\n",
+	ಬರೆ("\nERROR: %s and %s clash.  Remove or rename %s.\n",
 	    tmpname, cp, tmpname);
 	myexit(1);
     }
 
-    if (rename(cp, tmpname) != 0)
+    ಆದರೆ (rename(cp, tmpname) != 0)
     {
-	printf("\nERROR: failed to rename %s to %s: %s\n",
+	ಬರೆ("\nERROR: failed to rename %s to %s: %s\n",
 	    cp, tmpname, strerror(0));
 	myexit(1);
     }
 
     farname = searchpath_save(cp);
 
-    if (rename(tmpname, cp) != 0)
+    ಆದರೆ (rename(tmpname, cp) != 0)
     {
-	printf("\nERROR: failed to rename %s back to %s: %s\n",
+	ಬರೆ("\nERROR: failed to rename %s back to %s: %s\n",
 	    tmpname, cp, strerror(0));
 	myexit(1);
     }
 
-    free(*destination);
-    free(tmpname);
+    ಬಿಡುಗಡೆ(*destination);
+    ಬಿಡುಗಡೆ(tmpname);
     *destination = farname;
 }
 
@@ -342,31 +342,31 @@ findoldfile(char **destination)
  * Check if there is a vim.[exe|bat|, gvim.[exe|bat|, etc. in the path.
  * When "check_bat_only" is TRUE, only find "default_bat_dir".
  */
-    static void
-find_bat_exe(int check_bat_only)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಕಂಡುಹಿಡಿ_bat_exe(ಪೂರ್ಣಾಂಕ check_bat_only)
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
 
     // avoid looking in the "installdir" by chdir to system root
     mch_chdir(sysdrive);
     mch_chdir("\\");
 
-    for (i = 1; i < TARGET_COUNT; ++i)
+    ಗಾಗಿ (i = 1; i < ಗುರಿ_ಎಣಿಕೆ; ++i)
     {
 	targets[i].oldbat = searchpath_save(targets[i].batname);
-	if (!check_bat_only)
+	ಆದರೆ (!check_bat_only)
 	    targets[i].oldexe = searchpath_save(targets[i].exename);
 
-	if (default_bat_dir == NULL && targets[i].oldbat != NULL)
+	ಆದರೆ (default_bat_dir == ಖಾಲಿ && targets[i].oldbat != ಖಾಲಿ)
 	{
-	    default_bat_dir = alloc(strlen(targets[i].oldbat) + 1);
+	    default_bat_dir = alloc(ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(targets[i].oldbat) + 1);
 	    strcpy(default_bat_dir, targets[i].oldbat);
-	    remove_tail(default_bat_dir);
+	    remove_ಬಾಲ(default_bat_dir);
 	}
-	if (check_bat_only && targets[i].oldbat != NULL)
+	ಆದರೆ (check_bat_only && targets[i].oldbat != ಖಾಲಿ)
 	{
-	    free(targets[i].oldbat);
-	    targets[i].oldbat = NULL;
+	    ಬಿಡುಗಡೆ(targets[i].oldbat);
+	    targets[i].oldbat = ಖಾಲಿ;
 	}
     }
 
@@ -378,31 +378,31 @@ find_bat_exe(int check_bat_only)
  * that NSIS can read it.
  * When not set, use the directory of a previously installed Vim.
  */
-    static void
-get_vim_env(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+get_vim_env(ಶೂನ್ಯ)
 {
-    char	*vim;
-    char	buf[BUFSIZE];
+    ಅಕ್ಷರ	*vim;
+    ಅಕ್ಷರ	buf[BUFSIZE];
     FILE	*fd;
-    char	fname[BUFSIZE];
+    ಅಕ್ಷರ	fname[BUFSIZE];
 
     // First get $VIMRUNTIME.  If it's set, remove the tail.
     vim = getenv("VIMRUNTIME");
-    if (vim != NULL && *vim != 0 && strlen(vim) < sizeof(buf))
+    ಆದರೆ (vim != ಖಾಲಿ && *vim != 0 && ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(vim) < ಗಾತ್ರ(buf))
     {
 	strcpy(buf, vim);
-	remove_tail(buf);
+	remove_ಬಾಲ(buf);
 	vim = buf;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	vim = getenv("VIM");
-	if (vim == NULL || *vim == 0)
+	ಆದರೆ (vim == ಖಾಲಿ || *vim == 0)
 	{
 	    // Use the directory from an old uninstall entry.
-	    if (default_vim_dir != NULL)
+	    ಆದರೆ (default_vim_dir != ಖಾಲಿ)
 		vim = default_vim_dir;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		// Let NSIS know there is no default, it should use
 		// $PROGRAMFILES.
 		vim = "";
@@ -411,12 +411,12 @@ get_vim_env(void)
 
     // NSIS also uses GetTempPath(), thus we should get the same directory
     // name as where NSIS will look for vimini.ini.
-    GetTempPath(sizeof(fname) - 12, fname);
-    add_pathsep(fname);
+    Get_ತಾತ್ಕಾಲಿಕ_ಮಾರ್ಗ(ಗಾತ್ರ(fname) - 12, fname);
+    ಕೂಡಿಸು_pathsep(fname);
     strcat(fname, "vimini.ini");
 
     fd = fopen(fname, "w");
-    if (fd != NULL)
+    ಆದರೆ (fd != ಖಾಲಿ)
     {
 	// Make it look like an .ini file, so that NSIS can read it with a
 	// ReadINIStr command.
@@ -424,207 +424,207 @@ get_vim_env(void)
 	fprintf(fd, "dir=\"%s\"\n", vim);
 	fclose(fd);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	printf("Failed to open %s\n", fname);
+	ಬರೆ("Failed to open %s\n", fname);
 	sleep(2);
     }
 }
 
-static int num_windows;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಅಂಕೆ_windows;
 
 /*
  * Callback used for EnumWindows():
  * Count the window if the title looks like it is for the uninstaller.
  */
 //ARGSUSED
-    static BOOL CALLBACK
-window_cb(HWND hwnd, LPARAM lparam UNUSED)
+    ಸ್ಥಿರ BOOL CALLBACK
+ಕಿಟಕಿ_cb(HWND hwnd, LPARAM lparam ಬಳಸದ)
 {
-    char title[256];
+    ಅಕ್ಷರ title[256];
 
     title[0] = 0;
-    GetWindowText(hwnd, title, 256);
-    if (strstr(title, "Vim ") != NULL && strstr(title, " Uninstall") != NULL)
-	++num_windows;
-    return TRUE;
+    Get_ಕಿಟಕಿ_ಪಠ್ಯ(hwnd, title, 256);
+    ಆದರೆ (ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು(title, "Vim ") != ಖಾಲಿ && ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು(title, " Uninstall") != ಖಾಲಿ)
+	++ಅಂಕೆ_windows;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
  * Run the uninstaller silently.
  */
-    static int
-run_silent_uninstall(char *uninst_exe)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಸತತ_silent_uninstall(ಅಕ್ಷರ *uninst_exe)
 {
-    char    vimrt_dir[BUFSIZE];
-    char    temp_uninst[BUFSIZE];
-    char    temp_dir[MAX_PATH];
-    char    buf[BUFSIZE * 2 + 10];
-    int	    i;
+    ಅಕ್ಷರ    vimrt_dir[BUFSIZE];
+    ಅಕ್ಷರ    ತಾತ್ಕಾಲಿಕ_uninst[BUFSIZE];
+    ಅಕ್ಷರ    ತಾತ್ಕಾಲಿಕ_dir[MAX_ಮಾರ್ಗ];
+    ಅಕ್ಷರ    buf[BUFSIZE * 2 + 10];
+    ಪೂರ್ಣಾಂಕ	    i;
     DWORD   tick;
 
     strcpy(vimrt_dir, uninst_exe);
-    remove_tail(vimrt_dir);
+    remove_ಬಾಲ(vimrt_dir);
 
-    if (!GetTempPath(sizeof(temp_dir), temp_dir))
-	return FAIL;
+    ಆದರೆ (!Get_ತಾತ್ಕಾಲಿಕ_ಮಾರ್ಗ(ಗಾತ್ರ(ತಾತ್ಕಾಲಿಕ_dir), ತಾತ್ಕಾಲಿಕ_dir))
+	ಹಿಂತಿರುಗಿ FAIL;
 
     // Copy the uninstaller to a temporary exe.
-    tick = GetTickCount();
-    for (i = 0; ; i++)
+    tick = Get_Tick_ಎಣಿಕೆ();
+    ಗಾಗಿ (i = 0; ; i++)
     {
-	sprintf(temp_uninst, "%s\\vimun%04X.exe", temp_dir,
-					  (unsigned int)((i + tick) & 0xFFFF));
-	if (CopyFile(uninst_exe, temp_uninst, TRUE))
-	    break;
-	if (GetLastError() != ERROR_FILE_EXISTS)
-	    return FAIL;
-	if (i == 65535)
-	    return FAIL;
+	sprintf(ತಾತ್ಕಾಲಿಕ_uninst, "%s\\vimun%04X.exe", ತಾತ್ಕಾಲಿಕ_dir,
+					  (ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ)((i + tick) & 0xFFFF));
+	ಆದರೆ (CopyFile(uninst_exe, ತಾತ್ಕಾಲಿಕ_uninst, TRUE))
+	    ನಿಲ್ಲಿಸು;
+	ಆದರೆ (Get_ಕೊನೆಯ_Error() != ERROR_FILE_EXISTS)
+	    ಹಿಂತಿರುಗಿ FAIL;
+	ಆದರೆ (i == 65535)
+	    ಹಿಂತಿರುಗಿ FAIL;
     }
 
     // Run the copied uninstaller silently.
-    if (strchr(temp_uninst, ' ') != NULL)
-	sprintf(buf, "\"%s\" /S _?=%s", temp_uninst, vimrt_dir);
-    else
-	sprintf(buf, "%s /S _?=%s", temp_uninst, vimrt_dir);
-    run_command(buf);
+    ಆದರೆ (strchr(ತಾತ್ಕಾಲಿಕ_uninst, ' ') != ಖಾಲಿ)
+	sprintf(buf, "\"%s\" /S _?=%s", ತಾತ್ಕಾಲಿಕ_uninst, vimrt_dir);
+    ಇಲ್ಲದಿದ್ದರೆ
+	sprintf(buf, "%s /S _?=%s", ತಾತ್ಕಾಲಿಕ_uninst, vimrt_dir);
+    ಸತತ_command(buf);
 
-    DeleteFile(temp_uninst);
-    return OK;
+    DeleteFile(ತಾತ್ಕಾಲಿಕ_uninst);
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Check for already installed Vims.
  * Return non-zero when found one.
  */
-    static int
-uninstall_check(int skip_question)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+uninstall_check(ಪೂರ್ಣಾಂಕ skip_question)
 {
-    HKEY	key_handle;
-    HKEY	uninstall_key_handle;
-    char	*uninstall_key = "software\\Microsoft\\Windows\\CurrentVersion\\Uninstall";
-    char	subkey_name_buff[BUFSIZE];
-    char	temp_string_buffer[BUFSIZE-2];
+    HKEY	ಕೀಲಿ_handle;
+    HKEY	uninstall_ಕೀಲಿ_handle;
+    ಅಕ್ಷರ	*uninstall_ಕೀಲಿ = "software\\Microsoft\\Windows\\CurrentVersion\\Uninstall";
+    ಅಕ್ಷರ	subkey_name_buff[BUFSIZE];
+    ಅಕ್ಷರ	ತಾತ್ಕಾಲಿಕ_string_ಬಫರ್[BUFSIZE-2];
     DWORD	local_bufsize;
-    FILETIME	temp_pfiletime;
-    DWORD	key_index;
-    char	input;
-    long	code;
-    DWORD	value_type;
-    DWORD	orig_num_keys;
-    DWORD	new_num_keys;
+    FILETIME	ತಾತ್ಕಾಲಿಕ_pfiletime;
+    DWORD	ಕೀಲಿ_ಸೂಚ್ಯಂಕ;
+    ಅಕ್ಷರ	ಒಳಹರಿವು;
+    ದೀರ್ಘ	ಸಂಕೇತ_2;
+    DWORD	ಮೌಲ್ಯ_type;
+    DWORD	orig_ಅಂಕೆ_ಕೀಲಿಗಳು;
+    DWORD	new_ಅಂಕೆ_ಕೀಲಿಗಳು;
     DWORD	allow_silent;
-    int		foundone = 0;
+    ಪೂರ್ಣಾಂಕ		foundone = 0;
 
-    code = RegOpenKeyEx(HKEY_LOCAL_MACHINE, uninstall_key, 0,
-				     KEY_WOW64_64KEY | KEY_READ, &key_handle);
-    CHECK_REG_ERROR(code);
+    ಸಂಕೇತ_2 = Reg_Open_ಕೀಲಿ_Ex(HKEY_LOCAL_MACHINE, uninstall_ಕೀಲಿ, 0,
+				     ಕೀಲಿ_WOW64_64_ಕೀಲಿ | ಕೀಲಿ_READ, &ಕೀಲಿ_handle);
+    CHECK_REG_ERROR(ಸಂಕೇತ_2);
 
-    key_index = 0;
-    while (TRUE)
+    ಕೀಲಿ_ಸೂಚ್ಯಂಕ = 0;
+    ಆಗ (TRUE)
     {
-	local_bufsize = sizeof(subkey_name_buff);
-	if (RegEnumKeyEx(key_handle, key_index, subkey_name_buff, &local_bufsize,
-		NULL, NULL, NULL, &temp_pfiletime) == ERROR_NO_MORE_ITEMS)
-	    break;
+	local_bufsize = ಗಾತ್ರ(subkey_name_buff);
+	ಆದರೆ (Reg_Enum_ಕೀಲಿ_Ex(ಕೀಲಿ_handle, ಕೀಲಿ_ಸೂಚ್ಯಂಕ, subkey_name_buff, &local_bufsize,
+		ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ, &ತಾತ್ಕಾಲಿಕ_pfiletime) == ERROR_NO_ಇನ್ನಷ್ಟು_ವಸ್ತುಗಳು)
+	    ನಿಲ್ಲಿಸು;
 
-	if (strncmp("Vim", subkey_name_buff, 3) == 0)
+	ಆದರೆ (ಅಕ್ಷರಸರಣಿ_ಹೋಲಿಕೆ("Vim", subkey_name_buff, 3) == 0)
 	{
 	    // Open the key named Vim*
-	    code = RegOpenKeyEx(key_handle, subkey_name_buff, 0,
-			   KEY_WOW64_64KEY | KEY_READ, &uninstall_key_handle);
-	    CHECK_REG_ERROR(code);
+	    ಸಂಕೇತ_2 = Reg_Open_ಕೀಲಿ_Ex(ಕೀಲಿ_handle, subkey_name_buff, 0,
+			   ಕೀಲಿ_WOW64_64_ಕೀಲಿ | ಕೀಲಿ_READ, &uninstall_ಕೀಲಿ_handle);
+	    CHECK_REG_ERROR(ಸಂಕೇತ_2);
 
 	    // get the DisplayName out of it to show the user
-	    local_bufsize = sizeof(temp_string_buffer);
-	    code = RegQueryValueEx(uninstall_key_handle, "displayname", 0,
-		    &value_type, (LPBYTE)temp_string_buffer,
+	    local_bufsize = ಗಾತ್ರ(ತಾತ್ಕಾಲಿಕ_string_ಬಫರ್);
+	    ಸಂಕೇತ_2 = Reg_Query_ಮೌಲ್ಯ_Ex(uninstall_ಕೀಲಿ_handle, "displayname", 0,
+		    &ಮೌಲ್ಯ_type, (LPBYTE)ತಾತ್ಕಾಲಿಕ_string_ಬಫರ್,
 		    &local_bufsize);
-	    CHECK_REG_ERROR(code);
+	    CHECK_REG_ERROR(ಸಂಕೇತ_2);
 
 	    allow_silent = 0;
-	    if (skip_question)
+	    ಆದರೆ (skip_question)
 	    {
-		DWORD varsize = sizeof(DWORD);
+		DWORD varsize = ಗಾತ್ರ(DWORD);
 
-		RegQueryValueEx(uninstall_key_handle, "AllowSilent", 0,
-			&value_type, (LPBYTE)&allow_silent,
+		Reg_Query_ಮೌಲ್ಯ_Ex(uninstall_ಕೀಲಿ_handle, "AllowSilent", 0,
+			&ಮೌಲ್ಯ_type, (LPBYTE)&allow_silent,
 			&varsize);
 	    }
 
 	    foundone = 1;
-	    printf("\n*********************************************************\n");
-	    printf("Vim Install found what looks like an existing Vim version.\n");
-	    printf("The name of the entry is:\n");
-	    printf("\n        \"%s\"\n\n", temp_string_buffer);
+	    ಬರೆ("\n*********************************************************\n");
+	    ಬರೆ("Vim Install found what looks like an existing Vim version.\n");
+	    ಬರೆ("The name of the entry is:\n");
+	    ಬರೆ("\n        \"%s\"\n\n", ತಾತ್ಕಾಲಿಕ_string_ಬಫರ್);
 
-	    printf("Installing the new version will disable part of the existing version.\n");
-	    printf("(The batch files used in a console and the \"Edit with Vim\" entry in\n");
-	    printf("the popup menu will use the new version)\n");
+	    ಬರೆ("Installing the new version will disable part of the existing version.\n");
+	    ಬರೆ("(The batch files used in a console and the \"Edit with Vim\" entry in\n");
+	    ಬರೆ("the popup menu will use the new version)\n");
 
-	    if (skip_question)
-		printf("\nRunning uninstall program for \"%s\"\n", temp_string_buffer);
-	    else
-		printf("\nDo you want to uninstall \"%s\" now?\n(y)es/(n)o)  ", temp_string_buffer);
+	    ಆದರೆ (skip_question)
+		ಬರೆ("\nRunning uninstall program for \"%s\"\n", ತಾತ್ಕಾಲಿಕ_string_ಬಫರ್);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ಬರೆ("\nDo you want to uninstall \"%s\" now?\n(y)es/(n)o)  ", ತಾತ್ಕಾಲಿಕ_string_ಬಫರ್);
 	    fflush(stdout);
 
 	    // get the UninstallString
-	    local_bufsize = sizeof(temp_string_buffer);
-	    code = RegQueryValueEx(uninstall_key_handle, "uninstallstring", 0,
-		    &value_type, (LPBYTE)temp_string_buffer, &local_bufsize);
-	    CHECK_REG_ERROR(code);
+	    local_bufsize = ಗಾತ್ರ(ತಾತ್ಕಾಲಿಕ_string_ಬಫರ್);
+	    ಸಂಕೇತ_2 = Reg_Query_ಮೌಲ್ಯ_Ex(uninstall_ಕೀಲಿ_handle, "uninstallstring", 0,
+		    &ಮೌಲ್ಯ_type, (LPBYTE)ತಾತ್ಕಾಲಿಕ_string_ಬಫರ್, &local_bufsize);
+	    CHECK_REG_ERROR(ಸಂಕೇತ_2);
 
 	    // Remember the directory, it is used as the default for NSIS.
-	    default_vim_dir = alloc(strlen(temp_string_buffer) + 1);
-	    strcpy(default_vim_dir, temp_string_buffer);
-	    remove_tail(default_vim_dir);
-	    remove_tail(default_vim_dir);
+	    default_vim_dir = alloc(ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(ತಾತ್ಕಾಲಿಕ_string_ಬಫರ್) + 1);
+	    strcpy(default_vim_dir, ತಾತ್ಕಾಲಿಕ_string_ಬಫರ್);
+	    remove_ಬಾಲ(default_vim_dir);
+	    remove_ಬಾಲ(default_vim_dir);
 
-	    input = 'n';
-	    do
+	    ಒಳಹರಿವು = 'n';
+	    ಮಾಡು
 	    {
-		if (input != 'n')
-		    printf("%c is an invalid reply.  Please enter either 'y' or 'n'\n", input);
+		ಆದರೆ (ಒಳಹರಿವು != 'n')
+		    ಬರೆ("%c is an invalid reply.  Please enter either 'y' or 'n'\n", ಒಳಹರಿವು);
 
-		if (skip_question)
-		    input = 'y';
-		else
+		ಆದರೆ (skip_question)
+		    ಒಳಹರಿವು = 'y';
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    rewind(stdin);
-		    scanf("%c", &input);
+		    scanf("%c", &ಒಳಹರಿವು);
 		}
-		switch (input)
+		ಆಯ್ಕೆ (ಒಳಹರಿವು)
 		{
-		    case 'y':
-		    case 'Y':
+		    ಸ್ಥಿತಿ 'y':
+		    ಸ್ಥಿತಿ 'Y':
 			// save the number of uninstall keys so we can know if
 			// it changed
-			RegQueryInfoKey(key_handle, NULL, NULL, NULL,
-					     &orig_num_keys, NULL, NULL, NULL,
-						      NULL, NULL, NULL, NULL);
+			Reg_Query_Info_ಕೀಲಿ(ಕೀಲಿ_handle, ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ,
+					     &orig_ಅಂಕೆ_ಕೀಲಿಗಳು, ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ,
+						      ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ);
 
 			// Find existing .bat files before deleting them.
-			find_bat_exe(TRUE);
+			ಕಂಡುಹಿಡಿ_bat_exe(TRUE);
 
-			if (allow_silent)
+			ಆದರೆ (allow_silent)
 			{
-			    if (run_silent_uninstall(temp_string_buffer)
+			    ಆದರೆ (ಸತತ_silent_uninstall(ತಾತ್ಕಾಲಿಕ_string_ಬಫರ್)
 								    == FAIL)
 				allow_silent = 0; // Retry with non silent.
 			}
-			if (!allow_silent)
+			ಆದರೆ (!allow_silent)
 			{
 			    // Execute the uninstall program.  Put it in double
 			    // quotes if there is an embedded space.
 			    {
-				char buf[BUFSIZE];
+				ಅಕ್ಷರ buf[BUFSIZE];
 
-				if (strchr(temp_string_buffer, ' ') != NULL)
-				    sprintf(buf, "\"%s\"", temp_string_buffer);
-				else
-				    strcpy(buf, temp_string_buffer);
-				run_command(buf);
+				ಆದರೆ (strchr(ತಾತ್ಕಾಲಿಕ_string_ಬಫರ್, ' ') != ಖಾಲಿ)
+				    sprintf(buf, "\"%s\"", ತಾತ್ಕಾಲಿಕ_string_ಬಫರ್);
+				ಇಲ್ಲದಿದ್ದರೆ
+				    strcpy(buf, ತಾತ್ಕಾಲಿಕ_string_ಬಫರ್);
+				ಸತತ_command(buf);
 			    }
 
 			    // Count the number of windows with a title that
@@ -633,128 +633,128 @@ uninstall_check(int skip_question)
 			    // executes the copy and exits, thus we can't wait
 			    // for the process to finish.
 			    sleep(1);  // wait for uninstaller to start up
-			    num_windows = 0;
-			    EnumWindows(window_cb, 0);
-			    if (num_windows == 0)
+			    ಅಂಕೆ_windows = 0;
+			    EnumWindows(ಕಿಟಕಿ_cb, 0);
+			    ಆದರೆ (ಅಂಕೆ_windows == 0)
 			    {
 				// Did not find the uninstaller, ask user to
 				// press Enter when done. Just in case.
-				printf("Press Enter when the uninstaller is finished\n");
+				ಬರೆ("Press Enter when the uninstaller is finished\n");
 				rewind(stdin);
-				(void)getchar();
+				(ಶೂನ್ಯ)getchar();
 			    }
-			    else
+			    ಇಲ್ಲದಿದ್ದರೆ
 			    {
-				printf("Waiting for the uninstaller to finish (press CTRL-C to abort).");
-				do
+				ಬರೆ("Waiting for the uninstaller to finish (press CTRL-C to abort).");
+				ಮಾಡು
 				{
-				    printf(".");
+				    ಬರೆ(".");
 				    fflush(stdout);
 				    sleep(1);	// wait for the uninstaller to
-						// finish
-				    num_windows = 0;
-				    EnumWindows(window_cb, 0);
-				} while (num_windows > 0);
+						//ಮುಕ್ತಾಯ
+				    ಅಂಕೆ_windows = 0;
+				    EnumWindows(ಕಿಟಕಿ_cb, 0);
+				} ಆಗ (ಅಂಕೆ_windows > 0);
 			    }
 			}
-			printf("\nDone!\n");
+			ಬರೆ("\nDone!\n");
 
 			// Check if an uninstall reg key was deleted.
 			// if it was, we want to decrement key_index.
 			// if we don't do this, we will skip the key
 			// immediately after any key that we delete.
-			RegQueryInfoKey(key_handle, NULL, NULL, NULL,
-					      &new_num_keys, NULL, NULL, NULL,
-						      NULL, NULL, NULL, NULL);
-			if (new_num_keys < orig_num_keys)
-			    key_index--;
+			Reg_Query_Info_ಕೀಲಿ(ಕೀಲಿ_handle, ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ,
+					      &new_ಅಂಕೆ_ಕೀಲಿಗಳು, ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ,
+						      ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ);
+			ಆದರೆ (new_ಅಂಕೆ_ಕೀಲಿಗಳು < orig_ಅಂಕೆ_ಕೀಲಿಗಳು)
+			    ಕೀಲಿ_ಸೂಚ್ಯಂಕ--;
 
-			input = 'y';
-			break;
+			ಒಳಹರಿವು = 'y';
+			ನಿಲ್ಲಿಸು;
 
-		    case 'n':
-		    case 'N':
+		    ಸ್ಥಿತಿ 'n':
+		    ಸ್ಥಿತಿ 'N':
 			// Do not uninstall
-			input = 'n';
-			break;
+			ಒಳಹರಿವು = 'n';
+			ನಿಲ್ಲಿಸು;
 
-		    default: // just drop through and redo the loop
-			break;
+		    ಪೂರ್ವನಿಯೋಜಿತ: // just drop through and redo the loop
+			ನಿಲ್ಲಿಸು;
 		}
 
-	    } while (input != 'n' && input != 'y');
+	    } ಆಗ (ಒಳಹರಿವು != 'n' && ಒಳಹರಿವು != 'y');
 
-	    RegCloseKey(uninstall_key_handle);
+	    Reg_Close_ಕೀಲಿ(uninstall_ಕೀಲಿ_handle);
 	}
 
-	key_index++;
+	ಕೀಲಿ_ಸೂಚ್ಯಂಕ++;
     }
-    RegCloseKey(key_handle);
+    Reg_Close_ಕೀಲಿ(ಕೀಲಿ_handle);
 
-    return foundone;
+    ಹಿಂತಿರುಗಿ foundone;
 }
 
 /*
  * Find out information about the system.
  */
-    static void
-inspect_system(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+inspect_system(ಶೂನ್ಯ)
 {
-    char	*p;
-    char	buf[BUFSIZE];
+    ಅಕ್ಷರ	*p;
+    ಅಕ್ಷರ	buf[BUFSIZE];
     FILE	*fd;
-    int		i;
-    int		foundone;
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		foundone;
 
     // This may take a little while, let the user know what we're doing.
-    printf("Inspecting system...\n");
+    ಬರೆ("Inspecting system...\n");
 
     /*
      * If $VIM is set, check that it's pointing to our directory.
      */
     p = getenv("VIM");
-    if (p != NULL && pathcmp(p, -1, installdir, runtimeidx - 1) != 0)
+    ಆದರೆ (p != ಖಾಲಿ && pathcmp(p, -1, installdir, runtimeidx - 1) != 0)
     {
-	printf("------------------------------------------------------\n");
-	printf("$VIM is set to \"%s\".\n", p);
-	printf("This is different from where this version of Vim is:\n");
+	ಬರೆ("------------------------------------------------------\n");
+	ಬರೆ("$VIM is set to \"%s\".\n", p);
+	ಬರೆ("This is different from where this version of Vim is:\n");
 	strcpy(buf, installdir);
 	*(buf + runtimeidx - 1) = NUL;
-	printf("\"%s\"\n", buf);
-	printf("You must adjust or remove the setting of $VIM,\n");
-	if (interactive)
+	ಬರೆ("\"%s\"\n", buf);
+	ಬರೆ("You must adjust or remove the setting of $VIM,\n");
+	ಆದರೆ (interactive)
 	{
-	    printf("to be able to use this install program.\n");
+	    ಬರೆ("to be able to use this install program.\n");
 	    myexit(1);
 	}
-	printf("otherwise Vim WILL NOT WORK properly!\n");
-	printf("------------------------------------------------------\n");
+	ಬರೆ("otherwise Vim WILL NOT WORK properly!\n");
+	ಬರೆ("------------------------------------------------------\n");
     }
 
     /*
      * If $VIMRUNTIME is set, check that it's pointing to our runtime directory.
      */
     p = getenv("VIMRUNTIME");
-    if (p != NULL && pathcmp(p, -1, installdir, -1) != 0)
+    ಆದರೆ (p != ಖಾಲಿ && pathcmp(p, -1, installdir, -1) != 0)
     {
-	printf("------------------------------------------------------\n");
-	printf("$VIMRUNTIME is set to \"%s\".\n", p);
-	printf("This is different from where this version of Vim is:\n");
-	printf("\"%s\"\n", installdir);
-	printf("You must adjust or remove the setting of $VIMRUNTIME,\n");
-	if (interactive)
+	ಬರೆ("------------------------------------------------------\n");
+	ಬರೆ("$VIMRUNTIME is set to \"%s\".\n", p);
+	ಬರೆ("This is different from where this version of Vim is:\n");
+	ಬರೆ("\"%s\"\n", installdir);
+	ಬರೆ("You must adjust or remove the setting of $VIMRUNTIME,\n");
+	ಆದರೆ (interactive)
 	{
-	    printf("to be able to use this install program.\n");
+	    ಬರೆ("to be able to use this install program.\n");
 	    myexit(1);
 	}
-	printf("otherwise Vim WILL NOT WORK properly!\n");
-	printf("------------------------------------------------------\n");
+	ಬರೆ("otherwise Vim WILL NOT WORK properly!\n");
+	ಬರೆ("------------------------------------------------------\n");
     }
 
     /*
      * Check if there is a vim.[exe|bat|, gvim.[exe|bat|, etc. in the path.
      */
-    find_bat_exe(FALSE);
+    ಕಂಡುಹಿಡಿ_bat_exe(FALSE);
 
     /*
      * A .exe in the install directory may be found anyway on Windows 2000.
@@ -762,21 +762,21 @@ inspect_system(void)
      * w.briscoe@ponl.com 2001-01-20
      */
     foundone = 0;
-    for (i = 1; i < TARGET_COUNT; ++i)
+    ಗಾಗಿ (i = 1; i < ಗುರಿ_ಎಣಿಕೆ; ++i)
     {
 	findoldfile(&(targets[i].oldexe));
-	if (targets[i].oldexe != NULL)
+	ಆದರೆ (targets[i].oldexe != ಖಾಲಿ)
 	    foundone = 1;
     }
 
-    if (foundone)
+    ಆದರೆ (foundone)
     {
-	printf("Warning: Found Vim executable(s) in your $PATH:\n");
-	for (i = 1; i < TARGET_COUNT; ++i)
-	    if (targets[i].oldexe != NULL)
-		printf("%s\n", targets[i].oldexe);
-	printf("It will be used instead of the version you are installing.\n");
-	printf("Please delete or rename it, or adjust your $PATH setting.\n");
+	ಬರೆ("Warning: Found Vim executable(s) in your $PATH:\n");
+	ಗಾಗಿ (i = 1; i < ಗುರಿ_ಎಣಿಕೆ; ++i)
+	    ಆದರೆ (targets[i].oldexe != ಖಾಲಿ)
+		ಬರೆ("%s\n", targets[i].oldexe);
+	ಬರೆ("It will be used instead of the version you are installing.\n");
+	ಬರೆ("Please delete or rename it, or adjust your $PATH setting.\n");
     }
 
     /*
@@ -784,18 +784,18 @@ inspect_system(void)
      */
     strcpy(oldvimrc, installdir);
     strcpy(oldvimrc + runtimeidx, "_vimrc");
-    if ((fd = fopen(oldvimrc, "r")) == NULL)
+    ಆದರೆ ((fd = fopen(oldvimrc, "r")) == ಖಾಲಿ)
     {
 	strcpy(oldvimrc + runtimeidx, "vimrc~1"); // short version of .vimrc
-	if ((fd = fopen(oldvimrc, "r")) == NULL)
+	ಆದರೆ ((fd = fopen(oldvimrc, "r")) == ಖಾಲಿ)
 	{
 	    strcpy(oldvimrc + runtimeidx, ".vimrc");
 	    fd = fopen(oldvimrc, "r");
 	}
     }
-    if (fd != NULL)
+    ಆದರೆ (fd != ಖಾಲಿ)
 	fclose(fd);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	*oldvimrc = NUL;
 }
 
@@ -804,15 +804,15 @@ inspect_system(void)
  * in the environment.  The user may type a number he remembered without
  * looking.
  */
-    static void
-add_dummy_choice(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಕೂಡಿಸು_dummy_choice(ಶೂನ್ಯ)
 {
-    choices[choice_count].installfunc = NULL;
-    choices[choice_count].active = 0;
-    choices[choice_count].changefunc = NULL;
-    choices[choice_count].text = NULL;
-    choices[choice_count].arg = 0;
-    ++choice_count;
+    choices[choice_ಎಣಿಕೆ].installfunc = ಖಾಲಿ;
+    choices[choice_ಎಣಿಕೆ].ಸಕ್ರಿಯ = 0;
+    choices[choice_ಎಣಿಕೆ].changefunc = ಖಾಲಿ;
+    choices[choice_ಎಣಿಕೆ].ಪಠ್ಯ = ಖಾಲಿ;
+    choices[choice_ಎಣಿಕೆ].arg = 0;
+    ++choice_ಎಣಿಕೆ;
 }
 
 ////////////////////////////////////////////////
@@ -821,26 +821,26 @@ add_dummy_choice(void)
 /*
  * Install the vim.bat, gvim.bat, etc. files.
  */
-    static void
-install_bat_choice(int idx)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+install_bat_choice(ಪೂರ್ಣಾಂಕ idx)
 {
-    char	*batpath = targets[choices[idx].arg].batpath;
-    char	*oldname = targets[choices[idx].arg].oldbat;
-    char	*exename = targets[choices[idx].arg].exenamearg;
-    char	*vimarg = targets[choices[idx].arg].exearg;
+    ಅಕ್ಷರ	*batpath = targets[choices[idx].arg].batpath;
+    ಅಕ್ಷರ	*oldname = targets[choices[idx].arg].oldbat;
+    ಅಕ್ಷರ	*exename = targets[choices[idx].arg].exenamearg;
+    ಅಕ್ಷರ	*vimarg = targets[choices[idx].arg].exearg;
     FILE	*fd;
 
-    if (*batpath == NUL)
-	return;
+    ಆದರೆ (*batpath == NUL)
+	ಹಿಂತಿರುಗಿ;
 
     fd = fopen(batpath, "w");
-    if (fd == NULL)
+    ಆದರೆ (fd == ಖಾಲಿ)
     {
-	printf("\nERROR: Cannot open \"%s\" for writing.\n", batpath);
-	return;
+	ಬರೆ("\nERROR: Cannot open \"%s\" for writing.\n", batpath);
+	ಹಿಂತಿರುಗಿ;
     }
 
-    need_uninstall_entry = 1;
+    need_uninstall_ನಮೂದು = 1;
 
     fprintf(fd, "@echo off\n");
     fprintf(fd, "rem -- Run Vim --\n");
@@ -858,7 +858,7 @@ install_bat_choice(int idx)
      */
     fprintf(fd, "set VIM_EXE_DIR=%s\n", installdir);
     fprintf(fd, "if exist \"%%VIM%%\\%s\\%s\" set VIM_EXE_DIR=%%VIM%%\\%s\n",
-	    VIM_VERSION_NODOT, exename, VIM_VERSION_NODOT);
+	    VIM_ಆವೃತ್ತಿ_NODOT, exename, VIM_ಆವೃತ್ತಿ_NODOT);
     fprintf(fd, "if exist \"%%VIMRUNTIME%%\\%s\" set VIM_EXE_DIR=%%VIMRUNTIME%%\n", exename);
     fprintf(fd, "\n");
 
@@ -869,7 +869,7 @@ install_bat_choice(int idx)
     fprintf(fd, ")\n");
     fprintf(fd, "\n");
 
-    if (*exename == 'g')
+    ಆದರೆ (*exename == 'g')
     {
 	fprintf(fd, "rem check --nofork argument\n");
 	fprintf(fd, "set VIMNOFORK=\n");
@@ -886,7 +886,7 @@ install_bat_choice(int idx)
 	fprintf(fd, "\n");
     }
 
-    if (*exename == 'g')
+    ಆದರೆ (*exename == 'g')
     {
 	// For gvim.exe use "start /b" to avoid that the console window
 	// stays open.
@@ -902,7 +902,7 @@ install_bat_choice(int idx)
 		exename, vimarg);
 	fprintf(fd, ")\n");
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Always use quotes, $VIM or $VIMRUNTIME might have a space.
 	fprintf(fd, "\"%%VIM_EXE_DIR%%\\%s\" %s %%*\n",
@@ -910,41 +910,41 @@ install_bat_choice(int idx)
     }
 
     fclose(fd);
-    printf("%s has been %s\n", batpath,
-	    oldname == NULL ? "created" : "overwritten");
+    ಬರೆ("%s has been %s\n", batpath,
+	    oldname == ಖಾಲಿ ? "created" : "overwritten");
 }
 
 /*
  * Make the text string for choice "idx".
  * The format "fmt" is must have one %s item, which "arg" is used for.
  */
-    static void
-alloc_text(int idx, char *fmt, char *arg)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+alloc_ಪಠ್ಯ(ಪೂರ್ಣಾಂಕ idx, ಅಕ್ಷರ *fmt, ಅಕ್ಷರ *arg)
 {
-    if (choices[idx].text != NULL)
-	free(choices[idx].text);
+    ಆದರೆ (choices[idx].ಪಠ್ಯ != ಖಾಲಿ)
+	ಬಿಡುಗಡೆ(choices[idx].ಪಠ್ಯ);
 
-    choices[idx].text = alloc(strlen(fmt) + strlen(arg) - 1);
-    sprintf(choices[idx].text, fmt, arg);
+    choices[idx].ಪಠ್ಯ = alloc(ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(fmt) + ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(arg) - 1);
+    sprintf(choices[idx].ಪಠ್ಯ, fmt, arg);
 }
 
 /*
  * Toggle the "Overwrite .../vim.bat" to "Don't overwrite".
  */
-    static void
-toggle_bat_choice(int idx)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+toggle_bat_choice(ಪೂರ್ಣಾಂಕ idx)
 {
-    char	*batname = targets[choices[idx].arg].batpath;
-    char	*oldname = targets[choices[idx].arg].oldbat;
+    ಅಕ್ಷರ	*batname = targets[choices[idx].arg].batpath;
+    ಅಕ್ಷರ	*oldname = targets[choices[idx].arg].oldbat;
 
-    if (*batname == NUL)
+    ಆದರೆ (*batname == NUL)
     {
-	alloc_text(idx, "    Overwrite %s", oldname);
+	alloc_ಪಠ್ಯ(idx, "    Overwrite %s", oldname);
 	strcpy(batname, oldname);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	alloc_text(idx, "    Do NOT overwrite %s", oldname);
+	alloc_ಪಠ್ಯ(idx, "    Do NOT overwrite %s", oldname);
 	*batname = NUL;
     }
 }
@@ -953,289 +953,289 @@ toggle_bat_choice(int idx)
  * Do some work for a batch file entry: Append the batch file name to the path
  * and set the text for the choice.
  */
-    static void
-set_bat_text(int idx, char *batpath, char *name)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_bat_ಪಠ್ಯ(ಪೂರ್ಣಾಂಕ idx, ಅಕ್ಷರ *batpath, ಅಕ್ಷರ *name)
 {
     strcat(batpath, name);
 
-    alloc_text(idx, "    Create %s", batpath);
+    alloc_ಪಠ್ಯ(idx, "    Create %s", batpath);
 }
 
 /*
  * Select a directory to write the batch file line.
  */
-    static void
-change_bat_choice(int idx)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+change_bat_choice(ಪೂರ್ಣಾಂಕ idx)
 {
-    char	*path;
-    char	*batpath;
-    char	*name;
-    int		n;
-    char	*s;
-    char	*p;
-    int		count;
-    char	**names = NULL;
-    int		i;
-    int		target = choices[idx].arg;
+    ಅಕ್ಷರ	*ಮಾರ್ಗ;
+    ಅಕ್ಷರ	*batpath;
+    ಅಕ್ಷರ	*name;
+    ಪೂರ್ಣಾಂಕ		n;
+    ಅಕ್ಷರ	*s;
+    ಅಕ್ಷರ	*p;
+    ಪೂರ್ಣಾಂಕ		ಎಣಿಕೆ_2;
+    ಅಕ್ಷರ	**ಹೆಸರುಗಳು = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		ಗುರಿ = choices[idx].arg;
 
-    name = targets[target].batname;
-    batpath = targets[target].batpath;
+    name = targets[ಗುರಿ].batname;
+    batpath = targets[ಗುರಿ].batpath;
 
-    path = getenv("PATH");
-    if (path == NULL)
+    ಮಾರ್ಗ = getenv("PATH");
+    ಆದರೆ (ಮಾರ್ಗ == ಖಾಲಿ)
     {
-	printf("\nERROR: The variable $PATH is not set\n");
-	return;
+	ಬರೆ("\nERROR: The variable $PATH is not set\n");
+	ಹಿಂತಿರುಗಿ;
     }
 
     /*
      * first round: count number of names in path;
      * second round: save names to names[].
      */
-    for (;;)
+    ಗಾಗಿ (;;)
     {
-	count = 1;
-	for (p = path; *p; )
+	ಎಣಿಕೆ_2 = 1;
+	ಗಾಗಿ (p = ಮಾರ್ಗ; *p; )
 	{
 	    s = strchr(p, ';');
-	    if (s == NULL)
-		s = p + strlen(p);
-	    if (names != NULL)
+	    ಆದರೆ (s == ಖಾಲಿ)
+		s = p + ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(p);
+	    ಆದರೆ (ಹೆಸರುಗಳು != ಖಾಲಿ)
 	    {
-		names[count] = alloc(s - p + 1);
-		strncpy(names[count], p, s - p);
-		names[count][s - p] = NUL;
+		ಹೆಸರುಗಳು[ಎಣಿಕೆ_2] = alloc(s - p + 1);
+		strncpy(ಹೆಸರುಗಳು[ಎಣಿಕೆ_2], p, s - p);
+		ಹೆಸರುಗಳು[ಎಣಿಕೆ_2][s - p] = NUL;
 	    }
-	    ++count;
+	    ++ಎಣಿಕೆ_2;
 	    p = s;
-	    if (*p != NUL)
+	    ಆದರೆ (*p != NUL)
 		++p;
 	}
-	if (names != NULL)
-	    break;
-	names = alloc((count + 1) * sizeof(char *));
+	ಆದರೆ (ಹೆಸರುಗಳು != ಖಾಲಿ)
+	    ನಿಲ್ಲಿಸು;
+	ಹೆಸರುಗಳು = alloc((ಎಣಿಕೆ_2 + 1) * ಗಾತ್ರ(ಅಕ್ಷರ *));
     }
-    names[0] = alloc(50);
-    sprintf(names[0], "Select directory to create %s in:", name);
-    names[count] = alloc(50);
-    if (choices[idx].arg == 0)
-	sprintf(names[count], "Do not create any .bat file.");
-    else
-	sprintf(names[count], "Do not create a %s file.", name);
-    n = get_choice(names, count + 1);
+    ಹೆಸರುಗಳು[0] = alloc(50);
+    sprintf(ಹೆಸರುಗಳು[0], "Select directory to create %s in:", name);
+    ಹೆಸರುಗಳು[ಎಣಿಕೆ_2] = alloc(50);
+    ಆದರೆ (choices[idx].arg == 0)
+	sprintf(ಹೆಸರುಗಳು[ಎಣಿಕೆ_2], "Do not create any .bat file.");
+    ಇಲ್ಲದಿದ್ದರೆ
+	sprintf(ಹೆಸರುಗಳು[ಎಣಿಕೆ_2], "Do not create a %s file.", name);
+    n = get_choice(ಹೆಸರುಗಳು, ಎಣಿಕೆ_2 + 1);
 
-    if (n == count)
+    ಆದರೆ (n == ಎಣಿಕೆ_2)
     {
 	// Selected last item, don't create bat file.
 	*batpath = NUL;
-	if (choices[idx].arg != 0)
-	    alloc_text(idx, "    Do NOT create %s", name);
+	ಆದರೆ (choices[idx].arg != 0)
+	    alloc_ಪಠ್ಯ(idx, "    Do NOT create %s", name);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Selected one of the paths.  For the first item only keep the path,
 	// for the others append the batch file name.
-	strcpy(batpath, names[n]);
-	add_pathsep(batpath);
-	if (choices[idx].arg != 0)
-	    set_bat_text(idx, batpath, name);
+	strcpy(batpath, ಹೆಸರುಗಳು[n]);
+	ಕೂಡಿಸು_pathsep(batpath);
+	ಆದರೆ (choices[idx].arg != 0)
+	    ಗಣ_bat_ಪಠ್ಯ(idx, batpath, name);
     }
 
-    for (i = 0; i <= count; ++i)
-	free(names[i]);
-    free(names);
+    ಗಾಗಿ (i = 0; i <= ಎಣಿಕೆ_2; ++i)
+	ಬಿಡುಗಡೆ(ಹೆಸರುಗಳು[i]);
+    ಬಿಡುಗಡೆ(ಹೆಸರುಗಳು);
 }
 
-char *bat_text_yes = "Install .bat files to use Vim at the command line:";
-char *bat_text_no = "do NOT install .bat files to use Vim at the command line";
+ಅಕ್ಷರ *bat_ಪಠ್ಯ_yes = "Install .bat files to use Vim at the command line:";
+ಅಕ್ಷರ *bat_ಪಠ್ಯ_no = "do NOT install .bat files to use Vim at the command line";
 
-    static void
-change_main_bat_choice(int idx)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+change_main_bat_choice(ಪೂರ್ಣಾಂಕ idx)
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
 
     // let the user select a default directory or NONE
     change_bat_choice(idx);
 
-    if (targets[0].batpath[0] != NUL)
-	choices[idx].text = bat_text_yes;
-    else
-	choices[idx].text = bat_text_no;
+    ಆದರೆ (targets[0].batpath[0] != NUL)
+	choices[idx].ಪಠ್ಯ = bat_ಪಠ್ಯ_yes;
+    ಇಲ್ಲದಿದ್ದರೆ
+	choices[idx].ಪಠ್ಯ = bat_ಪಠ್ಯ_no;
 
     // update the individual batch file selections
-    for (i = 1; i < TARGET_COUNT; ++i)
+    ಗಾಗಿ (i = 1; i < ಗುರಿ_ಎಣಿಕೆ; ++i)
     {
 	// Only make it active when the first item has a path and the vim.exe
 	// or gvim.exe exists (there is a changefunc then).
-	if (targets[0].batpath[0] != NUL
-		&& choices[idx + i].changefunc != NULL)
+	ಆದರೆ (targets[0].batpath[0] != NUL
+		&& choices[idx + i].changefunc != ಖಾಲಿ)
 	{
-	    choices[idx + i].active = 1;
-	    if (choices[idx + i].changefunc == change_bat_choice
+	    choices[idx + i].ಸಕ್ರಿಯ = 1;
+	    ಆದರೆ (choices[idx + i].changefunc == change_bat_choice
 		    && targets[i].batpath[0] != NUL)
 	    {
 		strcpy(targets[i].batpath, targets[0].batpath);
-		set_bat_text(idx + i, targets[i].batpath, targets[i].batname);
+		ಗಣ_bat_ಪಠ್ಯ(idx + i, targets[i].batpath, targets[i].batname);
 	    }
 	}
-	else
-	    choices[idx + i].active = 0;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    choices[idx + i].ಸಕ್ರಿಯ = 0;
     }
 }
 
 /*
  * Initialize a choice for creating a batch file.
  */
-    static void
-init_bat_choice(int target)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+init_bat_choice(ಪೂರ್ಣಾಂಕ ಗುರಿ)
 {
-    char	*batpath = targets[target].batpath;
-    char	*oldbat = targets[target].oldbat;
-    char	*p;
-    int		i;
+    ಅಕ್ಷರ	*batpath = targets[ಗುರಿ].batpath;
+    ಅಕ್ಷರ	*oldbat = targets[ಗುರಿ].oldbat;
+    ಅಕ್ಷರ	*p;
+    ಪೂರ್ಣಾಂಕ		i;
 
-    choices[choice_count].arg = target;
-    choices[choice_count].installfunc = install_bat_choice;
-    choices[choice_count].active = 1;
-    choices[choice_count].text = NULL;	// will be set below
-    if (oldbat != NULL)
+    choices[choice_ಎಣಿಕೆ].arg = ಗುರಿ;
+    choices[choice_ಎಣಿಕೆ].installfunc = install_bat_choice;
+    choices[choice_ಎಣಿಕೆ].ಸಕ್ರಿಯ = 1;
+    choices[choice_ಎಣಿಕೆ].ಪಠ್ಯ = ಖಾಲಿ;	// will be set below
+    ಆದರೆ (oldbat != ಖಾಲಿ)
     {
 	// A [g]vim.bat exists: Only choice is to overwrite it or not.
-	choices[choice_count].changefunc = toggle_bat_choice;
+	choices[choice_ಎಣಿಕೆ].changefunc = toggle_bat_choice;
 	*batpath = NUL;
-	toggle_bat_choice(choice_count);
+	toggle_bat_choice(choice_ಎಣಿಕೆ);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (default_bat_dir != NULL)
+	ಆದರೆ (default_bat_dir != ಖಾಲಿ)
 	    // Prefer using the same path as an existing .bat file.
 	    strcpy(batpath, default_bat_dir);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // No [g]vim.bat exists: Write it to a directory in $PATH.  Use
 	    // $WINDIR by default, if it's empty the first item in $PATH.
 	    p = getenv("WINDIR");
-	    if (p != NULL && *p != NUL)
+	    ಆದರೆ (p != ಖಾಲಿ && *p != NUL)
 		strcpy(batpath, p);
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		p = getenv("PATH");
-		if (p == NULL || *p == NUL)		// "cannot happen"
+		ಆದರೆ (p == ಖಾಲಿ || *p == NUL)		// "cannot happen"
 		    strcpy(batpath, "C:/Windows");
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    i = 0;
-		    while (*p != NUL && *p != ';')
+		    ಆಗ (*p != NUL && *p != ';')
 			batpath[i++] = *p++;
 		    batpath[i] = NUL;
 		}
 	    }
 	}
-	add_pathsep(batpath);
-	set_bat_text(choice_count, batpath, targets[target].batname);
+	ಕೂಡಿಸು_pathsep(batpath);
+	ಗಣ_bat_ಪಠ್ಯ(choice_ಎಣಿಕೆ, batpath, targets[ಗುರಿ].batname);
 
-	choices[choice_count].changefunc = change_bat_choice;
+	choices[choice_ಎಣಿಕೆ].changefunc = change_bat_choice;
     }
-    ++choice_count;
+    ++choice_ಎಣಿಕೆ;
 }
 
 /*
  * Set up the choices for installing .bat files.
  * For these items "arg" is the index in targets[].
  */
-    static void
-init_bat_choices(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+init_bat_choices(ಶೂನ್ಯ)
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
 
     // The first item is used to switch installing batch files on/off and
     // setting the default path.
-    choices[choice_count].text = bat_text_yes;
-    choices[choice_count].changefunc = change_main_bat_choice;
-    choices[choice_count].installfunc = NULL;
-    choices[choice_count].active = 1;
-    choices[choice_count].arg = 0;
-    ++choice_count;
+    choices[choice_ಎಣಿಕೆ].ಪಠ್ಯ = bat_ಪಠ್ಯ_yes;
+    choices[choice_ಎಣಿಕೆ].changefunc = change_main_bat_choice;
+    choices[choice_ಎಣಿಕೆ].installfunc = ಖಾಲಿ;
+    choices[choice_ಎಣಿಕೆ].ಸಕ್ರಿಯ = 1;
+    choices[choice_ಎಣಿಕೆ].arg = 0;
+    ++choice_ಎಣಿಕೆ;
 
     // Add items for each batch file target.  Only used when not disabled by
     // the first item.  When a .exe exists, don't offer to create a .bat.
-    for (i = 1; i < TARGET_COUNT; ++i)
-	if (targets[i].oldexe == NULL
+    ಗಾಗಿ (i = 1; i < ಗುರಿ_ಎಣಿಕೆ; ++i)
+	ಆದರೆ (targets[i].oldexe == ಖಾಲಿ
 		&& (targets[i].exenamearg[0] == 'g' ? has_gvim : has_vim))
 	    init_bat_choice(i);
-	else
-	    add_dummy_choice();
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಕೂಡಿಸು_dummy_choice();
 }
 
 /*
  * Install the vimrc file.
  */
-    static void
-install_vimrc(int idx UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+install_vimrc(ಪೂರ್ಣಾಂಕ idx ಬಳಸದ)
 {
     FILE	*fd, *tfd;
-    char	*fname;
+    ಅಕ್ಷರ	*fname;
 
     // If an old vimrc file exists, overwrite it.
     // Otherwise create a new one.
-    if (*oldvimrc != NUL)
+    ಆದರೆ (*oldvimrc != NUL)
 	fname = oldvimrc;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	fname = vimrc;
 
     fd = fopen(fname, "w");
-    if (fd == NULL)
+    ಆದರೆ (fd == ಖಾಲಿ)
     {
-	printf("\nERROR: Cannot open \"%s\" for writing.\n", fname);
-	return;
+	ಬರೆ("\nERROR: Cannot open \"%s\" for writing.\n", fname);
+	ಹಿಂತಿರುಗಿ;
     }
-    switch (compat_choice)
+    ಆಯ್ಕೆ (compat_choice)
     {
-	case compat_vi:
+	ಸ್ಥಿತಿ compat_vi:
 		    fprintf(fd, "\" Vi compatible\n");
 		    fprintf(fd, "set compatible\n");
-		    break;
-	case compat_vim:
+		    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ compat_vim:
 		    fprintf(fd, "\" Vim's default behavior\n");
 		    fprintf(fd, "if &compatible\n");
 		    fprintf(fd, "  set nocompatible\n");
 		    fprintf(fd, "endif\n");
-		    break;
-	case compat_some_enhancements:
+		    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ compat_some_enhancements:
 		    fprintf(fd, "\" Vim with some enhancements\n");
 		    fprintf(fd, "source $VIMRUNTIME/defaults.vim\n");
-		    break;
-	case compat_all_enhancements:
+		    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ compat_all_enhancements:
 		    fprintf(fd, "\" Vim with all enhancements\n");
 		    fprintf(fd, "source $VIMRUNTIME/vimrc_example.vim\n");
-		    break;
+		    ನಿಲ್ಲಿಸು;
     }
-    switch (remap_choice)
+    ಆಯ್ಕೆ (remap_choice)
     {
-	case remap_no:
-		    break;
-	case remap_win:
+	ಸ್ಥಿತಿ remap_no:
+		    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ remap_win:
 		    fprintf(fd, "\n");
 		    fprintf(fd, "\" Remap a few keys for Windows behavior\n");
 		    fprintf(fd, "source $VIMRUNTIME/mswin.vim\n");
-		    break;
+		    ನಿಲ್ಲಿಸು;
     }
-    switch (mouse_choice)
+    ಆಯ್ಕೆ (mouse_choice)
     {
-	case mouse_xterm:
+	ಸ್ಥಿತಿ mouse_xterm:
 		    fprintf(fd, "\n");
 		    fprintf(fd, "\" Mouse behavior (the Unix way)\n");
 		    fprintf(fd, "behave xterm\n");
-		    break;
-	case mouse_mswin:
+		    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ mouse_mswin:
 		    fprintf(fd, "\n");
 		    fprintf(fd, "\" Mouse behavior (the Windows way)\n");
 		    fprintf(fd, "behave mswin\n");
-		    break;
-	case mouse_default:
-		    break;
+		    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ mouse_default:
+		    ನಿಲ್ಲಿಸು;
     }
-    if ((tfd = fopen("diff.exe", "r")) != NULL)
+    ಆದರೆ ((tfd = fopen("diff.exe", "r")) != ಖಾಲಿ)
     {
 	// Use the diff.exe that comes with the self-extracting gvim.exe.
 	fclose(tfd);
@@ -1290,277 +1290,277 @@ install_vimrc(int idx UNUSED)
 	fprintf(fd, "\n");
     }
     fclose(fd);
-    printf("%s has been written\n", fname);
+    ಬರೆ("%s has been written\n", fname);
 }
 
-    static void
-change_vimrc_choice(int idx)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+change_vimrc_choice(ಪೂರ್ಣಾಂಕ idx)
 {
-    if (choices[idx].installfunc != NULL)
+    ಆದರೆ (choices[idx].installfunc != ಖಾಲಿ)
     {
 	// Switch to NOT change or create a vimrc file.
-	if (*oldvimrc != NUL)
-	    alloc_text(idx, "Do NOT change startup file %s", oldvimrc);
-	else
-	    alloc_text(idx, "Do NOT create startup file %s", vimrc);
-	choices[idx].installfunc = NULL;
-	choices[idx + 1].active = 0;
-	choices[idx + 2].active = 0;
-	choices[idx + 3].active = 0;
+	ಆದರೆ (*oldvimrc != NUL)
+	    alloc_ಪಠ್ಯ(idx, "Do NOT change startup file %s", oldvimrc);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    alloc_ಪಠ್ಯ(idx, "Do NOT create startup file %s", vimrc);
+	choices[idx].installfunc = ಖಾಲಿ;
+	choices[idx + 1].ಸಕ್ರಿಯ = 0;
+	choices[idx + 2].ಸಕ್ರಿಯ = 0;
+	choices[idx + 3].ಸಕ್ರಿಯ = 0;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Switch to change or create a vimrc file.
-	if (*oldvimrc != NUL)
-	    alloc_text(idx, "Overwrite startup file %s with:", oldvimrc);
-	else
-	    alloc_text(idx, "Create startup file %s with:", vimrc);
+	ಆದರೆ (*oldvimrc != NUL)
+	    alloc_ಪಠ್ಯ(idx, "Overwrite startup file %s with:", oldvimrc);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    alloc_ಪಠ್ಯ(idx, "Create startup file %s with:", vimrc);
 	choices[idx].installfunc = install_vimrc;
-	choices[idx + 1].active = 1;
-	choices[idx + 2].active = 1;
-	choices[idx + 3].active = 1;
+	choices[idx + 1].ಸಕ್ರಿಯ = 1;
+	choices[idx + 2].ಸಕ್ರಿಯ = 1;
+	choices[idx + 3].ಸಕ್ರಿಯ = 1;
     }
 }
 
 /*
  * Change the choice how to run Vim.
  */
-    static void
-change_run_choice(int idx)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+change_ಸತತ_choice(ಪೂರ್ಣಾಂಕ idx)
 {
-    compat_choice = get_choice(compat_choices, TABLE_SIZE(compat_choices));
-    alloc_text(idx, compat_text, compat_choices[compat_choice]);
+    compat_choice = get_choice(compat_choices, ಕೋಷ್ಟಕ_ಗಾತ್ರ(compat_choices));
+    alloc_ಪಠ್ಯ(idx, compat_ಪಠ್ಯ, compat_choices[compat_choice]);
 }
 
 /*
  * Change the choice if keys are to be remapped.
  */
-    static void
-change_remap_choice(int idx)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+change_remap_choice(ಪೂರ್ಣಾಂಕ idx)
 {
-    remap_choice = get_choice(remap_choices, TABLE_SIZE(remap_choices));
-    alloc_text(idx, remap_text, remap_choices[remap_choice]);
+    remap_choice = get_choice(remap_choices, ಕೋಷ್ಟಕ_ಗಾತ್ರ(remap_choices));
+    alloc_ಪಠ್ಯ(idx, remap_ಪಠ್ಯ, remap_choices[remap_choice]);
 }
 
 /*
  * Change the choice how to select text.
  */
-    static void
-change_mouse_choice(int idx)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+change_mouse_choice(ಪೂರ್ಣಾಂಕ idx)
 {
-    mouse_choice = get_choice(mouse_choices, TABLE_SIZE(mouse_choices));
-    alloc_text(idx, mouse_text, mouse_choices[mouse_choice]);
+    mouse_choice = get_choice(mouse_choices, ಕೋಷ್ಟಕ_ಗಾತ್ರ(mouse_choices));
+    alloc_ಪಠ್ಯ(idx, mouse_ಪಠ್ಯ, mouse_choices[mouse_choice]);
 }
 
-    static void
-init_vimrc_choices(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+init_vimrc_choices(ಶೂನ್ಯ)
 {
     // set path for a new _vimrc file (also when not used)
     strcpy(vimrc, installdir);
     strcpy(vimrc + runtimeidx, "_vimrc");
 
     // Set opposite value and then toggle it by calling change_vimrc_choice()
-    if (*oldvimrc == NUL)
-	choices[choice_count].installfunc = NULL;
-    else
-	choices[choice_count].installfunc = install_vimrc;
-    choices[choice_count].text = NULL;
-    change_vimrc_choice(choice_count);
-    choices[choice_count].changefunc = change_vimrc_choice;
-    choices[choice_count].active = 1;
-    ++choice_count;
+    ಆದರೆ (*oldvimrc == NUL)
+	choices[choice_ಎಣಿಕೆ].installfunc = ಖಾಲಿ;
+    ಇಲ್ಲದಿದ್ದರೆ
+	choices[choice_ಎಣಿಕೆ].installfunc = install_vimrc;
+    choices[choice_ಎಣಿಕೆ].ಪಠ್ಯ = ಖಾಲಿ;
+    change_vimrc_choice(choice_ಎಣಿಕೆ);
+    choices[choice_ಎಣಿಕೆ].changefunc = change_vimrc_choice;
+    choices[choice_ಎಣಿಕೆ].ಸಕ್ರಿಯ = 1;
+    ++choice_ಎಣಿಕೆ;
 
     // default way to run Vim
-    alloc_text(choice_count, compat_text, compat_choices[compat_choice]);
-    choices[choice_count].changefunc = change_run_choice;
-    choices[choice_count].installfunc = NULL;
-    choices[choice_count].active = (*oldvimrc == NUL);
-    ++choice_count;
+    alloc_ಪಠ್ಯ(choice_ಎಣಿಕೆ, compat_ಪಠ್ಯ, compat_choices[compat_choice]);
+    choices[choice_ಎಣಿಕೆ].changefunc = change_ಸತತ_choice;
+    choices[choice_ಎಣಿಕೆ].installfunc = ಖಾಲಿ;
+    choices[choice_ಎಣಿಕೆ].ಸಕ್ರಿಯ = (*oldvimrc == NUL);
+    ++choice_ಎಣಿಕೆ;
 
     // Whether to remap keys
-    alloc_text(choice_count, remap_text , remap_choices[remap_choice]);
-    choices[choice_count].changefunc = change_remap_choice;
-    choices[choice_count].installfunc = NULL;
-    choices[choice_count].active = (*oldvimrc == NUL);
-    ++choice_count;
+    alloc_ಪಠ್ಯ(choice_ಎಣಿಕೆ, remap_ಪಠ್ಯ , remap_choices[remap_choice]);
+    choices[choice_ಎಣಿಕೆ].changefunc = change_remap_choice;
+    choices[choice_ಎಣಿಕೆ].installfunc = ಖಾಲಿ;
+    choices[choice_ಎಣಿಕೆ].ಸಕ್ರಿಯ = (*oldvimrc == NUL);
+    ++choice_ಎಣಿಕೆ;
 
     // default way to use the mouse
-    alloc_text(choice_count, mouse_text, mouse_choices[mouse_choice]);
-    choices[choice_count].changefunc = change_mouse_choice;
-    choices[choice_count].installfunc = NULL;
-    choices[choice_count].active = (*oldvimrc == NUL);
-    ++choice_count;
+    alloc_ಪಠ್ಯ(choice_ಎಣಿಕೆ, mouse_ಪಠ್ಯ, mouse_choices[mouse_choice]);
+    choices[choice_ಎಣಿಕೆ].changefunc = change_mouse_choice;
+    choices[choice_ಎಣಿಕೆ].installfunc = ಖಾಲಿ;
+    choices[choice_ಎಣಿಕೆ].ಸಕ್ರಿಯ = (*oldvimrc == NUL);
+    ++choice_ಎಣಿಕೆ;
 }
 
-    static LONG
-reg_create_key(
-    HKEY root,
-    const char *subkey,
-    PHKEY phKey,
+    ಸ್ಥಿರ LONG
+reg_create_ಕೀಲಿ(
+    HKEY ಬೇರು,
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *subkey,
+    PHKEY ph_ಕೀಲಿ,
     DWORD flag)
 {
     DWORD disp;
 
-    *phKey = NULL;
-    return RegCreateKeyEx(
-		root, subkey,
-		0, NULL, REG_OPTION_NON_VOLATILE,
-		flag | KEY_WRITE,
-		NULL, phKey, &disp);
+    *ph_ಕೀಲಿ = ಖಾಲಿ;
+    ಹಿಂತಿರುಗಿ Reg_Create_ಕೀಲಿ_Ex(
+		ಬೇರು, subkey,
+		0, ಖಾಲಿ, REG_OPTION_NON_VOLATILE,
+		flag | ಕೀಲಿ_WRITE,
+		ಖಾಲಿ, ph_ಕೀಲಿ, &disp);
 }
 
-    static LONG
-reg_set_string_value(
-    HKEY hKey,
-    const char *value_name,
-    const char *data)
+    ಸ್ಥಿರ LONG
+reg_ಗಣ_string_ಮೌಲ್ಯ(
+    HKEY h_ಕೀಲಿ,
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಮೌಲ್ಯ_name,
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ದತ್ತಾಂಶ)
 {
-    return RegSetValueEx(hKey, value_name, 0, REG_SZ,
-				     (LPBYTE)data, (DWORD)(1 + strlen(data)));
+    ಹಿಂತಿರುಗಿ Reg_ಗಣ_ಮೌಲ್ಯ_Ex(h_ಕೀಲಿ, ಮೌಲ್ಯ_name, 0, REG_SZ,
+				     (LPBYTE)ದತ್ತಾಂಶ, (DWORD)(1 + ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(ದತ್ತಾಂಶ)));
 }
 
-    static LONG
-reg_create_key_and_value(
-    HKEY hRootKey,
-    const char *subkey,
-    const char *value_name,
-    const char *data,
+    ಸ್ಥಿರ LONG
+reg_create_ಕೀಲಿ_and_ಮೌಲ್ಯ(
+    HKEY h_ಬೇರು_ಕೀಲಿ,
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *subkey,
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಮೌಲ್ಯ_name,
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ದತ್ತಾಂಶ,
     DWORD flag)
 {
-    HKEY hKey;
-    LONG lRet = reg_create_key(hRootKey, subkey, &hKey, flag);
+    HKEY h_ಕೀಲಿ;
+    LONG lRet = reg_create_ಕೀಲಿ(h_ಬೇರು_ಕೀಲಿ, subkey, &h_ಕೀಲಿ, flag);
 
-    if (ERROR_SUCCESS == lRet)
+    ಆದರೆ (ERROR_SUCCESS == lRet)
     {
-	lRet = reg_set_string_value(hKey, value_name, data);
-	RegCloseKey(hKey);
+	lRet = reg_ಗಣ_string_ಮೌಲ್ಯ(h_ಕೀಲಿ, ಮೌಲ್ಯ_name, ದತ್ತಾಂಶ);
+	Reg_Close_ಕೀಲಿ(h_ಕೀಲಿ);
     }
-    return lRet;
+    ಹಿಂತಿರುಗಿ lRet;
 }
 
-    static LONG
-register_inproc_server(
-    HKEY hRootKey,
-    const char *clsid,
-    const char *extname,
-    const char *module,
-    const char *threading_model,
+    ಸ್ಥಿರ LONG
+ರಿಜಿಸ್ಟರ್_inproc_server(
+    HKEY h_ಬೇರು_ಕೀಲಿ,
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *clsid,
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *extname,
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *module,
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *threading_model,
     DWORD flag)
 {
     CHAR subkey[BUFSIZE];
     LONG lRet;
 
     sprintf(subkey, "CLSID\\%s", clsid);
-    lRet = reg_create_key_and_value(hRootKey, subkey, NULL, extname, flag);
-    if (ERROR_SUCCESS == lRet)
+    lRet = reg_create_ಕೀಲಿ_and_ಮೌಲ್ಯ(h_ಬೇರು_ಕೀಲಿ, subkey, ಖಾಲಿ, extname, flag);
+    ಆದರೆ (ERROR_SUCCESS == lRet)
     {
 	sprintf(subkey, "CLSID\\%s\\InProcServer32", clsid);
-	lRet = reg_create_key_and_value(hRootKey, subkey, NULL, module, flag);
-	if (ERROR_SUCCESS == lRet)
+	lRet = reg_create_ಕೀಲಿ_and_ಮೌಲ್ಯ(h_ಬೇರು_ಕೀಲಿ, subkey, ಖಾಲಿ, module, flag);
+	ಆದರೆ (ERROR_SUCCESS == lRet)
 	{
-	    lRet = reg_create_key_and_value(hRootKey, subkey,
+	    lRet = reg_create_ಕೀಲಿ_and_ಮೌಲ್ಯ(h_ಬೇರು_ಕೀಲಿ, subkey,
 					   "ThreadingModel", threading_model, flag);
 	}
     }
-    return lRet;
+    ಹಿಂತಿರುಗಿ lRet;
 }
 
-    static LONG
-register_shellex(
-    HKEY hRootKey,
-    const char *clsid,
-    const char *name,
-    const char *exe_path,
+    ಸ್ಥಿರ LONG
+ರಿಜಿಸ್ಟರ್_shellex(
+    HKEY h_ಬೇರು_ಕೀಲಿ,
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *clsid,
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *name,
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *exe_ಮಾರ್ಗ,
     DWORD flag)
 {
-    LONG lRet = reg_create_key_and_value(
-	    hRootKey,
+    LONG lRet = reg_create_ಕೀಲಿ_and_ಮೌಲ್ಯ(
+	    h_ಬೇರು_ಕೀಲಿ,
 	    "*\\shellex\\ContextMenuHandlers\\gvim",
-	    NULL,
+	    ಖಾಲಿ,
 	    clsid,
 	    flag);
 
-    if (ERROR_SUCCESS == lRet)
+    ಆದರೆ (ERROR_SUCCESS == lRet)
     {
-	lRet = reg_create_key_and_value(
+	lRet = reg_create_ಕೀಲಿ_and_ಮೌಲ್ಯ(
 		HKEY_LOCAL_MACHINE,
 		"Software\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",
 		clsid,
 		name,
 		flag);
 
-	if (ERROR_SUCCESS == lRet)
+	ಆದರೆ (ERROR_SUCCESS == lRet)
 	{
-	    lRet = reg_create_key_and_value(
+	    lRet = reg_create_ಕೀಲಿ_and_ಮೌಲ್ಯ(
 		    HKEY_LOCAL_MACHINE,
 		    "Software\\Vim\\Gvim",
 		    "path",
-		    exe_path,
+		    exe_ಮಾರ್ಗ,
 		    flag);
 	}
     }
-    return lRet;
+    ಹಿಂತಿರುಗಿ lRet;
 }
 
-    static LONG
-register_openwith(
-    HKEY hRootKey,
-    const char *exe_path,
+    ಸ್ಥಿರ LONG
+ರಿಜಿಸ್ಟರ್_openwith(
+    HKEY h_ಬೇರು_ಕೀಲಿ,
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *exe_ಮಾರ್ಗ,
     DWORD flag)
 {
-    char	exe_cmd[BUFSIZE];
+    ಅಕ್ಷರ	exe_cmd[BUFSIZE];
     LONG	lRet;
 
-    sprintf(exe_cmd, "\"%s\" \"%%1\"", exe_path);
-    lRet = reg_create_key_and_value(
-	    hRootKey,
+    sprintf(exe_cmd, "\"%s\" \"%%1\"", exe_ಮಾರ್ಗ);
+    lRet = reg_create_ಕೀಲಿ_and_ಮೌಲ್ಯ(
+	    h_ಬೇರು_ಕೀಲಿ,
 	    "Applications\\gvim.exe\\shell\\edit\\command",
-	    NULL,
+	    ಖಾಲಿ,
 	    exe_cmd,
 	    flag);
 
-    if (ERROR_SUCCESS == lRet)
+    ಆದರೆ (ERROR_SUCCESS == lRet)
     {
-	int i;
-	static const char *openwith[] = {
+	ಪೂರ್ಣಾಂಕ i;
+	ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *openwith[] = {
 		".htm\\OpenWithList\\gvim.exe",
 		".vim\\OpenWithList\\gvim.exe",
 		"*\\OpenWithList\\gvim.exe",
 	};
 
-	for (i = 0; ERROR_SUCCESS == lRet && i < (int)ARRAYSIZE(openwith); i++)
-	    lRet = reg_create_key_and_value(hRootKey, openwith[i], NULL, "", flag);
+	ಗಾಗಿ (i = 0; ERROR_SUCCESS == lRet && i < (ಪೂರ್ಣಾಂಕ)ARRAYSIZE(openwith); i++)
+	    lRet = reg_create_ಕೀಲಿ_and_ಮೌಲ್ಯ(h_ಬೇರು_ಕೀಲಿ, openwith[i], ಖಾಲಿ, "", flag);
     }
 
-    return lRet;
+    ಹಿಂತಿರುಗಿ lRet;
 }
 
-    static LONG
-register_uninstall(
-    HKEY hRootKey,
-    const char *appname,
-    const char *display_name,
-    const char *uninstall_string,
-    const char *display_icon,
-    const char *display_version,
-    const char *publisher)
+    ಸ್ಥಿರ LONG
+ರಿಜಿಸ್ಟರ್_uninstall(
+    HKEY h_ಬೇರು_ಕೀಲಿ,
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *appname,
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *display_name,
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *uninstall_string,
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *display_icon,
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *display_ಆವೃತ್ತಿ,
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *publisher)
 {
-    LONG lRet = reg_create_key_and_value(hRootKey, appname,
-			     "DisplayName", display_name, KEY_WOW64_64KEY);
+    LONG lRet = reg_create_ಕೀಲಿ_and_ಮೌಲ್ಯ(h_ಬೇರು_ಕೀಲಿ, appname,
+			     "DisplayName", display_name, ಕೀಲಿ_WOW64_64_ಕೀಲಿ);
 
-    if (ERROR_SUCCESS == lRet)
-	lRet = reg_create_key_and_value(hRootKey, appname,
-		     "UninstallString", uninstall_string, KEY_WOW64_64KEY);
-    if (ERROR_SUCCESS == lRet)
-	lRet = reg_create_key_and_value(hRootKey, appname,
-		     "DisplayIcon", display_icon, KEY_WOW64_64KEY);
-    if (ERROR_SUCCESS == lRet)
-	lRet = reg_create_key_and_value(hRootKey, appname,
-		     "DisplayVersion", display_version, KEY_WOW64_64KEY);
-    if (ERROR_SUCCESS == lRet)
-	lRet = reg_create_key_and_value(hRootKey, appname,
-		     "Publisher", publisher, KEY_WOW64_64KEY);
-    return lRet;
+    ಆದರೆ (ERROR_SUCCESS == lRet)
+	lRet = reg_create_ಕೀಲಿ_and_ಮೌಲ್ಯ(h_ಬೇರು_ಕೀಲಿ, appname,
+		     "UninstallString", uninstall_string, ಕೀಲಿ_WOW64_64_ಕೀಲಿ);
+    ಆದರೆ (ERROR_SUCCESS == lRet)
+	lRet = reg_create_ಕೀಲಿ_and_ಮೌಲ್ಯ(h_ಬೇರು_ಕೀಲಿ, appname,
+		     "DisplayIcon", display_icon, ಕೀಲಿ_WOW64_64_ಕೀಲಿ);
+    ಆದರೆ (ERROR_SUCCESS == lRet)
+	lRet = reg_create_ಕೀಲಿ_and_ಮೌಲ್ಯ(h_ಬೇರು_ಕೀಲಿ, appname,
+		     "DisplayVersion", display_ಆವೃತ್ತಿ, ಕೀಲಿ_WOW64_64_ಕೀಲಿ);
+    ಆದರೆ (ERROR_SUCCESS == lRet)
+	lRet = reg_create_ಕೀಲಿ_and_ಮೌಲ್ಯ(h_ಬೇರು_ಕೀಲಿ, appname,
+		     "Publisher", publisher, ಕೀಲಿ_WOW64_64_ಕೀಲಿ);
+    ಹಿಂತಿರುಗಿ lRet;
 }
 
 /*
@@ -1570,117 +1570,117 @@ register_uninstall(
  * - to uninstall Vim
  */
 //ARGSUSED
-    static int
-install_registry(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+install_registry(ಶೂನ್ಯ)
 {
     LONG	lRet = ERROR_SUCCESS;
-    const char	*vim_ext_ThreadingModel = "Apartment";
-    const char	*vim_ext_name = "Vim Shell Extension";
-    const char	*vim_ext_clsid = "{51EEE242-AD87-11d3-9C1E-0090278BBD99}";
-    char	vim_exe_path[MAX_PATH];
-    char	display_name[BUFSIZE];
-    char	uninstall_string[BUFSIZE];
-    char	icon_string[BUFSIZE];
-    char	version_string[BUFSIZE];
-    int		i;
-    int		loop_count = is_64bit_os() ? 2 : 1;
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ	*vim_ext_ThreadingModel = "Apartment";
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ	*vim_ext_name = "Vim Shell Extension";
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ	*vim_ext_clsid = "{51EEE242-AD87-11d3-9C1E-0090278BBD99}";
+    ಅಕ್ಷರ	vim_exe_ಮಾರ್ಗ[MAX_ಮಾರ್ಗ];
+    ಅಕ್ಷರ	display_name[BUFSIZE];
+    ಅಕ್ಷರ	uninstall_string[BUFSIZE];
+    ಅಕ್ಷರ	icon_string[BUFSIZE];
+    ಅಕ್ಷರ	ಆವೃತ್ತಿ_string[BUFSIZE];
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		loop_ಎಣಿಕೆ = is_64bit_os() ? 2 : 1;
     DWORD	flag;
 
-    sprintf(vim_exe_path, "%s\\gvim.exe", installdir);
+    sprintf(vim_exe_ಮಾರ್ಗ, "%s\\gvim.exe", installdir);
 
-    if (install_popup)
+    ಆದರೆ (install_popup)
     {
-	char	    bufg[BUFSIZE];
+	ಅಕ್ಷರ	    bufg[BUFSIZE];
 
-	printf("Creating \"Edit with Vim\" popup menu entry\n");
+	ಬರೆ("Creating \"Edit with Vim\" popup menu entry\n");
 
-	for (i = 0; i < loop_count; i++)
+	ಗಾಗಿ (i = 0; i < loop_ಎಣಿಕೆ; i++)
 	{
-	    if (i == 0)
+	    ಆದರೆ (i == 0)
 	    {
-		sprintf(bufg, "%s\\" GVIMEXT32_PATH, installdir);
-		flag = KEY_WOW64_32KEY;
+		sprintf(bufg, "%s\\" GVIMEXT32_ಮಾರ್ಗ, installdir);
+		flag = ಕೀಲಿ_WOW64_32_ಕೀಲಿ;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		sprintf(bufg, "%s\\" GVIMEXT64_PATH, installdir);
-		flag = KEY_WOW64_64KEY;
+		sprintf(bufg, "%s\\" GVIMEXT64_ಮಾರ್ಗ, installdir);
+		flag = ಕೀಲಿ_WOW64_64_ಕೀಲಿ;
 	    }
 
-	    lRet = register_inproc_server(
-		    HKEY_CLASSES_ROOT, vim_ext_clsid, vim_ext_name,
+	    lRet = ರಿಜಿಸ್ಟರ್_inproc_server(
+		    HKEY_CLASSES_ಬೇರು, vim_ext_clsid, vim_ext_name,
 		    bufg, vim_ext_ThreadingModel, flag);
-	    if (ERROR_SUCCESS != lRet)
-		return FAIL;
-	    lRet = register_shellex(
-		    HKEY_CLASSES_ROOT, vim_ext_clsid, vim_ext_name,
-		    vim_exe_path, flag);
-	    if (ERROR_SUCCESS != lRet)
-		return FAIL;
+	    ಆದರೆ (ERROR_SUCCESS != lRet)
+		ಹಿಂತಿರುಗಿ FAIL;
+	    lRet = ರಿಜಿಸ್ಟರ್_shellex(
+		    HKEY_CLASSES_ಬೇರು, vim_ext_clsid, vim_ext_name,
+		    vim_exe_ಮಾರ್ಗ, flag);
+	    ಆದರೆ (ERROR_SUCCESS != lRet)
+		ಹಿಂತಿರುಗಿ FAIL;
 	}
     }
 
-    if (install_openwith)
+    ಆದರೆ (install_openwith)
     {
-	printf("Creating \"Open with ...\" list entry\n");
+	ಬರೆ("Creating \"Open with ...\" list entry\n");
 
-	for (i = 0; i < loop_count; i++)
+	ಗಾಗಿ (i = 0; i < loop_ಎಣಿಕೆ; i++)
 	{
-	    if (i == 0)
-		flag = KEY_WOW64_32KEY;
-	    else
-		flag = KEY_WOW64_64KEY;
+	    ಆದರೆ (i == 0)
+		flag = ಕೀಲಿ_WOW64_32_ಕೀಲಿ;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		flag = ಕೀಲಿ_WOW64_64_ಕೀಲಿ;
 
-	    lRet = register_openwith(HKEY_CLASSES_ROOT, vim_exe_path, flag);
-	    if (ERROR_SUCCESS != lRet)
-		return FAIL;
+	    lRet = ರಿಜಿಸ್ಟರ್_openwith(HKEY_CLASSES_ಬೇರು, vim_exe_ಮಾರ್ಗ, flag);
+	    ಆದರೆ (ERROR_SUCCESS != lRet)
+		ಹಿಂತಿರುಗಿ FAIL;
 	}
     }
 
-    printf("Creating an uninstall entry\n");
-    sprintf(display_name, "Vim " VIM_VERSION_SHORT
-#ifdef _M_ARM64
+    ಬರೆ("Creating an uninstall entry\n");
+    sprintf(display_name, "Vim " VIM_ಆವೃತ್ತಿ_SHORT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ _M_ARM64
 	    " (arm64)"
-#elif _M_X64
+#ಅಥವಾಆದರೆ _M_X64
 	    " (x64)"
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    );
 
     // For the NSIS installer use the generated uninstaller.
-    if (interactive)
+    ಆದರೆ (interactive)
 	sprintf(uninstall_string, "%s\\uninstall.exe", installdir);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	sprintf(uninstall_string, "%s\\uninstall-gui.exe", installdir);
 
     sprintf(icon_string, "%s\\gvim.exe,0", installdir);
 
-    sprintf(version_string, VIM_VERSION_SHORT "." VIM_VERSION_PATCHLEVEL_STR);
+    sprintf(ಆವೃತ್ತಿ_string, VIM_ಆವೃತ್ತಿ_SHORT "." VIM_ಆವೃತ್ತಿ_PATCHLEVEL_STR);
 
-    lRet = register_uninstall(
+    lRet = ರಿಜಿಸ್ಟರ್_uninstall(
 	HKEY_LOCAL_MACHINE,
-	"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Vim " VIM_VERSION_SHORT,
+	"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Vim " VIM_ಆವೃತ್ತಿ_SHORT,
 	display_name,
 	uninstall_string,
 	icon_string,
-	version_string,
+	ಆವೃತ್ತಿ_string,
 	"The Vim Project");
-    if (ERROR_SUCCESS != lRet)
-	return FAIL;
+    ಆದರೆ (ERROR_SUCCESS != lRet)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-    static void
-change_popup_choice(int idx)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+change_popup_choice(ಪೂರ್ಣಾಂಕ idx)
 {
-    if (install_popup == 0)
+    ಆದರೆ (install_popup == 0)
     {
-	choices[idx].text = "Install an entry for Vim in the popup menu for the right\n    mouse button so that you can edit any file with Vim";
+	choices[idx].ಪಠ್ಯ = "Install an entry for Vim in the popup menu for the right\n    mouse button so that you can edit any file with Vim";
 	install_popup = 1;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	choices[idx].text = "Do NOT install an entry for Vim in the popup menu for the\n    right mouse button to edit any file with Vim";
+	choices[idx].ಪಠ್ಯ = "Do NOT install an entry for Vim in the popup menu for the\n    right mouse button to edit any file with Vim";
 	install_popup = 0;
     }
 }
@@ -1689,36 +1689,36 @@ change_popup_choice(int idx)
  * Only add the choice for the popup menu entry when gvim.exe was found and
  * both gvimext.dll and regedit.exe exist.
  */
-    static void
-init_popup_choice(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+init_popup_choice(ಶೂನ್ಯ)
 {
-    struct stat	st;
+    ರಚನೆ stat	st;
 
-    if (has_gvim
-	    && (stat(GVIMEXT32_PATH, &st) >= 0
-		|| stat(GVIMEXT64_PATH, &st) >= 0))
+    ಆದರೆ (has_gvim
+	    && (stat(GVIMEXT32_ಮಾರ್ಗ, &st) >= 0
+		|| stat(GVIMEXT64_ಮಾರ್ಗ, &st) >= 0))
     {
-	choices[choice_count].changefunc = change_popup_choice;
-	choices[choice_count].installfunc = NULL;
-	choices[choice_count].active = 1;
-	change_popup_choice(choice_count);  // set the text
-	++choice_count;
+	choices[choice_ಎಣಿಕೆ].changefunc = change_popup_choice;
+	choices[choice_ಎಣಿಕೆ].installfunc = ಖಾಲಿ;
+	choices[choice_ಎಣಿಕೆ].ಸಕ್ರಿಯ = 1;
+	change_popup_choice(choice_ಎಣಿಕೆ);  // set the text
+	++choice_ಎಣಿಕೆ;
     }
-    else
-	add_dummy_choice();
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಕೂಡಿಸು_dummy_choice();
 }
 
-    static void
-change_openwith_choice(int idx)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+change_openwith_choice(ಪೂರ್ಣಾಂಕ idx)
 {
-    if (install_openwith == 0)
+    ಆದರೆ (install_openwith == 0)
     {
-	choices[idx].text = "Add Vim to the \"Open With...\" list in the popup menu for the right\n    mouse button so that you can edit any file with Vim";
+	choices[idx].ಪಠ್ಯ = "Add Vim to the \"Open With...\" list in the popup menu for the right\n    mouse button so that you can edit any file with Vim";
 	install_openwith = 1;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	choices[idx].text = "Do NOT add Vim to the \"Open With...\" list in the popup menu for the\n    right mouse button to edit any file with Vim";
+	choices[idx].ಪಠ್ಯ = "Do NOT add Vim to the \"Open With...\" list in the popup menu for the\n    right mouse button to edit any file with Vim";
 	install_openwith = 0;
     }
 }
@@ -1727,19 +1727,19 @@ change_openwith_choice(int idx)
  * Only add the choice for the open-with menu entry when gvim.exe was found
  * and regedit.exe exist.
  */
-    static void
-init_openwith_choice(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+init_openwith_choice(ಶೂನ್ಯ)
 {
-    if (has_gvim)
+    ಆದರೆ (has_gvim)
     {
-	choices[choice_count].changefunc = change_openwith_choice;
-	choices[choice_count].installfunc = NULL;
-	choices[choice_count].active = 1;
-	change_openwith_choice(choice_count);  // set the text
-	++choice_count;
+	choices[choice_ಎಣಿಕೆ].changefunc = change_openwith_choice;
+	choices[choice_ಎಣಿಕೆ].installfunc = ಖಾಲಿ;
+	choices[choice_ಎಣಿಕೆ].ಸಕ್ರಿಯ = 1;
+	change_openwith_choice(choice_ಎಣಿಕೆ);  // set the text
+	++choice_ಎಣಿಕೆ;
     }
-    else
-	add_dummy_choice();
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಕೂಡಿಸು_dummy_choice();
 }
 
 /*
@@ -1749,14 +1749,14 @@ init_openwith_choice(void)
  *
  * NOTE:  Currently untested with mingw.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 create_shortcut(
-	const char *shortcut_name,
-	const char *iconfile_path,
-	int	    iconindex,
-	const char *shortcut_target,
-	const char *shortcut_args,
-	const char *workingdir
+	ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *shortcut_name,
+	ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *iconfile_ಮಾರ್ಗ,
+	ಪೂರ್ಣಾಂಕ	    iconindex,
+	ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *shortcut_ಗುರಿ,
+	ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *shortcut_ವಾದಗಳು,
+	ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *workingdir
 	)
 {
     IShellLink	    *shelllink_ptr;
@@ -1764,64 +1764,64 @@ create_shortcut(
     IPersistFile	    *persistfile_ptr;
 
     // Initialize COM library
-    hres = CoInitialize(NULL);
-    if (!SUCCEEDED(hres))
+    hres = CoInitialize(ಖಾಲಿ);
+    ಆದರೆ (!SUCCEEDED(hres))
     {
-	printf("Error:  Could not open the COM library.  Not creating shortcut.\n");
-	return FAIL;
+	ಬರೆ("Error:  Could not open the COM library.  Not creating shortcut.\n");
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
     // Instantiate a COM object for the ShellLink, store a pointer to it
     // in shelllink_ptr.
     hres = CoCreateInstance(&CLSID_ShellLink,
-			   NULL,
+			   ಖಾಲಿ,
 			   CLSCTX_INPROC_SERVER,
 			   &IID_IShellLink,
-			   (void **) &shelllink_ptr);
+			   (ಶೂನ್ಯ **) &shelllink_ptr);
 
-    if (SUCCEEDED(hres)) // If the instantiation was successful...
+    ಆದರೆ (SUCCEEDED(hres)) // If the instantiation was successful...
     {
 	// ...Then build a PersistFile interface for the ShellLink so we can
 	// save it as a file after we build it.
 	hres = shelllink_ptr->lpVtbl->QueryInterface(shelllink_ptr,
-		&IID_IPersistFile, (void **) &persistfile_ptr);
+		&IID_IPersistFile, (ಶೂನ್ಯ **) &persistfile_ptr);
 
-	if (SUCCEEDED(hres))
+	ಆದರೆ (SUCCEEDED(hres))
 	{
 	    wchar_t wsz[BUFSIZE];
 
 	    // translate the (possibly) multibyte shortcut filename to windows
 	    // Unicode so it can be used as a file name.
-	    MultiByteToWideChar(CP_ACP, 0, shortcut_name, -1, wsz, sizeof(wsz)/sizeof(wsz[0]));
+	    Multi_Byte_ಗಮ್ಯ_Wide_Char(CP_ACP, 0, shortcut_name, -1, wsz, ಗಾತ್ರ(wsz)/ಗಾತ್ರ(wsz[0]));
 
 	    // set the attributes
-	    shelllink_ptr->lpVtbl->SetPath(shelllink_ptr, shortcut_target);
-	    shelllink_ptr->lpVtbl->SetWorkingDirectory(shelllink_ptr,
+	    shelllink_ptr->lpVtbl->ಗಣ_ಮಾರ್ಗ(shelllink_ptr, shortcut_ಗುರಿ);
+	    shelllink_ptr->lpVtbl->ಗಣ_Working_Directory(shelllink_ptr,
 								  workingdir);
-	    shelllink_ptr->lpVtbl->SetIconLocation(shelllink_ptr,
-						    iconfile_path, iconindex);
-	    shelllink_ptr->lpVtbl->SetArguments(shelllink_ptr, shortcut_args);
+	    shelllink_ptr->lpVtbl->ಗಣ_Icon_Location(shelllink_ptr,
+						    iconfile_ಮಾರ್ಗ, iconindex);
+	    shelllink_ptr->lpVtbl->ಗಣ_Arguments(shelllink_ptr, shortcut_ವಾದಗಳು);
 
 	    // save the shortcut to a file and return the PersistFile object
 	    persistfile_ptr->lpVtbl->Save(persistfile_ptr, wsz, 1);
 	    persistfile_ptr->lpVtbl->Release(persistfile_ptr);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    printf("QueryInterface Error\n");
-	    return FAIL;
+	    ಬರೆ("QueryInterface Error\n");
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
 
 	// Return the ShellLink object
 	shelllink_ptr->lpVtbl->Release(shelllink_ptr);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	printf("CoCreateInstance Error - hres = %08x\n", (int)hres);
-	return FAIL;
+	ಬರೆ("CoCreateInstance Error - hres = %08x\n", (ಪೂರ್ಣಾಂಕ)hres);
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
@@ -1829,55 +1829,55 @@ create_shortcut(
  *
  * Return 0 on error, non-zero on success
  */
-   int
+   ಪೂರ್ಣಾಂಕ
 build_link_name(
-	char	   *link_path,
-	const char *link_name,
-	const char *shell_folder_name)
+	ಅಕ್ಷರ	   *link_ಮಾರ್ಗ,
+	ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *link_name,
+	ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *shell_folder_name)
 {
-    char	shell_folder_path[MAX_PATH];
+    ಅಕ್ಷರ	shell_folder_ಮಾರ್ಗ[MAX_ಮಾರ್ಗ];
 
-    if (get_shell_folder_path(shell_folder_path, shell_folder_name) == FAIL)
+    ಆದರೆ (get_shell_folder_ಮಾರ್ಗ(shell_folder_ಮಾರ್ಗ, shell_folder_name) == FAIL)
     {
-	printf("An error occurred while attempting to find the path to %s.\n",
+	ಬರೆ("An error occurred while attempting to find the path to %s.\n",
 							   shell_folder_name);
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
     // Make sure the directory exists (create Start Menu\Programs\Vim).
     // Ignore errors if it already exists.
-    vim_mkdir(shell_folder_path, 0755);
+    vim_mkdir(shell_folder_ಮಾರ್ಗ, 0755);
 
     // build the path to the shortcut and the path to gvim.exe
-    sprintf(link_path, "%s\\%s.lnk", shell_folder_path, link_name);
+    sprintf(link_ಮಾರ್ಗ, "%s\\%s.lnk", shell_folder_ಮಾರ್ಗ, link_name);
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 build_shortcut(
-	const char *name,	// Name of the shortcut
-	const char *exename,	// Name of the executable (e.g., vim.exe)
-	const char *args,
-	const char *shell_folder,
-	const char *workingdir)
+	ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *name,	// Name of the shortcut
+	ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *exename,	// Name of the executable (e.g., vim.exe)
+	ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ವಾದಗಳು,
+	ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *shell_folder,
+	ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *workingdir)
 {
-    char	executable_path[BUFSIZE];
-    char	link_name[BUFSIZE];
+    ಅಕ್ಷರ	executable_ಮಾರ್ಗ[BUFSIZE];
+    ಅಕ್ಷರ	link_name[BUFSIZE];
 
-    sprintf(executable_path, "%s\\%s", installdir, exename);
+    sprintf(executable_ಮಾರ್ಗ, "%s\\%s", installdir, exename);
 
-    if (build_link_name(link_name, name, shell_folder) == FAIL)
+    ಆದರೆ (build_link_name(link_name, name, shell_folder) == FAIL)
     {
-	printf("An error has occurred.  A shortcut to %s will not be created %s.\n",
+	ಬರೆ("An error has occurred.  A shortcut to %s will not be created %s.\n",
 		name,
 		*shell_folder == 'd' ? "on the desktop" : "in the Start menu");
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
 
     // Create the shortcut:
-    return create_shortcut(link_name, executable_path, 0,
-					   executable_path, args, workingdir);
+    ಹಿಂತಿರುಗಿ create_shortcut(link_name, executable_ಮಾರ್ಗ, 0,
+					   executable_ಮಾರ್ಗ, ವಾದಗಳು, workingdir);
 }
 
 /*
@@ -1886,87 +1886,87 @@ build_shortcut(
  * current directory to be c:\Windows\system32 on Windows 7. Use environment
  * variables instead.
  */
-#define WORKDIR "%HOMEDRIVE%%HOMEPATH%"
+#ವ್ಯಾಖ್ಯಾನಿಸು WORKDIR "%HOMEDRIVE%%HOMEPATH%"
 
 /*
  * Create shortcut(s) in the Start Menu\Programs\Vim folder.
  */
-    static void
-install_start_menu(int idx UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+install_ಆರಂಭ_menu(ಪೂರ್ಣಾಂಕ idx ಬಳಸದ)
 {
-    need_uninstall_entry = 1;
-    printf("Creating start menu\n");
-    if (has_vim)
+    need_uninstall_ನಮೂದು = 1;
+    ಬರೆ("Creating start menu\n");
+    ಆದರೆ (has_vim)
     {
-	if (build_shortcut("Vim", "vim.exe", "",
+	ಆದರೆ (build_shortcut("Vim", "vim.exe", "",
 					      VIM_STARTMENU, WORKDIR) == FAIL)
-	    return;
-	if (build_shortcut("Vim Read-only", "vim.exe", "-R",
+	    ಹಿಂತಿರುಗಿ;
+	ಆದರೆ (build_shortcut("Vim Read-only", "vim.exe", "-R",
 					      VIM_STARTMENU, WORKDIR) == FAIL)
-	    return;
-	if (build_shortcut("Vim Diff", "vim.exe", "-d",
+	    ಹಿಂತಿರುಗಿ;
+	ಆದರೆ (build_shortcut("Vim Diff", "vim.exe", "-d",
 					      VIM_STARTMENU, WORKDIR) == FAIL)
-	    return;
+	    ಹಿಂತಿರುಗಿ;
     }
-    if (has_gvim)
+    ಆದರೆ (has_gvim)
     {
-	if (build_shortcut("gVim", "gvim.exe", "",
+	ಆದರೆ (build_shortcut("gVim", "gvim.exe", "",
 					      VIM_STARTMENU, WORKDIR) == FAIL)
-	    return;
-	if (build_shortcut("gVim Easy", "gvim.exe", "-y",
+	    ಹಿಂತಿರುಗಿ;
+	ಆದರೆ (build_shortcut("gVim Easy", "gvim.exe", "-y",
 					      VIM_STARTMENU, WORKDIR) == FAIL)
-	    return;
-	if (build_shortcut("gVim Read-only", "gvim.exe", "-R",
+	    ಹಿಂತಿರುಗಿ;
+	ಆದರೆ (build_shortcut("gVim Read-only", "gvim.exe", "-R",
 					      VIM_STARTMENU, WORKDIR) == FAIL)
-	    return;
-	if (build_shortcut("gVim Diff", "gvim.exe", "-d",
+	    ಹಿಂತಿರುಗಿ;
+	ಆದರೆ (build_shortcut("gVim Diff", "gvim.exe", "-d",
 					      VIM_STARTMENU, WORKDIR) == FAIL)
-	    return;
+	    ಹಿಂತಿರುಗಿ;
     }
-    if (build_shortcut("Uninstall",
+    ಆದರೆ (build_shortcut("Uninstall",
 		interactive ? "uninstall.exe" : "uninstall-gui.exe", "",
 					   VIM_STARTMENU, installdir) == FAIL)
-	return;
+	ಹಿಂತಿರುಗಿ;
     // For Windows NT the working dir of the vimtutor.bat must be right,
     // otherwise gvim.exe won't be found and using gvimbat doesn't work.
-    if (build_shortcut("Vim tutor", "vimtutor.bat", "",
+    ಆದರೆ (build_shortcut("Vim tutor", "vimtutor.bat", "",
 					   VIM_STARTMENU, installdir) == FAIL)
-	return;
-    if (build_shortcut("Help", has_gvim ? "gvim.exe" : "vim.exe", "-c h",
+	ಹಿಂತಿರುಗಿ;
+    ಆದರೆ (build_shortcut("Help", has_gvim ? "gvim.exe" : "vim.exe", "-c h",
 					      VIM_STARTMENU, WORKDIR) == FAIL)
-	return;
+	ಹಿಂತಿರುಗಿ;
     {
-	char	shell_folder_path[BUFSIZE];
+	ಅಕ್ಷರ	shell_folder_ಮಾರ್ಗ[BUFSIZE];
 
 	// Creating the URL shortcut works a bit differently...
-	if (get_shell_folder_path(shell_folder_path, VIM_STARTMENU) == FAIL)
+	ಆದರೆ (get_shell_folder_ಮಾರ್ಗ(shell_folder_ಮಾರ್ಗ, VIM_STARTMENU) == FAIL)
 	{
-	    printf("Finding the path of the Start menu failed\n");
-	    return ;
+	    ಬರೆ("Finding the path of the Start menu failed\n");
+	    ಹಿಂತಿರುಗಿ ;
 	}
-	add_pathsep(shell_folder_path);
-	strcat(shell_folder_path, "Vim Online.url");
-	if (!WritePrivateProfileString("InternetShortcut", "URL",
-				    "https://www.vim.org/", shell_folder_path))
+	ಕೂಡಿಸು_pathsep(shell_folder_ಮಾರ್ಗ);
+	strcat(shell_folder_ಮಾರ್ಗ, "Vim Online.url");
+	ಆದರೆ (!Write_ಖಾಸಗಿ_Profile_String("InternetShortcut", "URL",
+				    "https://www.vim.org/", shell_folder_ಮಾರ್ಗ))
 	{
-	    printf("Creating the Vim online URL failed\n");
-	    return;
+	    ಬರೆ("Creating the Vim online URL failed\n");
+	    ಹಿಂತಿರುಗಿ;
 	}
     }
 }
 
-    static void
-toggle_startmenu_choice(int idx)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+toggle_startmenu_choice(ಪೂರ್ಣಾಂಕ idx)
 {
-    if (choices[idx].installfunc == NULL)
+    ಆದರೆ (choices[idx].installfunc == ಖಾಲಿ)
     {
-	choices[idx].installfunc = install_start_menu;
-	choices[idx].text = "Add Vim to the Start menu";
+	choices[idx].installfunc = install_ಆರಂಭ_menu;
+	choices[idx].ಪಠ್ಯ = "Add Vim to the Start menu";
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	choices[idx].installfunc = NULL;
-	choices[idx].text = "Do NOT add Vim to the Start menu";
+	choices[idx].installfunc = ಖಾಲಿ;
+	choices[idx].ಪಠ್ಯ = "Do NOT add Vim to the Start menu";
     }
 }
 
@@ -1979,157 +1979,157 @@ toggle_startmenu_choice(int idx)
  *    - the location of the file being edited if a file is supplied (ie via
  *      drag and drop onto the shortcut).
  */
-    void
-install_shortcut_gvim(int idx)
+    ಶೂನ್ಯ
+install_shortcut_gvim(ಪೂರ್ಣಾಂಕ idx)
 {
     // Create shortcut(s) on the desktop
-    if (choices[idx].arg)
+    ಆದರೆ (choices[idx].arg)
     {
-	(void)build_shortcut(icon_names[0], "gvim.exe",
+	(ಶೂನ್ಯ)build_shortcut(icon_ಹೆಸರುಗಳು[0], "gvim.exe",
 						      "", "desktop", WORKDIR);
-	need_uninstall_entry = 1;
+	need_uninstall_ನಮೂದು = 1;
     }
 }
 
-    void
-install_shortcut_evim(int idx)
+    ಶೂನ್ಯ
+install_shortcut_evim(ಪೂರ್ಣಾಂಕ idx)
 {
-    if (choices[idx].arg)
+    ಆದರೆ (choices[idx].arg)
     {
-	(void)build_shortcut(icon_names[1], "gvim.exe",
+	(ಶೂನ್ಯ)build_shortcut(icon_ಹೆಸರುಗಳು[1], "gvim.exe",
 						    "-y", "desktop", WORKDIR);
-	need_uninstall_entry = 1;
+	need_uninstall_ನಮೂದು = 1;
     }
 }
 
-    void
-install_shortcut_gview(int idx)
+    ಶೂನ್ಯ
+install_shortcut_gview(ಪೂರ್ಣಾಂಕ idx)
 {
-    if (choices[idx].arg)
+    ಆದರೆ (choices[idx].arg)
     {
-	(void)build_shortcut(icon_names[2], "gvim.exe",
+	(ಶೂನ್ಯ)build_shortcut(icon_ಹೆಸರುಗಳು[2], "gvim.exe",
 						    "-R", "desktop", WORKDIR);
-	need_uninstall_entry = 1;
+	need_uninstall_ನಮೂದು = 1;
     }
 }
 
-    void
-toggle_shortcut_choice(int idx)
+    ಶೂನ್ಯ
+toggle_shortcut_choice(ಪೂರ್ಣಾಂಕ idx)
 {
-    char	*arg;
+    ಅಕ್ಷರ	*arg;
 
-    if (choices[idx].installfunc == install_shortcut_gvim)
+    ಆದರೆ (choices[idx].installfunc == install_shortcut_gvim)
 	arg = "gVim";
-    else if (choices[idx].installfunc == install_shortcut_evim)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (choices[idx].installfunc == install_shortcut_evim)
 	arg = "gVim Easy";
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	arg = "gVim Read-only";
-    if (choices[idx].arg)
+    ಆದರೆ (choices[idx].arg)
     {
 	choices[idx].arg = 0;
-	alloc_text(idx, "Do NOT create a desktop icon for %s", arg);
+	alloc_ಪಠ್ಯ(idx, "Do NOT create a desktop icon for %s", arg);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	choices[idx].arg = 1;
-	alloc_text(idx, "Create a desktop icon for %s", arg);
+	alloc_ಪಠ್ಯ(idx, "Create a desktop icon for %s", arg);
     }
 }
 
-    static void
-init_startmenu_choice(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+init_startmenu_choice(ಶೂನ್ಯ)
 {
     // Start menu
-    choices[choice_count].changefunc = toggle_startmenu_choice;
-    choices[choice_count].installfunc = NULL;
-    choices[choice_count].active = 1;
-    toggle_startmenu_choice(choice_count);	// set the text
-    ++choice_count;
+    choices[choice_ಎಣಿಕೆ].changefunc = toggle_startmenu_choice;
+    choices[choice_ಎಣಿಕೆ].installfunc = ಖಾಲಿ;
+    choices[choice_ಎಣಿಕೆ].ಸಕ್ರಿಯ = 1;
+    toggle_startmenu_choice(choice_ಎಣಿಕೆ);	// set the text
+    ++choice_ಎಣಿಕೆ;
 }
 
 /*
  * Add the choice for the desktop shortcuts.
  */
-    static void
-init_shortcut_choices(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+init_shortcut_choices(ಶೂನ್ಯ)
 {
     // Shortcut to gvim
-    choices[choice_count].text = NULL;
-    choices[choice_count].arg = 0;
-    choices[choice_count].active = has_gvim;
-    choices[choice_count].changefunc = toggle_shortcut_choice;
-    choices[choice_count].installfunc = install_shortcut_gvim;
-    toggle_shortcut_choice(choice_count);
-    ++choice_count;
+    choices[choice_ಎಣಿಕೆ].ಪಠ್ಯ = ಖಾಲಿ;
+    choices[choice_ಎಣಿಕೆ].arg = 0;
+    choices[choice_ಎಣಿಕೆ].ಸಕ್ರಿಯ = has_gvim;
+    choices[choice_ಎಣಿಕೆ].changefunc = toggle_shortcut_choice;
+    choices[choice_ಎಣಿಕೆ].installfunc = install_shortcut_gvim;
+    toggle_shortcut_choice(choice_ಎಣಿಕೆ);
+    ++choice_ಎಣಿಕೆ;
 
     // Shortcut to evim
-    choices[choice_count].text = NULL;
-    choices[choice_count].arg = 0;
-    choices[choice_count].active = has_gvim;
-    choices[choice_count].changefunc = toggle_shortcut_choice;
-    choices[choice_count].installfunc = install_shortcut_evim;
-    toggle_shortcut_choice(choice_count);
-    ++choice_count;
+    choices[choice_ಎಣಿಕೆ].ಪಠ್ಯ = ಖಾಲಿ;
+    choices[choice_ಎಣಿಕೆ].arg = 0;
+    choices[choice_ಎಣಿಕೆ].ಸಕ್ರಿಯ = has_gvim;
+    choices[choice_ಎಣಿಕೆ].changefunc = toggle_shortcut_choice;
+    choices[choice_ಎಣಿಕೆ].installfunc = install_shortcut_evim;
+    toggle_shortcut_choice(choice_ಎಣಿಕೆ);
+    ++choice_ಎಣಿಕೆ;
 
     // Shortcut to gview
-    choices[choice_count].text = NULL;
-    choices[choice_count].arg = 0;
-    choices[choice_count].active = has_gvim;
-    choices[choice_count].changefunc = toggle_shortcut_choice;
-    choices[choice_count].installfunc = install_shortcut_gview;
-    toggle_shortcut_choice(choice_count);
-    ++choice_count;
+    choices[choice_ಎಣಿಕೆ].ಪಠ್ಯ = ಖಾಲಿ;
+    choices[choice_ಎಣಿಕೆ].arg = 0;
+    choices[choice_ಎಣಿಕೆ].ಸಕ್ರಿಯ = has_gvim;
+    choices[choice_ಎಣಿಕೆ].changefunc = toggle_shortcut_choice;
+    choices[choice_ಎಣಿಕೆ].installfunc = install_shortcut_gview;
+    toggle_shortcut_choice(choice_ಎಣಿಕೆ);
+    ++choice_ಎಣಿಕೆ;
 }
 
 /*
  * Attempt to register OLE for Vim.
  */
-   static void
-install_OLE_register(void)
+   ಸ್ಥಿರ ಶೂನ್ಯ
+install_OLE_ರಿಜಿಸ್ಟರ್(ಶೂನ್ಯ)
 {
-    char register_command_string[BUFSIZE + 30];
+    ಅಕ್ಷರ ರಿಜಿಸ್ಟರ್_command_string[BUFSIZE + 30];
 
-    printf("\n--- Attempting to register Vim with OLE ---\n");
-    printf("(There is no message whether this works or not.)\n");
+    ಬರೆ("\n--- Attempting to register Vim with OLE ---\n");
+    ಬರೆ("(There is no message whether this works or not.)\n");
 
-    sprintf(register_command_string, "\"%s\\gvim.exe\" -silent -register", installdir);
-    system(register_command_string);
+    sprintf(ರಿಜಿಸ್ಟರ್_command_string, "\"%s\\gvim.exe\" -silent -register", installdir);
+    system(ರಿಜಿಸ್ಟರ್_command_string);
 }
 
 /*
  * Remove the last part of directory "path[]" to get its parent, and put the
  * result in "to[]".
  */
-    static void
-dir_remove_last(const char *path, char to[MAX_PATH])
+    ಸ್ಥಿರ ಶೂನ್ಯ
+dir_remove_ಕೊನೆಯ(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಮಾರ್ಗ, ಅಕ್ಷರ ಗಮ್ಯ[MAX_ಮಾರ್ಗ])
 {
-    char c;
-    long last_char_to_copy;
-    long path_length = strlen(path);
+    ಅಕ್ಷರ c;
+    ದೀರ್ಘ ಕೊನೆಯ_char_ಗಮ್ಯ_copy;
+    ದೀರ್ಘ ಮಾರ್ಗ_ಉದ್ದಳತೆ = ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(ಮಾರ್ಗ);
 
     // skip the last character just in case it is a '\\'
-    last_char_to_copy = path_length - 2;
-    c = path[last_char_to_copy];
+    ಕೊನೆಯ_char_ಗಮ್ಯ_copy = ಮಾರ್ಗ_ಉದ್ದಳತೆ - 2;
+    c = ಮಾರ್ಗ[ಕೊನೆಯ_char_ಗಮ್ಯ_copy];
 
-    while (c != '\\')
+    ಆಗ (c != '\\')
     {
-	last_char_to_copy--;
-	c = path[last_char_to_copy];
+	ಕೊನೆಯ_char_ಗಮ್ಯ_copy--;
+	c = ಮಾರ್ಗ[ಕೊನೆಯ_char_ಗಮ್ಯ_copy];
     }
 
-    strncpy(to, path, (size_t)last_char_to_copy);
-    to[last_char_to_copy] = NUL;
+    strncpy(ಗಮ್ಯ, ಮಾರ್ಗ, (size_t)ಕೊನೆಯ_char_ಗಮ್ಯ_copy);
+    ಗಮ್ಯ[ಕೊನೆಯ_char_ಗಮ್ಯ_copy] = NUL;
 }
 
-    static void
-set_directories_text(int idx)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_directories_ಪಠ್ಯ(ಪೂರ್ಣಾಂಕ idx)
 {
-    int vimfiles_dir_choice = choices[idx].arg;
+    ಪೂರ್ಣಾಂಕ vimfiles_dir_choice = choices[idx].arg;
 
-    if (vimfiles_dir_choice == (int)vimfiles_dir_none)
-	alloc_text(idx, "Do NOT create plugin directories%s", "");
-    else
-	alloc_text(idx, "Create plugin directories: %s",
+    ಆದರೆ (vimfiles_dir_choice == (ಪೂರ್ಣಾಂಕ)vimfiles_dir_none)
+	alloc_ಪಠ್ಯ(idx, "Do NOT create plugin directories%s", "");
+    ಇಲ್ಲದಿದ್ದರೆ
+	alloc_ಪಠ್ಯ(idx, "Create plugin directories: %s",
 				   vimfiles_dir_choices[vimfiles_dir_choice]);
 }
 
@@ -2141,18 +2141,18 @@ set_directories_text(int idx)
  *
  * This code is based on init_homedir() in misc1.c, keep in sync!
  */
-static char *homedir = NULL;
+ಸ್ಥಿರ ಅಕ್ಷರ *homedir = ಖಾಲಿ;
 
-    void
-init_homedir(void)
+    ಶೂನ್ಯ
+init_homedir(ಶೂನ್ಯ)
 {
-    char    *var;
-    char    buf[MAX_PATH];
+    ಅಕ್ಷರ    *var;
+    ಅಕ್ಷರ    buf[MAX_ಮಾರ್ಗ];
 
-    if (homedir != NULL)
+    ಆದರೆ (homedir != ಖಾಲಿ)
     {
-	free(homedir);
-	homedir = NULL;
+	ಬಿಡುಗಡೆ(homedir);
+	homedir = ಖಾಲಿ;
     }
 
     var = getenv("HOME");
@@ -2163,24 +2163,24 @@ init_homedir(void)
      * platforms, $HOMEDRIVE and $HOMEPATH are automatically defined for
      * each user.  Try constructing $HOME from these.
      */
-    if (var == NULL || *var == NUL)
+    ಆದರೆ (var == ಖಾಲಿ || *var == NUL)
     {
-	char	*homedrive, *homepath;
+	ಅಕ್ಷರ	*homedrive, *homepath;
 
 	homedrive = getenv("HOMEDRIVE");
 	homepath = getenv("HOMEPATH");
-	if (homepath == NULL || *homepath == NUL)
+	ಆದರೆ (homepath == ಖಾಲಿ || *homepath == NUL)
 	    homepath = "\\";
-	if (homedrive != NULL
-		   && strlen(homedrive) + strlen(homepath) < sizeof(buf))
+	ಆದರೆ (homedrive != ಖಾಲಿ
+		   && ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(homedrive) + ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(homepath) < ಗಾತ್ರ(buf))
 	{
-	    if (snprintf(buf, sizeof(buf), "%s%s", homedrive, homepath) > 0
+	    ಆದರೆ (snprintf(buf, ಗಾತ್ರ(buf), "%s%s", homedrive, homepath) > 0
 		&& buf[0] != NUL)
 		var = buf;
 	}
     }
 
-    if (var == NULL)
+    ಆದರೆ (var == ಖಾಲಿ)
 	var = getenv("USERPROFILE");
 
     /*
@@ -2188,32 +2188,32 @@ init_homedir(void)
      * variable, esp. "%USERPROFILE%".  Happens when $USERPROFILE isn't set
      * when $HOME is being set.
      */
-    if (var != NULL && *var == '%')
+    ಆದರೆ (var != ಖಾಲಿ && *var == '%')
     {
-	char	*p;
-	char	*exp;
+	ಅಕ್ಷರ	*p;
+	ಅಕ್ಷರ	*ಘಾತಾಂಕ;
 
 	p = strchr(var + 1, '%');
-	if (p != NULL)
+	ಆದರೆ (p != ಖಾಲಿ)
 	{
 	    strncpy(buf, var + 1, p - (var + 1));
 	    buf[p - (var + 1)] = NUL;
-	    exp = getenv(buf);
-	    if (exp != NULL && *exp != NUL
-				&& strlen(exp) + strlen(p) < sizeof(buf))
+	    ಘಾತಾಂಕ = getenv(buf);
+	    ಆದರೆ (ಘಾತಾಂಕ != ಖಾಲಿ && *ಘಾತಾಂಕ != NUL
+				&& ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(ಘಾತಾಂಕ) + ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(p) < ಗಾತ್ರ(buf))
 	    {
-		snprintf(buf, sizeof(buf), "%s%s", exp, p + 1);
+		snprintf(buf, ಗಾತ್ರ(buf), "%s%s", ಘಾತಾಂಕ, p + 1);
 		var = buf;
 	    }
 	}
     }
 
-    if (var != NULL && *var == NUL)	// empty is same as not set
-	var = NULL;
+    ಆದರೆ (var != ಖಾಲಿ && *var == NUL)	// empty is same as not set
+	var = ಖಾಲಿ;
 
-    if (var == NULL)
-	homedir = NULL;
-    else
+    ಆದರೆ (var == ಖಾಲಿ)
+	homedir = ಖಾಲಿ;
+    ಇಲ್ಲದಿದ್ದರೆ
 	homedir = _strdup(var);
 }
 
@@ -2221,132 +2221,132 @@ init_homedir(void)
  * Change the directory that the vim plugin directories will be created in:
  * $HOME, $VIM or nowhere.
  */
-    static void
-change_directories_choice(int idx)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+change_directories_choice(ಪೂರ್ಣಾಂಕ idx)
 {
-    int	    choice_count = TABLE_SIZE(vimfiles_dir_choices);
+    ಪೂರ್ಣಾಂಕ	    choice_ಎಣಿಕೆ = ಕೋಷ್ಟಕ_ಗಾತ್ರ(vimfiles_dir_choices);
 
     // Don't offer the $HOME choice if $HOME isn't set.
-    if (homedir == NULL)
-	--choice_count;
-    choices[idx].arg = get_choice(vimfiles_dir_choices, choice_count);
-    set_directories_text(idx);
+    ಆದರೆ (homedir == ಖಾಲಿ)
+	--choice_ಎಣಿಕೆ;
+    choices[idx].arg = get_choice(vimfiles_dir_choices, choice_ಎಣಿಕೆ);
+    ಗಣ_directories_ಪಠ್ಯ(idx);
 }
 
 /*
  * Create the plugin directories...
  */
 //ARGSUSED
-    static void
-install_vimfilesdir(int idx)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+install_vimfilesdir(ಪೂರ್ಣಾಂಕ idx)
 {
-    int i;
-    int vimfiles_dir_choice = choices[idx].arg;
-    char *p;
-    char vimdir_path[MAX_PATH];
-    char vimfiles_path[MAX_PATH + 9];
-    char tmp_dirname[BUFSIZE];
+    ಪೂರ್ಣಾಂಕ i;
+    ಪೂರ್ಣಾಂಕ vimfiles_dir_choice = choices[idx].arg;
+    ಅಕ್ಷರ *p;
+    ಅಕ್ಷರ vimdir_ಮಾರ್ಗ[MAX_ಮಾರ್ಗ];
+    ಅಕ್ಷರ vimfiles_ಮಾರ್ಗ[MAX_ಮಾರ್ಗ + 9];
+    ಅಕ್ಷರ tmp_dirname[BUFSIZE];
 
     // switch on the location that the user wants the plugin directories
     // built in
-    switch (vimfiles_dir_choice)
+    ಆಯ್ಕೆ (vimfiles_dir_choice)
     {
-	case vimfiles_dir_vim:
+	ಸ್ಥಿತಿ vimfiles_dir_vim:
 	{
 	    // Go to the %VIM% directory - check env first, then go one dir
 	    //	   below installdir if there is no %VIM% environment variable.
 	    //	   The accuracy of $VIM is checked in inspect_system(), so we
 	    //	   can be sure it is ok to use here.
 	    p = getenv("VIM");
-	    if (p == NULL) // No $VIM in path
-		dir_remove_last(installdir, vimdir_path);
-	    else
-		strcpy(vimdir_path, p);
-	    break;
+	    ಆದರೆ (p == ಖಾಲಿ) // No $VIM in path
+		dir_remove_ಕೊನೆಯ(installdir, vimdir_ಮಾರ್ಗ);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		strcpy(vimdir_ಮಾರ್ಗ, p);
+	    ನಿಲ್ಲಿಸು;
 	}
-	case vimfiles_dir_home:
+	ಸ್ಥಿತಿ vimfiles_dir_home:
 	{
 	    // Find the $HOME directory.  Its existence was already checked.
 	    p = homedir;
-	    if (p == NULL)
+	    ಆದರೆ (p == ಖಾಲಿ)
 	    {
-		printf("Internal error: $HOME is NULL\n");
+		ಬರೆ("Internal error: $HOME is NULL\n");
 		p = "c:\\";
 	    }
-	    strcpy(vimdir_path, p);
-	    break;
+	    strcpy(vimdir_ಮಾರ್ಗ, p);
+	    ನಿಲ್ಲಿಸು;
 	}
-	case vimfiles_dir_none:
+	ಸ್ಥಿತಿ vimfiles_dir_none:
 	{
 	    // Do not create vim plugin directory.
-	    return;
+	    ಹಿಂತಿರುಗಿ;
 	}
     }
 
     // Now, just create the directory.	If it already exists, it will fail
     // silently.
-    sprintf(vimfiles_path, "%s\\vimfiles", vimdir_path);
-    vim_mkdir(vimfiles_path, 0755);
+    sprintf(vimfiles_ಮಾರ್ಗ, "%s\\vimfiles", vimdir_ಮಾರ್ಗ);
+    vim_mkdir(vimfiles_ಮಾರ್ಗ, 0755);
 
-    printf("Creating the following directories in \"%s\":\n", vimfiles_path);
-    for (i = 0; i < TABLE_SIZE(vimfiles_subdirs); i++)
+    ಬರೆ("Creating the following directories in \"%s\":\n", vimfiles_ಮಾರ್ಗ);
+    ಗಾಗಿ (i = 0; i < ಕೋಷ್ಟಕ_ಗಾತ್ರ(vimfiles_subdirs); i++)
     {
-	sprintf(tmp_dirname, "%s\\%s", vimfiles_path, vimfiles_subdirs[i]);
-	printf("  %s", vimfiles_subdirs[i]);
+	sprintf(tmp_dirname, "%s\\%s", vimfiles_ಮಾರ್ಗ, vimfiles_subdirs[i]);
+	ಬರೆ("  %s", vimfiles_subdirs[i]);
 	vim_mkdir(tmp_dirname, 0755);
     }
-    printf("\n");
+    ಬರೆ("\n");
 }
 
 /*
  * Add the creation of runtime files to the setup sequence.
  */
-    static void
-init_directories_choice(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+init_directories_choice(ಶೂನ್ಯ)
 {
-    struct stat	st;
-    char	tmp_dirname[BUFSIZE];
-    char	*p;
-    int		vimfiles_dir_choice;
+    ರಚನೆ stat	st;
+    ಅಕ್ಷರ	tmp_dirname[BUFSIZE];
+    ಅಕ್ಷರ	*p;
+    ಪೂರ್ಣಾಂಕ		vimfiles_dir_choice;
 
-    choices[choice_count].text = alloc(150);
-    choices[choice_count].changefunc = change_directories_choice;
-    choices[choice_count].installfunc = install_vimfilesdir;
-    choices[choice_count].active = 1;
+    choices[choice_ಎಣಿಕೆ].ಪಠ್ಯ = alloc(150);
+    choices[choice_ಎಣಿಕೆ].changefunc = change_directories_choice;
+    choices[choice_ಎಣಿಕೆ].installfunc = install_vimfilesdir;
+    choices[choice_ಎಣಿಕೆ].ಸಕ್ರಿಯ = 1;
 
     // Check if the "compiler" directory already exists.  That's a good
     // indication that the plugin directories were already created.
     p = getenv("HOME");
-    if (p != NULL)
+    ಆದರೆ (p != ಖಾಲಿ)
     {
-	vimfiles_dir_choice = (int)vimfiles_dir_home;
+	vimfiles_dir_choice = (ಪೂರ್ಣಾಂಕ)vimfiles_dir_home;
 	sprintf(tmp_dirname, "%s\\vimfiles\\compiler", p);
-	if (stat(tmp_dirname, &st) == 0)
-	    vimfiles_dir_choice = (int)vimfiles_dir_none;
+	ಆದರೆ (stat(tmp_dirname, &st) == 0)
+	    vimfiles_dir_choice = (ಪೂರ್ಣಾಂಕ)vimfiles_dir_none;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	vimfiles_dir_choice = (int)vimfiles_dir_vim;
+	vimfiles_dir_choice = (ಪೂರ್ಣಾಂಕ)vimfiles_dir_vim;
 	p = getenv("VIM");
-	if (p == NULL)  // No $VIM in path, use the install dir.
-	    dir_remove_last(installdir, tmp_dirname);
-	else
+	ಆದರೆ (p == ಖಾಲಿ)  // No $VIM in path, use the install dir.
+	    dir_remove_ಕೊನೆಯ(installdir, tmp_dirname);
+	ಇಲ್ಲದಿದ್ದರೆ
 	    strcpy(tmp_dirname, p);
 	strcat(tmp_dirname, "\\vimfiles\\compiler");
-	if (stat(tmp_dirname, &st) == 0)
-	    vimfiles_dir_choice = (int)vimfiles_dir_none;
+	ಆದರೆ (stat(tmp_dirname, &st) == 0)
+	    vimfiles_dir_choice = (ಪೂರ್ಣಾಂಕ)vimfiles_dir_none;
     }
 
-    choices[choice_count].arg = vimfiles_dir_choice;
-    set_directories_text(choice_count);
-    ++choice_count;
+    choices[choice_ಎಣಿಕೆ].arg = vimfiles_dir_choice;
+    ಗಣ_directories_ಪಠ್ಯ(choice_ಎಣಿಕೆ);
+    ++choice_ಎಣಿಕೆ;
 }
 
 /*
  * Setup the choices and the default values.
  */
-    static void
-setup_choices(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಸಿದ್ಧತೆ_choices(ಶೂನ್ಯ)
 {
     // install the batch files
     init_bat_choices();
@@ -2370,163 +2370,163 @@ setup_choices(void)
     init_directories_choice();
 }
 
-    static void
-print_cmd_line_help(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+print_cmd_ಸಾಲು_help(ಶೂನ್ಯ)
 {
-    printf("Vim installer non-interactive command line arguments:\n");
-    printf("\n");
-    printf("-create-batfiles  [vim gvim evim view gview vimdiff gvimdiff]\n");
-    printf("    Create .bat files for Vim variants in the Windows directory.\n");
-    printf("-create-vimrc\n");
-    printf("    Create a default _vimrc file if one does not already exist.\n");
-    printf("-vimrc-remap [no|win]\n");
-    printf("    Remap keys when creating a default _vimrc file.\n");
-    printf("-vimrc-behave [unix|mswin|default]\n");
-    printf("    Set mouse behavior when creating a default _vimrc file.\n");
-    printf("-vimrc-compat [vi|vim|defaults|all]\n");
-    printf("    Set Vi compatibility when creating a default _vimrc file.\n");
-    printf("-install-popup\n");
-    printf("    Install the Edit-with-Vim context menu entry\n");
-    printf("-install-openwith\n");
-    printf("    Add Vim to the \"Open With...\" context menu list\n");
-    printf("-add-start-menu");
-    printf("    Add Vim to the start menu\n");
-    printf("-install-icons");
-    printf("    Create icons for gVim executables on the desktop\n");
-    printf("-create-directories [vim|home]\n");
-    printf("    Create runtime directories to drop plugins into; in the $VIM\n");
-    printf("    or $HOME directory\n");
-    printf("-register-OLE");
-    printf("    Ignored\n");
-    printf("\n");
+    ಬರೆ("Vim installer non-interactive command line arguments:\n");
+    ಬರೆ("\n");
+    ಬರೆ("-create-batfiles  [vim gvim evim view gview vimdiff gvimdiff]\n");
+    ಬರೆ("    Create .bat files for Vim variants in the Windows directory.\n");
+    ಬರೆ("-create-vimrc\n");
+    ಬರೆ("    Create a default _vimrc file if one does not already exist.\n");
+    ಬರೆ("-vimrc-remap [no|win]\n");
+    ಬರೆ("    Remap keys when creating a default _vimrc file.\n");
+    ಬರೆ("-vimrc-behave [unix|mswin|default]\n");
+    ಬರೆ("    Set mouse behavior when creating a default _vimrc file.\n");
+    ಬರೆ("-vimrc-compat [vi|vim|defaults|all]\n");
+    ಬರೆ("    Set Vi compatibility when creating a default _vimrc file.\n");
+    ಬರೆ("-install-popup\n");
+    ಬರೆ("    Install the Edit-with-Vim context menu entry\n");
+    ಬರೆ("-install-openwith\n");
+    ಬರೆ("    Add Vim to the \"Open With...\" context menu list\n");
+    ಬರೆ("-add-start-menu");
+    ಬರೆ("    Add Vim to the start menu\n");
+    ಬರೆ("-install-icons");
+    ಬರೆ("    Create icons for gVim executables on the desktop\n");
+    ಬರೆ("-create-directories [vim|home]\n");
+    ಬರೆ("    Create runtime directories to drop plugins into; in the $VIM\n");
+    ಬರೆ("    or $HOME directory\n");
+    ಬರೆ("-register-OLE");
+    ಬರೆ("    Ignored\n");
+    ಬರೆ("\n");
 }
 
 /*
  * Setup installation choices based on command line switches
  */
-    static void
-command_line_setup_choices(int argc, char **argv)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+command_ಸಾಲು_ಸಿದ್ಧತೆ_choices(ಪೂರ್ಣಾಂಕ argc, ಅಕ್ಷರ **argv)
 {
-    int i, j;
+    ಪೂರ್ಣಾಂಕ i, j;
 
-    for (i = 1; i < argc; i++)
+    ಗಾಗಿ (i = 1; i < argc; i++)
     {
-	if (strcmp(argv[i], "-create-batfiles") == 0)
+	ಆದರೆ (strcmp(argv[i], "-create-batfiles") == 0)
 	{
-	    if (i + 1 == argc)
-		continue;
-	    while (argv[i + 1][0] != '-' && i < argc)
+	    ಆದರೆ (i + 1 == argc)
+		ಮುಂದುವರಿ;
+	    ಆಗ (argv[i + 1][0] != '-' && i < argc)
 	    {
 		i++;
-		for (j = 1; j < TARGET_COUNT; ++j)
-		    if ((targets[j].exenamearg[0] == 'g' ? has_gvim : has_vim)
+		ಗಾಗಿ (j = 1; j < ಗುರಿ_ಎಣಿಕೆ; ++j)
+		    ಆದರೆ ((targets[j].exenamearg[0] == 'g' ? has_gvim : has_vim)
 			    && strcmp(argv[i], targets[j].name) == 0)
 		    {
 			init_bat_choice(j);
-			break;
+			ನಿಲ್ಲಿಸು;
 		    }
-		if (j == TARGET_COUNT)
-		    printf("%s is not a valid choice for -create-batfiles\n",
+		ಆದರೆ (j == ಗುರಿ_ಎಣಿಕೆ)
+		    ಬರೆ("%s is not a valid choice for -create-batfiles\n",
 								     argv[i]);
 
-		if (i + 1 == argc)
-		    break;
+		ಆದರೆ (i + 1 == argc)
+		    ನಿಲ್ಲಿಸು;
 	    }
 	}
-	else if (strcmp(argv[i], "-create-vimrc") == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(argv[i], "-create-vimrc") == 0)
 	{
 	    // Setup default vimrc choices.  If there is already a _vimrc file,
 	    // it will NOT be overwritten.
 	    init_vimrc_choices();
 	}
-	else if (strcmp(argv[i], "-vimrc-remap") == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(argv[i], "-vimrc-remap") == 0)
 	{
-	    if (i + 1 == argc)
-		break;
+	    ಆದರೆ (i + 1 == argc)
+		ನಿಲ್ಲಿಸು;
 	    i++;
-	    if (strcmp(argv[i], "no") == 0)
+	    ಆದರೆ (strcmp(argv[i], "no") == 0)
 		remap_choice = remap_no;
-	    else if (strcmp(argv[i], "win") == 0)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(argv[i], "win") == 0)
 		remap_choice = remap_win;
 	}
-	else if (strcmp(argv[i], "-vimrc-behave") == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(argv[i], "-vimrc-behave") == 0)
 	{
-	    if (i + 1 == argc)
-		break;
+	    ಆದರೆ (i + 1 == argc)
+		ನಿಲ್ಲಿಸು;
 	    i++;
-	    if (strcmp(argv[i], "unix") == 0)
+	    ಆದರೆ (strcmp(argv[i], "unix") == 0)
 		mouse_choice = mouse_xterm;
-	    else if (strcmp(argv[i], "mswin") == 0)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(argv[i], "mswin") == 0)
 		mouse_choice = mouse_mswin;
-	    else if (strcmp(argv[i], "default") == 0)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(argv[i], "default") == 0)
 		mouse_choice = mouse_default;
 	}
-	else if (strcmp(argv[i], "-vimrc-compat") == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(argv[i], "-vimrc-compat") == 0)
 	{
-	    if (i + 1 == argc)
-		break;
+	    ಆದರೆ (i + 1 == argc)
+		ನಿಲ್ಲಿಸು;
 	    i++;
-	    if (strcmp(argv[i], "vi") == 0)
+	    ಆದರೆ (strcmp(argv[i], "vi") == 0)
 		compat_choice = compat_vi;
-	    else if (strcmp(argv[i], "vim") == 0)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(argv[i], "vim") == 0)
 		compat_choice = compat_vim;
-	    else if (strcmp(argv[i], "defaults") == 0)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(argv[i], "defaults") == 0)
 		compat_choice = compat_some_enhancements;
-	    else if (strcmp(argv[i], "all") == 0)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(argv[i], "all") == 0)
 		compat_choice = compat_all_enhancements;
 	}
-	else if (strcmp(argv[i], "-install-popup") == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(argv[i], "-install-popup") == 0)
 	{
 	    init_popup_choice();
 	}
-	else if (strcmp(argv[i], "-install-openwith") == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(argv[i], "-install-openwith") == 0)
 	{
 	    init_openwith_choice();
 	}
-	else if (strcmp(argv[i], "-add-start-menu") == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(argv[i], "-add-start-menu") == 0)
 	{
 	    init_startmenu_choice();
 	}
-	else if (strcmp(argv[i], "-install-icons") == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(argv[i], "-install-icons") == 0)
 	{
 	    init_shortcut_choices();
 	}
-	else if (strcmp(argv[i], "-create-directories") == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(argv[i], "-create-directories") == 0)
 	{
-	    int vimfiles_dir_choice = (int)vimfiles_dir_none;
+	    ಪೂರ್ಣಾಂಕ vimfiles_dir_choice = (ಪೂರ್ಣಾಂಕ)vimfiles_dir_none;
 
 	    init_directories_choice();
-	    if (i + 1 < argc && argv[i + 1][0] != '-')
+	    ಆದರೆ (i + 1 < argc && argv[i + 1][0] != '-')
 	    {
 		i++;
-		if (strcmp(argv[i], "vim") == 0)
-		    vimfiles_dir_choice = (int)vimfiles_dir_vim;
-		else if (strcmp(argv[i], "home") == 0)
+		ಆದರೆ (strcmp(argv[i], "vim") == 0)
+		    vimfiles_dir_choice = (ಪೂರ್ಣಾಂಕ)vimfiles_dir_vim;
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(argv[i], "home") == 0)
 		{
-		    if (homedir == NULL)  // No $HOME in environment
-			vimfiles_dir_choice = (int)vimfiles_dir_none;
-		    else
-			vimfiles_dir_choice = (int)vimfiles_dir_home;
+		    ಆದರೆ (homedir == ಖಾಲಿ)  // No $HOME in environment
+			vimfiles_dir_choice = (ಪೂರ್ಣಾಂಕ)vimfiles_dir_none;
+		    ಇಲ್ಲದಿದ್ದರೆ
+			vimfiles_dir_choice = (ಪೂರ್ಣಾಂಕ)vimfiles_dir_home;
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    printf("Unknown argument for -create-directories: %s\n",
+		    ಬರೆ("Unknown argument for -create-directories: %s\n",
 								     argv[i]);
-		    print_cmd_line_help();
+		    print_cmd_ಸಾಲು_help();
 		}
 	    }
-	    else // No choice specified, default to vim directory
-		vimfiles_dir_choice = (int)vimfiles_dir_vim;
-	    choices[choice_count - 1].arg = vimfiles_dir_choice;
+	    ಇಲ್ಲದಿದ್ದರೆ // No choice specified, default to vim directory
+		vimfiles_dir_choice = (ಪೂರ್ಣಾಂಕ)vimfiles_dir_vim;
+	    choices[choice_ಎಣಿಕೆ - 1].arg = vimfiles_dir_choice;
 	}
-	else if (strcmp(argv[i], "-register-OLE") == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (strcmp(argv[i], "-register-OLE") == 0)
 	{
 	    // This is always done when gvim is found
 	}
-	else // Unknown switch
+	ಇಲ್ಲದಿದ್ದರೆ // Unknown switch
 	{
-	    printf("Got unknown argument argv[%d] = %s\n", i, argv[i]);
-	    print_cmd_line_help();
+	    ಬರೆ("Got unknown argument argv[%d] = %s\n", i, argv[i]);
+	    print_cmd_ಸಾಲು_help();
 	}
     }
 }
@@ -2535,10 +2535,10 @@ command_line_setup_choices(int argc, char **argv)
 /*
  * Show a few screens full of helpful information.
  */
-    static void
-show_help(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+show_help(ಶೂನ್ಯ)
 {
-    static char *(items[]) =
+    ಸ್ಥಿರ ಅಕ್ಷರ *(ವಸ್ತುಗಳು[]) =
     {
 "Installing .bat files\n"
 "---------------------\n"
@@ -2634,92 +2634,92 @@ show_help(void)
 "This choice allows creating them in $HOME (if you have a home directory) or\n"
 "$VIM (used for everybody on the system).\n"
 ,
-NULL
+ಖಾಲಿ
     };
-    int		i;
-    int		c;
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		c;
 
     rewind(stdin);
-    printf("\n");
-    for (i = 0; items[i] != NULL; ++i)
+    ಬರೆ("\n");
+    ಗಾಗಿ (i = 0; ವಸ್ತುಗಳು[i] != ಖಾಲಿ; ++i)
     {
-	puts(items[i]);
-	printf("Hit Enter to continue, b (back) or q (quit help): ");
+	puts(ವಸ್ತುಗಳು[i]);
+	ಬರೆ("Hit Enter to continue, b (back) or q (quit help): ");
 	c = getchar();
 	rewind(stdin);
-	if (c == 'b' || c == 'B')
+	ಆದರೆ (c == 'b' || c == 'B')
 	{
-	    if (i == 0)
+	    ಆದರೆ (i == 0)
 		--i;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		i -= 2;
 	}
-	if (c == 'q' || c == 'Q')
-	    break;
-	printf("\n");
+	ಆದರೆ (c == 'q' || c == 'Q')
+	    ನಿಲ್ಲಿಸು;
+	ಬರೆ("\n");
     }
 }
 
 /*
  * Install the choices.
  */
-    static void
-install(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+install(ಶೂನ್ಯ)
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
 
     // Install the selected choices.
-    for (i = 0; i < choice_count; ++i)
-	if (choices[i].installfunc != NULL && choices[i].active)
+    ಗಾಗಿ (i = 0; i < choice_ಎಣಿಕೆ; ++i)
+	ಆದರೆ (choices[i].installfunc != ಖಾಲಿ && choices[i].ಸಕ್ರಿಯ)
 	    (choices[i].installfunc)(i);
 
     // Add some entries to the registry, if needed.
-    if (install_popup
+    ಆದರೆ (install_popup
 	    || install_openwith
-	    || (need_uninstall_entry && interactive)
+	    || (need_uninstall_ನಮೂದು && interactive)
 	    || !interactive)
 	install_registry();
 
     // Register gvim with OLE.
-    if (has_gvim)
-	install_OLE_register();
+    ಆದರೆ (has_gvim)
+	install_OLE_ರಿಜಿಸ್ಟರ್();
 }
 
 /*
  * request_choice
  */
-    static void
-request_choice(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+request_choice(ಶೂನ್ಯ)
 {
-    int		      i;
+    ಪೂರ್ಣಾಂಕ		      i;
 
-    printf("\n\nInstall will do for you:\n");
-    for (i = 0; i < choice_count; ++i)
-	if (choices[i].active)
-	    printf("%2d  %s\n", i + 1, choices[i].text);
-    printf("To change an item, enter its number\n\n");
-    printf("Enter item number, h (help), d (do it) or q (quit): ");
+    ಬರೆ("\n\nInstall will do for you:\n");
+    ಗಾಗಿ (i = 0; i < choice_ಎಣಿಕೆ; ++i)
+	ಆದರೆ (choices[i].ಸಕ್ರಿಯ)
+	    ಬರೆ("%2d  %s\n", i + 1, choices[i].ಪಠ್ಯ);
+    ಬರೆ("To change an item, enter its number\n\n");
+    ಬರೆ("Enter item number, h (help), d (do it) or q (quit): ");
 }
 
-    int
-main(int argc, char **argv)
+    ಪೂರ್ಣಾಂಕ
+ಮುಖ್ಯ(ಪೂರ್ಣಾಂಕ argc, ಅಕ್ಷರ **argv)
 {
-    int		i;
-    char	buf[BUFSIZE];
+    ಪೂರ್ಣಾಂಕ		i;
+    ಅಕ್ಷರ	buf[BUFSIZE];
 
     /*
      * Run interactively if there are no command line arguments.
      */
-    if (argc > 1)
+    ಆದರೆ (argc > 1)
 	interactive = 0;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	interactive = 1;
 
     // Initialize this program.
     do_inits(argv);
     init_homedir();
 
-    if (argc > 1 && strcmp(argv[1], "-uninstall-check") == 0)
+    ಆದರೆ (argc > 1 && strcmp(argv[1], "-uninstall-check") == 0)
     {
 	// Only check for already installed Vims.  Used by NSIS installer.
 	i = uninstall_check(1);
@@ -2730,76 +2730,76 @@ main(int argc, char **argv)
 
 	// When nothing found exit quietly.  If something found wait for
 	// a little while, so that the user can read the messages.
-	if (i && _isatty(1))
+	ಆದರೆ (i && _isatty(1))
 	    sleep(3);
-	exit(0);
+	ನಿರ್ಗಮಿಸು(0);
     }
 
-    printf("This program sets up the installation of Vim "
-						   VIM_VERSION_MEDIUM "\n\n");
+    ಬರೆ("This program sets up the installation of Vim "
+						   VIM_ಆವೃತ್ತಿ_MEDIUM "\n\n");
 
     // Check if the user unpacked the archives properly.
     check_unpack();
 
     // Check for already installed Vims.
-    if (interactive)
+    ಆದರೆ (interactive)
 	uninstall_check(0);
 
     // Find out information about the system.
     inspect_system();
 
-    if (interactive)
+    ಆದರೆ (interactive)
     {
 	// Setup all the choices.
-	setup_choices();
+	ಸಿದ್ಧತೆ_choices();
 
 	// Let the user change choices and finally install (or quit).
-	for (;;)
+	ಗಾಗಿ (;;)
 	{
 	    request_choice();
 	    rewind(stdin);
-	    if (scanf("%99s", buf) == 1)
+	    ಆದರೆ (scanf("%99s", buf) == 1)
 	    {
-		if (isdigit((unsigned char)buf[0]))
+		ಆದರೆ (ಅಂಕಿಯೇ((ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ)buf[0]))
 		{
 		    // Change a choice.
 		    i = atoi(buf);
-		    if (i > 0 && i <= choice_count && choices[i - 1].active)
+		    ಆದರೆ (i > 0 && i <= choice_ಎಣಿಕೆ && choices[i - 1].ಸಕ್ರಿಯ)
 			(choices[i - 1].changefunc)(i - 1);
-		    else
-			printf("\nIllegal choice\n");
+		    ಇಲ್ಲದಿದ್ದರೆ
+			ಬರೆ("\nIllegal choice\n");
 		}
-		else if (buf[0] == 'h' || buf[0] == 'H')
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (buf[0] == 'h' || buf[0] == 'H')
 		{
 		    // Help
 		    show_help();
 		}
-		else if (buf[0] == 'd' || buf[0] == 'D')
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (buf[0] == 'd' || buf[0] == 'D')
 		{
 		    // Install!
 		    install();
-		    printf("\nThat finishes the installation.  Happy Vimming!\n");
-		    break;
+		    ಬರೆ("\nThat finishes the installation.  Happy Vimming!\n");
+		    ನಿಲ್ಲಿಸು;
 		}
-		else if (buf[0] == 'q' || buf[0] == 'Q')
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (buf[0] == 'q' || buf[0] == 'Q')
 		{
 		    // Quit
-		    printf("\nExiting without anything done\n");
-		    break;
+		    ಬರೆ("\nExiting without anything done\n");
+		    ನಿಲ್ಲಿಸು;
 		}
-		else
-		    printf("\nIllegal choice\n");
+		ಇಲ್ಲದಿದ್ದರೆ
+		    ಬರೆ("\nIllegal choice\n");
 	    }
 	}
-	printf("\n");
+	ಬರೆ("\n");
 	myexit(0);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	/*
 	 * Run non-interactive - setup according to the command line switches
 	 */
-	command_line_setup_choices(argc, argv);
+	command_ಸಾಲು_ಸಿದ್ಧತೆ_choices(argc, argv);
 	install();
 
 	// Avoid that the user has to hit Enter, just wait a little bit to
@@ -2807,5 +2807,5 @@ main(int argc, char **argv)
 	sleep(2);
     }
 
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }

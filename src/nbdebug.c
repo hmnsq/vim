@@ -25,19 +25,19 @@
  * This code must have NBDEBUG defined for it to be compiled into vim/gvim.
  */
 
-#ifdef NBDEBUG
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ NBDEBUG
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-FILE		*nb_debug = NULL;
+FILE		*nb_debug = ಖಾಲಿ;
 u_int		 nb_dlevel = 0;		// nb_debug verbosity level
 
-void		 nbdb(char *, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
+ಶೂನ್ಯ		 nbdb(ಅಕ್ಷರ *, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
 
-static int	 lookup(char *);
-#ifdef USE_NB_ERRORHANDLER
-static int	 errorHandler(Display *, XErrorEvent *);
-#endif
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	 lookup(ಅಕ್ಷರ *);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_NB_ERRORHANDLER
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	 errorHandler(Display *, XErrorEvent *);
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * nbdebug_wait	-   This function can be used to delay or stop execution of vim.
@@ -46,73 +46,73 @@ static int	 errorHandler(Display *, XErrorEvent *);
  *		    from a background process this is the only way to debug
  *		    startup problems.
  */
-	void
+	ಶೂನ್ಯ
 nbdebug_wait(
 	u_int		 wait_flags,	// tells what to do
-	char		*wait_var,	// wait environment variable
+	ಅಕ್ಷರ		*wait_var,	// wait environment variable
 	u_int		 wait_secs)	// how many seconds to wait
 {
 
 	init_homedir();			// not inited yet
-#ifdef USE_WDDUMP
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_WDDUMP
 	WDDump(0, 0, 0);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 	// for debugging purposes only
-	if (wait_flags & WT_ENV && wait_var && getenv(wait_var) != NULL)
+	ಆದರೆ (wait_flags & WT_ENV && wait_var && getenv(wait_var) != ಖಾಲಿ)
 	{
 		sleep(atoi(getenv(wait_var)));
 	}
-	else if (wait_flags & WT_WAIT && lookup("~/.gvimwait"))
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (wait_flags & WT_WAIT && lookup("~/.gvimwait"))
 	{
 		sleep(wait_secs > 0 && wait_secs < 120 ? wait_secs : 20);
 	}
-	else if (wait_flags & WT_STOP && lookup("~/.gvimstop"))
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (wait_flags & WT_STOP && lookup("~/.gvimstop"))
 	{
-		int w = 1;
-		while (w)
+		ಪೂರ್ಣಾಂಕ w = 1;
+		ಆಗ (w)
 		{
 			;
 		}
 	}
 }
 
-	void
+	ಶೂನ್ಯ
 nbdebug_log_init(
-	char		*log_var,	// env var with log file
-	char		*level_var)	// env var with nb_debug level
+	ಅಕ್ಷರ		*log_var,	// env var with log file
+	ಅಕ್ಷರ		*level_var)	// env var with nb_debug level
 {
-	char		*file;		// possible nb_debug output file
-	char		*cp;		// nb_dlevel pointer
+	ಅಕ್ಷರ		*file;		// possible nb_debug output file
+	ಅಕ್ಷರ		*cp;		// nb_dlevel pointer
 
-	if (log_var && (file = getenv(log_var)) != NULL)
+	ಆದರೆ (log_var && (file = getenv(log_var)) != ಖಾಲಿ)
 	{
 		time_t now;
 
 		nb_debug = fopen(file, "a");
-		time(&now);
+		ಸಮಯ(&now);
 		fprintf(nb_debug, "%s", get_ctime(now, TRUE));
-		if (level_var && (cp = getenv(level_var)) != NULL)
+		ಆದರೆ (level_var && (cp = getenv(level_var)) != ಖಾಲಿ)
 		{
-			nb_dlevel = strtoul(cp, NULL, 0);
+			nb_dlevel = strtoul(cp, ಖಾಲಿ, 0);
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 			nb_dlevel = NB_TRACE;	// default level
 		}
-#ifdef USE_NB_ERRORHANDLER
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_NB_ERRORHANDLER
 		XSetErrorHandler(errorHandler);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	}
 
 }
 
-	void
-nbdbg(char *fmt, ...)
+	ಶೂನ್ಯ
+nbdbg(ಅಕ್ಷರ *fmt, ...)
 {
 	va_list		 ap;
 
-	if (nb_debug != NULL && nb_dlevel & NB_TRACE)
+	ಆದರೆ (nb_debug != ಖಾಲಿ && nb_dlevel & NB_TRACE)
 	{
 		va_start(ap, fmt);
 		vfprintf(nb_debug, fmt, ap);
@@ -122,47 +122,47 @@ nbdbg(char *fmt, ...)
 
 }
 
-	static int
-lookup(char *file)
+	ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+lookup(ಅಕ್ಷರ *file)
 {
-	char		 buf[BUFSIZ];
+	ಅಕ್ಷರ		 buf[BUFSIZ];
 
 	expand_env((char_u *) file, (char_u *) buf, BUFSIZ);
-	return
-#ifndef FEAT_GUI_MSWIN
+	ಹಿಂತಿರುಗಿ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ FEAT_GUI_MSWIN
 		(access(buf, F_OK) == 0);
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 		(access(buf, 0) == 0);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 }
 
-#ifdef USE_NB_ERRORHANDLER
-	static int
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_NB_ERRORHANDLER
+	ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 errorHandler(
 	Display		*dpy,
 	XErrorEvent	*err)
 {
-	char		 msg[256];
-	char		 buf[256];
+	ಅಕ್ಷರ		 ಸಂದೇಶ[256];
+	ಅಕ್ಷರ		 buf[256];
 
-	XGetErrorText(dpy, err->error_code, msg, sizeof(msg));
-	nbdbg("\n\nNBDEBUG Vim: X Error of failed request: %s\n", msg);
+	XGet_Error_ಪಠ್ಯ(dpy, err->error_ಸಂಕೇತ, ಸಂದೇಶ, ಗಾತ್ರ(ಸಂದೇಶ));
+	nbdbg("\n\nNBDEBUG Vim: X Error of failed request: %s\n", ಸಂದೇಶ);
 
-	sprintf(buf, "%d", err->request_code);
-	XGetErrorDatabaseText(dpy,
-	    "XRequest", buf, "Unknown", msg, sizeof(msg));
+	sprintf(buf, "%d", err->request_ಸಂಕೇತ);
+	XGet_Error_Database_ಪಠ್ಯ(dpy,
+	    "XRequest", buf, "Unknown", ಸಂದೇಶ, ಗಾತ್ರ(ಸಂದೇಶ));
 	nbdbg("\tMajor opcode of failed request: %d (%s)\n",
-	    err->request_code, msg);
-	if (err->request_code > 128)
+	    err->request_ಸಂಕೇತ, ಸಂದೇಶ);
+	ಆದರೆ (err->request_ಸಂಕೇತ > 128)
 	{
 		nbdbg("\tMinor opcode of failed request: %d\n",
-		    err->minor_code);
+		    err->minor_ಸಂಕೇತ);
 	}
 
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 
-#endif // NBDEBUG
+#ಆದರೆ_ಅಂತ್ಯ // NBDEBUG

@@ -10,71 +10,71 @@
 /*
  * popupmenu.c: Popup menu (PUM)
  */
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-static pumitem_T *pum_array = NULL;	// items of displayed pum
-static int pum_size;			// nr of items in "pum_array"
-static int pum_selected;		// index of selected item or -1
-static int pum_first = 0;		// index of top item
+ಸ್ಥಿರ pumitem_T *pum_array = ಖಾಲಿ;	// items of displayed pum
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ pum_ಗಾತ್ರ;			// nr of items in "pum_array"
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ pum_selected;		// index of selected item or -1
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ pum_ಮೊದಲ = 0;		// index of top item
 
-static int call_update_screen = FALSE;
-static int pum_in_cmdline = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ call_update_screen = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ pum_ಒಳ_cmdline = FALSE;
 
-static int pum_height;			// nr of displayed pum items
-static int pum_width;			// width of displayed pum items
-static int pum_base_width;		// width of pum items base
-static int pum_kind_width;		// width of pum items kind column
-static int pum_extra_width;		// width of extra stuff
-static int pum_scrollbar;		// TRUE when scrollbar present
-#ifdef FEAT_RIGHTLEFT
-static int pum_rl;			// TRUE when pum is drawn 'rightleft'
-#endif
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ pum_ಎತ್ತರ;			// nr of displayed pum items
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ pum_ಅಗಲ;			// width of displayed pum items
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ pum_ತಳ_ಅಗಲ;		// width of pum items base
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ pum_ಬಗೆ_ಅಗಲ;		// width of pum items kind column
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ pum_extra_ಅಗಲ;		// width of extra stuff
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ pum_scrollbar;		// TRUE when scrollbar present
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ pum_rl;			// TRUE when pum is drawn 'rightleft'
+#ಆದರೆ_ಅಂತ್ಯ
 
-static int pum_row;			// top row of pum
-static int pum_col;			// left column of pum
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ pum_ಅಡ್ಡಸಾಲು;			// top row of pum
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ pum_ಲಂಬಸಾಲು;			// left column of pum
 
-static win_T *pum_window = NULL;
-static int pum_win_row;
-static int pum_win_height;
-static int pum_win_col;
-static int pum_win_wcol;
-static int pum_win_width;
+ಸ್ಥಿರ win_T *pum_ಕಿಟಕಿ = ಖಾಲಿ;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ pum_win_ಅಡ್ಡಸಾಲು;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ pum_win_ಎತ್ತರ;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ pum_win_ಲಂಬಸಾಲು;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ pum_win_wcol;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ pum_win_ಅಗಲ;
 
 // Some parts are not updated when a popup menu is visible.  Setting this flag
 // makes pum_visible() return FALSE even when there is a popup menu.
-static int pum_pretend_not_visible = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ pum_pretend_not_visible = FALSE;
 
 // Border support
-static int pum_border = 0;
-static int pum_margin = 0;	// margin of 1 cell on left and right
-static int pum_shadow = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ pum_border = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ pum_margin = 0;	// margin of 1 cell on left and right
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ pum_shadow = 0;
 
-#ifdef FEAT_IMAGE_POPUP
-static image_placement_T *pum_imagep = NULL;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_IMAGE_POPUP
+ಸ್ಥಿರ image_placement_T *pum_imagep = ಖಾಲಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 
 // Border characters
-static struct {
-    int top;
-    int right;
-    int bottom;
-    int left;
-    int top_left;
-    int top_right;
-    int bottom_right;
-    int bottom_left;
+ಸ್ಥಿರ ರಚನೆ {
+    ಪೂರ್ಣಾಂಕ ತುದಿ;
+    ಪೂರ್ಣಾಂಕ ಬಲ_2;
+    ಪೂರ್ಣಾಂಕ bottom;
+    ಪೂರ್ಣಾಂಕ ಎಡ_2;
+    ಪೂರ್ಣಾಂಕ ತುದಿ_ಎಡ;
+    ಪೂರ್ಣಾಂಕ ತುದಿ_ಬಲ;
+    ಪೂರ್ಣಾಂಕ bottom_ಬಲ;
+    ಪೂರ್ಣಾಂಕ bottom_ಎಡ;
 } pum_border_chars;
 
-static int pum_set_selected(int n, int repeat);
-static void pum_draw_border(void);
-static void pum_draw_shadow(void);
-static void compute_margins(int *right_margin, int *left_margin, int *left_padding);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ pum_ಗಣ_selected(ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ repeat);
+ಸ್ಥಿರ ಶೂನ್ಯ pum_draw_border(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಶೂನ್ಯ pum_draw_shadow(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಶೂನ್ಯ compute_margins(ಪೂರ್ಣಾಂಕ *ಬಲ_margin, ಪೂರ್ಣಾಂಕ *ಎಡ_margin, ಪೂರ್ಣಾಂಕ *ಎಡ_padding);
 
-#define PUM_DEF_HEIGHT 10
+#ವ್ಯಾಖ್ಯಾನಿಸು PUM_DEF_ಎತ್ತರ 10
 
-#define DEFINE_PUM_SETTER(feature) \
-	void \
-    pum_set_##feature(int enable) \
+#ವ್ಯಾಖ್ಯಾನಿಸು DEFINE_PUM_SETTER(feature) \
+	ಶೂನ್ಯ \
+    pum_ಗಣ##feature(ಪೂರ್ಣಾಂಕ enable) \
     { \
 	pum_##feature = enable ? 1 : 0; \
     }
@@ -83,34 +83,34 @@ DEFINE_PUM_SETTER(border)
 DEFINE_PUM_SETTER(shadow)
 DEFINE_PUM_SETTER(margin)
 
-    static void
-pum_compute_size(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+pum_compute_ಗಾತ್ರ(ಶೂನ್ಯ)
 {
-    int	w;
+    ಪೂರ್ಣಾಂಕ	w;
 
     // Compute the width of the widest match and the widest extra.
-    pum_base_width = 0;
-    pum_kind_width = 0;
-    pum_extra_width = 0;
-    for (int i = 0; i < pum_size; ++i)
+    pum_ತಳ_ಅಗಲ = 0;
+    pum_ಬಗೆ_ಅಗಲ = 0;
+    pum_extra_ಅಗಲ = 0;
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < pum_ಗಾತ್ರ; ++i)
     {
-	if (pum_array[i].pum_text != NULL)
+	ಆದರೆ (pum_array[i].pum_ಪಠ್ಯ != ಖಾಲಿ)
 	{
-	    w = vim_strsize(pum_array[i].pum_text);
-	    if (pum_base_width < w)
-		pum_base_width = w;
+	    w = vim_strsize(pum_array[i].pum_ಪಠ್ಯ);
+	    ಆದರೆ (pum_ತಳ_ಅಗಲ < w)
+		pum_ತಳ_ಅಗಲ = w;
 	}
-	if (pum_array[i].pum_kind != NULL)
+	ಆದರೆ (pum_array[i].pum_ಬಗೆ != ಖಾಲಿ)
 	{
-	    w = vim_strsize(pum_array[i].pum_kind) + 1;
-	    if (pum_kind_width < w)
-		pum_kind_width = w;
+	    w = vim_strsize(pum_array[i].pum_ಬಗೆ) + 1;
+	    ಆದರೆ (pum_ಬಗೆ_ಅಗಲ < w)
+		pum_ಬಗೆ_ಅಗಲ = w;
 	}
-	if (pum_array[i].pum_extra != NULL)
+	ಆದರೆ (pum_array[i].pum_extra != ಖಾಲಿ)
 	{
 	    w = vim_strsize(pum_array[i].pum_extra) + 1;
-	    if (pum_extra_width < w)
-		pum_extra_width = w;
+	    ಆದರೆ (pum_extra_ಅಗಲ < w)
+		pum_extra_ಅಗಲ = w;
 	}
     }
 }
@@ -119,169 +119,169 @@ pum_compute_size(void)
  * Calculate vertical placement for popup menu.
  * Sets pum_row and pum_height based on available space.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 pum_compute_vertical_placement(
-	int size,
-	int above_row,
-	int below_row)
+	ಪೂರ್ಣಾಂಕ ಗಾತ್ರ_2,
+	ಪೂರ್ಣಾಂಕ above_ಅಡ್ಡಸಾಲು,
+	ಪೂರ್ಣಾಂಕ ಕೆಳಗೆ_ಅಡ್ಡಸಾಲು)
 {
-    int context_lines;
-    int cline_visible_offset;
-    int extra_height = 2 * pum_border + pum_shadow;
-    int extra_offset = pum_border + pum_shadow;
+    ಪೂರ್ಣಾಂಕ context_ಸಾಲುಗಳು;
+    ಪೂರ್ಣಾಂಕ cline_visible_ಸ್ಥಾನಾಂತರ;
+    ಪೂರ್ಣಾಂಕ extra_ಎತ್ತರ = 2 * pum_border + pum_shadow;
+    ಪೂರ್ಣಾಂಕ extra_ಸ್ಥಾನಾಂತರ = pum_border + pum_shadow;
 
-    pum_height = MIN(size, PUM_DEF_HEIGHT);
-    if (p_ph > 0 && pum_height > p_ph)
-	pum_height = p_ph;
+    pum_ಎತ್ತರ = MIN(ಗಾತ್ರ_2, PUM_DEF_ಎತ್ತರ);
+    ಆದರೆ (p_ph > 0 && pum_ಎತ್ತರ > p_ph)
+	pum_ಎತ್ತರ = p_ph;
 
     // Put the pum below "pum_win_row" if possible.  If there are few lines
     // decide on where there is more room.
-    if (pum_win_row + 2 >= below_row - pum_height - extra_height
-	    && pum_win_row - above_row > (below_row - above_row) / 2)
+    ಆದರೆ (pum_win_ಅಡ್ಡಸಾಲು + 2 >= ಕೆಳಗೆ_ಅಡ್ಡಸಾಲು - pum_ಎತ್ತರ - extra_ಎತ್ತರ
+	    && pum_win_ಅಡ್ಡಸಾಲು - above_ಅಡ್ಡಸಾಲು > (ಕೆಳಗೆ_ಅಡ್ಡಸಾಲು - above_ಅಡ್ಡಸಾಲು) / 2)
     {
 	// pum above "pum_win_row"
-	if (State & MODE_CMDLINE)
+	ಆದರೆ (State & ಬಹುಲಕ_CMDLINE)
 	    // for cmdline pum, no need for context lines
-	    context_lines = 0;
-	else
+	    context_ಸಾಲುಗಳು = 0;
+	ಇಲ್ಲದಿದ್ದರೆ
 	    // Leave two lines of context if possible
-	    context_lines = MIN(2, curwin->w_wrow - curwin->w_cline_row);
+	    context_ಸಾಲುಗಳು = MIN(2, curwin->w_wrow - curwin->w_cline_ಅಡ್ಡಸಾಲು);
 
-	if (pum_win_row >= size + context_lines + extra_height)
+	ಆದರೆ (pum_win_ಅಡ್ಡಸಾಲು >= ಗಾತ್ರ_2 + context_ಸಾಲುಗಳು + extra_ಎತ್ತರ)
 	{
-	    pum_row = pum_win_row - size - context_lines - extra_offset;
-	    pum_height = size;
+	    pum_ಅಡ್ಡಸಾಲು = pum_win_ಅಡ್ಡಸಾಲು - ಗಾತ್ರ_2 - context_ಸಾಲುಗಳು - extra_ಸ್ಥಾನಾಂತರ;
+	    pum_ಎತ್ತರ = ಗಾತ್ರ_2;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    pum_row = pum_border;
-	    pum_height = pum_win_row - context_lines - extra_height;
+	    pum_ಅಡ್ಡಸಾಲು = pum_border;
+	    pum_ಎತ್ತರ = pum_win_ಅಡ್ಡಸಾಲು - context_ಸಾಲುಗಳು - extra_ಎತ್ತರ;
 	}
-	if (p_ph > 0 && pum_height > p_ph)
+	ಆದರೆ (p_ph > 0 && pum_ಎತ್ತರ > p_ph)
 	{
-	    pum_row += pum_height - p_ph;
-	    pum_height = p_ph;
+	    pum_ಅಡ್ಡಸಾಲು += pum_ಎತ್ತರ - p_ph;
+	    pum_ಎತ್ತರ = p_ph;
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// pum below "pum_win_row"
-	if (State & MODE_CMDLINE)
+	ಆದರೆ (State & ಬಹುಲಕ_CMDLINE)
 	    // for cmdline pum, no need for context lines
-	    context_lines = 0;
-	else
+	    context_ಸಾಲುಗಳು = 0;
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // Leave three lines of context if possible
 	    validate_cheight();
-	    cline_visible_offset = curwin->w_cline_row +
-		curwin->w_cline_height - curwin->w_wrow;
-	    context_lines = MIN(3, cline_visible_offset);
+	    cline_visible_ಸ್ಥಾನಾಂತರ = curwin->w_cline_ಅಡ್ಡಸಾಲು +
+		curwin->w_cline_ಎತ್ತರ - curwin->w_wrow;
+	    context_ಸಾಲುಗಳು = MIN(3, cline_visible_ಸ್ಥಾನಾಂತರ);
 	}
 
-	pum_row = pum_win_row + context_lines + pum_border;
-	pum_height = MIN(below_row - pum_row - extra_offset, size);
-	if (p_ph > 0 && pum_height > p_ph)
-	    pum_height = p_ph;
+	pum_ಅಡ್ಡಸಾಲು = pum_win_ಅಡ್ಡಸಾಲು + context_ಸಾಲುಗಳು + pum_border;
+	pum_ಎತ್ತರ = MIN(ಕೆಳಗೆ_ಅಡ್ಡಸಾಲು - pum_ಅಡ್ಡಸಾಲು - extra_ಸ್ಥಾನಾಂತರ, ಗಾತ್ರ_2);
+	ಆದರೆ (p_ph > 0 && pum_ಎತ್ತರ > p_ph)
+	    pum_ಎತ್ತರ = p_ph;
     }
 
-#if defined(FEAT_QUICKFIX)
+#ಆದರೆ defined(FEAT_QUICKFIX)
     // If there is a preview window above avoid drawing over it.
-    if (above_row > 0 && pum_row < above_row && pum_height > above_row)
+    ಆದರೆ (above_ಅಡ್ಡಸಾಲು > 0 && pum_ಅಡ್ಡಸಾಲು < above_ಅಡ್ಡಸಾಲು && pum_ಎತ್ತರ > above_ಅಡ್ಡಸಾಲು)
     {
-	pum_row = above_row;
-	pum_height = pum_win_row - above_row;
+	pum_ಅಡ್ಡಸಾಲು = above_ಅಡ್ಡಸಾಲು;
+	pum_ಎತ್ತರ = pum_win_ಅಡ್ಡಸಾಲು - above_ಅಡ್ಡಸಾಲು;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Try to set 'pum_width' so that it fits within available_width.
  * Returns TRUE if pum_width was successfully set, FALSE otherwise.
  */
-    static int
-set_pum_width_aligned_with_cursor(int width, int available_width)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+ಗಣ_pum_ಅಗಲ_aligned_with_cursor(ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಲಭ್ಯ_ಅಗಲ)
 {
-    int end_padding = TRUE;
+    ಪೂರ್ಣಾಂಕ ಕೊನೆ_padding = TRUE;
 
-    if (width < p_pw)
+    ಆದರೆ (ಅಗಲ < p_pw)
     {
-	width = p_pw;
-	end_padding = FALSE;
+	ಅಗಲ = p_pw;
+	ಕೊನೆ_padding = FALSE;
     }
-    if (p_pmw > 0 && width >= p_pmw)
+    ಆದರೆ (p_pmw > 0 && ಅಗಲ >= p_pmw)
     {
-	width = p_pmw;
-	end_padding = FALSE;
+	ಅಗಲ = p_pmw;
+	ಕೊನೆ_padding = FALSE;
     }
 
-    pum_width = width + (end_padding && width >= p_pw ? 1 : 0);
-    return available_width >= pum_width;
+    pum_ಅಗಲ = ಅಗಲ + (ಕೊನೆ_padding && ಅಗಲ >= p_pw ? 1 : 0);
+    ಹಿಂತಿರುಗಿ ಲಭ್ಯ_ಅಗಲ >= pum_ಅಗಲ;
 }
 
 /*
  * Calculate horizontal placement for popup menu. Sets pum_col and pum_width
  * based on cursor position and available space.
  */
-    static void
-pum_compute_horizontal_placement(int cursor_col)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+pum_compute_horizontal_placement(ಪೂರ್ಣಾಂಕ cursor_ಲಂಬಸಾಲು)
 {
-    int desired_width = pum_base_width + pum_kind_width + pum_extra_width;
-    int available_width;
-    int col_offset;
-    int trailing_overhead = pum_scrollbar + pum_border
+    ಪೂರ್ಣಾಂಕ desired_ಅಗಲ = pum_ತಳ_ಅಗಲ + pum_ಬಗೆ_ಅಗಲ + pum_extra_ಅಗಲ;
+    ಪೂರ್ಣಾಂಕ ಲಭ್ಯ_ಅಗಲ;
+    ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸ್ಥಾನಾಂತರ;
+    ಪೂರ್ಣಾಂಕ trailing_overhead = pum_scrollbar + pum_border
 	+ (pum_margin && pum_border ? 1 : 0) + (pum_shadow ? 2 : 0);
 
-#ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+    ಆದರೆ (pum_rl)
     {
-	col_offset = pum_border && (cursor_col >= Columns - 2)
-	    ? (3 - Columns + cursor_col) : 0;
-	available_width = cursor_col + 1;
-	pum_col = cursor_col - col_offset;
+	ಲಂಬಸಾಲು_ಸ್ಥಾನಾಂತರ = pum_border && (cursor_ಲಂಬಸಾಲು >= Columns - 2)
+	    ? (3 - Columns + cursor_ಲಂಬಸಾಲು) : 0;
+	ಲಭ್ಯ_ಅಗಲ = cursor_ಲಂಬಸಾಲು + 1;
+	pum_ಲಂಬಸಾಲು = cursor_ಲಂಬಸಾಲು - ಲಂಬಸಾಲು_ಸ್ಥಾನಾಂತರ;
     }
-    else
-#endif
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
     {
-	col_offset = pum_border && (cursor_col <= 1) ? (2 - cursor_col) : 0;
-	available_width = Columns - cursor_col;
-	pum_col = cursor_col + col_offset;
+	ಲಂಬಸಾಲು_ಸ್ಥಾನಾಂತರ = pum_border && (cursor_ಲಂಬಸಾಲು <= 1) ? (2 - cursor_ಲಂಬಸಾಲು) : 0;
+	ಲಭ್ಯ_ಅಗಲ = Columns - cursor_ಲಂಬಸಾಲು;
+	pum_ಲಂಬಸಾಲು = cursor_ಲಂಬಸಾಲು + ಲಂಬಸಾಲು_ಸ್ಥಾನಾಂತರ;
     }
 
-    available_width -= trailing_overhead + col_offset;
+    ಲಭ್ಯ_ಅಗಲ -= trailing_overhead + ಲಂಬಸಾಲು_ಸ್ಥಾನಾಂತರ;
 
     // Case 1: Align pum with "cursor_col"
-    if (set_pum_width_aligned_with_cursor(desired_width, available_width))
-	return;
+    ಆದರೆ (ಗಣ_pum_ಅಗಲ_aligned_with_cursor(desired_ಅಗಲ, ಲಭ್ಯ_ಅಗಲ))
+	ಹಿಂತಿರುಗಿ;
     // Show the pum truncated, provided it is at least as wide as 'pum_width'
-    if (available_width > p_pw)
+    ಆದರೆ (ಲಭ್ಯ_ಅಗಲ > p_pw)
     {
-	pum_width = available_width;
-	return;
+	pum_ಅಗಲ = ಲಭ್ಯ_ಅಗಲ;
+	ಹಿಂತಿರುಗಿ;
     }
 
     // Case 2: Truncated pum is no longer aligned with "cursor_col"
-    available_width = Columns - trailing_overhead - col_offset;
+    ಲಭ್ಯ_ಅಗಲ = Columns - trailing_overhead - ಲಂಬಸಾಲು_ಸ್ಥಾನಾಂತರ;
 
-    if (available_width > p_pw)
+    ಆದರೆ (ಲಭ್ಯ_ಅಗಲ > p_pw)
     {
-	pum_width = p_pw;  // Truncate beyond 'pum_width'
-#ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
-	    pum_col = pum_width + trailing_overhead;
-	else
-#endif
-	    pum_col = Columns - pum_width - trailing_overhead;
-	return;
+	pum_ಅಗಲ = p_pw;  // Truncate beyond 'pum_width'
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+	ಆದರೆ (pum_rl)
+	    pum_ಲಂಬಸಾಲು = pum_ಅಗಲ + trailing_overhead;
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	    pum_ಲಂಬಸಾಲು = Columns - pum_ಅಗಲ - trailing_overhead;
+	ಹಿಂತಿರುಗಿ;
     }
 
     // Case 3: Not enough room anywhere, use what we have
-#ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
-	pum_col = Columns - 1 - col_offset;
-    else
-#endif
-	pum_col = col_offset;
-    pum_width = Columns - trailing_overhead;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+    ಆದರೆ (pum_rl)
+	pum_ಲಂಬಸಾಲು = Columns - 1 - ಲಂಬಸಾಲು_ಸ್ಥಾನಾಂತರ;
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	pum_ಲಂಬಸಾಲು = ಲಂಬಸಾಲು_ಸ್ಥಾನಾಂತರ;
+    pum_ಅಗಲ = Columns - trailing_overhead;
 }
 
 /*
@@ -290,116 +290,116 @@ pum_compute_horizontal_placement(int cursor_col)
  * When possible the leftmost character is aligned with cursor column.
  * The menu appears above the screen line "row" or at "row" + "height" - 1.
  */
-    void
+    ಶೂನ್ಯ
 pum_display(
 	pumitem_T   *array,
-	int	    size,
-	int	    selected,   // index of initially selected item, -1 if
+	ಪೂರ್ಣಾಂಕ	    ಗಾತ್ರ_2,
+	ಪೂರ್ಣಾಂಕ	    selected,   // index of initially selected item, -1 if
 				// out of range
-	int	    pum_wcol)   // screen column to align the menu to, or -1
+	ಪೂರ್ಣಾಂಕ	    pum_wcol)   // screen column to align the menu to, or -1
 				// to use the cursor column
 {
-    int	    cursor_col;
-    int	    above_row;
-    int	    below_row;
-    int	    redo_count = 0;
-#if defined(FEAT_QUICKFIX)
+    ಪೂರ್ಣಾಂಕ	    cursor_ಲಂಬಸಾಲು;
+    ಪೂರ್ಣಾಂಕ	    above_ಅಡ್ಡಸಾಲು;
+    ಪೂರ್ಣಾಂಕ	    ಕೆಳಗೆ_ಅಡ್ಡಸಾಲು;
+    ಪೂರ್ಣಾಂಕ	    redo_ಎಣಿಕೆ = 0;
+#ಆದರೆ defined(FEAT_QUICKFIX)
     win_T   *pvwin;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_RIGHTLEFT
-    pum_rl = (State & MODE_CMDLINE) == 0 && curwin->w_p_rl;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+    pum_rl = (State & ಬಹುಲಕ_CMDLINE) == 0 && curwin->w_p_rl;
+#ಆದರೆ_ಅಂತ್ಯ
 
-    do
+    ಮಾಡು
     {
-	above_row = 0;
-	below_row = cmdline_row;
+	above_ಅಡ್ಡಸಾಲು = 0;
+	ಕೆಳಗೆ_ಅಡ್ಡಸಾಲು = cmdline_ಅಡ್ಡಸಾಲು;
 
 	// Pretend the pum is already there to avoid that must_redraw is set
 	// when 'cuc' is on.
 	pum_array = (pumitem_T *)1;
-	validate_cursor_col();
-	pum_array = NULL;
+	validate_cursor_ಲಂಬಸಾಲು();
+	pum_array = ಖಾಲಿ;
 
 	// Remember the essential parts of the window position and size, so we
 	// can decide when to reposition the popup menu.
-	pum_window = curwin;
-	if (State & MODE_CMDLINE)
+	pum_ಕಿಟಕಿ = curwin;
+	ಆದರೆ (State & ಬಹುಲಕ_CMDLINE)
 	    // cmdline completion popup menu
-	    pum_win_row = cmdline_row;
-	else
-	    pum_win_row = curwin->w_wrow + W_WINROW(curwin);
-	pum_win_height = curwin->w_height;
-	pum_win_col = curwin->w_wincol;
+	    pum_win_ಅಡ್ಡಸಾಲು = cmdline_ಅಡ್ಡಸಾಲು;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    pum_win_ಅಡ್ಡಸಾಲು = curwin->w_wrow + W_WINROW(curwin);
+	pum_win_ಎತ್ತರ = curwin->w_ಎತ್ತರ;
+	pum_win_ಲಂಬಸಾಲು = curwin->w_wincol;
 	pum_win_wcol = pum_wcol >= 0 ? pum_wcol : curwin->w_wcol;
-	pum_win_width = curwin->w_width;
+	pum_win_ಅಗಲ = curwin->w_ಅಗಲ;
 
-#if defined(FEAT_QUICKFIX)
+#ಆದರೆ defined(FEAT_QUICKFIX)
 	FOR_ALL_WINDOWS(pvwin)
-	    if (pvwin->w_p_pvw)
-		break;
-	if (pvwin != NULL)
+	    ಆದರೆ (pvwin->w_p_pvw)
+		ನಿಲ್ಲಿಸು;
+	ಆದರೆ (pvwin != ಖಾಲಿ)
 	{
-	    if (W_WINROW(pvwin) < W_WINROW(curwin))
-		above_row = W_WINROW(pvwin) + pvwin->w_height;
-	    else if (W_WINROW(pvwin) > W_WINROW(curwin) + curwin->w_height)
-		below_row = W_WINROW(pvwin);
+	    ಆದರೆ (W_WINROW(pvwin) < W_WINROW(curwin))
+		above_ಅಡ್ಡಸಾಲು = W_WINROW(pvwin) + pvwin->w_ಎತ್ತರ;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (W_WINROW(pvwin) > W_WINROW(curwin) + curwin->w_ಎತ್ತರ)
+		ಕೆಳಗೆ_ಅಡ್ಡಸಾಲು = W_WINROW(pvwin);
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 	// Figure out the vertical size and position of the pum.
-	pum_compute_vertical_placement(size, above_row, below_row);
+	pum_compute_vertical_placement(ಗಾತ್ರ_2, above_ಅಡ್ಡಸಾಲು, ಕೆಳಗೆ_ಅಡ್ಡಸಾಲು);
 
 	// don't display when we only have room for one line
-	if (pum_height < 1 || (pum_height == 1 && size > 1))
-	    return;
+	ಆದರೆ (pum_ಎತ್ತರ < 1 || (pum_ಎತ್ತರ == 1 && ಗಾತ್ರ_2 > 1))
+	    ಹಿಂತಿರುಗಿ;
 
 	pum_array = array;
-	pum_size = size;
-	pum_compute_size();
+	pum_ಗಾತ್ರ = ಗಾತ್ರ_2;
+	pum_compute_ಗಾತ್ರ();
 
 	// Calculate cursor column
-	if (State & MODE_CMDLINE)
+	ಆದರೆ (State & ಬಹುಲಕ_CMDLINE)
 	    // cmdline completion popup menu
-	    cursor_col = cmdline_compl_startcol();
-	else
+	    cursor_ಲಂಬಸಾಲು = cmdline_compl_startcol();
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    int wcol = pum_wcol >= 0 ? pum_wcol : curwin->w_wcol;
+	    ಪೂರ್ಣಾಂಕ wcol = pum_wcol >= 0 ? pum_wcol : curwin->w_wcol;
 	    // w_wcol includes virtual text "above".
-	    if (curwin->w_width > 0)
-		wcol %= curwin->w_width;
-	    else
+	    ಆದರೆ (curwin->w_ಅಗಲ > 0)
+		wcol %= curwin->w_ಅಗಲ;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		wcol = 0;
-#ifdef FEAT_CONCEAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CONCEAL
 	    // w_wcol does not account for text concealed before the cursor;
 	    // shift by the offset win_line() recorded for the cursor line so the
 	    // menu lines up with the visible text.
-	    if (curwin->w_p_cole > 0 && conceal_cursor_line(curwin))
+	    ಆದರೆ (curwin->w_p_cole > 0 && conceal_cursor_ಸಾಲು(curwin))
 	    {
 		wcol -= curwin->w_wcol_conceal_off;
-		if (wcol < 0)
+		ಆದರೆ (wcol < 0)
 		    wcol = 0;
 	    }
-#endif
-#ifdef FEAT_RIGHTLEFT
-	    if (pum_rl)
-		cursor_col = curwin->w_wincol + curwin->w_width - wcol - 1;
-	    else
-#endif
-		cursor_col = curwin->w_wincol + wcol;
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+	    ಆದರೆ (pum_rl)
+		cursor_ಲಂಬಸಾಲು = curwin->w_wincol + curwin->w_ಅಗಲ - wcol - 1;
+	    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+		cursor_ಲಂಬಸಾಲು = curwin->w_wincol + wcol;
 	}
 
 	// if there are more items than room we need a scrollbar
-	pum_scrollbar = (pum_height < size) ? 1 : 0;
+	pum_scrollbar = (pum_ಎತ್ತರ < ಗಾತ್ರ_2) ? 1 : 0;
 
 	// Figure out the horizontal size and position of the pum.
-	pum_compute_horizontal_placement(cursor_col);
+	pum_compute_horizontal_placement(cursor_ಲಂಬಸಾಲು);
 
 	// Set selected item and redraw.  If the window size changed need to
 	// redo the positioning.  Limit this to two times, when there is not
 	// much room the window size will keep changing.
-    } while (pum_set_selected(selected, redo_count) && ++redo_count <= 2);
+    } ಆಗ (pum_ಗಣ_selected(selected, redo_ಎಣಿಕೆ) && ++redo_ಎಣಿಕೆ <= 2);
 
     pum_redraw();
 }
@@ -408,8 +408,8 @@ pum_display(
  * Set a flag that when pum_redraw() is called it first calls update_screen().
  * This will avoid clearing and redrawing the popup menu, prevent flicker.
  */
-    void
-pum_call_update_screen(void)
+    ಶೂನ್ಯ
+pum_call_update_screen(ಶೂನ್ಯ)
 {
     call_update_screen = TRUE;
 
@@ -424,122 +424,122 @@ pum_call_update_screen(void)
  * Return TRUE if we are going to redraw the popup menu and the screen position
  * "row"/"col" is under the popup menu.
  */
-    int
-pum_under_menu(int row, int col, int only_redrawing)
+    ಪೂರ್ಣಾಂಕ
+pum_under_menu(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು, ಪೂರ್ಣಾಂಕ only_redrawing)
 {
-    int	extra_left = pum_border + (pum_margin && pum_border ? 1 : 0);
-    int	extra_right = pum_border + (pum_margin && pum_border ? 1 : 0)
+    ಪೂರ್ಣಾಂಕ	extra_ಎಡ = pum_border + (pum_margin && pum_border ? 1 : 0);
+    ಪೂರ್ಣಾಂಕ	extra_ಬಲ = pum_border + (pum_margin && pum_border ? 1 : 0)
 						+ (pum_shadow ? 2 : 0);
-    int	extra_above = pum_border;
-    int	extra_below = pum_border + (pum_shadow ? 1 : 0);
-    int	top = pum_row - extra_above;
-    int	bot = pum_row + pum_height + extra_below;
-    int	left = pum_col - 1 - extra_left;
-    int	right = pum_col + pum_width + pum_scrollbar + extra_right;
+    ಪೂರ್ಣಾಂಕ	extra_above = pum_border;
+    ಪೂರ್ಣಾಂಕ	extra_ಕೆಳಗೆ = pum_border + (pum_shadow ? 1 : 0);
+    ಪೂರ್ಣಾಂಕ	ತುದಿ = pum_ಅಡ್ಡಸಾಲು - extra_above;
+    ಪೂರ್ಣಾಂಕ	bot = pum_ಅಡ್ಡಸಾಲು + pum_ಎತ್ತರ + extra_ಕೆಳಗೆ;
+    ಪೂರ್ಣಾಂಕ	ಎಡ_2 = pum_ಲಂಬಸಾಲು - 1 - extra_ಎಡ;
+    ಪೂರ್ಣಾಂಕ	ಬಲ_2 = pum_ಲಂಬಸಾಲು + pum_ಅಗಲ + pum_scrollbar + extra_ಬಲ;
 
-    if (!((!only_redrawing || pum_will_redraw)
-	    && row >= top && row < bot && col >= left && col < right))
-	return FALSE;
+    ಆದರೆ (!((!only_redrawing || pum_will_redraw)
+	    && ಅಡ್ಡಸಾಲು >= ತುದಿ && ಅಡ್ಡಸಾಲು < bot && ಲಂಬಸಾಲು >= ಎಡ_2 && ಲಂಬಸಾಲು < ಬಲ_2))
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    if (pum_shadow)
+    ಆದರೆ (pum_shadow)
     {
 	// The shadow recolors the cells underneath.  When the menu will be
 	// redrawn, leave the shadow cells unprotected so the window refreshes
 	// them first, clearing stale content left by a larger menu.
-	if (only_redrawing)
+	ಆದರೆ (only_redrawing)
 	{
-	    if (col >= right - 2 || row == bot - 1)
-		return FALSE;
+	    ಆದರೆ (ಲಂಬಸಾಲು >= ಬಲ_2 - 2 || ಅಡ್ಡಸಾಲು == bot - 1)
+		ಹಿಂತಿರುಗಿ FALSE;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // Menu stays as-is: exclude only the corner cells the shadow never
 	    // draws.
-	    int	    right_margin, left_margin, left_padding;
+	    ಪೂರ್ಣಾಂಕ	    ಬಲ_margin, ಎಡ_margin, ಎಡ_padding;
 
-	    compute_margins(&right_margin, &left_margin, &left_padding);
-	    if (row == top && col >= right - 2)
-		return FALSE;
-	    if (row == bot - 1 && col < pum_col + 2 - left_padding - pum_border
-		    - left_margin)
-		return FALSE;
+	    compute_margins(&ಬಲ_margin, &ಎಡ_margin, &ಎಡ_padding);
+	    ಆದರೆ (ಅಡ್ಡಸಾಲು == ತುದಿ && ಲಂಬಸಾಲು >= ಬಲ_2 - 2)
+		ಹಿಂತಿರುಗಿ FALSE;
+	    ಆದರೆ (ಅಡ್ಡಸಾಲು == bot - 1 && ಲಂಬಸಾಲು < pum_ಲಂಬಸಾಲು + 2 - ಎಡ_padding - pum_border
+		    - ಎಡ_margin)
+		ಹಿಂತಿರುಗಿ FALSE;
 	}
     }
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
  * Computes attributes of text on the popup menu.
  * Returns attributes for every cell, or NULL if all attributes are the same.
  */
-    static int *
-pum_compute_text_attrs(char_u *text, hlf_T hlf, int user_hlattr)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ *
+pum_compute_ಪಠ್ಯ_attrs(char_u *ಪಠ್ಯ, hlf_T hlf, ಪೂರ್ಣಾಂಕ user_hlattr)
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
     size_t	leader_len;
-    int		char_cells;
-    int		new_attr;
-    char_u	*ptr = text;
-    int		cell_idx = 0;
-    garray_T	*ga = NULL;
-    int		*attrs = NULL;
-    char_u	*leader = NULL;
-    int		in_fuzzy;
-    int		matched_len = -1;
+    ಪೂರ್ಣಾಂಕ		char_cells;
+    ಪೂರ್ಣಾಂಕ		new_attr;
+    char_u	*ptr = ಪಠ್ಯ;
+    ಪೂರ್ಣಾಂಕ		cell_idx = 0;
+    garray_T	*ga = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		*attrs = ಖಾಲಿ;
+    char_u	*leader = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		ಒಳ_fuzzy;
+    ಪೂರ್ಣಾಂಕ		matched_len = -1;
     int_u	char_pos = 0;
-    int		is_select = FALSE;
+    ಪೂರ್ಣಾಂಕ		is_select = FALSE;
 
-    if (*text == NUL || (hlf != HLF_PSI && hlf != HLF_PNI)
+    ಆದರೆ (*ಪಠ್ಯ == NUL || (hlf != HLF_PSI && hlf != HLF_PNI)
 	    || (highlight_attr[HLF_PMSI] == highlight_attr[HLF_PSI]
 		&& highlight_attr[HLF_PMNI] == highlight_attr[HLF_PNI]))
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     is_select = hlf == HLF_PSI;
-    leader = (State & MODE_CMDLINE) ? cmdline_compl_pattern()
+    leader = (State & ಬಹುಲಕ_CMDLINE) ? cmdline_compl_ನಮೂನೆ()
 							  : ins_compl_leader();
-    if (leader == NULL || *leader == NUL)
-	return NULL;
+    ಆದರೆ (leader == ಖಾಲಿ || *leader == NUL)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    attrs = ALLOC_MULT(int, vim_strsize(text));
-    if (attrs == NULL)
-	return NULL;
+    attrs = ALLOC_MULT(ಪೂರ್ಣಾಂಕ, vim_strsize(ಪಠ್ಯ));
+    ಆದರೆ (attrs == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    in_fuzzy = (State & MODE_CMDLINE) ? cmdline_compl_is_fuzzy()
+    ಒಳ_fuzzy = (State & ಬಹುಲಕ_CMDLINE) ? cmdline_compl_is_fuzzy()
 					  : (get_cot_flags() & COT_FUZZY) != 0;
     leader_len = STRLEN(leader);
 
-    if (in_fuzzy)
+    ಆದರೆ (ಒಳ_fuzzy)
     {
-	ga = fuzzy_match_str_with_pos(text, leader);
-	if (!ga)
+	ga = fuzzy_ಹೊಂದಿಕೆ_str_with_pos(ಪಠ್ಯ, leader);
+	ಆದರೆ (!ga)
 	{
 	    vim_free(attrs);
-	    return NULL;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
     }
 
-    while (*ptr != NUL)
+    ಆಗ (*ptr != NUL)
     {
 	new_attr = highlight_attr[hlf];
 
-	if (ga != NULL)
+	ಆದರೆ (ga != ಖಾಲಿ)
 	{
 	    // Handle fuzzy matching
-	    for (i = 0; i < ga->ga_len; i++)
+	    ಗಾಗಿ (i = 0; i < ga->ga_len; i++)
 	    {
-		if (char_pos == ((int_u *)ga->ga_data)[i])
+		ಆದರೆ (char_pos == ((int_u *)ga->ga_ದತ್ತಾಂಶ)[i])
 		{
 		    new_attr = highlight_attr[is_select ? HLF_PMSI : HLF_PMNI];
 		    new_attr = hl_combine_attr(highlight_attr[hlf], new_attr);
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (matched_len < 0 && MB_STRNICMP(ptr, leader, leader_len) == 0)
-		matched_len = (int)leader_len;
-	    if (matched_len > 0)
+	    ಆದರೆ (matched_len < 0 && MB_STRNICMP(ptr, leader, leader_len) == 0)
+		matched_len = (ಪೂರ್ಣಾಂಕ)leader_len;
+	    ಆದರೆ (matched_len > 0)
 	    {
 		new_attr = highlight_attr[is_select ? HLF_PMSI : HLF_PMNI];
 		new_attr = hl_combine_attr(highlight_attr[hlf], new_attr);
@@ -548,11 +548,11 @@ pum_compute_text_attrs(char_u *text, hlf_T hlf, int user_hlattr)
 	}
 
 	new_attr = hl_combine_attr(highlight_attr[HLF_PNI], new_attr);
-	if (user_hlattr > 0)
+	ಆದರೆ (user_hlattr > 0)
 	    new_attr = hl_combine_attr(new_attr, user_hlattr);
 
 	char_cells = mb_ptr2cells(ptr);
-	for (i = 0; i < char_cells; i++)
+	ಗಾಗಿ (i = 0; i < char_cells; i++)
 	    attrs[cell_idx + i] = new_attr;
 	cell_idx += char_cells;
 
@@ -560,122 +560,122 @@ pum_compute_text_attrs(char_u *text, hlf_T hlf, int user_hlattr)
 	char_pos++;
     }
 
-    if (ga != NULL)
+    ಆದರೆ (ga != ಖಾಲಿ)
     {
 	ga_clear(ga);
 	vim_free(ga);
     }
-    return attrs;
+    ಹಿಂತಿರುಗಿ attrs;
 }
 
 /*
  * Displays text on the popup menu with specific attributes.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 pum_screen_puts_with_attrs(
-    int		row,
-    int		col,
-    int		cells UNUSED,
-    char_u	*text,
-    int		textlen,
-    int		*attrs)
+    ಪೂರ್ಣಾಂಕ		ಅಡ್ಡಸಾಲು,
+    ಪೂರ್ಣಾಂಕ		ಲಂಬಸಾಲು,
+    ಪೂರ್ಣಾಂಕ		cells ಬಳಸದ,
+    char_u	*ಪಠ್ಯ,
+    ಪೂರ್ಣಾಂಕ		textlen,
+    ಪೂರ್ಣಾಂಕ		*attrs)
 {
-    int		col_start = col;
-    char_u	*ptr = text;
-    int		char_len;
-    int		attr;
+    ಪೂರ್ಣಾಂಕ		ಲಂಬಸಾಲು_ಆರಂಭ = ಲಂಬಸಾಲು;
+    char_u	*ptr = ಪಠ್ಯ;
+    ಪೂರ್ಣಾಂಕ		char_len;
+    ಪೂರ್ಣಾಂಕ		attr;
 
     // Render text with proper attributes
-    while (*ptr != NUL && ptr < text + textlen)
+    ಆಗ (*ptr != NUL && ptr < ಪಠ್ಯ + textlen)
     {
 	char_len = mb_ptr2len(ptr);
-#ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
-	    attr = attrs[col_start + cells - col - 1];
-	else
-#endif
-	    attr = attrs[col - col_start];
-	screen_puts_len(ptr, char_len, row, col, attr);
-	col += mb_ptr2cells(ptr);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+	ಆದರೆ (pum_rl)
+	    attr = attrs[ಲಂಬಸಾಲು_ಆರಂಭ + cells - ಲಂಬಸಾಲು - 1];
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	    attr = attrs[ಲಂಬಸಾಲು - ಲಂಬಸಾಲು_ಆರಂಭ];
+	screen_puts_len(ptr, char_len, ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು, attr);
+	ಲಂಬಸಾಲು += mb_ptr2cells(ptr);
 	ptr += char_len;
     }
 }
 
-    static inline char_u *
-pum_get_item(int index, int type)
+    ಸ್ಥಿರ ಸಾಲೊಳಗೆ char_u *
+pum_get_ಅಂಶ(ಪೂರ್ಣಾಂಕ ಸೂಚ್ಯಂಕ, ಪೂರ್ಣಾಂಕ type)
 {
-    switch(type)
+    ಆಯ್ಕೆ(type)
     {
-	case CPT_ABBR: return pum_array[index].pum_text;
-	case CPT_KIND: return pum_array[index].pum_kind;
-	case CPT_MENU: return pum_array[index].pum_extra;
+	ಸ್ಥಿತಿ CPT_ABBR: ಹಿಂತಿರುಗಿ pum_array[ಸೂಚ್ಯಂಕ].pum_ಪಠ್ಯ;
+	ಸ್ಥಿತಿ CPT_ಬಗೆ: ಹಿಂತಿರುಗಿ pum_array[ಸೂಚ್ಯಂಕ].pum_ಬಗೆ;
+	ಸ್ಥಿತಿ CPT_MENU: ಹಿಂತಿರುಗಿ pum_array[ಸೂಚ್ಯಂಕ].pum_extra;
     }
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
-    static inline int
-pum_user_attr_combine(int idx, int type, int attr)
+    ಸ್ಥಿರ ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ
+pum_user_attr_combine(ಪೂರ್ಣಾಂಕ idx, ಪೂರ್ಣಾಂಕ type, ಪೂರ್ಣಾಂಕ attr)
 {
-    int user_attr[] = {
+    ಪೂರ್ಣಾಂಕ user_attr[] = {
 	pum_array[idx].pum_user_abbr_hlattr,
-	pum_array[idx].pum_user_kind_hlattr,
+	pum_array[idx].pum_user_ಬಗೆ_hlattr,
     };
 
-    return user_attr[type] > 0 ? hl_combine_attr(attr, user_attr[type]) : attr;
+    ಹಿಂತಿರುಗಿ user_attr[type] > 0 ? hl_combine_attr(attr, user_attr[type]) : attr;
 }
 
-#ifdef FEAT_RIGHTLEFT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
 /*
  * Display RTL text with proper attributes in the popup menu.
  * Returns the adjusted column position after drawing.
  */
-    static int
-pum_display_rtl_text(
-	int	row,
-	int     col,
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+pum_display_rtl_ಪಠ್ಯ(
+	ಪೂರ್ಣಾಂಕ	ಅಡ್ಡಸಾಲು,
+	ಪೂರ್ಣಾಂಕ     ಲಂಬಸಾಲು,
 	char_u  *st,
-	int     attr,
-	int     *attrs,
-	int     width,
-	int     width_limit,
-	int     totwidth,
-	int     next_isempty,
-	int	selected)
+	ಪೂರ್ಣಾಂಕ     attr,
+	ಪೂರ್ಣಾಂಕ     *attrs,
+	ಪೂರ್ಣಾಂಕ     ಅಗಲ,
+	ಪೂರ್ಣಾಂಕ     ಅಗಲ_ಎಲ್ಲೆ,
+	ಪೂರ್ಣಾಂಕ     totwidth,
+	ಪೂರ್ಣಾಂಕ     ಮುಂದಿನ_isempty,
+	ಪೂರ್ಣಾಂಕ	selected)
 {
-    char_u  *rt = NULL;
-    int     cells = 0;
-    int     over_cell = 0;
-    int     truncated = FALSE;
-    int     pad = next_isempty ? 0 : 2;
-    int     remaining = 0;
-    int	    trunc_attr = highlight_attr[selected ? HLF_PSI : HLF_PNI];
-    int	    truncrl = curwin->w_fill_chars.truncrl != NUL
+    char_u  *rt = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ     cells = 0;
+    ಪೂರ್ಣಾಂಕ     over_cell = 0;
+    ಪೂರ್ಣಾಂಕ     truncated = FALSE;
+    ಪೂರ್ಣಾಂಕ     pad = ಮುಂದಿನ_isempty ? 0 : 2;
+    ಪೂರ್ಣಾಂಕ     ಉಳಿದ = 0;
+    ಪೂರ್ಣಾಂಕ	    trunc_attr = highlight_attr[selected ? HLF_PSI : HLF_PNI];
+    ಪೂರ್ಣಾಂಕ	    truncrl = curwin->w_fill_chars.truncrl != NUL
 					? curwin->w_fill_chars.truncrl : '<';
 
-    if (st == NULL)
-	return col;
+    ಆದರೆ (st == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಲಂಬಸಾಲು;
 
-    rt = reverse_text(st);
-    if (rt == NULL)
+    rt = ಹಿಮ್ಮುಖ_ಪಠ್ಯ(st);
+    ಆದರೆ (rt == ಖಾಲಿ)
     {
 	VIM_CLEAR(st);
-	return col;
+	ಹಿಂತಿರುಗಿ ಲಂಬಸಾಲು;
     }
 
-    char_u *rt_start = rt;
+    char_u *rt_ಆರಂಭ = rt;
     cells = mb_string2cells(rt, -1);
-    truncated = width_limit - totwidth < cells + pad;
+    truncated = ಅಗಲ_ಎಲ್ಲೆ - totwidth < cells + pad;
 
     // only draw the text that fits
-    if (cells > width_limit)
+    ಆದರೆ (cells > ಅಗಲ_ಎಲ್ಲೆ)
     {
-	do
+	ಮಾಡು
 	{
 	    cells -= has_mbyte ? (*mb_ptr2cells)(rt) : 1;
 	    MB_PTR_ADV(rt);
-	} while (cells > width_limit);
+	} ಆಗ (cells > ಅಗಲ_ಎಲ್ಲೆ);
 
-	if (cells < width_limit)
+	ಆದರೆ (cells < ಅಗಲ_ಎಲ್ಲೆ)
 	{
 	    // Most left character requires 2-cells
 	    // but only 1 cell is available on screen.
@@ -685,133 +685,133 @@ pum_display_rtl_text(
 	}
     }
 
-    if (truncated)
+    ಆದರೆ (truncated)
     {
 	char_u  *orig_rt = rt;
-	int     size = 0;
+	ಪೂರ್ಣಾಂಕ     ಗಾತ್ರ_2 = 0;
 
-	remaining = width_limit - totwidth - 1;
+	ಉಳಿದ = ಅಗಲ_ಎಲ್ಲೆ - totwidth - 1;
 	cells = mb_string2cells(rt, -1);
-	if (cells > remaining)
+	ಆದರೆ (cells > ಉಳಿದ)
 	{
-	    while (cells > remaining)
+	    ಆಗ (cells > ಉಳಿದ)
 	    {
 		MB_PTR_ADV(orig_rt);
 		cells -= has_mbyte ? (*mb_ptr2cells)(orig_rt) : 1;
 	    }
 	}
-	size = (int)STRLEN(orig_rt);
-	if (cells < remaining)
-	    over_cell = remaining - cells;
+	ಗಾತ್ರ_2 = (ಪೂರ್ಣಾಂಕ)STRLEN(orig_rt);
+	ಆದರೆ (cells < ಉಳಿದ)
+	    over_cell = ಉಳಿದ - cells;
 
-	cells = mb_string2cells(orig_rt, size);
-	width = cells + over_cell + 1;
+	cells = mb_string2cells(orig_rt, ಗಾತ್ರ_2);
+	ಅಗಲ = cells + over_cell + 1;
 	rt = orig_rt;
 
-	screen_putchar(truncrl, row, col - width + 1, trunc_attr);
+	screen_putchar(truncrl, ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು - ಅಗಲ + 1, trunc_attr);
 
-	if (over_cell > 0)
-	    screen_fill(row, row + 1, col - width + 2,
-		    col - width + 2 + over_cell, ' ', ' ', attr);
+	ಆದರೆ (over_cell > 0)
+	    screen_fill(ಅಡ್ಡಸಾಲು, ಅಡ್ಡಸಾಲು + 1, ಲಂಬಸಾಲು - ಅಗಲ + 2,
+		    ಲಂಬಸಾಲು - ಅಗಲ + 2 + over_cell, ' ', ' ', attr);
     }
 
-    if (attrs == NULL)
-	screen_puts_len(rt, (int)STRLEN(rt), row, col - cells + 1, attr);
-    else
-	pum_screen_puts_with_attrs(row, col - cells + 1, cells, rt,
-		(int)STRLEN(rt), attrs);
+    ಆದರೆ (attrs == ಖಾಲಿ)
+	screen_puts_len(rt, (ಪೂರ್ಣಾಂಕ)STRLEN(rt), ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು - cells + 1, attr);
+    ಇಲ್ಲದಿದ್ದರೆ
+	pum_screen_puts_with_attrs(ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು - cells + 1, cells, rt,
+		(ಪೂರ್ಣಾಂಕ)STRLEN(rt), attrs);
 
-    vim_free(rt_start);
+    vim_free(rt_ಆರಂಭ);
     VIM_CLEAR(st);
-    return col - width;
+    ಹಿಂತಿರುಗಿ ಲಂಬಸಾಲು - ಅಗಲ;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Display LTR text with proper attributes in the popup menu.
  * Returns the adjusted column position after drawing.
  */
-    static int
-pum_display_ltr_text(
-	int     row,
-	int     col,
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+pum_display_ltr_ಪಠ್ಯ(
+	ಪೂರ್ಣಾಂಕ     ಅಡ್ಡಸಾಲು,
+	ಪೂರ್ಣಾಂಕ     ಲಂಬಸಾಲು,
 	char_u  *st,
-	int     attr,
-	int     *attrs,
-	int     width,        // width already calculated in outer loop
-	int     width_limit,
-	int     totwidth,
-	int     next_isempty,
-	int	selected)
+	ಪೂರ್ಣಾಂಕ     attr,
+	ಪೂರ್ಣಾಂಕ     *attrs,
+	ಪೂರ್ಣಾಂಕ     ಅಗಲ,        // width already calculated in outer loop
+	ಪೂರ್ಣಾಂಕ     ಅಗಲ_ಎಲ್ಲೆ,
+	ಪೂರ್ಣಾಂಕ     totwidth,
+	ಪೂರ್ಣಾಂಕ     ಮುಂದಿನ_isempty,
+	ಪೂರ್ಣಾಂಕ	selected)
 {
-    int     size = 0;
-    int     cells = 0;
-    char_u  *st_end = NULL;
-    int     over_cell = 0;
-    int     pad = next_isempty ? 0 : 2;
-    int     truncated = FALSE;
-    int     remaining = 0;
-    int	    trunc_attr = highlight_attr[selected ? HLF_PSI : HLF_PNI];
-    int	    trunc = curwin->w_fill_chars.trunc != NUL
+    ಪೂರ್ಣಾಂಕ     ಗಾತ್ರ_2 = 0;
+    ಪೂರ್ಣಾಂಕ     cells = 0;
+    char_u  *st_ಕೊನೆ = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ     over_cell = 0;
+    ಪೂರ್ಣಾಂಕ     pad = ಮುಂದಿನ_isempty ? 0 : 2;
+    ಪೂರ್ಣಾಂಕ     truncated = FALSE;
+    ಪೂರ್ಣಾಂಕ     ಉಳಿದ = 0;
+    ಪೂರ್ಣಾಂಕ	    trunc_attr = highlight_attr[selected ? HLF_PSI : HLF_PNI];
+    ಪೂರ್ಣಾಂಕ	    trunc = curwin->w_fill_chars.trunc != NUL
 					    ? curwin->w_fill_chars.trunc : '>';
 
-    if (st == NULL)
-	return col;
+    ಆದರೆ (st == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಲಂಬಸಾಲು;
 
-    size = (int)STRLEN(st);
-    cells = (*mb_string2cells)(st, size);
-    truncated = width_limit - totwidth < cells + pad;
+    ಗಾತ್ರ_2 = (ಪೂರ್ಣಾಂಕ)STRLEN(st);
+    cells = (*mb_string2cells)(st, ಗಾತ್ರ_2);
+    truncated = ಅಗಲ_ಎಲ್ಲೆ - totwidth < cells + pad;
 
     // only draw the text that fits
-    while (size > 0 && col + cells > width_limit + pum_col)
+    ಆಗ (ಗಾತ್ರ_2 > 0 && ಲಂಬಸಾಲು + cells > ಅಗಲ_ಎಲ್ಲೆ + pum_ಲಂಬಸಾಲು)
     {
-	--size;
-	if (has_mbyte)
+	--ಗಾತ್ರ_2;
+	ಆದರೆ (has_mbyte)
 	{
-	    size -= (*mb_head_off)(st, st + size);
-	    cells -= (*mb_ptr2cells)(st + size);
+	    ಗಾತ್ರ_2 -= (*mb_ತಲೆ_off)(st, st + ಗಾತ್ರ_2);
+	    cells -= (*mb_ptr2cells)(st + ಗಾತ್ರ_2);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    --cells;
     }
 
     // truncated
-    if (truncated)
+    ಆದರೆ (truncated)
     {
-	remaining = width_limit - totwidth - 1;
-	if (cells > remaining)
+	ಉಳಿದ = ಅಗಲ_ಎಲ್ಲೆ - totwidth - 1;
+	ಆದರೆ (cells > ಉಳಿದ)
 	{
-	    st_end = st + size;
-	    while (st_end > st && cells > remaining)
+	    st_ಕೊನೆ = st + ಗಾತ್ರ_2;
+	    ಆಗ (st_ಕೊನೆ > st && cells > ಉಳಿದ)
 	    {
-		MB_PTR_BACK(st, st_end);
-		cells -= has_mbyte ? (*mb_ptr2cells)(st_end) : 1;
+		MB_PTR_ಹಿಂಭಾಗ(st, st_ಕೊನೆ);
+		cells -= has_mbyte ? (*mb_ptr2cells)(st_ಕೊನೆ) : 1;
 	    }
-	    size = st_end - st;
+	    ಗಾತ್ರ_2 = st_ಕೊನೆ - st;
 	}
 
-	if (cells < remaining)
-	    over_cell = remaining - cells;
-	cells = mb_string2cells(st, size);
-	width = cells + over_cell + 1;
+	ಆದರೆ (cells < ಉಳಿದ)
+	    over_cell = ಉಳಿದ - cells;
+	cells = mb_string2cells(st, ಗಾತ್ರ_2);
+	ಅಗಲ = cells + over_cell + 1;
     }
 
-    if (attrs == NULL)
-	screen_puts_len(st, size, row, col, attr);
-    else
-	pum_screen_puts_with_attrs(row, col, cells, st, size, attrs);
+    ಆದರೆ (attrs == ಖಾಲಿ)
+	screen_puts_len(st, ಗಾತ್ರ_2, ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು, attr);
+    ಇಲ್ಲದಿದ್ದರೆ
+	pum_screen_puts_with_attrs(ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು, cells, st, ಗಾತ್ರ_2, attrs);
 
-    if (truncated)
+    ಆದರೆ (truncated)
     {
-	if (over_cell > 0)
-	    screen_fill(row, row + 1, col + cells,
-		    col + cells + over_cell, ' ', ' ', attr);
+	ಆದರೆ (over_cell > 0)
+	    screen_fill(ಅಡ್ಡಸಾಲು, ಅಡ್ಡಸಾಲು + 1, ಲಂಬಸಾಲು + cells,
+		    ಲಂಬಸಾಲು + cells + over_cell, ' ', ' ', attr);
 
-	screen_putchar(trunc, row, col + cells + over_cell, trunc_attr);
+	screen_putchar(trunc, ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು + cells + over_cell, trunc_attr);
     }
 
     VIM_CLEAR(st);
-    return col + width;
+    ಹಿಂತಿರುಗಿ ಲಂಬಸಾಲು + ಅಗಲ;
 }
 
 
@@ -819,133 +819,133 @@ pum_display_ltr_text(
  * Process and display a single popup menu item (text/kind/extra).
  * Returns the new column position after drawing.
  */
-    static int
-pum_process_item(
-	int     row,
-	int     col,
-	int     idx,
-	int     j,         // Current position in order array
-	int     *order,    // Order array
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+pum_process_ಅಂಶ(
+	ಪೂರ್ಣಾಂಕ     ಅಡ್ಡಸಾಲು,
+	ಪೂರ್ಣಾಂಕ     ಲಂಬಸಾಲು,
+	ಪೂರ್ಣಾಂಕ     idx,
+	ಪೂರ್ಣಾಂಕ     j,         // Current position in order array
+	ಪೂರ್ಣಾಂಕ     *ಕ್ರಮ,    // Order array
 	hlf_T   hlf,
-	int     attr,
-	int     *totwidth_ptr,
-	int     next_isempty)
+	ಪೂರ್ಣಾಂಕ     attr,
+	ಪೂರ್ಣಾಂಕ     *totwidth_ptr,
+	ಪೂರ್ಣಾಂಕ     ಮುಂದಿನ_isempty)
 {
-    int     item_type = order[j];
-    char_u  *s = NULL;
-    char_u  *p = pum_get_item(idx, item_type);
-    int     width = 0;  // item width
-    int     w;		// char width
-    int	    selected = idx == pum_selected;
+    ಪೂರ್ಣಾಂಕ     ಅಂಶ_type = ಕ್ರಮ[j];
+    char_u  *s = ಖಾಲಿ;
+    char_u  *p = pum_get_ಅಂಶ(idx, ಅಂಶ_type);
+    ಪೂರ್ಣಾಂಕ     ಅಗಲ = 0;  // item width
+    ಪೂರ್ಣಾಂಕ     w;		// char width
+    ಪೂರ್ಣಾಂಕ	    selected = idx == pum_selected;
 
-    for ( ; ; MB_PTR_ADV(p))
+    ಗಾಗಿ ( ; ; MB_PTR_ADV(p))
     {
-	if (s == NULL)
+	ಆದರೆ (s == ಖಾಲಿ)
 	    s = p;
 	w = ptr2cells(p);
-	if (*p != NUL && *p != TAB && *totwidth_ptr + w <= pum_width)
+	ಆದರೆ (*p != NUL && *p != TAB && *totwidth_ptr + w <= pum_ಅಗಲ)
 	{
-	    width += w;
-	    continue;
+	    ಅಗಲ += w;
+	    ಮುಂದುವರಿ;
 	}
 
 	// Display the text that fits or comes before a Tab.
 	// First convert it to printable characters.
 	char_u  *st;
-	int     *attrs = NULL;
-	int     saved = *p;
+	ಪೂರ್ಣಾಂಕ     *attrs = ಖಾಲಿ;
+	ಪೂರ್ಣಾಂಕ     saved = *p;
 
-	if (saved != NUL)
+	ಆದರೆ (saved != NUL)
 	    *p = NUL;
 	st = transstr(s);
-	if (saved != NUL)
+	ಆದರೆ (saved != NUL)
 	    *p = saved;
 
-	if (item_type == CPT_ABBR)
-	    attrs = pum_compute_text_attrs(st, hlf,
+	ಆದರೆ (ಅಂಶ_type == CPT_ABBR)
+	    attrs = pum_compute_ಪಠ್ಯ_attrs(st, hlf,
 		      pum_array[idx].pum_user_abbr_hlattr);
-#ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
-	    col = pum_display_rtl_text(row, col, st, attr, attrs,
-		    width, pum_width, *totwidth_ptr, next_isempty, selected);
-	else
-#endif
-	    col = pum_display_ltr_text(row, col, st, attr, attrs,
-		    width, pum_width, *totwidth_ptr, next_isempty, selected);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+	ಆದರೆ (pum_rl)
+	    ಲಂಬಸಾಲು = pum_display_rtl_ಪಠ್ಯ(ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು, st, attr, attrs,
+		    ಅಗಲ, pum_ಅಗಲ, *totwidth_ptr, ಮುಂದಿನ_isempty, selected);
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಲಂಬಸಾಲು = pum_display_ltr_ಪಠ್ಯ(ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು, st, attr, attrs,
+		    ಅಗಲ, pum_ಅಗಲ, *totwidth_ptr, ಮುಂದಿನ_isempty, selected);
 
-	if (attrs != NULL)
+	ಆದರೆ (attrs != ಖಾಲಿ)
 	    VIM_CLEAR(attrs);
 
-	if (*p != TAB)
-	    break;
+	ಆದರೆ (*p != TAB)
+	    ನಿಲ್ಲಿಸು;
 
 	// Display two spaces for a Tab.
-#ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+	ಆದರೆ (pum_rl)
 	{
-	    screen_puts_len((char_u *)"  ", 2, row, col - 1, attr);
-	    col -= 2;
+	    screen_puts_len((char_u *)"  ", 2, ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು - 1, attr);
+	    ಲಂಬಸಾಲು -= 2;
 	}
-	else
-#endif
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 	{
-	    screen_puts_len((char_u *)"  ", 2, row, col, attr);
-	    col += 2;
+	    screen_puts_len((char_u *)"  ", 2, ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು, attr);
+	    ಲಂಬಸಾಲು += 2;
 	}
 	*totwidth_ptr += 2;
-	s = NULL;  // start text at next char
-	width = 0;
+	s = ಖಾಲಿ;  // start text at next char
+	ಅಗಲ = 0;
     }
 
-    return col;
+    ಹಿಂತಿರುಗಿ ಲಂಬಸಾಲು;
 }
 
 /*
  * Draw the scrollbar for the popup menu.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 pum_draw_scrollbar(
-	int	row,
-	int	i,
-	int	thumb_pos,
-	int	thumb_height)
+	ಪೂರ್ಣಾಂಕ	ಅಡ್ಡಸಾಲು,
+	ಪೂರ್ಣಾಂಕ	i,
+	ಪೂರ್ಣಾಂಕ	thumb_pos,
+	ಪೂರ್ಣಾಂಕ	thumb_ಎತ್ತರ)
 {
-    if (pum_scrollbar <= 0)
-	return;
+    ಆದರೆ (pum_scrollbar <= 0)
+	ಹಿಂತಿರುಗಿ;
 
-    int attr = (i >= thumb_pos && i < thumb_pos + thumb_height) ?
+    ಪೂರ್ಣಾಂಕ attr = (i >= thumb_pos && i < thumb_pos + thumb_ಎತ್ತರ) ?
 			highlight_attr[HLF_PST] : highlight_attr[HLF_PSB];
 
-#ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
-	screen_putchar(' ', row, pum_col - pum_width, attr);
-    else
-#endif
-	screen_putchar(' ', row, pum_col + pum_width, attr);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+    ಆದರೆ (pum_rl)
+	screen_putchar(' ', ಅಡ್ಡಸಾಲು, pum_ಲಂಬಸಾಲು - pum_ಅಗಲ, attr);
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	screen_putchar(' ', ಅಡ್ಡಸಾಲು, pum_ಲಂಬಸಾಲು + pum_ಅಗಲ, attr);
 }
 
-    static inline void
-pum_align_order(int *order)
+    ಸ್ಥಿರ ಸಾಲೊಳಗೆ ಶೂನ್ಯ
+pum_align_ಕ್ರಮ(ಪೂರ್ಣಾಂಕ *ಕ್ರಮ)
 {
-    int is_default = cia_flags == 0;
-    order[0] = is_default ? CPT_ABBR : cia_flags / 100;
-    order[1] = is_default ? CPT_KIND : (cia_flags / 10) % 10;
-    order[2] = is_default ? CPT_MENU : cia_flags % 10;
+    ಪೂರ್ಣಾಂಕ is_default = cia_flags == 0;
+    ಕ್ರಮ[0] = is_default ? CPT_ABBR : cia_flags / 100;
+    ಕ್ರಮ[1] = is_default ? CPT_ಬಗೆ : (cia_flags / 10) % 10;
+    ಕ್ರಮ[2] = is_default ? CPT_MENU : cia_flags % 10;
 }
 
-static void pum_free_bg(void);
+ಸ್ಥಿರ ಶೂನ್ಯ pum_free_bg(ಶೂನ್ಯ);
 
 /*
  * Called when the pum opacity value has changed.
  * Invalidates cached background and triggers redraw if pum is visible.
  */
-    void
-pum_opacity_changed(void)
+    ಶೂನ್ಯ
+pum_opacity_ಬದಲಾಯಿತು(ಶೂನ್ಯ)
 {
     // Invalidate cached background so it gets re-saved.
     pum_free_bg();
 
-    if (pum_visible())
+    ಆದರೆ (pum_visible())
     {
 	// Force full screen clear so ScreenAttrs doesn't retain
 	// stale blended values from the previous pumopacity.
@@ -955,72 +955,72 @@ pum_opacity_changed(void)
     }
 }
 
-    static void
-pum_free_bg(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+pum_free_bg(ಶೂನ್ಯ)
 {
-    int k;
+    ಪೂರ್ಣಾಂಕ k;
     VIM_CLEAR(pum_bg_attrs);
-    VIM_CLEAR(pum_bg_lines);
-    VIM_CLEAR(pum_bg_linesUC);
-    for (k = 0; k < MAX_MCO; ++k)
-	VIM_CLEAR(pum_bg_linesC[k]);
-    pum_bg_top = 0;
+    VIM_CLEAR(pum_bg_ಸಾಲುಗಳು);
+    VIM_CLEAR(pum_bg_ಸಾಲುಗಳು_UC);
+    ಗಾಗಿ (k = 0; k < MAX_MCO; ++k)
+	VIM_CLEAR(pum_bg_ಸಾಲುಗಳು_C[k]);
+    pum_bg_ತುದಿ = 0;
     pum_bg_bot = 0;
-    pum_bg_cols = 0;
+    pum_bg_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = 0;
 }
 
 /*
  * Redraw the popup menu, using "pum_first" and "pum_selected".
  */
-    void
-pum_redraw(void)
+    ಶೂನ್ಯ
+pum_redraw(ಶೂನ್ಯ)
 {
-    int		row = pum_row;
-    int		col;
+    ಪೂರ್ಣಾಂಕ		ಅಡ್ಡಸಾಲು = pum_ಅಡ್ಡಸಾಲು;
+    ಪೂರ್ಣಾಂಕ		ಲಂಬಸಾಲು;
     hlf_T	*hlfs; // array used for highlights
     hlf_T	hlf;
-    int		attr;
-    int		i, j;
-    int		idx;
-    char_u	*p = NULL;
-    int		totwidth;
-    int		thumb_pos = 0;
-    int		thumb_height = 1;
-    int		item_type;
-    int		order[3];
-    int		next_isempty = FALSE;
-    int		n;
-    int		items_width_array[3] = { pum_base_width, pum_kind_width,
-							    pum_extra_width };
-    int		basic_width;  // first item width
-    int		last_isabbr = FALSE;
-    int		orig_attr = -1;
-    int		scroll_range = pum_size - pum_height;
+    ಪೂರ್ಣಾಂಕ		attr;
+    ಪೂರ್ಣಾಂಕ		i, j;
+    ಪೂರ್ಣಾಂಕ		idx;
+    char_u	*p = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		totwidth;
+    ಪೂರ್ಣಾಂಕ		thumb_pos = 0;
+    ಪೂರ್ಣಾಂಕ		thumb_ಎತ್ತರ = 1;
+    ಪೂರ್ಣಾಂಕ		ಅಂಶ_type;
+    ಪೂರ್ಣಾಂಕ		ಕ್ರಮ[3];
+    ಪೂರ್ಣಾಂಕ		ಮುಂದಿನ_isempty = FALSE;
+    ಪೂರ್ಣಾಂಕ		n;
+    ಪೂರ್ಣಾಂಕ		ವಸ್ತುಗಳು_ಅಗಲ_array[3] = { pum_ತಳ_ಅಗಲ, pum_ಬಗೆ_ಅಗಲ,
+							    pum_extra_ಅಗಲ };
+    ಪೂರ್ಣಾಂಕ		basic_ಅಗಲ;  // first item width
+    ಪೂರ್ಣಾಂಕ		ಕೊನೆಯ_isabbr = FALSE;
+    ಪೂರ್ಣಾಂಕ		orig_attr = -1;
+    ಪೂರ್ಣಾಂಕ		scroll_range = pum_ಗಾತ್ರ - pum_ಎತ್ತರ;
     bool	override_success;
-    int		opacity_active = (p_po > 0 && p_po < 100);
+    ಪೂರ್ಣಾಂಕ		opacity_ಸಕ್ರಿಯ = (p_po > 0 && p_po < 100);
 
     // Use current window for highlight overrides when using 'winhighlight'
-    override_success = push_highlight_overrides(curwin->w_hl, curwin->w_hl_len);
+    override_success = ತಳ್ಳು_highlight_overrides(curwin->w_hl, curwin->w_hl_len);
 
     // Batch the underlying screen update and the pum drawing into a single
     // synchronized output frame to avoid flicker.
-    term_set_sync_output(TERM_SYNC_OUTPUT_ENABLE);
+    ಪದ_ಗಣ_sync_output(ಪದ_SYNC_OUTPUT_ENABLE);
 
-#ifdef FEAT_IMAGE_POPUP
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_IMAGE_POPUP
     // Create a image placement so that other images are clipped correctly
-    if (pum_imagep == NULL)
+    ಆದರೆ (pum_imagep == ಖಾಲಿ)
 	// Make pom always be on top of any image placement with same zindex.
-	pum_imagep = image_placement_new(NULL, UINT_MAX,
+	pum_imagep = image_placement_new(ಖಾಲಿ, UINT_MAX,
 		IMAGE_PLACEMENT_USE_PUM, true);
-    if (pum_imagep != NULL)
+    ಆದರೆ (pum_imagep != ಖಾಲಿ)
     {
-	image_placement_set_zindex(pum_imagep, POPUPMENU_ZINDEX);
-	image_placement_set_position(pum_imagep, pum_row, pum_col);
-	image_placement_set_bounding_box(pum_imagep, pum_row, pum_col,
-		pum_height, pum_width);
-	image_placement_set_enable(pum_imagep, true);
+	image_placement_ಗಣ_zindex(pum_imagep, POPUPMENU_ZINDEX);
+	image_placement_ಗಣ_position(pum_imagep, pum_ಅಡ್ಡಸಾಲು, pum_ಲಂಬಸಾಲು);
+	image_placement_ಗಣ_bounding_box(pum_imagep, pum_ಅಡ್ಡಸಾಲು, pum_ಲಂಬಸಾಲು,
+		pum_ಎತ್ತರ, pum_ಅಗಲ);
+	image_placement_ಗಣ_enable(pum_imagep, true);
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     hlf_T	hlfsNorm[3];
     hlf_T	hlfsSel[3];
@@ -1034,17 +1034,17 @@ pum_redraw(void)
     hlfsNorm[2] = HLF_PNX;
     hlfsSel[2] = HLF_PSX;
 
-    if (call_update_screen)
+    ಆದರೆ (call_update_screen)
     {
 	call_update_screen = FALSE;
 	// Invalidate cached background if screen size changed (e.g.
 	// after window resize).
-	if (opacity_active && pum_bg_lines != NULL
-		&& (pum_bg_cols != screen_Columns
-		    || pum_bg_bot > screen_Rows))
+	ಆದರೆ (opacity_ಸಕ್ರಿಯ && pum_bg_ಸಾಲುಗಳು != ಖಾಲಿ
+		&& (pum_bg_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ != screen_Columns
+		    || pum_bg_bot > screen_ಅಡ್ಡಸಾಲುಗಳು))
 	    pum_free_bg();
 
-	if (opacity_active && pum_bg_lines != NULL)
+	ಆದರೆ (opacity_ಸಕ್ರಿಯ && pum_bg_ಸಾಲುಗಳು != ಖಾಲಿ)
 	{
 	    // Already have saved background; skip update_screen to avoid
 	    // flickering.  Just do a normal pum_will_redraw update.
@@ -1052,7 +1052,7 @@ pum_redraw(void)
 	    update_screen(0);
 	    pum_will_redraw = FALSE;
 	}
-	else if (opacity_active)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (opacity_ಸಕ್ರಿಯ)
 	{
 	    // For opacity: draw background including the area under the
 	    // pum, then save it.
@@ -1061,66 +1061,66 @@ pum_redraw(void)
 	    pum_pretend_not_visible = FALSE;
 
 	    // Save background to static buffers.
-	    if (ScreenLines != NULL && ScreenAttrs != NULL)
+	    ಆದರೆ (Screen_ಸಾಲುಗಳು != ಖಾಲಿ && ScreenAttrs != ಖಾಲಿ)
 	    {
-		int	save_top, save_bot, save_ncells, k;
+		ಪೂರ್ಣಾಂಕ	save_ತುದಿ, save_bot, save_ncells, k;
 
 		pum_free_bg();
-		save_top = pum_row - pum_border;
-		save_bot = pum_row + pum_height + pum_border
+		save_ತುದಿ = pum_ಅಡ್ಡಸಾಲು - pum_border;
+		save_bot = pum_ಅಡ್ಡಸಾಲು + pum_ಎತ್ತರ + pum_border
 					    + (pum_shadow ? 1 : 0) + 1;
-		if (save_top < 0)
-		    save_top = 0;
-		if (save_bot > screen_Rows)
-		    save_bot = screen_Rows;
-		pum_bg_top = save_top;
+		ಆದರೆ (save_ತುದಿ < 0)
+		    save_ತುದಿ = 0;
+		ಆದರೆ (save_bot > screen_ಅಡ್ಡಸಾಲುಗಳು)
+		    save_bot = screen_ಅಡ್ಡಸಾಲುಗಳು;
+		pum_bg_ತುದಿ = save_ತುದಿ;
 		pum_bg_bot = save_bot;
-		pum_bg_cols = screen_Columns;
-		if (save_top < save_bot)
+		pum_bg_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = screen_Columns;
+		ಆದರೆ (save_ತುದಿ < save_bot)
 		{
-		    save_ncells = (save_bot - save_top) * screen_Columns;
+		    save_ncells = (save_bot - save_ತುದಿ) * screen_Columns;
 		    pum_bg_attrs = LALLOC_MULT(sattr_T, save_ncells);
-		    pum_bg_lines = LALLOC_MULT(schar_T, save_ncells);
-		    if (enc_utf8)
+		    pum_bg_ಸಾಲುಗಳು = LALLOC_MULT(schar_T, save_ncells);
+		    ಆದರೆ (enc_utf8)
 		    {
-			pum_bg_linesUC = LALLOC_MULT(u8char_T, save_ncells);
-			for (k = 0; k < MAX_MCO; ++k)
-			    pum_bg_linesC[k] = LALLOC_MULT(u8char_T,
+			pum_bg_ಸಾಲುಗಳು_UC = LALLOC_MULT(u8char_T, save_ncells);
+			ಗಾಗಿ (k = 0; k < MAX_MCO; ++k)
+			    pum_bg_ಸಾಲುಗಳು_C[k] = LALLOC_MULT(u8char_T,
 							    save_ncells);
 		    }
-		    if (pum_bg_attrs != NULL && pum_bg_lines != NULL)
+		    ಆದರೆ (pum_bg_attrs != ಖಾಲಿ && pum_bg_ಸಾಲುಗಳು != ಖಾಲಿ)
 		    {
-			for (int r = save_top; r < save_bot; ++r)
+			ಗಾಗಿ (ಪೂರ್ಣಾಂಕ r = save_ತುದಿ; r < save_bot; ++r)
 			{
-			    int soff = (r - save_top) * screen_Columns;
-			    int loff = LineOffset[r];
+			    ಪೂರ್ಣಾಂಕ soff = (r - save_ತುದಿ) * screen_Columns;
+			    ಪೂರ್ಣಾಂಕ loff = ಸಾಲು_ಸ್ಥಾನಾಂತರ[r];
 
 			    mch_memmove(pum_bg_attrs + soff,
 				    ScreenAttrs + loff,
-				    screen_Columns * sizeof(sattr_T));
-			    mch_memmove(pum_bg_lines + soff,
-				    ScreenLines + loff,
-				    screen_Columns * sizeof(schar_T));
-			    if (enc_utf8 && pum_bg_linesUC != NULL
-						&& ScreenLinesUC != NULL)
+				    screen_Columns * ಗಾತ್ರ(sattr_T));
+			    mch_memmove(pum_bg_ಸಾಲುಗಳು + soff,
+				    Screen_ಸಾಲುಗಳು + loff,
+				    screen_Columns * ಗಾತ್ರ(schar_T));
+			    ಆದರೆ (enc_utf8 && pum_bg_ಸಾಲುಗಳು_UC != ಖಾಲಿ
+						&& Screen_ಸಾಲುಗಳು_UC != ಖಾಲಿ)
 			    {
-				mch_memmove(pum_bg_linesUC + soff,
-					ScreenLinesUC + loff,
-					screen_Columns * sizeof(u8char_T));
-				for (k = 0; k < MAX_MCO; ++k)
-				    if (pum_bg_linesC[k] != NULL
-						    && ScreenLinesC[k] != NULL)
-					mch_memmove(pum_bg_linesC[k] + soff,
-						ScreenLinesC[k] + loff,
+				mch_memmove(pum_bg_ಸಾಲುಗಳು_UC + soff,
+					Screen_ಸಾಲುಗಳು_UC + loff,
+					screen_Columns * ಗಾತ್ರ(u8char_T));
+				ಗಾಗಿ (k = 0; k < MAX_MCO; ++k)
+				    ಆದರೆ (pum_bg_ಸಾಲುಗಳು_C[k] != ಖಾಲಿ
+						    && Screen_ಸಾಲುಗಳು_C[k] != ಖಾಲಿ)
+					mch_memmove(pum_bg_ಸಾಲುಗಳು_C[k] + soff,
+						Screen_ಸಾಲುಗಳು_C[k] + loff,
 						screen_Columns
-						    * sizeof(u8char_T));
+						    * ಗಾತ್ರ(u8char_T));
 			    }
 			}
 		    }
 		}
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // Do not redraw in pum_may_redraw() and don't draw in the area
 	    // where the popup menu will be.
@@ -1131,199 +1131,199 @@ pum_redraw(void)
     }
 
     // never display more than we have
-    pum_first = MIN(pum_first, scroll_range);
+    pum_ಮೊದಲ = MIN(pum_ಮೊದಲ, scroll_range);
 
-    if (pum_scrollbar)
+    ಆದರೆ (pum_scrollbar)
     {
-	thumb_height = pum_height * pum_height / pum_size;
-	if (thumb_height == 0)
-	    thumb_height = 1;
-	thumb_pos = (pum_first * (pum_height - thumb_height)
+	thumb_ಎತ್ತರ = pum_ಎತ್ತರ * pum_ಎತ್ತರ / pum_ಗಾತ್ರ;
+	ಆದರೆ (thumb_ಎತ್ತರ == 0)
+	    thumb_ಎತ್ತರ = 1;
+	thumb_pos = (pum_ಮೊದಲ * (pum_ಎತ್ತರ - thumb_ಎತ್ತರ)
 			    + scroll_range / 2) / scroll_range;
     }
 
-#ifdef FEAT_PROP_POPUP
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
     // The popup menu is drawn over popup menus with zindex under
     // POPUPMENU_ZINDEX.
     screen_zindex = POPUPMENU_ZINDEX;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Draw border and shadow first if enabled, before setting blend
     // so that border/shadow characters are drawn without opacity.
-    if (pum_border)
+    ಆದರೆ (pum_border)
 	pum_draw_border();
-    if (pum_shadow)
+    ಆದರೆ (pum_shadow)
 	pum_draw_shadow();
 
     // Set blend for screen_puts_len / screen_fill to use.
     // Only the pum content area should be blended, not border/shadow.
-    if (opacity_active)
-	screen_pum_blend = 100 - (int)p_po;
+    ಆದರೆ (opacity_ಸಕ್ರಿಯ)
+	screen_pum_blend = 100 - (ಪೂರ್ಣಾಂಕ)p_po;
 
-    for (i = 0; i < pum_height; ++i)
+    ಗಾಗಿ (i = 0; i < pum_ಎತ್ತರ; ++i)
     {
-	idx = i + pum_first;
+	idx = i + pum_ಮೊದಲ;
 	hlfs = (idx == pum_selected) ? hlfsSel : hlfsNorm;
 	hlf = hlfs[0]; // start with "word" highlight
 	attr = highlight_attr[hlf];
 
 	// prepend a space if there is room
-#ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+	ಆದರೆ (pum_rl)
 	{
-	    if (pum_col < curwin->w_wincol + curwin->w_width - 1
+	    ಆದರೆ (pum_ಲಂಬಸಾಲು < curwin->w_wincol + curwin->w_ಅಗಲ - 1
 							    - pum_border)
-		screen_putchar(' ', row, pum_col + 1, attr);
+		screen_putchar(' ', ಅಡ್ಡಸಾಲು, pum_ಲಂಬಸಾಲು + 1, attr);
 	}
-	else
-#endif
-	    if (pum_col > pum_border)
-		screen_putchar(' ', row, pum_col - 1, attr);
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಆದರೆ (pum_ಲಂಬಸಾಲು > pum_border)
+		screen_putchar(' ', ಅಡ್ಡಸಾಲು, pum_ಲಂಬಸಾಲು - 1, attr);
 
 	// Display each entry, use two spaces for a Tab.
 	// Do this 3 times and order from p_cia
-	col = pum_col;
+	ಲಂಬಸಾಲು = pum_ಲಂಬಸಾಲು;
 	totwidth = 0;
-	pum_align_order(order);
-	basic_width = items_width_array[order[0]];
-	last_isabbr = order[2] == CPT_ABBR;
-	for (j = 0; j < 3; ++j)
+	pum_align_ಕ್ರಮ(ಕ್ರಮ);
+	basic_ಅಗಲ = ವಸ್ತುಗಳು_ಅಗಲ_array[ಕ್ರಮ[0]];
+	ಕೊನೆಯ_isabbr = ಕ್ರಮ[2] == CPT_ABBR;
+	ಗಾಗಿ (j = 0; j < 3; ++j)
 	{
-	    item_type = order[j];
-	    hlf = hlfs[item_type];
+	    ಅಂಶ_type = ಕ್ರಮ[j];
+	    hlf = hlfs[ಅಂಶ_type];
 	    attr = highlight_attr[hlf];
 	    orig_attr = attr;
-	    if (item_type < 2)  // try combine attr with user custom
-		attr = pum_user_attr_combine(idx, item_type, attr);
-	    p = pum_get_item(idx, item_type);
+	    ಆದರೆ (ಅಂಶ_type < 2)  // try combine attr with user custom
+		attr = pum_user_attr_combine(idx, ಅಂಶ_type, attr);
+	    p = pum_get_ಅಂಶ(idx, ಅಂಶ_type);
 
-	    if (j + 1 < 3)
-		next_isempty = pum_get_item(idx, order[j + 1]) == NULL;
-	    else
-		next_isempty = TRUE;
+	    ಆದರೆ (j + 1 < 3)
+		ಮುಂದಿನ_isempty = pum_get_ಅಂಶ(idx, ಕ್ರಮ[j + 1]) == ಖಾಲಿ;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ಮುಂದಿನ_isempty = TRUE;
 
-	    if (p != NULL)
+	    ಆದರೆ (p != ಖಾಲಿ)
 		// Process and display the item
-		col = pum_process_item(row, col, idx, j, order, hlf, attr,
-						    &totwidth, next_isempty);
+		ಲಂಬಸಾಲು = pum_process_ಅಂಶ(ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು, idx, j, ಕ್ರಮ, hlf, attr,
+						    &totwidth, ಮುಂದಿನ_isempty);
 
-	    if (j > 0)
-		n = items_width_array[order[1]] + (last_isabbr ? 0 : 1);
-	    else
-		n = order[j] == CPT_ABBR ? 1 : 0;
+	    ಆದರೆ (j > 0)
+		n = ವಸ್ತುಗಳು_ಅಗಲ_array[ಕ್ರಮ[1]] + (ಕೊನೆಯ_isabbr ? 0 : 1);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		n = ಕ್ರಮ[j] == CPT_ABBR ? 1 : 0;
 
 	    // Stop when there is nothing more to display.
-	    if (j == 2
-		    || (next_isempty && (j == 1 || (j == 0
-				&& pum_get_item(idx, order[j + 2]) == NULL)))
-		    || basic_width + n >= pum_width)
-		break;
-#ifdef FEAT_RIGHTLEFT
-	    if (pum_rl)
+	    ಆದರೆ (j == 2
+		    || (ಮುಂದಿನ_isempty && (j == 1 || (j == 0
+				&& pum_get_ಅಂಶ(idx, ಕ್ರಮ[j + 2]) == ಖಾಲಿ)))
+		    || basic_ಅಗಲ + n >= pum_ಅಗಲ)
+		ನಿಲ್ಲಿಸು;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+	    ಆದರೆ (pum_rl)
 	    {
-		screen_fill(row, row + 1, pum_col - basic_width - n + 1,
-						col + 1, ' ', ' ', orig_attr);
-		col = pum_col - basic_width - n;
+		screen_fill(ಅಡ್ಡಸಾಲು, ಅಡ್ಡಸಾಲು + 1, pum_ಲಂಬಸಾಲು - basic_ಅಗಲ - n + 1,
+						ಲಂಬಸಾಲು + 1, ' ', ' ', orig_attr);
+		ಲಂಬಸಾಲು = pum_ಲಂಬಸಾಲು - basic_ಅಗಲ - n;
 	    }
-	    else
-#endif
+	    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 	    {
-		screen_fill(row, row + 1, col, pum_col + basic_width + n,
+		screen_fill(ಅಡ್ಡಸಾಲು, ಅಡ್ಡಸಾಲು + 1, ಲಂಬಸಾಲು, pum_ಲಂಬಸಾಲು + basic_ಅಗಲ + n,
 							' ', ' ', orig_attr);
-		col = pum_col + basic_width + n;
+		ಲಂಬಸಾಲು = pum_ಲಂಬಸಾಲು + basic_ಅಗಲ + n;
 	    }
-	    totwidth = basic_width + n;
+	    totwidth = basic_ಅಗಲ + n;
 	}
 
-#ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
-	    screen_fill(row, row + 1, pum_col - pum_width + 1, col + 1,
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+	ಆದರೆ (pum_rl)
+	    screen_fill(ಅಡ್ಡಸಾಲು, ಅಡ್ಡಸಾಲು + 1, pum_ಲಂಬಸಾಲು - pum_ಅಗಲ + 1, ಲಂಬಸಾಲು + 1,
 							    ' ', ' ', orig_attr);
-	else
-#endif
-	    screen_fill(row, row + 1, col, pum_col + pum_width, ' ', ' ',
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	    screen_fill(ಅಡ್ಡಸಾಲು, ಅಡ್ಡಸಾಲು + 1, ಲಂಬಸಾಲು, pum_ಲಂಬಸಾಲು + pum_ಅಗಲ, ' ', ' ',
 								orig_attr);
-	pum_draw_scrollbar(row, i, thumb_pos, thumb_height);
+	pum_draw_scrollbar(ಅಡ್ಡಸಾಲು, i, thumb_pos, thumb_ಎತ್ತರ);
 
-	++row;
+	++ಅಡ್ಡಸಾಲು;
     }
 
     screen_pum_blend = 0;
 
-#ifdef FEAT_PROP_POPUP
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_PROP_POPUP
     screen_zindex = 0;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (override_success)
-	pop_highlight_overrides();
+    ಆದರೆ (override_success)
+	ತೆಗೆ_highlight_overrides();
 
-    term_set_sync_output(TERM_SYNC_OUTPUT_DISABLE);
+    ಪದ_ಗಣ_sync_output(ಪದ_SYNC_OUTPUT_DISABLE);
 }
 
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+#ಆದರೆ defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
 /*
  * Position the info popup relative to the popup menu item.
  */
-    void
+    ಶೂನ್ಯ
 pum_position_info_popup(win_T *wp)
 {
-    int col = pum_col + pum_width + pum_scrollbar + 1;
-    int row = pum_row;
-    int botpos = POPPOS_BOTLEFT;
-    int	used_maxwidth_opt = FALSE;
-    int	right_margin, left_margin, dummy;
-    int left_extra_width, right_extra_width;
+    ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು = pum_ಲಂಬಸಾಲು + pum_ಅಗಲ + pum_scrollbar + 1;
+    ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು = pum_ಅಡ್ಡಸಾಲು;
+    ಪೂರ್ಣಾಂಕ botpos = POPPOS_BOTLEFT;
+    ಪೂರ್ಣಾಂಕ	ಬಳಸಿದ_maxwidth_opt = FALSE;
+    ಪೂರ್ಣಾಂಕ	ಬಲ_margin, ಎಡ_margin, dummy;
+    ಪೂರ್ಣಾಂಕ ಎಡ_extra_ಅಗಲ, ಬಲ_extra_ಅಗಲ;
 
-    (void)compute_margins(&right_margin, &left_margin, &dummy);
+    (ಶೂನ್ಯ)compute_margins(&ಬಲ_margin, &ಎಡ_margin, &dummy);
 
-    left_extra_width = pum_border + left_margin;
-    right_extra_width = pum_border + right_margin + (pum_shadow ? 2 : 0);
-    col += right_extra_width;
+    ಎಡ_extra_ಅಗಲ = pum_border + ಎಡ_margin;
+    ಬಲ_extra_ಅಗಲ = pum_border + ಬಲ_margin + (pum_shadow ? 2 : 0);
+    ಲಂಬಸಾಲು += ಬಲ_extra_ಅಗಲ;
 
     wp->w_popup_pos = POPPOS_TOPLEFT;
-    if (Columns - col < 20 && Columns - col < pum_col)
+    ಆದರೆ (Columns - ಲಂಬಸಾಲು < 20 && Columns - ಲಂಬಸಾಲು < pum_ಲಂಬಸಾಲು)
     {
-	col = pum_col - 1 - left_extra_width;
+	ಲಂಬಸಾಲು = pum_ಲಂಬಸಾಲು - 1 - ಎಡ_extra_ಅಗಲ;
 	wp->w_popup_pos = POPPOS_TOPRIGHT;
 	botpos = POPPOS_BOTRIGHT;
-	wp->w_maxwidth = pum_col - 1 - left_extra_width;
+	wp->w_maxwidth = pum_ಲಂಬಸಾಲು - 1 - ಎಡ_extra_ಅಗಲ;
     }
-    else
-	wp->w_maxwidth = Columns - col + 1;
-    wp->w_maxwidth -= popup_extra_width(wp);
-    if (wp->w_maxwidth_opt > 0 && wp->w_maxwidth > wp->w_maxwidth_opt)
+    ಇಲ್ಲದಿದ್ದರೆ
+	wp->w_maxwidth = Columns - ಲಂಬಸಾಲು + 1;
+    wp->w_maxwidth -= popup_extra_ಅಗಲ(wp);
+    ಆದರೆ (wp->w_maxwidth_opt > 0 && wp->w_maxwidth > wp->w_maxwidth_opt)
     {
 	// option value overrules computed value
 	wp->w_maxwidth = wp->w_maxwidth_opt;
-	used_maxwidth_opt = TRUE;
+	ಬಳಸಿದ_maxwidth_opt = TRUE;
     }
 
-    row -= popup_top_extra(wp);
-    if (wp->w_popup_flags & POPF_INFO_MENU)
+    ಅಡ್ಡಸಾಲು -= popup_ತುದಿ_extra(wp);
+    ಆದರೆ (wp->w_popup_flags & POPF_INFO_MENU)
     {
-	if (pum_row < pum_win_row)
+	ಆದರೆ (pum_ಅಡ್ಡಸಾಲು < pum_win_ಅಡ್ಡಸಾಲು)
 	{
 	    // menu above cursor line, align with bottom
-	    row += pum_height;
+	    ಅಡ್ಡಸಾಲು += pum_ಎತ್ತರ;
 	    wp->w_popup_pos = botpos;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    // menu below cursor line, align with top
-	    row += 1;
+	    ಅಡ್ಡಸಾಲು += 1;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	// align with the selected item
-	row += pum_selected - pum_first + 1;
+	ಅಡ್ಡಸಾಲು += pum_selected - pum_ಮೊದಲ + 1;
 
     wp->w_popup_flags &= ~POPF_HIDDEN;
-    if (wp->w_maxwidth < 10 && !used_maxwidth_opt)
+    ಆದರೆ (wp->w_maxwidth < 10 && !ಬಳಸಿದ_maxwidth_opt)
 	// The popup is not going to fit or will overlap with the cursor
 	// position, hide the popup.
 	wp->w_popup_flags |= POPF_HIDDEN;
-    else
-	popup_set_wantpos_rowcol(wp, row, col);
+    ಇಲ್ಲದಿದ್ದರೆ
+	popup_ಗಣ_wantpos_rowcol(wp, ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Set the index of the currently selected item.  The menu will scroll when
@@ -1335,63 +1335,63 @@ pum_position_info_popup(win_T *wp)
  * Returns TRUE when the window was resized and the location of the popup menu
  * must be recomputed.
  */
-    static int
-pum_set_selected(int n, int repeat UNUSED)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+pum_ಗಣ_selected(ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ repeat ಬಳಸದ)
 {
-    int	    resized = FALSE;
-    int	    context = pum_height / 2;
-    int	    scroll_offset;
-#ifdef FEAT_QUICKFIX
-    int	    prev_selected = pum_selected;
-    unsigned	cur_cot_flags = get_cot_flags();
-#endif
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
-    int	    has_info = FALSE;
-#endif
+    ಪೂರ್ಣಾಂಕ	    resized = FALSE;
+    ಪೂರ್ಣಾಂಕ	    context = pum_ಎತ್ತರ / 2;
+    ಪೂರ್ಣಾಂಕ	    scroll_ಸ್ಥಾನಾಂತರ;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_QUICKFIX
+    ಪೂರ್ಣಾಂಕ	    prev_selected = pum_selected;
+    ಚಿಹ್ನೆರಹಿತ	cur_cot_flags = get_cot_flags();
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+    ಪೂರ್ಣಾಂಕ	    has_info = FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
 
     pum_selected = n;
-    scroll_offset = pum_selected - pum_height;
+    scroll_ಸ್ಥಾನಾಂತರ = pum_selected - pum_ಎತ್ತರ;
 
-    if (pum_selected >= 0 && pum_selected < pum_size)
+    ಆದರೆ (pum_selected >= 0 && pum_selected < pum_ಗಾತ್ರ)
     {
-	if (pum_first > pum_selected - 4)
+	ಆದರೆ (pum_ಮೊದಲ > pum_selected - 4)
 	{
 	    // scroll down; when we did a jump it's probably a PageUp then
 	    // scroll a whole page
-	    if (pum_first > pum_selected - 2)
+	    ಆದರೆ (pum_ಮೊದಲ > pum_selected - 2)
 	    {
-		pum_first -= pum_height - 2;
-		if (pum_first < 0)
-		    pum_first = 0;
-		else if (pum_first > pum_selected)
-		    pum_first = pum_selected;
+		pum_ಮೊದಲ -= pum_ಎತ್ತರ - 2;
+		ಆದರೆ (pum_ಮೊದಲ < 0)
+		    pum_ಮೊದಲ = 0;
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (pum_ಮೊದಲ > pum_selected)
+		    pum_ಮೊದಲ = pum_selected;
 	    }
-	    else
-		pum_first = pum_selected;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		pum_ಮೊದಲ = pum_selected;
 	}
-	else if (pum_first < scroll_offset + 5)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (pum_ಮೊದಲ < scroll_ಸ್ಥಾನಾಂತರ + 5)
 	{
 	    // scroll up; when we did a jump it's probably a PageDown then
 	    // scroll a whole page
-	    if (pum_first < scroll_offset + 3)
-		pum_first = MAX(pum_first + pum_height - 2, scroll_offset + 1);
-	    else
-		pum_first = scroll_offset + 1;
+	    ಆದರೆ (pum_ಮೊದಲ < scroll_ಸ್ಥಾನಾಂತರ + 3)
+		pum_ಮೊದಲ = MAX(pum_ಮೊದಲ + pum_ಎತ್ತರ - 2, scroll_ಸ್ಥಾನಾಂತರ + 1);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		pum_ಮೊದಲ = scroll_ಸ್ಥಾನಾಂತರ + 1;
 	}
 
 	// Give a few lines of context when possible.
 	context = MIN(context, 3);
-	if (pum_height > 2)
+	ಆದರೆ (pum_ಎತ್ತರ > 2)
 	{
-	    if (pum_first > pum_selected - context)
-		pum_first = MAX(pum_selected - context, 0);  // scroll down
-	    else if (pum_first < pum_selected + context - pum_height + 1)
-		pum_first = pum_selected + context - pum_height + 1;  // up
+	    ಆದರೆ (pum_ಮೊದಲ > pum_selected - context)
+		pum_ಮೊದಲ = MAX(pum_selected - context, 0);  // scroll down
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (pum_ಮೊದಲ < pum_selected + context - pum_ಎತ್ತರ + 1)
+		pum_ಮೊದಲ = pum_selected + context - pum_ಎತ್ತರ + 1;  //ಮೇಲೆ
 	}
 	// adjust for the number of lines displayed
-	pum_first = MIN(pum_first, pum_size - pum_height);
+	pum_ಮೊದಲ = MIN(pum_ಮೊದಲ, pum_ಗಾತ್ರ - pum_ಎತ್ತರ);
 
-#if defined(FEAT_QUICKFIX)
+#ಆದರೆ defined(FEAT_QUICKFIX)
 	/*
 	 * Show extra info in the preview window if there is something and
 	 * 'completeopt' contains "preview" or "popup" or "popuphidden".
@@ -1400,8 +1400,8 @@ pum_set_selected(int n, int repeat UNUSED)
 	 * Skip this for command-window when 'completeopt' contains "preview".
 	 * NOTE: Be very careful not to sync undo!
 	 */
-	if (pum_array[pum_selected].pum_info != NULL
-		&& Rows > 10
+	ಆದರೆ (pum_array[pum_selected].pum_info != ಖಾಲಿ
+		&& ಅಡ್ಡಸಾಲುಗಳು > 10
 		&& repeat <= 1
 		&& (cur_cot_flags & COT_ANY_PREVIEW)
 		&& !((cur_cot_flags & COT_PREVIEW) && cmdwin_type != 0))
@@ -1410,26 +1410,26 @@ pum_set_selected(int n, int repeat UNUSED)
 	    tabpage_T   *curtab_save = curtab;
 # ifdef FEAT_PROP_POPUP
 	    use_popup_T	use_popup;
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  define use_popup USEPOPUP_NONE
 # endif
 # ifdef FEAT_PROP_POPUP
 	    has_info = TRUE;
-	    if (cur_cot_flags & COT_POPUPHIDDEN)
+	    ಆದರೆ (cur_cot_flags & COT_POPUPHIDDEN)
 		use_popup = USEPOPUP_HIDDEN;
-	    else if (cur_cot_flags & COT_POPUP)
-		use_popup = USEPOPUP_NORMAL;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (cur_cot_flags & COT_POPUP)
+		use_popup = USEPOPUP_ಸಾಮಾನ್ಯ;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		use_popup = USEPOPUP_NONE;
-	    if (use_popup != USEPOPUP_NONE)
+	    ಆದರೆ (use_popup != USEPOPUP_NONE)
 		// don't use WinEnter or WinLeave autocommands for the info
 		// popup
-		block_autocmds();
+		ಖಂಡ_autocmds();
 # endif
 	    // Open a preview window and set "curwin" to it.
 	    // 3 lines by default, prefer 'previewheight' if set and smaller.
 	    g_do_tagpreview = 3;
-	    if (p_pvh > 0 && p_pvh < g_do_tagpreview)
+	    ಆದರೆ (p_pvh > 0 && p_pvh < g_do_tagpreview)
 		g_do_tagpreview = p_pvh;
 	    ++RedrawingDisabled;
 	    // Prevent undo sync here, if an autocommand syncs undo weird
@@ -1437,118 +1437,118 @@ pum_set_selected(int n, int repeat UNUSED)
 	    ++no_u_sync;
 	    resized = prepare_tagpreview(FALSE, FALSE, use_popup);
 	    --no_u_sync;
-	    if (RedrawingDisabled > 0)
+	    ಆದರೆ (RedrawingDisabled > 0)
 		--RedrawingDisabled;
 	    g_do_tagpreview = 0;
 
-	    if (curwin->w_p_pvw
+	    ಆದರೆ (curwin->w_p_pvw
 # ifdef FEAT_PROP_POPUP
 		    || (curwin->w_popup_flags & POPF_INFO)
 # endif
 		    )
 	    {
-		int	res = OK;
+		ಪೂರ್ಣಾಂಕ	res = OK;
 
-		if (!resized
+		ಆದರೆ (!resized
 			&& curbuf->b_nwindows == 1
-			&& curbuf->b_fname == NULL
+			&& curbuf->b_fname == ಖಾಲಿ
 			&& bt_nofile(curbuf)
 			&& curbuf->b_p_bh[0] == 'w')
 		{
 		    // Already a "wipeout" buffer, make it empty.
-		    while (!BUFEMPTY())
+		    ಆಗ (!BUFEMPTY())
 			ml_delete((linenr_T)1);
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    // Don't want to sync undo in the current buffer.
 		    ++no_u_sync;
-		    res = do_ecmd(0, NULL, NULL, NULL, ECMD_ONE, 0, NULL);
+		    res = do_ecmd(0, ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ, ECMD_ONE, 0, ಖಾಲಿ);
 		    --no_u_sync;
-		    if (res == OK)
+		    ಆದರೆ (res == OK)
 		    {
 			// Edit a new, empty buffer. Set options for a "wipeout"
 			// buffer.
-			set_option_value_give_err((char_u *)"swf",
-							  0L, NULL, OPT_LOCAL);
-			set_option_value_give_err((char_u *)"bl",
-							  0L, NULL, OPT_LOCAL);
-			set_option_value_give_err((char_u *)"bt",
+			ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"swf",
+							  0L, ಖಾಲಿ, OPT_LOCAL);
+			ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"bl",
+							  0L, ಖಾಲಿ, OPT_LOCAL);
+			ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"bt",
 					    0L, (char_u *)"nofile", OPT_LOCAL);
-			set_option_value_give_err((char_u *)"bh",
+			ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"bh",
 					      0L, (char_u *)"wipe", OPT_LOCAL);
-			set_option_value_give_err((char_u *)"diff",
-							  0L, NULL, OPT_LOCAL);
+			ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"diff",
+							  0L, ಖಾಲಿ, OPT_LOCAL);
 		    }
 		}
-		if (res == OK)
+		ಆದರೆ (res == OK)
 		{
 		    char_u	*p, *e;
 		    linenr_T	lnum = 0;
 
-		    for (p = pum_array[pum_selected].pum_info; *p != NUL; )
+		    ಗಾಗಿ (p = pum_array[pum_selected].pum_info; *p != NUL; )
 		    {
 			e = vim_strchr(p, '\n');
-			if (e == NULL)
+			ಆದರೆ (e == ಖಾಲಿ)
 			{
 			    ml_append(lnum++, p, 0, FALSE);
-			    break;
+			    ನಿಲ್ಲಿಸು;
 			}
 			*e = NUL;
-			ml_append(lnum++, p, (int)(e - p + 1), FALSE);
+			ml_append(lnum++, p, (ಪೂರ್ಣಾಂಕ)(e - p + 1), FALSE);
 			*e = '\n';
 			p = e + 1;
 		    }
 		    // delete the empty last line
-		    ml_delete(curbuf->b_ml.ml_line_count);
+		    ml_delete(curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ);
 
 		    // Increase the height of the preview window to show the
 		    // text, but no more than 'previewheight' lines.
-		    if (repeat == 0 && use_popup == USEPOPUP_NONE)
+		    ಆದರೆ (repeat == 0 && use_popup == USEPOPUP_NONE)
 		    {
 			lnum = MIN(lnum, p_pvh);
-			if (curwin->w_height < lnum)
+			ಆದರೆ (curwin->w_ಎತ್ತರ < lnum)
 			{
-			    win_setheight((int)lnum);
+			    win_setheight((ಪೂರ್ಣಾಂಕ)lnum);
 			    resized = TRUE;
 			}
 		    }
 
-		    curbuf->b_changed = 0;
+		    curbuf->b_ಬದಲಾಯಿತು = 0;
 		    curbuf->b_p_ma = FALSE;
-		    if (pum_selected != prev_selected)
+		    ಆದರೆ (pum_selected != prev_selected)
 		    {
 # ifdef FEAT_PROP_POPUP
 			curwin->w_firstline = 0;
 # endif
 			curwin->w_topline = 1;
 		    }
-		    else if (curwin->w_topline > curbuf->b_ml.ml_line_count)
-			curwin->w_topline = curbuf->b_ml.ml_line_count;
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (curwin->w_topline > curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
+			curwin->w_topline = curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
 		    curwin->w_cursor.lnum = curwin->w_topline;
-		    curwin->w_cursor.col = 0;
+		    curwin->w_cursor.ಲಂಬಸಾಲು = 0;
 # ifdef FEAT_PROP_POPUP
-		    if (use_popup != USEPOPUP_NONE)
+		    ಆದರೆ (use_popup != USEPOPUP_NONE)
 		    {
 			pum_position_info_popup(curwin);
-			if (win_valid(curwin_save))
+			ಆದರೆ (win_valid(curwin_save))
 			    redraw_win_later(curwin_save, UPD_SOME_VALID);
 		    }
 # endif
-		    if ((curwin != curwin_save && win_valid(curwin_save))
+		    ಆದರೆ ((curwin != curwin_save && win_valid(curwin_save))
 			    || (curtab != curtab_save
 						&& valid_tabpage(curtab_save)))
 		    {
-			int save_redr_status;
+			ಪೂರ್ಣಾಂಕ save_redr_ಸ್ಥಿತಿ;
 
-			if (curtab != curtab_save && valid_tabpage(curtab_save))
+			ಆದರೆ (curtab != curtab_save && valid_tabpage(curtab_save))
 			    goto_tabpage_tp(curtab_save, FALSE, FALSE);
 
 			// When the first completion is done and the preview
 			// window is not resized, skip the preview window's
 			// status line redrawing.
-			if (ins_compl_active() && !resized)
-			    curwin->w_redr_status = false;
+			ಆದರೆ (ins_compl_ಸಕ್ರಿಯ() && !resized)
+			    curwin->w_redr_ಸ್ಥಿತಿ = false;
 
 			// Return cursor to where we were
 			validate_cursor();
@@ -1558,7 +1558,7 @@ pum_set_selected(int n, int repeat UNUSED)
 			// update the view on the buffer.  Only go back to
 			// the window when needed, otherwise it will always be
 			// redrawn.
-			if (resized && win_valid(curwin_save))
+			ಆದರೆ (resized && win_valid(curwin_save))
 			{
 			    ++no_u_sync;
 			    win_enter(curwin_save, TRUE);
@@ -1577,14 +1577,14 @@ pum_set_selected(int n, int repeat UNUSED)
 			// current window here, to avoid it gets drawn with
 			// StatusLineNC for a moment and cause flicker.
 			pum_will_redraw = !resized;
-			save_redr_status = curwin_save->w_redr_status;
-			curwin_save->w_redr_status = false;
+			save_redr_ಸ್ಥಿತಿ = curwin_save->w_redr_ಸ್ಥಿತಿ;
+			curwin_save->w_redr_ಸ್ಥಿತಿ = false;
 			update_screen(0);
 			pum_pretend_not_visible = FALSE;
 			pum_will_redraw = FALSE;
-			curwin_save->w_redr_status = save_redr_status;
+			curwin_save->w_redr_ಸ್ಥಿತಿ = save_redr_ಸ್ಥಿತಿ;
 
-			if (!resized && win_valid(curwin_save))
+			ಆದರೆ (!resized && win_valid(curwin_save))
 			{
 # ifdef FEAT_PROP_POPUP
 			    win_T *wp = curwin;
@@ -1593,7 +1593,7 @@ pum_set_selected(int n, int repeat UNUSED)
 			    win_enter(curwin_save, TRUE);
 			    --no_u_sync;
 # ifdef FEAT_PROP_POPUP
-			    if (use_popup == USEPOPUP_HIDDEN && win_valid(wp))
+			    ಆದರೆ (use_popup == USEPOPUP_HIDDEN && win_valid(wp))
 				popup_hide(wp);
 # endif
 			}
@@ -1609,67 +1609,67 @@ pum_set_selected(int n, int repeat UNUSED)
 		    }
 		}
 	    }
-# if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
-	    if (WIN_IS_POPUP(curwin))
+# ಆದರೆ defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+	    ಆದರೆ (WIN_IS_POPUP(curwin))
 		// can't keep focus in a popup window
 		win_enter(firstwin, TRUE);
 # endif
 # ifdef FEAT_PROP_POPUP
-	    if (use_popup != USEPOPUP_NONE)
+	    ಆದರೆ (use_popup != USEPOPUP_NONE)
 		unblock_autocmds();
 # endif
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
-    if (!has_info)
+#ಆದರೆ defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+    ಆದರೆ (!has_info)
 	// hide any popup info window
 	popup_hide_info();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return resized;
+    ಹಿಂತಿರುಗಿ resized;
 }
 
 /*
  * Undisplay the popup menu (later).
  */
-    void
-pum_undisplay(void)
+    ಶೂನ್ಯ
+pum_undisplay(ಶೂನ್ಯ)
 {
-#ifdef FEAT_IMAGE_POPUP
-    if (pum_imagep != NULL)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_IMAGE_POPUP
+    ಆದರೆ (pum_imagep != ಖಾಲಿ)
     {
 	image_placement_free(pum_imagep);
-	pum_imagep = NULL;
+	pum_imagep = ಖಾಲಿ;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     pum_free_bg();
-    pum_array = NULL;
+    pum_array = ಖಾಲಿ;
     redraw_all_later(UPD_NOT_VALID);
     redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#ಆದರೆ defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
-#endif
-    if (pum_in_cmdline)
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (pum_ಒಳ_cmdline)
     {
 	clear_cmdline = TRUE;
-	pum_in_cmdline = FALSE;
+	pum_ಒಳ_cmdline = FALSE;
     }
-    status_redraw_all();
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+    ಸ್ಥಿತಿ_redraw_all();
+#ಆದರೆ defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
     // hide any popup info window
     popup_hide_info();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Clear the popup menu.  Currently only resets the offset to the first
  * displayed item.
  */
-    void
-pum_clear(void)
+    ಶೂನ್ಯ
+pum_clear(ಶೂನ್ಯ)
 {
-    pum_first = 0;
+    pum_ಮೊದಲ = 0;
 }
 
 /*
@@ -1677,60 +1677,60 @@ pum_clear(void)
  * that could overwrite it.  Overruled when "pum_pretend_not_visible" is set,
  * used to redraw the status lines.
  */
-    int
-pum_visible(void)
+    ಪೂರ್ಣಾಂಕ
+pum_visible(ಶೂನ್ಯ)
 {
-    return !pum_pretend_not_visible && pum_array != NULL;
+    ಹಿಂತಿರುಗಿ !pum_pretend_not_visible && pum_array != ಖಾಲಿ;
 }
 
 /*
  * Return TRUE if the popup can be redrawn in the same position.
  */
-    static int
-pum_in_same_position(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+pum_ಒಳ_same_position(ಶೂನ್ಯ)
 {
-    int	    row = (State & MODE_CMDLINE)
-			? cmdline_row
+    ಪೂರ್ಣಾಂಕ	    ಅಡ್ಡಸಾಲು = (State & ಬಹುಲಕ_CMDLINE)
+			? cmdline_ಅಡ್ಡಸಾಲು
 			: curwin->w_wrow + W_WINROW(curwin);
 
-    return pum_window != curwin
-	    || (pum_win_row == row
-		&& pum_win_height == curwin->w_height
-		&& pum_win_col == curwin->w_wincol
-		&& pum_win_width == curwin->w_width);
+    ಹಿಂತಿರುಗಿ pum_ಕಿಟಕಿ != curwin
+	    || (pum_win_ಅಡ್ಡಸಾಲು == ಅಡ್ಡಸಾಲು
+		&& pum_win_ಎತ್ತರ == curwin->w_ಎತ್ತರ
+		&& pum_win_ಲಂಬಸಾಲು == curwin->w_wincol
+		&& pum_win_ಅಗಲ == curwin->w_ಅಗಲ);
 }
 
 /*
  * Return TRUE when pum_may_redraw() will call pum_redraw().
  * This means that the pum area should not be overwritten to avoid flicker.
  */
-    int
-pum_redraw_in_same_position(void)
+    ಪೂರ್ಣಾಂಕ
+pum_redraw_ಒಳ_same_position(ಶೂನ್ಯ)
 {
-    if (!pum_visible() || pum_will_redraw)
-	return FALSE;  // nothing to do
+    ಆದರೆ (!pum_visible() || pum_will_redraw)
+	ಹಿಂತಿರುಗಿ FALSE;  // nothing to do
 
-    return pum_in_same_position();
+    ಹಿಂತಿರುಗಿ pum_ಒಳ_same_position();
 }
 
 /*
  * Reposition the popup menu to adjust for window layout changes.
  */
-    void
-pum_may_redraw(void)
+    ಶೂನ್ಯ
+pum_may_redraw(ಶೂನ್ಯ)
 {
     pumitem_T	*array = pum_array;
-    int		len = pum_size;
-    int		selected = pum_selected;
+    ಪೂರ್ಣಾಂಕ		len = pum_ಗಾತ್ರ;
+    ಪೂರ್ಣಾಂಕ		selected = pum_selected;
 
-    if (!pum_visible() || pum_will_redraw)
-	return;  // nothing to do
+    ಆದರೆ (!pum_visible() || pum_will_redraw)
+	ಹಿಂತಿರುಗಿ;  // nothing to do
 
-    if (pum_in_same_position())
+    ಆದರೆ (pum_ಒಳ_same_position())
     {
 	pum_redraw();  // Redraw window in same position
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Window layout changed, recompute the position.
 	// Use the remembered w_wcol value, the cursor may have moved when a
@@ -1744,60 +1744,60 @@ pum_may_redraw(void)
  * Return the height of the popup menu, the number of entries visible.
  * Only valid when pum_visible() returns TRUE!
  */
-    int
-pum_get_height(void)
+    ಪೂರ್ಣಾಂಕ
+pum_get_ಎತ್ತರ(ಶೂನ್ಯ)
 {
-    return pum_height;
+    ಹಿಂತಿರುಗಿ pum_ಎತ್ತರ;
 }
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * Add size information about the pum to "dict".
  */
-    void
-pum_set_event_info(dict_T *dict)
+    ಶೂನ್ಯ
+pum_ಗಣ_event_info(dict_T *dict)
 {
-    if (!pum_visible())
-	return;
-    (void)dict_add_number(dict, "height", pum_height);
-    (void)dict_add_number(dict, "width", pum_width);
-    (void)dict_add_number(dict, "row", pum_row);
-    (void)dict_add_number(dict, "col", pum_col);
-    (void)dict_add_number(dict, "size", pum_size);
-    (void)dict_add_bool(dict, "scrollbar",
+    ಆದರೆ (!pum_visible())
+	ಹಿಂತಿರುಗಿ;
+    (ಶೂನ್ಯ)dict_ಕೂಡಿಸು_ಸಂಖ್ಯೆ(dict, "height", pum_ಎತ್ತರ);
+    (ಶೂನ್ಯ)dict_ಕೂಡಿಸು_ಸಂಖ್ಯೆ(dict, "width", pum_ಅಗಲ);
+    (ಶೂನ್ಯ)dict_ಕೂಡಿಸು_ಸಂಖ್ಯೆ(dict, "row", pum_ಅಡ್ಡಸಾಲು);
+    (ಶೂನ್ಯ)dict_ಕೂಡಿಸು_ಸಂಖ್ಯೆ(dict, "col", pum_ಲಂಬಸಾಲು);
+    (ಶೂನ್ಯ)dict_ಕೂಡಿಸು_ಸಂಖ್ಯೆ(dict, "size", pum_ಗಾತ್ರ);
+    (ಶೂನ್ಯ)dict_ಕೂಡಿಸು_bool(dict, "scrollbar",
 				       pum_scrollbar ? VVAL_TRUE : VVAL_FALSE);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_BEVAL_TERM) || defined(FEAT_TERM_POPUP_MENU)
-    static void
-pum_position_at_mouse(int min_width)
+#ಆದರೆ defined(FEAT_BEVAL_ಪದ) || defined(FEAT_ಪದ_POPUP_MENU)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+pum_position_at_mouse(ಪೂರ್ಣಾಂಕ min_ಅಗಲ)
 {
-    int extra_height = pum_border * 2 + pum_shadow;
-    int extra_offset = pum_border + pum_shadow;
-    int trailing_overhead = 0;
-    int col_offset = 0;
-    int available_width;
+    ಪೂರ್ಣಾಂಕ extra_ಎತ್ತರ = pum_border * 2 + pum_shadow;
+    ಪೂರ್ಣಾಂಕ extra_ಸ್ಥಾನಾಂತರ = pum_border + pum_shadow;
+    ಪೂರ್ಣಾಂಕ trailing_overhead = 0;
+    ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸ್ಥಾನಾಂತರ = 0;
+    ಪೂರ್ಣಾಂಕ ಲಭ್ಯ_ಅಗಲ;
 
-    if (Rows - mouse_row - extra_height > pum_size
-	    || Rows - mouse_row > mouse_row)
+    ಆದರೆ (ಅಡ್ಡಸಾಲುಗಳು - mouse_ಅಡ್ಡಸಾಲು - extra_ಎತ್ತರ > pum_ಗಾತ್ರ
+	    || ಅಡ್ಡಸಾಲುಗಳು - mouse_ಅಡ್ಡಸಾಲು > mouse_ಅಡ್ಡಸಾಲು)
     {
 	// Enough space below the mouse row,
 	// or there is more space below the mouse row than above.
-	pum_row = mouse_row + 1 + pum_border;
-	if (pum_height > Rows - pum_row - extra_height)
-	    pum_height = Rows - pum_row - extra_height;
-	if (pum_row + pum_height + extra_offset >= cmdline_row)
-	    pum_in_cmdline = TRUE;
+	pum_ಅಡ್ಡಸಾಲು = mouse_ಅಡ್ಡಸಾಲು + 1 + pum_border;
+	ಆದರೆ (pum_ಎತ್ತರ > ಅಡ್ಡಸಾಲುಗಳು - pum_ಅಡ್ಡಸಾಲು - extra_ಎತ್ತರ)
+	    pum_ಎತ್ತರ = ಅಡ್ಡಸಾಲುಗಳು - pum_ಅಡ್ಡಸಾಲು - extra_ಎತ್ತರ;
+	ಆದರೆ (pum_ಅಡ್ಡಸಾಲು + pum_ಎತ್ತರ + extra_ಸ್ಥಾನಾಂತರ >= cmdline_ಅಡ್ಡಸಾಲು)
+	    pum_ಒಳ_cmdline = TRUE;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Show above the mouse row, reduce height if it does not fit.
-	pum_row = mouse_row - pum_size - extra_offset;
-	if (pum_row < pum_border)
+	pum_ಅಡ್ಡಸಾಲು = mouse_ಅಡ್ಡಸಾಲು - pum_ಗಾತ್ರ - extra_ಸ್ಥಾನಾಂತರ;
+	ಆದರೆ (pum_ಅಡ್ಡಸಾಲು < pum_border)
 	{
-	    pum_height += pum_row - pum_border;
-	    pum_row = pum_border;
+	    pum_ಎತ್ತರ += pum_ಅಡ್ಡಸಾಲು - pum_border;
+	    pum_ಅಡ್ಡಸಾಲು = pum_border;
 	}
     }
 
@@ -1805,52 +1805,52 @@ pum_position_at_mouse(int min_width)
 	+ (pum_margin && pum_border ? 1 : 0) + (pum_shadow ? 2 : 0);
 
 # ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
+    ಆದರೆ (pum_rl)
     {
-	col_offset = (mouse_col == Columns - 1) && pum_border;
-	available_width = mouse_col + 1 - trailing_overhead - col_offset;
-	if (available_width >= pum_base_width || available_width > min_width)
+	ಲಂಬಸಾಲು_ಸ್ಥಾನಾಂತರ = (mouse_ಲಂಬಸಾಲು == Columns - 1) && pum_border;
+	ಲಭ್ಯ_ಅಗಲ = mouse_ಲಂಬಸಾಲು + 1 - trailing_overhead - ಲಂಬಸಾಲು_ಸ್ಥಾನಾಂತರ;
+	ಆದರೆ (ಲಭ್ಯ_ಅಗಲ >= pum_ತಳ_ಅಗಲ || ಲಭ್ಯ_ಅಗಲ > min_ಅಗಲ)
 	    // Enough space to show at mouse column.
-	    pum_col = mouse_col - col_offset;
-	else
+	    pum_ಲಂಬಸಾಲು = mouse_ಲಂಬಸಾಲು - ಲಂಬಸಾಲು_ಸ್ಥಾನಾಂತರ;
+	ಇಲ್ಲದಿದ್ದರೆ
 	    // Not enough space, left align with window.
-	    pum_col = MIN(pum_base_width, min_width) - 1 + trailing_overhead;
-	pum_width = pum_col + 1 - trailing_overhead;
+	    pum_ಲಂಬಸಾಲು = MIN(pum_ತಳ_ಅಗಲ, min_ಅಗಲ) - 1 + trailing_overhead;
+	pum_ಅಗಲ = pum_ಲಂಬಸಾಲು + 1 - trailing_overhead;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 # endif
     {
-	col_offset = (mouse_col == 0) && pum_border;
-	available_width = Columns - mouse_col - trailing_overhead - col_offset;
-	if (available_width >= pum_base_width || available_width > min_width)
+	ಲಂಬಸಾಲು_ಸ್ಥಾನಾಂತರ = (mouse_ಲಂಬಸಾಲು == 0) && pum_border;
+	ಲಭ್ಯ_ಅಗಲ = Columns - mouse_ಲಂಬಸಾಲು - trailing_overhead - ಲಂಬಸಾಲು_ಸ್ಥಾನಾಂತರ;
+	ಆದರೆ (ಲಭ್ಯ_ಅಗಲ >= pum_ತಳ_ಅಗಲ || ಲಭ್ಯ_ಅಗಲ > min_ಅಗಲ)
 	    // Enough space to show at mouse column.
-	    pum_col = mouse_col + col_offset;
-	else
+	    pum_ಲಂಬಸಾಲು = mouse_ಲಂಬಸಾಲು + ಲಂಬಸಾಲು_ಸ್ಥಾನಾಂತರ;
+	ಇಲ್ಲದಿದ್ದರೆ
 	    // Not enough space, right align with window.
-	    pum_col = Columns - MIN(pum_base_width, min_width)
+	    pum_ಲಂಬಸಾಲು = Columns - MIN(pum_ತಳ_ಅಗಲ, min_ಅಗಲ)
 		- trailing_overhead;
-	pum_width = Columns - pum_col - trailing_overhead;
+	pum_ಅಗಲ = Columns - pum_ಲಂಬಸಾಲು - trailing_overhead;
     }
 
-    pum_width = MIN(pum_width, pum_base_width + 1);
+    pum_ಅಗಲ = MIN(pum_ಅಗಲ, pum_ತಳ_ಅಗಲ + 1);
     // Do not redraw at cursor position.
-    pum_window = NULL;
+    pum_ಕಿಟಕಿ = ಖಾಲಿ;
 }
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_BEVAL_TERM)
-static pumitem_T *balloon_array = NULL;
-static int balloon_arraysize;
+#ಆದರೆ defined(FEAT_BEVAL_ಪದ)
+ಸ್ಥಿರ pumitem_T *balloon_array = ಖಾಲಿ;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ balloon_arraysize;
 
-# define BALLOON_MIN_WIDTH 50
-# define BALLOON_MIN_HEIGHT 10
+# define BALLOON_MIN_ಅಗಲ 50
+# define BALLOON_MIN_ಎತ್ತರ 10
 
-typedef struct {
-    char_u	*start;
-    int		bytelen;
-    int		cells;
-    int		indent;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+    char_u	*ಆರಂಭ;
+    ಪೂರ್ಣಾಂಕ		bytelen;
+    ಪೂರ್ಣಾಂಕ		cells;
+    ಪೂರ್ಣಾಂಕ		indent;
 } balpart_T;
 
 /*
@@ -1859,253 +1859,253 @@ typedef struct {
  * strings and make a struct look good.
  * Resulting array is stored in "array" and returns the size of the array.
  */
-    int
-split_message(char_u *mesg, pumitem_T **array)
+    ಪೂರ್ಣಾಂಕ
+ವಿಭಜಿಸು_ಸಂದೇಶ(char_u *mesg, pumitem_T **array)
 {
     garray_T	ga;
     char_u	*p;
-    balpart_T	*item;
-    int		quoted = FALSE;
-    int		height;
-    int		line;
-    int		item_idx;
-    int		indent = 0;
-    int		max_cells = 0;
-    int		max_height = Rows / 2 - 1;
-    int		long_item_count = 0;
-    int		split_long_items = FALSE;
+    balpart_T	*ಅಂಶ;
+    ಪೂರ್ಣಾಂಕ		quoted = FALSE;
+    ಪೂರ್ಣಾಂಕ		ಎತ್ತರ;
+    ಪೂರ್ಣಾಂಕ		ಸಾಲು;
+    ಪೂರ್ಣಾಂಕ		ಅಂಶ_idx;
+    ಪೂರ್ಣಾಂಕ		indent = 0;
+    ಪೂರ್ಣಾಂಕ		max_cells = 0;
+    ಪೂರ್ಣಾಂಕ		max_ಎತ್ತರ_2 = ಅಡ್ಡಸಾಲುಗಳು / 2 - 1;
+    ಪೂರ್ಣಾಂಕ		long_ಅಂಶ_ಎಣಿಕೆ = 0;
+    ಪೂರ್ಣಾಂಕ		ವಿಭಜಿಸು_long_ವಸ್ತುಗಳು = FALSE;
 
-    ga_init2(&ga, sizeof(balpart_T), 20);
+    ga_init2(&ga, ಗಾತ್ರ(balpart_T), 20);
     p = mesg;
 
-    while (*p != NUL)
+    ಆಗ (*p != NUL)
     {
-	if (ga_grow(&ga, 1) == FAIL)
-	    goto failed;
-	item = ((balpart_T *)ga.ga_data) + ga.ga_len;
-	item->start = p;
-	item->indent = indent;
-	item->cells = indent * 2;
+	ಆದರೆ (ga_grow(&ga, 1) == FAIL)
+	    ಹೋಗು failed;
+	ಅಂಶ = ((balpart_T *)ga.ga_ದತ್ತಾಂಶ) + ga.ga_len;
+	ಅಂಶ->ಆರಂಭ = p;
+	ಅಂಶ->indent = indent;
+	ಅಂಶ->cells = indent * 2;
 	++ga.ga_len;
-	while (*p != NUL)
+	ಆಗ (*p != NUL)
 	{
-	    if (*p == '"')
+	    ಆದರೆ (*p == '"')
 		quoted = !quoted;
-	    else if (*p == '\n')
-		break;
-	    else if (*p == '\\' && p[1] != NUL)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*p == '\n')
+		ನಿಲ್ಲಿಸು;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*p == '\\' && p[1] != NUL)
 		++p;
-	    else if (!quoted)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!quoted)
 	    {
-		if ((*p == ',' && p[1] == ' ') || *p == '{' || *p == '}')
+		ಆದರೆ ((*p == ',' && p[1] == ' ') || *p == '{' || *p == '}')
 		{
 		    // Looks like a good point to break.
-		    if (*p == '{')
+		    ಆದರೆ (*p == '{')
 			++indent;
-		    else if (*p == '}' && indent > 0)
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*p == '}' && indent > 0)
 			--indent;
-		    ++item->cells;
+		    ++ಅಂಶ->cells;
 		    p = skipwhite(p + 1);
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 	    }
-	    item->cells += ptr2cells(p);
+	    ಅಂಶ->cells += ptr2cells(p);
 	    p += mb_ptr2len(p);
 	}
-	item->bytelen = p - item->start;
-	if (*p == '\n')
+	ಅಂಶ->bytelen = p - ಅಂಶ->ಆರಂಭ;
+	ಆದರೆ (*p == '\n')
 	    ++p;
-	if (item->cells > max_cells)
-	    max_cells = item->cells;
-	long_item_count += (item->cells - 1) / BALLOON_MIN_WIDTH;
+	ಆದರೆ (ಅಂಶ->cells > max_cells)
+	    max_cells = ಅಂಶ->cells;
+	long_ಅಂಶ_ಎಣಿಕೆ += (ಅಂಶ->cells - 1) / BALLOON_MIN_ಅಗಲ;
     }
 
-    height = 2 + ga.ga_len;
+    ಎತ್ತರ = 2 + ga.ga_len;
 
     // If there are long items and the height is below the limit: split lines
-    if (long_item_count > 0 && height + long_item_count <= max_height)
+    ಆದರೆ (long_ಅಂಶ_ಎಣಿಕೆ > 0 && ಎತ್ತರ + long_ಅಂಶ_ಎಣಿಕೆ <= max_ಎತ್ತರ_2)
     {
-	split_long_items = TRUE;
-	height += long_item_count;
+	ವಿಭಜಿಸು_long_ವಸ್ತುಗಳು = TRUE;
+	ಎತ್ತರ += long_ಅಂಶ_ಎಣಿಕೆ;
     }
 
     // Limit to half the window height, it has to fit above or below the mouse
     // position.
-    if (height > max_height)
-	height = max_height;
-    *array = ALLOC_CLEAR_MULT(pumitem_T, height);
-    if (*array == NULL)
-	goto failed;
+    ಆದರೆ (ಎತ್ತರ > max_ಎತ್ತರ_2)
+	ಎತ್ತರ = max_ಎತ್ತರ_2;
+    *array = ALLOC_CLEAR_MULT(pumitem_T, ಎತ್ತರ);
+    ಆದರೆ (*array == ಖಾಲಿ)
+	ಹೋಗು failed;
 
     // Add an empty line above and below, looks better.
-    (*array)->pum_text = vim_strsave((char_u *)"");
-    (*array + height - 1)->pum_text = vim_strsave((char_u *)"");
+    (*array)->pum_ಪಠ್ಯ = vim_strsave((char_u *)"");
+    (*array + ಎತ್ತರ - 1)->pum_ಪಠ್ಯ = vim_strsave((char_u *)"");
 
-    for (line = 1, item_idx = 0; line < height - 1; ++item_idx)
+    ಗಾಗಿ (ಸಾಲು = 1, ಅಂಶ_idx = 0; ಸಾಲು < ಎತ್ತರ - 1; ++ಅಂಶ_idx)
     {
-	int	skip;
-	int	thislen;
-	int	copylen;
-	int	ind;
-	int	cells;
+	ಪೂರ್ಣಾಂಕ	skip;
+	ಪೂರ್ಣಾಂಕ	thislen;
+	ಪೂರ್ಣಾಂಕ	copylen;
+	ಪೂರ್ಣಾಂಕ	ind;
+	ಪೂರ್ಣಾಂಕ	cells;
 
-	item = ((balpart_T *)ga.ga_data) + item_idx;
-	if (item->bytelen == 0)
-	    (*array)[line++].pum_text = vim_strsave((char_u *)"");
-	else
-	    for (skip = 0; skip < item->bytelen; skip += thislen)
+	ಅಂಶ = ((balpart_T *)ga.ga_ದತ್ತಾಂಶ) + ಅಂಶ_idx;
+	ಆದರೆ (ಅಂಶ->bytelen == 0)
+	    (*array)[ಸಾಲು++].pum_ಪಠ್ಯ = vim_strsave((char_u *)"");
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಗಾಗಿ (skip = 0; skip < ಅಂಶ->bytelen; skip += thislen)
 	    {
-		if (split_long_items && item->cells >= BALLOON_MIN_WIDTH)
+		ಆದರೆ (ವಿಭಜಿಸು_long_ವಸ್ತುಗಳು && ಅಂಶ->cells >= BALLOON_MIN_ಅಗಲ)
 		{
-		    cells = item->indent * 2;
-		    for (p = item->start + skip;
-			    p < item->start + item->bytelen;
+		    cells = ಅಂಶ->indent * 2;
+		    ಗಾಗಿ (p = ಅಂಶ->ಆರಂಭ + skip;
+			    p < ಅಂಶ->ಆರಂಭ + ಅಂಶ->bytelen;
 							    p += mb_ptr2len(p))
-			if ((cells += ptr2cells(p)) > BALLOON_MIN_WIDTH)
-			    break;
-		    thislen = p - (item->start + skip);
+			ಆದರೆ ((cells += ptr2cells(p)) > BALLOON_MIN_ಅಗಲ)
+			    ನಿಲ್ಲಿಸು;
+		    thislen = p - (ಅಂಶ->ಆರಂಭ + skip);
 		}
-		else
-		    thislen = item->bytelen;
+		ಇಲ್ಲದಿದ್ದರೆ
+		    thislen = ಅಂಶ->bytelen;
 
 		// put indent at the start
-		p = alloc(thislen + item->indent * 2 + 1);
-		if (p == NULL)
+		p = alloc(thislen + ಅಂಶ->indent * 2 + 1);
+		ಆದರೆ (p == ಖಾಲಿ)
 		{
-		    for (line = 0; line <= height - 1; ++line)
-			vim_free((*array)[line].pum_text);
+		    ಗಾಗಿ (ಸಾಲು = 0; ಸಾಲು <= ಎತ್ತರ - 1; ++ಸಾಲು)
+			vim_free((*array)[ಸಾಲು].pum_ಪಠ್ಯ);
 		    vim_free(*array);
-		    goto failed;
+		    ಹೋಗು failed;
 		}
-		for (ind = 0; ind < item->indent * 2; ++ind)
+		ಗಾಗಿ (ind = 0; ind < ಅಂಶ->indent * 2; ++ind)
 		    p[ind] = ' ';
 
 		// exclude spaces at the end of the string
-		for (copylen = thislen; copylen > 0; --copylen)
-		    if (item->start[skip + copylen - 1] != ' ')
-			break;
+		ಗಾಗಿ (copylen = thislen; copylen > 0; --copylen)
+		    ಆದರೆ (ಅಂಶ->ಆರಂಭ[skip + copylen - 1] != ' ')
+			ನಿಲ್ಲಿಸು;
 
-		vim_strncpy(p + ind, item->start + skip, copylen);
-		(*array)[line].pum_text = p;
-		item->indent = 0;  // wrapped line has no indent
-		++line;
+		vim_strncpy(p + ind, ಅಂಶ->ಆರಂಭ + skip, copylen);
+		(*array)[ಸಾಲು].pum_ಪಠ್ಯ = p;
+		ಅಂಶ->indent = 0;  // wrapped line has no indent
+		++ಸಾಲು;
 	    }
     }
     ga_clear(&ga);
-    return height;
+    ಹಿಂತಿರುಗಿ ಎತ್ತರ;
 
 failed:
     ga_clear(&ga);
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-    void
-ui_remove_balloon(void)
+    ಶೂನ್ಯ
+ui_remove_balloon(ಶೂನ್ಯ)
 {
-    if (balloon_array == NULL)
-	return;
+    ಆದರೆ (balloon_array == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     pum_undisplay();
-    while (balloon_arraysize > 0)
-	vim_free(balloon_array[--balloon_arraysize].pum_text);
+    ಆಗ (balloon_arraysize > 0)
+	vim_free(balloon_array[--balloon_arraysize].pum_ಪಠ್ಯ);
     VIM_CLEAR(balloon_array);
 }
 
 /*
  * Terminal version of a balloon, uses the popup menu code.
  */
-    void
+    ಶೂನ್ಯ
 ui_post_balloon(char_u *mesg, list_T *list)
 {
     ui_remove_balloon();
 
-    if (mesg == NULL && list == NULL)
+    ಆದರೆ (mesg == ಖಾಲಿ && list == ಖಾಲಿ)
     {
 	pum_undisplay();
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
-    if (list != NULL)
+    ಆದರೆ (list != ಖಾಲಿ)
     {
 	listitem_T  *li;
-	int	    idx;
+	ಪೂರ್ಣಾಂಕ	    idx;
 
 	balloon_arraysize = list->lv_len;
 	balloon_array = ALLOC_CLEAR_MULT(pumitem_T, list->lv_len);
-	if (balloon_array == NULL)
-	    return;
+	ಆದರೆ (balloon_array == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ;
 	CHECK_LIST_MATERIALIZE(list);
-	for (idx = 0, li = list->lv_first; li != NULL; li = li->li_next, ++idx)
+	ಗಾಗಿ (idx = 0, li = list->lv_ಮೊದಲ; li != ಖಾಲಿ; li = li->li_ಮುಂದಿನ, ++idx)
 	{
-	    char_u *text = tv_get_string_chk(&li->li_tv);
+	    char_u *ಪಠ್ಯ = tv_get_string_chk(&li->li_tv);
 
-	    balloon_array[idx].pum_text = vim_strsave(
-					   text == NULL ? (char_u *)"" : text);
+	    balloon_array[idx].pum_ಪಠ್ಯ = vim_strsave(
+					   ಪಠ್ಯ == ಖಾಲಿ ? (char_u *)"" : ಪಠ್ಯ);
 	}
     }
-    else
-	balloon_arraysize = split_message(mesg, &balloon_array);
+    ಇಲ್ಲದಿದ್ದರೆ
+	balloon_arraysize = ವಿಭಜಿಸು_ಸಂದೇಶ(mesg, &balloon_array);
 
-    if (balloon_arraysize <= 0)
-	return;
+    ಆದರೆ (balloon_arraysize <= 0)
+	ಹಿಂತಿರುಗಿ;
 
     pum_array = balloon_array;
-    pum_size = balloon_arraysize;
-    pum_compute_size();
+    pum_ಗಾತ್ರ = balloon_arraysize;
+    pum_compute_ಗಾತ್ರ();
     pum_scrollbar = 0;
-    pum_height = balloon_arraysize;
+    pum_ಎತ್ತರ = balloon_arraysize;
 # ifdef FEAT_RIGHTLEFT
     pum_rl = curwin->w_p_rl;
 # endif
 
-    pum_position_at_mouse(BALLOON_MIN_WIDTH);
+    pum_position_at_mouse(BALLOON_MIN_ಅಗಲ);
     pum_selected = -1;
-    pum_first = 0;
+    pum_ಮೊದಲ = 0;
     pum_redraw();
 }
 
 /*
  * Called when the mouse moved, may remove any displayed balloon.
  */
-    void
-ui_may_remove_balloon(void)
+    ಶೂನ್ಯ
+ui_may_remove_balloon(ಶೂನ್ಯ)
 {
     // For now: remove the balloon whenever the mouse moves to another screen
     // cell.
     ui_remove_balloon();
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_TERM_POPUP_MENU)
+#ಆದರೆ defined(FEAT_ಪದ_POPUP_MENU)
 /*
  * Select the pum entry at the mouse position.
  */
-    static void
-pum_select_mouse_pos(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+pum_select_mouse_pos(ಶೂನ್ಯ)
 {
-    int idx = mouse_row - pum_row;
+    ಪೂರ್ಣಾಂಕ idx = mouse_ಅಡ್ಡಸಾಲು - pum_ಅಡ್ಡಸಾಲು;
 
-    if (idx < 0 || idx >= pum_height)
+    ಆದರೆ (idx < 0 || idx >= pum_ಎತ್ತರ)
 	pum_selected = -1;
-    else if (*pum_array[idx].pum_text != NUL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*pum_array[idx].pum_ಪಠ್ಯ != NUL)
 	pum_selected = idx;
 }
 
 /*
  * Execute the currently selected popup menu item.
  */
-    static void
-pum_execute_menu(vimmenu_T *menu, int mode)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+pum_execute_menu(vimmenu_T *menu, ಪೂರ್ಣಾಂಕ ಬಹುಲಕ)
 {
     vimmenu_T   *mp;
-    int		idx = 0;
+    ಪೂರ್ಣಾಂಕ		idx = 0;
     exarg_T	ea;
 
-    FOR_ALL_CHILD_MENUS(menu, mp)
-	if ((mp->modes & mp->enabled & mode) && idx++ == pum_selected)
+    FOR_ALL_ಮಗು_MENUS(menu, mp)
+	ಆದರೆ ((mp->modes & mp->enabled & ಬಹುಲಕ) && idx++ == pum_selected)
 	{
-	    CLEAR_FIELD(ea);
+	    CLEAR_ಕ್ಷೇತ್ರ(ea);
 	    execute_menu(&ea, mp, -1);
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
 }
 
@@ -2113,345 +2113,345 @@ pum_execute_menu(vimmenu_T *menu, int mode)
  * Open the terminal version of the popup menu and don't return until it is
  * closed.
  */
-    void
+    ಶೂನ್ಯ
 pum_show_popupmenu(vimmenu_T *menu)
 {
     vimmenu_T   *mp;
-    int		idx = 0;
+    ಪೂರ್ಣಾಂಕ		idx = 0;
     pumitem_T	*array;
-# ifdef FEAT_BEVAL_TERM
-    int		save_bevalterm = p_bevalterm;
+# ifdef FEAT_BEVAL_ಪದ
+    ಪೂರ್ಣಾಂಕ		save_bevalterm = p_bevalterm;
 # endif
-    int		mode;
+    ಪೂರ್ಣಾಂಕ		ಬಹುಲಕ;
 
     pum_undisplay();
-    pum_size = 0;
-    mode = get_menu_mode_flag();
+    pum_ಗಾತ್ರ = 0;
+    ಬಹುಲಕ = get_menu_ಬಹುಲಕ_flag();
 
-    FOR_ALL_CHILD_MENUS(menu, mp)
-	if (menu_is_separator(mp->dname)
-		|| (mp->modes & mp->enabled & mode))
-	    ++pum_size;
+    FOR_ALL_ಮಗು_MENUS(menu, mp)
+	ಆದರೆ (menu_is_separator(mp->dname)
+		|| (mp->modes & mp->enabled & ಬಹುಲಕ))
+	    ++pum_ಗಾತ್ರ;
 
     // When there are only Terminal mode menus, using "popup Edit" results in
     // pum_size being zero.
-    if (pum_size <= 0)
+    ಆದರೆ (pum_ಗಾತ್ರ <= 0)
     {
-	emsg(_(e_menu_only_exists_in_another_mode));
-	return;
+	emsg(_(e_menu_only_exists_ಒಳ_another_ಬಹುಲಕ));
+	ಹಿಂತಿರುಗಿ;
     }
 
-    array = ALLOC_CLEAR_MULT(pumitem_T, pum_size);
-    if (array == NULL)
-	return;
+    array = ALLOC_CLEAR_MULT(pumitem_T, pum_ಗಾತ್ರ);
+    ಆದರೆ (array == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    FOR_ALL_CHILD_MENUS(menu, mp)
+    FOR_ALL_ಮಗು_MENUS(menu, mp)
     {
-	char_u *s = NULL;
+	char_u *s = ಖಾಲಿ;
 
 	// Make a copy of the text, the menu may be redefined in a callback.
-	if (menu_is_separator(mp->dname))
+	ಆದರೆ (menu_is_separator(mp->dname))
 	    s = (char_u *)"";
-	else if (mp->modes & mp->enabled & mode)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (mp->modes & mp->enabled & ಬಹುಲಕ)
 	    s = mp->dname;
-	if (s != NULL)
+	ಆದರೆ (s != ಖಾಲಿ)
 	{
 	    s = vim_strsave(s);
-	    if (s != NULL)
-		array[idx++].pum_text = s;
+	    ಆದರೆ (s != ಖಾಲಿ)
+		array[idx++].pum_ಪಠ್ಯ = s;
 	}
     }
 
     pum_array = array;
-    pum_compute_size();
+    pum_compute_ಗಾತ್ರ();
     pum_scrollbar = 0;
-    pum_height = pum_size;
+    pum_ಎತ್ತರ = pum_ಗಾತ್ರ;
 # ifdef FEAT_RIGHTLEFT
     pum_rl = curwin->w_p_rl;
 # endif
     pum_position_at_mouse(20);
 
     pum_selected = -1;
-    pum_first = 0;
-# ifdef FEAT_BEVAL_TERM
+    pum_ಮೊದಲ = 0;
+# ifdef FEAT_BEVAL_ಪದ
     p_bevalterm = TRUE;  // track mouse movement
     mch_setmouse(TRUE);
 # endif
 
-    for (;;)
+    ಗಾಗಿ (;;)
     {
-	int	c;
+	ಪೂರ್ಣಾಂಕ	c;
 
 	pum_redraw();
 	setcursor_mayforce(TRUE);
-	out_flush();
+	ಹೊರಹೋಗು_flush();
 
 	c = vgetc();
 
 	// Bail out when typing Esc, CTRL-C or some callback or <expr> mapping
 	// closed the popup menu.
-	if (c == ESC || c == Ctrl_C || pum_array == NULL)
-	    break;
-	else if (c == CAR || c == NL)
+	ಆದರೆ (c == ESC || c == Ctrl_C || pum_array == ಖಾಲಿ)
+	    ನಿಲ್ಲಿಸು;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (c == CAR || c == NL)
 	{
 	    // enter: select current item, if any, and close
-	    pum_execute_menu(menu, mode);
-	    break;
+	    pum_execute_menu(menu, ಬಹುಲಕ);
+	    ನಿಲ್ಲಿಸು;
 	}
-	else if (c == 'k' || c == K_UP || c == K_MOUSEUP)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (c == 'k' || c == K_ಮೇಲೆ || c == K_MOUSEUP)
 	{
 	    // cursor up: select previous item
-	    while (pum_selected > 0)
+	    ಆಗ (pum_selected > 0)
 	    {
 		--pum_selected;
-		if (*array[pum_selected].pum_text != NUL)
-		    break;
+		ಆದರೆ (*array[pum_selected].pum_ಪಠ್ಯ != NUL)
+		    ನಿಲ್ಲಿಸು;
 	    }
 	}
-	else if (c == 'j' || c == K_DOWN || c == K_MOUSEDOWN)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (c == 'j' || c == K_ಕೆಳಕ್ಕೆ || c == K_MOUSEDOWN)
 	{
 	    // cursor down: select next item
-	    while (pum_selected < pum_size - 1)
+	    ಆಗ (pum_selected < pum_ಗಾತ್ರ - 1)
 	    {
 		++pum_selected;
-		if (*array[pum_selected].pum_text != NUL)
-		    break;
+		ಆದರೆ (*array[pum_selected].pum_ಪಠ್ಯ != NUL)
+		    ನಿಲ್ಲಿಸು;
 	    }
 	}
-	else if (c == K_RIGHTMOUSE)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (c == K_RIGHTMOUSE)
 	{
 	    // Right mouse down: reposition the menu.
 	    vungetc(c);
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
-	else if (c == K_LEFTDRAG || c == K_RIGHTDRAG || c == K_MOUSEMOVE)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (c == K_LEFTDRAG || c == K_RIGHTDRAG || c == K_MOUSEMOVE)
 	{
 	    // mouse moved: select item in the mouse row
 	    pum_select_mouse_pos();
 	}
-	else if (c == K_LEFTMOUSE || c == K_LEFTMOUSE_NM || c == K_RIGHTRELEASE)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (c == K_LEFTMOUSE || c == K_LEFTMOUSE_NM || c == K_RIGHTRELEASE)
 	{
 	    // left mouse click: select clicked item, if any, and close;
 	    // right mouse release: select clicked item, close if any
 	    pum_select_mouse_pos();
-	    if (pum_selected >= 0)
+	    ಆದರೆ (pum_selected >= 0)
 	    {
-		pum_execute_menu(menu, mode);
-		break;
+		pum_execute_menu(menu, ಬಹುಲಕ);
+		ನಿಲ್ಲಿಸು;
 	    }
-	    if (c == K_LEFTMOUSE || c == K_LEFTMOUSE_NM)
-		break;
+	    ಆದರೆ (c == K_LEFTMOUSE || c == K_LEFTMOUSE_NM)
+		ನಿಲ್ಲಿಸು;
 	}
     }
 
-    for (idx = 0; idx < pum_size; ++idx)
-	vim_free(array[idx].pum_text);
+    ಗಾಗಿ (idx = 0; idx < pum_ಗಾತ್ರ; ++idx)
+	vim_free(array[idx].pum_ಪಠ್ಯ);
     vim_free(array);
     pum_undisplay();
-# ifdef FEAT_BEVAL_TERM
+# ifdef FEAT_BEVAL_ಪದ
     p_bevalterm = save_bevalterm;
     mch_setmouse(TRUE);
 # endif
 }
 
-    void
-pum_make_popup(char_u *path_name, int use_mouse_pos)
+    ಶೂನ್ಯ
+pum_make_popup(char_u *ಮಾರ್ಗ_name, ಪೂರ್ಣಾಂಕ use_mouse_pos)
 {
     vimmenu_T *menu;
 
-    if (!use_mouse_pos)
+    ಆದರೆ (!use_mouse_pos)
     {
 	// Hack: set mouse position at the cursor so that the menu pops up
 	// around there.
-	mouse_row = W_WINROW(curwin) + curwin->w_wrow;
-	mouse_col =
+	mouse_ಅಡ್ಡಸಾಲು = W_WINROW(curwin) + curwin->w_wrow;
+	mouse_ಲಂಬಸಾಲು =
 # ifdef FEAT_RIGHTLEFT
 	    curwin->w_p_rl ? W_ENDCOL(curwin) - curwin->w_wcol - 1 :
 # endif
 	    curwin->w_wincol + curwin->w_wcol;
     }
 
-    menu = gui_find_menu(path_name);
-    if (menu != NULL)
+    menu = gui_ಕಂಡುಹಿಡಿ_menu(ಮಾರ್ಗ_name);
+    ಆದರೆ (menu != ಖಾಲಿ)
 	pum_show_popupmenu(menu);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    static int
-is_singlewidth(int c)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+is_singlewidth(ಪೂರ್ಣಾಂಕ c)
 {
-    if (c >= 0 && c < 0x80)
-	return TRUE;
-    if (utf_char2cells(c) == 1)
-	return TRUE;
-    return FALSE;
+    ಆದರೆ (c >= 0 && c < 0x80)
+	ಹಿಂತಿರುಗಿ TRUE;
+    ಆದರೆ (utf_char2cells(c) == 1)
+	ಹಿಂತಿರುಗಿ TRUE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 /*
  * Set border characters for popup menu.
  */
-    void
-pum_set_border_chars(
-	int top,
-	int right,
-	int bottom,
-	int left,
-	int top_left,
-	int top_right,
-	int bottom_right,
-	int bottom_left)
+    ಶೂನ್ಯ
+pum_ಗಣ_border_chars(
+	ಪೂರ್ಣಾಂಕ ತುದಿ,
+	ಪೂರ್ಣಾಂಕ ಬಲ_2,
+	ಪೂರ್ಣಾಂಕ bottom,
+	ಪೂರ್ಣಾಂಕ ಎಡ_2,
+	ಪೂರ್ಣಾಂಕ ತುದಿ_ಎಡ,
+	ಪೂರ್ಣಾಂಕ ತುದಿ_ಬಲ,
+	ಪೂರ್ಣಾಂಕ bottom_ಬಲ,
+	ಪೂರ್ಣಾಂಕ bottom_ಎಡ)
 {
-    if (!is_singlewidth(top) || !is_singlewidth(right)
-	    || !is_singlewidth(bottom) || !is_singlewidth(left)
-	    || !is_singlewidth(top_left) || !is_singlewidth(top_right)
-	    || !is_singlewidth(bottom_right) || !is_singlewidth(bottom_left))
-	return;
-    pum_border_chars.top = top;
-    pum_border_chars.right = right;
+    ಆದರೆ (!is_singlewidth(ತುದಿ) || !is_singlewidth(ಬಲ_2)
+	    || !is_singlewidth(bottom) || !is_singlewidth(ಎಡ_2)
+	    || !is_singlewidth(ತುದಿ_ಎಡ) || !is_singlewidth(ತುದಿ_ಬಲ)
+	    || !is_singlewidth(bottom_ಬಲ) || !is_singlewidth(bottom_ಎಡ))
+	ಹಿಂತಿರುಗಿ;
+    pum_border_chars.ತುದಿ = ತುದಿ;
+    pum_border_chars.ಬಲ_2 = ಬಲ_2;
     pum_border_chars.bottom = bottom;
-    pum_border_chars.left = left;
-    pum_border_chars.top_left = top_left;
-    pum_border_chars.top_right = top_right;
-    pum_border_chars.bottom_right = bottom_right;
-    pum_border_chars.bottom_left = bottom_left;
+    pum_border_chars.ಎಡ_2 = ಎಡ_2;
+    pum_border_chars.ತುದಿ_ಎಡ = ತುದಿ_ಎಡ;
+    pum_border_chars.ತುದಿ_ಬಲ = ತುದಿ_ಬಲ;
+    pum_border_chars.bottom_ಬಲ = bottom_ಬಲ;
+    pum_border_chars.bottom_ಎಡ = bottom_ಎಡ;
     pum_border = 1;
 }
 
 /*
  * Compute margins for the popup menu.
  */
-    static void
-compute_margins(int *right_margin, int *left_margin, int *left_padding)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+compute_margins(ಪೂರ್ಣಾಂಕ *ಬಲ_margin, ಪೂರ್ಣಾಂಕ *ಎಡ_margin, ಪೂರ್ಣಾಂಕ *ಎಡ_padding)
 {
-    *right_margin = pum_margin && pum_border;
+    *ಬಲ_margin = pum_margin && pum_border;
 
-#ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+    ಆದರೆ (pum_rl)
     {
-	*left_padding = (pum_col < Columns - 1 - pum_border);
-	*left_margin = *right_margin && (pum_col < Columns - 3);
-	return;
+	*ಎಡ_padding = (pum_ಲಂಬಸಾಲು < Columns - 1 - pum_border);
+	*ಎಡ_margin = *ಬಲ_margin && (pum_ಲಂಬಸಾಲು < Columns - 3);
+	ಹಿಂತಿರುಗಿ;
     }
-#endif
-    *left_padding = (pum_col > pum_border);
-    *left_margin = *right_margin && (pum_col > 2);
+#ಆದರೆ_ಅಂತ್ಯ
+    *ಎಡ_padding = (pum_ಲಂಬಸಾಲು > pum_border);
+    *ಎಡ_margin = *ಬಲ_margin && (pum_ಲಂಬಸಾಲು > 2);
 }
 
 /*
  * Draw the border around the popup menu
  */
-    static void
-pum_draw_border(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+pum_draw_border(ಶೂನ್ಯ)
 {
-    int	top_row = pum_row - 1;
-    int	bottom_row = pum_row + pum_height;
-    int	col;
-    int	attr = highlight_attr[HLF_PMB];
-    int	right_margin, left_margin, left_padding;
-    int	inner_width;
+    ಪೂರ್ಣಾಂಕ	ತುದಿ_ಅಡ್ಡಸಾಲು = pum_ಅಡ್ಡಸಾಲು - 1;
+    ಪೂರ್ಣಾಂಕ	bottom_ಅಡ್ಡಸಾಲು = pum_ಅಡ್ಡಸಾಲು + pum_ಎತ್ತರ;
+    ಪೂರ್ಣಾಂಕ	ಲಂಬಸಾಲು;
+    ಪೂರ್ಣಾಂಕ	attr = highlight_attr[HLF_PMB];
+    ಪೂರ್ಣಾಂಕ	ಬಲ_margin, ಎಡ_margin, ಎಡ_padding;
+    ಪೂರ್ಣಾಂಕ	inner_ಅಗಲ;
 
-    if (!pum_border)
-	return;
+    ಆದರೆ (!pum_border)
+	ಹಿಂತಿರುಗಿ;
 
-    (void)compute_margins(&right_margin, &left_margin, &left_padding);
+    (ಶೂನ್ಯ)compute_margins(&ಬಲ_margin, &ಎಡ_margin, &ಎಡ_padding);
 
-    inner_width = pum_width + pum_scrollbar + left_padding;
+    inner_ಅಗಲ = pum_ಅಗಲ + pum_scrollbar + ಎಡ_padding;
 
     // Draw border left to right or right to left (for RTL)
-#ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
-	col = pum_col + left_padding + 1;
-    else
-#endif
-	col = pum_col - left_padding - 1;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+    ಆದರೆ (pum_rl)
+	ಲಂಬಸಾಲು = pum_ಲಂಬಸಾಲು + ಎಡ_padding + 1;
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	ಲಂಬಸಾಲು = pum_ಲಂಬಸಾಲು - ಎಡ_padding - 1;
 
     // left corners (right corners for RTL)
-#ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+    ಆದರೆ (pum_rl)
     {
-	screen_putchar(pum_border_chars.top_right, top_row, col, attr);
-	if (left_margin)
-	    screen_putchar(' ', top_row, col + 1, attr);
-	screen_putchar(pum_border_chars.bottom_right, bottom_row, col, attr);
-	if (left_margin)
-	    screen_putchar(' ', bottom_row, col + 1, attr);
+	screen_putchar(pum_border_chars.ತುದಿ_ಬಲ, ತುದಿ_ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು, attr);
+	ಆದರೆ (ಎಡ_margin)
+	    screen_putchar(' ', ತುದಿ_ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು + 1, attr);
+	screen_putchar(pum_border_chars.bottom_ಬಲ, bottom_ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು, attr);
+	ಆದರೆ (ಎಡ_margin)
+	    screen_putchar(' ', bottom_ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು + 1, attr);
     }
-    else
-#endif
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
     {
-	screen_putchar(pum_border_chars.top_left, top_row, col, attr);
-	if (left_margin)
-	    screen_putchar(' ', top_row, col - 1, attr);
-	screen_putchar(pum_border_chars.bottom_left, bottom_row, col, attr);
-	if (left_margin)
-	    screen_putchar(' ', bottom_row, col - 1, attr);
+	screen_putchar(pum_border_chars.ತುದಿ_ಎಡ, ತುದಿ_ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು, attr);
+	ಆದರೆ (ಎಡ_margin)
+	    screen_putchar(' ', ತುದಿ_ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು - 1, attr);
+	screen_putchar(pum_border_chars.bottom_ಎಡ, bottom_ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು, attr);
+	ಆದರೆ (ಎಡ_margin)
+	    screen_putchar(' ', bottom_ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು - 1, attr);
     }
 
     // Top horizontal lines
-    for (int i = 0; i < inner_width; i++)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < inner_ಅಗಲ; i++)
     {
-	int cur_col;
-#ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
-	    cur_col = col - 1 - i;
-	else
-#endif
-	    cur_col = col + 1 + i;
-	screen_putchar(pum_border_chars.top, top_row, cur_col, attr);
-	screen_putchar(pum_border_chars.bottom, bottom_row, cur_col, attr);
+	ಪೂರ್ಣಾಂಕ cur_ಲಂಬಸಾಲು;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+	ಆದರೆ (pum_rl)
+	    cur_ಲಂಬಸಾಲು = ಲಂಬಸಾಲು - 1 - i;
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	    cur_ಲಂಬಸಾಲು = ಲಂಬಸಾಲು + 1 + i;
+	screen_putchar(pum_border_chars.ತುದಿ, ತುದಿ_ಅಡ್ಡಸಾಲು, cur_ಲಂಬಸಾಲು, attr);
+	screen_putchar(pum_border_chars.bottom, bottom_ಅಡ್ಡಸಾಲು, cur_ಲಂಬಸಾಲು, attr);
     }
 
     // right corners (left corners for RTL)
-#ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+    ಆದರೆ (pum_rl)
     {
-	screen_putchar(pum_border_chars.top_left, top_row,
-		col - inner_width - 1, attr);
-	if (right_margin)
-	    screen_putchar(' ', top_row, col - inner_width - 2, attr);
-	screen_putchar(pum_border_chars.bottom_left, bottom_row,
-		col - inner_width - 1, attr);
-	if (right_margin)
-	    screen_putchar(' ', bottom_row, col - inner_width - 2, attr);
+	screen_putchar(pum_border_chars.ತುದಿ_ಎಡ, ತುದಿ_ಅಡ್ಡಸಾಲು,
+		ಲಂಬಸಾಲು - inner_ಅಗಲ - 1, attr);
+	ಆದರೆ (ಬಲ_margin)
+	    screen_putchar(' ', ತುದಿ_ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು - inner_ಅಗಲ - 2, attr);
+	screen_putchar(pum_border_chars.bottom_ಎಡ, bottom_ಅಡ್ಡಸಾಲು,
+		ಲಂಬಸಾಲು - inner_ಅಗಲ - 1, attr);
+	ಆದರೆ (ಬಲ_margin)
+	    screen_putchar(' ', bottom_ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು - inner_ಅಗಲ - 2, attr);
     }
-    else
-#endif
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
     {
-	screen_putchar(pum_border_chars.top_right, top_row,
-		col + inner_width + 1, attr);
-	if (right_margin)
-	    screen_putchar(' ', top_row, col + inner_width + 2, attr);
-	screen_putchar(pum_border_chars.bottom_right, bottom_row,
-		col + inner_width + 1, attr);
-	if (right_margin)
-	    screen_putchar(' ', bottom_row, col + inner_width + 2, attr);
+	screen_putchar(pum_border_chars.ತುದಿ_ಬಲ, ತುದಿ_ಅಡ್ಡಸಾಲು,
+		ಲಂಬಸಾಲು + inner_ಅಗಲ + 1, attr);
+	ಆದರೆ (ಬಲ_margin)
+	    screen_putchar(' ', ತುದಿ_ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು + inner_ಅಗಲ + 2, attr);
+	screen_putchar(pum_border_chars.bottom_ಬಲ, bottom_ಅಡ್ಡಸಾಲು,
+		ಲಂಬಸಾಲು + inner_ಅಗಲ + 1, attr);
+	ಆದರೆ (ಬಲ_margin)
+	    screen_putchar(' ', bottom_ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು + inner_ಅಗಲ + 2, attr);
     }
 
     // Draw side borders
-    for (int i = 0; i < pum_height; i++)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < pum_ಎತ್ತರ; i++)
     {
-	int row = pum_row + i;
-#ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
+	ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು = pum_ಅಡ್ಡಸಾಲು + i;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+	ಆದರೆ (pum_rl)
 	{
-	    screen_putchar(pum_border_chars.left, row, col, attr);
-	    if (left_margin)
-		screen_putchar(' ', row, col + 1, attr);
-	    screen_putchar(pum_border_chars.right, row,
-		    col - inner_width - 1, attr);
-	    if (right_margin)
-		screen_putchar(' ', row, col - inner_width - 2, attr);
+	    screen_putchar(pum_border_chars.ಎಡ_2, ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು, attr);
+	    ಆದರೆ (ಎಡ_margin)
+		screen_putchar(' ', ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು + 1, attr);
+	    screen_putchar(pum_border_chars.ಬಲ_2, ಅಡ್ಡಸಾಲು,
+		    ಲಂಬಸಾಲು - inner_ಅಗಲ - 1, attr);
+	    ಆದರೆ (ಬಲ_margin)
+		screen_putchar(' ', ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು - inner_ಅಗಲ - 2, attr);
 	}
-	else
-#endif
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 	{
-	    screen_putchar(pum_border_chars.left, row, col, attr);
-	    if (left_margin)
-		screen_putchar(' ', row, col - 1, attr);
-	    screen_putchar(pum_border_chars.right, row,
-		    col + inner_width + 1, attr);
-	    if (right_margin)
-		screen_putchar(' ', row, col + inner_width + 2, attr);
+	    screen_putchar(pum_border_chars.ಎಡ_2, ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು, attr);
+	    ಆದರೆ (ಎಡ_margin)
+		screen_putchar(' ', ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು - 1, attr);
+	    screen_putchar(pum_border_chars.ಬಲ_2, ಅಡ್ಡಸಾಲು,
+		    ಲಂಬಸಾಲು + inner_ಅಗಲ + 1, attr);
+	    ಆದರೆ (ಬಲ_margin)
+		screen_putchar(' ', ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು + inner_ಅಗಲ + 2, attr);
 	}
     }
 }
@@ -2460,69 +2460,69 @@ pum_draw_border(void)
  * Get the underlying character and redraw with shadow highlight.
  * Preserve bold, italic, underline, and reverse text underneath the shadow.
  */
-    void
-put_shadow_char(int row, int col)
+    ಶೂನ್ಯ
+put_shadow_char(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು)
 {
     char_u  buf[MB_MAXBYTES + 1];
-    int	    shadow_attr = highlight_attr[HLF_PMS];
-    int	    char_attr, new_attr;
+    ಪೂರ್ಣಾಂಕ	    shadow_attr = highlight_attr[HLF_PMS];
+    ಪೂರ್ಣಾಂಕ	    char_attr, new_attr;
 
-    screen_getbytes(row, col, buf, &char_attr);
+    screen_getbytes(ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು, buf, &char_attr);
     new_attr = hl_combine_attr(char_attr, shadow_attr);
-    screen_putchar((*mb_ptr2char)(buf), row, col, new_attr);
+    screen_putchar((*mb_ptr2char)(buf), ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು, new_attr);
 }
 
 /*
  * Draw the shadow
  */
-    static void
-pum_draw_shadow(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+pum_draw_shadow(ಶೂನ್ಯ)
 {
-    int	row, col, next_col;
-    int	width, offset;
-    int	inner_width;
-    int	right_margin, left_margin, left_padding;
+    ಪೂರ್ಣಾಂಕ	ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು, ಮುಂದಿನ_ಲಂಬಸಾಲು;
+    ಪೂರ್ಣಾಂಕ	ಅಗಲ, ಸ್ಥಾನಾಂತರ;
+    ಪೂರ್ಣಾಂಕ	inner_ಅಗಲ;
+    ಪೂರ್ಣಾಂಕ	ಬಲ_margin, ಎಡ_margin, ಎಡ_padding;
 
-    if (!pum_shadow)
-	return;
+    ಆದರೆ (!pum_shadow)
+	ಹಿಂತಿರುಗಿ;
 
-    (void)compute_margins(&right_margin, &left_margin, &left_padding);
-    inner_width = pum_width + pum_scrollbar + pum_border + right_margin;
+    (ಶೂನ್ಯ)compute_margins(&ಬಲ_margin, &ಎಡ_margin, &ಎಡ_padding);
+    inner_ಅಗಲ = pum_ಅಗಲ + pum_scrollbar + pum_border + ಬಲ_margin;
 
     // Draw right side shadow (left for RTL)
-#ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+    ಆದರೆ (pum_rl)
     {
-	col = pum_col - inner_width;
-	next_col = col - 1;
+	ಲಂಬಸಾಲು = pum_ಲಂಬಸಾಲು - inner_ಅಗಲ;
+	ಮುಂದಿನ_ಲಂಬಸಾಲು = ಲಂಬಸಾಲು - 1;
     }
-    else
-#endif
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
     {
-	col = pum_col + inner_width;
-	next_col = col + 1;
+	ಲಂಬಸಾಲು = pum_ಲಂಬಸಾಲು + inner_ಅಗಲ;
+	ಮುಂದಿನ_ಲಂಬಸಾಲು = ಲಂಬಸಾಲು + 1;
     }
 
-    for (int i = 0; i < pum_height + pum_border; i++)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < pum_ಎತ್ತರ + pum_border; i++)
     {
-	row = pum_row + 1 + i - pum_border;
-	put_shadow_char(row, col);
-	put_shadow_char(row, next_col);
+	ಅಡ್ಡಸಾಲು = pum_ಅಡ್ಡಸಾಲು + 1 + i - pum_border;
+	put_shadow_char(ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು);
+	put_shadow_char(ಅಡ್ಡಸಾಲು, ಮುಂದಿನ_ಲಂಬಸಾಲು);
     }
 
     // Bottom shadow
-    row = pum_row + pum_height + pum_border;
-    width = inner_width + left_padding + pum_border + left_margin;
-    offset = 2 - left_padding - pum_border - left_margin;
+    ಅಡ್ಡಸಾಲು = pum_ಅಡ್ಡಸಾಲು + pum_ಎತ್ತರ + pum_border;
+    ಅಗಲ = inner_ಅಗಲ + ಎಡ_padding + pum_border + ಎಡ_margin;
+    ಸ್ಥಾನಾಂತರ = 2 - ಎಡ_padding - pum_border - ಎಡ_margin;
 
-    for (int i = 0; i < width; i++)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < ಅಗಲ; i++)
     {
-#ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
-	    col = pum_col - offset - i;
-	else
-#endif
-	    col = pum_col + offset + i;
-	put_shadow_char(row, col);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
+	ಆದರೆ (pum_rl)
+	    ಲಂಬಸಾಲು = pum_ಲಂಬಸಾಲು - ಸ್ಥಾನಾಂತರ - i;
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	    ಲಂಬಸಾಲು = pum_ಲಂಬಸಾಲು + ಸ್ಥಾನಾಂತರ + i;
+	put_shadow_char(ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು);
     }
 }

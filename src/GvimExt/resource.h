@@ -5,11 +5,11 @@
 
 // Next default values for new objects
 //
-#ifdef APSTUDIO_INVOKED
-#ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE	101
-#define _APS_NEXT_COMMAND_VALUE		40001
-#define _APS_NEXT_CONTROL_VALUE		1000
-#define _APS_NEXT_SYMED_VALUE		101
-#endif
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ APSTUDIO_INVOKED
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ APSTUDIO_READONLY_SYMBOLS
+#ವ್ಯಾಖ್ಯಾನಿಸು APS_ಮುಂದಿನ_RESOURCE_ಮೌಲ್ಯ	101
+#ವ್ಯಾಖ್ಯಾನಿಸು APS_ಮುಂದಿನ_COMMAND_ಮೌಲ್ಯ		40001
+#ವ್ಯಾಖ್ಯಾನಿಸು APS_ಮುಂದಿನ_CONTROL_ಮೌಲ್ಯ		1000
+#ವ್ಯಾಖ್ಯಾನಿಸು APS_ಮುಂದಿನ_SYMED_ಮೌಲ್ಯ		101
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ_ಅಂತ್ಯ

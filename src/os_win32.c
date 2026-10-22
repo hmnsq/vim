@@ -20,357 +20,357 @@
  * Roger Knobbe <rogerk@wonderware.com> did the initial port of Vim 3.0.
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-#ifdef FEAT_MZSCHEME
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MZSCHEME
 # include "if_mzsch.h"
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#include <sys/types.h>
-#include <signal.h>
-#include <limits.h>
+#ಅನ್ತರ್ಭಾವ <sys/types.h>
+#ಅನ್ತರ್ಭಾವ <signal.h>
+#ಅನ್ತರ್ಭಾವ <limits.h>
 
-#include <process.h>
-#include <winternl.h>
-#include <direct.h>
+#ಅನ್ತರ್ಭಾವ <process.h>
+#ಅನ್ತರ್ಭಾವ <winternl.h>
+#ಅನ್ತರ್ಭಾವ <direct.h>
 
-#if !defined(FEAT_GUI_MSWIN)
+#ಆದರೆ !defined(FEAT_GUI_MSWIN)
 # include <shellapi.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_JOB_CHANNEL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕೆಲಸ_CHANNEL
 # include <tlhelp32.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 // Record all output and all keyboard & mouse input
 // #define MCH_WRITE_DUMP
 
-#ifdef MCH_WRITE_DUMP
-FILE* fdDump = NULL;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MCH_WRITE_DUMP
+FILE* fdDump = ಖಾಲಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ಆದರೆ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 // Win32 Console handles for input and output
-static HANDLE g_hConIn  = INVALID_HANDLE_VALUE;
-static HANDLE g_hConOut = INVALID_HANDLE_VALUE;
+ಸ್ಥಿರ HANDLE g_h_Con_ಒಳ  = INVALID_HANDLE_ಮೌಲ್ಯ;
+ಸ್ಥಿರ HANDLE g_h_Con_ಹೊರಹೋಗು = INVALID_HANDLE_ಮೌಲ್ಯ;
 
 // Win32 Screen buffer,coordinate,console I/O information
-static SMALL_RECT g_srScrollRegion;
+ಸ್ಥಿರ SMALL_RECT g_srScrollRegion;
 // This is explicitly initialised to work around a LTCG issue on Windows ARM64
 // (at least of 19.39.33321).  This pushes this into the `.data` rather than
 // `.bss` which corrects code generation in `write_chars` (#13453).
-static COORD	  g_coord = {0, 0};  // 0-based, but external coords are 1-based
+ಸ್ಥಿರ COORD	  g_coord = {0, 0};  // 0-based, but external coords are 1-based
 
 // The attribute of the screen when the editor was started
-static WORD  g_attrDefault = 7;  // lightgray text on black background
-static WORD  g_attrCurrent;
+ಸ್ಥಿರ ಶಬ್ದ_2  g_attrDefault = 7;  // lightgray text on black background
+ಸ್ಥಿರ ಶಬ್ದ_2  g_attrCurrent;
 
-static int g_fCBrkPressed = FALSE;  // set by ctrl-break interrupt
-static int g_fCtrlCPressed = FALSE; // set when ctrl-C or ctrl-break detected
-static int g_fForceExit = FALSE;    // set when forcefully exiting
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ g_fCBrkPressed = FALSE;  // set by ctrl-break interrupt
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ g_fCtrlCPressed = FALSE; // set when ctrl-C or ctrl-break detected
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ g_fForceExit = FALSE;    // set when forcefully exiting
 
-static void scroll(unsigned cLines);
-static void set_scroll_region(unsigned left, unsigned top,
-			      unsigned right, unsigned bottom);
-static void set_scroll_region_tb(unsigned top, unsigned bottom);
-static void set_scroll_region_lr(unsigned left, unsigned right);
-static void insert_lines(unsigned cLines);
-static void delete_lines(unsigned cLines);
-static void gotoxy(unsigned x, unsigned y);
-static void standout(void);
-static int s_cursor_visible = TRUE;
-static int did_create_conin = FALSE;
+ಸ್ಥಿರ ಶೂನ್ಯ scroll(ಚಿಹ್ನೆರಹಿತ c_ಸಾಲುಗಳು);
+ಸ್ಥಿರ ಶೂನ್ಯ ಗಣ_scroll_region(ಚಿಹ್ನೆರಹಿತ ಎಡ_2, ಚಿಹ್ನೆರಹಿತ ತುದಿ,
+			      ಚಿಹ್ನೆರಹಿತ ಬಲ_2, ಚಿಹ್ನೆರಹಿತ bottom);
+ಸ್ಥಿರ ಶೂನ್ಯ ಗಣ_scroll_region_tb(ಚಿಹ್ನೆರಹಿತ ತುದಿ, ಚಿಹ್ನೆರಹಿತ bottom);
+ಸ್ಥಿರ ಶೂನ್ಯ ಗಣ_scroll_region_lr(ಚಿಹ್ನೆರಹಿತ ಎಡ_2, ಚಿಹ್ನೆರಹಿತ ಬಲ_2);
+ಸ್ಥಿರ ಶೂನ್ಯ ಸೇರಿಸು_ಸಾಲುಗಳು(ಚಿಹ್ನೆರಹಿತ c_ಸಾಲುಗಳು);
+ಸ್ಥಿರ ಶೂನ್ಯ delete_ಸಾಲುಗಳು(ಚಿಹ್ನೆರಹಿತ c_ಸಾಲುಗಳು);
+ಸ್ಥಿರ ಶೂನ್ಯ gotoxy(ಚಿಹ್ನೆರಹಿತ x, ಚಿಹ್ನೆರಹಿತ y);
+ಸ್ಥಿರ ಶೂನ್ಯ standout(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ s_cursor_visible = TRUE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ did_create_conin = FALSE;
 // The 'input_record_buffer' is an internal dynamic fifo queue of MS-Windows
 // console INPUT_RECORD events that are normally read from the console input
 // buffer.  This provides an injection point for testing the low-level handling
 // of INPUT_RECORDs.
-typedef struct input_record_buffer_node_S
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್_ಗಂಟು_S
 {
-    INPUT_RECORD ir;
-    struct input_record_buffer_node_S *next;
-} input_record_buffer_node_T;
-typedef struct input_record_buffer_S
+    ಒಳಹರಿವು_ದಾಖಲೆ ir;
+    ರಚನೆ ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್_ಗಂಟು_S *ಮುಂದಿನ;
+} ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್_ಗಂಟು_T;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್_S
 {
-    input_record_buffer_node_T *head;
-    input_record_buffer_node_T *tail;
-    int length;
-} input_record_buffer_T;
-static input_record_buffer_T input_record_buffer;
-static int read_input_record_buffer(INPUT_RECORD* irEvents, int nMaxLength);
-static int write_input_record_buffer(INPUT_RECORD* irEvents, int nLength);
-#endif
-#ifdef FEAT_GUI_MSWIN
-static int s_dont_use_vimrun = TRUE;
-static int need_vimrun_warning = FALSE;
-static string_T vimrun_path = {(char_u *)"vimrun ", 7};
-static int vimrun_path_allocated = FALSE;
-#endif
+    ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್_ಗಂಟು_T *ತಲೆ;
+    ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್_ಗಂಟು_T *ಬಾಲ;
+    ಪೂರ್ಣಾಂಕ ಉದ್ದಳತೆ;
+} ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್_T;
+ಸ್ಥಿರ ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್_T ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ read_ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್(ಒಳಹರಿವು_ದಾಖಲೆ* irEvents, ಪೂರ್ಣಾಂಕ n_Max_ಉದ್ದಳತೆ);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ write_ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್(ಒಳಹರಿವು_ದಾಖಲೆ* irEvents, ಪೂರ್ಣಾಂಕ n_ಉದ್ದಳತೆ);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_MSWIN
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ s_dont_use_vimrun = TRUE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ need_vimrun_warning = FALSE;
+ಸ್ಥಿರ string_T vimrun_ಮಾರ್ಗ = {(char_u *)"vimrun ", 7};
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ vimrun_ಮಾರ್ಗ_allocated = FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
 
-static int win32_getattrs(char_u *name);
-static int win32_setattrs(char_u *name, int attrs);
-static int win32_set_archive(char_u *name);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ win32_getattrs(char_u *name);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ win32_setattrs(char_u *name, ಪೂರ್ಣಾಂಕ attrs);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ win32_ಗಣ_archive(char_u *name);
 
-static int conpty_working = 0;
-static int conpty_type = 0;
-static int conpty_stable = 0;
-static int conpty_fix_type = 0;
-static void vtp_flag_init(void);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ conpty_working = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ conpty_type = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ conpty_stable = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ conpty_fix_type = 0;
+ಸ್ಥಿರ ಶೂನ್ಯ vtp_flag_init(ಶೂನ್ಯ);
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-static int vtp_working = 0;
-static void vtp_init(void);
-static void vtp_exit(void);
-static void vtp_sgr_bulk(int arg);
-static void vtp_sgr_bulks(int argc, int *argv);
+#ಆದರೆ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ vtp_working = 0;
+ಸ್ಥಿರ ಶೂನ್ಯ vtp_init(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಶೂನ್ಯ vtp_exit(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಶೂನ್ಯ vtp_sgr_bulk(ಪೂರ್ಣಾಂಕ arg);
+ಸ್ಥಿರ ಶೂನ್ಯ vtp_sgr_bulks(ಪೂರ್ಣಾಂಕ argc, ಪೂರ್ಣಾಂಕ *argv);
 
-static int wt_working = 0;
-static void wt_init(void);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ wt_working = 0;
+ಸ್ಥಿರ ಶೂನ್ಯ wt_init(ಶೂನ್ಯ);
 
-static int g_color_index_bg = 0;
-static int g_color_index_fg = 7;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ g_color_ಸೂಚ್ಯಂಕ_bg = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ g_color_ಸೂಚ್ಯಂಕ_fg = 7;
 
 # ifdef FEAT_TERMGUICOLORS
-static guicolor_T save_console_bg_rgb;
-static guicolor_T save_console_fg_rgb;
-static guicolor_T store_console_bg_rgb;
-static guicolor_T store_console_fg_rgb;
-static int default_console_color_bg = 0x000000; // black
-static int default_console_color_fg = 0xc0c0c0; // white
-#  define USE_VTP		(vtp_working && is_term_win32() \
+ಸ್ಥಿರ guicolor_T save_console_bg_rgb;
+ಸ್ಥಿರ guicolor_T save_console_fg_rgb;
+ಸ್ಥಿರ guicolor_T store_console_bg_rgb;
+ಸ್ಥಿರ guicolor_T store_console_fg_rgb;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ default_console_color_bg = 0x000000; // black
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ default_console_color_fg = 0xc0c0c0; // white
+#  define USE_VTP		(vtp_working && is_ಪದ_win32() \
 						 && (p_tgc || t_colors >= 256))
 #  define USE_WT		(wt_working)
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  define USE_VTP		0
 #  define USE_WT		0
 # endif
 
-static void set_console_color_rgb(void);
-static void reset_console_color_rgb(void);
-static void restore_console_color_rgb(void);
-#endif  // !FEAT_GUI_MSWIN || VIMDLL
+ಸ್ಥಿರ ಶೂನ್ಯ ಗಣ_console_color_rgb(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಶೂನ್ಯ reset_console_color_rgb(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಶೂನ್ಯ restore_console_color_rgb(ಶೂನ್ಯ);
+#ಆದರೆ_ಅಂತ್ಯ  // !FEAT_GUI_MSWIN || VIMDLL
 
 // This flag is newly created from Windows 10
-#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ ENABLE_VIRTUAL_TERMINAL_PROCESSING
 # define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-static int suppress_winsize = 1;	// don't fiddle with console
-#endif
+#ಆದರೆ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ suppress_winsize = 1;	// don't fiddle with console
+#ಆದರೆ_ಅಂತ್ಯ
 
-static WCHAR *exe_pathw = NULL;
+ಸ್ಥಿರ WCHAR *exe_pathw = ಖಾಲಿ;
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-static BOOL use_alternate_screen_buffer = FALSE;
-#endif
+#ಆದರೆ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+ಸ್ಥಿರ BOOL use_alternate_screen_ಬಫರ್ = FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
 
-extern DWORD win_version; // this is in os_mswin.c
+ಬಾಹ್ಯ DWORD win_ಆವೃತ್ತಿ; // this is in os_mswin.c
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-    static BOOL
+#ಆದರೆ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+    ಸ್ಥಿರ BOOL
 is_ambiwidth_event(
-    INPUT_RECORD *ir)
+    ಒಳಹರಿವು_ದಾಖಲೆ *ir)
 {
-    return ir->EventType == KEY_EVENT
-		&& ir->Event.KeyEvent.bKeyDown
-		&& ir->Event.KeyEvent.wRepeatCount == 1
-		&& ir->Event.KeyEvent.wVirtualKeyCode == 0x12
-		&& ir->Event.KeyEvent.wVirtualScanCode == 0x38
-		&& ir->Event.KeyEvent.uChar.UnicodeChar == 0
-		&& ir->Event.KeyEvent.dwControlKeyState == 2;
+    ಹಿಂತಿರುಗಿ ir->EventType == ಕೀಲಿ_EVENT
+		&& ir->Event.ಕೀಲಿ_Event_2.b_ಕೀಲಿ_ಕೆಳಕ್ಕೆ
+		&& ir->Event.ಕೀಲಿ_Event_2.w_Repeat_ಎಣಿಕೆ == 1
+		&& ir->Event.ಕೀಲಿ_Event_2.w_Virtual_ಕೀಲಿ_ಸಂಕೇತ == 0x12
+		&& ir->Event.ಕೀಲಿ_Event_2.w_Virtual_ಪರಿಶೀಲನೆ_ಸಂಕೇತ == 0x38
+		&& ir->Event.ಕೀಲಿ_Event_2.uChar.UnicodeChar == 0
+		&& ir->Event.ಕೀಲಿ_Event_2.dw_Control_ಕೀಲಿ_State == 2;
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 make_ambiwidth_event(
-    INPUT_RECORD *down,
-    INPUT_RECORD *up)
+    ಒಳಹರಿವು_ದಾಖಲೆ *ಕೆಳಕ್ಕೆ,
+    ಒಳಹರಿವು_ದಾಖಲೆ *ಮೇಲೆ)
 {
-    down->Event.KeyEvent.wVirtualKeyCode = 0;
-    down->Event.KeyEvent.wVirtualScanCode = 0;
-    down->Event.KeyEvent.uChar.UnicodeChar
-				    = up->Event.KeyEvent.uChar.UnicodeChar;
-    down->Event.KeyEvent.dwControlKeyState = 0;
+    ಕೆಳಕ್ಕೆ->Event.ಕೀಲಿ_Event_2.w_Virtual_ಕೀಲಿ_ಸಂಕೇತ = 0;
+    ಕೆಳಕ್ಕೆ->Event.ಕೀಲಿ_Event_2.w_Virtual_ಪರಿಶೀಲನೆ_ಸಂಕೇತ = 0;
+    ಕೆಳಕ್ಕೆ->Event.ಕೀಲಿ_Event_2.uChar.UnicodeChar
+				    = ಮೇಲೆ->Event.ಕೀಲಿ_Event_2.uChar.UnicodeChar;
+    ಕೆಳಕ್ಕೆ->Event.ಕೀಲಿ_Event_2.dw_Control_ಕೀಲಿ_State = 0;
 }
 
 /*
  * Version of ReadConsoleInput() that works with IME.
  * Works around problems on Windows 8.
  */
-    static BOOL
-read_console_input(
-    HANDLE	    hInput,
-    INPUT_RECORD    *lpBuffer,
-    int		    nLength,
+    ಸ್ಥಿರ BOOL
+read_console_ಒಳಹರಿವು(
+    HANDLE	    h_ಒಳಹರಿವು,
+    ಒಳಹರಿವು_ದಾಖಲೆ    *lp_ಬಫರ್,
+    ಪೂರ್ಣಾಂಕ		    n_ಉದ್ದಳತೆ,
     LPDWORD	    lpEvents)
 {
-    enum
+    ಎಣಿಕೆ
     {
 	IRSIZE = 10
     };
-    static INPUT_RECORD s_irCache[IRSIZE];
-    static DWORD s_dwIndex = 0;
-    static DWORD s_dwMax = 0;
+    ಸ್ಥಿರ ಒಳಹರಿವು_ದಾಖಲೆ s_irCache[IRSIZE];
+    ಸ್ಥಿರ DWORD s_dw_ಸೂಚ್ಯಂಕ = 0;
+    ಸ್ಥಿರ DWORD s_dwMax = 0;
     DWORD dwEvents;
-    int head;
-    int tail;
-    int i;
-    static INPUT_RECORD s_irPseudo;
+    ಪೂರ್ಣಾಂಕ ತಲೆ;
+    ಪೂರ್ಣಾಂಕ ಬಾಲ;
+    ಪೂರ್ಣಾಂಕ i;
+    ಸ್ಥಿರ ಒಳಹರಿವು_ದಾಖಲೆ s_irPseudo;
 
-    if (s_dwMax == 0 && input_record_buffer.length > 0)
+    ಆದರೆ (s_dwMax == 0 && ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್.ಉದ್ದಳತೆ > 0)
     {
-	dwEvents = read_input_record_buffer(s_irCache, IRSIZE);
-	s_dwIndex = 0;
+	dwEvents = read_ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್(s_irCache, IRSIZE);
+	s_dw_ಸೂಚ್ಯಂಕ = 0;
 	s_dwMax = dwEvents;
     }
 
-    if (nLength == -2)
-	return (s_dwMax > 0) ? TRUE : FALSE;
+    ಆದರೆ (n_ಉದ್ದಳತೆ == -2)
+	ಹಿಂತಿರುಗಿ (s_dwMax > 0) ? TRUE : FALSE;
 
-    if (win_version < MAKE_VER(6, 2, 0)) // Before Windows 8
+    ಆದರೆ (win_ಆವೃತ್ತಿ < MAKE_VER(6, 2, 0)) // Before Windows 8
     {
-	if (nLength == -1)
-	    return PeekConsoleInputW(hInput, lpBuffer, 1, lpEvents);
-	return ReadConsoleInputW(hInput, lpBuffer, 1, &dwEvents);
+	ಆದರೆ (n_ಉದ್ದಳತೆ == -1)
+	    ಹಿಂತಿರುಗಿ Peek_Console_ಒಳಹರಿವು_W(h_ಒಳಹರಿವು, lp_ಬಫರ್, 1, lpEvents);
+	ಹಿಂತಿರುಗಿ Read_Console_ಒಳಹರಿವು_W(h_ಒಳಹರಿವು, lp_ಬಫರ್, 1, &dwEvents);
     }
 
-    if (s_dwMax == 0)
+    ಆದರೆ (s_dwMax == 0)
     {
-	if (!vtp_working && nLength == -1)
-	    return PeekConsoleInputW(hInput, lpBuffer, 1, lpEvents);
-	GetNumberOfConsoleInputEvents(hInput, &dwEvents);
-	if (dwEvents == 0 && nLength == -1)
-	    return PeekConsoleInputW(hInput, lpBuffer, 1, lpEvents);
-	ReadConsoleInputW(hInput, s_irCache, IRSIZE, &dwEvents);
-	s_dwIndex = 0;
+	ಆದರೆ (!vtp_working && n_ಉದ್ದಳತೆ == -1)
+	    ಹಿಂತಿರುಗಿ Peek_Console_ಒಳಹರಿವು_W(h_ಒಳಹರಿವು, lp_ಬಫರ್, 1, lpEvents);
+	Get_ಸಂಖ್ಯೆ_ದ_Console_ಒಳಹರಿವು_Events(h_ಒಳಹರಿವು, &dwEvents);
+	ಆದರೆ (dwEvents == 0 && n_ಉದ್ದಳತೆ == -1)
+	    ಹಿಂತಿರುಗಿ Peek_Console_ಒಳಹರಿವು_W(h_ಒಳಹರಿವು, lp_ಬಫರ್, 1, lpEvents);
+	Read_Console_ಒಳಹರಿವು_W(h_ಒಳಹರಿವು, s_irCache, IRSIZE, &dwEvents);
+	s_dw_ಸೂಚ್ಯಂಕ = 0;
 	s_dwMax = dwEvents;
-	if (dwEvents == 0)
+	ಆದರೆ (dwEvents == 0)
 	{
 	    *lpEvents = 0;
-	    return TRUE;
+	    ಹಿಂತಿರುಗಿ TRUE;
 	}
 
-	for (i = s_dwIndex; i < (int)s_dwMax - 1; ++i)
-	    if (is_ambiwidth_event(&s_irCache[i]))
+	ಗಾಗಿ (i = s_dw_ಸೂಚ್ಯಂಕ; i < (ಪೂರ್ಣಾಂಕ)s_dwMax - 1; ++i)
+	    ಆದರೆ (is_ambiwidth_event(&s_irCache[i]))
 		make_ambiwidth_event(&s_irCache[i], &s_irCache[i + 1]);
 
-	if (s_dwMax > 1)
+	ಆದರೆ (s_dwMax > 1)
 	{
-	    head = 0;
-	    tail = s_dwMax - 1;
-	    while (head != tail)
+	    ತಲೆ = 0;
+	    ಬಾಲ = s_dwMax - 1;
+	    ಆಗ (ತಲೆ != ಬಾಲ)
 	    {
-		if (s_irCache[head].EventType == WINDOW_BUFFER_SIZE_EVENT
-			&& s_irCache[head + 1].EventType
-						  == WINDOW_BUFFER_SIZE_EVENT)
+		ಆದರೆ (s_irCache[ತಲೆ].EventType == ಕಿಟಕಿ_ಬಫರ್_ಗಾತ್ರ_EVENT
+			&& s_irCache[ತಲೆ + 1].EventType
+						  == ಕಿಟಕಿ_ಬಫರ್_ಗಾತ್ರ_EVENT)
 		{
 		    // Remove duplicate event to avoid flicker.
-		    for (i = head; i < tail; ++i)
+		    ಗಾಗಿ (i = ತಲೆ; i < ಬಾಲ; ++i)
 			s_irCache[i] = s_irCache[i + 1];
-		    --tail;
-		    continue;
+		    --ಬಾಲ;
+		    ಮುಂದುವರಿ;
 		}
-		head++;
+		ತಲೆ++;
 	    }
-	    s_dwMax = tail + 1;
+	    s_dwMax = ಬಾಲ + 1;
 	}
     }
 
-    if (s_irCache[s_dwIndex].EventType == KEY_EVENT)
+    ಆದರೆ (s_irCache[s_dw_ಸೂಚ್ಯಂಕ].EventType == ಕೀಲಿ_EVENT)
     {
-	if (s_irCache[s_dwIndex].Event.KeyEvent.wRepeatCount > 1)
+	ಆದರೆ (s_irCache[s_dw_ಸೂಚ್ಯಂಕ].Event.ಕೀಲಿ_Event_2.w_Repeat_ಎಣಿಕೆ > 1)
 	{
-	    s_irPseudo = s_irCache[s_dwIndex];
-	    s_irPseudo.Event.KeyEvent.wRepeatCount = 1;
-	    s_irCache[s_dwIndex].Event.KeyEvent.wRepeatCount--;
-	    *lpBuffer = s_irPseudo;
+	    s_irPseudo = s_irCache[s_dw_ಸೂಚ್ಯಂಕ];
+	    s_irPseudo.Event.ಕೀಲಿ_Event_2.w_Repeat_ಎಣಿಕೆ = 1;
+	    s_irCache[s_dw_ಸೂಚ್ಯಂಕ].Event.ಕೀಲಿ_Event_2.w_Repeat_ಎಣಿಕೆ--;
+	    *lp_ಬಫರ್ = s_irPseudo;
 	    *lpEvents = 1;
-	    return TRUE;
+	    ಹಿಂತಿರುಗಿ TRUE;
 	}
     }
 
-    *lpBuffer = s_irCache[s_dwIndex];
-    if (!(nLength == -1 || nLength == -2) && ++s_dwIndex >= s_dwMax)
+    *lp_ಬಫರ್ = s_irCache[s_dw_ಸೂಚ್ಯಂಕ];
+    ಆದರೆ (!(n_ಉದ್ದಳತೆ == -1 || n_ಉದ್ದಳತೆ == -2) && ++s_dw_ಸೂಚ್ಯಂಕ >= s_dwMax)
 	s_dwMax = 0;
     *lpEvents = 1;
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
  * Version of PeekConsoleInput() that works with IME.
  */
-    static BOOL
-peek_console_input(
-    HANDLE	    hInput,
-    INPUT_RECORD    *lpBuffer,
-    DWORD	    nLength UNUSED,
+    ಸ್ಥಿರ BOOL
+peek_console_ಒಳಹರಿವು(
+    HANDLE	    h_ಒಳಹರಿವು,
+    ಒಳಹರಿವು_ದಾಖಲೆ    *lp_ಬಫರ್,
+    DWORD	    n_ಉದ್ದಳತೆ ಬಳಸದ,
     LPDWORD	    lpEvents)
 {
-    return read_console_input(hInput, lpBuffer, -1, lpEvents);
+    ಹಿಂತಿರುಗಿ read_console_ಒಳಹರಿವು(h_ಒಳಹರಿವು, lp_ಬಫರ್, -1, lpEvents);
 }
 
 # ifdef FEAT_CLIENTSERVER
-    static DWORD
-msg_wait_for_multiple_objects(
-    DWORD    nCount,
+    ಸ್ಥಿರ DWORD
+ಸಂದೇಶ_wait_for_ಅಪವರ್ತ್ಯ_objects(
+    DWORD    n_ಎಣಿಕೆ,
     LPHANDLE pHandles,
     BOOL     fWaitAll,
     DWORD    dwMilliseconds,
-    DWORD    dwWakeMask)
+    DWORD    dw_Wake_ಮುಖವಾಡ)
 {
-    if (read_console_input(NULL, NULL, -2, NULL))
-	return WAIT_OBJECT_0;
-    return MsgWaitForMultipleObjects(nCount, pHandles, fWaitAll,
-				     dwMilliseconds, dwWakeMask);
+    ಆದರೆ (read_console_ಒಳಹರಿವು(ಖಾಲಿ, ಖಾಲಿ, -2, ಖಾಲಿ))
+	ಹಿಂತಿರುಗಿ WAIT_OBJECT_0;
+    ಹಿಂತಿರುಗಿ ಸಂದೇಶ_Wait_For_ಅಪವರ್ತ್ಯ_Objects(n_ಎಣಿಕೆ, pHandles, fWaitAll,
+				     dwMilliseconds, dw_Wake_ಮುಖವಾಡ);
 }
 # endif
 
 # ifndef FEAT_CLIENTSERVER
-    static DWORD
+    ಸ್ಥಿರ DWORD
 wait_for_single_object(
     HANDLE hHandle,
     DWORD dwMilliseconds)
 {
-    if (read_console_input(NULL, NULL, -2, NULL))
-	return WAIT_OBJECT_0;
-    return WaitForSingleObject(hHandle, dwMilliseconds);
+    ಆದರೆ (read_console_ಒಳಹರಿವು(ಖಾಲಿ, ಖಾಲಿ, -2, ಖಾಲಿ))
+	ಹಿಂತಿರುಗಿ WAIT_OBJECT_0;
+    ಹಿಂತಿರುಗಿ WaitForSingleObject(hHandle, dwMilliseconds);
 }
 # endif
-#endif   // !FEAT_GUI_MSWIN || VIMDLL
+#ಆದರೆ_ಅಂತ್ಯ   // !FEAT_GUI_MSWIN || VIMDLL
 
-    void
-mch_get_exe_name(void)
+    ಶೂನ್ಯ
+mch_get_exe_name(ಶೂನ್ಯ)
 {
-    int		updated = FALSE;
-    static int	enc_prev = -1;
-    WCHAR	*path;
+    ಪೂರ್ಣಾಂಕ		updated = FALSE;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	enc_prev = -1;
+    WCHAR	*ಮಾರ್ಗ;
     size_t	pathlen;
 
-    if (exe_name == NULL || exe_pathw == NULL || enc_prev != enc_codepage)
+    ಆದರೆ (exe_name == ಖಾಲಿ || exe_pathw == ಖಾಲಿ || enc_prev != enc_codepage)
     {
-	WCHAR	buf[MAX_PATH];
+	WCHAR	buf[MAX_ಮಾರ್ಗ];
 	WCHAR	*p;
 
 	// store the name of the executable, may be used for $VIM
-	p = buf + GetModuleFileNameW(NULL, buf, MAX_PATH);
-	if (p > buf)
+	p = buf + GetModuleFileNameW(ಖಾಲಿ, buf, MAX_ಮಾರ್ಗ);
+	ಆದರೆ (p > buf)
 	{
-	    if (enc_codepage == -1)
+	    ಆದರೆ (enc_codepage == -1)
 		enc_codepage = GetACP();
 	    vim_free(exe_name);
-	    exe_name = utf16_to_enc(buf, NULL);
+	    exe_name = utf16_ಗಮ್ಯ_enc(buf, ಖಾಲಿ);
 	    enc_prev = enc_codepage;
 
 	    // truncate the buffer at the last path separator
 	    // to isolate the path.
-	    do
+	    ಮಾಡು
 	    {
 		--p;
-		if (*p == L'\\')
+		ಆದರೆ (*p == L'\\')
 		{
 		    *p = L'\0';
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
-	    } while (p > buf);
+	    } ಆಗ (p > buf);
 
 	    vim_free(exe_pathw);
 	    exe_pathw = _wcsdup(buf);
@@ -378,69 +378,69 @@ mch_get_exe_name(void)
 	}
     }
 
-    if (exe_pathw == NULL || !updated)
-	return;
+    ಆದರೆ (exe_pathw == ಖಾಲಿ || !updated)
+	ಹಿಂತಿರುಗಿ;
 
     // Append our starting directory to $PATH, so that when doing
     // "!xxd" it's found in our starting directory.  Needed because
     // SearchPath() also looks there.
-    path = _wgetenv(L"PATH");
-    pathlen = (path == NULL) ? 0 : wcslen(path);
+    ಮಾರ್ಗ = _wgetenv(L"PATH");
+    pathlen = (ಮಾರ್ಗ == ಖಾಲಿ) ? 0 : wcslen(ಮಾರ್ಗ);
 
     // Maximum length of $PATH is more than MAXPATHL. 8191 is often mentioned
     // as the maximum length that works. Add an extra 7 characters (5 for
     // "PATH=", 1 for a potential ";" and 1 for the NUL byte).
-#define EXTRA_LEN 7
-#define MAX_ENV_STRING_LEN 8191
+#ವ್ಯಾಖ್ಯಾನಿಸು EXTRA_LEN 7
+#ವ್ಯಾಖ್ಯಾನಿಸು MAX_ENV_STRING_LEN 8191
 
-    if (pathlen + wcslen(exe_pathw) < MAX_ENV_STRING_LEN)
+    ಆದರೆ (pathlen + wcslen(exe_pathw) < MAX_ENV_STRING_LEN)
     {
-	WCHAR   temp[MAX_ENV_STRING_LEN + EXTRA_LEN] = L"PATH=";
+	WCHAR   ತಾತ್ಕಾಲಿಕ[MAX_ENV_STRING_LEN + EXTRA_LEN] = L"PATH=";
 	size_t  templen = 5;
 
-	if (pathlen == 0)
-	    wcscpy(temp + templen, exe_pathw);
-	else
+	ಆದರೆ (pathlen == 0)
+	    wcscpy(ತಾತ್ಕಾಲಿಕ + templen, exe_pathw);
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    wcscpy(temp + templen, path);
+	    wcscpy(ತಾತ್ಕಾಲಿಕ + templen, ಮಾರ್ಗ);
 
 	    // Check if exe_path is already included in $PATH.
-	    if (wcsstr(temp, exe_pathw) == NULL)
+	    ಆದರೆ (wcsstr(ತಾತ್ಕಾಲಿಕ, exe_pathw) == ಖಾಲಿ)
 	    {
 		templen += pathlen;
 
 		// Append ';' if $PATH doesn't end with it.
-		if (temp[templen - 1] != L';')
+		ಆದರೆ (ತಾತ್ಕಾಲಿಕ[templen - 1] != L';')
 		{
-		    wcscpy(temp + templen, L";");
+		    wcscpy(ತಾತ್ಕಾಲಿಕ + templen, L";");
 		    ++templen;
 		}
 
-		wcscpy(temp + templen, exe_pathw);
+		wcscpy(ತಾತ್ಕಾಲಿಕ + templen, exe_pathw);
 	    }
 	}
 
-	_wputenv(temp);
-#ifdef libintl_wputenv
-	libintl_wputenv(temp);
-#endif
+	_wputenv(ತಾತ್ಕಾಲಿಕ);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ libintl_wputenv
+	libintl_wputenv(ತಾತ್ಕಾಲಿಕ);
+#ಆದರೆ_ಅಂತ್ಯ
     }
-#undef EXTRA_LEN
-#undef MAX_ENV_PATH_LEN
+#ವ್ಯಾಖ್ಯಾನ_ರದ್ದು EXTRA_LEN
+#ವ್ಯಾಖ್ಯಾನ_ರದ್ದು MAX_ENV_ಮಾರ್ಗ_LEN
 }
 
 /*
  * Unescape characters in "p" that appear in "escaped".
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 unescape_shellxquote(char_u *p, char_u *escaped)
 {
-    int	    l = (int)STRLEN(p);
-    int	    n;
+    ಪೂರ್ಣಾಂಕ	    l = (ಪೂರ್ಣಾಂಕ)STRLEN(p);
+    ಪೂರ್ಣಾಂಕ	    n;
 
-    while (*p != NUL)
+    ಆಗ (*p != NUL)
     {
-	if (*p == '^' && vim_strchr(escaped, p[1]) != NULL)
+	ಆದರೆ (*p == '^' && vim_strchr(escaped, p[1]) != ಖಾಲಿ)
 	    mch_memmove(p, p + 1, l--);
 	n = (*mb_ptr2len)(p);
 	p += n;
@@ -452,60 +452,60 @@ unescape_shellxquote(char_u *p, char_u *escaped)
  * Load library "name".
  */
     HINSTANCE
-vimLoadLib(const char *name)
+vim_ತುಂಬು_Lib(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *name)
 {
-    HINSTANCE	dll = NULL;
+    HINSTANCE	dll = ಖಾಲಿ;
 
     // No need to load any library when registering OLE.
-    if (found_register_arg)
-	return NULL;
+    ಆದರೆ (ಸಿಕ್ಕಿತು_ರಿಜಿಸ್ಟರ್_arg)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     // NOTE: Do not use mch_dirname() and mch_chdir() here, they may call
     // vimLoadLib() recursively, which causes a stack overflow.
-    if (exe_pathw == NULL)
+    ಆದರೆ (exe_pathw == ಖಾಲಿ)
     {
 	mch_get_exe_name();
-	if (exe_pathw == NULL)
-	    return NULL;
+	ಆದರೆ (exe_pathw == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
     WCHAR old_dirw[MAXPATHL];
 
-    if (GetCurrentDirectoryW(MAXPATHL, old_dirw) == 0)
-	return NULL;
+    ಆದರೆ (GetCurrentDirectoryW(MAXPATHL, old_dirw) == 0)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     // Change directory to where the executable is, both to make
     // sure we find a .dll there and to avoid looking for a .dll
     // in the current directory.
-    SetCurrentDirectoryW(exe_pathw);
-    dll = LoadLibrary(name);
-    SetCurrentDirectoryW(old_dirw);
-    return dll;
+    ಗಣ_Current_Directory_W(exe_pathw);
+    dll = ತುಂಬು_Library(name);
+    ಗಣ_Current_Directory_W(old_dirw);
+    ಹಿಂತಿರುಗಿ dll;
 }
 
-#if defined(VIMDLL)
+#ಆದರೆ defined(VIMDLL)
 /*
  * Check if the current executable file is for the GUI subsystem.
  */
-    int
-mch_is_gui_executable(void)
+    ಪೂರ್ಣಾಂಕ
+mch_is_gui_executable(ಶೂನ್ಯ)
 {
-    PBYTE		pImage = (PBYTE)GetModuleHandle(NULL);
-    PIMAGE_DOS_HEADER	pDOS = (PIMAGE_DOS_HEADER)pImage;
-    PIMAGE_NT_HEADERS	pPE;
+    PBYTE		pImage = (PBYTE)GetModuleHandle(ಖಾಲಿ);
+    PIMAGE_DOS_ಶೀರ್ಷಿಕೆ	pDOS = (PIMAGE_DOS_ಶೀರ್ಷಿಕೆ)pImage;
+    PIMAGE_NT_ಶೀರ್ಷಿಕೆಗಳು	pPE;
 
-    if (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
-	return FALSE;
-    pPE = (PIMAGE_NT_HEADERS)(pImage + pDOS->e_lfanew);
-    if (pPE->Signature != IMAGE_NT_SIGNATURE)
-	return FALSE;
-    if (pPE->OptionalHeader.Subsystem == IMAGE_SUBSYSTEM_WINDOWS_GUI)
-	return TRUE;
-    return FALSE;
+    ಆದರೆ (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
+	ಹಿಂತಿರುಗಿ FALSE;
+    pPE = (PIMAGE_NT_ಶೀರ್ಷಿಕೆಗಳು)(pImage + pDOS->e_lfanew);
+    ಆದರೆ (pPE->Signature != IMAGE_NT_SIGNATURE)
+	ಹಿಂತಿರುಗಿ FALSE;
+    ಆದರೆ (pPE->Optional_ಶೀರ್ಷಿಕೆ.Subsystem == IMAGE_SUBSYSTEM_WINDOWS_GUI)
+	ಹಿಂತಿರುಗಿ TRUE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(DYNAMIC_ICONV) || defined(DYNAMIC_GETTEXT) \
+#ಆದರೆ defined(DYNAMIC_ICONV) || defined(DYNAMIC_GETTEXT) \
     || defined(FEAT_PYTHON3)
 /*
  * Get related information about 'funcname' which is imported by 'hInst'.
@@ -514,106 +514,106 @@ mch_is_gui_executable(void)
  * If 'info' is 2, hook the function with 'ptr', and return the original
  * function address.
  */
-    static void *
-get_imported_func_info(HINSTANCE hInst, const char *funcname, int info,
-	const void *ptr)
+    ಸ್ಥಿರ ಶೂನ್ಯ *
+get_imported_func_info(HINSTANCE hInst, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *funcname, ಪೂರ್ಣಾಂಕ info,
+	ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *ptr)
 {
     PBYTE			pImage = (PBYTE)hInst;
-    PIMAGE_DOS_HEADER		pDOS = (PIMAGE_DOS_HEADER)hInst;
-    PIMAGE_NT_HEADERS		pPE;
+    PIMAGE_DOS_ಶೀರ್ಷಿಕೆ		pDOS = (PIMAGE_DOS_ಶೀರ್ಷಿಕೆ)hInst;
+    PIMAGE_NT_ಶೀರ್ಷಿಕೆಗಳು		pPE;
     PIMAGE_IMPORT_DESCRIPTOR	pImpDesc;
-    PIMAGE_THUNK_DATA		pIAT;	    // Import Address Table
-    PIMAGE_THUNK_DATA		pINT;	    // Import Name Table
+    PIMAGE_THUNK_ದತ್ತಾಂಶ		pIAT;	    // Import Address Table
+    PIMAGE_THUNK_ದತ್ತಾಂಶ		pINT;	    // Import Name Table
     PIMAGE_IMPORT_BY_NAME	pImpName;
     DWORD			ImpVA;
 
-    if (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
-	return NULL;
-    pPE = (PIMAGE_NT_HEADERS)(pImage + pDOS->e_lfanew);
-    if (pPE->Signature != IMAGE_NT_SIGNATURE)
-	return NULL;
+    ಆದರೆ (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    pPE = (PIMAGE_NT_ಶೀರ್ಷಿಕೆಗಳು)(pImage + pDOS->e_lfanew);
+    ಆದರೆ (pPE->Signature != IMAGE_NT_SIGNATURE)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    ImpVA = pPE->OptionalHeader
-		.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;
-    if (ImpVA == 0)
-	return NULL;	// No Import Table
+    ImpVA = pPE->Optional_ಶೀರ್ಷಿಕೆ
+		.ದತ್ತಾಂಶ_Directory[IMAGE_DIRECTORY_ನಮೂದು_IMPORT].Virtual_ವಿಳಾಸ;
+    ಆದರೆ (ImpVA == 0)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;	// No Import Table
     pImpDesc = (PIMAGE_IMPORT_DESCRIPTOR)(pImage + ImpVA);
 
-    for (; pImpDesc->FirstThunk; ++pImpDesc)
+    ಗಾಗಿ (; pImpDesc->ಮೊದಲ_Thunk; ++pImpDesc)
     {
-	if (!pImpDesc->OriginalFirstThunk)
-	    continue;
-	pIAT = (PIMAGE_THUNK_DATA)(pImage + pImpDesc->FirstThunk);
-	pINT = (PIMAGE_THUNK_DATA)(pImage + pImpDesc->OriginalFirstThunk);
-	for (; pIAT->u1.Function; ++pIAT, ++pINT)
+	ಆದರೆ (!pImpDesc->Original_ಮೊದಲ_Thunk)
+	    ಮುಂದುವರಿ;
+	pIAT = (PIMAGE_THUNK_ದತ್ತಾಂಶ)(pImage + pImpDesc->ಮೊದಲ_Thunk);
+	pINT = (PIMAGE_THUNK_ದತ್ತಾಂಶ)(pImage + pImpDesc->Original_ಮೊದಲ_Thunk);
+	ಗಾಗಿ (; pIAT->u1.Function; ++pIAT, ++pINT)
 	{
-	    if (IMAGE_SNAP_BY_ORDINAL(pINT->u1.Ordinal))
-		continue;
+	    ಆದರೆ (IMAGE_SNAP_BY_ORDINAL(pINT->u1.Ordinal))
+		ಮುಂದುವರಿ;
 	    pImpName = (PIMAGE_IMPORT_BY_NAME)(pImage
-					+ (UINT_PTR)(pINT->u1.AddressOfData));
-	    if (strcmp((char *)pImpName->Name, funcname) == 0)
+					+ (UINT_PTR)(pINT->u1.ವಿಳಾಸ_ದ_ದತ್ತಾಂಶ));
+	    ಆದರೆ (strcmp((ಅಕ್ಷರ *)pImpName->Name, funcname) == 0)
 	    {
-		void *original;
-		DWORD old, new = PAGE_READWRITE;
+		ಶೂನ್ಯ *original;
+		DWORD old, new = ಪುಟ_READWRITE;
 
-		switch (info)
+		ಆಯ್ಕೆ (info)
 		{
-		    case 0:
-			return (void *)pIAT->u1.Function;
-		    case 1:
-			return (void *)(pImage + pImpDesc->Name);
-		    case 2:
-			original = (void *)pIAT->u1.Function;
-			VirtualProtect(&pIAT->u1.Function, sizeof(void *),
+		    ಸ್ಥಿತಿ 0:
+			ಹಿಂತಿರುಗಿ (ಶೂನ್ಯ *)pIAT->u1.Function;
+		    ಸ್ಥಿತಿ 1:
+			ಹಿಂತಿರುಗಿ (ಶೂನ್ಯ *)(pImage + pImpDesc->Name);
+		    ಸ್ಥಿತಿ 2:
+			original = (ಶೂನ್ಯ *)pIAT->u1.Function;
+			VirtualProtect(&pIAT->u1.Function, ಗಾತ್ರ(ಶೂನ್ಯ *),
 				new, &old);
 			pIAT->u1.Function = (UINT_PTR)ptr;
-			VirtualProtect(&pIAT->u1.Function, sizeof(void *),
+			VirtualProtect(&pIAT->u1.Function, ಗಾತ್ರ(ಶೂನ್ಯ *),
 				old, &new);
-			return original;
-		    default:
-			return NULL;
+			ಹಿಂತಿರುಗಿ original;
+		    ಪೂರ್ವನಿಯೋಜಿತ:
+			ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 		}
 	    }
 	}
     }
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Get the module handle which 'funcname' in 'hInst' is imported from.
  */
     HINSTANCE
-find_imported_module_by_funcname(HINSTANCE hInst, const char *funcname)
+ಕಂಡುಹಿಡಿ_imported_module_by_funcname(HINSTANCE hInst, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *funcname)
 {
-    char    *modulename;
+    ಅಕ್ಷರ    *modulename;
 
-    modulename = (char *)get_imported_func_info(hInst, funcname, 1, NULL);
-    if (modulename != NULL)
-	return GetModuleHandleA(modulename);
-    return NULL;
+    modulename = (ಅಕ್ಷರ *)get_imported_func_info(hInst, funcname, 1, ಖಾಲಿ);
+    ಆದರೆ (modulename != ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ GetModuleHandleA(modulename);
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 /*
  * Get the address of 'funcname' which is imported by 'hInst' DLL.
  */
-    void *
-get_dll_import_func(HINSTANCE hInst, const char *funcname)
+    ಶೂನ್ಯ *
+get_dll_import_func(HINSTANCE hInst, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *funcname)
 {
-    return get_imported_func_info(hInst, funcname, 0, NULL);
+    ಹಿಂತಿರುಗಿ get_imported_func_info(hInst, funcname, 0, ಖಾಲಿ);
 }
 
 /*
  * Hook the function named 'funcname' which is imported by 'hInst' DLL,
  * and return the original function address.
  */
-    void *
-hook_dll_import_func(HINSTANCE hInst, const char *funcname, const void *hook)
+    ಶೂನ್ಯ *
+hook_dll_import_func(HINSTANCE hInst, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *funcname, ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *hook)
 {
-    return get_imported_func_info(hInst, funcname, 2, hook);
+    ಹಿಂತಿರುಗಿ get_imported_func_info(hInst, funcname, 2, hook);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_PYTHON3)
+#ಆದರೆ defined(FEAT_PYTHON3)
 /*
  * Check if the specified DLL is a function forwarder.
  * If yes, return the instance of the forwarded DLL.
@@ -625,300 +625,300 @@ hook_dll_import_func(HINSTANCE hInst, const char *funcname, const void *hook)
 get_forwarded_dll(HINSTANCE hInst)
 {
     PBYTE			pImage = (PBYTE)hInst;
-    PIMAGE_DOS_HEADER		pDOS = (PIMAGE_DOS_HEADER)hInst;
-    PIMAGE_NT_HEADERS		pPE;
+    PIMAGE_DOS_ಶೀರ್ಷಿಕೆ		pDOS = (PIMAGE_DOS_ಶೀರ್ಷಿಕೆ)hInst;
+    PIMAGE_NT_ಶೀರ್ಷಿಕೆಗಳು		pPE;
     PIMAGE_EXPORT_DIRECTORY	pExpDir;
     DWORD			ExpVA;
-    DWORD			ExpSize;
-    LPDWORD			pFunctionTable;
+    DWORD			Exp_ಗಾತ್ರ;
+    LPDWORD			p_Function_ಕೋಷ್ಟಕ;
 
-    if (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
-	return NULL;
-    pPE = (PIMAGE_NT_HEADERS)(pImage + pDOS->e_lfanew);
-    if (pPE->Signature != IMAGE_NT_SIGNATURE)
-	return NULL;
+    ಆದರೆ (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    pPE = (PIMAGE_NT_ಶೀರ್ಷಿಕೆಗಳು)(pImage + pDOS->e_lfanew);
+    ಆದರೆ (pPE->Signature != IMAGE_NT_SIGNATURE)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    ExpVA = pPE->OptionalHeader
-		.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress;
-    ExpSize = pPE->OptionalHeader
-		.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].Size;
-    if (ExpVA == 0)
-	return hInst;	// No Export Directory
+    ExpVA = pPE->Optional_ಶೀರ್ಷಿಕೆ
+		.ದತ್ತಾಂಶ_Directory[IMAGE_DIRECTORY_ನಮೂದು_EXPORT].Virtual_ವಿಳಾಸ;
+    Exp_ಗಾತ್ರ = pPE->Optional_ಶೀರ್ಷಿಕೆ
+		.ದತ್ತಾಂಶ_Directory[IMAGE_DIRECTORY_ನಮೂದು_EXPORT].ಗಾತ್ರ_3;
+    ಆದರೆ (ExpVA == 0)
+	ಹಿಂತಿರುಗಿ hInst;	// No Export Directory
     pExpDir = (PIMAGE_EXPORT_DIRECTORY)(pImage + ExpVA);
-    pFunctionTable = (LPDWORD)(pImage + pExpDir->AddressOfFunctions);
+    p_Function_ಕೋಷ್ಟಕ = (LPDWORD)(pImage + pExpDir->ವಿಳಾಸ_ದ_Functions);
 
-    if (pExpDir->NumberOfNames == 0)
-	return hInst;	// No export names.
+    ಆದರೆ (pExpDir->ಸಂಖ್ಯೆ_ದ_ಹೆಸರುಗಳು == 0)
+	ಹಿಂತಿರುಗಿ hInst;	// No export names.
 
     // Check only the first entry.
-    if ((pFunctionTable[0] < ExpVA) || (pFunctionTable[0] >= ExpVA + ExpSize))
+    ಆದರೆ ((p_Function_ಕೋಷ್ಟಕ[0] < ExpVA) || (p_Function_ಕೋಷ್ಟಕ[0] >= ExpVA + Exp_ಗಾತ್ರ))
 	// The first entry is not a function forwarder.
-	return hInst;
+	ಹಿಂತಿರುಗಿ hInst;
 
     // The first entry is a function forwarder.
     // The name is represented as "DllName.FunctionName".
-    const char *name = (const char *)(pImage + pFunctionTable[0]);
-    const char *p = strchr(name, '.');
-    if (p == NULL)
-	return hInst;
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *name = (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)(pImage + p_Function_ಕೋಷ್ಟಕ[0]);
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *p = strchr(name, '.');
+    ಆದರೆ (p == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ hInst;
 
     // Extract DllName.
-    char buf[MAX_PATH];
-    if (p - name + 1 > sizeof(buf))
-	return NULL;
+    ಅಕ್ಷರ buf[MAX_ಮಾರ್ಗ];
+    ಆದರೆ (p - name + 1 > ಗಾತ್ರ(buf))
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     strncpy(buf, name, p - name);
     buf[p - name] = NUL;
-    return GetModuleHandleA(buf);
+    ಹಿಂತಿರುಗಿ GetModuleHandleA(buf);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(DYNAMIC_GETTEXT)
+#ಆದರೆ defined(DYNAMIC_GETTEXT)
 # ifndef GETTEXT_DLL
 #  define GETTEXT_DLL "libintl.dll"
 #  define GETTEXT_DLL_ALT1 "libintl-8.dll"
 #  define GETTEXT_DLL_ALT2 "intl.dll"
 # endif
 // Dummy functions
-static char *null_libintl_gettext(const char *);
-static char *null_libintl_ngettext(const char *, const char *, unsigned long n);
-static char *null_libintl_textdomain(const char *);
-static char *null_libintl_bindtextdomain(const char *, const char *);
-static char *null_libintl_bind_textdomain_codeset(const char *, const char *);
-static int null_libintl_wputenv(const wchar_t *);
+ಸ್ಥಿರ ಅಕ್ಷರ *null_libintl_gettext(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *);
+ಸ್ಥಿರ ಅಕ್ಷರ *null_libintl_ngettext(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *, ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ n);
+ಸ್ಥಿರ ಅಕ್ಷರ *null_libintl_textdomain(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *);
+ಸ್ಥಿರ ಅಕ್ಷರ *null_libintl_bindtextdomain(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *);
+ಸ್ಥಿರ ಅಕ್ಷರ *null_libintl_bind_textdomain_codeset(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ null_libintl_wputenv(ಸ್ಥಿರಾಂಕ wchar_t *);
 
-static HINSTANCE hLibintlDLL = NULL;
-char *(*dyn_libintl_gettext)(const char *) = null_libintl_gettext;
-char *(*dyn_libintl_ngettext)(const char *, const char *, unsigned long n)
+ಸ್ಥಿರ HINSTANCE hLibintlDLL = ಖಾಲಿ;
+ಅಕ್ಷರ *(*dyn_libintl_gettext)(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *) = null_libintl_gettext;
+ಅಕ್ಷರ *(*dyn_libintl_ngettext)(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *, ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ n)
 						= null_libintl_ngettext;
-char *(*dyn_libintl_textdomain)(const char *) = null_libintl_textdomain;
-char *(*dyn_libintl_bindtextdomain)(const char *, const char *)
+ಅಕ್ಷರ *(*dyn_libintl_textdomain)(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *) = null_libintl_textdomain;
+ಅಕ್ಷರ *(*dyn_libintl_bindtextdomain)(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)
 						= null_libintl_bindtextdomain;
-char *(*dyn_libintl_bind_textdomain_codeset)(const char *, const char *)
+ಅಕ್ಷರ *(*dyn_libintl_bind_textdomain_codeset)(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)
 				       = null_libintl_bind_textdomain_codeset;
-int (*dyn_libintl_wputenv)(const wchar_t *) = null_libintl_wputenv;
-int *dyn_libintl_nl_msg_cat_cntr = NULL;
+ಪೂರ್ಣಾಂಕ (*dyn_libintl_wputenv)(ಸ್ಥಿರಾಂಕ wchar_t *) = null_libintl_wputenv;
+ಪೂರ್ಣಾಂಕ *dyn_libintl_nl_ಸಂದೇಶ_cat_cntr = ಖಾಲಿ;
 
-    int
-dyn_libintl_init(void)
+    ಪೂರ್ಣಾಂಕ
+dyn_libintl_init(ಶೂನ್ಯ)
 {
-    int i;
-    static struct
+    ಪೂರ್ಣಾಂಕ i;
+    ಸ್ಥಿರ ರಚನೆ
     {
-	char	    *name;
+	ಅಕ್ಷರ	    *name;
 	FARPROC	    *ptr;
-    } libintl_entry[] =
+    } libintl_ನಮೂದು[] =
     {
 	{"gettext", (FARPROC*)&dyn_libintl_gettext},
 	{"ngettext", (FARPROC*)&dyn_libintl_ngettext},
 	{"textdomain", (FARPROC*)&dyn_libintl_textdomain},
 	{"bindtextdomain", (FARPROC*)&dyn_libintl_bindtextdomain},
-	{NULL, NULL}
+	{ಖಾಲಿ, ಖಾಲಿ}
     };
     HINSTANCE hmsvcrt;
 
     // No need to initialize twice.
-    if (hLibintlDLL != NULL)
-	return 1;
+    ಆದರೆ (hLibintlDLL != ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ 1;
     // Load gettext library (libintl.dll and other names).
-    hLibintlDLL = vimLoadLib(GETTEXT_DLL);
+    hLibintlDLL = vim_ತುಂಬು_Lib(GETTEXT_DLL);
 # ifdef GETTEXT_DLL_ALT1
-    if (!hLibintlDLL)
-	hLibintlDLL = vimLoadLib(GETTEXT_DLL_ALT1);
+    ಆದರೆ (!hLibintlDLL)
+	hLibintlDLL = vim_ತುಂಬು_Lib(GETTEXT_DLL_ALT1);
 # endif
 # ifdef GETTEXT_DLL_ALT2
-    if (!hLibintlDLL)
-	hLibintlDLL = vimLoadLib(GETTEXT_DLL_ALT2);
+    ಆದರೆ (!hLibintlDLL)
+	hLibintlDLL = vim_ತುಂಬು_Lib(GETTEXT_DLL_ALT2);
 # endif
-    if (!hLibintlDLL)
+    ಆದರೆ (!hLibintlDLL)
     {
-	if (p_verbose > 0)
+	ಆದರೆ (p_verbose > 0)
 	{
 	    verbose_enter();
-	    semsg(_(e_could_not_load_library_str_str), GETTEXT_DLL, GetWin32Error());
+	    semsg(_(e_could_not_ತುಂಬು_library_str_str), GETTEXT_DLL, GetWin32Error());
 	    verbose_leave();
 	}
-	return 0;
+	ಹಿಂತಿರುಗಿ 0;
     }
-    for (i = 0; libintl_entry[i].name != NULL
-					 && libintl_entry[i].ptr != NULL; ++i)
+    ಗಾಗಿ (i = 0; libintl_ನಮೂದು[i].name != ಖಾಲಿ
+					 && libintl_ನಮೂದು[i].ptr != ಖಾಲಿ; ++i)
     {
-	if ((*libintl_entry[i].ptr = GetProcAddress(hLibintlDLL,
-					      libintl_entry[i].name)) == NULL)
+	ಆದರೆ ((*libintl_ನಮೂದು[i].ptr = Get_Proc_ವಿಳಾಸ(hLibintlDLL,
+					      libintl_ನಮೂದು[i].name)) == ಖಾಲಿ)
 	{
-	    dyn_libintl_end();
-	    if (p_verbose > 0)
+	    dyn_libintl_ಕೊನೆ();
+	    ಆದರೆ (p_verbose > 0)
 	    {
 		verbose_enter();
-		semsg(_(e_could_not_load_library_function_str), libintl_entry[i].name);
+		semsg(_(e_could_not_ತುಂಬು_library_function_str), libintl_ನಮೂದು[i].name);
 		verbose_leave();
 	    }
-	    return 0;
+	    ಹಿಂತಿರುಗಿ 0;
 	}
     }
 
     // The bind_textdomain_codeset() function is optional.
-    dyn_libintl_bind_textdomain_codeset = (char *(*)(const char *, const char *))
-			GetProcAddress(hLibintlDLL, "bind_textdomain_codeset");
-    if (dyn_libintl_bind_textdomain_codeset == NULL)
+    dyn_libintl_bind_textdomain_codeset = (ಅಕ್ಷರ *(*)(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *))
+			Get_Proc_ವಿಳಾಸ(hLibintlDLL, "bind_textdomain_codeset");
+    ಆದರೆ (dyn_libintl_bind_textdomain_codeset == ಖಾಲಿ)
 	dyn_libintl_bind_textdomain_codeset =
 					 null_libintl_bind_textdomain_codeset;
 
     // _wputenv() function for the libintl.dll is optional.
-    hmsvcrt = find_imported_module_by_funcname(hLibintlDLL, "getenv");
-    if (hmsvcrt != NULL)
-	dyn_libintl_wputenv = (int (*)(const wchar_t *))
-					GetProcAddress(hmsvcrt, "_wputenv");
-    if (dyn_libintl_wputenv == NULL || dyn_libintl_wputenv == _wputenv)
+    hmsvcrt = ಕಂಡುಹಿಡಿ_imported_module_by_funcname(hLibintlDLL, "getenv");
+    ಆದರೆ (hmsvcrt != ಖಾಲಿ)
+	dyn_libintl_wputenv = (ಪೂರ್ಣಾಂಕ (*)(ಸ್ಥಿರಾಂಕ wchar_t *))
+					Get_Proc_ವಿಳಾಸ(hmsvcrt, "_wputenv");
+    ಆದರೆ (dyn_libintl_wputenv == ಖಾಲಿ || dyn_libintl_wputenv == _wputenv)
 	dyn_libintl_wputenv = null_libintl_wputenv;
 
     // The _nl_msg_cat_cntr variable is optional.  It is used to make gettext
     // drop the translations it cached.
-    dyn_libintl_nl_msg_cat_cntr = (int *)GetProcAddress(hLibintlDLL,
+    dyn_libintl_nl_ಸಂದೇಶ_cat_cntr = (ಪೂರ್ಣಾಂಕ *)Get_Proc_ವಿಳಾಸ(hLibintlDLL,
 							 "_nl_msg_cat_cntr");
 
-    return 1;
+    ಹಿಂತಿರುಗಿ 1;
 }
 
-    void
-dyn_libintl_end(void)
+    ಶೂನ್ಯ
+dyn_libintl_ಕೊನೆ(ಶೂನ್ಯ)
 {
-    if (hLibintlDLL)
+    ಆದರೆ (hLibintlDLL)
 	FreeLibrary(hLibintlDLL);
-    hLibintlDLL			= NULL;
+    hLibintlDLL			= ಖಾಲಿ;
     dyn_libintl_gettext		= null_libintl_gettext;
     dyn_libintl_ngettext	= null_libintl_ngettext;
     dyn_libintl_textdomain	= null_libintl_textdomain;
     dyn_libintl_bindtextdomain	= null_libintl_bindtextdomain;
     dyn_libintl_bind_textdomain_codeset = null_libintl_bind_textdomain_codeset;
     dyn_libintl_wputenv		= null_libintl_wputenv;
-    dyn_libintl_nl_msg_cat_cntr	= NULL;
+    dyn_libintl_nl_ಸಂದೇಶ_cat_cntr	= ಖಾಲಿ;
 }
 
-    static char *
-null_libintl_gettext(const char *msgid)
+    ಸ್ಥಿರ ಅಕ್ಷರ *
+null_libintl_gettext(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *msgid)
 {
-    return (char*)msgid;
+    ಹಿಂತಿರುಗಿ (ಅಕ್ಷರ*)msgid;
 }
 
-    static char *
+    ಸ್ಥಿರ ಅಕ್ಷರ *
 null_libintl_ngettext(
-	const char *msgid,
-	const char *msgid_plural,
-	unsigned long n)
+	ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *msgid,
+	ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *msgid_plural,
+	ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ n)
 {
-    return (char *)(n == 1 ? msgid : msgid_plural);
+    ಹಿಂತಿರುಗಿ (ಅಕ್ಷರ *)(n == 1 ? msgid : msgid_plural);
 }
 
-    static char *
+    ಸ್ಥಿರ ಅಕ್ಷರ *
 null_libintl_bindtextdomain(
-	const char *domainname UNUSED,
-	const char *dirname UNUSED)
+	ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *domainname ಬಳಸದ,
+	ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *dirname ಬಳಸದ)
 {
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
-    static char *
+    ಸ್ಥಿರ ಅಕ್ಷರ *
 null_libintl_bind_textdomain_codeset(
-	const char *domainname UNUSED,
-	const char *codeset UNUSED)
+	ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *domainname ಬಳಸದ,
+	ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *codeset ಬಳಸದ)
 {
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
-    static char *
-null_libintl_textdomain(const char *domainname UNUSED)
+    ಸ್ಥಿರ ಅಕ್ಷರ *
+null_libintl_textdomain(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *domainname ಬಳಸದ)
 {
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
-    static int
-null_libintl_wputenv(const wchar_t *envstring UNUSED)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+null_libintl_wputenv(ಸ್ಥಿರಾಂಕ wchar_t *envstring ಬಳಸದ)
 {
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-#endif // DYNAMIC_GETTEXT
+#ಆದರೆ_ಅಂತ್ಯ // DYNAMIC_GETTEXT
 
 // This symbol is not defined in older versions of the SDK or Visual C++
 
-#ifndef VER_PLATFORM_WIN32_WINDOWS
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ VER_PLATFORM_WIN32_WINDOWS
 # define VER_PLATFORM_WIN32_WINDOWS 1
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef HAVE_ACL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_ACL
 # include <aclapi.h>
 # ifndef PROTECTED_DACL_SECURITY_INFORMATION
 #  define PROTECTED_DACL_SECURITY_INFORMATION	0x80000000L
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef HAVE_ACL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_ACL
 /*
  * Enables or disables the specified privilege.
  */
-    static BOOL
+    ಸ್ಥಿರ BOOL
 win32_enable_privilege(LPTSTR lpszPrivilege)
 {
     LUID		luid;
     HANDLE		hToken;
     TOKEN_PRIVILEGES	tokenPrivileges;
 
-    if (!OpenProcessToken(GetCurrentProcess(),
+    ಆದರೆ (!OpenProcessToken(GetCurrentProcess(),
 		TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken))
-	return FALSE;
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    if (!LookupPrivilegeValue(NULL, lpszPrivilege, &luid))
+    ಆದರೆ (!Lookup_Privilege_ಮೌಲ್ಯ(ಖಾಲಿ, lpszPrivilege, &luid))
     {
 	CloseHandle(hToken);
-	return FALSE;
+	ಹಿಂತಿರುಗಿ FALSE;
     }
 
-    tokenPrivileges.PrivilegeCount	     = 1;
+    tokenPrivileges.Privilege_ಎಣಿಕೆ	     = 1;
     tokenPrivileges.Privileges[0].Luid       = luid;
-    tokenPrivileges.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+    tokenPrivileges.Privileges[0].ಗುಣಲಕ್ಷಣಗಳು_2 = SE_PRIVILEGE_ENABLED;
 
-    if (!AdjustTokenPrivileges(hToken, FALSE, &tokenPrivileges, 0, NULL, NULL))
+    ಆದರೆ (!AdjustTokenPrivileges(hToken, FALSE, &tokenPrivileges, 0, ಖಾಲಿ, ಖಾಲಿ))
     {
 	CloseHandle(hToken);
-	return FALSE;
+	ಹಿಂತಿರುಗಿ FALSE;
     }
 
-    if (GetLastError() != ERROR_SUCCESS)
+    ಆದರೆ (Get_ಕೊನೆಯ_Error() != ERROR_SUCCESS)
     {
 	CloseHandle(hToken);
-	return FALSE;
+	ಹಿಂತಿರುಗಿ FALSE;
     }
 
     CloseHandle(hToken);
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Fill in "windowsVersion" if possible and enable security privilege for ACL.
  */
-    void
-PlatformId(void)
+    ಶೂನ್ಯ
+PlatformId(ಶೂನ್ಯ)
 {
-#ifdef FEAT_EVAL
-    DWORD major = (win_version >> 24) & 0xFF;
-    DWORD minor = (win_version >> 16) & 0xFF;
-    vim_snprintf(windowsVersion, sizeof(windowsVersion), "%d.%d", major, minor);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    DWORD major = (win_ಆವೃತ್ತಿ >> 24) & 0xFF;
+    DWORD minor = (win_ಆವೃತ್ತಿ >> 16) & 0xFF;
+    vim_snprintf(windows_ಆವೃತ್ತಿ, ಗಾತ್ರ(windows_ಆವೃತ್ತಿ), "%d.%d", major, minor);
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef HAVE_ACL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_ACL
     // Enable privilege for getting or setting SACLs.
-    if (!win32_enable_privilege(SE_SECURITY_NAME))
-	return;
-#endif
+    ಆದರೆ (!win32_enable_privilege(SE_SECURITY_NAME))
+	ಹಿಂತಿರುಗಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ಆದರೆ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
-# define SHIFT  (SHIFT_PRESSED)
-# define CTRL   (RIGHT_CTRL_PRESSED | LEFT_CTRL_PRESSED)
-# define ALT    (RIGHT_ALT_PRESSED  | LEFT_ALT_PRESSED)
-# define ALT_GR (RIGHT_ALT_PRESSED  | LEFT_CTRL_PRESSED)
+# define ಸರಿಸು_2  (ಸರಿಸು_PRESSED)
+# define CTRL   (ಬಲ_CTRL_PRESSED | ಎಡ_CTRL_PRESSED)
+# define ALT    (ಬಲ_ALT_PRESSED  | ಎಡ_ALT_PRESSED)
+# define ALT_GR (ಬಲ_ALT_PRESSED  | ಎಡ_CTRL_PRESSED)
 
 
 // When uChar.AsciiChar is 0, then we need to look at wVirtualKeyCode.
@@ -928,15 +928,15 @@ PlatformId(void)
 // so that the user can have access to all SHIFT-, CTRL-, and ALT-
 // combinations of function/arrow/etc keys.
 
-static const struct
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ರಚನೆ
 {
-    WORD    wVirtKey;
-    BOOL    fAnsiKey;
-    int	    chAlone;
-    int	    chShift;
-    int	    chCtrl;
-    int	    chAlt;
-} VirtKeyMap[] =
+    ಶಬ್ದ_2    w_Virt_ಕೀಲಿ;
+    BOOL    f_Ansi_ಕೀಲಿ;
+    ಪೂರ್ಣಾಂಕ	    chAlone;
+    ಪೂರ್ಣಾಂಕ	    ch_ಸರಿಸು;
+    ಪೂರ್ಣಾಂಕ	    chCtrl;
+    ಪೂರ್ಣಾಂಕ	    chAlt;
+} Virt_ಕೀಲಿ_Map[] =
 {
 //    Key	ANSI	alone	shift	ctrl	    alt
     { VK_ESCAPE,FALSE,	ESC,	ESC,	ESC,	    ESC,    },
@@ -955,20 +955,20 @@ static const struct
     { VK_F12,	TRUE,	'\206',	'\210',	'\212',	    '\214', },
 
     { VK_HOME,	TRUE,	'G',	'\302',	'w',	    '\303', },
-    { VK_UP,	TRUE,	'H',	'\304',	'\305',	    '\306', },
-    { VK_PRIOR,	TRUE,	'I',	'\307',	'\204',	    '\310', }, // PgUp
-    { VK_LEFT,	TRUE,	'K',	'\311',	's',	    '\312', },
-    { VK_RIGHT,	TRUE,	'M',	'\313',	't',	    '\314', },
-    { VK_END,	TRUE,	'O',	'\315',	'u',	    '\316', },
-    { VK_DOWN,	TRUE,	'P',	'\317',	'\320',	    '\321', },
-    { VK_NEXT,	TRUE,	'Q',	'\322',	'v',	    '\323', }, // PgDn
-    { VK_INSERT,TRUE,	'R',	'\324',	'\325',	    '\326', },
+    { VK_ಮೇಲೆ,	TRUE,	'H',	'\304',	'\305',	    '\306', },
+    { VK_ಪೂರ್ವ,	TRUE,	'I',	'\307',	'\204',	    '\310', }, // PgUp
+    { VK_ಎಡ,	TRUE,	'K',	'\311',	's',	    '\312', },
+    { VK_ಬಲ,	TRUE,	'M',	'\313',	't',	    '\314', },
+    { VK_ಕೊನೆ,	TRUE,	'O',	'\315',	'u',	    '\316', },
+    { VK_ಕೆಳಕ್ಕೆ,	TRUE,	'P',	'\317',	'\320',	    '\321', },
+    { VK_ಮುಂದಿನ,	TRUE,	'Q',	'\322',	'v',	    '\323', }, // PgDn
+    { VK_ಸೇರಿಸು,TRUE,	'R',	'\324',	'\325',	    '\326', },
     { VK_DELETE,TRUE,	'S',	'\327',	'\330',	    '\331', },
-    { VK_BACK,	TRUE,	'x',	'y',	'z',	    '{', }, // Backspace
+    { VK_ಹಿಂಭಾಗ,	TRUE,	'x',	'y',	'z',	    '{', }, // Backspace
 
     { VK_SNAPSHOT,TRUE,	0,	0,	0,	    'r', }, // PrtScrn
 
-# if 0
+# ಆದರೆ 0
     // Most people don't have F13-F20, but what the hell...
     { VK_F13,	TRUE,	'\332',	'\333',	'\334',	    '\335', },
     { VK_F14,	TRUE,	'\336',	'\337',	'\340',	    '\341', },
@@ -979,8 +979,8 @@ static const struct
     { VK_F19,	TRUE,	'\362',	'\363',	'\364',	    '\365', },
     { VK_F20,	TRUE,	'\366',	'\367',	'\370',	    '\371', },
 # endif
-    { VK_ADD,	TRUE,   'N',    'N',    'N',	'N',	}, // keyp '+'
-    { VK_SUBTRACT, TRUE,'J',	'J',    'J',	'J',	}, // keyp '-'
+    { VK_ಕೂಡಿಸು,	TRUE,   'N',    'N',    'N',	'N',	}, // keyp '+'
+    { VK_ಕಳೆ, TRUE,'J',	'J',    'J',	'J',	}, // keyp '-'
  // { VK_DIVIDE,   TRUE,'N',	'N',    'N',	'N',	}, // keyp '/'
     { VK_MULTIPLY, TRUE,'7',	'7',    '7',	'7',	}, // keyp '*'
 
@@ -1001,400 +1001,400 @@ static const struct
 /*
  * The return code indicates key code size.
  */
-    static int
-win32_kbd_patch_key(
-    KEY_EVENT_RECORD *pker)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+win32_kbd_patch_ಕೀಲಿ(
+    ಕೀಲಿ_EVENT_ದಾಖಲೆ *pker)
 {
-    UINT uMods = pker->dwControlKeyState;
-    static int s_iIsDead = 0;
-    static WORD awAnsiCode[2];
-    static BYTE abKeystate[256];
+    UINT uMods = pker->dw_Control_ಕೀಲಿ_State;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ s_iIsDead = 0;
+    ಸ್ಥಿರ ಶಬ್ದ_2 aw_Ansi_ಸಂಕೇತ[2];
+    ಸ್ಥಿರ BYTE abKeystate[256];
 
-    if (s_iIsDead == 2)
+    ಆದರೆ (s_iIsDead == 2)
     {
-	pker->uChar.UnicodeChar = (WCHAR) awAnsiCode[1];
+	pker->uChar.UnicodeChar = (WCHAR) aw_Ansi_ಸಂಕೇತ[1];
 	s_iIsDead = 0;
-	return 1;
+	ಹಿಂತಿರುಗಿ 1;
     }
 
     // check if it already has a valid unicode character.
-    if (pker->uChar.UnicodeChar != 0)
-	return 1;
+    ಆದರೆ (pker->uChar.UnicodeChar != 0)
+	ಹಿಂತಿರುಗಿ 1;
 
-    CLEAR_FIELD(abKeystate);
+    CLEAR_ಕ್ಷೇತ್ರ(abKeystate);
 
     // Clear any pending dead keys
-    ToUnicode(VK_SPACE, MapVirtualKey(VK_SPACE, 0), abKeystate, awAnsiCode, 2, 0);
+    ಗಮ್ಯ_Unicode(VK_SPACE, Map_Virtual_ಕೀಲಿ(VK_SPACE, 0), abKeystate, aw_Ansi_ಸಂಕೇತ, 2, 0);
 
-    if (uMods & SHIFT_PRESSED)
-	abKeystate[VK_SHIFT] = 0x80;
-    if (uMods & CAPSLOCK_ON)
+    ಆದರೆ (uMods & ಸರಿಸು_PRESSED)
+	abKeystate[VK_ಸರಿಸು] = 0x80;
+    ಆದರೆ (uMods & CAPSLOCK_ON)
 	abKeystate[VK_CAPITAL] = 1;
 
-    if ((uMods & ALT_GR) == ALT_GR)
+    ಆದರೆ ((uMods & ALT_GR) == ALT_GR)
     {
 	abKeystate[VK_CONTROL] = abKeystate[VK_LCONTROL] =
 	    abKeystate[VK_MENU] = abKeystate[VK_RMENU] = 0x80;
     }
 
-    s_iIsDead = ToUnicode(pker->wVirtualKeyCode, pker->wVirtualScanCode,
-			abKeystate, awAnsiCode, 2, 0);
+    s_iIsDead = ಗಮ್ಯ_Unicode(pker->w_Virtual_ಕೀಲಿ_ಸಂಕೇತ, pker->w_Virtual_ಪರಿಶೀಲನೆ_ಸಂಕೇತ,
+			abKeystate, aw_Ansi_ಸಂಕೇತ, 2, 0);
 
-    if (s_iIsDead > 0)
-	pker->uChar.UnicodeChar = (WCHAR) awAnsiCode[0];
+    ಆದರೆ (s_iIsDead > 0)
+	pker->uChar.UnicodeChar = (WCHAR) aw_Ansi_ಸಂಕೇತ[0];
 
-    return s_iIsDead;
+    ಹಿಂತಿರುಗಿ s_iIsDead;
 }
 
-static BOOL g_fJustGotFocus = FALSE;
+ಸ್ಥಿರ BOOL g_fJustGotFocus = FALSE;
 
 /*
  * Decode a KEY_EVENT into one or two keystrokes
  */
-    static BOOL
-decode_key_event(
-    KEY_EVENT_RECORD	*pker,
+    ಸ್ಥಿರ BOOL
+decode_ಕೀಲಿ_event(
+    ಕೀಲಿ_EVENT_ದಾಖಲೆ	*pker,
     WCHAR		*pch,
     WCHAR		*pch2,
-    int			*pmodifiers,
-    BOOL		fDoPost UNUSED)
+    ಪೂರ್ಣಾಂಕ			*pmodifiers,
+    BOOL		fDoPost ಬಳಸದ)
 {
-    int i;
-    const int nModifs = pker->dwControlKeyState & (SHIFT | ALT | CTRL);
+    ಪೂರ್ಣಾಂಕ i;
+    ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ nModifs = pker->dw_Control_ಕೀಲಿ_State & (ಸರಿಸು_2 | ALT | CTRL);
 
     *pch = *pch2 = NUL;
     g_fJustGotFocus = FALSE;
 
     // ignore key up events
-    if (!pker->bKeyDown)
-	return FALSE;
+    ಆದರೆ (!pker->b_ಕೀಲಿ_ಕೆಳಕ್ಕೆ)
+	ಹಿಂತಿರುಗಿ FALSE;
 
     // ignore some keystrokes
-    switch (pker->wVirtualKeyCode)
+    ಆಯ್ಕೆ (pker->w_Virtual_ಕೀಲಿ_ಸಂಕೇತ)
     {
     // modifiers
-    case VK_SHIFT:
-    case VK_CONTROL:
-    case VK_MENU:   // Alt key
-	return FALSE;
+    ಸ್ಥಿತಿ VK_ಸರಿಸು:
+    ಸ್ಥಿತಿ VK_CONTROL:
+    ಸ್ಥಿತಿ VK_MENU:   // Alt key
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    default:
-	break;
+    ಪೂರ್ವನಿಯೋಜಿತ:
+	ನಿಲ್ಲಿಸು;
     }
 
     // Shift-TAB
-    if (pker->wVirtualKeyCode == VK_TAB && (nModifs & SHIFT_PRESSED))
+    ಆದರೆ (pker->w_Virtual_ಕೀಲಿ_ಸಂಕೇತ == VK_TAB && (nModifs & ಸರಿಸು_PRESSED))
     {
 	*pch = K_NUL;
 	*pch2 = '\017';
-	return TRUE;
+	ಹಿಂತಿರುಗಿ TRUE;
     }
 
-    for (i = ARRAY_LENGTH(VirtKeyMap); --i >= 0; )
+    ಗಾಗಿ (i = ARRAY_ಉದ್ದಳತೆ(Virt_ಕೀಲಿ_Map); --i >= 0; )
     {
-	if (VirtKeyMap[i].wVirtKey == pker->wVirtualKeyCode)
+	ಆದರೆ (Virt_ಕೀಲಿ_Map[i].w_Virt_ಕೀಲಿ == pker->w_Virtual_ಕೀಲಿ_ಸಂಕೇತ)
 	{
-	    *pch = VirtKeyMap[i].chAlone;
-	    if ((nModifs & SHIFT) != 0)
-		*pch = VirtKeyMap[i].chShift;
-	    else if ((nModifs & CTRL) != 0 && (nModifs & ~CTRL) == 0)
-		*pch = VirtKeyMap[i].chCtrl;
-	    else if ((nModifs & ALT) != 0)
-		*pch = VirtKeyMap[i].chAlt;
+	    *pch = Virt_ಕೀಲಿ_Map[i].chAlone;
+	    ಆದರೆ ((nModifs & ಸರಿಸು_2) != 0)
+		*pch = Virt_ಕೀಲಿ_Map[i].ch_ಸರಿಸು;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((nModifs & CTRL) != 0 && (nModifs & ~CTRL) == 0)
+		*pch = Virt_ಕೀಲಿ_Map[i].chCtrl;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((nModifs & ALT) != 0)
+		*pch = Virt_ಕೀಲಿ_Map[i].chAlt;
 
-	    if (*pch != 0)
+	    ಆದರೆ (*pch != 0)
 	    {
-		if (VirtKeyMap[i].fAnsiKey)
+		ಆದರೆ (Virt_ಕೀಲಿ_Map[i].f_Ansi_ಕೀಲಿ)
 		{
 		    *pch2 = *pch;
 		    *pch = K_NUL;
-		    if (pmodifiers)
+		    ಆದರೆ (pmodifiers)
 		    {
-			if (pker->wVirtualKeyCode >= VK_F1
-			    && pker->wVirtualKeyCode <= VK_F12)
+			ಆದರೆ (pker->w_Virtual_ಕೀಲಿ_ಸಂಕೇತ >= VK_F1
+			    && pker->w_Virtual_ಕೀಲಿ_ಸಂಕೇತ <= VK_F12)
 			{
-			    if ((nModifs & ALT) != 0)
+			    ಆದರೆ ((nModifs & ALT) != 0)
 			    {
-				*pmodifiers |= MOD_MASK_ALT;
-				if ((nModifs & SHIFT) == 0)
-				    *pch2 = VirtKeyMap[i].chAlone;
+				*pmodifiers |= MOD_ಮುಖವಾಡ_ALT;
+				ಆದರೆ ((nModifs & ಸರಿಸು_2) == 0)
+				    *pch2 = Virt_ಕೀಲಿ_Map[i].chAlone;
 			    }
-			    if ((nModifs & CTRL) != 0)
+			    ಆದರೆ ((nModifs & CTRL) != 0)
 			    {
-				*pmodifiers |= MOD_MASK_CTRL;
-				if ((nModifs & SHIFT) == 0)
-				    *pch2 = VirtKeyMap[i].chAlone;
+				*pmodifiers |= MOD_ಮುಖವಾಡ_CTRL;
+				ಆದರೆ ((nModifs & ಸರಿಸು_2) == 0)
+				    *pch2 = Virt_ಕೀಲಿ_Map[i].chAlone;
 			    }
 			}
-			else if (pker->wVirtualKeyCode >= VK_END
-				&& pker->wVirtualKeyCode <= VK_DOWN)
+			ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (pker->w_Virtual_ಕೀಲಿ_ಸಂಕೇತ >= VK_ಕೊನೆ
+				&& pker->w_Virtual_ಕೀಲಿ_ಸಂಕೇತ <= VK_ಕೆಳಕ್ಕೆ)
 			{
 			    // (0x23 - 0x28): VK_END, VK_HOME,
 			    // VK_LEFT, VK_UP, VK_RIGHT, VK_DOWN
 
 			    *pmodifiers = 0;
-			    *pch2 = VirtKeyMap[i].chAlone;
-			    if ((nModifs & SHIFT) != 0
-						    && (nModifs & ~SHIFT) == 0)
+			    *pch2 = Virt_ಕೀಲಿ_Map[i].chAlone;
+			    ಆದರೆ ((nModifs & ಸರಿಸು_2) != 0
+						    && (nModifs & ~ಸರಿಸು_2) == 0)
 			    {
-				*pch2 = VirtKeyMap[i].chShift;
+				*pch2 = Virt_ಕೀಲಿ_Map[i].ch_ಸರಿಸು;
 			    }
-			    if ((nModifs & CTRL) != 0
+			    ಆದರೆ ((nModifs & CTRL) != 0
 						     && (nModifs & ~CTRL) == 0)
 			    {
-				*pch2 = VirtKeyMap[i].chCtrl;
-				if (pker->wVirtualKeyCode == VK_UP
-				    || pker->wVirtualKeyCode == VK_DOWN)
+				*pch2 = Virt_ಕೀಲಿ_Map[i].chCtrl;
+				ಆದರೆ (pker->w_Virtual_ಕೀಲಿ_ಸಂಕೇತ == VK_ಮೇಲೆ
+				    || pker->w_Virtual_ಕೀಲಿ_ಸಂಕೇತ == VK_ಕೆಳಕ್ಕೆ)
 				{
-				    *pmodifiers |= MOD_MASK_CTRL;
-				    *pch2 = VirtKeyMap[i].chAlone;
+				    *pmodifiers |= MOD_ಮುಖವಾಡ_CTRL;
+				    *pch2 = Virt_ಕೀಲಿ_Map[i].chAlone;
 				}
 			    }
-			    if ((nModifs & SHIFT) != 0
+			    ಆದರೆ ((nModifs & ಸರಿಸು_2) != 0
 						      && (nModifs & CTRL) != 0)
 			    {
-				*pmodifiers |= MOD_MASK_CTRL;
-				*pch2 = VirtKeyMap[i].chShift;
+				*pmodifiers |= MOD_ಮುಖವಾಡ_CTRL;
+				*pch2 = Virt_ಕೀಲಿ_Map[i].ch_ಸರಿಸು;
 			    }
-			    if ((nModifs & ALT) != 0)
+			    ಆದರೆ ((nModifs & ALT) != 0)
 			    {
-				*pch2 = VirtKeyMap[i].chAlt;
-				*pmodifiers |= MOD_MASK_ALT;
-				if ((nModifs & ~ALT) == 0)
+				*pch2 = Virt_ಕೀಲಿ_Map[i].chAlt;
+				*pmodifiers |= MOD_ಮುಖವಾಡ_ALT;
+				ಆದರೆ ((nModifs & ~ALT) == 0)
 				{
-				    *pch2 = VirtKeyMap[i].chAlone;
+				    *pch2 = Virt_ಕೀಲಿ_Map[i].chAlone;
 				}
-				else if ((nModifs & SHIFT) != 0)
+				ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((nModifs & ಸರಿಸು_2) != 0)
 				{
-				    *pch2 = VirtKeyMap[i].chShift;
+				    *pch2 = Virt_ಕೀಲಿ_Map[i].ch_ಸರಿಸು;
 				}
-				else if ((nModifs & CTRL) != 0)
+				ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((nModifs & CTRL) != 0)
 				{
-				    if (pker->wVirtualKeyCode == VK_UP
-					|| pker->wVirtualKeyCode == VK_DOWN)
+				    ಆದರೆ (pker->w_Virtual_ಕೀಲಿ_ಸಂಕೇತ == VK_ಮೇಲೆ
+					|| pker->w_Virtual_ಕೀಲಿ_ಸಂಕೇತ == VK_ಕೆಳಕ್ಕೆ)
 				    {
-					*pmodifiers |= MOD_MASK_CTRL;
-					*pch2 = VirtKeyMap[i].chAlone;
+					*pmodifiers |= MOD_ಮುಖವಾಡ_CTRL;
+					*pch2 = Virt_ಕೀಲಿ_Map[i].chAlone;
 				    }
-				    else
+				    ಇಲ್ಲದಿದ್ದರೆ
 				    {
-					*pch2 = VirtKeyMap[i].chCtrl;
+					*pch2 = Virt_ಕೀಲಿ_Map[i].chCtrl;
 				    }
 				}
 			    }
 			}
-			else if (pker->wVirtualKeyCode == VK_INSERT
-					&& (nModifs & SHIFT) != 0
-					&& (nModifs & ~SHIFT) == 0)
+			ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (pker->w_Virtual_ಕೀಲಿ_ಸಂಕೇತ == VK_ಸೇರಿಸು
+					&& (nModifs & ಸರಿಸು_2) != 0
+					&& (nModifs & ~ಸರಿಸು_2) == 0)
 			{
 			    *pmodifiers = 0;
-			    *pch2 = VirtKeyMap[i].chShift;
+			    *pch2 = Virt_ಕೀಲಿ_Map[i].ch_ಸರಿಸು;
 			}
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
-			    *pch2 = VirtKeyMap[i].chAlone;
-			    if ((nModifs & SHIFT) != 0)
-				*pmodifiers |= MOD_MASK_SHIFT;
-			    if ((nModifs & CTRL) != 0)
-				*pmodifiers |= MOD_MASK_CTRL;
-			    if ((nModifs & ALT) != 0)
-				*pmodifiers |= MOD_MASK_ALT;
+			    *pch2 = Virt_ಕೀಲಿ_Map[i].chAlone;
+			    ಆದರೆ ((nModifs & ಸರಿಸು_2) != 0)
+				*pmodifiers |= MOD_ಮುಖವಾಡ_ಸರಿಸು;
+			    ಆದರೆ ((nModifs & CTRL) != 0)
+				*pmodifiers |= MOD_ಮುಖವಾಡ_CTRL;
+			    ಆದರೆ ((nModifs & ALT) != 0)
+				*pmodifiers |= MOD_ಮುಖವಾಡ_ALT;
 			}
 		    }
 		}
 
-		return TRUE;
+		ಹಿಂತಿರುಗಿ TRUE;
 	    }
 	}
     }
 
-    i = win32_kbd_patch_key(pker);
+    i = win32_kbd_patch_ಕೀಲಿ(pker);
 
-    if (i < 0)
+    ಆದರೆ (i < 0)
 	*pch = NUL;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	*pch = (i > 0) ? pker->uChar.UnicodeChar : NUL;
 
-	if (pmodifiers != NULL)
+	ಆದರೆ (pmodifiers != ಖಾಲಿ)
 	{
 	    // Pass on the ALT key as a modifier, but only when not combined
 	    // with CTRL (which is ALTGR).
-	    if ((nModifs & ALT) != 0 && (nModifs & CTRL) == 0)
-		*pmodifiers |= MOD_MASK_ALT;
+	    ಆದರೆ ((nModifs & ALT) != 0 && (nModifs & CTRL) == 0)
+		*pmodifiers |= MOD_ಮುಖವಾಡ_ALT;
 
 	    // Pass on SHIFT only for special keys, because we don't know when
 	    // it's already included with the character.
-	    if ((nModifs & SHIFT) != 0 && *pch <= 0x20)
-		*pmodifiers |= MOD_MASK_SHIFT;
+	    ಆದರೆ ((nModifs & ಸರಿಸು_2) != 0 && *pch <= 0x20)
+		*pmodifiers |= MOD_ಮುಖವಾಡ_ಸರಿಸು;
 
 	    // Pass on CTRL only for non-special keys, because we don't know
 	    // when it's already included with the character.  And not when
 	    // combined with ALT (which is ALTGR).
-	    if ((nModifs & CTRL) != 0 && (nModifs & ALT) == 0
+	    ಆದರೆ ((nModifs & CTRL) != 0 && (nModifs & ALT) == 0
 					       && *pch >= 0x20 && *pch < 0x80)
-		*pmodifiers |= MOD_MASK_CTRL;
+		*pmodifiers |= MOD_ಮುಖವಾಡ_CTRL;
 	}
     }
 
-    return (*pch != NUL);
+    ಹಿಂತಿರುಗಿ (*pch != NUL);
 }
 
-# if defined(FEAT_EVAL)
-    static int
-encode_key_event(dict_T *args, INPUT_RECORD *ir)
+# ಆದರೆ defined(FEAT_EVAL)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+encode_ಕೀಲಿ_event(dict_T *ವಾದಗಳು, ಒಳಹರಿವು_ದಾಖಲೆ *ir)
 {
-    static int s_dwMods = 0;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ s_dwMods = 0;
 
-    char_u *action = dict_get_string(args, "event", TRUE);
-    if (action && (STRICMP(action, "keydown") == 0
+    char_u *action = dict_get_string(ವಾದಗಳು, "event", TRUE);
+    ಆದರೆ (action && (STRICMP(action, "keydown") == 0
 					|| STRICMP(action, "keyup") == 0))
     {
-	BOOL isKeyDown = STRICMP(action, "keydown") == 0;
-	WORD vkCode = dict_get_number_def(args, "keycode", 0);
-	if (vkCode <= 0 || vkCode >= 0xFF)
+	BOOL is_ಕೀಲಿ_ಕೆಳಕ್ಕೆ = STRICMP(action, "keydown") == 0;
+	ಶಬ್ದ_2 vk_ಸಂಕೇತ = dict_get_ಸಂಖ್ಯೆ_def(ವಾದಗಳು, "keycode", 0);
+	ಆದರೆ (vk_ಸಂಕೇತ <= 0 || vk_ಸಂಕೇತ >= 0xFF)
 	{
-	    semsg(_(e_invalid_argument_nr), (long)vkCode);
-	    return FALSE;
+	    semsg(_(e_invalid_ವಾದ_nr), (ದೀರ್ಘ)vk_ಸಂಕೇತ);
+	    ಹಿಂತಿರುಗಿ FALSE;
 	}
 
-	ir->EventType = KEY_EVENT;
-	KEY_EVENT_RECORD ker;
-	ZeroMemory(&ker, sizeof(ker));
-	ker.bKeyDown = isKeyDown;
-	ker.wRepeatCount = 1;
-	ker.wVirtualScanCode = 0;
-	ker.dwControlKeyState = 0;
-	int mods = (int)dict_get_number(args, "modifiers");
+	ir->EventType = ಕೀಲಿ_EVENT;
+	ಕೀಲಿ_EVENT_ದಾಖಲೆ ker;
+	Zero_ಸ್ಮರಣೆ(&ker, ಗಾತ್ರ(ker));
+	ker.b_ಕೀಲಿ_ಕೆಳಕ್ಕೆ = is_ಕೀಲಿ_ಕೆಳಕ್ಕೆ;
+	ker.w_Repeat_ಎಣಿಕೆ = 1;
+	ker.w_Virtual_ಪರಿಶೀಲನೆ_ಸಂಕೇತ = 0;
+	ker.dw_Control_ಕೀಲಿ_State = 0;
+	ಪೂರ್ಣಾಂಕ mods = (ಪೂರ್ಣಾಂಕ)dict_get_ಸಂಖ್ಯೆ(ವಾದಗಳು, "modifiers");
 	// Encode the win32 console key modifiers from Vim keyboard modifiers.
-	if (mods)
+	ಆದರೆ (mods)
 	{
 	    // If "modifiers" is explicitly set in the args, then we reset any
 	    // remembered modifier key state that may have been set from
 	    // earlier mod-key-down events, even if they are not yet unset by
 	    // earlier mod-key-up events.
 	    s_dwMods = 0;
-	    if (mods & MOD_MASK_SHIFT)
-		ker.dwControlKeyState |= SHIFT_PRESSED;
-	    if (mods & MOD_MASK_CTRL)
-		ker.dwControlKeyState |= LEFT_CTRL_PRESSED;
-	    if (mods & MOD_MASK_ALT)
-		ker.dwControlKeyState |= LEFT_ALT_PRESSED;
+	    ಆದರೆ (mods & MOD_ಮುಖವಾಡ_ಸರಿಸು)
+		ker.dw_Control_ಕೀಲಿ_State |= ಸರಿಸು_PRESSED;
+	    ಆದರೆ (mods & MOD_ಮುಖವಾಡ_CTRL)
+		ker.dw_Control_ಕೀಲಿ_State |= ಎಡ_CTRL_PRESSED;
+	    ಆದರೆ (mods & MOD_ಮುಖವಾಡ_ALT)
+		ker.dw_Control_ಕೀಲಿ_State |= ಎಡ_ALT_PRESSED;
 	}
 
-	if (vkCode == VK_LSHIFT || vkCode == VK_RSHIFT || vkCode == VK_SHIFT)
+	ಆದರೆ (vk_ಸಂಕೇತ == VK_LSHIFT || vk_ಸಂಕೇತ == VK_RSHIFT || vk_ಸಂಕೇತ == VK_ಸರಿಸು)
 	{
-	    if (isKeyDown)
-		s_dwMods |= SHIFT_PRESSED;
-	    else
-		s_dwMods &= ~SHIFT_PRESSED;
+	    ಆದರೆ (is_ಕೀಲಿ_ಕೆಳಕ್ಕೆ)
+		s_dwMods |= ಸರಿಸು_PRESSED;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		s_dwMods &= ~ಸರಿಸು_PRESSED;
 	}
-	else if (vkCode == VK_LCONTROL || vkCode == VK_CONTROL)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (vk_ಸಂಕೇತ == VK_LCONTROL || vk_ಸಂಕೇತ == VK_CONTROL)
 	{
-	    if (isKeyDown)
-		s_dwMods |= LEFT_CTRL_PRESSED;
-	    else
-		s_dwMods &= ~LEFT_CTRL_PRESSED;
+	    ಆದರೆ (is_ಕೀಲಿ_ಕೆಳಕ್ಕೆ)
+		s_dwMods |= ಎಡ_CTRL_PRESSED;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		s_dwMods &= ~ಎಡ_CTRL_PRESSED;
 	}
-	else if (vkCode == VK_RCONTROL)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (vk_ಸಂಕೇತ == VK_RCONTROL)
 	{
-	    if (isKeyDown)
-		s_dwMods |= RIGHT_CTRL_PRESSED;
-	    else
-		s_dwMods &= ~RIGHT_CTRL_PRESSED;
+	    ಆದರೆ (is_ಕೀಲಿ_ಕೆಳಕ್ಕೆ)
+		s_dwMods |= ಬಲ_CTRL_PRESSED;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		s_dwMods &= ~ಬಲ_CTRL_PRESSED;
 	}
-	else if (vkCode == VK_LMENU || vkCode == VK_MENU)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (vk_ಸಂಕೇತ == VK_LMENU || vk_ಸಂಕೇತ == VK_MENU)
 	{
-	    if (isKeyDown)
-		s_dwMods |= LEFT_ALT_PRESSED;
-	    else
-		s_dwMods &= ~LEFT_ALT_PRESSED;
+	    ಆದರೆ (is_ಕೀಲಿ_ಕೆಳಕ್ಕೆ)
+		s_dwMods |= ಎಡ_ALT_PRESSED;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		s_dwMods &= ~ಎಡ_ALT_PRESSED;
 	}
-	else if (vkCode == VK_RMENU)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (vk_ಸಂಕೇತ == VK_RMENU)
 	{
-	    if (isKeyDown)
-		s_dwMods |= RIGHT_ALT_PRESSED;
-	    else
-		s_dwMods &= ~RIGHT_ALT_PRESSED;
+	    ಆದರೆ (is_ಕೀಲಿ_ಕೆಳಕ್ಕೆ)
+		s_dwMods |= ಬಲ_ALT_PRESSED;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		s_dwMods &= ~ಬಲ_ALT_PRESSED;
 	}
-	ker.dwControlKeyState |= s_dwMods;
-	ker.wVirtualKeyCode = vkCode;
+	ker.dw_Control_ಕೀಲಿ_State |= s_dwMods;
+	ker.w_Virtual_ಕೀಲಿ_ಸಂಕೇತ = vk_ಸಂಕೇತ;
 	ker.uChar.UnicodeChar = 0;
-	ir->Event.KeyEvent = ker;
+	ir->Event.ಕೀಲಿ_Event_2 = ker;
 	vim_free(action);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (action == NULL)
+	ಆದರೆ (action == ಖಾಲಿ)
 	{
-	    semsg(_(e_missing_argument_str), "event");
+	    semsg(_(e_missing_ವಾದ_str), "event");
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    semsg(_(e_invalid_value_for_argument_str_str), "event", action);
+	    semsg(_(e_invalid_ಮೌಲ್ಯ_for_ವಾದ_str_str), "event", action);
 	    vim_free(action);
 	}
-	return FALSE;
+	ಹಿಂತಿರುಗಿ FALSE;
     }
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 # endif  // FEAT_EVAL
-#endif // !FEAT_GUI_MSWIN || VIMDLL
+#ಆದರೆ_ಅಂತ್ಯ // !FEAT_GUI_MSWIN || VIMDLL
 
 
 /*
  * For the GUI the mouse handling is in gui_w32.c.
  */
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-static int g_fMouseAvail = FALSE;   // mouse present
-static int g_fMouseActive = FALSE;  // mouse enabled
-static int g_nMouseClick = -1;	    // mouse status
-static int g_xMouse;		    // mouse x coordinate
-static int g_yMouse;		    // mouse y coordinate
-static DWORD g_cmodein = 0;	    // Original console input mode
-static DWORD g_cmodeout = 0;	    // Original console output mode
+#ಆದರೆ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ g_fMouseAvail = FALSE;   // mouse present
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ g_f_Mouse_ಸಕ್ರಿಯ = FALSE;  // mouse enabled
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ g_nMouseClick = -1;	    // mouse status
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ g_xMouse;		    // mouse x coordinate
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ g_yMouse;		    // mouse y coordinate
+ಸ್ಥಿರ DWORD g_cmodein = 0;	    // Original console input mode
+ಸ್ಥಿರ DWORD g_cmodeout = 0;	    // Original console output mode
 
 /*
  * Enable or disable mouse input
  */
-    void
-mch_setmouse(int on)
+    ಶೂನ್ಯ
+mch_setmouse(ಪೂರ್ಣಾಂಕ on)
 {
     DWORD cmodein;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return;
+    ಆದರೆ (gui.ಒಳ_use)
+	ಹಿಂತಿರುಗಿ;
 # endif
-    if (!g_fMouseAvail)
-	return;
+    ಆದರೆ (!g_fMouseAvail)
+	ಹಿಂತಿರುಗಿ;
 
-    g_fMouseActive = on;
-    GetConsoleMode(g_hConIn, &cmodein);
+    g_f_Mouse_ಸಕ್ರಿಯ = on;
+    Get_Console_ಬಹುಲಕ(g_h_Con_ಒಳ, &cmodein);
 
-    if (g_fMouseActive)
+    ಆದರೆ (g_f_Mouse_ಸಕ್ರಿಯ)
     {
-	cmodein |= ENABLE_MOUSE_INPUT;
-	cmodein &= ~ENABLE_QUICK_EDIT_MODE;
+	cmodein |= ENABLE_MOUSE_ಒಳಹರಿವು;
+	cmodein &= ~ENABLE_ಶೀಘ್ರ_EDIT_ಬಹುಲಕ;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	cmodein &= ~ENABLE_MOUSE_INPUT;
-	cmodein |= g_cmodein & ENABLE_QUICK_EDIT_MODE;
+	cmodein &= ~ENABLE_MOUSE_ಒಳಹರಿವು;
+	cmodein |= g_cmodein & ENABLE_ಶೀಘ್ರ_EDIT_ಬಹುಲಕ;
     }
 
-    SetConsoleMode(g_hConIn, cmodein | ENABLE_EXTENDED_FLAGS);
+    ಗಣ_Console_ಬಹುಲಕ(g_h_Con_ಒಳ, cmodein | ENABLE_EXTENDED_FLAGS);
 }
 
 
-# if defined(FEAT_BEVAL_TERM)
+# ಆದರೆ defined(FEAT_BEVAL_ಪದ)
 /*
  * Called when 'balloonevalterm' changed.
  */
-    void
-mch_bevalterm_changed(void)
+    ಶೂನ್ಯ
+mch_bevalterm_ಬದಲಾಯಿತು(ಶೂನ್ಯ)
 {
-    mch_setmouse(g_fMouseActive);
+    mch_setmouse(g_f_Mouse_ಸಕ್ರಿಯ);
 }
 # endif
 
@@ -1419,72 +1419,72 @@ mch_bevalterm_changed(void)
  *       the wheel was rotated forward, away from the user.
  *    -  Otherwise, the wheel was rotated backward, toward the user.
  */
-    static void
-decode_mouse_wheel(MOUSE_EVENT_RECORD *pmer)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+decode_mouse_wheel(MOUSE_EVENT_ದಾಖಲೆ *pmer)
 {
-    int	    horizontal = (pmer->dwEventFlags == MOUSE_HWHEELED);
-    int	    zDelta = pmer->dwButtonState;
+    ಪೂರ್ಣಾಂಕ	    horizontal = (pmer->dwEventFlags == MOUSE_HWHEELED);
+    ಪೂರ್ಣಾಂಕ	    zDelta = pmer->dwButtonState;
 
     g_xMouse = pmer->dwMousePosition.X;
     g_yMouse = pmer->dwMousePosition.Y;
 
 # ifdef FEAT_PROP_POPUP
-    int lcol = g_xMouse;
-    int lrow = g_yMouse;
-    win_T *wp = mouse_find_win(&lrow, &lcol, FIND_POPUP);
-    if (wp != NULL && popup_is_popup(wp))
+    ಪೂರ್ಣಾಂಕ lcol = g_xMouse;
+    ಪೂರ್ಣಾಂಕ lrow = g_yMouse;
+    win_T *wp = mouse_ಕಂಡುಹಿಡಿ_win(&lrow, &lcol, ಕಂಡುಹಿಡಿ_POPUP);
+    ಆದರೆ (wp != ಖಾಲಿ && popup_is_popup(wp))
     {
 	g_nMouseClick = -1;
 	cmdarg_T cap;
 	oparg_T oa;
-	CLEAR_FIELD(cap);
+	CLEAR_ಕ್ಷೇತ್ರ(cap);
 	clear_oparg(&oa);
 	cap.oap = &oa;
-	if (horizontal)
+	ಆದರೆ (horizontal)
 	{
-	    cap.arg = zDelta < 0 ? MSCR_LEFT : MSCR_RIGHT;
+	    cap.arg = zDelta < 0 ? MSCR_ಎಡ : MSCR_ಬಲ;
 	    cap.cmdchar = zDelta < 0 ? K_MOUSELEFT : K_MOUSERIGHT;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    cap.cmdchar = zDelta < 0 ? K_MOUSEUP : K_MOUSEDOWN;
-	    cap.arg = zDelta < 0 ? MSCR_UP : MSCR_DOWN;
+	    cap.arg = zDelta < 0 ? MSCR_ಮೇಲೆ : MSCR_ಕೆಳಕ್ಕೆ;
 	}
 
 	// Mouse hovers over popup window, scroll it if possible.
-	mouse_row = wp->w_winrow;
-	mouse_col = wp->w_wincol;
+	mouse_ಅಡ್ಡಸಾಲು = wp->w_winrow;
+	mouse_ಲಂಬಸಾಲು = wp->w_wincol;
 	nv_mousescroll(&cap);
 	update_screen(0);
 	setcursor();
-	out_flush();
+	ಹೊರಹೋಗು_flush();
     }
 # endif
-    mouse_col = g_xMouse;
-    mouse_row = g_yMouse;
+    mouse_ಲಂಬಸಾಲು = g_xMouse;
+    mouse_ಅಡ್ಡಸಾಲು = g_yMouse;
 
     char_u modifiers = 0;
     char_u direction = 0;
 
     // Decode the direction into an event that Vim can process
-    if (horizontal)
+    ಆದರೆ (horizontal)
 	direction = zDelta >= 0 ? KE_MOUSELEFT : KE_MOUSERIGHT;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	direction = zDelta >= 0 ? KE_MOUSEDOWN : KE_MOUSEUP;
 
     // Decode the win32 console key modifiers into Vim mouse modifiers.
-    if (pmer->dwControlKeyState & SHIFT_PRESSED)
-	modifiers |= MOD_MASK_SHIFT; // MOUSE_SHIFT;
-    if (pmer->dwControlKeyState & (RIGHT_CTRL_PRESSED | LEFT_CTRL_PRESSED))
-	modifiers |= MOD_MASK_CTRL; // MOUSE_CTRL;
-    if (pmer->dwControlKeyState & (RIGHT_ALT_PRESSED  | LEFT_ALT_PRESSED))
-	modifiers |= MOD_MASK_ALT; // MOUSE_ALT;
+    ಆದರೆ (pmer->dw_Control_ಕೀಲಿ_State & ಸರಿಸು_PRESSED)
+	modifiers |= MOD_ಮುಖವಾಡ_ಸರಿಸು; // MOUSE_SHIFT;
+    ಆದರೆ (pmer->dw_Control_ಕೀಲಿ_State & (ಬಲ_CTRL_PRESSED | ಎಡ_CTRL_PRESSED))
+	modifiers |= MOD_ಮುಖವಾಡ_CTRL; // MOUSE_CTRL;
+    ಆದರೆ (pmer->dw_Control_ಕೀಲಿ_State & (ಬಲ_ALT_PRESSED  | ಎಡ_ALT_PRESSED))
+	modifiers |= MOD_ಮುಖವಾಡ_ALT; // MOUSE_ALT;
 
     // add (bitwise or) the scroll direction and the key modifier chars
     // together.
     g_nMouseClick = ((direction << 8) | modifiers);
 
-    return;
+    ಹಿಂತಿರುಗಿ;
 }
 
 /*
@@ -1514,238 +1514,238 @@ decode_mouse_wheel(MOUSE_EVENT_RECORD *pmer)
  * so we need to delay a little.  Also, we tend not to get MOUSE_RELEASE
  * in such cases, if the user is clicking quickly.
  */
-    static BOOL
+    ಸ್ಥಿರ BOOL
 decode_mouse_event(
-    MOUSE_EVENT_RECORD *pmer)
+    MOUSE_EVENT_ದಾಖಲೆ *pmer)
 {
-    static int s_nOldButton = -1;
-    static int s_nOldMouseClick = -1;
-    static int s_xOldMouse = -1;
-    static int s_yOldMouse = -1;
-    static linenr_T s_old_topline = 0;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ s_nOldButton = -1;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ s_nOldMouseClick = -1;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ s_xOldMouse = -1;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ s_yOldMouse = -1;
+    ಸ್ಥಿರ linenr_T s_old_topline = 0;
 # ifdef FEAT_DIFF
-    static int s_old_topfill = 0;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ s_old_topfill = 0;
 # endif
-    static int s_cClicks = 1;
-    static BOOL s_fReleased = TRUE;
-    static DWORD s_dwLastClickTime = 0;
-    static BOOL s_fNextIsMiddle = FALSE;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ s_cClicks = 1;
+    ಸ್ಥಿರ BOOL s_fReleased = TRUE;
+    ಸ್ಥಿರ DWORD s_dw_ಕೊನೆಯ_Click_ಸಮಯ = 0;
+    ಸ್ಥಿರ BOOL s_f_ಮುಂದಿನ_Is_ಮಧ್ಯ = FALSE;
 
-    static DWORD cButtons = 0;	// number of buttons supported
+    ಸ್ಥಿರ DWORD cButtons = 0;	// number of buttons supported
 
-    const DWORD LEFT = FROM_LEFT_1ST_BUTTON_PRESSED;
-    const DWORD MIDDLE = FROM_LEFT_2ND_BUTTON_PRESSED;
-    const DWORD RIGHT = RIGHTMOST_BUTTON_PRESSED;
-    const DWORD LEFT_RIGHT = LEFT | RIGHT;
+    ಸ್ಥಿರಾಂಕ DWORD ಎಡ_3 = FROM_ಎಡ_1_ST_BUTTON_PRESSED;
+    ಸ್ಥಿರಾಂಕ DWORD ಮಧ್ಯ = FROM_ಎಡ_2_ND_BUTTON_PRESSED;
+    ಸ್ಥಿರಾಂಕ DWORD ಬಲ_3 = RIGHTMOST_BUTTON_PRESSED;
+    ಸ್ಥಿರಾಂಕ DWORD ಎಡ_ಬಲ = ಎಡ_3 | ಬಲ_3;
 
-    int nButton;
+    ಪೂರ್ಣಾಂಕ nButton;
 
-    if (cButtons == 0 && !GetNumberOfConsoleMouseButtons(&cButtons))
+    ಆದರೆ (cButtons == 0 && !Get_ಸಂಖ್ಯೆ_ದ_Console_Mouse_Buttons(&cButtons))
 	cButtons = 2;
 
-    if (!g_fMouseAvail || !g_fMouseActive)
+    ಆದರೆ (!g_fMouseAvail || !g_f_Mouse_ಸಕ್ರಿಯ)
     {
 	g_nMouseClick = -1;
-	return FALSE;
+	ಹಿಂತಿರುಗಿ FALSE;
     }
 
     // get a spurious MOUSE_EVENT immediately after receiving focus; ignore
-    if (g_fJustGotFocus)
+    ಆದರೆ (g_fJustGotFocus)
     {
 	g_fJustGotFocus = FALSE;
-	return FALSE;
+	ಹಿಂತಿರುಗಿ FALSE;
     }
 
     // If there is an unprocessed mouse click drop this one.
-    if (g_nMouseClick != -1)
-	return TRUE;
+    ಆದರೆ (g_nMouseClick != -1)
+	ಹಿಂತಿರುಗಿ TRUE;
 
-    if (pmer->dwEventFlags == MOUSE_WHEELED
+    ಆದರೆ (pmer->dwEventFlags == MOUSE_WHEELED
 				       || pmer->dwEventFlags == MOUSE_HWHEELED)
     {
 	decode_mouse_wheel(pmer);
-	return TRUE;  // we now should have a mouse scroll in g_nMouseClick
+	ಹಿಂತಿರುಗಿ TRUE;  // we now should have a mouse scroll in g_nMouseClick
     }
 
     nButton = -1;
     g_xMouse = pmer->dwMousePosition.X;
     g_yMouse = pmer->dwMousePosition.Y;
 
-    if (pmer->dwEventFlags == MOUSE_MOVED)
+    ಆದರೆ (pmer->dwEventFlags == MOUSE_MOVED)
     {
 	// Ignore MOUSE_MOVED events if (x, y) hasn't changed.	(We get these
 	// events even when the mouse moves only within a char cell.)
-	if (s_xOldMouse == g_xMouse && s_yOldMouse == g_yMouse)
-	    return FALSE;
+	ಆದರೆ (s_xOldMouse == g_xMouse && s_yOldMouse == g_yMouse)
+	    ಹಿಂತಿರುಗಿ FALSE;
     }
 
     // If no buttons are pressed...
-    if ((pmer->dwButtonState & ((1 << cButtons) - 1)) == 0)
+    ಆದರೆ ((pmer->dwButtonState & ((1 << cButtons) - 1)) == 0)
     {
 	nButton = MOUSE_RELEASE;
 
 	// If the last thing returned was MOUSE_RELEASE, ignore this
-	if (s_fReleased)
+	ಆದರೆ (s_fReleased)
 	{
-# ifdef FEAT_BEVAL_TERM
+# ifdef FEAT_BEVAL_ಪದ
 	    // do return mouse move events when we want them
-	    if (p_bevalterm)
+	    ಆದರೆ (p_bevalterm)
 		nButton = MOUSE_DRAG;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 # endif
-		return FALSE;
+		ಹಿಂತಿರುಗಿ FALSE;
 	}
 
 	s_fReleased = TRUE;
     }
-    else    // one or more buttons pressed
+    ಇಲ್ಲದಿದ್ದರೆ    // one or more buttons pressed
     {
 	// on a 2-button mouse, hold down left and right buttons
 	// simultaneously to get MIDDLE.
 
-	if (cButtons == 2 && s_nOldButton != MOUSE_DRAG)
+	ಆದರೆ (cButtons == 2 && s_nOldButton != MOUSE_DRAG)
 	{
-	    DWORD dwLR = (pmer->dwButtonState & LEFT_RIGHT);
+	    DWORD dwLR = (pmer->dwButtonState & ಎಡ_ಬಲ);
 
 	    // if either left or right button only is pressed, see if the
 	    // next mouse event has both of them pressed
-	    if (dwLR == LEFT || dwLR == RIGHT)
+	    ಆದರೆ (dwLR == ಎಡ_3 || dwLR == ಬಲ_3)
 	    {
-		for (;;)
+		ಗಾಗಿ (;;)
 		{
 		    // wait a short time for next input event
-		    if (WaitForSingleObject(g_hConIn, p_mouset / 3)
+		    ಆದರೆ (WaitForSingleObject(g_h_Con_ಒಳ, p_mouset / 3)
 							     != WAIT_OBJECT_0)
-			break;
-		    else
+			ನಿಲ್ಲಿಸು;
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
-			DWORD cRecords = 0;
-			INPUT_RECORD ir;
-			MOUSE_EVENT_RECORD* pmer2 = &ir.Event.MouseEvent;
+			DWORD c_ದಾಖಲೆಗಳು = 0;
+			ಒಳಹರಿವು_ದಾಖಲೆ ir;
+			MOUSE_EVENT_ದಾಖಲೆ* pmer2 = &ir.Event.MouseEvent;
 
-			peek_console_input(g_hConIn, &ir, 1, &cRecords);
+			peek_console_ಒಳಹರಿವು(g_h_Con_ಒಳ, &ir, 1, &c_ದಾಖಲೆಗಳು);
 
-			if (cRecords == 0 || ir.EventType != MOUSE_EVENT
-				|| !(pmer2->dwButtonState & LEFT_RIGHT))
-			    break;
-			else
+			ಆದರೆ (c_ದಾಖಲೆಗಳು == 0 || ir.EventType != MOUSE_EVENT
+				|| !(pmer2->dwButtonState & ಎಡ_ಬಲ))
+			    ನಿಲ್ಲಿಸು;
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
-			    if (pmer2->dwEventFlags != MOUSE_MOVED)
+			    ಆದರೆ (pmer2->dwEventFlags != MOUSE_MOVED)
 			    {
-				read_console_input(g_hConIn, &ir, 1, &cRecords);
+				read_console_ಒಳಹರಿವು(g_h_Con_ಒಳ, &ir, 1, &c_ದಾಖಲೆಗಳು);
 
-				return decode_mouse_event(pmer2);
+				ಹಿಂತಿರುಗಿ decode_mouse_event(pmer2);
 			    }
-			    else if (s_xOldMouse == pmer2->dwMousePosition.X &&
+			    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (s_xOldMouse == pmer2->dwMousePosition.X &&
 				     s_yOldMouse == pmer2->dwMousePosition.Y)
 			    {
 				// throw away spurious mouse move
-				read_console_input(g_hConIn, &ir, 1, &cRecords);
+				read_console_ಒಳಹರಿವು(g_h_Con_ಒಳ, &ir, 1, &c_ದಾಖಲೆಗಳು);
 
 				// are there any more mouse events in queue?
-				peek_console_input(g_hConIn, &ir, 1, &cRecords);
+				peek_console_ಒಳಹರಿವು(g_h_Con_ಒಳ, &ir, 1, &c_ದಾಖಲೆಗಳು);
 
-				if (cRecords==0 || ir.EventType != MOUSE_EVENT)
-				    break;
+				ಆದರೆ (c_ದಾಖಲೆಗಳು==0 || ir.EventType != MOUSE_EVENT)
+				    ನಿಲ್ಲಿಸು;
 			    }
-			    else
-				break;
+			    ಇಲ್ಲದಿದ್ದರೆ
+				ನಿಲ್ಲಿಸು;
 			}
 		    }
 		}
 	    }
 	}
 
-	if (s_fNextIsMiddle)
+	ಆದರೆ (s_f_ಮುಂದಿನ_Is_ಮಧ್ಯ)
 	{
 	    nButton = (pmer->dwEventFlags == MOUSE_MOVED)
-		? MOUSE_DRAG : MOUSE_MIDDLE;
-	    s_fNextIsMiddle = FALSE;
+		? MOUSE_DRAG : MOUSE_ಮಧ್ಯ;
+	    s_f_ಮುಂದಿನ_Is_ಮಧ್ಯ = FALSE;
 	}
-	else if (cButtons == 2	&&
-	    ((pmer->dwButtonState & LEFT_RIGHT) == LEFT_RIGHT))
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (cButtons == 2	&&
+	    ((pmer->dwButtonState & ಎಡ_ಬಲ) == ಎಡ_ಬಲ))
 	{
-	    nButton = MOUSE_MIDDLE;
+	    nButton = MOUSE_ಮಧ್ಯ;
 
-	    if (! s_fReleased && pmer->dwEventFlags != MOUSE_MOVED)
+	    ಆದರೆ (! s_fReleased && pmer->dwEventFlags != MOUSE_MOVED)
 	    {
-		s_fNextIsMiddle = TRUE;
+		s_f_ಮುಂದಿನ_Is_ಮಧ್ಯ = TRUE;
 		nButton = MOUSE_RELEASE;
 	    }
 	}
-	else if ((pmer->dwButtonState & LEFT) == LEFT)
-	    nButton = MOUSE_LEFT;
-	else if ((pmer->dwButtonState & MIDDLE) == MIDDLE)
-	    nButton = MOUSE_MIDDLE;
-	else if ((pmer->dwButtonState & RIGHT) == RIGHT)
-	    nButton = MOUSE_RIGHT;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((pmer->dwButtonState & ಎಡ_3) == ಎಡ_3)
+	    nButton = MOUSE_ಎಡ;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((pmer->dwButtonState & ಮಧ್ಯ) == ಮಧ್ಯ)
+	    nButton = MOUSE_ಮಧ್ಯ;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((pmer->dwButtonState & ಬಲ_3) == ಬಲ_3)
+	    nButton = MOUSE_ಬಲ;
 
-	if (! s_fReleased && ! s_fNextIsMiddle
+	ಆದರೆ (! s_fReleased && ! s_f_ಮುಂದಿನ_Is_ಮಧ್ಯ
 		&& nButton != s_nOldButton && s_nOldButton != MOUSE_DRAG)
-	    return FALSE;
+	    ಹಿಂತಿರುಗಿ FALSE;
 
-	s_fReleased = s_fNextIsMiddle;
+	s_fReleased = s_f_ಮುಂದಿನ_Is_ಮಧ್ಯ;
     }
 
-    if (pmer->dwEventFlags == 0 || pmer->dwEventFlags == DOUBLE_CLICK)
+    ಆದರೆ (pmer->dwEventFlags == 0 || pmer->dwEventFlags == DOUBLE_CLICK)
     {
 	// button pressed or released, without mouse moving
-	if (nButton != -1 && nButton != MOUSE_RELEASE)
+	ಆದರೆ (nButton != -1 && nButton != MOUSE_RELEASE)
 	{
-	    DWORD dwCurrentTime = GetTickCount();
+	    DWORD dw_Current_ಸಮಯ = Get_Tick_ಎಣಿಕೆ();
 
-	    if (s_xOldMouse != g_xMouse
+	    ಆದರೆ (s_xOldMouse != g_xMouse
 		    || s_yOldMouse != g_yMouse
 		    || s_nOldButton != nButton
 		    || s_old_topline != curwin->w_topline
 # ifdef FEAT_DIFF
 		    || s_old_topfill != curwin->w_topfill
 # endif
-		    || (int)(dwCurrentTime - s_dwLastClickTime) > p_mouset)
+		    || (ಪೂರ್ಣಾಂಕ)(dw_Current_ಸಮಯ - s_dw_ಕೊನೆಯ_Click_ಸಮಯ) > p_mouset)
 	    {
 		s_cClicks = 1;
 	    }
-	    else if (++s_cClicks > 4)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (++s_cClicks > 4)
 	    {
 		s_cClicks = 1;
 	    }
 
-	    s_dwLastClickTime = dwCurrentTime;
+	    s_dw_ಕೊನೆಯ_Click_ಸಮಯ = dw_Current_ಸಮಯ;
 	}
     }
-    else if (pmer->dwEventFlags == MOUSE_MOVED)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (pmer->dwEventFlags == MOUSE_MOVED)
     {
-	if (nButton != -1 && nButton != MOUSE_RELEASE)
+	ಆದರೆ (nButton != -1 && nButton != MOUSE_RELEASE)
 	    nButton = MOUSE_DRAG;
 
 	s_cClicks = 1;
     }
 
-    if (nButton == -1)
-	return FALSE;
+    ಆದರೆ (nButton == -1)
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    if (nButton != MOUSE_RELEASE)
+    ಆದರೆ (nButton != MOUSE_RELEASE)
 	s_nOldButton = nButton;
 
     g_nMouseClick = nButton;
 
-    if (pmer->dwControlKeyState & SHIFT_PRESSED)
-	g_nMouseClick |= MOUSE_SHIFT;
-    if (pmer->dwControlKeyState & (RIGHT_CTRL_PRESSED | LEFT_CTRL_PRESSED))
+    ಆದರೆ (pmer->dw_Control_ಕೀಲಿ_State & ಸರಿಸು_PRESSED)
+	g_nMouseClick |= MOUSE_ಸರಿಸು;
+    ಆದರೆ (pmer->dw_Control_ಕೀಲಿ_State & (ಬಲ_CTRL_PRESSED | ಎಡ_CTRL_PRESSED))
 	g_nMouseClick |= MOUSE_CTRL;
-    if (pmer->dwControlKeyState & (RIGHT_ALT_PRESSED  | LEFT_ALT_PRESSED))
+    ಆದರೆ (pmer->dw_Control_ಕೀಲಿ_State & (ಬಲ_ALT_PRESSED  | ಎಡ_ALT_PRESSED))
 	g_nMouseClick |= MOUSE_ALT;
 
-    if (nButton != MOUSE_DRAG && nButton != MOUSE_RELEASE)
-	SET_NUM_MOUSE_CLICKS(g_nMouseClick, s_cClicks);
+    ಆದರೆ (nButton != MOUSE_DRAG && nButton != MOUSE_RELEASE)
+	ಗಣ_ಅಂಕೆ_MOUSE_CLICKS(g_nMouseClick, s_cClicks);
 
     // only pass on interesting (i.e., different) mouse events
-    if (s_xOldMouse == g_xMouse
+    ಆದರೆ (s_xOldMouse == g_xMouse
 	    && s_yOldMouse == g_yMouse
 	    && s_nOldMouseClick == g_nMouseClick)
     {
 	g_nMouseClick = -1;
-	return FALSE;
+	ಹಿಂತಿರುಗಿ FALSE;
     }
 
     s_xOldMouse = g_xMouse;
@@ -1756,174 +1756,174 @@ decode_mouse_event(
 # endif
     s_nOldMouseClick = g_nMouseClick;
 
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 # ifdef FEAT_EVAL
-    static int
-encode_mouse_event(dict_T *args, INPUT_RECORD *ir)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+encode_mouse_event(dict_T *ವಾದಗಳು, ಒಳಹರಿವು_ದಾಖಲೆ *ir)
 {
-    int		button;
-    int		row;
-    int		col;
-    int		repeated_click;
+    ಪೂರ್ಣಾಂಕ		button;
+    ಪೂರ್ಣಾಂಕ		ಅಡ್ಡಸಾಲು;
+    ಪೂರ್ಣಾಂಕ		ಲಂಬಸಾಲು;
+    ಪೂರ್ಣಾಂಕ		repeated_click;
     int_u	mods = 0;
-    int		move;
+    ಪೂರ್ಣಾಂಕ		move;
 
-    if (!dict_has_key(args, "row") || !dict_has_key(args, "col"))
-	return FALSE;
+    ಆದರೆ (!dict_has_ಕೀಲಿ(ವಾದಗಳು, "row") || !dict_has_ಕೀಲಿ(ವಾದಗಳು, "col"))
+	ಹಿಂತಿರುಗಿ FALSE;
 
     // Note: "move" is optional, requires fewer arguments
-    move = (int)dict_get_bool(args, "move", FALSE);
-    if (!move && (!dict_has_key(args, "button")
-	    || !dict_has_key(args, "multiclick")
-	    || !dict_has_key(args, "modifiers")))
-	return FALSE;
+    move = (ಪೂರ್ಣಾಂಕ)dict_get_bool(ವಾದಗಳು, "move", FALSE);
+    ಆದರೆ (!move && (!dict_has_ಕೀಲಿ(ವಾದಗಳು, "button")
+	    || !dict_has_ಕೀಲಿ(ವಾದಗಳು, "multiclick")
+	    || !dict_has_ಕೀಲಿ(ವಾದಗಳು, "modifiers")))
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    row = (int)dict_get_number(args, "row") - 1;
-    col = (int)dict_get_number(args, "col") - 1;
+    ಅಡ್ಡಸಾಲು = (ಪೂರ್ಣಾಂಕ)dict_get_ಸಂಖ್ಯೆ(ವಾದಗಳು, "row") - 1;
+    ಲಂಬಸಾಲು = (ಪೂರ್ಣಾಂಕ)dict_get_ಸಂಖ್ಯೆ(ವಾದಗಳು, "col") - 1;
 
     ir->EventType = MOUSE_EVENT;
-    MOUSE_EVENT_RECORD mer;
-    ZeroMemory(&mer, sizeof(mer));
-    mer.dwMousePosition.X  = col;
-    mer.dwMousePosition.Y  = row;
+    MOUSE_EVENT_ದಾಖಲೆ mer;
+    Zero_ಸ್ಮರಣೆ(&mer, ಗಾತ್ರ(mer));
+    mer.dwMousePosition.X  = ಲಂಬಸಾಲು;
+    mer.dwMousePosition.Y  = ಅಡ್ಡಸಾಲು;
 
-    if (move)
+    ಆದರೆ (move)
     {
 	mer.dwButtonState = 0;
 	mer.dwEventFlags = MOUSE_MOVED;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	button = (int)dict_get_number(args, "button");
-	repeated_click = (int)dict_get_number(args, "multiclick");
-	mods = (int)dict_get_number(args, "modifiers");
+	button = (ಪೂರ್ಣಾಂಕ)dict_get_ಸಂಖ್ಯೆ(ವಾದಗಳು, "button");
+	repeated_click = (ಪೂರ್ಣಾಂಕ)dict_get_ಸಂಖ್ಯೆ(ವಾದಗಳು, "multiclick");
+	mods = (ಪೂರ್ಣಾಂಕ)dict_get_ಸಂಖ್ಯೆ(ವಾದಗಳು, "modifiers");
 	// Reset the scroll values to known values.
 	// XXX: Remove this when/if the scroll step is made configurable.
-	mouse_set_hor_scroll_step(6);
-	mouse_set_vert_scroll_step(3);
+	mouse_ಗಣ_hor_scroll_ಹೆಜ್ಜೆ(6);
+	mouse_ಗಣ_vert_scroll_ಹೆಜ್ಜೆ(3);
 
-	switch (button)
+	ಆಯ್ಕೆ (button)
 	{
-	    case MOUSE_LEFT:
-		mer.dwButtonState = FROM_LEFT_1ST_BUTTON_PRESSED;
+	    ಸ್ಥಿತಿ MOUSE_ಎಡ:
+		mer.dwButtonState = FROM_ಎಡ_1_ST_BUTTON_PRESSED;
 		mer.dwEventFlags = repeated_click == 1 ? DOUBLE_CLICK : 0;
-		break;
-	    case MOUSE_MIDDLE:
-		mer.dwButtonState = FROM_LEFT_2ND_BUTTON_PRESSED;
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ MOUSE_ಮಧ್ಯ:
+		mer.dwButtonState = FROM_ಎಡ_2_ND_BUTTON_PRESSED;
 		mer.dwEventFlags = repeated_click == 1 ? DOUBLE_CLICK : 0;
-		break;
-	    case MOUSE_RIGHT:
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ MOUSE_ಬಲ:
 		mer.dwButtonState = RIGHTMOST_BUTTON_PRESSED;
 		mer.dwEventFlags = repeated_click == 1 ? DOUBLE_CLICK : 0;
-		break;
-	    case MOUSE_RELEASE:
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ MOUSE_RELEASE:
 		// umm?  Assume Left Release?
 		mer.dwEventFlags = 0;
 
-	    case MOUSE_MOVE:
+	    ಸ್ಥಿತಿ MOUSE_MOVE:
 		mer.dwButtonState = 0;
 		mer.dwEventFlags = MOUSE_MOVED;
-		break;
-	    case MOUSE_X1:
-		mer.dwButtonState = FROM_LEFT_3RD_BUTTON_PRESSED;
-		break;
-	    case MOUSE_X2:
-		mer.dwButtonState = FROM_LEFT_4TH_BUTTON_PRESSED;
-		break;
-	    case MOUSE_4:  // KE_MOUSEDOWN;
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ MOUSE_X1:
+		mer.dwButtonState = FROM_ಎಡ_3_RD_BUTTON_PRESSED;
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ MOUSE_X2:
+		mer.dwButtonState = FROM_ಎಡ_4_TH_BUTTON_PRESSED;
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ MOUSE_4:  // KE_MOUSEDOWN;
 		mer.dwButtonState = -1;
 		mer.dwEventFlags = MOUSE_WHEELED;
-		break;
-	    case MOUSE_5:  // KE_MOUSEUP;
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ MOUSE_5:  // KE_MOUSEUP;
 		mer.dwButtonState = +1;
 		mer.dwEventFlags = MOUSE_WHEELED;
-		break;
-	    case MOUSE_6:  // KE_MOUSELEFT;
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ MOUSE_6:  // KE_MOUSELEFT;
 		mer.dwButtonState = -1;
 		mer.dwEventFlags = MOUSE_HWHEELED;
-		break;
-	    case MOUSE_7:  // KE_MOUSERIGHT;
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ MOUSE_7:  // KE_MOUSERIGHT;
 		mer.dwButtonState = +1;
 		mer.dwEventFlags = MOUSE_HWHEELED;
-		break;
-	    default:
-		semsg(_(e_invalid_argument_str), "button");
-		return FALSE;
+		ನಿಲ್ಲಿಸು;
+	    ಪೂರ್ವನಿಯೋಜಿತ:
+		semsg(_(e_invalid_ವಾದ_str), "button");
+		ಹಿಂತಿರುಗಿ FALSE;
 	}
     }
 
-    mer.dwControlKeyState = 0;
-    if (mods != 0)
+    mer.dw_Control_ಕೀಲಿ_State = 0;
+    ಆದರೆ (mods != 0)
     {
 	// Encode the win32 console key modifiers from Vim MOUSE modifiers.
-	if (mods & MOUSE_SHIFT)
-	    mer.dwControlKeyState |= SHIFT_PRESSED;
-	if (mods & MOUSE_CTRL)
-	    mer.dwControlKeyState |= LEFT_CTRL_PRESSED;
-	if (mods & MOUSE_ALT)
-	    mer.dwControlKeyState |= LEFT_ALT_PRESSED;
+	ಆದರೆ (mods & MOUSE_ಸರಿಸು)
+	    mer.dw_Control_ಕೀಲಿ_State |= ಸರಿಸು_PRESSED;
+	ಆದರೆ (mods & MOUSE_CTRL)
+	    mer.dw_Control_ಕೀಲಿ_State |= ಎಡ_CTRL_PRESSED;
+	ಆದರೆ (mods & MOUSE_ALT)
+	    mer.dw_Control_ಕೀಲಿ_State |= ಎಡ_ALT_PRESSED;
     }
     ir->Event.MouseEvent = mer;
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 # endif  // FEAT_EVAL
 
-    static int
-write_input_record_buffer(INPUT_RECORD* irEvents, int nLength)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+write_ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್(ಒಳಹರಿವು_ದಾಖಲೆ* irEvents, ಪೂರ್ಣಾಂಕ n_ಉದ್ದಳತೆ)
 {
-    int				nCount = 0;
-    input_record_buffer_node_T	*event_node;
+    ಪೂರ್ಣಾಂಕ				n_ಎಣಿಕೆ = 0;
+    ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್_ಗಂಟು_T	*event_ಗಂಟು;
 
-    while (nCount < nLength)
+    ಆಗ (n_ಎಣಿಕೆ < n_ಉದ್ದಳತೆ)
     {
-	event_node = alloc(sizeof(input_record_buffer_node_T));
-	if (event_node == NULL)
-	    return -1;
+	event_ಗಂಟು = alloc(ಗಾತ್ರ(ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್_ಗಂಟು_T));
+	ಆದರೆ (event_ಗಂಟು == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ -1;
 
-	event_node->ir = irEvents[nCount++];
-	event_node->next = NULL;
+	event_ಗಂಟು->ir = irEvents[n_ಎಣಿಕೆ++];
+	event_ಗಂಟು->ಮುಂದಿನ = ಖಾಲಿ;
 
-	input_record_buffer.length++;
-	if (input_record_buffer.tail == NULL)
+	ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್.ಉದ್ದಳತೆ++;
+	ಆದರೆ (ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್.ಬಾಲ == ಖಾಲಿ)
 	{
-	    input_record_buffer.head = event_node;
-	    input_record_buffer.tail = event_node;
+	    ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್.ತಲೆ = event_ಗಂಟು;
+	    ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್.ಬಾಲ = event_ಗಂಟು;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    input_record_buffer.tail->next = event_node;
-	    input_record_buffer.tail = input_record_buffer.tail->next;
+	    ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್.ಬಾಲ->ಮುಂದಿನ = event_ಗಂಟು;
+	    ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್.ಬಾಲ = ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್.ಬಾಲ->ಮುಂದಿನ;
 	}
     }
-    return nCount;
+    ಹಿಂತಿರುಗಿ n_ಎಣಿಕೆ;
 }
 
-    static int
-read_input_record_buffer(INPUT_RECORD* irEvents, int nMaxLength)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+read_ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್(ಒಳಹರಿವು_ದಾಖಲೆ* irEvents, ಪೂರ್ಣಾಂಕ n_Max_ಉದ್ದಳತೆ)
 {
-    int nCount = 0;
-    while (nCount < nMaxLength && input_record_buffer.head != NULL)
+    ಪೂರ್ಣಾಂಕ n_ಎಣಿಕೆ = 0;
+    ಆಗ (n_ಎಣಿಕೆ < n_Max_ಉದ್ದಳತೆ && ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್.ತಲೆ != ಖಾಲಿ)
     {
-	input_record_buffer.length--;
-	input_record_buffer_node_T *pop_head = input_record_buffer.head;
-	irEvents[nCount++] = pop_head->ir;
-	input_record_buffer.head = pop_head->next;
-	vim_free(pop_head);
-	if (input_record_buffer.length == 0)
-	    input_record_buffer.tail = NULL;
+	ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್.ಉದ್ದಳತೆ--;
+	ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್_ಗಂಟು_T *ತೆಗೆ_ತಲೆ = ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್.ತಲೆ;
+	irEvents[n_ಎಣಿಕೆ++] = ತೆಗೆ_ತಲೆ->ir;
+	ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್.ತಲೆ = ತೆಗೆ_ತಲೆ->ಮುಂದಿನ;
+	vim_free(ತೆಗೆ_ತಲೆ);
+	ಆದರೆ (ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್.ಉದ್ದಳತೆ == 0)
+	    ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್.ಬಾಲ = ಖಾಲಿ;
     }
-    return nCount;
+    ಹಿಂತಿರುಗಿ n_ಎಣಿಕೆ;
 }
-#else  // FEAT_GUI_MSWIN && !VIMDLL
-    void
-mch_setmouse(int on UNUSED)
+#ಇಲ್ಲದಿದ್ದರೆ  // FEAT_GUI_MSWIN && !VIMDLL
+    ಶೂನ್ಯ
+mch_setmouse(ಪೂರ್ಣಾಂಕ on ಬಳಸದ)
 {
 }
-#endif // FEAT_GUI_MSWIN && !VIMDLL
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_GUI_MSWIN && !VIMDLL
 
-#ifdef FEAT_EVAL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
 /*
  * The 'test_mswin_event' function is for testing Vim's low-level handling of
  * user input events.  ie, this manages the encoding of INPUT_RECORD events
@@ -1941,115 +1941,115 @@ mch_setmouse(int on UNUSED)
  * Note: INPUT_RECORDs are only used by the Windows console, not the GUI.  The
  * GUI sends MSG structs instead.
  */
-    int
-test_mswin_event(char_u *event, dict_T *args)
+    ಪೂರ್ಣಾಂಕ
+test_mswin_event(char_u *event, dict_T *ವಾದಗಳು)
 {
-    int lpEventsWritten = 0;
+    ಪೂರ್ಣಾಂಕ lpEventsWritten = 0;
 
-# if defined(VIMDLL) || defined(FEAT_GUI_MSWIN)
-    if (gui.in_use)
-	return test_gui_w32_sendevent(event, args);
+# ಆದರೆ defined(VIMDLL) || defined(FEAT_GUI_MSWIN)
+    ಆದರೆ (gui.ಒಳ_use)
+	ಹಿಂತಿರುಗಿ test_gui_w32_sendevent(event, ವಾದಗಳು);
 # endif
 
-# if defined(VIMDLL) || !defined(FEAT_GUI_MSWIN)
+# ಆದರೆ defined(VIMDLL) || !defined(FEAT_GUI_MSWIN)
 
 // Currently implemented event record types are; KEY_EVENT and MOUSE_EVENT
 // Potentially could also implement: FOCUS_EVENT and WINDOW_BUFFER_SIZE_EVENT
 // Maybe also:  MENU_EVENT
 
-    INPUT_RECORD ir;
-    BOOL input_encoded = FALSE;
+    ಒಳಹರಿವು_ದಾಖಲೆ ir;
+    BOOL ಒಳಹರಿವು_encoded = FALSE;
     BOOL execute = FALSE;
-    if (STRCMP(event, "key") == 0)
+    ಆದರೆ (STRCMP(event, "key") == 0)
     {
-	execute = dict_get_bool(args, "execute", FALSE);
-	if (dict_has_key(args, "event"))
-	    input_encoded = encode_key_event(args, &ir);
-	else if (!execute)
+	execute = dict_get_bool(ವಾದಗಳು, "execute", FALSE);
+	ಆದರೆ (dict_has_ಕೀಲಿ(ವಾದಗಳು, "event"))
+	    ಒಳಹರಿವು_encoded = encode_ಕೀಲಿ_event(ವಾದಗಳು, &ir);
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!execute)
 	{
-	    semsg(_(e_missing_argument_str), "event");
-	    return FALSE;
+	    semsg(_(e_missing_ವಾದ_str), "event");
+	    ಹಿಂತಿರುಗಿ FALSE;
 	}
     }
-    else if (STRCMP(event, "mouse") == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRCMP(event, "mouse") == 0)
     {
 	execute = TRUE;
-	input_encoded = encode_mouse_event(args, &ir);
+	ಒಳಹರಿವು_encoded = encode_mouse_event(ವಾದಗಳು, &ir);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	semsg(_(e_invalid_value_for_argument_str_str), "event", event);
-	return FALSE;
+	semsg(_(e_invalid_ಮೌಲ್ಯ_for_ವಾದ_str_str), "event", event);
+	ಹಿಂತಿರುಗಿ FALSE;
     }
 
     // Ideally, WriteConsoleInput would be used to inject these low-level
     // events.  But, this doesn't work well in the CI test environment.  So
     // implementing an input_record_buffer instead.
-    if (input_encoded)
+    ಆದರೆ (ಒಳಹರಿವು_encoded)
     {
-	if ((lpEventsWritten = write_input_record_buffer(&ir, 1)) < 0)
+	ಆದರೆ ((lpEventsWritten = write_ಒಳಹರಿವು_ದಾಖಲೆ_ಬಫರ್(&ir, 1)) < 0)
 	{
-	    semsg(_(e_out_of_memory), "event");
-	    return FALSE;
+	    semsg(_(e_ಹೊರಹೋಗು_ದ_ಸ್ಮರಣೆ), "event");
+	    ಹಿಂತಿರುಗಿ FALSE;
 	}
     }
 
     // Set flags to execute the event, ie. like feedkeys mode X.
-    if (execute)
+    ಆದರೆ (execute)
     {
-	int save_msg_scroll = msg_scroll;
+	ಪೂರ್ಣಾಂಕ save_ಸಂದೇಶ_scroll = ಸಂದೇಶ_scroll;
 	// Avoid a 1 second delay when the keys start Insert mode.
-	msg_scroll = FALSE;
-	ch_log(NULL, "test_mswin_event() executing");
-	exec_normal(TRUE, TRUE, TRUE);
-	msg_scroll |= save_msg_scroll;
+	ಸಂದೇಶ_scroll = FALSE;
+	ch_log(ಖಾಲಿ, "test_mswin_event() executing");
+	exec_ಸಾಮಾನ್ಯ(TRUE, TRUE, TRUE);
+	ಸಂದೇಶ_scroll |= save_ಸಂದೇಶ_scroll;
     }
 
 # endif
-    return lpEventsWritten;
+    ಹಿಂತಿರುಗಿ lpEventsWritten;
 }
-#endif // FEAT_EVAL
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_EVAL
 
-#if defined(MCH_CURSOR_SHAPE)
+#ಆದರೆ defined(MCH_CURSOR_SHAPE)
 /*
  * Set the shape of the cursor.
  * 'thickness' can be from 1 (thin) to 99 (block)
  */
-    static void
-mch_set_cursor_shape(int thickness)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+mch_ಗಣ_cursor_shape(ಪೂರ್ಣಾಂಕ thickness)
 {
-    if (vtp_working)
+    ಆದರೆ (vtp_working)
     {
-	if (*T_CSI == NUL)
+	ಆದರೆ (*T_CSI == NUL)
 	{
 	    // If 't_SI' is not set, use the default cursor styles.
-	    if (thickness < 50)
+	    ಆದರೆ (thickness < 50)
 		vtp_printf("\033[3 q");	// underline
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		vtp_printf("\033[0 q");	// default
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	CONSOLE_CURSOR_INFO ConsoleCursorInfo;
-	ConsoleCursorInfo.dwSize = thickness;
+	ConsoleCursorInfo.dw_ಗಾತ್ರ = thickness;
 	ConsoleCursorInfo.bVisible = s_cursor_visible;
 
-	SetConsoleCursorInfo(g_hConOut, &ConsoleCursorInfo);
-	if (s_cursor_visible)
-	    SetConsoleCursorPosition(g_hConOut, g_coord);
+	ಗಣ_Console_Cursor_Info(g_h_Con_ಹೊರಹೋಗು, &ConsoleCursorInfo);
+	ಆದರೆ (s_cursor_visible)
+	    ಗಣ_Console_Cursor_Position(g_h_Con_ಹೊರಹೋಗು, g_coord);
     }
 }
 
-    void
-mch_update_cursor(void)
+    ಶೂನ್ಯ
+mch_update_cursor(ಶೂನ್ಯ)
 {
-    int		idx;
-    int		thickness;
+    ಪೂರ್ಣಾಂಕ		idx;
+    ಪೂರ್ಣಾಂಕ		thickness;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return;
+    ಆದರೆ (gui.ಒಳ_use)
+	ಹಿಂತಿರುಗಿ;
 # endif
 
     /*
@@ -2057,26 +2057,26 @@ mch_update_cursor(void)
      */
     idx = get_shape_idx(FALSE);
 
-    if (shape_table[idx].shape == SHAPE_BLOCK)
+    ಆದರೆ (shape_ಕೋಷ್ಟಕ[idx].shape == SHAPE_ಖಂಡ)
 	thickness = 99;	// 100 doesn't work on W95
-    else
-	thickness = shape_table[idx].percentage;
-    mch_set_cursor_shape(thickness);
+    ಇಲ್ಲದಿದ್ದರೆ
+	thickness = shape_ಕೋಷ್ಟಕ[idx].percentage;
+    mch_ಗಣ_cursor_shape(thickness);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ಆದರೆ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 /*
  * Handle FOCUS_EVENT.
  */
-    static void
-handle_focus_event(INPUT_RECORD ir)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+handle_focus_event(ಒಳಹರಿವು_ದಾಖಲೆ ir)
 {
-    g_fJustGotFocus = ir.Event.FocusEvent.bSetFocus;
-    ui_focus_change((int)g_fJustGotFocus);
+    g_fJustGotFocus = ir.Event.FocusEvent.b_ಗಣ_Focus;
+    ui_focus_change((ಪೂರ್ಣಾಂಕ)g_fJustGotFocus);
 }
 
-static void ResizeConBuf(HANDLE hConsole, COORD coordScreen);
+ಸ್ಥಿರ ಶೂನ್ಯ ResizeConBuf(HANDLE hConsole, COORD coordScreen);
 
 /*
  * Wait until console input from keyboard or mouse is available,
@@ -2084,116 +2084,116 @@ static void ResizeConBuf(HANDLE hConsole, COORD coordScreen);
  * When "ignore_input" is TRUE even wait when input is available.
  * Return TRUE if something is available FALSE if not.
  */
-    static int
-WaitForChar(long msec, int ignore_input)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+WaitForChar(ದೀರ್ಘ msec, ಪೂರ್ಣಾಂಕ ignore_ಒಳಹರಿವು)
 {
-    DWORD	    dwNow = 0, dwEndTime = 0;
-    INPUT_RECORD    ir;
-    DWORD	    cRecords;
+    DWORD	    dwNow = 0, dw_ಕೊನೆ_ಸಮಯ = 0;
+    ಒಳಹರಿವು_ದಾಖಲೆ    ir;
+    DWORD	    c_ದಾಖಲೆಗಳು;
     WCHAR	    ch, ch2;
 # ifdef FEAT_TIMERS
-    int		    tb_change_cnt = typebuf.tb_change_cnt;
+    ಪೂರ್ಣಾಂಕ		    tb_change_cnt = typebuf.tb_change_cnt;
 # endif
 
-    if (msec > 0)
+    ಆದರೆ (msec > 0)
 	// Wait until the specified time has elapsed.
-	dwEndTime = GetTickCount() + msec;
-    else if (msec < 0)
+	dw_ಕೊನೆ_ಸಮಯ = Get_Tick_ಎಣಿಕೆ() + msec;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (msec < 0)
 	// Wait forever.
-	dwEndTime = INFINITE;
+	dw_ಕೊನೆ_ಸಮಯ = INFINITE;
 
     // We need to loop until the end of the time period, because
     // we might get multiple unusable mouse events in that time.
-    for (;;)
+    ಗಾಗಿ (;;)
     {
 	// Only process messages when waiting.
-	if (msec != 0)
+	ಆದರೆ (msec != 0)
 	{
-# ifdef MESSAGE_QUEUE
+# ifdef ಸಂದೇಶ_ಸರತಿ
 	    parse_queued_messages();
 # endif
 # ifdef FEAT_MZSCHEME
-	    mzvim_check_threads();
+	    mzvim_check_ಎಳೆಗಳು();
 # endif
 # ifdef FEAT_CLIENTSERVER
 	    serverProcessPendingMessages();
 # endif
 	}
 
-	if (g_nMouseClick != -1
+	ಆದರೆ (g_nMouseClick != -1
 # ifdef FEAT_CLIENTSERVER
-		|| (!ignore_input && input_available())
+		|| (!ignore_ಒಳಹರಿವು && ಒಳಹರಿವು_ಲಭ್ಯ())
 # endif
 	   )
-	    return TRUE;
+	    ಹಿಂತಿರುಗಿ TRUE;
 
-	if (msec > 0)
+	ಆದರೆ (msec > 0)
 	{
 	    // If the specified wait time has passed, return.  Beware that
 	    // GetTickCount() may wrap around (overflow).
-	    dwNow = GetTickCount();
-	    if ((int)(dwNow - dwEndTime) >= 0)
-		break;
+	    dwNow = Get_Tick_ಎಣಿಕೆ();
+	    ಆದರೆ ((ಪೂರ್ಣಾಂಕ)(dwNow - dw_ಕೊನೆ_ಸಮಯ) >= 0)
+		ನಿಲ್ಲಿಸು;
 	}
-	if (msec != 0)
+	ಆದರೆ (msec != 0)
 	{
-	    DWORD dwWaitTime = dwEndTime - dwNow;
+	    DWORD dw_Wait_ಸಮಯ = dw_ಕೊನೆ_ಸಮಯ - dwNow;
 
 	    // Don't wait for more than 11 msec to avoid dropping characters,
 	    // check channel while waiting for input and handle a callback from
 	    // 'balloonexpr'.
-	    if (dwWaitTime > 11)
-		dwWaitTime = 11;
+	    ಆದರೆ (dw_Wait_ಸಮಯ > 11)
+		dw_Wait_ಸಮಯ = 11;
 
 # ifdef FEAT_MZSCHEME
-	    if (mzthreads_allowed() && p_mzq > 0 && (long)dwWaitTime > p_mzq)
-		dwWaitTime = p_mzq; // don't wait longer than 'mzquantum'
+	    ಆದರೆ (mzthreads_allowed() && p_mzq > 0 && (ದೀರ್ಘ)dw_Wait_ಸಮಯ > p_mzq)
+		dw_Wait_ಸಮಯ = p_mzq; // don't wait longer than 'mzquantum'
 # endif
 # ifdef FEAT_TIMERS
 	    // When waiting very briefly don't trigger timers.
-	    if (dwWaitTime > 10)
+	    ಆದರೆ (dw_Wait_ಸಮಯ > 10)
 	    {
-		long	due_time;
+		ದೀರ್ಘ	due_ಸಮಯ;
 
 		// Trigger timers and then get the time in msec until the next
 		// one is due.  Wait up to that time.
-		due_time = check_due_timer();
-		if (typebuf.tb_change_cnt != tb_change_cnt)
+		due_ಸಮಯ = check_due_timer();
+		ಆದರೆ (typebuf.tb_change_cnt != tb_change_cnt)
 		{
 		    // timer may have used feedkeys().
-		    return FALSE;
+		    ಹಿಂತಿರುಗಿ FALSE;
 		}
-		if (due_time > 0 && dwWaitTime > (DWORD)due_time)
-		    dwWaitTime = due_time;
+		ಆದರೆ (due_ಸಮಯ > 0 && dw_Wait_ಸಮಯ > (DWORD)due_ಸಮಯ)
+		    dw_Wait_ಸಮಯ = due_ಸಮಯ;
 	    }
 # endif
-	    if (
+	    ಆದರೆ (
 # ifdef FEAT_CLIENTSERVER
 		    // Wait for either an event on the console input or a
 		    // message in the client-server window.
-		    msg_wait_for_multiple_objects(1, &g_hConIn, FALSE,
-				  dwWaitTime, QS_SENDMESSAGE) != WAIT_OBJECT_0
-# else
-		    wait_for_single_object(g_hConIn, dwWaitTime)
+		    ಸಂದೇಶ_wait_for_ಅಪವರ್ತ್ಯ_objects(1, &g_h_Con_ಒಳ, FALSE,
+				  dw_Wait_ಸಮಯ, QS_SENDMESSAGE) != WAIT_OBJECT_0
+# ಇಲ್ಲದಿದ್ದರೆ
+		    wait_for_single_object(g_h_Con_ಒಳ, dw_Wait_ಸಮಯ)
 							      != WAIT_OBJECT_0
 # endif
 		    )
-		continue;
+		ಮುಂದುವರಿ;
 	}
 
-	cRecords = 0;
-	peek_console_input(g_hConIn, &ir, 1, &cRecords);
+	c_ದಾಖಲೆಗಳು = 0;
+	peek_console_ಒಳಹರಿವು(g_h_Con_ಒಳ, &ir, 1, &c_ದಾಖಲೆಗಳು);
 
 # ifdef FEAT_MBYTE_IME
 	// May have to redraw if the cursor ends up in the wrong place.
 	// Only when not peeking.
-	if (State == MODE_CMDLINE && msg_row == Rows - 1 && msec != 0)
+	ಆದರೆ (State == ಬಹುಲಕ_CMDLINE && ಸಂದೇಶ_ಅಡ್ಡಸಾಲು == ಅಡ್ಡಸಾಲುಗಳು - 1 && msec != 0)
 	{
-	    CONSOLE_SCREEN_BUFFER_INFO csbi;
+	    CONSOLE_SCREEN_ಬಫರ್_INFO csbi;
 
-	    if (GetConsoleScreenBufferInfo(g_hConOut, &csbi))
+	    ಆದರೆ (Get_Console_Screen_ಬಫರ್_Info(g_h_Con_ಹೊರಹೋಗು, &csbi))
 	    {
-		if (csbi.dwCursorPosition.Y != msg_row)
+		ಆದರೆ (csbi.dwCursorPosition.Y != ಸಂದೇಶ_ಅಡ್ಡಸಾಲು)
 		{
 		    // The screen is now messed up, must redraw the command
 		    // line and later all the windows.
@@ -2205,152 +2205,152 @@ WaitForChar(long msec, int ignore_input)
 	}
 # endif
 
-	if (cRecords > 0)
+	ಆದರೆ (c_ದಾಖಲೆಗಳು > 0)
 	{
-	    if (ir.EventType == KEY_EVENT && ir.Event.KeyEvent.bKeyDown)
+	    ಆದರೆ (ir.EventType == ಕೀಲಿ_EVENT && ir.Event.ಕೀಲಿ_Event_2.b_ಕೀಲಿ_ಕೆಳಕ್ಕೆ)
 	    {
 # ifdef FEAT_MBYTE_IME
 		// Windows IME sends two '\n's with only one 'ENTER'.  First:
 		// wVirtualKeyCode == 13. second: wVirtualKeyCode == 0
-		if (ir.Event.KeyEvent.uChar.UnicodeChar == 0
-			&& ir.Event.KeyEvent.wVirtualKeyCode == 13)
+		ಆದರೆ (ir.Event.ಕೀಲಿ_Event_2.uChar.UnicodeChar == 0
+			&& ir.Event.ಕೀಲಿ_Event_2.w_Virtual_ಕೀಲಿ_ಸಂಕೇತ == 13)
 		{
-		    read_console_input(g_hConIn, &ir, 1, &cRecords);
-		    continue;
+		    read_console_ಒಳಹರಿವು(g_h_Con_ಒಳ, &ir, 1, &c_ದಾಖಲೆಗಳು);
+		    ಮುಂದುವರಿ;
 		}
 # endif
-		if (decode_key_event(&ir.Event.KeyEvent, &ch, &ch2,
-								 NULL, FALSE))
-		    return TRUE;
+		ಆದರೆ (decode_ಕೀಲಿ_event(&ir.Event.ಕೀಲಿ_Event_2, &ch, &ch2,
+								 ಖಾಲಿ, FALSE))
+		    ಹಿಂತಿರುಗಿ TRUE;
 	    }
 
-	    read_console_input(g_hConIn, &ir, 1, &cRecords);
+	    read_console_ಒಳಹರಿವು(g_h_Con_ಒಳ, &ir, 1, &c_ದಾಖಲೆಗಳು);
 
-	    if (ir.EventType == FOCUS_EVENT)
+	    ಆದರೆ (ir.EventType == FOCUS_EVENT)
 		handle_focus_event(ir);
-	    else if (ir.EventType == WINDOW_BUFFER_SIZE_EVENT)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ir.EventType == ಕಿಟಕಿ_ಬಫರ್_ಗಾತ್ರ_EVENT)
 	    {
-		COORD dwSize = ir.Event.WindowBufferSizeEvent.dwSize;
+		COORD dw_ಗಾತ್ರ = ir.Event.ಕಿಟಕಿ_ಬಫರ್_ಗಾತ್ರ_Event.dw_ಗಾತ್ರ;
 
 		// Only call shell_resized() when the size actually changed to
 		// avoid the screen is cleared.
-		if (dwSize.X != Columns || dwSize.Y != Rows)
+		ಆದರೆ (dw_ಗಾತ್ರ.X != Columns || dw_ಗಾತ್ರ.Y != ಅಡ್ಡಸಾಲುಗಳು)
 		{
-		    CONSOLE_SCREEN_BUFFER_INFO csbi;
-		    GetConsoleScreenBufferInfo(g_hConOut, &csbi);
-		    dwSize.X = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-		    dwSize.Y = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
-		    if (dwSize.X != Columns || dwSize.Y != Rows)
+		    CONSOLE_SCREEN_ಬಫರ್_INFO csbi;
+		    Get_Console_Screen_ಬಫರ್_Info(g_h_Con_ಹೊರಹೋಗು, &csbi);
+		    dw_ಗಾತ್ರ.X = csbi.sr_ಕಿಟಕಿ.ಬಲ_4 - csbi.sr_ಕಿಟಕಿ.ಎಡ_4 + 1;
+		    dw_ಗಾತ್ರ.Y = csbi.sr_ಕಿಟಕಿ.Bottom - csbi.sr_ಕಿಟಕಿ.ತುದಿ_2 + 1;
+		    ಆದರೆ (dw_ಗಾತ್ರ.X != Columns || dw_ಗಾತ್ರ.Y != ಅಡ್ಡಸಾಲುಗಳು)
 		    {
-			ResizeConBuf(g_hConOut, dwSize);
+			ResizeConBuf(g_h_Con_ಹೊರಹೋಗು, dw_ಗಾತ್ರ);
 			shell_resized();
 		    }
 		}
 	    }
-	    else if (ir.EventType == MOUSE_EVENT
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ir.EventType == MOUSE_EVENT
 		    && decode_mouse_event(&ir.Event.MouseEvent))
-		return TRUE;
+		ಹಿಂತಿರುಗಿ TRUE;
 	}
-	else if (msec == 0)
-	    break;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (msec == 0)
+	    ನಿಲ್ಲಿಸು;
     }
 
 # ifdef FEAT_CLIENTSERVER
     // Something might have been received while we were waiting.
-    if (input_available())
-	return TRUE;
+    ಆದರೆ (ಒಳಹರಿವು_ಲಭ್ಯ())
+	ಹಿಂತಿರುಗಿ TRUE;
 # endif
 
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 /*
  * return non-zero if a character is available
  */
-    int
-mch_char_avail(void)
+    ಪೂರ್ಣಾಂಕ
+mch_char_avail(ಶೂನ್ಯ)
 {
 # ifdef VIMDLL
-    if (gui.in_use)
-	return TRUE;
+    ಆದರೆ (gui.ಒಳ_use)
+	ಹಿಂತಿರುಗಿ TRUE;
 # endif
-    return WaitForChar(0L, FALSE);
+    ಹಿಂತಿರುಗಿ WaitForChar(0L, FALSE);
 }
 
-# if defined(FEAT_TERMINAL)
+# ಆದರೆ defined(FEAT_TERMINAL)
 /*
  * Check for any pending input or messages.
  */
-    int
-mch_check_messages(void)
+    ಪೂರ್ಣಾಂಕ
+mch_check_messages(ಶೂನ್ಯ)
 {
 #  ifdef VIMDLL
-    if (gui.in_use)
-	return TRUE;
+    ಆದರೆ (gui.ಒಳ_use)
+	ಹಿಂತಿರುಗಿ TRUE;
 #  endif
-    return WaitForChar(0L, TRUE);
+    ಹಿಂತಿರುಗಿ WaitForChar(0L, TRUE);
 }
 # endif
 
 /*
  * Create the console input.  Used when reading stdin doesn't work.
  */
-    static void
-create_conin(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+create_conin(ಶೂನ್ಯ)
 {
-    g_hConIn =	CreateFile("CONIN$", GENERIC_READ|GENERIC_WRITE,
+    g_h_Con_ಒಳ =	CreateFile("CONIN$", GENERIC_READ|GENERIC_WRITE,
 			FILE_SHARE_READ|FILE_SHARE_WRITE,
-			(LPSECURITY_ATTRIBUTES) NULL,
-			OPEN_EXISTING, 0, (HANDLE)NULL);
+			(LPSECURITY_ಗುಣಲಕ್ಷಣಗಳು) ಖಾಲಿ,
+			OPEN_EXISTING, 0, (HANDLE)ಖಾಲಿ);
     did_create_conin = TRUE;
 }
 
 /*
  * Get a keystroke or a mouse event, use a blocking wait.
  */
-    static WCHAR
-tgetch(int *pmodifiers, WCHAR *pch2)
+    ಸ್ಥಿರ WCHAR
+tgetch(ಪೂರ್ಣಾಂಕ *pmodifiers, WCHAR *pch2)
 {
     WCHAR ch;
 
-    for (;;)
+    ಗಾಗಿ (;;)
     {
-	INPUT_RECORD ir;
-	DWORD cRecords = 0;
+	ಒಳಹರಿವು_ದಾಖಲೆ ir;
+	DWORD c_ದಾಖಲೆಗಳು = 0;
 
 # ifdef FEAT_CLIENTSERVER
-	(void)WaitForChar(-1L, FALSE);
-	if (input_available())
-	    return 0;
-	if (g_nMouseClick != -1)
-	    return 0;
+	(ಶೂನ್ಯ)WaitForChar(-1L, FALSE);
+	ಆದರೆ (ಒಳಹರಿವು_ಲಭ್ಯ())
+	    ಹಿಂತಿರುಗಿ 0;
+	ಆದರೆ (g_nMouseClick != -1)
+	    ಹಿಂತಿರುಗಿ 0;
 # endif
-	if (read_console_input(g_hConIn, &ir, 1, &cRecords) == 0)
+	ಆದರೆ (read_console_ಒಳಹರಿವು(g_h_Con_ಒಳ, &ir, 1, &c_ದಾಖಲೆಗಳು) == 0)
 	{
-	    if (did_create_conin)
+	    ಆದರೆ (did_create_conin)
 		read_error_exit();
 	    create_conin();
-	    continue;
+	    ಮುಂದುವರಿ;
 	}
 
-	if (ir.EventType == KEY_EVENT)
+	ಆದರೆ (ir.EventType == ಕೀಲಿ_EVENT)
 	{
-	    if (decode_key_event(&ir.Event.KeyEvent, &ch, pch2,
+	    ಆದರೆ (decode_ಕೀಲಿ_event(&ir.Event.ಕೀಲಿ_Event_2, &ch, pch2,
 							    pmodifiers, TRUE))
-		return ch;
+		ಹಿಂತಿರುಗಿ ch;
 	}
-	else if (ir.EventType == FOCUS_EVENT)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ir.EventType == FOCUS_EVENT)
 	    handle_focus_event(ir);
-	else if (ir.EventType == WINDOW_BUFFER_SIZE_EVENT)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ir.EventType == ಕಿಟಕಿ_ಬಫರ್_ಗಾತ್ರ_EVENT)
 	    shell_resized();
-	else if (ir.EventType == MOUSE_EVENT)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ir.EventType == MOUSE_EVENT)
 	{
-	    if (decode_mouse_event(&ir.Event.MouseEvent))
-		return 0;
+	    ಆದರೆ (decode_mouse_event(&ir.Event.MouseEvent))
+		ಹಿಂತಿರುಗಿ 0;
 	}
     }
 }
-#endif // !FEAT_GUI_MSWIN
+#ಆದರೆ_ಅಂತ್ಯ // !FEAT_GUI_MSWIN
 
 
 /*
@@ -2361,58 +2361,58 @@ tgetch(int *pmodifiers, WCHAR *pch2)
  * If time == -1, wait forever for characters.
  * Returns the number of characters read into buf.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_inchar(
-    char_u	*buf UNUSED,
-    int		maxlen UNUSED,
-    long	time UNUSED,
-    int		tb_change_cnt UNUSED)
+    char_u	*buf ಬಳಸದ,
+    ಪೂರ್ಣಾಂಕ		maxlen ಬಳಸದ,
+    ದೀರ್ಘ	ಸಮಯ ಬಳಸದ,
+    ಪೂರ್ಣಾಂಕ		tb_change_cnt ಬಳಸದ)
 {
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ಆದರೆ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
-    int		len;
-    int		c;
+    ಪೂರ್ಣಾಂಕ		len;
+    ಪೂರ್ಣಾಂಕ		c;
 # ifdef VIMDLL
 // Extra space for maximum three CSIs. E.g. U+1B6DB -> 0xF0 0x9B 0x9B 0x9B.
 #  define TYPEAHEADSPACE    6
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  define TYPEAHEADSPACE    0
 # endif
 # define TYPEAHEADLEN	    (20 + TYPEAHEADSPACE)
-    static char_u   typeahead[TYPEAHEADLEN];	// previously typed bytes.
-    static int	    typeaheadlen = 0;
+    ಸ್ಥಿರ char_u   typeahead[TYPEAHEADLEN];	// previously typed bytes.
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    typeaheadlen = 0;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return 0;
+    ಆದರೆ (gui.ಒಳ_use)
+	ಹಿಂತಿರುಗಿ 0;
 # endif
 
     // First use any typeahead that was kept because "buf" was too small.
-    if (typeaheadlen > 0)
-	goto theend;
+    ಆದರೆ (typeaheadlen > 0)
+	ಹೋಗು theend;
 
-    if (time >= 0)
+    ಆದರೆ (ಸಮಯ >= 0)
     {
-	if (!WaitForChar(time, FALSE))     // no character available
-	    return 0;
+	ಆದರೆ (!WaitForChar(ಸಮಯ, FALSE))     // no character available
+	    ಹಿಂತಿರುಗಿ 0;
     }
-    else    // time == -1, wait forever
+    ಇಲ್ಲದಿದ್ದರೆ    // time == -1, wait forever
     {
-	mch_set_winsize_now();	// Allow winsize changes from now on
+	mch_ಗಣ_winsize_now();	// Allow winsize changes from now on
 
 	/*
 	 * If there is no character available within 2 seconds (default)
 	 * write the autoscript file to disk.  Or cause the CursorHold event
 	 * to be triggered.
 	 */
-	if (!WaitForChar(p_ut, FALSE))
+	ಆದರೆ (!WaitForChar(p_ut, FALSE))
 	{
-	    if (trigger_cursorhold() && maxlen >= 3)
+	    ಆದರೆ (trigger_cursorhold() && maxlen >= 3)
 	    {
 		buf[0] = K_SPECIAL;
 		buf[1] = KS_EXTRA;
-		buf[2] = (int)KE_CURSORHOLD;
-		return 3;
+		buf[2] = (ಪೂರ್ಣಾಂಕ)KE_CURSORHOLD;
+		ಹಿಂತಿರುಗಿ 3;
 	    }
 	    before_blocking();
 	}
@@ -2426,7 +2426,7 @@ mch_inchar(
     g_fCBrkPressed = FALSE;
 
 # ifdef MCH_WRITE_DUMP
-    if (fdDump)
+    ಆದರೆ (fdDump)
 	fputc('[', fdDump);
 # endif
 
@@ -2434,32 +2434,32 @@ mch_inchar(
     // to get and still room in the buffer.  A mouse event uses up to
     // 10 bytes: 3 (modifier) + 3 (scroll event) + 4 (coordinates), and a
     // keyboard input uses up to 7 bytes: 3 (modifier) + 4 (UTF-8 char).
-    while ((typeaheadlen == 0 || WaitForChar(0L, FALSE))
+    ಆಗ ((typeaheadlen == 0 || WaitForChar(0L, FALSE))
 			  && typeaheadlen + 10 + TYPEAHEADSPACE <= TYPEAHEADLEN)
     {
-	if (typebuf_changed(tb_change_cnt))
+	ಆದರೆ (typebuf_ಬದಲಾಯಿತು(tb_change_cnt))
 	{
 	    // "buf" may be invalid now if a client put something in the
 	    // typeahead buffer and "buf" is in the typeahead buffer.
 	    typeaheadlen = 0;
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
-	if (g_nMouseClick != -1)
+	ಆದರೆ (g_nMouseClick != -1)
 	{
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    ಆದರೆ (fdDump)
 		fprintf(fdDump, "{%02x @ %d, %d}",
 			g_nMouseClick, g_xMouse, g_yMouse);
 # endif
 	    char_u modifiers = ((char_u *)(&g_nMouseClick))[0];
 	    char_u scroll_dir = ((char_u *)(&g_nMouseClick))[1];
 
-	    if (scroll_dir == KE_MOUSEDOWN
+	    ಆದರೆ (scroll_dir == KE_MOUSEDOWN
 		    || scroll_dir == KE_MOUSEUP
 		    || scroll_dir == KE_MOUSELEFT
 		    || scroll_dir == KE_MOUSERIGHT)
 	    {
-		if (modifiers > 0)
+		ಆದರೆ (modifiers > 0)
 		{
 		    // use K_SPECIAL instead of CSI to make mappings work
 		    typeahead[typeaheadlen++] = K_SPECIAL;
@@ -2470,7 +2470,7 @@ mch_inchar(
 		typeahead[typeaheadlen++] = KS_EXTRA;
 		typeahead[typeaheadlen++] = scroll_dir;
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		typeahead[typeaheadlen++] = ESC + 128;
 		typeahead[typeaheadlen++] = 'M';
@@ -2487,64 +2487,64 @@ mch_inchar(
 
 	    g_nMouseClick = -1;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    WCHAR	ch2 = NUL;
-	    int		modifiers = 0;
+	    ಪೂರ್ಣಾಂಕ		modifiers = 0;
 
 	    c = tgetch(&modifiers, &ch2);
 
-	    c = simplify_key(c, &modifiers);
+	    c = simplify_ಕೀಲಿ(c, &modifiers);
 
 	    // Some chars need adjustment when the Ctrl modifier is used.
-	    ++no_reduce_keys;
-	    c = may_adjust_key_for_ctrl(modifiers, c);
-	    --no_reduce_keys;
+	    ++no_reduce_ಕೀಲಿಗಳು;
+	    c = may_adjust_ಕೀಲಿ_for_ctrl(modifiers, c);
+	    --no_reduce_ಕೀಲಿಗಳು;
 
 	    // remove the SHIFT modifier for keys where it's already included,
 	    // e.g., '(' and '*'
-	    modifiers = may_remove_shift_modifier(modifiers, c);
+	    modifiers = may_remove_ಸರಿಸು_modifier(modifiers, c);
 
-	    if (typebuf_changed(tb_change_cnt))
+	    ಆದರೆ (typebuf_ಬದಲಾಯಿತು(tb_change_cnt))
 	    {
 		// "buf" may be invalid now if a client put something in the
 		// typeahead buffer and "buf" is in the typeahead buffer.
 		typeaheadlen = 0;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 
-	    if (c == Ctrl_C && ctrl_c_interrupts)
+	    ಆದರೆ (c == Ctrl_C && ctrl_c_interrupts)
 	    {
-# if defined(FEAT_CLIENTSERVER)
-		trash_input_buf();
+# ಆದರೆ defined(FEAT_CLIENTSERVER)
+		trash_ಒಳಹರಿವು_buf();
 # endif
 		got_int = TRUE;
 	    }
 
-	    if (g_nMouseClick == -1)
+	    ಆದರೆ (g_nMouseClick == -1)
 	    {
-		int	n = 1;
+		ಪೂರ್ಣಾಂಕ	n = 1;
 
-		if (ch2 == NUL)
+		ಆದರೆ (ch2 == NUL)
 		{
-		    int	    i, j;
+		    ಪೂರ್ಣಾಂಕ	    i, j;
 		    char_u  *p;
 		    WCHAR   ch[2];
 
 		    ch[0] = c;
-		    if (c >= 0xD800 && c <= 0xDBFF)	// High surrogate
+		    ಆದರೆ (c >= 0xD800 && c <= 0xDBFF)	// High surrogate
 		    {
 			ch[1] = tgetch(&modifiers, &ch2);
 			n++;
 		    }
-		    p = utf16_to_enc(ch, &n);
-		    if (p != NULL)
+		    p = utf16_ಗಮ್ಯ_enc(ch, &n);
+		    ಆದರೆ (p != ಖಾಲಿ)
 		    {
-			for (i = 0, j = 0; i < n; i++)
+			ಗಾಗಿ (i = 0, j = 0; i < n; i++)
 			{
 			    typeahead[typeaheadlen + j++] = p[i];
 # ifdef VIMDLL
-			    if (p[i] == CSI)
+			    ಆದರೆ (p[i] == CSI)
 			    {
 				typeahead[typeaheadlen + j++] = KS_EXTRA;
 				typeahead[typeaheadlen + j++] = KE_CSI;
@@ -2555,11 +2555,11 @@ mch_inchar(
 			vim_free(p);
 		    }
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    typeahead[typeaheadlen] = c;
 # ifdef VIMDLL
-		    if (c == CSI)
+		    ಆದರೆ (c == CSI)
 		    {
 			typeahead[typeaheadlen + 1] = KS_EXTRA;
 			typeahead[typeaheadlen + 2] = KE_CSI;
@@ -2567,28 +2567,28 @@ mch_inchar(
 		    }
 # endif
 		}
-		if (ch2 != NUL)
+		ಆದರೆ (ch2 != NUL)
 		{
-		    if (c == K_NUL)
+		    ಆದರೆ (c == K_NUL)
 		    {
-			switch (ch2)
+			ಆಯ್ಕೆ (ch2)
 			{
-			case (WCHAR)'\324': // SHIFT+Insert
-			case (WCHAR)'\325': // CTRL+Insert
-			case (WCHAR)'\327': // SHIFT+Delete
-			case (WCHAR)'\330': // CTRL+Delete
+			ಸ್ಥಿತಿ (WCHAR)'\324': // SHIFT+Insert
+			ಸ್ಥಿತಿ (WCHAR)'\325': // CTRL+Insert
+			ಸ್ಥಿತಿ (WCHAR)'\327': // SHIFT+Delete
+			ಸ್ಥಿತಿ (WCHAR)'\330': // CTRL+Delete
 			    typeahead[typeaheadlen + n] = (char_u)ch2;
 			    n++;
-			    break;
+			    ನಿಲ್ಲಿಸು;
 
-			default:
+			ಪೂರ್ವನಿಯೋಜಿತ:
 			    typeahead[typeaheadlen + n] = 3;
 			    typeahead[typeaheadlen + n + 1] = (char_u)ch2;
 			    n += 2;
-			    break;
+			    ನಿಲ್ಲಿಸು;
 			}
 		    }
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
 			typeahead[typeaheadlen + n] = 3;
 			typeahead[typeaheadlen + n + 1] = (char_u)ch2;
@@ -2600,7 +2600,7 @@ mch_inchar(
 		// when it's one byte, the 8th bit isn't set yet and not
 		// using a double-byte encoding (would become a lead
 		// byte).
-		if ((modifiers & MOD_MASK_ALT)
+		ಆದರೆ ((modifiers & MOD_ಮುಖವಾಡ_ALT)
 			&& n == 1
 			&& (typeahead[typeaheadlen] & 0x80) == 0
 			&& !enc_dbcs
@@ -2608,10 +2608,10 @@ mch_inchar(
 		{
 		    n = (*mb_char2bytes)(typeahead[typeaheadlen] | 0x80,
 						    typeahead + typeaheadlen);
-		    modifiers &= ~MOD_MASK_ALT;
+		    modifiers &= ~MOD_ಮುಖವಾಡ_ALT;
 		}
 
-		if (modifiers != 0)
+		ಆದರೆ (modifiers != 0)
 		{
 		    // Prepend modifiers to the character.
 		    mch_memmove(typeahead + typeaheadlen + 3,
@@ -2624,7 +2624,7 @@ mch_inchar(
 		typeaheadlen += n;
 
 # ifdef MCH_WRITE_DUMP
-		if (fdDump)
+		ಆದರೆ (fdDump)
 		    fputc(c, fdDump);
 # endif
 	    }
@@ -2632,7 +2632,7 @@ mch_inchar(
     }
 
 # ifdef MCH_WRITE_DUMP
-    if (fdDump)
+    ಆದರೆ (fdDump)
     {
 	fputs("]\n", fdDump);
 	fflush(fdDump);
@@ -2642,23 +2642,23 @@ mch_inchar(
 theend:
     // Move typeahead to "buf", as much as fits.
     len = 0;
-    while (len < maxlen && typeaheadlen > 0)
+    ಆಗ (len < maxlen && typeaheadlen > 0)
     {
 	buf[len++] = typeahead[0];
 	mch_memmove(typeahead, typeahead + 1, --typeaheadlen);
     }
 # ifdef FEAT_EVAL
-    if (len > 0)
+    ಆದರೆ (len > 0)
     {
 	buf[len] = NUL;
-	ch_log(NULL, "raw key input: \"%s\"", buf);
+	ch_log(ಖಾಲಿ, "raw key input: \"%s\"", buf);
     }
 # endif
-    return len;
+    ಹಿಂತಿರುಗಿ len;
 
-#else // FEAT_GUI_MSWIN && !VIMDLL
-    return 0;
-#endif // FEAT_GUI_MSWIN && !VIMDLL
+#ಇಲ್ಲದಿದ್ದರೆ // FEAT_GUI_MSWIN && !VIMDLL
+    ಹಿಂತಿರುಗಿ 0;
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_GUI_MSWIN && !VIMDLL
 }
 
 /*
@@ -2667,32 +2667,32 @@ theend:
  * the allocated memory.
  * TODO: Should somehow check if it's really executable.
  */
-    static int
-executable_file(char *name, char_u **path)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+executable_file(ಅಕ್ಷರ *name, char_u **ಮಾರ್ಗ)
 {
-    int attrs = win32_getattrs((char_u *)name);
+    ಪೂರ್ಣಾಂಕ attrs = win32_getattrs((char_u *)name);
 
     // The file doesn't exist or is a folder.
-    if (attrs == -1 || (attrs & FILE_ATTRIBUTE_DIRECTORY))
-	return FALSE;
+    ಆದರೆ (attrs == -1 || (attrs & FILE_ATTRIBUTE_DIRECTORY))
+	ಹಿಂತಿರುಗಿ FALSE;
     // Check if the file is an AppExecLink, a special alias used by Windows
     // Store for its apps.
-    if (attrs & FILE_ATTRIBUTE_REPARSE_POINT)
+    ಆದರೆ (attrs & FILE_ATTRIBUTE_REPARSE_ಬಿಂದು)
     {
 	char_u	*res = resolve_appexeclink((char_u *)name);
-	if (res == NULL)
-	    res = resolve_reparse_point((char_u *)name);
-	if (res == NULL)
-	    return FALSE;
+	ಆದರೆ (res == ಖಾಲಿ)
+	    res = resolve_reparse_ಬಿಂದು((char_u *)name);
+	ಆದರೆ (res == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ FALSE;
 	// The path is already absolute.
-	if (path != NULL)
-	    *path = res;
-	else
+	ಆದರೆ (ಮಾರ್ಗ != ಖಾಲಿ)
+	    *ಮಾರ್ಗ = res;
+	ಇಲ್ಲದಿದ್ದರೆ
 	    vim_free(res);
     }
-    else if (path != NULL)
-	*path = FullName_save((char_u *)name, FALSE);
-    return TRUE;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಮಾರ್ಗ != ಖಾಲಿ)
+	*ಮಾರ್ಗ = ತುಂಬಿದ_Name_save((char_u *)name, FALSE);
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
@@ -2700,27 +2700,27 @@ executable_file(char *name, char_u **path)
  * An inconclusive search (e.g. a directory which cannot be enumerated) must
  * not skip the normal checks.
  */
-    static bool
-executable_prefix_exists(char_u *name)
+    ಸ್ಥಿರ bool
+executable_ಪೂರ್ವಪ್ರತ್ಯಯ_exists(char_u *name)
 {
     WCHAR		*wn;
-    WIN32_FIND_DATAW	data;
+    WIN32_ಕಂಡುಹಿಡಿ_DATAW	ದತ್ತಾಂಶ;
     HANDLE		handle;
     DWORD		error;
 
-    wn = enc_to_utf16(name, NULL);
-    if (wn == NULL)
-	return true;
-    handle = FindFirstFileExW(wn, FindExInfoBasic, &data,
-					    FindExSearchNameMatch, NULL, 0);
-    error = GetLastError();
+    wn = enc_ಗಮ್ಯ_utf16(name, ಖಾಲಿ);
+    ಆದರೆ (wn == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ true;
+    handle = ಕಂಡುಹಿಡಿ_ಮೊದಲ_File_Ex_W(wn, ಕಂಡುಹಿಡಿ_Ex_Info_Basic, &ದತ್ತಾಂಶ,
+					    ಕಂಡುಹಿಡಿ_Ex_ಹುಡುಕು_Name_ಹೊಂದಿಕೆ, ಖಾಲಿ, 0);
+    error = Get_ಕೊನೆಯ_Error();
     vim_free(wn);
-    if (handle != INVALID_HANDLE_VALUE)
+    ಆದರೆ (handle != INVALID_HANDLE_ಮೌಲ್ಯ)
     {
-	FindClose(handle);
-	return true;
+	ಕಂಡುಹಿಡಿ_Close(handle);
+	ಹಿಂತಿರುಗಿ true;
     }
-    return error != ERROR_FILE_NOT_FOUND && error != ERROR_PATH_NOT_FOUND;
+    ಹಿಂತಿರುಗಿ error != ERROR_FILE_NOT_ಸಿಕ್ಕಿತು && error != ERROR_ಮಾರ್ಗ_NOT_ಸಿಕ್ಕಿತು;
 }
 
 /*
@@ -2730,48 +2730,48 @@ executable_prefix_exists(char_u *name)
  * When returning TRUE and "path" is not NULL save the path and set "*path" to
  * the allocated memory.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 executable_exists(
-    char	*name,
+    ಅಕ್ಷರ	*name,
     size_t	namelen,
-    char_u	**path,
-    int		use_path,
-    int		use_pathext)
+    char_u	**ಮಾರ್ಗ,
+    ಪೂರ್ಣಾಂಕ		use_ಮಾರ್ಗ,
+    ಪೂರ್ಣಾಂಕ		use_pathext)
 {
     // WinNT and later can use _MAX_PATH wide characters for a pathname, which
     // means that the maximum pathname is _MAX_PATH * 3 bytes when 'enc' is
     // UTF-8.
-    char_u	buf[_MAX_PATH * 3];
+    char_u	buf[MAX_ಮಾರ್ಗ_2 * 3];
     char_u	*p;
-    string_T	pathbuf = {NULL, 0};
-    int		pathbuf_allocated = FALSE;
-    string_T	pathext = {NULL, 0};
-    int		pathext_allocated = FALSE;
-    char_u	*shname = NULL;
-    int		noext = FALSE;
+    string_T	pathbuf = {ಖಾಲಿ, 0};
+    ಪೂರ್ಣಾಂಕ		pathbuf_allocated = FALSE;
+    string_T	pathext = {ಖಾಲಿ, 0};
+    ಪೂರ್ಣಾಂಕ		pathext_allocated = FALSE;
+    char_u	*shname = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		noext = FALSE;
     bool	simple_pathext = true;
-    int		ext_count = 0;
-    int		retval = FALSE;
+    ಪೂರ್ಣಾಂಕ		ext_ಎಣಿಕೆ = 0;
+    ಪೂರ್ಣಾಂಕ		retval = FALSE;
 
-    if (namelen >= sizeof(buf))	// safety check
-	return FALSE;
+    ಆದರೆ (namelen >= ಗಾತ್ರ(buf))	// safety check
+	ಹಿಂತಿರುಗಿ FALSE;
 
     // Using the name directly when a Unix-shell like 'shell'.
     shname = gettail(p_sh);
-    if (strstr((char *)shname, "sh") != NULL &&
-	!(strstr((char *)shname, "powershell") != NULL
-				    || strstr((char *)shname, "pwsh") != NULL))
+    ಆದರೆ (ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು((ಅಕ್ಷರ *)shname, "sh") != ಖಾಲಿ &&
+	!(ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು((ಅಕ್ಷರ *)shname, "powershell") != ಖಾಲಿ
+				    || ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು((ಅಕ್ಷರ *)shname, "pwsh") != ಖಾಲಿ))
 	noext = TRUE;
 
-    if (use_pathext)
+    ಆದರೆ (use_pathext)
     {
 	pathext.string = mch_getenv("PATHEXT");
-	if (pathext.string == NULL)
-	    STR_LITERAL_SET(pathext, ".com;.exe;.bat;.cmd");
-	else
-	    pathext.length = STRLEN(pathext.string);
+	ಆದರೆ (pathext.string == ಖಾಲಿ)
+	    STR_LITERAL_ಗಣ(pathext, ".com;.exe;.bat;.cmd");
+	ಇಲ್ಲದಿದ್ದರೆ
+	    pathext.ಉದ್ದಳತೆ = STRLEN(pathext.string);
 
-	if (noext == FALSE)
+	ಆದರೆ (noext == FALSE)
 	{
 	    char_u  *e;
 	    char_u  *q;
@@ -2782,32 +2782,32 @@ executable_exists(
 	     * Check "name" ends with extension.
 	     */
 	    p = pathext.string;
-	    while (*p)
+	    ಆಗ (*p)
 	    {
-		if (p[0] == ';'
+		ಆದರೆ (p[0] == ';'
 			    || (p[0] == '.' && (p[1] == NUL || p[1] == ';')))
 		{
 		    // Skip empty or single ".".
-		    if (*p == '.')
+		    ಆದರೆ (*p == '.')
 			simple_pathext = false;
 		    ++p;
-		    continue;
+		    ಮುಂದುವರಿ;
 		}
 		e = vim_strchr(p, ';');
-		if (e == NULL)
-		    e = pathext.string + pathext.length;
+		ಆದರೆ (e == ಖಾಲಿ)
+		    e = pathext.string + pathext.ಉದ್ದಳತೆ;
 		plen = (size_t)(e - p);
-		++ext_count;
-		if (*p != '.')
+		++ext_ಎಣಿಕೆ;
+		ಆದರೆ (*p != '.')
 		    simple_pathext = false;
-		for (q = p + 1; q < e; ++q)
-		    if (!ASCII_ISALNUM(*q))
+		ಗಾಗಿ (q = p + 1; q < e; ++q)
+		    ಆದರೆ (!ASCII_ISALNUM(*q))
 			simple_pathext = false;
 
-		if (_strnicoll(name + namelen - plen, (char *)p, plen) == 0)
+		ಆದರೆ (_strnicoll(name + namelen - plen, (ಅಕ್ಷರ *)p, plen) == 0)
 		{
 		    noext = TRUE;
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 
 		p = e;
@@ -2816,49 +2816,49 @@ executable_exists(
     }
 
     // Prepend single "." to pathext, it means no extension added.
-    if (pathext.string == NULL)
-	STR_LITERAL_SET(pathext, ".");
-    else if (noext == TRUE)
+    ಆದರೆ (pathext.string == ಖಾಲಿ)
+	STR_LITERAL_ಗಣ(pathext, ".");
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (noext == TRUE)
     {
 	char_u  *tmp;
 
-	tmp = alloc(pathext.length + 3);
-	if (tmp == NULL)
+	tmp = alloc(pathext.ಉದ್ದಳತೆ + 3);
+	ಆದರೆ (tmp == ಖಾಲಿ)
 	{
 	    retval = FALSE;
-	    goto theend;
+	    ಹೋಗು theend;
 	}
 
 	STRCPY(tmp, ".;");
 	STRCPY(tmp + 2, pathext.string);
 	pathext.string = tmp;
-	pathext.length += 2;
+	pathext.ಉದ್ದಳತೆ += 2;
 	pathext_allocated = TRUE;
     }
 
     // Use $PATH when "use_path" is TRUE and "name" is basename.
-    if (use_path && gettail((char_u *)name) == (char_u *)name)
+    ಆದರೆ (use_ಮಾರ್ಗ && gettail((char_u *)name) == (char_u *)name)
     {
 	p = mch_getenv("PATH");
-	if (p != NULL)
+	ಆದರೆ (p != ಖಾಲಿ)
 	{
 	    size_t  plen = STRLEN(p);
 
 	    pathbuf.string = alloc(plen + 3);
-	    if (pathbuf.string == NULL)
+	    ಆದರೆ (pathbuf.string == ಖಾಲಿ)
 	    {
 		retval = FALSE;
-		goto theend;
+		ಹೋಗು theend;
 	    }
 
-	    if (mch_getenv("NoDefaultCurrentDirectoryInExePath") == NULL &&
-		    strstr((char *)gettail(p_sh), "cmd.exe") != NULL)
+	    ಆದರೆ (mch_getenv("NoDefaultCurrentDirectoryInExePath") == ಖಾಲಿ &&
+		    ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು((ಅಕ್ಷರ *)gettail(p_sh), "cmd.exe") != ಖಾಲಿ)
 	    {
 		STRCPY(pathbuf.string, ".;");
-		pathbuf.length = 2;
+		pathbuf.ಉದ್ದಳತೆ = 2;
 	    }
-	    STRCPY(pathbuf.string + pathbuf.length, p);
-	    pathbuf.length += plen;
+	    STRCPY(pathbuf.string + pathbuf.ಉದ್ದಳತೆ, p);
+	    pathbuf.ಉದ್ದಳತೆ += plen;
 	    pathbuf_allocated = TRUE;
 	}
     }
@@ -2867,40 +2867,40 @@ executable_exists(
      * Walk through all entries in $PATH to check if "name" exists there and
      * is an executable file.
      */
-    if (pathbuf.string == NULL)
-	STR_LITERAL_SET(pathbuf, ".");
+    ಆದರೆ (pathbuf.string == ಖಾಲಿ)
+	STR_LITERAL_ಗಣ(pathbuf, ".");
     p = pathbuf.string;
-    while (*p)
+    ಆಗ (*p)
     {
 	char_u	*e;
 	size_t	buflen;
 
-	if (*p == ';') // Skip empty entry
+	ಆದರೆ (*p == ';') // Skip empty entry
 	{
 	    ++p;
-	    continue;
+	    ಮುಂದುವರಿ;
 	}
 	e = vim_strchr(p, ';');
-	if (e == NULL)
-	    e = pathbuf.string + pathbuf.length;
+	ಆದರೆ (e == ಖಾಲಿ)
+	    e = pathbuf.string + pathbuf.ಉದ್ದಳತೆ;
 
-	if (e - p + namelen + 2 > sizeof(buf))
+	ಆದರೆ (e - p + namelen + 2 > ಗಾತ್ರ(buf))
 	{
 	    retval = FALSE;
-	    goto theend;
+	    ಹೋಗು theend;
 	}
 	// A single "." that means current dir.
-	if (e - p == 1 && *p == '.')
+	ಆದರೆ (e - p == 1 && *p == '.')
 	{
 	    STRCPY(buf, name);
 	    buflen = namelen;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    buflen = vim_snprintf_safelen(
-		(char *)buf,
-		sizeof(buf),
-		"%.*s%s%s", (int)(e - p), p,
+		(ಅಕ್ಷರ *)buf,
+		ಗಾತ್ರ(buf),
+		"%.*s%s%s", (ಪೂರ್ಣಾಂಕ)(e - p), p,
 		!after_pathsep(p, e) ? PATHSEPSTR : "",
 		name);
 	}
@@ -2910,22 +2910,22 @@ executable_exists(
 	// few extensions, or an explicit executable suffix, it is cheaper to
 	// use the normal checks.  Leave unusual paths and suffixes to those
 	// checks as well, to preserve their path normalization and semantics.
-	if (!noext && simple_pathext && ext_count >= 3 && buflen > 0
-		&& buflen + 2 <= sizeof(buf)
+	ಆದರೆ (!noext && simple_pathext && ext_ಎಣಿಕೆ >= 3 && buflen > 0
+		&& buflen + 2 <= ಗಾತ್ರ(buf)
 		&& buf[buflen - 1] != '.' && buf[buflen - 1] != ' '
-		&& vim_strpbrk(buf, (char_u *)"*?") == NULL
-		&& vim_strchr(gettail(buf), ':') == NULL)
+		&& vim_strpbrk(buf, (char_u *)"*?") == ಖಾಲಿ
+		&& vim_strchr(gettail(buf), ':') == ಖಾಲಿ)
 	{
 	    bool exists;
 
 	    buf[buflen] = '*';
 	    buf[buflen + 1] = NUL;
-	    exists = executable_prefix_exists(buf);
+	    exists = executable_ಪೂರ್ವಪ್ರತ್ಯಯ_exists(buf);
 	    buf[buflen] = NUL;
-	    if (!exists)
+	    ಆದರೆ (!exists)
 	    {
 		p = e;
-		continue;
+		ಮುಂದುವರಿ;
 	    }
 	}
 
@@ -2934,34 +2934,34 @@ executable_exists(
 	 * Check "name" with extension added.
 	 */
 	p = pathext.string;
-	while (*p)
+	ಆಗ (*p)
 	{
 	    char_u  *e2;
 
-	    if (*p == ';')
+	    ಆದರೆ (*p == ';')
 	    {
 		// Skip empty entry
 		++p;
-		continue;
+		ಮುಂದುವರಿ;
 	    }
 	    e2 = vim_strchr(p, ';');
-	    if (e2 == NULL)
-		e2 = pathext.string + pathext.length;
+	    ಆದರೆ (e2 == ಖಾಲಿ)
+		e2 = pathext.string + pathext.ಉದ್ದಳತೆ;
 
-	    if (!(p[0] == '.' && (p[1] == NUL || p[1] == ';')))
+	    ಆದರೆ (!(p[0] == '.' && (p[1] == NUL || p[1] == ';')))
 	    {
 		// Not a single "." that means no extension is added.
-		if (e2 - p + buflen + 1 > sizeof(buf))
+		ಆದರೆ (e2 - p + buflen + 1 > ಗಾತ್ರ(buf))
 		{
 		    retval = FALSE;
-		    goto theend;
+		    ಹೋಗು theend;
 		}
 		vim_strncpy(buf + buflen, p, e2 - p);
 	    }
-	    if (executable_file((char *)buf, path))
+	    ಆದರೆ (executable_file((ಅಕ್ಷರ *)buf, ಮಾರ್ಗ))
 	    {
 		retval = TRUE;
-		goto theend;
+		ಹೋಗು theend;
 	    }
 
 	    p = e2;
@@ -2971,14 +2971,14 @@ executable_exists(
     }
 
 theend:
-    if (pathbuf_allocated)
-	free(pathbuf.string);
-    if (pathext_allocated)
-	free(pathext.string);
-    return retval;
+    ಆದರೆ (pathbuf_allocated)
+	ಬಿಡುಗಡೆ(pathbuf.string);
+    ಆದರೆ (pathext_allocated)
+	ಬಿಡುಗಡೆ(pathext.string);
+    ಹಿಂತಿರುಗಿ retval;
 }
 
-#if (defined(__MINGW32__) && __MSVCRT_VERSION__ >= 0x800) || \
+#ಆದರೆ (defined(__MINGW32__) && __MSVCRT_VERSION__ >= 0x800) || \
 	(defined(_MSC_VER) && _MSC_VER >= 1400)
 /*
  * Bad parameter handler.
@@ -2992,80 +2992,80 @@ theend:
  * NULL/0.  Debug builds will also produce assert dialogs from the CRT, it is
  * worth allowing these to make debugging of issues easier.
  */
-    static void
-bad_param_handler(const wchar_t *expression UNUSED,
-    const wchar_t *function UNUSED,
-    const wchar_t *file UNUSED,
-    unsigned int line UNUSED,
-    uintptr_t pReserved UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+bad_param_handler(ಸ್ಥಿರಾಂಕ wchar_t *ಅಭಿವ್ಯಕ್ತಿ_2 ಬಳಸದ,
+    ಸ್ಥಿರಾಂಕ wchar_t *function ಬಳಸದ,
+    ಸ್ಥಿರಾಂಕ wchar_t *file ಬಳಸದ,
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ ಸಾಲು ಬಳಸದ,
+    uintptr_t pReserved ಬಳಸದ)
 {
 }
 
-# define SET_INVALID_PARAM_HANDLER \
-	((void)_set_invalid_parameter_handler(bad_param_handler))
-#else
-# define SET_INVALID_PARAM_HANDLER
-#endif
+# define ಗಣ_INVALID_PARAM_HANDLER \
+	((ಶೂನ್ಯ)ಗಣ_invalid_parameter_handler(bad_param_handler))
+#ಇಲ್ಲದಿದ್ದರೆ
+# define ಗಣ_INVALID_PARAM_HANDLER
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_GUI_MSWIN
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_MSWIN
 
 /*
  * GUI version of mch_init().
  */
-    static void
-mch_init_g(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+mch_init_g(ಶೂನ್ಯ)
 {
 # ifndef __MINGW32__
-    extern int _fmode;
+    ಬಾಹ್ಯ ಪೂರ್ಣಾಂಕ _fmode;
 # endif
 
     // Silently handle invalid parameters to CRT functions
-    SET_INVALID_PARAM_HANDLER;
+    ಗಣ_INVALID_PARAM_HANDLER;
 
     // Let critical errors result in a failure, not in a dialog box.  Required
     // for the timestamp test to work on removed floppies.
-    SetErrorMode(SEM_FAILCRITICALERRORS);
+    ಗಣ_Error_ಬಹುಲಕ(SEM_FAILCRITICALERRORS);
 
-    _fmode = O_BINARY;		// we do our own CR-LF translation
+    _fmode = O_ದ್ವಿಮಾನ;		// we do our own CR-LF translation
 
     // Specify window size.  Is there a place to get the default from?
-    Rows = 25;
+    ಅಡ್ಡಸಾಲುಗಳು = 25;
     Columns = 80;
 
     // Look for 'vimrun'.
     {
-	char_u	vimrun_location[_MAX_PATH + 4];
+	char_u	vimrun_location[MAX_ಮಾರ್ಗ_2 + 4];
 	size_t	exe_pathlen = (size_t)(gettail(exe_name) - exe_name);
 
 	// Note: 10 is length of 'vimrun.exe'.
-	if (exe_pathlen + 10 >= sizeof(vimrun_location))
+	ಆದರೆ (exe_pathlen + 10 >= ಗಾತ್ರ(vimrun_location))
 	{
-	    if (executable_exists("vimrun.exe", STRLEN_LITERAL("vimrun.exe"),
-		    NULL, TRUE, FALSE))
+	    ಆದರೆ (executable_exists("vimrun.exe", STRLEN_LITERAL("vimrun.exe"),
+		    ಖಾಲಿ, TRUE, FALSE))
 		s_dont_use_vimrun = FALSE;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // First try in same directory as gvim.exe.
-	    if (exe_pathlen > 0)
+	    ಆದರೆ (exe_pathlen > 0)
 		vim_strncpy(vimrun_location, exe_name, exe_pathlen);
 	    STRCPY(vimrun_location + exe_pathlen, "vimrun.exe");
 
-	    if (mch_getperm(vimrun_location) >= 0)
+	    ಆದರೆ (mch_getperm(vimrun_location) >= 0)
 	    {
 		char_u  *p;
 		size_t  plen;
 
-		if (exe_pathlen > 0 && *skiptowhite(vimrun_location) != NUL)
+		ಆದರೆ (exe_pathlen > 0 && *skiptowhite(vimrun_location) != NUL)
 		{
 		    // Enclose path with white space in double quotes.
 		    plen = vim_snprintf_safelen(
-			(char *)vimrun_location,
-			sizeof(vimrun_location),
+			(ಅಕ್ಷರ *)vimrun_location,
+			ಗಾತ್ರ(vimrun_location),
 			"\"%.*svimrun\" ",
-			(int)exe_pathlen, exe_name);
+			(ಪೂರ್ಣಾಂಕ)exe_pathlen, exe_name);
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    // Remove the suffix ('.exe').
 		    vimrun_location[exe_pathlen + 6] = ' ';
@@ -3074,23 +3074,23 @@ mch_init_g(void)
 		}
 
 		p = vim_strnsave(vimrun_location, plen);
-		if (p != NULL)
+		ಆದರೆ (p != ಖಾಲಿ)
 		{
-		    vimrun_path.string = p;
-		    vimrun_path.length = plen;
-		    vimrun_path_allocated = TRUE;
+		    vimrun_ಮಾರ್ಗ.string = p;
+		    vimrun_ಮಾರ್ಗ.ಉದ್ದಳತೆ = plen;
+		    vimrun_ಮಾರ್ಗ_allocated = TRUE;
 		    s_dont_use_vimrun = FALSE;
 		}
 	    }
-	    else if (executable_exists("vimrun.exe", STRLEN_LITERAL("vimrun.exe"),
-		    NULL, TRUE, FALSE))
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (executable_exists("vimrun.exe", STRLEN_LITERAL("vimrun.exe"),
+		    ಖಾಲಿ, TRUE, FALSE))
 		s_dont_use_vimrun = FALSE;
 	}
 
 	// Don't give the warning for a missing vimrun.exe right now, but only
 	// when vimrun was supposed to be used.  Don't bother people that do
 	// not need vimrun.exe.
-	if (s_dont_use_vimrun)
+	ಆದರೆ (s_dont_use_vimrun)
 	    need_vimrun_warning = TRUE;
     }
 
@@ -3098,9 +3098,9 @@ mch_init_g(void)
      * If "findstr.exe" doesn't exist, use "grep -n" for 'grepprg'.
      * Otherwise the default "findstr /n" is used.
      */
-    if (!executable_exists("findstr.exe", STRLEN_LITERAL("findstr.exe"),
-	    NULL, TRUE, FALSE))
-	set_option_value_give_err((char_u *)"grepprg",
+    ಆದರೆ (!executable_exists("findstr.exe", STRLEN_LITERAL("findstr.exe"),
+	    ಖಾಲಿ, TRUE, FALSE))
+	ಗಣ_option_ಮೌಲ್ಯ_give_err((char_u *)"grepprg",
 						    0, (char_u *)"grep -n", 0);
 
 # ifdef FEAT_CLIPBOARD
@@ -3111,12 +3111,12 @@ mch_init_g(void)
 }
 
 
-#endif // FEAT_GUI_MSWIN
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_GUI_MSWIN
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ಆದರೆ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
-# define SRWIDTH(sr) ((sr).Right - (sr).Left + 1)
-# define SRHEIGHT(sr) ((sr).Bottom - (sr).Top + 1)
+# define SRWIDTH(sr) ((sr).ಬಲ_4 - (sr).ಎಡ_4 + 1)
+# define SRHEIGHT(sr) ((sr).Bottom - (sr).ತುದಿ_2 + 1)
 
 /*
  * ClearConsoleBuffer()
@@ -3126,27 +3126,27 @@ mch_init_g(void)
  * Returns:
  *  TRUE on success
  */
-    static BOOL
-ClearConsoleBuffer(WORD wAttribute)
+    ಸ್ಥಿರ BOOL
+Clear_Console_ಬಫರ್(ಶಬ್ದ_2 wAttribute)
 {
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    CONSOLE_SCREEN_ಬಫರ್_INFO csbi;
     COORD coord;
-    DWORD NumCells, dummy;
+    DWORD ಅಂಕೆ_Cells, dummy;
 
-    if (!GetConsoleScreenBufferInfo(g_hConOut, &csbi))
-	return FALSE;
+    ಆದರೆ (!Get_Console_Screen_ಬಫರ್_Info(g_h_Con_ಹೊರಹೋಗು, &csbi))
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    NumCells = csbi.dwSize.X * csbi.dwSize.Y;
+    ಅಂಕೆ_Cells = csbi.dw_ಗಾತ್ರ.X * csbi.dw_ಗಾತ್ರ.Y;
     coord.X = 0;
     coord.Y = 0;
-    if (!FillConsoleOutputCharacter(g_hConOut, ' ', NumCells,
+    ಆದರೆ (!FillConsoleOutputCharacter(g_h_Con_ಹೊರಹೋಗು, ' ', ಅಂಕೆ_Cells,
 	    coord, &dummy))
-	return FALSE;
-    if (!FillConsoleOutputAttribute(g_hConOut, wAttribute, NumCells,
+	ಹಿಂತಿರುಗಿ FALSE;
+    ಆದರೆ (!FillConsoleOutputAttribute(g_h_Con_ಹೊರಹೋಗು, wAttribute, ಅಂಕೆ_Cells,
 	    coord, &dummy))
-	return FALSE;
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
@@ -3157,58 +3157,58 @@ ClearConsoleBuffer(WORD wAttribute)
  * Returns:
  *  TRUE on success
  */
-    static BOOL
-FitConsoleWindow(
-    COORD dwBufferSize,
+    ಸ್ಥಿರ BOOL
+Fit_Console_ಕಿಟಕಿ(
+    COORD dw_ಬಫರ್_ಗಾತ್ರ,
     BOOL WantAdjust)
 {
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
-    COORD dwWindowSize;
+    CONSOLE_SCREEN_ಬಫರ್_INFO csbi;
+    COORD dw_ಕಿಟಕಿ_ಗಾತ್ರ;
     BOOL NeedAdjust = FALSE;
 
-    if (!GetConsoleScreenBufferInfo(g_hConOut, &csbi))
-	return FALSE;
+    ಆದರೆ (!Get_Console_Screen_ಬಫರ್_Info(g_h_Con_ಹೊರಹೋಗು, &csbi))
+	ಹಿಂತಿರುಗಿ FALSE;
 
     /*
      * A buffer resize will fail if the current console window does
      * not lie completely within that buffer.  To avoid this, we might
      * have to move and possibly shrink the window.
      */
-    if (csbi.srWindow.Right >= dwBufferSize.X)
+    ಆದರೆ (csbi.sr_ಕಿಟಕಿ.ಬಲ_4 >= dw_ಬಫರ್_ಗಾತ್ರ.X)
     {
-	dwWindowSize.X = SRWIDTH(csbi.srWindow);
-	if (dwWindowSize.X > dwBufferSize.X)
-	    dwWindowSize.X = dwBufferSize.X;
-	csbi.srWindow.Right = dwBufferSize.X - 1;
-	csbi.srWindow.Left = dwBufferSize.X - dwWindowSize.X;
+	dw_ಕಿಟಕಿ_ಗಾತ್ರ.X = SRWIDTH(csbi.sr_ಕಿಟಕಿ);
+	ಆದರೆ (dw_ಕಿಟಕಿ_ಗಾತ್ರ.X > dw_ಬಫರ್_ಗಾತ್ರ.X)
+	    dw_ಕಿಟಕಿ_ಗಾತ್ರ.X = dw_ಬಫರ್_ಗಾತ್ರ.X;
+	csbi.sr_ಕಿಟಕಿ.ಬಲ_4 = dw_ಬಫರ್_ಗಾತ್ರ.X - 1;
+	csbi.sr_ಕಿಟಕಿ.ಎಡ_4 = dw_ಬಫರ್_ಗಾತ್ರ.X - dw_ಕಿಟಕಿ_ಗಾತ್ರ.X;
 	NeedAdjust = TRUE;
     }
-    if (csbi.srWindow.Bottom >= dwBufferSize.Y)
+    ಆದರೆ (csbi.sr_ಕಿಟಕಿ.Bottom >= dw_ಬಫರ್_ಗಾತ್ರ.Y)
     {
-	dwWindowSize.Y = SRHEIGHT(csbi.srWindow);
-	if (dwWindowSize.Y > dwBufferSize.Y)
-	    dwWindowSize.Y = dwBufferSize.Y;
-	csbi.srWindow.Bottom = dwBufferSize.Y - 1;
-	csbi.srWindow.Top = dwBufferSize.Y - dwWindowSize.Y;
+	dw_ಕಿಟಕಿ_ಗಾತ್ರ.Y = SRHEIGHT(csbi.sr_ಕಿಟಕಿ);
+	ಆದರೆ (dw_ಕಿಟಕಿ_ಗಾತ್ರ.Y > dw_ಬಫರ್_ಗಾತ್ರ.Y)
+	    dw_ಕಿಟಕಿ_ಗಾತ್ರ.Y = dw_ಬಫರ್_ಗಾತ್ರ.Y;
+	csbi.sr_ಕಿಟಕಿ.Bottom = dw_ಬಫರ್_ಗಾತ್ರ.Y - 1;
+	csbi.sr_ಕಿಟಕಿ.ತುದಿ_2 = dw_ಬಫರ್_ಗಾತ್ರ.Y - dw_ಕಿಟಕಿ_ಗಾತ್ರ.Y;
 	NeedAdjust = TRUE;
     }
-    if (NeedAdjust && WantAdjust)
+    ಆದರೆ (NeedAdjust && WantAdjust)
     {
-	if (!SetConsoleWindowInfo(g_hConOut, TRUE, &csbi.srWindow))
-	    return FALSE;
+	ಆದರೆ (!ಗಣ_Console_ಕಿಟಕಿ_Info(g_h_Con_ಹೊರಹೋಗು, TRUE, &csbi.sr_ಕಿಟಕಿ))
+	    ಹಿಂತಿರುಗಿ FALSE;
     }
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
-typedef struct ConsoleBufferStruct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ Console_ಬಫರ್_Struct
 {
     BOOL			IsValid;
-    CONSOLE_SCREEN_BUFFER_INFO	Info;
-    PCHAR_INFO			Buffer;
-    COORD			BufferSize;
+    CONSOLE_SCREEN_ಬಫರ್_INFO	Info;
+    PCHAR_INFO			ಬಫರ್_2;
+    COORD			ಬಫರ್_ಗಾತ್ರ_2;
     PSMALL_RECT			Regions;
-    int				NumRegions;
-} ConsoleBuffer;
+    ಪೂರ್ಣಾಂಕ				ಅಂಕೆ_Regions;
+} Console_ಬಫರ್;
 
 /*
  * SaveConsoleBuffer()
@@ -3220,47 +3220,47 @@ typedef struct ConsoleBufferStruct
  *  TRUE if all information was saved; FALSE otherwise
  *  If FALSE, still sets cb->IsValid if buffer characteristics were saved.
  */
-    static BOOL
-SaveConsoleBuffer(
-    ConsoleBuffer *cb)
+    ಸ್ಥಿರ BOOL
+Save_Console_ಬಫರ್(
+    Console_ಬಫರ್ *cb)
 {
-    DWORD NumCells;
-    COORD BufferCoord;
+    DWORD ಅಂಕೆ_Cells;
+    COORD ಬಫರ್_Coord;
     SMALL_RECT ReadRegion;
-    WORD Y, Y_incr;
-    int i, numregions;
+    ಶಬ್ದ_2 Y, Y_incr;
+    ಪೂರ್ಣಾಂಕ i, numregions;
 
-    if (cb == NULL)
-	return FALSE;
+    ಆದರೆ (cb == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    if (!GetConsoleScreenBufferInfo(g_hConOut, &cb->Info))
+    ಆದರೆ (!Get_Console_Screen_ಬಫರ್_Info(g_h_Con_ಹೊರಹೋಗು, &cb->Info))
     {
 	cb->IsValid = FALSE;
-	return FALSE;
+	ಹಿಂತಿರುಗಿ FALSE;
     }
     cb->IsValid = TRUE;
 
     // VTP uses alternate screen buffer.
     // No need to save buffer contents for restoration.
-    if (use_alternate_screen_buffer)
-	return TRUE;
+    ಆದರೆ (use_alternate_screen_ಬಫರ್)
+	ಹಿಂತಿರುಗಿ TRUE;
 
     /*
      * Allocate a buffer large enough to hold the entire console screen
      * buffer.  If this ConsoleBuffer structure has already been initialized
      * with a buffer of the correct size, then just use that one.
      */
-    if (!cb->IsValid || cb->Buffer == NULL ||
-	    cb->BufferSize.X != cb->Info.dwSize.X ||
-	    cb->BufferSize.Y != cb->Info.dwSize.Y)
+    ಆದರೆ (!cb->IsValid || cb->ಬಫರ್_2 == ಖಾಲಿ ||
+	    cb->ಬಫರ್_ಗಾತ್ರ_2.X != cb->Info.dw_ಗಾತ್ರ.X ||
+	    cb->ಬಫರ್_ಗಾತ್ರ_2.Y != cb->Info.dw_ಗಾತ್ರ.Y)
     {
-	cb->BufferSize.X = cb->Info.dwSize.X;
-	cb->BufferSize.Y = cb->Info.dwSize.Y;
-	NumCells = cb->BufferSize.X * cb->BufferSize.Y;
-	vim_free(cb->Buffer);
-	cb->Buffer = ALLOC_MULT(CHAR_INFO, NumCells);
-	if (cb->Buffer == NULL)
-	    return FALSE;
+	cb->ಬಫರ್_ಗಾತ್ರ_2.X = cb->Info.dw_ಗಾತ್ರ.X;
+	cb->ಬಫರ್_ಗಾತ್ರ_2.Y = cb->Info.dw_ಗಾತ್ರ.Y;
+	ಅಂಕೆ_Cells = cb->ಬಫರ್_ಗಾತ್ರ_2.X * cb->ಬಫರ್_ಗಾತ್ರ_2.Y;
+	vim_free(cb->ಬಫರ್_2);
+	cb->ಬಫರ್_2 = ALLOC_MULT(CHAR_INFO, ಅಂಕೆ_Cells);
+	ಆದರೆ (cb->ಬಫರ್_2 == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ FALSE;
     }
 
     /*
@@ -3272,52 +3272,52 @@ SaveConsoleBuffer(
      * same horizontal characteristics, so initialize them now.  The
      * height of each chunk will be (12000 / width).
      */
-    BufferCoord.X = 0;
-    ReadRegion.Left = 0;
-    ReadRegion.Right = cb->Info.dwSize.X - 1;
-    Y_incr = 12000 / cb->Info.dwSize.X;
+    ಬಫರ್_Coord.X = 0;
+    ReadRegion.ಎಡ_4 = 0;
+    ReadRegion.ಬಲ_4 = cb->Info.dw_ಗಾತ್ರ.X - 1;
+    Y_incr = 12000 / cb->Info.dw_ಗಾತ್ರ.X;
 
-    numregions = (cb->Info.dwSize.Y + Y_incr - 1) / Y_incr;
-    if (cb->Regions == NULL || numregions != cb->NumRegions)
+    numregions = (cb->Info.dw_ಗಾತ್ರ.Y + Y_incr - 1) / Y_incr;
+    ಆದರೆ (cb->Regions == ಖಾಲಿ || numregions != cb->ಅಂಕೆ_Regions)
     {
-	cb->NumRegions = numregions;
+	cb->ಅಂಕೆ_Regions = numregions;
 	vim_free(cb->Regions);
-	cb->Regions = ALLOC_MULT(SMALL_RECT, cb->NumRegions);
-	if (cb->Regions == NULL)
+	cb->Regions = ALLOC_MULT(SMALL_RECT, cb->ಅಂಕೆ_Regions);
+	ಆದರೆ (cb->Regions == ಖಾಲಿ)
 	{
-	    VIM_CLEAR(cb->Buffer);
-	    return FALSE;
+	    VIM_CLEAR(cb->ಬಫರ್_2);
+	    ಹಿಂತಿರುಗಿ FALSE;
 	}
     }
 
-    for (i = 0, Y = 0; i < cb->NumRegions; i++, Y += Y_incr)
+    ಗಾಗಿ (i = 0, Y = 0; i < cb->ಅಂಕೆ_Regions; i++, Y += Y_incr)
     {
 	/*
 	 * Read into position (0, Y) in our buffer.
 	 */
-	BufferCoord.Y = Y;
+	ಬಫರ್_Coord.Y = Y;
 	/*
 	 * Read the region whose top left corner is (0, Y) and whose bottom
 	 * right corner is (width - 1, Y + Y_incr - 1).  This should define
 	 * a region of size width by Y_incr.  Don't worry if this region is
 	 * too large for the remaining buffer; it will be cropped.
 	 */
-	ReadRegion.Top = Y;
+	ReadRegion.ತುದಿ_2 = Y;
 	ReadRegion.Bottom = Y + Y_incr - 1;
-	if (!ReadConsoleOutputW(g_hConOut,	// output handle
-		cb->Buffer,			// our buffer
-		cb->BufferSize,			// dimensions of our buffer
-		BufferCoord,			// offset in our buffer
+	ಆದರೆ (!ReadConsoleOutputW(g_h_Con_ಹೊರಹೋಗು,	// output handle
+		cb->ಬಫರ್_2,			// our buffer
+		cb->ಬಫರ್_ಗಾತ್ರ_2,			// dimensions of our buffer
+		ಬಫರ್_Coord,			// offset in our buffer
 		&ReadRegion))			// region to save
 	{
-	    VIM_CLEAR(cb->Buffer);
+	    VIM_CLEAR(cb->ಬಫರ್_2);
 	    VIM_CLEAR(cb->Regions);
-	    return FALSE;
+	    ಹಿಂತಿರುಗಿ FALSE;
 	}
 	cb->Regions[i] = ReadRegion;
     }
 
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
@@ -3329,85 +3329,85 @@ SaveConsoleBuffer(
  * Returns:
  *  TRUE on success
  */
-    static BOOL
-RestoreConsoleBuffer(
-    ConsoleBuffer   *cb,
+    ಸ್ಥಿರ BOOL
+Restore_Console_ಬಫರ್(
+    Console_ಬಫರ್   *cb,
     BOOL	    RestoreScreen)
 {
-    COORD BufferCoord;
+    COORD ಬಫರ್_Coord;
     SMALL_RECT WriteRegion;
-    int i;
+    ಪೂರ್ಣಾಂಕ i;
 
-    if (cb == NULL || !cb->IsValid)
-	return FALSE;
+    ಆದರೆ (cb == ಖಾಲಿ || !cb->IsValid)
+	ಹಿಂತಿರುಗಿ FALSE;
 
     /*
      * Before restoring the buffer contents, clear the current buffer, and
      * restore the cursor position and window information.  Doing this now
      * prevents old buffer contents from "flashing" onto the screen.
      */
-    if (RestoreScreen)
-	ClearConsoleBuffer(cb->Info.wAttributes);
+    ಆದರೆ (RestoreScreen)
+	Clear_Console_ಬಫರ್(cb->Info.w_ಗುಣಲಕ್ಷಣಗಳು);
 
-    FitConsoleWindow(cb->Info.dwSize, TRUE);
-    if (!SetConsoleScreenBufferSize(g_hConOut, cb->Info.dwSize))
-	return FALSE;
-    if (!SetConsoleTextAttribute(g_hConOut, cb->Info.wAttributes))
-	return FALSE;
+    Fit_Console_ಕಿಟಕಿ(cb->Info.dw_ಗಾತ್ರ, TRUE);
+    ಆದರೆ (!ಗಣ_Console_Screen_ಬಫರ್_ಗಾತ್ರ(g_h_Con_ಹೊರಹೋಗು, cb->Info.dw_ಗಾತ್ರ))
+	ಹಿಂತಿರುಗಿ FALSE;
+    ಆದರೆ (!ಗಣ_Console_ಪಠ್ಯ_Attribute(g_h_Con_ಹೊರಹೋಗು, cb->Info.w_ಗುಣಲಕ್ಷಣಗಳು))
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    if (!RestoreScreen)
+    ಆದರೆ (!RestoreScreen)
     {
 	/*
 	 * No need to restore the screen buffer contents, so we're done.
 	 */
-	return TRUE;
+	ಹಿಂತಿರುಗಿ TRUE;
     }
 
-    if (!SetConsoleCursorPosition(g_hConOut, cb->Info.dwCursorPosition))
-	return FALSE;
-    if (!SetConsoleWindowInfo(g_hConOut, TRUE, &cb->Info.srWindow))
-	return FALSE;
+    ಆದರೆ (!ಗಣ_Console_Cursor_Position(g_h_Con_ಹೊರಹೋಗು, cb->Info.dwCursorPosition))
+	ಹಿಂತಿರುಗಿ FALSE;
+    ಆದರೆ (!ಗಣ_Console_ಕಿಟಕಿ_Info(g_h_Con_ಹೊರಹೋಗು, TRUE, &cb->Info.sr_ಕಿಟಕಿ))
+	ಹಿಂತಿರುಗಿ FALSE;
 
     // VTP uses alternate screen buffer.
     // No need to restore buffer contents.
-    if (use_alternate_screen_buffer)
-	return TRUE;
+    ಆದರೆ (use_alternate_screen_ಬಫರ್)
+	ಹಿಂತಿರುಗಿ TRUE;
 
     /*
      * Restore the screen buffer contents.
      */
-    if (cb->Buffer != NULL)
+    ಆದರೆ (cb->ಬಫರ್_2 != ಖಾಲಿ)
     {
-	for (i = 0; i < cb->NumRegions; i++)
+	ಗಾಗಿ (i = 0; i < cb->ಅಂಕೆ_Regions; i++)
 	{
-	    BufferCoord.X = cb->Regions[i].Left;
-	    BufferCoord.Y = cb->Regions[i].Top;
+	    ಬಫರ್_Coord.X = cb->Regions[i].ಎಡ_4;
+	    ಬಫರ್_Coord.Y = cb->Regions[i].ತುದಿ_2;
 	    WriteRegion = cb->Regions[i];
-	    if (!WriteConsoleOutputW(g_hConOut,	// output handle
-			cb->Buffer,		// our buffer
-			cb->BufferSize,		// dimensions of our buffer
-			BufferCoord,		// offset in our buffer
+	    ಆದರೆ (!WriteConsoleOutputW(g_h_Con_ಹೊರಹೋಗು,	// output handle
+			cb->ಬಫರ್_2,		// our buffer
+			cb->ಬಫರ್_ಗಾತ್ರ_2,		// dimensions of our buffer
+			ಬಫರ್_Coord,		// offset in our buffer
 			&WriteRegion))		// region to restore
-		return FALSE;
+		ಹಿಂತಿರುಗಿ FALSE;
 	}
     }
 
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 # define FEAT_RESTORE_ORIG_SCREEN
 # ifdef FEAT_RESTORE_ORIG_SCREEN
-static ConsoleBuffer g_cbOrig = { 0 };
+ಸ್ಥಿರ Console_ಬಫರ್ g_cbOrig = { 0 };
 # endif
-static ConsoleBuffer g_cbNonTermcap = { 0 };
-static ConsoleBuffer g_cbTermcap = { 0 };
+ಸ್ಥಿರ Console_ಬಫರ್ g_cbNonTermcap = { 0 };
+ಸ್ಥಿರ Console_ಬಫರ್ g_cbTermcap = { 0 };
 
-char g_szOrigTitle[256] = { 0 };
-HWND g_hWnd = NULL;	// also used in os_mswin.c
-static HICON g_hOrigIconSmall = NULL;
-static HICON g_hOrigIcon = NULL;
-static HICON g_hVimIcon = NULL;
-static BOOL g_fCanChangeIcon = FALSE;
+ಅಕ್ಷರ g_szOrigTitle[256] = { 0 };
+HWND g_hWnd = ಖಾಲಿ;	// also used in os_mswin.c
+ಸ್ಥಿರ HICON g_hOrigIconSmall = ಖಾಲಿ;
+ಸ್ಥಿರ HICON g_hOrigIcon = ಖಾಲಿ;
+ಸ್ಥಿರ HICON g_hVimIcon = ಖಾಲಿ;
+ಸ್ಥಿರ BOOL g_fCanChangeIcon = FALSE;
 
 /*
  * GetConsoleIcon()
@@ -3417,22 +3417,22 @@ static BOOL g_fCanChangeIcon = FALSE;
  * Returns:
  *  TRUE on success
  */
-    static BOOL
+    ಸ್ಥಿರ BOOL
 GetConsoleIcon(
     HWND	hWnd,
     HICON	*phIconSmall,
     HICON	*phIcon)
 {
-    if (hWnd == NULL)
-	return FALSE;
+    ಆದರೆ (hWnd == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    if (phIconSmall != NULL)
-	*phIconSmall = (HICON)SendMessage(hWnd, WM_GETICON,
+    ಆದರೆ (phIconSmall != ಖಾಲಿ)
+	*phIconSmall = (HICON)Send_ಸಂದೇಶ(hWnd, WM_GETICON,
 					       (WPARAM)ICON_SMALL, (LPARAM)0);
-    if (phIcon != NULL)
-	*phIcon = (HICON)SendMessage(hWnd, WM_GETICON,
+    ಆದರೆ (phIcon != ಖಾಲಿ)
+	*phIcon = (HICON)Send_ಸಂದೇಶ(hWnd, WM_GETICON,
 						 (WPARAM)ICON_BIG, (LPARAM)0);
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
@@ -3443,22 +3443,22 @@ GetConsoleIcon(
  * Returns:
  *  TRUE on success
  */
-    static BOOL
-SetConsoleIcon(
+    ಸ್ಥಿರ BOOL
+ಗಣ_Console_Icon(
     HWND    hWnd,
     HICON   hIconSmall,
     HICON   hIcon)
 {
-    if (hWnd == NULL)
-	return FALSE;
+    ಆದರೆ (hWnd == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    if (hIconSmall != NULL)
-	SendMessage(hWnd, WM_SETICON,
+    ಆದರೆ (hIconSmall != ಖಾಲಿ)
+	Send_ಸಂದೇಶ(hWnd, WM_SETICON,
 			    (WPARAM)ICON_SMALL, (LPARAM)hIconSmall);
-    if (hIcon != NULL)
-	SendMessage(hWnd, WM_SETICON,
+    ಆದರೆ (hIcon != ಖಾಲಿ)
+	Send_ಸಂದೇಶ(hWnd, WM_SETICON,
 			    (WPARAM)ICON_BIG, (LPARAM) hIcon);
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
@@ -3471,12 +3471,12 @@ SetConsoleIcon(
  *  nor is it possible when running Vim remotely using Telnet (since the
  *  console window the user sees is owned by a remote process).
  */
-    static void
-SaveConsoleTitleAndIcon(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+SaveConsoleTitleAndIcon(ಶೂನ್ಯ)
 {
     // Save the original title.
-    if (!GetConsoleTitle(g_szOrigTitle, sizeof(g_szOrigTitle)))
-	return;
+    ಆದರೆ (!GetConsoleTitle(g_szOrigTitle, ಗಾತ್ರ(g_szOrigTitle)))
+	ಹಿಂತಿರುಗಿ;
 
     /*
      * Obtain a handle to the console window using GetConsoleWindow() from
@@ -3485,86 +3485,86 @@ SaveConsoleTitleAndIcon(void)
      * 2000.  On older operating systems, we can't change the window icon
      * anyway.
      */
-    g_hWnd = GetConsoleWindow();
-    if (g_hWnd == NULL)
-	return;
+    g_hWnd = Get_Console_ಕಿಟಕಿ();
+    ಆದರೆ (g_hWnd == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     // Save the original console window icon.
     GetConsoleIcon(g_hWnd, &g_hOrigIconSmall, &g_hOrigIcon);
-    if (g_hOrigIconSmall == NULL || g_hOrigIcon == NULL)
-	return;
+    ಆದರೆ (g_hOrigIconSmall == ಖಾಲಿ || g_hOrigIcon == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     // Extract the first icon contained in the Vim executable.
-    if (
+    ಆದರೆ (
 # ifdef FEAT_LIBCALL
-	    mch_icon_load((HANDLE *)&g_hVimIcon) == FAIL ||
+	    mch_icon_ತುಂಬು((HANDLE *)&g_hVimIcon) == FAIL ||
 # endif
-	    g_hVimIcon == NULL)
-	g_hVimIcon = ExtractIcon(NULL, (LPCSTR)exe_name, 0);
-    if (g_hVimIcon != NULL)
+	    g_hVimIcon == ಖಾಲಿ)
+	g_hVimIcon = ಹೊರತೆಗೆ_Icon(ಖಾಲಿ, (LPCSTR)exe_name, 0);
+    ಆದರೆ (g_hVimIcon != ಖಾಲಿ)
 	g_fCanChangeIcon = TRUE;
 }
 
-static int g_fWindInitCalled = FALSE;
-static int g_fTermcapMode = FALSE;
-static CONSOLE_CURSOR_INFO g_cci;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ g_fWindInitCalled = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ g_f_Termcap_ಬಹುಲಕ = FALSE;
+ಸ್ಥಿರ CONSOLE_CURSOR_INFO g_cci;
 
 /*
  * non-GUI version of mch_init().
  */
-    static void
-mch_init_c(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+mch_init_c(ಶೂನ್ಯ)
 {
 # ifndef FEAT_RESTORE_ORIG_SCREEN
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    CONSOLE_SCREEN_ಬಫರ್_INFO csbi;
 # endif
 # ifndef __MINGW32__
-    extern int _fmode;
+    ಬಾಹ್ಯ ಪೂರ್ಣಾಂಕ _fmode;
 # endif
 
     // Silently handle invalid parameters to CRT functions
-    SET_INVALID_PARAM_HANDLER;
+    ಗಣ_INVALID_PARAM_HANDLER;
 
     // Let critical errors result in a failure, not in a dialog box.  Required
     // for the timestamp test to work on removed floppies.
-    SetErrorMode(SEM_FAILCRITICALERRORS);
+    ಗಣ_Error_ಬಹುಲಕ(SEM_FAILCRITICALERRORS);
 
-    _fmode = O_BINARY;		// we do our own CR-LF translation
-    out_flush();
+    _fmode = O_ದ್ವಿಮಾನ;		// we do our own CR-LF translation
+    ಹೊರಹೋಗು_flush();
 
     // Obtain handles for the standard Console I/O devices
-    if (read_cmd_fd == 0)
-	g_hConIn =  GetStdHandle(STD_INPUT_HANDLE);
-    else
+    ಆದರೆ (read_cmd_fd == 0)
+	g_h_Con_ಒಳ =  GetStdHandle(STD_ಒಳಹರಿವು_HANDLE);
+    ಇಲ್ಲದಿದ್ದರೆ
 	create_conin();
-    g_hConOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    g_h_Con_ಹೊರಹೋಗು = GetStdHandle(STD_OUTPUT_HANDLE);
 
     wt_init();
     vtp_flag_init();
 # ifdef FEAT_RESTORE_ORIG_SCREEN
     // Save the initial console buffer for later restoration
-    SaveConsoleBuffer(&g_cbOrig);
-    g_attrCurrent = g_attrDefault = g_cbOrig.Info.wAttributes;
-# else
+    Save_Console_ಬಫರ್(&g_cbOrig);
+    g_attrCurrent = g_attrDefault = g_cbOrig.Info.w_ಗುಣಲಕ್ಷಣಗಳು;
+# ಇಲ್ಲದಿದ್ದರೆ
     // Get current text attributes
-    GetConsoleScreenBufferInfo(g_hConOut, &csbi);
-    g_attrCurrent = g_attrDefault = csbi.wAttributes;
+    Get_Console_Screen_ಬಫರ್_Info(g_h_Con_ಹೊರಹೋಗು, &csbi);
+    g_attrCurrent = g_attrDefault = csbi.w_ಗುಣಲಕ್ಷಣಗಳು;
 # endif
-    if (cterm_normal_fg_color == 0)
-	cterm_normal_fg_color = (g_attrCurrent & 0xf) + 1;
-    if (cterm_normal_bg_color == 0)
-	cterm_normal_bg_color = ((g_attrCurrent >> 4) & 0xf) + 1;
+    ಆದರೆ (cterm_ಸಾಮಾನ್ಯ_fg_color == 0)
+	cterm_ಸಾಮಾನ್ಯ_fg_color = (g_attrCurrent & 0xf) + 1;
+    ಆದರೆ (cterm_ಸಾಮಾನ್ಯ_bg_color == 0)
+	cterm_ಸಾಮಾನ್ಯ_bg_color = ((g_attrCurrent >> 4) & 0xf) + 1;
 
     // Fg and Bg color index number at startup
-    g_color_index_fg = g_attrDefault & 0xf;
-    g_color_index_bg = (g_attrDefault >> 4) & 0xf;
+    g_color_ಸೂಚ್ಯಂಕ_fg = g_attrDefault & 0xf;
+    g_color_ಸೂಚ್ಯಂಕ_bg = (g_attrDefault >> 4) & 0xf;
 
     // set termcap codes to current text attributes
     update_tcap(g_attrCurrent);
 
-    GetConsoleCursorInfo(g_hConOut, &g_cci);
-    GetConsoleMode(g_hConIn,  &g_cmodein);
-    GetConsoleMode(g_hConOut, &g_cmodeout);
+    GetConsoleCursorInfo(g_h_Con_ಹೊರಹೋಗು, &g_cci);
+    Get_Console_ಬಹುಲಕ(g_h_Con_ಒಳ,  &g_cmodein);
+    Get_Console_ಬಹುಲಕ(g_h_Con_ಹೊರಹೋಗು, &g_cmodeout);
 
     SaveConsoleTitleAndIcon();
     /*
@@ -3572,24 +3572,24 @@ mch_init_c(void)
      * Note that Vim presently only has one size of icon (32x32), but it
      * automatically gets scaled down to 16x16 when setting the small icon.
      */
-    if (g_fCanChangeIcon)
-	SetConsoleIcon(g_hWnd, g_hVimIcon, g_hVimIcon);
+    ಆದರೆ (g_fCanChangeIcon)
+	ಗಣ_Console_Icon(g_hWnd, g_hVimIcon, g_hVimIcon);
 
     ui_get_shellsize();
 
     vtp_init();
     // Switch to a new alternate screen buffer.
-    if (use_alternate_screen_buffer)
+    ಆದರೆ (use_alternate_screen_ಬಫರ್)
 	vtp_printf("\033[?1049h");
 
 # ifdef MCH_WRITE_DUMP
     fdDump = fopen("dump", "wt");
 
-    if (fdDump)
+    ಆದರೆ (fdDump)
     {
 	time_t t;
 
-	time(&t);
+	ಸಮಯ(&t);
 	fputs(ctime(&t), fdDump);
 	fflush(fdDump);
     }
@@ -3609,11 +3609,11 @@ mch_init_c(void)
  * Shut down and exit with status `r'
  * Careful: mch_exit() may be called before mch_init()!
  */
-    static void
-mch_exit_c(int r)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+mch_exit_c(ಪೂರ್ಣಾಂಕ r)
 {
     // Copy flag since stoptermcap() will clear the flag.
-    int fTermcapMode = g_fTermcapMode;
+    ಪೂರ್ಣಾಂಕ f_Termcap_ಬಹುಲಕ = g_f_Termcap_ಬಹುಲಕ;
 
     exiting = TRUE;
 
@@ -3621,15 +3621,15 @@ mch_exit_c(int r)
 
     stoptermcap();
     // Switch back to main screen buffer if TermcapMode was not active.
-    if (!fTermcapMode &&  use_alternate_screen_buffer)
+    ಆದರೆ (!f_Termcap_ಬಹುಲಕ &&  use_alternate_screen_ಬಫರ್)
 	vtp_printf("\033[?1049l");
 
-    if (g_fWindInitCalled)
+    ಆದರೆ (g_fWindInitCalled)
 	settmode(TMODE_COOK);
 
     ml_close_all(TRUE);		// remove all memfiles
 
-    if (g_fWindInitCalled)
+    ಆದರೆ (g_fWindInitCalled)
     {
 	mch_restore_title(SAVE_RESTORE_BOTH);
 	/*
@@ -3637,130 +3637,130 @@ mch_exit_c(int r)
 	 * what they were at startup.  Don't do this when the window is
 	 * closed, Vim would hang here.
 	 */
-	if (g_fCanChangeIcon && !g_fForceExit)
-	    SetConsoleIcon(g_hWnd, g_hOrigIconSmall, g_hOrigIcon);
+	ಆದರೆ (g_fCanChangeIcon && !g_fForceExit)
+	    ಗಣ_Console_Icon(g_hWnd, g_hOrigIconSmall, g_hOrigIcon);
 
 # ifdef MCH_WRITE_DUMP
-	if (fdDump)
+	ಆದರೆ (fdDump)
 	{
 	    time_t t;
 
-	    time(&t);
+	    ಸಮಯ(&t);
 	    fputs(ctime(&t), fdDump);
 	    fclose(fdDump);
 	}
-	fdDump = NULL;
+	fdDump = ಖಾಲಿ;
 # endif
     }
 
-    SetConsoleCursorInfo(g_hConOut, &g_cci);
-    SetConsoleMode(g_hConIn,  g_cmodein | ENABLE_EXTENDED_FLAGS);
-    SetConsoleMode(g_hConOut, g_cmodeout);
+    ಗಣ_Console_Cursor_Info(g_h_Con_ಹೊರಹೋಗು, &g_cci);
+    ಗಣ_Console_ಬಹುಲಕ(g_h_Con_ಒಳ,  g_cmodein | ENABLE_EXTENDED_FLAGS);
+    ಗಣ_Console_ಬಹುಲಕ(g_h_Con_ಹೊರಹೋಗು, g_cmodeout);
 
 # ifdef DYNAMIC_GETTEXT
-    dyn_libintl_end();
+    dyn_libintl_ಕೊನೆ();
 # endif
 
-    exit(r);
+    ನಿರ್ಗಮಿಸು(r);
 }
-#endif // !FEAT_GUI_MSWIN || VIMDLL
+#ಆದರೆ_ಅಂತ್ಯ // !FEAT_GUI_MSWIN || VIMDLL
 
-    void
-mch_init(void)
+    ಶೂನ್ಯ
+mch_init(ಶೂನ್ಯ)
 {
-#ifdef VIMDLL
-    if (gui.starting)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VIMDLL
+    ಆದರೆ (gui.starting)
 	mch_init_g();
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	mch_init_c();
-#elif defined(FEAT_GUI_MSWIN)
+#ಅಥವಾಆದರೆ defined(FEAT_GUI_MSWIN)
     mch_init_g();
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
     mch_init_c();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-    void
-mch_exit(int r)
+    ಶೂನ್ಯ
+mch_exit(ಪೂರ್ಣಾಂಕ r)
 {
-#ifdef FEAT_NETBEANS_INTG
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_NETBEANS_INTG
     netbeans_send_disconnect();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef VIMDLL
-    if (vimrun_path_allocated)
-	vim_free(vimrun_path.string);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VIMDLL
+    ಆದರೆ (vimrun_ಮಾರ್ಗ_allocated)
+	vim_free(vimrun_ಮಾರ್ಗ.string);
 
-    if (gui.in_use || gui.starting)
+    ಆದರೆ (gui.ಒಳ_use || gui.starting)
 	mch_exit_g(r);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	mch_exit_c(r);
-#elif defined(FEAT_GUI_MSWIN)
-    if (vimrun_path_allocated)
-	vim_free(vimrun_path.string);
+#ಅಥವಾಆದರೆ defined(FEAT_GUI_MSWIN)
+    ಆದರೆ (vimrun_ಮಾರ್ಗ_allocated)
+	vim_free(vimrun_ಮಾರ್ಗ.string);
     mch_exit_g(r);
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
     mch_exit_c(r);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Do we have an interactive window?
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_check_win(
-    int argc UNUSED,
-    char **argv UNUSED)
+    ಪೂರ್ಣಾಂಕ argc ಬಳಸದ,
+    ಅಕ್ಷರ **argv ಬಳಸದ)
 {
     mch_get_exe_name();
 
-#if defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
-    return OK;	    // GUI always has a tty
-#else
+#ಆದರೆ defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
+    ಹಿಂತಿರುಗಿ OK;	    // GUI always has a tty
+#ಇಲ್ಲದಿದ್ದರೆ
 # ifdef VIMDLL
-    if (gui.in_use)
-	return OK;
+    ಆದರೆ (gui.ಒಳ_use)
+	ಹಿಂತಿರುಗಿ OK;
 # endif
-    if (isatty(1))
-	return OK;
-    return FAIL;
-#endif
+    ಆದರೆ (isatty(1))
+	ಹಿಂತಿರುಗಿ OK;
+    ಹಿಂತಿರುಗಿ FAIL;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Set the case of the file name, if it already exists.
  * When "len" is > 0, also expand short to long filenames.
  */
-    void
+    ಶೂನ್ಯ
 fname_case(
     char_u	*name,
-    int		len)
+    ಪೂರ್ಣಾಂಕ		len)
 {
     WCHAR   *p;
-    WCHAR   buf[_MAX_PATH + 1];
+    WCHAR   buf[MAX_ಮಾರ್ಗ_2 + 1];
 
-    if (*name == NUL)
-	return;
+    ಆದರೆ (*name == NUL)
+	ಹಿಂತಿರುಗಿ;
 
     slash_adjust(name);
 
-    p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return;
+    p = enc_ಗಮ್ಯ_utf16(name, ಖಾಲಿ);
+    ಆದರೆ (p == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    if (GetLongPathNameW(p, buf, _MAX_PATH))
+    ಆದರೆ (Get_Long_ಮಾರ್ಗ_Name_W(p, buf, MAX_ಮಾರ್ಗ_2))
     {
-	char_u	*q = utf16_to_enc(buf, NULL);
+	char_u	*q = utf16_ಗಮ್ಯ_enc(buf, ಖಾಲಿ);
 
-	if (q != NULL)
+	ಆದರೆ (q != ಖಾಲಿ)
 	{
-	    if (len > 0)
+	    ಆದರೆ (len > 0)
 		vim_strncpy(name, q, len - 1);
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		size_t  namelen = STRLEN(name);
 
-		if (namelen >= STRLEN(q))
+		ಆದರೆ (namelen >= STRLEN(q))
 		    vim_strncpy(name, q, namelen);
 	    }
 	    vim_free(q);
@@ -3773,47 +3773,47 @@ fname_case(
 /*
  * Insert user name in s[len].
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_get_user_name(
     char_u  *s,
-    int	    len)
+    ಪೂರ್ಣಾಂಕ	    len)
 {
     WCHAR wszUserName[256 + 1];	// UNLEN is 256
-    DWORD wcch = ARRAY_LENGTH(wszUserName);
+    DWORD wcch = ARRAY_ಉದ್ದಳತೆ(wszUserName);
 
-    if (GetUserNameW(wszUserName, &wcch))
+    ಆದರೆ (GetUserNameW(wszUserName, &wcch))
     {
-	char_u  *p = utf16_to_enc(wszUserName, NULL);
+	char_u  *p = utf16_ಗಮ್ಯ_enc(wszUserName, ಖಾಲಿ);
 
-	if (p != NULL)
+	ಆದರೆ (p != ಖಾಲಿ)
 	{
 	    vim_strncpy(s, p, len - 1);
 	    vim_free(p);
-	    return OK;
+	    ಹಿಂತಿರುಗಿ OK;
 	}
     }
     s[0] = NUL;
-    return FAIL;
+    ಹಿಂತಿರುಗಿ FAIL;
 }
 
 
 /*
  * Insert host name in s[len].
  */
-    void
+    ಶೂನ್ಯ
 mch_get_host_name(
     char_u	*s,
-    int		len)
+    ಪೂರ್ಣಾಂಕ		len)
 {
     WCHAR wszHostName[256 + 1];
-    DWORD wcch = ARRAY_LENGTH(wszHostName);
+    DWORD wcch = ARRAY_ಉದ್ದಳತೆ(wszHostName);
 
-    if (!GetComputerNameW(wszHostName, &wcch))
-	return;
+    ಆದರೆ (!GetComputerNameW(wszHostName, &wcch))
+	ಹಿಂತಿರುಗಿ;
 
-    char_u  *p = utf16_to_enc(wszHostName, NULL);
-    if (p == NULL)
-	return;
+    char_u  *p = utf16_ಗಮ್ಯ_enc(wszHostName, ಖಾಲಿ);
+    ಆದರೆ (p == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     vim_strncpy(s, p, len - 1);
     vim_free(p);
@@ -3823,40 +3823,40 @@ mch_get_host_name(
 /*
  * return process ID
  */
-    long
-mch_get_pid(void)
+    ದೀರ್ಘ
+mch_get_pid(ಶೂನ್ಯ)
 {
-    return (long)GetCurrentProcessId();
+    ಹಿಂತಿರುಗಿ (ದೀರ್ಘ)GetCurrentProcessId();
 }
 
 /*
  * return TRUE if process "pid" is still running
  */
-    int
-mch_process_running(long pid)
+    ಪೂರ್ಣಾಂಕ
+mch_process_running(ದೀರ್ಘ pid)
 {
     HANDLE  hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, 0, (DWORD)pid);
-    DWORD   status = 0;
-    int	    ret = FALSE;
+    DWORD   ಸ್ಥಿತಿ_2 = 0;
+    ಪೂರ್ಣಾಂಕ	    ret = FALSE;
 
-    if (hProcess == NULL)
-	return FALSE;  // might not have access
-    if (GetExitCodeProcess(hProcess, &status))
-	ret = status == STILL_ACTIVE;
+    ಆದರೆ (hProcess == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FALSE;  // might not have access
+    ಆದರೆ (Get_Exit_ಸಂಕೇತ_Process(hProcess, &ಸ್ಥಿತಿ_2))
+	ret = ಸ್ಥಿತಿ_2 == STILL_ಸಕ್ರಿಯ;
     CloseHandle(hProcess);
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
 /*
  * Get name of current directory into buffer 'buf' of length 'len' bytes.
  * Return OK for success, FAIL for failure.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_dirname(
     char_u	*buf,
-    int		len)
+    ಪೂರ್ಣಾಂಕ		len)
 {
-    WCHAR   wbuf[_MAX_PATH + 1];
+    WCHAR   wbuf[MAX_ಮಾರ್ಗ_2 + 1];
 
     /*
      * Originally this was:
@@ -3864,46 +3864,46 @@ mch_dirname(
      * But the Win32s known bug list says that getcwd() doesn't work
      * so use the Win32 system call instead. <Negri>
      */
-    if (GetCurrentDirectoryW(_MAX_PATH, wbuf) == 0)
-	return FAIL;
+    ಆದರೆ (GetCurrentDirectoryW(MAX_ಮಾರ್ಗ_2, wbuf) == 0)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    WCHAR   wcbuf[_MAX_PATH + 1];
-    char_u  *p = NULL;
+    WCHAR   wcbuf[MAX_ಮಾರ್ಗ_2 + 1];
+    char_u  *p = ಖಾಲಿ;
 
-    if (GetLongPathNameW(wbuf, wcbuf, _MAX_PATH) != 0)
+    ಆದರೆ (Get_Long_ಮಾರ್ಗ_Name_W(wbuf, wcbuf, MAX_ಮಾರ್ಗ_2) != 0)
     {
-	p = utf16_to_enc(wcbuf, NULL);
-	if (p != NULL)
+	p = utf16_ಗಮ್ಯ_enc(wcbuf, ಖಾಲಿ);
+	ಆದರೆ (p != ಖಾಲಿ)
 	{
-	    if (STRLEN(p) >= (size_t)len)
+	    ಆದರೆ (STRLEN(p) >= (size_t)len)
 	    {
 		// long path name is too long, fall back to short one
 		VIM_CLEAR(p);
 	    }
 	}
     }
-    if (p == NULL)
-	p = utf16_to_enc(wbuf, NULL);
+    ಆದರೆ (p == ಖಾಲಿ)
+	p = utf16_ಗಮ್ಯ_enc(wbuf, ಖಾಲಿ);
 
-    if (p == NULL)
-	return FAIL;
+    ಆದರೆ (p == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
     vim_strncpy(buf, p, len - 1);
     vim_free(p);
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Get file permissions for "name".
  * Return mode_t or -1 for error.
  */
-    long
+    ದೀರ್ಘ
 mch_getperm(char_u *name)
 {
     stat_T	st;
 
-    return (mch_stat((char *)name, &st) == 0)
-	? (long)(unsigned short)st.st_mode
+    ಹಿಂತಿರುಗಿ (mch_stat((ಅಕ್ಷರ *)name, &st) == 0)
+	? (ದೀರ್ಘ)(ಚಿಹ್ನೆರಹಿತ ಗಿಡ್ಡ)st.st_ಬಹುಲಕ
 	: -1L;
 }
 
@@ -3913,35 +3913,35 @@ mch_getperm(char_u *name)
  *
  * Return FAIL for failure, OK otherwise.
  */
-    int
-mch_setperm(char_u *name, long perm)
+    ಪೂರ್ಣಾಂಕ
+mch_setperm(char_u *name, ದೀರ್ಘ perm)
 {
-    long	n;
+    ದೀರ್ಘ	n;
     WCHAR	*p;
 
-    p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return FAIL;
+    p = enc_ಗಮ್ಯ_utf16(name, ಖಾಲಿ);
+    ಆದರೆ (p == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
     n = _wchmod(p, perm);
     vim_free(p);
-    if (n == -1)
-	return FAIL;
+    ಆದರೆ (n == -1)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    win32_set_archive(name);
+    win32_ಗಣ_archive(name);
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Set hidden flag for "name".
  */
-    void
+    ಶೂನ್ಯ
 mch_hide(char_u *name)
 {
-    int attrs = win32_getattrs(name);
-    if (attrs == -1)
-	return;
+    ಪೂರ್ಣಾಂಕ attrs = win32_getattrs(name);
+    ಆದರೆ (attrs == -1)
+	ಹಿಂತಿರುಗಿ;
 
     attrs |= FILE_ATTRIBUTE_HIDDEN;
     win32_setattrs(name, attrs);
@@ -3950,30 +3950,30 @@ mch_hide(char_u *name)
 /*
  * Return TRUE if file "name" exists and is hidden.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_ishidden(char_u *name)
 {
-    int f = win32_getattrs(name);
+    ಪೂರ್ಣಾಂಕ f = win32_getattrs(name);
 
-    if (f == -1)
-	return FALSE;		    // file does not exist at all
+    ಆದರೆ (f == -1)
+	ಹಿಂತಿರುಗಿ FALSE;		    // file does not exist at all
 
-    return (f & FILE_ATTRIBUTE_HIDDEN) != 0;
+    ಹಿಂತಿರುಗಿ (f & FILE_ATTRIBUTE_HIDDEN) != 0;
 }
 
 /*
  * return TRUE if "name" is a directory
  * return FALSE if "name" is not a directory or upon error
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_isdir(char_u *name)
 {
-    int f = win32_getattrs(name);
+    ಪೂರ್ಣಾಂಕ f = win32_getattrs(name);
 
-    if (f == -1)
-	return FALSE;		    // file does not exist at all
+    ಆದರೆ (f == -1)
+	ಹಿಂತಿರುಗಿ FALSE;		    // file does not exist at all
 
-    return (f & FILE_ATTRIBUTE_DIRECTORY) != 0;
+    ಹಿಂತಿರುಗಿ (f & FILE_ATTRIBUTE_DIRECTORY) != 0;
 }
 
 /*
@@ -3981,24 +3981,24 @@ mch_isdir(char_u *name)
  * Return FALSE otherwise, also when the attributes cannot be obtained for
  * another reason.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_isdir_or_missing(char_u *name)
 {
     WCHAR	*p;
     DWORD	attr;
     DWORD	error = 0;
 
-    p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return FALSE;
-    attr = GetFileAttributesW(p);
-    if (attr == INVALID_FILE_ATTRIBUTES)
-	error = GetLastError();
+    p = enc_ಗಮ್ಯ_utf16(name, ಖಾಲಿ);
+    ಆದರೆ (p == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FALSE;
+    attr = Get_File_ಗುಣಲಕ್ಷಣಗಳು_W(p);
+    ಆದರೆ (attr == INVALID_FILE_ಗುಣಲಕ್ಷಣಗಳು)
+	error = Get_ಕೊನೆಯ_Error();
     vim_free(p);
 
-    if (attr == INVALID_FILE_ATTRIBUTES)
-	return error == ERROR_FILE_NOT_FOUND || error == ERROR_PATH_NOT_FOUND;
-    return (attr & FILE_ATTRIBUTE_DIRECTORY) != 0;
+    ಆದರೆ (attr == INVALID_FILE_ಗುಣಲಕ್ಷಣಗಳು)
+	ಹಿಂತಿರುಗಿ error == ERROR_FILE_NOT_ಸಿಕ್ಕಿತು || error == ERROR_ಮಾರ್ಗ_NOT_ಸಿಕ್ಕಿತು;
+    ಹಿಂತಿರುಗಿ (attr & FILE_ATTRIBUTE_DIRECTORY) != 0;
 }
 
 /*
@@ -4006,103 +4006,103 @@ mch_isdir_or_missing(char_u *name)
  * return FALSE if "name" is not a directory
  * return FALSE for error
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_isrealdir(char_u *name)
 {
-    return mch_isdir(name) && !mch_is_symbolic_link(name);
+    ಹಿಂತಿರುಗಿ mch_isdir(name) && !mch_is_symbolic_link(name);
 }
 
 /*
  * Create directory "name".
  * Return 0 on success, -1 on error.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_mkdir(char_u *name)
 {
     WCHAR   *p;
-    int	    retval;
+    ಪೂರ್ಣಾಂಕ	    retval;
 
-    p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return -1;
+    p = enc_ಗಮ್ಯ_utf16(name, ಖಾಲಿ);
+    ಆದರೆ (p == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ -1;
     retval = _wmkdir(p);
     vim_free(p);
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
 /*
  * Delete directory "name".
  * Return 0 on success, -1 on error.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_rmdir(char_u *name)
 {
     WCHAR   *p;
-    int	    retval;
+    ಪೂರ್ಣಾಂಕ	    retval;
 
-    p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return -1;
+    p = enc_ಗಮ್ಯ_utf16(name, ಖಾಲಿ);
+    ಆದರೆ (p == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ -1;
     retval = _wrmdir(p);
     vim_free(p);
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
 /*
  * Return TRUE if file "fname" has more than one link.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_is_hard_link(char_u *fname)
 {
     BY_HANDLE_FILE_INFORMATION info;
 
-    return win32_fileinfo(fname, &info) == FILEINFO_OK
-						   && info.nNumberOfLinks > 1;
+    ಹಿಂತಿರುಗಿ win32_fileinfo(fname, &info) == FILEINFO_OK
+						   && info.n_ಸಂಖ್ಯೆ_ದ_Links > 1;
 }
 
 /*
  * Return TRUE if "name" is a symbolic link (or a junction).
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_is_symbolic_link(char_u *name)
 {
-    HANDLE		hFind;
-    int			res = FALSE;
-    DWORD		fileFlags = 0, reparseTag = 0;
+    HANDLE		h_ಕಂಡುಹಿಡಿ;
+    ಪೂರ್ಣಾಂಕ			res = FALSE;
+    DWORD		fileFlags = 0, reparse_ಟ್ಯಾಗ್ = 0;
     WCHAR		*wn;
-    WIN32_FIND_DATAW	findDataW;
+    WIN32_ಕಂಡುಹಿಡಿ_DATAW	ಕಂಡುಹಿಡಿ_ದತ್ತಾಂಶ_W;
 
-    wn = enc_to_utf16(name, NULL);
-    if (wn == NULL)
-	return FALSE;
+    wn = enc_ಗಮ್ಯ_utf16(name, ಖಾಲಿ);
+    ಆದರೆ (wn == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    hFind = FindFirstFileW(wn, &findDataW);
+    h_ಕಂಡುಹಿಡಿ = ಕಂಡುಹಿಡಿ_ಮೊದಲ_File_W(wn, &ಕಂಡುಹಿಡಿ_ದತ್ತಾಂಶ_W);
     vim_free(wn);
-    if (hFind != INVALID_HANDLE_VALUE)
+    ಆದರೆ (h_ಕಂಡುಹಿಡಿ != INVALID_HANDLE_ಮೌಲ್ಯ)
     {
-	fileFlags = findDataW.dwFileAttributes;
-	reparseTag = findDataW.dwReserved0;
-	FindClose(hFind);
+	fileFlags = ಕಂಡುಹಿಡಿ_ದತ್ತಾಂಶ_W.dw_File_ಗುಣಲಕ್ಷಣಗಳು;
+	reparse_ಟ್ಯಾಗ್ = ಕಂಡುಹಿಡಿ_ದತ್ತಾಂಶ_W.dwReserved0;
+	ಕಂಡುಹಿಡಿ_Close(h_ಕಂಡುಹಿಡಿ);
     }
 
-    if ((fileFlags & FILE_ATTRIBUTE_REPARSE_POINT)
-	    && (reparseTag == IO_REPARSE_TAG_SYMLINK
-		|| reparseTag == IO_REPARSE_TAG_MOUNT_POINT))
+    ಆದರೆ ((fileFlags & FILE_ATTRIBUTE_REPARSE_ಬಿಂದು)
+	    && (reparse_ಟ್ಯಾಗ್ == IO_REPARSE_ಟ್ಯಾಗ್_SYMLINK
+		|| reparse_ಟ್ಯಾಗ್ == IO_REPARSE_ಟ್ಯಾಗ್_MOUNT_ಬಿಂದು))
 	res = TRUE;
 
-    return res;
+    ಹಿಂತಿರುಗಿ res;
 }
 
 /*
  * Return TRUE if file "fname" has more than one link or if it is a symbolic
  * link.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_is_linked(char_u *fname)
 {
-    if (mch_is_hard_link(fname) || mch_is_symbolic_link(fname))
-	return TRUE;
-    return FALSE;
+    ಆದರೆ (mch_is_hard_link(fname) || mch_is_symbolic_link(fname))
+	ಹಿಂತಿರುಗಿ TRUE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 /*
@@ -4112,36 +4112,36 @@ mch_is_linked(char_u *fname)
  * Returns FILEINFO_READ_FAIL when CreateFile() failed.
  * Returns FILEINFO_INFO_FAIL when GetFileInformationByHandle() failed.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 win32_fileinfo(char_u *fname, BY_HANDLE_FILE_INFORMATION *info)
 {
     HANDLE	hFile;
-    int		res = FILEINFO_READ_FAIL;
+    ಪೂರ್ಣಾಂಕ		res = FILEINFO_READ_FAIL;
     WCHAR	*wn;
 
-    wn = enc_to_utf16(fname, NULL);
-    if (wn == NULL)
-	return FILEINFO_ENC_FAIL;
+    wn = enc_ಗಮ್ಯ_utf16(fname, ಖಾಲಿ);
+    ಆದರೆ (wn == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FILEINFO_ENC_FAIL;
 
     hFile = CreateFileW(wn,	// file name
 	    GENERIC_READ,	// access mode
 	    FILE_SHARE_READ | FILE_SHARE_WRITE,	// share mode
-	    NULL,		// security descriptor
+	    ಖಾಲಿ,		// security descriptor
 	    OPEN_EXISTING,	// creation disposition
 	    FILE_FLAG_BACKUP_SEMANTICS,	// file attributes
-	    NULL);		// handle to template file
+	    ಖಾಲಿ);		// handle to template file
     vim_free(wn);
 
-    if (hFile == INVALID_HANDLE_VALUE)
-	return FILEINFO_READ_FAIL;
+    ಆದರೆ (hFile == INVALID_HANDLE_ಮೌಲ್ಯ)
+	ಹಿಂತಿರುಗಿ FILEINFO_READ_FAIL;
 
-    if (GetFileInformationByHandle(hFile, info) != 0)
+    ಆದರೆ (GetFileInformationByHandle(hFile, info) != 0)
 	res = FILEINFO_OK;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	res = FILEINFO_INFO_FAIL;
     CloseHandle(hFile);
 
-    return res;
+    ಹಿಂತಿರುಗಿ res;
 }
 
 /*
@@ -4149,20 +4149,20 @@ win32_fileinfo(char_u *fname, BY_HANDLE_FILE_INFORMATION *info)
  * -1 : error
  * else FILE_ATTRIBUTE_* defined in winnt.h
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 win32_getattrs(char_u *name)
 {
-    int		attr;
+    ಪೂರ್ಣಾಂಕ		attr;
     WCHAR	*p;
 
-    p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return INVALID_FILE_ATTRIBUTES;
+    p = enc_ಗಮ್ಯ_utf16(name, ಖಾಲಿ);
+    ಆದರೆ (p == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ INVALID_FILE_ಗುಣಲಕ್ಷಣಗಳು;
 
-    attr = GetFileAttributesW(p);
+    attr = Get_File_ಗುಣಲಕ್ಷಣಗಳು_W(p);
     vim_free(p);
 
-    return attr;
+    ಹಿಂತಿರುಗಿ attr;
 }
 
 /*
@@ -4170,34 +4170,34 @@ win32_getattrs(char_u *name)
  *
  * return -1 for failure, 0 otherwise
  */
-    static int
-win32_setattrs(char_u *name, int attrs)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+win32_setattrs(char_u *name, ಪೂರ್ಣಾಂಕ attrs)
 {
-    int	    res;
+    ಪೂರ್ಣಾಂಕ	    res;
     WCHAR   *p;
 
-    p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return -1;
+    p = enc_ಗಮ್ಯ_utf16(name, ಖಾಲಿ);
+    ಆದರೆ (p == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ -1;
 
-    res = SetFileAttributesW(p, attrs);
+    res = ಗಣ_File_ಗುಣಲಕ್ಷಣಗಳು_W(p, attrs);
     vim_free(p);
 
-    return res ? 0 : -1;
+    ಹಿಂತಿರುಗಿ res ? 0 : -1;
 }
 
 /*
  * Set archive flag for "name".
  */
-    static int
-win32_set_archive(char_u *name)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+win32_ಗಣ_archive(char_u *name)
 {
-    int attrs = win32_getattrs(name);
-    if (attrs == -1)
-	return -1;
+    ಪೂರ್ಣಾಂಕ attrs = win32_getattrs(name);
+    ಆದರೆ (attrs == -1)
+	ಹಿಂತಿರುಗಿ -1;
 
     attrs |= FILE_ATTRIBUTE_ARCHIVE;
-    return win32_setattrs(name, attrs);
+    ಹಿಂತಿರುಗಿ win32_setattrs(name, attrs);
 }
 
 /*
@@ -4205,12 +4205,12 @@ win32_set_archive(char_u *name)
  * Strange semantics of Win32: a readonly directory is writable, but you can't
  * delete a file.  Let's say this means it is writable.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_writable(char_u *name)
 {
-    int attrs = win32_getattrs(name);
+    ಪೂರ್ಣಾಂಕ attrs = win32_getattrs(name);
 
-    return (attrs != -1 && (!(attrs & FILE_ATTRIBUTE_READONLY)
+    ಹಿಂತಿರುಗಿ (attrs != -1 && (!(attrs & FILE_ATTRIBUTE_READONLY)
 			  || (attrs & FILE_ATTRIBUTE_DIRECTORY)));
 }
 
@@ -4220,10 +4220,10 @@ mch_writable(char_u *name)
  * When returning TRUE and "path" is not NULL save the path and set "*path" to
  * the allocated memory.
  */
-    int
-mch_can_exe(char_u *name, char_u **path, int use_path UNUSED)
+    ಪೂರ್ಣಾಂಕ
+mch_can_exe(char_u *name, char_u **ಮಾರ್ಗ, ಪೂರ್ಣಾಂಕ use_ಮಾರ್ಗ ಬಳಸದ)
 {
-    return executable_exists((char *)name, STRLEN(name), path, TRUE, TRUE);
+    ಹಿಂತಿರುಗಿ executable_exists((ಅಕ್ಷರ *)name, STRLEN(name), ಮಾರ್ಗ, TRUE, TRUE);
 }
 
 /*
@@ -4232,53 +4232,53 @@ mch_can_exe(char_u *name, char_u **path, int use_path UNUSED)
  * NODE_WRITABLE: writable device, socket, fifo, etc.
  * NODE_OTHER: non-writable things
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_nodetype(char_u *name)
 {
     HANDLE	hFile;
-    int		type;
+    ಪೂರ್ಣಾಂಕ		type;
     WCHAR	*wn;
 
     // We can't open a file with a name "\\.\con" or "\\.\prn" and trying to
     // read from it later will cause Vim to hang.  Thus return NODE_WRITABLE
     // here.
-    if (STRNCMP(name, "\\\\.\\", 4) == 0)
-	return NODE_WRITABLE;
+    ಆದರೆ (STRNCMP(name, "\\\\.\\", 4) == 0)
+	ಹಿಂತಿರುಗಿ ಗಂಟು_WRITABLE;
 
-    wn = enc_to_utf16(name, NULL);
-    if (wn == NULL)
-	return NODE_NORMAL;
+    wn = enc_ಗಮ್ಯ_utf16(name, ಖಾಲಿ);
+    ಆದರೆ (wn == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಗಂಟು_ಸಾಮಾನ್ಯ;
 
     hFile = CreateFileW(wn,	    // file name
 	    GENERIC_WRITE,	    // access mode
 	    0,			    // share mode
-	    NULL,		    // security descriptor
+	    ಖಾಲಿ,		    // security descriptor
 	    OPEN_EXISTING,	    // creation disposition
 	    0,			    // file attributes
-	    NULL);		    // handle to template file
+	    ಖಾಲಿ);		    // handle to template file
     vim_free(wn);
-    if (hFile == INVALID_HANDLE_VALUE)
-	return NODE_NORMAL;
+    ಆದರೆ (hFile == INVALID_HANDLE_ಮೌಲ್ಯ)
+	ಹಿಂತಿರುಗಿ ಗಂಟು_ಸಾಮಾನ್ಯ;
 
     type = GetFileType(hFile);
     CloseHandle(hFile);
-    if (type == FILE_TYPE_CHAR)
-	return NODE_WRITABLE;
-    if (type == FILE_TYPE_DISK)
-	return NODE_NORMAL;
-    return NODE_OTHER;
+    ಆದರೆ (type == FILE_TYPE_CHAR)
+	ಹಿಂತಿರುಗಿ ಗಂಟು_WRITABLE;
+    ಆದರೆ (type == FILE_TYPE_DISK)
+	ಹಿಂತಿರುಗಿ ಗಂಟು_ಸಾಮಾನ್ಯ;
+    ಹಿಂತಿರುಗಿ ಗಂಟು_OTHER;
 }
 
-#ifdef HAVE_ACL
-struct my_acl
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_ACL
+ರಚನೆ my_acl
 {
     PSECURITY_DESCRIPTOR    pSecurityDescriptor;
     PSID		    pSidOwner;
-    PSID		    pSidGroup;
+    PSID		    p_Sid_ಗುಂಪು;
     PACL		    pDacl;
     PACL		    pSacl;
 };
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Return a pointer to the ACL of file "fname" in allocated memory.
@@ -4287,22 +4287,22 @@ struct my_acl
     vim_acl_T
 mch_get_acl(char_u *fname)
 {
-#ifndef HAVE_ACL
-    return (vim_acl_T)NULL;
-#else
-    struct my_acl   *p = NULL;
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ HAVE_ACL
+    ಹಿಂತಿರುಗಿ (vim_acl_T)ಖಾಲಿ;
+#ಇಲ್ಲದಿದ್ದರೆ
+    ರಚನೆ my_acl   *p = ಖಾಲಿ;
     DWORD   err;
 
-    p = ALLOC_CLEAR_ONE(struct my_acl);
-    if (p != NULL)
+    p = ALLOC_CLEAR_ONE(ರಚನೆ my_acl);
+    ಆದರೆ (p != ಖಾಲಿ)
     {
 	WCHAR	*wn;
 
-	wn = enc_to_utf16(fname, NULL);
-	if (wn == NULL)
+	wn = enc_ಗಮ್ಯ_utf16(fname, ಖಾಲಿ);
+	ಆದರೆ (wn == ಖಾಲಿ)
 	{
 	    vim_free(p);
-	    return NULL;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
 
 	// Try to retrieve the entire security descriptor.
@@ -4310,167 +4310,167 @@ mch_get_acl(char_u *fname)
 		wn,			// Abstract filename
 		SE_FILE_OBJECT,		// File Object
 		OWNER_SECURITY_INFORMATION |
-		GROUP_SECURITY_INFORMATION |
+		ಗುಂಪು_SECURITY_INFORMATION |
 		DACL_SECURITY_INFORMATION |
 		SACL_SECURITY_INFORMATION,
 		&p->pSidOwner,		// Ownership information.
-		&p->pSidGroup,		// Group membership.
+		&p->p_Sid_ಗುಂಪು,		// Group membership.
 		&p->pDacl,		// Discretionary information.
 		&p->pSacl,		// For auditing purposes.
 		&p->pSecurityDescriptor);
-	if (err == ERROR_ACCESS_DENIED ||
+	ಆದರೆ (err == ERROR_ACCESS_DENIED ||
 		err == ERROR_PRIVILEGE_NOT_HELD)
 	{
 	    // Retrieve only DACL.
-	    (void)GetNamedSecurityInfoW(
+	    (ಶೂನ್ಯ)GetNamedSecurityInfoW(
 		    wn,
 		    SE_FILE_OBJECT,
 		    DACL_SECURITY_INFORMATION,
-		    NULL,
-		    NULL,
+		    ಖಾಲಿ,
+		    ಖಾಲಿ,
 		    &p->pDacl,
-		    NULL,
+		    ಖಾಲಿ,
 		    &p->pSecurityDescriptor);
 	}
-	if (p->pSecurityDescriptor == NULL)
+	ಆದರೆ (p->pSecurityDescriptor == ಖಾಲಿ)
 	{
 	    mch_free_acl((vim_acl_T)p);
-	    p = NULL;
+	    p = ಖಾಲಿ;
 	}
 	vim_free(wn);
     }
 
-    return (vim_acl_T)p;
-#endif
+    ಹಿಂತಿರುಗಿ (vim_acl_T)p;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#ifdef HAVE_ACL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_ACL
 /*
  * Check if "acl" contains inherited ACE.
  */
-    static BOOL
+    ಸ್ಥಿರ BOOL
 is_acl_inherited(PACL acl)
 {
     DWORD   i;
-    ACL_SIZE_INFORMATION    acl_info;
+    ACL_ಗಾತ್ರ_INFORMATION    acl_info;
     PACCESS_ALLOWED_ACE	    ace;
 
-    acl_info.AceCount = 0;
-    GetAclInformation(acl, &acl_info, sizeof(acl_info), AclSizeInformation);
-    for (i = 0; i < acl_info.AceCount; i++)
+    acl_info.Ace_ಎಣಿಕೆ = 0;
+    GetAclInformation(acl, &acl_info, ಗಾತ್ರ(acl_info), Acl_ಗಾತ್ರ_Information);
+    ಗಾಗಿ (i = 0; i < acl_info.Ace_ಎಣಿಕೆ; i++)
     {
 	GetAce(acl, i, (LPVOID *)&ace);
-	if (ace->Header.AceFlags & INHERITED_ACE)
-	    return TRUE;
+	ಆದರೆ (ace->ಶೀರ್ಷಿಕೆ_2.AceFlags & INHERITED_ACE)
+	    ಹಿಂತಿರುಗಿ TRUE;
     }
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Set the ACL of file "fname" to "acl" (unless it's NULL).
  * Errors are ignored.
  * This must only be called with "acl" equal to what mch_get_acl() returned.
  */
-    void
-mch_set_acl(char_u *fname, vim_acl_T acl)
+    ಶೂನ್ಯ
+mch_ಗಣ_acl(char_u *fname, vim_acl_T acl)
 {
-#ifdef HAVE_ACL
-    struct my_acl   *p = (struct my_acl *)acl;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_ACL
+    ರಚನೆ my_acl   *p = (ರಚನೆ my_acl *)acl;
     SECURITY_INFORMATION    sec_info = 0;
     WCHAR	    *wn;
 
-    if (p == NULL)
-	return;
+    ಆದರೆ (p == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    wn = enc_to_utf16(fname, NULL);
-    if (wn == NULL)
-	return;
+    wn = enc_ಗಮ್ಯ_utf16(fname, ಖಾಲಿ);
+    ಆದರೆ (wn == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     // Set security flags
-    if (p->pSidOwner)
+    ಆದರೆ (p->pSidOwner)
 	sec_info |= OWNER_SECURITY_INFORMATION;
-    if (p->pSidGroup)
-	sec_info |= GROUP_SECURITY_INFORMATION;
-    if (p->pDacl)
+    ಆದರೆ (p->p_Sid_ಗುಂಪು)
+	sec_info |= ಗುಂಪು_SECURITY_INFORMATION;
+    ಆದರೆ (p->pDacl)
     {
 	sec_info |= DACL_SECURITY_INFORMATION;
 	// Do not inherit its parent's DACL.
 	// If the DACL is inherited, Cygwin permissions would be changed.
-	if (!is_acl_inherited(p->pDacl))
+	ಆದರೆ (!is_acl_inherited(p->pDacl))
 	    sec_info |= PROTECTED_DACL_SECURITY_INFORMATION;
     }
-    if (p->pSacl)
+    ಆದರೆ (p->pSacl)
 	sec_info |= SACL_SECURITY_INFORMATION;
 
-    (void)SetNamedSecurityInfoW(
+    (ಶೂನ್ಯ)ಗಣ_Named_Security_Info_W(
 	    wn,			// Abstract filename
 	    SE_FILE_OBJECT,	// File Object
 	    sec_info,
 	    p->pSidOwner,	// Ownership information.
-	    p->pSidGroup,	// Group membership.
+	    p->p_Sid_ಗುಂಪು,	// Group membership.
 	    p->pDacl,		// Discretionary information.
 	    p->pSacl		// For auditing purposes.
 	    );
     vim_free(wn);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-    void
+    ಶೂನ್ಯ
 mch_free_acl(vim_acl_T acl)
 {
-#ifdef HAVE_ACL
-    struct my_acl   *p = (struct my_acl *)acl;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_ACL
+    ರಚನೆ my_acl   *p = (ರಚನೆ my_acl *)acl;
 
-    if (p != NULL)
+    ಆದರೆ (p != ಖಾಲಿ)
     {
 	LocalFree(p->pSecurityDescriptor);	// Free the memory just in case
 	vim_free(p);
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ಆದರೆ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
 /*
  * handler for ctrl-break, ctrl-c interrupts, and fatal events.
  */
-    static BOOL WINAPI
+    ಸ್ಥಿರ BOOL WINAPI
 handler_routine(
     DWORD dwCtrlType)
 {
-    INPUT_RECORD ir;
-    DWORD out;
+    ಒಳಹರಿವು_ದಾಖಲೆ ir;
+    DWORD ಹೊರಹೋಗು;
 
-    switch (dwCtrlType)
+    ಆಯ್ಕೆ (dwCtrlType)
     {
-    case CTRL_C_EVENT:
-	if (ctrl_c_interrupts)
+    ಸ್ಥಿತಿ CTRL_C_EVENT:
+	ಆದರೆ (ctrl_c_interrupts)
 	    g_fCtrlCPressed = TRUE;
-	return TRUE;
+	ಹಿಂತಿರುಗಿ TRUE;
 
-    case CTRL_BREAK_EVENT:
+    ಸ್ಥಿತಿ CTRL_BREAK_EVENT:
 	g_fCBrkPressed	= TRUE;
 	ctrl_break_was_pressed = TRUE;
 	// ReadConsoleInput is blocking, send a key event to continue.
-	ir.EventType = KEY_EVENT;
-	ir.Event.KeyEvent.bKeyDown = TRUE;
-	ir.Event.KeyEvent.wRepeatCount = 1;
-	ir.Event.KeyEvent.wVirtualKeyCode = VK_CANCEL;
-	ir.Event.KeyEvent.wVirtualScanCode = 0;
-	ir.Event.KeyEvent.dwControlKeyState = 0;
-	ir.Event.KeyEvent.uChar.UnicodeChar = 0;
-	WriteConsoleInput(g_hConIn, &ir, 1, &out);
-	return TRUE;
+	ir.EventType = ಕೀಲಿ_EVENT;
+	ir.Event.ಕೀಲಿ_Event_2.b_ಕೀಲಿ_ಕೆಳಕ್ಕೆ = TRUE;
+	ir.Event.ಕೀಲಿ_Event_2.w_Repeat_ಎಣಿಕೆ = 1;
+	ir.Event.ಕೀಲಿ_Event_2.w_Virtual_ಕೀಲಿ_ಸಂಕೇತ = VK_CANCEL;
+	ir.Event.ಕೀಲಿ_Event_2.w_Virtual_ಪರಿಶೀಲನೆ_ಸಂಕೇತ = 0;
+	ir.Event.ಕೀಲಿ_Event_2.dw_Control_ಕೀಲಿ_State = 0;
+	ir.Event.ಕೀಲಿ_Event_2.uChar.UnicodeChar = 0;
+	Write_Console_ಒಳಹರಿವು(g_h_Con_ಒಳ, &ir, 1, &ಹೊರಹೋಗು);
+	ಹಿಂತಿರುಗಿ TRUE;
 
     // fatal events: shut down gracefully
-    case CTRL_CLOSE_EVENT:
-    case CTRL_LOGOFF_EVENT:
-    case CTRL_SHUTDOWN_EVENT:
-	windgoto((int)Rows - 1, cmdline_col_off);
+    ಸ್ಥಿತಿ CTRL_CLOSE_EVENT:
+    ಸ್ಥಿತಿ CTRL_LOGOFF_EVENT:
+    ಸ್ಥಿತಿ CTRL_SHUTDOWN_EVENT:
+	windgoto((ಪೂರ್ಣಾಂಕ)ಅಡ್ಡಸಾಲುಗಳು - 1, cmdline_ಲಂಬಸಾಲು_off);
 	g_fForceExit = TRUE;
 
-	vim_snprintf((char *)IObuff, IOSIZE, _("Vim: Caught %s event\n"),
+	vim_snprintf((ಅಕ್ಷರ *)IObuff, IOSIZE, _("Vim: Caught %s event\n"),
 		(dwCtrlType == CTRL_CLOSE_EVENT
 		     ? _("close")
 		     : dwCtrlType == CTRL_LOGOFF_EVENT
@@ -4482,10 +4482,10 @@ handler_routine(
 
 	preserve_exit();	// output IObuff, preserve files and exit
 
-	return TRUE;		// not reached
+	ಹಿಂತಿರುಗಿ TRUE;		// not reached
 
-    default:
-	return FALSE;
+    ಪೂರ್ವನಿಯೋಜಿತ:
+	ಹಿಂತಿರುಗಿ FALSE;
     }
 }
 
@@ -4493,7 +4493,7 @@ handler_routine(
 /*
  * set the tty in (raw) ? "raw" : "cooked" mode
  */
-    void
+    ಶೂನ್ಯ
 mch_settmode(tmode_T tmode)
 {
     DWORD cmodein;
@@ -4501,48 +4501,48 @@ mch_settmode(tmode_T tmode)
     BOOL bEnableHandler;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return;
+    ಆದರೆ (gui.ಒಳ_use)
+	ಹಿಂತಿರುಗಿ;
 # endif
-    GetConsoleMode(g_hConIn, &cmodein);
-    GetConsoleMode(g_hConOut, &cmodeout);
-    if (tmode == TMODE_RAW)
+    Get_Console_ಬಹುಲಕ(g_h_Con_ಒಳ, &cmodein);
+    Get_Console_ಬಹುಲಕ(g_h_Con_ಹೊರಹೋಗು, &cmodeout);
+    ಆದರೆ (tmode == TMODE_RAW)
     {
-	cmodein &= ~(ENABLE_LINE_INPUT | ENABLE_PROCESSED_INPUT |
-		     ENABLE_ECHO_INPUT);
-	if (g_fMouseActive)
+	cmodein &= ~(ENABLE_ಸಾಲು_ಒಳಹರಿವು | ENABLE_PROCESSED_ಒಳಹರಿವು |
+		     ENABLE_ECHO_ಒಳಹರಿವು);
+	ಆದರೆ (g_f_Mouse_ಸಕ್ರಿಯ)
 	{
-	    cmodein |= ENABLE_MOUSE_INPUT;
-	    cmodein &= ~ENABLE_QUICK_EDIT_MODE;
+	    cmodein |= ENABLE_MOUSE_ಒಳಹರಿವು;
+	    cmodein &= ~ENABLE_ಶೀಘ್ರ_EDIT_ಬಹುಲಕ;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    cmodein |= g_cmodein & ENABLE_QUICK_EDIT_MODE;
+	    cmodein |= g_cmodein & ENABLE_ಶೀಘ್ರ_EDIT_ಬಹುಲಕ;
 	}
 	cmodeout &= ~(
 # ifdef FEAT_TERMGUICOLORS
 	    // Do not turn off the ENABLE_PROCESSED_OUTPUT flag when using
 	    // VTP.
 	    ((vtp_working) ? 0 : ENABLE_PROCESSED_OUTPUT) |
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 	    ENABLE_PROCESSED_OUTPUT |
 # endif
 	    ENABLE_WRAP_AT_EOL_OUTPUT);
 	bEnableHandler = TRUE;
     }
-    else // cooked
+    ಇಲ್ಲದಿದ್ದರೆ // cooked
     {
-	cmodein |= (ENABLE_LINE_INPUT | ENABLE_PROCESSED_INPUT |
-		    ENABLE_ECHO_INPUT);
+	cmodein |= (ENABLE_ಸಾಲು_ಒಳಹರಿವು | ENABLE_PROCESSED_ಒಳಹರಿವು |
+		    ENABLE_ECHO_ಒಳಹರಿವು);
 	cmodeout |= (ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT);
 	bEnableHandler = FALSE;
     }
-    SetConsoleMode(g_hConIn, cmodein | ENABLE_EXTENDED_FLAGS);
-    SetConsoleMode(g_hConOut, cmodeout);
-    SetConsoleCtrlHandler(handler_routine, bEnableHandler);
+    ಗಣ_Console_ಬಹುಲಕ(g_h_Con_ಒಳ, cmodein | ENABLE_EXTENDED_FLAGS);
+    ಗಣ_Console_ಬಹುಲಕ(g_h_Con_ಹೊರಹೋಗು, cmodeout);
+    ಗಣ_Console_Ctrl_Handler(handler_routine, bEnableHandler);
 
 # ifdef MCH_WRITE_DUMP
-    if (fdDump)
+    ಆದರೆ (fdDump)
     {
 	fprintf(fdDump, "mch_settmode(%s, in = %x, out = %x)\n",
 		tmode == TMODE_RAW ? "raw" :
@@ -4558,16 +4558,16 @@ mch_settmode(tmode_T tmode)
  * Get the size of the current window in `Rows' and `Columns'
  * Return OK when size could be determined, FAIL otherwise.
  */
-    int
-mch_get_shellsize(void)
+    ಪೂರ್ಣಾಂಕ
+mch_get_shellsize(ಶೂನ್ಯ)
 {
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    CONSOLE_SCREEN_ಬಫರ್_INFO csbi;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return OK;
+    ಆದರೆ (gui.ಒಳ_use)
+	ಹಿಂತಿರುಗಿ OK;
 # endif
-    if (!g_fTermcapMode && g_cbTermcap.IsValid)
+    ಆದರೆ (!g_f_Termcap_ಬಹುಲಕ && g_cbTermcap.IsValid)
     {
 	/*
 	 * For some reason, we are trying to get the screen dimensions
@@ -4575,40 +4575,40 @@ mch_get_shellsize(void)
 	 * variables are really intended to mean the size of Vim screen
 	 * while in termcap mode.
 	 */
-	Rows = g_cbTermcap.Info.dwSize.Y;
-	Columns = g_cbTermcap.Info.dwSize.X;
+	ಅಡ್ಡಸಾಲುಗಳು = g_cbTermcap.Info.dw_ಗಾತ್ರ.Y;
+	Columns = g_cbTermcap.Info.dw_ಗಾತ್ರ.X;
     }
-    else if (GetConsoleScreenBufferInfo(g_hConOut, &csbi))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (Get_Console_Screen_ಬಫರ್_Info(g_h_Con_ಹೊರಹೋಗು, &csbi))
     {
-	Rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
-	Columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+	ಅಡ್ಡಸಾಲುಗಳು = csbi.sr_ಕಿಟಕಿ.Bottom - csbi.sr_ಕಿಟಕಿ.ತುದಿ_2 + 1;
+	Columns = csbi.sr_ಕಿಟಕಿ.ಬಲ_4 - csbi.sr_ಕಿಟಕಿ.ಎಡ_4 + 1;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	Rows = 25;
+	ಅಡ್ಡಸಾಲುಗಳು = 25;
 	Columns = 80;
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Resize console buffer to 'COORD'
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 ResizeConBuf(
     HANDLE  hConsole,
     COORD   coordScreen)
 {
-    if (use_alternate_screen_buffer)
-	return;
+    ಆದರೆ (use_alternate_screen_ಬಫರ್)
+	ಹಿಂತಿರುಗಿ;
 
-    if (!SetConsoleScreenBufferSize(hConsole, coordScreen))
+    ಆದರೆ (!ಗಣ_Console_Screen_ಬಫರ್_ಗಾತ್ರ(hConsole, coordScreen))
     {
 # ifdef MCH_WRITE_DUMP
-	if (fdDump)
+	ಆದರೆ (fdDump)
 	{
 	    fprintf(fdDump, "SetConsoleScreenBufferSize failed: %lx\n",
-		    GetLastError());
+		    Get_ಕೊನೆಯ_Error());
 	    fflush(fdDump);
 	}
 # endif
@@ -4618,18 +4618,18 @@ ResizeConBuf(
 /*
  * Resize console window size to 'srWindowRect'
  */
-    static void
-ResizeWindow(
+    ಸ್ಥಿರ ಶೂನ್ಯ
+Resize_ಕಿಟಕಿ(
     HANDLE     hConsole,
-    SMALL_RECT srWindowRect)
+    SMALL_RECT sr_ಕಿಟಕಿ_Rect)
 {
-    if (!SetConsoleWindowInfo(hConsole, TRUE, &srWindowRect))
+    ಆದರೆ (!ಗಣ_Console_ಕಿಟಕಿ_Info(hConsole, TRUE, &sr_ಕಿಟಕಿ_Rect))
     {
 # ifdef MCH_WRITE_DUMP
-	if (fdDump)
+	ಆದರೆ (fdDump)
 	{
 	    fprintf(fdDump, "SetConsoleWindowInfo failed: %lx\n",
-		    GetLastError());
+		    Get_ಕೊನೆಯ_Error());
 	    fflush(fdDump);
 	}
 # endif
@@ -4639,77 +4639,77 @@ ResizeWindow(
 /*
  * Set a console window to `xSize' * `ySize'
  */
-    static void
-ResizeConBufAndWindow(
+    ಸ್ಥಿರ ಶೂನ್ಯ
+Resize_Con_Buf_And_ಕಿಟಕಿ(
     HANDLE  hConsole,
-    int	    xSize,
-    int	    ySize)
+    ಪೂರ್ಣಾಂಕ	    x_ಗಾತ್ರ,
+    ಪೂರ್ಣಾಂಕ	    y_ಗಾತ್ರ_2)
 {
-    CONSOLE_SCREEN_BUFFER_INFO csbi;	// hold current console buffer info
-    SMALL_RECT	    srWindowRect;	// hold the new console size
+    CONSOLE_SCREEN_ಬಫರ್_INFO csbi;	// hold current console buffer info
+    SMALL_RECT	    sr_ಕಿಟಕಿ_Rect;	// hold the new console size
     COORD	    coordScreen;
     COORD	    cursor;
-    static int	    resized = FALSE;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    resized = FALSE;
 
 # ifdef MCH_WRITE_DUMP
-    if (fdDump)
+    ಆದರೆ (fdDump)
     {
-	fprintf(fdDump, "ResizeConBufAndWindow(%d, %d)\n", xSize, ySize);
+	fprintf(fdDump, "ResizeConBufAndWindow(%d, %d)\n", x_ಗಾತ್ರ, y_ಗಾತ್ರ_2);
 	fflush(fdDump);
     }
 # endif
 
     // get the largest size we can size the console window to
-    coordScreen = GetLargestConsoleWindowSize(hConsole);
+    coordScreen = Get_ಅತಿದೊಡ್ಡ_Console_ಕಿಟಕಿ_ಗಾತ್ರ(hConsole);
 
     // define the new console window size and scroll position
-    srWindowRect.Left = srWindowRect.Top = (SHORT) 0;
-    srWindowRect.Right =  (SHORT) (min(xSize, coordScreen.X) - 1);
-    srWindowRect.Bottom = (SHORT) (min(ySize, coordScreen.Y) - 1);
+    sr_ಕಿಟಕಿ_Rect.ಎಡ_4 = sr_ಕಿಟಕಿ_Rect.ತುದಿ_2 = (SHORT) 0;
+    sr_ಕಿಟಕಿ_Rect.ಬಲ_4 =  (SHORT) (min(x_ಗಾತ್ರ, coordScreen.X) - 1);
+    sr_ಕಿಟಕಿ_Rect.Bottom = (SHORT) (min(y_ಗಾತ್ರ_2, coordScreen.Y) - 1);
 
-    if (GetConsoleScreenBufferInfo(g_hConOut, &csbi))
+    ಆದರೆ (Get_Console_Screen_ಬಫರ್_Info(g_h_Con_ಹೊರಹೋಗು, &csbi))
     {
-	int sx, sy;
+	ಪೂರ್ಣಾಂಕ sx, sy;
 
-	sx = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-	sy = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
-	if (sy < ySize || sx < xSize)
+	sx = csbi.sr_ಕಿಟಕಿ.ಬಲ_4 - csbi.sr_ಕಿಟಕಿ.ಎಡ_4 + 1;
+	sy = csbi.sr_ಕಿಟಕಿ.Bottom - csbi.sr_ಕಿಟಕಿ.ತುದಿ_2 + 1;
+	ಆದರೆ (sy < y_ಗಾತ್ರ_2 || sx < x_ಗಾತ್ರ)
 	{
 	    /*
 	     * Increasing number of lines/columns, do buffer first.
 	     * Use the maximal size in x and y direction.
 	     */
-	    if (sy < ySize)
-		coordScreen.Y = ySize;
-	    else
+	    ಆದರೆ (sy < y_ಗಾತ್ರ_2)
+		coordScreen.Y = y_ಗಾತ್ರ_2;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		coordScreen.Y = sy;
-	    if (sx < xSize)
-		coordScreen.X = xSize;
-	    else
+	    ಆದರೆ (sx < x_ಗಾತ್ರ)
+		coordScreen.X = x_ಗಾತ್ರ;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		coordScreen.X = sx;
-	    SetConsoleScreenBufferSize(hConsole, coordScreen);
+	    ಗಣ_Console_Screen_ಬಫರ್_ಗಾತ್ರ(hConsole, coordScreen);
 	}
     }
 
     // define the new console buffer size
-    coordScreen.X = xSize;
-    coordScreen.Y = ySize;
+    coordScreen.X = x_ಗಾತ್ರ;
+    coordScreen.Y = y_ಗಾತ್ರ_2;
 
     // In the new console call API, only the first time in reverse order
-    if (!vtp_working || resized)
+    ಆದರೆ (!vtp_working || resized)
     {
-	ResizeWindow(hConsole, srWindowRect);
+	Resize_ಕಿಟಕಿ(hConsole, sr_ಕಿಟಕಿ_Rect);
 	ResizeConBuf(hConsole, coordScreen);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Workaround for a Windows 10 bug
-	cursor.X = srWindowRect.Left;
-	cursor.Y = srWindowRect.Top;
-	SetConsoleCursorPosition(hConsole, cursor);
+	cursor.X = sr_ಕಿಟಕಿ_Rect.ಎಡ_4;
+	cursor.Y = sr_ಕಿಟಕಿ_Rect.ತುದಿ_2;
+	ಗಣ_Console_Cursor_Position(hConsole, cursor);
 
 	ResizeConBuf(hConsole, coordScreen);
-	ResizeWindow(hConsole, srWindowRect);
+	Resize_ಕಿಟಕಿ(hConsole, sr_ಕಿಟಕಿ_Rect);
 	resized = TRUE;
     }
 }
@@ -4718,136 +4718,136 @@ ResizeConBufAndWindow(
 /*
  * Set the console window to `Rows' * `Columns'
  */
-    void
-mch_set_shellsize(void)
+    ಶೂನ್ಯ
+mch_ಗಣ_shellsize(ಶೂನ್ಯ)
 {
     COORD coordScreen;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return;
+    ಆದರೆ (gui.ಒಳ_use)
+	ಹಿಂತಿರುಗಿ;
 # endif
     // Don't change window size while still starting up
-    if (suppress_winsize != 0)
+    ಆದರೆ (suppress_winsize != 0)
     {
 	suppress_winsize = 2;
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if (term_console)
+    ಆದರೆ (ಪದ_console)
     {
-	coordScreen = GetLargestConsoleWindowSize(g_hConOut);
+	coordScreen = Get_ಅತಿದೊಡ್ಡ_Console_ಕಿಟಕಿ_ಗಾತ್ರ(g_h_Con_ಹೊರಹೋಗು);
 
 	// Clamp Rows and Columns to reasonable values
-	if (Rows > coordScreen.Y)
-	    Rows = coordScreen.Y;
-	if (Columns > coordScreen.X)
+	ಆದರೆ (ಅಡ್ಡಸಾಲುಗಳು > coordScreen.Y)
+	    ಅಡ್ಡಸಾಲುಗಳು = coordScreen.Y;
+	ಆದರೆ (Columns > coordScreen.X)
 	    Columns = coordScreen.X;
 
-	ResizeConBufAndWindow(g_hConOut, Columns, Rows);
+	Resize_Con_Buf_And_ಕಿಟಕಿ(g_h_Con_ಹೊರಹೋಗು, Columns, ಅಡ್ಡಸಾಲುಗಳು);
     }
 }
 
 /*
  * Rows and/or Columns has changed.
  */
-    void
-mch_new_shellsize(void)
+    ಶೂನ್ಯ
+mch_new_shellsize(ಶೂನ್ಯ)
 {
 # ifdef VIMDLL
-    if (gui.in_use)
-	return;
+    ಆದರೆ (gui.ಒಳ_use)
+	ಹಿಂತಿರುಗಿ;
 # endif
-    set_scroll_region(0, 0, Columns - 1, Rows - 1);
+    ಗಣ_scroll_region(0, 0, Columns - 1, ಅಡ್ಡಸಾಲುಗಳು - 1);
 }
 
 
 /*
  * Called when started up, to set the winsize that was delayed.
  */
-    void
-mch_set_winsize_now(void)
+    ಶೂನ್ಯ
+mch_ಗಣ_winsize_now(ಶೂನ್ಯ)
 {
-    if (suppress_winsize == 2)
+    ಆದರೆ (suppress_winsize == 2)
     {
 	suppress_winsize = 0;
-	mch_set_shellsize();
+	mch_ಗಣ_shellsize();
 	shell_resized();
     }
     suppress_winsize = 0;
 }
 
-# if defined(FEAT_IMAGE) || defined(FEAT_EVAL)
+# ಆದರೆ defined(FEAT_IMAGE) || defined(FEAT_EVAL)
 /*
  * Try to get the current terminal cell size in pixels.
  */
-    void
-mch_calc_cell_size(struct cellsize *cs_out)
+    ಶೂನ್ಯ
+mch_calc_cell_ಗಾತ್ರ(ರಚನೆ cellsize *cs_ಹೊರಹೋಗು)
 {
     CONSOLE_FONT_INFOEX cfi;
     DWORD cmodeold;
     DWORD cmodein;
 
-    cs_out->cs_xpixel = -1;
-    cs_out->cs_ypixel = -1;
+    cs_ಹೊರಹೋಗು->cs_xpixel = -1;
+    cs_ಹೊರಹೋಗು->cs_ypixel = -1;
 
-    if (g_hConOut == INVALID_HANDLE_VALUE)
-	return;
+    ಆದರೆ (g_h_Con_ಹೊರಹೋಗು == INVALID_HANDLE_ಮೌಲ್ಯ)
+	ಹಿಂತಿರುಗಿ;
 
-    cfi.cbSize = sizeof(cfi);
-    if (GetCurrentConsoleFontEx(g_hConOut, FALSE, &cfi)
-	    && cfi.dwFontSize.X > 0 && cfi.dwFontSize.Y > 0)
+    cfi.cb_ಗಾತ್ರ = ಗಾತ್ರ(cfi);
+    ಆದರೆ (GetCurrentConsoleFontEx(g_h_Con_ಹೊರಹೋಗು, FALSE, &cfi)
+	    && cfi.dw_Font_ಗಾತ್ರ.X > 0 && cfi.dw_Font_ಗಾತ್ರ.Y > 0)
     {
-	cs_out->cs_xpixel = cfi.dwFontSize.X;
-	cs_out->cs_ypixel = cfi.dwFontSize.Y;
-	return;
+	cs_ಹೊರಹೋಗು->cs_xpixel = cfi.dw_Font_ಗಾತ್ರ.X;
+	cs_ಹೊರಹೋಗು->cs_ypixel = cfi.dw_Font_ಗಾತ್ರ.Y;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    GetConsoleMode(g_hConIn, &cmodein);
+    Get_Console_ಬಹುಲಕ(g_h_Con_ಒಳ, &cmodein);
     cmodeold = cmodein;
-    cmodein &= ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT
-	    | ENABLE_PROCESSED_INPUT);
-    cmodein |= ENABLE_VIRTUAL_TERMINAL_INPUT;
+    cmodein &= ~(ENABLE_ಸಾಲು_ಒಳಹರಿವು | ENABLE_ECHO_ಒಳಹರಿವು
+	    | ENABLE_PROCESSED_ಒಳಹರಿವು);
+    cmodein |= ENABLE_VIRTUAL_TERMINAL_ಒಳಹರಿವು;
 
-    if (SetConsoleMode(g_hConIn, cmodein))
+    ಆದರೆ (ಗಣ_Console_ಬಹುಲಕ(g_h_Con_ಒಳ, cmodein))
     {
 	// We will receive the window dimensions later
 	vtp_printf("\033[14t");
-	SetConsoleMode(g_hConIn, cmodeold);
+	ಗಣ_Console_ಬಹುಲಕ(g_h_Con_ಒಳ, cmodeold);
     }
 }
 # endif
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    static BOOL
+    ಸ್ಥಿರ BOOL
 vim_create_process(
-    char		*cmd,
+    ಅಕ್ಷರ		*cmd,
     BOOL		inherit_handles,
     DWORD		flags,
     STARTUPINFO		*si,
     PROCESS_INFORMATION *pi,
     LPVOID		*env,
-    char		*cwd)
+    ಅಕ್ಷರ		*cwd)
 {
     BOOL	ret = FALSE;
-    WCHAR	*wcmd, *wcwd = NULL;
+    WCHAR	*wcmd, *wcwd = ಖಾಲಿ;
 
-    wcmd = enc_to_utf16((char_u *)cmd, NULL);
-    if (wcmd == NULL)
-	return FALSE;
-    if (cwd != NULL)
+    wcmd = enc_ಗಮ್ಯ_utf16((char_u *)cmd, ಖಾಲಿ);
+    ಆದರೆ (wcmd == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FALSE;
+    ಆದರೆ (cwd != ಖಾಲಿ)
     {
-	wcwd = enc_to_utf16((char_u *)cwd, NULL);
-	if (wcwd == NULL)
-	    goto theend;
+	wcwd = enc_ಗಮ್ಯ_utf16((char_u *)cwd, ಖಾಲಿ);
+	ಆದರೆ (wcwd == ಖಾಲಿ)
+	    ಹೋಗು theend;
     }
 
     ret = CreateProcessW(
-	    NULL,		// Executable name
+	    ಖಾಲಿ,		// Executable name
 	    wcmd,		// Command to execute
-	    NULL,		// Process security attributes
-	    NULL,		// Thread security attributes
+	    ಖಾಲಿ,		// Process security attributes
+	    ಖಾಲಿ,		// Thread security attributes
 	    inherit_handles,	// Inherit handles
 	    flags,		// Creation flags
 	    env,		// Environment
@@ -4857,29 +4857,29 @@ vim_create_process(
 theend:
     vim_free(wcmd);
     vim_free(wcwd);
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
 
-    static HINSTANCE
+    ಸ್ಥಿರ HINSTANCE
 vim_shell_execute(
-    char *cmd,
+    ಅಕ್ಷರ *cmd,
     INT	 n_show_cmd)
 {
     HINSTANCE	ret;
     WCHAR	*wcmd;
 
-    wcmd = enc_to_utf16((char_u *)cmd, NULL);
-    if (wcmd == NULL)
-	return (HINSTANCE) 0;
+    wcmd = enc_ಗಮ್ಯ_utf16((char_u *)cmd, ಖಾಲಿ);
+    ಆದರೆ (wcmd == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ (HINSTANCE) 0;
 
-    ret = ShellExecuteW(NULL, NULL, wcmd, NULL, NULL, n_show_cmd);
+    ret = ShellExecuteW(ಖಾಲಿ, ಖಾಲಿ, wcmd, ಖಾಲಿ, ಖಾಲಿ, n_show_cmd);
     vim_free(wcmd);
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
 
-#if defined(FEAT_GUI_MSWIN)
+#ಆದರೆ defined(FEAT_GUI_MSWIN)
 
 /*
  * Specialised version of system() for Win32 GUI mode.
@@ -4889,63 +4889,63 @@ vim_shell_execute(
  *    3. Wait for the subprocess to terminate and get its exit code
  *    4. Prompt the user to press a key to close the console window
  */
-    static int
-mch_system_classic(char *cmd, int options)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+mch_system_classic(ಅಕ್ಷರ *cmd, ಪೂರ್ಣಾಂಕ options)
 {
     STARTUPINFO		si;
     PROCESS_INFORMATION pi;
     DWORD		ret = 0;
     HWND		hwnd = GetFocus();
 
-    si.cb = sizeof(si);
-    si.lpReserved = NULL;
-    si.lpDesktop = NULL;
-    si.lpTitle = NULL;
+    si.cb = ಗಾತ್ರ(si);
+    si.lpReserved = ಖಾಲಿ;
+    si.lpDesktop = ಖಾಲಿ;
+    si.lpTitle = ಖಾಲಿ;
     si.dwFlags = STARTF_USESHOWWINDOW;
     /*
      * It's nicer to run a filter command in a minimized window.
      * Don't activate the window to keep focus on Vim.
      */
-    if (options & SHELL_DOOUT)
-	si.wShowWindow = SW_SHOWMINNOACTIVE;
-    else
-	si.wShowWindow = SW_SHOWNORMAL;
+    ಆದರೆ (options & SHELL_DOOUT)
+	si.w_Show_ಕಿಟಕಿ = SW_SHOWMINNOACTIVE;
+    ಇಲ್ಲದಿದ್ದರೆ
+	si.w_Show_ಕಿಟಕಿ = SW_SHOWNORMAL;
     si.cbReserved2 = 0;
-    si.lpReserved2 = NULL;
+    si.lpReserved2 = ಖಾಲಿ;
 
     // Now, run the command
     vim_create_process(cmd, FALSE,
-	    CREATE_DEFAULT_ERROR_MODE |	CREATE_NEW_CONSOLE,
-	    &si, &pi, NULL, NULL);
+	    CREATE_DEFAULT_ERROR_ಬಹುಲಕ |	CREATE_NEW_CONSOLE,
+	    &si, &pi, ಖಾಲಿ, ಖಾಲಿ);
 
     // Wait for the command to terminate before continuing
     {
-	int	    delay = 1;
+	ಪೂರ್ಣಾಂಕ	    delay = 1;
 
 	// Keep updating the window while waiting for the shell to finish.
-	for (;;)
+	ಗಾಗಿ (;;)
 	{
-	    MSG	msg;
+	    ಸಂದೇಶ_3	ಸಂದೇಶ;
 
-	    if (PeekMessageW(&msg, (HWND)NULL, 0, 0, PM_REMOVE))
+	    ಆದರೆ (Peek_ಸಂದೇಶ_W(&ಸಂದೇಶ, (HWND)ಖಾಲಿ, 0, 0, PM_REMOVE))
 	    {
-		TranslateMessage(&msg);
-		DispatchMessageW(&msg);
+		Translate_ಸಂದೇಶ(&ಸಂದೇಶ);
+		Dispatch_ಸಂದೇಶ_W(&ಸಂದೇಶ);
 		delay = 1;
-		continue;
+		ಮುಂದುವರಿ;
 	    }
-	    if (WaitForSingleObject(pi.hProcess, delay) != WAIT_TIMEOUT)
-		break;
+	    ಆದರೆ (WaitForSingleObject(pi.hProcess, delay) != WAIT_TIMEOUT)
+		ನಿಲ್ಲಿಸು;
 
 	    // We start waiting for a very short time and then increase it, so
 	    // that we respond quickly when the process is quick, and don't
 	    // consume too much overhead when it's slow.
-	    if (delay < 50)
+	    ಆದರೆ (delay < 50)
 		delay += 10;
 	}
 
 	// Get the command exit code
-	GetExitCodeProcess(pi.hProcess, &ret);
+	Get_Exit_ಸಂಕೇತ_Process(pi.hProcess, &ret);
     }
 
     // Close the handles to the subprocess, so that it goes away
@@ -4953,13 +4953,13 @@ mch_system_classic(char *cmd, int options)
     CloseHandle(pi.hProcess);
 
     // Try to get input focus back.  Doesn't always work though.
-    PostMessage(hwnd, WM_SETFOCUS, 0, 0);
+    Post_ಸಂದೇಶ(hwnd, WM_SETFOCUS, 0, 0);
     // To increase the chances that WM_SETFOCUS will work, run the message loop
     // here.  In addition, it prevents problems caused by delayed WM_SETFOCUS
     // processing.
     gui_mch_update();
 
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
 /*
@@ -4967,63 +4967,63 @@ mch_system_classic(char *cmd, int options)
  * process. This way avoid to hang up vim totally if the children
  * process take a long time to process the lines.
  */
-    static unsigned int __stdcall
+    ಸ್ಥಿರ ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ __stdcall
 sub_process_writer(LPVOID param)
 {
-    HANDLE	    g_hChildStd_IN_Wr = param;
-    linenr_T	    lnum = curbuf->b_op_start.lnum;
+    HANDLE	    g_h_ಮಗು_Std_ಒಳ_Wr = param;
+    linenr_T	    lnum = curbuf->b_op_ಆರಂಭ.lnum;
     DWORD	    len = 0;
     DWORD	    l;
     char_u	    *lp = ml_get(lnum);
     char_u	    *s;
-    int		    written = 0;
+    ಪೂರ್ಣಾಂಕ		    written = 0;
 
-    for (;;)
+    ಗಾಗಿ (;;)
     {
 	l = (DWORD)STRLEN(lp + written);
-	if (l == 0)
+	ಆದರೆ (l == 0)
 	    len = 0;
-	else if (lp[written] == NL)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (lp[written] == NL)
 	{
 	    // NL -> NUL translation
-	    WriteFile(g_hChildStd_IN_Wr, "", 1, &len, NULL);
+	    WriteFile(g_h_ಮಗು_Std_ಒಳ_Wr, "", 1, &len, ಖಾಲಿ);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    s = vim_strchr(lp + written, NL);
-	    WriteFile(g_hChildStd_IN_Wr, (char *)lp + written,
-		      s == NULL ? l : (DWORD)(s - (lp + written)),
-		      &len, NULL);
+	    WriteFile(g_h_ಮಗು_Std_ಒಳ_Wr, (ಅಕ್ಷರ *)lp + written,
+		      s == ಖಾಲಿ ? l : (DWORD)(s - (lp + written)),
+		      &len, ಖಾಲಿ);
 	}
-	if (len == l)
+	ಆದರೆ (len == l)
 	{
 	    // Finished a line, add a NL, unless this line should not have
 	    // one.
-	    if (lnum != curbuf->b_op_end.lnum
+	    ಆದರೆ (lnum != curbuf->b_op_ಕೊನೆ.lnum
 		|| (!curbuf->b_p_bin
 		    && curbuf->b_p_fixeol)
 		|| (lnum != curbuf->b_no_eol_lnum
-		    && (lnum != curbuf->b_ml.ml_line_count
+		    && (lnum != curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ
 			|| curbuf->b_p_eol)))
 	    {
-		WriteFile(g_hChildStd_IN_Wr, "\n", 1,
-						  (LPDWORD)&vim_ignored, NULL);
+		WriteFile(g_h_ಮಗು_Std_ಒಳ_Wr, "\n", 1,
+						  (LPDWORD)&vim_ignored, ಖಾಲಿ);
 	    }
 
 	    ++lnum;
-	    if (lnum > curbuf->b_op_end.lnum)
-		break;
+	    ಆದರೆ (lnum > curbuf->b_op_ಕೊನೆ.lnum)
+		ನಿಲ್ಲಿಸು;
 
 	    lp = ml_get(lnum);
 	    written = 0;
 	}
-	else if (len > 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (len > 0)
 	    written += len;
     }
 
     // finished all the lines, close pipe
-    CloseHandle(g_hChildStd_IN_Wr);
-    return 0;
+    CloseHandle(g_h_ಮಗು_Std_ಒಳ_Wr);
+    ಹಿಂತಿರುಗಿ 0;
 }
 
 
@@ -5033,107 +5033,107 @@ sub_process_writer(LPVOID param)
  * This function read from the children's stdout and write the
  * data on screen or in the buffer accordingly.
  */
-    static void
-dump_pipe(int	    options,
-	  HANDLE    g_hChildStd_OUT_Rd,
+    ಸ್ಥಿರ ಶೂನ್ಯ
+dump_pipe(ಪೂರ್ಣಾಂಕ	    options,
+	  HANDLE    g_h_ಮಗು_Std_ಹೊರಹೋಗು_Rd,
 	  garray_T  *ga,
-	  char_u    buffer[],
-	  DWORD	    *buffer_off)
+	  char_u    ಬಫರ್[],
+	  DWORD	    *ಬಫರ್_off)
 {
-    DWORD	availableBytes = 0;
+    DWORD	ಲಭ್ಯ_ಬೈಟುಗಳು = 0;
     DWORD	i;
-    int		ret;
+    ಪೂರ್ಣಾಂಕ		ret;
     DWORD	len;
-    DWORD	toRead;
+    DWORD	ಗಮ್ಯ_Read;
 
     // we query the pipe to see if there is any data to read
     // to avoid to perform a blocking read
-    ret = PeekNamedPipe(g_hChildStd_OUT_Rd, // pipe to query
-			NULL,		    // optional buffer
+    ret = PeekNamedPipe(g_h_ಮಗು_Std_ಹೊರಹೋಗು_Rd, // pipe to query
+			ಖಾಲಿ,		    // optional buffer
 			0,		    // buffer size
-			NULL,		    // number of read bytes
-			&availableBytes,    // available bytes total
-			NULL);		    // byteLeft
+			ಖಾಲಿ,		    // number of read bytes
+			&ಲಭ್ಯ_ಬೈಟುಗಳು,    // available bytes total
+			ಖಾಲಿ);		    // byteLeft
 
     // We got real data in the pipe, read it
-    while (ret != 0 && availableBytes > 0)
+    ಆಗ (ret != 0 && ಲಭ್ಯ_ಬೈಟುಗಳು > 0)
     {
-	toRead = (DWORD)(BUFLEN - *buffer_off);
-	toRead = availableBytes < toRead ? availableBytes : toRead;
-	ReadFile(g_hChildStd_OUT_Rd, buffer + *buffer_off, toRead , &len, NULL);
+	ಗಮ್ಯ_Read = (DWORD)(BUFLEN - *ಬಫರ್_off);
+	ಗಮ್ಯ_Read = ಲಭ್ಯ_ಬೈಟುಗಳು < ಗಮ್ಯ_Read ? ಲಭ್ಯ_ಬೈಟುಗಳು : ಗಮ್ಯ_Read;
+	ReadFile(g_h_ಮಗು_Std_ಹೊರಹೋಗು_Rd, ಬಫರ್ + *ಬಫರ್_off, ಗಮ್ಯ_Read , &len, ಖಾಲಿ);
 
 	// If we haven't read anything, there is a problem
-	if (len == 0)
-	    break;
+	ಆದರೆ (len == 0)
+	    ನಿಲ್ಲಿಸು;
 
-	availableBytes -= len;
+	ಲಭ್ಯ_ಬೈಟುಗಳು -= len;
 
-	if (options & SHELL_READ)
+	ಆದರೆ (options & SHELL_READ)
 	{
 	    // Do NUL -> NL translation, append NL separated
 	    // lines to the current buffer.
-	    for (i = 0; i < len; ++i)
+	    ಗಾಗಿ (i = 0; i < len; ++i)
 	    {
-		if (buffer[i] == NL)
-		    append_ga_line(ga);
-		else if (buffer[i] == NUL)
+		ಆದರೆ (ಬಫರ್[i] == NL)
+		    append_ga_ಸಾಲು(ga);
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಬಫರ್[i] == NUL)
 		    ga_append(ga, NL);
-		else
-		    ga_append(ga, buffer[i]);
+		ಇಲ್ಲದಿದ್ದರೆ
+		    ga_append(ga, ಬಫರ್[i]);
 	    }
 	}
-	else if (has_mbyte)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (has_mbyte)
 	{
-	    int		l;
-	    int		c;
+	    ಪೂರ್ಣಾಂಕ		l;
+	    ಪೂರ್ಣಾಂಕ		c;
 	    char_u	*p;
 
-	    len += *buffer_off;
-	    buffer[len] = NUL;
+	    len += *ಬಫರ್_off;
+	    ಬಫರ್[len] = NUL;
 
 	    // Check if the last character in buffer[] is
 	    // incomplete, keep these bytes for the next
 	    // round.
-	    for (p = buffer; p < buffer + len; p += l)
+	    ಗಾಗಿ (p = ಬಫರ್; p < ಬಫರ್ + len; p += l)
 	    {
 		l = MB_CPTR2LEN(p);
-		if (l == 0)
+		ಆದರೆ (l == 0)
 		    l = 1;  // NUL byte?
-		else if (MB_BYTE2LEN(*p) != l)
-		    break;
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (MB_BYTE2LEN(*p) != l)
+		    ನಿಲ್ಲಿಸು;
 	    }
-	    if (p == buffer)	// no complete character
+	    ಆದರೆ (p == ಬಫರ್)	// no complete character
 	    {
 		// avoid getting stuck at an illegal byte
-		if (len >= 12)
+		ಆದರೆ (len >= 12)
 		    ++p;
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    *buffer_off = len;
-		    return;
+		    *ಬಫರ್_off = len;
+		    ಹಿಂತಿರುಗಿ;
 		}
 	    }
 	    c = *p;
 	    *p = NUL;
-	    msg_puts((char *)buffer);
-	    if (p < buffer + len)
+	    ಸಂದೇಶ_puts((ಅಕ್ಷರ *)ಬಫರ್);
+	    ಆದರೆ (p < ಬಫರ್ + len)
 	    {
 		*p = c;
-		*buffer_off = (DWORD)((buffer + len) - p);
-		mch_memmove(buffer, p, *buffer_off);
-		return;
+		*ಬಫರ್_off = (DWORD)((ಬಫರ್ + len) - p);
+		mch_memmove(ಬಫರ್, p, *ಬಫರ್_off);
+		ಹಿಂತಿರುಗಿ;
 	    }
-	    *buffer_off = 0;
+	    *ಬಫರ್_off = 0;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    buffer[len] = NUL;
-	    msg_puts((char *)buffer);
+	    ಬಫರ್[len] = NUL;
+	    ಸಂದೇಶ_puts((ಅಕ್ಷರ *)ಬಫರ್);
 	}
 
-	windgoto(msg_row, cmdline_col_off + msg_col);
+	windgoto(ಸಂದೇಶ_ಅಡ್ಡಸಾಲು, cmdline_ಲಂಬಸಾಲು_off + ಸಂದೇಶ_ಲಂಬಸಾಲು);
 	cursor_on();
-	out_flush();
+	ಹೊರಹೋಗು_flush();
     }
 }
 
@@ -5141,77 +5141,77 @@ dump_pipe(int	    options,
  * Version of system to use for windows NT > 5.0 (Win2K), use pipe
  * for communication and doesn't open any new window.
  */
-    static int
-mch_system_piped(char *cmd, int options)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+mch_system_piped(ಅಕ್ಷರ *cmd, ಪೂರ್ಣಾಂಕ options)
 {
     STARTUPINFO		si;
     PROCESS_INFORMATION pi;
     DWORD		ret = 0;
 
-    HANDLE g_hChildStd_IN_Rd = NULL;
-    HANDLE g_hChildStd_IN_Wr = NULL;
-    HANDLE g_hChildStd_OUT_Rd = NULL;
-    HANDLE g_hChildStd_OUT_Wr = NULL;
+    HANDLE g_h_ಮಗು_Std_ಒಳ_Rd = ಖಾಲಿ;
+    HANDLE g_h_ಮಗು_Std_ಒಳ_Wr = ಖಾಲಿ;
+    HANDLE g_h_ಮಗು_Std_ಹೊರಹೋಗು_Rd = ಖಾಲಿ;
+    HANDLE g_h_ಮಗು_Std_ಹೊರಹೋಗು_Wr = ಖಾಲಿ;
 
-    char_u	buffer[BUFLEN + 1]; // reading buffer + size
+    char_u	ಬಫರ್[BUFLEN + 1]; // reading buffer + size
     DWORD	len;
 
     // buffer used to receive keys
     char_u	ta_buf[BUFLEN + 1];	// TypeAHead
-    int		ta_len = 0;		// valid bytes in ta_buf[]
+    ಪೂರ್ಣಾಂಕ		ta_len = 0;		// valid bytes in ta_buf[]
 
     DWORD	i;
-    int		noread_cnt = 0;
+    ಪೂರ್ಣಾಂಕ		noread_cnt = 0;
     garray_T	ga;
-    int		delay = 1;
-    DWORD	buffer_off = 0;	// valid bytes in buffer[]
-    char	*p = NULL;
+    ಪೂರ್ಣಾಂಕ		delay = 1;
+    DWORD	ಬಫರ್_off = 0;	// valid bytes in buffer[]
+    ಅಕ್ಷರ	*p = ಖಾಲಿ;
 
-    SECURITY_ATTRIBUTES saAttr;
+    SECURITY_ಗುಣಲಕ್ಷಣಗಳು saAttr;
 
     // Set the bInheritHandle flag so pipe handles are inherited.
-    saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
+    saAttr.n_ಉದ್ದಳತೆ = ಗಾತ್ರ(SECURITY_ಗುಣಲಕ್ಷಣಗಳು);
     saAttr.bInheritHandle = TRUE;
-    saAttr.lpSecurityDescriptor = NULL;
+    saAttr.lpSecurityDescriptor = ಖಾಲಿ;
 
-    if ( ! CreatePipe(&g_hChildStd_OUT_Rd, &g_hChildStd_OUT_Wr, &saAttr, 0)
+    ಆದರೆ ( ! CreatePipe(&g_h_ಮಗು_Std_ಹೊರಹೋಗು_Rd, &g_h_ಮಗು_Std_ಹೊರಹೋಗು_Wr, &saAttr, 0)
 	// Ensure the read handle to the pipe for STDOUT is not inherited.
-       || ! SetHandleInformation(g_hChildStd_OUT_Rd, HANDLE_FLAG_INHERIT, 0)
+       || ! ಗಣ_Handle_Information(g_h_ಮಗು_Std_ಹೊರಹೋಗು_Rd, HANDLE_FLAG_INHERIT, 0)
 	// Create a pipe for the child process's STDIN.
-       || ! CreatePipe(&g_hChildStd_IN_Rd, &g_hChildStd_IN_Wr, &saAttr, 0)
+       || ! CreatePipe(&g_h_ಮಗು_Std_ಒಳ_Rd, &g_h_ಮಗು_Std_ಒಳ_Wr, &saAttr, 0)
 	// Ensure the write handle to the pipe for STDIN is not inherited.
-       || ! SetHandleInformation(g_hChildStd_IN_Wr, HANDLE_FLAG_INHERIT, 0) )
+       || ! ಗಣ_Handle_Information(g_h_ಮಗು_Std_ಒಳ_Wr, HANDLE_FLAG_INHERIT, 0) )
     {
-	CloseHandle(g_hChildStd_IN_Rd);
-	CloseHandle(g_hChildStd_IN_Wr);
-	CloseHandle(g_hChildStd_OUT_Rd);
-	CloseHandle(g_hChildStd_OUT_Wr);
-	msg_puts(_("\nCannot create pipes\n"));
+	CloseHandle(g_h_ಮಗು_Std_ಒಳ_Rd);
+	CloseHandle(g_h_ಮಗು_Std_ಒಳ_Wr);
+	CloseHandle(g_h_ಮಗು_Std_ಹೊರಹೋಗು_Rd);
+	CloseHandle(g_h_ಮಗು_Std_ಹೊರಹೋಗು_Wr);
+	ಸಂದೇಶ_puts(_("\nCannot create pipes\n"));
     }
 
-    si.cb = sizeof(si);
-    si.lpReserved = NULL;
-    si.lpDesktop = NULL;
-    si.lpTitle = NULL;
+    si.cb = ಗಾತ್ರ(si);
+    si.lpReserved = ಖಾಲಿ;
+    si.lpDesktop = ಖಾಲಿ;
+    si.lpTitle = ಖಾಲಿ;
     si.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
 
     // set-up our file redirection
-    si.hStdError = g_hChildStd_OUT_Wr;
-    si.hStdOutput = g_hChildStd_OUT_Wr;
-    si.hStdInput = g_hChildStd_IN_Rd;
-    si.wShowWindow = SW_HIDE;
+    si.hStdError = g_h_ಮಗು_Std_ಹೊರಹೋಗು_Wr;
+    si.hStdOutput = g_h_ಮಗು_Std_ಹೊರಹೋಗು_Wr;
+    si.h_Std_ಒಳಹರಿವು = g_h_ಮಗು_Std_ಒಳ_Rd;
+    si.w_Show_ಕಿಟಕಿ = SW_HIDE;
     si.cbReserved2 = 0;
-    si.lpReserved2 = NULL;
+    si.lpReserved2 = ಖಾಲಿ;
 
-    if (options & SHELL_READ)
+    ಆದರೆ (options & SHELL_READ)
 	ga_init2(&ga, 1, BUFLEN);
 
-    if (cmd != NULL)
+    ಆದರೆ (cmd != ಖಾಲಿ)
     {
-	p = (char *)vim_strsave((char_u *)cmd);
-	if (p != NULL)
+	p = (ಅಕ್ಷರ *)vim_strsave((char_u *)cmd);
+	ಆದರೆ (p != ಖಾಲಿ)
 	    unescape_shellxquote((char_u *)p, p_sxe);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    p = cmd;
     }
 
@@ -5219,73 +5219,73 @@ mch_system_piped(char *cmd, int options)
     // About "Inherit handles" being TRUE: this command can be litigious,
     // handle inheritance was deactivated for pending temp file, but, if we
     // deactivate it, the pipes don't work for some reason.
-    vim_create_process(p, TRUE, CREATE_DEFAULT_ERROR_MODE,
-						&si, &pi, NULL, NULL);
+    vim_create_process(p, TRUE, CREATE_DEFAULT_ERROR_ಬಹುಲಕ,
+						&si, &pi, ಖಾಲಿ, ಖಾಲಿ);
 
-    if (p != cmd)
+    ಆದರೆ (p != cmd)
 	vim_free(p);
 
     // Close our unused side of the pipes
-    CloseHandle(g_hChildStd_IN_Rd);
-    CloseHandle(g_hChildStd_OUT_Wr);
+    CloseHandle(g_h_ಮಗು_Std_ಒಳ_Rd);
+    CloseHandle(g_h_ಮಗು_Std_ಹೊರಹೋಗು_Wr);
 
-    if (options & SHELL_WRITE)
+    ಆದರೆ (options & SHELL_WRITE)
     {
 	HANDLE thread = (HANDLE)
-	 _beginthreadex(NULL,  // security attributes
+	 _beginthreadex(ಖಾಲಿ,  // security attributes
 			0,     // default stack size
 			sub_process_writer, // function to be executed
-			g_hChildStd_IN_Wr,  // parameter
+			g_h_ಮಗು_Std_ಒಳ_Wr,  // parameter
 			0,		 // creation flag, start immediately
-			NULL);		    // we don't care about thread id
+			ಖಾಲಿ);		    // we don't care about thread id
 	CloseHandle(thread);
-	g_hChildStd_IN_Wr = NULL;
+	g_h_ಮಗು_Std_ಒಳ_Wr = ಖಾಲಿ;
     }
 
     // Keep updating the window while waiting for the shell to finish.
-    for (;;)
+    ಗಾಗಿ (;;)
     {
-	MSG	msg;
+	ಸಂದೇಶ_3	ಸಂದೇಶ;
 
-	if (PeekMessageW(&msg, (HWND)NULL, 0, 0, PM_REMOVE))
+	ಆದರೆ (Peek_ಸಂದೇಶ_W(&ಸಂದೇಶ, (HWND)ಖಾಲಿ, 0, 0, PM_REMOVE))
 	{
-	    TranslateMessage(&msg);
-	    DispatchMessageW(&msg);
+	    Translate_ಸಂದೇಶ(&ಸಂದೇಶ);
+	    Dispatch_ಸಂದೇಶ_W(&ಸಂದೇಶ);
 	}
 
 	// write pipe information in the window
-	if ((options & (SHELL_READ|SHELL_WRITE))
+	ಆದರೆ ((options & (SHELL_READ|SHELL_WRITE))
 # ifdef FEAT_GUI
-		|| gui.in_use
+		|| gui.ಒಳ_use
 # endif
 	    )
 	{
 	    len = 0;
-	    if (((options &
+	    ಆದರೆ (((options &
 			(SHELL_READ|SHELL_WRITE|SHELL_COOKED))
 		    != (SHELL_READ|SHELL_WRITE|SHELL_COOKED)
 # ifdef FEAT_GUI
-		    || gui.in_use
+		    || gui.ಒಳ_use
 # endif
 		    )
 		&& (ta_len > 0 || noread_cnt > 4))
 	    {
-		if (ta_len == 0)
+		ಆದರೆ (ta_len == 0)
 		{
 		    // Get extra characters when we don't have any.  Reset the
 		    // counter and timer.
 		    noread_cnt = 0;
 		    len = ui_inchar(ta_buf, BUFLEN, 10L, 0);
 		}
-		if (ta_len > 0 || len > 0)
+		ಆದರೆ (ta_len > 0 || len > 0)
 		{
 		    /*
 		     * For pipes: Check for CTRL-C: send interrupt signal to
 		     * child.
 		     */
-		    if (len == 1 && cmd != NULL)
+		    ಆದರೆ (len == 1 && cmd != ಖಾಲಿ)
 		    {
-			if (ta_buf[ta_len] == Ctrl_C)
+			ಆದರೆ (ta_buf[ta_len] == Ctrl_C)
 			{
 			    // Learn what exit code is expected, for
 			// now put 9 as SIGKILL
@@ -5297,41 +5297,41 @@ mch_system_piped(char *cmd, int options)
 		     * Check for CTRL-D: EOF, close pipe to child.
 		     * Ctrl_D may be decorated by _OnChar()
 		     */
-		    if ((len == 1 || len == 4 ) && cmd != NULL)
+		    ಆದರೆ ((len == 1 || len == 4 ) && cmd != ಖಾಲಿ)
 		    {
-			if (ta_buf[0] == Ctrl_D
+			ಆದರೆ (ta_buf[0] == Ctrl_D
 			    || (ta_buf[0] == CSI
 				&& ta_buf[1] == KS_MODIFIER
 				&& ta_buf[3] == Ctrl_D))
 			{
-			    CloseHandle(g_hChildStd_IN_Wr);
-			    g_hChildStd_IN_Wr = NULL;
+			    CloseHandle(g_h_ಮಗು_Std_ಒಳ_Wr);
+			    g_h_ಮಗು_Std_ಒಳ_Wr = ಖಾಲಿ;
 			    len = 0;
 			}
 		    }
 
-		    len = term_replace_keycodes(ta_buf, ta_len, len);
+		    len = ಪದ_replace_keycodes(ta_buf, ta_len, len);
 
 		    /*
 		     * For pipes: echo the typed characters.  For a pty this
 		     * does not seem to work.
 		     */
-		    for (i = ta_len; i < ta_len + len; ++i)
+		    ಗಾಗಿ (i = ta_len; i < ta_len + len; ++i)
 		    {
-			if (ta_buf[i] == '\n' || ta_buf[i] == '\b')
-			    msg_putchar(ta_buf[i]);
-			else if (has_mbyte)
+			ಆದರೆ (ta_buf[i] == '\n' || ta_buf[i] == '\b')
+			    ಸಂದೇಶ_putchar(ta_buf[i]);
+			ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (has_mbyte)
 			{
-			    int l = (*mb_ptr2len)(ta_buf + i);
+			    ಪೂರ್ಣಾಂಕ l = (*mb_ptr2len)(ta_buf + i);
 
-			    msg_outtrans_len(ta_buf + i, l);
+			    ಸಂದೇಶ_outtrans_len(ta_buf + i, l);
 			    i += l - 1;
 			}
-			else
-			    msg_outtrans_len(ta_buf + i, 1);
+			ಇಲ್ಲದಿದ್ದರೆ
+			    ಸಂದೇಶ_outtrans_len(ta_buf + i, 1);
 		    }
-		    windgoto(msg_row, cmdline_col_off + msg_col);
-		    out_flush();
+		    windgoto(ಸಂದೇಶ_ಅಡ್ಡಸಾಲು, cmdline_ಲಂಬಸಾಲು_off + ಸಂದೇಶ_ಲಂಬಸಾಲು);
+		    ಹೊರಹೋಗು_flush();
 
 		    ta_len += len;
 
@@ -5342,15 +5342,15 @@ mch_system_piped(char *cmd, int options)
 		     * lines, drop the typed characters (only check for
 		     * CTRL-C).
 		     */
-		    if (options & SHELL_WRITE)
+		    ಆದರೆ (options & SHELL_WRITE)
 			ta_len = 0;
-		    else if (g_hChildStd_IN_Wr != NULL)
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (g_h_ಮಗು_Std_ಒಳ_Wr != ಖಾಲಿ)
 		    {
-			WriteFile(g_hChildStd_IN_Wr, (char*)ta_buf,
-				    1, &len, NULL);
+			WriteFile(g_h_ಮಗು_Std_ಒಳ_Wr, (ಅಕ್ಷರ*)ta_buf,
+				    1, &len, ಖಾಲಿ);
 			// if we are typing in, we want to keep things reactive
 			delay = 1;
-			if (len > 0)
+			ಆದರೆ (len > 0)
 			{
 			    ta_len -= len;
 			    mch_memmove(ta_buf, ta_buf + len, ta_len);
@@ -5360,44 +5360,44 @@ mch_system_piped(char *cmd, int options)
 	    }
 	}
 
-	if (ta_len)
+	ಆದರೆ (ta_len)
 	    ui_inchar_undo(ta_buf, ta_len);
 
-	if (WaitForSingleObject(pi.hProcess, delay) != WAIT_TIMEOUT)
+	ಆದರೆ (WaitForSingleObject(pi.hProcess, delay) != WAIT_TIMEOUT)
 	{
-	    dump_pipe(options, g_hChildStd_OUT_Rd, &ga, buffer, &buffer_off);
-	    break;
+	    dump_pipe(options, g_h_ಮಗು_Std_ಹೊರಹೋಗು_Rd, &ga, ಬಫರ್, &ಬಫರ್_off);
+	    ನಿಲ್ಲಿಸು;
 	}
 
 	++noread_cnt;
-	dump_pipe(options, g_hChildStd_OUT_Rd, &ga, buffer, &buffer_off);
+	dump_pipe(options, g_h_ಮಗು_Std_ಹೊರಹೋಗು_Rd, &ga, ಬಫರ್, &ಬಫರ್_off);
 
 	// We start waiting for a very short time and then increase it, so
 	// that we respond quickly when the process is quick, and don't
 	// consume too much overhead when it's slow.
-	if (delay < 50)
+	ಆದರೆ (delay < 50)
 	    delay += 10;
     }
 
     // Close the pipe
-    CloseHandle(g_hChildStd_OUT_Rd);
-    if (g_hChildStd_IN_Wr != NULL)
-	CloseHandle(g_hChildStd_IN_Wr);
+    CloseHandle(g_h_ಮಗು_Std_ಹೊರಹೋಗು_Rd);
+    ಆದರೆ (g_h_ಮಗು_Std_ಒಳ_Wr != ಖಾಲಿ)
+	CloseHandle(g_h_ಮಗು_Std_ಒಳ_Wr);
 
     WaitForSingleObject(pi.hProcess, INFINITE);
 
     // Get the command exit code
-    GetExitCodeProcess(pi.hProcess, &ret);
+    Get_Exit_ಸಂಕೇತ_Process(pi.hProcess, &ret);
 
-    if (options & SHELL_READ)
+    ಆದರೆ (options & SHELL_READ)
     {
-	if (ga.ga_len > 0)
+	ಆದರೆ (ga.ga_len > 0)
 	{
-	    append_ga_line(&ga);
+	    append_ga_ಸಾಲು(&ga);
 	    // remember that the NL was missing
 	    curbuf->b_no_eol_lnum = curwin->w_cursor.lnum;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    curbuf->b_no_eol_lnum = 0;
 	ga_clear(&ga);
     }
@@ -5406,25 +5406,25 @@ mch_system_piped(char *cmd, int options)
     CloseHandle(pi.hThread);
     CloseHandle(pi.hProcess);
 
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-    static int
-mch_system_g(char *cmd, int options)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+mch_system_g(ಅಕ್ಷರ *cmd, ಪೂರ್ಣಾಂಕ options)
 {
     // if we can pipe and the shelltemp option is off
-    if (!p_stmp)
-	return mch_system_piped(cmd, options);
-    else
-	return mch_system_classic(cmd, options);
+    ಆದರೆ (!p_stmp)
+	ಹಿಂತಿರುಗಿ mch_system_piped(cmd, options);
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಹಿಂತಿರುಗಿ mch_system_classic(cmd, options);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-    static int
-mch_system_c(char *cmd, int options UNUSED)
+#ಆದರೆ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+mch_system_c(ಅಕ್ಷರ *cmd, ಪೂರ್ಣಾಂಕ options ಬಳಸದ)
 {
-    int		ret;
+    ಪೂರ್ಣಾಂಕ		ret;
     WCHAR	*wcmd;
     char_u	*buf;
     size_t	len;
@@ -5432,142 +5432,142 @@ mch_system_c(char *cmd, int options UNUSED)
     // If the command starts and ends with double quotes, enclose the command
     // in parentheses.
     len = STRLEN(cmd);
-    if (len >= 2 && cmd[0] == '"' && cmd[len - 1] == '"')
+    ಆದರೆ (len >= 2 && cmd[0] == '"' && cmd[len - 1] == '"')
     {
 	len += 3;
 	buf = alloc(len);
-	if (buf == NULL)
-	    return -1;
-	vim_snprintf((char *)buf, len, "(%s)", cmd);
-	wcmd = enc_to_utf16(buf, NULL);
-	free(buf);
+	ಆದರೆ (buf == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ -1;
+	vim_snprintf((ಅಕ್ಷರ *)buf, len, "(%s)", cmd);
+	wcmd = enc_ಗಮ್ಯ_utf16(buf, ಖಾಲಿ);
+	ಬಿಡುಗಡೆ(buf);
     }
-    else
-	wcmd = enc_to_utf16((char_u *)cmd, NULL);
+    ಇಲ್ಲದಿದ್ದರೆ
+	wcmd = enc_ಗಮ್ಯ_utf16((char_u *)cmd, ಖಾಲಿ);
 
-    if (wcmd == NULL)
-	return -1;
+    ಆದರೆ (wcmd == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ -1;
 
     ret = _wsystem(wcmd);
     vim_free(wcmd);
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    static int
-mch_system(char *cmd, int options)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+mch_system(ಅಕ್ಷರ *cmd, ಪೂರ್ಣಾಂಕ options)
 {
-#ifdef VIMDLL
-    if (gui.in_use || gui.starting)
-	return mch_system_g(cmd, options);
-    else
-	return mch_system_c(cmd, options);
-#elif defined(FEAT_GUI_MSWIN)
-    return mch_system_g(cmd, options);
-#else
-    return mch_system_c(cmd, options);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VIMDLL
+    ಆದರೆ (gui.ಒಳ_use || gui.starting)
+	ಹಿಂತಿರುಗಿ mch_system_g(cmd, options);
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಹಿಂತಿರುಗಿ mch_system_c(cmd, options);
+#ಅಥವಾಆದರೆ defined(FEAT_GUI_MSWIN)
+    ಹಿಂತಿರುಗಿ mch_system_g(cmd, options);
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಹಿಂತಿರುಗಿ mch_system_c(cmd, options);
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#if defined(FEAT_GUI) && defined(FEAT_TERMINAL)
+#ಆದರೆ defined(FEAT_GUI) && defined(FEAT_TERMINAL)
 /*
  * Use a terminal window to run a shell command in.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 mch_call_shell_terminal(
     char_u	*cmd,
-    int		options UNUSED)	// SHELL_*, see vim.h
+    ಪೂರ್ಣಾಂಕ		options ಬಳಸದ)	// SHELL_*, see vim.h
 {
     jobopt_T	opt;
-    char_u	*newcmd = NULL;
+    char_u	*newcmd = ಖಾಲಿ;
     typval_T	argvar[2];
     long_u	cmdlen;
-    int		retval = -1;
+    ಪೂರ್ಣಾಂಕ		retval = -1;
     buf_T	*buf;
-    job_T	*job;
+    ಕೆಲಸ_T	*ಕೆಲಸ;
     aco_save_T	aco;
     oparg_T	oa;		// operator arguments
 
-    if (cmd == NULL)
+    ಆದರೆ (cmd == ಖಾಲಿ)
 	cmdlen = STRLEN(p_sh) + 1;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	cmdlen = STRLEN(p_sh) + STRLEN(p_shcf) + STRLEN(cmd) + 10;
     newcmd = alloc(cmdlen);
-    if (newcmd == NULL)
-	return 255;
-    if (cmd == NULL)
+    ಆದರೆ (newcmd == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ 255;
+    ಆದರೆ (cmd == ಖಾಲಿ)
     {
 	STRCPY(newcmd, p_sh);
-	ch_log(NULL, "starting terminal to run a shell");
+	ch_log(ಖಾಲಿ, "starting terminal to run a shell");
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	vim_snprintf((char *)newcmd, cmdlen, "%s %s %s", p_sh, p_shcf, cmd);
-	ch_log(NULL, "starting terminal for system command '%s'", cmd);
+	vim_snprintf((ಅಕ್ಷರ *)newcmd, cmdlen, "%s %s %s", p_sh, p_shcf, cmd);
+	ch_log(ಖಾಲಿ, "starting terminal for system command '%s'", cmd);
     }
 
-    init_job_options(&opt);
+    init_ಕೆಲಸ_options(&opt);
 
     argvar[0].v_type = VAR_STRING;
     argvar[0].vval.v_string = newcmd;
     argvar[1].v_type = VAR_UNKNOWN;
-    buf = term_start(argvar, NULL, &opt, TERM_START_SYSTEM);
-    if (buf == NULL)
+    buf = ಪದ_ಆರಂಭ(argvar, ಖಾಲಿ, &opt, ಪದ_ಆರಂಭ_SYSTEM);
+    ಆದರೆ (buf == ಖಾಲಿ)
     {
 	vim_free(newcmd);
-	return 255;
+	ಹಿಂತಿರುಗಿ 255;
     }
 
-    job = term_getjob(buf->b_term);
-    ++job->jv_refcount;
+    ಕೆಲಸ = ಪದ_getjob(buf->b_ಪದ);
+    ++ಕೆಲಸ->jv_refcount;
 
     // Find a window to make "buf" curbuf.
     aucmd_prepbuf(&aco, buf);
-    if (curbuf == buf)
+    ಆದರೆ (curbuf == buf)
     {
 	// Only do this when a window was found for "buf".
 	clear_oparg(&oa);
-	while (term_use_loop())
+	ಆಗ (ಪದ_use_loop())
 	{
-	    if (oa.op_type == OP_NOP && oa.regname == NUL && !VIsual_active)
+	    ಆದರೆ (oa.op_type == OP_NOP && oa.regname == NUL && !VIsual_ಸಕ್ರಿಯ)
 	    {
 		// If terminal_loop() returns OK we got a key that is handled
 		// in Normal model. We don't do redrawing anyway.
-		if (terminal_loop(TRUE) == OK)
-		    normal_cmd(&oa, TRUE);
+		ಆದರೆ (terminal_loop(TRUE) == OK)
+		    ಸಾಮಾನ್ಯ_cmd(&oa, TRUE);
 	    }
-	    else
-		normal_cmd(&oa, TRUE);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ಸಾಮಾನ್ಯ_cmd(&oa, TRUE);
 	}
-	retval = job->jv_exitval;
-	ch_log(NULL, "system command finished");
+	retval = ಕೆಲಸ->jv_exitval;
+	ch_log(ಖಾಲಿ, "system command finished");
 
-	job_unref(job);
+	ಕೆಲಸ_unref(ಕೆಲಸ);
 
 	// restore curwin/curbuf and a few other things
 	aucmd_restbuf(&aco);
     }
 
     wait_return(TRUE);
-    do_buffer(DOBUF_WIPE, DOBUF_FIRST, FORWARD, buf->b_fnum, TRUE);
+    do_ಬಫರ್(DOBUF_WIPE, DOBUF_ಮೊದಲ, FORWARD, buf->b_fnum, TRUE);
 
     vim_free(newcmd);
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 /* Restore a previous environment variable value, or unset it if NULL.
  * 'must_free' indicates whether 'old_value' was allocated.
  */
-    static void
-restore_env_var(char_u *name, char_u *old_value, int must_free)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+restore_env_var(char_u *name, char_u *old_ಮೌಲ್ಯ, ಪೂರ್ಣಾಂಕ must_free)
 {
-    if (old_value != NULL)
+    ಆದರೆ (old_ಮೌಲ್ಯ != ಖಾಲಿ)
     {
-	vim_setenv(name, old_value);
-	if (must_free)
-	    vim_free(old_value);
-	return;
+	vim_setenv(name, old_ಮೌಲ್ಯ);
+	ಆದರೆ (must_free)
+	    vim_free(old_ಮೌಲ್ಯ);
+	ಹಿಂತಿರುಗಿ;
     }
     vim_unsetenv(name);
 }
@@ -5575,36 +5575,36 @@ restore_env_var(char_u *name, char_u *old_value, int must_free)
 /*
  * Either execute a command by calling the shell or start a new shell
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_call_shell(
     char_u  *cmd,
-    int	    options)	// SHELL_*, see vim.h
+    ಪೂರ್ಣಾಂಕ	    options)	// SHELL_*, see vim.h
 {
-    int		x = 0;
-    int		tmode = cur_tmode;
+    ಪೂರ್ಣಾಂಕ		x = 0;
+    ಪೂರ್ಣಾಂಕ		tmode = cur_tmode;
     WCHAR	szShellTitle[512];
-    int		must_free;
+    ಪೂರ್ಣಾಂಕ		must_free;
     char_u	*oldval;
 
-#ifdef FEAT_EVAL
-    ch_log(NULL, "executing shell command: %s", cmd);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ch_log(ಖಾಲಿ, "executing shell command: %s", cmd);
+#ಆದರೆ_ಅಂತ್ಯ
     // Change the title to reflect that we are in a subshell.
-    if (GetConsoleTitleW(szShellTitle, ARRAY_LENGTH(szShellTitle) - 4) > 0)
+    ಆದರೆ (GetConsoleTitleW(szShellTitle, ARRAY_ಉದ್ದಳತೆ(szShellTitle) - 4) > 0)
     {
-	if (cmd == NULL)
+	ಆದರೆ (cmd == ಖಾಲಿ)
 	    wcscat(szShellTitle, L" :sh");
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    WCHAR *wn = enc_to_utf16((char_u *)cmd, NULL);
+	    WCHAR *wn = enc_ಗಮ್ಯ_utf16((char_u *)cmd, ಖಾಲಿ);
 
-	    if (wn != NULL)
+	    ಆದರೆ (wn != ಖಾಲಿ)
 	    {
 		wcscat(szShellTitle, L" - !");
-		if ((wcslen(szShellTitle) + wcslen(wn) <
-			    ARRAY_LENGTH(szShellTitle)))
+		ಆದರೆ ((wcslen(szShellTitle) + wcslen(wn) <
+			    ARRAY_ಉದ್ದಳತೆ(szShellTitle)))
 		    wcscat(szShellTitle, wn);
-		SetConsoleTitleW(szShellTitle);
+		ಗಣ_Console_Title_W(szShellTitle);
 		vim_free(wn);
 	    }
 	}
@@ -5615,33 +5615,33 @@ mch_call_shell(
 	    &must_free);
     vim_setenv((char_u *)"NoDefaultCurrentDirectoryInExePath", (char_u *)"1");
 
-    out_flush();
+    ಹೊರಹೋಗು_flush();
 
-#ifdef MCH_WRITE_DUMP
-    if (fdDump)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ MCH_WRITE_DUMP
+    ಆದರೆ (fdDump)
     {
 	fprintf(fdDump, "mch_call_shell(\"%s\", %d)\n", cmd, options);
 	fflush(fdDump);
     }
-#endif
-#if defined(FEAT_GUI) && defined(FEAT_TERMINAL)
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ defined(FEAT_GUI) && defined(FEAT_TERMINAL)
     // TODO: make the terminal window work with input or output redirected.
-    if (
+    ಆದರೆ (
 # ifdef VIMDLL
-	    gui.in_use &&
+	    gui.ಒಳ_use &&
 # endif
-	    vim_strchr(p_go, GO_TERMINAL) != NULL
+	    vim_strchr(p_go, GO_TERMINAL) != ಖಾಲಿ
 	 && (options & (SHELL_FILTER|SHELL_DOOUT|SHELL_WRITE|SHELL_READ)) == 0)
     {
 	char_u	*cmdbase = cmd;
 
-	if (cmdbase != NULL)
+	ಆದರೆ (cmdbase != ಖಾಲಿ)
 	    // Skip a leading quote and (.
-	    while (*cmdbase == '"' || *cmdbase == '(')
+	    ಆಗ (*cmdbase == '"' || *cmdbase == '(')
 		++cmdbase;
 
 	// Check the command does not begin with "start "
-	if (cmdbase == NULL || STRNICMP(cmdbase, "start", 5) != 0
+	ಆದರೆ (cmdbase == ಖಾಲಿ || STRNICMP(cmdbase, "start", 5) != 0
 						   || !VIM_ISWHITE(cmdbase[5]))
 	{
 	    // Use a terminal window to run the command in.
@@ -5649,10 +5649,10 @@ mch_call_shell(
 	    resettitle();
 	    restore_env_var((char_u *)"NoDefaultCurrentDirectoryInExePath",
 		    oldval, must_free);
-	    return x;
+	    ಹಿಂತಿರುಗಿ x;
 	}
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     /*
      * Catch all deadly signals while running the external command, because a
@@ -5666,27 +5666,27 @@ mch_call_shell(
     mch_signal(SIGTERM, SIG_IGN);
     mch_signal(SIGABRT, SIG_IGN);
 
-    if (options & SHELL_COOKED)
+    ಆದರೆ (options & SHELL_COOKED)
 	settmode(TMODE_COOK);	// set to normal mode
 
-    if (cmd == NULL)
+    ಆದರೆ (cmd == ಖಾಲಿ)
     {
-	x = mch_system((char *)p_sh, options);
+	x = mch_system((ಅಕ್ಷರ *)p_sh, options);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// we use "command" or "cmd" to start the shell; slow but easy
-	char_u	*newcmd = NULL;
+	char_u	*newcmd = ಖಾಲಿ;
 	char_u	*cmdbase = cmd;
 	long_u	cmdlen;
 
 	// Skip a leading ", ( and "(.
-	if (*cmdbase == '"' )
+	ಆದರೆ (*cmdbase == '"' )
 	    ++cmdbase;
-	if (*cmdbase == '(')
+	ಆದರೆ (*cmdbase == '(')
 	    ++cmdbase;
 
-	if ((STRNICMP(cmdbase, "start", 5) == 0) && VIM_ISWHITE(cmdbase[5]))
+	ಆದರೆ ((STRNICMP(cmdbase, "start", 5) == 0) && VIM_ISWHITE(cmdbase[5]))
 	{
 	    STARTUPINFO		si;
 	    PROCESS_INFORMATION	pi;
@@ -5694,49 +5694,49 @@ mch_call_shell(
 	    INT			n_show_cmd = SW_SHOWNORMAL;
 	    char_u		*p;
 
-	    ZeroMemory(&si, sizeof(si));
-	    si.cb = sizeof(si);
-	    si.lpReserved = NULL;
-	    si.lpDesktop = NULL;
-	    si.lpTitle = NULL;
+	    Zero_ಸ್ಮರಣೆ(&si, ಗಾತ್ರ(si));
+	    si.cb = ಗಾತ್ರ(si);
+	    si.lpReserved = ಖಾಲಿ;
+	    si.lpDesktop = ಖಾಲಿ;
+	    si.lpTitle = ಖಾಲಿ;
 	    si.dwFlags = 0;
 	    si.cbReserved2 = 0;
-	    si.lpReserved2 = NULL;
+	    si.lpReserved2 = ಖಾಲಿ;
 
 	    cmdbase = skipwhite(cmdbase + 5);
-	    if ((STRNICMP(cmdbase, "/min", 4) == 0)
+	    ಆದರೆ ((STRNICMP(cmdbase, "/min", 4) == 0)
 		    && VIM_ISWHITE(cmdbase[4]))
 	    {
 		cmdbase = skipwhite(cmdbase + 4);
 		si.dwFlags = STARTF_USESHOWWINDOW;
-		si.wShowWindow = SW_SHOWMINNOACTIVE;
+		si.w_Show_ಕಿಟಕಿ = SW_SHOWMINNOACTIVE;
 		n_show_cmd = SW_SHOWMINNOACTIVE;
 	    }
-	    else if ((STRNICMP(cmdbase, "/b", 2) == 0)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((STRNICMP(cmdbase, "/b", 2) == 0)
 		    && VIM_ISWHITE(cmdbase[2]))
 	    {
 		cmdbase = skipwhite(cmdbase + 2);
-		flags = CREATE_NO_WINDOW;
+		flags = CREATE_NO_ಕಿಟಕಿ;
 		si.dwFlags = STARTF_USESTDHANDLES;
-		si.hStdInput = CreateFile("\\\\.\\NUL",	// File name
+		si.h_Std_ಒಳಹರಿವು = CreateFile("\\\\.\\NUL",	// File name
 		    GENERIC_READ,			// Access flags
 		    0,					// Share flags
-		    NULL,				// Security att.
+		    ಖಾಲಿ,				// Security att.
 		    OPEN_EXISTING,			// Open flags
-		    FILE_ATTRIBUTE_NORMAL,		// File att.
-		    NULL);				// Temp file
-		si.hStdOutput = si.hStdInput;
-		si.hStdError = si.hStdInput;
+		    FILE_ATTRIBUTE_ಸಾಮಾನ್ಯ,		// File att.
+		    ಖಾಲಿ);				// Temp file
+		si.hStdOutput = si.h_Std_ಒಳಹರಿವು;
+		si.hStdError = si.h_Std_ಒಳಹರಿವು;
 	    }
 
 	    // Remove a trailing ", ) and )" if they have a match
 	    // at the start of the command.
-	    if (cmdbase > cmd)
+	    ಆದರೆ (cmdbase > cmd)
 	    {
 		p = cmdbase + STRLEN(cmdbase);
-		if (p > cmdbase && p[-1] == '"' && *cmd == '"')
+		ಆದರೆ (p > cmdbase && p[-1] == '"' && *cmd == '"')
 		    *--p = NUL;
-		if (p > cmdbase && p[-1] == ')'
+		ಆದರೆ (p > cmdbase && p[-1] == ')'
 			&& (*cmd =='(' || cmd[1] == '('))
 		    *--p = NUL;
 	    }
@@ -5751,25 +5751,25 @@ mch_call_shell(
 	     * shellxescape except '|' for avoiding to be treated as
 	     * argument to them. Pass the arguments to sub-shell.
 	     */
-	    if (flags != CREATE_NEW_CONSOLE)
+	    ಆದರೆ (flags != CREATE_NEW_CONSOLE)
 	    {
 		char_u	*subcmd;
 		char_u	*cmd_shell = mch_getenv("COMSPEC");
 
-		if (cmd_shell == NULL || *cmd_shell == NUL)
+		ಆದರೆ (cmd_shell == ಖಾಲಿ || *cmd_shell == NUL)
 		    cmd_shell = (char_u *)default_shell();
 
 		subcmd = vim_strsave_escaped_ext(cmdbase,
 			(char_u *)"|", '^', FALSE);
-		if (subcmd != NULL)
+		ಆದರೆ (subcmd != ಖಾಲಿ)
 		{
 		    // make "cmd.exe /c arguments"
 		    cmdlen = STRLEN(cmd_shell) + STRLEN(subcmd) + 5;
 		    newcmd = alloc(cmdlen);
-		    if (newcmd != NULL)
-			vim_snprintf((char *)newcmd, cmdlen, "%s /c %s",
+		    ಆದರೆ (newcmd != ಖಾಲಿ)
+			vim_snprintf((ಅಕ್ಷರ *)newcmd, cmdlen, "%s /c %s",
 						       cmd_shell, subcmd);
-		    else
+		    ಇಲ್ಲದಿದ್ದರೆ
 			newcmd = cmdbase;
 		    vim_free(subcmd);
 		}
@@ -5780,94 +5780,94 @@ mch_call_shell(
 	     * inherit our handles which causes unpleasant dangling swap
 	     * files if we exit before the spawned process
 	     */
-	    if (vim_create_process((char *)newcmd, FALSE, flags,
-			&si, &pi, NULL, NULL))
+	    ಆದರೆ (vim_create_process((ಅಕ್ಷರ *)newcmd, FALSE, flags,
+			&si, &pi, ಖಾಲಿ, ಖಾಲಿ))
 		x = 0;
-	    else if (vim_shell_execute((char *)newcmd, n_show_cmd)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (vim_shell_execute((ಅಕ್ಷರ *)newcmd, n_show_cmd)
 							       > (HINSTANCE)32)
 		x = 0;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		x = -1;
-#ifdef FEAT_GUI_MSWIN
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_MSWIN
 # ifdef VIMDLL
-		if (gui.in_use)
+		ಆದರೆ (gui.ಒಳ_use)
 # endif
-		    emsg(_(e_command_not_found));
-#endif
+		    emsg(_(e_command_not_ಸಿಕ್ಕಿತು));
+#ಆದರೆ_ಅಂತ್ಯ
 	    }
 
-	    if (newcmd != cmdbase)
+	    ಆದರೆ (newcmd != cmdbase)
 		vim_free(newcmd);
 
-	    if (si.dwFlags == STARTF_USESTDHANDLES && si.hStdInput != NULL)
+	    ಆದರೆ (si.dwFlags == STARTF_USESTDHANDLES && si.h_Std_ಒಳಹರಿವು != ಖಾಲಿ)
 	    {
 		// Close the handle to \\.\NUL created above.
-		CloseHandle(si.hStdInput);
+		CloseHandle(si.h_Std_ಒಳಹರಿವು);
 	    }
 	    // Close the handles to the subprocess, so that it goes away
 	    CloseHandle(pi.hThread);
 	    CloseHandle(pi.hProcess);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    cmdlen =
-#ifdef FEAT_GUI_MSWIN
-		((gui.in_use || gui.starting) ?
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_MSWIN
+		((gui.ಒಳ_use || gui.starting) ?
 		    (!s_dont_use_vimrun && p_stmp ?
-			vimrun_path.length : STRLEN(p_sh) + STRLEN(p_shcf))
+			vimrun_ಮಾರ್ಗ.ಉದ್ದಳತೆ : STRLEN(p_sh) + STRLEN(p_shcf))
 		    : 0) +
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 		STRLEN(p_sh) + STRLEN(p_shcf) + STRLEN(cmd) + 10;
 
 	    newcmd = alloc(cmdlen);
-	    if (newcmd != NULL)
+	    ಆದರೆ (newcmd != ಖಾಲಿ)
 	    {
-#if defined(FEAT_GUI_MSWIN)
-		if (
+#ಆದರೆ defined(FEAT_GUI_MSWIN)
+		ಆದರೆ (
 # ifdef VIMDLL
-		    (gui.in_use || gui.starting) &&
+		    (gui.ಒಳ_use || gui.starting) &&
 # endif
 		    need_vimrun_warning)
 		{
-		    char *msg = _("VIMRUN.EXE not found in your $PATH.\n"
+		    ಅಕ್ಷರ *ಸಂದೇಶ = _("VIMRUN.EXE not found in your $PATH.\n"
 			"External commands will not pause after completion.\n"
 			"See  :help win32-vimrun  for more information.");
-		    char *title = _("Vim Warning");
-		    WCHAR *wmsg = enc_to_utf16((char_u *)msg, NULL);
-		    WCHAR *wtitle = enc_to_utf16((char_u *)title, NULL);
+		    ಅಕ್ಷರ *title = _("Vim Warning");
+		    WCHAR *wmsg = enc_ಗಮ್ಯ_utf16((char_u *)ಸಂದೇಶ, ಖಾಲಿ);
+		    WCHAR *wtitle = enc_ಗಮ್ಯ_utf16((char_u *)title, ಖಾಲಿ);
 
-		    if (wmsg != NULL && wtitle != NULL)
-			MessageBoxW(NULL, wmsg, wtitle, MB_ICONWARNING);
+		    ಆದರೆ (wmsg != ಖಾಲಿ && wtitle != ಖಾಲಿ)
+			ಸಂದೇಶ_Box_W(ಖಾಲಿ, wmsg, wtitle, MB_ICONWARNING);
 		    vim_free(wmsg);
 		    vim_free(wtitle);
 		    need_vimrun_warning = FALSE;
 		}
-		if (
+		ಆದರೆ (
 # ifdef VIMDLL
-		    (gui.in_use || gui.starting) &&
+		    (gui.ಒಳ_use || gui.starting) &&
 # endif
 		    !s_dont_use_vimrun && p_stmp)
 		    // Use vimrun to execute the command.  It opens a console
 		    // window, which can be closed without killing Vim.
-		    vim_snprintf((char *)newcmd, cmdlen, "%s%s%s %s %s",
-			    vimrun_path.string,
-			    (msg_silent != 0 || (options & SHELL_DOOUT))
+		    vim_snprintf((ಅಕ್ಷರ *)newcmd, cmdlen, "%s%s%s %s %s",
+			    vimrun_ಮಾರ್ಗ.string,
+			    (ಸಂದೇಶ_silent != 0 || (options & SHELL_DOOUT))
 								 ? "-s " : "",
 			    p_sh, p_shcf, cmd);
-		else if (
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (
 # ifdef VIMDLL
-			(gui.in_use || gui.starting) &&
+			(gui.ಒಳ_use || gui.starting) &&
 # endif
 			s_dont_use_vimrun && STRCMP(p_shcf, "/c") == 0)
 		    // workaround for the case that "vimrun" does not exist
-		    vim_snprintf((char *)newcmd, cmdlen, "%s %s %s %s %s",
+		    vim_snprintf((ಅಕ್ಷರ *)newcmd, cmdlen, "%s %s %s %s %s",
 					   p_sh, p_shcf, p_sh, p_shcf, cmd);
-		else
-#endif
-		    vim_snprintf((char *)newcmd, cmdlen, "%s %s %s",
+		ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+		    vim_snprintf((ಅಕ್ಷರ *)newcmd, cmdlen, "%s %s %s",
 							   p_sh, p_shcf, cmd);
-		x = mch_system((char *)newcmd, options);
+		x = mch_system((ಅಕ್ಷರ *)newcmd, options);
 		vim_free(newcmd);
 	    }
 	}
@@ -5877,7 +5877,7 @@ mch_call_shell(
     restore_env_var((char_u *)"NoDefaultCurrentDirectoryInExePath",
 	    oldval, must_free);
 
-    if (tmode == TMODE_RAW)
+    ಆದರೆ (tmode == TMODE_RAW)
     {
 	// The shell may have messed with the mode, always set it.
 	cur_tmode = TMODE_UNKNOWN;
@@ -5885,15 +5885,15 @@ mch_call_shell(
     }
 
     // Print the return value, unless "vimrun" was used.
-    if (x != 0 && !(options & SHELL_SILENT) && !emsg_silent
-#if defined(FEAT_GUI_MSWIN)
-	    && ((gui.in_use || gui.starting) ?
+    ಆದರೆ (x != 0 && !(options & SHELL_SILENT) && !emsg_silent
+#ಆದರೆ defined(FEAT_GUI_MSWIN)
+	    && ((gui.ಒಳ_use || gui.starting) ?
 		((options & SHELL_DOOUT) || s_dont_use_vimrun || !p_stmp) : 1)
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    )
     {
 	smsg(_("shell returned %d"), x);
-	msg_putchar('\n');
+	ಸಂದೇಶ_putchar('\n');
     }
     resettitle();
 
@@ -5905,72 +5905,72 @@ mch_call_shell(
     mch_signal(SIGTERM, SIG_DFL);
     mch_signal(SIGABRT, SIG_DFL);
 
-    return x;
+    ಹಿಂತಿರುಗಿ x;
 }
 
-#if defined(FEAT_JOB_CHANNEL)
-    static HANDLE
-job_io_file_open(
+#ಆದರೆ defined(FEAT_ಕೆಲಸ_CHANNEL)
+    ಸ್ಥಿರ HANDLE
+ಕೆಲಸ_io_file_open(
 	char_u *fname,
 	DWORD dwDesiredAccess,
-	DWORD dwShareMode,
-	LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+	DWORD dw_Share_ಬಹುಲಕ,
+	LPSECURITY_ಗುಣಲಕ್ಷಣಗಳು lp_Security_ಗುಣಲಕ್ಷಣಗಳು,
 	DWORD dwCreationDisposition,
-	DWORD dwFlagsAndAttributes)
+	DWORD dw_Flags_And_ಗುಣಲಕ್ಷಣಗಳು)
 {
     HANDLE h;
     WCHAR *wn;
 
-    wn = enc_to_utf16(fname, NULL);
-    if (wn == NULL)
-	return INVALID_HANDLE_VALUE;
+    wn = enc_ಗಮ್ಯ_utf16(fname, ಖಾಲಿ);
+    ಆದರೆ (wn == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ INVALID_HANDLE_ಮೌಲ್ಯ;
 
-    h = CreateFileW(wn, dwDesiredAccess, dwShareMode,
-	    lpSecurityAttributes, dwCreationDisposition,
-	    dwFlagsAndAttributes, NULL);
+    h = CreateFileW(wn, dwDesiredAccess, dw_Share_ಬಹುಲಕ,
+	    lp_Security_ಗುಣಲಕ್ಷಣಗಳು, dwCreationDisposition,
+	    dw_Flags_And_ಗುಣಲಕ್ಷಣಗಳು, ಖಾಲಿ);
     vim_free(wn);
-    return h;
+    ಹಿಂತಿರುಗಿ h;
 }
 
 /*
  * Turn the dictionary "env" into a NUL separated list that can be used as the
  * environment argument of vim_create_process().
  */
-    void
-win32_build_env(dict_T *env, garray_T *gap, int is_terminal)
+    ಶೂನ್ಯ
+win32_build_env(dict_T *env, garray_T *gap, ಪೂರ್ಣಾಂಕ is_terminal)
 {
     hashitem_T	*hi;
-    long_u	todo = env != NULL ? env->dv_hashtab.ht_used : 0;
-    LPVOID	base = GetEnvironmentStringsW();
+    long_u	todo = env != ಖಾಲಿ ? env->dv_hashtab.ht_ಬಳಸಿದ : 0;
+    LPVOID	ತಳ = Get_Environment_ಅಕ್ಷರಸರಣಿಗಳು_W();
 
     // for last \0
-    if (ga_grow(gap, 1) == FAIL)
-	return;
+    ಆದರೆ (ga_grow(gap, 1) == FAIL)
+	ಹಿಂತಿರುಗಿ;
 
-    if (env != NULL)
+    ಆದರೆ (env != ಖಾಲಿ)
     {
-	FOR_ALL_HASHTAB_ITEMS(&env->dv_hashtab, hi, todo)
+	FOR_ALL_HASHTAB_ವಸ್ತುಗಳು(&env->dv_hashtab, hi, todo)
 	{
-	    if (!HASHITEM_EMPTY(hi))
+	    ಆದರೆ (!HASHITEM_ಖಾಲಿಗಳು(hi))
 	    {
-		typval_T *item = &dict_lookup(hi)->di_tv;
-		WCHAR   *wkey = enc_to_utf16((char_u *)hi->hi_key, NULL);
-		WCHAR   *wval = enc_to_utf16(tv_get_string(item), NULL);
+		typval_T *ಅಂಶ = &dict_lookup(hi)->di_tv;
+		WCHAR   *wkey = enc_ಗಮ್ಯ_utf16((char_u *)hi->hi_ಕೀಲಿ, ಖಾಲಿ);
+		WCHAR   *wval = enc_ಗಮ್ಯ_utf16(tv_get_string(ಅಂಶ), ಖಾಲಿ);
 		--todo;
-		if (wkey != NULL && wval != NULL)
+		ಆದರೆ (wkey != ಖಾಲಿ && wval != ಖಾಲಿ)
 		{
 		    size_t	n;
 		    size_t	lkey = wcslen(wkey);
 		    size_t	lval = wcslen(wval);
 
-		    if (ga_grow(gap, (int)(lkey + lval + 2)) == FAIL)
-			continue;
-		    for (n = 0; n < lkey; n++)
-			*((WCHAR*)gap->ga_data + gap->ga_len++) = wkey[n];
-		    *((WCHAR*)gap->ga_data + gap->ga_len++) = L'=';
-		    for (n = 0; n < lval; n++)
-			*((WCHAR*)gap->ga_data + gap->ga_len++) = wval[n];
-		    *((WCHAR*)gap->ga_data + gap->ga_len++) = L'\0';
+		    ಆದರೆ (ga_grow(gap, (ಪೂರ್ಣಾಂಕ)(lkey + lval + 2)) == FAIL)
+			ಮುಂದುವರಿ;
+		    ಗಾಗಿ (n = 0; n < lkey; n++)
+			*((WCHAR*)gap->ga_ದತ್ತಾಂಶ + gap->ga_len++) = wkey[n];
+		    *((WCHAR*)gap->ga_ದತ್ತಾಂಶ + gap->ga_len++) = L'=';
+		    ಗಾಗಿ (n = 0; n < lval; n++)
+			*((WCHAR*)gap->ga_ದತ್ತಾಂಶ + gap->ga_len++) = wval[n];
+		    *((WCHAR*)gap->ga_ದತ್ತಾಂಶ + gap->ga_len++) = L'\0';
 		}
 		vim_free(wkey);
 		vim_free(wval);
@@ -5978,33 +5978,33 @@ win32_build_env(dict_T *env, garray_T *gap, int is_terminal)
 	}
     }
 
-    if (base)
+    ಆದರೆ (ತಳ)
     {
-	WCHAR	*p = (WCHAR*) base;
+	WCHAR	*p = (WCHAR*) ತಳ;
 
 	// for last \0
-	if (ga_grow(gap, 1) == FAIL)
-	    return;
+	ಆದರೆ (ga_grow(gap, 1) == FAIL)
+	    ಹಿಂತಿರುಗಿ;
 
-	while (*p != 0 || *(p + 1) != 0)
+	ಆಗ (*p != 0 || *(p + 1) != 0)
 	{
-	    if (ga_grow(gap, 1) == OK)
-		*((WCHAR*)gap->ga_data + gap->ga_len++) = *p;
+	    ಆದರೆ (ga_grow(gap, 1) == OK)
+		*((WCHAR*)gap->ga_ದತ್ತಾಂಶ + gap->ga_len++) = *p;
 	    p++;
 	}
-	FreeEnvironmentStringsW(base);
-	*((WCHAR*)gap->ga_data + gap->ga_len++) = L'\0';
+	Free_Environment_ಅಕ್ಷರಸರಣಿಗಳು_W(ತಳ);
+	*((WCHAR*)gap->ga_ದತ್ತಾಂಶ + gap->ga_len++) = L'\0';
     }
 
-# if defined(FEAT_CLIENTSERVER) || defined(FEAT_TERMINAL)
+# ಆದರೆ defined(FEAT_CLIENTSERVER) || defined(FEAT_TERMINAL)
     {
 #  ifdef FEAT_CLIENTSERVER
 	char_u	*servername = get_vim_var_str(VV_SEND_SERVER);
 	size_t	servername_len = STRLEN(servername);
 #  endif
 #  ifdef FEAT_TERMINAL
-	char_u	*version = get_vim_var_str(VV_VERSION);
-	size_t	version_len = STRLEN(version);
+	char_u	*ಆವೃತ್ತಿ_2 = get_vim_var_str(VV_ಆವೃತ್ತಿ);
+	size_t	ಆವೃತ್ತಿ_len = STRLEN(ಆವೃತ್ತಿ_2);
 #  endif
 	// size of "VIM_SERVERNAME=" and value,
 	// plus "VIM_TERMINAL=" and value,
@@ -6014,31 +6014,31 @@ win32_build_env(dict_T *env, garray_T *gap, int is_terminal)
 		    + 15 + servername_len
 #  endif
 #  ifdef FEAT_TERMINAL
-		    + 13 + version_len + 2
+		    + 13 + ಆವೃತ್ತಿ_len + 2
 #  endif
 		    ;
 
-	if (ga_grow(gap, (int)n) == OK)
+	ಆದರೆ (ga_grow(gap, (ಪೂರ್ಣಾಂಕ)n) == OK)
 	{
 #  ifdef FEAT_CLIENTSERVER
-	    for (n = 0; n < 15; n++)
-		*((WCHAR*)gap->ga_data + gap->ga_len++) =
+	    ಗಾಗಿ (n = 0; n < 15; n++)
+		*((WCHAR*)gap->ga_ದತ್ತಾಂಶ + gap->ga_len++) =
 		    (WCHAR)"VIM_SERVERNAME="[n];
-	    for (n = 0; n < servername_len; n++)
-		*((WCHAR*)gap->ga_data + gap->ga_len++) =
+	    ಗಾಗಿ (n = 0; n < servername_len; n++)
+		*((WCHAR*)gap->ga_ದತ್ತಾಂಶ + gap->ga_len++) =
 		    (WCHAR)servername[n];
-	    *((WCHAR*)gap->ga_data + gap->ga_len++) = L'\0';
+	    *((WCHAR*)gap->ga_ದತ್ತಾಂಶ + gap->ga_len++) = L'\0';
 #  endif
 #  ifdef FEAT_TERMINAL
-	    if (is_terminal)
+	    ಆದರೆ (is_terminal)
 	    {
-		for (n = 0; n < 13; n++)
-		    *((WCHAR*)gap->ga_data + gap->ga_len++) =
+		ಗಾಗಿ (n = 0; n < 13; n++)
+		    *((WCHAR*)gap->ga_ದತ್ತಾಂಶ + gap->ga_len++) =
 			(WCHAR)"VIM_TERMINAL="[n];
-		for (n = 0; n < version_len; n++)
-		    *((WCHAR*)gap->ga_data + gap->ga_len++) =
-			(WCHAR)version[n];
-		*((WCHAR*)gap->ga_data + gap->ga_len++) = L'\0';
+		ಗಾಗಿ (n = 0; n < ಆವೃತ್ತಿ_len; n++)
+		    *((WCHAR*)gap->ga_ದತ್ತಾಂಶ + gap->ga_len++) =
+			(WCHAR)ಆವೃತ್ತಿ_2[n];
+		*((WCHAR*)gap->ga_ದತ್ತಾಂಶ + gap->ga_len++) = L'\0';
 	    }
 #  endif
 	}
@@ -6050,12 +6050,12 @@ win32_build_env(dict_T *env, garray_T *gap, int is_terminal)
  * Create a pair of pipes.
  * Return TRUE for success, FALSE for failure.
  */
-    static BOOL
+    ಸ್ಥಿರ BOOL
 create_pipe_pair(HANDLE handles[2])
 {
-    static LONG		s;
-    char		name[64];
-    SECURITY_ATTRIBUTES sa;
+    ಸ್ಥಿರ LONG		s;
+    ಅಕ್ಷರ		name[64];
+    SECURITY_ಗುಣಲಕ್ಷಣಗಳು sa;
 
     sprintf(name, "\\\\?\\pipe\\vim-%08lx-%08lx",
 	    GetCurrentProcessId(),
@@ -6066,32 +6066,32 @@ create_pipe_pair(HANDLE handles[2])
 	    name,
 	    PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED,
 	    PIPE_TYPE_BYTE | PIPE_NOWAIT,
-	    1, MAX_NAMED_PIPE_SIZE, 0, 0, NULL);
+	    1, MAX_NAMED_PIPE_ಗಾತ್ರ, 0, 0, ಖಾಲಿ);
 
-    if (handles[1] == INVALID_HANDLE_VALUE)
-	return FALSE;
+    ಆದರೆ (handles[1] == INVALID_HANDLE_ಮೌಲ್ಯ)
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    sa.nLength = sizeof(sa);
+    sa.n_ಉದ್ದಳತೆ = ಗಾತ್ರ(sa);
     sa.bInheritHandle = TRUE;
-    sa.lpSecurityDescriptor = NULL;
+    sa.lpSecurityDescriptor = ಖಾಲಿ;
 
     handles[0] = CreateFile(name,
 	    FILE_GENERIC_READ,
 	    FILE_SHARE_READ, &sa,
-	    OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	    OPEN_EXISTING, FILE_ATTRIBUTE_ಸಾಮಾನ್ಯ, 0);
 
-    if (handles[0] == INVALID_HANDLE_VALUE)
+    ಆದರೆ (handles[0] == INVALID_HANDLE_ಮೌಲ್ಯ)
     {
 	CloseHandle(handles[1]);
-	return FALSE;
+	ಹಿಂತಿರುಗಿ FALSE;
     }
 
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
-#endif // FEAT_JOB_CHANNEL
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_JOB_CHANNEL
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * Execute "argv" directly without the shell and return the output.
  * Used by system() and systemlist() when the command is a List.
@@ -6101,72 +6101,72 @@ create_pipe_pair(HANDLE handles[2])
  * Sets v:shell_error to the exit status.
  */
     char_u *
-mch_get_cmd_output_direct(
-    char	**argv,
+mch_get_cmd_output_ನೇರ(
+    ಅಕ್ಷರ	**argv,
     char_u	*infile,
-    int		flags UNUSED,
-    int		*ret_len)
+    ಪೂರ್ಣಾಂಕ		flags ಬಳಸದ,
+    ಪೂರ್ಣಾಂಕ		*ret_len)
 {
     STARTUPINFO		si;
     PROCESS_INFORMATION pi;
-    SECURITY_ATTRIBUTES saAttr;
-    HANDLE		hChildStdoutRd = INVALID_HANDLE_VALUE;
-    HANDLE		hChildStdoutWr = INVALID_HANDLE_VALUE;
-    HANDLE		hChildStdinRd = INVALID_HANDLE_VALUE;
+    SECURITY_ಗುಣಲಕ್ಷಣಗಳು saAttr;
+    HANDLE		h_ಮಗು_Stdout_Rd = INVALID_HANDLE_ಮೌಲ್ಯ;
+    HANDLE		h_ಮಗು_Stdout_Wr = INVALID_HANDLE_ಮೌಲ್ಯ;
+    HANDLE		h_ಮಗು_Stdin_Rd = INVALID_HANDLE_ಮೌಲ್ಯ;
     garray_T		cmd_ga;
-    garray_T		out_ga;
-    char_u		*buffer = NULL;
-    DWORD		exit_code = (DWORD)-1;
-    int			i;
+    garray_T		ಹೊರಹೋಗು_ga;
+    char_u		*ಬಫರ್ = ಖಾಲಿ;
+    DWORD		exit_ಸಂಕೇತ = (DWORD)-1;
+    ಪೂರ್ಣಾಂಕ			i;
 
     // Build a command string from argv.
     ga_init2(&cmd_ga, 1, 256);
-    for (i = 0; argv[i] != NULL; i++)
+    ಗಾಗಿ (i = 0; argv[i] != ಖಾಲಿ; i++)
     {
 	char_u	*arg = (char_u *)argv[i];
 	char_u	*s = arg;
-	int	has_spaces = FALSE;
-	int	j;
+	ಪೂರ್ಣಾಂಕ	has_spaces = FALSE;
+	ಪೂರ್ಣಾಂಕ	j;
 
-	for (j = 0; s[j] != NUL; j++)
-	    if (s[j] == ' ' || s[j] == '\t' || s[j] == '"')
+	ಗಾಗಿ (j = 0; s[j] != NUL; j++)
+	    ಆದರೆ (s[j] == ' ' || s[j] == '\t' || s[j] == '"')
 	    {
 		has_spaces = TRUE;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 
-	if (i > 0)
+	ಆದರೆ (i > 0)
 	    ga_append(&cmd_ga, ' ');
 
-	if (has_spaces)
+	ಆದರೆ (has_spaces)
 	{
-	    int	num_bs;
+	    ಪೂರ್ಣಾಂಕ	ಅಂಕೆ_bs;
 
 	    ga_append(&cmd_ga, '"');
-	    for (j = 0; arg[j] != NUL; j++)
+	    ಗಾಗಿ (j = 0; arg[j] != NUL; j++)
 	    {
-		num_bs = 0;
-		while (arg[j] == '\\')
+		ಅಂಕೆ_bs = 0;
+		ಆಗ (arg[j] == '\\')
 		{
-		    num_bs++;
+		    ಅಂಕೆ_bs++;
 		    j++;
 		}
 
-		if (arg[j] == NUL)
+		ಆದರೆ (arg[j] == NUL)
 		{
 		    // Backslashes before closing quote must be doubled.
-		    while (num_bs-- > 0)
+		    ಆಗ (ಅಂಕೆ_bs-- > 0)
 		    {
 			ga_append(&cmd_ga, '\\');
 			ga_append(&cmd_ga, '\\');
 		    }
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
-		else if (arg[j] == '"')
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (arg[j] == '"')
 		{
 		    // Backslashes before a double quote must be doubled,
 		    // and the double quote must be escaped.
-		    while (num_bs-- > 0)
+		    ಆಗ (ಅಂಕೆ_bs-- > 0)
 		    {
 			ga_append(&cmd_ga, '\\');
 			ga_append(&cmd_ga, '\\');
@@ -6174,310 +6174,310 @@ mch_get_cmd_output_direct(
 		    ga_append(&cmd_ga, '\\');
 		    ga_append(&cmd_ga, '"');
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    while (num_bs-- > 0)
+		    ಆಗ (ಅಂಕೆ_bs-- > 0)
 			ga_append(&cmd_ga, '\\');
 		    ga_append(&cmd_ga, arg[j]);
 		}
 	    }
 	    ga_append(&cmd_ga, '"');
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    ga_concat(&cmd_ga, arg);
     }
     ga_append(&cmd_ga, NUL);
 
-    ga_init2(&out_ga, 1, 4096);
+    ga_init2(&ಹೊರಹೋಗು_ga, 1, 4096);
 
-    saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
+    saAttr.n_ಉದ್ದಳತೆ = ಗಾತ್ರ(SECURITY_ಗುಣಲಕ್ಷಣಗಳು);
     saAttr.bInheritHandle = TRUE;
-    saAttr.lpSecurityDescriptor = NULL;
+    saAttr.lpSecurityDescriptor = ಖಾಲಿ;
 
     // Create a pipe for the child's stdout.
-    if (!CreatePipe(&hChildStdoutRd, &hChildStdoutWr, &saAttr, 0)
-	    || !SetHandleInformation(hChildStdoutRd, HANDLE_FLAG_INHERIT, 0))
+    ಆದರೆ (!CreatePipe(&h_ಮಗು_Stdout_Rd, &h_ಮಗು_Stdout_Wr, &saAttr, 0)
+	    || !ಗಣ_Handle_Information(h_ಮಗು_Stdout_Rd, HANDLE_FLAG_INHERIT, 0))
     {
 	emsg(_(e_cannot_create_pipes));
-	goto done;
+	ಹೋಗು ಮುಗಿದ;
     }
 
     // Set up stdin from infile if provided.
-    if (infile != NULL)
+    ಆದರೆ (infile != ಖಾಲಿ)
     {
-	WCHAR *winfile = enc_to_utf16(infile, NULL);
+	WCHAR *winfile = enc_ಗಮ್ಯ_utf16(infile, ಖಾಲಿ);
 
-	if (winfile != NULL)
+	ಆದರೆ (winfile != ಖಾಲಿ)
 	{
-	    hChildStdinRd = CreateFileW(winfile, GENERIC_READ,
+	    h_ಮಗು_Stdin_Rd = CreateFileW(winfile, GENERIC_READ,
 		    FILE_SHARE_READ, &saAttr, OPEN_EXISTING,
-		    FILE_ATTRIBUTE_NORMAL, NULL);
+		    FILE_ATTRIBUTE_ಸಾಮಾನ್ಯ, ಖಾಲಿ);
 	    vim_free(winfile);
 	}
     }
 
-    ZeroMemory(&pi, sizeof(pi));
-    ZeroMemory(&si, sizeof(si));
-    si.cb = sizeof(si);
+    Zero_ಸ್ಮರಣೆ(&pi, ಗಾತ್ರ(pi));
+    Zero_ಸ್ಮರಣೆ(&si, ಗಾತ್ರ(si));
+    si.cb = ಗಾತ್ರ(si);
     si.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
-    si.wShowWindow = SW_HIDE;
-    si.hStdOutput = hChildStdoutWr;
-    si.hStdError = hChildStdoutWr;
-    si.hStdInput = (hChildStdinRd != INVALID_HANDLE_VALUE)
-		    ? hChildStdinRd : INVALID_HANDLE_VALUE;
+    si.w_Show_ಕಿಟಕಿ = SW_HIDE;
+    si.hStdOutput = h_ಮಗು_Stdout_Wr;
+    si.hStdError = h_ಮಗು_Stdout_Wr;
+    si.h_Std_ಒಳಹರಿವು = (h_ಮಗು_Stdin_Rd != INVALID_HANDLE_ಮೌಲ್ಯ)
+		    ? h_ಮಗು_Stdin_Rd : INVALID_HANDLE_ಮೌಲ್ಯ;
 
-    ch_log(NULL, "directly executing: %s", (char *)cmd_ga.ga_data);
+    ch_log(ಖಾಲಿ, "directly executing: %s", (ಅಕ್ಷರ *)cmd_ga.ga_ದತ್ತಾಂಶ);
 
     // Create the child process directly, without going through the shell.
-    if (!vim_create_process((char *)cmd_ga.ga_data, TRUE,
-		CREATE_DEFAULT_ERROR_MODE | CREATE_NEW_PROCESS_GROUP,
-		&si, &pi, NULL, NULL))
+    ಆದರೆ (!vim_create_process((ಅಕ್ಷರ *)cmd_ga.ga_ದತ್ತಾಂಶ, TRUE,
+		CREATE_DEFAULT_ERROR_ಬಹುಲಕ | CREATE_NEW_PROCESS_ಗುಂಪು,
+		&si, &pi, ಖಾಲಿ, ಖಾಲಿ))
     {
-	semsg(_(e_invalid_argument_str), cmd_ga.ga_data);
-	goto done;
+	semsg(_(e_invalid_ವಾದ_str), cmd_ga.ga_ದತ್ತಾಂಶ);
+	ಹೋಗು ಮುಗಿದ;
     }
 
     // Close the write end of stdout pipe and stdin in the parent so that
     // ReadFile() will get EOF when the child process exits.
-    CloseHandle(hChildStdoutWr);
-    hChildStdoutWr = INVALID_HANDLE_VALUE;
-    if (hChildStdinRd != INVALID_HANDLE_VALUE)
+    CloseHandle(h_ಮಗು_Stdout_Wr);
+    h_ಮಗು_Stdout_Wr = INVALID_HANDLE_ಮೌಲ್ಯ;
+    ಆದರೆ (h_ಮಗು_Stdin_Rd != INVALID_HANDLE_ಮೌಲ್ಯ)
     {
-	CloseHandle(hChildStdinRd);
-	hChildStdinRd = INVALID_HANDLE_VALUE;
+	CloseHandle(h_ಮಗು_Stdin_Rd);
+	h_ಮಗು_Stdin_Rd = INVALID_HANDLE_ಮೌಲ್ಯ;
     }
 
     // Read output from child process.
-    for (;;)
+    ಗಾಗಿ (;;)
     {
-	char	buf[4096];
+	ಅಕ್ಷರ	buf[4096];
 	DWORD	n;
 
-	if (!ReadFile(hChildStdoutRd, buf, sizeof(buf), &n, NULL) || n == 0)
-	    break;
-	if (ga_grow(&out_ga, (int)n) == OK)
+	ಆದರೆ (!ReadFile(h_ಮಗು_Stdout_Rd, buf, ಗಾತ್ರ(buf), &n, ಖಾಲಿ) || n == 0)
+	    ನಿಲ್ಲಿಸು;
+	ಆದರೆ (ga_grow(&ಹೊರಹೋಗು_ga, (ಪೂರ್ಣಾಂಕ)n) == OK)
 	{
-	    mch_memmove((char *)out_ga.ga_data + out_ga.ga_len, buf, n);
-	    out_ga.ga_len += (int)n;
+	    mch_memmove((ಅಕ್ಷರ *)ಹೊರಹೋಗು_ga.ga_ದತ್ತಾಂಶ + ಹೊರಹೋಗು_ga.ga_len, buf, n);
+	    ಹೊರಹೋಗು_ga.ga_len += (ಪೂರ್ಣಾಂಕ)n;
 	}
     }
 
     // Wait for child to finish and get exit code.
     WaitForSingleObject(pi.hProcess, INFINITE);
-    GetExitCodeProcess(pi.hProcess, &exit_code);
+    Get_Exit_ಸಂಕೇತ_Process(pi.hProcess, &exit_ಸಂಕೇತ);
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
 
-    set_vim_var_nr(VV_SHELL_ERROR, (long)exit_code);
+    ಗಣ_vim_var_nr(VV_SHELL_ERROR, (ದೀರ್ಘ)exit_ಸಂಕೇತ);
 
-    if (out_ga.ga_len > 0)
+    ಆದರೆ (ಹೊರಹೋಗು_ga.ga_len > 0)
     {
-	buffer = alloc(out_ga.ga_len + 1);
-	if (buffer != NULL)
+	ಬಫರ್ = alloc(ಹೊರಹೋಗು_ga.ga_len + 1);
+	ಆದರೆ (ಬಫರ್ != ಖಾಲಿ)
 	{
-	    mch_memmove(buffer, out_ga.ga_data, out_ga.ga_len);
-	    if (ret_len == NULL)
+	    mch_memmove(ಬಫರ್, ಹೊರಹೋಗು_ga.ga_ದತ್ತಾಂಶ, ಹೊರಹೋಗು_ga.ga_len);
+	    ಆದರೆ (ret_len == ಖಾಲಿ)
 	    {
 		// Change NUL into SOH, otherwise the string is truncated.
-		for (i = 0; i < out_ga.ga_len; ++i)
-		    if (buffer[i] == NUL)
-			buffer[i] = 1;
-		buffer[out_ga.ga_len] = NUL;
+		ಗಾಗಿ (i = 0; i < ಹೊರಹೋಗು_ga.ga_len; ++i)
+		    ಆದರೆ (ಬಫರ್[i] == NUL)
+			ಬಫರ್[i] = 1;
+		ಬಫರ್[ಹೊರಹೋಗು_ga.ga_len] = NUL;
 	    }
-	    else
-		*ret_len = out_ga.ga_len;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		*ret_len = ಹೊರಹೋಗು_ga.ga_len;
 	}
     }
-    else if (ret_len != NULL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ret_len != ಖಾಲಿ)
 	*ret_len = 0;
 
-done:
+ಮುಗಿದ:
     ga_clear(&cmd_ga);
-    ga_clear(&out_ga);
-    if (hChildStdoutRd != INVALID_HANDLE_VALUE)
-	CloseHandle(hChildStdoutRd);
-    if (hChildStdoutWr != INVALID_HANDLE_VALUE)
-	CloseHandle(hChildStdoutWr);
-    if (hChildStdinRd != INVALID_HANDLE_VALUE)
-	CloseHandle(hChildStdinRd);
-    return buffer;
+    ga_clear(&ಹೊರಹೋಗು_ga);
+    ಆದರೆ (h_ಮಗು_Stdout_Rd != INVALID_HANDLE_ಮೌಲ್ಯ)
+	CloseHandle(h_ಮಗು_Stdout_Rd);
+    ಆದರೆ (h_ಮಗು_Stdout_Wr != INVALID_HANDLE_ಮೌಲ್ಯ)
+	CloseHandle(h_ಮಗು_Stdout_Wr);
+    ಆದರೆ (h_ಮಗು_Stdin_Rd != INVALID_HANDLE_ಮೌಲ್ಯ)
+	CloseHandle(h_ಮಗು_Stdin_Rd);
+    ಹಿಂತಿರುಗಿ ಬಫರ್;
 }
-#endif // FEAT_EVAL
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_EVAL
 
-#if defined(FEAT_JOB_CHANNEL)
-    void
-mch_job_start(char *cmd, job_T *job, jobopt_T *options)
+#ಆದರೆ defined(FEAT_ಕೆಲಸ_CHANNEL)
+    ಶೂನ್ಯ
+mch_ಕೆಲಸ_ಆರಂಭ(ಅಕ್ಷರ *cmd, ಕೆಲಸ_T *ಕೆಲಸ, jobopt_T *options)
 {
     STARTUPINFO		si;
     PROCESS_INFORMATION	pi;
     HANDLE		jo;
-    SECURITY_ATTRIBUTES saAttr;
-    channel_T		*channel = NULL;
+    SECURITY_ಗುಣಲಕ್ಷಣಗಳು saAttr;
+    channel_T		*channel = ಖಾಲಿ;
     HANDLE		ifd[2];
     HANDLE		ofd[2];
     HANDLE		efd[2];
     garray_T		ga;
 
-    int		use_null_for_in = options->jo_io[PART_IN] == JIO_NULL;
-    int		use_null_for_out = options->jo_io[PART_OUT] == JIO_NULL;
-    int		use_null_for_err = options->jo_io[PART_ERR] == JIO_NULL;
-    int		use_file_for_in = options->jo_io[PART_IN] == JIO_FILE;
-    int		use_file_for_out = options->jo_io[PART_OUT] == JIO_FILE;
-    int		use_file_for_err = options->jo_io[PART_ERR] == JIO_FILE;
-    int		use_out_for_err = options->jo_io[PART_ERR] == JIO_OUT;
+    ಪೂರ್ಣಾಂಕ		use_null_for_ಒಳ = options->jo_io[PART_ಒಳ] == JIO_NULL;
+    ಪೂರ್ಣಾಂಕ		use_null_for_ಹೊರಹೋಗು = options->jo_io[PART_ಹೊರಹೋಗು] == JIO_NULL;
+    ಪೂರ್ಣಾಂಕ		use_null_for_err = options->jo_io[PART_ERR] == JIO_NULL;
+    ಪೂರ್ಣಾಂಕ		use_file_for_ಒಳ = options->jo_io[PART_ಒಳ] == JIO_FILE;
+    ಪೂರ್ಣಾಂಕ		use_file_for_ಹೊರಹೋಗು = options->jo_io[PART_ಹೊರಹೋಗು] == JIO_FILE;
+    ಪೂರ್ಣಾಂಕ		use_file_for_err = options->jo_io[PART_ERR] == JIO_FILE;
+    ಪೂರ್ಣಾಂಕ		use_ಹೊರಹೋಗು_for_err = options->jo_io[PART_ERR] == JIO_ಹೊರಹೋಗು;
 
-    if (use_out_for_err && use_null_for_out)
+    ಆದರೆ (use_ಹೊರಹೋಗು_for_err && use_null_for_ಹೊರಹೋಗು)
 	use_null_for_err = TRUE;
 
-    ifd[0] = INVALID_HANDLE_VALUE;
-    ifd[1] = INVALID_HANDLE_VALUE;
-    ofd[0] = INVALID_HANDLE_VALUE;
-    ofd[1] = INVALID_HANDLE_VALUE;
-    efd[0] = INVALID_HANDLE_VALUE;
-    efd[1] = INVALID_HANDLE_VALUE;
-    ga_init2(&ga, sizeof(wchar_t), 500);
+    ifd[0] = INVALID_HANDLE_ಮೌಲ್ಯ;
+    ifd[1] = INVALID_HANDLE_ಮೌಲ್ಯ;
+    ofd[0] = INVALID_HANDLE_ಮೌಲ್ಯ;
+    ofd[1] = INVALID_HANDLE_ಮೌಲ್ಯ;
+    efd[0] = INVALID_HANDLE_ಮೌಲ್ಯ;
+    efd[1] = INVALID_HANDLE_ಮೌಲ್ಯ;
+    ga_init2(&ga, ಗಾತ್ರ(wchar_t), 500);
 
-    jo = CreateJobObject(NULL, NULL);
-    if (jo == NULL)
+    jo = Create_ಕೆಲಸ_Object(ಖಾಲಿ, ಖಾಲಿ);
+    ಆದರೆ (jo == ಖಾಲಿ)
     {
-	job->jv_status = JOB_FAILED;
-	goto failed;
+	ಕೆಲಸ->jv_ಸ್ಥಿತಿ = ಕೆಲಸ_FAILED;
+	ಹೋಗು failed;
     }
 
-    if (options->jo_env != NULL)
+    ಆದರೆ (options->jo_env != ಖಾಲಿ)
 	win32_build_env(options->jo_env, &ga, FALSE);
 
-    ZeroMemory(&pi, sizeof(pi));
-    ZeroMemory(&si, sizeof(si));
-    si.cb = sizeof(si);
+    Zero_ಸ್ಮರಣೆ(&pi, ಗಾತ್ರ(pi));
+    Zero_ಸ್ಮರಣೆ(&si, ಗಾತ್ರ(si));
+    si.cb = ಗಾತ್ರ(si);
     si.dwFlags |= STARTF_USESHOWWINDOW;
-    si.wShowWindow = SW_HIDE;
+    si.w_Show_ಕಿಟಕಿ = SW_HIDE;
 
-    saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
+    saAttr.n_ಉದ್ದಳತೆ = ಗಾತ್ರ(SECURITY_ಗುಣಲಕ್ಷಣಗಳು);
     saAttr.bInheritHandle = TRUE;
-    saAttr.lpSecurityDescriptor = NULL;
+    saAttr.lpSecurityDescriptor = ಖಾಲಿ;
 
-    if (use_file_for_in)
+    ಆದರೆ (use_file_for_ಒಳ)
     {
-	char_u *fname = options->jo_io_name[PART_IN];
+	char_u *fname = options->jo_io_name[PART_ಒಳ];
 
-	ifd[0] = job_io_file_open(fname, GENERIC_READ,
+	ifd[0] = ಕೆಲಸ_io_file_open(fname, GENERIC_READ,
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
-		&saAttr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL);
-	if (ifd[0] == INVALID_HANDLE_VALUE)
+		&saAttr, OPEN_EXISTING, FILE_ATTRIBUTE_ಸಾಮಾನ್ಯ);
+	ಆದರೆ (ifd[0] == INVALID_HANDLE_ಮೌಲ್ಯ)
 	{
 	    semsg(_(e_cant_open_file_str), fname);
-	    goto failed;
+	    ಹೋಗು failed;
 	}
     }
-    else if (!use_null_for_in
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!use_null_for_ಒಳ
 	    && (!create_pipe_pair(ifd)
-		|| !SetHandleInformation(ifd[1], HANDLE_FLAG_INHERIT, 0)))
-	goto failed;
+		|| !ಗಣ_Handle_Information(ifd[1], HANDLE_FLAG_INHERIT, 0)))
+	ಹೋಗು failed;
 
-    if (use_file_for_out)
+    ಆದರೆ (use_file_for_ಹೊರಹೋಗು)
     {
-	char_u *fname = options->jo_io_name[PART_OUT];
+	char_u *fname = options->jo_io_name[PART_ಹೊರಹೋಗು];
 
-	ofd[1] = job_io_file_open(fname, GENERIC_WRITE,
+	ofd[1] = ಕೆಲಸ_io_file_open(fname, GENERIC_WRITE,
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
-		&saAttr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL);
-	if (ofd[1] == INVALID_HANDLE_VALUE)
+		&saAttr, CREATE_ALWAYS, FILE_ATTRIBUTE_ಸಾಮಾನ್ಯ);
+	ಆದರೆ (ofd[1] == INVALID_HANDLE_ಮೌಲ್ಯ)
 	{
 	    semsg(_(e_cant_open_file_str), fname);
-	    goto failed;
+	    ಹೋಗು failed;
 	}
     }
-    else if (!use_null_for_out &&
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!use_null_for_ಹೊರಹೋಗು &&
 	    (!CreatePipe(&ofd[0], &ofd[1], &saAttr, 0)
-	    || !SetHandleInformation(ofd[0], HANDLE_FLAG_INHERIT, 0)))
-	goto failed;
+	    || !ಗಣ_Handle_Information(ofd[0], HANDLE_FLAG_INHERIT, 0)))
+	ಹೋಗು failed;
 
-    if (use_file_for_err)
+    ಆದರೆ (use_file_for_err)
     {
 	char_u *fname = options->jo_io_name[PART_ERR];
 
-	efd[1] = job_io_file_open(fname, GENERIC_WRITE,
+	efd[1] = ಕೆಲಸ_io_file_open(fname, GENERIC_WRITE,
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
-		&saAttr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL);
-	if (efd[1] == INVALID_HANDLE_VALUE)
+		&saAttr, CREATE_ALWAYS, FILE_ATTRIBUTE_ಸಾಮಾನ್ಯ);
+	ಆದರೆ (efd[1] == INVALID_HANDLE_ಮೌಲ್ಯ)
 	{
 	    semsg(_(e_cant_open_file_str), fname);
-	    goto failed;
+	    ಹೋಗು failed;
 	}
     }
-    else if (!use_out_for_err && !use_null_for_err &&
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!use_ಹೊರಹೋಗು_for_err && !use_null_for_err &&
 	    (!CreatePipe(&efd[0], &efd[1], &saAttr, 0)
-	    || !SetHandleInformation(efd[0], HANDLE_FLAG_INHERIT, 0)))
-	goto failed;
+	    || !ಗಣ_Handle_Information(efd[0], HANDLE_FLAG_INHERIT, 0)))
+	ಹೋಗು failed;
 
     si.dwFlags |= STARTF_USESTDHANDLES;
-    si.hStdInput = ifd[0];
+    si.h_Std_ಒಳಹರಿವು = ifd[0];
     si.hStdOutput = ofd[1];
-    si.hStdError = use_out_for_err ? ofd[1] : efd[1];
+    si.hStdError = use_ಹೊರಹೋಗು_for_err ? ofd[1] : efd[1];
 
-    if (!use_null_for_in || !use_null_for_out || !use_null_for_err)
+    ಆದರೆ (!use_null_for_ಒಳ || !use_null_for_ಹೊರಹೋಗು || !use_null_for_err)
     {
-	if (options->jo_set & JO_CHANNEL)
+	ಆದರೆ (options->jo_ಗಣ & JO_CHANNEL)
 	{
 	    channel = options->jo_channel;
-	    if (channel != NULL)
+	    ಆದರೆ (channel != ಖಾಲಿ)
 		++channel->ch_refcount;
 	}
-	else
-	    channel = add_channel();
-	if (channel == NULL)
-	    goto failed;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    channel = ಕೂಡಿಸು_channel();
+	ಆದರೆ (channel == ಖಾಲಿ)
+	    ಹೋಗು failed;
     }
 
-    if (!vim_create_process(cmd, TRUE,
+    ಆದರೆ (!vim_create_process(cmd, TRUE,
 	    CREATE_SUSPENDED |
-	    CREATE_DEFAULT_ERROR_MODE |
-	    CREATE_NEW_PROCESS_GROUP |
+	    CREATE_DEFAULT_ERROR_ಬಹುಲಕ |
+	    CREATE_NEW_PROCESS_ಗುಂಪು |
 	    CREATE_UNICODE_ENVIRONMENT |
 	    CREATE_NEW_CONSOLE,
 	    &si, &pi,
-	    ga.ga_data,
-	    (char *)options->jo_cwd))
+	    ga.ga_ದತ್ತಾಂಶ,
+	    (ಅಕ್ಷರ *)options->jo_cwd))
     {
 	CloseHandle(jo);
-	job->jv_status = JOB_FAILED;
-	goto failed;
+	ಕೆಲಸ->jv_ಸ್ಥಿತಿ = ಕೆಲಸ_FAILED;
+	ಹೋಗು failed;
     }
 
     ga_clear(&ga);
 
-    if (!AssignProcessToJobObject(jo, pi.hProcess))
+    ಆದರೆ (!ನಿಯೋಜಿಸು_Process_ಗಮ್ಯ_ಕೆಲಸ_Object(jo, pi.hProcess))
     {
 	// if failing, switch the way to terminate
 	// process with TerminateProcess.
 	CloseHandle(jo);
-	jo = NULL;
+	jo = ಖಾಲಿ;
     }
     ResumeThread(pi.hThread);
     CloseHandle(pi.hThread);
-    job->jv_proc_info = pi;
-    job->jv_job_object = jo;
-    job->jv_status = JOB_STARTED;
+    ಕೆಲಸ->jv_proc_info = pi;
+    ಕೆಲಸ->jv_ಕೆಲಸ_object = jo;
+    ಕೆಲಸ->jv_ಸ್ಥಿತಿ = ಕೆಲಸ_STARTED;
 
     CloseHandle(ifd[0]);
     CloseHandle(ofd[1]);
-    if (!use_out_for_err && !use_null_for_err)
+    ಆದರೆ (!use_ಹೊರಹೋಗು_for_err && !use_null_for_err)
 	CloseHandle(efd[1]);
 
-    job->jv_channel = channel;
-    if (channel != NULL)
+    ಕೆಲಸ->jv_channel = channel;
+    ಆದರೆ (channel != ಖಾಲಿ)
     {
-	channel_set_pipes(channel,
-		      use_file_for_in || use_null_for_in
+	channel_ಗಣ_pipes(channel,
+		      use_file_for_ಒಳ || use_null_for_ಒಳ
 					      ? INVALID_FD : (sock_T)ifd[1],
-		      use_file_for_out || use_null_for_out
+		      use_file_for_ಹೊರಹೋಗು || use_null_for_ಹೊರಹೋಗು
 					     ? INVALID_FD : (sock_T)ofd[0],
-		      use_out_for_err || use_file_for_err || use_null_for_err
+		      use_ಹೊರಹೋಗು_for_err || use_file_for_err || use_null_for_err
 					    ? INVALID_FD : (sock_T)efd[0]);
-	channel_set_job(channel, job, options);
+	channel_ಗಣ_ಕೆಲಸ(channel, ಕೆಲಸ, options);
     }
-    return;
+    ಹಿಂತಿರುಗಿ;
 
 failed:
     CloseHandle(ifd[0]);
@@ -6490,162 +6490,162 @@ failed:
     ga_clear(&ga);
 }
 
-    char *
-mch_job_status(job_T *job)
+    ಅಕ್ಷರ *
+mch_ಕೆಲಸ_ಸ್ಥಿತಿ(ಕೆಲಸ_T *ಕೆಲಸ)
 {
-    DWORD dwExitCode = 0;
+    DWORD dw_Exit_ಸಂಕೇತ = 0;
 
-    if (!GetExitCodeProcess(job->jv_proc_info.hProcess, &dwExitCode)
-	    || dwExitCode != STILL_ACTIVE)
+    ಆದರೆ (!Get_Exit_ಸಂಕೇತ_Process(ಕೆಲಸ->jv_proc_info.hProcess, &dw_Exit_ಸಂಕೇತ)
+	    || dw_Exit_ಸಂಕೇತ != STILL_ಸಕ್ರಿಯ)
     {
-	job->jv_exitval = (int)dwExitCode;
-	if (job->jv_status < JOB_ENDED)
+	ಕೆಲಸ->jv_exitval = (ಪೂರ್ಣಾಂಕ)dw_Exit_ಸಂಕೇತ;
+	ಆದರೆ (ಕೆಲಸ->jv_ಸ್ಥಿತಿ < ಕೆಲಸ_ENDED)
 	{
-	    ch_log(job->jv_channel, "Job ended");
-	    job->jv_status = JOB_ENDED;
+	    ch_log(ಕೆಲಸ->jv_channel, "Job ended");
+	    ಕೆಲಸ->jv_ಸ್ಥಿತಿ = ಕೆಲಸ_ENDED;
 	}
-	return "dead";
+	ಹಿಂತಿರುಗಿ "dead";
     }
-    return "run";
+    ಹಿಂತಿರುಗಿ "run";
 }
 
-    job_T *
-mch_detect_ended_job(job_T *job_list)
+    ಕೆಲಸ_T *
+mch_detect_ended_ಕೆಲಸ(ಕೆಲಸ_T *ಕೆಲಸ_list)
 {
-    HANDLE jobHandles[MAXIMUM_WAIT_OBJECTS];
-    job_T *jobArray[MAXIMUM_WAIT_OBJECTS];
-    job_T *job = job_list;
+    HANDLE ಕೆಲಸ_Handles[ಗರಿಷ್ಠ_WAIT_OBJECTS];
+    ಕೆಲಸ_T *ಕೆಲಸ_Array[ಗರಿಷ್ಠ_WAIT_OBJECTS];
+    ಕೆಲಸ_T *ಕೆಲಸ = ಕೆಲಸ_list;
 
-    while (job != NULL)
+    ಆಗ (ಕೆಲಸ != ಖಾಲಿ)
     {
 	DWORD n;
-	DWORD result;
+	DWORD ಫಲಿತಾಂಶ;
 
-	for (n = 0; n < MAXIMUM_WAIT_OBJECTS
-				       && job != NULL; job = job->jv_next)
+	ಗಾಗಿ (n = 0; n < ಗರಿಷ್ಠ_WAIT_OBJECTS
+				       && ಕೆಲಸ != ಖಾಲಿ; ಕೆಲಸ = ಕೆಲಸ->jv_ಮುಂದಿನ)
 	{
-	    if (job->jv_status == JOB_STARTED)
+	    ಆದರೆ (ಕೆಲಸ->jv_ಸ್ಥಿತಿ == ಕೆಲಸ_STARTED)
 	    {
-		jobHandles[n] = job->jv_proc_info.hProcess;
-		jobArray[n] = job;
+		ಕೆಲಸ_Handles[n] = ಕೆಲಸ->jv_proc_info.hProcess;
+		ಕೆಲಸ_Array[n] = ಕೆಲಸ;
 		++n;
 	    }
 	}
-	if (n == 0)
-	    continue;
-	result = WaitForMultipleObjects(n, jobHandles, FALSE, 0);
-	if (result >= WAIT_OBJECT_0 && result < WAIT_OBJECT_0 + n)
+	ಆದರೆ (n == 0)
+	    ಮುಂದುವರಿ;
+	ಫಲಿತಾಂಶ = Wait_For_ಅಪವರ್ತ್ಯ_Objects(n, ಕೆಲಸ_Handles, FALSE, 0);
+	ಆದರೆ (ಫಲಿತಾಂಶ >= WAIT_OBJECT_0 && ಫಲಿತಾಂಶ < WAIT_OBJECT_0 + n)
 	{
-	    job_T *wait_job = jobArray[result - WAIT_OBJECT_0];
+	    ಕೆಲಸ_T *wait_ಕೆಲಸ = ಕೆಲಸ_Array[ಫಲಿತಾಂಶ - WAIT_OBJECT_0];
 
-	    if (STRCMP(mch_job_status(wait_job), "dead") == 0)
-		return wait_job;
+	    ಆದರೆ (STRCMP(mch_ಕೆಲಸ_ಸ್ಥಿತಿ(wait_ಕೆಲಸ), "dead") == 0)
+		ಹಿಂತಿರುಗಿ wait_ಕೆಲಸ;
 	}
     }
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
-    static BOOL
-terminate_all(HANDLE process, int code)
+    ಸ್ಥಿರ BOOL
+terminate_all(HANDLE process, ಪೂರ್ಣಾಂಕ ಸಂಕೇತ_2)
 {
     PROCESSENTRY32  pe;
-    HANDLE	    h = INVALID_HANDLE_VALUE;
+    HANDLE	    h = INVALID_HANDLE_ಮೌಲ್ಯ;
     DWORD	    pid = GetProcessId(process);
 
-    if (pid != 0)
+    ಆದರೆ (pid != 0)
     {
 	h = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-	if (h != INVALID_HANDLE_VALUE)
+	ಆದರೆ (h != INVALID_HANDLE_ಮೌಲ್ಯ)
 	{
-	    pe.dwSize = sizeof(PROCESSENTRY32);
-	    if (!Process32First(h, &pe))
-		goto theend;
+	    pe.dw_ಗಾತ್ರ = ಗಾತ್ರ(PROCESSENTRY32);
+	    ಆದರೆ (!Process32_ಮೊದಲ(h, &pe))
+		ಹೋಗು theend;
 
-	    do
+	    ಮಾಡು
 	    {
-		if (pe.th32ParentProcessID == pid)
+		ಆದರೆ (pe.th32_ಪೋಷಕ_Process_ID == pid)
 		{
 		    HANDLE ph = OpenProcess(
 				  PROCESS_ALL_ACCESS, FALSE, pe.th32ProcessID);
-		    if (ph != NULL)
+		    ಆದರೆ (ph != ಖಾಲಿ)
 		    {
-			terminate_all(ph, code);
+			terminate_all(ph, ಸಂಕೇತ_2);
 			CloseHandle(ph);
 		    }
 		}
-	    } while (Process32Next(h, &pe));
+	    } ಆಗ (Process32_ಮುಂದಿನ(h, &pe));
 
 	    CloseHandle(h);
 	}
     }
 
 theend:
-    return TerminateProcess(process, code);
+    ಹಿಂತಿರುಗಿ TerminateProcess(process, ಸಂಕೇತ_2);
 }
 
 /*
  * Send a (deadly) signal to "job".
  * Return FAIL if it didn't work.
  */
-    int
-mch_signal_job(job_T *job, char_u *how)
+    ಪೂರ್ಣಾಂಕ
+mch_signal_ಕೆಲಸ(ಕೆಲಸ_T *ಕೆಲಸ, char_u *how)
 {
-    int ret;
+    ಪೂರ್ಣಾಂಕ ret;
 
-    if (STRCMP(how, "term") == 0 || STRCMP(how, "kill") == 0 || *how == NUL)
+    ಆದರೆ (STRCMP(how, "term") == 0 || STRCMP(how, "kill") == 0 || *how == NUL)
     {
 	// deadly signal
-	if (job->jv_job_object != NULL)
+	ಆದರೆ (ಕೆಲಸ->jv_ಕೆಲಸ_object != ಖಾಲಿ)
 	{
-	    if (job->jv_channel != NULL && job->jv_channel->ch_anonymous_pipe)
-		job->jv_channel->ch_killing = TRUE;
-	    return TerminateJobObject(job->jv_job_object, (UINT)-1) ? OK : FAIL;
+	    ಆದರೆ (ಕೆಲಸ->jv_channel != ಖಾಲಿ && ಕೆಲಸ->jv_channel->ch_anonymous_pipe)
+		ಕೆಲಸ->jv_channel->ch_killing = TRUE;
+	    ಹಿಂತಿರುಗಿ Terminate_ಕೆಲಸ_Object(ಕೆಲಸ->jv_ಕೆಲಸ_object, (UINT)-1) ? OK : FAIL;
 	}
-	return terminate_all(job->jv_proc_info.hProcess, -1) ? OK : FAIL;
+	ಹಿಂತಿರುಗಿ terminate_all(ಕೆಲಸ->jv_proc_info.hProcess, -1) ? OK : FAIL;
     }
 
-    if (!AttachConsole(job->jv_proc_info.dwProcessId))
-	return FAIL;
+    ಆದರೆ (!AttachConsole(ಕೆಲಸ->jv_proc_info.dwProcessId))
+	ಹಿಂತಿರುಗಿ FAIL;
     ret = GenerateConsoleCtrlEvent(
 		STRCMP(how, "int") == 0 ? CTRL_C_EVENT : CTRL_BREAK_EVENT,
-		job->jv_proc_info.dwProcessId)
+		ಕೆಲಸ->jv_proc_info.dwProcessId)
 	    ? OK : FAIL;
     FreeConsole();
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
 
 /*
  * Clear the data related to "job".
  */
-    void
-mch_clear_job(job_T *job)
+    ಶೂನ್ಯ
+mch_clear_ಕೆಲಸ(ಕೆಲಸ_T *ಕೆಲಸ)
 {
-    if (job->jv_status == JOB_FAILED)
-	return;
+    ಆದರೆ (ಕೆಲಸ->jv_ಸ್ಥಿತಿ == ಕೆಲಸ_FAILED)
+	ಹಿಂತಿರುಗಿ;
 
-    if (job->jv_job_object != NULL)
-	CloseHandle(job->jv_job_object);
-    CloseHandle(job->jv_proc_info.hProcess);
+    ಆದರೆ (ಕೆಲಸ->jv_ಕೆಲಸ_object != ಖಾಲಿ)
+	CloseHandle(ಕೆಲಸ->jv_ಕೆಲಸ_object);
+    CloseHandle(ಕೆಲಸ->jv_proc_info.hProcess);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ಆದರೆ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
 /*
  * Start termcap mode
  */
-    static void
-termcap_mode_start(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+termcap_ಬಹುಲಕ_ಆರಂಭ(ಶೂನ್ಯ)
 {
     DWORD cmodein;
 
-    if (g_fTermcapMode)
-	return;
+    ಆದರೆ (g_f_Termcap_ಬಹುಲಕ)
+	ಹಿಂತಿರುಗಿ;
 
-    SaveConsoleBuffer(&g_cbNonTermcap);
+    Save_Console_ಬಫರ್(&g_cbNonTermcap);
 
-    if (g_cbTermcap.IsValid)
+    ಆದರೆ (g_cbTermcap.IsValid)
     {
 	/*
 	 * We've been in termcap mode before.  Restore certain screen
@@ -6653,87 +6653,87 @@ termcap_mode_start(void)
 	 * size.  Since we will be redrawing the screen, we don't need
 	 * to restore the actual contents of the buffer.
 	 */
-	RestoreConsoleBuffer(&g_cbTermcap, FALSE);
+	Restore_Console_ಬಫರ್(&g_cbTermcap, FALSE);
 	reset_console_color_rgb();
-	SetConsoleWindowInfo(g_hConOut, TRUE, &g_cbTermcap.Info.srWindow);
-	Rows = g_cbTermcap.Info.dwSize.Y;
-	Columns = g_cbTermcap.Info.dwSize.X;
+	ಗಣ_Console_ಕಿಟಕಿ_Info(g_h_Con_ಹೊರಹೋಗು, TRUE, &g_cbTermcap.Info.sr_ಕಿಟಕಿ);
+	ಅಡ್ಡಸಾಲುಗಳು = g_cbTermcap.Info.dw_ಗಾತ್ರ.Y;
+	Columns = g_cbTermcap.Info.dw_ಗಾತ್ರ.X;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	/*
 	 * This is our first time entering termcap mode.  Clear the console
 	 * screen buffer, and resize the buffer to match the current window
 	 * size.  We will use this as the size of our editing environment.
 	 */
-	ClearConsoleBuffer(g_attrCurrent);
-	set_console_color_rgb();
-	ResizeConBufAndWindow(g_hConOut, Columns, Rows);
+	Clear_Console_ಬಫರ್(g_attrCurrent);
+	ಗಣ_console_color_rgb();
+	Resize_Con_Buf_And_ಕಿಟಕಿ(g_h_Con_ಹೊರಹೋಗು, Columns, ಅಡ್ಡಸಾಲುಗಳು);
     }
 
     resettitle();
 
-    GetConsoleMode(g_hConIn, &cmodein);
-    if (g_fMouseActive)
+    Get_Console_ಬಹುಲಕ(g_h_Con_ಒಳ, &cmodein);
+    ಆದರೆ (g_f_Mouse_ಸಕ್ರಿಯ)
     {
-	cmodein |= ENABLE_MOUSE_INPUT;
-	cmodein &= ~ENABLE_QUICK_EDIT_MODE;
+	cmodein |= ENABLE_MOUSE_ಒಳಹರಿವು;
+	cmodein &= ~ENABLE_ಶೀಘ್ರ_EDIT_ಬಹುಲಕ;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	cmodein &= ~ENABLE_MOUSE_INPUT;
-	cmodein |= g_cmodein & ENABLE_QUICK_EDIT_MODE;
+	cmodein &= ~ENABLE_MOUSE_ಒಳಹರಿವು;
+	cmodein |= g_cmodein & ENABLE_ಶೀಘ್ರ_EDIT_ಬಹುಲಕ;
     }
-    cmodein |= ENABLE_WINDOW_INPUT;
-    SetConsoleMode(g_hConIn, cmodein | ENABLE_EXTENDED_FLAGS);
+    cmodein |= ENABLE_ಕಿಟಕಿ_ಒಳಹರಿವು;
+    ಗಣ_Console_ಬಹುಲಕ(g_h_Con_ಒಳ, cmodein | ENABLE_EXTENDED_FLAGS);
 
     redraw_later_clear();
-    g_fTermcapMode = TRUE;
+    g_f_Termcap_ಬಹುಲಕ = TRUE;
 }
 
 
 /*
  * End termcap mode
  */
-    static void
-termcap_mode_end(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+termcap_ಬಹುಲಕ_ಕೊನೆ(ಶೂನ್ಯ)
 {
     DWORD cmodein;
-    ConsoleBuffer *cb;
+    Console_ಬಫರ್ *cb;
     COORD coord;
     DWORD dwDummy;
 
-    if (!g_fTermcapMode)
-	return;
+    ಆದರೆ (!g_f_Termcap_ಬಹುಲಕ)
+	ಹಿಂತಿರುಗಿ;
 
-    SaveConsoleBuffer(&g_cbTermcap);
+    Save_Console_ಬಫರ್(&g_cbTermcap);
 
-    GetConsoleMode(g_hConIn, &cmodein);
-    cmodein &= ~(ENABLE_MOUSE_INPUT | ENABLE_WINDOW_INPUT);
-    cmodein |= g_cmodein & ENABLE_QUICK_EDIT_MODE;
-    SetConsoleMode(g_hConIn, cmodein | ENABLE_EXTENDED_FLAGS);
+    Get_Console_ಬಹುಲಕ(g_h_Con_ಒಳ, &cmodein);
+    cmodein &= ~(ENABLE_MOUSE_ಒಳಹರಿವು | ENABLE_ಕಿಟಕಿ_ಒಳಹರಿವು);
+    cmodein |= g_cmodein & ENABLE_ಶೀಘ್ರ_EDIT_ಬಹುಲಕ;
+    ಗಣ_Console_ಬಹುಲಕ(g_h_Con_ಒಳ, cmodein | ENABLE_EXTENDED_FLAGS);
 
 # ifdef FEAT_RESTORE_ORIG_SCREEN
     cb = exiting ? &g_cbOrig : &g_cbNonTermcap;
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
     cb = &g_cbNonTermcap;
 # endif
-    RestoreConsoleBuffer(cb, p_rs);
+    Restore_Console_ಬಫರ್(cb, p_rs);
     restore_console_color_rgb();
 
     // Switch back to main screen buffer.
-    if (exiting && use_alternate_screen_buffer)
+    ಆದರೆ (exiting && use_alternate_screen_ಬಫರ್)
 	vtp_printf("\033[?1049l");
 
-    if (!USE_WT && (p_rs || exiting))
+    ಆದರೆ (!USE_WT && (p_rs || exiting))
     {
 	/*
 	 * Clear anything that happens to be on the current line.
 	 */
 	coord.X = 0;
-	coord.Y = (SHORT) (p_rs ? cb->Info.dwCursorPosition.Y : (Rows - 1));
-	FillConsoleOutputCharacter(g_hConOut, ' ',
-		cb->Info.dwSize.X, coord, &dwDummy);
+	coord.Y = (SHORT) (p_rs ? cb->Info.dwCursorPosition.Y : (ಅಡ್ಡಸಾಲುಗಳು - 1));
+	FillConsoleOutputCharacter(g_h_Con_ಹೊರಹೋಗು, ' ',
+		cb->Info.dw_ಗಾತ್ರ.X, coord, &dwDummy);
 	/*
 	 * The following is just for aesthetics.  If we are exiting without
 	 * restoring the screen, then we want to have a prompt string
@@ -6742,40 +6742,40 @@ termcap_mode_end(void)
 	 * the prompt string, which causes the screen to scroll.  To
 	 * counter this, move the cursor up one line before exiting.
 	 */
-	if (exiting && !p_rs)
+	ಆದರೆ (exiting && !p_rs)
 	    coord.Y--;
 	/*
 	 * Position the cursor at the leftmost column of the desired row.
 	 */
-	SetConsoleCursorPosition(g_hConOut, coord);
+	ಗಣ_Console_Cursor_Position(g_h_Con_ಹೊರಹೋಗು, coord);
     }
-    SetConsoleCursorInfo(g_hConOut, &g_cci);
-    g_fTermcapMode = FALSE;
+    ಗಣ_Console_Cursor_Info(g_h_Con_ಹೊರಹೋಗು, &g_cci);
+    g_f_Termcap_ಬಹುಲಕ = FALSE;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ಆದರೆ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
 /*
  * clear `n' chars, starting from `coord'
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 clear_chars(
     COORD coord,
     DWORD n)
 {
-    if (!vtp_working)
+    ಆದರೆ (!vtp_working)
     {
 	DWORD dwDummy;
 
-	FillConsoleOutputCharacter(g_hConOut, ' ', n, coord, &dwDummy);
-	FillConsoleOutputAttribute(g_hConOut, g_attrCurrent, n, coord,
+	FillConsoleOutputCharacter(g_h_Con_ಹೊರಹೋಗು, ' ', n, coord, &dwDummy);
+	FillConsoleOutputAttribute(g_h_Con_ಹೊರಹೋಗು, g_attrCurrent, n, coord,
 								     &dwDummy);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	set_console_color_rgb();
+	ಗಣ_console_color_rgb();
 	gotoxy(coord.X + 1, coord.Y + 1);
 	vtp_printf("\033[%dX", n);
     }
@@ -6785,16 +6785,16 @@ clear_chars(
 /*
  * Clear the screen
  */
-    static void
-clear_screen(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+clear_screen(ಶೂನ್ಯ)
 {
     g_coord.X = g_coord.Y = 0;
 
-    if (!vtp_working)
-	clear_chars(g_coord, Rows * Columns);
-    else
+    ಆದರೆ (!vtp_working)
+	clear_chars(g_coord, ಅಡ್ಡಸಾಲುಗಳು * Columns);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	set_console_color_rgb();
+	ಗಣ_console_color_rgb();
 	gotoxy(1, 1);
 	vtp_printf("\033[2J");
     }
@@ -6804,17 +6804,17 @@ clear_screen(void)
 /*
  * Clear to end of display
  */
-    static void
-clear_to_end_of_display(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+clear_ಗಮ್ಯ_ಕೊನೆ_ದ_display(ಶೂನ್ಯ)
 {
     COORD save = g_coord;
 
-    if (!vtp_working)
-	clear_chars(g_coord, (Rows - g_coord.Y - 1)
+    ಆದರೆ (!vtp_working)
+	clear_chars(g_coord, (ಅಡ್ಡಸಾಲುಗಳು - g_coord.Y - 1)
 					   * Columns + (Columns - g_coord.X));
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	set_console_color_rgb();
+	ಗಣ_console_color_rgb();
 	gotoxy(g_coord.X + 1, g_coord.Y + 1);
 	vtp_printf("\033[0J");
 
@@ -6827,16 +6827,16 @@ clear_to_end_of_display(void)
 /*
  * Clear to end of line
  */
-    static void
-clear_to_end_of_line(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+clear_ಗಮ್ಯ_ಕೊನೆ_ದ_ಸಾಲು(ಶೂನ್ಯ)
 {
     COORD save = g_coord;
 
-    if (!vtp_working)
+    ಆದರೆ (!vtp_working)
 	clear_chars(g_coord, Columns - g_coord.X);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	set_console_color_rgb();
+	ಗಣ_console_color_rgb();
 	gotoxy(g_coord.X + 1, g_coord.Y + 1);
 	vtp_printf("\033[0K");
 
@@ -6849,13 +6849,13 @@ clear_to_end_of_line(void)
 /*
  * Scroll the scroll region up by `cLines' lines
  */
-    static void
-scroll(unsigned cLines)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+scroll(ಚಿಹ್ನೆರಹಿತ c_ಸಾಲುಗಳು)
 {
     COORD oldcoord = g_coord;
 
-    gotoxy(g_srScrollRegion.Left + 1, g_srScrollRegion.Top + 1);
-    delete_lines(cLines);
+    gotoxy(g_srScrollRegion.ಎಡ_4 + 1, g_srScrollRegion.ತುದಿ_2 + 1);
+    delete_ಸಾಲುಗಳು(c_ಸಾಲುಗಳು);
 
     g_coord = oldcoord;
 }
@@ -6864,84 +6864,84 @@ scroll(unsigned cLines)
 /*
  * Set the scroll region
  */
-    static void
-set_scroll_region(
-    unsigned left,
-    unsigned top,
-    unsigned right,
-    unsigned bottom)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_scroll_region(
+    ಚಿಹ್ನೆರಹಿತ ಎಡ_2,
+    ಚಿಹ್ನೆರಹಿತ ತುದಿ,
+    ಚಿಹ್ನೆರಹಿತ ಬಲ_2,
+    ಚಿಹ್ನೆರಹಿತ bottom)
 {
-    if (left >= right
-	    || top >= bottom
-	    || right > (unsigned) Columns - 1
-	    || bottom > (unsigned) Rows - 1)
-	return;
+    ಆದರೆ (ಎಡ_2 >= ಬಲ_2
+	    || ತುದಿ >= bottom
+	    || ಬಲ_2 > (ಚಿಹ್ನೆರಹಿತ) Columns - 1
+	    || bottom > (ಚಿಹ್ನೆರಹಿತ) ಅಡ್ಡಸಾಲುಗಳು - 1)
+	ಹಿಂತಿರುಗಿ;
 
-    g_srScrollRegion.Left =   left;
-    g_srScrollRegion.Top =    top;
-    g_srScrollRegion.Right =  right;
+    g_srScrollRegion.ಎಡ_4 =   ಎಡ_2;
+    g_srScrollRegion.ತುದಿ_2 =    ತುದಿ;
+    g_srScrollRegion.ಬಲ_4 =  ಬಲ_2;
     g_srScrollRegion.Bottom = bottom;
 }
 
-    static void
-set_scroll_region_tb(
-    unsigned top,
-    unsigned bottom)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_scroll_region_tb(
+    ಚಿಹ್ನೆರಹಿತ ತುದಿ,
+    ಚಿಹ್ನೆರಹಿತ bottom)
 {
-    if (top >= bottom || bottom > (unsigned)Rows - 1)
-	return;
+    ಆದರೆ (ತುದಿ >= bottom || bottom > (ಚಿಹ್ನೆರಹಿತ)ಅಡ್ಡಸಾಲುಗಳು - 1)
+	ಹಿಂತಿರುಗಿ;
 
-    g_srScrollRegion.Top = top;
+    g_srScrollRegion.ತುದಿ_2 = ತುದಿ;
     g_srScrollRegion.Bottom = bottom;
 }
 
-    static void
-set_scroll_region_lr(
-    unsigned left,
-    unsigned right)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_scroll_region_lr(
+    ಚಿಹ್ನೆರಹಿತ ಎಡ_2,
+    ಚಿಹ್ನೆರಹಿತ ಬಲ_2)
 {
-    if (left >= right || right > (unsigned)Columns - 1)
-	return;
+    ಆದರೆ (ಎಡ_2 >= ಬಲ_2 || ಬಲ_2 > (ಚಿಹ್ನೆರಹಿತ)Columns - 1)
+	ಹಿಂತಿರುಗಿ;
 
-    g_srScrollRegion.Left = left;
-    g_srScrollRegion.Right = right;
+    g_srScrollRegion.ಎಡ_4 = ಎಡ_2;
+    g_srScrollRegion.ಬಲ_4 = ಬಲ_2;
 }
 
 
 /*
  * Insert `cLines' lines at the current cursor position
  */
-    static void
-insert_lines(unsigned cLines)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಸೇರಿಸು_ಸಾಲುಗಳು(ಚಿಹ್ನೆರಹಿತ c_ಸಾಲುಗಳು)
 {
-    SMALL_RECT	    source, clip;
+    SMALL_RECT	    ಮೂಲ, clip;
     COORD	    dest;
     CHAR_INFO	    fill;
 
-    gotoxy(g_srScrollRegion.Left + 1, g_srScrollRegion.Top + 1);
+    gotoxy(g_srScrollRegion.ಎಡ_4 + 1, g_srScrollRegion.ತುದಿ_2 + 1);
 
-    dest.X = g_srScrollRegion.Left;
-    dest.Y = g_coord.Y + cLines;
+    dest.X = g_srScrollRegion.ಎಡ_4;
+    dest.Y = g_coord.Y + c_ಸಾಲುಗಳು;
 
-    source.Left   = g_srScrollRegion.Left;
-    source.Top	  = g_coord.Y;
-    source.Right  = g_srScrollRegion.Right;
-    source.Bottom = g_srScrollRegion.Bottom - cLines;
+    ಮೂಲ.ಎಡ_4   = g_srScrollRegion.ಎಡ_4;
+    ಮೂಲ.ತುದಿ_2	  = g_coord.Y;
+    ಮೂಲ.ಬಲ_4  = g_srScrollRegion.ಬಲ_4;
+    ಮೂಲ.Bottom = g_srScrollRegion.Bottom - c_ಸಾಲುಗಳು;
 
-    clip.Left   = g_srScrollRegion.Left;
-    clip.Top    = g_coord.Y;
-    clip.Right  = g_srScrollRegion.Right;
+    clip.ಎಡ_4   = g_srScrollRegion.ಎಡ_4;
+    clip.ತುದಿ_2    = g_coord.Y;
+    clip.ಬಲ_4  = g_srScrollRegion.ಬಲ_4;
     clip.Bottom = g_srScrollRegion.Bottom;
 
     fill.Char.AsciiChar = ' ';
-    if (!USE_VTP)
-	fill.Attributes = g_attrCurrent;
-    else
-	fill.Attributes = g_attrDefault;
+    ಆದರೆ (!USE_VTP)
+	fill.ಗುಣಲಕ್ಷಣಗಳು_2 = g_attrCurrent;
+    ಇಲ್ಲದಿದ್ದರೆ
+	fill.ಗುಣಲಕ್ಷಣಗಳು_2 = g_attrDefault;
 
-    set_console_color_rgb();
+    ಗಣ_console_color_rgb();
 
-    ScrollConsoleScreenBuffer(g_hConOut, &source, &clip, dest, &fill);
+    Scroll_Console_Screen_ಬಫರ್(g_h_Con_ಹೊರಹೋಗು, &ಮೂಲ, &clip, dest, &fill);
 
     // Here we have to deal with a win32 console flake: If the scroll
     // region looks like abc and we scroll c to a and fill with d we get
@@ -6950,29 +6950,29 @@ insert_lines(unsigned cLines)
     // here... (this also occurs scrolling the same way in the other
     // direction).
 
-    if (source.Bottom < dest.Y)
+    ಆದರೆ (ಮೂಲ.Bottom < dest.Y)
     {
 	COORD coord;
-	int   i;
+	ಪೂರ್ಣಾಂಕ   i;
 
-	coord.X = source.Left;
-	for (i = clip.Top; i < dest.Y; ++i)
+	coord.X = ಮೂಲ.ಎಡ_4;
+	ಗಾಗಿ (i = clip.ತುದಿ_2; i < dest.Y; ++i)
 	{
 	    coord.Y = i;
-	    clear_chars(coord, source.Right - source.Left + 1);
+	    clear_chars(coord, ಮೂಲ.ಬಲ_4 - ಮೂಲ.ಎಡ_4 + 1);
 	}
     }
 
-    if (vtp_working)
+    ಆದರೆ (vtp_working)
     {
 	COORD coord;
-	int i;
+	ಪೂರ್ಣಾಂಕ i;
 
-	coord.X = source.Left;
-	for (i = source.Top; i < dest.Y; ++i)
+	coord.X = ಮೂಲ.ಎಡ_4;
+	ಗಾಗಿ (i = ಮೂಲ.ತುದಿ_2; i < dest.Y; ++i)
 	{
 	    coord.Y = i;
-	    clear_chars(coord, source.Right - source.Left + 1);
+	    clear_chars(coord, ಮೂಲ.ಬಲ_4 - ಮೂಲ.ಎಡ_4 + 1);
 	}
     }
 }
@@ -6981,67 +6981,67 @@ insert_lines(unsigned cLines)
 /*
  * Delete `cLines' lines at the current cursor position
  */
-    static void
-delete_lines(unsigned cLines)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+delete_ಸಾಲುಗಳು(ಚಿಹ್ನೆರಹಿತ c_ಸಾಲುಗಳು)
 {
-    SMALL_RECT	    source, clip;
+    SMALL_RECT	    ಮೂಲ, clip;
     COORD	    dest;
     CHAR_INFO	    fill;
-    int		    nb;
+    ಪೂರ್ಣಾಂಕ		    nb;
 
-    gotoxy(g_srScrollRegion.Left + 1, g_srScrollRegion.Top + 1);
+    gotoxy(g_srScrollRegion.ಎಡ_4 + 1, g_srScrollRegion.ತುದಿ_2 + 1);
 
-    dest.X = g_srScrollRegion.Left;
+    dest.X = g_srScrollRegion.ಎಡ_4;
     dest.Y = g_coord.Y;
 
-    source.Left   = g_srScrollRegion.Left;
-    source.Top	  = g_coord.Y + cLines;
-    source.Right  = g_srScrollRegion.Right;
-    source.Bottom = g_srScrollRegion.Bottom;
+    ಮೂಲ.ಎಡ_4   = g_srScrollRegion.ಎಡ_4;
+    ಮೂಲ.ತುದಿ_2	  = g_coord.Y + c_ಸಾಲುಗಳು;
+    ಮೂಲ.ಬಲ_4  = g_srScrollRegion.ಬಲ_4;
+    ಮೂಲ.Bottom = g_srScrollRegion.Bottom;
 
-    clip.Left   = g_srScrollRegion.Left;
-    clip.Top    = g_coord.Y;
-    clip.Right  = g_srScrollRegion.Right;
+    clip.ಎಡ_4   = g_srScrollRegion.ಎಡ_4;
+    clip.ತುದಿ_2    = g_coord.Y;
+    clip.ಬಲ_4  = g_srScrollRegion.ಬಲ_4;
     clip.Bottom = g_srScrollRegion.Bottom;
 
     fill.Char.AsciiChar = ' ';
-    if (!vtp_working)
-	fill.Attributes = g_attrCurrent;
-    else
-	fill.Attributes = g_attrDefault;
+    ಆದರೆ (!vtp_working)
+	fill.ಗುಣಲಕ್ಷಣಗಳು_2 = g_attrCurrent;
+    ಇಲ್ಲದಿದ್ದರೆ
+	fill.ಗುಣಲಕ್ಷಣಗಳು_2 = g_attrDefault;
 
-    set_console_color_rgb();
+    ಗಣ_console_color_rgb();
 
-    ScrollConsoleScreenBuffer(g_hConOut, &source, &clip, dest, &fill);
+    Scroll_Console_Screen_ಬಫರ್(g_h_Con_ಹೊರಹೋಗು, &ಮೂಲ, &clip, dest, &fill);
 
     // Here we have to deal with a win32 console flake; See insert_lines()
     // above.
 
-    nb = dest.Y + (source.Bottom - source.Top) + 1;
+    nb = dest.Y + (ಮೂಲ.Bottom - ಮೂಲ.ತುದಿ_2) + 1;
 
-    if (nb < source.Top)
+    ಆದರೆ (nb < ಮೂಲ.ತುದಿ_2)
     {
 	COORD coord;
-	int   i;
+	ಪೂರ್ಣಾಂಕ   i;
 
-	coord.X = source.Left;
-	for (i = nb; i < clip.Bottom; ++i)
+	coord.X = ಮೂಲ.ಎಡ_4;
+	ಗಾಗಿ (i = nb; i < clip.Bottom; ++i)
 	{
 	    coord.Y = i;
-	    clear_chars(coord, source.Right - source.Left + 1);
+	    clear_chars(coord, ಮೂಲ.ಬಲ_4 - ಮೂಲ.ಎಡ_4 + 1);
 	}
     }
 
-    if (vtp_working)
+    ಆದರೆ (vtp_working)
     {
 	COORD coord;
-	int i;
+	ಪೂರ್ಣಾಂಕ i;
 
-	coord.X = source.Left;
-	for (i = nb; i <= source.Bottom; ++i)
+	coord.X = ಮೂಲ.ಎಡ_4;
+	ಗಾಗಿ (i = nb; i <= ಮೂಲ.Bottom; ++i)
 	{
 	    coord.Y = i;
-	    clear_chars(coord, source.Right - source.Left + 1);
+	    clear_chars(coord, ಮೂಲ.ಬಲ_4 - ಮೂಲ.ಎಡ_4 + 1);
 	}
     }
 }
@@ -7050,28 +7050,28 @@ delete_lines(unsigned cLines)
 /*
  * Set the cursor position to (x,y) (1-based).
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 gotoxy(
-    unsigned x,
-    unsigned y)
+    ಚಿಹ್ನೆರಹಿತ x,
+    ಚಿಹ್ನೆರಹಿತ y)
 {
-    if (x < 1 || x > (unsigned)Columns || y < 1 || y > (unsigned)Rows)
-	return;
+    ಆದರೆ (x < 1 || x > (ಚಿಹ್ನೆರಹಿತ)Columns || y < 1 || y > (ಚಿಹ್ನೆರಹಿತ)ಅಡ್ಡಸಾಲುಗಳು)
+	ಹಿಂತಿರುಗಿ;
 
-    if (!USE_VTP)
+    ಆದರೆ (!USE_VTP)
     {
 	// There are reports of double-width characters not displayed
 	// correctly.  This workaround should fix it, similar to how it's done
 	// for VTP.
 	g_coord.X = 0;
-	SetConsoleCursorPosition(g_hConOut, g_coord);
+	ಗಣ_Console_Cursor_Position(g_h_Con_ಹೊರಹೋಗು, g_coord);
 
 	// external cursor coords are 1-based; internal are 0-based
 	g_coord.X = x - 1;
 	g_coord.Y = y - 1;
-	SetConsoleCursorPosition(g_hConOut, g_coord);
+	ಗಣ_Console_Cursor_Position(g_h_Con_ಹೊರಹೋಗು, g_coord);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Move the cursor to the left edge of the screen to prevent screen
 	// destruction.  Insider build bug.  Always enabled because it's cheap
@@ -7090,35 +7090,35 @@ gotoxy(
  * Set the current text attribute = (foreground | background)
  * See ../runtime/doc/os_win32.txt for the numbers.
  */
-    static void
-textattr(WORD wAttr)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+textattr(ಶಬ್ದ_2 wAttr)
 {
     g_attrCurrent = wAttr & 0xff;
 
-    SetConsoleTextAttribute(g_hConOut, wAttr);
+    ಗಣ_Console_ಪಠ್ಯ_Attribute(g_h_Con_ಹೊರಹೋಗು, wAttr);
 }
 
 
-    static void
-textcolor(WORD wAttr)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+textcolor(ಶಬ್ದ_2 wAttr)
 {
     g_attrCurrent = (g_attrCurrent & 0xf0) + (wAttr & 0x0f);
 
-    if (!vtp_working)
-	SetConsoleTextAttribute(g_hConOut, g_attrCurrent);
-    else
+    ಆದರೆ (!vtp_working)
+	ಗಣ_Console_ಪಠ್ಯ_Attribute(g_h_Con_ಹೊರಹೋಗು, g_attrCurrent);
+    ಇಲ್ಲದಿದ್ದರೆ
 	vtp_sgr_bulk(wAttr);
 }
 
 
-    static void
-textbackground(WORD wAttr)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+textbackground(ಶಬ್ದ_2 wAttr)
 {
     g_attrCurrent = (g_attrCurrent & 0x0f) + ((wAttr & 0x0f) << 4);
 
-    if (!vtp_working)
-	SetConsoleTextAttribute(g_hConOut, g_attrCurrent);
-    else
+    ಆದರೆ (!vtp_working)
+	ಗಣ_Console_ಪಠ್ಯ_Attribute(g_h_Con_ಹೊರಹೋಗು, g_attrCurrent);
+    ಇಲ್ಲದಿದ್ದರೆ
 	vtp_sgr_bulk(wAttr);
 }
 
@@ -7126,37 +7126,37 @@ textbackground(WORD wAttr)
 /*
  * restore the default text attribute (whatever we started with)
  */
-    static void
-normvideo(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+normvideo(ಶೂನ್ಯ)
 {
-    if (!vtp_working)
+    ಆದರೆ (!vtp_working)
 	textattr(g_attrDefault);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	vtp_sgr_bulk(0);
 }
 
 
-static WORD g_attrPreStandout = 0;
+ಸ್ಥಿರ ಶಬ್ದ_2 g_attrPreStandout = 0;
 
 /*
  * Make the text standout, by brightening it
  */
-    static void
-standout(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+standout(ಶೂನ್ಯ)
 {
     g_attrPreStandout = g_attrCurrent;
 
-    textattr((WORD) (g_attrCurrent|FOREGROUND_INTENSITY|BACKGROUND_INTENSITY));
+    textattr((ಶಬ್ದ_2) (g_attrCurrent|FOREGROUND_INTENSITY|BACKGROUND_INTENSITY));
 }
 
 
 /*
  * Turn off standout mode
  */
-    static void
-standend(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+standend(ಶೂನ್ಯ)
 {
-    if (g_attrPreStandout)
+    ಆದರೆ (g_attrPreStandout)
 	textattr(g_attrPreStandout);
 
     g_attrPreStandout = 0;
@@ -7166,15 +7166,15 @@ standend(void)
 /*
  * Set normal fg/bg color, based on T_ME.  Called when t_me has been set.
  */
-    void
-mch_set_normal_colors(void)
+    ಶೂನ್ಯ
+mch_ಗಣ_ಸಾಮಾನ್ಯ_colors(ಶೂನ್ಯ)
 {
     char_u	*p;
-    int		n;
+    ಪೂರ್ಣಾಂಕ		n;
 
-    cterm_normal_fg_color = (g_attrDefault & 0xf) + 1;
-    cterm_normal_bg_color = ((g_attrDefault >> 4) & 0xf) + 1;
-    if (
+    cterm_ಸಾಮಾನ್ಯ_fg_color = (g_attrDefault & 0xf) + 1;
+    cterm_ಸಾಮಾನ್ಯ_bg_color = ((g_attrDefault >> 4) & 0xf) + 1;
+    ಆದರೆ (
 # ifdef FEAT_TERMGUICOLORS
 	!p_tgc &&
 # endif
@@ -7182,15 +7182,15 @@ mch_set_normal_colors(void)
     {
 	p = T_ME + 2;
 	n = getdigits(&p);
-	if (*p == 'm' && n > 0)
+	ಆದರೆ (*p == 'm' && n > 0)
 	{
-	    cterm_normal_fg_color = (n & 0xf) + 1;
-	    cterm_normal_bg_color = ((n >> 4) & 0xf) + 1;
+	    cterm_ಸಾಮಾನ್ಯ_fg_color = (n & 0xf) + 1;
+	    cterm_ಸಾಮಾನ್ಯ_bg_color = ((n >> 4) & 0xf) + 1;
 	}
     }
 # ifdef FEAT_TERMGUICOLORS
-    cterm_normal_fg_gui_color = INVALCOLOR;
-    cterm_normal_bg_gui_color = INVALCOLOR;
+    cterm_ಸಾಮಾನ್ಯ_fg_gui_color = INVALCOLOR;
+    cterm_ಸಾಮಾನ್ಯ_bg_gui_color = INVALCOLOR;
 # endif
 }
 
@@ -7198,34 +7198,34 @@ mch_set_normal_colors(void)
 /*
  * visual bell: flash the screen
  */
-    static void
-visual_bell(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+visual_bell(ಶೂನ್ಯ)
 {
     COORD   coordOrigin = {0, 0};
-    WORD    attrFlash = ~g_attrCurrent & 0xff;
+    ಶಬ್ದ_2    attrFlash = ~g_attrCurrent & 0xff;
 
     DWORD   dwDummy;
-    LPWORD  oldattrs = NULL;
+    LPWORD  oldattrs = ಖಾಲಿ;
 
 # ifdef FEAT_TERMGUICOLORS
-    if (!(p_tgc || t_colors >= 256))
+    ಆದರೆ (!(p_tgc || t_colors >= 256))
 # endif
     {
-	oldattrs = ALLOC_MULT(WORD, Rows * Columns);
-	if (oldattrs == NULL)
-	    return;
-	ReadConsoleOutputAttribute(g_hConOut, oldattrs, Rows * Columns,
+	oldattrs = ALLOC_MULT(ಶಬ್ದ_2, ಅಡ್ಡಸಾಲುಗಳು * Columns);
+	ಆದರೆ (oldattrs == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ;
+	ReadConsoleOutputAttribute(g_h_Con_ಹೊರಹೋಗು, oldattrs, ಅಡ್ಡಸಾಲುಗಳು * Columns,
 			       coordOrigin, &dwDummy);
     }
 
-    FillConsoleOutputAttribute(g_hConOut, attrFlash, Rows * Columns,
+    FillConsoleOutputAttribute(g_h_Con_ಹೊರಹೋಗು, attrFlash, ಅಡ್ಡಸಾಲುಗಳು * Columns,
 			       coordOrigin, &dwDummy);
 
     Sleep(15);	    // wait for 15 msec
 
-    if (oldattrs != NULL)
+    ಆದರೆ (oldattrs != ಖಾಲಿ)
     {
-	WriteConsoleOutputAttribute(g_hConOut, oldattrs, Rows * Columns,
+	WriteConsoleOutputAttribute(g_h_Con_ಹೊರಹೋಗು, oldattrs, ಅಡ್ಡಸಾಲುಗಳು * Columns,
 				coordOrigin, &dwDummy);
 	vim_free(oldattrs);
     }
@@ -7235,19 +7235,19 @@ visual_bell(void)
 /*
  * Make the cursor visible or invisible
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 cursor_visible(BOOL fVisible)
 {
     s_cursor_visible = fVisible;
 
-    if (vtp_working)
+    ಆದರೆ (vtp_working)
     {
 	// In vtp mode, visibility is controlled solely by DECTCEM.  Skip
 	// mch_update_cursor() since shape is independent of visibility and
 	// re-emitting DECSCUSR can cause the terminal to briefly redisplay
 	// the cursor while a redraw is in progress.
 	vtp_printf("\033[?25%c", fVisible ? 'h' : 'l');
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
 # ifdef MCH_CURSOR_SHAPE
@@ -7263,201 +7263,201 @@ cursor_visible(BOOL fVisible)
  * Write "cbToWrite" bytes in `pchBuf' to the screen.
  * Returns the number of bytes actually written (at least one).
  */
-    static DWORD
+    ಸ್ಥಿರ DWORD
 write_chars(
     char_u *pchBuf,
-    DWORD  cbToWrite)
+    DWORD  cb_ಗಮ್ಯ_Write)
 {
     COORD	    coord = g_coord;
     DWORD	    written;
     DWORD	    n, cchwritten;
-    static DWORD    cells;
-    static WCHAR    *unicodebuf = NULL;
-    static int	    unibuflen = 0;
-    static int	    length;
-    int		    cp = enc_utf8 ? CP_UTF8 : enc_codepage;
-    static WCHAR    *utf8spbuf = NULL;
-    static int	    utf8splength;
-    static DWORD    utf8spcells;
-    static WCHAR    **utf8usingbuf = &unicodebuf;
+    ಸ್ಥಿರ DWORD    cells;
+    ಸ್ಥಿರ WCHAR    *unicodebuf = ಖಾಲಿ;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    unibuflen = 0;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    ಉದ್ದಳತೆ;
+    ಪೂರ್ಣಾಂಕ		    cp = enc_utf8 ? CP_UTF8 : enc_codepage;
+    ಸ್ಥಿರ WCHAR    *utf8spbuf = ಖಾಲಿ;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    utf8splength;
+    ಸ್ಥಿರ DWORD    utf8spcells;
+    ಸ್ಥಿರ WCHAR    **utf8usingbuf = &unicodebuf;
 
-    if (cbToWrite != 1 || *pchBuf != ' ' || !enc_utf8)
+    ಆದರೆ (cb_ಗಮ್ಯ_Write != 1 || *pchBuf != ' ' || !enc_utf8)
     {
 	utf8usingbuf = &unicodebuf;
-	do
+	ಮಾಡು
 	{
-	    length = MultiByteToWideChar(cp, 0, (LPCSTR)pchBuf, cbToWrite,
+	    ಉದ್ದಳತೆ = Multi_Byte_ಗಮ್ಯ_Wide_Char(cp, 0, (LPCSTR)pchBuf, cb_ಗಮ್ಯ_Write,
 							unicodebuf, unibuflen);
-	    if (length && length <= unibuflen)
-		break;
+	    ಆದರೆ (ಉದ್ದಳತೆ && ಉದ್ದಳತೆ <= unibuflen)
+		ನಿಲ್ಲಿಸು;
 	    vim_free(unicodebuf);
-	    unicodebuf = length ? LALLOC_MULT(WCHAR, length) : NULL;
-	    unibuflen = unibuflen ? 0 : length;
-	} while (TRUE);
-	cells = mb_string2cells(pchBuf, cbToWrite);
+	    unicodebuf = ಉದ್ದಳತೆ ? LALLOC_MULT(WCHAR, ಉದ್ದಳತೆ) : ಖಾಲಿ;
+	    unibuflen = unibuflen ? 0 : ಉದ್ದಳತೆ;
+	} ಆಗ (TRUE);
+	cells = mb_string2cells(pchBuf, cb_ಗಮ್ಯ_Write);
     }
-    else // cbToWrite == 1 && *pchBuf == ' ' && enc_utf8
+    ಇಲ್ಲದಿದ್ದರೆ // cbToWrite == 1 && *pchBuf == ' ' && enc_utf8
     {
-	if (utf8usingbuf != &utf8spbuf)
+	ಆದರೆ (utf8usingbuf != &utf8spbuf)
 	{
-	    if (utf8spbuf == NULL)
+	    ಆದರೆ (utf8spbuf == ಖಾಲಿ)
 	    {
 		cells = mb_string2cells((char_u *)" ", 1);
-		length = MultiByteToWideChar(CP_UTF8, 0, " ", 1, NULL, 0);
-		utf8spbuf = LALLOC_MULT(WCHAR, length);
-		if (utf8spbuf != NULL)
+		ಉದ್ದಳತೆ = Multi_Byte_ಗಮ್ಯ_Wide_Char(CP_UTF8, 0, " ", 1, ಖಾಲಿ, 0);
+		utf8spbuf = LALLOC_MULT(WCHAR, ಉದ್ದಳತೆ);
+		ಆದರೆ (utf8spbuf != ಖಾಲಿ)
 		{
-		    MultiByteToWideChar(CP_UTF8, 0, " ", 1, utf8spbuf, length);
+		    Multi_Byte_ಗಮ್ಯ_Wide_Char(CP_UTF8, 0, " ", 1, utf8spbuf, ಉದ್ದಳತೆ);
 		    utf8usingbuf = &utf8spbuf;
-		    utf8splength = length;
+		    utf8splength = ಉದ್ದಳತೆ;
 		    utf8spcells = cells;
 		}
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
 		utf8usingbuf = &utf8spbuf;
-		length = utf8splength;
+		ಉದ್ದಳತೆ = utf8splength;
 		cells = utf8spcells;
 	    }
 	}
     }
 
-    if (!USE_VTP)
+    ಆದರೆ (!USE_VTP)
     {
-	FillConsoleOutputAttribute(g_hConOut, g_attrCurrent, cells,
+	FillConsoleOutputAttribute(g_h_Con_ಹೊರಹೋಗು, g_attrCurrent, cells,
 				    coord, &written);
 	// When writing fails or didn't write a single character, pretend one
 	// character was written, otherwise we get stuck.
-	if (WriteConsoleOutputCharacterW(g_hConOut, *utf8usingbuf, length,
+	ಆದರೆ (WriteConsoleOutputCharacterW(g_h_Con_ಹೊರಹೋಗು, *utf8usingbuf, ಉದ್ದಳತೆ,
 		    coord, &cchwritten) == 0
 		|| cchwritten == 0 || cchwritten == (DWORD)-1)
 	    cchwritten = 1;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (WriteConsoleW(g_hConOut, *utf8usingbuf, length, &cchwritten,
-		    NULL) == 0 || cchwritten == 0)
+	ಆದರೆ (WriteConsoleW(g_h_Con_ಹೊರಹೋಗು, *utf8usingbuf, ಉದ್ದಳತೆ, &cchwritten,
+		    ಖಾಲಿ) == 0 || cchwritten == 0)
 	    cchwritten = 1;
     }
 
-    if (cchwritten == (DWORD)length)
+    ಆದರೆ (cchwritten == (DWORD)ಉದ್ದಳತೆ)
     {
-	written = cbToWrite;
+	written = cb_ಗಮ್ಯ_Write;
 	g_coord.X += (SHORT)cells;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	char_u *p = pchBuf;
-	for (n = 0; n < cchwritten; n++)
+	ಗಾಗಿ (n = 0; n < cchwritten; n++)
 	    MB_CPTR_ADV(p);
 	written = p - pchBuf;
 	g_coord.X += (SHORT)mb_string2cells(pchBuf, written);
     }
 
-    while (g_coord.X > g_srScrollRegion.Right)
+    ಆಗ (g_coord.X > g_srScrollRegion.ಬಲ_4)
     {
 	g_coord.X -= (SHORT) Columns;
-	if (g_coord.Y < g_srScrollRegion.Bottom)
+	ಆದರೆ (g_coord.Y < g_srScrollRegion.Bottom)
 	    g_coord.Y++;
     }
 
     // Cursor under VTP is always in the correct position, no need to reset.
-    if (!USE_VTP)
+    ಆದರೆ (!USE_VTP)
 	gotoxy(g_coord.X + 1, g_coord.Y + 1);
 
-    return written;
+    ಹಿಂತಿರುಗಿ written;
 }
 
-    static char_u *
+    ಸ್ಥಿರ char_u *
 get_seq(
-    int *args,
-    int *count,
-    char_u *head)
+    ಪೂರ್ಣಾಂಕ *ವಾದಗಳು,
+    ಪೂರ್ಣಾಂಕ *ಎಣಿಕೆ_2,
+    char_u *ತಲೆ)
 {
-    int argc;
+    ಪೂರ್ಣಾಂಕ argc;
     char_u *p;
 
-    if (head == NULL || *head != '\033')
-	return NULL;
+    ಆದರೆ (ತಲೆ == ಖಾಲಿ || *ತಲೆ != '\033')
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     argc = 0;
-    p = head;
+    p = ತಲೆ;
     ++p;
-    do
+    ಮಾಡು
     {
 	++p;
-	args[argc] = getdigits(&p);
+	ವಾದಗಳು[argc] = getdigits(&p);
 	argc += (argc < 15) ? 1 : 0;
-    } while (*p == ';');
-    *count = argc;
+    } ಆಗ (*p == ';');
+    *ಎಣಿಕೆ_2 = argc;
 
-    return p;
+    ಹಿಂತಿರುಗಿ p;
 }
 
-    static char_u *
+    ಸ್ಥಿರ char_u *
 get_sgr(
-    int *args,
-    int *count,
-    char_u *head)
+    ಪೂರ್ಣಾಂಕ *ವಾದಗಳು,
+    ಪೂರ್ಣಾಂಕ *ಎಣಿಕೆ_2,
+    char_u *ತಲೆ)
 {
-    char_u *p = get_seq(args, count, head);
+    char_u *p = get_seq(ವಾದಗಳು, ಎಣಿಕೆ_2, ತಲೆ);
 
-    return (p && *p == 'm') ? ++p : NULL;
+    ಹಿಂತಿರುಗಿ (p && *p == 'm') ? ++p : ಖಾಲಿ;
 }
 
 /*
  * Pointer to next if SGR (^[[n;2;*;*;*m), NULL otherwise.
  */
-    static char_u *
+    ಸ್ಥಿರ char_u *
 sgrn2(
-    char_u *head,
-    int	   n)
+    char_u *ತಲೆ,
+    ಪೂರ್ಣಾಂಕ	   n)
 {
-    int argc;
-    int args[16];
-    char_u *p = get_sgr(args, &argc, head);
+    ಪೂರ್ಣಾಂಕ argc;
+    ಪೂರ್ಣಾಂಕ ವಾದಗಳು[16];
+    char_u *p = get_sgr(ವಾದಗಳು, &argc, ತಲೆ);
 
-    return p && argc == 5 && args[0] == n && args[1] == 2 ? p : NULL;
+    ಹಿಂತಿರುಗಿ p && argc == 5 && ವಾದಗಳು[0] == n && ವಾದಗಳು[1] == 2 ? p : ಖಾಲಿ;
 }
 
 /*
  * Pointer to next if SGR(^[[nm)<space>ESC, NULL otherwise.
  */
-    static char_u *
+    ಸ್ಥಿರ char_u *
 sgrnc(
-    char_u *head,
-    int	   n)
+    char_u *ತಲೆ,
+    ಪೂರ್ಣಾಂಕ	   n)
 {
-    int argc;
-    int args[16];
-    char_u *p = get_sgr(args, &argc, head);
+    ಪೂರ್ಣಾಂಕ argc;
+    ಪೂರ್ಣಾಂಕ ವಾದಗಳು[16];
+    char_u *p = get_sgr(ವಾದಗಳು, &argc, ತಲೆ);
 
-    return p && argc == 1 && args[0] == n && (p = skipwhite(p)) && *p == '\033'
-								    ? p : NULL;
+    ಹಿಂತಿರುಗಿ p && argc == 1 && ವಾದಗಳು[0] == n && (p = skipwhite(p)) && *p == '\033'
+								    ? p : ಖಾಲಿ;
 }
 
-    static char_u *
+    ಸ್ಥಿರ char_u *
 skipblank(char_u *q)
 {
     char_u *p = q;
 
-    while (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r')
+    ಆಗ (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r')
 	++p;
-    return p;
+    ಹಿಂತಿರುಗಿ p;
 }
 
 /*
  * Pointer to the next if any whitespace that may follow SGR is ESC, otherwise
  * NULL.
  */
-    static char_u *
+    ಸ್ಥಿರ char_u *
 sgrn2c(
-    char_u *head,
-    int	   n)
+    char_u *ತಲೆ,
+    ಪೂರ್ಣಾಂಕ	   n)
 {
-    char_u *p = sgrn2(head, n);
+    char_u *p = sgrn2(ತಲೆ, n);
 
-    return p && *p != NUL && (p = skipblank(p)) && *p == '\033' ? p : NULL;
+    ಹಿಂತಿರುಗಿ p && *p != NUL && (p = skipblank(p)) && *p == '\033' ? p : ಖಾಲಿ;
 }
 
 /*
@@ -7465,38 +7465,38 @@ sgrn2c(
  * a pointer to the character following the newline is returned.
  * Otherwise NULL.
  */
-    static char_u *
+    ಸ್ಥಿರ char_u *
 sgrn2cn(
-    char_u *head,
-    int n)
+    char_u *ತಲೆ,
+    ಪೂರ್ಣಾಂಕ n)
 {
-    char_u *p = sgrn2(head, n);
+    char_u *p = sgrn2(ತಲೆ, n);
 
-    return p && p[0] == 0x0a && p[1] == '\033' ? ++p : NULL;
+    ಹಿಂತಿರುಗಿ p && p[0] == 0x0a && p[1] == '\033' ? ++p : ಖಾಲಿ;
 }
 
-static bool in_dcs = false;	// inside a DCS (sixel) sequence
-static bool dcs_esc = false;	// last DCS byte written was ESC
+ಸ್ಥಿರ bool ಒಳ_dcs = false;	// inside a DCS (sixel) sequence
+ಸ್ಥಿರ bool dcs_esc = false;	// last DCS byte written was ESC
 
 /*
  * Write "len" bytes at "s" with WriteConsoleW, so that the console's own VT
  * parser processes them.  Needed for DCS sequences when USE_VTP is off.
  */
-    static void
-write_vt(char_u *s, int len)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+write_vt(char_u *s, ಪೂರ್ಣಾಂಕ len)
 {
-    int		wlen;
+    ಪೂರ್ಣಾಂಕ		wlen;
     WCHAR	*ws;
     DWORD	written;
 
-    wlen = MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)s, len, NULL, 0);
-    if (wlen <= 0)
-	return;
+    wlen = Multi_Byte_ಗಮ್ಯ_Wide_Char(CP_UTF8, 0, (LPCSTR)s, len, ಖಾಲಿ, 0);
+    ಆದರೆ (wlen <= 0)
+	ಹಿಂತಿರುಗಿ;
     ws = ALLOC_MULT(WCHAR, wlen);
-    if (ws == NULL)
-	return;
-    MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)s, len, ws, wlen);
-    WriteConsoleW(g_hConOut, ws, wlen, &written, NULL);
+    ಆದರೆ (ws == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
+    Multi_Byte_ಗಮ್ಯ_Wide_Char(CP_UTF8, 0, (LPCSTR)s, len, ws, wlen);
+    WriteConsoleW(g_h_Con_ಹೊರಹೋಗು, ws, wlen, &written, ಖಾಲಿ);
     vim_free(ws);
 }
 
@@ -7505,171 +7505,171 @@ write_vt(char_u *s, int len)
  * Returns "end" when the ST is not in this chunk; "in_dcs" then stays set so
  * that the next mch_write() call continues the scan.
  */
-    static char_u *
-skip_dcs(char_u *s, char_u *end)
+    ಸ್ಥಿರ char_u *
+skip_dcs(char_u *s, char_u *ಕೊನೆ)
 {
-    for (char_u *p = s; p < end; ++p)
+    ಗಾಗಿ (char_u *p = s; p < ಕೊನೆ; ++p)
     {
-	if (dcs_esc && *p == '\\')
+	ಆದರೆ (dcs_esc && *p == '\\')
 	{
 	    dcs_esc = false;
-	    in_dcs = false;
-	    return p + 1;
+	    ಒಳ_dcs = false;
+	    ಹಿಂತಿರುಗಿ p + 1;
 	}
 	dcs_esc = *p == ESC;
     }
-    return end;
+    ಹಿಂತಿರುಗಿ ಕೊನೆ;
 }
 
 /*
  * mch_write(): write the output buffer to the screen, translating ESC
  * sequences into calls to console output routines.
  */
-    void
+    ಶೂನ್ಯ
 mch_write(
     char_u  *s,
-    int	    len)
+    ಪೂರ್ಣಾಂಕ	    len)
 {
-    char_u  *end = s + len;
+    char_u  *ಕೊನೆ = s + len;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return;
+    ಆದರೆ (gui.ಒಳ_use)
+	ಹಿಂತಿರುಗಿ;
 # endif
 
-    if (!term_console)
+    ಆದರೆ (!ಪದ_console)
     {
-	write(1, s, (unsigned)len);
-	return;
+	ಲಿಖ(1, s, (ಚಿಹ್ನೆರಹಿತ)len);
+	ಹಿಂತಿರುಗಿ;
     }
 
     // translate ESC | sequences into faked bios calls
-    while (len--)
+    ಆಗ (len--)
     {
-	int prefix = -1;
+	ಪೂರ್ಣಾಂಕ ಪೂರ್ವಪ್ರತ್ಯಯ = -1;
 	char_u ch;
 
 	// While processing a sequence, on rare occasions it seems that another
 	// sequence may be inserted asynchronously.
-	if (len < 0)
+	ಆದರೆ (len < 0)
 	{
 	    redraw_all_later(UPD_CLEAR);
-	    return;
+	    ಹಿಂತಿರುಗಿ;
 	}
 
-	if (in_dcs)
+	ಆದರೆ (ಒಳ_dcs)
 	{
 	    // Continuation of a DCS sequence split over several writes.
-	    int	l = (int)(skip_dcs(s, end) - s);
+	    ಪೂರ್ಣಾಂಕ	l = (ಪೂರ್ಣಾಂಕ)(skip_dcs(s, ಕೊನೆ) - s);
 
-	    if (vtp_working)
+	    ಆದರೆ (vtp_working)
 		write_vt(s, l);
 	    len -= l - 1;
 	    s += l;
-	    continue;
+	    ಮುಂದುವರಿ;
 	}
 
-	while (s + ++prefix < end)
+	ಆಗ (s + ++ಪೂರ್ವಪ್ರತ್ಯಯ < ಕೊನೆ)
 	{
-	    ch = s[prefix];
-	    if (ch <= 0x1e && !(ch != '\n' && ch != '\r' && ch != '\b'
+	    ch = s[ಪೂರ್ವಪ್ರತ್ಯಯ];
+	    ಆದರೆ (ch <= 0x1e && !(ch != '\n' && ch != '\r' && ch != '\b'
 						&& ch != '\a' && ch != '\033'))
-		break;
+		ನಿಲ್ಲಿಸು;
 	}
 
-	if (p_wd)
+	ಆದರೆ (p_wd)
 	{
 	    WaitForChar(p_wd, FALSE);
-	    if (prefix != 0)
-		prefix = 1;
+	    ಆದರೆ (ಪೂರ್ವಪ್ರತ್ಯಯ != 0)
+		ಪೂರ್ವಪ್ರತ್ಯಯ = 1;
 	}
 
-	if (prefix != 0)
+	ಆದರೆ (ಪೂರ್ವಪ್ರತ್ಯಯ != 0)
 	{
 	    DWORD nWritten;
 
-	    nWritten = write_chars(s, prefix);
+	    nWritten = write_chars(s, ಪೂರ್ವಪ್ರತ್ಯಯ);
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    ಆದರೆ (fdDump)
 	    {
 		fputc('>', fdDump);
-		fwrite(s, sizeof(char_u), nWritten, fdDump);
+		fwrite(s, ಗಾತ್ರ(char_u), nWritten, fdDump);
 		fputs("<\n", fdDump);
 	    }
 # endif
 	    len -= (nWritten - 1);
 	    s += nWritten;
 	}
-	else if (s[0] == '\n')
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (s[0] == '\n')
 	{
 	    // \n, newline: go to the beginning of the next line or scroll
-	    if (g_coord.Y == g_srScrollRegion.Bottom)
+	    ಆದರೆ (g_coord.Y == g_srScrollRegion.Bottom)
 	    {
 		scroll(1);
-		gotoxy(g_srScrollRegion.Left + 1, g_srScrollRegion.Bottom + 1);
+		gotoxy(g_srScrollRegion.ಎಡ_4 + 1, g_srScrollRegion.Bottom + 1);
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 	    {
-		gotoxy(g_srScrollRegion.Left + 1, g_coord.Y + 2);
+		gotoxy(g_srScrollRegion.ಎಡ_4 + 1, g_coord.Y + 2);
 	    }
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    ಆದರೆ (fdDump)
 		fputs("\\n\n", fdDump);
 # endif
 	    s++;
 	}
-	else if (s[0] == '\r')
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (s[0] == '\r')
 	{
 	    // \r, carriage return: go to beginning of line
-	    gotoxy(g_srScrollRegion.Left+1, g_coord.Y + 1);
+	    gotoxy(g_srScrollRegion.ಎಡ_4+1, g_coord.Y + 1);
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    ಆದರೆ (fdDump)
 		fputs("\\r\n", fdDump);
 # endif
 	    s++;
 	}
-	else if (s[0] == '\b')
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (s[0] == '\b')
 	{
 	    // \b, backspace: move cursor one position left
-	    if (g_coord.X > g_srScrollRegion.Left)
+	    ಆದರೆ (g_coord.X > g_srScrollRegion.ಎಡ_4)
 		g_coord.X--;
-	    else if (g_coord.Y > g_srScrollRegion.Top)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (g_coord.Y > g_srScrollRegion.ತುದಿ_2)
 	    {
-		g_coord.X = g_srScrollRegion.Right;
+		g_coord.X = g_srScrollRegion.ಬಲ_4;
 		g_coord.Y--;
 	    }
 	    gotoxy(g_coord.X + 1, g_coord.Y + 1);
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    ಆದರೆ (fdDump)
 		fputs("\\b\n", fdDump);
 # endif
 	    s++;
 	}
-	else if (s[0] == '\a')
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (s[0] == '\a')
 	{
 	    // \a, bell
-	    MessageBeep(0xFFFFFFFF);
+	    ಸಂದೇಶ_Beep(0xFFFFFFFF);
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    ಆದರೆ (fdDump)
 		fputs("\\a\n", fdDump);
 # endif
 	    s++;
 	}
-	else if (s[0] == ESC && len >= 3-1 && s[1] == '|')
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (s[0] == ESC && len >= 3-1 && s[1] == '|')
 	{
 # ifdef MCH_WRITE_DUMP
 	    char_u  *old_s = s;
 # endif
 	    char_u  *p;
-	    int	    arg1 = 0, arg2 = 0, argc = 0, args[16];
+	    ಪೂರ್ಣಾಂಕ	    arg1 = 0, arg2 = 0, argc = 0, ವಾದಗಳು[16];
 	    char_u  *sp;
 
-	    switch (s[2])
+	    ಆಯ್ಕೆ (s[2])
 	    {
-	    case '0': case '1': case '2': case '3': case '4':
-	    case '5': case '6': case '7': case '8': case '9':
-		if (*(p = get_seq(args, &argc, s)) != 'm')
-		    goto notsgr;
+	    ಸ್ಥಿತಿ '0': ಸ್ಥಿತಿ '1': ಸ್ಥಿತಿ '2': ಸ್ಥಿತಿ '3': ಸ್ಥಿತಿ '4':
+	    ಸ್ಥಿತಿ '5': ಸ್ಥಿತಿ '6': ಸ್ಥಿತಿ '7': ಸ್ಥಿತಿ '8': ಸ್ಥಿತಿ '9':
+		ಆದರೆ (*(p = get_seq(ವಾದಗಳು, &argc, s)) != 'm')
+		    ಹೋಗು notsgr;
 
 		p = s;
 
@@ -7678,164 +7678,164 @@ mch_write(
 
 		// If resetFG,FG,BG,<cr>,BG,FG are connected, the preceding
 		// resetFG,FG,BG are omitted.
-		if (sgrn2(sgrn2(sgrn2cn(sgrn2(sgrnc(p, 39), 38), 48), 48), 38))
+		ಆದರೆ (sgrn2(sgrn2(sgrn2cn(sgrn2(sgrnc(p, 39), 38), 48), 48), 38))
 		{
 		    p = sgrn2(sgrn2(sgrnc(p, 39), 38), 48);
-		    len = len + 1 - (int)(p - s);
+		    len = len + 1 - (ಪೂರ್ಣಾಂಕ)(p - s);
 		    s = p;
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 
 		// If FG,BG,BG,FG of SGR are connected, the first FG can be
 		// omitted.
-		if (sgrn2(sgrn2(sgrn2c((sp = sgrn2(p, 38)), 48), 48), 38))
+		ಆದರೆ (sgrn2(sgrn2(sgrn2c((sp = sgrn2(p, 38)), 48), 48), 38))
 		    p = sp;
 
 		// If FG,BG,FG,BG of SGR are connected, the first FG can be
 		// omitted.
-		if (sgrn2(sgrn2(sgrn2c((sp = sgrn2(p, 38)), 48), 38), 48))
+		ಆದರೆ (sgrn2(sgrn2(sgrn2c((sp = sgrn2(p, 38)), 48), 38), 48))
 		    p = sp;
 
 		// If BG,BG of SGR are connected, the first BG can be omitted.
-		if (sgrn2((sp = sgrn2(p, 48)), 48))
+		ಆದರೆ (sgrn2((sp = sgrn2(p, 48)), 48))
 		    p = sp;
 
 		// If restoreFG and FG are connected, the restoreFG can be
 		// omitted.
-		if (sgrn2((sp = sgrnc(p, 39)), 38))
+		ಆದರೆ (sgrn2((sp = sgrnc(p, 39)), 38))
 		    p = sp;
 
-		p = get_seq(args, &argc, p);
+		p = get_seq(ವಾದಗಳು, &argc, p);
 
 notsgr:
-		arg1 = args[0];
-		arg2 = args[1];
-		if (*p == 'm')
+		arg1 = ವಾದಗಳು[0];
+		arg2 = ವಾದಗಳು[1];
+		ಆದರೆ (*p == 'm')
 		{
-		    if (argc == 1 && args[0] == 0)
+		    ಆದರೆ (argc == 1 && ವಾದಗಳು[0] == 0)
 			normvideo();
-		    else if (argc == 1)
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argc == 1)
 		    {
-			if (USE_VTP)
-			    textcolor((WORD)arg1);
-			else
-			    textattr((WORD)arg1);
+			ಆದರೆ (USE_VTP)
+			    textcolor((ಶಬ್ದ_2)arg1);
+			ಇಲ್ಲದಿದ್ದರೆ
+			    textattr((ಶಬ್ದ_2)arg1);
 		    }
-		    else if (vtp_working)
-			vtp_sgr_bulks(argc, args);
+		    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (vtp_working)
+			vtp_sgr_bulks(argc, ವಾದಗಳು);
 		}
-		else if (argc == 2 && *p == 'H')
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argc == 2 && *p == 'H')
 		{
 		    gotoxy(arg2, arg1);
 		}
-		else if (argc == 2 && *p == 'r')
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argc == 2 && *p == 'r')
 		{
-		    set_scroll_region(0, arg1 - 1, Columns - 1, arg2 - 1);
+		    ಗಣ_scroll_region(0, arg1 - 1, Columns - 1, arg2 - 1);
 		}
-		else if (argc == 2 && *p == 'R')
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argc == 2 && *p == 'R')
 		{
-		    set_scroll_region_tb(arg1, arg2);
+		    ಗಣ_scroll_region_tb(arg1, arg2);
 		}
-		else if (argc == 2 && *p == 'V')
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argc == 2 && *p == 'V')
 		{
-		    set_scroll_region_lr(arg1, arg2);
+		    ಗಣ_scroll_region_lr(arg1, arg2);
 		}
-		else if (argc == 1 && *p == 'A')
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argc == 1 && *p == 'A')
 		{
 		    gotoxy(g_coord.X + 1,
-			   max(g_srScrollRegion.Top, g_coord.Y - arg1) + 1);
+			   max(g_srScrollRegion.ತುದಿ_2, g_coord.Y - arg1) + 1);
 		}
-		else if (argc == 1 && *p == 'b')
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argc == 1 && *p == 'b')
 		{
-		    textbackground((WORD) arg1);
+		    textbackground((ಶಬ್ದ_2) arg1);
 		}
-		else if (argc == 1 && *p == 'C')
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argc == 1 && *p == 'C')
 		{
-		    gotoxy(min(g_srScrollRegion.Right, g_coord.X + arg1) + 1,
+		    gotoxy(min(g_srScrollRegion.ಬಲ_4, g_coord.X + arg1) + 1,
 			   g_coord.Y + 1);
 		}
-		else if (argc == 1 && *p == 'f')
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argc == 1 && *p == 'f')
 		{
-		    textcolor((WORD) arg1);
+		    textcolor((ಶಬ್ದ_2) arg1);
 		}
-		else if (argc == 1 && *p == 'H')
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argc == 1 && *p == 'H')
 		{
 		    gotoxy(1, arg1);
 		}
-		else if (argc == 1 && *p == 'L')
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argc == 1 && *p == 'L')
 		{
-		    insert_lines(arg1);
+		    ಸೇರಿಸು_ಸಾಲುಗಳು(arg1);
 		}
-		else if (argc == 1 && *p == 'M')
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argc == 1 && *p == 'M')
 		{
-		    delete_lines(arg1);
+		    delete_ಸಾಲುಗಳು(arg1);
 		}
 
-		len -= (int)(p - s);
+		len -= (ಪೂರ್ಣಾಂಕ)(p - s);
 		s = p + 1;
-		break;
+		ನಿಲ್ಲಿಸು;
 
-	    case 'A':
+	    ಸ್ಥಿತಿ 'A':
 		gotoxy(g_coord.X + 1,
-		       max(g_srScrollRegion.Top, g_coord.Y - 1) + 1);
-		goto got3;
+		       max(g_srScrollRegion.ತುದಿ_2, g_coord.Y - 1) + 1);
+		ಹೋಗು got3;
 
-	    case 'B':
+	    ಸ್ಥಿತಿ 'B':
 		visual_bell();
-		goto got3;
+		ಹೋಗು got3;
 
-	    case 'C':
-		gotoxy(min(g_srScrollRegion.Right, g_coord.X + 1) + 1,
+	    ಸ್ಥಿತಿ 'C':
+		gotoxy(min(g_srScrollRegion.ಬಲ_4, g_coord.X + 1) + 1,
 		       g_coord.Y + 1);
-		goto got3;
+		ಹೋಗು got3;
 
-	    case 'E':
-		termcap_mode_end();
-		goto got3;
+	    ಸ್ಥಿತಿ 'E':
+		termcap_ಬಹುಲಕ_ಕೊನೆ();
+		ಹೋಗು got3;
 
-	    case 'F':
+	    ಸ್ಥಿತಿ 'F':
 		standout();
-		goto got3;
+		ಹೋಗು got3;
 
-	    case 'f':
+	    ಸ್ಥಿತಿ 'f':
 		standend();
-		goto got3;
+		ಹೋಗು got3;
 
-	    case 'H':
+	    ಸ್ಥಿತಿ 'H':
 		gotoxy(1, 1);
-		goto got3;
+		ಹೋಗು got3;
 
-	    case 'j':
-		clear_to_end_of_display();
-		goto got3;
+	    ಸ್ಥಿತಿ 'j':
+		clear_ಗಮ್ಯ_ಕೊನೆ_ದ_display();
+		ಹೋಗು got3;
 
-	    case 'J':
+	    ಸ್ಥಿತಿ 'J':
 		clear_screen();
-		goto got3;
+		ಹೋಗು got3;
 
-	    case 'K':
-		clear_to_end_of_line();
-		goto got3;
+	    ಸ್ಥಿತಿ 'K':
+		clear_ಗಮ್ಯ_ಕೊನೆ_ದ_ಸಾಲು();
+		ಹೋಗು got3;
 
-	    case 'L':
-		insert_lines(1);
-		goto got3;
+	    ಸ್ಥಿತಿ 'L':
+		ಸೇರಿಸು_ಸಾಲುಗಳು(1);
+		ಹೋಗು got3;
 
-	    case 'M':
-		delete_lines(1);
-		goto got3;
+	    ಸ್ಥಿತಿ 'M':
+		delete_ಸಾಲುಗಳು(1);
+		ಹೋಗು got3;
 
-	    case 'S':
-		termcap_mode_start();
-		goto got3;
+	    ಸ್ಥಿತಿ 'S':
+		termcap_ಬಹುಲಕ_ಆರಂಭ();
+		ಹೋಗು got3;
 
-	    case 'V':
+	    ಸ್ಥಿತಿ 'V':
 		cursor_visible(TRUE);
-		goto got3;
+		ಹೋಗು got3;
 
-	    case 'v':
+	    ಸ್ಥಿತಿ 'v':
 		cursor_visible(FALSE);
-		goto got3;
+		ಹೋಗು got3;
 
 	    got3:
 		s += 3;
@@ -7843,61 +7843,61 @@ notsgr:
 	    }
 
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    ಆದರೆ (fdDump)
 	    {
 		fputs("ESC | ", fdDump);
-		fwrite(old_s + 2, sizeof(char_u), s - old_s - 2, fdDump);
+		fwrite(old_s + 2, ಗಾತ್ರ(char_u), s - old_s - 2, fdDump);
 		fputc('\n', fdDump);
 	    }
 # endif
 	}
-	else if (s[0] == ESC && len >= 3-1 && s[1] == '[')
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (s[0] == ESC && len >= 3-1 && s[1] == '[')
 	{
 	    // CSI sequences should not be written as plain text to the
 	    // console.  Parse the sequence and skip over it.  When
 	    // USE_VTP is active, pass through known safe ones (e.g.
 	    // DECSCUSR for cursor shape) via vtp_printf().
-	    int l = 2;
+	    ಪೂರ್ಣಾಂಕ l = 2;
 
 	    // skip parameter and intermediate bytes (0x20-0x3F)
-	    while (s + l < end && s[l] >= 0x20 && s[l] <= 0x3F)
+	    ಆಗ (s + l < ಕೊನೆ && s[l] >= 0x20 && s[l] <= 0x3F)
 		l++;
 	    // skip the final byte (0x40-0x7E)
-	    if (s + l < end && s[l] >= 0x40 && s[l] <= 0x7E)
+	    ಆದರೆ (s + l < ಕೊನೆ && s[l] >= 0x40 && s[l] <= 0x7E)
 	    {
 		// DECSCUSR (cursor style): pass through to terminal
-		if (USE_VTP && s[l] == 'q')
+		ಆದರೆ (USE_VTP && s[l] == 'q')
 		    vtp_printf("%.*s", l + 1, s);
 		l++;
 	    }
 	    len -= l - 1;
 	    s += l;
 	}
-	else if (s[0] == ESC && len >= 2-1 && s[1] == 'P')
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (s[0] == ESC && len >= 2-1 && s[1] == 'P')
 	{
 	    // DCS (e.g. sixel image): write_chars() would print it as raw text
 	    // when USE_VTP is off, so let the console's VT parser handle it.
-	    int	l;
+	    ಪೂರ್ಣಾಂಕ	l;
 
-	    in_dcs = true;
+	    ಒಳ_dcs = true;
 	    dcs_esc = false;
-	    l = (int)(skip_dcs(s + 2, end) - s);
-	    if (vtp_working)
+	    l = (ಪೂರ್ಣಾಂಕ)(skip_dcs(s + 2, ಕೊನೆ) - s);
+	    ಆದರೆ (vtp_working)
 		write_vt(s, l);
 	    len -= l - 1;
 	    s += l;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    // Write a single character
 	    DWORD nWritten;
 
 	    nWritten = write_chars(s, 1);
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    ಆದರೆ (fdDump)
 	    {
 		fputc('>', fdDump);
-		fwrite(s, sizeof(char_u), nWritten, fdDump);
+		fwrite(s, ಗಾತ್ರ(char_u), nWritten, fdDump);
 		fputs("<\n", fdDump);
 	    }
 # endif
@@ -7908,63 +7908,63 @@ notsgr:
     }
 
 # ifdef MCH_WRITE_DUMP
-    if (fdDump)
+    ಆದರೆ (fdDump)
 	fflush(fdDump);
 # endif
 }
 
-#else // FEAT_GUI_MSWIN && !VIMDLL
-    void
+#ಇಲ್ಲದಿದ್ದರೆ // FEAT_GUI_MSWIN && !VIMDLL
+    ಶೂನ್ಯ
 mch_write(
-    char_u  *s UNUSED,
-    int	    len UNUSED)
+    char_u  *s ಬಳಸದ,
+    ಪೂರ್ಣಾಂಕ	    len ಬಳಸದ)
 {
     // never used
 }
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 
 /*
  * Delay for "msec" milliseconds.
  */
-    void
+    ಶೂನ್ಯ
 mch_delay(
-    long    msec,
-    int	    flags UNUSED)
+    ದೀರ್ಘ    msec,
+    ಪೂರ್ಣಾಂಕ	    flags ಬಳಸದ)
 {
-#if defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
-    Sleep((int)msec);	    // never wait for input
-#else // Console
+#ಆದರೆ defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
+    Sleep((ಪೂರ್ಣಾಂಕ)msec);	    // never wait for input
+#ಇಲ್ಲದಿದ್ದರೆ // Console
 # ifdef VIMDLL
-    if (gui.in_use)
+    ಆದರೆ (gui.ಒಳ_use)
     {
-	Sleep((int)msec);	    // never wait for input
-	return;
+	Sleep((ಪೂರ್ಣಾಂಕ)msec);	    // never wait for input
+	ಹಿಂತಿರುಗಿ;
     }
 # endif
-    if (flags & MCH_DELAY_IGNOREINPUT)
+    ಆದರೆ (flags & MCH_DELAY_IGNOREINPUT)
 # ifdef FEAT_MZSCHEME
-	if (mzthreads_allowed() && p_mzq > 0 && msec > p_mzq)
+	ಆದರೆ (mzthreads_allowed() && p_mzq > 0 && msec > p_mzq)
 	{
-	    int towait = p_mzq;
+	    ಪೂರ್ಣಾಂಕ towait = p_mzq;
 
 	    // if msec is large enough, wait by portions in p_mzq
-	    while (msec > 0)
+	    ಆಗ (msec > 0)
 	    {
-		mzvim_check_threads();
-		if (msec < towait)
+		mzvim_check_ಎಳೆಗಳು();
+		ಆದರೆ (msec < towait)
 		    towait = msec;
 		Sleep(towait);
 		msec -= towait;
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 # endif
-	    Sleep((int)msec);
-    else
+	    Sleep((ಪೂರ್ಣಾಂಕ)msec);
+    ಇಲ್ಲದಿದ್ದರೆ
 	WaitForChar(msec, FALSE);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 
@@ -7973,77 +7973,77 @@ mch_delay(
  * This can also remove a symbolic link like Unix.
  * Return 0 for success, -1 for failure.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_remove(char_u *name)
 {
     WCHAR	*wn;
-    int		n;
+    ಪೂರ್ಣಾಂಕ		n;
 
     /*
      * On Windows, deleting a directory's symbolic link is done by
      * RemoveDirectory(): mch_rmdir.  It seems unnatural, but it is fact.
      */
-    if (mch_isdir(name) && mch_is_symbolic_link(name))
-	return mch_rmdir(name);
+    ಆದರೆ (mch_isdir(name) && mch_is_symbolic_link(name))
+	ಹಿಂತಿರುಗಿ mch_rmdir(name);
 
-    win32_setattrs(name, FILE_ATTRIBUTE_NORMAL);
+    win32_setattrs(name, FILE_ATTRIBUTE_ಸಾಮಾನ್ಯ);
 
-    wn = enc_to_utf16(name, NULL);
-    if (wn == NULL)
-	return -1;
+    wn = enc_ಗಮ್ಯ_utf16(name, ಖಾಲಿ);
+    ಆದರೆ (wn == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ -1;
 
     n = DeleteFileW(wn) ? 0 : -1;
     vim_free(wn);
-    return n;
+    ಹಿಂತಿರುಗಿ n;
 }
 
 
 /*
  * Check for an "interrupt signal": CTRL-break or CTRL-C.
  */
-    void
-mch_breakcheck(int force UNUSED)
+    ಶೂನ್ಯ
+mch_breakcheck(ಪೂರ್ಣಾಂಕ force ಬಳಸದ)
 {
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ಆದರೆ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 # ifdef VIMDLL
-    if (!gui.in_use)
+    ಆದರೆ (!gui.ಒಳ_use)
 # endif
-	if (g_fCtrlCPressed || g_fCBrkPressed)
+	ಆದರೆ (g_fCtrlCPressed || g_fCBrkPressed)
 	{
 	    ctrl_break_was_pressed = g_fCBrkPressed;
 	    g_fCtrlCPressed = g_fCBrkPressed = FALSE;
 	    got_int = TRUE;
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 // physical RAM to leave for the OS
-#define WINNT_RESERVE_BYTES     (256*1024*1024)
+#ವ್ಯಾಖ್ಯಾನಿಸು WINNT_RESERVE_ಬೈಟುಗಳು     (256*1024*1024)
 
 /*
  * How much main memory in KiB that can be used by VIM.
  */
     long_u
-mch_total_mem(int special UNUSED)
+mch_ಒಟ್ಟು_mem(ಪೂರ್ಣಾಂಕ special ಬಳಸದ)
 {
     MEMORYSTATUSEX  ms;
 
     // Need to use GlobalMemoryStatusEx() when there is more memory than
     // what fits in 32 bits.
-    ms.dwLength = sizeof(MEMORYSTATUSEX);
-    GlobalMemoryStatusEx(&ms);
-    if (ms.ullAvailVirtual < ms.ullTotalPhys)
+    ms.dw_ಉದ್ದಳತೆ = ಗಾತ್ರ(MEMORYSTATUSEX);
+    Global_ಸ್ಮರಣೆ_ಸ್ಥಿತಿ_Ex(&ms);
+    ಆದರೆ (ms.ullAvailVirtual < ms.ull_ಒಟ್ಟು_Phys)
     {
 	// Process address space fits in physical RAM, use all of it.
-	return (long_u)(ms.ullAvailVirtual / 1024);
+	ಹಿಂತಿರುಗಿ (long_u)(ms.ullAvailVirtual / 1024);
     }
-    if (ms.ullTotalPhys <= WINNT_RESERVE_BYTES)
+    ಆದರೆ (ms.ull_ಒಟ್ಟು_Phys <= WINNT_RESERVE_ಬೈಟುಗಳು)
     {
 	// Catch old NT box or perverse hardware setup.
-	return (long_u)((ms.ullTotalPhys / 2) / 1024);
+	ಹಿಂತಿರುಗಿ (long_u)((ms.ull_ಒಟ್ಟು_Phys / 2) / 1024);
     }
     // Use physical RAM less reserve for OS + data.
-    return (long_u)((ms.ullTotalPhys - WINNT_RESERVE_BYTES) / 1024);
+    ಹಿಂತಿರುಗಿ (long_u)((ms.ull_ಒಟ್ಟು_Phys - WINNT_RESERVE_ಬೈಟುಗಳು) / 1024);
 }
 
 /*
@@ -8052,13 +8052,13 @@ mch_total_mem(int special UNUSED)
  * "path" has backslashes before chars that are not to be expanded.
  * Returns the number of matches found.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_expandpath(
     garray_T	*gap,
-    char_u	*path,
-    int		flags)		// EW_* flags
+    char_u	*ಮಾರ್ಗ,
+    ಪೂರ್ಣಾಂಕ		flags)		// EW_* flags
 {
-    return dos_expandpath(gap, path, 0, flags, FALSE);
+    ಹಿಂತಿರುಗಿ dos_expandpath(gap, ಮಾರ್ಗ, 0, flags, FALSE);
 }
 
 /*
@@ -8070,56 +8070,56 @@ mch_expandpath(
  * Like rename(), returns 0 upon success, non-zero upon failure.
  * Should probably set errno appropriately when errors occur.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_wrename(WCHAR *wold, WCHAR *wnew)
 {
     WCHAR	*p;
     WCHAR	*q;
-    WCHAR	szTempFile[_MAX_PATH + 1];
-    WCHAR	szNewPath[_MAX_PATH + 1];
+    WCHAR	sz_ತಾತ್ಕಾಲಿಕ_File[MAX_ಮಾರ್ಗ_2 + 1];
+    WCHAR	sz_New_ಮಾರ್ಗ[MAX_ಮಾರ್ಗ_2 + 1];
     HANDLE	hf;
 
     // No need to play tricks unless the file name contains a "~" as the
     // seventh character.
-    for (p = q = wold; *p != L'\0'; ++p)
+    ಗಾಗಿ (p = q = wold; *p != L'\0'; ++p)
     {
-	switch (*p)
+	ಆಯ್ಕೆ (*p)
 	{
-	case L'/':
-	case L'\\':
-	case L':':
-	    if (*(p + 1) != L'\0')
+	ಸ್ಥಿತಿ L'/':
+	ಸ್ಥಿತಿ L'\\':
+	ಸ್ಥಿತಿ L':':
+	    ಆದರೆ (*(p + 1) != L'\0')
 		q = p + 1;	    // point to the character after the path
 				    // separator.
-	    break;
+	    ನಿಲ್ಲಿಸು;
 
-	default:
-	    break;
+	ಪೂರ್ವನಿಯೋಜಿತ:
+	    ನಿಲ್ಲಿಸು;
 	}
     }
 
     // If the length of the file name is less than 8 characters or the seventh
     // character is not a "~', do a normal move.
-    if ((int)(p - q) < 8 || q[6] != L'~')
-	return (MoveFileW(wold, wnew) == 0);
+    ಆದರೆ ((ಪೂರ್ಣಾಂಕ)(p - q) < 8 || q[6] != L'~')
+	ಹಿಂತಿರುಗಿ (MoveFileW(wold, wnew) == 0);
 
     // Get base path of new file name.  Undocumented feature: If pszNewFile is
     // a directory, no error is returned and pszFilePart will be NULL.
-    if (GetFullPathNameW(wnew, _MAX_PATH, szNewPath, &p) == 0 || p == NULL)
-	return -1;
+    ಆದರೆ (Get_ತುಂಬಿದ_ಮಾರ್ಗ_Name_W(wnew, MAX_ಮಾರ್ಗ_2, sz_New_ಮಾರ್ಗ, &p) == 0 || p == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ -1;
     *p = NUL;
 
     // Get (and create) a unique temporary file name in directory of new file
-    if (GetTempFileNameW(szNewPath, L"VIM", 0, szTempFile) == 0)
-	return -2;
+    ಆದರೆ (Get_ತಾತ್ಕಾಲಿಕ_File_Name_W(sz_New_ಮಾರ್ಗ, L"VIM", 0, sz_ತಾತ್ಕಾಲಿಕ_File) == 0)
+	ಹಿಂತಿರುಗಿ -2;
 
     // blow the temp file away
-    if (!DeleteFileW(szTempFile))
-	return -3;
+    ಆದರೆ (!DeleteFileW(sz_ತಾತ್ಕಾಲಿಕ_File))
+	ಹಿಂತಿರುಗಿ -3;
 
     // rename old file to the temp file
-    if (!MoveFileW(wold, szTempFile))
-	return -4;
+    ಆದರೆ (!MoveFileW(wold, sz_ತಾತ್ಕಾಲಿಕ_File))
+	ಹಿಂತಿರುಗಿ -4;
 
     // now create an empty file called pszOldFile; this prevents the operating
     // system using pszOldFile as an alias (SFN) if we're renaming within the
@@ -8130,29 +8130,29 @@ mch_wrename(WCHAR *wold, WCHAR *wnew)
     // cause all sorts of problems later in buf_write().  So, we create an
     // empty file called filena~1.txt and the system will have to find some
     // other SFN for filena~1.txt~, such as filena~2.txt
-    if ((hf = CreateFileW(wold, GENERIC_WRITE, 0, NULL, CREATE_NEW,
-		    FILE_ATTRIBUTE_NORMAL, NULL)) == INVALID_HANDLE_VALUE)
-	return -5;
-    if (!CloseHandle(hf))
-	return -6;
+    ಆದರೆ ((hf = CreateFileW(wold, GENERIC_WRITE, 0, ಖಾಲಿ, CREATE_NEW,
+		    FILE_ATTRIBUTE_ಸಾಮಾನ್ಯ, ಖಾಲಿ)) == INVALID_HANDLE_ಮೌಲ್ಯ)
+	ಹಿಂತಿರುಗಿ -5;
+    ಆದರೆ (!CloseHandle(hf))
+	ಹಿಂತಿರುಗಿ -6;
 
     // rename the temp file to the new file
-    if (!MoveFileW(szTempFile, wnew))
+    ಆದರೆ (!MoveFileW(sz_ತಾತ್ಕಾಲಿಕ_File, wnew))
     {
 	// Renaming failed.  Rename the file back to its old name, so that it
 	// looks like nothing happened.
-	(void)MoveFileW(szTempFile, wold);
-	return -7;
+	(ಶೂನ್ಯ)MoveFileW(sz_ತಾತ್ಕಾಲಿಕ_File, wold);
+	ಹಿಂತಿರುಗಿ -7;
     }
 
     // Seems to be left around on Novell filesystems
-    DeleteFileW(szTempFile);
+    DeleteFileW(sz_ತಾತ್ಕಾಲಿಕ_File);
 
     // finally, remove the empty old file
-    if (!DeleteFileW(wold))
-	return -8;
+    ಆದರೆ (!DeleteFileW(wold))
+	ಹಿಂತಿರುಗಿ -8;
 
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
 
@@ -8160,159 +8160,159 @@ mch_wrename(WCHAR *wold, WCHAR *wnew)
  * Converts the filenames to UTF-16, then call mch_wrename().
  * Like rename(), returns 0 upon success, non-zero upon failure.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 mch_rename(
-    const char	*pszOldFile,
-    const char	*pszNewFile)
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ	*pszOldFile,
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ	*pszNewFile)
 {
-    WCHAR	*wold = NULL;
-    WCHAR	*wnew = NULL;
-    int		retval = -1;
+    WCHAR	*wold = ಖಾಲಿ;
+    WCHAR	*wnew = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		retval = -1;
 
-    wold = enc_to_utf16((char_u *)pszOldFile, NULL);
-    wnew = enc_to_utf16((char_u *)pszNewFile, NULL);
-    if (wold != NULL && wnew != NULL)
+    wold = enc_ಗಮ್ಯ_utf16((char_u *)pszOldFile, ಖಾಲಿ);
+    wnew = enc_ಗಮ್ಯ_utf16((char_u *)pszNewFile, ಖಾಲಿ);
+    ಆದರೆ (wold != ಖಾಲಿ && wnew != ಖಾಲಿ)
 	retval = mch_wrename(wold, wnew);
     vim_free(wold);
     vim_free(wnew);
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
 /*
  * Get the default shell for the current hardware platform
  */
-    char *
-default_shell(void)
+    ಅಕ್ಷರ *
+default_shell(ಶೂನ್ಯ)
 {
-    return "cmd.exe";
+    ಹಿಂತಿರುಗಿ "cmd.exe";
 }
 
 /*
  * mch_access() extends access() to do more detailed check on network drives.
  * Returns 0 if file "n" has access rights according to "p", -1 otherwise.
  */
-    int
-mch_access(char *n, int p)
+    ಪೂರ್ಣಾಂಕ
+mch_access(ಅಕ್ಷರ *n, ಪೂರ್ಣಾಂಕ p)
 {
     HANDLE	hFile;
-    int		retval = -1;	    // default: fail
+    ಪೂರ್ಣಾಂಕ		retval = -1;	    // default: fail
     WCHAR	*wn;
 
-    wn = enc_to_utf16((char_u *)n, NULL);
-    if (wn == NULL)
-	return -1;
+    wn = enc_ಗಮ್ಯ_utf16((char_u *)n, ಖಾಲಿ);
+    ಆದರೆ (wn == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ -1;
 
-    if (mch_isdir((char_u *)n))
+    ಆದರೆ (mch_isdir((char_u *)n))
     {
-	WCHAR TempNameW[_MAX_PATH + 16] = L"";
+	WCHAR ತಾತ್ಕಾಲಿಕ_Name_W[MAX_ಮಾರ್ಗ_2 + 16] = L"";
 
-	if (p & R_OK)
+	ಆದರೆ (p & R_OK)
 	{
 	    // Read check is performed by seeing if we can do a find file on
 	    // the directory for any file.
-	    int			i;
-	    WIN32_FIND_DATAW    d;
+	    ಪೂರ್ಣಾಂಕ			i;
+	    WIN32_ಕಂಡುಹಿಡಿ_DATAW    d;
 
-	    for (i = 0; i < _MAX_PATH && wn[i] != 0; ++i)
-		TempNameW[i] = wn[i];
-	    if (TempNameW[i - 1] != '\\' && TempNameW[i - 1] != '/')
-		TempNameW[i++] = '\\';
-	    TempNameW[i++] = '*';
-	    TempNameW[i++] = 0;
+	    ಗಾಗಿ (i = 0; i < MAX_ಮಾರ್ಗ_2 && wn[i] != 0; ++i)
+		ತಾತ್ಕಾಲಿಕ_Name_W[i] = wn[i];
+	    ಆದರೆ (ತಾತ್ಕಾಲಿಕ_Name_W[i - 1] != '\\' && ತಾತ್ಕಾಲಿಕ_Name_W[i - 1] != '/')
+		ತಾತ್ಕಾಲಿಕ_Name_W[i++] = '\\';
+	    ತಾತ್ಕಾಲಿಕ_Name_W[i++] = '*';
+	    ತಾತ್ಕಾಲಿಕ_Name_W[i++] = 0;
 
-	    hFile = FindFirstFileW(TempNameW, &d);
-	    if (hFile == INVALID_HANDLE_VALUE)
-		goto getout;
-	    else
-		(void)FindClose(hFile);
+	    hFile = ಕಂಡುಹಿಡಿ_ಮೊದಲ_File_W(ತಾತ್ಕಾಲಿಕ_Name_W, &d);
+	    ಆದರೆ (hFile == INVALID_HANDLE_ಮೌಲ್ಯ)
+		ಹೋಗು getout;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		(ಶೂನ್ಯ)ಕಂಡುಹಿಡಿ_Close(hFile);
 	}
 
-	if (p & W_OK)
+	ಆದರೆ (p & W_OK)
 	{
 	    // Trying to create a temporary file in the directory should catch
 	    // directories on read-only network shares.  However, in
 	    // directories whose ACL allows writes but denies deletes will end
 	    // up keeping the temporary file :-(.
-	    if (!GetTempFileNameW(wn, L"VIM", 0, TempNameW))
-		goto getout;
-	    else
-		DeleteFileW(TempNameW);
+	    ಆದರೆ (!Get_ತಾತ್ಕಾಲಿಕ_File_Name_W(wn, L"VIM", 0, ತಾತ್ಕಾಲಿಕ_Name_W))
+		ಹೋಗು getout;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		DeleteFileW(ತಾತ್ಕಾಲಿಕ_Name_W);
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Don't consider a file read-only if another process has opened it.
-	DWORD share_mode = FILE_SHARE_READ | FILE_SHARE_WRITE;
+	DWORD share_ಬಹುಲಕ = FILE_SHARE_READ | FILE_SHARE_WRITE;
 
 	// Trying to open the file for the required access does ACL, read-only
 	// network share, and file attribute checks.
-	DWORD access_mode = ((p & W_OK) ? GENERIC_WRITE : 0)
+	DWORD access_ಬಹುಲಕ = ((p & W_OK) ? GENERIC_WRITE : 0)
 					     | ((p & R_OK) ? GENERIC_READ : 0);
 
-	hFile = CreateFileW(wn, access_mode, share_mode,
-					     NULL, OPEN_EXISTING, 0, NULL);
-	if (hFile == INVALID_HANDLE_VALUE)
-	    goto getout;
+	hFile = CreateFileW(wn, access_ಬಹುಲಕ, share_ಬಹುಲಕ,
+					     ಖಾಲಿ, OPEN_EXISTING, 0, ಖಾಲಿ);
+	ಆದರೆ (hFile == INVALID_HANDLE_ಮೌಲ್ಯ)
+	    ಹೋಗು getout;
 	CloseHandle(hFile);
     }
 
     retval = 0;	    // success
 getout:
     vim_free(wn);
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
 /*
  * Version of open() that may use UTF-16 file name.
  */
-    int
-mch_open(const char *name, int flags, int mode)
+    ಪೂರ್ಣಾಂಕ
+mch_open(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *name, ಪೂರ್ಣಾಂಕ flags, ಪೂರ್ಣಾಂಕ ಬಹುಲಕ)
 {
     WCHAR	*wn;
-    int		f;
+    ಪೂರ್ಣಾಂಕ		f;
 
-    wn = enc_to_utf16((char_u *)name, NULL);
-    if (wn == NULL)
-	return -1;
+    wn = enc_ಗಮ್ಯ_utf16((char_u *)name, ಖಾಲಿ);
+    ಆದರೆ (wn == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ -1;
 
-    f = _wopen(wn, flags, mode);
+    f = _wopen(wn, flags, ಬಹುಲಕ);
     vim_free(wn);
-    return f;
+    ಹಿಂತಿರುಗಿ f;
 }
 
 /*
  * Version of fopen() that uses UTF-16 file name.
  */
     FILE *
-mch_fopen(const char *name, const char *mode)
+mch_fopen(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *name, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಬಹುಲಕ)
 {
     WCHAR	*wn, *wm;
-    FILE	*f = NULL;
+    FILE	*f = ಖಾಲಿ;
 
-#if defined(DEBUG) && _MSC_VER >= 1400
+#ಆದರೆ defined(DEBUG) && _MSC_VER >= 1400
     // Work around an annoying assertion in the Microsoft debug CRT
     // when mode's text/binary setting doesn't match _get_fmode().
-    char newMode = mode[strlen(mode) - 1];
-    int oldMode = 0;
+    ಅಕ್ಷರ new_ಬಹುಲಕ = ಬಹುಲಕ[ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(ಬಹುಲಕ) - 1];
+    ಪೂರ್ಣಾಂಕ old_ಬಹುಲಕ_2 = 0;
 
-    _get_fmode(&oldMode);
-    if (newMode == 't')
-	_set_fmode(_O_TEXT);
-    else if (newMode == 'b')
-	_set_fmode(_O_BINARY);
-#endif
-    wn = enc_to_utf16((char_u *)name, NULL);
-    wm = enc_to_utf16((char_u *)mode, NULL);
-    if (wn != NULL && wm != NULL)
+    _get_fmode(&old_ಬಹುಲಕ_2);
+    ಆದರೆ (new_ಬಹುಲಕ == 't')
+	ಗಣ_fmode(O_ಪಠ್ಯ);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (new_ಬಹುಲಕ == 'b')
+	ಗಣ_fmode(O_ದ್ವಿಮಾನ_2);
+#ಆದರೆ_ಅಂತ್ಯ
+    wn = enc_ಗಮ್ಯ_utf16((char_u *)name, ಖಾಲಿ);
+    wm = enc_ಗಮ್ಯ_utf16((char_u *)ಬಹುಲಕ, ಖಾಲಿ);
+    ಆದರೆ (wn != ಖಾಲಿ && wm != ಖಾಲಿ)
 	f = _wfopen(wn, wm);
     vim_free(wn);
     vim_free(wm);
 
-#if defined(DEBUG) && _MSC_VER >= 1400
-    if (oldMode != 0)
-	_set_fmode(oldMode);
-#endif
-    return f;
+#ಆದರೆ defined(DEBUG) && _MSC_VER >= 1400
+    ಆದರೆ (old_ಬಹುಲಕ_2 != 0)
+	ಗಣ_fmode(old_ಬಹುಲಕ_2);
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ f;
 }
 
 /*
@@ -8336,123 +8336,123 @@ mch_fopen(const char *name, const char *mode)
  * and write to stream "substream" of file "to".
  * Errors are ignored.
  */
-    static void
-copy_substream(HANDLE sh, void *context, WCHAR *to, WCHAR *substream, long len)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+copy_substream(HANDLE sh, ಶೂನ್ಯ *context, WCHAR *ಗಮ್ಯ, WCHAR *substream, ದೀರ್ಘ len)
 {
-    HANDLE  hTo;
-    WCHAR   *to_name;
+    HANDLE  h_ಗಮ್ಯ;
+    WCHAR   *ಗಮ್ಯ_name;
 
-    to_name = alloc((wcslen(to) + wcslen(substream) + 1) * sizeof(WCHAR));
-    if (to_name == NULL)
-	return;
+    ಗಮ್ಯ_name = alloc((wcslen(ಗಮ್ಯ) + wcslen(substream) + 1) * ಗಾತ್ರ(WCHAR));
+    ಆದರೆ (ಗಮ್ಯ_name == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    wcscpy(to_name, to);
-    wcscat(to_name, substream);
+    wcscpy(ಗಮ್ಯ_name, ಗಮ್ಯ);
+    wcscat(ಗಮ್ಯ_name, substream);
 
-    hTo = CreateFileW(to_name, GENERIC_WRITE, 0, NULL, OPEN_ALWAYS,
-						 FILE_ATTRIBUTE_NORMAL, NULL);
-    if (hTo != INVALID_HANDLE_VALUE)
+    h_ಗಮ್ಯ = CreateFileW(ಗಮ್ಯ_name, GENERIC_WRITE, 0, ಖಾಲಿ, OPEN_ALWAYS,
+						 FILE_ATTRIBUTE_ಸಾಮಾನ್ಯ, ಖಾಲಿ);
+    ಆದರೆ (h_ಗಮ್ಯ != INVALID_HANDLE_ಮೌಲ್ಯ)
     {
-	long	done;
+	ದೀರ್ಘ	ಮುಗಿದ;
 	DWORD	todo;
 	DWORD	readcnt, written;
-	char	buf[4096];
+	ಅಕ್ಷರ	buf[4096];
 
 	// Copy block of bytes at a time.  Abort when something goes wrong.
-	for (done = 0; done < len; done += written)
+	ಗಾಗಿ (ಮುಗಿದ = 0; ಮುಗಿದ < len; ಮುಗಿದ += written)
 	{
 	    // (size_t) cast for Borland C 5.5
-	    todo = (DWORD)((size_t)(len - done) > sizeof(buf) ? sizeof(buf)
-						       : (size_t)(len - done));
-	    if (!BackupRead(sh, (LPBYTE)buf, todo, &readcnt,
+	    todo = (DWORD)((size_t)(len - ಮುಗಿದ) > ಗಾತ್ರ(buf) ? ಗಾತ್ರ(buf)
+						       : (size_t)(len - ಮುಗಿದ));
+	    ಆದರೆ (!BackupRead(sh, (LPBYTE)buf, todo, &readcnt,
 						       FALSE, FALSE, context)
 		    || readcnt != todo
-		    || !WriteFile(hTo, buf, todo, &written, NULL)
+		    || !WriteFile(h_ಗಮ್ಯ, buf, todo, &written, ಖಾಲಿ)
 		    || written != todo)
-		break;
+		ನಿಲ್ಲಿಸು;
 	}
-	CloseHandle(hTo);
+	CloseHandle(h_ಗಮ್ಯ);
     }
 
-    free(to_name);
+    ಬಿಡುಗಡೆ(ಗಮ್ಯ_name);
 }
 
 /*
  * Copy info streams from file "from" to file "to".
  */
-    static void
-copy_infostreams(char_u *from, char_u *to)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+copy_infostreams(char_u *from, char_u *ಗಮ್ಯ)
 {
     WCHAR		*fromw;
     WCHAR		*tow;
     HANDLE		sh;
-    WIN32_STREAM_ID	sid;
-    int			headersize;
-    WCHAR		streamname[_MAX_PATH];
+    WIN32_ಹರಿವು_ID	sid;
+    ಪೂರ್ಣಾಂಕ			headersize;
+    WCHAR		streamname[MAX_ಮಾರ್ಗ_2];
     DWORD		readcount;
-    void		*context = NULL;
+    ಶೂನ್ಯ		*context = ಖಾಲಿ;
     DWORD		lo, hi;
-    int			len;
+    ಪೂರ್ಣಾಂಕ			len;
 
     // Convert the file names to wide characters.
-    fromw = enc_to_utf16(from, NULL);
-    tow = enc_to_utf16(to, NULL);
-    if (fromw != NULL && tow != NULL)
+    fromw = enc_ಗಮ್ಯ_utf16(from, ಖಾಲಿ);
+    tow = enc_ಗಮ್ಯ_utf16(ಗಮ್ಯ, ಖಾಲಿ);
+    ಆದರೆ (fromw != ಖಾಲಿ && tow != ಖಾಲಿ)
     {
 	// Open the file for reading.
-	sh = CreateFileW(fromw, GENERIC_READ, FILE_SHARE_READ, NULL,
-			     OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
-	if (sh != INVALID_HANDLE_VALUE)
+	sh = CreateFileW(fromw, GENERIC_READ, FILE_SHARE_READ, ಖಾಲಿ,
+			     OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, ಖಾಲಿ);
+	ಆದರೆ (sh != INVALID_HANDLE_ಮೌಲ್ಯ)
 	{
 	    // Use BackupRead() to find the info streams.  Repeat until we
 	    // have done them all.
-	    for (;;)
+	    ಗಾಗಿ (;;)
 	    {
 		// Get the header to find the length of the stream name.  If
 		// the "readcount" is zero we have done all info streams.
-		ZeroMemory(&sid, sizeof(WIN32_STREAM_ID));
-		headersize = (int)((char *)&sid.cStreamName - (char *)&sid.dwStreamId);
-		if (!BackupRead(sh, (LPBYTE)&sid, headersize,
+		Zero_ಸ್ಮರಣೆ(&sid, ಗಾತ್ರ(WIN32_ಹರಿವು_ID));
+		headersize = (ಪೂರ್ಣಾಂಕ)((ಅಕ್ಷರ *)&sid.c_ಹರಿವು_Name - (ಅಕ್ಷರ *)&sid.dw_ಹರಿವು_Id);
+		ಆದರೆ (!BackupRead(sh, (LPBYTE)&sid, headersize,
 					   &readcount, FALSE, FALSE, &context)
 			|| readcount == 0)
-		    break;
+		    ನಿಲ್ಲಿಸು;
 
 		// We only deal with streams that have a name.  The normal
 		// file data appears to be without a name, even though docs
 		// suggest it is called "::$DATA".
-		if (sid.dwStreamNameSize > 0)
+		ಆದರೆ (sid.dw_ಹರಿವು_Name_ಗಾತ್ರ > 0)
 		{
 		    // Read the stream name.
-		    if (!BackupRead(sh, (LPBYTE)streamname,
-							 sid.dwStreamNameSize,
+		    ಆದರೆ (!BackupRead(sh, (LPBYTE)streamname,
+							 sid.dw_ಹರಿವು_Name_ಗಾತ್ರ,
 					  &readcount, FALSE, FALSE, &context))
-			break;
+			ನಿಲ್ಲಿಸು;
 
 		    // Copy an info stream with a name ":anything:$DATA".
 		    // Skip "::$DATA", it has no stream name (examples suggest
 		    // it might be used for the normal file contents).
 		    // Note that BackupRead() counts bytes, but the name is in
 		    // wide characters.
-		    len = readcount / sizeof(WCHAR);
+		    len = readcount / ಗಾತ್ರ(WCHAR);
 		    streamname[len] = 0;
-		    if (len > 7 && wcsicmp(streamname + len - 6,
+		    ಆದರೆ (len > 7 && wcsicmp(streamname + len - 6,
 							      L":$DATA") == 0)
 		    {
 			streamname[len - 6] = 0;
 			copy_substream(sh, &context, tow, streamname,
-						    (long)sid.Size.u.LowPart);
+						    (ದೀರ್ಘ)sid.ಗಾತ್ರ_3.u.ಕೆಳಗಿನ_Part);
 		    }
 		}
 
 		// Advance to the next stream.  We might try seeking too far,
 		// but BackupSeek() doesn't skip over stream borders, thus
 		// that's OK.
-		(void)BackupSeek(sh, sid.Size.u.LowPart, sid.Size.u.HighPart,
+		(ಶೂನ್ಯ)BackupSeek(sh, sid.ಗಾತ್ರ_3.u.ಕೆಳಗಿನ_Part, sid.ಗಾತ್ರ_3.u.ಮೇಲಿನ_Part,
 							  &lo, &hi, &context);
 	    }
 
 	    // Clear the context.
-	    (void)BackupRead(sh, NULL, 0, &readcount, TRUE, FALSE, &context);
+	    (ಶೂನ್ಯ)BackupRead(sh, ಖಾಲಿ, 0, &readcount, TRUE, FALSE, &context);
 
 	    CloseHandle(sh);
 	}
@@ -8464,154 +8464,154 @@ copy_infostreams(char_u *from, char_u *to)
 /*
  * ntdll.dll definitions
  */
-#define FileEaInformation   7
-#ifndef STATUS_SUCCESS
-# define STATUS_SUCCESS	    ((NTSTATUS) 0x00000000L)
-#endif
+#ವ್ಯಾಖ್ಯಾನಿಸು FileEaInformation   7
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ ಸ್ಥಿತಿ_SUCCESS
+# define ಸ್ಥಿತಿ_SUCCESS	    ((NTSTATUS) 0x00000000L)
+#ಆದರೆ_ಅಂತ್ಯ
 
-typedef struct _FILE_FULL_EA_INFORMATION_ {
-    ULONG  NextEntryOffset;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ FILE_ತುಂಬಿದ_EA_INFORMATION {
+    ULONG  ಮುಂದಿನ_ನಮೂದು_ಸ್ಥಾನಾಂತರ;
     UCHAR  Flags;
-    UCHAR  EaNameLength;
-    USHORT EaValueLength;
+    UCHAR  Ea_Name_ಉದ್ದಳತೆ;
+    USHORT Ea_ಮೌಲ್ಯ_ಉದ್ದಳತೆ;
     CHAR   EaName[1];
-} FILE_FULL_EA_INFORMATION_, *PFILE_FULL_EA_INFORMATION_;
+} FILE_ತುಂಬಿದ_EA_INFORMATION_2, *PFILE_ತುಂಬಿದ_EA_INFORMATION;
 
-typedef struct _FILE_EA_INFORMATION_ {
-    ULONG EaSize;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ _FILE_EA_INFORMATION_ {
+    ULONG Ea_ಗಾತ್ರ;
 } FILE_EA_INFORMATION_, *PFILE_EA_INFORMATION_;
 
-#ifndef PROTO
-typedef NTSTATUS (NTAPI *PfnNtOpenFile)(
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ PROTO
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ NTSTATUS (NTAPI *PfnNtOpenFile)(
 	PHANDLE FileHandle,
-	ACCESS_MASK DesiredAccess,
-	POBJECT_ATTRIBUTES ObjectAttributes,
-	PIO_STATUS_BLOCK IoStatusBlock,
+	ACCESS_ಮುಖವಾಡ DesiredAccess,
+	POBJECT_ಗುಣಲಕ್ಷಣಗಳು Object_ಗುಣಲಕ್ಷಣಗಳು,
+	PIO_ಸ್ಥಿತಿ_ಖಂಡ Io_ಸ್ಥಿತಿ_ಖಂಡ,
 	ULONG ShareAccess,
 	ULONG OpenOptions);
-typedef NTSTATUS (NTAPI *PfnNtClose)(
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ NTSTATUS (NTAPI *PfnNtClose)(
 	HANDLE Handle);
-typedef NTSTATUS (NTAPI *PfnNtSetEaFile)(
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ NTSTATUS (NTAPI *Pfn_Nt_ಗಣ_Ea_File)(
 	HANDLE		    FileHandle,
-	PIO_STATUS_BLOCK    IoStatusBlock,
-	PVOID		    Buffer,
-	ULONG		    Length);
-typedef NTSTATUS (NTAPI *PfnNtQueryEaFile)(
+	PIO_ಸ್ಥಿತಿ_ಖಂಡ    Io_ಸ್ಥಿತಿ_ಖಂಡ,
+	PVOID		    ಬಫರ್_2,
+	ULONG		    ಉದ್ದಳತೆ_2);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ NTSTATUS (NTAPI *PfnNtQueryEaFile)(
 	HANDLE FileHandle,
-	PIO_STATUS_BLOCK IoStatusBlock,
-	PVOID Buffer,
-	ULONG Length,
-	BOOLEAN ReturnSingleEntry,
+	PIO_ಸ್ಥಿತಿ_ಖಂಡ Io_ಸ್ಥಿತಿ_ಖಂಡ,
+	PVOID ಬಫರ್_2,
+	ULONG ಉದ್ದಳತೆ_2,
+	BOOLEAN Return_Single_ನಮೂದು,
 	PVOID EaList,
-	ULONG EaListLength,
-	PULONG EaIndex,
-	BOOLEAN RestartScan);
-typedef NTSTATUS (NTAPI *PfnNtQueryInformationFile)(
+	ULONG Ea_List_ಉದ್ದಳತೆ,
+	PULONG Ea_ಸೂಚ್ಯಂಕ,
+	BOOLEAN Restart_ಪರಿಶೀಲನೆ);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ NTSTATUS (NTAPI *PfnNtQueryInformationFile)(
 	HANDLE			FileHandle,
-	PIO_STATUS_BLOCK	IoStatusBlock,
+	PIO_ಸ್ಥಿತಿ_ಖಂಡ	Io_ಸ್ಥಿತಿ_ಖಂಡ,
 	PVOID			FileInformation,
-	ULONG			Length,
+	ULONG			ಉದ್ದಳತೆ_2,
 	FILE_INFORMATION_CLASS FileInformationClass);
-typedef VOID (NTAPI *PfnRtlInitUnicodeString)(
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ VOID (NTAPI *PfnRtlInitUnicodeString)(
 	PUNICODE_STRING DestinationString,
-	PCWSTR SourceString);
+	PCWSTR ಮೂಲ_String);
 
-PfnNtOpenFile pNtOpenFile = NULL;
-PfnNtClose pNtClose = NULL;
-PfnNtSetEaFile pNtSetEaFile = NULL;
-PfnNtQueryEaFile pNtQueryEaFile = NULL;
-PfnNtQueryInformationFile pNtQueryInformationFile = NULL;
-PfnRtlInitUnicodeString pRtlInitUnicodeString = NULL;
-#endif
+PfnNtOpenFile pNtOpenFile = ಖಾಲಿ;
+PfnNtClose pNtClose = ಖಾಲಿ;
+Pfn_Nt_ಗಣ_Ea_File p_Nt_ಗಣ_Ea_File = ಖಾಲಿ;
+PfnNtQueryEaFile pNtQueryEaFile = ಖಾಲಿ;
+PfnNtQueryInformationFile pNtQueryInformationFile = ಖಾಲಿ;
+PfnRtlInitUnicodeString pRtlInitUnicodeString = ಖಾಲಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Load ntdll.dll functions.
  */
-    static BOOL
-load_ntdll(void)
+    ಸ್ಥಿರ BOOL
+ತುಂಬು_ntdll(ಶೂನ್ಯ)
 {
-    static int	loaded = -1;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	loaded = -1;
 
-    if (loaded != -1)
-	return (BOOL) loaded;
+    ಆದರೆ (loaded != -1)
+	ಹಿಂತಿರುಗಿ (BOOL) loaded;
 
     HMODULE hNtdll = GetModuleHandle("ntdll.dll");
-    if (hNtdll != NULL)
+    ಆದರೆ (hNtdll != ಖಾಲಿ)
     {
-	pNtOpenFile = (PfnNtOpenFile) GetProcAddress(hNtdll, "NtOpenFile");
-	pNtClose = (PfnNtClose) GetProcAddress(hNtdll, "NtClose");
-	pNtSetEaFile = (PfnNtSetEaFile)
-	    GetProcAddress(hNtdll, "NtSetEaFile");
+	pNtOpenFile = (PfnNtOpenFile) Get_Proc_ವಿಳಾಸ(hNtdll, "NtOpenFile");
+	pNtClose = (PfnNtClose) Get_Proc_ವಿಳಾಸ(hNtdll, "NtClose");
+	p_Nt_ಗಣ_Ea_File = (Pfn_Nt_ಗಣ_Ea_File)
+	    Get_Proc_ವಿಳಾಸ(hNtdll, "NtSetEaFile");
 	pNtQueryEaFile = (PfnNtQueryEaFile)
-	    GetProcAddress(hNtdll, "NtQueryEaFile");
+	    Get_Proc_ವಿಳಾಸ(hNtdll, "NtQueryEaFile");
 	pNtQueryInformationFile = (PfnNtQueryInformationFile)
-	    GetProcAddress(hNtdll, "NtQueryInformationFile");
+	    Get_Proc_ವಿಳಾಸ(hNtdll, "NtQueryInformationFile");
 	pRtlInitUnicodeString = (PfnRtlInitUnicodeString)
-	    GetProcAddress(hNtdll, "RtlInitUnicodeString");
+	    Get_Proc_ವಿಳಾಸ(hNtdll, "RtlInitUnicodeString");
     }
-    if (pNtOpenFile == NULL
-	    || pNtClose == NULL
-	    || pNtSetEaFile == NULL
-	    || pNtQueryEaFile == NULL
-	    || pNtQueryInformationFile == NULL
-	    || pRtlInitUnicodeString == NULL)
+    ಆದರೆ (pNtOpenFile == ಖಾಲಿ
+	    || pNtClose == ಖಾಲಿ
+	    || p_Nt_ಗಣ_Ea_File == ಖಾಲಿ
+	    || pNtQueryEaFile == ಖಾಲಿ
+	    || pNtQueryInformationFile == ಖಾಲಿ
+	    || pRtlInitUnicodeString == ಖಾಲಿ)
 	loaded = FALSE;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	loaded = TRUE;
-    return (BOOL) loaded;
+    ಹಿಂತಿರುಗಿ (BOOL) loaded;
 }
 
 /*
  * Copy extended attributes (EA) from file "from" to file "to".
  */
-    static void
-copy_extattr(char_u *from, char_u *to)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+copy_extattr(char_u *from, char_u *ಗಮ್ಯ)
 {
-    char_u		    *fromf = NULL;
-    char_u		    *tof = NULL;
-    WCHAR		    *fromw = NULL;
-    WCHAR		    *tow = NULL;
+    char_u		    *fromf = ಖಾಲಿ;
+    char_u		    *tof = ಖಾಲಿ;
+    WCHAR		    *fromw = ಖಾಲಿ;
+    WCHAR		    *tow = ಖಾಲಿ;
     UNICODE_STRING	    u;
     HANDLE		    h;
-    OBJECT_ATTRIBUTES	    oa;
-    IO_STATUS_BLOCK	    iosb;
+    OBJECT_ಗುಣಲಕ್ಷಣಗಳು	    oa;
+    IO_ಸ್ಥಿತಿ_ಖಂಡ	    iosb;
     FILE_EA_INFORMATION_    eainfo = {0};
-    void		    *ea = NULL;
+    ಶೂನ್ಯ		    *ea = ಖಾಲಿ;
 
-    if (!load_ntdll())
-	return;
+    ಆದರೆ (!ತುಂಬು_ntdll())
+	ಹಿಂತಿರುಗಿ;
 
     // Convert the file names to the fully qualified object names.
     fromf = alloc(STRLEN(from) + 5);
-    tof = alloc(STRLEN(to) + 5);
-    if (fromf == NULL || tof == NULL)
-	goto theend;
+    tof = alloc(STRLEN(ಗಮ್ಯ) + 5);
+    ಆದರೆ (fromf == ಖಾಲಿ || tof == ಖಾಲಿ)
+	ಹೋಗು theend;
     STRCPY(fromf, "\\??\\");
     STRCPY(fromf + STRLEN_LITERAL("\\??\\"), from);
     STRCPY(tof, "\\??\\");
-    STRCPY(tof + STRLEN_LITERAL("\\??\\"), to);
+    STRCPY(tof + STRLEN_LITERAL("\\??\\"), ಗಮ್ಯ);
 
     // Convert the names to wide characters.
-    fromw = enc_to_utf16(fromf, NULL);
-    tow = enc_to_utf16(tof, NULL);
-    if (fromw == NULL || tow == NULL)
-	goto theend;
+    fromw = enc_ಗಮ್ಯ_utf16(fromf, ಖಾಲಿ);
+    tow = enc_ಗಮ್ಯ_utf16(tof, ಖಾಲಿ);
+    ಆದರೆ (fromw == ಖಾಲಿ || tow == ಖಾಲಿ)
+	ಹೋಗು theend;
 
     // Get the EA.
     pRtlInitUnicodeString(&u, fromw);
-    InitializeObjectAttributes(&oa, &u, 0, NULL, NULL);
-    if (pNtOpenFile(&h, FILE_READ_EA, &oa, &iosb, 0,
-		FILE_NON_DIRECTORY_FILE) != STATUS_SUCCESS)
-	goto theend;
-    pNtQueryInformationFile(h, &iosb, &eainfo, sizeof(eainfo),
+    Initialize_Object_ಗುಣಲಕ್ಷಣಗಳು(&oa, &u, 0, ಖಾಲಿ, ಖಾಲಿ);
+    ಆದರೆ (pNtOpenFile(&h, FILE_READ_EA, &oa, &iosb, 0,
+		FILE_NON_DIRECTORY_FILE) != ಸ್ಥಿತಿ_SUCCESS)
+	ಹೋಗು theend;
+    pNtQueryInformationFile(h, &iosb, &eainfo, ಗಾತ್ರ(eainfo),
 	    FileEaInformation);
-    if (eainfo.EaSize != 0)
+    ಆದರೆ (eainfo.Ea_ಗಾತ್ರ != 0)
     {
-	ea = alloc(eainfo.EaSize);
-	if (ea != NULL)
+	ea = alloc(eainfo.Ea_ಗಾತ್ರ);
+	ಆದರೆ (ea != ಖಾಲಿ)
 	{
-	    if (pNtQueryEaFile(h, &iosb, ea, eainfo.EaSize, FALSE,
-			NULL, 0, NULL, TRUE) != STATUS_SUCCESS)
+	    ಆದರೆ (pNtQueryEaFile(h, &iosb, ea, eainfo.Ea_ಗಾತ್ರ, FALSE,
+			ಖಾಲಿ, 0, ಖಾಲಿ, TRUE) != ಸ್ಥಿತಿ_SUCCESS)
 	    {
 		VIM_CLEAR(ea);
 	    }
@@ -8620,15 +8620,15 @@ copy_extattr(char_u *from, char_u *to)
     pNtClose(h);
 
     // Set the EA.
-    if (ea != NULL)
+    ಆದರೆ (ea != ಖಾಲಿ)
     {
 	pRtlInitUnicodeString(&u, tow);
-	InitializeObjectAttributes(&oa, &u, 0, NULL, NULL);
-	if (pNtOpenFile(&h, FILE_WRITE_EA, &oa, &iosb, 0,
-		    FILE_NON_DIRECTORY_FILE) != STATUS_SUCCESS)
-	    goto theend;
+	Initialize_Object_ಗುಣಲಕ್ಷಣಗಳು(&oa, &u, 0, ಖಾಲಿ, ಖಾಲಿ);
+	ಆದರೆ (pNtOpenFile(&h, FILE_WRITE_EA, &oa, &iosb, 0,
+		    FILE_NON_DIRECTORY_FILE) != ಸ್ಥಿತಿ_SUCCESS)
+	    ಹೋಗು theend;
 
-	pNtSetEaFile(h, &iosb, ea, eainfo.EaSize);
+	p_Nt_ಗಣ_Ea_File(h, &iosb, ea, eainfo.Ea_ಗಾತ್ರ);
 	pNtClose(h);
     }
 
@@ -8645,73 +8645,73 @@ theend:
  * For Windows NT and later we copy info streams.
  * Always returns zero, errors are ignored.
  */
-    int
-mch_copy_file_attribute(char_u *from, char_u *to)
+    ಪೂರ್ಣಾಂಕ
+mch_copy_file_attribute(char_u *from, char_u *ಗಮ್ಯ)
 {
     // File streams only work on Windows NT and later.
-    copy_infostreams(from, to);
-    copy_extattr(from, to);
-    return 0;
+    copy_infostreams(from, ಗಮ್ಯ);
+    copy_extattr(from, ಗಮ್ಯ);
+    ಹಿಂತಿರುಗಿ 0;
 }
 
 
 /*
  * The command line arguments in UTF-16
  */
-static int	nArgsW = 0;
-static LPWSTR	*ArglistW = NULL;
-static int	global_argc = 0;
-static char	**global_argv;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	n_ವಾದಗಳು_W = 0;
+ಸ್ಥಿರ LPWSTR	*ArglistW = ಖಾಲಿ;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	global_argc = 0;
+ಸ್ಥಿರ ಅಕ್ಷರ	**global_argv;
 
-static int	used_file_argc = 0;	// last argument in global_argv[] used
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	ಬಳಸಿದ_file_argc = 0;	// last argument in global_argv[] used
 					// for the argument list.
-static int	*used_file_indexes = NULL; // indexes in global_argv[] for
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	*ಬಳಸಿದ_file_indexes = ಖಾಲಿ; // indexes in global_argv[] for
 					   // command line arguments added to
 					   // the argument list
-static int	used_file_count = 0;	// nr of entries in used_file_indexes
-static int	used_file_literal = FALSE;  // take file names literally
-static int	used_file_full_path = FALSE;  // file name was full path
-#ifdef FEAT_DIFF
-static int	used_file_diff_mode = FALSE;  // file name was with diff mode
-#endif
-static int	used_alist_count = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	ಬಳಸಿದ_file_ಎಣಿಕೆ = 0;	// nr of entries in used_file_indexes
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	ಬಳಸಿದ_file_literal = FALSE;  // take file names literally
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	ಬಳಸಿದ_file_ತುಂಬಿದ_ಮಾರ್ಗ = FALSE;  // file name was full path
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	ಬಳಸಿದ_file_diff_ಬಹುಲಕ = FALSE;  // file name was with diff mode
+#ಆದರೆ_ಅಂತ್ಯ
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	ಬಳಸಿದ_alist_ಎಣಿಕೆ = 0;
 
 
 /*
  * Get the command line arguments.  Unicode version.
  * Returns argc.  Zero when something fails.
  */
-    int
-get_cmd_argsW(char ***argvp)
+    ಪೂರ್ಣಾಂಕ
+get_cmd_ವಾದಗಳು_W(ಅಕ್ಷರ ***argvp)
 {
-    char	**argv = NULL;
-    int		argc = 0;
-    int		i;
+    ಅಕ್ಷರ	**argv = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		argc = 0;
+    ಪೂರ್ಣಾಂಕ		i;
 
-    free_cmd_argsW();
-    ArglistW = CommandLineToArgvW(GetCommandLineW(), &nArgsW);
-    if (ArglistW != NULL)
+    free_cmd_ವಾದಗಳು_W();
+    ArglistW = Command_ಸಾಲು_ಗಮ್ಯ_Argv_W(Get_Command_ಸಾಲು_W(), &n_ವಾದಗಳು_W);
+    ಆದರೆ (ArglistW != ಖಾಲಿ)
     {
-	argv = alloc((nArgsW + 1) * sizeof(char *));
-	if (argv != NULL)
+	argv = alloc((n_ವಾದಗಳು_W + 1) * ಗಾತ್ರ(ಅಕ್ಷರ *));
+	ಆದರೆ (argv != ಖಾಲಿ)
 	{
-	    argc = nArgsW;
-	    argv[argc] = NULL;
-	    for (i = 0; i < argc; ++i)
+	    argc = n_ವಾದಗಳು_W;
+	    argv[argc] = ಖಾಲಿ;
+	    ಗಾಗಿ (i = 0; i < argc; ++i)
 	    {
-		int	len;
+		ಪೂರ್ಣಾಂಕ	len;
 
 		// Convert each Unicode argument to UTF-8.
-		WideCharToMultiByte_alloc(CP_UTF8, 0,
-				ArglistW[i], (int)wcslen(ArglistW[i]) + 1,
+		Wide_Char_ಗಮ್ಯ_Multi_Byte_alloc(CP_UTF8, 0,
+				ArglistW[i], (ಪೂರ್ಣಾಂಕ)wcslen(ArglistW[i]) + 1,
 				(LPSTR *)&argv[i], &len, 0, 0);
-		if (argv[i] == NULL)
+		ಆದರೆ (argv[i] == ಖಾಲಿ)
 		{
 		    // Out of memory, clear everything.
-		    while (i > 0)
-			free(argv[--i]);
-		    free(argv);
-		    argv = NULL;
+		    ಆಗ (i > 0)
+			ಬಿಡುಗಡೆ(argv[--i]);
+		    ಬಿಡುಗಡೆ(argv);
+		    argv = ಖಾಲಿ;
 		    argc = 0;
 		}
 	    }
@@ -8720,26 +8720,26 @@ get_cmd_argsW(char ***argvp)
 
     global_argc = argc;
     global_argv = argv;
-    if (argc > 0)
+    ಆದರೆ (argc > 0)
     {
-	if (used_file_indexes != NULL)
-	    free(used_file_indexes);
-	used_file_indexes = alloc(argc * sizeof(int));
+	ಆದರೆ (ಬಳಸಿದ_file_indexes != ಖಾಲಿ)
+	    ಬಿಡುಗಡೆ(ಬಳಸಿದ_file_indexes);
+	ಬಳಸಿದ_file_indexes = alloc(argc * ಗಾತ್ರ(ಪೂರ್ಣಾಂಕ));
     }
 
-    if (argvp != NULL)
+    ಆದರೆ (argvp != ಖಾಲಿ)
 	*argvp = argv;
-    return argc;
+    ಹಿಂತಿರುಗಿ argc;
 }
 
-    void
-free_cmd_argsW(void)
+    ಶೂನ್ಯ
+free_cmd_ವಾದಗಳು_W(ಶೂನ್ಯ)
 {
-    if (ArglistW == NULL)
-	return;
+    ಆದರೆ (ArglistW == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     GlobalFree(ArglistW);
-    ArglistW = NULL;
+    ArglistW = ಖಾಲಿ;
 }
 
 /*
@@ -8747,35 +8747,35 @@ free_cmd_argsW(void)
  * This avoids that we have to re-parse the argument list when fix_arg_enc()
  * is called.
  */
-    void
-used_file_arg(char *name, int literal, int full_path, int diff_mode)
+    ಶೂನ್ಯ
+ಬಳಸಿದ_file_arg(ಅಕ್ಷರ *name, ಪೂರ್ಣಾಂಕ literal, ಪೂರ್ಣಾಂಕ ತುಂಬಿದ_ಮಾರ್ಗ, ಪೂರ್ಣಾಂಕ diff_ಬಹುಲಕ)
 {
-    int		i;
+    ಪೂರ್ಣಾಂಕ		i;
 
-    if (used_file_indexes == NULL)
-	return;
-    for (i = used_file_argc + 1; i < global_argc; ++i)
-	if (STRCMP(global_argv[i], name) == 0)
+    ಆದರೆ (ಬಳಸಿದ_file_indexes == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
+    ಗಾಗಿ (i = ಬಳಸಿದ_file_argc + 1; i < global_argc; ++i)
+	ಆದರೆ (STRCMP(global_argv[i], name) == 0)
 	{
-	    used_file_argc = i;
-	    used_file_indexes[used_file_count++] = i;
-	    break;
+	    ಬಳಸಿದ_file_argc = i;
+	    ಬಳಸಿದ_file_indexes[ಬಳಸಿದ_file_ಎಣಿಕೆ++] = i;
+	    ನಿಲ್ಲಿಸು;
 	}
-    used_file_literal = literal;
-    used_file_full_path = full_path;
-#ifdef FEAT_DIFF
-    used_file_diff_mode = diff_mode;
-#endif
+    ಬಳಸಿದ_file_literal = literal;
+    ಬಳಸಿದ_file_ತುಂಬಿದ_ಮಾರ್ಗ = ತುಂಬಿದ_ಮಾರ್ಗ;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
+    ಬಳಸಿದ_file_diff_ಬಹುಲಕ = diff_ಬಹುಲಕ;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Remember the length of the argument list as it was.  If it changes then we
  * leave it alone when 'encoding' is set.
  */
-    void
-set_alist_count(void)
+    ಶೂನ್ಯ
+ಗಣ_alist_ಎಣಿಕೆ(ಶೂನ್ಯ)
 {
-    used_alist_count = GARGCOUNT;
+    ಬಳಸಿದ_alist_ಎಣಿಕೆ = GARGCOUNT;
 }
 
 /*
@@ -8783,83 +8783,83 @@ set_alist_count(void)
  * has been changed while starting up.  Use the UTF-16 command line arguments
  * and convert them to 'encoding'.
  */
-    void
-fix_arg_enc(void)
+    ಶೂನ್ಯ
+fix_arg_enc(ಶೂನ್ಯ)
 {
-    int		i;
-    int		idx;
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		idx;
     char_u	*str;
-    int		*fnum_list;
+    ಪೂರ್ಣಾಂಕ		*fnum_list;
 
     // Safety checks:
     // - if argument count differs between the wide and non-wide argument
     //   list, something must be wrong.
     // - the file name arguments must have been located.
     // - the length of the argument list wasn't changed by the user.
-    if (global_argc != nArgsW
-	    || ArglistW == NULL
-	    || used_file_indexes == NULL
-	    || used_file_count == 0
-	    || used_alist_count != GARGCOUNT)
-	return;
+    ಆದರೆ (global_argc != n_ವಾದಗಳು_W
+	    || ArglistW == ಖಾಲಿ
+	    || ಬಳಸಿದ_file_indexes == ಖಾಲಿ
+	    || ಬಳಸಿದ_file_ಎಣಿಕೆ == 0
+	    || ಬಳಸಿದ_alist_ಎಣಿಕೆ != GARGCOUNT)
+	ಹಿಂತಿರುಗಿ;
 
     // Remember the buffer numbers for the arguments.
-    fnum_list = ALLOC_MULT(int, GARGCOUNT);
-    if (fnum_list == NULL)
-	return;		// out of memory
-    for (i = 0; i < GARGCOUNT; ++i)
+    fnum_list = ALLOC_MULT(ಪೂರ್ಣಾಂಕ, GARGCOUNT);
+    ಆದರೆ (fnum_list == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;		// out of memory
+    ಗಾಗಿ (i = 0; i < GARGCOUNT; ++i)
 	fnum_list[i] = GARGLIST[i].ae_fnum;
 
     // Clear the argument list.  Make room for the new arguments.
     alist_clear(&global_alist);
-    if (ga_grow(&global_alist.al_ga, used_file_count) == FAIL)
-	return;		// out of memory
+    ಆದರೆ (ga_grow(&global_alist.al_ga, ಬಳಸಿದ_file_ಎಣಿಕೆ) == FAIL)
+	ಹಿಂತಿರುಗಿ;		// out of memory
 
-    for (i = 0; i < used_file_count; ++i)
+    ಗಾಗಿ (i = 0; i < ಬಳಸಿದ_file_ಎಣಿಕೆ; ++i)
     {
-	idx = used_file_indexes[i];
-	str = utf16_to_enc(ArglistW[idx], NULL);
-	if (str != NULL)
+	idx = ಬಳಸಿದ_file_indexes[i];
+	str = utf16_ಗಮ್ಯ_enc(ArglistW[idx], ಖಾಲಿ);
+	ಆದರೆ (str != ಖಾಲಿ)
 	{
-	    int literal = used_file_literal;
+	    ಪೂರ್ಣಾಂಕ literal = ಬಳಸಿದ_file_literal;
 
-#ifdef FEAT_DIFF
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DIFF
 	    // When using diff mode may need to concatenate file name to
 	    // directory name.  Just like it's done in main().
-	    if (used_file_diff_mode && mch_isdir(str) && GARGCOUNT > 0
+	    ಆದರೆ (ಬಳಸಿದ_file_diff_ಬಹುಲಕ && mch_isdir(str) && GARGCOUNT > 0
 				      && !mch_isdir(alist_name(&GARGLIST[0])))
 	    {
-		char_u	    *tail;
+		char_u	    *ಬಾಲ;
 		string_T    ret;
 
-		tail = gettail(alist_name(&GARGLIST[0]));
-		concat_fnames(str, STRLEN(str), tail, STRLEN(tail), TRUE, &ret);
-		if (ret.string != NULL)
+		ಬಾಲ = gettail(alist_name(&GARGLIST[0]));
+		concat_fnames(str, STRLEN(str), ಬಾಲ, STRLEN(ಬಾಲ), TRUE, &ret);
+		ಆದರೆ (ret.string != ಖಾಲಿ)
 		{
 		    vim_free(str);
 		    str = ret.string;
 		}
 	    }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 	    // Re-use the old buffer by renaming it.  When not using literal
 	    // names it's done by alist_expand() below.
-	    if (used_file_literal)
-		buf_set_name(fnum_list[i], str);
+	    ಆದರೆ (ಬಳಸಿದ_file_literal)
+		buf_ಗಣ_name(fnum_list[i], str);
 
 	    // Check backtick literal. backtick literal is already expanded in
 	    // main.c, so this part add str as literal.
-	    if (literal == FALSE)
+	    ಆದರೆ (literal == FALSE)
 	    {
 		size_t len = STRLEN(str);
 
-		if (len > 2 && *str == '`' && *(str + len - 1) == '`')
+		ಆದರೆ (len > 2 && *str == '`' && *(str + len - 1) == '`')
 		    literal = TRUE;
 	    }
-	    alist_add(&global_alist, str, literal ? 2 : 0);
+	    alist_ಕೂಡಿಸು(&global_alist, str, literal ? 2 : 0);
 	}
     }
 
-    if (!used_file_literal)
+    ಆದರೆ (!ಬಳಸಿದ_file_literal)
     {
 	// Now expand wildcards in the arguments.
 	// Temporarily add '(' and ')' to 'isfname'.  These are valid
@@ -8871,7 +8871,7 @@ fix_arg_enc(void)
 	// Use :legacy so that it also works when in Vim9 script.
 	do_cmdline_cmd((char_u *)":legacy let g:SaVe_ISF = &isf|set isf+=(,)");
 	do_cmdline_cmd((char_u *)":legacy let g:SaVe_WIG = &wig|set wig=");
-	alist_expand(fnum_list, used_alist_count);
+	alist_expand(fnum_list, ಬಳಸಿದ_alist_ಎಣಿಕೆ);
 	do_cmdline_cmd(
 		(char_u *)":legacy let &isf = g:SaVe_ISF|unlet g:SaVe_ISF");
 	do_cmdline_cmd(
@@ -8880,83 +8880,83 @@ fix_arg_enc(void)
 
     // If wildcard expansion failed, we are editing the first file of the
     // arglist and there is no file name: Edit the first argument now.
-    if (curwin->w_arg_idx == 0 && curbuf->b_fname == NULL)
+    ಆದರೆ (curwin->w_arg_idx == 0 && curbuf->b_fname == ಖಾಲಿ)
     {
 	do_cmdline_cmd((char_u *)":rewind");
-	if (GARGCOUNT == 1 && used_file_full_path
+	ಆದರೆ (GARGCOUNT == 1 && ಬಳಸಿದ_file_ತುಂಬಿದ_ಮಾರ್ಗ
 		&& vim_chdirfile(alist_name(&GARGLIST[0]), "drop") == OK)
-	    last_chdir_reason = "drop";
+	    ಕೊನೆಯ_chdir_reason = "drop";
     }
 
-    set_alist_count();
+    ಗಣ_alist_ಎಣಿಕೆ();
 }
 
-    int
-mch_setenv(char *var, char *value, int x UNUSED)
+    ಪೂರ್ಣಾಂಕ
+mch_setenv(ಅಕ್ಷರ *var, ಅಕ್ಷರ *ಮೌಲ್ಯ, ಪೂರ್ಣಾಂಕ x ಬಳಸದ)
 {
     char_u	*envbuf;
     WCHAR	*p;
 
-    envbuf = alloc(STRLEN(var) + STRLEN(value) + 2);
-    if (envbuf == NULL)
-	return -1;
+    envbuf = alloc(STRLEN(var) + STRLEN(ಮೌಲ್ಯ) + 2);
+    ಆದರೆ (envbuf == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ -1;
 
-    sprintf((char *)envbuf, "%s=%s", var, value);
+    sprintf((ಅಕ್ಷರ *)envbuf, "%s=%s", var, ಮೌಲ್ಯ);
 
-    p = enc_to_utf16(envbuf, NULL);
+    p = enc_ಗಮ್ಯ_utf16(envbuf, ಖಾಲಿ);
 
     vim_free(envbuf);
-    if (p == NULL)
-	return -1;
+    ಆದರೆ (p == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ -1;
     _wputenv(p);
-#ifdef libintl_wputenv
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ libintl_wputenv
     libintl_wputenv(p);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     // Unlike Un*x systems, we can free the string for _wputenv().
     vim_free(p);
 
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
 /*
  * Support for 256 colors and 24-bit colors was added in Windows 10
  * version 1703 (Creators update).
  */
-#define VTP_FIRST_SUPPORT_BUILD	    MAKE_VER(10, 0, 15063)
+#ವ್ಯಾಖ್ಯಾನಿಸು VTP_ಮೊದಲ_SUPPORT_BUILD	    MAKE_VER(10, 0, 15063)
 
 /*
  * Support for pseudo-console (ConPTY) was added in windows 10
  * version 1809 (October 2018 update).
  */
-#define CONPTY_FIRST_SUPPORT_BUILD  MAKE_VER(10, 0, 17763)
+#ವ್ಯಾಖ್ಯಾನಿಸು CONPTY_ಮೊದಲ_SUPPORT_BUILD  MAKE_VER(10, 0, 17763)
 
 /*
  * ConPTY differences between versions, need different logic.
  * version 1903 (May 2019 update).
  */
-#define CONPTY_1903_BUILD	    MAKE_VER(10, 0, 18362)
+#ವ್ಯಾಖ್ಯಾನಿಸು CONPTY_1903_BUILD	    MAKE_VER(10, 0, 18362)
 
 /*
  * version 1909 (November 2019 update).
  */
-#define CONPTY_1909_BUILD	    MAKE_VER(10, 0, 18363)
+#ವ್ಯಾಖ್ಯಾನಿಸು CONPTY_1909_BUILD	    MAKE_VER(10, 0, 18363)
 
 /*
  * Stay ahead of the next update, and when it's done, fix this.
  * version ? (2020 update, temporarily use the build number of insider preview)
  */
-#define CONPTY_NEXT_UPDATE_BUILD    MAKE_VER(10, 0, 19587)
+#ವ್ಯಾಖ್ಯಾನಿಸು CONPTY_ಮುಂದಿನ_UPDATE_BUILD    MAKE_VER(10, 0, 19587)
 
 /*
  * Confirm until this version.  Also the logic changes.
  * insider preview.
  */
-#define CONPTY_INSIDER_BUILD	    MAKE_VER(10, 0, 18995)
+#ವ್ಯಾಖ್ಯಾನಿಸು CONPTY_INSIDER_BUILD	    MAKE_VER(10, 0, 18995)
 
 /*
  * Make conpty default on Windows 11
  */
-#define CONPTY_STABLE_BUILD	    MAKE_VER(10, 0, 22000)
+#ವ್ಯಾಖ್ಯಾನಿಸು CONPTY_STABLE_BUILD	    MAKE_VER(10, 0, 22000)
 // Notes:
 // Win 10 22H2 Final is build 19045, its conpty is widely used.
 // Strangely, 19045 is newer but is a lower build number than the 2020 insider
@@ -8964,218 +8964,218 @@ mch_setenv(char *var, char *value, int x UNUSED)
 // Win Server 2022 (May 10, 2022) is build 20348, its conpty is widely used.
 // Win 11 starts from build 22000, even though the major version says 10!
 
-    static void
-vtp_flag_init(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+vtp_flag_init(ಶೂನ್ಯ)
 {
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-    DWORD   mode;
-    HANDLE  out;
+#ಆದರೆ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+    DWORD   ಬಹುಲಕ;
+    HANDLE  ಹೊರಹೋಗು;
 
 # ifdef VIMDLL
-    if (!gui.in_use)
+    ಆದರೆ (!gui.ಒಳ_use)
 # endif
     {
-	out = GetStdHandle(STD_OUTPUT_HANDLE);
+	ಹೊರಹೋಗು = GetStdHandle(STD_OUTPUT_HANDLE);
 
-	vtp_working = (win_version >= VTP_FIRST_SUPPORT_BUILD) ? 1 : 0;
-	GetConsoleMode(out, &mode);
-	mode |= (ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
-	if (SetConsoleMode(out, mode) == 0)
+	vtp_working = (win_ಆವೃತ್ತಿ >= VTP_ಮೊದಲ_SUPPORT_BUILD) ? 1 : 0;
+	Get_Console_ಬಹುಲಕ(ಹೊರಹೋಗು, &ಬಹುಲಕ);
+	ಬಹುಲಕ |= (ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+	ಆದರೆ (ಗಣ_Console_ಬಹುಲಕ(ಹೊರಹೋಗು, ಬಹುಲಕ) == 0)
 	    vtp_working = 0;
 
 	// VTP uses alternate screen buffer.
 	// But, not if running in a nested terminal
-	use_alternate_screen_buffer = win_version >= MAKE_VER(10, 0, 19045)
+	use_alternate_screen_ಬಫರ್ = win_ಆವೃತ್ತಿ >= MAKE_VER(10, 0, 19045)
 	    && p_rs && vtp_working && !mch_getenv("VIM_TERMINAL");
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (win_version >= CONPTY_FIRST_SUPPORT_BUILD)
+    ಆದರೆ (win_ಆವೃತ್ತಿ >= CONPTY_ಮೊದಲ_SUPPORT_BUILD)
 	conpty_working = 1;
-    if (win_version >= CONPTY_STABLE_BUILD)
+    ಆದರೆ (win_ಆವೃತ್ತಿ >= CONPTY_STABLE_BUILD)
 	conpty_stable = 1;
 
-    if (win_version <= CONPTY_INSIDER_BUILD)
+    ಆದರೆ (win_ಆವೃತ್ತಿ <= CONPTY_INSIDER_BUILD)
 	conpty_type = 3;
-    if (win_version <= CONPTY_1909_BUILD)
+    ಆದರೆ (win_ಆವೃತ್ತಿ <= CONPTY_1909_BUILD)
 	conpty_type = 2;
-    if (win_version <= CONPTY_1903_BUILD)
+    ಆದರೆ (win_ಆವೃತ್ತಿ <= CONPTY_1903_BUILD)
 	conpty_type = 2;
-    if (win_version < CONPTY_FIRST_SUPPORT_BUILD)
+    ಆದರೆ (win_ಆವೃತ್ತಿ < CONPTY_ಮೊದಲ_SUPPORT_BUILD)
 	conpty_type = 1;
 
-    if (win_version >= CONPTY_NEXT_UPDATE_BUILD)
+    ಆದರೆ (win_ಆವೃತ್ತಿ >= CONPTY_ಮುಂದಿನ_UPDATE_BUILD)
 	conpty_fix_type = 1;
 }
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ಆದರೆ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
-    static void
-vtp_init(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+vtp_init(ಶೂನ್ಯ)
 {
 # ifdef FEAT_TERMGUICOLORS
-    CONSOLE_SCREEN_BUFFER_INFOEX csbi;
-    csbi.cbSize = sizeof(csbi);
-    GetConsoleScreenBufferInfoEx(g_hConOut, &csbi);
-    save_console_bg_rgb = (guicolor_T)csbi.ColorTable[g_color_index_bg];
-    save_console_fg_rgb = (guicolor_T)csbi.ColorTable[g_color_index_fg];
+    CONSOLE_SCREEN_ಬಫರ್_INFOEX csbi;
+    csbi.cb_ಗಾತ್ರ = ಗಾತ್ರ(csbi);
+    Get_Console_Screen_ಬಫರ್_Info_Ex(g_h_Con_ಹೊರಹೋಗು, &csbi);
+    save_console_bg_rgb = (guicolor_T)csbi.Color_ಕೋಷ್ಟಕ[g_color_ಸೂಚ್ಯಂಕ_bg];
+    save_console_fg_rgb = (guicolor_T)csbi.Color_ಕೋಷ್ಟಕ[g_color_ಸೂಚ್ಯಂಕ_fg];
     store_console_bg_rgb = save_console_bg_rgb;
     store_console_fg_rgb = save_console_fg_rgb;
 
     COLORREF bg;
-    bg = (COLORREF)csbi.ColorTable[g_color_index_bg];
+    bg = (COLORREF)csbi.Color_ಕೋಷ್ಟಕ[g_color_ಸೂಚ್ಯಂಕ_bg];
     bg = (GetRValue(bg) << 16) | (GetGValue(bg) << 8) | GetBValue(bg);
     default_console_color_bg = bg;
 
     COLORREF fg;
-    fg = (COLORREF)csbi.ColorTable[g_color_index_fg];
+    fg = (COLORREF)csbi.Color_ಕೋಷ್ಟಕ[g_color_ಸೂಚ್ಯಂಕ_fg];
     fg = (GetRValue(fg) << 16) | (GetGValue(fg) << 8) | GetBValue(fg);
     default_console_color_fg = fg;
 # endif
-    set_console_color_rgb();
+    ಗಣ_console_color_rgb();
 }
 
-    static void
-vtp_exit(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+vtp_exit(ಶೂನ್ಯ)
 {
     restore_console_color_rgb();
 }
 
-    int
+    ಪೂರ್ಣಾಂಕ
 vtp_printf(
-    char *format,
+    ಅಕ್ಷರ *format,
     ...)
 {
     char_u  buf[100];
     va_list list;
-    DWORD   result;
-    int	    len;
+    DWORD   ಫಲಿತಾಂಶ;
+    ಪೂರ್ಣಾಂಕ	    len;
 
-    if (silent_mode)
-	return 0;
+    ಆದರೆ (silent_ಬಹುಲಕ)
+	ಹಿಂತಿರುಗಿ 0;
 
     va_start(list, format);
-    len = vim_vsnprintf((char *)buf, 100, (char *)format, list);
+    len = vim_vsnprintf((ಅಕ್ಷರ *)buf, 100, (ಅಕ್ಷರ *)format, list);
     va_end(list);
-    WriteConsoleA(g_hConOut, buf, (DWORD)len, &result, NULL);
-    return (int)result;
+    WriteConsoleA(g_h_Con_ಹೊರಹೋಗು, buf, (DWORD)len, &ಫಲಿತಾಂಶ, ಖಾಲಿ);
+    ಹಿಂತಿರುಗಿ (ಪೂರ್ಣಾಂಕ)ಫಲಿತಾಂಶ;
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 vtp_sgr_bulk(
-    int arg)
+    ಪೂರ್ಣಾಂಕ arg)
 {
-    int args[1];
+    ಪೂರ್ಣಾಂಕ ವಾದಗಳು[1];
 
-    args[0] = arg;
-    vtp_sgr_bulks(1, args);
+    ವಾದಗಳು[0] = arg;
+    vtp_sgr_bulks(1, ವಾದಗಳು);
 }
 
 # define FAST256(x) \
-    if ((*p-- = "0123456789"[(n = x % 10)]) \
+    ಆದರೆ ((*p-- = "0123456789"[(n = x % 10)]) \
 	    && x >= 10 && (*p-- = "0123456789"[((m = x % 100) - n) / 10]) \
 	    && x >= 100 && (*p-- = "012"[((x & 0xff) - m) / 100]));
 
 # define FAST256CASE(x) \
-    case x: \
+    ಸ್ಥಿತಿ x: \
 	FAST256(newargs[x - 1]);
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 vtp_sgr_bulks(
-    int argc,
-    int *args)
+    ಪೂರ್ಣಾಂಕ argc,
+    ಪೂರ್ಣಾಂಕ *ವಾದಗಳು)
 {
 # define MAXSGR 16
 # define SGRBUFSIZE 2 + 4 * MAXSGR + 1 // '\033[' + SGR + 'm'
     char_u  buf[SGRBUFSIZE];
     char_u  *p;
-    int	    in, out;
-    int	    newargs[16];
-    static int sgrfgr = -1, sgrfgg, sgrfgb;
-    static int sgrbgr = -1, sgrbgg, sgrbgb;
+    ಪೂರ್ಣಾಂಕ	    ಒಳ, ಹೊರಹೋಗು;
+    ಪೂರ್ಣಾಂಕ	    newargs[16];
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ sgrfgr = -1, sgrfgg, sgrfgb;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ sgrbgr = -1, sgrbgg, sgrbgb;
 
-    if (argc == 0)
+    ಆದರೆ (argc == 0)
     {
 	sgrfgr = sgrbgr = -1;
 	vtp_printf("\033[m");
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    in = out = 0;
-    while (in < argc)
+    ಒಳ = ಹೊರಹೋಗು = 0;
+    ಆಗ (ಒಳ < argc)
     {
-	int s = args[in];
-	int copylen = 1;
+	ಪೂರ್ಣಾಂಕ s = ವಾದಗಳು[ಒಳ];
+	ಪೂರ್ಣಾಂಕ copylen = 1;
 
-	if (s == 38)
+	ಆದರೆ (s == 38)
 	{
-	    if (argc - in >= 5 && args[in + 1] == 2)
+	    ಆದರೆ (argc - ಒಳ >= 5 && ವಾದಗಳು[ಒಳ + 1] == 2)
 	    {
-		if (sgrfgr == args[in + 2] && sgrfgg == args[in + 3]
-						     && sgrfgb == args[in + 4])
+		ಆದರೆ (sgrfgr == ವಾದಗಳು[ಒಳ + 2] && sgrfgg == ವಾದಗಳು[ಒಳ + 3]
+						     && sgrfgb == ವಾದಗಳು[ಒಳ + 4])
 		{
-		    in += 5;
+		    ಒಳ += 5;
 		    copylen = 0;
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    sgrfgr = args[in + 2];
-		    sgrfgg = args[in + 3];
-		    sgrfgb = args[in + 4];
+		    sgrfgr = ವಾದಗಳು[ಒಳ + 2];
+		    sgrfgg = ವಾದಗಳು[ಒಳ + 3];
+		    sgrfgb = ವಾದಗಳು[ಒಳ + 4];
 		    copylen = 5;
 		}
 	    }
-	    else if (argc - in >= 3 && args[in + 1] == 5)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argc - ಒಳ >= 3 && ವಾದಗಳು[ಒಳ + 1] == 5)
 	    {
 		sgrfgr = -1;
 		copylen = 3;
 	    }
 	}
-	else if (s == 48)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (s == 48)
 	{
-	    if (argc - in >= 5 && args[in + 1] == 2)
+	    ಆದರೆ (argc - ಒಳ >= 5 && ವಾದಗಳು[ಒಳ + 1] == 2)
 	    {
-		if (sgrbgr == args[in + 2] && sgrbgg == args[in + 3]
-						     && sgrbgb == args[in + 4])
+		ಆದರೆ (sgrbgr == ವಾದಗಳು[ಒಳ + 2] && sgrbgg == ವಾದಗಳು[ಒಳ + 3]
+						     && sgrbgb == ವಾದಗಳು[ಒಳ + 4])
 		{
-		    in += 5;
+		    ಒಳ += 5;
 		    copylen = 0;
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
-		    sgrbgr = args[in + 2];
-		    sgrbgg = args[in + 3];
-		    sgrbgb = args[in + 4];
+		    sgrbgr = ವಾದಗಳು[ಒಳ + 2];
+		    sgrbgg = ವಾದಗಳು[ಒಳ + 3];
+		    sgrbgb = ವಾದಗಳು[ಒಳ + 4];
 		    copylen = 5;
 		}
 	    }
-	    else if (argc - in >= 3 && args[in + 1] == 5)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (argc - ಒಳ >= 3 && ವಾದಗಳು[ಒಳ + 1] == 5)
 	    {
 		sgrbgr = -1;
 		copylen = 3;
 	    }
 	}
-	else if (30 <= s && s <= 39)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (30 <= s && s <= 39)
 	    sgrfgr = -1;
-	else if (90 <= s && s <= 97)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (90 <= s && s <= 97)
 	    sgrfgr = -1;
-	else if (40 <= s && s <= 49)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (40 <= s && s <= 49)
 	    sgrbgr = -1;
-	else if (100 <= s && s <= 107)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (100 <= s && s <= 107)
 	    sgrbgr = -1;
-	else if (s == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (s == 0)
 	    sgrfgr = sgrbgr = -1;
 
-	while (copylen--)
-	    newargs[out++] = args[in++];
+	ಆಗ (copylen--)
+	    newargs[ಹೊರಹೋಗು++] = ವಾದಗಳು[ಒಳ++];
     }
 
-    p = &buf[sizeof(buf) - 1];
+    p = &buf[ಗಾತ್ರ(buf) - 1];
     *p-- = 'm';
 
-    switch (out)
+    ಆಯ್ಕೆ (ಹೊರಹೋಗು)
     {
-	int	n, m;
+	ಪೂರ್ಣಾಂಕ	n, m;
 	DWORD	r;
 
 	FAST256CASE(16);
@@ -9211,110 +9211,110 @@ vtp_sgr_bulks(
 	FAST256CASE(1);
 	*p-- = '[';
 	*p = '\033';
-	WriteConsoleA(g_hConOut, p, (DWORD)(&buf[SGRBUFSIZE] - p), &r, NULL);
-    default:
-	break;
+	WriteConsoleA(g_h_Con_ಹೊರಹೋಗು, p, (DWORD)(&buf[SGRBUFSIZE] - p), &r, ಖಾಲಿ);
+    ಪೂರ್ವನಿಯೋಜಿತ:
+	ನಿಲ್ಲಿಸು;
     }
 }
 
-    static void
-wt_init(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+wt_init(ಶೂನ್ಯ)
 {
-    wt_working = mch_getenv("WT_SESSION") != NULL;
+    wt_working = mch_getenv("WT_SESSION") != ಖಾಲಿ;
 }
 
 # ifdef FEAT_TERMGUICOLORS
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 ctermtoxterm(
-    int cterm)
+    ಪೂರ್ಣಾಂಕ cterm)
 {
     char_u r, g, b, idx;
 
     cterm_color2rgb(cterm, &r, &g, &b, &idx);
-    return (((int)r << 16) | ((int)g << 8) | (int)b);
+    ಹಿಂತಿರುಗಿ (((ಪೂರ್ಣಾಂಕ)r << 16) | ((ಪೂರ್ಣಾಂಕ)g << 8) | (ಪೂರ್ಣಾಂಕ)b);
 }
 # endif
 
-    static void
-set_console_color_rgb(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_console_color_rgb(ಶೂನ್ಯ)
 {
 # ifdef FEAT_TERMGUICOLORS
-    CONSOLE_SCREEN_BUFFER_INFOEX csbi;
+    CONSOLE_SCREEN_ಬಫರ್_INFOEX csbi;
     guicolor_T	fg, bg;
-    int		ctermfg, ctermbg;
+    ಪೂರ್ಣಾಂಕ		ctermfg, ctermbg;
 
-    if (!vtp_working)
-	return;
+    ಆದರೆ (!vtp_working)
+	ಹಿಂತಿರುಗಿ;
 
     get_default_console_color(&ctermfg, &ctermbg, &fg, &bg);
 
-    if (p_tgc || t_colors >= 256)
+    ಆದರೆ (p_tgc || t_colors >= 256)
     {
-	term_fg_rgb_color(fg);
-	term_bg_rgb_color(bg);
-	return;
+	ಪದ_fg_rgb_color(fg);
+	ಪದ_bg_rgb_color(bg);
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if (use_alternate_screen_buffer)
-	return;
+    ಆದರೆ (use_alternate_screen_ಬಫರ್)
+	ಹಿಂತಿರುಗಿ;
 
     fg = (GetRValue(fg) << 16) | (GetGValue(fg) << 8) | GetBValue(fg);
     bg = (GetRValue(bg) << 16) | (GetGValue(bg) << 8) | GetBValue(bg);
 
-    csbi.cbSize = sizeof(csbi);
-    GetConsoleScreenBufferInfoEx(g_hConOut, &csbi);
+    csbi.cb_ಗಾತ್ರ = ಗಾತ್ರ(csbi);
+    Get_Console_Screen_ಬಫರ್_Info_Ex(g_h_Con_ಹೊರಹೋಗು, &csbi);
 
-    csbi.cbSize = sizeof(csbi);
-    csbi.srWindow.Right += 1;
-    csbi.srWindow.Bottom += 1;
-    store_console_bg_rgb = csbi.ColorTable[g_color_index_bg];
-    store_console_fg_rgb = csbi.ColorTable[g_color_index_fg];
-    csbi.ColorTable[g_color_index_bg] = (COLORREF)bg;
-    csbi.ColorTable[g_color_index_fg] = (COLORREF)fg;
-    SetConsoleScreenBufferInfoEx(g_hConOut, &csbi);
+    csbi.cb_ಗಾತ್ರ = ಗಾತ್ರ(csbi);
+    csbi.sr_ಕಿಟಕಿ.ಬಲ_4 += 1;
+    csbi.sr_ಕಿಟಕಿ.Bottom += 1;
+    store_console_bg_rgb = csbi.Color_ಕೋಷ್ಟಕ[g_color_ಸೂಚ್ಯಂಕ_bg];
+    store_console_fg_rgb = csbi.Color_ಕೋಷ್ಟಕ[g_color_ಸೂಚ್ಯಂಕ_fg];
+    csbi.Color_ಕೋಷ್ಟಕ[g_color_ಸೂಚ್ಯಂಕ_bg] = (COLORREF)bg;
+    csbi.Color_ಕೋಷ್ಟಕ[g_color_ಸೂಚ್ಯಂಕ_fg] = (COLORREF)fg;
+    ಗಣ_Console_Screen_ಬಫರ್_Info_Ex(g_h_Con_ಹೊರಹೋಗು, &csbi);
 # endif
 }
 
-# if defined(FEAT_TERMGUICOLORS)
-    void
+# ಆದರೆ defined(FEAT_TERMGUICOLORS)
+    ಶೂನ್ಯ
 get_default_console_color(
-    int *cterm_fg,
-    int *cterm_bg,
+    ಪೂರ್ಣಾಂಕ *cterm_fg,
+    ಪೂರ್ಣಾಂಕ *cterm_bg,
     guicolor_T *gui_fg,
     guicolor_T *gui_bg)
 {
-    int id;
+    ಪೂರ್ಣಾಂಕ id;
     guicolor_T guifg = INVALCOLOR;
     guicolor_T guibg = INVALCOLOR;
-    int ctermfg = 0;
-    int ctermbg = 0;
-    int dummynull = 0;
+    ಪೂರ್ಣಾಂಕ ctermfg = 0;
+    ಪೂರ್ಣಾಂಕ ctermbg = 0;
+    ಪೂರ್ಣಾಂಕ dummynull = 0;
 
     id = syn_name2id((char_u *)"Normal");
-    if (id > 0 && p_tgc)
+    ಆದರೆ (id > 0 && p_tgc)
 	syn_id2colors(id, &guifg, &guibg);
-    if (guifg == INVALCOLOR)
+    ಆದರೆ (guifg == INVALCOLOR)
     {
 	ctermfg = -1;
-	if (id > 0)
+	ಆದರೆ (id > 0)
 	    syn_id2cterm_bg(id, &ctermfg, &dummynull);
-	if (ctermfg != -1)
+	ಆದರೆ (ctermfg != -1)
 	    guifg = ctermtoxterm(ctermfg);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    guifg = USE_WT ? INVALCOLOR : default_console_color_fg;
-	cterm_normal_fg_gui_color = guifg;
+	cterm_ಸಾಮಾನ್ಯ_fg_gui_color = guifg;
 	ctermfg = ctermfg < 0 ? 0 : ctermfg;
     }
-    if (guibg == INVALCOLOR)
+    ಆದರೆ (guibg == INVALCOLOR)
     {
 	ctermbg = -1;
-	if (id > 0)
+	ಆದರೆ (id > 0)
 	    syn_id2cterm_bg(id, &dummynull, &ctermbg);
-	if (ctermbg != -1)
+	ಆದರೆ (ctermbg != -1)
 	    guibg = ctermtoxterm(ctermbg);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    guibg = USE_WT ? INVALCOLOR : default_console_color_bg;
-	cterm_normal_bg_gui_color = guibg;
+	cterm_ಸಾಮಾನ್ಯ_bg_gui_color = guibg;
 	ctermbg = ctermbg < 0 ? 0 : ctermbg;
     }
 
@@ -9328,172 +9328,172 @@ get_default_console_color(
 /*
  * Set the console colors to the original colors or the last set colors.
  */
-    static void
-reset_console_color_rgb(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+reset_console_color_rgb(ಶೂನ್ಯ)
 {
 # ifdef FEAT_TERMGUICOLORS
-    if (use_alternate_screen_buffer)
-	return;
+    ಆದರೆ (use_alternate_screen_ಬಫರ್)
+	ಹಿಂತಿರುಗಿ;
 
-    CONSOLE_SCREEN_BUFFER_INFOEX csbi;
+    CONSOLE_SCREEN_ಬಫರ್_INFOEX csbi;
 
-    csbi.cbSize = sizeof(csbi);
-    GetConsoleScreenBufferInfoEx(g_hConOut, &csbi);
+    csbi.cb_ಗಾತ್ರ = ಗಾತ್ರ(csbi);
+    Get_Console_Screen_ಬಫರ್_Info_Ex(g_h_Con_ಹೊರಹೋಗು, &csbi);
 
-    csbi.cbSize = sizeof(csbi);
-    csbi.srWindow.Right += 1;
-    csbi.srWindow.Bottom += 1;
-    csbi.ColorTable[g_color_index_bg] = (COLORREF)store_console_bg_rgb;
-    csbi.ColorTable[g_color_index_fg] = (COLORREF)store_console_fg_rgb;
-    SetConsoleScreenBufferInfoEx(g_hConOut, &csbi);
+    csbi.cb_ಗಾತ್ರ = ಗಾತ್ರ(csbi);
+    csbi.sr_ಕಿಟಕಿ.ಬಲ_4 += 1;
+    csbi.sr_ಕಿಟಕಿ.Bottom += 1;
+    csbi.Color_ಕೋಷ್ಟಕ[g_color_ಸೂಚ್ಯಂಕ_bg] = (COLORREF)store_console_bg_rgb;
+    csbi.Color_ಕೋಷ್ಟಕ[g_color_ಸೂಚ್ಯಂಕ_fg] = (COLORREF)store_console_fg_rgb;
+    ಗಣ_Console_Screen_ಬಫರ್_Info_Ex(g_h_Con_ಹೊರಹೋಗು, &csbi);
 # endif
 }
 
 /*
  * Set the console colors to the original colors.
  */
-    static void
-restore_console_color_rgb(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+restore_console_color_rgb(ಶೂನ್ಯ)
 {
 # ifdef FEAT_TERMGUICOLORS
-    if (use_alternate_screen_buffer)
-	return;
+    ಆದರೆ (use_alternate_screen_ಬಫರ್)
+	ಹಿಂತಿರುಗಿ;
 
-    CONSOLE_SCREEN_BUFFER_INFOEX csbi;
+    CONSOLE_SCREEN_ಬಫರ್_INFOEX csbi;
 
-    csbi.cbSize = sizeof(csbi);
-    GetConsoleScreenBufferInfoEx(g_hConOut, &csbi);
+    csbi.cb_ಗಾತ್ರ = ಗಾತ್ರ(csbi);
+    Get_Console_Screen_ಬಫರ್_Info_Ex(g_h_Con_ಹೊರಹೋಗು, &csbi);
 
-    csbi.cbSize = sizeof(csbi);
-    csbi.srWindow.Right += 1;
-    csbi.srWindow.Bottom += 1;
-    csbi.ColorTable[g_color_index_bg] = (COLORREF)save_console_bg_rgb;
-    csbi.ColorTable[g_color_index_fg] = (COLORREF)save_console_fg_rgb;
-    SetConsoleScreenBufferInfoEx(g_hConOut, &csbi);
+    csbi.cb_ಗಾತ್ರ = ಗಾತ್ರ(csbi);
+    csbi.sr_ಕಿಟಕಿ.ಬಲ_4 += 1;
+    csbi.sr_ಕಿಟಕಿ.Bottom += 1;
+    csbi.Color_ಕೋಷ್ಟಕ[g_color_ಸೂಚ್ಯಂಕ_bg] = (COLORREF)save_console_bg_rgb;
+    csbi.Color_ಕೋಷ್ಟಕ[g_color_ಸೂಚ್ಯಂಕ_fg] = (COLORREF)save_console_fg_rgb;
+    ಗಣ_Console_Screen_ಬಫರ್_Info_Ex(g_h_Con_ಹೊರಹೋಗು, &csbi);
 # endif
 }
 
-    void
-control_console_color_rgb(void)
+    ಶೂನ್ಯ
+control_console_color_rgb(ಶೂನ್ಯ)
 {
-    if (vtp_working)
-	set_console_color_rgb();
-    else
+    ಆದರೆ (vtp_working)
+	ಗಣ_console_color_rgb();
+    ಇಲ್ಲದಿದ್ದರೆ
 	reset_console_color_rgb();
 }
 
-    int
-use_vtp(void)
+    ಪೂರ್ಣಾಂಕ
+use_vtp(ಶೂನ್ಯ)
 {
-    return USE_VTP;
+    ಹಿಂತಿರುಗಿ USE_VTP;
 }
 
-    int
-is_term_win32(void)
+    ಪೂರ್ಣಾಂಕ
+is_ಪದ_win32(ಶೂನ್ಯ)
 {
-    return T_NAME != NULL && STRCMP(T_NAME, "win32") == 0;
+    ಹಿಂತಿರುಗಿ T_NAME != ಖಾಲಿ && STRCMP(T_NAME, "win32") == 0;
 }
 
-    int
-has_vtp_working(void)
+    ಪೂರ್ಣಾಂಕ
+has_vtp_working(ಶೂನ್ಯ)
 {
-    return vtp_working;
+    ಹಿಂತಿರುಗಿ vtp_working;
 }
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    int
-has_conpty_working(void)
+    ಪೂರ್ಣಾಂಕ
+has_conpty_working(ಶೂನ್ಯ)
 {
-    return conpty_working;
+    ಹಿಂತಿರುಗಿ conpty_working;
 }
 
-    int
-get_conpty_type(void)
+    ಪೂರ್ಣಾಂಕ
+get_conpty_type(ಶೂನ್ಯ)
 {
-    return conpty_type;
+    ಹಿಂತಿರುಗಿ conpty_type;
 }
 
-    int
-is_conpty_stable(void)
+    ಪೂರ್ಣಾಂಕ
+is_conpty_stable(ಶೂನ್ಯ)
 {
-    return conpty_stable;
+    ಹಿಂತಿರುಗಿ conpty_stable;
 }
 
-    int
-get_conpty_fix_type(void)
+    ಪೂರ್ಣಾಂಕ
+get_conpty_fix_type(ಶೂನ್ಯ)
 {
-    return conpty_fix_type;
+    ಹಿಂತಿರುಗಿ conpty_fix_type;
 }
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-    void
-resize_console_buf(void)
+#ಆದರೆ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+    ಶೂನ್ಯ
+resize_console_buf(ಶೂನ್ಯ)
 {
-    if (use_alternate_screen_buffer)
-	return;
+    ಆದರೆ (use_alternate_screen_ಬಫರ್)
+	ಹಿಂತಿರುಗಿ;
 
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    CONSOLE_SCREEN_ಬಫರ್_INFO csbi;
     COORD coord;
     SMALL_RECT newsize;
 
-    if (!GetConsoleScreenBufferInfo(g_hConOut, &csbi))
-	return;
+    ಆದರೆ (!Get_Console_Screen_ಬಫರ್_Info(g_h_Con_ಹೊರಹೋಗು, &csbi))
+	ಹಿಂತಿರುಗಿ;
 
-    coord.X = SRWIDTH(csbi.srWindow);
-    coord.Y = SRHEIGHT(csbi.srWindow);
-    SetConsoleScreenBufferSize(g_hConOut, coord);
+    coord.X = SRWIDTH(csbi.sr_ಕಿಟಕಿ);
+    coord.Y = SRHEIGHT(csbi.sr_ಕಿಟಕಿ);
+    ಗಣ_Console_Screen_ಬಫರ್_ಗಾತ್ರ(g_h_Con_ಹೊರಹೋಗು, coord);
 
-    newsize.Left = 0;
-    newsize.Top = 0;
-    newsize.Right = coord.X - 1;
+    newsize.ಎಡ_4 = 0;
+    newsize.ತುದಿ_2 = 0;
+    newsize.ಬಲ_4 = coord.X - 1;
     newsize.Bottom = coord.Y - 1;
-    SetConsoleWindowInfo(g_hConOut, TRUE, &newsize);
+    ಗಣ_Console_ಕಿಟಕಿ_Info(g_h_Con_ಹೊರಹೋಗು, TRUE, &newsize);
 
-    SetConsoleScreenBufferSize(g_hConOut, coord);
+    ಗಣ_Console_Screen_ಬಫರ್_ಗಾತ್ರ(g_h_Con_ಹೊರಹೋಗು, coord);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    char *
-GetWin32Error(void)
+    ಅಕ್ಷರ *
+GetWin32Error(ಶೂನ್ಯ)
 {
-    static char	*oldmsg = NULL;
-    char	*acp_msg = NULL;
+    ಸ್ಥಿರ ಅಕ್ಷರ	*oldmsg = ಖಾಲಿ;
+    ಅಕ್ಷರ	*acp_ಸಂದೇಶ = ಖಾಲಿ;
     DWORD	acp_len;
-    char	*enc_msg = NULL;
-    int		enc_len = 0;
+    ಅಕ್ಷರ	*enc_ಸಂದೇಶ = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		enc_len = 0;
 
     // get formatted message from OS
-    acp_len = FormatMessage(
-	    FORMAT_MESSAGE_ALLOCATE_BUFFER|FORMAT_MESSAGE_FROM_SYSTEM,
-	    NULL, GetLastError(), 0, (LPSTR)&acp_msg, 0, NULL);
-    if (acp_len == 0 || acp_msg == NULL)
-	return NULL;
+    acp_len = Format_ಸಂದೇಶ(
+	    FORMAT_ಸಂದೇಶ_ALLOCATE_ಬಫರ್|FORMAT_ಸಂದೇಶ_FROM_SYSTEM,
+	    ಖಾಲಿ, Get_ಕೊನೆಯ_Error(), 0, (LPSTR)&acp_ಸಂದೇಶ, 0, ಖಾಲಿ);
+    ಆದರೆ (acp_len == 0 || acp_ಸಂದೇಶ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     // clean oldmsg if remained.
-    if (oldmsg != NULL)
+    ಆದರೆ (oldmsg != ಖಾಲಿ)
     {
 	vim_free(oldmsg);
-	oldmsg = NULL;
+	oldmsg = ಖಾಲಿ;
     }
 
-    acp_to_enc((char_u *)acp_msg, (int)acp_len, (char_u **)&enc_msg, &enc_len);
-    LocalFree(acp_msg);
-    if (enc_msg == NULL)
-	return NULL;
+    acp_ಗಮ್ಯ_enc((char_u *)acp_ಸಂದೇಶ, (ಪೂರ್ಣಾಂಕ)acp_len, (char_u **)&enc_ಸಂದೇಶ, &enc_len);
+    LocalFree(acp_ಸಂದೇಶ);
+    ಆದರೆ (enc_ಸಂದೇಶ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     // remove trailing \r\n
-    char *pcrlf = strstr(enc_msg, "\r\n");
-    if (pcrlf != NULL)
+    ಅಕ್ಷರ *pcrlf = ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು(enc_ಸಂದೇಶ, "\r\n");
+    ಆದರೆ (pcrlf != ಖಾಲಿ)
 	*pcrlf = NUL;
 
-    oldmsg = enc_msg;
-    return enc_msg;
+    oldmsg = enc_ಸಂದೇಶ;
+    ಹಿಂತಿರುಗಿ enc_ಸಂದೇಶ;
 }
 
-#if defined(FEAT_RELTIME)
-static HANDLE   timer_handle;
-static int      timer_active = FALSE;
+#ಆದರೆ defined(FEAT_RELTIME)
+ಸ್ಥಿರ HANDLE   timer_handle;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ      timer_ಸಕ್ರಿಯ = FALSE;
 
 /*
  * Calls to start_timeout alternate the return value pointer between the two
@@ -9503,13 +9503,13 @@ static int      timer_active = FALSE;
  * deleted. Ping-ponging between the two flags prevents this causing 'fake'
  * timeouts.
  */
-static sig_atomic_t timeout_flags[2];
-static int	    timeout_flag_idx = 0;
-static sig_atomic_t *timeout_flag = &timeout_flags[0];
+ಸ್ಥಿರ sig_atomic_t timeout_flags[2];
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    timeout_flag_idx = 0;
+ಸ್ಥಿರ sig_atomic_t *timeout_flag = &timeout_flags[0];
 
 
-    static void CALLBACK
-set_flag(void *param, BOOLEAN unused2 UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ CALLBACK
+ಗಣ_flag(ಶೂನ್ಯ *param, BOOLEAN unused2 ಬಳಸದ)
 {
     *(sig_atomic_t *)param = TRUE;
 }
@@ -9517,14 +9517,14 @@ set_flag(void *param, BOOLEAN unused2 UNUSED)
 /*
  * Stop any active timeout.
  */
-    void
-stop_timeout(void)
+    ಶೂನ್ಯ
+stop_timeout(ಶೂನ್ಯ)
 {
-    if (timer_active)
+    ಆದರೆ (timer_ಸಕ್ರಿಯ)
     {
-	BOOL ret = DeleteTimerQueueTimer(NULL, timer_handle, NULL);
-	timer_active = FALSE;
-	if (!ret && GetLastError() != ERROR_IO_PENDING)
+	BOOL ret = Delete_Timer_ಸರತಿ_Timer(ಖಾಲಿ, timer_handle, ಖಾಲಿ);
+	timer_ಸಕ್ರಿಯ = FALSE;
+	ಆದರೆ (!ret && Get_ಕೊನೆಯ_Error() != ERROR_IO_PENDING)
 	{
 	    semsg(_(e_could_not_clear_timeout_str), GetWin32Error());
 	}
@@ -9545,27 +9545,27 @@ stop_timeout(void)
  * This function is not expected to fail, but if it does it still returns a
  * valid flag pointer; the flag will remain stuck at zero.
  */
-    volatile sig_atomic_t *
-start_timeout(long msec)
+    ಅಸ್ಥಿರ sig_atomic_t *
+ಆರಂಭ_timeout(ದೀರ್ಘ msec)
 {
     BOOL ret;
 
     timeout_flag = &timeout_flags[timeout_flag_idx];
 
     stop_timeout();
-    ret = CreateTimerQueueTimer(
-	    &timer_handle, NULL, set_flag, timeout_flag,
+    ret = Create_Timer_ಸರತಿ_Timer(
+	    &timer_handle, ಖಾಲಿ, ಗಣ_flag, timeout_flag,
 	    (DWORD)msec, 0, WT_EXECUTEDEFAULT);
-    if (!ret)
+    ಆದರೆ (!ret)
     {
-	semsg(_(e_could_not_set_timeout_str), GetWin32Error());
+	semsg(_(e_could_not_ಗಣ_timeout_str), GetWin32Error());
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	timeout_flag_idx = (timeout_flag_idx + 1) % 2;
-	timer_active = TRUE;
+	timer_ಸಕ್ರಿಯ = TRUE;
 	*timeout_flag = FALSE;
     }
-    return timeout_flag;
+    ಹಿಂತಿರುಗಿ timeout_flag;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ

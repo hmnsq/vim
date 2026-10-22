@@ -12,129 +12,129 @@
  * Not used for GTK.
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-#include <X11/keysym.h>
-#include <X11/Xatom.h>
-#include <X11/StringDefs.h>
-#include <X11/Intrinsic.h>
-#include <X11/Shell.h>
-#include <X11/cursorfont.h>
+#ಅನ್ತರ್ಭಾವ <X11/keysym.h>
+#ಅನ್ತರ್ಭಾವ <X11/Xatom.h>
+#ಅನ್ತರ್ಭಾವ <X11/StringDefs.h>
+#ಅನ್ತರ್ಭಾವ <X11/Intrinsic.h>
+#ಅನ್ತರ್ಭಾವ <X11/Shell.h>
+#ಅನ್ತರ್ಭಾವ <X11/cursorfont.h>
 
 /*
  * XpmP.h is preferred, because it makes the signs drawn with a transparent
  * background instead of black.
  */
-#if defined(HAVE_XM_XPMP_H) && defined(FEAT_GUI_MOTIF) \
+#ಆದರೆ defined(HAVE_XM_XPMP_H) && defined(FEAT_GUI_MOTIF) \
 	&& !defined(HAVE_X11_XPM_H)
 # include <Xm/XpmP.h>
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 # ifdef HAVE_X11_XPM_H
 #  ifdef VMS
 #   include <xpm.h>
-#  else
+#  ಇಲ್ಲದಿದ್ದರೆ
 #   include <X11/xpm.h>
 #  endif
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_XFONTSET
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XFONTSET
 # ifdef X_LOCALE
 #  include <X11/Xlocale.h>
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 #  include <locale.h>
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef HAVE_X11_SUNKEYSYM_H
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_X11_SUNKEYSYM_H
 # include <X11/Sunkeysym.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef HAVE_X11_XMU_EDITRES_H
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_X11_XMU_EDITRES_H
 # include <X11/Xmu/Editres.h>
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#define VIM_NAME	"vim"
-#define VIM_CLASS	"Vim"
+#ವ್ಯಾಖ್ಯಾನಿಸು VIM_NAME	"vim"
+#ವ್ಯಾಖ್ಯಾನಿಸು VIM_CLASS	"Vim"
 
 // Default resource values
-#define DFLT_FONT		"7x13"
-#ifdef FONTSET_ALWAYS
-# define DFLT_MENU_FONT		XtDefaultFontSet
-#else
+#ವ್ಯಾಖ್ಯಾನಿಸು DFLT_FONT		"7x13"
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FONTSET_ALWAYS
+# define DFLT_MENU_FONT		Xt_Default_Font_ಗಣ
+#ಇಲ್ಲದಿದ್ದರೆ
 # define DFLT_MENU_FONT		XtDefaultFont
-#endif
-#define DFLT_TOOLTIP_FONT	XtDefaultFontSet
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿಸು DFLT_TOOLTIP_FONT	Xt_Default_Font_ಗಣ
 
 // use the default (CDE) colors
-#define DFLT_MENU_BG_COLOR	""
-#define DFLT_MENU_FG_COLOR	""
-#define DFLT_SCROLL_BG_COLOR	""
-#define DFLT_SCROLL_FG_COLOR	""
-#define DFLT_TOOLTIP_BG_COLOR	"#ffff91"
-#define DFLT_TOOLTIP_FG_COLOR	"#000000"
+#ವ್ಯಾಖ್ಯಾನಿಸು DFLT_MENU_BG_COLOR	""
+#ವ್ಯಾಖ್ಯಾನಿಸು DFLT_MENU_FG_COLOR	""
+#ವ್ಯಾಖ್ಯಾನಿಸು DFLT_SCROLL_BG_COLOR	""
+#ವ್ಯಾಖ್ಯಾನಿಸು DFLT_SCROLL_FG_COLOR	""
+#ವ್ಯಾಖ್ಯಾನಿಸು DFLT_TOOLTIP_BG_COLOR	"#ffff91"
+#ವ್ಯಾಖ್ಯಾನಿಸು DFLT_TOOLTIP_FG_COLOR	"#000000"
 
 Widget vimShell = (Widget)0;
 
-static Atom   wm_atoms[2];	// Window Manager Atoms
-#define DELETE_WINDOW_IDX 0	// index in wm_atoms[] for WM_DELETE_WINDOW
-#define SAVE_YOURSELF_IDX 1	// index in wm_atoms[] for WM_SAVE_YOURSELF
+ಸ್ಥಿರ Atom   wm_atoms[2];	// Window Manager Atoms
+#ವ್ಯಾಖ್ಯಾನಿಸು DELETE_ಕಿಟಕಿ_IDX 0	// index in wm_atoms[] for WM_DELETE_WINDOW
+#ವ್ಯಾಖ್ಯಾನಿಸು SAVE_YOURSELF_IDX 1	// index in wm_atoms[] for WM_SAVE_YOURSELF
 
-#ifdef FEAT_XFONTSET
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XFONTSET
 /*
  * We either draw with a fontset (when current_fontset != NULL) or with a
  * normal font (current_fontset == NULL, use gui.text_gc and gui.back_gc).
  */
-static XFontSet current_fontset = NULL;
-# if !defined(XDrawString)
+ಸ್ಥಿರ XFont_ಗಣ current_fontset = ಖಾಲಿ;
+# ಆದರೆ !defined(XDrawString)
 #  define XDrawString(dpy, win, gc, x, y, str, n) \
-	do \
+	ಮಾಡು \
 	{ \
-	    if (current_fontset != NULL) \
+	    ಆದರೆ (current_fontset != ಖಾಲಿ) \
 		XmbDrawString(dpy, win, current_fontset, gc, x, y, str, n); \
-	    else \
+	    ಇಲ್ಲದಿದ್ದರೆ \
 		XDrawString(dpy, win, gc, x, y, str, n); \
-	} while (0)
+	} ಆಗ (0)
 # endif
-# if !defined(XDrawString16)
+# ಆದರೆ !defined(XDrawString16)
 #  define XDrawString16(dpy, win, gc, x, y, str, n) \
-	do \
+	ಮಾಡು \
 	{ \
-	    if (current_fontset != NULL) \
+	    ಆದರೆ (current_fontset != ಖಾಲಿ) \
 		XwcDrawString(dpy, win, current_fontset, gc, x, y, (wchar_t *)str, n); \
-	    else \
+	    ಇಲ್ಲದಿದ್ದರೆ \
 		XDrawString16(dpy, win, gc, x, y, (XChar2b *)str, n); \
-	} while (0)
+	} ಆಗ (0)
 # endif
-# if !defined(XDrawImageString16)
+# ಆದರೆ !defined(XDrawImageString16)
 #  define XDrawImageString16(dpy, win, gc, x, y, str, n) \
-	do \
+	ಮಾಡು \
 	{ \
-	    if (current_fontset != NULL) \
+	    ಆದರೆ (current_fontset != ಖಾಲಿ) \
 		XwcDrawImageString(dpy, win, current_fontset, gc, x, y, (wchar_t *)str, n); \
-	    else \
+	    ಇಲ್ಲದಿದ್ದರೆ \
 		XDrawImageString16(dpy, win, gc, x, y, (XChar2b *)str, n); \
-	} while (0)
+	} ಆಗ (0)
 # endif
-static int check_fontset_sanity(XFontSet fs);
-static int fontset_width(XFontSet fs);
-static int fontset_ascent(XFontSet fs);
-#endif
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ check_fontset_sanity(XFont_ಗಣ fs);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ fontset_ಅಗಲ(XFont_ಗಣ fs);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ fontset_ascent(XFont_ಗಣ fs);
+#ಆದರೆ_ಅಂತ್ಯ
 
-static guicolor_T	prev_fg_color = INVALCOLOR;
-static guicolor_T	prev_bg_color = INVALCOLOR;
-static guicolor_T	prev_sp_color = INVALCOLOR;
+ಸ್ಥಿರ guicolor_T	prev_fg_color = INVALCOLOR;
+ಸ್ಥಿರ guicolor_T	prev_bg_color = INVALCOLOR;
+ಸ್ಥಿರ guicolor_T	prev_sp_color = INVALCOLOR;
 
-#if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
-static XButtonPressedEvent last_mouse_event;
-#endif
+#ಆದರೆ defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
+ಸ್ಥಿರ XButtonPressedEvent ಕೊನೆಯ_mouse_event;
+#ಆದರೆ_ಅಂತ್ಯ
 
-static void gui_x11_check_copy_area(void);
-#ifdef FEAT_CLIENTSERVER
-static void gui_x11_send_event_handler(Widget, XtPointer, XEvent *, Boolean *);
-#endif
-static void gui_x11_wm_protocol_handler(Widget, XtPointer, XEvent *, Boolean *);
-static Cursor gui_x11_create_blank_mouse(void);
+ಸ್ಥಿರ ಶೂನ್ಯ gui_x11_check_copy_area(ಶೂನ್ಯ);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CLIENTSERVER
+ಸ್ಥಿರ ಶೂನ್ಯ gui_x11_send_event_handler(Widget, Xt_ಸೂಚಕ, XEvent *, Boolean *);
+#ಆದರೆ_ಅಂತ್ಯ
+ಸ್ಥಿರ ಶೂನ್ಯ gui_x11_wm_protocol_handler(Widget, Xt_ಸೂಚಕ, XEvent *, Boolean *);
+ಸ್ಥಿರ Cursor gui_x11_create_blank_mouse(ಶೂನ್ಯ);
 
 
 /*
@@ -142,17 +142,17 @@ static Cursor gui_x11_create_blank_mouse(void);
  * NOTE: when changing this, the table in gui_gtk_x11.c probably needs the
  * same change!
  */
-static struct specialkey
+ಸ್ಥಿರ ರಚನೆ specialkey
 {
-    KeySym  key_sym;
+    ಕೀಲಿ_Sym  ಕೀಲಿ_sym;
     char_u  vim_code0;
     char_u  vim_code1;
-} special_keys[] =
+} special_ಕೀಲಿಗಳು[] =
 {
-    {XK_Up,		'k', 'u'},
-    {XK_Down,		'k', 'd'},
-    {XK_Left,		'k', 'l'},
-    {XK_Right,		'k', 'r'},
+    {XK_ಮೇಲೆ,		'k', 'u'},
+    {XK_ಕೆಳಕ್ಕೆ,		'k', 'd'},
+    {XK_ಎಡ,		'k', 'l'},
+    {XK_ಬಲ,		'k', 'r'},
 
     {XK_F1,		'k', '1'},
     {XK_F2,		'k', '2'},
@@ -192,37 +192,37 @@ static struct specialkey
     {XK_F33,		'F', 'N'},
     {XK_F34,		'F', 'O'},
     {XK_F35,		'F', 'P'},	// keysymdef.h defines up to F35
-#ifdef SunXK_F36
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SunXK_F36
     {SunXK_F36,		'F', 'Q'},
     {SunXK_F37,		'F', 'R'},
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     {XK_Help,		'%', '1'},
     {XK_Undo,		'&', '8'},
-    {XK_BackSpace,	'k', 'b'},
-    {XK_Insert,		'k', 'I'},
+    {XK_ಹಿಂಭಾಗ_Space,	'k', 'b'},
+    {XK_ಸೇರಿಸು,		'k', 'I'},
     {XK_Delete,		'k', 'D'},
     {XK_Home,		'k', 'h'},
-    {XK_End,		'@', '7'},
-    {XK_Prior,		'k', 'P'},
-    {XK_Next,		'k', 'N'},
+    {XK_ಕೊನೆ,		'@', '7'},
+    {XK_ಪೂರ್ವ,		'k', 'P'},
+    {XK_ಮುಂದಿನ,		'k', 'N'},
     {XK_Print,		'%', '9'},
 
     // Keypad keys:
-#ifdef XK_KP_Left
-    {XK_KP_Left,	'k', 'l'},
-    {XK_KP_Right,	'k', 'r'},
-    {XK_KP_Up,		'k', 'u'},
-    {XK_KP_Down,	'k', 'd'},
-    {XK_KP_Insert,	KS_EXTRA, (char_u)KE_KINS},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ XK_KP_ಎಡ
+    {XK_KP_ಎಡ,	'k', 'l'},
+    {XK_KP_ಬಲ,	'k', 'r'},
+    {XK_KP_ಮೇಲೆ,		'k', 'u'},
+    {XK_KP_ಕೆಳಕ್ಕೆ,	'k', 'd'},
+    {XK_KP_ಸೇರಿಸು,	KS_EXTRA, (char_u)KE_KINS},
     {XK_KP_Delete,	KS_EXTRA, (char_u)KE_KDEL},
     {XK_KP_Home,	'K', '1'},
-    {XK_KP_End,		'K', '4'},
-    {XK_KP_Prior,	'K', '3'},
-    {XK_KP_Next,	'K', '5'},
+    {XK_KP_ಕೊನೆ,		'K', '4'},
+    {XK_KP_ಪೂರ್ವ,	'K', '3'},
+    {XK_KP_ಮುಂದಿನ,	'K', '5'},
 
-    {XK_KP_Add,		'K', '6'},
-    {XK_KP_Subtract,	'K', '7'},
+    {XK_KP_ಕೂಡಿಸು,		'K', '6'},
+    {XK_KP_ಕಳೆ,	'K', '7'},
     {XK_KP_Divide,	'K', '8'},
     {XK_KP_Multiply,	'K', '9'},
     {XK_KP_Enter,	'K', 'A'},
@@ -238,59 +238,59 @@ static struct specialkey
     {XK_KP_7,		'K', 'J'},
     {XK_KP_8,		'K', 'K'},
     {XK_KP_9,		'K', 'L'},
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // End of list marker:
-    {(KeySym)0,	    0, 0}
+    {(ಕೀಲಿ_Sym)0,	    0, 0}
 };
 
-#define XtNboldFont		"boldFont"
-#define XtCBoldFont		"BoldFont"
-#define XtNitalicFont		"italicFont"
-#define XtCItalicFont		"ItalicFont"
-#define XtNboldItalicFont	"boldItalicFont"
-#define XtCBoldItalicFont	"BoldItalicFont"
-#define XtNscrollbarWidth	"scrollbarWidth"
-#define XtCScrollbarWidth	"ScrollbarWidth"
-#define XtNmenuHeight		"menuHeight"
-#define XtCMenuHeight		"MenuHeight"
-#define XtNmenuFont		"menuFont"
-#define XtCMenuFont		"MenuFont"
-#define XtNmenuFontSet		"menuFontSet"
-#define XtCMenuFontSet		"MenuFontSet"
+#ವ್ಯಾಖ್ಯಾನಿಸು XtNboldFont		"boldFont"
+#ವ್ಯಾಖ್ಯಾನಿಸು XtCBoldFont		"BoldFont"
+#ವ್ಯಾಖ್ಯಾನಿಸು XtNitalicFont		"italicFont"
+#ವ್ಯಾಖ್ಯಾನಿಸು XtCItalicFont		"ItalicFont"
+#ವ್ಯಾಖ್ಯಾನಿಸು XtNboldItalicFont	"boldItalicFont"
+#ವ್ಯಾಖ್ಯಾನಿಸು XtCBoldItalicFont	"BoldItalicFont"
+#ವ್ಯಾಖ್ಯಾನಿಸು Xt_Nscrollbar_ಅಗಲ	"scrollbarWidth"
+#ವ್ಯಾಖ್ಯಾನಿಸು Xt_CScrollbar_ಅಗಲ	"ScrollbarWidth"
+#ವ್ಯಾಖ್ಯಾನಿಸು Xt_Nmenu_ಎತ್ತರ		"menuHeight"
+#ವ್ಯಾಖ್ಯಾನಿಸು Xt_CMenu_ಎತ್ತರ		"MenuHeight"
+#ವ್ಯಾಖ್ಯಾನಿಸು XtNmenuFont		"menuFont"
+#ವ್ಯಾಖ್ಯಾನಿಸು XtCMenuFont		"MenuFont"
+#ವ್ಯಾಖ್ಯಾನಿಸು Xt_Nmenu_Font_ಗಣ		"menuFontSet"
+#ವ್ಯಾಖ್ಯಾನಿಸು Xt_CMenu_Font_ಗಣ		"MenuFontSet"
 
 
 // Resources for setting the foreground and background colors of menus
-#define XtNmenuBackground	"menuBackground"
-#define XtCMenuBackground	"MenuBackground"
-#define XtNmenuForeground	"menuForeground"
-#define XtCMenuForeground	"MenuForeground"
+#ವ್ಯಾಖ್ಯಾನಿಸು XtNmenuBackground	"menuBackground"
+#ವ್ಯಾಖ್ಯಾನಿಸು XtCMenuBackground	"MenuBackground"
+#ವ್ಯಾಖ್ಯಾನಿಸು XtNmenuForeground	"menuForeground"
+#ವ್ಯಾಖ್ಯಾನಿಸು XtCMenuForeground	"MenuForeground"
 
 // Resources for setting the foreground and background colors of scrollbars
-#define XtNscrollBackground	"scrollBackground"
-#define XtCScrollBackground	"ScrollBackground"
-#define XtNscrollForeground	"scrollForeground"
-#define XtCScrollForeground	"ScrollForeground"
+#ವ್ಯಾಖ್ಯಾನಿಸು XtNscrollBackground	"scrollBackground"
+#ವ್ಯಾಖ್ಯಾನಿಸು XtCScrollBackground	"ScrollBackground"
+#ವ್ಯಾಖ್ಯಾನಿಸು XtNscrollForeground	"scrollForeground"
+#ವ್ಯಾಖ್ಯಾನಿಸು XtCScrollForeground	"ScrollForeground"
 
 // Resources for setting the foreground and background colors of tooltip
-#define XtNtooltipBackground	"tooltipBackground"
-#define XtCTooltipBackground	"TooltipBackground"
-#define XtNtooltipForeground	"tooltipForeground"
-#define XtCTooltipForeground	"TooltipForeground"
-#define XtNtooltipFont		"tooltipFont"
-#define XtCTooltipFont		"TooltipFont"
+#ವ್ಯಾಖ್ಯಾನಿಸು XtNtooltipBackground	"tooltipBackground"
+#ವ್ಯಾಖ್ಯಾನಿಸು XtCTooltipBackground	"TooltipBackground"
+#ವ್ಯಾಖ್ಯಾನಿಸು XtNtooltipForeground	"tooltipForeground"
+#ವ್ಯಾಖ್ಯಾನಿಸು XtCTooltipForeground	"TooltipForeground"
+#ವ್ಯಾಖ್ಯಾನಿಸು XtNtooltipFont		"tooltipFont"
+#ವ್ಯಾಖ್ಯಾನಿಸು XtCTooltipFont		"TooltipFont"
 
 /*
  * X Resources:
  */
-static XtResource vim_resources[] =
+ಸ್ಥಿರ XtResource vim_resources[] =
 {
     {
 	XtNforeground,
 	XtCForeground,
 	XtRPixel,
-	sizeof(Pixel),
-	XtOffsetOf(gui_T, def_norm_pixel),
+	ಗಾತ್ರ(Pixel),
+	Xt_ಸ್ಥಾನಾಂತರ_ದ(gui_T, def_norm_pixel),
 	XtRString,
 	XtDefaultForeground
     },
@@ -298,8 +298,8 @@ static XtResource vim_resources[] =
 	XtNbackground,
 	XtCBackground,
 	XtRPixel,
-	sizeof(Pixel),
-	XtOffsetOf(gui_T, def_back_pixel),
+	ಗಾತ್ರ(Pixel),
+	Xt_ಸ್ಥಾನಾಂತರ_ದ(gui_T, def_ಹಿಂಭಾಗ_pixel),
 	XtRString,
 	XtDefaultBackground
     },
@@ -307,8 +307,8 @@ static XtResource vim_resources[] =
 	XtNfont,
 	XtCFont,
 	XtRString,
-	sizeof(String *),
-	XtOffsetOf(gui_T, rsrc_font_name),
+	ಗಾತ್ರ(String *),
+	Xt_ಸ್ಥಾನಾಂತರ_ದ(gui_T, rsrc_font_name),
 	XtRImmediate,
 	XtDefaultFont
     },
@@ -316,8 +316,8 @@ static XtResource vim_resources[] =
 	XtNboldFont,
 	XtCBoldFont,
 	XtRString,
-	sizeof(String *),
-	XtOffsetOf(gui_T, rsrc_bold_font_name),
+	ಗಾತ್ರ(String *),
+	Xt_ಸ್ಥಾನಾಂತರ_ದ(gui_T, rsrc_bold_font_name),
 	XtRImmediate,
 	""
     },
@@ -325,8 +325,8 @@ static XtResource vim_resources[] =
 	XtNitalicFont,
 	XtCItalicFont,
 	XtRString,
-	sizeof(String *),
-	XtOffsetOf(gui_T, rsrc_ital_font_name),
+	ಗಾತ್ರ(String *),
+	Xt_ಸ್ಥಾನಾಂತರ_ದ(gui_T, rsrc_ital_font_name),
 	XtRImmediate,
 	""
     },
@@ -334,8 +334,8 @@ static XtResource vim_resources[] =
 	XtNboldItalicFont,
 	XtCBoldItalicFont,
 	XtRString,
-	sizeof(String *),
-	XtOffsetOf(gui_T, rsrc_boldital_font_name),
+	ಗಾತ್ರ(String *),
+	Xt_ಸ್ಥಾನಾಂತರ_ದ(gui_T, rsrc_boldital_font_name),
 	XtRImmediate,
 	""
     },
@@ -343,8 +343,8 @@ static XtResource vim_resources[] =
 	XtNgeometry,
 	XtCGeometry,
 	XtRString,
-	sizeof(String *),
-	XtOffsetOf(gui_T, geom),
+	ಗಾತ್ರ(String *),
+	Xt_ಸ್ಥಾನಾಂತರ_ದ(gui_T, geom),
 	XtRImmediate,
 	""
     },
@@ -352,51 +352,51 @@ static XtResource vim_resources[] =
 	XtNreverseVideo,
 	XtCReverseVideo,
 	XtRBool,
-	sizeof(Bool),
-	XtOffsetOf(gui_T, rsrc_rev_video),
+	ಗಾತ್ರ(Bool),
+	Xt_ಸ್ಥಾನಾಂತರ_ದ(gui_T, rsrc_rev_video),
 	XtRImmediate,
-	(XtPointer)False
+	(Xt_ಸೂಚಕ)False
     },
     {
-	XtNborderWidth,
-	XtCBorderWidth,
+	Xt_Nborder_ಅಗಲ,
+	Xt_CBorder_ಅಗಲ,
 	XtRInt,
-	sizeof(int),
-	XtOffsetOf(gui_T, border_width),
+	ಗಾತ್ರ(ಪೂರ್ಣಾಂಕ),
+	Xt_ಸ್ಥಾನಾಂತರ_ದ(gui_T, border_ಅಗಲ),
 	XtRImmediate,
-	(XtPointer)2
+	(Xt_ಸೂಚಕ)2
     },
     {
-	XtNscrollbarWidth,
-	XtCScrollbarWidth,
+	Xt_Nscrollbar_ಅಗಲ,
+	Xt_CScrollbar_ಅಗಲ,
 	XtRInt,
-	sizeof(int),
-	XtOffsetOf(gui_T, scrollbar_width),
+	ಗಾತ್ರ(ಪೂರ್ಣಾಂಕ),
+	Xt_ಸ್ಥಾನಾಂತರ_ದ(gui_T, scrollbar_ಅಗಲ),
 	XtRImmediate,
-	(XtPointer)SB_DEFAULT_WIDTH
+	(Xt_ಸೂಚಕ)SB_DEFAULT_ಅಗಲ
     },
-#ifdef FEAT_MENU
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MENU
     {
 # ifdef FONTSET_ALWAYS
-	XtNmenuFontSet,
-	XtCMenuFontSet,
-# else
+	Xt_Nmenu_Font_ಗಣ,
+	Xt_CMenu_Font_ಗಣ,
+# ಇಲ್ಲದಿದ್ದರೆ
 	XtNmenuFont,
 	XtCMenuFont,
 # endif
 	XtRString,
-	sizeof(char *),
-	XtOffsetOf(gui_T, rsrc_menu_font_name),
+	ಗಾತ್ರ(ಅಕ್ಷರ *),
+	Xt_ಸ್ಥಾನಾಂತರ_ದ(gui_T, rsrc_menu_font_name),
 	XtRString,
 	DFLT_MENU_FONT
     },
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     {
 	XtNmenuForeground,
 	XtCMenuForeground,
 	XtRString,
-	sizeof(char *),
-	XtOffsetOf(gui_T, rsrc_menu_fg_name),
+	ಗಾತ್ರ(ಅಕ್ಷರ *),
+	Xt_ಸ್ಥಾನಾಂತರ_ದ(gui_T, rsrc_menu_fg_name),
 	XtRString,
 	DFLT_MENU_FG_COLOR
     },
@@ -404,8 +404,8 @@ static XtResource vim_resources[] =
 	XtNmenuBackground,
 	XtCMenuBackground,
 	XtRString,
-	sizeof(char *),
-	XtOffsetOf(gui_T, rsrc_menu_bg_name),
+	ಗಾತ್ರ(ಅಕ್ಷರ *),
+	Xt_ಸ್ಥಾನಾಂತರ_ದ(gui_T, rsrc_menu_bg_name),
 	XtRString,
 	DFLT_MENU_BG_COLOR
     },
@@ -413,8 +413,8 @@ static XtResource vim_resources[] =
 	XtNscrollForeground,
 	XtCScrollForeground,
 	XtRString,
-	sizeof(char *),
-	XtOffsetOf(gui_T, rsrc_scroll_fg_name),
+	ಗಾತ್ರ(ಅಕ್ಷರ *),
+	Xt_ಸ್ಥಾನಾಂತರ_ದ(gui_T, rsrc_scroll_fg_name),
 	XtRString,
 	DFLT_SCROLL_FG_COLOR
     },
@@ -422,18 +422,18 @@ static XtResource vim_resources[] =
 	XtNscrollBackground,
 	XtCScrollBackground,
 	XtRString,
-	sizeof(char *),
-	XtOffsetOf(gui_T, rsrc_scroll_bg_name),
+	ಗಾತ್ರ(ಅಕ್ಷರ *),
+	Xt_ಸ್ಥಾನಾಂತರ_ದ(gui_T, rsrc_scroll_bg_name),
 	XtRString,
 	DFLT_SCROLL_BG_COLOR
     },
-#ifdef FEAT_BEVAL_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_BEVAL_GUI
     {
 	XtNtooltipForeground,
 	XtCTooltipForeground,
 	XtRString,
-	sizeof(char *),
-	XtOffsetOf(gui_T, rsrc_tooltip_fg_name),
+	ಗಾತ್ರ(ಅಕ್ಷರ *),
+	Xt_ಸ್ಥಾನಾಂತರ_ದ(gui_T, rsrc_tooltip_fg_name),
 	XtRString,
 	DFLT_TOOLTIP_FG_COLOR
     },
@@ -441,8 +441,8 @@ static XtResource vim_resources[] =
 	XtNtooltipBackground,
 	XtCTooltipBackground,
 	XtRString,
-	sizeof(char *),
-	XtOffsetOf(gui_T, rsrc_tooltip_bg_name),
+	ಗಾತ್ರ(ಅಕ್ಷರ *),
+	Xt_ಸ್ಥಾನಾಂತರ_ದ(gui_T, rsrc_tooltip_bg_name),
 	XtRString,
 	DFLT_TOOLTIP_BG_COLOR
     },
@@ -450,42 +450,42 @@ static XtResource vim_resources[] =
 	XtNtooltipFont,
 	XtCTooltipFont,
 	XtRString,
-	sizeof(char *),
-	XtOffsetOf(gui_T, rsrc_tooltip_font_name),
+	ಗಾತ್ರ(ಅಕ್ಷರ *),
+	Xt_ಸ್ಥಾನಾಂತರ_ದ(gui_T, rsrc_tooltip_font_name),
 	XtRString,
 	DFLT_TOOLTIP_FONT
     },
     // This one may not be really needed?
     {
 	"balloonEvalFontSet",
-	XtCFontSet,
-	XtRFontSet,
-	sizeof(XFontSet),
-	XtOffsetOf(gui_T, tooltip_fontset),
+	Xt_CFont_ಗಣ,
+	Xt_RFont_ಗಣ,
+	ಗಾತ್ರ(XFont_ಗಣ),
+	Xt_ಸ್ಥಾನಾಂತರ_ದ(gui_T, tooltip_fontset),
 	XtRImmediate,
-	(XtPointer)NOFONTSET
+	(Xt_ಸೂಚಕ)NOFONTSET
     },
-#endif // FEAT_BEVAL_GUI
-#ifdef FEAT_XIM
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_BEVAL_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XIM
     {
 	"preeditType",
 	"PreeditType",
 	XtRString,
-	sizeof(char*),
-	XtOffsetOf(gui_T, rsrc_preedit_type_name),
+	ಗಾತ್ರ(ಅಕ್ಷರ*),
+	Xt_ಸ್ಥಾನಾಂತರ_ದ(gui_T, rsrc_preedit_type_name),
 	XtRString,
-	(XtPointer)"OverTheSpot,OffTheSpot,Root"
+	(Xt_ಸೂಚಕ)"OverTheSpot,OffTheSpot,Root"
     },
     {
 	"inputMethod",
 	"InputMethod",
 	XtRString,
-	sizeof(char*),
-	XtOffsetOf(gui_T, rsrc_input_method),
+	ಗಾತ್ರ(ಅಕ್ಷರ*),
+	Xt_ಸ್ಥಾನಾಂತರ_ದ(gui_T, rsrc_ಒಳಹರಿವು_ವಿಧಾನ),
 	XtRString,
-	NULL
+	ಖಾಲಿ
     },
-#endif // FEAT_XIM
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_XIM
 };
 
 /*
@@ -494,65 +494,65 @@ static XtResource vim_resources[] =
  * GUI (but the GUI might start up later).
  * When changing this, also update doc/vim_gui.txt and the usage message!!!
  */
-static XrmOptionDescRec cmdline_options[] =
+ಸ್ಥಿರ XrmOptionDescRec cmdline_options[] =
 {
     // We handle these options ourselves
-    {"-bg",		".background",	    XrmoptionSepArg,	NULL},
-    {"-background",	".background",	    XrmoptionSepArg,	NULL},
-    {"-fg",		".foreground",	    XrmoptionSepArg,	NULL},
-    {"-foreground",	".foreground",	    XrmoptionSepArg,	NULL},
-    {"-fn",		".font",	    XrmoptionSepArg,	NULL},
-    {"-font",		".font",	    XrmoptionSepArg,	NULL},
-    {"-boldfont",	".boldFont",	    XrmoptionSepArg,	NULL},
-    {"-italicfont",	".italicFont",	    XrmoptionSepArg,	NULL},
-    {"-geom",		".geometry",	    XrmoptionSepArg,	NULL},
-    {"-geometry",	".geometry",	    XrmoptionSepArg,	NULL},
+    {"-bg",		".background",	    XrmoptionSepArg,	ಖಾಲಿ},
+    {"-background",	".background",	    XrmoptionSepArg,	ಖಾಲಿ},
+    {"-fg",		".foreground",	    XrmoptionSepArg,	ಖಾಲಿ},
+    {"-foreground",	".foreground",	    XrmoptionSepArg,	ಖಾಲಿ},
+    {"-fn",		".font",	    XrmoptionSepArg,	ಖಾಲಿ},
+    {"-font",		".font",	    XrmoptionSepArg,	ಖಾಲಿ},
+    {"-boldfont",	".boldFont",	    XrmoptionSepArg,	ಖಾಲಿ},
+    {"-italicfont",	".italicFont",	    XrmoptionSepArg,	ಖಾಲಿ},
+    {"-geom",		".geometry",	    XrmoptionSepArg,	ಖಾಲಿ},
+    {"-geometry",	".geometry",	    XrmoptionSepArg,	ಖಾಲಿ},
     {"-reverse",	"*reverseVideo",    XrmoptionNoArg,	"True"},
     {"-rv",		"*reverseVideo",    XrmoptionNoArg,	"True"},
     {"+reverse",	"*reverseVideo",    XrmoptionNoArg,	"False"},
     {"+rv",		"*reverseVideo",    XrmoptionNoArg,	"False"},
-    {"-display",	".display",	    XrmoptionSepArg,	NULL},
+    {"-display",	".display",	    XrmoptionSepArg,	ಖಾಲಿ},
     {"-iconic",		".iconic",	    XrmoptionNoArg,	"True"},
-    {"-name",		".name",	    XrmoptionSepArg,	NULL},
-    {"-bw",		".borderWidth",	    XrmoptionSepArg,	NULL},
-    {"-borderwidth",	".borderWidth",	    XrmoptionSepArg,	NULL},
-    {"-sw",		".scrollbarWidth",  XrmoptionSepArg,	NULL},
-    {"-scrollbarwidth",	".scrollbarWidth",  XrmoptionSepArg,	NULL},
-    {"-mh",		".menuHeight",	    XrmoptionSepArg,	NULL},
-    {"-menuheight",	".menuHeight",	    XrmoptionSepArg,	NULL},
-#ifdef FONTSET_ALWAYS
-    {"-mf",		".menuFontSet",	    XrmoptionSepArg,	NULL},
-    {"-menufont",	".menuFontSet",	    XrmoptionSepArg,	NULL},
-    {"-menufontset",	".menuFontSet",	    XrmoptionSepArg,	NULL},
-#else
-    {"-mf",		".menuFont",	    XrmoptionSepArg,	NULL},
-    {"-menufont",	".menuFont",	    XrmoptionSepArg,	NULL},
-#endif
-    {"-xrm",		NULL,		    XrmoptionResArg,	NULL}
+    {"-name",		".name",	    XrmoptionSepArg,	ಖಾಲಿ},
+    {"-bw",		".borderWidth",	    XrmoptionSepArg,	ಖಾಲಿ},
+    {"-borderwidth",	".borderWidth",	    XrmoptionSepArg,	ಖಾಲಿ},
+    {"-sw",		".scrollbarWidth",  XrmoptionSepArg,	ಖಾಲಿ},
+    {"-scrollbarwidth",	".scrollbarWidth",  XrmoptionSepArg,	ಖಾಲಿ},
+    {"-mh",		".menuHeight",	    XrmoptionSepArg,	ಖಾಲಿ},
+    {"-menuheight",	".menuHeight",	    XrmoptionSepArg,	ಖಾಲಿ},
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FONTSET_ALWAYS
+    {"-mf",		".menuFontSet",	    XrmoptionSepArg,	ಖಾಲಿ},
+    {"-menufont",	".menuFontSet",	    XrmoptionSepArg,	ಖಾಲಿ},
+    {"-menufontset",	".menuFontSet",	    XrmoptionSepArg,	ಖಾಲಿ},
+#ಇಲ್ಲದಿದ್ದರೆ
+    {"-mf",		".menuFont",	    XrmoptionSepArg,	ಖಾಲಿ},
+    {"-menufont",	".menuFont",	    XrmoptionSepArg,	ಖಾಲಿ},
+#ಆದರೆ_ಅಂತ್ಯ
+    {"-xrm",		ಖಾಲಿ,		    XrmoptionResArg,	ಖಾಲಿ}
 };
 
-static int gui_argc = 0;
-static char **gui_argv = NULL;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ gui_argc = 0;
+ಸ್ಥಿರ ಅಕ್ಷರ **gui_argv = ಖಾಲಿ;
 
 /*
  * Call-back routines.
  */
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 gui_x11_timer_cb(
-    XtPointer	    timed_out,
-    XtIntervalId    *interval_id UNUSED)
+    Xt_ಸೂಚಕ	    timed_ಹೊರಹೋಗು,
+    XtIntervalId    *interval_id ಬಳಸದ)
 {
-    *((int *)timed_out) = TRUE;
+    *((ಪೂರ್ಣಾಂಕ *)timed_ಹೊರಹೋಗು) = TRUE;
 }
 
-#ifdef FEAT_JOB_CHANNEL
-    static void
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕೆಲಸ_CHANNEL
+    ಸ್ಥಿರ ಶೂನ್ಯ
 channel_poll_cb(
-    XtPointer	    client_data,
-    XtIntervalId    *interval_id UNUSED)
+    Xt_ಸೂಚಕ	    client_ದತ್ತಾಂಶ_2,
+    XtIntervalId    *interval_id ಬಳಸದ)
 {
-    XtIntervalId    *channel_timer = (XtIntervalId *)client_data;
+    XtIntervalId    *channel_timer = (XtIntervalId *)client_ದತ್ತಾಂಶ_2;
 
     // Using an event handler for a channel that may be disconnected does
     // not work, it hangs.  Instead poll for messages.
@@ -560,20 +560,20 @@ channel_poll_cb(
     parse_queued_messages();
 
     // repeat
-    *channel_timer = XtAppAddTimeOut(app_context, (long_u)20,
-						 channel_poll_cb, client_data);
+    *channel_timer = Xt_App_ಕೂಡಿಸು_ಸಮಯ_ಹೊರಹೋಗು(app_context, (long_u)20,
+						 channel_poll_cb, client_ದತ್ತಾಂಶ_2);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 gui_x11_visibility_cb(
-    Widget	w UNUSED,
-    XtPointer	dud UNUSED,
+    Widget	w ಬಳಸದ,
+    Xt_ಸೂಚಕ	dud ಬಳಸದ,
     XEvent	*event,
-    Boolean	*dum UNUSED)
+    Boolean	*dum ಬಳಸದ)
 {
-    if (event->type != VisibilityNotify)
-	return;
+    ಆದರೆ (event->type != VisibilityNotify)
+	ಹಿಂತಿರುಗಿ;
 
     gui.visibility = event->xvisibility.state;
 
@@ -581,48 +581,48 @@ gui_x11_visibility_cb(
      * When we do an XCopyArea(), and the window is partially obscured, we want
      * to receive an event to tell us whether it worked or not.
      */
-    XSetGraphicsExposures(gui.dpy, gui.text_gc,
+    XSetGraphicsExposures(gui.dpy, gui.ಪಠ್ಯ_gc,
 	    gui.visibility != VisibilityUnobscured);
 
     // This is needed for when redrawing is slow.
     gui_mch_update();
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 gui_x11_expose_cb(
-    Widget	w UNUSED,
-    XtPointer	dud UNUSED,
+    Widget	w ಬಳಸದ,
+    Xt_ಸೂಚಕ	dud ಬಳಸದ,
     XEvent	*event,
-    Boolean	*dum UNUSED)
+    Boolean	*dum ಬಳಸದ)
 {
     XExposeEvent	*gevent;
-    int			new_x;
+    ಪೂರ್ಣಾಂಕ			new_x;
 
-    if (event->type != Expose)
-	return;
+    ಆದರೆ (event->type != Expose)
+	ಹಿಂತಿರುಗಿ;
 
-    out_flush();	    // make sure all output has been processed
+    ಹೊರಹೋಗು_flush();	    // make sure all output has been processed
 
     gevent = (XExposeEvent *)event;
-    gui_redraw(gevent->x, gevent->y, gevent->width, gevent->height);
+    gui_redraw(gevent->x, gevent->y, gevent->ಅಗಲ, gevent->ಎತ್ತರ);
 
     new_x = FILL_X(0);
 
     // Clear the border areas if needed
-    if (gevent->x < new_x)
+    ಆದರೆ (gevent->x < new_x)
 	XClearArea(gui.dpy, gui.wid, 0, 0, new_x, 0, False);
-    if (gevent->y < FILL_Y(0))
+    ಆದರೆ (gevent->y < FILL_Y(0))
 	XClearArea(gui.dpy, gui.wid, 0, 0, 0, FILL_Y(0), False);
-    if (gevent->x > FILL_X(Columns))
-	XClearArea(gui.dpy, gui.wid, FILL_X((int)Columns), 0, 0, 0, False);
-    if (gevent->y > FILL_Y(Rows))
-	XClearArea(gui.dpy, gui.wid, 0, FILL_Y((int)Rows), 0, 0, False);
+    ಆದರೆ (gevent->x > FILL_X(Columns))
+	XClearArea(gui.dpy, gui.wid, FILL_X((ಪೂರ್ಣಾಂಕ)Columns), 0, 0, 0, False);
+    ಆದರೆ (gevent->y > FILL_Y(ಅಡ್ಡಸಾಲುಗಳು))
+	XClearArea(gui.dpy, gui.wid, 0, FILL_Y((ಪೂರ್ಣಾಂಕ)ಅಡ್ಡಸಾಲುಗಳು), 0, 0, False);
 
     // This is needed for when redrawing is slow.
     gui_mch_update();
 }
 
-#if defined(FEAT_NETBEANS_INTG) && defined(FEAT_GUI_MOTIF)
+#ಆದರೆ defined(FEAT_NETBEANS_INTG) && defined(FEAT_GUI_MOTIF)
 /*
  * This function fills in the XRectangle object with the current x,y
  * coordinates and height, width so that an XtVaSetValues to the same shell of
@@ -633,386 +633,386 @@ gui_x11_expose_cb(
  * unchanged.  Be sure to have the XRectangle set with the proper values for a
  * failed condition prior to calling this function.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 shellRectangle(Widget shell, XRectangle *r)
 {
-    Window		rootw, shellw, child, parentw;
-    int			absx, absy;
-    XWindowAttributes	a;
-    Window		*children;
-    unsigned int	childrenCount;
+    ಕಿಟಕಿ		rootw, shellw, ಮಗು, parentw;
+    ಪೂರ್ಣಾಂಕ			absx, absy;
+    XWindow_ಗುಣಲಕ್ಷಣಗಳು	a;
+    ಕಿಟಕಿ		*children;
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ	children_ಎಣಿಕೆ;
 
-    shellw = XtWindow(shell);
-    if (shellw == 0)
-	return;
-    for (;;)
+    shellw = Xt_ಕಿಟಕಿ(shell);
+    ಆದರೆ (shellw == 0)
+	ಹಿಂತಿರುಗಿ;
+    ಗಾಗಿ (;;)
     {
-	XQueryTree(XtDisplay(shell), shellw, &rootw, &parentw,
-						   &children, &childrenCount);
+	XQuery_ವೃಕ್ಷ(XtDisplay(shell), shellw, &rootw, &parentw,
+						   &children, &children_ಎಣಿಕೆ);
 	XFree(children);
-	if (parentw == rootw)
-	    break;
+	ಆದರೆ (parentw == rootw)
+	    ನಿಲ್ಲಿಸು;
 	shellw = parentw;
     }
-    XGetWindowAttributes(XtDisplay(shell), shellw, &a);
-    XTranslateCoordinates(XtDisplay(shell), shellw, a.root, 0, 0,
-							&absx, &absy, &child);
+    XGet_ಕಿಟಕಿ_ಗುಣಲಕ್ಷಣಗಳು(XtDisplay(shell), shellw, &a);
+    XTranslateCoordinates(XtDisplay(shell), shellw, a.ಬೇರು, 0, 0,
+							&absx, &absy, &ಮಗು);
     r->x = absx;
     r->y = absy;
-    XtVaGetValues(shell, XmNheight, &r->height, XmNwidth, &r->width, NULL);
+    Xt_Va_Get_ಮೌಲ್ಯಗಳು(shell, XmNheight, &r->ಎತ್ತರ, XmNwidth, &r->ಅಗಲ, ಖಾಲಿ);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    static void
-gui_x11_resize_window_cb(
-    Widget	w UNUSED,
-    XtPointer	dud UNUSED,
+    ಸ್ಥಿರ ಶೂನ್ಯ
+gui_x11_resize_ಕಿಟಕಿ_cb(
+    Widget	w ಬಳಸದ,
+    Xt_ಸೂಚಕ	dud ಬಳಸದ,
     XEvent	*event,
-    Boolean	*dum UNUSED)
+    Boolean	*dum ಬಳಸದ)
 {
-    static int lastWidth, lastHeight;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಕೊನೆಯ_ಅಗಲ_2, ಕೊನೆಯ_ಎತ್ತರ_2;
 
-    if (event->type != ConfigureNotify)
-	return;
+    ಆದರೆ (event->type != ConfigureNotify)
+	ಹಿಂತಿರುಗಿ;
 
-    if (event->xconfigure.width != lastWidth
-	    || event->xconfigure.height != lastHeight)
+    ಆದರೆ (event->xconfigure.ಅಗಲ != ಕೊನೆಯ_ಅಗಲ_2
+	    || event->xconfigure.ಎತ್ತರ != ಕೊನೆಯ_ಎತ್ತರ_2)
     {
-	lastWidth = event->xconfigure.width;
-	lastHeight = event->xconfigure.height;
-	gui_resize_shell(event->xconfigure.width, event->xconfigure.height
-#ifdef FEAT_XIM
-						- xim_get_status_area_height()
-#endif
+	ಕೊನೆಯ_ಅಗಲ_2 = event->xconfigure.ಅಗಲ;
+	ಕೊನೆಯ_ಎತ್ತರ_2 = event->xconfigure.ಎತ್ತರ;
+	gui_resize_shell(event->xconfigure.ಅಗಲ, event->xconfigure.ಎತ್ತರ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XIM
+						- xim_get_ಸ್ಥಿತಿ_area_ಎತ್ತರ()
+#ಆದರೆ_ಅಂತ್ಯ
 		     );
     }
-#if defined(FEAT_NETBEANS_INTG) && defined(FEAT_GUI_MOTIF)
-    if (netbeans_active())
+#ಆದರೆ defined(FEAT_NETBEANS_INTG) && defined(FEAT_GUI_MOTIF)
+    ಆದರೆ (netbeans_ಸಕ್ರಿಯ())
     {
 	XRectangle  rec;
 
 	shellRectangle(w, &rec);
-	netbeans_frame_moved(rec.x, rec.y);
+	netbeans_ಚೌಕಟ್ಟು_moved(rec.x, rec.y);
     }
-#endif
-#ifdef FEAT_XIM
-    xim_set_preedit();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XIM
+    xim_ಗಣ_preedit();
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 gui_x11_focus_change_cb(
-    Widget	w UNUSED,
-    XtPointer	data UNUSED,
+    Widget	w ಬಳಸದ,
+    Xt_ಸೂಚಕ	ದತ್ತಾಂಶ ಬಳಸದ,
     XEvent	*event,
-    Boolean	*dum UNUSED)
+    Boolean	*dum ಬಳಸದ)
 {
-    gui_focus_change(event->type == FocusIn);
+    gui_focus_change(event->type == Focus_ಒಳ);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 gui_x11_enter_cb(
-    Widget	w UNUSED,
-    XtPointer	data UNUSED,
-    XEvent	*event UNUSED,
-    Boolean	*dum UNUSED)
+    Widget	w ಬಳಸದ,
+    Xt_ಸೂಚಕ	ದತ್ತಾಂಶ ಬಳಸದ,
+    XEvent	*event ಬಳಸದ,
+    Boolean	*dum ಬಳಸದ)
 {
     gui_focus_change(TRUE);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 gui_x11_leave_cb(
-    Widget	w UNUSED,
-    XtPointer	data UNUSED,
-    XEvent	*event UNUSED,
-    Boolean	*dum UNUSED)
+    Widget	w ಬಳಸದ,
+    Xt_ಸೂಚಕ	ದತ್ತಾಂಶ ಬಳಸದ,
+    XEvent	*event ಬಳಸದ,
+    Boolean	*dum ಬಳಸದ)
 {
     gui_focus_change(FALSE);
 }
 
-#if defined(X_HAVE_UTF8_STRING)
-# if X_HAVE_UTF8_STRING
+#ಆದರೆ defined(X_HAVE_UTF8_STRING)
+# ಆದರೆ X_HAVE_UTF8_STRING
 #  define USE_UTF8LOOKUP
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    void
-gui_x11_key_hit_cb(
-    Widget	w UNUSED,
-    XtPointer	dud UNUSED,
+    ಶೂನ್ಯ
+gui_x11_ಕೀಲಿ_ದೊರಕಿತು_cb(
+    Widget	w ಬಳಸದ,
+    Xt_ಸೂಚಕ	dud ಬಳಸದ,
     XEvent	*event,
-    Boolean	*dum UNUSED)
+    Boolean	*dum ಬಳಸದ)
 {
     XKeyPressedEvent	*ev_press;
-#ifdef FEAT_XIM
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XIM
     char_u		string2[256];
     char_u		string_shortbuf[256];
     char_u		*string = string_shortbuf;
     Boolean		string_alloced = False;
-    Status		status;
-#else
+    ಸ್ಥಿತಿ_3		ಸ್ಥಿತಿ_2;
+#ಇಲ್ಲದಿದ್ದರೆ
     char_u		string[4], string2[3];
-#endif
-    KeySym		key_sym;
-    int			len;
-    int			i;
-    int			modifiers;
-    int			key;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಕೀಲಿ_Sym		ಕೀಲಿ_sym;
+    ಪೂರ್ಣಾಂಕ			len;
+    ಪೂರ್ಣಾಂಕ			i;
+    ಪೂರ್ಣಾಂಕ			modifiers;
+    ಪೂರ್ಣಾಂಕ			ಕೀಲಿ;
 
     ev_press = (XKeyPressedEvent *)event;
 
-#ifdef FEAT_XIM
-    if (xic)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XIM
+    ಆದರೆ (xic)
     {
 # ifdef USE_UTF8LOOKUP
 	// XFree86 4.0.2 or newer: Be able to get UTF-8 characters even when
 	// the locale isn't utf-8.
-	if (enc_utf8)
-	    len = Xutf8LookupString(xic, ev_press, (char *)string,
-				  sizeof(string_shortbuf), &key_sym, &status);
-	else
+	ಆದರೆ (enc_utf8)
+	    len = Xutf8LookupString(xic, ev_press, (ಅಕ್ಷರ *)string,
+				  ಗಾತ್ರ(string_shortbuf), &ಕೀಲಿ_sym, &ಸ್ಥಿತಿ_2);
+	ಇಲ್ಲದಿದ್ದರೆ
 # endif
-	    len = XmbLookupString(xic, ev_press, (char *)string,
-				  sizeof(string_shortbuf), &key_sym, &status);
-	if (status == XBufferOverflow)
+	    len = XmbLookupString(xic, ev_press, (ಅಕ್ಷರ *)string,
+				  ಗಾತ್ರ(string_shortbuf), &ಕೀಲಿ_sym, &ಸ್ಥಿತಿ_2);
+	ಆದರೆ (ಸ್ಥಿತಿ_2 == XBuffer_ಅತಿಪ್ರವಾಹ)
 	{
 	    string = (char_u *)XtMalloc(len + 1);
 	    string_alloced = True;
 # ifdef USE_UTF8LOOKUP
 	    // XFree86 4.0.2 or newer: Be able to get UTF-8 characters even
 	    // when the locale isn't utf-8.
-	    if (enc_utf8)
-		len = Xutf8LookupString(xic, ev_press, (char *)string,
-						      len, &key_sym, &status);
-	    else
+	    ಆದರೆ (enc_utf8)
+		len = Xutf8LookupString(xic, ev_press, (ಅಕ್ಷರ *)string,
+						      len, &ಕೀಲಿ_sym, &ಸ್ಥಿತಿ_2);
+	    ಇಲ್ಲದಿದ್ದರೆ
 # endif
-		len = XmbLookupString(xic, ev_press, (char *)string,
-						      len, &key_sym, &status);
+		len = XmbLookupString(xic, ev_press, (ಅಕ್ಷರ *)string,
+						      len, &ಕೀಲಿ_sym, &ಸ್ಥಿತಿ_2);
 	}
-	if (status == XLookupNone || status == XLookupChars)
-	    key_sym = XK_VoidSymbol;
+	ಆದರೆ (ಸ್ಥಿತಿ_2 == XLookupNone || ಸ್ಥಿತಿ_2 == XLookupChars)
+	    ಕೀಲಿ_sym = XK_Void_ಚಿಹ್ನೆ;
 
 	// Do conversion from 'termencoding' to 'encoding'.  When using
 	// Xutf8LookupString() it has already been done.
-	if (len > 0 && input_conv.vc_type != CONV_NONE
+	ಆದರೆ (len > 0 && ಒಳಹರಿವು_conv.vc_type != CONV_NONE
 # ifdef USE_UTF8LOOKUP
 		&& !enc_utf8
 # endif
 		)
 	{
-	    int		maxlen = len * 4 + 40;	// guessed
+	    ಪೂರ್ಣಾಂಕ		maxlen = len * 4 + 40;	// guessed
 	    char_u	*p = (char_u *)XtMalloc(maxlen);
 
 	    mch_memmove(p, string, len);
-	    if (string_alloced)
-		XtFree((char *)string);
+	    ಆದರೆ (string_alloced)
+		XtFree((ಅಕ್ಷರ *)string);
 	    string = p;
 	    string_alloced = True;
-	    len = convert_input(p, len, maxlen);
+	    len = convert_ಒಳಹರಿವು(p, len, maxlen);
 	}
 
 	// Translate CSI to K_CSI, otherwise it could be recognized as the
 	// start of a special key.
-	for (i = 0; i < len; ++i)
-	    if (string[i] == CSI)
+	ಗಾಗಿ (i = 0; i < len; ++i)
+	    ಆದರೆ (string[i] == CSI)
 	    {
 		char_u	*p = (char_u *)XtMalloc(len + 3);
 
 		mch_memmove(p, string, i + 1);
 		p[i + 1] = KS_EXTRA;
-		p[i + 2] = (int)KE_CSI;
+		p[i + 2] = (ಪೂರ್ಣಾಂಕ)KE_CSI;
 		mch_memmove(p + i + 3, string + i + 1, len - i);
-		if (string_alloced)
-		    XtFree((char *)string);
+		ಆದರೆ (string_alloced)
+		    XtFree((ಅಕ್ಷರ *)string);
 		string = p;
 		string_alloced = True;
 		i += 2;
 		len += 2;
 	    }
     }
-    else
-#endif
-	len = XLookupString(ev_press, (char *)string, sizeof(string),
-		&key_sym, NULL);
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+	len = XLookupString(ev_press, (ಅಕ್ಷರ *)string, ಗಾತ್ರ(string),
+		&ಕೀಲಿ_sym, ಖಾಲಿ);
 
-#ifdef SunXK_F36
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ SunXK_F36
     /*
     * These keys have bogus lookup strings, and trapping them here is
     * easier than trying to XRebindKeysym() on them with every possible
     * combination of modifiers.
     */
-    if (key_sym == SunXK_F36 || key_sym == SunXK_F37)
+    ಆದರೆ (ಕೀಲಿ_sym == SunXK_F36 || ಕೀಲಿ_sym == SunXK_F37)
 	len = 0;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (key_sym == XK_space)
+    ಆದರೆ (ಕೀಲಿ_sym == XK_space)
 	string[0] = ' ';	// Otherwise Ctrl-Space doesn't work
 
     /*
      * Only on some machines ^_ requires Ctrl+Shift+minus.  For consistency,
      * allow just Ctrl+minus too.
      */
-    if (key_sym == XK_minus && (ev_press->state & ControlMask))
+    ಆದರೆ (ಕೀಲಿ_sym == XK_minus && (ev_press->state & Control_ಮುಖವಾಡ))
 	string[0] = Ctrl__;
 
-#ifdef XK_ISO_Left_Tab
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ XK_ISO_ಎಡ_Tab
     // why do we get XK_ISO_Left_Tab instead of XK_Tab for shift-tab?
-    if (key_sym == XK_ISO_Left_Tab)
+    ಆದರೆ (ಕೀಲಿ_sym == XK_ISO_ಎಡ_Tab)
     {
-	key_sym = XK_Tab;
+	ಕೀಲಿ_sym = XK_Tab;
 	string[0] = TAB;
 	len = 1;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // We used to apply Alt/Meta to the key here (Mod1Mask), but that is now
     // done later, the same as it happens for the terminal.  Hopefully that
     // works for everybody...
 
-    if (len == 1 && string[0] == CSI)
+    ಆದರೆ (len == 1 && string[0] == CSI)
     {
 	string[1] = KS_EXTRA;
-	string[2] = (int)KE_CSI;
+	string[2] = (ಪೂರ್ಣಾಂಕ)KE_CSI;
 	len = -3;
     }
 
     // Check for special keys.  Also do this when len == 1 (key has an ASCII
     // value) to detect backspace, delete and keypad keys.
-    if (len == 0 || len == 1)
+    ಆದರೆ (len == 0 || len == 1)
     {
-	for (i = 0; special_keys[i].key_sym != (KeySym)0; i++)
+	ಗಾಗಿ (i = 0; special_ಕೀಲಿಗಳು[i].ಕೀಲಿ_sym != (ಕೀಲಿ_Sym)0; i++)
 	{
-	    if (special_keys[i].key_sym == key_sym)
+	    ಆದರೆ (special_ಕೀಲಿಗಳು[i].ಕೀಲಿ_sym == ಕೀಲಿ_sym)
 	    {
 		string[0] = CSI;
-		string[1] = special_keys[i].vim_code0;
-		string[2] = special_keys[i].vim_code1;
+		string[1] = special_ಕೀಲಿಗಳು[i].vim_code0;
+		string[2] = special_ಕೀಲಿಗಳು[i].vim_code1;
 		len = -3;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	}
     }
 
     // Unrecognised key is ignored.
-    if (len == 0)
-	goto theend;
+    ಆದರೆ (len == 0)
+	ಹೋಗು theend;
 
     // Handle modifiers.
     modifiers = 0;
-    if (ev_press->state & ShiftMask)
-	modifiers |= MOD_MASK_SHIFT;
-    if (ev_press->state & ControlMask)
+    ಆದರೆ (ev_press->state & ಸರಿಸು_ಮುಖವಾಡ)
+	modifiers |= MOD_ಮುಖವಾಡ_ಸರಿಸು;
+    ಆದರೆ (ev_press->state & Control_ಮುಖವಾಡ)
     {
-	modifiers |= MOD_MASK_CTRL;
-	if (len == 1 && string[0] < 0x20)
+	modifiers |= MOD_ಮುಖವಾಡ_CTRL;
+	ಆದರೆ (len == 1 && string[0] < 0x20)
 	    // Use the character before applyng CTRL.
 	    string[0] += 0x40;
     }
-    if (ev_press->state & Mod1Mask)
-	modifiers |= MOD_MASK_ALT;
-    if (ev_press->state & Mod4Mask)
-	modifiers |= MOD_MASK_META;
+    ಆದರೆ (ev_press->state & Mod1_ಮುಖವಾಡ)
+	modifiers |= MOD_ಮುಖವಾಡ_ALT;
+    ಆದರೆ (ev_press->state & Mod4_ಮುಖವಾಡ)
+	modifiers |= MOD_ಮುಖವಾಡ_META;
 
     /*
      * For some keys a shift modifier is translated into another key
      * code.
      */
-    if (len == -3)
-	key = TO_SPECIAL(string[1], string[2]);
-    else
+    ಆದರೆ (len == -3)
+	ಕೀಲಿ = ಗಮ್ಯ_SPECIAL(string[1], string[2]);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	string[len] = NUL;
-	key = mb_ptr2char(string);
+	ಕೀಲಿ = mb_ptr2char(string);
     }
-    key = simplify_key(key, &modifiers);
-    if (key == CSI)
-	key = K_CSI;
-    if (IS_SPECIAL(key))
+    ಕೀಲಿ = simplify_ಕೀಲಿ(ಕೀಲಿ, &modifiers);
+    ಆದರೆ (ಕೀಲಿ == CSI)
+	ಕೀಲಿ = K_CSI;
+    ಆದರೆ (IS_SPECIAL(ಕೀಲಿ))
     {
 	string[0] = CSI;
-	string[1] = K_SECOND(key);
-	string[2] = K_THIRD(key);
+	string[1] = K_ಎರಡನೇ(ಕೀಲಿ);
+	string[2] = K_ಮೂರನೇ(ಕೀಲಿ);
 	len = 3;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Some keys need adjustment when the Ctrl modifier is used.
-	key = may_adjust_key_for_ctrl(modifiers, key);
+	ಕೀಲಿ = may_adjust_ಕೀಲಿ_for_ctrl(modifiers, ಕೀಲಿ);
 
-	len = mb_char2bytes(key, string);
+	len = mb_char2bytes(ಕೀಲಿ, string);
 
 	// Remove the SHIFT modifier for keys where it's already included,
 	// e.g., '(', '!' and '*'.
-	modifiers = may_remove_shift_modifier(modifiers, key);
+	modifiers = may_remove_ಸರಿಸು_modifier(modifiers, ಕೀಲಿ);
     }
 
-    if (modifiers != 0)
+    ಆದರೆ (modifiers != 0)
     {
 	string2[0] = CSI;
 	string2[1] = KS_MODIFIER;
 	string2[2] = modifiers;
-	add_to_input_buf(string2, 3);
+	ಕೂಡಿಸು_ಗಮ್ಯ_ಒಳಹರಿವು_buf(string2, 3);
     }
 
     // Check if the key interrupts.
     {
-	int int_ch = check_for_interrupt(key, modifiers);
+	ಪೂರ್ಣಾಂಕ int_ch = check_for_ಅಡಚಣೆ(ಕೀಲಿ, modifiers);
 
-	if (int_ch != NUL)
+	ಆದರೆ (int_ch != NUL)
 	{
-	    trash_input_buf();
+	    trash_ಒಳಹರಿವು_buf();
 	    string[0] = int_ch;
 	    len = 1;
 	}
     }
 
-    add_to_input_buf(string, len);
+    ಕೂಡಿಸು_ಗಮ್ಯ_ಒಳಹರಿವು_buf(string, len);
 
     /*
      * blank out the pointer if necessary
      */
-    if (p_mh)
+    ಆದರೆ (p_mh)
 	gui_mch_mousehide(TRUE);
 
-#if defined(FEAT_BEVAL_TIP)
+#ಆದರೆ defined(FEAT_BEVAL_TIP)
     {
 	BalloonEval *be;
 
-	if ((be = gui_mch_currently_showing_beval()) != NULL)
+	ಆದರೆ ((be = gui_mch_currently_showing_beval()) != ಖಾಲಿ)
 	    gui_mch_unpost_balloon(be);
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 theend:
     {}	    // some compilers need a statement here
-#ifdef FEAT_XIM
-    if (string_alloced)
-	XtFree((char *)string);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XIM
+    ಆದರೆ (string_alloced)
+	XtFree((ಅಕ್ಷರ *)string);
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 gui_x11_mouse_cb(
-    Widget	w UNUSED,
-    XtPointer	dud UNUSED,
+    Widget	w ಬಳಸದ,
+    Xt_ಸೂಚಕ	dud ಬಳಸದ,
     XEvent	*event,
-    Boolean	*dum UNUSED)
+    Boolean	*dum ಬಳಸದ)
 {
-    static XtIntervalId timer = (XtIntervalId)0;
-    static int	timed_out = TRUE;
+    ಸ್ಥಿರ XtIntervalId timer = (XtIntervalId)0;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	timed_ಹೊರಹೋಗು = TRUE;
 
-    int		button;
-    int		repeated_click = FALSE;
-    int		x, y;
+    ಪೂರ್ಣಾಂಕ		button;
+    ಪೂರ್ಣಾಂಕ		repeated_click = FALSE;
+    ಪೂರ್ಣಾಂಕ		x, y;
     int_u	x_modifiers;
     int_u	vim_modifiers;
 
-    if (event->type == MotionNotify)
+    ಆದರೆ (event->type == MotionNotify)
     {
 	// Get the latest position, avoids lagging behind on a drag.
 	x = event->xmotion.x;
 	y = event->xmotion.y;
 	x_modifiers = event->xmotion.state;
-	button = (x_modifiers & (Button1Mask | Button2Mask | Button3Mask))
+	button = (x_modifiers & (Button1_ಮುಖವಾಡ | Button2_ಮುಖವಾಡ | Button3_ಮುಖವಾಡ))
 		? MOUSE_DRAG : ' ';
 
 	/*
@@ -1020,64 +1020,64 @@ gui_x11_mouse_cb(
 	 */
 	gui_mch_mousehide(FALSE);
 
-	if (button != MOUSE_DRAG)	// just moving the rodent
+	ಆದರೆ (button != MOUSE_DRAG)	// just moving the rodent
 	{
-#ifdef FEAT_MENU
-	    if (dud)			// moved in vimForm
-		y -= gui.menu_height;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MENU
+	    ಆದರೆ (dud)			// moved in vimForm
+		y -= gui.menu_ಎತ್ತರ;
+#ಆದರೆ_ಅಂತ್ಯ
 	    gui_mouse_moved(x, y);
-	    return;
+	    ಹಿಂತಿರುಗಿ;
 	}
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	x = event->xbutton.x;
 	y = event->xbutton.y;
-	if (event->type == ButtonPress)
+	ಆದರೆ (event->type == ButtonPress)
 	{
 	    // Handle multiple clicks
-	    if (!timed_out)
+	    ಆದರೆ (!timed_ಹೊರಹೋಗು)
 	    {
-		XtRemoveTimeOut(timer);
+		Xt_Remove_ಸಮಯ_ಹೊರಹೋಗು(timer);
 		repeated_click = TRUE;
 	    }
-	    timed_out = FALSE;
-	    timer = XtAppAddTimeOut(app_context, (long_u)p_mouset,
-			gui_x11_timer_cb, &timed_out);
-	    switch (event->xbutton.button)
+	    timed_ಹೊರಹೋಗು = FALSE;
+	    timer = Xt_App_ಕೂಡಿಸು_ಸಮಯ_ಹೊರಹೋಗು(app_context, (long_u)p_mouset,
+			gui_x11_timer_cb, &timed_ಹೊರಹೋಗು);
+	    ಆಯ್ಕೆ (event->xbutton.button)
 	    {
 		// keep in sync with gui_gtk_x11.c
-		case Button1:	button = MOUSE_LEFT;	break;
-		case Button2:	button = MOUSE_MIDDLE;	break;
-		case Button3:	button = MOUSE_RIGHT;	break;
-		case Button4:	button = MOUSE_4;	break;
-		case Button5:	button = MOUSE_5;	break;
-		case 6:		button = MOUSE_7;	break;
-		case 7:		button = MOUSE_6;	break;
-		case 8:		button = MOUSE_X1;	break;
-		case 9:		button = MOUSE_X2;	break;
-		default:
-		    return;	// Unknown button
+		ಸ್ಥಿತಿ Button1:	button = MOUSE_ಎಡ;	ನಿಲ್ಲಿಸು;
+		ಸ್ಥಿತಿ Button2:	button = MOUSE_ಮಧ್ಯ;	ನಿಲ್ಲಿಸು;
+		ಸ್ಥಿತಿ Button3:	button = MOUSE_ಬಲ;	ನಿಲ್ಲಿಸು;
+		ಸ್ಥಿತಿ Button4:	button = MOUSE_4;	ನಿಲ್ಲಿಸು;
+		ಸ್ಥಿತಿ Button5:	button = MOUSE_5;	ನಿಲ್ಲಿಸು;
+		ಸ್ಥಿತಿ 6:		button = MOUSE_7;	ನಿಲ್ಲಿಸು;
+		ಸ್ಥಿತಿ 7:		button = MOUSE_6;	ನಿಲ್ಲಿಸು;
+		ಸ್ಥಿತಿ 8:		button = MOUSE_X1;	ನಿಲ್ಲಿಸು;
+		ಸ್ಥಿತಿ 9:		button = MOUSE_X2;	ನಿಲ್ಲಿಸು;
+		ಪೂರ್ವನಿಯೋಜಿತ:
+		    ಹಿಂತಿರುಗಿ;	// Unknown button
 	    }
 	}
-	else if (event->type == ButtonRelease)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (event->type == ButtonRelease)
 	    button = MOUSE_RELEASE;
-	else
-	    return;	// Unknown mouse event type
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಹಿಂತಿರುಗಿ;	// Unknown mouse event type
 
 	x_modifiers = event->xbutton.state;
-#if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
-	last_mouse_event = event->xbutton;
-#endif
+#ಆದರೆ defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
+	ಕೊನೆಯ_mouse_event = event->xbutton;
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
     vim_modifiers = 0x0;
-    if (x_modifiers & ShiftMask)
-	vim_modifiers |= MOUSE_SHIFT;
-    if (x_modifiers & ControlMask)
+    ಆದರೆ (x_modifiers & ಸರಿಸು_ಮುಖವಾಡ)
+	vim_modifiers |= MOUSE_ಸರಿಸು;
+    ಆದರೆ (x_modifiers & Control_ಮುಖವಾಡ)
 	vim_modifiers |= MOUSE_CTRL;
-    if (x_modifiers & Mod1Mask)	    // Alt or Meta key
+    ಆದರೆ (x_modifiers & Mod1_ಮುಖವಾಡ)	    // Alt or Meta key
 	vim_modifiers |= MOUSE_ALT;
 
     gui_send_mouse_event(button, x, y, repeated_click, vim_modifiers);
@@ -1092,164 +1092,164 @@ gui_x11_mouse_cb(
  * deleted from argv, and *argc is decremented accordingly.  This is called
  * when vim is started, whether or not the GUI has been started.
  */
-    void
-gui_mch_prepare(int *argc, char **argv)
+    ಶೂನ್ಯ
+gui_mch_prepare(ಪೂರ್ಣಾಂಕ *argc, ಅಕ್ಷರ **argv)
 {
-    int	    arg;
-    int	    i;
+    ಪೂರ್ಣಾಂಕ	    arg;
+    ಪೂರ್ಣಾಂಕ	    i;
 
     /*
      * Move all the entries in argv which are relevant to X into gui_argv.
      */
     gui_argc = 0;
-    gui_argv = LALLOC_MULT(char *, *argc);
-    if (gui_argv == NULL)
-	return;
+    gui_argv = LALLOC_MULT(ಅಕ್ಷರ *, *argc);
+    ಆದರೆ (gui_argv == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
     gui_argv[gui_argc++] = argv[0];
     arg = 1;
-    while (arg < *argc)
+    ಆಗ (arg < *argc)
     {
 	// Look for argv[arg] in cmdline_options[] table
-	for (i = 0; i < (int)XtNumber(cmdline_options); i++)
-	    if (strcmp(argv[arg], cmdline_options[i].option) == 0)
-		break;
+	ಗಾಗಿ (i = 0; i < (ಪೂರ್ಣಾಂಕ)Xt_ಸಂಖ್ಯೆ(cmdline_options); i++)
+	    ಆದರೆ (strcmp(argv[arg], cmdline_options[i].option) == 0)
+		ನಿಲ್ಲಿಸು;
 
-	if (i < (int)XtNumber(cmdline_options))
+	ಆದರೆ (i < (ಪೂರ್ಣಾಂಕ)Xt_ಸಂಖ್ಯೆ(cmdline_options))
 	{
 	    // Remember finding "-rv" or "-reverse"
-	    if (strcmp("-rv", argv[arg]) == 0
+	    ಆದರೆ (strcmp("-rv", argv[arg]) == 0
 		    || strcmp("-reverse", argv[arg]) == 0)
-		found_reverse_arg = TRUE;
-	    else if ((strcmp("-fn", argv[arg]) == 0
+		ಸಿಕ್ಕಿತು_ಹಿಮ್ಮುಖ_arg = TRUE;
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ ((strcmp("-fn", argv[arg]) == 0
 			|| strcmp("-font", argv[arg]) == 0)
 		    && arg + 1 < *argc)
-		font_argument = argv[arg + 1];
+		font_ವಾದ = argv[arg + 1];
 
 	    // Found match in table, so move it into gui_argv
 	    gui_argv[gui_argc++] = argv[arg];
-	    if (--*argc > arg)
+	    ಆದರೆ (--*argc > arg)
 	    {
 		mch_memmove(&argv[arg], &argv[arg + 1], (*argc - arg)
-						    * sizeof(char *));
-		if (cmdline_options[i].argKind != XrmoptionNoArg)
+						    * ಗಾತ್ರ(ಅಕ್ಷರ *));
+		ಆದರೆ (cmdline_options[i].arg_ಬಗೆ != XrmoptionNoArg)
 		{
 		    // Move the options argument as well
 		    gui_argv[gui_argc++] = argv[arg];
-		    if (--*argc > arg)
+		    ಆದರೆ (--*argc > arg)
 			mch_memmove(&argv[arg], &argv[arg + 1], (*argc - arg)
-							    * sizeof(char *));
+							    * ಗಾತ್ರ(ಅಕ್ಷರ *));
 		}
 	    }
-	    argv[*argc] = NULL;
+	    argv[*argc] = ಖಾಲಿ;
 	}
-	else
-#ifdef FEAT_NETBEANS_INTG
-	    if (strncmp("-nb", argv[arg], 3) == 0)
+	ಇಲ್ಲದಿದ್ದರೆ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_NETBEANS_INTG
+	    ಆದರೆ (ಅಕ್ಷರಸರಣಿ_ಹೋಲಿಕೆ("-nb", argv[arg], 3) == 0)
 	{
 	    gui.dofork = false;	// don't fork() when starting GUI
 	    netbeansArg = argv[arg];
 	    mch_memmove(&argv[arg], &argv[arg + 1],
-					    (--*argc - arg) * sizeof(char *));
-	    argv[*argc] = NULL;
+					    (--*argc - arg) * ಗಾತ್ರ(ಅಕ್ಷರ *));
+	    argv[*argc] = ಖಾಲಿ;
 	}
-	else
-#endif
+	ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 	    arg++;
     }
 }
 
-#ifndef XtSpecificationRelease
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ XtSpecificationRelease
 # define CARDINAL (Cardinal *)
-#else
-# if XtSpecificationRelease == 4
+#ಇಲ್ಲದಿದ್ದರೆ
+# ಆದರೆ XtSpecificationRelease == 4
 #  define CARDINAL (Cardinal *)
-# else
-#  define CARDINAL (int *)
+# ಇಲ್ಲದಿದ್ದರೆ
+#  define CARDINAL (ಪೂರ್ಣಾಂಕ *)
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Check if the GUI can be started.  Called before gvimrc is sourced.
  * Return OK or FAIL.
  */
-    int
-gui_mch_init_check(void)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_init_check(ಶೂನ್ಯ)
 {
-#ifdef FEAT_XIM
-    XtSetLanguageProc(NULL, NULL, NULL);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XIM
+    Xt_ಗಣ_Language_Proc(ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ
     open_app_context();
-    if (app_context != NULL)
+    ಆದರೆ (app_context != ಖಾಲಿ)
 	gui.dpy = XtOpenDisplay(app_context, 0, VIM_NAME, VIM_CLASS,
-		cmdline_options, XtNumber(cmdline_options),
+		cmdline_options, Xt_ಸಂಖ್ಯೆ(cmdline_options),
 		CARDINAL &gui_argc, gui_argv);
 
-#if defined(LC_NUMERIC)
+#ಆದರೆ defined(LC_NUMERIC)
     {
 	// The call to XtOpenDisplay() may have set the locale from the
 	// environment. Set LC_NUMERIC to "C" to make sure that strtod() uses a
 	// decimal point, not a comma.
-	char *p = setlocale(LC_NUMERIC, NULL);
+	ಅಕ್ಷರ *p = setlocale(LC_NUMERIC, ಖಾಲಿ);
 
-	if (p == NULL || strcmp(p, "C") != 0)
+	ಆದರೆ (p == ಖಾಲಿ || strcmp(p, "C") != 0)
 	   setlocale(LC_NUMERIC, "C");
     }
-#endif
-    if (app_context == NULL || gui.dpy == NULL)
+#ಆದರೆ_ಅಂತ್ಯ
+    ಆದರೆ (app_context == ಖಾಲಿ || gui.dpy == ಖಾಲಿ)
     {
 	gui.dying = true;
 	emsg(_(e_cannot_open_display));
-	return FAIL;
+	ಹಿಂತಿರುಗಿ FAIL;
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 
-#ifdef USE_XSMP
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_XSMP
 /*
  * Handle XSMP processing, de-registering the attachment upon error
  */
-static XtInputId _xsmp_xtinputid;
+ಸ್ಥಿರ Xt_ಒಳಹರಿವು_Id _xsmp_xtinputid;
 
-    static void
-local_xsmp_handle_requests(
-    XtPointer	c UNUSED,
-    int		*s UNUSED,
-    XtInputId	*i UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+local_xsmp_handle_ವಿನಂತಿಗಳು(
+    Xt_ಸೂಚಕ	c ಬಳಸದ,
+    ಪೂರ್ಣಾಂಕ		*s ಬಳಸದ,
+    Xt_ಒಳಹರಿವು_Id	*i ಬಳಸದ)
 {
-    if (xsmp_handle_requests() == FAIL)
-	XtRemoveInput(_xsmp_xtinputid);
+    ಆದರೆ (xsmp_handle_ವಿನಂತಿಗಳು() == FAIL)
+	Xt_Remove_ಒಳಹರಿವು(_xsmp_xtinputid);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 
 /*
  * Initialise the X GUI.  Create all the windows, set up all the call-backs etc.
  * Returns OK for success, FAIL when the GUI can't be started.
  */
-    int
-gui_mch_init(void)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_init(ಶೂನ್ಯ)
 {
-    XtGCMask	gc_mask;
+    XtGCMask	gc_ಮುಖವಾಡ;
     XGCValues	gc_vals;
-    int		x, y, mask;
-    unsigned	w, h;
+    ಪೂರ್ಣಾಂಕ		x, y, ಮುಖವಾಡ;
+    ಚಿಹ್ನೆರಹಿತ	w, h;
 
-#if 0
+#ಆದರೆ 0
     // Uncomment this to enable synchronous mode for debugging
     XSynchronize(gui.dpy, True);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     vimShell = XtVaAppCreateShell(VIM_NAME, VIM_CLASS,
-	    applicationShellWidgetClass, gui.dpy, NULL);
+	    applicationShellWidgetClass, gui.dpy, ಖಾಲಿ);
 
     /*
      * Get the application resources
      */
-    XtVaGetApplicationResources(vimShell, (XtPointer)&gui,
-	vim_resources, XtNumber(vim_resources), NULL);
+    XtVaGetApplicationResources(vimShell, (Xt_ಸೂಚಕ)&gui,
+	vim_resources, Xt_ಸಂಖ್ಯೆ(vim_resources), ಖಾಲಿ);
 
-    gui.scrollbar_height = gui.scrollbar_width;
+    gui.scrollbar_ಎತ್ತರ = gui.scrollbar_ಅಗಲ;
 
     /*
      * Get the colors ourselves.  Using the automatic conversion doesn't
@@ -1259,28 +1259,28 @@ gui_mch_init(void)
     gui.menu_bg_pixel = gui_get_color((char_u *)gui.rsrc_menu_bg_name);
     gui.scroll_fg_pixel = gui_get_color((char_u *)gui.rsrc_scroll_fg_name);
     gui.scroll_bg_pixel = gui_get_color((char_u *)gui.rsrc_scroll_bg_name);
-#ifdef FEAT_BEVAL_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_BEVAL_GUI
     gui.tooltip_fg_pixel = gui_get_color((char_u *)gui.rsrc_tooltip_fg_name);
     gui.tooltip_bg_pixel = gui_get_color((char_u *)gui.rsrc_tooltip_bg_name);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Set default foreground and background colours
     gui.norm_pixel = gui.def_norm_pixel;
-    gui.back_pixel = gui.def_back_pixel;
+    gui.ಹಿಂಭಾಗ_pixel = gui.def_ಹಿಂಭಾಗ_pixel;
 
     // Check if reverse video needs to be applied (on Sun it's done by X)
-    if (gui.rsrc_rev_video && gui_get_lightness(gui.back_pixel)
+    ಆದರೆ (gui.rsrc_rev_video && gui_get_lightness(gui.ಹಿಂಭಾಗ_pixel)
 					  > gui_get_lightness(gui.norm_pixel))
     {
-	gui.norm_pixel = gui.def_back_pixel;
-	gui.back_pixel = gui.def_norm_pixel;
+	gui.norm_pixel = gui.def_ಹಿಂಭಾಗ_pixel;
+	gui.ಹಿಂಭಾಗ_pixel = gui.def_norm_pixel;
 	gui.def_norm_pixel = gui.norm_pixel;
-	gui.def_back_pixel = gui.back_pixel;
+	gui.def_ಹಿಂಭಾಗ_pixel = gui.ಹಿಂಭಾಗ_pixel;
     }
 
     // Get the colors from the "Normal", "Tooltip", "Scrollbar" and "Menu"
     // group (set in syntax.c or in a vimrc file)
-    set_normal_colors();
+    ಗಣ_ಸಾಮಾನ್ಯ_colors();
 
     /*
      * Check that none of the colors are the same as the background color
@@ -1290,48 +1290,48 @@ gui_mch_init(void)
     /*
      * Set up the GCs.	The font attributes will be set in gui_init_font().
      */
-    gc_mask = GCForeground | GCBackground;
+    gc_ಮುಖವಾಡ = GCForeground | GCBackground;
     gc_vals.foreground = gui.norm_pixel;
-    gc_vals.background = gui.back_pixel;
-    gui.text_gc = XtGetGC(vimShell, gc_mask, &gc_vals);
+    gc_vals.background = gui.ಹಿಂಭಾಗ_pixel;
+    gui.ಪಠ್ಯ_gc = XtGetGC(vimShell, gc_ಮುಖವಾಡ, &gc_vals);
 
-    gc_vals.foreground = gui.back_pixel;
+    gc_vals.foreground = gui.ಹಿಂಭಾಗ_pixel;
     gc_vals.background = gui.norm_pixel;
-    gui.back_gc = XtGetGC(vimShell, gc_mask, &gc_vals);
+    gui.ಹಿಂಭಾಗ_gc = XtGetGC(vimShell, gc_ಮುಖವಾಡ, &gc_vals);
 
-    gc_mask |= GCFunction;
-    gc_vals.foreground = gui.norm_pixel ^ gui.back_pixel;
-    gc_vals.background = gui.norm_pixel ^ gui.back_pixel;
+    gc_ಮುಖವಾಡ |= GCFunction;
+    gc_vals.foreground = gui.norm_pixel ^ gui.ಹಿಂಭಾಗ_pixel;
+    gc_vals.background = gui.norm_pixel ^ gui.ಹಿಂಭಾಗ_pixel;
     gc_vals.function   = GXxor;
-    gui.invert_gc = XtGetGC(vimShell, gc_mask, &gc_vals);
+    gui.invert_gc = XtGetGC(vimShell, gc_ಮುಖವಾಡ, &gc_vals);
 
     gui.visibility = VisibilityUnobscured;
-    x11_setup_atoms(gui.dpy);
+    x11_ಸಿದ್ಧತೆ_atoms(gui.dpy);
 
-    if (gui_win_x != -1 && gui_win_y != -1)
-	gui_mch_set_winpos(gui_win_x, gui_win_y);
+    ಆದರೆ (gui_win_x != -1 && gui_win_y != -1)
+	gui_mch_ಗಣ_winpos(gui_win_x, gui_win_y);
 
     // Now adapt the supplied(?) geometry-settings
     // Added by Kjetil Jacobsen <kjetilja@stud.cs.uit.no>
-    if (gui.geom != NULL && *gui.geom != NUL)
+    ಆದರೆ (gui.geom != ಖಾಲಿ && *gui.geom != NUL)
     {
-	mask = XParseGeometry((char *)gui.geom, &x, &y, &w, &h);
-	if (mask & WidthValue)
+	ಮುಖವಾಡ = XParseGeometry((ಅಕ್ಷರ *)gui.geom, &x, &y, &w, &h);
+	ಆದರೆ (ಮುಖವಾಡ & ಅಗಲ_ಮೌಲ್ಯ)
 	    Columns = w;
-	if (mask & HeightValue)
+	ಆದರೆ (ಮುಖವಾಡ & ಎತ್ತರ_ಮೌಲ್ಯ)
 	{
-	    if (p_window > (long)h - 1 || !option_was_set((char_u *)"window"))
-		p_window = h - 1;
-	    Rows = h;
+	    ಆದರೆ (p_ಕಿಟಕಿ > (ದೀರ್ಘ)h - 1 || !option_was_ಗಣ((char_u *)"window"))
+		p_ಕಿಟಕಿ = h - 1;
+	    ಅಡ್ಡಸಾಲುಗಳು = h;
 	}
-	limit_screen_size();
+	ಎಲ್ಲೆ_screen_ಗಾತ್ರ();
 	/*
 	 * Set the (x,y) position of the main window only if specified in the
 	 * users geometry, so we get good defaults when they don't. This needs
 	 * to be done before the shell is popped up.
 	 */
-	if (mask & (XValue|YValue))
-	    XtVaSetValues(vimShell, XtNgeometry, gui.geom, NULL);
+	ಆದರೆ (ಮುಖವಾಡ & (XValue|YValue))
+	    Xt_Va_ಗಣ_ಮೌಲ್ಯಗಳು(vimShell, XtNgeometry, gui.geom, ಖಾಲಿ);
     }
 
     gui_x11_create_widgets();
@@ -1339,59 +1339,59 @@ gui_mch_init(void)
    /*
     * Add an icon to Vim (Marcel Douben: 11 May 1998).
     */
-    if (vim_strchr(p_go, GO_ICON) != NULL)
+    ಆದರೆ (vim_strchr(p_go, GO_ICON) != ಖಾಲಿ)
     {
-#ifndef HAVE_XPM
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ HAVE_XPM
 # include "vim_icon.xbm"
 # include "vim_mask.xbm"
 
 	Arg	arg[2];
 
-	XtSetArg(arg[0], XtNiconPixmap,
-		XCreateBitmapFromData(gui.dpy,
-		    DefaultRootWindow(gui.dpy),
-		    (char *)vim_icon_bits,
-		    vim_icon_width,
-		    vim_icon_height));
-	XtSetArg(arg[1], XtNiconMask,
-		XCreateBitmapFromData(gui.dpy,
-		    DefaultRootWindow(gui.dpy),
-		    (char *)vim_mask_icon_bits,
-		    vim_mask_icon_width,
-		    vim_mask_icon_height));
-	XtSetValues(vimShell, arg, (Cardinal)2);
-#else
+	Xt_ಗಣ_Arg(arg[0], XtNiconPixmap,
+		XCreate_Bitmap_From_ದತ್ತಾಂಶ(gui.dpy,
+		    Default_ಬೇರು_ಕಿಟಕಿ(gui.dpy),
+		    (ಅಕ್ಷರ *)vim_icon_ಬಿಟ್ಟುಗಳು,
+		    vim_icon_ಅಗಲ,
+		    vim_icon_ಎತ್ತರ));
+	Xt_ಗಣ_Arg(arg[1], Xt_Nicon_ಮುಖವಾಡ,
+		XCreate_Bitmap_From_ದತ್ತಾಂಶ(gui.dpy,
+		    Default_ಬೇರು_ಕಿಟಕಿ(gui.dpy),
+		    (ಅಕ್ಷರ *)vim_ಮುಖವಾಡ_icon_ಬಿಟ್ಟುಗಳು,
+		    vim_ಮುಖವಾಡ_icon_ಅಗಲ,
+		    vim_ಮುಖವಾಡ_icon_ಎತ್ತರ));
+	Xt_ಗಣ_ಮೌಲ್ಯಗಳು(vimShell, arg, (Cardinal)2);
+#ಇಲ್ಲದಿದ್ದರೆ
 // Use Pixmaps, looking much nicer.
 
 # include "../runtime/vim32x32.xpm"
 # include "../runtime/vim16x16.xpm"
 # include "../runtime/vim48x48.xpm"
 
-    static Pixmap	icon = 0;
-    static Pixmap	icon_mask = 0;
-    static char		**magick = vim32x32;
-    Window		root_window;
-    XIconSize		*size;
-    int			number_sizes;
+    ಸ್ಥಿರ Pixmap	icon = 0;
+    ಸ್ಥಿರ Pixmap	icon_ಮುಖವಾಡ = 0;
+    ಸ್ಥಿರ ಅಕ್ಷರ		**magick = vim32x32;
+    ಕಿಟಕಿ		ಬೇರು_ಕಿಟಕಿ;
+    XIcon_ಗಾತ್ರ		*ಗಾತ್ರ_2;
+    ಪೂರ್ಣಾಂಕ			ಸಂಖ್ಯೆ_sizes;
     Display		*dsp;
     Screen		*scr;
-    XpmAttributes	attr;
+    Xpm_ಗುಣಲಕ್ಷಣಗಳು	attr;
     Colormap		cmap;
 
     /*
      * Adjust the icon to the preferences of the actual window manager.
      */
-    root_window = XRootWindowOfScreen(XtScreen(vimShell));
-    if (XGetIconSizes(XtDisplay(vimShell), root_window,
-						   &size, &number_sizes) != 0)
+    ಬೇರು_ಕಿಟಕಿ = XRoot_ಕಿಟಕಿ_ದ_Screen(XtScreen(vimShell));
+    ಆದರೆ (XGetIconSizes(XtDisplay(vimShell), ಬೇರು_ಕಿಟಕಿ,
+						   &ಗಾತ್ರ_2, &ಸಂಖ್ಯೆ_sizes) != 0)
     {
-	if (number_sizes > 0)
+	ಆದರೆ (ಸಂಖ್ಯೆ_sizes > 0)
 	{
-	    if (size->max_height >= 48 && size->max_width >= 48)
+	    ಆದರೆ (ಗಾತ್ರ_2->max_ಎತ್ತರ_2 >= 48 && ಗಾತ್ರ_2->max_ಅಗಲ_2 >= 48)
 		magick = vim48x48;
-	    else if (size->max_height >= 32 && size->max_width >= 32)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಗಾತ್ರ_2->max_ಎತ್ತರ_2 >= 32 && ಗಾತ್ರ_2->max_ಅಗಲ_2 >= 32)
 		magick = vim32x32;
-	    else if (size->max_height >= 16 && size->max_width >= 16)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಗಾತ್ರ_2->max_ಎತ್ತರ_2 >= 16 && ಗಾತ್ರ_2->max_ಅಗಲ_2 >= 16)
 		magick = vim16x16;
 	}
     }
@@ -1400,51 +1400,51 @@ gui_mch_init(void)
     scr = XtScreen(vimShell);
 
     cmap = DefaultColormap(dsp, DefaultScreen(dsp));
-    XtVaSetValues(vimShell, XtNcolormap, cmap, NULL);
+    Xt_Va_ಗಣ_ಮೌಲ್ಯಗಳು(vimShell, XtNcolormap, cmap, ಖಾಲಿ);
 
     attr.valuemask = 0L;
-    attr.valuemask = XpmCloseness | XpmReturnPixels | XpmColormap | XpmDepth;
+    attr.valuemask = XpmCloseness | XpmReturnPixels | XpmColormap | Xpm_ಆಳ;
     attr.closeness = 65535;	// accuracy isn't crucial
     attr.colormap = cmap;
-    attr.depth = DefaultDepthOfScreen(scr);
+    attr.ಆಳ = Default_ಆಳ_ದ_Screen(scr);
 
-    if (!icon)
+    ಆದರೆ (!icon)
     {
-	XpmCreatePixmapFromData(dsp, root_window, magick, &icon,
-							   &icon_mask, &attr);
-	XpmFreeAttributes(&attr);
+	Xpm_Create_Pixmap_From_ದತ್ತಾಂಶ(dsp, ಬೇರು_ಕಿಟಕಿ, magick, &icon,
+							   &icon_ಮುಖವಾಡ, &attr);
+	Xpm_Free_ಗುಣಲಕ್ಷಣಗಳು(&attr);
     }
 
-    XtVaSetValues(vimShell, XmNiconPixmap, icon, XmNiconMask, icon_mask, NULL);
-#endif
+    Xt_Va_ಗಣ_ಮೌಲ್ಯಗಳು(vimShell, XmNiconPixmap, icon, Xm_Nicon_ಮುಖವಾಡ, icon_ಮುಖವಾಡ, ಖಾಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
-#ifdef FEAT_BEVAL_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_BEVAL_GUI
     gui_init_tooltip_font();
-#endif
-#ifdef FEAT_MENU
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MENU
     gui_init_menu_font();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef USE_XSMP
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_XSMP
     // Attach listener on ICE connection
-    if (-1 != xsmp_icefd)
-	_xsmp_xtinputid = XtAppAddInput(app_context, xsmp_icefd,
-		(XtPointer)XtInputReadMask, local_xsmp_handle_requests, NULL);
-#endif
+    ಆದರೆ (-1 != xsmp_icefd)
+	_xsmp_xtinputid = Xt_App_ಕೂಡಿಸು_ಒಳಹರಿವು(app_context, xsmp_icefd,
+		(Xt_ಸೂಚಕ)Xt_ಒಳಹರಿವು_Read_ಮುಖವಾಡ, local_xsmp_handle_ವಿನಂತಿಗಳು, ಖಾಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Called when starting the GUI fails after calling gui_mch_init().
  */
-    void
-gui_mch_uninit(void)
+    ಶೂನ್ಯ
+gui_mch_uninit(ಶೂನ್ಯ)
 {
     gui_x11_destroy_widgets();
     XtCloseDisplay(gui.dpy);
-    gui.dpy = NULL;
+    gui.dpy = ಖಾಲಿ;
     vimShell = (Widget)0;
     VIM_CLEAR(gui_argv);
 }
@@ -1452,45 +1452,45 @@ gui_mch_uninit(void)
 /*
  * Called when the foreground or background color has been changed.
  */
-    void
-gui_mch_new_colors(void)
+    ಶೂನ್ಯ
+gui_mch_new_colors(ಶೂನ್ಯ)
 {
-    long_u	gc_mask;
+    long_u	gc_ಮುಖವಾಡ;
     XGCValues	gc_vals;
 
-    gc_mask = GCForeground | GCBackground;
+    gc_ಮುಖವಾಡ = GCForeground | GCBackground;
     gc_vals.foreground = gui.norm_pixel;
-    gc_vals.background = gui.back_pixel;
-    if (gui.text_gc != NULL)
-	XChangeGC(gui.dpy, gui.text_gc, gc_mask, &gc_vals);
+    gc_vals.background = gui.ಹಿಂಭಾಗ_pixel;
+    ಆದರೆ (gui.ಪಠ್ಯ_gc != ಖಾಲಿ)
+	XChangeGC(gui.dpy, gui.ಪಠ್ಯ_gc, gc_ಮುಖವಾಡ, &gc_vals);
 
-    gc_vals.foreground = gui.back_pixel;
+    gc_vals.foreground = gui.ಹಿಂಭಾಗ_pixel;
     gc_vals.background = gui.norm_pixel;
-    if (gui.back_gc != NULL)
-	XChangeGC(gui.dpy, gui.back_gc, gc_mask, &gc_vals);
+    ಆದರೆ (gui.ಹಿಂಭಾಗ_gc != ಖಾಲಿ)
+	XChangeGC(gui.dpy, gui.ಹಿಂಭಾಗ_gc, gc_ಮುಖವಾಡ, &gc_vals);
 
-    gc_mask |= GCFunction;
-    gc_vals.foreground = gui.norm_pixel ^ gui.back_pixel;
-    gc_vals.background = gui.norm_pixel ^ gui.back_pixel;
+    gc_ಮುಖವಾಡ |= GCFunction;
+    gc_vals.foreground = gui.norm_pixel ^ gui.ಹಿಂಭಾಗ_pixel;
+    gc_vals.background = gui.norm_pixel ^ gui.ಹಿಂಭಾಗ_pixel;
     gc_vals.function   = GXxor;
-    if (gui.invert_gc != NULL)
-	XChangeGC(gui.dpy, gui.invert_gc, gc_mask, &gc_vals);
+    ಆದರೆ (gui.invert_gc != ಖಾಲಿ)
+	XChangeGC(gui.dpy, gui.invert_gc, gc_ಮುಖವಾಡ, &gc_vals);
 
-    gui_x11_set_back_color();
+    gui_x11_ಗಣ_ಹಿಂಭಾಗ_color();
 }
 
 /*
  * Open the GUI window which was created by a call to gui_mch_init().
  */
-    int
-gui_mch_open(void)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_open(ಶೂನ್ಯ)
 {
     // Actually open the window
     XtRealizeWidget(vimShell);
-    XtManageChild(XtNameToWidget(vimShell, "*vimForm"));
+    Xt_Manage_ಮಗು(Xt_Name_ಗಮ್ಯ_Widget(vimShell, "*vimForm"));
 
     gui.wid = gui_x11_get_wid();
-    gui.blank_pointer = gui_x11_create_blank_mouse();
+    gui.blank_ಸೂಚಕ = gui_x11_create_blank_mouse();
 
     /*
      * Add a callback for the Close item on the window managers menu, and the
@@ -1498,182 +1498,182 @@ gui_mch_open(void)
      */
     wm_atoms[SAVE_YOURSELF_IDX] =
 			      XInternAtom(gui.dpy, "WM_SAVE_YOURSELF", False);
-    wm_atoms[DELETE_WINDOW_IDX] =
+    wm_atoms[DELETE_ಕಿಟಕಿ_IDX] =
 			      XInternAtom(gui.dpy, "WM_DELETE_WINDOW", False);
-    XSetWMProtocols(gui.dpy, XtWindow(vimShell), wm_atoms, 2);
-    XtAddEventHandler(vimShell, NoEventMask, True, gui_x11_wm_protocol_handler,
-							     NULL);
-#ifdef HAVE_X11_XMU_EDITRES_H
+    XSetWMProtocols(gui.dpy, Xt_ಕಿಟಕಿ(vimShell), wm_atoms, 2);
+    Xt_ಕೂಡಿಸು_Event_Handler(vimShell, No_Event_ಮುಖವಾಡ, True, gui_x11_wm_protocol_handler,
+							     ಖಾಲಿ);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_X11_XMU_EDITRES_H
     /*
      * Enable editres protocol (see "man editres").
      * Usually will need to add -lXmu to the linker line as well.
      */
-    XtAddEventHandler(vimShell, (EventMask)0, True, _XEditResCheckMessages,
-	    (XtPointer)NULL);
-#endif
+    Xt_ಕೂಡಿಸು_Event_Handler(vimShell, (Event_ಮುಖವಾಡ)0, True, _XEditResCheckMessages,
+	    (Xt_ಸೂಚಕ)ಖಾಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_CLIENTSERVER
-    if (serverName == NULL && serverDelayedStartName != NULL)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CLIENTSERVER
+    ಆದರೆ (serverName == ಖಾಲಿ && server_Delayed_ಆರಂಭ_Name != ಖಾಲಿ)
     {
 	// This is a :gui command in a plain vim with no previous server
-	commWindow = XtWindow(vimShell);
-	(void)serverRegisterName(gui.dpy, serverDelayedStartName);
+	comm_ಕಿಟಕಿ = Xt_ಕಿಟಕಿ(vimShell);
+	(ಶೂನ್ಯ)server_ರಿಜಿಸ್ಟರ್_Name(gui.dpy, server_Delayed_ಆರಂಭ_Name);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	/*
 	 * Cannot handle "widget-less" windows with XtProcessEvent() we'll
 	 * have to change the "server" registration to that of the main window
 	 * If we have not registered a name yet, remember the window
 	 */
-	serverChangeRegisteredWindow(gui.dpy, XtWindow(vimShell));
+	server_Change_Registered_ಕಿಟಕಿ(gui.dpy, Xt_ಕಿಟಕಿ(vimShell));
     }
-    XtAddEventHandler(vimShell, PropertyChangeMask, False,
-		      gui_x11_send_event_handler, NULL);
-#endif
+    Xt_ಕೂಡಿಸು_Event_Handler(vimShell, Property_Change_ಮುಖವಾಡ, False,
+		      gui_x11_send_event_handler, ಖಾಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Get the colors for the highlight groups (gui_check_colors() might have
     // changed them)
     highlight_gui_started();		// re-init colors and fonts
 
-#ifdef FEAT_XIM
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XIM
     xim_init();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-#if defined(FEAT_BEVAL_GUI)
+#ಆದರೆ defined(FEAT_BEVAL_GUI)
 /*
  * Convert the tooltip fontset name to an XFontSet.
  */
-    void
-gui_init_tooltip_font(void)
+    ಶೂನ್ಯ
+gui_init_tooltip_font(ಶೂನ್ಯ)
 {
-    XrmValue from, to;
+    Xrm_ಮೌಲ್ಯ from, ಗಮ್ಯ;
 
-    from.addr = (char *)gui.rsrc_tooltip_font_name;
-    from.size = strlen(from.addr);
-    to.addr = (XtPointer)&gui.tooltip_fontset;
-    to.size = sizeof(XFontSet);
+    from.addr = (ಅಕ್ಷರ *)gui.rsrc_tooltip_font_name;
+    from.ಗಾತ್ರ_2 = ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(from.addr);
+    ಗಮ್ಯ.addr = (Xt_ಸೂಚಕ)&gui.tooltip_fontset;
+    ಗಮ್ಯ.ಗಾತ್ರ_2 = ಗಾತ್ರ(XFont_ಗಣ);
 
-    if (XtConvertAndStore(vimShell, XtRString, &from, XtRFontSet, &to) == False)
+    ಆದರೆ (XtConvertAndStore(vimShell, XtRString, &from, Xt_RFont_ಗಣ, &ಗಮ್ಯ) == False)
     {
 	// Failed. What to do?
     }
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_MENU)
+#ಆದರೆ defined(FEAT_MENU)
 // Convert the menu font/fontset name to an XFontStruct/XFontset
-    void
-gui_init_menu_font(void)
+    ಶೂನ್ಯ
+gui_init_menu_font(ಶೂನ್ಯ)
 {
-    XrmValue from, to;
+    Xrm_ಮೌಲ್ಯ from, ಗಮ್ಯ;
 
 # ifdef FONTSET_ALWAYS
-    from.addr = (char *)gui.rsrc_menu_font_name;
-    from.size = strlen(from.addr);
-    to.addr = (XtPointer)&gui.menu_fontset;
-    to.size = sizeof(GuiFontset);
+    from.addr = (ಅಕ್ಷರ *)gui.rsrc_menu_font_name;
+    from.ಗಾತ್ರ_2 = ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(from.addr);
+    ಗಮ್ಯ.addr = (Xt_ಸೂಚಕ)&gui.menu_fontset;
+    ಗಮ್ಯ.ಗಾತ್ರ_2 = ಗಾತ್ರ(GuiFontset);
 
-    if (XtConvertAndStore(vimShell, XtRString, &from, XtRFontSet, &to) == False)
+    ಆದರೆ (XtConvertAndStore(vimShell, XtRString, &from, Xt_RFont_ಗಣ, &ಗಮ್ಯ) == False)
     {
 	// Failed. What to do?
     }
-# else
-    from.addr = (char *)gui.rsrc_menu_font_name;
-    from.size = strlen(from.addr);
-    to.addr = (XtPointer)&gui.menu_font;
-    to.size = sizeof(GuiFont);
+# ಇಲ್ಲದಿದ್ದರೆ
+    from.addr = (ಅಕ್ಷರ *)gui.rsrc_menu_font_name;
+    from.ಗಾತ್ರ_2 = ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(from.addr);
+    ಗಮ್ಯ.addr = (Xt_ಸೂಚಕ)&gui.menu_font;
+    ಗಮ್ಯ.ಗಾತ್ರ_2 = ಗಾತ್ರ(GuiFont);
 
-    if (XtConvertAndStore(vimShell, XtRString, &from, XtRFontStruct, &to) == False)
+    ಆದರೆ (XtConvertAndStore(vimShell, XtRString, &from, XtRFontStruct, &ಗಮ್ಯ) == False)
     {
 	// Failed. What to do?
     }
 # endif
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    void
-gui_mch_exit(int rc UNUSED)
+    ಶೂನ್ಯ
+gui_mch_exit(ಪೂರ್ಣಾಂಕ rc ಬಳಸದ)
 {
-#if 0
+#ಆದರೆ 0
     // Lesstif gives an error message here, and so does Solaris.  The man page
     // says that this isn't needed when exiting, so just skip it.
     XtCloseDisplay(gui.dpy);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     VIM_CLEAR(gui_argv);
 }
 
 /*
  * Get the position of the top left corner of the window.
  */
-    int
-gui_mch_get_winpos(int *x, int *y)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_get_winpos(ಪೂರ್ಣಾಂಕ *x, ಪೂರ್ಣಾಂಕ *y)
 {
     Dimension	xpos, ypos;
 
-    XtVaGetValues(vimShell,
+    Xt_Va_Get_ಮೌಲ್ಯಗಳು(vimShell,
 	XtNx,	&xpos,
 	XtNy,	&ypos,
-	NULL);
+	ಖಾಲಿ);
     *x = xpos;
     *y = ypos;
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Set the position of the top left corner of the window to the given
  * coordinates.
  */
-    void
-gui_mch_set_winpos(int x, int y)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_winpos(ಪೂರ್ಣಾಂಕ x, ಪೂರ್ಣಾಂಕ y)
 {
-    XtVaSetValues(vimShell,
+    Xt_Va_ಗಣ_ಮೌಲ್ಯಗಳು(vimShell,
 	XtNx,	x,
 	XtNy,	y,
-	NULL);
+	ಖಾಲಿ);
 }
 
-    void
-gui_mch_set_shellsize(
-    int		width,
-    int		height,
-    int		min_width,
-    int		min_height,
-    int		base_width,
-    int		base_height,
-    int		direction UNUSED)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_shellsize(
+    ಪೂರ್ಣಾಂಕ		ಅಗಲ,
+    ಪೂರ್ಣಾಂಕ		ಎತ್ತರ,
+    ಪೂರ್ಣಾಂಕ		min_ಅಗಲ,
+    ಪೂರ್ಣಾಂಕ		min_ಎತ್ತರ,
+    ಪೂರ್ಣಾಂಕ		ತಳ_ಅಗಲ,
+    ಪೂರ್ಣಾಂಕ		ತಳ_ಎತ್ತರ,
+    ಪೂರ್ಣಾಂಕ		direction ಬಳಸದ)
 {
-#ifdef FEAT_XIM
-    height += xim_get_status_area_height(),
-#endif
-    XtVaSetValues(vimShell,
-	XtNwidthInc,	gui.char_width,
-	XtNheightInc,	gui.char_height,
-#if defined(XtSpecificationRelease) && XtSpecificationRelease >= 4
-	XtNbaseWidth,	base_width,
-	XtNbaseHeight,	base_height,
-#endif
-	XtNminWidth,	min_width,
-	XtNminHeight,	min_height,
-	XtNwidth,	width,
-	XtNheight,	height,
-	NULL);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XIM
+    ಎತ್ತರ += xim_get_ಸ್ಥಿತಿ_area_ಎತ್ತರ(),
+#ಆದರೆ_ಅಂತ್ಯ
+    Xt_Va_ಗಣ_ಮೌಲ್ಯಗಳು(vimShell,
+	XtNwidthInc,	gui.char_ಅಗಲ,
+	XtNheightInc,	gui.char_ಎತ್ತರ,
+#ಆದರೆ defined(XtSpecificationRelease) && XtSpecificationRelease >= 4
+	Xt_Nbase_ಅಗಲ,	ತಳ_ಅಗಲ,
+	Xt_Nbase_ಎತ್ತರ,	ತಳ_ಎತ್ತರ,
+#ಆದರೆ_ಅಂತ್ಯ
+	Xt_Nmin_ಅಗಲ,	min_ಅಗಲ,
+	Xt_Nmin_ಎತ್ತರ,	min_ಎತ್ತರ,
+	XtNwidth,	ಅಗಲ,
+	XtNheight,	ಎತ್ತರ,
+	ಖಾಲಿ);
 }
 
 /*
  * Allow 10 pixels for horizontal borders, 'guiheadroom' for vertical borders.
  * Is there no way in X to find out how wide the borders really are?
  */
-    void
+    ಶೂನ್ಯ
 gui_mch_get_screen_dimensions(
-    int	    *screen_w,
-    int	    *screen_h)
+    ಪೂರ್ಣಾಂಕ	    *screen_w,
+    ಪೂರ್ಣಾಂಕ	    *screen_h)
 {
-    *screen_w = DisplayWidth(gui.dpy, DefaultScreen(gui.dpy)) - 10;
-    *screen_h = DisplayHeight(gui.dpy, DefaultScreen(gui.dpy)) - p_ghr;
+    *screen_w = Display_ಅಗಲ(gui.dpy, DefaultScreen(gui.dpy)) - 10;
+    *screen_h = Display_ಎತ್ತರ(gui.dpy, DefaultScreen(gui.dpy)) - p_ghr;
 }
 
 /*
@@ -1682,46 +1682,46 @@ gui_mch_get_screen_dimensions(
  * If "fontset" is TRUE, load the "font_name" as a fontset.
  * Return FAIL if the font could not be loaded, OK otherwise.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 gui_mch_init_font(
     char_u	*font_name,
-    int		do_fontset UNUSED)
+    ಪೂರ್ಣಾಂಕ		do_fontset ಬಳಸದ)
 {
-    XFontStruct	*font = NULL;
+    XFontStruct	*font = ಖಾಲಿ;
 
-#ifdef FEAT_XFONTSET
-    XFontSet	fontset = NULL;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XFONTSET
+    XFont_ಗಣ	fontset = ಖಾಲಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_GUI_MOTIF
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_MOTIF
     // A font name equal "*" is indicating, that we should activate the font
     // selection dialogue to get a new font name. So let us do it here.
-    if (font_name != NULL && STRCMP(font_name, "*") == 0)
+    ಆದರೆ (font_name != ಖಾಲಿ && STRCMP(font_name, "*") == 0)
     {
 	font_name = gui_xm_select_font(hl_get_font_name());
 
 	// Do not reset to default font except on GUI startup.
-	if (font_name == NULL && !gui.starting)
-	    return OK;
+	ಆದರೆ (font_name == ಖಾಲಿ && !gui.starting)
+	    ಹಿಂತಿರುಗಿ OK;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_XFONTSET
-    if (do_fontset)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XFONTSET
+    ಆದರೆ (do_fontset)
     {
 	// If 'guifontset' is set, VIM treats all font specifications as if
 	// they were fontsets, and 'guifontset' becomes the default.
-	if (font_name != NULL)
+	ಆದರೆ (font_name != ಖಾಲಿ)
 	{
-	    fontset = (XFontSet)gui_mch_get_fontset(font_name, FALSE, TRUE);
-	    if (fontset == NULL)
-		return FAIL;
+	    fontset = (XFont_ಗಣ)gui_mch_get_fontset(font_name, FALSE, TRUE);
+	    ಆದರೆ (fontset == ಖಾಲಿ)
+		ಹಿಂತಿರುಗಿ FAIL;
 	}
     }
-    else
-#endif
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
     {
-	if (font_name == NULL)
+	ಆದರೆ (font_name == ಖಾಲಿ)
 	{
 	    /*
 	     * If none of the fonts in 'font' could be loaded, try the one set
@@ -1730,255 +1730,255 @@ gui_mch_init_font(
 	     */
 	    font_name = gui.rsrc_font_name;
 	    font = (XFontStruct *)gui_mch_get_font(font_name, FALSE);
-	    if (font == NULL)
+	    ಆದರೆ (font == ಖಾಲಿ)
 		font_name = (char_u *)DFLT_FONT;
 	}
-	if (font == NULL)
+	ಆದರೆ (font == ಖಾಲಿ)
 	    font = (XFontStruct *)gui_mch_get_font(font_name, FALSE);
-	if (font == NULL)
-	    return FAIL;
+	ಆದರೆ (font == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ FAIL;
     }
 
     gui_mch_free_font(gui.norm_font);
-#ifdef FEAT_XFONTSET
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XFONTSET
     gui_mch_free_fontset(gui.fontset);
 
-    if (fontset != NULL)
+    ಆದರೆ (fontset != ಖಾಲಿ)
     {
 	gui.norm_font = NOFONT;
 	gui.fontset = (GuiFontset)fontset;
-	gui.char_width = fontset_width(fontset);
-	gui.char_height = fontset_height(fontset) + p_linespace;
+	gui.char_ಅಗಲ = fontset_ಅಗಲ(fontset);
+	gui.char_ಎತ್ತರ = fontset_ಎತ್ತರ(fontset) + p_linespace;
 	gui.char_ascent = fontset_ascent(fontset) + p_linespace / 2;
     }
-    else
-#endif
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
     {
 	gui.norm_font = (GuiFont)font;
-#ifdef FEAT_XFONTSET
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XFONTSET
 	gui.fontset = NOFONTSET;
-#endif
-	gui.char_width = font->max_bounds.width;
-	gui.char_height = font->ascent + font->descent + p_linespace;
+#ಆದರೆ_ಅಂತ್ಯ
+	gui.char_ಅಗಲ = font->max_bounds.ಅಗಲ;
+	gui.char_ಎತ್ತರ = font->ascent + font->descent + p_linespace;
 	gui.char_ascent = font->ascent + p_linespace / 2;
     }
 
-    hl_set_font_name(font_name);
+    hl_ಗಣ_font_name(font_name);
 
     /*
      * Try to load other fonts for bold, italic, and bold-italic.
      * We should also try to work out what font to use for these when they are
      * not specified by X resources, but we don't yet.
      */
-    if (font_name == gui.rsrc_font_name)
+    ಆದರೆ (font_name == gui.rsrc_font_name)
     {
-	if (gui.bold_font == NOFONT
-		&& gui.rsrc_bold_font_name != NULL
+	ಆದರೆ (gui.bold_font == NOFONT
+		&& gui.rsrc_bold_font_name != ಖಾಲಿ
 		&& *gui.rsrc_bold_font_name != NUL)
 	    gui.bold_font = gui_mch_get_font(gui.rsrc_bold_font_name, FALSE);
-	if (gui.ital_font == NOFONT
-		&& gui.rsrc_ital_font_name != NULL
+	ಆದರೆ (gui.ital_font == NOFONT
+		&& gui.rsrc_ital_font_name != ಖಾಲಿ
 		&& *gui.rsrc_ital_font_name != NUL)
 	    gui.ital_font = gui_mch_get_font(gui.rsrc_ital_font_name, FALSE);
-	if (gui.boldital_font == NOFONT
-		&& gui.rsrc_boldital_font_name != NULL
+	ಆದರೆ (gui.boldital_font == NOFONT
+		&& gui.rsrc_boldital_font_name != ಖಾಲಿ
 		&& *gui.rsrc_boldital_font_name != NUL)
 	    gui.boldital_font = gui_mch_get_font(gui.rsrc_boldital_font_name,
 								       FALSE);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// When not using the font specified by the resources, also don't use
 	// the bold/italic fonts, otherwise setting 'guifont' will look very
 	// strange.
-	if (gui.bold_font != NOFONT)
+	ಆದರೆ (gui.bold_font != NOFONT)
 	{
 	    XFreeFont(gui.dpy, (XFontStruct *)gui.bold_font);
 	    gui.bold_font = NOFONT;
 	}
-	if (gui.ital_font != NOFONT)
+	ಆದರೆ (gui.ital_font != NOFONT)
 	{
 	    XFreeFont(gui.dpy, (XFontStruct *)gui.ital_font);
 	    gui.ital_font = NOFONT;
 	}
-	if (gui.boldital_font != NOFONT)
+	ಆದರೆ (gui.boldital_font != NOFONT)
 	{
 	    XFreeFont(gui.dpy, (XFontStruct *)gui.boldital_font);
 	    gui.boldital_font = NOFONT;
 	}
     }
 
-#ifdef FEAT_GUI_MOTIF
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_MOTIF
     gui_motif_synch_fonts();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Get a font structure for highlighting.
  */
     GuiFont
-gui_mch_get_font(char_u *name, int giveErrorIfMissing)
+gui_mch_get_font(char_u *name, ಪೂರ್ಣಾಂಕ giveErrorIfMissing)
 {
     XFontStruct	*font;
 
-    if (!gui.in_use || name == NULL)	// can't do this when GUI not running
-	return NOFONT;
+    ಆದರೆ (!gui.ಒಳ_use || name == ಖಾಲಿ)	// can't do this when GUI not running
+	ಹಿಂತಿರುಗಿ NOFONT;
 
-    font = XLoadQueryFont(gui.dpy, (char *)name);
+    font = XLoadQueryFont(gui.dpy, (ಅಕ್ಷರ *)name);
 
-    if (font == NULL)
+    ಆದರೆ (font == ಖಾಲಿ)
     {
-	if (giveErrorIfMissing)
+	ಆದರೆ (giveErrorIfMissing)
 	    semsg(_(e_unknown_font_str), name);
-	return NOFONT;
+	ಹಿಂತಿರುಗಿ NOFONT;
     }
 
-#ifdef DEBUG
-    printf("Font Information for '%s':\n", name);
-    printf("  w = %d, h = %d, ascent = %d, descent = %d\n",
-	   font->max_bounds.width, font->ascent + font->descent,
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ DEBUG
+    ಬರೆ("Font Information for '%s':\n", name);
+    ಬರೆ("  w = %d, h = %d, ascent = %d, descent = %d\n",
+	   font->max_bounds.ಅಗಲ, font->ascent + font->descent,
 	   font->ascent, font->descent);
-    printf("  max ascent = %d, max descent = %d, max h = %d\n",
+    ಬರೆ("  max ascent = %d, max descent = %d, max h = %d\n",
 	   font->max_bounds.ascent, font->max_bounds.descent,
 	   font->max_bounds.ascent + font->max_bounds.descent);
-    printf("  min lbearing = %d, min rbearing = %d\n",
+    ಬರೆ("  min lbearing = %d, min rbearing = %d\n",
 	   font->min_bounds.lbearing, font->min_bounds.rbearing);
-    printf("  max lbearing = %d, max rbearing = %d\n",
+    ಬರೆ("  max lbearing = %d, max rbearing = %d\n",
 	   font->max_bounds.lbearing, font->max_bounds.rbearing);
-    printf("  leftink = %d, rightink = %d\n",
+    ಬರೆ("  leftink = %d, rightink = %d\n",
 	   (font->min_bounds.lbearing < 0),
-	   (font->max_bounds.rbearing > font->max_bounds.width));
-    printf("\n");
-#endif
+	   (font->max_bounds.rbearing > font->max_bounds.ಅಗಲ));
+    ಬರೆ("\n");
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (font->max_bounds.width != font->min_bounds.width)
+    ಆದರೆ (font->max_bounds.ಅಗಲ != font->min_bounds.ಅಗಲ)
     {
-	semsg(_(e_font_str_is_not_fixed_width), name);
+	semsg(_(e_font_str_is_not_fixed_ಅಗಲ), name);
 	XFreeFont(gui.dpy, font);
-	return NOFONT;
+	ಹಿಂತಿರುಗಿ NOFONT;
     }
-    return (GuiFont)font;
+    ಹಿಂತಿರುಗಿ (GuiFont)font;
 }
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * Return the name of font "font" in allocated memory.
  */
     char_u *
 gui_mch_get_fontname(GuiFont font, char_u *name)
 {
-    char_u *ret = NULL;
+    char_u *ret = ಖಾಲಿ;
 
-    if (name != NULL && font == NULL)
+    ಆದರೆ (name != ಖಾಲಿ && font == ಖಾಲಿ)
     {
 	// In this case, there's no way other than doing this.
 	ret = vim_strsave(name);
     }
-    else if (font != NULL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (font != ಖಾಲಿ)
     {
 	// In this case, try to retrieve the XLFD corresponding to 'font'->fid;
 	// if failed, use 'name' unless it's NULL.
-	unsigned long value = 0L;
+	ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ ಮೌಲ್ಯ = 0L;
 
-	if (XGetFontProperty(font, XA_FONT, &value))
+	ಆದರೆ (XGetFontProperty(font, XA_FONT, &ಮೌಲ್ಯ))
 	{
-	    char *xa_font_name = NULL;
+	    ಅಕ್ಷರ *xa_font_name = ಖಾಲಿ;
 
-	    xa_font_name = XGetAtomName(gui.dpy, value);
-	    if (xa_font_name != NULL)
+	    xa_font_name = XGetAtomName(gui.dpy, ಮೌಲ್ಯ);
+	    ಆದರೆ (xa_font_name != ಖಾಲಿ)
 	    {
 		ret = vim_strsave((char_u *)xa_font_name);
 		XFree(xa_font_name);
 	    }
-	    else if (name != NULL)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (name != ಖಾಲಿ)
 		ret = vim_strsave(name);
 	}
-	else if (name != NULL)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (name != ಖಾಲಿ)
 	    ret = vim_strsave(name);
     }
-    return ret;
+    ಹಿಂತಿರುಗಿ ret;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Adjust gui.char_height (after 'linespace' was changed).
  */
-    int
-gui_mch_adjust_charheight(void)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_adjust_charheight(ಶೂನ್ಯ)
 {
-#ifdef FEAT_XFONTSET
-    if (gui.fontset != NOFONTSET)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XFONTSET
+    ಆದರೆ (gui.fontset != NOFONTSET)
     {
-	gui.char_height = fontset_height((XFontSet)gui.fontset) + p_linespace;
-	gui.char_ascent = fontset_ascent((XFontSet)gui.fontset)
+	gui.char_ಎತ್ತರ = fontset_ಎತ್ತರ((XFont_ಗಣ)gui.fontset) + p_linespace;
+	gui.char_ascent = fontset_ascent((XFont_ಗಣ)gui.fontset)
 							    + p_linespace / 2;
     }
-    else
-#endif
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
     {
 	XFontStruct *font = (XFontStruct *)gui.norm_font;
 
-	gui.char_height = font->ascent + font->descent + p_linespace;
+	gui.char_ಎತ್ತರ = font->ascent + font->descent + p_linespace;
 	gui.char_ascent = font->ascent + p_linespace / 2;
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Set the current text font.
  */
-    void
-gui_mch_set_font(GuiFont font)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_font(GuiFont font)
 {
-    static Font	prev_font = (Font)-1;
+    ಸ್ಥಿರ Font	prev_font = (Font)-1;
     Font	fid = ((XFontStruct *)font)->fid;
 
-    if (fid != prev_font)
+    ಆದರೆ (fid != prev_font)
     {
-	XSetFont(gui.dpy, gui.text_gc, fid);
-	XSetFont(gui.dpy, gui.back_gc, fid);
+	XSetFont(gui.dpy, gui.ಪಠ್ಯ_gc, fid);
+	XSetFont(gui.dpy, gui.ಹಿಂಭಾಗ_gc, fid);
 	prev_font = fid;
 	gui.char_ascent = ((XFontStruct *)font)->ascent + p_linespace / 2;
     }
-#ifdef FEAT_XFONTSET
-    current_fontset = (XFontSet)NULL;
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XFONTSET
+    current_fontset = (XFont_ಗಣ)ಖಾಲಿ;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#if defined(FEAT_XFONTSET)
+#ಆದರೆ defined(FEAT_XFONTSET)
 /*
  * Set the current text fontset.
  * Adjust the ascent, in case it's different.
  */
-    void
-gui_mch_set_fontset(GuiFontset fontset)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_fontset(GuiFontset fontset)
 {
-    current_fontset = (XFontSet)fontset;
+    current_fontset = (XFont_ಗಣ)fontset;
     gui.char_ascent = fontset_ascent(current_fontset) + p_linespace / 2;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * If a font is not going to be used, free its structure.
  */
-    void
+    ಶೂನ್ಯ
 gui_mch_free_font(GuiFont font)
 {
-    if (font != NOFONT)
+    ಆದರೆ (font != NOFONT)
 	XFreeFont(gui.dpy, (XFontStruct *)font);
 }
 
-#if defined(FEAT_XFONTSET)
+#ಆದರೆ defined(FEAT_XFONTSET)
 /*
  * If a fontset is not going to be used, free its structure.
  */
-    void
+    ಶೂನ್ಯ
 gui_mch_free_fontset(GuiFontset fontset)
 {
-    if (fontset != NOFONTSET)
-	XFreeFontSet(gui.dpy, (XFontSet)fontset);
+    ಆದರೆ (fontset != NOFONTSET)
+	XFree_Font_ಗಣ(gui.dpy, (XFont_ಗಣ)fontset);
 }
 
 /*
@@ -1988,138 +1988,138 @@ gui_mch_free_fontset(GuiFontset fontset)
     GuiFontset
 gui_mch_get_fontset(
     char_u	*name,
-    int		giveErrorIfMissing,
-    int		fixed_width)
+    ಪೂರ್ಣಾಂಕ		giveErrorIfMissing,
+    ಪೂರ್ಣಾಂಕ		fixed_ಅಗಲ)
 {
-    XFontSet	fontset;
-    char	**missing, *def_str;
-    int		num_missing;
+    XFont_ಗಣ	fontset;
+    ಅಕ್ಷರ	**missing, *def_str;
+    ಪೂರ್ಣಾಂಕ		ಅಂಕೆ_missing;
 
-    if (!gui.in_use || name == NULL)
-	return NOFONTSET;
+    ಆದರೆ (!gui.ಒಳ_use || name == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ NOFONTSET;
 
-    fontset = XCreateFontSet(gui.dpy, (char *)name, &missing, &num_missing,
+    fontset = XCreate_Font_ಗಣ(gui.dpy, (ಅಕ್ಷರ *)name, &missing, &ಅಂಕೆ_missing,
 			     &def_str);
-    if (num_missing > 0)
+    ಆದರೆ (ಅಂಕೆ_missing > 0)
     {
-	int i;
+	ಪೂರ್ಣಾಂಕ i;
 
-	if (giveErrorIfMissing)
+	ಆದರೆ (giveErrorIfMissing)
 	{
-	    semsg(_(e_fonts_for_the_following_charsets_are_missing_in_fontset), name);
-	    for (i = 0; i < num_missing; i++)
+	    semsg(_(e_fonts_for_the_following_charsets_are_missing_ಒಳ_fontset), name);
+	    ಗಾಗಿ (i = 0; i < ಅಂಕೆ_missing; i++)
 		semsg("%s", missing[i]);
 	}
 	XFreeStringList(missing);
     }
 
-    if (fontset == NULL)
+    ಆದರೆ (fontset == ಖಾಲಿ)
     {
-	if (giveErrorIfMissing)
+	ಆದರೆ (giveErrorIfMissing)
 	    semsg(_(e_unknown_fontset_str), name);
-	return NOFONTSET;
+	ಹಿಂತಿರುಗಿ NOFONTSET;
     }
 
-    if (fixed_width && check_fontset_sanity(fontset) == FAIL)
+    ಆದರೆ (fixed_ಅಗಲ && check_fontset_sanity(fontset) == FAIL)
     {
-	XFreeFontSet(gui.dpy, fontset);
-	return NOFONTSET;
+	XFree_Font_ಗಣ(gui.dpy, fontset);
+	ಹಿಂತಿರುಗಿ NOFONTSET;
     }
-    return (GuiFontset)fontset;
+    ಹಿಂತಿರುಗಿ (GuiFontset)fontset;
 }
 
 /*
  * Check if fontset "fs" is fixed width.
  */
-    static int
-check_fontset_sanity(XFontSet fs)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+check_fontset_sanity(XFont_ಗಣ fs)
 {
     XFontStruct	**xfs;
-    char	**font_name;
-    int		fn;
-    char	*base_name;
-    int		i;
-    int		min_width;
-    int		min_font_idx = 0;
+    ಅಕ್ಷರ	**font_name;
+    ಪೂರ್ಣಾಂಕ		fn;
+    ಅಕ್ಷರ	*ತಳ_name;
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		min_ಅಗಲ;
+    ಪೂರ್ಣಾಂಕ		min_font_idx = 0;
 
-    base_name = XBaseFontNameListOfFontSet(fs);
-    fn = XFontsOfFontSet(fs, &xfs, &font_name);
-    for (i = 0; i < fn; i++)
+    ತಳ_name = XBase_Font_Name_List_ದ_Font_ಗಣ(fs);
+    fn = XFonts_ದ_Font_ಗಣ(fs, &xfs, &font_name);
+    ಗಾಗಿ (i = 0; i < fn; i++)
     {
-	if (xfs[i]->max_bounds.width != xfs[i]->min_bounds.width)
+	ಆದರೆ (xfs[i]->max_bounds.ಅಗಲ != xfs[i]->min_bounds.ಅಗಲ)
 	{
-	    semsg(_(e_fontsent_name_str_font_str_is_not_fixed_width),
-		    base_name, font_name[i]);
-	    return FAIL;
+	    semsg(_(e_fontsent_name_str_font_str_is_not_fixed_ಅಗಲ),
+		    ತಳ_name, font_name[i]);
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
     }
     // scan base font width
-    min_width = 32767;
-    for (i = 0; i < fn; i++)
+    min_ಅಗಲ = 32767;
+    ಗಾಗಿ (i = 0; i < fn; i++)
     {
-	if (xfs[i]->max_bounds.width<min_width)
+	ಆದರೆ (xfs[i]->max_bounds.ಅಗಲ<min_ಅಗಲ)
 	{
-	    min_width = xfs[i]->max_bounds.width;
+	    min_ಅಗಲ = xfs[i]->max_bounds.ಅಗಲ;
 	    min_font_idx = i;
 	}
     }
-    for (i = 0; i < fn; i++)
+    ಗಾಗಿ (i = 0; i < fn; i++)
     {
-	if (	   xfs[i]->max_bounds.width != 2 * min_width
-		&& xfs[i]->max_bounds.width != min_width)
+	ಆದರೆ (	   xfs[i]->max_bounds.ಅಗಲ != 2 * min_ಅಗಲ
+		&& xfs[i]->max_bounds.ಅಗಲ != min_ಅಗಲ)
 	{
-	    semsg(_(e_fontset_name_str), base_name);
+	    semsg(_(e_fontset_name_str), ತಳ_name);
 	    semsg(_("Font0: %s"), font_name[min_font_idx]);
 	    semsg(_("Font%d: %s"), i, font_name[i]);
 	    semsg(_("Font%d width is not twice that of font0"), i);
 	    semsg(_("Font0 width: %d"),
-				     (int)xfs[min_font_idx]->max_bounds.width);
-	    semsg(_("Font%d width: %d"), i, (int)xfs[i]->max_bounds.width);
-	    return FAIL;
+				     (ಪೂರ್ಣಾಂಕ)xfs[min_font_idx]->max_bounds.ಅಗಲ);
+	    semsg(_("Font%d width: %d"), i, (ಪೂರ್ಣಾಂಕ)xfs[i]->max_bounds.ಅಗಲ);
+	    ಹಿಂತಿರುಗಿ FAIL;
 	}
     }
     // it seems ok. Good Luck!!
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-    static int
-fontset_width(XFontSet fs)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+fontset_ಅಗಲ(XFont_ಗಣ fs)
 {
- return XmbTextEscapement(fs, "Vim", 3) / 3;
+ ಹಿಂತಿರುಗಿ Xmb_ಪಠ್ಯ_Escapement(fs, "Vim", 3) / 3;
 }
 
-    int
-fontset_height(
-    XFontSet fs)
+    ಪೂರ್ಣಾಂಕ
+fontset_ಎತ್ತರ(
+    XFont_ಗಣ fs)
 {
-    XFontSetExtents *extents;
+    XFont_ಗಣ_Extents *extents;
 
-    extents = XExtentsOfFontSet(fs);
-    return extents->max_logical_extent.height;
+    extents = XExtents_ದ_Font_ಗಣ(fs);
+    ಹಿಂತಿರುಗಿ extents->max_logical_extent.ಎತ್ತರ;
 }
 
-# if 0
+# ಆದರೆ 0
 // NOT USED YET
-    static int
-fontset_descent(XFontSet fs)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+fontset_descent(XFont_ಗಣ fs)
 {
-    XFontSetExtents *extents;
+    XFont_ಗಣ_Extents *extents;
 
-    extents = XExtentsOfFontSet (fs);
-    return extents->max_logical_extent.height + extents->max_logical_extent.y;
+    extents = XExtents_ದ_Font_ಗಣ (fs);
+    ಹಿಂತಿರುಗಿ extents->max_logical_extent.ಎತ್ತರ + extents->max_logical_extent.y;
 }
 # endif
 
-    static int
-fontset_ascent(XFontSet fs)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+fontset_ascent(XFont_ಗಣ fs)
 {
-    XFontSetExtents *extents;
+    XFont_ಗಣ_Extents *extents;
 
-    extents = XExtentsOfFontSet(fs);
-    return -extents->max_logical_extent.y;
+    extents = XExtents_ದ_Font_ಗಣ(fs);
+    ಹಿಂತಿರುಗಿ -extents->max_logical_extent.y;
 }
 
-#endif // FEAT_XFONTSET
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_XFONTSET
 
 /*
  * Return the Pixel value (color) for the given color name.
@@ -2131,14 +2131,14 @@ gui_mch_get_color(char_u *name)
     guicolor_T	requested;
 
     // can't do this when GUI not running
-    if (!gui.in_use || name == NULL || *name == NUL)
-	return INVALCOLOR;
+    ಆದರೆ (!gui.ಒಳ_use || name == ಖಾಲಿ || *name == NUL)
+	ಹಿಂತಿರುಗಿ INVALCOLOR;
 
     requested = gui_get_color_cmn(name);
-    if (requested == INVALCOLOR)
-	return INVALCOLOR;
+    ಆದರೆ (requested == INVALCOLOR)
+	ಹಿಂತಿರುಗಿ INVALCOLOR;
 
-    return gui_mch_get_rgb_color(
+    ಹಿಂತಿರುಗಿ gui_mch_get_rgb_color(
 	    (requested & 0xff0000) >> 16,
 	    (requested & 0xff00) >> 8,
 	    requested & 0xff);
@@ -2149,62 +2149,62 @@ gui_mch_get_color(char_u *name)
  * Return INVALCOLOR for error.
  */
     guicolor_T
-gui_mch_get_rgb_color(int r, int g, int b)
+gui_mch_get_rgb_color(ಪೂರ್ಣಾಂಕ r, ಪೂರ್ಣಾಂಕ g, ಪೂರ್ಣಾಂಕ b)
 {
-    XColor	available;
+    XColor	ಲಭ್ಯ;
     Colormap	colormap;
 
-#if 0
+#ಆದರೆ 0
 // Using XParseColor() is very slow, put rgb in XColor directly.
 
-    char	spec[8]; // space enough to hold "#RRGGBB"
-    vim_snprintf(spec, sizeof(spec), "#%.2x%.2x%.2x", r, g, b);
-    if (XParseColor(gui.dpy, colormap, (char *)spec, &available) != 0
-	    && XAllocColor(gui.dpy, colormap, &available) != 0)
-	return (guicolor_T)available.pixel;
-#endif
+    ಅಕ್ಷರ	spec[8]; // space enough to hold "#RRGGBB"
+    vim_snprintf(spec, ಗಾತ್ರ(spec), "#%.2x%.2x%.2x", r, g, b);
+    ಆದರೆ (XParseColor(gui.dpy, colormap, (ಅಕ್ಷರ *)spec, &ಲಭ್ಯ) != 0
+	    && XAllocColor(gui.dpy, colormap, &ಲಭ್ಯ) != 0)
+	ಹಿಂತಿರುಗಿ (guicolor_T)ಲಭ್ಯ.pixel;
+#ಆದರೆ_ಅಂತ್ಯ
     colormap = DefaultColormap(gui.dpy, DefaultScreen(gui.dpy));
-    CLEAR_FIELD(available);
-    available.red = r << 8;
-    available.green = g << 8;
-    available.blue = b << 8;
-    if (XAllocColor(gui.dpy, colormap, &available) != 0)
-	return (guicolor_T)available.pixel;
+    CLEAR_ಕ್ಷೇತ್ರ(ಲಭ್ಯ);
+    ಲಭ್ಯ.red = r << 8;
+    ಲಭ್ಯ.green = g << 8;
+    ಲಭ್ಯ.blue = b << 8;
+    ಆದರೆ (XAllocColor(gui.dpy, colormap, &ಲಭ್ಯ) != 0)
+	ಹಿಂತಿರುಗಿ (guicolor_T)ಲಭ್ಯ.pixel;
 
-    return INVALCOLOR;
+    ಹಿಂತಿರುಗಿ INVALCOLOR;
 }
 
 /*
  * Set the current text foreground color.
  */
-    void
-gui_mch_set_fg_color(guicolor_T color)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_fg_color(guicolor_T color)
 {
-    if (color == prev_fg_color)
-	return;
+    ಆದರೆ (color == prev_fg_color)
+	ಹಿಂತಿರುಗಿ;
 
-    XSetForeground(gui.dpy, gui.text_gc, (Pixel)color);
+    XSetForeground(gui.dpy, gui.ಪಠ್ಯ_gc, (Pixel)color);
     prev_fg_color = color;
 }
 
 /*
  * Set the current text background color.
  */
-    void
-gui_mch_set_bg_color(guicolor_T color)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_bg_color(guicolor_T color)
 {
-    if (color == prev_bg_color)
-	return;
+    ಆದರೆ (color == prev_bg_color)
+	ಹಿಂತಿರುಗಿ;
 
-    XSetBackground(gui.dpy, gui.text_gc, (Pixel)color);
+    XSetBackground(gui.dpy, gui.ಪಠ್ಯ_gc, (Pixel)color);
     prev_bg_color = color;
 }
 
 /*
  * Set the current text special color.
  */
-    void
-gui_mch_set_sp_color(guicolor_T color)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_sp_color(guicolor_T color)
 {
     prev_sp_color = color;
 }
@@ -2212,88 +2212,88 @@ gui_mch_set_sp_color(guicolor_T color)
 /*
  * create a mouse pointer that is blank
  */
-    static Cursor
-gui_x11_create_blank_mouse(void)
+    ಸ್ಥಿರ Cursor
+gui_x11_create_blank_mouse(ಶೂನ್ಯ)
 {
     Pixmap blank_pixmap = XCreatePixmap(gui.dpy, gui.wid, 1, 1, 1);
-    GC gc = XCreateGC(gui.dpy, blank_pixmap, (unsigned long)0, (XGCValues*)0);
+    GC gc = XCreateGC(gui.dpy, blank_pixmap, (ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ)0, (XGCValues*)0);
 
-    if (gc != NULL)
+    ಆದರೆ (gc != ಖಾಲಿ)
     {
-	XDrawPoint(gui.dpy, blank_pixmap, gc, 0, 0);
+	XDraw_ಬಿಂದು(gui.dpy, blank_pixmap, gc, 0, 0);
 	XFreeGC(gui.dpy, gc);
     }
-    return XCreatePixmapCursor(gui.dpy, blank_pixmap, blank_pixmap,
+    ಹಿಂತಿರುಗಿ XCreatePixmapCursor(gui.dpy, blank_pixmap, blank_pixmap,
 		     (XColor*)&gui.norm_pixel, (XColor*)&gui.norm_pixel, 0, 0);
 }
 
 /*
  * Draw a curled line at the bottom of the character cell.
  */
-    static void
-draw_curl(int row, int col, int cells)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+draw_curl(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು, ಪೂರ್ಣಾಂಕ cells)
 {
-    int			i;
-    int			offset;
-    static const int	val[8] = {1, 0, 0, 0, 1, 2, 2, 2 };
+    ಪೂರ್ಣಾಂಕ			i;
+    ಪೂರ್ಣಾಂಕ			ಸ್ಥಾನಾಂತರ;
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ	val[8] = {1, 0, 0, 0, 1, 2, 2, 2 };
 
-    XSetForeground(gui.dpy, gui.text_gc, prev_sp_color);
-    for (i = FILL_X(col); i < FILL_X(col + cells); ++i)
+    XSetForeground(gui.dpy, gui.ಪಠ್ಯ_gc, prev_sp_color);
+    ಗಾಗಿ (i = FILL_X(ಲಂಬಸಾಲು); i < FILL_X(ಲಂಬಸಾಲು + cells); ++i)
     {
-	offset = val[i % 8];
-	XDrawPoint(gui.dpy, gui.wid, gui.text_gc, i,
-						FILL_Y(row + 1) - 1 - offset);
+	ಸ್ಥಾನಾಂತರ = val[i % 8];
+	XDraw_ಬಿಂದು(gui.dpy, gui.wid, gui.ಪಠ್ಯ_gc, i,
+						FILL_Y(ಅಡ್ಡಸಾಲು + 1) - 1 - ಸ್ಥಾನಾಂತರ);
     }
-    XSetForeground(gui.dpy, gui.text_gc, prev_fg_color);
+    XSetForeground(gui.dpy, gui.ಪಠ್ಯ_gc, prev_fg_color);
 }
 
-    void
+    ಶೂನ್ಯ
 gui_mch_draw_string(
-    int		row,
-    int		col,
+    ಪೂರ್ಣಾಂಕ		ಅಡ್ಡಸಾಲು,
+    ಪೂರ್ಣಾಂಕ		ಲಂಬಸಾಲು,
     char_u	*s,
-    int		len,
-    int		flags)
+    ಪೂರ್ಣಾಂಕ		len,
+    ಪೂರ್ಣಾಂಕ		flags)
 {
-    int			cells = len;
-    static void		*buf = NULL;
-    static int		buflen = 0;
+    ಪೂರ್ಣಾಂಕ			cells = len;
+    ಸ್ಥಿರ ಶೂನ್ಯ		*buf = ಖಾಲಿ;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ		buflen = 0;
     char_u		*p;
-    int			wlen = 0;
-    int			c;
+    ಪೂರ್ಣಾಂಕ			wlen = 0;
+    ಪೂರ್ಣಾಂಕ			c;
 
-    if (enc_utf8)
+    ಆದರೆ (enc_utf8)
     {
 	// Convert UTF-8 byte sequence to 16 bit characters for the X
 	// functions.  Need a buffer for the 16 bit characters.  Keep it
 	// between calls, because allocating it each time is slow.
-	if (buflen < len)
+	ಆದರೆ (buflen < len)
 	{
-	    XtFree((char *)buf);
-	    buf = (void *)XtMalloc(len * (sizeof(XChar2b) < sizeof(wchar_t)
-					? sizeof(wchar_t) : sizeof(XChar2b)));
+	    XtFree((ಅಕ್ಷರ *)buf);
+	    buf = (ಶೂನ್ಯ *)XtMalloc(len * (ಗಾತ್ರ(XChar2b) < ಗಾತ್ರ(wchar_t)
+					? ಗಾತ್ರ(wchar_t) : ಗಾತ್ರ(XChar2b)));
 	    buflen = len;
 	}
 	p = s;
 	cells = 0;
-	while (p < s + len)
+	ಆಗ (p < s + len)
 	{
 	    c = utf_ptr2char(p);
-#ifdef FEAT_XFONTSET
-	    if (current_fontset != NULL)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XFONTSET
+	    ಆದರೆ (current_fontset != ಖಾಲಿ)
 	    {
 # ifdef SMALL_WCHAR_T
-		if (c >= 0x10000)
+		ಆದರೆ (c >= 0x10000)
 		    c = 0xbf;		// show chars > 0xffff as ?
 # endif
 		((wchar_t *)buf)[wlen] = c;
 	    }
-	    else
-#endif
+	    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 	    {
-		if (c >= 0x10000)
+		ಆದರೆ (c >= 0x10000)
 		    c = 0xbf;		// show chars > 0xffff as ?
-		((XChar2b *)buf)[wlen].byte1 = (unsigned)c >> 8;
+		((XChar2b *)buf)[wlen].byte1 = (ಚಿಹ್ನೆರಹಿತ)c >> 8;
 		((XChar2b *)buf)[wlen].byte2 = c;
 	    }
 	    ++wlen;
@@ -2301,18 +2301,18 @@ gui_mch_draw_string(
 	    p += utf_ptr2len(p);
 	}
     }
-    else if (has_mbyte)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (has_mbyte)
     {
 	cells = 0;
-	for (p = s; p < s + len; )
+	ಗಾಗಿ (p = s; p < s + len; )
 	{
 	    cells += ptr2cells(p);
 	    p += (*mb_ptr2len)(p);
 	}
     }
 
-#ifdef FEAT_XFONTSET
-    if (current_fontset != NULL)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XFONTSET
+    ಆದರೆ (current_fontset != ಖಾಲಿ)
     {
 	// Setup a clip rectangle to avoid spilling over in the next or
 	// previous line.  This is apparently needed for some fonts which are
@@ -2321,206 +2321,206 @@ gui_mch_draw_string(
 
 	clip.x = 0;
 	clip.y = 0;
-	clip.height = gui.char_height;
-	clip.width = gui.char_width * cells + 1;
-	XSetClipRectangles(gui.dpy, gui.text_gc, FILL_X(col), FILL_Y(row),
+	clip.ಎತ್ತರ = gui.char_ಎತ್ತರ;
+	clip.ಅಗಲ = gui.char_ಅಗಲ * cells + 1;
+	XSetClipRectangles(gui.dpy, gui.ಪಠ್ಯ_gc, FILL_X(ಲಂಬಸಾಲು), FILL_Y(ಅಡ್ಡಸಾಲು),
 		&clip, 1, Unsorted);
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (flags & DRAW_TRANSP)
+    ಆದರೆ (flags & DRAW_TRANSP)
     {
-	if (enc_utf8)
-	    XDrawString16(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col),
-		    TEXT_Y(row), buf, wlen);
-	else
-	    XDrawString(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col),
-		    TEXT_Y(row), (char *)s, len);
+	ಆದರೆ (enc_utf8)
+	    XDrawString16(gui.dpy, gui.wid, gui.ಪಠ್ಯ_gc, ಪಠ್ಯ_X(ಲಂಬಸಾಲು),
+		    ಪಠ್ಯ_Y(ಅಡ್ಡಸಾಲು), buf, wlen);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    XDrawString(gui.dpy, gui.wid, gui.ಪಠ್ಯ_gc, ಪಠ್ಯ_X(ಲಂಬಸಾಲು),
+		    ಪಠ್ಯ_Y(ಅಡ್ಡಸಾಲು), (ಅಕ್ಷರ *)s, len);
     }
-    else if (p_linespace != 0
-#ifdef FEAT_XFONTSET
-	    || current_fontset != NULL
-#endif
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p_linespace != 0
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XFONTSET
+	    || current_fontset != ಖಾಲಿ
+#ಆದರೆ_ಅಂತ್ಯ
 	    )
     {
-	XSetForeground(gui.dpy, gui.text_gc, prev_bg_color);
-	XFillRectangle(gui.dpy, gui.wid, gui.text_gc, FILL_X(col),
-		FILL_Y(row), gui.char_width * cells, gui.char_height);
-	XSetForeground(gui.dpy, gui.text_gc, prev_fg_color);
+	XSetForeground(gui.dpy, gui.ಪಠ್ಯ_gc, prev_bg_color);
+	XFillRectangle(gui.dpy, gui.wid, gui.ಪಠ್ಯ_gc, FILL_X(ಲಂಬಸಾಲು),
+		FILL_Y(ಅಡ್ಡಸಾಲು), gui.char_ಅಗಲ * cells, gui.char_ಎತ್ತರ);
+	XSetForeground(gui.dpy, gui.ಪಠ್ಯ_gc, prev_fg_color);
 
-	if (enc_utf8)
-	    XDrawString16(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col),
-		    TEXT_Y(row), buf, wlen);
-	else
-	    XDrawString(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col),
-		    TEXT_Y(row), (char *)s, len);
+	ಆದರೆ (enc_utf8)
+	    XDrawString16(gui.dpy, gui.wid, gui.ಪಠ್ಯ_gc, ಪಠ್ಯ_X(ಲಂಬಸಾಲು),
+		    ಪಠ್ಯ_Y(ಅಡ್ಡಸಾಲು), buf, wlen);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    XDrawString(gui.dpy, gui.wid, gui.ಪಠ್ಯ_gc, ಪಠ್ಯ_X(ಲಂಬಸಾಲು),
+		    ಪಠ್ಯ_Y(ಅಡ್ಡಸಾಲು), (ಅಕ್ಷರ *)s, len);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// XmbDrawImageString has bug, don't use it for fontset.
-	if (enc_utf8)
-	    XDrawImageString16(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col),
-		    TEXT_Y(row), buf, wlen);
-	else
-	    XDrawImageString(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col),
-		    TEXT_Y(row), (char *)s, len);
+	ಆದರೆ (enc_utf8)
+	    XDrawImageString16(gui.dpy, gui.wid, gui.ಪಠ್ಯ_gc, ಪಠ್ಯ_X(ಲಂಬಸಾಲು),
+		    ಪಠ್ಯ_Y(ಅಡ್ಡಸಾಲು), buf, wlen);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    XDrawImageString(gui.dpy, gui.wid, gui.ಪಠ್ಯ_gc, ಪಠ್ಯ_X(ಲಂಬಸಾಲು),
+		    ಪಠ್ಯ_Y(ಅಡ್ಡಸಾಲು), (ಅಕ್ಷರ *)s, len);
     }
 
     // Bold trick: draw the text again with a one-pixel offset.
-    if (flags & DRAW_BOLD)
+    ಆದರೆ (flags & DRAW_BOLD)
     {
-	if (enc_utf8)
-	    XDrawString16(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col) + 1,
-		    TEXT_Y(row), buf, wlen);
-	else
-	    XDrawString(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col) + 1,
-		    TEXT_Y(row), (char *)s, len);
+	ಆದರೆ (enc_utf8)
+	    XDrawString16(gui.dpy, gui.wid, gui.ಪಠ್ಯ_gc, ಪಠ್ಯ_X(ಲಂಬಸಾಲು) + 1,
+		    ಪಠ್ಯ_Y(ಅಡ್ಡಸಾಲು), buf, wlen);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    XDrawString(gui.dpy, gui.wid, gui.ಪಠ್ಯ_gc, ಪಠ್ಯ_X(ಲಂಬಸಾಲು) + 1,
+		    ಪಠ್ಯ_Y(ಅಡ್ಡಸಾಲು), (ಅಕ್ಷರ *)s, len);
     }
 
     // Undercurl: draw curl at the bottom of the character cell.
-    if (flags & DRAW_UNDERC)
-	draw_curl(row, col, cells);
+    ಆದರೆ (flags & DRAW_UNDERC)
+	draw_curl(ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು, cells);
 
     // Underline: draw a line at the bottom of the character cell.
-    if (flags & DRAW_UNDERL)
+    ಆದರೆ (flags & DRAW_UNDERL)
     {
-	int	y = FILL_Y(row + 1) - 1;
+	ಪೂರ್ಣಾಂಕ	y = FILL_Y(ಅಡ್ಡಸಾಲು + 1) - 1;
 
 	// When p_linespace is 0, overwrite the bottom row of pixels.
 	// Otherwise put the line just below the character.
-	if (p_linespace > 1)
+	ಆದರೆ (p_linespace > 1)
 	    y -= p_linespace - 1;
-	XDrawLine(gui.dpy, gui.wid, gui.text_gc, FILL_X(col),
-		y, FILL_X(col + cells) - 1, y);
+	XDraw_ಸಾಲು(gui.dpy, gui.wid, gui.ಪಠ್ಯ_gc, FILL_X(ಲಂಬಸಾಲು),
+		y, FILL_X(ಲಂಬಸಾಲು + cells) - 1, y);
     }
 
-    if (flags & DRAW_STRIKE)
+    ಆದರೆ (flags & DRAW_STRIKE)
     {
-	int	y = FILL_Y(row + 1) - gui.char_height/2;
+	ಪೂರ್ಣಾಂಕ	y = FILL_Y(ಅಡ್ಡಸಾಲು + 1) - gui.char_ಎತ್ತರ/2;
 
-	XSetForeground(gui.dpy, gui.text_gc, prev_sp_color);
-	XDrawLine(gui.dpy, gui.wid, gui.text_gc, FILL_X(col),
-		y, FILL_X(col + cells) - 1, y);
-	XSetForeground(gui.dpy, gui.text_gc, prev_fg_color);
+	XSetForeground(gui.dpy, gui.ಪಠ್ಯ_gc, prev_sp_color);
+	XDraw_ಸಾಲು(gui.dpy, gui.wid, gui.ಪಠ್ಯ_gc, FILL_X(ಲಂಬಸಾಲು),
+		y, FILL_X(ಲಂಬಸಾಲು + cells) - 1, y);
+	XSetForeground(gui.dpy, gui.ಪಠ್ಯ_gc, prev_fg_color);
     }
 
-#ifdef FEAT_XFONTSET
-    if (current_fontset != NULL)
-	XSetClipMask(gui.dpy, gui.text_gc, None);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XFONTSET
+    ಆದರೆ (current_fontset != ಖಾಲಿ)
+	XSet_Clip_ಮುಖವಾಡ(gui.dpy, gui.ಪಠ್ಯ_gc, None);
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*
  * Return OK if the key with the termcap name "name" is supported.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 gui_mch_haskey(char_u *name)
 {
-    int i;
+    ಪೂರ್ಣಾಂಕ i;
 
-    for (i = 0; special_keys[i].key_sym != (KeySym)0; i++)
-	if (name[0] == special_keys[i].vim_code0 &&
-					 name[1] == special_keys[i].vim_code1)
-	    return OK;
-    return FAIL;
+    ಗಾಗಿ (i = 0; special_ಕೀಲಿಗಳು[i].ಕೀಲಿ_sym != (ಕೀಲಿ_Sym)0; i++)
+	ಆದರೆ (name[0] == special_ಕೀಲಿಗಳು[i].vim_code0 &&
+					 name[1] == special_ಕೀಲಿಗಳು[i].vim_code1)
+	    ಹಿಂತಿರುಗಿ OK;
+    ಹಿಂತಿರುಗಿ FAIL;
 }
 
 /*
  * Return the text window-id and display.  Only required for X-based GUI's
  */
-    int
-gui_get_x11_windis(Window *win, Display **dis)
+    ಪೂರ್ಣಾಂಕ
+gui_get_x11_windis(ಕಿಟಕಿ *win, Display **dis)
 {
-    *win = XtWindow(vimShell);
+    *win = Xt_ಕಿಟಕಿ(vimShell);
     *dis = gui.dpy;
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-    void
-gui_mch_beep(void)
+    ಶೂನ್ಯ
+gui_mch_beep(ಶೂನ್ಯ)
 {
     XBell(gui.dpy, 0);
 }
 
-    void
-gui_mch_flash(int msec)
+    ಶೂನ್ಯ
+gui_mch_flash(ಪೂರ್ಣಾಂಕ msec)
 {
     // Do a visual beep by reversing the foreground and background colors
     XFillRectangle(gui.dpy, gui.wid, gui.invert_gc, 0, 0,
-	    FILL_X((int)Columns) + gui.border_offset,
-	    FILL_Y((int)Rows) + gui.border_offset);
+	    FILL_X((ಪೂರ್ಣಾಂಕ)Columns) + gui.border_ಸ್ಥಾನಾಂತರ,
+	    FILL_Y((ಪೂರ್ಣಾಂಕ)ಅಡ್ಡಸಾಲುಗಳು) + gui.border_ಸ್ಥಾನಾಂತರ);
     XSync(gui.dpy, False);
-    ui_delay((long)msec, TRUE);	// wait for a few msec
+    ui_delay((ದೀರ್ಘ)msec, TRUE);	// wait for a few msec
     XFillRectangle(gui.dpy, gui.wid, gui.invert_gc, 0, 0,
-	    FILL_X((int)Columns) + gui.border_offset,
-	    FILL_Y((int)Rows) + gui.border_offset);
+	    FILL_X((ಪೂರ್ಣಾಂಕ)Columns) + gui.border_ಸ್ಥಾನಾಂತರ,
+	    FILL_Y((ಪೂರ್ಣಾಂಕ)ಅಡ್ಡಸಾಲುಗಳು) + gui.border_ಸ್ಥಾನಾಂತರ);
 }
 
 /*
  * Invert a rectangle from row r, column c, for nr rows and nc columns.
  */
-    void
+    ಶೂನ್ಯ
 gui_mch_invert_rectangle(
-    int	    r,
-    int	    c,
-    int	    nr,
-    int	    nc)
+    ಪೂರ್ಣಾಂಕ	    r,
+    ಪೂರ್ಣಾಂಕ	    c,
+    ಪೂರ್ಣಾಂಕ	    nr,
+    ಪೂರ್ಣಾಂಕ	    nc)
 {
     XFillRectangle(gui.dpy, gui.wid, gui.invert_gc,
-	FILL_X(c), FILL_Y(r), (nc) * gui.char_width, (nr) * gui.char_height);
+	FILL_X(c), FILL_Y(r), (nc) * gui.char_ಅಗಲ, (nr) * gui.char_ಎತ್ತರ);
 }
 
 /*
  * Iconify the GUI window.
  */
-    void
-gui_mch_iconify(void)
+    ಶೂನ್ಯ
+gui_mch_iconify(ಶೂನ್ಯ)
 {
-    XIconifyWindow(gui.dpy, XtWindow(vimShell), DefaultScreen(gui.dpy));
+    XIconify_ಕಿಟಕಿ(gui.dpy, Xt_ಕಿಟಕಿ(vimShell), DefaultScreen(gui.dpy));
 }
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 /*
  * Bring the Vim window to the foreground.
  */
-    void
-gui_mch_set_foreground(void)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_foreground(ಶೂನ್ಯ)
 {
-    XMapRaised(gui.dpy, XtWindow(vimShell));
+    XMapRaised(gui.dpy, Xt_ಕಿಟಕಿ(vimShell));
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Draw a cursor without focus.
  */
-    void
+    ಶೂನ್ಯ
 gui_mch_draw_hollow_cursor(guicolor_T color)
 {
-    int		w = 1;
+    ಪೂರ್ಣಾಂಕ		w = 1;
 
-    if (mb_lefthalve(gui.row, gui.col))
+    ಆದರೆ (mb_lefthalve(gui.ಅಡ್ಡಸಾಲು, gui.ಲಂಬಸಾಲು))
 	w = 2;
-    gui_mch_set_fg_color(color);
-    XDrawRectangle(gui.dpy, gui.wid, gui.text_gc, FILL_X(gui.col),
-	    FILL_Y(gui.row), w * gui.char_width - 1, gui.char_height - 1);
+    gui_mch_ಗಣ_fg_color(color);
+    XDrawRectangle(gui.dpy, gui.wid, gui.ಪಠ್ಯ_gc, FILL_X(gui.ಲಂಬಸಾಲು),
+	    FILL_Y(gui.ಅಡ್ಡಸಾಲು), w * gui.char_ಅಗಲ - 1, gui.char_ಎತ್ತರ - 1);
 }
 
 /*
  * Draw part of a cursor, "w" pixels wide, and "h" pixels high, using
  * color "color".
  */
-    void
-gui_mch_draw_part_cursor(int w, int h, guicolor_T color)
+    ಶೂನ್ಯ
+gui_mch_draw_part_cursor(ಪೂರ್ಣಾಂಕ w, ಪೂರ್ಣಾಂಕ h, guicolor_T color)
 {
-    gui_mch_set_fg_color(color);
+    gui_mch_ಗಣ_fg_color(color);
 
-    XFillRectangle(gui.dpy, gui.wid, gui.text_gc,
-#ifdef FEAT_RIGHTLEFT
+    XFillRectangle(gui.dpy, gui.wid, gui.ಪಠ್ಯ_gc,
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_RIGHTLEFT
 	    // vertical line should be on the right of current point
-	    CURSOR_BAR_RIGHT ? FILL_X(gui.col + 1) - w :
-#endif
-		FILL_X(gui.col),
-	    FILL_Y(gui.row) + gui.char_height - h,
+	    CURSOR_BAR_ಬಲ ? FILL_X(gui.ಲಂಬಸಾಲು + 1) - w :
+#ಆದರೆ_ಅಂತ್ಯ
+		FILL_X(gui.ಲಂಬಸಾಲು),
+	    FILL_Y(gui.ಅಡ್ಡಸಾಲು) + gui.char_ಎತ್ತರ - h,
 	    w, h);
 }
 
@@ -2530,19 +2530,19 @@ gui_mch_draw_part_cursor(int w, int h, guicolor_T color)
  * nothing in the X event queue (& no timers pending), then we return
  * immediately.
  */
-    void
-gui_mch_update(void)
+    ಶೂನ್ಯ
+gui_mch_update(ಶೂನ್ಯ)
 {
-    XtInputMask mask, desired;
+    Xt_ಒಳಹರಿವು_ಮುಖವಾಡ ಮುಖವಾಡ, desired;
 
-#ifdef ALT_X_INPUT
-    if (suppress_alternate_input)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ALT_X_ಒಳಹರಿವು
+    ಆದರೆ (suppress_alternate_ಒಳಹರಿವು)
 	desired = (XtIMXEvent | XtIMTimer);
-    else
-#endif
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
 	desired = (XtIMAll);
-    while ((mask = XtAppPending(app_context)) && (mask & desired)
-	    && !vim_is_input_buf_full())
+    ಆಗ ((ಮುಖವಾಡ = XtAppPending(app_context)) && (ಮುಖವಾಡ & desired)
+	    && !vim_is_ಒಳಹರಿವು_buf_ತುಂಬಿದ())
 	XtAppProcessEvent(app_context, desired);
 }
 
@@ -2555,62 +2555,62 @@ gui_mch_update(void)
  * Returns OK if a character was found to be available within the given time,
  * or FAIL otherwise.
  */
-    int
-gui_mch_wait_for_chars(long wtime)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_wait_for_chars(ದೀರ್ಘ wtime)
 {
-    int	    focus;
-    int	    retval = FAIL;
+    ಪೂರ್ಣಾಂಕ	    focus;
+    ಪೂರ್ಣಾಂಕ	    retval = FAIL;
 
     /*
      * Make this static, in case gui_x11_timer_cb is called after leaving
      * this function (otherwise a random value on the stack may be changed).
      */
-    static int	    timed_out;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    timed_ಹೊರಹೋಗು;
     XtIntervalId    timer = (XtIntervalId)0;
-    XtInputMask	    desired;
-#ifdef FEAT_JOB_CHANNEL
+    Xt_ಒಳಹರಿವು_ಮುಖವಾಡ	    desired;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕೆಲಸ_CHANNEL
     XtIntervalId    channel_timer = (XtIntervalId)0;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    timed_out = FALSE;
+    timed_ಹೊರಹೋಗು = FALSE;
 
-    if (wtime >= 0)
-	timer = XtAppAddTimeOut(app_context,
+    ಆದರೆ (wtime >= 0)
+	timer = Xt_App_ಕೂಡಿಸು_ಸಮಯ_ಹೊರಹೋಗು(app_context,
 				(long_u)(wtime == 0 ? 1L : wtime),
-						 gui_x11_timer_cb, &timed_out);
-#ifdef FEAT_JOB_CHANNEL
+						 gui_x11_timer_cb, &timed_ಹೊರಹೋಗು);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕೆಲಸ_CHANNEL
     // If there is a channel with the keep_open flag we need to poll for input
     // on them.
-    if (channel_any_keep_open())
-	channel_timer = XtAppAddTimeOut(app_context, (long_u)20,
-				   channel_poll_cb, (XtPointer)&channel_timer);
-#endif
+    ಆದರೆ (channel_any_keep_open())
+	channel_timer = Xt_App_ಕೂಡಿಸು_ಸಮಯ_ಹೊರಹೋಗು(app_context, (long_u)20,
+				   channel_poll_cb, (Xt_ಸೂಚಕ)&channel_timer);
+#ಆದರೆ_ಅಂತ್ಯ
 
-    focus = gui.in_focus;
+    focus = gui.ಒಳ_focus;
     desired = (XtIMAll);
-    while (!timed_out)
+    ಆಗ (!timed_ಹೊರಹೋಗು)
     {
 	// Stop or start blinking when focus changes
-	if (gui.in_focus != focus)
+	ಆದರೆ (gui.ಒಳ_focus != focus)
 	{
-	    if (gui.in_focus)
-		gui_mch_start_blink();
-	    else
+	    ಆದರೆ (gui.ಒಳ_focus)
+		gui_mch_ಆರಂಭ_blink();
+	    ಇಲ್ಲದಿದ್ದರೆ
 		gui_mch_stop_blink(TRUE);
-	    focus = gui.in_focus;
+	    focus = gui.ಒಳ_focus;
 	}
 
-#ifdef MESSAGE_QUEUE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ಸಂದೇಶ_ಸರತಿ
 # ifdef FEAT_TIMERS
-	did_add_timer = FALSE;
+	did_ಕೂಡಿಸು_timer = FALSE;
 # endif
 	parse_queued_messages();
 # ifdef FEAT_TIMERS
-	if (did_add_timer)
+	ಆದರೆ (did_ಕೂಡಿಸು_timer)
 	    // Need to recompute the waiting time.
-	    break;
+	    ನಿಲ್ಲಿಸು;
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 	/*
 	 * Don't use gui_mch_update() because then we will spin-lock until a
@@ -2622,21 +2622,21 @@ gui_mch_wait_for_chars(long wtime)
 	 */
 	XtAppProcessEvent(app_context, desired);
 
-	if (input_available())
+	ಆದರೆ (ಒಳಹರಿವು_ಲಭ್ಯ())
 	{
 	    retval = OK;
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
     }
 
-    if (timer != (XtIntervalId)0 && !timed_out)
-	XtRemoveTimeOut(timer);
-#ifdef FEAT_JOB_CHANNEL
-    if (channel_timer != (XtIntervalId)0)
-	XtRemoveTimeOut(channel_timer);
-#endif
+    ಆದರೆ (timer != (XtIntervalId)0 && !timed_ಹೊರಹೋಗು)
+	Xt_Remove_ಸಮಯ_ಹೊರಹೋಗು(timer);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕೆಲಸ_CHANNEL
+    ಆದರೆ (channel_timer != (XtIntervalId)0)
+	Xt_Remove_ಸಮಯ_ಹೊರಹೋಗು(channel_timer);
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
 /*
@@ -2646,8 +2646,8 @@ gui_mch_wait_for_chars(long wtime)
 /*
  * Flush any output to the screen
  */
-    void
-gui_mch_flush(void)
+    ಶೂನ್ಯ
+gui_mch_flush(ಶೂನ್ಯ)
 {
     XFlush(gui.dpy);
 }
@@ -2656,26 +2656,26 @@ gui_mch_flush(void)
  * Clear a rectangular region of the screen from text pos (row1, col1) to
  * (row2, col2) inclusive.
  */
-    void
-gui_mch_clear_block(
-    int		row1,
-    int		col1,
-    int		row2,
-    int		col2)
+    ಶೂನ್ಯ
+gui_mch_clear_ಖಂಡ(
+    ಪೂರ್ಣಾಂಕ		row1,
+    ಪೂರ್ಣಾಂಕ		col1,
+    ಪೂರ್ಣಾಂಕ		row2,
+    ಪೂರ್ಣಾಂಕ		col2)
 {
-    int		x;
+    ಪೂರ್ಣಾಂಕ		x;
 
     x = FILL_X(col1);
 
     // Clear one extra pixel at the far right, for when bold characters have
     // spilled over to the next column.
-    XFillRectangle(gui.dpy, gui.wid, gui.back_gc, x, FILL_Y(row1),
-	    (col2 - col1 + 1) * gui.char_width + (col2 == Columns - 1),
-	    (row2 - row1 + 1) * gui.char_height);
+    XFillRectangle(gui.dpy, gui.wid, gui.ಹಿಂಭಾಗ_gc, x, FILL_Y(row1),
+	    (col2 - col1 + 1) * gui.char_ಅಗಲ + (col2 == Columns - 1),
+	    (row2 - row1 + 1) * gui.char_ಎತ್ತರ);
 }
 
-    void
-gui_mch_clear_all(void)
+    ಶೂನ್ಯ
+gui_mch_clear_all(ಶೂನ್ಯ)
 {
     XClearArea(gui.dpy, gui.wid, 0, 0, 0, 0, False);
 }
@@ -2684,24 +2684,24 @@ gui_mch_clear_all(void)
  * Delete the given number of lines from the given row, scrolling up any
  * text further down within the scroll region.
  */
-    void
-gui_mch_delete_lines(int row, int num_lines)
+    ಶೂನ್ಯ
+gui_mch_delete_ಸಾಲುಗಳು(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು, ಪೂರ್ಣಾಂಕ ಅಂಕೆ_ಸಾಲುಗಳು)
 {
-    if (gui.visibility == VisibilityFullyObscured)
-	return;	    // Can't see the window
+    ಆದರೆ (gui.visibility == VisibilityFullyObscured)
+	ಹಿಂತಿರುಗಿ;	    // Can't see the window
 
     // copy one extra pixel at the far right, for when bold has spilled
     // over
-    XCopyArea(gui.dpy, gui.wid, gui.wid, gui.text_gc,
-	FILL_X(gui.scroll_region_left), FILL_Y(row + num_lines),
-	gui.char_width * (gui.scroll_region_right - gui.scroll_region_left + 1)
-			       + (gui.scroll_region_right == Columns - 1),
-	gui.char_height * (gui.scroll_region_bot - row - num_lines + 1),
-	FILL_X(gui.scroll_region_left), FILL_Y(row));
+    XCopyArea(gui.dpy, gui.wid, gui.wid, gui.ಪಠ್ಯ_gc,
+	FILL_X(gui.scroll_region_ಎಡ), FILL_Y(ಅಡ್ಡಸಾಲು + ಅಂಕೆ_ಸಾಲುಗಳು),
+	gui.char_ಅಗಲ * (gui.scroll_region_ಬಲ - gui.scroll_region_ಎಡ + 1)
+			       + (gui.scroll_region_ಬಲ == Columns - 1),
+	gui.char_ಎತ್ತರ * (gui.scroll_region_bot - ಅಡ್ಡಸಾಲು - ಅಂಕೆ_ಸಾಲುಗಳು + 1),
+	FILL_X(gui.scroll_region_ಎಡ), FILL_Y(ಅಡ್ಡಸಾಲು));
 
-    gui_clear_block(gui.scroll_region_bot - num_lines + 1,
-						       gui.scroll_region_left,
-			  gui.scroll_region_bot, gui.scroll_region_right);
+    gui_clear_ಖಂಡ(gui.scroll_region_bot - ಅಂಕೆ_ಸಾಲುಗಳು + 1,
+						       gui.scroll_region_ಎಡ,
+			  gui.scroll_region_bot, gui.scroll_region_ಬಲ);
     gui_x11_check_copy_area();
 }
 
@@ -2709,52 +2709,52 @@ gui_mch_delete_lines(int row, int num_lines)
  * Insert the given number of lines before the given row, scrolling down any
  * following text within the scroll region.
  */
-    void
-gui_mch_insert_lines(int row, int num_lines)
+    ಶೂನ್ಯ
+gui_mch_ಸೇರಿಸು_ಸಾಲುಗಳು(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು, ಪೂರ್ಣಾಂಕ ಅಂಕೆ_ಸಾಲುಗಳು)
 {
-    if (gui.visibility == VisibilityFullyObscured)
-	return;	    // Can't see the window
+    ಆದರೆ (gui.visibility == VisibilityFullyObscured)
+	ಹಿಂತಿರುಗಿ;	    // Can't see the window
 
     // copy one extra pixel at the far right, for when bold has spilled
     // over
-    XCopyArea(gui.dpy, gui.wid, gui.wid, gui.text_gc,
-	FILL_X(gui.scroll_region_left), FILL_Y(row),
-	gui.char_width * (gui.scroll_region_right - gui.scroll_region_left + 1)
-			       + (gui.scroll_region_right == Columns - 1),
-	gui.char_height * (gui.scroll_region_bot - row - num_lines + 1),
-	FILL_X(gui.scroll_region_left), FILL_Y(row + num_lines));
+    XCopyArea(gui.dpy, gui.wid, gui.wid, gui.ಪಠ್ಯ_gc,
+	FILL_X(gui.scroll_region_ಎಡ), FILL_Y(ಅಡ್ಡಸಾಲು),
+	gui.char_ಅಗಲ * (gui.scroll_region_ಬಲ - gui.scroll_region_ಎಡ + 1)
+			       + (gui.scroll_region_ಬಲ == Columns - 1),
+	gui.char_ಎತ್ತರ * (gui.scroll_region_bot - ಅಡ್ಡಸಾಲು - ಅಂಕೆ_ಸಾಲುಗಳು + 1),
+	FILL_X(gui.scroll_region_ಎಡ), FILL_Y(ಅಡ್ಡಸಾಲು + ಅಂಕೆ_ಸಾಲುಗಳು));
 
-    gui_clear_block(row, gui.scroll_region_left,
-				row + num_lines - 1, gui.scroll_region_right);
+    gui_clear_ಖಂಡ(ಅಡ್ಡಸಾಲು, gui.scroll_region_ಎಡ,
+				ಅಡ್ಡಸಾಲು + ಅಂಕೆ_ಸಾಲುಗಳು - 1, gui.scroll_region_ಬಲ);
     gui_x11_check_copy_area();
 }
 
 /*
  * Update the region revealed by scrolling up/down.
  */
-    static void
-gui_x11_check_copy_area(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+gui_x11_check_copy_area(ಶೂನ್ಯ)
 {
     XEvent		    event;
     XGraphicsExposeEvent    *gevent;
 
-    if (gui.visibility != VisibilityPartiallyObscured)
-	return;
+    ಆದರೆ (gui.visibility != VisibilityPartiallyObscured)
+	ಹಿಂತಿರುಗಿ;
 
     XFlush(gui.dpy);
 
     // Wait to check whether the scroll worked or not
-    for (;;)
+    ಗಾಗಿ (;;)
     {
-	if (XCheckTypedEvent(gui.dpy, NoExpose, &event))
-	    return;	// The scroll worked.
+	ಆದರೆ (XCheckTypedEvent(gui.dpy, NoExpose, &event))
+	    ಹಿಂತಿರುಗಿ;	// The scroll worked.
 
-	if (XCheckTypedEvent(gui.dpy, GraphicsExpose, &event))
+	ಆದರೆ (XCheckTypedEvent(gui.dpy, GraphicsExpose, &event))
 	{
 	    gevent = (XGraphicsExposeEvent *)&event;
-	    gui_redraw(gevent->x, gevent->y, gevent->width, gevent->height);
-	    if (gevent->count == 0)
-		return;		// This was the last expose event
+	    gui_redraw(gevent->x, gevent->y, gevent->ಅಗಲ, gevent->ಎತ್ತರ);
+	    ಆದರೆ (gevent->ಎಣಿಕೆ_2 == 0)
+		ಹಿಂತಿರುಗಿ;		// This was the last expose event
 	}
 	XSync(gui.dpy, False);
     }
@@ -2764,32 +2764,32 @@ gui_x11_check_copy_area(void)
  * X Selection stuff, for cutting and pasting text to other windows.
  */
 
-    void
+    ಶೂನ್ಯ
 clip_mch_lose_selection(Clipboard_T *cbd)
 {
     clip_x11_lose_selection(vimShell, cbd);
 }
 
-    int
+    ಪೂರ್ಣಾಂಕ
 clip_mch_own_selection(Clipboard_T *cbd)
 {
-    return clip_x11_own_selection(vimShell, cbd);
+    ಹಿಂತಿರುಗಿ clip_x11_own_selection(vimShell, cbd);
 }
 
-    void
+    ಶೂನ್ಯ
 clip_mch_request_selection(Clipboard_T *cbd)
 {
  clip_x11_request_selection(vimShell, gui.dpy, cbd);
 }
 
-    void
-clip_mch_set_selection(
+    ಶೂನ್ಯ
+clip_mch_ಗಣ_selection(
     Clipboard_T	*cbd)
 {
-    clip_x11_set_selection(cbd);
+    clip_x11_ಗಣ_selection(cbd);
 }
 
-#if defined(FEAT_MENU)
+#ಆದರೆ defined(FEAT_MENU)
 /*
  * Menu stuff.
  */
@@ -2797,57 +2797,57 @@ clip_mch_set_selection(
 /*
  * Make a menu either grey or not grey.
  */
-    void
-gui_mch_menu_grey(vimmenu_T *menu, int grey)
+    ಶೂನ್ಯ
+gui_mch_menu_grey(vimmenu_T *menu, ಪೂರ್ಣಾಂಕ grey)
 {
-    if (menu->id == (Widget)0)
-	return;
+    ಆದರೆ (menu->id == (Widget)0)
+	ಹಿಂತಿರುಗಿ;
 
     gui_mch_menu_hidden(menu, False);
-    if (grey
+    ಆದರೆ (grey
 # ifdef FEAT_GUI_MOTIF
 	    || !menu->sensitive
 # endif
        )
-	XtSetSensitive(menu->id, False);
-    else
-	XtSetSensitive(menu->id, True);
+	Xt_ಗಣ_Sensitive(menu->id, False);
+    ಇಲ್ಲದಿದ್ದರೆ
+	Xt_ಗಣ_Sensitive(menu->id, True);
 }
 
 /*
  * Make menu item hidden or not hidden
  */
-    void
-gui_mch_menu_hidden(vimmenu_T *menu, int hidden)
+    ಶೂನ್ಯ
+gui_mch_menu_hidden(vimmenu_T *menu, ಪೂರ್ಣಾಂಕ hidden)
 {
-    if (menu->id == (Widget)0)
-	return;
+    ಆದರೆ (menu->id == (Widget)0)
+	ಹಿಂತಿರುಗಿ;
 
-    if (hidden)
-	XtUnmanageChild(menu->id);
-    else
-	XtManageChild(menu->id);
+    ಆದರೆ (hidden)
+	Xt_Unmanage_ಮಗು(menu->id);
+    ಇಲ್ಲದಿದ್ದರೆ
+	Xt_Manage_ಮಗು(menu->id);
 }
 
 /*
  * This is called after setting all the menus to grey/hidden or not.
  */
-    void
-gui_mch_draw_menubar(void)
+    ಶೂನ್ಯ
+gui_mch_draw_menubar(ಶೂನ್ಯ)
 {
     // Nothing to do in X
 }
 
-    void
+    ಶೂನ್ಯ
 gui_x11_menu_cb(
-    Widget	w UNUSED,
-    XtPointer	client_data,
-    XtPointer	call_data UNUSED)
+    Widget	w ಬಳಸದ,
+    Xt_ಸೂಚಕ	client_ದತ್ತಾಂಶ_2,
+    Xt_ಸೂಚಕ	call_ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    gui_menu_cb((vimmenu_T *)client_data);
+    gui_menu_cb((vimmenu_T *)client_ದತ್ತಾಂಶ_2);
 }
 
-#endif // FEAT_MENU
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_MENU
 
 
 
@@ -2855,62 +2855,62 @@ gui_x11_menu_cb(
  * Function called when window closed.	Works like ":qa".
  * Should put up a requester!
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 gui_x11_wm_protocol_handler(
-    Widget	w UNUSED,
-    XtPointer	client_data UNUSED,
+    Widget	w ಬಳಸದ,
+    Xt_ಸೂಚಕ	client_ದತ್ತಾಂಶ_2 ಬಳಸದ,
     XEvent	*event,
-    Boolean	*dum UNUSED)
+    Boolean	*dum ಬಳಸದ)
 {
     /*
      * Only deal with Client messages.
      */
-    if (event->type != ClientMessage)
-	return;
+    ಆದರೆ (event->type != Client_ಸಂದೇಶ)
+	ಹಿಂತಿರುಗಿ;
 
     /*
      * The WM_SAVE_YOURSELF event arrives when the window manager wants to
      * exit.  That can be cancelled though, thus Vim shouldn't exit here.
      * Just sync our swap files.
      */
-    if ((Atom)((XClientMessageEvent *)event)->data.l[0] ==
+    ಆದರೆ ((Atom)((XClient_ಸಂದೇಶ_Event *)event)->ದತ್ತಾಂಶ.l[0] ==
 						  wm_atoms[SAVE_YOURSELF_IDX])
     {
-	out_flush();
+	ಹೊರಹೋಗು_flush();
 	ml_sync_all(FALSE, FALSE);	// preserve all swap files
 
 	// Set the window's WM_COMMAND property, to let the window manager
 	// know we are done saving ourselves.  We don't want to be restarted,
 	// thus set argv to NULL.
-	XSetCommand(gui.dpy, XtWindow(vimShell), NULL, 0);
-	return;
+	XSetCommand(gui.dpy, Xt_ಕಿಟಕಿ(vimShell), ಖಾಲಿ, 0);
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if ((Atom)((XClientMessageEvent *)event)->data.l[0] !=
-						  wm_atoms[DELETE_WINDOW_IDX])
-	return;
+    ಆದರೆ ((Atom)((XClient_ಸಂದೇಶ_Event *)event)->ದತ್ತಾಂಶ.l[0] !=
+						  wm_atoms[DELETE_ಕಿಟಕಿ_IDX])
+	ಹಿಂತಿರುಗಿ;
 
     gui_shell_closed();
 }
 
-#ifdef FEAT_CLIENTSERVER
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_CLIENTSERVER
 /*
  * Function called when property changed. Check for incoming commands
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 gui_x11_send_event_handler(
-    Widget	w UNUSED,
-    XtPointer	client_data UNUSED,
+    Widget	w ಬಳಸದ,
+    Xt_ಸೂಚಕ	client_ದತ್ತಾಂಶ_2 ಬಳಸದ,
     XEvent	*event,
-    Boolean	*dum UNUSED)
+    Boolean	*dum ಬಳಸದ)
 {
     XPropertyEvent *e = (XPropertyEvent *) event;
 
-    if (e->type == PropertyNotify && e->window == commWindow
-	    && e->atom == commProperty &&  e->state == PropertyNewValue)
+    ಆದರೆ (e->type == PropertyNotify && e->ಕಿಟಕಿ_2 == comm_ಕಿಟಕಿ
+	    && e->atom == commProperty &&  e->state == Property_New_ಮೌಲ್ಯ)
 	serverEventProc(gui.dpy, event, 0);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Cursor blink functions.
@@ -2921,30 +2921,30 @@ gui_x11_send_event_handler(
  * BLINK_ON	blinking, cursor is shown
  */
 
-#define BLINK_NONE  0
-#define BLINK_OFF   1
-#define BLINK_ON    2
+#ವ್ಯಾಖ್ಯಾನಿಸು BLINK_NONE  0
+#ವ್ಯಾಖ್ಯಾನಿಸು BLINK_OFF   1
+#ವ್ಯಾಖ್ಯಾನಿಸು BLINK_ON    2
 
-static int		blink_state = BLINK_NONE;
-static long_u		blink_waittime = 700;
-static long_u		blink_ontime = 400;
-static long_u		blink_offtime = 250;
-static XtIntervalId	blink_timer = (XtIntervalId)0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ		blink_state = BLINK_NONE;
+ಸ್ಥಿರ long_u		blink_waittime = 700;
+ಸ್ಥಿರ long_u		blink_ontime = 400;
+ಸ್ಥಿರ long_u		blink_offtime = 250;
+ಸ್ಥಿರ XtIntervalId	blink_timer = (XtIntervalId)0;
 
-    int
-gui_mch_is_blinking(void)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_is_blinking(ಶೂನ್ಯ)
 {
-    return blink_state != BLINK_NONE;
+    ಹಿಂತಿರುಗಿ blink_state != BLINK_NONE;
 }
 
-    int
-gui_mch_is_blink_off(void)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_is_blink_off(ಶೂನ್ಯ)
 {
-    return blink_state == BLINK_OFF;
+    ಹಿಂತಿರುಗಿ blink_state == BLINK_OFF;
 }
 
-    void
-gui_mch_set_blinking(long waittime, long on, long off)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_blinking(ದೀರ್ಘ waittime, ದೀರ್ಘ on, ದೀರ್ಘ off)
 {
     blink_waittime = waittime;
     blink_ontime = on;
@@ -2954,37 +2954,37 @@ gui_mch_set_blinking(long waittime, long on, long off)
 /*
  * Stop the cursor blinking.  Show the cursor if it wasn't shown.
  */
-    void
-gui_mch_stop_blink(int may_call_gui_update_cursor)
+    ಶೂನ್ಯ
+gui_mch_stop_blink(ಪೂರ್ಣಾಂಕ may_call_gui_update_cursor)
 {
-    if (blink_timer != (XtIntervalId)0)
+    ಆದರೆ (blink_timer != (XtIntervalId)0)
     {
-	XtRemoveTimeOut(blink_timer);
+	Xt_Remove_ಸಮಯ_ಹೊರಹೋಗು(blink_timer);
 	blink_timer = (XtIntervalId)0;
     }
-    if (blink_state == BLINK_OFF && may_call_gui_update_cursor)
+    ಆದರೆ (blink_state == BLINK_OFF && may_call_gui_update_cursor)
 	gui_update_cursor(TRUE, FALSE);
     blink_state = BLINK_NONE;
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 gui_x11_blink_cb(
-    XtPointer	    timed_out UNUSED,
-    XtIntervalId    *interval_id UNUSED)
+    Xt_ಸೂಚಕ	    timed_ಹೊರಹೋಗು ಬಳಸದ,
+    XtIntervalId    *interval_id ಬಳಸದ)
 {
-    if (blink_state == BLINK_ON)
+    ಆದರೆ (blink_state == BLINK_ON)
     {
 	gui_undraw_cursor();
 	blink_state = BLINK_OFF;
-	blink_timer = XtAppAddTimeOut(app_context, blink_offtime,
-						      gui_x11_blink_cb, NULL);
+	blink_timer = Xt_App_ಕೂಡಿಸು_ಸಮಯ_ಹೊರಹೋಗು(app_context, blink_offtime,
+						      gui_x11_blink_cb, ಖಾಲಿ);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	gui_update_cursor(TRUE, FALSE);
 	blink_state = BLINK_ON;
-	blink_timer = XtAppAddTimeOut(app_context, blink_ontime,
-						      gui_x11_blink_cb, NULL);
+	blink_timer = Xt_App_ಕೂಡಿಸು_ಸಮಯ_ಹೊರಹೋಗು(app_context, blink_ontime,
+						      gui_x11_blink_cb, ಖಾಲಿ);
     }
 }
 
@@ -2992,16 +2992,16 @@ gui_x11_blink_cb(
  * Start the cursor blinking.  If it was already blinking, this restarts the
  * waiting time and shows the cursor.
  */
-    void
-gui_mch_start_blink(void)
+    ಶೂನ್ಯ
+gui_mch_ಆರಂಭ_blink(ಶೂನ್ಯ)
 {
-    if (blink_timer != (XtIntervalId)0)
-	XtRemoveTimeOut(blink_timer);
+    ಆದರೆ (blink_timer != (XtIntervalId)0)
+	Xt_Remove_ಸಮಯ_ಹೊರಹೋಗು(blink_timer);
     // Only switch blinking on if none of the times is zero
-    if (blink_waittime && blink_ontime && blink_offtime && gui.in_focus)
+    ಆದರೆ (blink_waittime && blink_ontime && blink_offtime && gui.ಒಳ_focus)
     {
-	blink_timer = XtAppAddTimeOut(app_context, blink_waittime,
-						      gui_x11_blink_cb, NULL);
+	blink_timer = Xt_App_ಕೂಡಿಸು_ಸಮಯ_ಹೊರಹೋಗು(app_context, blink_waittime,
+						      gui_x11_blink_cb, ಖಾಲಿ);
 	blink_state = BLINK_ON;
 	gui_update_cursor(TRUE, FALSE);
     }
@@ -3020,198 +3020,198 @@ gui_mch_get_rgb(guicolor_T pixel)
     xc.pixel = pixel;
     XQueryColor(gui.dpy, colormap, &xc);
 
-    return (guicolor_T)(((xc.red & 0xff00) << 8) + (xc.green & 0xff00)
-						   + ((unsigned)xc.blue >> 8));
+    ಹಿಂತಿರುಗಿ (guicolor_T)(((xc.red & 0xff00) << 8) + (xc.green & 0xff00)
+						   + ((ಚಿಹ್ನೆರಹಿತ)xc.blue >> 8));
 }
 
 /*
  * Add the callback functions.
  */
-    void
-gui_x11_callbacks(Widget textArea, Widget vimForm)
+    ಶೂನ್ಯ
+gui_x11_callbacks(Widget ಪಠ್ಯ_Area, Widget vimForm)
 {
-    XtAddEventHandler(textArea, VisibilityChangeMask, FALSE,
-	gui_x11_visibility_cb, (XtPointer)0);
+    Xt_ಕೂಡಿಸು_Event_Handler(ಪಠ್ಯ_Area, Visibility_Change_ಮುಖವಾಡ, FALSE,
+	gui_x11_visibility_cb, (Xt_ಸೂಚಕ)0);
 
-    XtAddEventHandler(textArea, ExposureMask, FALSE, gui_x11_expose_cb,
-	(XtPointer)0);
+    Xt_ಕೂಡಿಸು_Event_Handler(ಪಠ್ಯ_Area, Exposure_ಮುಖವಾಡ, FALSE, gui_x11_expose_cb,
+	(Xt_ಸೂಚಕ)0);
 
-    XtAddEventHandler(vimShell, StructureNotifyMask, FALSE,
-	gui_x11_resize_window_cb, (XtPointer)0);
+    Xt_ಕೂಡಿಸು_Event_Handler(vimShell, Structure_Notify_ಮುಖವಾಡ, FALSE,
+	gui_x11_resize_ಕಿಟಕಿ_cb, (Xt_ಸೂಚಕ)0);
 
-    XtAddEventHandler(vimShell, FocusChangeMask, FALSE, gui_x11_focus_change_cb,
-	(XtPointer)0);
+    Xt_ಕೂಡಿಸು_Event_Handler(vimShell, Focus_Change_ಮುಖವಾಡ, FALSE, gui_x11_focus_change_cb,
+	(Xt_ಸೂಚಕ)0);
     /*
      * Only install these enter/leave callbacks when 'p' in 'guioptions'.
      * Only needed for some window managers.
      */
-    if (vim_strchr(p_go, GO_POINTER) != NULL)
+    ಆದರೆ (vim_strchr(p_go, GO_ಸೂಚಕ) != ಖಾಲಿ)
     {
-	XtAddEventHandler(vimShell, LeaveWindowMask, FALSE, gui_x11_leave_cb,
-	    (XtPointer)0);
-	XtAddEventHandler(textArea, LeaveWindowMask, FALSE, gui_x11_leave_cb,
-	    (XtPointer)0);
-	XtAddEventHandler(textArea, EnterWindowMask, FALSE, gui_x11_enter_cb,
-	    (XtPointer)0);
-	XtAddEventHandler(vimShell, EnterWindowMask, FALSE, gui_x11_enter_cb,
-	    (XtPointer)0);
+	Xt_ಕೂಡಿಸು_Event_Handler(vimShell, Leave_ಕಿಟಕಿ_ಮುಖವಾಡ, FALSE, gui_x11_leave_cb,
+	    (Xt_ಸೂಚಕ)0);
+	Xt_ಕೂಡಿಸು_Event_Handler(ಪಠ್ಯ_Area, Leave_ಕಿಟಕಿ_ಮುಖವಾಡ, FALSE, gui_x11_leave_cb,
+	    (Xt_ಸೂಚಕ)0);
+	Xt_ಕೂಡಿಸು_Event_Handler(ಪಠ್ಯ_Area, Enter_ಕಿಟಕಿ_ಮುಖವಾಡ, FALSE, gui_x11_enter_cb,
+	    (Xt_ಸೂಚಕ)0);
+	Xt_ಕೂಡಿಸು_Event_Handler(vimShell, Enter_ಕಿಟಕಿ_ಮುಖವಾಡ, FALSE, gui_x11_enter_cb,
+	    (Xt_ಸೂಚಕ)0);
     }
 
-    XtAddEventHandler(vimForm, KeyPressMask, FALSE, gui_x11_key_hit_cb,
-	(XtPointer)0);
-    XtAddEventHandler(textArea, KeyPressMask, FALSE, gui_x11_key_hit_cb,
-	(XtPointer)0);
+    Xt_ಕೂಡಿಸು_Event_Handler(vimForm, ಕೀಲಿ_Press_ಮುಖವಾಡ, FALSE, gui_x11_ಕೀಲಿ_ದೊರಕಿತು_cb,
+	(Xt_ಸೂಚಕ)0);
+    Xt_ಕೂಡಿಸು_Event_Handler(ಪಠ್ಯ_Area, ಕೀಲಿ_Press_ಮುಖವಾಡ, FALSE, gui_x11_ಕೀಲಿ_ದೊರಕಿತು_cb,
+	(Xt_ಸೂಚಕ)0);
 
     // get pointer moved events from scrollbar, needed for 'mousefocus'
-    XtAddEventHandler(vimForm, PointerMotionMask,
-	FALSE, gui_x11_mouse_cb, (XtPointer)1);
-    XtAddEventHandler(textArea, ButtonPressMask | ButtonReleaseMask |
-					 ButtonMotionMask | PointerMotionMask,
-	FALSE, gui_x11_mouse_cb, (XtPointer)0);
+    Xt_ಕೂಡಿಸು_Event_Handler(vimForm, ಸೂಚಕ_Motion_ಮುಖವಾಡ,
+	FALSE, gui_x11_mouse_cb, (Xt_ಸೂಚಕ)1);
+    Xt_ಕೂಡಿಸು_Event_Handler(ಪಠ್ಯ_Area, Button_Press_ಮುಖವಾಡ | Button_Release_ಮುಖವಾಡ |
+					 Button_Motion_ಮುಖವಾಡ | ಸೂಚಕ_Motion_ಮುಖವಾಡ,
+	FALSE, gui_x11_mouse_cb, (Xt_ಸೂಚಕ)0);
 }
 
 /*
  * Get current mouse coordinates in text window.
  */
-    void
-gui_mch_getmouse(int *x, int *y)
+    ಶೂನ್ಯ
+gui_mch_getmouse(ಪೂರ್ಣಾಂಕ *x, ಪೂರ್ಣಾಂಕ *y)
 {
-    int		rootx, rooty, winx, winy;
-    Window	root, child;
-    unsigned int mask;
+    ಪೂರ್ಣಾಂಕ		rootx, rooty, winx, winy;
+    ಕಿಟಕಿ	ಬೇರು, ಮಗು;
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ ಮುಖವಾಡ;
 
-    if (gui.wid && XQueryPointer(gui.dpy, gui.wid, &root, &child,
-					 &rootx, &rooty, &winx, &winy, &mask))
+    ಆದರೆ (gui.wid && XQuery_ಸೂಚಕ(gui.dpy, gui.wid, &ಬೇರು, &ಮಗು,
+					 &rootx, &rooty, &winx, &winy, &ಮುಖವಾಡ))
     {
 	*x = winx;
 	*y = winy;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	*x = -1;
 	*y = -1;
     }
 }
 
-    void
-gui_mch_setmouse(int x, int y)
+    ಶೂನ್ಯ
+gui_mch_setmouse(ಪೂರ್ಣಾಂಕ x, ಪೂರ್ಣಾಂಕ y)
 {
-    if (gui.wid)
-	XWarpPointer(gui.dpy, (Window)0, gui.wid, 0, 0, 0, 0, x, y);
+    ಆದರೆ (gui.wid)
+	XWarp_ಸೂಚಕ(gui.dpy, (ಕಿಟಕಿ)0, gui.wid, 0, 0, 0, 0, x, y);
 }
 
-#if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
+#ಆದರೆ defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
     XButtonPressedEvent *
-gui_x11_get_last_mouse_event(void)
+gui_x11_get_ಕೊನೆಯ_mouse_event(ಶೂನ್ಯ)
 {
-    return &last_mouse_event;
+    ಹಿಂತಿರುಗಿ &ಕೊನೆಯ_mouse_event;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_SIGN_ICONS)
+#ಆದರೆ defined(FEAT_SIGN_ICONS)
 
 // Signs are currently always 2 chars wide.  Hopefully the font is big enough
 // to provide room for the bitmap!
-# define SIGN_WIDTH (gui.char_width * 2)
+# define SIGN_ಅಗಲ (gui.char_ಅಗಲ * 2)
 
-    void
-gui_mch_drawsign(int row, int col, int typenr)
+    ಶೂನ್ಯ
+gui_mch_drawsign(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು, ಪೂರ್ಣಾಂಕ typenr)
 {
     XImage	*sign;
 
-    if (!gui.in_use || (sign = (XImage *)sign_get_image(typenr)) == NULL)
-	return;
+    ಆದರೆ (!gui.ಒಳ_use || (sign = (XImage *)sign_get_image(typenr)) == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    XClearArea(gui.dpy, gui.wid, TEXT_X(col), TEXT_Y(row) - sign->height,
-	    SIGN_WIDTH, gui.char_height, FALSE);
-    XPutImage(gui.dpy, gui.wid, gui.text_gc, sign, 0, 0,
-	    TEXT_X(col) + (SIGN_WIDTH - sign->width) / 2,
-	    TEXT_Y(row) - sign->height,
-	    sign->width, sign->height);
+    XClearArea(gui.dpy, gui.wid, ಪಠ್ಯ_X(ಲಂಬಸಾಲು), ಪಠ್ಯ_Y(ಅಡ್ಡಸಾಲು) - sign->ಎತ್ತರ,
+	    SIGN_ಅಗಲ, gui.char_ಎತ್ತರ, FALSE);
+    XPutImage(gui.dpy, gui.wid, gui.ಪಠ್ಯ_gc, sign, 0, 0,
+	    ಪಠ್ಯ_X(ಲಂಬಸಾಲು) + (SIGN_ಅಗಲ - sign->ಅಗಲ) / 2,
+	    ಪಠ್ಯ_Y(ಅಡ್ಡಸಾಲು) - sign->ಎತ್ತರ,
+	    sign->ಅಗಲ, sign->ಎತ್ತರ);
 }
 
-    void *
-gui_mch_register_sign(char_u *signfile)
+    ಶೂನ್ಯ *
+gui_mch_ರಿಜಿಸ್ಟರ್_sign(char_u *signfile)
 {
-    XpmAttributes   attrs;
-    XImage	    *sign = NULL;
-    int		    status;
+    Xpm_ಗುಣಲಕ್ಷಣಗಳು   attrs;
+    XImage	    *sign = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		    ಸ್ಥಿತಿ_2;
 
     /*
      * Setup the color substitution table.
      */
-    if (signfile[0] != NUL && signfile[0] != '-')
+    ಆದರೆ (signfile[0] != NUL && signfile[0] != '-')
     {
-	XpmColorSymbol color[5] =
+	Xpm_Color_ಚಿಹ್ನೆ color[5] =
 	{
-	    {"none", NULL, 0},
-	    {"iconColor1", NULL, 0},
-	    {"bottomShadowColor", NULL, 0},
-	    {"topShadowColor", NULL, 0},
-	    {"selectColor", NULL, 0}
+	    {"none", ಖಾಲಿ, 0},
+	    {"iconColor1", ಖಾಲಿ, 0},
+	    {"bottomShadowColor", ಖಾಲಿ, 0},
+	    {"topShadowColor", ಖಾಲಿ, 0},
+	    {"selectColor", ಖಾಲಿ, 0}
 	};
 	attrs.valuemask = XpmColorSymbols;
 	attrs.numsymbols = 2;
 	attrs.colorsymbols = color;
-	attrs.colorsymbols[0].pixel = gui.back_pixel;
+	attrs.colorsymbols[0].pixel = gui.ಹಿಂಭಾಗ_pixel;
 	attrs.colorsymbols[1].pixel = gui.norm_pixel;
-	status = XpmReadFileToImage(gui.dpy, (char *)signfile,
-							 &sign, NULL, &attrs);
-	if (status == 0)
+	ಸ್ಥಿತಿ_2 = Xpm_Read_File_ಗಮ್ಯ_Image(gui.dpy, (ಅಕ್ಷರ *)signfile,
+							 &sign, ಖಾಲಿ, &attrs);
+	ಆದರೆ (ಸ್ಥಿತಿ_2 == 0)
 	{
 	    // Sign width is fixed at two columns now.
 	    // if (sign->width > gui.sign_width)
 	    //     gui.sign_width = sign->width + 8;
 	}
-	else
-	    emsg(_(e_couldnt_read_in_sign_data));
+	ಇಲ್ಲದಿದ್ದರೆ
+	    emsg(_(e_couldnt_read_ಒಳ_sign_ದತ್ತಾಂಶ));
     }
 
-    return (void *)sign;
+    ಹಿಂತಿರುಗಿ (ಶೂನ್ಯ *)sign;
 }
 
-    void
-gui_mch_destroy_sign(void *sign)
+    ಶೂನ್ಯ
+gui_mch_destroy_sign(ಶೂನ್ಯ *sign)
 {
     XDestroyImage((XImage*)sign);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 
-#ifdef FEAT_MOUSESHAPE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MOUSESHAPE
 // The last set mouse pointer shape is remembered, to be used when it goes
 // from hidden to not hidden.
-static int last_shape = 0;
-#endif
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಕೊನೆಯ_shape = 0;
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Use the blank mouse pointer or not.
  */
-    void
+    ಶೂನ್ಯ
 gui_mch_mousehide(
-    int		hide)	// TRUE = use blank ptr, FALSE = use parent ptr
+    ಪೂರ್ಣಾಂಕ		hide)	// TRUE = use blank ptr, FALSE = use parent ptr
 {
-    if (gui.pointer_hidden == hide)
-	return;
+    ಆದರೆ (gui.ಸೂಚಕ_hidden == hide)
+	ಹಿಂತಿರುಗಿ;
 
-    gui.pointer_hidden = hide;
-    if (hide)
-	XDefineCursor(gui.dpy, gui.wid, gui.blank_pointer);
-    else
-#ifdef FEAT_MOUSESHAPE
-	mch_set_mouse_shape(last_shape);
-#else
+    gui.ಸೂಚಕ_hidden = hide;
+    ಆದರೆ (hide)
+	XDefineCursor(gui.dpy, gui.wid, gui.blank_ಸೂಚಕ);
+    ಇಲ್ಲದಿದ್ದರೆ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MOUSESHAPE
+	mch_ಗಣ_mouse_shape(ಕೊನೆಯ_shape);
+#ಇಲ್ಲದಿದ್ದರೆ
     XUndefineCursor(gui.dpy, gui.wid);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#if defined(FEAT_MOUSESHAPE)
+#ಆದರೆ defined(FEAT_MOUSESHAPE)
 
 // Table for shape IDs.  Keep in sync with the mshape_names[] table in
 // misc2.c!
-static int mshape_ids[] =
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ mshape_ids[] =
 {
-    XC_left_ptr,		// arrow
+    XC_ಎಡ_ptr,		// arrow
     0,				// blank
     XC_xterm,			// beam
     XC_sb_v_double_arrow,	// updown
@@ -3225,66 +3225,66 @@ static int mshape_ids[] =
     XC_hand2,			// hand2
     XC_pencil,			// pencil
     XC_question_arrow,		// question
-    XC_right_ptr,		// right-arrow
+    XC_ಬಲ_ptr,		// right-arrow
     XC_center_ptr,		// up-arrow
-    XC_left_ptr			// last one
+    XC_ಎಡ_ptr			// last one
 };
 
-    void
-mch_set_mouse_shape(int shape)
+    ಶೂನ್ಯ
+mch_ಗಣ_mouse_shape(ಪೂರ್ಣಾಂಕ shape)
 {
-    int	    id;
+    ಪೂರ್ಣಾಂಕ	    id;
 
-    if (!gui.in_use)
-	return;
+    ಆದರೆ (!gui.ಒಳ_use)
+	ಹಿಂತಿರುಗಿ;
 
-    if (shape == MSHAPE_HIDE || gui.pointer_hidden)
-	XDefineCursor(gui.dpy, gui.wid, gui.blank_pointer);
-    else
+    ಆದರೆ (shape == MSHAPE_HIDE || gui.ಸೂಚಕ_hidden)
+	XDefineCursor(gui.dpy, gui.wid, gui.blank_ಸೂಚಕ);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (shape >= MSHAPE_NUMBERED)
+	ಆದರೆ (shape >= MSHAPE_NUMBERED)
 	{
 	    id = shape - MSHAPE_NUMBERED;
-	    if (id >= XC_num_glyphs)
-		id = XC_left_ptr;
-	    else
+	    ಆದರೆ (id >= XC_ಅಂಕೆ_glyphs)
+		id = XC_ಎಡ_ptr;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		id &= ~1;	// they are always even (why?)
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    id = mshape_ids[shape];
 
 	XDefineCursor(gui.dpy, gui.wid, XCreateFontCursor(gui.dpy, id));
     }
-    if (shape != MSHAPE_HIDE)
-	last_shape = shape;
+    ಆದರೆ (shape != MSHAPE_HIDE)
+	ಕೊನೆಯ_shape = shape;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(FEAT_TOOLBAR) && defined(FEAT_BEVAL_GUI)
+#ಆದರೆ defined(FEAT_TOOLBAR) && defined(FEAT_BEVAL_GUI)
 /*
  * Set the balloon-eval used for the tooltip of a toolbar menu item.
  * The check for a non-toolbar item was added, because there is a crash when
  * passing a normal menu item here.  Can't explain that, but better avoid it.
  */
-    void
-gui_mch_menu_set_tip(vimmenu_T *menu)
+    ಶೂನ್ಯ
+gui_mch_menu_ಗಣ_tip(vimmenu_T *menu)
 {
-    if (menu->id == NULL || menu->parent == NULL
-				|| !menu_is_toolbar(menu->parent->name))
-	return;
+    ಆದರೆ (menu->id == ಖಾಲಿ || menu->ಪೋಷಕ == ಖಾಲಿ
+				|| !menu_is_toolbar(menu->ಪೋಷಕ->name))
+	ಹಿಂತಿರುಗಿ;
 
     // Always destroy and create the balloon, in case the string was
     // changed.
-    if (menu->tip != NULL)
+    ಆದರೆ (menu->tip != ಖಾಲಿ)
     {
 	gui_mch_destroy_beval_area(menu->tip);
-	menu->tip = NULL;
+	menu->tip = ಖಾಲಿ;
     }
-    if (menu->strings[MENU_INDEX_TIP] != NULL)
+    ಆದರೆ (menu->ಅಕ್ಷರಸರಣಿಗಳು[MENU_ಸೂಚ್ಯಂಕ_TIP] != ಖಾಲಿ)
 	menu->tip = gui_mch_create_beval_area(
 		menu->id,
-		menu->strings[MENU_INDEX_TIP],
-		NULL,
-		NULL);
+		menu->ಅಕ್ಷರಸರಣಿಗಳು[MENU_ಸೂಚ್ಯಂಕ_TIP],
+		ಖಾಲಿ,
+		ಖಾಲಿ);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ

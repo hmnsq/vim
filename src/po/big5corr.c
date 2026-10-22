@@ -18,40 +18,40 @@
  *
  */
 
-#include <stdio.h>
-#include <string.h>
+#ಅನ್ತರ್ಭಾವ <stdio.h>
+#ಅನ್ತರ್ಭಾವ <string.h>
 
-	int
-main(int argc, char **argv)
+	ಪೂರ್ಣಾಂಕ
+ಮುಖ್ಯ(ಪೂರ್ಣಾಂಕ argc, ಅಕ್ಷರ **argv)
 {
-	char buffer[BUFSIZ];
-	char *p;
+	ಅಕ್ಷರ ಬಫರ್[BUFSIZ];
+	ಅಕ್ಷರ *p;
 
-	while (fgets(buffer, BUFSIZ, stdin) != NULL)
+	ಆಗ (fgets(ಬಫರ್, BUFSIZ, stdin) != ಖಾಲಿ)
 	{
-		for (p = buffer; *p != 0; p++)
+		ಗಾಗಿ (p = ಬಫರ್; *p != 0; p++)
 		{
-			if (strncmp(p, "charset=utf-8", 13) == 0
-				|| strncmp(p, "charset=UTF-8", 13) == 0)
+			ಆದರೆ (ಅಕ್ಷರಸರಣಿ_ಹೋಲಿಕೆ(p, "charset=utf-8", 13) == 0
+				|| ಅಕ್ಷರಸರಣಿ_ಹೋಲಿಕೆ(p, "charset=UTF-8", 13) == 0)
 			{
 				fputs("charset=BIG-5", stdout);
 				p += 12;
 			}
-			else if (strncmp(p, "# Original translations", 23) == 0)
+			ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಅಕ್ಷರಸರಣಿ_ಹೋಲಿಕೆ(p, "# Original translations", 23) == 0)
 			{
 				fputs("# Generated from zh_TW.UTF-8.po, DO NOT EDIT.", stdout);
-				while (p[1] != '\n')
+				ಆಗ (p[1] != '\n')
 					++p;
 			}
-			else
+			ಇಲ್ಲದಿದ್ದರೆ
 			{
-				if (*(unsigned char *)p >= 0xA1)
+				ಆದರೆ (*(ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ *)p >= 0xA1)
 				{
-					putchar(*p++);
-					if (*p == '\\')
-						putchar(*p);
+					ಅಕ್ಷರ_ಬರೆ(*p++);
+					ಆದರೆ (*p == '\\')
+						ಅಕ್ಷರ_ಬರೆ(*p);
 				}
-				putchar(*p);
+				ಅಕ್ಷರ_ಬರೆ(*p);
 			}
 		}
 	}

@@ -6,73 +6,73 @@
  * Do ":help credits" in Vim to see a list of people who contributed.
  */
 
-#if defined(FEAT_OLE) && defined(FEAT_GUI_MSWIN)
+#ಆದರೆ defined(FEAT_OLE) && defined(FEAT_GUI_MSWIN)
 /*
  * OLE server implementation.
  *
  * See os_mswin.c for the client side.
  */
-extern "C" {
+ಬಾಹ್ಯ "C" {
 # include "vim.h"
 }
 
-#include <windows.h>
-#include <oleauto.h>
+#ಅನ್ತರ್ಭಾವ <windows.h>
+#ಅನ್ತರ್ಭಾವ <oleauto.h>
 
-extern "C" {
-extern HWND s_hwnd;
-extern HWND vim_parent_hwnd;
+ಬಾಹ್ಯ "C" {
+ಬಾಹ್ಯ HWND s_hwnd;
+ಬಾಹ್ಯ HWND vim_ಪೋಷಕ_hwnd;
 }
 
-#if (defined(_MSC_VER) && (_MSC_VER >= 1700)) || (__cplusplus >= 201103L)
+#ಆದರೆ (defined(_MSC_VER) && (_MSC_VER >= 1700)) || (__cplusplus >= 201103L)
 # define FINAL final
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 # define FINAL
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#include "if_ole.h"	// Interface definitions
-#include "iid_ole.c"	// UUID definitions (compile here)
+#ಅನ್ತರ್ಭಾವ "if_ole.h"	// Interface definitions
+#ಅನ್ತರ್ಭಾವ "iid_ole.c"	// UUID definitions (compile here)
 
 /* Supply function prototype to work around bug in Mingw oleauto.h header */
-#ifdef __MINGW32__
-WINOLEAUTAPI UnRegisterTypeLib(REFGUID libID, WORD wVerMajor,
-	    WORD wVerMinor, LCID lcid, SYSKIND syskind);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ __MINGW32__
+WINOLEAUTAPI Un_ರಿಜಿಸ್ಟರ್_Type_Lib(REFGUID libID, ಶಬ್ದ_2 wVerMajor,
+	    ಶಬ್ದ_2 wVerMinor, LCID lcid, SYSKIND syskind);
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*****************************************************************************
  1. Internal definitions for this file
 *****************************************************************************/
 
-class CVim;
-class CVimCF;
+ವರ್ಗ CVim;
+ವರ್ಗ CVimCF;
 
 /* Internal data */
 // The identifier of the registered class factory
-static unsigned long cf_id = 0;
+ಸ್ಥಿರ ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ cf_id = 0;
 
 // The identifier of the running application object
-static unsigned long app_id = 0;
+ಸ್ಥಿರ ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ app_id = 0;
 
 // The single global instance of the class factory
-static CVimCF *cf = 0;
+ಸ್ಥಿರ CVimCF *cf = 0;
 
 // The single global instance of the application object
-static CVim *app = 0;
+ಸ್ಥಿರ CVim *app = 0;
 
 /* GUIDs, versions and type library information */
-#define MYCLSID CLSID_Vim
-#define MYLIBID LIBID_Vim
-#define MYIID IID_IVim
+#ವ್ಯಾಖ್ಯಾನಿಸು MYCLSID CLSID_Vim
+#ವ್ಯಾಖ್ಯಾನಿಸು MYLIBID LIBID_Vim
+#ವ್ಯಾಖ್ಯಾನಿಸು MYIID IID_IVim
 
-#define MAJORVER 1
-#define MINORVER 0
-#define LOCALE 0x0409
+#ವ್ಯಾಖ್ಯಾನಿಸು MAJORVER 1
+#ವ್ಯಾಖ್ಯಾನಿಸು MINORVER 0
+#ವ್ಯಾಖ್ಯಾನಿಸು LOCALE 0x0409
 
-#define MYNAME "Vim"
-#define MYPROGID "Vim.Application.1"
-#define MYVIPROGID "Vim.Application"
+#ವ್ಯಾಖ್ಯಾನಿಸು MYNAME "Vim"
+#ವ್ಯಾಖ್ಯಾನಿಸು MYPROGID "Vim.Application.1"
+#ವ್ಯಾಖ್ಯಾನಿಸು MYVIPROGID "Vim.Application"
 
-#define MAX_CLSID_LEN 100
+#ವ್ಯಾಖ್ಯಾನಿಸು MAX_CLSID_LEN 100
 
 /*****************************************************************************
  2. The application object
@@ -82,35 +82,35 @@ static CVim *app = 0;
  * ----------
  */
 
-class CVim FINAL : public IVim
+ವರ್ಗ CVim FINAL : ಸಾರ್ವಜನಿಕ IVim
 {
-public:
-    virtual ~CVim();
-    static CVim *Create(int *pbDoRestart);
+ಸಾರ್ವಜನಿಕ:
+    ವಾಸ್ತವಿಕ ~CVim();
+    ಸ್ಥಿರ CVim *Create(ಪೂರ್ಣಾಂಕ *pbDoRestart);
 
     // IUnknown members
-    STDMETHOD(QueryInterface)(REFIID riid, void ** ppv);
-    STDMETHOD_(unsigned long, AddRef)(void);
-    STDMETHOD_(unsigned long, Release)(void);
+    STDMETHOD(QueryInterface)(REFIID riid, ಶೂನ್ಯ ** ppv);
+    STDMETHOD_(ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ, ಕೂಡಿಸು_Ref)(ಶೂನ್ಯ);
+    STDMETHOD_(ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ, Release)(ಶೂನ್ಯ);
 
     // IDispatch members
-    STDMETHOD(GetTypeInfoCount)(UINT *pCount);
+    STDMETHOD(Get_Type_Info_ಎಣಿಕೆ)(UINT *p_ಎಣಿಕೆ);
     STDMETHOD(GetTypeInfo)(UINT iTypeInfo, LCID, ITypeInfo **ppITypeInfo);
-    STDMETHOD(GetIDsOfNames)(const IID &iid, OLECHAR **names, UINT n, LCID, DISPID *dispids);
-    STDMETHOD(Invoke)(DISPID member, const IID &iid, LCID, WORD flags, DISPPARAMS *dispparams, VARIANT *result, EXCEPINFO *excepinfo, UINT *argerr);
+    STDMETHOD(Get_IDs_ದ_ಹೆಸರುಗಳು)(ಸ್ಥಿರಾಂಕ IID &iid, OLECHAR **ಹೆಸರುಗಳು, UINT n, LCID, DISPID *dispids);
+    STDMETHOD(Invoke)(DISPID member, ಸ್ಥಿರಾಂಕ IID &iid, LCID, ಶಬ್ದ_2 flags, DISPPARAMS *dispparams, VARIANT *ಫಲಿತಾಂಶ, EXCEPINFO *excepinfo, UINT *argerr);
 
     // IVim members
-    STDMETHOD(SendKeys)(BSTR keys);
-    STDMETHOD(Eval)(BSTR expr, BSTR *result);
-    STDMETHOD(SetForeground)(void);
-    STDMETHOD(GetHwnd)(UINT_PTR *result);
+    STDMETHOD(Send_ಕೀಲಿಗಳು)(BSTR ಕೀಲಿಗಳು);
+    STDMETHOD(Eval)(BSTR ಅಭಿವ್ಯಕ್ತಿ, BSTR *ಫಲಿತಾಂಶ);
+    STDMETHOD(ಗಣ_Foreground)(ಶೂನ್ಯ);
+    STDMETHOD(GetHwnd)(UINT_PTR *ಫಲಿತಾಂಶ);
 
-private:
+ಖಾಸಗಿ:
     // Constructor is private - create using CVim::Create()
     CVim() : ref(0), typeinfo(0) {};
 
     // Reference count
-    unsigned long ref;
+    ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ ref;
 
     // The object's TypeInfo
     ITypeInfo *typeinfo;
@@ -120,7 +120,7 @@ private:
  * --------------
  */
 
-CVim *CVim::Create(int *pbDoRestart)
+CVim *CVim::Create(ಪೂರ್ಣಾಂಕ *pbDoRestart)
 {
     HRESULT hr;
     CVim *me = 0;
@@ -130,93 +130,93 @@ CVim *CVim::Create(int *pbDoRestart)
     *pbDoRestart = FALSE;
 
     // Create the object
-    me = new CVim();
-    if (me == NULL)
+    me = ಹೊಸ CVim();
+    ಆದರೆ (me == ಖಾಲಿ)
     {
-	MessageBox(0, "Cannot create application object", "Vim Initialisation", 0);
-	return NULL;
+	ಸಂದೇಶ_Box(0, "Cannot create application object", "Vim Initialisation", 0);
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
     // Load the type library from the registry
-    hr = LoadRegTypeLib(MYLIBID, 1, 0, 0x00, &typelib);
-    if (FAILED(hr))
+    hr = ತುಂಬು_Reg_Type_Lib(MYLIBID, 1, 0, 0x00, &typelib);
+    ಆದರೆ (FAILED(hr))
     {
-	HKEY hKey;
+	HKEY h_ಕೀಲಿ;
 
 	// Check we can write to the registry.
 	// RegCreateKeyEx succeeds even if key exists. W.Briscoe W2K 20021011
-	if (RegCreateKeyEx(HKEY_CLASSES_ROOT, MYVIPROGID, 0, NULL,
+	ಆದರೆ (Reg_Create_ಕೀಲಿ_Ex(HKEY_CLASSES_ಬೇರು, MYVIPROGID, 0, ಖಾಲಿ,
 		  REG_OPTION_NON_VOLATILE,
-		  KEY_ALL_ACCESS, NULL, &hKey, NULL))
+		  ಕೀಲಿ_ALL_ACCESS, ಖಾಲಿ, &h_ಕೀಲಿ, ಖಾಲಿ))
 	{
-	    delete me;
-	    return NULL; // Unable to write to registry. Quietly fail.
+	    ಅಳಿಸು me;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ; // Unable to write to registry. Quietly fail.
 	}
-	RegCloseKey(hKey);
+	Reg_Close_ಕೀಲಿ(h_ಕೀಲಿ);
 
-	if (MessageBox(0, "Cannot load registered type library.\nDo you want to register Vim now?",
+	ಆದರೆ (ಸಂದೇಶ_Box(0, "Cannot load registered type library.\nDo you want to register Vim now?",
 		    "Vim Initialisation", MB_YESNO | MB_ICONQUESTION) != IDYES)
 	{
-	    delete me;
-	    return NULL;
+	    ಅಳಿಸು me;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
 
-	RegisterMe(FALSE);
+	ರಿಜಿಸ್ಟರ್_Me(FALSE);
 
 	// Load the type library from the registry
-	hr = LoadRegTypeLib(MYLIBID, 1, 0, 0x00, &typelib);
-	if (FAILED(hr))
+	hr = ತುಂಬು_Reg_Type_Lib(MYLIBID, 1, 0, 0x00, &typelib);
+	ಆದರೆ (FAILED(hr))
 	{
-	    MessageBox(0, "You must restart Vim in order for the registration to take effect.",
+	    ಸಂದೇಶ_Box(0, "You must restart Vim in order for the registration to take effect.",
 						     "Vim Initialisation", 0);
 	    *pbDoRestart = TRUE;
-	    delete me;
-	    return NULL;
+	    ಅಳಿಸು me;
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 	}
     }
 
     // Get the type info of the vtable interface
-    hr = typelib->GetTypeInfoOfGuid(MYIID, &typeinfo);
+    hr = typelib->Get_Type_Info_ದ_Guid(MYIID, &typeinfo);
     typelib->Release();
 
-    if (FAILED(hr))
+    ಆದರೆ (FAILED(hr))
     {
-	MessageBox(0, "Cannot get interface type information",
+	ಸಂದೇಶ_Box(0, "Cannot get interface type information",
 						     "Vim Initialisation", 0);
-	delete me;
-	return NULL;
+	ಅಳಿಸು me;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
     // Save the type information
     me->typeinfo = typeinfo;
-    return me;
+    ಹಿಂತಿರುಗಿ me;
 }
 
 CVim::~CVim()
 {
-    if (typeinfo && vim_parent_hwnd == NULL)
+    ಆದರೆ (typeinfo && vim_ಪೋಷಕ_hwnd == ಖಾಲಿ)
 	typeinfo->Release();
     typeinfo = 0;
 }
 
 STDMETHODIMP
-CVim::QueryInterface(REFIID riid, void **ppv)
+CVim::QueryInterface(REFIID riid, ಶೂನ್ಯ **ppv)
 {
-    if (IsEqualIID(riid, IID_IUnknown) || IsEqualIID(riid, IID_IDispatch) || IsEqualIID(riid, MYIID))
+    ಆದರೆ (IsEqualIID(riid, IID_IUnknown) || IsEqualIID(riid, IID_IDispatch) || IsEqualIID(riid, MYIID))
     {
-	AddRef();
-	*ppv = this;
-	return S_OK;
+	ಕೂಡಿಸು_Ref();
+	*ppv = ಇದು;
+	ಹಿಂತಿರುಗಿ S_OK;
     }
 
     *ppv = 0;
-    return E_NOINTERFACE;
+    ಹಿಂತಿರುಗಿ E_NOINTERFACE;
 }
 
 STDMETHODIMP_(ULONG)
-CVim::AddRef()
+CVim::ಕೂಡಿಸು_Ref()
 {
-    return ++ref;
+    ಹಿಂತಿರುಗಿ ++ref;
 }
 
 STDMETHODIMP_(ULONG)
@@ -225,16 +225,16 @@ CVim::Release()
     // Don't delete the object when the reference count reaches zero, as there
     // is only a single application object, and its lifetime is controlled by
     // the running instance, not by its reference count.
-    if (ref > 0)
+    ಆದರೆ (ref > 0)
 	--ref;
-    return ref;
+    ಹಿಂತಿರುಗಿ ref;
 }
 
 STDMETHODIMP
-CVim::GetTypeInfoCount(UINT *pCount)
+CVim::Get_Type_Info_ಎಣಿಕೆ(UINT *p_ಎಣಿಕೆ)
 {
-    *pCount = 1;
-    return S_OK;
+    *p_ಎಣಿಕೆ = 1;
+    ಹಿಂತಿರುಗಿ S_OK;
 }
 
 STDMETHODIMP
@@ -242,94 +242,94 @@ CVim::GetTypeInfo(UINT iTypeInfo, LCID, ITypeInfo **ppITypeInfo)
 {
     *ppITypeInfo = 0;
 
-    if (iTypeInfo != 0)
-	return DISP_E_BADINDEX;
+    ಆದರೆ (iTypeInfo != 0)
+	ಹಿಂತಿರುಗಿ DISP_E_BADINDEX;
 
-    typeinfo->AddRef();
+    typeinfo->ಕೂಡಿಸು_Ref();
     *ppITypeInfo = typeinfo;
-    return S_OK;
+    ಹಿಂತಿರುಗಿ S_OK;
 }
 
 STDMETHODIMP
-CVim::GetIDsOfNames(
-	const IID &iid,
-	OLECHAR **names,
+CVim::Get_IDs_ದ_ಹೆಸರುಗಳು(
+	ಸ್ಥಿರಾಂಕ IID &iid,
+	OLECHAR **ಹೆಸರುಗಳು,
 	UINT n,
 	LCID,
 	DISPID *dispids)
 {
-    if (iid != IID_NULL)
-	return DISP_E_UNKNOWNINTERFACE;
+    ಆದರೆ (iid != IID_NULL)
+	ಹಿಂತಿರುಗಿ DISP_E_UNKNOWNINTERFACE;
 
-    return typeinfo->GetIDsOfNames(names, n, dispids);
+    ಹಿಂತಿರುಗಿ typeinfo->Get_IDs_ದ_ಹೆಸರುಗಳು(ಹೆಸರುಗಳು, n, dispids);
 }
 
 STDMETHODIMP
 CVim::Invoke(
 	DISPID member,
-	const IID &iid,
+	ಸ್ಥಿರಾಂಕ IID &iid,
 	LCID,
-	WORD flags,
+	ಶಬ್ದ_2 flags,
 	DISPPARAMS *dispparams,
-	VARIANT *result,
+	VARIANT *ಫಲಿತಾಂಶ,
 	EXCEPINFO *excepinfo,
 	UINT *argerr)
 {
-    if (iid != IID_NULL)
-	return DISP_E_UNKNOWNINTERFACE;
+    ಆದರೆ (iid != IID_NULL)
+	ಹಿಂತಿರುಗಿ DISP_E_UNKNOWNINTERFACE;
 
-    ::SetErrorInfo(0, NULL);
-    return typeinfo->Invoke(static_cast<IDispatch*>(this),
+    ::ಗಣ_Error_Info(0, ಖಾಲಿ);
+    ಹಿಂತಿರುಗಿ typeinfo->Invoke(static_cast<IDispatch*>(ಇದು),
 			    member, flags, dispparams,
-			    result, excepinfo, argerr);
+			    ಫಲಿತಾಂಶ, excepinfo, argerr);
 }
 
 STDMETHODIMP
-CVim::GetHwnd(UINT_PTR *result)
+CVim::GetHwnd(UINT_PTR *ಫಲಿತಾಂಶ)
 {
-    *result = (UINT_PTR)s_hwnd;
-    return S_OK;
+    *ಫಲಿತಾಂಶ = (UINT_PTR)s_hwnd;
+    ಹಿಂತಿರುಗಿ S_OK;
 }
 
 STDMETHODIMP
-CVim::SetForeground(void)
+CVim::ಗಣ_Foreground(ಶೂನ್ಯ)
 {
     /* Make the Vim window come to the foreground */
-    gui_mch_set_foreground();
-    return S_OK;
+    gui_mch_ಗಣ_foreground();
+    ಹಿಂತಿರುಗಿ S_OK;
 }
 
 STDMETHODIMP
-CVim::SendKeys(BSTR keys)
+CVim::Send_ಕೀಲಿಗಳು(BSTR ಕೀಲಿಗಳು)
 {
-    int len;
-    char *buffer;
+    ಪೂರ್ಣಾಂಕ len;
+    ಅಕ್ಷರ *ಬಫರ್;
     char_u *str;
     char_u *ptr;
 
     /* Get a suitable buffer */
-    len = WideCharToMultiByte(CP_ACP, 0, keys, -1, 0, 0, 0, 0);
-    buffer = (char *)alloc(len+1);
+    len = Wide_Char_ಗಮ್ಯ_Multi_Byte(CP_ACP, 0, ಕೀಲಿಗಳು, -1, 0, 0, 0, 0);
+    ಬಫರ್ = (ಅಕ್ಷರ *)alloc(len+1);
 
-    if (buffer == NULL)
-	return E_OUTOFMEMORY;
+    ಆದರೆ (ಬಫರ್ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ E_OUTOFMEMORY;
 
-    len = WideCharToMultiByte(CP_ACP, 0, keys, -1, buffer, len, 0, 0);
+    len = Wide_Char_ಗಮ್ಯ_Multi_Byte(CP_ACP, 0, ಕೀಲಿಗಳು, -1, ಬಫರ್, len, 0, 0);
 
-    if (len == 0)
+    ಆದರೆ (len == 0)
     {
-	vim_free(buffer);
-	return E_INVALIDARG;
+	vim_free(ಬಫರ್);
+	ಹಿಂತಿರುಗಿ E_INVALIDARG;
     }
 
     /* Translate key codes like <Esc> */
-    str = replace_termcodes((char_u *)buffer, &ptr, 0, REPTERM_DO_LT, NULL);
+    str = replace_termcodes((char_u *)ಬಫರ್, &ptr, 0, REPTERM_DO_LT, ಖಾಲಿ);
 
     /* If ptr was set, then a new buffer was allocated,
      * so we can free the old one.
      */
-    if (ptr)
-	vim_free((char_u *)(buffer));
+    ಆದರೆ (ptr)
+	vim_free((char_u *)(ಬಫರ್));
 
     /* Reject strings too long to fit in the input buffer. Allow 10 bytes
      * space to cover for the (remote) possibility that characters may enter
@@ -337,76 +337,76 @@ CVim::SendKeys(BSTR keys)
      * processed. If more than 10 characters enter the input buffer in that
      * time, the WM_OLE processing will simply fail to insert the characters.
      */
-    if ((int)(STRLEN(str)) > (vim_free_in_input_buf() - 10))
+    ಆದರೆ ((ಪೂರ್ಣಾಂಕ)(STRLEN(str)) > (vim_free_ಒಳ_ಒಳಹರಿವು_buf() - 10))
     {
 	vim_free(str);
-	return E_INVALIDARG;
+	ಹಿಂತಿರುಗಿ E_INVALIDARG;
     }
 
     /* Pass the string to the main input loop. The memory will be freed when
      * the message is processed.  Except for an empty message, we don't need
      * to post it then.
      */
-    if (*str == NUL)
+    ಆದರೆ (*str == NUL)
 	vim_free(str);
-    else
-	PostMessage(NULL, WM_OLE, 0, (LPARAM)str);
+    ಇಲ್ಲದಿದ್ದರೆ
+	Post_ಸಂದೇಶ(ಖಾಲಿ, WM_OLE, 0, (LPARAM)str);
 
-    return S_OK;
+    ಹಿಂತಿರುಗಿ S_OK;
 }
 
 STDMETHODIMP
-CVim::Eval(BSTR expr, BSTR *result)
+CVim::Eval(BSTR ಅಭಿವ್ಯಕ್ತಿ, BSTR *ಫಲಿತಾಂಶ)
 {
-#ifdef FEAT_EVAL
-    int len;
-    char *buffer;
-    char *str;
-    wchar_t *w_buffer;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_EVAL
+    ಪೂರ್ಣಾಂಕ len;
+    ಅಕ್ಷರ *ಬಫರ್;
+    ಅಕ್ಷರ *str;
+    wchar_t *w_ಬಫರ್;
 
     /* Get a suitable buffer */
-    len = WideCharToMultiByte(CP_ACP, 0, expr, -1, 0, 0, 0, 0);
-    if (len == 0)
-	return E_INVALIDARG;
+    len = Wide_Char_ಗಮ್ಯ_Multi_Byte(CP_ACP, 0, ಅಭಿವ್ಯಕ್ತಿ, -1, 0, 0, 0, 0);
+    ಆದರೆ (len == 0)
+	ಹಿಂತಿರುಗಿ E_INVALIDARG;
 
-    buffer = (char *)alloc(len);
+    ಬಫರ್ = (ಅಕ್ಷರ *)alloc(len);
 
-    if (buffer == NULL)
-	return E_OUTOFMEMORY;
+    ಆದರೆ (ಬಫರ್ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ E_OUTOFMEMORY;
 
     /* Convert the (wide character) expression to an ASCII string */
-    len = WideCharToMultiByte(CP_ACP, 0, expr, -1, buffer, len, 0, 0);
-    if (len == 0)
-	return E_INVALIDARG;
+    len = Wide_Char_ಗಮ್ಯ_Multi_Byte(CP_ACP, 0, ಅಭಿವ್ಯಕ್ತಿ, -1, ಬಫರ್, len, 0, 0);
+    ಆದರೆ (len == 0)
+	ಹಿಂತಿರುಗಿ E_INVALIDARG;
 
     /* Evaluate the expression */
     ++emsg_skip;
-    str = (char *)eval_to_string((char_u *)buffer, TRUE, FALSE);
+    str = (ಅಕ್ಷರ *)eval_ಗಮ್ಯ_string((char_u *)ಬಫರ್, TRUE, FALSE);
     --emsg_skip;
-    vim_free(buffer);
-    if (str == NULL)
-	return E_FAIL;
+    vim_free(ಬಫರ್);
+    ಆದರೆ (str == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ E_FAIL;
 
     /* Convert the result to wide characters */
-    MultiByteToWideChar_alloc(CP_ACP, 0, str, -1, &w_buffer, &len);
+    Multi_Byte_ಗಮ್ಯ_Wide_Char_alloc(CP_ACP, 0, str, -1, &w_ಬಫರ್, &len);
     vim_free(str);
-    if (w_buffer == NULL)
-	return E_OUTOFMEMORY;
+    ಆದರೆ (w_ಬಫರ್ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ E_OUTOFMEMORY;
 
-    if (len == 0)
+    ಆದರೆ (len == 0)
     {
-	vim_free(w_buffer);
-	return E_FAIL;
+	vim_free(w_ಬಫರ್);
+	ಹಿಂತಿರುಗಿ E_FAIL;
     }
 
     /* Store the result */
-    *result = SysAllocString(w_buffer);
-    vim_free(w_buffer);
+    *ಫಲಿತಾಂಶ = SysAllocString(w_ಬಫರ್);
+    vim_free(w_ಬಫರ್);
 
-    return S_OK;
-#else
-    return E_NOTIMPL;
-#endif
+    ಹಿಂತಿರುಗಿ S_OK;
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಹಿಂತಿರುಗಿ E_NOTIMPL;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 /*****************************************************************************
@@ -417,24 +417,24 @@ CVim::Eval(BSTR expr, BSTR *result)
  * ----------
  */
 
-class CVimCF FINAL : public IClassFactory
+ವರ್ಗ CVimCF FINAL : ಸಾರ್ವಜನಿಕ IClassFactory
 {
-public:
-    static CVimCF *Create();
-    virtual ~CVimCF() {};
+ಸಾರ್ವಜನಿಕ:
+    ಸ್ಥಿರ CVimCF *Create();
+    ವಾಸ್ತವಿಕ ~CVimCF() {};
 
-    STDMETHOD(QueryInterface)(REFIID riid, void ** ppv);
-    STDMETHOD_(unsigned long, AddRef)(void);
-    STDMETHOD_(unsigned long, Release)(void);
-    STDMETHOD(CreateInstance)(IUnknown *punkOuter, REFIID riid, void ** ppv);
-    STDMETHOD(LockServer)(BOOL lock);
+    STDMETHOD(QueryInterface)(REFIID riid, ಶೂನ್ಯ ** ppv);
+    STDMETHOD_(ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ, ಕೂಡಿಸು_Ref)(ಶೂನ್ಯ);
+    STDMETHOD_(ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ, Release)(ಶೂನ್ಯ);
+    STDMETHOD(CreateInstance)(IUnknown *punkOuter, REFIID riid, ಶೂನ್ಯ ** ppv);
+    STDMETHOD(ಬೀಗ_Server)(BOOL ಬೀಗ);
 
-private:
+ಖಾಸಗಿ:
     // Constructor is private - create via Create()
     CVimCF() : ref(0) {};
 
     // Reference count
-    unsigned long ref;
+    ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ ref;
 };
 
 /* Implementation
@@ -443,32 +443,32 @@ private:
 
 CVimCF *CVimCF::Create()
 {
-    CVimCF *me = new CVimCF();
+    CVimCF *me = ಹೊಸ CVimCF();
 
-    if (me == NULL)
-	MessageBox(0, "Cannot create class factory", "Vim Initialisation", 0);
+    ಆದರೆ (me == ಖಾಲಿ)
+	ಸಂದೇಶ_Box(0, "Cannot create class factory", "Vim Initialisation", 0);
 
-    return me;
+    ಹಿಂತಿರುಗಿ me;
 }
 
 STDMETHODIMP
-CVimCF::QueryInterface(REFIID riid, void **ppv)
+CVimCF::QueryInterface(REFIID riid, ಶೂನ್ಯ **ppv)
 {
-    if (IsEqualIID(riid, IID_IUnknown) || IsEqualIID(riid, IID_IClassFactory))
+    ಆದರೆ (IsEqualIID(riid, IID_IUnknown) || IsEqualIID(riid, IID_IClassFactory))
     {
-	AddRef();
-	*ppv = this;
-	return S_OK;
+	ಕೂಡಿಸು_Ref();
+	*ppv = ಇದು;
+	ಹಿಂತಿರುಗಿ S_OK;
     }
 
     *ppv = 0;
-    return E_NOINTERFACE;
+    ಹಿಂತಿರುಗಿ E_NOINTERFACE;
 }
 
 STDMETHODIMP_(ULONG)
-CVimCF::AddRef()
+CVimCF::ಕೂಡಿಸು_Ref()
 {
-    return ++ref;
+    ಹಿಂತಿರುಗಿ ++ref;
 }
 
 STDMETHODIMP_(ULONG)
@@ -477,23 +477,23 @@ CVimCF::Release()
     // Don't delete the object when the reference count reaches zero, as there
     // is only a single application object, and its lifetime is controlled by
     // the running instance, not by its reference count.
-    if (ref > 0)
+    ಆದರೆ (ref > 0)
 	--ref;
-    return ref;
+    ಹಿಂತಿರುಗಿ ref;
 }
 
 /*ARGSUSED*/
 STDMETHODIMP
-CVimCF::CreateInstance(IUnknown *punkOuter, REFIID riid, void **ppv)
+CVimCF::CreateInstance(IUnknown *punkOuter, REFIID riid, ಶೂನ್ಯ **ppv)
 {
-    return app->QueryInterface(riid, ppv);
+    ಹಿಂತಿರುಗಿ app->QueryInterface(riid, ppv);
 }
 
 /*ARGSUSED*/
 STDMETHODIMP
-CVimCF::LockServer(BOOL lock)
+CVimCF::ಬೀಗ_Server(BOOL ಬೀಗ)
 {
-    return S_OK;
+    ಹಿಂತಿರುಗಿ S_OK;
 }
 
 /*****************************************************************************
@@ -501,96 +501,96 @@ CVimCF::LockServer(BOOL lock)
 *****************************************************************************/
 
 // Internal use only
-static void SetKeyAndValue(const char *path, const char *subkey, const char *value);
-static void GUIDtochar(const GUID &guid, char *GUID, int length);
-static void RecursiveDeleteKey(HKEY hKeyParent, const char *child);
-static const int GUID_STRING_SIZE = 39;
+ಸ್ಥಿರ ಶೂನ್ಯ ಗಣ_ಕೀಲಿ_And_ಮೌಲ್ಯ(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಮಾರ್ಗ, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *subkey, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಮೌಲ್ಯ);
+ಸ್ಥಿರ ಶೂನ್ಯ GUIDtochar(ಸ್ಥಿರಾಂಕ GUID &guid, ಅಕ್ಷರ *GUID, ಪೂರ್ಣಾಂಕ ಉದ್ದಳತೆ);
+ಸ್ಥಿರ ಶೂನ್ಯ Recursive_Delete_ಕೀಲಿ(HKEY h_ಕೀಲಿ_ಪೋಷಕ, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಮಗು);
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ GUID_STRING_ಗಾತ್ರ = 39;
 
 // Register the component in the registry
 // When "silent" is TRUE don't give any messages.
 
-extern "C" void RegisterMe(int silent)
+ಬಾಹ್ಯ "C" ಶೂನ್ಯ ರಿಜಿಸ್ಟರ್_Me(ಪೂರ್ಣಾಂಕ silent)
 {
     BOOL ok = TRUE;
 
     // Get the application startup command
-    char module[MAX_PATH];
+    ಅಕ್ಷರ module[MAX_ಮಾರ್ಗ];
 
-    ::GetModuleFileName(NULL, module, MAX_PATH);
+    ::GetModuleFileName(ಖಾಲಿ, module, MAX_ಮಾರ್ಗ);
 
     // Unregister first (quietly)
     UnregisterMe(FALSE);
 
     // Convert the CLSID into a char
-    char clsid[GUID_STRING_SIZE];
-    GUIDtochar(MYCLSID, clsid, sizeof(clsid));
+    ಅಕ್ಷರ clsid[GUID_STRING_ಗಾತ್ರ];
+    GUIDtochar(MYCLSID, clsid, ಗಾತ್ರ(clsid));
 
     // Convert the LIBID into a char
-    char libid[GUID_STRING_SIZE];
-    GUIDtochar(MYLIBID, libid, sizeof(libid));
+    ಅಕ್ಷರ libid[GUID_STRING_ಗಾತ್ರ];
+    GUIDtochar(MYLIBID, libid, ಗಾತ್ರ(libid));
 
     // Build the key CLSID\\{...}
-    char Key[MAX_CLSID_LEN];
-    strcpy(Key, "CLSID\\");
-    strcat(Key, clsid);
+    ಅಕ್ಷರ ಕೀಲಿ_2[MAX_CLSID_LEN];
+    strcpy(ಕೀಲಿ_2, "CLSID\\");
+    strcat(ಕೀಲಿ_2, clsid);
 
     // Add the CLSID to the registry
-    SetKeyAndValue(Key, NULL, MYNAME);
-    SetKeyAndValue(Key, "LocalServer32", module);
-    SetKeyAndValue(Key, "ProgID", MYPROGID);
-    SetKeyAndValue(Key, "VersionIndependentProgID", MYVIPROGID);
-    SetKeyAndValue(Key, "TypeLib", libid);
+    ಗಣ_ಕೀಲಿ_And_ಮೌಲ್ಯ(ಕೀಲಿ_2, ಖಾಲಿ, MYNAME);
+    ಗಣ_ಕೀಲಿ_And_ಮೌಲ್ಯ(ಕೀಲಿ_2, "LocalServer32", module);
+    ಗಣ_ಕೀಲಿ_And_ಮೌಲ್ಯ(ಕೀಲಿ_2, "ProgID", MYPROGID);
+    ಗಣ_ಕೀಲಿ_And_ಮೌಲ್ಯ(ಕೀಲಿ_2, "VersionIndependentProgID", MYVIPROGID);
+    ಗಣ_ಕೀಲಿ_And_ಮೌಲ್ಯ(ಕೀಲಿ_2, "TypeLib", libid);
 
     // Add the version-independent ProgID subkey under HKEY_CLASSES_ROOT
-    SetKeyAndValue(MYVIPROGID, NULL, MYNAME);
-    SetKeyAndValue(MYVIPROGID, "CLSID", clsid);
-    SetKeyAndValue(MYVIPROGID, "CurVer", MYPROGID);
+    ಗಣ_ಕೀಲಿ_And_ಮೌಲ್ಯ(MYVIPROGID, ಖಾಲಿ, MYNAME);
+    ಗಣ_ಕೀಲಿ_And_ಮೌಲ್ಯ(MYVIPROGID, "CLSID", clsid);
+    ಗಣ_ಕೀಲಿ_And_ಮೌಲ್ಯ(MYVIPROGID, "CurVer", MYPROGID);
 
     // Add the versioned ProgID subkey under HKEY_CLASSES_ROOT
-    SetKeyAndValue(MYPROGID, NULL, MYNAME);
-    SetKeyAndValue(MYPROGID, "CLSID", clsid);
+    ಗಣ_ಕೀಲಿ_And_ಮೌಲ್ಯ(MYPROGID, ಖಾಲಿ, MYNAME);
+    ಗಣ_ಕೀಲಿ_And_ಮೌಲ್ಯ(MYPROGID, "CLSID", clsid);
 
-    wchar_t w_module[MAX_PATH];
-    MultiByteToWideChar(CP_ACP, 0, module, -1, w_module, MAX_PATH);
+    wchar_t w_module[MAX_ಮಾರ್ಗ];
+    Multi_Byte_ಗಮ್ಯ_Wide_Char(CP_ACP, 0, module, -1, w_module, MAX_ಮಾರ್ಗ);
 
-    ITypeLib *typelib = NULL;
-    if (LoadTypeLib(w_module, &typelib) != S_OK)
+    ITypeLib *typelib = ಖಾಲಿ;
+    ಆದರೆ (ತುಂಬು_Type_Lib(w_module, &typelib) != S_OK)
     {
-	if (!silent)
-	    MessageBox(0, "Cannot load type library to register",
+	ಆದರೆ (!silent)
+	    ಸಂದೇಶ_Box(0, "Cannot load type library to register",
 						       "Vim Registration", 0);
 	ok = FALSE;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (RegisterTypeLib(typelib, w_module, NULL) != S_OK)
+	ಆದರೆ (ರಿಜಿಸ್ಟರ್_Type_Lib(typelib, w_module, ಖಾಲಿ) != S_OK)
 	{
-	    if (!silent)
-		MessageBox(0, "Cannot register type library",
+	    ಆದರೆ (!silent)
+		ಸಂದೇಶ_Box(0, "Cannot register type library",
 						       "Vim Registration", 0);
 	    ok = FALSE;
 	}
 	typelib->Release();
     }
 
-    if (ok && !silent)
-	MessageBox(0, "Registered successfully", "Vim", 0);
+    ಆದರೆ (ok && !silent)
+	ಸಂದೇಶ_Box(0, "Registered successfully", "Vim", 0);
 }
 
 // Remove the component from the registry
 //
 // Note: There is little error checking in this code, to allow incomplete
 // or failed registrations to be undone.
-extern "C" void UnregisterMe(int bNotifyUser)
+ಬಾಹ್ಯ "C" ಶೂನ್ಯ UnregisterMe(ಪೂರ್ಣಾಂಕ bNotifyUser)
 {
     // Unregister the type library
     ITypeLib *typelib;
-    if (SUCCEEDED(LoadRegTypeLib(MYLIBID, MAJORVER, MINORVER, LOCALE, &typelib)))
+    ಆದರೆ (SUCCEEDED(ತುಂಬು_Reg_Type_Lib(MYLIBID, MAJORVER, MINORVER, LOCALE, &typelib)))
     {
 	TLIBATTR *tla;
-	if (SUCCEEDED(typelib->GetLibAttr(&tla)))
+	ಆದರೆ (SUCCEEDED(typelib->GetLibAttr(&tla)))
 	{
-	    UnRegisterTypeLib(tla->guid, tla->wMajorVerNum, tla->wMinorVerNum,
+	    Un_ರಿಜಿಸ್ಟರ್_Type_Lib(tla->guid, tla->w_Major_Ver_ಅಂಕೆ, tla->w_Minor_Ver_ಅಂಕೆ,
 			      tla->lcid, tla->syskind);
 	    typelib->ReleaseTLibAttr(tla);
 	}
@@ -598,179 +598,179 @@ extern "C" void UnregisterMe(int bNotifyUser)
     }
 
     // Convert the CLSID into a char
-    char clsid[GUID_STRING_SIZE];
-    GUIDtochar(MYCLSID, clsid, sizeof(clsid));
+    ಅಕ್ಷರ clsid[GUID_STRING_ಗಾತ್ರ];
+    GUIDtochar(MYCLSID, clsid, ಗಾತ್ರ(clsid));
 
     // Build the key CLSID\\{...}
-    char Key[MAX_CLSID_LEN];
-    strcpy(Key, "CLSID\\");
-    strcat(Key, clsid);
+    ಅಕ್ಷರ ಕೀಲಿ_2[MAX_CLSID_LEN];
+    strcpy(ಕೀಲಿ_2, "CLSID\\");
+    strcat(ಕೀಲಿ_2, clsid);
 
     // Delete the CLSID Key - CLSID\{...}
-    RecursiveDeleteKey(HKEY_CLASSES_ROOT, Key);
+    Recursive_Delete_ಕೀಲಿ(HKEY_CLASSES_ಬೇರು, ಕೀಲಿ_2);
 
     // Delete the version-independent ProgID Key
-    RecursiveDeleteKey(HKEY_CLASSES_ROOT, MYVIPROGID);
+    Recursive_Delete_ಕೀಲಿ(HKEY_CLASSES_ಬೇರು, MYVIPROGID);
 
     // Delete the ProgID key
-    RecursiveDeleteKey(HKEY_CLASSES_ROOT, MYPROGID);
+    Recursive_Delete_ಕೀಲಿ(HKEY_CLASSES_ಬೇರು, MYPROGID);
 
-    if (bNotifyUser)
-	MessageBox(0, "Unregistered successfully", "Vim", 0);
+    ಆದರೆ (bNotifyUser)
+	ಸಂದೇಶ_Box(0, "Unregistered successfully", "Vim", 0);
 }
 
 /****************************************************************************/
 
 // Convert a GUID to a char string
-static void GUIDtochar(const GUID &guid, char *GUID, int length)
+ಸ್ಥಿರ ಶೂನ್ಯ GUIDtochar(ಸ್ಥಿರಾಂಕ GUID &guid, ಅಕ್ಷರ *GUID, ಪೂರ್ಣಾಂಕ ಉದ್ದಳತೆ)
 {
     // Get wide string version
-    LPOLESTR wGUID = NULL;
+    LPOLESTR wGUID = ಖಾಲಿ;
     StringFromCLSID(guid, &wGUID);
 
     // Convert from wide characters to non-wide
-    wcstombs(GUID, wGUID, length);
+    wcstombs(GUID, wGUID, ಉದ್ದಳತೆ);
 
     // Free memory
     CoTaskMemFree(wGUID);
 }
 
 // Delete a key and all of its descendants
-static void RecursiveDeleteKey(HKEY hKeyParent, const char *child)
+ಸ್ಥಿರ ಶೂನ್ಯ Recursive_Delete_ಕೀಲಿ(HKEY h_ಕೀಲಿ_ಪೋಷಕ, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಮಗು)
 {
     // Open the child
-    HKEY hKeyChild;
-    LONG result = RegOpenKeyEx(hKeyParent, child, 0,
-			       KEY_ALL_ACCESS, &hKeyChild);
-    if (result != ERROR_SUCCESS)
-	return;
+    HKEY h_ಕೀಲಿ_ಮಗು;
+    LONG ಫಲಿತಾಂಶ = Reg_Open_ಕೀಲಿ_Ex(h_ಕೀಲಿ_ಪೋಷಕ, ಮಗು, 0,
+			       ಕೀಲಿ_ALL_ACCESS, &h_ಕೀಲಿ_ಮಗು);
+    ಆದರೆ (ಫಲಿತಾಂಶ != ERROR_SUCCESS)
+	ಹಿಂತಿರುಗಿ;
 
     // Enumerate all of the descendants of this child
-    FILETIME time;
-    char buffer[1024];
-    DWORD size = 1024;
+    FILETIME ಸಮಯ;
+    ಅಕ್ಷರ ಬಫರ್[1024];
+    DWORD ಗಾತ್ರ_2 = 1024;
 
-    while (RegEnumKeyEx(hKeyChild, 0, buffer, &size, NULL,
-			NULL, NULL, &time) == S_OK)
+    ಆಗ (Reg_Enum_ಕೀಲಿ_Ex(h_ಕೀಲಿ_ಮಗು, 0, ಬಫರ್, &ಗಾತ್ರ_2, ಖಾಲಿ,
+			ಖಾಲಿ, ಖಾಲಿ, &ಸಮಯ) == S_OK)
     {
 	// Delete the descendants of this child
-	RecursiveDeleteKey(hKeyChild, buffer);
-	size = 256;
+	Recursive_Delete_ಕೀಲಿ(h_ಕೀಲಿ_ಮಗು, ಬಫರ್);
+	ಗಾತ್ರ_2 = 256;
     }
 
     // Close the child
-    RegCloseKey(hKeyChild);
+    Reg_Close_ಕೀಲಿ(h_ಕೀಲಿ_ಮಗು);
 
     // Delete this child
-    RegDeleteKey(hKeyParent, child);
+    Reg_Delete_ಕೀಲಿ(h_ಕೀಲಿ_ಪೋಷಕ, ಮಗು);
 }
 
 // Create a key and set its value
-static void SetKeyAndValue(const char *key, const char *subkey, const char *value)
+ಸ್ಥಿರ ಶೂನ್ಯ ಗಣ_ಕೀಲಿ_And_ಮೌಲ್ಯ(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಕೀಲಿ, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *subkey, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಮೌಲ್ಯ)
 {
-    HKEY hKey;
-    char buffer[1024];
+    HKEY h_ಕೀಲಿ;
+    ಅಕ್ಷರ ಬಫರ್[1024];
 
-    strcpy(buffer, key);
+    strcpy(ಬಫರ್, ಕೀಲಿ);
 
     // Add subkey name to buffer.
-    if (subkey)
+    ಆದರೆ (subkey)
     {
-	strcat(buffer, "\\");
-	strcat(buffer, subkey);
+	strcat(ಬಫರ್, "\\");
+	strcat(ಬಫರ್, subkey);
     }
 
     // Create and open key and subkey.
-    long result = RegCreateKeyEx(HKEY_CLASSES_ROOT,
-				 buffer,
-				 0, NULL, REG_OPTION_NON_VOLATILE,
-				 KEY_ALL_ACCESS, NULL,
-				 &hKey, NULL);
-    if (result != ERROR_SUCCESS)
-	return;
+    ದೀರ್ಘ ಫಲಿತಾಂಶ = Reg_Create_ಕೀಲಿ_Ex(HKEY_CLASSES_ಬೇರು,
+				 ಬಫರ್,
+				 0, ಖಾಲಿ, REG_OPTION_NON_VOLATILE,
+				 ಕೀಲಿ_ALL_ACCESS, ಖಾಲಿ,
+				 &h_ಕೀಲಿ, ಖಾಲಿ);
+    ಆದರೆ (ಫಲಿತಾಂಶ != ERROR_SUCCESS)
+	ಹಿಂತಿರುಗಿ;
 
     // Set the value
-    if (value)
-	RegSetValueEx(hKey, NULL, 0, REG_SZ, (BYTE *)value,
-		      (DWORD)STRLEN(value)+1);
+    ಆದರೆ (ಮೌಲ್ಯ)
+	Reg_ಗಣ_ಮೌಲ್ಯ_Ex(h_ಕೀಲಿ, ಖಾಲಿ, 0, REG_SZ, (BYTE *)ಮೌಲ್ಯ,
+		      (DWORD)STRLEN(ಮೌಲ್ಯ)+1);
 
-    RegCloseKey(hKey);
+    Reg_Close_ಕೀಲಿ(h_ಕೀಲಿ);
 }
 
 /*****************************************************************************
  5. OLE Initialisation and shutdown processing
 *****************************************************************************/
-extern "C" void InitOLE(int *pbDoRestart)
+ಬಾಹ್ಯ "C" ಶೂನ್ಯ InitOLE(ಪೂರ್ಣಾಂಕ *pbDoRestart)
 {
     HRESULT hr;
 
     *pbDoRestart = FALSE;
 
     // Initialize the OLE libraries
-    hr = OleInitialize(NULL);
-    if (FAILED(hr))
+    hr = OleInitialize(ಖಾಲಿ);
+    ಆದರೆ (FAILED(hr))
     {
-	MessageBox(0, "Cannot initialise OLE", "Vim Initialisation", 0);
-	goto error0;
+	ಸಂದೇಶ_Box(0, "Cannot initialise OLE", "Vim Initialisation", 0);
+	ಹೋಗು error0;
     }
 
     // Create the application object
     app = CVim::Create(pbDoRestart);
-    if (app == NULL)
-	goto error1;
+    ಆದರೆ (app == ಖಾಲಿ)
+	ಹೋಗು error1;
 
     // Create the class factory
     cf = CVimCF::Create();
-    if (cf == NULL)
-	goto error1;
+    ಆದರೆ (cf == ಖಾಲಿ)
+	ಹೋಗು error1;
 
     // Register the class factory
-    hr = CoRegisterClassObject(
+    hr = Co_ರಿಜಿಸ್ಟರ್_Class_Object(
 	MYCLSID,
 	cf,
 	CLSCTX_LOCAL_SERVER,
 	REGCLS_MULTIPLEUSE,
 	&cf_id);
 
-    if (FAILED(hr))
+    ಆದರೆ (FAILED(hr))
     {
-	MessageBox(0, "Cannot register class factory", "Vim Initialisation", 0);
-	goto error1;
+	ಸಂದೇಶ_Box(0, "Cannot register class factory", "Vim Initialisation", 0);
+	ಹೋಗು error1;
     }
 
     // Register the application object as active
-    hr = RegisterActiveObject(
+    hr = ರಿಜಿಸ್ಟರ್_ಸಕ್ರಿಯ_Object(
 	app,
 	MYCLSID,
 	0,
 	&app_id);
 
-    if (FAILED(hr))
+    ಆದರೆ (FAILED(hr))
     {
-	MessageBox(0, "Cannot register application object", "Vim Initialisation", 0);
-	goto error1;
+	ಸಂದೇಶ_Box(0, "Cannot register application object", "Vim Initialisation", 0);
+	ಹೋಗು error1;
     }
 
-    return;
+    ಹಿಂತಿರುಗಿ;
 
     // Errors: tidy up as much as needed and return
 error1:
     UninitOLE();
 error0:
-    return;
+    ಹಿಂತಿರುಗಿ;
 }
 
-extern "C" void UninitOLE()
+ಬಾಹ್ಯ "C" ಶೂನ್ಯ UninitOLE()
 {
     // Unregister the application object
-    if (app_id)
+    ಆದರೆ (app_id)
     {
-	RevokeActiveObject(app_id, NULL);
+	Revoke_ಸಕ್ರಿಯ_Object(app_id, ಖಾಲಿ);
 	app_id = 0;
     }
 
     // Unregister the class factory
-    if (cf_id)
+    ಆದರೆ (cf_id)
     {
 	CoRevokeClassObject(cf_id);
 	cf_id = 0;
@@ -780,17 +780,17 @@ extern "C" void UninitOLE()
     OleUninitialize();
 
     // Delete the application object
-    if (app)
+    ಆದರೆ (app)
     {
-	delete app;
-	app = NULL;
+	ಅಳಿಸು app;
+	app = ಖಾಲಿ;
     }
 
     // Delete the class factory
-    if (cf)
+    ಆದರೆ (cf)
     {
-	delete cf;
-	cf = NULL;
+	ಅಳಿಸು cf;
+	cf = ಖಾಲಿ;
     }
 }
-#endif /* FEAT_OLE */
+#ಆದರೆ_ಅಂತ್ಯ /* FEAT_OLE */

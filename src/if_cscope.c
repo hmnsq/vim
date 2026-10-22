@@ -9,19 +9,19 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-#if defined(FEAT_CSCOPE)
+#ಆದರೆ defined(FEAT_CSCOPE)
 
 # include <sys/types.h>
 # include <sys/stat.h>
-# if defined(UNIX)
+# ಆದರೆ defined(UNIX)
 #  include <sys/wait.h>
 # endif
 
-# if defined (MSWIN)
-#  ifndef WIN32_LEAN_AND_MEAN
-#   define WIN32_LEAN_AND_MEAN
+# ಆದರೆ defined (MSWIN)
+#  ifndef WIN32_LEAN_AND_ಸರಾಸರಿ
+#   define WIN32_LEAN_AND_ಸರಾಸರಿ
 #  endif
 #  include <windows.h>
 # endif
@@ -36,86 +36,86 @@
  * See ":help cscope-find" for the possible queries.
  */
 
-typedef struct {
-    char *  name;
-    int     (*func)(exarg_T *eap);
-    char *  help;
-    char *  usage;
-    int	    cansplit;		// if supports splitting window
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+    ಅಕ್ಷರ *  name;
+    ಪೂರ್ಣಾಂಕ     (*func)(exarg_T *eap);
+    ಅಕ್ಷರ *  help;
+    ಅಕ್ಷರ *  usage;
+    ಪೂರ್ಣಾಂಕ	    cansplit;		// if supports splitting window
 } cscmd_T;
 
-typedef struct csi {
-    char *	    fname;	// cscope db name
-    char *	    ppath;	// path to prepend (the -P option)
-    char *	    flags;	// additional cscope flags/options (e.g, -p2)
-# if defined(UNIX)
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ csi {
+    ಅಕ್ಷರ *	    fname;	// cscope db name
+    ಅಕ್ಷರ *	    ppath;	// path to prepend (the -P option)
+    ಅಕ್ಷರ *	    flags;	// additional cscope flags/options (e.g, -p2)
+# ಆದರೆ defined(UNIX)
     pid_t	    pid;	// PID of the connected cscope process.
     dev_t	    st_dev;	// ID of dev containing cscope db
     ino_t	    st_ino;	// inode number of cscope db
-# else
-#  if defined(MSWIN)
+# ಇಲ್ಲದಿದ್ದರೆ
+#  ಆದರೆ defined(MSWIN)
     DWORD	    pid;	// PID of the connected cscope process.
     HANDLE	    hProc;	// cscope process handle
     DWORD	    nVolume;	// Volume serial number, instead of st_dev
-    DWORD	    nIndexHigh;	// st_ino has no meaning in the Windows
-    DWORD	    nIndexLow;
+    DWORD	    n_ಸೂಚ್ಯಂಕ_ಮೇಲಿನ;	// st_ino has no meaning in the Windows
+    DWORD	    n_ಸೂಚ್ಯಂಕ_ಕೆಳಗಿನ;
 #  endif
 # endif
 
     FILE *	    fr_fp;	// from cscope: FILE.
-    FILE *	    to_fp;	// to cscope: FILE.
+    FILE *	    ಗಮ್ಯ_fp;	// to cscope: FILE.
 } csinfo_T;
 
-typedef enum { Add, Find, Help, Kill, Reset, Show } csid_e;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ { ಕೂಡಿಸು_2, ಕಂಡುಹಿಡಿ_2, Help, Kill, Reset, Show } csid_e;
 
-typedef enum {
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ {
     Store,
     Get,
     Free,
     Print
 } mcmd_e;
 
-static int	    cs_add(exarg_T *eap);
-static int	    cs_add_common(char *, char *, char *);
-static int	    cs_check_for_connections(void);
-static int	    cs_check_for_tags(void);
-static int	    cs_cnt_connections(void);
-static int	    cs_create_connection(int i);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    cs_ಕೂಡಿಸು(exarg_T *eap);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    cs_ಕೂಡಿಸು_common(ಅಕ್ಷರ *, ಅಕ್ಷರ *, ಅಕ್ಷರ *);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    cs_check_for_connections(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    cs_check_for_ಟ್ಯಾಗುಗಳು(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    cs_cnt_connections(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    cs_create_connection(ಪೂರ್ಣಾಂಕ i);
 # ifdef FEAT_QUICKFIX
-static void	    cs_file_results(FILE *, int *);
+ಸ್ಥಿರ ಶೂನ್ಯ	    cs_file_results(FILE *, ಪೂರ್ಣಾಂಕ *);
 # endif
-static void	    cs_fill_results(char *, int , int *, char ***,
-			char ***, int *);
-static int	    cs_find(exarg_T *eap);
-static int	    cs_find_common(char *opt, char *pat, int, int, int, char_u *cmdline);
-static int	    cs_help(exarg_T *eap);
-static int	    cs_insert_filelist(char *, char *, char *,
+ಸ್ಥಿರ ಶೂನ್ಯ	    cs_fill_results(ಅಕ್ಷರ *, ಪೂರ್ಣಾಂಕ , ಪೂರ್ಣಾಂಕ *, ಅಕ್ಷರ ***,
+			ಅಕ್ಷರ ***, ಪೂರ್ಣಾಂಕ *);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    cs_ಕಂಡುಹಿಡಿ(exarg_T *eap);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    cs_ಕಂಡುಹಿಡಿ_common(ಅಕ್ಷರ *opt, ಅಕ್ಷರ *pat, ಪೂರ್ಣಾಂಕ, ಪೂರ್ಣಾಂಕ, ಪೂರ್ಣಾಂಕ, char_u *cmdline);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    cs_help(exarg_T *eap);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    cs_ಸೇರಿಸು_filelist(ಅಕ್ಷರ *, ಅಕ್ಷರ *, ಅಕ್ಷರ *,
 			stat_T *);
-static int	    cs_kill(exarg_T *eap);
-static void	    cs_kill_execute(int, char *);
-static cscmd_T *    cs_lookup_cmd(exarg_T *eap);
-static char *	    cs_make_vim_style_matches(char *, char *,
-			char *, char *);
-static char *	    cs_manage_matches(char **, char **, int, mcmd_e);
-static void	    cs_print_tags_priv(char **, char **, int);
-static int	    cs_read_prompt(int);
-static void	    cs_release_csp(int, int freefnpp);
-static int	    cs_reset(exarg_T *eap);
-static char *	    cs_resolve_file(int, char *);
-static int	    cs_show(exarg_T *eap);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    cs_kill(exarg_T *eap);
+ಸ್ಥಿರ ಶೂನ್ಯ	    cs_kill_execute(ಪೂರ್ಣಾಂಕ, ಅಕ್ಷರ *);
+ಸ್ಥಿರ cscmd_T *    cs_lookup_cmd(exarg_T *eap);
+ಸ್ಥಿರ ಅಕ್ಷರ *	    cs_make_vim_style_matches(ಅಕ್ಷರ *, ಅಕ್ಷರ *,
+			ಅಕ್ಷರ *, ಅಕ್ಷರ *);
+ಸ್ಥಿರ ಅಕ್ಷರ *	    cs_manage_matches(ಅಕ್ಷರ **, ಅಕ್ಷರ **, ಪೂರ್ಣಾಂಕ, mcmd_e);
+ಸ್ಥಿರ ಶೂನ್ಯ	    cs_print_ಟ್ಯಾಗುಗಳು_priv(ಅಕ್ಷರ **, ಅಕ್ಷರ **, ಪೂರ್ಣಾಂಕ);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    cs_read_prompt(ಪೂರ್ಣಾಂಕ);
+ಸ್ಥಿರ ಶೂನ್ಯ	    cs_release_csp(ಪೂರ್ಣಾಂಕ, ಪೂರ್ಣಾಂಕ freefnpp);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    cs_reset(exarg_T *eap);
+ಸ್ಥಿರ ಅಕ್ಷರ *	    cs_resolve_file(ಪೂರ್ಣಾಂಕ, ಅಕ್ಷರ *);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    cs_show(exarg_T *eap);
 
 
-static csinfo_T *   csinfo = NULL;
-static int	    csinfo_size = 0;	// number of items allocated in
+ಸ್ಥಿರ csinfo_T *   csinfo = ಖಾಲಿ;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    csinfo_ಗಾತ್ರ = 0;	// number of items allocated in
 					// csinfo[]
 
-static int	    eap_arg_len;    // length of eap->arg, set in
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	    eap_arg_len;    // length of eap->arg, set in
 				    // cs_lookup_cmd()
-static cscmd_T	    cs_cmds[] =
+ಸ್ಥಿರ cscmd_T	    cs_cmds[] =
 {
-    { "add",	cs_add,
+    { "add",	cs_ಕೂಡಿಸು,
 		N_("Add a new database"),     "add file|dir [pre-path] [flags]", 0 },
-    { "find",	cs_find,
+    { "find",	cs_ಕಂಡುಹಿಡಿ,
 		N_("Query for a pattern"),    "find a|c|d|e|f|g|i|s|t name", 1 },
     { "help",	cs_help,
 		N_("Show this message"),      "help", 0 },
@@ -125,20 +125,20 @@ static cscmd_T	    cs_cmds[] =
 		N_("Reinit all connections"), "reset", 0 },
     { "show",	cs_show,
 		N_("Show connections"),       "show", 0 },
-    { NULL, NULL, NULL, NULL, 0 }
+    { ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ, ಖಾಲಿ, 0 }
 };
 
-    static void
-cs_usage_msg(csid_e x)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+cs_usage_ಸಂದೇಶ(csid_e x)
 {
-    (void)semsg(_(e_usage_cscope_str), cs_cmds[(int)x].usage);
+    (ಶೂನ್ಯ)semsg(_(e_usage_cscope_str), cs_cmds[(ಪೂರ್ಣಾಂಕ)x].usage);
 }
 
-static enum
+ಸ್ಥಿರ ಎಣಿಕೆ
 {
     EXP_CSCOPE_SUBCMD,	// expand ":cscope" sub-commands
     EXP_SCSCOPE_SUBCMD,	// expand ":scscope" sub-commands
-    EXP_CSCOPE_FIND,	// expand ":cscope find" arguments
+    EXP_CSCOPE_ಕಂಡುಹಿಡಿ,	// expand ":cscope find" arguments
     EXP_CSCOPE_KILL	// expand ":cscope kill" arguments
 } expand_what;
 
@@ -147,68 +147,68 @@ static enum
  * expansion.
  */
     char_u *
-get_cscope_name(expand_T *xp UNUSED, int idx)
+get_cscope_name(expand_T *xp ಬಳಸದ, ಪೂರ್ಣಾಂಕ idx)
 {
-    int		current_idx;
-    int		i;
+    ಪೂರ್ಣಾಂಕ		current_idx;
+    ಪೂರ್ಣಾಂಕ		i;
 
-    switch (expand_what)
+    ಆಯ್ಕೆ (expand_what)
     {
-    case EXP_CSCOPE_SUBCMD:
+    ಸ್ಥಿತಿ EXP_CSCOPE_SUBCMD:
 	// Complete with sub-commands of ":cscope":
 	// add, find, help, kill, reset, show
-	return (char_u *)cs_cmds[idx].name;
-    case EXP_SCSCOPE_SUBCMD:
+	ಹಿಂತಿರುಗಿ (char_u *)cs_cmds[idx].name;
+    ಸ್ಥಿತಿ EXP_SCSCOPE_SUBCMD:
 	// Complete with sub-commands of ":scscope": same sub-commands as
 	// ":cscope" but skip commands which don't support split windows
-	for (i = 0, current_idx = 0; cs_cmds[i].name != NULL; i++)
-	    if (cs_cmds[i].cansplit)
-		if (current_idx++ == idx)
-		    break;
-	return (char_u *)cs_cmds[i].name;
-    case EXP_CSCOPE_FIND:
+	ಗಾಗಿ (i = 0, current_idx = 0; cs_cmds[i].name != ಖಾಲಿ; i++)
+	    ಆದರೆ (cs_cmds[i].cansplit)
+		ಆದರೆ (current_idx++ == idx)
+		    ನಿಲ್ಲಿಸು;
+	ಹಿಂತಿರುಗಿ (char_u *)cs_cmds[i].name;
+    ಸ್ಥಿತಿ EXP_CSCOPE_ಕಂಡುಹಿಡಿ:
 	{
-	    const char *query_type[] =
+	    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *query_type[] =
 	    {
-		"a", "c", "d", "e", "f", "g", "i", "s", "t", NULL
+		"a", "c", "d", "e", "f", "g", "i", "s", "t", ಖಾಲಿ
 	    };
 
 	    // Complete with query type of ":cscope find {query_type}".
 	    // {query_type} can be letters (c, d, ... a) or numbers (0, 1,
 	    // ..., 9) but only complete with letters, since numbers are
 	    // redundant.
-	    return (char_u *)query_type[idx];
+	    ಹಿಂತಿರುಗಿ (char_u *)query_type[idx];
 	}
-    case EXP_CSCOPE_KILL:
+    ಸ್ಥಿತಿ EXP_CSCOPE_KILL:
 	{
-	    static char	connection[5];
+	    ಸ್ಥಿರ ಅಕ್ಷರ	connection[5];
 
 	    // ":cscope kill" accepts connection numbers or partial names of
 	    // the pathname of the cscope database as argument.  Only complete
 	    // with connection numbers. -1 can also be used to kill all
 	    // connections.
-	    for (i = 0, current_idx = 0; i < csinfo_size; i++)
+	    ಗಾಗಿ (i = 0, current_idx = 0; i < csinfo_ಗಾತ್ರ; i++)
 	    {
-		if (csinfo[i].fname == NULL)
-		    continue;
-		if (current_idx++ == idx)
+		ಆದರೆ (csinfo[i].fname == ಖಾಲಿ)
+		    ಮುಂದುವರಿ;
+		ಆದರೆ (current_idx++ == idx)
 		{
-		    vim_snprintf(connection, sizeof(connection), "%d", i);
-		    return (char_u *)connection;
+		    vim_snprintf(connection, ಗಾತ್ರ(connection), "%d", i);
+		    ಹಿಂತಿರುಗಿ (char_u *)connection;
 		}
 	    }
-	    return (current_idx == idx && idx > 0) ? (char_u *)"-1" : NULL;
+	    ಹಿಂತಿರುಗಿ (current_idx == idx && idx > 0) ? (char_u *)"-1" : ಖಾಲಿ;
 	}
-    default:
-	return NULL;
+    ಪೂರ್ವನಿಯೋಜಿತ:
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 }
 
 /*
  * Handle command line completion for :cscope command.
  */
-    void
-set_context_in_cscope_cmd(
+    ಶೂನ್ಯ
+ಗಣ_context_ಒಳ_cscope_cmd(
     expand_T	*xp,
     char_u	*arg,
     cmdidx_T	cmdidx)
@@ -217,29 +217,29 @@ set_context_in_cscope_cmd(
 
     // Default: expand subcommands
     xp->xp_context = EXPAND_CSCOPE;
-    xp->xp_pattern = arg;
+    xp->xp_ನಮೂನೆ = arg;
     expand_what = (cmdidx == CMD_scscope)
 			? EXP_SCSCOPE_SUBCMD : EXP_CSCOPE_SUBCMD;
 
-    if (*arg == NUL)
-	return;
+    ಆದರೆ (*arg == NUL)
+	ಹಿಂತಿರುಗಿ;
 
     // (part of) subcommand already typed
     p = skiptowhite(arg);
-    if (*p == NUL)
-	return;
+    ಆದರೆ (*p == NUL)
+	ಹಿಂತಿರುಗಿ;
 
     // past first word
-    xp->xp_pattern = skipwhite(p);
-    if (*skiptowhite(xp->xp_pattern) != NUL)
+    xp->xp_ನಮೂನೆ = skipwhite(p);
+    ಆದರೆ (*skiptowhite(xp->xp_ನಮೂನೆ) != NUL)
 	xp->xp_context = EXPAND_NOTHING;
-    else if (STRNICMP(arg, "add", p - arg) == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRNICMP(arg, "add", p - arg) == 0)
 	xp->xp_context = EXPAND_FILES;
-    else if (STRNICMP(arg, "kill", p - arg) == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRNICMP(arg, "kill", p - arg) == 0)
 	expand_what = EXP_CSCOPE_KILL;
-    else if (STRNICMP(arg, "find", p - arg) == 0)
-	expand_what = EXP_CSCOPE_FIND;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRNICMP(arg, "find", p - arg) == 0)
+	expand_what = EXP_CSCOPE_ಕಂಡುಹಿಡಿ;
+    ಇಲ್ಲದಿದ್ದರೆ
 	xp->xp_context = EXPAND_NOTHING;
 }
 
@@ -247,44 +247,44 @@ set_context_in_cscope_cmd(
  * Find the command, print help if invalid, and then call the corresponding
  * command function.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 do_cscope_general(
     exarg_T	*eap,
-    int		make_split UNUSED) // whether to split window
+    ಪೂರ್ಣಾಂಕ		make_ವಿಭಜಿಸು ಬಳಸದ) // whether to split window
 {
     cscmd_T *cmdp;
 
-    if (check_restricted())
-	return;
+    ಆದರೆ (check_restricted())
+	ಹಿಂತಿರುಗಿ;
 
-    if ((cmdp = cs_lookup_cmd(eap)) == NULL)
+    ಆದರೆ ((cmdp = cs_lookup_cmd(eap)) == ಖಾಲಿ)
     {
 	cs_help(eap);
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    if (make_split)
+    ಆದರೆ (make_ವಿಭಜಿಸು)
     {
-	if (!cmdp->cansplit)
+	ಆದರೆ (!cmdp->cansplit)
 	{
-	    (void)msg_puts(_("This cscope command does not support splitting the window.\n"));
-	    return;
+	    (ಶೂನ್ಯ)ಸಂದೇಶ_puts(_("This cscope command does not support splitting the window.\n"));
+	    ಹಿಂತಿರುಗಿ;
 	}
-	postponed_split = -1;
-	postponed_split_flags = cmdmod.cmod_split;
-	postponed_split_tab = cmdmod.cmod_tab;
+	postponed_ವಿಭಜಿಸು = -1;
+	postponed_ವಿಭಜಿಸು_flags = cmdmod.cmod_ವಿಭಜಿಸು;
+	postponed_ವಿಭಜಿಸು_tab = cmdmod.cmod_tab;
     }
 
     cmdp->func(eap);
 
-    postponed_split_flags = 0;
-    postponed_split_tab = 0;
+    postponed_ವಿಭಜಿಸು_flags = 0;
+    postponed_ವಿಭಜಿಸು_tab = 0;
 }
 
 /*
  * Implementation of ":cscope" and ":lcscope"
  */
-    void
+    ಶೂನ್ಯ
 ex_cscope(exarg_T *eap)
 {
     do_cscope_general(eap, FALSE);
@@ -293,7 +293,7 @@ ex_cscope(exarg_T *eap)
 /*
  * Implementation of ":scscope". Same as ex_cscope(), but splits window, too.
  */
-    void
+    ಶೂನ್ಯ
 ex_scscope(exarg_T *eap)
 {
     do_cscope_general(eap, TRUE);
@@ -302,73 +302,73 @@ ex_scscope(exarg_T *eap)
 /*
  * Implementation of ":cstag"
  */
-    void
+    ಶೂನ್ಯ
 ex_cstag(exarg_T *eap)
 {
-    int ret = FALSE;
+    ಪೂರ್ಣಾಂಕ ret = FALSE;
 
-    if (*eap->arg == NUL)
+    ಆದರೆ (*eap->arg == NUL)
     {
-	(void)emsg(_(e_usage_cstag_ident));
-	return;
+	(ಶೂನ್ಯ)emsg(_(e_usage_cstag_ident));
+	ಹಿಂತಿರುಗಿ;
     }
 
-    switch (p_csto)
+    ಆಯ್ಕೆ (p_csto)
     {
-    case 0 :
-	if (cs_check_for_connections())
+    ಸ್ಥಿತಿ 0 :
+	ಆದರೆ (cs_check_for_connections())
 	{
-	    ret = cs_find_common("g", (char *)(eap->arg), eap->forceit, FALSE,
+	    ret = cs_ಕಂಡುಹಿಡಿ_common("g", (ಅಕ್ಷರ *)(eap->arg), eap->forceit, FALSE,
 						       FALSE, *eap->cmdlinep);
-	    if (ret == FALSE)
+	    ಆದರೆ (ret == FALSE)
 	    {
-		cs_free_tags();
-		if (msg_col)
-		    msg_putchar('\n');
+		cs_free_ಟ್ಯಾಗುಗಳು();
+		ಆದರೆ (ಸಂದೇಶ_ಲಂಬಸಾಲು)
+		    ಸಂದೇಶ_putchar('\n');
 
-		if (cs_check_for_tags())
-		    ret = do_tag(eap->arg, DT_JUMP, 0, eap->forceit, FALSE);
+		ಆದರೆ (cs_check_for_ಟ್ಯಾಗುಗಳು())
+		    ret = do_ಟ್ಯಾಗ್(eap->arg, DT_JUMP, 0, eap->forceit, FALSE);
 	    }
 	}
-	else if (cs_check_for_tags())
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (cs_check_for_ಟ್ಯಾಗುಗಳು())
 	{
-	    ret = do_tag(eap->arg, DT_JUMP, 0, eap->forceit, FALSE);
+	    ret = do_ಟ್ಯಾಗ್(eap->arg, DT_JUMP, 0, eap->forceit, FALSE);
 	}
-	break;
-    case 1 :
-	if (cs_check_for_tags())
+	ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ 1 :
+	ಆದರೆ (cs_check_for_ಟ್ಯಾಗುಗಳು())
 	{
-	    ret = do_tag(eap->arg, DT_JUMP, 0, eap->forceit, FALSE);
-	    if (ret == FALSE)
+	    ret = do_ಟ್ಯಾಗ್(eap->arg, DT_JUMP, 0, eap->forceit, FALSE);
+	    ಆದರೆ (ret == FALSE)
 	    {
-		if (msg_col)
-		    msg_putchar('\n');
+		ಆದರೆ (ಸಂದೇಶ_ಲಂಬಸಾಲು)
+		    ಸಂದೇಶ_putchar('\n');
 
-		if (cs_check_for_connections())
+		ಆದರೆ (cs_check_for_connections())
 		{
-		    ret = cs_find_common("g", (char *)(eap->arg), eap->forceit,
+		    ret = cs_ಕಂಡುಹಿಡಿ_common("g", (ಅಕ್ಷರ *)(eap->arg), eap->forceit,
 						FALSE, FALSE, *eap->cmdlinep);
-		    if (ret == FALSE)
-			cs_free_tags();
+		    ಆದರೆ (ret == FALSE)
+			cs_free_ಟ್ಯಾಗುಗಳು();
 		}
 	    }
 	}
-	else if (cs_check_for_connections())
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (cs_check_for_connections())
 	{
-	    ret = cs_find_common("g", (char *)(eap->arg), eap->forceit, FALSE,
+	    ret = cs_ಕಂಡುಹಿಡಿ_common("g", (ಅಕ್ಷರ *)(eap->arg), eap->forceit, FALSE,
 						       FALSE, *eap->cmdlinep);
-	    if (ret == FALSE)
-		cs_free_tags();
+	    ಆದರೆ (ret == FALSE)
+		cs_free_ಟ್ಯಾಗುಗಳು();
 	}
-	break;
-    default :
-	break;
+	ನಿಲ್ಲಿಸು;
+    ಪೂರ್ವನಿಯೋಜಿತ :
+	ನಿಲ್ಲಿಸು;
     }
 
-    if (!ret)
+    ಆದರೆ (!ret)
     {
-	(void)emsg(_(e_cstag_tag_not_founc));
-# if defined(FEAT_QUICKFIX)
+	(ಶೂನ್ಯ)emsg(_(e_cstag_ಟ್ಯಾಗ್_not_founc));
+# ಆದರೆ defined(FEAT_QUICKFIX)
 	g_do_tagpreview = 0;
 # endif
     }
@@ -382,36 +382,36 @@ ex_cstag(exarg_T *eap)
  *
  * returns TRUE if eof, FALSE otherwise
  */
-    int
-cs_fgets(char_u *buf, int size)
+    ಪೂರ್ಣಾಂಕ
+cs_fgets(char_u *buf, ಪೂರ್ಣಾಂಕ ಗಾತ್ರ_2)
 {
-    char *p;
+    ಅಕ್ಷರ *p;
 
-    if ((p = cs_manage_matches(NULL, NULL, -1, Get)) == NULL)
-	return TRUE;
-    vim_strncpy(buf, (char_u *)p, size - 1);
+    ಆದರೆ ((p = cs_manage_matches(ಖಾಲಿ, ಖಾಲಿ, -1, Get)) == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ TRUE;
+    vim_strncpy(buf, (char_u *)p, ಗಾತ್ರ_2 - 1);
 
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 
 /*
  * Called only from do_tag(), when popping the tag stack.
  */
-    void
-cs_free_tags(void)
+    ಶೂನ್ಯ
+cs_free_ಟ್ಯಾಗುಗಳು(ಶೂನ್ಯ)
 {
-    cs_manage_matches(NULL, NULL, -1, Free);
+    cs_manage_matches(ಖಾಲಿ, ಖಾಲಿ, -1, Free);
 }
 
 
 /*
  * Called from do_tag().
  */
-    void
-cs_print_tags(void)
+    ಶೂನ್ಯ
+cs_print_ಟ್ಯಾಗುಗಳು(ಶೂನ್ಯ)
 {
-    cs_manage_matches(NULL, NULL, -1, Print);
+    cs_manage_matches(ಖಾಲಿ, ಖಾಲಿ, -1, Print);
 }
 
 
@@ -442,53 +442,53 @@ cs_print_tags(void)
  *
  *		Note: All string comparisons are case sensitive!
  */
-# if defined(FEAT_EVAL)
-    static int
-cs_connection(int num, char_u *dbpath, char_u *ppath)
+# ಆದರೆ defined(FEAT_EVAL)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+cs_connection(ಪೂರ್ಣಾಂಕ ಅಂಕೆ, char_u *dbpath, char_u *ppath)
 {
-    int i;
+    ಪೂರ್ಣಾಂಕ i;
 
-    if (num < 0 || num > 4 || (num > 0 && !dbpath))
-	return FALSE;
+    ಆದರೆ (ಅಂಕೆ < 0 || ಅಂಕೆ > 4 || (ಅಂಕೆ > 0 && !dbpath))
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    for (i = 0; i < csinfo_size; i++)
+    ಗಾಗಿ (i = 0; i < csinfo_ಗಾತ್ರ; i++)
     {
-	if (!csinfo[i].fname)
-	    continue;
+	ಆದರೆ (!csinfo[i].fname)
+	    ಮುಂದುವರಿ;
 
-	if (num == 0)
-	    return TRUE;
+	ಆದರೆ (ಅಂಕೆ == 0)
+	    ಹಿಂತಿರುಗಿ TRUE;
 
-	switch (num)
+	ಆಯ್ಕೆ (ಅಂಕೆ)
 	{
-	case 1:
-	    if (strstr(csinfo[i].fname, (char *)dbpath))
-		return TRUE;
-	    break;
-	case 2:
-	    if (strcmp(csinfo[i].fname, (char *)dbpath) == 0)
-		return TRUE;
-	    break;
-	case 3:
-	    if (strstr(csinfo[i].fname, (char *)dbpath)
+	ಸ್ಥಿತಿ 1:
+	    ಆದರೆ (ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು(csinfo[i].fname, (ಅಕ್ಷರ *)dbpath))
+		ಹಿಂತಿರುಗಿ TRUE;
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ 2:
+	    ಆದರೆ (strcmp(csinfo[i].fname, (ಅಕ್ಷರ *)dbpath) == 0)
+		ಹಿಂತಿರುಗಿ TRUE;
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ 3:
+	    ಆದರೆ (ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು(csinfo[i].fname, (ಅಕ್ಷರ *)dbpath)
 		    && ((!ppath && !csinfo[i].ppath)
 			|| (ppath
 			    && csinfo[i].ppath
-			    && strstr(csinfo[i].ppath, (char *)ppath))))
-		return TRUE;
-	    break;
-	case 4:
-	    if ((strcmp(csinfo[i].fname, (char *)dbpath) == 0)
+			    && ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು(csinfo[i].ppath, (ಅಕ್ಷರ *)ppath))))
+		ಹಿಂತಿರುಗಿ TRUE;
+	    ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ 4:
+	    ಆದರೆ ((strcmp(csinfo[i].fname, (ಅಕ್ಷರ *)dbpath) == 0)
 		    && ((!ppath && !csinfo[i].ppath)
 			|| (ppath
 			    && csinfo[i].ppath
-			    && (strcmp(csinfo[i].ppath, (char *)ppath) == 0))))
-		return TRUE;
-	    break;
+			    && (strcmp(csinfo[i].ppath, (ಅಕ್ಷರ *)ppath) == 0))))
+		ಹಿಂತಿರುಗಿ TRUE;
+	    ನಿಲ್ಲಿಸು;
 	}
     }
 
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
 # endif
@@ -502,27 +502,27 @@ cs_connection(int num, char_u *dbpath, char_u *ppath)
  * Add cscope database or a directory name (to look for cscope.out)
  * to the cscope connection list.
  */
-    static int
-cs_add(exarg_T *eap UNUSED)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+cs_ಕೂಡಿಸು(exarg_T *eap ಬಳಸದ)
 {
-    char *fname, *ppath, *flags = NULL;
+    ಅಕ್ಷರ *fname, *ppath, *flags = ಖಾಲಿ;
 
-    if ((fname = strtok((char *)NULL, (const char *)" ")) == NULL)
+    ಆದರೆ ((fname = strtok((ಅಕ್ಷರ *)ಖಾಲಿ, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)" ")) == ಖಾಲಿ)
     {
-	cs_usage_msg(Add);
-	return CSCOPE_FAILURE;
+	cs_usage_ಸಂದೇಶ(ಕೂಡಿಸು_2);
+	ಹಿಂತಿರುಗಿ CSCOPE_FAILURE;
     }
-    if ((ppath = strtok((char *)NULL, (const char *)" ")) != NULL)
-	flags = strtok((char *)NULL, (const char *)" ");
+    ಆದರೆ ((ppath = strtok((ಅಕ್ಷರ *)ಖಾಲಿ, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)" ")) != ಖಾಲಿ)
+	flags = strtok((ಅಕ್ಷರ *)ಖಾಲಿ, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)" ");
 
-    return cs_add_common(fname, ppath, flags);
+    ಹಿಂತಿರುಗಿ cs_ಕೂಡಿಸು_common(fname, ppath, flags);
 }
 
-    static void
-cs_stat_emsg(char *fname)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+cs_stat_emsg(ಅಕ್ಷರ *fname)
 {
-    int err = errno;
-    (void)semsg(_(e_stat_str_error_nr), fname, err);
+    ಪೂರ್ಣಾಂಕ err = errno;
+    (ಶೂನ್ಯ)semsg(_(e_stat_str_error_nr), fname, err);
 }
 
 
@@ -531,115 +531,115 @@ cs_stat_emsg(char *fname)
  * cs_add() and cs_reset().  I really don't like to do this, but this
  * routine uses a number of goto statements.
  */
-    static int
-cs_add_common(
-    char *arg1,	    // filename - may contain environment variables
-    char *arg2,	    // prepend path - may contain environment variables
-    char *flags)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+cs_ಕೂಡಿಸು_common(
+    ಅಕ್ಷರ *arg1,	    // filename - may contain environment variables
+    ಅಕ್ಷರ *arg2,	    // prepend path - may contain environment variables
+    ಅಕ್ಷರ *flags)
 {
     stat_T	statbuf;
-    int		ret;
-    char	*fname = NULL;
-    char	*fname2 = NULL;
-    char	*ppath = NULL;
-    int		i;
+    ಪೂರ್ಣಾಂಕ		ret;
+    ಅಕ್ಷರ	*fname = ಖಾಲಿ;
+    ಅಕ್ಷರ	*fname2 = ಖಾಲಿ;
+    ಅಕ್ಷರ	*ppath = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ		i;
     size_t	len;
     size_t	usedlen = 0;
-    char_u	*fbuf = NULL;
+    char_u	*fbuf = ಖಾಲಿ;
 
     // get the filename (arg1), expand it, and try to stat it
-    if ((fname = alloc(MAXPATHL + 1)) == NULL)
-	goto add_err;
+    ಆದರೆ ((fname = alloc(MAXPATHL + 1)) == ಖಾಲಿ)
+	ಹೋಗು ಕೂಡಿಸು_err;
 
     len = expand_env((char_u *)arg1, (char_u *)fname, MAXPATHL);
     fbuf = (char_u *)fname;
-    (void)modify_fname((char_u *)":p", FALSE, &usedlen,
+    (ಶೂನ್ಯ)modify_fname((char_u *)":p", FALSE, &usedlen,
 					      (char_u **)&fname, &fbuf, &len);
-    if (fname == NULL)
-	goto add_err;
-    fname = (char *)vim_strnsave((char_u *)fname, len);
+    ಆದರೆ (fname == ಖಾಲಿ)
+	ಹೋಗು ಕೂಡಿಸು_err;
+    fname = (ಅಕ್ಷರ *)vim_strnsave((char_u *)fname, len);
     vim_free(fbuf);
 
     ret = mch_stat(fname, &statbuf);
-    if (ret < 0)
+    ಆದರೆ (ret < 0)
     {
 staterr:
-	if (p_csverbose)
+	ಆದರೆ (p_csverbose)
 	    cs_stat_emsg(fname);
-	goto add_err;
+	ಹೋಗು ಕೂಡಿಸು_err;
     }
 
     // get the prepend path (arg2), expand it, and try to stat it
-    if (arg2 != NULL)
+    ಆದರೆ (arg2 != ಖಾಲಿ)
     {
 	stat_T	    statbuf2;
 
-	if ((ppath = alloc(MAXPATHL + 1)) == NULL)
-	    goto add_err;
+	ಆದರೆ ((ppath = alloc(MAXPATHL + 1)) == ಖಾಲಿ)
+	    ಹೋಗು ಕೂಡಿಸು_err;
 
 	expand_env((char_u *)arg2, (char_u *)ppath, MAXPATHL);
 	ret = mch_stat(ppath, &statbuf2);
-	if (ret < 0)
-	    goto staterr;
+	ಆದರೆ (ret < 0)
+	    ಹೋಗು staterr;
     }
 
     // if filename is a directory, append the cscope database name to it
-    if (S_ISDIR(statbuf.st_mode))
+    ಆದರೆ (S_ISDIR(statbuf.st_ಬಹುಲಕ))
     {
-	fname2 = alloc(STRLEN_LITERAL(CSCOPE_DBFILE) + strlen(fname) + 2);
-	if (fname2 == NULL)
-	    goto add_err;
+	fname2 = alloc(STRLEN_LITERAL(CSCOPE_DBFILE) + ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(fname) + 2);
+	ಆದರೆ (fname2 == ಖಾಲಿ)
+	    ಹೋಗು ಕೂಡಿಸು_err;
 
-	while (fname[strlen(fname)-1] == '/'
+	ಆಗ (fname[ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(fname)-1] == '/'
 # ifdef MSWIN
-		|| fname[strlen(fname)-1] == '\\'
+		|| fname[ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(fname)-1] == '\\'
 # endif
 		)
 	{
-	    fname[strlen(fname)-1] = '\0';
-	    if (fname[0] == '\0')
-		break;
+	    fname[ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(fname)-1] = '\0';
+	    ಆದರೆ (fname[0] == '\0')
+		ನಿಲ್ಲಿಸು;
 	}
-	if (fname[0] == '\0')
-	    (void)sprintf(fname2, "/%s", CSCOPE_DBFILE);
-	else
-	    (void)sprintf(fname2, "%s/%s", fname, CSCOPE_DBFILE);
+	ಆದರೆ (fname[0] == '\0')
+	    (ಶೂನ್ಯ)sprintf(fname2, "/%s", CSCOPE_DBFILE);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    (ಶೂನ್ಯ)sprintf(fname2, "%s/%s", fname, CSCOPE_DBFILE);
 
 	ret = mch_stat(fname2, &statbuf);
-	if (ret < 0)
+	ಆದರೆ (ret < 0)
 	{
-	    if (p_csverbose)
+	    ಆದರೆ (p_csverbose)
 		cs_stat_emsg(fname2);
-	    goto add_err;
+	    ಹೋಗು ಕೂಡಿಸು_err;
 	}
 
-	i = cs_insert_filelist(fname2, ppath, flags, &statbuf);
+	i = cs_ಸೇರಿಸು_filelist(fname2, ppath, flags, &statbuf);
     }
-    else if (S_ISREG(statbuf.st_mode) || S_ISLNK(statbuf.st_mode))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (S_ISREG(statbuf.st_ಬಹುಲಕ) || S_ISLNK(statbuf.st_ಬಹುಲಕ))
     {
-	i = cs_insert_filelist(fname, ppath, flags, &statbuf);
+	i = cs_ಸೇರಿಸು_filelist(fname, ppath, flags, &statbuf);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (p_csverbose)
-	    (void)semsg(_(e_str_is_not_directory_or_valid_cscope_database),
+	ಆದರೆ (p_csverbose)
+	    (ಶೂನ್ಯ)semsg(_(e_str_is_not_directory_or_valid_cscope_database),
 									fname);
-	goto add_err;
+	ಹೋಗು ಕೂಡಿಸು_err;
     }
 
-    if (i != -1)
+    ಆದರೆ (i != -1)
     {
-	if (cs_create_connection(i) == CSCOPE_FAILURE
+	ಆದರೆ (cs_create_connection(i) == CSCOPE_FAILURE
 		|| cs_read_prompt(i) == CSCOPE_FAILURE)
 	{
 	    cs_release_csp(i, TRUE);
-	    goto add_err;
+	    ಹೋಗು ಕೂಡಿಸು_err;
 	}
 
-	if (p_csverbose)
+	ಆದರೆ (p_csverbose)
 	{
-	    msg_clr_eos();
-	    (void)smsg_attr(HL_ATTR(HLF_R),
+	    ಸಂದೇಶ_clr_eos();
+	    (ಶೂನ್ಯ)smsg_attr(HL_ATTR(HLF_R),
 			    _("Added cscope database %s"),
 			    csinfo[i].fname);
 	}
@@ -648,48 +648,48 @@ staterr:
     vim_free(fname);
     vim_free(fname2);
     vim_free(ppath);
-    return CSCOPE_SUCCESS;
+    ಹಿಂತಿರುಗಿ CSCOPE_SUCCESS;
 
-add_err:
+ಕೂಡಿಸು_err:
     vim_free(fname2);
     vim_free(fname);
     vim_free(ppath);
-    return CSCOPE_FAILURE;
+    ಹಿಂತಿರುಗಿ CSCOPE_FAILURE;
 }
 
 
-    static int
-cs_check_for_connections(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+cs_check_for_connections(ಶೂನ್ಯ)
 {
-    return (cs_cnt_connections() > 0);
+    ಹಿಂತಿರುಗಿ (cs_cnt_connections() > 0);
 }
 
 
-    static int
-cs_check_for_tags(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+cs_check_for_ಟ್ಯಾಗುಗಳು(ಶೂನ್ಯ)
 {
-    return (p_tags[0] != NUL && curbuf->b_p_tags != NULL);
+    ಹಿಂತಿರುಗಿ (p_ಟ್ಯಾಗುಗಳು[0] != NUL && curbuf->b_p_ಟ್ಯಾಗುಗಳು != ಖಾಲಿ);
 }
 
 
 /*
  * Count the number of cscope connections.
  */
-    static int
-cs_cnt_connections(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+cs_cnt_connections(ಶೂನ್ಯ)
 {
-    int i;
-    int cnt = 0;
+    ಪೂರ್ಣಾಂಕ i;
+    ಪೂರ್ಣಾಂಕ cnt = 0;
 
-    for (i = 0; i < csinfo_size; i++)
-	if (csinfo[i].fname != NULL)
+    ಗಾಗಿ (i = 0; i < csinfo_ಗಾತ್ರ; i++)
+	ಆದರೆ (csinfo[i].fname != ಖಾಲಿ)
 	    cnt++;
-    return cnt;
+    ಹಿಂತಿರುಗಿ cnt;
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 cs_reading_emsg(
-    int idx)	// connection index
+    ಪೂರ್ಣಾಂಕ idx)	// connection index
 {
     semsg(_(e_error_reading_cscope_connection_nr), idx);
 }
@@ -698,27 +698,27 @@ cs_reading_emsg(
 /*
  * Count the number of matches for a given cscope connection.
  */
-    static int
-cs_cnt_matches(int idx)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+cs_cnt_matches(ಪೂರ್ಣಾಂಕ idx)
 {
-    char *stok;
-    char *buf;
-    int nlines = 0;
+    ಅಕ್ಷರ *stok;
+    ಅಕ್ಷರ *buf;
+    ಪೂರ್ಣಾಂಕ nlines = 0;
 
     buf = alloc(CSREAD_BUFSIZE);
-    if (buf == NULL)
-	return 0;
-    for (;;)
+    ಆದರೆ (buf == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ 0;
+    ಗಾಗಿ (;;)
     {
-	if (!fgets(buf, CSREAD_BUFSIZE, csinfo[idx].fr_fp))
+	ಆದರೆ (!fgets(buf, CSREAD_BUFSIZE, csinfo[idx].fr_fp))
 	{
-	    if (feof(csinfo[idx].fr_fp))
+	    ಆದರೆ (feof(csinfo[idx].fr_fp))
 		errno = EIO;
 
 	    cs_reading_emsg(idx);
 
 	    vim_free(buf);
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 
 	/*
@@ -728,93 +728,93 @@ cs_cnt_matches(int idx)
 	 * Accept "\S*cscope: X lines", also matches "mlcscope".
 	 * Bail out for the "Unable to search" error.
 	 */
-	if (strstr((const char *)buf, "Unable to search database") != NULL)
-	    break;
-	if ((stok = strtok(buf, (const char *)" ")) == NULL)
-	    continue;
-	if (strstr((const char *)stok, "cscope:") == NULL)
-	    continue;
+	ಆದರೆ (ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)buf, "Unable to search database") != ಖಾಲಿ)
+	    ನಿಲ್ಲಿಸು;
+	ಆದರೆ ((stok = strtok(buf, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)" ")) == ಖಾಲಿ)
+	    ಮುಂದುವರಿ;
+	ಆದರೆ (ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)stok, "cscope:") == ಖಾಲಿ)
+	    ಮುಂದುವರಿ;
 
-	if ((stok = strtok(NULL, (const char *)" ")) == NULL)
-	    continue;
+	ಆದರೆ ((stok = strtok(ಖಾಲಿ, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)" ")) == ಖಾಲಿ)
+	    ಮುಂದುವರಿ;
 	nlines = atoi(stok);
-	if (nlines < 0)
+	ಆದರೆ (nlines < 0)
 	{
 	    nlines = 0;
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
 
-	if ((stok = strtok(NULL, (const char *)" ")) == NULL)
-	    continue;
-	if (strncmp((const char *)stok, "lines", 5))
-	    continue;
+	ಆದರೆ ((stok = strtok(ಖಾಲಿ, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)" ")) == ಖಾಲಿ)
+	    ಮುಂದುವರಿ;
+	ಆದರೆ (ಅಕ್ಷರಸರಣಿ_ಹೋಲಿಕೆ((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)stok, "lines", 5))
+	    ಮುಂದುವರಿ;
 
-	break;
+	ನಿಲ್ಲಿಸು;
     }
 
     vim_free(buf);
-    return nlines;
+    ಹಿಂತಿರುಗಿ nlines;
 }
 
 
 /*
  * Creates the actual cscope command query from what the user entered.
  */
-    static char *
-cs_create_cmd(char *csoption, char *pattern)
+    ಸ್ಥಿರ ಅಕ್ಷರ *
+cs_create_cmd(ಅಕ್ಷರ *csoption, ಅಕ್ಷರ *ನಮೂನೆ)
 {
-    char *cmd;
-    short search;
-    char *pat;
+    ಅಕ್ಷರ *cmd;
+    ಗಿಡ್ಡ ಹುಡುಕು;
+    ಅಕ್ಷರ *pat;
 
-    switch (csoption[0])
+    ಆಯ್ಕೆ (csoption[0])
     {
-    case '0' : case 's' :
-	search = 0;
-	break;
-    case '1' : case 'g' :
-	search = 1;
-	break;
-    case '2' : case 'd' :
-	search = 2;
-	break;
-    case '3' : case 'c' :
-	search = 3;
-	break;
-    case '4' : case 't' :
-	search = 4;
-	break;
-    case '6' : case 'e' :
-	search = 6;
-	break;
-    case '7' : case 'f' :
-	search = 7;
-	break;
-    case '8' : case 'i' :
-	search = 8;
-	break;
-    case '9' : case 'a' :
-	search = 9;
-	break;
-    default :
-	(void)emsg(_(e_unknown_cscope_search_type));
-	cs_usage_msg(Find);
-	return NULL;
+    ಸ್ಥಿತಿ '0' : ಸ್ಥಿತಿ 's' :
+	ಹುಡುಕು = 0;
+	ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ '1' : ಸ್ಥಿತಿ 'g' :
+	ಹುಡುಕು = 1;
+	ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ '2' : ಸ್ಥಿತಿ 'd' :
+	ಹುಡುಕು = 2;
+	ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ '3' : ಸ್ಥಿತಿ 'c' :
+	ಹುಡುಕು = 3;
+	ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ '4' : ಸ್ಥಿತಿ 't' :
+	ಹುಡುಕು = 4;
+	ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ '6' : ಸ್ಥಿತಿ 'e' :
+	ಹುಡುಕು = 6;
+	ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ '7' : ಸ್ಥಿತಿ 'f' :
+	ಹುಡುಕು = 7;
+	ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ '8' : ಸ್ಥಿತಿ 'i' :
+	ಹುಡುಕು = 8;
+	ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ '9' : ಸ್ಥಿತಿ 'a' :
+	ಹುಡುಕು = 9;
+	ನಿಲ್ಲಿಸು;
+    ಪೂರ್ವನಿಯೋಜಿತ :
+	(ಶೂನ್ಯ)emsg(_(e_unknown_cscope_ಹುಡುಕು_type));
+	cs_usage_ಸಂದೇಶ(ಕಂಡುಹಿಡಿ_2);
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
     // Skip white space before the pattern, except for text and pattern search,
     // they may want to use the leading white space.
-    pat = pattern;
-    if (search != 4 && search != 6)
-	while VIM_ISWHITE(*pat)
+    pat = ನಮೂನೆ;
+    ಆದರೆ (ಹುಡುಕು != 4 && ಹುಡುಕು != 6)
+	ಆಗ VIM_ISWHITE(*pat)
 	    ++pat;
 
-    if ((cmd = alloc(strlen(pat) + 2)) == NULL)
-	return NULL;
+    ಆದರೆ ((cmd = alloc(ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(pat) + 2)) == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    (void)sprintf(cmd, "%d%s", search, pat);
+    (ಶೂನ್ಯ)sprintf(cmd, "%d%s", ಹುಡುಕು, pat);
 
-    return cmd;
+    ಹಿಂತಿರುಗಿ cmd;
 }
 
 
@@ -822,19 +822,19 @@ cs_create_cmd(char *csoption, char *pattern)
  * This piece of code was taken/adapted from nvi.  do we need to add
  * the BSD license notice?
  */
-    static int
-cs_create_connection(int i)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+cs_create_connection(ಪೂರ್ಣಾಂಕ i)
 {
 # ifdef UNIX
-    int		to_cs[2], from_cs[2];
+    ಪೂರ್ಣಾಂಕ		ಗಮ್ಯ_cs[2], from_cs[2];
 # endif
-    int		cmdlen;
-    char	*prog, *cmd, *ppath = NULL;
+    ಪೂರ್ಣಾಂಕ		cmdlen;
+    ಅಕ್ಷರ	*prog, *cmd, *ppath = ಖಾಲಿ;
     size_t	proglen;
 # ifdef MSWIN
-    int		fd;
-    int		len;
-    SECURITY_ATTRIBUTES sa;
+    ಪೂರ್ಣಾಂಕ		fd;
+    ಪೂರ್ಣಾಂಕ		len;
+    SECURITY_ಗುಣಲಕ್ಷಣಗಳು sa;
     PROCESS_INFORMATION pi;
     STARTUPINFO si;
     BOOL	pipe_stdin = FALSE, pipe_stdout = FALSE;
@@ -843,113 +843,113 @@ cs_create_connection(int i)
     BOOL	created;
 # endif
 
-# if defined(UNIX)
+# ಆದರೆ defined(UNIX)
     /*
      * Cscope reads from to_cs[0] and writes to from_cs[1]; vi reads from
      * from_cs[0] and writes to to_cs[1].
      */
-    to_cs[0] = to_cs[1] = from_cs[0] = from_cs[1] = -1;
-    if (pipe(to_cs) < 0 || pipe(from_cs) < 0)
+    ಗಮ್ಯ_cs[0] = ಗಮ್ಯ_cs[1] = from_cs[0] = from_cs[1] = -1;
+    ಆದರೆ (pipe(ಗಮ್ಯ_cs) < 0 || pipe(from_cs) < 0)
     {
-	(void)emsg(_(e_could_not_create_cscope_pipes));
+	(ಶೂನ್ಯ)emsg(_(e_could_not_create_cscope_pipes));
 err_closing:
-	if (to_cs[0] != -1)
-	    (void)close(to_cs[0]);
-	if (to_cs[1] != -1)
-	    (void)close(to_cs[1]);
-	if (from_cs[0] != -1)
-	    (void)close(from_cs[0]);
-	if (from_cs[1] != -1)
-	    (void)close(from_cs[1]);
-	return CSCOPE_FAILURE;
+	ಆದರೆ (ಗಮ್ಯ_cs[0] != -1)
+	    (ಶೂನ್ಯ)close(ಗಮ್ಯ_cs[0]);
+	ಆದರೆ (ಗಮ್ಯ_cs[1] != -1)
+	    (ಶೂನ್ಯ)close(ಗಮ್ಯ_cs[1]);
+	ಆದರೆ (from_cs[0] != -1)
+	    (ಶೂನ್ಯ)close(from_cs[0]);
+	ಆದರೆ (from_cs[1] != -1)
+	    (ಶೂನ್ಯ)close(from_cs[1]);
+	ಹಿಂತಿರುಗಿ CSCOPE_FAILURE;
     }
 
-    if ((csinfo[i].pid = fork()) == -1)
+    ಆದರೆ ((csinfo[i].pid = fork()) == -1)
     {
-	(void)emsg(_(e_could_not_fork_for_cscope));
-	goto err_closing;
+	(ಶೂನ್ಯ)emsg(_(e_could_not_fork_for_cscope));
+	ಹೋಗು err_closing;
     }
-    else if (csinfo[i].pid == 0)	// child: run cscope.
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (csinfo[i].pid == 0)	// child: run cscope.
     {
-	char **argv = NULL;
+	ಅಕ್ಷರ **argv = ಖಾಲಿ;
 
-	if (dup2(to_cs[0], STDIN_FILENO) == -1)
+	ಆದರೆ (dup2(ಗಮ್ಯ_cs[0], STDIN_FILENO) == -1)
 	    PERROR("cs_create_connection 1");
-	if (dup2(from_cs[1], STDOUT_FILENO) == -1)
+	ಆದರೆ (dup2(from_cs[1], STDOUT_FILENO) == -1)
 	    PERROR("cs_create_connection 2");
-	if (dup2(from_cs[1], STDERR_FILENO) == -1)
+	ಆದರೆ (dup2(from_cs[1], STDERR_FILENO) == -1)
 	    PERROR("cs_create_connection 3");
 
 	// close unused
-	(void)close(to_cs[1]);
-	(void)close(from_cs[0]);
-# else
+	(ಶೂನ್ಯ)close(ಗಮ್ಯ_cs[1]);
+	(ಶೂನ್ಯ)close(from_cs[0]);
+# ಇಲ್ಲದಿದ್ದರೆ
 	// MSWIN
 	// Create pipes to communicate with cscope
-	sa.nLength = sizeof(SECURITY_ATTRIBUTES);
+	sa.n_ಉದ್ದಳತೆ = ಗಾತ್ರ(SECURITY_ಗುಣಲಕ್ಷಣಗಳು);
 	sa.bInheritHandle = TRUE;
-	sa.lpSecurityDescriptor = NULL;
+	sa.lpSecurityDescriptor = ಖಾಲಿ;
 
-	if (!(pipe_stdin = CreatePipe(&stdin_rd, &stdin_wr, &sa, 0))
+	ಆದರೆ (!(pipe_stdin = CreatePipe(&stdin_rd, &stdin_wr, &sa, 0))
 		|| !(pipe_stdout = CreatePipe(&stdout_rd, &stdout_wr, &sa, 0)))
 	{
-	    (void)emsg(_(e_could_not_create_cscope_pipes));
+	    (ಶೂನ್ಯ)emsg(_(e_could_not_create_cscope_pipes));
 err_closing:
-	    if (pipe_stdin)
+	    ಆದರೆ (pipe_stdin)
 	    {
 		CloseHandle(stdin_rd);
 		CloseHandle(stdin_wr);
 	    }
-	    if (pipe_stdout)
+	    ಆದರೆ (pipe_stdout)
 	    {
 		CloseHandle(stdout_rd);
 		CloseHandle(stdout_wr);
 	    }
-	    return CSCOPE_FAILURE;
+	    ಹಿಂತಿರುಗಿ CSCOPE_FAILURE;
 	}
 # endif
 	// expand the cscope exec for env var's
-	if ((prog = alloc(MAXPATHL + 1)) == NULL)
+	ಆದರೆ ((prog = alloc(MAXPATHL + 1)) == ಖಾಲಿ)
 	{
 # ifdef UNIX
-	    exit(EXIT_FAILURE);
-# else
+	    ನಿರ್ಗಮಿಸು(EXIT_FAILURE);
+# ಇಲ್ಲದಿದ್ದರೆ
 	    // MSWIN
-	    goto err_closing;
+	    ಹೋಗು err_closing;
 # endif
 	}
 	proglen = expand_env(p_csprg, (char_u *)prog, MAXPATHL);
 
 	// alloc space to hold the cscope command
-	cmdlen = (int)(proglen + strlen(csinfo[i].fname) + 32);
-	if (csinfo[i].ppath)
+	cmdlen = (ಪೂರ್ಣಾಂಕ)(proglen + ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(csinfo[i].fname) + 32);
+	ಆದರೆ (csinfo[i].ppath)
 	{
 	    // expand the prepend path for env var's
-	    if ((ppath = alloc(MAXPATHL + 1)) == NULL)
+	    ಆದರೆ ((ppath = alloc(MAXPATHL + 1)) == ಖಾಲಿ)
 	    {
 		vim_free(prog);
 # ifdef UNIX
-		exit(EXIT_FAILURE);
-# else
+		ನಿರ್ಗಮಿಸು(EXIT_FAILURE);
+# ಇಲ್ಲದಿದ್ದರೆ
 		// MSWIN
-		goto err_closing;
+		ಹೋಗು err_closing;
 # endif
 	    }
-	    cmdlen += (int)expand_env((char_u *)csinfo[i].ppath, (char_u *)ppath, MAXPATHL);
+	    cmdlen += (ಪೂರ್ಣಾಂಕ)expand_env((char_u *)csinfo[i].ppath, (char_u *)ppath, MAXPATHL);
 	}
 
-	if (csinfo[i].flags)
-	    cmdlen += (int)strlen(csinfo[i].flags);
+	ಆದರೆ (csinfo[i].flags)
+	    cmdlen += (ಪೂರ್ಣಾಂಕ)ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(csinfo[i].flags);
 
-	if ((cmd = alloc(cmdlen)) == NULL)
+	ಆದರೆ ((cmd = alloc(cmdlen)) == ಖಾಲಿ)
 	{
 	    vim_free(prog);
 	    vim_free(ppath);
 # ifdef UNIX
-	    exit(EXIT_FAILURE);
-# else
+	    ನಿರ್ಗಮಿಸು(EXIT_FAILURE);
+# ಇಲ್ಲದಿದ್ದರೆ
 	    // MSWIN
-	    goto err_closing;
+	    ಹೋಗು err_closing;
 # endif
 	}
 
@@ -957,118 +957,118 @@ err_closing:
 # ifdef UNIX
 	{
 	    garray_T	ga_argv;
-	    char	**tok = NULL;
-	    int		tokc = 0;
+	    ಅಕ್ಷರ	**tok = ಖಾಲಿ;
+	    ಪೂರ್ಣಾಂಕ		tokc = 0;
 
-	    ga_init2(&ga_argv, sizeof(char *), 8);
+	    ga_init2(&ga_argv, ಗಾತ್ರ(ಅಕ್ಷರ *), 8);
 
 	    // 'cscopeprg' may be multi-word (e.g. "cscope --foo");
 	    // split it into separate argv entries.
-	    if (build_argv_from_string((char_u *)prog, &tok, &tokc) == FAIL)
-		exit(EXIT_FAILURE);
-	    for (int k = 0; k < tokc; ++k)
+	    ಆದರೆ (build_argv_from_string((char_u *)prog, &tok, &tokc) == FAIL)
+		ನಿರ್ಗಮಿಸು(EXIT_FAILURE);
+	    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ k = 0; k < tokc; ++k)
 	    {
-		if (ga_grow(&ga_argv, 1) == FAIL)
-		    exit(EXIT_FAILURE);
-		((char **)ga_argv.ga_data)[ga_argv.ga_len++] = tok[k];
+		ಆದರೆ (ga_grow(&ga_argv, 1) == FAIL)
+		    ನಿರ್ಗಮಿಸು(EXIT_FAILURE);
+		((ಅಕ್ಷರ **)ga_argv.ga_ದತ್ತಾಂಶ)[ga_argv.ga_len++] = tok[k];
 	    }
 	    VIM_CLEAR(tok);
 
 	    // Literal arguments: "-dl", "-f", fname.
-	    if (ga_grow(&ga_argv, 3) == FAIL)
-		exit(EXIT_FAILURE);
-	    ((char **)ga_argv.ga_data)[ga_argv.ga_len++] =
-				    (char *)vim_strsave((char_u *)"-dl");
-	    ((char **)ga_argv.ga_data)[ga_argv.ga_len++] =
-				    (char *)vim_strsave((char_u *)"-f");
-	    ((char **)ga_argv.ga_data)[ga_argv.ga_len++] =
-				(char *)vim_strsave((char_u *)csinfo[i].fname);
+	    ಆದರೆ (ga_grow(&ga_argv, 3) == FAIL)
+		ನಿರ್ಗಮಿಸು(EXIT_FAILURE);
+	    ((ಅಕ್ಷರ **)ga_argv.ga_ದತ್ತಾಂಶ)[ga_argv.ga_len++] =
+				    (ಅಕ್ಷರ *)vim_strsave((char_u *)"-dl");
+	    ((ಅಕ್ಷರ **)ga_argv.ga_ದತ್ತಾಂಶ)[ga_argv.ga_len++] =
+				    (ಅಕ್ಷರ *)vim_strsave((char_u *)"-f");
+	    ((ಅಕ್ಷರ **)ga_argv.ga_ದತ್ತಾಂಶ)[ga_argv.ga_len++] =
+				(ಅಕ್ಷರ *)vim_strsave((char_u *)csinfo[i].fname);
 
 	    // "-P<ppath>" as a single argv entry, if set.
-	    if (ppath != NULL)
+	    ಆದರೆ (ppath != ಖಾಲಿ)
 	    {
 		size_t	plen = STRLEN(ppath) + 3;
-		char	*parg = alloc(plen);
+		ಅಕ್ಷರ	*parg = alloc(plen);
 
-		if (parg == NULL || ga_grow(&ga_argv, 1) == FAIL)
-		    exit(EXIT_FAILURE);
+		ಆದರೆ (parg == ಖಾಲಿ || ga_grow(&ga_argv, 1) == FAIL)
+		    ನಿರ್ಗಮಿಸು(EXIT_FAILURE);
 		vim_snprintf(parg, plen, "-P%s", ppath);
-		((char **)ga_argv.ga_data)[ga_argv.ga_len++] = parg;
+		((ಅಕ್ಷರ **)ga_argv.ga_ದತ್ತಾಂಶ)[ga_argv.ga_len++] = parg;
 	    }
 
 	    // 'flags' is intended to be a sequence of cscope tokens
 	    // like "-q -i somefile"; split it the same way as prog.
-	    if (csinfo[i].flags != NULL)
+	    ಆದರೆ (csinfo[i].flags != ಖಾಲಿ)
 	    {
-		if (build_argv_from_string((char_u *)csinfo[i].flags,
+		ಆದರೆ (build_argv_from_string((char_u *)csinfo[i].flags,
 							&tok, &tokc) == FAIL)
-		    exit(EXIT_FAILURE);
-		for (int k = 0; k < tokc; ++k)
+		    ನಿರ್ಗಮಿಸು(EXIT_FAILURE);
+		ಗಾಗಿ (ಪೂರ್ಣಾಂಕ k = 0; k < tokc; ++k)
 		{
-		    if (ga_grow(&ga_argv, 1) == FAIL)
-			exit(EXIT_FAILURE);
-		    ((char **)ga_argv.ga_data)[ga_argv.ga_len++] = tok[k];
+		    ಆದರೆ (ga_grow(&ga_argv, 1) == FAIL)
+			ನಿರ್ಗಮಿಸು(EXIT_FAILURE);
+		    ((ಅಕ್ಷರ **)ga_argv.ga_ದತ್ತಾಂಶ)[ga_argv.ga_len++] = tok[k];
 		}
 		vim_free(tok);
 	    }
 
 	    // NULL-terminate argv.
-	    if (ga_grow(&ga_argv, 1) == FAIL)
-		exit(EXIT_FAILURE);
-	    ((char **)ga_argv.ga_data)[ga_argv.ga_len] = NULL;
+	    ಆದರೆ (ga_grow(&ga_argv, 1) == FAIL)
+		ನಿರ್ಗಮಿಸು(EXIT_FAILURE);
+	    ((ಅಕ್ಷರ **)ga_argv.ga_ದತ್ತಾಂಶ)[ga_argv.ga_len] = ಖಾಲಿ;
 
 	    vim_free(prog);
 	    vim_free(ppath);
 	    vim_free(cmd);
 
-#  if defined(HAVE_SETSID) || defined(HAVE_SETPGID)
+#  ಆದರೆ defined(HAVE_SETSID) || defined(HAVE_SETPGID)
 	    // Change our process group to avoid cscope receiving SIGWINCH.
-#   if defined(HAVE_SETSID)
-	    (void)setsid();
-#   else
-	    if (setpgid(0, 0) == -1)
+#   ಆದರೆ defined(HAVE_SETSID)
+	    (ಶೂನ್ಯ)setsid();
+#   ಇಲ್ಲದಿದ್ದರೆ
+	    ಆದರೆ (setpgid(0, 0) == -1)
 		PERROR(_("cs_create_connection setpgid failed"));
 #   endif
 #  endif
 
-	    argv = (char **)ga_argv.ga_data;
-	    if (argv[0] == NULL || execvp(argv[0], argv) == -1)
+	    argv = (ಅಕ್ಷರ **)ga_argv.ga_ದತ್ತಾಂಶ;
+	    ಆದರೆ (argv[0] == ಖಾಲಿ || execvp(argv[0], argv) == -1)
 	    {
 		fprintf(stderr, "%s\n",
 		    _("cs_create_connection exec failed"));
 		fflush(stderr);
 	    }
 
-	    exit(127);
+	    ನಿರ್ಗಮಿಸು(127);
 	    // NOTREACHED
 	}
     }
-    else	// parent.
+    ಇಲ್ಲದಿದ್ದರೆ	// parent.
     {
 	/*
 	 * Save the file descriptors for later duplication, and
 	 * reopen as streams.
 	 */
-	if ((csinfo[i].to_fp = fdopen(to_cs[1], "w")) == NULL)
+	ಆದರೆ ((csinfo[i].ಗಮ್ಯ_fp = fdopen(ಗಮ್ಯ_cs[1], "w")) == ಖಾಲಿ)
 	    PERROR(_("cs_create_connection: fdopen for to_fp failed"));
-	if ((csinfo[i].fr_fp = fdopen(from_cs[0], "r")) == NULL)
+	ಆದರೆ ((csinfo[i].fr_fp = fdopen(from_cs[0], "r")) == ಖಾಲಿ)
 	    PERROR(_("cs_create_connection: fdopen for fr_fp failed"));
 
 	// close unused
-	(void)close(to_cs[0]);
-	(void)close(from_cs[1]);
+	(ಶೂನ್ಯ)close(ಗಮ್ಯ_cs[0]);
+	(ಶೂನ್ಯ)close(from_cs[1]);
     }
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
     // MSWIN
     vim_snprintf(cmd, cmdlen, "%s -dl -f %s", prog, csinfo[i].fname);
-    if (csinfo[i].ppath != NULL)
+    ಆದರೆ (csinfo[i].ppath != ಖಾಲಿ)
     {
-	len = (int)STRLEN(cmd);
+	len = (ಪೂರ್ಣಾಂಕ)STRLEN(cmd);
 	vim_snprintf(cmd + len, cmdlen - len, " -P%s", csinfo[i].ppath);
     }
-    if (csinfo[i].flags != NULL)
+    ಆದರೆ (csinfo[i].flags != ಖಾಲಿ)
     {
-	len = (int)STRLEN(cmd);
+	len = (ಪೂರ್ಣಾಂಕ)STRLEN(cmd);
 	vim_snprintf(cmd + len, cmdlen - len, " %s", csinfo[i].flags);
     }
     vim_free(ppath);
@@ -1076,20 +1076,20 @@ err_closing:
     // Create a new process to run cscope and use pipes to talk with it
     GetStartupInfo(&si);
     si.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
-    si.wShowWindow = SW_HIDE;  // Hide child application window
+    si.w_Show_ಕಿಟಕಿ = SW_HIDE;  // Hide child application window
     si.hStdOutput = stdout_wr;
     si.hStdError  = stdout_wr;
-    si.hStdInput  = stdin_rd;
-    created = CreateProcess(NULL, cmd, NULL, NULL, TRUE, CREATE_NEW_CONSOLE,
-							NULL, NULL, &si, &pi);
+    si.h_Std_ಒಳಹರಿವು  = stdin_rd;
+    created = CreateProcess(ಖಾಲಿ, cmd, ಖಾಲಿ, ಖಾಲಿ, TRUE, CREATE_NEW_CONSOLE,
+							ಖಾಲಿ, ಖಾಲಿ, &si, &pi);
     vim_free(prog);
     vim_free(cmd);
 
-    if (!created)
+    ಆದರೆ (!created)
     {
 	PERROR(_("cs_create_connection exec failed"));
-	(void)emsg(_(e_could_not_spawn_cscope_process));
-	goto err_closing;
+	(ಶೂನ್ಯ)emsg(_(e_could_not_spawn_cscope_process));
+	ಹೋಗು err_closing;
     }
     // else
     csinfo[i].pid = pi.dwProcessId;
@@ -1097,13 +1097,13 @@ err_closing:
     CloseHandle(pi.hThread);
 
     // TODO - tidy up after failure to create files on pipe handles.
-    if (((fd = _open_osfhandle((intptr_t)stdin_wr,
-						      _O_TEXT|_O_APPEND)) < 0)
-	    || ((csinfo[i].to_fp = _fdopen(fd, "w")) == NULL))
+    ಆದರೆ (((fd = _open_osfhandle((intptr_t)stdin_wr,
+						      O_ಪಠ್ಯ|_O_APPEND)) < 0)
+	    || ((csinfo[i].ಗಮ್ಯ_fp = _fdopen(fd, "w")) == ಖಾಲಿ))
 	PERROR(_("cs_create_connection: fdopen for to_fp failed"));
-    if (((fd = _open_osfhandle((intptr_t)stdout_rd,
-						      _O_TEXT|_O_RDONLY)) < 0)
-	    || ((csinfo[i].fr_fp = _fdopen(fd, "r")) == NULL))
+    ಆದರೆ (((fd = _open_osfhandle((intptr_t)stdout_rd,
+						      O_ಪಠ್ಯ|_O_RDONLY)) < 0)
+	    || ((csinfo[i].fr_fp = _fdopen(fd, "r")) == ಖಾಲಿ))
 	PERROR(_("cs_create_connection: fdopen for fr_fp failed"));
 
     // Close handles for file descriptors inherited by the cscope process
@@ -1112,7 +1112,7 @@ err_closing:
 
 # endif // !UNIX
 
-    return CSCOPE_SUCCESS;
+    ಹಿಂತಿರುಗಿ CSCOPE_SUCCESS;
 }
 
 
@@ -1122,40 +1122,40 @@ err_closing:
  *
  * returns TRUE if we jump to a tag or abort, FALSE if not.
  */
-    static int
-cs_find(exarg_T *eap)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+cs_ಕಂಡುಹಿಡಿ(exarg_T *eap)
 {
-    char *opt, *pat;
-    int i;
+    ಅಕ್ಷರ *opt, *pat;
+    ಪೂರ್ಣಾಂಕ i;
 
-    if (cs_check_for_connections() == FALSE)
+    ಆದರೆ (cs_check_for_connections() == FALSE)
     {
-	(void)emsg(_(e_no_cscope_connections));
-	return FALSE;
+	(ಶೂನ್ಯ)emsg(_(e_no_cscope_connections));
+	ಹಿಂತಿರುಗಿ FALSE;
     }
 
-    if ((opt = strtok((char *)NULL, (const char *)" ")) == NULL)
+    ಆದರೆ ((opt = strtok((ಅಕ್ಷರ *)ಖಾಲಿ, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)" ")) == ಖಾಲಿ)
     {
-	cs_usage_msg(Find);
-	return FALSE;
+	cs_usage_ಸಂದೇಶ(ಕಂಡುಹಿಡಿ_2);
+	ಹಿಂತಿರುಗಿ FALSE;
     }
 
-    pat = opt + strlen(opt) + 1;
-    if (pat >= (char *)eap->arg + eap_arg_len)
+    pat = opt + ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(opt) + 1;
+    ಆದರೆ (pat >= (ಅಕ್ಷರ *)eap->arg + eap_arg_len)
     {
-	cs_usage_msg(Find);
-	return FALSE;
+	cs_usage_ಸಂದೇಶ(ಕಂಡುಹಿಡಿ_2);
+	ಹಿಂತಿರುಗಿ FALSE;
     }
 
     /*
      * Let's replace the NULs written by strtok() with spaces - we need the
      * spaces to correctly display the quickfix/location list window's title.
      */
-    for (i = 0; i < eap_arg_len; ++i)
-	if (NUL == eap->arg[i])
+    ಗಾಗಿ (i = 0; i < eap_arg_len; ++i)
+	ಆದರೆ (NUL == eap->arg[i])
 	    eap->arg[i] = ' ';
 
-    return cs_find_common(opt, pat, eap->forceit, TRUE,
+    ಹಿಂತಿರುಗಿ cs_ಕಂಡುಹಿಡಿ_common(opt, pat, eap->forceit, TRUE,
 				  eap->cmdidx == CMD_lcscope, *eap->cmdlinep);
 }
 
@@ -1163,76 +1163,76 @@ cs_find(exarg_T *eap)
 /*
  * Common code for cscope find, shared by cs_find() and ex_cstag().
  */
-    static int
-cs_find_common(
-    char *opt,
-    char *pat,
-    int forceit,
-    int verbose,
-    int	use_ll UNUSED,
-    char_u *cmdline UNUSED)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+cs_ಕಂಡುಹಿಡಿ_common(
+    ಅಕ್ಷರ *opt,
+    ಅಕ್ಷರ *pat,
+    ಪೂರ್ಣಾಂಕ forceit,
+    ಪೂರ್ಣಾಂಕ verbose,
+    ಪೂರ್ಣಾಂಕ	use_ll ಬಳಸದ,
+    char_u *cmdline ಬಳಸದ)
 {
-    int i;
-    char *cmd;
-    int *nummatches;
-    int totmatches;
+    ಪೂರ್ಣಾಂಕ i;
+    ಅಕ್ಷರ *cmd;
+    ಪೂರ್ಣಾಂಕ *nummatches;
+    ಪೂರ್ಣಾಂಕ totmatches;
 # ifdef FEAT_QUICKFIX
-    char cmdletter;
-    char *qfpos;
+    ಅಕ್ಷರ cmdletter;
+    ಅಕ್ಷರ *qfpos;
 
     // get cmd letter
-    switch (opt[0])
+    ಆಯ್ಕೆ (opt[0])
     {
-    case '0' :
+    ಸ್ಥಿತಿ '0' :
 	cmdletter = 's';
-	break;
-    case '1' :
+	ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ '1' :
 	cmdletter = 'g';
-	break;
-    case '2' :
+	ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ '2' :
 	cmdletter = 'd';
-	break;
-    case '3' :
+	ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ '3' :
 	cmdletter = 'c';
-	break;
-    case '4' :
+	ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ '4' :
 	cmdletter = 't';
-	break;
-    case '6' :
+	ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ '6' :
 	cmdletter = 'e';
-	break;
-    case '7' :
+	ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ '7' :
 	cmdletter = 'f';
-	break;
-    case '8' :
+	ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ '8' :
 	cmdletter = 'i';
-	break;
-    case '9' :
+	ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ '9' :
 	cmdletter = 'a';
-	break;
-    default :
+	ನಿಲ್ಲಿಸು;
+    ಪೂರ್ವನಿಯೋಜಿತ :
 	cmdletter = opt[0];
     }
 
-    qfpos = (char *)vim_strchr(p_csqf, cmdletter);
-    if (qfpos != NULL)
+    qfpos = (ಅಕ್ಷರ *)vim_strchr(p_csqf, cmdletter);
+    ಆದರೆ (qfpos != ಖಾಲಿ)
     {
 	qfpos++;
 	// next symbol must be + or -
-	if (strchr(CSQF_FLAGS, *qfpos) == NULL)
+	ಆದರೆ (strchr(CSQF_FLAGS, *qfpos) == ಖಾಲಿ)
 	{
-	    (void)semsg(_(e_invalid_cscopequickfix_flag_chr_for_chr),
+	    (ಶೂನ್ಯ)semsg(_(e_invalid_cscopequickfix_flag_chr_for_chr),
 							 *qfpos, *(qfpos - 1));
-	    return FALSE;
+	    ಹಿಂತಿರುಗಿ FALSE;
 	}
 
-	if (*qfpos != '0'
+	ಆದರೆ (*qfpos != '0'
 		&& apply_autocmds(EVENT_QUICKFIXCMDPRE, (char_u *)"cscope",
 					       curbuf->b_fname, TRUE, curbuf))
 	{
 #  ifdef FEAT_EVAL
-	    if (aborting())
-		return FALSE;
+	    ಆದರೆ (aborting())
+		ಹಿಂತಿರುಗಿ FALSE;
 #  endif
 	}
     }
@@ -1240,93 +1240,93 @@ cs_find_common(
 
     // create the actual command to send to cscope
     cmd = cs_create_cmd(opt, pat);
-    if (cmd == NULL)
-	return FALSE;
+    ಆದರೆ (cmd == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    nummatches = ALLOC_MULT(int, csinfo_size);
-    if (nummatches == NULL)
+    nummatches = ALLOC_MULT(ಪೂರ್ಣಾಂಕ, csinfo_ಗಾತ್ರ);
+    ಆದರೆ (nummatches == ಖಾಲಿ)
     {
 	vim_free(cmd);
-	return FALSE;
+	ಹಿಂತಿರುಗಿ FALSE;
     }
 
     // Send query to all open connections, then count the total number
     // of matches so we can alloc all in one swell foop.
-    for (i = 0; i < csinfo_size; i++)
+    ಗಾಗಿ (i = 0; i < csinfo_ಗಾತ್ರ; i++)
 	nummatches[i] = 0;
     totmatches = 0;
-    for (i = 0; i < csinfo_size; i++)
+    ಗಾಗಿ (i = 0; i < csinfo_ಗಾತ್ರ; i++)
     {
-	if (csinfo[i].fname == NULL || csinfo[i].to_fp == NULL)
-	    continue;
+	ಆದರೆ (csinfo[i].fname == ಖಾಲಿ || csinfo[i].ಗಮ್ಯ_fp == ಖಾಲಿ)
+	    ಮುಂದುವರಿ;
 
 	// send cmd to cscope
-	(void)fprintf(csinfo[i].to_fp, "%s\n", cmd);
-	(void)fflush(csinfo[i].to_fp);
+	(ಶೂನ್ಯ)fprintf(csinfo[i].ಗಮ್ಯ_fp, "%s\n", cmd);
+	(ಶೂನ್ಯ)fflush(csinfo[i].ಗಮ್ಯ_fp);
 
 	nummatches[i] = cs_cnt_matches(i);
 
-	if (nummatches[i] > -1)
+	ಆದರೆ (nummatches[i] > -1)
 	    totmatches += nummatches[i];
 
-	if (nummatches[i] == 0)
-	    (void)cs_read_prompt(i);
+	ಆದರೆ (nummatches[i] == 0)
+	    (ಶೂನ್ಯ)cs_read_prompt(i);
     }
     vim_free(cmd);
 
-    if (totmatches == 0)
+    ಆದರೆ (totmatches == 0)
     {
-	if (verbose)
-	    (void)semsg(_(e_no_matches_found_for_cscope_query_str_of_str),
+	ಆದರೆ (verbose)
+	    (ಶೂನ್ಯ)semsg(_(e_no_matches_ಸಿಕ್ಕಿತು_for_cscope_query_str_ದ_str),
 								     opt, pat);
 	vim_free(nummatches);
-	return FALSE;
+	ಹಿಂತಿರುಗಿ FALSE;
     }
 
 # ifdef FEAT_QUICKFIX
-    if (qfpos != NULL && *qfpos != '0' && totmatches > 0)
+    ಆದರೆ (qfpos != ಖಾಲಿ && *qfpos != '0' && totmatches > 0)
     {
 	// fill error list
 	FILE	    *f;
 	char_u	    *tmp = vim_tempname('c', TRUE);
-	qf_info_T   *qi = NULL;
-	win_T	    *wp = NULL;
+	qf_info_T   *qi = ಖಾಲಿ;
+	win_T	    *wp = ಖಾಲಿ;
 
-	if (tmp == NULL)
+	ಆದರೆ (tmp == ಖಾಲಿ)
 	{
 	    vim_free(nummatches);
-	    return FALSE;
+	    ಹಿಂತಿರುಗಿ FALSE;
 	}
 
-	f = mch_fopen((char *)tmp, "w");
-	if (f == NULL)
+	f = mch_fopen((ಅಕ್ಷರ *)tmp, "w");
+	ಆದರೆ (f == ಖಾಲಿ)
 	    semsg(_(e_cant_open_file_str), tmp);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    cs_file_results(f, nummatches);
 	    fclose(f);
-	    if (use_ll)	    // Use location list
+	    ಆದರೆ (use_ll)	    // Use location list
 		wp = curwin;
 	    // '-' starts a new error list
-	    if (qf_init(wp, tmp, (char_u *)"%f%*\\t%l%*\\t%m",
-					  *qfpos == '-', cmdline, NULL) > 0)
+	    ಆದರೆ (qf_init(wp, tmp, (char_u *)"%f%*\\t%l%*\\t%m",
+					  *qfpos == '-', cmdline, ಖಾಲಿ) > 0)
 	    {
-		if (postponed_split != 0)
+		ಆದರೆ (postponed_ವಿಭಜಿಸು != 0)
 		{
-		    (void)win_split(postponed_split > 0 ? postponed_split : 0,
-						       postponed_split_flags);
+		    (ಶೂನ್ಯ)win_ವಿಭಜಿಸು(postponed_ವಿಭಜಿಸು > 0 ? postponed_ವಿಭಜಿಸು : 0,
+						       postponed_ವಿಭಜಿಸು_flags);
 		    RESET_BINDING(curwin);
-		    postponed_split = 0;
+		    postponed_ವಿಭಜಿಸು = 0;
 		}
 
 		apply_autocmds(EVENT_QUICKFIXCMDPOST, (char_u *)"cscope",
 					       curbuf->b_fname, TRUE, curbuf);
-		if (use_ll)
+		ಆದರೆ (use_ll)
 		    /*
 		     * In the location list window, use the displayed location
 		     * list. Otherwise, use the location list for the window.
 		     */
-		    qi = (bt_quickfix(wp->w_buffer) && wp->w_llist_ref != NULL)
+		    qi = (bt_quickfix(wp->w_ಬಫರ್) && wp->w_llist_ref != ಖಾಲಿ)
 			?  wp->w_llist_ref : wp->w_llist;
 		qf_jump(qi, 0, 0, forceit);
 	    }
@@ -1334,24 +1334,24 @@ cs_find_common(
 	mch_remove(tmp);
 	vim_free(tmp);
 	vim_free(nummatches);
-	return TRUE;
+	ಹಿಂತಿರುಗಿ TRUE;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 # endif // FEAT_QUICKFIX
     {
-	char **matches = NULL, **contexts = NULL;
-	int matched = 0;
+	ಅಕ್ಷರ **matches = ಖಾಲಿ, **contexts = ಖಾಲಿ;
+	ಪೂರ್ಣಾಂಕ matched = 0;
 
 	// read output
 	cs_fill_results(pat, totmatches, nummatches, &matches,
 							 &contexts, &matched);
 	vim_free(nummatches);
-	if (matches == NULL)
-	    return FALSE;
+	ಆದರೆ (matches == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ FALSE;
 
-	(void)cs_manage_matches(matches, contexts, matched, Store);
+	(ಶೂನ್ಯ)cs_manage_matches(matches, contexts, matched, Store);
 
-	return do_tag((char_u *)pat, DT_CSCOPE, 0, forceit, verbose);
+	ಹಿಂತಿರುಗಿ do_ಟ್ಯಾಗ್((char_u *)pat, DT_CSCOPE, 0, forceit, verbose);
     }
 
 }
@@ -1359,26 +1359,26 @@ cs_find_common(
 /*
  * Print help.
  */
-    static int
-cs_help(exarg_T *eap UNUSED)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+cs_help(exarg_T *eap ಬಳಸದ)
 {
     cscmd_T *cmdp = cs_cmds;
 
-    (void)msg_puts(_("cscope commands:\n"));
-    while (cmdp->name != NULL)
+    (ಶೂನ್ಯ)ಸಂದೇಶ_puts(_("cscope commands:\n"));
+    ಆಗ (cmdp->name != ಖಾಲಿ)
     {
-	char *help = _(cmdp->help);
-	int  space_cnt = 30 - vim_strsize((char_u *)help);
+	ಅಕ್ಷರ *help = _(cmdp->help);
+	ಪೂರ್ಣಾಂಕ  space_cnt = 30 - vim_strsize((char_u *)help);
 
 	// Use %*s rather than %30s to ensure proper alignment in utf-8
-	if (space_cnt < 0)
+	ಆದರೆ (space_cnt < 0)
 	    space_cnt = 0;
-	(void)smsg(_("%-5s: %s%*s (Usage: %s)"),
+	(ಶೂನ್ಯ)smsg(_("%-5s: %s%*s (Usage: %s)"),
 				      cmdp->name,
 				      help, space_cnt, " ",
 				      cmdp->usage);
-	if (strcmp(cmdp->name, "find") == 0)
-	    msg_puts(_("\n"
+	ಆದರೆ (strcmp(cmdp->name, "find") == 0)
+	    ಸಂದೇಶ_puts(_("\n"
 		       "       a: Find assignments to this symbol\n"
 		       "       c: Find functions calling this function\n"
 		       "       d: Find functions called by this function\n"
@@ -1393,267 +1393,267 @@ cs_help(exarg_T *eap UNUSED)
     }
 
     wait_return(TRUE);
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
 
-    static void
-clear_csinfo(int i)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+clear_csinfo(ಪೂರ್ಣಾಂಕ i)
 {
-    csinfo[i].fname  = NULL;
-    csinfo[i].ppath  = NULL;
-    csinfo[i].flags  = NULL;
-# if defined(UNIX)
+    csinfo[i].fname  = ಖಾಲಿ;
+    csinfo[i].ppath  = ಖಾಲಿ;
+    csinfo[i].flags  = ಖಾಲಿ;
+# ಆದರೆ defined(UNIX)
     csinfo[i].st_dev = (dev_t)0;
     csinfo[i].st_ino = (ino_t)0;
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
     csinfo[i].nVolume = 0;
-    csinfo[i].nIndexHigh = 0;
-    csinfo[i].nIndexLow = 0;
+    csinfo[i].n_ಸೂಚ್ಯಂಕ_ಮೇಲಿನ = 0;
+    csinfo[i].n_ಸೂಚ್ಯಂಕ_ಕೆಳಗಿನ = 0;
 # endif
     csinfo[i].pid    = 0;
-    csinfo[i].fr_fp  = NULL;
-    csinfo[i].to_fp  = NULL;
-# if defined(MSWIN)
-    csinfo[i].hProc = NULL;
+    csinfo[i].fr_fp  = ಖಾಲಿ;
+    csinfo[i].ಗಮ್ಯ_fp  = ಖಾಲಿ;
+# ಆದರೆ defined(MSWIN)
+    csinfo[i].hProc = ಖಾಲಿ;
 # endif
 }
 
 /*
  * Insert a new cscope database filename into the filelist.
  */
-    static int
-cs_insert_filelist(
-    char *fname,
-    char *ppath,
-    char *flags,
-    stat_T *sb UNUSED)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+cs_ಸೇರಿಸು_filelist(
+    ಅಕ್ಷರ *fname,
+    ಅಕ್ಷರ *ppath,
+    ಅಕ್ಷರ *flags,
+    stat_T *sb ಬಳಸದ)
 {
-    int	    i;
-    int	    j;
+    ಪೂರ್ಣಾಂಕ	    i;
+    ಪೂರ್ಣಾಂಕ	    j;
 # ifndef UNIX
     BY_HANDLE_FILE_INFORMATION bhfi;
 
-    switch (win32_fileinfo((char_u *)fname, &bhfi))
+    ಆಯ್ಕೆ (win32_fileinfo((char_u *)fname, &bhfi))
     {
-	case FILEINFO_ENC_FAIL:		// enc_to_utf16() failed
-	case FILEINFO_READ_FAIL:	// CreateFile() failed
-	    if (p_csverbose)
+	ಸ್ಥಿತಿ FILEINFO_ENC_FAIL:		// enc_to_utf16() failed
+	ಸ್ಥಿತಿ FILEINFO_READ_FAIL:	// CreateFile() failed
+	    ಆದರೆ (p_csverbose)
 	    {
-		char *cant_msg = _(e_cannot_open_cscope_database_str);
-		char *winmsg = GetWin32Error();
+		ಅಕ್ಷರ *cant_ಸಂದೇಶ = _(e_cannot_open_cscope_database_str);
+		ಅಕ್ಷರ *winmsg = GetWin32Error();
 
-		if (winmsg != NULL)
-		    (void)semsg(cant_msg, winmsg);
-		else
+		ಆದರೆ (winmsg != ಖಾಲಿ)
+		    (ಶೂನ್ಯ)semsg(cant_ಸಂದೇಶ, winmsg);
+		ಇಲ್ಲದಿದ್ದರೆ
 		    // subst filename if can't get error text
-		    (void)semsg(cant_msg, fname);
+		    (ಶೂನ್ಯ)semsg(cant_ಸಂದೇಶ, fname);
 	    }
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 
-	case FILEINFO_INFO_FAIL:    // GetFileInformationByHandle() failed
-	    if (p_csverbose)
-		(void)emsg(_(e_cannot_get_cscope_database_information));
-	    return -1;
+	ಸ್ಥಿತಿ FILEINFO_INFO_FAIL:    // GetFileInformationByHandle() failed
+	    ಆದರೆ (p_csverbose)
+		(ಶೂನ್ಯ)emsg(_(e_cannot_get_cscope_database_information));
+	    ಹಿಂತಿರುಗಿ -1;
     }
 # endif
 
     i = -1; // can be set to the index of an empty item in csinfo
-    for (j = 0; j < csinfo_size; j++)
+    ಗಾಗಿ (j = 0; j < csinfo_ಗಾತ್ರ; j++)
     {
-	if (csinfo[j].fname != NULL
-# if defined(UNIX)
+	ಆದರೆ (csinfo[j].fname != ಖಾಲಿ
+# ಆದರೆ defined(UNIX)
 	    && csinfo[j].st_dev == sb->st_dev && csinfo[j].st_ino == sb->st_ino
-# else
+# ಇಲ್ಲದಿದ್ದರೆ
 	    // compare pathnames first
 	    && ((fullpathcmp((char_u *)csinfo[j].fname,
 			(char_u *)fname, FALSE, TRUE) & FPC_SAME)
 		// test index file attributes too
-		|| (csinfo[j].nVolume == bhfi.dwVolumeSerialNumber
-		    && csinfo[j].nIndexHigh == bhfi.nFileIndexHigh
-		    && csinfo[j].nIndexLow == bhfi.nFileIndexLow))
+		|| (csinfo[j].nVolume == bhfi.dw_Volume_Serial_ಸಂಖ್ಯೆ
+		    && csinfo[j].n_ಸೂಚ್ಯಂಕ_ಮೇಲಿನ == bhfi.n_File_ಸೂಚ್ಯಂಕ_ಮೇಲಿನ
+		    && csinfo[j].n_ಸೂಚ್ಯಂಕ_ಕೆಳಗಿನ == bhfi.n_File_ಸೂಚ್ಯಂಕ_ಕೆಳಗಿನ))
 # endif
 	    )
 	{
-	    if (p_csverbose)
-		(void)emsg(_(e_duplicate_cscope_database_not_added));
-	    return -1;
+	    ಆದರೆ (p_csverbose)
+		(ಶೂನ್ಯ)emsg(_(e_duplicate_cscope_database_not_added));
+	    ಹಿಂತಿರುಗಿ -1;
 	}
 
-	if (csinfo[j].fname == NULL && i == -1)
+	ಆದರೆ (csinfo[j].fname == ಖಾಲಿ && i == -1)
 	    i = j; // remember first empty entry
     }
 
-    if (i == -1)
+    ಆದರೆ (i == -1)
     {
-	i = csinfo_size;
-	if (csinfo_size == 0)
+	i = csinfo_ಗಾತ್ರ;
+	ಆದರೆ (csinfo_ಗಾತ್ರ == 0)
 	{
 	    // First time allocation: allocate only 1 connection. It should
 	    // be enough for most users.  If more is needed, csinfo will be
 	    // reallocated.
-	    csinfo_size = 1;
+	    csinfo_ಗಾತ್ರ = 1;
 	    csinfo = ALLOC_CLEAR_ONE(csinfo_T);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    csinfo_T *t_csinfo = csinfo;
 
 	    // Reallocate space for more connections.
-	    csinfo_size *= 2;
-	    csinfo = vim_realloc(csinfo, sizeof(csinfo_T)*csinfo_size);
-	    if (csinfo == NULL)
+	    csinfo_ಗಾತ್ರ *= 2;
+	    csinfo = vim_realloc(csinfo, ಗಾತ್ರ(csinfo_T)*csinfo_ಗಾತ್ರ);
+	    ಆದರೆ (csinfo == ಖಾಲಿ)
 	    {
 		// allocation failure, so keep the old infos
 		csinfo = t_csinfo;
-		csinfo_size = i;
-		return -1;
+		csinfo_ಗಾತ್ರ = i;
+		ಹಿಂತಿರುಗಿ -1;
 	    }
 	}
-	if (csinfo == NULL)
-	    return -1;
-	for (j = csinfo_size/2; j < csinfo_size; j++)
+	ಆದರೆ (csinfo == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ -1;
+	ಗಾಗಿ (j = csinfo_ಗಾತ್ರ/2; j < csinfo_ಗಾತ್ರ; j++)
 	    clear_csinfo(j);
     }
 
-    if ((csinfo[i].fname = alloc(strlen(fname)+1)) == NULL)
-	return -1;
+    ಆದರೆ ((csinfo[i].fname = alloc(ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(fname)+1)) == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ -1;
 
-    vim_strncpy((char_u *)csinfo[i].fname, (char_u *)fname, strlen((const char *)fname));
+    vim_strncpy((char_u *)csinfo[i].fname, (char_u *)fname, ಅಕ್ಷರಸರಣಿ_ಉದ್ದ((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)fname));
 
-    if (ppath != NULL)
+    ಆದರೆ (ppath != ಖಾಲಿ)
     {
-	if ((csinfo[i].ppath = alloc(strlen(ppath) + 1)) == NULL)
+	ಆದರೆ ((csinfo[i].ppath = alloc(ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(ppath) + 1)) == ಖಾಲಿ)
 	{
 	    VIM_CLEAR(csinfo[i].fname);
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
-	vim_strncpy((char_u *)csinfo[i].ppath, (char_u *)ppath, strlen((const char *)ppath));
+	vim_strncpy((char_u *)csinfo[i].ppath, (char_u *)ppath, ಅಕ್ಷರಸರಣಿ_ಉದ್ದ((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)ppath));
     }
-    else
-	csinfo[i].ppath = NULL;
+    ಇಲ್ಲದಿದ್ದರೆ
+	csinfo[i].ppath = ಖಾಲಿ;
 
-    if (flags != NULL)
+    ಆದರೆ (flags != ಖಾಲಿ)
     {
-	if ((csinfo[i].flags = alloc(strlen(flags) + 1)) == NULL)
+	ಆದರೆ ((csinfo[i].flags = alloc(ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(flags) + 1)) == ಖಾಲಿ)
 	{
 	    VIM_CLEAR(csinfo[i].fname);
 	    VIM_CLEAR(csinfo[i].ppath);
-	    return -1;
+	    ಹಿಂತಿರುಗಿ -1;
 	}
-	vim_strncpy((char_u *)csinfo[i].flags, (char_u *)flags, strlen((const char *)flags));
+	vim_strncpy((char_u *)csinfo[i].flags, (char_u *)flags, ಅಕ್ಷರಸರಣಿ_ಉದ್ದ((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)flags));
     }
-    else
-	csinfo[i].flags = NULL;
+    ಇಲ್ಲದಿದ್ದರೆ
+	csinfo[i].flags = ಖಾಲಿ;
 
-# if defined(UNIX)
+# ಆದರೆ defined(UNIX)
     csinfo[i].st_dev = sb->st_dev;
     csinfo[i].st_ino = sb->st_ino;
 
-# else
-    csinfo[i].nVolume = bhfi.dwVolumeSerialNumber;
-    csinfo[i].nIndexLow = bhfi.nFileIndexLow;
-    csinfo[i].nIndexHigh = bhfi.nFileIndexHigh;
+# ಇಲ್ಲದಿದ್ದರೆ
+    csinfo[i].nVolume = bhfi.dw_Volume_Serial_ಸಂಖ್ಯೆ;
+    csinfo[i].n_ಸೂಚ್ಯಂಕ_ಕೆಳಗಿನ = bhfi.n_File_ಸೂಚ್ಯಂಕ_ಕೆಳಗಿನ;
+    csinfo[i].n_ಸೂಚ್ಯಂಕ_ಮೇಲಿನ = bhfi.n_File_ಸೂಚ್ಯಂಕ_ಮೇಲಿನ;
 # endif
-    return i;
+    ಹಿಂತಿರುಗಿ i;
 }
 
 
 /*
  * Find cscope command in command table.
  */
-    static cscmd_T *
+    ಸ್ಥಿರ cscmd_T *
 cs_lookup_cmd(exarg_T *eap)
 {
     cscmd_T *cmdp;
-    char *stok;
+    ಅಕ್ಷರ *stok;
     size_t len;
 
-    if (eap->arg == NULL)
-	return NULL;
+    ಆದರೆ (eap->arg == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     // Store length of eap->arg before it gets modified by strtok().
-    eap_arg_len = (int)STRLEN(eap->arg);
+    eap_arg_len = (ಪೂರ್ಣಾಂಕ)STRLEN(eap->arg);
 
-    if ((stok = strtok((char *)(eap->arg), (const char *)" ")) == NULL)
-	return NULL;
+    ಆದರೆ ((stok = strtok((ಅಕ್ಷರ *)(eap->arg), (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)" ")) == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    len = strlen(stok);
-    for (cmdp = cs_cmds; cmdp->name != NULL; ++cmdp)
+    len = ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(stok);
+    ಗಾಗಿ (cmdp = cs_cmds; cmdp->name != ಖಾಲಿ; ++cmdp)
     {
-	if (strncmp((const char *)(stok), cmdp->name, len) == 0)
-	    return (cmdp);
+	ಆದರೆ (ಅಕ್ಷರಸರಣಿ_ಹೋಲಿಕೆ((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)(stok), cmdp->name, len) == 0)
+	    ಹಿಂತಿರುಗಿ (cmdp);
     }
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 
 /*
  * Nuke em.
  */
-    static int
-cs_kill(exarg_T *eap UNUSED)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+cs_kill(exarg_T *eap ಬಳಸದ)
 {
-    char *stok;
-    int i;
+    ಅಕ್ಷರ *stok;
+    ಪೂರ್ಣಾಂಕ i;
 
-    if ((stok = strtok((char *)NULL, (const char *)" ")) == NULL)
+    ಆದರೆ ((stok = strtok((ಅಕ್ಷರ *)ಖಾಲಿ, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)" ")) == ಖಾಲಿ)
     {
-	cs_usage_msg(Kill);
-	return CSCOPE_FAILURE;
+	cs_usage_ಸಂದೇಶ(Kill);
+	ಹಿಂತಿರುಗಿ CSCOPE_FAILURE;
     }
 
     // only single digit positive and negative integers are allowed
-    if ((strlen(stok) < 2 && VIM_ISDIGIT((int)(stok[0])))
-	    || (strlen(stok) < 3 && stok[0] == '-'
-					      && VIM_ISDIGIT((int)(stok[1]))))
+    ಆದರೆ ((ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(stok) < 2 && VIM_ISDIGIT((ಪೂರ್ಣಾಂಕ)(stok[0])))
+	    || (ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(stok) < 3 && stok[0] == '-'
+					      && VIM_ISDIGIT((ಪೂರ್ಣಾಂಕ)(stok[1]))))
 	i = atoi(stok);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// It must be part of a name.  We will try to find a match
 	// within all the names in the csinfo data structure
-	for (i = 0; i < csinfo_size; i++)
+	ಗಾಗಿ (i = 0; i < csinfo_ಗಾತ್ರ; i++)
 	{
-	    if (csinfo[i].fname != NULL && strstr(csinfo[i].fname, stok))
-		break;
+	    ಆದರೆ (csinfo[i].fname != ಖಾಲಿ && ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು(csinfo[i].fname, stok))
+		ನಿಲ್ಲಿಸು;
 	}
     }
 
-    if ((i != -1) && (i >= csinfo_size || i < -1 || csinfo[i].fname == NULL))
+    ಆದರೆ ((i != -1) && (i >= csinfo_ಗಾತ್ರ || i < -1 || csinfo[i].fname == ಖಾಲಿ))
     {
-	if (p_csverbose)
-	    (void)semsg(_(e_cscope_connection_str_not_founc), stok);
+	ಆದರೆ (p_csverbose)
+	    (ಶೂನ್ಯ)semsg(_(e_cscope_connection_str_not_founc), stok);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (i == -1)
+	ಆದರೆ (i == -1)
 	{
-	    for (i = 0; i < csinfo_size; i++)
+	    ಗಾಗಿ (i = 0; i < csinfo_ಗಾತ್ರ; i++)
 	    {
-		if (csinfo[i].fname)
+		ಆದರೆ (csinfo[i].fname)
 		    cs_kill_execute(i, csinfo[i].fname);
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    cs_kill_execute(i, stok);
     }
 
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
 
 /*
  * Actually kills a specific cscope connection.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 cs_kill_execute(
-    int i,	    // cscope table index
-    char *cname)    // cscope database name
+    ಪೂರ್ಣಾಂಕ i,	    // cscope table index
+    ಅಕ್ಷರ *cname)    // cscope database name
 {
-    if (p_csverbose)
+    ಆದರೆ (p_csverbose)
     {
-	msg_clr_eos();
-	(void)smsg_attr(HL_ATTR(HLF_R) | MSG_HIST,
+	ಸಂದೇಶ_clr_eos();
+	(ಶೂನ್ಯ)smsg_attr(HL_ATTR(HLF_R) | ಸಂದೇಶ_HIST,
 			_("cscope connection %s closed"), cname);
     }
     cs_release_csp(i, TRUE);
@@ -1678,12 +1678,12 @@ cs_kill_execute(
  * would still have to be modified to escape all the special regular expression
  * characters to comply with ctags formatting.
  */
-    static char *
+    ಸ್ಥಿರ ಅಕ್ಷರ *
 cs_make_vim_style_matches(
-    char *fname,
-    char *slno,
-    char *search,
-    char *tagstr)
+    ಅಕ್ಷರ *fname,
+    ಅಕ್ಷರ *slno,
+    ಅಕ್ಷರ *ಹುಡುಕು,
+    ಅಕ್ಷರ *tagstr)
 {
     // vim style is ctags:
     //
@@ -1695,27 +1695,27 @@ cs_make_vim_style_matches(
     // buf is used as part of vim's method of handling tags, and
     // (i think) vim frees it when you pop your tags and get replaced
     // by new ones on the tag stack.
-    char *buf;
-    int amt;
+    ಅಕ್ಷರ *buf;
+    ಪೂರ್ಣಾಂಕ amt;
 
-    if (search != NULL)
+    ಆದರೆ (ಹುಡುಕು != ಖಾಲಿ)
     {
-	amt = (int)(strlen(fname) + strlen(slno) + strlen(tagstr) + strlen(search)+6);
-	if ((buf = alloc(amt)) == NULL)
-	    return NULL;
+	amt = (ಪೂರ್ಣಾಂಕ)(ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(fname) + ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(slno) + ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(tagstr) + ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(ಹುಡುಕು)+6);
+	ಆದರೆ ((buf = alloc(amt)) == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-	(void)sprintf(buf, "%s\t%s\t%s;\"\t%s", tagstr, fname, slno, search);
+	(ಶೂನ್ಯ)sprintf(buf, "%s\t%s\t%s;\"\t%s", tagstr, fname, slno, ಹುಡುಕು);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	amt = (int)(strlen(fname) + strlen(slno) + strlen(tagstr) + 5);
-	if ((buf = alloc(amt)) == NULL)
-	    return NULL;
+	amt = (ಪೂರ್ಣಾಂಕ)(ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(fname) + ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(slno) + ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(tagstr) + 5);
+	ಆದರೆ ((buf = alloc(amt)) == ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-	(void)sprintf(buf, "%s\t%s\t%s;\"", tagstr, fname, slno);
+	(ಶೂನ್ಯ)sprintf(buf, "%s\t%s\t%s;\"", tagstr, fname, slno);
     }
 
-    return buf;
+    ಹಿಂತಿರುಗಿ buf;
 }
 
 
@@ -1735,100 +1735,100 @@ cs_make_vim_style_matches(
  *
  * Print: prints the tags
  */
-    static char *
+    ಸ್ಥಿರ ಅಕ್ಷರ *
 cs_manage_matches(
-    char **matches,
-    char **contexts,
-    int totmatches,
+    ಅಕ್ಷರ **matches,
+    ಅಕ್ಷರ **contexts,
+    ಪೂರ್ಣಾಂಕ totmatches,
     mcmd_e cmd)
 {
-    static char **mp = NULL;
-    static char **cp = NULL;
-    static int cnt = -1;
-    static int next = -1;
-    char *p = NULL;
+    ಸ್ಥಿರ ಅಕ್ಷರ **mp = ಖಾಲಿ;
+    ಸ್ಥಿರ ಅಕ್ಷರ **cp = ಖಾಲಿ;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ cnt = -1;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಮುಂದಿನ = -1;
+    ಅಕ್ಷರ *p = ಖಾಲಿ;
 
-    switch (cmd)
+    ಆಯ್ಕೆ (cmd)
     {
-    case Store:
-	assert(matches != NULL);
-	assert(totmatches > 0);
-	if (mp != NULL || cp != NULL)
-	    (void)cs_manage_matches(NULL, NULL, -1, Free);
+    ಸ್ಥಿತಿ Store:
+	ಪ್ರತಿಜ್ಞಾ(matches != ಖಾಲಿ);
+	ಪ್ರತಿಜ್ಞಾ(totmatches > 0);
+	ಆದರೆ (mp != ಖಾಲಿ || cp != ಖಾಲಿ)
+	    (ಶೂನ್ಯ)cs_manage_matches(ಖಾಲಿ, ಖಾಲಿ, -1, Free);
 	mp = matches;
 	cp = contexts;
 	cnt = totmatches;
-	next = 0;
-	break;
-    case Get:
-	if (next >= cnt)
-	    return NULL;
+	ಮುಂದಿನ = 0;
+	ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ Get:
+	ಆದರೆ (ಮುಂದಿನ >= cnt)
+	    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-	p = mp[next];
-	next++;
-	break;
-    case Free:
-	if (mp != NULL)
+	p = mp[ಮುಂದಿನ];
+	ಮುಂದಿನ++;
+	ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ Free:
+	ಆದರೆ (mp != ಖಾಲಿ)
 	{
-	    if (cnt > 0)
-		while (cnt--)
+	    ಆದರೆ (cnt > 0)
+		ಆಗ (cnt--)
 		{
 		    vim_free(mp[cnt]);
-		    if (cp != NULL)
+		    ಆದರೆ (cp != ಖಾಲಿ)
 			vim_free(cp[cnt]);
 		}
 	    vim_free(mp);
 	    vim_free(cp);
 	}
-	mp = NULL;
-	cp = NULL;
+	mp = ಖಾಲಿ;
+	cp = ಖಾಲಿ;
 	cnt = 0;
-	next = 0;
-	break;
-    case Print:
-	cs_print_tags_priv(mp, cp, cnt);
-	break;
-    default:	// should not reach here
-	iemsg(e_fatal_error_in_cs_manage_matches);
-	return NULL;
+	ಮುಂದಿನ = 0;
+	ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ Print:
+	cs_print_ಟ್ಯಾಗುಗಳು_priv(mp, cp, cnt);
+	ನಿಲ್ಲಿಸು;
+    ಪೂರ್ವನಿಯೋಜಿತ:	// should not reach here
+	iemsg(e_fatal_error_ಒಳ_cs_manage_matches);
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
-    return p;
+    ಹಿಂತಿರುಗಿ p;
 }
 
 
 /*
  * Parse cscope output.
  */
-    static char *
+    ಸ್ಥಿರ ಅಕ್ಷರ *
 cs_parse_results(
-    int cnumber,
-    char *buf,
-    int bufsize,
-    char **context,
-    char **linenumber,
-    char **search)
+    ಪೂರ್ಣಾಂಕ cnumber,
+    ಅಕ್ಷರ *buf,
+    ಪೂರ್ಣಾಂಕ bufsize,
+    ಅಕ್ಷರ **context,
+    ಅಕ್ಷರ **linenumber,
+    ಅಕ್ಷರ **ಹುಡುಕು)
 {
-    int ch;
-    char *p;
-    char *name;
+    ಪೂರ್ಣಾಂಕ ch;
+    ಅಕ್ಷರ *p;
+    ಅಕ್ಷರ *name;
 
-    if (fgets(buf, bufsize, csinfo[cnumber].fr_fp) == NULL)
+    ಆದರೆ (fgets(buf, bufsize, csinfo[cnumber].fr_fp) == ಖಾಲಿ)
     {
-	if (feof(csinfo[cnumber].fr_fp))
+	ಆದರೆ (feof(csinfo[cnumber].fr_fp))
 	    errno = EIO;
 
 	cs_reading_emsg(cnumber);
 
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
     // If the line's too long for the buffer, discard it.
-    if ((p = strchr(buf, '\n')) == NULL)
+    ಆದರೆ ((p = strchr(buf, '\n')) == ಖಾಲಿ)
     {
-	while ((ch = getc(csinfo[cnumber].fr_fp)) != EOF && ch != '\n')
+	ಆಗ ((ch = getc(csinfo[cnumber].fr_fp)) != EOF && ch != '\n')
 	    ;
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
     *p = '\0';
 
@@ -1837,76 +1837,76 @@ cs_parse_results(
      *
      *	<filename> <context> <line number> <pattern>
      */
-    if ((name = strtok(buf, (const char *)" ")) == NULL)
-	return NULL;
-    if ((*context = strtok(NULL, (const char *)" ")) == NULL)
-	return NULL;
-    if ((*linenumber = strtok(NULL, (const char *)" ")) == NULL)
-	return NULL;
-    *search = *linenumber + strlen(*linenumber) + 1;	// +1 to skip \0
+    ಆದರೆ ((name = strtok(buf, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)" ")) == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    ಆದರೆ ((*context = strtok(ಖಾಲಿ, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)" ")) == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    ಆದರೆ ((*linenumber = strtok(ಖಾಲಿ, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)" ")) == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
+    *ಹುಡುಕು = *linenumber + ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(*linenumber) + 1;	// +1 to skip \0
 
     // --- nvi ---
     // If the file is older than the cscope database, that is,
     // the database was built since the file was last modified,
     // or there wasn't a search string, use the line number.
-    if (strcmp(*search, "<unknown>") == 0)
-	*search = NULL;
+    ಆದರೆ (strcmp(*ಹುಡುಕು, "<unknown>") == 0)
+	*ಹುಡುಕು = ಖಾಲಿ;
 
     name = cs_resolve_file(cnumber, name);
-    return name;
+    ಹಿಂತಿರುಗಿ name;
 }
 
 # ifdef FEAT_QUICKFIX
 /*
  * Write cscope find results to file.
  */
-    static void
-cs_file_results(FILE *f, int *nummatches_a)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+cs_file_results(FILE *f, ಪೂರ್ಣಾಂಕ *nummatches_a)
 {
-    int i, j;
-    char *buf;
-    char *search, *slno;
-    char *fullname;
-    char *cntx;
-    char *context;
+    ಪೂರ್ಣಾಂಕ i, j;
+    ಅಕ್ಷರ *buf;
+    ಅಕ್ಷರ *ಹುಡುಕು, *slno;
+    ಅಕ್ಷರ *fullname;
+    ಅಕ್ಷರ *cntx;
+    ಅಕ್ಷರ *context;
 
     buf = alloc(CSREAD_BUFSIZE);
-    if (buf == NULL)
-	return;
+    ಆದರೆ (buf == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    for (i = 0; i < csinfo_size; i++)
+    ಗಾಗಿ (i = 0; i < csinfo_ಗಾತ್ರ; i++)
     {
-	if (nummatches_a[i] < 1)
-	    continue;
+	ಆದರೆ (nummatches_a[i] < 1)
+	    ಮುಂದುವರಿ;
 
-	for (j = 0; j < nummatches_a[i]; j++)
+	ಗಾಗಿ (j = 0; j < nummatches_a[i]; j++)
 	{
-	   if ((fullname = cs_parse_results(i, buf, CSREAD_BUFSIZE, &cntx,
-			   &slno, &search)) == NULL)
-	       continue;
+	   ಆದರೆ ((fullname = cs_parse_results(i, buf, CSREAD_BUFSIZE, &cntx,
+			   &slno, &ಹುಡುಕು)) == ಖಾಲಿ)
+	       ಮುಂದುವರಿ;
 
-	   context = alloc(strlen(cntx)+5);
-	   if (context == NULL)
+	   context = alloc(ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(cntx)+5);
+	   ಆದರೆ (context == ಖಾಲಿ)
 	   {
 	       vim_free(fullname);
-	       continue;
+	       ಮುಂದುವರಿ;
 	   }
 
-	   if (strcmp(cntx, "<global>")==0)
+	   ಆದರೆ (strcmp(cntx, "<global>")==0)
 	       strcpy(context, "<<global>>");
-	   else
+	   ಇಲ್ಲದಿದ್ದರೆ
 	       sprintf(context, "<<%s>>", cntx);
 
-	   if (search == NULL)
+	   ಆದರೆ (ಹುಡುಕು == ಖಾಲಿ)
 	       fprintf(f, "%s\t%s\t%s\n", fullname, slno, context);
-	   else
-	       fprintf(f, "%s\t%s\t%s %s\n", fullname, slno, context, search);
+	   ಇಲ್ಲದಿದ್ದರೆ
+	       fprintf(f, "%s\t%s\t%s %s\n", fullname, slno, context, ಹುಡುಕು);
 
 	   vim_free(context);
 	   vim_free(fullname);
 	} // for all matches
 
-	(void)cs_read_prompt(i);
+	(ಶೂನ್ಯ)cs_read_prompt(i);
 
     } // for all cscope connections
     vim_free(buf);
@@ -1918,69 +1918,69 @@ cs_file_results(FILE *f, int *nummatches_a)
  * into ctags format.
  * When there are no matches sets "*matches_p" to NULL.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 cs_fill_results(
-    char *tagstr,
-    int totmatches,
-    int *nummatches_a,
-    char ***matches_p,
-    char ***cntxts_p,
-    int *matched)
+    ಅಕ್ಷರ *tagstr,
+    ಪೂರ್ಣಾಂಕ totmatches,
+    ಪೂರ್ಣಾಂಕ *nummatches_a,
+    ಅಕ್ಷರ ***matches_p,
+    ಅಕ್ಷರ ***cntxts_p,
+    ಪೂರ್ಣಾಂಕ *matched)
 {
-    int i, j;
-    char *buf;
-    char *search, *slno;
-    int totsofar = 0;
-    char **matches = NULL;
-    char **cntxts = NULL;
-    char *fullname;
-    char *cntx;
+    ಪೂರ್ಣಾಂಕ i, j;
+    ಅಕ್ಷರ *buf;
+    ಅಕ್ಷರ *ಹುಡುಕು, *slno;
+    ಪೂರ್ಣಾಂಕ totsofar = 0;
+    ಅಕ್ಷರ **matches = ಖಾಲಿ;
+    ಅಕ್ಷರ **cntxts = ಖಾಲಿ;
+    ಅಕ್ಷರ *fullname;
+    ಅಕ್ಷರ *cntx;
 
-    assert(totmatches > 0);
+    ಪ್ರತಿಜ್ಞಾ(totmatches > 0);
 
     buf = alloc(CSREAD_BUFSIZE);
-    if (buf == NULL)
-	return;
+    ಆದರೆ (buf == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    if ((matches = ALLOC_MULT(char *, totmatches)) == NULL)
-	goto parse_out;
-    if ((cntxts = ALLOC_MULT(char *, totmatches)) == NULL)
-	goto parse_out;
+    ಆದರೆ ((matches = ALLOC_MULT(ಅಕ್ಷರ *, totmatches)) == ಖಾಲಿ)
+	ಹೋಗು parse_ಹೊರಹೋಗು;
+    ಆದರೆ ((cntxts = ALLOC_MULT(ಅಕ್ಷರ *, totmatches)) == ಖಾಲಿ)
+	ಹೋಗು parse_ಹೊರಹೋಗು;
 
-    for (i = 0; i < csinfo_size; i++)
+    ಗಾಗಿ (i = 0; i < csinfo_ಗಾತ್ರ; i++)
     {
-	if (nummatches_a[i] < 1)
-	    continue;
+	ಆದರೆ (nummatches_a[i] < 1)
+	    ಮುಂದುವರಿ;
 
-	for (j = 0; j < nummatches_a[i]; j++)
+	ಗಾಗಿ (j = 0; j < nummatches_a[i]; j++)
 	{
-	   if ((fullname = cs_parse_results(i, buf, CSREAD_BUFSIZE, &cntx,
-			   &slno, &search)) == NULL)
-		continue;
+	   ಆದರೆ ((fullname = cs_parse_results(i, buf, CSREAD_BUFSIZE, &cntx,
+			   &slno, &ಹುಡುಕು)) == ಖಾಲಿ)
+		ಮುಂದುವರಿ;
 
 	    matches[totsofar] = cs_make_vim_style_matches(fullname, slno,
-							  search, tagstr);
+							  ಹುಡುಕು, tagstr);
 
 	    vim_free(fullname);
 
-	    if (strcmp(cntx, "<global>") == 0)
-		cntxts[totsofar] = NULL;
-	    else
+	    ಆದರೆ (strcmp(cntx, "<global>") == 0)
+		cntxts[totsofar] = ಖಾಲಿ;
+	    ಇಲ್ಲದಿದ್ದರೆ
 		// note: if vim_strsave returns NULL, then the context
 		// will be "<global>", which is misleading.
-		cntxts[totsofar] = (char *)vim_strsave((char_u *)cntx);
+		cntxts[totsofar] = (ಅಕ್ಷರ *)vim_strsave((char_u *)cntx);
 
-	    if (matches[totsofar] != NULL)
+	    ಆದರೆ (matches[totsofar] != ಖಾಲಿ)
 		totsofar++;
 
 	} // for all matches
 
-	(void)cs_read_prompt(i);
+	(ಶೂನ್ಯ)cs_read_prompt(i);
 
     } // for all cscope connections
 
-parse_out:
-    if (totsofar == 0)
+parse_ಹೊರಹೋಗು:
+    ಆದರೆ (totsofar == 0)
     {
 	// No matches, free the arrays and return NULL in "*matches_p".
 	VIM_CLEAR(matches);
@@ -1997,180 +1997,180 @@ parse_out:
 /*
  * get the requested path components
  */
-    static char *
-cs_pathcomponents(char *path)
+    ಸ್ಥಿರ ಅಕ್ಷರ *
+cs_pathcomponents(ಅಕ್ಷರ *ಮಾರ್ಗ)
 {
-    int		i;
-    char	*s;
+    ಪೂರ್ಣಾಂಕ		i;
+    ಅಕ್ಷರ	*s;
 
-    if (p_cspc == 0)
-	return path;
+    ಆದರೆ (p_cspc == 0)
+	ಹಿಂತಿರುಗಿ ಮಾರ್ಗ;
 
-    s = path + strlen(path) - 1;
-    for (i = 0; i < p_cspc; ++i)
+    s = ಮಾರ್ಗ + ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(ಮಾರ್ಗ) - 1;
+    ಗಾಗಿ (i = 0; i < p_cspc; ++i)
     {
-	while (s > path)
+	ಆಗ (s > ಮಾರ್ಗ)
 	{
 	   s--;
-	   if (*s == '/'
+	   ಆದರೆ (*s == '/'
 # ifdef MSWIN
 		|| *s == '\\'
 # endif
 		)
-	      break;
+	      ನಿಲ್ಲಿಸು;
 	}
     }
-    if ((s > path && *s == '/')
+    ಆದರೆ ((s > ಮಾರ್ಗ && *s == '/')
 # ifdef MSWIN
-	|| (s > path && *s == '\\')
+	|| (s > ಮಾರ್ಗ && *s == '\\')
 # endif
 	    )
 	++s;
-    return s;
+    ಹಿಂತಿರುಗಿ s;
 }
 
 /*
  * Called from cs_manage_matches().
  */
-    static void
-cs_print_tags_priv(char **matches, char **cntxts, int num_matches)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+cs_print_ಟ್ಯಾಗುಗಳು_priv(ಅಕ್ಷರ **matches, ಅಕ್ಷರ **cntxts, ಪೂರ್ಣಾಂಕ ಅಂಕೆ_matches)
 {
-    char	*buf = NULL;
-    char	*t_buf;
-    int		bufsize = 0; // Track available bufsize
-    int		newsize = 0;
-    char	*ptag;
-    char	*fname, *lno, *extra, *tbuf;
-    int		i, idx, num;
-    char	*globalcntx = "GLOBAL";
-    char	*cntxformat = " <<%s>>";
-    char	*context;
-    char	*cstag_msg = _("Cscope tag: %s");
-    char	*csfmt_str = "%4d %6s  ";
+    ಅಕ್ಷರ	*buf = ಖಾಲಿ;
+    ಅಕ್ಷರ	*t_buf;
+    ಪೂರ್ಣಾಂಕ		bufsize = 0; // Track available bufsize
+    ಪೂರ್ಣಾಂಕ		newsize = 0;
+    ಅಕ್ಷರ	*ptag;
+    ಅಕ್ಷರ	*fname, *lno, *extra, *tbuf;
+    ಪೂರ್ಣಾಂಕ		i, idx, ಅಂಕೆ;
+    ಅಕ್ಷರ	*globalcntx = "GLOBAL";
+    ಅಕ್ಷರ	*cntxformat = " <<%s>>";
+    ಅಕ್ಷರ	*context;
+    ಅಕ್ಷರ	*cstag_ಸಂದೇಶ = _("Cscope tag: %s");
+    ಅಕ್ಷರ	*csfmt_str = "%4d %6s  ";
 
-    assert(num_matches > 0);
+    ಪ್ರತಿಜ್ಞಾ(ಅಂಕೆ_matches > 0);
 
-    if ((tbuf = alloc(strlen(matches[0]) + 1)) == NULL)
-	return;
+    ಆದರೆ ((tbuf = alloc(ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(matches[0]) + 1)) == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     strcpy(tbuf, matches[0]);
     ptag = strtok(tbuf, "\t");
-    if (ptag == NULL)
+    ಆದರೆ (ptag == ಖಾಲಿ)
     {
 	vim_free(tbuf);
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
-    newsize = (int)(strlen(cstag_msg) + strlen(ptag));
+    newsize = (ಪೂರ್ಣಾಂಕ)(ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(cstag_ಸಂದೇಶ) + ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(ptag));
     buf = alloc(newsize);
-    if (buf != NULL)
+    ಆದರೆ (buf != ಖಾಲಿ)
     {
 	bufsize = newsize;
-	(void)sprintf(buf, cstag_msg, ptag);
-	msg_puts_attr(buf, HL_ATTR(HLF_T));
+	(ಶೂನ್ಯ)sprintf(buf, cstag_ಸಂದೇಶ, ptag);
+	ಸಂದೇಶ_puts_attr(buf, HL_ATTR(HLF_T));
     }
 
     vim_free(tbuf);
 
-    msg_puts_attr(_("\n   #   line"), HL_ATTR(HLF_T));    // strlen is 7
-    msg_advance(msg_col + 2);
-    msg_puts_attr(_("filename / context / line\n"), HL_ATTR(HLF_T));
+    ಸಂದೇಶ_puts_attr(_("\n   #   line"), HL_ATTR(HLF_T));    // strlen is 7
+    ಸಂದೇಶ_advance(ಸಂದೇಶ_ಲಂಬಸಾಲು + 2);
+    ಸಂದೇಶ_puts_attr(_("filename / context / line\n"), HL_ATTR(HLF_T));
 
-    num = 1;
-    for (i = 0; i < num_matches; i++)
+    ಅಂಕೆ = 1;
+    ಗಾಗಿ (i = 0; i < ಅಂಕೆ_matches; i++)
     {
 	idx = i;
 
 	// if we really wanted to, we could avoid this malloc and strcpy
 	// by parsing matches[i] on the fly and placing stuff into buf
 	// directly, but that's too much of a hassle
-	if ((tbuf = alloc(strlen(matches[idx]) + 1)) == NULL)
-	    continue;
-	(void)strcpy(tbuf, matches[idx]);
+	ಆದರೆ ((tbuf = alloc(ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(matches[idx]) + 1)) == ಖಾಲಿ)
+	    ಮುಂದುವರಿ;
+	(ಶೂನ್ಯ)strcpy(tbuf, matches[idx]);
 
-	if (strtok(tbuf, (const char *)"\t") == NULL
-		|| (fname = strtok(NULL, (const char *)"\t")) == NULL
-		|| (lno = strtok(NULL, (const char *)"\t")) == NULL)
+	ಆದರೆ (strtok(tbuf, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)"\t") == ಖಾಲಿ
+		|| (fname = strtok(ಖಾಲಿ, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)"\t")) == ಖಾಲಿ
+		|| (lno = strtok(ಖಾಲಿ, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)"\t")) == ಖಾಲಿ)
 	{
 	    vim_free(tbuf);
-	    continue;
+	    ಮುಂದುವರಿ;
 	}
-	extra = strtok(NULL, (const char *)"\t");
+	extra = strtok(ಖಾಲಿ, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)"\t");
 
-	lno[strlen(lno)-2] = '\0';  // ignore ;" at the end
+	lno[ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(lno)-2] = '\0';  // ignore ;" at the end
 
 	// hopefully 'num' (num of matches) will be less than 10^16
-	newsize = (int)(strlen(csfmt_str) + 16 + strlen(lno));
-	if (bufsize < newsize)
+	newsize = (ಪೂರ್ಣಾಂಕ)(ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(csfmt_str) + 16 + ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(lno));
+	ಆದರೆ (bufsize < newsize)
 	{
 	    t_buf = buf;
 	    buf = vim_realloc(buf, newsize);
-	    if (buf == NULL)
+	    ಆದರೆ (buf == ಖಾಲಿ)
 	    {
 		bufsize = 0;
 		vim_free(t_buf);
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		bufsize = newsize;
 	}
-	if (buf != NULL)
+	ಆದರೆ (buf != ಖಾಲಿ)
 	{
 	    // csfmt_str = "%4d %6s  ";
-	    (void)sprintf(buf, csfmt_str, num, lno);
-	    msg_puts_attr(buf, HL_ATTR(HLF_CM));
+	    (ಶೂನ್ಯ)sprintf(buf, csfmt_str, ಅಂಕೆ, lno);
+	    ಸಂದೇಶ_puts_attr(buf, HL_ATTR(HLF_CM));
 	}
-	msg_outtrans_long_attr((char_u *)cs_pathcomponents(fname),
+	ಸಂದೇಶ_outtrans_long_attr((char_u *)cs_pathcomponents(fname),
 							      HL_ATTR(HLF_CM));
 
 	// compute the required space for the context
-	if (cntxts[idx] != NULL)
+	ಆದರೆ (cntxts[idx] != ಖಾಲಿ)
 	    context = cntxts[idx];
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    context = globalcntx;
-	newsize = (int)(strlen(context) + strlen(cntxformat));
+	newsize = (ಪೂರ್ಣಾಂಕ)(ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(context) + ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(cntxformat));
 
-	if (bufsize < newsize)
+	ಆದರೆ (bufsize < newsize)
 	{
 	    t_buf = buf;
 	    buf = vim_realloc(buf, newsize);
-	    if (buf == NULL)
+	    ಆದರೆ (buf == ಖಾಲಿ)
 	    {
 		bufsize = 0;
 		vim_free(t_buf);
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		bufsize = newsize;
 	}
-	if (buf != NULL)
+	ಆದರೆ (buf != ಖಾಲಿ)
 	{
-	    (void)sprintf(buf, cntxformat, context);
+	    (ಶೂನ್ಯ)sprintf(buf, cntxformat, context);
 
 	    // print the context only if it fits on the same line
-	    if (msg_col + (int)strlen(buf) >= cmdline_width)
-		msg_putchar('\n');
-	    msg_advance(12);
-	    msg_outtrans_long_attr((char_u *)buf, 0);
-	    msg_putchar('\n');
+	    ಆದರೆ (ಸಂದೇಶ_ಲಂಬಸಾಲು + (ಪೂರ್ಣಾಂಕ)ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(buf) >= cmdline_ಅಗಲ)
+		ಸಂದೇಶ_putchar('\n');
+	    ಸಂದೇಶ_advance(12);
+	    ಸಂದೇಶ_outtrans_long_attr((char_u *)buf, 0);
+	    ಸಂದೇಶ_putchar('\n');
 	}
-	if (extra != NULL)
+	ಆದರೆ (extra != ಖಾಲಿ)
 	{
-	    msg_advance(13);
-	    msg_outtrans_long_attr((char_u *)extra, 0);
+	    ಸಂದೇಶ_advance(13);
+	    ಸಂದೇಶ_outtrans_long_attr((char_u *)extra, 0);
 	}
 
 	vim_free(tbuf); // only after printing extra due to strtok use
 
-	if (msg_col)
-	    msg_putchar('\n');
+	ಆದರೆ (ಸಂದೇಶ_ಲಂಬಸಾಲು)
+	    ಸಂದೇಶ_putchar('\n');
 
 	ui_breakcheck();
-	if (got_int)
+	ಆದರೆ (got_int)
 	{
 	    got_int = FALSE;	// don't print any more matches
-	    break;
+	    ನಿಲ್ಲಿಸು;
 	}
 
-	num++;
+	ಅಂಕೆ++;
     } // for all matches
 
     vim_free(buf);
@@ -2180,46 +2180,46 @@ cs_print_tags_priv(char **matches, char **cntxts, int num_matches)
 /*
  * Read a cscope prompt (basically, skip over the ">> ").
  */
-    static int
-cs_read_prompt(int i)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+cs_read_prompt(ಪೂರ್ಣಾಂಕ i)
 {
-    int		ch;
-    char	*buf = NULL; // buffer for possible error message from cscope
-    int		bufpos = 0;
-    int		maxlen;
-    static char *eprompt = "Press the RETURN key to continue:";
-    int		epromptlen = (int)strlen(eprompt);
-    int		n;
+    ಪೂರ್ಣಾಂಕ		ch;
+    ಅಕ್ಷರ	*buf = ಖಾಲಿ; // buffer for possible error message from cscope
+    ಪೂರ್ಣಾಂಕ		bufpos = 0;
+    ಪೂರ್ಣಾಂಕ		maxlen;
+    ಸ್ಥಿರ ಅಕ್ಷರ *eprompt = "Press the RETURN key to continue:";
+    ಪೂರ್ಣಾಂಕ		epromptlen = (ಪೂರ್ಣಾಂಕ)ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(eprompt);
+    ಪೂರ್ಣಾಂಕ		n;
 
     // compute maximum allowed len for Cscope error message
-    char *cs_emsg = _(e_cscope_error_str);
-    maxlen = (int)(IOSIZE - strlen(cs_emsg));
+    ಅಕ್ಷರ *cs_emsg = _(e_cscope_error_str);
+    maxlen = (ಪೂರ್ಣಾಂಕ)(IOSIZE - ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(cs_emsg));
 
-    for (;;)
+    ಗಾಗಿ (;;)
     {
-	while ((ch = getc(csinfo[i].fr_fp)) != EOF && ch != CSCOPE_PROMPT[0])
+	ಆಗ ((ch = getc(csinfo[i].fr_fp)) != EOF && ch != CSCOPE_PROMPT[0])
 	    // if there is room and char is printable
-	    if (bufpos < maxlen - 1 && vim_isprintc(ch))
+	    ಆದರೆ (bufpos < maxlen - 1 && vim_isprintc(ch))
 	    {
-		if (buf == NULL) // lazy buffer allocation
+		ಆದರೆ (buf == ಖಾಲಿ) // lazy buffer allocation
 		    buf = alloc(maxlen);
-		if (buf != NULL)
+		ಆದರೆ (buf != ಖಾಲಿ)
 		{
 		    // append character to the message
 		    buf[bufpos++] = ch;
 		    buf[bufpos] = NUL;
-		    if (bufpos >= epromptlen
+		    ಆದರೆ (bufpos >= epromptlen
 			    && strcmp(&buf[bufpos - epromptlen], eprompt) == 0)
 		    {
 			// remove eprompt from buf
 			buf[bufpos - epromptlen] = NUL;
 
 			// print message to user
-			(void)semsg(cs_emsg, buf);
+			(ಶೂನ್ಯ)semsg(cs_emsg, buf);
 
 			// send RETURN to cscope
-			(void)putc('\n', csinfo[i].to_fp);
-			(void)fflush(csinfo[i].to_fp);
+			(ಶೂನ್ಯ)putc('\n', csinfo[i].ಗಮ್ಯ_fp);
+			(ಶೂನ್ಯ)fflush(csinfo[i].ಗಮ್ಯ_fp);
 
 			// clear buf
 			bufpos = 0;
@@ -2228,42 +2228,42 @@ cs_read_prompt(int i)
 		}
 	    }
 
-	for (n = 0; n < (int)STRLEN_LITERAL(CSCOPE_PROMPT); ++n)
+	ಗಾಗಿ (n = 0; n < (ಪೂರ್ಣಾಂಕ)STRLEN_LITERAL(CSCOPE_PROMPT); ++n)
 	{
-	    if (n > 0)
+	    ಆದರೆ (n > 0)
 		ch = getc(csinfo[i].fr_fp);
-	    if (ch == EOF)
+	    ಆದರೆ (ch == EOF)
 	    {
-		if (buf != NULL && buf[0] != NUL)
-		    (void)semsg(cs_emsg, buf);
-		else if (p_csverbose)
+		ಆದರೆ (buf != ಖಾಲಿ && buf[0] != NUL)
+		    (ಶೂನ್ಯ)semsg(cs_emsg, buf);
+		ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p_csverbose)
 		    cs_reading_emsg(i); // don't have additional information
 		cs_release_csp(i, TRUE);
 		vim_free(buf);
-		return CSCOPE_FAILURE;
+		ಹಿಂತಿರುಗಿ CSCOPE_FAILURE;
 	    }
 
-	    if (ch != CSCOPE_PROMPT[n])
+	    ಆದರೆ (ch != CSCOPE_PROMPT[n])
 	    {
 		ch = EOF;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	}
 
-	if (ch == EOF)
-	    continue;	    // didn't find the prompt
-	break;		    // did find the prompt
+	ಆದರೆ (ch == EOF)
+	    ಮುಂದುವರಿ;	    // didn't find the prompt
+	ನಿಲ್ಲಿಸು;		    // did find the prompt
     }
 
     vim_free(buf);
-    return CSCOPE_SUCCESS;
+    ಹಿಂತಿರುಗಿ CSCOPE_SUCCESS;
 }
 
-# if defined(UNIX) && defined(SIGALRM)
+# ಆದರೆ defined(UNIX) && defined(SIGALRM)
 /*
  * Used to catch and ignore SIGALRM below.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 sig_handler SIGDEFARG(sigarg)
 {
     // do nothing
@@ -2274,32 +2274,32 @@ sig_handler SIGDEFARG(sigarg)
  * Does the actual free'ing for the cs ptr with an optional flag of whether
  * or not to free the filename.  Called by cs_kill and cs_reset.
  */
-    static void
-cs_release_csp(int i, int freefnpp)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+cs_release_csp(ಪೂರ್ಣಾಂಕ i, ಪೂರ್ಣಾಂಕ freefnpp)
 {
     /*
      * Trying to exit normally (not sure whether it is fit to UNIX cscope
      */
-    if (csinfo[i].to_fp != NULL)
+    ಆದರೆ (csinfo[i].ಗಮ್ಯ_fp != ಖಾಲಿ)
     {
-	(void)fputs("q\n", csinfo[i].to_fp);
-	(void)fflush(csinfo[i].to_fp);
+	(ಶೂನ್ಯ)fputs("q\n", csinfo[i].ಗಮ್ಯ_fp);
+	(ಶೂನ್ಯ)fflush(csinfo[i].ಗಮ್ಯ_fp);
     }
-# if defined(UNIX)
+# ಆದರೆ defined(UNIX)
     {
-	int waitpid_errno;
-	int pstat;
+	ಪೂರ್ಣಾಂಕ waitpid_errno;
+	ಪೂರ್ಣಾಂಕ pstat;
 	pid_t pid;
 
-#  if defined(HAVE_SIGACTION)
-	struct sigaction sa, old;
+#  ಆದರೆ defined(HAVE_SIGACTION)
+	ರಚನೆ sigaction sa, old;
 
 	// Use sigaction() to limit the waiting time to two seconds.
 	sigemptyset(&sa.sa_mask);
 	sa.sa_handler = sig_handler;
 #   ifdef SA_NODEFER
 	sa.sa_flags = SA_NODEFER;
-#   else
+#   ಇಲ್ಲದಿದ್ದರೆ
 	sa.sa_flags = 0;
 #   endif
 	sigaction(SIGALRM, &sa, &old);
@@ -2311,19 +2311,19 @@ cs_release_csp(int i, int freefnpp)
 
 	// cancel pending alarm if still there and restore signal
 	alarm(0);
-	sigaction(SIGALRM, &old, NULL);
-#  else
-	int waited;
+	sigaction(SIGALRM, &old, ಖಾಲಿ);
+#  ಇಲ್ಲದಿದ್ದರೆ
+	ಪೂರ್ಣಾಂಕ waited;
 
 	// Can't use sigaction(), loop for two seconds.  First yield the CPU
 	// to give cscope a chance to exit quickly.
 	sleep(0);
-	for (waited = 0; waited < 40; ++waited)
+	ಗಾಗಿ (waited = 0; waited < 40; ++waited)
 	{
 	    pid = waitpid(csinfo[i].pid, &pstat, WNOHANG);
 	    waitpid_errno = errno;
-	    if (pid != 0)
-		break;  // break unless the process is still running
+	    ಆದರೆ (pid != 0)
+		ನಿಲ್ಲಿಸು;  // break unless the process is still running
 	    mch_delay(50L, 0); // sleep 50 ms
 	}
 #  endif
@@ -2332,12 +2332,12 @@ cs_release_csp(int i, int freefnpp)
 	 * Safety check: If the PID would be zero here, the entire X session
 	 * would be killed.  -1 and 1 are dangerous as well.
 	 */
-	if (pid < 0 && csinfo[i].pid > 1)
+	ಆದರೆ (pid < 0 && csinfo[i].pid > 1)
 	{
 #  ifdef ECHILD
-	    int alive = TRUE;
+	    ಪೂರ್ಣಾಂಕ alive = TRUE;
 
-	    if (waitpid_errno == ECHILD)
+	    ಆದರೆ (waitpid_errno == ECHILD)
 	    {
 		/*
 		 * When using 'vim -g', vim is forked and cscope process is
@@ -2348,44 +2348,44 @@ cs_release_csp(int i, int freefnpp)
 		 * the "q" command, hence giving it a chance to clean up
 		 * its temporary files.
 		 */
-		int waited;
+		ಪೂರ್ಣಾಂಕ waited;
 
 		sleep(0);
-		for (waited = 0; waited < 40; ++waited)
+		ಗಾಗಿ (waited = 0; waited < 40; ++waited)
 		{
 		    // Check whether cscope process is still alive
-		    if (kill(csinfo[i].pid, 0) != 0)
+		    ಆದರೆ (kill(csinfo[i].pid, 0) != 0)
 		    {
 			alive = FALSE; // cscope process no longer exists
-			break;
+			ನಿಲ್ಲಿಸು;
 		    }
 		    mch_delay(50L, 0); // sleep 50 ms
 		}
 	    }
-	    if (alive)
+	    ಆದರೆ (alive)
 #  endif
 	    {
 		kill(csinfo[i].pid, SIGKILL);
-		(void)waitpid(csinfo[i].pid, &pstat, 0);
+		(ಶೂನ್ಯ)waitpid(csinfo[i].pid, &pstat, 0);
 	    }
 	}
     }
-# else  // !UNIX
-    if (csinfo[i].hProc != NULL)
+# ಇಲ್ಲದಿದ್ದರೆ  // !UNIX
+    ಆದರೆ (csinfo[i].hProc != ಖಾಲಿ)
     {
 	// Give cscope a chance to exit normally
-	if (WaitForSingleObject(csinfo[i].hProc, 1000) == WAIT_TIMEOUT)
+	ಆದರೆ (WaitForSingleObject(csinfo[i].hProc, 1000) == WAIT_TIMEOUT)
 	    TerminateProcess(csinfo[i].hProc, 0);
 	CloseHandle(csinfo[i].hProc);
     }
 # endif
 
-    if (csinfo[i].fr_fp != NULL)
-	(void)fclose(csinfo[i].fr_fp);
-    if (csinfo[i].to_fp != NULL)
-	(void)fclose(csinfo[i].to_fp);
+    ಆದರೆ (csinfo[i].fr_fp != ಖಾಲಿ)
+	(ಶೂನ್ಯ)fclose(csinfo[i].fr_fp);
+    ಆದರೆ (csinfo[i].ಗಮ್ಯ_fp != ಖಾಲಿ)
+	(ಶೂನ್ಯ)fclose(csinfo[i].ಗಮ್ಯ_fp);
 
-    if (freefnpp)
+    ಆದರೆ (freefnpp)
     {
 	vim_free(csinfo[i].fname);
 	vim_free(csinfo[i].ppath);
@@ -2399,50 +2399,50 @@ cs_release_csp(int i, int freefnpp)
 /*
  * Calls cs_kill on all cscope connections then reinits.
  */
-    static int
-cs_reset(exarg_T *eap UNUSED)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+cs_reset(exarg_T *eap ಬಳಸದ)
 {
-    char	**dblist = NULL, **pplist = NULL, **fllist = NULL;
-    int	i;
-    char buf[20]; // for sprintf " (#%d)"
+    ಅಕ್ಷರ	**dblist = ಖಾಲಿ, **pplist = ಖಾಲಿ, **fllist = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ	i;
+    ಅಕ್ಷರ buf[20]; // for sprintf " (#%d)"
 
-    if (csinfo_size == 0)
-	return CSCOPE_SUCCESS;
+    ಆದರೆ (csinfo_ಗಾತ್ರ == 0)
+	ಹಿಂತಿರುಗಿ CSCOPE_SUCCESS;
 
     // malloc our db and ppath list
-    dblist = ALLOC_MULT(char *, csinfo_size);
-    pplist = ALLOC_MULT(char *, csinfo_size);
-    fllist = ALLOC_MULT(char *, csinfo_size);
-    if (dblist == NULL || pplist == NULL || fllist == NULL)
+    dblist = ALLOC_MULT(ಅಕ್ಷರ *, csinfo_ಗಾತ್ರ);
+    pplist = ALLOC_MULT(ಅಕ್ಷರ *, csinfo_ಗಾತ್ರ);
+    fllist = ALLOC_MULT(ಅಕ್ಷರ *, csinfo_ಗಾತ್ರ);
+    ಆದರೆ (dblist == ಖಾಲಿ || pplist == ಖಾಲಿ || fllist == ಖಾಲಿ)
     {
 	vim_free(dblist);
 	vim_free(pplist);
 	vim_free(fllist);
-	return CSCOPE_FAILURE;
+	ಹಿಂತಿರುಗಿ CSCOPE_FAILURE;
     }
 
-    for (i = 0; i < csinfo_size; i++)
+    ಗಾಗಿ (i = 0; i < csinfo_ಗಾತ್ರ; i++)
     {
 	dblist[i] = csinfo[i].fname;
 	pplist[i] = csinfo[i].ppath;
 	fllist[i] = csinfo[i].flags;
-	if (csinfo[i].fname != NULL)
+	ಆದರೆ (csinfo[i].fname != ಖಾಲಿ)
 	    cs_release_csp(i, FALSE);
     }
 
     // rebuild the cscope connection list
-    for (i = 0; i < csinfo_size; i++)
+    ಗಾಗಿ (i = 0; i < csinfo_ಗಾತ್ರ; i++)
     {
-	if (dblist[i] != NULL)
+	ಆದರೆ (dblist[i] != ಖಾಲಿ)
 	{
-	    cs_add_common(dblist[i], pplist[i], fllist[i]);
-	    if (p_csverbose)
+	    cs_ಕೂಡಿಸು_common(dblist[i], pplist[i], fllist[i]);
+	    ಆದರೆ (p_csverbose)
 	    {
 		// don't use smsg_attr() because we want to display the
 		// connection number in the same line as
 		// "Added cscope database..."
 		sprintf(buf, " (#%d)", i);
-		msg_puts_attr(buf, HL_ATTR(HLF_R));
+		ಸಂದೇಶ_puts_attr(buf, HL_ATTR(HLF_R));
 	    }
 	}
 	vim_free(dblist[i]);
@@ -2453,9 +2453,9 @@ cs_reset(exarg_T *eap UNUSED)
     vim_free(pplist);
     vim_free(fllist);
 
-    if (p_csverbose)
-	msg_attr(_("All cscope databases reset"), HL_ATTR(HLF_R) | MSG_HIST);
-    return CSCOPE_SUCCESS;
+    ಆದರೆ (p_csverbose)
+	ಸಂದೇಶ_attr(_("All cscope databases reset"), HL_ATTR(HLF_R) | ಸಂದೇಶ_HIST);
+    ಹಿಂತಿರುಗಿ CSCOPE_SUCCESS;
 }
 
 
@@ -2468,14 +2468,14 @@ cs_reset(exarg_T *eap UNUSED)
  * ships with Solaris 2.6), the output never has the prefix prepended.
  * Contrast this with my development system (Digital Unix), which does.
  */
-    static char *
-cs_resolve_file(int i, char *name)
+    ಸ್ಥಿರ ಅಕ್ಷರ *
+cs_resolve_file(ಪೂರ್ಣಾಂಕ i, ಅಕ್ಷರ *name)
 {
-    char	*fullname;
-    string_T	csdir = {NULL, 0};
+    ಅಕ್ಷರ	*fullname;
+    string_T	csdir = {ಖಾಲಿ, 0};
     size_t	namelen;
     size_t	ppathlen = 0;
-    int		len;
+    ಪೂರ್ಣಾಂಕ		len;
 
     /*
      * Ppath is freed when we destroy the cscope connection.
@@ -2483,144 +2483,144 @@ cs_resolve_file(int i, char *name)
      * copied into the tag buffer used by Vim.
      */
     namelen = STRLEN(name);
-    len = (int)namelen + 2;
-    if (csinfo[i].ppath != NULL)
+    len = (ಪೂರ್ಣಾಂಕ)namelen + 2;
+    ಆದರೆ (csinfo[i].ppath != ಖಾಲಿ)
     {
 	ppathlen = STRLEN(csinfo[i].ppath);
-	len += (int)ppathlen;
+	len += (ಪೂರ್ಣಾಂಕ)ppathlen;
     }
-    else if (p_csre && csinfo[i].fname != NULL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p_csre && csinfo[i].fname != ಖಾಲಿ)
     {
 	// If 'cscoperelative' is set and ppath is not set, use cscope.out
 	// path in path resolution.
 	csdir.string = alloc(MAXPATHL);
-	if (csdir.string != NULL)
+	ಆದರೆ (csdir.string != ಖಾಲಿ)
 	{
 	    vim_strncpy(csdir.string, (char_u *)csinfo[i].fname,
 					  gettail((char_u *)csinfo[i].fname)
 						 - (char_u *)csinfo[i].fname);
-	    csdir.length = STRLEN(csdir.string);
-	    len += (int)csdir.length;
+	    csdir.ಉದ್ದಳತೆ = STRLEN(csdir.string);
+	    len += (ಪೂರ್ಣಾಂಕ)csdir.ಉದ್ದಳತೆ;
 	}
     }
 
     // Note/example: this won't work if the cscope output already starts
     // "../.." and the prefix path is also "../..".  if something like this
     // happens, you are screwed up and need to fix how you're using cscope.
-    if (csinfo[i].ppath != NULL
-	    && (strncmp(name, csinfo[i].ppath, ppathlen) != 0)
+    ಆದರೆ (csinfo[i].ppath != ಖಾಲಿ
+	    && (ಅಕ್ಷರಸರಣಿ_ಹೋಲಿಕೆ(name, csinfo[i].ppath, ppathlen) != 0)
 	    && (name[0] != '/')
 # ifdef MSWIN
 	    && name[0] != '\\' && name[1] != ':'
 # endif
        )
     {
-	if ((fullname = alloc(len)) != NULL)
-	    (void)sprintf(fullname, "%s/%s", csinfo[i].ppath, name);
+	ಆದರೆ ((fullname = alloc(len)) != ಖಾಲಿ)
+	    (ಶೂನ್ಯ)sprintf(fullname, "%s/%s", csinfo[i].ppath, name);
     }
-    else if (csdir.string != NULL && csinfo[i].fname != NULL && *csdir.string != NUL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (csdir.string != ಖಾಲಿ && csinfo[i].fname != ಖಾಲಿ && *csdir.string != NUL)
     {
 	string_T    ret;
 
 	// Check for csdir to be non empty to avoid empty path concatenated to
 	// cscope output.
-	fullname = (char *)concat_fnames(csdir.string, csdir.length, (char_u *)name, namelen, TRUE, &ret);
+	fullname = (ಅಕ್ಷರ *)concat_fnames(csdir.string, csdir.ಉದ್ದಳತೆ, (char_u *)name, namelen, TRUE, &ret);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	fullname = (char *)vim_strnsave((char_u *)name, namelen);
+	fullname = (ಅಕ್ಷರ *)vim_strnsave((char_u *)name, namelen);
     }
 
     vim_free(csdir.string);
-    return fullname;
+    ಹಿಂತಿರುಗಿ fullname;
 }
 
 
 /*
  * Show all cscope connections.
  */
-    static int
-cs_show(exarg_T *eap UNUSED)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+cs_show(exarg_T *eap ಬಳಸದ)
 {
-    int i;
+    ಪೂರ್ಣಾಂಕ i;
 
-    if (cs_cnt_connections() == 0)
-	msg_puts(_("no cscope connections\n"));
-    else
+    ಆದರೆ (cs_cnt_connections() == 0)
+	ಸಂದೇಶ_puts(_("no cscope connections\n"));
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	msg_puts_attr(
+	ಸಂದೇಶ_puts_attr(
 	    _(" # pid    database name                       prepend path\n"),
 	    HL_ATTR(HLF_T));
-	for (i = 0; i < csinfo_size; i++)
+	ಗಾಗಿ (i = 0; i < csinfo_ಗಾತ್ರ; i++)
 	{
-	    if (csinfo[i].fname == NULL)
-		continue;
+	    ಆದರೆ (csinfo[i].fname == ಖಾಲಿ)
+		ಮುಂದುವರಿ;
 
-	    if (csinfo[i].ppath != NULL)
-		(void)smsg("%2d %-5ld  %-34s  %-32s",
-		    i, (long)csinfo[i].pid, csinfo[i].fname, csinfo[i].ppath);
-	    else
-		(void)smsg("%2d %-5ld  %-34s  <none>",
-			   i, (long)csinfo[i].pid, csinfo[i].fname);
+	    ಆದರೆ (csinfo[i].ppath != ಖಾಲಿ)
+		(ಶೂನ್ಯ)smsg("%2d %-5ld  %-34s  %-32s",
+		    i, (ದೀರ್ಘ)csinfo[i].pid, csinfo[i].fname, csinfo[i].ppath);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		(ಶೂನ್ಯ)smsg("%2d %-5ld  %-34s  <none>",
+			   i, (ದೀರ್ಘ)csinfo[i].pid, csinfo[i].fname);
 	}
     }
 
     wait_return(FALSE);
-    return CSCOPE_SUCCESS;
+    ಹಿಂತಿರುಗಿ CSCOPE_SUCCESS;
 }
 
 
 /*
  * Only called when VIM exits to quit any cscope sessions.
  */
-    void
-cs_end(void)
+    ಶೂನ್ಯ
+cs_ಕೊನೆ(ಶೂನ್ಯ)
 {
-    int i;
+    ಪೂರ್ಣಾಂಕ i;
 
-    for (i = 0; i < csinfo_size; i++)
+    ಗಾಗಿ (i = 0; i < csinfo_ಗಾತ್ರ; i++)
 	cs_release_csp(i, TRUE);
     vim_free(csinfo);
-    csinfo_size = 0;
+    csinfo_ಗಾತ್ರ = 0;
 }
 
-#endif	// FEAT_CSCOPE
+#ಆದರೆ_ಅಂತ್ಯ	// FEAT_CSCOPE
 
-#if defined(FEAT_EVAL)
+#ಆದರೆ defined(FEAT_EVAL)
 
 /*
  * "cscope_connection([{num} , {dbpath} [, {prepend}]])" function
  *
  * Checks the existence of a cscope connection.
  */
-    void
-f_cscope_connection(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
+    ಶೂನ್ಯ
+f_cscope_connection(typval_T *argvars ಬಳಸದ, typval_T *rettv ಬಳಸದ)
 {
 # ifdef FEAT_CSCOPE
-    int		num = 0;
-    char_u	*dbpath = NULL;
-    char_u	*prepend = NULL;
+    ಪೂರ್ಣಾಂಕ		ಅಂಕೆ = 0;
+    char_u	*dbpath = ಖಾಲಿ;
+    char_u	*prepend = ಖಾಲಿ;
     char_u	buf[NUMBUFLEN];
 
-    if (in_vim9script()
-	    && (check_for_opt_number_arg(argvars, 0) == FAIL
+    ಆದರೆ (ಒಳ_vim9script()
+	    && (check_for_opt_ಸಂಖ್ಯೆ_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type != VAR_UNKNOWN
 		    && (check_for_opt_string_arg(argvars, 1) == FAIL
 			|| (argvars[1].v_type != VAR_UNKNOWN
 			    && check_for_opt_string_arg(argvars, 2) == FAIL)))))
-	return;
+	ಹಿಂತಿರುಗಿ;
 
-    if (argvars[0].v_type != VAR_UNKNOWN
+    ಆದರೆ (argvars[0].v_type != VAR_UNKNOWN
 	    && argvars[1].v_type != VAR_UNKNOWN)
     {
-	num = (int)tv_get_number(&argvars[0]);
+	ಅಂಕೆ = (ಪೂರ್ಣಾಂಕ)tv_get_ಸಂಖ್ಯೆ(&argvars[0]);
 	dbpath = tv_get_string(&argvars[1]);
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	ಆದರೆ (argvars[2].v_type != VAR_UNKNOWN)
 	    prepend = tv_get_string_buf(&argvars[2], buf);
     }
 
-    rettv->vval.v_number = cs_connection(num, dbpath, prepend);
+    rettv->vval.v_ಸಂಖ್ಯೆ = cs_connection(ಅಂಕೆ, dbpath, prepend);
 # endif
 }
 
-#endif // FEAT_EVAL
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_EVAL

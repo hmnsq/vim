@@ -21,270 +21,270 @@
  * - gtk_window_new() takes no arguments
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-#ifdef FEAT_GUI_GTK
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_GTK
 
-#include <gdk/gdkkeysyms.h>
-#include <gdk/gdk.h>
-#include <gtk/gtk.h>
-#include "gui_gtk4_f.h"
-#include "gui_gtk4_cb.h"
-#include "gui_gtk4_da.h"
-#ifdef FEAT_TOOLBAR
+#ಅನ್ತರ್ಭಾವ <gdk/gdkkeysyms.h>
+#ಅನ್ತರ್ಭಾವ <gdk/gdk.h>
+#ಅನ್ತರ್ಭಾವ <gtk/gtk.h>
+#ಅನ್ತರ್ಭಾವ "gui_gtk4_f.h"
+#ಅನ್ತರ್ಭಾವ "gui_gtk4_cb.h"
+#ಅನ್ತರ್ಭಾವ "gui_gtk4_da.h"
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TOOLBAR
 # include "gui_gtk4_tb.h"
-#endif
-#ifdef FEAT_MENU
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MENU
 # include "gui_gtk4_menu.h"
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * Geometry string parser, replacing XParseGeometry to remove X11 dependency.
  * Format: [WIDTHxHEIGHT][{+-}XOFF{+-}YOFF]
  */
-#define NoValue		0x0000
-#define WidthValue	0x0004
-#define HeightValue	0x0008
+#ವ್ಯಾಖ್ಯಾನಿಸು No_ಮೌಲ್ಯ		0x0000
+#ವ್ಯಾಖ್ಯಾನಿಸು ಅಗಲ_ಮೌಲ್ಯ	0x0004
+#ವ್ಯಾಖ್ಯಾನಿಸು ಎತ್ತರ_ಮೌಲ್ಯ	0x0008
 
-    static int
-vim_parse_geometry(const char *str, unsigned int *width, unsigned int *height)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+vim_parse_geometry(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *str, ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ *ಅಗಲ, ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ *ಎತ್ತರ)
 {
-    int mask = NoValue;
-    char *end;
-    long val;
+    ಪೂರ್ಣಾಂಕ ಮುಖವಾಡ = No_ಮೌಲ್ಯ;
+    ಅಕ್ಷರ *ಕೊನೆ;
+    ದೀರ್ಘ val;
 
-    if (str == NULL || *str == NUL)
-	return mask;
+    ಆದರೆ (str == ಖಾಲಿ || *str == NUL)
+	ಹಿಂತಿರುಗಿ ಮುಖವಾಡ;
 
     // Parse width
-    if (*str != '+' && *str != '-')
+    ಆದರೆ (*str != '+' && *str != '-')
     {
-	val = strtol(str, &end, 10);
-	if (end != str)
+	val = strtol(str, &ಕೊನೆ, 10);
+	ಆದರೆ (ಕೊನೆ != str)
 	{
-	    *width = (unsigned int)val;
-	    mask |= WidthValue;
-	    str = end;
+	    *ಅಗಲ = (ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ)val;
+	    ಮುಖವಾಡ |= ಅಗಲ_ಮೌಲ್ಯ;
+	    str = ಕೊನೆ;
 	}
     }
 
     // Parse 'x' or 'X' separator and height
-    if (*str == 'x' || *str == 'X')
+    ಆದರೆ (*str == 'x' || *str == 'X')
     {
 	str++;
-	val = strtol(str, &end, 10);
-	if (end != str)
+	val = strtol(str, &ಕೊನೆ, 10);
+	ಆದರೆ (ಕೊನೆ != str)
 	{
-	    *height = (unsigned int)val;
-	    mask |= HeightValue;
-	    str = end;
+	    *ಎತ್ತರ = (ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ)val;
+	    ಮುಖವಾಡ |= ಎತ್ತರ_ಮೌಲ್ಯ;
+	    str = ಕೊನೆ;
 	}
     }
 
-    return mask;
+    ಹಿಂತಿರುಗಿ ಮುಖವಾಡ;
 }
 
-#if defined(FEAT_MOUSESHAPE)
+#ಆದರೆ defined(FEAT_MOUSESHAPE)
 // Last set mouse pointer shape
-static int last_shape = 0;
-#endif
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಕೊನೆಯ_shape = 0;
+#ಆದರೆ_ಅಂತ್ಯ
 
-#define DEFAULT_FONT	"Monospace 10"
+#ವ್ಯಾಖ್ಯಾನಿಸು DEFAULT_FONT	"Monospace 10"
 
 // Cursor blinking state
-static enum {
+ಸ್ಥಿರ ಎಣಿಕೆ {
     BLINK_NONE,
     BLINK_OFF,
     BLINK_ON
 } blink_state = BLINK_NONE;
 
 // GTK4 main loop compatibility
-static int gtk4_main_loop_level = 0;
-static int gtk4_main_loop_quit = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ gtk4_main_loop_level = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ gtk4_main_loop_quit = FALSE;
 
-#ifdef USE_GRESOURCE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_GRESOURCE
 # include "auto/gui_gtk_gresources.h"
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-typedef gboolean timeout_cb_type;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ gboolean timeout_cb_type;
 
 /*
  * Table of special key mappings.
  */
-static struct special_key
+ಸ್ಥಿರ ರಚನೆ special_ಕೀಲಿ
 {
-    guint key_sym;
+    guint ಕೀಲಿ_sym;
     char_u code0;
     char_u code1;
 }
-const special_keys[] =
+ಸ್ಥಿರಾಂಕ special_ಕೀಲಿಗಳು[] =
 {
-    {GDK_KEY_Up,	'k', 'u'},
-    {GDK_KEY_Down,	'k', 'd'},
-    {GDK_KEY_Left,	'k', 'l'},
-    {GDK_KEY_Right,	'k', 'r'},
-    {GDK_KEY_F1,	'k', '1'},
-    {GDK_KEY_F2,	'k', '2'},
-    {GDK_KEY_F3,	'k', '3'},
-    {GDK_KEY_F4,	'k', '4'},
-    {GDK_KEY_F5,	'k', '5'},
-    {GDK_KEY_F6,	'k', '6'},
-    {GDK_KEY_F7,	'k', '7'},
-    {GDK_KEY_F8,	'k', '8'},
-    {GDK_KEY_F9,	'k', '9'},
-    {GDK_KEY_F10,	'k', ';'},
-    {GDK_KEY_F11,	'F', '1'},
-    {GDK_KEY_F12,	'F', '2'},
-    {GDK_KEY_Help,	'%', '1'},
-    {GDK_KEY_Undo,	'&', '8'},
-    {GDK_KEY_BackSpace,	'k', 'b'},
-    {GDK_KEY_Insert,	'k', 'I'},
-    {GDK_KEY_Delete,	'k', 'D'},
-    {GDK_KEY_Home,	'k', 'h'},
-    {GDK_KEY_End,	'@', '7'},
-    {GDK_KEY_Prior,	'k', 'P'},
-    {GDK_KEY_Next,	'k', 'N'},
-    {GDK_KEY_Print,	'%', '9'},
-    {GDK_KEY_KP_Left,	'k', 'l'},
-    {GDK_KEY_KP_Right,	'k', 'r'},
-    {GDK_KEY_KP_Up,	'k', 'u'},
-    {GDK_KEY_KP_Down,	'k', 'd'},
-    {GDK_KEY_KP_Insert,	KS_EXTRA, (char_u)KE_KINS},
-    {GDK_KEY_KP_Delete,	KS_EXTRA, (char_u)KE_KDEL},
-    {GDK_KEY_KP_Home,	'K', '1'},
-    {GDK_KEY_KP_End,	'K', '4'},
-    {GDK_KEY_KP_Prior,	'K', '3'},
-    {GDK_KEY_KP_Next,	'K', '5'},
-    {GDK_KEY_KP_Add,	'K', '6'},
-    {GDK_KEY_KP_Subtract, 'K', '7'},
-    {GDK_KEY_KP_Divide,	'K', '8'},
-    {GDK_KEY_KP_Multiply, 'K', '9'},
-    {GDK_KEY_KP_Enter,	'K', 'A'},
-    {GDK_KEY_KP_Decimal,	'K', 'B'},
-    {GDK_KEY_KP_0,	'K', 'C'},
-    {GDK_KEY_KP_1,	'K', 'D'},
-    {GDK_KEY_KP_2,	'K', 'E'},
-    {GDK_KEY_KP_3,	'K', 'F'},
-    {GDK_KEY_KP_4,	'K', 'G'},
-    {GDK_KEY_KP_5,	'K', 'H'},
-    {GDK_KEY_KP_6,	'K', 'I'},
-    {GDK_KEY_KP_7,	'K', 'J'},
-    {GDK_KEY_KP_8,	'K', 'K'},
-    {GDK_KEY_KP_9,	'K', 'L'},
+    {GDK_ಕೀಲಿ_ಮೇಲೆ,	'k', 'u'},
+    {GDK_ಕೀಲಿ_ಕೆಳಕ್ಕೆ,	'k', 'd'},
+    {GDK_ಕೀಲಿ_ಎಡ,	'k', 'l'},
+    {GDK_ಕೀಲಿ_ಬಲ,	'k', 'r'},
+    {GDK_ಕೀಲಿ_F1,	'k', '1'},
+    {GDK_ಕೀಲಿ_F2,	'k', '2'},
+    {GDK_ಕೀಲಿ_F3,	'k', '3'},
+    {GDK_ಕೀಲಿ_F4,	'k', '4'},
+    {GDK_ಕೀಲಿ_F5,	'k', '5'},
+    {GDK_ಕೀಲಿ_F6,	'k', '6'},
+    {GDK_ಕೀಲಿ_F7,	'k', '7'},
+    {GDK_ಕೀಲಿ_F8,	'k', '8'},
+    {GDK_ಕೀಲಿ_F9,	'k', '9'},
+    {GDK_ಕೀಲಿ_F10,	'k', ';'},
+    {GDK_ಕೀಲಿ_F11,	'F', '1'},
+    {GDK_ಕೀಲಿ_F12,	'F', '2'},
+    {GDK_ಕೀಲಿ_Help,	'%', '1'},
+    {GDK_ಕೀಲಿ_Undo,	'&', '8'},
+    {GDK_ಕೀಲಿ_ಹಿಂಭಾಗ_Space,	'k', 'b'},
+    {GDK_ಕೀಲಿ_ಸೇರಿಸು,	'k', 'I'},
+    {GDK_ಕೀಲಿ_Delete,	'k', 'D'},
+    {GDK_ಕೀಲಿ_Home,	'k', 'h'},
+    {GDK_ಕೀಲಿ_ಕೊನೆ,	'@', '7'},
+    {GDK_ಕೀಲಿ_ಪೂರ್ವ,	'k', 'P'},
+    {GDK_ಕೀಲಿ_ಮುಂದಿನ,	'k', 'N'},
+    {GDK_ಕೀಲಿ_Print,	'%', '9'},
+    {GDK_ಕೀಲಿ_KP_ಎಡ,	'k', 'l'},
+    {GDK_ಕೀಲಿ_KP_ಬಲ,	'k', 'r'},
+    {GDK_ಕೀಲಿ_KP_ಮೇಲೆ,	'k', 'u'},
+    {GDK_ಕೀಲಿ_KP_ಕೆಳಕ್ಕೆ,	'k', 'd'},
+    {GDK_ಕೀಲಿ_KP_ಸೇರಿಸು,	KS_EXTRA, (char_u)KE_KINS},
+    {GDK_ಕೀಲಿ_KP_Delete,	KS_EXTRA, (char_u)KE_KDEL},
+    {GDK_ಕೀಲಿ_KP_Home,	'K', '1'},
+    {GDK_ಕೀಲಿ_KP_ಕೊನೆ,	'K', '4'},
+    {GDK_ಕೀಲಿ_KP_ಪೂರ್ವ,	'K', '3'},
+    {GDK_ಕೀಲಿ_KP_ಮುಂದಿನ,	'K', '5'},
+    {GDK_ಕೀಲಿ_KP_ಕೂಡಿಸು,	'K', '6'},
+    {GDK_ಕೀಲಿ_KP_ಕಳೆ, 'K', '7'},
+    {GDK_ಕೀಲಿ_KP_Divide,	'K', '8'},
+    {GDK_ಕೀಲಿ_KP_Multiply, 'K', '9'},
+    {GDK_ಕೀಲಿ_KP_Enter,	'K', 'A'},
+    {GDK_ಕೀಲಿ_KP_Decimal,	'K', 'B'},
+    {GDK_ಕೀಲಿ_KP_0,	'K', 'C'},
+    {GDK_ಕೀಲಿ_KP_1,	'K', 'D'},
+    {GDK_ಕೀಲಿ_KP_2,	'K', 'E'},
+    {GDK_ಕೀಲಿ_KP_3,	'K', 'F'},
+    {GDK_ಕೀಲಿ_KP_4,	'K', 'G'},
+    {GDK_ಕೀಲಿ_KP_5,	'K', 'H'},
+    {GDK_ಕೀಲಿ_KP_6,	'K', 'I'},
+    {GDK_ಕೀಲಿ_KP_7,	'K', 'J'},
+    {GDK_ಕೀಲಿ_KP_8,	'K', 'K'},
+    {GDK_ಕೀಲಿ_KP_9,	'K', 'L'},
     {0, 0, 0}
 };
 
-    static int
-keyval_to_string(unsigned int keyval, char_u *string)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+keyval_ಗಮ್ಯ_string(ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ keyval, char_u *string)
 {
-    int		len;
+    ಪೂರ್ಣಾಂಕ		len;
     guint32	uc;
 
-    uc = gdk_keyval_to_unicode(keyval);
-    if (uc != 0)
+    uc = gdk_keyval_ಗಮ್ಯ_unicode(keyval);
+    ಆದರೆ (uc != 0)
     {
-	len = utf_char2bytes((int)uc, string);
+	len = utf_char2bytes((ಪೂರ್ಣಾಂಕ)uc, string);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	len = 1;
-	switch (keyval)
+	ಆಯ್ಕೆ (keyval)
 	{
-	    case GDK_KEY_Tab: case GDK_KEY_KP_Tab: case GDK_KEY_ISO_Left_Tab:
+	    ಸ್ಥಿತಿ GDK_ಕೀಲಿ_Tab: ಸ್ಥಿತಿ GDK_ಕೀಲಿ_KP_Tab: ಸ್ಥಿತಿ GDK_ಕೀಲಿ_ISO_ಎಡ_Tab:
 		string[0] = TAB;
-		break;
-	    case GDK_KEY_Linefeed:
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ GDK_ಕೀಲಿ_Linefeed:
 		string[0] = NL;
-		break;
-	    case GDK_KEY_Return: case GDK_KEY_ISO_Enter: case GDK_KEY_3270_Enter:
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ GDK_ಕೀಲಿ_Return: ಸ್ಥಿತಿ GDK_ಕೀಲಿ_ISO_Enter: ಸ್ಥಿತಿ GDK_ಕೀಲಿ_3270_Enter:
 		string[0] = CAR;
-		break;
-	    case GDK_KEY_Escape:
+		ನಿಲ್ಲಿಸು;
+	    ಸ್ಥಿತಿ GDK_ಕೀಲಿ_Escape:
 		string[0] = ESC;
-		break;
-	    default:
+		ನಿಲ್ಲಿಸು;
+	    ಪೂರ್ವನಿಯೋಜಿತ:
 		len = 0;
-		break;
+		ನಿಲ್ಲಿಸು;
 	}
     }
     string[len] = NUL;
-    return len;
+    ಹಿಂತಿರುಗಿ len;
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 modifiers_gdk2vim(guint state)
 {
-    int modifiers = 0;
+    ಪೂರ್ಣಾಂಕ modifiers = 0;
 
-    if (state & GDK_SHIFT_MASK)
-	modifiers |= MOD_MASK_SHIFT;
-    if (state & GDK_CONTROL_MASK)
-	modifiers |= MOD_MASK_CTRL;
-    if (state & GDK_ALT_MASK)
-	modifiers |= MOD_MASK_ALT;
-    if (state & GDK_META_MASK)
-	modifiers |= MOD_MASK_META;
-    if (state & GDK_SUPER_MASK)
-	modifiers |= MOD_MASK_CMD;
+    ಆದರೆ (state & GDK_ಸರಿಸು_ಮುಖವಾಡ)
+	modifiers |= MOD_ಮುಖವಾಡ_ಸರಿಸು;
+    ಆದರೆ (state & GDK_CONTROL_ಮುಖವಾಡ)
+	modifiers |= MOD_ಮುಖವಾಡ_CTRL;
+    ಆದರೆ (state & GDK_ALT_ಮುಖವಾಡ)
+	modifiers |= MOD_ಮುಖವಾಡ_ALT;
+    ಆದರೆ (state & GDK_META_ಮುಖವಾಡ)
+	modifiers |= MOD_ಮುಖವಾಡ_META;
+    ಆದರೆ (state & GDK_SUPER_ಮುಖವಾಡ)
+	modifiers |= MOD_ಮುಖವಾಡ_CMD;
 
-    return modifiers;
+    ಹಿಂತಿರುಗಿ modifiers;
 }
 
-static GtkWidget *vbox;		// the main vertical box
+ಸ್ಥಿರ GtkWidget *vbox;		// the main vertical box
 
 // Forward declarations for event callbacks
-static gboolean key_press_event(GtkEventControllerKey *controller, guint keyval, guint keycode, GdkModifierType state, gpointer data);
-static void key_release_event(GtkEventControllerKey *controller, guint keyval, guint keycode, GdkModifierType state, gpointer data);
-static void button_press_event(GtkGestureClick *gesture, int n_press, double x, double y, gpointer data);
-static void button_release_event(GtkGestureClick *gesture, int n_press, double x, double y, gpointer data);
-static void motion_notify_event(GtkEventControllerMotion *controller, double x, double y, gpointer data);
-static void enter_notify_event(GtkEventControllerMotion *controller, double x, double y, gpointer data);
-static gboolean scroll_event(GtkEventControllerScroll *controller, double dx, double dy, gpointer data);
-static void focus_in_event(GtkEventControllerFocus *controller, gpointer data);
-static void focus_out_event(GtkEventControllerFocus *controller, gpointer data);
-#ifdef FEAT_DND
-static gboolean drop_cb(GtkDropTargetAsync *target, GdkDrop *drop, double x, double y, void *data);
-#endif
-#ifdef FEAT_GUI_TABLINE
-static void tabline_enter_cb(GtkEventController *controller, double x, double y, void *udata);
-static void on_select_tab(GtkNotebook *notebook, gpointer *page, gint idx, gpointer data);
-static void on_tab_reordered(GtkNotebook *notebook, gpointer *page, gint idx, gpointer data);
-static VimMenu *create_tabline_popup_menu(void);
-static void tabline_add_css(void);
-static void tabline_menu_press_event(GtkGestureClick *gesture, int n_press, double x, double y, GtkWidget *popover);
-#endif
-static void mainwin_destroy_cb(GObject *object, gpointer data);
-static gboolean delete_event_cb(GtkWindow *window, gpointer data);
-static int query_pointer_pos(int *x, int *y, GdkModifierType *state);
-static void mainwin_fullscreened_cb(GObject *obj, GParamSpec *pspec, gpointer user_data);
-static void set_form_size(int width, int height);
-static void drawarea_realize_cb(GtkWidget *widget, gpointer data);
-static void drawarea_unrealize_cb(GtkWidget *widget, gpointer data);
-static void clipboard_changed_cb(GdkClipboard *clipboard, gpointer user_data);
-#ifdef FEAT_MENU
-static void show_menubar_popover(void);
-#endif
+ಸ್ಥಿರ gboolean ಕೀಲಿ_press_event(Gtk_Event_Controller_ಕೀಲಿ *controller, guint keyval, guint keycode, GdkModifierType state, gpointer ದತ್ತಾಂಶ);
+ಸ್ಥಿರ ಶೂನ್ಯ ಕೀಲಿ_release_event(Gtk_Event_Controller_ಕೀಲಿ *controller, guint keyval, guint keycode, GdkModifierType state, gpointer ದತ್ತಾಂಶ);
+ಸ್ಥಿರ ಶೂನ್ಯ button_press_event(GtkGestureClick *gesture, ಪೂರ್ಣಾಂಕ n_press, ದ್ವಿಗುಣ x, ದ್ವಿಗುಣ y, gpointer ದತ್ತಾಂಶ);
+ಸ್ಥಿರ ಶೂನ್ಯ button_release_event(GtkGestureClick *gesture, ಪೂರ್ಣಾಂಕ n_press, ದ್ವಿಗುಣ x, ದ್ವಿಗುಣ y, gpointer ದತ್ತಾಂಶ);
+ಸ್ಥಿರ ಶೂನ್ಯ motion_notify_event(GtkEventControllerMotion *controller, ದ್ವಿಗುಣ x, ದ್ವಿಗುಣ y, gpointer ದತ್ತಾಂಶ);
+ಸ್ಥಿರ ಶೂನ್ಯ enter_notify_event(GtkEventControllerMotion *controller, ದ್ವಿಗುಣ x, ದ್ವಿಗುಣ y, gpointer ದತ್ತಾಂಶ);
+ಸ್ಥಿರ gboolean scroll_event(GtkEventControllerScroll *controller, ದ್ವಿಗುಣ dx, ದ್ವಿಗುಣ dy, gpointer ದತ್ತಾಂಶ);
+ಸ್ಥಿರ ಶೂನ್ಯ focus_ಒಳ_event(GtkEventControllerFocus *controller, gpointer ದತ್ತಾಂಶ);
+ಸ್ಥಿರ ಶೂನ್ಯ focus_ಹೊರಹೋಗು_event(GtkEventControllerFocus *controller, gpointer ದತ್ತಾಂಶ);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DND
+ಸ್ಥಿರ gboolean drop_cb(Gtk_Drop_ಗುರಿ_Async *ಗುರಿ, GdkDrop *drop, ದ್ವಿಗುಣ x, ದ್ವಿಗುಣ y, ಶೂನ್ಯ *ದತ್ತಾಂಶ);
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_TABLINE
+ಸ್ಥಿರ ಶೂನ್ಯ tabline_enter_cb(GtkEventController *controller, ದ್ವಿಗುಣ x, ದ್ವಿಗುಣ y, ಶೂನ್ಯ *udata);
+ಸ್ಥಿರ ಶೂನ್ಯ on_select_tab(GtkNotebook *notebook, gpointer *ಪುಟ, gint idx, gpointer ದತ್ತಾಂಶ);
+ಸ್ಥಿರ ಶೂನ್ಯ on_tab_reordered(GtkNotebook *notebook, gpointer *ಪುಟ, gint idx, gpointer ದತ್ತಾಂಶ);
+ಸ್ಥಿರ VimMenu *create_tabline_popup_menu(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಶೂನ್ಯ tabline_ಕೂಡಿಸು_css(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಶೂನ್ಯ tabline_menu_press_event(GtkGestureClick *gesture, ಪೂರ್ಣಾಂಕ n_press, ದ್ವಿಗುಣ x, ದ್ವಿಗುಣ y, GtkWidget *popover);
+#ಆದರೆ_ಅಂತ್ಯ
+ಸ್ಥಿರ ಶೂನ್ಯ mainwin_destroy_cb(GObject *object, gpointer ದತ್ತಾಂಶ);
+ಸ್ಥಿರ gboolean delete_event_cb(Gtk_ಕಿಟಕಿ *ಕಿಟಕಿ_2, gpointer ದತ್ತಾಂಶ);
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ query_ಸೂಚಕ_pos(ಪೂರ್ಣಾಂಕ *x, ಪೂರ್ಣಾಂಕ *y, GdkModifierType *state);
+ಸ್ಥಿರ ಶೂನ್ಯ mainwin_fullscreened_cb(GObject *obj, GParamSpec *pspec, gpointer user_ದತ್ತಾಂಶ);
+ಸ್ಥಿರ ಶೂನ್ಯ ಗಣ_form_ಗಾತ್ರ(ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ);
+ಸ್ಥಿರ ಶೂನ್ಯ drawarea_realize_cb(GtkWidget *widget, gpointer ದತ್ತಾಂಶ);
+ಸ್ಥಿರ ಶೂನ್ಯ drawarea_unrealize_cb(GtkWidget *widget, gpointer ದತ್ತಾಂಶ);
+ಸ್ಥಿರ ಶೂನ್ಯ clipboard_ಬದಲಾಯಿತು_cb(GdkClipboard *clipboard, gpointer user_ದತ್ತಾಂಶ);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MENU
+ಸ್ಥಿರ ಶೂನ್ಯ show_menubar_popover(ಶೂನ್ಯ);
+#ಆದರೆ_ಅಂತ್ಯ
 
-static const char *prgname = NULL;
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *prgname = ಖಾಲಿ;
 
 /*
  * Check if "s" is the option "name" (which includes the leading dash(es)).
  * "value" is set to the value if the option uses 'opt=val' format.
  */
-    static gboolean
-arg_match(const char *s, const char *name, char **value)
+    ಸ್ಥಿರ gboolean
+arg_ಹೊಂದಿಕೆ(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *s, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *name, ಅಕ್ಷರ **ಮೌಲ್ಯ)
 {
-    size_t  len = strlen(name);
+    size_t  len = ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(name);
 
-    if (strncmp(s, name, len) != 0)
-	return FALSE;
-    if (s[len] == '=')
-	*value = (char *)s + len + 1;
-    else if (s[len] != NUL)
+    ಆದರೆ (ಅಕ್ಷರಸರಣಿ_ಹೋಲಿಕೆ(s, name, len) != 0)
+	ಹಿಂತಿರುಗಿ FALSE;
+    ಆದರೆ (s[len] == '=')
+	*ಮೌಲ್ಯ = (ಅಕ್ಷರ *)s + len + 1;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (s[len] != NUL)
 	// Something follows the option name that isn't "=": this is a
 	// different, longer option (e.g. "-fnord" while matching "-fn").
-	return FALSE;
-    return TRUE;
+	ಹಿಂತಿರುಗಿ FALSE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
@@ -292,76 +292,76 @@ arg_match(const char *s, const char *name, char **value)
  * deleted from argv, and *argc is decremented accordingly.  This is called
  * when vim is started, whether or not the GUI has been started.
  */
-    void
-gui_mch_prepare(int *argc, char **argv)
+    ಶೂನ್ಯ
+gui_mch_prepare(ಪೂರ್ಣಾಂಕ *argc, ಅಕ್ಷರ **argv)
 {
     // Don't call gtk_init() here.  It will be called in
     // gui_mch_init_check() after the fork.  Calling it before fork
     // breaks the display connection in the child process, causing gvim
     // to fail to start without --nofork.
 
-    int	i = 0;
+    ಪೂರ್ಣಾಂಕ	i = 0;
 
-    while (i < *argc)
+    ಆಗ (i < *argc)
     {
-	char	*s = argv[i];
-	char	*value = NULL;
-	int	has_inline_value = FALSE;
-	int	n_strip;
+	ಅಕ್ಷರ	*s = argv[i];
+	ಅಕ್ಷರ	*ಮೌಲ್ಯ = ಖಾಲಿ;
+	ಪೂರ್ಣಾಂಕ	has_inline_ಮೌಲ್ಯ = FALSE;
+	ಪೂರ್ಣಾಂಕ	n_strip;
 
-	if (s[0] != '-' && s[0] != '+')
+	ಆದರೆ (s[0] != '-' && s[0] != '+')
 	{
 	    ++i;
-	    continue;
+	    ಮುಂದುವರಿ;
 	}
 
-	if (strchr(s, '=') != NULL)
-	    has_inline_value = TRUE;
+	ಆದರೆ (strchr(s, '=') != ಖಾಲಿ)
+	    has_inline_ಮೌಲ್ಯ = TRUE;
 
 	// If the value was not given inline (no "="), it would come from the
 	// next argv element.  Do not treat that next element as this option's
 	// value if it is "--" (end-of-options marker) or is another option.
-	if (!has_inline_value)
+	ಆದರೆ (!has_inline_ಮೌಲ್ಯ)
 	{
-	    if (i + 1 < *argc
+	    ಆದರೆ (i + 1 < *argc
 		    && strcmp(argv[i + 1], "--") != 0
 		    && !((argv[i + 1][0] == '-' || argv[i + 1][0] == '+')
 			&& !vim_isdigit(argv[i + 1][1])))
-		value = argv[i + 1];
-	    else
-		value = NULL;
+		ಮೌಲ್ಯ = argv[i + 1];
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ಮೌಲ್ಯ = ಖಾಲಿ;
 	}
 
-	if (arg_match(s, "-fn", &value) || arg_match(s, "-font", &value))
-	    font_argument = value;
-	else if (arg_match(s, "-geom", &value)
-		|| arg_match(s, "-geometry", &value))
+	ಆದರೆ (arg_ಹೊಂದಿಕೆ(s, "-fn", &ಮೌಲ್ಯ) || arg_ಹೊಂದಿಕೆ(s, "-font", &ಮೌಲ್ಯ))
+	    font_ವಾದ = ಮೌಲ್ಯ;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (arg_ಹೊಂದಿಕೆ(s, "-geom", &ಮೌಲ್ಯ)
+		|| arg_ಹೊಂದಿಕೆ(s, "-geometry", &ಮೌಲ್ಯ))
 	{
-	    if (value != NULL)
-		gui.geom = vim_strsave((char_u *)value);
+	    ಆದರೆ (ಮೌಲ್ಯ != ಖಾಲಿ)
+		gui.geom = vim_strsave((char_u *)ಮೌಲ್ಯ);
 	}
-	else if (arg_match(s, "-bg", &value)
-		|| arg_match(s, "-background", &value))
-	    background_argument = value;
-	else if (arg_match(s, "-fg", &value)
-		|| arg_match(s, "-foreground", &value))
-	    foreground_argument = value;
-#ifdef FEAT_NETBEANS_INTG
-	else if (strncmp(s, "-nb", 3) == 0)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (arg_ಹೊಂದಿಕೆ(s, "-bg", &ಮೌಲ್ಯ)
+		|| arg_ಹೊಂದಿಕೆ(s, "-background", &ಮೌಲ್ಯ))
+	    background_ವಾದ = ಮೌಲ್ಯ;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (arg_ಹೊಂದಿಕೆ(s, "-fg", &ಮೌಲ್ಯ)
+		|| arg_ಹೊಂದಿಕೆ(s, "-foreground", &ಮೌಲ್ಯ))
+	    foreground_ವಾದ = ಮೌಲ್ಯ;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_NETBEANS_INTG
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಅಕ್ಷರಸರಣಿ_ಹೋಲಿಕೆ(s, "-nb", 3) == 0)
 	{
 	    gui.dofork = false; // don't fork() when starting GUI
 	    netbeansArg = argv[i];
-	    has_inline_value = TRUE; // -nb uses non standard syntax, just
+	    has_inline_ಮೌಲ್ಯ = TRUE; // -nb uses non standard syntax, just
 				     // remove the flag.
 	}
-#endif
-	else if (arg_match(s, "--prg-name", &value))
+#ಆದರೆ_ಅಂತ್ಯ
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (arg_ಹೊಂದಿಕೆ(s, "--prg-name", &ಮೌಲ್ಯ))
 	    // GTK4 specific
-	    prgname = value;
-	else
+	    prgname = ಮೌಲ್ಯ;
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    i++;
-	    continue;
+	    ಮುಂದುವರಿ;
 	}
 
 	// Remove the flag from the argument vector.
@@ -369,16 +369,16 @@ gui_mch_prepare(int *argc, char **argv)
 	// Move the argument's value as well, but only if it was consumed
 	// from a separate argv element (the "-opt=value" form lives inside
 	// the flag's own element and is stripped along with it already).
-	if (value != NULL && !has_inline_value)
+	ಆದರೆ (ಮೌಲ್ಯ != ಖಾಲಿ && !has_inline_ಮೌಲ್ಯ)
 	    n_strip = 2;
 
-	if (*argc - n_strip >= i)
+	ಆದರೆ (*argc - n_strip >= i)
 	{
 	    *argc -= n_strip;
-	    if (*argc > i)
+	    ಆದರೆ (*argc > i)
 		mch_memmove(&argv[i], &argv[i + n_strip],
-			(*argc - i) * sizeof(char *));
-	    argv[*argc] = NULL;
+			(*argc - i) * ಗಾತ್ರ(ಅಕ್ಷರ *));
+	    argv[*argc] = ಖಾಲಿ;
 	}
     }
 }
@@ -386,128 +386,128 @@ gui_mch_prepare(int *argc, char **argv)
 /*
  * Free all GUI related resources.
  */
-    void
-gui_mch_free_all(void)
+    ಶೂನ್ಯ
+gui_mch_free_all(ಶೂನ್ಯ)
 {
 }
 
-    static guint
-timeout_add(int time, timeout_cb_type (*callback)(gpointer), int *flagp)
+    ಸ್ಥಿರ guint
+timeout_ಕೂಡಿಸು(ಪೂರ್ಣಾಂಕ ಸಮಯ, timeout_cb_type (*callback)(gpointer), ಪೂರ್ಣಾಂಕ *flagp)
 {
-    return g_timeout_add((guint)time, (GSourceFunc)callback, flagp);
+    ಹಿಂತಿರುಗಿ g_timeout_ಕೂಡಿಸು((guint)ಸಮಯ, (GSourceFunc)callback, flagp);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 timeout_remove(guint timer)
 {
-    g_source_remove(timer);
+    g_ಮೂಲ_remove(timer);
 }
 
-static long_u blink_waittime = 700;
-static long_u blink_ontime = 400;
-static long_u blink_offtime = 250;
-static guint blink_timer = 0;
+ಸ್ಥಿರ long_u blink_waittime = 700;
+ಸ್ಥಿರ long_u blink_ontime = 400;
+ಸ್ಥಿರ long_u blink_offtime = 250;
+ಸ್ಥಿರ guint blink_timer = 0;
 
-    static timeout_cb_type
-blink_cb(gpointer data UNUSED)
+    ಸ್ಥಿರ timeout_cb_type
+blink_cb(gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    if (blink_state == BLINK_ON)
+    ಆದರೆ (blink_state == BLINK_ON)
     {
 	gui_undraw_cursor();
 	blink_state = BLINK_OFF;
-	blink_timer = timeout_add(blink_offtime, blink_cb, NULL);
+	blink_timer = timeout_ಕೂಡಿಸು(blink_offtime, blink_cb, ಖಾಲಿ);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	gui_update_cursor(TRUE, FALSE);
 	blink_state = BLINK_ON;
-	blink_timer = timeout_add(blink_ontime, blink_cb, NULL);
+	blink_timer = timeout_ಕೂಡಿಸು(blink_ontime, blink_cb, ಖಾಲಿ);
     }
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
-    int
-gui_mch_is_blinking(void)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_is_blinking(ಶೂನ್ಯ)
 {
-    return blink_state != BLINK_NONE;
+    ಹಿಂತಿರುಗಿ blink_state != BLINK_NONE;
 }
 
-    int
-gui_mch_is_blink_off(void)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_is_blink_off(ಶೂನ್ಯ)
 {
-    return blink_state == BLINK_OFF;
+    ಹಿಂತಿರುಗಿ blink_state == BLINK_OFF;
 }
 
-    void
-gui_mch_set_blinking(long waittime, long on, long off)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_blinking(ದೀರ್ಘ waittime, ದೀರ್ಘ on, ದೀರ್ಘ off)
 {
     blink_waittime = waittime;
     blink_ontime = on;
     blink_offtime = off;
 }
 
-    void
-gui_mch_stop_blink(int may_call_gui_update_cursor)
+    ಶೂನ್ಯ
+gui_mch_stop_blink(ಪೂರ್ಣಾಂಕ may_call_gui_update_cursor)
 {
-    if (blink_timer)
+    ಆದರೆ (blink_timer)
     {
 	timeout_remove(blink_timer);
 	blink_timer = 0;
     }
-    if (blink_state == BLINK_OFF && may_call_gui_update_cursor)
+    ಆದರೆ (blink_state == BLINK_OFF && may_call_gui_update_cursor)
 	gui_update_cursor(TRUE, FALSE);
     blink_state = BLINK_NONE;
 }
 
-    void
-gui_mch_start_blink(void)
+    ಶೂನ್ಯ
+gui_mch_ಆರಂಭ_blink(ಶೂನ್ಯ)
 {
-    if (blink_timer)
+    ಆದರೆ (blink_timer)
     {
 	timeout_remove(blink_timer);
 	blink_timer = 0;
     }
-    if (blink_waittime && blink_ontime && blink_offtime && gui.in_focus)
+    ಆದರೆ (blink_waittime && blink_ontime && blink_offtime && gui.ಒಳ_focus)
     {
-	blink_timer = timeout_add(blink_waittime, blink_cb, NULL);
+	blink_timer = timeout_ಕೂಡಿಸು(blink_waittime, blink_cb, ಖಾಲಿ);
 	blink_state = BLINK_ON;
 	gui_update_cursor(TRUE, FALSE);
     }
 }
 
-    int
-gui_mch_early_init_check(int give_message UNUSED)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_early_init_check(ಪೂರ್ಣಾಂಕ give_ಸಂದೇಶ ಬಳಸದ)
 {
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-    int
-gui_mch_init_check(void)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_init_check(ಶೂನ್ಯ)
 {
     // This defaults to argv[0], but we want it to match the name of the
     // shipped gvim.desktop so that Vim's windows can be associated with this
     // file.  Also sets WM_CLASS on X11. If "--prg-name" is specified, then use
     // that.
-    g_set_prgname(prgname == NULL ? "gvim" : prgname);
+    g_ಗಣ_prgname(prgname == ಖಾಲಿ ? "gvim" : prgname);
 
     // Suppress noisy EGL warnings when GL is not available.  Only set
     // this when actually starting the GUI, so non-GUI invocations are
     // not affected.
-    if (g_getenv("EGL_LOG_LEVEL") == NULL)
+    ಆದರೆ (g_getenv("EGL_LOG_LEVEL") == ಖಾಲಿ)
 	setenv("EGL_LOG_LEVEL", "fatal", 0);
 
     // Call gtk_init() here after fork().  Calling it before fork() breaks
     // the display connection in the child process.
     gtk_init();
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
 /*
  * Initialise the GUI.  Create all the windows, set up all the callbacks etc.
  * Returns OK for success, FAIL when the GUI can't be started.
  */
-    int
-gui_mch_init(void)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_init(ಶೂನ್ಯ)
 {
     // Allocate GdkRGBA color structs.
     gui.fgcolor = g_new0(GdkRGBA, 1);
@@ -515,72 +515,72 @@ gui_mch_init(void)
     gui.spcolor = g_new0(GdkRGBA, 1);
 
     gui.def_norm_pixel = 0x00000000;	// black
-    gui.def_back_pixel = 0x00ffffff;	// white
+    gui.def_ಹಿಂಭಾಗ_pixel = 0x00ffffff;	// white
     gui.norm_pixel = gui.def_norm_pixel;
-    gui.back_pixel = gui.def_back_pixel;
+    gui.ಹಿಂಭಾಗ_pixel = gui.def_ಹಿಂಭಾಗ_pixel;
 
-    gui.scrollbar_width = SB_DEFAULT_WIDTH;
-    gui.scrollbar_height = SB_DEFAULT_WIDTH;
+    gui.scrollbar_ಅಗಲ = SB_DEFAULT_ಅಗಲ;
+    gui.scrollbar_ಎತ್ತರ = SB_DEFAULT_ಅಗಲ;
 
     // Create the main window.
-    gui.mainwin = gtk_window_new();
-    gtk_widget_set_name(gui.mainwin, "vim-main-window");
+    gui.mainwin = gtk_ಕಿಟಕಿ_new();
+    gtk_widget_ಗಣ_name(gui.mainwin, "vim-main-window");
 
     // Create the PangoContext used for drawing all text.
-    gui.text_context = gtk_widget_create_pango_context(gui.mainwin);
-    pango_context_set_base_dir(gui.text_context, PANGO_DIRECTION_LTR);
+    gui.ಪಠ್ಯ_context = gtk_widget_create_pango_context(gui.mainwin);
+    pango_context_ಗಣ_ತಳ_dir(gui.ಪಠ್ಯ_context, PANGO_DIRECTION_LTR);
 
     g_signal_connect(G_OBJECT(gui.mainwin), "close-request",
-		     G_CALLBACK(delete_event_cb), NULL);
+		     G_CALLBACK(delete_event_cb), ಖಾಲಿ);
     g_signal_connect(G_OBJECT(gui.mainwin), "notify::fullscreened",
-		     G_CALLBACK(mainwin_fullscreened_cb), NULL);
+		     G_CALLBACK(mainwin_fullscreened_cb), ಖಾಲಿ);
 
     // A vertical box holds the menubar, toolbar and main text window.
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_box_set_homogeneous(GTK_BOX(vbox), FALSE);
-    gtk_window_set_child(GTK_WINDOW(gui.mainwin), vbox);
+    gtk_box_ಗಣ_homogeneous(GTK_BOX(vbox), FALSE);
+    gtk_ಕಿಟಕಿ_ಗಣ_ಮಗು(GTK_ಕಿಟಕಿ(gui.mainwin), vbox);
 
-#ifdef FEAT_MENU
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MENU
     gui.menubar = vim_menu_bar_new();
-    gtk_widget_set_name(gui.menubar, "vim-menubar");
-    gtk_widget_set_visible(gui.menubar, FALSE);
+    gtk_widget_ಗಣ_name(gui.menubar, "vim-menubar");
+    gtk_widget_ಗಣ_visible(gui.menubar, FALSE);
     gtk_box_append(GTK_BOX(vbox), gui.menubar);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_TOOLBAR
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TOOLBAR
     gui.toolbar = vim_toolbar_new();
-    gtk_widget_set_name(gui.toolbar, "vim-toolbar");
-    gtk_widget_set_visible(gui.toolbar, FALSE);
+    gtk_widget_ಗಣ_name(gui.toolbar, "vim-toolbar");
+    gtk_widget_ಗಣ_visible(gui.toolbar, FALSE);
     gtk_box_append(GTK_BOX(vbox), gui.toolbar);
-    vim_toolbar_set_style(VIM_TOOLBAR(gui.toolbar), toolbar_flags, tbis_flags);
-#endif
+    vim_toolbar_ಗಣ_style(VIM_TOOLBAR(gui.toolbar), toolbar_flags, tbis_flags);
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_GUI_TABLINE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_TABLINE
     gui.tabline = gtk_notebook_new();
-    gtk_notebook_set_show_border(GTK_NOTEBOOK(gui.tabline), FALSE);
-    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(gui.tabline), TRUE);
-    gtk_notebook_set_scrollable(GTK_NOTEBOOK(gui.tabline), TRUE);
-    gtk_widget_add_css_class(gui.tabline, "vim-tabline");
-    tabline_add_css();
-    gtk_widget_set_visible(gui.tabline, FALSE);
+    gtk_notebook_ಗಣ_show_border(GTK_NOTEBOOK(gui.tabline), FALSE);
+    gtk_notebook_ಗಣ_show_tabs(GTK_NOTEBOOK(gui.tabline), TRUE);
+    gtk_notebook_ಗಣ_scrollable(GTK_NOTEBOOK(gui.tabline), TRUE);
+    gtk_widget_ಕೂಡಿಸು_css_class(gui.tabline, "vim-tabline");
+    tabline_ಕೂಡಿಸು_css();
+    gtk_widget_ಗಣ_visible(gui.tabline, FALSE);
     gtk_box_append(GTK_BOX(vbox), gui.tabline);
 
     g_signal_connect(G_OBJECT(gui.tabline), "switch-page",
-		     G_CALLBACK(on_select_tab), NULL);
+		     G_CALLBACK(on_select_tab), ಖಾಲಿ);
     g_signal_connect(G_OBJECT(gui.tabline), "page-reordered",
-		     G_CALLBACK(on_tab_reordered), NULL);
+		     G_CALLBACK(on_tab_reordered), ಖಾಲಿ);
 
     {
 	GtkEventController *mcontroller = gtk_event_controller_motion_new();
 
 	g_signal_connect(mcontroller, "enter",
-		G_CALLBACK(tabline_enter_cb), NULL);
+		G_CALLBACK(tabline_enter_cb), ಖಾಲಿ);
 
 	// Make sure that tabline_enter_cb() is always called before
 	// tabpage_enter_cb().
-	gtk_event_controller_set_propagation_phase(
+	gtk_event_controller_ಗಣ_ಪ್ರಸರಣ_phase(
 		mcontroller, GTK_PHASE_CAPTURE);
-	gtk_widget_add_controller(gui.tabline, mcontroller);
+	gtk_widget_ಕೂಡಿಸು_controller(gui.tabline, mcontroller);
     }
 
     // Create right click popup menu for tabline
@@ -591,74 +591,74 @@ gui_mch_init(void)
 	click = gtk_gesture_click_new();
 	menu = create_tabline_popup_menu();
 
-	gtk_widget_set_parent(GTK_WIDGET(menu), gui.tabline);
-	g_object_set_data(G_OBJECT(gui.tabline), "menu", menu);
+	gtk_widget_ಗಣ_ಪೋಷಕ(GTK_WIDGET(menu), gui.tabline);
+	g_object_ಗಣ_ದತ್ತಾಂಶ(G_OBJECT(gui.tabline), "menu", menu);
 
-	gtk_popover_set_has_arrow(GTK_POPOVER(menu), FALSE);
-	gtk_popover_set_position(GTK_POPOVER(menu), GTK_POS_BOTTOM);
+	gtk_popover_ಗಣ_has_arrow(GTK_POPOVER(menu), FALSE);
+	gtk_popover_ಗಣ_position(GTK_POPOVER(menu), GTK_POS_BOTTOM);
 	// Make popover start at top left corner
-	gtk_widget_set_halign(GTK_WIDGET(menu), GTK_ALIGN_START);
+	gtk_widget_ಗಣ_halign(GTK_WIDGET(menu), GTK_ALIGN_ಆರಂಭ);
 
 	// Listen for anny mouse button
-	gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(click), 0);
+	gtk_gesture_single_ಗಣ_button(GTK_GESTURE_SINGLE(click), 0);
 
 	g_signal_connect_object(click, "pressed",
 		G_CALLBACK(tabline_menu_press_event),
 		menu, G_CONNECT_DEFAULT);
-	gtk_widget_add_controller(gui.tabline, GTK_EVENT_CONTROLLER(click));
+	gtk_widget_ಕೂಡಿಸು_controller(gui.tabline, GTK_EVENT_CONTROLLER(click));
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
     // The form widget manages absolute positioning of scrollbars and the draw
     // area.
     gui.formwin = vim_form_new();
-    gtk_widget_set_name(gui.formwin, "vim-gtk-form");
-    gtk_widget_set_vexpand(gui.formwin, TRUE);
-    gtk_widget_set_hexpand(gui.formwin, TRUE);
+    gtk_widget_ಗಣ_name(gui.formwin, "vim-gtk-form");
+    gtk_widget_ಗಣ_vexpand(gui.formwin, TRUE);
+    gtk_widget_ಗಣ_hexpand(gui.formwin, TRUE);
     gtk_box_append(GTK_BOX(vbox), gui.formwin);
 
     // The drawing area for the editor content.
     gui.drawarea = vim_draw_area_new();
-    gtk_widget_set_focusable(gui.drawarea, TRUE);
-    gtk_widget_set_vexpand(gui.drawarea, TRUE);
-    gtk_widget_set_hexpand(gui.drawarea, TRUE);
+    gtk_widget_ಗಣ_focusable(gui.drawarea, TRUE);
+    gtk_widget_ಗಣ_vexpand(gui.drawarea, TRUE);
+    gtk_widget_ಗಣ_hexpand(gui.drawarea, TRUE);
     vim_form_put(VIM_FORM(gui.formwin), gui.drawarea, 0, 0);
 
     g_signal_connect(G_OBJECT(gui.drawarea), "realize",
-		     G_CALLBACK(drawarea_realize_cb), NULL);
+		     G_CALLBACK(drawarea_realize_cb), ಖಾಲಿ);
     g_signal_connect(G_OBJECT(gui.drawarea), "unrealize",
-		     G_CALLBACK(drawarea_unrealize_cb), NULL);
+		     G_CALLBACK(drawarea_unrealize_cb), ಖಾಲಿ);
 
     // Set up event controllers.
     {
-	GtkEventController *key_ctrl = gtk_event_controller_key_new();
-	g_signal_connect(key_ctrl, "key-pressed",
-			 G_CALLBACK(key_press_event), NULL);
-	g_signal_connect(key_ctrl, "key-released",
-			 G_CALLBACK(key_release_event), NULL);
-	gtk_widget_add_controller(gui.drawarea, key_ctrl);
-#ifdef FEAT_XIM
+	GtkEventController *ಕೀಲಿ_ctrl = gtk_event_controller_ಕೀಲಿ_new();
+	g_signal_connect(ಕೀಲಿ_ctrl, "key-pressed",
+			 G_CALLBACK(ಕೀಲಿ_press_event), ಖಾಲಿ);
+	g_signal_connect(ಕೀಲಿ_ctrl, "key-released",
+			 G_CALLBACK(ಕೀಲಿ_release_event), ಖಾಲಿ);
+	gtk_widget_ಕೂಡಿಸು_controller(gui.drawarea, ಕೀಲಿ_ctrl);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XIM
 	xim_init();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
     {
 	GtkGesture *click = gtk_gesture_click_new();
-	gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(click), 0);
+	gtk_gesture_single_ಗಣ_button(GTK_GESTURE_SINGLE(click), 0);
 	g_signal_connect(click, "pressed",
-			 G_CALLBACK(button_press_event), NULL);
+			 G_CALLBACK(button_press_event), ಖಾಲಿ);
 	g_signal_connect(click, "released",
-			 G_CALLBACK(button_release_event), NULL);
-	gtk_widget_add_controller(gui.drawarea, GTK_EVENT_CONTROLLER(click));
+			 G_CALLBACK(button_release_event), ಖಾಲಿ);
+	gtk_widget_ಕೂಡಿಸು_controller(gui.drawarea, GTK_EVENT_CONTROLLER(click));
     }
 
     {
 	GtkEventController *motion = gtk_event_controller_motion_new();
 	g_signal_connect(motion, "motion",
-			 G_CALLBACK(motion_notify_event), NULL);
+			 G_CALLBACK(motion_notify_event), ಖಾಲಿ);
 	g_signal_connect(motion, "enter",
-			 G_CALLBACK(enter_notify_event), NULL);
-	gtk_widget_add_controller(gui.drawarea, motion);
+			 G_CALLBACK(enter_notify_event), ಖಾಲಿ);
+	gtk_widget_ಕೂಡಿಸು_controller(gui.drawarea, motion);
     }
 
     {
@@ -666,143 +666,143 @@ gui_mch_init(void)
 		GTK_EVENT_CONTROLLER_SCROLL_BOTH_AXES
 		| GTK_EVENT_CONTROLLER_SCROLL_DISCRETE);
 	g_signal_connect(scroll, "scroll",
-			 G_CALLBACK(scroll_event), NULL);
-	gtk_widget_add_controller(gui.drawarea, scroll);
+			 G_CALLBACK(scroll_event), ಖಾಲಿ);
+	gtk_widget_ಕೂಡಿಸು_controller(gui.drawarea, scroll);
     }
 
     {
 	GtkEventController *focus = gtk_event_controller_focus_new();
 	g_signal_connect(focus, "enter",
-			 G_CALLBACK(focus_in_event), NULL);
+			 G_CALLBACK(focus_ಒಳ_event), ಖಾಲಿ);
 	g_signal_connect(focus, "leave",
-			 G_CALLBACK(focus_out_event), NULL);
-	gtk_widget_add_controller(gui.drawarea, focus);
+			 G_CALLBACK(focus_ಹೊರಹೋಗು_event), ಖಾಲಿ);
+	gtk_widget_ಕೂಡಿಸು_controller(gui.drawarea, focus);
     }
 
-#ifdef FEAT_DND
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DND
     // Set up drag-and-drop target for files and text. We use async variant so
     // we can handle html format.
     {
-	gui.drop_target = gtk_drop_target_async_new(NULL,
+	gui.drop_ಗುರಿ = gtk_drop_ಗುರಿ_async_new(ಖಾಲಿ,
 		GDK_ACTION_COPY | GDK_ACTION_MOVE);
 
-	gui_gtk_set_dnd_targets();
-	g_signal_connect(gui.drop_target, "drop",
-			 G_CALLBACK(drop_cb), NULL);
-	gtk_widget_add_controller(gui.drawarea,
-		GTK_EVENT_CONTROLLER(gui.drop_target));
+	gui_gtk_ಗಣ_dnd_targets();
+	g_signal_connect(gui.drop_ಗುರಿ, "drop",
+			 G_CALLBACK(drop_cb), ಖಾಲಿ);
+	gtk_widget_ಕೂಡಿಸು_controller(gui.drawarea,
+		GTK_EVENT_CONTROLLER(gui.drop_ಗುರಿ));
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    gui.border_offset = gui.border_width;
+    gui.border_ಸ್ಥಾನಾಂತರ = gui.border_ಅಗಲ;
 
     // Create a blank (invisible) cursor for hiding the mouse pointer.
-    gui.blank_pointer = gdk_cursor_new_from_name("none", NULL);
+    gui.blank_ಸೂಚಕ = gdk_cursor_new_from_name("none", ಖಾಲಿ);
 
     {
 	GdkDisplay   *display = gtk_widget_get_display(gui.mainwin);
 	GdkClipboard *primary = gdk_display_get_primary_clipboard(display);
 	GdkClipboard *regular = gdk_display_get_clipboard(display);
 
-	if (primary != NULL)
+	ಆದರೆ (primary != ಖಾಲಿ)
 	    g_signal_connect(primary, "changed",
-		    G_CALLBACK(clipboard_changed_cb), &clip_star);
-	if (regular != NULL)
+		    G_CALLBACK(clipboard_ಬದಲಾಯಿತು_cb), &clip_ನಕ್ಷತ್ರ);
+	ಆದರೆ (regular != ಖಾಲಿ)
 	    g_signal_connect(regular, "changed",
-		    G_CALLBACK(clipboard_changed_cb), &clip_plus);
+		    G_CALLBACK(clipboard_ಬದಲಾಯಿತು_cb), &clip_plus);
     }
 
     gui.regular_provider = vim_content_provider_new(&clip_plus);
-    gui.primary_provider = vim_content_provider_new(&clip_star);
+    gui.primary_provider = vim_content_provider_new(&clip_ನಕ್ಷತ್ರ);
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-    void
-gui_mch_new_colors(void)
+    ಶೂನ್ಯ
+gui_mch_new_colors(ಶೂನ್ಯ)
 {
-    if (gui.drawarea != NULL && gtk_widget_get_realized(gui.drawarea))
-	gtk_widget_queue_draw(gui.drawarea);
+    ಆದರೆ (gui.drawarea != ಖಾಲಿ && gtk_widget_get_realized(gui.drawarea))
+	gtk_widget_ಸರತಿ_draw(gui.drawarea);
 }
 
 /*
  * Open the GUI window which was created by a call to gui_mch_init().
  */
-    int
-gui_mch_open(void)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_open(ಶೂನ್ಯ)
 {
     guicolor_T fg_pixel = INVALCOLOR;
     guicolor_T bg_pixel = INVALCOLOR;
-    guint pixel_width;
-    guint pixel_height;
+    guint pixel_ಅಗಲ;
+    guint pixel_ಎತ್ತರ;
 
-    if (gui.geom != NULL)
+    ಆದರೆ (gui.geom != ಖಾಲಿ)
     {
-	int		mask;
-	unsigned int	w, h;
+	ಪೂರ್ಣಾಂಕ		ಮುಖವಾಡ;
+	ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ	w, h;
 
-	mask = vim_parse_geometry((char *)gui.geom, &w, &h);
+	ಮುಖವಾಡ = vim_parse_geometry((ಅಕ್ಷರ *)gui.geom, &w, &h);
 
-	if (mask & WidthValue)
+	ಆದರೆ (ಮುಖವಾಡ & ಅಗಲ_ಮೌಲ್ಯ)
 	    Columns = w;
-	if (mask & HeightValue)
+	ಆದರೆ (ಮುಖವಾಡ & ಎತ್ತರ_ಮೌಲ್ಯ)
 	{
-	    if (p_window > (long)h - 1 || !option_was_set((char_u *)"window"))
-		p_window = h - 1;
-	    Rows = h;
+	    ಆದರೆ (p_ಕಿಟಕಿ > (ದೀರ್ಘ)h - 1 || !option_was_ಗಣ((char_u *)"window"))
+		p_ಕಿಟಕಿ = h - 1;
+	    ಅಡ್ಡಸಾಲುಗಳು = h;
 	}
-	limit_screen_size();
+	ಎಲ್ಲೆ_screen_ಗಾತ್ರ();
 
 	VIM_CLEAR(gui.geom);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Use 80x24 as the default GUI size, unless geometry was specified.
-	if (Columns > 80)
+	ಆದರೆ (Columns > 80)
 	    Columns = 80;
-	if (Rows > 24)
-	    Rows = 24;
+	ಆದರೆ (ಅಡ್ಡಸಾಲುಗಳು > 24)
+	    ಅಡ್ಡಸಾಲುಗಳು = 24;
     }
 
-    pixel_width = (guint)(gui_get_base_width() + Columns * gui.char_width);
-    pixel_height = (guint)(gui_get_base_height() + Rows * gui.char_height);
+    pixel_ಅಗಲ = (guint)(gui_get_ತಳ_ಅಗಲ() + Columns * gui.char_ಅಗಲ);
+    pixel_ಎತ್ತರ = (guint)(gui_get_ತಳ_ಎತ್ತರ() + ಅಡ್ಡಸಾಲುಗಳು * gui.char_ಎತ್ತರ);
 
-    pixel_width  += get_menu_tool_width();
-    pixel_height += get_menu_tool_height();
+    pixel_ಅಗಲ  += get_menu_tool_ಅಗಲ();
+    pixel_ಎತ್ತರ += get_menu_tool_ಎತ್ತರ();
 
-    if (foreground_argument != NULL)
-	fg_pixel = gui_get_color((char_u *)foreground_argument);
-    if (fg_pixel == INVALCOLOR)
+    ಆದರೆ (foreground_ವಾದ != ಖಾಲಿ)
+	fg_pixel = gui_get_color((char_u *)foreground_ವಾದ);
+    ಆದರೆ (fg_pixel == INVALCOLOR)
 	fg_pixel = gui_get_color((char_u *)"Black");
 
-    if (background_argument != NULL)
-	bg_pixel = gui_get_color((char_u *)background_argument);
-    if (bg_pixel == INVALCOLOR)
+    ಆದರೆ (background_ವಾದ != ಖಾಲಿ)
+	bg_pixel = gui_get_color((char_u *)background_ವಾದ);
+    ಆದರೆ (bg_pixel == INVALCOLOR)
 	bg_pixel = gui_get_color((char_u *)"White");
 
-    if (found_reverse_arg)
+    ಆದರೆ (ಸಿಕ್ಕಿತು_ಹಿಮ್ಮುಖ_arg)
     {
 	gui.def_norm_pixel = bg_pixel;
-	gui.def_back_pixel = fg_pixel;
+	gui.def_ಹಿಂಭಾಗ_pixel = fg_pixel;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	gui.def_norm_pixel = fg_pixel;
-	gui.def_back_pixel = bg_pixel;
+	gui.def_ಹಿಂಭಾಗ_pixel = bg_pixel;
     }
 
-    set_normal_colors();
+    ಗಣ_ಸಾಮಾನ್ಯ_colors();
     gui_check_colors();
     highlight_gui_started();
 
     g_signal_connect(G_OBJECT(gui.mainwin), "destroy",
-		     G_CALLBACK(mainwin_destroy_cb), NULL);
+		     G_CALLBACK(mainwin_destroy_cb), ಖಾಲಿ);
     // Resize is handled by GtkForm's size_allocate callback.
 
-    set_form_size((int)pixel_width - get_menu_tool_width(),
-	    (int)pixel_height - get_menu_tool_height());
+    ಗಣ_form_ಗಾತ್ರ((ಪೂರ್ಣಾಂಕ)pixel_ಅಗಲ - get_menu_tool_ಅಗಲ(),
+	    (ಪೂರ್ಣಾಂಕ)pixel_ಎತ್ತರ - get_menu_tool_ಎತ್ತರ());
 
-    gtk_window_present(GTK_WINDOW(gui.mainwin));
+    gtk_ಕಿಟಕಿ_present(GTK_ಕಿಟಕಿ(gui.mainwin));
 
     // Undo the 80x24 clamp above, gui_init() asks for this size next.  Drain
     // the pending allocation before that, or gui_resize_shell() overwrites it.
@@ -812,85 +812,85 @@ gui_mch_open(void)
     gtk_widget_grab_focus(gui.drawarea);
     gui_focus_change(TRUE);
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-    void
-gui_mch_exit(int rc UNUSED)
+    ಶೂನ್ಯ
+gui_mch_exit(ಪೂರ್ಣಾಂಕ rc ಬಳಸದ)
 {
-    if (gui.mainwin != NULL)
+    ಆದರೆ (gui.mainwin != ಖಾಲಿ)
     {
-#ifdef FEAT_GUI_TABLINE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_TABLINE
 	// Must unparent popover menu for tabline or we will get warning
-	gtk_widget_unparent(g_object_get_data(G_OBJECT(gui.tabline), "menu"));
-#endif
-#ifdef FEAT_BEVAL_GUI
+	gtk_widget_unparent(g_object_get_ದತ್ತಾಂಶ(G_OBJECT(gui.tabline), "menu"));
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_BEVAL_GUI
 	// Make sure to destroy popover used for balloon eval, or we will get a
 	// warning from GTK that the draw area still has children left.
 	gui_mch_destroy_beval_area(balloonEval);
-#endif
-#ifdef FEAT_MENU
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MENU
 	// Make sure to unparent any popover menus
 	{
 	    vimmenu_T *menu;
 
 	    FOR_ALL_MENUS(menu)
 	    {
-		if ((menu->name[0] == ']' || menu_is_popup(menu->name))
-			&& menu->submenu_id != NULL)
+		ಆದರೆ ((menu->name[0] == ']' || menu_is_popup(menu->name))
+			&& menu->submenu_id != ಖಾಲಿ)
 		    gtk_widget_unparent(menu->submenu_id);
 	    }
 	}
-#endif
-	gtk_window_destroy(GTK_WINDOW(gui.mainwin));
+#ಆದರೆ_ಅಂತ್ಯ
+	gtk_ಕಿಟಕಿ_destroy(GTK_ಕಿಟಕಿ(gui.mainwin));
     }
 }
 
-    int
-gui_mch_get_winpos(int *x, int *y)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_get_winpos(ಪೂರ್ಣಾಂಕ *x, ಪೂರ್ಣಾಂಕ *y)
 {
     // GTK4 does not provide a window position API.
     *x = 0;
     *y = 0;
-    return FAIL;
+    ಹಿಂತಿರುಗಿ FAIL;
 }
 
-    void
-gui_mch_set_winpos(int x UNUSED, int y UNUSED)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_winpos(ಪೂರ್ಣಾಂಕ x ಬಳಸದ, ಪೂರ್ಣಾಂಕ y ಬಳಸದ)
 {
     // GTK4/Wayland: window positioning not available
 }
 
-    int
-gui_mch_maximized(void)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_maximized(ಶೂನ್ಯ)
 {
-    return gtk_window_is_maximized(GTK_WINDOW(gui.mainwin));
+    ಹಿಂತಿರುಗಿ gtk_ಕಿಟಕಿ_is_maximized(GTK_ಕಿಟಕಿ(gui.mainwin));
 }
 
-    void
-gui_mch_unmaximize(void)
+    ಶೂನ್ಯ
+gui_mch_unmaximize(ಶೂನ್ಯ)
 {
-    if (gui.mainwin != NULL)
-	gtk_window_unmaximize(GTK_WINDOW(gui.mainwin));
+    ಆದರೆ (gui.mainwin != ಖಾಲಿ)
+	gtk_ಕಿಟಕಿ_unmaximize(GTK_ಕಿಟಕಿ(gui.mainwin));
 }
 
-    void
-gui_mch_set_fullscreen(int flag)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_fullscreen(ಪೂರ್ಣಾಂಕ flag)
 {
-    if (gui.mainwin == NULL)
-	return;
-    if (flag)
-	gtk_window_fullscreen(GTK_WINDOW(gui.mainwin));
-    else
-	gtk_window_unfullscreen(GTK_WINDOW(gui.mainwin));
+    ಆದರೆ (gui.mainwin == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
+    ಆದರೆ (flag)
+	gtk_ಕಿಟಕಿ_fullscreen(GTK_ಕಿಟಕಿ(gui.mainwin));
+    ಇಲ್ಲದಿದ್ದರೆ
+	gtk_ಕಿಟಕಿ_unfullscreen(GTK_ಕಿಟಕಿ(gui.mainwin));
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 mainwin_fullscreened_cb(GObject *obj,
-	GParamSpec *pspec UNUSED, gpointer user_data UNUSED)
+	GParamSpec *pspec ಬಳಸದ, gpointer user_ದತ್ತಾಂಶ ಬಳಸದ)
 {
     // Force a redraw of the drawing area when entering fullscreen mode.
-    if (gtk_window_is_fullscreen(GTK_WINDOW(obj)))
+    ಆದರೆ (gtk_ಕಿಟಕಿ_is_fullscreen(GTK_ಕಿಟಕಿ(obj)))
 	gui_focus_change(TRUE);
 }
 
@@ -906,23 +906,23 @@ mainwin_fullscreened_cb(GObject *obj,
  * crash.  Use gui_resize_shell() to recalculate Rows/Columns from the current
  * window size instead.
  */
-    void
-gui_mch_newfont(void)
+    ಶೂನ್ಯ
+gui_mch_newfont(ಶೂನ್ಯ)
 {
-    int w, h;
+    ಪೂರ್ಣಾಂಕ w, h;
 
     // Do not subtract width and height with menubar, toolbar, etc, because
     // those are not part of the shell.
-    w = gtk_widget_get_width(gui.formwin);
-    h = gtk_widget_get_height(gui.formwin);
+    w = gtk_widget_get_ಅಗಲ(gui.formwin);
+    h = gtk_widget_get_ಎತ್ತರ(gui.formwin);
     gui_resize_shell(w, h);
 }
 
-    void
-gui_mch_settitle(char_u *title, char_u *icon UNUSED)
+    ಶೂನ್ಯ
+gui_mch_settitle(char_u *title, char_u *icon ಬಳಸದ)
 {
-    if (title != NULL && gui.mainwin != NULL)
-	gtk_window_set_title(GTK_WINDOW(gui.mainwin), (const char *)title);
+    ಆದರೆ (title != ಖಾಲಿ && gui.mainwin != ಖಾಲಿ)
+	gtk_ಕಿಟಕಿ_ಗಣ_title(GTK_ಕಿಟಕಿ(gui.mainwin), (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)title);
 }
 
 /*
@@ -933,81 +933,81 @@ gui_mch_settitle(char_u *title, char_u *icon UNUSED)
  * it actually is (while the window size is up to date), causing a negative
  * "decor_height".
  */
-    void
-gui_gtk_init_decor_height(void)
+    ಶೂನ್ಯ
+gui_gtk_init_decor_ಎತ್ತರ(ಶೂನ್ಯ)
 {
-    int h = gtk_widget_get_height(gui.mainwin);
+    ಪೂರ್ಣಾಂಕ h = gtk_widget_get_ಎತ್ತರ(gui.mainwin);
 
-    if (h == 0)
-	return;
+    ಆದರೆ (h == 0)
+	ಹಿಂತಿರುಗಿ;
 
-    h -= get_menu_tool_height();
-    h -= gtk_widget_get_height(gui.formwin);
+    h -= get_menu_tool_ಎತ್ತರ();
+    h -= gtk_widget_get_ಎತ್ತರ(gui.formwin);
 
-    gui.decor_height = h;
+    gui.decor_ಎತ್ತರ = h;
 }
 
 /*
  * Ask for the form widget, and thus the shell, to become "width" by "height"
  * pixels.
  */
-    static void
-set_form_size(int width, int height)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಗಣ_form_ಗಾತ್ರ(ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ)
 {
     // Nothing to do when the form widget already has this size: no allocation
     // would follow and the size request below would never be dropped.
-    if (gtk_widget_get_width(gui.formwin) == width
-	    && gtk_widget_get_height(gui.formwin) == height)
-	return;
+    ಆದರೆ (gtk_widget_get_ಅಗಲ(gui.formwin) == ಅಗಲ
+	    && gtk_widget_get_ಎತ್ತರ(gui.formwin) == ಎತ್ತರ)
+	ಹಿಂತಿರುಗಿ;
 
     // Remember the size the form widget is supposed to get. An allocation
     // that arrives before the compositor has answered this request still has
     // the previous size and must not be used.
-    gui.pending_form_w = width;
-    gui.pending_form_h = height;
+    gui.pending_form_w = ಅಗಲ;
+    gui.pending_form_h = ಎತ್ತರ;
     gui.pending_form_skip = 1;
 
     // GtkWindow default size also includes client side decorations, so must
     // include it also.  It also keeps the natural width of the toolbar from
     // deciding the width.
-    gtk_window_set_default_size(GTK_WINDOW(gui.mainwin),
-	    width + get_menu_tool_width(),
-	    height + get_menu_tool_height() + gui.decor_height);
+    gtk_ಕಿಟಕಿ_ಗಣ_default_ಗಾತ್ರ(GTK_ಕಿಟಕಿ(gui.mainwin),
+	    ಅಗಲ + get_menu_tool_ಅಗಲ(),
+	    ಎತ್ತರ + get_menu_tool_ಎತ್ತರ() + gui.decor_ಎತ್ತರ);
 
     // The window drops a request made while it is being presented, and
     // "gui.decor_height" is not known before that.  A size request on the form
     // widget is honoured then; it is dropped again once the size was given.
-    gtk_widget_set_size_request(gui.formwin, width, height);
+    gtk_widget_ಗಣ_ಗಾತ್ರ_request(gui.formwin, ಅಗಲ, ಎತ್ತರ);
 }
 
-    void
-gui_mch_set_shellsize(int width, int height,
-	int min_width UNUSED, int min_height UNUSED,
-	int base_width UNUSED, int base_height UNUSED,
-	int direction UNUSED)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_shellsize(ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ,
+	ಪೂರ್ಣಾಂಕ min_ಅಗಲ ಬಳಸದ, ಪೂರ್ಣಾಂಕ min_ಎತ್ತರ ಬಳಸದ,
+	ಪೂರ್ಣಾಂಕ ತಳ_ಅಗಲ ಬಳಸದ, ಪೂರ್ಣಾಂಕ ತಳ_ಎತ್ತರ ಬಳಸದ,
+	ಪೂರ್ಣಾಂಕ direction ಬಳಸದ)
 {
-    set_form_size(width, height);
+    ಗಣ_form_ಗಾತ್ರ(ಅಗಲ, ಎತ್ತರ);
 
     gui_mch_update();
 }
 
-    void
-gui_mch_get_screen_dimensions(int *screen_w, int *screen_h)
+    ಶೂನ್ಯ
+gui_mch_get_screen_dimensions(ಪೂರ್ಣಾಂಕ *screen_w, ಪೂರ್ಣಾಂಕ *screen_h)
 {
     GdkDisplay *display = gtk_widget_get_display(gui.mainwin);
     GdkSurface *surface = gtk_native_get_surface(GTK_NATIVE(gui.mainwin));
 
-    if (surface != NULL)
+    ಆದರೆ (surface != ಖಾಲಿ)
     {
 	GdkMonitor *monitor = gdk_display_get_monitor_at_surface(display,
 		surface);
-	if (monitor != NULL)
+	ಆದರೆ (monitor != ಖಾಲಿ)
 	{
 	    GdkRectangle geom;
 	    gdk_monitor_get_geometry(monitor, &geom);
-	    *screen_w = geom.width;
-	    *screen_h = geom.height;
-	    return;
+	    *screen_w = geom.ಅಗಲ;
+	    *screen_h = geom.ಎತ್ತರ;
+	    ಹಿಂತಿರುಗಿ;
 	}
     }
 
@@ -1015,45 +1015,45 @@ gui_mch_get_screen_dimensions(int *screen_w, int *screen_h)
     *screen_h = 600;
 }
 
-#ifdef FEAT_MENU
-    void
-gui_mch_enable_menu(int showit)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MENU
+    ಶೂನ್ಯ
+gui_mch_enable_menu(ಪೂರ್ಣಾಂಕ showit)
 {
-    if (gui.menubar != NULL)
+    ಆದರೆ (gui.menubar != ಖಾಲಿ)
     {
-	gtk_widget_set_visible(gui.menubar, showit);
+	gtk_widget_ಗಣ_visible(gui.menubar, showit);
 	// Draw area might become blank after this for some reason, queue a
 	// redraw, same for toolbar as well.
-	if (gui.drawarea != NULL)
-	    gtk_widget_queue_draw(gui.drawarea);
+	ಆದರೆ (gui.drawarea != ಖಾಲಿ)
+	    gtk_widget_ಸರತಿ_draw(gui.drawarea);
     }
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_TOOLBAR
-    void
-gui_mch_show_toolbar(int showit)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TOOLBAR
+    ಶೂನ್ಯ
+gui_mch_show_toolbar(ಪೂರ್ಣಾಂಕ showit)
 {
-    if (gui.toolbar != NULL)
+    ಆದರೆ (gui.toolbar != ಖಾಲಿ)
     {
-	gtk_widget_set_visible(gui.toolbar, showit);
-	if (showit)
-	    vim_toolbar_set_style(VIM_TOOLBAR(gui.toolbar),
+	gtk_widget_ಗಣ_visible(gui.toolbar, showit);
+	ಆದರೆ (showit)
+	    vim_toolbar_ಗಣ_style(VIM_TOOLBAR(gui.toolbar),
 		    toolbar_flags, tbis_flags);
-	if (gui.drawarea != NULL)
-	    gtk_widget_queue_draw(gui.drawarea);
+	ಆದರೆ (gui.drawarea != ಖಾಲಿ)
+	    gtk_widget_ಸರತಿ_draw(gui.drawarea);
     }
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    void
-gui_mch_set_dark_theme(int dark)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_dark_theme(ಪೂರ್ಣಾಂಕ dark)
 {
     // GTK4: use GtkSettings
     GtkSettings *settings = gtk_settings_get_default();
-    if (settings != NULL)
-	g_object_set(settings, "gtk-application-prefer-dark-theme",
-		(gboolean)dark, NULL);
+    ಆದರೆ (settings != ಖಾಲಿ)
+	g_object_ಗಣ(settings, "gtk-application-prefer-dark-theme",
+		(gboolean)dark, ಖಾಲಿ);
 }
 
 /*
@@ -1062,211 +1062,211 @@ gui_mch_set_dark_theme(int dark)
  * ============================================================
  */
 
-    int
-gui_mch_adjust_charheight(void)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_adjust_charheight(ಶೂನ್ಯ)
 {
     PangoFontMetrics *metrics;
-    int ascent;
-    int descent;
+    ಪೂರ್ಣಾಂಕ ascent;
+    ಪೂರ್ಣಾಂಕ descent;
 
-    metrics = pango_context_get_metrics(gui.text_context, gui.norm_font,
-			    pango_context_get_language(gui.text_context));
+    metrics = pango_context_get_metrics(gui.ಪಠ್ಯ_context, gui.norm_font,
+			    pango_context_get_language(gui.ಪಠ್ಯ_context));
     ascent = pango_font_metrics_get_ascent(metrics);
     descent = pango_font_metrics_get_descent(metrics);
     pango_font_metrics_unref(metrics);
 
-    gui.char_height = (ascent + descent + (PANGO_SCALE * 15) / 16)
+    gui.char_ಎತ್ತರ = (ascent + descent + (PANGO_SCALE * 15) / 16)
 						   / PANGO_SCALE + p_linespace;
     gui.char_ascent = PANGO_PIXELS(ascent + p_linespace * PANGO_SCALE / 2);
     gui.char_ascent = MAX(gui.char_ascent, 0);
-    gui.char_height = MAX(gui.char_height, gui.char_ascent + 1);
+    gui.char_ಎತ್ತರ = MAX(gui.char_ಎತ್ತರ, gui.char_ascent + 1);
 
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-typedef struct {
-    PangoFontDescription    *result;
-    gboolean		    done;
-} FontDialogData;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+    PangoFontDescription    *ಫಲಿತಾಂಶ;
+    gboolean		    ಮುಗಿದ;
+} Font_Dialog_ದತ್ತಾಂಶ;
 
-    static void
-font_dialog_finish_cb(GObject *source, GAsyncResult *res, gpointer data)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+font_dialog_ಮುಕ್ತಾಯ_cb(GObject *ಮೂಲ, GAsync_ಫಲಿತಾಂಶ *res, gpointer ದತ್ತಾಂಶ)
 {
-    FontDialogData *fdd = (FontDialogData *)data;
-    fdd->result = gtk_font_dialog_choose_font_finish(
-		    GTK_FONT_DIALOG(source), res, NULL);
-    fdd->done = TRUE;
+    Font_Dialog_ದತ್ತಾಂಶ *fdd = (Font_Dialog_ದತ್ತಾಂಶ *)ದತ್ತಾಂಶ;
+    fdd->ಫಲಿತಾಂಶ = gtk_font_dialog_ಆರಿಸು_font_ಮುಕ್ತಾಯ(
+		    GTK_FONT_DIALOG(ಮೂಲ), res, ಖಾಲಿ);
+    fdd->ಮುಗಿದ = TRUE;
 }
 
-    static gboolean
-font_filter(gpointer item, gpointer data UNUSED)
+    ಸ್ಥಿರ gboolean
+font_filter(gpointer ಅಂಶ, gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    if (PANGO_IS_FONT_FAMILY(item))
-	return pango_font_family_is_monospace(PANGO_FONT_FAMILY(item));
-    if (PANGO_IS_FONT_FACE(item))
+    ಆದರೆ (PANGO_IS_FONT_FAMILY(ಅಂಶ))
+	ಹಿಂತಿರುಗಿ pango_font_family_is_monospace(PANGO_FONT_FAMILY(ಅಂಶ));
+    ಆದರೆ (PANGO_IS_FONT_FACE(ಅಂಶ))
     {
 	PangoFontFamily *family = pango_font_face_get_family(
-		PANGO_FONT_FACE(item));
-	if (family != NULL)
-	    return pango_font_family_is_monospace(family);
+		PANGO_FONT_FACE(ಅಂಶ));
+	ಆದರೆ (family != ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ pango_font_family_is_monospace(family);
     }
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
     char_u *
 gui_mch_font_dialog(char_u *oldval)
 {
     GtkFontDialog	*dlg;
-    PangoFontDescription *initial = NULL;
-    char_u		*fontname = NULL;
-    FontDialogData	fdd;
+    PangoFontDescription *initial = ಖಾಲಿ;
+    char_u		*fontname = ಖಾಲಿ;
+    Font_Dialog_ದತ್ತಾಂಶ	fdd;
 
     dlg = gtk_font_dialog_new();
-    gtk_font_dialog_set_modal(dlg, TRUE);
-    gtk_font_dialog_set_filter(dlg,
+    gtk_font_dialog_ಗಣ_modal(dlg, TRUE);
+    gtk_font_dialog_ಗಣ_filter(dlg,
 	    GTK_FILTER(gtk_custom_filter_new(
-		    (GtkCustomFilterFunc)font_filter, NULL, NULL)));
+		    (GtkCustomFilterFunc)font_filter, ಖಾಲಿ, ಖಾಲಿ)));
 
-    if (oldval != NULL && oldval[0] != NUL)
+    ಆದರೆ (oldval != ಖಾಲಿ && oldval[0] != NUL)
     {
 	char_u *oldname;
 
-	if (output_conv.vc_type != CONV_NONE)
-	    oldname = string_convert(&output_conv, oldval, NULL);
-	else
+	ಆದರೆ (output_conv.vc_type != CONV_NONE)
+	    oldname = string_convert(&output_conv, oldval, ಖಾಲಿ);
+	ಇಲ್ಲದಿದ್ದರೆ
 	    oldname = oldval;
 
-	if (STRLEN(oldname) > 0 && !vim_isdigit(oldname[STRLEN(oldname) - 1]))
+	ಆದರೆ (STRLEN(oldname) > 0 && !vim_isdigit(oldname[STRLEN(oldname) - 1]))
 	{
 	    char_u *p = vim_strnsave(oldname, STRLEN(oldname) + 3);
-	    if (p != NULL)
+	    ಆದರೆ (p != ಖಾಲಿ)
 	    {
 		STRCPY(p + STRLEN(p), " 10");
-		if (oldname != oldval)
+		ಆದರೆ (oldname != oldval)
 		    vim_free(oldname);
 		oldname = p;
 	    }
 	}
 
-	initial = pango_font_description_from_string((const char *)oldname);
-	if (oldname != oldval)
+	initial = pango_font_description_from_string((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)oldname);
+	ಆದರೆ (oldname != oldval)
 	    vim_free(oldname);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	initial = pango_font_description_from_string(DEFAULT_FONT);
 
-    fdd.result = NULL;
-    fdd.done = FALSE;
+    fdd.ಫಲಿತಾಂಶ = ಖಾಲಿ;
+    fdd.ಮುಗಿದ = FALSE;
 
-    gtk_font_dialog_choose_font(dlg, GTK_WINDOW(gui.mainwin),
-	    initial, NULL, font_dialog_finish_cb, &fdd);
+    gtk_font_dialog_ಆರಿಸು_font(dlg, GTK_ಕಿಟಕಿ(gui.mainwin),
+	    initial, ಖಾಲಿ, font_dialog_ಮುಕ್ತಾಯ_cb, &fdd);
 
-    while (!fdd.done)
-	g_main_context_iteration(NULL, TRUE);
+    ಆಗ (!fdd.ಮುಗಿದ)
+	g_main_context_iteration(ಖಾಲಿ, TRUE);
 
-    if (fdd.result != NULL)
+    ಆದರೆ (fdd.ಫಲಿತಾಂಶ != ಖಾಲಿ)
     {
-	char *name = pango_font_description_to_string(fdd.result);
-	if (name != NULL)
+	ಅಕ್ಷರ *name = pango_font_description_ಗಮ್ಯ_string(fdd.ಫಲಿತಾಂಶ);
+	ಆದರೆ (name != ಖಾಲಿ)
 	{
 	    char_u *p;
 
 	    p = vim_strsave_escaped((char_u *)name, (char_u *)",");
 	    g_free(name);
-	    if (p != NULL && input_conv.vc_type != CONV_NONE)
+	    ಆದರೆ (p != ಖಾಲಿ && ಒಳಹರಿವು_conv.vc_type != CONV_NONE)
 	    {
-		fontname = string_convert(&input_conv, p, NULL);
+		fontname = string_convert(&ಒಳಹರಿವು_conv, p, ಖಾಲಿ);
 		vim_free(p);
 	    }
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		fontname = p;
 	}
-	pango_font_description_free(fdd.result);
+	pango_font_description_free(fdd.ಫಲಿತಾಂಶ);
     }
 
-    if (initial != NULL)
+    ಆದರೆ (initial != ಖಾಲಿ)
 	pango_font_description_free(initial);
     g_object_unref(dlg);
 
-    return fontname;
+    ಹಿಂತಿರುಗಿ fontname;
 }
 
 /*
  * Build a table of glyphs for ASCII characters 32..126.
  * This avoids the overhead of itemize+shape for the common case.
  */
-    static void
-ascii_glyph_table_init(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ascii_glyph_ಕೋಷ್ಟಕ_init(ಶೂನ್ಯ)
 {
     char_u	    ascii_chars[2 * 128];
     PangoAttrList   *attr_list;
-    GList	    *item_list;
-    int		    i;
+    GList	    *ಅಂಶ_list;
+    ಪೂರ್ಣಾಂಕ		    i;
 
-    if (gui.ascii_glyphs != NULL)
+    ಆದರೆ (gui.ascii_glyphs != ಖಾಲಿ)
 	pango_glyph_string_free(gui.ascii_glyphs);
-    if (gui.ascii_font != NULL)
+    ಆದರೆ (gui.ascii_font != ಖಾಲಿ)
 	g_object_unref(gui.ascii_font);
 
-    gui.ascii_glyphs = NULL;
-    gui.ascii_font   = NULL;
+    gui.ascii_glyphs = ಖಾಲಿ;
+    gui.ascii_font   = ಖಾಲಿ;
 
-    for (i = 0; i < 128; ++i)
+    ಗಾಗಿ (i = 0; i < 128; ++i)
     {
-	if (i >= 32 && i < 127)
+	ಆದರೆ (i >= 32 && i < 127)
 	    ascii_chars[2 * i] = i;
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    ascii_chars[2 * i] = '?';
 	ascii_chars[2 * i + 1] = ' ';
     }
 
     attr_list = pango_attr_list_new();
-    item_list = pango_itemize(gui.text_context, (const char *)ascii_chars,
-			      0, sizeof(ascii_chars), attr_list, NULL);
+    ಅಂಶ_list = pango_itemize(gui.ಪಠ್ಯ_context, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)ascii_chars,
+			      0, ಗಾತ್ರ(ascii_chars), attr_list, ಖಾಲಿ);
 
-    if (item_list != NULL && item_list->next == NULL)
+    ಆದರೆ (ಅಂಶ_list != ಖಾಲಿ && ಅಂಶ_list->ಮುಂದಿನ == ಖಾಲಿ)
     {
-	PangoItem   *item;
-	int	    width;
+	Pango_ಅಂಶ   *ಅಂಶ;
+	ಪೂರ್ಣಾಂಕ	    ಅಗಲ;
 
-	item  = (PangoItem *)item_list->data;
-	width = gui.char_width * PANGO_SCALE;
+	ಅಂಶ  = (Pango_ಅಂಶ *)ಅಂಶ_list->ದತ್ತಾಂಶ;
+	ಅಗಲ = gui.char_ಅಗಲ * PANGO_SCALE;
 
-	gui.ascii_font = item->analysis.font;
+	gui.ascii_font = ಅಂಶ->analysis.font;
 	g_object_ref(gui.ascii_font);
 
 	gui.ascii_glyphs = pango_glyph_string_new();
 
-	pango_shape((const char *)ascii_chars, sizeof(ascii_chars),
-		    &item->analysis, gui.ascii_glyphs);
+	pango_shape((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)ascii_chars, ಗಾತ್ರ(ascii_chars),
+		    &ಅಂಶ->analysis, gui.ascii_glyphs);
 
-	if (gui.ascii_glyphs->num_glyphs == (int)sizeof(ascii_chars))
+	ಆದರೆ (gui.ascii_glyphs->ಅಂಕೆ_glyphs == (ಪೂರ್ಣಾಂಕ)ಗಾತ್ರ(ascii_chars))
 	{
-	    for (i = 0; i < gui.ascii_glyphs->num_glyphs; ++i)
+	    ಗಾಗಿ (i = 0; i < gui.ascii_glyphs->ಅಂಕೆ_glyphs; ++i)
 	    {
 		PangoGlyphGeometry *geom;
 
 		geom = &gui.ascii_glyphs->glyphs[i].geometry;
-		geom->x_offset += MAX(0, width - geom->width) / 2;
-		geom->width = width;
+		geom->x_ಸ್ಥಾನಾಂತರ += MAX(0, ಅಗಲ - geom->ಅಗಲ) / 2;
+		geom->ಅಗಲ = ಅಗಲ;
 	    }
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    pango_glyph_string_free(gui.ascii_glyphs);
-	    gui.ascii_glyphs = NULL;
+	    gui.ascii_glyphs = ಖಾಲಿ;
 	    g_object_unref(gui.ascii_font);
-	    gui.ascii_font = NULL;
+	    gui.ascii_font = ಖಾಲಿ;
 	}
     }
 
-    g_list_foreach(item_list, (GFunc)(void *)&pango_item_free, NULL);
-    g_list_free(item_list);
+    g_list_foreach(ಅಂಶ_list, (GFunc)(ಶೂನ್ಯ *)&pango_ಅಂಶ_free, ಖಾಲಿ);
+    g_list_free(ಅಂಶ_list);
     pango_attr_list_unref(attr_list);
 }
 
-    static void
-get_styled_font_variants(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+get_styled_font_variants(ಶೂನ್ಯ)
 {
     PangoFontDescription    *bold_font_desc;
     PangoFont		    *plain_font;
@@ -1274,15 +1274,15 @@ get_styled_font_variants(void)
 
     gui.font_can_bold = FALSE;
 
-    plain_font = pango_context_load_font(gui.text_context, gui.norm_font);
-    if (plain_font == NULL)
-	return;
+    plain_font = pango_context_ತುಂಬು_font(gui.ಪಠ್ಯ_context, gui.norm_font);
+    ಆದರೆ (plain_font == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     bold_font_desc = pango_font_description_copy_static(gui.norm_font);
-    pango_font_description_set_weight(bold_font_desc, PANGO_WEIGHT_BOLD);
+    pango_font_description_ಗಣ_ತೂಕ(bold_font_desc, PANGO_ತೂಕ_BOLD);
 
-    bold_font = pango_context_load_font(gui.text_context, bold_font_desc);
-    if (bold_font != NULL)
+    bold_font = pango_context_ತುಂಬು_font(gui.ಪಠ್ಯ_context, bold_font_desc);
+    ಆದರೆ (bold_font != ಖಾಲಿ)
     {
 	gui.font_can_bold = (bold_font != plain_font);
 	g_object_unref(bold_font);
@@ -1292,143 +1292,143 @@ get_styled_font_variants(void)
     g_object_unref(plain_font);
 }
 
-    int
-gui_mch_init_font(char_u *font_name, int fontset UNUSED)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_init_font(char_u *font_name, ಪೂರ್ಣಾಂಕ fontset ಬಳಸದ)
 {
     PangoFontDescription    *font_desc;
     PangoLayout		    *layout;
-    int			    width;
+    ಪೂರ್ಣಾಂಕ			    ಅಗಲ;
 
-    if (font_name == NULL)
+    ಆದರೆ (font_name == ಖಾಲಿ)
 	font_name = (char_u *)DEFAULT_FONT;
 
     font_desc = gui_mch_get_font(font_name, FALSE);
-    if (font_desc == NULL)
-	return FAIL;
+    ಆದರೆ (font_desc == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
     gui_mch_free_font(gui.norm_font);
     gui.norm_font = font_desc;
 
-    pango_context_set_font_description(gui.text_context, font_desc);
+    pango_context_ಗಣ_font_description(gui.ಪಠ್ಯ_context, font_desc);
 
-    layout = pango_layout_new(gui.text_context);
-    pango_layout_set_text(layout, "MW", 2);
-    pango_layout_get_size(layout, &width, NULL);
+    layout = pango_layout_new(gui.ಪಠ್ಯ_context);
+    pango_layout_ಗಣ_ಪಠ್ಯ(layout, "MW", 2);
+    pango_layout_get_ಗಾತ್ರ(layout, &ಅಗಲ, ಖಾಲಿ);
     g_object_unref(layout);
 
-    gui.char_width = (width / 2 + PANGO_SCALE / 2) / PANGO_SCALE;
-    if (gui.char_width <= 0)
-	gui.char_width = 8;
+    gui.char_ಅಗಲ = (ಅಗಲ / 2 + PANGO_SCALE / 2) / PANGO_SCALE;
+    ಆದರೆ (gui.char_ಅಗಲ <= 0)
+	gui.char_ಅಗಲ = 8;
 
     gui_mch_adjust_charheight();
 
-    hl_set_font_name(font_name);
+    hl_ಗಣ_font_name(font_name);
 
     get_styled_font_variants();
-    ascii_glyph_table_init();
+    ascii_glyph_ಕೋಷ್ಟಕ_init();
 
     // im window position depends on cursor size which depends on font metrics
     // update the position after we've initialized font. Make sure to not go out
     // of bounds of the screen.
     {
-	int im_row = gui.row < screen_Rows ? gui.row : screen_Rows - 1;
-	int im_col = gui.col < screen_Columns ? gui.col : screen_Columns - 1;
-	im_set_position(im_row, im_col);
+	ಪೂರ್ಣಾಂಕ im_ಅಡ್ಡಸಾಲು = gui.ಅಡ್ಡಸಾಲು < screen_ಅಡ್ಡಸಾಲುಗಳು ? gui.ಅಡ್ಡಸಾಲು : screen_ಅಡ್ಡಸಾಲುಗಳು - 1;
+	ಪೂರ್ಣಾಂಕ im_ಲಂಬಸಾಲು = gui.ಲಂಬಸಾಲು < screen_Columns ? gui.ಲಂಬಸಾಲು : screen_Columns - 1;
+	im_ಗಣ_position(im_ಅಡ್ಡಸಾಲು, im_ಲಂಬಸಾಲು);
     }
-    return OK;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
     GuiFont
-gui_mch_get_font(char_u *name, int report_error)
+gui_mch_get_font(char_u *name, ಪೂರ್ಣಾಂಕ report_error)
 {
     PangoFontDescription *font;
 
-    if (name == NULL)
-	return NULL;
+    ಆದರೆ (name == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    font = pango_font_description_from_string((const char *)name);
-    if (font == NULL)
+    font = pango_font_description_from_string((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)name);
+    ಆದರೆ (font == ಖಾಲಿ)
     {
-	if (report_error)
+	ಆದರೆ (report_error)
 	    semsg(_(e_unknown_font_str), name);
-	return NULL;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
     // Ensure a size is set
-    if (pango_font_description_get_size(font) <= 0)
-	pango_font_description_set_size(font, 10 * PANGO_SCALE);
+    ಆದರೆ (pango_font_description_get_ಗಾತ್ರ(font) <= 0)
+	pango_font_description_ಗಣ_ಗಾತ್ರ(font, 10 * PANGO_SCALE);
 
-    return font;
+    ಹಿಂತಿರುಗಿ font;
 }
 
     char_u *
-gui_mch_get_fontname(GuiFont font, char_u *name UNUSED)
+gui_mch_get_fontname(GuiFont font, char_u *name ಬಳಸದ)
 {
-    if (font != NOFONT)
+    ಆದರೆ (font != NOFONT)
     {
-	char *desc = pango_font_description_to_string(font);
+	ಅಕ್ಷರ *desc = pango_font_description_ಗಮ್ಯ_string(font);
 	char_u *ret = vim_strsave((char_u *)desc);
 	g_free(desc);
-	return ret;
+	ಹಿಂತಿರುಗಿ ret;
     }
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
-    void
+    ಶೂನ್ಯ
 gui_mch_free_font(GuiFont font)
 {
-    if (font != NOFONT)
+    ಆದರೆ (font != NOFONT)
 	pango_font_description_free(font);
 }
 
-    void
+    ಶೂನ್ಯ
 gui_mch_expand_font(
-    optexpand_T	*args,
-    void	*param,
-    int		(*add_match)(char_u *val))
+    optexpand_T	*ವಾದಗಳು,
+    ಶೂನ್ಯ	*param,
+    ಪೂರ್ಣಾಂಕ		(*ಕೂಡಿಸು_ಹೊಂದಿಕೆ)(char_u *val))
 {
-    PangoFontFamily	**font_families = NULL;
-    int			n_families = 0;
-    int			wide = *(int *)param;
+    PangoFontFamily	**font_families = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ			n_families = 0;
+    ಪೂರ್ಣಾಂಕ			wide = *(ಪೂರ್ಣಾಂಕ *)param;
 
-    if (args->oe_include_orig_val && *args->oe_opt_value == NUL && !wide)
+    ಆದರೆ (ವಾದಗಳು->oe_include_orig_val && *ವಾದಗಳು->oe_opt_ಮೌಲ್ಯ == NUL && !wide)
     {
 	// If guifont is empty, suggest the default so the user can modify it.
-	if (add_match((char_u *)DEFAULT_FONT) != OK)
-	    return;
+	ಆದರೆ (ಕೂಡಿಸು_ಹೊಂದಿಕೆ((char_u *)DEFAULT_FONT) != OK)
+	    ಹಿಂತಿರುಗಿ;
     }
 
     pango_context_list_families(
-	    gui.text_context,
+	    gui.ಪಠ್ಯ_context,
 	    &font_families,
 	    &n_families);
 
-    for (int i = 0; i < n_families; i++)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < n_families; i++)
     {
-	if (!wide && !pango_font_family_is_monospace(font_families[i]))
-	    continue;
+	ಆದರೆ (!wide && !pango_font_family_is_monospace(font_families[i]))
+	    ಮುಂದುವರಿ;
 
-	const char *fam_name = pango_font_family_get_name(font_families[i]);
-	if (input_conv.vc_type != CONV_NONE)
+	ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *fam_name = pango_font_family_get_name(font_families[i]);
+	ಆದರೆ (ಒಳಹರಿವು_conv.vc_type != CONV_NONE)
 	{
-	    char_u *buf = string_convert(&input_conv,
-		    (char_u *)fam_name, NULL);
-	    if (buf != NULL)
+	    char_u *buf = string_convert(&ಒಳಹರಿವು_conv,
+		    (char_u *)fam_name, ಖಾಲಿ);
+	    ಆದರೆ (buf != ಖಾಲಿ)
 	    {
-		if (add_match(buf) != OK)
+		ಆದರೆ (ಕೂಡಿಸು_ಹೊಂದಿಕೆ(buf) != OK)
 		{
 		    vim_free(buf);
-		    break;
+		    ನಿಲ್ಲಿಸು;
 		}
 		vim_free(buf);
 	    }
-	    else
-		break;
+	    ಇಲ್ಲದಿದ್ದರೆ
+		ನಿಲ್ಲಿಸು;
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
-	    if (add_match((char_u *)fam_name) != OK)
-		break;
+	    ಆದರೆ (ಕೂಡಿಸು_ಹೊಂದಿಕೆ((char_u *)fam_name) != OK)
+		ನಿಲ್ಲಿಸು;
 	}
     }
 
@@ -1444,54 +1444,54 @@ gui_mch_expand_font(
     guicolor_T
 gui_mch_get_color(char_u *name)
 {
-    if (!gui.in_use)
-	return INVALCOLOR;
+    ಆದರೆ (!gui.ಒಳ_use)
+	ಹಿಂತಿರುಗಿ INVALCOLOR;
 
-    if (name != NULL)
-	return gui_get_color_cmn(name);
+    ಆದರೆ (name != ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ gui_get_color_cmn(name);
 
-    return INVALCOLOR;
+    ಹಿಂತಿರುಗಿ INVALCOLOR;
 }
 
     guicolor_T
-gui_mch_get_rgb_color(int r, int g, int b)
+gui_mch_get_rgb_color(ಪೂರ್ಣಾಂಕ r, ಪೂರ್ಣಾಂಕ g, ಪೂರ್ಣಾಂಕ b)
 {
-    return gui_get_rgb_color_cmn(r, g, b);
+    ಹಿಂತಿರುಗಿ gui_get_rgb_color_cmn(r, g, b);
 }
 
-    static GdkRGBA
-color_to_rgba(guicolor_T color)
+    ಸ್ಥಿರ GdkRGBA
+color_ಗಮ್ಯ_rgba(guicolor_T color)
 {
     GdkRGBA rgba;
     rgba.red   = ((color & 0xff0000) >> 16) / 255.0;
     rgba.green = ((color & 0xff00) >> 8) / 255.0;
     rgba.blue  = (color & 0xff) / 255.0;
     rgba.alpha = 1.0;
-    return rgba;
+    ಹಿಂತಿರುಗಿ rgba;
 }
 
-    void
-gui_mch_set_fg_color(guicolor_T color)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_fg_color(guicolor_T color)
 {
-    *gui.fgcolor = color_to_rgba(color);
+    *gui.fgcolor = color_ಗಮ್ಯ_rgba(color);
 }
 
-    void
-gui_mch_set_bg_color(guicolor_T color)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_bg_color(guicolor_T color)
 {
-    *gui.bgcolor = color_to_rgba(color);
+    *gui.bgcolor = color_ಗಮ್ಯ_rgba(color);
 }
 
-    void
-gui_mch_set_sp_color(guicolor_T color)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_sp_color(guicolor_T color)
 {
-    *gui.spcolor = color_to_rgba(color);
+    *gui.spcolor = color_ಗಮ್ಯ_rgba(color);
 }
 
     guicolor_T
 gui_mch_get_rgb(guicolor_T pixel)
 {
-    return pixel;
+    ಹಿಂತಿರುಗಿ pixel;
 }
 
 /*
@@ -1500,97 +1500,97 @@ gui_mch_get_rgb(guicolor_T pixel)
  * ============================================================
  */
 
-    void
-gui_gtk4_update_size(void)
+    ಶೂನ್ಯ
+gui_gtk4_update_ಗಾತ್ರ(ಶೂನ್ಯ)
 {
-    vim_draw_area_set_size(VIM_DRAW_AREA(gui.drawarea),
-	    gui.num_rows, gui.num_cols);
+    vim_draw_area_ಗಣ_ಗಾತ್ರ(VIM_DRAW_AREA(gui.drawarea),
+	    gui.ಅಂಕೆ_ಅಡ್ಡಸಾಲುಗಳು, gui.ಅಂಕೆ_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ);
 }
 
-#ifdef FEAT_NETBEANS_INTG
-    void
-gui_gtk4_add_multisign(
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_NETBEANS_INTG
+    ಶೂನ್ಯ
+gui_gtk4_ಕೂಡಿಸು_multisign(
 	cairo_surface_t *surf,
-	int		row,
-	int		col,
-	int		width,
-	int		height)
+	ಪೂರ್ಣಾಂಕ		ಅಡ್ಡಸಾಲು,
+	ಪೂರ್ಣಾಂಕ		ಲಂಬಸಾಲು,
+	ಪೂರ್ಣಾಂಕ		ಅಗಲ,
+	ಪೂರ್ಣಾಂಕ		ಎತ್ತರ)
 {
-    vim_draw_area_add_multisign(VIM_DRAW_AREA(gui.drawarea), surf, row, col,
-	    width, height);
+    vim_draw_area_ಕೂಡಿಸು_multisign(VIM_DRAW_AREA(gui.drawarea), surf, ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು,
+	    ಅಗಲ, ಎತ್ತರ);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    void
-gui_mch_clear_block(int row1, int col1, int row2, int col2)
+    ಶೂನ್ಯ
+gui_mch_clear_ಖಂಡ(ಪೂರ್ಣಾಂಕ row1, ಪೂರ್ಣಾಂಕ col1, ಪೂರ್ಣಾಂಕ row2, ಪೂರ್ಣಾಂಕ col2)
 {
-    vim_draw_area_clear_block(VIM_DRAW_AREA(gui.drawarea), row1,
+    vim_draw_area_clear_ಖಂಡ(VIM_DRAW_AREA(gui.drawarea), row1,
 	    col1, row2, col2);
-    if (gui.drawarea != NULL)
-	gtk_widget_queue_draw(gui.drawarea);
+    ಆದರೆ (gui.drawarea != ಖಾಲಿ)
+	gtk_widget_ಸರತಿ_draw(gui.drawarea);
 }
 
-    void
-gui_mch_clear_all(void)
+    ಶೂನ್ಯ
+gui_mch_clear_all(ಶೂನ್ಯ)
 {
     vim_draw_area_clear(VIM_DRAW_AREA(gui.drawarea));
-    if (gui.drawarea != NULL)
-	gtk_widget_queue_draw(gui.drawarea);
+    ಆದರೆ (gui.drawarea != ಖಾಲಿ)
+	gtk_widget_ಸರತಿ_draw(gui.drawarea);
 }
 
-    void
-gui_mch_delete_lines(int row, int num_lines)
+    ಶೂನ್ಯ
+gui_mch_delete_ಸಾಲುಗಳು(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು, ಪೂರ್ಣಾಂಕ ಅಂಕೆ_ಸಾಲುಗಳು)
 {
-    vim_draw_area_move_block(VIM_DRAW_AREA(gui.drawarea),
-	    row, row + num_lines, gui.scroll_region_bot,
-	    gui.scroll_region_left, gui.scroll_region_right);
-    gui_clear_block(
-	    gui.scroll_region_bot - num_lines + 1, gui.scroll_region_left,
-	    gui.scroll_region_bot, gui.scroll_region_right);
+    vim_draw_area_move_ಖಂಡ(VIM_DRAW_AREA(gui.drawarea),
+	    ಅಡ್ಡಸಾಲು, ಅಡ್ಡಸಾಲು + ಅಂಕೆ_ಸಾಲುಗಳು, gui.scroll_region_bot,
+	    gui.scroll_region_ಎಡ, gui.scroll_region_ಬಲ);
+    gui_clear_ಖಂಡ(
+	    gui.scroll_region_bot - ಅಂಕೆ_ಸಾಲುಗಳು + 1, gui.scroll_region_ಎಡ,
+	    gui.scroll_region_bot, gui.scroll_region_ಬಲ);
 
-    gtk_widget_queue_draw(gui.drawarea);
+    gtk_widget_ಸರತಿ_draw(gui.drawarea);
 }
 
-    void
-gui_mch_insert_lines(int row, int num_lines)
+    ಶೂನ್ಯ
+gui_mch_ಸೇರಿಸು_ಸಾಲುಗಳು(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು, ಪೂರ್ಣಾಂಕ ಅಂಕೆ_ಸಾಲುಗಳು)
 {
-    vim_draw_area_move_block(VIM_DRAW_AREA(gui.drawarea),
-	    row + num_lines, row, gui.scroll_region_bot - num_lines,
-	    gui.scroll_region_left, gui.scroll_region_right);
-    gui_clear_block(
-	    row, gui.scroll_region_left,
-	    row + num_lines - 1, gui.scroll_region_right);
+    vim_draw_area_move_ಖಂಡ(VIM_DRAW_AREA(gui.drawarea),
+	    ಅಡ್ಡಸಾಲು + ಅಂಕೆ_ಸಾಲುಗಳು, ಅಡ್ಡಸಾಲು, gui.scroll_region_bot - ಅಂಕೆ_ಸಾಲುಗಳು,
+	    gui.scroll_region_ಎಡ, gui.scroll_region_ಬಲ);
+    gui_clear_ಖಂಡ(
+	    ಅಡ್ಡಸಾಲು, gui.scroll_region_ಎಡ,
+	    ಅಡ್ಡಸಾಲು + ಅಂಕೆ_ಸಾಲುಗಳು - 1, gui.scroll_region_ಬಲ);
 
-    gtk_widget_queue_draw(gui.drawarea);
+    gtk_widget_ಸರತಿ_draw(gui.drawarea);
 }
 
 /*
  * See vim_draw_area_set_cursor() for more information
  */
-    void
-gui_gtk4_draw_cursor(guicolor_T bg, guicolor_T fg, int w, int h)
+    ಶೂನ್ಯ
+gui_gtk4_draw_cursor(guicolor_T bg, guicolor_T fg, ಪೂರ್ಣಾಂಕ w, ಪೂರ್ಣಾಂಕ h)
 {
-    gui_mch_set_bg_color(bg);
-    gui_mch_set_fg_color(fg);
-    vim_draw_area_set_cursor(VIM_DRAW_AREA(gui.drawarea), w, h);
-    gtk_widget_queue_draw(gui.drawarea);
+    gui_mch_ಗಣ_bg_color(bg);
+    gui_mch_ಗಣ_fg_color(fg);
+    vim_draw_area_ಗಣ_cursor(VIM_DRAW_AREA(gui.drawarea), w, h);
+    gtk_widget_ಸರತಿ_draw(gui.drawarea);
 }
 
-    void
-gui_mch_flash(int msec)
+    ಶೂನ್ಯ
+gui_mch_flash(ಪೂರ್ಣಾಂಕ msec)
 {
     // Invert the screen, wait, then invert back
-    gui_mch_invert_rectangle(0, 0, (int)Rows - 1, (int)Columns - 1);
+    gui_mch_invert_rectangle(0, 0, (ಪೂರ್ಣಾಂಕ)ಅಡ್ಡಸಾಲುಗಳು - 1, (ಪೂರ್ಣಾಂಕ)Columns - 1);
     gui_mch_flush();
-    ui_delay((long)msec, TRUE);
-    gui_mch_invert_rectangle(0, 0, (int)Rows - 1, (int)Columns - 1);
+    ui_delay((ದೀರ್ಘ)msec, TRUE);
+    gui_mch_invert_rectangle(0, 0, (ಪೂರ್ಣಾಂಕ)ಅಡ್ಡಸಾಲುಗಳು - 1, (ಪೂರ್ಣಾಂಕ)Columns - 1);
 }
 
-    void
-gui_mch_invert_rectangle(int r, int c, int nr, int nc)
+    ಶೂನ್ಯ
+gui_mch_invert_rectangle(ಪೂರ್ಣಾಂಕ r, ಪೂರ್ಣಾಂಕ c, ಪೂರ್ಣಾಂಕ nr, ಪೂರ್ಣಾಂಕ nc)
 {
-    vim_draw_area_invert_block(VIM_DRAW_AREA(gui.drawarea), r, c, nr, nc);
-    gtk_widget_queue_draw(gui.drawarea);
+    vim_draw_area_invert_ಖಂಡ(VIM_DRAW_AREA(gui.drawarea), r, c, nr, nc);
+    gtk_widget_ಸರತಿ_draw(gui.drawarea);
 }
 
 /*
@@ -1599,203 +1599,203 @@ gui_mch_invert_rectangle(int r, int c, int nr, int nc)
  * ============================================================
  */
 
-    static gboolean
-key_press_event(GtkEventControllerKey *controller UNUSED,
-	guint key_sym, guint keycode UNUSED,
-	GdkModifierType state, gpointer data UNUSED)
+    ಸ್ಥಿರ gboolean
+ಕೀಲಿ_press_event(Gtk_Event_Controller_ಕೀಲಿ *controller ಬಳಸದ,
+	guint ಕೀಲಿ_sym, guint keycode ಬಳಸದ,
+	GdkModifierType state, gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
     char_u	string[32], string2[32];
-    int		len;
-    int		i;
-    int		modifiers;
-    int		key;
+    ಪೂರ್ಣಾಂಕ		len;
+    ಪೂರ್ಣಾಂಕ		i;
+    ಪೂರ್ಣಾಂಕ		modifiers;
+    ಪೂರ್ಣಾಂಕ		ಕೀಲಿ;
     char_u	*s, *d;
 
-#ifdef FEAT_XIM
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XIM
     // Let the input method have a go at the key event.
     // If it consumed the event, we're done.
-    if (xic != NULL)
+    ಆದರೆ (xic != ಖಾಲಿ)
     {
 	GdkEvent *event = gtk_event_controller_get_current_event(
 		GTK_EVENT_CONTROLLER(controller));
-	if (event != NULL && gtk_im_context_filter_keypress(xic, event))
-	    return TRUE;
+	ಆದರೆ (event != ಖಾಲಿ && gtk_im_context_filter_keypress(xic, event))
+	    ಹಿಂತಿರುಗಿ TRUE;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef FEAT_MENU
-    if (key_sym == GDK_KEY_F10 && gui.menubar != NULL)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MENU
+    ಆದರೆ (ಕೀಲಿ_sym == GDK_ಕೀಲಿ_F10 && gui.menubar != ಖಾಲಿ)
     {
-	static char_u k10[] = {K_SPECIAL, 'k', ';', 0};
+	ಸ್ಥಿರ char_u k10[] = {K_SPECIAL, 'k', ';', 0};
 
-	if (check_map(k10, State, FALSE, TRUE, FALSE, NULL, NULL) == NULL)
+	ಆದರೆ (check_map(k10, State, FALSE, TRUE, FALSE, ಖಾಲಿ, ಖಾಲಿ) == ಖಾಲಿ)
 	{
 	    show_menubar_popover();
-	    return TRUE;
+	    ಹಿಂತಿರುಗಿ TRUE;
 	}
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    len = keyval_to_string(key_sym, string2);
+    len = keyval_ಗಮ್ಯ_string(ಕೀಲಿ_sym, string2);
 
-    if (len > 1 && input_conv.vc_type != CONV_NONE)
-	len = convert_input(string2, len, sizeof(string2));
+    ಆದರೆ (len > 1 && ಒಳಹರಿವು_conv.vc_type != CONV_NONE)
+	len = convert_ಒಳಹರಿವು(string2, len, ಗಾತ್ರ(string2));
 
     s = string2;
     d = string;
-    for (i = 0; i < len; ++i)
+    ಗಾಗಿ (i = 0; i < len; ++i)
     {
 	*d++ = s[i];
-	if (d[-1] == CSI && d + 2 < string + sizeof(string))
+	ಆದರೆ (d[-1] == CSI && d + 2 < string + ಗಾತ್ರ(string))
 	{
 	    *d++ = KS_EXTRA;
-	    *d++ = (int)KE_CSI;
+	    *d++ = (ಪೂರ್ಣಾಂಕ)KE_CSI;
 	}
     }
     len = d - string;
 
     // Shift-Tab results in Left_Tab
-    if (key_sym == GDK_KEY_ISO_Left_Tab)
+    ಆದರೆ (ಕೀಲಿ_sym == GDK_ಕೀಲಿ_ISO_ಎಡ_Tab)
     {
-	key_sym = GDK_KEY_Tab;
-	state |= GDK_SHIFT_MASK;
+	ಕೀಲಿ_sym = GDK_ಕೀಲಿ_Tab;
+	state |= GDK_ಸರಿಸು_ಮುಖವಾಡ;
     }
 
-#ifdef FEAT_MENU
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MENU
     // If there is a menu and 'wak' is "yes", or 'wak' is "menu" and the key
     // is a menu shortcut, we ignore everything with the ALT modifier.
-    if ((state & GDK_ALT_MASK)
-	    && gui.menu_is_active
+    ಆದರೆ ((state & GDK_ALT_ಮುಖವಾಡ)
+	    && gui.menu_is_ಸಕ್ರಿಯ
 	    && (*p_wak == 'y'
 		|| (*p_wak == 'm'
 		    && len == 1
 		    && gui_is_menu_shortcut(string[0]))))
 	// Tell GTK we have not handled the key (so it can handle it).
-	return FALSE;
-#endif
+	ಹಿಂತಿರುಗಿ FALSE;
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Check for special keys
-    if (len == 0 || len == 1)
+    ಆದರೆ (len == 0 || len == 1)
     {
-	for (i = 0; special_keys[i].key_sym != 0; i++)
+	ಗಾಗಿ (i = 0; special_ಕೀಲಿಗಳು[i].ಕೀಲಿ_sym != 0; i++)
 	{
-	    if (special_keys[i].key_sym == key_sym)
+	    ಆದರೆ (special_ಕೀಲಿಗಳು[i].ಕೀಲಿ_sym == ಕೀಲಿ_sym)
 	    {
 		string[0] = CSI;
-		string[1] = special_keys[i].code0;
-		string[2] = special_keys[i].code1;
+		string[1] = special_ಕೀಲಿಗಳು[i].code0;
+		string[2] = special_ಕೀಲಿಗಳು[i].code1;
 		len = -3;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	}
     }
 
-    if (len == 0)
-	return TRUE;
+    ಆದರೆ (len == 0)
+	ಹಿಂತಿರುಗಿ TRUE;
 
-    if (len == -3)
-	key = TO_SPECIAL(string[1], string[2]);
-    else
+    ಆದರೆ (len == -3)
+	ಕೀಲಿ = ಗಮ್ಯ_SPECIAL(string[1], string[2]);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	string[len] = NUL;
-	key = mb_ptr2char(string);
+	ಕೀಲಿ = mb_ptr2char(string);
     }
 
     modifiers = modifiers_gdk2vim(state);
 
-    key = simplify_key(key, &modifiers);
-    if (key == CSI)
-	key = K_CSI;
-    if (IS_SPECIAL(key))
+    ಕೀಲಿ = simplify_ಕೀಲಿ(ಕೀಲಿ, &modifiers);
+    ಆದರೆ (ಕೀಲಿ == CSI)
+	ಕೀಲಿ = K_CSI;
+    ಆದರೆ (IS_SPECIAL(ಕೀಲಿ))
     {
 	string[0] = CSI;
-	string[1] = K_SECOND(key);
-	string[2] = K_THIRD(key);
+	string[1] = K_ಎರಡನೇ(ಕೀಲಿ);
+	string[2] = K_ಮೂರನೇ(ಕೀಲಿ);
 	len = 3;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	key = may_adjust_key_for_ctrl(modifiers, key);
-	modifiers = may_remove_shift_modifier(modifiers, key);
-	len = mb_char2bytes(key, string);
+	ಕೀಲಿ = may_adjust_ಕೀಲಿ_for_ctrl(modifiers, ಕೀಲಿ);
+	modifiers = may_remove_ಸರಿಸು_modifier(modifiers, ಕೀಲಿ);
+	len = mb_char2bytes(ಕೀಲಿ, string);
     }
 
-    if (modifiers != 0)
+    ಆದರೆ (modifiers != 0)
     {
 	string2[0] = CSI;
 	string2[1] = KS_MODIFIER;
 	string2[2] = modifiers;
-	add_to_input_buf(string2, 3);
+	ಕೂಡಿಸು_ಗಮ್ಯ_ಒಳಹರಿವು_buf(string2, 3);
     }
 
     {
-	int int_ch = check_for_interrupt(key, modifiers);
-	if (int_ch != NUL)
+	ಪೂರ್ಣಾಂಕ int_ch = check_for_ಅಡಚಣೆ(ಕೀಲಿ, modifiers);
+	ಆದರೆ (int_ch != NUL)
 	{
-	    trash_input_buf();
+	    trash_ಒಳಹರಿವು_buf();
 	    string[0] = int_ch;
 	    len = 1;
 	}
     }
 
-    add_to_input_buf(string, len);
+    ಕೂಡಿಸು_ಗಮ್ಯ_ಒಳಹರಿವು_buf(string, len);
 
-    if (p_mh)
+    ಆದರೆ (p_mh)
 	gui_mch_mousehide(TRUE);
 
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
-    static void
-key_release_event(GtkEventControllerKey *controller UNUSED,
-	guint keyval UNUSED, guint keycode UNUSED,
-	GdkModifierType state UNUSED, gpointer data UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಕೀಲಿ_release_event(Gtk_Event_Controller_ಕೀಲಿ *controller ಬಳಸದ,
+	guint keyval ಬಳಸದ, guint keycode ಬಳಸದ,
+	GdkModifierType state ಬಳಸದ, gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
 }
 
-static int mouse_timed_out = TRUE;
-static guint mouse_click_timer = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ mouse_timed_ಹೊರಹೋಗು = TRUE;
+ಸ್ಥಿರ guint mouse_click_timer = 0;
 
-    static timeout_cb_type
-mouse_click_timer_cb(gpointer data)
+    ಸ್ಥಿರ timeout_cb_type
+mouse_click_timer_cb(gpointer ದತ್ತಾಂಶ)
 {
-    *(int *)data = TRUE;
-    return FALSE;
+    *(ಪೂರ್ಣಾಂಕ *)ದತ್ತಾಂಶ = TRUE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
 modifiers_gdk2mouse(guint state)
 {
-    int modifiers = 0;
+    ಪೂರ್ಣಾಂಕ modifiers = 0;
 
-    if (state & GDK_SHIFT_MASK)
-	modifiers |= MOUSE_SHIFT;
-    if (state & GDK_CONTROL_MASK)
+    ಆದರೆ (state & GDK_ಸರಿಸು_ಮುಖವಾಡ)
+	modifiers |= MOUSE_ಸರಿಸು;
+    ಆದರೆ (state & GDK_CONTROL_ಮುಖವಾಡ)
 	modifiers |= MOUSE_CTRL;
-    if (state & GDK_ALT_MASK)
+    ಆದರೆ (state & GDK_ALT_ಮುಖವಾಡ)
 	modifiers |= MOUSE_ALT;
 
-    return modifiers;
+    ಹಿಂತಿರುಗಿ modifiers;
 }
 
 // GdkModifierType has no mask covering the mouse buttons only.
-#define ANY_BUTTON_MASK (GDK_BUTTON1_MASK | GDK_BUTTON2_MASK \
-	| GDK_BUTTON3_MASK | GDK_BUTTON4_MASK | GDK_BUTTON5_MASK)
+#ವ್ಯಾಖ್ಯಾನಿಸು ANY_BUTTON_ಮುಖವಾಡ (GDK_BUTTON1_ಮುಖವಾಡ | GDK_BUTTON2_ಮುಖವಾಡ \
+	| GDK_BUTTON3_ಮುಖವಾಡ | GDK_BUTTON4_ಮುಖವಾಡ | GDK_BUTTON5_ಮುಖವಾಡ)
 
 // Track which mouse button is currently pressed for drag detection.
 // -1 means no button is pressed (MOUSE_LEFT is 0x00, so can't use 0).
-static int mouse_pressed_button = -1;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ mouse_pressed_button = -1;
 
-static guint motion_repeat_timer = 0;
-static gboolean motion_repeat_offset = FALSE;
-static int mouse_press_x = -1, mouse_press_y = -1;
+ಸ್ಥಿರ guint motion_repeat_timer = 0;
+ಸ್ಥಿರ gboolean motion_repeat_ಸ್ಥಾನಾಂತರ = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ mouse_press_x = -1, mouse_press_y = -1;
 
-    static void
-button_press_event(GtkGestureClick *gesture, int n_press UNUSED,
-	double x, double y, gpointer data UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+button_press_event(GtkGestureClick *gesture, ಪೂರ್ಣಾಂಕ n_press ಬಳಸದ,
+	ದ್ವಿಗುಣ x, ದ್ವಿಗುಣ y, gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    int button;
-    int repeated_click = FALSE;
+    ಪೂರ್ಣಾಂಕ button;
+    ಪೂರ್ಣಾಂಕ repeated_click = FALSE;
     int_u vim_modifiers;
     guint btn;
     GdkModifierType state;
@@ -1806,40 +1806,40 @@ button_press_event(GtkGestureClick *gesture, int n_press UNUSED,
     state = gdk_event_get_modifier_state(event);
     btn = gdk_button_event_get_button(event);
 
-    if (!mouse_timed_out && mouse_click_timer)
+    ಆದರೆ (!mouse_timed_ಹೊರಹೋಗು && mouse_click_timer)
     {
 	timeout_remove(mouse_click_timer);
 	mouse_click_timer = 0;
 	repeated_click = TRUE;
     }
 
-    mouse_timed_out = FALSE;
-    mouse_click_timer = timeout_add(p_mouset, mouse_click_timer_cb,
-	    &mouse_timed_out);
+    mouse_timed_ಹೊರಹೋಗು = FALSE;
+    mouse_click_timer = timeout_ಕೂಡಿಸು(p_mouset, mouse_click_timer_cb,
+	    &mouse_timed_ಹೊರಹೋಗು);
 
-    switch (btn)
+    ಆಯ್ಕೆ (btn)
     {
-	case 1: button = MOUSE_LEFT; break;
-	case 2: button = MOUSE_MIDDLE; break;
-	case 3: button = MOUSE_RIGHT; break;
-	case 8: button = MOUSE_X1; break;
-	case 9: button = MOUSE_X2; break;
-	default: return;
+	ಸ್ಥಿತಿ 1: button = MOUSE_ಎಡ; ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ 2: button = MOUSE_ಮಧ್ಯ; ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ 3: button = MOUSE_ಬಲ; ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ 8: button = MOUSE_X1; ನಿಲ್ಲಿಸು;
+	ಸ್ಥಿತಿ 9: button = MOUSE_X2; ನಿಲ್ಲಿಸು;
+	ಪೂರ್ವನಿಯೋಜಿತ: ಹಿಂತಿರುಗಿ;
     }
 
-    mouse_press_x = (int)x;
-    mouse_press_y = (int)y;
+    mouse_press_x = (ಪೂರ್ಣಾಂಕ)x;
+    mouse_press_y = (ಪೂರ್ಣಾಂಕ)y;
 
     mouse_pressed_button = button;
     vim_modifiers = modifiers_gdk2mouse(state);
-    gui_send_mouse_event(button, (int)x, (int)y, repeated_click, vim_modifiers);
+    gui_send_mouse_event(button, (ಪೂರ್ಣಾಂಕ)x, (ಪೂರ್ಣಾಂಕ)y, repeated_click, vim_modifiers);
 }
 
-    static void
-button_release_event(GtkGestureClick *gesture, int n_press UNUSED,
-	double x, double y, gpointer data UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+button_release_event(GtkGestureClick *gesture, ಪೂರ್ಣಾಂಕ n_press ಬಳಸದ,
+	ದ್ವಿಗುಣ x, ದ್ವಿಗುಣ y, gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    int vim_modifiers;
+    ಪೂರ್ಣಾಂಕ vim_modifiers;
     GdkModifierType state;
     GdkEvent *event;
 
@@ -1849,59 +1849,59 @@ button_release_event(GtkGestureClick *gesture, int n_press UNUSED,
     vim_modifiers = modifiers_gdk2mouse(state);
 
     // If we are repeating motion events, then stop
-    if (motion_repeat_timer != 0)
+    ಆದರೆ (motion_repeat_timer != 0)
     {
 	timeout_remove(motion_repeat_timer);
 	motion_repeat_timer = 0;
     }
 
     mouse_pressed_button = -1;
-    gui_send_mouse_event(MOUSE_RELEASE, (int)x, (int)y, FALSE, vim_modifiers);
+    gui_send_mouse_event(MOUSE_RELEASE, (ಪೂರ್ಣಾಂಕ)x, (ಪೂರ್ಣಾಂಕ)y, FALSE, vim_modifiers);
 }
 
-static double prev_mouse_x = -1.0;
-static double prev_mouse_y = -1.0;
+ಸ್ಥಿರ ದ್ವಿಗುಣ prev_mouse_x = -1.0;
+ಸ್ಥಿರ ದ್ವಿಗುಣ prev_mouse_y = -1.0;
 
-static GdkModifierType cur_state = 0;
+ಸ್ಥಿರ GdkModifierType cur_state = 0;
 
-    static timeout_cb_type
-mouse_repeat_timer_cb(gpointer data UNUSED)
+    ಸ್ಥಿರ timeout_cb_type
+mouse_repeat_timer_cb(gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    int x, y;
+    ಪೂರ್ಣಾಂಕ x, y;
 
-    if (mouse_pressed_button == -1)
+    ಆದರೆ (mouse_pressed_button == -1)
     {
 	motion_repeat_timer = 0;
-	return G_SOURCE_REMOVE;
+	ಹಿಂತಿರುಗಿ G_ಮೂಲ_REMOVE;
     }
 
     // If there already is a mouse click in the input buffer, wait another
     // time (otherwise we would create a backlog of clicks)
-    if (vim_used_in_input_buf() > 10)
-	return G_SOURCE_CONTINUE;
+    ಆದರೆ (vim_ಬಳಸಿದ_ಒಳ_ಒಳಹರಿವು_buf() > 10)
+	ಹಿಂತಿರುಗಿ G_ಮೂಲ_CONTINUE;
 
-    x = (int)prev_mouse_x;
-    y = (int)prev_mouse_y;
+    x = (ಪೂರ್ಣಾಂಕ)prev_mouse_x;
+    y = (ಪೂರ್ಣಾಂಕ)prev_mouse_y;
 
     // Fake a motion event.
     //
     // Trick: Pretend the mouse moved to the next character on every other
     // event, otherwise drag events will be discarded, because they are still in
     // the same character.
-    if (motion_repeat_offset)
-	x += gui.char_width;
-    motion_repeat_offset = !motion_repeat_offset;
+    ಆದರೆ (motion_repeat_ಸ್ಥಾನಾಂತರ)
+	x += gui.char_ಅಗಲ;
+    motion_repeat_ಸ್ಥಾನಾಂತರ = !motion_repeat_ಸ್ಥಾನಾಂತರ;
 
     gui_send_mouse_event(MOUSE_DRAG, x, y, FALSE,
 	    modifiers_gdk2mouse(cur_state));
 
     // Always continue, when button is released, then this timer is removed.
-    return G_SOURCE_CONTINUE;
+    ಹಿಂತಿರುಗಿ G_ಮೂಲ_CONTINUE;
 }
 
-    static void
-motion_notify_event(GtkEventControllerMotion *controller UNUSED,
-	double x, double y, gpointer data UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+motion_notify_event(GtkEventControllerMotion *controller ಬಳಸದ,
+	ದ್ವಿಗುಣ x, ದ್ವಿಗುಣ y, gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
     GdkEvent *event = gtk_event_controller_get_current_event(
 	    GTK_EVENT_CONTROLLER(controller));
@@ -1909,10 +1909,10 @@ motion_notify_event(GtkEventControllerMotion *controller UNUSED,
     // The button release event may have gone to another widget, e.g. a modal
     // dialog. Forget about the pressed button when no button is down anymore,
     // otherwise moving the mouse would be taken for a drag.
-    if (mouse_pressed_button >= 0 && event != NULL
-	    && !(gdk_event_get_modifier_state(event) & ANY_BUTTON_MASK))
+    ಆದರೆ (mouse_pressed_button >= 0 && event != ಖಾಲಿ
+	    && !(gdk_event_get_modifier_state(event) & ANY_BUTTON_ಮುಖವಾಡ))
     {
-	if (motion_repeat_timer != 0)
+	ಆದರೆ (motion_repeat_timer != 0)
 	{
 	    timeout_remove(motion_repeat_timer);
 	    motion_repeat_timer = 0;
@@ -1920,15 +1920,15 @@ motion_notify_event(GtkEventControllerMotion *controller UNUSED,
 	mouse_pressed_button = -1;
     }
 
-    if (mouse_pressed_button >= 0)
+    ಆದರೆ (mouse_pressed_button >= 0)
     {
 	GdkModifierType state;
-	int		w, h;
+	ಪೂರ್ಣಾಂಕ		w, h;
 
-	if (event != NULL)
+	ಆದರೆ (event != ಖಾಲಿ)
 	{
 	    cur_state = state = gdk_event_get_modifier_state(event);
-	    gui_send_mouse_event(MOUSE_DRAG, (int)x, (int)y,
+	    gui_send_mouse_event(MOUSE_DRAG, (ಪೂರ್ಣಾಂಕ)x, (ಪೂರ್ಣಾಂಕ)y,
 		    FALSE, modifiers_gdk2mouse(state));
 	}
 
@@ -1937,40 +1937,40 @@ motion_notify_event(GtkEventControllerMotion *controller UNUSED,
 	// repeats depend on how far away the pointer is from the start of the
 	// drag.
 	//
-	w = gtk_widget_get_width(gui.drawarea);
-	h = gtk_widget_get_height(gui.drawarea);
+	w = gtk_widget_get_ಅಗಲ(gui.drawarea);
+	h = gtk_widget_get_ಎತ್ತರ(gui.drawarea);
 
-	if (motion_repeat_timer > 0)
+	ಆದರೆ (motion_repeat_timer > 0)
 	    timeout_remove(motion_repeat_timer);
 
-	if (x < 0 || y < 0 || x >= w || y >= h)
+	ಆದರೆ (x < 0 || y < 0 || x >= w || y >= h)
 	{
-	    int	dx, dy;
-	    int offshoot;
-	    int	delay;
+	    ಪೂರ್ಣಾಂಕ	dx, dy;
+	    ಪೂರ್ಣಾಂಕ offshoot;
+	    ಪೂರ್ಣಾಂಕ	delay;
 
 	    dx = x < 0 ? -x + mouse_press_x : x - mouse_press_x;
 	    dy = y < 0 ? -y + mouse_press_y : y - mouse_press_y;
 
 	    offshoot = dx > dy ? dx : dy;
 
-	    if (offshoot > 127)
+	    ಆದರೆ (offshoot > 127)
 		delay = 5;
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		delay = (130 * (127 - offshoot)) / 127 + 5;
 
-	    motion_repeat_timer = timeout_add(delay,
-		    mouse_repeat_timer_cb, NULL);
+	    motion_repeat_timer = timeout_ಕೂಡಿಸು(delay,
+		    mouse_repeat_timer_cb, ಖಾಲಿ);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    motion_repeat_timer = 0;
     }
-    else
-	gui_mouse_moved((int)x, (int)y);
+    ಇಲ್ಲದಿದ್ದರೆ
+	gui_mouse_moved((ಪೂರ್ಣಾಂಕ)x, (ಪೂರ್ಣಾಂಕ)y);
 
     // Only unhide if mouse actually moved. GTK seems to send a motion event
     // when switching tabs, causing the cursor to unhide.
-    if (p_mh && ((prev_mouse_x == -1 || prev_mouse_y == -1)
+    ಆದರೆ (p_mh && ((prev_mouse_x == -1 || prev_mouse_y == -1)
 		|| (fabs(prev_mouse_x - x) > 0.05
 		    && fabs(prev_mouse_y - y) > 0.05)))
 	gui_mch_mousehide(FALSE);
@@ -1983,9 +1983,9 @@ motion_notify_event(GtkEventControllerMotion *controller UNUSED,
     gtk_widget_grab_focus(gui.drawarea);
 }
 
-    static void
-enter_notify_event(GtkEventControllerMotion *controller UNUSED,
-	double x, double y, gpointer data UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+enter_notify_event(GtkEventControllerMotion *controller ಬಳಸದ,
+	ದ್ವಿಗುಣ x, ದ್ವಿಗುಣ y, gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
     prev_mouse_x = x;
     prev_mouse_y = y;
@@ -1994,209 +1994,209 @@ enter_notify_event(GtkEventControllerMotion *controller UNUSED,
     gtk_widget_grab_focus(gui.drawarea);
 }
 
-    static gboolean
-scroll_event(GtkEventControllerScroll *controller UNUSED,
-	double dx UNUSED, double dy, gpointer data UNUSED)
+    ಸ್ಥಿರ gboolean
+scroll_event(GtkEventControllerScroll *controller ಬಳಸದ,
+	ದ್ವಿಗುಣ dx ಬಳಸದ, ದ್ವಿಗುಣ dy, gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    int button;
+    ಪೂರ್ಣಾಂಕ button;
     int_u vim_modifiers;
-    int x, y;
+    ಪೂರ್ಣಾಂಕ x, y;
     GdkModifierType state;
     GdkEvent *event;
 
     event = gtk_event_controller_get_current_event(
 	    GTK_EVENT_CONTROLLER(controller));
-    if (event == NULL)
-	return FALSE;
+    ಆದರೆ (event == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FALSE;
     state = gdk_event_get_modifier_state(event);
 
-    if (dy < 0)
+    ಆದರೆ (dy < 0)
 	button = MOUSE_4;	// scroll up
-    else if (dy > 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (dy > 0)
 	button = MOUSE_5;	// scroll down
-    else if (dx < 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (dx < 0)
 	button = MOUSE_7;	// scroll left
-    else if (dx > 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (dx > 0)
 	button = MOUSE_6;	// scroll right
-    else
-	return FALSE;
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಹಿಂತಿರುಗಿ FALSE;
 
     vim_modifiers = modifiers_gdk2mouse(state);
 
     gui_mch_getmouse(&x, &y);
     gui_send_mouse_event(button, x, y, FALSE, vim_modifiers);
 
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
-    static void
-focus_in_event(GtkEventControllerFocus *controller UNUSED,
-	gpointer data UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+focus_ಒಳ_event(GtkEventControllerFocus *controller ಬಳಸದ,
+	gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    if (gtk_window_is_active(GTK_WINDOW(gui.mainwin)))
+    ಆದರೆ (gtk_ಕಿಟಕಿ_is_ಸಕ್ರಿಯ(GTK_ಕಿಟಕಿ(gui.mainwin)))
     {
 	gui_focus_change(TRUE);
-	if (blink_state == BLINK_NONE)
-	    gui_mch_start_blink();
+	ಆದರೆ (blink_state == BLINK_NONE)
+	    gui_mch_ಆರಂಭ_blink();
     }
 }
 
-    static void
-focus_out_event(GtkEventControllerFocus *controller UNUSED,
-	gpointer data UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+focus_ಹೊರಹೋಗು_event(GtkEventControllerFocus *controller ಬಳಸದ,
+	gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    if (!gtk_window_is_active(GTK_WINDOW(gui.mainwin)))
+    ಆದರೆ (!gtk_ಕಿಟಕಿ_is_ಸಕ್ರಿಯ(GTK_ಕಿಟಕಿ(gui.mainwin)))
     {
 	gui_focus_change(FALSE);
-	if (blink_state != BLINK_NONE)
+	ಆದರೆ (blink_state != BLINK_NONE)
 	    gui_mch_stop_blink(TRUE);
     }
 }
 
-#if defined(FEAT_IMAGE)
-    static void
-scale_factor_cb(GdkSurface  *surface,
-	GParamSpec	    *pspec UNUSED,
-	void		    *udata UNUSED)
+#ಆದರೆ defined(FEAT_IMAGE)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+scale_ಗುಣಕ_cb(GdkSurface  *surface,
+	GParamSpec	    *pspec ಬಳಸದ,
+	ಶೂನ್ಯ		    *udata ಬಳಸದ)
 {
     gui.scale = gdk_surface_get_scale(surface);
     redraw_all_later(UPD_VALID);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    static void
-drawarea_realize_cb(GtkWidget *widget UNUSED, gpointer data UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+drawarea_realize_cb(GtkWidget *widget ಬಳಸದ, gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
-#if defined(FEAT_IMAGE)
+#ಆದರೆ defined(FEAT_IMAGE)
     // Use GdkSurface, as that handles fractional scale values.
     GdkSurface *surface = gtk_native_get_surface(
 	    gtk_widget_get_native(gui.drawarea));
 
     gui.scale = gdk_surface_get_scale(surface);
     g_signal_connect(G_OBJECT(surface), "notify::scale",
-	    G_CALLBACK(scale_factor_cb), NULL);
+	    G_CALLBACK(scale_ಗುಣಕ_cb), ಖಾಲಿ);
     redraw_all_later(UPD_VALID);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     gui_mch_new_colors();
 }
 
-    static void
-drawarea_unrealize_cb(GtkWidget *widget UNUSED, gpointer data UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+drawarea_unrealize_cb(GtkWidget *widget ಬಳಸದ, gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
-#ifdef FEAT_XIM
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_XIM
     im_shutdown();
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-typedef enum
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಎಣಿಕೆ
 {
-    READ_DATA_CLIP,	    // Clipboard data
-    READ_DATA_DROP,	    // URI or text DND data
-    READ_DATA_DROP_DATA	    // HTML DND data
-} ReadDataType;
+    READ_ದತ್ತಾಂಶ_CLIP,	    // Clipboard data
+    READ_ದತ್ತಾಂಶ_DROP,	    // URI or text DND data
+    READ_ದತ್ತಾಂಶ_DROP_ದತ್ತಾಂಶ	    // HTML DND data
+} Read_ದತ್ತಾಂಶ_Type;
 
-#define READDATA_BUFSIZE 4096
+#ವ್ಯಾಖ್ಯಾನಿಸು READDATA_BUFSIZE 4096
 
 // Used for reading clipboard and DND data.
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    ReadDataType    type;
+    Read_ದತ್ತಾಂಶ_Type    type;
 
     GCancellable    *cancel;
     GByteArray	    *arr; // NULL when not needed
-    char	    *buf; // NULL when not needed
-} ReadData;
+    ಅಕ್ಷರ	    *buf; // NULL when not needed
+} Read_ದತ್ತಾಂಶ;
 
-#ifdef FEAT_DND
-typedef struct
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DND
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    ReadData	rd;
+    Read_ದತ್ತಾಂಶ	rd;
     GdkDrop	*drop;
-    int		x;
-    int		y;
-} DropReadData;
-#endif
+    ಪೂರ್ಣಾಂಕ		x;
+    ಪೂರ್ಣಾಂಕ		y;
+} Drop_Read_ದತ್ತಾಂಶ;
+#ಆದರೆ_ಅಂತ್ಯ
 
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    ReadData	rd;
+    Read_ದತ್ತಾಂಶ	rd;
     Clipboard_T *cbd;
-    char	*mime_type;
-} ClipReadData;
+    ಅಕ್ಷರ	*mime_type;
+} Clip_Read_ದತ್ತಾಂಶ;
 
-    static ReadData *
-read_data_new(ReadDataType type, size_t sz)
+    ಸ್ಥಿರ Read_ದತ್ತಾಂಶ *
+read_ದತ್ತಾಂಶ_new(Read_ದತ್ತಾಂಶ_Type type, size_t sz)
 {
-    ReadData *rd = g_malloc0(sz);
+    Read_ದತ್ತಾಂಶ *rd = g_malloc0(sz);
 
     rd->type = type;
     rd->cancel = g_cancellable_new();
 
-    if (type == READ_DATA_CLIP || type == READ_DATA_DROP_DATA)
+    ಆದರೆ (type == READ_ದತ್ತಾಂಶ_CLIP || type == READ_ದತ್ತಾಂಶ_DROP_ದತ್ತಾಂಶ)
     {
 	rd->arr = g_byte_array_new();
 	rd->buf = g_malloc(READDATA_BUFSIZE);
     }
 
-    return rd;
+    ಹಿಂತಿರುಗಿ rd;
 }
 
-    static void
-read_data_free(ReadData *rd)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+read_ದತ್ತಾಂಶ_free(Read_ದತ್ತಾಂಶ *rd)
 {
     g_cancellable_cancel(rd->cancel);
 
-    if (rd->type == READ_DATA_CLIP)
-	g_free(((ClipReadData *)rd)->mime_type);
-    else if (rd->type == READ_DATA_DROP || rd->type == READ_DATA_DROP_DATA)
-	g_object_unref(((DropReadData *)rd)->drop);
+    ಆದರೆ (rd->type == READ_ದತ್ತಾಂಶ_CLIP)
+	g_free(((Clip_Read_ದತ್ತಾಂಶ *)rd)->mime_type);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (rd->type == READ_ದತ್ತಾಂಶ_DROP || rd->type == READ_ದತ್ತಾಂಶ_DROP_ದತ್ತಾಂಶ)
+	g_object_unref(((Drop_Read_ದತ್ತಾಂಶ *)rd)->drop);
     g_object_unref(rd->cancel);
-    if (rd->arr != NULL)
+    ಆದರೆ (rd->arr != ಖಾಲಿ)
 	g_byte_array_free(rd->arr, TRUE);
     g_free(rd->buf);
     g_free(rd);
 }
 
-#ifdef FEAT_DND
-static void drop_read_text(GdkDrop *drop, char_u *text);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DND
+ಸ್ಥಿರ ಶೂನ್ಯ drop_read_ಪಠ್ಯ(GdkDrop *drop, char_u *ಪಠ್ಯ);
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * General purpose callback for reading data from an input stream, either from
  * clipboard or DND.
  */
-    static void
-read_data_input_cb(
-	GInputStream	*stream,
-	GAsyncResult	*result,
-	ReadData	*rd)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+read_ದತ್ತಾಂಶ_ಒಳಹರಿವು_cb(
+	GInput_ಹರಿವು	*ಹರಿವು,
+	GAsync_ಫಲಿತಾಂಶ	*ಫಲಿತಾಂಶ,
+	Read_ದತ್ತಾಂಶ	*rd)
 {
-    ssize_t r = g_input_stream_read_finish(stream, result, NULL);
+    ssize_t r = g_ಒಳಹರಿವು_ಹರಿವು_read_ಮುಕ್ತಾಯ(ಹರಿವು, ಫಲಿತಾಂಶ, ಖಾಲಿ);
 
-    if (r == -1)
+    ಆದರೆ (r == -1)
     {
 	// Error occurred
-	DropReadData *drd = (DropReadData *)rd;
+	Drop_Read_ದತ್ತಾಂಶ *drd = (Drop_Read_ದತ್ತಾಂಶ *)rd;
 
-	if (rd->type == READ_DATA_DROP_DATA)
-	    gdk_drop_finish(drd->drop, 0);
+	ಆದರೆ (rd->type == READ_ದತ್ತಾಂಶ_DROP_ದತ್ತಾಂಶ)
+	    gdk_drop_ಮುಕ್ತಾಯ(drd->drop, 0);
     }
-    else if (r == 0)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (r == 0)
     {
 	// EOF, don't need to check for READ_DATA_DROP because that uses GType.
-	if (rd->type == READ_DATA_CLIP)
+	ಆದರೆ (rd->type == READ_ದತ್ತಾಂಶ_CLIP)
 	{
-	    ClipReadData    *crd = (ClipReadData *)rd;
-	    long	    len;
+	    Clip_Read_ದತ್ತಾಂಶ    *crd = (Clip_Read_ದತ್ತಾಂಶ *)rd;
+	    ದೀರ್ಘ	    len;
 	    char_u	    *actual, *final;
-	    int		    motion_type = MAUTO;
-	    char_u	    *tofree = NULL;
+	    ಪೂರ್ಣಾಂಕ		    motion_type = MAUTO;
+	    char_u	    *tofree = ಖಾಲಿ;
 
-	    len = (long)rd->arr->len;
+	    len = (ದೀರ್ಘ)rd->arr->len;
 	    actual = final = g_byte_array_free(rd->arr, FALSE);
-	    rd->arr = NULL;
+	    rd->arr = ಖಾಲಿ;
 
-	    if (clip_convert_data(&final, &len, &motion_type,
+	    ಆದರೆ (clip_convert_ದತ್ತಾಂಶ(&final, &len, &motion_type,
 			STRCMP(crd->mime_type, VIM_MIMETYPE_NAME) == 0,
 			STRCMP(crd->mime_type, VIMENC_MIMETYPE_NAME) == 0,
 			&tofree) == OK)
@@ -2204,61 +2204,61 @@ read_data_input_cb(
 	    g_free(actual);
 	    vim_free(tofree);
 	}
-#ifdef FEAT_DND
-	else if (rd->type == READ_DATA_DROP_DATA)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DND
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (rd->type == READ_ದತ್ತಾಂಶ_DROP_ದತ್ತಾಂಶ)
 	{
-	    DropReadData    *drd = (DropReadData *)rd;
+	    Drop_Read_ದತ್ತಾಂಶ    *drd = (Drop_Read_ದತ್ತಾಂಶ *)rd;
 	    char_u	    *str;
 
 	    // Append NUL
-	    g_byte_array_append(rd->arr, (const uint8_t *)"", 1);
+	    g_byte_array_append(rd->arr, (ಸ್ಥಿರಾಂಕ uint8_t *)"", 1);
 	    str = g_byte_array_free(rd->arr, FALSE);
-	    rd->arr = NULL;
-	    drop_read_text(drd->drop, str);
+	    rd->arr = ಖಾಲಿ;
+	    drop_read_ಪಠ್ಯ(drd->drop, str);
 	    g_free(str);
-	    gdk_drop_finish(drd->drop, gdk_drop_get_actions(drd->drop));
+	    gdk_drop_ಮುಕ್ತಾಯ(drd->drop, gdk_drop_get_actions(drd->drop));
 	}
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	// Continue reading
-	g_byte_array_append(rd->arr, (const uint8_t *)rd->buf, r);
-	g_input_stream_read_async(stream, rd->buf, READDATA_BUFSIZE,
-		G_PRIORITY_HIGH,
-		rd->cancel, (GAsyncReadyCallback)read_data_input_cb, rd);
-	return;
+	g_byte_array_append(rd->arr, (ಸ್ಥಿರಾಂಕ uint8_t *)rd->buf, r);
+	g_ಒಳಹರಿವು_ಹರಿವು_read_async(ಹರಿವು, rd->buf, READDATA_BUFSIZE,
+		G_ಆದ್ಯತೆ_ಮೇಲಿನ,
+		rd->cancel, (GAsyncReadyCallback)read_ದತ್ತಾಂಶ_ಒಳಹರಿವು_cb, rd);
+	ಹಿಂತಿರುಗಿ;
     }
 
-    read_data_free(rd);
-    g_object_unref(stream);
+    read_ದತ್ತಾಂಶ_free(rd);
+    g_object_unref(ಹರಿವು);
 }
 
-#ifdef FEAT_DND
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_DND
 /*
  * Set up for receiving DND items.
  */
-    void
-gui_gtk_set_dnd_targets(void)
+    ಶೂನ್ಯ
+gui_gtk_ಗಣ_dnd_targets(ಶೂನ್ಯ)
 {
     GdkContentFormatsBuilder	*builder = gdk_content_formats_builder_new();
     GdkContentFormats		*formats;
 
-    gdk_content_formats_builder_add_gtype(builder, GDK_TYPE_FILE_LIST);
-    gdk_content_formats_builder_add_gtype(builder, G_TYPE_STRING);
-    if (clip_html)
-	gdk_content_formats_builder_add_mime_type(builder, "text/html");
+    gdk_content_formats_builder_ಕೂಡಿಸು_gtype(builder, GDK_TYPE_FILE_LIST);
+    gdk_content_formats_builder_ಕೂಡಿಸು_gtype(builder, G_TYPE_STRING);
+    ಆದರೆ (clip_html)
+	gdk_content_formats_builder_ಕೂಡಿಸು_mime_type(builder, "text/html");
 
-    formats = gdk_content_formats_builder_free_to_formats(builder);
-    gtk_drop_target_async_set_formats(gui.drop_target, formats);
+    formats = gdk_content_formats_builder_free_ಗಮ್ಯ_formats(builder);
+    gtk_drop_ಗುರಿ_async_ಗಣ_formats(gui.drop_ಗುರಿ, formats);
     gdk_content_formats_unref(formats);
 }
 
 /*
  * Handle textual DND data. Note that this does not finish the drop.
  */
-    static void
-drop_read_text(GdkDrop *drop UNUSED, char_u *text)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+drop_read_ಪಠ್ಯ(GdkDrop *drop ಬಳಸದ, char_u *ಪಠ್ಯ)
 {
     GdkModifierType state;
     char_u	    dropkey[6] = {
@@ -2270,156 +2270,156 @@ drop_read_text(GdkDrop *drop UNUSED, char_u *text)
 	(char_u)KE_DROP
     };
 
-    if (text == NULL || *text == NUL || !query_pointer_pos(NULL, NULL, &state))
-	return;
+    ಆದರೆ (ಪಠ್ಯ == ಖಾಲಿ || *ಪಠ್ಯ == NUL || !query_ಸೂಚಕ_pos(ಖಾಲಿ, ಖಾಲಿ, &state))
+	ಹಿಂತಿರುಗಿ;
 
-    dnd_yank_drag_data((char_u *)text, (long)STRLEN(text));
+    dnd_yank_drag_ದತ್ತಾಂಶ((char_u *)ಪಠ್ಯ, (ದೀರ್ಘ)STRLEN(ಪಠ್ಯ));
 
     dropkey[2] = modifiers_gdk2vim(state);
-    if (dropkey[2] != 0)
-	add_to_input_buf(dropkey, (int)sizeof(dropkey));
-    else
-	add_to_input_buf(dropkey + 3, (int)(sizeof(dropkey) - 3));
+    ಆದರೆ (dropkey[2] != 0)
+	ಕೂಡಿಸು_ಗಮ್ಯ_ಒಳಹರಿವು_buf(dropkey, (ಪೂರ್ಣಾಂಕ)ಗಾತ್ರ(dropkey));
+    ಇಲ್ಲದಿದ್ದರೆ
+	ಕೂಡಿಸು_ಗಮ್ಯ_ಒಳಹರಿವು_buf(dropkey + 3, (ಪೂರ್ಣಾಂಕ)(ಗಾತ್ರ(dropkey) - 3));
 }
 
-    static void
-drop_read_value_cb(GdkDrop *drop, GAsyncResult *result, DropReadData *drd)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+drop_read_ಮೌಲ್ಯ_cb(GdkDrop *drop, GAsync_ಫಲಿತಾಂಶ *ಫಲಿತಾಂಶ, Drop_Read_ದತ್ತಾಂಶ *drd)
 {
-    const GValue    *value = gdk_drop_read_value_finish(drop, result, NULL);
+    ಸ್ಥಿರಾಂಕ GValue    *ಮೌಲ್ಯ = gdk_drop_read_ಮೌಲ್ಯ_ಮುಕ್ತಾಯ(drop, ಫಲಿತಾಂಶ, ಖಾಲಿ);
     gboolean	    success = FALSE;
 
-    if (value == NULL)
-	goto exit;
+    ಆದರೆ (ಮೌಲ್ಯ == ಖಾಲಿ)
+	ಹೋಗು ನಿರ್ಗಮಿಸು;
 
-    if (G_VALUE_HOLDS(value, GDK_TYPE_FILE_LIST))
+    ಆದರೆ (G_ಮೌಲ್ಯ_HOLDS(ಮೌಲ್ಯ, GDK_TYPE_FILE_LIST))
     {
-	GSList	*files = g_value_get_boxed(value);
-	int	nfiles = g_slist_length(files);
+	GSList	*files = g_ಮೌಲ್ಯ_get_boxed(ಮೌಲ್ಯ);
+	ಪೂರ್ಣಾಂಕ	nfiles = g_slist_ಉದ್ದಳತೆ(files);
 	char_u	**fnames;
-	int	i;
+	ಪೂರ್ಣಾಂಕ	i;
 
-	if (nfiles <= 0)
-	    goto exit;
+	ಆದರೆ (nfiles <= 0)
+	    ಹೋಗು ನಿರ್ಗಮಿಸು;
 
 	fnames = ALLOC_MULT(char_u *, nfiles);
-	if (fnames == NULL)
-	    goto exit;
+	ಆದರೆ (fnames == ಖಾಲಿ)
+	    ಹೋಗು ನಿರ್ಗಮಿಸು;
 
 	i = 0;
-	for (GSList *l = files; l != NULL; l = l->next)
+	ಗಾಗಿ (GSList *l = files; l != ಖಾಲಿ; l = l->ಮುಂದಿನ)
 	{
-	    GFile *file = l->data;
-	    char *path = g_file_get_path(file);
-	    if (path != NULL)
-		fnames[i++] = vim_strsave((char_u *)path);
-	    g_free(path);
+	    GFile *file = l->ದತ್ತಾಂಶ;
+	    ಅಕ್ಷರ *ಮಾರ್ಗ = g_file_get_ಮಾರ್ಗ(file);
+	    ಆದರೆ (ಮಾರ್ಗ != ಖಾಲಿ)
+		fnames[i++] = vim_strsave((char_u *)ಮಾರ್ಗ);
+	    g_free(ಮಾರ್ಗ);
 	}
 	nfiles = i;
 
-	if (nfiles > 0)
+	ಆದರೆ (nfiles > 0)
 	    gui_handle_drop(drd->x, drd->y, 0, fnames, nfiles);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    vim_free(fnames);
 	success = TRUE;
     }
-    else if (G_VALUE_HOLDS(value, G_TYPE_STRING))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (G_ಮೌಲ್ಯ_HOLDS(ಮೌಲ್ಯ, G_TYPE_STRING))
     {
-	const char *text = g_value_get_string(value);
+	ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಪಠ್ಯ = g_ಮೌಲ್ಯ_get_string(ಮೌಲ್ಯ);
 
-	if (text == NULL || *text == NUL)
-	    goto exit;
+	ಆದರೆ (ಪಠ್ಯ == ಖಾಲಿ || *ಪಠ್ಯ == NUL)
+	    ಹೋಗು ನಿರ್ಗಮಿಸು;
 
-	drop_read_text(drop, (char_u *)text);
+	drop_read_ಪಠ್ಯ(drop, (char_u *)ಪಠ್ಯ);
 	success = TRUE;
     }
 
-exit:
-    gdk_drop_finish(drop, success ? gdk_drop_get_actions(drop) : 0);
-    read_data_free(&drd->rd);
+ನಿರ್ಗಮಿಸು:
+    gdk_drop_ಮುಕ್ತಾಯ(drop, success ? gdk_drop_get_actions(drop) : 0);
+    read_ದತ್ತಾಂಶ_free(&drd->rd);
 }
 
-    static void
-drop_read_cb(GdkDrop *drop, GAsyncResult *result, DropReadData *drd)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+drop_read_cb(GdkDrop *drop, GAsync_ಫಲಿತಾಂಶ *ಫಲಿತಾಂಶ, Drop_Read_ದತ್ತಾಂಶ *drd)
 {
-    GInputStream    *in_stream;
-    const char	    *m;
+    GInput_ಹರಿವು    *ಒಳ_ಹರಿವು;
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ	    *m;
 
-    in_stream = gdk_drop_read_finish(drop, result, &m, NULL);
-    if (in_stream == NULL || STRCMP(m, "text/html") != 0)
+    ಒಳ_ಹರಿವು = gdk_drop_read_ಮುಕ್ತಾಯ(drop, ಫಲಿತಾಂಶ, &m, ಖಾಲಿ);
+    ಆದರೆ (ಒಳ_ಹರಿವು == ಖಾಲಿ || STRCMP(m, "text/html") != 0)
     {
-	read_data_free(&drd->rd);
-	gdk_drop_finish(drop, 0);
-	return;
+	read_ದತ್ತಾಂಶ_free(&drd->rd);
+	gdk_drop_ಮುಕ್ತಾಯ(drop, 0);
+	ಹಿಂತಿರುಗಿ;
     }
 
-    assert(STRCMP(m, "text/html") == 0);
+    ಪ್ರತಿಜ್ಞಾ(STRCMP(m, "text/html") == 0);
 
     // GTK docs says not to use blocking read calls, so do it async.
-    g_input_stream_read_async(in_stream, drd->rd.buf, READDATA_BUFSIZE,
-	    G_PRIORITY_HIGH,
-	    drd->rd.cancel, (GAsyncReadyCallback)read_data_input_cb, drd);
+    g_ಒಳಹರಿವು_ಹರಿವು_read_async(ಒಳ_ಹರಿವು, drd->rd.buf, READDATA_BUFSIZE,
+	    G_ಆದ್ಯತೆ_ಮೇಲಿನ,
+	    drd->rd.cancel, (GAsyncReadyCallback)read_ದತ್ತಾಂಶ_ಒಳಹರಿವು_cb, drd);
 }
 
 // GCancellable of current DND operation, else NULL.
-static GCancellable *dnd_cancel = NULL;
-static guint dnd_timeout_id = 0;
+ಸ್ಥಿರ GCancellable *dnd_cancel = ಖಾಲಿ;
+ಸ್ಥಿರ guint dnd_timeout_id = 0;
 
-    static gboolean
-drop_timeout_cb(void *udata UNUSED)
+    ಸ್ಥಿರ gboolean
+drop_timeout_cb(ಶೂನ್ಯ *udata ಬಳಸದ)
 {
     g_cancellable_cancel(dnd_cancel);
     g_clear_object(&dnd_cancel);
     dnd_timeout_id = 0;
 
-    return G_SOURCE_REMOVE;
+    ಹಿಂತಿರುಗಿ G_ಮೂಲ_REMOVE;
 }
 
 /*
  * Drag-and-drop handler for files and text.
  */
-    static gboolean
+    ಸ್ಥಿರ gboolean
 drop_cb(
-	GtkDropTargetAsync  *target UNUSED,
+	Gtk_Drop_ಗುರಿ_Async  *ಗುರಿ ಬಳಸದ,
 	GdkDrop		    *drop,
-	double		    x,
-	double		    y,
-	void		    *udata UNUSED)
+	ದ್ವಿಗುಣ		    x,
+	ದ್ವಿಗುಣ		    y,
+	ಶೂನ್ಯ		    *udata ಬಳಸದ)
 {
     GdkContentFormats	*formats = gdk_drop_get_formats(drop);
-    DropReadData	*drd = NULL;
+    Drop_Read_ದತ್ತಾಂಶ	*drd = ಖಾಲಿ;
 
-    if (gdk_content_formats_contain_gtype(formats, GDK_TYPE_FILE_LIST))
+    ಆದರೆ (gdk_content_formats_contain_gtype(formats, GDK_TYPE_FILE_LIST))
     {
-	drd = (DropReadData *)read_data_new(READ_DATA_DROP, sizeof(*drd));
-	gdk_drop_read_value_async(drop, GDK_TYPE_FILE_LIST, G_PRIORITY_HIGH,
-		drd->rd.cancel, (GAsyncReadyCallback)drop_read_value_cb, drd);
+	drd = (Drop_Read_ದತ್ತಾಂಶ *)read_ದತ್ತಾಂಶ_new(READ_ದತ್ತಾಂಶ_DROP, ಗಾತ್ರ(*drd));
+	gdk_drop_read_ಮೌಲ್ಯ_async(drop, GDK_TYPE_FILE_LIST, G_ಆದ್ಯತೆ_ಮೇಲಿನ,
+		drd->rd.cancel, (GAsyncReadyCallback)drop_read_ಮೌಲ್ಯ_cb, drd);
     }
-    else if (clip_html
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (clip_html
 	    && gdk_content_formats_contain_mime_type(formats, "text/html"))
     {
-	static const char *m[] = {"text/html", NULL};
+	ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *m[] = {"text/html", ಖಾಲಿ};
 
-	drd = (DropReadData *)read_data_new(READ_DATA_DROP_DATA, sizeof(*drd));
-	gdk_drop_read_async(drop, m, G_PRIORITY_HIGH,
+	drd = (Drop_Read_ದತ್ತಾಂಶ *)read_ದತ್ತಾಂಶ_new(READ_ದತ್ತಾಂಶ_DROP_ದತ್ತಾಂಶ, ಗಾತ್ರ(*drd));
+	gdk_drop_read_async(drop, m, G_ಆದ್ಯತೆ_ಮೇಲಿನ,
 		drd->rd.cancel, (GAsyncReadyCallback)drop_read_cb, drd);
     }
-    else if (gdk_content_formats_contain_gtype(formats, G_TYPE_STRING))
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (gdk_content_formats_contain_gtype(formats, G_TYPE_STRING))
     {
-	drd = (DropReadData *)read_data_new(READ_DATA_DROP, sizeof(*drd));
-	gdk_drop_read_value_async(drop, G_TYPE_STRING, G_PRIORITY_HIGH,
-		drd->rd.cancel, (GAsyncReadyCallback)drop_read_value_cb, drd);
+	drd = (Drop_Read_ದತ್ತಾಂಶ *)read_ದತ್ತಾಂಶ_new(READ_ದತ್ತಾಂಶ_DROP, ಗಾತ್ರ(*drd));
+	gdk_drop_read_ಮೌಲ್ಯ_async(drop, G_TYPE_STRING, G_ಆದ್ಯತೆ_ಮೇಲಿನ,
+		drd->rd.cancel, (GAsyncReadyCallback)drop_read_ಮೌಲ್ಯ_cb, drd);
     }
 
-    if (dnd_cancel != NULL)
+    ಆದರೆ (dnd_cancel != ಖಾಲಿ)
 	g_cancellable_cancel(dnd_cancel);
     g_clear_object(&dnd_cancel);
     g_clear_handle_id(&dnd_timeout_id, timeout_remove);
 
-    if (drd != NULL)
+    ಆದರೆ (drd != ಖಾಲಿ)
     {
 	drd->drop = g_object_ref(drop);
-	drd->x = (int)x;
-	drd->y = (int)y;
+	drd->x = (ಪೂರ್ಣಾಂಕ)x;
+	drd->y = (ಪೂರ್ಣಾಂಕ)y;
 	dnd_cancel = g_object_ref(drd->rd.cancel);
 
 	// Trying to spin the event loop here causes this GTK assertion error:
@@ -2429,28 +2429,28 @@ drop_cb(
 	// the first place anyways.
 
 	// Add a 3 second timeout
-	dnd_timeout_id = timeout_add(3000, drop_timeout_cb, NULL);
+	dnd_timeout_id = timeout_ಕೂಡಿಸು(3000, drop_timeout_cb, ಖಾಲಿ);
 
-	return TRUE;
+	ಹಿಂತಿರುಗಿ TRUE;
     }
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    static void
-mainwin_destroy_cb(GObject *object UNUSED, gpointer data UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+mainwin_destroy_cb(GObject *object ಬಳಸದ, gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    gui.mainwin = NULL;
-    gui.drawarea = NULL;
-    if (!exiting)
+    gui.mainwin = ಖಾಲಿ;
+    gui.drawarea = ಖಾಲಿ;
+    ಆದರೆ (!exiting)
 	gui_shell_closed();
 }
 
-    static gboolean
-delete_event_cb(GtkWindow *window UNUSED, gpointer data UNUSED)
+    ಸ್ಥಿರ gboolean
+delete_event_cb(Gtk_ಕಿಟಕಿ *ಕಿಟಕಿ_2 ಬಳಸದ, gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
     gui_shell_closed();
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
 /*
@@ -2459,266 +2459,266 @@ delete_event_cb(GtkWindow *window UNUSED, gpointer data UNUSED)
  * ============================================================
  */
 
-    static timeout_cb_type
-input_timer_cb(gpointer data)
+    ಸ್ಥಿರ timeout_cb_type
+ಒಳಹರಿವು_timer_cb(gpointer ದತ್ತಾಂಶ)
 {
-    int *timed_out = (int *)data;
+    ಪೂರ್ಣಾಂಕ *timed_ಹೊರಹೋಗು = (ಪೂರ್ಣಾಂಕ *)ದತ್ತಾಂಶ;
 
-    *timed_out = TRUE;
-    return FALSE;	// don't call me again
+    *timed_ಹೊರಹೋಗು = TRUE;
+    ಹಿಂತಿರುಗಿ FALSE;	// don't call me again
 }
 
-    void
-gui_mch_update(void)
+    ಶೂನ್ಯ
+gui_mch_update(ಶೂನ್ಯ)
 {
-    int cnt = 0;
+    ಪೂರ್ಣಾಂಕ cnt = 0;
 
-    while (g_main_context_pending(NULL) && !vim_is_input_buf_full()
+    ಆಗ (g_main_context_pending(ಖಾಲಿ) && !vim_is_ಒಳಹರಿವು_buf_ತುಂಬಿದ()
 								&& ++cnt < 100)
-	g_main_context_iteration(NULL, TRUE);
+	g_main_context_iteration(ಖಾಲಿ, TRUE);
 }
 
-#ifdef FEAT_JOB_CHANNEL
-    static timeout_cb_type
-channel_poll_cb(gpointer data UNUSED)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕೆಲಸ_CHANNEL
+    ಸ್ಥಿರ timeout_cb_type
+channel_poll_cb(gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
     // Using an event handler for a channel that may be disconnected does
     // not work, it hangs.  Instead poll for messages.
     channel_handle_events(TRUE);
     parse_queued_messages();
-    return TRUE; // Keep repeating
+    ಹಿಂತಿರುಗಿ TRUE; // Keep repeating
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    int
-gui_mch_wait_for_chars(long wtime)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_wait_for_chars(ದೀರ್ಘ wtime)
 {
-    int		focus;
+    ಪೂರ್ಣಾಂಕ		focus;
     guint	timer;
-    static int	timed_out;
-    int		retval = FAIL;
-#ifdef FEAT_JOB_CHANNEL
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ	timed_ಹೊರಹೋಗು;
+    ಪೂರ್ಣಾಂಕ		retval = FAIL;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕೆಲಸ_CHANNEL
     guint	channel_timer = 0;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    timed_out = FALSE;
+    timed_ಹೊರಹೋಗು = FALSE;
 
-    if (wtime >= 0)
-	timer = timeout_add(wtime == 0 ? 1L : wtime,
-						   input_timer_cb, &timed_out);
-    else
+    ಆದರೆ (wtime >= 0)
+	timer = timeout_ಕೂಡಿಸು(wtime == 0 ? 1L : wtime,
+						   ಒಳಹರಿವು_timer_cb, &timed_ಹೊರಹೋಗು);
+    ಇಲ್ಲದಿದ್ದರೆ
 	timer = 0;
 
-#ifdef FEAT_JOB_CHANNEL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕೆಲಸ_CHANNEL
     // If there is a channel with the keep_open flag we need to poll for input
     // on them.
-    if (channel_any_keep_open())
-	channel_timer = timeout_add(20, channel_poll_cb, NULL);
-#endif
+    ಆದರೆ (channel_any_keep_open())
+	channel_timer = timeout_ಕೂಡಿಸು(20, channel_poll_cb, ಖಾಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ
 
-    focus = gui.in_focus;
+    focus = gui.ಒಳ_focus;
 
-    do
+    ಮಾಡು
     {
 	// Stop or start blinking when focus changes
-	if (gui.in_focus != focus)
+	ಆದರೆ (gui.ಒಳ_focus != focus)
 	{
-	    if (gui.in_focus)
-		gui_mch_start_blink();
-	    else
+	    ಆದರೆ (gui.ಒಳ_focus)
+		gui_mch_ಆರಂಭ_blink();
+	    ಇಲ್ಲದಿದ್ದರೆ
 		gui_mch_stop_blink(TRUE);
-	    focus = gui.in_focus;
+	    focus = gui.ಒಳ_focus;
 	}
 
-#ifdef MESSAGE_QUEUE
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ ಸಂದೇಶ_ಸರತಿ
 # ifdef FEAT_TIMERS
-	did_add_timer = FALSE;
+	did_ಕೂಡಿಸು_timer = FALSE;
 # endif
 	parse_queued_messages();
 # ifdef FEAT_TIMERS
-	if (did_add_timer)
-	    goto theend;
+	ಆದರೆ (did_ಕೂಡಿಸು_timer)
+	    ಹೋಗು theend;
 # endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-	if (gui.mainwin == NULL)
-	    goto theend;
+	ಆದರೆ (gui.mainwin == ಖಾಲಿ)
+	    ಹೋಗು theend;
 
 	// gtk_main_quit() is a wake-up request; consume it so later
 	// waits resume.
-	if (gtk4_main_loop_quit)
+	ಆದರೆ (gtk4_main_loop_quit)
 	{
 	    gtk4_main_loop_quit = FALSE;
-	    goto theend;
+	    ಹೋಗು theend;
 	}
 
-	if (!input_available())
+	ಆದರೆ (!ಒಳಹರಿವು_ಲಭ್ಯ())
 	{
 	    ++gtk4_main_loop_level;
-	    g_main_context_iteration(NULL, TRUE);
+	    g_main_context_iteration(ಖಾಲಿ, TRUE);
 	    --gtk4_main_loop_level;
 	}
 
-	if (input_available())
+	ಆದರೆ (ಒಳಹರಿವು_ಲಭ್ಯ())
 	{
 	    retval = OK;
-	    goto theend;
+	    ಹೋಗು theend;
 	}
-    } while (wtime < 0 || !timed_out);
+    } ಆಗ (wtime < 0 || !timed_ಹೊರಹೋಗು);
 
     gui_mch_update();
 
 theend:
-    if (timer != 0 && !timed_out)
+    ಆದರೆ (timer != 0 && !timed_ಹೊರಹೋಗು)
 	timeout_remove(timer);
-#ifdef FEAT_JOB_CHANNEL
-    if (channel_timer != 0)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_ಕೆಲಸ_CHANNEL
+    ಆದರೆ (channel_timer != 0)
 	timeout_remove(channel_timer);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return retval;
+    ಹಿಂತಿರುಗಿ retval;
 }
 
-    void
-gui_mch_flush(void)
+    ಶೂನ್ಯ
+gui_mch_flush(ಶೂನ್ಯ)
 {
     // Ensure the offscreen surface content gets painted to the widget.
-    if (gui.drawarea != NULL)
-	gtk_widget_queue_draw(gui.drawarea);
-    if (gui.mainwin != NULL && gtk_widget_get_realized(gui.mainwin))
+    ಆದರೆ (gui.drawarea != ಖಾಲಿ)
+	gtk_widget_ಸರತಿ_draw(gui.drawarea);
+    ಆದರೆ (gui.mainwin != ಖಾಲಿ && gtk_widget_get_realized(gui.mainwin))
 	gdk_display_flush(gtk_widget_get_display(gui.mainwin));
 }
 
-    void
-gui_mch_beep(void)
+    ಶೂನ್ಯ
+gui_mch_beep(ಶೂನ್ಯ)
 {
     GdkDisplay *display;
 
-    if (gui.mainwin != NULL && gtk_widget_get_realized(gui.mainwin))
+    ಆದರೆ (gui.mainwin != ಖಾಲಿ && gtk_widget_get_realized(gui.mainwin))
     {
 	display = gtk_widget_get_display(gui.mainwin);
-	if (display != NULL)
+	ಆದರೆ (display != ಖಾಲಿ)
 	    gdk_display_beep(display);
     }
 }
 
-    void *
-gui_mch_get_display(void)
+    ಶೂನ್ಯ *
+gui_mch_get_display(ಶೂನ್ಯ)
 {
-    if (gui.mainwin != NULL && gtk_widget_get_display(gui.mainwin))
-	return gtk_widget_get_display(gui.mainwin);
-    return NULL;
+    ಆದರೆ (gui.mainwin != ಖಾಲಿ && gtk_widget_get_display(gui.mainwin))
+	ಹಿಂತಿರುಗಿ gtk_widget_get_display(gui.mainwin);
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
-    void
-gui_mch_iconify(void)
+    ಶೂನ್ಯ
+gui_mch_iconify(ಶೂನ್ಯ)
 {
-    gtk_window_minimize(GTK_WINDOW(gui.mainwin));
+    gtk_ಕಿಟಕಿ_minimize(GTK_ಕಿಟಕಿ(gui.mainwin));
 }
 
-    void
-gui_mch_set_foreground(void)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_foreground(ಶೂನ್ಯ)
 {
-    gtk_window_present(GTK_WINDOW(gui.mainwin));
+    gtk_ಕಿಟಕಿ_present(GTK_ಕಿಟಕಿ(gui.mainwin));
 }
 
-    static int
-query_pointer_pos(int *x, int *y, GdkModifierType *state)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+query_ಸೂಚಕ_pos(ಪೂರ್ಣಾಂಕ *x, ಪೂರ್ಣಾಂಕ *y, GdkModifierType *state)
 {
     GtkNative	    *native;
     GdkSurface	    *surface;
     GdkDisplay	    *display;
     GdkSeat	    *seat;
-    GdkDevice	    *pointer;
-    double	     sx, sy, nx, ny;
-    graphene_point_t src, dst;
+    GdkDevice	    *ಸೂಚಕ;
+    ದ್ವಿಗುಣ	     sx, sy, nx, ny;
+    graphene_ಬಿಂದು_t src, dst;
 
-    if (gui.drawarea == NULL)
-	return FALSE;
+    ಆದರೆ (gui.drawarea == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FALSE;
     native = gtk_widget_get_native(gui.drawarea);
-    if (native == NULL)
-	return FALSE;
+    ಆದರೆ (native == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FALSE;
     surface = gtk_native_get_surface(native);
-    if (surface == NULL)
-	return FALSE;
+    ಆದರೆ (surface == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FALSE;
     display = gtk_widget_get_display(gui.drawarea);
-    if (display == NULL)
-	return FALSE;
+    ಆದರೆ (display == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FALSE;
     seat = gdk_display_get_default_seat(display);
-    if (seat == NULL)
-	return FALSE;
-    pointer = gdk_seat_get_pointer(seat);
-    if (pointer == NULL)
-	return FALSE;
+    ಆದರೆ (seat == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FALSE;
+    ಸೂಚಕ = gdk_seat_get_ಸೂಚಕ(seat);
+    ಆದರೆ (ಸೂಚಕ == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    if (!gdk_surface_get_device_position(surface, pointer, &sx, &sy, state))
-	return FALSE;
+    ಆದರೆ (!gdk_surface_get_device_position(surface, ಸೂಚಕ, &sx, &sy, state))
+	ಹಿಂತಿರುಗಿ FALSE;
 
-    if (x != NULL && y != NULL)
+    ಆದರೆ (x != ಖಾಲಿ && y != ಖಾಲಿ)
     {
 	gtk_native_get_surface_transform(native, &nx, &ny);
-	src.x = (float)(sx - nx);
-	src.y = (float)(sy - ny);
-	if (!gtk_widget_compute_point(GTK_WIDGET(native), gui.drawarea,
+	src.x = (ದಶಮಾಂಶ)(sx - nx);
+	src.y = (ದಶಮಾಂಶ)(sy - ny);
+	ಆದರೆ (!gtk_widget_compute_ಬಿಂದು(GTK_WIDGET(native), gui.drawarea,
 		    &src, &dst))
-	    return FALSE;
+	    ಹಿಂತಿರುಗಿ FALSE;
 
-	*x = (int)dst.x;
-	*y = (int)dst.y;
+	*x = (ಪೂರ್ಣಾಂಕ)dst.x;
+	*y = (ಪೂರ್ಣಾಂಕ)dst.y;
     }
-    return TRUE;
+    ಹಿಂತಿರುಗಿ TRUE;
 }
 
-    void
-gui_mch_getmouse(int *x, int *y)
+    ಶೂನ್ಯ
+gui_mch_getmouse(ಪೂರ್ಣಾಂಕ *x, ಪೂರ್ಣಾಂಕ *y)
 {
-    if (!query_pointer_pos(x, y, NULL))
+    ಆದರೆ (!query_ಸೂಚಕ_pos(x, y, ಖಾಲಿ))
     {
 	*x = 0;
 	*y = 0;
     }
 }
 
-    void
-gui_mch_setmouse(int x UNUSED, int y UNUSED)
+    ಶೂನ್ಯ
+gui_mch_setmouse(ಪೂರ್ಣಾಂಕ x ಬಳಸದ, ಪೂರ್ಣಾಂಕ y ಬಳಸದ)
 {
     // GTK4/Wayland: cannot warp pointer
 }
 
-    void
-gui_mch_mousehide(int hide)
+    ಶೂನ್ಯ
+gui_mch_mousehide(ಪೂರ್ಣಾಂಕ hide)
 {
-    if (gui.pointer_hidden == hide)
-	return;
+    ಆದರೆ (gui.ಸೂಚಕ_hidden == hide)
+	ಹಿಂತಿರುಗಿ;
 
-    gui.pointer_hidden = hide;
-    if (gui.blank_pointer != NULL)
+    gui.ಸೂಚಕ_hidden = hide;
+    ಆದರೆ (gui.blank_ಸೂಚಕ != ಖಾಲಿ)
     {
-	if (hide)
-	    gtk_widget_set_cursor(gui.drawarea, gui.blank_pointer);
-	else
-#ifdef FEAT_MOUSESHAPE
-	    mch_set_mouse_shape(last_shape);
-#else
-	    gtk_widget_set_cursor(gui.drawarea, NULL);
-#endif
+	ಆದರೆ (hide)
+	    gtk_widget_ಗಣ_cursor(gui.drawarea, gui.blank_ಸೂಚಕ);
+	ಇಲ್ಲದಿದ್ದರೆ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MOUSESHAPE
+	    mch_ಗಣ_mouse_shape(ಕೊನೆಯ_shape);
+#ಇಲ್ಲದಿದ್ದರೆ
+	    gtk_widget_ಗಣ_cursor(gui.drawarea, ಖಾಲಿ);
+#ಆದರೆ_ಅಂತ್ಯ
     }
 }
 
-    int
+    ಪೂರ್ಣಾಂಕ
 gui_mch_haskey(char_u *name)
 {
-    int i;
+    ಪೂರ್ಣಾಂಕ i;
 
-    for (i = 0; special_keys[i].key_sym != 0; i++)
-	if (name[0] == special_keys[i].code0
-		&& name[1] == special_keys[i].code1)
-	    return OK;
-    return FAIL;
+    ಗಾಗಿ (i = 0; special_ಕೀಲಿಗಳು[i].ಕೀಲಿ_sym != 0; i++)
+	ಆದರೆ (name[0] == special_ಕೀಲಿಗಳು[i].code0
+		&& name[1] == special_ಕೀಲಿಗಳು[i].code1)
+	    ಹಿಂತಿರುಗಿ OK;
+    ಹಿಂತಿರುಗಿ FAIL;
 }
 
-    void
-gui_mch_forked(void)
+    ಶೂನ್ಯ
+gui_mch_forked(ಶೂನ್ಯ)
 {
 }
 
@@ -2726,57 +2726,57 @@ gui_mch_forked(void)
  * Try getting the actual size of the scrollbar, and update gui.scrollbar_width
  * and gui.scrollbar_height.
  */
-    static void
-gui_gtk4_update_scrollbar_size(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+gui_gtk4_update_scrollbar_ಗಾತ್ರ(ಶೂನ್ಯ)
 {
     win_T	*wp;
-    int		w = -1, h = -1;
+    ಪೂರ್ಣಾಂಕ		w = -1, h = -1;
     GtkWidget	*sbar;
 
     FOR_ALL_WINDOWS(wp)
     {
-	sbar = wp->w_scrollbars[SBAR_LEFT].id;
+	sbar = wp->w_scrollbars[SBAR_ಎಡ].id;
 
-	if (sbar == NULL || !gtk_widget_get_visible(sbar)
-		|| (!gui.which_scrollbars[SBAR_LEFT]
-		    && wp->w_scrollbars[SBAR_RIGHT].id != NULL))
-	    sbar = wp->w_scrollbars[SBAR_RIGHT].id;
+	ಆದರೆ (sbar == ಖಾಲಿ || !gtk_widget_get_visible(sbar)
+		|| (!gui.which_scrollbars[SBAR_ಎಡ]
+		    && wp->w_scrollbars[SBAR_ಬಲ].id != ಖಾಲಿ))
+	    sbar = wp->w_scrollbars[SBAR_ಬಲ].id;
 
-	if (sbar != NULL && gtk_widget_get_visible(sbar))
+	ಆದರೆ (sbar != ಖಾಲಿ && gtk_widget_get_visible(sbar))
 	{
 	    GtkRequisition  min, nat;
-	    int		    sw;
+	    ಪೂರ್ಣಾಂಕ		    sw;
 
 	    // Use preferred size, since widget may not have its size allocated
 	    // yet.
-	    gtk_widget_get_preferred_size(sbar, &min, &nat);
-	    sw = MAX(min.width, nat.width);
-	    if (sw > 0)
+	    gtk_widget_get_preferred_ಗಾತ್ರ(sbar, &min, &nat);
+	    sw = MAX(min.ಅಗಲ, nat.ಅಗಲ);
+	    ಆದರೆ (sw > 0)
 	    {
 		w = sw;
-		break;
+		ನಿಲ್ಲಿಸು;
 	    }
 	}
 
     }
 
     sbar = gui.bottom_sbar.id;
-    if (sbar != NULL && gtk_widget_get_visible(sbar))
+    ಆದರೆ (sbar != ಖಾಲಿ && gtk_widget_get_visible(sbar))
     {
 	GtkRequisition min, nat;
-	int		    sh;
+	ಪೂರ್ಣಾಂಕ		    sh;
 
-	gtk_widget_get_preferred_size(sbar, &min, &nat);
-	sh = MAX(min.height, nat.height);
+	gtk_widget_get_preferred_ಗಾತ್ರ(sbar, &min, &nat);
+	sh = MAX(min.ಎತ್ತರ, nat.ಎತ್ತರ);
 
-	if (sh > 0)
+	ಆದರೆ (sh > 0)
 	    h = sh;
     }
 
-    if (w != -1)
-	gui.scrollbar_width = w;
-    if (h != -1)
-	gui.scrollbar_height = h;
+    ಆದರೆ (w != -1)
+	gui.scrollbar_ಅಗಲ = w;
+    ಆದರೆ (h != -1)
+	gui.scrollbar_ಎತ್ತರ = h;
 }
 
 
@@ -2786,55 +2786,55 @@ gui_gtk4_update_scrollbar_size(void)
  * ============================================================
  */
 
-    void
-gui_mch_enable_scrollbar(scrollbar_T *sb, int flag)
+    ಶೂನ್ಯ
+gui_mch_enable_scrollbar(scrollbar_T *sb, ಪೂರ್ಣಾಂಕ flag)
 {
-    if (sb->id != NULL)
+    ಆದರೆ (sb->id != ಖಾಲಿ)
     {
 	gboolean was_visible = gtk_widget_get_visible(sb->id);
 
-	gtk_widget_set_visible(sb->id, flag);
+	gtk_widget_ಗಣ_visible(sb->id, flag);
 
-	if (!was_visible && flag)
-	    gui_gtk4_update_scrollbar_size();
+	ಆದರೆ (!was_visible && flag)
+	    gui_gtk4_update_scrollbar_ಗಾತ್ರ();
     }
 }
 
-#if defined(FEAT_MENU)
+#ಆದರೆ defined(FEAT_MENU)
 /*
  * ============================================================
  * Menu stubs
  * ============================================================
  */
 
-    void
-gui_mch_menu_grey(vimmenu_T *menu, int grey)
+    ಶೂನ್ಯ
+gui_mch_menu_grey(vimmenu_T *menu, ಪೂರ್ಣಾಂಕ grey)
 {
-    if (menu->id == NULL)
-	return;
-    gtk_widget_set_sensitive(menu->id, !grey);
+    ಆದರೆ (menu->id == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
+    gtk_widget_ಗಣ_sensitive(menu->id, !grey);
     gui_mch_update();
 }
 
 /*
  * Make menu item hidden or not hidden.
  */
-    void
-gui_mch_menu_hidden(vimmenu_T *menu, int hidden)
+    ಶೂನ್ಯ
+gui_mch_menu_hidden(vimmenu_T *menu, ಪೂರ್ಣಾಂಕ hidden)
 {
-    if (menu->id == NULL)
-	return;
-    gtk_widget_set_visible(menu->id, !hidden);
+    ಆದರೆ (menu->id == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
+    gtk_widget_ಗಣ_visible(menu->id, !hidden);
     gui_mch_update();
 }
 
-    void
-gui_mch_draw_menubar(void)
+    ಶೂನ್ಯ
+gui_mch_draw_menubar(ಶೂನ್ಯ)
 {
     // Just make sure that the visual changes get effect immediately
     gui_mch_update();
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * ============================================================
@@ -2842,42 +2842,42 @@ gui_mch_draw_menubar(void)
  * ============================================================
  */
 
-#ifdef FEAT_GUI_TABLINE
-    void
-gui_mch_show_tabline(int showit)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_TABLINE
+    ಶೂನ್ಯ
+gui_mch_show_tabline(ಪೂರ್ಣಾಂಕ showit)
 {
-    if (gui.tabline == NULL)
-	return;
-    gtk_widget_set_visible(gui.tabline, showit);
+    ಆದರೆ (gui.tabline == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
+    gtk_widget_ಗಣ_visible(gui.tabline, showit);
     gui_mch_update();
 }
 
-    int
-gui_mch_showing_tabline(void)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_showing_tabline(ಶೂನ್ಯ)
 {
-    return gui.tabline != NULL && gtk_widget_get_visible(gui.tabline);
+    ಹಿಂತಿರುಗಿ gui.tabline != ಖಾಲಿ && gtk_widget_get_visible(gui.tabline);
 }
 
-static int ignore_tabline_evt = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ignore_tabline_evt = FALSE;
 // Page hovered over in tab line, zero indicates none
-static int tabpage_hover = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ tabpage_hover = 0;
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 tabpage_enter_cb(
-	GtkEventController  *controller UNUSED,
-	double		    x UNUSED,
-	double		    y UNUSED,
-	void		    *udata)
+	GtkEventController  *controller ಬಳಸದ,
+	ದ್ವಿಗುಣ		    x ಬಳಸದ,
+	ದ್ವಿಗುಣ		    y ಬಳಸದ,
+	ಶೂನ್ಯ		    *udata)
 {
-    tabpage_hover = GPOINTER_TO_INT(udata);
+    tabpage_hover = GPOINTER_ಗಮ್ಯ_INT(udata);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 tabline_enter_cb(
-	GtkEventController  *controller UNUSED,
-	double		    x UNUSED,
-	double		    y UNUSED,
-	void		    *udata UNUSED)
+	GtkEventController  *controller ಬಳಸದ,
+	ದ್ವಿಗುಣ		    x ಬಳಸದ,
+	ದ್ವಿಗುಣ		    y ಬಳಸದ,
+	ಶೂನ್ಯ		    *udata ಬಳಸದ)
 {
     tabpage_hover = 0;
 }
@@ -2886,11 +2886,11 @@ tabline_enter_cb(
  * CSS for the tab pages line: flat rounded tabs, the current tab with a light
  * background.  Only applies to the notebook with the "vim-tabline" CSS class.
  */
-    static void
-tabline_add_css(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+tabline_ಕೂಡಿಸು_css(ಶೂನ್ಯ)
 {
     GtkCssProvider  *provider;
-    static const char *css =
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *css =
 	"notebook.vim-tabline > header {"
 	"  background: none; border: none; padding: 6px 1px; }"
 	"notebook.vim-tabline > header > tabs { margin: 0; }"
@@ -2935,250 +2935,250 @@ tabline_add_css(void)
 	"  min-width: 24px; }";
 
     provider = gtk_css_provider_new();
-# if GTK_CHECK_VERSION(4, 12, 0)
-    gtk_css_provider_load_from_string(provider, css);
-# else
-    gtk_css_provider_load_from_data(provider, css, -1);
+# ಆದರೆ GTK_CHECK_ಆವೃತ್ತಿ(4, 12, 0)
+    gtk_css_provider_ತುಂಬು_from_string(provider, css);
+# ಇಲ್ಲದಿದ್ದರೆ
+    gtk_css_provider_ತುಂಬು_from_ದತ್ತಾಂಶ(provider, css, -1);
 # endif
-    gtk_style_context_add_provider_for_display(
+    gtk_style_context_ಕೂಡಿಸು_provider_for_display(
 	    gtk_widget_get_display(gui.tabline), GTK_STYLE_PROVIDER(provider),
-	    GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+	    GTK_STYLE_PROVIDER_ಆದ್ಯತೆ_APPLICATION);
     g_object_unref(provider);
 }
 
 /*
  * Handle clicking the close button of a tab.
  */
-    static void
-tab_close_clicked_cb(GtkButton *button UNUSED, gpointer data)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+tab_close_clicked_cb(GtkButton *button ಬಳಸದ, gpointer ದತ್ತಾಂಶ)
 {
-    int idx = gtk_notebook_page_num(GTK_NOTEBOOK(gui.tabline),
-							   GTK_WIDGET(data));
+    ಪೂರ್ಣಾಂಕ idx = gtk_notebook_ಪುಟ_ಅಂಕೆ(GTK_NOTEBOOK(gui.tabline),
+							   GTK_WIDGET(ದತ್ತಾಂಶ));
 
-    if (idx >= 0)
+    ಆದರೆ (idx >= 0)
 	send_tabline_menu_event(idx + 1, TABLINE_MENU_CLOSE);
 }
 
-    void
-gui_mch_update_tabline(void)
+    ಶೂನ್ಯ
+gui_mch_update_tabline(ಶೂನ್ಯ)
 {
-    GtkWidget	*page;
+    GtkWidget	*ಪುಟ;
     GtkWidget	*event_box;
     GtkWidget	*label;
     tabpage_T	*tp;
-    int		nr = 0;
-    int		tab_num;
-    int		curtabidx = 0;
+    ಪೂರ್ಣಾಂಕ		nr = 0;
+    ಪೂರ್ಣಾಂಕ		tab_ಅಂಕೆ;
+    ಪೂರ್ಣಾಂಕ		curtabidx = 0;
     char_u	*labeltext;
 
-    if (gui.tabline == NULL)
-	return;
+    ಆದರೆ (gui.tabline == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     ignore_tabline_evt = TRUE;
 
-    for (tp = first_tabpage; tp != NULL; tp = tp->tp_next, ++nr)
+    ಗಾಗಿ (tp = ಮೊದಲ_tabpage; tp != ಖಾಲಿ; tp = tp->tp_ಮುಂದಿನ, ++nr)
     {
-	GtkNotebookPage	    *page_widget;
+	Gtk_Notebook_ಪುಟ	    *ಪುಟ_widget;
 	GtkWidget	    *tab_widget;
 	GtkEventController  *mcontroller;
 
-	if (tp == curtab)
+	ಆದರೆ (tp == curtab)
 	    curtabidx = nr;
 
-	tab_num = nr + 1;
+	tab_ಅಂಕೆ = nr + 1;
 
-	page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(gui.tabline), nr);
-	if (page == NULL)
+	ಪುಟ = gtk_notebook_get_nth_ಪುಟ(GTK_NOTEBOOK(gui.tabline), nr);
+	ಆದರೆ (ಪುಟ == ಖಾಲಿ)
 	{
 	    GtkWidget	*spacer;
 	    GtkWidget	*close_button;
 
-	    page = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-	    gtk_widget_set_visible(page, TRUE);
+	    ಪುಟ = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+	    gtk_widget_ಗಣ_visible(ಪುಟ, TRUE);
 	    event_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-	    gtk_widget_set_visible(event_box, TRUE);
+	    gtk_widget_ಗಣ_visible(event_box, TRUE);
 
 	    spacer = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-	    gtk_widget_add_css_class(spacer, "vim-tab-spacer");
+	    gtk_widget_ಕೂಡಿಸು_css_class(spacer, "vim-tab-spacer");
 	    gtk_box_append(GTK_BOX(event_box), spacer);
 
 	    label = gtk_label_new("-Empty-");
-	    gtk_widget_set_hexpand(label, TRUE);
-	    gtk_label_set_ellipsize(GTK_LABEL(label), PANGO_ELLIPSIZE_END);
+	    gtk_widget_ಗಣ_hexpand(label, TRUE);
+	    gtk_label_ಗಣ_ellipsize(GTK_LABEL(label), PANGO_ELLIPSIZE_ಕೊನೆ);
 	    gtk_box_append(GTK_BOX(event_box), label);
-	    gtk_widget_set_visible(label, TRUE);
-	    g_object_set_data(G_OBJECT(event_box), "label", label);
+	    gtk_widget_ಗಣ_visible(label, TRUE);
+	    g_object_ಗಣ_ದತ್ತಾಂಶ(G_OBJECT(event_box), "label", label);
 
 	    close_button = gtk_button_new_from_icon_name("window-close-symbolic");
-	    gtk_widget_add_css_class(close_button, "flat");
-	    gtk_widget_add_css_class(close_button, "circular");
-	    gtk_widget_set_valign(close_button, GTK_ALIGN_CENTER);
-	    gtk_widget_set_focus_on_click(close_button, FALSE);
-	    gtk_widget_set_tooltip_text(close_button, _("Close Tab"));
+	    gtk_widget_ಕೂಡಿಸು_css_class(close_button, "flat");
+	    gtk_widget_ಕೂಡಿಸು_css_class(close_button, "circular");
+	    gtk_widget_ಗಣ_valign(close_button, GTK_ALIGN_CENTER);
+	    gtk_widget_ಗಣ_focus_on_click(close_button, FALSE);
+	    gtk_widget_ಗಣ_tooltip_ಪಠ್ಯ(close_button, _("Close Tab"));
 	    g_signal_connect(close_button, "clicked",
-		    G_CALLBACK(tab_close_clicked_cb), page);
+		    G_CALLBACK(tab_close_clicked_cb), ಪುಟ);
 	    gtk_box_append(GTK_BOX(event_box), close_button);
 
-	    gtk_notebook_insert_page(GTK_NOTEBOOK(gui.tabline),
-		    page, event_box, nr);
-	    gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(gui.tabline),
-		    page, TRUE);
-	    g_object_set(gtk_notebook_get_page(GTK_NOTEBOOK(gui.tabline), page),
-		    "tab-expand", TRUE, NULL);
+	    gtk_notebook_ಸೇರಿಸು_ಪುಟ(GTK_NOTEBOOK(gui.tabline),
+		    ಪುಟ, event_box, nr);
+	    gtk_notebook_ಗಣ_tab_reorderable(GTK_NOTEBOOK(gui.tabline),
+		    ಪುಟ, TRUE);
+	    g_object_ಗಣ(gtk_notebook_get_ಪುಟ(GTK_NOTEBOOK(gui.tabline), ಪುಟ),
+		    "tab-expand", TRUE, ಖಾಲಿ);
 	}
 
 	// Attach motion event controller to detect which tab page is currently
 	// hovered over.
-	page_widget = gtk_notebook_get_page(GTK_NOTEBOOK(gui.tabline), page);
+	ಪುಟ_widget = gtk_notebook_get_ಪುಟ(GTK_NOTEBOOK(gui.tabline), ಪುಟ);
 	mcontroller = gtk_event_controller_motion_new();
 	g_signal_connect(mcontroller, "enter", G_CALLBACK(tabpage_enter_cb),
-		GINT_TO_POINTER(tab_num));
-	gtk_event_controller_set_propagation_phase(
+		GINT_ಗಮ್ಯ_ಸೂಚಕ(tab_ಅಂಕೆ));
+	gtk_event_controller_ಗಣ_ಪ್ರಸರಣ_phase(
 		mcontroller, GTK_PHASE_CAPTURE);
-	g_object_get(page_widget, "tab", &tab_widget, NULL);
-	gtk_widget_add_controller(tab_widget, mcontroller);
+	g_object_get(ಪುಟ_widget, "tab", &tab_widget, ಖಾಲಿ);
+	gtk_widget_ಕೂಡಿಸು_controller(tab_widget, mcontroller);
 
-	event_box = gtk_notebook_get_tab_label(GTK_NOTEBOOK(gui.tabline), page);
-	label = g_object_get_data(G_OBJECT(event_box), "label");
+	event_box = gtk_notebook_get_tab_label(GTK_NOTEBOOK(gui.tabline), ಪುಟ);
+	label = g_object_get_ದತ್ತಾಂಶ(G_OBJECT(event_box), "label");
 	get_tabline_label(tp, FALSE);
-	labeltext = CONVERT_TO_UTF8(NameBuff);
-	if (label != NULL && GTK_IS_LABEL(label))
-	    gtk_label_set_text(GTK_LABEL(label), (const char *)labeltext);
-	CONVERT_TO_UTF8_FREE(labeltext);
+	labeltext = CONVERT_ಗಮ್ಯ_UTF8(NameBuff);
+	ಆದರೆ (label != ಖಾಲಿ && GTK_IS_LABEL(label))
+	    gtk_label_ಗಣ_ಪಠ್ಯ(GTK_LABEL(label), (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)labeltext);
+	CONVERT_ಗಮ್ಯ_UTF8_FREE(labeltext);
 
 	get_tabline_label(tp, TRUE);
-	labeltext = CONVERT_TO_UTF8(NameBuff);
-	gtk_widget_set_tooltip_text(event_box, (const gchar *)labeltext);
-	CONVERT_TO_UTF8_FREE(labeltext);
+	labeltext = CONVERT_ಗಮ್ಯ_UTF8(NameBuff);
+	gtk_widget_ಗಣ_tooltip_ಪಠ್ಯ(event_box, (ಸ್ಥಿರಾಂಕ gchar *)labeltext);
+	CONVERT_ಗಮ್ಯ_UTF8_FREE(labeltext);
     }
 
-    while (gtk_notebook_get_nth_page(GTK_NOTEBOOK(gui.tabline), nr) != NULL)
-	gtk_notebook_remove_page(GTK_NOTEBOOK(gui.tabline), nr);
+    ಆಗ (gtk_notebook_get_nth_ಪುಟ(GTK_NOTEBOOK(gui.tabline), nr) != ಖಾಲಿ)
+	gtk_notebook_remove_ಪುಟ(GTK_NOTEBOOK(gui.tabline), nr);
 
     // With a single tab the tab is not highlighted and has no close button.
-    if (nr == 1)
-	gtk_widget_add_css_class(gui.tabline, "single-tab");
-    else
+    ಆದರೆ (nr == 1)
+	gtk_widget_ಕೂಡಿಸು_css_class(gui.tabline, "single-tab");
+    ಇಲ್ಲದಿದ್ದರೆ
 	gtk_widget_remove_css_class(gui.tabline, "single-tab");
 
-    if (gtk_notebook_get_current_page(GTK_NOTEBOOK(gui.tabline)) != curtabidx)
-	gtk_notebook_set_current_page(GTK_NOTEBOOK(gui.tabline), curtabidx);
+    ಆದರೆ (gtk_notebook_get_current_ಪುಟ(GTK_NOTEBOOK(gui.tabline)) != curtabidx)
+	gtk_notebook_ಗಣ_current_ಪುಟ(GTK_NOTEBOOK(gui.tabline), curtabidx);
 
     ignore_tabline_evt = FALSE;
 }
 
-    void
-gui_mch_set_curtab(int nr)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_curtab(ಪೂರ್ಣಾಂಕ nr)
 {
-    if (gui.tabline != NULL)
-	gtk_notebook_set_current_page(GTK_NOTEBOOK(gui.tabline), nr - 1);
+    ಆದರೆ (gui.tabline != ಖಾಲಿ)
+	gtk_notebook_ಗಣ_current_ಪುಟ(GTK_NOTEBOOK(gui.tabline), nr - 1);
 }
 
 /*
  * Handle selecting one of the tabs.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 on_select_tab(
-	GtkNotebook	*notebook UNUSED,
-	gpointer	*page UNUSED,
+	GtkNotebook	*notebook ಬಳಸದ,
+	gpointer	*ಪುಟ ಬಳಸದ,
 	gint		idx,
-	gpointer	data UNUSED)
+	gpointer	ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    if (!ignore_tabline_evt)
+    ಆದರೆ (!ignore_tabline_evt)
 	send_tabline_event(idx + 1);
 }
 
 /*
  * Handle reordering the tabs (using D&D).
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 on_tab_reordered(
-	GtkNotebook	*notebook UNUSED,
-	gpointer	*page UNUSED,
+	GtkNotebook	*notebook ಬಳಸದ,
+	gpointer	*ಪುಟ ಬಳಸದ,
 	gint		idx,
-	gpointer	data UNUSED)
+	gpointer	ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    if (ignore_tabline_evt)
-	return;
+    ಆದರೆ (ignore_tabline_evt)
+	ಹಿಂತಿರುಗಿ;
 
-    if ((tabpage_index(curtab) - 1) < idx)
+    ಆದರೆ ((tabpage_ಸೂಚ್ಯಂಕ(curtab) - 1) < idx)
 	tabpage_move(idx + 1);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	tabpage_move(idx);
 }
 
 /*
  * Handle selecting an item in the tab line popup menu.
  */
-    static void
-tabline_menu_event_cb(VimMenuItem *item UNUSED, VimMenuItemEvent event, void *udata)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+tabline_menu_event_cb(Vim_Menu_ಅಂಶ *ಅಂಶ ಬಳಸದ, Vim_Menu_ಅಂಶ_Event event, ಶೂನ್ಯ *udata)
 {
-    if (event == VIM_MENU_ITEM_CLICKED)
-	send_tabline_menu_event(tabpage_hover, GPOINTER_TO_INT(udata));
+    ಆದರೆ (event == VIM_MENU_ಅಂಶ_CLICKED)
+	send_tabline_menu_event(tabpage_hover, GPOINTER_ಗಮ್ಯ_INT(udata));
 }
 
-    static void
-add_tabline_menu_item(VimMenu *menu, const char *name, int resp)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಕೂಡಿಸು_tabline_menu_ಅಂಶ(VimMenu *menu, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *name, ಪೂರ್ಣಾಂಕ resp)
 {
-    VimMenuItem *item = VIM_MENU_ITEM(vim_menu_item_new(name,
-		tabline_menu_event_cb, GINT_TO_POINTER(resp)));
+    Vim_Menu_ಅಂಶ *ಅಂಶ = VIM_MENU_ಅಂಶ(vim_menu_ಅಂಶ_new(name,
+		tabline_menu_event_cb, GINT_ಗಮ್ಯ_ಸೂಚಕ(resp)));
 
-    vim_menu_insert_item(menu, item, -1);
+    vim_menu_ಸೇರಿಸು_ಅಂಶ(menu, ಅಂಶ, -1);
 }
 
 /*
  * Create a menu for the tab line.
  */
-    static VimMenu *
-create_tabline_popup_menu(void)
+    ಸ್ಥಿರ VimMenu *
+create_tabline_popup_menu(ಶೂನ್ಯ)
 {
     VimMenu *menu = VIM_MENU(vim_menu_new());
 
-    add_tabline_menu_item(menu, _("Close Tab"), TABLINE_MENU_CLOSE);
-    add_tabline_menu_item(menu, _("New Tab"), TABLINE_MENU_NEW);
-    add_tabline_menu_item(menu, _("Open Tab..."), TABLINE_MENU_OPEN);
+    ಕೂಡಿಸು_tabline_menu_ಅಂಶ(menu, _("Close Tab"), TABLINE_MENU_CLOSE);
+    ಕೂಡಿಸು_tabline_menu_ಅಂಶ(menu, _("New Tab"), TABLINE_MENU_NEW);
+    ಕೂಡಿಸು_tabline_menu_ಅಂಶ(menu, _("Open Tab..."), TABLINE_MENU_OPEN);
 
-    return menu;
+    ಹಿಂತಿರುಗಿ menu;
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 tabline_menu_press_event(
 	GtkGestureClick *gesture,
-	int		n_press UNUSED,
-	double		x,
-	double		y,
+	ಪೂರ್ಣಾಂಕ		n_press ಬಳಸದ,
+	ದ್ವಿಗುಣ		x,
+	ದ್ವಿಗುಣ		y,
 	GtkWidget	*popover)
 {
     guint but;
 
     but = gtk_gesture_single_get_current_button(GTK_GESTURE_SINGLE(gesture));
-    if (but == GDK_BUTTON_SECONDARY)
+    ಆದರೆ (but == GDK_BUTTON_SECONDARY)
     {
 	// Right mouse button pressed, popup menu
 	GdkRectangle rect;
 	rect.x = x;
 	rect.y = y;
-	rect.width = 1;
-	rect.height = 1;
+	rect.ಅಗಲ = 1;
+	rect.ಎತ್ತರ = 1;
 
-	gtk_popover_set_pointing_to(GTK_POPOVER(popover), &rect);
+	gtk_popover_ಗಣ_pointing_ಗಮ್ಯ(GTK_POPOVER(popover), &rect);
 	gtk_popover_popup(GTK_POPOVER(popover));
     }
-    else if (but == GDK_BUTTON_PRIMARY)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (but == GDK_BUTTON_PRIMARY)
     {
-	if (tabpage_hover == 0)
+	ಆದರೆ (tabpage_hover == 0)
 	    // Click after all tabs moves to next tab page.  When "x" is
 	    // small guess it's the left button.
 	    send_tabline_event(x < 50 ? -1 : 0);
     }
-    else if (but == GDK_BUTTON_MIDDLE)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (but == GDK_BUTTON_ಮಧ್ಯ)
     {
-	if (tabpage_hover != 0)
+	ಆದರೆ (tabpage_hover != 0)
 	    // Middle mouse click on tabpage label closes that tab.
 	    send_tabline_menu_event(tabpage_hover, TABLINE_MENU_CLOSE);
     }
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * ============================================================
@@ -3186,51 +3186,51 @@ tabline_menu_press_event(
  * ============================================================
  */
 
-#if defined(FEAT_SIGN_ICONS)
-# define SIGN_WIDTH  (2 * gui.char_width)
-# define SIGN_HEIGHT (gui.char_height)
+#ಆದರೆ defined(FEAT_SIGN_ICONS)
+# define SIGN_ಅಗಲ  (2 * gui.char_ಅಗಲ)
+# define SIGN_ಎತ್ತರ (gui.char_ಎತ್ತರ)
 
-    void
-gui_mch_drawsign(int row, int col, int typenr)
+    ಶೂನ್ಯ
+gui_mch_drawsign(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು, ಪೂರ್ಣಾಂಕ typenr)
 {
     GdkTexture *sign;
 
     sign = (GdkTexture *)sign_get_image(typenr);
-    if (sign == NULL)
-	return;
+    ಆದರೆ (sign == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    vim_draw_area_add_sign(VIM_DRAW_AREA(gui.drawarea), sign,
-	    row, col, SIGN_WIDTH, SIGN_HEIGHT);
+    vim_draw_area_ಕೂಡಿಸು_sign(VIM_DRAW_AREA(gui.drawarea), sign,
+	    ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು, SIGN_ಅಗಲ, SIGN_ಎತ್ತರ);
 
-    gtk_widget_queue_draw(gui.drawarea);
+    gtk_widget_ಸರತಿ_draw(gui.drawarea);
 }
 
-    void *
-gui_mch_register_sign(char_u *signfile)
+    ಶೂನ್ಯ *
+gui_mch_ರಿಜಿಸ್ಟರ್_sign(char_u *signfile)
 {
-    if (signfile[0] != NUL && signfile[0] != '-' && gui.in_use)
+    ಆದರೆ (signfile[0] != NUL && signfile[0] != '-' && gui.ಒಳ_use)
     {
-	GError	    *error = NULL;
+	GError	    *error = ಖಾಲಿ;
 	GdkTexture  *sign;
 
-	sign = gdk_texture_new_from_filename((const char *)signfile,
+	sign = gdk_texture_new_from_filename((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)signfile,
 							    &error);
-	if (sign != NULL)
-	    return sign;
+	ಆದರೆ (sign != ಖಾಲಿ)
+	    ಹಿಂತಿರುಗಿ sign;
 
-	semsg("E255: %s", error->message);
+	semsg("E255: %s", error->ಸಂದೇಶ_2);
 	g_error_free(error);
     }
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
-    void
-gui_mch_destroy_sign(void *sign)
+    ಶೂನ್ಯ
+gui_mch_destroy_sign(ಶೂನ್ಯ *sign)
 {
-    if (sign != NULL)
+    ಆದರೆ (sign != ಖಾಲಿ)
 	g_object_unref(sign);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
  * ============================================================
@@ -3245,28 +3245,28 @@ gui_mch_destroy_sign(void *sign)
  * uses the fast cached glyph path.
  * Returns the number of display cells used.
  */
-    int
-gui_gtk_draw_string(int row, int col, char_u *s, int len, int flags)
+    ಪೂರ್ಣಾಂಕ
+gui_gtk_draw_string(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು, char_u *s, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ flags)
 {
-    int cells;
+    ಪೂರ್ಣಾಂಕ cells;
 
     cells = vim_draw_area_draw_string(VIM_DRAW_AREA(gui.drawarea),
-	    row, col, s, len, flags);
+	    ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು, s, len, flags);
 
-    if (gui.drawarea != NULL)
-	gtk_widget_queue_draw(gui.drawarea);
+    ಆದರೆ (gui.drawarea != ಖಾಲಿ)
+	gtk_widget_ಸರತಿ_draw(gui.drawarea);
 
-    return cells;
+    ಹಿಂತಿರುಗಿ cells;
 }
 
-    int
-gui_get_x11_windis(Window *win UNUSED, Display **dis UNUSED)
+    ಪೂರ್ಣಾಂಕ
+gui_get_x11_windis(ಕಿಟಕಿ *win ಬಳಸದ, Display **dis ಬಳಸದ)
 {
     // GTK4: not applicable
-    return FAIL;
+    ಹಿಂತಿರುಗಿ FAIL;
 }
 
-#if defined(FEAT_MENU)
+#ಆದರೆ defined(FEAT_MENU)
 /*
  * Translate Vim's mnemonic tagging to GTK+ style and convert to UTF-8
  * if necessary.  The caller must vim_free() the returned string.
@@ -3277,42 +3277,42 @@ gui_get_x11_windis(Window *win UNUSED, Display **dis UNUSED)
  *	&	_	stripped if use_mnemonic == FALSE
  *	<Tab>		end of menu label text
  */
-    static char_u *
-translate_mnemonic_tag(char_u *name, int use_mnemonic)
+    ಸ್ಥಿರ char_u *
+translate_mnemonic_ಟ್ಯಾಗ್(char_u *name, ಪೂರ್ಣಾಂಕ use_mnemonic)
 {
     char_u  *buf;
     char_u  *psrc;
     char_u  *pdest;
-    int	    n_underscores = 0;
+    ಪೂರ್ಣಾಂಕ	    n_underscores = 0;
 
-    name = CONVERT_TO_UTF8(name);
-    if (name == NULL)
-	return NULL;
+    name = CONVERT_ಗಮ್ಯ_UTF8(name);
+    ಆದರೆ (name == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    for (psrc = name; *psrc != NUL && *psrc != TAB; ++psrc)
-	if (*psrc == '_')
+    ಗಾಗಿ (psrc = name; *psrc != NUL && *psrc != TAB; ++psrc)
+	ಆದರೆ (*psrc == '_')
 	    ++n_underscores;
 
     buf = alloc(psrc - name + n_underscores + 1);
-    if (buf != NULL)
+    ಆದರೆ (buf != ಖಾಲಿ)
     {
 	pdest = buf;
-	for (psrc = name; *psrc != NUL && *psrc != TAB; ++psrc)
+	ಗಾಗಿ (psrc = name; *psrc != NUL && *psrc != TAB; ++psrc)
 	{
-	    if (*psrc == '_')
+	    ಆದರೆ (*psrc == '_')
 	    {
 		*pdest++ = '_';
 		*pdest++ = '_';
 	    }
-	    else if (*psrc != '&')
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*psrc != '&')
 	    {
 		*pdest++ = *psrc;
 	    }
-	    else if (*(psrc + 1) == '&')
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*(psrc + 1) == '&')
 	    {
 		*pdest++ = *psrc++;
 	    }
-	    else if (use_mnemonic)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (use_mnemonic)
 	    {
 		*pdest++ = '_';
 	    }
@@ -3320,83 +3320,83 @@ translate_mnemonic_tag(char_u *name, int use_mnemonic)
 	*pdest = NUL;
     }
 
-    CONVERT_TO_UTF8_FREE(name);
-    return buf;
+    CONVERT_ಗಮ್ಯ_UTF8_FREE(name);
+    ಹಿಂತಿರುಗಿ buf;
 }
 
 /*
  * Enable or disable accelerators for the toplevel menus.
  */
-    void
-gui_gtk_set_mnemonics(int enable)
+    ಶೂನ್ಯ
+gui_gtk_ಗಣ_mnemonics(ಪೂರ್ಣಾಂಕ enable)
 {
     vimmenu_T	*menu;
     char_u	*name;
 
     FOR_ALL_MENUS(menu)
     {
-	if (menu->id == NULL)
-	    continue;
+	ಆದರೆ (menu->id == ಖಾಲಿ)
+	    ಮುಂದುವರಿ;
 
-	name = translate_mnemonic_tag(menu->name, enable);
+	name = translate_mnemonic_ಟ್ಯಾಗ್(menu->name, enable);
 	// Don't think the check if necessary but still do it anyways
-	if (VIM_IS_MENU_BAR_ITEM(menu->id))
-	    vim_menu_bar_item_set_text(VIM_MENU_BAR_ITEM(menu->id),
-		    (const char *)name);
+	ಆದರೆ (VIM_IS_MENU_BAR_ಅಂಶ(menu->id))
+	    vim_menu_bar_ಅಂಶ_ಗಣ_ಪಠ್ಯ(VIM_MENU_BAR_ಅಂಶ(menu->id),
+		    (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)name);
 	vim_free(name);
     }
 }
 
-    static void
-popupmenu_closed_cb(GtkWidget *popover, void *udata UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+popupmenu_closed_cb(GtkWidget *popover, ಶೂನ್ಯ *udata ಬಳಸದ)
 {
     gtk_widget_unparent(popover);
-    if (gui.drawarea != NULL)
-	gtk_widget_queue_draw(gui.drawarea);
+    ಆದರೆ (gui.drawarea != ಖಾಲಿ)
+	gtk_widget_ಸರತಿ_draw(gui.drawarea);
 }
 
 /*
  * Open a popup for the given menu at point (x, y).
  */
-    static void
-gui_gtk_popup_at(vimmenu_T *menu, int x, int y)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+gui_gtk_popup_at(vimmenu_T *menu, ಪೂರ್ಣಾಂಕ x, ಪೂರ್ಣಾಂಕ y)
 {
     GtkWidget	    *popover;
     GdkRectangle    rect;
 
-    if (menu == NULL || menu->submenu_id == NULL)
-	return;
+    ಆದರೆ (menu == ಖಾಲಿ || menu->submenu_id == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     popover = vim_menu_copy(VIM_MENU(menu->submenu_id));
-    gtk_widget_set_parent(popover, gui.drawarea);
+    gtk_widget_ಗಣ_ಪೋಷಕ(popover, gui.drawarea);
 
     rect.x = x;
     rect.y = y;
-    rect.width = rect.height = 1;
+    rect.ಅಗಲ = rect.ಎತ್ತರ = 1;
 
     // Make sure popover aligns down-and-to-the-right of the pointer.
-    gtk_popover_set_position(GTK_POPOVER(popover), GTK_POS_BOTTOM);
-    gtk_widget_set_halign(popover, GTK_ALIGN_START);
-    gtk_popover_set_pointing_to(GTK_POPOVER(popover), &rect);
+    gtk_popover_ಗಣ_position(GTK_POPOVER(popover), GTK_POS_BOTTOM);
+    gtk_widget_ಗಣ_halign(popover, GTK_ALIGN_ಆರಂಭ);
+    gtk_popover_ಗಣ_pointing_ಗಮ್ಯ(GTK_POPOVER(popover), &rect);
 
     g_signal_connect(GTK_POPOVER(popover), "closed",
-	    G_CALLBACK(popupmenu_closed_cb), NULL);
+	    G_CALLBACK(popupmenu_closed_cb), ಖಾಲಿ);
     gtk_popover_popup(GTK_POPOVER(popover));
 }
 
-    void
-gui_make_popup(char_u *path_name, int mouse_pos)
+    ಶೂನ್ಯ
+gui_make_popup(char_u *ಮಾರ್ಗ_name, ಪೂರ್ಣಾಂಕ mouse_pos)
 {
     vimmenu_T	*menu;
-    int		x, y;
+    ಪೂರ್ಣಾಂಕ		x, y;
 
-    menu = gui_find_menu(path_name);
-    if (menu == NULL || menu->submenu_id == NULL)
-	return;
+    menu = gui_ಕಂಡುಹಿಡಿ_menu(ಮಾರ್ಗ_name);
+    ಆದರೆ (menu == ಖಾಲಿ || menu->submenu_id == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    if (mouse_pos)
+    ಆದರೆ (mouse_pos)
 	gui_mch_getmouse(&x, &y);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	x = FILL_X(curwin->w_wincol + curwin->w_wcol + 1) + 1;
 	y = FILL_Y(W_WINROW(curwin) + curwin->w_wrow + 1) + 1;
@@ -3405,43 +3405,43 @@ gui_make_popup(char_u *path_name, int mouse_pos)
     gui_gtk_popup_at(menu, x, y);
 
 }
-#endif // FEAT_MENU
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_MENU
 
-    int
-get_menu_tool_width(void)
+    ಪೂರ್ಣಾಂಕ
+get_menu_tool_ಅಗಲ(ಶೂನ್ಯ)
 {
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-    int
-get_menu_tool_height(void)
+    ಪೂರ್ಣಾಂಕ
+get_menu_tool_ಎತ್ತರ(ಶೂನ್ಯ)
 {
     GtkWidget *widgets[] = {
-#ifdef FEAT_MENU
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MENU
 	gui.menubar,
-#endif
-#ifdef FEAT_TOOLBAR
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_TOOLBAR
 	gui.toolbar,
-#endif
-#ifdef FEAT_GUI_TABLINE
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_GUI_TABLINE
 	gui.tabline
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     };
 
-    int height = 0;
+    ಪೂರ್ಣಾಂಕ ಎತ್ತರ = 0;
 
-    for (int i = 0; i < (int)ARRAY_LENGTH(widgets); i++)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(widgets); i++)
     {
 	GtkRequisition	min;
 	GtkRequisition	nat;
-	int		h;
+	ಪೂರ್ಣಾಂಕ		h;
 
-	if (widgets[i] == NULL || !gtk_widget_get_visible(widgets[i]))
-	    continue;
+	ಆದರೆ (widgets[i] == ಖಾಲಿ || !gtk_widget_get_visible(widgets[i]))
+	    ಮುಂದುವರಿ;
 
-	h = gtk_widget_get_height(widgets[i]);
+	h = gtk_widget_get_ಎತ್ತರ(widgets[i]);
 
-	if (h == 0)
+	ಆದರೆ (h == 0)
 	{
 	    // Allocation hasn't been updated yet (widget just became visible).
 	    // Query the preferred height so the caller gets a valid value
@@ -3449,210 +3449,210 @@ get_menu_tool_height(void)
 	    // natural height: GTK may allocate min_h even when natural_h is
 	    // smaller (e.g. GtkNotebook tab bar has min_h > natural_h due to
 	    // CSS).
-	    gtk_widget_get_preferred_size(widgets[i], &min, &nat);
-	    height += MAX(min.height, nat.height);
+	    gtk_widget_get_preferred_ಗಾತ್ರ(widgets[i], &min, &nat);
+	    ಎತ್ತರ += MAX(min.ಎತ್ತರ, nat.ಎತ್ತರ);
 	}
-	else
-	    height += h;
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಎತ್ತರ += h;
     }
-    return height;
+    ಹಿಂತಿರುಗಿ ಎತ್ತರ;
 }
 
 /*
  * Update selection targets for regular and primary selections.
  */
-    void
+    ಶೂನ್ಯ
 gui_gtk_update_selection_formats(Clipboard_T *cbd)
 {
     // This will call the ref_formats() vfunc of the content provider, see
     // gui_gtk4_cb.c
-    if (cbd == &clip_plus)
-	gdk_content_provider_content_changed(gui.regular_provider);
-    else
-	gdk_content_provider_content_changed(gui.primary_provider);
+    ಆದರೆ (cbd == &clip_plus)
+	gdk_content_provider_content_ಬದಲಾಯಿತು(gui.regular_provider);
+    ಇಲ್ಲದಿದ್ದರೆ
+	gdk_content_provider_content_ಬದಲಾಯಿತು(gui.primary_provider);
 }
 
 /*
  * Get the GdkClipboard and GdkContentProvider for the given Clipboard_T.
  * clip_star (*) uses PRIMARY, clip_plus (+) uses CLIPBOARD.
  */
-    static GdkClipboard *
+    ಸ್ಥಿರ GdkClipboard *
 gtk4_get_clipboard(Clipboard_T *cbd, GdkContentProvider **provider)
 {
     GdkDisplay *display;
 
-    if (gui.mainwin == NULL)
-	return NULL;
+    ಆದರೆ (gui.mainwin == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
     display = gtk_widget_get_display(gui.mainwin);
-    if (display == NULL)
-	return NULL;
+    ಆದರೆ (display == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 
-    if (cbd == &clip_plus)
+    ಆದರೆ (cbd == &clip_plus)
     {
-	if (provider != NULL)
+	ಆದರೆ (provider != ಖಾಲಿ)
 	    *provider = gui.regular_provider;
-	return gdk_display_get_clipboard(display);
+	ಹಿಂತಿರುಗಿ gdk_display_get_clipboard(display);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (provider != NULL)
+	ಆದರೆ (provider != ಖಾಲಿ)
 	    *provider = gui.primary_provider;
-	return gdk_display_get_primary_clipboard(display);
+	ಹಿಂತಿರುಗಿ gdk_display_get_primary_clipboard(display);
     }
 }
 
 /*
  * Callback for gdk_clipboard_read_async().
  */
-    static void
-clip_read_cb(GdkClipboard *cb, GAsyncResult *result, ClipReadData *crd)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+clip_read_cb(GdkClipboard *cb, GAsync_ಫಲಿತಾಂಶ *ಫಲಿತಾಂಶ, Clip_Read_ದತ್ತಾಂಶ *crd)
 {
-    GInputStream    *in_stream;
-    const char	    *mime_type;
+    GInput_ಹರಿವು    *ಒಳ_ಹರಿವು;
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ	    *mime_type;
 
-    in_stream = gdk_clipboard_read_finish(cb, result, &mime_type, NULL);
-    if (in_stream == NULL)
+    ಒಳ_ಹರಿವು = gdk_clipboard_read_ಮುಕ್ತಾಯ(cb, ಫಲಿತಾಂಶ, &mime_type, ಖಾಲಿ);
+    ಆದರೆ (ಒಳ_ಹರಿವು == ಖಾಲಿ)
     {
-	read_data_free(&crd->rd);
-	return;
+	read_ದತ್ತಾಂಶ_free(&crd->rd);
+	ಹಿಂತಿರುಗಿ;
     }
 
     // Not sure if we need to copy the string, but do it anyways.
     crd->mime_type = g_strdup(mime_type);
-    g_input_stream_read_async(in_stream, crd->rd.buf, READDATA_BUFSIZE,
-	    G_PRIORITY_HIGH,
-	    crd->rd.cancel, (GAsyncReadyCallback)read_data_input_cb, crd);
+    g_ಒಳಹರಿವು_ಹರಿವು_read_async(ಒಳ_ಹರಿವು, crd->rd.buf, READDATA_BUFSIZE,
+	    G_ಆದ್ಯತೆ_ಮೇಲಿನ,
+	    crd->rd.cancel, (GAsyncReadyCallback)read_ದತ್ತಾಂಶ_ಒಳಹರಿವು_cb, crd);
 }
 
 /*
  * Request the selection from the clipboard.
  */
-    void
+    ಶೂನ್ಯ
 clip_mch_request_selection(Clipboard_T *cbd)
 {
-    static const char *mimes_no_html[] = {
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *mimes_no_html[] = {
 	VIMENC_MIMETYPE_NAME,
 	VIM_MIMETYPE_NAME,
 	"text/plain;charset=utf-8",
 	"text/plain",
-	NULL
+	ಖಾಲಿ
     };
 
     GdkClipboard *clipboard;
-    ClipReadData *crd;
+    Clip_Read_ದತ್ತಾಂಶ *crd;
     GCancellable *cancel;
 
-    clipboard = gtk4_get_clipboard(cbd, NULL);
-    if (clipboard == NULL)
-	return;
+    clipboard = gtk4_get_clipboard(cbd, ಖಾಲಿ);
+    ಆದರೆ (clipboard == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    crd = (ClipReadData *)read_data_new(READ_DATA_CLIP, sizeof(*crd));
+    crd = (Clip_Read_ದತ್ತಾಂಶ *)read_ದತ್ತಾಂಶ_new(READ_ದತ್ತಾಂಶ_CLIP, ಗಾತ್ರ(*crd));
     crd->cbd = cbd;
     cancel = g_object_ref(crd->rd.cancel);
 
     gdk_clipboard_read_async(
 	    clipboard, clip_html ? supported_mimes : mimes_no_html,
-	    G_PRIORITY_HIGH, crd->rd.cancel,
+	    G_ಆದ್ಯತೆ_ಮೇಲಿನ, crd->rd.cancel,
 	    (GAsyncReadyCallback)clip_read_cb, crd);
 
     {
-	time_t start;
+	time_t ಆರಂಭ;
 
 	// Spin until the done receiving data, with a 3-second wall-clock
 	// timeout as a safety net. Use the GCancellable as a way to signal if
 	// done (and also use it to cancel if timed out as well).
-	start = time(NULL);
-	while (!g_cancellable_is_cancelled(cancel)
-		&& time(NULL) < start + 3)
-	    g_main_context_iteration(NULL, TRUE);
+	ಆರಂಭ = ಸಮಯ(ಖಾಲಿ);
+	ಆಗ (!g_cancellable_is_cancelled(cancel)
+		&& ಸಮಯ(ಖಾಲಿ) < ಆರಂಭ + 3)
+	    g_main_context_iteration(ಖಾಲಿ, TRUE);
 
 	g_cancellable_cancel(cancel);
 	g_object_unref(cancel);
     }
 }
 
-static int in_clipboard_set = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಒಳ_clipboard_ಗಣ = FALSE;
 
 /*
  * Send the current selection to the clipboard. Do nothing for because we
  * subclass GdkContentProvider which will provide the data only when needed.
  */
-    void
-clip_mch_set_selection(Clipboard_T *cbd UNUSED)
+    ಶೂನ್ಯ
+clip_mch_ಗಣ_selection(Clipboard_T *cbd ಬಳಸದ)
 {
 }
 
-    static void
-clipboard_changed_cb(GdkClipboard *clipboard, gpointer user_data)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+clipboard_ಬದಲಾಯಿತು_cb(GdkClipboard *clipboard, gpointer user_ದತ್ತಾಂಶ)
 {
-    Clipboard_T *cbd = (Clipboard_T *)user_data;
+    Clipboard_T *cbd = (Clipboard_T *)user_ದತ್ತಾಂಶ;
 
-    if (in_clipboard_set)
-	return;
-    if (gdk_clipboard_is_local(clipboard))
-	return;
+    ಆದರೆ (ಒಳ_clipboard_ಗಣ)
+	ಹಿಂತಿರುಗಿ;
+    ಆದರೆ (gdk_clipboard_is_local(clipboard))
+	ಹಿಂತಿರುಗಿ;
     clip_lose_selection(cbd);
 }
 
 /*
  * Own the selection.
  */
-    int
+    ಪೂರ್ಣಾಂಕ
 clip_mch_own_selection(Clipboard_T *cbd)
 {
     GdkContentProvider	*cp;
     GdkClipboard	*cb = gtk4_get_clipboard(cbd, &cp);
-    int			ret;
+    ಪೂರ್ಣಾಂಕ			ret;
 
-    if (cb == NULL)
-	return FAIL;
+    ಆದರೆ (cb == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    in_clipboard_set = TRUE;
-    ret = gdk_clipboard_set_content(cb, cp);
-    in_clipboard_set = FALSE;
+    ಒಳ_clipboard_ಗಣ = TRUE;
+    ret = gdk_clipboard_ಗಣ_content(cb, cp);
+    ಒಳ_clipboard_ಗಣ = FALSE;
 
-    return ret ? OK : FAIL;
+    ಹಿಂತಿರುಗಿ ret ? OK : FAIL;
 }
 
 /*
  * Disown the selection.  In GTK4, we clear the clipboard content to
  * release ownership.
  */
-    void
+    ಶೂನ್ಯ
 clip_mch_lose_selection(Clipboard_T *cbd)
 {
     GdkClipboard *clipboard;
 
-    clipboard = gtk4_get_clipboard(cbd, NULL);
-    if (clipboard == NULL)
-	return;
+    clipboard = gtk4_get_clipboard(cbd, ಖಾಲಿ);
+    ಆದರೆ (clipboard == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     // Only release ownership if we still own it. We don't want to clear the
     // current selection when we aren't actually the source.
-    if (gdk_clipboard_is_local(clipboard))
-	gdk_clipboard_set_content(clipboard, NULL);
+    ಆದರೆ (gdk_clipboard_is_local(clipboard))
+	gdk_clipboard_ಗಣ_content(clipboard, ಖಾಲಿ);
 }
 
 // GTK4 does not have gtk_main_level/gtk_main_quit.
 // Provide compatibility stubs using a simple flag.
     guint
-gtk_main_level(void)
+gtk_main_level(ಶೂನ್ಯ)
 {
-    return gtk4_main_loop_level;
+    ಹಿಂತಿರುಗಿ gtk4_main_loop_level;
 }
 
-    void
-gtk_main_quit(void)
+    ಶೂನ್ಯ
+gtk_main_quit(ಶೂನ್ಯ)
 {
     gtk4_main_loop_quit = TRUE;
 }
 
-#if defined(FEAT_MOUSESHAPE)
+#ಆದರೆ defined(FEAT_MOUSESHAPE)
 
 // Table of CSS cursor names corresponding to Vim's mouse shape IDs.
 // Keep in sync with the mshape_names[] table in misc2.c.
-static const char *mshape_css_names[] =
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *mshape_css_ಹೆಸರುಗಳು[] =
 {
     "default",			// arrow
     "none",			// blank
@@ -3673,36 +3673,36 @@ static const char *mshape_css_names[] =
     "default"			// last entry
 };
 
-    void
-mch_set_mouse_shape(int shape)
+    ಶೂನ್ಯ
+mch_ಗಣ_mouse_shape(ಪೂರ್ಣಾಂಕ shape)
 {
     GdkCursor	*c;
-    const char	*css_name = "default";
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ	*css_name = "default";
 
-    if (gui.drawarea == NULL)
-	return;
+    ಆದರೆ (gui.drawarea == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    if (shape == MSHAPE_HIDE || gui.pointer_hidden)
-	gtk_widget_set_cursor(gui.drawarea, gui.blank_pointer);
-    else
+    ಆದರೆ (shape == MSHAPE_HIDE || gui.ಸೂಚಕ_hidden)
+	gtk_widget_ಗಣ_cursor(gui.drawarea, gui.blank_ಸೂಚಕ);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	if (shape >= MSHAPE_NUMBERED)
+	ಆದರೆ (shape >= MSHAPE_NUMBERED)
 	    css_name = "default";
-	else if (shape < (int)ARRAY_LENGTH(mshape_css_names))
-	    css_name = mshape_css_names[shape];
-	else
-	    return;
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (shape < (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(mshape_css_ಹೆಸರುಗಳು))
+	    css_name = mshape_css_ಹೆಸರುಗಳು[shape];
+	ಇಲ್ಲದಿದ್ದರೆ
+	    ಹಿಂತಿರುಗಿ;
 
 	// GTK4: gdk_cursor_new_from_name(name, fallback)
-	c = gdk_cursor_new_from_name(css_name, NULL);
-	gtk_widget_set_cursor(gui.drawarea, c);
+	c = gdk_cursor_new_from_name(css_name, ಖಾಲಿ);
+	gtk_widget_ಗಣ_cursor(gui.drawarea, c);
 	g_object_unref(G_OBJECT(c));
     }
-    if (shape != MSHAPE_HIDE)
-	last_shape = shape;
+    ಆದರೆ (shape != MSHAPE_HIDE)
+	ಕೊನೆಯ_shape = shape;
 }
 
-#endif // FEAT_MOUSESHAPE
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_MOUSESHAPE
 
 
 /*
@@ -3712,8 +3712,8 @@ mch_set_mouse_shape(int shape)
 
 
 
-static int last_text_area_w = 0;
-static int last_text_area_h = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಕೊನೆಯ_ಪಠ್ಯ_area_w = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಕೊನೆಯ_ಪಠ್ಯ_area_h = 0;
 
 /*
  * ============================================================
@@ -3721,14 +3721,14 @@ static int last_text_area_h = 0;
  * ============================================================
  */
 
-#ifdef FEAT_MENU
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_MENU
 
 # ifdef FEAT_TOOLBAR
 /*
  * Icon name table for toolbar buttons.
  * Must match toolbar_names[] in menu.c.
  */
-static const char * const toolbar_icon_names[] =
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ * ಸ್ಥಿರಾಂಕ toolbar_icon_ಹೆಸರುಗಳು[] =
 {
     /* 00 */ "document-new",
     /* 01 */ "document-open",
@@ -3763,314 +3763,314 @@ static const char * const toolbar_icon_names[] =
     /* 30 */ "image-missing",
 };
 
-    static void
-toolbar_button_clicked_cb(GtkWidget *widget UNUSED, gpointer data)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+toolbar_button_clicked_cb(GtkWidget *widget ಬಳಸದ, gpointer ದತ್ತಾಂಶ)
 {
-    gui_menu_cb((vimmenu_T *)data);
+    gui_menu_cb((vimmenu_T *)ದತ್ತಾಂಶ);
 }
 
-    static GtkWidget *
+    ಸ್ಥಿರ GtkWidget *
 create_toolbar_icon(vimmenu_T *menu)
 {
     char_u	buf[MAXPATHL];
-    GtkWidget	*image = NULL;
+    GtkWidget	*image = ಖಾಲಿ;
 
     // Try specified icon file first
-    if (menu->iconfile != NULL)
+    ಆದರೆ (menu->iconfile != ಖಾಲಿ)
     {
 	expand_env(menu->iconfile, buf, MAXPATHL);
-	if (vim_fexists(buf))
+	ಆದರೆ (vim_fexists(buf))
 	{
 	    GdkTexture *texture = gdk_texture_new_from_filename(
-		    (const char *)buf, NULL);
+		    (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)buf, ಖಾಲಿ);
 
-	    if (texture != NULL)
+	    ಆದರೆ (texture != ಖಾಲಿ)
 	    {
 		image = gtk_image_new_from_paintable(
 			GDK_PAINTABLE(texture));
-		gtk_widget_set_size_request(image, 24, 24);
+		gtk_widget_ಗಣ_ಗಾತ್ರ_request(image, 24, 24);
 		g_object_unref(texture);
 	    }
 	}
     }
 
     // Use themed icon
-    if (image == NULL)
+    ಆದರೆ (image == ಖಾಲಿ)
     {
-	const char *icon_name = "image-missing";
-	int n = (int)ARRAY_LENGTH(toolbar_icon_names);
+	ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *icon_name = "image-missing";
+	ಪೂರ್ಣಾಂಕ n = (ಪೂರ್ಣಾಂಕ)ARRAY_ಉದ್ದಳತೆ(toolbar_icon_ಹೆಸರುಗಳು);
 
-	if (menu->iconidx >= 0 && menu->iconidx < n)
-	    icon_name = toolbar_icon_names[menu->iconidx];
+	ಆದರೆ (menu->iconidx >= 0 && menu->iconidx < n)
+	    icon_name = toolbar_icon_ಹೆಸರುಗಳು[menu->iconidx];
 
 	image = gtk_image_new_from_icon_name(icon_name);
     }
 
-    return image;
+    ಹಿಂತಿರುಗಿ image;
 }
 # endif
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 menu_button_clicked_cb(
-	VimMenuItem	    *item UNUSED,
-	VimMenuItemEvent    event,
+	Vim_Menu_ಅಂಶ	    *ಅಂಶ ಬಳಸದ,
+	Vim_Menu_ಅಂಶ_Event    event,
 	vimmenu_T	    *menu)
 {
-    if (event == VIM_MENU_ITEM_CLICKED)
+    ಆದರೆ (event == VIM_MENU_ಅಂಶ_CLICKED)
 	gui_menu_cb(menu);
-    else if (event == VIM_MENU_ITEM_SELECTED)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (event == VIM_MENU_ಅಂಶ_SELECTED)
     {
 	// Show tooltip instantly in cmdline message.
 	char_u		*tooltip;
-	static gboolean did_msg = FALSE;
+	ಸ್ಥಿರ gboolean did_ಸಂದೇಶ = FALSE;
 
-	if (State & MODE_CMDLINE)
-	    return;
+	ಆದರೆ (State & ಬಹುಲಕ_CMDLINE)
+	    ಹಿಂತಿರುಗಿ;
 
-	tooltip = CONVERT_TO_UTF8(menu->strings[MENU_INDEX_TIP]);
-	if (tooltip != NULL && utf_valid_string(tooltip, NULL))
+	tooltip = CONVERT_ಗಮ್ಯ_UTF8(menu->ಅಕ್ಷರಸರಣಿಗಳು[MENU_ಸೂಚ್ಯಂಕ_TIP]);
+	ಆದರೆ (tooltip != ಖಾಲಿ && utf_valid_string(tooltip, ಖಾಲಿ))
 	{
-	    msg((char *)tooltip);
-	    did_msg = TRUE;
+	    ಸಂದೇಶ((ಅಕ್ಷರ *)tooltip);
+	    did_ಸಂದೇಶ = TRUE;
 	    setcursor();
-	    out_flush_cursor(TRUE, FALSE);
+	    ಹೊರಹೋಗು_flush_cursor(TRUE, FALSE);
 	}
-	else if (did_msg)
+	ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (did_ಸಂದೇಶ)
 	{
-	    msg("");
-	    did_msg = FALSE;
+	    ಸಂದೇಶ("");
+	    did_ಸಂದೇಶ = FALSE;
 	    setcursor();
-	    out_flush_cursor(TRUE, FALSE);
+	    ಹೊರಹೋಗು_flush_cursor(TRUE, FALSE);
 	}
-	CONVERT_TO_UTF8_FREE(tooltip);
+	CONVERT_ಗಮ್ಯ_UTF8_FREE(tooltip);
     }
 }
 
-    void
-gui_mch_add_menu(vimmenu_T *menu, int idx)
+    ಶೂನ್ಯ
+gui_mch_ಕೂಡಿಸು_menu(vimmenu_T *menu, ಪೂರ್ಣಾಂಕ idx)
 {
-    vimmenu_T	*parent;
-    GtkWidget	*parent_widget;
+    vimmenu_T	*ಪೋಷಕ;
+    GtkWidget	*ಪೋಷಕ_widget;
     gboolean	use_mnemonic;
-    char_u	*text;
+    char_u	*ಪಠ್ಯ;
 
-    if (menu->name[0] == ']' || menu_is_popup(menu->name))
+    ಆದರೆ (menu->name[0] == ']' || menu_is_popup(menu->name))
     {
 	// Attach the popover to drawarea's parent rather than to drawarea
 	// itself. GtkDrawingArea is a leaf widget whose snapshot does not
 	// iterate children, and parenting a popover to it has been observed to
 	// leave the drawing area blank while the popover is open.
 	menu->submenu_id = g_object_ref_sink(vim_menu_new());
-	gtk_widget_set_parent(menu->submenu_id, gui.drawarea);
-	return;
+	gtk_widget_ಗಣ_ಪೋಷಕ(menu->submenu_id, gui.drawarea);
+	ಹಿಂತಿರುಗಿ;
     }
 
-    parent = menu->parent;
+    ಪೋಷಕ = menu->ಪೋಷಕ;
 
-    if ((parent != NULL && parent->submenu_id == NULL)
+    ಆದರೆ ((ಪೋಷಕ != ಖಾಲಿ && ಪೋಷಕ->submenu_id == ಖಾಲಿ)
 	    || !menu_is_menubar(menu->name))
-	return;
+	ಹಿಂತಿರುಗಿ;
 
     menu->submenu_id = g_object_ref_sink(vim_menu_new());
 
-    use_mnemonic = parent != NULL || p_wak[0] != 'n';
-    text = translate_mnemonic_tag(menu->name, use_mnemonic);
+    use_mnemonic = ಪೋಷಕ != ಖಾಲಿ || p_wak[0] != 'n';
+    ಪಠ್ಯ = translate_mnemonic_ಟ್ಯಾಗ್(menu->name, use_mnemonic);
 
-    if (parent != NULL)
+    ಆದರೆ (ಪೋಷಕ != ಖಾಲಿ)
     {
-	parent_widget = parent->submenu_id;
-	menu->id = g_object_ref_sink(vim_menu_item_new(
-		    (const char *)text, NULL, NULL));
+	ಪೋಷಕ_widget = ಪೋಷಕ->submenu_id;
+	menu->id = g_object_ref_sink(vim_menu_ಅಂಶ_new(
+		    (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)ಪಠ್ಯ, ಖಾಲಿ, ಖಾಲಿ));
 
-	vim_menu_item_set_submenu(VIM_MENU_ITEM(menu->id),
+	vim_menu_ಅಂಶ_ಗಣ_submenu(VIM_MENU_ಅಂಶ(menu->id),
 		VIM_MENU(menu->submenu_id));
-	vim_menu_insert_item(VIM_MENU(parent_widget),
-		VIM_MENU_ITEM(menu->id), idx);
+	vim_menu_ಸೇರಿಸು_ಅಂಶ(VIM_MENU(ಪೋಷಕ_widget),
+		VIM_MENU_ಅಂಶ(menu->id), idx);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	parent_widget = gui.menubar;
-	menu->id = g_object_ref_sink(vim_menu_bar_item_new(
-		    (const char *)text, VIM_MENU(menu->submenu_id)));
+	ಪೋಷಕ_widget = gui.menubar;
+	menu->id = g_object_ref_sink(vim_menu_bar_ಅಂಶ_new(
+		    (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)ಪಠ್ಯ, VIM_MENU(menu->submenu_id)));
 
-	vim_menu_bar_insert_item(VIM_MENU_BAR(parent_widget),
-		VIM_MENU_BAR_ITEM(menu->id), idx);
+	vim_menu_bar_ಸೇರಿಸು_ಅಂಶ(VIM_MENU_BAR(ಪೋಷಕ_widget),
+		VIM_MENU_BAR_ಅಂಶ(menu->id), idx);
     }
 
-    vim_free(text);
+    vim_free(ಪಠ್ಯ);
 }
 
-    void
-gui_mch_add_menu_item(vimmenu_T *menu, int idx)
+    ಶೂನ್ಯ
+gui_mch_ಕೂಡಿಸು_menu_ಅಂಶ(vimmenu_T *menu, ಪೂರ್ಣಾಂಕ idx)
 {
-    vimmenu_T	*parent = menu->parent;
+    vimmenu_T	*ಪೋಷಕ = menu->ಪೋಷಕ;
 
 # ifdef FEAT_TOOLBAR
-    if (parent != NULL && menu_is_toolbar(parent->name))
+    ಆದರೆ (ಪೋಷಕ != ಖಾಲಿ && menu_is_toolbar(ಪೋಷಕ->name))
     {
-	if (menu_is_separator(menu->name))
+	ಆದರೆ (menu_is_separator(menu->name))
 	{
 	    menu->id =
-		vim_toolbar_insert_separator(VIM_TOOLBAR(gui.toolbar), idx);
+		vim_toolbar_ಸೇರಿಸು_separator(VIM_TOOLBAR(gui.toolbar), idx);
 	}
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	{
 	    GtkWidget	*btn;
 	    GtkWidget	*icon;
-	    char_u	*text;
+	    char_u	*ಪಠ್ಯ;
 	    char_u	*tooltip;
 
-	    text    = CONVERT_TO_UTF8(menu->dname);
-	    tooltip = CONVERT_TO_UTF8(menu->strings[MENU_INDEX_TIP]);
-	    if (tooltip != NULL && !utf_valid_string(tooltip, NULL))
-		CONVERT_TO_UTF8_FREE(tooltip);
+	    ಪಠ್ಯ    = CONVERT_ಗಮ್ಯ_UTF8(menu->dname);
+	    tooltip = CONVERT_ಗಮ್ಯ_UTF8(menu->ಅಕ್ಷರಸರಣಿಗಳು[MENU_ಸೂಚ್ಯಂಕ_TIP]);
+	    ಆದರೆ (tooltip != ಖಾಲಿ && !utf_valid_string(tooltip, ಖಾಲಿ))
+		CONVERT_ಗಮ್ಯ_UTF8_FREE(tooltip);
 
 	    icon = create_toolbar_icon(menu);
-	    btn = vim_toolbar_insert_button(VIM_TOOLBAR(gui.toolbar),
-		    icon, (const char *)text, idx);
-	    gtk_widget_set_tooltip_text(btn, (const gchar *)tooltip);
+	    btn = vim_toolbar_ಸೇರಿಸು_button(VIM_TOOLBAR(gui.toolbar),
+		    icon, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)ಪಠ್ಯ, idx);
+	    gtk_widget_ಗಣ_tooltip_ಪಠ್ಯ(btn, (ಸ್ಥಿರಾಂಕ gchar *)tooltip);
 
 	    g_signal_connect(btn, "clicked",
 		    G_CALLBACK(toolbar_button_clicked_cb), menu);
 
 	    menu->id = btn;
-	    CONVERT_TO_UTF8_FREE(text);
-	    CONVERT_TO_UTF8_FREE(tooltip);
+	    CONVERT_ಗಮ್ಯ_UTF8_FREE(ಪಠ್ಯ);
+	    CONVERT_ಗಮ್ಯ_UTF8_FREE(tooltip);
 	}
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 # endif
 
     // Menu items (non-toolbar)
-    if (parent == NULL || parent->submenu_id == NULL)
-	return;
+    ಆದರೆ (ಪೋಷಕ == ಖಾಲಿ || ಪೋಷಕ->submenu_id == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    if (menu_is_separator(menu->name))
+    ಆದರೆ (menu_is_separator(menu->name))
     {
-	menu->id = g_object_ref_sink(vim_menu_insert_separator(
-		VIM_MENU(parent->submenu_id), idx));
+	menu->id = g_object_ref_sink(vim_menu_ಸೇರಿಸು_separator(
+		VIM_MENU(ಪೋಷಕ->submenu_id), idx));
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	char_u	    *text;
-	char_u	    *accel_text = NULL;
+	char_u	    *ಪಠ್ಯ;
+	char_u	    *accel_ಪಠ್ಯ = ಖಾಲಿ;
 	gboolean    use_mnemonic;
 
 	use_mnemonic = p_wak[0] != 'n';
-	text = translate_mnemonic_tag(menu->name, use_mnemonic);
+	ಪಠ್ಯ = translate_mnemonic_ಟ್ಯಾಗ್(menu->name, use_mnemonic);
 
-	if (menu->actext != NULL && menu->actext[0] != NUL)
-	    accel_text = CONVERT_TO_UTF8(menu->actext);
+	ಆದರೆ (menu->actext != ಖಾಲಿ && menu->actext[0] != NUL)
+	    accel_ಪಠ್ಯ = CONVERT_ಗಮ್ಯ_UTF8(menu->actext);
 
 	// Add our own reference to the widget
-	menu->id = g_object_ref_sink(vim_menu_item_new((const char *)text,
-		    (VimMenuItemFunc)menu_button_clicked_cb, menu));
+	menu->id = g_object_ref_sink(vim_menu_ಅಂಶ_new((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)ಪಠ್ಯ,
+		    (Vim_Menu_ಅಂಶ_Func)menu_button_clicked_cb, menu));
 
-	if (accel_text != NULL)
-	    vim_menu_item_set_accel(VIM_MENU_ITEM(menu->id),
-		    (const char *)accel_text);
+	ಆದರೆ (accel_ಪಠ್ಯ != ಖಾಲಿ)
+	    vim_menu_ಅಂಶ_ಗಣ_accel(VIM_MENU_ಅಂಶ(menu->id),
+		    (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)accel_ಪಠ್ಯ);
 
-	vim_menu_insert_item(VIM_MENU(parent->submenu_id),
-		VIM_MENU_ITEM(menu->id), idx);
+	vim_menu_ಸೇರಿಸು_ಅಂಶ(VIM_MENU(ಪೋಷಕ->submenu_id),
+		VIM_MENU_ಅಂಶ(menu->id), idx);
 
-	vim_free(text);
-	CONVERT_TO_UTF8_FREE(accel_text);
+	vim_free(ಪಠ್ಯ);
+	CONVERT_ಗಮ್ಯ_UTF8_FREE(accel_ಪಠ್ಯ);
     }
 }
 
-    void
-gui_mch_toggle_tearoffs(int enable UNUSED)
+    ಶೂನ್ಯ
+gui_mch_toggle_tearoffs(ಪೂರ್ಣಾಂಕ enable ಬಳಸದ)
 {
     // GTK4: tearoff menus don't exist.
 }
 
-    void
-gui_mch_menu_set_tip(vimmenu_T *menu)
+    ಶೂನ್ಯ
+gui_mch_menu_ಗಣ_tip(vimmenu_T *menu)
 {
     char_u *tooltip;
 
-    if (menu->id == NULL)
-	return;
+    ಆದರೆ (menu->id == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    tooltip = CONVERT_TO_UTF8(menu->strings[MENU_INDEX_TIP]);
-    if (tooltip != NULL && utf_valid_string(tooltip, NULL))
-	gtk_widget_set_tooltip_text(menu->id, (const char *)tooltip);
-    CONVERT_TO_UTF8_FREE(tooltip);
+    tooltip = CONVERT_ಗಮ್ಯ_UTF8(menu->ಅಕ್ಷರಸರಣಿಗಳು[MENU_ಸೂಚ್ಯಂಕ_TIP]);
+    ಆದರೆ (tooltip != ಖಾಲಿ && utf_valid_string(tooltip, ಖಾಲಿ))
+	gtk_widget_ಗಣ_tooltip_ಪಠ್ಯ(menu->id, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)tooltip);
+    CONVERT_ಗಮ್ಯ_UTF8_FREE(tooltip);
 }
 
-    void
+    ಶೂನ್ಯ
 gui_mch_destroy_menu(vimmenu_T *menu)
 {
     // For toolbar buttons and separators, remove from the toolbar box.
-    if (menu->parent != NULL && menu_is_toolbar(menu->parent->name))
+    ಆದರೆ (menu->ಪೋಷಕ != ಖಾಲಿ && menu_is_toolbar(menu->ಪೋಷಕ->name))
     {
-	if (menu->id != NULL)
+	ಆದರೆ (menu->id != ಖಾಲಿ)
 	{
 	    vim_toolbar_remove(VIM_TOOLBAR(gui.toolbar), menu->id);
-	    menu->id = NULL;
+	    menu->id = ಖಾಲಿ;
 	}
-	return;
+	ಹಿಂತಿರುಗಿ;
     }
 
     // For popup menus, unparent the menu as well
-    if (menu->name[0] == ']' || menu_is_popup(menu->name))
+    ಆದರೆ (menu->name[0] == ']' || menu_is_popup(menu->name))
     {
-	if (menu->submenu_id != NULL)
+	ಆದರೆ (menu->submenu_id != ಖಾಲಿ)
 	    gtk_widget_unparent(menu->submenu_id);
     }
-    else if (menu->parent == NULL && menu->id != NULL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (menu->ಪೋಷಕ == ಖಾಲಿ && menu->id != ಖಾಲಿ)
 	// Remove from menubar, if not NULL.
 	vim_menu_bar_remove(VIM_MENU_BAR(gui.menubar), menu->id);
     // "menu->id" is NULL for window toolbar
-    else if (menu->id != NULL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (menu->id != ಖಾಲಿ)
 	// Remove from parent menu
-	vim_menu_remove(VIM_MENU(menu->parent->submenu_id), menu->id);
+	vim_menu_remove(VIM_MENU(menu->ಪೋಷಕ->submenu_id), menu->id);
 
     g_clear_object(&menu->submenu_id);
     g_clear_object(&menu->id);
 }
 
-    void
+    ಶೂನ್ಯ
 gui_mch_show_popupmenu(vimmenu_T *menu)
 {
-    int x, y;
+    ಪೂರ್ಣಾಂಕ x, y;
 
     gui_mch_getmouse(&x, &y);
     gui_gtk_popup_at(menu, x, y);
 }
 
-    static void
-show_menubar_popover(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+show_menubar_popover(ಶೂನ್ಯ)
 {
     GtkWidget	    *menu;
     GdkRectangle    rect;
 
-    if (gui.menubar == NULL || gui.drawarea == NULL)
-	return;
+    ಆದರೆ (gui.menubar == ಖಾಲಿ || gui.drawarea == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    if (gtk_widget_is_visible(gui.menubar))
+    ಆದರೆ (gtk_widget_is_visible(gui.menubar))
     {
 	// If menubar is visible, then just show first menu in menubar, like how
 	// GTK traditionally seems to do it?
-	vim_menu_bar_show(VIM_MENU_BAR(gui.menubar), NULL);
-	return;
+	vim_menu_bar_show(VIM_MENU_BAR(gui.menubar), ಖಾಲಿ);
+	ಹಿಂತಿರುಗಿ;
     }
 
     // Copy and convert the menubar into a menu popover
-    menu = vim_menu_bar_to_menu(VIM_MENU_BAR(gui.menubar));
+    menu = vim_menu_bar_ಗಮ್ಯ_menu(VIM_MENU_BAR(gui.menubar));
 
-    gtk_widget_set_parent(menu, gui.drawarea);
-    gtk_popover_set_position(GTK_POPOVER(menu), GTK_POS_BOTTOM);
+    gtk_widget_ಗಣ_ಪೋಷಕ(menu, gui.drawarea);
+    gtk_popover_ಗಣ_position(GTK_POPOVER(menu), GTK_POS_BOTTOM);
     rect.x = 0;
     rect.y = 0;
-    rect.width = 1;
-    rect.height = 1;
-    gtk_popover_set_pointing_to(GTK_POPOVER(menu), &rect);
-    g_signal_connect(menu, "closed", G_CALLBACK(popupmenu_closed_cb), NULL);
+    rect.ಅಗಲ = 1;
+    rect.ಎತ್ತರ = 1;
+    gtk_popover_ಗಣ_pointing_ಗಮ್ಯ(GTK_POPOVER(menu), &rect);
+    g_signal_connect(menu, "closed", G_CALLBACK(popupmenu_closed_cb), ಖಾಲಿ);
     gtk_popover_popup(GTK_POPOVER(menu));
 }
 
-#endif // FEAT_MENU
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_MENU
 
 /*
  * ============================================================
@@ -4078,98 +4078,98 @@ show_menubar_popover(void)
  * ============================================================
  */
 
-    void
-gui_mch_set_scrollbar_thumb(scrollbar_T *sb, long val, long size, long max)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_scrollbar_thumb(scrollbar_T *sb, ದೀರ್ಘ val, ದೀರ್ಘ ಗಾತ್ರ_2, ದೀರ್ಘ max)
 {
     GtkAdjustment *adj;
 
-    if (sb->id == NULL)
-	return;
-    if (!GTK_IS_WIDGET(sb->id) || !GTK_IS_SCROLLBAR(sb->id))
-	return;
+    ಆದರೆ (sb->id == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
+    ಆದರೆ (!GTK_IS_WIDGET(sb->id) || !GTK_IS_SCROLLBAR(sb->id))
+	ಹಿಂತಿರುಗಿ;
 
     adj = gtk_scrollbar_get_adjustment(GTK_SCROLLBAR(sb->id));
-    gtk_adjustment_set_lower(adj, 0.0);
-    gtk_adjustment_set_upper(adj, (gdouble)max + 1);
-    gtk_adjustment_set_value(adj, (gdouble)val);
-    gtk_adjustment_set_step_increment(adj, 1.0);
-    gtk_adjustment_set_page_increment(adj, (gdouble)(size > 2 ? size - 2 : 1));
-    gtk_adjustment_set_page_size(adj, (gdouble)size);
+    gtk_adjustment_ಗಣ_ಅಧೋ(adj, 0.0);
+    gtk_adjustment_ಗಣ_ಊರ್ಧ್ವ(adj, (gdouble)max + 1);
+    gtk_adjustment_ಗಣ_ಮೌಲ್ಯ(adj, (gdouble)val);
+    gtk_adjustment_ಗಣ_ಹೆಜ್ಜೆ_increment(adj, 1.0);
+    gtk_adjustment_ಗಣ_ಪುಟ_increment(adj, (gdouble)(ಗಾತ್ರ_2 > 2 ? ಗಾತ್ರ_2 - 2 : 1));
+    gtk_adjustment_ಗಣ_ಪುಟ_ಗಾತ್ರ(adj, (gdouble)ಗಾತ್ರ_2);
 }
 
-    void
-gui_mch_set_scrollbar_pos(scrollbar_T *sb, int x, int y, int w, int h)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_scrollbar_pos(scrollbar_T *sb, ಪೂರ್ಣಾಂಕ x, ಪೂರ್ಣಾಂಕ y, ಪೂರ್ಣಾಂಕ w, ಪೂರ್ಣಾಂಕ h)
 {
-    if (sb->id != NULL)
+    ಆದರೆ (sb->id != ಖಾಲಿ)
 	vim_form_move_resize(VIM_FORM(gui.formwin), sb->id, x, y, w, h);
 }
 
-    int
-gui_mch_get_scrollbar_xpadding(void)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_get_scrollbar_xpadding(ಶೂನ್ಯ)
 {
-    int formwin_w = gtk_widget_get_width(gui.formwin);
-    int sbar_w = 0;
-    int xpad;
+    ಪೂರ್ಣಾಂಕ formwin_w = gtk_widget_get_ಅಗಲ(gui.formwin);
+    ಪೂರ್ಣಾಂಕ sbar_w = 0;
+    ಪೂರ್ಣಾಂಕ xpad;
 
-    if (gui.which_scrollbars[SBAR_LEFT])
-	sbar_w += gui.scrollbar_width;
-    if (gui.which_scrollbars[SBAR_RIGHT])
-	sbar_w += gui.scrollbar_width;
+    ಆದರೆ (gui.which_scrollbars[SBAR_ಎಡ])
+	sbar_w += gui.scrollbar_ಅಗಲ;
+    ಆದರೆ (gui.which_scrollbars[SBAR_ಬಲ])
+	sbar_w += gui.scrollbar_ಅಗಲ;
 
-    xpad = formwin_w - last_text_area_w - sbar_w;
-    return (xpad < 0) ? 0 : xpad;
+    xpad = formwin_w - ಕೊನೆಯ_ಪಠ್ಯ_area_w - sbar_w;
+    ಹಿಂತಿರುಗಿ (xpad < 0) ? 0 : xpad;
 }
 
-    int
-gui_mch_get_scrollbar_ypadding(void)
+    ಪೂರ್ಣಾಂಕ
+gui_mch_get_scrollbar_ypadding(ಶೂನ್ಯ)
 {
-    int formwin_h = gtk_widget_get_height(gui.formwin);
-    int ypad;
+    ಪೂರ್ಣಾಂಕ formwin_h = gtk_widget_get_ಎತ್ತರ(gui.formwin);
+    ಪೂರ್ಣಾಂಕ ypad;
 
-    ypad = formwin_h - last_text_area_h;
-    if (gui.which_scrollbars[SBAR_BOTTOM])
-	ypad -= gui.scrollbar_height;
+    ypad = formwin_h - ಕೊನೆಯ_ಪಠ್ಯ_area_h;
+    ಆದರೆ (gui.which_scrollbars[SBAR_BOTTOM])
+	ypad -= gui.scrollbar_ಎತ್ತರ;
 
-    return (ypad < 0) ? 0 : ypad;
+    ಹಿಂತಿರುಗಿ (ypad < 0) ? 0 : ypad;
 }
 
-    static void
-adjustment_value_changed(GtkAdjustment *adj, gpointer data UNUSED)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+adjustment_ಮೌಲ್ಯ_ಬದಲಾಯಿತು(GtkAdjustment *adj, gpointer ದತ್ತಾಂಶ ಬಳಸದ)
 {
-    scrollbar_T *sb = (scrollbar_T *)g_object_get_data(G_OBJECT(adj), "vim-sb");
-    long value = (long)gtk_adjustment_get_value(adj);
+    scrollbar_T *sb = (scrollbar_T *)g_object_get_ದತ್ತಾಂಶ(G_OBJECT(adj), "vim-sb");
+    ದೀರ್ಘ ಮೌಲ್ಯ = (ದೀರ್ಘ)gtk_adjustment_get_ಮೌಲ್ಯ(adj);
 
-    if (sb != NULL)
-	gui_drag_scrollbar(sb, value, FALSE);
+    ಆದರೆ (sb != ಖಾಲಿ)
+	gui_drag_scrollbar(sb, ಮೌಲ್ಯ, FALSE);
 }
 
-    void
-gui_mch_create_scrollbar(scrollbar_T *sb, int orient)
+    ಶೂನ್ಯ
+gui_mch_create_scrollbar(scrollbar_T *sb, ಪೂರ್ಣಾಂಕ orient)
 {
     GtkAdjustment *adj;
-    if (orient == SBAR_HORIZ)
-	sb->id = gtk_scrollbar_new(GTK_ORIENTATION_HORIZONTAL, NULL);
-    else
-	sb->id = gtk_scrollbar_new(GTK_ORIENTATION_VERTICAL, NULL);
+    ಆದರೆ (orient == SBAR_HORIZ)
+	sb->id = gtk_scrollbar_new(GTK_ORIENTATION_HORIZONTAL, ಖಾಲಿ);
+    ಇಲ್ಲದಿದ್ದರೆ
+	sb->id = gtk_scrollbar_new(GTK_ORIENTATION_VERTICAL, ಖಾಲಿ);
 
-    gtk_widget_add_css_class(sb->id, "vim-scrollbar");
+    gtk_widget_ಕೂಡಿಸು_css_class(sb->id, "vim-scrollbar");
     adj = gtk_scrollbar_get_adjustment(GTK_SCROLLBAR(sb->id));
 
-    gtk_widget_set_visible(sb->id, FALSE);
+    gtk_widget_ಗಣ_visible(sb->id, FALSE);
     vim_form_put(VIM_FORM(gui.formwin), sb->id, 0, 0);
 
-    g_object_set_data(G_OBJECT(adj), "vim-sb", (gpointer)sb);
+    g_object_ಗಣ_ದತ್ತಾಂಶ(G_OBJECT(adj), "vim-sb", (gpointer)sb);
     g_signal_connect(G_OBJECT(adj), "value-changed",
-	    G_CALLBACK(adjustment_value_changed), NULL);
+	    G_CALLBACK(adjustment_ಮೌಲ್ಯ_ಬದಲಾಯಿತು), ಖಾಲಿ);
 }
 
-    void
+    ಶೂನ್ಯ
 gui_mch_destroy_scrollbar(scrollbar_T *sb)
 {
-    if (sb->id != NULL)
+    ಆದರೆ (sb->id != ಖಾಲಿ)
     {
 	vim_form_remove(VIM_FORM(gui.formwin), sb->id);
-	sb->id = NULL;
+	sb->id = ಖಾಲಿ;
     }
 }
 
@@ -4179,15 +4179,15 @@ gui_mch_destroy_scrollbar(scrollbar_T *sb)
  * ============================================================
  */
 
-    void
-gui_mch_set_text_area_pos(int x, int y, int w, int h)
+    ಶೂನ್ಯ
+gui_mch_ಗಣ_ಪಠ್ಯ_area_pos(ಪೂರ್ಣಾಂಕ x, ಪೂರ್ಣಾಂಕ y, ಪೂರ್ಣಾಂಕ w, ಪೂರ್ಣಾಂಕ h)
 {
     // "h" may be negative especially when draw area size is smaller than
     // "gui.char_height".
-    if (w <= 0 || h <= 0)
-	return;
-    last_text_area_w = w;
-    last_text_area_h = h;
+    ಆದರೆ (w <= 0 || h <= 0)
+	ಹಿಂತಿರುಗಿ;
+    ಕೊನೆಯ_ಪಠ್ಯ_area_w = w;
+    ಕೊನೆಯ_ಪಠ್ಯ_area_h = h;
 
     vim_form_move_resize(VIM_FORM(gui.formwin), gui.drawarea, x, y, w, h);
 }
@@ -4196,31 +4196,31 @@ gui_mch_set_text_area_pos(int x, int y, int w, int h)
  * Calculate the number of pixels to bleed background color to. Should be called
  * after all UI elements are positioned and resized.
  */
-    void
-gui_gtk4_calculate_bleed(int width, int height)
+    ಶೂನ್ಯ
+gui_gtk4_calculate_bleed(ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ)
 {
-    int old_right = gui.bleed_right;
-    int old_bot = gui.bleed_bot;
+    ಪೂರ್ಣಾಂಕ old_ಬಲ = gui.bleed_ಬಲ;
+    ಪೂರ್ಣಾಂಕ old_bot = gui.bleed_bot;
 
-    gui.bleed_right = width - last_text_area_w;
-    gui.bleed_bot = height - last_text_area_h;
+    gui.bleed_ಬಲ = ಅಗಲ - ಕೊನೆಯ_ಪಠ್ಯ_area_w;
+    gui.bleed_bot = ಎತ್ತರ - ಕೊನೆಯ_ಪಠ್ಯ_area_h;
 
-    if (gui.which_scrollbars[SBAR_LEFT])
-	gui.bleed_right -= gui.scrollbar_width;
-    if (gui.which_scrollbars[SBAR_RIGHT])
-	gui.bleed_right -= gui.scrollbar_width;
-    if (gui.which_scrollbars[SBAR_BOTTOM])
-	gui.bleed_bot -= gui.scrollbar_height;
+    ಆದರೆ (gui.which_scrollbars[SBAR_ಎಡ])
+	gui.bleed_ಬಲ -= gui.scrollbar_ಅಗಲ;
+    ಆದರೆ (gui.which_scrollbars[SBAR_ಬಲ])
+	gui.bleed_ಬಲ -= gui.scrollbar_ಅಗಲ;
+    ಆದರೆ (gui.which_scrollbars[SBAR_BOTTOM])
+	gui.bleed_bot -= gui.scrollbar_ಎತ್ತರ;
 
     // Not sure if this can happen, but be safe...
-    if (gui.bleed_right < 0)
-	gui.bleed_right = 0;
-    if (gui.bleed_bot < 0)
+    ಆದರೆ (gui.bleed_ಬಲ < 0)
+	gui.bleed_ಬಲ = 0;
+    ಆದರೆ (gui.bleed_bot < 0)
 	gui.bleed_bot = 0;
 
     // Make sure to update draw area if changed
-    if (old_right != gui.bleed_right || old_bot != gui.bleed_bot)
-	gtk_widget_queue_draw(GTK_WIDGET(gui.drawarea));
+    ಆದರೆ (old_ಬಲ != gui.bleed_ಬಲ || old_bot != gui.bleed_bot)
+	gtk_widget_ಸರತಿ_draw(GTK_WIDGET(gui.drawarea));
 }
 
 /*
@@ -4232,109 +4232,109 @@ gui_gtk4_calculate_bleed(int width, int height)
 /*
  * Blocking helper: run a GtkFileDialog and wait for result.
  */
-typedef struct {
-    GFile	*result;
-    gboolean	done;
-} FileDialogData;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ {
+    GFile	*ಫಲಿತಾಂಶ;
+    gboolean	ಮುಗಿದ;
+} File_Dialog_ದತ್ತಾಂಶ;
 
-    static void
-file_dialog_open_cb(GObject *source, GAsyncResult *res, gpointer data)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+file_dialog_open_cb(GObject *ಮೂಲ, GAsync_ಫಲಿತಾಂಶ *res, gpointer ದತ್ತಾಂಶ)
 {
-    FileDialogData *fdd = (FileDialogData *)data;
-    fdd->result = gtk_file_dialog_open_finish(
-		    GTK_FILE_DIALOG(source), res, NULL);
-    fdd->done = TRUE;
+    File_Dialog_ದತ್ತಾಂಶ *fdd = (File_Dialog_ದತ್ತಾಂಶ *)ದತ್ತಾಂಶ;
+    fdd->ಫಲಿತಾಂಶ = gtk_file_dialog_open_ಮುಕ್ತಾಯ(
+		    GTK_FILE_DIALOG(ಮೂಲ), res, ಖಾಲಿ);
+    fdd->ಮುಗಿದ = TRUE;
 }
 
-    static void
-file_dialog_save_cb(GObject *source, GAsyncResult *res, gpointer data)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+file_dialog_save_cb(GObject *ಮೂಲ, GAsync_ಫಲಿತಾಂಶ *res, gpointer ದತ್ತಾಂಶ)
 {
-    FileDialogData *fdd = (FileDialogData *)data;
-    fdd->result = gtk_file_dialog_save_finish(
-		    GTK_FILE_DIALOG(source), res, NULL);
-    fdd->done = TRUE;
+    File_Dialog_ದತ್ತಾಂಶ *fdd = (File_Dialog_ದತ್ತಾಂಶ *)ದತ್ತಾಂಶ;
+    fdd->ಫಲಿತಾಂಶ = gtk_file_dialog_save_ಮುಕ್ತಾಯ(
+		    GTK_FILE_DIALOG(ಮೂಲ), res, ಖಾಲಿ);
+    fdd->ಮುಗಿದ = TRUE;
 }
 
-    static void
-file_dialog_folder_cb(GObject *source, GAsyncResult *res, gpointer data)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+file_dialog_folder_cb(GObject *ಮೂಲ, GAsync_ಫಲಿತಾಂಶ *res, gpointer ದತ್ತಾಂಶ)
 {
-    FileDialogData *fdd = (FileDialogData *)data;
-    fdd->result = gtk_file_dialog_select_folder_finish(
-		    GTK_FILE_DIALOG(source), res, NULL);
-    fdd->done = TRUE;
+    File_Dialog_ದತ್ತಾಂಶ *fdd = (File_Dialog_ದತ್ತಾಂಶ *)ದತ್ತಾಂಶ;
+    fdd->ಫಲಿತಾಂಶ = gtk_file_dialog_select_folder_ಮುಕ್ತಾಯ(
+		    GTK_FILE_DIALOG(ಮೂಲ), res, ಖಾಲಿ);
+    fdd->ಮುಗಿದ = TRUE;
 }
 
     char_u *
-gui_mch_browse(int saving,
+gui_mch_browse(ಪೂರ್ಣಾಂಕ saving,
 	char_u *title,
 	char_u *dflt,
-	char_u *ext UNUSED,
+	char_u *ext ಬಳಸದ,
 	char_u *initdir,
 	char_u *filter)
 {
     GtkFileDialog   *dlg;
-    FileDialogData  fdd;
+    File_Dialog_ದತ್ತಾಂಶ  fdd;
     char_u	    dirbuf[MAXPATHL];
-    char_u	    *result = NULL;
+    char_u	    *ಫಲಿತಾಂಶ = ಖಾಲಿ;
     GListStore	    *filters;
 
-    title = CONVERT_TO_UTF8(title);
+    title = CONVERT_ಗಮ್ಯ_UTF8(title);
 
-    if (initdir == NULL || *initdir == NUL)
+    ಆದರೆ (initdir == ಖಾಲಿ || *initdir == NUL)
 	mch_dirname(dirbuf, MAXPATHL);
-    else if (vim_FullName(initdir, dirbuf, MAXPATHL - 2, FALSE) == FAIL)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (vim_ತುಂಬಿದ_Name(initdir, dirbuf, MAXPATHL - 2, FALSE) == FAIL)
 	dirbuf[0] = NUL;
-    add_pathsep(dirbuf);
+    ಕೂಡಿಸು_pathsep(dirbuf);
 
     gui_mch_mousehide(FALSE);
 
     dlg = gtk_file_dialog_new();
-    gtk_file_dialog_set_modal(dlg, TRUE);
-    if (title != NULL)
-	gtk_file_dialog_set_title(dlg, (const char *)title);
+    gtk_file_dialog_ಗಣ_modal(dlg, TRUE);
+    ಆದರೆ (title != ಖಾಲಿ)
+	gtk_file_dialog_ಗಣ_title(dlg, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)title);
 
     {
-	GFile *dir = g_file_new_for_path((const char *)dirbuf);
-	gtk_file_dialog_set_initial_folder(dlg, dir);
+	GFile *dir = g_file_new_for_ಮಾರ್ಗ((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)dirbuf);
+	gtk_file_dialog_ಗಣ_initial_folder(dlg, dir);
 	g_object_unref(dir);
     }
 
     // Add file filters
     filters = g_list_store_new(GTK_TYPE_FILE_FILTER);
-    if (filter != NULL && *filter != NUL)
+    ಆದರೆ (filter != ಖಾಲಿ && *filter != NUL)
     {
-	int		i = 0;
+	ಪೂರ್ಣಾಂಕ		i = 0;
 	char_u		*patt;
 	char_u		*p = filter;
 	GtkFileFilter	*gfilter;
 
 	gfilter = gtk_file_filter_new();
 	patt = alloc(STRLEN(filter));
-	if (patt != NULL)
+	ಆದರೆ (patt != ಖಾಲಿ)
 	{
-	    while (p != NULL && *p != NUL)
+	    ಆಗ (p != ಖಾಲಿ && *p != NUL)
 	    {
-		if (*p == '\n' || *p == ';' || *p == '\t')
+		ಆದರೆ (*p == '\n' || *p == ';' || *p == '\t')
 		{
 		    STRNCPY(patt, filter, i);
 		    patt[i] = '\0';
-		    if (*p == '\t')
-			gtk_file_filter_set_name(gfilter, (gchar *)patt);
-		    else
+		    ಆದರೆ (*p == '\t')
+			gtk_file_filter_ಗಣ_name(gfilter, (gchar *)patt);
+		    ಇಲ್ಲದಿದ್ದರೆ
 		    {
-			gtk_file_filter_add_pattern(gfilter, (gchar *)patt);
-			if (*p == '\n')
+			gtk_file_filter_ಕೂಡಿಸು_ನಮೂನೆ(gfilter, (gchar *)patt);
+			ಆದರೆ (*p == '\n')
 			{
 			    g_list_store_append(filters, gfilter);
 			    g_object_unref(gfilter);
-			    if (*(p + 1) != NUL)
+			    ಆದರೆ (*(p + 1) != NUL)
 				gfilter = gtk_file_filter_new();
 			}
 		    }
 		    filter = ++p;
 		    i = 0;
 		}
-		else
+		ಇಲ್ಲದಿದ್ದರೆ
 		{
 		    p++;
 		    i++;
@@ -4343,88 +4343,88 @@ gui_mch_browse(int saving,
 	}
 	vim_free(patt);
     }
-    gtk_file_dialog_set_filters(dlg, G_LIST_MODEL(filters));
+    gtk_file_dialog_ಗಣ_filters(dlg, G_LIST_MODEL(filters));
     g_object_unref(filters);
 
-    if (saving && dflt != NULL && *dflt != NUL)
-	gtk_file_dialog_set_initial_name(dlg, (const char *)dflt);
+    ಆದರೆ (saving && dflt != ಖಾಲಿ && *dflt != NUL)
+	gtk_file_dialog_ಗಣ_initial_name(dlg, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)dflt);
 
-    fdd.result = NULL;
-    fdd.done = FALSE;
+    fdd.ಫಲಿತಾಂಶ = ಖಾಲಿ;
+    fdd.ಮುಗಿದ = FALSE;
 
-    if (saving)
-	gtk_file_dialog_save(dlg, GTK_WINDOW(gui.mainwin), NULL,
+    ಆದರೆ (saving)
+	gtk_file_dialog_save(dlg, GTK_ಕಿಟಕಿ(gui.mainwin), ಖಾಲಿ,
 		file_dialog_save_cb, &fdd);
-    else
-	gtk_file_dialog_open(dlg, GTK_WINDOW(gui.mainwin), NULL,
+    ಇಲ್ಲದಿದ್ದರೆ
+	gtk_file_dialog_open(dlg, GTK_ಕಿಟಕಿ(gui.mainwin), ಖಾಲಿ,
 		file_dialog_open_cb, &fdd);
 
-    while (!fdd.done)
-	g_main_context_iteration(NULL, TRUE);
+    ಆಗ (!fdd.ಮುಗಿದ)
+	g_main_context_iteration(ಖಾಲಿ, TRUE);
 
-    if (fdd.result != NULL)
+    ಆದರೆ (fdd.ಫಲಿತಾಂಶ != ಖಾಲಿ)
     {
-	char *path = g_file_get_path(fdd.result);
-	if (path != NULL)
+	ಅಕ್ಷರ *ಮಾರ್ಗ = g_file_get_ಮಾರ್ಗ(fdd.ಫಲಿತಾಂಶ);
+	ಆದರೆ (ಮಾರ್ಗ != ಖಾಲಿ)
 	{
-	    result = vim_strsave((char_u *)path);
-	    g_free(path);
+	    ಫಲಿತಾಂಶ = vim_strsave((char_u *)ಮಾರ್ಗ);
+	    g_free(ಮಾರ್ಗ);
 	}
-	g_object_unref(fdd.result);
+	g_object_unref(fdd.ಫಲಿತಾಂಶ);
     }
 
     g_object_unref(dlg);
-    CONVERT_TO_UTF8_FREE(title);
+    CONVERT_ಗಮ್ಯ_UTF8_FREE(title);
 
-    return result;
+    ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
 }
 
     char_u *
 gui_mch_browsedir(char_u *title, char_u *initdir)
 {
     GtkFileDialog	*dlg;
-    FileDialogData	fdd;
-    char_u		*result = NULL;
+    File_Dialog_ದತ್ತಾಂಶ	fdd;
+    char_u		*ಫಲಿತಾಂಶ = ಖಾಲಿ;
 
-    title = CONVERT_TO_UTF8(title);
+    title = CONVERT_ಗಮ್ಯ_UTF8(title);
     gui_mch_mousehide(FALSE);
 
     dlg = gtk_file_dialog_new();
-    gtk_file_dialog_set_modal(dlg, TRUE);
-    if (title != NULL)
-	gtk_file_dialog_set_title(dlg, (const char *)title);
+    gtk_file_dialog_ಗಣ_modal(dlg, TRUE);
+    ಆದರೆ (title != ಖಾಲಿ)
+	gtk_file_dialog_ಗಣ_title(dlg, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)title);
 
-    if (initdir != NULL && *initdir != NUL)
+    ಆದರೆ (initdir != ಖಾಲಿ && *initdir != NUL)
     {
-	GFile *dir = g_file_new_for_path((const char *)initdir);
-	gtk_file_dialog_set_initial_folder(dlg, dir);
+	GFile *dir = g_file_new_for_ಮಾರ್ಗ((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)initdir);
+	gtk_file_dialog_ಗಣ_initial_folder(dlg, dir);
 	g_object_unref(dir);
     }
 
-    fdd.result = NULL;
-    fdd.done = FALSE;
+    fdd.ಫಲಿತಾಂಶ = ಖಾಲಿ;
+    fdd.ಮುಗಿದ = FALSE;
 
-    gtk_file_dialog_select_folder(dlg, GTK_WINDOW(gui.mainwin), NULL,
+    gtk_file_dialog_select_folder(dlg, GTK_ಕಿಟಕಿ(gui.mainwin), ಖಾಲಿ,
 	    file_dialog_folder_cb, &fdd);
 
-    while (!fdd.done)
-	g_main_context_iteration(NULL, TRUE);
+    ಆಗ (!fdd.ಮುಗಿದ)
+	g_main_context_iteration(ಖಾಲಿ, TRUE);
 
-    if (fdd.result != NULL)
+    ಆದರೆ (fdd.ಫಲಿತಾಂಶ != ಖಾಲಿ)
     {
-	char *path = g_file_get_path(fdd.result);
-	if (path != NULL)
+	ಅಕ್ಷರ *ಮಾರ್ಗ = g_file_get_ಮಾರ್ಗ(fdd.ಫಲಿತಾಂಶ);
+	ಆದರೆ (ಮಾರ್ಗ != ಖಾಲಿ)
 	{
-	    result = vim_strsave((char_u *)path);
-	    g_free(path);
+	    ಫಲಿತಾಂಶ = vim_strsave((char_u *)ಮಾರ್ಗ);
+	    g_free(ಮಾರ್ಗ);
 	}
-	g_object_unref(fdd.result);
+	g_object_unref(fdd.ಫಲಿತಾಂಶ);
     }
 
     g_object_unref(dlg);
-    CONVERT_TO_UTF8_FREE(title);
+    CONVERT_ಗಮ್ಯ_UTF8_FREE(title);
 
-    return result;
+    ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
 }
 
 /*
@@ -4439,274 +4439,274 @@ gui_mch_browsedir(char_u *title, char_u *initdir)
  * "button_string" is duplicated; caller must free the duplicated string via
  * *tofree.
  */
-    static char **
-split_button_string(char_u *button_string, int *n_buttons, char **tofree)
+    ಸ್ಥಿರ ಅಕ್ಷರ **
+ವಿಭಜಿಸು_button_string(char_u *button_string, ಪೂರ್ಣಾಂಕ *n_buttons, ಅಕ್ಷರ **tofree)
 {
-    char	    **array;
+    ಅಕ್ಷರ	    **array;
     char_u	    *p;
-    unsigned int    count = 1;
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ    ಎಣಿಕೆ_2 = 1;
 
-    button_string = (char_u *)g_strdup((const char *)button_string);
+    button_string = (char_u *)g_strdup((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)button_string);
 
-    for (p = button_string; *p != NUL; ++p)
-	if (*p == DLG_BUTTON_SEP)
-	    ++count;
+    ಗಾಗಿ (p = button_string; *p != NUL; ++p)
+	ಆದರೆ (*p == DLG_BUTTON_SEP)
+	    ++ಎಣಿಕೆ_2;
 
-    array = g_malloc_n(count, sizeof(char *));
-    count = 0;
+    array = g_malloc_n(ಎಣಿಕೆ_2, ಗಾತ್ರ(ಅಕ್ಷರ *));
+    ಎಣಿಕೆ_2 = 0;
 
-    if (array != NULL)
+    ಆದರೆ (array != ಖಾಲಿ)
     {
-	array[count++] = (char *)button_string;
-	for (p = button_string; *p != NUL; )
+	array[ಎಣಿಕೆ_2++] = (ಅಕ್ಷರ *)button_string;
+	ಗಾಗಿ (p = button_string; *p != NUL; )
 	{
-	    if (*p == DLG_BUTTON_SEP)
+	    ಆದರೆ (*p == DLG_BUTTON_SEP)
 	    {
 		*p++ = NUL;
-		array[count++] = (char *)p;
+		array[ಎಣಿಕೆ_2++] = (ಅಕ್ಷರ *)p;
 	    }
-	    else if (*p == DLG_HOTKEY_CHAR)
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (*p == DLG_HOTKEY_CHAR)
 		*p++ = '_';
-	    else
+	    ಇಲ್ಲದಿದ್ದರೆ
 		MB_PTR_ADV(p);
 	}
     }
 
-    *tofree = (char *)button_string;
-    *n_buttons = count;
-    return array;
+    *tofree = (ಅಕ್ಷರ *)button_string;
+    *n_buttons = ಎಣಿಕೆ_2;
+    ಹಿಂತಿರುಗಿ array;
 }
 
 /*
  * Convert VIM_GENERIC, VIM_ERROR, etc into an icon name. Returns NULL for
  * VIM_GENERIC.
  */
-    static const char *
-dialog_type_to_icon(int type)
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *
+dialog_type_ಗಮ್ಯ_icon(ಪೂರ್ಣಾಂಕ type)
 {
-    switch (type)
+    ಆಯ್ಕೆ (type)
     {
-	case VIM_ERROR:
-	    return "dialog-error-symbolic";
-	case VIM_WARNING:
-	    return "dialog-warning-symbolic";
-	case VIM_INFO:
-	    return "dialog-information-symbolic";
-	case VIM_QUESTION:
-	    return "dialog-question-symbolic";
-	default:
-	    break;
+	ಸ್ಥಿತಿ VIM_ERROR:
+	    ಹಿಂತಿರುಗಿ "dialog-error-symbolic";
+	ಸ್ಥಿತಿ VIM_WARNING:
+	    ಹಿಂತಿರುಗಿ "dialog-warning-symbolic";
+	ಸ್ಥಿತಿ VIM_INFO:
+	    ಹಿಂತಿರುಗಿ "dialog-information-symbolic";
+	ಸ್ಥಿತಿ VIM_QUESTION:
+	    ಹಿಂತಿರುಗಿ "dialog-question-symbolic";
+	ಪೂರ್ವನಿಯೋಜಿತ:
+	    ನಿಲ್ಲಿಸು;
     }
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
 // Data associated with each button in the dialog
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    int		but_idx;
-    int		*response;
-    gboolean	*done;
+    ಪೂರ್ಣಾಂಕ		but_idx;
+    ಪೂರ್ಣಾಂಕ		*response;
+    gboolean	*ಮುಗಿದ;
 } DialogButtonState;
 
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
     GtkWidget	*win;
-    gboolean	*done;
+    gboolean	*ಮುಗಿದ;
     gboolean	no_alt;
 } DialogState;
 
-    static void
-dialog_button_clicked_cb(GtkButton *button UNUSED, DialogButtonState *state)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+dialog_button_clicked_cb(GtkButton *button ಬಳಸದ, DialogButtonState *state)
 {
     *state->response = state->but_idx;
-    *state->done = TRUE;
+    *state->ಮುಗಿದ = TRUE;
 }
 
-    static gboolean
-dialog_key_pressed_cb(
-	GtkEventControllerKey	*controller UNUSED,
+    ಸ್ಥಿರ gboolean
+dialog_ಕೀಲಿ_pressed_cb(
+	Gtk_Event_Controller_ಕೀಲಿ	*controller ಬಳಸದ,
 	guint			keyval,
-	guint			keycode UNUSED,
+	guint			keycode ಬಳಸದ,
 	GdkModifierType		state,
 	DialogState		*dstate)
 {
-    if (keyval == GDK_KEY_Escape)
+    ಆದರೆ (keyval == GDK_ಕೀಲಿ_Escape)
     {
-	*dstate->done = TRUE;
-	return TRUE;
+	*dstate->ಮುಗಿದ = TRUE;
+	ಹಿಂತಿರುಗಿ TRUE;
     }
 
-    if (dstate->no_alt && !(state & gtk_accelerator_get_default_mod_mask()))
-	return gtk_widget_mnemonic_activate(dstate->win, FALSE);
-    return FALSE;
+    ಆದರೆ (dstate->no_alt && !(state & gtk_accelerator_get_default_mod_ಮುಖವಾಡ()))
+	ಹಿಂತಿರುಗಿ gtk_widget_mnemonic_activate(dstate->win, FALSE);
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
-    static gboolean
-dialog_close_request_cb(GtkWindow *win UNUSED, gboolean *win_closed)
+    ಸ್ಥಿರ gboolean
+dialog_close_request_cb(Gtk_ಕಿಟಕಿ *win ಬಳಸದ, gboolean *win_closed)
 {
     *win_closed = TRUE;
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
-    int
+    ಪೂರ್ಣಾಂಕ
 gui_mch_dialog(
-	int	type,
+	ಪೂರ್ಣಾಂಕ	type,
 	char_u	*title,
-	char_u	*message,
+	char_u	*ಸಂದೇಶ_2,
 	char_u	*buttons,
-	int	def_but,
+	ಪೂರ್ಣಾಂಕ	def_but,
 	char_u	*textfield,
-	int	ex_cmd UNUSED)
+	ಪೂರ್ಣಾಂಕ	ex_cmd ಬಳಸದ)
 {
-    GtkWindow		*win = GTK_WINDOW(gtk_window_new());
+    Gtk_ಕಿಟಕಿ		*win = GTK_ಕಿಟಕಿ(gtk_ಕಿಟಕಿ_new());
     GtkWidget		*vertbox;
-    GtkWidget		*message_box;
-    const char		*icon_name;
+    GtkWidget		*ಸಂದೇಶ_box;
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ		*icon_name;
     GtkWidget		*icon;
     GtkWidget		*label;
-    GtkWidget		*entry = NULL;
+    GtkWidget		*ನಮೂದು = ಖಾಲಿ;
     char_u		*utf8_title;
-    char_u		*utf8_message;
-    GtkEventController *key_controller;
-    DialogButtonState	*but_states = NULL;
-    char		*tofree = NULL;
-    int			response = -1;
-    gboolean		done = FALSE;
+    char_u		*utf8_ಸಂದೇಶ;
+    GtkEventController *ಕೀಲಿ_controller;
+    DialogButtonState	*but_ಸ್ಥಿತಿಗಳು = ಖಾಲಿ;
+    ಅಕ್ಷರ		*tofree = ಖಾಲಿ;
+    ಪೂರ್ಣಾಂಕ			response = -1;
+    gboolean		ಮುಗಿದ = FALSE;
     gboolean		win_closed = FALSE;
     DialogState		state;
 
-    utf8_title = CONVERT_TO_UTF8(title);
-    if (utf8_title != NULL)
-	gtk_window_set_title(win, (const char *)utf8_title);
-    CONVERT_TO_UTF8_FREE(utf8_title);
+    utf8_title = CONVERT_ಗಮ್ಯ_UTF8(title);
+    ಆದರೆ (utf8_title != ಖಾಲಿ)
+	gtk_ಕಿಟಕಿ_ಗಣ_title(win, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)utf8_title);
+    CONVERT_ಗಮ್ಯ_UTF8_FREE(utf8_title);
 
-    gtk_window_set_transient_for(win, GTK_WINDOW(gui.mainwin));
-    gtk_window_set_modal(win, TRUE);
-    gtk_window_set_default_size(win, 300, -1);
-    gtk_window_set_destroy_with_parent(win, TRUE);
+    gtk_ಕಿಟಕಿ_ಗಣ_transient_for(win, GTK_ಕಿಟಕಿ(gui.mainwin));
+    gtk_ಕಿಟಕಿ_ಗಣ_modal(win, TRUE);
+    gtk_ಕಿಟಕಿ_ಗಣ_default_ಗಾತ್ರ(win, 300, -1);
+    gtk_ಕಿಟಕಿ_ಗಣ_destroy_with_ಪೋಷಕ(win, TRUE);
     g_signal_connect(win, "close-request",
 	    G_CALLBACK(dialog_close_request_cb), &win_closed);
 
     // Create main vertical layout container
     vertbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 16);
-    gtk_window_set_child(win, vertbox);
-    gtk_widget_set_margin_top(vertbox, 24);
-    gtk_widget_set_margin_bottom(vertbox, 24);
-    gtk_widget_set_margin_start(vertbox, 12);
-    gtk_widget_set_margin_end(vertbox, 12);
+    gtk_ಕಿಟಕಿ_ಗಣ_ಮಗು(win, vertbox);
+    gtk_widget_ಗಣ_margin_ತುದಿ(vertbox, 24);
+    gtk_widget_ಗಣ_margin_bottom(vertbox, 24);
+    gtk_widget_ಗಣ_margin_ಆರಂಭ(vertbox, 12);
+    gtk_widget_ಗಣ_margin_ಕೊನೆ(vertbox, 12);
 
     // Add the message label
-    message_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
-    gtk_widget_set_halign(message_box, GTK_ALIGN_CENTER);
-    gtk_box_append(GTK_BOX(vertbox), message_box);
+    ಸಂದೇಶ_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
+    gtk_widget_ಗಣ_halign(ಸಂದೇಶ_box, GTK_ALIGN_CENTER);
+    gtk_box_append(GTK_BOX(vertbox), ಸಂದೇಶ_box);
 
     // If type is not VIM_GENERIC, add an icon to make the dialog look nicer :)
-    icon_name = dialog_type_to_icon(type);
-    if (icon_name != NULL)
+    icon_name = dialog_type_ಗಮ್ಯ_icon(type);
+    ಆದರೆ (icon_name != ಖಾಲಿ)
     {
 	icon = gtk_image_new_from_icon_name(icon_name);
-	gtk_image_set_icon_size(GTK_IMAGE(icon), GTK_ICON_SIZE_LARGE);
-	gtk_box_append(GTK_BOX(message_box), icon);
+	gtk_image_ಗಣ_icon_ಗಾತ್ರ(GTK_IMAGE(icon), GTK_ICON_ಗಾತ್ರ_LARGE);
+	gtk_box_append(GTK_BOX(ಸಂದೇಶ_box), icon);
     }
 
-    utf8_message = CONVERT_TO_UTF8(message);
-    label = gtk_label_new((const char *)utf8_message);
-    CONVERT_TO_UTF8_FREE(utf8_message);
-    gtk_label_set_wrap(GTK_LABEL(label), TRUE);
-    gtk_label_set_max_width_chars(GTK_LABEL(label), 40);
-    gtk_box_append(GTK_BOX(message_box), label);
+    utf8_ಸಂದೇಶ = CONVERT_ಗಮ್ಯ_UTF8(ಸಂದೇಶ_2);
+    label = gtk_label_new((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)utf8_ಸಂದೇಶ);
+    CONVERT_ಗಮ್ಯ_UTF8_FREE(utf8_ಸಂದೇಶ);
+    gtk_label_ಗಣ_wrap(GTK_LABEL(label), TRUE);
+    gtk_label_ಗಣ_max_ಅಗಲ_chars(GTK_LABEL(label), 40);
+    gtk_box_append(GTK_BOX(ಸಂದೇಶ_box), label);
 
     // Close the dialog when the <Esc> key is pressed. Also allow using
     // mnemonics without <Alt> key (if there is no text field).
-    key_controller = gtk_event_controller_key_new();
-    g_signal_connect(key_controller, "key-pressed",
-	    G_CALLBACK(dialog_key_pressed_cb), &state);
-    gtk_widget_add_controller(GTK_WIDGET(win), key_controller);
-    state.done = &done;
+    ಕೀಲಿ_controller = gtk_event_controller_ಕೀಲಿ_new();
+    g_signal_connect(ಕೀಲಿ_controller, "key-pressed",
+	    G_CALLBACK(dialog_ಕೀಲಿ_pressed_cb), &state);
+    gtk_widget_ಕೂಡಿಸು_controller(GTK_WIDGET(win), ಕೀಲಿ_controller);
+    state.ಮುಗಿದ = &ಮುಗಿದ;
     state.win = GTK_WIDGET(win);
 
-    if (textfield != NULL)
+    ಆದರೆ (textfield != ಖಾಲಿ)
     {
 	// Add text entry so user can enter text
-	char_u *utf8_text = CONVERT_TO_UTF8(textfield);
+	char_u *utf8_ಪಠ್ಯ = CONVERT_ಗಮ್ಯ_UTF8(textfield);
 
-	entry = gtk_entry_new();
+	ನಮೂದು = gtk_ನಮೂದು_new();
 
-	if (utf8_text != NULL)
-	    gtk_editable_set_text(GTK_EDITABLE(entry), (const char *)utf8_text);
-	else
-	    gtk_editable_set_text(GTK_EDITABLE(entry), "");
-	CONVERT_TO_UTF8_FREE(utf8_text);
+	ಆದರೆ (utf8_ಪಠ್ಯ != ಖಾಲಿ)
+	    gtk_editable_ಗಣ_ಪಠ್ಯ(GTK_EDITABLE(ನಮೂದು), (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)utf8_ಪಠ್ಯ);
+	ಇಲ್ಲದಿದ್ದರೆ
+	    gtk_editable_ಗಣ_ಪಠ್ಯ(GTK_EDITABLE(ನಮೂದು), "");
+	CONVERT_ಗಮ್ಯ_UTF8_FREE(utf8_ಪಠ್ಯ);
 
 	// Make it so that pressing enter key will activate "def_but" button
 	// (which is set as the default widget).
-	gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
-	gtk_box_append(GTK_BOX(vertbox), entry);
+	gtk_ನಮೂದು_ಗಣ_activates_default(GTK_ನಮೂದು(ನಮೂದು), TRUE);
+	gtk_box_append(GTK_BOX(vertbox), ನಮೂದು);
 	state.no_alt = FALSE;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
 	GListModel  *controllers;
-	int	    len;
+	ಪೂರ್ಣಾಂಕ	    len;
 
 	// Set all shortcut controllers in the window to not require a modifier
 	// for mnemonics.
 	controllers = gtk_widget_observe_controllers(GTK_WIDGET(win));
-	len  = g_list_model_get_n_items(controllers);
-	for (int i = 0; i < len; i++)
+	len  = g_list_model_get_n_ವಸ್ತುಗಳು(controllers);
+	ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < len; i++)
 	{
 	    GtkEventController *controller;
 
-	    controller = g_list_model_get_item(controllers, i);
-	    if (GTK_IS_SHORTCUT_CONTROLLER(controller))
-		gtk_shortcut_controller_set_mnemonics_modifiers(
+	    controller = g_list_model_get_ಅಂಶ(controllers, i);
+	    ಆದರೆ (GTK_IS_SHORTCUT_CONTROLLER(controller))
+		gtk_shortcut_controller_ಗಣ_mnemonics_modifiers(
 			GTK_SHORTCUT_CONTROLLER(controller), 0);
 	}
 	g_object_unref(controllers);
 
-	gtk_window_set_mnemonics_visible(win, TRUE);
+	gtk_ಕಿಟಕಿ_ಗಣ_mnemonics_visible(win, TRUE);
 	state.no_alt = TRUE;
     }
 
-    if (buttons != NULL)
+    ಆದರೆ (buttons != ಖಾಲಿ)
     {
 	GtkWidget   *but_box;
-	char	    **buttons_arr; // Note that array is allocated, not strings
-	int	    n_buttons;
+	ಅಕ್ಷರ	    **buttons_arr; // Note that array is allocated, not strings
+	ಪೂರ್ಣಾಂಕ	    n_buttons;
 
 	// Check 'v' flag in 'guioptions': vertical button placement.
-	if (vim_strchr(p_go, GO_VERTICAL) != NULL)
+	ಆದರೆ (vim_strchr(p_go, GO_VERTICAL) != ಖಾಲಿ)
 	    but_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 8);
-	else
+	ಇಲ್ಲದಿದ್ದರೆ
 	    but_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
 
-	gtk_widget_set_halign(but_box, GTK_ALIGN_CENTER);
-	gtk_box_set_homogeneous(GTK_BOX(but_box), TRUE);
+	gtk_widget_ಗಣ_halign(but_box, GTK_ALIGN_CENTER);
+	gtk_box_ಗಣ_homogeneous(GTK_BOX(but_box), TRUE);
 	gtk_box_append(GTK_BOX(vertbox), but_box);
 
-	buttons_arr = split_button_string(buttons, &n_buttons, &tofree);
+	buttons_arr = ವಿಭಜಿಸು_button_string(buttons, &n_buttons, &tofree);
 
-	but_states = g_malloc_n(n_buttons, sizeof(DialogButtonState));
+	but_ಸ್ಥಿತಿಗಳು = g_malloc_n(n_buttons, ಗಾತ್ರ(DialogButtonState));
 
-	for (int i = 0; i < n_buttons; i++)
+	ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < n_buttons; i++)
 	{
 	    char_u		*but_label;
 	    GtkWidget		*but;
-	    DialogButtonState	*but_state = but_states + i;
+	    DialogButtonState	*but_state = but_ಸ್ಥಿತಿಗಳು + i;
 
-	    but_label = CONVERT_TO_UTF8((char_u *)buttons_arr[i]);
-	    if (but_label == NULL)
-		continue;
+	    but_label = CONVERT_ಗಮ್ಯ_UTF8((char_u *)buttons_arr[i]);
+	    ಆದರೆ (but_label == ಖಾಲಿ)
+		ಮುಂದುವರಿ;
 
-	    but = gtk_button_new_with_mnemonic((char *)but_label);
-	    if (i == def_but - 1)
-		gtk_window_set_default_widget(win, but);
+	    but = gtk_button_new_with_mnemonic((ಅಕ್ಷರ *)but_label);
+	    ಆದರೆ (i == def_but - 1)
+		gtk_ಕಿಟಕಿ_ಗಣ_default_widget(win, but);
 	    gtk_box_append(GTK_BOX(but_box), but);
-	    CONVERT_TO_UTF8_FREE(but_label);
+	    CONVERT_ಗಮ್ಯ_UTF8_FREE(but_label);
 
 	    but_state->but_idx = i;
 	    but_state->response = &response;
-	    but_state->done = &done;
+	    but_state->ಮುಗಿದ = &ಮುಗಿದ;
 
 	    g_signal_connect(but, "clicked",
 		    G_CALLBACK(dialog_button_clicked_cb), but_state);
@@ -4714,31 +4714,31 @@ gui_mch_dialog(
 	g_free(buttons_arr);
     }
 
-    gtk_window_present(win);
+    gtk_ಕಿಟಕಿ_present(win);
 
-    while (!done && !win_closed)
-	g_main_context_iteration(NULL, TRUE);
+    ಆಗ (!ಮುಗಿದ && !win_closed)
+	g_main_context_iteration(ಖಾಲಿ, TRUE);
 
-    if (done)
+    ಆದರೆ (ಮುಗಿದ)
     {
-	if (textfield != NULL)
+	ಆದರೆ (textfield != ಖಾಲಿ)
 	{
 	    // Get the text the user entered
-	    char_u *text;
+	    char_u *ಪಠ್ಯ;
 
-	    text = (char_u *)gtk_editable_get_text(GTK_EDITABLE(entry));
-	    text = CONVERT_FROM_UTF8(text);
-	    vim_strncpy(textfield, text, IOSIZE - 1);
-	    CONVERT_FROM_UTF8_FREE(text);
+	    ಪಠ್ಯ = (char_u *)gtk_editable_get_ಪಠ್ಯ(GTK_EDITABLE(ನಮೂದು));
+	    ಪಠ್ಯ = CONVERT_FROM_UTF8(ಪಠ್ಯ);
+	    vim_strncpy(textfield, ಪಠ್ಯ, IOSIZE - 1);
+	    CONVERT_FROM_UTF8_FREE(ಪಠ್ಯ);
 	}
 
-	gtk_window_destroy(win);
+	gtk_ಕಿಟಕಿ_destroy(win);
     }
-    g_free(but_states);
+    g_free(but_ಸ್ಥಿತಿಗಳು);
     g_free(tofree);
 
     // Vim buttons are indexed starting from one.
-    return response == -1 ? 0 : response + 1;
+    ಹಿಂತಿರುಗಿ response == -1 ? 0 : response + 1;
 }
 
 /*
@@ -4753,241 +4753,241 @@ gui_mch_dialog(
  * ============================================================
  */
 
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
     GtkWidget *dialog;
     GtkWidget *what;	    // Find what entry
     GtkWidget *with;	    // Replace with entry
     GtkWidget *wword;	    // Whole word check
     GtkWidget *mcase;	    // Match case check
-    GtkWidget *up;	    // Direction up radio
-    GtkWidget *down;	    // Direction down radio
-    GtkWidget *find;	    // 'Find Next' action button
+    GtkWidget *ಮೇಲೆ;	    // Direction up radio
+    GtkWidget *ಕೆಳಕ್ಕೆ;	    // Direction down radio
+    GtkWidget *ಕಂಡುಹಿಡಿ;	    // 'Find Next' action button
     GtkWidget *replace;	    // 'Replace With' action button
     GtkWidget *all;	    // 'Replace All' action button
-} SharedFindReplace;
+} Shared_ಕಂಡುಹಿಡಿ_Replace_2;
 
-static SharedFindReplace find_widgets = {0};
-static SharedFindReplace repl_widgets = {0};
+ಸ್ಥಿರ Shared_ಕಂಡುಹಿಡಿ_Replace_2 ಕಂಡುಹಿಡಿ_widgets = {0};
+ಸ್ಥಿರ Shared_ಕಂಡುಹಿಡಿ_Replace_2 repl_widgets = {0};
 
-    static void
-find_replace_cb(GtkWidget *widget UNUSED, gpointer data)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಕಂಡುಹಿಡಿ_replace_cb(GtkWidget *widget ಬಳಸದ, gpointer ದತ್ತಾಂಶ)
 {
-    int			flags;
-    char_u		*find_text;
-    char_u		*repl_text;
-    gboolean		direction_down;
-    SharedFindReplace	*sfr;
+    ಪೂರ್ಣಾಂಕ			flags;
+    char_u		*ಕಂಡುಹಿಡಿ_ಪಠ್ಯ;
+    char_u		*repl_ಪಠ್ಯ;
+    gboolean		direction_ಕೆಳಕ್ಕೆ;
+    Shared_ಕಂಡುಹಿಡಿ_Replace_2	*sfr;
 
-    flags = GPOINTER_TO_INT(data);
+    flags = GPOINTER_ಗಮ್ಯ_INT(ದತ್ತಾಂಶ);
 
-    if (flags == FRD_FINDNEXT)
+    ಆದರೆ (flags == FRD_FINDNEXT)
     {
-	repl_text = NULL;
-	sfr = &find_widgets;
+	repl_ಪಠ್ಯ = ಖಾಲಿ;
+	sfr = &ಕಂಡುಹಿಡಿ_widgets;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-	repl_text = (char_u *)gtk_editable_get_text(
+	repl_ಪಠ್ಯ = (char_u *)gtk_editable_get_ಪಠ್ಯ(
 		GTK_EDITABLE(repl_widgets.with));
 	sfr = &repl_widgets;
     }
 
-    find_text = (char_u *)gtk_editable_get_text(GTK_EDITABLE(sfr->what));
-    direction_down = gtk_check_button_get_active(
-	    GTK_CHECK_BUTTON(sfr->down));
+    ಕಂಡುಹಿಡಿ_ಪಠ್ಯ = (char_u *)gtk_editable_get_ಪಠ್ಯ(GTK_EDITABLE(sfr->what));
+    direction_ಕೆಳಕ್ಕೆ = gtk_check_button_get_ಸಕ್ರಿಯ(
+	    GTK_CHECK_BUTTON(sfr->ಕೆಳಕ್ಕೆ));
 
-    if (gtk_check_button_get_active(GTK_CHECK_BUTTON(sfr->wword)))
-	flags |= FRD_WHOLE_WORD;
-    if (gtk_check_button_get_active(GTK_CHECK_BUTTON(sfr->mcase)))
-	flags |= FRD_MATCH_CASE;
+    ಆದರೆ (gtk_check_button_get_ಸಕ್ರಿಯ(GTK_CHECK_BUTTON(sfr->wword)))
+	flags |= FRD_ಸಂಪೂರ್ಣ_ಶಬ್ದ;
+    ಆದರೆ (gtk_check_button_get_ಸಕ್ರಿಯ(GTK_CHECK_BUTTON(sfr->mcase)))
+	flags |= FRD_ಹೊಂದಿಕೆ_CASE;
 
-    repl_text = CONVERT_FROM_UTF8(repl_text);
-    find_text = CONVERT_FROM_UTF8(find_text);
-    gui_do_findrepl(flags, find_text, repl_text, direction_down);
-    CONVERT_FROM_UTF8_FREE(repl_text);
-    CONVERT_FROM_UTF8_FREE(find_text);
+    repl_ಪಠ್ಯ = CONVERT_FROM_UTF8(repl_ಪಠ್ಯ);
+    ಕಂಡುಹಿಡಿ_ಪಠ್ಯ = CONVERT_FROM_UTF8(ಕಂಡುಹಿಡಿ_ಪಠ್ಯ);
+    gui_do_findrepl(flags, ಕಂಡುಹಿಡಿ_ಪಠ್ಯ, repl_ಪಠ್ಯ, direction_ಕೆಳಕ್ಕೆ);
+    CONVERT_FROM_UTF8_FREE(repl_ಪಠ್ಯ);
+    CONVERT_FROM_UTF8_FREE(ಕಂಡುಹಿಡಿ_ಪಠ್ಯ);
 }
 
-    static void
-dialog_destroyed_cb(GtkWidget *widget UNUSED, gpointer data)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+dialog_destroyed_cb(GtkWidget *widget ಬಳಸದ, gpointer ದತ್ತಾಂಶ)
 {
-    *(GtkWidget **)data = NULL;
+    *(GtkWidget **)ದತ್ತಾಂಶ = ಖಾಲಿ;
 }
 
-    static void
-entry_changed_cb(GtkWidget *entry, GtkWidget *dialog)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ನಮೂದು_ಬದಲಾಯಿತು_cb(GtkWidget *ನಮೂದು, GtkWidget *dialog)
 {
-    const gchar	*entry_text;
+    ಸ್ಥಿರಾಂಕ gchar	*ನಮೂದು_ಪಠ್ಯ;
     gboolean	nonempty;
 
-    entry_text = gtk_editable_get_text(GTK_EDITABLE(entry));
+    ನಮೂದು_ಪಠ್ಯ = gtk_editable_get_ಪಠ್ಯ(GTK_EDITABLE(ನಮೂದು));
 
-    if (!entry_text)
-	return; // Shouldn't happen
+    ಆದರೆ (!ನಮೂದು_ಪಠ್ಯ)
+	ಹಿಂತಿರುಗಿ; // Shouldn't happen
 
-    nonempty = (entry_text[0] != '\0');
+    nonempty = (ನಮೂದು_ಪಠ್ಯ[0] != '\0');
 
-    if (dialog == find_widgets.dialog)
-	gtk_widget_set_sensitive(find_widgets.find, nonempty);
+    ಆದರೆ (dialog == ಕಂಡುಹಿಡಿ_widgets.dialog)
+	gtk_widget_ಗಣ_sensitive(ಕಂಡುಹಿಡಿ_widgets.ಕಂಡುಹಿಡಿ, nonempty);
 
-    if (dialog == repl_widgets.dialog)
+    ಆದರೆ (dialog == repl_widgets.dialog)
     {
-	gtk_widget_set_sensitive(repl_widgets.find, nonempty);
-	gtk_widget_set_sensitive(repl_widgets.replace, nonempty);
-	gtk_widget_set_sensitive(repl_widgets.all, nonempty);
+	gtk_widget_ಗಣ_sensitive(repl_widgets.ಕಂಡುಹಿಡಿ, nonempty);
+	gtk_widget_ಗಣ_sensitive(repl_widgets.replace, nonempty);
+	gtk_widget_ಗಣ_sensitive(repl_widgets.all, nonempty);
     }
 }
 
-    static gboolean
-find_key_pressed_cb(
-	GtkEventControllerKey	*controller UNUSED,
+    ಸ್ಥಿರ gboolean
+ಕಂಡುಹಿಡಿ_ಕೀಲಿ_pressed_cb(
+	Gtk_Event_Controller_ಕೀಲಿ	*controller ಬಳಸದ,
 	guint			keyval,
-	guint			keycode UNUSED,
+	guint			keycode ಬಳಸದ,
 	GdkModifierType		state,
-	SharedFindReplace	*frdp)
+	Shared_ಕಂಡುಹಿಡಿ_Replace_2	*frdp)
 {
     // If the user is holding one of the key modifiers we will just bail out,
     // thus preserving the possibility of normal focus traversal.
-    if (state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK))
-	return FALSE;
+    ಆದರೆ (state & (GDK_CONTROL_ಮುಖವಾಡ | GDK_ಸರಿಸು_ಮುಖವಾಡ))
+	ಹಿಂತಿರುಗಿ FALSE;
 
     // the Escape key synthesizes a cancellation action
-    if (keyval == GDK_KEY_Escape)
+    ಆದರೆ (keyval == GDK_ಕೀಲಿ_Escape)
     {
 	// Destroy rather than hide the dialog: reusing a hidden toplevel loses
 	// window decorations on Wayland
-	gtk_window_destroy(GTK_WINDOW(frdp->dialog));
-	return TRUE;
+	gtk_ಕಿಟಕಿ_destroy(GTK_ಕಿಟಕಿ(frdp->dialog));
+	ಹಿಂತಿರುಗಿ TRUE;
     }
 
-    return FALSE;
+    ಹಿಂತಿರುಗಿ FALSE;
 }
 
-    static void
-entry_activate_cb(GtkWidget *widget UNUSED, void *udata)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ನಮೂದು_activate_cb(GtkWidget *widget ಬಳಸದ, ಶೂನ್ಯ *udata)
 {
     gtk_widget_grab_focus(GTK_WIDGET(udata));
 }
 
-    static void
-find_replace_dialog_create(char_u *arg, int do_replace)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಕಂಡುಹಿಡಿ_replace_dialog_create(char_u *arg, ಪೂರ್ಣಾಂಕ do_replace)
 {
-    SharedFindReplace	*frdp;
-    char_u		*entry_text;
-    int			wword = FALSE;
-    int			mcase = !p_ic;
+    Shared_ಕಂಡುಹಿಡಿ_Replace_2	*frdp;
+    char_u		*ನಮೂದು_ಪಠ್ಯ;
+    ಪೂರ್ಣಾಂಕ			wword = FALSE;
+    ಪೂರ್ಣಾಂಕ			mcase = !p_ic;
     GtkWidget		*vertbox, *grid, *hbox, *tmp, *btn;
     gboolean		sensitive;
-    GtkEventController	*key_controller;
+    GtkEventController	*ಕೀಲಿ_controller;
 
-    frdp = do_replace ? &repl_widgets : &find_widgets;
-    entry_text = get_find_dialog_text(arg, &wword, &mcase);
+    frdp = do_replace ? &repl_widgets : &ಕಂಡುಹಿಡಿ_widgets;
+    ನಮೂದು_ಪಠ್ಯ = get_ಕಂಡುಹಿಡಿ_dialog_ಪಠ್ಯ(arg, &wword, &mcase);
 
-    if (entry_text != NULL && output_conv.vc_type != CONV_NONE)
+    ಆದರೆ (ನಮೂದು_ಪಠ್ಯ != ಖಾಲಿ && output_conv.vc_type != CONV_NONE)
     {
-	char_u *old = entry_text;
-	entry_text = string_convert(&output_conv, entry_text, NULL);
+	char_u *old = ನಮೂದು_ಪಠ್ಯ;
+	ನಮೂದು_ಪಠ್ಯ = string_convert(&output_conv, ನಮೂದು_ಪಠ್ಯ, ಖಾಲಿ);
 	vim_free(old);
     }
 
     // If the dialog already exists, just raise it.
-    if (frdp->dialog != NULL)
+    ಆದರೆ (frdp->dialog != ಖಾಲಿ)
     {
-	if (entry_text != NULL)
+	ಆದರೆ (ನಮೂದು_ಪಠ್ಯ != ಖಾಲಿ)
 	{
-	    gtk_editable_set_text(GTK_EDITABLE(frdp->what),
-		    (char *)entry_text);
-	    gtk_check_button_set_active(GTK_CHECK_BUTTON(frdp->wword),
+	    gtk_editable_ಗಣ_ಪಠ್ಯ(GTK_EDITABLE(frdp->what),
+		    (ಅಕ್ಷರ *)ನಮೂದು_ಪಠ್ಯ);
+	    gtk_check_button_ಗಣ_ಸಕ್ರಿಯ(GTK_CHECK_BUTTON(frdp->wword),
 		    (gboolean)wword);
-	    gtk_check_button_set_active(GTK_CHECK_BUTTON(frdp->mcase),
+	    gtk_check_button_ಗಣ_ಸಕ್ರಿಯ(GTK_CHECK_BUTTON(frdp->mcase),
 		    (gboolean)mcase);
 	}
-	gtk_window_present(GTK_WINDOW(frdp->dialog));
+	gtk_ಕಿಟಕಿ_present(GTK_ಕಿಟಕಿ(frdp->dialog));
 
 	// For :promptfind dialog, always give keyboard focus to 'what' entry.
 	// For :promptrepl dialog, give it to 'with' entry if 'what' has a
 	// non-empty entry; otherwise, to 'what' entry.
 	gtk_widget_grab_focus(frdp->what);
-	if (do_replace && g_utf8_strlen(
-		    gtk_editable_get_text(GTK_EDITABLE(frdp->what)), -1) > 0)
+	ಆದರೆ (do_replace && g_utf8_strlen(
+		    gtk_editable_get_ಪಠ್ಯ(GTK_EDITABLE(frdp->what)), -1) > 0)
 	    gtk_widget_grab_focus(frdp->with);
 
-	vim_free(entry_text);
-	return;
+	vim_free(ನಮೂದು_ಪಠ್ಯ);
+	ಹಿಂತಿರುಗಿ;
     }
 
     // Create a new dialog window.
-    frdp->dialog = gtk_window_new();
-    gtk_window_set_transient_for(GTK_WINDOW(frdp->dialog),
-	    GTK_WINDOW(gui.mainwin));
-    gtk_window_set_destroy_with_parent(GTK_WINDOW(frdp->dialog), TRUE);
-    gtk_window_set_title(GTK_WINDOW(frdp->dialog),
+    frdp->dialog = gtk_ಕಿಟಕಿ_new();
+    gtk_ಕಿಟಕಿ_ಗಣ_transient_for(GTK_ಕಿಟಕಿ(frdp->dialog),
+	    GTK_ಕಿಟಕಿ(gui.mainwin));
+    gtk_ಕಿಟಕಿ_ಗಣ_destroy_with_ಪೋಷಕ(GTK_ಕಿಟಕಿ(frdp->dialog), TRUE);
+    gtk_ಕಿಟಕಿ_ಗಣ_title(GTK_ಕಿಟಕಿ(frdp->dialog),
 	    do_replace ? _("VIM - Search and Replace...")
 	    : _("VIM - Search..."));
-    gtk_window_set_resizable(GTK_WINDOW(frdp->dialog), FALSE);
+    gtk_ಕಿಟಕಿ_ಗಣ_resizable(GTK_ಕಿಟಕಿ(frdp->dialog), FALSE);
 
     g_signal_connect(frdp->dialog, "destroy",
 	    G_CALLBACK(dialog_destroyed_cb), &frdp->dialog);
 
     vertbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 6);
-    gtk_widget_set_margin_start(vertbox, 12);
-    gtk_widget_set_margin_end(vertbox, 12);
-    gtk_widget_set_margin_top(vertbox, 12);
-    gtk_widget_set_margin_bottom(vertbox, 12);
-    gtk_window_set_child(GTK_WINDOW(frdp->dialog), vertbox);
+    gtk_widget_ಗಣ_margin_ಆರಂಭ(vertbox, 12);
+    gtk_widget_ಗಣ_margin_ಕೊನೆ(vertbox, 12);
+    gtk_widget_ಗಣ_margin_ತುದಿ(vertbox, 12);
+    gtk_widget_ಗಣ_margin_bottom(vertbox, 12);
+    gtk_ಕಿಟಕಿ_ಗಣ_ಮಗು(GTK_ಕಿಟಕಿ(frdp->dialog), vertbox);
 
     // Grid for labels + entries
     grid = gtk_grid_new();
-    gtk_grid_set_row_spacing(GTK_GRID(grid), 6);
-    gtk_grid_set_column_spacing(GTK_GRID(grid), 6);
+    gtk_grid_ಗಣ_ಅಡ್ಡಸಾಲು_spacing(GTK_GRID(grid), 6);
+    gtk_grid_ಗಣ_ಸ್ತಂಭ_spacing(GTK_GRID(grid), 6);
     gtk_box_append(GTK_BOX(vertbox), grid);
 
     // "Find what:" label + entry
     tmp = gtk_label_new(_("Find what:"));
-    gtk_label_set_xalign(GTK_LABEL(tmp), 0.0);
+    gtk_label_ಗಣ_xalign(GTK_LABEL(tmp), 0.0);
     gtk_grid_attach(GTK_GRID(grid), tmp, 0, 0, 1, 1);
 
-    frdp->what = gtk_entry_new();
-    gtk_widget_set_hexpand(frdp->what, TRUE);
-    sensitive = (entry_text != NULL && entry_text[0] != NUL);
-    if (entry_text != NULL)
-	gtk_editable_set_text(GTK_EDITABLE(frdp->what), (char *)entry_text);
+    frdp->what = gtk_ನಮೂದು_new();
+    gtk_widget_ಗಣ_hexpand(frdp->what, TRUE);
+    sensitive = (ನಮೂದು_ಪಠ್ಯ != ಖಾಲಿ && ನಮೂದು_ಪಠ್ಯ[0] != NUL);
+    ಆದರೆ (ನಮೂದು_ಪಠ್ಯ != ಖಾಲಿ)
+	gtk_editable_ಗಣ_ಪಠ್ಯ(GTK_EDITABLE(frdp->what), (ಅಕ್ಷರ *)ನಮೂದು_ಪಠ್ಯ);
     gtk_grid_attach(GTK_GRID(grid), frdp->what, 1, 0, 1, 1);
 
-    if (do_replace)
+    ಆದರೆ (do_replace)
     {
 	// "Replace with:" label + entry
 	tmp = gtk_label_new(_("Replace with:"));
-	gtk_label_set_xalign(GTK_LABEL(tmp), 0.0);
+	gtk_label_ಗಣ_xalign(GTK_LABEL(tmp), 0.0);
 	gtk_grid_attach(GTK_GRID(grid), tmp, 0, 1, 1, 1);
 
-	frdp->with = gtk_entry_new();
-	gtk_widget_set_hexpand(frdp->with, TRUE);
+	frdp->with = gtk_ನಮೂದು_new();
+	gtk_widget_ಗಣ_hexpand(frdp->with, TRUE);
 	gtk_grid_attach(GTK_GRID(grid), frdp->with, 1, 1, 1, 1);
-	gtk_entry_set_activates_default(GTK_ENTRY(frdp->with), TRUE);
+	gtk_ನಮೂದು_ಗಣ_activates_default(GTK_ನಮೂದು(frdp->with), TRUE);
 
 	// Make the entry activation only change the input focus onto the
 	// with item.
-	gtk_entry_set_activates_default(GTK_ENTRY(frdp->what), FALSE);
+	gtk_ನಮೂದು_ಗಣ_activates_default(GTK_ನಮೂದು(frdp->what), FALSE);
 	g_signal_connect(G_OBJECT(frdp->what), "activate",
-		G_CALLBACK(entry_activate_cb), frdp->with);
+		G_CALLBACK(ನಮೂದು_activate_cb), frdp->with);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 	// Make the entry activation do the search.
-	gtk_entry_set_activates_default(GTK_ENTRY(frdp->what), TRUE);
+	gtk_ನಮೂದು_ಗಣ_activates_default(GTK_ನಮೂದು(frdp->what), TRUE);
 
     // Checkboxes
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
     gtk_box_append(GTK_BOX(vertbox), hbox);
 
     frdp->wword = gtk_check_button_new_with_label(_("Match whole word only"));
-    gtk_check_button_set_active(GTK_CHECK_BUTTON(frdp->wword),
+    gtk_check_button_ಗಣ_ಸಕ್ರಿಯ(GTK_CHECK_BUTTON(frdp->wword),
 	    (gboolean)wword);
     gtk_box_append(GTK_BOX(hbox), frdp->wword);
 
     frdp->mcase = gtk_check_button_new_with_label(_("Match case"));
-    gtk_check_button_set_active(GTK_CHECK_BUTTON(frdp->mcase),
+    gtk_check_button_ಗಣ_ಸಕ್ರಿಯ(GTK_CHECK_BUTTON(frdp->mcase),
 	    (gboolean)mcase);
     gtk_box_append(GTK_BOX(hbox), frdp->mcase);
 
@@ -4998,80 +4998,80 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     tmp = gtk_label_new(_("Direction:"));
     gtk_box_append(GTK_BOX(hbox), tmp);
 
-    frdp->up = gtk_check_button_new_with_label(_("Up"));
-    gtk_box_append(GTK_BOX(hbox), frdp->up);
+    frdp->ಮೇಲೆ = gtk_check_button_new_with_label(_("Up"));
+    gtk_box_append(GTK_BOX(hbox), frdp->ಮೇಲೆ);
 
-    frdp->down = gtk_check_button_new_with_label(_("Down"));
-    gtk_check_button_set_group(GTK_CHECK_BUTTON(frdp->down),
-	    GTK_CHECK_BUTTON(frdp->up));
-    gtk_check_button_set_active(GTK_CHECK_BUTTON(frdp->down), TRUE);
-    gtk_box_append(GTK_BOX(hbox), frdp->down);
+    frdp->ಕೆಳಕ್ಕೆ = gtk_check_button_new_with_label(_("Down"));
+    gtk_check_button_ಗಣ_ಗುಂಪು(GTK_CHECK_BUTTON(frdp->ಕೆಳಕ್ಕೆ),
+	    GTK_CHECK_BUTTON(frdp->ಮೇಲೆ));
+    gtk_check_button_ಗಣ_ಸಕ್ರಿಯ(GTK_CHECK_BUTTON(frdp->ಕೆಳಕ್ಕೆ), TRUE);
+    gtk_box_append(GTK_BOX(hbox), frdp->ಕೆಳಕ್ಕೆ);
 
     // Action buttons
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
-    gtk_widget_set_halign(hbox, GTK_ALIGN_END);
+    gtk_widget_ಗಣ_halign(hbox, GTK_ALIGN_ಕೊನೆ);
     gtk_box_append(GTK_BOX(vertbox), hbox);
 
     btn = gtk_button_new_with_label(_("Find Next"));
-    gtk_widget_set_sensitive(btn, sensitive);
-    frdp->find = btn;
+    gtk_widget_ಗಣ_sensitive(btn, sensitive);
+    frdp->ಕಂಡುಹಿಡಿ = btn;
 
-    key_controller = gtk_event_controller_key_new();
-    g_signal_connect(key_controller, "key-pressed",
-	    G_CALLBACK(find_key_pressed_cb), frdp);
-    gtk_widget_add_controller(GTK_WIDGET(frdp->dialog), key_controller);
+    ಕೀಲಿ_controller = gtk_event_controller_ಕೀಲಿ_new();
+    g_signal_connect(ಕೀಲಿ_controller, "key-pressed",
+	    G_CALLBACK(ಕಂಡುಹಿಡಿ_ಕೀಲಿ_pressed_cb), frdp);
+    gtk_widget_ಕೂಡಿಸು_controller(GTK_WIDGET(frdp->dialog), ಕೀಲಿ_controller);
 
     g_signal_connect(G_OBJECT(frdp->what), "changed",
-	    G_CALLBACK(entry_changed_cb), frdp->dialog);
+	    G_CALLBACK(ನಮೂದು_ಬದಲಾಯಿತು_cb), frdp->dialog);
 
     // Make it so that when entry is activated, this button will be activated.
-    gtk_window_set_default_widget(GTK_WINDOW(frdp->dialog), btn);
-    g_signal_connect(btn, "clicked", G_CALLBACK(find_replace_cb),
-	    GINT_TO_POINTER(do_replace ? FRD_R_FINDNEXT : FRD_FINDNEXT));
+    gtk_ಕಿಟಕಿ_ಗಣ_default_widget(GTK_ಕಿಟಕಿ(frdp->dialog), btn);
+    g_signal_connect(btn, "clicked", G_CALLBACK(ಕಂಡುಹಿಡಿ_replace_cb),
+	    GINT_ಗಮ್ಯ_ಸೂಚಕ(do_replace ? FRD_R_FINDNEXT : FRD_FINDNEXT));
     gtk_box_append(GTK_BOX(hbox), btn);
 
-    if (do_replace)
+    ಆದರೆ (do_replace)
     {
 	btn = gtk_button_new_with_label(_("Replace"));
-	gtk_widget_set_sensitive(btn, sensitive);
-	g_signal_connect(btn, "clicked", G_CALLBACK(find_replace_cb),
-		GINT_TO_POINTER(FRD_REPLACE));
+	gtk_widget_ಗಣ_sensitive(btn, sensitive);
+	g_signal_connect(btn, "clicked", G_CALLBACK(ಕಂಡುಹಿಡಿ_replace_cb),
+		GINT_ಗಮ್ಯ_ಸೂಚಕ(FRD_REPLACE));
 	frdp->replace = btn;
 	gtk_box_append(GTK_BOX(hbox), btn);
 
 	btn = gtk_button_new_with_label(_("Replace All"));
-	gtk_widget_set_sensitive(btn, sensitive);
-	g_signal_connect(btn, "clicked", G_CALLBACK(find_replace_cb),
-		GINT_TO_POINTER(FRD_REPLACEALL));
+	gtk_widget_ಗಣ_sensitive(btn, sensitive);
+	g_signal_connect(btn, "clicked", G_CALLBACK(ಕಂಡುಹಿಡಿ_replace_cb),
+		GINT_ಗಮ್ಯ_ಸೂಚಕ(FRD_REPLACEALL));
 	frdp->all = btn;
 	gtk_box_append(GTK_BOX(hbox), btn);
     }
 
     btn = gtk_button_new_with_label(_("Close"));
     g_signal_connect_swapped(btn, "clicked",
-	    G_CALLBACK(gtk_window_destroy), frdp->dialog);
+	    G_CALLBACK(gtk_ಕಿಟಕಿ_destroy), frdp->dialog);
     gtk_box_append(GTK_BOX(hbox), btn);
 
-    gtk_window_present(GTK_WINDOW(frdp->dialog));
+    gtk_ಕಿಟಕಿ_present(GTK_ಕಿಟಕಿ(frdp->dialog));
     gtk_widget_grab_focus(frdp->what);
-    if (do_replace && entry_text != NULL && entry_text[0] != NUL)
+    ಆದರೆ (do_replace && ನಮೂದು_ಪಠ್ಯ != ಖಾಲಿ && ನಮೂದು_ಪಠ್ಯ[0] != NUL)
 	gtk_widget_grab_focus(frdp->with);
 
-    vim_free(entry_text);
+    vim_free(ನಮೂದು_ಪಠ್ಯ);
 }
 
-    void
-gui_mch_find_dialog(exarg_T *eap)
+    ಶೂನ್ಯ
+gui_mch_ಕಂಡುಹಿಡಿ_dialog(exarg_T *eap)
 {
-    if (gui.in_use)
-	find_replace_dialog_create(eap->arg, FALSE);
+    ಆದರೆ (gui.ಒಳ_use)
+	ಕಂಡುಹಿಡಿ_replace_dialog_create(eap->arg, FALSE);
 }
 
-    void
+    ಶೂನ್ಯ
 gui_mch_replace_dialog(exarg_T *eap)
 {
-    if (gui.in_use)
-	find_replace_dialog_create(eap->arg, TRUE);
+    ಆದರೆ (gui.ಒಳ_use)
+	ಕಂಡುಹಿಡಿ_replace_dialog_create(eap->arg, TRUE);
 }
 
 /*
@@ -5080,8 +5080,8 @@ gui_mch_replace_dialog(exarg_T *eap)
  * ============================================================
  */
 
-    void
-ex_helpfind(exarg_T *eap UNUSED)
+    ಶೂನ್ಯ
+ex_helpfind(exarg_T *eap ಬಳಸದ)
 {
     do_cmdline_cmd((char_u *)"emenu ToolBar.FindHelp");
 }
@@ -5092,25 +5092,25 @@ ex_helpfind(exarg_T *eap UNUSED)
  * ============================================================
  */
 
-#ifdef USE_GTK4_PRINT_DIALOG
-static GtkPrintDialog *print_dialog = NULL;
-static GtkPrintSettings *print_settings = NULL;
-static GtkPageSetup *page_setup = NULL;
-static GtkPrintSetup *print_setup = NULL;
-static GFile *print_file;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_GTK4_PRINT_DIALOG
+ಸ್ಥಿರ GtkPrintDialog *print_dialog = ಖಾಲಿ;
+ಸ್ಥಿರ GtkPrintSettings *print_settings = ಖಾಲಿ;
+ಸ್ಥಿರ Gtk_ಪುಟ_ಸಿದ್ಧತೆ *ಪುಟ_ಸಿದ್ಧತೆ = ಖಾಲಿ;
+ಸ್ಥಿರ Gtk_Print_ಸಿದ್ಧತೆ *print_ಸಿದ್ಧತೆ = ಖಾಲಿ;
+ಸ್ಥಿರ GFile *print_file;
 
-    static void
-print_dialog_cb(GtkPrintDialog *dialog, GAsyncResult *result, gboolean *done)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+print_dialog_cb(GtkPrintDialog *dialog, GAsync_ಫಲಿತಾಂಶ *ಫಲಿತಾಂಶ, gboolean *ಮುಗಿದ)
 {
-    GError *error = NULL;
-    print_setup = gtk_print_dialog_setup_finish(dialog, result, &error);
+    GError *error = ಖಾಲಿ;
+    print_ಸಿದ್ಧತೆ = gtk_print_dialog_ಸಿದ್ಧತೆ_ಮುಕ್ತಾಯ(dialog, ಫಲಿತಾಂಶ, &error);
 
-    if (print_setup == NULL)
+    ಆದರೆ (print_ಸಿದ್ಧತೆ == ಖಾಲಿ)
     {
-	semsg(_(e_print_error_str), error->message);
+	semsg(_(e_print_error_str), error->ಸಂದೇಶ_2);
 	g_error_free(error);
     }
-    *done = TRUE;
+    *ಮುಗಿದ = TRUE;
 }
 
 /*
@@ -5121,93 +5121,93 @@ print_dialog_cb(GtkPrintDialog *dialog, GAsyncResult *result, gboolean *done)
 gui_gtk4_print_dialog(
 	prt_settings_T	*psettings,
 	char_u		*jobname,
-	double		*page_width,
-	double		*page_height)
+	ದ್ವಿಗುಣ		*ಪುಟ_ಅಗಲ,
+	ದ್ವಿಗುಣ		*ಪುಟ_ಎತ್ತರ)
 {
     GtkPrintDialog  *dialog = gtk_print_dialog_new();
-    gboolean	    done = FALSE;
-    char_u	    *temp;
+    gboolean	    ಮುಗಿದ = FALSE;
+    char_u	    *ತಾತ್ಕಾಲಿಕ;
 
-    gtk_print_dialog_set_title(dialog, (const char *)jobname);
-    gtk_print_dialog_set_modal(dialog, TRUE);
+    gtk_print_dialog_ಗಣ_title(dialog, (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)jobname);
+    gtk_print_dialog_ಗಣ_modal(dialog, TRUE);
 
-    print_dialog = NULL;
-    print_setup = NULL;
+    print_dialog = ಖಾಲಿ;
+    print_ಸಿದ್ಧತೆ = ಖಾಲಿ;
 
-    if (print_settings == NULL)
+    ಆದರೆ (print_settings == ಖಾಲಿ)
     {
-	option_table_T *opt;
+	option_ಕೋಷ್ಟಕ_T *opt;
 
 	print_settings = gtk_print_settings_new();
 
 	opt = &printer_opts[OPT_PRINT_DUPLEX];
-	if (opt->present)
+	ಆದರೆ (opt->present)
 	{
-	    if (STRNICMP(opt->string, "off", 3) == 0)
-		gtk_print_settings_set_duplex(print_settings,
+	    ಆದರೆ (STRNICMP(opt->string, "off", 3) == 0)
+		gtk_print_settings_ಗಣ_duplex(print_settings,
 			GTK_PRINT_DUPLEX_SIMPLEX);
-	    else if (STRNICMP(opt->string, "short", 5) == 0)
-		gtk_print_settings_set_duplex(print_settings,
+	    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (STRNICMP(opt->string, "short", 5) == 0)
+		gtk_print_settings_ಗಣ_duplex(print_settings,
 			GTK_PRINT_DUPLEX_VERTICAL);
-	    else
-		gtk_print_settings_set_duplex(print_settings,
+	    ಇಲ್ಲದಿದ್ದರೆ
+		gtk_print_settings_ಗಣ_duplex(print_settings,
 			GTK_PRINT_DUPLEX_HORIZONTAL);
 	}
 
 	opt = &printer_opts[OPT_PRINT_PORTRAIT];
-	if (opt->present)
+	ಆದರೆ (opt->present)
 	{
-	    if (*opt->string == 'y')
-		gtk_print_settings_set_orientation(print_settings,
-			GTK_PAGE_ORIENTATION_PORTRAIT);
-	    else
-		gtk_print_settings_set_orientation(print_settings,
-			GTK_PAGE_ORIENTATION_LANDSCAPE);
+	    ಆದರೆ (*opt->string == 'y')
+		gtk_print_settings_ಗಣ_orientation(print_settings,
+			GTK_ಪುಟ_ORIENTATION_PORTRAIT);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		gtk_print_settings_ಗಣ_orientation(print_settings,
+			GTK_ಪುಟ_ORIENTATION_LANDSCAPE);
 	}
 
 	opt = &printer_opts[OPT_PRINT_PAPER];
-	if (opt->present)
+	ಆದರೆ (opt->present)
 	{
-	    gtk_print_settings_set_paper_size(print_settings,
-		    gtk_paper_size_new((const char *)opt->string));
+	    gtk_print_settings_ಗಣ_paper_ಗಾತ್ರ(print_settings,
+		    gtk_paper_ಗಾತ್ರ_new((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *)opt->string));
 	}
 
 	opt = &printer_opts[OPT_PRINT_COLLATE];
-	if (opt->present)
+	ಆದರೆ (opt->present)
 	{
-	    if (*opt->string == 'y')
-		gtk_print_settings_set_collate(print_settings, TRUE);
-	    else
-		gtk_print_settings_set_collate(print_settings, FALSE);
+	    ಆದರೆ (*opt->string == 'y')
+		gtk_print_settings_ಗಣ_collate(print_settings, TRUE);
+	    ಇಲ್ಲದಿದ್ದರೆ
+		gtk_print_settings_ಗಣ_collate(print_settings, FALSE);
 	}
     }
 
-    if (page_setup == NULL)
-	page_setup = gtk_page_setup_new();
+    ಆದರೆ (ಪುಟ_ಸಿದ್ಧತೆ == ಖಾಲಿ)
+	ಪುಟ_ಸಿದ್ಧತೆ = gtk_ಪುಟ_ಸಿದ್ಧತೆ_new();
 
-    gtk_print_dialog_set_print_settings(dialog, print_settings);
-    gtk_print_dialog_set_page_setup(dialog, page_setup);
+    gtk_print_dialog_ಗಣ_print_settings(dialog, print_settings);
+    gtk_print_dialog_ಗಣ_ಪುಟ_ಸಿದ್ಧತೆ(dialog, ಪುಟ_ಸಿದ್ಧತೆ);
 
-    gtk_print_dialog_setup(dialog, GTK_WINDOW(gui.mainwin), NULL,
-	    (GAsyncReadyCallback)print_dialog_cb, &done);
+    gtk_print_dialog_ಸಿದ್ಧತೆ(dialog, GTK_ಕಿಟಕಿ(gui.mainwin), ಖಾಲಿ,
+	    (GAsyncReadyCallback)print_dialog_cb, &ಮುಗಿದ);
 
-    while (!done)
-	g_main_context_iteration(NULL, TRUE);
+    ಆಗ (!ಮುಗಿದ)
+	g_main_context_iteration(ಖಾಲಿ, TRUE);
 
-    if (print_setup == NULL)
+    ಆದರೆ (print_ಸಿದ್ಧತೆ == ಖಾಲಿ)
     {
 	g_object_unref(dialog);
-	g_clear_pointer(&print_setup, gtk_print_setup_unref);
+	g_clear_ಸೂಚಕ(&print_ಸಿದ್ಧತೆ, gtk_print_ಸಿದ್ಧತೆ_unref);
 
-	psettings->user_abort_msg = FALSE;
-	return NULL;
+	psettings->user_abort_ಸಂದೇಶ = FALSE;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
 
     g_clear_object(&print_settings);
-    g_clear_object(&page_setup);
+    g_clear_object(&ಪುಟ_ಸಿದ್ಧತೆ);
     print_settings = g_object_ref(
-	    gtk_print_setup_get_print_settings(print_setup));
-    page_setup = g_object_ref(gtk_print_setup_get_page_setup(print_setup));
+	    gtk_print_ಸಿದ್ಧತೆ_get_print_settings(print_ಸಿದ್ಧತೆ));
+    ಪುಟ_ಸಿದ್ಧತೆ = g_object_ref(gtk_print_ಸಿದ್ಧತೆ_get_ಪುಟ_ಸಿದ್ಧತೆ(print_ಸಿದ್ಧತೆ));
 
     {
 	GtkPrintDuplex duplex = gtk_print_settings_get_duplex(print_settings);
@@ -5216,217 +5216,217 @@ gui_gtk4_print_dialog(
 
     psettings->has_color = gtk_print_settings_get_use_color(print_settings);
 
-    *page_width = gtk_page_setup_get_paper_width(page_setup,
+    *ಪುಟ_ಅಗಲ = gtk_ಪುಟ_ಸಿದ್ಧತೆ_get_paper_ಅಗಲ(ಪುಟ_ಸಿದ್ಧತೆ,
 	    GTK_UNIT_POINTS);
-    *page_height = gtk_page_setup_get_paper_height(page_setup,
+    *ಪುಟ_ಎತ್ತರ = gtk_ಪುಟ_ಸಿದ್ಧತೆ_get_paper_ಎತ್ತರ(ಪುಟ_ಸಿದ್ಧತೆ,
 	    GTK_UNIT_POINTS);
 
-    temp  = vim_tempname('p', FALSE);
-    if (temp == NULL)
+    ತಾತ್ಕಾಲಿಕ  = vim_tempname('p', FALSE);
+    ಆದರೆ (ತಾತ್ಕಾಲಿಕ == ಖಾಲಿ)
     {
-	emsg(_(e_cant_find_temp_file_for_writing));
+	emsg(_(e_cant_ಕಂಡುಹಿಡಿ_ತಾತ್ಕಾಲಿಕ_file_for_writing));
 	g_clear_object(&dialog);
-	g_clear_pointer(&print_setup, gtk_print_setup_unref);
+	g_clear_ಸೂಚಕ(&print_ಸಿದ್ಧತೆ, gtk_print_ಸಿದ್ಧತೆ_unref);
 
-	psettings->user_abort_msg = FALSE;
-	return NULL;
+	psettings->user_abort_ಸಂದೇಶ = FALSE;
+	ಹಿಂತಿರುಗಿ ಖಾಲಿ;
     }
-    print_file = g_file_new_for_path((char *)temp);
+    print_file = g_file_new_for_ಮಾರ್ಗ((ಅಕ್ಷರ *)ತಾತ್ಕಾಲಿಕ);
 
     print_dialog = dialog;
 
-    return temp;
+    ಹಿಂತಿರುಗಿ ತಾತ್ಕಾಲಿಕ;
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 print_file_cb(
 	GtkPrintDialog	*dialog,
-	GAsyncResult	*result,
+	GAsync_ಫಲಿತಾಂಶ	*ಫಲಿತಾಂಶ,
 	GFile		*file)
 {
-    char *path = g_file_get_path(file);
+    ಅಕ್ಷರ *ಮಾರ್ಗ = g_file_get_ಮಾರ್ಗ(file);
 
-    (void)gtk_print_dialog_print_file_finish(dialog, result, NULL);
+    (ಶೂನ್ಯ)gtk_print_dialog_print_file_ಮುಕ್ತಾಯ(dialog, ಫಲಿತಾಂಶ, ಖಾಲಿ);
     g_object_unref(dialog);
 
     // Don't use g_file_delete() to be consistent
-    mch_remove(path);
-    g_free(path);
+    mch_remove(ಮಾರ್ಗ);
+    g_free(ಮಾರ್ಗ);
 }
 
 
-    void
-gui_gtk4_print_finish(void)
+    ಶೂನ್ಯ
+gui_gtk4_print_ಮುಕ್ತಾಯ(ಶೂನ್ಯ)
 {
-    if (print_dialog != NULL)
+    ಆದರೆ (print_dialog != ಖಾಲಿ)
     {
 	gtk_print_dialog_print_file(
-		print_dialog, GTK_WINDOW(gui.mainwin),
-		print_setup, print_file, NULL,
+		print_dialog, GTK_ಕಿಟಕಿ(gui.mainwin),
+		print_ಸಿದ್ಧತೆ, print_file, ಖಾಲಿ,
 		(GAsyncReadyCallback)print_file_cb, print_file);
-	print_dialog = NULL;
-	g_clear_pointer(&print_setup, gtk_print_setup_unref);
+	print_dialog = ಖಾಲಿ;
+	g_clear_ಸೂಚಕ(&print_ಸಿದ್ಧತೆ, gtk_print_ಸಿದ್ಧತೆ_unref);
     }
 }
-#endif // USE_GTK4_PRINT_DIALOG
+#ಆದರೆ_ಅಂತ್ಯ // USE_GTK4_PRINT_DIALOG
 
-#ifdef FEAT_IMAGE_GUI
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ FEAT_IMAGE_GUI
 
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
     GdkTexture *texture;
 } image_gdk_T;
 
-typedef struct
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ
 {
-    GskRenderNode   **nodes; // Note that elements may be NULL
-    int		    n_nodes;
+    Gsk_Render_ಗಂಟು   **nodes; // Note that elements may be NULL
+    ಪೂರ್ಣಾಂಕ		    n_nodes;
 } image_placement_gdk_T;
 
-    int
+    ಪೂರ್ಣಾಂಕ
 image_gui_init(image_T *img)
 {
     image_gdk_T	    *ctx = ALLOC_CLEAR_ONE(image_gdk_T);
-    GdkMemoryFormat fmt;
+    Gdk_ಸ್ಮರಣೆ_Format fmt;
     size_t	    stride;
-    GBytes	    *bytes;
-    size_t	    size;
-    int		    w, h;
+    GBytes	    *ಬೈಟುಗಳು;
+    size_t	    ಗಾತ್ರ_2;
+    ಪೂರ್ಣಾಂಕ		    w, h;
 
-    if (ctx == NULL)
-	return FAIL;
+    ಆದರೆ (ctx == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    if (img->fmt == IMAGE_FORMAT_RGBA)
-	fmt = GDK_MEMORY_R8G8B8A8;
-    else
-	fmt = GDK_MEMORY_R8G8B8;
+    ಆದರೆ (img->fmt == IMAGE_FORMAT_RGBA)
+	fmt = GDK_ಸ್ಮರಣೆ_R8_G8_B8_A8;
+    ಇಲ್ಲದಿದ್ದರೆ
+	fmt = GDK_ಸ್ಮರಣೆ_R8_G8_B8;
 
     image_get_dimensions(img, &w, &h);
 
-    size = (size_t)w * h * img->fmt;
+    ಗಾತ್ರ_2 = (size_t)w * h * img->fmt;
     stride = w * img->fmt;
 
-    bytes = g_bytes_new(img->data, size);
-    ctx->texture = gdk_memory_texture_new(w, h, fmt, bytes, stride);
-    g_bytes_unref(bytes);
+    ಬೈಟುಗಳು = g_ಬೈಟುಗಳು_new(img->ದತ್ತಾಂಶ, ಗಾತ್ರ_2);
+    ctx->texture = gdk_ಸ್ಮರಣೆ_texture_new(w, h, fmt, ಬೈಟುಗಳು, stride);
+    g_ಬೈಟುಗಳು_unref(ಬೈಟುಗಳು);
 
-    img->backend_data = ctx;
-    return OK;
+    img->backend_ದತ್ತಾಂಶ = ctx;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-    void
+    ಶೂನ್ಯ
 image_gui_uninit(image_T *img)
 {
-    image_gdk_T *ctx = img->backend_data;
+    image_gdk_T *ctx = img->backend_ದತ್ತಾಂಶ;
 
     g_object_unref(ctx->texture);
     vim_free(ctx);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 clear_nodes(image_placement_gdk_T *ctx)
 {
-    if (ctx->nodes == NULL || gui.drawarea == NULL)
-	return;
+    ಆದರೆ (ctx->nodes == ಖಾಲಿ || gui.drawarea == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
-    for (int i = 0; i < ctx->n_nodes; i++)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < ctx->n_nodes; i++)
     {
-	if (ctx->nodes[i] == NULL)
-	    continue;
+	ಆದರೆ (ctx->nodes[i] == ಖಾಲಿ)
+	    ಮುಂದುವರಿ;
 	vim_draw_area_remove_external(
 		VIM_DRAW_AREA(gui.drawarea), ctx->nodes[i]);
-	gsk_render_node_unref(ctx->nodes[i]);
+	gsk_render_ಗಂಟು_unref(ctx->nodes[i]);
     }
-    g_clear_pointer(&ctx->nodes, g_free);
+    g_clear_ಸೂಚಕ(&ctx->nodes, g_free);
     ctx->n_nodes = 0;
 }
 
-    int
-image_placement_gui_init(image_placement_T *place)
+    ಪೂರ್ಣಾಂಕ
+image_placement_gui_init(image_placement_T *ಇರಿಸು)
 {
     image_placement_gdk_T *ctx = ALLOC_CLEAR_ONE(image_placement_gdk_T);
 
-    if (ctx == NULL)
-	return FAIL;
+    ಆದರೆ (ctx == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ FAIL;
 
-    place->backend_data = ctx;
-    return OK;
+    ಇರಿಸು->backend_ದತ್ತಾಂಶ = ctx;
+    ಹಿಂತಿರುಗಿ OK;
 }
 
-    void
-image_placement_gui_uninit(image_placement_T *place)
+    ಶೂನ್ಯ
+image_placement_gui_uninit(image_placement_T *ಇರಿಸು)
 {
-    image_placement_gdk_T *ctx = place->backend_data;
+    image_placement_gdk_T *ctx = ಇರಿಸು->backend_ದತ್ತಾಂಶ;
 
     clear_nodes(ctx);
     vim_free(ctx);
 }
 
-    void
-image_placement_gui_draw(image_placement_T *place)
+    ಶೂನ್ಯ
+image_placement_gui_draw(image_placement_T *ಇರಿಸು)
 {
-    image_T		    *img = place->img;
-    image_placement_gdk_T   *ctx = place->backend_data;
-    image_gdk_T		    *ictx = img->backend_data;
+    image_T		    *img = ಇರಿಸು->img;
+    image_placement_gdk_T   *ctx = ಇರಿಸು->backend_ದತ್ತಾಂಶ;
+    image_gdk_T		    *ictx = img->backend_ದತ್ತಾಂಶ;
     pixman_box32_t	    *rects;
-    int			    n_rects;
-    int			    iw, ih;
-    GskRenderNode	    *texture_node;
+    ಪೂರ್ಣಾಂಕ			    n_rects;
+    ಪೂರ್ಣಾಂಕ			    iw, ih;
+    Gsk_Render_ಗಂಟು	    *texture_ಗಂಟು;
 
-    rects = pixman_region32_rectangles(&place->visible, &n_rects);
-    if (rects == NULL)
-	return;
+    rects = pixman_region32_rectangles(&ಇರಿಸು->visible, &n_rects);
+    ಆದರೆ (rects == ಖಾಲಿ)
+	ಹಿಂತಿರುಗಿ;
 
     clear_nodes(ctx);
-    if (n_rects == 0)
-	return;
+    ಆದರೆ (n_rects == 0)
+	ಹಿಂತಿರುಗಿ;
 
     image_get_dimensions(img, &iw, &ih);
-    texture_node = gsk_texture_node_new(ictx->texture,
+    texture_ಗಂಟು = gsk_texture_ಗಂಟು_new(ictx->texture,
 	    &GRAPHENE_RECT_INIT(
-		FILL_X(place->col) - FILL_X(place->crop_box.x1),
-		FILL_Y(place->row) - FILL_Y(place->crop_box.y1)
-		+ FILL_Y(place->row_off),
+		FILL_X(ಇರಿಸು->ಲಂಬಸಾಲು) - FILL_X(ಇರಿಸು->crop_box.x1),
+		FILL_Y(ಇರಿಸು->ಅಡ್ಡಸಾಲು) - FILL_Y(ಇರಿಸು->crop_box.y1)
+		+ FILL_Y(ಇರಿಸು->ಅಡ್ಡಸಾಲು_off),
 		PHY2LOG(iw), PHY2LOG(ih)));
 
-    if (texture_node == NULL)
+    ಆದರೆ (texture_ಗಂಟು == ಖಾಲಿ)
 	// Not sure if this can happen...
-	return;
+	ಹಿಂತಿರುಗಿ;
 
-    ctx->nodes = g_malloc_n(n_rects, sizeof(GskRenderNode *));
+    ctx->nodes = g_malloc_n(n_rects, ಗಾತ್ರ(Gsk_Render_ಗಂಟು *));
     ctx->n_nodes = n_rects;
 
-    for (int i = 0; i < n_rects; i++)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < n_rects; i++)
     {
 	pixman_box32_t	rect = rects[i];
-	int		row, col;
-	int		posx, posy;
-	int		x, y, w, h;
-	GskRenderNode	*node;
+	ಪೂರ್ಣಾಂಕ		ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು;
+	ಪೂರ್ಣಾಂಕ		posx, posy;
+	ಪೂರ್ಣಾಂಕ		x, y, w, h;
+	Gsk_Render_ಗಂಟು	*ಗಂಟು;
 
-	image_placement_subrect(place, rect, &row, &col, &x, &y, &w, &h, false);
-	posx = FILL_X(col);
-	posy = FILL_Y(row);
+	image_placement_subrect(ಇರಿಸು, rect, &ಅಡ್ಡಸಾಲು, &ಲಂಬಸಾಲು, &x, &y, &w, &h, false);
+	posx = FILL_X(ಲಂಬಸಾಲು);
+	posy = FILL_Y(ಅಡ್ಡಸಾಲು);
 
-	node = gsk_clip_node_new(texture_node,
+	ಗಂಟು = gsk_clip_ಗಂಟು_new(texture_ಗಂಟು,
 		&GRAPHENE_RECT_INIT(posx, posy, w, h));
 
-	if (node != NULL)
-	    vim_draw_area_add_external(VIM_DRAW_AREA(gui.drawarea), node);
+	ಆದರೆ (ಗಂಟು != ಖಾಲಿ)
+	    vim_draw_area_ಕೂಡಿಸು_external(VIM_DRAW_AREA(gui.drawarea), ಗಂಟು);
 
-	ctx->nodes[i] = node;
+	ctx->nodes[i] = ಗಂಟು;
     }
-    gsk_render_node_unref(texture_node);
+    gsk_render_ಗಂಟು_unref(texture_ಗಂಟು);
 }
 
-    void
-image_placement_gui_clear(image_placement_T *place)
+    ಶೂನ್ಯ
+image_placement_gui_clear(image_placement_T *ಇರಿಸು)
 {
-    image_placement_gdk_T   *ctx = place->backend_data;
+    image_placement_gdk_T   *ctx = ಇರಿಸು->backend_ದತ್ತಾಂಶ;
 
     clear_nodes(ctx);
 }
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#endif // FEAT_GUI_GTK
+#ಆದರೆ_ಅಂತ್ಯ // FEAT_GUI_GTK

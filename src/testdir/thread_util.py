@@ -1,9 +1,9 @@
-import platform
+ಆಮದು platform
 
-if platform.system() == 'Darwin':
-    from ctypes import (
+ಆದರೆ platform.system() == 'Darwin':
+    ತಃ ctypes ಆಮದು (
         CDLL,
-        POINTER,
+        ಸೂಚಕ_2,
         Structure,
         byref,
         c_int,
@@ -12,9 +12,9 @@ if platform.system() == 'Darwin':
         c_void_p,
         sizeof
     )
-    from ctypes.util import find_library
+    ತಃ ctypes.util ಆಮದು ಕಂಡುಹಿಡಿ_library
 
-    class ThreadTimeConstraintPolicy(Structure):
+    ವರ್ಗ Thread_ಸಮಯ_Constraint_Policy(Structure):
         _fields_ = [
             ("period", c_uint32),
             ("computation", c_uint32),
@@ -22,12 +22,12 @@ if platform.system() == 'Darwin':
             ("preemptible", c_uint)
         ]
 
-    _libc = CDLL(find_library('c'))
+    _libc = CDLL(ಕಂಡುಹಿಡಿ_library('c'))
 
-    THREAD_TIME_CONSTRAINT_POLICY = c_uint(2)
+    THREAD_ಸಮಯ_CONSTRAINT_POLICY = c_uint(2)
 
-    THREAD_TIME_CONSTRAINT_POLICY_COUNT = c_uint(
-        int(sizeof(ThreadTimeConstraintPolicy) / sizeof(c_int)))
+    THREAD_ಸಮಯ_CONSTRAINT_POLICY_ಎಣಿಕೆ = c_uint(
+        ಪೂರ್ಣಾಂಕ(sizeof(Thread_ಸಮಯ_Constraint_Policy) / sizeof(c_int)))
 
     _libc.pthread_self.restype = c_void_p
 
@@ -39,52 +39,52 @@ if platform.system() == 'Darwin':
         c_uint,
         c_uint,
         c_void_p,
-        POINTER(c_uint),
-        POINTER(c_uint)
+        ಸೂಚಕ_2(c_uint),
+        ಸೂಚಕ_2(c_uint)
     ]
 
-    _libc.thread_policy_set.restype = c_int
-    _libc.thread_policy_set.argtypes = [
+    _libc.thread_policy_ಗಣ.restype = c_int
+    _libc.thread_policy_ಗಣ.argtypes = [
         c_uint,
         c_uint,
         c_void_p,
         c_uint
     ]
 
-    def _mach_thread_self():
-        return _libc.pthread_mach_thread_np(_libc.pthread_self())
+    ವ್ಯಾಖ್ಯಾನ _mach_thread_self():
+        ಹಿಂತಿರುಗಿ _libc.pthread_mach_thread_np(_libc.pthread_self())
 
-    def _get_time_constraint_policy(default=False):
+    ವ್ಯಾಖ್ಯಾನ get_ಸಮಯ_constraint_policy(ಪೂರ್ವನಿಯೋಜಿತ=ಸುಳ್ಳು):
         thread = _mach_thread_self()
-        policy_info = ThreadTimeConstraintPolicy()
-        policy_infoCnt = THREAD_TIME_CONSTRAINT_POLICY_COUNT
-        get_default = c_uint(default)
+        policy_info = Thread_ಸಮಯ_Constraint_Policy()
+        policy_infoCnt = THREAD_ಸಮಯ_CONSTRAINT_POLICY_ಎಣಿಕೆ
+        get_default = c_uint(ಪೂರ್ವನಿಯೋಜಿತ)
 
         kret = _libc.thread_policy_get(
             thread,
-            THREAD_TIME_CONSTRAINT_POLICY,
+            THREAD_ಸಮಯ_CONSTRAINT_POLICY,
             byref(policy_info),
             byref(policy_infoCnt),
             byref(get_default))
-        if kret != 0:
-            return None
-        return policy_info
+        ಆದರೆ kret != 0:
+            ಹಿಂತಿರುಗಿ ಏನೂಇಲ್ಲ
+        ಹಿಂತಿರುಗಿ policy_info
 
-    def _set_time_constraint_policy(policy_info):
+    ವ್ಯಾಖ್ಯಾನ ಗಣ_ಸಮಯ_constraint_policy(policy_info):
         thread = _mach_thread_self()
-        policy_infoCnt = THREAD_TIME_CONSTRAINT_POLICY_COUNT
+        policy_infoCnt = THREAD_ಸಮಯ_CONSTRAINT_POLICY_ಎಣಿಕೆ
 
-        kret = _libc.thread_policy_set(
+        kret = _libc.thread_policy_ಗಣ(
             thread,
-            THREAD_TIME_CONSTRAINT_POLICY,
+            THREAD_ಸಮಯ_CONSTRAINT_POLICY,
             byref(policy_info),
             policy_infoCnt)
-        if kret != 0:
-            raise OSError(kret)
+        ಆದರೆ kret != 0:
+            ಎತ್ತು OSError(kret)
 
-    def set_high_priority():
-        policy_info = _get_time_constraint_policy(default=True)
-        if not policy_info:
-            return
-        policy_info.preemptible = c_uint(False)
-        _set_time_constraint_policy(policy_info)
+    ವ್ಯಾಖ್ಯಾನ ಗಣ_ಮೇಲಿನ_ಆದ್ಯತೆ():
+        policy_info = get_ಸಮಯ_constraint_policy(ಪೂರ್ವನಿಯೋಜಿತ=ನಿಜ)
+        ಆದರೆ ಅಲ್ಲ policy_info:
+            ಹಿಂತಿರುಗಿ
+        policy_info.preemptible = c_uint(ಸುಳ್ಳು)
+        ಗಣ_ಸಮಯ_constraint_policy(policy_info)

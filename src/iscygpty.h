@@ -27,15 +27,15 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _ISCYGPTY_H
-#define _ISCYGPTY_H
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ _ISCYGPTY_H
+#ವ್ಯಾಖ್ಯಾನಿಸು _ISCYGPTY_H
 
-#ifdef _WIN32
-int is_cygpty(int fd);
-int is_cygpty_used(void);
-#else
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ _WIN32
+ಪೂರ್ಣಾಂಕ is_cygpty(ಪೂರ್ಣಾಂಕ fd);
+ಪೂರ್ಣಾಂಕ is_cygpty_ಬಳಸಿದ(ಶೂನ್ಯ);
+#ಇಲ್ಲದಿದ್ದರೆ
 # define is_cygpty(fd)		0
-# define is_cygpty_used()	0
-#endif
+# define is_cygpty_ಬಳಸಿದ()	0
+#ಆದರೆ_ಅಂತ್ಯ
 
-#endif // _ISCYGPTY_H
+#ಆದರೆ_ಅಂತ್ಯ // _ISCYGPTY_H

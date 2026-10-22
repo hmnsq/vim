@@ -20,15 +20,15 @@
  *
  */
 
-#if !defined(XPREPARE_H)
-#define XPREPARE_H
+#ಆದರೆ !defined(XPREPARE_H)
+#ವ್ಯಾಖ್ಯಾನಿಸು XPREPARE_H
 
 
 
-int xdl_prepare_env(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
+ಪೂರ್ಣಾಂಕ xdl_prepare_env(mmfile_t *mf1, mmfile_t *mf2, xpparam_t ಸ್ಥಿರಾಂಕ *xpp,
 		    xdfenv_t *xe);
-void xdl_free_env(xdfenv_t *xe);
+ಶೂನ್ಯ xdl_free_env(xdfenv_t *xe);
 
 
 
-#endif /* #if !defined(XPREPARE_H) */
+#ಆದರೆ_ಅಂತ್ಯ /* #if !defined(XPREPARE_H) */

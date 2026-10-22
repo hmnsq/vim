@@ -7,18 +7,18 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#ifndef GUI_GTK4_FORM_H
-#define GUI_GTK4_FORM_H
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ GUI_GTK4_FORM_H
+#ವ್ಯಾಖ್ಯಾನಿಸು GUI_GTK4_FORM_H
 
-#include <gtk/gtk.h>
+#ಅನ್ತರ್ಭಾವ <gtk/gtk.h>
 
-#define VIM_TYPE_FORM (vim_form_get_type())
+#ವ್ಯಾಖ್ಯಾನಿಸು VIM_TYPE_FORM (vim_form_get_type())
 G_DECLARE_FINAL_TYPE(VimForm, vim_form, VIM, FORM, GtkWidget)
 
-GtkWidget *vim_form_new(void);
-void vim_form_put(VimForm *self, GtkWidget *widget, int x, int y);
-void vim_form_move(VimForm *self, GtkWidget *widget, int x, int y);
-void vim_form_move_resize(VimForm *self, GtkWidget *widget, gint x, gint y, gint w, gint h);
-void vim_form_remove(VimForm *self, GtkWidget *widget);
+GtkWidget *vim_form_new(ಶೂನ್ಯ);
+ಶೂನ್ಯ vim_form_put(VimForm *self, GtkWidget *widget, ಪೂರ್ಣಾಂಕ x, ಪೂರ್ಣಾಂಕ y);
+ಶೂನ್ಯ vim_form_move(VimForm *self, GtkWidget *widget, ಪೂರ್ಣಾಂಕ x, ಪೂರ್ಣಾಂಕ y);
+ಶೂನ್ಯ vim_form_move_resize(VimForm *self, GtkWidget *widget, gint x, gint y, gint w, gint h);
+ಶೂನ್ಯ vim_form_remove(VimForm *self, GtkWidget *widget);
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ

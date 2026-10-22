@@ -14,36 +14,36 @@
  * Don't include these while generating prototypes.  Prevents problems when
  * files are missing.
  */
-#if !defined(PROTO) && !defined(NOPROTO)
+#ಆದರೆ !defined(PROTO) && !defined(NOPROTO)
 
 /*
  * Machine-dependent routines.
  */
 // avoid errors in function prototypes
-# if !defined(FEAT_X11) && !defined(FEAT_GUI_GTK)
-#  define Display int
-#  define Widget int
+# ಆದರೆ !defined(FEAT_X11) && !defined(FEAT_GUI_GTK)
+#  define Display ಪೂರ್ಣಾಂಕ
+#  define Widget ಪೂರ್ಣಾಂಕ
 # endif
 # ifndef FEAT_GUI_GTK
-#  define GdkEvent int
-#  define GdkEventKey int
+#  define GdkEvent ಪೂರ್ಣಾಂಕ
+#  define Gdk_Event_ಕೀಲಿ ಪೂರ್ಣಾಂಕ
 # endif
 # ifndef FEAT_X11
-#  define XImage int
+#  define XImage ಪೂರ್ಣಾಂಕ
 # endif
 
 # ifdef AMIGA
 #  include "os_amiga.pro"
 # endif
-# if defined(UNIX) || defined(VMS)
+# ಆದರೆ defined(UNIX) || defined(VMS)
 #  include "os_unix.pro"
 # endif
 # ifdef MSWIN
 #  include "os_win32.pro"
 #  include "os_mswin.pro"
 #  include "winclip.pro"
-#  if (defined(__GNUC__) && !defined(__MINGW32__))
-extern int _stricoll(char *a, char *b);
+#  ಆದರೆ (defined(__GNUC__) && !defined(__MINGW32__))
+ಬಾಹ್ಯ ಪೂರ್ಣಾಂಕ _stricoll(ಅಕ್ಷರ *a, ಅಕ್ಷರ *b);
 #  endif
 # endif
 # ifdef VMS
@@ -134,26 +134,26 @@ extern int _stricoll(char *a, char *b);
 # endif
 
 // These prototypes cannot be produced automatically.
-int smsg(const char *, ...) ATTRIBUTE_COLD ATTRIBUTE_FORMAT_PRINTF(1, 2);
+ಪೂರ್ಣಾಂಕ smsg(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *, ...) ATTRIBUTE_COLD ATTRIBUTE_FORMAT_PRINTF(1, 2);
 
-int smsg_attr(int, const char *, ...) ATTRIBUTE_FORMAT_PRINTF(2, 3);
+ಪೂರ್ಣಾಂಕ smsg_attr(ಪೂರ್ಣಾಂಕ, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *, ...) ATTRIBUTE_FORMAT_PRINTF(2, 3);
 
-int smsg_attr_keep(int, const char *, ...) ATTRIBUTE_FORMAT_PRINTF(2, 3);
-
-// These prototypes cannot be produced automatically.
-int semsg(const char *, ...) ATTRIBUTE_COLD ATTRIBUTE_FORMAT_PRINTF(1, 2);
+ಪೂರ್ಣಾಂಕ smsg_attr_keep(ಪೂರ್ಣಾಂಕ, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *, ...) ATTRIBUTE_FORMAT_PRINTF(2, 3);
 
 // These prototypes cannot be produced automatically.
-void siemsg(const char *, ...) ATTRIBUTE_COLD ATTRIBUTE_FORMAT_PRINTF(1, 2);
+ಪೂರ್ಣಾಂಕ semsg(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *, ...) ATTRIBUTE_COLD ATTRIBUTE_FORMAT_PRINTF(1, 2);
 
-int vim_snprintf_add(char *, size_t, const char *, ...) ATTRIBUTE_FORMAT_PRINTF(3, 4);
+// These prototypes cannot be produced automatically.
+ಶೂನ್ಯ siemsg(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *, ...) ATTRIBUTE_COLD ATTRIBUTE_FORMAT_PRINTF(1, 2);
 
-int vim_snprintf(char *, size_t, const char *, ...) ATTRIBUTE_FORMAT_PRINTF(3, 4);
-size_t vim_snprintf_safelen(char *, size_t, const char *, ...) ATTRIBUTE_FORMAT_PRINTF(3, 4);
+ಪೂರ್ಣಾಂಕ vim_snprintf_ಕೂಡಿಸು(ಅಕ್ಷರ *, size_t, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *, ...) ATTRIBUTE_FORMAT_PRINTF(3, 4);
 
-int vim_vsnprintf(char *str, size_t str_m, const char *fmt, va_list ap)
+ಪೂರ್ಣಾಂಕ vim_snprintf(ಅಕ್ಷರ *, size_t, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *, ...) ATTRIBUTE_FORMAT_PRINTF(3, 4);
+size_t vim_snprintf_safelen(ಅಕ್ಷರ *, size_t, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *, ...) ATTRIBUTE_FORMAT_PRINTF(3, 4);
+
+ಪೂರ್ಣಾಂಕ vim_vsnprintf(ಅಕ್ಷರ *str, size_t str_m, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *fmt, va_list ap)
 	ATTRIBUTE_FORMAT_PRINTF(3, 0);
-int vim_vsnprintf_typval(char *str, size_t str_m, const char *fmt, va_list ap, typval_T *tvs)
+ಪೂರ್ಣಾಂಕ vim_vsnprintf_typval(ಅಕ್ಷರ *str, size_t str_m, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *fmt, va_list ap, typval_T *tvs)
 	ATTRIBUTE_FORMAT_PRINTF(3, 0);
 
 # include "message.pro"
@@ -164,22 +164,22 @@ char_u *vim_strpbrk(char_u *s, char_u *charset);
 # endif
 # ifndef HAVE_QSORT
 // Use our own qsort(), don't define the prototype when not used.
-void qsort(void *base, size_t elm_count, size_t elm_size, int (*cmp)(const void *, const void *));
+ಶೂನ್ಯ qsort(ಶೂನ್ಯ *ತಳ, size_t elm_ಎಣಿಕೆ, size_t elm_ಗಾತ್ರ, ಪೂರ್ಣಾಂಕ (*cmp)(ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *, ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *));
 # endif
 # include "mouse.pro"
 # include "move.pro"
 # include "mbyte.pro"
 # ifdef VIMDLL
 // Function name differs when VIMDLL is defined
-int mbyte_im_get_status(void);
-void mbyte_im_set_active(int active_arg);
+ಪೂರ್ಣಾಂಕ mbyte_im_get_ಸ್ಥಿತಿ(ಶೂನ್ಯ);
+ಶೂನ್ಯ mbyte_im_ಗಣ_ಸಕ್ರಿಯ(ಪೂರ್ಣಾಂಕ ಸಕ್ರಿಯ_arg);
 # endif
 # include "normal.pro"
 # include "ops.pro"
 # include "option.pro"
 # include "optionstr.pro"
 # include "popupmenu.pro"
-# if defined(FEAT_PROFILE) || defined(FEAT_RELTIME)
+# ಆದರೆ defined(FEAT_PROFILE) || defined(FEAT_RELTIME)
 #  include "profiler.pro"
 # endif
 # include "quickfix.pro"
@@ -191,7 +191,7 @@ void mbyte_im_set_active(int active_arg);
 # include "scriptfile.pro"
 # include "screen.pro"
 # include "session.pro"
-# if defined(FEAT_CRYPT) || defined(FEAT_PERSISTENT_UNDO)
+# ಆದರೆ defined(FEAT_CRYPT) || defined(FEAT_PERSISTENT_UNDO)
 #  include "sha256.pro"
 # endif
 # include "fuzzy.pro"
@@ -210,7 +210,7 @@ void mbyte_im_set_active(int active_arg);
 # ifdef FEAT_TERMINAL
 #  include "terminal.pro"
 # endif
-# if defined(HAVE_TGETENT) && (defined(AMIGA) || defined(VMS))
+# ಆದರೆ defined(HAVE_TGETENT) && (defined(AMIGA) || defined(VMS))
 #  include "termlib.pro"
 # endif
 # ifdef FEAT_PROP_POPUP
@@ -279,16 +279,16 @@ void mbyte_im_set_active(int active_arg);
 // Ugly solution for "BalloonEval" not being defined while it's used in some
 // .pro files.
 # ifndef FEAT_BEVAL
-#  define BalloonEval int
+#  define BalloonEval ಪೂರ್ಣಾಂಕ
 # endif
-# if defined(FEAT_BEVAL) || defined(FEAT_PROP_POPUP)
+# ಆದರೆ defined(FEAT_BEVAL) || defined(FEAT_PROP_POPUP)
 #  include "beval.pro"
 # endif
 
 # ifdef FEAT_NETBEANS_INTG
 #  include "netbeans.pro"
 # endif
-# ifdef FEAT_JOB_CHANNEL
+# ifdef FEAT_ಕೆಲಸ_CHANNEL
 #  include "job.pro"
 #  include "channel.pro"
 # endif
@@ -298,22 +298,22 @@ void mbyte_im_set_active(int active_arg);
 
 # ifdef FEAT_EVAL
 // Not generated automatically so that we can add an extra attribute.
-void ch_log(channel_T *ch, const char *fmt, ...) ATTRIBUTE_FORMAT_PRINTF(2, 3);
-void ch_error(channel_T *ch, const char *fmt, ...) ATTRIBUTE_FORMAT_PRINTF(2, 3);
+ಶೂನ್ಯ ch_log(channel_T *ch, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *fmt, ...) ATTRIBUTE_FORMAT_PRINTF(2, 3);
+ಶೂನ್ಯ ch_error(channel_T *ch, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *fmt, ...) ATTRIBUTE_FORMAT_PRINTF(2, 3);
 # endif
 
-# if defined(FEAT_GUI) || defined(FEAT_JOB_CHANNEL)
-#  if defined(UNIX) || defined(MACOS_X) || defined(VMS)
+# ಆದರೆ defined(FEAT_GUI) || defined(FEAT_ಕೆಲಸ_CHANNEL)
+#  ಆದರೆ defined(UNIX) || defined(MACOS_X) || defined(VMS)
 #   include "pty.pro"
 #  endif
 # endif
 
 # ifdef FEAT_GUI
 #  include "gui.pro"
-#  if !defined(HAVE_SETENV) && !defined(HAVE_PUTENV) && !defined(VMS)
-extern int putenv(const char *string);			// in misc2.c
+#  ಆದರೆ !defined(HAVE_SETENV) && !defined(HAVE_PUTENV) && !defined(VMS)
+ಬಾಹ್ಯ ಪೂರ್ಣಾಂಕ putenv(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *string);			// in misc2.c
 #   ifdef USE_VIMPTY_GETENV
-extern char_u *vimpty_getenv(const char_u *string);	// in misc2.c
+ಬಾಹ್ಯ char_u *vimpty_getenv(ಸ್ಥಿರಾಂಕ char_u *string);	// in misc2.c
 #   endif
 #  endif
 #  ifdef FEAT_GUI_MSWIN
@@ -322,7 +322,7 @@ extern char_u *vimpty_getenv(const char_u *string);	// in misc2.c
 #  ifdef FEAT_GUI_GTK
 #   ifdef USE_GTK4
 #    include "gui_gtk4.pro"
-#   else
+#   ಇಲ್ಲದಿದ್ದರೆ
 #    include "gui_gtk.pro"
 #    include "gui_gtk_x11.pro"
 #   endif
@@ -345,7 +345,7 @@ extern char_u *vimpty_getenv(const char_u *string);	// in misc2.c
 # ifdef FEAT_OLE
 #  include "if_ole.pro"
 # endif
-# if defined(FEAT_CLIENTSERVER) && defined(FEAT_X11)
+# ಆದರೆ defined(FEAT_CLIENTSERVER) && defined(FEAT_X11)
 #  include "if_xcmdsrv.pro"
 # endif
 
@@ -356,8 +356,8 @@ extern char_u *vimpty_getenv(const char_u *string);	// in misc2.c
  * not included here for the perl files.  Use a dummy define for CV for the
  * other files.
  */
-# if defined(FEAT_PERL) && !defined(IN_PERL_FILE)
-#  define CV void
+# ಆದರೆ defined(FEAT_PERL) && !defined(ಒಳ_PERL_FILE)
+#  define CV ಶೂನ್ಯ
 #  include "if_perl.pro"
 # endif
 
@@ -367,11 +367,11 @@ extern char_u *vimpty_getenv(const char_u *string);	// in misc2.c
 # ifdef MACOS_X
 #  include "os_macosx.pro"
 # endif
-# if defined(MACOS_X_DARWIN) && defined(FEAT_CLIPBOARD) && !defined(FEAT_GUI)
+# ಆದರೆ defined(MACOS_X_DARWIN) && defined(FEAT_CLIPBOARD) && !defined(FEAT_GUI)
 // functions in os_macosx.m
-void clip_mch_lose_selection(Clipboard_T *cbd);
-int clip_mch_own_selection(Clipboard_T *cbd);
-void clip_mch_request_selection(Clipboard_T *cbd);
-void clip_mch_set_selection(Clipboard_T *cbd);
+ಶೂನ್ಯ clip_mch_lose_selection(Clipboard_T *cbd);
+ಪೂರ್ಣಾಂಕ clip_mch_own_selection(Clipboard_T *cbd);
+ಶೂನ್ಯ clip_mch_request_selection(Clipboard_T *cbd);
+ಶೂನ್ಯ clip_mch_ಗಣ_selection(Clipboard_T *cbd);
 # endif
-#endif // !PROTO && !NOPROTO
+#ಆದರೆ_ಅಂತ್ಯ // !PROTO && !NOPROTO

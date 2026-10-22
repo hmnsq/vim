@@ -7,51 +7,51 @@
 //  Os (OptLev=s), W1, Zp8, env=Win32, ms_ext, c_ext
 //  error checks: none
 //@@MIDL_FILE_HEADING(  )
-#include "rpc.h"
-#include "rpcndr.h"
-#ifndef COM_NO_WINDOWS_H
-#include "windows.h"
-#include "ole2.h"
-#endif //COM_NO_WINDOWS_H
+#ಅನ್ತರ್ಭಾವ "rpc.h"
+#ಅನ್ತರ್ಭಾವ "rpcndr.h"
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ COM_NO_WINDOWS_H
+#ಅನ್ತರ್ಭಾವ "windows.h"
+#ಅನ್ತರ್ಭಾವ "ole2.h"
+#ಆದರೆ_ಅಂತ್ಯ //COM_NO_WINDOWS_H
 
-#ifndef __if_ole_h__
-#define __if_ole_h__
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ __if_ole_h__
+#ವ್ಯಾಖ್ಯಾನಿಸು __if_ole_h__
 
-#ifdef __cplusplus
-extern "C"{
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ __cplusplus
+ಬಾಹ್ಯ "C"{
+#ಆದರೆ_ಅಂತ್ಯ
 
 // Forward Declarations
 
-#ifndef __IVim_FWD_DEFINED__
-#define __IVim_FWD_DEFINED__
-typedef interface IVim IVim;
-#endif	// __IVim_FWD_DEFINED__
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ __IVim_FWD_DEFINED__
+#ವ್ಯಾಖ್ಯಾನಿಸು __IVim_FWD_DEFINED__
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ interface IVim IVim;
+#ಆದರೆ_ಅಂತ್ಯ	// __IVim_FWD_DEFINED__
 
 
-#ifndef __Vim_FWD_DEFINED__
-#define __Vim_FWD_DEFINED__
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ __Vim_FWD_DEFINED__
+#ವ್ಯಾಖ್ಯಾನಿಸು __Vim_FWD_DEFINED__
 
-#ifdef __cplusplus
-typedef class Vim Vim;
-#else
-typedef struct Vim Vim;
-#endif // __cplusplus
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ __cplusplus
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ class Vim Vim;
+#ಇಲ್ಲದಿದ್ದರೆ
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ Vim Vim;
+#ಆದರೆ_ಅಂತ್ಯ // __cplusplus
 
-#endif	// __Vim_FWD_DEFINED__
+#ಆದರೆ_ಅಂತ್ಯ	// __Vim_FWD_DEFINED__
 
 
 // header files for imported files
-#include "oaidl.h"
+#ಅನ್ತರ್ಭಾವ "oaidl.h"
 
-#ifndef __MIDL_user_allocate_free_DEFINED__
-#define __MIDL_user_allocate_free_DEFINED__
-    void __RPC_FAR * __RPC_USER MIDL_user_allocate(size_t);
-    void __RPC_USER MIDL_user_free( void __RPC_FAR * );
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ __MIDL_user_allocate_free_DEFINED__
+#ವ್ಯಾಖ್ಯಾನಿಸು __MIDL_user_allocate_free_DEFINED__
+    ಶೂನ್ಯ __RPC_FAR * __RPC_USER MIDL_user_allocate(size_t);
+    ಶೂನ್ಯ __RPC_USER MIDL_user_free( ಶೂನ್ಯ __RPC_FAR * );
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifndef __IVim_INTERFACE_DEFINED__
-#define __IVim_INTERFACE_DEFINED__
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ __IVim_INTERFACE_DEFINED__
+#ವ್ಯಾಖ್ಯಾನಿಸು __IVim_INTERFACE_DEFINED__
 
 //***************************************
 // Generated header for interface: IVim
@@ -62,46 +62,46 @@ typedef struct Vim Vim;
 
 
 
-EXTERN_C const IID IID_IVim;
+EXTERN_C ಸ್ಥಿರಾಂಕ IID IID_IVim;
 
-#if defined(__cplusplus) && !defined(CINTERFACE)
+#ಆದರೆ defined(__cplusplus) && !defined(CINTERFACE)
 
     interface DECLSPEC_UUID("0F0BFAE2-4C90-11d1-82D7-0004AC368519")
-    IVim : public IDispatch
+    IVim : ಸಾರ್ವಜನಿಕ IDispatch
     {
-    public:
-	virtual HRESULT STDMETHODCALLTYPE SendKeys(
-	    /* [in] */ BSTR keys) = 0;
+    ಸಾರ್ವಜನಿಕ:
+	ವಾಸ್ತವಿಕ HRESULT STDMETHODCALLTYPE Send_ಕೀಲಿಗಳು(
+	    /* [in] */ BSTR ಕೀಲಿಗಳು) = 0;
 
-	virtual HRESULT STDMETHODCALLTYPE Eval(
-	    /* [in] */ BSTR expr,
-	    /* [retval][out] */ BSTR __RPC_FAR *result) = 0;
+	ವಾಸ್ತವಿಕ HRESULT STDMETHODCALLTYPE Eval(
+	    /* [in] */ BSTR ಅಭಿವ್ಯಕ್ತಿ,
+	    /* [retval][out] */ BSTR __RPC_FAR *ಫಲಿತಾಂಶ) = 0;
 
-	virtual HRESULT STDMETHODCALLTYPE SetForeground( void) = 0;
+	ವಾಸ್ತವಿಕ HRESULT STDMETHODCALLTYPE ಗಣ_Foreground( ಶೂನ್ಯ) = 0;
 
-	virtual HRESULT STDMETHODCALLTYPE GetHwnd(
-	    /* [retval][out] */ UINT_PTR __RPC_FAR *result) = 0;
+	ವಾಸ್ತವಿಕ HRESULT STDMETHODCALLTYPE GetHwnd(
+	    /* [retval][out] */ UINT_PTR __RPC_FAR *ಫಲಿತಾಂಶ) = 0;
 
     };
 
-#else	// C style interface
+#ಇಲ್ಲದಿದ್ದರೆ	// C style interface
 
-    typedef struct IVimVtbl
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ IVimVtbl
     {
 	BEGIN_INTERFACE
 
 	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *QueryInterface )(
 	    IVim __RPC_FAR * This,
 	    /* [in] */ REFIID riid,
-	    /* [iid_is][out] */ void __RPC_FAR *__RPC_FAR *ppvObject);
+	    /* [iid_is][out] */ ಶೂನ್ಯ __RPC_FAR *__RPC_FAR *ppvObject);
 
-	ULONG ( STDMETHODCALLTYPE __RPC_FAR *AddRef )(
+	ULONG ( STDMETHODCALLTYPE __RPC_FAR *ಕೂಡಿಸು_Ref )(
 	    IVim __RPC_FAR * This);
 
 	ULONG ( STDMETHODCALLTYPE __RPC_FAR *Release )(
 	    IVim __RPC_FAR * This);
 
-	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *GetTypeInfoCount )(
+	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *Get_Type_Info_ಎಣಿಕೆ )(
 	    IVim __RPC_FAR * This,
 	    /* [out] */ UINT __RPC_FAR *pctinfo);
 
@@ -111,11 +111,11 @@ EXTERN_C const IID IID_IVim;
 	    /* [in] */ LCID lcid,
 	    /* [out] */ ITypeInfo __RPC_FAR *__RPC_FAR *ppTInfo);
 
-	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *GetIDsOfNames )(
+	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *Get_IDs_ದ_ಹೆಸರುಗಳು )(
 	    IVim __RPC_FAR * This,
 	    /* [in] */ REFIID riid,
-	    /* [size_is][in] */ LPOLESTR __RPC_FAR *rgszNames,
-	    /* [in] */ UINT cNames,
+	    /* [size_is][in] */ LPOLESTR __RPC_FAR *rgsz_ಹೆಸರುಗಳು,
+	    /* [in] */ UINT c_ಹೆಸರುಗಳು,
 	    /* [in] */ LCID lcid,
 	    /* [size_is][out] */ DISPID __RPC_FAR *rgDispId);
 
@@ -124,136 +124,136 @@ EXTERN_C const IID IID_IVim;
 	    /* [in] */ DISPID dispIdMember,
 	    /* [in] */ REFIID riid,
 	    /* [in] */ LCID lcid,
-	    /* [in] */ WORD wFlags,
+	    /* [in] */ ಶಬ್ದ_2 wFlags,
 	    /* [out][in] */ DISPPARAMS __RPC_FAR *pDispParams,
-	    /* [out] */ VARIANT __RPC_FAR *pVarResult,
+	    /* [out] */ VARIANT __RPC_FAR *p_Var_ಫಲಿತಾಂಶ,
 	    /* [out] */ EXCEPINFO __RPC_FAR *pExcepInfo,
 	    /* [out] */ UINT __RPC_FAR *puArgErr);
 
-	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *SendKeys )(
+	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *Send_ಕೀಲಿಗಳು )(
 	    IVim __RPC_FAR * This,
-	    /* [in] */ BSTR keys);
+	    /* [in] */ BSTR ಕೀಲಿಗಳು);
 
 	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *Eval )(
 	    IVim __RPC_FAR * This,
-	    /* [in] */ BSTR expr,
-	    /* [retval][out] */ BSTR __RPC_FAR *result);
+	    /* [in] */ BSTR ಅಭಿವ್ಯಕ್ತಿ,
+	    /* [retval][out] */ BSTR __RPC_FAR *ಫಲಿತಾಂಶ);
 
-	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *SetForeground )(
+	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *ಗಣ_Foreground )(
 	    IVim __RPC_FAR * This);
 
 	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *GetHwnd )(
 	    IVim __RPC_FAR * This,
-	    /* [retval][out] */ UINT_PTR __RPC_FAR *result);
+	    /* [retval][out] */ UINT_PTR __RPC_FAR *ಫಲಿತಾಂಶ);
 
-	END_INTERFACE
+	ಕೊನೆ_INTERFACE
     } IVimVtbl;
 
     interface IVim
     {
-	CONST_VTBL struct IVimVtbl __RPC_FAR *lpVtbl;
+	CONST_VTBL ರಚನೆ IVimVtbl __RPC_FAR *lpVtbl;
     };
 
-#ifdef COBJMACROS
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ COBJMACROS
 
 
-#define IVim_QueryInterface(This,riid,ppvObject)	\
+#ವ್ಯಾಖ್ಯಾನಿಸು IVim_QueryInterface(This,riid,ppvObject)	\
     (This)->lpVtbl -> QueryInterface(This,riid,ppvObject)
 
-#define IVim_AddRef(This)	\
-    (This)->lpVtbl -> AddRef(This)
+#ವ್ಯಾಖ್ಯಾನಿಸು IVim_ಕೂಡಿಸು_Ref(This)	\
+    (This)->lpVtbl -> ಕೂಡಿಸು_Ref(This)
 
-#define IVim_Release(This)	\
+#ವ್ಯಾಖ್ಯಾನಿಸು IVim_Release(This)	\
     (This)->lpVtbl -> Release(This)
 
 
-#define IVim_GetTypeInfoCount(This,pctinfo)	\
-    (This)->lpVtbl -> GetTypeInfoCount(This,pctinfo)
+#ವ್ಯಾಖ್ಯಾನಿಸು IVim_Get_Type_Info_ಎಣಿಕೆ(This,pctinfo)	\
+    (This)->lpVtbl -> Get_Type_Info_ಎಣಿಕೆ(This,pctinfo)
 
-#define IVim_GetTypeInfo(This,iTInfo,lcid,ppTInfo)	\
+#ವ್ಯಾಖ್ಯಾನಿಸು IVim_GetTypeInfo(This,iTInfo,lcid,ppTInfo)	\
     (This)->lpVtbl -> GetTypeInfo(This,iTInfo,lcid,ppTInfo)
 
-#define IVim_GetIDsOfNames(This,riid,rgszNames,cNames,lcid,rgDispId)	\
-    (This)->lpVtbl -> GetIDsOfNames(This,riid,rgszNames,cNames,lcid,rgDispId)
+#ವ್ಯಾಖ್ಯಾನಿಸು IVim_Get_IDs_ದ_ಹೆಸರುಗಳು(This,riid,rgsz_ಹೆಸರುಗಳು,c_ಹೆಸರುಗಳು,lcid,rgDispId)	\
+    (This)->lpVtbl -> Get_IDs_ದ_ಹೆಸರುಗಳು(This,riid,rgsz_ಹೆಸರುಗಳು,c_ಹೆಸರುಗಳು,lcid,rgDispId)
 
-#define IVim_Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr)	\
-    (This)->lpVtbl -> Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr)
-
-
-#define IVim_SendKeys(This,keys)	\
-    (This)->lpVtbl -> SendKeys(This,keys)
-
-#define IVim_Eval(This,expr,result)	\
-    (This)->lpVtbl -> Eval(This,expr,result)
-
-#define IVim_SetForeground(This)	\
-    (This)->lpVtbl -> SetForeground(This)
-
-#define IVim_GetHwnd(This,result)	\
-    (This)->lpVtbl -> GetHwnd(This,result)
-
-#endif // COBJMACROS
+#ವ್ಯಾಖ್ಯಾನಿಸು IVim_Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,p_Var_ಫಲಿತಾಂಶ,pExcepInfo,puArgErr)	\
+    (This)->lpVtbl -> Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,p_Var_ಫಲಿತಾಂಶ,pExcepInfo,puArgErr)
 
 
-#endif	// C style interface
+#ವ್ಯಾಖ್ಯಾನಿಸು IVim_Send_ಕೀಲಿಗಳು(This,ಕೀಲಿಗಳು)	\
+    (This)->lpVtbl -> Send_ಕೀಲಿಗಳು(This,ಕೀಲಿಗಳು)
+
+#ವ್ಯಾಖ್ಯಾನಿಸು IVim_Eval(This,ಅಭಿವ್ಯಕ್ತಿ,ಫಲಿತಾಂಶ)	\
+    (This)->lpVtbl -> Eval(This,ಅಭಿವ್ಯಕ್ತಿ,ಫಲಿತಾಂಶ)
+
+#ವ್ಯಾಖ್ಯಾನಿಸು IVim_ಗಣ_Foreground(This)	\
+    (This)->lpVtbl -> ಗಣ_Foreground(This)
+
+#ವ್ಯಾಖ್ಯಾನಿಸು IVim_GetHwnd(This,ಫಲಿತಾಂಶ)	\
+    (This)->lpVtbl -> GetHwnd(This,ಫಲಿತಾಂಶ)
+
+#ಆದರೆ_ಅಂತ್ಯ // COBJMACROS
+
+
+#ಆದರೆ_ಅಂತ್ಯ	// C style interface
 
 
 
-HRESULT STDMETHODCALLTYPE IVim_SendKeys_Proxy(
+HRESULT STDMETHODCALLTYPE IVim_Send_ಕೀಲಿಗಳು_Proxy(
     IVim __RPC_FAR * This,
-    /* [in] */ BSTR keys);
+    /* [in] */ BSTR ಕೀಲಿಗಳು);
 
 
-void __RPC_STUB IVim_SendKeys_Stub(
-    IRpcStubBuffer *This,
-    IRpcChannelBuffer *_pRpcChannelBuffer,
-    PRPC_MESSAGE _pRpcMessage,
+ಶೂನ್ಯ __RPC_STUB IVim_Send_ಕೀಲಿಗಳು_Stub(
+    IRpc_Stub_ಬಫರ್ *This,
+    IRpc_Channel_ಬಫರ್ *p_Rpc_Channel_ಬಫರ್,
+    PRPC_ಸಂದೇಶ p_Rpc_ಸಂದೇಶ,
     DWORD *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IVim_Eval_Proxy(
     IVim __RPC_FAR * This,
-    /* [in] */ BSTR expr,
-    /* [retval][out] */ BSTR __RPC_FAR *result);
+    /* [in] */ BSTR ಅಭಿವ್ಯಕ್ತಿ,
+    /* [retval][out] */ BSTR __RPC_FAR *ಫಲಿತಾಂಶ);
 
 
-void __RPC_STUB IVim_Eval_Stub(
-    IRpcStubBuffer *This,
-    IRpcChannelBuffer *_pRpcChannelBuffer,
-    PRPC_MESSAGE _pRpcMessage,
+ಶೂನ್ಯ __RPC_STUB IVim_Eval_Stub(
+    IRpc_Stub_ಬಫರ್ *This,
+    IRpc_Channel_ಬಫರ್ *p_Rpc_Channel_ಬಫರ್,
+    PRPC_ಸಂದೇಶ p_Rpc_ಸಂದೇಶ,
     DWORD *_pdwStubPhase);
 
 
-HRESULT STDMETHODCALLTYPE IVim_SetForeground_Proxy(
+HRESULT STDMETHODCALLTYPE IVim_ಗಣ_Foreground_Proxy(
     IVim __RPC_FAR * This);
 
 
-void __RPC_STUB IVim_SetForeground_Stub(
-    IRpcStubBuffer *This,
-    IRpcChannelBuffer *_pRpcChannelBuffer,
-    PRPC_MESSAGE _pRpcMessage,
+ಶೂನ್ಯ __RPC_STUB IVim_ಗಣ_Foreground_Stub(
+    IRpc_Stub_ಬಫರ್ *This,
+    IRpc_Channel_ಬಫರ್ *p_Rpc_Channel_ಬಫರ್,
+    PRPC_ಸಂದೇಶ p_Rpc_ಸಂದೇಶ,
     DWORD *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IVim_GetHwnd_Proxy(
     IVim __RPC_FAR * This,
-    /* [retval][out] */ UINT_PTR __RPC_FAR *result);
+    /* [retval][out] */ UINT_PTR __RPC_FAR *ಫಲಿತಾಂಶ);
 
 
-void __RPC_STUB IVim_GetHwnd_Stub(
-    IRpcStubBuffer *This,
-    IRpcChannelBuffer *_pRpcChannelBuffer,
-    PRPC_MESSAGE _pRpcMessage,
+ಶೂನ್ಯ __RPC_STUB IVim_GetHwnd_Stub(
+    IRpc_Stub_ಬಫರ್ *This,
+    IRpc_Channel_ಬಫರ್ *p_Rpc_Channel_ಬಫರ್,
+    PRPC_ಸಂದೇಶ p_Rpc_ಸಂದೇಶ,
     DWORD *_pdwStubPhase);
 
 
 
-#endif	// __IVim_INTERFACE_DEFINED__
+#ಆದರೆ_ಅಂತ್ಯ	// __IVim_INTERFACE_DEFINED__
 
 
 
-#ifndef __Vim_LIBRARY_DEFINED__
-#define __Vim_LIBRARY_DEFINED__
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ __Vim_LIBRARY_DEFINED__
+#ವ್ಯಾಖ್ಯಾನಿಸು __Vim_LIBRARY_DEFINED__
 
 //***************************************
 // Generated header for library: Vim
@@ -264,27 +264,27 @@ void __RPC_STUB IVim_GetHwnd_Stub(
 
 
 
-EXTERN_C const IID LIBID_Vim;
+EXTERN_C ಸ್ಥಿರಾಂಕ IID LIBID_Vim;
 
-#ifdef __cplusplus
-EXTERN_C const CLSID CLSID_Vim;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ __cplusplus
+EXTERN_C ಸ್ಥಿರಾಂಕ CLSID CLSID_Vim;
 
 class DECLSPEC_UUID("0F0BFAE1-4C90-11d1-82D7-0004AC368519")
 Vim;
-#endif
-#endif // __Vim_LIBRARY_DEFINED__
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ_ಅಂತ್ಯ // __Vim_LIBRARY_DEFINED__
 
 // Additional Prototypes for ALL interfaces
 
-unsigned long		  __RPC_USER  BSTR_UserSize(	 unsigned long __RPC_FAR *, unsigned long	     , BSTR __RPC_FAR * );
-unsigned char __RPC_FAR * __RPC_USER  BSTR_UserMarshal(  unsigned long __RPC_FAR *, unsigned char __RPC_FAR *, BSTR __RPC_FAR * );
-unsigned char __RPC_FAR * __RPC_USER  BSTR_UserUnmarshal(unsigned long __RPC_FAR *, unsigned char __RPC_FAR *, BSTR __RPC_FAR * );
-void			  __RPC_USER  BSTR_UserFree(	 unsigned long __RPC_FAR *, BSTR __RPC_FAR * );
+ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ		  __RPC_USER  BSTR_User_ಗಾತ್ರ(	 ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ __RPC_FAR *, ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ	     , BSTR __RPC_FAR * );
+ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ __RPC_FAR * __RPC_USER  BSTR_UserMarshal(  ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ __RPC_FAR *, ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ __RPC_FAR *, BSTR __RPC_FAR * );
+ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ __RPC_FAR * __RPC_USER  BSTR_UserUnmarshal(ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ __RPC_FAR *, ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ __RPC_FAR *, BSTR __RPC_FAR * );
+ಶೂನ್ಯ			  __RPC_USER  BSTR_UserFree(	 ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ __RPC_FAR *, BSTR __RPC_FAR * );
 
 // end of Additional Prototypes
 
-#ifdef __cplusplus
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ __cplusplus
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ

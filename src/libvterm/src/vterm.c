@@ -1,82 +1,82 @@
-#define DEFINE_INLINES
+#ವ್ಯಾಖ್ಯಾನಿಸು DEFINE_INLINES
 
 // vim: set sw=2 :
-#include "vterm_internal.h"
+#ಅನ್ತರ್ಭಾವ "vterm_internal.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
+#ಅನ್ತರ್ಭಾವ <stdio.h>
+#ಅನ್ತರ್ಭಾವ <stdlib.h>
+#ಅನ್ತರ್ಭಾವ <stdarg.h>
+#ಅನ್ತರ್ಭಾವ <string.h>
 
-#include "utf8.h"
+#ಅನ್ತರ್ಭಾವ "utf8.h"
 
 /*****************
  * API functions *
  *****************/
 
-static void *default_malloc(size_t size, void *allocdata UNUSED)
+ಸ್ಥಿರ ಶೂನ್ಯ *default_malloc(size_t ಗಾತ್ರ_2, ಶೂನ್ಯ *allocdata ಬಳಸದ)
 {
-  void *ptr = malloc(size);
-  if(ptr)
-    memset(ptr, 0, size);
-  return ptr;
+  ಶೂನ್ಯ *ptr = ಸ್ಮರಣೆ_ಕೊಡು(ಗಾತ್ರ_2);
+  ಆದರೆ(ptr)
+    memset(ptr, 0, ಗಾತ್ರ_2);
+  ಹಿಂತಿರುಗಿ ptr;
 }
 
-static void default_free(void *ptr, void *allocdata UNUSED)
+ಸ್ಥಿರ ಶೂನ್ಯ default_free(ಶೂನ್ಯ *ptr, ಶೂನ್ಯ *allocdata ಬಳಸದ)
 {
-  free(ptr);
+  ಬಿಡುಗಡೆ(ptr);
 }
 
-static VTermAllocatorFunctions default_allocator = {
+ಸ್ಥಿರ VTermAllocatorFunctions default_allocator = {
   &default_malloc, // malloc
   &default_free // free
 };
 
-VTerm *vterm_new(int rows, int cols)
+VTerm *vterm_new(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು_2, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ)
 {
-  struct VTermBuilder builder;
-  memset(&builder, 0, sizeof(builder));
-  builder.rows = rows;
-  builder.cols = cols;
-  return vterm_build(&builder);
+  ರಚನೆ VTermBuilder builder;
+  memset(&builder, 0, ಗಾತ್ರ(builder));
+  builder.ಅಡ್ಡಸಾಲುಗಳು_2 = ಅಡ್ಡಸಾಲುಗಳು_2;
+  builder.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+  ಹಿಂತಿರುಗಿ vterm_build(&builder);
 }
 
-VTerm *vterm_new_with_allocator(int rows, int cols, VTermAllocatorFunctions *funcs, void *allocdata)
+VTerm *vterm_new_with_allocator(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು_2, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, VTermAllocatorFunctions *funcs, ಶೂನ್ಯ *allocdata)
 {
-  struct VTermBuilder builder;
-  memset(&builder, 0, sizeof(builder));
-  builder.rows = rows;
-  builder.cols = cols;
+  ರಚನೆ VTermBuilder builder;
+  memset(&builder, 0, ಗಾತ್ರ(builder));
+  builder.ಅಡ್ಡಸಾಲುಗಳು_2 = ಅಡ್ಡಸಾಲುಗಳು_2;
+  builder.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
   builder.allocator = funcs;
   builder.allocdata = allocdata;
-  return vterm_build(&builder);
+  ಹಿಂತಿರುಗಿ vterm_build(&builder);
 }
 
 /* A handy macro for defaulting values out of builder fields */
-#define DEFAULT(v, def)  ((v) ? (v) : (def))
+#ವ್ಯಾಖ್ಯಾನಿಸು DEFAULT(v, def)  ((v) ? (v) : (def))
 
-VTerm *vterm_build(const struct VTermBuilder *builder)
+VTerm *vterm_build(ಸ್ಥಿರಾಂಕ ರಚನೆ VTermBuilder *builder)
 {
-  const VTermAllocatorFunctions *allocator = DEFAULT(builder->allocator, &default_allocator);
+  ಸ್ಥಿರಾಂಕ VTermAllocatorFunctions *allocator = DEFAULT(builder->allocator, &default_allocator);
 
   /* Need to bootstrap using the allocator function directly */
-  VTerm *vt = (*allocator->malloc)(sizeof(VTerm), builder->allocdata);
+  VTerm *vt = (*allocator->ಸ್ಮರಣೆ_ಕೊಡು)(ಗಾತ್ರ(VTerm), builder->allocdata);
 
   vt->allocator = allocator;
   vt->allocdata = builder->allocdata;
 
-  vt->rows = builder->rows;
-  vt->cols = builder->cols;
+  vt->ಅಡ್ಡಸಾಲುಗಳು_2 = builder->ಅಡ್ಡಸಾಲುಗಳು_2;
+  vt->ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = builder->ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
 
-  vt->parser.state = NORMAL;
+  vt->parser.state = ಸಾಮಾನ್ಯ_2;
 
-  vt->parser.callbacks = NULL;
-  vt->parser.cbdata    = NULL;
+  vt->parser.callbacks = ಖಾಲಿ;
+  vt->parser.cbdata    = ಖಾಲಿ;
 
   vt->parser.emit_nul  = FALSE;
 
-  vt->outfunc = NULL;
-  vt->outdata = NULL;
+  vt->outfunc = ಖಾಲಿ;
+  vt->outdata = ಖಾಲಿ;
 
   vt->outbuffer_len = DEFAULT(builder->outbuffer_len, 4096);
   vt->outbuffer_cur = 0;
@@ -85,25 +85,25 @@ VTerm *vterm_build(const struct VTermBuilder *builder)
   vt->tmpbuffer_len = DEFAULT(builder->tmpbuffer_len, 4096);
   vt->tmpbuffer = vterm_allocator_malloc(vt, vt->tmpbuffer_len);
 
-  if (vt->tmpbuffer == NULL
-      || vt->outbuffer == NULL
-      || vt->tmpbuffer == NULL)
+  ಆದರೆ (vt->tmpbuffer == ಖಾಲಿ
+      || vt->outbuffer == ಖಾಲಿ
+      || vt->tmpbuffer == ಖಾಲಿ)
   {
     vterm_allocator_free(vt, vt->outbuffer);
     vterm_allocator_free(vt, vt->tmpbuffer);
     vterm_allocator_free(vt, vt);
-    return NULL;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
   }
 
-  return vt;
+  ಹಿಂತಿರುಗಿ vt;
 }
 
-void vterm_free(VTerm *vt)
+ಶೂನ್ಯ vterm_free(VTerm *vt)
 {
-  if(vt->screen)
+  ಆದರೆ(vt->screen)
     vterm_screen_free(vt->screen);
 
-  if(vt->state)
+  ಆದರೆ(vt->state)
     vterm_state_free(vt->state);
 
   vterm_allocator_free(vt, vt->outbuffer);
@@ -112,341 +112,341 @@ void vterm_free(VTerm *vt)
   vterm_allocator_free(vt, vt);
 }
 
-INTERNAL void *vterm_allocator_malloc(VTerm *vt, size_t size)
+ಆಂತರಿಕ ಶೂನ್ಯ *vterm_allocator_malloc(VTerm *vt, size_t ಗಾತ್ರ_2)
 {
-  return (*vt->allocator->malloc)(size, vt->allocdata);
+  ಹಿಂತಿರುಗಿ (*vt->allocator->ಸ್ಮರಣೆ_ಕೊಡು)(ಗಾತ್ರ_2, vt->allocdata);
 }
 
 /*
  * Free "ptr" unless it is NULL.
  */
-INTERNAL void vterm_allocator_free(VTerm *vt, void *ptr)
+ಆಂತರಿಕ ಶೂನ್ಯ vterm_allocator_free(VTerm *vt, ಶೂನ್ಯ *ptr)
 {
-  if (ptr)
-    (*vt->allocator->free)(ptr, vt->allocdata);
+  ಆದರೆ (ptr)
+    (*vt->allocator->ಬಿಡುಗಡೆ)(ptr, vt->allocdata);
 }
 
-void vterm_get_size(const VTerm *vt, int *rowsp, int *colsp)
+ಶೂನ್ಯ vterm_get_ಗಾತ್ರ(ಸ್ಥಿರಾಂಕ VTerm *vt, ಪೂರ್ಣಾಂಕ *rowsp, ಪೂರ್ಣಾಂಕ *colsp)
 {
-  if(rowsp)
-    *rowsp = vt->rows;
-  if(colsp)
-    *colsp = vt->cols;
+  ಆದರೆ(rowsp)
+    *rowsp = vt->ಅಡ್ಡಸಾಲುಗಳು_2;
+  ಆದರೆ(colsp)
+    *colsp = vt->ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
 }
 
-void vterm_set_size(VTerm *vt, int rows, int cols)
+ಶೂನ್ಯ vterm_ಗಣ_ಗಾತ್ರ(VTerm *vt, ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು_2, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ)
 {
-  if(rows < 1 || cols < 1)
-    return;
+  ಆದರೆ(ಅಡ್ಡಸಾಲುಗಳು_2 < 1 || ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ < 1)
+    ಹಿಂತಿರುಗಿ;
 
-  vt->rows = rows;
-  vt->cols = cols;
+  vt->ಅಡ್ಡಸಾಲುಗಳು_2 = ಅಡ್ಡಸಾಲುಗಳು_2;
+  vt->ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
 
-  if(vt->parser.callbacks && vt->parser.callbacks->resize)
-    (*vt->parser.callbacks->resize)(rows, cols, vt->parser.cbdata);
+  ಆದರೆ(vt->parser.callbacks && vt->parser.callbacks->resize)
+    (*vt->parser.callbacks->resize)(ಅಡ್ಡಸಾಲುಗಳು_2, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, vt->parser.cbdata);
 }
 
-int vterm_get_utf8(const VTerm *vt)
+ಪೂರ್ಣಾಂಕ vterm_get_utf8(ಸ್ಥಿರಾಂಕ VTerm *vt)
 {
-  return vt->mode.utf8;
+  ಹಿಂತಿರುಗಿ vt->ಬಹುಲಕ.utf8;
 }
 
-void vterm_set_utf8(VTerm *vt, int is_utf8)
+ಶೂನ್ಯ vterm_ಗಣ_utf8(VTerm *vt, ಪೂರ್ಣಾಂಕ is_utf8)
 {
-  vt->mode.utf8 = is_utf8;
+  vt->ಬಹುಲಕ.utf8 = is_utf8;
 }
 
-void vterm_output_set_callback(VTerm *vt, VTermOutputCallback *func, void *user)
+ಶೂನ್ಯ vterm_output_ಗಣ_callback(VTerm *vt, VTermOutputCallback *func, ಶೂನ್ಯ *user)
 {
   vt->outfunc = func;
   vt->outdata = user;
 }
 
-INTERNAL void vterm_push_output_bytes(VTerm *vt, const char *bytes, size_t len)
+ಆಂತರಿಕ ಶೂನ್ಯ vterm_ತಳ್ಳು_output_ಬೈಟುಗಳು(VTerm *vt, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಬೈಟುಗಳು, size_t len)
 {
-  if(vt->outfunc) {
-    (vt->outfunc)(bytes, len, vt->outdata);
-    return;
+  ಆದರೆ(vt->outfunc) {
+    (vt->outfunc)(ಬೈಟುಗಳು, len, vt->outdata);
+    ಹಿಂತಿರುಗಿ;
   }
 
-  if(len > vt->outbuffer_len - vt->outbuffer_cur) {
+  ಆದರೆ(len > vt->outbuffer_len - vt->outbuffer_cur) {
     DEBUG_LOG("vterm_push_output_bytes(): buffer overflow; dropping output\n");
-    return;
+    ಹಿಂತಿರುಗಿ;
   }
 
-  memcpy(vt->outbuffer + vt->outbuffer_cur, bytes, len);
+  ಸ್ಮರಣೆ_ನಕಲು(vt->outbuffer + vt->outbuffer_cur, ಬೈಟುಗಳು, len);
   vt->outbuffer_cur += len;
 }
 
-INTERNAL void vterm_push_output_vsprintf(VTerm *vt, const char *format, va_list args)
+ಆಂತರಿಕ ಶೂನ್ಯ vterm_ತಳ್ಳು_output_vsprintf(VTerm *vt, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *format, va_list ವಾದಗಳು)
 {
   size_t len;
-#ifdef VSNPRINTF
-  len = VSNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len, format, args);
-#else
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ VSNPRINTF
+  len = VSNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len, format, ವಾದಗಳು);
+#ಇಲ್ಲದಿದ್ದರೆ
   // When vsnprintf() is not available (C90) fall back to vsprintf().
   // Use the heap-allocated tmpbuffer (default 4096 bytes) instead of a small
   // stack buffer to reduce the risk of overflow.
-  len = vsprintf(vt->tmpbuffer, format, args);
-  if (len >= vt->tmpbuffer_len)
+  len = vsprintf(vt->tmpbuffer, format, ವಾದಗಳು);
+  ಆದರೆ (len >= vt->tmpbuffer_len)
     len = vt->tmpbuffer_len - 1;
-#endif
-  vterm_push_output_bytes(vt, vt->tmpbuffer, len);
+#ಆದರೆ_ಅಂತ್ಯ
+  vterm_ತಳ್ಳು_output_ಬೈಟುಗಳು(vt, vt->tmpbuffer, len);
 }
 
-INTERNAL void vterm_push_output_sprintf(VTerm *vt, const char *format, ...)
+ಆಂತರಿಕ ಶೂನ್ಯ vterm_ತಳ್ಳು_output_sprintf(VTerm *vt, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *format, ...)
 {
-  va_list args;
-  va_start(args, format);
-  vterm_push_output_vsprintf(vt, format, args);
-  va_end(args);
+  va_list ವಾದಗಳು;
+  va_start(ವಾದಗಳು, format);
+  vterm_ತಳ್ಳು_output_vsprintf(vt, format, ವಾದಗಳು);
+  va_end(ವಾದಗಳು);
 }
 
-INTERNAL void vterm_push_output_sprintf_ctrl(VTerm *vt, unsigned char ctrl, const char *fmt, ...)
+ಆಂತರಿಕ ಶೂನ್ಯ vterm_ತಳ್ಳು_output_sprintf_ctrl(VTerm *vt, ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ ctrl, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *fmt, ...)
 {
   size_t cur;
 
-  if(ctrl >= 0x80 && !vt->mode.ctrl8bit)
+  ಆದರೆ(ctrl >= 0x80 && !vt->ಬಹುಲಕ.ctrl8bit)
     cur = SNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len,
         ESC_S "%c", ctrl - 0x40);
-  else
+  ಇಲ್ಲದಿದ್ದರೆ
     cur = SNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len,
         "%c", ctrl);
-  if(cur >= vt->tmpbuffer_len)
-    return;
-  vterm_push_output_bytes(vt, vt->tmpbuffer, cur);
+  ಆದರೆ(cur >= vt->tmpbuffer_len)
+    ಹಿಂತಿರುಗಿ;
+  vterm_ತಳ್ಳು_output_ಬೈಟುಗಳು(vt, vt->tmpbuffer, cur);
 
-  va_list args;
-  va_start(args, fmt);
-  vterm_push_output_vsprintf(vt, fmt, args);
-  va_end(args);
+  va_list ವಾದಗಳು;
+  va_start(ವಾದಗಳು, fmt);
+  vterm_ತಳ್ಳು_output_vsprintf(vt, fmt, ವಾದಗಳು);
+  va_end(ವಾದಗಳು);
 }
 
-INTERNAL void vterm_push_output_sprintf_str(VTerm *vt, unsigned char ctrl, int term, const char *fmt, ...)
+ಆಂತರಿಕ ಶೂನ್ಯ vterm_ತಳ್ಳು_output_sprintf_str(VTerm *vt, ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ ctrl, ಪೂರ್ಣಾಂಕ ಪದ, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *fmt, ...)
 {
   size_t cur;
 
-  if(ctrl) {
-    if(ctrl >= 0x80 && !vt->mode.ctrl8bit)
+  ಆದರೆ(ctrl) {
+    ಆದರೆ(ctrl >= 0x80 && !vt->ಬಹುಲಕ.ctrl8bit)
       cur = SNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len,
           ESC_S "%c", ctrl - 0x40);
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
       cur = SNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len,
           "%c", ctrl);
 
-    if(cur >= vt->tmpbuffer_len)
-      return;
-    vterm_push_output_bytes(vt, vt->tmpbuffer, cur);
+    ಆದರೆ(cur >= vt->tmpbuffer_len)
+      ಹಿಂತಿರುಗಿ;
+    vterm_ತಳ್ಳು_output_ಬೈಟುಗಳು(vt, vt->tmpbuffer, cur);
   }
 
-  va_list args;
-  va_start(args, fmt);
-  vterm_push_output_vsprintf(vt, fmt, args);
-  va_end(args);
+  va_list ವಾದಗಳು;
+  va_start(ವಾದಗಳು, fmt);
+  vterm_ತಳ್ಳು_output_vsprintf(vt, fmt, ವಾದಗಳು);
+  va_end(ವಾದಗಳು);
 
-  if(term) {
+  ಆದರೆ(ಪದ) {
     cur = SNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len,
-        vt->mode.ctrl8bit ? "\x9C" : ESC_S "\\"); // ST
-    if(cur >= vt->tmpbuffer_len)
-      return;
-    vterm_push_output_bytes(vt, vt->tmpbuffer, cur);
+        vt->ಬಹುಲಕ.ctrl8bit ? "\x9C" : ESC_S "\\"); // ST
+    ಆದರೆ(cur >= vt->tmpbuffer_len)
+      ಹಿಂತಿರುಗಿ;
+    vterm_ತಳ್ಳು_output_ಬೈಟುಗಳು(vt, vt->tmpbuffer, cur);
   }
 }
 
-size_t vterm_output_get_buffer_size(const VTerm *vt)
+size_t vterm_output_get_ಬಫರ್_ಗಾತ್ರ(ಸ್ಥಿರಾಂಕ VTerm *vt)
 {
-  return vt->outbuffer_len;
+  ಹಿಂತಿರುಗಿ vt->outbuffer_len;
 }
 
-size_t vterm_output_get_buffer_current(const VTerm *vt)
+size_t vterm_output_get_ಬಫರ್_current(ಸ್ಥಿರಾಂಕ VTerm *vt)
 {
-  return vt->outbuffer_cur;
+  ಹಿಂತಿರುಗಿ vt->outbuffer_cur;
 }
 
-size_t vterm_output_get_buffer_remaining(const VTerm *vt)
+size_t vterm_output_get_ಬಫರ್_ಉಳಿದ(ಸ್ಥಿರಾಂಕ VTerm *vt)
 {
-  return vt->outbuffer_len - vt->outbuffer_cur;
+  ಹಿಂತಿರುಗಿ vt->outbuffer_len - vt->outbuffer_cur;
 }
 
-size_t vterm_output_read(VTerm *vt, char *buffer, size_t len)
+size_t vterm_output_read(VTerm *vt, ಅಕ್ಷರ *ಬಫರ್, size_t len)
 {
-  if(len > vt->outbuffer_cur)
+  ಆದರೆ(len > vt->outbuffer_cur)
     len = vt->outbuffer_cur;
 
-  memcpy(buffer, vt->outbuffer, len);
+  ಸ್ಮರಣೆ_ನಕಲು(ಬಫರ್, vt->outbuffer, len);
 
-  if(len < vt->outbuffer_cur)
+  ಆದರೆ(len < vt->outbuffer_cur)
     memmove(vt->outbuffer, vt->outbuffer + len, vt->outbuffer_cur - len);
 
   vt->outbuffer_cur -= len;
 
-  return len;
+  ಹಿಂತಿರುಗಿ len;
 }
 
-VTermValueType vterm_get_attr_type(VTermAttr attr)
+VTerm_ಮೌಲ್ಯ_Type vterm_get_attr_type(VTermAttr attr)
 {
-  switch(attr) {
-    case VTERM_ATTR_BOLD:       return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_UNDERLINE:  return VTERM_VALUETYPE_INT;
-    case VTERM_ATTR_ITALIC:     return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_BLINK:      return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_REVERSE:    return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_CONCEAL:    return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_STRIKE:     return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_FONT:       return VTERM_VALUETYPE_INT;
-    case VTERM_ATTR_FOREGROUND: return VTERM_VALUETYPE_COLOR;
-    case VTERM_ATTR_BACKGROUND: return VTERM_VALUETYPE_COLOR;
-    case VTERM_ATTR_SMALL:      return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_BASELINE:   return VTERM_VALUETYPE_INT;
+  ಆಯ್ಕೆ(attr) {
+    ಸ್ಥಿತಿ VTERM_ATTR_BOLD:       ಹಿಂತಿರುಗಿ VTERM_VALUETYPE_BOOL;
+    ಸ್ಥಿತಿ VTERM_ATTR_UNDERLINE:  ಹಿಂತಿರುಗಿ VTERM_VALUETYPE_INT;
+    ಸ್ಥಿತಿ VTERM_ATTR_ITALIC:     ಹಿಂತಿರುಗಿ VTERM_VALUETYPE_BOOL;
+    ಸ್ಥಿತಿ VTERM_ATTR_BLINK:      ಹಿಂತಿರುಗಿ VTERM_VALUETYPE_BOOL;
+    ಸ್ಥಿತಿ VTERM_ATTR_ಹಿಮ್ಮುಖ:    ಹಿಂತಿರುಗಿ VTERM_VALUETYPE_BOOL;
+    ಸ್ಥಿತಿ VTERM_ATTR_CONCEAL:    ಹಿಂತಿರುಗಿ VTERM_VALUETYPE_BOOL;
+    ಸ್ಥಿತಿ VTERM_ATTR_STRIKE:     ಹಿಂತಿರುಗಿ VTERM_VALUETYPE_BOOL;
+    ಸ್ಥಿತಿ VTERM_ATTR_FONT:       ಹಿಂತಿರುಗಿ VTERM_VALUETYPE_INT;
+    ಸ್ಥಿತಿ VTERM_ATTR_FOREGROUND: ಹಿಂತಿರುಗಿ VTERM_VALUETYPE_COLOR;
+    ಸ್ಥಿತಿ VTERM_ATTR_BACKGROUND: ಹಿಂತಿರುಗಿ VTERM_VALUETYPE_COLOR;
+    ಸ್ಥಿತಿ VTERM_ATTR_SMALL:      ಹಿಂತಿರುಗಿ VTERM_VALUETYPE_BOOL;
+    ಸ್ಥಿತಿ VTERM_ATTR_BASELINE:   ಹಿಂತಿರುಗಿ VTERM_VALUETYPE_INT;
 
-    case VTERM_N_ATTRS: return 0;
+    ಸ್ಥಿತಿ VTERM_N_ATTRS: ಹಿಂತಿರುಗಿ 0;
   }
-  return 0; /* UNREACHABLE */
+  ಹಿಂತಿರುಗಿ 0; /* UNREACHABLE */
 }
 
-VTermValueType vterm_get_prop_type(VTermProp prop)
+VTerm_ಮೌಲ್ಯ_Type vterm_get_prop_type(VTermProp prop)
 {
-  switch(prop) {
-    case VTERM_PROP_CURSORVISIBLE: return VTERM_VALUETYPE_BOOL;
-    case VTERM_PROP_CURSORBLINK:   return VTERM_VALUETYPE_BOOL;
-    case VTERM_PROP_ALTSCREEN:     return VTERM_VALUETYPE_BOOL;
-    case VTERM_PROP_TITLE:         return VTERM_VALUETYPE_STRING;
-    case VTERM_PROP_ICONNAME:      return VTERM_VALUETYPE_STRING;
-    case VTERM_PROP_REVERSE:       return VTERM_VALUETYPE_BOOL;
-    case VTERM_PROP_CURSORSHAPE:   return VTERM_VALUETYPE_INT;
-    case VTERM_PROP_MOUSE:         return VTERM_VALUETYPE_INT;
-    case VTERM_PROP_FOCUSREPORT:   return VTERM_VALUETYPE_BOOL;
-    case VTERM_PROP_CURSORCOLOR:   return VTERM_VALUETYPE_STRING;
+  ಆಯ್ಕೆ(prop) {
+    ಸ್ಥಿತಿ VTERM_PROP_CURSORVISIBLE: ಹಿಂತಿರುಗಿ VTERM_VALUETYPE_BOOL;
+    ಸ್ಥಿತಿ VTERM_PROP_CURSORBLINK:   ಹಿಂತಿರುಗಿ VTERM_VALUETYPE_BOOL;
+    ಸ್ಥಿತಿ VTERM_PROP_ALTSCREEN:     ಹಿಂತಿರುಗಿ VTERM_VALUETYPE_BOOL;
+    ಸ್ಥಿತಿ VTERM_PROP_TITLE:         ಹಿಂತಿರುಗಿ VTERM_VALUETYPE_STRING;
+    ಸ್ಥಿತಿ VTERM_PROP_ICONNAME:      ಹಿಂತಿರುಗಿ VTERM_VALUETYPE_STRING;
+    ಸ್ಥಿತಿ VTERM_PROP_ಹಿಮ್ಮುಖ:       ಹಿಂತಿರುಗಿ VTERM_VALUETYPE_BOOL;
+    ಸ್ಥಿತಿ VTERM_PROP_CURSORSHAPE:   ಹಿಂತಿರುಗಿ VTERM_VALUETYPE_INT;
+    ಸ್ಥಿತಿ VTERM_PROP_MOUSE:         ಹಿಂತಿರುಗಿ VTERM_VALUETYPE_INT;
+    ಸ್ಥಿತಿ VTERM_PROP_FOCUSREPORT:   ಹಿಂತಿರುಗಿ VTERM_VALUETYPE_BOOL;
+    ಸ್ಥಿತಿ VTERM_PROP_CURSORCOLOR:   ಹಿಂತಿರುಗಿ VTERM_VALUETYPE_STRING;
 
-    case VTERM_N_PROPS: return 0;
+    ಸ್ಥಿತಿ VTERM_N_PROPS: ಹಿಂತಿರುಗಿ 0;
   }
-  return 0; /* UNREACHABLE */
+  ಹಿಂತಿರುಗಿ 0; /* UNREACHABLE */
 }
 
-void vterm_scroll_rect(VTermRect rect,
-    int downward,
-    int rightward,
-    int (*moverect)(VTermRect src, VTermRect dest, void *user),
-    int (*eraserect)(VTermRect rect, int selective, void *user),
-    void *user)
+ಶೂನ್ಯ vterm_scroll_rect(VTermRect rect,
+    ಪೂರ್ಣಾಂಕ downward,
+    ಪೂರ್ಣಾಂಕ rightward,
+    ಪೂರ್ಣಾಂಕ (*moverect)(VTermRect src, VTermRect dest, ಶೂನ್ಯ *user),
+    ಪೂರ್ಣಾಂಕ (*eraserect)(VTermRect rect, ಪೂರ್ಣಾಂಕ selective, ಶೂನ್ಯ *user),
+    ಶೂನ್ಯ *user)
 {
   VTermRect src;
   VTermRect dest;
 
-  if(abs(downward)  >= rect.end_row - rect.start_row ||
-     abs(rightward) >= rect.end_col - rect.start_col) {
+  ಆದರೆ(ನಿರಪೇಕ್ಷ(downward)  >= rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು - rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು ||
+     ನಿರಪೇಕ್ಷ(rightward) >= rect.ಕೊನೆ_ಲಂಬಸಾಲು - rect.ಆರಂಭ_ಲಂಬಸಾಲು) {
     /* Scroll more than area; just erase the lot */
     (*eraserect)(rect, 0, user);
-    return;
+    ಹಿಂತಿರುಗಿ;
   }
 
-  if(rightward >= 0) {
+  ಆದರೆ(rightward >= 0) {
     /* rect: [XXX................]
      * src:     [----------------]
      * dest: [----------------]
      */
-    dest.start_col = rect.start_col;
-    dest.end_col   = rect.end_col   - rightward;
-    src.start_col  = rect.start_col + rightward;
-    src.end_col    = rect.end_col;
+    dest.ಆರಂಭ_ಲಂಬಸಾಲು = rect.ಆರಂಭ_ಲಂಬಸಾಲು;
+    dest.ಕೊನೆ_ಲಂಬಸಾಲು   = rect.ಕೊನೆ_ಲಂಬಸಾಲು   - rightward;
+    src.ಆರಂಭ_ಲಂಬಸಾಲು  = rect.ಆರಂಭ_ಲಂಬಸಾಲು + rightward;
+    src.ಕೊನೆ_ಲಂಬಸಾಲು    = rect.ಕೊನೆ_ಲಂಬಸಾಲು;
   }
-  else {
+  ಇಲ್ಲದಿದ್ದರೆ {
     /* rect: [................XXX]
      * src:  [----------------]
      * dest:    [----------------]
      */
-    int leftward = -rightward;
-    dest.start_col = rect.start_col + leftward;
-    dest.end_col   = rect.end_col;
-    src.start_col  = rect.start_col;
-    src.end_col    = rect.end_col - leftward;
+    ಪೂರ್ಣಾಂಕ leftward = -rightward;
+    dest.ಆರಂಭ_ಲಂಬಸಾಲು = rect.ಆರಂಭ_ಲಂಬಸಾಲು + leftward;
+    dest.ಕೊನೆ_ಲಂಬಸಾಲು   = rect.ಕೊನೆ_ಲಂಬಸಾಲು;
+    src.ಆರಂಭ_ಲಂಬಸಾಲು  = rect.ಆರಂಭ_ಲಂಬಸಾಲು;
+    src.ಕೊನೆ_ಲಂಬಸಾಲು    = rect.ಕೊನೆ_ಲಂಬಸಾಲು - leftward;
   }
 
-  if(downward >= 0) {
-    dest.start_row = rect.start_row;
-    dest.end_row   = rect.end_row   - downward;
-    src.start_row  = rect.start_row + downward;
-    src.end_row    = rect.end_row;
+  ಆದರೆ(downward >= 0) {
+    dest.ಆರಂಭ_ಅಡ್ಡಸಾಲು = rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು;
+    dest.ಕೊನೆ_ಅಡ್ಡಸಾಲು   = rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು   - downward;
+    src.ಆರಂಭ_ಅಡ್ಡಸಾಲು  = rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು + downward;
+    src.ಕೊನೆ_ಅಡ್ಡಸಾಲು    = rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು;
   }
-  else {
-    int upward = -downward;
-    dest.start_row = rect.start_row + upward;
-    dest.end_row   = rect.end_row;
-    src.start_row  = rect.start_row;
-    src.end_row    = rect.end_row - upward;
+  ಇಲ್ಲದಿದ್ದರೆ {
+    ಪೂರ್ಣಾಂಕ upward = -downward;
+    dest.ಆರಂಭ_ಅಡ್ಡಸಾಲು = rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು + upward;
+    dest.ಕೊನೆ_ಅಡ್ಡಸಾಲು   = rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು;
+    src.ಆರಂಭ_ಅಡ್ಡಸಾಲು  = rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು;
+    src.ಕೊನೆ_ಅಡ್ಡಸಾಲು    = rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು - upward;
   }
 
-  if(moverect)
+  ಆದರೆ(moverect)
     (*moverect)(dest, src, user);
 
-  if(downward > 0)
-    rect.start_row = rect.end_row - downward;
-  else if(downward < 0)
-    rect.end_row = rect.start_row - downward;
+  ಆದರೆ(downward > 0)
+    rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು = rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು - downward;
+  ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(downward < 0)
+    rect.ಕೊನೆ_ಅಡ್ಡಸಾಲು = rect.ಆರಂಭ_ಅಡ್ಡಸಾಲು - downward;
 
-  if(rightward > 0)
-    rect.start_col = rect.end_col - rightward;
-  else if(rightward < 0)
-    rect.end_col = rect.start_col - rightward;
+  ಆದರೆ(rightward > 0)
+    rect.ಆರಂಭ_ಲಂಬಸಾಲು = rect.ಕೊನೆ_ಲಂಬಸಾಲು - rightward;
+  ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(rightward < 0)
+    rect.ಕೊನೆ_ಲಂಬಸಾಲು = rect.ಆರಂಭ_ಲಂಬಸಾಲು - rightward;
 
   (*eraserect)(rect, 0, user);
 }
 
-void vterm_copy_cells(VTermRect dest,
+ಶೂನ್ಯ vterm_copy_cells(VTermRect dest,
     VTermRect src,
-    void (*copycell)(VTermPos dest, VTermPos src, void *user),
-    void *user)
+    ಶೂನ್ಯ (*copycell)(VTermPos dest, VTermPos src, ಶೂನ್ಯ *user),
+    ಶೂನ್ಯ *user)
 {
-  int downward  = src.start_row - dest.start_row;
-  int rightward = src.start_col - dest.start_col;
+  ಪೂರ್ಣಾಂಕ downward  = src.ಆರಂಭ_ಅಡ್ಡಸಾಲು - dest.ಆರಂಭ_ಅಡ್ಡಸಾಲು;
+  ಪೂರ್ಣಾಂಕ rightward = src.ಆರಂಭ_ಲಂಬಸಾಲು - dest.ಆರಂಭ_ಲಂಬಸಾಲು;
 
-  int init_row, test_row, init_col, test_col;
-  int inc_row, inc_col;
+  ಪೂರ್ಣಾಂಕ init_ಅಡ್ಡಸಾಲು, test_ಅಡ್ಡಸಾಲು, init_ಲಂಬಸಾಲು, test_ಲಂಬಸಾಲು;
+  ಪೂರ್ಣಾಂಕ inc_ಅಡ್ಡಸಾಲು, inc_ಲಂಬಸಾಲು;
 
-  if(downward < 0) {
-    init_row = dest.end_row - 1;
-    test_row = dest.start_row - 1;
-    inc_row = -1;
+  ಆದರೆ(downward < 0) {
+    init_ಅಡ್ಡಸಾಲು = dest.ಕೊನೆ_ಅಡ್ಡಸಾಲು - 1;
+    test_ಅಡ್ಡಸಾಲು = dest.ಆರಂಭ_ಅಡ್ಡಸಾಲು - 1;
+    inc_ಅಡ್ಡಸಾಲು = -1;
   }
-  else /* downward >= 0 */ {
-    init_row = dest.start_row;
-    test_row = dest.end_row;
-    inc_row = +1;
+  ಇಲ್ಲದಿದ್ದರೆ /* downward >= 0 */ {
+    init_ಅಡ್ಡಸಾಲು = dest.ಆರಂಭ_ಅಡ್ಡಸಾಲು;
+    test_ಅಡ್ಡಸಾಲು = dest.ಕೊನೆ_ಅಡ್ಡಸಾಲು;
+    inc_ಅಡ್ಡಸಾಲು = +1;
   }
 
-  if(rightward < 0) {
-    init_col = dest.end_col - 1;
-    test_col = dest.start_col - 1;
-    inc_col = -1;
+  ಆದರೆ(rightward < 0) {
+    init_ಲಂಬಸಾಲು = dest.ಕೊನೆ_ಲಂಬಸಾಲು - 1;
+    test_ಲಂಬಸಾಲು = dest.ಆರಂಭ_ಲಂಬಸಾಲು - 1;
+    inc_ಲಂಬಸಾಲು = -1;
   }
-  else /* rightward >= 0 */ {
-    init_col = dest.start_col;
-    test_col = dest.end_col;
-    inc_col = +1;
+  ಇಲ್ಲದಿದ್ದರೆ /* rightward >= 0 */ {
+    init_ಲಂಬಸಾಲು = dest.ಆರಂಭ_ಲಂಬಸಾಲು;
+    test_ಲಂಬಸಾಲು = dest.ಕೊನೆ_ಲಂಬಸಾಲು;
+    inc_ಲಂಬಸಾಲು = +1;
   }
 
   VTermPos pos;
-  for(pos.row = init_row; pos.row != test_row; pos.row += inc_row)
-    for(pos.col = init_col; pos.col != test_col; pos.col += inc_col) {
+  ಗಾಗಿ(pos.ಅಡ್ಡಸಾಲು = init_ಅಡ್ಡಸಾಲು; pos.ಅಡ್ಡಸಾಲು != test_ಅಡ್ಡಸಾಲು; pos.ಅಡ್ಡಸಾಲು += inc_ಅಡ್ಡಸಾಲು)
+    ಗಾಗಿ(pos.ಲಂಬಸಾಲು = init_ಲಂಬಸಾಲು; pos.ಲಂಬಸಾಲು != test_ಲಂಬಸಾಲು; pos.ಲಂಬಸಾಲು += inc_ಲಂಬಸಾಲು) {
       VTermPos srcpos;
-      srcpos.row = pos.row + downward;
-      srcpos.col = pos.col + rightward;
+      srcpos.ಅಡ್ಡಸಾಲು = pos.ಅಡ್ಡಸಾಲು + downward;
+      srcpos.ಲಂಬಸಾಲು = pos.ಲಂಬಸಾಲು + rightward;
       (*copycell)(pos, srcpos, user);
     }
 }
 
-void vterm_check_version(int major, int minor)
+ಶೂನ್ಯ vterm_check_ಆವೃತ್ತಿ(ಪೂರ್ಣಾಂಕ major, ಪೂರ್ಣಾಂಕ minor)
 {
-  if(major != VTERM_VERSION_MAJOR) {
+  ಆದರೆ(major != VTERM_ಆವೃತ್ತಿ_MAJOR) {
     fprintf(stderr, "libvterm major version mismatch; %d (wants) != %d (library)\n",
-        major, VTERM_VERSION_MAJOR);
-    exit(1);
+        major, VTERM_ಆವೃತ್ತಿ_MAJOR);
+    ನಿರ್ಗಮಿಸು(1);
   }
 
-  if(minor > VTERM_VERSION_MINOR) {
+  ಆದರೆ(minor > VTERM_ಆವೃತ್ತಿ_MINOR) {
     fprintf(stderr, "libvterm minor version mismatch; %d (wants) > %d (library)\n",
-        minor, VTERM_VERSION_MINOR);
-    exit(1);
+        minor, VTERM_ಆವೃತ್ತಿ_MINOR);
+    ನಿರ್ಗಮಿಸು(1);
   }
 
   // Happy
