@@ -1,30 +1,30 @@
-#include "vterm_internal.h"
+#ضمن "vterm_internal.h"
 
-#include "utf8.h"
+#ضمن "utf8.h"
 
-static void output_mouse(VTermState *state, int code, int pressed, int modifiers, int col, int row)
+ساكن فراغ output_mouse(VTermState *state, صحيح code, صحيح pressed, صحيح modifiers, صحيح col, صحيح row)
 {
   modifiers <<= 2;
 
-  switch(state->mouse_protocol) {
-  case MOUSE_X10:
-    if(col + 0x21 > 0xff)
+  بدل(state->mouse_protocol) {
+  حالة MOUSE_X10:
+    إذا(col + 0x21 > 0xff)
       col = 0xff - 0x21;
-    if(row + 0x21 > 0xff)
+    إذا(row + 0x21 > 0xff)
       row = 0xff - 0x21;
 
-    if(!pressed)
+    إذا(!pressed)
       code = 3;
 
-    vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "M%c%c%c",
+    vterm_ئىتتىرىش_output_sprintf_ctrl(state->vt, C1_CSI, "M%c%c%c",
         (code | modifiers) + 0x20, col + 0x21, row + 0x21);
-    break;
+    اكسر;
 
-  case MOUSE_UTF8:
+  حالة MOUSE_UTF8:
     {
-      char utf8[18]; size_t len = 0;
+      حرف utf8[18]; size_t len = 0;
 
-      if(!pressed)
+      إذا(!pressed)
         code = 3;
 
       len += fill_utf8((code | modifiers) + 0x20, utf8 + len);
@@ -32,70 +32,70 @@ static void output_mouse(VTermState *state, int code, int pressed, int modifiers
       len += fill_utf8(row + 0x21, utf8 + len);
       utf8[len] = 0;
 
-      vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "M%s", utf8);
+      vterm_ئىتتىرىش_output_sprintf_ctrl(state->vt, C1_CSI, "M%s", utf8);
     }
-    break;
+    اكسر;
 
-  case MOUSE_SGR:
-    vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "<%d;%d;%d%c",
+  حالة MOUSE_SGR:
+    vterm_ئىتتىرىش_output_sprintf_ctrl(state->vt, C1_CSI, "<%d;%d;%d%c",
         code | modifiers, col + 1, row + 1, pressed ? 'M' : 'm');
-    break;
+    اكسر;
 
-  case MOUSE_RXVT:
-    if(!pressed)
+  حالة MOUSE_RXVT:
+    إذا(!pressed)
       code = 3;
 
-    vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "%d;%d;%dM",
+    vterm_ئىتتىرىش_output_sprintf_ctrl(state->vt, C1_CSI, "%d;%d;%dM",
         code | modifiers, col + 1, row + 1);
-    break;
+    اكسر;
   }
 }
 
-void vterm_mouse_move(VTerm *vt, int row, int col, VTermModifier mod)
+فراغ vterm_mouse_move(VTerm *vt, صحيح row, صحيح col, VTermModifier mod)
 {
   VTermState *state = vt->state;
 
-  if(col == state->mouse_col && row == state->mouse_row)
-    return;
+  إذا(col == state->mouse_col && row == state->mouse_row)
+    أرجع;
 
   state->mouse_col = col;
   state->mouse_row = row;
 
-  if((state->mouse_flags & MOUSE_WANT_DRAG && state->mouse_buttons) ||
+  إذا((state->mouse_flags & MOUSE_WANT_DRAG && state->mouse_buttons) ||
      (state->mouse_flags & MOUSE_WANT_MOVE)) {
-    int button = state->mouse_buttons & MOUSE_BUTTON_LEFT ? 1 :
-                 state->mouse_buttons & MOUSE_BUTTON_MIDDLE ? 2 :
-                 state->mouse_buttons & MOUSE_BUTTON_RIGHT ? 3 : 4;
+    صحيح button = state->mouse_buttons & MOUSE_BUTTON_سول ? 1 :
+                 state->mouse_buttons & MOUSE_BUTTON_ئوتتۇرا ? 2 :
+                 state->mouse_buttons & MOUSE_BUTTON_ئوڭ ? 3 : 4;
     output_mouse(state, button-1 + 0x20, 1, mod, col, row);
   }
 }
 
-void vterm_mouse_button(VTerm *vt, int button, int pressed, VTermModifier mod)
+فراغ vterm_mouse_button(VTerm *vt, صحيح button, صحيح pressed, VTermModifier mod)
 {
   VTermState *state = vt->state;
 
-  int old_buttons = state->mouse_buttons;
+  صحيح old_buttons = state->mouse_buttons;
 
-  if(button > 0 && button <= 3) {
-    if(pressed)
+  إذا(button > 0 && button <= 3) {
+    إذا(pressed)
       state->mouse_buttons |= (1 << (button-1));
-    else
+    وإلا
       state->mouse_buttons &= ~(1 << (button-1));
   }
 
   /* Most of the time we don't get button releases from 4/5/6/7 */
-  if(state->mouse_buttons == old_buttons && button < 4)
-    return;
-  if (!(state->mouse_flags & MOUSE_WANT_CLICK))
-    return;
+  إذا(state->mouse_buttons == old_buttons && button < 4)
+    أرجع;
+  إذا (!(state->mouse_flags & MOUSE_WANT_CLICK))
+    أرجع;
 
-  if(!state->mouse_flags)
-    return;
+  إذا(!state->mouse_flags)
+    أرجع;
 
-  if(button < 4) {
+  إذا(button < 4) {
     output_mouse(state, button-1, pressed, mod, state->mouse_col, state->mouse_row);
   }
-  else if(button < 8) {
+  وإلا إذا(button < 8) {
     output_mouse(state, button-4 + 0x40, pressed, mod, state->mouse_col, state->mouse_row);
   }
 }

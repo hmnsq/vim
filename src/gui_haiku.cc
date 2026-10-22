@@ -68,297 +68,297 @@
  * convenient and necessary.
  */
 
-extern "C" {
+خارجي "C" {
 
-#include <assert.h>
-#include <float.h>
-#include <syslog.h>
+#ضمن <assert.h>
+#ضمن <float.h>
+#ضمن <syslog.h>
 
-#include "vim.h"
-#include "version.h"
+#ضمن "vim.h"
+#ضمن "version.h"
 
 }   // extern "C"
 
 // ---------------- start of header part ----------------
 
 //#include <Alert.h>
-#include <Application.h>
-#include <Beep.h>
-#include <Bitmap.h>
-#include <Box.h>
-#include <Button.h>
-#include <Clipboard.h>
-#include <Debug.h>
+#ضمن <Application.h>
+#ضمن <Beep.h>
+#ضمن <Bitmap.h>
+#ضمن <Box.h>
+#ضمن <Button.h>
+#ضمن <Clipboard.h>
+#ضمن <Debug.h>
 //#include <Directory.h>
 //#include <Entry.h>
-#include <File.h>
-#include <FilePanel.h>
-#include <FindDirectory.h>
+#ضمن <File.h>
+#ضمن <FilePanel.h>
+#ضمن <FindDirectory.h>
 //#include <Font.h>
-#include <IconUtils.h>
-#include <Input.h>
-#include <ListView.h>
-#include <MenuBar.h>
-#include <MenuItem.h>
+#ضمن <IconUtils.h>
+#ضمن <Input.h>
+#ضمن <ListView.h>
+#ضمن <MenuBar.h>
+#ضمن <MenuItem.h>
 //#include <MessageQueue.h>
 //#include <OS.h>
-#include <Path.h>
-#include <PictureButton.h>
-#include <PopUpMenu.h>
+#ضمن <Path.h>
+#ضمن <PictureButton.h>
+#ضمن <PopUpMenu.h>
 //#include <Region.h>
-#include <Resources.h>
+#ضمن <Resources.h>
 //#include <Roster.h>
-#include <Screen.h>
-#include <ScrollBar.h>
-#include <ScrollView.h>
-#include <String.h>
-#include <StringView.h>
+#ضمن <Screen.h>
+#ضمن <ScrollBar.h>
+#ضمن <ScrollView.h>
+#ضمن <String.h>
+#ضمن <StringView.h>
 //#include <SupportDefs.h>
-#include <TabView.h>
-#include <TextControl.h>
-#include <TextView.h>
-#include <TranslationUtils.h>
-#include <TranslatorFormats.h>
-#include <View.h>
-#include <Window.h>
+#ضمن <TabView.h>
+#ضمن <TextControl.h>
+#ضمن <TextView.h>
+#ضمن <TranslationUtils.h>
+#ضمن <TranslatorFormats.h>
+#ضمن <View.h>
+#ضمن <Window.h>
 
-class VimApp;
-class VimFormView;
-class VimTextAreaView;
-class VimWindow;
-class VimToolbar;
-class VimTabLine;
+صنف VimApp;
+صنف VimFormView;
+صنف VimTextAreaView;
+صنف VimWindow;
+صنف VimToolbar;
+صنف Vim_Tab_قۇر;
 
-extern key_map *keyMap;
-extern char *keyMapChars;
+خارجي ئاچقۇچ_map *ئاچقۇچ_Map;
+خارجي حرف *ئاچقۇچ_Map_Chars;
 
-extern int main(int argc, char **argv);
+خارجي صحيح main(صحيح argc, حرف **argv);
 
-#ifndef B_MAX_PORT_COUNT
-#define B_MAX_PORT_COUNT    255
+#ifndef B_MAX_PORT_سانى
+#define B_MAX_PORT_سانى    255
 #endif
 
 // VimApp seems comparable to the X "vimShell"
-class VimApp: public BApplication
+صنف VimApp: عام BApplication
 {
-    typedef BApplication Inherited;
-    public:
-    VimApp(const char *appsig);
+    تعريفنوع BApplication Inherited;
+    عام:
+    VimApp(ثابت حرف *appsig);
     ~VimApp();
 
     // callbacks:
-#if 0
-    virtual void DispatchMessage(BMessage *m, BHandler *h)
+#إذا 0
+    virtual فراغ DispatchMessage(BMessage *m, BHandler *h)
     {
 	m->PrintToStream();
 	Inherited::DispatchMessage(m, h);
     }
 #endif
-    virtual void ReadyToRun();
-    virtual void ArgvReceived(int32 argc, char **argv);
-    virtual void RefsReceived(BMessage *m);
-    virtual bool QuitRequested();
-    virtual void MessageReceived(BMessage *m);
+    virtual فراغ ReadyToRun();
+    virtual فراغ ArgvReceived(int32 argc, حرف **argv);
+    virtual فراغ RefsReceived(BMessage *m);
+    virtual منطقي QuitRequested();
+    virtual فراغ MessageReceived(BMessage *m);
 
-    static void SendRefs(BMessage *m, bool changedir);
+    ساكن فراغ SendRefs(BMessage *m, منطقي changedir);
 
     sem_id	fFilePanelSem;
     BFilePanel*	fFilePanel;
     BPath	fBrowsedPath;
-    private:
+    خاص:
 };
 
-class VimWindow: public BWindow
+صنف VimWindow: عام BWindow
 {
-    typedef BWindow Inherited;
-    public:
+    تعريفنوع BWindow Inherited;
+    عام:
     VimWindow();
     ~VimWindow();
 
-    virtual void DispatchMessage(BMessage *m, BHandler *h);
-    virtual void WindowActivated(bool active);
-    virtual bool QuitRequested();
+    virtual فراغ DispatchMessage(BMessage *m, BHandler *h);
+    virtual فراغ WindowActivated(منطقي active);
+    virtual منطقي QuitRequested();
 
     VimFormView	    *formView;
 
-    private:
-    void init();
+    خاص:
+    فراغ init();
 
-    bool is_fullscreen = false;
+    منطقي is_fullscreen = خطأ;
     BRect saved_frame;
     window_look saved_look;
 };
 
-class VimFormView: public BView
+صنف VimFormView: عام BView
 {
-    typedef BView Inherited;
-    public:
+    تعريفنوع BView Inherited;
+    عام:
     VimFormView(BRect frame);
     ~VimFormView();
 
     // callbacks:
-    virtual void AllAttached();
-    virtual void FrameResized(float new_width, float new_height);
+    virtual فراغ AllAttached();
+    virtual فراغ FrameResized(عائم new_width, عائم new_height);
 
 #define MENUBAR_MARGIN	1
-    float MenuHeight() const
-    { return menuBar ? menuBar->Frame().Height() + MENUBAR_MARGIN: 0; }
-    BMenuBar *MenuBar() const
-    { return menuBar; }
+    عائم MenuHeight() ثابت
+    { أرجع menuBar ? menuBar->Frame().Height() + MENUBAR_MARGIN: 0; }
+    BMenuBar *MenuBar() ثابت
+    { أرجع menuBar; }
 
-    private:
-    void init(BRect);
+    خاص:
+    فراغ init(BRect);
 
     BMenuBar	    *menuBar;
     VimTextAreaView *textArea;
 
 #ifdef FEAT_TOOLBAR
-    public:
-    float ToolbarHeight() const;
-    VimToolbar *ToolBar() const
-    { return toolBar; }
-    private:
+    عام:
+    عائم ToolbarHeight() ثابت;
+    VimToolbar *ToolBar() ثابت
+    { أرجع toolBar; }
+    خاص:
     VimToolbar	    *toolBar;
 #endif
 
 #ifdef FEAT_GUI_TABLINE
-    public:
-    VimTabLine *TabLine() const	{ return tabLine; }
-    bool IsShowingTabLine() const { return showingTabLine; }
-    void SetShowingTabLine(bool showing) { showingTabLine = showing;	}
-    float TablineHeight() const;
-    private:
-    VimTabLine	*tabLine;
-    int	showingTabLine;
+    عام:
+    Vim_Tab_قۇر *Tab_قۇر() ثابت	{ أرجع tab_قۇر; }
+    منطقي Is_Showing_Tab_قۇر() ثابت { أرجع showing_Tab_قۇر; }
+    فراغ Set_Showing_Tab_قۇر(منطقي showing) { showing_Tab_قۇر = showing;	}
+    عائم TablineHeight() ثابت;
+    خاص:
+    Vim_Tab_قۇر	*tab_قۇر;
+    صحيح	showing_Tab_قۇر;
 #endif
 };
 
-class VimTextAreaView: public BView
+صنف VimTextAreaView: عام BView
 {
-    typedef BView Inherited;
-    public:
+    تعريفنوع BView Inherited;
+    عام:
     VimTextAreaView(BRect frame);
     ~VimTextAreaView();
 
     // callbacks:
-    virtual void Draw(BRect updateRect);
-    virtual void KeyDown(const char *bytes, int32 numBytes);
-    virtual void MouseDown(BPoint point);
-    virtual void MouseUp(BPoint point);
-    virtual void MouseMoved(BPoint point, uint32 transit, const BMessage *message);
-    virtual void MessageReceived(BMessage *m);
+    virtual فراغ Draw(BRect updateRect);
+    virtual فراغ ئاچقۇچ_Down(ثابت حرف *bytes, int32 رەقەم_Bytes);
+    virtual فراغ MouseDown(BPoint point);
+    virtual فراغ MouseUp(BPoint point);
+    virtual فراغ MouseMoved(BPoint point, uint32 transit, ثابت BMessage *message);
+    virtual فراغ MessageReceived(BMessage *m);
 
     // own functions:
-    int mchInitFont(char_u *name);
-    void mchDrawString(int row, int col, char_u *s, int len, int flags);
-    void mchClearBlock(int row1, int col1, int row2, int col2);
-    void mchClearAll();
-    void mchDeleteLines(int row, int num_lines);
-    void mchInsertLines(int row, int num_lines);
+    صحيح mchInitFont(char_u *name);
+    فراغ mchDrawString(صحيح row, صحيح col, char_u *s, صحيح len, صحيح flags);
+    فراغ mchClearBlock(صحيح row1, صحيح col1, صحيح row2, صحيح col2);
+    فراغ mchClearAll();
+    فراغ mch_Delete_قۇرلار(صحيح row, صحيح رەقەم_قۇرلار);
+    فراغ mch_قىستۇرۇش_قۇرلار(صحيح row, صحيح رەقەم_قۇرلار);
 
-    static void guiSendMouseEvent(int button, int x, int y, int repeated_click, int_u modifiers);
-    static void guiMouseMoved(int x, int y);
-    static void guiBlankMouse(bool should_hide);
-    static int_u mouseModifiersToVim(int32 beModifiers);
+    ساكن فراغ guiSendMouseEvent(صحيح button, صحيح x, صحيح y, صحيح repeated_click, int_u modifiers);
+    ساكن فراغ guiMouseMoved(صحيح x, صحيح y);
+    ساكن فراغ guiBlankMouse(منطقي should_hide);
+    ساكن int_u mouseModifiersToVim(int32 beModifiers);
 
-    int32 mouseDragEventCount;
+    int32 mouse_Drag_Event_سانى;
 
 #ifdef FEAT_MBYTE_IME
-    void DrawIMString(void);
+    فراغ DrawIMString(فراغ);
 #endif
 
-    private:
-    void init(BRect);
+    خاص:
+    فراغ init(BRect);
 
     int_u	vimMouseButton;
     int_u	vimMouseModifiers;
 
 #ifdef FEAT_MBYTE_IME
-    struct {
+    بنية {
 	BMessenger* messenger;
 	BMessage* message;
 	BPoint location;
-	int row;
-	int col;
-	int count;
+	صحيح row;
+	صحيح col;
+	صحيح سانى;
     } IMData;
 #endif
 };
 
-class VimScrollBar: public BScrollBar
+صنف VimScrollBar: عام BScrollBar
 {
-    typedef BScrollBar Inherited;
-    public:
+    تعريفنوع BScrollBar Inherited;
+    عام:
     VimScrollBar(scrollbar_T *gsb, orientation posture);
     ~VimScrollBar();
 
-    virtual void ValueChanged(float newValue);
-    virtual void MouseUp(BPoint where);
-    void SetValue(float newval);
+    virtual فراغ قىممەت_Changed(عائم new_قىممەت);
+    virtual فراغ MouseUp(BPoint where);
+    فراغ Set_قىممەت(عائم newval);
     scrollbar_T *getGsb()
-    { return gsb; }
+    { أرجع gsb; }
 
-    int32	scrollEventCount;
+    int32	scroll_Event_سانى;
 
-    private:
+    خاص:
     scrollbar_T *gsb;
-    float   ignoreValue;
+    عائم   ignore_قىممەت;
 };
 
 
 #ifdef FEAT_TOOLBAR
 
-class VimToolbar : public BBox
+صنف VimToolbar : عام BBox
 {
-    static BBitmap *normalButtonsBitmap;
-    static BBitmap *grayedButtonsBitmap;
+    ساكن BBitmap *normalButtonsBitmap;
+    ساكن BBitmap *grayedButtonsBitmap;
 
-    BBitmap *LoadVimBitmap(const char* fileName);
-    bool GetPictureFromBitmap(BPicture *pictureTo, int32 index, BBitmap *bitmapFrom, bool pressed);
-    bool ModifyBitmapToGrayed(BBitmap *bitmap);
+    BBitmap *LoadVimBitmap(ثابت حرف* fileName);
+    منطقي GetPictureFromBitmap(BPicture *pictureTo, int32 index, BBitmap *bitmapFrom, منطقي pressed);
+    منطقي ModifyBitmapToGrayed(BBitmap *bitmap);
 
     BList fButtonsList;
-    void InvalidateLayout();
+    فراغ InvalidateLayout();
 
-    public:
-    VimToolbar(BRect frame, const char * name);
+    عام:
+    VimToolbar(BRect frame, ثابت حرف * name);
     ~VimToolbar();
 
-    bool PrepareButtonBitmaps();
+    منطقي PrepareButtonBitmaps();
 
-    bool AddButton(int32 index, vimmenu_T *menu);
-    bool RemoveButton(vimmenu_T *menu);
-    bool GrayButton(vimmenu_T *menu, int grey);
+    منطقي AddButton(int32 index, vimmenu_T *menu);
+    منطقي RemoveButton(vimmenu_T *menu);
+    منطقي GrayButton(vimmenu_T *menu, صحيح grey);
 
-    float ToolbarHeight() const;
-    virtual void AttachedToWindow();
+    عائم ToolbarHeight() ثابت;
+    virtual فراغ AttachedToWindow();
 };
 
-BBitmap *VimToolbar::normalButtonsBitmap  = NULL;
-BBitmap *VimToolbar::grayedButtonsBitmap  = NULL;
+BBitmap *VimToolbar::normalButtonsBitmap  = عدم;
+BBitmap *VimToolbar::grayedButtonsBitmap  = عدم;
 
-const float ToolbarMargin = 3.;
-const float ButtonMargin  = 3.;
+ثابت عائم ToolbarMargin = 3.;
+ثابت عائم ButtonMargin  = 3.;
 
 #endif //FEAT_TOOLBAR
 
 #ifdef FEAT_GUI_TABLINE
 
-class VimTabLine : public BTabView
+صنف Vim_Tab_قۇر : عام BTabView
 {
-    public:
-	class VimTab : public BTab {
-	    public:
-		VimTab() : BTab(new BView(BRect(), "-Empty-", 0, 0)) {}
+    عام:
+	صنف VimTab : عام BTab {
+	    عام:
+		VimTab() : BTab(جديد BView(BRect(), "-Empty-", 0, 0)) {}
 
-	    virtual void Select(BView* owner);
+	    virtual فراغ Select(BView* owner);
 	};
 
-	VimTabLine(BRect r) : BTabView(r, "vimTabLine", B_WIDTH_FROM_LABEL,
-	       B_FOLLOW_LEFT | B_FOLLOW_TOP | B_FOLLOW_RIGHT, B_WILL_DRAW | B_FRAME_EVENTS) {}
+	Vim_Tab_قۇر(BRect r) : BTabView(r, "vimTabLine", B_WIDTH_FROM_LABEL,
+	       B_FOLLOW_سول | B_FOLLOW_چوققا | B_FOLLOW_ئوڭ, B_WILL_DRAW | B_FRAME_EVENTS) {}
 
-    float TablineHeight() const;
-    virtual void MouseDown(BPoint point);
+    عائم TablineHeight() ثابت;
+    virtual فراغ MouseDown(BPoint point);
 };
 
 #endif //FEAT_GUI_TABLINE
@@ -366,108 +366,108 @@ class VimTabLine : public BTabView
 
 // For caching the fonts that are used;
 // Vim seems rather sloppy in this regard.
-class VimFont: public BFont
+صنف VimFont: عام BFont
 {
-    typedef BFont Inherited;
-    public:
+    تعريفنوع BFont Inherited;
+    عام:
     VimFont();
-    VimFont(const VimFont *rhs);
-    VimFont(const BFont *rhs);
-    VimFont(const VimFont &rhs);
+    VimFont(ثابت VimFont *rhs);
+    VimFont(ثابت BFont *rhs);
+    VimFont(ثابت VimFont &rhs);
     ~VimFont();
 
     VimFont *next;
-    int refcount;
+    صحيح refcount;
     char_u *name;
 
-    private:
-    void init();
+    خاص:
+    فراغ init();
 };
 
-#if defined(FEAT_GUI_DIALOG)
+#إذا defined(FEAT_GUI_DIALOG)
 
-class VimDialog : public BWindow
+صنف VimDialog : عام BWindow
 {
-    typedef BWindow Inherited;
+    تعريفنوع BWindow Inherited;
 
-    BButton* _CreateButton(int32 which, const char* label);
+    BButton* _CreateButton(int32 which, ثابت حرف* label);
 
-    public:
+    عام:
 
-    class View : public BView {
-	typedef BView Inherited;
+    صنف View : عام BView {
+	تعريفنوع BView Inherited;
 
-	public:
+	عام:
 	View(BRect frame);
 	~View();
 
-	virtual void Draw(BRect updateRect);
-	void InitIcon(int32 type);
+	virtual فراغ Draw(BRect updateRect);
+	فراغ InitIcon(int32 type);
 
-	private:
+	خاص:
 	BBitmap*    fIconBitmap;
     };
 
-    VimDialog(int type, const char *title, const char *message,
-	    const char *buttons, int dfltbutton, const char *textfield,
-	    int ex_cmd);
+    VimDialog(صحيح type, ثابت حرف *title, ثابت حرف *message,
+	    ثابت حرف *buttons, صحيح dfltbutton, ثابت حرف *textfield,
+	    صحيح ex_cmd);
     ~VimDialog();
 
-    int Go();
+    صحيح Go();
 
-    virtual void MessageReceived(BMessage *msg);
+    virtual فراغ MessageReceived(BMessage *ئۇچۇر);
 
-    private:
+    خاص:
     sem_id	    fDialogSem;
-    int		    fDialogValue;
+    صحيح		    f_Dialog_قىممەت;
     BList	    fButtonsList;
     BTextView*	    fMessageView;
-    BTextControl*   fInputControl;
-    const char*	    fInputValue;
+    BTextControl*   f_كىرگۈزۈش_Control;
+    ثابت حرف*	    f_كىرگۈزۈش_قىممەت;
 };
 
-class VimSelectFontDialog : public BWindow
+صنف VimSelectFontDialog : عام BWindow
 {
-    typedef BWindow Inherited;
+    تعريفنوع BWindow Inherited;
 
-    void _CleanList(BListView* list);
-    void _UpdateFontStyles();
-    void _UpdateSizeInputPreview();
-    void _UpdateFontPreview();
-    bool _UpdateFromListItem(BListView* list, char* text, int textSize);
-    public:
+    فراغ _CleanList(BListView* list);
+    فراغ _UpdateFontStyles();
+    فراغ Update_Size_كىرگۈزۈش_Preview();
+    فراغ _UpdateFontPreview();
+    منطقي _UpdateFromListItem(BListView* list, حرف* text, صحيح textSize);
+    عام:
 
-    VimSelectFontDialog(font_family* family, font_style* style, float* size);
+    VimSelectFontDialog(font_family* family, font_style* style, عائم* size);
     ~VimSelectFontDialog();
 
-    bool Go();
+    منطقي Go();
 
-    virtual void MessageReceived(BMessage *msg);
+    virtual فراغ MessageReceived(BMessage *ئۇچۇر);
 
-    private:
+    خاص:
     status_t	    fStatus;
     sem_id	    fDialogSem;
-    bool	    fDialogValue;
+    منطقي	    f_Dialog_قىممەت;
     font_family*    fFamily;
     font_style*	    fStyle;
-    float*	    fSize;
+    عائم*	    fSize;
     font_family	    fFontFamily;
     font_style	    fFontStyle;
-    float	    fFontSize;
+    عائم	    fFontSize;
     BStringView*    fPreview;
     BListView*	    fFamiliesList;
     BListView*	    fStylesList;
     BListView*	    fSizesList;
-    BTextControl*   fSizesInput;
+    BTextControl*   f_Sizes_كىرگۈزۈش;
 };
 
 #endif // FEAT_GUI_DIALOG
 
 // ---------------- end of GUI classes ----------------
 
-struct MainArgs {
-    int	     argc;
-    char    **argv;
+بنية MainArgs {
+    صحيح	     argc;
+    حرف    **argv;
 };
 
 // These messages are copied through the VDCMP.
@@ -475,79 +475,79 @@ struct MainArgs {
 // They must be of POD type (Plain Old Data)
 // as the C++ standard calls them.
 
-#define	KEY_MSG_BUFSIZ	7
-#if KEY_MSG_BUFSIZ < MAX_KEY_CODE_LEN
-#error Increase KEY_MSG_BUFSIZ!
+#define	ئاچقۇچ_ئۇچۇر_BUFSIZ	7
+#إذا ئاچقۇچ_ئۇچۇر_BUFSIZ < MAX_ئاچقۇچ_CODE_LEN
+#error Increase ئاچقۇچ_ئۇچۇر_BUFSIZ!
 #endif
 
-struct VimKeyMsg {
+بنية Vim_ئاچقۇچ_ئۇچۇر {
     char_u  length;
-    char_u  chars[KEY_MSG_BUFSIZ];  // contains Vim encoding
-    bool    csi_escape;
+    char_u  chars[ئاچقۇچ_ئۇچۇر_BUFSIZ];  // contains Vim encoding
+    منطقي    csi_escape;
 };
 
-struct VimResizeMsg {
-    int	    width;
-    int	    height;
+بنية Vim_Resize_ئۇچۇر {
+    صحيح	    width;
+    صحيح	    height;
 };
 
-struct VimScrollBarMsg {
+بنية Vim_Scroll_Bar_ئۇچۇر {
     VimScrollBar *sb;
-    long    value;
-    int	    stillDragging;
+    long    قىممەت;
+    صحيح	    stillDragging;
 };
 
-struct VimMenuMsg {
+بنية Vim_Menu_ئۇچۇر {
     vimmenu_T	*guiMenu;
 };
 
-struct VimMouseMsg {
-    int	    button;
-    int	    x;
-    int	    y;
-    int	    repeated_click;
+بنية Vim_Mouse_ئۇچۇر {
+    صحيح	    button;
+    صحيح	    x;
+    صحيح	    y;
+    صحيح	    repeated_click;
     int_u   modifiers;
 };
 
-struct VimMouseMovedMsg {
-    int	    x;
-    int	    y;
+بنية Vim_Mouse_Moved_ئۇچۇر {
+    صحيح	    x;
+    صحيح	    y;
 };
 
-struct VimFocusMsg {
-    bool    active;
+بنية Vim_Focus_ئۇچۇر {
+    منطقي    active;
 };
 
-struct VimRefsMsg {
+بنية Vim_Refs_ئۇچۇر {
     BMessage   *message;
-    bool    changedir;
+    منطقي    changedir;
 };
 
-struct VimTablineMsg {
-    int	    index;
+بنية Vim_Tabline_ئۇچۇر {
+    صحيح	    index;
 };
 
-struct VimTablineMenuMsg {
-    int	    index;
-    int	    event;
+بنية Vim_Tabline_Menu_ئۇچۇر {
+    صحيح	    index;
+    صحيح	    event;
 };
 
-struct VimMsg {
-    enum VimMsgType {
-	Key, Resize, ScrollBar, Menu, Mouse, MouseMoved, Focus, Refs, Tabline, TablineMenu
+بنية Vim_ئۇچۇر {
+    تعداد Vim_ئۇچۇر_Type {
+	ئاچقۇچ_2, Resize, ScrollBar, Menu, Mouse, MouseMoved, Focus, Refs, Tabline, TablineMenu
     };
 
-    union {
-	struct VimKeyMsg    Key;
-	struct VimResizeMsg NewSize;
-	struct VimScrollBarMsg	Scroll;
-	struct VimMenuMsg   Menu;
-	struct VimMouseMsg  Mouse;
-	struct VimMouseMovedMsg	MouseMoved;
-	struct VimFocusMsg  Focus;
-	struct VimRefsMsg   Refs;
-	struct VimTablineMsg	Tabline;
-	struct VimTablineMenuMsg    TablineMenu;
+    اتحاد {
+	بنية Vim_ئاچقۇچ_ئۇچۇر    ئاچقۇچ_2;
+	بنية Vim_Resize_ئۇچۇر NewSize;
+	بنية Vim_Scroll_Bar_ئۇچۇر	Scroll;
+	بنية Vim_Menu_ئۇچۇر   Menu;
+	بنية Vim_Mouse_ئۇچۇر  Mouse;
+	بنية Vim_Mouse_Moved_ئۇچۇر	MouseMoved;
+	بنية Vim_Focus_ئۇچۇر  Focus;
+	بنية Vim_Refs_ئۇچۇر   Refs;
+	بنية Vim_Tabline_ئۇچۇر	Tabline;
+	بنية Vim_Tabline_Menu_ئۇچۇر    TablineMenu;
     } u;
 };
 
@@ -556,42 +556,42 @@ struct VimMsg {
 
 // ---------------- end of header part ----------------
 
-static struct specialkey
+ساكن بنية specialkey
 {
-    uint16  BeKeys;
-#define KEY(a,b)    ((a)<<8|(b))
-#define K(a)	    KEY(0,a)		// for ASCII codes
-#define F(b)	    KEY(1,b)		// for scancodes
+    uint16  Be_ئاچقۇچلار;
+#define ئاچقۇچ_3(a,b)    ((a)<<8|(b))
+#define K(a)	    ئاچقۇچ_3(0,a)		// for ASCII codes
+#define F(b)	    ئاچقۇچ_3(1,b)		// for scancodes
     char_u  vim_code0;
     char_u  vim_code1;
-} special_keys[] =
+} special_ئاچقۇچلار[] =
 {
     {K(B_UP_ARROW),	'k', 'u'},
     {K(B_DOWN_ARROW),	    'k', 'd'},
-    {K(B_LEFT_ARROW),	    'k', 'l'},
-    {K(B_RIGHT_ARROW),	    'k', 'r'},
+    {K(B_سول_ARROW),	    'k', 'l'},
+    {K(B_ئوڭ_ARROW),	    'k', 'r'},
     {K(B_BACKSPACE),	    'k', 'b'},
-    {K(B_INSERT),	'k', 'I'},
+    {K(B_قىستۇرۇش),	'k', 'I'},
     {K(B_DELETE),	'k', 'D'},
     {K(B_HOME),		'k', 'h'},
     {K(B_END),		'@', '7'},
     {K(B_PAGE_UP),	'k', 'P'},	// XK_Prior
     {K(B_PAGE_DOWN),	    'k', 'N'},	    // XK_Next,
 
-#define FIRST_FUNCTION_KEY  11
-    {F(B_F1_KEY),	'k', '1'},
-    {F(B_F2_KEY),	'k', '2'},
-    {F(B_F3_KEY),	'k', '3'},
-    {F(B_F4_KEY),	'k', '4'},
-    {F(B_F5_KEY),	'k', '5'},
-    {F(B_F6_KEY),	'k', '6'},
-    {F(B_F7_KEY),	'k', '7'},
-    {F(B_F8_KEY),	'k', '8'},
-    {F(B_F9_KEY),	'k', '9'},
-    {F(B_F10_KEY),	'k', ';'},
+#define FIRST_FUNCTION_ئاچقۇچ  11
+    {F(B_F1_ئاچقۇچ),	'k', '1'},
+    {F(B_F2_ئاچقۇچ),	'k', '2'},
+    {F(B_F3_ئاچقۇچ),	'k', '3'},
+    {F(B_F4_ئاچقۇچ),	'k', '4'},
+    {F(B_F5_ئاچقۇچ),	'k', '5'},
+    {F(B_F6_ئاچقۇچ),	'k', '6'},
+    {F(B_F7_ئاچقۇچ),	'k', '7'},
+    {F(B_F8_ئاچقۇچ),	'k', '8'},
+    {F(B_F9_ئاچقۇچ),	'k', '9'},
+    {F(B_F10_ئاچقۇچ),	'k', ';'},
 
-    {F(B_F11_KEY),	'F', '1'},
-    {F(B_F12_KEY),	'F', '2'},
+    {F(B_F11_ئاچقۇچ),	'F', '1'},
+    {F(B_F12_ئاچقۇچ),	'F', '2'},
     //	{XK_F13,	    'F', '3'},	// would be print screen
     // sysreq
     {F(0x0F),		'F', '4'},	// scroll lock
@@ -618,9 +618,9 @@ static struct specialkey
     //	{XK_F35,	'F', 'P'},	// keysymdef.h defines up to F35
 
     //	{XK_Help,	'%', '1'},	// XK_Help
-    {F(B_PRINT_KEY),	    '%', '9'},
+    {F(B_PRINT_ئاچقۇچ),	    '%', '9'},
 
-#if 0
+#إذا 0
     // Keypad keys:
     {F(0x48),	    'k', 'l'},	    // XK_KP_Left
     {F(0x4A),	    'k', 'r'},	    // XK_KP_Right
@@ -639,20 +639,20 @@ static struct specialkey
     {0,		    0, 0}
 };
 
-#define NUM_SPECIAL_KEYS    ARRAY_LENGTH(special_keys)
+#define رەقەم_SPECIAL_ئاچقۇچلار    ARRAY_LENGTH(special_ئاچقۇچلار)
 
 // ---------------- VimApp ----------------
 
-    static void
+    ساكن فراغ
 docd(BPath &path)
 {
-    mch_chdir((char *)path.Path());
+    mch_chdir((حرف *)path.Path());
     // Do this to get the side effects of a :cd command
     do_cmdline_cmd((char_u *)"cd .");
 }
 
-	static void
-drop_callback(void *cookie)
+	ساكن فراغ
+drop_callback(فراغ *cookie)
 {
     // TODO here we could handle going to a specific position in the dropped
     // file (see src/gui_mac.c, deleted in 8.2.1422)
@@ -661,37 +661,37 @@ drop_callback(void *cookie)
 }
 
     // Really handle dropped files and folders.
-	static void
-RefsReceived(BMessage *m, bool changedir)
+	ساكن فراغ
+RefsReceived(BMessage *m, منطقي changedir)
 {
     uint32 type;
-    int32 count;
+    int32 سانى;
 
     m->PrintToStream();
-    switch (m->what) {
-	case B_REFS_RECEIVED:
-	case B_SIMPLE_DATA:
-	    m->GetInfo("refs", &type, &count);
-	    if (type != B_REF_TYPE)
-		goto bad;
-	    break;
-	case B_ARGV_RECEIVED:
-	    m->GetInfo("argv", &type, &count);
-	    if (type != B_STRING_TYPE)
-		goto bad;
-	    if (changedir) {
-		char *dirname;
-		if (m->FindString("cwd", (const char **) &dirname) == B_OK) {
+    بدل (m->what) {
+	حالة B_REFS_RECEIVED:
+	حالة B_SIMPLE_DATA:
+	    m->GetInfo("refs", &type, &سانى);
+	    إذا (type != B_REF_TYPE)
+		اذهب bad;
+	    اكسر;
+	حالة B_ARGV_RECEIVED:
+	    m->GetInfo("argv", &type, &سانى);
+	    إذا (type != B_STRING_TYPE)
+		اذهب bad;
+	    إذا (changedir) {
+		حرف *dirname;
+		إذا (m->FindString("cwd", (ثابت حرف **) &dirname) == B_OK) {
 		    chdir(dirname);
 		    do_cmdline_cmd((char_u *)"cd .");
 		}
 	    }
-	    break;
-	default:
+	    اكسر;
+	افتراضي:
 bad:
 	    /*fprintf(stderr, "bad!\n"); */
 	    delete m;
-	    return;
+	    أرجع;
     }
 
 #ifdef FEAT_VISUAL
@@ -699,23 +699,23 @@ bad:
 #endif
 
     char_u  **fnames;
-    fnames = (char_u **) alloc(count * sizeof(char_u *));
-    int fname_index = 0;
+    fnames = (char_u **) alloc(سانى * حجم(char_u *));
+    صحيح fname_index = 0;
 
-    switch (m->what) {
-	case B_REFS_RECEIVED:
-	case B_SIMPLE_DATA:
+    بدل (m->what) {
+	حالة B_REFS_RECEIVED:
+	حالة B_SIMPLE_DATA:
 	    // fprintf(stderr, "case B_REFS_RECEIVED\n");
-	    for (int i = 0; i < count; ++i)
+	    لكل (صحيح i = 0; i < سانى; ++i)
 	    {
 		entry_ref ref;
-		if (m->FindRef("refs", i, &ref) == B_OK) {
-		    BEntry entry(&ref, false);
+		إذا (m->FindRef("refs", i, &ref) == B_OK) {
+		    BEntry entry(&ref, خطأ);
 		    BPath path;
 		    entry.GetPath(&path);
 
 		    // Change to parent directory?
-		    if (changedir) {
+		    إذا (changedir) {
 			BPath parentpath;
 			path.GetParent(&parentpath);
 			docd(parentpath);
@@ -723,57 +723,57 @@ bad:
 
 		    // Is it a directory? If so, cd into it.
 		    BDirectory bdir(&ref);
-		    if (bdir.InitCheck() == B_OK) {
+		    إذا (bdir.InitCheck() == B_OK) {
 			// don't cd if we already did it
-			if (!changedir)
+			إذا (!changedir)
 			    docd(path);
-		    } else {
+		    } وإلا {
 			mch_dirname(IObuff, IOSIZE);
 			char_u *fname = shorten_fname((char_u *)path.Path(), IObuff);
-			if (fname == NULL)
+			إذا (fname == عدم)
 			    fname = (char_u *)path.Path();
 			fnames[fname_index++] = vim_strsave(fname);
 			// fprintf(stderr, "%s\n", fname);
 		    }
 
 		    // Only do it for the first file/dir
-		    changedir = false;
+		    changedir = خطأ;
 		}
 	    }
-	    break;
-	case B_ARGV_RECEIVED:
+	    اكسر;
+	حالة B_ARGV_RECEIVED:
 	    // fprintf(stderr, "case B_ARGV_RECEIVED\n");
-	    for (int i = 1; i < count; ++i)
+	    لكل (صحيح i = 1; i < سانى; ++i)
 	    {
-		char *fname;
+		حرف *fname;
 
-		if (m->FindString("argv", i, (const char **) &fname) == B_OK) {
+		إذا (m->FindString("argv", i, (ثابت حرف **) &fname) == B_OK) {
 		    fnames[fname_index++] = vim_strsave((char_u *)fname);
 		}
 	    }
-	    break;
-	default:
+	    اكسر;
+	افتراضي:
 	    // fprintf(stderr, "case default\n");
-	    break;
+	    اكسر;
     }
 
     delete m;
 
     // Handle the drop, :edit to get to the file
-    if (fname_index > 0) {
-	handle_drop(fname_index, fnames, FALSE, drop_callback, NULL);
+    إذا (fname_index > 0) {
+	handle_drop(fname_index, fnames, FALSE, drop_callback, عدم);
 
 	setcursor();
 	out_flush();
-    } else {
+    } وإلا {
 	vim_free(fnames);
     }
 }
 
-VimApp::VimApp(const char *appsig):
+VimApp::VimApp(ثابت حرف *appsig):
     BApplication(appsig),
     fFilePanelSem(-1),
-    fFilePanel(NULL)
+    fFilePanel(عدم)
 {
 }
 
@@ -781,7 +781,7 @@ VimApp::~VimApp()
 {
 }
 
-    void
+    فراغ
 VimApp::ReadyToRun()
 {
     /*
@@ -792,34 +792,34 @@ VimApp::ReadyToRun()
     mch_signal(SIGQUIT, SIG_IGN);
 }
 
-    void
-VimApp::ArgvReceived(int32 arg_argc, char **arg_argv)
+    فراغ
+VimApp::ArgvReceived(int32 arg_argc, حرف **arg_argv)
 {
-    if (!IsLaunching()) {
+    إذا (!IsLaunching()) {
 	/*
 	 * This can happen if we are set to Single or Exclusive
 	 * Launch. Be nice and open the file(s).
 	 */
-	if (gui.vimWindow)
-	    gui.vimWindow->Minimize(false);
+	إذا (gui.vimWindow)
+	    gui.vimWindow->Minimize(خطأ);
 	BMessage *m = CurrentMessage();
 	DetachCurrentMessage();
 	SendRefs(m, true);
     }
 }
 
-    void
+    فراغ
 VimApp::RefsReceived(BMessage *m)
 {
     // Horrible hack!!! XXX XXX XXX
     // The real problem is that b_start_ffc is set too late for
     // the initial empty buffer. As a result the window will be
     // split instead of abandoned.
-    int limit = 15;
-    while (--limit >= 0 && (curbuf == NULL || curbuf->b_start_ffc == 0))
+    صحيح limit = 15;
+    طالما (--limit >= 0 && (curbuf == عدم || curbuf->b_start_ffc == 0))
 	snooze(100000);    //  0.1 s
-    if (gui.vimWindow)
-	gui.vimWindow->Minimize(false);
+    إذا (gui.vimWindow)
+	gui.vimWindow->Minimize(خطأ);
     DetachCurrentMessage();
     SendRefs(m, true);
 }
@@ -828,22 +828,22 @@ VimApp::RefsReceived(BMessage *m)
  * Pass a BMessage on to the main() thread.
  * Caller must have detached the message.
  */
-    void
-VimApp::SendRefs(BMessage *m, bool changedir)
+    فراغ
+VimApp::SendRefs(BMessage *m, منطقي changedir)
 {
-    VimRefsMsg rm;
+    Vim_Refs_ئۇچۇر rm;
     rm.message = m;
     rm.changedir = changedir;
 
-    write_port(gui.vdcmp, VimMsg::Refs, &rm, sizeof(rm));
+    write_port(gui.vdcmp, Vim_ئۇچۇر::Refs, &rm, حجم(rm));
     //	calls ::RefsReceived
 }
 
-    void
+    فراغ
 VimApp::MessageReceived(BMessage *m)
 {
-    switch (m->what) {
-	case 'save':
+    بدل (m->what) {
+	حالة 'save':
 	    {
 		entry_ref refDirectory;
 		m->FindRef("directory", &refDirectory);
@@ -852,37 +852,37 @@ VimApp::MessageReceived(BMessage *m)
 		m->FindString("name", &strName);
 		fBrowsedPath.Append(strName.String());
 	    }
-	    break;
-	case 'open':
+	    اكسر;
+	حالة 'open':
 	    {
 		entry_ref ref;
 		m->FindRef("refs", &ref);
 		fBrowsedPath.SetTo(&ref);
 	    }
-	    break;
-	case B_CANCEL:
+	    اكسر;
+	حالة B_CANCEL:
 	    {
 		BFilePanel *panel;
-		m->FindPointer("source", (void**)&panel);
-		if (fFilePanelSem != -1 && panel == fFilePanel)
+		m->FindPointer("source", (فراغ**)&panel);
+		إذا (fFilePanelSem != -1 && panel == fFilePanel)
 		{
 		    delete_sem(fFilePanelSem);
 		    fFilePanelSem = -1;
 		}
 
 	    }
-	    break;
-	default:
+	    اكسر;
+	افتراضي:
 	    Inherited::MessageReceived(m);
-	    break;
+	    اكسر;
     }
 }
 
-    bool
+    منطقي
 VimApp::QuitRequested()
 {
-    (void)Inherited::QuitRequested();
-    return false;
+    (فراغ)Inherited::QuitRequested();
+    أرجع خطأ;
 }
 
 // ---------------- VimWindow ----------------
@@ -900,25 +900,25 @@ VimWindow::VimWindow():
 
 VimWindow::~VimWindow()
 {
-    if (formView) {
+    إذا (formView) {
 	RemoveChild(formView);
 	delete formView;
     }
-    gui.vimWindow = NULL;
+    gui.vimWindow = عدم;
 }
 
-    void
+    فراغ
 VimWindow::init()
 {
     // Attach the VimFormView
-    formView = new VimFormView(Bounds());
-    if (formView != NULL) {
+    formView = جديد VimFormView(Bounds());
+    إذا (formView != عدم) {
 	AddChild(formView);
     }
 }
 
-#if 0  //  disabled in zeta patch
-    void
+#إذا 0  //  disabled in zeta patch
+    فراغ
 VimWindow::DispatchMessage(BMessage *m, BHandler *h)
 {
     /*
@@ -926,93 +926,93 @@ VimWindow::DispatchMessage(BMessage *m, BHandler *h)
      * a manner that should be compatible with the
      * intended future system behaviour.
      */
-    switch (m->what) {
-	case B_MOUSE_UP:
+    بدل (m->what) {
+	حالة B_MOUSE_UP:
 	    //	if (!h) h = PreferredHandler();
 	    //	gcc isn't happy without this extra set of braces, complains about
 	    //	jump to case label crosses init of 'class BView * v'
 	    //	richard@whitequeen.com jul 99
 	    {
 		BView *v = dynamic_cast<BView *>(h);
-		if (v) {
+		إذا (v) {
 		    // m->PrintToStream();
 		    BPoint where;
 		    m->FindPoint("where", &where);
 		    v->MouseUp(where);
-		} else {
+		} وإلا {
 		    Inherited::DispatchMessage(m, h);
 		}
 	    }
-	    break;
-	default:
+	    اكسر;
+	افتراضي:
 	    Inherited::DispatchMessage(m, h);
     }
 }
 #endif
 
-    void
-VimWindow::WindowActivated(bool active)
+    فراغ
+VimWindow::WindowActivated(منطقي active)
 {
     Inherited::WindowActivated(active);
     // the textArea gets the keyboard action
-    if (active && gui.vimTextArea)
+    إذا (active && gui.vimTextArea)
 	gui.vimTextArea->MakeFocus(true);
 
-    struct VimFocusMsg fm;
+    بنية Vim_Focus_ئۇچۇر fm;
     fm.active = active;
 
-    write_port(gui.vdcmp, VimMsg::Focus, &fm, sizeof(fm));
+    write_port(gui.vdcmp, Vim_ئۇچۇر::Focus, &fm, حجم(fm));
 }
 
-    bool
+    منطقي
 VimWindow::QuitRequested()
 {
-    struct VimKeyMsg km;
+    بنية Vim_ئاچقۇچ_ئۇچۇر km;
     km.length = 5;
-    memcpy((char *)km.chars, "\033:qa\r", km.length);
-    km.csi_escape = false;
-    write_port(gui.vdcmp, VimMsg::Key, &km, sizeof(km));
-    return false;
+    memcpy((حرف *)km.chars, "\033:qa\r", km.length);
+    km.csi_escape = خطأ;
+    write_port(gui.vdcmp, Vim_ئۇچۇر::ئاچقۇچ_2, &km, حجم(km));
+    أرجع خطأ;
 }
-    void
+    فراغ
 VimWindow::DispatchMessage(BMessage *m, BHandler *h)
 {
-    bool should_propagate = true;
+    منطقي should_propagate = true;
 
-    switch (m->what)
+    بدل (m->what)
     {
-	case B_KEY_DOWN:
+	حالة B_ئاچقۇچ_DOWN:
 	    {
 		int32 scancode = 0;
 		int32 beModifiers = 0;
 		m->FindInt32("raw_char", &scancode);
 		m->FindInt32("modifiers", &beModifiers);
 
-		if (scancode == B_ENTER && (beModifiers & B_LEFT_COMMAND_KEY))
+		إذا (scancode == B_ENTER && (beModifiers & B_سول_COMMAND_ئاچقۇچ))
 		    {
-			should_propagate = false;
-			if (this->is_fullscreen)
+			should_propagate = خطأ;
+			إذا (هذا->is_fullscreen)
 			    {
-				this->is_fullscreen = false;
-				ResizeTo(this->saved_frame.Width(), this->saved_frame.Height());
-				MoveTo(this->saved_frame.left, this->saved_frame.top);
-				SetLook(this->saved_look);
+				هذا->is_fullscreen = خطأ;
+				ResizeTo(هذا->saved_frame.Width(), هذا->saved_frame.Height());
+				MoveTo(هذا->saved_frame.سول, هذا->saved_frame.چوققا);
+				SetLook(هذا->saved_look);
 				SetFlags(Flags() & ~(B_NOT_RESIZABLE | B_NOT_MOVABLE));
-			    } else {
-				this->saved_frame = Frame();
-				this->saved_look = Look();
-				this->is_fullscreen = true;
-				BScreen s(this);
+			    } وإلا {
+				هذا->saved_frame = Frame();
+				هذا->saved_look = Look();
+				هذا->is_fullscreen = true;
+				BScreen s(هذا);
 				SetLook(B_NO_BORDER_WINDOW_LOOK);
 				ResizeTo(s.Frame().Width() + 1, s.Frame().Height() + 1);
-				MoveTo(s.Frame().left, s.Frame().top);
+				MoveTo(s.Frame().سول, s.Frame().چوققا);
 				SetFlags(Flags() | (B_NOT_RESIZABLE | B_NOT_MOVABLE));
 			    }
 		    }
 	    }
     }
 
-    if (should_propagate)
+    إذا (should_propagate)
 	Inherited::DispatchMessage(m, h);
 }
 
@@ -1022,22 +1022,22 @@ VimWindow::DispatchMessage(BMessage *m, BHandler *h)
 VimFormView::VimFormView(BRect frame):
     BView(frame, "VimFormView", B_FOLLOW_ALL_SIDES,
 	    B_WILL_DRAW | B_FRAME_EVENTS),
-    menuBar(NULL),
+    menuBar(عدم),
 #ifdef FEAT_TOOLBAR
-    toolBar(NULL),
+    toolBar(عدم),
 #endif
 #ifdef FEAT_GUI_TABLINE
 //  showingTabLine(false),
-    tabLine(NULL),
+    tab_قۇر(عدم),
 #endif
-    textArea(NULL)
+    textArea(عدم)
 {
     init(frame);
 }
 
 VimFormView::~VimFormView()
 {
-    if (menuBar) {
+    إذا (menuBar) {
 	RemoveChild(menuBar);
 #ifdef never
 	//  deleting the menuBar leads to SEGV on exit
@@ -1051,61 +1051,61 @@ VimFormView::~VimFormView()
 #endif
 
 #ifdef FEAT_GUI_TABLINE
-    delete tabLine;
+    delete tab_قۇر;
 #endif
 
-    if (textArea) {
+    إذا (textArea) {
 	RemoveChild(textArea);
 	delete textArea;
     }
-    gui.vimForm = NULL;
+    gui.vimForm = عدم;
 }
 
-    void
+    فراغ
 VimFormView::init(BRect frame)
 {
-    menuBar = new BMenuBar(BRect(0,0,-MENUBAR_MARGIN,-MENUBAR_MARGIN),
+    menuBar = جديد BMenuBar(BRect(0,0,-MENUBAR_MARGIN,-MENUBAR_MARGIN),
 	    "VimMenuBar");
 
     AddChild(menuBar);
 
 #ifdef FEAT_TOOLBAR
-    toolBar = new VimToolbar(BRect(0,0,0,0), "VimToolBar");
+    toolBar = جديد VimToolbar(BRect(0,0,0,0), "VimToolBar");
     toolBar->PrepareButtonBitmaps();
     AddChild(toolBar);
 #endif
 
 #ifdef FEAT_GUI_TABLINE
-    tabLine = new VimTabLine(BRect(0,0,0,0));
+    tab_قۇر = جديد Vim_Tab_قۇر(BRect(0,0,0,0));
 //  tabLine->PrepareButtonBitmaps();
-    AddChild(tabLine);
+    AddChild(tab_قۇر);
 #endif
 
     BRect remaining = frame;
-    textArea = new VimTextAreaView(remaining);
+    textArea = جديد VimTextAreaView(remaining);
     AddChild(textArea);
     // The textArea will be resized later when menus are added
 
-    gui.vimForm = this;
+    gui.vimForm = هذا;
 }
 
 #ifdef FEAT_TOOLBAR
-    float
-VimFormView::ToolbarHeight() const
+    عائم
+VimFormView::ToolbarHeight() ثابت
 {
-    return toolBar ? toolBar->ToolbarHeight() : 0.;
+    أرجع toolBar ? toolBar->ToolbarHeight() : 0.;
 }
 #endif
 
 #ifdef FEAT_GUI_TABLINE
-    float
-VimFormView::TablineHeight() const
+    عائم
+VimFormView::TablineHeight() ثابت
 {
-    return (tabLine && IsShowingTabLine()) ? tabLine->TablineHeight() : 0.;
+    أرجع (tab_قۇر && Is_Showing_Tab_قۇر()) ? tab_قۇر->TablineHeight() : 0.;
 }
 #endif
 
-    void
+    فراغ
 VimFormView::AllAttached()
 {
     /*
@@ -1115,7 +1115,7 @@ VimFormView::AllAttached()
     mch_signal(SIGINT, SIG_IGN);
     mch_signal(SIGQUIT, SIG_IGN);
 
-    if (menuBar && textArea) {
+    إذا (menuBar && textArea) {
 	/*
 	 * Resize the textArea to fill the space left over by the menu.
 	 * This is somewhat futile since it will be done again once
@@ -1124,56 +1124,56 @@ VimFormView::AllAttached()
 	BRect remaining = Bounds();
 
 #ifdef FEAT_MENU
-	remaining.top += MenuHeight();
-	menuBar->ResizeTo(remaining.right, remaining.top);
-	gui.menu_height = (int) MenuHeight();
+	remaining.چوققا += MenuHeight();
+	menuBar->ResizeTo(remaining.ئوڭ, remaining.چوققا);
+	gui.menu_height = (صحيح) MenuHeight();
 #endif
 
 #ifdef FEAT_TOOLBAR
-	toolBar->MoveTo(remaining.left, remaining.top);
-	toolBar->ResizeTo(remaining.right, ToolbarHeight());
-	remaining.top += ToolbarHeight();
+	toolBar->MoveTo(remaining.سول, remaining.چوققا);
+	toolBar->ResizeTo(remaining.ئوڭ, ToolbarHeight());
+	remaining.چوققا += ToolbarHeight();
 	gui.toolbar_height = ToolbarHeight();
 #endif
 
 #ifdef FEAT_GUI_TABLINE
-	tabLine->MoveTo(remaining.left, remaining.top);
-	tabLine->ResizeTo(remaining.right + 1, TablineHeight());
-	remaining.top += TablineHeight();
+	tab_قۇر->MoveTo(remaining.سول, remaining.چوققا);
+	tab_قۇر->ResizeTo(remaining.ئوڭ + 1, TablineHeight());
+	remaining.چوققا += TablineHeight();
 	gui.tabline_height = TablineHeight();
 #endif
 
 	textArea->ResizeTo(remaining.Width(), remaining.Height());
-	textArea->MoveTo(remaining.left, remaining.top);
+	textArea->MoveTo(remaining.سول, remaining.چوققا);
     }
 
 
     Inherited::AllAttached();
 }
 
-    void
-VimFormView::FrameResized(float new_width, float new_height)
+    فراغ
+VimFormView::FrameResized(عائم new_width, عائم new_height)
 {
-    struct VimResizeMsg sm;
-    int adjust_h, adjust_w;
+    بنية Vim_Resize_ئۇچۇر sm;
+    صحيح adjust_h, adjust_w;
 
     new_width += 1;	//  adjust from width to number of pixels occupied
     new_height += 1;
 
-    sm.width = (int) new_width;
-    sm.height = (int) new_height;
-    adjust_w = ((int)new_width - gui_get_base_width()) % gui.char_width;
-    adjust_h = ((int)new_height - gui_get_base_height()) % gui.char_height;
+    sm.width = (صحيح) new_width;
+    sm.height = (صحيح) new_height;
+    adjust_w = ((صحيح)new_width - gui_get_base_width()) % gui.char_width;
+    adjust_h = ((صحيح)new_height - gui_get_base_height()) % gui.char_height;
 
-    if (adjust_w > 0 || adjust_h > 0) {
+    إذا (adjust_w > 0 || adjust_h > 0) {
 	sm.width  -= adjust_w;
 	sm.height -= adjust_h;
     }
 
-    write_port(gui.vdcmp, VimMsg::Resize, &sm, sizeof(sm));
+    write_port(gui.vdcmp, Vim_ئۇچۇر::Resize, &sm, حجم(sm));
     //	calls gui_resize_shell(new_width, new_height);
 
-    return;
+    أرجع;
 
     /*
      * The area below the vertical scrollbar is erased to the colour
@@ -1188,30 +1188,30 @@ VimFormView::FrameResized(float new_width, float new_height)
 VimTextAreaView::VimTextAreaView(BRect frame):
     BView(frame, "VimTextAreaView", B_FOLLOW_ALL_SIDES,
 #ifdef FEAT_MBYTE_IME
-	B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_INPUT_METHOD_AWARE
-#else
+	B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_كىرگۈزۈش_METHOD_AWARE
+#وإلا
 	B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE
 #endif
 	),
-    mouseDragEventCount(0)
+    mouse_Drag_Event_سانى(0)
 {
 #ifdef FEAT_MBYTE_IME
-    IMData.messenger = NULL;
-    IMData.message = NULL;
+    IMData.messenger = عدم;
+    IMData.message = عدم;
 #endif
     init(frame);
 }
 
 VimTextAreaView::~VimTextAreaView()
 {
-    gui.vimTextArea = NULL;
+    gui.vimTextArea = عدم;
 }
 
-    void
+    فراغ
 VimTextAreaView::init(BRect frame)
 {
     // set up global var for fast access
-    gui.vimTextArea = this;
+    gui.vimTextArea = هذا;
 
     /*
      * Tell the app server not to erase the view: we will
@@ -1224,7 +1224,7 @@ VimTextAreaView::init(BRect frame)
 #define W_WIDTH(curwin)   0
 }
 
-    void
+    فراغ
 VimTextAreaView::Draw(BRect updateRect)
 {
     /*
@@ -1239,42 +1239,42 @@ VimTextAreaView::Draw(BRect updateRect)
      *	However, it would not hurt.
      */
     rgb_color rgb = GUI_TO_RGB(gui.back_pixel);
-    SetLowColor(rgb);
-    FillRect(updateRect, B_SOLID_LOW);
-    gui_redraw((int) updateRect.left, (int) updateRect.top,
-	    (int) (updateRect.Width() + PEN_WIDTH), (int) (updateRect.Height() + PEN_WIDTH));
+    Set_تۆۋەن_Color(rgb);
+    FillRect(updateRect, B_SOLID_تۆۋەن);
+    gui_redraw((صحيح) updateRect.سول, (صحيح) updateRect.چوققا,
+	    (صحيح) (updateRect.Width() + PEN_WIDTH), (صحيح) (updateRect.Height() + PEN_WIDTH));
 
     // Clear the border areas if needed
-    SetLowColor(rgb);
+    Set_تۆۋەن_Color(rgb);
 
-    if (updateRect.left < FILL_X(0))	//  left border
-	FillRect(BRect(updateRect.left, updateRect.top,
-		    FILL_X(0)-PEN_WIDTH, updateRect.bottom), B_SOLID_LOW);
-    if (updateRect.top < FILL_Y(0)) //	top border
-	FillRect(BRect(updateRect.left, updateRect.top,
-		    updateRect.right, FILL_Y(0)-PEN_WIDTH), B_SOLID_LOW);
-    if (updateRect.right >= FILL_X(Columns)) //  right border
-	FillRect(BRect(FILL_X((int)Columns), updateRect.top,
-		    updateRect.right, updateRect.bottom), B_SOLID_LOW);
-    if (updateRect.bottom >= FILL_Y(Rows))   //  bottom border
-	FillRect(BRect(updateRect.left, FILL_Y((int)Rows),
-		    updateRect.right, updateRect.bottom), B_SOLID_LOW);
+    إذا (updateRect.سول < FILL_X(0))	//  left border
+	FillRect(BRect(updateRect.سول, updateRect.چوققا,
+		    FILL_X(0)-PEN_WIDTH, updateRect.bottom), B_SOLID_تۆۋەن);
+    إذا (updateRect.چوققا < FILL_Y(0)) //	top border
+	FillRect(BRect(updateRect.سول, updateRect.چوققا,
+		    updateRect.ئوڭ, FILL_Y(0)-PEN_WIDTH), B_SOLID_تۆۋەن);
+    إذا (updateRect.ئوڭ >= FILL_X(Columns)) //  right border
+	FillRect(BRect(FILL_X((صحيح)Columns), updateRect.چوققا,
+		    updateRect.ئوڭ, updateRect.bottom), B_SOLID_تۆۋەن);
+    إذا (updateRect.bottom >= FILL_Y(Rows))   //  bottom border
+	FillRect(BRect(updateRect.سول, FILL_Y((صحيح)Rows),
+		    updateRect.ئوڭ, updateRect.bottom), B_SOLID_تۆۋەن);
 
 #ifdef FEAT_MBYTE_IME
     DrawIMString();
 #endif
 }
 
-    void
-VimTextAreaView::KeyDown(const char *bytes, int32 numBytes)
+    فراغ
+VimTextAreaView::ئاچقۇچ_Down(ثابت حرف *bytes, int32 رەقەم_Bytes)
 {
-    struct VimKeyMsg km;
+    بنية Vim_ئاچقۇچ_ئۇچۇر km;
     char_u *dest = km.chars;
 
-    bool canHaveVimModifiers = false;
+    منطقي canHaveVimModifiers = خطأ;
 
-    BMessage *msg = Window()->CurrentMessage();
-    assert(msg);
+    BMessage *ئۇچۇر = Window()->CurrentMessage();
+    أكد(ئۇچۇر);
     // msg->PrintToStream();
 
     /*
@@ -1287,32 +1287,32 @@ VimTextAreaView::KeyDown(const char *bytes, int32 numBytes)
      * TODO: I'm not quite happy with detection of special
      * keys. Perhaps I should use scan codes after all...
      */
-    if (numBytes > 1) {
+    إذا (رەقەم_Bytes > 1) {
 	// This cannot be a special key
-	if (numBytes > KEY_MSG_BUFSIZ)
-	    numBytes = KEY_MSG_BUFSIZ;	    //	should never happen... ???
-	km.length = numBytes;
-	memcpy((char *)dest, bytes, numBytes);
+	إذا (رەقەم_Bytes > ئاچقۇچ_ئۇچۇر_BUFSIZ)
+	    رەقەم_Bytes = ئاچقۇچ_ئۇچۇر_BUFSIZ;	    //	should never happen... ???
+	km.length = رەقەم_Bytes;
+	memcpy((حرف *)dest, bytes, رەقەم_Bytes);
 	km.csi_escape = true;
-    } else {
+    } وإلا {
 	int32 scancode = 0;
-	msg->FindInt32("key", &scancode);
+	ئۇچۇر->FindInt32("key", &scancode);
 
 	int32 beModifiers = 0;
-	msg->FindInt32("modifiers", &beModifiers);
+	ئۇچۇر->FindInt32("modifiers", &beModifiers);
 
 	char_u string[3];
-	int len = 0;
+	صحيح len = 0;
 	km.length = 0;
 
 	/*
 	 * For normal, printable ASCII characters, don't look them up
 	 * to check if they might be a special key. They aren't.
 	 */
-	assert(B_BACKSPACE <= 0x20);
-	assert(B_DELETE == 0x7F);
-	if (((char_u)bytes[0] <= 0x20 || (char_u)bytes[0] == 0x7F) &&
-		numBytes == 1) {
+	أكد(B_BACKSPACE <= 0x20);
+	أكد(B_DELETE == 0x7F);
+	إذا (((char_u)bytes[0] <= 0x20 || (char_u)bytes[0] == 0x7F) &&
+		رەقەم_Bytes == 1) {
 	    /*
 	     * Due to the great nature of Be's mapping of special keys,
 	     * viz. into the range of the control characters,
@@ -1320,10 +1320,10 @@ VimTextAreaView::KeyDown(const char *bytes, int32 numBytes)
 	     * if it is special without using ctrl. So, only if ctrl is
 	     * used, we need to check it unmodified.
 	     */
-	    if (beModifiers & B_CONTROL_KEY) {
-		int index = keyMap->normal_map[scancode];
-		int newNumBytes = keyMapChars[index];
-		char_u *newBytes = (char_u *)&keyMapChars[index + 1];
+	    إذا (beModifiers & B_CONTROL_ئاچقۇچ) {
+		صحيح index = ئاچقۇچ_Map->normal_map[scancode];
+		صحيح new_رەقەم_Bytes = ئاچقۇچ_Map_Chars[index];
+		char_u *newBytes = (char_u *)&ئاچقۇچ_Map_Chars[index + 1];
 
 		/*
 		 * Check if still special without the control key.
@@ -1331,68 +1331,68 @@ VimTextAreaView::KeyDown(const char *bytes, int32 numBytes)
 		 * different values with modifiers (DEL).
 		 * Otherwise we could simply have checked for equality.
 		 */
-		if (newNumBytes != 1 || (*newBytes > 0x20 &&
+		إذا (new_رەقەم_Bytes != 1 || (*newBytes > 0x20 &&
 			    *newBytes != 0x7F )) {
-		    goto notspecial;
+		    اذهب notspecial;
 		}
-		bytes = (char *)newBytes;
+		bytes = (حرف *)newBytes;
 	    }
 	    canHaveVimModifiers = true;
 
 	    uint16 beoskey;
-	    int first, last;
+	    صحيح first, last;
 
 	    /*
 	     * If numBytes == 0 that probably always indicates a special key.
 	     * (does not happen yet)
 	     */
-	    if (numBytes == 0 || bytes[0] == B_FUNCTION_KEY) {
+	    إذا (رەقەم_Bytes == 0 || bytes[0] == B_FUNCTION_ئاچقۇچ) {
 		beoskey = F(scancode);
-		first = FIRST_FUNCTION_KEY;
-		last = NUM_SPECIAL_KEYS;
-	    } else if (*bytes == '\n' && scancode == 0x47) {
+		first = FIRST_FUNCTION_ئاچقۇچ;
+		last = رەقەم_SPECIAL_ئاچقۇچلار;
+	    } وإلا إذا (*bytes == '\n' && scancode == 0x47) {
 		// remap the (non-keypad) ENTER key from \n to \r.
 		string[0] = '\r';
 		len = 1;
 		first = last = 0;
-	    } else {
+	    } وإلا {
 		beoskey = K(bytes[0]);
 		first = 0;
-		last = FIRST_FUNCTION_KEY;
+		last = FIRST_FUNCTION_ئاچقۇچ;
 	    }
 
-	    for (int i = first; i < last; i++) {
-		if (special_keys[i].BeKeys == beoskey) {
+	    لكل (صحيح i = first; i < last; i++) {
+		إذا (special_ئاچقۇچلار[i].Be_ئاچقۇچلار == beoskey) {
 		    string[0] = CSI;
-		    string[1] = special_keys[i].vim_code0;
-		    string[2] = special_keys[i].vim_code1;
+		    string[1] = special_ئاچقۇچلار[i].vim_code0;
+		    string[2] = special_ئاچقۇچلار[i].vim_code1;
 		    len = 3;
 		}
 	    }
 	}
 notspecial:
-	if (len == 0) {
+	إذا (len == 0) {
 	    string[0] = bytes[0];
 	    len = 1;
 	}
 
 	// Special keys (and a few others) may have modifiers
-#if 0
-	if (len == 3 ||
+#إذا 0
+	إذا (len == 3 ||
 		bytes[0] == B_SPACE || bytes[0] == B_TAB ||
 		bytes[0] == B_RETURN || bytes[0] == '\r' ||
 		bytes[0] == B_ESCAPE)
-#else
-	    if (canHaveVimModifiers)
+#وإلا
+	    إذا (canHaveVimModifiers)
 #endif
 	    {
-		int modifiers;
+		صحيح modifiers;
 		modifiers = 0;
-		if (beModifiers & B_SHIFT_KEY)
+		إذا (beModifiers & B_SHIFT_ئاچقۇچ)
 		    modifiers |= MOD_MASK_SHIFT;
-		if (beModifiers & B_CONTROL_KEY)
+		إذا (beModifiers & B_CONTROL_ئاچقۇچ)
 		    modifiers |= MOD_MASK_CTRL;
-		if (beModifiers & B_OPTION_KEY)
+		إذا (beModifiers & B_OPTION_ئاچقۇچ)
 		    modifiers |= MOD_MASK_ALT;
 
 		/*
@@ -1401,26 +1401,26 @@ notspecial:
 		 * string[0] != CSI? (Not for BeOS, since len == 3 implies
 		 * string[0] == CSI...)
 		 */
-		int key;
-		if (string[0] == CSI && len == 3)
-		    key = TO_SPECIAL(string[1], string[2]);
-		else
-		    key = string[0];
-		key = simplify_key(key, &modifiers);
-		if (IS_SPECIAL(key))
+		صحيح ئاچقۇچ;
+		إذا (string[0] == CSI && len == 3)
+		    ئاچقۇچ = TO_SPECIAL(string[1], string[2]);
+		وإلا
+		    ئاچقۇچ = string[0];
+		ئاچقۇچ = simplify_ئاچقۇچ(ئاچقۇچ, &modifiers);
+		إذا (IS_SPECIAL(ئاچقۇچ))
 		{
 		    string[0] = CSI;
-		    string[1] = K_SECOND(key);
-		    string[2] = K_THIRD(key);
+		    string[1] = K_SECOND(ئاچقۇچ);
+		    string[2] = K_THIRD(ئاچقۇچ);
 		    len = 3;
 		}
-		else
+		وإلا
 		{
-		    string[0] = key;
+		    string[0] = ئاچقۇچ;
 		    len = 1;
 		}
 
-		if (modifiers)
+		إذا (modifiers)
 		{
 		    *dest++ = CSI;
 		    *dest++ = KS_MODIFIER;
@@ -1428,31 +1428,31 @@ notspecial:
 		    km.length = 3;
 		}
 	    }
-	memcpy((char *)dest, string, len);
+	memcpy((حرف *)dest, string, len);
 	km.length += len;
-	km.csi_escape = false;
+	km.csi_escape = خطأ;
     }
 
-    write_port(gui.vdcmp, VimMsg::Key, &km, sizeof(km));
+    write_port(gui.vdcmp, Vim_ئۇچۇر::ئاچقۇچ_2, &km, حجم(km));
 
     /*
      * blank out the pointer if necessary
      */
-    if (p_mh && !gui.pointer_hidden)
+    إذا (p_mh && !gui.pointer_hidden)
     {
 	guiBlankMouse(true);
 	gui.pointer_hidden = TRUE;
     }
 }
-void
+فراغ
 VimTextAreaView::guiSendMouseEvent(
-	int	button,
-	int	x,
-	int	y,
-	int	repeated_click,
+	صحيح	button,
+	صحيح	x,
+	صحيح	y,
+	صحيح	repeated_click,
 	int_u	modifiers)
 {
-    VimMouseMsg mm;
+    Vim_Mouse_ئۇچۇر mm;
 
     mm.button = button;
     mm.x = x;
@@ -1460,42 +1460,42 @@ VimTextAreaView::guiSendMouseEvent(
     mm.repeated_click = repeated_click;
     mm.modifiers = modifiers;
 
-    write_port(gui.vdcmp, VimMsg::Mouse, &mm, sizeof(mm));
+    write_port(gui.vdcmp, Vim_ئۇچۇر::Mouse, &mm, حجم(mm));
     //	calls gui_send_mouse_event()
 
     /*
      * if our pointer is currently hidden, then we should show it.
      */
-    if (gui.pointer_hidden)
+    إذا (gui.pointer_hidden)
     {
-	guiBlankMouse(false);
+	guiBlankMouse(خطأ);
 	gui.pointer_hidden = FALSE;
     }
 }
 
-void
+فراغ
 VimTextAreaView::guiMouseMoved(
-	int	x,
-	int	y)
+	صحيح	x,
+	صحيح	y)
 {
-    VimMouseMovedMsg mm;
+    Vim_Mouse_Moved_ئۇچۇر mm;
 
     mm.x = x;
     mm.y = y;
 
-    write_port(gui.vdcmp, VimMsg::MouseMoved, &mm, sizeof(mm));
+    write_port(gui.vdcmp, Vim_ئۇچۇر::MouseMoved, &mm, حجم(mm));
 
-    if (gui.pointer_hidden)
+    إذا (gui.pointer_hidden)
     {
-	guiBlankMouse(false);
+	guiBlankMouse(خطأ);
 	gui.pointer_hidden = FALSE;
     }
 }
 
-    void
-VimTextAreaView::guiBlankMouse(bool should_hide)
+    فراغ
+VimTextAreaView::guiBlankMouse(منطقي should_hide)
 {
-    if (should_hide) {
+    إذا (should_hide) {
 	// gui.vimApp->HideCursor();
 	gui.vimApp->ObscureCursor();
 	/*
@@ -1503,7 +1503,7 @@ VimTextAreaView::guiBlankMouse(bool should_hide)
 	 * Vim's idea of mouse visibility does not necessarily
 	 * correspond to reality.
 	 */
-    } else {
+    } وإلا {
 	// gui.vimApp->ShowCursor();
     }
 }
@@ -1513,35 +1513,35 @@ VimTextAreaView::mouseModifiersToVim(int32 beModifiers)
 {
     int_u vim_modifiers = 0x0;
 
-    if (beModifiers & B_SHIFT_KEY)
+    إذا (beModifiers & B_SHIFT_ئاچقۇچ)
 	vim_modifiers |= MOUSE_SHIFT;
-    if (beModifiers & B_CONTROL_KEY)
+    إذا (beModifiers & B_CONTROL_ئاچقۇچ)
 	vim_modifiers |= MOUSE_CTRL;
-    if (beModifiers & B_OPTION_KEY)	// Alt or Meta key
+    إذا (beModifiers & B_OPTION_ئاچقۇچ)	// Alt or Meta key
 	vim_modifiers |= MOUSE_ALT;
 
-    return vim_modifiers;
+    أرجع vim_modifiers;
 }
 
-    void
+    فراغ
 VimTextAreaView::MouseDown(BPoint point)
 {
     BMessage *m = Window()->CurrentMessage();
-    assert(m);
+    أكد(m);
 
     int32 buttons = 0;
     m->FindInt32("buttons", &buttons);
 
-    int vimButton;
+    صحيح vimButton;
 
-    if (buttons & B_PRIMARY_MOUSE_BUTTON)
-	vimButton = MOUSE_LEFT;
-    else if (buttons & B_SECONDARY_MOUSE_BUTTON)
-	vimButton = MOUSE_RIGHT;
-    else if (buttons & B_TERTIARY_MOUSE_BUTTON)
-	vimButton = MOUSE_MIDDLE;
-    else
-	return;		// Unknown button
+    إذا (buttons & B_PRIMARY_MOUSE_BUTTON)
+	vimButton = MOUSE_سول;
+    وإلا إذا (buttons & B_SECONDARY_MOUSE_BUTTON)
+	vimButton = MOUSE_ئوڭ;
+    وإلا إذا (buttons & B_TERTIARY_MOUSE_BUTTON)
+	vimButton = MOUSE_ئوتتۇرا;
+    وإلا
+	أرجع;		// Unknown button
 
     vimMouseButton = 1;	    // don't care which one
 
@@ -1558,13 +1558,13 @@ VimTextAreaView::MouseDown(BPoint point)
 	    clicks > 1 /* = repeated_click*/, vimMouseModifiers);
 }
 
-    void
+    فراغ
 VimTextAreaView::MouseUp(BPoint point)
 {
     vimMouseButton = 0;
 
     BMessage *m = Window()->CurrentMessage();
-    assert(m);
+    أكد(m);
     // m->PrintToStream();
 
     int32 modifiers = 0;
@@ -1578,136 +1578,136 @@ VimTextAreaView::MouseUp(BPoint point)
     Inherited::MouseUp(point);
 }
 
-    void
-VimTextAreaView::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
+    فراغ
+VimTextAreaView::MouseMoved(BPoint point, uint32 transit, ثابت BMessage *message)
 {
     /*
      * if our pointer is currently hidden, then we should show it.
      */
-    if (gui.pointer_hidden)
+    إذا (gui.pointer_hidden)
     {
-	guiBlankMouse(false);
+	guiBlankMouse(خطأ);
 	gui.pointer_hidden = FALSE;
     }
 
-    if (!vimMouseButton) {    // could also check m->"buttons"
+    إذا (!vimMouseButton) {    // could also check m->"buttons"
 	guiMouseMoved(point.x, point.y);
-	return;
+	أرجع;
     }
 
-    atomic_add(&mouseDragEventCount, 1);
+    atomic_add(&mouse_Drag_Event_سانى, 1);
 
     // Don't care much about "transit"
     guiSendMouseEvent(MOUSE_DRAG, point.x, point.y, 0, vimMouseModifiers);
 }
 
-    void
+    فراغ
 VimTextAreaView::MessageReceived(BMessage *m)
 {
-    switch (m->what) {
-	case 'menu':
+    بدل (m->what) {
+	حالة 'menu':
 	    {
-		VimMenuMsg mm;
-		mm.guiMenu = NULL;  // in case no pointer in msg
-		m->FindPointer("VimMenu", (void **)&mm.guiMenu);
-		write_port(gui.vdcmp, VimMsg::Menu, &mm, sizeof(mm));
+		Vim_Menu_ئۇچۇر mm;
+		mm.guiMenu = عدم;  // in case no pointer in msg
+		m->FindPointer("VimMenu", (فراغ **)&mm.guiMenu);
+		write_port(gui.vdcmp, Vim_ئۇچۇر::Menu, &mm, حجم(mm));
 	    }
-	    break;
-	case B_MOUSE_WHEEL_CHANGED:
+	    اكسر;
+	حالة B_MOUSE_WHEEL_CHANGED:
 	    {
 		VimScrollBar* scb = curwin->w_scrollbars[1].id;
-		float small=0, big=0, dy=0;
+		عائم small=0, big=0, dy=0;
 		m->FindFloat("be:wheel_delta_y", &dy);
 		scb->GetSteps(&small, &big);
-		scb->SetValue(scb->Value()+small*dy*3);
-		scb->ValueChanged(scb->Value());
-#if 0
+		scb->Set_قىممەت(scb->قىممەت_2()+small*dy*3);
+		scb->قىممەت_Changed(scb->قىممەت_2());
+#إذا 0
 		scb = curwin->w_scrollbars[0].id;
 		scb->GetSteps(&small, &big);
-		scb->SetValue(scb->Value()+small*dy);
-		scb->ValueChanged(scb->Value());
+		scb->Set_قىممەت(scb->قىممەت_2()+small*dy);
+		scb->قىممەت_Changed(scb->قىممەت_2());
 #endif
 	    }
-	    break;
+	    اكسر;
 #ifdef FEAT_MBYTE_IME
-	case B_INPUT_METHOD_EVENT:
+	حالة B_كىرگۈزۈش_METHOD_EVENT:
 	    {
 		int32 opcode;
 		m->FindInt32("be:opcode", &opcode);
-		switch(opcode)
+		بدل(opcode)
 		{
-		    case B_INPUT_METHOD_STARTED:
-			if (!IMData.messenger) delete IMData.messenger;
-			IMData.messenger = new BMessenger();
+		    حالة B_كىرگۈزۈش_METHOD_STARTED:
+			إذا (!IMData.messenger) delete IMData.messenger;
+			IMData.messenger = جديد BMessenger();
 			m->FindMessenger("be:reply_to", IMData.messenger);
-			break;
-		    case B_INPUT_METHOD_CHANGED:
+			اكسر;
+		    حالة B_كىرگۈزۈش_METHOD_CHANGED:
 			{
 			    BString str;
-			    bool confirmed;
-			    if (IMData.message) *(IMData.message) = *m;
-			    else	       IMData.message = new BMessage(*m);
+			    منطقي confirmed;
+			    إذا (IMData.message) *(IMData.message) = *m;
+			    وإلا	       IMData.message = جديد BMessage(*m);
 			    DrawIMString();
 			    m->FindBool("be:confirmed", &confirmed);
-			    if (confirmed)
+			    إذا (confirmed)
 			    {
 				m->FindString("be:string", &str);
 				char_u *chars = (char_u*)str.String();
-				struct VimKeyMsg km;
+				بنية Vim_ئاچقۇچ_ئۇچۇر km;
 				km.csi_escape = true;
-				int clen;
-				int i = 0;
-				while (i < str.Length())
+				صحيح clen;
+				صحيح i = 0;
+				طالما (i < str.Length())
 				{
 				    clen = utf_ptr2len(chars+i);
 				    memcpy(km.chars, chars+i, clen);
 				    km.length = clen;
-				    write_port(gui.vdcmp, VimMsg::Key, &km, sizeof(km));
+				    write_port(gui.vdcmp, Vim_ئۇچۇر::ئاچقۇچ_2, &km, حجم(km));
 				    i += clen;
 				}
 			    }
 			}
-			break;
-		    case B_INPUT_METHOD_LOCATION_REQUEST:
+			اكسر;
+		    حالة B_كىرگۈزۈش_METHOD_LOCATION_REQUEST:
 			{
-			    BMessage msg(B_INPUT_METHOD_EVENT);
-			    msg.AddInt32("be:opcode", B_INPUT_METHOD_LOCATION_REQUEST);
-			    msg.AddPoint("be:location_reply", IMData.location);
-			    msg.AddFloat("be:height_reply", FILL_Y(1));
-			    IMData.messenger->SendMessage(&msg);
+			    BMessage ئۇچۇر(B_كىرگۈزۈش_METHOD_EVENT);
+			    ئۇچۇر.AddInt32("be:opcode", B_كىرگۈزۈش_METHOD_LOCATION_REQUEST);
+			    ئۇچۇر.AddPoint("be:location_reply", IMData.location);
+			    ئۇچۇر.AddFloat("be:height_reply", FILL_Y(1));
+			    IMData.messenger->SendMessage(&ئۇچۇر);
 			}
-			break;
-		    case B_INPUT_METHOD_STOPPED:
+			اكسر;
+		    حالة B_كىرگۈزۈش_METHOD_STOPPED:
 			delete IMData.messenger;
 			delete IMData.message;
-			IMData.messenger = NULL;
-			IMData.message = NULL;
-			break;
+			IMData.messenger = عدم;
+			IMData.message = عدم;
+			اكسر;
 		}
 	    }
 	    // TODO: sz: break here???
 #endif
-	default:
-	    if (m->WasDropped()) {
+	افتراضي:
+	    إذا (m->WasDropped()) {
 		BWindow *w = Window();
 		w->DetachCurrentMessage();
-		w->Minimize(false);
-		VimApp::SendRefs(m, (modifiers() & B_SHIFT_KEY) != 0);
-	    } else {
+		w->Minimize(خطأ);
+		VimApp::SendRefs(m, (modifiers() & B_SHIFT_ئاچقۇچ) != 0);
+	    } وإلا {
 		Inherited::MessageReceived(m);
 	    }
-	    break;
+	    اكسر;
     }
 }
 
-    int
+    صحيح
 VimTextAreaView::mchInitFont(char_u *name)
 {
     VimFont *newFont = (VimFont *)gui_mch_get_font(name, 1);
-    if (newFont != NOFONT) {
+    إذا (newFont != NOFONT) {
 	gui.norm_font = (GuiFont)newFont;
 	gui_mch_set_font((GuiFont)newFont);
-	if (name && STRCMP(name, "*") != 0)
+	إذا (name && STRCMP(name, "*") != 0)
 	    hl_set_font_name(name);
 
 	SetDrawingMode(B_OP_COPY);
@@ -1717,13 +1717,13 @@ VimTextAreaView::mchInitFont(char_u *name)
 	 * We should also try to work out what font to use for these when they are
 	 * not specified by X resources, but we don't yet.
 	 */
-	return OK;
+	أرجع OK;
     }
-    return FAIL;
+    أرجع FAIL;
 }
 
-    void
-VimTextAreaView::mchDrawString(int row, int col, char_u *s, int len, int flags)
+    فراغ
+VimTextAreaView::mchDrawString(صحيح row, صحيح col, char_u *s, صحيح len, صحيح flags)
 {
     /*
      * First we must erase the area, because DrawString won't do
@@ -1732,113 +1732,113 @@ VimTextAreaView::mchDrawString(int row, int col, char_u *s, int len, int flags)
      * should be set when appropriate!!!
      * (Rectangles include the bottom and right edge)
      */
-    if (!(flags & DRAW_TRANSP)) {
-	int cells;
+    إذا (!(flags & DRAW_TRANSP)) {
+	صحيح cells;
 	cells = 0;
-	for (int i=0; i<len; i++) {
-	    int cn = utf_ptr2cells((char_u *)(s+i));
-	    if (cn<4) cells += cn;
+	لكل (صحيح i=0; i<len; i++) {
+	    صحيح cn = utf_ptr2cells((char_u *)(s+i));
+	    إذا (cn<4) cells += cn;
 	}
 
 	BRect r(FILL_X(col), FILL_Y(row),
 		FILL_X(col + cells) - PEN_WIDTH, FILL_Y(row + 1) - PEN_WIDTH);
-	FillRect(r, B_SOLID_LOW);
+	FillRect(r, B_SOLID_تۆۋەن);
     }
 
     BFont font;
-    this->GetFont(&font);
-    if (!font.IsFixed())
+    هذا->GetFont(&font);
+    إذا (!font.IsFixed())
     {
-	char* p = (char*)s;
+	حرف* p = (حرف*)s;
 	int32 clen, lastpos = 0;
 	BPoint where;
-	int cells;
-	while ((p - (char*)s) < len) {
+	صحيح cells;
+	طالما ((p - (حرف*)s) < len) {
 	    clen = utf_ptr2len((u_char*)p);
 	    where.Set(TEXT_X(col+lastpos), TEXT_Y(row));
 	    DrawString(p, clen, where);
-	    if (flags & DRAW_BOLD) {
+	    إذا (flags & DRAW_BOLD) {
 		where.x += 1.0;
 		SetDrawingMode(B_OP_BLEND);
 		DrawString(p, clen, where);
 		SetDrawingMode(B_OP_COPY);
 	    }
 	    cells = utf_ptr2cells((char_u *)p);
-	    if (cells<4) lastpos += cells;
-	    else	lastpos++;
+	    إذا (cells<4) lastpos += cells;
+	    وإلا	lastpos++;
 	    p += clen;
 	}
     }
-    else
+    وإلا
     {
 	BPoint where(TEXT_X(col), TEXT_Y(row));
-	DrawString((char*)s, len, where);
-	if (flags & DRAW_BOLD) {
+	DrawString((حرف*)s, len, where);
+	إذا (flags & DRAW_BOLD) {
 	    where.x += 1.0;
 	    SetDrawingMode(B_OP_BLEND);
-	    DrawString((char*)s, len, where);
+	    DrawString((حرف*)s, len, where);
 	    SetDrawingMode(B_OP_COPY);
 	}
     }
 
-    if (flags & DRAW_UNDERL) {
-	int cells;
+    إذا (flags & DRAW_UNDERL) {
+	صحيح cells;
 	cells = 0;
-	for (int i=0; i<len; i++) {
-	    int cn = utf_ptr2cells((char_u *)(s+i));
-	    if (cn<4) cells += cn;
+	لكل (صحيح i=0; i<len; i++) {
+	    صحيح cn = utf_ptr2cells((char_u *)(s+i));
+	    إذا (cn<4) cells += cn;
 	}
 
 	BPoint start(FILL_X(col), FILL_Y(row + 1) - PEN_WIDTH);
 	BPoint end(FILL_X(col + cells) - PEN_WIDTH, start.y);
 
-	StrokeLine(start, end);
+	Stroke_قۇر(start, end);
     }
 }
 
-void
+فراغ
 VimTextAreaView::mchClearBlock(
-	int	row1,
-	int	col1,
-	int	row2,
-	int	col2)
+	صحيح	row1,
+	صحيح	col1,
+	صحيح	row2,
+	صحيح	col2)
 {
     BRect r(FILL_X(col1), FILL_Y(row1),
 	    FILL_X(col2 + 1) - PEN_WIDTH, FILL_Y(row2 + 1) - PEN_WIDTH);
     gui_mch_set_bg_color(gui.back_pixel);
-    FillRect(r, B_SOLID_LOW);
+    FillRect(r, B_SOLID_تۆۋەن);
 }
 
-    void
+    فراغ
 VimTextAreaView::mchClearAll()
 {
     gui_mch_set_bg_color(gui.back_pixel);
-    FillRect(Bounds(), B_SOLID_LOW);
+    FillRect(Bounds(), B_SOLID_تۆۋەن);
 }
 
 /*
  * mchDeleteLines() Lock()s the window by itself.
  */
-    void
-VimTextAreaView::mchDeleteLines(int row, int num_lines)
+    فراغ
+VimTextAreaView::mch_Delete_قۇرلار(صحيح row, صحيح رەقەم_قۇرلار)
 {
     BRect source, dest;
-    source.left = FILL_X(gui.scroll_region_left);
-    source.top = FILL_Y(row + num_lines);
-    source.right = FILL_X(gui.scroll_region_right + 1) - PEN_WIDTH;
+    source.سول = FILL_X(gui.scroll_region_سول);
+    source.چوققا = FILL_Y(row + رەقەم_قۇرلار);
+    source.ئوڭ = FILL_X(gui.scroll_region_ئوڭ + 1) - PEN_WIDTH;
     source.bottom = FILL_Y(gui.scroll_region_bot + 1) - PEN_WIDTH;
 
-    dest.left = FILL_X(gui.scroll_region_left);
-    dest.top = FILL_Y(row);
-    dest.right = FILL_X(gui.scroll_region_right + 1) - PEN_WIDTH;
-    dest.bottom = FILL_Y(gui.scroll_region_bot - num_lines + 1) - PEN_WIDTH;
+    dest.سول = FILL_X(gui.scroll_region_سول);
+    dest.چوققا = FILL_Y(row);
+    dest.ئوڭ = FILL_X(gui.scroll_region_ئوڭ + 1) - PEN_WIDTH;
+    dest.bottom = FILL_Y(gui.scroll_region_bot - رەقەم_قۇرلار + 1) - PEN_WIDTH;
 
-    if (gui.vimWindow->Lock()) {
+    إذا (gui.vimWindow->Lock()) {
 	// Clear one column more for when bold has spilled over
 	CopyBits(source, dest);
-	gui_clear_block(gui.scroll_region_bot - num_lines + 1,
-		gui.scroll_region_left,
-		gui.scroll_region_bot, gui.scroll_region_right);
+	gui_clear_block(gui.scroll_region_bot - رەقەم_قۇرلار + 1,
+		gui.scroll_region_سول,
+		gui.scroll_region_bot, gui.scroll_region_ئوڭ);
 
 
 	gui.vimWindow->Unlock();
@@ -1854,28 +1854,28 @@ VimTextAreaView::mchDeleteLines(int row, int num_lines)
 /*
  * mchInsertLines() Lock()s the window by itself.
  */
-    void
-VimTextAreaView::mchInsertLines(int row, int num_lines)
+    فراغ
+VimTextAreaView::mch_قىستۇرۇش_قۇرلار(صحيح row, صحيح رەقەم_قۇرلار)
 {
     BRect source, dest;
 
     // XXX Attempt at a hack:
     gui.vimWindow->UpdateIfNeeded();
-    source.left = FILL_X(gui.scroll_region_left);
-    source.top = FILL_Y(row);
-    source.right = FILL_X(gui.scroll_region_right + 1) - PEN_WIDTH;
-    source.bottom = FILL_Y(gui.scroll_region_bot - num_lines + 1) - PEN_WIDTH;
+    source.سول = FILL_X(gui.scroll_region_سول);
+    source.چوققا = FILL_Y(row);
+    source.ئوڭ = FILL_X(gui.scroll_region_ئوڭ + 1) - PEN_WIDTH;
+    source.bottom = FILL_Y(gui.scroll_region_bot - رەقەم_قۇرلار + 1) - PEN_WIDTH;
 
-    dest.left = FILL_X(gui.scroll_region_left);
-    dest.top = FILL_Y(row + num_lines);
-    dest.right = FILL_X(gui.scroll_region_right + 1) - PEN_WIDTH;
+    dest.سول = FILL_X(gui.scroll_region_سول);
+    dest.چوققا = FILL_Y(row + رەقەم_قۇرلار);
+    dest.ئوڭ = FILL_X(gui.scroll_region_ئوڭ + 1) - PEN_WIDTH;
     dest.bottom = FILL_Y(gui.scroll_region_bot + 1) - PEN_WIDTH;
 
-    if (gui.vimWindow->Lock()) {
+    إذا (gui.vimWindow->Lock()) {
 	// Clear one column more for when bold has spilled over
 	CopyBits(source, dest);
-	gui_clear_block(row, gui.scroll_region_left,
-		row + num_lines - 1, gui.scroll_region_right);
+	gui_clear_block(row, gui.scroll_region_سول,
+		row + رەقەم_قۇرلار - 1, gui.scroll_region_ئوڭ);
 
 	gui.vimWindow->Unlock();
 	/*
@@ -1897,69 +1897,69 @@ VimTextAreaView::mchInsertLines(int row, int num_lines)
 /*
  * DrawIMString draws string with IMData.message.
  */
-void VimTextAreaView::DrawIMString(void)
+فراغ VimTextAreaView::DrawIMString(فراغ)
 {
-    static const rgb_color r_highlight = {255, 152, 152, 255},
+    ساكن ثابت rgb_color r_highlight = {255, 152, 152, 255},
 		 b_highlight = {152, 203, 255, 255};
     BString str;
-    const char* s;
-    int len;
-    BMessage* msg = IMData.message;
-    if (!msg)
-	return;
+    ثابت حرف* s;
+    صحيح len;
+    BMessage* ئۇچۇر = IMData.message;
+    إذا (!ئۇچۇر)
+	أرجع;
     gui_redraw_block(IMData.row, 0,
-	    IMData.row + IMData.count, W_WIDTH(curwin), GUI_MON_NOCLEAR);
-    bool confirmed = false;
-    msg->FindBool("be:confirmed", &confirmed);
-    if (confirmed)
-	return;
-    rgb_color hcolor = HighColor(), lcolor = LowColor();
-    msg->FindString("be:string", &str);
+	    IMData.row + IMData.سانى, W_WIDTH(curwin), GUI_MON_NOCLEAR);
+    منطقي confirmed = خطأ;
+    ئۇچۇر->FindBool("be:confirmed", &confirmed);
+    إذا (confirmed)
+	أرجع;
+    rgb_color hcolor = يۇقىرى_Color(), lcolor = تۆۋەن_Color();
+    ئۇچۇر->FindString("be:string", &str);
     s = str.String();
     len = str.Length();
-    SetHighColor(0, 0, 0);
+    Set_يۇقىرى_Color(0, 0, 0);
     IMData.row = gui.row;
     IMData.col = gui.col;
     int32 sel_start = 0, sel_end = 0;
-    msg->FindInt32("be:selection", 0, &sel_start);
-    msg->FindInt32("be:selection", 1, &sel_end);
-    int clen, cn;
+    ئۇچۇر->FindInt32("be:selection", 0, &sel_start);
+    ئۇچۇر->FindInt32("be:selection", 1, &sel_end);
+    صحيح clen, cn;
     BPoint pos(IMData.col, 0);
     BRect r;
     BPoint where;
     IMData.location = ConvertToScreen(
 	    BPoint(FILL_X(pos.x), FILL_Y(IMData.row + pos.y)));
-    for (int i=0; i<len; i+=clen)
+    لكل (صحيح i=0; i<len; i+=clen)
     {
 	cn = utf_ptr2cells((char_u *)(s+i));
 	clen = utf_ptr2len((char_u *)(s+i));
-	if (pos.x + cn > W_WIDTH(curwin))
+	إذا (pos.x + cn > W_WIDTH(curwin))
 	{
 	    pos.y++;
 	    pos.x = 0;
 	}
-	if (sel_start<=i && i<sel_end)
+	إذا (sel_start<=i && i<sel_end)
 	{
-	    SetLowColor(r_highlight);
+	    Set_تۆۋەن_Color(r_highlight);
 	    IMData.location = ConvertToScreen(
 		    BPoint(FILL_X(pos.x), FILL_Y(IMData.row + pos.y)));
 	}
-	else
+	وإلا
 	{
-	    SetLowColor(b_highlight);
+	    Set_تۆۋەن_Color(b_highlight);
 	}
 	r.Set(FILL_X(pos.x), FILL_Y(IMData.row + pos.y),
 		FILL_X(pos.x + cn) - PEN_WIDTH,
 		FILL_Y(IMData.row + pos.y + 1) - PEN_WIDTH);
-	FillRect(r, B_SOLID_LOW);
+	FillRect(r, B_SOLID_تۆۋەن);
 	where.Set(TEXT_X(pos.x), TEXT_Y(IMData.row + pos.y));
 	DrawString((s+i), clen, where);
 	pos.x += cn;
     }
-    IMData.count = (int)pos.y;
+    IMData.سانى = (صحيح)pos.y;
 
-    SetHighColor(hcolor);
-    SetLowColor(lcolor);
+    Set_يۇقىرى_Color(hcolor);
+    Set_تۆۋەن_Color(lcolor);
 }
 #endif
 // ---------------- VimScrollBar ----------------
@@ -1975,10 +1975,10 @@ void VimTextAreaView::DrawIMString(void)
 VimScrollBar::VimScrollBar(scrollbar_T *g, orientation posture):
     BScrollBar(posture == B_HORIZONTAL ?  BRect(-100,-100,-10,-90) :
 	    BRect(-100,-100,-90,-10),
-	    "vim scrollbar", (BView *)NULL,
+	    "vim scrollbar", (BView *)عدم,
 	    0.0, 10.0, posture),
-    ignoreValue(-1),
-    scrollEventCount(0)
+    ignore_قىممەت(-1),
+    scroll_Event_سانى(0)
 {
     gsb = g;
     SetResizingMode(B_FOLLOW_NONE);
@@ -1988,14 +1988,14 @@ VimScrollBar::~VimScrollBar()
 {
 }
 
-    void
-VimScrollBar::ValueChanged(float newValue)
+    فراغ
+VimScrollBar::قىممەت_Changed(عائم new_قىممەت)
 {
-    if (ignoreValue >= 0.0 && newValue == ignoreValue) {
-	ignoreValue = -1;
-	return;
+    إذا (ignore_قىممەت >= 0.0 && new_قىممەت == ignore_قىممەت) {
+	ignore_قىممەت = -1;
+	أرجع;
     }
-    ignoreValue = -1;
+    ignore_قىممەت = -1;
     /*
      * We want to throttle the amount of scroll messages generated.
      * Normally I presume you won't get a new message before we've
@@ -2004,15 +2004,15 @@ VimScrollBar::ValueChanged(float newValue)
      * scroll events there are (or will be) in the VDCMP, and the
      * throttling happens at the receiving end.
      */
-    atomic_add(&scrollEventCount, 1);
+    atomic_add(&scroll_Event_سانى, 1);
 
-    struct VimScrollBarMsg sm;
+    بنية Vim_Scroll_Bar_ئۇچۇر sm;
 
-    sm.sb = this;
-    sm.value = (long) newValue;
+    sm.sb = هذا;
+    sm.قىممەت = (long) new_قىممەت;
     sm.stillDragging = TRUE;
 
-    write_port(gui.vdcmp, VimMsg::ScrollBar, &sm, sizeof(sm));
+    write_port(gui.vdcmp, Vim_ئۇچۇر::ScrollBar, &sm, حجم(sm));
 
     //	calls gui_drag_scrollbar(sb, newValue, TRUE);
 }
@@ -2024,35 +2024,35 @@ VimScrollBar::ValueChanged(float newValue)
  * is outside... This has some funny effects... XXX
  * So we do special processing when the window de/activates.
  */
-    void
+    فراغ
 VimScrollBar::MouseUp(BPoint where)
 {
     // BMessage *m = Window()->CurrentMessage();
     // m->PrintToStream();
 
-    atomic_add(&scrollEventCount, 1);
+    atomic_add(&scroll_Event_سانى, 1);
 
-    struct VimScrollBarMsg sm;
+    بنية Vim_Scroll_Bar_ئۇچۇر sm;
 
-    sm.sb = this;
-    sm.value = (long) Value();
+    sm.sb = هذا;
+    sm.قىممەت = (long) قىممەت_2();
     sm.stillDragging = FALSE;
 
-    write_port(gui.vdcmp, VimMsg::ScrollBar, &sm, sizeof(sm));
+    write_port(gui.vdcmp, Vim_ئۇچۇر::ScrollBar, &sm, حجم(sm));
 
     //	calls gui_drag_scrollbar(sb, newValue, FALSE);
 
     Inherited::MouseUp(where);
 }
 
-    void
-VimScrollBar::SetValue(float newValue)
+    فراغ
+VimScrollBar::Set_قىممەت(عائم new_قىممەت)
 {
-    if (newValue == Value())
-	return;
+    إذا (new_قىممەت == قىممەت_2())
+	أرجع;
 
-    ignoreValue = newValue;
-    Inherited::SetValue(newValue);
+    ignore_قىممەت = new_قىممەت;
+    Inherited::Set_قىممەت(new_قىممەت);
 }
 
 // ---------------- VimFont ----------------
@@ -2062,17 +2062,17 @@ VimFont::VimFont(): BFont()
     init();
 }
 
-VimFont::VimFont(const VimFont *rhs): BFont(rhs)
+VimFont::VimFont(ثابت VimFont *rhs): BFont(rhs)
 {
     init();
 }
 
-VimFont::VimFont(const BFont *rhs): BFont(rhs)
+VimFont::VimFont(ثابت BFont *rhs): BFont(rhs)
 {
     init();
 }
 
-VimFont::VimFont(const VimFont &rhs): BFont(rhs)
+VimFont::VimFont(ثابت VimFont &rhs): BFont(rhs)
 {
     init();
 }
@@ -2081,46 +2081,46 @@ VimFont::~VimFont()
 {
 }
 
-    void
+    فراغ
 VimFont::init()
 {
-    next = NULL;
+    next = عدم;
     refcount = 1;
-    name = NULL;
+    name = عدم;
 }
 
 // ---------------- VimDialog ----------------
 
-#if defined(FEAT_GUI_DIALOG)
+#إذا defined(FEAT_GUI_DIALOG)
 
-const unsigned int  kVimDialogButtonMsg = 'VMDB';
-const unsigned int  kVimDialogIconStripeWidth = 30;
-const unsigned int  kVimDialogButtonsSpacingX = 9;
-const unsigned int  kVimDialogButtonsSpacingY = 4;
-const unsigned int  kVimDialogSpacingX = 6;
-const unsigned int  kVimDialogSpacingY = 10;
-const unsigned int  kVimDialogMinimalWidth  = 310;
-const unsigned int  kVimDialogMinimalHeight = 75;
-const BRect	    kDefaultRect =
+ثابت unsigned صحيح  k_Vim_Dialog_Button_ئۇچۇر = 'VMDB';
+ثابت unsigned صحيح  kVimDialogIconStripeWidth = 30;
+ثابت unsigned صحيح  kVimDialogButtonsSpacingX = 9;
+ثابت unsigned صحيح  kVimDialogButtonsSpacingY = 4;
+ثابت unsigned صحيح  kVimDialogSpacingX = 6;
+ثابت unsigned صحيح  kVimDialogSpacingY = 10;
+ثابت unsigned صحيح  kVimDialogMinimalWidth  = 310;
+ثابت unsigned صحيح  kVimDialogMinimalHeight = 75;
+ثابت BRect	    kDefaultRect =
 BRect(0, 0, kVimDialogMinimalWidth, kVimDialogMinimalHeight);
 
-VimDialog::VimDialog(int type, const char *title, const char *message,
-	const char *buttons, int dfltbutton, const char *textfield, int ex_cmd)
+VimDialog::VimDialog(صحيح type, ثابت حرف *title, ثابت حرف *message,
+	ثابت حرف *buttons, صحيح dfltbutton, ثابت حرف *textfield, صحيح ex_cmd)
 : BWindow(kDefaultRect, title, B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
 	B_NOT_CLOSABLE | B_NOT_RESIZABLE |
 	B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_ASYNCHRONOUS_CONTROLS)
     , fDialogSem(-1)
-    , fDialogValue(dfltbutton)
-    , fMessageView(NULL)
-    , fInputControl(NULL)
-    , fInputValue(textfield)
+    , f_Dialog_قىممەت(dfltbutton)
+    , fMessageView(عدم)
+    , f_كىرگۈزۈش_Control(عدم)
+    , f_كىرگۈزۈش_قىممەت(textfield)
 {
     //	master view
-    VimDialog::View* view = new VimDialog::View(Bounds());
-    if (view == NULL)
-	return;
+    VimDialog::View* view = جديد VimDialog::View(Bounds());
+    إذا (view == عدم)
+	أرجع;
 
-    if (title == NULL)
+    إذا (title == عدم)
 	SetTitle("Vim " VIM_VERSION_MEDIUM);
 
     AddChild(view);
@@ -2130,16 +2130,16 @@ VimDialog::VimDialog(int type, const char *title, const char *message,
 
     //	buttons
     int32 which = 1;
-    float maxButtonWidth  = 0;
-    float maxButtonHeight = 0;
-    float buttonsWidth	  = 0;
-    float buttonsHeight   = 0;
+    عائم maxButtonWidth  = 0;
+    عائم maxButtonHeight = 0;
+    عائم buttonsWidth	  = 0;
+    عائم buttonsHeight   = 0;
     BString strButtons(buttons);
     strButtons.RemoveAll("&");
-    do
+    افعل
     {
 	int32 end = strButtons.FindFirst('\n');
-	if (end != B_ERROR)
+	إذا (end != B_ERROR)
 	    strButtons.SetByteAt(end, '\0');
 
 	BButton *button = _CreateButton(which++, strButtons.String());
@@ -2151,23 +2151,23 @@ VimDialog::VimDialog(int type, const char *title, const char *message,
 	buttonsWidth   += button->Bounds().Width();
 	buttonsHeight  += button->Bounds().Height();
 
-	if (end == B_ERROR)
-	    break;
+	إذا (end == B_ERROR)
+	    اكسر;
 
 	strButtons.Remove(0, end + 1);
-    } while (true);
+    } طالما (true);
 
-    int32 buttonsCount = fButtonsList.CountItems();
-    buttonsWidth      += kVimDialogButtonsSpacingX * (buttonsCount - 1);
-    buttonsHeight     += kVimDialogButtonsSpacingY * (buttonsCount - 1);
-    float dialogWidth  = buttonsWidth + kVimDialogIconStripeWidth +
+    int32 buttons_سانى = fButtonsList.سانى_بۇيۇملار();
+    buttonsWidth      += kVimDialogButtonsSpacingX * (buttons_سانى - 1);
+    buttonsHeight     += kVimDialogButtonsSpacingY * (buttons_سانى - 1);
+    عائم dialogWidth  = buttonsWidth + kVimDialogIconStripeWidth +
 	kVimDialogSpacingX * 2;
-    float dialogHeight = maxButtonHeight + kVimDialogSpacingY * 3;
+    عائم dialogHeight = maxButtonHeight + kVimDialogSpacingY * 3;
 
     // Check 'v' flag in 'guioptions': vertical button placement.
-    bool vertical = (vim_strchr(p_go, GO_VERTICAL) != NULL) ||
+    منطقي vertical = (vim_strchr(p_go, GO_VERTICAL) != عدم) ||
 	dialogWidth >= gui.vimWindow->Bounds().Width();
-    if (vertical) {
+    إذا (vertical) {
 	dialogWidth  -= buttonsWidth;
 	dialogWidth  += maxButtonWidth;
 	dialogHeight -= maxButtonHeight;
@@ -2178,41 +2178,41 @@ VimDialog::VimDialog(int type, const char *title, const char *message,
 
     //	message view
     BRect rect(0, 0, dialogWidth, 0);
-    rect.left  += kVimDialogIconStripeWidth + 16 + kVimDialogSpacingX;
-    rect.top   += kVimDialogSpacingY;
-    rect.right -= kVimDialogSpacingX;
-    rect.bottom = rect.top;
-    fMessageView = new BTextView(rect, "_tv_", rect.OffsetByCopy(B_ORIGIN),
-	    B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
+    rect.سول  += kVimDialogIconStripeWidth + 16 + kVimDialogSpacingX;
+    rect.چوققا   += kVimDialogSpacingY;
+    rect.ئوڭ -= kVimDialogSpacingX;
+    rect.bottom = rect.چوققا;
+    fMessageView = جديد BTextView(rect, "_tv_", rect.OffsetByCopy(B_ORIGIN),
+	    B_FOLLOW_سول | B_FOLLOW_چوققا, B_WILL_DRAW);
 
     fMessageView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
     rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
     fMessageView->SetFontAndColor(be_plain_font, B_FONT_ALL, &textColor);
     fMessageView->SetText(message);
-    fMessageView->MakeEditable(false);
-    fMessageView->MakeSelectable(false);
+    fMessageView->MakeEditable(خطأ);
+    fMessageView->MakeSelectable(خطأ);
     fMessageView->SetWordWrap(true);
     AddChild(fMessageView);
 
-    float messageHeight = fMessageView->TextHeight(0, fMessageView->CountLines());
+    عائم messageHeight = fMessageView->TextHeight(0, fMessageView->سانى_قۇرلار());
     fMessageView->ResizeBy(0, messageHeight);
     fMessageView->SetTextRect(BRect(0, 0, rect.Width(), messageHeight));
 
     dialogHeight += messageHeight;
 
     //	input view
-    if (fInputValue != NULL) {
-	rect.top     =
+    إذا (f_كىرگۈزۈش_قىممەت != عدم) {
+	rect.چوققا     =
 	    rect.bottom += messageHeight + kVimDialogSpacingY;
-	fInputControl = new BTextControl(rect, "_iv_", NULL, fInputValue, NULL,
-		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE |  B_PULSE_NEEDED);
-	fInputControl->TextView()->SetText(fInputValue);
-	fInputControl->TextView()->SetWordWrap(false);
-	AddChild(fInputControl);
+	f_كىرگۈزۈش_Control = جديد BTextControl(rect, "_iv_", عدم, f_كىرگۈزۈش_قىممەت, عدم,
+		B_FOLLOW_سول | B_FOLLOW_چوققا, B_WILL_DRAW | B_NAVIGABLE |  B_PULSE_NEEDED);
+	f_كىرگۈزۈش_Control->TextView()->SetText(f_كىرگۈزۈش_قىممەت);
+	f_كىرگۈزۈش_Control->TextView()->SetWordWrap(خطأ);
+	AddChild(f_كىرگۈزۈش_Control);
 
-	float width = 0.f, height = 0.f;
-	fInputControl->GetPreferredSize(&width, &height);
-	fInputControl->MakeFocus(true);
+	عائم width = 0.f, height = 0.f;
+	f_كىرگۈزۈش_Control->GetPreferredSize(&width, &height);
+	f_كىرگۈزۈش_Control->MakeFocus(true);
 
 	dialogHeight += height + kVimDialogSpacingY * 1.5;
     }
@@ -2224,90 +2224,90 @@ VimDialog::VimDialog(int type, const char *title, const char *message,
 	    (gui.vimWindow->Bounds().Height() - dialogHeight) / 2);
 
     //	adjust layout of buttons
-    float buttonWidth = max_c(maxButtonWidth, rect.Width() * 0.66);
+    عائم buttonWidth = max_c(maxButtonWidth, rect.Width() * 0.66);
     BPoint origin(dialogWidth, dialogHeight);
     origin.x -= kVimDialogSpacingX + (vertical ? buttonWidth : buttonsWidth);
     origin.y -= kVimDialogSpacingY + (vertical ? buttonsHeight	: maxButtonHeight);
 
-    for (int32 i = 0 ; i < buttonsCount; i++) {
+    لكل (int32 i = 0 ; i < buttons_سانى; i++) {
 	BButton *button = (BButton*)fButtonsList.ItemAt(i);
 	button->MoveTo(origin);
-	if (vertical) {
+	إذا (vertical) {
 	    origin.y += button->Frame().Height() + kVimDialogButtonsSpacingY;
 	    button->ResizeTo(buttonWidth, button->Frame().Height());
-	} else
+	} وإلا
 	    origin.x += button->Frame().Width() + kVimDialogButtonsSpacingX;
 
-	if (dfltbutton == i + 1) {
+	إذا (dfltbutton == i + 1) {
 	    button->MakeDefault(true);
-	    button->MakeFocus(fInputControl == NULL);
+	    button->MakeFocus(f_كىرگۈزۈش_Control == عدم);
 	}
     }
 }
 
 VimDialog::~VimDialog()
 {
-    if (fDialogSem > B_OK)
+    إذا (fDialogSem > B_OK)
 	delete_sem(fDialogSem);
 }
 
-    int
+    صحيح
 VimDialog::Go()
 {
     fDialogSem = create_sem(0, "VimDialogSem");
-    if (fDialogSem < B_OK) {
+    إذا (fDialogSem < B_OK) {
 	Quit();
-	return fDialogValue;
+	أرجع f_Dialog_قىممەت;
     }
 
     Show();
 
-    while (acquire_sem(fDialogSem) == B_INTERRUPTED);
+    طالما (acquire_sem(fDialogSem) == B_INTERRUPTED);
 
-    int retValue = fDialogValue;
-    if (fInputValue != NULL)
-	vim_strncpy((char_u*)fInputValue, (char_u*)fInputControl->Text(), IOSIZE - 1);
+    صحيح ret_قىممەت = f_Dialog_قىممەت;
+    إذا (f_كىرگۈزۈش_قىممەت != عدم)
+	vim_strncpy((char_u*)f_كىرگۈزۈش_قىممەت, (char_u*)f_كىرگۈزۈش_Control->Text(), IOSIZE - 1);
 
-    if (Lock())
+    إذا (Lock())
 	Quit();
 
-    return retValue;
+    أرجع ret_قىممەت;
 }
 
-void VimDialog::MessageReceived(BMessage *msg)
+فراغ VimDialog::MessageReceived(BMessage *ئۇچۇر)
 {
     int32 which = 0;
-    if (msg->what != kVimDialogButtonMsg ||
-	    msg->FindInt32("which", &which) != B_OK)
-	return BWindow::MessageReceived(msg);
+    إذا (ئۇچۇر->what != k_Vim_Dialog_Button_ئۇچۇر ||
+	    ئۇچۇر->FindInt32("which", &which) != B_OK)
+	أرجع BWindow::MessageReceived(ئۇچۇر);
 
-    fDialogValue = which;
+    f_Dialog_قىممەت = which;
     delete_sem(fDialogSem);
     fDialogSem = -1;
 }
 
-BButton* VimDialog::_CreateButton(int32 which, const char* label)
+BButton* VimDialog::_CreateButton(int32 which, ثابت حرف* label)
 {
-    BMessage *message = new BMessage(kVimDialogButtonMsg);
+    BMessage *message = جديد BMessage(k_Vim_Dialog_Button_ئۇچۇر);
     message->AddInt32("which", which);
 
     BRect rect(0, 0, 0, 0);
     BString name;
     name << "_b" << which << "_";
 
-    BButton* button = new BButton(rect, name.String(), label, message,
-	    B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+    BButton* button = جديد BButton(rect, name.String(), label, message,
+	    B_FOLLOW_ئوڭ | B_FOLLOW_BOTTOM);
 
-    float width = 0.f, height = 0.f;
+    عائم width = 0.f, height = 0.f;
     button->GetPreferredSize(&width, &height);
     button->ResizeTo(width, height);
 
-    return button;
+    أرجع button;
 }
 
 VimDialog::View::View(BRect frame)
     :	BView(frame, "VimDialogView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
-    fIconBitmap(NULL)
+    fIconBitmap(عدم)
 {
     SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
@@ -2317,100 +2317,100 @@ VimDialog::View::~View()
     delete fIconBitmap;
 }
 
-void VimDialog::View::Draw(BRect updateRect)
+فراغ VimDialog::View::Draw(BRect updateRect)
 {
     BRect stripeRect = Bounds();
-    stripeRect.right = kVimDialogIconStripeWidth;
-    SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
+    stripeRect.ئوڭ = kVimDialogIconStripeWidth;
+    Set_يۇقىرى_Color(tint_color(ViewColor(), B_DARKEN_1_TINT));
     FillRect(stripeRect);
 
-    if (fIconBitmap == NULL)
-	return;
+    إذا (fIconBitmap == عدم)
+	أرجع;
 
     SetDrawingMode(B_OP_ALPHA);
     SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
     DrawBitmapAsync(fIconBitmap, BPoint(18, 6));
 }
 
-void VimDialog::View::InitIcon(int32 type)
+فراغ VimDialog::View::InitIcon(int32 type)
 {
-    if (type == VIM_GENERIC)
-	return;
+    إذا (type == VIM_GENERIC)
+	أرجع;
 
     BPath path;
     status_t status = find_directory(B_BEOS_SERVERS_DIRECTORY, &path);
-    if (status != B_OK) {
+    إذا (status != B_OK) {
 	fprintf(stderr, "Cannot retrieve app info:%s\n", strerror(status));
-	return;
+	أرجع;
     }
 
     path.Append("app_server");
 
     BFile file(path.Path(), O_RDONLY);
-    if (file.InitCheck() != B_OK) {
+    إذا (file.InitCheck() != B_OK) {
 	fprintf(stderr, "App file assignment failed:%s\n",
 		strerror(file.InitCheck()));
-	return;
+	أرجع;
     }
 
     BResources resources(&file);
-    if (resources.InitCheck() != B_OK) {
+    إذا (resources.InitCheck() != B_OK) {
 	fprintf(stderr, "App server resources assignment failed:%s\n",
 		strerror(resources.InitCheck()));
-	return;
+	أرجع;
     }
 
-    const char *name = "";
-    switch(type) {
-	case VIM_ERROR:	    name = "stop"; break;
-	case VIM_WARNING:   name = "warn"; break;
-	case VIM_INFO:	    name = "info"; break;
-	case VIM_QUESTION:  name = "idea"; break;
-	default: return;
+    ثابت حرف *name = "";
+    بدل(type) {
+	حالة VIM_ERROR:	    name = "stop"; اكسر;
+	حالة VIM_WARNING:   name = "warn"; اكسر;
+	حالة VIM_INFO:	    name = "info"; اكسر;
+	حالة VIM_QUESTION:  name = "idea"; اكسر;
+	افتراضي: أرجع;
     }
 
     int32 iconSize = 32;
-    fIconBitmap = new BBitmap(BRect(0, 0, iconSize - 1, iconSize - 1), 0, B_RGBA32);
-    if (fIconBitmap == NULL || fIconBitmap->InitCheck() != B_OK) {
+    fIconBitmap = جديد BBitmap(BRect(0, 0, iconSize - 1, iconSize - 1), 0, B_RGBA32);
+    إذا (fIconBitmap == عدم || fIconBitmap->InitCheck() != B_OK) {
 	fprintf(stderr, "Icon bitmap allocation failed:%s\n",
-		(fIconBitmap == NULL) ? "null" : strerror(fIconBitmap->InitCheck()));
-	return;
+		(fIconBitmap == عدم) ? "null" : strerror(fIconBitmap->InitCheck()));
+	أرجع;
     }
 
     size_t size = 0;
-    const uint8* iconData = NULL;
+    ثابت uint8* iconData = عدم;
     //	try vector icon first?
-    iconData = (const uint8*)resources.LoadResource(B_VECTOR_ICON_TYPE, name, &size);
-    if (iconData != NULL && BIconUtils::GetVectorIcon(iconData, size, fIconBitmap) == B_OK)
-	return;
+    iconData = (ثابت uint8*)resources.LoadResource(B_VECTOR_ICON_TYPE, name, &size);
+    إذا (iconData != عدم && BIconUtils::GetVectorIcon(iconData, size, fIconBitmap) == B_OK)
+	أرجع;
 
     //	try bitmap icon now
-    iconData = (const uint8*)resources.LoadResource(B_LARGE_ICON_TYPE, name, &size);
-    if (iconData == NULL) {
+    iconData = (ثابت uint8*)resources.LoadResource(B_LARGE_ICON_TYPE, name, &size);
+    إذا (iconData == عدم) {
 	fprintf(stderr, "Bitmap icon resource not found\n");
 	delete fIconBitmap;
-	fIconBitmap = NULL;
-	return;
+	fIconBitmap = عدم;
+	أرجع;
     }
 
-    if (fIconBitmap->ColorSpace() != B_CMAP8)
+    إذا (fIconBitmap->ColorSpace() != B_CMAP8)
 	BIconUtils::ConvertFromCMAP8(iconData, iconSize, iconSize, iconSize, fIconBitmap);
 }
 
-const unsigned int  kVimDialogOKButtonMsg = 'FDOK';
-const unsigned int  kVimDialogCancelButtonMsg = 'FDCN';
-const unsigned int  kVimDialogSizeInputMsg = 'SICH';
-const unsigned int  kVimDialogFamilySelectMsg = 'MSFM';
-const unsigned int  kVimDialogStyleSelectMsg = 'MSST';
-const unsigned int  kVimDialogSizeSelectMsg = 'MSSZ';
+ثابت unsigned صحيح  k_Vim_Dialog_OKButton_ئۇچۇر = 'FDOK';
+ثابت unsigned صحيح  k_Vim_Dialog_Cancel_Button_ئۇچۇر = 'FDCN';
+ثابت unsigned صحيح  k_Vim_Dialog_Size_كىرگۈزۈش_ئۇچۇر = 'SICH';
+ثابت unsigned صحيح  k_Vim_Dialog_Family_Select_ئۇچۇر = 'MSFM';
+ثابت unsigned صحيح  k_Vim_Dialog_Style_Select_ئۇچۇر = 'MSST';
+ثابت unsigned صحيح  k_Vim_Dialog_Size_Select_ئۇچۇر = 'MSSZ';
 
-VimSelectFontDialog::VimSelectFontDialog(font_family* family, font_style* style, float* size)
+VimSelectFontDialog::VimSelectFontDialog(font_family* family, font_style* style, عائم* size)
 : BWindow(kDefaultRect, "Font Selection", B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
 	B_NOT_CLOSABLE | B_NOT_RESIZABLE |
 	B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_ASYNCHRONOUS_CONTROLS)
     , fStatus(B_NO_INIT)
     , fDialogSem(-1)
-    , fDialogValue(false)
+    , f_Dialog_قىممەت(خطأ)
     , fFamily(family)
     , fStyle(style)
     , fSize(size)
@@ -2419,13 +2419,13 @@ VimSelectFontDialog::VimSelectFontDialog(font_family* family, font_style* style,
     , fFamiliesList(0)
     , fStylesList(0)
     , fSizesList(0)
-    , fSizesInput(0)
+    , f_Sizes_كىرگۈزۈش(0)
 {
     strncpy(fFontFamily, *family, B_FONT_FAMILY_LENGTH);
     strncpy(fFontStyle, *style, B_FONT_STYLE_LENGTH);
 
     //	"client" area view
-    BBox *clientBox = new BBox(Bounds(), B_EMPTY_STRING, B_FOLLOW_ALL_SIDES,
+    BBox *clientBox = جديد BBox(Bounds(), B_EMPTY_STRING, B_FOLLOW_ALL_SIDES,
 		    B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP | B_PULSE_NEEDED,
 		    B_PLAIN_BORDER);
     AddChild(clientBox);
@@ -2433,83 +2433,83 @@ VimSelectFontDialog::VimSelectFontDialog(font_family* family, font_style* style,
     //	client view
     BRect RC = clientBox->Bounds();
     RC.InsetBy(kVimDialogSpacingX, kVimDialogSpacingY);
-    BRect rc(RC.LeftTop(), RC.LeftTop());
+    BRect rc(RC.سول_چوققا(), RC.سول_چوققا());
 
     //	at first create all controls
-    fPreview = new BStringView(rc, "preview", "DejaVu Sans Mono");
+    fPreview = جديد BStringView(rc, "preview", "DejaVu Sans Mono");
     clientBox->AddChild(fPreview);
 
-    BBox* boxDivider = new BBox(rc, B_EMPTY_STRING,
+    BBox* boxDivider = جديد BBox(rc, B_EMPTY_STRING,
 	    B_FOLLOW_NONE, B_WILL_DRAW, B_FANCY_BORDER);
     clientBox->AddChild(boxDivider);
 
-    BStringView *labelFamily = new BStringView(rc, "labelFamily", "Family:");
+    BStringView *labelFamily = جديد BStringView(rc, "labelFamily", "Family:");
     clientBox->AddChild(labelFamily);
     labelFamily->ResizeToPreferred();
 
-    BStringView *labelStyle = new BStringView(rc, "labelStyle", "Style:");
+    BStringView *labelStyle = جديد BStringView(rc, "labelStyle", "Style:");
     clientBox->AddChild(labelStyle);
     labelStyle->ResizeToPreferred();
 
-    BStringView *labelSize = new BStringView(rc, "labelSize", "Size:");
+    BStringView *labelSize = جديد BStringView(rc, "labelSize", "Size:");
     clientBox->AddChild(labelSize);
     labelSize->ResizeToPreferred();
 
-    fFamiliesList = new BListView(rc, "listFamily",
+    fFamiliesList = جديد BListView(rc, "listFamily",
 	    B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
-    BScrollView *scrollFamilies = new BScrollView("scrollFamily",
-	    fFamiliesList, B_FOLLOW_LEFT_RIGHT, 0, false, true);
+    BScrollView *scrollFamilies = جديد BScrollView("scrollFamily",
+	    fFamiliesList, B_FOLLOW_سول_ئوڭ, 0, خطأ, true);
     clientBox->AddChild(scrollFamilies);
 
-    fStylesList= new BListView(rc, "listStyles",
+    fStylesList= جديد BListView(rc, "listStyles",
 	    B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
-    BScrollView *scrollStyles = new BScrollView("scrollStyle",
-	    fStylesList, B_FOLLOW_LEFT_RIGHT, 0, false, true);
+    BScrollView *scrollStyles = جديد BScrollView("scrollStyle",
+	    fStylesList, B_FOLLOW_سول_ئوڭ, 0, خطأ, true);
     clientBox->AddChild(scrollStyles);
 
-    fSizesInput = new BTextControl(rc, "inputSize", NULL, "???",
-	    new BMessage(kVimDialogSizeInputMsg));
-    clientBox->AddChild(fSizesInput);
-    fSizesInput->ResizeToPreferred();
+    f_Sizes_كىرگۈزۈش = جديد BTextControl(rc, "inputSize", عدم, "???",
+	    جديد BMessage(k_Vim_Dialog_Size_كىرگۈزۈش_ئۇچۇر));
+    clientBox->AddChild(f_Sizes_كىرگۈزۈش);
+    f_Sizes_كىرگۈزۈش->ResizeToPreferred();
 
-    fSizesList = new BListView(rc, "listSizes",
+    fSizesList = جديد BListView(rc, "listSizes",
 	    B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
-    BScrollView *scrollSizes = new BScrollView("scrollSize",
-	    fSizesList, B_FOLLOW_LEFT_RIGHT, 0, false, true);
+    BScrollView *scrollSizes = جديد BScrollView("scrollSize",
+	    fSizesList, B_FOLLOW_سول_ئوڭ, 0, خطأ, true);
     clientBox->AddChild(scrollSizes);
 
-    BButton *buttonOK = new BButton(rc, "buttonOK", "OK",
-			new BMessage(kVimDialogOKButtonMsg));
+    BButton *buttonOK = جديد BButton(rc, "buttonOK", "OK",
+			جديد BMessage(k_Vim_Dialog_OKButton_ئۇچۇر));
     clientBox->AddChild(buttonOK);
     buttonOK->ResizeToPreferred();
 
-    BButton *buttonCancel = new BButton(rc, "buttonCancel", "Cancel",
-			new BMessage(kVimDialogCancelButtonMsg));
+    BButton *buttonCancel = جديد BButton(rc, "buttonCancel", "Cancel",
+			جديد BMessage(k_Vim_Dialog_Cancel_Button_ئۇچۇر));
     clientBox->AddChild(buttonCancel);
     buttonCancel->ResizeToPreferred();
 
     //	layout controls
-    float lineHeight = labelFamily->Bounds().Height();
-    float previewHeight = lineHeight * 3;
-    float offsetYLabels = previewHeight + kVimDialogSpacingY;
-    float offsetYLists = offsetYLabels + lineHeight + kVimDialogSpacingY / 2;
-    float offsetYSizes = offsetYLists + fSizesInput->Bounds().Height() + kVimDialogSpacingY / 2;
-    float listsHeight = lineHeight * 9;
-    float offsetYButtons = offsetYLists + listsHeight +  kVimDialogSpacingY;
-    float maxControlsHeight = offsetYButtons + buttonOK->Bounds().Height();
-    float familiesWidth = labelFamily->Bounds().Width() * 5;
-    float offsetXStyles = familiesWidth + kVimDialogSpacingX;
-    float stylesWidth = labelStyle->Bounds().Width() * 4;
-    float offsetXSizes = offsetXStyles + stylesWidth + kVimDialogSpacingX;
-    float sizesWidth = labelSize->Bounds().Width() * 2;
-    float maxControlsWidth = offsetXSizes + sizesWidth;
+    عائم قۇر_Height = labelFamily->Bounds().Height();
+    عائم previewHeight = قۇر_Height * 3;
+    عائم offsetYLabels = previewHeight + kVimDialogSpacingY;
+    عائم offsetYLists = offsetYLabels + قۇر_Height + kVimDialogSpacingY / 2;
+    عائم offsetYSizes = offsetYLists + f_Sizes_كىرگۈزۈش->Bounds().Height() + kVimDialogSpacingY / 2;
+    عائم listsHeight = قۇر_Height * 9;
+    عائم offsetYButtons = offsetYLists + listsHeight +  kVimDialogSpacingY;
+    عائم maxControlsHeight = offsetYButtons + buttonOK->Bounds().Height();
+    عائم familiesWidth = labelFamily->Bounds().Width() * 5;
+    عائم offsetXStyles = familiesWidth + kVimDialogSpacingX;
+    عائم stylesWidth = labelStyle->Bounds().Width() * 4;
+    عائم offsetXSizes = offsetXStyles + stylesWidth + kVimDialogSpacingX;
+    عائم sizesWidth = labelSize->Bounds().Width() * 2;
+    عائم maxControlsWidth = offsetXSizes + sizesWidth;
 
     ResizeTo(maxControlsWidth + kVimDialogSpacingX * 2,
 	maxControlsHeight + kVimDialogSpacingY * 2);
 
     BRect rcVim = gui.vimWindow->Frame();
-    MoveTo(rcVim.left + (rcVim.Width() - Frame().Width()) / 2,
-	    rcVim.top + (rcVim.Height() - Frame().Height()) / 2);
+    MoveTo(rcVim.سول + (rcVim.Width() - Frame().Width()) / 2,
+	    rcVim.چوققا + (rcVim.Height() - Frame().Height()) / 2);
 
     fPreview->ResizeTo(maxControlsWidth, previewHeight);
     fPreview->SetAlignment(B_ALIGN_CENTER);
@@ -2522,19 +2522,19 @@ VimSelectFontDialog::VimSelectFontDialog(font_family* family, font_style* style,
     labelSize->MoveBy(offsetXSizes, offsetYLabels);
 
     //	text control alignment issues
-    float insetX = fSizesInput->TextView()->Bounds().Width() - fSizesInput->Bounds().Width();
-    float insetY = fSizesInput->TextView()->Bounds().Width() - fSizesInput->Bounds().Width();
+    عائم insetX = f_Sizes_كىرگۈزۈش->TextView()->Bounds().Width() - f_Sizes_كىرگۈزۈش->Bounds().Width();
+    عائم insetY = f_Sizes_كىرگۈزۈش->TextView()->Bounds().Width() - f_Sizes_كىرگۈزۈش->Bounds().Width();
 
     scrollFamilies->MoveBy(0.f, offsetYLists);
     scrollStyles->MoveBy(offsetXStyles, offsetYLists);
-    fSizesInput->MoveBy(offsetXSizes + insetX / 2, offsetYLists + insetY / 2);
+    f_Sizes_كىرگۈزۈش->MoveBy(offsetXSizes + insetX / 2, offsetYLists + insetY / 2);
     scrollSizes->MoveBy(offsetXSizes, offsetYSizes);
 
-    fSizesInput->SetAlignment(B_ALIGN_CENTER, B_ALIGN_CENTER);
+    f_Sizes_كىرگۈزۈش->SetAlignment(B_ALIGN_CENTER, B_ALIGN_CENTER);
 
     scrollFamilies->ResizeTo(familiesWidth, listsHeight);
     scrollStyles->ResizeTo(stylesWidth, listsHeight);
-    fSizesInput->ResizeTo(sizesWidth, fSizesInput->Bounds().Height());
+    f_Sizes_كىرگۈزۈش->ResizeTo(sizesWidth, f_Sizes_كىرگۈزۈش->Bounds().Height());
     scrollSizes->ResizeTo(sizesWidth,
 	    listsHeight - (offsetYSizes - offsetYLists));
 
@@ -2543,18 +2543,18 @@ VimSelectFontDialog::VimSelectFontDialog(font_family* family, font_style* style,
 	    - buttonCancel->Bounds().Width() - kVimDialogSpacingX, offsetYButtons);
 
     //	fill lists
-    int selIndex = -1;
-    int count = count_font_families();
-    for (int i = 0; i < count; i++) {
+    صحيح selIndex = -1;
+    صحيح سانى = سانى_font_families();
+    لكل (صحيح i = 0; i < سانى; i++) {
 	font_family family;
-	if (get_font_family(i, &family ) == B_OK) {
-	    fFamiliesList->AddItem(new BStringItem((const char*)family));
-	    if (strncmp(family, fFontFamily, B_FONT_FAMILY_LENGTH) == 0)
+	إذا (get_font_family(i, &family ) == B_OK) {
+	    fFamiliesList->AddItem(جديد BStringItem((ثابت حرف*)family));
+	    إذا (strncmp(family, fFontFamily, B_FONT_FAMILY_LENGTH) == 0)
 		selIndex = i;
 	}
     }
 
-    if (selIndex >= 0) {
+    إذا (selIndex >= 0) {
 	fFamiliesList->Select(selIndex);
 	fFamiliesList->ScrollToSelection();
     }
@@ -2562,26 +2562,26 @@ VimSelectFontDialog::VimSelectFontDialog(font_family* family, font_style* style,
     _UpdateFontStyles();
 
     selIndex = -1;
-    for (int size = 8, index = 0; size <= 18; size++, index++) {
+    لكل (صحيح size = 8, index = 0; size <= 18; size++, index++) {
 	BString str;
 	str << size;
-	fSizesList->AddItem(new BStringItem(str));
-	if (size == fFontSize)
+	fSizesList->AddItem(جديد BStringItem(str));
+	إذا (size == fFontSize)
 	    selIndex = index;
 
     }
 
-    if (selIndex >= 0) {
+    إذا (selIndex >= 0) {
 	fSizesList->Select(selIndex);
 	fSizesList->ScrollToSelection();
     }
 
-    fFamiliesList->SetSelectionMessage(new BMessage(kVimDialogFamilySelectMsg));
-    fStylesList->SetSelectionMessage(new BMessage(kVimDialogStyleSelectMsg));
-    fSizesList->SetSelectionMessage(new BMessage(kVimDialogSizeSelectMsg));
-    fSizesInput->SetModificationMessage(new BMessage(kVimDialogSizeInputMsg));
+    fFamiliesList->SetSelectionMessage(جديد BMessage(k_Vim_Dialog_Family_Select_ئۇچۇر));
+    fStylesList->SetSelectionMessage(جديد BMessage(k_Vim_Dialog_Style_Select_ئۇچۇر));
+    fSizesList->SetSelectionMessage(جديد BMessage(k_Vim_Dialog_Size_Select_ئۇچۇر));
+    f_Sizes_كىرگۈزۈش->SetModificationMessage(جديد BMessage(k_Vim_Dialog_Size_كىرگۈزۈش_ئۇچۇر));
 
-    _UpdateSizeInputPreview();
+    Update_Size_كىرگۈزۈش_Preview();
     _UpdateFontPreview();
 
     fStatus = B_OK;
@@ -2593,77 +2593,77 @@ VimSelectFontDialog::~VimSelectFontDialog()
     _CleanList(fStylesList);
     _CleanList(fSizesList);
 
-    if (fDialogSem > B_OK)
+    إذا (fDialogSem > B_OK)
 	delete_sem(fDialogSem);
 }
 
-    void
+    فراغ
 VimSelectFontDialog::_CleanList(BListView* list)
 {
-    while (0 < list->CountItems())
+    طالما (0 < list->سانى_بۇيۇملار())
 	delete (dynamic_cast<BStringItem*>(list->RemoveItem((int32)0)));
 }
 
-    bool
+    منطقي
 VimSelectFontDialog::Go()
 {
-    if (fStatus != B_OK) {
+    إذا (fStatus != B_OK) {
 	Quit();
-	return NOFONT;
+	أرجع NOFONT;
     }
 
     fDialogSem = create_sem(0, "VimFontSelectDialogSem");
-    if (fDialogSem < B_OK) {
+    إذا (fDialogSem < B_OK) {
 	Quit();
-	return fDialogValue;
+	أرجع f_Dialog_قىممەت;
     }
 
     Show();
 
-    while (acquire_sem(fDialogSem) == B_INTERRUPTED);
+    طالما (acquire_sem(fDialogSem) == B_INTERRUPTED);
 
-    bool retValue = fDialogValue;
+    منطقي ret_قىممەت = f_Dialog_قىممەت;
 
-    if (Lock())
+    إذا (Lock())
 	Quit();
 
-    return retValue;
+    أرجع ret_قىممەت;
 }
 
 
-void VimSelectFontDialog::_UpdateFontStyles()
+فراغ VimSelectFontDialog::_UpdateFontStyles()
 {
     _CleanList(fStylesList);
 
     int32 selIndex = -1;
-    int32 count = count_font_styles(fFontFamily);
-    for (int32 i = 0; i < count; i++) {
+    int32 سانى = سانى_font_styles(fFontFamily);
+    لكل (int32 i = 0; i < سانى; i++) {
 	font_style style;
 	uint32 flags = 0;
-	if (get_font_style(fFontFamily, i, &style, &flags) == B_OK) {
-	    fStylesList->AddItem(new BStringItem((const char*)style));
-	    if (strncmp(style, fFontStyle, B_FONT_STYLE_LENGTH) == 0)
+	إذا (get_font_style(fFontFamily, i, &style, &flags) == B_OK) {
+	    fStylesList->AddItem(جديد BStringItem((ثابت حرف*)style));
+	    إذا (strncmp(style, fFontStyle, B_FONT_STYLE_LENGTH) == 0)
 		selIndex = i;
 	}
     }
 
-    if (selIndex >= 0) {
+    إذا (selIndex >= 0) {
 	fStylesList->Select(selIndex);
 	fStylesList->ScrollToSelection();
-    } else
+    } وإلا
 	fStylesList->Select(0);
 }
 
 
-void VimSelectFontDialog::_UpdateSizeInputPreview()
+فراغ VimSelectFontDialog::Update_Size_كىرگۈزۈش_Preview()
 {
-    char buf[10] = {0};
-    vim_snprintf(buf, sizeof(buf), (char*)"%.0f", fFontSize);
-    fSizesInput->SetText(buf);
+    حرف buf[10] = {0};
+    vim_snprintf(buf, حجم(buf), (حرف*)"%.0f", fFontSize);
+    f_Sizes_كىرگۈزۈش->SetText(buf);
 }
 
 
-void VimSelectFontDialog::_UpdateFontPreview()
+فراغ VimSelectFontDialog::_UpdateFontPreview()
 {
     BFont font;
     fPreview->GetFont(&font);
@@ -2672,86 +2672,86 @@ void VimSelectFontDialog::_UpdateFontPreview()
     fPreview->SetFont(&font, B_FONT_FAMILY_AND_STYLE | B_FONT_SIZE);
 
     BString str;
-    str << fFontFamily << " " << fFontStyle << ", " << (int)fFontSize << " pt.";
+    str << fFontFamily << " " << fFontStyle << ", " << (صحيح)fFontSize << " pt.";
     fPreview->SetText(str);
 }
 
 
-    bool
-VimSelectFontDialog::_UpdateFromListItem(BListView* list, char* text, int textSize)
+    منطقي
+VimSelectFontDialog::_UpdateFromListItem(BListView* list, حرف* text, صحيح textSize)
 {
     int32 index = list->CurrentSelection();
-    if (index < 0)
-	return false;
+    إذا (index < 0)
+	أرجع خطأ;
     BStringItem* item = (BStringItem*)list->ItemAt(index);
-    if (item == NULL)
-	return false;
+    إذا (item == عدم)
+	أرجع خطأ;
     strncpy(text, item->Text(), textSize);
-    return true;
+    أرجع true;
 }
 
 
-void VimSelectFontDialog::MessageReceived(BMessage *msg)
+فراغ VimSelectFontDialog::MessageReceived(BMessage *ئۇچۇر)
 {
-    switch (msg->what) {
-	case kVimDialogOKButtonMsg:
+    بدل (ئۇچۇر->what) {
+	حالة k_Vim_Dialog_OKButton_ئۇچۇر:
 	    strncpy(*fFamily, fFontFamily, B_FONT_FAMILY_LENGTH);
 	    strncpy(*fStyle, fFontStyle, B_FONT_STYLE_LENGTH);
 	    *fSize = fFontSize;
-	    fDialogValue = true;
-	case kVimDialogCancelButtonMsg:
+	    f_Dialog_قىممەت = true;
+	حالة k_Vim_Dialog_Cancel_Button_ئۇچۇر:
 	    delete_sem(fDialogSem);
 	    fDialogSem = -1;
-	    return;
-	case B_KEY_UP:
+	    أرجع;
+	حالة B_ئاچقۇچ_UP:
 	    {
-		int32 key = 0;
-		if (msg->FindInt32("raw_char", &key) == B_OK
-			&& key == B_ESCAPE) {
+		int32 ئاچقۇچ = 0;
+		إذا (ئۇچۇر->FindInt32("raw_char", &ئاچقۇچ) == B_OK
+			&& ئاچقۇچ == B_ESCAPE) {
 		    delete_sem(fDialogSem);
 		    fDialogSem = -1;
 		}
 	    }
-	    break;
+	    اكسر;
 
-	case kVimDialogFamilySelectMsg:
-	    if (_UpdateFromListItem(fFamiliesList,
+	حالة k_Vim_Dialog_Family_Select_ئۇچۇر:
+	    إذا (_UpdateFromListItem(fFamiliesList,
 		    fFontFamily, B_FONT_FAMILY_LENGTH)) {
 		_UpdateFontStyles();
 		_UpdateFontPreview();
 	    }
-	    break;
-	case kVimDialogStyleSelectMsg:
-	    if (_UpdateFromListItem(fStylesList,
+	    اكسر;
+	حالة k_Vim_Dialog_Style_Select_ئۇچۇر:
+	    إذا (_UpdateFromListItem(fStylesList,
 		    fFontStyle, B_FONT_STYLE_LENGTH))
 		_UpdateFontPreview();
-	    break;
-	case kVimDialogSizeSelectMsg:
+	    اكسر;
+	حالة k_Vim_Dialog_Size_Select_ئۇچۇر:
 	    {
-		char buf[10] = {0};
-		if (_UpdateFromListItem(fSizesList, buf, sizeof(buf))) {
-		    float size = atof(buf);
-		    if (size > 0.f) {
+		حرف buf[10] = {0};
+		إذا (_UpdateFromListItem(fSizesList, buf, حجم(buf))) {
+		    عائم size = atof(buf);
+		    إذا (size > 0.f) {
 			fFontSize = size;
-			_UpdateSizeInputPreview();
+			Update_Size_كىرگۈزۈش_Preview();
 			_UpdateFontPreview();
 		    }
 		}
 	    }
-	    break;
-	case kVimDialogSizeInputMsg:
+	    اكسر;
+	حالة k_Vim_Dialog_Size_كىرگۈزۈش_ئۇچۇر:
 	    {
-		float size = atof(fSizesInput->Text());
-		if (size > 0.f) {
+		عائم size = atof(f_Sizes_كىرگۈزۈش->Text());
+		إذا (size > 0.f) {
 		    fFontSize = size;
 		    _UpdateFontPreview();
 		}
 	    }
-	    break;
-	default:
-	    break;
+	    اكسر;
+	افتراضي:
+	    اكسر;
     }
-    return BWindow::MessageReceived(msg);
+    أرجع BWindow::MessageReceived(ئۇچۇر);
 }
 
 #endif // FEAT_GUI_DIALOG
@@ -2759,27 +2759,27 @@ void VimSelectFontDialog::MessageReceived(BMessage *msg)
 #ifdef FEAT_TOOLBAR
 
 //  some forward declaration required by toolbar functions...
-static BMessage * MenuMessage(vimmenu_T *menu);
+ساكن BMessage * MenuMessage(vimmenu_T *menu);
 
-VimToolbar::VimToolbar(BRect frame, const char *name) :
-    BBox(frame, name, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER)
+VimToolbar::VimToolbar(BRect frame, ثابت حرف *name) :
+    BBox(frame, name, B_FOLLOW_سول | B_FOLLOW_چوققا, B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER)
 {
 }
 
 VimToolbar::~VimToolbar()
 {
-    int32 count = fButtonsList.CountItems();
-    for (int32 i = 0; i < count; i++)
+    int32 سانى = fButtonsList.سانى_بۇيۇملار();
+    لكل (int32 i = 0; i < سانى; i++)
 	delete (BPictureButton*)fButtonsList.ItemAt(i);
     fButtonsList.MakeEmpty();
 
     delete normalButtonsBitmap;
     delete grayedButtonsBitmap;
-    normalButtonsBitmap    = NULL;
-    grayedButtonsBitmap  = NULL;
+    normalButtonsBitmap    = عدم;
+    grayedButtonsBitmap  = عدم;
 }
 
-    void
+    فراغ
 VimToolbar::AttachedToWindow()
 {
     BBox::AttachedToWindow();
@@ -2787,84 +2787,84 @@ VimToolbar::AttachedToWindow()
     SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 
-    float
-VimToolbar::ToolbarHeight() const
+    عائم
+VimToolbar::ToolbarHeight() ثابت
 {
-    float size = NULL == normalButtonsBitmap ? 18. : normalButtonsBitmap->Bounds().Height();
-    return size + ToolbarMargin * 2 + ButtonMargin * 2 + 1;
+    عائم size = عدم == normalButtonsBitmap ? 18. : normalButtonsBitmap->Bounds().Height();
+    أرجع size + ToolbarMargin * 2 + ButtonMargin * 2 + 1;
 }
 
-    bool
+    منطقي
 VimToolbar::ModifyBitmapToGrayed(BBitmap *bitmap)
 {
-    float height = bitmap->Bounds().Height();
-    float width  = bitmap->Bounds().Width();
+    عائم height = bitmap->Bounds().Height();
+    عائم width  = bitmap->Bounds().Width();
 
     rgb_color *bits = (rgb_color*)bitmap->Bits();
     int32 pixels = bitmap->BitsLength() / 4;
-    for (int32 i = 0; i < pixels; i++) {
+    لكل (int32 i = 0; i < pixels; i++) {
 	bits[i].red = bits[i].green =
 	bits[i].blue = ((uint32)bits[i].red + bits[i].green + bits[i].blue) / 3;
 	bits[i].alpha /= 4;
     }
 
-    return true;
+    أرجع true;
 }
 
-    bool
+    منطقي
 VimToolbar::PrepareButtonBitmaps()
 {
     //	first try to load potentially customized $VIRUNTIME/bitmaps/builtin-tools.png
     normalButtonsBitmap = LoadVimBitmap("builtin-tools.png");
-    if (normalButtonsBitmap == NULL)
+    إذا (normalButtonsBitmap == عدم)
 	//  customized not found? dig application resources for "builtin-tools" one
 	normalButtonsBitmap = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "builtin-tools");
 
-    if (normalButtonsBitmap == NULL)
-	return false;
+    إذا (normalButtonsBitmap == عدم)
+	أرجع خطأ;
 
     BMessage archive;
     normalButtonsBitmap->Archive(&archive);
 
-    grayedButtonsBitmap = new BBitmap(&archive);
-    if (grayedButtonsBitmap == NULL)
-	return false;
+    grayedButtonsBitmap = جديد BBitmap(&archive);
+    إذا (grayedButtonsBitmap == عدم)
+	أرجع خطأ;
 
     //	modify grayed bitmap
     ModifyBitmapToGrayed(grayedButtonsBitmap);
 
-    return true;
+    أرجع true;
 }
 
-BBitmap *VimToolbar::LoadVimBitmap(const char* fileName)
+BBitmap *VimToolbar::LoadVimBitmap(ثابت حرف* fileName)
 {
-    BBitmap *bitmap = NULL;
+    BBitmap *bitmap = عدم;
 
-    int mustfree = 0;
+    صحيح mustfree = 0;
     char_u* runtimePath = vim_getenv((char_u*)"VIMRUNTIME", &mustfree);
-    if (runtimePath != NULL && fileName != NULL) {
-	BString strPath((char*)runtimePath);
+    إذا (runtimePath != عدم && fileName != عدم) {
+	BString strPath((حرف*)runtimePath);
 	strPath << "/bitmaps/" << fileName;
 	bitmap = BTranslationUtils::GetBitmap(strPath.String());
     }
 
-    if (mustfree)
+    إذا (mustfree)
 	vim_free(runtimePath);
 
-    return bitmap;
+    أرجع bitmap;
 }
 
-    bool
-VimToolbar::GetPictureFromBitmap(BPicture *pictureTo, int32 index, BBitmap *bitmapFrom, bool pressed)
+    منطقي
+VimToolbar::GetPictureFromBitmap(BPicture *pictureTo, int32 index, BBitmap *bitmapFrom, منطقي pressed)
 {
-    float size = bitmapFrom->Bounds().Height() + 1.;
+    عائم size = bitmapFrom->Bounds().Height() + 1.;
 
     BView view(BRect(0, 0, size, size), "", 0, 0);
 
     AddChild(&view);
     view.BeginPicture(pictureTo);
 
-    view.SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+    view.Set_يۇقىرى_Color(ui_color(B_PANEL_BACKGROUND_COLOR));
     view.FillRect(view.Bounds());
     view.SetDrawingMode(B_OP_OVER);
 
@@ -2876,65 +2876,65 @@ VimToolbar::GetPictureFromBitmap(BPicture *pictureTo, int32 index, BBitmap *bitm
 
     view.DrawBitmap(bitmapFrom, source, destination);
 
-    if (pressed)	{
+    إذا (pressed)	{
 	rgb_color shineColor  = ui_color(B_SHINE_COLOR);
 	rgb_color shadowColor = ui_color(B_SHADOW_COLOR);
 	size += ButtonMargin * 2 - 1;
-	view.BeginLineArray(4);
-	view.AddLine(BPoint(0, 0),	 BPoint(size, 0),    shadowColor);
-	view.AddLine(BPoint(size, 0),	 BPoint(size, size), shineColor);
-	view.AddLine(BPoint(size, size), BPoint(0, size),    shineColor);
-	view.AddLine(BPoint(0, size),	 BPoint(0, 0),	     shadowColor);
-	view.EndLineArray();
+	view.Begin_قۇر_Array(4);
+	view.Add_قۇر(BPoint(0, 0),	 BPoint(size, 0),    shadowColor);
+	view.Add_قۇر(BPoint(size, 0),	 BPoint(size, size), shineColor);
+	view.Add_قۇر(BPoint(size, size), BPoint(0, size),    shineColor);
+	view.Add_قۇر(BPoint(0, size),	 BPoint(0, 0),	     shadowColor);
+	view.End_قۇر_Array();
     }
 
     view.EndPicture();
     RemoveChild(&view);
 
-    return true;
+    أرجع true;
 }
 
-    bool
+    منطقي
 VimToolbar::AddButton(int32 index, vimmenu_T *menu)
 {
-    BPictureButton *button = NULL;
-    if (!menu_is_separator(menu->name)) {
-	float size = normalButtonsBitmap ?
+    BPictureButton *button = عدم;
+    إذا (!menu_is_separator(menu->name)) {
+	عائم size = normalButtonsBitmap ?
 	    normalButtonsBitmap->Bounds().Height() + 1. + ButtonMargin * 2 : 18.;
 	BRect frame(0, 0, size, size);
 	BPicture pictureOn;
 	BPicture pictureOff;
 	BPicture pictureGray;
 
-	if (menu->iconfile == NULL && menu->iconidx >= 0 && normalButtonsBitmap) {
+	إذا (menu->iconfile == عدم && menu->iconidx >= 0 && normalButtonsBitmap) {
 	    GetPictureFromBitmap(&pictureOn,  menu->iconidx, normalButtonsBitmap, true);
-	    GetPictureFromBitmap(&pictureOff, menu->iconidx, normalButtonsBitmap, false);
-	    GetPictureFromBitmap(&pictureGray, menu->iconidx, grayedButtonsBitmap, false);
-	} else {
+	    GetPictureFromBitmap(&pictureOff, menu->iconidx, normalButtonsBitmap, خطأ);
+	    GetPictureFromBitmap(&pictureGray, menu->iconidx, grayedButtonsBitmap, خطأ);
+	} وإلا {
 
 	    char_u buffer[MAXPATHL] = {0};
-	    BBitmap *bitmap = NULL;
+	    BBitmap *bitmap = عدم;
 
-	    if (menu->iconfile) {
-		gui_find_iconfile(menu->iconfile, buffer, (char*)"png");
-		bitmap = BTranslationUtils::GetBitmap((char*)buffer);
+	    إذا (menu->iconfile) {
+		gui_find_iconfile(menu->iconfile, buffer, (حرف*)"png");
+		bitmap = BTranslationUtils::GetBitmap((حرف*)buffer);
 	    }
 
-	    if (bitmap == NULL && gui_find_bitmap(menu->name, buffer, (char*)"png") == OK)
-		bitmap = BTranslationUtils::GetBitmap((char*)buffer);
+	    إذا (bitmap == عدم && gui_find_bitmap(menu->name, buffer, (حرف*)"png") == OK)
+		bitmap = BTranslationUtils::GetBitmap((حرف*)buffer);
 
-	    if (bitmap == NULL)
-		bitmap = new BBitmap(BRect(0, 0, size, size), B_RGB32);
+	    إذا (bitmap == عدم)
+		bitmap = جديد BBitmap(BRect(0, 0, size, size), B_RGB32);
 
 	    GetPictureFromBitmap(&pictureOn,   0, bitmap, true);
-	    GetPictureFromBitmap(&pictureOff,  0, bitmap, false);
+	    GetPictureFromBitmap(&pictureOff,  0, bitmap, خطأ);
 	    ModifyBitmapToGrayed(bitmap);
-	    GetPictureFromBitmap(&pictureGray, 0, bitmap, false);
+	    GetPictureFromBitmap(&pictureGray, 0, bitmap, خطأ);
 
 	    delete bitmap;
 	}
 
-	button = new BPictureButton(frame, (char*)menu->name,
+	button = جديد BPictureButton(frame, (حرف*)menu->name,
 		    &pictureOff, &pictureOn, MenuMessage(menu));
 
 	button->SetDisabledOn(&pictureGray);
@@ -2947,69 +2947,69 @@ VimToolbar::AddButton(int32 index, vimmenu_T *menu)
 	menu->button = button;
     }
 
-    bool result = fButtonsList.AddItem(button, index);
+    منطقي result = fButtonsList.AddItem(button, index);
     InvalidateLayout();
-    return result;
+    أرجع result;
 }
 
-    bool
+    منطقي
 VimToolbar::RemoveButton(vimmenu_T *menu)
 {
-    if (menu->button) {
-	if (fButtonsList.RemoveItem(menu->button)) {
+    إذا (menu->button) {
+	إذا (fButtonsList.RemoveItem(menu->button)) {
 	    delete menu->button;
-	    menu->button = NULL;
+	    menu->button = عدم;
 	}
     }
-    return true;
+    أرجع true;
 }
 
-    bool
-VimToolbar::GrayButton(vimmenu_T *menu, int grey)
+    منطقي
+VimToolbar::GrayButton(vimmenu_T *menu, صحيح grey)
 {
-    if (menu->button) {
+    إذا (menu->button) {
 	int32 index = fButtonsList.IndexOf(menu->button);
-	if (index >= 0)
-	    menu->button->SetEnabled(grey ? false : true);
+	إذا (index >= 0)
+	    menu->button->SetEnabled(grey ? خطأ : true);
     }
-    return true;
+    أرجع true;
 }
 
-    void
+    فراغ
 VimToolbar::InvalidateLayout()
 {
     int32 offset = ToolbarMargin;
-    int32 count = fButtonsList.CountItems();
-    for (int32 i = 0; i < count; i++) {
+    int32 سانى = fButtonsList.سانى_بۇيۇملار();
+    لكل (int32 i = 0; i < سانى; i++) {
 	BPictureButton *button = (BPictureButton *)fButtonsList.ItemAt(i);
-	if (button) {
+	إذا (button) {
 	    button->MoveTo(offset, ToolbarMargin);
 	    offset += button->Bounds().Width() + ToolbarMargin;
-	} else
+	} وإلا
 	    offset += ToolbarMargin * 3;
     }
 }
 
 #endif /*FEAT_TOOLBAR*/
 
-#if defined(FEAT_GUI_TABLINE)
+#إذا defined(FEAT_GUI_TABLINE)
 
-    float
-VimTabLine::TablineHeight() const
+    عائم
+Vim_Tab_قۇر::TablineHeight() ثابت
 {
 //  float size = NULL == normalButtonsBitmap ? 18. : normalButtonsBitmap->Bounds().Height();
 //  return size + ToolbarMargin * 2 + ButtonMargin * 2 + 1;
-    return TabHeight(); //  + ToolbarMargin;
+    أرجع TabHeight(); //  + ToolbarMargin;
 }
 
-void
-VimTabLine::MouseDown(BPoint point)
+فراغ
+Vim_Tab_قۇر::MouseDown(BPoint point)
 {
-    if (!gui_mch_showing_tabline())
-	return;
+    إذا (!gui_mch_showing_tabline())
+	أرجع;
 
     BMessage *m = Window()->CurrentMessage();
-    assert(m);
+    أكد(m);
 
     int32 buttons = 0;
     m->FindInt32("buttons", &buttons);
@@ -3017,73 +3017,73 @@ VimTabLine::MouseDown(BPoint point)
     int32 clicks = 0;
     m->FindInt32("clicks", &clicks);
 
-    int index = 0; //  0 means here - no tab found
-    for (int i = 0; i < CountTabs(); i++) {
-	if (TabFrame(i).Contains(point)) {
+    صحيح index = 0; //  0 means here - no tab found
+    لكل (صحيح i = 0; i < سانى_Tabs(); i++) {
+	إذا (TabFrame(i).Contains(point)) {
 	    index = i + 1; //  indexes are 1-based
-	    break;
+	    اكسر;
 	}
     }
 
-    int event = -1;
+    صحيح event = -1;
 
-    if ((buttons & B_PRIMARY_MOUSE_BUTTON) && clicks > 1)
+    إذا ((buttons & B_PRIMARY_MOUSE_BUTTON) && clicks > 1)
 	//  left button double click on - create new tab
 	event = TABLINE_MENU_NEW;
 
-    else if (buttons & B_TERTIARY_MOUSE_BUTTON)
+    وإلا إذا (buttons & B_TERTIARY_MOUSE_BUTTON)
 	//  middle button click - close the pointed tab
 	//  or create new one in case empty space
 	event = index > 0 ? TABLINE_MENU_CLOSE : TABLINE_MENU_NEW;
 
-    else if (buttons & B_SECONDARY_MOUSE_BUTTON) {
+    وإلا إذا (buttons & B_SECONDARY_MOUSE_BUTTON) {
 	//  right button click - show context menu
-	BPopUpMenu* popUpMenu = new BPopUpMenu("tabLineContextMenu", false, false);
-	popUpMenu->AddItem(new BMenuItem(_("Close tabi R"), new BMessage(TABLINE_MENU_CLOSE)));
-	popUpMenu->AddItem(new BMenuItem(_("New tab    T"), new BMessage(TABLINE_MENU_NEW)));
-	popUpMenu->AddItem(new BMenuItem(_("Open tab..."), new BMessage(TABLINE_MENU_OPEN)));
+	BPopUpMenu* چىقىرىش_Up_Menu = جديد BPopUpMenu("tabLineContextMenu", خطأ, خطأ);
+	چىقىرىش_Up_Menu->AddItem(جديد BMenuItem(_("Close tabi R"), جديد BMessage(TABLINE_MENU_CLOSE)));
+	چىقىرىش_Up_Menu->AddItem(جديد BMenuItem(_("New tab    T"), جديد BMessage(TABLINE_MENU_NEW)));
+	چىقىرىش_Up_Menu->AddItem(جديد BMenuItem(_("Open tab..."), جديد BMessage(TABLINE_MENU_OPEN)));
 
 	ConvertToScreen(&point);
-	BMenuItem* item = popUpMenu->Go(point);
-	if (item != NULL) {
+	BMenuItem* item = چىقىرىش_Up_Menu->Go(point);
+	إذا (item != عدم) {
 	    event = item->Command();
 	}
 
-	delete popUpMenu;
+	delete چىقىرىش_Up_Menu;
 
-    } else {
+    } وإلا {
 	//  default processing
 	BTabView::MouseDown(point);
-	return;
+	أرجع;
     }
 
-    if (event < 0)
-	return;
+    إذا (event < 0)
+	أرجع;
 
-    VimTablineMenuMsg tmm;
+    Vim_Tabline_Menu_ئۇچۇر tmm;
     tmm.index = index;
     tmm.event = event;
-    write_port(gui.vdcmp, VimMsg::TablineMenu, &tmm, sizeof(tmm));
+    write_port(gui.vdcmp, Vim_ئۇچۇر::TablineMenu, &tmm, حجم(tmm));
 }
 
-void
-VimTabLine::VimTab::Select(BView* owner)
+فراغ
+Vim_Tab_قۇر::VimTab::Select(BView* owner)
 {
     BTab::Select(owner);
 
-    VimTabLine *tabLine = gui.vimForm->TabLine();
-    if (tabLine != NULL) {
+    Vim_Tab_قۇر *tab_قۇر = gui.vimForm->Tab_قۇر();
+    إذا (tab_قۇر != عدم) {
 
 	int32 i = 0;
-	for (; i < tabLine->CountTabs(); i++)
-	    if (this == tabLine->TabAt(i))
-		break;
+	لكل (; i < tab_قۇر->سانى_Tabs(); i++)
+	    إذا (هذا == tab_قۇر->TabAt(i))
+		اكسر;
 
 //	printf("%d:%d:%s\n", i, tabLine->CountTabs(), tabLine->TabAt(i)->Label());
-	if (i < tabLine->CountTabs()) {
-	    VimTablineMsg tm;
+	إذا (i < tab_قۇر->سانى_Tabs()) {
+	    Vim_Tabline_ئۇچۇر tm;
 	    tm.index = i + 1;
-	    write_port(gui.vdcmp, VimMsg::Tabline, &tm, sizeof(tm));
+	    write_port(gui.vdcmp, Vim_ئۇچۇر::Tabline, &tm, حجم(tm));
 	}
     }
 }
@@ -3093,61 +3093,61 @@ VimTabLine::VimTab::Select(BView* owner)
 // ---------------- ----------------
 
 //  some global variables
-static char appsig[] = "application/x-vnd.Haiku-Vim-8";
-key_map *keyMap;
-char *keyMapChars;
-int main_exitcode = 127;
+ساكن حرف appsig[] = "application/x-vnd.Haiku-Vim-8";
+ئاچقۇچ_map *ئاچقۇچ_Map;
+حرف *ئاچقۇچ_Map_Chars;
+صحيح main_exitcode = 127;
 
     status_t
 gui_haiku_process_event(bigtime_t timeout)
 {
-    struct VimMsg vm;
+    بنية Vim_ئۇچۇر vm;
     int32 what;
     ssize_t size;
 
-    size = read_port_etc(gui.vdcmp, &what, &vm, sizeof(vm),
+    size = read_port_etc(gui.vdcmp, &what, &vm, حجم(vm),
 	    B_TIMEOUT, timeout);
 
-    if (size >= 0) {
-	switch (what) {
-	    case VimMsg::Key:
+    إذا (size >= 0) {
+	بدل (what) {
+	    حالة Vim_ئۇچۇر::ئاچقۇچ_2:
 		{
-		    char_u *string = vm.u.Key.chars;
-		    int len = vm.u.Key.length;
-		    if (len == 1 && string[0] == Ctrl_chr('C')) {
-			trash_input_buf();
+		    char_u *string = vm.u.ئاچقۇچ_2.chars;
+		    صحيح len = vm.u.ئاچقۇچ_2.length;
+		    إذا (len == 1 && string[0] == Ctrl_chr('C')) {
+			trash_كىرگۈزۈش_buf();
 			got_int = TRUE;
 		    }
 
-		    if (vm.u.Key.csi_escape)
+		    إذا (vm.u.ئاچقۇچ_2.csi_escape)
 #ifndef FEAT_MBYTE_IME
 		    {
-			int	i;
+			صحيح	i;
 			char_u	buf[2];
 
-			for (i = 0; i < len; ++i)
+			لكل (i = 0; i < len; ++i)
 			{
-			    add_to_input_buf(string + i, 1);
-			    if (string[i] == CSI)
+			    add_to_كىرگۈزۈش_buf(string + i, 1);
+			    إذا (string[i] == CSI)
 			    {
 				// Turn CSI into K_CSI.
 				buf[0] = KS_EXTRA;
-				buf[1] = (int)KE_CSI;
-				add_to_input_buf(buf, 2);
+				buf[1] = (صحيح)KE_CSI;
+				add_to_كىرگۈزۈش_buf(buf, 2);
 			    }
 			}
 		    }
-#else
-			add_to_input_buf_csi(string, len);
+#وإلا
+			add_to_كىرگۈزۈش_buf_csi(string, len);
 #endif
-		    else
-			add_to_input_buf(string, len);
+		    وإلا
+			add_to_كىرگۈزۈش_buf(string, len);
 		}
-		break;
-	    case VimMsg::Resize:
+		اكسر;
+	    حالة Vim_ئۇچۇر::Resize:
 		gui_resize_shell(vm.u.NewSize.width, vm.u.NewSize.height);
-		break;
-	    case VimMsg::ScrollBar:
+		اكسر;
+	    حالة Vim_ئۇچۇر::ScrollBar:
 		{
 		    /*
 		     * If loads of scroll messages queue up, use only the last
@@ -3155,66 +3155,66 @@ gui_haiku_process_event(bigtime_t timeout)
 		     * This is not perfect yet anyway: these events are queued
 		     * yet again, this time in the keyboard input buffer.
 		     */
-		    int32 oldCount =
-			atomic_add(&vm.u.Scroll.sb->scrollEventCount, -1);
-		    if (oldCount <= 1 || !vm.u.Scroll.stillDragging)
+		    int32 old_سانى =
+			atomic_add(&vm.u.Scroll.sb->scroll_Event_سانى, -1);
+		    إذا (old_سانى <= 1 || !vm.u.Scroll.stillDragging)
 			gui_drag_scrollbar(vm.u.Scroll.sb->getGsb(),
-				vm.u.Scroll.value, vm.u.Scroll.stillDragging);
+				vm.u.Scroll.قىممەت, vm.u.Scroll.stillDragging);
 		}
-		break;
-#if defined(FEAT_MENU)
-	    case VimMsg::Menu:
+		اكسر;
+#إذا defined(FEAT_MENU)
+	    حالة Vim_ئۇچۇر::Menu:
 		gui_menu_cb(vm.u.Menu.guiMenu);
-		break;
+		اكسر;
 #endif
-	    case VimMsg::Mouse:
+	    حالة Vim_ئۇچۇر::Mouse:
 		{
-		    int32 oldCount;
-		    if (vm.u.Mouse.button == MOUSE_DRAG)
-			oldCount =
-			    atomic_add(&gui.vimTextArea->mouseDragEventCount, -1);
-		    else
-			oldCount = 0;
-		    if (oldCount <= 1)
+		    int32 old_سانى;
+		    إذا (vm.u.Mouse.button == MOUSE_DRAG)
+			old_سانى =
+			    atomic_add(&gui.vimTextArea->mouse_Drag_Event_سانى, -1);
+		    وإلا
+			old_سانى = 0;
+		    إذا (old_سانى <= 1)
 			gui_send_mouse_event(vm.u.Mouse.button, vm.u.Mouse.x,
 				vm.u.Mouse.y, vm.u.Mouse.repeated_click,
 				vm.u.Mouse.modifiers);
 		}
-		break;
-	    case VimMsg::MouseMoved:
+		اكسر;
+	    حالة Vim_ئۇچۇر::MouseMoved:
 		{
 		    gui_mouse_moved(vm.u.MouseMoved.x, vm.u.MouseMoved.y);
 		}
-		break;
-	    case VimMsg::Focus:
+		اكسر;
+	    حالة Vim_ئۇچۇر::Focus:
 		gui.in_focus = vm.u.Focus.active;
 		// XXX Signal that scrollbar dragging has stopped?
 		// This is needed because we don't get a MouseUp if
 		// that happens while outside the window... :-(
-		if (gui.dragged_sb) {
+		إذا (gui.dragged_sb) {
 		    gui.dragged_sb = SBAR_NONE;
 		}
 		//  gui_update_cursor(TRUE, FALSE);
-		break;
-	    case VimMsg::Refs:
+		اكسر;
+	    حالة Vim_ئۇچۇر::Refs:
 		::RefsReceived(vm.u.Refs.message, vm.u.Refs.changedir);
-		break;
-	    case VimMsg::Tabline:
+		اكسر;
+	    حالة Vim_ئۇچۇر::Tabline:
 		send_tabline_event(vm.u.Tabline.index);
-		break;
-	    case VimMsg::TablineMenu:
+		اكسر;
+	    حالة Vim_ئۇچۇر::TablineMenu:
 		send_tabline_menu_event(vm.u.TablineMenu.index, vm.u.TablineMenu.event);
-		break;
-	    default:
+		اكسر;
+	    افتراضي:
 		//  unrecognised message, ignore it
-		break;
+		اكسر;
 	}
     }
 
     /*
      * If size < B_OK, it is an error code.
      */
-    return size;
+    أرجع size;
 }
 
 /*
@@ -3230,42 +3230,42 @@ gui_haiku_process_event(bigtime_t timeout)
  * If there is no window, don't call Lock() but do succeed.
  */
 
-    int
+    صحيح
 vim_lock_screen()
 {
-    return !gui.vimWindow || gui.vimWindow->Lock();
+    أرجع !gui.vimWindow || gui.vimWindow->Lock();
 }
 
-    void
+    فراغ
 vim_unlock_screen()
 {
-    if (gui.vimWindow)
+    إذا (gui.vimWindow)
 	gui.vimWindow->Unlock();
 }
 
 #define RUN_BAPPLICATION_IN_NEW_THREAD	0
 
-#if RUN_BAPPLICATION_IN_NEW_THREAD
+#إذا RUN_BAPPLICATION_IN_NEW_THREAD
 
     int32
-run_vimapp(void *args)
+run_vimapp(فراغ *args)
 {
     VimApp app(appsig);
 
     gui.vimApp = &app;
     app.Run();		    // Run until Quit() called
 
-    return 0;
+    أرجع 0;
 }
 
-#else
+#وإلا
 
     int32
-call_main(void *args)
+call_main(فراغ *args)
 {
-    struct MainArgs *ma = (MainArgs *)args;
+    بنية MainArgs *ma = (MainArgs *)args;
 
-    return main(ma->argc, ma->argv);
+    أرجع main(ma->argc, ma->argv);
 }
 #endif
 
@@ -3274,35 +3274,35 @@ call_main(void *args)
  * deleted from argv, and *argc is decremented accordingly.  This is called
  * when vim is started, whether or not the GUI has been started.
  */
-    void
+    فراغ
 gui_mch_prepare(
-	int	*argc,
-	char	**argv)
+	صحيح	*argc,
+	حرف	**argv)
 {
     /*
      * We don't have any command line arguments for the BeOS GUI yet,
      * but this is an excellent place to create our Application object.
      */
-    if (!gui.vimApp) {
+    إذا (!gui.vimApp) {
 	thread_info tinfo;
-	get_thread_info(find_thread(NULL), &tinfo);
+	get_thread_info(find_thread(عدم), &tinfo);
 
 	// May need the port very early on to process RefsReceived()
-	gui.vdcmp = create_port(B_MAX_PORT_COUNT, "vim VDCMP");
+	gui.vdcmp = create_port(B_MAX_PORT_سانى, "vim VDCMP");
 
-#if RUN_BAPPLICATION_IN_NEW_THREAD
+#إذا RUN_BAPPLICATION_IN_NEW_THREAD
 	thread_id tid = spawn_thread(run_vimapp, "vim VimApp",
-		tinfo.priority, NULL);
-	if (tid >= B_OK) {
+		tinfo.priority, عدم);
+	إذا (tid >= B_OK) {
 	    resume_thread(tid);
-	} else {
+	} وإلا {
 	    getout(1);
 	}
-#else
+#وإلا
 	MainArgs ma = { *argc, argv };
 	thread_id tid = spawn_thread(call_main, "vim main()",
 		tinfo.priority, &ma);
-	if (tid >= B_OK) {
+	إذا (tid >= B_OK) {
 	    VimApp app(appsig);
 
 	    gui.vimApp = &app;
@@ -3316,7 +3316,7 @@ gui_mch_prepare(
 	    app.Run();		    // Run until Quit() called
 	    // fprintf(stderr, "app.Run() returned...\n");
 	    status_t dummy_exitcode;
-	    (void)wait_for_thread(tid, &dummy_exitcode);
+	    (فراغ)wait_for_thread(tid, &dummy_exitcode);
 
 	    /*
 	     * This path should be the normal one taken to exit Vim.
@@ -3343,10 +3343,10 @@ gui_mch_prepare(
      * too early to see the command line parsing. Tough.
      * On the other hand, it starts the gui for vim file & which is nice.
      */
-    if (!isatty(0)) {
-	struct stat stat_stdin, stat_dev_null;
+    إذا (!isatty(0)) {
+	بنية stat stat_stdin, stat_dev_null;
 
-	if (fstat(0, &stat_stdin) == -1 ||
+	إذا (fstat(0, &stat_stdin) == -1 ||
 		stat("/dev/null", &stat_dev_null) == -1 ||
 		(stat_stdin.st_dev == stat_dev_null.st_dev &&
 		 stat_stdin.st_ino == stat_dev_null.st_ino))
@@ -3358,17 +3358,17 @@ gui_mch_prepare(
  * Check if the GUI can be started.  Called before gvimrc is sourced.
  * Return OK or FAIL.
  */
-    int
-gui_mch_init_check(void)
+    صحيح
+gui_mch_init_check(فراغ)
 {
-    return OK;	    // TODO: GUI can always be started?
+    أرجع OK;	    // TODO: GUI can always be started?
 }
 
 /*
  * Initialise the GUI.	Create all the windows, set up all the call-backs
  * etc.
  */
-    int
+    صحيح
 gui_mch_init()
 {
     display_errors();
@@ -3377,21 +3377,21 @@ gui_mch_init()
     gui.norm_pixel = gui.def_norm_pixel;
     gui.back_pixel = gui.def_back_pixel;
 
-    gui.scrollbar_width = (int) B_V_SCROLL_BAR_WIDTH;
-    gui.scrollbar_height = (int) B_H_SCROLL_BAR_HEIGHT;
+    gui.scrollbar_width = (صحيح) B_V_SCROLL_BAR_WIDTH;
+    gui.scrollbar_height = (صحيح) B_H_SCROLL_BAR_HEIGHT;
 #ifdef FEAT_MENU
     gui.menu_height = 19;   //	initial guess -
     //	correct for my default settings
 #endif
     gui.border_offset = 3;  //	coordinates are inside window borders
 
-    if (gui.vdcmp < B_OK)
-	return FAIL;
-    get_key_map(&keyMap, &keyMapChars);
+    إذا (gui.vdcmp < B_OK)
+	أرجع FAIL;
+    get_ئاچقۇچ_map(&ئاچقۇچ_Map, &ئاچقۇچ_Map_Chars);
 
-    gui.vimWindow = new VimWindow();	// hidden and locked
-    if (!gui.vimWindow)
-	return FAIL;
+    gui.vimWindow = جديد VimWindow();	// hidden and locked
+    إذا (!gui.vimWindow)
+	أرجع FAIL;
 
     gui.vimWindow->Run();	// Run() unlocks but does not show
 
@@ -3410,18 +3410,18 @@ gui_mch_init()
 
     gui_mch_new_colors();	// window must exist for this
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Called when the foreground or background color has been changed.
  */
-    void
+    فراغ
 gui_mch_new_colors()
 {
     rgb_color rgb = GUI_TO_RGB(gui.back_pixel);
 
-    if (gui.vimWindow->Lock()) {
+    إذا (gui.vimWindow->Lock()) {
 	gui.vimForm->SetViewColor(rgb);
 	//  Does this not have too much effect for those small rectangles?
 	gui.vimForm->Invalidate();
@@ -3432,26 +3432,26 @@ gui_mch_new_colors()
 /*
  * Open the GUI window which was created by a call to gui_mch_init().
  */
-    int
+    صحيح
 gui_mch_open()
 {
-    if (gui_win_x != -1 && gui_win_y != -1)
+    إذا (gui_win_x != -1 && gui_win_y != -1)
 	gui_mch_set_winpos(gui_win_x, gui_win_y);
 
     // Actually open the window
-    if (gui.vimWindow->Lock()) {
+    إذا (gui.vimWindow->Lock()) {
 	gui.vimWindow->Show();
 	gui.vimWindow->Unlock();
-	return OK;
+	أرجع OK;
     }
 
-    return FAIL;
+    أرجع FAIL;
 }
 
-    void
-gui_mch_exit(int vim_exitcode)
+    فراغ
+gui_mch_exit(صحيح vim_exitcode)
 {
-    if (gui.vimWindow) {
+    إذا (gui.vimWindow) {
 	thread_id tid = gui.vimWindow->Thread();
 	gui.vimWindow->Lock();
 	gui.vimWindow->Quit();
@@ -3460,7 +3460,7 @@ gui_mch_exit(int vim_exitcode)
 	wait_for_thread(tid, &exitcode);
     }
     delete_port(gui.vdcmp);
-#if !RUN_BAPPLICATION_IN_NEW_THREAD
+#إذا !RUN_BAPPLICATION_IN_NEW_THREAD
     /*
      * We are in the main() thread - quit the App thread and
      * quit ourselves (passing on the exitcode). Use a global since the
@@ -3468,18 +3468,18 @@ gui_mch_exit(int vim_exitcode)
      * called in time (race condition).
      */
 #endif
-    if (gui.vimApp) {
-	VimTextAreaView::guiBlankMouse(false);
+    إذا (gui.vimApp) {
+	VimTextAreaView::guiBlankMouse(خطأ);
 
 	main_exitcode = vim_exitcode;
-#if RUN_BAPPLICATION_IN_NEW_THREAD
+#إذا RUN_BAPPLICATION_IN_NEW_THREAD
 	thread_id tid = gui.vimApp->Thread();
 	int32 exitcode;
 	gui.vimApp->Lock();
 	gui.vimApp->Quit();
 	gui.vimApp->Unlock();
 	wait_for_thread(tid, &exitcode);
-#else
+#وإلا
 	gui.vimApp->Lock();
 	gui.vimApp->Quit();
 	gui.vimApp->Unlock();
@@ -3493,29 +3493,29 @@ gui_mch_exit(int vim_exitcode)
 /*
  * Get the position of the top left corner of the window.
  */
-    int
-gui_mch_get_winpos(int *x, int *y)
+    صحيح
+gui_mch_get_winpos(صحيح *x, صحيح *y)
 {
-    if (gui.vimWindow->Lock()) {
+    إذا (gui.vimWindow->Lock()) {
 	BRect r;
 	r = gui.vimWindow->Frame();
 	gui.vimWindow->Unlock();
-	*x = (int)r.left;
-	*y = (int)r.top;
-	return OK;
+	*x = (صحيح)r.سول;
+	*y = (صحيح)r.چوققا;
+	أرجع OK;
     }
-    else
-	return FAIL;
+    وإلا
+	أرجع FAIL;
 }
 
 /*
  * Set the position of the top left corner of the window to the given
  * coordinates.
  */
-    void
-gui_mch_set_winpos(int x, int y)
+    فراغ
+gui_mch_set_winpos(صحيح x, صحيح y)
 {
-    if (gui.vimWindow->Lock()) {
+    إذا (gui.vimWindow->Lock()) {
 	gui.vimWindow->MoveTo(x, y);
 	gui.vimWindow->Unlock();
     }
@@ -3524,26 +3524,26 @@ gui_mch_set_winpos(int x, int y)
 /*
  * Set the size of the window to the given width and height in pixels.
  */
-void
+فراغ
 gui_mch_set_shellsize(
-	int	width,
-	int	height,
-	int	min_width,
-	int	min_height,
-	int	base_width,
-	int	base_height,
-	int	direction) // TODO: utilize?
+	صحيح	width,
+	صحيح	height,
+	صحيح	min_width,
+	صحيح	min_height,
+	صحيح	base_width,
+	صحيح	base_height,
+	صحيح	direction) // TODO: utilize?
 {
     /*
      * We are basically given the size of the VimForm, if I understand
      * correctly. Since it fills the window completely, this will also
      * be the size of the window.
      */
-    if (gui.vimWindow->Lock()) {
+    إذا (gui.vimWindow->Lock()) {
 	gui.vimWindow->ResizeTo(width - PEN_WIDTH, height - PEN_WIDTH);
 
 	// set size limits
-	float minWidth, maxWidth, minHeight, maxHeight;
+	عائم minWidth, maxWidth, minHeight, maxHeight;
 
 	gui.vimWindow->GetSizeLimits(&minWidth, &maxWidth,
 		&minHeight, &maxHeight);
@@ -3569,50 +3569,50 @@ gui_mch_set_shellsize(
     }
 }
 
-void
+فراغ
 gui_mch_get_screen_dimensions(
-	int	*screen_w,
-	int	*screen_h)
+	صحيح	*screen_w,
+	صحيح	*screen_h)
 {
     BRect frame;
 
     {
 	BScreen screen(gui.vimWindow);
 
-	if (screen.IsValid()) {
+	إذا (screen.IsValid()) {
 	    frame = screen.Frame();
-	} else {
-	    frame.right = 640;
+	} وإلا {
+	    frame.ئوڭ = 640;
 	    frame.bottom = 480;
 	}
     }
 
     // XXX approximations...
-    *screen_w = (int) frame.right - 2 * gui.scrollbar_width - 20;
-    *screen_h = (int) frame.bottom - gui.scrollbar_height
+    *screen_w = (صحيح) frame.ئوڭ - 2 * gui.scrollbar_width - 20;
+    *screen_h = (صحيح) frame.bottom - gui.scrollbar_height
 #ifdef FEAT_MENU
 	- gui.menu_height
 #endif
 	- 30;
 }
 
-void
+فراغ
 gui_mch_set_text_area_pos(
-	int	x,
-	int	y,
-	int	w,
-	int	h)
+	صحيح	x,
+	صحيح	y,
+	صحيح	w,
+	صحيح	h)
 {
-    if (!gui.vimTextArea)
-	return;
+    إذا (!gui.vimTextArea)
+	أرجع;
 
-    if (gui.vimWindow->Lock()) {
+    إذا (gui.vimWindow->Lock()) {
 	gui.vimTextArea->MoveTo(x, y);
 	gui.vimTextArea->ResizeTo(w - PEN_WIDTH, h - PEN_WIDTH);
 
 #ifdef FEAT_GUI_TABLINE
-	if (gui.vimForm->TabLine() != NULL) {
-	    gui.vimForm->TabLine()->ResizeTo(w, gui.vimForm->TablineHeight());
+	إذا (gui.vimForm->Tab_قۇر() != عدم) {
+	    gui.vimForm->Tab_قۇر()->ResizeTo(w, gui.vimForm->TablineHeight());
 	}
 #endif // FEAT_GUI_TABLINE
 
@@ -3625,23 +3625,23 @@ gui_mch_set_text_area_pos(
  * Scrollbar stuff:
  */
 
-void
+فراغ
 gui_mch_enable_scrollbar(
 	scrollbar_T *sb,
-	int	flag)
+	صحيح	flag)
 {
     VimScrollBar *vsb = sb->id;
-    if (gui.vimWindow->Lock()) {
+    إذا (gui.vimWindow->Lock()) {
 	/*
 	 * This function is supposed to be idempotent, but Show()/Hide()
 	 * is not. Therefore we test if they are needed.
 	 */
-	if (flag) {
-	    if (vsb->IsHidden()) {
+	إذا (flag) {
+	    إذا (vsb->IsHidden()) {
 		vsb->Show();
 	    }
-	} else {
-	    if (!vsb->IsHidden()) {
+	} وإلا {
+	    إذا (!vsb->IsHidden()) {
 		vsb->Hide();
 	    }
 	}
@@ -3649,25 +3649,25 @@ gui_mch_enable_scrollbar(
     }
 }
 
-void
+فراغ
 gui_mch_set_scrollbar_thumb(
 	scrollbar_T *sb,
-	int	val,
-	int	size,
-	int	max)
+	صحيح	val,
+	صحيح	size,
+	صحيح	max)
 {
-    if (gui.vimWindow->Lock()) {
+    إذا (gui.vimWindow->Lock()) {
 	VimScrollBar *s = sb->id;
-	if (max == 0) {
-	    s->SetValue(0);
+	إذا (max == 0) {
+	    s->Set_قىممەت(0);
 	    s->SetRange(0.0, 0.0);
-	} else {
-	    s->SetProportion((float)size / (max + 1.0));
+	} وإلا {
+	    s->SetProportion((عائم)size / (max + 1.0));
 	    s->SetSteps(1.0, size > 5 ? size - 2 : size);
 #ifndef SCROLL_PAST_END	    //	really only defined in gui.c...
 	    max = max + 1 - size;
 #endif
-	    if (max < s->Value()) {
+	    إذا (max < s->قىممەت_2()) {
 		/*
 		 * If the new maximum is lower than the current value,
 		 * setting it would cause the value to be clipped and
@@ -3675,66 +3675,66 @@ gui_mch_set_scrollbar_thumb(
 		 * We avoid this by setting the value first, because
 		 * it presumably is <= max.
 		 */
-		s->SetValue(val);
+		s->Set_قىممەت(val);
 		s->SetRange(0.0, max);
-	    } else {
+	    } وإلا {
 		/*
 		 * In the other case, set the range first, since the
 		 * new value might be higher than the current max.
 		 */
 		s->SetRange(0.0, max);
-		s->SetValue(val);
+		s->Set_قىممەت(val);
 	    }
 	}
 	gui.vimWindow->Unlock();
     }
 }
 
-void
+فراغ
 gui_mch_set_scrollbar_pos(
 	scrollbar_T *sb,
-	int	x,
-	int	y,
-	int	w,
-	int	h)
+	صحيح	x,
+	صحيح	y,
+	صحيح	w,
+	صحيح	h)
 {
-    if (gui.vimWindow->Lock()) {
+    إذا (gui.vimWindow->Lock()) {
 	BRect winb = gui.vimWindow->Bounds();
-	float vsbx = x, vsby = y;
+	عائم vsbx = x, vsby = y;
 	VimScrollBar *vsb = sb->id;
 	vsb->ResizeTo(w - PEN_WIDTH, h - PEN_WIDTH);
-	if (winb.right-(x+w)<w) vsbx = winb.right - (w - PEN_WIDTH);
+	إذا (winb.ئوڭ-(x+w)<w) vsbx = winb.ئوڭ - (w - PEN_WIDTH);
 	vsb->MoveTo(vsbx, vsby);
 	gui.vimWindow->Unlock();
     }
 }
 
-    int
-gui_mch_get_scrollbar_xpadding(void)
+    صحيح
+gui_mch_get_scrollbar_xpadding(فراغ)
 {
     // TODO: Calculate the padding for adjust scrollbar position when the
     // Window is maximized.
-    return 0;
+    أرجع 0;
 }
 
-    int
-gui_mch_get_scrollbar_ypadding(void)
+    صحيح
+gui_mch_get_scrollbar_ypadding(فراغ)
 {
     // TODO: Calculate the padding for adjust scrollbar position when the
     // Window is maximized.
-    return 0;
+    أرجع 0;
 }
 
-void
+فراغ
 gui_mch_create_scrollbar(
 	scrollbar_T *sb,
-	int	orient)	    // SBAR_VERT or SBAR_HORIZ
+	صحيح	orient)	    // SBAR_VERT or SBAR_HORIZ
 {
     orientation posture =
 	(orient == SBAR_HORIZ) ? B_HORIZONTAL : B_VERTICAL;
 
-    VimScrollBar *vsb = sb->id = new VimScrollBar(sb, posture);
-    if (gui.vimWindow->Lock()) {
+    VimScrollBar *vsb = sb->id = جديد VimScrollBar(sb, posture);
+    إذا (gui.vimWindow->Lock()) {
 	vsb->SetTarget(gui.vimTextArea);
 	vsb->Hide();
 	gui.vimForm->AddChild(vsb);
@@ -3742,12 +3742,12 @@ gui_mch_create_scrollbar(
     }
 }
 
-#if defined(FEAT_WINDOWS) || defined(FEAT_GUI_HAIKU)
-void
+#إذا defined(FEAT_WINDOWS) || defined(FEAT_GUI_HAIKU)
+فراغ
 gui_mch_destroy_scrollbar(
 	scrollbar_T *sb)
 {
-    if (gui.vimWindow->Lock()) {
+    إذا (gui.vimWindow->Lock()) {
 	sb->id->RemoveSelf();
 	delete sb->id;
 	gui.vimWindow->Unlock();
@@ -3758,10 +3758,10 @@ gui_mch_destroy_scrollbar(
 /*
  * Cursor does not flash
  */
-    int
-gui_mch_is_blink_off(void)
+    صحيح
+gui_mch_is_blink_off(فراغ)
 {
-    return FALSE;
+    أرجع FALSE;
 }
 
 /*
@@ -3777,13 +3777,13 @@ gui_mch_is_blink_off(void)
 #define BLINK_OFF   1
 #define BLINK_ON    2
 
-static int	blink_state = BLINK_NONE;
-static long_u	    blink_waittime = 700;
-static long_u	    blink_ontime = 400;
-static long_u	    blink_offtime = 250;
-static int  blink_timer = 0;
+ساكن صحيح	blink_state = BLINK_NONE;
+ساكن long_u	    blink_waittime = 700;
+ساكن long_u	    blink_ontime = 400;
+ساكن long_u	    blink_offtime = 250;
+ساكن صحيح  blink_timer = 0;
 
-void
+فراغ
 gui_mch_set_blinking(
 	long	waittime,
 	long	on,
@@ -3798,16 +3798,16 @@ gui_mch_set_blinking(
 /*
  * Stop the cursor blinking.  Show the cursor if it wasn't shown.
  */
-    void
-gui_mch_stop_blink(int may_call_gui_update_cursor)
+    فراغ
+gui_mch_stop_blink(صحيح may_call_gui_update_cursor)
 {
     // TODO
-    if (blink_timer != 0)
+    إذا (blink_timer != 0)
     {
 	// XtRemoveTimeOut(blink_timer);
 	blink_timer = 0;
     }
-    if (blink_state == BLINK_OFF)
+    إذا (blink_state == BLINK_OFF)
 	gui_update_cursor(TRUE, FALSE);
     blink_state = BLINK_NONE;
 }
@@ -3816,14 +3816,14 @@ gui_mch_stop_blink(int may_call_gui_update_cursor)
  * Start the cursor blinking.  If it was already blinking, this restarts the
  * waiting time and shows the cursor.
  */
-    void
+    فراغ
 gui_mch_start_blink()
 {
     // TODO
-    if (blink_timer != 0)
+    إذا (blink_timer != 0)
 	;// XtRemoveTimeOut(blink_timer);
     // Only switch blinking on if none of the times is zero
-    if (blink_waittime && blink_ontime && blink_offtime && gui.in_focus)
+    إذا (blink_waittime && blink_ontime && blink_offtime && gui.in_focus)
     {
 	blink_timer = 1; // XtAppAddTimeOut(app_context, blink_waittime,
 	blink_state = BLINK_ON;
@@ -3835,41 +3835,41 @@ gui_mch_start_blink()
  * Initialise vim to use the font with the given name.	Return FAIL if the font
  * could not be loaded, OK otherwise.
  */
-int
+صحيح
 gui_mch_init_font(
 	char_u	    *font_name,
-	int	    fontset)
+	صحيح	    fontset)
 {
-    if (gui.vimWindow->Lock())
+    إذا (gui.vimWindow->Lock())
     {
-	int rc = gui.vimTextArea->mchInitFont(font_name);
+	صحيح rc = gui.vimTextArea->mchInitFont(font_name);
 	gui.vimWindow->Unlock();
 
-	return rc;
+	أرجع rc;
     }
 
-    return FAIL;
+    أرجع FAIL;
 }
 
 
-    int
+    صحيح
 gui_mch_adjust_charsize()
 {
-    return FAIL;
+    أرجع FAIL;
 }
 
 
-    int
-gui_mch_font_dialog(font_family* family, font_style* style, float* size)
+    صحيح
+gui_mch_font_dialog(font_family* family, font_style* style, عائم* size)
 {
-#if defined(FEAT_GUI_DIALOG)
+#إذا defined(FEAT_GUI_DIALOG)
 	// gui.vimWindow->Unlock();
-    VimSelectFontDialog *dialog = new VimSelectFontDialog(family, style, size);
-    bool ret = dialog->Go();
+    VimSelectFontDialog *dialog = جديد VimSelectFontDialog(family, style, size);
+    منطقي ret = dialog->Go();
 	delete dialog;
-	return ret;
-#else
-    return NOFONT;
+	أرجع ret;
+#وإلا
+    أرجع NOFONT;
 #endif // FEAT_GUI_DIALOG
 }
 
@@ -3877,92 +3877,92 @@ gui_mch_font_dialog(font_family* family, font_style* style, float* size)
 GuiFont
 gui_mch_get_font(
 	char_u	    *name,
-	int	    giveErrorIfMissing)
+	صحيح	    giveErrorIfMissing)
 {
-    static VimFont *fontList = NULL;
+    ساكن VimFont *fontList = عدم;
 
-    if (!gui.in_use)	//  can't do this when GUI not running
-	return NOFONT;
+    إذا (!gui.in_use)	//  can't do this when GUI not running
+	أرجع NOFONT;
 
     //	storage for locally modified name;
-    const int buff_size = B_FONT_FAMILY_LENGTH + B_FONT_STYLE_LENGTH + 20;
-    static char font_name[buff_size] = {0};
+    ثابت صحيح buff_size = B_FONT_FAMILY_LENGTH + B_FONT_STYLE_LENGTH + 20;
+    ساكن حرف font_name[buff_size] = {0};
     font_family family = {0};
     font_style	style  = {0};
-    float size = 0.f;
+    عائم size = 0.f;
 
-    if (name == 0 && be_fixed_font == 0) {
-	if (giveErrorIfMissing)
+    إذا (name == 0 && be_fixed_font == 0) {
+	إذا (giveErrorIfMissing)
 	    semsg(_(e_unknown_font_str), name);
-	return NOFONT;
+	أرجع NOFONT;
     }
 
-    bool useSelectGUI = false;
-    if (name != NULL)
-	if (STRCMP(name, "*") == 0) {
+    منطقي useSelectGUI = خطأ;
+    إذا (name != عدم)
+	إذا (STRCMP(name, "*") == 0) {
 	    useSelectGUI = true;
 	    STRNCPY(font_name, hl_get_font_name(), buff_size);
-	} else
+	} وإلا
 	    STRNCPY(font_name, name, buff_size);
 
-    if (font_name[0] == 0) {
+    إذا (font_name[0] == 0) {
 	be_fixed_font->GetFamilyAndStyle(&family, &style);
 	size = be_fixed_font->Size();
 	vim_snprintf(font_name, buff_size,
-	    (char*)"%s/%s/%.0f", family, style, size);
+	    (حرف*)"%s/%s/%.0f", family, style, size);
     }
 
     //	replace underscores with spaces
-    char* end = 0;
-    while (end = strchr((char *)font_name, '_'))
+    حرف* end = 0;
+    طالما (end = strchr((حرف *)font_name, '_'))
 	*end = ' ';
 
     //	store the name before strtok corrupt the buffer ;-)
-    static char buff[buff_size] = {0};
+    ساكن حرف buff[buff_size] = {0};
     STRNCPY(buff, font_name, buff_size);
     STRNCPY(family, strtok(buff, "/\0"), B_FONT_FAMILY_LENGTH);
-    char* style_s = strtok(0, "/\0");
-    if (style_s != 0)
+    حرف* style_s = strtok(0, "/\0");
+    إذا (style_s != 0)
 	STRNCPY(style, style_s, B_FONT_STYLE_LENGTH);
     size = atof((style_s != 0) ? strtok(0, "/\0") : "0");
 
-    if (useSelectGUI) {
-	if (gui_mch_font_dialog(&family, &style, &size) == NOFONT)
-	    return FAIL;
+    إذا (useSelectGUI) {
+	إذا (gui_mch_font_dialog(&family, &style, &size) == NOFONT)
+	    أرجع FAIL;
 	//  compose for further processing
 	vim_snprintf(font_name, buff_size,
-		(char*)"%s/%s/%.0f", family, style, size);
+		(حرف*)"%s/%s/%.0f", family, style, size);
 	hl_set_font_name((char_u*)font_name);
 
 	//  Set guifont to the name of the selected font.
 	char_u* new_p_guifont = (char_u*)alloc(STRLEN(font_name) + 1);
-	if (new_p_guifont != NULL) {
+	إذا (new_p_guifont != عدم) {
 	    STRCPY(new_p_guifont, font_name);
 	    vim_free(p_guifont);
 	    p_guifont = new_p_guifont;
 	    //	Replace spaces in the font name with underscores.
-	    for ( ; *new_p_guifont; ++new_p_guifont)
-		if (*new_p_guifont == ' ')
+	    لكل ( ; *new_p_guifont; ++new_p_guifont)
+		إذا (*new_p_guifont == ' ')
 		    *new_p_guifont = '_';
 	}
     }
 
     VimFont *flp;
-    for (flp = fontList; flp; flp = flp->next) {
-	if (STRCMP(font_name, flp->name) == 0) {
+    لكل (flp = fontList; flp; flp = flp->next) {
+	إذا (STRCMP(font_name, flp->name) == 0) {
 	    flp->refcount++;
-	    return (GuiFont)flp;
+	    أرجع (GuiFont)flp;
 	}
     }
 
-    VimFont *font = new VimFont();
+    VimFont *font = جديد VimFont();
     font->name = vim_strsave((char_u*)font_name);
 
-    if (count_font_styles(family) <= 0) {
-	if (giveErrorIfMissing)
+    إذا (سانى_font_styles(family) <= 0) {
+	إذا (giveErrorIfMissing)
 	    semsg(_(e_unknown_font_str), font->name);
 	delete font;
-	return NOFONT;
+	أرجع NOFONT;
     }
 
     //	Remember font in the static list for later use
@@ -3970,48 +3970,48 @@ gui_mch_get_font(
     fontList = font;
 
     font->SetFamilyAndStyle(family, style);
-    if (size > 0.f)
+    إذا (size > 0.f)
 	font->SetSize(size);
 
     font->SetSpacing(B_FIXED_SPACING);
     font->SetEncoding(B_UNICODE_UTF8);
 
-    return (GuiFont)font;
+    أرجع (GuiFont)font;
 }
 
 /*
  * Set the current text font.
  */
-void
+فراغ
 gui_mch_set_font(
 	GuiFont	font)
 {
-    if (gui.vimWindow->Lock()) {
+    إذا (gui.vimWindow->Lock()) {
 	VimFont *vf = (VimFont *)font;
 
 	gui.vimTextArea->SetFont(vf);
 
-	gui.char_width = (int) vf->StringWidth("n");
+	gui.char_width = (صحيح) vf->StringWidth("n");
 	font_height fh;
 	vf->GetHeight(&fh);
-	gui.char_height = (int)(fh.ascent + 0.9999)
-	    + (int)(fh.descent + 0.9999) + (int)(fh.leading + 0.9999);
-	gui.char_ascent = (int)(fh.ascent + 0.9999);
+	gui.char_height = (صحيح)(fh.ascent + 0.9999)
+	    + (صحيح)(fh.descent + 0.9999) + (صحيح)(fh.leading + 0.9999);
+	gui.char_ascent = (صحيح)(fh.ascent + 0.9999);
 
 	gui.vimWindow->Unlock();
     }
 }
 
 // XXX TODO This is apparently never called...
-void
+فراغ
 gui_mch_free_font(
 	GuiFont	font)
 {
-    if (font == NOFONT)
-	return;
+    إذا (font == NOFONT)
+	أرجع;
     VimFont *f = (VimFont *)font;
-    if (--f->refcount <= 0) {
-	if (f->refcount < 0)
+    إذا (--f->refcount <= 0) {
+	إذا (f->refcount < 0)
 	    fprintf(stderr, "VimFont: refcount < 0\n");
 	delete f;
     }
@@ -4020,15 +4020,15 @@ gui_mch_free_font(
     char_u *
 gui_mch_get_fontname(GuiFont font, char_u *name)
 {
-    if (name == NULL)
-	return NULL;
-    return vim_strsave(name);
+    إذا (name == عدم)
+	أرجع عدم;
+    أرجع vim_strsave(name);
 }
 
 /*
  * Adjust gui.char_height (after 'linespace' was changed).
  */
-    int
+    صحيح
 gui_mch_adjust_charheight()
 {
 
@@ -4047,14 +4047,14 @@ gui_mch_adjust_charheight()
 	VimFont *font = (VimFont *)gui.norm_font;
 	font_height fh = {0};
 	font->GetHeight(&fh);
-	gui.char_height = (int)(fh.ascent + fh.descent + 0.5) + p_linespace;
-	gui.char_ascent = (int)(fh.ascent + 0.5) + p_linespace / 2;
+	gui.char_height = (صحيح)(fh.ascent + fh.descent + 0.5) + p_linespace;
+	gui.char_ascent = (صحيح)(fh.ascent + 0.5) + p_linespace / 2;
     }
-    return OK;
+    أرجع OK;
 }
 
-    void
-gui_mch_getmouse(int *x, int *y)
+    فراغ
+gui_mch_getmouse(صحيح *x, صحيح *y)
 {
     fprintf(stderr, "gui_mch_getmouse");
 
@@ -4072,8 +4072,8 @@ gui_mch_getmouse(int *x, int *y)
      }
 }
 
-    void
-gui_mch_mousehide(int hide)
+    فراغ
+gui_mch_mousehide(صحيح hide)
 {
     fprintf(stderr, "gui_mch_getmouse");
     //	TODO
@@ -4089,19 +4089,19 @@ guicolor_T
 gui_mch_get_color(
 	char_u	*name)
 {
-    return gui_get_color_cmn(name);
+    أرجع gui_get_color_cmn(name);
 }
 
 /*
  * Set the current text foreground color.
  */
-void
+فراغ
 gui_mch_set_fg_color(
 	guicolor_T  color)
 {
     rgb_color rgb = GUI_TO_RGB(color);
-    if (gui.vimWindow->Lock()) {
-	gui.vimTextArea->SetHighColor(rgb);
+    إذا (gui.vimWindow->Lock()) {
+	gui.vimTextArea->Set_يۇقىرى_Color(rgb);
 	gui.vimWindow->Unlock();
     }
 }
@@ -4109,13 +4109,13 @@ gui_mch_set_fg_color(
 /*
  * Set the current text background color.
  */
-void
+فراغ
 gui_mch_set_bg_color(
 	guicolor_T  color)
 {
     rgb_color rgb = GUI_TO_RGB(color);
-    if (gui.vimWindow->Lock()) {
-	gui.vimTextArea->SetLowColor(rgb);
+    إذا (gui.vimWindow->Lock()) {
+	gui.vimTextArea->Set_تۆۋەن_Color(rgb);
 	gui.vimWindow->Unlock();
     }
 }
@@ -4123,59 +4123,59 @@ gui_mch_set_bg_color(
 /*
  * Set the current text special color.
  */
-    void
+    فراغ
 gui_mch_set_sp_color(guicolor_T	color)
 {
     // prev_sp_color = color;
 }
 
-void
+فراغ
 gui_mch_draw_string(
-	int	row,
-	int	col,
+	صحيح	row,
+	صحيح	col,
 	char_u	*s,
-	int	len,
-	int	flags)
+	صحيح	len,
+	صحيح	flags)
 {
-    if (gui.vimWindow->Lock()) {
+    إذا (gui.vimWindow->Lock()) {
 	gui.vimTextArea->mchDrawString(row, col, s, len, flags);
 	gui.vimWindow->Unlock();
     }
 }
 
 	guicolor_T
-gui_mch_get_rgb_color(int r, int g, int b)
+gui_mch_get_rgb_color(صحيح r, صحيح g, صحيح b)
 {
-    return gui_get_rgb_color_cmn(r, g, b);
+    أرجع gui_get_rgb_color_cmn(r, g, b);
 }
 
 
 // Return OK if the key with the termcap name "name" is supported.
-int
+صحيح
 gui_mch_haskey(
 	char_u	*name)
 {
-    int i;
+    صحيح i;
 
-    for (i = 0; special_keys[i].BeKeys != 0; i++)
-	if (name[0] == special_keys[i].vim_code0 &&
-		name[1] == special_keys[i].vim_code1)
-	    return OK;
-    return FAIL;
+    لكل (i = 0; special_ئاچقۇچلار[i].Be_ئاچقۇچلار != 0; i++)
+	إذا (name[0] == special_ئاچقۇچلار[i].vim_code0 &&
+		name[1] == special_ئاچقۇچلار[i].vim_code1)
+	    أرجع OK;
+    أرجع FAIL;
 }
 
-    void
+    فراغ
 gui_mch_beep()
 {
     ::beep();
 }
 
-    void
-gui_mch_flash(int msec)
+    فراغ
+gui_mch_flash(صحيح msec)
 {
     // Do a visual beep by reversing the foreground and background colors
 
-    if (gui.vimWindow->Lock()) {
+    إذا (gui.vimWindow->Lock()) {
 	BRect rect = gui.vimTextArea->Bounds();
 
 	gui.vimTextArea->SetDrawingMode(B_OP_INVERT);
@@ -4192,20 +4192,20 @@ gui_mch_flash(int msec)
 /*
  * Invert a rectangle from row r, column c, for nr rows and nc columns.
  */
-void
+فراغ
 gui_mch_invert_rectangle(
-	int	r,
-	int	c,
-	int	nr,
-	int	nc)
+	صحيح	r,
+	صحيح	c,
+	صحيح	nr,
+	صحيح	nc)
 {
     BRect rect;
-    rect.left = FILL_X(c);
-    rect.top = FILL_Y(r);
-    rect.right = rect.left + nc * gui.char_width - PEN_WIDTH;
-    rect.bottom = rect.top + nr * gui.char_height - PEN_WIDTH;
+    rect.سول = FILL_X(c);
+    rect.چوققا = FILL_Y(r);
+    rect.ئوڭ = rect.سول + nc * gui.char_width - PEN_WIDTH;
+    rect.bottom = rect.چوققا + nr * gui.char_height - PEN_WIDTH;
 
-    if (gui.vimWindow->Lock()) {
+    إذا (gui.vimWindow->Lock()) {
 	gui.vimTextArea->SetDrawingMode(B_OP_INVERT);
 	gui.vimTextArea->FillRect(rect);
 	gui.vimTextArea->SetDrawingMode(B_OP_COPY);
@@ -4216,21 +4216,21 @@ gui_mch_invert_rectangle(
 /*
  * Iconify the GUI window.
  */
-    void
+    فراغ
 gui_mch_iconify()
 {
-    if (gui.vimWindow->Lock()) {
+    إذا (gui.vimWindow->Lock()) {
 	gui.vimWindow->Minimize(true);
 	gui.vimWindow->Unlock();
     }
 }
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * Bring the Vim window to the foreground.
  */
-    void
-gui_mch_set_foreground(void)
+    فراغ
+gui_mch_set_foreground(فراغ)
 {
     // TODO
 }
@@ -4239,13 +4239,13 @@ gui_mch_set_foreground(void)
 /*
  * Set the window title
  */
-void
+فراغ
 gui_mch_settitle(
 	char_u	*title,
 	char_u	*icon)
 {
-    if (gui.vimWindow->Lock()) {
-	gui.vimWindow->SetTitle((char *)title);
+    إذا (gui.vimWindow->Lock()) {
+	gui.vimWindow->SetTitle((حرف *)title);
 	gui.vimWindow->Unlock();
     }
 }
@@ -4253,20 +4253,20 @@ gui_mch_settitle(
 /*
  * Draw a cursor without focus.
  */
-    void
+    فراغ
 gui_mch_draw_hollow_cursor(guicolor_T color)
 {
     gui_mch_set_fg_color(color);
 
     BRect r;
-    r.left = FILL_X(gui.col);
-    r.top = FILL_Y(gui.row);
-    int cells = utf_off2cells(LineOffset[gui.row] + gui.col, 100); // TODO-TODO
-    if (cells>=4) cells = 1;
-    r.right = r.left + cells*gui.char_width - PEN_WIDTH;
-    r.bottom = r.top + gui.char_height - PEN_WIDTH;
+    r.سول = FILL_X(gui.col);
+    r.چوققا = FILL_Y(gui.row);
+    صحيح cells = utf_off2cells(قۇر_Offset[gui.row] + gui.col, 100); // TODO-TODO
+    إذا (cells>=4) cells = 1;
+    r.ئوڭ = r.سول + cells*gui.char_width - PEN_WIDTH;
+    r.bottom = r.چوققا + gui.char_height - PEN_WIDTH;
 
-    if (gui.vimWindow->Lock()) {
+    إذا (gui.vimWindow->Lock()) {
 	gui.vimTextArea->StrokeRect(r);
 	gui.vimWindow->Unlock();
 	// gui_mch_flush();
@@ -4276,26 +4276,26 @@ gui_mch_draw_hollow_cursor(guicolor_T color)
 /*
  * Draw part of a cursor, only w pixels wide, and h pixels high.
  */
-void
+فراغ
 gui_mch_draw_part_cursor(
-	int	w,
-	int	h,
+	صحيح	w,
+	صحيح	h,
 	guicolor_T  color)
 {
     gui_mch_set_fg_color(color);
 
     BRect r;
-    r.left =
+    r.سول =
 #ifdef FEAT_RIGHTLEFT
 	// vertical line should be on the right of current point
-	CURSOR_BAR_RIGHT ? FILL_X(gui.col + 1) - w :
+	CURSOR_BAR_ئوڭ ? FILL_X(gui.col + 1) - w :
 #endif
 	FILL_X(gui.col);
-    r.right = r.left + w - PEN_WIDTH;
+    r.ئوڭ = r.سول + w - PEN_WIDTH;
     r.bottom = FILL_Y(gui.row + 1) - PEN_WIDTH;
-    r.top = r.bottom - h + PEN_WIDTH;
+    r.چوققا = r.bottom - h + PEN_WIDTH;
 
-    if (gui.vimWindow->Lock()) {
+    إذا (gui.vimWindow->Lock()) {
 	gui.vimTextArea->FillRect(r);
 	gui.vimWindow->Unlock();
 	// gui_mch_flush();
@@ -4308,12 +4308,12 @@ gui_mch_draw_part_cursor(
  * nothing in the event queue (& no timers pending), then we return
  * immediately.
  */
-    void
+    فراغ
 gui_mch_update()
 {
     gui_mch_flush();
-    while (port_count(gui.vdcmp) > 0 &&
-	    !vim_is_input_buf_full() &&
+    طالما (port_سانى(gui.vdcmp) > 0 &&
+	    !vim_is_كىرگۈزۈش_buf_full() &&
 	    gui_haiku_process_event(0) >= B_OK)
 	/* nothing */ ;
 }
@@ -4327,31 +4327,31 @@ gui_mch_update()
  * Returns OK if a character was found to be available within the given time,
  * or FAIL otherwise.
  */
-int
+صحيح
 gui_mch_wait_for_chars(
 	long	wtime)
 {
-    int		focus;
+    صحيح		focus;
     bigtime_t	until, timeout;
     status_t	st;
 
-    if (wtime >= 0)
+    إذا (wtime >= 0)
     {
 	timeout = wtime * 1000;
 	until = system_time() + timeout;
     }
-    else
+    وإلا
 	timeout = B_INFINITE_TIMEOUT;
 
     focus = gui.in_focus;
-    for (;;)
+    لكل (;;)
     {
 	// Stop or start blinking when focus changes
-	if (gui.in_focus != focus)
+	إذا (gui.in_focus != focus)
 	{
-	    if (gui.in_focus)
+	    إذا (gui.in_focus)
 		gui_mch_start_blink();
-	    else
+	    وإلا
 		gui_mch_stop_blink(TRUE);
 	    focus = gui.in_focus;
 	}
@@ -4364,17 +4364,17 @@ gui_mch_wait_for_chars(
 # endif
 	parse_queued_messages();
 # ifdef FEAT_TIMERS
-	if (did_add_timer)
+	إذا (did_add_timer)
 	    // Need to recompute the waiting time.
-	    break;
+	    اكسر;
 # endif
 # ifdef FEAT_JOB_CHANNEL
-	if (has_any_channel())
+	إذا (has_any_channel())
 	{
-	    if (wtime < 0 || timeout > 20000)
+	    إذا (wtime < 0 || timeout > 20000)
 		timeout = 20000;
 	}
-	else if (wtime < 0)
+	وإلا إذا (wtime < 0)
 	    timeout = B_INFINITE_TIMEOUT;
 # endif
 #endif
@@ -4387,23 +4387,23 @@ gui_mch_wait_for_chars(
 	 */
 	st = gui_haiku_process_event(timeout);
 
-	if (input_available())
-	    return OK;
-	if (st < B_OK)		// includes B_TIMED_OUT
-	    return FAIL;
+	إذا (كىرگۈزۈش_available())
+	    أرجع OK;
+	إذا (st < B_OK)		// includes B_TIMED_OUT
+	    أرجع FAIL;
 
 	/*
 	 * Calculate how much longer we're willing to wait for the
 	 * next event.
 	 */
-	if (wtime >= 0)
+	إذا (wtime >= 0)
 	{
 	    timeout = until - system_time();
-	    if (timeout < 0)
-		break;
+	    إذا (timeout < 0)
+		اكسر;
 	}
     }
-    return FAIL;
+    أرجع FAIL;
 
 }
 
@@ -4415,38 +4415,38 @@ gui_mch_wait_for_chars(
  * Flush any output to the screen. This is typically called before
  * the app goes to sleep.
  */
-    void
+    فراغ
 gui_mch_flush()
 {
     //	does this need to lock the window? Apparently not but be safe.
-    if (gui.vimWindow->Lock()) {
+    إذا (gui.vimWindow->Lock()) {
 	gui.vimWindow->Flush();
 	gui.vimWindow->Unlock();
     }
-    return;
+    أرجع;
 }
 
 /*
  * Clear a rectangular region of the screen from text pos (row1, col1) to
  * (row2, col2) inclusive.
  */
-void
+فراغ
 gui_mch_clear_block(
-	int	row1,
-	int	col1,
-	int	row2,
-	int	col2)
+	صحيح	row1,
+	صحيح	col1,
+	صحيح	row2,
+	صحيح	col2)
 {
-    if (gui.vimWindow->Lock()) {
+    إذا (gui.vimWindow->Lock()) {
 	gui.vimTextArea->mchClearBlock(row1, col1, row2, col2);
 	gui.vimWindow->Unlock();
     }
 }
 
-    void
+    فراغ
 gui_mch_clear_all()
 {
-    if (gui.vimWindow->Lock()) {
+    إذا (gui.vimWindow->Lock()) {
 	gui.vimTextArea->mchClearAll();
 	gui.vimWindow->Unlock();
     }
@@ -4456,36 +4456,36 @@ gui_mch_clear_all()
  * Delete the given number of lines from the given row, scrolling up any
  * text further down within the scroll region.
  */
-void
-gui_mch_delete_lines(
-	int	row,
-	int	num_lines)
+فراغ
+gui_mch_delete_قۇرلار(
+	صحيح	row,
+	صحيح	رەقەم_قۇرلار)
 {
-    gui.vimTextArea->mchDeleteLines(row, num_lines);
+    gui.vimTextArea->mch_Delete_قۇرلار(row, رەقەم_قۇرلار);
 }
 
 /*
  * Insert the given number of lines before the given row, scrolling down any
  * following text within the scroll region.
  */
-void
-gui_mch_insert_lines(
-	int	row,
-	int	num_lines)
+فراغ
+gui_mch_قىستۇرۇش_قۇرلار(
+	صحيح	row,
+	صحيح	رەقەم_قۇرلار)
 {
-    gui.vimTextArea->mchInsertLines(row, num_lines);
+    gui.vimTextArea->mch_قىستۇرۇش_قۇرلار(row, رەقەم_قۇرلار);
 }
 
-#if defined(FEAT_MENU)
+#إذا defined(FEAT_MENU)
 /*
  * Menu stuff.
  */
 
-void
+فراغ
 gui_mch_enable_menu(
-	int	flag)
+	صحيح	flag)
 {
-    if (gui.vimWindow->Lock())
+    إذا (gui.vimWindow->Lock())
     {
 	BMenuBar *menubar = gui.vimForm->MenuBar();
 	menubar->SetEnabled(flag);
@@ -4493,12 +4493,12 @@ gui_mch_enable_menu(
     }
 }
 
-void
+فراغ
 gui_mch_set_menu_pos(
-	int	x,
-	int	y,
-	int	w,
-	int	h)
+	صحيح	x,
+	صحيح	y,
+	صحيح	w,
+	صحيح	h)
 {
     // It will be in the right place anyway
 }
@@ -4506,26 +4506,26 @@ gui_mch_set_menu_pos(
 /*
  * Add a sub menu to the menu bar.
  */
-void
+فراغ
 gui_mch_add_menu(
 	vimmenu_T   *menu,
-	int	idx)
+	صحيح	idx)
 {
     vimmenu_T	*parent = menu->parent;
 
     //	popup menu - just create it unattached
-    if (menu_is_popup(menu->name) && parent == NULL) {
-	BPopUpMenu* popUpMenu = new BPopUpMenu((const char*)menu->name, false, false);
-	menu->submenu_id = popUpMenu;
-	menu->id = NULL;
-	return;
+    إذا (menu_is_popup(menu->name) && parent == عدم) {
+	BPopUpMenu* چىقىرىش_Up_Menu = جديد BPopUpMenu((ثابت حرف*)menu->name, خطأ, خطأ);
+	menu->submenu_id = چىقىرىش_Up_Menu;
+	menu->id = عدم;
+	أرجع;
     }
 
-    if (!menu_is_menubar(menu->name)
-	    || (parent != NULL && parent->submenu_id == NULL))
-	return;
+    إذا (!menu_is_menubar(menu->name)
+	    || (parent != عدم && parent->submenu_id == عدم))
+	أرجع;
 
-    if (gui.vimWindow->Lock())
+    إذا (gui.vimWindow->Lock())
     {
 	// Major re-write of the menu code, it was failing with memory corruption when
 	// we started loading multiple files (the Buffer menu)
@@ -4537,16 +4537,16 @@ gui_mch_add_menu(
 
 	BMenu *tmp;
 
-	if ( parent )
+	إذا ( parent )
 	    tmp = parent->submenu_id;
-	else
+	وإلا
 	    tmp = gui.vimForm->MenuBar();
 	//  make sure we don't try and add the same menu twice. The Buffers menu tries to
 	//  do this and Be starts to crash...
 
-	if ( ! tmp->FindItem((const char *) menu->dname)) {
+	إذا ( ! tmp->FindItem((ثابت حرف *) menu->dname)) {
 
-	    BMenu *bmenu = new BMenu((char *)menu->dname);
+	    BMenu *bmenu = جديد BMenu((حرف *)menu->dname);
 
 	    menu->submenu_id = bmenu;
 
@@ -4554,37 +4554,37 @@ gui_mch_add_menu(
 	    tmp->AddItem(bmenu);
 
 	    //	Now it's safe to query the menu for the associated MenuItem...
-	    menu->id = tmp->FindItem((const char *) menu->dname);
+	    menu->id = tmp->FindItem((ثابت حرف *) menu->dname);
 
 	}
 	gui.vimWindow->Unlock();
     }
 }
 
-    void
-gui_mch_toggle_tearoffs(int enable)
+    فراغ
+gui_mch_toggle_tearoffs(صحيح enable)
 {
     // no tearoff menus
 }
 
-    static BMessage *
+    ساكن BMessage *
 MenuMessage(vimmenu_T *menu)
 {
-    BMessage *m = new BMessage('menu');
-    m->AddPointer("VimMenu", (void *)menu);
+    BMessage *m = جديد BMessage('menu');
+    m->AddPointer("VimMenu", (فراغ *)menu);
 
-    return m;
+    أرجع m;
 }
 
 /*
  * Add a menu item to a menu
  */
-void
+فراغ
 gui_mch_add_menu_item(
 	vimmenu_T   *menu,
-	int	idx)
+	صحيح	idx)
 {
-    int	    mnemonic = 0;
+    صحيح	    mnemonic = 0;
     vimmenu_T	*parent = menu->parent;
 
     // TODO: use menu->actext
@@ -4593,32 +4593,32 @@ gui_mch_add_menu_item(
     //
     // Punt for Now...
     // richard@whiequeen.com jul 99
-    if (gui.vimWindow->Lock())
+    إذا (gui.vimWindow->Lock())
     {
 #ifdef FEAT_TOOLBAR
-	if (menu_is_toolbar(parent->name)) {
+	إذا (menu_is_toolbar(parent->name)) {
 	    VimToolbar *toolbar = gui.vimForm->ToolBar();
-	    if (toolbar != NULL) {
+	    إذا (toolbar != عدم) {
 		toolbar->AddButton(idx, menu);
 	    }
-	} else
+	} وإلا
 #endif
 
-	if (parent->submenu_id != NULL || menu_is_popup(parent->name)) {
-	    if (menu_is_separator(menu->name)) {
-		BSeparatorItem *item = new BSeparatorItem();
+	إذا (parent->submenu_id != عدم || menu_is_popup(parent->name)) {
+	    إذا (menu_is_separator(menu->name)) {
+		BSeparatorItem *item = جديد BSeparatorItem();
 		parent->submenu_id->AddItem(item);
 		menu->id = item;
-		menu->submenu_id = NULL;
+		menu->submenu_id = عدم;
 	    }
-	    else {
-		BMenuItem *item = new BMenuItem((char *)menu->dname,
+	    وإلا {
+		BMenuItem *item = جديد BMenuItem((حرف *)menu->dname,
 			MenuMessage(menu));
 		item->SetTarget(gui.vimTextArea);
-		item->SetTrigger((char) menu->mnemonic);
+		item->SetTrigger((حرف) menu->mnemonic);
 		parent->submenu_id->AddItem(item);
 		menu->id = item;
-		menu->submenu_id = NULL;
+		menu->submenu_id = عدم;
 	    }
 	}
 	gui.vimWindow->Unlock();
@@ -4628,22 +4628,22 @@ gui_mch_add_menu_item(
 /*
  * Destroy the machine specific menu widget.
  */
-void
+فراغ
 gui_mch_destroy_menu(
 	vimmenu_T   *menu)
 {
-    if (gui.vimWindow->Lock())
+    إذا (gui.vimWindow->Lock())
     {
 #ifdef FEAT_TOOLBAR
-	if (menu->parent && menu_is_toolbar(menu->parent->name)) {
+	إذا (menu->parent && menu_is_toolbar(menu->parent->name)) {
 	    VimToolbar *toolbar = gui.vimForm->ToolBar();
-	    if (toolbar != NULL) {
+	    إذا (toolbar != عدم) {
 		toolbar->RemoveButton(menu);
 	    }
-	} else
+	} وإلا
 #endif
 	{
-	    assert(menu->submenu_id == NULL || menu->submenu_id->CountItems() == 0);
+	    أكد(menu->submenu_id == عدم || menu->submenu_id->سانى_بۇيۇملار() == 0);
 	    /*
 	     * Detach this menu from its parent, so that it is not deleted
 	     * twice once we get to delete that parent.
@@ -4652,23 +4652,23 @@ gui_mch_destroy_menu(
 	     * removed and deleted before).
 	     */
 	    BMenu *bmenu = menu->id->Menu();
-	    if (bmenu)
+	    إذا (bmenu)
 	    {
 		bmenu->RemoveItem(menu->id);
 		/*
 		 * If we removed the last item from the menu bar,
 		 * resize it out of sight.
 		 */
-		if (bmenu == gui.vimForm->MenuBar() && bmenu->CountItems() == 0)
+		إذا (bmenu == gui.vimForm->MenuBar() && bmenu->سانى_بۇيۇملار() == 0)
 		{
 		    bmenu->ResizeTo(-MENUBAR_MARGIN, -MENUBAR_MARGIN);
 		}
 	    }
 	    delete menu->id;
-	    menu->id = NULL;
-	    menu->submenu_id = NULL;
+	    menu->id = عدم;
+	    menu->submenu_id = عدم;
 
-	    gui.menu_height = (int) gui.vimForm->MenuHeight();
+	    gui.menu_height = (صحيح) gui.vimForm->MenuHeight();
 	}
 	gui.vimWindow->Unlock();
     }
@@ -4677,59 +4677,59 @@ gui_mch_destroy_menu(
 /*
  * Make a menu either grey or not grey.
  */
-void
+فراغ
 gui_mch_menu_grey(
 	vimmenu_T   *menu,
-	int	grey)
+	صحيح	grey)
 {
 #ifdef FEAT_TOOLBAR
-    if (menu->parent && menu_is_toolbar(menu->parent->name)) {
-	if (gui.vimWindow->Lock()) {
+    إذا (menu->parent && menu_is_toolbar(menu->parent->name)) {
+	إذا (gui.vimWindow->Lock()) {
 	    VimToolbar *toolbar = gui.vimForm->ToolBar();
-	    if (toolbar != NULL) {
+	    إذا (toolbar != عدم) {
 		toolbar->GrayButton(menu, grey);
 	    }
 	    gui.vimWindow->Unlock();
 	}
-    } else
+    } وإلا
 #endif
-    if (menu->id != NULL)
+    إذا (menu->id != عدم)
 	menu->id->SetEnabled(!grey);
 }
 
 /*
  * Make menu item hidden or not hidden
  */
-void
+فراغ
 gui_mch_menu_hidden(
 	vimmenu_T   *menu,
-	int	hidden)
+	صحيح	hidden)
 {
-    if (menu->id != NULL)
+    إذا (menu->id != عدم)
 	menu->id->SetEnabled(!hidden);
 }
 
 /*
  * This is called after setting all the menus to grey/hidden or not.
  */
-    void
+    فراغ
 gui_mch_draw_menubar()
 {
     // Nothing to do in BeOS
 }
 
-    void
+    فراغ
 gui_mch_show_popupmenu(vimmenu_T *menu)
 {
-    if (!menu_is_popup(menu->name) || menu->submenu_id == NULL)
-	return;
+    إذا (!menu_is_popup(menu->name) || menu->submenu_id == عدم)
+	أرجع;
 
     BPopUpMenu* popupMenu = dynamic_cast<BPopUpMenu*>(menu->submenu_id);
-    if (popupMenu == NULL)
-	return;
+    إذا (popupMenu == عدم)
+	أرجع;
 
     BPoint point;
-    if (gui.vimWindow->Lock()) {
+    إذا (gui.vimWindow->Lock()) {
 	uint32 buttons = 0;
 	gui.vimTextArea->GetMouse(&point, &buttons);
 	gui.vimTextArea->ConvertToScreen(&point);
@@ -4746,51 +4746,51 @@ gui_mch_show_popupmenu(vimmenu_T *menu)
 /*
  * Clipboard stuff, for cutting and pasting text to other windows.
  */
-char textplain[] = "text/plain";
-char vimselectiontype[] = "application/x-vnd.Rhialto-Vim-selectiontype";
+حرف textplain[] = "text/plain";
+حرف vimselectiontype[] = "application/x-vnd.Rhialto-Vim-selectiontype";
 
 /*
  * Get the current selection and put it in the clipboard register.
  */
-    void
+    فراغ
 clip_mch_request_selection(Clipboard_T *cbd)
 {
-    if (be_clipboard->Lock())
+    إذا (be_clipboard->Lock())
     {
 	BMessage *m = be_clipboard->Data();
 	// m->PrintToStream();
 
-	char_u *string = NULL;
+	char_u *string = عدم;
 	ssize_t stringlen = -1;
 
-	if (m->FindData(textplain, B_MIME_TYPE,
-		    (const void **)&string, &stringlen) == B_OK
-		|| m->FindString("text", (const char **)&string) == B_OK)
+	إذا (m->FindData(textplain, B_MIME_TYPE,
+		    (ثابت فراغ **)&string, &stringlen) == B_OK
+		|| m->FindString("text", (ثابت حرف **)&string) == B_OK)
 	{
-	    if (stringlen == -1)
+	    إذا (stringlen == -1)
 		stringlen = STRLEN(string);
 
-	    int type;
-	    char *seltype;
+	    صحيح type;
+	    حرف *seltype;
 	    ssize_t seltypelen;
 
 	    /*
 	     * Try to get the special vim selection type first
 	     */
-	    if (m->FindData(vimselectiontype, B_MIME_TYPE,
-			(const void **)&seltype, &seltypelen) == B_OK)
+	    إذا (m->FindData(vimselectiontype, B_MIME_TYPE,
+			(ثابت فراغ **)&seltype, &seltypelen) == B_OK)
 	    {
-		switch (*seltype)
+		بدل (*seltype)
 		{
-		    default:
-		    case 'L':	type = MLINE;	break;
-		    case 'C':	type = MCHAR;	break;
+		    افتراضي:
+		    حالة 'L':	type = MLINE;	اكسر;
+		    حالة 'C':	type = MCHAR;	اكسر;
 #ifdef FEAT_VISUAL
-		    case 'B':	type = MBLOCK;	break;
+		    حالة 'B':	type = MBLOCK;	اكسر;
 #endif
 		}
 	    }
-	    else
+	    وإلا
 	    {
 		// Otherwise use heuristic as documented
 		type = memchr(string, stringlen, '\n') ? MLINE : MCHAR;
@@ -4803,7 +4803,7 @@ clip_mch_request_selection(Clipboard_T *cbd)
 /*
  * Make vim the owner of the current selection.
  */
-    void
+    فراغ
 clip_mch_lose_selection(Clipboard_T *cbd)
 {
     // Nothing needs to be done here
@@ -4812,56 +4812,56 @@ clip_mch_lose_selection(Clipboard_T *cbd)
 /*
  * Make vim the owner of the current selection.  Return OK upon success.
  */
-    int
+    صحيح
 clip_mch_own_selection(Clipboard_T *cbd)
 {
     /*
      * Never actually own the clipboard.  If another application sets the
      * clipboard, we don't want to think that we still own it.
      */
-    return FAIL;
+    أرجع FAIL;
 }
 
 /*
  * Send the current selection to the clipboard.
  */
-    void
+    فراغ
 clip_mch_set_selection(Clipboard_T *cbd)
 {
-    if (be_clipboard->Lock())
+    إذا (be_clipboard->Lock())
     {
 	be_clipboard->Clear();
 	BMessage *m = be_clipboard->Data();
-	assert(m);
+	أكد(m);
 
 	// If the '*' register isn't already filled in, fill it in now
 	cbd->owned = TRUE;
 	clip_get_selection(cbd);
 	cbd->owned = FALSE;
 
-	char_u	*str = NULL;
-	long_u	count;
-	int type;
+	char_u	*str = عدم;
+	long_u	سانى;
+	صحيح type;
 
-	type = clip_convert_selection(&str, &count, cbd);
+	type = clip_convert_selection(&str, &سانى, cbd);
 
-	if (type < 0)
-	    return;
+	إذا (type < 0)
+	    أرجع;
 
-	m->AddData(textplain, B_MIME_TYPE, (void *)str, count);
+	m->AddData(textplain, B_MIME_TYPE, (فراغ *)str, سانى);
 
 	// Add type of selection
-	char	vtype;
-	switch (type)
+	حرف	vtype;
+	بدل (type)
 	{
-	    default:
-	    case MLINE:    vtype = 'L';    break;
-	    case MCHAR:    vtype = 'C';    break;
+	    افتراضي:
+	    حالة MLINE:    vtype = 'L';    اكسر;
+	    حالة MCHAR:    vtype = 'C';    اكسر;
 #ifdef FEAT_VISUAL
-	    case MBLOCK:   vtype = 'B';    break;
+	    حالة MBLOCK:   vtype = 'B';    اكسر;
 #endif
 	}
-	m->AddData(vimselectiontype, B_MIME_TYPE, (void *)&vtype, 1);
+	m->AddData(vimselectiontype, B_MIME_TYPE, (فراغ *)&vtype, 1);
 
 	vim_free(str);
 
@@ -4893,47 +4893,47 @@ clip_mch_set_selection(Clipboard_T *cbd)
  */
 char_u *
 gui_mch_browse(
-	int saving,
+	صحيح saving,
 	char_u *title,
 	char_u *dflt,
 	char_u *ext,
 	char_u *initdir,
 	char_u *filter)
 {
-    gui.vimApp->fFilePanel = new BFilePanel((saving == TRUE) ? B_SAVE_PANEL : B_OPEN_PANEL,
-	    NULL, NULL, 0, false,
-	    new BMessage((saving == TRUE) ? 'save' : 'open'), NULL, true);
+    gui.vimApp->fFilePanel = جديد BFilePanel((saving == TRUE) ? B_SAVE_PANEL : B_OPEN_PANEL,
+	    عدم, عدم, 0, خطأ,
+	    جديد BMessage((saving == TRUE) ? 'save' : 'open'), عدم, true);
 
     gui.vimApp->fBrowsedPath.Unset();
 
-    gui.vimApp->fFilePanel->Window()->SetTitle((char*)title);
-    gui.vimApp->fFilePanel->SetPanelDirectory((const char*)initdir);
+    gui.vimApp->fFilePanel->Window()->SetTitle((حرف*)title);
+    gui.vimApp->fFilePanel->SetPanelDirectory((ثابت حرف*)initdir);
 
     gui.vimApp->fFilePanel->Show();
 
     gui.vimApp->fFilePanelSem = create_sem(0, "FilePanelSem");
 
-    while (acquire_sem(gui.vimApp->fFilePanelSem) == B_INTERRUPTED);
+    طالما (acquire_sem(gui.vimApp->fFilePanelSem) == B_INTERRUPTED);
 
-    char_u *fileName = NULL;
+    char_u *fileName = عدم;
     status_t result = gui.vimApp->fBrowsedPath.InitCheck();
-    if (result == B_OK) {
+    إذا (result == B_OK) {
 	fileName = vim_strsave((char_u*)gui.vimApp->fBrowsedPath.Path());
-    } else
-	if (result != B_NO_INIT) {
+    } وإلا
+	إذا (result != B_NO_INIT) {
 	    fprintf(stderr, "gui_mch_browse: BPath error: %#08x (%s)\n",
 		    result, strerror(result));
 	}
 
     delete gui.vimApp->fFilePanel;
-    gui.vimApp->fFilePanel = NULL;
+    gui.vimApp->fFilePanel = عدم;
 
-    return fileName;
+    أرجع fileName;
 }
 #endif // FEAT_BROWSE
 
 
-#if defined(FEAT_GUI_DIALOG)
+#إذا defined(FEAT_GUI_DIALOG)
 
 /*
  * Create a dialog dynamically from the parameter strings.
@@ -4952,21 +4952,21 @@ gui_mch_browse(
  * If stubbing out this fn, return 1.
  */
 
-int
+صحيح
 gui_mch_dialog(
-	int	 type,
+	صحيح	 type,
 	char_u	*title,
 	char_u	*message,
 	char_u	*buttons,
-	int	 dfltbutton,
+	صحيح	 dfltbutton,
 	char_u	*textfield,
-	int ex_cmd)
+	صحيح ex_cmd)
 {
-    VimDialog *dialog = new VimDialog(type, (char*)title, (char*)message,
-	    (char*)buttons, dfltbutton, (char*)textfield, ex_cmd);
-    bool ret = dialog->Go();
+    VimDialog *dialog = جديد VimDialog(type, (حرف*)title, (حرف*)message,
+	    (حرف*)buttons, dfltbutton, (حرف*)textfield, ex_cmd);
+    منطقي ret = dialog->Go();
     delete dialog;
-	return ret;
+	أرجع ret;
 }
 
 #endif // FEAT_GUI_DIALOG
@@ -4980,43 +4980,43 @@ gui_mch_get_rgb(guicolor_T pixel)
 {
     rgb_color rgb = GUI_TO_RGB(pixel);
 
-    return ((rgb.red & 0xff) << 16) + ((rgb.green & 0xff) << 8)
+    أرجع ((rgb.red & 0xff) << 16) + ((rgb.green & 0xff) << 8)
 	+ (rgb.blue & 0xff);
 }
 
-    void
-gui_mch_setmouse(int x, int y)
+    فراغ
+gui_mch_setmouse(صحيح x, صحيح y)
 {
     TRACE();
     // TODO
 }
 
 #ifdef FEAT_MBYTE_IME
-    void
-im_set_position(int row, int col)
+    فراغ
+im_set_position(صحيح row, صحيح col)
 {
-    if (gui.vimWindow->Lock())
+    إذا (gui.vimWindow->Lock())
     {
 	gui.vimTextArea->DrawIMString();
 	gui.vimWindow->Unlock();
     }
-    return;
+    أرجع;
 }
 #endif
 
-    void
-gui_mch_show_toolbar(int showit)
+    فراغ
+gui_mch_show_toolbar(صحيح showit)
 {
     VimToolbar *toolbar = gui.vimForm->ToolBar();
     gui.toolbar_height = (toolbar && showit) ? toolbar->ToolbarHeight() : 0.;
 }
 
-    void
-gui_mch_set_toolbar_pos(int x, int y, int w, int h)
+    فراغ
+gui_mch_set_toolbar_pos(صحيح x, صحيح y, صحيح w, صحيح h)
 {
     VimToolbar *toolbar = gui.vimForm->ToolBar();
-    if (toolbar != NULL) {
-	if (gui.vimWindow->Lock()) {
+    إذا (toolbar != عدم) {
+	إذا (gui.vimWindow->Lock()) {
 	    toolbar->MoveTo(x, y);
 	    toolbar->ResizeTo(w - 1, h - 1);
 	    gui.vimWindow->Unlock();
@@ -5024,33 +5024,33 @@ gui_mch_set_toolbar_pos(int x, int y, int w, int h)
     }
 }
 
-#if defined(FEAT_GUI_TABLINE)
+#إذا defined(FEAT_GUI_TABLINE)
 
 /*
  * Show or hide the tabline.
  */
-    void
-gui_mch_show_tabline(int showit)
+    فراغ
+gui_mch_show_tabline(صحيح showit)
 {
-    VimTabLine *tabLine = gui.vimForm->TabLine();
+    Vim_Tab_قۇر *tab_قۇر = gui.vimForm->Tab_قۇر();
 
-    if (tabLine == NULL)
-	return;
+    إذا (tab_قۇر == عدم)
+	أرجع;
 
-    if (!showit != !gui.vimForm->IsShowingTabLine()) {
-	gui.vimForm->SetShowingTabLine(showit != 0);
+    إذا (!showit != !gui.vimForm->Is_Showing_Tab_قۇر()) {
+	gui.vimForm->Set_Showing_Tab_قۇر(showit != 0);
 	gui.tabline_height = gui.vimForm->TablineHeight();
     }
 }
 
-    void
-gui_mch_set_tabline_pos(int x, int y, int w, int h)
+    فراغ
+gui_mch_set_tabline_pos(صحيح x, صحيح y, صحيح w, صحيح h)
 {
-    VimTabLine *tabLine = gui.vimForm->TabLine();
-    if (tabLine != NULL) {
-	if (gui.vimWindow->Lock()) {
-	    tabLine->MoveTo(x, y);
-	    tabLine->ResizeTo(w - 1, h - 1);
+    Vim_Tab_قۇر *tab_قۇر = gui.vimForm->Tab_قۇر();
+    إذا (tab_قۇر != عدم) {
+	إذا (gui.vimWindow->Lock()) {
+	    tab_قۇر->MoveTo(x, y);
+	    tab_قۇر->ResizeTo(w - 1, h - 1);
 	    gui.vimWindow->Unlock();
 	}
     }
@@ -5059,53 +5059,53 @@ gui_mch_set_tabline_pos(int x, int y, int w, int h)
 /*
  * Return TRUE when tabline is displayed.
  */
-    int
+    صحيح
 gui_mch_showing_tabline()
 {
-    VimTabLine *tabLine = gui.vimForm->TabLine();
-    return tabLine != NULL && gui.vimForm->IsShowingTabLine();
+    Vim_Tab_قۇر *tab_قۇر = gui.vimForm->Tab_قۇر();
+    أرجع tab_قۇر != عدم && gui.vimForm->Is_Showing_Tab_قۇر();
 }
 
 /*
  * Update the labels of the tabline.
  */
-    void
+    فراغ
 gui_mch_update_tabline()
 {
     tabpage_T	*tp;
-    int	    nr = 0;
-    int	    curtabidx = 0;
+    صحيح	    nr = 0;
+    صحيح	    curtabidx = 0;
 
-    VimTabLine *tabLine = gui.vimForm->TabLine();
+    Vim_Tab_قۇر *tab_قۇر = gui.vimForm->Tab_قۇر();
 
-    if (tabLine == NULL)
-	return;
+    إذا (tab_قۇر == عدم)
+	أرجع;
 
     gui.vimWindow->Lock();
 
     // Add a label for each tab page.  They all contain the same text area.
-    for (tp = first_tabpage; tp != NULL; tp = tp->tp_next, ++nr) {
-	if (tp == curtab)
+    لكل (tp = first_tabpage; tp != عدم; tp = tp->tp_next, ++nr) {
+	إذا (tp == curtab)
 	    curtabidx = nr;
 
-	BTab* tab = tabLine->TabAt(nr);
+	BTab* tab = tab_قۇر->TabAt(nr);
 
-	if (tab == NULL) {
-	    tab = new VimTabLine::VimTab();
-	    tabLine->AddTab(NULL, tab);
+	إذا (tab == عدم) {
+	    tab = جديد Vim_Tab_قۇر::VimTab();
+	    tab_قۇر->AddTab(عدم, tab);
 	}
 
 	get_tabline_label(tp, FALSE);
-	tab->SetLabel((const char*)NameBuff);
-	tabLine->Invalidate();
+	tab->SetLabel((ثابت حرف*)NameBuff);
+	tab_قۇر->Invalidate();
     }
 
     // Remove any old labels.
-    while (nr < tabLine->CountTabs())
-	tabLine->RemoveTab(nr);
+    طالما (nr < tab_قۇر->سانى_Tabs())
+	tab_قۇر->RemoveTab(nr);
 
-    if (tabLine->Selection() != curtabidx)
-	tabLine->Select(curtabidx);
+    إذا (tab_قۇر->Selection() != curtabidx)
+	tab_قۇر->Select(curtabidx);
 
     gui.vimWindow->Unlock();
 }
@@ -5113,17 +5113,17 @@ gui_mch_update_tabline()
 /*
  * Set the current tab to "nr".  First tab is 1.
  */
-    void
-gui_mch_set_curtab(int nr)
+    فراغ
+gui_mch_set_curtab(صحيح nr)
 {
-    VimTabLine *tabLine = gui.vimForm->TabLine();
-    if (tabLine == NULL)
-	return;
+    Vim_Tab_قۇر *tab_قۇر = gui.vimForm->Tab_قۇر();
+    إذا (tab_قۇر == عدم)
+	أرجع;
 
     gui.vimWindow->Lock();
 
-    if (tabLine->Selection() != nr -1)
-	tabLine->Select(nr -1);
+    إذا (tab_قۇر->Selection() != nr -1)
+	tab_قۇر->Select(nr -1);
 
     gui.vimWindow->Unlock();
 }

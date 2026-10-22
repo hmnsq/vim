@@ -12,9 +12,9 @@
  */
 #define USING_FLOAT_STUFF
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 
 #ifdef VMS
 # include <float.h>
@@ -26,342 +26,342 @@
  * this always uses a decimal point.
  * Returns the length of the text that was consumed.
  */
-    int
+    صحيح
 string2float(
     char_u	*text,
-    float_T	*value,	    // result stored here
-    int		skip_quotes)
+    float_T	*قىممەت,	    // result stored here
+    صحيح		skip_quotes)
 {
-    char	*s = (char *)text;
+    حرف	*s = (حرف *)text;
     float_T	f;
 
     // MS-Windows does not deal with "inf" and "nan" properly.
-    if (STRNICMP(text, "inf", 3) == 0)
+    إذا (STRNICMP(text, "inf", 3) == 0)
     {
-	*value = INFINITY;
-	return 3;
+	*قىممەت = INFINITY;
+	أرجع 3;
     }
-    if (STRNICMP(text, "-inf", 4) == 0)
+    إذا (STRNICMP(text, "-inf", 4) == 0)
     {
-	*value = -INFINITY;
-	return 4;
+	*قىممەت = -INFINITY;
+	أرجع 4;
     }
-    if (STRNICMP(text, "nan", 3) == 0)
+    إذا (STRNICMP(text, "nan", 3) == 0)
     {
-	*value = NAN;
-	return 3;
+	*قىممەت = NAN;
+	أرجع 3;
     }
-    if (skip_quotes && vim_strchr((char_u *)s, '\'') != NULL)
+    إذا (skip_quotes && vim_strchr((char_u *)s, '\'') != عدم)
     {
 	char_u	    buf[100];
 	char_u	    *p;
-	int	    quotes = 0;
+	صحيح	    quotes = 0;
 
 	vim_strncpy(buf, (char_u *)s, 99);
-	for (p = buf; ; p = skipdigits(p))
+	لكل (p = buf; ; p = skipdigits(p))
 	{
 	    // remove single quotes between digits, not in the exponent
-	    if (*p == '\'')
+	    إذا (*p == '\'')
 	    {
 		++quotes;
 		mch_memmove(p, p + 1, STRLEN(p));
 	    }
-	    if (!vim_isdigit(*p))
-		break;
+	    إذا (!vim_isdigit(*p))
+		اكسر;
 	}
-	s = (char *)buf;
+	s = (حرف *)buf;
 	f = strtod(s, &s);
-	*value = f;
-	return (int)((char_u *)s - buf) + quotes;
+	*قىممەت = f;
+	أرجع (صحيح)((char_u *)s - buf) + quotes;
     }
 
     f = strtod(s, &s);
-    *value = f;
-    return (int)((char_u *)s - text);
+    *قىممەت = f;
+    أرجع (صحيح)((char_u *)s - text);
 }
 
 /*
  * Get the float value of "argvars[0]" into "f".
  * Returns FAIL when the argument is not a Number or Float.
  */
-    static int
+    ساكن صحيح
 get_float_arg(typval_T *argvars, float_T *f)
 {
-    if (argvars[0].v_type == VAR_FLOAT)
+    إذا (argvars[0].v_type == VAR_FLOAT)
     {
 	*f = argvars[0].vval.v_float;
-	return OK;
+	أرجع OK;
     }
-    if (argvars[0].v_type == VAR_NUMBER)
+    إذا (argvars[0].v_type == VAR_سان)
     {
-	*f = (float_T)argvars[0].vval.v_number;
-	return OK;
+	*f = (float_T)argvars[0].vval.v_سان;
+	أرجع OK;
     }
-    emsg(_(e_number_or_float_required));
-    return FAIL;
+    emsg(_(e_سان_or_float_required));
+    أرجع FAIL;
 }
 
 /*
  * "abs(expr)" function
  */
-    void
+    فراغ
 f_abs(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    إذا (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	أرجع;
 
-    if (argvars[0].v_type == VAR_FLOAT)
+    إذا (argvars[0].v_type == VAR_FLOAT)
     {
 	rettv->v_type = VAR_FLOAT;
 	rettv->vval.v_float = fabs(argvars[0].vval.v_float);
     }
-    else
+    وإلا
     {
 	varnumber_T	n;
-	int		error = FALSE;
+	صحيح		error = FALSE;
 
-	n = tv_get_number_chk(&argvars[0], &error);
-	if (error)
-	    rettv->vval.v_number = -1;
-	else if (n > 0)
-	    rettv->vval.v_number = n;
-	else
-	    rettv->vval.v_number = -n;
+	n = tv_get_سان_chk(&argvars[0], &error);
+	إذا (error)
+	    rettv->vval.v_سان = -1;
+	وإلا إذا (n > 0)
+	    rettv->vval.v_سان = n;
+	وإلا
+	    rettv->vval.v_سان = -n;
     }
 }
 
 /*
  * "acos()" function
  */
-    void
+    فراغ
 f_acos(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    إذا (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	أرجع;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    إذا (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = acos(f);
-    else
+    وإلا
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "asin()" function
  */
-    void
+    فراغ
 f_asin(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    إذا (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	أرجع;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    إذا (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = asin(f);
-    else
+    وإلا
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "atan()" function
  */
-    void
+    فراغ
 f_atan(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    إذا (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	أرجع;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    إذا (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = atan(f);
-    else
+    وإلا
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "atan2()" function
  */
-    void
+    فراغ
 f_atan2(typval_T *argvars, typval_T *rettv)
 {
     float_T	fx = 0.0, fy = 0.0;
 
-    if (in_vim9script()
+    إذا (in_vim9script()
 	    && (check_for_float_or_nr_arg(argvars, 0) == FAIL
 		|| check_for_float_or_nr_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &fx) == OK
+    إذا (get_float_arg(argvars, &fx) == OK
 				     && get_float_arg(&argvars[1], &fy) == OK)
 	rettv->vval.v_float = atan2(fx, fy);
-    else
+    وإلا
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "ceil({float})" function
  */
-    void
+    فراغ
 f_ceil(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    إذا (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	أرجع;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    إذا (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = ceil(f);
-    else
+    وإلا
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "cos()" function
  */
-    void
+    فراغ
 f_cos(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    إذا (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	أرجع;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    إذا (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = cos(f);
-    else
+    وإلا
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "cosh()" function
  */
-    void
+    فراغ
 f_cosh(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    إذا (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	أرجع;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    إذا (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = cosh(f);
-    else
+    وإلا
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "exp()" function
  */
-    void
+    فراغ
 f_exp(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    إذا (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	أرجع;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    إذا (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = exp(f);
-    else
+    وإلا
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "float2nr({float})" function
  */
-    void
+    فراغ
 f_float2nr(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    إذا (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	أرجع;
 
-    if (get_float_arg(argvars, &f) != OK)
-	return;
+    إذا (get_float_arg(argvars, &f) != OK)
+	أرجع;
 
-    if (f <= (float_T)-VARNUM_MAX + DBL_EPSILON)
-	rettv->vval.v_number = -VARNUM_MAX;
-    else if (f >= (float_T)VARNUM_MAX - DBL_EPSILON)
-	rettv->vval.v_number = VARNUM_MAX;
-    else
-	rettv->vval.v_number = (varnumber_T)f;
+    إذا (f <= (float_T)-VARNUM_MAX + DBL_EPSILON)
+	rettv->vval.v_سان = -VARNUM_MAX;
+    وإلا إذا (f >= (float_T)VARNUM_MAX - DBL_EPSILON)
+	rettv->vval.v_سان = VARNUM_MAX;
+    وإلا
+	rettv->vval.v_سان = (varnumber_T)f;
 }
 
 /*
  * "floor({float})" function
  */
-    void
+    فراغ
 f_floor(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    إذا (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	أرجع;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    إذا (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = floor(f);
-    else
+    وإلا
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "fmod()" function
  */
-    void
+    فراغ
 f_fmod(typval_T *argvars, typval_T *rettv)
 {
     float_T	fx = 0.0, fy = 0.0;
 
-    if (in_vim9script()
+    إذا (in_vim9script()
 	    && (check_for_float_or_nr_arg(argvars, 0) == FAIL
 		|| check_for_float_or_nr_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &fx) == OK
+    إذا (get_float_arg(argvars, &fx) == OK
 				     && get_float_arg(&argvars[1], &fy) == OK)
 	rettv->vval.v_float = fmod(fx, fy);
-    else
+    وإلا
 	rettv->vval.v_float = 0.0;
 }
 
-#if defined(HAVE_MATH_H)
+#إذا defined(HAVE_MATH_H)
 /*
  * "isinf()" function
  */
-    void
+    فراغ
 f_isinf(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    إذا (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	أرجع;
 
-    if (argvars[0].v_type == VAR_FLOAT && isinf(argvars[0].vval.v_float))
-	rettv->vval.v_number = argvars[0].vval.v_float > 0.0 ? 1 : -1;
+    إذا (argvars[0].v_type == VAR_FLOAT && isinf(argvars[0].vval.v_float))
+	rettv->vval.v_سان = argvars[0].vval.v_float > 0.0 ? 1 : -1;
 }
 
 /*
  * "isnan()" function
  */
-    void
+    فراغ
 f_isnan(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    إذا (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	أرجع;
 
-    rettv->vval.v_number = argvars[0].v_type == VAR_FLOAT
+    rettv->vval.v_سان = argvars[0].v_type == VAR_FLOAT
 					    && isnan(argvars[0].vval.v_float);
 }
 #endif
@@ -369,57 +369,57 @@ f_isnan(typval_T *argvars, typval_T *rettv)
 /*
  * "log()" function
  */
-    void
+    فراغ
 f_log(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    إذا (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	أرجع;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    إذا (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = log(f);
-    else
+    وإلا
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "log10()" function
  */
-    void
+    فراغ
 f_log10(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    إذا (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	أرجع;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    إذا (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = log10(f);
-    else
+    وإلا
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "pow()" function
  */
-    void
+    فراغ
 f_pow(typval_T *argvars, typval_T *rettv)
 {
     float_T	fx = 0.0, fy = 0.0;
 
-    if (in_vim9script()
+    إذا (in_vim9script()
 	    && (check_for_float_or_nr_arg(argvars, 0) == FAIL
 		|| check_for_float_or_nr_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &fx) == OK
+    إذا (get_float_arg(argvars, &fx) == OK
 				     && get_float_arg(&argvars[1], &fy) == OK)
 	rettv->vval.v_float = pow(fx, fy);
-    else
+    وإلا
 	rettv->vval.v_float = 0.0;
 }
 
@@ -430,103 +430,103 @@ f_pow(typval_T *argvars, typval_T *rettv)
     float_T
 vim_round(float_T f)
 {
-    return f > 0 ? floor(f + 0.5) : ceil(f - 0.5);
+    أرجع f > 0 ? floor(f + 0.5) : ceil(f - 0.5);
 }
 
 /*
  * "round({float})" function
  */
-    void
+    فراغ
 f_round(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    إذا (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	أرجع;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    إذا (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = vim_round(f);
-    else
+    وإلا
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "sin()" function
  */
-    void
+    فراغ
 f_sin(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    إذا (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	أرجع;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    إذا (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = sin(f);
-    else
+    وإلا
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "sinh()" function
  */
-    void
+    فراغ
 f_sinh(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    إذا (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	أرجع;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    إذا (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = sinh(f);
-    else
+    وإلا
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "sqrt()" function
  */
-    void
+    فراغ
 f_sqrt(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    إذا (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	أرجع;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    إذا (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = sqrt(f);
-    else
+    وإلا
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "str2float()" function
  */
-    void
+    فراغ
 f_str2float(typval_T *argvars, typval_T *rettv)
 {
     char_u *p;
-    int     isneg;
-    int	    skip_quotes;
+    صحيح     isneg;
+    صحيح	    skip_quotes;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    إذا (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	أرجع;
 
     skip_quotes = argvars[1].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[1]);
 
     p = skipwhite(tv_get_string_strict(&argvars[0]));
     isneg = (*p == '-');
 
-    if (*p == '+' || *p == '-')
+    إذا (*p == '+' || *p == '-')
 	p = skipwhite(p + 1);
-    (void)string2float(p, &rettv->vval.v_float, skip_quotes);
-    if (isneg)
+    (فراغ)string2float(p, &rettv->vval.v_float, skip_quotes);
+    إذا (isneg)
 	rettv->vval.v_float *= -1;
     rettv->v_type = VAR_FLOAT;
 }
@@ -534,55 +534,55 @@ f_str2float(typval_T *argvars, typval_T *rettv)
 /*
  * "tan()" function
  */
-    void
+    فراغ
 f_tan(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    إذا (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	أرجع;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    إذا (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = tan(f);
-    else
+    وإلا
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "tanh()" function
  */
-    void
+    فراغ
 f_tanh(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    إذا (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	أرجع;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    إذا (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = tanh(f);
-    else
+    وإلا
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "trunc({float})" function
  */
-    void
+    فراغ
 f_trunc(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    إذا (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	أرجع;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    إذا (get_float_arg(argvars, &f) == OK)
 	// trunc() is not in C90, use floor() or ceil() instead.
 	rettv->vval.v_float = f > 0 ? floor(f) : ceil(f);
-    else
+    وإلا
 	rettv->vval.v_float = 0.0;
 }
 
