@@ -14,7 +14,7 @@
 #define USING_FLOAT_STUFF
 #include "vim.h"
 
-#if defined(FEAT_EVAL)
+#ပေႃး defined(FEAT_EVAL)
 
 #ifdef VMS
 # include <float.h>
@@ -29,15 +29,15 @@ get_type_ptr(garray_T *type_gap)
 {
     type_T *type;
 
-    if (ga_grow(type_gap, 1) == FAIL)
-	return NULL;
+    ပေႃး (ga_grow(type_gap, 1) == FAIL)
+	ပွၵ်ႈ NULL;
     type = ALLOC_CLEAR_ONE(type_T);
-    if (type == NULL)
-	return NULL;
+    ပေႃး (type == NULL)
+	ပွၵ်ႈ NULL;
 
     ((type_T **)type_gap->ga_data)[type_gap->ga_len] = type;
     ++type_gap->ga_len;
-    return type;
+    ပွၵ်ႈ type;
 }
 
 /*
@@ -49,17 +49,17 @@ copy_type(type_T *type, garray_T *type_gap)
 {
     type_T *copy = get_type_ptr(type_gap);
 
-    if (copy == NULL)
-	return type;
+    ပေႃး (copy == NULL)
+	ပွၵ်ႈ type;
     *copy = *type;
     copy->tt_flags &= ~TTFLAG_STATIC;
 
-    if (type->tt_args != NULL
+    ပေႃး (type->tt_args != NULL
 	   && func_type_add_arg_types(copy, type->tt_argcount, type_gap) == OK)
-	for (int i = 0; i < type->tt_argcount; ++i)
+	for (puur_naa_nka i = 0; i < type->tt_argcount; ++i)
 	    copy->tt_args[i] = type->tt_args[i];
 
-    return copy;
+    ပွၵ်ႈ copy;
 }
 
 /*
@@ -69,27 +69,27 @@ copy_type(type_T *type, garray_T *type_gap)
     static type_T *
 copy_type_deep_rec(type_T *type, garray_T *type_gap, garray_T *seen_types)
 {
-    for (int i = 0; i < seen_types->ga_len; ++i)
-	if (((type_T **)seen_types->ga_data)[i * 2] == type)
+    for (puur_naa_nka i = 0; i < seen_types->ga_len; ++i)
+	ပေႃး (((type_T **)seen_types->ga_data)[i * 2] == type)
 	    // seen this type before, return the copy we made
-	    return ((type_T **)seen_types->ga_data)[i * 2 + 1];
+	    ပွၵ်ႈ ((type_T **)seen_types->ga_data)[i * 2 + 1];
 
     type_T *copy = copy_type(type, type_gap);
-    if (ga_grow(seen_types, 1) == FAIL)
-	return copy;
+    ပေႃး (ga_grow(seen_types, 1) == FAIL)
+	ပွၵ်ႈ copy;
     ((type_T **)seen_types->ga_data)[seen_types->ga_len * 2] = type;
     ((type_T **)seen_types->ga_data)[seen_types->ga_len * 2 + 1] = copy;
     ++seen_types->ga_len;
 
-    if (copy->tt_member != NULL)
+    ပေႃး (copy->tt_member != NULL)
 	copy->tt_member = copy_type_deep_rec(copy->tt_member,
 							 type_gap, seen_types);
-    if (type->tt_args != NULL)
-	for (int i = 0; i < type->tt_argcount; ++i)
+    ပေႃး (type->tt_args != NULL)
+	for (puur_naa_nka i = 0; i < type->tt_argcount; ++i)
 	    copy->tt_args[i] = copy_type_deep_rec(copy->tt_args[i],
 							 type_gap, seen_types);
 
-    return copy;
+    ပွၵ်ႈ copy;
 }
 
 /*
@@ -101,18 +101,18 @@ copy_type_deep(type_T *type, garray_T *type_gap)
 {
     garray_T seen_types;
     // stores type pairs : a type we have seen and the copy used
-    ga_init2(&seen_types, sizeof(type_T *) * 2, 20);
+    ga_init2(&seen_types, parimaa_na(type_T *) * 2, 20);
 
     type_T *res = copy_type_deep_rec(type, type_gap, &seen_types);
 
     ga_clear(&seen_types);
-    return res;
+    ပွၵ်ႈ res;
 }
 
     void
 clear_type_list(garray_T *gap)
 {
-    while (gap->ga_len > 0)
+    ၶၢဝ်း (gap->ga_len > 0)
 	vim_free(((type_T **)gap->ga_data)[--gap->ga_len]);
     ga_clear(gap);
 }
@@ -120,10 +120,10 @@ clear_type_list(garray_T *gap)
     void
 clear_func_type_list(garray_T *gap, type_T **func_type)
 {
-    while (gap->ga_len > 0)
+    ၶၢဝ်း (gap->ga_len > 0)
     {
 	// func_type pointing to the uf_type_list, so reset pointer
-	if (*func_type == ((type_T **)gap->ga_data)[--gap->ga_len])
+	ပေႃး (*func_type == ((type_T **)gap->ga_data)[--gap->ga_len])
 	    *func_type = &t_func_any;
 	vim_free(((type_T **)gap->ga_data)[gap->ga_len]);
     }
@@ -139,34 +139,34 @@ alloc_type(type_T *type)
 {
     type_T *ret;
 
-    if (type == NULL)
-	return NULL;
+    ပေႃး (type == NULL)
+	ပွၵ်ႈ NULL;
 
     // A fixed type never contains allocated types, return as-is.
-    if (type->tt_flags & TTFLAG_STATIC)
-	return type;
+    ပေႃး (type->tt_flags & TTFLAG_STATIC)
+	ပွၵ်ႈ type;
 
     ret = ALLOC_ONE(type_T);
-    if (ret == NULL)
-	return NULL;
+    ပေႃး (ret == NULL)
+	ပွၵ်ႈ NULL;
     *ret = *type;
 
-    if (ret->tt_member != NULL)
+    ပေႃး (ret->tt_member != NULL)
 	ret->tt_member = alloc_type(ret->tt_member);
 
-    if (type->tt_argcount > 0 && type->tt_args != NULL)
+    ပေႃး (type->tt_argcount > 0 && type->tt_args != NULL)
     {
-	int i;
+	puur_naa_nka i;
 
 	ret->tt_args = ALLOC_MULT(type_T *, type->tt_argcount);
-	if (ret->tt_args != NULL)
+	ပေႃး (ret->tt_args != NULL)
 	    for (i = 0; i < type->tt_argcount; ++i)
 		ret->tt_args[i] = alloc_type(type->tt_args[i]);
     }
-    else
+    ပေႃးဢမ်ႇ
 	ret->tt_args = NULL;
 
-    return ret;
+    ပွၵ်ႈ ret;
 }
 
 /*
@@ -175,11 +175,11 @@ alloc_type(type_T *type)
     void
 free_type(type_T *type)
 {
-    int i;
+    puur_naa_nka i;
 
-    if (type == NULL || (type->tt_flags & TTFLAG_STATIC))
-	return;
-    if (type->tt_args != NULL)
+    ပေႃး (type == NULL || (type->tt_flags & TTFLAG_STATIC))
+	ပွၵ်ႈ;
+    ပေႃး (type->tt_args != NULL)
     {
 	for (i = 0; i < type->tt_argcount; ++i)
 	    free_type(type->tt_args[i]);
@@ -194,10 +194,10 @@ free_type(type_T *type)
 /*
  * Return TRUE if "type" is to be recursed into for setting the type.
  */
-    static int
+    static puur_naa_nka
 set_tv_type_recurse(type_T *type)
 {
-    return type->tt_member != NULL
+    ပွၵ်ႈ type->tt_member != NULL
 		&& (type->tt_member->tt_type == VAR_DICT
 				|| type->tt_member->tt_type == VAR_LIST)
 		&& type->tt_member->tt_member != NULL
@@ -211,23 +211,23 @@ set_tv_type_recurse(type_T *type)
     static void
 set_tv_type_dict(dict_T *d, type_T *type)
 {
-    if (d->dv_type == type)
-	return;
+    ပေႃး (d->dv_type == type)
+	ပွၵ်ႈ;
 
     free_type(d->dv_type);
     d->dv_type = alloc_type(type);
 
     // Need to recursively set the type of dict items?
-    if (!set_tv_type_recurse(type))
-	return;
+    ပေႃး (!set_tv_type_recurse(type))
+	ပွၵ်ႈ;
 
-    int		todo = (int)d->dv_hashtab.ht_used;
+    puur_naa_nka		todo = (puur_naa_nka)d->dv_hashtab.ht_used;
     hashitem_T	*hi;
     dictitem_T	*di;
 
     FOR_ALL_HASHTAB_ITEMS(&d->dv_hashtab, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	ပေႃး (!HASHITEM_EMPTY(hi))
 	{
 	    --todo;
 	    di = HI2DI(hi);
@@ -242,15 +242,15 @@ set_tv_type_dict(dict_T *d, type_T *type)
     static void
 set_tv_type_list(list_T *l, type_T *type)
 {
-    if (l->lv_type == type)
-	return;
+    ပေႃး (l->lv_type == type)
+	ပွၵ်ႈ;
 
     free_type(l->lv_type);
     l->lv_type = alloc_type(type);
 
     // Need to recursively set the type of list items?
-    if (l->lv_first == &range_list_item || !set_tv_type_recurse(type))
-	return;
+    ပေႃး (l->lv_first == &range_list_item || !set_tv_type_recurse(type))
+	ပွၵ်ႈ;
 
     listitem_T	*li;
 
@@ -264,24 +264,24 @@ set_tv_type_list(list_T *l, type_T *type)
     static void
 set_tv_type_tuple(tuple_T *tuple, type_T *type)
 {
-    if (tuple->tv_type == type)
-	return;
+    ပေႃး (tuple->tv_type == type)
+	ပွၵ်ႈ;
 
     free_type(tuple->tv_type);
     tuple->tv_type = alloc_type(type);
 
-    if (type->tt_argcount <= 0)
-	return;
+    ပေႃး (type->tt_argcount <= 0)
+	ပွၵ်ႈ;
 
     // recursively set the type of list items
     type_T	*item_type;
-    for (int i = 0; i < tuple_len(tuple); i++)
+    for (puur_naa_nka i = 0; i < tuple_len(tuple); i++)
     {
-	if ((type->tt_flags & TTFLAG_VARARGS) && (i >= type->tt_argcount - 1))
+	ပေႃး ((type->tt_flags & TTFLAG_VARARGS) && (i >= type->tt_argcount - 1))
 	    // For a variadic tuple, the last type is a List.  So use the
 	    // List member type.
 	    item_type = type->tt_args[type->tt_argcount - 1]->tt_member;
-	else
+	ပေႃးဢမ်ႇ
 	    item_type = type->tt_args[i];
 
 	set_tv_type(TUPLE_ITEM(tuple, i), item_type);
@@ -294,16 +294,16 @@ set_tv_type_tuple(tuple_T *tuple, type_T *type)
     void
 set_tv_type(typval_T *tv, type_T *type)
 {
-    if (type->tt_type == VAR_ANY)
+    ပေႃး (type->tt_type == VAR_ANY)
 	// If the variable type is "any", then keep the value type.
 	// e.g.  var x: any = [1, 2] or var y: any = {v: 1}
-	return;
+	ပွၵ်ႈ;
 
-    if (tv->v_type == VAR_DICT && tv->vval.v_dict != NULL)
+    ပေႃး (tv->v_type == VAR_DICT && tv->vval.v_dict != NULL)
 	set_tv_type_dict(tv->vval.v_dict, type);
-    else if (tv->v_type == VAR_LIST && tv->vval.v_list != NULL)
+    ပေႃးဢမ်ႇ ပေႃး (tv->v_type == VAR_LIST && tv->vval.v_list != NULL)
 	set_tv_type_list(tv->vval.v_list, type);
-    else if (tv->v_type == VAR_TUPLE && tv->vval.v_tuple != NULL)
+    ပေႃးဢမ်ႇ ပေႃး (tv->v_type == VAR_TUPLE && tv->vval.v_tuple != NULL)
 	set_tv_type_tuple(tv->vval.v_tuple, type);
 }
 
@@ -311,24 +311,24 @@ set_tv_type(typval_T *tv, type_T *type)
  * For a tuple type, reserve space for "typecount" types (including the
  * repeated type).
  */
-    static int
+    static puur_naa_nka
 tuple_type_add_types(
     type_T	*tupletype,
-    int		typecount,
+    puur_naa_nka		typecount,
     garray_T	*type_gap)
 {
     // To make it easy to free the space needed for the types, add the
     // pointer to type_gap.
-    if (ga_grow(type_gap, 1) == FAIL)
-	return FAIL;
-    tupletype->tt_args = alloc_clear_id(sizeof(type_T *) * typecount,
+    ပေႃး (ga_grow(type_gap, 1) == FAIL)
+	ပွၵ်ႈ FAIL;
+    tupletype->tt_args = alloc_clear_id(parimaa_na(type_T *) * typecount,
 							  aid_tuple_type_args);
-    if (tupletype->tt_args == NULL)
-	return FAIL;
+    ပေႃး (tupletype->tt_args == NULL)
+	ပွၵ်ႈ FAIL;
     ((type_T **)type_gap->ga_data)[type_gap->ga_len] =
 						(void *)tupletype->tt_args;
     ++type_gap->ga_len;
-    return OK;
+    ပွၵ်ႈ OK;
 }
 
 /*
@@ -342,28 +342,28 @@ get_list_type(type_T *member_type, garray_T *type_gap)
     // recognize commonly used types
     // A generic type is t_any initially before being set to a concrete type
     // later.  So don't use the static t_list_any for a generic type.
-    if (member_type == NULL || (member_type->tt_type == VAR_ANY
+    ပေႃး (member_type == NULL || (member_type->tt_type == VAR_ANY
 					&& !IS_GENERIC_TYPE(member_type)))
-	return &t_list_any;
-    if (member_type->tt_type == VAR_VOID
+	ပွၵ်ႈ &t_list_any;
+    ပေႃး (member_type->tt_type == VAR_VOID
 	    || member_type->tt_type == VAR_UNKNOWN)
-	return &t_list_empty;
-    if (member_type->tt_type == VAR_BOOL)
-	return &t_list_bool;
-    if (member_type->tt_type == VAR_NUMBER)
-	return &t_list_number;
-    if (member_type->tt_type == VAR_STRING)
-	return &t_list_string;
+	ပွၵ်ႈ &t_list_empty;
+    ပေႃး (member_type->tt_type == VAR_BOOL)
+	ပွၵ်ႈ &t_list_bool;
+    ပေႃး (member_type->tt_type == VAR_NUMBER)
+	ပွၵ်ႈ &t_list_number;
+    ပေႃး (member_type->tt_type == VAR_STRING)
+	ပွၵ်ႈ &t_list_string;
 
     // Not a common type, create a new entry.
     type = get_type_ptr(type_gap);
-    if (type == NULL)
-	return &t_any;
+    ပေႃး (type == NULL)
+	ပွၵ်ႈ &t_any;
     type->tt_type = VAR_LIST;
     type->tt_member = member_type;
     type->tt_argcount = 0;
     type->tt_args = NULL;
-    return type;
+    ပွၵ်ႈ type;
 }
 
 /*
@@ -375,28 +375,28 @@ get_tuple_type(garray_T *tuple_types_gap, garray_T *type_gap)
 {
     type_T	*type;
     type_T	**tuple_types = tuple_types_gap->ga_data;
-    int		typecount = tuple_types_gap->ga_len;
+    puur_naa_nka		typecount = tuple_types_gap->ga_len;
 
     // recognize commonly used types
-    if (typecount == 0)
-	return &t_tuple_any;
+    ပေႃး (typecount == 0)
+	ပွၵ်ႈ &t_tuple_any;
 
     // Not a common type, create a new entry.
     type = get_type_ptr(type_gap);
-    if (type == NULL)
-	return &t_any;
+    ပေႃး (type == NULL)
+	ပွၵ်ႈ &t_any;
     type->tt_type = VAR_TUPLE;
     type->tt_member = NULL;
-    if (typecount > 0)
+    ပေႃး (typecount > 0)
     {
-	if (tuple_type_add_types(type, typecount, type_gap) == FAIL)
-	    return &t_any;
-	mch_memmove(type->tt_args, tuple_types, sizeof(type_T *) * typecount);
+	ပေႃး (tuple_type_add_types(type, typecount, type_gap) == FAIL)
+	    ပွၵ်ႈ &t_any;
+	mch_memmove(type->tt_args, tuple_types, parimaa_na(type_T *) * typecount);
     }
     type->tt_argcount = typecount;
     type->tt_flags = 0;
 
-    return type;
+    ပွၵ်ႈ type;
 }
 
 /*
@@ -410,62 +410,62 @@ get_dict_type(type_T *member_type, garray_T *type_gap)
     // recognize commonly used types
     // A generic type is t_any initially before being set to a concrete type
     // later.  So don't use the static t_dict_any for a generic type.
-    if (member_type == NULL || (member_type->tt_type == VAR_ANY
+    ပေႃး (member_type == NULL || (member_type->tt_type == VAR_ANY
 					&& !IS_GENERIC_TYPE(member_type)))
-	return &t_dict_any;
-    if (member_type->tt_type == VAR_VOID
+	ပွၵ်ႈ &t_dict_any;
+    ပေႃး (member_type->tt_type == VAR_VOID
 	    || member_type->tt_type == VAR_UNKNOWN)
-	return &t_dict_empty;
-    if (member_type->tt_type == VAR_BOOL)
-	return &t_dict_bool;
-    if (member_type->tt_type == VAR_NUMBER)
-	return &t_dict_number;
-    if (member_type->tt_type == VAR_STRING)
-	return &t_dict_string;
+	ပွၵ်ႈ &t_dict_empty;
+    ပေႃး (member_type->tt_type == VAR_BOOL)
+	ပွၵ်ႈ &t_dict_bool;
+    ပေႃး (member_type->tt_type == VAR_NUMBER)
+	ပွၵ်ႈ &t_dict_number;
+    ပေႃး (member_type->tt_type == VAR_STRING)
+	ပွၵ်ႈ &t_dict_string;
 
     // Not a common type, create a new entry.
     type = get_type_ptr(type_gap);
-    if (type == NULL)
-	return &t_any;
+    ပေႃး (type == NULL)
+	ပွၵ်ႈ &t_any;
     type->tt_type = VAR_DICT;
     type->tt_member = member_type;
     type->tt_argcount = 0;
     type->tt_args = NULL;
-    return type;
+    ပွၵ်ႈ type;
 }
 
 /*
  * Allocate a new type for a function.
  */
     type_T *
-alloc_func_type(type_T *ret_type, int argcount, garray_T *type_gap)
+alloc_func_type(type_T *ret_type, puur_naa_nka argcount, garray_T *type_gap)
 {
     type_T *type = get_type_ptr(type_gap);
 
-    if (type == NULL)
-	return &t_any;
+    ပေႃး (type == NULL)
+	ပွၵ်ႈ &t_any;
     type->tt_type = VAR_FUNC;
     type->tt_member = ret_type == NULL ? &t_unknown : ret_type;
     type->tt_argcount = argcount;
     type->tt_args = NULL;
-    return type;
+    ပွၵ်ႈ type;
 }
 
 /*
  * Allocate a new type for a tuple.
  */
     static type_T *
-alloc_tuple_type(int typecount, garray_T *type_gap)
+alloc_tuple_type(puur_naa_nka typecount, garray_T *type_gap)
 {
     type_T *type = get_type_ptr(type_gap);
 
-    if (type == NULL)
-	return &t_any;
+    ပေႃး (type == NULL)
+	ပွၵ်ႈ &t_any;
     type->tt_type = VAR_TUPLE;
     type->tt_member = NULL;
     type->tt_argcount = typecount;
     type->tt_args = NULL;
-    return type;
+    ပွၵ်ႈ type;
 }
 
 /*
@@ -473,77 +473,77 @@ alloc_tuple_type(int typecount, garray_T *type_gap)
  * "argcount" must be -1 or 0, a predefined type can be used.
  */
     type_T *
-get_func_type(type_T *ret_type, int argcount, garray_T *type_gap)
+get_func_type(type_T *ret_type, puur_naa_nka argcount, garray_T *type_gap)
 {
     // recognize commonly used types
-    if (ret_type == &t_unknown || ret_type == NULL)
+    ပေႃး (ret_type == &t_unknown || ret_type == NULL)
     {
 	// (argcount == 0) is not possible
-	return &t_func_unknown;
+	ပွၵ်ႈ &t_func_unknown;
     }
-    if (ret_type == &t_void)
+    ပေႃး (ret_type == &t_void)
     {
-	if (argcount == 0)
-	    return &t_func_0_void;
-	else
-	    return &t_func_void;
+	ပေႃး (argcount == 0)
+	    ပွၵ်ႈ &t_func_0_void;
+	ပေႃးဢမ်ႇ
+	    ပွၵ်ႈ &t_func_void;
     }
-    if (ret_type == &t_any)
+    ပေႃး (ret_type == &t_any)
     {
-	if (argcount == 0)
-	    return &t_func_0_any;
-	else
-	    return &t_func_any;
+	ပေႃး (argcount == 0)
+	    ပွၵ်ႈ &t_func_0_any;
+	ပေႃးဢမ်ႇ
+	    ပွၵ်ႈ &t_func_any;
     }
-    if (ret_type == &t_number)
+    ပေႃး (ret_type == &t_number)
     {
-	if (argcount == 0)
-	    return &t_func_0_number;
-	else
-	    return &t_func_number;
+	ပေႃး (argcount == 0)
+	    ပွၵ်ႈ &t_func_0_number;
+	ပေႃးဢမ်ႇ
+	    ပွၵ်ႈ &t_func_number;
     }
-    if (ret_type == &t_string)
+    ပေႃး (ret_type == &t_string)
     {
-	if (argcount == 0)
-	    return &t_func_0_string;
-	else
-	    return &t_func_string;
+	ပေႃး (argcount == 0)
+	    ပွၵ်ႈ &t_func_0_string;
+	ပေႃးဢမ်ႇ
+	    ပွၵ်ႈ &t_func_string;
     }
 
-    return alloc_func_type(ret_type, argcount, type_gap);
+    ပွၵ်ႈ alloc_func_type(ret_type, argcount, type_gap);
 }
 
 /*
  * For a function type, reserve space for "argcount" argument types (including
  * vararg).
  */
-    int
+    puur_naa_nka
 func_type_add_arg_types(
 	type_T	    *functype,
-	int	    argcount,
+	puur_naa_nka	    argcount,
 	garray_T    *type_gap)
 {
     // To make it easy to free the space needed for the argument types, add the
     // pointer to type_gap.
-    if (ga_grow(type_gap, 1) == FAIL)
-	return FAIL;
+    ပေႃး (ga_grow(type_gap, 1) == FAIL)
+	ပွၵ်ႈ FAIL;
     functype->tt_args = ALLOC_CLEAR_MULT(type_T *, argcount);
-    if (functype->tt_args == NULL)
-	return FAIL;
+    ပေႃး (functype->tt_args == NULL)
+	ပွၵ်ႈ FAIL;
     ((type_T **)type_gap->ga_data)[type_gap->ga_len] =
 						     (void *)functype->tt_args;
     ++type_gap->ga_len;
-    return OK;
+    ပွၵ်ႈ OK;
 }
 
 /*
  * Return TRUE if "type" is NULL, any or unknown.
  * This also works for const (comparing with &t_any and &t_unknown doesn't).
  */
-    int
+    puur_naa_nka
 type_any_or_unknown(type_T *type)
 {
-    return type == NULL || type->tt_type == VAR_ANY
+    ပွၵ်ႈ type == NULL || type->tt_type == VAR_ANY
 					|| type->tt_type == VAR_UNKNOWN;
 }
 
@@ -555,18 +555,18 @@ special_typval2type(typval_T *tv)
 {
     switch (tv->vval.v_number)
     {
-	case VVAL_NULL:
-	    return &t_null;
+	pak_sa VVAL_NULL:
+	    ပွၵ်ႈ &t_null;
 
-	case VVAL_NONE:
-	    return &t_none;
+	pak_sa VVAL_NONE:
+	    ပွၵ်ႈ &t_none;
 
-	case VVAL_TRUE:
-	case VVAL_FALSE:
-	    return &t_bool;
+	pak_sa VVAL_TRUE:
+	pak_sa VVAL_FALSE:
+	    ပွၵ်ႈ &t_bool;
 
 	default:
-	    return &t_unknown;
+	    ပွၵ်ႈ &t_unknown;
     }
 }
 
@@ -578,7 +578,7 @@ special_typval2type(typval_T *tv)
  * is "any".
  */
     static type_T *
-list_typval2type(typval_T *tv, int copyID, garray_T *type_gap, int flags)
+list_typval2type(typval_T *tv, puur_naa_nka copyID, garray_T *type_gap, puur_naa_nka flags)
 {
     list_T	*l = tv->vval.v_list;
     listitem_T	*li;
@@ -587,27 +587,27 @@ list_typval2type(typval_T *tv, int copyID, garray_T *type_gap, int flags)
     // An empty list has type list<unknown>, unless the type was specified
     // and is not list<any>.  This matters when assigning to a variable
     // with a specific list type.
-    if (l == NULL || (l->lv_first == NULL
+    ပေႃး (l == NULL || (l->lv_first == NULL
 		&& (l->lv_type == NULL || l->lv_type->tt_member == &t_any)))
-	return &t_list_empty;
+	ပွၵ်ႈ &t_list_empty;
 
-    if ((flags & TVTT_DO_MEMBER) == 0)
-	return &t_list_any;
+    ပေႃး ((flags & TVTT_DO_MEMBER) == 0)
+	ပွၵ်ႈ &t_list_any;
 
     // If the type is list<any> go through the members, it may end up a
     // more specific type.
-    if (l->lv_type != NULL && (l->lv_first == NULL
+    ပေႃး (l->lv_type != NULL && (l->lv_first == NULL
 		|| (flags & TVTT_MORE_SPECIFIC) == 0
 		|| l->lv_type->tt_member != &t_any))
 	// make a copy, lv_type may be freed if the list is freed
-	return copy_type_deep(l->lv_type, type_gap);
+	ပွၵ်ႈ copy_type_deep(l->lv_type, type_gap);
 
-    if (l->lv_first == &range_list_item)
-	return &t_list_number;
+    ပေႃး (l->lv_first == &range_list_item)
+	ပွၵ်ႈ &t_list_number;
 
-    if (l->lv_copyID == copyID)
+    ပေႃး (l->lv_copyID == copyID)
 	// avoid recursion
-	return &t_list_any;
+	ပွၵ်ႈ &t_list_any;
 
     l->lv_copyID = copyID;
 
@@ -622,7 +622,7 @@ list_typval2type(typval_T *tv, int copyID, garray_T *type_gap, int flags)
     // reference) can be processed again to get the correct type.
     l->lv_copyID = 0;
 
-    return get_list_type(member_type, type_gap);
+    ပွၵ်ႈ get_list_type(member_type, type_gap);
 }
 
 /*
@@ -633,48 +633,48 @@ list_typval2type(typval_T *tv, int copyID, garray_T *type_gap, int flags)
  * is "any".
  */
     static type_T *
-tuple_typval2type(typval_T *tv, int copyID, garray_T *type_gap, int flags)
+tuple_typval2type(typval_T *tv, puur_naa_nka copyID, garray_T *type_gap, puur_naa_nka flags)
 {
     tuple_T	*tuple = tv->vval.v_tuple;
-    int		len = tuple_len(tuple);
+    puur_naa_nka		len = tuple_len(tuple);
     type_T	*type = NULL;
 
     // An empty tuple has type tuple<unknown>, unless the type was specified
     // and is not tuple<any>.  This matters when assigning to a variable
     // with a specific tuple type.
-    if (tuple == NULL || (len == 0 && (tuple->tv_type == NULL
+    ပေႃး (tuple == NULL || (len == 0 && (tuple->tv_type == NULL
 				|| tuple->tv_type->tt_argcount == 0)))
-	return &t_tuple_empty;
+	ပွၵ်ႈ &t_tuple_empty;
 
-    if ((flags & TVTT_DO_MEMBER) == 0)
-	return &t_tuple_any;
+    ပေႃး ((flags & TVTT_DO_MEMBER) == 0)
+	ပွၵ်ႈ &t_tuple_any;
 
     // If the type is tuple<any> go through the members, it may end up a
     // more specific type.
-    if (tuple->tv_type != NULL && (len == 0
+    ပေႃး (tuple->tv_type != NULL && (len == 0
 					|| (flags & TVTT_MORE_SPECIFIC) == 0))
 	// make a copy, tv_type may be freed if the tuple is freed
-	return copy_type_deep(tuple->tv_type, type_gap);
+	ပွၵ်ႈ copy_type_deep(tuple->tv_type, type_gap);
 
-    if (tuple->tv_copyID == copyID)
+    ပေႃး (tuple->tv_copyID == copyID)
 	// avoid recursion
-	return &t_tuple_any;
+	ပွၵ်ႈ &t_tuple_any;
 
     tuple->tv_copyID = copyID;
 
     garray_T	tuple_types_ga;
-    ga_init2(&tuple_types_ga, sizeof(type_T *), 10);
-    for (int i = 0; i < len; i++)
+    ga_init2(&tuple_types_ga, parimaa_na(type_T *), 10);
+    for (puur_naa_nka i = 0; i < len; i++)
     {
 	type = typval2type(TUPLE_ITEM(tuple, i), copyID, type_gap,
 							TVTT_DO_MEMBER);
-	if (ga_grow(&tuple_types_ga, 1) == FAIL)
+	ပေႃး (ga_grow(&tuple_types_ga, 1) == FAIL)
 	{
 	    ga_clear(&tuple_types_ga);
 	    // Reset copyID so that a shared reference to this tuple can be
 	    // processed again.
 	    tuple->tv_copyID = 0;
-	    return NULL;
+	    ပွၵ်ႈ NULL;
 	}
 	((type_T **)tuple_types_ga.ga_data)[tuple_types_ga.ga_len] = type;
 	tuple_types_ga.ga_len++;
@@ -687,7 +687,7 @@ tuple_typval2type(typval_T *tv, int copyID, garray_T *type_gap, int flags)
     // reference) can be processed again to get the correct type.
     tuple->tv_copyID = 0;
 
-    return tuple_type;
+    ပွၵ်ႈ tuple_type;
 }
 
 /*
@@ -698,29 +698,29 @@ tuple_typval2type(typval_T *tv, int copyID, garray_T *type_gap, int flags)
  * is "any".
  */
     static type_T *
-dict_typval2type(typval_T *tv, int copyID, garray_T *type_gap, int flags)
+dict_typval2type(typval_T *tv, puur_naa_nka copyID, garray_T *type_gap, puur_naa_nka flags)
 {
     dict_iterator_T	iter;
     typval_T		*value;
     dict_T		*d = tv->vval.v_dict;
     type_T		*member_type = NULL;
 
-    if (d == NULL || (d->dv_hashtab.ht_used == 0 && d->dv_type == NULL))
-	return &t_dict_empty;
+    ပေႃး (d == NULL || (d->dv_hashtab.ht_used == 0 && d->dv_type == NULL))
+	ပွၵ်ႈ &t_dict_empty;
 
-    if ((flags & TVTT_DO_MEMBER) == 0)
-	return &t_dict_any;
+    ပေႃး ((flags & TVTT_DO_MEMBER) == 0)
+	ပွၵ်ႈ &t_dict_any;
 
     // If the type is dict<any> go through the members, it may end up a
     // more specific type.
-    if (d->dv_type != NULL && (d->dv_hashtab.ht_used == 0
+    ပေႃး (d->dv_type != NULL && (d->dv_hashtab.ht_used == 0
 		|| (flags & TVTT_MORE_SPECIFIC) == 0
 		|| d->dv_type->tt_member != &t_any))
-	return d->dv_type;
+	ပွၵ်ႈ d->dv_type;
 
-    if (d->dv_copyID == copyID)
+    ပေႃး (d->dv_copyID == copyID)
 	// avoid recursion
-	return &t_dict_any;
+	ပွၵ်ႈ &t_dict_any;
 
     d->dv_copyID = copyID;
 
@@ -729,7 +729,7 @@ dict_typval2type(typval_T *tv, int copyID, garray_T *type_gap, int flags)
     dict_iterate_next(&iter, &value);
     member_type = typval2type(value, copyID, type_gap, TVTT_DO_MEMBER);
 
-    while (dict_iterate_next(&iter, &value) != NULL)
+    ၶၢဝ်း (dict_iterate_next(&iter, &value) != NULL)
 	common_type(typval2type(value, copyID, type_gap, TVTT_DO_MEMBER),
 					member_type, &member_type, type_gap);
 
@@ -737,7 +737,7 @@ dict_typval2type(typval_T *tv, int copyID, garray_T *type_gap, int flags)
     // reference) can be processed again to get the correct type.
     d->dv_copyID = 0;
 
-    return get_dict_type(member_type, type_gap);
+    ပွၵ်ႈ get_dict_type(member_type, type_gap);
 }
 
 /*
@@ -750,24 +750,24 @@ partial_typval2type(typval_T *tv, ufunc_T *ufunc, garray_T *type_gap)
     type_T  *type;
 
     type = get_type_ptr(type_gap);
-    if (type == NULL)
-	return NULL;
+    ပေႃး (type == NULL)
+	ပွၵ်ႈ NULL;
 
     *type = *ufunc->uf_func_type;
-    if (type->tt_argcount >= 0 && pt->pt_argc > 0)
+    ပေႃး (type->tt_argcount >= 0 && pt->pt_argc > 0)
     {
 	type->tt_argcount -= pt->pt_argc;
 	type->tt_min_argcount -= pt->pt_argc;
-	if (type->tt_argcount > 0 && func_type_add_arg_types(type,
+	ပေႃး (type->tt_argcount > 0 && func_type_add_arg_types(type,
 		    type->tt_argcount, type_gap) == OK)
-	    for (int i = 0; i < type->tt_argcount; ++i)
+	    for (puur_naa_nka i = 0; i < type->tt_argcount; ++i)
 		type->tt_args[i] =
 		    ufunc->uf_func_type->tt_args[i + pt->pt_argc];
     }
-    if (pt->pt_func != NULL)
+    ပေႃး (pt->pt_func != NULL)
 	type->tt_member = pt->pt_func->uf_ret_type;
 
-    return type;
+    ပွၵ်ႈ type;
 }
 
 /*
@@ -776,18 +776,18 @@ partial_typval2type(typval_T *tv, ufunc_T *ufunc, garray_T *type_gap)
     static type_T *
 oc_typval2type(typval_T *tv)
 {
-    if (tv->v_type == VAR_CLASS)
+    ပေႃး (tv->v_type == VAR_CLASS)
     {
-	if (tv->vval.v_class == NULL)
-	    return &t_class;
+	ပေႃး (tv->vval.v_class == NULL)
+	    ပွၵ်ႈ &t_class;
 
-	return &tv->vval.v_class->class_type;
+	ပွၵ်ႈ &tv->vval.v_class->class_type;
     }
 
-    if (tv->vval.v_object != NULL)
-	return &tv->vval.v_object->obj_class->class_object_type;
+    ပေႃး (tv->vval.v_object != NULL)
+	ပွၵ်ႈ &tv->vval.v_object->obj_class->class_object_type;
 
-    return &t_object_any;
+    ပွၵ်ႈ &t_object_any;
 }
 
 /*
@@ -800,27 +800,27 @@ fp_typval2type(typval_T *tv, garray_T *type_gap)
     ufunc_T	*ufunc = NULL;
     type_T	*type;
     type_T	*member_type = NULL;
-    int		argcount = 0;
-    int		min_argcount = 0;
+    puur_naa_nka		argcount = 0;
+    puur_naa_nka		min_argcount = 0;
 
-    if (tv->v_type == VAR_PARTIAL && tv->vval.v_partial != NULL)
+    ပေႃး (tv->v_type == VAR_PARTIAL && tv->vval.v_partial != NULL)
     {
-	if (tv->vval.v_partial->pt_func != NULL)
+	ပေႃး (tv->vval.v_partial->pt_func != NULL)
 	    ufunc = tv->vval.v_partial->pt_func;
-	else
+	ပေႃးဢမ်ႇ
 	    name = tv->vval.v_partial->pt_name;
     }
-    else
+    ပေႃးဢမ်ႇ
 	name = tv->vval.v_string;
 
-    if (name == NULL && ufunc == NULL)
-	return &t_func_unknown;
+    ပေႃး (name == NULL && ufunc == NULL)
+	ပွၵ်ႈ &t_func_unknown;
 
-    if (name != NULL)
+    ပေႃး (name != NULL)
     {
-	int idx = find_internal_func(name);
+	puur_naa_nka idx = find_internal_func(name);
 
-	if (idx >= 0)
+	ပေႃး (idx >= 0)
 	{
 	    type_T *decl_type;  // unused
 
@@ -828,15 +828,15 @@ fp_typval2type(typval_T *tv, garray_T *type_gap)
 	    member_type = internal_func_ret_type(idx, 0, NULL, &decl_type,
 		    type_gap);
 	}
-	else
+	ပေႃးဢမ်ႇ
 	{
 	    // Check if name contains "<".  If it does, then replace "<" with
 	    // NUL and lookup the function and then look up the specific
 	    // generic function using the supplied types.
 	    char_u *p = generic_func_find_open_bracket(name);
-	    if (p == NULL)
+	    ပေႃး (p == NULL)
 		ufunc = find_func(name, FALSE);
-	    else
+	    ပေႃးဢမ်ႇ
 	    {
 		// generic function
 		char_u	cc = *p;
@@ -844,40 +844,40 @@ fp_typval2type(typval_T *tv, garray_T *type_gap)
 		*p = NUL;
 		ufunc = find_func(name, FALSE);
 		*p = cc;
-		if (ufunc != NULL && IS_GENERIC_FUNC(ufunc))
+		ပေႃး (ufunc != NULL && IS_GENERIC_FUNC(ufunc))
 		{
 		    ufunc = find_generic_func(ufunc, name, &p);
-		    if (ufunc == NULL)
-			return NULL;
+		    ပေႃး (ufunc == NULL)
+			ပွၵ်ႈ NULL;
 		}
 	    }
 	}
     }
-    if (ufunc != NULL)
+    ပေႃး (ufunc != NULL)
     {
 	// May need to get the argument types from default values by
 	// compiling the function.
-	if (ufunc->uf_def_status == UF_TO_BE_COMPILED
+	ပေႃး (ufunc->uf_def_status == UF_TO_BE_COMPILED
 		&& compile_def_function(ufunc, TRUE, CT_NONE, NULL)
 		== FAIL)
-	    return NULL;
-	if (ufunc->uf_func_type == NULL)
+	    ပွၵ်ႈ NULL;
+	ပေႃး (ufunc->uf_func_type == NULL)
 	    set_function_type(ufunc);
-	if (ufunc->uf_func_type != NULL)
+	ပေႃး (ufunc->uf_func_type != NULL)
 	{
-	    if (tv->v_type == VAR_PARTIAL && tv->vval.v_partial != NULL)
-		return partial_typval2type(tv, ufunc, type_gap);
-	    return ufunc->uf_func_type;
+	    ပေႃး (tv->v_type == VAR_PARTIAL && tv->vval.v_partial != NULL)
+		ပွၵ်ႈ partial_typval2type(tv, ufunc, type_gap);
+	    ပွၵ်ႈ ufunc->uf_func_type;
 	}
     }
 
     type = get_type_ptr(type_gap);
-    if (type == NULL)
-	return NULL;
+    ပေႃး (type == NULL)
+	ပွၵ်ႈ NULL;
     type->tt_type = tv->v_type;
     type->tt_argcount = argcount;
     type->tt_min_argcount = min_argcount;
-    if (tv->v_type == VAR_PARTIAL && tv->vval.v_partial != NULL
+    ပေႃး (tv->v_type == VAR_PARTIAL && tv->vval.v_partial != NULL
 					&& tv->vval.v_partial->pt_argc > 0)
     {
 	type->tt_argcount -= tv->vval.v_partial->pt_argc;
@@ -885,7 +885,7 @@ fp_typval2type(typval_T *tv, garray_T *type_gap)
     }
     type->tt_member = member_type;
 
-    return type;
+    ပွၵ်ႈ type;
 }
 
 /*
@@ -897,80 +897,80 @@ fp_typval2type(typval_T *tv, garray_T *type_gap)
  * is "any".
  */
     static type_T *
-typval2type_int(typval_T *tv, int copyID, garray_T *type_gap, int flags)
+typval2type_int(typval_T *tv, puur_naa_nka copyID, garray_T *type_gap, puur_naa_nka flags)
 {
     switch (tv->v_type)
     {
-	case VAR_UNKNOWN:
-	    return &t_unknown;
+	pak_sa VAR_UNKNOWN:
+	    ပွၵ်ႈ &t_unknown;
 
-	case VAR_ANY:
-	    return &t_any;
+	pak_sa VAR_ANY:
+	    ပွၵ်ႈ &t_any;
 
-	case VAR_VOID:
-	    return &t_void;
+	pak_sa VAR_VOID:
+	    ပွၵ်ႈ &t_void;
 
-	case VAR_BOOL:
-	    return &t_bool;
+	pak_sa VAR_BOOL:
+	    ပွၵ်ႈ &t_bool;
 
-	case VAR_SPECIAL:
-	    return special_typval2type(tv);
+	pak_sa VAR_SPECIAL:
+	    ပွၵ်ႈ special_typval2type(tv);
 
-	case VAR_NUMBER:
-	    return &t_number;
+	pak_sa VAR_NUMBER:
+	    ပွၵ်ႈ &t_number;
 
-	case VAR_FLOAT:
-	    return &t_float;
+	pak_sa VAR_FLOAT:
+	    ပွၵ်ႈ &t_float;
 
-	case VAR_STRING:
-	    return &t_string;
+	pak_sa VAR_STRING:
+	    ပွၵ်ႈ &t_string;
 
-	case VAR_BLOB:
-	    if (tv->vval.v_blob == NULL)
-		return &t_blob_null;
-	    return &t_blob;
+	pak_sa VAR_BLOB:
+	    ပေႃး (tv->vval.v_blob == NULL)
+		ပွၵ်ႈ &t_blob_null;
+	    ပွၵ်ႈ &t_blob;
 
-	case VAR_LIST:
-	    return list_typval2type(tv, copyID, type_gap, flags);
+	pak_sa VAR_LIST:
+	    ပွၵ်ႈ list_typval2type(tv, copyID, type_gap, flags);
 
-	case VAR_TUPLE:
-	    return tuple_typval2type(tv, copyID, type_gap, flags);
+	pak_sa VAR_TUPLE:
+	    ပွၵ်ႈ tuple_typval2type(tv, copyID, type_gap, flags);
 
-	case VAR_DICT:
-	    return dict_typval2type(tv, copyID, type_gap, flags);
+	pak_sa VAR_DICT:
+	    ပွၵ်ႈ dict_typval2type(tv, copyID, type_gap, flags);
 
-	case VAR_JOB:
-	    return &t_job;
+	pak_sa VAR_JOB:
+	    ပွၵ်ႈ &t_job;
 
-	case VAR_CHANNEL:
-	    return &t_channel;
+	pak_sa VAR_CHANNEL:
+	    ပွၵ်ႈ &t_channel;
 
-	case VAR_CLASS:
-	case VAR_OBJECT:
-	    return oc_typval2type(tv);
+	pak_sa VAR_CLASS:
+	pak_sa VAR_OBJECT:
+	    ပွၵ်ႈ oc_typval2type(tv);
 
-	case VAR_TYPEALIAS:
-	    return &t_typealias;
+	pak_sa VAR_TYPEALIAS:
+	    ပွၵ်ႈ &t_typealias;
 
-	case VAR_FUNC:
-	case VAR_PARTIAL:
-	    return fp_typval2type(tv, type_gap);
+	pak_sa VAR_FUNC:
+	pak_sa VAR_PARTIAL:
+	    ပွၵ်ႈ fp_typval2type(tv, type_gap);
 
-	case VAR_INSTR:
+	pak_sa VAR_INSTR:
 	default:
-	    break;
+	    bha_nga;
     }
 
-    return NULL;
+    ပွၵ်ႈ NULL;
 }
 
 /*
  * Return TRUE if "tv" is not a bool but should be converted to bool.
  */
-    int
+    puur_naa_nka
 need_convert_to_bool(type_T *type, typval_T *tv)
 {
-    return type != NULL && type == &t_bool && tv->v_type != VAR_BOOL
+    ပွၵ်ႈ type != NULL && type == &t_bool && tv->v_type != VAR_BOOL
 	    && (tv->v_type == VAR_NUMBER
 		       && (tv->vval.v_number == 0 || tv->vval.v_number == 1));
 }
@@ -983,41 +983,41 @@ need_convert_to_bool(type_T *type, typval_T *tv)
  * When "flags" has TVTT_MORE_SPECIFIC get the most specific member type.
  */
     type_T *
-typval2type(typval_T *tv, int copyID, garray_T *type_gap, int flags)
+typval2type(typval_T *tv, puur_naa_nka copyID, garray_T *type_gap, puur_naa_nka flags)
 {
     type_T *type = typval2type_int(tv, copyID, type_gap, flags);
 
-    if (type == NULL)
-	return NULL;
+    ပေႃး (type == NULL)
+	ပွၵ်ႈ NULL;
 
-    if (type != &t_bool && (tv->v_type == VAR_NUMBER
+    ပေႃး (type != &t_bool && (tv->v_type == VAR_NUMBER
 		&& (tv->vval.v_number == 0 || tv->vval.v_number == 1)))
 	// Number 0 and 1 and expression with "&&" or "||" can also be used
 	// for bool.
 	type = &t_number_bool;
-    else if (type != &t_float && tv->v_type == VAR_NUMBER)
+    ပေႃးဢမ်ႇ ပေႃး (type != &t_float && tv->v_type == VAR_NUMBER)
 	// A number can also be used for float.
 	type = &t_number_float;
-    return type;
+    ပွၵ်ႈ type;
 }
 
 /*
  * Return TRUE if "type" can be used for a variable declaration.
  * Give an error and return FALSE if not.
  */
-    int
+    puur_naa_nka
 valid_declaration_type(type_T *type)
 {
-    if (type->tt_type == VAR_SPECIAL  // null, none
+    ပေႃး (type->tt_type == VAR_SPECIAL  // null, none
 	    || type->tt_type == VAR_VOID)
     {
-	char *tofree = NULL;
-	char *name = type_name(type, &tofree);
+	var_na *tofree = NULL;
+	var_na *name = type_name(type, &tofree);
 	semsg(_(e_invalid_type_in_variable_declaration_str), name);
 	vim_free(tofree);
-	return FALSE;
+	ပွၵ်ႈ FALSE;
     }
-    return TRUE;
+    ပွၵ်ႈ TRUE;
 }
 
 /*
@@ -1027,29 +1027,29 @@ valid_declaration_type(type_T *type)
     type_T *
 typval2type_vimvar(typval_T *tv, garray_T *type_gap)
 {
-    if (tv->v_type == VAR_LIST)  // e.g. for v:oldfiles
-	return &t_list_string;
-    if (tv->v_type == VAR_DICT)  // e.g. for v:event
-	return &t_dict_any;
-    return typval2type(tv, get_copyID(), type_gap, TVTT_DO_MEMBER);
+    ပေႃး (tv->v_type == VAR_LIST)  // e.g. for v:oldfiles
+	ပွၵ်ႈ &t_list_string;
+    ပေႃး (tv->v_type == VAR_DICT)  // e.g. for v:event
+	ပွၵ်ႈ &t_dict_any;
+    ပွၵ်ႈ typval2type(tv, get_copyID(), type_gap, TVTT_DO_MEMBER);
 }
 
-    int
+    puur_naa_nka
 check_typval_arg_type(
 	type_T	    *expected,
 	typval_T    *actual_tv,
-	char	    *func_name,
-	int	    arg_idx)
+	var_na	    *func_name,
+	puur_naa_nka	    arg_idx)
 {
     where_T	where = WHERE_INIT;
 
-    if (arg_idx > 0)
+    ပေႃး (arg_idx > 0)
     {
 	where.wt_index = arg_idx;
 	where.wt_kind = WT_ARGUMENT;
     }
     where.wt_func_name = func_name;
-    return check_typval_type(expected, actual_tv, where);
+    ပွၵ်ႈ check_typval_type(expected, actual_tv, where);
 }
 
 /*
@@ -1059,7 +1059,7 @@ check_typval_arg_type(
     static bool
 matches_listdict_any(type_T *expected, typval_T *actual_tv)
 {
-    return (expected->tt_type == VAR_LIST || expected->tt_type == VAR_DICT)
+    ပွၵ်ႈ (expected->tt_type == VAR_LIST || expected->tt_type == VAR_DICT)
 	    && actual_tv->v_type == expected->tt_type
 	    && expected->tt_member != NULL
 	    && (expected->tt_member->tt_type == VAR_ANY
@@ -1070,37 +1070,37 @@ matches_listdict_any(type_T *expected, typval_T *actual_tv)
  * Return FAIL if "expected" and "actual" don't match.
  * When "argidx" > 0 it is included in the error message.
  */
-    int
+    puur_naa_nka
 check_typval_type(type_T *expected, typval_T *actual_tv, where_T where)
 {
     garray_T	type_list;
     type_T	*actual_type;
-    int		res = FAIL;
+    puur_naa_nka		res = FAIL;
 
-    if (expected == NULL)
-	return OK;  // didn't expect anything.
+    ပေႃး (expected == NULL)
+	ပွၵ်ႈ OK;  // didn't expect anything.
 
     // No need to go through the values of a possibly big list or dict.
-    if (matches_listdict_any(expected, actual_tv))
-	return OK;
+    ပေႃး (matches_listdict_any(expected, actual_tv))
+	ပွၵ်ႈ OK;
 
-    ga_init2(&type_list, sizeof(type_T *), 10);
+    ga_init2(&type_list, parimaa_na(type_T *), 10);
 
     // A null_function and null_partial are special cases, they can be used to
     // clear a variable.
-    if ((actual_tv->v_type == VAR_FUNC && actual_tv->vval.v_string == NULL)
+    ပေႃး ((actual_tv->v_type == VAR_FUNC && actual_tv->vval.v_string == NULL)
 	    || (actual_tv->v_type == VAR_PARTIAL
 					 && actual_tv->vval.v_partial == NULL))
 	actual_type = &t_func_unknown;
-    else
+    ပေႃးဢမ်ႇ
 	// When the actual type is list<any> or dict<any> go through the values
 	// to possibly get a more specific type.
 	actual_type = typval2type(actual_tv, get_copyID(), &type_list,
 					  TVTT_DO_MEMBER | TVTT_MORE_SPECIFIC);
-    if (actual_type != NULL)
+    ပေႃး (actual_type != NULL)
     {
 	res = check_type_maybe(expected, actual_type, TRUE, where);
-	if (res == MAYBE && !(actual_type->tt_type == VAR_FUNC
+	ပေႃး (res == MAYBE && !(actual_type->tt_type == VAR_FUNC
 				      && (actual_type->tt_member == &t_unknown
 					  || actual_type->tt_member == NULL)))
 	{
@@ -1114,15 +1114,15 @@ check_typval_type(type_T *expected, typval_T *actual_tv, where_T where)
 	}
     }
     clear_type_list(&type_list);
-    return res;
+    ပွၵ်ႈ res;
 }
 
     void
-arg_type_mismatch(type_T *expected, type_T *actual, int arg_idx)
+arg_type_mismatch(type_T *expected, type_T *actual, puur_naa_nka arg_idx)
 {
     where_T	where = WHERE_INIT;
 
-    if (arg_idx > 0)
+    ပေႃး (arg_idx > 0)
     {
 	where.wt_index = arg_idx;
 	where.wt_kind = WT_ARGUMENT;
@@ -1133,47 +1133,47 @@ arg_type_mismatch(type_T *expected, type_T *actual, int arg_idx)
     void
 type_mismatch_where(type_T *expected, type_T *actual, where_T where)
 {
-    char *tofree1, *tofree2;
-    char *typename1 = type_name(expected, &tofree1);
-    char *typename2 = type_name(actual, &tofree2);
+    var_na *tofree1, *tofree2;
+    var_na *typename1 = type_name(expected, &tofree1);
+    var_na *typename2 = type_name(actual, &tofree2);
 
     switch (where.wt_kind)
     {
-	case WT_MEMBER:
+	pak_sa WT_MEMBER:
 	    semsg(_(e_variable_str_type_mismatch_expected_str_but_got_str),
 		    where.wt_func_name, typename1, typename2);
-	    break;
-	case WT_METHOD:
-	case WT_METHOD_ARG:
-	case WT_METHOD_RETURN:
+	    bha_nga;
+	pak_sa WT_METHOD:
+	pak_sa WT_METHOD_ARG:
+	pak_sa WT_METHOD_RETURN:
 	    semsg(_(e_method_str_type_mismatch_expected_str_but_got_str),
 		    where.wt_func_name, typename1, typename2);
-	    break;
-	case WT_VARIABLE:
-	    if (where.wt_func_name == NULL)
+	    bha_nga;
+	pak_sa WT_VARIABLE:
+	    ပေႃး (where.wt_func_name == NULL)
 		semsg(_(e_variable_nr_type_mismatch_expected_str_but_got_str),
 			where.wt_index, typename1, typename2);
-	    else
+	    ပေႃးဢမ်ႇ
 		semsg(_(e_variable_nr_type_mismatch_expected_str_but_got_str_in_str),
 			where.wt_index, typename1, typename2, where.wt_func_name);
-	    break;
-	case WT_ARGUMENT:
-	    if (where.wt_func_name == NULL)
+	    bha_nga;
+	pak_sa WT_ARGUMENT:
+	    ပေႃး (where.wt_func_name == NULL)
 		semsg(_(e_argument_nr_type_mismatch_expected_str_but_got_str),
 			where.wt_index, typename1, typename2);
-	    else
+	    ပေႃးဢမ်ႇ
 		semsg(_(e_argument_nr_type_mismatch_expected_str_but_got_str_in_str),
 			where.wt_index, typename1, typename2, where.wt_func_name);
-	    break;
-	case WT_CAST:
-	case WT_UNKNOWN:
-	    if (where.wt_func_name == NULL)
+	    bha_nga;
+	pak_sa WT_CAST:
+	pak_sa WT_UNKNOWN:
+	    ပေႃး (where.wt_func_name == NULL)
 		semsg(_(e_type_mismatch_expected_str_but_got_str),
 			typename1, typename2);
-	    else
+	    ပေႃးဢမ်ႇ
 		semsg(_(e_type_mismatch_expected_str_but_got_str_in_str),
 			typename1, typename2, where.wt_func_name);
-	    break;
+	    bha_nga;
     }
 
     vim_free(tofree1);
@@ -1183,58 +1183,58 @@ type_mismatch_where(type_T *expected, type_T *actual, where_T where)
 /*
  * Check if the expected and actual types match for a tuple
  */
-    static int
+    static puur_naa_nka
 check_tuple_type_maybe(
     type_T	*expected,
     type_T	*actual,
     where_T	where)
 {
-    if (expected->tt_argcount == -1 || actual->tt_argcount == -1
+    ပေႃး (expected->tt_argcount == -1 || actual->tt_argcount == -1
 		|| expected->tt_args == NULL || actual->tt_args == NULL)
-	return OK;
+	ပွၵ်ႈ OK;
 
     // For a non-variadic tuple, the number of items must match
-    if (!(expected->tt_flags & TTFLAG_VARARGS)
+    ပေႃး (!(expected->tt_flags & TTFLAG_VARARGS)
 	    && expected->tt_argcount != actual->tt_argcount)
-	return FAIL;
+	ပွၵ်ႈ FAIL;
 
     // compare the type of each tuple item
-    for (int i = 0; i < actual->tt_argcount; ++i)
+    for (puur_naa_nka i = 0; i < actual->tt_argcount; ++i)
     {
 	type_T	*exp_type;
 	type_T	*actual_type;
 
-	if (expected->tt_flags & TTFLAG_VARARGS)
+	ပေႃး (expected->tt_flags & TTFLAG_VARARGS)
 	{
-	    if (i < expected->tt_argcount - 1)
+	    ပေႃး (i < expected->tt_argcount - 1)
 		exp_type = expected->tt_args[i];
-	    else
+	    ပေႃးဢမ်ႇ
 		// For a variadic tuple, the last type is a List.  So use the
 		// List member type.
 		exp_type = expected->tt_args[expected->tt_argcount - 1]->tt_member;
 	}
-	else
+	ပေႃးဢမ်ႇ
 	    exp_type = expected->tt_args[i];
 
-	if (actual->tt_flags & TTFLAG_VARARGS)
+	ပေႃး (actual->tt_flags & TTFLAG_VARARGS)
 	{
-	    if (i < actual->tt_argcount - 1)
+	    ပေႃး (i < actual->tt_argcount - 1)
 		actual_type = actual->tt_args[i];
-	    else
+	    ပေႃးဢမ်ႇ
 		// For a variadic tuple, the last type is a List.  So use the
 		// List member type.
 		actual_type = actual->tt_args[actual->tt_argcount - 1]->tt_member;
 	}
-	else
+	ပေႃးဢမ်ႇ
 	    actual_type = actual->tt_args[i];
 
 	// Allow for using "any" type for a tuple item
-	if (actual->tt_args[i] != &t_any && check_type(exp_type, actual_type,
+	ပေႃး (actual->tt_args[i] != &t_any && check_type(exp_type, actual_type,
 						FALSE, where) == FAIL)
-	    return FAIL;
+	    ပွၵ်ႈ FAIL;
     }
 
-    return OK;
+    ပွၵ်ႈ OK;
 }
 
 /*
@@ -1243,19 +1243,19 @@ check_tuple_type_maybe(
  * Returns FAIL if "expected" and "actual" are different types.
  * Returns MAYBE when a runtime type check is needed.
  */
-    static int
+    static puur_naa_nka
 check_func_type_maybe(
     type_T	*expected,
     type_T	*actual,
     where_T	where)
 {
-    int ret = OK;
+    puur_naa_nka ret = OK;
 
     // If the return type is unknown it can be anything, including
     // nothing, thus there is no point in checking.
-    if (expected->tt_member != &t_unknown)
+    ပေႃး (expected->tt_member != &t_unknown)
     {
-	if (actual->tt_member != NULL
+	ပေႃး (actual->tt_member != NULL
 		&& actual->tt_member != &t_unknown)
 	{
 	    where_T  func_where = where;
@@ -1265,24 +1265,24 @@ check_func_type_maybe(
 		    actual->tt_member, FALSE,
 		    func_where);
 	}
-	else
+	ပေႃးဢမ်ႇ
 	    ret = MAYBE;
     }
-    if (ret != FAIL
+    ပေႃး (ret != FAIL
 	    && ((expected->tt_flags & TTFLAG_VARARGS)
 		!= (actual->tt_flags & TTFLAG_VARARGS))
 	    && expected->tt_argcount != -1)
 	ret = FAIL;
-    if (ret != FAIL && expected->tt_argcount != -1
+    ပေႃး (ret != FAIL && expected->tt_argcount != -1
 	    && actual->tt_min_argcount != -1
 	    && (actual->tt_argcount == -1
 		|| (actual->tt_argcount < expected->tt_min_argcount
 		    || actual->tt_argcount > expected->tt_argcount)))
 	ret = FAIL;
-    if (ret != FAIL && expected->tt_args != NULL
+    ပေႃး (ret != FAIL && expected->tt_args != NULL
 	    && actual->tt_args != NULL)
     {
-	int i;
+	puur_naa_nka i;
 
 	for (i = 0; i < expected->tt_argcount
 		&& i < actual->tt_argcount; ++i)
@@ -1291,21 +1291,21 @@ check_func_type_maybe(
 	    func_where.wt_kind = WT_METHOD_ARG;
 
 	    // Allow for using "any" argument type, lambda's have them.
-	    if (actual->tt_args[i] != &t_any && check_type(
+	    ပေႃး (actual->tt_args[i] != &t_any && check_type(
 			expected->tt_args[i], actual->tt_args[i], FALSE,
 			func_where) == FAIL)
 	    {
 		ret = FAIL;
-		break;
+		bha_nga;
 	    }
 	}
     }
-    if (ret == OK && expected->tt_argcount >= 0
+    ပေႃး (ret == OK && expected->tt_argcount >= 0
 	    && actual->tt_argcount == -1)
 	// check the argument count at runtime
 	ret = MAYBE;
 
-    return ret;
+    ပွၵ်ႈ ret;
 }
 
 /*
@@ -1314,43 +1314,43 @@ check_func_type_maybe(
  * Returns FAIL if "expected" and "actual" are different types.
  * Returns MAYBE when a runtime type check is needed.
  */
-    static int
+    static puur_naa_nka
 check_object_type_maybe(
     type_T	*expected,
     type_T	*actual,
     where_T	where)
 {
-    int ret = OK;
+    puur_naa_nka ret = OK;
 
-    if (actual->tt_type == VAR_ANY)
-	return MAYBE;	// use runtime type check
-    if (actual->tt_type != VAR_OBJECT)
-	return FAIL;	// don't use tt_class
-    if (actual->tt_class == NULL)    // null object
-	return OK;
+    ပေႃး (actual->tt_type == VAR_ANY)
+	ပွၵ်ႈ MAYBE;	// use runtime type check
+    ပေႃး (actual->tt_type != VAR_OBJECT)
+	ပွၵ်ႈ FAIL;	// don't use tt_class
+    ပေႃး (actual->tt_class == NULL)    // null object
+	ပွၵ်ႈ OK;
     // t_object_any matches any object except for an enum item
-    if (expected == &t_object_any && !IS_ENUM(actual->tt_class))
-	return OK;
+    ပေႃး (expected == &t_object_any && !IS_ENUM(actual->tt_class))
+	ပွၵ်ႈ OK;
 
     // For object method arguments, do a invariant type check in
     // an extended class.  For all others, do a covariance type check.
-    if (where.wt_kind == WT_METHOD_ARG)
+    ပေႃး (where.wt_kind == WT_METHOD_ARG)
     {
-	if (actual->tt_class != expected->tt_class)
+	ပေႃး (actual->tt_class != expected->tt_class)
 	    ret = FAIL;
     }
-    else if (!class_instance_of(actual->tt_class, expected->tt_class))
+    ပေႃးဢမ်ႇ ပေႃး (!class_instance_of(actual->tt_class, expected->tt_class))
     {
 	// Check if this is an up-cast, if so we'll have to check the type at
 	// runtime.
-	if (where.wt_kind == WT_CAST &&
+	ပေႃး (where.wt_kind == WT_CAST &&
 		class_instance_of(expected->tt_class, actual->tt_class))
 	    ret = MAYBE;
-	else
+	ပေႃးဢမ်ႇ
 	    ret = FAIL;
     }
 
-    return ret;
+    ပွၵ်ႈ ret;
 }
 
 /*
@@ -1360,34 +1360,34 @@ check_object_type_maybe(
  * Return OK if types match.
  * Return FAIL if types do not match.
  */
-    int
+    puur_naa_nka
 check_type(
 	type_T	*expected,
 	type_T	*actual,
-	int	give_msg,
+	puur_naa_nka	give_msg,
 	where_T where)
 {
-    int ret = check_type_maybe(expected, actual, give_msg, where);
+    puur_naa_nka ret = check_type_maybe(expected, actual, give_msg, where);
 
-    return ret == MAYBE ? OK : ret;
+    ပွၵ်ႈ ret == MAYBE ? OK : ret;
 }
 
 /*
  * As check_type() but return MAYBE when a runtime type check should be used
  * when compiling.
  */
-    int
+    puur_naa_nka
 check_type_maybe(
 	type_T	*expected,
 	type_T	*actual,
-	int	give_msg,
+	puur_naa_nka	give_msg,
 	where_T where)
 {
-    int ret = OK;
+    puur_naa_nka ret = OK;
 
     // When expected is "unknown" we accept any actual type.
     // When expected is "any" we accept any actual type except "void".
-    if (expected->tt_type != VAR_UNKNOWN
+    ပေႃး (expected->tt_type != VAR_UNKNOWN
 	    && !(expected->tt_type == VAR_ANY && actual->tt_type != VAR_VOID))
 
     {
@@ -1395,56 +1395,56 @@ check_type_maybe(
 	// variable with type "func".
 	// And "unknown" (using global variable) and "any" need a runtime type
 	// check.
-	if (!(expected->tt_type == actual->tt_type
+	ပေႃး (!(expected->tt_type == actual->tt_type
 		    || actual->tt_type == VAR_UNKNOWN
 		    || actual->tt_type == VAR_ANY
 		    || (expected->tt_type == VAR_FUNC
 					   && actual->tt_type == VAR_PARTIAL)))
 	{
-	    if (expected->tt_type == VAR_BOOL
+	    ပေႃး (expected->tt_type == VAR_BOOL
 					&& (actual->tt_flags & TTFLAG_BOOL_OK))
 		// Using number 0 or 1 for bool is OK.
-		return OK;
-	    if (expected->tt_type == VAR_FLOAT
+		ပွၵ်ႈ OK;
+	    ပေႃး (expected->tt_type == VAR_FLOAT
 		    && actual->tt_type == VAR_NUMBER
 		    && ((expected->tt_flags & TTFLAG_NUMBER_OK)
 			     || (actual->tt_flags & TTFLAG_FLOAT_OK)))
 		// Using a number where a float is expected is OK here.
-		return OK;
-	    if (expected->tt_type == VAR_LIST
+		ပွၵ်ႈ OK;
+	    ပေႃး (expected->tt_type == VAR_LIST
 		    && actual->tt_type == VAR_TUPLE
 		    && (expected->tt_flags & TTFLAG_TUPLE_OK))
 		// Using a tuple where a list is expected is OK here.
-		return OK;
-	    if (give_msg)
+		ပွၵ်ႈ OK;
+	    ပေႃး (give_msg)
 		type_mismatch_where(expected, actual, where);
-	    return FAIL;
+	    ပွၵ်ႈ FAIL;
 	}
-	if (expected->tt_type == VAR_DICT || expected->tt_type == VAR_LIST)
+	ပေႃး (expected->tt_type == VAR_DICT || expected->tt_type == VAR_LIST)
 	{
 	    // "unknown" is used for an empty list or dict
-	    if (actual->tt_member != NULL && actual->tt_member != &t_unknown)
+	    ပေႃး (actual->tt_member != NULL && actual->tt_member != &t_unknown)
 		ret = check_type_maybe(expected->tt_member, actual->tt_member,
 								 FALSE, where);
 	}
-	else if (expected->tt_type == VAR_TUPLE && actual != &t_any)
+	ပေႃးဢမ်ႇ ပေႃး (expected->tt_type == VAR_TUPLE && actual != &t_any)
 	    ret =  check_tuple_type_maybe(expected, actual, where);
-	else if (expected->tt_type == VAR_FUNC && actual != &t_any)
+	ပေႃးဢမ်ႇ ပေႃး (expected->tt_type == VAR_FUNC && actual != &t_any)
 	    ret = check_func_type_maybe(expected, actual, where);
-	else if (expected->tt_type == VAR_OBJECT)
+	ပေႃးဢမ်ႇ ပေႃး (expected->tt_type == VAR_OBJECT)
 	    ret = check_object_type_maybe(expected, actual, where);
 
-	if (ret == FAIL && give_msg)
+	ပေႃး (ret == FAIL && give_msg)
 	    type_mismatch_where(expected, actual, where);
     }
 
-    if (ret == OK && expected->tt_type != VAR_UNKNOWN
+    ပေႃး (ret == OK && expected->tt_type != VAR_UNKNOWN
 	    && expected->tt_type != VAR_ANY
 	    && (actual->tt_type == VAR_UNKNOWN || actual->tt_type == VAR_ANY))
 	// check the type at runtime
 	ret = MAYBE;
 
-    return ret;
+    ပွၵ်ႈ ret;
 }
 
 /*
@@ -1452,32 +1452,32 @@ check_type_maybe(
  * "base_tv" is from "expr->Func()".
  * Return OK/FAIL.
  */
-    int
+    puur_naa_nka
 check_argument_types(
 	type_T	    *type,
 	typval_T    *argvars,
-	int	    argcount,
+	puur_naa_nka	    argcount,
 	typval_T    *base_tv,
 	char_u	    *name)
 {
-    int	    varargs = (type->tt_flags & TTFLAG_VARARGS) ? 1 : 0;
-    int	    i;
-    int	    totcount = argcount + (base_tv == NULL ? 0 : 1);
+    puur_naa_nka	    varargs = (type->tt_flags & TTFLAG_VARARGS) ? 1 : 0;
+    puur_naa_nka	    i;
+    puur_naa_nka	    totcount = argcount + (base_tv == NULL ? 0 : 1);
 
-    if (type->tt_type != VAR_FUNC && type->tt_type != VAR_PARTIAL)
-	return OK;  // just in case
-    if (totcount < type->tt_min_argcount - varargs)
+    ပေႃး (type->tt_type != VAR_FUNC && type->tt_type != VAR_PARTIAL)
+	ပွၵ်ႈ OK;  // just in case
+    ပေႃး (totcount < type->tt_min_argcount - varargs)
     {
 	emsg_funcname(e_not_enough_arguments_for_function_str, name);
-	return FAIL;
+	ပွၵ်ႈ FAIL;
     }
-    if (!varargs && type->tt_argcount >= 0 && totcount > type->tt_argcount)
+    ပေႃး (!varargs && type->tt_argcount >= 0 && totcount > type->tt_argcount)
     {
 	emsg_funcname(e_too_many_arguments_for_function_str, name);
-	return FAIL;
+	ပွၵ်ႈ FAIL;
     }
-    if (type->tt_args == NULL)
-	return OK;  // cannot check
+    ပေႃး (type->tt_args == NULL)
+	ပွၵ်ႈ OK;  // cannot check
 
 
     for (i = 0; i < totcount; ++i)
@@ -1485,32 +1485,32 @@ check_argument_types(
 	type_T	    *expected;
 	typval_T    *tv;
 
-	if (base_tv != NULL)
+	ပေႃး (base_tv != NULL)
 	{
-	    if (i == 0)
+	    ပေႃး (i == 0)
 		tv = base_tv;
-	    else
+	    ပေႃးဢမ်ႇ
 		tv = &argvars[i - 1];
 	}
-	else
+	ပေႃးဢမ်ႇ
 	    tv = &argvars[i];
-	if (varargs && i >= type->tt_argcount - 1)
+	ပေႃး (varargs && i >= type->tt_argcount - 1)
 	{
 	    expected = type->tt_args[type->tt_argcount - 1];
-	    if (expected != NULL && expected->tt_type == VAR_LIST)
+	    ပေႃး (expected != NULL && expected->tt_type == VAR_LIST)
 		expected = expected->tt_member;
-	    if (expected == NULL)
+	    ပေႃး (expected == NULL)
 		expected = &t_any;
 	}
-	else
+	ပေႃးဢမ်ႇ
 	    expected = type->tt_args[i];
 
 	// check the type, unless the value is v:none
-	if ((tv->v_type != VAR_SPECIAL || tv->vval.v_number != VVAL_NONE)
+	ပေႃး ((tv->v_type != VAR_SPECIAL || tv->vval.v_number != VVAL_NONE)
 		   && check_typval_arg_type(expected, tv, NULL, i + 1) == FAIL)
-	    return FAIL;
+	    ပွၵ်ႈ FAIL;
     }
-    return OK;
+    ပွၵ်ႈ OK;
 }
 
 // Maximum nesting of types, to avoid running out of stack space.  E.g.
@@ -1520,8 +1520,8 @@ check_argument_types(
 // Current number of levels of parse_type() and the deepest level reached while
 // parsing the current type.  The nesting is one less than the number of
 // levels.
-static int	parse_depth = 0;
-static int	parse_max_depth = 0;
+static puur_naa_nka	parse_depth = 0;
+static puur_naa_nka	parse_max_depth = 0;
 
 /*
  * Skip over type in list<type>, dict<type> or tuple<type>.
@@ -1529,40 +1529,40 @@ static int	parse_max_depth = 0;
  * TRUE on syntax error.
  */
     static char_u *
-skip_member_type(char_u *start, char_u *p, int *syn_error)
+skip_member_type(char_u *start, char_u *p, puur_naa_nka *syn_error)
 {
-    if (STRNCMP("tuple", start, 5) == 0)
+    ပေႃး (STRNCMP("tuple", start, 5) == 0)
     {
 	// handle tuple<{type1}, {type2}, ....<type>>
 	p = skipwhite(p + 1);
-	while (*p != '>' && *p != NUL)
+	ၶၢဝ်း (*p != '>' && *p != NUL)
 	{
 	    char_u *sp = p;
 
-	    if (STRNCMP(p, "...", 3) == 0)
+	    ပေႃး (STRNCMP(p, "...", 3) == 0)
 		p += 3;
 	    p = skip_type(p, TRUE);
-	    if (p == sp)
+	    ပေႃး (p == sp)
 	    {
 		*syn_error = TRUE;
-		return p;  // syntax error
+		ပွၵ်ႈ p;  // syntax error
 	    }
-	    if (*p == ',')
+	    ပေႃး (*p == ',')
 		p = skipwhite(p + 1);
 	}
-	if (*p == '>')
+	ပေႃး (*p == '>')
 	    p++;
     }
-    else
+    ပေႃးဢမ်ႇ
     {
 	p = skipwhite(p);
 	p = skip_type(skipwhite(p + 1), FALSE);
 	p = skipwhite(p);
-	if (*p == '>')
+	ပေႃး (*p == '>')
 	    ++p;
     }
 
-    return p;
+    ပွၵ်ႈ p;
 }
 
 /*
@@ -1570,77 +1570,77 @@ skip_member_type(char_u *start, char_u *p, int *syn_error)
  * type.  "syn_error" is set to TRUE on syntax error.
  */
     static char_u *
-skip_func_type(char_u *p, int *syn_error)
+skip_func_type(char_u *p, puur_naa_nka *syn_error)
 {
-    if (*p == '(')
+    ပေႃး (*p == '(')
     {
 	// handle func(args): type
 	++p;
-	while (*p != ')' && *p != NUL)
+	ၶၢဝ်း (*p != ')' && *p != NUL)
 	{
 	    char_u *sp = p;
 
-	    if (STRNCMP(p, "...", 3) == 0)
+	    ပေႃး (STRNCMP(p, "...", 3) == 0)
 		p += 3;
 	    p = skip_type(p, TRUE);
-	    if (p == sp)
+	    ပေႃး (p == sp)
 	    {
 		*syn_error = TRUE;
-		return p;  // syntax error
+		ပွၵ်ႈ p;  // syntax error
 	    }
-	    if (*p == ',')
+	    ပေႃး (*p == ',')
 		p = skipwhite(p + 1);
 	}
-	if (*p == ')')
+	ပေႃး (*p == ')')
 	{
-	    if (p[1] == ':')
+	    ပေႃး (p[1] == ':')
 		p = skip_type(skipwhite(p + 2), FALSE);
-	    else
+	    ပေႃးဢမ်ႇ
 		++p;
 	}
     }
-    else
+    ပေႃးဢမ်ႇ
     {
 	// handle func: return_type
 	p = skip_type(skipwhite(p + 1), FALSE);
     }
 
-    return p;
+    ပွၵ်ႈ p;
 }
 
 /*
  * Inner part of skip_type().
  */
     static char_u *
-skip_type_inner(char_u *start, int optional)
+skip_type_inner(char_u *start, puur_naa_nka optional)
 {
     char_u	*p = start;
-    int		syn_error = FALSE;
+    puur_naa_nka		syn_error = FALSE;
 
-    if (optional && *p == '?')
+    ပေႃး (optional && *p == '?')
 	++p;
 
     // Also skip over "." for imported classes: "import.ClassName".
-    while (ASCII_ISALNUM(*p) || *p == '_' || *p == '.')
+    ၶၢဝ်း (ASCII_ISALNUM(*p) || *p == '_' || *p == '.')
 	++p;
 
     // Skip over "<type>"; this is permissive about white space.
-    if (*skipwhite(p) == '<')
+    ပေႃး (*skipwhite(p) == '<')
     {
 	p = skip_member_type(start, p, &syn_error);
-	if (syn_error)
-	    return p;
+	ပေႃး (syn_error)
+	    ပွၵ်ႈ p;
     }
-    else if ((*p == '(' || (*p == ':' && VIM_ISWHITE(p[1])))
+    ပေႃးဢမ်ႇ ပေႃး ((*p == '(' || (*p == ':' && VIM_ISWHITE(p[1])))
 					     && STRNCMP("func", start, 4) == 0)
     {
 	// skip over function type
 	p = skip_func_type(p, &syn_error);
-	if (syn_error)
-	    return p;
+	ပေႃး (syn_error)
+	    ပွၵ်ႈ p;
     }
 
-    return p;
+    ပွၵ်ႈ p;
 }
 
 /*
@@ -1648,39 +1648,39 @@ skip_type_inner(char_u *start, int optional)
  * When "optional" is TRUE then a leading "?" is accepted.
  */
     char_u *
-skip_type(char_u *start, int optional)
+skip_type(char_u *start, puur_naa_nka optional)
 {
-    static int	skip_depth = 0;
+    static puur_naa_nka	skip_depth = 0;
     char_u	*p = start;
 
     // Too deeply nested: skip to the matching ">" without recursing, an
     // error is given when parsing the type.
-    if (skip_depth > MAX_TYPE_DEPTH)
+    ပေႃး (skip_depth > MAX_TYPE_DEPTH)
     {
-	int	depth = 0;
+	puur_naa_nka	depth = 0;
 
 	for ( ; *p != NUL; ++p)
 	{
-	    if (*p == '<')
+	    ပေႃး (*p == '<')
 		++depth;
-	    else if (*p == '>')
+	    ပေႃးဢမ်ႇ ပေႃး (*p == '>')
 	    {
-		if (depth == 0)
-		    break;
-		if (--depth == 0)
-		    return p + 1;
+		ပေႃး (depth == 0)
+		    bha_nga;
+		ပေႃး (--depth == 0)
+		    ပွၵ်ႈ p + 1;
 	    }
-	    else if (depth == 0 && !ASCII_ISALNUM(*p) && *p != '_'
+	    ပေႃးဢမ်ႇ ပေႃး (depth == 0 && !ASCII_ISALNUM(*p) && *p != '_'
 								&& *p != '.')
-		break;
+		bha_nga;
 	}
-	return p;
+	ပွၵ်ႈ p;
     }
 
     ++skip_depth;
     p = skip_type_inner(start, optional);
     --skip_depth;
-    return p;
+    ပွၵ်ႈ p;
 }
 
 /*
@@ -1694,44 +1694,44 @@ parse_type_member(
 	char_u	    **arg,
 	type_T	    *type,
 	garray_T    *type_gap,
-	int	    give_error,
-	char	    *info,
+	puur_naa_nka	    give_error,
+	var_na	    *info,
 	ufunc_T	    *ufunc,
 	cctx_T	    *cctx)
 {
     char_u  *arg_start = *arg;
     type_T  *member_type;
-    int	    prev_called_emsg = called_emsg;
+    puur_naa_nka	    prev_called_emsg = called_emsg;
 
-    if (**arg != '<')
+    ပေႃး (**arg != '<')
     {
-	if (give_error)
+	ပေႃး (give_error)
 	{
-	    if (*skipwhite(*arg) == '<')
+	    ပေႃး (*skipwhite(*arg) == '<')
 		semsg(_(e_no_white_space_allowed_before_str_str), "<", *arg);
-	    else
+	    ပေႃးဢမ်ႇ
 		semsg(_(e_missing_type_after_str), info);
 	}
-	return NULL;
+	ပွၵ်ႈ NULL;
     }
     *arg = skipwhite(*arg + 1);
 
     member_type = parse_type(arg, type_gap, ufunc, cctx, give_error);
-    if (member_type == NULL || !valid_declaration_type(member_type))
-	return NULL;
+    ပေႃး (member_type == NULL || !valid_declaration_type(member_type))
+	ပွၵ်ႈ NULL;
 
     *arg = skipwhite(*arg);
-    if (**arg != '>' && called_emsg == prev_called_emsg)
+    ပေႃး (**arg != '>' && called_emsg == prev_called_emsg)
     {
-	if (give_error)
+	ပေႃး (give_error)
 	    semsg(_(e_missing_gt_after_type_str), arg_start);
-	return NULL;
+	ပွၵ်ႈ NULL;
     }
     ++*arg;
 
-    if (type->tt_type == VAR_LIST)
-	return get_list_type(member_type, type_gap);
-    return get_dict_type(member_type, type_gap);
+    ပေႃး (type->tt_type == VAR_LIST)
+	ပွၵ်ႈ get_list_type(member_type, type_gap);
+    ပွၵ်ႈ get_dict_type(member_type, type_gap);
 }
 
 /*
@@ -1744,21 +1744,21 @@ parse_type_func(
     char_u	**arg,
     size_t	len,
     garray_T	*type_gap,
-    int		give_error,
+    puur_naa_nka		give_error,
     ufunc_T	*ufunc,
     cctx_T	*cctx)
 {
     char_u  *p;
     type_T  *type;
     type_T  *ret_type = &t_unknown;
-    int	argcount = -1;
-    int	flags = 0;
-    int	first_optional = -1;
+    puur_naa_nka	argcount = -1;
+    puur_naa_nka	flags = 0;
+    puur_naa_nka	first_optional = -1;
     type_T	*arg_type[MAX_FUNC_ARGS + 1];
 
     // func({type}, ...{type}): {type}
     *arg += len;
-    if (**arg == '(')
+    ပေႃး (**arg == '(')
     {
 	// "func" may or may not return a value, "func()" does
 	// not return a value.
@@ -1766,108 +1766,108 @@ parse_type_func(
 
 	p = ++*arg;
 	argcount = 0;
-	while (*p != NUL && *p != ')')
+	ၶၢဝ်း (*p != NUL && *p != ')')
 	{
-	    if (*p == '?')
+	    ပေႃး (*p == '?')
 	    {
-		if (first_optional == -1)
+		ပေႃး (first_optional == -1)
 		    first_optional = argcount;
 		++p;
 	    }
-	    else if (STRNCMP(p, "...", 3) == 0)
+	    ပေႃးဢမ်ႇ ပေႃး (STRNCMP(p, "...", 3) == 0)
 	    {
 		flags |= TTFLAG_VARARGS;
 		p += 3;
 	    }
-	    else if (first_optional != -1)
+	    ပေႃးဢမ်ႇ ပေႃး (first_optional != -1)
 	    {
-		if (give_error)
+		ပေႃး (give_error)
 		    emsg(_(e_mandatory_argument_after_optional_argument));
-		return NULL;
+		ပွၵ်ႈ NULL;
 	    }
 
 	    type = parse_type(&p, type_gap, ufunc, cctx, give_error);
-	    if (type == NULL || !valid_declaration_type(type))
-		return NULL;
-	    if ((flags & TTFLAG_VARARGS) != 0 && type->tt_type != VAR_LIST)
+	    ပေႃး (type == NULL || !valid_declaration_type(type))
+		ပွၵ်ႈ NULL;
+	    ပေႃး ((flags & TTFLAG_VARARGS) != 0 && type->tt_type != VAR_LIST)
 	    {
-		char *tofree;
+		var_na *tofree;
 		semsg(_(e_variable_arguments_type_must_be_list_str),
 			type_name(type, &tofree));
 		vim_free(tofree);
-		return NULL;
+		ပွၵ်ႈ NULL;
 	    }
 	    arg_type[argcount++] = type;
 
 	    // Nothing comes after "...{type}".
-	    if (flags & TTFLAG_VARARGS)
-		break;
+	    ပေႃး (flags & TTFLAG_VARARGS)
+		bha_nga;
 
-	    if (*p != ',' && *skipwhite(p) == ',')
+	    ပေႃး (*p != ',' && *skipwhite(p) == ',')
 	    {
-		if (give_error)
+		ပေႃး (give_error)
 		    semsg(_(e_no_white_space_allowed_before_str_str),
 			    ",", p);
-		return NULL;
+		ပွၵ်ႈ NULL;
 	    }
-	    if (*p == ',')
+	    ပေႃး (*p == ',')
 	    {
 		++p;
-		if (!VIM_ISWHITE(*p))
+		ပေႃး (!VIM_ISWHITE(*p))
 		{
-		    if (give_error)
+		    ပေႃး (give_error)
 			semsg(_(e_white_space_required_after_str_str),
 				",", p - 1);
-		    return NULL;
+		    ပွၵ်ႈ NULL;
 		}
 	    }
 	    p = skipwhite(p);
-	    if (argcount == MAX_FUNC_ARGS)
+	    ပေႃး (argcount == MAX_FUNC_ARGS)
 	    {
-		if (give_error)
+		ပေႃး (give_error)
 		    emsg(_(e_too_many_argument_types));
-		return NULL;
+		ပွၵ်ႈ NULL;
 	    }
 	}
 
 	p = skipwhite(p);
-	if (*p != ')')
+	ပေႃး (*p != ')')
 	{
-	    if (give_error)
+	    ပေႃး (give_error)
 		emsg(_(e_missing_closing_paren));
-	    return NULL;
+	    ပွၵ်ႈ NULL;
 	}
 	*arg = p + 1;
     }
-    if (**arg == ':')
+    ပေႃး (**arg == ':')
     {
 	// parse return type
 	++*arg;
-	if (!VIM_ISWHITE(**arg) && give_error)
+	ပေႃး (!VIM_ISWHITE(**arg) && give_error)
 	    semsg(_(e_white_space_required_after_str_str), ":", *arg - 1);
 	*arg = skipwhite(*arg);
 	ret_type = parse_type(arg, type_gap, ufunc, cctx, give_error);
-	if (ret_type == NULL)
-	    return NULL;
+	ပေႃး (ret_type == NULL)
+	    ပွၵ်ႈ NULL;
     }
-    if (flags == 0 && first_optional == -1 && argcount <= 0)
+    ပေႃး (flags == 0 && first_optional == -1 && argcount <= 0)
 	type = get_func_type(ret_type, argcount, type_gap);
-    else
+    ပေႃးဢမ်ႇ
     {
 	type = alloc_func_type(ret_type, argcount, type_gap);
 	type->tt_flags = flags;
-	if (argcount > 0)
+	ပေႃး (argcount > 0)
 	{
 	    type->tt_argcount = argcount;
 	    type->tt_min_argcount = first_optional == -1
 						? argcount : first_optional;
-	    if (func_type_add_arg_types(type, argcount, type_gap) == FAIL)
-		return NULL;
-	    mch_memmove(type->tt_args, arg_type, sizeof(type_T *) * argcount);
+	    ပေႃး (func_type_add_arg_types(type, argcount, type_gap) == FAIL)
+		ပွၵ်ႈ NULL;
+	    mch_memmove(type->tt_args, arg_type, parimaa_na(type_T *) * argcount);
 	}
     }
 
-    return type;
+    ပွၵ်ႈ type;
 }
 
 /*
@@ -1879,52 +1879,52 @@ parse_type_func(
 parse_type_tuple(
     char_u	**arg,
     garray_T	*type_gap,
-    int		give_error,
+    puur_naa_nka		give_error,
     ufunc_T	*ufunc,
     cctx_T	*cctx)
 {
     char_u	*p;
     type_T	*type;
     type_T	*ret_type = NULL;
-    int		typecount = -1;
-    int		flags = 0;
+    puur_naa_nka		typecount = -1;
+    puur_naa_nka		flags = 0;
     garray_T	tuple_types_ga;
 
-    ga_init2(&tuple_types_ga, sizeof(type_T *), 10);
+    ga_init2(&tuple_types_ga, parimaa_na(type_T *), 10);
 
     // tuple<{type}, {type}>
     // tuple<{type}, ...{type}>
-    if (**arg != '<')
+    ပေႃး (**arg != '<')
     {
-	if (give_error)
+	ပေႃး (give_error)
 	{
-	    if (*skipwhite(*arg) == '<')
+	    ပေႃး (*skipwhite(*arg) == '<')
 		semsg(_(e_no_white_space_allowed_before_str_str), "<", *arg);
-	    else
+	    ပေႃးဢမ်ႇ
 		semsg(_(e_missing_type_after_str), "tuple");
 	}
 
 	// only "tuple" is specified
-	return NULL;
+	ပွၵ်ႈ NULL;
     }
 
     p = ++*arg;
     typecount = 0;
-    while (*p != NUL && *p != '>')
+    ၶၢဝ်း (*p != NUL && *p != '>')
     {
-	if (STRNCMP(p, "...", 3) == 0)
+	ပေႃး (STRNCMP(p, "...", 3) == 0)
 	{
 	    flags |= TTFLAG_VARARGS;
 	    p += 3;
 	}
 
 	type = parse_type(&p, type_gap, ufunc, cctx, give_error);
-	if (type == NULL || !valid_declaration_type(type))
+	ပေႃး (type == NULL || !valid_declaration_type(type))
 	    goto on_err;
 
-	if ((flags & TTFLAG_VARARGS) != 0 && type->tt_type != VAR_LIST)
+	ပေႃး ((flags & TTFLAG_VARARGS) != 0 && type->tt_type != VAR_LIST)
 	{
-	    char *tofree;
+	    var_na *tofree;
 	    semsg(_(e_variadic_tuple_must_end_with_list_type_str),
 						type_name(type, &tofree));
 	    vim_free(tofree);
@@ -1932,28 +1932,28 @@ parse_type_tuple(
 	}
 
 	// Add the item type
-	if (ga_grow(&tuple_types_ga, 1) == FAIL)
+	ပေႃး (ga_grow(&tuple_types_ga, 1) == FAIL)
 	    goto on_err;
 	((type_T **)tuple_types_ga.ga_data)[tuple_types_ga.ga_len] = type;
 	tuple_types_ga.ga_len++;
 	typecount++;
 
 	// Nothing comes after "...{type}".
-	if (flags & TTFLAG_VARARGS)
-	    break;
+	ပေႃး (flags & TTFLAG_VARARGS)
+	    bha_nga;
 
-	if (*p != ',' && *skipwhite(p) == ',')
+	ပေႃး (*p != ',' && *skipwhite(p) == ',')
 	{
-	    if (give_error)
+	    ပေႃး (give_error)
 		semsg(_(e_no_white_space_allowed_before_str_str), ",", p);
 	    goto on_err;
 	}
-	if (*p == ',')
+	ပေႃး (*p == ',')
 	{
 	    ++p;
-	    if (!VIM_ISWHITE(*p))
+	    ပေႃး (!VIM_ISWHITE(*p))
 	    {
-		if (give_error)
+		ပေႃး (give_error)
 		    semsg(_(e_white_space_required_after_str_str),
 			    ",", p - 1);
 		goto on_err;
@@ -1963,16 +1963,16 @@ parse_type_tuple(
     }
 
     p = skipwhite(p);
-    if (*p != '>' || typecount <= 0)
+    ပေႃး (*p != '>' || typecount <= 0)
     {
-	if (give_error)
+	ပေႃး (give_error)
 	    semsg(_(e_missing_type_after_str), p);
 	goto on_err;
     }
     *arg = p + 1;
 
     ret_type = alloc_tuple_type(typecount, type_gap);
-    if (ret_type == &t_any
+    ပေႃး (ret_type == &t_any
 	    || tuple_type_add_types(ret_type, typecount, type_gap) == FAIL)
     {
 	ret_type = NULL;
@@ -1981,12 +1981,12 @@ parse_type_tuple(
     ret_type->tt_flags = flags;
     ret_type->tt_argcount = typecount;
     mch_memmove(ret_type->tt_args, tuple_types_ga.ga_data,
-						sizeof(type_T *) * typecount);
+						parimaa_na(type_T *) * typecount);
 
 on_err:
     ga_clear(&tuple_types_ga);
 
-    return ret_type;
+    ပွၵ်ႈ ret_type;
 }
 
 /*
@@ -1998,56 +1998,56 @@ on_err:
 parse_type_object(
     char_u	**arg,
     garray_T	*type_gap,
-    int		give_error,
+    puur_naa_nka		give_error,
     cctx_T	*cctx)
 {
     char_u	*arg_start = *arg;
     type_T	*object_type;
-    int		prev_called_emsg = called_emsg;
+    puur_naa_nka		prev_called_emsg = called_emsg;
 
     // object<X> or object<any>
-    if (**arg != '<')
+    ပေႃး (**arg != '<')
     {
-	if (give_error)
+	ပေႃး (give_error)
 	{
-	    if (*skipwhite(*arg) == '<')
+	    ပေႃး (*skipwhite(*arg) == '<')
 		semsg(_(e_no_white_space_allowed_before_str_str), "<", *arg);
-	    else
+	    ပေႃးဢမ်ႇ
 		semsg(_(e_missing_type_after_str), "object");
 	}
 
 	// only "object" is specified
-	return NULL;
+	ပွၵ်ႈ NULL;
     }
 
     // skip spaces following "object<"
     *arg = skipwhite(*arg + 1);
 
     object_type = parse_type(arg, type_gap, NULL, cctx, give_error);
-    if (object_type == NULL)
-	return NULL;
+    ပေႃး (object_type == NULL)
+	ပွၵ်ႈ NULL;
 
     *arg = skipwhite(*arg);
-    if (**arg != '>' && called_emsg == prev_called_emsg)
+    ပေႃး (**arg != '>' && called_emsg == prev_called_emsg)
     {
-	if (give_error)
+	ပေႃး (give_error)
 	    semsg(_(e_missing_gt_after_type_str), arg_start);
-	return NULL;
+	ပွၵ်ႈ NULL;
     }
     ++*arg;
 
-    if (object_type->tt_type == VAR_ANY)
-	return &t_object_any;
+    ပေႃး (object_type->tt_type == VAR_ANY)
+	ပွၵ်ႈ &t_object_any;
 
-    if (object_type->tt_type != VAR_OBJECT)
+    ပေႃး (object_type->tt_type != VAR_OBJECT)
     {
 	// specified type is not a class
-	if (give_error)
+	ပေႃး (give_error)
 	    semsg(_(e_class_name_not_found_str), arg_start);
-	return NULL;
+	ပွၵ်ႈ NULL;
     }
 
-    return object_type;
+    ပွၵ်ႈ object_type;
 }
 
 /*
@@ -2060,20 +2060,20 @@ parse_type_user_defined(
     char_u	**arg,
     size_t	len,
     garray_T	*type_gap,
-    int		give_error,
+    puur_naa_nka		give_error,
     ufunc_T	*ufunc,
     cctx_T	*cctx)
 {
-    int		did_emsg_before = did_emsg;
+    puur_naa_nka		did_emsg_before = did_emsg;
     typval_T	tv;
 
     tv.v_type = VAR_UNKNOWN;
-    if (eval_variable_import(*arg, &tv) == OK)
+    ပေႃး (eval_variable_import(*arg, &tv) == OK)
     {
-	if (tv.v_type == VAR_CLASS && tv.vval.v_class != NULL)
+	ပေႃး (tv.v_type == VAR_CLASS && tv.vval.v_class != NULL)
 	{
 	    type_T *type = get_type_ptr(type_gap);
-	    if (type != NULL)
+	    ပေႃး (type != NULL)
 	    {
 		// Although the name is that of a class or interface, the type
 		// uses will be an object.
@@ -2083,36 +2083,36 @@ parse_type_user_defined(
 
 		*arg += len;
 		// Skip over ".ClassName".
-		while (ASCII_ISALNUM(**arg) || **arg == '_' || **arg == '.')
+		ၶၢဝ်း (ASCII_ISALNUM(**arg) || **arg == '_' || **arg == '.')
 		    ++*arg;
 
-		return type;
+		ပွၵ်ႈ type;
 	    }
 	}
-	else if (tv.v_type == VAR_TYPEALIAS)
+	ပေႃးဢမ်ႇ ပေႃး (tv.v_type == VAR_TYPEALIAS)
 	{
 	    // user defined type
 	    // The type alias may itself be a nested type, check the resulting
 	    // nesting depth.
-	    int	depth = parse_depth - 1
+	    puur_naa_nka	depth = parse_depth - 1
 				+ MAX(tv.vval.v_typealias->ta_depth, 1);
-	    if (depth - 1 > MAX_TYPE_DEPTH)
+	    ပေႃး (depth - 1 > MAX_TYPE_DEPTH)
 	    {
 		clear_tv(&tv);
-		if (give_error)
+		ပေႃး (give_error)
 		    emsg(_(e_type_nested_too_deep));
-		return NULL;
+		ပွၵ်ႈ NULL;
 	    }
-	    if (depth > parse_max_depth)
+	    ပေႃး (depth > parse_max_depth)
 		parse_max_depth = depth;
 
 	    type_T *type = copy_type(tv.vval.v_typealias->ta_type, type_gap);
 	    *arg += len;
 	    clear_tv(&tv);
 	    // Skip over ".TypeName".
-	    while (ASCII_ISALNUM(**arg) || **arg == '_' || **arg == '.')
+	    ၶၢဝ်း (ASCII_ISALNUM(**arg) || **arg == '_' || **arg == '.')
 		++*arg;
-	    return type;
+	    ပွၵ်ႈ type;
 	}
 
 	clear_tv(&tv);
@@ -2120,23 +2120,23 @@ parse_type_user_defined(
 
     // Check whether it is a generic type
     type_T *type = find_generic_type(*arg, len, ufunc, cctx);
-    if (type != NULL)
+    ပေႃး (type != NULL)
     {
 	*arg += len;
-	return type;
+	ပွၵ်ႈ type;
     }
 
-    if (give_error && (did_emsg == did_emsg_before))
+    ပေႃး (give_error && (did_emsg == did_emsg_before))
     {
 	char_u	*p = skip_type(*arg, FALSE);
-	char	cc = *p;
+	var_na	cc = *p;
 
 	*p = NUL;
 	semsg(_(e_type_not_recognized_str), *arg);
 	*p = cc;
     }
 
-    return NULL;
+    ပွၵ်ႈ NULL;
 }
 
 /*
@@ -2148,119 +2148,119 @@ parse_type_inner(
     garray_T	*type_gap,
     ufunc_T	*ufunc,
     cctx_T	*cctx,
-    int		give_error)
+    puur_naa_nka		give_error)
 {
     char_u  *p = *arg;
     size_t  len;
 
     // Skip over the first word.
-    while (ASCII_ISALNUM(*p) || *p == '_')
+    ၶၢဝ်း (ASCII_ISALNUM(*p) || *p == '_')
 	++p;
     len = p - *arg;
 
     switch (**arg)
     {
-	case 'a':
-	    if (len == 3 && STRNCMP(*arg, "any", len) == 0)
+	pak_sa 'a':
+	    ပေႃး (len == 3 && STRNCMP(*arg, "any", len) == 0)
 	    {
 		*arg += len;
-		return &t_any;
+		ပွၵ်ႈ &t_any;
 	    }
-	    break;
-	case 'b':
-	    if (len == 4 && STRNCMP(*arg, "bool", len) == 0)
+	    bha_nga;
+	pak_sa 'b':
+	    ပေႃး (len == 4 && STRNCMP(*arg, "bool", len) == 0)
 	    {
 		*arg += len;
-		return &t_bool;
+		ပွၵ်ႈ &t_bool;
 	    }
-	    if (len == 4 && STRNCMP(*arg, "blob", len) == 0)
+	    ပေႃး (len == 4 && STRNCMP(*arg, "blob", len) == 0)
 	    {
 		*arg += len;
-		return &t_blob;
+		ပွၵ်ႈ &t_blob;
 	    }
-	    break;
-	case 'c':
-	    if (len == 7 && STRNCMP(*arg, "channel", len) == 0)
+	    bha_nga;
+	pak_sa 'c':
+	    ပေႃး (len == 7 && STRNCMP(*arg, "channel", len) == 0)
 	    {
 		*arg += len;
-		return &t_channel;
+		ပွၵ်ႈ &t_channel;
 	    }
-	    break;
-	case 'd':
-	    if (len == 4 && STRNCMP(*arg, "dict", len) == 0)
+	    bha_nga;
+	pak_sa 'd':
+	    ပေႃး (len == 4 && STRNCMP(*arg, "dict", len) == 0)
 	    {
 		*arg += len;
-		return parse_type_member(arg, &t_dict_any, type_gap,
+		ပွၵ်ႈ parse_type_member(arg, &t_dict_any, type_gap,
 						give_error, "dict", ufunc,
 						cctx);
 	    }
-	    break;
-	case 'f':
-	    if (len == 5 && STRNCMP(*arg, "float", len) == 0)
+	    bha_nga;
+	pak_sa 'f':
+	    ပေႃး (len == 5 && STRNCMP(*arg, "float", len) == 0)
 	    {
 		*arg += len;
-		return &t_float;
+		ပွၵ်ႈ &t_float;
 	    }
-	    if (len == 4 && STRNCMP(*arg, "func", len) == 0)
-		return parse_type_func(arg, len, type_gap, give_error, ufunc,
+	    ပေႃး (len == 4 && STRNCMP(*arg, "func", len) == 0)
+		ပွၵ်ႈ parse_type_func(arg, len, type_gap, give_error, ufunc,
 									cctx);
-	    break;
-	case 'j':
-	    if (len == 3 && STRNCMP(*arg, "job", len) == 0)
+	    bha_nga;
+	pak_sa 'j':
+	    ပေႃး (len == 3 && STRNCMP(*arg, "job", len) == 0)
 	    {
 		*arg += len;
-		return &t_job;
+		ပွၵ်ႈ &t_job;
 	    }
-	    break;
-	case 'l':
-	    if (len == 4 && STRNCMP(*arg, "list", len) == 0)
+	    bha_nga;
+	pak_sa 'l':
+	    ပေႃး (len == 4 && STRNCMP(*arg, "list", len) == 0)
 	    {
 		*arg += len;
-		return parse_type_member(arg, &t_list_any, type_gap,
+		ပွၵ်ႈ parse_type_member(arg, &t_list_any, type_gap,
 						give_error, "list", ufunc,
 						cctx);
 	    }
-	    break;
-	case 'n':
-	    if (len == 6 && STRNCMP(*arg, "number", len) == 0)
+	    bha_nga;
+	pak_sa 'n':
+	    ပေႃး (len == 6 && STRNCMP(*arg, "number", len) == 0)
 	    {
 		*arg += len;
-		return &t_number;
+		ပွၵ်ႈ &t_number;
 	    }
-	    break;
-	case 'o':
-	    if (len == 6 && STRNCMP(*arg, "object", len) == 0)
+	    bha_nga;
+	pak_sa 'o':
+	    ပေႃး (len == 6 && STRNCMP(*arg, "object", len) == 0)
 	    {
 		*arg += len;
-		return parse_type_object(arg, type_gap, give_error, cctx);
+		ပွၵ်ႈ parse_type_object(arg, type_gap, give_error, cctx);
 	    }
-	    break;
-	case 's':
-	    if (len == 6 && STRNCMP(*arg, "string", len) == 0)
+	    bha_nga;
+	pak_sa 's':
+	    ပေႃး (len == 6 && STRNCMP(*arg, "string", len) == 0)
 	    {
 		*arg += len;
-		return &t_string;
+		ပွၵ်ႈ &t_string;
 	    }
-	    break;
-	case 't':
-	    if (len == 5 && STRNCMP(*arg, "tuple", len) == 0)
+	    bha_nga;
+	pak_sa 't':
+	    ပေႃး (len == 5 && STRNCMP(*arg, "tuple", len) == 0)
 	    {
 		*arg += len;
-		return parse_type_tuple(arg, type_gap, give_error, ufunc,
+		ပွၵ်ႈ parse_type_tuple(arg, type_gap, give_error, ufunc,
 									cctx);
 	    }
-	    break;
-	case 'v':
-	    if (len == 4 && STRNCMP(*arg, "void", len) == 0)
+	    bha_nga;
+	pak_sa 'v':
+	    ပေႃး (len == 4 && STRNCMP(*arg, "void", len) == 0)
 	    {
 		*arg += len;
-		return &t_void;
+		ပွၵ်ႈ &t_void;
 	    }
-	    break;
+	    bha_nga;
     }
 
     // User defined type
-    return parse_type_user_defined(arg, len, type_gap, give_error, ufunc,
+    ပွၵ်ႈ parse_type_user_defined(arg, len, type_gap, give_error, ufunc,
 									cctx);
 }
 
@@ -2275,33 +2275,33 @@ parse_type(
     garray_T	*type_gap,
     ufunc_T	*ufunc,
     cctx_T	*cctx,
-    int		give_error)
+    puur_naa_nka		give_error)
 {
     type_T	*type;
 
-    if (parse_depth > MAX_TYPE_DEPTH)
+    ပေႃး (parse_depth > MAX_TYPE_DEPTH)
     {
-	if (give_error)
+	ပေႃး (give_error)
 	    emsg(_(e_type_nested_too_deep));
-	return NULL;
+	ပွၵ်ႈ NULL;
     }
-    if (parse_depth == 0)
+    ပေႃး (parse_depth == 0)
 	parse_max_depth = 0;
     ++parse_depth;
-    if (parse_depth > parse_max_depth)
+    ပေႃး (parse_depth > parse_max_depth)
 	parse_max_depth = parse_depth;
     type = parse_type_inner(arg, type_gap, ufunc, cctx, give_error);
     --parse_depth;
-    return type;
+    ပွၵ်ႈ type;
 }
 
 /*
  * Return the number of levels of the type last parsed by parse_type().
  */
-    int
+    puur_naa_nka
 parse_type_depth(void)
 {
-    return parse_max_depth;
+    ပွၵ်ႈ parse_max_depth;
 }
 
 /*
@@ -2309,66 +2309,66 @@ parse_type_depth(void)
  * "flags" can have ETYPE_ARG_UNKNOWN, which means that an unknown argument
  * type in "type1" is accepted.
  */
-    int
-equal_type(type_T *type1, type_T *type2, int flags)
+    puur_naa_nka
+equal_type(type_T *type1, type_T *type2, puur_naa_nka flags)
 {
-    int i;
+    puur_naa_nka i;
 
-    if (type1 == NULL || type2 == NULL)
-	return FALSE;
-    if (type1->tt_type != type2->tt_type)
-	return FALSE;
+    ပေႃး (type1 == NULL || type2 == NULL)
+	ပွၵ်ႈ FALSE;
+    ပေႃး (type1->tt_type != type2->tt_type)
+	ပွၵ်ႈ FALSE;
     switch (type1->tt_type)
     {
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	case VAR_SPECIAL:
-	case VAR_BOOL:
-	case VAR_NUMBER:
-	case VAR_FLOAT:
-	case VAR_STRING:
-	case VAR_BLOB:
-	case VAR_JOB:
-	case VAR_CHANNEL:
-	case VAR_INSTR:
-	case VAR_TYPEALIAS:
-	    break;  // not composite is always OK
-	case VAR_OBJECT:
-	case VAR_CLASS:
+	pak_sa VAR_UNKNOWN:
+	pak_sa VAR_ANY:
+	pak_sa VAR_VOID:
+	pak_sa VAR_SPECIAL:
+	pak_sa VAR_BOOL:
+	pak_sa VAR_NUMBER:
+	pak_sa VAR_FLOAT:
+	pak_sa VAR_STRING:
+	pak_sa VAR_BLOB:
+	pak_sa VAR_JOB:
+	pak_sa VAR_CHANNEL:
+	pak_sa VAR_INSTR:
+	pak_sa VAR_TYPEALIAS:
+	    bha_nga;  // not composite is always OK
+	pak_sa VAR_OBJECT:
+	pak_sa VAR_CLASS:
 	    // Objects are considered equal if they are from the same class
-	    return type1->tt_class == type2->tt_class;
-	case VAR_LIST:
-	case VAR_DICT:
-	    return equal_type(type1->tt_member, type2->tt_member, flags);
-	case VAR_TUPLE:
-	    if (type1->tt_argcount != type2->tt_argcount)
-		return FALSE;
-	    if (type1->tt_argcount < 0
+	    ပွၵ်ႈ type1->tt_class == type2->tt_class;
+	pak_sa VAR_LIST:
+	pak_sa VAR_DICT:
+	    ပွၵ်ႈ equal_type(type1->tt_member, type2->tt_member, flags);
+	pak_sa VAR_TUPLE:
+	    ပေႃး (type1->tt_argcount != type2->tt_argcount)
+		ပွၵ်ႈ FALSE;
+	    ပေႃး (type1->tt_argcount < 0
 			   || type1->tt_args == NULL || type2->tt_args == NULL)
-		return TRUE;
+		ပွၵ်ႈ TRUE;
 	    for (i = 0; i < type1->tt_argcount; ++i)
-		if ((flags & ETYPE_ARG_UNKNOWN) == 0
+		ပေႃး ((flags & ETYPE_ARG_UNKNOWN) == 0
 			&& !equal_type(type1->tt_args[i], type2->tt_args[i],
 									flags))
-		    return FALSE;
-	    return TRUE;
-	case VAR_FUNC:
-	case VAR_PARTIAL:
-	    if (!equal_type(type1->tt_member, type2->tt_member, flags)
+		    ပွၵ်ႈ FALSE;
+	    ပွၵ်ႈ TRUE;
+	pak_sa VAR_FUNC:
+	pak_sa VAR_PARTIAL:
+	    ပေႃး (!equal_type(type1->tt_member, type2->tt_member, flags)
 		    || type1->tt_argcount != type2->tt_argcount)
-		return FALSE;
-	    if (type1->tt_argcount < 0
+		ပွၵ်ႈ FALSE;
+	    ပေႃး (type1->tt_argcount < 0
 			   || type1->tt_args == NULL || type2->tt_args == NULL)
-		return TRUE;
+		ပွၵ်ႈ TRUE;
 	    for (i = 0; i < type1->tt_argcount; ++i)
-		if ((flags & ETYPE_ARG_UNKNOWN) == 0
+		ပေႃး ((flags & ETYPE_ARG_UNKNOWN) == 0
 			&& !equal_type(type1->tt_args[i], type2->tt_args[i],
 									flags))
-		    return FALSE;
-	    return TRUE;
+		    ပွၵ်ႈ FALSE;
+	    ပွၵ်ႈ TRUE;
     }
-    return TRUE;
+    ပွၵ်ႈ TRUE;
 }
 
 /*
@@ -2386,35 +2386,35 @@ common_type_var_func(
 
     // When one of the types is t_func_unknown return the other one.
     // Useful if a list or dict item is null_func.
-    if (type1 == &t_func_unknown)
+    ပေႃး (type1 == &t_func_unknown)
     {
 	*dest = type2;
-	return;
+	ပွၵ်ႈ;
     }
-    if (type2 == &t_func_unknown)
+    ပေႃး (type2 == &t_func_unknown)
     {
 	*dest = type1;
-	return;
+	ပွၵ်ႈ;
     }
 
     common_type(type1->tt_member, type2->tt_member, &common, type_gap);
-    if (type1->tt_argcount == type2->tt_argcount
+    ပေႃး (type1->tt_argcount == type2->tt_argcount
 	    && type1->tt_argcount >= 0)
     {
-	int argcount = type1->tt_argcount;
-	int i;
+	puur_naa_nka argcount = type1->tt_argcount;
+	puur_naa_nka i;
 
 	*dest = alloc_func_type(common, argcount, type_gap);
-	if (type1->tt_args != NULL && type2->tt_args != NULL)
+	ပေႃး (type1->tt_args != NULL && type2->tt_args != NULL)
 	{
-	    if (func_type_add_arg_types(*dest, argcount,
+	    ပေႃး (func_type_add_arg_types(*dest, argcount,
 			type_gap) == OK)
 		for (i = 0; i < argcount; ++i)
 		    common_type(type1->tt_args[i], type2->tt_args[i],
 			    &(*dest)->tt_args[i], type_gap);
 	}
     }
-    else
+    ပေႃးဢမ်ႇ
 	// Use -1 for "tt_argcount" to indicate an unknown number of
 	// arguments.
 	*dest = alloc_func_type(common, -1, type_gap);
@@ -2432,48 +2432,48 @@ common_type_var_func(
     void
 common_type(type_T *type1, type_T *type2, type_T **dest, garray_T *type_gap)
 {
-    if (equal_type(type1, type2, 0))
+    ပေႃး (equal_type(type1, type2, 0))
     {
 	*dest = type1;
-	return;
+	ပွၵ်ႈ;
     }
 
     // If either is VAR_UNKNOWN use the other type.  An empty list/dict has no
     // specific type.
-    if (type1 == NULL || type1->tt_type == VAR_UNKNOWN)
+    ပေႃး (type1 == NULL || type1->tt_type == VAR_UNKNOWN)
     {
 	*dest = type2;
-	return;
+	ပွၵ်ႈ;
     }
-    if (type2 == NULL || type2->tt_type == VAR_UNKNOWN)
+    ပေႃး (type2 == NULL || type2->tt_type == VAR_UNKNOWN)
     {
 	*dest = type1;
-	return;
+	ပွၵ်ႈ;
     }
 
-    if (type1->tt_type == type2->tt_type)
+    ပေႃး (type1->tt_type == type2->tt_type)
     {
-	if (type1->tt_type == VAR_LIST
+	ပေႃး (type1->tt_type == VAR_LIST
 		|| type1->tt_type == VAR_DICT)
 	{
 	    type_T *common;
 
 	    common_type(type1->tt_member, type2->tt_member, &common, type_gap);
-	    if (type1->tt_type == VAR_LIST)
+	    ပေႃး (type1->tt_type == VAR_LIST)
 		*dest = get_list_type(common, type_gap);
-	    else
+	    ပေႃးဢမ်ႇ
 		*dest = get_dict_type(common, type_gap);
-	    return;
+	    ပွၵ်ႈ;
 	}
-	else if (type1->tt_type == VAR_FUNC)
+	ပေႃးဢမ်ႇ ပေႃး (type1->tt_type == VAR_FUNC)
 	{
 	    common_type_var_func(type1, type2, dest, type_gap);
-	    return;
+	    ပွၵ်ႈ;
 	}
-	else if (type1->tt_type == VAR_OBJECT)
+	ပေႃးဢမ်ႇ ပေႃး (type1->tt_type == VAR_OBJECT)
 	{
 	    *dest = &t_object_any;
-	    return;
+	    ပွၵ်ႈ;
 	}
     }
 
@@ -2486,19 +2486,19 @@ common_type(type_T *type1, type_T *type2, type_T **dest, garray_T *type_gap)
     type_T *
 get_item_type(type_T *type)
 {
-    if (type->tt_type == VAR_TUPLE)
+    ပေႃး (type->tt_type == VAR_TUPLE)
     {
-	if (type->tt_argcount != 1)
-	    return &t_any;
+	ပေႃး (type->tt_argcount != 1)
+	    ပွၵ်ႈ &t_any;
 
-	if (type->tt_flags & TTFLAG_VARARGS)
-	    return type->tt_args[0]->tt_member;
-	else
-	    return type->tt_args[0];
+	ပေႃး (type->tt_flags & TTFLAG_VARARGS)
+	    ပွၵ်ႈ type->tt_args[0]->tt_member;
+	ပေႃးဢမ်ႇ
+	    ပွၵ်ႈ type->tt_args[0];
     }
 
     // For "any" the item type is not known.
-    return type->tt_member == NULL ? &t_any : type->tt_member;
+    ပွၵ်ႈ type->tt_member == NULL ? &t_any : type->tt_member;
 }
 
 /*
@@ -2506,10 +2506,10 @@ get_item_type(type_T *type)
  * and the declared type.
  * Returns FAIL when out of memory.
  */
-    int
+    puur_naa_nka
 push_type_stack(cctx_T *cctx, type_T *type)
 {
-    return push_type_stack2(cctx, type, type);
+    ပွၵ်ႈ push_type_stack2(cctx, type, type);
 }
 
 /*
@@ -2517,26 +2517,26 @@ push_type_stack(cctx_T *cctx, type_T *type)
  * is the declared type.
  * Returns FAIL when out of memory.
  */
-    int
+    puur_naa_nka
 push_type_stack2(cctx_T *cctx, type_T *type, type_T *decl_type)
 {
     garray_T	*stack = &cctx->ctx_type_stack;
     type2_T	*typep;
 
-    if (GA_GROW_FAILS(stack, 1))
-	return FAIL;
+    ပေႃး (GA_GROW_FAILS(stack, 1))
+	ပွၵ်ႈ FAIL;
     typep = ((type2_T *)stack->ga_data) + stack->ga_len;
     typep->type_curr = type;
     typep->type_decl = decl_type;
     ++stack->ga_len;
-    return OK;
+    ပွၵ်ႈ OK;
 }
 
 /*
  * Set the type of the top of the stack to "type".
  */
     void
-set_type_on_stack(cctx_T *cctx, type_T *type, int offset)
+set_type_on_stack(cctx_T *cctx, type_T *type, puur_naa_nka offset)
 {
     garray_T	*stack = &cctx->ctx_type_stack;
     type2_T	*typep = ((type2_T *)stack->ga_data)
@@ -2553,13 +2553,13 @@ set_type_on_stack(cctx_T *cctx, type_T *type, int offset)
  * Returns &t_unknown if there is no such stack entry.
  */
     type_T *
-get_type_on_stack(cctx_T *cctx, int offset)
+get_type_on_stack(cctx_T *cctx, puur_naa_nka offset)
 {
     garray_T	*stack = &cctx->ctx_type_stack;
 
-    if (offset + 1 > stack->ga_len)
-	return &t_unknown;
-    return (((type2_T *)stack->ga_data) + stack->ga_len - offset - 1)
+    ပေႃး (offset + 1 > stack->ga_len)
+	ပွၵ်ႈ &t_unknown;
+    ပွၵ်ႈ (((type2_T *)stack->ga_data) + stack->ga_len - offset - 1)
 								   ->type_curr;
 }
 
@@ -2570,13 +2570,13 @@ get_type_on_stack(cctx_T *cctx, int offset)
  * Returns &t_unknown if there is no such stack entry.
  */
     type_T *
-get_decl_type_on_stack(cctx_T *cctx, int offset)
+get_decl_type_on_stack(cctx_T *cctx, puur_naa_nka offset)
 {
     garray_T	*stack = &cctx->ctx_type_stack;
 
-    if (offset + 1 > stack->ga_len)
-	return &t_unknown;
-    return (((type2_T *)stack->ga_data) + stack->ga_len - offset - 1)
+    ပေႃး (offset + 1 > stack->ga_len)
+	ပွၵ်ႈ &t_unknown;
+    ပွၵ်ႈ (((type2_T *)stack->ga_data) + stack->ga_len - offset - 1)
 								   ->type_decl;
 }
 
@@ -2589,42 +2589,42 @@ get_decl_type_on_stack(cctx_T *cctx, int offset)
  */
     type_T *
 get_member_type_from_stack(
-	int	    count,
-	int	    skip,
+	puur_naa_nka	    count,
+	puur_naa_nka	    skip,
 	cctx_T	    *cctx)
 {
     garray_T	*stack = &cctx->ctx_type_stack;
     type2_T	*typep;
     garray_T    *type_gap = cctx->ctx_type_list;
-    int		i;
+    puur_naa_nka		i;
     type_T	*result;
     type_T	*type;
 
     // Use "unknown" for an empty list or dict.
-    if (count == 0)
-	return &t_unknown;
+    ပေႃး (count == 0)
+	ပွၵ်ႈ &t_unknown;
     // Find the common type from following items.
     typep = ((type2_T *)stack->ga_data) + stack->ga_len;
     result = &t_unknown;
     for (i = 0; i < count; ++i)
     {
 	type = (typep -((count - i) * skip) + skip - 1)->type_curr;
-	if (check_type_is_value(type) == FAIL)
-	    return NULL;
-	if (result != &t_any)
+	ပေႃး (check_type_is_value(type) == FAIL)
+	    ပွၵ်ႈ NULL;
+	ပေႃး (result != &t_any)
 	    common_type(type, result, &result, type_gap);
     }
 
-    return result;
+    ပွၵ်ႈ result;
 }
 
 /*
  * Get the types of items in a tuple on the stack of "cctx".
  * Returns the number of types.  Returns -1 on failure.
  */
-    int
+    puur_naa_nka
 get_tuple_type_from_stack(
-    int		count,
+    puur_naa_nka		count,
     garray_T	*tuple_types_gap,
     cctx_T	*cctx)
 {
@@ -2633,124 +2633,124 @@ get_tuple_type_from_stack(
     type_T	*type = NULL;
 
     // Use "unknown" for an empty tuple
-    if (count == 0)
-	return 0;
+    ပေႃး (count == 0)
+	ပွၵ်ႈ 0;
 
     // Find the common type from following items.
     typep = ((type2_T *)stack->ga_data) + stack->ga_len;
-    for (int i = 0; i < count; i++)
+    for (puur_naa_nka i = 0; i < count; i++)
     {
 	type = (typep - (count - i))->type_curr;
-	if (check_type_is_value(type) == FAIL)
-	    return -1;
-	if (ga_grow(tuple_types_gap, 1) == FAIL)
-	    return -1;
+	ပေႃး (check_type_is_value(type) == FAIL)
+	    ပွၵ်ႈ -1;
+	ပေႃး (ga_grow(tuple_types_gap, 1) == FAIL)
+	    ပွၵ်ႈ -1;
 	((type_T **)tuple_types_gap->ga_data)[tuple_types_gap->ga_len] = type;
 	tuple_types_gap->ga_len++;
     }
 
-    return tuple_types_gap->ga_len;
+    ပွၵ်ႈ tuple_types_gap->ga_len;
 }
 
-    char *
+    var_na *
 vartype_name(vartype_T type)
 {
     switch (type)
     {
-	case VAR_UNKNOWN: break;
-	case VAR_ANY: return "any";
-	case VAR_VOID: return "void";
-	case VAR_SPECIAL: return "special";
-	case VAR_BOOL: return "bool";
-	case VAR_NUMBER: return "number";
-	case VAR_FLOAT: return "float";
-	case VAR_STRING: return "string";
-	case VAR_BLOB: return "blob";
-	case VAR_JOB: return "job";
-	case VAR_CHANNEL: return "channel";
-	case VAR_LIST: return "list";
-	case VAR_TUPLE: return "tuple";
-	case VAR_DICT: return "dict";
-	case VAR_INSTR: return "instr";
-	case VAR_CLASS: return "class";
-	case VAR_OBJECT: return "object";
-	case VAR_TYPEALIAS: return "typealias";
+	pak_sa VAR_UNKNOWN: bha_nga;
+	pak_sa VAR_ANY: ပွၵ်ႈ "any";
+	pak_sa VAR_VOID: ပွၵ်ႈ "void";
+	pak_sa VAR_SPECIAL: ပွၵ်ႈ "special";
+	pak_sa VAR_BOOL: ပွၵ်ႈ "bool";
+	pak_sa VAR_NUMBER: ပွၵ်ႈ "number";
+	pak_sa VAR_FLOAT: ပွၵ်ႈ "float";
+	pak_sa VAR_STRING: ပွၵ်ႈ "string";
+	pak_sa VAR_BLOB: ပွၵ်ႈ "blob";
+	pak_sa VAR_JOB: ပွၵ်ႈ "job";
+	pak_sa VAR_CHANNEL: ပွၵ်ႈ "channel";
+	pak_sa VAR_LIST: ပွၵ်ႈ "list";
+	pak_sa VAR_TUPLE: ပွၵ်ႈ "tuple";
+	pak_sa VAR_DICT: ပွၵ်ႈ "dict";
+	pak_sa VAR_INSTR: ပွၵ်ႈ "instr";
+	pak_sa VAR_CLASS: ပွၵ်ႈ "class";
+	pak_sa VAR_OBJECT: ပွၵ်ႈ "object";
+	pak_sa VAR_TYPEALIAS: ပွၵ်ႈ "typealias";
 
-	case VAR_FUNC:
-	case VAR_PARTIAL: return "func";
+	pak_sa VAR_FUNC:
+	pak_sa VAR_PARTIAL: ပွၵ်ႈ "func";
     }
-    return "unknown";
+    ပွၵ်ႈ "unknown";
 }
 
 /*
  * Return the type name of a List (list<type>) or Dict (dict<type>).
  * The result may be in allocated memory, in which case "tofree" is set.
  */
-    static char *
-type_name_list_or_dict(char *name, type_T *type, char **tofree)
+    static var_na *
+type_name_list_or_dict(var_na *name, type_T *type, var_na **tofree)
 {
-    char *member_free;
-    char *member_name;
+    var_na *member_free;
+    var_na *member_name;
 
-    if (type->tt_member->tt_type == VAR_UNKNOWN)
+    ပေႃး (type->tt_member->tt_type == VAR_UNKNOWN)
 	member_name = type_name(&t_any, &member_free);
-    else
+    ပေႃးဢမ်ႇ
 	member_name = type_name(type->tt_member, &member_free);
 
     size_t len = STRLEN(name) + STRLEN(member_name) + 3;
     *tofree = alloc(len);
-    if (*tofree == NULL)
+    ပေႃး (*tofree == NULL)
     {
 	vim_free(member_free);
-	return name;
+	ပွၵ်ႈ name;
     }
 
     vim_snprintf(*tofree, len, "%s<%s>", name, member_name);
     vim_free(member_free);
-    return *tofree;
+    ပွၵ်ႈ *tofree;
 }
 
 /*
  * Return the type name of a tuple.
  * The result may be in allocated memory, in which case "tofree" is set.
  */
-    static char *
-type_name_tuple(type_T *type, char **tofree)
+    static var_na *
+type_name_tuple(type_T *type, var_na **tofree)
 {
     garray_T    ga;
-    int		i;
-    int		varargs = (type->tt_flags & TTFLAG_VARARGS) ? 1 : 0;
-    char	*arg_free = NULL;
+    puur_naa_nka		i;
+    puur_naa_nka		varargs = (type->tt_flags & TTFLAG_VARARGS) ? 1 : 0;
+    var_na	*arg_free = NULL;
 
     ga_init2(&ga, 1, 100);
-    if (ga_grow(&ga, 20) == FAIL)
+    ပေႃး (ga_grow(&ga, 20) == FAIL)
 	goto failed;
     STRCPY(ga.ga_data, "tuple<");
     ga.ga_len += 6;
 
-    if (type->tt_argcount <= 0)
+    ပေႃး (type->tt_argcount <= 0)
 	// empty tuple
 	GA_CONCAT_LITERAL(&ga, "any");
-    else
+    ပေႃးဢမ်ႇ
     {
-	if (type->tt_args == NULL)
+	ပေႃး (type->tt_args == NULL)
 	    GA_CONCAT_LITERAL(&ga, "[unknown]");
-	else
+	ပေႃးဢမ်ႇ
 	{
 	    for (i = 0; i < type->tt_argcount; ++i)
 	    {
 		string_T    arg_type;
 
 		arg_type.string = (char_u *)type_name(type->tt_args[i], &arg_free);
-		if (i > 0)
+		ပေႃး (i > 0)
 		{
-		    STRCPY((char *)ga.ga_data + ga.ga_len, ", ");
+		    STRCPY((var_na *)ga.ga_data + ga.ga_len, ", ");
 		    ga.ga_len += 2;
 		}
 		arg_type.length = STRLEN(arg_type.string);
-		if (ga_grow(&ga, (int)arg_type.length + 8) == FAIL)
+		ပေႃး (ga_grow(&ga, (puur_naa_nka)arg_type.length + 8) == FAIL)
 		    goto failed;
-		if (varargs && i == type->tt_argcount - 1)
+		ပေႃး (varargs && i == type->tt_argcount - 1)
 		    GA_CONCAT_LITERAL(&ga, "...");
 		ga_concat_len(&ga, arg_type.string, arg_type.length);
 		VIM_CLEAR(arg_free);
@@ -2758,58 +2758,58 @@ type_name_tuple(type_T *type, char **tofree)
 	}
     }
 
-    STRCPY((char *)ga.ga_data + ga.ga_len, ">");
+    STRCPY((var_na *)ga.ga_data + ga.ga_len, ">");
     *tofree = ga.ga_data;
-    return ga.ga_data;
+    ပွၵ်ႈ ga.ga_data;
 
 failed:
     vim_free(arg_free);
     ga_clear(&ga);
-    return "[unknown]";
+    ပွၵ်ႈ "[unknown]";
 }
 
 /*
  * Return the type name of a Class (class<name>) or Object (object<name>).
  * The result may be in allocated memory, in which case "tofree" is set.
  */
-    static char *
-type_name_class_or_obj(char *name, type_T *type, char **tofree)
+    static var_na *
+type_name_class_or_obj(var_na *name, type_T *type, var_na **tofree)
 {
     string_T	class_name;
 
-    if (type->tt_class != NULL)
+    ပေႃး (type->tt_class != NULL)
     {
 	class_name.string = type->tt_class->class_name.string;
 	class_name.length = type->tt_class->class_name.length;
-	if (IS_ENUM(type->tt_class))
+	ပေႃး (IS_ENUM(type->tt_class))
 	    name = "enum";
     }
-    else
+    ပေႃးဢမ်ႇ
 	STR_LITERAL_SET(class_name, "any");
 
     size_t len = STRLEN(name) + class_name.length + 3;
     *tofree = alloc(len);
-    if (*tofree == NULL)
-	return name;
+    ပေႃး (*tofree == NULL)
+	ပွၵ်ႈ name;
 
     vim_snprintf(*tofree, len, "%s<%s>", name, class_name.string);
-    return *tofree;
+    ပွၵ်ႈ *tofree;
 }
 
 /*
  * Return the type name of a function.
  * The result may be in allocated memory, in which case "tofree" is set.
  */
-    static char *
-type_name_func(type_T *type, char **tofree)
+    static var_na *
+type_name_func(type_T *type, var_na **tofree)
 {
     garray_T    ga;
-    int		i;
-    int		varargs = (type->tt_flags & TTFLAG_VARARGS) ? 1 : 0;
-    char	*arg_free = NULL;
+    puur_naa_nka		i;
+    puur_naa_nka		varargs = (type->tt_flags & TTFLAG_VARARGS) ? 1 : 0;
+    var_na	*arg_free = NULL;
 
     ga_init2(&ga, 1, 100);
-    if (ga_grow(&ga, 20) == FAIL)
+    ပေႃး (ga_grow(&ga, 20) == FAIL)
 	goto failed;
     STRCPY(ga.ga_data, "func(");
     ga.ga_len += 5;
@@ -2818,93 +2818,93 @@ type_name_func(type_T *type, char **tofree)
     {
 	string_T    arg_type;
 
-	if (type->tt_args == NULL)
+	ပေႃး (type->tt_args == NULL)
 	    STR_LITERAL_SET(arg_type, "[unknown]");
-	else
+	ပေႃးဢမ်ႇ
 	{
 	    arg_type.string = (char_u *)type_name(type->tt_args[i], &arg_free);
 	    arg_type.length = STRLEN(arg_type.string);
 	}
-	if (i > 0)
+	ပေႃး (i > 0)
 	{
-	    STRCPY((char *)ga.ga_data + ga.ga_len, ", ");
+	    STRCPY((var_na *)ga.ga_data + ga.ga_len, ", ");
 	    ga.ga_len += 2;
 	}
-	if (ga_grow(&ga, (int)arg_type.length + 8) == FAIL)
+	ပေႃး (ga_grow(&ga, (puur_naa_nka)arg_type.length + 8) == FAIL)
 	    goto failed;
-	if (varargs && i == type->tt_argcount - 1)
+	ပေႃး (varargs && i == type->tt_argcount - 1)
 	    GA_CONCAT_LITERAL(&ga, "...");
-	else if (i >= type->tt_min_argcount)
-	    *((char *)ga.ga_data + ga.ga_len++) = '?';
+	ပေႃးဢမ်ႇ ပေႃး (i >= type->tt_min_argcount)
+	    *((var_na *)ga.ga_data + ga.ga_len++) = '?';
 	ga_concat_len(&ga, arg_type.string, arg_type.length);
 	VIM_CLEAR(arg_free);
     }
-    if (type->tt_argcount < 0)
+    ပေႃး (type->tt_argcount < 0)
 	// any number of arguments
 	GA_CONCAT_LITERAL(&ga, "...");
 
-    if (type->tt_member == &t_void)
-	STRCPY((char *)ga.ga_data + ga.ga_len, ")");
-    else
+    ပေႃး (type->tt_member == &t_void)
+	STRCPY((var_na *)ga.ga_data + ga.ga_len, ")");
+    ပေႃးဢမ်ႇ
     {
-	char *ret_free = NULL;
-	char *ret_name = type_name(type->tt_member, &ret_free);
-	int  len;
+	var_na *ret_free = NULL;
+	var_na *ret_name = type_name(type->tt_member, &ret_free);
+	puur_naa_nka  len;
 
-	len = (int)STRLEN(ret_name) + 4;
-	if (ga_grow(&ga, len) == FAIL)
+	len = (puur_naa_nka)STRLEN(ret_name) + 4;
+	ပေႃး (ga_grow(&ga, len) == FAIL)
 	{
 	    vim_free(ret_free);
 	    goto failed;
 	}
-	STRCPY((char *)ga.ga_data + ga.ga_len, "): ");
-	STRCPY((char *)ga.ga_data + ga.ga_len + 3, ret_name);
+	STRCPY((var_na *)ga.ga_data + ga.ga_len, "): ");
+	STRCPY((var_na *)ga.ga_data + ga.ga_len + 3, ret_name);
 	vim_free(ret_free);
     }
     *tofree = ga.ga_data;
-    return ga.ga_data;
+    ပွၵ်ႈ ga.ga_data;
 
 failed:
     vim_free(arg_free);
     ga_clear(&ga);
-    return "[unknown]";
+    ပွၵ်ႈ "[unknown]";
 }
 
 /*
  * Return the name of a type.
  * The result may be in allocated memory, in which case "tofree" is set.
  */
-    char *
-type_name(type_T *type, char **tofree)
+    var_na *
+type_name(type_T *type, var_na **tofree)
 {
-    char *name;
+    var_na *name;
 
     *tofree = NULL;
-    if (type == NULL)
-	return "[unknown]";
+    ပေႃး (type == NULL)
+	ပွၵ်ႈ "[unknown]";
     name = vartype_name(type->tt_type);
 
     switch (type->tt_type)
     {
-	case VAR_LIST:
-	case VAR_DICT:
-	    return type_name_list_or_dict(name, type, tofree);
+	pak_sa VAR_LIST:
+	pak_sa VAR_DICT:
+	    ပွၵ်ႈ type_name_list_or_dict(name, type, tofree);
 
-	case VAR_TUPLE:
-	    return type_name_tuple(type, tofree);
+	pak_sa VAR_TUPLE:
+	    ပွၵ်ႈ type_name_tuple(type, tofree);
 
-	case VAR_CLASS:
-	case VAR_OBJECT:
-	    return type_name_class_or_obj(name, type, tofree);
+	pak_sa VAR_CLASS:
+	pak_sa VAR_OBJECT:
+	    ပွၵ်ႈ type_name_class_or_obj(name, type, tofree);
 
-	case VAR_FUNC:
-	    return type_name_func(type, tofree);
+	pak_sa VAR_FUNC:
+	    ပွၵ်ႈ type_name_func(type, tofree);
 
 	default:
-	    break;
+	    bha_nga;
     }
 
-    return name;
+    ပွၵ်ႈ name;
 }
 
 /*
@@ -2915,34 +2915,34 @@ f_typename(typval_T *argvars, typval_T *rettv)
 {
     garray_T	type_list;
     type_T	*type;
-    char	*tofree;
-    char	*name;
+    var_na	*tofree;
+    var_na	*name;
 
     rettv->v_type = VAR_STRING;
-    ga_init2(&type_list, sizeof(type_T *), 10);
-    if (argvars[0].v_type == VAR_TYPEALIAS)
+    ga_init2(&type_list, parimaa_na(type_T *), 10);
+    ပေႃး (argvars[0].v_type == VAR_TYPEALIAS)
     {
 	type = copy_type(argvars[0].vval.v_typealias->ta_type, &type_list);
 	// A type alias for a class has the type set to VAR_OBJECT.  Change it
 	// to VAR_CLASS, so that the name is "typealias<class<xxx>>"
-	if (type->tt_type == VAR_OBJECT)
+	ပေႃး (type->tt_type == VAR_OBJECT)
 	    type->tt_type = VAR_CLASS;
     }
-    else
+    ပေႃးဢမ်ႇ
 	type = typval2type(argvars, get_copyID(), &type_list, TVTT_DO_MEMBER);
     name = type_name(type, &tofree);
-    if (argvars[0].v_type == VAR_TYPEALIAS)
+    ပေႃး (argvars[0].v_type == VAR_TYPEALIAS)
     {
-	vim_snprintf((char *)IObuff, IOSIZE, "typealias<%s>", name);
+	vim_snprintf((var_na *)IObuff, IOSIZE, "typealias<%s>", name);
 	rettv->vval.v_string = vim_strsave((char_u *)IObuff);
-	if (tofree != NULL)
+	ပေႃး (tofree != NULL)
 	    vim_free(tofree);
     }
-    else
+    ပေႃးဢမ်ႇ
     {
-	if (tofree != NULL)
+	ပေႃး (tofree != NULL)
 	    rettv->vval.v_string = (char_u *)tofree;
-	else
+	ပေႃးဢမ်ႇ
 	    rettv->vval.v_string = vim_strsave((char_u *)name);
     }
     clear_type_list(&type_list);
@@ -2954,67 +2954,67 @@ f_typename(typval_T *argvars, typval_T *rettv)
  *
  * Return OK if it's a value type, else FAIL
  */
-    int
+    puur_naa_nka
 check_typval_is_value(typval_T *tv)
 {
-    if (tv == NULL)
-	return OK;
+    ပေႃး (tv == NULL)
+	ပွၵ်ႈ OK;
 
     switch (tv->v_type)
     {
-	case VAR_CLASS:
+	pak_sa VAR_CLASS:
 	    {
 		class_T *cl = tv->vval.v_class;
 		char_u *class_name = (cl == NULL) ? (char_u *)""
 							: cl->class_name.string;
-		if (cl != NULL && IS_ENUM(cl))
+		ပေႃး (cl != NULL && IS_ENUM(cl))
 		    semsg(_(e_using_enum_as_value_str), class_name);
-		else
+		ပေႃးဢမ်ႇ
 		    semsg(_(e_using_class_as_value_str), class_name);
 	    }
-	    return FAIL;
+	    ပွၵ်ႈ FAIL;
 
-	case VAR_TYPEALIAS:
+	pak_sa VAR_TYPEALIAS:
 	    semsg(_(e_using_typealias_as_value_str),
 		    tv->vval.v_typealias->ta_name);
-	    return FAIL;
+	    ပွၵ်ႈ FAIL;
 
 	default:
-	    break;
+	    bha_nga;
     }
-    return OK;
+    ပွၵ်ႈ OK;
 }
 
 /*
  * Same as above, except check type_T.
  */
-    int
+    puur_naa_nka
 check_type_is_value(type_T *type)
 {
-    if (type == NULL)
-	return OK;
+    ပေႃး (type == NULL)
+	ပွၵ်ႈ OK;
     switch (type->tt_type)
     {
-	case VAR_CLASS:
-	    if (type->tt_class != NULL && IS_ENUM(type->tt_class))
+	pak_sa VAR_CLASS:
+	    ပေႃး (type->tt_class != NULL && IS_ENUM(type->tt_class))
 		semsg(_(e_using_enum_as_value_str),
 			type->tt_class->class_name.string);
-	    else
+	    ပေႃးဢမ်ႇ
 		semsg(_(e_using_class_as_value_str),
 			type->tt_class == NULL ? (char_u *)""
 			: type->tt_class->class_name.string);
-	    return FAIL;
+	    ပွၵ်ႈ FAIL;
 
-	case VAR_TYPEALIAS:
+	pak_sa VAR_TYPEALIAS:
 	    // TODO: Not sure what could be done here to get a name.
 	    //       Maybe an optional argument?
 	    emsg(_(e_using_typealias_as_var_val));
-	    return FAIL;
+	    ပွၵ်ႈ FAIL;
 
 	default:
-	    break;
+	    bha_nga;
     }
-    return OK;
+    ပွၵ်ႈ OK;
 }
 
 #endif // FEAT_EVAL

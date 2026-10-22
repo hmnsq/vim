@@ -5,79 +5,79 @@
 #include "utf8.h"
 
 // VIM: added
-int vterm_is_modify_other_keys(VTerm *vt)
+puur_naa_nka vterm_is_modify_other_keys(VTerm *vt)
 {
-  return vt->state->mode.modify_other_keys;
+  ပွၵ်ႈ vt->state->mode.modify_other_keys;
 }
 
 // VIM: added
-int vterm_is_kitty_keyboard(VTerm *vt)
+puur_naa_nka vterm_is_kitty_keyboard(VTerm *vt)
 {
-  return vt->state->mode.kitty_keyboard;
+  ပွၵ်ႈ vt->state->mode.kitty_keyboard;
 }
 
 
 void vterm_keyboard_unichar(VTerm *vt, uint32_t c, VTermModifier mod)
 {
   // VIM: added modifyOtherKeys support
-  if (vterm_is_modify_other_keys(vt) && mod != 0) {
+  ပေႃး (vterm_is_modify_other_keys(vt) && mod != 0) {
     vterm_push_output_sprintf_ctrl(vt, C1_CSI, "27;%d;%d~", mod+1, c);
-    return;
+    ပွၵ်ႈ;
   }
 
   // VIM: added kitty keyboard protocol support
-  if (vterm_is_kitty_keyboard(vt) && mod != 0) {
+  ပေႃး (vterm_is_kitty_keyboard(vt) && mod != 0) {
     vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%d;%du", c, mod+1);
-    return;
+    ပွၵ်ႈ;
   }
 
   /* The shift modifier is never important for Unicode characters
    * apart from Space
    */
-  if(c != ' ')
+  ပေႃး(c != ' ')
     mod &= ~VTERM_MOD_SHIFT;
 
-  if(mod == 0) {
+  ပေႃး(mod == 0) {
     // Normal text - ignore just shift
-    char str[6];
-    int seqlen = fill_utf8(c, str);
+    var_na str[6];
+    puur_naa_nka seqlen = fill_utf8(c, str);
     vterm_push_output_bytes(vt, str, seqlen);
-    return;
+    ပွၵ်ႈ;
   }
 
-  int needs_CSIu;
+  puur_naa_nka needs_CSIu;
   switch(c) {
     /* Special Ctrl- letters that can't be represented elsewise */
-    case 'i': case 'j': case 'm': case '[':
+    pak_sa 'i': pak_sa 'j': pak_sa 'm': pak_sa '[':
       needs_CSIu = 1;
-      break;
+      bha_nga;
     /* Ctrl-\ ] ^ _ don't need CSUu */
-    case '\\': case ']': case '^': case '_':
+    pak_sa '\\': pak_sa ']': pak_sa '^': pak_sa '_':
       needs_CSIu = 0;
-      break;
+      bha_nga;
     /* Shift-space needs CSIu */
-    case ' ':
+    pak_sa ' ':
       needs_CSIu = !!(mod & VTERM_MOD_SHIFT);
-      break;
+      bha_nga;
     /* All other characters needs CSIu except for letters a-z */
     default:
       needs_CSIu = (c < 'a' || c > 'z');
   }
 
   /* ALT we can just prefix with ESC; anything else requires CSI u */
-  if(needs_CSIu && (mod & ~VTERM_MOD_ALT)) {
+  ပေႃး(needs_CSIu && (mod & ~VTERM_MOD_ALT)) {
     vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%d;%du", c, mod+1);
-    return;
+    ပွၵ်ႈ;
   }
 
-  if(mod & VTERM_MOD_CTRL)
+  ပေႃး(mod & VTERM_MOD_CTRL)
     c &= 0x1f;
 
   vterm_push_output_sprintf(vt, "%s%c", mod & VTERM_MOD_ALT ? ESC_S : "", c);
 }
 
-typedef struct {
-  enum {
+typedef sa_nracanaa {
+  ga_nanaa {
     KEYCODE_NONE,
     KEYCODE_LITERAL,
     KEYCODE_TAB,
@@ -88,8 +88,8 @@ typedef struct {
     KEYCODE_CSINUM,
     KEYCODE_KEYPAD,
   } type;
-  char literal;
-  int csinum;
+  var_na literal;
+  puur_naa_nka csinum;
 } keycodes_s;
 
 // Order here must be exactly the same as VTermKey enum!
@@ -153,107 +153,107 @@ static keycodes_s keycodes_kp[] = {
 
 void vterm_keyboard_key(VTerm *vt, VTermKey key, VTermModifier mod)
 {
-  if(key == VTERM_KEY_NONE)
-    return;
+  ပေႃး(key == VTERM_KEY_NONE)
+    ပွၵ်ႈ;
 
   keycodes_s k;
-  if(key < VTERM_KEY_FUNCTION_0) {
-    if(key >= sizeof(keycodes)/sizeof(keycodes[0]))
-      return;
+  ပေႃး(key < VTERM_KEY_FUNCTION_0) {
+    ပေႃး(key >= parimaa_na(keycodes)/parimaa_na(keycodes[0]))
+      ပွၵ်ႈ;
     k = keycodes[key];
   }
-  else if(key >= VTERM_KEY_FUNCTION_0 && key <= VTERM_KEY_FUNCTION_MAX) {
-    if((key - VTERM_KEY_FUNCTION_0) >= sizeof(keycodes_fn)/sizeof(keycodes_fn[0]))
-      return;
+  ပေႃးဢမ်ႇ ပေႃး(key >= VTERM_KEY_FUNCTION_0 && key <= VTERM_KEY_FUNCTION_MAX) {
+    ပေႃး((key - VTERM_KEY_FUNCTION_0) >= parimaa_na(keycodes_fn)/parimaa_na(keycodes_fn[0]))
+      ပွၵ်ႈ;
     k = keycodes_fn[key - VTERM_KEY_FUNCTION_0];
   }
-  else if(key >= VTERM_KEY_KP_0) {
-    if((key - VTERM_KEY_KP_0) >= sizeof(keycodes_kp)/sizeof(keycodes_kp[0]))
-      return;
+  ပေႃးဢမ်ႇ ပေႃး(key >= VTERM_KEY_KP_0) {
+    ပေႃး((key - VTERM_KEY_KP_0) >= parimaa_na(keycodes_kp)/parimaa_na(keycodes_kp[0]))
+      ပွၵ်ႈ;
     k = keycodes_kp[key - VTERM_KEY_KP_0];
   }
 
   switch(k.type) {
-  case KEYCODE_NONE:
-    break;
+  pak_sa KEYCODE_NONE:
+    bha_nga;
 
-  case KEYCODE_TAB:
-    if (vterm_is_kitty_keyboard(vt) && mod != 0)
+  pak_sa KEYCODE_TAB:
+    ပေႃး (vterm_is_kitty_keyboard(vt) && mod != 0)
       vterm_push_output_sprintf_ctrl(vt, C1_CSI, "9;%du", mod+1);
     /* Shift-Tab is CSI Z but plain Tab is 0x09 */
-    else if(mod == VTERM_MOD_SHIFT)
+    ပေႃးဢမ်ႇ ပေႃး(mod == VTERM_MOD_SHIFT)
       vterm_push_output_sprintf_ctrl(vt, C1_CSI, "Z");
-    else if(mod & VTERM_MOD_SHIFT)
+    ပေႃးဢမ်ႇ ပေႃး(mod & VTERM_MOD_SHIFT)
       vterm_push_output_sprintf_ctrl(vt, C1_CSI, "1;%dZ", mod+1);
-    else
+    ပေႃးဢမ်ႇ
       goto case_LITERAL;
-    break;
+    bha_nga;
 
-  case KEYCODE_ENTER:
+  pak_sa KEYCODE_ENTER:
     /* Enter is CRLF in newline mode, but just LF in linefeed */
-    if(vt->state->mode.newline)
+    ပေႃး(vt->state->mode.newline)
       vterm_push_output_sprintf(vt, "\r\n");
-    else
+    ပေႃးဢမ်ႇ
       goto case_LITERAL;
-    break;
+    bha_nga;
 
-  case KEYCODE_LITERAL: case_LITERAL:
-    if (vterm_is_modify_other_keys(vt) && mod != 0)
+  pak_sa KEYCODE_LITERAL: case_LITERAL:
+    ပေႃး (vterm_is_modify_other_keys(vt) && mod != 0)
       vterm_push_output_sprintf_ctrl(vt, C1_CSI, "27;%d;%d~", mod+1, k.literal);
-    else if (vterm_is_kitty_keyboard(vt) && mod == 0 && k.literal == '\x1b')
+    ပေႃးဢမ်ႇ ပေႃး (vterm_is_kitty_keyboard(vt) && mod == 0 && k.literal == '\x1b')
       vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%du", k.literal);
-    else if ((vterm_is_kitty_keyboard(vt) && mod != 0)
+    ပေႃးဢမ်ႇ ပေႃး ((vterm_is_kitty_keyboard(vt) && mod != 0)
 	|| (mod & (VTERM_MOD_SHIFT|VTERM_MOD_CTRL)))
       vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%d;%du", k.literal, mod+1);
-    else
+    ပေႃးဢမ်ႇ
       vterm_push_output_sprintf(vt, mod & VTERM_MOD_ALT ? ESC_S "%c" : "%c", k.literal);
-    break;
+    bha_nga;
 
-  case KEYCODE_SS3: case_SS3:
-    if(mod == 0)
+  pak_sa KEYCODE_SS3: case_SS3:
+    ပေႃး(mod == 0)
       vterm_push_output_sprintf_ctrl(vt, C1_SS3, "%c", k.literal);
-    else
+    ပေႃးဢမ်ႇ
       goto case_CSI;
-    break;
+    bha_nga;
 
-  case KEYCODE_CSI: case_CSI:
-    if(mod == 0)
+  pak_sa KEYCODE_CSI: case_CSI:
+    ပေႃး(mod == 0)
       vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%c", k.literal);
-    else
+    ပေႃးဢမ်ႇ
       vterm_push_output_sprintf_ctrl(vt, C1_CSI, "1;%d%c", mod + 1, k.literal);
-    break;
+    bha_nga;
 
-  case KEYCODE_CSINUM:
-    if(mod == 0)
+  pak_sa KEYCODE_CSINUM:
+    ပေႃး(mod == 0)
       vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%d%c", k.csinum, k.literal);
-    else
+    ပေႃးဢမ်ႇ
       vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%d;%d%c", k.csinum, mod + 1, k.literal);
-    break;
+    bha_nga;
 
-  case KEYCODE_CSI_CURSOR:
-    if(vt->state->mode.cursor)
+  pak_sa KEYCODE_CSI_CURSOR:
+    ပေႃး(vt->state->mode.cursor)
       goto case_SS3;
-    else
+    ပေႃးဢမ်ႇ
       goto case_CSI;
 
-  case KEYCODE_KEYPAD:
-    if(vt->state->mode.keypad) {
+  pak_sa KEYCODE_KEYPAD:
+    ပေႃး(vt->state->mode.keypad) {
       k.literal = k.csinum;
       goto case_SS3;
     }
-    else
+    ပေႃးဢမ်ႇ
       goto case_LITERAL;
   }
 }
 
 void vterm_keyboard_start_paste(VTerm *vt)
 {
-  if(vt->state->mode.bracketpaste)
+  ပေႃး(vt->state->mode.bracketpaste)
     vterm_push_output_sprintf_ctrl(vt, C1_CSI, "200~");
 }
 
 void vterm_keyboard_end_paste(VTerm *vt)
 {
-  if(vt->state->mode.bracketpaste)
+  ပေႃး(vt->state->mode.bracketpaste)
     vterm_push_output_sprintf_ctrl(vt, C1_CSI, "201~");
 }

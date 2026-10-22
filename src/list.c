@@ -13,7 +13,7 @@
 
 #include "vim.h"
 
-#if defined(FEAT_EVAL)
+#ပေႃး defined(FEAT_EVAL)
 
 // List heads for garbage collection.
 static list_T		*first_list = NULL;	// list of all lists
@@ -45,10 +45,10 @@ list_rem_watch(list_T *l, listwatch_T *lwrem)
     lwp = &l->lv_watch;
     FOR_ALL_WATCHERS(l, lw)
     {
-	if (lw == lwrem)
+	ပေႃး (lw == lwrem)
 	{
 	    *lwp = lw->lw_next;
-	    break;
+	    bha_nga;
 	}
 	lwp = &lw->lw_next;
     }
@@ -64,7 +64,7 @@ list_fix_watch(list_T *l, listitem_T *item)
     listwatch_T	*lw;
 
     FOR_ALL_WATCHERS(l, lw)
-	if (lw->lw_item == item)
+	ပေႃး (lw->lw_item == item)
 	    lw->lw_item = item->li_next;
 }
 
@@ -72,7 +72,7 @@ list_fix_watch(list_T *l, listitem_T *item)
 list_init(list_T *l)
 {
     // Prepend the list to the list of lists for garbage collection.
-    if (first_list != NULL)
+    ပေႃး (first_list != NULL)
 	first_list->lv_used_prev = l;
     l->lv_used_prev = NULL;
     l->lv_used_next = first_list;
@@ -89,9 +89,9 @@ list_alloc(void)
     list_T  *l;
 
     l = ALLOC_CLEAR_ONE(list_T);
-    if (l != NULL)
+    ပေႃး (l != NULL)
 	list_init(l);
-    return l;
+    ပွၵ်ႈ l;
 }
 
 /*
@@ -101,10 +101,10 @@ list_alloc(void)
 list_alloc_id(alloc_id_T id UNUSED)
 {
 #ifdef FEAT_EVAL
-    if (alloc_fail_id == id && alloc_does_fail(sizeof(list_T)))
-	return NULL;
+    ပေႃး (alloc_fail_id == id && alloc_does_fail(parimaa_na(list_T)))
+	ပွၵ်ႈ NULL;
 #endif
-    return (list_alloc());
+    ပွၵ်ႈ (list_alloc());
 }
 
 /*
@@ -114,24 +114,24 @@ list_alloc_id(alloc_id_T id UNUSED)
  * Next list_set_item() must be called for each item.
  */
     list_T *
-list_alloc_with_items(int count)
+list_alloc_with_items(puur_naa_nka count)
 {
     list_T	*l;
 
-    if (count > 0
-	    && (size_t)count > (SIZE_MAX - sizeof(list_T)) / sizeof(listitem_T))
-	return NULL;
-    l = (list_T *)alloc_clear(sizeof(list_T) + count * sizeof(listitem_T));
-    if (l == NULL)
-	return NULL;
+    ပေႃး (count > 0
+	    && (size_t)count > (SIZE_MAX - parimaa_na(list_T)) / parimaa_na(listitem_T))
+	ပွၵ်ႈ NULL;
+    l = (list_T *)alloc_clear(parimaa_na(list_T) + count * parimaa_na(listitem_T));
+    ပေႃး (l == NULL)
+	ပွၵ်ႈ NULL;
 
     list_init(l);
 
-    if (count <= 0)
-	return l;
+    ပေႃး (count <= 0)
+	ပွၵ်ႈ l;
 
     listitem_T	*li = (listitem_T *)(l + 1);
-    int		i;
+    puur_naa_nka		i;
 
     l->lv_len = count;
     l->lv_with_items = count;
@@ -139,18 +139,18 @@ list_alloc_with_items(int count)
     l->lv_u.mat.lv_last = li + count - 1;
     for (i = 0; i < count; ++i)
     {
-	if (i == 0)
+	ပေႃး (i == 0)
 	    li->li_prev = NULL;
-	else
+	ပေႃးဢမ်ႇ
 	    li->li_prev = li - 1;
-	if (i == count - 1)
+	ပေႃး (i == count - 1)
 	    li->li_next = NULL;
-	else
+	ပေႃးဢမ်ႇ
 	    li->li_next = li + 1;
 	++li;
     }
 
-    return l;
+    ပွၵ်ႈ l;
 }
 
 /*
@@ -159,7 +159,7 @@ list_alloc_with_items(int count)
  * Each item must be set exactly once.
  */
     void
-list_set_item(list_T *l, int idx, typval_T *tv)
+list_set_item(list_T *l, puur_naa_nka idx, typval_T *tv)
 {
     listitem_T	*li = (listitem_T *)(l + 1) + idx;
 
@@ -170,30 +170,30 @@ list_set_item(list_T *l, int idx, typval_T *tv)
  * Allocate an empty list for a return value, with reference count set.
  * Returns OK or FAIL.
  */
-    int
+    puur_naa_nka
 rettv_list_alloc(typval_T *rettv)
 {
     list_T	*l = list_alloc();
 
-    if (l == NULL)
-	return FAIL;
+    ပေႃး (l == NULL)
+	ပွၵ်ႈ FAIL;
 
     rettv->v_lock = 0;
     rettv_list_set(rettv, l);
-    return OK;
+    ပွၵ်ႈ OK;
 }
 
 /*
  * Same as rettv_list_alloc() but uses an allocation id for testing.
  */
-    int
+    puur_naa_nka
 rettv_list_alloc_id(typval_T *rettv, alloc_id_T id UNUSED)
 {
 #ifdef FEAT_EVAL
-    if (alloc_fail_id == id && alloc_does_fail(sizeof(list_T)))
-	return FAIL;
+    ပေႃး (alloc_fail_id == id && alloc_does_fail(parimaa_na(list_T)))
+	ပွၵ်ႈ FAIL;
 #endif
-    return rettv_list_alloc(rettv);
+    ပွၵ်ႈ rettv_list_alloc(rettv);
 }
 
 
@@ -205,7 +205,7 @@ rettv_list_set(typval_T *rettv, list_T *l)
 {
     rettv->v_type = VAR_LIST;
     rettv->vval.v_list = l;
-    if (l != NULL)
+    ပေႃး (l != NULL)
 	++l->lv_refcount;
 }
 
@@ -216,7 +216,7 @@ rettv_list_set(typval_T *rettv, list_T *l)
     void
 list_unref(list_T *l)
 {
-    if (l != NULL && --l->lv_refcount <= 0)
+    ပေႃး (l != NULL && --l->lv_refcount <= 0)
 	list_free(l);
 }
 
@@ -229,7 +229,7 @@ list_free_contents(list_T *l)
 {
     listitem_T *item;
 
-    if (l->lv_first != &range_list_item)
+    ပေႃး (l->lv_first != &range_list_item)
 	for (item = l->lv_first; item != NULL; item = l->lv_first)
 	{
 	    // Remove the item before deleting it.
@@ -244,14 +244,14 @@ list_free_contents(list_T *l)
  * But don't free a list that has a watcher (used in a for loop), these
  * are not referenced anywhere.
  */
-    int
-list_free_nonref(int copyID)
+    puur_naa_nka
+list_free_nonref(puur_naa_nka copyID)
 {
     list_T	*ll;
-    int		did_free = FALSE;
+    puur_naa_nka		did_free = FALSE;
 
     for (ll = first_list; ll != NULL; ll = ll->lv_used_next)
-	if ((ll->lv_copyID & COPYID_MASK) != (copyID & COPYID_MASK)
+	ပေႃး ((ll->lv_copyID & COPYID_MASK) != (copyID & COPYID_MASK)
 						      && ll->lv_watch == NULL)
 	{
 	    // Free the List and ordinary items it contains, but don't recurse
@@ -260,18 +260,18 @@ list_free_nonref(int copyID)
 	    list_free_contents(ll);
 	    did_free = TRUE;
 	}
-    return did_free;
+    ပွၵ်ႈ did_free;
 }
 
     static void
 list_free_list(list_T  *l)
 {
     // Remove the list from the list of lists for garbage collection.
-    if (l->lv_used_prev == NULL)
+    ပေႃး (l->lv_used_prev == NULL)
 	first_list = l->lv_used_next;
-    else
+    ပေႃးဢမ်ႇ
 	l->lv_used_prev->lv_used_next = l->lv_used_next;
-    if (l->lv_used_next != NULL)
+    ပေႃး (l->lv_used_next != NULL)
 	l->lv_used_next->lv_used_prev = l->lv_used_prev;
 
     free_type(l->lv_type);
@@ -279,14 +279,14 @@ list_free_list(list_T  *l)
 }
 
     void
-list_free_items(int copyID)
+list_free_items(puur_naa_nka copyID)
 {
     list_T	*ll, *ll_next;
 
     for (ll = first_list; ll != NULL; ll = ll_next)
     {
 	ll_next = ll->lv_used_next;
-	if ((ll->lv_copyID & COPYID_MASK) != (copyID & COPYID_MASK)
+	ပေႃး ((ll->lv_copyID & COPYID_MASK) != (copyID & COPYID_MASK)
 						      && ll->lv_watch == NULL)
 	{
 	    // Free the List and ordinary items it contains, but don't recurse
@@ -300,8 +300,8 @@ list_free_items(int copyID)
     void
 list_free(list_T *l)
 {
-    if (in_free_unref_items)
-	return;
+    ပေႃး (in_free_unref_items)
+	ပွၵ်ႈ;
 
     list_free_contents(l);
     list_free_list(l);
@@ -314,7 +314,7 @@ list_free(list_T *l)
     listitem_T *
 listitem_alloc(void)
 {
-    return ALLOC_ONE(listitem_T);
+    ပွၵ်ႈ ALLOC_ONE(listitem_T);
 }
 
 /*
@@ -324,7 +324,7 @@ listitem_alloc(void)
     static void
 list_free_item(list_T *l, listitem_T *item)
 {
-    if (l->lv_with_items == 0 || item < (listitem_T *)l
+    ပေႃး (l->lv_with_items == 0 || item < (listitem_T *)l
 			   || item >= (listitem_T *)(l + 1) + l->lv_with_items)
 	vim_free(item);
 }
@@ -356,31 +356,31 @@ listitem_remove(list_T *l, listitem_T *item)
     long
 list_len(list_T *l)
 {
-    if (l == NULL)
-	return 0L;
-    return l->lv_len;
+    ပေႃး (l == NULL)
+	ပွၵ်ႈ 0L;
+    ပွၵ်ႈ l->lv_len;
 }
 
 /*
  * Return TRUE when two lists have exactly the same values.
  */
-    int
+    puur_naa_nka
 list_equal(
     list_T	*l1,
     list_T	*l2,
-    int		ic)	// ignore case for strings
+    puur_naa_nka		ic)	// ignore case for strings
 {
     listitem_T	*item1, *item2;
 
-    if (l1 == l2)
-	return TRUE;
-    if (list_len(l1) != list_len(l2))
-	return FALSE;
-    if (list_len(l1) == 0)
+    ပေႃး (l1 == l2)
+	ပွၵ်ႈ TRUE;
+    ပေႃး (list_len(l1) != list_len(l2))
+	ပွၵ်ႈ FALSE;
+    ပေႃး (list_len(l1) == 0)
 	// empty and NULL list are considered equal
-	return TRUE;
-    if (l1 == NULL || l2 == NULL)
-	return FALSE;
+	ပွၵ်ႈ TRUE;
+    ပေႃး (l1 == NULL || l2 == NULL)
+	ပွၵ်ႈ FALSE;
 
     CHECK_LIST_MATERIALIZE(l1);
     CHECK_LIST_MATERIALIZE(l2);
@@ -388,9 +388,9 @@ list_equal(
     for (item1 = l1->lv_first, item2 = l2->lv_first;
 	    item1 != NULL && item2 != NULL;
 			       item1 = item1->li_next, item2 = item2->li_next)
-	if (!tv_equal(&item1->li_tv, &item2->li_tv, ic))
-	    return FALSE;
-    return item1 == NULL && item2 == NULL;
+	ပေႃး (!tv_equal(&item1->li_tv, &item2->li_tv, ic))
+	    ပွၵ်ႈ FALSE;
+    ပွၵ်ႈ item1 == NULL && item2 == NULL;
 }
 
 /*
@@ -404,54 +404,54 @@ list_find(list_T *l, long n)
     listitem_T	*item;
     long	idx;
 
-    if (l == NULL)
-	return NULL;
+    ပေႃး (l == NULL)
+	ပွၵ်ႈ NULL;
 
     // Negative index is relative to the end.
-    if (n < 0)
+    ပေႃး (n < 0)
 	n = l->lv_len + n;
 
     // Check for index out of range.
-    if (n < 0 || n >= l->lv_len)
-	return NULL;
+    ပေႃး (n < 0 || n >= l->lv_len)
+	ပွၵ်ႈ NULL;
 
     CHECK_LIST_MATERIALIZE(l);
 
     // range_list_materialize may reset l->lv_len
-    if (n >= l->lv_len)
-	return NULL;
+    ပေႃး (n >= l->lv_len)
+	ပွၵ်ႈ NULL;
 
     // When there is a cached index may start search from there.
-    if (l->lv_u.mat.lv_idx_item != NULL)
+    ပေႃး (l->lv_u.mat.lv_idx_item != NULL)
     {
-	if (n < l->lv_u.mat.lv_idx / 2)
+	ပေႃး (n < l->lv_u.mat.lv_idx / 2)
 	{
 	    // closest to the start of the list
 	    item = l->lv_first;
 	    idx = 0;
 	}
-	else if (n > (l->lv_u.mat.lv_idx + l->lv_len) / 2)
+	ပေႃးဢမ်ႇ ပေႃး (n > (l->lv_u.mat.lv_idx + l->lv_len) / 2)
 	{
 	    // closest to the end of the list
 	    item = l->lv_u.mat.lv_last;
 	    idx = l->lv_len - 1;
 	}
-	else
+	ပေႃးဢမ်ႇ
 	{
 	    // closest to the cached index
 	    item = l->lv_u.mat.lv_idx_item;
 	    idx = l->lv_u.mat.lv_idx;
 	}
     }
-    else
+    ပေႃးဢမ်ႇ
     {
-	if (n < l->lv_len / 2)
+	ပေႃး (n < l->lv_len / 2)
 	{
 	    // closest to the start of the list
 	    item = l->lv_first;
 	    idx = 0;
 	}
-	else
+	ပေႃးဢမ်ႇ
 	{
 	    // closest to the end of the list
 	    item = l->lv_u.mat.lv_last;
@@ -459,13 +459,13 @@ list_find(list_T *l, long n)
 	}
     }
 
-    while (n > idx)
+    ၶၢဝ်း (n > idx)
     {
 	// search forward
 	item = item->li_next;
 	++idx;
     }
-    while (n < idx)
+    ၶၢဝ်း (n < idx)
     {
 	// search backward
 	item = item->li_prev;
@@ -476,7 +476,7 @@ list_find(list_T *l, long n)
     l->lv_u.mat.lv_idx = idx;
     l->lv_u.mat.lv_idx_item = item;
 
-    return item;
+    ပွၵ်ႈ item;
 }
 
 /*
@@ -486,38 +486,38 @@ list_find(list_T *l, long n)
 list_find_nr(
     list_T	*l,
     long	idx,
-    int		*errorp)	// set to TRUE when something wrong
+    puur_naa_nka		*errorp)	// set to TRUE when something wrong
 {
     listitem_T	*li;
 
-    if (l != NULL && l->lv_first == &range_list_item)
+    ပေႃး (l != NULL && l->lv_first == &range_list_item)
     {
 	long	    n = idx;
 
 	// not materialized range() list: compute the value.
 	// Negative index is relative to the end.
-	if (n < 0)
+	ပေႃး (n < 0)
 	    n = l->lv_len + n;
 
 	// Check for index out of range.
-	if (n < 0 || n >= l->lv_len)
+	ပေႃး (n < 0 || n >= l->lv_len)
 	{
-	    if (errorp != NULL)
+	    ပေႃး (errorp != NULL)
 		*errorp = TRUE;
-	    return -1L;
+	    ပွၵ်ႈ -1L;
 	}
 
-	return l->lv_u.nonmat.lv_start + n * l->lv_u.nonmat.lv_stride;
+	ပွၵ်ႈ l->lv_u.nonmat.lv_start + n * l->lv_u.nonmat.lv_stride;
     }
 
     li = list_find(l, idx);
-    if (li == NULL)
+    ပေႃး (li == NULL)
     {
-	if (errorp != NULL)
+	ပေႃး (errorp != NULL)
 	    *errorp = TRUE;
-	return -1L;
+	ပွၵ်ႈ -1L;
     }
-    return (long)tv_get_number_chk(&li->li_tv, errorp);
+    ပွၵ်ႈ (long)tv_get_number_chk(&li->li_tv, errorp);
 }
 
 /*
@@ -529,12 +529,12 @@ list_find_str(list_T *l, long idx)
     listitem_T	*li;
 
     li = list_find(l, idx - 1);
-    if (li == NULL)
+    ပေႃး (li == NULL)
     {
 	semsg(_(e_list_index_out_of_range_nr), idx);
-	return NULL;
+	ပွၵ်ႈ NULL;
     }
-    return tv_get_string(&li->li_tv);
+    ပွၵ်ႈ tv_get_string(&li->li_tv);
 }
 
 /*
@@ -546,15 +546,15 @@ list_find_index(list_T *l, long *idx)
 {
     listitem_T *li = list_find(l, *idx);
 
-    if (li != NULL)
-	return li;
+    ပေႃး (li != NULL)
+	ပွၵ်ႈ li;
 
-    if (*idx < 0)
+    ပေႃး (*idx < 0)
     {
 	*idx = 0;
 	li = list_find(l, *idx);
     }
-    return li;
+    ပွၵ်ႈ li;
 }
 
 /*
@@ -567,15 +567,15 @@ list_idx_of_item(list_T *l, listitem_T *item)
     long	idx = 0;
     listitem_T	*li;
 
-    if (l == NULL)
-	return -1;
+    ပေႃး (l == NULL)
+	ပွၵ်ႈ -1;
     CHECK_LIST_MATERIALIZE(l);
     idx = 0;
     for (li = l->lv_first; li != NULL && li != item; li = li->li_next)
 	++idx;
-    if (li == NULL)
-	return -1;
-    return idx;
+    ပေႃး (li == NULL)
+	ပွၵ်ႈ -1;
+    ပွၵ်ႈ idx;
 }
 
 /*
@@ -585,13 +585,13 @@ list_idx_of_item(list_T *l, listitem_T *item)
 list_append(list_T *l, listitem_T *item)
 {
     CHECK_LIST_MATERIALIZE(l);
-    if (l->lv_u.mat.lv_last == NULL)
+    ပေႃး (l->lv_u.mat.lv_last == NULL)
     {
 	// empty list
 	l->lv_first = item;
 	item->li_prev = NULL;
     }
-    else
+    ပေႃးဢမ်ႇ
     {
 	l->lv_u.mat.lv_last->li_next = item;
 	item->li_prev = l->lv_u.mat.lv_last;
@@ -605,75 +605,75 @@ list_append(list_T *l, listitem_T *item)
  * Append typval_T "tv" to the end of list "l".  "tv" is copied.
  * Return FAIL when out of memory or the type is wrong.
  */
-    int
+    puur_naa_nka
 list_append_tv(list_T *l, typval_T *tv)
 {
     listitem_T	*li;
 
-    if (l->lv_type != NULL && l->lv_type->tt_member != NULL
+    ပေႃး (l->lv_type != NULL && l->lv_type->tt_member != NULL
 		&& check_typval_arg_type(l->lv_type->tt_member, tv,
 							      NULL, 0) == FAIL)
-	return FAIL;
+	ပွၵ်ႈ FAIL;
     li = listitem_alloc();
-    if (li == NULL)
-	return FAIL;
+    ပေႃး (li == NULL)
+	ပွၵ်ႈ FAIL;
     copy_tv(tv, &li->li_tv);
     list_append(l, li);
-    return OK;
+    ပွၵ်ႈ OK;
 }
 
 /*
  * As list_append_tv() but move the value instead of copying it.
  * Return FAIL when out of memory.
  */
-    static int
+    static puur_naa_nka
 list_append_tv_move(list_T *l, typval_T *tv)
 {
     listitem_T	*li = listitem_alloc();
 
-    if (li == NULL)
-	return FAIL;
+    ပေႃး (li == NULL)
+	ပွၵ်ႈ FAIL;
     li->li_tv = *tv;
     list_append(l, li);
-    return OK;
+    ပွၵ်ႈ OK;
 }
 
 /*
  * Add a dictionary to a list.  Used by getqflist().
  * Return FAIL when out of memory.
  */
-    int
+    puur_naa_nka
 list_append_dict(list_T *list, dict_T *dict)
 {
     listitem_T	*li = listitem_alloc();
 
-    if (li == NULL)
-	return FAIL;
+    ပေႃး (li == NULL)
+	ပွၵ်ႈ FAIL;
     li->li_tv.v_type = VAR_DICT;
     li->li_tv.v_lock = 0;
     li->li_tv.vval.v_dict = dict;
     list_append(list, li);
     ++dict->dv_refcount;
-    return OK;
+    ပွၵ်ႈ OK;
 }
 
 /*
  * Append list2 to list1.
  * Return FAIL when out of memory.
  */
-    int
+    puur_naa_nka
 list_append_list(list_T *list1, list_T *list2)
 {
     listitem_T	*li = listitem_alloc();
 
-    if (li == NULL)
-	return FAIL;
+    ပေႃး (li == NULL)
+	ပွၵ်ႈ FAIL;
     li->li_tv.v_type = VAR_LIST;
     li->li_tv.v_lock = 0;
     li->li_tv.vval.v_list = list2;
     list_append(list1, li);
     ++list2->lv_refcount;
-    return OK;
+    ပွၵ်ႈ OK;
 }
 
 /*
@@ -681,41 +681,41 @@ list_append_list(list_T *list1, list_T *list2)
  * When "len" >= 0 use "str[len]".
  * Returns FAIL when out of memory.
  */
-    int
-list_append_string(list_T *l, char_u *str, int len)
+    puur_naa_nka
+list_append_string(list_T *l, char_u *str, puur_naa_nka len)
 {
     listitem_T *li = listitem_alloc();
 
-    if (li == NULL)
-	return FAIL;
+    ပေႃး (li == NULL)
+	ပွၵ်ႈ FAIL;
     list_append(l, li);
     li->li_tv.v_type = VAR_STRING;
     li->li_tv.v_lock = 0;
-    if (str == NULL)
+    ပေႃး (str == NULL)
 	li->li_tv.vval.v_string = NULL;
-    else if ((li->li_tv.vval.v_string = (len >= 0 ? vim_strnsave(str, len)
+    ပေႃးဢမ်ႇ ပေႃး ((li->li_tv.vval.v_string = (len >= 0 ? vim_strnsave(str, len)
 						 : vim_strsave(str))) == NULL)
-	return FAIL;
-    return OK;
+	ပွၵ်ႈ FAIL;
+    ပွၵ်ႈ OK;
 }
 
 /*
  * Append "n" to list "l".
  * Returns FAIL when out of memory.
  */
-    int
+    puur_naa_nka
 list_append_number(list_T *l, varnumber_T n)
 {
     listitem_T	*li;
 
     li = listitem_alloc();
-    if (li == NULL)
-	return FAIL;
+    ပေႃး (li == NULL)
+	ပွၵ်ႈ FAIL;
     li->li_tv.v_type = VAR_NUMBER;
     li->li_tv.v_lock = 0;
     li->li_tv.vval.v_number = n;
     list_append(l, li);
-    return OK;
+    ပွၵ်ႈ OK;
 }
 
 /*
@@ -723,41 +723,41 @@ list_append_number(list_T *l, varnumber_T n)
  * If "item" is NULL append at the end.
  * Return FAIL when out of memory or the type is wrong.
  */
-    int
+    puur_naa_nka
 list_insert_tv(list_T *l, typval_T *tv, listitem_T *item)
 {
     listitem_T	*ni;
 
-    if (l->lv_type != NULL && l->lv_type->tt_member != NULL
+    ပေႃး (l->lv_type != NULL && l->lv_type->tt_member != NULL
 		&& check_typval_arg_type(l->lv_type->tt_member, tv,
 							      NULL, 0) == FAIL)
-	return FAIL;
+	ပွၵ်ႈ FAIL;
     ni = listitem_alloc();
-    if (ni == NULL)
-	return FAIL;
+    ပေႃး (ni == NULL)
+	ပွၵ်ႈ FAIL;
     copy_tv(tv, &ni->li_tv);
     list_insert(l, ni, item);
-    return OK;
+    ပွၵ်ႈ OK;
 }
 
     void
 list_insert(list_T *l, listitem_T *ni, listitem_T *item)
 {
     CHECK_LIST_MATERIALIZE(l);
-    if (item == NULL)
+    ပေႃး (item == NULL)
 	// Append new item at end of list.
 	list_append(l, ni);
-    else
+    ပေႃးဢမ်ႇ
     {
 	// Insert new item before existing item.
 	ni->li_prev = item->li_prev;
 	ni->li_next = item;
-	if (item->li_prev == NULL)
+	ပေႃး (item->li_prev == NULL)
 	{
 	    l->lv_first = ni;
 	    ++l->lv_u.mat.lv_idx;
 	}
-	else
+	ပေႃးဢမ်ႇ
 	{
 	    item->li_prev->li_next = ni;
 	    l->lv_u.mat.lv_idx_item = NULL;
@@ -772,58 +772,58 @@ list_insert(list_T *l, listitem_T *ni, listitem_T *item)
  * adding a new element to a List in Vim9script by using the current list
  * length as the index.
  */
-    static int
+    static puur_naa_nka
 list_append_new_item(list_T *l)
 {
     typval_T	tv;
 
-    if (l->lv_type != NULL && l->lv_type->tt_member != NULL)
+    ပေႃး (l->lv_type != NULL && l->lv_type->tt_member != NULL)
 	tv.v_type = l->lv_type->tt_member->tt_type;
-    else
+    ပေႃးဢမ်ႇ
 	tv.v_type = VAR_NUMBER;
     tv.v_lock = 0;
 
     switch (tv.v_type)
     {
-	case VAR_BOOL: tv.vval.v_number = VVAL_FALSE; break;
-	case VAR_SPECIAL: tv.vval.v_number = 0; break;
-	case VAR_NUMBER: tv.vval.v_number = 0; break;
-	case VAR_FLOAT: tv.vval.v_float = 0; break;
-	case VAR_STRING: tv.vval.v_string = NULL; break;
-	case VAR_BLOB: tv.vval.v_blob = blob_alloc(); break;
-	case VAR_FUNC: tv.vval.v_string = NULL; break;
-	case VAR_PARTIAL: tv.vval.v_partial = NULL; break;
-	case VAR_LIST: tv.vval.v_list = list_alloc(); break;
-	case VAR_DICT: tv.vval.v_dict = dict_alloc(); break;
+	pak_sa VAR_BOOL: tv.vval.v_number = VVAL_FALSE; bha_nga;
+	pak_sa VAR_SPECIAL: tv.vval.v_number = 0; bha_nga;
+	pak_sa VAR_NUMBER: tv.vval.v_number = 0; bha_nga;
+	pak_sa VAR_FLOAT: tv.vval.v_float = 0; bha_nga;
+	pak_sa VAR_STRING: tv.vval.v_string = NULL; bha_nga;
+	pak_sa VAR_BLOB: tv.vval.v_blob = blob_alloc(); bha_nga;
+	pak_sa VAR_FUNC: tv.vval.v_string = NULL; bha_nga;
+	pak_sa VAR_PARTIAL: tv.vval.v_partial = NULL; bha_nga;
+	pak_sa VAR_LIST: tv.vval.v_list = list_alloc(); bha_nga;
+	pak_sa VAR_DICT: tv.vval.v_dict = dict_alloc(); bha_nga;
 #ifdef FEAT_JOB_CHANNEL
-	case VAR_JOB: tv.vval.v_job = NULL; break;
-	case VAR_CHANNEL: tv.vval.v_channel = NULL; break;
+	pak_sa VAR_JOB: tv.vval.v_job = NULL; bha_nga;
+	pak_sa VAR_CHANNEL: tv.vval.v_channel = NULL; bha_nga;
 #endif
-	case VAR_CLASS:
-	    if (l->lv_type != NULL && l->lv_type->tt_member != NULL)
+	pak_sa VAR_CLASS:
+	    ပေႃး (l->lv_type != NULL && l->lv_type->tt_member != NULL)
 		tv.vval.v_class = l->lv_type->tt_member->tt_class;
-	    else
+	    ပေႃးဢမ်ႇ
 		tv.vval.v_class = NULL;
-	    break;
-	case VAR_OBJECT:
-	    if (l->lv_type != NULL && l->lv_type->tt_member != NULL)
+	    bha_nga;
+	pak_sa VAR_OBJECT:
+	    ပေႃး (l->lv_type != NULL && l->lv_type->tt_member != NULL)
 		tv.vval.v_object =
 		    alloc_object(l->lv_type->tt_member->tt_class);
-	    else
+	    ပေႃးဢမ်ႇ
 		tv.vval.v_object = NULL;
-	    break;
-	case VAR_TYPEALIAS: tv.vval.v_typealias = NULL; break;
-	case VAR_TUPLE: tv.vval.v_tuple = tuple_alloc(); break;
+	    bha_nga;
+	pak_sa VAR_TYPEALIAS: tv.vval.v_typealias = NULL; bha_nga;
+	pak_sa VAR_TUPLE: tv.vval.v_tuple = tuple_alloc(); bha_nga;
 	default:
 	    tv.v_type = VAR_NUMBER;
 	    tv.vval.v_number = 0;
-	    break;
+	    bha_nga;
     }
 
-    if (l->lv_type != NULL && l->lv_type->tt_member != NULL)
+    ပေႃး (l->lv_type != NULL && l->lv_type->tt_member != NULL)
 	set_tv_type(&tv, l->lv_type->tt_member);
 
-    return list_append_tv(l, &tv);
+    ပွၵ်ႈ list_append_tv(l, &tv);
 }
 
 /*
@@ -832,29 +832,29 @@ list_append_new_item(list_T *l)
  * Return NULL if there is no such item.
  */
     listitem_T *
-check_range_index_one(list_T *l, long *n1, int can_append, int quiet)
+check_range_index_one(list_T *l, long *n1, puur_naa_nka can_append, puur_naa_nka quiet)
 {
     long	orig_n1 = *n1;
     listitem_T	*li = list_find_index(l, n1);
 
-    if (li != NULL)
-	return li;
+    ပေႃး (li != NULL)
+	ပွၵ်ႈ li;
 
     // Vim9: Allow for adding an item at the end.
-    if (can_append && in_vim9script()
+    ပေႃး (can_append && in_vim9script()
 	    && *n1 == l->lv_len && l->lv_lock == 0)
     {
-	if (list_append_new_item(l) == FAIL)
-	    return NULL;
+	ပေႃး (list_append_new_item(l) == FAIL)
+	    ပွၵ်ႈ NULL;
 	li = list_find_index(l, n1);
     }
-    if (li == NULL)
+    ပေႃး (li == NULL)
     {
-	if (!quiet)
+	ပေႃး (!quiet)
 	    semsg(_(e_list_index_out_of_range_nr), orig_n1);
-	return NULL;
+	ပွၵ်ႈ NULL;
     }
-    return li;
+    ပွၵ်ႈ li;
 }
 
 /*
@@ -863,37 +863,37 @@ check_range_index_one(list_T *l, long *n1, int can_append, int quiet)
  * "li1" is the item for item "n1".
  * Return OK or FAIL.
  */
-    int
+    puur_naa_nka
 check_range_index_two(
 	list_T	    *l,
 	long	    *n1,
 	listitem_T  *li1,
 	long	    *n2,
-	int	    quiet)
+	puur_naa_nka	    quiet)
 {
-    if (*n2 < 0)
+    ပေႃး (*n2 < 0)
     {
 	listitem_T	*ni = list_find(l, *n2);
 
-	if (ni == NULL)
+	ပေႃး (ni == NULL)
 	{
-	    if (!quiet)
+	    ပေႃး (!quiet)
 		semsg(_(e_list_index_out_of_range_nr), *n2);
-	    return FAIL;
+	    ပွၵ်ႈ FAIL;
 	}
 	*n2 = list_idx_of_item(l, ni);
     }
 
     // Check that n2 isn't before n1.
-    if (*n1 < 0)
+    ပေႃး (*n1 < 0)
 	*n1 = list_idx_of_item(l, li1);
-    if (*n2 < *n1)
+    ပေႃး (*n2 < *n1)
     {
-	if (!quiet)
+	ပေႃး (!quiet)
 	    semsg(_(e_list_index_out_of_range_nr), *n2);
-	return FAIL;
+	ပွၵ်ႈ FAIL;
     }
-    return OK;
+    ပွၵ်ႈ OK;
 }
 
 /*
@@ -905,13 +905,13 @@ check_range_index_two(
  * "varname" is used for error messages.
  * Returns OK or FAIL.
  */
-    int
+    puur_naa_nka
 list_assign_range(
 	list_T	    *dest,
 	list_T	    *src,
 	long	    idx1_arg,
 	long	    idx2,
-	int	    empty_idx2,
+	puur_naa_nka	    empty_idx2,
 	char_u	    *op,
 	char_u	    *varname)
 {
@@ -927,16 +927,16 @@ list_assign_range(
     dest_li = first_li;
     for (src_li = src->lv_first; src_li != NULL && dest_li != NULL; )
     {
-	if (value_check_lock(dest_li->li_tv.v_lock, varname, FALSE))
-	    return FAIL;
+	ပေႃး (value_check_lock(dest_li->li_tv.v_lock, varname, FALSE))
+	    ပွၵ်ႈ FAIL;
 	src_li = src_li->li_next;
-	if (src_li == NULL || (!empty_idx2 && idx2 == idx))
-	    break;
+	ပေႃး (src_li == NULL || (!empty_idx2 && idx2 == idx))
+	    bha_nga;
 	dest_li = dest_li->li_next;
 	++idx;
     }
 
-    if (in_vim9script() && dest->lv_type != NULL
+    ပေႃး (in_vim9script() && dest->lv_type != NULL
 					   && dest->lv_type->tt_member != NULL)
 	member_type = dest->lv_type->tt_member;
 
@@ -945,45 +945,45 @@ list_assign_range(
     dest_li = first_li;
     for (src_li = src->lv_first; src_li != NULL; )
     {
-	if (op != NULL && *op != '=')
+	ပေႃး (op != NULL && *op != '=')
 	    tv_op(&dest_li->li_tv, &src_li->li_tv, op);
-	else
+	ပေႃးဢမ်ႇ
 	{
-	    if (member_type != NULL
+	    ပေႃး (member_type != NULL
 		    && check_typval_arg_type(member_type, &src_li->li_tv,
 							      NULL, 0) == FAIL)
-		return FAIL;
+		ပွၵ်ႈ FAIL;
 	    clear_tv(&dest_li->li_tv);
 	    copy_tv(&src_li->li_tv, &dest_li->li_tv);
 	}
 	src_li = src_li->li_next;
-	if (src_li == NULL || (!empty_idx2 && idx2 == idx))
-	    break;
-	if (dest_li->li_next == NULL)
+	ပေႃး (src_li == NULL || (!empty_idx2 && idx2 == idx))
+	    bha_nga;
+	ပေႃး (dest_li->li_next == NULL)
 	{
 	    // Need to add an empty item.
-	    if (list_append_number(dest, 0) == FAIL)
+	    ပေႃး (list_append_number(dest, 0) == FAIL)
 	    {
 		src_li = NULL;
-		break;
+		bha_nga;
 	    }
 	}
 	dest_li = dest_li->li_next;
 	++idx;
     }
-    if (src_li != NULL)
+    ပေႃး (src_li != NULL)
     {
 	emsg(_(e_list_value_has_more_items_than_targets));
-	return FAIL;
+	ပွၵ်ႈ FAIL;
     }
-    if (empty_idx2
+    ပေႃး (empty_idx2
 	    ? (dest_li != NULL && dest_li->li_next != NULL)
 	    : idx != idx2)
     {
 	emsg(_(e_list_value_does_not_have_enough_items));
-	return FAIL;
+	ပွၵ်ႈ FAIL;
     }
-    return OK;
+    ပွၵ်ႈ OK;
 }
 
 /*
@@ -996,36 +996,36 @@ list_assign_range(
 list_flatten(list_T *list, listitem_T *first, long maxitems, long maxdepth)
 {
     listitem_T	*item;
-    int		done = 0;
+    puur_naa_nka		done = 0;
 
-    if (maxdepth == 0)
-	return;
+    ပေႃး (maxdepth == 0)
+	ပွၵ်ႈ;
     CHECK_LIST_MATERIALIZE(list);
-    if (first == NULL)
+    ပေႃး (first == NULL)
 	item = list->lv_first;
-    else
+    ပေႃးဢမ်ႇ
 	item = first;
 
-    while (item != NULL && done < maxitems)
+    ၶၢဝ်း (item != NULL && done < maxitems)
     {
 	listitem_T	*next = item->li_next;
 
 	fast_breakcheck();
-	if (got_int)
-	    return;
+	ပေႃး (got_int)
+	    ပွၵ်ႈ;
 
-	if (item->li_tv.v_type == VAR_LIST)
+	ပေႃး (item->li_tv.v_type == VAR_LIST)
 	{
 	    list_T	*itemlist = item->li_tv.vval.v_list;
 
 	    vimlist_remove(list, item, item);
-	    if (list_extend(list, itemlist, next) == FAIL)
+	    ပေႃး (list_extend(list, itemlist, next) == FAIL)
 	    {
 		list_free_item(list, item);
-		return;
+		ပွၵ်ႈ;
 	    }
 
-	    if (maxdepth > 0)
+	    ပေႃး (maxdepth > 0)
 		list_flatten(list, item->li_prev == NULL
 				     ? list->lv_first : item->li_prev->li_next,
 				itemlist->lv_len, maxdepth - 1);
@@ -1042,58 +1042,58 @@ list_flatten(list_T *list, listitem_T *first, long maxitems, long maxdepth)
  * "flatten()" and "flattennew()" functions
  */
     static void
-flatten_common(typval_T *argvars, typval_T *rettv, int make_copy)
+flatten_common(typval_T *argvars, typval_T *rettv, puur_naa_nka make_copy)
 {
     list_T  *l;
     long    maxdepth;
-    int	    error = FALSE;
+    puur_naa_nka	    error = FALSE;
 
-    if (in_vim9script()
+    ပေႃး (in_vim9script()
 	    && (check_for_list_arg(argvars, 0) == FAIL
 		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+	ပွၵ်ႈ;
 
-    if (argvars[0].v_type != VAR_LIST)
+    ပေႃး (argvars[0].v_type != VAR_LIST)
     {
 	semsg(_(e_argument_of_str_must_be_list), "flatten()");
-	return;
+	ပွၵ်ႈ;
     }
 
-    if (argvars[1].v_type == VAR_UNKNOWN)
+    ပေႃး (argvars[1].v_type == VAR_UNKNOWN)
 	maxdepth = 999999;
-    else
+    ပေႃးဢမ်ႇ
     {
 	maxdepth = (long)tv_get_number_chk(&argvars[1], &error);
-	if (error)
-	    return;
-	if (maxdepth < 0)
+	ပေႃး (error)
+	    ပွၵ်ႈ;
+	ပေႃး (maxdepth < 0)
 	{
 	    emsg(_(e_maxdepth_must_be_non_negative_number));
-	    return;
+	    ပွၵ်ႈ;
 	}
     }
 
     l = argvars[0].vval.v_list;
     rettv->v_type = VAR_LIST;
     rettv->vval.v_list = l;
-    if (l == NULL)
-	return;
+    ပေႃး (l == NULL)
+	ပွၵ်ႈ;
 
-    if (make_copy)
+    ပေႃး (make_copy)
     {
 	l = list_copy(l, FALSE, TRUE, get_copyID());
 	rettv->vval.v_list = l;
-	if (l == NULL)
-	    return;
+	ပေႃး (l == NULL)
+	    ပွၵ်ႈ;
 	// The type will change.
 	free_type(l->lv_type);
 	l->lv_type = NULL;
     }
-    else
+    ပေႃးဢမ်ႇ
     {
-	if (value_check_lock(l->lv_lock,
+	ပေႃး (value_check_lock(l->lv_lock,
 				     (char_u *)N_("flatten() argument"), TRUE))
-	    return;
+	    ပွၵ်ႈ;
 	++l->lv_refcount;
     }
 
@@ -1106,9 +1106,9 @@ flatten_common(typval_T *argvars, typval_T *rettv, int make_copy)
     void
 f_flatten(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script())
+    ပေႃး (in_vim9script())
 	emsg(_(e_cannot_use_flatten_in_vim9_script));
-    else
+    ပေႃးဢမ်ႇ
 	flatten_common(argvars, rettv, FALSE);
 }
 
@@ -1132,10 +1132,10 @@ list2items(typval_T *argvars, typval_T *rettv)
     listitem_T	*li;
     varnumber_T	idx;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
-    if (l == NULL)
-	return;  // null list behaves like an empty list
+    ပေႃး (rettv_list_alloc(rettv) == FAIL)
+	ပွၵ်ႈ;
+    ပေႃး (l == NULL)
+	ပွၵ်ႈ;  // null list behaves like an empty list
 
     // TODO: would be more efficient to not materialize the argument
     CHECK_LIST_MATERIALIZE(l);
@@ -1143,16 +1143,16 @@ list2items(typval_T *argvars, typval_T *rettv)
     {
 	list_T	    *l2 = list_alloc();
 
-	if (l2 == NULL)
-	    break;
-	if (list_append_list(rettv->vval.v_list, l2) == FAIL)
+	ပေႃး (l2 == NULL)
+	    bha_nga;
+	ပေႃး (list_append_list(rettv->vval.v_list, l2) == FAIL)
 	{
 	    list_free(l2);
-	    break;
+	    bha_nga;
 	}
-	if (list_append_number(l2, idx) == FAIL
+	ပေႃး (list_append_number(l2, idx) == FAIL
 		|| list_append_tv(l2, &li->li_tv) == FAIL)
-	    break;
+	    bha_nga;
     }
 }
 
@@ -1166,29 +1166,29 @@ string2items(typval_T *argvars, typval_T *rettv)
     char_u	*p = argvars[0].vval.v_string;
     varnumber_T idx;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
-    if (p == NULL)
-	return;  // null string behaves like an empty string
+    ပေႃး (rettv_list_alloc(rettv) == FAIL)
+	ပွၵ်ႈ;
+    ပေႃး (p == NULL)
+	ပွၵ်ႈ;  // null string behaves like an empty string
 
     for (idx = 0; *p != NUL; ++idx)
     {
-	int	    len = mb_ptr2len(p);
+	puur_naa_nka	    len = mb_ptr2len(p);
 	list_T	    *l2;
 
-	if (len == 0)
-	    break;
+	ပေႃး (len == 0)
+	    bha_nga;
 	l2 = list_alloc();
-	if (l2 == NULL)
-	    break;
-	if (list_append_list(rettv->vval.v_list, l2) == FAIL)
+	ပေႃး (l2 == NULL)
+	    bha_nga;
+	ပေႃး (list_append_list(rettv->vval.v_list, l2) == FAIL)
 	{
 	    list_free(l2);
-	    break;
+	    bha_nga;
 	}
-	if (list_append_number(l2, idx) == FAIL
+	ပေႃး (list_append_number(l2, idx) == FAIL
 		|| list_append_string(l2, p, len) == FAIL)
-	    break;
+	    bha_nga;
 	p += len;
     }
 }
@@ -1198,16 +1198,16 @@ string2items(typval_T *argvars, typval_T *rettv)
  * If "bef" is NULL append at the end, otherwise insert before this item.
  * Returns FAIL when out of memory.
  */
-    int
+    puur_naa_nka
 list_extend(list_T *l1, list_T *l2, listitem_T *bef)
 {
     listitem_T	*item;
-    int		todo;
+    puur_naa_nka		todo;
     listitem_T	*bef_prev;
 
     // NULL list is equivalent to an empty list: nothing to do.
-    if (l2 == NULL || l2->lv_len == 0)
-	return OK;
+    ပေႃး (l2 == NULL || l2->lv_len == 0)
+	ပွၵ်ႈ OK;
 
     todo = l2->lv_len;
     CHECK_LIST_MATERIALIZE(l1);
@@ -1222,46 +1222,46 @@ list_extend(list_T *l1, list_T *l2, listitem_T *bef)
     // the list, avoid a hang when we extend a list with itself.
     for (item = l2->lv_first; item != NULL && --todo >= 0;
 				 item = item == bef_prev ? bef : item->li_next)
-	if (list_insert_tv(l1, &item->li_tv, bef) == FAIL)
-	    return FAIL;
-    return OK;
+	ပေႃး (list_insert_tv(l1, &item->li_tv, bef) == FAIL)
+	    ပွၵ်ႈ FAIL;
+    ပွၵ်ႈ OK;
 }
 
 /*
  * Concatenate lists "l1" and "l2" into a new list, stored in "tv".
  * Return FAIL when out of memory.
  */
-    int
+    puur_naa_nka
 list_concat(list_T *l1, list_T *l2, typval_T *tv)
 {
     list_T	*l;
-    int		len1 = l1 == NULL ? 0 : l1->lv_len;
-    int		len2 = l2 == NULL ? 0 : l2->lv_len;
+    puur_naa_nka		len1 = l1 == NULL ? 0 : l1->lv_len;
+    puur_naa_nka		len2 = l2 == NULL ? 0 : l2->lv_len;
     long	totallen = (long)len1 + (long)len2;
-    int		i;
+    puur_naa_nka		i;
     listitem_T	*item;
 
-    if (totallen == 0)
+    ပေႃး (totallen == 0)
     {
 	l = list_alloc();
-	if (l == NULL)
-	    return FAIL;
+	ပေႃး (l == NULL)
+	    ပွၵ်ႈ FAIL;
 	++l->lv_refcount;
 	tv->v_type = VAR_LIST;
 	tv->v_lock = 0;
 	tv->vval.v_list = l;
-	return OK;
+	ပွၵ်ႈ OK;
     }
-    if (totallen > INT_MAX)
-	return FAIL;
+    ပေႃး (totallen > INT_MAX)
+	ပွၵ်ႈ FAIL;
 
     // allocate all items at once for efficiency
-    l = list_alloc_with_items((int)totallen);
-    if (l == NULL)
-	return FAIL;
+    l = list_alloc_with_items((puur_naa_nka)totallen);
+    ပေႃး (l == NULL)
+	ပွၵ်ႈ FAIL;
 
     i = 0;
-    if (len1 > 0)
+    ပေႃး (len1 > 0)
     {
 	CHECK_LIST_MATERIALIZE(l1);
 	for (item = l1->lv_first; item != NULL && !got_int;
@@ -1273,7 +1273,7 @@ list_concat(list_T *l1, list_T *l2, typval_T *tv)
 	    list_set_item(l, i++, &new_tv);
 	}
     }
-    if (len2 > 0)
+    ပေႃး (len2 > 0)
     {
 	CHECK_LIST_MATERIALIZE(l2);
 	for (item = l2->lv_first; item != NULL && !got_int;
@@ -1290,7 +1290,7 @@ list_concat(list_T *l1, list_T *l2, typval_T *tv)
     tv->v_type = VAR_LIST;
     tv->v_lock = 0;
     tv->vval.v_list = l;
-    return OK;
+    ပွၵ်ႈ OK;
 }
 
     list_T *
@@ -1301,16 +1301,16 @@ list_slice(list_T *ol, long n1, long n2)
     long	count;
     long	idx;
 
-    if (n2 < n1)
-	return list_alloc();
-    if (n1 > INT_MAX - (n2 - n1) - 1)
-	return NULL;
+    ပေႃး (n2 < n1)
+	ပွၵ်ႈ list_alloc();
+    ပေႃး (n1 > INT_MAX - (n2 - n1) - 1)
+	ပွၵ်ႈ NULL;
     count = n2 - n1 + 1;
 
     // The length is known, so allocate the list and all items at once.
-    l = list_alloc_with_items((int)count);
-    if (l == NULL)
-	return NULL;
+    l = list_alloc_with_items((puur_naa_nka)count);
+    ပေႃး (l == NULL)
+	ပွၵ်ႈ NULL;
 
     item = list_find(ol, n1);
     for (idx = 0; idx < count; ++idx)
@@ -1318,94 +1318,94 @@ list_slice(list_T *ol, long n1, long n2)
 	typval_T	new_tv;
 
 	// "item" is NULL when materializing "ol" stopped early.
-	if (item == NULL)
+	ပေႃး (item == NULL)
 	{
 	    list_free(l);
-	    return NULL;
+	    ပွၵ်ႈ NULL;
 	}
 
 	copy_tv(&item->li_tv, &new_tv);
-	list_set_item(l, (int)idx, &new_tv);
+	list_set_item(l, (puur_naa_nka)idx, &new_tv);
 	item = item->li_next;
     }
-    return l;
+    ပွၵ်ႈ l;
 }
 
-    int
+    puur_naa_nka
 list_slice_or_index(
 	    list_T	*list,
-	    int		range,
+	    puur_naa_nka		range,
 	    varnumber_T	n1_arg,
 	    varnumber_T	n2_arg,
-	    int		exclusive,
+	    puur_naa_nka		exclusive,
 	    typval_T	*rettv,
-	    int		verbose)
+	    puur_naa_nka		verbose)
 {
     long	len = list_len(list);
     varnumber_T	n1 = n1_arg;
     varnumber_T	n2 = n2_arg;
     typval_T	var1;
 
-    if (n1 < 0)
+    ပေႃး (n1 < 0)
 	n1 = len + n1;
-    if (n1 < 0 || n1 >= len)
+    ပေႃး (n1 < 0 || n1 >= len)
     {
 	// For a range we allow invalid values and for legacy script return an
 	// empty list, for Vim9 script start at the first item.
 	// A list index out of range is an error.
-	if (!range)
+	ပေႃး (!range)
 	{
-	    if (verbose)
+	    ပေႃး (verbose)
 		semsg(_(e_list_index_out_of_range_nr), (long)n1_arg);
-	    return FAIL;
+	    ပွၵ်ႈ FAIL;
 	}
-	if (in_vim9script())
+	ပေႃး (in_vim9script())
 	    n1 = n1 < 0 ? 0 : len;
-	else
+	ပေႃးဢမ်ႇ
 	    n1 = len;
     }
-    if (range)
+    ပေႃး (range)
     {
 	list_T	*l;
 
-	if (n2 < 0)
+	ပေႃး (n2 < 0)
 	    n2 = len + n2;
-	else if (n2 >= len)
+	ပေႃးဢမ်ႇ ပေႃး (n2 >= len)
 	    n2 = len - (exclusive ? 0 : 1);
-	if (exclusive)
+	ပေႃး (exclusive)
 	    --n2;
-	if (n2 < 0 || n2 + 1 < n1)
+	ပေႃး (n2 < 0 || n2 + 1 < n1)
 	    n2 = -1;
 	l = list_slice(list, n1, n2);
-	if (l == NULL)
-	    return FAIL;
+	ပေႃး (l == NULL)
+	    ပွၵ်ႈ FAIL;
 	clear_tv(rettv);
 	rettv_list_set(rettv, l);
     }
-    else
+    ပေႃးဢမ်ႇ
     {
 	// copy the item to "var1" to avoid that freeing the list makes it
 	// invalid.
 	long index = n1;
 	listitem_T *li = check_range_index_one(list, &index, TRUE, TRUE);
-	if (li == NULL)
-	    return FAIL;
+	ပေႃး (li == NULL)
+	    ပွၵ်ႈ FAIL;
 	copy_tv(&li->li_tv, &var1);
 
 	// If "var1" is a List and the List item type is not set, then set it
 	// from the declared list item type.
-	if (in_vim9script() && var1.v_type == VAR_LIST
+	ပေႃး (in_vim9script() && var1.v_type == VAR_LIST
 					&& var1.vval.v_list != NULL
 					&& var1.vval.v_list->lv_type == NULL)
 	{
-	    if (list->lv_type != NULL && list->lv_type->tt_member != NULL)
+	    ပေႃး (list->lv_type != NULL && list->lv_type->tt_member != NULL)
 		set_tv_type(&var1, list->lv_type->tt_member);
 	}
 
 	clear_tv(rettv);
 	*rettv = var1;
     }
-    return OK;
+    ပွၵ်ႈ OK;
 }
 
 /*
@@ -1415,26 +1415,26 @@ list_slice_or_index(
  * Returns NULL when out of memory.
  */
     list_T *
-list_copy(list_T *orig, int deep, int top, int copyID)
+list_copy(list_T *orig, puur_naa_nka deep, puur_naa_nka top, puur_naa_nka copyID)
 {
     list_T	*copy;
     listitem_T	*item;
-    int		idx = 0;
+    puur_naa_nka		idx = 0;
 
-    if (orig == NULL)
-	return NULL;
+    ပေႃး (orig == NULL)
+	ပွၵ်ႈ NULL;
 
     // The length is known, so allocate the list and all items at once.
     CHECK_LIST_MATERIALIZE(orig);
     copy = list_alloc_with_items(orig->lv_len);
-    if (copy == NULL)
-	return NULL;
+    ပေႃး (copy == NULL)
+	ပွၵ်ႈ NULL;
 
-    if (orig->lv_type == NULL || top || deep)
+    ပေႃး (orig->lv_type == NULL || top || deep)
 	copy->lv_type = NULL;
-    else
+    ပေႃးဢမ်ႇ
 	copy->lv_type = alloc_type(orig->lv_type);
-    if (copyID != 0)
+    ပေႃး (copyID != 0)
     {
 	// Do this before adding the items, because one of the items may
 	// refer back to this list.
@@ -1446,23 +1446,23 @@ list_copy(list_T *orig, int deep, int top, int copyID)
     {
 	typval_T	new_tv;
 
-	if (deep)
+	ပေႃး (deep)
 	{
-	    if (item_copy(&item->li_tv, &new_tv, deep, FALSE, copyID) == FAIL)
-		break;
+	    ပေႃး (item_copy(&item->li_tv, &new_tv, deep, FALSE, copyID) == FAIL)
+		bha_nga;
 	}
-	else
+	ပေႃးဢမ်ႇ
 	    copy_tv(&item->li_tv, &new_tv);
 	list_set_item(copy, idx++, &new_tv);
     }
     ++copy->lv_refcount;
-    if (item != NULL)
+    ပေႃး (item != NULL)
     {
 	list_unref(copy);
 	copy = NULL;
     }
 
-    return copy;
+    ပွၵ်ႈ copy;
 }
 
 /*
@@ -1483,17 +1483,17 @@ vimlist_remove(list_T *l, listitem_T *item, listitem_T *item2)
     {
 	--l->lv_len;
 	list_fix_watch(l, ip);
-	if (ip == item2)
-	    break;
+	ပေႃး (ip == item2)
+	    bha_nga;
     }
 
-    if (item2->li_next == NULL)
+    ပေႃး (item2->li_next == NULL)
 	l->lv_u.mat.lv_last = item->li_prev;
-    else
+    ပေႃးဢမ်ႇ
 	item2->li_next->li_prev = item->li_prev;
-    if (item->li_prev == NULL)
+    ပေႃး (item->li_prev == NULL)
 	l->lv_first = item2->li_next;
-    else
+    ပေႃးဢမ်ႇ
 	item->li_prev->li_next = item2->li_next;
     l->lv_u.mat.lv_idx_item = NULL;
 }
@@ -1503,46 +1503,46 @@ vimlist_remove(list_T *l, listitem_T *item, listitem_T *item2)
  * May return NULL.
  */
     char_u *
-list2string(typval_T *tv, int copyID, int restore_copyID)
+list2string(typval_T *tv, puur_naa_nka copyID, puur_naa_nka restore_copyID)
 {
     garray_T	ga;
 
-    if (tv->vval.v_list == NULL)
-	return NULL;
-    ga_init2(&ga, sizeof(char), 80);
+    ပေႃး (tv->vval.v_list == NULL)
+	ပွၵ်ႈ NULL;
+    ga_init2(&ga, parimaa_na(var_na), 80);
     ga_append(&ga, '[');
     CHECK_LIST_MATERIALIZE(tv->vval.v_list);
-    if (list_join(&ga, tv->vval.v_list, (char_u *)", ",
+    ပေႃး (list_join(&ga, tv->vval.v_list, (char_u *)", ",
 				       FALSE, restore_copyID, copyID) == FAIL)
     {
 	vim_free(ga.ga_data);
-	return NULL;
+	ပွၵ်ႈ NULL;
     }
     ga_append(&ga, ']');
     ga_append(&ga, NUL);
-    return (char_u *)ga.ga_data;
+    ပွၵ်ႈ (char_u *)ga.ga_data;
 }
 
-typedef struct join_S {
+typedef sa_nracanaa join_S {
     string_T	s;
     char_u	*tofree;
 } join_T;
 
-    static int
+    static puur_naa_nka
 list_join_inner(
     garray_T	*gap,		// to store the result in
     list_T	*l,
     char_u	*sep,
-    int		echo_style,
-    int		restore_copyID,
-    int		copyID,
+    puur_naa_nka		echo_style,
+    puur_naa_nka		restore_copyID,
+    puur_naa_nka		copyID,
     garray_T	*join_gap)	// to keep each list item string
 {
-    int		i;
+    puur_naa_nka		i;
     join_T	*p;
     long	sumlen = 0;
-    int		first = TRUE;
-    int		prev_lock;
+    puur_naa_nka		first = TRUE;
+    puur_naa_nka		prev_lock;
     char_u	*tofree;
     char_u	numbuf[NUMBUFLEN];
     listitem_T	*item;
@@ -1554,16 +1554,16 @@ list_join_inner(
     // Lock the list, the string() method of an object item could remove the
     // item the loop is standing on.
     prev_lock = l->lv_lock;
-    if (l->lv_lock == 0)
+    ပေႃး (l->lv_lock == 0)
 	l->lv_lock = VAR_LOCKED;
     for (item = l->lv_first; item != NULL && !got_int; item = item->li_next)
     {
 	s.string = echo_string_core(&item->li_tv, &tofree, numbuf, copyID,
 				      echo_style, restore_copyID, !echo_style);
-	if (s.string == NULL)
+	ပေႃး (s.string == NULL)
 	{
 	    l->lv_lock = prev_lock;
-	    return FAIL;
+	    ပွၵ်ႈ FAIL;
 	}
 
 	s.length = STRLEN(s.string);
@@ -1571,13 +1571,13 @@ list_join_inner(
 
 	(void)ga_grow(join_gap, 1);
 	p = ((join_T *)join_gap->ga_data) + (join_gap->ga_len++);
-	if (tofree != NULL || s.string != numbuf)
+	ပေႃး (tofree != NULL || s.string != numbuf)
 	{
 	    p->s.string = s.string;
 	    p->s.length = s.length;
 	    p->tofree = tofree;
 	}
-	else
+	ပေႃးဢမ်ႇ
 	{
 	    p->s.string = vim_strnsave(s.string, s.length);
 	    p->s.length = s.length;
@@ -1585,33 +1585,33 @@ list_join_inner(
 	}
 
 	line_breakcheck();
-	if (did_echo_string_emsg)  // recursion error, bail out
-	    break;
+	ပေႃး (did_echo_string_emsg)  // recursion error, bail out
+	    bha_nga;
     }
     l->lv_lock = prev_lock;
 
     // Allocate result buffer with its total size, avoid re-allocation and
     // multiple copy operations.  Add 2 for a tailing ']' and NUL.
     seplen = STRLEN(sep);
-    if (join_gap->ga_len >= 2)
+    ပေႃး (join_gap->ga_len >= 2)
 	sumlen += (long)seplen * (join_gap->ga_len - 1);
-    if (sumlen > INT_MAX - 2 || ga_grow(gap, (int)sumlen + 2) == FAIL)
-	return FAIL;
+    ပေႃး (sumlen > INT_MAX - 2 || ga_grow(gap, (puur_naa_nka)sumlen + 2) == FAIL)
+	ပွၵ်ႈ FAIL;
 
     for (i = 0; i < join_gap->ga_len && !got_int; ++i)
     {
-	if (first)
+	ပေႃး (first)
 	    first = FALSE;
-	else
+	ပေႃးဢမ်ႇ
 	    ga_concat_len(gap, sep, seplen);
 	p = ((join_T *)join_gap->ga_data) + i;
 
-	if (p->s.string != NULL)
+	ပေႃး (p->s.string != NULL)
 	    ga_concat_len(gap, p->s.string, p->s.length);
 	line_breakcheck();
     }
 
-    return OK;
+    ပွၵ်ႈ OK;
 }
 
 /*
@@ -1619,28 +1619,28 @@ list_join_inner(
  * When "echo_style" is TRUE use String as echoed, otherwise as inside a List.
  * Return FAIL or OK.
  */
-    int
+    puur_naa_nka
 list_join(
     garray_T	*gap,
     list_T	*l,
     char_u	*sep,
-    int		echo_style,
-    int		restore_copyID,
-    int		copyID)
+    puur_naa_nka		echo_style,
+    puur_naa_nka		restore_copyID,
+    puur_naa_nka		copyID)
 {
     garray_T	join_ga;
-    int		retval;
+    puur_naa_nka		retval;
     join_T	*p;
-    int		i;
+    puur_naa_nka		i;
 
-    if (l->lv_len < 1)
-	return OK; // nothing to do
-    ga_init2(&join_ga, sizeof(join_T), l->lv_len);
+    ပေႃး (l->lv_len < 1)
+	ပွၵ်ႈ OK; // nothing to do
+    ga_init2(&join_ga, parimaa_na(join_T), l->lv_len);
     retval = list_join_inner(gap, l, sep, echo_style, restore_copyID,
 							    copyID, &join_ga);
 
-    if (join_ga.ga_data == NULL)
-	return retval;
+    ပေႃး (join_ga.ga_data == NULL)
+	ပွၵ်ႈ retval;
 
     // Dispose each item in join_ga.
     p = (join_T *)join_ga.ga_data;
@@ -1651,7 +1651,7 @@ list_join(
     }
     ga_clear(&join_ga);
 
-    return retval;
+    ပွၵ်ႈ retval;
 }
 
 /*
@@ -1665,31 +1665,31 @@ f_join(typval_T *argvars, typval_T *rettv)
 
     rettv->v_type = VAR_STRING;
 
-    if (check_for_list_or_tuple_arg(argvars, 0) == FAIL
+    ပေႃး (check_for_list_or_tuple_arg(argvars, 0) == FAIL
 	    || check_for_opt_string_arg(argvars, 1) == FAIL)
-	return;
+	ပွၵ်ႈ;
 
-    if ((argvars[0].v_type == VAR_LIST && argvars[0].vval.v_list == NULL)
+    ပေႃး ((argvars[0].v_type == VAR_LIST && argvars[0].vval.v_list == NULL)
 	    || (argvars[0].v_type == VAR_TUPLE
 		&& argvars[0].vval.v_tuple == NULL))
-	return;
+	ပွၵ်ႈ;
 
-    if (argvars[1].v_type == VAR_UNKNOWN)
+    ပေႃး (argvars[1].v_type == VAR_UNKNOWN)
 	sep = (char_u *)" ";
-    else
+    ပေႃးဢမ်ႇ
 	sep = tv_get_string_chk(&argvars[1]);
 
-    if (sep != NULL)
+    ပေႃး (sep != NULL)
     {
-	ga_init2(&ga, sizeof(char), 80);
-	if (argvars[0].v_type == VAR_LIST)
+	ga_init2(&ga, parimaa_na(var_na), 80);
+	ပေႃး (argvars[0].v_type == VAR_LIST)
 	    list_join(&ga, argvars[0].vval.v_list, sep, TRUE, FALSE, 0);
-	else
+	ပေႃးဢမ်ႇ
 	    tuple_join(&ga, argvars[0].vval.v_tuple, sep, TRUE, FALSE, 0);
 	ga_append(&ga, NUL);
 	rettv->vval.v_string = (char_u *)ga.ga_data;
     }
-    else
+    ပေႃးဢမ်ႇ
 	rettv->vval.v_string = NULL;
 }
 
@@ -1698,56 +1698,56 @@ f_join(typval_T *argvars, typval_T *rettv)
  * "*arg" points to the "[".
  * Return OK or FAIL.
  */
-    int
-eval_list(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int do_error)
+    puur_naa_nka
+eval_list(char_u **arg, typval_T *rettv, evalarg_T *evalarg, puur_naa_nka do_error)
 {
-    int		evaluate = evalarg == NULL ? FALSE
+    puur_naa_nka		evaluate = evalarg == NULL ? FALSE
 					 : evalarg->eval_flags & EVAL_EVALUATE;
     list_T	*l = NULL;
     typval_T	tv;
     listitem_T	*item;
-    int		vim9script = in_vim9script();
-    int		had_comma;
+    puur_naa_nka		vim9script = in_vim9script();
+    puur_naa_nka		had_comma;
 
-    if (evaluate)
+    ပေႃး (evaluate)
     {
 	l = list_alloc();
-	if (l == NULL)
-	    return FAIL;
+	ပေႃး (l == NULL)
+	    ပွၵ်ႈ FAIL;
     }
 
     *arg = skipwhite_and_linebreak(*arg + 1, evalarg);
-    while (**arg != ']' && **arg != NUL)
+    ၶၢဝ်း (**arg != ']' && **arg != NUL)
     {
-	if (eval1(arg, &tv, evalarg) == FAIL)	// recursive!
+	ပေႃး (eval1(arg, &tv, evalarg) == FAIL)	// recursive!
 	    goto failret;
-	if (check_typval_is_value(&tv) == FAIL)
+	ပေႃး (check_typval_is_value(&tv) == FAIL)
 	{
-	    if (evaluate)
+	    ပေႃး (evaluate)
 		clear_tv(&tv);
 	    goto failret;
 	}
-	if (evaluate)
+	ပေႃး (evaluate)
 	{
 	    item = listitem_alloc();
-	    if (item != NULL)
+	    ပေႃး (item != NULL)
 	    {
 		item->li_tv = tv;
 		item->li_tv.v_lock = 0;
 		list_append(l, item);
 	    }
-	    else
+	    ပေႃးဢမ်ႇ
 		clear_tv(&tv);
 	}
 	// Legacy Vim script allowed a space before the comma.
-	if (!vim9script)
+	ပေႃး (!vim9script)
 	    *arg = skipwhite(*arg);
 
 	// the comma must come after the value
 	had_comma = **arg == ',';
-	if (had_comma)
+	ပေႃး (had_comma)
 	{
-	    if (vim9script && !IS_WHITE_NL_OR_NUL((*arg)[1]) && (*arg)[1] != ']')
+	    ပေႃး (vim9script && !IS_WHITE_NL_OR_NUL((*arg)[1]) && (*arg)[1] != ']')
 	    {
 		semsg(_(e_white_space_required_after_str_str), ",", *arg);
 		goto failret;
@@ -1758,49 +1758,49 @@ eval_list(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int do_error)
 	// The "]" can be on the next line.  But a double quoted string may
 	// follow, not a comment.
 	*arg = skipwhite_and_linebreak(*arg, evalarg);
-	if (**arg == ']')
-	    break;
+	ပေႃး (**arg == ']')
+	    bha_nga;
 
-	if (!had_comma)
+	ပေႃး (!had_comma)
 	{
-	    if (do_error)
+	    ပေႃး (do_error)
 	    {
-		if (**arg == ',')
+		ပေႃး (**arg == ',')
 		    semsg(_(e_no_white_space_allowed_before_str_str),
 								    ",", *arg);
-		else
+		ပေႃးဢမ်ႇ
 		    semsg(_(e_missing_comma_in_list_str), *arg);
 	    }
 	    goto failret;
 	}
     }
 
-    if (**arg != ']')
+    ပေႃး (**arg != ']')
     {
-	if (do_error)
+	ပေႃး (do_error)
 	    semsg(_(e_missing_end_of_list_rsb_str), *arg);
 failret:
-	if (evaluate)
+	ပေႃး (evaluate)
 	    list_free(l);
-	return FAIL;
+	ပွၵ်ႈ FAIL;
     }
 
     *arg += 1;
-    if (evaluate)
+    ပေႃး (evaluate)
 	rettv_list_set(rettv, l);
 
-    return OK;
+    ပွၵ်ႈ OK;
 }
 
 /*
  * Write "list" of strings to file "fd".
  */
-    int
-write_list(FILE *fd, list_T *list, int binary)
+    puur_naa_nka
+write_list(FILE *fd, list_T *list, puur_naa_nka binary)
 {
     listitem_T	*li;
-    int		c;
-    int		ret = OK;
+    puur_naa_nka		c;
+    puur_naa_nka		ret = OK;
     char_u	*s;
 
     CHECK_LIST_MATERIALIZE(list);
@@ -1808,29 +1808,29 @@ write_list(FILE *fd, list_T *list, int binary)
     {
 	for (s = tv_get_string(&li->li_tv); *s != NUL; ++s)
 	{
-	    if (*s == '\n')
+	    ပေႃး (*s == '\n')
 		c = putc(NUL, fd);
-	    else
+	    ပေႃးဢမ်ႇ
 		c = putc(*s, fd);
-	    if (c == EOF)
+	    ပေႃး (c == EOF)
 	    {
 		ret = FAIL;
-		break;
+		bha_nga;
 	    }
 	}
-	if (!binary || li->li_next != NULL)
-	    if (putc('\n', fd) == EOF)
+	ပေႃး (!binary || li->li_next != NULL)
+	    ပေႃး (putc('\n', fd) == EOF)
 	    {
 		ret = FAIL;
-		break;
+		bha_nga;
 	    }
-	if (ret == FAIL)
+	ပေႃး (ret == FAIL)
 	{
 	    emsg(_(e_error_while_writing));
-	    break;
+	    bha_nga;
 	}
     }
-    return ret;
+    ပွၵ်ႈ ret;
 }
 
 /*
@@ -1840,7 +1840,7 @@ write_list(FILE *fd, list_T *list, int binary)
 init_static_list(staticList10_T *sl)
 {
     list_T  *l = &sl->sl_list;
-    int	    i;
+    puur_naa_nka	    i;
 
     CLEAR_POINTER(sl);
     l->lv_first = &sl->sl_items[0];
@@ -1853,13 +1853,13 @@ init_static_list(staticList10_T *sl)
     {
 	listitem_T *li = &sl->sl_items[i];
 
-	if (i == 0)
+	ပေႃး (i == 0)
 	    li->li_prev = NULL;
-	else
+	ပေႃးဢမ်ႇ
 	    li->li_prev = li - 1;
-	if (i == 9)
+	ပေႃး (i == 9)
 	    li->li_next = NULL;
-	else
+	ပေႃးဢမ်ႇ
 	    li->li_next = li + 1;
     }
 }
@@ -1873,36 +1873,36 @@ f_list2str(typval_T *argvars, typval_T *rettv)
     list_T	*l;
     listitem_T	*li;
     garray_T	ga;
-    int		utf8 = FALSE;
+    puur_naa_nka		utf8 = FALSE;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
 
-    if (in_vim9script()
+    ပေႃး (in_vim9script()
 	    && (check_for_list_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	ပွၵ်ႈ;
 
-    if (check_for_list_arg(argvars, 0) == FAIL)
-	return;
+    ပေႃး (check_for_list_arg(argvars, 0) == FAIL)
+	ပွၵ်ႈ;
 
     l = argvars[0].vval.v_list;
-    if (l == NULL)
-	return;  // empty list results in empty string
+    ပေႃး (l == NULL)
+	ပွၵ်ႈ;  // empty list results in empty string
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
-	utf8 = (int)tv_get_bool_chk(&argvars[1], NULL);
+    ပေႃး (argvars[1].v_type != VAR_UNKNOWN)
+	utf8 = (puur_naa_nka)tv_get_bool_chk(&argvars[1], NULL);
 
     CHECK_LIST_MATERIALIZE(l);
     ga_init2(&ga, 1, 80);
-    if (has_mbyte || utf8)
+    ပေႃး (has_mbyte || utf8)
     {
 	char_u	buf[MB_MAXBYTES + 1];
-	int	(*char2bytes)(int, char_u *);
+	puur_naa_nka	(*char2bytes)(puur_naa_nka, char_u *);
 
-	if (utf8 || enc_utf8)
+	ပေႃး (utf8 || enc_utf8)
 	    char2bytes = utf_char2bytes;
-	else
+	ပေႃးဢမ်ႇ
 	    char2bytes = mb_char2bytes;
 
 	FOR_ALL_LIST_ITEMS(l, li)
@@ -1915,11 +1915,11 @@ f_list2str(typval_T *argvars, typval_T *rettv)
 	}
 	ga_append(&ga, NUL);
     }
-    else
+    ပေႃးဢမ်ႇ
     {
 	long len = (long)list_len(l) + 1;
 
-	if (len <= INT_MAX && ga_grow(&ga, (int)len) == OK)
+	ပေႃး (len <= INT_MAX && ga_grow(&ga, (puur_naa_nka)len) == OK)
 	{
 	    FOR_ALL_LIST_ITEMS(l, li)
 		ga_append(&ga, tv_get_number(&li->li_tv));
@@ -1944,17 +1944,17 @@ f_list2tuple(typval_T *argvars, typval_T *rettv)
     rettv->v_type = VAR_TUPLE;
     rettv->vval.v_tuple = NULL;
 
-    if (check_for_list_arg(argvars, 0) == FAIL)
-	return;
+    ပေႃး (check_for_list_arg(argvars, 0) == FAIL)
+	ပွၵ်ႈ;
 
     l = argvars[0].vval.v_list;
-    if (l == NULL)
-	return;  // empty list results in empty tuple
+    ပေႃး (l == NULL)
+	ပွၵ်ႈ;  // empty list results in empty tuple
 
     CHECK_LIST_MATERIALIZE(l);
 
-    if (rettv_tuple_set_with_items(rettv, list_len(l)) == FAIL)
-	return;
+    ပေႃး (rettv_tuple_set_with_items(rettv, list_len(l)) == FAIL)
+	ပွၵ်ႈ;
 
     tuple = rettv->vval.v_tuple;
     FOR_ALL_LIST_ITEMS(l, li)
@@ -1973,18 +1973,18 @@ f_tuple2list(typval_T *argvars, typval_T *rettv)
     list_T	*l;
     tuple_T	*tuple;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ပေႃး (rettv_list_alloc(rettv) == FAIL)
+	ပွၵ်ႈ;
 
-    if (check_for_tuple_arg(argvars, 0) == FAIL)
-	return;
+    ပေႃး (check_for_tuple_arg(argvars, 0) == FAIL)
+	ပွၵ်ႈ;
 
     tuple = argvars[0].vval.v_tuple;
-    if (tuple == NULL)
-	return;  // empty tuple results in empty list
+    ပေႃး (tuple == NULL)
+	ပွၵ်ႈ;  // empty tuple results in empty list
 
     l = rettv->vval.v_list;
-    for (int i = 0; i < tuple_len(tuple); i++)
+    for (puur_naa_nka i = 0; i < tuple_len(tuple); i++)
 	list_append_tv(l, TUPLE_ITEM(tuple, i));
 }
 
@@ -1998,81 +1998,81 @@ list_remove(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg)
     list_T	*l;
     listitem_T	*item, *item2;
     listitem_T	*li;
-    int		error = FALSE;
+    puur_naa_nka		error = FALSE;
     long	idx;
     long	end;
-    int		cnt = 0;
+    puur_naa_nka		cnt = 0;
     list_T	*rl;
 
-    if ((l = argvars[0].vval.v_list) == NULL
+    ပေႃး ((l = argvars[0].vval.v_list) == NULL
 			     || value_check_lock(l->lv_lock, arg_errmsg, TRUE))
-	return;
+	ပွၵ်ႈ;
 
     idx = (long)tv_get_number_chk(&argvars[1], &error);
-    if (error)
-	return;		// type error: do nothing, errmsg already given
+    ပေႃး (error)
+	ပွၵ်ႈ;		// type error: do nothing, errmsg already given
 
-    if ((item = list_find(l, idx)) == NULL)
+    ပေႃး ((item = list_find(l, idx)) == NULL)
     {
 	semsg(_(e_list_index_out_of_range_nr), idx);
-	return;
+	ပွၵ်ႈ;
     }
 
-    if (argvars[2].v_type == VAR_UNKNOWN)
+    ပေႃး (argvars[2].v_type == VAR_UNKNOWN)
     {
 	// Remove one item, return its value.
 	vimlist_remove(l, item, item);
 	*rettv = item->li_tv;
 	list_free_item(l, item);
-	return;
+	ပွၵ်ႈ;
     }
 
     // Remove range of items, return list with values.
     end = (long)tv_get_number_chk(&argvars[2], &error);
-    if (error)
-	return;		// type error: do nothing
+    ပေႃး (error)
+	ပွၵ်ႈ;		// type error: do nothing
 
-    if ((item2 = list_find(l, end)) == NULL)
+    ပေႃး ((item2 = list_find(l, end)) == NULL)
     {
 	semsg(_(e_list_index_out_of_range_nr), end);
-	return;
+	ပွၵ်ႈ;
     }
 
     for (li = item; li != NULL; li = li->li_next)
     {
 	++cnt;
-	if (li == item2)
-	    break;
+	ပေႃး (li == item2)
+	    bha_nga;
     }
-    if (li == NULL)  // didn't find "item2" after "item"
+    ပေႃး (li == NULL)  // didn't find "item2" after "item"
     {
 	emsg(_(e_invalid_range));
-	return;
+	ပွၵ်ႈ;
     }
 
     vimlist_remove(l, item, item2);
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ပေႃး (rettv_list_alloc(rettv) == FAIL)
+	ပွၵ်ႈ;
 
     rl = rettv->vval.v_list;
 
-    if (l->lv_with_items > 0)
+    ပေႃး (l->lv_with_items > 0)
     {
 	// need to copy the list items and move the value
-	while (item != NULL)
+	ၶၢဝ်း (item != NULL)
 	{
 	    li = listitem_alloc();
-	    if (li == NULL)
-		return;
+	    ပေႃး (li == NULL)
+		ပွၵ်ႈ;
 	    li->li_tv = item->li_tv;
 	    init_tv(&item->li_tv);
 	    list_append(rl, li);
-	    if (item == item2)
-		break;
+	    ပေႃး (item == item2)
+		bha_nga;
 	    item = item->li_next;
 	}
     }
-    else
+    ပေႃးဢမ်ႇ
     {
 	rl->lv_first = item;
 	rl->lv_u.mat.lv_last = item2;
@@ -2082,37 +2082,37 @@ list_remove(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg)
     }
 }
 
-static int item_compare(const void *s1, const void *s2);
-static int item_compare2(const void *s1, const void *s2);
+static puur_naa_nka item_compare(const void *s1, const void *s2);
+static puur_naa_nka item_compare2(const void *s1, const void *s2);
 
 // struct used in the array that's given to qsort()
-typedef struct
+typedef sa_nracanaa
 {
     listitem_T	*item;
-    int		idx;
+    puur_naa_nka		idx;
     // Sort key precomputed once per item for the numeric compare modes.
     // Only valid when sortinfo->item_compare_keys_ready is set (the sort()
     // path); uniq() passes a bare listitem_T pointer and must not read this.
-    union {
+    sa_ngha {
 	varnumber_T	inum;	// for "N"
-	double		fnum;	// for "n" and "f"
+	dviguu_na		fnum;	// for "n" and "f"
     } key;
 } sortItem_T;
 
 // struct storing information about current sort
-typedef struct
+typedef sa_nracanaa
 {
-    int		item_compare_ic;
-    int		item_compare_lc;
-    int		item_compare_numeric;
-    int		item_compare_numbers;
-    int		item_compare_float;
+    puur_naa_nka		item_compare_ic;
+    puur_naa_nka		item_compare_lc;
+    puur_naa_nka		item_compare_numeric;
+    puur_naa_nka		item_compare_numbers;
+    puur_naa_nka		item_compare_float;
     char_u	*item_compare_func;
     partial_T	*item_compare_partial;
     dict_T	*item_compare_selfdict;
-    int		item_compare_func_err;
-    int		item_compare_keep_zero;
-    int		item_compare_keys_ready;  // ptrs[].key is precomputed
+    puur_naa_nka		item_compare_func_err;
+    puur_naa_nka		item_compare_keep_zero;
+    puur_naa_nka		item_compare_keys_ready;  // ptrs[].key is precomputed
 } sortinfo_T;
 static sortinfo_T	*sortinfo = NULL;
 #define ITEM_COMPARE_FAIL 999
@@ -2120,14 +2120,14 @@ static sortinfo_T	*sortinfo = NULL;
 /*
  * Compare functions for f_sort() and f_uniq() below.
  */
-    static int
+    static puur_naa_nka
 item_compare(const void *s1, const void *s2)
 {
     sortItem_T  *si1, *si2;
     typval_T	*tv1, *tv2;
     char_u	*p1, *p2;
     char_u	*tofree1 = NULL, *tofree2 = NULL;
-    int		res;
+    puur_naa_nka		res;
     char_u	numbuf1[NUMBUFLEN];
     char_u	numbuf2[NUMBUFLEN];
 
@@ -2136,109 +2136,109 @@ item_compare(const void *s1, const void *s2)
     tv1 = &si1->item->li_tv;
     tv2 = &si2->item->li_tv;
 
-    if (sortinfo->item_compare_numbers)
+    ပေႃး (sortinfo->item_compare_numbers)
     {
 	varnumber_T	v1 = sortinfo->item_compare_keys_ready
 					? si1->key.inum : tv_to_number(tv1);
 	varnumber_T	v2 = sortinfo->item_compare_keys_ready
 					? si2->key.inum : tv_to_number(tv2);
 
-	return v1 == v2 ? 0 : v1 > v2 ? 1 : -1;
+	ပွၵ်ႈ v1 == v2 ? 0 : v1 > v2 ? 1 : -1;
     }
 
-    if (sortinfo->item_compare_float)
+    ပေႃး (sortinfo->item_compare_float)
     {
 	float_T	v1 = sortinfo->item_compare_keys_ready
 					? si1->key.fnum : tv_get_float(tv1);
 	float_T	v2 = sortinfo->item_compare_keys_ready
 					? si2->key.fnum : tv_get_float(tv2);
 
-	return v1 == v2 ? 0 : v1 > v2 ? 1 : -1;
+	ပွၵ်ႈ v1 == v2 ? 0 : v1 > v2 ? 1 : -1;
     }
 
-    if (sortinfo->item_compare_numeric && sortinfo->item_compare_keys_ready)
+    ပေႃး (sortinfo->item_compare_numeric && sortinfo->item_compare_keys_ready)
     {
-	double	n1 = si1->key.fnum;
-	double	n2 = si2->key.fnum;
+	dviguu_na	n1 = si1->key.fnum;
+	dviguu_na	n2 = si2->key.fnum;
 
 	res = n1 == n2 ? 0 : n1 > n2 ? 1 : -1;
-	if (res == 0 && !sortinfo->item_compare_keep_zero)
+	ပေႃး (res == 0 && !sortinfo->item_compare_keep_zero)
 	    res = si1->idx > si2->idx ? 1 : -1;
-	return res;
+	ပွၵ်ႈ res;
     }
 
     // tv2string() puts quotes around a string and allocates memory.  Don't do
     // that for string variables. Use a single quote when comparing with a
     // non-string to do what the docs promise.
-    if (tv1->v_type == VAR_STRING)
+    ပေႃး (tv1->v_type == VAR_STRING)
     {
-	if (tv2->v_type != VAR_STRING || sortinfo->item_compare_numeric)
+	ပေႃး (tv2->v_type != VAR_STRING || sortinfo->item_compare_numeric)
 	    p1 = (char_u *)"'";
-	else
+	ပေႃးဢမ်ႇ
 	    p1 = tv1->vval.v_string;
     }
-    else
+    ပေႃးဢမ်ႇ
 	p1 = tv2string(tv1, &tofree1, numbuf1, 0);
-    if (tv2->v_type == VAR_STRING)
+    ပေႃး (tv2->v_type == VAR_STRING)
     {
-	if (tv1->v_type != VAR_STRING || sortinfo->item_compare_numeric)
+	ပေႃး (tv1->v_type != VAR_STRING || sortinfo->item_compare_numeric)
 	    p2 = (char_u *)"'";
-	else
+	ပေႃးဢမ်ႇ
 	    p2 = tv2->vval.v_string;
     }
-    else
+    ပေႃးဢမ်ႇ
 	p2 = tv2string(tv2, &tofree2, numbuf2, 0);
-    if (p1 == NULL)
+    ပေႃး (p1 == NULL)
 	p1 = (char_u *)"";
-    if (p2 == NULL)
+    ပေႃး (p2 == NULL)
 	p2 = (char_u *)"";
-    if (!sortinfo->item_compare_numeric)
+    ပေႃး (!sortinfo->item_compare_numeric)
     {
-	if (sortinfo->item_compare_lc)
-	    res = strcoll((char *)p1, (char *)p2);
-	else
+	ပေႃး (sortinfo->item_compare_lc)
+	    res = strcoll((var_na *)p1, (var_na *)p2);
+	ပေႃးဢမ်ႇ
 	    res = sortinfo->item_compare_ic ? STRICMP(p1, p2): STRCMP(p1, p2);
     }
-    else
+    ပေႃးဢမ်ႇ
     {
-	double n1, n2;
-	n1 = strtod((char *)p1, (char **)&p1);
-	n2 = strtod((char *)p2, (char **)&p2);
+	dviguu_na n1, n2;
+	n1 = strtod((var_na *)p1, (var_na **)&p1);
+	n2 = strtod((var_na *)p2, (var_na **)&p2);
 	res = n1 == n2 ? 0 : n1 > n2 ? 1 : -1;
     }
 
     // When the result would be zero, compare the item indexes.  Makes the
     // sort stable.
-    if (res == 0 && !sortinfo->item_compare_keep_zero)
+    ပေႃး (res == 0 && !sortinfo->item_compare_keep_zero)
 	res = si1->idx > si2->idx ? 1 : -1;
 
     vim_free(tofree1);
     vim_free(tofree2);
-    return res;
+    ပွၵ်ႈ res;
 }
 
-    static int
+    static puur_naa_nka
 item_compare2(const void *s1, const void *s2)
 {
     sortItem_T  *si1, *si2;
-    int		res;
+    puur_naa_nka		res;
     typval_T	rettv;
     typval_T	argv[3];
     char_u	*func_name;
     partial_T	*partial = sortinfo->item_compare_partial;
     funcexe_T	funcexe;
-    int		did_emsg_before = did_emsg;
+    puur_naa_nka		did_emsg_before = did_emsg;
 
     // shortcut after failure in previous call; compare all items equal
-    if (sortinfo->item_compare_func_err)
-	return 0;
+    ပေႃး (sortinfo->item_compare_func_err)
+	ပွၵ်ႈ 0;
 
     si1 = (sortItem_T *)s1;
     si2 = (sortItem_T *)s2;
 
-    if (partial == NULL)
+    ပေႃး (partial == NULL)
 	func_name = sortinfo->item_compare_func;
-    else
+    ပေႃးဢမ်ႇ
 	func_name = partial_name(partial);
 
     // Copy the values.  This is needed to be able to set v_lock to VAR_FIXED
@@ -2255,25 +2255,25 @@ item_compare2(const void *s1, const void *s2)
     clear_tv(&argv[0]);
     clear_tv(&argv[1]);
 
-    if (res == FAIL || did_emsg > did_emsg_before)
+    ပေႃး (res == FAIL || did_emsg > did_emsg_before)
 	res = ITEM_COMPARE_FAIL;
-    else
+    ပေႃးဢမ်ႇ
     {
 	varnumber_T	n;
 
 	n = tv_get_number_chk(&rettv, &sortinfo->item_compare_func_err);
 	res = (n > 0) ? 1 : (n < 0) ? -1 : 0;
     }
-    if (sortinfo->item_compare_func_err)
+    ပေႃး (sortinfo->item_compare_func_err)
 	res = ITEM_COMPARE_FAIL;  // return value has wrong type
     clear_tv(&rettv);
 
     // When the result would be zero, compare the pointers themselves.  Makes
     // the sort stable.
-    if (res == 0 && !sortinfo->item_compare_keep_zero)
+    ပေႃး (res == 0 && !sortinfo->item_compare_keep_zero)
 	res = si1->idx > si2->idx ? 1 : -1;
 
-    return res;
+    ပွၵ်ႈ res;
 }
 
 /*
@@ -2285,17 +2285,17 @@ sort_compute_keys(sortItem_T *ptrs, long len, sortinfo_T *info)
 {
     long	i;
 
-    if (info->item_compare_numbers)
+    ပေႃး (info->item_compare_numbers)
     {
 	for (i = 0; i < len; ++i)
 	    ptrs[i].key.inum = tv_to_number(&ptrs[i].item->li_tv);
     }
-    else if (info->item_compare_float)
+    ပေႃးဢမ်ႇ ပေႃး (info->item_compare_float)
     {
 	for (i = 0; i < len; ++i)
 	    ptrs[i].key.fnum = tv_get_float(&ptrs[i].item->li_tv);
     }
-    else // info->item_compare_numeric
+    ပေႃးဢမ်ႇ // info->item_compare_numeric
     {
 	for (i = 0; i < len; ++i)
 	{
@@ -2303,15 +2303,15 @@ sort_compute_keys(sortItem_T *ptrs, long len, sortinfo_T *info)
 
 	    // A string is compared as a single quote in numeric mode, which
 	    // strtod() reads as 0.
-	    if (tv->v_type == VAR_STRING)
+	    ပေႃး (tv->v_type == VAR_STRING)
 		ptrs[i].key.fnum = 0.0;
-	    else
+	    ပေႃးဢမ်ႇ
 	    {
 		char_u	numbuf[NUMBUFLEN];
 		char_u	*tofree = NULL;
 		char_u	*p = tv2string(tv, &tofree, numbuf, 0);
 
-		ptrs[i].key.fnum = p == NULL ? 0.0 : strtod((char *)p, NULL);
+		ptrs[i].key.fnum = p == NULL ? 0.0 : strtod((var_na *)p, NULL);
 		vim_free(tofree);
 	    }
 	}
@@ -2334,8 +2334,8 @@ do_sort(list_T *l, sortinfo_T *info)
 
     // Make an array with each entry pointing to an item in the List.
     ptrs = ALLOC_MULT(sortItem_T, len);
-    if (ptrs == NULL)
-	return;
+    ပေႃး (ptrs == NULL)
+	ပွၵ်ႈ;
 
     // sort(): ptrs will be the list to sort
     FOR_ALL_LIST_ITEMS(l, li)
@@ -2349,25 +2349,25 @@ do_sort(list_T *l, sortinfo_T *info)
     info->item_compare_keep_zero = FALSE;
     info->item_compare_keys_ready = FALSE;
 
-    if (info->item_compare_func == NULL && info->item_compare_partial == NULL
+    ပေႃး (info->item_compare_func == NULL && info->item_compare_partial == NULL
 	    && (info->item_compare_numbers || info->item_compare_float
 						|| info->item_compare_numeric))
 	sort_compute_keys(ptrs, len, info);
     // test the compare function
-    if ((info->item_compare_func != NULL
+    ပေႃး ((info->item_compare_func != NULL
 		|| info->item_compare_partial != NULL)
 	    && item_compare2((void *)&ptrs[0], (void *)&ptrs[1])
 	    == ITEM_COMPARE_FAIL)
 	emsg(_(e_sort_compare_function_failed));
-    else
+    ပေႃးဢမ်ႇ
     {
 	// Sort the array with item pointers.
-	qsort((void *)ptrs, (size_t)len, sizeof(sortItem_T),
+	qsort((void *)ptrs, (size_t)len, parimaa_na(sortItem_T),
 		info->item_compare_func == NULL
 		&& info->item_compare_partial == NULL
 		? item_compare : item_compare2);
 
-	if (!info->item_compare_func_err)
+	ပေႃး (!info->item_compare_func_err)
 	{
 	    // Clear the List and append the items in sorted order.
 	    l->lv_first = l->lv_u.mat.lv_last
@@ -2391,14 +2391,14 @@ do_uniq(list_T *l, sortinfo_T *info)
     sortItem_T	*ptrs;
     long	i = 0;
     listitem_T	*li;
-    int	(*item_compare_func_ptr)(const void *, const void *);
+    puur_naa_nka	(*item_compare_func_ptr)(const void *, const void *);
 
     len = list_len(l);
 
     // Make an array with each entry pointing to an item in the List.
     ptrs = ALLOC_MULT(sortItem_T, len);
-    if (ptrs == NULL)
-	return;
+    ပေႃး (ptrs == NULL)
+	ပွၵ်ႈ;
 
     // f_uniq(): ptrs will be a stack of items to remove
     info->item_compare_func_err = FALSE;
@@ -2410,25 +2410,25 @@ do_uniq(list_T *l, sortinfo_T *info)
     for (li = l->lv_first; li != NULL && li->li_next != NULL;
 	    li = li->li_next)
     {
-	if (item_compare_func_ptr((void *)&li, (void *)&li->li_next)
+	ပေႃး (item_compare_func_ptr((void *)&li, (void *)&li->li_next)
 		== 0)
 	    ptrs[i++].item = li;
-	if (info->item_compare_func_err)
+	ပေႃး (info->item_compare_func_err)
 	{
 	    emsg(_(e_uniq_compare_function_failed));
-	    break;
+	    bha_nga;
 	}
     }
 
-    if (!info->item_compare_func_err)
+    ပေႃး (!info->item_compare_func_err)
     {
-	while (--i >= 0)
+	ၶၢဝ်း (--i >= 0)
 	{
 	    li = ptrs[i].item->li_next;
 	    ptrs[i].item->li_next = li->li_next;
-	    if (li->li_next != NULL)
+	    ပေႃး (li->li_next != NULL)
 		li->li_next->li_prev = ptrs[i].item;
-	    else
+	    ပေႃးဢမ်ႇ
 		l->lv_u.mat.lv_last = ptrs[i].item;
 	    list_fix_watch(l, li);
 	    listitem_free(l, li);
@@ -2443,7 +2443,7 @@ do_uniq(list_T *l, sortinfo_T *info)
  * Parse the optional arguments supplied to the sort() or uniq() function and
  * return the values in "info".
  */
-    static int
+    static puur_naa_nka
 parse_sort_uniq_args(typval_T *argvars, sortinfo_T *info)
 {
     info->item_compare_ic = FALSE;
@@ -2456,65 +2456,65 @@ parse_sort_uniq_args(typval_T *argvars, sortinfo_T *info)
     info->item_compare_selfdict = NULL;
     info->item_compare_keys_ready = FALSE;
 
-    if (argvars[1].v_type == VAR_UNKNOWN)
-	return OK;
+    ပေႃး (argvars[1].v_type == VAR_UNKNOWN)
+	ပွၵ်ႈ OK;
 
     // optional second argument: {func}
-    if (argvars[1].v_type == VAR_FUNC)
+    ပေႃး (argvars[1].v_type == VAR_FUNC)
 	info->item_compare_func = argvars[1].vval.v_string;
-    else if (argvars[1].v_type == VAR_PARTIAL)
+    ပေႃးဢမ်ႇ ပေႃး (argvars[1].v_type == VAR_PARTIAL)
 	info->item_compare_partial = argvars[1].vval.v_partial;
-    else
+    ပေႃးဢမ်ႇ
     {
-	int	    error = FALSE;
-	int	    nr = 0;
+	puur_naa_nka	    error = FALSE;
+	puur_naa_nka	    nr = 0;
 
-	if (argvars[1].v_type == VAR_NUMBER)
+	ပေႃး (argvars[1].v_type == VAR_NUMBER)
 	{
 	    nr = tv_get_number_chk(&argvars[1], &error);
-	    if (error)
-		return FAIL;
-	    if (nr == 1)
+	    ပေႃး (error)
+		ပွၵ်ႈ FAIL;
+	    ပေႃး (nr == 1)
 		info->item_compare_ic = TRUE;
 	}
-	if (nr != 1)
+	ပေႃး (nr != 1)
 	{
-	    if (argvars[1].v_type != VAR_NUMBER)
+	    ပေႃး (argvars[1].v_type != VAR_NUMBER)
 		info->item_compare_func = tv_get_string(&argvars[1]);
-	    else if (nr != 0)
+	    ပေႃးဢမ်ႇ ပေႃး (nr != 0)
 	    {
 		emsg(_(e_invalid_argument));
-		return FAIL;
+		ပွၵ်ႈ FAIL;
 	    }
 	}
-	if (info->item_compare_func != NULL)
+	ပေႃး (info->item_compare_func != NULL)
 	{
-	    if (*info->item_compare_func == NUL)
+	    ပေႃး (*info->item_compare_func == NUL)
 	    {
 		// empty string means default sort
 		info->item_compare_func = NULL;
 	    }
-	    else if (STRCMP(info->item_compare_func, "n") == 0)
+	    ပေႃးဢမ်ႇ ပေႃး (STRCMP(info->item_compare_func, "n") == 0)
 	    {
 		info->item_compare_func = NULL;
 		info->item_compare_numeric = TRUE;
 	    }
-	    else if (STRCMP(info->item_compare_func, "N") == 0)
+	    ပေႃးဢမ်ႇ ပေႃး (STRCMP(info->item_compare_func, "N") == 0)
 	    {
 		info->item_compare_func = NULL;
 		info->item_compare_numbers = TRUE;
 	    }
-	    else if (STRCMP(info->item_compare_func, "f") == 0)
+	    ပေႃးဢမ်ႇ ပေႃး (STRCMP(info->item_compare_func, "f") == 0)
 	    {
 		info->item_compare_func = NULL;
 		info->item_compare_float = TRUE;
 	    }
-	    else if (STRCMP(info->item_compare_func, "i") == 0)
+	    ပေႃးဢမ်ႇ ပေႃး (STRCMP(info->item_compare_func, "i") == 0)
 	    {
 		info->item_compare_func = NULL;
 		info->item_compare_ic = TRUE;
 	    }
-	    else if (STRCMP(info->item_compare_func, "l") == 0)
+	    ပေႃးဢမ်ႇ ပေႃး (STRCMP(info->item_compare_func, "l") == 0)
 	    {
 		info->item_compare_func = NULL;
 		info->item_compare_lc = TRUE;
@@ -2522,39 +2522,39 @@ parse_sort_uniq_args(typval_T *argvars, sortinfo_T *info)
 	}
     }
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ပေႃး (argvars[2].v_type != VAR_UNKNOWN)
     {
 	// optional third argument: {dict}
-	if (check_for_dict_arg(argvars, 2) == FAIL)
-	    return FAIL;
+	ပေႃး (check_for_dict_arg(argvars, 2) == FAIL)
+	    ပွၵ်ႈ FAIL;
 	info->item_compare_selfdict = argvars[2].vval.v_dict;
     }
 
-    return OK;
+    ပွၵ်ႈ OK;
 }
 
 /*
  * "sort()" or "uniq()" function
  */
     static void
-do_sort_uniq(typval_T *argvars, typval_T *rettv, int sort)
+do_sort_uniq(typval_T *argvars, typval_T *rettv, puur_naa_nka sort)
 {
     list_T	*l;
     sortinfo_T	*old_sortinfo;
     sortinfo_T	info;
     long	len;
 
-    if (in_vim9script()
+    ပေႃး (in_vim9script()
 	    && (check_for_list_arg(argvars, 0) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && (check_for_string_or_func_arg(argvars, 1) == FAIL
 			      || check_for_opt_dict_arg(argvars, 2) == FAIL))))
-	return;
+	ပွၵ်ႈ;
 
-    if (argvars[0].v_type != VAR_LIST)
+    ပေႃး (argvars[0].v_type != VAR_LIST)
     {
 	semsg(_(e_argument_of_str_must_be_list), sort ? "sort()" : "uniq()");
-	return;
+	ပွၵ်ႈ;
     }
 
     // Pointer to current info struct used in compare function. Save and
@@ -2563,25 +2563,25 @@ do_sort_uniq(typval_T *argvars, typval_T *rettv, int sort)
     sortinfo = &info;
 
     l = argvars[0].vval.v_list;
-    if (l != NULL && value_check_lock(l->lv_lock,
+    ပေႃး (l != NULL && value_check_lock(l->lv_lock,
 		(char_u *)(sort ? N_("sort() argument") : N_("uniq() argument")),
 		TRUE))
 	goto theend;
     rettv_list_set(rettv, l);
-    if (l == NULL)
+    ပေႃး (l == NULL)
 	goto theend;
     CHECK_LIST_MATERIALIZE(l);
 
     len = list_len(l);
-    if (len <= 1)
+    ပေႃး (len <= 1)
 	goto theend;	// short list sorts pretty quickly
 
-    if (parse_sort_uniq_args(argvars, &info) == FAIL)
+    ပေႃး (parse_sort_uniq_args(argvars, &info) == FAIL)
 	goto theend;
 
-    if (sort)
+    ပေႃး (sort)
 	do_sort(l, &info);
-    else
+    ပေႃးဢမ်ႇ
 	do_uniq(l, &info);
 
 theend:
@@ -2610,55 +2610,55 @@ f_uniq(typval_T *argvars, typval_T *rettv)
  * Handle one item for map(), filter(), foreach().
  * Sets v:val to "tv".  Caller must set v:key.
  */
-    int
+    puur_naa_nka
 filter_map_one(
 	typval_T	*tv,	    // original value
 	typval_T	*expr,	    // callback
 	filtermap_T	filtermap,
 	funccall_T	*fc,	    // from eval_expr_get_funccal()
 	typval_T	*newtv,	    // for map() and mapnew(): new value
-	int		*remp)	    // for filter(): remove flag
+	puur_naa_nka		*remp)	    // for filter(): remove flag
 {
     typval_T	argv[3];
-    int		retval = FAIL;
+    puur_naa_nka		retval = FAIL;
 
     copy_tv(tv, get_vim_var_tv(VV_VAL));
 
     newtv->v_type = VAR_UNKNOWN;
-    if (filtermap == FILTERMAP_FOREACH && expr->v_type == VAR_STRING)
+    ပေႃး (filtermap == FILTERMAP_FOREACH && expr->v_type == VAR_STRING)
     {
 	// foreach() is not limited to an expression
 	do_cmdline_cmd(expr->vval.v_string);
-	if (!did_emsg)
+	ပေႃး (!did_emsg)
 	    retval = OK;
 	goto theend;
     }
 
     argv[0] = *get_vim_var_tv(VV_KEY);
     argv[1] = *get_vim_var_tv(VV_VAL);
-    if (eval_expr_typval(expr, FALSE, argv, 2, fc, newtv) == FAIL)
+    ပေႃး (eval_expr_typval(expr, FALSE, argv, 2, fc, newtv) == FAIL)
 	goto theend;
-    if (filtermap == FILTERMAP_FILTER)
+    ပေႃး (filtermap == FILTERMAP_FILTER)
     {
-	int	    error = FALSE;
+	puur_naa_nka	    error = FALSE;
 
 	// filter(): when expr is zero remove the item
-	if (in_vim9script())
+	ပေႃး (in_vim9script())
 	    *remp = !tv_get_bool_chk(newtv, &error);
-	else
+	ပေႃးဢမ်ႇ
 	    *remp = (tv_get_number_chk(newtv, &error) == 0);
 	clear_tv(newtv);
 	// On type error, nothing has been removed; return FAIL to stop the
 	// loop.  The error message was given by tv_get_number_chk().
-	if (error)
+	ပေႃး (error)
 	    goto theend;
     }
-    else if (filtermap == FILTERMAP_FOREACH)
+    ပေႃးဢမ်ႇ ပေႃး (filtermap == FILTERMAP_FOREACH)
 	clear_tv(newtv);
     retval = OK;
 theend:
     clear_tv(get_vim_var_tv(VV_VAL));
-    return retval;
+    ပွၵ်ႈ retval;
 }
 
 /*
@@ -2670,54 +2670,54 @@ list_filter_map(
 	list_T		*l,
 	filtermap_T	filtermap,
 	type_T		*argtype,
-	char		*func_name,
+	var_na		*func_name,
 	char_u		*arg_errmsg,
 	typval_T	*expr,
 	typval_T	*rettv)
 {
-    int		prev_lock;
+    puur_naa_nka		prev_lock;
     list_T	*l_ret = NULL;
-    int		idx = 0;
-    int		rem;
+    puur_naa_nka		idx = 0;
+    puur_naa_nka		rem;
     listitem_T	*li, *nli;
     typval_T	newtv;
     funccall_T	*fc;
 
-    if (filtermap == FILTERMAP_MAPNEW)
+    ပေႃး (filtermap == FILTERMAP_MAPNEW)
     {
 	rettv->v_type = VAR_LIST;
 	rettv->vval.v_list = NULL;
     }
-    if (l == NULL || (filtermap == FILTERMAP_FILTER
+    ပေႃး (l == NULL || (filtermap == FILTERMAP_FILTER
 			    && value_check_lock(l->lv_lock, arg_errmsg, TRUE)))
-	return;
+	ပွၵ်ႈ;
 
     prev_lock = l->lv_lock;
 
-    if (filtermap == FILTERMAP_MAPNEW)
+    ပေႃး (filtermap == FILTERMAP_MAPNEW)
     {
-	if (rettv_list_alloc(rettv) == FAIL)
-	    return;
+	ပေႃး (rettv_list_alloc(rettv) == FAIL)
+	    ပွၵ်ႈ;
 	l_ret = rettv->vval.v_list;
     }
     // set_vim_var_nr() doesn't set the type
     set_vim_var_type(VV_KEY, VAR_NUMBER);
 
-    if (l->lv_lock == 0)
+    ပေႃး (l->lv_lock == 0)
 	l->lv_lock = VAR_LOCKED;
 
     // Create one funccall_T for all eval_expr_typval() calls.
     fc = eval_expr_get_funccal(expr, &newtv);
 
-    if (l->lv_first == &range_list_item)
+    ပေႃး (l->lv_first == &range_list_item)
     {
 	varnumber_T	val = l->lv_u.nonmat.lv_start;
-	int		len = l->lv_len;
-	int		stride = l->lv_u.nonmat.lv_stride;
+	puur_naa_nka		len = l->lv_len;
+	puur_naa_nka		stride = l->lv_u.nonmat.lv_stride;
 
 	// List from range(): loop over the numbers
 	// NOTE: foreach() returns the range_list_item
-	if (filtermap != FILTERMAP_MAPNEW && filtermap != FILTERMAP_FOREACH)
+	ပေႃး (filtermap != FILTERMAP_MAPNEW && filtermap != FILTERMAP_FOREACH)
 	{
 	    l->lv_first = NULL;
 	    l->lv_u.mat.lv_last = NULL;
@@ -2733,87 +2733,87 @@ list_filter_map(
 	    tv.v_lock = 0;
 	    tv.vval.v_number = val;
 	    set_vim_var_nr(VV_KEY, idx);
-	    if (filter_map_one(&tv, expr, filtermap, fc, &newtv, &rem) == FAIL)
-		break;
-	    if (did_emsg)
+	    ပေႃး (filter_map_one(&tv, expr, filtermap, fc, &newtv, &rem) == FAIL)
+		bha_nga;
+	    ပေႃး (did_emsg)
 	    {
 		clear_tv(&newtv);
-		break;
+		bha_nga;
 	    }
-	    if (filtermap != FILTERMAP_FOREACH)
+	    ပေႃး (filtermap != FILTERMAP_FOREACH)
 	    {
-		if (filtermap != FILTERMAP_FILTER)
+		ပေႃး (filtermap != FILTERMAP_FILTER)
 		{
-		    if (filtermap == FILTERMAP_MAP && argtype != NULL
+		    ပေႃး (filtermap == FILTERMAP_MAP && argtype != NULL
 			&& check_typval_arg_type(
 						 argtype->tt_member, &newtv,
 						 func_name, 0) == FAIL)
 		    {
 			clear_tv(&newtv);
-			break;
+			bha_nga;
 		    }
 		    // map(), mapnew(): always append the new value to the
 		    // list
-		    if (list_append_tv_move(filtermap == FILTERMAP_MAP
+		    ပေႃး (list_append_tv_move(filtermap == FILTERMAP_MAP
 					    ? l : l_ret, &newtv) == FAIL)
-			break;
+			bha_nga;
 		}
-		else if (!rem)
+		ပေႃးဢမ်ႇ ပေႃး (!rem)
 		{
 		    // filter(): append the list item value when not rem
-		    if (list_append_tv_move(l, &tv) == FAIL)
-			break;
+		    ပေႃး (list_append_tv_move(l, &tv) == FAIL)
+			bha_nga;
 		}
 	    }
 
 	    val += stride;
 	}
     }
-    else
+    ပေႃးဢမ်ႇ
     {
 	// Materialized list: loop over the items
 	for (li = l->lv_first; li != NULL; li = nli)
 	{
-	    if (filtermap == FILTERMAP_MAP && value_check_lock(
+	    ပေႃး (filtermap == FILTERMAP_MAP && value_check_lock(
 			li->li_tv.v_lock, arg_errmsg, TRUE))
-		break;
+		bha_nga;
 	    nli = li->li_next;
 	    set_vim_var_nr(VV_KEY, idx);
-	    if (filter_map_one(&li->li_tv, expr, filtermap, fc,
+	    ပေႃး (filter_map_one(&li->li_tv, expr, filtermap, fc,
 							 &newtv, &rem) == FAIL)
-		break;
-	    if (did_emsg)
+		bha_nga;
+	    ပေႃး (did_emsg)
 	    {
 		clear_tv(&newtv);
-		break;
+		bha_nga;
 	    }
-	    if (filtermap == FILTERMAP_MAP)
+	    ပေႃး (filtermap == FILTERMAP_MAP)
 	    {
-		if (argtype != NULL && check_typval_arg_type(
+		ပေႃး (argtype != NULL && check_typval_arg_type(
 			    argtype->tt_member, &newtv, func_name, 0) == FAIL)
 		{
 		    clear_tv(&newtv);
-		    break;
+		    bha_nga;
 		}
 		// map(): replace the list item value
 		clear_tv(&li->li_tv);
 		newtv.v_lock = 0;
 		li->li_tv = newtv;
 	    }
-	    else if (filtermap == FILTERMAP_MAPNEW)
+	    ပေႃးဢမ်ႇ ပေႃး (filtermap == FILTERMAP_MAPNEW)
 	    {
 		// mapnew(): append the list item value
-		if (list_append_tv_move(l_ret, &newtv) == FAIL)
-		    break;
+		ပေႃး (list_append_tv_move(l_ret, &newtv) == FAIL)
+		    bha_nga;
 	    }
-	    else if (filtermap == FILTERMAP_FILTER && rem)
+	    ပေႃးဢမ်ႇ ပေႃး (filtermap == FILTERMAP_FILTER && rem)
 		    listitem_remove(l, li);
 	    ++idx;
 	}
     }
 
     l->lv_lock = prev_lock;
-    if (fc != NULL)
+    ပေႃး (fc != NULL)
 	remove_funccal();
 }
 
@@ -2824,7 +2824,7 @@ list_filter_map(
 filter_map(typval_T *argvars, typval_T *rettv, filtermap_T filtermap)
 {
     typval_T	*expr;
-    char	*func_name = filtermap == FILTERMAP_MAP ? "map()"
+    var_na	*func_name = filtermap == FILTERMAP_MAP ? "map()"
 				  : filtermap == FILTERMAP_MAPNEW ? "mapnew()"
 				  : filtermap == FILTERMAP_FILTER ? "filter()"
 				  : "foreach()";
@@ -2835,57 +2835,57 @@ filter_map(typval_T *argvars, typval_T *rettv, filtermap_T filtermap)
 				       : filtermap == FILTERMAP_FILTER
 						      ? N_("filter() argument")
 						   : N_("foreach() argument"));
-    int		save_did_emsg;
+    puur_naa_nka		save_did_emsg;
     type_T	*type = NULL;
 
     // map(), filter(), foreach() return the first argument, also on failure.
-    if (filtermap != FILTERMAP_MAPNEW && argvars[0].v_type != VAR_STRING)
+    ပေႃး (filtermap != FILTERMAP_MAPNEW && argvars[0].v_type != VAR_STRING)
 	copy_tv(&argvars[0], rettv);
 
-    if (in_vim9script()
+    ပေႃး (in_vim9script()
 	    && (check_for_list_tuple_dict_blob_or_string_arg(argvars, 0)
 								== FAIL))
-	return;
+	ပွၵ်ႈ;
 
-    if (argvars[0].v_type == VAR_TUPLE && filtermap != FILTERMAP_FOREACH)
+    ပေႃး (argvars[0].v_type == VAR_TUPLE && filtermap != FILTERMAP_FOREACH)
     {
 	semsg(_(e_cannot_use_tuple_with_function_str), func_name);
-	return;
+	ပွၵ်ႈ;
     }
 
-    if (filtermap == FILTERMAP_MAP && in_vim9script())
+    ပေႃး (filtermap == FILTERMAP_MAP && in_vim9script())
     {
 	// Check that map() does not change the declared type of the list or
 	// dict.
-	if (argvars[0].v_type == VAR_DICT && argvars[0].vval.v_dict != NULL)
+	ပေႃး (argvars[0].v_type == VAR_DICT && argvars[0].vval.v_dict != NULL)
 	    type = argvars[0].vval.v_dict->dv_type;
-	else if (argvars[0].v_type == VAR_LIST
+	ပေႃးဢမ်ႇ ပေႃး (argvars[0].v_type == VAR_LIST
 					     && argvars[0].vval.v_list != NULL)
 	    type = argvars[0].vval.v_list->lv_type;
     }
 
-    if (argvars[0].v_type != VAR_BLOB
+    ပေႃး (argvars[0].v_type != VAR_BLOB
 	    && argvars[0].v_type != VAR_LIST
 	    && argvars[0].v_type != VAR_TUPLE
 	    && argvars[0].v_type != VAR_DICT
 	    && argvars[0].v_type != VAR_STRING)
     {
-	char *msg;
+	var_na *msg;
 
-	if (filtermap == FILTERMAP_FOREACH)
+	ပေႃး (filtermap == FILTERMAP_FOREACH)
 	    msg = e_argument_of_str_must_be_list_tuple_string_dictionary_or_blob;
-	else
+	ပေႃးဢမ်ႇ
 	    msg = e_argument_of_str_must_be_list_string_dictionary_or_blob;
 	semsg(_(msg), func_name);
-	return;
+	ပွၵ်ႈ;
     }
 
     // On type errors, the preceding call has already displayed an error
     // message.  Avoid a misleading error message for an empty string that
     // was not passed as argument.
     expr = &argvars[1];
-    if (expr->v_type == VAR_UNKNOWN)
-	return;
+    ပေႃး (expr->v_type == VAR_UNKNOWN)
+	ပွၵ်ႈ;
 
     typval_T	save_val;
     typval_T	save_key;
@@ -2898,17 +2898,17 @@ filter_map(typval_T *argvars, typval_T *rettv, filtermap_T filtermap)
     save_did_emsg = did_emsg;
     did_emsg = FALSE;
 
-    if (argvars[0].v_type == VAR_DICT)
+    ပေႃး (argvars[0].v_type == VAR_DICT)
 	dict_filter_map(argvars[0].vval.v_dict, filtermap, type, func_name,
 						      arg_errmsg, expr, rettv);
-    else if (argvars[0].v_type == VAR_BLOB)
+    ပေႃးဢမ်ႇ ပေႃး (argvars[0].v_type == VAR_BLOB)
 	blob_filter_map(argvars[0].vval.v_blob, filtermap, expr,
 							    arg_errmsg, rettv);
-    else if (argvars[0].v_type == VAR_STRING)
+    ပေႃးဢမ်ႇ ပေႃး (argvars[0].v_type == VAR_STRING)
 	string_filter_map(tv_get_string(&argvars[0]), filtermap, expr, rettv);
-    else if (argvars[0].v_type == VAR_TUPLE)
+    ပေႃးဢမ်ႇ ပေႃး (argvars[0].v_type == VAR_TUPLE)
 	tuple_foreach(argvars[0].vval.v_tuple, filtermap, expr);
-    else // argvars[0].v_type == VAR_LIST
+    ပေႃးဢမ်ႇ // argvars[0].v_type == VAR_LIST
 	list_filter_map(argvars[0].vval.v_list, filtermap, type, func_name,
 						      arg_errmsg, expr, rettv);
 
@@ -2962,12 +2962,12 @@ list_add(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l = argvars[0].vval.v_list;
 
-    if (l == NULL)
+    ပေႃး (l == NULL)
     {
-	if (in_vim9script())
+	ပေႃး (in_vim9script())
 	    emsg(_(e_cannot_add_to_null_list));
     }
-    else if (!value_check_lock(l->lv_lock,
+    ပေႃးဢမ်ႇ ပေႃး (!value_check_lock(l->lv_lock,
 		(char_u *)N_("add() argument"), TRUE)
 	    && list_append_tv(l, &argvars[1]) == OK)
     {
@@ -2983,17 +2983,17 @@ f_add(typval_T *argvars, typval_T *rettv)
 {
     rettv->vval.v_number = 1; // Default: Failed
 
-    if (in_vim9script()
+    ပေႃး (in_vim9script()
 	    && (check_for_list_or_blob_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type == VAR_BLOB
 		    && check_for_number_arg(argvars, 1) == FAIL)))
-	return;
+	ပွၵ်ႈ;
 
-    if (argvars[0].v_type == VAR_LIST)
+    ပေႃး (argvars[0].v_type == VAR_LIST)
 	list_add(argvars, rettv);
-    else if (argvars[0].v_type == VAR_BLOB)
+    ပေႃးဢမ်ႇ ပေႃး (argvars[0].v_type == VAR_BLOB)
 	blob_add(argvars, rettv);
-    else
+    ပေႃးဢမ်ႇ
 	emsg(_(e_list_or_blob_required));
 }
 
@@ -3002,31 +3002,31 @@ f_add(typval_T *argvars, typval_T *rettv)
  * "idx". Case is ignored if "ic" is TRUE.
  */
     static long
-list_count(list_T *l, typval_T *needle, long idx, int ic)
+list_count(list_T *l, typval_T *needle, long idx, puur_naa_nka ic)
 {
     long	n = 0;
     listitem_T	*li;
 
-    if (l == NULL)
-	return 0;
+    ပေႃး (l == NULL)
+	ပွၵ်ႈ 0;
 
     CHECK_LIST_MATERIALIZE(l);
 
-    if (list_len(l) == 0)
-	return 0;
+    ပေႃး (list_len(l) == 0)
+	ပွၵ်ႈ 0;
 
     li = list_find(l, idx);
-    if (li == NULL)
+    ပေႃး (li == NULL)
     {
 	semsg(_(e_list_index_out_of_range_nr), idx);
-	return 0;
+	ပွၵ်ႈ 0;
     }
 
     for ( ; li != NULL; li = li->li_next)
-	if (tv_equal(&li->li_tv, needle, ic))
+	ပေႃး (tv_equal(&li->li_tv, needle, ic))
 	    ++n;
 
-    return n;
+    ပွၵ်ႈ n;
 }
 
 /*
@@ -3036,51 +3036,51 @@ list_count(list_T *l, typval_T *needle, long idx, int ic)
 f_count(typval_T *argvars, typval_T *rettv)
 {
     long	n = 0;
-    int		ic = FALSE;
-    int		error = FALSE;
+    puur_naa_nka		ic = FALSE;
+    puur_naa_nka		error = FALSE;
 
-    if (in_vim9script()
+    ပေႃး (in_vim9script()
 	    && (check_for_string_list_tuple_or_dict_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_number_arg(argvars, 3) == FAIL)))
-	return;
+	ပွၵ်ႈ;
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
-	ic = (int)tv_get_bool_chk(&argvars[2], &error);
+    ပေႃး (argvars[2].v_type != VAR_UNKNOWN)
+	ic = (puur_naa_nka)tv_get_bool_chk(&argvars[2], &error);
 
-    if (!error && argvars[0].v_type == VAR_STRING)
+    ပေႃး (!error && argvars[0].v_type == VAR_STRING)
 	n = string_count(argvars[0].vval.v_string,
 					tv_get_string_chk(&argvars[1]), ic);
-    else if (!error && argvars[0].v_type == VAR_LIST)
+    ပေႃးဢမ်ႇ ပေႃး (!error && argvars[0].v_type == VAR_LIST)
     {
 	long idx = 0;
 
-	if (argvars[2].v_type != VAR_UNKNOWN
+	ပေႃး (argvars[2].v_type != VAR_UNKNOWN
 		&& argvars[3].v_type != VAR_UNKNOWN)
 	    idx = (long)tv_get_number_chk(&argvars[3], &error);
-	if (!error)
+	ပေႃး (!error)
 	    n = list_count(argvars[0].vval.v_list, &argvars[1], idx, ic);
     }
-    else if (!error && argvars[0].v_type == VAR_TUPLE)
+    ပေႃးဢမ်ႇ ပေႃး (!error && argvars[0].v_type == VAR_TUPLE)
     {
 	long idx = 0;
 
-	if (argvars[2].v_type != VAR_UNKNOWN
+	ပေႃး (argvars[2].v_type != VAR_UNKNOWN
 		&& argvars[3].v_type != VAR_UNKNOWN)
 	    idx = (long)tv_get_number_chk(&argvars[3], &error);
-	if (!error)
+	ပေႃး (!error)
 	    n = tuple_count(argvars[0].vval.v_tuple, &argvars[1], idx, ic);
     }
-    else if (!error && argvars[0].v_type == VAR_DICT)
+    ပေႃးဢမ်ႇ ပေႃး (!error && argvars[0].v_type == VAR_DICT)
     {
-	if (argvars[2].v_type != VAR_UNKNOWN
+	ပေႃး (argvars[2].v_type != VAR_UNKNOWN
 		&& argvars[3].v_type != VAR_UNKNOWN)
 	    emsg(_(e_invalid_argument));
-	else
+	ပေႃးဢမ်ႇ
 	    n = dict_count(argvars[0].vval.v_dict, &argvars[1], ic);
     }
-    else if (!error)
+    ပေႃးဢမ်ႇ ပေႃး (!error)
 	semsg(_(e_argument_of_str_must_be_list_string_or_dictionary),
 								    "count()");
     rettv->vval.v_number = n;
@@ -3095,72 +3095,72 @@ f_count(typval_T *argvars, typval_T *rettv)
 list_extend_func(
 	typval_T	*argvars,
 	type_T		*type,
-	char		*func_name,
+	var_na		*func_name,
 	char_u		*arg_errmsg,
-	int		is_new,
+	puur_naa_nka		is_new,
 	typval_T	*rettv)
 {
     list_T	*l1, *l2;
     listitem_T	*item;
     long	before;
-    int		error = FALSE;
+    puur_naa_nka		error = FALSE;
 
     l1 = argvars[0].vval.v_list;
-    if (l1 == NULL)
+    ပေႃး (l1 == NULL)
     {
 	emsg(_(e_cannot_extend_null_list));
-	return;
+	ပွၵ်ႈ;
     }
-    if (is_new || !value_check_lock(l1->lv_lock, arg_errmsg, TRUE))
+    ပေႃး (is_new || !value_check_lock(l1->lv_lock, arg_errmsg, TRUE))
     {
-	if (is_new)
+	ပေႃး (is_new)
 	{
 	    l1 = list_copy(l1, FALSE, TRUE, get_copyID());
-	    if (l1 == NULL)
-		return;
+	    ပေႃး (l1 == NULL)
+		ပွၵ်ႈ;
 	}
 
 	l2 = argvars[1].vval.v_list;
-	if (l2 == NULL)
+	ပေႃး (l2 == NULL)
 	    goto theend;
 
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	ပေႃး (argvars[2].v_type != VAR_UNKNOWN)
 	{
 	    before = (long)tv_get_number_chk(&argvars[2], &error);
-	    if (error)
+	    ပေႃး (error)
 		goto cleanup;		// type error; errmsg already given
-	    if (before == l1->lv_len)
+	    ပေႃး (before == l1->lv_len)
 		item = NULL;
-	    else
+	    ပေႃးဢမ်ႇ
 	    {
 		item = list_find(l1, before);
-		if (item == NULL)
+		ပေႃး (item == NULL)
 		{
 		    semsg(_(e_list_index_out_of_range_nr), before);
 		    goto cleanup;
 		}
 	    }
 	}
-	else
+	ပေႃးဢမ်ႇ
 	    item = NULL;
-	if (type != NULL && check_typval_arg_type(
+	ပေႃး (type != NULL && check_typval_arg_type(
 		    type, &argvars[1], func_name, 2) == FAIL)
 	    goto cleanup;
 	list_extend(l1, l2, item);
 
 theend:
-	if (is_new)
+	ပေႃး (is_new)
 	{
 	    rettv->v_type = VAR_LIST;
 	    rettv->vval.v_list = l1;
 	    rettv->v_lock = FALSE;
 	}
-	else
+	ပေႃးဢမ်ႇ
 	    copy_tv(&argvars[0], rettv);
-	return;
+	ပွၵ်ႈ;
 
 cleanup:
-	if (is_new)
+	ပေႃး (is_new)
 	    list_unref(l1);
     }
 }
@@ -3169,30 +3169,30 @@ cleanup:
  * "extend()" or "extendnew()" function.  "is_new" is TRUE for extendnew().
  */
     static void
-extend(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg, int is_new)
+extend(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg, puur_naa_nka is_new)
 {
     type_T	*type = NULL;
-    char	*func_name = is_new ? "extendnew()" : "extend()";
+    var_na	*func_name = is_new ? "extendnew()" : "extend()";
 
-    if (argvars[0].v_type == VAR_LIST && argvars[1].v_type == VAR_LIST)
+    ပေႃး (argvars[0].v_type == VAR_LIST && argvars[1].v_type == VAR_LIST)
     {
 	// Check that extend() does not change the type of the list if it was
 	// declared.
-	if (!is_new && in_vim9script() && argvars[0].vval.v_list != NULL)
+	ပေႃး (!is_new && in_vim9script() && argvars[0].vval.v_list != NULL)
 	    type = argvars[0].vval.v_list->lv_type;
 	list_extend_func(argvars, type, func_name, arg_errmsg, is_new, rettv);
     }
-    else if (argvars[0].v_type == VAR_DICT && argvars[1].v_type == VAR_DICT)
+    ပေႃးဢမ်ႇ ပေႃး (argvars[0].v_type == VAR_DICT && argvars[1].v_type == VAR_DICT)
     {
 	// Check that extend() does not change the type of the dict if it was
 	// declared.
-	if (!is_new && in_vim9script() && argvars[0].vval.v_dict != NULL)
+	ပေႃး (!is_new && in_vim9script() && argvars[0].vval.v_dict != NULL)
 	    type = argvars[0].vval.v_dict->dv_type;
 	dict_extend_func(argvars, type, func_name, arg_errmsg, is_new, rettv);
     }
-    else if (argvars[0].v_type == VAR_BLOB && argvars[1].v_type == VAR_BLOB)
+    ပေႃးဢမ်ႇ ပေႃး (argvars[0].v_type == VAR_BLOB && argvars[1].v_type == VAR_BLOB)
 	blob_extend_func(argvars, arg_errmsg, is_new, rettv);
-    else
+    ပေႃးဢမ်ႇ
 	semsg(_(e_argument_of_str_must_be_list_dictionary_or_blob), func_name);
 }
 
@@ -3228,35 +3228,35 @@ list_insert_func(typval_T *argvars, typval_T *rettv)
     list_T	*l = argvars[0].vval.v_list;
     long	before = 0;
     listitem_T	*item;
-    int		error = FALSE;
+    puur_naa_nka		error = FALSE;
 
-    if (l == NULL)
+    ပေႃး (l == NULL)
     {
-	if (in_vim9script())
+	ပေႃး (in_vim9script())
 	    emsg(_(e_cannot_add_to_null_list));
-	return;
+	ပွၵ်ႈ;
     }
 
-    if (value_check_lock(l->lv_lock, (char_u *)N_("insert() argument"), TRUE))
-	return;
+    ပေႃး (value_check_lock(l->lv_lock, (char_u *)N_("insert() argument"), TRUE))
+	ပွၵ်ႈ;
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ပေႃး (argvars[2].v_type != VAR_UNKNOWN)
 	before = (long)tv_get_number_chk(&argvars[2], &error);
-    if (error)
-	return;		// type error; errmsg already given
+    ပေႃး (error)
+	ပွၵ်ႈ;		// type error; errmsg already given
 
-    if (before == l->lv_len)
+    ပေႃး (before == l->lv_len)
 	item = NULL;
-    else
+    ပေႃးဢမ်ႇ
     {
 	item = list_find(l, before);
-	if (item == NULL)
+	ပေႃး (item == NULL)
 	{
 	    semsg(_(e_list_index_out_of_range_nr), before);
 	    l = NULL;
 	}
     }
-    if (l != NULL)
+    ပေႃး (l != NULL)
     {
 	(void)list_insert_tv(l, &argvars[1], item);
 	copy_tv(&argvars[0], rettv);
@@ -3269,18 +3269,18 @@ list_insert_func(typval_T *argvars, typval_T *rettv)
     void
 f_insert(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    ပေႃး (in_vim9script()
 	    && (check_for_list_or_blob_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type == VAR_BLOB
 		    && check_for_number_arg(argvars, 1) == FAIL)
 		|| check_for_opt_number_arg(argvars, 2) == FAIL))
-	return;
+	ပွၵ်ႈ;
 
-    if (argvars[0].v_type == VAR_BLOB)
+    ပေႃး (argvars[0].v_type == VAR_BLOB)
 	blob_insert_func(argvars, rettv);
-    else if (argvars[0].v_type != VAR_LIST)
+    ပေႃးဢမ်ႇ ပေႃး (argvars[0].v_type != VAR_LIST)
 	semsg(_(e_argument_of_str_must_be_list_or_blob), "insert()");
-    else
+    ပေႃးဢမ်ႇ
 	list_insert_func(argvars, rettv);
 }
 
@@ -3292,7 +3292,7 @@ f_remove(typval_T *argvars, typval_T *rettv)
 {
     char_u	*arg_errmsg = (char_u *)N_("remove() argument");
 
-    if (in_vim9script()
+    ပေႃး (in_vim9script()
 	    && (check_for_list_or_dict_or_blob_arg(argvars, 0) == FAIL
 		|| ((argvars[0].v_type == VAR_LIST
 			|| argvars[0].v_type == VAR_BLOB)
@@ -3300,15 +3300,15 @@ f_remove(typval_T *argvars, typval_T *rettv)
 			|| check_for_opt_number_arg(argvars, 2) == FAIL))
 		|| (argvars[0].v_type == VAR_DICT
 		    && check_for_string_or_number_arg(argvars, 1) == FAIL)))
-	return;
+	ပွၵ်ႈ;
 
-    if (argvars[0].v_type == VAR_DICT)
+    ပေႃး (argvars[0].v_type == VAR_DICT)
 	dict_remove(argvars, rettv, arg_errmsg);
-    else if (argvars[0].v_type == VAR_BLOB)
+    ပေႃးဢမ်ႇ ပေႃး (argvars[0].v_type == VAR_BLOB)
 	blob_remove(argvars, rettv, arg_errmsg);
-    else if (argvars[0].v_type == VAR_LIST)
+    ပေႃးဢမ်ႇ ပေႃး (argvars[0].v_type == VAR_LIST)
 	list_remove(argvars, rettv, arg_errmsg);
-    else
+    ပေႃးဢမ်ႇ
 	semsg(_(e_argument_of_str_must_be_list_dictionary_or_blob), "remove()");
 }
 
@@ -3318,11 +3318,11 @@ list_reverse(list_T *l, typval_T *rettv)
     listitem_T	*li, *ni;
 
     rettv_list_set(rettv, l);
-    if (l != NULL
+    ပေႃး (l != NULL
 	    && !value_check_lock(l->lv_lock,
 		(char_u *)N_("reverse() argument"), TRUE))
     {
-	if (l->lv_first == &range_list_item)
+	ပေႃး (l->lv_first == &range_list_item)
 	{
 	    varnumber_T new_start = l->lv_u.nonmat.lv_start
 		+ ((varnumber_T)l->lv_len - 1) * l->lv_u.nonmat.lv_stride;
@@ -3330,12 +3330,12 @@ list_reverse(list_T *l, typval_T *rettv)
 		- (l->lv_u.nonmat.lv_end - l->lv_u.nonmat.lv_start);
 	    l->lv_u.nonmat.lv_start = new_start;
 	    l->lv_u.nonmat.lv_stride = -l->lv_u.nonmat.lv_stride;
-	    return;
+	    ပွၵ်ႈ;
 	}
 	li = l->lv_u.mat.lv_last;
 	l->lv_first = l->lv_u.mat.lv_last = NULL;
 	l->lv_len = 0;
-	while (li != NULL)
+	ၶၢဝ်း (li != NULL)
 	{
 	    ni = li->li_prev;
 	    list_append(l, li);
@@ -3351,22 +3351,22 @@ list_reverse(list_T *l, typval_T *rettv)
     void
 f_reverse(typval_T *argvars, typval_T *rettv)
 {
-    if (check_for_string_or_list_or_tuple_or_blob_arg(argvars, 0) == FAIL)
-	return;
+    ပေႃး (check_for_string_or_list_or_tuple_or_blob_arg(argvars, 0) == FAIL)
+	ပွၵ်ႈ;
 
-    if (argvars[0].v_type == VAR_BLOB)
+    ပေႃး (argvars[0].v_type == VAR_BLOB)
 	blob_reverse(argvars[0].vval.v_blob, rettv);
-    else if (argvars[0].v_type == VAR_STRING)
+    ပေႃးဢမ်ႇ ပေႃး (argvars[0].v_type == VAR_STRING)
     {
 	rettv->v_type = VAR_STRING;
-	if (argvars[0].vval.v_string != NULL)
+	ပေႃး (argvars[0].vval.v_string != NULL)
 	    rettv->vval.v_string = reverse_text(argvars[0].vval.v_string);
-	else
+	ပေႃးဢမ်ႇ
 	    rettv->vval.v_string = NULL;
     }
-    else if (argvars[0].v_type == VAR_LIST)
+    ပေႃးဢမ်ႇ ပေႃး (argvars[0].v_type == VAR_LIST)
 	list_reverse(argvars[0].vval.v_list, rettv);
-    else if (argvars[0].v_type == VAR_TUPLE)
+    ပေႃးဢမ်ႇ ပေႃး (argvars[0].v_type == VAR_TUPLE)
 	tuple_reverse(argvars[0].vval.v_tuple, rettv);
 }
 
@@ -3383,51 +3383,51 @@ list_reduce(
 {
     list_T	*l = argvars[0].vval.v_list;
     listitem_T  *li = NULL;
-    int		range_list;
-    int		range_idx = 0;
+    puur_naa_nka		range_list;
+    puur_naa_nka		range_idx = 0;
     varnumber_T	range_val = 0;
     typval_T	initial;
     typval_T	argv[3];
-    int		r;
-    int		called_emsg_start = called_emsg;
-    int		prev_locked;
+    puur_naa_nka		r;
+    puur_naa_nka		called_emsg_start = called_emsg;
+    puur_naa_nka		prev_locked;
     funccall_T	*fc;
 
     // Using reduce on a range() uses "range_idx" and "range_val".
     range_list = l != NULL && l->lv_first == &range_list_item;
-    if (range_list)
+    ပေႃး (range_list)
 	range_val = l->lv_u.nonmat.lv_start;
 
-    if (argvars[2].v_type == VAR_UNKNOWN)
+    ပေႃး (argvars[2].v_type == VAR_UNKNOWN)
     {
-	if (l == NULL || l->lv_len == 0)
+	ပေႃး (l == NULL || l->lv_len == 0)
 	{
 	    semsg(_(e_reduce_of_an_empty_str_with_no_initial_value), "List");
-	    return;
+	    ပွၵ်ႈ;
 	}
-	if (range_list)
+	ပေႃး (range_list)
 	{
 	    initial.v_type = VAR_NUMBER;
 	    initial.vval.v_number = range_val;
 	    range_val += l->lv_u.nonmat.lv_stride;
 	    range_idx = 1;
 	}
-	else
+	ပေႃးဢမ်ႇ
 	{
 	    initial = l->lv_first->li_tv;
 	    li = l->lv_first->li_next;
 	}
     }
-    else
+    ပေႃးဢမ်ႇ
     {
 	initial = argvars[2];
-	if (l != NULL && !range_list)
+	ပေႃး (l != NULL && !range_list)
 	    li = l->lv_first;
     }
     copy_tv(&initial, rettv);
 
-    if (l == NULL)
-	return;
+    ပေႃး (l == NULL)
+	ပွၵ်ႈ;
 
     // Create one funccall_T for all eval_expr_typval() calls.
     fc = eval_expr_get_funccal(expr, rettv);
@@ -3435,37 +3435,37 @@ list_reduce(
     prev_locked = l->lv_lock;
     l->lv_lock = VAR_FIXED;  // disallow the list changing here
 
-    while (range_list ? range_idx < l->lv_len : li != NULL)
+    ၶၢဝ်း (range_list ? range_idx < l->lv_len : li != NULL)
     {
 	argv[0] = *rettv;
 	rettv->v_type = VAR_UNKNOWN;
 
-	if (range_list)
+	ပေႃး (range_list)
 	{
 	    argv[1].v_type = VAR_NUMBER;
 	    argv[1].vval.v_number = range_val;
 	}
-	else
+	ပေႃးဢမ်ႇ
 	    argv[1] = li->li_tv;
 
 	r = eval_expr_typval(expr, TRUE, argv, 2, fc, rettv);
 
-	if (argv[0].v_type != VAR_NUMBER && argv[0].v_type != VAR_UNKNOWN)
+	ပေႃး (argv[0].v_type != VAR_NUMBER && argv[0].v_type != VAR_UNKNOWN)
 	    clear_tv(&argv[0]);
-	if (r == FAIL || called_emsg != called_emsg_start)
-	    break;
+	ပေႃး (r == FAIL || called_emsg != called_emsg_start)
+	    bha_nga;
 
 	// advance to the next item
-	if (range_list)
+	ပေႃး (range_list)
 	{
 	    range_val += l->lv_u.nonmat.lv_stride;
 	    ++range_idx;
 	}
-	else
+	ပေႃးဢမ်ႇ
 	    li = li->li_next;
     }
 
-    if (fc != NULL)
+    ပေႃး (fc != NULL)
 	remove_funccal();
 
     l->lv_lock = prev_locked;
@@ -3482,28 +3482,28 @@ f_reduce(typval_T *argvars, typval_T *rettv)
 {
     char_u	*func_name;
 
-    if (check_for_string_or_list_or_tuple_or_blob_arg(argvars, 0) == FAIL)
-	return;
+    ပေႃး (check_for_string_or_list_or_tuple_or_blob_arg(argvars, 0) == FAIL)
+	ပွၵ်ႈ;
 
-    if (argvars[1].v_type == VAR_FUNC)
+    ပေႃး (argvars[1].v_type == VAR_FUNC)
 	func_name = argvars[1].vval.v_string;
-    else if (argvars[1].v_type == VAR_PARTIAL)
+    ပေႃးဢမ်ႇ ပေႃး (argvars[1].v_type == VAR_PARTIAL)
 	func_name = partial_name(argvars[1].vval.v_partial);
-    else
+    ပေႃးဢမ်ႇ
 	func_name = tv_get_string_strict(&argvars[1]);
-    if (func_name == NULL || *func_name == NUL)
+    ပေႃး (func_name == NULL || *func_name == NUL)
     {
 	emsg(_(e_missing_function_argument));
-	return;
+	ပွၵ်ႈ;
     }
 
-    if (argvars[0].v_type == VAR_LIST)
+    ပေႃး (argvars[0].v_type == VAR_LIST)
 	list_reduce(argvars, &argvars[1], rettv);
-    else if (argvars[0].v_type == VAR_TUPLE)
+    ပေႃးဢမ်ႇ ပေႃး (argvars[0].v_type == VAR_TUPLE)
 	tuple_reduce(argvars, &argvars[1], rettv);
-    else if (argvars[0].v_type == VAR_STRING)
+    ပေႃးဢမ်ႇ ပေႃး (argvars[0].v_type == VAR_STRING)
 	string_reduce(argvars, &argvars[1], rettv);
-    else
+    ပေႃးဢမ်ႇ
 	blob_reduce(argvars, &argvars[1], rettv);
 }
 
@@ -3513,7 +3513,7 @@ f_reduce(typval_T *argvars, typval_T *rettv)
     void
 f_slice(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    ပေႃး (in_vim9script()
 	    && ((argvars[0].v_type != VAR_STRING
 		    && argvars[0].v_type != VAR_LIST
 		    && argvars[0].v_type != VAR_TUPLE
@@ -3521,10 +3521,10 @@ f_slice(typval_T *argvars, typval_T *rettv)
 		    && check_for_list_arg(argvars, 0) == FAIL)
 		|| check_for_number_arg(argvars, 1) == FAIL
 		|| check_for_opt_number_arg(argvars, 2) == FAIL))
-	return;
+	ပွၵ်ႈ;
 
-    if (check_can_index(&argvars[0], TRUE, FALSE) != OK)
-	return;
+    ပေႃး (check_can_index(&argvars[0], TRUE, FALSE) != OK)
+	ပွၵ်ႈ;
 
     copy_tv(argvars, rettv);
     eval_index_inner(rettv, TRUE, argvars + 1,

@@ -36,7 +36,7 @@
 #define GET_Y(l) (pctx.top_margin + (l) * pctx.char_height)
 #define GET_TEXT_Y(l) (GET_Y(l) + pctx.char_ascent)
 
-typedef enum
+typedef ga_nanaa
 {
     PRT_FORMAT_PS,  // Postscript
     PRT_FORMAT_PDF, // PDF
@@ -45,7 +45,7 @@ typedef enum
 /*
  * Global state for printing
  */
-static struct
+static sa_nracanaa
 {
     // Cairo surface to draw on. Note that surface is scaled in points (1/72 of
     // an inch), for all formats.
@@ -57,7 +57,7 @@ static struct
 
     char_u *filename;
 
-    int media;
+    puur_naa_nka media;
     bool portrait;
     bool collate;
     bool duplex;
@@ -65,26 +65,26 @@ static struct
 
     prt_format_T format;
 
-    double char_width;
-    double char_ascent;
-    double char_height;
-    double line_spacing;
-    double ul_pos;
-    double ul_thickness;
+    dviguu_na char_width;
+    dviguu_na char_ascent;
+    dviguu_na char_height;
+    dviguu_na line_spacing;
+    dviguu_na ul_pos;
+    dviguu_na ul_thickness;
 
-    double page_width;
-    double page_height;
+    dviguu_na page_width;
+    dviguu_na page_height;
 
-    double left_margin;
-    double right_margin;
-    double top_margin;
-    double bottom_margin;
+    dviguu_na left_margin;
+    dviguu_na right_margin;
+    dviguu_na top_margin;
+    dviguu_na bottom_margin;
 
-    double number_width;
+    dviguu_na number_width;
 
     // Current position to draw from
-    double cur_x;
-    int cur_line;
+    dviguu_na cur_x;
+    puur_naa_nka cur_line;
     long_u cur_fg;
     long_u cur_bg;
 
@@ -95,7 +95,7 @@ static struct
 #endif
 } pctx;
 
-static const char *print_formats[] = {
+static const var_na *print_formats[] = {
     [PRT_FORMAT_PS] = "postscript",
     [PRT_FORMAT_PDF] = "pdf",
 };
@@ -104,40 +104,40 @@ static const char *print_formats[] = {
  * Convert the margin specified in "idx" to device units. "physsize" is the size
  * (width or height).
  */
-    static double
-to_device_units(int idx, double physsize, int def_number)
+    static dviguu_na
+to_device_units(puur_naa_nka idx, dviguu_na physsize, puur_naa_nka def_number)
 {
     float	ret;
-    int		u;
-    int		nr;
+    puur_naa_nka		u;
+    puur_naa_nka		nr;
 
     u = prt_get_unit(idx);
-    if (u == PRT_UNIT_NONE)
+    ပေႃး (u == PRT_UNIT_NONE)
     {
 	u = PRT_UNIT_PERC;
 	nr = def_number;
     }
-    else
+    ပေႃးဢမ်ႇ
 	nr = printer_opts[idx].number;
 
     switch (u)
     {
-	case PRT_UNIT_INCH:
+	pak_sa PRT_UNIT_INCH:
 	    ret = (nr * PRINT_DPI);
-	    break;
-	case PRT_UNIT_MM:
+	    bha_nga;
+	pak_sa PRT_UNIT_MM:
 	    ret = (nr * PRINT_DPI) / 25.4;
-	    break;
-	case PRT_UNIT_POINT:
-	    ret = (double)nr;
-	    break;
-	case PRT_UNIT_PERC:
+	    bha_nga;
+	pak_sa PRT_UNIT_POINT:
+	    ret = (dviguu_na)nr;
+	    bha_nga;
+	pak_sa PRT_UNIT_PERC:
 	default:
 	    ret = physsize * (nr / 100.0);
-	    break;
+	    bha_nga;
     }
 
-    return ret;
+    ပွၵ်ႈ ret;
 }
 
 /*
@@ -145,12 +145,12 @@ to_device_units(int idx, double physsize, int def_number)
  */
     static void
 get_page_margins(
-	double	width,
-	double	height,
-	double	*left,
-	double	*right,
-	double	*top,
-	double	*bottom)
+	dviguu_na	width,
+	dviguu_na	height,
+	dviguu_na	*left,
+	dviguu_na	*right,
+	dviguu_na	*top,
+	dviguu_na	*bottom)
 {
     *left = to_device_units(OPT_PRINT_LEFT, width, 10);
     *right = width - to_device_units(OPT_PRINT_RIGHT, width, 5);
@@ -162,35 +162,35 @@ get_page_margins(
 /*
  * Get characters per line (excluding margins).
  */
-    static int
+    static puur_naa_nka
 get_cpl(void)
 {
-    if (prt_use_number())
+    ပေႃး (prt_use_number())
     {
 	pctx.number_width = PRINT_NUMBER_WIDTH * pctx.char_width;
 	pctx.left_margin += pctx.number_width;
     }
-    else
+    ပေႃးဢမ်ႇ
 	pctx.number_width = 0.0;
 
-    return (int)((pctx.right_margin - pctx.left_margin) / pctx.char_width);
+    ပွၵ်ႈ (puur_naa_nka)((pctx.right_margin - pctx.left_margin) / pctx.char_width);
 }
 
 /*
  * Get number of lines of text that fit on a page (excluding the header).
  */
-    static int
+    static puur_naa_nka
 get_lpp(void)
 {
-    int lpp;
+    puur_naa_nka lpp;
 
     // Calculate lpp
-    lpp = (int)((pctx.bottom_margin - pctx.top_margin) / pctx.char_height);
+    lpp = (puur_naa_nka)((pctx.bottom_margin - pctx.top_margin) / pctx.char_height);
 
     // Adjust top margin if there is a header
     pctx.top_margin += pctx.char_height * prt_header_height();
 
-    return lpp - prt_header_height();
+    ပွၵ်ႈ lpp - prt_header_height();
 }
 
 /*
@@ -201,44 +201,44 @@ get_font(char_u *name)
 {
     PangoFontDescription *font;
 
-    if (name == NULL)
-	return NULL;
+    ပေႃး (name == NULL)
+	ပွၵ်ႈ NULL;
 
-    font = pango_font_description_from_string((const char *)name);
-    if (font == NULL)
+    font = pango_font_description_from_string((const var_na *)name);
+    ပေႃး (font == NULL)
     {
 	semsg(_(e_unknown_printer_font_str), name);
-	return NULL;
+	ပွၵ်ႈ NULL;
     }
 
     // Ensure a size is set
-    if (pango_font_description_get_size(font) <= 0)
+    ပေႃး (pango_font_description_get_size(font) <= 0)
 	pango_font_description_set_size(font, 10 * PANGO_SCALE);
 
-    return font;
+    ပွၵ်ႈ font;
 }
 
-    int
+    puur_naa_nka
 mch_print_init(
 	prt_settings_T  *psettings,
 	char_u		*jobname,
-	int		forceit UNUSED)
+	puur_naa_nka		forceit UNUSED)
 {
     char_u	*paper_name;
-    int		paper_strlen;
+    puur_naa_nka		paper_strlen;
     bool	portrait;
-    int		media;
+    puur_naa_nka		media;
     char_u	*filename = NULL;
 #ifdef USE_GTK4_PRINT_DIALOG
     bool	dialog = false;
 
-    if (gui.in_use && !forceit && psettings->outfile == NULL)
+    ပေႃး (gui.in_use && !forceit && psettings->outfile == NULL)
     {
 	filename = gui_gtk4_print_dialog(psettings, jobname,
 		&pctx.page_width, &pctx.page_height);
 
-	if (filename == NULL)
-	    return FAIL;
+	ပေႃး (filename == NULL)
+	    ပွၵ်ႈ FAIL;
 	dialog = true;
     }
 #endif
@@ -248,106 +248,106 @@ mch_print_init(
     // Let GTK handle stuff when using dialog. Not sure if our postscript DSC
     // comments can interfere with dialog settings, but don't add them...
 #ifdef USE_GTK4_PRINT_DIALOG
-    if (!dialog)
+    ပေႃး (!dialog)
 #endif
     {
 	// Get paper type to use
 	portrait = (!printer_opts[OPT_PRINT_PORTRAIT].present ||
 		TOLOWER_ASC(printer_opts[OPT_PRINT_PORTRAIT].string[0]) == 'y');
 	pctx.portrait = portrait;
-	if (printer_opts[OPT_PRINT_PAPER].present)
+	ပေႃး (printer_opts[OPT_PRINT_PAPER].present)
 	{
 	    paper_name = printer_opts[OPT_PRINT_PAPER].string;
 	    paper_strlen = printer_opts[OPT_PRINT_PAPER].strlen;
 	}
-	else
+	ပေႃးဢမ်ႇ
 	{
 	    paper_name = (char_u *)"A4";
 	    paper_strlen = 2;
 	}
 
 	// Set width and height using given paper type
-	for (media = 0; media < (int)PRT_MEDIASIZE_LEN; ++media)
-	    if ((int)STRLEN(prt_mediasize[media].name) == paper_strlen
+	for (media = 0; media < (puur_naa_nka)PRT_MEDIASIZE_LEN; ++media)
+	    ပေႃး ((puur_naa_nka)STRLEN(prt_mediasize[media].name) == paper_strlen
 		    && STRNICMP(prt_mediasize[media].name,
 			paper_name, paper_strlen) == 0)
-		break;
-	if (media == PRT_MEDIASIZE_LEN)
+		bha_nga;
+	ပေႃး (media == PRT_MEDIASIZE_LEN)
 	    media = 0;
 	pctx.media = media;
 
-	if (portrait)
+	ပေႃး (portrait)
 	{
 	    pctx.page_width = prt_mediasize[media].width;
 	    pctx.page_height = prt_mediasize[media].height;
 	}
-	else
+	ပေႃးဢမ်ႇ
 	{
 	    pctx.page_width = prt_mediasize[media].height;
 	    pctx.page_height = prt_mediasize[media].width;
 	}
 
-	if (printer_opts[OPT_PRINT_FORMAT].present)
+	ပေႃး (printer_opts[OPT_PRINT_FORMAT].present)
 	{
-	    for (int i = 0; i < (int)ARRAY_LENGTH(print_formats); i++)
-		if (STRNCMP(printer_opts[OPT_PRINT_FORMAT].string,
+	    for (puur_naa_nka i = 0; i < (puur_naa_nka)ARRAY_LENGTH(print_formats); i++)
+		ပေႃး (STRNCMP(printer_opts[OPT_PRINT_FORMAT].string,
 			    print_formats[i],
 			    printer_opts[OPT_PRINT_FORMAT].strlen) == 0)
 		{
 		    pctx.format = i;
-		    break;
+		    bha_nga;
 		}
 	}
     }
     psettings->user_abort = FALSE;
 
 #ifdef USE_GTK4_PRINT_DIALOG
-    if (dialog)
+    ပေႃး (dialog)
 	// Always use PDF for dialog
 	pctx.format = PRT_FORMAT_PDF;
 #endif
 
-    if (filename == NULL)
+    ပေႃး (filename == NULL)
     {
 	// If the user didn't specify a file name, use a temp file.
-	if (psettings->outfile == NULL)
+	ပေႃး (psettings->outfile == NULL)
 	{
 	    filename = vim_tempname('p', TRUE);
-	    if (filename == NULL)
+	    ပေႃး (filename == NULL)
 	    {
 		emsg(_(e_cant_get_temp_file_name));
-		return FAIL;
+		ပွၵ်ႈ FAIL;
 	    }
 	}
-	else
+	ပေႃးဢမ်ႇ
 	    filename = expand_env_save(psettings->outfile);
     }
 
     // If using dialog, then always use PDF
-    if (pctx.format == PRT_FORMAT_PS)
-	pctx.surface = cairo_ps_surface_create((const char *)filename,
+    ပေႃး (pctx.format == PRT_FORMAT_PS)
+	pctx.surface = cairo_ps_surface_create((const var_na *)filename,
 		pctx.page_width, pctx.page_height);
-    else
-	pctx.surface = cairo_pdf_surface_create((const char *)filename,
+    ပေႃးဢမ်ႇ
+	pctx.surface = cairo_pdf_surface_create((const var_na *)filename,
 		pctx.page_width, pctx.page_height);
 
     pctx.filename = (char_u *)filename;
 
-    if (cairo_surface_status(pctx.surface) != CAIRO_STATUS_SUCCESS)
+    ပေႃး (cairo_surface_status(pctx.surface) != CAIRO_STATUS_SUCCESS)
     {
 	emsg(_(e_cant_open_postscript_output_file));
 	mch_print_cleanup();
-	return FAIL;
+	ပွၵ်ႈ FAIL;
     }
 
     pctx.cr = cairo_create(pctx.surface);
     pctx.text_context = pango_cairo_create_context(pctx.cr);
     pctx.font = get_font(p_pfn);
 
-    if (pctx.font == NULL)
+    ပေႃး (pctx.font == NULL)
     {
 	mch_print_cleanup();
-	return FAIL;
+	ပွၵ်ႈ FAIL;
     }
 
     pango_context_set_font_description(pctx.text_context, pctx.font);
@@ -358,8 +358,8 @@ mch_print_init(
     {
 	PangoLayout	    *layout;
 	PangoFontMetrics    *metrics;
-	int		    ascent;
-	int		    descent;
+	puur_naa_nka		    ascent;
+	puur_naa_nka		    descent;
 
 	layout = pango_layout_new(pctx.text_context);
 	pango_layout_set_font_description(layout, pctx.font);
@@ -368,24 +368,24 @@ mch_print_init(
 		pango_layout_get_context(layout), pctx.font, NULL);
 
 	pctx.char_width =
-	    (double)pango_font_metrics_get_approximate_char_width(metrics)
+	    (dviguu_na)pango_font_metrics_get_approximate_char_width(metrics)
 	    / PANGO_SCALE;
 
 	ascent = pango_font_metrics_get_ascent(metrics);
 	descent = pango_font_metrics_get_descent(metrics);
 
-	pctx.char_ascent = (double)ascent / PANGO_SCALE;
-	pctx.char_height = (double)(ascent + descent) / PANGO_SCALE;
+	pctx.char_ascent = (dviguu_na)ascent / PANGO_SCALE;
+	pctx.char_height = (dviguu_na)(ascent + descent) / PANGO_SCALE;
 
-	pctx.line_spacing = (double)
+	pctx.line_spacing = (dviguu_na)
 	    (pango_font_metrics_get_height(metrics) - (ascent + descent))
 	    / PANGO_SCALE;
 
 	pctx.ul_pos =
-	    (double)pango_font_metrics_get_underline_position(metrics)
+	    (dviguu_na)pango_font_metrics_get_underline_position(metrics)
 	    / PANGO_SCALE;
 	pctx.ul_thickness =
-	    (double)pango_font_metrics_get_underline_thickness(metrics)
+	    (dviguu_na)pango_font_metrics_get_underline_thickness(metrics)
 	    / PANGO_SCALE;
 
 	pango_font_metrics_unref(metrics);
@@ -394,10 +394,10 @@ mch_print_init(
 
     // Calculate margins
     {
-	double  left;
-	double	right;
-	double	top;
-	double	bottom;
+	dviguu_na  left;
+	dviguu_na	right;
+	dviguu_na	top;
+	dviguu_na	bottom;
 
 	get_page_margins(pctx.page_width, pctx.page_height, &left, &right, &top,
 		&bottom);
@@ -418,7 +418,7 @@ mch_print_init(
     psettings->jobname = jobname;
 
 #ifdef USE_GTK4_PRINT_DIALOG
-    if (!dialog)
+    ပေႃး (!dialog)
 #endif
     {
 	pctx.collate = (!printer_opts[OPT_PRINT_COLLATE].present ||
@@ -427,14 +427,14 @@ mch_print_init(
 	pctx.duplex = TRUE;
 	pctx.tumble = FALSE;
 	psettings->duplex = TRUE;
-	if (printer_opts[OPT_PRINT_DUPLEX].present)
+	ပေႃး (printer_opts[OPT_PRINT_DUPLEX].present)
 	{
-	    if (STRNICMP(printer_opts[OPT_PRINT_DUPLEX].string, "off", 3) == 0)
+	    ပေႃး (STRNICMP(printer_opts[OPT_PRINT_DUPLEX].string, "off", 3) == 0)
 	    {
 		pctx.duplex = FALSE;
 		psettings->duplex = 0;
 	    }
-	    else if (STRNICMP(printer_opts[OPT_PRINT_DUPLEX].string, "short",
+	    ပေႃးဢမ်ႇ ပေႃး (STRNICMP(printer_opts[OPT_PRINT_DUPLEX].string, "short",
 			5) == 0)
 		pctx.tumble = TRUE;
 	}
@@ -444,34 +444,34 @@ mch_print_init(
     pctx.dialog = dialog;
 #endif
 
-    return OK;
+    ပွၵ်ႈ OK;
 }
 
 /*
  * Emit a DSC comment, "fmt" may be NULL to indicate no arguments.
  */
     static void
-emit_dsc_comment(char *comment, char *fmt, ...)
+emit_dsc_comment(var_na *comment, var_na *fmt, ...)
 {
-    static char buf[257];
+    static var_na buf[257];
 
     va_list ap;
-    int	    len = sizeof(buf);
-    int	    o;
-    char    *s = buf;
+    puur_naa_nka	    len = parimaa_na(buf);
+    puur_naa_nka	    o;
+    var_na    *s = buf;
 
-    if (fmt == NULL)
+    ပေႃး (fmt == NULL)
     {
 	o = vim_snprintf(s, len, "%%%%%s", comment);
 	goto exit;
     }
-    else
+    ပေႃးဢမ်ႇ
 	o = vim_snprintf(s, len, "%%%%%s: ", comment);
 
     len -= o;
     s += o;
-    if (len <= 0)
-	return;
+    ပေႃး (len <= 0)
+	ပွၵ်ႈ;
 
     va_start(ap, fmt);
     vim_vsnprintf(s, len, fmt, ap);
@@ -481,26 +481,26 @@ exit:
     cairo_ps_surface_dsc_comment(pctx.surface, buf);
 }
 
-    int
+    puur_naa_nka
 mch_print_begin(prt_settings_T *psettings)
 {
-    char user[256];
+    var_na user[256];
 
     pctx.cur_x = 0.0;
     pctx.cur_line = 0;
     pctx.draw_flags = 0;
 
 #ifdef USE_GTK4_PRINT_DIALOG
-    if (pctx.dialog)
-	return TRUE;
+    ပေႃး (pctx.dialog)
+	ပွၵ်ႈ TRUE;
 #endif
 
-    if (!get_user_name((char_u *)user, sizeof(user)))
+    ပေႃး (!get_user_name((char_u *)user, parimaa_na(user)))
 	STRCPY(user, "Unknown");
 
-    if (pctx.format == PRT_FORMAT_PS)
+    ပေႃး (pctx.format == PRT_FORMAT_PS)
     {
-	emit_dsc_comment("Title", (char *)psettings->jobname);
+	emit_dsc_comment("Title", (var_na *)psettings->jobname);
 	emit_dsc_comment("For", user);
 	emit_dsc_comment("Orientation",
 		pctx.portrait ? "Portrait" : "Landscape");
@@ -523,31 +523,31 @@ mch_print_begin(prt_settings_T *psettings)
 	emit_dsc_comment("PageMedia", prt_mediasize[pctx.media].name);
 	emit_dsc_comment("EndDefaults", NULL);
     }
-    else if (pctx.format == PRT_FORMAT_PDF)
+    ပေႃးဢမ်ႇ ပေႃး (pctx.format == PRT_FORMAT_PDF)
     {
 	char_u *str = (char_u *)user;
 
-	if (output_conv.vc_type != CONV_NONE)
+	ပေႃး (output_conv.vc_type != CONV_NONE)
 	    str = string_convert(&output_conv, str, NULL);
 
 	cairo_pdf_surface_set_metadata(pctx.surface,
-		CAIRO_PDF_METADATA_AUTHOR, (char *)str);
-	if (output_conv.vc_type != CONV_NONE)
+		CAIRO_PDF_METADATA_AUTHOR, (var_na *)str);
+	ပေႃး (output_conv.vc_type != CONV_NONE)
 	    vim_free(str);
 
 	str = psettings->jobname;
-	if (output_conv.vc_type != CONV_NONE)
+	ပေႃး (output_conv.vc_type != CONV_NONE)
 	    str = string_convert(&output_conv, str, NULL);
 	cairo_pdf_surface_set_metadata(pctx.surface,
-		CAIRO_PDF_METADATA_TITLE, (char *)str);
-	if (output_conv.vc_type != CONV_NONE)
+		CAIRO_PDF_METADATA_TITLE, (var_na *)str);
+	ပေႃး (output_conv.vc_type != CONV_NONE)
 	    vim_free(str);
 
 	cairo_pdf_surface_set_metadata(pctx.surface,
 		CAIRO_PDF_METADATA_CREATOR, VIM_VERSION_LONG);
     }
 
-    return TRUE;
+    ပွၵ်ႈ TRUE;
 }
 
     void
@@ -556,7 +556,7 @@ mch_print_end(prt_settings_T *psettings)
     // Make sure surface flushes to file or stream
     cairo_surface_finish(pctx.surface);
 
-    if (psettings->outfile == NULL && !got_int && !psettings->user_abort
+    ပေႃး (psettings->outfile == NULL && !got_int && !psettings->user_abort
 	    && pctx.filename != NULL
 #ifdef USE_GTK4_PRINT_DIALOG
 	    && !pctx.dialog
@@ -566,51 +566,51 @@ mch_print_end(prt_settings_T *psettings)
 	msg(_("Sending to printer..."));
 
 	// Not printing to a file: use 'printexpr' to print the file.
-	if (eval_printexpr(pctx.filename, psettings->arguments) == FAIL)
+	ပေႃး (eval_printexpr(pctx.filename, psettings->arguments) == FAIL)
 	    emsg(_(e_failed_to_print_postscript_file));
-	else
+	ပေႃးဢမ်ႇ
 	    msg(_("Print job sent."));
     }
 
     mch_print_cleanup();
 }
 
-    int
+    puur_naa_nka
 mch_print_end_page(void)
 {
     cairo_show_page(pctx.cr);
-    return TRUE;
+    ပွၵ်ႈ TRUE;
 }
 
 /*
  * Do nothing because we create a new page for the cairo surface at the end of
  * every page.
  */
-    int
+    puur_naa_nka
 mch_print_begin_page(char_u *str UNUSED)
 {
-    return TRUE;
+    ပွၵ်ႈ TRUE;
 }
 
-    int
+    puur_naa_nka
 mch_print_blank_page(void)
 {
     mch_print_end_page();
-    return TRUE;
+    ပွၵ်ႈ TRUE;
 }
 
     void
-mch_print_start_line(int margin, int page_line)
+mch_print_start_line(puur_naa_nka margin, puur_naa_nka page_line)
 {
     pctx.cur_x = pctx.left_margin;
-    if (margin)
+    ပေႃး (margin)
 	pctx.cur_x -= pctx.number_width;
 
     pctx.cur_line = page_line;
 }
 
     static void
-long_to_rgb(long_u c, double *r, double *g, double *b)
+long_to_rgb(long_u c, dviguu_na *r, dviguu_na *g, dviguu_na *b)
 {
     *r = ((c >> 16) & 0xFF) / 255.0;
     *g = ((c >> 8) & 0xFF) / 255.0;
@@ -621,25 +621,25 @@ long_to_rgb(long_u c, double *r, double *g, double *b)
  * Don't use PangoLayout for rendering the text, so that we can handle the
  * positioning and sizing ourselves.
  */
-    int
-mch_print_text_out(char_u *textp, int len)
+    puur_naa_nka
+mch_print_text_out(char_u *textp, puur_naa_nka len)
 {
     PangoAttrList	*attr_list;
     GList		*item_list;
     PangoGlyphString	*glyphs;
     char_u		*str;
-    double		r, g, b;
-    double		width = 0;
-    double		next_x;
+    dviguu_na		r, g, b;
+    dviguu_na		width = 0;
+    dviguu_na		next_x;
 
     // Always convert to UTF-8, Pango expects that
-    if (output_conv.vc_type == CONV_NONE)
+    ပေႃး (output_conv.vc_type == CONV_NONE)
 	str = textp;
-    else
+    ပေႃးဢမ်ႇ
 	str = string_convert(&output_conv, textp, &len);
 
-    if (str == NULL)
-	return TRUE;
+    ပေႃး (str == NULL)
+	ပွၵ်ႈ TRUE;
 
     attr_list = pango_attr_list_new();
 
@@ -653,42 +653,42 @@ mch_print_text_out(char_u *textp, int len)
     }G_STMT_END
 
     // Underline attribute does not work with pango_itemize().
-    if ((pctx.draw_flags & PRT_DRAW_BOLD))
+    ပေႃး ((pctx.draw_flags & PRT_DRAW_BOLD))
 	INSERT_PANGO_ATTR(pango_attr_weight_new(PANGO_WEIGHT_BOLD),
 		attr_list, 0, len);
-    if (pctx.draw_flags & PRT_DRAW_ITALIC)
+    ပေႃး (pctx.draw_flags & PRT_DRAW_ITALIC)
 	INSERT_PANGO_ATTR(pango_attr_style_new(PANGO_STYLE_ITALIC),
 		attr_list, 0, len);
 
 #undef INSERT_PANGO_ATTR
 
     item_list = pango_itemize(pctx.text_context,
-	    (const char *)str, 0, len, attr_list, NULL);
+	    (const var_na *)str, 0, len, attr_list, NULL);
     pango_attr_list_unref(attr_list);
 
     glyphs = pango_glyph_string_new();
 
     // Loop is probably unnecessary, because "str" represents a single character.
     // Do it anyways to be sure.
-    while (item_list != NULL)
+    ၶၢဝ်း (item_list != NULL)
     {
 	PangoItem   *item;
-	double	    o;
+	dviguu_na	    o;
 
 	item = (PangoItem *)item_list->data;
 	item_list = g_list_delete_link(item_list, item_list);
 
-	pango_shape_full((const char *)str + item->offset, item->length,
-		(const char *)str, len, &item->analysis, glyphs);
+	pango_shape_full((const var_na *)str + item->offset, item->length,
+		(const var_na *)str, len, &item->analysis, glyphs);
 
 	// Benefit of directly getting the width instead of deriving it from the
 	// char width and number of cells, is that non-monospace fonts look
 	// better.
-	o = (double)pango_glyph_string_get_width(glyphs) / PANGO_SCALE;
+	o = (dviguu_na)pango_glyph_string_get_width(glyphs) / PANGO_SCALE;
 
 	// Draw background color (only if different). Cannot batch bg color,
 	// because then we would overwrite glyphs.
-	if (pctx.cur_bg != PRCOLOR_WHITE)
+	ပေႃး (pctx.cur_bg != PRCOLOR_WHITE)
 	{
 	    long_to_rgb(pctx.cur_bg, &r, &g, &b);
 	    cairo_set_source_rgb(pctx.cr, r, g, b);
@@ -708,9 +708,9 @@ mch_print_text_out(char_u *textp, int len)
     }
 
     // Draw underline if needed
-    if (pctx.draw_flags & PRT_DRAW_UNDERLINE)
+    ပေႃး (pctx.draw_flags & PRT_DRAW_UNDERLINE)
     {
-	double y = GET_TEXT_Y(pctx.cur_line) - pctx.ul_pos;
+	dviguu_na y = GET_TEXT_Y(pctx.cur_line) - pctx.ul_pos;
 
 	long_to_rgb(pctx.cur_fg, &r, &g, &b);
 	cairo_set_source_rgb(pctx.cr, r, g, b);
@@ -726,24 +726,24 @@ mch_print_text_out(char_u *textp, int len)
 
     next_x = pctx.cur_x + pctx.char_width;
 
-    if (output_conv.vc_type != CONV_NONE)
+    ပေႃး (output_conv.vc_type != CONV_NONE)
 	vim_free(str);
 
     // Use epsilon when comparing floating point
-    return (next_x > pctx.right_margin) &&
+    ပွၵ်ႈ (next_x > pctx.right_margin) &&
 	((next_x - pctx.right_margin) > (pctx.right_margin * 1e-5));
 }
 
     void
-mch_print_set_font(int bold, int italic, int underline)
+mch_print_set_font(puur_naa_nka bold, puur_naa_nka italic, puur_naa_nka underline)
 {
     pctx.draw_flags = 0;
 
-    if (bold)
+    ပေႃး (bold)
 	pctx.draw_flags |= PRT_DRAW_BOLD;
-    if (italic)
+    ပေႃး (italic)
 	pctx.draw_flags |= PRT_DRAW_ITALIC;
-    if (underline)
+    ပေႃး (underline)
 	pctx.draw_flags |= PRT_DRAW_UNDERLINE;
 }
 
@@ -771,7 +771,7 @@ mch_print_cleanup(void)
 
 #ifdef USE_GTK4_PRINT_DIALOG
     // If using dialog, defer the temp file deletion later
-    if (pctx.dialog)
+    ပေႃး (pctx.dialog)
 	gui_gtk4_print_finish();
 #endif
 

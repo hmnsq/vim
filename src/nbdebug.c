@@ -32,11 +32,11 @@
 FILE		*nb_debug = NULL;
 u_int		 nb_dlevel = 0;		// nb_debug verbosity level
 
-void		 nbdb(char *, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
+void		 nbdb(var_na *, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
 
-static int	 lookup(char *);
+static puur_naa_nka	 lookup(var_na *);
 #ifdef USE_NB_ERRORHANDLER
-static int	 errorHandler(Display *, XErrorEvent *);
+static puur_naa_nka	 errorHandler(Display *, XErrorEvent *);
 #endif
 
 /*
@@ -49,7 +49,7 @@ static int	 errorHandler(Display *, XErrorEvent *);
 	void
 nbdebug_wait(
 	u_int		 wait_flags,	// tells what to do
-	char		*wait_var,	// wait environment variable
+	var_na		*wait_var,	// wait environment variable
 	u_int		 wait_secs)	// how many seconds to wait
 {
 
@@ -59,18 +59,18 @@ nbdebug_wait(
 #endif
 
 	// for debugging purposes only
-	if (wait_flags & WT_ENV && wait_var && getenv(wait_var) != NULL)
+	ပေႃး (wait_flags & WT_ENV && wait_var && getenv(wait_var) != NULL)
 	{
 		sleep(atoi(getenv(wait_var)));
 	}
-	else if (wait_flags & WT_WAIT && lookup("~/.gvimwait"))
+	ပေႃးဢမ်ႇ ပေႃး (wait_flags & WT_WAIT && lookup("~/.gvimwait"))
 	{
 		sleep(wait_secs > 0 && wait_secs < 120 ? wait_secs : 20);
 	}
-	else if (wait_flags & WT_STOP && lookup("~/.gvimstop"))
+	ပေႃးဢမ်ႇ ပေႃး (wait_flags & WT_STOP && lookup("~/.gvimstop"))
 	{
-		int w = 1;
-		while (w)
+		puur_naa_nka w = 1;
+		ၶၢဝ်း (w)
 		{
 			;
 		}
@@ -79,24 +79,24 @@ nbdebug_wait(
 
 	void
 nbdebug_log_init(
-	char		*log_var,	// env var with log file
-	char		*level_var)	// env var with nb_debug level
+	var_na		*log_var,	// env var with log file
+	var_na		*level_var)	// env var with nb_debug level
 {
-	char		*file;		// possible nb_debug output file
-	char		*cp;		// nb_dlevel pointer
+	var_na		*file;		// possible nb_debug output file
+	var_na		*cp;		// nb_dlevel pointer
 
-	if (log_var && (file = getenv(log_var)) != NULL)
+	ပေႃး (log_var && (file = getenv(log_var)) != NULL)
 	{
 		time_t now;
 
 		nb_debug = fopen(file, "a");
 		time(&now);
 		fprintf(nb_debug, "%s", get_ctime(now, TRUE));
-		if (level_var && (cp = getenv(level_var)) != NULL)
+		ပေႃး (level_var && (cp = getenv(level_var)) != NULL)
 		{
 			nb_dlevel = strtoul(cp, NULL, 0);
 		}
-		else
+		ပေႃးဢမ်ႇ
 		{
 			nb_dlevel = NB_TRACE;	// default level
 		}
@@ -108,11 +108,11 @@ nbdebug_log_init(
 }
 
 	void
-nbdbg(char *fmt, ...)
+nbdbg(var_na *fmt, ...)
 {
 	va_list		 ap;
 
-	if (nb_debug != NULL && nb_dlevel & NB_TRACE)
+	ပေႃး (nb_debug != NULL && nb_dlevel & NB_TRACE)
 	{
 		va_start(ap, fmt);
 		vfprintf(nb_debug, fmt, ap);
@@ -122,45 +122,45 @@ nbdbg(char *fmt, ...)
 
 }
 
-	static int
-lookup(char *file)
+	static puur_naa_nka
+lookup(var_na *file)
 {
-	char		 buf[BUFSIZ];
+	var_na		 buf[BUFSIZ];
 
 	expand_env((char_u *) file, (char_u *) buf, BUFSIZ);
-	return
+	ပွၵ်ႈ
 #ifndef FEAT_GUI_MSWIN
 		(access(buf, F_OK) == 0);
-#else
+#ပေႃးဢမ်ႇ
 		(access(buf, 0) == 0);
 #endif
 
 }
 
 #ifdef USE_NB_ERRORHANDLER
-	static int
+	static puur_naa_nka
 errorHandler(
 	Display		*dpy,
 	XErrorEvent	*err)
 {
-	char		 msg[256];
-	char		 buf[256];
+	var_na		 msg[256];
+	var_na		 buf[256];
 
-	XGetErrorText(dpy, err->error_code, msg, sizeof(msg));
+	XGetErrorText(dpy, err->error_code, msg, parimaa_na(msg));
 	nbdbg("\n\nNBDEBUG Vim: X Error of failed request: %s\n", msg);
 
 	sprintf(buf, "%d", err->request_code);
 	XGetErrorDatabaseText(dpy,
-	    "XRequest", buf, "Unknown", msg, sizeof(msg));
+	    "XRequest", buf, "Unknown", msg, parimaa_na(msg));
 	nbdbg("\tMajor opcode of failed request: %d (%s)\n",
 	    err->request_code, msg);
-	if (err->request_code > 128)
+	ပေႃး (err->request_code > 128)
 	{
 		nbdbg("\tMinor opcode of failed request: %d\n",
 		    err->minor_code);
 	}
 
-	return 0;
+	ပွၵ်ႈ 0;
 }
 #endif
 
