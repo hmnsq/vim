@@ -11,23 +11,23 @@
  * digraph.c: code for digraphs
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-#if defined(FEAT_DIGRAPHS)
+#ಯದಿ defined(FEAT_DIGRAPHS)
 
-typedef int result_T;
+ಪ್ರಕಾರನಿರ್ದೇಶ ಪೂರ್ಣಾಙ್ಕ result_T;
 
-typedef struct digraph
+ಪ್ರಕಾರನಿರ್ದೇಶ ಸಂರಚನಾ digraph
 {
     char_u	char1;
     char_u	char2;
     result_T	result;
 } digr_T;
 
-static void printdigraph(digr_T *dp, result_T *previous);
+ಸ್ಥಿರ ಶೂನ್ಯ printdigraph(digr_T *dp, result_T *previous);
 
 // digraphs added by the user
-static garray_T	user_digraphs = {0, 0, (int)sizeof(digr_T), 10, NULL};
+ಸ್ಥಿರ garray_T	user_digraphs = {0, 0, (ಪೂರ್ಣಾಙ್ಕ)ಪರಿಮಾಣ(digr_T), 10, ರಿಕ್ತ};
 
 /*
  * digraphs for Unicode from RFC1345
@@ -36,7 +36,7 @@ static garray_T	user_digraphs = {0, 0, (int)sizeof(digr_T), 10, NULL};
  * Note: Characters marked with XX are not included literally, because some
  * compilers cannot handle them (Amiga SAS/C is the most picky one).
  */
-static digr_T digraphdefault[] = {
+ಸ್ಥಿರ digr_T digraphdefault[] = {
 	{'N', 'U', 0x0a},	// LF for NUL
 	{'S', 'H', 0x01},
 	{'S', 'X', 0x02},
@@ -1441,26 +1441,26 @@ static digr_T digraphdefault[] = {
 /*
  * handle digraphs after typing a character
  */
-    int
-do_digraph(int c)
+    ಪೂರ್ಣಾಙ್ಕ
+do_digraph(ಪೂರ್ಣಾಙ್ಕ c)
 {
-    static int	backspaced;	// character before K_BS
-    static int	lastchar;	// last typed character
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ	backspaced;	// character before K_BS
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ	lastchar;	// last typed character
 
-    if (c == -1)		// init values
+    ಯದಿ (c == -1)		// init values
     {
 	backspaced = -1;
     }
-    else if (p_dg)
+    ಅನ್ಯಥಾ ಯದಿ (p_dg)
     {
-	if (backspaced >= 0)
+	ಯದಿ (backspaced >= 0)
 	    c = digraph_get(backspaced, c, FALSE);
 	backspaced = -1;
-	if ((c == K_BS || c == Ctrl_H) && lastchar >= 0)
+	ಯದಿ ((c == K_BS || c == Ctrl_H) && lastchar >= 0)
 	    backspaced = lastchar;
     }
     lastchar = c;
-    return c;
+    ಪ್ರತ್ಯಾಗಮ c;
 }
 
 /*
@@ -1468,16 +1468,16 @@ do_digraph(int c)
  * If not found return NULL.
  */
     char_u *
-get_digraph_for_char(int val_arg)
+get_digraph_for_char(ಪೂರ್ಣಾಙ್ಕ val_arg)
 {
-    int		val = val_arg;
-    int		i;
-    int		use_defaults;
+    ಪೂರ್ಣಾಙ್ಕ		val = val_arg;
+    ಪೂರ್ಣಾಙ್ಕ		i;
+    ಪೂರ್ಣಾಙ್ಕ		use_defaults;
     digr_T	*dp;
-    static      char_u      r[3];
+    ಸ್ಥಿರ      char_u      r[3];
 
-# if defined(USE_UNICODE_DIGRAPHS)
-    if (!enc_utf8)
+# ಯದಿ defined(USE_UNICODE_DIGRAPHS)
+    ಯದಿ (!enc_utf8)
     {
 	char_u	    buf[6], *to;
 	vimconv_T   vc;
@@ -1485,40 +1485,40 @@ get_digraph_for_char(int val_arg)
 	// convert the character from 'encoding' to Unicode
 	i = mb_char2bytes(val, buf);
 	vc.vc_type = CONV_NONE;
-	if (convert_setup(&vc, p_enc, (char_u *)"utf-8") == OK)
+	ಯದಿ (convert_setup(&vc, p_enc, (char_u *)"utf-8") == OK)
 	{
 	    vc.vc_fail = TRUE;
 	    to = string_convert(&vc, buf, &i);
-	    if (to != NULL)
+	    ಯದಿ (to != ರಿಕ್ತ)
 	    {
 		val = utf_ptr2char(to);
 		vim_free(to);
 	    }
-	    (void)convert_setup(&vc, NULL, NULL);
+	    (ಶೂನ್ಯ)convert_setup(&vc, ರಿಕ್ತ, ರಿಕ್ತ);
 	}
     }
 # endif
 
-    for (use_defaults = 0; use_defaults <= 1; use_defaults++)
+    ಪ್ರತಿ (use_defaults = 0; use_defaults <= 1; use_defaults++)
     {
-	if (use_defaults == 0)
+	ಯದಿ (use_defaults == 0)
 	    dp = (digr_T *)user_digraphs.ga_data;
-	else
+	ಅನ್ಯಥಾ
 	    dp = digraphdefault;
-	for (i = 0; use_defaults ? dp->char1 != NUL
+	ಪ್ರತಿ (i = 0; use_defaults ? dp->char1 != NUL
 					       : i < user_digraphs.ga_len; ++i)
 	{
-	    if (dp->result == val)
+	    ಯದಿ (dp->result == val)
 	    {
 		r[0] = dp->char1;
 		r[1] = dp->char2;
 		r[2] = NUL;
-		return r;
+		ಪ್ರತ್ಯಾಗಮ r;
 	    }
 	    ++dp;
 	}
     }
-    return NULL;
+    ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
 }
 
 /*
@@ -1526,42 +1526,42 @@ get_digraph_for_char(int val_arg)
  * mode.
  * Returns composed character, or NUL when ESC was used.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 get_digraph(
-    int		cmdline)	// TRUE when called from the cmdline
+    ಪೂರ್ಣಾಙ್ಕ		cmdline)	// TRUE when called from the cmdline
 {
-    int		c, cc;
+    ಪೂರ್ಣಾಙ್ಕ		c, cc;
 
     ++no_mapping;
-    ++allow_keys;
+    ++allow_ಕೀಲಿಗಳು;
     c = plain_vgetc();
     --no_mapping;
-    --allow_keys;
+    --allow_ಕೀಲಿಗಳು;
 
-    if (c == ESC)		// ESC cancels CTRL-K
-	return NUL;
+    ಯದಿ (c == ESC)		// ESC cancels CTRL-K
+	ಪ್ರತ್ಯಾಗಮ NUL;
 
-    if (IS_SPECIAL(c))	// insert special key code
-	return c;
-    if (cmdline)
+    ಯದಿ (IS_SPECIAL(c))	// insert special key code
+	ಪ್ರತ್ಯಾಗಮ c;
+    ಯದಿ (cmdline)
     {
-	if (char2cells(c) == 1
-# if defined(FEAT_CRYPT) || defined(FEAT_EVAL)
+	ಯದಿ (char2cells(c) == 1
+# ಯದಿ defined(FEAT_CRYPT) || defined(FEAT_EVAL)
 		&& cmdline_star == 0
 # endif
 	   )
 	    putcmdline(c, TRUE);
     }
-    else
+    ಅನ್ಯಥಾ
 	add_to_showcmd(c);
     ++no_mapping;
-    ++allow_keys;
+    ++allow_ಕೀಲಿಗಳು;
     cc = plain_vgetc();
     --no_mapping;
-    --allow_keys;
-    if (cc != ESC)	    // ESC cancels CTRL-K
-	return digraph_get(c, cc, TRUE);
-    return NUL;
+    --allow_ಕೀಲಿಗಳು;
+    ಯದಿ (cc != ESC)	    // ESC cancels CTRL-K
+	ಪ್ರತ್ಯಾಗಮ digraph_get(c, cc, TRUE);
+    ಪ್ರತ್ಯಾಗಮ NUL;
 }
 
 /*
@@ -1569,26 +1569,26 @@ get_digraph(
  * If no match, return "char2".
  * If "meta_char" is TRUE and "char1" is a space, return "char2" | 0x80.
  */
-    static int
-getexactdigraph(int char1, int char2, int meta_char)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+getexactdigraph(ಪೂರ್ಣಾಙ್ಕ char1, ಪೂರ್ಣಾಙ್ಕ char2, ಪೂರ್ಣಾಙ್ಕ meta_char)
 {
-    int		i;
-    int		retval = 0;
+    ಪೂರ್ಣಾಙ್ಕ		i;
+    ಪೂರ್ಣಾಙ್ಕ		retval = 0;
     digr_T	*dp;
 
-    if (IS_SPECIAL(char1) || IS_SPECIAL(char2))
-	return char2;
+    ಯದಿ (IS_SPECIAL(char1) || IS_SPECIAL(char2))
+	ಪ್ರತ್ಯಾಗಮ char2;
 
     /*
      * Search user digraphs first.
      */
     dp = (digr_T *)user_digraphs.ga_data;
-    for (i = 0; i < user_digraphs.ga_len; ++i)
+    ಪ್ರತಿ (i = 0; i < user_digraphs.ga_len; ++i)
     {
-	if ((int)dp->char1 == char1 && (int)dp->char2 == char2)
+	ಯದಿ ((ಪೂರ್ಣಾಙ್ಕ)dp->char1 == char1 && (ಪೂರ್ಣಾಙ್ಕ)dp->char2 == char2)
 	{
 	    retval = dp->result;
-	    break;
+	    ಭಙ್ಗ;
 	}
 	++dp;
     }
@@ -1596,21 +1596,21 @@ getexactdigraph(int char1, int char2, int meta_char)
     /*
      * Search default digraphs.
      */
-    if (retval == 0)
+    ಯದಿ (retval == 0)
     {
 	dp = digraphdefault;
-	while (dp->char1 != 0)
+	ಯಾವತ್ (dp->char1 != 0)
 	{
-	    if ((int)dp->char1 == char1 && (int)dp->char2 == char2)
+	    ಯದಿ ((ಪೂರ್ಣಾಙ್ಕ)dp->char1 == char1 && (ಪೂರ್ಣಾಙ್ಕ)dp->char2 == char2)
 	    {
 		retval = dp->result;
-		break;
+		ಭಙ್ಗ;
 	    }
 	    ++dp;
 	}
     }
 # ifdef USE_UNICODE_DIGRAPHS
-    if (retval != 0 && !enc_utf8)
+    ಯದಿ (retval != 0 && !enc_utf8)
     {
 	char_u	    buf[6], *to;
 	vimconv_T   vc;
@@ -1621,73 +1621,73 @@ getexactdigraph(int char1, int char2, int meta_char)
 	i = utf_char2bytes(retval, buf);
 	retval = 0;
 	vc.vc_type = CONV_NONE;
-	if (convert_setup(&vc, (char_u *)"utf-8", p_enc) == OK)
+	ಯದಿ (convert_setup(&vc, (char_u *)"utf-8", p_enc) == OK)
 	{
 	    vc.vc_fail = TRUE;
 	    to = string_convert(&vc, buf, &i);
-	    if (to != NULL)
+	    ಯದಿ (to != ರಿಕ್ತ)
 	    {
 		retval = (*mb_ptr2char)(to);
 		vim_free(to);
 	    }
-	    (void)convert_setup(&vc, NULL, NULL);
+	    (ಶೂನ್ಯ)convert_setup(&vc, ರಿಕ್ತ, ರಿಕ್ತ);
 	}
     }
 # endif
 
     // Ignore multi-byte characters when not in multi-byte mode.
-    if (!has_mbyte && retval > 0xff)
+    ಯದಿ (!has_mbyte && retval > 0xff)
 	retval = 0;
 
-    if (retval == 0)		// digraph deleted or not found
+    ಯದಿ (retval == 0)		// digraph deleted or not found
     {
-	if (char1 == ' ' && meta_char)	// <space> <char> --> meta-char
-	    return (char2 | 0x80);
-	return char2;
+	ಯದಿ (char1 == ' ' && meta_char)	// <space> <char> --> meta-char
+	    ಪ್ರತ್ಯಾಗಮ (char2 | 0x80);
+	ಪ್ರತ್ಯಾಗಮ char2;
     }
-    return retval;
+    ಪ್ರತ್ಯಾಗಮ retval;
 }
 
 /*
  * Get digraph.
  * Allow for both char1-char2 and char2-char1
  */
-    int
-digraph_get(int char1, int char2, int meta_char)
+    ಪೂರ್ಣಾಙ್ಕ
+digraph_get(ಪೂರ್ಣಾಙ್ಕ char1, ಪೂರ್ಣಾಙ್ಕ char2, ಪೂರ್ಣಾಙ್ಕ meta_char)
 {
-    int	    retval;
+    ಪೂರ್ಣಾಙ್ಕ	    retval;
 
-    if (((retval = getexactdigraph(char1, char2, meta_char)) == char2)
+    ಯದಿ (((retval = getexactdigraph(char1, char2, meta_char)) == char2)
 	    && (char1 != char2)
 	    && ((retval = getexactdigraph(char2, char1, meta_char)) == char1))
-	return char2;
-    return retval;
+	ಪ್ರತ್ಯಾಗಮ char2;
+    ಪ್ರತ್ಯಾಗಮ retval;
 }
 
 /*
  * Add a digraph to the digraph table.
  */
-    static void
-registerdigraph(int char1, int char2, int n)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+registerdigraph(ಪೂರ್ಣಾಙ್ಕ char1, ಪೂರ್ಣಾಙ್ಕ char2, ಪೂರ್ಣಾಙ್ಕ n)
 {
-    int		i;
+    ಪೂರ್ಣಾಙ್ಕ		i;
     digr_T	*dp;
 
     // If the digraph already exists, replace "result".
     dp = (digr_T *)user_digraphs.ga_data;
-    for (i = 0; i < user_digraphs.ga_len; ++i)
+    ಪ್ರತಿ (i = 0; i < user_digraphs.ga_len; ++i)
     {
-	if ((int)dp->char1 == char1 && (int)dp->char2 == char2)
+	ಯದಿ ((ಪೂರ್ಣಾಙ್ಕ)dp->char1 == char1 && (ಪೂರ್ಣಾಙ್ಕ)dp->char2 == char2)
 	{
 	    dp->result = n;
-	    return;
+	    ಪ್ರತ್ಯಾಗಮ;
 	}
 	++dp;
     }
 
     // Add a new digraph to the table.
-    if (ga_grow(&user_digraphs, 1) == FAIL)
-	return;
+    ಯದಿ (ga_grow(&user_digraphs, 1) == FAIL)
+	ಪ್ರತ್ಯಾಗಮ;
 
     dp = (digr_T *)user_digraphs.ga_data + user_digraphs.ga_len;
     dp->char1 = char1;
@@ -1701,24 +1701,24 @@ registerdigraph(int char1, int char2, int n)
  * If they are valid, returns TRUE; otherwise, give an error message and
  * returns FALSE.
  */
-    static int
-check_digraph_chars_valid(int char1, int char2)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+check_digraph_chars_valid(ಪೂರ್ಣಾಙ್ಕ char1, ಪೂರ್ಣಾಙ್ಕ char2)
 {
-    if (char2 == 0)
+    ಯದಿ (char2 == 0)
     {
-	char_u msg[MB_MAXBYTES + 1];
+	char_u ಸಂದೇಶ[MB_MAXBYTES + 1];
 
-	msg[mb_char2bytes(char1, msg)] = NUL;
+	ಸಂದೇಶ[mb_char2bytes(char1, ಸಂದೇಶ)] = NUL;
 
-	semsg(_(e_digraph_must_be_just_two_characters_str), msg);
-	return FALSE;
+	semsg(_(e_digraph_must_be_just_two_characters_str), ಸಂದೇಶ);
+	ಪ್ರತ್ಯಾಗಮ FALSE;
     }
-    if (char1 == ESC || char2 == ESC)
+    ಯದಿ (char1 == ESC || char2 == ESC)
     {
 	emsg(_(e_escape_not_allowed_in_digraph));
-	return FALSE;
+	ಪ್ರತ್ಯಾಗಮ FALSE;
     }
-    return TRUE;
+    ಪ್ರತ್ಯಾಗಮ TRUE;
 }
 
 
@@ -1727,27 +1727,27 @@ check_digraph_chars_valid(int char1, int char2)
  * Add the digraphs in the argument to the digraph table.
  * format: {c1}{c2} char {c1}{c2} char ...
  */
-    void
+    ಶೂನ್ಯ
 putdigraph(char_u *str)
 {
-    int		char1, char2, n;
+    ಪೂರ್ಣಾಙ್ಕ		char1, char2, n;
 
-    while (*str != NUL)
+    ಯಾವತ್ (*str != NUL)
     {
 	str = skipwhite(str);
-	if (*str == NUL)
-	    return;
+	ಯದಿ (*str == NUL)
+	    ಪ್ರತ್ಯಾಗಮ;
 	char1 = *str++;
 	char2 = *str++;
 
-	if (!check_digraph_chars_valid(char1, char2))
-	    return;
+	ಯದಿ (!check_digraph_chars_valid(char1, char2))
+	    ಪ್ರತ್ಯಾಗಮ;
 
 	str = skipwhite(str);
-	if (!VIM_ISDIGIT(*str))
+	ಯದಿ (!VIM_ISDIGIT(*str))
 	{
-	    emsg(_(e_number_expected));
-	    return;
+	    emsg(_(e_ಸಂಖ್ಯೆ_expected));
+	    ಪ್ರತ್ಯಾಗಮ;
 	}
 	n = getdigits(&str);
 
@@ -1755,58 +1755,58 @@ putdigraph(char_u *str)
     }
 }
 
-# if defined(USE_UNICODE_DIGRAPHS)
-    static void
-digraph_header(char *msg)
+# ಯದಿ defined(USE_UNICODE_DIGRAPHS)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+digraph_header(ವರ್ಣ *ಸಂದೇಶ)
 {
-    if (msg_col > 0)
-	msg_putchar('\n');
-    msg_outtrans_attr((char_u *)msg, HL_ATTR(HLF_CM));
-    msg_putchar('\n');
+    ಯದಿ (ಸಂದೇಶ_col > 0)
+	ಸಂದೇಶ_putchar('\n');
+    ಸಂದೇಶ_outtrans_attr((char_u *)ಸಂದೇಶ, HL_ATTR(HLF_CM));
+    ಸಂದೇಶ_putchar('\n');
 }
 # endif
 
-    void
-listdigraphs(int use_headers)
+    ಶೂನ್ಯ
+listdigraphs(ಪೂರ್ಣಾಙ್ಕ use_headers)
 {
-    int		i;
+    ಪೂರ್ಣಾಙ್ಕ		i;
     digr_T	*dp;
     result_T	previous = 0;
 
-    msg_putchar('\n');
+    ಸಂದೇಶ_putchar('\n');
 
     dp = digraphdefault;
-    while (dp->char1 != NUL && !got_int)
+    ಯಾವತ್ (dp->char1 != NUL && !got_int)
     {
-# if defined(USE_UNICODE_DIGRAPHS)
+# ಯದಿ defined(USE_UNICODE_DIGRAPHS)
 	digr_T tmp;
 
 	// May need to convert the result to 'encoding'.
 	tmp.char1 = dp->char1;
 	tmp.char2 = dp->char2;
 	tmp.result = getexactdigraph(tmp.char1, tmp.char2, FALSE);
-	if (tmp.result != 0 && tmp.result != tmp.char2
+	ಯದಿ (tmp.result != 0 && tmp.result != tmp.char2
 					  && (has_mbyte || tmp.result <= 255))
-	    printdigraph(&tmp, use_headers ? &previous : NULL);
-# else
+	    printdigraph(&tmp, use_headers ? &previous : ರಿಕ್ತ);
+# ಅನ್ಯಥಾ
 
-	if (getexactdigraph(dp->char1, dp->char2, FALSE) == dp->result
+	ಯದಿ (getexactdigraph(dp->char1, dp->char2, FALSE) == dp->result
 		&& (has_mbyte || dp->result <= 255))
-	    printdigraph(dp, use_headers ? &previous : NULL);
+	    printdigraph(dp, use_headers ? &previous : ರಿಕ್ತ);
 # endif
 	++dp;
 	ui_breakcheck();
     }
 
     dp = (digr_T *)user_digraphs.ga_data;
-    for (i = 0; i < user_digraphs.ga_len && !got_int; ++i)
+    ಪ್ರತಿ (i = 0; i < user_digraphs.ga_len && !got_int; ++i)
     {
-# if defined(USE_UNICODE_DIGRAPHS)
-	if (previous >= 0 && use_headers)
+# ಯದಿ defined(USE_UNICODE_DIGRAPHS)
+	ಯದಿ (previous >= 0 && use_headers)
 	    digraph_header(_("Custom"));
 	previous = -1;
 # endif
-	printdigraph(dp, NULL);
+	printdigraph(dp, ರಿಕ್ತ);
 	ui_breakcheck();
 	++dp;
     }
@@ -1816,7 +1816,7 @@ listdigraphs(int use_headers)
     set_must_redraw(UPD_CLEAR);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 digraph_getlist_appendpair(digr_T *dp, list_T *l)
 {
     char_u	buf[30];
@@ -1826,21 +1826,21 @@ digraph_getlist_appendpair(digr_T *dp, list_T *l)
 
 
     li = listitem_alloc();
-    if (li == NULL)
-	return;
+    ಯದಿ (li == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ;
     list_append(l, li);
     li->li_tv.v_type = VAR_LIST;
     li->li_tv.v_lock = 0;
 
     l2 = list_alloc();
     li->li_tv.vval.v_list = l2;
-    if (l2 == NULL)
-	return;
+    ಯದಿ (l2 == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ;
     ++l2->lv_refcount;
 
     li2 = listitem_alloc();
-    if (li2 == NULL)
-	return;
+    ಯದಿ (li2 == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ;
     list_append(l2, li2);
     li2->li_tv.v_type = VAR_STRING;
     li2->li_tv.v_lock = 0;
@@ -1851,35 +1851,35 @@ digraph_getlist_appendpair(digr_T *dp, list_T *l)
     li2->li_tv.vval.v_string = vim_strsave(&buf[0]);
 
     li2 = listitem_alloc();
-    if (li2 == NULL)
-	return;
+    ಯದಿ (li2 == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ;
     list_append(l2, li2);
     li2->li_tv.v_type = VAR_STRING;
     li2->li_tv.v_lock = 0;
 
     p = buf;
-    if (has_mbyte)
+    ಯದಿ (has_mbyte)
 	p += (*mb_char2bytes)(dp->result, p);
-    else
+    ಅನ್ಯಥಾ
 	*p++ = (char_u)dp->result;
     *p = NUL;
 
     li2->li_tv.vval.v_string = vim_strsave(buf);
 }
 
-    static void
-digraph_getlist_common(int list_all, typval_T *rettv)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+digraph_getlist_common(ಪೂರ್ಣಾಙ್ಕ list_all, typval_T *rettv)
 {
-    int		i;
+    ಪೂರ್ಣಾಙ್ಕ		i;
     digr_T	*dp;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ಯದಿ (rettv_list_alloc(rettv) == FAIL)
+	ಪ್ರತ್ಯಾಗಮ;
 
-    if (list_all)
+    ಯದಿ (list_all)
     {
 	dp = digraphdefault;
-	while (dp->char1 != NUL && !got_int)
+	ಯಾವತ್ (dp->char1 != NUL && !got_int)
 	{
 # ifdef USE_UNICODE_DIGRAPHS
 	    digr_T tmp;
@@ -1887,11 +1887,11 @@ digraph_getlist_common(int list_all, typval_T *rettv)
 	    tmp.char1 = dp->char1;
 	    tmp.char2 = dp->char2;
 	    tmp.result = getexactdigraph(tmp.char1, tmp.char2, FALSE);
-	    if (tmp.result != 0 && tmp.result != tmp.char2
+	    ಯದಿ (tmp.result != 0 && tmp.result != tmp.char2
 					  && (has_mbyte || tmp.result <= 255))
 		digraph_getlist_appendpair(&tmp, rettv->vval.v_list);
-# else
-	    if (getexactdigraph(dp->char1, dp->char2, FALSE) == dp->result
+# ಅನ್ಯಥಾ
+	    ಯದಿ (getexactdigraph(dp->char1, dp->char2, FALSE) == dp->result
 		    && (has_mbyte || dp->result <= 255))
 		digraph_getlist_appendpair(dp, rettv->vval.v_list);
 # endif
@@ -1900,16 +1900,16 @@ digraph_getlist_common(int list_all, typval_T *rettv)
     }
 
     dp = (digr_T *)user_digraphs.ga_data;
-    for (i = 0; i < user_digraphs.ga_len && !got_int; ++i)
+    ಪ್ರತಿ (i = 0; i < user_digraphs.ga_len && !got_int; ++i)
     {
 	digraph_getlist_appendpair(dp, rettv->vval.v_list);
 	++dp;
     }
 }
 
-static struct dg_header_entry {
-    int	    dg_start;
-    char    *dg_header;
+ಸ್ಥಿರ ಸಂರಚನಾ dg_header_entry {
+    ಪೂರ್ಣಾಙ್ಕ	    dg_start;
+    ವರ್ಣ    *dg_header;
 } header_table[] = {
     {DG_START_LATIN, N_("Latin supplement")},
     {DG_START_GREEK, N_("Greek and Coptic")},
@@ -1937,70 +1937,70 @@ static struct dg_header_entry {
     {DG_START_KATAKANA, N_("Katakana")},
     {DG_START_BOPOMOFO, N_("Bopomofo")},
     {DG_START_OTHER3, N_("Other")},
-    {0xfffffff, NULL},
+    {0xfffffff, ರಿಕ್ತ},
 };
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 printdigraph(digr_T *dp, result_T *previous)
 {
     char_u	buf[30];
     char_u	*p;
 
-    int		list_width;
+    ಪೂರ್ಣಾಙ್ಕ		list_width;
 
-    if ((dy_flags & DY_UHEX) || has_mbyte)
+    ಯದಿ ((dy_flags & DY_UHEX) || has_mbyte)
 	list_width = 13;
-    else
+    ಅನ್ಯಥಾ
 	list_width = 11;
 
-    if (dp->result == 0)
-	return;
+    ಯದಿ (dp->result == 0)
+	ಪ್ರತ್ಯಾಗಮ;
 
-# if defined(USE_UNICODE_DIGRAPHS)
-    if (previous != NULL)
+# ಯದಿ defined(USE_UNICODE_DIGRAPHS)
+    ಯದಿ (previous != ರಿಕ್ತ)
     {
-	int i;
+	ಪೂರ್ಣಾಙ್ಕ i;
 
-	for (i = 0; header_table[i].dg_header != NULL; ++i)
-	    if (*previous < header_table[i].dg_start
+	ಪ್ರತಿ (i = 0; header_table[i].dg_header != ರಿಕ್ತ; ++i)
+	    ಯದಿ (*previous < header_table[i].dg_start
 		    && dp->result >= header_table[i].dg_start
 		    && dp->result < header_table[i + 1].dg_start)
 	    {
 		digraph_header(_(header_table[i].dg_header));
-		break;
+		ಭಙ್ಗ;
 	    }
 	*previous = dp->result;
     }
 # endif
-    if (msg_col > cmdline_width - list_width)
-	msg_putchar('\n');
-    if (msg_col)
-	while (msg_col % list_width != 0)
-	    msg_putchar(' ');
+    ಯದಿ (ಸಂದೇಶ_col > cmdline_width - list_width)
+	ಸಂದೇಶ_putchar('\n');
+    ಯದಿ (ಸಂದೇಶ_col)
+	ಯಾವತ್ (ಸಂದೇಶ_col % list_width != 0)
+	    ಸಂದೇಶ_putchar(' ');
 
     p = buf;
     *p++ = dp->char1;
     *p++ = dp->char2;
     *p++ = ' ';
     *p = NUL;
-    msg_outtrans(buf);
+    ಸಂದೇಶ_outtrans(buf);
     p = buf;
-    if (has_mbyte)
+    ಯದಿ (has_mbyte)
     {
 	// add a space to draw a composing char on
-	if (enc_utf8 && utf_iscomposing(dp->result))
+	ಯದಿ (enc_utf8 && utf_iscomposing(dp->result))
 	    *p++ = ' ';
 	p += (*mb_char2bytes)(dp->result, p);
     }
-    else
+    ಅನ್ಯಥಾ
 	*p++ = (char_u)dp->result;
     *p = NUL;
-    msg_outtrans_attr(buf, HL_ATTR(HLF_8));
+    ಸಂದೇಶ_outtrans_attr(buf, HL_ATTR(HLF_8));
     p = buf;
-    if (char2cells(dp->result) == 1)
+    ಯದಿ (char2cells(dp->result) == 1)
 	*p++ = ' ';
-    vim_snprintf((char *)p, sizeof(buf) - (p - buf), " %3d", dp->result);
-    msg_outtrans(buf);
+    vim_snprintf((ವರ್ಣ *)p, ಪರಿಮಾಣ(buf) - (p - buf), " %3d", dp->result);
+    ಸಂದೇಶ_outtrans(buf);
 }
 
 # ifdef FEAT_EVAL
@@ -2008,103 +2008,103 @@ printdigraph(digr_T *dp, result_T *previous)
  * Get the two digraph characters from a typval.
  * Return OK or FAIL.
  */
-    static int
-get_digraph_chars(typval_T *arg, int *char1, int *char2)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+get_digraph_chars(typval_T *arg, ಪೂರ್ಣಾಙ್ಕ *char1, ಪೂರ್ಣಾಙ್ಕ *char2)
 {
     char_u	buf_chars[NUMBUFLEN];
     char_u	*chars = tv_get_string_buf_chk(arg, buf_chars);
     char_u	*p = chars;
 
-    if (p != NULL)
+    ಯದಿ (p != ರಿಕ್ತ)
     {
-	if (*p != NUL)
+	ಯದಿ (*p != NUL)
 	{
 	    *char1 = mb_cptr2char_adv(&p);
-	    if (*p != NUL)
+	    ಯದಿ (*p != NUL)
 	    {
 		*char2 = mb_cptr2char_adv(&p);
-		if (*p == NUL)
+		ಯದಿ (*p == NUL)
 		{
-		    if (check_digraph_chars_valid(*char1, *char2))
-			return OK;
-		    return FAIL;
+		    ಯದಿ (check_digraph_chars_valid(*char1, *char2))
+			ಪ್ರತ್ಯಾಗಮ OK;
+		    ಪ್ರತ್ಯಾಗಮ FAIL;
 		}
 	    }
 	}
     }
     semsg(_(e_digraph_must_be_just_two_characters_str), chars);
-    return FAIL;
+    ಪ್ರತ್ಯಾಗಮ FAIL;
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
 digraph_set_common(typval_T *argchars, typval_T *argdigraph)
 {
-    int		char1, char2;
+    ಪೂರ್ಣಾಙ್ಕ		char1, char2;
     char_u	*digraph;
     char_u	*p;
     char_u	buf_digraph[NUMBUFLEN];
     varnumber_T n;
 
-    if (get_digraph_chars(argchars, &char1, &char2) == FAIL)
-	return FALSE;
+    ಯದಿ (get_digraph_chars(argchars, &char1, &char2) == FAIL)
+	ಪ್ರತ್ಯಾಗಮ FALSE;
 
     digraph = tv_get_string_buf_chk(argdigraph, buf_digraph);
-    if (digraph == NULL)
-	return FALSE;
+    ಯದಿ (digraph == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FALSE;
     p = digraph;
     n = mb_cptr2char_adv(&p);
-    if (*p != NUL)
+    ಯದಿ (*p != NUL)
     {
 	semsg(_(e_digraph_argument_must_be_one_character_str), digraph);
-	return FALSE;
+	ಪ್ರತ್ಯಾಗಮ FALSE;
     }
 
-    registerdigraph(char1, char2, (int)n);
-    return TRUE;
+    registerdigraph(char1, char2, (ಪೂರ್ಣಾಙ್ಕ)n);
+    ಪ್ರತ್ಯಾಗಮ TRUE;
 }
 # endif
 
 #endif // FEAT_DIGRAPHS
 
-#if defined(FEAT_EVAL)
+#ಯದಿ defined(FEAT_EVAL)
 /*
  * "digraph_get()" function
  */
-    void
+    ಶೂನ್ಯ
 f_digraph_get(typval_T *argvars, typval_T *rettv)
 {
 # ifdef FEAT_DIGRAPHS
-    int		code;
+    ಪೂರ್ಣಾಙ್ಕ		code;
     char_u	buf[NUMBUFLEN];
     char_u	*digraphs;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;  // Return empty string for failure
+    rettv->vval.v_string = ರಿಕ್ತ;  // Return empty string for failure
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ಯದಿ (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ಪ್ರತ್ಯಾಗಮ;
 
     digraphs = tv_get_string_chk(&argvars[0]);
 
-    if (digraphs == NULL)
-	return;
-    else if (STRLEN(digraphs) != 2)
+    ಯದಿ (digraphs == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ;
+    ಅನ್ಯಥಾ ಯದಿ (STRLEN(digraphs) != 2)
     {
 	semsg(_(e_digraph_must_be_just_two_characters_str), digraphs);
-	return;
+	ಪ್ರತ್ಯಾಗಮ;
     }
     code = digraph_get(digraphs[0], digraphs[1], FALSE);
 
-    if (has_mbyte)
+    ಯದಿ (has_mbyte)
 	buf[(*mb_char2bytes)(code, buf)] = NUL;
-    else
+    ಅನ್ಯಥಾ
     {
 	buf[0] = code;
 	buf[1] = NUL;
     }
 
     rettv->vval.v_string = vim_strsave(buf);
-# else
+# ಅನ್ಯಥಾ
     emsg(_(e_no_digraphs_version));
 # endif
 }
@@ -2112,18 +2112,18 @@ f_digraph_get(typval_T *argvars, typval_T *rettv)
 /*
  * "digraph_getlist()" function
  */
-    void
+    ಶೂನ್ಯ
 f_digraph_getlist(typval_T *argvars, typval_T *rettv)
 {
 # ifdef FEAT_DIGRAPHS
-    int     flag_list_all;
+    ಪೂರ್ಣಾಙ್ಕ     flag_list_all;
 
-    if (check_for_opt_bool_arg(argvars, 0) == FAIL)
-	return;
+    ಯದಿ (check_for_opt_bool_arg(argvars, 0) == FAIL)
+	ಪ್ರತ್ಯಾಗಮ;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    ಯದಿ (argvars[0].v_type == VAR_UNKNOWN)
 	flag_list_all = FALSE;
-    else
+    ಅನ್ಯಥಾ
     {
 	varnumber_T flag = tv_get_bool(&argvars[0]);
 
@@ -2131,7 +2131,7 @@ f_digraph_getlist(typval_T *argvars, typval_T *rettv)
     }
 
     digraph_getlist_common(flag_list_all, rettv);
-# else
+# ಅನ್ಯಥಾ
     emsg(_(e_no_digraphs_version));
 # endif
 }
@@ -2139,23 +2139,23 @@ f_digraph_getlist(typval_T *argvars, typval_T *rettv)
 /*
  * "digraph_set()" function
  */
-    void
+    ಶೂನ್ಯ
 f_digraph_set(typval_T *argvars, typval_T *rettv)
 {
 # ifdef FEAT_DIGRAPHS
     rettv->v_type = VAR_BOOL;
-    rettv->vval.v_number = VVAL_FALSE;
+    rettv->vval.v_ಸಂಖ್ಯೆ = VVAL_FALSE;
 
-    if (in_vim9script()
+    ಯದಿ (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	ಪ್ರತ್ಯಾಗಮ;
 
-    if (!digraph_set_common(&argvars[0], &argvars[1]))
-	return;
+    ಯದಿ (!digraph_set_common(&argvars[0], &argvars[1]))
+	ಪ್ರತ್ಯಾಗಮ;
 
-    rettv->vval.v_number = VVAL_TRUE;
-# else
+    rettv->vval.v_ಸಂಖ್ಯೆ = VVAL_TRUE;
+# ಅನ್ಯಥಾ
     emsg(_(e_no_digraphs_version));
 # endif
 }
@@ -2163,7 +2163,7 @@ f_digraph_set(typval_T *argvars, typval_T *rettv)
 /*
  * "digraph_setlist()" function
  */
-    void
+    ಶೂನ್ಯ
 f_digraph_setlist(typval_T * argvars, typval_T *rettv)
 {
 # ifdef FEAT_DIGRAPHS
@@ -2171,43 +2171,43 @@ f_digraph_setlist(typval_T * argvars, typval_T *rettv)
     listitem_T	*pli;
 
     rettv->v_type = VAR_BOOL;
-    rettv->vval.v_number = VVAL_FALSE;
+    rettv->vval.v_ಸಂಖ್ಯೆ = VVAL_FALSE;
 
-    if (argvars[0].v_type != VAR_LIST)
+    ಯದಿ (argvars[0].v_type != VAR_LIST)
     {
-	emsg(_(e_digraph_setlist_argument_must_be_list_of_lists_with_two_items));
-	return;
+	emsg(_(e_digraph_setlist_argument_must_be_list_of_lists_with_two_ವಸ್ತುಗಳು));
+	ಪ್ರತ್ಯಾಗಮ;
     }
 
     pl = argvars[0].vval.v_list;
-    if (pl == NULL)
+    ಯದಿ (pl == ರಿಕ್ತ)
     {
 	// Empty list always results in success.
-	rettv->vval.v_number = VVAL_TRUE;
-	return;
+	rettv->vval.v_ಸಂಖ್ಯೆ = VVAL_TRUE;
+	ಪ್ರತ್ಯಾಗಮ;
     }
 
-    FOR_ALL_LIST_ITEMS(pl, pli)
+    FOR_ALL_LIST_ವಸ್ತುಗಳು(pl, pli)
     {
-	if (pli->li_tv.v_type != VAR_LIST)
+	ಯದಿ (pli->li_tv.v_type != VAR_LIST)
 	{
-	    emsg(_(e_digraph_setlist_argument_must_be_list_of_lists_with_two_items));
-	    return;
+	    emsg(_(e_digraph_setlist_argument_must_be_list_of_lists_with_two_ವಸ್ತುಗಳು));
+	    ಪ್ರತ್ಯಾಗಮ;
 	}
 
 	l = pli->li_tv.vval.v_list;
-	if (l == NULL || l->lv_len != 2)
+	ಯದಿ (l == ರಿಕ್ತ || l->lv_len != 2)
 	{
-	    emsg(_(e_digraph_setlist_argument_must_be_list_of_lists_with_two_items));
-	    return;
+	    emsg(_(e_digraph_setlist_argument_must_be_list_of_lists_with_two_ವಸ್ತುಗಳು));
+	    ಪ್ರತ್ಯಾಗಮ;
 	}
 
-	if (!digraph_set_common(&l->lv_first->li_tv,
+	ಯದಿ (!digraph_set_common(&l->lv_first->li_tv,
 						 &l->lv_first->li_next->li_tv))
-	    return;
+	    ಪ್ರತ್ಯಾಗಮ;
     }
-    rettv->vval.v_number = VVAL_TRUE;
-# else
+    rettv->vval.v_ಸಂಖ್ಯೆ = VVAL_TRUE;
+# ಅನ್ಯಥಾ
     emsg(_(e_no_digraphs_version));
 # endif
 }
@@ -2215,10 +2215,10 @@ f_digraph_setlist(typval_T * argvars, typval_T *rettv)
 #endif // FEAT_EVAL
 
 
-#if defined(FEAT_KEYMAP)
+#ಯದಿ defined(FEAT_KEYMAP)
 
 // structure used for b_kmap_ga.ga_data
-typedef struct
+ಪ್ರಕಾರನಿರ್ದೇಶ ಸಂರಚನಾ
 {
     char_u	*from;
     char_u	*to;
@@ -2226,7 +2226,7 @@ typedef struct
 
 # define KMAP_MAXLEN 20	    // maximum length of "from" or "to"
 
-static void keymap_unload(void);
+ಸ್ಥಿರ ಶೂನ್ಯ keymap_unload(ಶೂನ್ಯ);
 
 /*
  * Set up key mapping tables for the 'keymap' option.
@@ -2234,19 +2234,19 @@ static void keymap_unload(void);
  * used when setting the option, not later when the value has already been
  * checked.
  */
-    char *
-keymap_init(void)
+    ವರ್ಣ *
+keymap_init(ಶೂನ್ಯ)
 {
     curbuf->b_kmap_state &= ~KEYMAP_INIT;
 
-    if (*curbuf->b_p_keymap == NUL)
+    ಯದಿ (*curbuf->b_p_keymap == NUL)
     {
 	// Stop any active keymap and clear the table.  Also remove
 	// b:keymap_name, as no keymap is active now.
 	keymap_unload();
 	do_cmdline_cmd((char_u *)"unlet! b:keymap_name");
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	char_u	*buf;
 	size_t  buflen;
@@ -2255,56 +2255,56 @@ keymap_init(void)
 	// which will call ex_loadkeymap() below.
 	buflen = STRLEN(curbuf->b_p_keymap) + STRLEN(p_enc) + 14;
 	buf = alloc(buflen);
-	if (buf == NULL)
-	    return e_out_of_memory;
+	ಯದಿ (buf == ರಿಕ್ತ)
+	    ಪ್ರತ್ಯಾಗಮ e_out_of_memory;
 
 	// try finding "keymap/'keymap'_'encoding'.vim"  in 'runtimepath'
-	vim_snprintf((char *)buf, buflen, "keymap/%s_%s.vim",
+	vim_snprintf((ವರ್ಣ *)buf, buflen, "keymap/%s_%s.vim",
 						   curbuf->b_p_keymap, p_enc);
-	if (source_runtime(buf, 0) == FAIL)
+	ಯದಿ (source_runtime(buf, 0) == FAIL)
 	{
 	    // try finding "keymap/'keymap'.vim" in 'runtimepath'
-	    vim_snprintf((char *)buf, buflen, "keymap/%s.vim",
+	    vim_snprintf((ವರ್ಣ *)buf, buflen, "keymap/%s.vim",
 							  curbuf->b_p_keymap);
-	    if (source_runtime(buf, 0) == FAIL)
+	    ಯದಿ (source_runtime(buf, 0) == FAIL)
 	    {
 		vim_free(buf);
-		return N_(e_keymap_file_not_found);
+		ಪ್ರತ್ಯಾಗಮ N_(e_keymap_file_not_found);
 	    }
 	}
 	vim_free(buf);
     }
 
-    return NULL;
+    ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
 }
 
 /*
  * ":loadkeymap" command: load the following lines as the keymap.
  */
-    void
+    ಶೂನ್ಯ
 ex_loadkeymap(exarg_T *eap)
 {
-    char_u	*line;
+    char_u	*ಸಾಲು;
     char_u	*p;
     char_u	*s;
     kmap_T	*kp;
 # define KMAP_LLEN   200	    // max length of "to" and "from" together
     char_u	buf[KMAP_LLEN + 11];
-    int		i;
+    ಪೂರ್ಣಾಙ್ಕ		i;
     char_u	*save_cpo = p_cpo;
 
-    if (!sourcing_a_script(eap))
+    ಯದಿ (!sourcing_a_script(eap))
     {
 	emsg(_(e_using_loadkeymap_not_in_sourced_file));
-	return;
+	ಪ್ರತ್ಯಾಗಮ;
     }
 
-    if (eap->skip)
+    ಯದಿ (eap->skip)
     {
 	// The rest of the script is the keymap, read it and throw it away.
-	while ((line = eap->ea_getline(0, eap->cookie, 0, TRUE)) != NULL)
-	    vim_free(line);
-	return;
+	ಯಾವತ್ ((ಸಾಲು = eap->ea_getline(0, eap->cookie, 0, TRUE)) != ರಿಕ್ತ)
+	    vim_free(ಸಾಲು);
+	ಪ್ರತ್ಯಾಗಮ;
     }
 
     /*
@@ -2313,7 +2313,7 @@ ex_loadkeymap(exarg_T *eap)
     keymap_unload();
 
     curbuf->b_kmap_state = 0;
-    ga_init2(&curbuf->b_kmap_ga, sizeof(kmap_T), 20);
+    ga_init2(&curbuf->b_kmap_ga, ಪರಿಮಾಣ(kmap_T), 20);
 
     // Set 'cpoptions' to "C" to avoid line continuation.
     p_cpo = (char_u *)"C";
@@ -2321,14 +2321,14 @@ ex_loadkeymap(exarg_T *eap)
     /*
      * Get each line of the sourced file, break at the end.
      */
-    for (;;)
+    ಪ್ರತಿ (;;)
     {
-	line = eap->ea_getline(0, eap->cookie, 0, TRUE);
-	if (line == NULL)
-	    break;
+	ಸಾಲು = eap->ea_getline(0, eap->cookie, 0, TRUE);
+	ಯದಿ (ಸಾಲು == ರಿಕ್ತ)
+	    ಭಙ್ಗ;
 
-	p = skipwhite(line);
-	if (*p != '"' && *p != NUL && ga_grow(&curbuf->b_kmap_ga, 1) == OK)
+	p = skipwhite(ಸಾಲು);
+	ಯದಿ (*p != '"' && *p != NUL && ga_grow(&curbuf->b_kmap_ga, 1) == OK)
 	{
 	    kp = (kmap_T *)curbuf->b_kmap_ga.ga_data + curbuf->b_kmap_ga.ga_len;
 	    s = skiptowhite(p);
@@ -2337,30 +2337,30 @@ ex_loadkeymap(exarg_T *eap)
 	    s = skiptowhite(p);
 	    kp->to = vim_strnsave(p, s - p);
 
-	    if (kp->from == NULL || kp->to == NULL
+	    ಯದಿ (kp->from == ರಿಕ್ತ || kp->to == ರಿಕ್ತ
 		    || STRLEN(kp->from) + STRLEN(kp->to) >= KMAP_LLEN
 		    || *kp->from == NUL || *kp->to == NUL)
 	    {
-		if (kp->to != NULL && *kp->to == NUL)
+		ಯದಿ (kp->to != ರಿಕ್ತ && *kp->to == NUL)
 		    emsg(_(e_empty_keymap_entry));
 		vim_free(kp->from);
 		vim_free(kp->to);
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 		++curbuf->b_kmap_ga.ga_len;
 	}
-	vim_free(line);
+	vim_free(ಸಾಲು);
     }
 
     /*
      * setup ":lnoremap" to map the keys
      */
-    for (i = 0; i < curbuf->b_kmap_ga.ga_len; ++i)
+    ಪ್ರತಿ (i = 0; i < curbuf->b_kmap_ga.ga_len; ++i)
     {
-	vim_snprintf((char *)buf, sizeof(buf), "<buffer> %s %s",
+	vim_snprintf((ವರ್ಣ *)buf, ಪರಿಮಾಣ(buf), "<buffer> %s %s",
 				((kmap_T *)curbuf->b_kmap_ga.ga_data)[i].from,
 				 ((kmap_T *)curbuf->b_kmap_ga.ga_data)[i].to);
-	(void)do_map(MAPTYPE_NOREMAP, buf, MODE_LANGMAP, FALSE);
+	(ಶೂನ್ಯ)do_map(MAPTYPE_NOREMAP, buf, MODE_LANGMAP, FALSE);
     }
 
     p_cpo = save_cpo;
@@ -2372,26 +2372,26 @@ ex_loadkeymap(exarg_T *eap)
 /*
  * Stop using 'keymap'.
  */
-    static void
-keymap_unload(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+keymap_unload(ಶೂನ್ಯ)
 {
     char_u	buf[KMAP_MAXLEN + 10];
-    int		i;
+    ಪೂರ್ಣಾಙ್ಕ		i;
     char_u	*save_cpo = p_cpo;
     kmap_T	*kp;
 
-    if (!(curbuf->b_kmap_state & KEYMAP_LOADED))
-	return;
+    ಯದಿ (!(curbuf->b_kmap_state & KEYMAP_LOADED))
+	ಪ್ರತ್ಯಾಗಮ;
 
     // Set 'cpoptions' to "C" to avoid line continuation.
     p_cpo = (char_u *)"C";
 
     // clear the ":lmap"s
     kp = (kmap_T *)curbuf->b_kmap_ga.ga_data;
-    for (i = 0; i < curbuf->b_kmap_ga.ga_len; ++i)
+    ಪ್ರತಿ (i = 0; i < curbuf->b_kmap_ga.ga_len; ++i)
     {
-	vim_snprintf((char *)buf, sizeof(buf), "<buffer> %s", kp[i].from);
-	(void)do_map(MAPTYPE_UNMAP, buf, MODE_LANGMAP, FALSE);
+	vim_snprintf((ವರ್ಣ *)buf, ಪರಿಮಾಣ(buf), "<buffer> %s", kp[i].from);
+	(ಶೂನ್ಯ)do_map(MAPTYPE_UNMAP, buf, MODE_LANGMAP, FALSE);
     }
     keymap_clear(&curbuf->b_kmap_ga);
 
@@ -2402,13 +2402,13 @@ keymap_unload(void)
     status_redraw_curbuf();
 }
 
-    void
+    ಶೂನ್ಯ
 keymap_clear(garray_T *kmap)
 {
-    int	    i;
+    ಪೂರ್ಣಾಙ್ಕ	    i;
     kmap_T  *kp = (kmap_T *)kmap->ga_data;
 
-    for (i = 0; i < kmap->ga_len; ++i)
+    ಪ್ರತಿ (i = 0; i < kmap->ga_len; ++i)
     {
 	vim_free(kp[i].from);
 	vim_free(kp[i].to);

@@ -14,7 +14,7 @@
 // can access the internal structures.
 // (Until fully Carbon compliant)
 // TODO: Can we remove this? (Dany)
-#if 0
+#ಯದಿ 0
 # define OPAQUE_TOOLBOX_STRUCTS 0
 #endif
 
@@ -26,7 +26,7 @@
 /*
  * Unix interface
  */
-#if defined(__APPLE_CC__) // for Project Builder and ...
+#ಯದಿ defined(__APPLE_CC__) // for Project Builder and ...
 # include <unistd.h>
 // Get stat.h or something similar. Comment: How come some OS get in vim.h
 # include <sys/stat.h>
@@ -39,24 +39,24 @@
 // OK defined to 0 in MacOS X 10.2 curses!  Remove it, we define it to be 1.
 # undef OK
 #endif
-#include <signal.h>
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <dirent.h>
+#ಅನ್ತರ್ಭಾವ <signal.h>
+#ಅನ್ತರ್ಭಾವ <errno.h>
+#ಅನ್ತರ್ಭಾವ <stdio.h>
+#ಅನ್ತರ್ಭಾವ <stdlib.h>
+#ಅನ್ತರ್ಭಾವ <time.h>
+#ಅನ್ತರ್ಭಾವ <dirent.h>
 
 /*
  * Mach interface
  */
-#include <mach/task.h>
+#ಅನ್ತರ್ಭಾವ <mach/task.h>
 
 /*
  * MacOS specific #define
  */
 
 // This will go away when CMD_KEY fully tested
-#define USE_CMD_KEY
+#define USE_CMD_ಕೀಲಿ
 // On MacOS X use the / not the :
 // TODO: Should file such as ~/.vimrc reside instead in
 //       ~/Library/Vim or ~/Library/Preferences/org.vim.vim/ ? (Dany)
@@ -77,7 +77,7 @@
 
 #define USE_FNAME_CASE		// make ":e os_Mac.c" open the file in its
 				// original case, as "os_mac.c"
-#define BINARY_FILE_IO
+#define ದ್ವಿಮಾನ_FILE_IO
 #define EOL_DEFAULT EOL_MAC
 #define HAVE_AVAIL_MEM
 
@@ -90,7 +90,7 @@
 # define HAVE_ST_MODE		// have stat.st_mode
 # define HAVE_MATH_H
 
-# if defined(__DATE__) && defined(__TIME__)
+# ಯದಿ defined(__DATE__) && defined(__TIME__)
 #  define HAVE_DATE_TIME
 # endif
 # define HAVE_STRFTIME
@@ -196,12 +196,12 @@
 
 /**************/
 #define mch_rename(src, dst) rename(src, dst)
-#define mch_remove(x) unlink((char *)(x))
+#define mch_remove(x) unlink((ವರ್ಣ *)(x))
 #ifndef mch_getenv
-# if defined(__APPLE_CC__)
-#  define mch_getenv(name)  ((char_u *)getenv((char *)(name)))
+# ಯದಿ defined(__APPLE_CC__)
+#  define mch_getenv(name)  ((char_u *)getenv((ವರ್ಣ *)(name)))
 #  define mch_setenv(name, val, x) setenv(name, val, x)
-# else
+# ಅನ್ಯಥಾ
   // vim_getenv() is in pty.c
 #  define USE_VIMPTY_GETENV
 #  define mch_getenv(x) vimpty_getenv(x)
@@ -224,10 +224,10 @@
 // of ./configure for console MacOS X.
 
 #ifndef SIGPROTOARG
-# define SIGPROTOARG	(int)
+# define SIGPROTOARG	(ಪೂರ್ಣಾಙ್ಕ)
 #endif
 #ifndef SIGDEFARG
-# define SIGDEFARG(s)	(s) int s UNUSED;
+# define SIGDEFARG(s)	(s) ಪೂರ್ಣಾಙ್ಕ s UNUSED;
 #endif
 #ifndef SIGDUMMYARG
 # define SIGDUMMYARG	0
@@ -245,7 +245,7 @@
 # define HAVE_RENAME
 #endif
 
-#if !defined(HAVE_CONFIG_H)
+#ಯದಿ !defined(HAVE_CONFIG_H)
 # define HAVE_PUTENV
 #endif
 
@@ -256,9 +256,9 @@
 
 # include <dispatch/dispatch.h>
 
-# if !defined(MAC_OS_X_VERSION_10_12) \
+# ಯದಿ !defined(MAC_OS_X_VERSION_10_12) \
 	|| (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_12)
-typedef int clockid_t;
+ಪ್ರಕಾರನಿರ್ದೇಶ ಪೂರ್ಣಾಙ್ಕ clockid_t;
 # endif
 # ifndef CLOCK_REALTIME
 #  define CLOCK_REALTIME 0
@@ -267,35 +267,35 @@ typedef int clockid_t;
 #  define CLOCK_MONOTONIC 1
 # endif
 
-struct itimerspec
+ಸಂರಚನಾ itimerspec
 {
-    struct timespec it_interval;  // timer period
-    struct timespec it_value;	  // initial expiration
+    ಸಂರಚನಾ timespec it_interval;  // timer period
+    ಸಂರಚನಾ timespec it_value;	  // initial expiration
 };
 
-struct sigevent;
+ಸಂರಚನಾ sigevent;
 
-struct macos_timer
+ಸಂರಚನಾ macos_timer
 {
     dispatch_queue_t tim_queue;
     dispatch_source_t tim_timer;
-    void (*tim_func)(union sigval);
-    void *tim_arg;
+    ಶೂನ್ಯ (*tim_func)(ಸಙ್ಘ sigval);
+    ಶೂನ್ಯ *tim_arg;
 };
 
-typedef struct macos_timer *timer_t;
+ಪ್ರಕಾರನಿರ್ದೇಶ ಸಂರಚನಾ macos_timer *timer_t;
 
-extern int timer_create(
+ಬಾಹ್ಯ ಪೂರ್ಣಾಙ್ಕ timer_create(
     clockid_t clockid,
-    struct sigevent *sevp,
+    ಸಂರಚನಾ sigevent *sevp,
     timer_t *timerid);
 
-extern int timer_delete(timer_t timerid);
+ಬಾಹ್ಯ ಪೂರ್ಣಾಙ್ಕ timer_delete(timer_t timerid);
 
-extern int timer_settime(
-    timer_t timerid, int flags,
-    const struct itimerspec *new_value,
-    struct itimerspec *unused);
+ಬಾಹ್ಯ ಪೂರ್ಣಾಙ್ಕ timer_settime(
+    timer_t timerid, ಪೂರ್ಣಾಙ್ಕ flags,
+    ಧ್ರುವ ಸಂರಚನಾ itimerspec *new_ಮೌಲ್ಯ_2,
+    ಸಂರಚನಾ itimerspec *unused);
 
 #endif // FEAT_RELTIME
 

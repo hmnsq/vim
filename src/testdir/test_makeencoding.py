@@ -3,10 +3,10 @@
 
 # Test program for :make, :grep and :cgetfile.
 
-from __future__ import print_function, unicode_literals
-import locale
-import io
-import sys
+ತಃ __future__ ಆನಯನ print_function, unicode_literals
+ಆನಯನ locale
+ಆನಯನ io
+ಆನಯನ sys
 
 def set_output_encoding(enc=None):
     """Set the encoding of stdout and stderr
@@ -15,33 +15,33 @@ def set_output_encoding(enc=None):
       enc -- Encoding name.
              If omitted, locale.getpreferredencoding() is used.
     """
-    if enc is None:
+    ಯದಿ enc is None:
         enc = locale.getpreferredencoding()
 
     def get_text_writer(fo, **kwargs):
         kw = dict(kwargs)
         kw.setdefault('errors', 'backslashreplace') # use \uXXXX style
-        kw.setdefault('closefd', False)
+        kw.setdefault('closefd', ಅಸತ್ಯ)
 
-        if sys.version_info[0] < 3:
+        ಯದಿ sys.version_info[0] < 3:
             # Work around for Python 2.x
             # New line conversion isn't needed here. Done in somewhere else.
             writer = io.open(fo.fileno(), mode='w', newline='', **kw)
-            write = writer.write    # save the original write() function
+            ಲಿಖ = writer.ಲಿಖ    # save the original write() function
             enc = locale.getpreferredencoding()
             def convwrite(s):
-                if isinstance(s, bytes):
-                    write(s.decode(enc))    # convert to unistr
-                else:
-                    write(s)
-                try:
+                ಯದಿ isinstance(s, bytes):
+                    ಲಿಖ(s.decode(enc))    # convert to unistr
+                ಅನ್ಯಥಾ:
+                    ಲಿಖ(s)
+                ಯತ್ನ:
                     writer.flush()  # needed on Windows
-                except IOError:
+                ಅಪವಾದ IOError:
                     pass
-            writer.write = convwrite
-        else:
+            writer.ಲಿಖ = convwrite
+        ಅನ್ಯಥಾ:
             writer = io.open(fo.fileno(), mode='w', **kw)
-        return writer
+        ಪ್ರತ್ಯಾಗಮ writer
 
     sys.stdout = get_text_writer(sys.stdout, encoding=enc)
     sys.stderr = get_text_writer(sys.stderr, encoding=enc)
@@ -49,7 +49,7 @@ def set_output_encoding(enc=None):
 
 def main():
     enc = 'utf-8'
-    if len(sys.argv) > 1:
+    ಯದಿ len(sys.argv) > 1:
         enc = sys.argv[1]
     set_output_encoding(enc)
 
@@ -63,5 +63,5 @@ def main():
     print('Xfoobar.c(10) : %s (%s)' % (message_tbl[enc], enc))
 
 
-if __name__ == "__main__":
+ಯದಿ __name__ == "__main__":
     main()

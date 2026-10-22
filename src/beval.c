@@ -8,9 +8,9 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-#if defined(FEAT_BEVAL) || defined(FEAT_PROP_POPUP)
+#ಯದಿ defined(FEAT_BEVAL) || defined(FEAT_PROP_POPUP)
 /*
  * Find text under the mouse position "row" / "col".
  * If "getword" is TRUE the returned text in "*textp" is not the whole line but
@@ -18,119 +18,119 @@
  * Return OK if found.
  * Return FAIL if not found, no text at the mouse position.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 find_word_under_cursor(
-	int	    mouserow,
-	int	    mousecol,
-	int	    getword,
-	int	    flags,	// flags for find_ident_at_pos()
+	ಪೂರ್ಣಾಙ್ಕ	    mouserow,
+	ಪೂರ್ಣಾಙ್ಕ	    mousecol,
+	ಪೂರ್ಣಾಙ್ಕ	    getword,
+	ಪೂರ್ಣಾಙ್ಕ	    flags,	// flags for find_ident_at_pos()
 	win_T	    **winp,	// can be NULL
 	linenr_T    *lnump,	// can be NULL
 	char_u	    **textp,
-	int	    *colp,	// column where mouse hovers, can be NULL
-	int	    *startcolp) // column where text starts, can be NULL
+	ಪೂರ್ಣಾಙ್ಕ	    *colp,	// column where mouse hovers, can be NULL
+	ಪೂರ್ಣಾಙ್ಕ	    *startcolp) // column where text starts, can be NULL
 {
-    int		row = mouserow;
-    int		col = mousecol;
-    int		scol;
+    ಪೂರ್ಣಾಙ್ಕ		row = mouserow;
+    ಪೂರ್ಣಾಙ್ಕ		col = mousecol;
+    ಪೂರ್ಣಾಙ್ಕ		scol;
     win_T	*wp;
     char_u	*lbuf;
     linenr_T	lnum;
 
-    *textp = NULL;
+    *textp = ರಿಕ್ತ;
     wp = mouse_find_win(&row, &col, FAIL_POPUP);
-    if (wp == NULL || row < 0 || row >= wp->w_height || col >= wp->w_width)
-	return FAIL;
+    ಯದಿ (wp == ರಿಕ್ತ || row < 0 || row >= wp->w_height || col >= wp->w_width)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
 
     // Found a window and the cursor is in the text.  Now find the line
     // number.
-    if (mouse_comp_pos(wp, &row, &col, &lnum, NULL))
-	return FAIL;		// position is below the last line
+    ಯದಿ (mouse_comp_pos(wp, &row, &col, &lnum, ರಿಕ್ತ))
+	ಪ್ರತ್ಯಾಗಮ FAIL;		// position is below the last line
 
     // Not past end of the file.
     lbuf = ml_get_buf(wp->w_buffer, lnum, FALSE);
-    if (col > win_linetabsize(wp, lnum, lbuf, (colnr_T)MAXCOL))
-	return FAIL;		// past end of line
+    ಯದಿ (col > win_linetabsize(wp, lnum, lbuf, (colnr_T)MAXCOL))
+	ಪ್ರತ್ಯಾಗಮ FAIL;		// past end of line
 
     // Not past end of line.
-    if (getword)
+    ಯದಿ (getword)
     {
 	// For Netbeans we get the relevant part of the line
 	// instead of the whole line.
-	int		len;
-	pos_T	*spos = NULL, *epos = NULL;
+	ಪೂರ್ಣಾಙ್ಕ		len;
+	pos_T	*spos = ರಿಕ್ತ, *epos = ರಿಕ್ತ;
 
-	if (VIsual_active)
+	ಯದಿ (VIsual_active)
 	{
-	    if (LT_POS(VIsual, curwin->w_cursor))
+	    ಯದಿ (LT_POS(VIsual, curwin->w_cursor))
 	    {
 		spos = &VIsual;
 		epos = &curwin->w_cursor;
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 	    {
 		spos = &curwin->w_cursor;
 		epos = &VIsual;
 	    }
 	}
 
-	col = vcol2col(wp, lnum, col, NULL);
+	col = vcol2col(wp, lnum, col, ರಿಕ್ತ);
 	scol = col;
 
-	if (VIsual_active
+	ಯದಿ (VIsual_active
 		&& wp->w_buffer == curwin->w_buffer
 		&& (lnum == spos->lnum
-		    ? col >= (int)spos->col
+		    ? col >= (ಪೂರ್ಣಾಙ್ಕ)spos->col
 		    : lnum > spos->lnum)
 		&& (lnum == epos->lnum
-		    ? col <= (int)epos->col
+		    ? col <= (ಪೂರ್ಣಾಙ್ಕ)epos->col
 		    : lnum < epos->lnum))
 	{
 	    // Visual mode and pointing to the line with the
 	    // Visual selection: return selected text, with a
 	    // maximum of one line.
-	    if (spos->lnum != epos->lnum || spos->col == epos->col)
-		return FAIL;
+	    ಯದಿ (spos->lnum != epos->lnum || spos->col == epos->col)
+		ಪ್ರತ್ಯಾಗಮ FAIL;
 
 	    lbuf = ml_get_buf(curwin->w_buffer, VIsual.lnum, FALSE);
 	    len = epos->col - spos->col;
-	    if (*p_sel != 'e')
+	    ಯದಿ (*p_sel != 'e')
 		len += mb_ptr2len(lbuf + epos->col);
 	    lbuf = vim_strnsave(lbuf + spos->col, len);
 	    lnum = spos->lnum;
 	    col = spos->col;
 	    scol = col;
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
 	    // Find the word under the cursor.
 	    ++emsg_off;
 	    len = find_ident_at_pos(wp, lnum, (colnr_T)col,
 		    &lbuf, &scol, flags);
 	    --emsg_off;
-	    if (len == 0)
-		return FAIL;
+	    ಯದಿ (len == 0)
+		ಪ್ರತ್ಯಾಗಮ FAIL;
 	    lbuf = vim_strnsave(lbuf, len);
 	}
     }
-    else
+    ಅನ್ಯಥಾ
 	scol = col;
 
-    if (winp != NULL)
+    ಯದಿ (winp != ರಿಕ್ತ)
 	*winp = wp;
-    if (lnump != NULL)
+    ಯದಿ (lnump != ರಿಕ್ತ)
 	*lnump = lnum;
     *textp = lbuf;
-    if (colp != NULL)
+    ಯದಿ (colp != ರಿಕ್ತ)
 	*colp = col;
-    if (startcolp != NULL)
+    ಯದಿ (startcolp != ರಿಕ್ತ)
 	*startcolp = scol;
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 #endif
 
-#if defined(FEAT_BEVAL)
+#ಯದಿ defined(FEAT_BEVAL)
 
 /*
  * Get the text and position to be evaluated for "beval".
@@ -138,61 +138,61 @@ find_word_under_cursor(
  * relevant word in allocated memory.
  * Returns OK or FAIL.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 get_beval_info(
 	BalloonEval	*beval,
-	int		getword,
+	ಪೂರ್ಣಾಙ್ಕ		getword,
 	win_T		**winp,
 	linenr_T	*lnump,
 	char_u		**textp,
-	int		*colp)
+	ಪೂರ್ಣಾಙ್ಕ		*colp)
 {
-    int		row = mouse_row;
-    int		col = mouse_col;
+    ಪೂರ್ಣಾಙ್ಕ		row = mouse_row;
+    ಪೂರ್ಣಾಙ್ಕ		col = mouse_col;
 
 # ifdef FEAT_BEVAL_GUI
-    if (gui.in_use)
+    ಯದಿ (gui.in_use)
     {
 	row = Y_2_ROW(beval->y);
 	col = X_2_COL(beval->x);
     }
 # endif
-    if (find_word_under_cursor(row, col, getword,
+    ಯದಿ (find_word_under_cursor(row, col, getword,
 		FIND_IDENT + FIND_STRING + FIND_EVAL,
-		winp, lnump, textp, colp, NULL) == OK)
+		winp, lnump, textp, colp, ರಿಕ್ತ) == OK)
     {
 # ifdef FEAT_VARTABS
 	vim_free(beval->vts);
 	beval->vts = tabstop_copy((*winp)->w_buffer->b_p_vts_array);
-	if ((*winp)->w_buffer->b_p_vts_array != NULL && beval->vts == NULL)
+	ಯದಿ ((*winp)->w_buffer->b_p_vts_array != ರಿಕ್ತ && beval->vts == ರಿಕ್ತ)
 	{
-	    if (getword)
+	    ಯದಿ (getword)
 		vim_free(*textp);
-	    return FAIL;
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
 	}
 # endif
 	beval->ts = (*winp)->w_buffer->b_p_ts;
-	return OK;
+	ಪ್ರತ್ಯಾಗಮ OK;
     }
 
-    return FAIL;
+    ಪ್ರತ್ಯಾಗಮ FAIL;
 }
 
 /*
  * Show a balloon with "mesg" or "list".
  * Hide the balloon when both are NULL.
  */
-    void
+    ಶೂನ್ಯ
 post_balloon(BalloonEval *beval UNUSED, char_u *mesg, list_T *list UNUSED)
 {
 # ifdef FEAT_BEVAL_TERM
 #  ifdef FEAT_GUI
-    if (!gui.in_use)
+    ಯದಿ (!gui.in_use)
 #  endif
 	ui_post_balloon(mesg, list);
 # endif
 # ifdef FEAT_BEVAL_GUI
-    if (gui.in_use)
+    ಯದಿ (gui.in_use)
 	// GUI can't handle a list
 	gui_mch_post_balloon(beval, mesg);
 # endif
@@ -203,10 +203,10 @@ post_balloon(BalloonEval *beval UNUSED, char_u *mesg, list_T *list UNUSED)
  * 'ballooneval' for the GUI and 'balloonevalterm' for the terminal.
  * Also checks if the screen isn't scrolled up.
  */
-    int
-can_use_beval(void)
+    ಪೂರ್ಣಾಙ್ಕ
+can_use_beval(ಶೂನ್ಯ)
 {
-    return (0
+    ಪ್ರತ್ಯಾಗಮ (0
 # ifdef FEAT_BEVAL_GUI
 		|| (gui.in_use && p_beval)
 # endif
@@ -217,32 +217,32 @@ can_use_beval(void)
 #  endif
 		    p_bevalterm)
 # endif
-	     ) && msg_scrolled == 0;
+	     ) && ಸಂದೇಶ_scrolled == 0;
 }
 
 # ifdef FEAT_EVAL
 /*
  * Evaluate the expression 'bexpr' and set the text in the balloon 'beval'.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 bexpr_eval(
 	BalloonEval	*beval,
 	char_u		*bexpr,
 	win_T		*wp,
 	linenr_T	lnum,
-	int		col,
+	ಪೂರ್ಣಾಙ್ಕ		col,
 	char_u		*text)
 {
     win_T	*cw;
     long	winnr = 0;
-    int		use_sandbox;
-    static char_u  *result = NULL;
+    ಪೂರ್ಣಾಙ್ಕ		use_sandbox;
+    ಸ್ಥಿರ char_u  *result = ರಿಕ್ತ;
     size_t	len;
 
     sctx_T	save_sctx = current_sctx;
 
     // Convert window pointer to number.
-    for (cw = firstwin; cw != wp; cw = cw->w_next)
+    ಪ್ರತಿ (cw = firstwin; cw != wp; cw = cw->w_next)
 	++winnr;
 
     set_vim_var_nr(VV_BEVAL_BUFNR, (long)wp->w_buffer->b_fnum);
@@ -255,18 +255,18 @@ bexpr_eval(
 
     use_sandbox = was_set_insecurely(wp, (char_u *)"balloonexpr",
 			    *wp->w_buffer->b_p_bexpr == NUL ? 0 : OPT_LOCAL);
-    if (use_sandbox)
+    ಯದಿ (use_sandbox)
 	++sandbox;
     ++textlock;
 
-    if (bexpr == p_bexpr)
+    ಯದಿ (bexpr == p_bexpr)
     {
 	sctx_T *sp = get_option_sctx("balloonexpr");
 
-	if (sp != NULL)
+	ಯದಿ (sp != ರಿಕ್ತ)
 	    current_sctx = *sp;
     }
-    else
+    ಅನ್ಯಥಾ
 	current_sctx = curbuf->b_p_script_ctx[BV_BEXPR];
 
     vim_free(result);
@@ -275,25 +275,25 @@ bexpr_eval(
     // Remove one trailing newline, it is added when the result was a
     // list and it's hardly ever useful.  If the user really wants a
     // trailing newline he can add two and one remains.
-    if (result != NULL)
+    ಯದಿ (result != ರಿಕ್ತ)
     {
 	len = STRLEN(result);
-	if (len > 0 && result[len - 1] == NL)
+	ಯದಿ (len > 0 && result[len - 1] == NL)
 	    result[len - 1] = NUL;
     }
 
-    if (use_sandbox)
+    ಯದಿ (use_sandbox)
 	--sandbox;
     --textlock;
     current_sctx = save_sctx;
 
-    set_vim_var_string(VV_BEVAL_TEXT, NULL, -1);
-    if (result != NULL && result[0] != NUL)
-	post_balloon(beval, result, NULL);
+    set_vim_var_string(VV_BEVAL_TEXT, ರಿಕ್ತ, -1);
+    ಯದಿ (result != ರಿಕ್ತ && result[0] != NUL)
+	post_balloon(beval, result, ರಿಕ್ತ);
 
     // The 'balloonexpr' evaluation may show something on the screen
     // that requires a screen update.
-    if (must_redraw)
+    ಯದಿ (must_redraw)
 	redraw_after_callback(FALSE, FALSE);
 }
 # endif
@@ -301,46 +301,46 @@ bexpr_eval(
 /*
  * Common code, invoked when the mouse is resting for a moment.
  */
-    void
-general_beval_cb(BalloonEval *beval, int state UNUSED)
+    ಶೂನ್ಯ
+general_beval_cb(BalloonEval *beval, ಪೂರ್ಣಾಙ್ಕ state UNUSED)
 {
 # ifdef FEAT_EVAL
     win_T	*wp;
-    int		col;
+    ಪೂರ್ಣಾಙ್ಕ		col;
     linenr_T	lnum;
     char_u	*text;
     char_u	*bexpr;
 # endif
-    static int	recursive = FALSE;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ	recursive = FALSE;
 
     // Don't do anything when 'ballooneval' is off, messages scrolled the
     // windows up or we have no beval area.
-    if (!can_use_beval() || beval == NULL)
-	return;
+    ಯದಿ (!can_use_beval() || beval == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ;
 
     // Don't do this recursively.  Happens when the expression evaluation
     // takes a long time and invokes something that checks for CTRL-C typed.
-    if (recursive)
-	return;
+    ಯದಿ (recursive)
+	ಪ್ರತ್ಯಾಗಮ;
     recursive = TRUE;
 
 # ifdef FEAT_EVAL
-    if (get_beval_info(beval, TRUE, &wp, &lnum, &text, &col) == OK)
+    ಯದಿ (get_beval_info(beval, TRUE, &wp, &lnum, &text, &col) == OK)
     {
 	bexpr = (*wp->w_buffer->b_p_bexpr == NUL) ? p_bexpr
 						    : wp->w_buffer->b_p_bexpr;
-	if (*bexpr != NUL)
+	ಯದಿ (*bexpr != NUL)
 	{
 	    bexpr_eval(beval, bexpr, wp, lnum, col, text);
 	    recursive = FALSE;
-	    return;
+	    ಪ್ರತ್ಯಾಗಮ;
 	}
-	else
+	ಅನ್ಯಥಾ
 	    vim_free(text);
     }
 # endif
 # ifdef FEAT_NETBEANS_INTG
-    if (bevalServers & BEVAL_NETBEANS)
+    ಯದಿ (bevalServers & BEVAL_NETBEANS)
 	netbeans_beval_cb(beval, state);
 # endif
 

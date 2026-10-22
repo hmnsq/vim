@@ -20,43 +20,43 @@
  *   repeats.
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-#if defined(FEAT_CRYPT)
+#ಯದಿ defined(FEAT_CRYPT)
 
 #define BF_BLOCK    8
 #define BF_BLOCK_MASK 7
 #define BF_MAX_CFB_LEN  (8 * BF_BLOCK)
 
-typedef union {
+ಪ್ರಕಾರನಿರ್ದೇಶ ಸಙ್ಘ {
     UINT32_T ul[2];
     char_u   uc[8];
 } block8;
 
-#if defined(MSWIN)
+#ಯದಿ defined(MSWIN)
   // MS-Windows is always little endian
-#else
-# if defined(HAVE_CONFIG_H) || defined(WORDS_BIGENDIAN) || defined(AMIGA)
+#ಅನ್ಯಥಾ
+# ಯದಿ defined(HAVE_CONFIG_H) || defined(ಪದಗಳು_BIGENDIAN) || defined(AMIGA)
    // Endianness determined by configure, explicit define, or known platform.
    // Amiga (68k) is always big-endian.
-# else
-#  error Please change this code to define WORDS_BIGENDIAN for big-endian machines.
+# ಅನ್ಯಥಾ
+#  error Please change this code to define ಪದಗಳು_BIGENDIAN ಪ್ರತಿ big-endian machines.
 # endif
 #endif
 
 // The state of encryption, referenced by cryptstate_T.
-typedef struct {
+ಪ್ರಕಾರನಿರ್ದೇಶ ಸಂರಚನಾ {
     UINT32_T	pax[18];	    // P-array
     UINT32_T	sbx[4][256];	    // S-boxes
-    int		randbyte_offset;
-    int		update_offset;
+    ಪೂರ್ಣಾಙ್ಕ		randbyte_offset;
+    ಪೂರ್ಣಾಙ್ಕ		update_offset;
     char_u	cfb_buffer[BF_MAX_CFB_LEN]; // up to 64 bytes used
-    int		cfb_len;	    // size of cfb_buffer actually used
+    ಪೂರ್ಣಾಙ್ಕ		cfb_len;	    // size of cfb_buffer actually used
 } bf_state_T;
 
 
 // Blowfish code
-static UINT32_T pax_init[18] = {
+ಸ್ಥಿರ UINT32_T pax_init[18] = {
     0x243f6a88u, 0x85a308d3u, 0x13198a2eu,
     0x03707344u, 0xa4093822u, 0x299f31d0u,
     0x082efa98u, 0xec4e6c89u, 0x452821e6u,
@@ -65,7 +65,7 @@ static UINT32_T pax_init[18] = {
     0xb5470917u, 0x9216d5d9u, 0x8979fb1bu
 };
 
-static UINT32_T sbx_init[4][256] = {
+ಸ್ಥಿರ UINT32_T sbx_init[4][256] = {
    {0xd1310ba6u, 0x98dfb5acu, 0x2ffd72dbu, 0xd01adfb7u,
     0xb8e1afedu, 0x6a267e96u, 0xba7c9045u, 0xf12c7f99u,
     0x24a19947u, 0xb3916cf7u, 0x0801f2e2u, 0x858efc16u,
@@ -339,7 +339,7 @@ static UINT32_T sbx_init[4][256] = {
     bfs->sbx[2][(xr & 0xFF00) >> 8]) + \
     bfs->sbx[3][xr & 0xFF];
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 bf_e_block(
     bf_state_T *bfs,
     UINT32_T *p_xl,
@@ -367,15 +367,15 @@ bf_e_block(
 }
 
 
-#ifdef WORDS_BIGENDIAN
+#ifdef ಪದಗಳು_BIGENDIAN
 # define htonl2(x) \
     x = ((((x) &     0xffL) << 24) | (((x) & 0xff00L)     <<  8) | \
 	 (((x) & 0xff0000L) >>  8) | (((x) & 0xff000000L) >> 24))
-#else
+#ಅನ್ಯಥಾ
 # define htonl2(x)
 #endif
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 bf_e_cblock(
     bf_state_T *bfs,
     char_u *block)
@@ -395,61 +395,61 @@ bf_e_cblock(
  * Initialize the crypt method using "password" as the encryption key and
  * "salt[salt_len]" as the salt.
  */
-    static void
-bf_key_init(
+    ಸ್ಥಿರ ಶೂನ್ಯ
+bf_ಕೀಲಿ_init(
     bf_state_T	*bfs,
     char_u	*password,
     char_u	*salt,
-    int		salt_len)
+    ಪೂರ್ಣಾಙ್ಕ		salt_len)
 {
-    int      i, j, keypos = 0;
+    ಪೂರ್ಣಾಙ್ಕ      i, j, keypos = 0;
     unsigned u;
     UINT32_T val, data_l, data_r;
-    char_u   *key;
-    int      keylen;
+    char_u   *ಕೀಲಿ;
+    ಪೂರ್ಣಾಙ್ಕ      keylen;
 
     // Process the key 1001 times.
     // See http://en.wikipedia.org/wiki/Key_strengthening.
-    key = sha256_key(password, salt, salt_len);
-    for (i = 0; i < 1000; i++)
-	key = sha256_key(key, salt, salt_len);
+    ಕೀಲಿ = sha256_ಕೀಲಿ(password, salt, salt_len);
+    ಪ್ರತಿ (i = 0; i < 1000; i++)
+	ಕೀಲಿ = sha256_ಕೀಲಿ(ಕೀಲಿ, salt, salt_len);
 
     // Convert the key from 64 hex chars to 32 binary chars.
-    keylen = (int)STRLEN(key) / 2;
-    if (keylen == 0)
+    keylen = (ಪೂರ್ಣಾಙ್ಕ)STRLEN(ಕೀಲಿ) / 2;
+    ಯದಿ (keylen == 0)
     {
-	iemsg(e_bf_key_init_called_with_empty_password);
-	return;
+	iemsg(e_bf_ಕೀಲಿ_init_called_with_empty_password);
+	ಪ್ರತ್ಯಾಗಮ;
     }
-    for (i = 0; i < keylen; i++)
+    ಪ್ರತಿ (i = 0; i < keylen; i++)
     {
-	sscanf((char *)&key[i * 2], "%2x", &u);
-	key[i] = u;
+	sscanf((ವರ್ಣ *)&ಕೀಲಿ[i * 2], "%2x", &u);
+	ಕೀಲಿ[i] = u;
     }
 
     // Use "key" to initialize the P-array ("pax") and S-boxes ("sbx") of
     // Blowfish.
     mch_memmove(bfs->sbx, sbx_init, 4 * 4 * 256);
 
-    for (i = 0; i < 18; ++i)
+    ಪ್ರತಿ (i = 0; i < 18; ++i)
     {
 	val = 0;
-	for (j = 0; j < 4; ++j)
-	    val = (val << 8) | key[keypos++ % keylen];
+	ಪ್ರತಿ (j = 0; j < 4; ++j)
+	    val = (val << 8) | ಕೀಲಿ[keypos++ % keylen];
 	bfs->pax[i] = pax_init[i] ^ val;
     }
 
     data_l = data_r = 0;
-    for (i = 0; i < 18; i += 2)
+    ಪ್ರತಿ (i = 0; i < 18; i += 2)
     {
 	bf_e_block(bfs, &data_l, &data_r);
 	bfs->pax[i + 0] = data_l;
 	bfs->pax[i + 1] = data_r;
     }
 
-    for (i = 0; i < 4; ++i)
+    ಪ್ರತಿ (i = 0; i < 4; ++i)
     {
-	for (j = 0; j < 256; j += 2)
+	ಪ್ರತಿ (j = 0; j < 256; j += 2)
 	{
 	    bf_e_block(bfs, &data_l, &data_r);
 	    bfs->sbx[i][j + 0] = data_l;
@@ -461,24 +461,24 @@ bf_key_init(
 /*
  * Blowfish self-test for corrupted tables or instructions.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
 bf_check_tables(
     UINT32_T pax[18],
     UINT32_T sbx[4][256],
     UINT32_T val)
 {
-    int i, j;
+    ಪೂರ್ಣಾಙ್ಕ i, j;
     UINT32_T c = 0;
 
-    for (i = 0; i < 18; i++)
+    ಪ್ರತಿ (i = 0; i < 18; i++)
 	c ^= pax[i];
-    for (i = 0; i < 4; i++)
-	for (j = 0; j < 256; j++)
+    ಪ್ರತಿ (i = 0; i < 4; i++)
+	ಪ್ರತಿ (j = 0; j < 256; j++)
 	    c ^= sbx[i][j];
-    return c == val;
+    ಪ್ರತ್ಯಾಗಮ c == val;
 }
 
-typedef struct {
+ಪ್ರಕಾರನಿರ್ದೇಶ ಸಂರಚನಾ {
     char_u   password[64];
     char_u   salt[9];
     char_u   plaintxt[9];
@@ -491,7 +491,7 @@ typedef struct {
  * Assert bf(password, plaintxt) is cryptxt.
  * Assert csum(pax sbx(password)) is keysum.
  */
-static struct_bf_test_data bf_test_data[] = {
+ಸ್ಥಿರ struct_bf_test_data bf_test_data[] = {
   {
       "password",
       "salt",
@@ -505,11 +505,11 @@ static struct_bf_test_data bf_test_data[] = {
 /*
  * Return FAIL when there is something wrong with blowfish encryption.
  */
-    static int
-bf_self_test(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+bf_self_test(ಶೂನ್ಯ)
 {
-    int    i, bn;
-    int    err = 0;
+    ಪೂರ್ಣಾಙ್ಕ    i, bn;
+    ಪೂರ್ಣಾಙ್ಕ    err = 0;
     block8 bk;
     UINT32_T ui = 0xffffffffUL;
     bf_state_T state;
@@ -519,36 +519,36 @@ bf_self_test(void)
 
     // We can't simply use sizeof(UINT32_T), it would generate a compiler
     // warning.
-    if (ui != 0xffffffffUL || ui + 1 != 0)
+    ಯದಿ (ui != 0xffffffffUL || ui + 1 != 0)
     {
 	err++;
 	emsg(_(e_sizeof_uint32_isnot_four));
     }
 
-    if (!bf_check_tables(pax_init, sbx_init, 0x6ffa520a))
+    ಯದಿ (!bf_check_tables(pax_init, sbx_init, 0x6ffa520a))
 	err++;
 
     bn = ARRAY_LENGTH(bf_test_data);
-    for (i = 0; i < bn; i++)
+    ಪ್ರತಿ (i = 0; i < bn; i++)
     {
-	bf_key_init(&state, (char_u *)(bf_test_data[i].password),
+	bf_ಕೀಲಿ_init(&state, (char_u *)(bf_test_data[i].password),
 		    bf_test_data[i].salt,
-		    (int)STRLEN(bf_test_data[i].salt));
-	if (!bf_check_tables(state.pax, state.sbx, bf_test_data[i].keysum))
+		    (ಪೂರ್ಣಾಙ್ಕ)STRLEN(bf_test_data[i].salt));
+	ಯದಿ (!bf_check_tables(state.pax, state.sbx, bf_test_data[i].keysum))
 	    err++;
 
 	// Don't modify bf_test_data[i].plaintxt, self test is idempotent.
 	memcpy(bk.uc, bf_test_data[i].plaintxt, 8);
 	bf_e_cblock(&state, bk.uc);
-	if (memcmp(bk.uc, bf_test_data[i].cryptxt, 8) != 0)
+	ಯದಿ (memcmp(bk.uc, bf_test_data[i].cryptxt, 8) != 0)
 	{
-	    if (err == 0 && memcmp(bk.uc, bf_test_data[i].badcryptxt, 8) == 0)
+	    ಯದಿ (err == 0 && memcmp(bk.uc, bf_test_data[i].badcryptxt, 8) == 0)
 		emsg(_(e_blowfish_big_little_endian_use_wrong));
 	    err++;
 	}
     }
 
-    return err > 0 ? FAIL : OK;
+    ಪ್ರತ್ಯಾಗಮ err > 0 ? FAIL : OK;
 }
 
 /*
@@ -558,20 +558,20 @@ bf_self_test(void)
 /*
  * Initialize with seed "seed[seed_len]".
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 bf_cfb_init(
     bf_state_T	*bfs,
     char_u	*seed,
-    int		seed_len)
+    ಪೂರ್ಣಾಙ್ಕ		seed_len)
 {
-    int i, mi;
+    ಪೂರ್ಣಾಙ್ಕ i, mi;
 
     bfs->randbyte_offset = bfs->update_offset = 0;
     vim_memset(bfs->cfb_buffer, 0, bfs->cfb_len);
-    if (seed_len > 0)
+    ಯದಿ (seed_len > 0)
     {
 	mi = seed_len > bfs->cfb_len ? seed_len : bfs->cfb_len;
-	for (i = 0; i < mi; i++)
+	ಪ್ರತಿ (i = 0; i < mi; i++)
 	    bfs->cfb_buffer[i % bfs->cfb_len] ^= seed[i % seed_len];
     }
 }
@@ -579,16 +579,16 @@ bf_cfb_init(
 #define BF_CFB_UPDATE(bfs, c) \
 { \
     bfs->cfb_buffer[bfs->update_offset] ^= (char_u)c; \
-    if (++bfs->update_offset == bfs->cfb_len) \
+    ಯದಿ (++bfs->update_offset == bfs->cfb_len) \
 	bfs->update_offset = 0; \
 }
 
 #define BF_RANBYTE(bfs, t) \
 { \
-    if ((bfs->randbyte_offset & BF_BLOCK_MASK) == 0) \
+    ಯದಿ ((bfs->randbyte_offset & BF_BLOCK_MASK) == 0) \
 	bf_e_cblock(bfs, &(bfs->cfb_buffer[bfs->randbyte_offset])); \
     t = bfs->cfb_buffer[bfs->randbyte_offset]; \
-    if (++bfs->randbyte_offset == bfs->cfb_len) \
+    ಯದಿ (++bfs->randbyte_offset == bfs->cfb_len) \
 	bfs->randbyte_offset = 0; \
 }
 
@@ -596,19 +596,19 @@ bf_cfb_init(
  * Encrypt "from[len]" into "to[len]".
  * "from" and "to" can be equal to encrypt in place.
  */
-    void
+    ಶೂನ್ಯ
 crypt_blowfish_encode(
     cryptstate_T *state,
     char_u	*from,
     size_t	len,
     char_u	*to,
-    int		last UNUSED)
+    ಪೂರ್ಣಾಙ್ಕ		last UNUSED)
 {
     bf_state_T *bfs = state->method_state;
     size_t	i;
-    int		ztemp, t;
+    ಪೂರ್ಣಾಙ್ಕ		ztemp, t;
 
-    for (i = 0; i < len; ++i)
+    ಪ್ರತಿ (i = 0; i < len; ++i)
     {
 	ztemp = from[i];
 	BF_RANBYTE(bfs, t);
@@ -620,19 +620,19 @@ crypt_blowfish_encode(
 /*
  * Decrypt "from[len]" into "to[len]".
  */
-    void
+    ಶೂನ್ಯ
 crypt_blowfish_decode(
     cryptstate_T *state,
     char_u	*from,
     size_t	len,
     char_u	*to,
-    int		last UNUSED)
+    ಪೂರ್ಣಾಙ್ಕ		last UNUSED)
 {
     bf_state_T *bfs = state->method_state;
     size_t	i;
-    int		t;
+    ಪೂರ್ಣಾಙ್ಕ		t;
 
-    for (i = 0; i < len; ++i)
+    ಪ್ರತಿ (i = 0; i < len; ++i)
     {
 	BF_RANBYTE(bfs, t);
 	to[i] = from[i] ^ t;
@@ -640,48 +640,48 @@ crypt_blowfish_decode(
     }
 }
 
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 crypt_blowfish_init(
     cryptstate_T	*state,
-    char_u		*key,
+    char_u		*ಕೀಲಿ,
     crypt_arg_T		*arg)
 {
     bf_state_T	*bfs = ALLOC_CLEAR_ONE(bf_state_T);
 
-    if (bfs == NULL)
-	return FAIL;
+    ಯದಿ (bfs == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     state->method_state = bfs;
 
     // "blowfish" uses a 64 byte buffer, causing it to repeat 8 byte groups 8
     // times.  "blowfish2" uses an 8 byte buffer to avoid repeating.
     bfs->cfb_len = state->method_nr == CRYPT_M_BF ? BF_MAX_CFB_LEN : BF_BLOCK;
 
-    if (blowfish_self_test() == FAIL)
-	return FAIL;
+    ಯದಿ (blowfish_self_test() == FAIL)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
 
-    bf_key_init(bfs, key, arg->cat_salt, arg->cat_salt_len);
+    bf_ಕೀಲಿ_init(bfs, ಕೀಲಿ, arg->cat_salt, arg->cat_salt_len);
     bf_cfb_init(bfs, arg->cat_seed, arg->cat_seed_len);
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Run a test to check if the encryption works as expected.
  * Give an error and return FAIL when not.
  */
-    int
-blowfish_self_test(void)
+    ಪೂರ್ಣಾಙ್ಕ
+blowfish_self_test(ಶೂನ್ಯ)
 {
-    if (sha256_self_test() == FAIL)
+    ಯದಿ (sha256_self_test() == FAIL)
     {
 	emsg(_(e_sha256_test_failed));
-	return FAIL;
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     }
-    if (bf_self_test() == FAIL)
+    ಯದಿ (bf_self_test() == FAIL)
     {
 	emsg(_(e_blowfish_test_failed));
-	return FAIL;
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     }
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 #endif // FEAT_CRYPT

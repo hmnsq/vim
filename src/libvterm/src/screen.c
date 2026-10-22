@@ -1,11 +1,11 @@
-#include "vterm_internal.h"
+#ಅನ್ತರ್ಭಾವ "vterm_internal.h"
 
 // vim: set sw=2 :
-#include <stdio.h>
-#include <string.h>
+#ಅನ್ತರ್ಭಾವ <stdio.h>
+#ಅನ್ತರ್ಭಾವ <string.h>
 
-#include "rect.h"
-#include "utf8.h"
+#ಅನ್ತರ್ಭಾವ "rect.h"
+#ಅನ್ತರ್ಭಾವ "utf8.h"
 
 #define UNICODE_SPACE 0x20
 #define UNICODE_LINEFEED 0x0a
@@ -13,55 +13,55 @@
 #undef DEBUG_REFLOW
 
 /* State of the pen at some moment in time, also used in a cell */
-typedef struct
+ಪ್ರಕಾರನಿರ್ದೇಶ ಸಂರಚನಾ
 {
   /* After the bitfield */
   VTermColor   fg, bg;
 
-  unsigned int bold      : 1;
-  unsigned int underline : 2;
-  unsigned int italic    : 1;
-  unsigned int blink     : 1;
-  unsigned int reverse   : 1;
-  unsigned int conceal   : 1;
-  unsigned int strike    : 1;
-  unsigned int font      : 4; /* 0 to 9 */
-  unsigned int small     : 1;
-  unsigned int baseline  : 2;
+  unsigned ಪೂರ್ಣಾಙ್ಕ bold      : 1;
+  unsigned ಪೂರ್ಣಾಙ್ಕ underline : 2;
+  unsigned ಪೂರ್ಣಾಙ್ಕ italic    : 1;
+  unsigned ಪೂರ್ಣಾಙ್ಕ blink     : 1;
+  unsigned ಪೂರ್ಣಾಙ್ಕ reverse   : 1;
+  unsigned ಪೂರ್ಣಾಙ್ಕ conceal   : 1;
+  unsigned ಪೂರ್ಣಾಙ್ಕ strike    : 1;
+  unsigned ಪೂರ್ಣಾಙ್ಕ font      : 4; /* 0 to 9 */
+  unsigned ಪೂರ್ಣಾಙ್ಕ small     : 1;
+  unsigned ಪೂರ್ಣಾಙ್ಕ baseline  : 2;
 
   /* Extra state storage that isn't strictly pen-related */
-  unsigned int protected_cell : 1;
-  unsigned int dwl            : 1; /* on a DECDWL or DECDHL line */
-  unsigned int dhl            : 2; /* on a DECDHL line (1=top 2=bottom) */
+  unsigned ಪೂರ್ಣಾಙ್ಕ protected_cell : 1;
+  unsigned ಪೂರ್ಣಾಙ್ಕ dwl            : 1; /* on a DECDWL or DECDHL line */
+  unsigned ಪೂರ್ಣಾಙ್ಕ dhl            : 2; /* on a DECDHL line (1=top 2=bottom) */
 } ScreenPen;
 
 /* Internal representation of a screen cell */
-typedef struct
+ಪ್ರಕಾರನಿರ್ದೇಶ ಸಂರಚನಾ
 {
   uint32_t chars[VTERM_MAX_CHARS_PER_CELL];
   ScreenPen pen;
 } ScreenCell;
 
-struct VTermScreen
+ಸಂರಚನಾ VTermScreen
 {
   VTerm *vt;
   VTermState *state;
 
-  const VTermScreenCallbacks *callbacks;
-  void *cbdata;
-  int callbacks_has_pushline4;
+  ಧ್ರುವ VTermScreenCallbacks *callbacks;
+  ಶೂನ್ಯ *cbdata;
+  ಪೂರ್ಣಾಙ್ಕ callbacks_has_pushline4;
 
   VTermDamageSize damage_merge;
   /* start_row == -1 => no damage */
   VTermRect damaged;
   VTermRect pending_scrollrect;
-  int pending_scroll_downward, pending_scroll_rightward;
+  ಪೂರ್ಣಾಙ್ಕ pending_scroll_downward, pending_scroll_rightward;
 
-  int rows;
-  int cols;
+  ಪೂರ್ಣಾಙ್ಕ rows;
+  ಪೂರ್ಣಾಙ್ಕ cols;
 
-  unsigned int global_reverse : 1;
-  unsigned int reflow : 1;
+  unsigned ಪೂರ್ಣಾಙ್ಕ global_reverse : 1;
+  unsigned ಪೂರ್ಣಾಙ್ಕ reflow : 1;
 
   /* Primary and Altscreen. buffers[1] is lazily allocated as needed */
   ScreenCell *buffers[2];
@@ -75,94 +75,94 @@ struct VTermScreen
   ScreenPen pen;
 };
 
-static void clearcell(const VTermScreen *screen, ScreenCell *cell)
+ಸ್ಥಿರ ಶೂನ್ಯ clearcell(ಧ್ರುವ VTermScreen *screen, ScreenCell *cell)
 {
   cell->chars[0] = 0;
   cell->pen = screen->pen;
 }
 
-static ScreenCell *getcell(const VTermScreen *screen, int row, int col)
+ಸ್ಥಿರ ScreenCell *getcell(ಧ್ರುವ VTermScreen *screen, ಪೂರ್ಣಾಙ್ಕ row, ಪೂರ್ಣಾಙ್ಕ col)
 {
-  if(row < 0 || row >= screen->rows)
-    return NULL;
-  if(col < 0 || col >= screen->cols)
-    return NULL;
-  if (screen->buffer == NULL)
-    return NULL;
-  return screen->buffer + (screen->cols * row) + col;
+  ಯದಿ(row < 0 || row >= screen->rows)
+    ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
+  ಯದಿ(col < 0 || col >= screen->cols)
+    ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
+  ಯದಿ (screen->buffer == ರಿಕ್ತ)
+    ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
+  ಪ್ರತ್ಯಾಗಮ screen->buffer + (screen->cols * row) + col;
 }
 
-static ScreenCell *alloc_buffer(VTermScreen *screen, int rows, int cols)
+ಸ್ಥಿರ ScreenCell *alloc_buffer(VTermScreen *screen, ಪೂರ್ಣಾಙ್ಕ rows, ಪೂರ್ಣಾಙ್ಕ cols)
 {
-  ScreenCell *new_buffer = vterm_allocator_malloc(screen->vt, sizeof(ScreenCell) * rows * cols);
+  ScreenCell *new_buffer = vterm_allocator_malloc(screen->vt, ಪರಿಮಾಣ(ScreenCell) * rows * cols);
 
-  for(int row = 0; row < rows; row++) {
-    for(int col = 0; col < cols; col++) {
+  ಪ್ರತಿ(ಪೂರ್ಣಾಙ್ಕ row = 0; row < rows; row++) {
+    ಪ್ರತಿ(ಪೂರ್ಣಾಙ್ಕ col = 0; col < cols; col++) {
       clearcell(screen, &new_buffer[row * cols + col]);
     }
   }
 
-  return new_buffer;
+  ಪ್ರತ್ಯಾಗಮ new_buffer;
 }
 
-static void damagerect(VTermScreen *screen, VTermRect rect)
+ಸ್ಥಿರ ಶೂನ್ಯ damagerect(VTermScreen *screen, VTermRect rect)
 {
   VTermRect emit;
 
-  switch(screen->damage_merge) {
-  case VTERM_DAMAGE_CELL:
+  ವಿಕಲ್ಪ(screen->damage_merge) {
+  ಪಕ್ಷ VTERM_DAMAGE_CELL:
     /* Always emit damage event */
     emit = rect;
-    break;
+    ಭಙ್ಗ;
 
-  case VTERM_DAMAGE_ROW:
+  ಪಕ್ಷ VTERM_DAMAGE_ROW:
     /* Emit damage longer than one row. Try to merge with existing damage in
      * the same row */
-    if(rect.end_row > rect.start_row + 1) {
+    ಯದಿ(rect.end_row > rect.start_row + 1) {
       // Bigger than 1 line - flush existing, emit this
       vterm_screen_flush_damage(screen);
       emit = rect;
     }
-    else if(screen->damaged.start_row == -1) {
+    ಅನ್ಯಥಾ ಯದಿ(screen->damaged.start_row == -1) {
       // None stored yet
       screen->damaged = rect;
-      return;
+      ಪ್ರತ್ಯಾಗಮ;
     }
-    else if(rect.start_row == screen->damaged.start_row) {
+    ಅನ್ಯಥಾ ಯದಿ(rect.start_row == screen->damaged.start_row) {
       // Merge with the stored line
-      if(screen->damaged.start_col > rect.start_col)
+      ಯದಿ(screen->damaged.start_col > rect.start_col)
         screen->damaged.start_col = rect.start_col;
-      if(screen->damaged.end_col < rect.end_col)
+      ಯದಿ(screen->damaged.end_col < rect.end_col)
         screen->damaged.end_col = rect.end_col;
-      return;
+      ಪ್ರತ್ಯಾಗಮ;
     }
-    else {
+    ಅನ್ಯಥಾ {
       // Emit the currently stored line, store a new one
       emit = screen->damaged;
       screen->damaged = rect;
     }
-    break;
+    ಭಙ್ಗ;
 
-  case VTERM_DAMAGE_SCREEN:
-  case VTERM_DAMAGE_SCROLL:
+  ಪಕ್ಷ VTERM_DAMAGE_SCREEN:
+  ಪಕ್ಷ VTERM_DAMAGE_SCROLL:
     /* Never emit damage event */
-    if(screen->damaged.start_row == -1)
+    ಯದಿ(screen->damaged.start_row == -1)
       screen->damaged = rect;
-    else {
+    ಅನ್ಯಥಾ {
       rect_expand(&screen->damaged, &rect);
     }
-    return;
+    ಪ್ರತ್ಯಾಗಮ;
 
-  default:
+  ಸ್ವಭಾವ:
     DEBUG_LOG1("TODO: Maybe merge damage for level %d\n", screen->damage_merge);
-    return;
+    ಪ್ರತ್ಯಾಗಮ;
   }
 
-  if(screen->callbacks && screen->callbacks->damage)
+  ಯದಿ(screen->callbacks && screen->callbacks->damage)
     (*screen->callbacks->damage)(emit, screen->cbdata);
 }
 
-static void damagescreen(VTermScreen *screen)
+ಸ್ಥಿರ ಶೂನ್ಯ damagescreen(VTermScreen *screen)
 {
   VTermRect rect = {0,0,0,0};
   rect.end_row = screen->rows;
@@ -171,27 +171,27 @@ static void damagescreen(VTermScreen *screen)
   damagerect(screen, rect);
 }
 
-static int putglyph(VTermGlyphInfo *info, VTermPos pos, void *user)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ putglyph(VTermGlyphInfo *info, VTermPos pos, ಶೂನ್ಯ *user)
 {
   VTermScreen *screen = user;
   ScreenCell *cell = getcell(screen, pos.row, pos.col);
 
-  if(!cell)
-    return 0;
+  ಯದಿ(!cell)
+    ಪ್ರತ್ಯಾಗಮ 0;
 
-  int i;
-  for(i = 0; i < VTERM_MAX_CHARS_PER_CELL && info->chars[i]; i++) {
+  ಪೂರ್ಣಾಙ್ಕ i;
+  ಪ್ರತಿ(i = 0; i < VTERM_MAX_CHARS_PER_CELL && info->chars[i]; i++) {
     cell->chars[i] = info->chars[i];
     cell->pen = screen->pen;
   }
-  if(i < VTERM_MAX_CHARS_PER_CELL)
+  ಯದಿ(i < VTERM_MAX_CHARS_PER_CELL)
     cell->chars[i] = 0;
 
-  for(int col = 1; col < info->width; col++)
+  ಪ್ರತಿ(ಪೂರ್ಣಾಙ್ಕ col = 1; col < info->width; col++)
   {
     ScreenCell *onecell = getcell(screen, pos.row, pos.col + col);
-    if (onecell == NULL)
-      break;
+    ಯದಿ (onecell == ರಿಕ್ತ)
+      ಭಙ್ಗ;
     onecell->chars[0] = (uint32_t)-1;
   }
 
@@ -207,103 +207,103 @@ static int putglyph(VTermGlyphInfo *info, VTermPos pos, void *user)
 
   damagerect(screen, rect);
 
-  return 1;
+  ಪ್ರತ್ಯಾಗಮ 1;
 }
 
-static void sb_pushline_from_row(VTermScreen *screen, int row, int continuation)
+ಸ್ಥಿರ ಶೂನ್ಯ sb_pushline_from_row(VTermScreen *screen, ಪೂರ್ಣಾಙ್ಕ row, ಪೂರ್ಣಾಙ್ಕ continuation)
 {
   VTermPos pos;
   pos.row = row;
-  for(pos.col = 0; pos.col < screen->cols; pos.col++)
+  ಪ್ರತಿ(pos.col = 0; pos.col < screen->cols; pos.col++)
     vterm_screen_get_cell(screen, pos, screen->sb_buffer + pos.col);
 
-  if(screen->callbacks_has_pushline4 && screen->callbacks->sb_pushline4)
+  ಯದಿ(screen->callbacks_has_pushline4 && screen->callbacks->sb_pushline4)
     (screen->callbacks->sb_pushline4)(screen->cols, screen->sb_buffer, continuation, screen->cbdata);
-  else
+  ಅನ್ಯಥಾ
     (screen->callbacks->sb_pushline)(screen->cols, screen->sb_buffer, screen->cbdata);
 }
 
-static int premove(VTermRect rect, void *user)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ premove(VTermRect rect, ಶೂನ್ಯ *user)
 {
   VTermScreen *screen = user;
 
-  if(((screen->callbacks && screen->callbacks->sb_pushline) ||
+  ಯದಿ(((screen->callbacks && screen->callbacks->sb_pushline) ||
         (screen->callbacks_has_pushline4 && screen->callbacks && screen->callbacks->sb_pushline4)) &&
      rect.start_row == 0 && rect.start_col == 0 &&        // starts top-left corner
      rect.end_col == screen->cols &&                      // full width
      screen->buffer == screen->buffers[BUFIDX_PRIMARY]) { // not altscreen
-    for(int row = 0; row < rect.end_row; row++) {
-      const VTermLineInfo *lineinfo = vterm_state_get_lineinfo(screen->state, row);
+    ಪ್ರತಿ(ಪೂರ್ಣಾಙ್ಕ row = 0; row < rect.end_row; row++) {
+      ಧ್ರುವ VTerm_ಸಾಲು_Info *lineinfo = vterm_state_get_lineinfo(screen->state, row);
       sb_pushline_from_row(screen, row, lineinfo->continuation);
     }
   }
 
-  return 1;
+  ಪ್ರತ್ಯಾಗಮ 1;
 }
 
-static int moverect_internal(VTermRect dest, VTermRect src, void *user)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ moverect_internal(VTermRect dest, VTermRect src, ಶೂನ್ಯ *user)
 {
   VTermScreen *screen = user;
 
-  int cols = src.end_col - src.start_col;
-  int downward = src.start_row - dest.start_row;
+  ಪೂರ್ಣಾಙ್ಕ cols = src.end_col - src.start_col;
+  ಪೂರ್ಣಾಙ್ಕ downward = src.start_row - dest.start_row;
 
-  int init_row, test_row, inc_row;
-  if(downward < 0) {
+  ಪೂರ್ಣಾಙ್ಕ init_row, test_row, inc_row;
+  ಯದಿ(downward < 0) {
     init_row = dest.end_row - 1;
     test_row = dest.start_row - 1;
     inc_row  = -1;
   }
-  else {
+  ಅನ್ಯಥಾ {
     init_row = dest.start_row;
     test_row = dest.end_row;
     inc_row  = +1;
   }
 
-  for(int row = init_row; row != test_row; row += inc_row)
+  ಪ್ರತಿ(ಪೂರ್ಣಾಙ್ಕ row = init_row; row != test_row; row += inc_row)
     memmove(getcell(screen, row, dest.start_col),
             getcell(screen, row + downward, src.start_col),
-            cols * sizeof(ScreenCell));
+            cols * ಪರಿಮಾಣ(ScreenCell));
 
-  return 1;
+  ಪ್ರತ್ಯಾಗಮ 1;
 }
 
-static int moverect_user(VTermRect dest, VTermRect src, void *user)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ moverect_user(VTermRect dest, VTermRect src, ಶೂನ್ಯ *user)
 {
   VTermScreen *screen = user;
 
-  if(screen->callbacks && screen->callbacks->moverect) {
-    if(screen->damage_merge != VTERM_DAMAGE_SCROLL)
+  ಯದಿ(screen->callbacks && screen->callbacks->moverect) {
+    ಯದಿ(screen->damage_merge != VTERM_DAMAGE_SCROLL)
       // Avoid an infinite loop
       vterm_screen_flush_damage(screen);
 
-    if((*screen->callbacks->moverect)(dest, src, screen->cbdata))
-      return 1;
+    ಯದಿ((*screen->callbacks->moverect)(dest, src, screen->cbdata))
+      ಪ್ರತ್ಯಾಗಮ 1;
   }
 
   damagerect(screen, dest);
 
-  return 1;
+  ಪ್ರತ್ಯಾಗಮ 1;
 }
 
-static int erase_internal(VTermRect rect, int selective, void *user)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ erase_internal(VTermRect rect, ಪೂರ್ಣಾಙ್ಕ selective, ಶೂನ್ಯ *user)
 {
   VTermScreen *screen = user;
 
-  for(int row = rect.start_row; row < screen->state->rows && row < rect.end_row; row++) {
-    const VTermLineInfo *info = vterm_state_get_lineinfo(screen->state, row);
+  ಪ್ರತಿ(ಪೂರ್ಣಾಙ್ಕ row = rect.start_row; row < screen->state->rows && row < rect.end_row; row++) {
+    ಧ್ರುವ VTerm_ಸಾಲು_Info *info = vterm_state_get_lineinfo(screen->state, row);
 
-    for(int col = rect.start_col; col < rect.end_col; col++) {
+    ಪ್ರತಿ(ಪೂರ್ಣಾಙ್ಕ col = rect.start_col; col < rect.end_col; col++) {
       ScreenCell *cell = getcell(screen, row, col);
 
-      if (cell == NULL)
+      ಯದಿ (cell == ರಿಕ್ತ)
       {
         DEBUG_LOG2("libvterm: erase_internal() position invalid: %d / %d",
 								     row, col);
-	return 1;
+	ಪ್ರತ್ಯಾಗಮ 1;
       }
-      if(selective && cell->pen.protected_cell)
-        continue;
+      ಯದಿ(selective && cell->pen.protected_cell)
+        ಅನುವರ್ತ;
 
       cell->chars[0] = 0;
       cell->pen = (ScreenPen){
@@ -316,29 +316,29 @@ static int erase_internal(VTermRect rect, int selective, void *user)
     }
   }
 
-  return 1;
+  ಪ್ರತ್ಯಾಗಮ 1;
 }
 
-static int erase_user(VTermRect rect, int selective UNUSED, void *user)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ erase_user(VTermRect rect, ಪೂರ್ಣಾಙ್ಕ selective UNUSED, ಶೂನ್ಯ *user)
 {
   VTermScreen *screen = user;
 
   damagerect(screen, rect);
 
-  return 1;
+  ಪ್ರತ್ಯಾಗಮ 1;
 }
 
-static int erase(VTermRect rect, int selective, void *user)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ erase(VTermRect rect, ಪೂರ್ಣಾಙ್ಕ selective, ಶೂನ್ಯ *user)
 {
   erase_internal(rect, selective, user);
-  return erase_user(rect, 0, user);
+  ಪ್ರತ್ಯಾಗಮ erase_user(rect, 0, user);
 }
 
-static int scrollrect(VTermRect rect, int downward, int rightward, void *user)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ scrollrect(VTermRect rect, ಪೂರ್ಣಾಙ್ಕ downward, ಪೂರ್ಣಾಙ್ಕ rightward, ಶೂನ್ಯ *user)
 {
   VTermScreen *screen = user;
 
-  if(screen->damage_merge != VTERM_DAMAGE_SCROLL) {
+  ಯದಿ(screen->damage_merge != VTERM_DAMAGE_SCROLL) {
     vterm_scroll_rect(rect, downward, rightward,
         moverect_internal, erase_internal, screen);
 
@@ -347,26 +347,26 @@ static int scrollrect(VTermRect rect, int downward, int rightward, void *user)
     vterm_scroll_rect(rect, downward, rightward,
         moverect_user, erase_user, screen);
 
-    return 1;
+    ಪ್ರತ್ಯಾಗಮ 1;
   }
 
-  if(screen->damaged.start_row != -1 &&
+  ಯದಿ(screen->damaged.start_row != -1 &&
      !rect_intersects(&rect, &screen->damaged)) {
     vterm_screen_flush_damage(screen);
   }
 
-  if(screen->pending_scrollrect.start_row == -1) {
+  ಯದಿ(screen->pending_scrollrect.start_row == -1) {
     screen->pending_scrollrect = rect;
     screen->pending_scroll_downward  = downward;
     screen->pending_scroll_rightward = rightward;
   }
-  else if(rect_equal(&screen->pending_scrollrect, &rect) &&
+  ಅನ್ಯಥಾ ಯದಿ(rect_equal(&screen->pending_scrollrect, &rect) &&
      ((screen->pending_scroll_downward  == 0 && downward  == 0) ||
       (screen->pending_scroll_rightward == 0 && rightward == 0))) {
     screen->pending_scroll_downward  += downward;
     screen->pending_scroll_rightward += rightward;
   }
-  else {
+  ಅನ್ಯಥಾ {
     vterm_screen_flush_damage(screen);
 
     screen->pending_scrollrect = rect;
@@ -377,10 +377,10 @@ static int scrollrect(VTermRect rect, int downward, int rightward, void *user)
   vterm_scroll_rect(rect, downward, rightward,
       moverect_internal, erase_internal, screen);
 
-  if(screen->damaged.start_row == -1)
-    return 1;
+  ಯದಿ(screen->damaged.start_row == -1)
+    ಪ್ರತ್ಯಾಗಮ 1;
 
-  if(rect_contains(&rect, &screen->damaged)) {
+  ಯದಿ(rect_contains(&rect, &screen->damaged)) {
     /* Scroll region entirely contains the damage; just move it */
     vterm_rect_move(&screen->damaged, -downward, -rightward);
     rect_clip(&screen->damaged, &rect);
@@ -390,159 +390,159 @@ static int scrollrect(VTermRect rect, int downward, int rightward, void *user)
    * optimising it. Namely, a vertical scroll that neatly cuts the damage
    * region in half.
    */
-  else if(rect.start_col <= screen->damaged.start_col &&
+  ಅನ್ಯಥಾ ಯದಿ(rect.start_col <= screen->damaged.start_col &&
           rect.end_col   >= screen->damaged.end_col &&
           rightward == 0) {
-    if(screen->damaged.start_row >= rect.start_row &&
+    ಯದಿ(screen->damaged.start_row >= rect.start_row &&
        screen->damaged.start_row  < rect.end_row) {
       screen->damaged.start_row -= downward;
-      if(screen->damaged.start_row < rect.start_row)
+      ಯದಿ(screen->damaged.start_row < rect.start_row)
         screen->damaged.start_row = rect.start_row;
-      if(screen->damaged.start_row > rect.end_row)
+      ಯದಿ(screen->damaged.start_row > rect.end_row)
         screen->damaged.start_row = rect.end_row;
     }
-    if(screen->damaged.end_row >= rect.start_row &&
+    ಯದಿ(screen->damaged.end_row >= rect.start_row &&
        screen->damaged.end_row  < rect.end_row) {
       screen->damaged.end_row -= downward;
-      if(screen->damaged.end_row < rect.start_row)
+      ಯದಿ(screen->damaged.end_row < rect.start_row)
         screen->damaged.end_row = rect.start_row;
-      if(screen->damaged.end_row > rect.end_row)
+      ಯದಿ(screen->damaged.end_row > rect.end_row)
         screen->damaged.end_row = rect.end_row;
     }
   }
-  else {
+  ಅನ್ಯಥಾ {
     DEBUG_LOG2("TODO: Just flush and redo damaged=" STRFrect " rect=" STRFrect "\n",
         ARGSrect(screen->damaged), ARGSrect(rect));
   }
 
-  return 1;
+  ಪ್ರತ್ಯಾಗಮ 1;
 }
 
-static int movecursor(VTermPos pos, VTermPos oldpos, int visible, void *user)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ movecursor(VTermPos pos, VTermPos oldpos, ಪೂರ್ಣಾಙ್ಕ visible, ಶೂನ್ಯ *user)
 {
   VTermScreen *screen = user;
 
-  if(screen->callbacks && screen->callbacks->movecursor)
-    return (*screen->callbacks->movecursor)(pos, oldpos, visible, screen->cbdata);
+  ಯದಿ(screen->callbacks && screen->callbacks->movecursor)
+    ಪ್ರತ್ಯಾಗಮ (*screen->callbacks->movecursor)(pos, oldpos, visible, screen->cbdata);
 
-  return 0;
+  ಪ್ರತ್ಯಾಗಮ 0;
 }
 
-static int setpenattr(VTermAttr attr, VTermValue *val, void *user)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ setpenattr(VTermAttr attr, VTerm_ಮೌಲ್ಯ *val, ಶೂನ್ಯ *user)
 {
   VTermScreen *screen = user;
 
-  switch(attr) {
-  case VTERM_ATTR_BOLD:
+  ವಿಕಲ್ಪ(attr) {
+  ಪಕ್ಷ VTERM_ATTR_BOLD:
     screen->pen.bold = val->boolean;
-    return 1;
-  case VTERM_ATTR_UNDERLINE:
-    screen->pen.underline = val->number;
-    return 1;
-  case VTERM_ATTR_ITALIC:
+    ಪ್ರತ್ಯಾಗಮ 1;
+  ಪಕ್ಷ VTERM_ATTR_UNDERLINE:
+    screen->pen.underline = val->ಸಂಖ್ಯೆ;
+    ಪ್ರತ್ಯಾಗಮ 1;
+  ಪಕ್ಷ VTERM_ATTR_ITALIC:
     screen->pen.italic = val->boolean;
-    return 1;
-  case VTERM_ATTR_BLINK:
+    ಪ್ರತ್ಯಾಗಮ 1;
+  ಪಕ್ಷ VTERM_ATTR_BLINK:
     screen->pen.blink = val->boolean;
-    return 1;
-  case VTERM_ATTR_REVERSE:
+    ಪ್ರತ್ಯಾಗಮ 1;
+  ಪಕ್ಷ VTERM_ATTR_REVERSE:
     screen->pen.reverse = val->boolean;
-    return 1;
-  case VTERM_ATTR_CONCEAL:
+    ಪ್ರತ್ಯಾಗಮ 1;
+  ಪಕ್ಷ VTERM_ATTR_CONCEAL:
     screen->pen.conceal = val->boolean;
-    return 1;
-  case VTERM_ATTR_STRIKE:
+    ಪ್ರತ್ಯಾಗಮ 1;
+  ಪಕ್ಷ VTERM_ATTR_STRIKE:
     screen->pen.strike = val->boolean;
-    return 1;
-  case VTERM_ATTR_FONT:
-    screen->pen.font = val->number;
-    return 1;
-  case VTERM_ATTR_FOREGROUND:
+    ಪ್ರತ್ಯಾಗಮ 1;
+  ಪಕ್ಷ VTERM_ATTR_FONT:
+    screen->pen.font = val->ಸಂಖ್ಯೆ;
+    ಪ್ರತ್ಯಾಗಮ 1;
+  ಪಕ್ಷ VTERM_ATTR_FOREGROUND:
     screen->pen.fg = val->color;
-    return 1;
-  case VTERM_ATTR_BACKGROUND:
+    ಪ್ರತ್ಯಾಗಮ 1;
+  ಪಕ್ಷ VTERM_ATTR_BACKGROUND:
     screen->pen.bg = val->color;
-    return 1;
-  case VTERM_ATTR_SMALL:
+    ಪ್ರತ್ಯಾಗಮ 1;
+  ಪಕ್ಷ VTERM_ATTR_SMALL:
     screen->pen.small = val->boolean;
-    return 1;
-  case VTERM_ATTR_BASELINE:
-    screen->pen.baseline = val->number;
-    return 1;
+    ಪ್ರತ್ಯಾಗಮ 1;
+  ಪಕ್ಷ VTERM_ATTR_BASELINE:
+    screen->pen.baseline = val->ಸಂಖ್ಯೆ;
+    ಪ್ರತ್ಯಾಗಮ 1;
 
-  case VTERM_N_ATTRS:
-    return 0;
+  ಪಕ್ಷ VTERM_N_ATTRS:
+    ಪ್ರತ್ಯಾಗಮ 0;
   }
 
-  return 0;
+  ಪ್ರತ್ಯಾಗಮ 0;
 }
 
-static int settermprop(VTermProp prop, VTermValue *val, void *user)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ settermprop(VTermProp prop, VTerm_ಮೌಲ್ಯ *val, ಶೂನ್ಯ *user)
 {
   VTermScreen *screen = user;
 
-  switch(prop) {
-  case VTERM_PROP_ALTSCREEN:
-    if(val->boolean && !screen->buffers[BUFIDX_ALTSCREEN])
-      return 0;
+  ವಿಕಲ್ಪ(prop) {
+  ಪಕ್ಷ VTERM_PROP_ALTSCREEN:
+    ಯದಿ(val->boolean && !screen->buffers[BUFIDX_ALTSCREEN])
+      ಪ್ರತ್ಯಾಗಮ 0;
 
     screen->buffer = val->boolean ? screen->buffers[BUFIDX_ALTSCREEN] : screen->buffers[BUFIDX_PRIMARY];
     /* only send a damage event on disable; because during enable there's an
      * erase that sends a damage anyway
      */
-    if(!val->boolean)
+    ಯದಿ(!val->boolean)
       damagescreen(screen);
-    break;
-  case VTERM_PROP_REVERSE:
+    ಭಙ್ಗ;
+  ಪಕ್ಷ VTERM_PROP_REVERSE:
     screen->global_reverse = val->boolean;
     damagescreen(screen);
-    break;
-  default:
+    ಭಙ್ಗ;
+  ಸ್ವಭಾವ:
     ; /* ignore */
   }
 
-  if(screen->callbacks && screen->callbacks->settermprop)
-    return (*screen->callbacks->settermprop)(prop, val, screen->cbdata);
+  ಯದಿ(screen->callbacks && screen->callbacks->settermprop)
+    ಪ್ರತ್ಯಾಗಮ (*screen->callbacks->settermprop)(prop, val, screen->cbdata);
 
-  return 1;
+  ಪ್ರತ್ಯಾಗಮ 1;
 }
 
-static int bell(void *user)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ bell(ಶೂನ್ಯ *user)
 {
   VTermScreen *screen = user;
 
-  if(screen->callbacks && screen->callbacks->bell)
-    return (*screen->callbacks->bell)(screen->cbdata);
+  ಯದಿ(screen->callbacks && screen->callbacks->bell)
+    ಪ್ರತ್ಯಾಗಮ (*screen->callbacks->bell)(screen->cbdata);
 
-  return 0;
+  ಪ್ರತ್ಯಾಗಮ 0;
 }
 
 /* How many cells are non-blank
  * Returns the position of the first blank cell in the trailing blank end */
-static int line_popcount(ScreenCell *buffer, int row, int rows UNUSED, int cols)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ ಸಾಲು_popcount(ScreenCell *buffer, ಪೂರ್ಣಾಙ್ಕ row, ಪೂರ್ಣಾಙ್ಕ rows UNUSED, ಪೂರ್ಣಾಙ್ಕ cols)
 {
-  int col = cols - 1;
-  while(col >= 0 && buffer[row * cols + col].chars[0] == 0)
+  ಪೂರ್ಣಾಙ್ಕ col = cols - 1;
+  ಯಾವತ್(col >= 0 && buffer[row * cols + col].chars[0] == 0)
     col--;
-  return col + 1;
+  ಪ್ರತ್ಯಾಗಮ col + 1;
 }
 
 #define REFLOW (screen->reflow)
 
-static void resize_buffer(VTermScreen *screen, int bufidx, int new_rows, int new_cols, int active, VTermStateFields *statefields)
+ಸ್ಥಿರ ಶೂನ್ಯ resize_buffer(VTermScreen *screen, ಪೂರ್ಣಾಙ್ಕ bufidx, ಪೂರ್ಣಾಙ್ಕ new_rows, ಪೂರ್ಣಾಙ್ಕ new_cols, ಪೂರ್ಣಾಙ್ಕ active, VTermStateFields *statefields)
 {
-  int old_rows = screen->rows;
-  int old_cols = screen->cols;
+  ಪೂರ್ಣಾಙ್ಕ old_rows = screen->rows;
+  ಪೂರ್ಣಾಙ್ಕ old_cols = screen->cols;
 
   ScreenCell *old_buffer = screen->buffers[bufidx];
-  VTermLineInfo *old_lineinfo = statefields->lineinfos[bufidx];
+  VTerm_ಸಾಲು_Info *old_lineinfo = statefields->lineinfos[bufidx];
 
-  ScreenCell *new_buffer = vterm_allocator_malloc(screen->vt, sizeof(ScreenCell) * new_rows * new_cols);
-  VTermLineInfo *new_lineinfo = vterm_allocator_malloc(screen->vt, sizeof(new_lineinfo[0]) * new_rows);
+  ScreenCell *new_buffer = vterm_allocator_malloc(screen->vt, ಪರಿಮಾಣ(ScreenCell) * new_rows * new_cols);
+  VTerm_ಸಾಲು_Info *new_lineinfo = vterm_allocator_malloc(screen->vt, ಪರಿಮಾಣ(new_lineinfo[0]) * new_rows);
 
   // Find the final row of old buffer content
-  int old_row = old_rows - 1;
-  int new_row = new_rows - 1;
+  ಪೂರ್ಣಾಙ್ಕ old_row = old_rows - 1;
+  ಪೂರ್ಣಾಙ್ಕ new_row = new_rows - 1;
 
   VTermPos old_cursor = statefields->pos;
   VTermPos new_cursor = { -1, -1 };
@@ -555,62 +555,62 @@ static void resize_buffer(VTermScreen *screen, int bufidx, int new_rows, int new
   /* Keep track of the final row that is knonw to be blank, so we know what
    * spare space we have for scrolling into
    */
-  int final_blank_row = new_rows;
+  ಪೂರ್ಣಾಙ್ಕ final_blank_row = new_rows;
 
-  while(old_row >= 0) {
-    int old_row_end = old_row;
+  ಯಾವತ್(old_row >= 0) {
+    ಪೂರ್ಣಾಙ್ಕ old_row_end = old_row;
     /* TODO: Stop if dwl or dhl */
-    while(REFLOW && old_lineinfo && old_row >= 0 && old_lineinfo[old_row].continuation)
+    ಯಾವತ್(REFLOW && old_lineinfo && old_row >= 0 && old_lineinfo[old_row].continuation)
       old_row--;
-    int old_row_start = old_row;
+    ಪೂರ್ಣಾಙ್ಕ old_row_start = old_row;
 
-    int width = 0;
-    for(int row = old_row_start; row <= old_row_end; row++) {
-      if(REFLOW && row < (old_rows - 1) && old_lineinfo[row + 1].continuation)
+    ಪೂರ್ಣಾಙ್ಕ width = 0;
+    ಪ್ರತಿ(ಪೂರ್ಣಾಙ್ಕ row = old_row_start; row <= old_row_end; row++) {
+      ಯದಿ(REFLOW && row < (old_rows - 1) && old_lineinfo[row + 1].continuation)
         width += old_cols;
-      else
-        width += line_popcount(old_buffer, row, old_rows, old_cols);
+      ಅನ್ಯಥಾ
+        width += ಸಾಲು_popcount(old_buffer, row, old_rows, old_cols);
     }
 
-    if(final_blank_row == (new_row + 1) && width == 0)
+    ಯದಿ(final_blank_row == (new_row + 1) && width == 0)
       final_blank_row = new_row;
 
-    int new_height = REFLOW
+    ಪೂರ್ಣಾಙ್ಕ new_height = REFLOW
       ? width ? (width + new_cols - 1) / new_cols : 1
       : 1;
 
-    int new_row_end = new_row;
-    int new_row_start = new_row - new_height + 1;
+    ಪೂರ್ಣಾಙ್ಕ new_row_end = new_row;
+    ಪೂರ್ಣಾಙ್ಕ new_row_start = new_row - new_height + 1;
 
     old_row = old_row_start;
-    int old_col = 0;
+    ಪೂರ್ಣಾಙ್ಕ old_col = 0;
 
-    int spare_rows = new_rows - final_blank_row;
+    ಪೂರ್ಣಾಙ್ಕ spare_rows = new_rows - final_blank_row;
 
-    if(new_row_start < 0 && /* we'd fall off the top */
+    ಯದಿ(new_row_start < 0 && /* we'd fall off the top */
         spare_rows >= 0 && /* we actually have spare rows */
         (!active || new_cursor.row == -1 || (new_cursor.row - new_row_start) < new_rows))
     {
       /* Attempt to scroll content down into the blank rows at the bottom to
        * make it fit
        */
-      int downwards = -new_row_start;
-      if(downwards > spare_rows)
+      ಪೂರ್ಣಾಙ್ಕ downwards = -new_row_start;
+      ಯದಿ(downwards > spare_rows)
         downwards = spare_rows;
-      int rowcount = new_rows - downwards;
+      ಪೂರ್ಣಾಙ್ಕ rowcount = new_rows - downwards;
 
 #ifdef DEBUG_REFLOW
       fprintf(stderr, "  scroll %d rows +%d downwards\n", rowcount, downwards);
 #endif
 
-      memmove(&new_buffer[downwards * new_cols], &new_buffer[0],   rowcount * new_cols * sizeof(ScreenCell));
-      memmove(&new_lineinfo[downwards],          &new_lineinfo[0], rowcount            * sizeof(new_lineinfo[0]));
+      memmove(&new_buffer[downwards * new_cols], &new_buffer[0],   rowcount * new_cols * ಪರಿಮಾಣ(ScreenCell));
+      memmove(&new_lineinfo[downwards],          &new_lineinfo[0], rowcount            * ಪರಿಮಾಣ(new_lineinfo[0]));
 
       new_row += downwards;
       new_row_start += downwards;
       new_row_end += downwards;
 
-      if(new_cursor.row >= 0)
+      ಯದಿ(new_cursor.row >= 0)
         new_cursor.row += downwards;
 
       final_blank_row += downwards;
@@ -621,51 +621,51 @@ static void resize_buffer(VTermScreen *screen, int bufidx, int new_rows, int new
         new_row_start, new_row_end, old_row_start, old_row_end, width);
 #endif
 
-    if(new_row_start < 0) {
-      if(old_row_start <= old_cursor.row && old_cursor.row < old_row_end) {
+    ಯದಿ(new_row_start < 0) {
+      ಯದಿ(old_row_start <= old_cursor.row && old_cursor.row < old_row_end) {
         new_cursor.row = 0;
         new_cursor.col = old_cursor.col;
-        if(new_cursor.col >= new_cols)
+        ಯದಿ(new_cursor.col >= new_cols)
           new_cursor.col = new_cols-1;
       }
-      break;
+      ಭಙ್ಗ;
     }
 
-    for(new_row = new_row_start, old_row = old_row_start; new_row <= new_row_end; new_row++) {
-      int count = width >= new_cols ? new_cols : width;
-      width -= count;
+    ಪ್ರತಿ(new_row = new_row_start, old_row = old_row_start; new_row <= new_row_end; new_row++) {
+      ಪೂರ್ಣಾಙ್ಕ ಎಣಿಕೆ = width >= new_cols ? new_cols : width;
+      width -= ಎಣಿಕೆ;
 
-      int new_col = 0;
+      ಪೂರ್ಣಾಙ್ಕ new_col = 0;
 
-      while(count) {
+      ಯಾವತ್(ಎಣಿಕೆ) {
         /* TODO: This could surely be done a lot faster by memcpy()'ing the entire range */
         new_buffer[new_row * new_cols + new_col] = old_buffer[old_row * old_cols + old_col];
 
-        if(old_cursor.row == old_row && old_cursor.col == old_col)
+        ಯದಿ(old_cursor.row == old_row && old_cursor.col == old_col)
           new_cursor.row = new_row, new_cursor.col = new_col;
 
         old_col++;
-        if(old_col == old_cols) {
+        ಯದಿ(old_col == old_cols) {
           old_row++;
 
-          if(!REFLOW) {
+          ಯದಿ(!REFLOW) {
             new_col++;
-            break;
+            ಭಙ್ಗ;
           }
           old_col = 0;
         }
 
         new_col++;
-        count--;
+        ಎಣಿಕೆ--;
       }
 
-      if(old_cursor.row == old_row && old_cursor.col >= old_col) {
+      ಯದಿ(old_cursor.row == old_row && old_cursor.col >= old_col) {
         new_cursor.row = new_row, new_cursor.col = (old_cursor.col - old_col + new_col);
-        if(new_cursor.col >= new_cols)
+        ಯದಿ(new_cursor.col >= new_cols)
           new_cursor.col = new_cols-1;
       }
 
-      while(new_col < new_cols) {
+      ಯಾವತ್(new_col < new_cols) {
         clearcell(screen, &new_buffer[new_row * new_cols + new_col]);
         new_col++;
       }
@@ -677,54 +677,54 @@ static void resize_buffer(VTermScreen *screen, int bufidx, int new_rows, int new
     new_row = new_row_start - 1;
   }
 
-  if(old_cursor.row <= old_row) {
+  ಯದಿ(old_cursor.row <= old_row) {
     /* cursor would have moved entirely off the top of the screen; lets just
      * bring it within range */
     new_cursor.row = 0, new_cursor.col = old_cursor.col;
-    if(new_cursor.col >= new_cols)
+    ಯದಿ(new_cursor.col >= new_cols)
       new_cursor.col = new_cols-1;
   }
 
   /* We really expect the cursor position to be set by now */
   /* Unfortunately we do get here when "new_rows" is one.  We don't want
    * to crash, so until the above code is fixed let's just set the cursor. */
-  if(active && (new_cursor.row == -1 || new_cursor.col == -1)) {
+  ಯದಿ(active && (new_cursor.row == -1 || new_cursor.col == -1)) {
     /* fprintf(stderr, "screen_resize failed to update cursor position\n");
      * abort(); */
-    if (new_cursor.row < 0)
+    ಯದಿ (new_cursor.row < 0)
       new_cursor.row = 0;
-    if (new_cursor.col < 0)
+    ಯದಿ (new_cursor.col < 0)
       new_cursor.col = 0;
   }
 
-  if(old_row >= 0 && bufidx == BUFIDX_PRIMARY) {
+  ಯದಿ(old_row >= 0 && bufidx == BUFIDX_PRIMARY) {
     /* Push spare lines to scrollback buffer */
-    if((screen->callbacks && screen->callbacks->sb_pushline) ||
+    ಯದಿ((screen->callbacks && screen->callbacks->sb_pushline) ||
           (screen->callbacks_has_pushline4 && screen->callbacks && screen->callbacks->sb_pushline4))
-      for(int row = 0; row <= old_row; row++) {
-        const VTermLineInfo *lineinfo = old_lineinfo + row;
+      ಪ್ರತಿ(ಪೂರ್ಣಾಙ್ಕ row = 0; row <= old_row; row++) {
+        ಧ್ರುವ VTerm_ಸಾಲು_Info *lineinfo = old_lineinfo + row;
         sb_pushline_from_row(screen, row, lineinfo->continuation);
       }
-    if(active)
+    ಯದಿ(active)
       statefields->pos.row -= (old_row + 1);
   }
-  if(new_row >= 0 && bufidx == BUFIDX_PRIMARY &&
+  ಯದಿ(new_row >= 0 && bufidx == BUFIDX_PRIMARY &&
       screen->callbacks && screen->callbacks->sb_popline) {
     /* Try to backfill rows by popping scrollback buffer */
-    while(new_row >= 0) {
+    ಯಾವತ್(new_row >= 0) {
       VTermPos pos;
-      if(!(screen->callbacks->sb_popline(old_cols, screen->sb_buffer, screen->cbdata)))
-        break;
+      ಯದಿ(!(screen->callbacks->sb_popline(old_cols, screen->sb_buffer, screen->cbdata)))
+        ಭಙ್ಗ;
 
       pos.row = new_row;
-      for(pos.col = 0; pos.col < old_cols && pos.col < new_cols; pos.col += screen->sb_buffer[pos.col].width) {
+      ಪ್ರತಿ(pos.col = 0; pos.col < old_cols && pos.col < new_cols; pos.col += screen->sb_buffer[pos.col].width) {
         VTermScreenCell *src = &screen->sb_buffer[pos.col];
         ScreenCell *dst = &new_buffer[pos.row * new_cols + pos.col];
 
-        for(int i = 0; i < VTERM_MAX_CHARS_PER_CELL; i++) {
+        ಪ್ರತಿ(ಪೂರ್ಣಾಙ್ಕ i = 0; i < VTERM_MAX_CHARS_PER_CELL; i++) {
           dst->chars[i] = src->chars[i];
-          if(!src->chars[i])
-            break;
+          ಯದಿ(!src->chars[i])
+            ಭಙ್ಗ;
         }
 
         dst->pen.bold      = src->attrs.bold;
@@ -741,29 +741,29 @@ static void resize_buffer(VTermScreen *screen, int bufidx, int new_rows, int new
         dst->pen.fg = src->fg;
         dst->pen.bg = src->bg;
 
-        if(src->width == 2 && pos.col < (new_cols-1))
+        ಯದಿ(src->width == 2 && pos.col < (new_cols-1))
           (dst + 1)->chars[0] = (uint32_t) -1;
       }
-      for( ; pos.col < new_cols; pos.col++)
+      ಪ್ರತಿ( ; pos.col < new_cols; pos.col++)
         clearcell(screen, &new_buffer[pos.row * new_cols + pos.col]);
       new_row--;
 
-      if(active)
+      ಯದಿ(active)
         statefields->pos.row++;
     }
   }
-  if(new_row >= 0) {
+  ಯದಿ(new_row >= 0) {
     /* Scroll new rows back up to the top and fill in blanks at the bottom */
-    int moverows = new_rows - new_row - 1;
-    memmove(&new_buffer[0], &new_buffer[(new_row + 1) * new_cols], moverows * new_cols * sizeof(ScreenCell));
-    memmove(&new_lineinfo[0], &new_lineinfo[new_row + 1], moverows * sizeof(new_lineinfo[0]));
+    ಪೂರ್ಣಾಙ್ಕ moverows = new_rows - new_row - 1;
+    memmove(&new_buffer[0], &new_buffer[(new_row + 1) * new_cols], moverows * new_cols * ಪರಿಮಾಣ(ScreenCell));
+    memmove(&new_lineinfo[0], &new_lineinfo[new_row + 1], moverows * ಪರಿಮಾಣ(new_lineinfo[0]));
 
     new_cursor.row -= (new_row + 1);
 
-    for(new_row = moverows; new_row < new_rows; new_row++) {
-      for(int col = 0; col < new_cols; col++)
+    ಪ್ರತಿ(new_row = moverows; new_row < new_rows; new_row++) {
+      ಪ್ರತಿ(ಪೂರ್ಣಾಙ್ಕ col = 0; col < new_cols; col++)
         clearcell(screen, &new_buffer[new_row * new_cols + col]);
-      new_lineinfo[new_row] = (VTermLineInfo){ 0 };
+      new_lineinfo[new_row] = (VTerm_ಸಾಲು_Info){ 0 };
     }
   }
 
@@ -773,46 +773,46 @@ static void resize_buffer(VTermScreen *screen, int bufidx, int new_rows, int new
   vterm_allocator_free(screen->vt, old_lineinfo);
   statefields->lineinfos[bufidx] = new_lineinfo;
 
-  if(active)
+  ಯದಿ(active)
     statefields->pos = new_cursor;
 
-  return;
+  ಪ್ರತ್ಯಾಗಮ;
 }
 
-static int resize(int new_rows, int new_cols, VTermStateFields *fields, void *user)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ resize(ಪೂರ್ಣಾಙ್ಕ new_rows, ಪೂರ್ಣಾಙ್ಕ new_cols, VTermStateFields *fields, ಶೂನ್ಯ *user)
 {
   VTermScreen *screen = user;
 
-  int altscreen_active = (screen->buffers[BUFIDX_ALTSCREEN] && screen->buffer == screen->buffers[BUFIDX_ALTSCREEN]);
+  ಪೂರ್ಣಾಙ್ಕ altscreen_active = (screen->buffers[BUFIDX_ALTSCREEN] && screen->buffer == screen->buffers[BUFIDX_ALTSCREEN]);
 
-  int old_rows = screen->rows;
-  int old_cols = screen->cols;
+  ಪೂರ್ಣಾಙ್ಕ old_rows = screen->rows;
+  ಪೂರ್ಣಾಙ್ಕ old_cols = screen->cols;
 
-  if(new_cols > old_cols) {
+  ಯದಿ(new_cols > old_cols) {
     /* Ensure that ->sb_buffer is large enough for a new or and old row */
-    if(screen->sb_buffer)
+    ಯದಿ(screen->sb_buffer)
       vterm_allocator_free(screen->vt, screen->sb_buffer);
 
-    if (new_cols > VTERM_MAX_COLS)
+    ಯದಿ (new_cols > VTERM_MAX_COLS)
       new_cols = VTERM_MAX_COLS;
 
-    screen->sb_buffer = vterm_allocator_malloc(screen->vt, sizeof(VTermScreenCell) * new_cols);
+    screen->sb_buffer = vterm_allocator_malloc(screen->vt, ಪರಿಮಾಣ(VTermScreenCell) * new_cols);
   }
 
-  if (new_rows > VTERM_MAX_ROWS)
+  ಯದಿ (new_rows > VTERM_MAX_ROWS)
     new_rows = VTERM_MAX_ROWS;
 
   resize_buffer(screen, 0, new_rows, new_cols, !altscreen_active, fields);
-  if(screen->buffers[BUFIDX_ALTSCREEN])
+  ಯದಿ(screen->buffers[BUFIDX_ALTSCREEN])
     resize_buffer(screen, 1, new_rows, new_cols, altscreen_active, fields);
-  else if(new_rows != old_rows) {
+  ಅನ್ಯಥಾ ಯದಿ(new_rows != old_rows) {
     /* We don't need a full resize of the altscreen because it isn't enabled
      * but we should at least keep the lineinfo the right size */
     vterm_allocator_free(screen->vt, fields->lineinfos[BUFIDX_ALTSCREEN]);
 
-    VTermLineInfo *new_lineinfo = vterm_allocator_malloc(screen->vt, sizeof(new_lineinfo[0]) * new_rows);
-    for(int row = 0; row < new_rows; row++)
-      new_lineinfo[row] = (VTermLineInfo){ 0 };
+    VTerm_ಸಾಲು_Info *new_lineinfo = vterm_allocator_malloc(screen->vt, ಪರಿಮಾಣ(new_lineinfo[0]) * new_rows);
+    ಪ್ರತಿ(ಪೂರ್ಣಾಙ್ಕ row = 0; row < new_rows; row++)
+      new_lineinfo[row] = (VTerm_ಸಾಲು_Info){ 0 };
 
     fields->lineinfos[BUFIDX_ALTSCREEN] = new_lineinfo;
   }
@@ -822,35 +822,35 @@ static int resize(int new_rows, int new_cols, VTermStateFields *fields, void *us
   screen->rows = new_rows;
   screen->cols = new_cols;
 
-  if(new_cols <= old_cols) {
-    if(screen->sb_buffer)
+  ಯದಿ(new_cols <= old_cols) {
+    ಯದಿ(screen->sb_buffer)
       vterm_allocator_free(screen->vt, screen->sb_buffer);
 
-    screen->sb_buffer = vterm_allocator_malloc(screen->vt, sizeof(VTermScreenCell) * new_cols);
+    screen->sb_buffer = vterm_allocator_malloc(screen->vt, ಪರಿಮಾಣ(VTermScreenCell) * new_cols);
   }
 
   /* TODO: Maaaaybe we can optimise this if there's no reflow happening */
   damagescreen(screen);
 
-  if(screen->callbacks && screen->callbacks->resize)
-    return (*screen->callbacks->resize)(new_rows, new_cols, screen->cbdata);
+  ಯದಿ(screen->callbacks && screen->callbacks->resize)
+    ಪ್ರತ್ಯಾಗಮ (*screen->callbacks->resize)(new_rows, new_cols, screen->cbdata);
 
-  return 1;
+  ಪ್ರತ್ಯಾಗಮ 1;
 }
 
-static int setlineinfo(int row, const VTermLineInfo *newinfo, const VTermLineInfo *oldinfo, void *user)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ setlineinfo(ಪೂರ್ಣಾಙ್ಕ row, ಧ್ರುವ VTerm_ಸಾಲು_Info *newinfo, ಧ್ರುವ VTerm_ಸಾಲು_Info *oldinfo, ಶೂನ್ಯ *user)
 {
   VTermScreen *screen = user;
 
-  if(newinfo->doublewidth != oldinfo->doublewidth ||
+  ಯದಿ(newinfo->doublewidth != oldinfo->doublewidth ||
      newinfo->doubleheight != oldinfo->doubleheight) {
-    for(int col = 0; col < screen->cols; col++) {
+    ಪ್ರತಿ(ಪೂರ್ಣಾಙ್ಕ col = 0; col < screen->cols; col++) {
       ScreenCell *cell = getcell(screen, row, col);
-      if (cell == NULL)
+      ಯದಿ (cell == ರಿಕ್ತ)
       {
         DEBUG_LOG2("libvterm: setlineinfo() position invalid: %d / %d",
 								     row, col);
-	return 1;
+	ಪ್ರತ್ಯಾಗಮ 1;
       }
       cell->pen.dwl = newinfo->doublewidth;
       cell->pen.dhl = newinfo->doubleheight;
@@ -863,7 +863,7 @@ static int setlineinfo(int row, const VTermLineInfo *newinfo, const VTermLineInf
     rect.end_col   = newinfo->doublewidth ? screen->cols / 2 : screen->cols;
     damagerect(screen, rect);
 
-    if(newinfo->doublewidth) {
+    ಯದಿ(newinfo->doublewidth) {
       rect.start_col = screen->cols / 2;
       rect.end_col   = screen->cols;
 
@@ -871,26 +871,26 @@ static int setlineinfo(int row, const VTermLineInfo *newinfo, const VTermLineInf
     }
   }
 
-  return 1;
+  ಪ್ರತ್ಯಾಗಮ 1;
 }
 
-static int sb_clear(void *user) {
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ sb_clear(ಶೂನ್ಯ *user) {
   VTermScreen *screen = user;
 
-  if(screen->callbacks && screen->callbacks->sb_clear)
-    if((*screen->callbacks->sb_clear)(screen->cbdata))
-      return 1;
+  ಯದಿ(screen->callbacks && screen->callbacks->sb_clear)
+    ಯದಿ((*screen->callbacks->sb_clear)(screen->cbdata))
+      ಪ್ರತ್ಯಾಗಮ 1;
 
-  return 0;
+  ಪ್ರತ್ಯಾಗಮ 0;
 }
 
-static VTermStateCallbacks state_cbs = {
+ಸ್ಥಿರ VTermStateCallbacks state_cbs = {
   &putglyph, // putglyph
   &movecursor, // movecursor
   &scrollrect, // scrollrect
-  NULL, // moverect
+  ರಿಕ್ತ, // moverect
   &erase, // erase
-  NULL, // initpen
+  ರಿಕ್ತ, // initpen
   &setpenattr, // setpenattr
   &settermprop, // settermprop
   &bell, // bell
@@ -904,16 +904,16 @@ static VTermStateCallbacks state_cbs = {
  * Allocate a new screen and return it.
  * Return NULL when out of memory.
  */
-static VTermScreen *screen_new(VTerm *vt)
+ಸ್ಥಿರ VTermScreen *screen_new(VTerm *vt)
 {
   VTermState *state = vterm_obtain_state(vt);
-  if(!state)
-    return NULL;
+  ಯದಿ(!state)
+    ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
 
-  VTermScreen *screen = vterm_allocator_malloc(vt, sizeof(VTermScreen));
-  if (screen == NULL)
-    return NULL;
-  int rows, cols;
+  VTermScreen *screen = vterm_allocator_malloc(vt, ಪರಿಮಾಣ(VTermScreen));
+  ಯದಿ (screen == ರಿಕ್ತ)
+    ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
+  ಪೂರ್ಣಾಙ್ಕ rows, cols;
 
   vterm_get_size(vt, &rows, &cols);
 
@@ -930,31 +930,31 @@ static VTermScreen *screen_new(VTerm *vt)
   screen->global_reverse = FALSE;
   screen->reflow = FALSE;
 
-  screen->callbacks = NULL;
-  screen->cbdata    = NULL;
+  screen->callbacks = ರಿಕ್ತ;
+  screen->cbdata    = ರಿಕ್ತ;
   screen->callbacks_has_pushline4 = 0;
 
   screen->buffers[BUFIDX_PRIMARY] = alloc_buffer(screen, rows, cols);
 
   screen->buffer = screen->buffers[BUFIDX_PRIMARY];
 
-  screen->sb_buffer = vterm_allocator_malloc(screen->vt, sizeof(VTermScreenCell) * cols);
-  if (screen->buffer == NULL || screen->sb_buffer == NULL)
+  screen->sb_buffer = vterm_allocator_malloc(screen->vt, ಪರಿಮಾಣ(VTermScreenCell) * cols);
+  ಯದಿ (screen->buffer == ರಿಕ್ತ || screen->sb_buffer == ರಿಕ್ತ)
   {
     vterm_screen_free(screen);
-    return NULL;
+    ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
   }
 
   vterm_state_set_callbacks(screen->state, &state_cbs, screen);
   vterm_state_callbacks_has_premove(screen->state);
 
-  return screen;
+  ಪ್ರತ್ಯಾಗಮ screen;
 }
 
-INTERNAL void vterm_screen_free(VTermScreen *screen)
+INTERNAL ಶೂನ್ಯ vterm_screen_free(VTermScreen *screen)
 {
   vterm_allocator_free(screen->vt, screen->buffers[BUFIDX_PRIMARY]);
-  if(screen->buffers[BUFIDX_ALTSCREEN])
+  ಯದಿ(screen->buffers[BUFIDX_ALTSCREEN])
     vterm_allocator_free(screen->vt, screen->buffers[BUFIDX_ALTSCREEN]);
 
   vterm_allocator_free(screen->vt, screen->sb_buffer);
@@ -962,7 +962,7 @@ INTERNAL void vterm_screen_free(VTermScreen *screen)
   vterm_allocator_free(screen->vt, screen);
 }
 
-void vterm_screen_reset(VTermScreen *screen, int hard)
+ಶೂನ್ಯ vterm_screen_reset(VTermScreen *screen, ಪೂರ್ಣಾಙ್ಕ hard)
 {
   screen->damaged.start_row = -1;
   screen->pending_scrollrect.start_row = -1;
@@ -970,84 +970,84 @@ void vterm_screen_reset(VTermScreen *screen, int hard)
   vterm_screen_flush_damage(screen);
 }
 
-static size_t _get_chars(const VTermScreen *screen, const int utf8, void *buffer, size_t len, const VTermRect rect)
+ಸ್ಥಿರ size_t _get_chars(ಧ್ರುವ VTermScreen *screen, ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ utf8, ಶೂನ್ಯ *buffer, size_t len, ಧ್ರುವ VTermRect rect)
 {
   size_t outpos = 0;
-  int padding = 0;
+  ಪೂರ್ಣಾಙ್ಕ padding = 0;
 
 #define PUT(c)                                             \
-  if(utf8) {                                               \
+  ಯದಿ(utf8) {                                               \
     size_t thislen = utf8_seqlen(c);                       \
-    if(buffer && outpos + thislen <= len)                  \
-      outpos += fill_utf8((c), (char *)buffer + outpos);   \
-    else                                                   \
+    ಯದಿ(buffer && outpos + thislen <= len)                  \
+      outpos += fill_utf8((c), (ವರ್ಣ *)buffer + outpos);   \
+    ಅನ್ಯಥಾ                                                   \
       outpos += thislen;                                   \
   }                                                        \
-  else {                                                   \
-    if(buffer && outpos + 1 <= len)                        \
+  ಅನ್ಯಥಾ {                                                   \
+    ಯದಿ(buffer && outpos + 1 <= len)                        \
       ((uint32_t*)buffer)[outpos++] = (c);                 \
-    else                                                   \
+    ಅನ್ಯಥಾ                                                   \
       outpos++;                                            \
   }
 
-  for(int row = rect.start_row; row < rect.end_row; row++) {
-    for(int col = rect.start_col; col < rect.end_col; col++) {
+  ಪ್ರತಿ(ಪೂರ್ಣಾಙ್ಕ row = rect.start_row; row < rect.end_row; row++) {
+    ಪ್ರತಿ(ಪೂರ್ಣಾಙ್ಕ col = rect.start_col; col < rect.end_col; col++) {
       ScreenCell *cell = getcell(screen, row, col);
 
-      if (cell == NULL)
+      ಯದಿ (cell == ರಿಕ್ತ)
       {
         DEBUG_LOG2("libvterm: _get_chars() position invalid: %d / %d",
 								     row, col);
-	return 1;
+	ಪ್ರತ್ಯಾಗಮ 1;
       }
-      if(cell->chars[0] == 0)
+      ಯದಿ(cell->chars[0] == 0)
         // Erased cell, might need a space
         padding++;
-      else if(cell->chars[0] == (uint32_t)-1)
+      ಅನ್ಯಥಾ ಯದಿ(cell->chars[0] == (uint32_t)-1)
         // Gap behind a double-width char, do nothing
         ;
-      else {
-        while(padding) {
+      ಅನ್ಯಥಾ {
+        ಯಾವತ್(padding) {
           PUT(UNICODE_SPACE);
           padding--;
         }
-        for(int i = 0; i < VTERM_MAX_CHARS_PER_CELL && cell->chars[i]; i++) {
+        ಪ್ರತಿ(ಪೂರ್ಣಾಙ್ಕ i = 0; i < VTERM_MAX_CHARS_PER_CELL && cell->chars[i]; i++) {
           PUT(cell->chars[i]);
         }
       }
     }
 
-    if(row < rect.end_row - 1) {
+    ಯದಿ(row < rect.end_row - 1) {
       PUT(UNICODE_LINEFEED);
       padding = 0;
     }
   }
 
-  return outpos;
+  ಪ್ರತ್ಯಾಗಮ outpos;
 }
 
-size_t vterm_screen_get_chars(const VTermScreen *screen, uint32_t *chars, size_t len, const VTermRect rect)
+size_t vterm_screen_get_chars(ಧ್ರುವ VTermScreen *screen, uint32_t *chars, size_t len, ಧ್ರುವ VTermRect rect)
 {
-  return _get_chars(screen, 0, chars, len, rect);
+  ಪ್ರತ್ಯಾಗಮ _get_chars(screen, 0, chars, len, rect);
 }
 
-size_t vterm_screen_get_text(const VTermScreen *screen, char *str, size_t len, const VTermRect rect)
+size_t vterm_screen_get_text(ಧ್ರುವ VTermScreen *screen, ವರ್ಣ *str, size_t len, ಧ್ರುವ VTermRect rect)
 {
-  return _get_chars(screen, 1, str, len, rect);
+  ಪ್ರತ್ಯಾಗಮ _get_chars(screen, 1, str, len, rect);
 }
 
 /* Copy internal to external representation of a screen cell */
-int vterm_screen_get_cell(const VTermScreen *screen, VTermPos pos, VTermScreenCell *cell)
+ಪೂರ್ಣಾಙ್ಕ vterm_screen_get_cell(ಧ್ರುವ VTermScreen *screen, VTermPos pos, VTermScreenCell *cell)
 {
   ScreenCell *intcell = getcell(screen, pos.row, pos.col);
 
-  if(!intcell)
-    return 0;
+  ಯದಿ(!intcell)
+    ಪ್ರತ್ಯಾಗಮ 0;
 
-  for(int i = 0; i < VTERM_MAX_CHARS_PER_CELL; i++) {
+  ಪ್ರತಿ(ಪೂರ್ಣಾಙ್ಕ i = 0; i < VTERM_MAX_CHARS_PER_CELL; i++) {
     cell->chars[i] = intcell->chars[i];
-    if(!intcell->chars[i])
-      break;
+    ಯದಿ(!intcell->chars[i])
+      ಭಙ್ಗ;
   }
 
   cell->attrs.bold      = intcell->pen.bold;
@@ -1067,54 +1067,54 @@ int vterm_screen_get_cell(const VTermScreen *screen, VTermPos pos, VTermScreenCe
   cell->fg = intcell->pen.fg;
   cell->bg = intcell->pen.bg;
 
-  if(vterm_get_special_pty_type() == 2) {
+  ಯದಿ(vterm_get_special_pty_type() == 2) {
     // Get correct cell width from cell information contained in line buffer
-    if(pos.col < (screen->cols - 1) &&
+    ಯದಿ(pos.col < (screen->cols - 1) &&
        getcell(screen, pos.row, pos.col + 1)->chars[0] == (uint32_t)-1) {
-      if(getcell(screen, pos.row, pos.col)->chars[0] == 0x20) {
+      ಯದಿ(getcell(screen, pos.row, pos.col)->chars[0] == 0x20) {
         getcell(screen, pos.row, pos.col)->chars[0] = 0;
         cell->width = 2;
-      } else if(getcell(screen, pos.row, pos.col)->chars[0] == 0) {
+      } ಅನ್ಯಥಾ ಯದಿ(getcell(screen, pos.row, pos.col)->chars[0] == 0) {
         getcell(screen, pos.row, pos.col + 1)->chars[0] = 0;
         cell->width = 1;
-      } else {
+      } ಅನ್ಯಥಾ {
         cell->width = 2;
       }
-    } else
+    } ಅನ್ಯಥಾ
       cell->width = 1;
-  } else {
-    if(pos.col < (screen->cols - 1) &&
+  } ಅನ್ಯಥಾ {
+    ಯದಿ(pos.col < (screen->cols - 1) &&
        getcell(screen, pos.row, pos.col + 1)->chars[0] == (uint32_t)-1)
       cell->width = 2;
-    else
+    ಅನ್ಯಥಾ
       cell->width = 1;
   }
 
-  return 1;
+  ಪ್ರತ್ಯಾಗಮ 1;
 }
 
-int vterm_screen_is_eol(const VTermScreen *screen, VTermPos pos)
+ಪೂರ್ಣಾಙ್ಕ vterm_screen_is_eol(ಧ್ರುವ VTermScreen *screen, VTermPos pos)
 {
   /* This cell is EOL if this and every cell to the right is black */
-  for(; pos.col < screen->cols; pos.col++) {
+  ಪ್ರತಿ(; pos.col < screen->cols; pos.col++) {
     ScreenCell *cell = getcell(screen, pos.row, pos.col);
-    if(cell->chars[0] != 0)
-      return 0;
+    ಯದಿ(cell->chars[0] != 0)
+      ಪ್ರತ್ಯಾಗಮ 0;
   }
 
-  return 1;
+  ಪ್ರತ್ಯಾಗಮ 1;
 }
 
 VTermScreen *vterm_obtain_screen(VTerm *vt)
 {
-  if(vt->screen)
-    return vt->screen;
+  ಯದಿ(vt->screen)
+    ಪ್ರತ್ಯಾಗಮ vt->screen;
 
   vt->screen = screen_new(vt);
-  return vt->screen;
+  ಪ್ರತ್ಯಾಗಮ vt->screen;
 }
 
-void vterm_screen_enable_reflow(VTermScreen *screen, int reflow)
+ಶೂನ್ಯ vterm_screen_enable_reflow(VTermScreen *screen, ಪೂರ್ಣಾಙ್ಕ reflow)
 {
   screen->reflow = reflow;
 }
@@ -1126,96 +1126,96 @@ void vterm_screen_enable_reflow(VTermScreen *screen, int reflow)
 //   vterm_screen_enable_reflow(screen, reflow);
 // }
 
-void vterm_screen_enable_altscreen(VTermScreen *screen, int altscreen)
+ಶೂನ್ಯ vterm_screen_enable_altscreen(VTermScreen *screen, ಪೂರ್ಣಾಙ್ಕ altscreen)
 {
-  if(!screen->buffers[BUFIDX_ALTSCREEN] && altscreen) {
-    int rows, cols;
+  ಯದಿ(!screen->buffers[BUFIDX_ALTSCREEN] && altscreen) {
+    ಪೂರ್ಣಾಙ್ಕ rows, cols;
     vterm_get_size(screen->vt, &rows, &cols);
 
     screen->buffers[BUFIDX_ALTSCREEN] = alloc_buffer(screen, rows, cols);
   }
 }
 
-void vterm_screen_set_callbacks(VTermScreen *screen, const VTermScreenCallbacks *callbacks, void *user)
+ಶೂನ್ಯ vterm_screen_set_callbacks(VTermScreen *screen, ಧ್ರುವ VTermScreenCallbacks *callbacks, ಶೂನ್ಯ *user)
 {
   screen->callbacks = callbacks;
   screen->cbdata = user;
 }
 
-void *vterm_screen_get_cbdata(VTermScreen *screen)
+ಶೂನ್ಯ *vterm_screen_get_cbdata(VTermScreen *screen)
 {
-  return screen->cbdata;
+  ಪ್ರತ್ಯಾಗಮ screen->cbdata;
 }
 
-void vterm_screen_callbacks_has_pushline4(VTermScreen *screen)
+ಶೂನ್ಯ vterm_screen_callbacks_has_pushline4(VTermScreen *screen)
 {
   screen->callbacks_has_pushline4 = 1;
 }
 
-void vterm_screen_set_unrecognised_fallbacks(VTermScreen *screen, const VTermStateFallbacks *fallbacks, void *user)
+ಶೂನ್ಯ vterm_screen_set_unrecognised_fallbacks(VTermScreen *screen, ಧ್ರುವ VTermStateFallbacks *fallbacks, ಶೂನ್ಯ *user)
 {
   vterm_state_set_unrecognised_fallbacks(screen->state, fallbacks, user);
 }
 
-void *vterm_screen_get_unrecognised_fbdata(VTermScreen *screen)
+ಶೂನ್ಯ *vterm_screen_get_unrecognised_fbdata(VTermScreen *screen)
 {
-  return vterm_state_get_unrecognised_fbdata(screen->state);
+  ಪ್ರತ್ಯಾಗಮ vterm_state_get_unrecognised_fbdata(screen->state);
 }
 
-void vterm_screen_flush_damage(VTermScreen *screen)
+ಶೂನ್ಯ vterm_screen_flush_damage(VTermScreen *screen)
 {
-  if(screen->pending_scrollrect.start_row != -1) {
+  ಯದಿ(screen->pending_scrollrect.start_row != -1) {
     vterm_scroll_rect(screen->pending_scrollrect, screen->pending_scroll_downward, screen->pending_scroll_rightward,
         moverect_user, erase_user, screen);
 
     screen->pending_scrollrect.start_row = -1;
   }
 
-  if(screen->damaged.start_row != -1) {
-    if(screen->callbacks && screen->callbacks->damage)
+  ಯದಿ(screen->damaged.start_row != -1) {
+    ಯದಿ(screen->callbacks && screen->callbacks->damage)
       (*screen->callbacks->damage)(screen->damaged, screen->cbdata);
 
     screen->damaged.start_row = -1;
   }
 }
 
-void vterm_screen_set_damage_merge(VTermScreen *screen, VTermDamageSize size)
+ಶೂನ್ಯ vterm_screen_set_damage_merge(VTermScreen *screen, VTermDamageSize size)
 {
   vterm_screen_flush_damage(screen);
   screen->damage_merge = size;
 }
 
-static int attrs_differ(VTermAttrMask attrs, ScreenCell *a, ScreenCell *b)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ attrs_differ(VTermAttrMask attrs, ScreenCell *a, ScreenCell *b)
 {
-  if((attrs & VTERM_ATTR_BOLD_MASK)       && (a->pen.bold != b->pen.bold))
-    return 1;
-  if((attrs & VTERM_ATTR_UNDERLINE_MASK)  && (a->pen.underline != b->pen.underline))
-    return 1;
-  if((attrs & VTERM_ATTR_ITALIC_MASK)     && (a->pen.italic != b->pen.italic))
-    return 1;
-  if((attrs & VTERM_ATTR_BLINK_MASK)      && (a->pen.blink != b->pen.blink))
-    return 1;
-  if((attrs & VTERM_ATTR_REVERSE_MASK)    && (a->pen.reverse != b->pen.reverse))
-    return 1;
-  if((attrs & VTERM_ATTR_CONCEAL_MASK)    && (a->pen.conceal != b->pen.conceal))
-    return 1;
-  if((attrs & VTERM_ATTR_STRIKE_MASK)     && (a->pen.strike != b->pen.strike))
-    return 1;
-  if((attrs & VTERM_ATTR_FONT_MASK)       && (a->pen.font != b->pen.font))
-    return 1;
-  if((attrs & VTERM_ATTR_FOREGROUND_MASK) && !vterm_color_is_equal(&a->pen.fg, &b->pen.fg))
-    return 1;
-  if((attrs & VTERM_ATTR_BACKGROUND_MASK) && !vterm_color_is_equal(&a->pen.bg, &b->pen.bg))
-    return 1;
-  if((attrs & VTERM_ATTR_SMALL_MASK)    && (a->pen.small != b->pen.small))
-    return 1;
-  if((attrs & VTERM_ATTR_BASELINE_MASK)    && (a->pen.baseline != b->pen.baseline))
-    return 1;
+  ಯದಿ((attrs & VTERM_ATTR_BOLD_MASK)       && (a->pen.bold != b->pen.bold))
+    ಪ್ರತ್ಯಾಗಮ 1;
+  ಯದಿ((attrs & VTERM_ATTR_UNDERLINE_MASK)  && (a->pen.underline != b->pen.underline))
+    ಪ್ರತ್ಯಾಗಮ 1;
+  ಯದಿ((attrs & VTERM_ATTR_ITALIC_MASK)     && (a->pen.italic != b->pen.italic))
+    ಪ್ರತ್ಯಾಗಮ 1;
+  ಯದಿ((attrs & VTERM_ATTR_BLINK_MASK)      && (a->pen.blink != b->pen.blink))
+    ಪ್ರತ್ಯಾಗಮ 1;
+  ಯದಿ((attrs & VTERM_ATTR_REVERSE_MASK)    && (a->pen.reverse != b->pen.reverse))
+    ಪ್ರತ್ಯಾಗಮ 1;
+  ಯದಿ((attrs & VTERM_ATTR_CONCEAL_MASK)    && (a->pen.conceal != b->pen.conceal))
+    ಪ್ರತ್ಯಾಗಮ 1;
+  ಯದಿ((attrs & VTERM_ATTR_STRIKE_MASK)     && (a->pen.strike != b->pen.strike))
+    ಪ್ರತ್ಯಾಗಮ 1;
+  ಯದಿ((attrs & VTERM_ATTR_FONT_MASK)       && (a->pen.font != b->pen.font))
+    ಪ್ರತ್ಯಾಗಮ 1;
+  ಯದಿ((attrs & VTERM_ATTR_FOREGROUND_MASK) && !vterm_color_is_equal(&a->pen.fg, &b->pen.fg))
+    ಪ್ರತ್ಯಾಗಮ 1;
+  ಯದಿ((attrs & VTERM_ATTR_BACKGROUND_MASK) && !vterm_color_is_equal(&a->pen.bg, &b->pen.bg))
+    ಪ್ರತ್ಯಾಗಮ 1;
+  ಯದಿ((attrs & VTERM_ATTR_SMALL_MASK)    && (a->pen.small != b->pen.small))
+    ಪ್ರತ್ಯಾಗಮ 1;
+  ಯದಿ((attrs & VTERM_ATTR_BASELINE_MASK)    && (a->pen.baseline != b->pen.baseline))
+    ಪ್ರತ್ಯಾಗಮ 1;
 
-  return 0;
+  ಪ್ರತ್ಯಾಗಮ 0;
 }
 
-int vterm_screen_get_attrs_extent(const VTermScreen *screen, VTermRect *extent, VTermPos pos, VTermAttrMask attrs)
+ಪೂರ್ಣಾಙ್ಕ vterm_screen_get_attrs_extent(ಧ್ರುವ VTermScreen *screen, VTermRect *extent, VTermPos pos, VTermAttrMask attrs)
 {
   ScreenCell *target = getcell(screen, pos.row, pos.col);
 
@@ -1223,60 +1223,60 @@ int vterm_screen_get_attrs_extent(const VTermScreen *screen, VTermRect *extent, 
   extent->start_row = pos.row;
   extent->end_row   = pos.row + 1;
 
-  if(extent->start_col < 0)
+  ಯದಿ(extent->start_col < 0)
     extent->start_col = 0;
-  if(extent->end_col < 0)
+  ಯದಿ(extent->end_col < 0)
     extent->end_col = screen->cols;
 
-  int col;
+  ಪೂರ್ಣಾಙ್ಕ col;
 
-  for(col = pos.col - 1; col >= extent->start_col; col--)
-    if(attrs_differ(attrs, target, getcell(screen, pos.row, col)))
-      break;
+  ಪ್ರತಿ(col = pos.col - 1; col >= extent->start_col; col--)
+    ಯದಿ(attrs_differ(attrs, target, getcell(screen, pos.row, col)))
+      ಭಙ್ಗ;
   extent->start_col = col + 1;
 
-  for(col = pos.col + 1; col < extent->end_col; col++)
-    if(attrs_differ(attrs, target, getcell(screen, pos.row, col)))
-      break;
+  ಪ್ರತಿ(col = pos.col + 1; col < extent->end_col; col++)
+    ಯದಿ(attrs_differ(attrs, target, getcell(screen, pos.row, col)))
+      ಭಙ್ಗ;
   extent->end_col = col - 1;
 
-  return 1;
+  ಪ್ರತ್ಯಾಗಮ 1;
 }
 
-void vterm_screen_convert_color_to_rgb(const VTermScreen *screen, VTermColor *col)
+ಶೂನ್ಯ vterm_screen_convert_color_to_rgb(ಧ್ರುವ VTermScreen *screen, VTermColor *col)
 {
   vterm_state_convert_color_to_rgb(screen->state, col);
 }
 
-static void reset_default_colours(VTermScreen *screen, ScreenCell *buffer)
+ಸ್ಥಿರ ಶೂನ್ಯ reset_default_colours(VTermScreen *screen, ScreenCell *buffer)
 {
-  for(int row = 0; row <= screen->rows - 1; row++)
-    for(int col = 0; col <= screen->cols - 1; col++) {
+  ಪ್ರತಿ(ಪೂರ್ಣಾಙ್ಕ row = 0; row <= screen->rows - 1; row++)
+    ಪ್ರತಿ(ಪೂರ್ಣಾಙ್ಕ col = 0; col <= screen->cols - 1; col++) {
       ScreenCell *cell = &buffer[row * screen->cols + col];
-      if(VTERM_COLOR_IS_DEFAULT_FG(&cell->pen.fg))
+      ಯದಿ(VTERM_COLOR_IS_DEFAULT_FG(&cell->pen.fg))
         cell->pen.fg = screen->pen.fg;
-      if(VTERM_COLOR_IS_DEFAULT_BG(&cell->pen.bg))
+      ಯದಿ(VTERM_COLOR_IS_DEFAULT_BG(&cell->pen.bg))
         cell->pen.bg = screen->pen.bg;
     }
 }
 
-void vterm_screen_set_default_colors(VTermScreen *screen, const VTermColor *default_fg, const VTermColor *default_bg)
+ಶೂನ್ಯ vterm_screen_set_default_colors(VTermScreen *screen, ಧ್ರುವ VTermColor *default_fg, ಧ್ರುವ VTermColor *default_bg)
 {
   vterm_state_set_default_colors(screen->state, default_fg, default_bg);
 
-  if(default_fg && VTERM_COLOR_IS_DEFAULT_FG(&screen->pen.fg)) {
+  ಯದಿ(default_fg && VTERM_COLOR_IS_DEFAULT_FG(&screen->pen.fg)) {
     screen->pen.fg = *default_fg;
     screen->pen.fg.type = (screen->pen.fg.type & ~VTERM_COLOR_DEFAULT_MASK)
                         | VTERM_COLOR_DEFAULT_FG;
   }
 
-  if(default_bg && VTERM_COLOR_IS_DEFAULT_BG(&screen->pen.bg)) {
+  ಯದಿ(default_bg && VTERM_COLOR_IS_DEFAULT_BG(&screen->pen.bg)) {
     screen->pen.bg = *default_bg;
     screen->pen.bg.type = (screen->pen.bg.type & ~VTERM_COLOR_DEFAULT_MASK)
                         | VTERM_COLOR_DEFAULT_BG;
   }
 
   reset_default_colours(screen, screen->buffers[0]);
-  if(screen->buffers[1])
+  ಯದಿ(screen->buffers[1])
     reset_default_colours(screen, screen->buffers[1]);
 }

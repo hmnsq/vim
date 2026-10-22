@@ -7,26 +7,26 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
 #ifdef FEAT_TOOLBAR
 
-#include <gtk/gtk.h>
-#include "gui_gtk4_tb.h"
+#ಅನ್ತರ್ಭಾವ <gtk/gtk.h>
+#ಅನ್ತರ್ಭಾವ "gui_gtk4_tb.h"
 
 /*
  * GTK4 removed GtkToolbar, so this is our version of it.
  */
-struct _VimToolbar
+ಸಂರಚನಾ _VimToolbar
 {
     GtkWidget parent;
 
-    int style; // TOOLBAR_* flags
-    int iconsize; // TBIS_* values
+    ಪೂರ್ಣಾಙ್ಕ style; // TOOLBAR_* flags
+    ಪೂರ್ಣಾಙ್ಕ iconsize; // TBIS_* values
 
-    GList *items;
+    GList *ವಸ್ತುಗಳು;
 
-    GtkWidget	*root;
+    GtkWidget	*ಬೇರು;
     GtkWidget	*strip;
 
     GtkWidget	*overflow_btn;
@@ -35,21 +35,21 @@ struct _VimToolbar
 
 G_DEFINE_TYPE(VimToolbar, vim_toolbar, GTK_TYPE_WIDGET)
 
-static void vim_toolbar_size_allocate(GtkWidget *widget, int width, int height, int baseline);
-static void vim_toolbar_measure(GtkWidget *widget, GtkOrientation orientation, int for_size, int *minimum, int *natural, int *minimum_baseline, int *natural_baseline);
+ಸ್ಥಿರ ಶೂನ್ಯ vim_toolbar_size_allocate(GtkWidget *widget, ಪೂರ್ಣಾಙ್ಕ width, ಪೂರ್ಣಾಙ್ಕ height, ಪೂರ್ಣಾಙ್ಕ baseline);
+ಸ್ಥಿರ ಶೂನ್ಯ vim_toolbar_measure(GtkWidget *widget, GtkOrientation orientation, ಪೂರ್ಣಾಙ್ಕ for_size, ಪೂರ್ಣಾಙ್ಕ *minimum, ಪೂರ್ಣಾಙ್ಕ *natural, ಪೂರ್ಣಾಙ್ಕ *minimum_baseline, ಪೂರ್ಣಾಙ್ಕ *natural_baseline);
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 vim_toolbar_dispose(GObject *object)
 {
     VimToolbar *self = VIM_TOOLBAR(object);
 
-    g_clear_list(&self->items, g_object_unref);
-    g_clear_pointer(&self->root, gtk_widget_unparent);
+    g_clear_list(&self->ವಸ್ತುಗಳು, g_object_unref);
+    g_clear_pointer(&self->ಬೇರು, gtk_widget_unparent);
 
     G_OBJECT_CLASS(vim_toolbar_parent_class)->dispose(object);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 vim_toolbar_class_init(VimToolbarClass *class)
 {
     GtkWidgetClass  *widget_class = GTK_WIDGET_CLASS(class);
@@ -63,7 +63,7 @@ vim_toolbar_class_init(VimToolbarClass *class)
     gtk_widget_class_set_css_name(widget_class, "toolbar");
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 vim_toolbar_init(VimToolbar *self)
 {
     GtkWidget *popover;
@@ -71,20 +71,20 @@ vim_toolbar_init(VimToolbar *self)
     self->style = TOOLBAR_ICONS | TOOLBAR_TOOLTIPS;
     self->iconsize = TBIS_MEDIUM;
 
-    self->root = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4);
-    gtk_widget_set_parent(self->root, GTK_WIDGET(self));
+    self->ಬೇರು = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4);
+    gtk_widget_set_parent(self->ಬೇರು, GTK_WIDGET(self));
 
     self->strip = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_widget_set_hexpand(self->strip, TRUE);
     gtk_widget_set_halign(self->strip, GTK_ALIGN_START);
     gtk_widget_set_overflow(self->strip, GTK_OVERFLOW_HIDDEN);
-    gtk_box_append(GTK_BOX(self->root), self->strip);
+    gtk_box_append(GTK_BOX(self->ಬೇರು), self->strip);
 
     self->overflow_btn = gtk_menu_button_new();
     gtk_widget_set_hexpand(self->overflow_btn, FALSE);
     gtk_widget_set_halign(self->overflow_btn, GTK_ALIGN_END);
     gtk_widget_add_css_class(self->overflow_btn, "flat");
-    gtk_box_append(GTK_BOX(self->root), self->overflow_btn);
+    gtk_box_append(GTK_BOX(self->ಬೇರು), self->overflow_btn);
     g_object_set_data(G_OBJECT(self->overflow_btn),
 	    "toolbar-width", GINT_TO_POINTER(-1));
 
@@ -99,53 +99,53 @@ vim_toolbar_init(VimToolbar *self)
 }
 
     GtkWidget *
-vim_toolbar_new(void)
+vim_toolbar_new(ಶೂನ್ಯ)
 {
-    return g_object_new(VIM_TYPE_TOOLBAR, NULL);
+    ಪ್ರತ್ಯಾಗಮ g_object_new(VIM_TYPE_TOOLBAR, ರಿಕ್ತ);
 }
 
 /*
  * Insert the widget at the given index, then queue a size allocate to check for
  * overflowing items.
  */
-    static void
-vim_toolbar_insert(VimToolbar *self, GtkWidget *widget, int idx)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+vim_toolbar_ಸೇರಿಸು(VimToolbar *self, GtkWidget *widget, ಪೂರ್ಣಾಙ್ಕ idx)
 {
     GtkWidget	*cur_child = gtk_widget_get_first_child(self->strip);
-    int		i = 0;
+    ಪೂರ್ಣಾಙ್ಕ		i = 0;
 
-    while (cur_child != NULL && i != idx - 1)
+    ಯಾವತ್ (cur_child != ರಿಕ್ತ && i != idx - 1)
     {
 	cur_child = gtk_widget_get_next_sibling(cur_child);
 	i++;
     }
 
-    gtk_box_insert_child_after(GTK_BOX(self->strip), widget, cur_child);
-    self->items = g_list_insert(self->items, g_object_ref(widget), idx);
+    gtk_box_ಸೇರಿಸು_child_after(GTK_BOX(self->strip), widget, cur_child);
+    self->ವಸ್ತುಗಳು = g_list_ಸೇರಿಸು(self->ವಸ್ತುಗಳು, g_object_ref(widget), idx);
     gtk_widget_queue_allocate(GTK_WIDGET(self));
 }
 
 /*
  * Update "btn" according to "style" and "iconsize".
  */
-    static void
-set_button_style(GtkWidget *btn, int style, int iconsize, gboolean invalidate)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+set_button_style(GtkWidget *btn, ಪೂರ್ಣಾಙ್ಕ style, ಪೂರ್ಣಾಙ್ಕ iconsize, gboolean invalidate)
 {
     GtkWidget *box;
     GtkWidget *icon;
     GtkWidget *label;
 
-    if (GTK_IS_SEPARATOR(btn))
-	return;
+    ಯದಿ (GTK_IS_SEPARATOR(btn))
+	ಪ್ರತ್ಯಾಗಮ;
 
     box = gtk_button_get_child(GTK_BUTTON(btn));
-    if (style & TOOLBAR_HORIZ)
+    ಯದಿ (style & TOOLBAR_HORIZ)
     {
 	gtk_orientable_set_orientation(GTK_ORIENTABLE(box),
 		GTK_ORIENTATION_HORIZONTAL);
 	gtk_box_set_spacing(GTK_BOX(box), 8);
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	gtk_orientable_set_orientation(GTK_ORIENTABLE(box),
 		GTK_ORIENTATION_VERTICAL);
@@ -155,49 +155,49 @@ set_button_style(GtkWidget *btn, int style, int iconsize, gboolean invalidate)
     gtk_widget_set_has_tooltip(btn, style & TOOLBAR_TOOLTIPS);
 
     icon = g_object_get_data(G_OBJECT(btn), "icon");
-    if (icon != NULL)
+    ಯದಿ (icon != ರಿಕ್ತ)
     {
-	if (style & TOOLBAR_ICONS)
+	ಯದಿ (style & TOOLBAR_ICONS)
 	{
 	    GtkIconSize size;
 
-	    switch (iconsize)
+	    ವಿಕಲ್ಪ (iconsize)
 	    {
-		case TBIS_TINY:
-		case TBIS_SMALL:
-		case TBIS_MEDIUM:
+		ಪಕ್ಷ TBIS_TINY:
+		ಪಕ್ಷ TBIS_SMALL:
+		ಪಕ್ಷ TBIS_MEDIUM:
 		    size = GTK_ICON_SIZE_NORMAL;
-		    break;
-		case TBIS_LARGE:
-		case TBIS_HUGE:
-		case TBIS_GIANT:
+		    ಭಙ್ಗ;
+		ಪಕ್ಷ TBIS_LARGE:
+		ಪಕ್ಷ TBIS_HUGE:
+		ಪಕ್ಷ TBIS_GIANT:
 		    size = GTK_ICON_SIZE_LARGE;
-		    break;
-		default:
+		    ಭಙ್ಗ;
+		ಸ್ವಭಾವ:
 		    size = GTK_ICON_SIZE_NORMAL;
-		    break;
+		    ಭಙ್ಗ;
 	    }
 	    gtk_image_set_icon_size(GTK_IMAGE(icon), size);
 	    gtk_widget_set_visible(icon, TRUE);
 	}
-	else
+	ಅನ್ಯಥಾ
 	    gtk_widget_set_visible(icon, FALSE);
     }
 
     label = g_object_get_data(G_OBJECT(btn), "label");
-    if (label != NULL)
+    ಯದಿ (label != ರಿಕ್ತ)
 	gtk_widget_set_visible(label, style & TOOLBAR_TEXT);
 
     // Used to cache width in toolbar ("self->strip"). -1 means not calculated
     // yet.
-    if (invalidate)
+    ಯದಿ (invalidate)
 	g_object_set_data(G_OBJECT(btn), "toolbar-width", GINT_TO_POINTER(-1));
 }
 
 /*
  * Always close overflow popover when button is clicked.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 button_clicked(GtkWidget *widget UNUSED, VimToolbar *self)
 {
     gtk_menu_button_popdown(GTK_MENU_BUTTON(self->overflow_btn));
@@ -212,11 +212,11 @@ button_clicked(GtkWidget *widget UNUSED, VimToolbar *self)
  * "text" may be NULL..
  */
     GtkWidget *
-vim_toolbar_insert_button(
+vim_toolbar_ಸೇರಿಸು_button(
 	VimToolbar  *self,
 	GtkWidget   *icon,
-	const char  *text,
-	int	    idx)
+	ಧ್ರುವ ವರ್ಣ  *text,
+	ಪೂರ್ಣಾಙ್ಕ	    idx)
 {
     GtkWidget *btn = gtk_button_new();
     GtkWidget *box;
@@ -226,14 +226,14 @@ vim_toolbar_insert_button(
 
     gtk_button_set_child(GTK_BUTTON(btn), box);
 
-    if (icon != NULL)
+    ಯದಿ (icon != ರಿಕ್ತ)
     {
 	gtk_widget_set_valign (icon, GTK_ALIGN_CENTER);
 	gtk_widget_set_vexpand (icon, TRUE);
 	gtk_box_append(GTK_BOX(box), icon);
 	g_object_set_data(G_OBJECT(btn), "icon", icon);
     }
-    if (text != NULL)
+    ಯದಿ (text != ರಿಕ್ತ)
     {
 	GtkWidget *label = gtk_label_new(text);
 
@@ -248,48 +248,48 @@ vim_toolbar_insert_button(
     g_signal_connect_object(btn, "clicked",
 	    G_CALLBACK(button_clicked), self, G_CONNECT_DEFAULT);
 
-    vim_toolbar_insert(self, btn, idx);
-    return btn;
+    vim_toolbar_ಸೇರಿಸು(self, btn, idx);
+    ಪ್ರತ್ಯಾಗಮ btn;
 }
 
 /*
  * Insert a toolbar separator at the given index and return the widget.
  */
     GtkWidget *
-vim_toolbar_insert_separator(VimToolbar *self, int idx)
+vim_toolbar_ಸೇರಿಸು_separator(VimToolbar *self, ಪೂರ್ಣಾಙ್ಕ idx)
 {
     GtkWidget *sep = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
 
     g_object_set_data(G_OBJECT(sep), "toolbar-width", GINT_TO_POINTER(-1));
-    vim_toolbar_insert(self, sep, idx);
-    return sep;
+    vim_toolbar_ಸೇರಿಸು(self, sep, idx);
+    ಪ್ರತ್ಯಾಗಮ sep;
 }
 
 /*
  * Update the style and iconsize of the toolbar
  */
-    void
-vim_toolbar_set_style(VimToolbar *self, int style, int iconsize)
+    ಶೂನ್ಯ
+vim_toolbar_set_style(VimToolbar *self, ಪೂರ್ಣಾಙ್ಕ style, ಪೂರ್ಣಾಙ್ಕ iconsize)
 {
     GtkWidget *cur_child = gtk_widget_get_first_child(self->strip);
 
-    if (style == self->style && self->iconsize == iconsize)
-	return;
+    ಯದಿ (style == self->style && self->iconsize == iconsize)
+	ಪ್ರತ್ಯಾಗಮ;
 
     self->style = style;
     self->iconsize = iconsize;
 
-    while (cur_child != NULL)
+    ಯಾವತ್ (cur_child != ರಿಕ್ತ)
     {
-	if (!GTK_IS_SEPARATOR(cur_child))
+	ಯದಿ (!GTK_IS_SEPARATOR(cur_child))
 	    set_button_style(cur_child, style, iconsize, TRUE);
 	cur_child = gtk_widget_get_next_sibling(cur_child);
     }
 
     cur_child = gtk_widget_get_first_child(self->overflow_box);
-    while (cur_child != NULL)
+    ಯಾವತ್ (cur_child != ರಿಕ್ತ)
     {
-	if (!GTK_IS_SEPARATOR(cur_child))
+	ಯದಿ (!GTK_IS_SEPARATOR(cur_child))
 	    set_button_style(cur_child, style, iconsize, TRUE);
 	cur_child = gtk_widget_get_next_sibling(cur_child);
     }
@@ -300,15 +300,15 @@ vim_toolbar_set_style(VimToolbar *self, int style, int iconsize)
 /*
  * Remove the item from the toolbar.
  */
-    void
+    ಶೂನ್ಯ
 vim_toolbar_remove(VimToolbar *self, GtkWidget *item)
 {
-    if (gtk_widget_get_parent(item) == self->strip)
+    ಯದಿ (gtk_widget_get_parent(item) == self->strip)
 	gtk_box_remove(GTK_BOX(self->strip), item);
-    else
+    ಅನ್ಯಥಾ
 	gtk_box_remove(GTK_BOX(self->overflow_box), item);
 
-    self->items = g_list_remove(self->items, item);
+    self->ವಸ್ತುಗಳು = g_list_remove(self->ವಸ್ತುಗಳು, item);
     g_object_unref(item);
     gtk_widget_queue_allocate(GTK_WIDGET(self));
 }
@@ -317,7 +317,7 @@ vim_toolbar_remove(VimToolbar *self, GtkWidget *item)
  * If "overflow" is TRUE, then move "item" from the toolbar to the overflow, and
  * vice versa.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 vim_toolbar_move_item_to(
 	VimToolbar  *self,
 	GtkWidget   *item,
@@ -326,8 +326,8 @@ vim_toolbar_move_item_to(
     GtkBox *from, *to;
 
     to = overflow ? GTK_BOX(self->overflow_box) : GTK_BOX(self->strip);
-    if (gtk_widget_get_parent(item) == GTK_WIDGET(to))
-	return;
+    ಯದಿ (gtk_widget_get_parent(item) == GTK_WIDGET(to))
+	ಪ್ರತ್ಯಾಗಮ;
 
     from = overflow ? GTK_BOX(self->strip) : GTK_BOX(self->overflow_box);
 
@@ -336,13 +336,13 @@ vim_toolbar_move_item_to(
     gtk_box_append(to, item);
     g_object_unref(item);
 
-    if (GTK_IS_SEPARATOR(item))
+    ಯದಿ (GTK_IS_SEPARATOR(item))
 	gtk_widget_set_visible(item, !overflow);
-    else
+    ಅನ್ಯಥಾ
     {
-	if (overflow)
+	ಯದಿ (overflow)
 	{
-	    int style = self->style;
+	    ಪೂರ್ಣಾಙ್ಕ style = self->style;
 
 	    // Force set these flags for the overflow menu, to mimic what GTK3
 	    // GtkToolbar does.
@@ -351,15 +351,15 @@ vim_toolbar_move_item_to(
 	    style |= TOOLBAR_ICONS;
 	    set_button_style(item, style, self->iconsize, FALSE);
 	}
-	else
+	ಅನ್ಯಥಾ
 	    set_button_style(item, self->style, self->iconsize, FALSE);
     }
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
 get_item_width(GtkWidget *item)
 {
-    int toolbar_width = -1;
+    ಪೂರ್ಣಾಙ್ಕ toolbar_width = -1;
 
     // Always use cached width for item, because width in overflow menu is
     // different (GtkBox is in horizontal layout). Also use it for separators,
@@ -367,7 +367,7 @@ get_item_width(GtkWidget *item)
     toolbar_width = GPOINTER_TO_INT(
 	    g_object_get_data(G_OBJECT(item), "toolbar-width"));
 
-    if (toolbar_width == -1)
+    ಯದಿ (toolbar_width == -1)
     {
 	GtkRequisition min_req, nat_req;
 	gtk_widget_get_preferred_size(item, &min_req, &nat_req);
@@ -377,114 +377,114 @@ get_item_width(GtkWidget *item)
 	g_object_set_data(G_OBJECT(item),
 		"toolbar-width", GINT_TO_POINTER(toolbar_width));
     }
-    return toolbar_width;
+    ಪ್ರತ್ಯಾಗಮ toolbar_width;
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 vim_toolbar_size_allocate(
 	GtkWidget   *widget,
-	int	    width,
-	int	    height,
-	int	    baseline)
+	ಪೂರ್ಣಾಙ್ಕ	    width,
+	ಪೂರ್ಣಾಙ್ಕ	    height,
+	ಪೂರ್ಣಾಙ್ಕ	    baseline)
 {
     VimToolbar	    *self = VIM_TOOLBAR(widget);
     GtkAllocation   alloc;
-    int		    used = 0;
-    int		    avail;
-    GList	    *overflow_ele = NULL;
+    ಪೂರ್ಣಾಙ್ಕ		    used = 0;
+    ಪೂರ್ಣಾಙ್ಕ		    avail;
+    GList	    *overflow_ele = ರಿಕ್ತ;
     GtkWidget	    *child;
 
     avail = width - get_item_width(self->overflow_btn);
 
-    for (GList *ele = self->items; ele != NULL; ele = ele->next)
+    ಪ್ರತಿ (GList *ele = self->ವಸ್ತುಗಳು; ele != ರಿಕ್ತ; ele = ele->next)
     {
 	GtkWidget   *item = ele->data;
-	int	    toolbar_width = get_item_width(item);
+	ಪೂರ್ಣಾಙ್ಕ	    toolbar_width = get_item_width(item);
 
-	if (used + toolbar_width > avail)
+	ಯದಿ (used + toolbar_width > avail)
 	{
 	    overflow_ele = ele;
-	    break;
+	    ಭಙ್ಗ;
 	}
-	else
+	ಅನ್ಯಥಾ
 	    vim_toolbar_move_item_to(self, item, FALSE);
 	used += toolbar_width;
     }
 
-    if (overflow_ele != NULL)
+    ಯದಿ (overflow_ele != ರಿಕ್ತ)
     {
-	int	    remaining = width - used;
+	ಪೂರ್ಣಾಙ್ಕ	    remaining = width - used;
 	gboolean    need_overflow_btn = FALSE;
 
 	// Move all items in the overflow to the toolbar, so we can add them
 	// in the correct order back again. Also check if the overflow button is
 	// still needed (can fit all toolbar items by disabling it).
-	while ((child = gtk_widget_get_first_child(self->overflow_box))
-		!= NULL)
+	ಯಾವತ್ ((child = gtk_widget_get_first_child(self->overflow_box))
+		!= ರಿಕ್ತ)
 	    vim_toolbar_move_item_to(self, child, FALSE);
 
-	for (GList *ele = overflow_ele; ele != NULL; ele = ele->next)
+	ಪ್ರತಿ (GList *ele = overflow_ele; ele != ರಿಕ್ತ; ele = ele->next)
 	{
 	    remaining -= get_item_width(ele->data);
-	    if (remaining < 0)
+	    ಯದಿ (remaining < 0)
 	    {
 		need_overflow_btn = TRUE;
-		break;
+		ಭಙ್ಗ;
 	    }
 	}
 
-	if (need_overflow_btn)
-	    for (; overflow_ele != NULL; overflow_ele = overflow_ele->next)
+	ಯದಿ (need_overflow_btn)
+	    ಪ್ರತಿ (; overflow_ele != ರಿಕ್ತ; overflow_ele = overflow_ele->next)
 		vim_toolbar_move_item_to(self, overflow_ele->data, TRUE);
 	gtk_widget_set_visible(self->overflow_btn, need_overflow_btn);
     }
-    else
+    ಅನ್ಯಥಾ
 	gtk_widget_set_visible(self->overflow_btn, FALSE);
 
     alloc.x = alloc.y = 0;
     alloc.width = width;
     alloc.height = height;
 
-    gtk_widget_size_allocate(self->root, &alloc, baseline);
+    gtk_widget_size_allocate(self->ಬೇರು, &alloc, baseline);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 vim_toolbar_measure(
 	GtkWidget	*widget,
 	GtkOrientation	orientation,
-	int		for_size,
-	int		*min,
-	int		*nat,
-	int		*min_baseline,
-	int		*nat_baseline)
+	ಪೂರ್ಣಾಙ್ಕ		for_size,
+	ಪೂರ್ಣಾಙ್ಕ		*min,
+	ಪೂರ್ಣಾಙ್ಕ		*nat,
+	ಪೂರ್ಣಾಙ್ಕ		*min_baseline,
+	ಪೂರ್ಣಾಙ್ಕ		*nat_baseline)
 {
     VimToolbar	*self = VIM_TOOLBAR(widget);
-    int		strip_min = 0, strip_nat = 0;
-    int		obtn_min = 0, obtn_nat = 0;
+    ಪೂರ್ಣಾಙ್ಕ		strip_min = 0, strip_nat = 0;
+    ಪೂರ್ಣಾಙ್ಕ		obtn_min = 0, obtn_nat = 0;
 
     gtk_widget_measure(self->strip, orientation, for_size,
-	    &strip_min, &strip_nat, NULL, NULL);
+	    &strip_min, &strip_nat, ರಿಕ್ತ, ರಿಕ್ತ);
     gtk_widget_measure(self->overflow_btn, orientation, for_size,
-	    &obtn_min, &obtn_nat, NULL, NULL);
+	    &obtn_min, &obtn_nat, ರಿಕ್ತ, ರಿಕ್ತ);
 
-    if (orientation == GTK_ORIENTATION_HORIZONTAL)
+    ಯದಿ (orientation == GTK_ORIENTATION_HORIZONTAL)
     {
-	if (min != NULL)
+	ಯದಿ (min != ರಿಕ್ತ)
 	    *min = obtn_min;
-	if (nat != NULL)
+	ಯದಿ (nat != ರಿಕ್ತ)
 	    *nat = strip_nat + obtn_nat;
     }
-    else
+    ಅನ್ಯಥಾ
     {
-	if (min != NULL)
+	ಯದಿ (min != ರಿಕ್ತ)
 	    *min = MAX(strip_min, obtn_min);
-	if (nat != NULL)
+	ಯದಿ (nat != ರಿಕ್ತ)
 	    *nat = MAX(strip_nat, obtn_nat);
     }
 
-    if (min_baseline != NULL)
+    ಯದಿ (min_baseline != ರಿಕ್ತ)
 	*min_baseline = -1;
-    if (nat_baseline != NULL)
+    ಯದಿ (nat_baseline != ರಿಕ್ತ)
 	*nat_baseline = -1;
 }
 

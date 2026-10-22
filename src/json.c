@@ -14,27 +14,27 @@
  */
 #define USING_FLOAT_STUFF
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-#if defined(FEAT_EVAL)
+#ಯದಿ defined(FEAT_EVAL)
 
-static int json_encode_item(garray_T *gap, typval_T *val, int copyID, int options);
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ json_encode_item(garray_T *gap, typval_T *val, ಪೂರ್ಣಾಙ್ಕ copyID, ಪೂರ್ಣಾಙ್ಕ options);
 
 /*
  * Encode "val" into a JSON format string.
  * The result is added to "gap"
  * Returns FAIL on failure and makes gap->ga_data empty.
  */
-    static int
-json_encode_gap(garray_T *gap, typval_T *val, int options)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+json_encode_gap(garray_T *gap, typval_T *val, ಪೂರ್ಣಾಙ್ಕ options)
 {
-    if (json_encode_item(gap, val, get_copyID(), options) == FAIL)
+    ಯದಿ (json_encode_item(gap, val, get_copyID(), options) == FAIL)
     {
 	ga_clear(gap);
 	gap->ga_data = vim_strsave((char_u *)"");
-	return FAIL;
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     }
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
@@ -44,49 +44,49 @@ json_encode_gap(garray_T *gap, typval_T *val, int options)
  * "options" can contain JSON_JS, JSON_NO_NONE and JSON_NL.
  */
     char_u *
-json_encode(typval_T *val, int options)
+json_encode(typval_T *val, ಪೂರ್ಣಾಙ್ಕ options)
 {
     garray_T ga;
 
     // Store bytes in the growarray.
     ga_init2(&ga, 1, 4000);
     json_encode_gap(&ga, val, options);
-    if (options & JSON_NL)
+    ಯದಿ (options & JSON_NL)
 	ga_append(&ga, NL);
     ga_append(&ga, NUL);
-    return ga.ga_data;
+    ಪ್ರತ್ಯಾಗಮ ga.ga_data;
 }
 
-#if defined(FEAT_JOB_CHANNEL)
+#ಯದಿ defined(FEAT_JOB_CHANNEL)
 /*
  * Encode ["nr", "val"] into a JSON format string in allocated memory.
  * "options" can contain JSON_JS, JSON_NO_NONE and JSON_NL.
  * Returns NULL when out of memory.
  */
     char_u *
-json_encode_nr_expr(int nr, typval_T *val, int options)
+json_encode_nr_ಅಭಿವ್ಯಕ್ತಿ(ಪೂರ್ಣಾಙ್ಕ nr, typval_T *val, ಪೂರ್ಣಾಙ್ಕ options)
 {
     typval_T	listtv;
     typval_T	nrtv;
     garray_T	ga;
 
-    nrtv.v_type = VAR_NUMBER;
-    nrtv.vval.v_number = nr;
-    if (rettv_list_alloc(&listtv) == FAIL)
-	return NULL;
-    if (list_append_tv(listtv.vval.v_list, &nrtv) == FAIL
+    nrtv.v_type = VAR_ಸಂಖ್ಯೆ;
+    nrtv.vval.v_ಸಂಖ್ಯೆ = nr;
+    ಯದಿ (rettv_list_alloc(&listtv) == FAIL)
+	ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
+    ಯದಿ (list_append_tv(listtv.vval.v_list, &nrtv) == FAIL
 	    || list_append_tv(listtv.vval.v_list, val) == FAIL)
     {
 	list_unref(listtv.vval.v_list);
-	return NULL;
+	ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
     }
 
     ga_init2(&ga, 1, 4000);
-    if (json_encode_gap(&ga, &listtv, options) == OK && (options & JSON_NL))
+    ಯದಿ (json_encode_gap(&ga, &listtv, options) == OK && (options & JSON_NL))
 	ga_append(&ga, '\n');
     list_unref(listtv.vval.v_list);
     ga_append(&ga, NUL);
-    return ga.ga_data;
+    ಪ್ರತ್ಯಾಗಮ ga.ga_data;
 }
 
 /*
@@ -94,33 +94,33 @@ json_encode_nr_expr(int nr, typval_T *val, int options)
  * Returns NULL when out of memory.
  */
     char_u *
-json_encode_lsp_msg(typval_T *val)
+json_encode_lsp_ಸಂದೇಶ(typval_T *val)
 {
     garray_T	ga;
     garray_T	lspga;
     size_t	IObufflen;
 
     ga_init2(&ga, 1, 4000);
-    if (json_encode_gap(&ga, val, 0) == FAIL)
-	return NULL;
+    ಯದಿ (json_encode_gap(&ga, val, 0) == FAIL)
+	ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
     ga_append(&ga, NUL);
 
     ga_init2(&lspga, 1, 4000);
     // Header according to LSP specification.
-    IObufflen = vim_snprintf_safelen((char *)IObuff, IOSIZE,
+    IObufflen = vim_snprintf_safelen((ವರ್ಣ *)IObuff, IOSIZE,
 	    "Content-Length: %u\r\n\r\n",
 	    ga.ga_len - 1);
     ga_concat_len(&lspga, IObuff, IObufflen);
     ga_concat_len(&lspga, ga.ga_data, ga.ga_len);
     ga_clear(&ga);
-    return lspga.ga_data;
+    ಪ್ರತ್ಯಾಗಮ lspga.ga_data;
 }
 #endif
 
 /*
  * Lookup table to quickly know if the given ASCII character must be escaped.
  */
-static const char ascii_needs_escape[128] = {
+ಸ್ಥಿರ ಧ್ರುವ ವರ್ಣ ascii_needs_escape[128] = {
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 0x0.
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 0x1.
     0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0x2.
@@ -134,75 +134,75 @@ static const char ascii_needs_escape[128] = {
 /*
  * Encode the utf-8 encoded string "str" into "gap".
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 write_string(garray_T *gap, char_u *str)
 {
     char_u	*res = str;
     char_u	numbuf[NUMBUFLEN];
     char_u	*from;
-#if defined(USE_ICONV)
+#ಯದಿ defined(USE_ICONV)
     vimconv_T   conv;
-    char_u	*converted = NULL;
+    char_u	*converted = ರಿಕ್ತ;
 #endif
-    int		c;
+    ಪೂರ್ಣಾಙ್ಕ		c;
 
-    if (res == NULL)
+    ಯದಿ (res == ರಿಕ್ತ)
     {
 	GA_CONCAT_LITERAL(gap, "\"\"");
-	return;
+	ಪ್ರತ್ಯಾಗಮ;
     }
 
-#if defined(USE_ICONV)
-    if (!enc_utf8)
+#ಯದಿ defined(USE_ICONV)
+    ಯದಿ (!enc_utf8)
     {
 	// Convert the text from 'encoding' to utf-8, because a JSON string is
 	// always utf-8.
 	conv.vc_type = CONV_NONE;
 	convert_setup(&conv, p_enc, (char_u*)"utf-8");
-	if (conv.vc_type != CONV_NONE)
-	    converted = res = string_convert(&conv, res, NULL);
-	convert_setup(&conv, NULL, NULL);
+	ಯದಿ (conv.vc_type != CONV_NONE)
+	    converted = res = string_convert(&conv, res, ರಿಕ್ತ);
+	convert_setup(&conv, ರಿಕ್ತ, ರಿಕ್ತ);
     }
 #endif
     ga_append(gap, '"');
     // Pre-grow for the common case: input length + quotes + some escapes.
-    ga_grow(gap, (int)STRLEN(res) + 2);
+    ga_grow(gap, (ಪೂರ್ಣಾಙ್ಕ)STRLEN(res) + 2);
     // `from` is the beginning of a sequence of bytes we can directly copy from
     // the input string, avoiding the overhead associated to decoding/encoding
     // them.
     from = res;
-    while ((c = *res) != NUL)
+    ಯಾವತ್ ((c = *res) != NUL)
     {
 	// always use utf-8 encoding, ignore 'encoding'
-	if (c < 0x80)
+	ಯದಿ (c < 0x80)
 	{
-	    if (!ascii_needs_escape[c])
+	    ಯದಿ (!ascii_needs_escape[c])
 	    {
 		res += 1;
-		continue;
+		ಅನುವರ್ತ;
 	    }
 
-	    if (res != from)
+	    ಯದಿ (res != from)
 		ga_concat_len(gap, from, res - from);
 	    from = res + 1;
 
-	    switch (c)
+	    ವಿಕಲ್ಪ (c)
 	    {
-		case 0x08:
-		    GA_CONCAT_LITERAL(gap, "\\b"); break;
-		case 0x09:
-		    GA_CONCAT_LITERAL(gap, "\\t"); break;
-		case 0x0a:
-		    GA_CONCAT_LITERAL(gap, "\\n"); break;
-		case 0x0c:
-		    GA_CONCAT_LITERAL(gap, "\\f"); break;
-		case 0x0d:
-		    GA_CONCAT_LITERAL(gap, "\\r"); break;
-		case 0x22: // "
-		    GA_CONCAT_LITERAL(gap, "\\\""); break;
-		case 0x5c: // backslash
-		    GA_CONCAT_LITERAL(gap, "\\\\"); break;
-		default:
+		ಪಕ್ಷ 0x08:
+		    GA_CONCAT_LITERAL(gap, "\\b"); ಭಙ್ಗ;
+		ಪಕ್ಷ 0x09:
+		    GA_CONCAT_LITERAL(gap, "\\t"); ಭಙ್ಗ;
+		ಪಕ್ಷ 0x0a:
+		    GA_CONCAT_LITERAL(gap, "\\n"); ಭಙ್ಗ;
+		ಪಕ್ಷ 0x0c:
+		    GA_CONCAT_LITERAL(gap, "\\f"); ಭಙ್ಗ;
+		ಪಕ್ಷ 0x0d:
+		    GA_CONCAT_LITERAL(gap, "\\r"); ಭಙ್ಗ;
+		ಪಕ್ಷ 0x22: // "
+		    GA_CONCAT_LITERAL(gap, "\\\""); ಭಙ್ಗ;
+		ಪಕ್ಷ 0x5c: // backslash
+		    GA_CONCAT_LITERAL(gap, "\\\\"); ಭಙ್ಗ;
+		ಸ್ವಭಾವ:
 		{
 		    char_u escaped[] = "\\u0000";
 
@@ -215,20 +215,20 @@ write_string(garray_T *gap, char_u *str)
 
 	    res += 1;
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
-	    int	    l = utf_ptr2len(res);
+	    ಪೂರ್ಣಾಙ್ಕ	    l = utf_ptr2len(res);
 	    size_t  numbuflen;
 
-	    if (l > 1)
+	    ಯದಿ (l > 1)
 	    {
 		res += l;
-		continue;
+		ಅನುವರ್ತ;
 	    }
 
 	    // Invalid utf-8 sequence, replace it with the Unicode replacement
 	    // character U+FFFD.
-	    if (res != from)
+	    ಯದಿ (res != from)
 		ga_concat_len(gap, from, res - from);
 	    from = res + 1;
 
@@ -240,11 +240,11 @@ write_string(garray_T *gap, char_u *str)
 	}
     }
 
-    if (res != from)
+    ಯದಿ (res != from)
 	ga_concat_len(gap, from, res - from);
 
     ga_append(gap, '"');
-#if defined(USE_ICONV)
+#ಯದಿ defined(USE_ICONV)
     vim_free(converted);
 #endif
 }
@@ -254,42 +254,42 @@ write_string(garray_T *gap, char_u *str)
  * That is when it starts with a letter and only contains letters, digits and
  * underscore.
  */
-    static int
-is_simple_key(char_u *key)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+is_simple_ಕೀಲಿ(char_u *ಕೀಲಿ)
 {
     char_u *p;
 
-    if (!ASCII_ISALPHA(*key))
-	return FALSE;
-    for (p = key + 1; *p != NUL; ++p)
-	if (!ASCII_ISALPHA(*p) && *p != '_' && !vim_isdigit(*p))
-	    return FALSE;
-    return TRUE;
+    ಯದಿ (!ASCII_ISALPHA(*ಕೀಲಿ))
+	ಪ್ರತ್ಯಾಗಮ FALSE;
+    ಪ್ರತಿ (p = ಕೀಲಿ + 1; *p != NUL; ++p)
+	ಯದಿ (!ASCII_ISALPHA(*p) && *p != '_' && !vim_isdigit(*p))
+	    ಪ್ರತ್ಯಾಗಮ FALSE;
+    ಪ್ರತ್ಯಾಗಮ TRUE;
 }
 
-typedef enum {
+ಪ್ರಕಾರನಿರ್ದೇಶ ಗಣನಾ {
     ENC_LIST,
     ENC_TUPLE,
     ENC_DICT,
 } json_enc_type_T;
 
-typedef struct {
+ಪ್ರಕಾರನಿರ್ದೇಶ ಸಂರಚನಾ {
     json_enc_type_T je_type;
-    int		    je_options;	    // options when this container was entered
-    union {
-	struct {
+    ಪೂರ್ಣಾಙ್ಕ		    je_options;	    // options when this container was entered
+    ಸಙ್ಘ {
+	ಸಂರಚನಾ {
 	    list_T	*list;
 	    listitem_T	*li;	    // current item
 	} l;
-	struct {
+	ಸಂರಚನಾ {
 	    tuple_T	*tuple;
-	    int		idx;	    // current index
-	    int		len;
+	    ಪೂರ್ಣಾಙ್ಕ		idx;	    // current index
+	    ಪೂರ್ಣಾಙ್ಕ		len;
 	} t;
-	struct {
+	ಸಂರಚನಾ {
 	    dict_T	*dict;
 	    hashitem_T	*hi;	    // current entry
-	    int		todo;	    // remaining entries
+	    ಪೂರ್ಣಾಙ್ಕ		todo;	    // remaining entries
 	} d;
     } je_u;
 } json_enc_frame_T;
@@ -299,8 +299,8 @@ typedef struct {
  * Uses an explicit stack to avoid deep recursion on nested structures.
  * Return FAIL or OK.
  */
-    static int
-json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+json_encode_item(garray_T *gap, typval_T *val, ಪೂರ್ಣಾಙ್ಕ copyID, ಪೂರ್ಣಾಙ್ಕ options)
 {
     char_u		numbuf[NUMBUFLEN];
     char_u		*res;
@@ -308,417 +308,417 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
     list_T		*l;
     tuple_T		*tuple;
     dict_T		*d;
-    int			i;
-    garray_T		stack;
+    ಪೂರ್ಣಾಙ್ಕ			i;
+    garray_T		ರಾಶಿ;
     typval_T		*cur_val;
     json_enc_frame_T	*frame;
 
-    ga_init2(&stack, sizeof(json_enc_frame_T), 100);
+    ga_init2(&ರಾಶಿ, ಪರಿಮಾಣ(json_enc_frame_T), 100);
     cur_val = val;
 
-    for (;;)
+    ಪ್ರತಿ (;;)
     {
-    switch (cur_val->v_type)
+    ವಿಕಲ್ಪ (cur_val->v_type)
     {
-	case VAR_BOOL:
-	    switch ((long)cur_val->vval.v_number)
+	ಪಕ್ಷ VAR_BOOL:
+	    ವಿಕಲ್ಪ ((long)cur_val->vval.v_ಸಂಖ್ಯೆ)
 	    {
-		case VVAL_FALSE: GA_CONCAT_LITERAL(gap, "false"); break;
-		case VVAL_TRUE: GA_CONCAT_LITERAL(gap, "true"); break;
+		ಪಕ್ಷ VVAL_FALSE: GA_CONCAT_LITERAL(gap, "false"); ಭಙ್ಗ;
+		ಪಕ್ಷ VVAL_TRUE: GA_CONCAT_LITERAL(gap, "true"); ಭಙ್ಗ;
 	    }
-	    break;
+	    ಭಙ್ಗ;
 
-	case VAR_SPECIAL:
-	    switch ((long)cur_val->vval.v_number)
+	ಪಕ್ಷ VAR_SPECIAL:
+	    ವಿಕಲ್ಪ ((long)cur_val->vval.v_ಸಂಖ್ಯೆ)
 	    {
-		case VVAL_NONE: if ((options & JSON_JS) != 0
+		ಪಕ್ಷ VVAL_NONE: ಯದಿ ((options & JSON_JS) != 0
 					     && (options & JSON_NO_NONE) == 0)
 				    // empty item
-				    break;
+				    ಭಙ್ಗ;
 				// FALLTHROUGH
-		case VVAL_NULL: GA_CONCAT_LITERAL(gap, "null"); break;
+		ಪಕ್ಷ VVAL_NULL: GA_CONCAT_LITERAL(gap, "null"); ಭಙ್ಗ;
 	    }
-	    break;
+	    ಭಙ್ಗ;
 
-	case VAR_NUMBER:
+	ಪಕ್ಷ VAR_ಸಂಖ್ಯೆ:
 	    {
 		size_t  numbuflen;
 
-		numbuflen = vim_snprintf_safelen((char *)numbuf, sizeof(numbuf),
-		    "%lld", (varnumber_T)cur_val->vval.v_number);
+		numbuflen = vim_snprintf_safelen((ವರ್ಣ *)numbuf, ಪರಿಮಾಣ(numbuf),
+		    "%lld", (varnumber_T)cur_val->vval.v_ಸಂಖ್ಯೆ);
 		ga_concat_len(gap, numbuf, numbuflen);
 	    }
-	    break;
+	    ಭಙ್ಗ;
 
-	case VAR_STRING:
+	ಪಕ್ಷ VAR_STRING:
 	    res = cur_val->vval.v_string;
 	    write_string(gap, res);
-	    break;
+	    ಭಙ್ಗ;
 
-	case VAR_FUNC:
-	case VAR_PARTIAL:
-	case VAR_JOB:
-	case VAR_CHANNEL:
-	case VAR_INSTR:
-	case VAR_CLASS:
-	case VAR_OBJECT:
-	case VAR_TYPEALIAS:
+	ಪಕ್ಷ VAR_FUNC:
+	ಪಕ್ಷ VAR_PARTIAL:
+	ಪಕ್ಷ VAR_JOB:
+	ಪಕ್ಷ VAR_CHANNEL:
+	ಪಕ್ಷ VAR_INSTR:
+	ಪಕ್ಷ VAR_CLASS:
+	ಪಕ್ಷ VAR_OBJECT:
+	ಪಕ್ಷ VAR_TYPEALIAS:
 	    semsg(_(e_cannot_json_encode_str), vartype_name(cur_val->v_type));
-	    goto theend;
+	    ಗಚ್ಛ theend;
 
-	case VAR_BLOB:
+	ಪಕ್ಷ VAR_BLOB:
 	    b = cur_val->vval.v_blob;
-	    if (b == NULL || b->bv_ga.ga_len == 0)
+	    ಯದಿ (b == ರಿಕ್ತ || b->bv_ga.ga_len == 0)
 		GA_CONCAT_LITERAL(gap, "[]");
-	    else
+	    ಅನ್ಯಥಾ
 	    {
-		int	blen = b->bv_ga.ga_len;
+		ಪೂರ್ಣಾಙ್ಕ	blen = b->bv_ga.ga_len;
 		char_u	*src;
 		char_u	*dst;
 
 		// Worst case: '[' + ']' + per-byte 3 digits + comma = 2 + 4*blen
-		if (ga_grow(gap, 2 + 4 * blen) == FAIL)
-		    goto theend;
+		ಯದಿ (ga_grow(gap, 2 + 4 * blen) == FAIL)
+		    ಗಚ್ಛ theend;
 		src = (char_u *)b->bv_ga.ga_data;
 		dst = (char_u *)gap->ga_data + gap->ga_len;
 		*dst++ = '[';
-		for (i = 0; i < blen; i++)
+		ಪ್ರತಿ (i = 0; i < blen; i++)
 		{
-		    int	    byte = src[i];
+		    ಪೂರ್ಣಾಙ್ಕ	    byte = src[i];
 
-		    if (i > 0)
+		    ಯದಿ (i > 0)
 			*dst++ = ',';
-		    if (byte >= 100)
+		    ಯದಿ (byte >= 100)
 		    {
 			*dst++ = '0' + byte / 100;
 			*dst++ = '0' + (byte / 10) % 10;
 			*dst++ = '0' + byte % 10;
 		    }
-		    else if (byte >= 10)
+		    ಅನ್ಯಥಾ ಯದಿ (byte >= 10)
 		    {
 			*dst++ = '0' + byte / 10;
 			*dst++ = '0' + byte % 10;
 		    }
-		    else
+		    ಅನ್ಯಥಾ
 			*dst++ = '0' + byte;
 		}
 		*dst++ = ']';
-		gap->ga_len = (int)(dst - (char_u *)gap->ga_data);
+		gap->ga_len = (ಪೂರ್ಣಾಙ್ಕ)(dst - (char_u *)gap->ga_data);
 	    }
-	    break;
+	    ಭಙ್ಗ;
 
-	case VAR_LIST:
+	ಪಕ್ಷ VAR_LIST:
 	    l = cur_val->vval.v_list;
-	    if (l == NULL)
+	    ಯದಿ (l == ರಿಕ್ತ)
 		GA_CONCAT_LITERAL(gap, "[]");
-	    else
+	    ಅನ್ಯಥಾ
 	    {
-		if (l->lv_copyID == copyID)
+		ಯದಿ (l->lv_copyID == copyID)
 		    GA_CONCAT_LITERAL(gap, "[]");
-		else
+		ಅನ್ಯಥಾ
 		{
 		    l->lv_copyID = copyID;
 		    ga_append(gap, '[');
 		    CHECK_LIST_MATERIALIZE(l);
-		    if (l->lv_first != NULL)
+		    ಯದಿ (l->lv_first != ರಿಕ್ತ)
 		    {
-			if (stack.ga_len >= p_mfd)
+			ಯದಿ (ರಾಶಿ.ga_len >= p_mfd)
 			{
 			    emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
-			    goto theend;
+			    ಗಚ್ಛ theend;
 			}
-			if (ga_grow(&stack, 1) == FAIL)
-			    goto theend;
-			frame = ((json_enc_frame_T *)stack.ga_data)
-							    + stack.ga_len;
+			ಯದಿ (ga_grow(&ರಾಶಿ, 1) == FAIL)
+			    ಗಚ್ಛ theend;
+			frame = ((json_enc_frame_T *)ರಾಶಿ.ga_data)
+							    + ರಾಶಿ.ga_len;
 			frame->je_type = ENC_LIST;
 			frame->je_options = options;
 			frame->je_u.l.list = l;
 			frame->je_u.l.li = l->lv_first;
-			++stack.ga_len;
+			++ರಾಶಿ.ga_len;
 			options = options & JSON_JS;
 			cur_val = &l->lv_first->li_tv;
-			continue;
+			ಅನುವರ್ತ;
 		    }
 		    ga_append(gap, ']');
 		    l->lv_copyID = 0;
 		}
 	    }
-	    break;
+	    ಭಙ್ಗ;
 
-	case VAR_TUPLE:
+	ಪಕ್ಷ VAR_TUPLE:
 	    tuple = cur_val->vval.v_tuple;
-	    if (tuple == NULL)
+	    ಯದಿ (tuple == ರಿಕ್ತ)
 		GA_CONCAT_LITERAL(gap, "[]");
-	    else
+	    ಅನ್ಯಥಾ
 	    {
-		if (tuple->tv_copyID == copyID)
+		ಯದಿ (tuple->tv_copyID == copyID)
 		    GA_CONCAT_LITERAL(gap, "[]");
-		else
+		ಅನ್ಯಥಾ
 		{
-		    int		len = TUPLE_LEN(tuple);
+		    ಪೂರ್ಣಾಙ್ಕ		len = TUPLE_LEN(tuple);
 
-		    if (len > 0)
+		    ಯದಿ (len > 0)
 		    {
 			tuple->tv_copyID = copyID;
 			ga_append(gap, '[');
-			if (stack.ga_len >= p_mfd)
+			ಯದಿ (ರಾಶಿ.ga_len >= p_mfd)
 			{
 			    emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
-			    goto theend;
+			    ಗಚ್ಛ theend;
 			}
-			if (ga_grow(&stack, 1) == FAIL)
-			    goto theend;
-			frame = ((json_enc_frame_T *)stack.ga_data)
-							    + stack.ga_len;
+			ಯದಿ (ga_grow(&ರಾಶಿ, 1) == FAIL)
+			    ಗಚ್ಛ theend;
+			frame = ((json_enc_frame_T *)ರಾಶಿ.ga_data)
+							    + ರಾಶಿ.ga_len;
 			frame->je_type = ENC_TUPLE;
 			frame->je_options = options;
 			frame->je_u.t.tuple = tuple;
 			frame->je_u.t.idx = 0;
 			frame->je_u.t.len = len;
-			++stack.ga_len;
+			++ರಾಶಿ.ga_len;
 			options = options & JSON_JS;
 			cur_val = TUPLE_ITEM(tuple, 0);
-			continue;
+			ಅನುವರ್ತ;
 		    }
-		    else
+		    ಅನ್ಯಥಾ
 			GA_CONCAT_LITERAL(gap, "[]");
 		}
 	    }
-	    break;
+	    ಭಙ್ಗ;
 
-	case VAR_DICT:
+	ಪಕ್ಷ VAR_DICT:
 	    d = cur_val->vval.v_dict;
-	    if (d == NULL)
+	    ಯದಿ (d == ರಿಕ್ತ)
 		GA_CONCAT_LITERAL(gap, "{}");
-	    else
+	    ಅನ್ಯಥಾ
 	    {
-		if (d->dv_copyID == copyID)
+		ಯದಿ (d->dv_copyID == copyID)
 		    GA_CONCAT_LITERAL(gap, "{}");
-		else
+		ಅನ್ಯಥಾ
 		{
-		    int		todo = (int)d->dv_hashtab.ht_used;
+		    ಪೂರ್ಣಾಙ್ಕ		todo = (ಪೂರ್ಣಾಙ್ಕ)d->dv_hashtab.ht_used;
 		    hashitem_T	*hi;
 
-		    if (todo > 0)
+		    ಯದಿ (todo > 0)
 		    {
 			d->dv_copyID = copyID;
 			ga_append(gap, '{');
 
 			// Find first non-empty hash entry
-			for (hi = d->dv_hashtab.ht_array;
+			ಪ್ರತಿ (hi = d->dv_hashtab.ht_array;
 						  HASHITEM_EMPTY(hi); ++hi)
 			    ;
 			--todo;
 
 			// Write first key
-			if ((options & JSON_JS)
-						 && is_simple_key(hi->hi_key))
-			    ga_concat(gap, hi->hi_key);
-			else
-			    write_string(gap, hi->hi_key);
+			ಯದಿ ((options & JSON_JS)
+						 && is_simple_ಕೀಲಿ(hi->hi_ಕೀಲಿ))
+			    ga_concat(gap, hi->hi_ಕೀಲಿ);
+			ಅನ್ಯಥಾ
+			    write_string(gap, hi->hi_ಕೀಲಿ);
 			ga_append(gap, ':');
 
-			if (stack.ga_len >= p_mfd)
+			ಯದಿ (ರಾಶಿ.ga_len >= p_mfd)
 			{
 			    emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
-			    goto theend;
+			    ಗಚ್ಛ theend;
 			}
-			if (ga_grow(&stack, 1) == FAIL)
-			    goto theend;
-			frame = ((json_enc_frame_T *)stack.ga_data)
-							    + stack.ga_len;
+			ಯದಿ (ga_grow(&ರಾಶಿ, 1) == FAIL)
+			    ಗಚ್ಛ theend;
+			frame = ((json_enc_frame_T *)ರಾಶಿ.ga_data)
+							    + ರಾಶಿ.ga_len;
 			frame->je_type = ENC_DICT;
 			frame->je_options = options;
 			frame->je_u.d.dict = d;
 			frame->je_u.d.hi = hi;
 			frame->je_u.d.todo = todo;
-			++stack.ga_len;
+			++ರಾಶಿ.ga_len;
 			options = options | JSON_NO_NONE;
 			cur_val = &dict_lookup(hi)->di_tv;
-			continue;
+			ಅನುವರ್ತ;
 		    }
-		    else
+		    ಅನ್ಯಥಾ
 			GA_CONCAT_LITERAL(gap, "{}");
 		}
 	    }
-	    break;
+	    ಭಙ್ಗ;
 
-	case VAR_FLOAT:
-#if defined(HAVE_MATH_H)
-	    if (isnan(cur_val->vval.v_float))
+	ಪಕ್ಷ VAR_FLOAT:
+#ಯದಿ defined(HAVE_MATH_H)
+	    ಯದಿ (isnan(cur_val->vval.v_float))
 		GA_CONCAT_LITERAL(gap, "NaN");
-	    else if (isinf(cur_val->vval.v_float))
+	    ಅನ್ಯಥಾ ಯದಿ (isinf(cur_val->vval.v_float))
 	    {
-		if (cur_val->vval.v_float < 0.0)
+		ಯದಿ (cur_val->vval.v_float < 0.0)
 		    GA_CONCAT_LITERAL(gap, "-Infinity");
-		else
+		ಅನ್ಯಥಾ
 		    GA_CONCAT_LITERAL(gap, "Infinity");
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 #endif
 	    {
 		size_t	numbuflen;
 
-		numbuflen = vim_snprintf_safelen((char *)numbuf, sizeof(numbuf),
+		numbuflen = vim_snprintf_safelen((ವರ್ಣ *)numbuf, ಪರಿಮಾಣ(numbuf),
 		    "%g", cur_val->vval.v_float);
 		ga_concat_len(gap, numbuf, numbuflen);
 	    }
-	    break;
+	    ಭಙ್ಗ;
 
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
+	ಪಕ್ಷ VAR_UNKNOWN:
+	ಪಕ್ಷ VAR_ANY:
+	ಪಕ್ಷ VAR_VOID:
 	    internal_error_no_abort("json_encode_item()");
-	    goto theend;
+	    ಗಚ್ಛ theend;
     }
 
 	// Process the completed item by advancing containers or
 	// returning when the stack is empty.
-	for (;;)
+	ಪ್ರತಿ (;;)
 	{
-	    int		advance = FALSE;
+	    ಪೂರ್ಣಾಙ್ಕ		advance = FALSE;
 
-	    if (stack.ga_len == 0)
+	    ಯದಿ (ರಾಶಿ.ga_len == 0)
 	    {
-		ga_clear(&stack);
-		return OK;
+		ga_clear(&ರಾಶಿ);
+		ಪ್ರತ್ಯಾಗಮ OK;
 	    }
 
-	    frame = ((json_enc_frame_T *)stack.ga_data)
-							+ stack.ga_len - 1;
-	    switch (frame->je_type)
+	    frame = ((json_enc_frame_T *)ರಾಶಿ.ga_data)
+							+ ರಾಶಿ.ga_len - 1;
+	    ವಿಕಲ್ಪ (frame->je_type)
 	    {
-		case ENC_LIST:
+		ಪಕ್ಷ ENC_LIST:
 		{
 		    listitem_T	*li = frame->je_u.l.li;
 
 		    // JSON_JS: add trailing comma if last item is v:none
-		    if ((frame->je_options & JSON_JS)
-			    && li->li_next == NULL
+		    ಯದಿ ((frame->je_options & JSON_JS)
+			    && li->li_next == ರಿಕ್ತ
 			    && li->li_tv.v_type == VAR_SPECIAL
-			    && li->li_tv.vval.v_number == VVAL_NONE)
+			    && li->li_tv.vval.v_ಸಂಖ್ಯೆ == VVAL_NONE)
 			ga_append(gap, ',');
 
 		    li = li->li_next;
 		    frame->je_u.l.li = li;
-		    if (li != NULL && !got_int)
+		    ಯದಿ (li != ರಿಕ್ತ && !got_int)
 		    {
 			ga_append(gap, ',');
 			options = frame->je_options & JSON_JS;
 			cur_val = &li->li_tv;
 			advance = TRUE;
-			break;
+			ಭಙ್ಗ;
 		    }
 		    ga_append(gap, ']');
 		    frame->je_u.l.list->lv_copyID = 0;
-		    --stack.ga_len;
-		    break;
+		    --ರಾಶಿ.ga_len;
+		    ಭಙ್ಗ;
 		}
 
-		case ENC_TUPLE:
+		ಪಕ್ಷ ENC_TUPLE:
 		{
-		    int	    idx = frame->je_u.t.idx;
-		    int	    len = frame->je_u.t.len;
+		    ಪೂರ್ಣಾಙ್ಕ	    idx = frame->je_u.t.idx;
+		    ಪೂರ್ಣಾಙ್ಕ	    len = frame->je_u.t.len;
 
 		    // JSON_JS: add trailing comma if last item is v:none
-		    if ((frame->je_options & JSON_JS) && idx == len - 1)
+		    ಯದಿ ((frame->je_options & JSON_JS) && idx == len - 1)
 		    {
 			typval_T *t_item =
 				    TUPLE_ITEM(frame->je_u.t.tuple, idx);
 
-			if (t_item->v_type == VAR_SPECIAL
-				&& t_item->vval.v_number == VVAL_NONE)
+			ಯದಿ (t_item->v_type == VAR_SPECIAL
+				&& t_item->vval.v_ಸಂಖ್ಯೆ == VVAL_NONE)
 			    ga_append(gap, ',');
 		    }
 
 		    ++idx;
 		    frame->je_u.t.idx = idx;
-		    if (idx < len && !got_int)
+		    ಯದಿ (idx < len && !got_int)
 		    {
 			ga_append(gap, ',');
 			options = frame->je_options & JSON_JS;
 			cur_val = TUPLE_ITEM(frame->je_u.t.tuple, idx);
 			advance = TRUE;
-			break;
+			ಭಙ್ಗ;
 		    }
 		    ga_append(gap, ']');
 		    frame->je_u.t.tuple->tv_copyID = 0;
-		    --stack.ga_len;
-		    break;
+		    --ರಾಶಿ.ga_len;
+		    ಭಙ್ಗ;
 		}
 
-		case ENC_DICT:
+		ಪಕ್ಷ ENC_DICT:
 		{
 		    hashitem_T	*hi = frame->je_u.d.hi;
-		    int		todo = frame->je_u.d.todo;
+		    ಪೂರ್ಣಾಙ್ಕ		todo = frame->je_u.d.todo;
 
-		    if (todo > 0 && !got_int)
+		    ಯದಿ (todo > 0 && !got_int)
 		    {
 			// Advance to next non-empty entry
-			for (++hi; HASHITEM_EMPTY(hi); ++hi)
+			ಪ್ರತಿ (++hi; HASHITEM_EMPTY(hi); ++hi)
 			    ;
 			--todo;
 			frame->je_u.d.hi = hi;
 			frame->je_u.d.todo = todo;
 
 			ga_append(gap, ',');
-			if ((frame->je_options & JSON_JS)
-				&& is_simple_key(hi->hi_key))
-			    ga_concat(gap, hi->hi_key);
-			else
-			    write_string(gap, hi->hi_key);
+			ಯದಿ ((frame->je_options & JSON_JS)
+				&& is_simple_ಕೀಲಿ(hi->hi_ಕೀಲಿ))
+			    ga_concat(gap, hi->hi_ಕೀಲಿ);
+			ಅನ್ಯಥಾ
+			    write_string(gap, hi->hi_ಕೀಲಿ);
 			ga_append(gap, ':');
 
 			options = frame->je_options | JSON_NO_NONE;
 			cur_val = &dict_lookup(hi)->di_tv;
 			advance = TRUE;
-			break;
+			ಭಙ್ಗ;
 		    }
 		    ga_append(gap, '}');
 		    frame->je_u.d.dict->dv_copyID = 0;
-		    --stack.ga_len;
-		    break;
+		    --ರಾಶಿ.ga_len;
+		    ಭಙ್ಗ;
 		}
 	    }
-	    if (advance)
-		break;
+	    ಯದಿ (advance)
+		ಭಙ್ಗ;
 	}
     }
 
 theend:
     // Clean up copyIDs for remaining frames on error/failure
-    for (i = 0; i < stack.ga_len; i++)
+    ಪ್ರತಿ (i = 0; i < ರಾಶಿ.ga_len; i++)
     {
-	frame = ((json_enc_frame_T *)stack.ga_data) + i;
-	switch (frame->je_type)
+	frame = ((json_enc_frame_T *)ರಾಶಿ.ga_data) + i;
+	ವಿಕಲ್ಪ (frame->je_type)
 	{
-	    case ENC_LIST:
+	    ಪಕ್ಷ ENC_LIST:
 		frame->je_u.l.list->lv_copyID = 0;
-		break;
-	    case ENC_TUPLE:
+		ಭಙ್ಗ;
+	    ಪಕ್ಷ ENC_TUPLE:
 		frame->je_u.t.tuple->tv_copyID = 0;
-		break;
-	    case ENC_DICT:
+		ಭಙ್ಗ;
+	    ಪಕ್ಷ ENC_DICT:
 		frame->je_u.d.dict->dv_copyID = 0;
-		break;
+		ಭಙ್ಗ;
 	}
     }
-    ga_clear(&stack);
-    return FAIL;
+    ga_clear(&ರಾಶಿ);
+    ಪ್ರತ್ಯಾಗಮ FAIL;
 }
 
 /*
  * When "reader" has less than NUMBUFLEN bytes available, call the fill
  * callback to get more.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 fill_numbuflen(js_read_T *reader)
 {
-    if (reader->js_fill != NULL && (int)(reader->js_end - reader->js_buf)
+    ಯದಿ (reader->js_fill != ರಿಕ್ತ && (ಪೂರ್ಣಾಙ್ಕ)(reader->js_end - reader->js_buf)
 						- reader->js_used < NUMBUFLEN)
     {
-	if (reader->js_fill(reader))
+	ಯದಿ (reader->js_fill(reader))
 	    reader->js_end = reader->js_buf + STRLEN(reader->js_buf);
     }
 }
@@ -728,79 +728,79 @@ fill_numbuflen(js_read_T *reader)
  * space.
  * Also tops up readahead when needed.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 json_skip_white(js_read_T *reader)
 {
-    int c;
+    ಪೂರ್ಣಾಙ್ಕ c;
 
-    for (;;)
+    ಪ್ರತಿ (;;)
     {
 	c = reader->js_buf[reader->js_used];
-	if (reader->js_fill != NULL && c == NUL)
+	ಯದಿ (reader->js_fill != ರಿಕ್ತ && c == NUL)
 	{
-	    if (reader->js_fill(reader))
+	    ಯದಿ (reader->js_fill(reader))
 	    {
 		reader->js_end = reader->js_buf + STRLEN(reader->js_buf);
-		continue;
+		ಅನುವರ್ತ;
 	    }
 	}
-	if (c == NUL || c > ' ')
-	    break;
+	ಯದಿ (c == NUL || c > ' ')
+	    ಭಙ್ಗ;
 	++reader->js_used;
     }
     fill_numbuflen(reader);
 }
 
-    static int
-json_decode_string(js_read_T *reader, typval_T *res, int quote)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+json_decode_string(js_read_T *reader, typval_T *res, ಪೂರ್ಣಾಙ್ಕ quote)
 {
     garray_T    ga;
-    int		len;
+    ಪೂರ್ಣಾಙ್ಕ		len;
     char_u	*p;
-    int		c;
+    ಪೂರ್ಣಾಙ್ಕ		c;
     varnumber_T	nr;
 
-    if (res != NULL)
+    ಯದಿ (res != ರಿಕ್ತ)
 	ga_init2(&ga, 1, 200);
 
     p = reader->js_buf + reader->js_used + 1; // skip over " or '
-    while (*p != quote)
+    ಯಾವತ್ (*p != quote)
     {
 	// The JSON is always expected to be utf-8, thus use utf functions
 	// here. The string is converted below if needed.
-	if (*p == NUL || p[1] == NUL || utf_ptr2len(p) < utf_byte2len(*p))
+	ಯದಿ (*p == NUL || p[1] == NUL || utf_ptr2len(p) < utf_byte2len(*p))
 	{
 	    // Not enough bytes to make a character or end of the string. Get
 	    // more if possible.
-	    if (reader->js_fill == NULL)
-		break;
-	    len = (int)(reader->js_end - p);
-	    reader->js_used = (int)(p - reader->js_buf);
-	    if (!reader->js_fill(reader))
-		break; // didn't get more
+	    ಯದಿ (reader->js_fill == ರಿಕ್ತ)
+		ಭಙ್ಗ;
+	    len = (ಪೂರ್ಣಾಙ್ಕ)(reader->js_end - p);
+	    reader->js_used = (ಪೂರ್ಣಾಙ್ಕ)(p - reader->js_buf);
+	    ಯದಿ (!reader->js_fill(reader))
+		ಭಙ್ಗ; // didn't get more
 	    p = reader->js_buf + reader->js_used;
 	    reader->js_end = reader->js_buf + STRLEN(reader->js_buf);
-	    continue;
+	    ಅನುವರ್ತ;
 	}
 
-	if (*p == '\\')
+	ಯದಿ (*p == '\\')
 	{
 	    c = -1;
-	    switch (p[1])
+	    ವಿಕಲ್ಪ (p[1])
 	    {
-		case '\\': c = '\\'; break;
-		case '"': c = '"'; break;
-		case 'b': c = BS; break;
-		case 't': c = TAB; break;
-		case 'n': c = NL; break;
-		case 'f': c = FF; break;
-		case 'r': c = CAR; break;
-		case 'u':
-		    if (reader->js_fill != NULL
-				     && (int)(reader->js_end - p) < NUMBUFLEN)
+		ಪಕ್ಷ '\\': c = '\\'; ಭಙ್ಗ;
+		ಪಕ್ಷ '"': c = '"'; ಭಙ್ಗ;
+		ಪಕ್ಷ 'b': c = BS; ಭಙ್ಗ;
+		ಪಕ್ಷ 't': c = TAB; ಭಙ್ಗ;
+		ಪಕ್ಷ 'n': c = NL; ಭಙ್ಗ;
+		ಪಕ್ಷ 'f': c = FF; ಭಙ್ಗ;
+		ಪಕ್ಷ 'r': c = CAR; ಭಙ್ಗ;
+		ಪಕ್ಷ 'u':
+		    ಯದಿ (reader->js_fill != ರಿಕ್ತ
+				     && (ಪೂರ್ಣಾಙ್ಕ)(reader->js_end - p) < NUMBUFLEN)
 		    {
-			reader->js_used = (int)(p - reader->js_buf);
-			if (reader->js_fill(reader))
+			reader->js_used = (ಪೂರ್ಣಾಙ್ಕ)(p - reader->js_buf);
+			ಯದಿ (reader->js_fill(reader))
 			{
 			    p = reader->js_buf + reader->js_used;
 			    reader->js_end = reader->js_buf
@@ -809,32 +809,32 @@ json_decode_string(js_read_T *reader, typval_T *res, int quote)
 		    }
 		    nr = 0;
 		    len = 0;
-		    vim_str2nr(p + 2, NULL, &len,
-			     STR2NR_HEX + STR2NR_FORCE, &nr, NULL, 4, TRUE, NULL);
-		    if (len == 0)
+		    vim_str2nr(p + 2, ರಿಕ್ತ, &len,
+			     STR2NR_HEX + STR2NR_FORCE, &nr, ರಿಕ್ತ, 4, TRUE, ರಿಕ್ತ);
+		    ಯದಿ (len == 0)
 		    {
-			if (res != NULL)
+			ಯದಿ (res != ರಿಕ್ತ)
 			    ga_clear(&ga);
-			return FAIL;
+			ಪ್ರತ್ಯಾಗಮ FAIL;
 		    }
 		    p += len + 2;
-		    if (0xd800 <= nr && nr <= 0xdbff
-			    && (int)(reader->js_end - p) >= 6
+		    ಯದಿ (0xd800 <= nr && nr <= 0xdbff
+			    && (ಪೂರ್ಣಾಙ್ಕ)(reader->js_end - p) >= 6
 			    && *p == '\\' && *(p+1) == 'u')
 		    {
 			varnumber_T	nr2 = 0;
 
 			// decode surrogate pair: \ud812\u3456
 			len = 0;
-			vim_str2nr(p + 2, NULL, &len, STR2NR_HEX + STR2NR_FORCE,
-						    &nr2, NULL, 4, TRUE, NULL);
-			if (len == 0)
+			vim_str2nr(p + 2, ರಿಕ್ತ, &len, STR2NR_HEX + STR2NR_FORCE,
+						    &nr2, ರಿಕ್ತ, 4, TRUE, ರಿಕ್ತ);
+			ಯದಿ (len == 0)
 			{
-			    if (res != NULL)
+			    ಯದಿ (res != ರಿಕ್ತ)
 				ga_clear(&ga);
-			    return FAIL;
+			    ಪ್ರತ್ಯಾಗಮ FAIL;
 			}
-			if (0xdc00 <= nr2 && nr2 <= 0xdfff)
+			ಯದಿ (0xdc00 <= nr2 && nr2 <= 0xdfff)
 			{
 			    p += len + 2;
 			    nr = (((nr - 0xd800) << 10) |
@@ -842,101 +842,101 @@ json_decode_string(js_read_T *reader, typval_T *res, int quote)
 			}
 		    }
 		    // Lone surrogate is invalid.
-		    if (0xd800 <= nr && nr <= 0xdfff)
+		    ಯದಿ (0xd800 <= nr && nr <= 0xdfff)
 		    {
-			if (res != NULL)
+			ಯದಿ (res != ರಿಕ್ತ)
 			    ga_clear(&ga);
-			return FAIL;
+			ಪ್ರತ್ಯಾಗಮ FAIL;
 		    }
-		    if (res != NULL)
+		    ಯದಿ (res != ರಿಕ್ತ)
 		    {
 			char_u	buf[NUMBUFLEN];
 			size_t	buflen;
 
-			buflen = utf_char2bytes((int)nr, buf);
+			buflen = utf_char2bytes((ಪೂರ್ಣಾಙ್ಕ)nr, buf);
 			buf[buflen] = NUL;
 			ga_concat_len(&ga, buf, buflen);
 		    }
-		    break;
-		default:
+		    ಭಙ್ಗ;
+		ಸ್ವಭಾವ:
 		    // not a special char, skip over backslash
 		    ++p;
-		    continue;
+		    ಅನುವರ್ತ;
 	    }
-	    if (c > 0)
+	    ಯದಿ (c > 0)
 	    {
 		p += 2;
-		if (res != NULL)
+		ಯದಿ (res != ರಿಕ್ತ)
 		    ga_append(&ga, c);
 	    }
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
 	    len = utf_ptr2len(p);
-	    if (res != NULL)
+	    ಯದಿ (res != ರಿಕ್ತ)
 	    {
-		if (ga_grow(&ga, len) == FAIL)
+		ಯದಿ (ga_grow(&ga, len) == FAIL)
 		{
 		    ga_clear(&ga);
-		    return FAIL;
+		    ಪ್ರತ್ಯಾಗಮ FAIL;
 		}
-		mch_memmove((char *)ga.ga_data + ga.ga_len, p, (size_t)len);
+		mch_memmove((ವರ್ಣ *)ga.ga_data + ga.ga_len, p, (size_t)len);
 		ga.ga_len += len;
 	    }
 	    p += len;
 	}
     }
 
-    reader->js_used = (int)(p - reader->js_buf);
-    if (*p == quote)
+    reader->js_used = (ಪೂರ್ಣಾಙ್ಕ)(p - reader->js_buf);
+    ಯದಿ (*p == quote)
     {
 	++reader->js_used;
-	if (res != NULL)
+	ಯದಿ (res != ರಿಕ್ತ)
 	{
 	    ga_append(&ga, NUL);
 	    res->v_type = VAR_STRING;
-#if defined(USE_ICONV)
-	    if (!enc_utf8)
+#ಯದಿ defined(USE_ICONV)
+	    ಯದಿ (!enc_utf8)
 	    {
 		vimconv_T   conv;
 
 		// Convert the utf-8 string to 'encoding'.
 		conv.vc_type = CONV_NONE;
 		convert_setup(&conv, (char_u*)"utf-8", p_enc);
-		if (conv.vc_type != CONV_NONE)
+		ಯದಿ (conv.vc_type != CONV_NONE)
 		{
 		    res->vval.v_string =
-				      string_convert(&conv, ga.ga_data, NULL);
+				      string_convert(&conv, ga.ga_data, ರಿಕ್ತ);
 		    vim_free(ga.ga_data);
 		}
-		convert_setup(&conv, NULL, NULL);
+		convert_setup(&conv, ರಿಕ್ತ, ರಿಕ್ತ);
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 #endif
 		res->vval.v_string = ga.ga_data;
 	}
-	return OK;
+	ಪ್ರತ್ಯಾಗಮ OK;
     }
-    if (res != NULL)
+    ಯದಿ (res != ರಿಕ್ತ)
     {
 	res->v_type = VAR_SPECIAL;
-	res->vval.v_number = VVAL_NONE;
+	res->vval.v_ಸಂಖ್ಯೆ = VVAL_NONE;
 	ga_clear(&ga);
     }
-    return MAYBE;
+    ಪ್ರತ್ಯಾಗಮ MAYBE;
 }
 
-typedef enum {
+ಪ್ರಕಾರನಿರ್ದೇಶ ಗಣನಾ {
     JSON_ARRAY,		// parsing items in an array
-    JSON_OBJECT_KEY,	// parsing key of an object
+    JSON_OBJECT_ಕೀಲಿ,	// parsing key of an object
     JSON_OBJECT		// parsing item in an object, after the key
 } json_decode_T;
 
-typedef struct {
+ಪ್ರಕಾರನಿರ್ದೇಶ ಸಂರಚನಾ {
     json_decode_T jd_type;
     typval_T	  jd_tv;	// the list or dict
-    typval_T	  jd_key_tv;
-    char_u	  *jd_key;
+    typval_T	  jd_ಕೀಲಿ_tv;
+    char_u	  *jd_ಕೀಲಿ;
 } json_dec_item_T;
 
 /*
@@ -946,502 +946,502 @@ typedef struct {
  * Return FAIL for a decoding error (and give an error).
  * Return MAYBE for an incomplete message.
  */
-    static int
-json_decode_item(js_read_T *reader, typval_T *res, int options)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+json_decode_item(js_read_T *reader, typval_T *res, ಪೂರ್ಣಾಙ್ಕ options)
 {
     char_u	*p;
-    int		i;
-    int		len;
-    int		retval;
-    garray_T	stack;
+    ಪೂರ್ಣಾಙ್ಕ		i;
+    ಪೂರ್ಣಾಙ್ಕ		len;
+    ಪೂರ್ಣಾಙ್ಕ		retval;
+    garray_T	ರಾಶಿ;
     typval_T	item;
     typval_T	*cur_item;
-    json_dec_item_T *top_item;
-    char_u	key_buf[NUMBUFLEN];
+    json_dec_item_T *ತುದಿ_item;
+    char_u	ಕೀಲಿ_buf[NUMBUFLEN];
 
-    ga_init2(&stack, sizeof(json_dec_item_T), 100);
+    ga_init2(&ರಾಶಿ, ಪರಿಮಾಣ(json_dec_item_T), 100);
     cur_item = res;
     init_tv(&item);
-    if (res != NULL)
+    ಯದಿ (res != ರಿಕ್ತ)
 	init_tv(res);
 
     fill_numbuflen(reader);
     p = reader->js_buf + reader->js_used;
-    for (;;)
+    ಪ್ರತಿ (;;)
     {
-	top_item = NULL;
-	if (stack.ga_len > 0)
+	ತುದಿ_item = ರಿಕ್ತ;
+	ಯದಿ (ರಾಶಿ.ga_len > 0)
 	{
-	    top_item = ((json_dec_item_T *)stack.ga_data) + stack.ga_len - 1;
+	    ತುದಿ_item = ((json_dec_item_T *)ರಾಶಿ.ga_data) + ರಾಶಿ.ga_len - 1;
 	    json_skip_white(reader);
 	    p = reader->js_buf + reader->js_used;
-	    if (*p == NUL)
+	    ಯದಿ (*p == NUL)
 	    {
 		retval = MAYBE;
-		goto theend;
+		ಗಚ್ಛ theend;
 	    }
-	    if (top_item->jd_type == JSON_OBJECT_KEY
-					    || top_item->jd_type == JSON_ARRAY)
+	    ಯದಿ (ತುದಿ_item->jd_type == JSON_OBJECT_ಕೀಲಿ
+					    || ತುದಿ_item->jd_type == JSON_ARRAY)
 	    {
 		// Check for end of object or array.
-		if (*p == (top_item->jd_type == JSON_ARRAY ? ']' : '}'))
+		ಯದಿ (*p == (ತುದಿ_item->jd_type == JSON_ARRAY ? ']' : '}'))
 		{
 		    ++reader->js_used; // consume the ']' or '}'
-		    --stack.ga_len;
-		    if (stack.ga_len == 0)
+		    --ರಾಶಿ.ga_len;
+		    ಯದಿ (ರಾಶಿ.ga_len == 0)
 		    {
 			retval = OK;
-			goto theend;
+			ಗಚ್ಛ theend;
 		    }
-		    if (cur_item != NULL)
-			cur_item = &top_item->jd_tv;
-		    goto item_end;
+		    ಯದಿ (cur_item != ರಿಕ್ತ)
+			cur_item = &ತುದಿ_item->jd_tv;
+		    ಗಚ್ಛ item_end;
 		}
 	    }
 	}
 
-	if (top_item != NULL && top_item->jd_type == JSON_OBJECT_KEY
+	ಯದಿ (ತುದಿ_item != ರಿಕ್ತ && ತುದಿ_item->jd_type == JSON_OBJECT_ಕೀಲಿ
 		&& (options & JSON_JS)
 		&& reader->js_buf[reader->js_used] != '"'
 		&& reader->js_buf[reader->js_used] != '\''
 		&& reader->js_buf[reader->js_used] != '['
 		&& reader->js_buf[reader->js_used] != '{')
 	{
-	    char_u *key;
+	    char_u *ಕೀಲಿ;
 
 	    // accept an object key that is not in quotes
-	    key = p = reader->js_buf + reader->js_used;
-	    while (*p != NUL && *p != ':' && *p > ' ')
+	    ಕೀಲಿ = p = reader->js_buf + reader->js_used;
+	    ಯಾವತ್ (*p != NUL && *p != ':' && *p > ' ')
 		++p;
-	    if (cur_item != NULL)
+	    ಯದಿ (cur_item != ರಿಕ್ತ)
 	    {
 		cur_item->v_type = VAR_STRING;
-		cur_item->vval.v_string = vim_strnsave(key, p - key);
-		top_item->jd_key = cur_item->vval.v_string;
+		cur_item->vval.v_string = vim_strnsave(ಕೀಲಿ, p - ಕೀಲಿ);
+		ತುದಿ_item->jd_ಕೀಲಿ = cur_item->vval.v_string;
 	    }
-	    reader->js_used += (int)(p - key);
+	    reader->js_used += (ಪೂರ್ಣಾಙ್ಕ)(p - ಕೀಲಿ);
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
-	    switch (*p)
+	    ವಿಕಲ್ಪ (*p)
 	    {
-		case '[': // start of array
-		    if (top_item && top_item->jd_type == JSON_OBJECT_KEY)
+		ಪಕ್ಷ '[': // start of array
+		    ಯದಿ (ತುದಿ_item && ತುದಿ_item->jd_type == JSON_OBJECT_ಕೀಲಿ)
 		    {
 			retval = FAIL;
-			break;
+			ಭಙ್ಗ;
 		    }
-		    if (stack.ga_len >= p_mfd)
+		    ಯದಿ (ರಾಶಿ.ga_len >= p_mfd)
 		    {
 			emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
 			retval = FAIL;
-			break;
+			ಭಙ್ಗ;
 		    }
-		    if (ga_grow(&stack, 1) == FAIL)
+		    ಯದಿ (ga_grow(&ರಾಶಿ, 1) == FAIL)
 		    {
 			retval = FAIL;
-			break;
+			ಭಙ್ಗ;
 		    }
-		    if (cur_item != NULL && rettv_list_alloc(cur_item) == FAIL)
+		    ಯದಿ (cur_item != ರಿಕ್ತ && rettv_list_alloc(cur_item) == FAIL)
 		    {
 			cur_item->v_type = VAR_SPECIAL;
-			cur_item->vval.v_number = VVAL_NONE;
+			cur_item->vval.v_ಸಂಖ್ಯೆ = VVAL_NONE;
 			retval = FAIL;
-			break;
+			ಭಙ್ಗ;
 		    }
 
 		    ++reader->js_used; // consume the '['
-		    top_item = ((json_dec_item_T *)stack.ga_data)
-								+ stack.ga_len;
-		    top_item->jd_type = JSON_ARRAY;
-		    ++stack.ga_len;
-		    if (cur_item != NULL)
+		    ತುದಿ_item = ((json_dec_item_T *)ರಾಶಿ.ga_data)
+								+ ರಾಶಿ.ga_len;
+		    ತುದಿ_item->jd_type = JSON_ARRAY;
+		    ++ರಾಶಿ.ga_len;
+		    ಯದಿ (cur_item != ರಿಕ್ತ)
 		    {
-			top_item->jd_tv = *cur_item;
+			ತುದಿ_item->jd_tv = *cur_item;
 			cur_item = &item;
 		    }
-		    continue;
+		    ಅನುವರ್ತ;
 
-		case '{': // start of object
-		    if (top_item && top_item->jd_type == JSON_OBJECT_KEY)
+		ಪಕ್ಷ '{': // start of object
+		    ಯದಿ (ತುದಿ_item && ತುದಿ_item->jd_type == JSON_OBJECT_ಕೀಲಿ)
 		    {
 			retval = FAIL;
-			break;
+			ಭಙ್ಗ;
 		    }
-		    if (stack.ga_len >= p_mfd)
+		    ಯದಿ (ರಾಶಿ.ga_len >= p_mfd)
 		    {
 			emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
 			retval = FAIL;
-			break;
+			ಭಙ್ಗ;
 		    }
-		    if (ga_grow(&stack, 1) == FAIL)
+		    ಯದಿ (ga_grow(&ರಾಶಿ, 1) == FAIL)
 		    {
 			retval = FAIL;
-			break;
+			ಭಙ್ಗ;
 		    }
-		    if (cur_item != NULL && rettv_dict_alloc(cur_item) == FAIL)
+		    ಯದಿ (cur_item != ರಿಕ್ತ && rettv_dict_alloc(cur_item) == FAIL)
 		    {
 			cur_item->v_type = VAR_SPECIAL;
-			cur_item->vval.v_number = VVAL_NONE;
+			cur_item->vval.v_ಸಂಖ್ಯೆ = VVAL_NONE;
 			retval = FAIL;
-			break;
+			ಭಙ್ಗ;
 		    }
 
 		    ++reader->js_used; // consume the '{'
-		    top_item = ((json_dec_item_T *)stack.ga_data)
-								+ stack.ga_len;
-		    top_item->jd_type = JSON_OBJECT_KEY;
-		    ++stack.ga_len;
-		    if (cur_item != NULL)
+		    ತುದಿ_item = ((json_dec_item_T *)ರಾಶಿ.ga_data)
+								+ ರಾಶಿ.ga_len;
+		    ತುದಿ_item->jd_type = JSON_OBJECT_ಕೀಲಿ;
+		    ++ರಾಶಿ.ga_len;
+		    ಯದಿ (cur_item != ರಿಕ್ತ)
 		    {
-			top_item->jd_tv = *cur_item;
-			cur_item = &top_item->jd_key_tv;
+			ತುದಿ_item->jd_tv = *cur_item;
+			cur_item = &ತುದಿ_item->jd_ಕೀಲಿ_tv;
 		    }
-		    continue;
+		    ಅನುವರ್ತ;
 
-		case '"': // string
+		ಪಕ್ಷ '"': // string
 		    retval = json_decode_string(reader, cur_item, *p);
-		    break;
+		    ಭಙ್ಗ;
 
-		case '\'':
-		    if (options & JSON_JS)
+		ಪಕ್ಷ '\'':
+		    ಯದಿ (options & JSON_JS)
 			retval = json_decode_string(reader, cur_item, *p);
-		    else
+		    ಅನ್ಯಥಾ
 		    {
 			semsg(_(e_json_decode_error_at_str), p);
 			retval = FAIL;
 		    }
-		    break;
+		    ಭಙ್ಗ;
 
-		case ',': // comma: empty item
-		    if ((options & JSON_JS) == 0)
+		ಪಕ್ಷ ',': // comma: empty item
+		    ಯದಿ ((options & JSON_JS) == 0)
 		    {
 			semsg(_(e_json_decode_error_at_str), p);
 			retval = FAIL;
-			break;
+			ಭಙ್ಗ;
 		    }
 		    // FALLTHROUGH
-		case NUL: // empty
-		    if (cur_item != NULL)
+		ಪಕ್ಷ NUL: // empty
+		    ಯದಿ (cur_item != ರಿಕ್ತ)
 		    {
 			cur_item->v_type = VAR_SPECIAL;
-			cur_item->vval.v_number = VVAL_NONE;
+			cur_item->vval.v_ಸಂಖ್ಯೆ = VVAL_NONE;
 		    }
 		    retval = OK;
-		    break;
+		    ಭಙ್ಗ;
 
-		default:
-		    if (VIM_ISDIGIT(*p) || (*p == '-'
+		ಸ್ವಭಾವ:
+		    ಯದಿ (VIM_ISDIGIT(*p) || (*p == '-'
 					&& (VIM_ISDIGIT(p[1]) || p[1] == NUL)))
 		    {
 			char_u  *sp = p;
 
-			if (*sp == '-')
+			ಯದಿ (*sp == '-')
 			{
 			    ++sp;
-			    if (*sp == NUL)
+			    ಯದಿ (*sp == NUL)
 			    {
 				retval = MAYBE;
-				break;
+				ಭಙ್ಗ;
 			    }
-			    if (!VIM_ISDIGIT(*sp))
+			    ಯದಿ (!VIM_ISDIGIT(*sp))
 			    {
 				semsg(_(e_json_decode_error_at_str), p);
 				retval = FAIL;
-				break;
+				ಭಙ್ಗ;
 			    }
 			}
 			sp = skipdigits(sp);
-			if (*sp == '.' || *sp == 'e' || *sp == 'E')
+			ಯದಿ (*sp == '.' || *sp == 'e' || *sp == 'E')
 			{
-			    if (cur_item == NULL)
+			    ಯದಿ (cur_item == ರಿಕ್ತ)
 			    {
 				float_T f;
 
 				len = string2float(p, &f, FALSE);
 			    }
-			    else
+			    ಅನ್ಯಥಾ
 			    {
 				cur_item->v_type = VAR_FLOAT;
 				len = string2float(p, &cur_item->vval.v_float,
 									FALSE);
 			    }
 			}
-			else
+			ಅನ್ಯಥಾ
 			{
 			    varnumber_T nr;
 
 			    vim_str2nr(reader->js_buf + reader->js_used,
-				    NULL, &len, 0, // what
-				    &nr, NULL, 0, TRUE, NULL);
-			    if (len == 0)
+				    ರಿಕ್ತ, &len, 0, // what
+				    &nr, ರಿಕ್ತ, 0, TRUE, ರಿಕ್ತ);
+			    ಯದಿ (len == 0)
 			    {
 				semsg(_(e_json_decode_error_at_str), p);
 				retval = FAIL;
-				goto theend;
+				ಗಚ್ಛ theend;
 			    }
-			    if (cur_item != NULL)
+			    ಯದಿ (cur_item != ರಿಕ್ತ)
 			    {
-				cur_item->v_type = VAR_NUMBER;
-				cur_item->vval.v_number = nr;
+				cur_item->v_type = VAR_ಸಂಖ್ಯೆ;
+				cur_item->vval.v_ಸಂಖ್ಯೆ = nr;
 			    }
 			}
 			reader->js_used += len;
 			retval = OK;
-			break;
+			ಭಙ್ಗ;
 		    }
 		    // In strinct JSON mode, keywords must be lowercase.
 		    // In JS mode, keywords are case-insensitive.
 #define MATCH_KW(p, kw, len) \
     ((options & JSON_JS) \
-     ? STRNICMP((char *)(p), (kw), (len)) == 0 \
-     : STRNCMP((char *)(p), (kw), (len)) == 0)
-		    if (MATCH_KW(p, "false", 5))
+     ? STRNICMP((ವರ್ಣ *)(p), (kw), (len)) == 0 \
+     : STRNCMP((ವರ್ಣ *)(p), (kw), (len)) == 0)
+		    ಯದಿ (MATCH_KW(p, "false", 5))
 		    {
 			reader->js_used += 5;
-			if (cur_item != NULL)
+			ಯದಿ (cur_item != ರಿಕ್ತ)
 			{
 			    cur_item->v_type = VAR_BOOL;
-			    cur_item->vval.v_number = VVAL_FALSE;
+			    cur_item->vval.v_ಸಂಖ್ಯೆ = VVAL_FALSE;
 			}
 			retval = OK;
-			break;
+			ಭಙ್ಗ;
 		    }
-		    if (MATCH_KW(p, "true", 4))
+		    ಯದಿ (MATCH_KW(p, "true", 4))
 		    {
 			reader->js_used += 4;
-			if (cur_item != NULL)
+			ಯದಿ (cur_item != ರಿಕ್ತ)
 			{
 			    cur_item->v_type = VAR_BOOL;
-			    cur_item->vval.v_number = VVAL_TRUE;
+			    cur_item->vval.v_ಸಂಖ್ಯೆ = VVAL_TRUE;
 			}
 			retval = OK;
-			break;
+			ಭಙ್ಗ;
 		    }
-		    if (MATCH_KW(p, "null", 4))
+		    ಯದಿ (MATCH_KW(p, "null", 4))
 		    {
 			reader->js_used += 4;
-			if (cur_item != NULL)
+			ಯದಿ (cur_item != ರಿಕ್ತ)
 			{
 			    cur_item->v_type = VAR_SPECIAL;
-			    cur_item->vval.v_number = VVAL_NULL;
+			    cur_item->vval.v_ಸಂಖ್ಯೆ = VVAL_NULL;
 			}
 			retval = OK;
-			break;
+			ಭಙ್ಗ;
 		    }
-		    if (MATCH_KW(p, "NaN", 3))
+		    ಯದಿ (MATCH_KW(p, "NaN", 3))
 		    {
 			reader->js_used += 3;
-			if (cur_item != NULL)
+			ಯದಿ (cur_item != ರಿಕ್ತ)
 			{
 			    cur_item->v_type = VAR_FLOAT;
 			    cur_item->vval.v_float = NAN;
 			}
 			retval = OK;
-			break;
+			ಭಙ್ಗ;
 		    }
-		    if (MATCH_KW(p, "-Infinity", 9))
+		    ಯದಿ (MATCH_KW(p, "-Infinity", 9))
 		    {
 			reader->js_used += 9;
-			if (cur_item != NULL)
+			ಯದಿ (cur_item != ರಿಕ್ತ)
 			{
 			    cur_item->v_type = VAR_FLOAT;
 			    cur_item->vval.v_float = -INFINITY;
 			}
 			retval = OK;
-			break;
+			ಭಙ್ಗ;
 		    }
-		    if (MATCH_KW(p, "Infinity", 8))
+		    ಯದಿ (MATCH_KW(p, "Infinity", 8))
 		    {
 			reader->js_used += 8;
-			if (cur_item != NULL)
+			ಯದಿ (cur_item != ರಿಕ್ತ)
 			{
 			    cur_item->v_type = VAR_FLOAT;
 			    cur_item->vval.v_float = INFINITY;
 			}
 			retval = OK;
-			break;
+			ಭಙ್ಗ;
 		    }
 #undef MATCH_KW
 		    // check for truncated name
-		    len = (int)(reader->js_end
+		    len = (ಪೂರ್ಣಾಙ್ಕ)(reader->js_end
 					 - (reader->js_buf + reader->js_used));
-		    if (
-			    (len < 5 && STRNICMP((char *)p, "false", len) == 0)
+		    ಯದಿ (
+			    (len < 5 && STRNICMP((ವರ್ಣ *)p, "false", len) == 0)
 			    || (len < 9
-				 && STRNICMP((char *)p, "-Infinity", len) == 0)
+				 && STRNICMP((ವರ್ಣ *)p, "-Infinity", len) == 0)
 			    || (len < 8
-				  && STRNICMP((char *)p, "Infinity", len) == 0)
-			    || (len < 3 && STRNICMP((char *)p, "NaN", len) == 0)
+				  && STRNICMP((ವರ್ಣ *)p, "Infinity", len) == 0)
+			    || (len < 3 && STRNICMP((ವರ್ಣ *)p, "NaN", len) == 0)
 			    || (len < 4
-				  && (STRNICMP((char *)p, "true", len) == 0
-				    || STRNICMP((char *)p, "null", len) == 0)))
+				  && (STRNICMP((ವರ್ಣ *)p, "true", len) == 0
+				    || STRNICMP((ವರ್ಣ *)p, "null", len) == 0)))
 
 			retval = MAYBE;
-		    else
+		    ಅನ್ಯಥಾ
 			retval = FAIL;
-		    break;
+		    ಭಙ್ಗ;
 	    }
 
 	    // We are finished when retval is FAIL or MAYBE and when at the
 	    // toplevel.
-	    if (retval == FAIL)
-		break;
-	    if (retval == MAYBE || stack.ga_len == 0)
-		goto theend;
+	    ಯದಿ (retval == FAIL)
+		ಭಙ್ಗ;
+	    ಯದಿ (retval == MAYBE || ರಾಶಿ.ga_len == 0)
+		ಗಚ್ಛ theend;
 
-	    if (top_item != NULL && top_item->jd_type == JSON_OBJECT_KEY
-		    && cur_item != NULL)
+	    ಯದಿ (ತುದಿ_item != ರಿಕ್ತ && ತುದಿ_item->jd_type == JSON_OBJECT_ಕೀಲಿ
+		    && cur_item != ರಿಕ್ತ)
 	    {
-		if (cur_item->v_type == VAR_FLOAT)
+		ಯದಿ (cur_item->v_type == VAR_FLOAT)
 		{
 		    // cannot use a float as a key
 		    emsg(_(e_using_float_as_string));
 		    retval = FAIL;
-		    goto theend;
+		    ಗಚ್ಛ theend;
 		}
-		top_item->jd_key = tv_get_string_buf_chk(cur_item, key_buf);
-		if (top_item->jd_key == NULL)
+		ತುದಿ_item->jd_ಕೀಲಿ = tv_get_string_buf_chk(cur_item, ಕೀಲಿ_buf);
+		ಯದಿ (ತುದಿ_item->jd_ಕೀಲಿ == ರಿಕ್ತ)
 		{
 		    emsg(_(e_invalid_argument));
 		    retval = FAIL;
-		    goto theend;
+		    ಗಚ್ಛ theend;
 		}
 	    }
 	}
 
 item_end:
-	top_item = ((json_dec_item_T *)stack.ga_data) + stack.ga_len - 1;
-	switch (top_item->jd_type)
+	ತುದಿ_item = ((json_dec_item_T *)ರಾಶಿ.ga_data) + ರಾಶಿ.ga_len - 1;
+	ವಿಕಲ್ಪ (ತುದಿ_item->jd_type)
 	{
-	    case JSON_ARRAY:
-		if (res != NULL)
+	    ಪಕ್ಷ JSON_ARRAY:
+		ಯದಿ (res != ರಿಕ್ತ)
 		{
 		    listitem_T	*li = listitem_alloc();
 
-		    if (li == NULL)
+		    ಯದಿ (li == ರಿಕ್ತ)
 		    {
 			clear_tv(cur_item);
 			retval = FAIL;
-			goto theend;
+			ಗಚ್ಛ theend;
 		    }
 		    li->li_tv = *cur_item;
-		    list_append(top_item->jd_tv.vval.v_list, li);
+		    list_append(ತುದಿ_item->jd_tv.vval.v_list, li);
 		}
-		if (cur_item != NULL)
+		ಯದಿ (cur_item != ರಿಕ್ತ)
 		    cur_item = &item;
 
 		json_skip_white(reader);
 		p = reader->js_buf + reader->js_used;
-		if (*p == ',')
+		ಯದಿ (*p == ',')
 		    ++reader->js_used;
-		else if (*p != ']')
+		ಅನ್ಯಥಾ ಯದಿ (*p != ']')
 		{
-		    if (*p == NUL)
+		    ಯದಿ (*p == NUL)
 			retval = MAYBE;
-		    else
+		    ಅನ್ಯಥಾ
 		    {
 			semsg(_(e_json_decode_error_at_str), p);
 			retval = FAIL;
 		    }
-		    goto theend;
+		    ಗಚ್ಛ theend;
 		}
-		break;
+		ಭಙ್ಗ;
 
-	    case JSON_OBJECT_KEY:
+	    ಪಕ್ಷ JSON_OBJECT_ಕೀಲಿ:
 		json_skip_white(reader);
 		p = reader->js_buf + reader->js_used;
-		if (*p != ':')
+		ಯದಿ (*p != ':')
 		{
-		    if (cur_item != NULL)
+		    ಯದಿ (cur_item != ರಿಕ್ತ)
 			clear_tv(cur_item);
-		    if (*p == NUL)
+		    ಯದಿ (*p == NUL)
 			retval = MAYBE;
-		    else
+		    ಅನ್ಯಥಾ
 		    {
 			semsg(_(e_json_decode_error_at_str), p);
 			retval = FAIL;
 		    }
-		    goto theend;
+		    ಗಚ್ಛ theend;
 		}
 		++reader->js_used;
 		json_skip_white(reader);
-		top_item->jd_type = JSON_OBJECT;
-		if (cur_item != NULL)
+		ತುದಿ_item->jd_type = JSON_OBJECT;
+		ಯದಿ (cur_item != ರಿಕ್ತ)
 		    cur_item = &item;
-		break;
+		ಭಙ್ಗ;
 
-	    case JSON_OBJECT:
-		if (cur_item != NULL
-			&& dict_has_key(top_item->jd_tv.vval.v_dict,
-						(char *)top_item->jd_key))
+	    ಪಕ್ಷ JSON_OBJECT:
+		ಯದಿ (cur_item != ರಿಕ್ತ
+			&& dict_has_ಕೀಲಿ(ತುದಿ_item->jd_tv.vval.v_dict,
+						(ವರ್ಣ *)ತುದಿ_item->jd_ಕೀಲಿ))
 		{
-		    semsg(_(e_duplicate_key_in_json_str), top_item->jd_key);
+		    semsg(_(e_duplicate_ಕೀಲಿ_in_json_str), ತುದಿ_item->jd_ಕೀಲಿ);
 		    clear_tv(cur_item);
 		    retval = FAIL;
-		    goto theend;
+		    ಗಚ್ಛ theend;
 		}
 
-		if (cur_item != NULL)
+		ಯದಿ (cur_item != ರಿಕ್ತ)
 		{
-		    dictitem_T *di = dictitem_alloc(top_item->jd_key);
+		    dictitem_T *di = dictitem_alloc(ತುದಿ_item->jd_ಕೀಲಿ);
 
-		    clear_tv(&top_item->jd_key_tv);
-		    if (di == NULL)
+		    clear_tv(&ತುದಿ_item->jd_ಕೀಲಿ_tv);
+		    ಯದಿ (di == ರಿಕ್ತ)
 		    {
 			clear_tv(cur_item);
 			retval = FAIL;
-			goto theend;
+			ಗಚ್ಛ theend;
 		    }
 		    di->di_tv = *cur_item;
 		    di->di_tv.v_lock = 0;
-		    if (dict_add(top_item->jd_tv.vval.v_dict, di) == FAIL)
+		    ಯದಿ (dict_add(ತುದಿ_item->jd_tv.vval.v_dict, di) == FAIL)
 		    {
 			dictitem_free(di);
 			retval = FAIL;
-			goto theend;
+			ಗಚ್ಛ theend;
 		    }
 		}
 
 		json_skip_white(reader);
 		p = reader->js_buf + reader->js_used;
-		if (*p == ',')
+		ಯದಿ (*p == ',')
 		    ++reader->js_used;
-		else if (*p != '}')
+		ಅನ್ಯಥಾ ಯದಿ (*p != '}')
 		{
-		    if (*p == NUL)
+		    ಯದಿ (*p == NUL)
 			retval = MAYBE;
-		    else
+		    ಅನ್ಯಥಾ
 		    {
 			semsg(_(e_json_decode_error_at_str), p);
 			retval = FAIL;
 		    }
-		    goto theend;
+		    ಗಚ್ಛ theend;
 		}
-		top_item->jd_type = JSON_OBJECT_KEY;
-		if (cur_item != NULL)
-		    cur_item = &top_item->jd_key_tv;
-		break;
+		ತುದಿ_item->jd_type = JSON_OBJECT_ಕೀಲಿ;
+		ಯದಿ (cur_item != ರಿಕ್ತ)
+		    cur_item = &ತುದಿ_item->jd_ಕೀಲಿ_tv;
+		ಭಙ್ಗ;
 	}
     }
 
     // Get here when parsing failed.
-    if (res != NULL)
+    ಯದಿ (res != ರಿಕ್ತ)
     {
 	clear_tv(res);
 	res->v_type = VAR_SPECIAL;
-	res->vval.v_number = VVAL_NONE;
+	res->vval.v_ಸಂಖ್ಯೆ = VVAL_NONE;
     }
     // "p" may dangle into a buffer freed by a js_fill() refill in
     // json_decode_string(); report the position from the current reader.
     semsg(_(e_json_decode_error_at_str), reader->js_buf + reader->js_used);
 
 theend:
-    for (i = 0; i < stack.ga_len; i++)
-	clear_tv(&(((json_dec_item_T *)stack.ga_data) + i)->jd_key_tv);
-    ga_clear(&stack);
+    ಪ್ರತಿ (i = 0; i < ರಾಶಿ.ga_len; i++)
+	clear_tv(&(((json_dec_item_T *)ರಾಶಿ.ga_data) + i)->jd_ಕೀಲಿ_tv);
+    ga_clear(&ರಾಶಿ);
 
-    return retval;
+    ಪ್ರತ್ಯಾಗಮ retval;
 }
 
 /*
@@ -1449,31 +1449,31 @@ theend:
  * "options" can be JSON_JS or zero;
  * Return FAIL if not the whole message was consumed.
  */
-    static int
-json_decode_all(js_read_T *reader, typval_T *res, int options)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+json_decode_all(js_read_T *reader, typval_T *res, ಪೂರ್ಣಾಙ್ಕ options)
 {
-    int ret;
+    ಪೂರ್ಣಾಙ್ಕ ret;
 
     // We find the end once, to avoid calling strlen() many times.
     reader->js_end = reader->js_buf + STRLEN(reader->js_buf);
     json_skip_white(reader);
     ret = json_decode_item(reader, res, options);
-    if (ret != OK)
+    ಯದಿ (ret != OK)
     {
-	if (ret == MAYBE)
+	ಯದಿ (ret == MAYBE)
 	    semsg(_(e_json_decode_error_at_str), reader->js_buf);
-	return FAIL;
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     }
     json_skip_white(reader);
-    if (reader->js_buf[reader->js_used] != NUL)
+    ಯದಿ (reader->js_buf[reader->js_used] != NUL)
     {
 	semsg(_(e_trailing_characters_str), reader->js_buf + reader->js_used);
-	return FAIL;
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     }
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
-#if defined(FEAT_JOB_CHANNEL)
+#ಯದಿ defined(FEAT_JOB_CHANNEL)
 /*
  * Decode the JSON from "reader" and store the result in "res".
  * "options" can be JSON_JS or zero;
@@ -1481,10 +1481,10 @@ json_decode_all(js_read_T *reader, typval_T *res, int options)
  * Return MAYBE for an incomplete message.
  * Consumes the message anyway.
  */
-    int
-json_decode(js_read_T *reader, typval_T *res, int options)
+    ಪೂರ್ಣಾಙ್ಕ
+json_decode(js_read_T *reader, typval_T *res, ಪೂರ್ಣಾಙ್ಕ options)
 {
-    int ret;
+    ಪೂರ್ಣಾಙ್ಕ ret;
 
     // We find the end once, to avoid calling strlen() many times.
     reader->js_end = reader->js_buf + STRLEN(reader->js_buf);
@@ -1492,7 +1492,7 @@ json_decode(js_read_T *reader, typval_T *res, int options)
     ret = json_decode_item(reader, res, options);
     json_skip_white(reader);
 
-    return ret;
+    ಪ್ರತ್ಯಾಗಮ ret;
 }
 #endif
 
@@ -1506,42 +1506,42 @@ json_decode(js_read_T *reader, typval_T *res, int options)
  * string.  A number might be truncated without knowing.
  * Does not advance the reader.
  */
-    int
-json_find_end(js_read_T *reader, int options)
+    ಪೂರ್ಣಾಙ್ಕ
+json_find_end(js_read_T *reader, ಪೂರ್ಣಾಙ್ಕ options)
 {
-    int used_save = reader->js_used;
-    int ret;
+    ಪೂರ್ಣಾಙ್ಕ used_save = reader->js_used;
+    ಪೂರ್ಣಾಙ್ಕ ret;
 
     // We find the end once, to avoid calling strlen() many times.
     reader->js_end = reader->js_buf + STRLEN(reader->js_buf);
     json_skip_white(reader);
-    ret = json_decode_item(reader, NULL, options);
+    ret = json_decode_item(reader, ರಿಕ್ತ, options);
     reader->js_used = used_save;
-    return ret;
+    ಪ್ರತ್ಯಾಗಮ ret;
 }
 
 /*
  * "js_decode()" function
  */
-    void
+    ಶೂನ್ಯ
 f_js_decode(typval_T *argvars, typval_T *rettv)
 {
     js_read_T	reader;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ಯದಿ (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ಪ್ರತ್ಯಾಗಮ;
 
     reader.js_buf = tv_get_string(&argvars[0]);
-    reader.js_fill = NULL;
+    reader.js_fill = ರಿಕ್ತ;
     reader.js_used = 0;
-    if (json_decode_all(&reader, rettv, JSON_JS) != OK)
+    ಯದಿ (json_decode_all(&reader, rettv, JSON_JS) != OK)
 	emsg(_(e_invalid_argument));
 }
 
 /*
  * "js_encode()" function
  */
-    void
+    ಶೂನ್ಯ
 f_js_encode(typval_T *argvars, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
@@ -1551,16 +1551,16 @@ f_js_encode(typval_T *argvars, typval_T *rettv)
 /*
  * "json_decode()" function
  */
-    void
+    ಶೂನ್ಯ
 f_json_decode(typval_T *argvars, typval_T *rettv)
 {
     js_read_T	reader;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ಯದಿ (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ಪ್ರತ್ಯಾಗಮ;
 
     reader.js_buf = tv_get_string(&argvars[0]);
-    reader.js_fill = NULL;
+    reader.js_fill = ರಿಕ್ತ;
     reader.js_used = 0;
     json_decode_all(&reader, rettv, 0);
 }
@@ -1568,7 +1568,7 @@ f_json_decode(typval_T *argvars, typval_T *rettv)
 /*
  * "json_encode()" function
  */
-    void
+    ಶೂನ್ಯ
 f_json_encode(typval_T *argvars, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;

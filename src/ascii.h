@@ -11,7 +11,7 @@
  */
 
 #define CharOrd(x)	((x) < 'a' ? (x) - 'A' : (x) - 'a')
-#define CharOrdLow(x)	((x) - 'a')
+#define Char_Ord_ಕೆಳಗಿನ(x)	((x) - 'a')
 #define CharOrdUp(x)	((x) - 'A')
 #define ROT13(c, a)	(((((c) - (a)) + 13) % 26) + (a))
 
@@ -86,7 +86,7 @@
 #ifdef BACKSLASH_IN_FILENAME
 # define PATHSEP	psepc
 # define PATHSEPSTR	pseps
-#else
+#ಅನ್ಯಥಾ
 # define PATHSEP	((char_u)'/')
 # define PATHSEPSTR	"/"
 #endif

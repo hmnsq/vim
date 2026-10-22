@@ -11,29 +11,29 @@
  * mouse.c: mouse handling functions
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
 /*
  * Horiziontal and vertical steps used when scrolling.
  * When negative scroll by a whole page.
  */
-static long mouse_hor_step = 6;
-static long mouse_vert_step = 3;
-static win_T *dragwin = NULL;	// window being dragged
-static int stl_click_handler(win_T *wp, int mrow, int mcol, int which_button,
-								    int mods);
-static int stl_click_handler_regions(stl_click_region_T *regions,
-				    int region_count, int winid,
-				    char_u *area_name, int mrow, int mcol,
-				    int which_button, int mods);
+ಸ್ಥಿರ long mouse_hor_step = 6;
+ಸ್ಥಿರ long mouse_vert_step = 3;
+ಸ್ಥಿರ win_T *dragwin = ರಿಕ್ತ;	// window being dragged
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ stl_click_handler(win_T *wp, ಪೂರ್ಣಾಙ್ಕ mrow, ಪೂರ್ಣಾಙ್ಕ mcol, ಪೂರ್ಣಾಙ್ಕ which_button,
+								    ಪೂರ್ಣಾಙ್ಕ mods);
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ stl_click_handler_regions(stl_click_region_T *regions,
+				    ಪೂರ್ಣಾಙ್ಕ region_ಎಣಿಕೆ, ಪೂರ್ಣಾಙ್ಕ winid,
+				    char_u *area_name, ಪೂರ್ಣಾಙ್ಕ mrow, ಪೂರ್ಣಾಙ್ಕ mcol,
+				    ಪೂರ್ಣಾಙ್ಕ which_button, ಪೂರ್ಣಾಙ್ಕ mods);
 
-    void
+    ಶೂನ್ಯ
 mouse_set_vert_scroll_step(long step)
 {
     mouse_vert_step = step;
 }
 
-    void
+    ಶೂನ್ಯ
 mouse_set_hor_scroll_step(long step)
 {
     mouse_hor_step = step;
@@ -43,14 +43,14 @@ mouse_set_hor_scroll_step(long step)
 /*
  * Return the duration from t1 to t2 in milliseconds.
  */
-    static long
-time_diff_ms(struct timeval *t1, struct timeval *t2)
+    ಸ್ಥಿರ long
+time_diff_ms(ಸಂರಚನಾ timeval *t1, ಸಂರಚನಾ timeval *t2)
 {
     // This handles wrapping of tv_usec correctly without any special case.
     // Example of 2 pairs (tv_sec, tv_usec) with a duration of 5 ms:
     //	   t1 = (1, 998000) t2 = (2, 3000) gives:
     //	   (2 - 1) * 1000 + (3000 - 998000) / 1000 -> 5 ms.
-    return (t2->tv_sec - t1->tv_sec) * 1000
+    ಪ್ರತ್ಯಾಗಮ (t2->tv_sec - t1->tv_sec) * 1000
 	 + (t2->tv_usec - t1->tv_usec) / 1000;
 }
 #endif
@@ -62,49 +62,49 @@ time_diff_ms(struct timeval *t1, struct timeval *t2)
  * 2: normal word character
  * >2: multi-byte word character.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
 get_mouse_class(char_u *p)
 {
-    int		c;
+    ಪೂರ್ಣಾಙ್ಕ		c;
 
-    if (has_mbyte && MB_BYTE2LEN(p[0]) > 1)
-	return mb_get_class(p);
+    ಯದಿ (has_mbyte && MB_BYTE2LEN(p[0]) > 1)
+	ಪ್ರತ್ಯಾಗಮ mb_get_class(p);
 
     c = *p;
-    if (c == ' ' || c == '\t')
-	return 0;
+    ಯದಿ (c == ' ' || c == '\t')
+	ಪ್ರತ್ಯಾಗಮ 0;
 
-    if (vim_iswordc(c))
-	return 2;
+    ಯದಿ (vim_iswordc(c))
+	ಪ್ರತ್ಯಾಗಮ 2;
 
     // There are a few special cases where we want certain combinations of
     // characters to be considered as a single word.  These are things like
     // "->", "/ *", "*=", "+=", "&=", "<=", ">=", "!=" etc.  Otherwise, each
     // character is in its own class.
-    if (c != NUL && vim_strchr((char_u *)"-+*/%<>&|^!=", c) != NULL)
-	return 1;
-    return c;
+    ಯದಿ (c != NUL && vim_strchr((char_u *)"-+*/%<>&|^!=", c) != ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ 1;
+    ಪ್ರತ್ಯಾಗಮ c;
 }
 
 /*
  * Move "pos" back to the start of the word it's in.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 find_start_of_word(pos_T *pos)
 {
-    char_u	*line;
-    int		cclass;
-    int		col;
+    char_u	*ಸಾಲು;
+    ಪೂರ್ಣಾಙ್ಕ		cclass;
+    ಪೂರ್ಣಾಙ್ಕ		col;
 
-    line = ml_get(pos->lnum);
-    cclass = get_mouse_class(line + pos->col);
+    ಸಾಲು = ml_get(pos->lnum);
+    cclass = get_mouse_class(ಸಾಲು + pos->col);
 
-    while (pos->col > 0)
+    ಯಾವತ್ (pos->col > 0)
     {
 	col = pos->col - 1;
-	col -= (*mb_head_off)(line, line + col);
-	if (get_mouse_class(line + col) != cclass)
-	    break;
+	col -= (*mb_head_off)(ಸಾಲು, ಸಾಲು + col);
+	ಯದಿ (get_mouse_class(ಸಾಲು + col) != cclass)
+	    ಭಙ್ಗ;
 	pos->col = col;
     }
 }
@@ -113,34 +113,34 @@ find_start_of_word(pos_T *pos)
  * Move "pos" forward to the end of the word it's in.
  * When 'selection' is "exclusive", the position is just after the word.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 find_end_of_word(pos_T *pos)
 {
-    char_u	*line;
-    int		cclass;
-    int		col;
+    char_u	*ಸಾಲು;
+    ಪೂರ್ಣಾಙ್ಕ		cclass;
+    ಪೂರ್ಣಾಙ್ಕ		col;
 
-    line = ml_get(pos->lnum);
-    if (*p_sel == 'e' && pos->col > 0)
+    ಸಾಲು = ml_get(pos->lnum);
+    ಯದಿ (*p_sel == 'e' && pos->col > 0)
     {
 	--pos->col;
-	pos->col -= (*mb_head_off)(line, line + pos->col);
+	pos->col -= (*mb_head_off)(ಸಾಲು, ಸಾಲು + pos->col);
     }
-    cclass = get_mouse_class(line + pos->col);
-    while (line[pos->col] != NUL)
+    cclass = get_mouse_class(ಸಾಲು + pos->col);
+    ಯಾವತ್ (ಸಾಲು[pos->col] != NUL)
     {
-	col = pos->col + (*mb_ptr2len)(line + pos->col);
-	if (get_mouse_class(line + col) != cclass)
+	col = pos->col + (*mb_ptr2len)(ಸಾಲು + pos->col);
+	ಯದಿ (get_mouse_class(ಸಾಲು + col) != cclass)
 	{
-	    if (*p_sel == 'e')
+	    ಯದಿ (*p_sel == 'e')
 		pos->col = col;
-	    break;
+	    ಭಙ್ಗ;
 	}
 	pos->col = col;
     }
 }
 
-#if defined(FEAT_GUI_MOTIF) || defined(FEAT_GUI_GTK) \
+#ಯದಿ defined(FEAT_GUI_MOTIF) || defined(FEAT_GUI_GTK) \
 	    || defined(FEAT_GUI_MSWIN) \
 	    || defined(FEAT_GUI_PHOTON) \
 	    || defined(FEAT_TERM_POPUP_MENU)
@@ -152,35 +152,35 @@ find_end_of_word(pos_T *pos)
  * Returns IN_BUFFER and sets "mpos->col" to the column when in buffer text.
  * The column is one for the first column.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
 get_fpos_of_mouse(pos_T *mpos)
 {
     win_T	*wp;
-    int		row = mouse_row;
-    int		col = mouse_col;
+    ಪೂರ್ಣಾಙ್ಕ		row = mouse_row;
+    ಪೂರ್ಣಾಙ್ಕ		col = mouse_col;
 
-    if (row < 0 || col < 0)		// check if it makes sense
-	return IN_UNKNOWN;
+    ಯದಿ (row < 0 || col < 0)		// check if it makes sense
+	ಪ್ರತ್ಯಾಗಮ IN_UNKNOWN;
 
     // find the window where the row is in
     wp = mouse_find_win(&row, &col, FAIL_POPUP);
-    if (wp == NULL)
-	return IN_UNKNOWN;
+    ಯದಿ (wp == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ IN_UNKNOWN;
     // winpos and height may change in win_enter()!
-    if (row >= wp->w_height)	// In (or below) status line
-	return IN_STATUS_LINE;
-    if (col >= wp->w_width)	// In vertical separator line
-	return IN_SEP_LINE;
+    ಯದಿ (row >= wp->w_height)	// In (or below) status line
+	ಪ್ರತ್ಯಾಗಮ IN_STATUS_ಸಾಲು;
+    ಯದಿ (col >= wp->w_width)	// In vertical separator line
+	ಪ್ರತ್ಯಾಗಮ IN_SEP_ಸಾಲು;
 
-    if (wp != curwin)
-	return IN_UNKNOWN;
+    ಯದಿ (wp != curwin)
+	ಪ್ರತ್ಯಾಗಮ IN_UNKNOWN;
 
     // compute the position in the buffer line from the posn on the screen
-    if (mouse_comp_pos(curwin, &row, &col, &mpos->lnum, NULL))
-	return IN_STATUS_LINE; // past bottom
+    ಯದಿ (mouse_comp_pos(curwin, &row, &col, &mpos->lnum, ರಿಕ್ತ))
+	ಪ್ರತ್ಯಾಗಮ IN_STATUS_ಸಾಲು; // past bottom
 
     mpos->col = vcol2col(wp, mpos->lnum, col, &mpos->coladd);
-    return IN_BUFFER;
+    ಪ್ರತ್ಯಾಗಮ IN_BUFFER;
 }
 #endif
 
@@ -220,44 +220,44 @@ get_fpos_of_mouse(pos_T *mpos)
  *
  * Return TRUE if start_arrow() should be called for edit mode.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 do_mouse(
     oparg_T	*oap,		// operator argument, can be NULL
-    int		c,		// K_LEFTMOUSE, etc
-    int		dir,		// Direction to 'put' if necessary
-    long	count,
-    int		fixindent)	// PUT_FIXINDENT if fixing indent necessary
+    ಪೂರ್ಣಾಙ್ಕ		c,		// K_LEFTMOUSE, etc
+    ಪೂರ್ಣಾಙ್ಕ		dir,		// Direction to 'put' if necessary
+    long	ಎಣಿಕೆ,
+    ಪೂರ್ಣಾಙ್ಕ		fixindent)	// PUT_FIXINDENT if fixing indent necessary
 {
-    static int	do_always = FALSE;	// ignore 'mouse' setting next time
-    static int	got_click = FALSE;	// got a click some time back
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ	do_always = FALSE;	// ignore 'mouse' setting next time
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ	got_click = FALSE;	// got a click some time back
 
-    int		which_button;	// MOUSE_LEFT, _MIDDLE or _RIGHT
-    int		is_click = FALSE; // If FALSE it's a drag or release event
-    int		is_drag = FALSE;  // If TRUE it's a drag event
-    int		jump_flags = 0;	// flags for jump_to_mouse()
+    ಪೂರ್ಣಾಙ್ಕ		which_button;	// MOUSE_LEFT, _MIDDLE or _RIGHT
+    ಪೂರ್ಣಾಙ್ಕ		is_click = FALSE; // If FALSE it's a drag or release event
+    ಪೂರ್ಣಾಙ್ಕ		is_drag = FALSE;  // If TRUE it's a drag event
+    ಪೂರ್ಣಾಙ್ಕ		jump_flags = 0;	// flags for jump_to_mouse()
     pos_T	start_visual;
-    int		moved;		// Has cursor moved?
-    int		in_status_line;	// mouse in status line
-    static int	in_tab_line = FALSE; // mouse clicked in tab line
-    static int	in_tabpanel = FALSE; // mouse clicked in tabpanel
+    ಪೂರ್ಣಾಙ್ಕ		moved;		// Has cursor moved?
+    ಪೂರ್ಣಾಙ್ಕ		in_status_ಸಾಲು;	// mouse in status line
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ	in_tab_ಸಾಲು = FALSE; // mouse clicked in tab line
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ	in_tabpanel = FALSE; // mouse clicked in tabpanel
 #ifdef FEAT_TABPANEL
-    static bool	in_tabpanel_scrollbar = false; // dragging tabpanel scrollbar
+    ಸ್ಥಿರ bool	in_tabpanel_scrollbar = false; // dragging tabpanel scrollbar
 #endif
-    int		in_sep_line;	// mouse in vertical separator line
-    int		c1, c2;
-#if defined(FEAT_FOLDING)
+    ಪೂರ್ಣಾಙ್ಕ		in_sep_ಸಾಲು;	// mouse in vertical separator line
+    ಪೂರ್ಣಾಙ್ಕ		c1, c2;
+#ಯದಿ defined(FEAT_FOLDING)
     pos_T	save_cursor;
 #endif
     win_T	*old_curwin = curwin;
-    static pos_T orig_cursor;
+    ಸ್ಥಿರ pos_T orig_cursor;
     colnr_T	leftcol, rightcol;
     pos_T	end_visual;
-    int		diff;
-    int		old_active = VIsual_active;
-    int		old_mode = VIsual_mode;
-    int		regname;
+    ಪೂರ್ಣಾಙ್ಕ		diff;
+    ಪೂರ್ಣಾಙ್ಕ		old_active = VIsual_active;
+    ಪೂರ್ಣಾಙ್ಕ		old_mode = VIsual_mode;
+    ಪೂರ್ಣಾಙ್ಕ		regname;
 
-#if defined(FEAT_FOLDING)
+#ಯದಿ defined(FEAT_FOLDING)
     save_cursor = curwin->w_cursor;
 #endif
 
@@ -266,57 +266,57 @@ do_mouse(
     // - Ignore mouse event in visual mode if 'mouse' doesn't include 'v'.
     // - For command line and insert mode 'mouse' is checked before calling
     //	 do_mouse().
-    if (do_always)
+    ಯದಿ (do_always)
 	do_always = FALSE;
-    else
+    ಅನ್ಯಥಾ
 #ifdef FEAT_GUI
-	if (!gui.in_use)
+	ಯದಿ (!gui.in_use)
 #endif
 	{
-	    if (VIsual_active)
+	    ಯದಿ (VIsual_active)
 	    {
-		if (!mouse_has(MOUSE_VISUAL))
-		    return FALSE;
+		ಯದಿ (!mouse_has(MOUSE_VISUAL))
+		    ಪ್ರತ್ಯಾಗಮ FALSE;
 	    }
-	    else if (State == MODE_NORMAL && !mouse_has(MOUSE_NORMAL))
-		return FALSE;
+	    ಅನ್ಯಥಾ ಯದಿ (State == MODE_NORMAL && !mouse_has(MOUSE_NORMAL))
+		ಪ್ರತ್ಯಾಗಮ FALSE;
 	}
 
-    for (;;)
+    ಪ್ರತಿ (;;)
     {
 	which_button = get_mouse_button(KEY2TERMCAP1(c), &is_click, &is_drag);
-	if (is_drag)
+	ಯದಿ (is_drag)
 	{
 	    // If the next character is the same mouse event then use that
 	    // one. Speeds up dragging the status line.
 	    // Note: Since characters added to the stuff buffer in the code
 	    // below need to come before the next character, do not do this
 	    // when the current character was stuffed.
-	    if (!KeyStuffed && vpeekc() != NUL)
+	    ಯದಿ (!ಕೀಲಿ_Stuffed && vpeekc() != NUL)
 	    {
-		int nc;
-		int save_mouse_row = mouse_row;
-		int save_mouse_col = mouse_col;
+		ಪೂರ್ಣಾಙ್ಕ nc;
+		ಪೂರ್ಣಾಙ್ಕ save_mouse_row = mouse_row;
+		ಪೂರ್ಣಾಙ್ಕ save_mouse_col = mouse_col;
 
 		// Need to get the character, peeking doesn't get the actual
 		// one.
 		nc = safe_vgetc();
-		if (c == nc)
-		    continue;
+		ಯದಿ (c == nc)
+		    ಅನುವರ್ತ;
 		vungetc(nc);
 		mouse_row = save_mouse_row;
 		mouse_col = save_mouse_col;
 	    }
 	}
-	break;
+	ಭಙ್ಗ;
     }
 
-    if (c == K_MOUSEMOVE)
+    ಯದಿ (c == K_MOUSEMOVE)
     {
 	// Mouse moved without a button pressed.
 #ifdef FEAT_BEVAL_TERM
 	ui_may_remove_balloon();
-	if (p_bevalterm)
+	ಯದಿ (p_bevalterm)
 	{
 	    profile_setlimit(p_bdlay, &bevalexpr_due);
 	    bevalexpr_due_set = TRUE;
@@ -325,167 +325,167 @@ do_mouse(
 #ifdef FEAT_PROP_POPUP
 	popup_handle_mouse_moved();
 #endif
-	return FALSE;
+	ಪ್ರತ್ಯಾಗಮ FALSE;
     }
 
 #ifdef FEAT_MOUSESHAPE
     // May have stopped dragging the status or separator line.  The pointer is
     // most likely still on the status or separator line.
-    if (!is_drag && drag_status_line)
+    ಯದಿ (!is_drag && drag_status_ಸಾಲು)
     {
-	drag_status_line = FALSE;
+	drag_status_ಸಾಲು = FALSE;
 	update_mouseshape(SHAPE_IDX_STATUS);
     }
-    if (!is_drag && drag_sep_line)
+    ಯದಿ (!is_drag && drag_sep_ಸಾಲು)
     {
-	drag_sep_line = FALSE;
+	drag_sep_ಸಾಲು = FALSE;
 	update_mouseshape(SHAPE_IDX_VSEP);
     }
 #endif
 
     // Ignore drag and release events if we didn't get a click.
-    if (is_click)
+    ಯದಿ (is_click)
     {
 	got_click = TRUE;
-	in_tab_line = FALSE;
+	in_tab_ಸಾಲು = FALSE;
 	in_tabpanel = FALSE;
 #ifdef FEAT_TABPANEL
 	in_tabpanel_scrollbar = false;
 #endif
     }
-    else
+    ಅನ್ಯಥಾ
     {
-	if (!got_click)			// didn't get click, ignore
-	    return FALSE;
-	if (!is_drag)			// release, reset got_click
+	ಯದಿ (!got_click)			// didn't get click, ignore
+	    ಪ್ರತ್ಯಾಗಮ FALSE;
+	ಯದಿ (!is_drag)			// release, reset got_click
 	{
 	    got_click = FALSE;
-	    if (in_tab_line || in_tabpanel
+	    ಯದಿ (in_tab_ಸಾಲು || in_tabpanel
 #ifdef FEAT_TABPANEL
 		    || in_tabpanel_scrollbar
 #endif
 		    )
 	    {
-		in_tab_line = FALSE;
+		in_tab_ಸಾಲು = FALSE;
 		in_tabpanel = FALSE;
 #ifdef FEAT_TABPANEL
 		in_tabpanel_scrollbar = false;
 #endif
-		return FALSE;
+		ಪ್ರತ್ಯಾಗಮ FALSE;
 	    }
 	}
     }
 
 #ifdef FEAT_TABPANEL
     // Continue a scrollbar drag before any tab-selection handling.
-    if (is_drag && in_tabpanel_scrollbar)
+    ಯದಿ (is_drag && in_tabpanel_scrollbar)
     {
 	tabpanel_drag_scrollbar(mouse_row);
-	return FALSE;
+	ಪ್ರತ್ಯಾಗಮ FALSE;
     }
 #endif
 
     // CTRL right mouse button does CTRL-T
-    if (is_click && (mod_mask & MOD_MASK_CTRL) && which_button == MOUSE_RIGHT)
+    ಯದಿ (is_click && (mod_mask & MOD_MASK_CTRL) && which_button == MOUSE_ಬಲ)
     {
-	if (State & MODE_INSERT)
+	ಯದಿ (State & MODE_ಸೇರಿಸು)
 	    stuffcharReadbuff(Ctrl_O);
-	if (count > 1)
-	    stuffnumReadbuff(count);
+	ಯದಿ (ಎಣಿಕೆ > 1)
+	    stuffnumReadbuff(ಎಣಿಕೆ);
 	stuffcharReadbuff(Ctrl_T);
 	got_click = FALSE;		// ignore drag&release now
-	return FALSE;
+	ಪ್ರತ್ಯಾಗಮ FALSE;
     }
 
     // CTRL only works with left mouse button
-    if ((mod_mask & MOD_MASK_CTRL) && which_button != MOUSE_LEFT)
-	return FALSE;
+    ಯದಿ ((mod_mask & MOD_MASK_CTRL) && which_button != MOUSE_ಎಡ)
+	ಪ್ರತ್ಯಾಗಮ FALSE;
 
     // When a modifier is down, ignore drag and release events, as well as
     // multiple clicks and the middle mouse button.
     // Accept shift-leftmouse drags when 'mousemodel' is "popup.*".
-    if ((mod_mask & (MOD_MASK_SHIFT | MOD_MASK_CTRL | MOD_MASK_ALT
+    ಯದಿ ((mod_mask & (MOD_MASK_SHIFT | MOD_MASK_CTRL | MOD_MASK_ALT
 							     | MOD_MASK_META))
 	    && (!is_click
 		|| (mod_mask & MOD_MASK_MULTI_CLICK)
-		|| which_button == MOUSE_MIDDLE)
+		|| which_button == MOUSE_ಮಧ್ಯ)
 	    && !((mod_mask & (MOD_MASK_SHIFT|MOD_MASK_ALT))
 		&& mouse_model_popup()
-		&& which_button == MOUSE_LEFT)
+		&& which_button == MOUSE_ಎಡ)
 	    && !((mod_mask & MOD_MASK_ALT)
 		&& !mouse_model_popup()
-		&& which_button == MOUSE_RIGHT)
+		&& which_button == MOUSE_ಬಲ)
 	    )
-	return FALSE;
+	ಪ್ರತ್ಯಾಗಮ FALSE;
 
     // If the button press was used as the movement command for an operator
     // (eg "d<MOUSE>"), or it is the middle button that is held down, ignore
     // drag/release events.
-    if (!is_click && which_button == MOUSE_MIDDLE)
-	return FALSE;
+    ಯದಿ (!is_click && which_button == MOUSE_ಮಧ್ಯ)
+	ಪ್ರತ್ಯಾಗಮ FALSE;
 
-    if (oap != NULL)
+    ಯದಿ (oap != ರಿಕ್ತ)
 	regname = oap->regname;
-    else
+    ಅನ್ಯಥಾ
 	regname = 0;
 
     // Middle mouse button does a 'put' of the selected text
-    if (which_button == MOUSE_MIDDLE)
+    ಯದಿ (which_button == MOUSE_ಮಧ್ಯ)
     {
-	if (State == MODE_NORMAL)
+	ಯದಿ (State == MODE_NORMAL)
 	{
 	    // If an operator was pending, we don't know what the user wanted
 	    // to do. Go back to normal mode: Clear the operator and beep().
-	    if (oap != NULL && oap->op_type != OP_NOP)
+	    ಯದಿ (oap != ರಿಕ್ತ && oap->op_type != OP_NOP)
 	    {
 		clearopbeep(oap);
-		return FALSE;
+		ಪ್ರತ್ಯಾಗಮ FALSE;
 	    }
 
 	    // If visual was active, yank the highlighted text and put it
 	    // before the mouse pointer position.
 	    // In Select mode replace the highlighted text with the clipboard.
-	    if (VIsual_active)
+	    ಯದಿ (VIsual_active)
 	    {
-		if (VIsual_select)
+		ಯದಿ (VIsual_select)
 		{
 		    stuffcharReadbuff(Ctrl_G);
 		    stuffReadbuff((char_u *)"\"+p");
 		}
-		else
+		ಅನ್ಯಥಾ
 		{
 		    stuffcharReadbuff('y');
 		    stuffcharReadbuff(K_MIDDLEMOUSE);
 		}
 		do_always = TRUE;	// ignore 'mouse' setting next time
-		return FALSE;
+		ಪ್ರತ್ಯಾಗಮ FALSE;
 	    }
 	    // The rest is below jump_to_mouse()
 	}
 
-	else if ((State & MODE_INSERT) == 0)
-	    return FALSE;
+	ಅನ್ಯಥಾ ಯದಿ ((State & MODE_ಸೇರಿಸು) == 0)
+	    ಪ್ರತ್ಯಾಗಮ FALSE;
 
 	// Middle click in insert mode doesn't move the mouse, just insert the
 	// contents of a register.  '.' register is special, can't insert that
 	// with do_put().
 	// Also paste at the cursor if the current mode isn't in 'mouse' (only
 	// happens for the GUI).
-	if ((State & MODE_INSERT) || !mouse_has(MOUSE_NORMAL))
+	ಯದಿ ((State & MODE_ಸೇರಿಸು) || !mouse_has(MOUSE_NORMAL))
 	{
-	    if (regname == '.')
-		insert_reg(regname, TRUE);
-	    else
+	    ಯದಿ (regname == '.')
+		ಸೇರಿಸು_reg(regname, TRUE);
+	    ಅನ್ಯಥಾ
 	    {
 #ifdef FEAT_CLIPBOARD
-		if (clip_star.available && regname == 0)
+		ಯದಿ (clip_star.available && regname == 0)
 		    regname = '*';
 #endif
-		if ((State & REPLACE_FLAG) && !yank_register_mline(regname))
-		    insert_reg(regname, TRUE);
-		else
+		ಯದಿ ((State & REPLACE_FLAG) && !yank_register_mline(regname))
+		    ಸೇರಿಸು_reg(regname, TRUE);
+		ಅನ್ಯಥಾ
 		{
-		    do_put(regname, NULL, BACKWARD, 1L,
+		    do_put(regname, ರಿಕ್ತ, BACKWARD, 1L,
 						      fixindent | PUT_CURSEND);
 
 		    // Repeat it with CTRL-R CTRL-O r or CTRL-R CTRL-P r
@@ -494,104 +494,104 @@ do_mouse(
 		    AppendCharToRedobuff(regname == 0 ? '"' : regname);
 		}
 	    }
-	    return FALSE;
+	    ಪ್ರತ್ಯಾಗಮ FALSE;
 	}
     }
 
     // When dragging or button-up stay in the same window.
-    if (!is_click)
+    ಯದಿ (!is_click)
 	jump_flags |= MOUSE_FOCUS | MOUSE_DID_MOVE;
 
     start_visual.lnum = 0;
 
-    struct tabpage_label_info {
+    ಸಂರಚನಾ tabpage_label_info {
 	bool is_panel;	    // label type. true: tabpanel, false: tab line
 	bool just_in;	    // just in tabpage label area
 	bool just_click;    // just click tabpage label area
-	int nr;		    // tabpage number
+	ಪೂರ್ಣಾಙ್ಕ nr;		    // tabpage number
     } tp_label = { false, false, false, 0 };
 
     // Check for clicking in the tab page panel.
-#if defined(FEAT_TABPANEL)
-    if (mouse_col < firstwin->w_wincol
+#ಯದಿ defined(FEAT_TABPANEL)
+    ಯದಿ (mouse_col < firstwin->w_wincol
 		|| mouse_col >= firstwin->w_wincol + topframe->fr_width)
     {
 	// A click on the scrollbar column starts a drag interaction and
 	// preempts tab-selection.
-	if (is_click && !is_drag && mouse_on_tabpanel_scrollbar())
+	ಯದಿ (is_click && !is_drag && mouse_on_tabpanel_scrollbar())
 	{
 	    in_tabpanel_scrollbar = TRUE;
 	    tabpanel_drag_scrollbar(mouse_row);
-	    return FALSE;
+	    ಪ್ರತ್ಯಾಗಮ FALSE;
 	}
 
 	// Dispatch 'tabpanel' %[FuncName] click regions before falling through
 	// to tab-page selection.  On drag events fall through to the normal
 	// tab-drag handling.
-	if (is_click && !is_drag
+	ಯದಿ (is_click && !is_drag
 		&& stl_click_handler_regions(tabpanel_stl_click,
-					    tabpanel_stl_click_count,
+					    tabpanel_stl_click_ಎಣಿಕೆ,
 					    0, (char_u *)"tabpanel",
 					    mouse_row, mouse_col,
 					    which_button, mod_mask))
-	    return FALSE;
+	    ಪ್ರತ್ಯಾಗಮ FALSE;
 
 	tp_label.is_panel = true;
 	tp_label.just_in = true;
 	tp_label.nr = get_tabpagenr_on_tabpanel();
 
 	// click in a tab selects that tab page
-	if (is_click && cmdwin_type == 0)
+	ಯದಿ (is_click && cmdwin_type == 0)
 	    tp_label.just_click = true;
     }
-    else
+    ಅನ್ಯಥಾ
 #endif
     // Check for clicking in the tab page line.
-    if (TabPageIdxs != NULL && mouse_row == 0 && firstwin->w_winrow > 0)
+    ಯದಿ (TabPageIdxs != ರಿಕ್ತ && mouse_row == 0 && firstwin->w_winrow > 0)
     {
 	// Dispatch 'tabline' %[FuncName] click regions before falling through
 	// to tab-page selection.  On drag events fall through to the normal
 	// tab-drag handling.
-	if (is_click && !is_drag
+	ಯದಿ (is_click && !is_drag
 		&& stl_click_handler_regions(tabline_stl_click,
-					    tabline_stl_click_count,
+					    tabline_stl_click_ಎಣಿಕೆ,
 					    0, (char_u *)"tabline",
 					    mouse_row, mouse_col,
 					    which_button, mod_mask))
-	    return FALSE;
+	    ಪ್ರತ್ಯಾಗಮ FALSE;
 
 	tp_label.just_in = true;
 	tp_label.nr = TabPageIdxs[mouse_col];
 
 	// click in a tab selects that tab page
-	if (is_click && cmdwin_type == 0
+	ಯದಿ (is_click && cmdwin_type == 0
 		&& mouse_col < firstwin->w_wincol + topframe->fr_width)
 	    tp_label.just_click = true;
     }
 
-    if (tp_label.just_in)
+    ಯದಿ (tp_label.just_in)
     {
-	if (is_drag)
+	ಯದಿ (is_drag)
 	{
-	    if (in_tabpanel || in_tab_line)
+	    ಯದಿ (in_tabpanel || in_tab_ಸಾಲು)
 	    {
 		c1 = tp_label.nr;
 		tabpage_move(c1 <= 0 ? 9999 : c1 < tabpage_index(curtab)
 							    ? c1 - 1 : c1);
 	    }
-	    return FALSE;
+	    ಪ್ರತ್ಯಾಗಮ FALSE;
 	}
 
-	if (tp_label.just_click)
+	ಯದಿ (tp_label.just_click)
 	{
-	    if (tp_label.is_panel)
+	    ಯದಿ (tp_label.is_panel)
 		in_tabpanel = TRUE;
-	    else
-		in_tab_line = TRUE;
+	    ಅನ್ಯಥಾ
+		in_tab_ಸಾಲು = TRUE;
 	    c1 = tp_label.nr;
-	    if (c1 >= 0)
+	    ಯದಿ (c1 >= 0)
 	    {
-		if ((mod_mask & MOD_MASK_MULTI_CLICK) == MOD_MASK_2CLICK
+		ಯದಿ ((mod_mask & MOD_MASK_MULTI_CLICK) == MOD_MASK_2CLICK
 						    && !tp_label.is_panel)
 		{
 		    // Double-click on the tabline opens a new, empty tab page.
@@ -602,110 +602,110 @@ do_mouse(
 		    tabpage_new();
 		    tabpage_move(c1 == 0 ? 9999 : c1 - 1);
 		}
-		else
+		ಅನ್ಯಥಾ
 		{
 		    // Go to specified tab page, or next one if not clicking
 		    // on a label.
 		    goto_tabpage(c1);
 
 		    // It's like clicking on the status line of a window.
-		    if (curwin != old_curwin)
+		    ಯದಿ (curwin != old_curwin)
 			end_visual_mode_keep_button();
 		}
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 	    {
 		tabpage_T	*tp;
 
 		// Close the current or specified tab page.
-		if (c1 == -999)
+		ಯದಿ (c1 == -999)
 		    tp = curtab;
-		else
+		ಅನ್ಯಥಾ
 		    tp = find_tabpage(-c1);
-		if (tp == curtab)
+		ಯದಿ (tp == curtab)
 		{
-		    if (first_tabpage->tp_next != NULL)
+		    ಯದಿ (first_tabpage->tp_next != ರಿಕ್ತ)
 			tabpage_close(FALSE);
 		}
-		else if (tp != NULL)
+		ಅನ್ಯಥಾ ಯದಿ (tp != ರಿಕ್ತ)
 		    tabpage_close_other(tp, FALSE);
 	    }
 	}
-	return TRUE;
+	ಪ್ರತ್ಯಾಗಮ TRUE;
     }
-    else if (is_drag && (in_tabpanel || (in_tab_line && TabPageIdxs != NULL)))
+    ಅನ್ಯಥಾ ಯದಿ (is_drag && (in_tabpanel || (in_tab_ಸಾಲು && TabPageIdxs != ರಿಕ್ತ)))
     {
-#if defined(FEAT_TABPANEL)
-	if (in_tabpanel)
+#ಯದಿ defined(FEAT_TABPANEL)
+	ಯದಿ (in_tabpanel)
 	    c1 = get_tabpagenr_on_tabpanel();
-	else
+	ಅನ್ಯಥಾ
 #endif
 	    c1 = TabPageIdxs[mouse_col];
 	tabpage_move(c1 <= 0 ? 9999 : c1 - 1);
-	return FALSE;
+	ಪ್ರತ್ಯಾಗಮ FALSE;
     }
 
     // When 'mousemodel' is "popup" or "popup_setpos", translate mouse events:
     // right button up   -> pop-up menu
     // shift-left button -> right button
     // alt-left button   -> alt-right button
-    if (mouse_model_popup())
+    ಯದಿ (mouse_model_popup())
     {
-	if (which_button == MOUSE_RIGHT
+	ಯದಿ (which_button == MOUSE_ಬಲ
 			    && !(mod_mask & (MOD_MASK_SHIFT | MOD_MASK_CTRL)))
 	{
 #ifdef USE_POPUP_SETPOS
 # ifdef FEAT_GUI
-	    if (gui.in_use)
+	    ಯದಿ (gui.in_use)
 	    {
-#  if defined(FEAT_GUI_MOTIF) || defined(FEAT_GUI_GTK) \
+#  ಯದಿ defined(FEAT_GUI_MOTIF) || defined(FEAT_GUI_GTK) \
 			  || defined(FEAT_GUI_PHOTON)
-		if (!is_click)
+		ಯದಿ (!is_click)
 		    // Ignore right button release events, only shows the popup
 		    // menu on the button down event.
-		    return FALSE;
+		    ಪ್ರತ್ಯಾಗಮ FALSE;
 #  endif
-#  if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_HAIKU)
-		if (is_click || is_drag)
+#  ಯದಿ defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_HAIKU)
+		ಯದಿ (is_click || is_drag)
 		    // Ignore right button down and drag mouse events.  Windows
 		    // only shows the popup menu on the button up event.
-		    return FALSE;
+		    ಪ್ರತ್ಯಾಗಮ FALSE;
 #  endif
 	    }
 # endif
-# if defined(FEAT_GUI) && defined(FEAT_TERM_POPUP_MENU)
-	    else
+# ಯದಿ defined(FEAT_GUI) && defined(FEAT_TERM_POPUP_MENU)
+	    ಅನ್ಯಥಾ
 # endif
-# if defined(FEAT_TERM_POPUP_MENU)
-	    if (!is_click)
+# ಯದಿ defined(FEAT_TERM_POPUP_MENU)
+	    ಯದಿ (!is_click)
 		// Ignore right button release events, only shows the popup
 		// menu on the button down event.
-		return FALSE;
+		ಪ್ರತ್ಯಾಗಮ FALSE;
 # endif
 
 	    jump_flags = 0;
-	    if (STRCMP(p_mousem, "popup_setpos") == 0)
+	    ಯದಿ (STRCMP(p_mousem, "popup_setpos") == 0)
 	    {
 		// First set the cursor position before showing the popup
 		// menu.
-		if (VIsual_active)
+		ಯದಿ (VIsual_active)
 		{
 		    pos_T    m_pos;
 
 		    // set MOUSE_MAY_STOP_VIS if we are outside the
 		    // selection or the current window (might have false
 		    // negative here)
-		    if (mouse_row < curwin->w_winrow
+		    ಯದಿ (mouse_row < curwin->w_winrow
 			 || mouse_row
 				  > (curwin->w_winrow + curwin->w_height))
 			jump_flags = MOUSE_MAY_STOP_VIS;
-		    else if (get_fpos_of_mouse(&m_pos) != IN_BUFFER)
+		    ಅನ್ಯಥಾ ಯದಿ (get_fpos_of_mouse(&m_pos) != IN_BUFFER)
 			jump_flags = MOUSE_MAY_STOP_VIS;
-		    else
+		    ಅನ್ಯಥಾ
 		    {
-			if (VIsual_mode == 'V')
+			ಯದಿ (VIsual_mode == 'V')
 			{
-			    if ((curwin->w_cursor.lnum <= VIsual.lnum
+			    ಯದಿ ((curwin->w_cursor.lnum <= VIsual.lnum
 				    && (m_pos.lnum < curwin->w_cursor.lnum
 					|| VIsual.lnum < m_pos.lnum))
 				|| (VIsual.lnum < curwin->w_cursor.lnum
@@ -715,7 +715,7 @@ do_mouse(
 				jump_flags = MOUSE_MAY_STOP_VIS;
 			    }
 			}
-			else if ((LTOREQ_POS(curwin->w_cursor, VIsual)
+			ಅನ್ಯಥಾ ಯದಿ ((LTOREQ_POS(curwin->w_cursor, VIsual)
 				    && (LT_POS(m_pos, curwin->w_cursor)
 					|| LT_POS(VIsual, m_pos)))
 				|| (LT_POS(VIsual, curwin->w_cursor)
@@ -724,22 +724,22 @@ do_mouse(
 			{
 			    jump_flags = MOUSE_MAY_STOP_VIS;
 			}
-			else if (VIsual_mode == Ctrl_V)
+			ಅನ್ಯಥಾ ಯದಿ (VIsual_mode == Ctrl_V)
 			{
 			    getvcols(curwin, &curwin->w_cursor, &VIsual,
 						     &leftcol, &rightcol, 0);
-			    getvcol(curwin, &m_pos, NULL, &m_pos.col, NULL, 0);
-			    if (m_pos.col < leftcol || m_pos.col > rightcol)
+			    getvcol(curwin, &m_pos, ರಿಕ್ತ, &m_pos.col, ರಿಕ್ತ, 0);
+			    ಯದಿ (m_pos.col < leftcol || m_pos.col > rightcol)
 				jump_flags = MOUSE_MAY_STOP_VIS;
 			}
 		    }
 		}
-		else
+		ಅನ್ಯಥಾ
 		    jump_flags = MOUSE_MAY_STOP_VIS;
 	    }
-	    if (jump_flags)
+	    ಯದಿ (jump_flags)
 	    {
-		jump_flags = jump_to_mouse(jump_flags, NULL, which_button);
+		jump_flags = jump_to_mouse(jump_flags, ರಿಕ್ತ, which_button);
 		update_curbuf(VIsual_active ? UPD_INVERTED : UPD_VALID);
 		setcursor();
 		out_flush();    // Update before showing popup menu
@@ -748,176 +748,176 @@ do_mouse(
 	    show_popupmenu();
 	    got_click = FALSE;	// ignore release events
 # endif
-	    return (jump_flags & CURSOR_MOVED) != 0;
-#else
-	    return FALSE;
+	    ಪ್ರತ್ಯಾಗಮ (jump_flags & CURSOR_MOVED) != 0;
+#ಅನ್ಯಥಾ
+	    ಪ್ರತ್ಯಾಗಮ FALSE;
 #endif
 	}
-	if (which_button == MOUSE_LEFT
+	ಯದಿ (which_button == MOUSE_ಎಡ
 				&& (mod_mask & (MOD_MASK_SHIFT|MOD_MASK_ALT)))
 	{
-	    which_button = MOUSE_RIGHT;
+	    which_button = MOUSE_ಬಲ;
 	    mod_mask &= ~MOD_MASK_SHIFT;
 	}
     }
 
-    if ((State & (MODE_NORMAL | MODE_INSERT))
+    ಯದಿ ((State & (MODE_NORMAL | MODE_ಸೇರಿಸು))
 			    && !(mod_mask & (MOD_MASK_SHIFT | MOD_MASK_CTRL)))
     {
-	if (which_button == MOUSE_LEFT)
+	ಯದಿ (which_button == MOUSE_ಎಡ)
 	{
-	    if (is_click)
+	    ಯದಿ (is_click)
 	    {
 		// stop Visual mode for a left click in a window, but not when
 		// on a status line
-		if (VIsual_active)
+		ಯದಿ (VIsual_active)
 		    jump_flags |= MOUSE_MAY_STOP_VIS;
 	    }
-	    else if (mouse_has(MOUSE_VISUAL))
+	    ಅನ್ಯಥಾ ಯದಿ (mouse_has(MOUSE_VISUAL))
 		jump_flags |= MOUSE_MAY_VIS;
 	}
-	else if (which_button == MOUSE_RIGHT)
+	ಅನ್ಯಥಾ ಯದಿ (which_button == MOUSE_ಬಲ)
 	{
-	    if (is_click && VIsual_active)
+	    ಯದಿ (is_click && VIsual_active)
 	    {
 		// Remember the start and end of visual before moving the
 		// cursor.
-		if (LT_POS(curwin->w_cursor, VIsual))
+		ಯದಿ (LT_POS(curwin->w_cursor, VIsual))
 		{
 		    start_visual = curwin->w_cursor;
 		    end_visual = VIsual;
 		}
-		else
+		ಅನ್ಯಥಾ
 		{
 		    start_visual = VIsual;
 		    end_visual = curwin->w_cursor;
 		}
 	    }
 	    jump_flags |= MOUSE_FOCUS;
-	    if (mouse_has(MOUSE_VISUAL))
+	    ಯದಿ (mouse_has(MOUSE_VISUAL))
 		jump_flags |= MOUSE_MAY_VIS;
 	}
     }
 
     // If an operator is pending, ignore all drags and releases until the
     // next mouse click.
-    if (!is_drag && oap != NULL && oap->op_type != OP_NOP)
+    ಯದಿ (!is_drag && oap != ರಿಕ್ತ && oap->op_type != OP_NOP)
     {
 	got_click = FALSE;
 	oap->motion_type = MCHAR;
     }
 
     // When releasing the button let jump_to_mouse() know.
-    if (!is_click && !is_drag)
+    ಯದಿ (!is_click && !is_drag)
 	jump_flags |= MOUSE_RELEASED;
 
     // JUMP!
     jump_flags = jump_to_mouse(jump_flags,
-			oap == NULL ? NULL : &(oap->inclusive), which_button);
+			oap == ರಿಕ್ತ ? ರಿಕ್ತ : &(oap->inclusive), which_button);
 
 #ifdef FEAT_MENU
     // A click in the window toolbar has no side effects.
-    if (jump_flags & MOUSE_WINBAR)
-	return FALSE;
+    ಯದಿ (jump_flags & MOUSE_WINBAR)
+	ಪ್ರತ್ಯಾಗಮ FALSE;
 #endif
     moved = (jump_flags & CURSOR_MOVED);
-    in_status_line = (jump_flags & IN_STATUS_LINE);
-    in_sep_line = (jump_flags & IN_SEP_LINE);
+    in_status_ಸಾಲು = (jump_flags & IN_STATUS_ಸಾಲು);
+    in_sep_ಸಾಲು = (jump_flags & IN_SEP_ಸಾಲು);
 
     // Check for statusline click handler early, before visual mode or
     // other button-specific handling can interfere.
-    if (in_status_line && is_click && !is_drag
+    ಯದಿ (in_status_ಸಾಲು && is_click && !is_drag
 	    && stl_click_handler(dragwin, mouse_row, mouse_col,
 						which_button, mod_mask))
     {
 #ifdef FEAT_MOUSESHAPE
-	if (!drag_status_line)
+	ಯದಿ (!drag_status_ಸಾಲು)
 	{
-	    drag_status_line = TRUE;
+	    drag_status_ಸಾಲು = TRUE;
 	    update_mouseshape(-1);
 	}
 #endif
-	return FALSE;
+	ಪ್ರತ್ಯಾಗಮ FALSE;
     }
 
 #ifdef FEAT_NETBEANS_INTG
-    if (isNetbeansBuffer(curbuf)
-			    && !(jump_flags & (IN_STATUS_LINE | IN_SEP_LINE)))
+    ಯದಿ (isNetbeansBuffer(curbuf)
+			    && !(jump_flags & (IN_STATUS_ಸಾಲು | IN_SEP_ಸಾಲು)))
     {
-	int key = KEY2TERMCAP1(c);
+	ಪೂರ್ಣಾಙ್ಕ ಕೀಲಿ = KEY2TERMCAP1(c);
 
-	if (key == (int)KE_LEFTRELEASE || key == (int)KE_MIDDLERELEASE
-					       || key == (int)KE_RIGHTRELEASE)
+	ಯದಿ (ಕೀಲಿ == (ಪೂರ್ಣಾಙ್ಕ)KE_LEFTRELEASE || ಕೀಲಿ == (ಪೂರ್ಣಾಙ್ಕ)KE_MIDDLERELEASE
+					       || ಕೀಲಿ == (ಪೂರ್ಣಾಙ್ಕ)KE_RIGHTRELEASE)
 	    netbeans_button_release(which_button);
     }
 #endif
 
     // When jumping to another window, clear a pending operator.  That's a bit
     // friendlier than beeping and not jumping to that window.
-    if (curwin != old_curwin && oap != NULL && oap->op_type != OP_NOP)
+    ಯದಿ (curwin != old_curwin && oap != ರಿಕ್ತ && oap->op_type != OP_NOP)
 	clearop(oap);
 
 #ifdef FEAT_FOLDING
-    if (mod_mask == 0
+    ಯದಿ (mod_mask == 0
 	    && !is_drag
 	    && (jump_flags & (MOUSE_FOLD_CLOSE | MOUSE_FOLD_OPEN))
-	    && which_button == MOUSE_LEFT)
+	    && which_button == MOUSE_ಎಡ)
     {
 	// open or close a fold at this line
-	if (jump_flags & MOUSE_FOLD_OPEN)
+	ಯದಿ (jump_flags & MOUSE_FOLD_OPEN)
 	    openFold(curwin->w_cursor.lnum, 1L);
-	else
+	ಅನ್ಯಥಾ
 	    closeFold(curwin->w_cursor.lnum, 1L);
 	// don't move the cursor if still in the same window
-	if (curwin == old_curwin)
+	ಯದಿ (curwin == old_curwin)
 	    curwin->w_cursor = save_cursor;
     }
 #endif
 
-#if defined(FEAT_CLIPBOARD)
-    if ((jump_flags & IN_OTHER_WIN) && !VIsual_active &&
+#ಯದಿ defined(FEAT_CLIPBOARD)
+    ಯದಿ ((jump_flags & IN_OTHER_WIN) && !VIsual_active &&
 	    (clip_star.available || clip_plus.available))
     {
 	clip_modeless(which_button, is_click, is_drag);
-	return FALSE;
+	ಪ್ರತ್ಯಾಗಮ FALSE;
     }
 #endif
 
     // Set global flag that we are extending the Visual area with mouse
     // dragging; temporarily minimize 'scrolloff'.
-    if (VIsual_active && is_drag && get_scrolloff_value())
+    ಯದಿ (VIsual_active && is_drag && get_scrolloff_ಮೌಲ್ಯ())
     {
 	// In the very first line, allow scrolling one line
-	if (mouse_row == 0)
+	ಯದಿ (mouse_row == 0)
 	    mouse_dragging = 2;
-	else
+	ಅನ್ಯಥಾ
 	    mouse_dragging = 1;
     }
 
     // When dragging the mouse above the window, scroll down.
-    if (is_drag && mouse_row < 0 && !in_status_line)
+    ಯದಿ (is_drag && mouse_row < 0 && !in_status_ಸಾಲು)
     {
 	scroll_redraw(FALSE, 1L);
 	mouse_row = 0;
     }
 
-    if (start_visual.lnum)		// right click in visual mode
+    ಯದಿ (start_visual.lnum)		// right click in visual mode
     {
        // When ALT is pressed make Visual mode blockwise.
-       if (mod_mask & MOD_MASK_ALT)
+       ಯದಿ (mod_mask & MOD_MASK_ALT)
 	   VIsual_mode = Ctrl_V;
 
 	// In Visual-block mode, divide the area in four, pick up the corner
 	// that is in the quarter that the cursor is in.
-	if (VIsual_mode == Ctrl_V)
+	ಯದಿ (VIsual_mode == Ctrl_V)
 	{
 	    getvcols(curwin, &start_visual, &end_visual,
 						    &leftcol, &rightcol, 0);
-	    if (curwin->w_curswant > (leftcol + rightcol) / 2)
+	    ಯದಿ (curwin->w_curswant > (leftcol + rightcol) / 2)
 		end_visual.col = leftcol;
-	    else
+	    ಅನ್ಯಥಾ
 		end_visual.col = rightcol;
-	    if (curwin->w_cursor.lnum >=
+	    ಯದಿ (curwin->w_cursor.lnum >=
 				    (start_visual.lnum + end_visual.lnum) / 2)
 		end_visual.lnum = start_visual.lnum;
 
@@ -928,43 +928,43 @@ do_mouse(
 	    VIsual = curwin->w_cursor;
 	    curwin->w_cursor = start_visual;	    // restore the cursor
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
 	    // If the click is before the start of visual, change the start.
 	    // If the click is after the end of visual, change the end.  If
 	    // the click is inside the visual, change the closest side.
-	    if (LT_POS(curwin->w_cursor, start_visual))
+	    ಯದಿ (LT_POS(curwin->w_cursor, start_visual))
 		VIsual = end_visual;
-	    else if (LT_POS(end_visual, curwin->w_cursor))
+	    ಅನ್ಯಥಾ ಯದಿ (LT_POS(end_visual, curwin->w_cursor))
 		VIsual = start_visual;
-	    else
+	    ಅನ್ಯಥಾ
 	    {
 		// In the same line, compare column number
-		if (end_visual.lnum == start_visual.lnum)
+		ಯದಿ (end_visual.lnum == start_visual.lnum)
 		{
-		    if (curwin->w_cursor.col - start_visual.col >
+		    ಯದಿ (curwin->w_cursor.col - start_visual.col >
 				    end_visual.col - curwin->w_cursor.col)
 			VIsual = start_visual;
-		    else
+		    ಅನ್ಯಥಾ
 			VIsual = end_visual;
 		}
 
 		// In different lines, compare line number
-		else
+		ಅನ್ಯಥಾ
 		{
 		    diff = (curwin->w_cursor.lnum - start_visual.lnum) -
 				(end_visual.lnum - curwin->w_cursor.lnum);
 
-		    if (diff > 0)		// closest to end
+		    ಯದಿ (diff > 0)		// closest to end
 			VIsual = start_visual;
-		    else if (diff < 0)	// closest to start
+		    ಅನ್ಯಥಾ ಯದಿ (diff < 0)	// closest to start
 			VIsual = end_visual;
-		    else			// in the middle line
+		    ಅನ್ಯಥಾ			// in the middle line
 		    {
-			if (curwin->w_cursor.col <
+			ಯದಿ (curwin->w_cursor.col <
 					(start_visual.col + end_visual.col) / 2)
 			    VIsual = end_visual;
-			else
+			ಅನ್ಯಥಾ
 			    VIsual = start_visual;
 		    }
 		}
@@ -972,53 +972,53 @@ do_mouse(
 	}
     }
     // If Visual mode started in insert mode, execute "CTRL-O"
-    else if ((State & MODE_INSERT) && VIsual_active)
+    ಅನ್ಯಥಾ ಯದಿ ((State & MODE_ಸೇರಿಸು) && VIsual_active)
 	stuffcharReadbuff(Ctrl_O);
 
     // Middle mouse click: Put text before cursor.
-    if (which_button == MOUSE_MIDDLE)
+    ಯದಿ (which_button == MOUSE_ಮಧ್ಯ)
     {
 #ifdef FEAT_CLIPBOARD
-	if (clip_star.available && regname == 0)
+	ಯದಿ (clip_star.available && regname == 0)
 	    regname = '*';
 #endif
-	if (yank_register_mline(regname))
+	ಯದಿ (yank_register_mline(regname))
 	{
-	    if (mouse_past_bottom)
+	    ಯದಿ (mouse_past_bottom)
 		dir = FORWARD;
 	}
-	else if (mouse_past_eol)
+	ಅನ್ಯಥಾ ಯದಿ (mouse_past_eol)
 	    dir = FORWARD;
 
-	if (fixindent)
+	ಯದಿ (fixindent)
 	{
 	    c1 = (dir == BACKWARD) ? '[' : ']';
 	    c2 = 'p';
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
 	    c1 = (dir == FORWARD) ? 'p' : 'P';
 	    c2 = NUL;
 	}
-	prep_redo(regname, count, NUL, c1, NUL, c2, NUL);
+	prep_redo(regname, ಎಣಿಕೆ, NUL, c1, NUL, c2, NUL);
 
 	// Remember where the paste started, so in edit() Insstart can be set
 	// to this position
-	if (restart_edit != 0)
+	ಯದಿ (restart_edit != 0)
 	    where_paste_started = curwin->w_cursor;
-	do_put(regname, NULL, dir, count, fixindent | PUT_CURSEND);
+	do_put(regname, ರಿಕ್ತ, dir, ಎಣಿಕೆ, fixindent | PUT_CURSEND);
     }
 
-#if defined(FEAT_QUICKFIX)
+#ಯದಿ defined(FEAT_QUICKFIX)
     // Ctrl-Mouse click or double click in a quickfix window jumps to the
     // error under the mouse pointer.
-    else if (((mod_mask & MOD_MASK_CTRL)
+    ಅನ್ಯಥಾ ಯದಿ (((mod_mask & MOD_MASK_CTRL)
 		|| (mod_mask & MOD_MASK_MULTI_CLICK) == MOD_MASK_2CLICK)
 	    && bt_quickfix(curbuf))
     {
-	if (curwin->w_llist_ref == NULL)	// quickfix window
+	ಯದಿ (curwin->w_llist_ref == ರಿಕ್ತ)	// quickfix window
 	    do_cmdline_cmd((char_u *)".cc");
-	else					// location list window
+	ಅನ್ಯಥಾ					// location list window
 	    do_cmdline_cmd((char_u *)".ll");
 	got_click = FALSE;		// ignore drag&release now
     }
@@ -1026,10 +1026,10 @@ do_mouse(
 
     // Ctrl-Mouse click (or double click in a help window) jumps to the tag
     // under the mouse pointer.
-    else if ((mod_mask & MOD_MASK_CTRL) || (curbuf->b_help
+    ಅನ್ಯಥಾ ಯದಿ ((mod_mask & MOD_MASK_CTRL) || (curbuf->b_help
 		     && (mod_mask & MOD_MASK_MULTI_CLICK) == MOD_MASK_2CLICK))
     {
-	if (State & MODE_INSERT)
+	ಯದಿ (State & MODE_ಸೇರಿಸು)
 	    stuffcharReadbuff(Ctrl_O);
 	stuffcharReadbuff(Ctrl_RSB);
 	got_click = FALSE;		// ignore drag&release now
@@ -1037,46 +1037,46 @@ do_mouse(
 
     // Shift-Mouse click searches for the next occurrence of the word under
     // the mouse pointer
-    else if ((mod_mask & MOD_MASK_SHIFT))
+    ಅನ್ಯಥಾ ಯದಿ ((mod_mask & MOD_MASK_SHIFT))
     {
-	if ((State & MODE_INSERT) || (VIsual_active && VIsual_select))
+	ಯದಿ ((State & MODE_ಸೇರಿಸು) || (VIsual_active && VIsual_select))
 	    stuffcharReadbuff(Ctrl_O);
-	if (which_button == MOUSE_LEFT)
+	ಯದಿ (which_button == MOUSE_ಎಡ)
 	    stuffcharReadbuff('*');
-	else	// MOUSE_RIGHT
+	ಅನ್ಯಥಾ	// MOUSE_RIGHT
 	    stuffcharReadbuff('#');
     }
 
     // Handle double clicks, unless on status line
-    else if (in_status_line)
+    ಅನ್ಯಥಾ ಯದಿ (in_status_ಸಾಲು)
     {
 #ifdef FEAT_MOUSESHAPE
-	if ((is_drag || is_click) && !drag_status_line)
+	ಯದಿ ((is_drag || is_click) && !drag_status_ಸಾಲು)
 	{
-	    drag_status_line = TRUE;
+	    drag_status_ಸಾಲು = TRUE;
 	    update_mouseshape(-1);
 	}
 #endif
     }
-    else if (in_sep_line)
+    ಅನ್ಯಥಾ ಯದಿ (in_sep_ಸಾಲು)
     {
 #ifdef FEAT_MOUSESHAPE
-	if ((is_drag || is_click) && !drag_sep_line)
+	ಯದಿ ((is_drag || is_click) && !drag_sep_ಸಾಲು)
 	{
-	    drag_sep_line = TRUE;
+	    drag_sep_ಸಾಲು = TRUE;
 	    update_mouseshape(-1);
 	}
 #endif
     }
-    else if ((mod_mask & MOD_MASK_MULTI_CLICK)
-				       && (State & (MODE_NORMAL | MODE_INSERT))
+    ಅನ್ಯಥಾ ಯದಿ ((mod_mask & MOD_MASK_MULTI_CLICK)
+				       && (State & (MODE_NORMAL | MODE_ಸೇರಿಸು))
 	     && mouse_has(MOUSE_VISUAL))
     {
-	if (is_click || !VIsual_active)
+	ಯದಿ (is_click || !VIsual_active)
 	{
-	    if (VIsual_active)
+	    ಯದಿ (VIsual_active)
 		orig_cursor = VIsual;
-	    else
+	    ಅನ್ಯಥಾ
 	    {
 		check_visual_highlight();
 		VIsual = curwin->w_cursor;
@@ -1087,17 +1087,17 @@ do_mouse(
 		may_start_select('o');
 		setmouse();
 	    }
-	    if ((mod_mask & MOD_MASK_MULTI_CLICK) == MOD_MASK_2CLICK)
+	    ಯದಿ ((mod_mask & MOD_MASK_MULTI_CLICK) == MOD_MASK_2CLICK)
 	    {
 		// Double click with ALT pressed makes it blockwise.
-		if (mod_mask & MOD_MASK_ALT)
+		ಯದಿ (mod_mask & MOD_MASK_ALT)
 		    VIsual_mode = Ctrl_V;
-		else
+		ಅನ್ಯಥಾ
 		    VIsual_mode = 'v';
 	    }
-	    else if ((mod_mask & MOD_MASK_MULTI_CLICK) == MOD_MASK_3CLICK)
+	    ಅನ್ಯಥಾ ಯದಿ ((mod_mask & MOD_MASK_MULTI_CLICK) == MOD_MASK_3CLICK)
 		VIsual_mode = 'V';
-	    else if ((mod_mask & MOD_MASK_MULTI_CLICK) == MOD_MASK_4CLICK)
+	    ಅನ್ಯಥಾ ಯದಿ ((mod_mask & MOD_MASK_MULTI_CLICK) == MOD_MASK_4CLICK)
 		VIsual_mode = Ctrl_V;
 #ifdef FEAT_CLIPBOARD
 	    // Make sure the clipboard gets updated.  Needed because start and
@@ -1106,53 +1106,53 @@ do_mouse(
 #endif
 	}
 	// A double click selects a word or a block.
-	if ((mod_mask & MOD_MASK_MULTI_CLICK) == MOD_MASK_2CLICK)
+	ಯದಿ ((mod_mask & MOD_MASK_MULTI_CLICK) == MOD_MASK_2CLICK)
 	{
-	    pos_T	*pos = NULL;
-	    int		gc;
+	    pos_T	*pos = ರಿಕ್ತ;
+	    ಪೂರ್ಣಾಙ್ಕ		gc;
 
-	    if (is_click)
+	    ಯದಿ (is_click)
 	    {
 		// If the character under the cursor (skipping white space) is
 		// not a word character, try finding a match and select a (),
 		// {}, [], #if/#endif, etc. block.
 		end_visual = curwin->w_cursor;
-		while (gc = gchar_pos(&end_visual), VIM_ISWHITE(gc))
+		ಯಾವತ್ (gc = gchar_pos(&end_visual), VIM_ISWHITE(gc))
 		    inc(&end_visual);
-		if (oap != NULL)
+		ಯದಿ (oap != ರಿಕ್ತ)
 		    oap->motion_type = MCHAR;
-		if (oap != NULL
+		ಯದಿ (oap != ರಿಕ್ತ
 			&& VIsual_mode == 'v'
 			&& !vim_iswordc(gchar_pos(&end_visual))
 			&& EQUAL_POS(curwin->w_cursor, VIsual)
-			&& (pos = findmatch(oap, NUL)) != NULL)
+			&& (pos = findmatch(oap, NUL)) != ರಿಕ್ತ)
 		{
 		    curwin->w_cursor = *pos;
-		    if (oap->motion_type == MLINE)
+		    ಯದಿ (oap->motion_type == MLINE)
 			VIsual_mode = 'V';
-		    else if (*p_sel == 'e')
+		    ಅನ್ಯಥಾ ಯದಿ (*p_sel == 'e')
 		    {
-			if (LT_POS(curwin->w_cursor, VIsual))
+			ಯದಿ (LT_POS(curwin->w_cursor, VIsual))
 			    ++VIsual.col;
-			else
+			ಅನ್ಯಥಾ
 			    ++curwin->w_cursor.col;
 		    }
 		}
 	    }
 
-	    if (pos == NULL && (is_click || is_drag))
+	    ಯದಿ (pos == ರಿಕ್ತ && (is_click || is_drag))
 	    {
 		// When not found a match or when dragging: extend to include
 		// a word.
-		if (LT_POS(curwin->w_cursor, orig_cursor))
+		ಯದಿ (LT_POS(curwin->w_cursor, orig_cursor))
 		{
 		    find_start_of_word(&curwin->w_cursor);
 		    find_end_of_word(&VIsual);
 		}
-		else
+		ಅನ್ಯಥಾ
 		{
 		    find_start_of_word(&VIsual);
-		    if (*p_sel == 'e' && *ml_get_cursor() != NUL)
+		    ಯದಿ (*p_sel == 'e' && *ml_get_cursor() != NUL)
 			curwin->w_cursor.col +=
 					 (*mb_ptr2len)(ml_get_cursor());
 		    find_end_of_word(&curwin->w_cursor);
@@ -1160,59 +1160,59 @@ do_mouse(
 	    }
 	    curwin->w_set_curswant = true;
 	}
-	if (is_click)
+	ಯದಿ (is_click)
 	    redraw_curbuf_later(UPD_INVERTED);	// update the inversion
     }
-    else if (VIsual_active && !old_active)
+    ಅನ್ಯಥಾ ಯದಿ (VIsual_active && !old_active)
     {
-	if (mod_mask & MOD_MASK_ALT)
+	ಯದಿ (mod_mask & MOD_MASK_ALT)
 	    VIsual_mode = Ctrl_V;
-	else
+	ಅನ್ಯಥಾ
 	    VIsual_mode = 'v';
     }
 
     // If Visual mode changed show it later.
-    if ((!VIsual_active && old_active && mode_displayed)
-	    || (VIsual_active && p_smd && msg_silent == 0
+    ಯದಿ ((!VIsual_active && old_active && mode_displayed)
+	    || (VIsual_active && p_smd && ಸಂದೇಶ_silent == 0
 				 && (!old_active || VIsual_mode != old_mode)))
 	redraw_cmdline = TRUE;
 
-    return moved;
+    ಪ್ರತ್ಯಾಗಮ moved;
 }
 
-    void
-ins_mouse(int c)
+    ಶೂನ್ಯ
+ins_mouse(ಪೂರ್ಣಾಙ್ಕ c)
 {
     pos_T	tpos;
     win_T	*old_curwin = curwin;
 
 #ifdef FEAT_GUI
     // When GUI is active, also move/paste when 'mouse' is empty
-    if (!gui.in_use)
+    ಯದಿ (!gui.in_use)
 #endif
-	if (!mouse_has(MOUSE_INSERT))
-	    return;
+	ಯದಿ (!mouse_has(MOUSE_ಸೇರಿಸು))
+	    ಪ್ರತ್ಯಾಗಮ;
 
     undisplay_dollar();
     tpos = curwin->w_cursor;
-    if (do_mouse(NULL, c, BACKWARD, 1L, 0))
+    ಯದಿ (do_mouse(ರಿಕ್ತ, c, BACKWARD, 1L, 0))
     {
 	win_T	*new_curwin = curwin;
 
-	if (curwin != old_curwin && win_valid(old_curwin))
+	ಯದಿ (curwin != old_curwin && win_valid(old_curwin))
 	{
 	    // Mouse took us to another window.  We need to go back to the
 	    // previous one to stop insert there properly.
 	    curwin = old_curwin;
 	    curbuf = curwin->w_buffer;
 #ifdef FEAT_JOB_CHANNEL
-	    if (bt_prompt(curbuf))
+	    ಯದಿ (bt_prompt(curbuf))
 		// Restart Insert mode when re-entering the prompt buffer.
-		curbuf->b_prompt_insert = 'A';
+		curbuf->b_prompt_ಸೇರಿಸು = 'A';
 #endif
 	}
-	start_arrow(curwin == old_curwin ? &tpos : NULL);
-	if (curwin != new_curwin && win_valid(new_curwin))
+	start_arrow(curwin == old_curwin ? &tpos : ರಿಕ್ತ);
+	ಯದಿ (curwin != new_curwin && win_valid(new_curwin))
 	{
 	    curwin = new_curwin;
 	    curbuf = curwin->w_buffer;
@@ -1236,61 +1236,61 @@ ins_mouse(int c)
  * "curwin" may have been changed to the window that should be scrolled and
  * differ from the window that actually has focus.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 do_mousescroll(cmdarg_T *cap)
 {
-    int shift_or_ctrl = mod_mask & (MOD_MASK_SHIFT | MOD_MASK_CTRL);
+    ಪೂರ್ಣಾಙ್ಕ shift_or_ctrl = mod_mask & (MOD_MASK_SHIFT | MOD_MASK_CTRL);
 
 #ifdef FEAT_TERMINAL
-    if (term_use_loop())
+    ಯದಿ (term_use_loop())
 	// This window is a terminal window, send the mouse event there.
 	// Set "typed" to FALSE to avoid an endless loop.
-	send_keys_to_term(curbuf->b_term, cap->cmdchar, mod_mask, FALSE);
-    else
+	send_ಕೀಲಿಗಳು_to_term(curbuf->b_term, cap->cmdchar, mod_mask, FALSE);
+    ಅನ್ಯಥಾ
 #endif
-    if (cap->arg == MSCR_UP || cap->arg == MSCR_DOWN)
+    ಯದಿ (cap->arg == MSCR_UP || cap->arg == MSCR_DOWN)
     {
 	// Vertical scrolling
-	if (!(State & MODE_INSERT) && (mouse_vert_step < 0 || shift_or_ctrl))
+	ಯದಿ (!(State & MODE_ಸೇರಿಸು) && (mouse_vert_step < 0 || shift_or_ctrl))
 	{
 	    // whole page up or down
 	    pagescroll(cap->arg == MSCR_UP ? FORWARD : BACKWARD, 1L, FALSE);
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
-	    if (mouse_vert_step < 0 || shift_or_ctrl)
+	    ಯದಿ (mouse_vert_step < 0 || shift_or_ctrl)
 	    {
 		// whole page up or down
 		cap->count1 = (long)(curwin->w_botline - curwin->w_topline);
 	    }
 	    // Don't scroll more than half the window height.
-	    else if (curwin->w_height < mouse_vert_step * 2)
+	    ಅನ್ಯಥಾ ಯದಿ (curwin->w_height < mouse_vert_step * 2)
 	    {
 		cap->count1 = curwin->w_height / 2;
-		if (cap->count1 == 0)
+		ಯದಿ (cap->count1 == 0)
 		    cap->count1 = 1;
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 	    {
 		cap->count1 = mouse_vert_step;
 	    }
 	    cap->count0 = cap->count1;
-	    nv_scroll_line(cap);
+	    nv_scroll_ಸಾಲು(cap);
 	}
 
 #ifdef FEAT_PROP_POPUP
-	if (WIN_IS_POPUP(curwin))
+	ಯದಿ (WIN_IS_POPUP(curwin))
 	    popup_set_firstline(curwin);
 #endif
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	// Horizontal scrolling
 	long step = (mouse_hor_step < 0 || shift_or_ctrl)
 					    ? curwin->w_width : mouse_hor_step;
 	long leftcol = curwin->w_leftcol
-				     + (cap->arg == MSCR_RIGHT ? -step : step);
-	if (leftcol < 0)
+				     + (cap->arg == MSCR_ಬಲ ? -step : step);
+	ಯದಿ (leftcol < 0)
 	    leftcol = 0;
 	do_mousescroll_horiz((long_u)leftcol);
     }
@@ -1301,8 +1301,8 @@ do_mousescroll(cmdarg_T *cap)
  * Insert mode implementation for scrolling in direction "dir", which is
  * one of the MSCR_ values.
  */
-    void
-ins_mousescroll(int dir)
+    ಶೂನ್ಯ
+ins_mousescroll(ಪೂರ್ಣಾಙ್ಕ dir)
 {
     cmdarg_T	cap;
     oparg_T	oa;
@@ -1312,55 +1312,55 @@ ins_mousescroll(int dir)
     cap.arg = dir;
 
 #ifdef FEAT_TABPANEL
-    if (mouse_row >= 0 && mouse_col >= 0
+    ಯದಿ (mouse_row >= 0 && mouse_col >= 0
 	    && (dir == MSCR_UP || dir == MSCR_DOWN)
 	    && mouse_on_tabpanel())
     {
-	(void)tabpanel_scroll(dir == MSCR_UP ? 1 : -1,
+	(ಶೂನ್ಯ)tabpanel_scroll(dir == MSCR_UP ? 1 : -1,
 		mouse_vert_step > 0 ? mouse_vert_step : 3);
-	return;
+	ಪ್ರತ್ಯಾಗಮ;
     }
 #endif
 
-    switch (dir)
+    ವಿಕಲ್ಪ (dir)
     {
-	case MSCR_UP:
+	ಪಕ್ಷ MSCR_UP:
 	    cap.cmdchar = K_MOUSEUP;
-	    break;
-	case MSCR_DOWN:
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ MSCR_DOWN:
 	    cap.cmdchar = K_MOUSEDOWN;
-	    break;
-	case MSCR_LEFT:
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ MSCR_ಎಡ:
 	    cap.cmdchar = K_MOUSELEFT;
-	    break;
-	case MSCR_RIGHT:
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ MSCR_ಬಲ:
 	    cap.cmdchar = K_MOUSERIGHT;
-	    break;
-	default:
+	    ಭಙ್ಗ;
+	ಸ್ವಭಾವ:
 	    siemsg("Invalid ins_mousescroll() argument: %d", dir);
     }
 
     win_T *old_curwin = curwin;
-    if (mouse_row >= 0 && mouse_col >= 0)
+    ಯದಿ (mouse_row >= 0 && mouse_col >= 0)
     {
 	// Find the window at the mouse pointer coordinates.
 	// NOTE: Must restore "curwin" to "old_curwin" before returning!
-	int row = mouse_row;
-	int col = mouse_col;
+	ಪೂರ್ಣಾಙ್ಕ row = mouse_row;
+	ಪೂರ್ಣಾಙ್ಕ col = mouse_col;
 	curwin = mouse_find_win(&row, &col, FIND_POPUP);
-	if (curwin == NULL)
+	ಯದಿ (curwin == ರಿಕ್ತ)
 	{
 	    curwin = old_curwin;
-	    return;
+	    ಪ್ರತ್ಯಾಗಮ;
 	}
 	curbuf = curwin->w_buffer;
     }
 
-    if (curwin == old_curwin)
+    ಯದಿ (curwin == old_curwin)
     {
 	// Don't scroll the current window if the popup menu is visible.
-	if (pum_visible())
-	    return;
+	ಯದಿ (pum_visible())
+	    ಪ್ರತ್ಯಾಗಮ;
 
 	undisplay_dollar();
     }
@@ -1372,7 +1372,7 @@ ins_mousescroll(int dir)
     // Call the common mouse scroll function shared with other modes.
     do_mousescroll(&cap);
 
-    int did_scroll = (orig_topline != curwin->w_topline
+    ಪೂರ್ಣಾಙ್ಕ did_scroll = (orig_topline != curwin->w_topline
 		   || orig_leftcol != curwin->w_leftcol);
 
     curwin->w_redr_status = true;
@@ -1381,7 +1381,7 @@ ins_mousescroll(int dir)
 
     // If the window actually scrolled and the popup menu may overlay the
     // window, need to redraw it.
-    if (did_scroll && pum_visible())
+    ಯದಿ (did_scroll && pum_visible())
     {
 	// TODO: Would be more efficient to only redraw the windows that are
 	// overlapped by the popup menu.
@@ -1389,22 +1389,22 @@ ins_mousescroll(int dir)
 	ins_compl_show_pum();
     }
 
-    if (!EQUAL_POS(curwin->w_cursor, orig_cursor))
+    ಯದಿ (!EQUAL_POS(curwin->w_cursor, orig_cursor))
     {
 	start_arrow(&orig_cursor);
 	set_can_cindent(TRUE);
     }
 }
 
-#if defined(FEAT_PROP_POPUP)
+#ಯದಿ defined(FEAT_PROP_POPUP)
 /*
  * Command-line mode implementation for scrolling in direction "dir", which is
  * one of the MSCR_ values.  Scrolls the completion info popup when the mouse
  * pointer is on top of it.
  * Returns TRUE when the info popup was scrolled.
  */
-    int
-cmdline_mousescroll(int dir)
+    ಪೂರ್ಣಾಙ್ಕ
+cmdline_mousescroll(ಪೂರ್ಣಾಙ್ಕ dir)
 {
     cmdarg_T	cap;
     oparg_T	oa;
@@ -1414,26 +1414,26 @@ cmdline_mousescroll(int dir)
     cap.oap = &oa;
     cap.arg = dir;
 
-    switch (dir)
+    ವಿಕಲ್ಪ (dir)
     {
-	case MSCR_UP:	 cap.cmdchar = K_MOUSEUP; break;
-	case MSCR_DOWN:	 cap.cmdchar = K_MOUSEDOWN; break;
-	case MSCR_LEFT:	 cap.cmdchar = K_MOUSELEFT; break;
-	case MSCR_RIGHT: cap.cmdchar = K_MOUSERIGHT; break;
+	ಪಕ್ಷ MSCR_UP:	 cap.cmdchar = K_MOUSEUP; ಭಙ್ಗ;
+	ಪಕ್ಷ MSCR_DOWN:	 cap.cmdchar = K_MOUSEDOWN; ಭಙ್ಗ;
+	ಪಕ್ಷ MSCR_ಎಡ:	 cap.cmdchar = K_MOUSELEFT; ಭಙ್ಗ;
+	ಪಕ್ಷ MSCR_ಬಲ: cap.cmdchar = K_MOUSERIGHT; ಭಙ್ಗ;
     }
 
-    if (mouse_row < 0 || mouse_col < 0)
-	return FALSE;
+    ಯದಿ (mouse_row < 0 || mouse_col < 0)
+	ಪ್ರತ್ಯಾಗಮ FALSE;
 
-    int	    row = mouse_row;
-    int	    col = mouse_col;
+    ಪೂರ್ಣಾಙ್ಕ	    row = mouse_row;
+    ಪೂರ್ಣಾಙ್ಕ	    col = mouse_col;
     win_T   *wp;
 
     // Only scroll when the mouse is on top of the info popup.
     wp = mouse_find_win(&row, &col, FIND_POPUP);
-    if (wp == NULL || !WIN_IS_POPUP(wp) || !(wp->w_popup_flags & POPF_INFO)
+    ಯದಿ (wp == ರಿಕ್ತ || !WIN_IS_POPUP(wp) || !(wp->w_popup_flags & POPF_INFO)
 							|| !wp->w_has_scrollbar)
-	return FALSE;
+	ಪ್ರತ್ಯಾಗಮ FALSE;
 
     win_T   *old_curwin = curwin;
 
@@ -1446,19 +1446,19 @@ cmdline_mousescroll(int dir)
 
     // Cmdline mode doesn't normally call update_screen(), so redraw the
     // completion popup menu, which also repaints the info popup.
-    if (cmdline_pum_active())
+    ಯದಿ (cmdline_pum_active())
 	cmdline_pum_display();
-    return TRUE;
+    ಪ್ರತ್ಯಾಗಮ TRUE;
 }
 #endif
 
 /*
  * Return TRUE if "c" is a mouse key.
  */
-    int
-is_mouse_key(int c)
+    ಪೂರ್ಣಾಙ್ಕ
+is_mouse_ಕೀಲಿ(ಪೂರ್ಣಾಙ್ಕ c)
 {
-    return c == K_LEFTMOUSE
+    ಪ್ರತ್ಯಾಗಮ c == K_LEFTMOUSE
 	|| c == K_LEFTMOUSE_NM
 	|| c == K_LEFTDRAG
 	|| c == K_LEFTRELEASE
@@ -1482,39 +1482,39 @@ is_mouse_key(int c)
 	|| c == K_X2RELEASE;
 }
 
-static struct mousetable
+ಸ್ಥಿರ ಸಂರಚನಾ mousetable
 {
-    int	    pseudo_code;	// Code for pseudo mouse event
-    int	    button;		// Which mouse button is it?
-    int	    is_click;		// Is it a mouse button click event?
-    int	    is_drag;		// Is it a mouse drag event?
+    ಪೂರ್ಣಾಙ್ಕ	    pseudo_code;	// Code for pseudo mouse event
+    ಪೂರ್ಣಾಙ್ಕ	    button;		// Which mouse button is it?
+    ಪೂರ್ಣಾಙ್ಕ	    is_click;		// Is it a mouse button click event?
+    ಪೂರ್ಣಾಙ್ಕ	    is_drag;		// Is it a mouse drag event?
 } mouse_table[] =
 {
-    {(int)KE_LEFTMOUSE,		MOUSE_LEFT,	TRUE,	FALSE},
+    {(ಪೂರ್ಣಾಙ್ಕ)KE_LEFTMOUSE,		MOUSE_ಎಡ,	TRUE,	FALSE},
 #ifdef FEAT_GUI
-    {(int)KE_LEFTMOUSE_NM,	MOUSE_LEFT,	TRUE,	FALSE},
+    {(ಪೂರ್ಣಾಙ್ಕ)KE_LEFTMOUSE_NM,	MOUSE_ಎಡ,	TRUE,	FALSE},
 #endif
-    {(int)KE_LEFTDRAG,		MOUSE_LEFT,	FALSE,	TRUE},
-    {(int)KE_LEFTRELEASE,	MOUSE_LEFT,	FALSE,	FALSE},
+    {(ಪೂರ್ಣಾಙ್ಕ)KE_LEFTDRAG,		MOUSE_ಎಡ,	FALSE,	TRUE},
+    {(ಪೂರ್ಣಾಙ್ಕ)KE_LEFTRELEASE,	MOUSE_ಎಡ,	FALSE,	FALSE},
 #ifdef FEAT_GUI
-    {(int)KE_LEFTRELEASE_NM,	MOUSE_LEFT,	FALSE,	FALSE},
+    {(ಪೂರ್ಣಾಙ್ಕ)KE_LEFTRELEASE_NM,	MOUSE_ಎಡ,	FALSE,	FALSE},
 #endif
-    {(int)KE_MIDDLEMOUSE,	MOUSE_MIDDLE,	TRUE,	FALSE},
-    {(int)KE_MIDDLEDRAG,	MOUSE_MIDDLE,	FALSE,	TRUE},
-    {(int)KE_MIDDLERELEASE,	MOUSE_MIDDLE,	FALSE,	FALSE},
-    {(int)KE_RIGHTMOUSE,	MOUSE_RIGHT,	TRUE,	FALSE},
-    {(int)KE_RIGHTDRAG,		MOUSE_RIGHT,	FALSE,	TRUE},
-    {(int)KE_RIGHTRELEASE,	MOUSE_RIGHT,	FALSE,	FALSE},
-    {(int)KE_X1MOUSE,		MOUSE_X1,	TRUE,	FALSE},
-    {(int)KE_X1DRAG,		MOUSE_X1,	FALSE,	TRUE},
-    {(int)KE_X1RELEASE,		MOUSE_X1,	FALSE,	FALSE},
-    {(int)KE_X2MOUSE,		MOUSE_X2,	TRUE,	FALSE},
-    {(int)KE_X2DRAG,		MOUSE_X2,	FALSE,	TRUE},
-    {(int)KE_X2RELEASE,		MOUSE_X2,	FALSE,	FALSE},
+    {(ಪೂರ್ಣಾಙ್ಕ)KE_MIDDLEMOUSE,	MOUSE_ಮಧ್ಯ,	TRUE,	FALSE},
+    {(ಪೂರ್ಣಾಙ್ಕ)KE_MIDDLEDRAG,	MOUSE_ಮಧ್ಯ,	FALSE,	TRUE},
+    {(ಪೂರ್ಣಾಙ್ಕ)KE_MIDDLERELEASE,	MOUSE_ಮಧ್ಯ,	FALSE,	FALSE},
+    {(ಪೂರ್ಣಾಙ್ಕ)KE_RIGHTMOUSE,	MOUSE_ಬಲ,	TRUE,	FALSE},
+    {(ಪೂರ್ಣಾಙ್ಕ)KE_RIGHTDRAG,		MOUSE_ಬಲ,	FALSE,	TRUE},
+    {(ಪೂರ್ಣಾಙ್ಕ)KE_RIGHTRELEASE,	MOUSE_ಬಲ,	FALSE,	FALSE},
+    {(ಪೂರ್ಣಾಙ್ಕ)KE_X1MOUSE,		MOUSE_X1,	TRUE,	FALSE},
+    {(ಪೂರ್ಣಾಙ್ಕ)KE_X1DRAG,		MOUSE_X1,	FALSE,	TRUE},
+    {(ಪೂರ್ಣಾಙ್ಕ)KE_X1RELEASE,		MOUSE_X1,	FALSE,	FALSE},
+    {(ಪೂರ್ಣಾಙ್ಕ)KE_X2MOUSE,		MOUSE_X2,	TRUE,	FALSE},
+    {(ಪೂರ್ಣಾಙ್ಕ)KE_X2DRAG,		MOUSE_X2,	FALSE,	TRUE},
+    {(ಪೂರ್ಣಾಙ್ಕ)KE_X2RELEASE,		MOUSE_X2,	FALSE,	FALSE},
     // DRAG without CLICK
-    {(int)KE_MOUSEMOVE,		MOUSE_RELEASE,	FALSE,	TRUE},
+    {(ಪೂರ್ಣಾಙ್ಕ)KE_MOUSEMOVE,		MOUSE_RELEASE,	FALSE,	TRUE},
     // RELEASE without CLICK
-    {(int)KE_IGNORE,		MOUSE_RELEASE,	FALSE,	FALSE},
+    {(ಪೂರ್ಣಾಙ್ಕ)KE_IGNORE,		MOUSE_RELEASE,	FALSE,	FALSE},
     {0,				0,		0,	0},
 };
 
@@ -1522,19 +1522,19 @@ static struct mousetable
  * Look up the given mouse code to return the relevant information in the other
  * arguments.  Return which button is down or was released.
  */
-    int
-get_mouse_button(int code, int *is_click, int *is_drag)
+    ಪೂರ್ಣಾಙ್ಕ
+get_mouse_button(ಪೂರ್ಣಾಙ್ಕ code, ಪೂರ್ಣಾಙ್ಕ *is_click, ಪೂರ್ಣಾಙ್ಕ *is_drag)
 {
-    int	    i;
+    ಪೂರ್ಣಾಙ್ಕ	    i;
 
-    for (i = 0; mouse_table[i].pseudo_code; i++)
-	if (code == mouse_table[i].pseudo_code)
+    ಪ್ರತಿ (i = 0; mouse_table[i].pseudo_code; i++)
+	ಯದಿ (code == mouse_table[i].pseudo_code)
 	{
 	    *is_click = mouse_table[i].is_click;
 	    *is_drag = mouse_table[i].is_drag;
-	    return mouse_table[i].button;
+	    ಪ್ರತ್ಯಾಗಮ mouse_table[i].button;
 	}
-    return 0;	    // Shouldn't get here
+    ಪ್ರತ್ಯಾಗಮ 0;	    // Shouldn't get here
 }
 
 /*
@@ -1542,16 +1542,16 @@ get_mouse_button(int code, int *is_click, int *is_drag)
  * the given information about which mouse button is down, and whether the
  * mouse was clicked, dragged or released.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 get_pseudo_mouse_code(
-    int	    button,	// eg MOUSE_LEFT
-    int	    is_click,
-    int	    is_drag)
+    ಪೂರ್ಣಾಙ್ಕ	    button,	// eg MOUSE_LEFT
+    ಪೂರ್ಣಾಙ್ಕ	    is_click,
+    ಪೂರ್ಣಾಙ್ಕ	    is_drag)
 {
-    int	    i;
+    ಪೂರ್ಣಾಙ್ಕ	    i;
 
-    for (i = 0; mouse_table[i].pseudo_code; i++)
-	if (button == mouse_table[i].button
+    ಪ್ರತಿ (i = 0; mouse_table[i].pseudo_code; i++)
+	ಯದಿ (button == mouse_table[i].button
 	    && is_click == mouse_table[i].is_click
 	    && is_drag == mouse_table[i].is_drag)
 	{
@@ -1559,21 +1559,21 @@ get_pseudo_mouse_code(
 	    // Trick: a non mappable left click and release has mouse_col -1
 	    // or added MOUSE_COLOFF.  Used for 'mousefocus' in
 	    // gui_mouse_moved()
-	    if (mouse_col < 0 || mouse_col > MOUSE_COLOFF)
+	    ಯದಿ (mouse_col < 0 || mouse_col > MOUSE_COLOFF)
 	    {
-		if (mouse_col < 0)
+		ಯದಿ (mouse_col < 0)
 		    mouse_col = 0;
-		else
+		ಅನ್ಯಥಾ
 		    mouse_col -= MOUSE_COLOFF;
-		if (mouse_table[i].pseudo_code == (int)KE_LEFTMOUSE)
-		    return (int)KE_LEFTMOUSE_NM;
-		if (mouse_table[i].pseudo_code == (int)KE_LEFTRELEASE)
-		    return (int)KE_LEFTRELEASE_NM;
+		ಯದಿ (mouse_table[i].pseudo_code == (ಪೂರ್ಣಾಙ್ಕ)KE_LEFTMOUSE)
+		    ಪ್ರತ್ಯಾಗಮ (ಪೂರ್ಣಾಙ್ಕ)KE_LEFTMOUSE_NM;
+		ಯದಿ (mouse_table[i].pseudo_code == (ಪೂರ್ಣಾಙ್ಕ)KE_LEFTRELEASE)
+		    ಪ್ರತ್ಯಾಗಮ (ಪೂರ್ಣಾಙ್ಕ)KE_LEFTRELEASE_NM;
 	    }
 #endif
-	    return mouse_table[i].pseudo_code;
+	    ಪ್ರತ್ಯಾಗಮ mouse_table[i].pseudo_code;
 	}
-    return (int)KE_IGNORE;	    // not recognized, ignore it
+    ಪ್ರತ್ಯಾಗಮ (ಪೂರ್ಣಾಙ್ಕ)KE_IGNORE;	    // not recognized, ignore it
 }
 
 #define HMT_NORMAL	1
@@ -1585,11 +1585,11 @@ get_pseudo_mouse_code(
 #define HMT_GPM	64
 #define HMT_SGR	128
 #define HMT_SGR_REL	256
-static int has_mouse_termcode = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ has_mouse_termcode = 0;
 
-    void
+    ಶೂನ್ಯ
 set_mouse_termcode(
-    int		n,	// KS_MOUSE, KS_NETTERM_MOUSE or KS_DEC_MOUSE
+    ಪೂರ್ಣಾಙ್ಕ		n,	// KS_MOUSE, KS_NETTERM_MOUSE or KS_DEC_MOUSE
     char_u	*s)
 {
     char_u	name[2];
@@ -1598,47 +1598,47 @@ set_mouse_termcode(
     name[1] = KE_FILLER;
     add_termcode(name, s, FALSE);
 #ifdef FEAT_MOUSE_JSB
-    if (n == KS_JSBTERM_MOUSE)
+    ಯದಿ (n == KS_JSBTERM_MOUSE)
 	has_mouse_termcode |= HMT_JSBTERM;
-    else
+    ಅನ್ಯಥಾ
 #endif
 #ifdef FEAT_MOUSE_NET
-    if (n == KS_NETTERM_MOUSE)
+    ಯದಿ (n == KS_NETTERM_MOUSE)
 	has_mouse_termcode |= HMT_NETTERM;
-    else
+    ಅನ್ಯಥಾ
 #endif
 #ifdef FEAT_MOUSE_DEC
-    if (n == KS_DEC_MOUSE)
+    ಯದಿ (n == KS_DEC_MOUSE)
 	has_mouse_termcode |= HMT_DEC;
-    else
+    ಅನ್ಯಥಾ
 #endif
 #ifdef FEAT_MOUSE_PTERM
-    if (n == KS_PTERM_MOUSE)
+    ಯದಿ (n == KS_PTERM_MOUSE)
 	has_mouse_termcode |= HMT_PTERM;
-    else
+    ಅನ್ಯಥಾ
 #endif
 #ifdef FEAT_MOUSE_URXVT
-    if (n == KS_URXVT_MOUSE)
+    ಯದಿ (n == KS_URXVT_MOUSE)
 	has_mouse_termcode |= HMT_URXVT;
-    else
+    ಅನ್ಯಥಾ
 #endif
 #ifdef FEAT_MOUSE_GPM
-    if (n == KS_GPM_MOUSE)
+    ಯದಿ (n == KS_GPM_MOUSE)
 	has_mouse_termcode |= HMT_GPM;
-    else
+    ಅನ್ಯಥಾ
 #endif
-    if (n == KS_SGR_MOUSE)
+    ಯದಿ (n == KS_SGR_MOUSE)
 	has_mouse_termcode |= HMT_SGR;
-    else if (n == KS_SGR_MOUSE_RELEASE)
+    ಅನ್ಯಥಾ ಯದಿ (n == KS_SGR_MOUSE_RELEASE)
 	has_mouse_termcode |= HMT_SGR_REL;
-    else
+    ಅನ್ಯಥಾ
 	has_mouse_termcode |= HMT_NORMAL;
 }
 
-#if defined(UNIX) || defined(VMS)
-    void
+#ಯದಿ defined(UNIX) || defined(VMS)
+    ಶೂನ್ಯ
 del_mouse_termcode(
-    int		n)	// KS_MOUSE, KS_NETTERM_MOUSE or KS_DEC_MOUSE
+    ಪೂರ್ಣಾಙ್ಕ		n)	// KS_MOUSE, KS_NETTERM_MOUSE or KS_DEC_MOUSE
 {
     char_u	name[2];
 
@@ -1646,40 +1646,40 @@ del_mouse_termcode(
     name[1] = KE_FILLER;
     del_termcode(name);
 # ifdef FEAT_MOUSE_JSB
-    if (n == KS_JSBTERM_MOUSE)
+    ಯದಿ (n == KS_JSBTERM_MOUSE)
 	has_mouse_termcode &= ~HMT_JSBTERM;
-    else
+    ಅನ್ಯಥಾ
 # endif
 # ifdef FEAT_MOUSE_NET
-    if (n == KS_NETTERM_MOUSE)
+    ಯದಿ (n == KS_NETTERM_MOUSE)
 	has_mouse_termcode &= ~HMT_NETTERM;
-    else
+    ಅನ್ಯಥಾ
 # endif
 # ifdef FEAT_MOUSE_DEC
-    if (n == KS_DEC_MOUSE)
+    ಯದಿ (n == KS_DEC_MOUSE)
 	has_mouse_termcode &= ~HMT_DEC;
-    else
+    ಅನ್ಯಥಾ
 # endif
 # ifdef FEAT_MOUSE_PTERM
-    if (n == KS_PTERM_MOUSE)
+    ಯದಿ (n == KS_PTERM_MOUSE)
 	has_mouse_termcode &= ~HMT_PTERM;
-    else
+    ಅನ್ಯಥಾ
 # endif
 # ifdef FEAT_MOUSE_URXVT
-    if (n == KS_URXVT_MOUSE)
+    ಯದಿ (n == KS_URXVT_MOUSE)
 	has_mouse_termcode &= ~HMT_URXVT;
-    else
+    ಅನ್ಯಥಾ
 # endif
 # ifdef FEAT_MOUSE_GPM
-    if (n == KS_GPM_MOUSE)
+    ಯದಿ (n == KS_GPM_MOUSE)
 	has_mouse_termcode &= ~HMT_GPM;
-    else
+    ಅನ್ಯಥಾ
 # endif
-    if (n == KS_SGR_MOUSE)
+    ಯದಿ (n == KS_SGR_MOUSE)
 	has_mouse_termcode &= ~HMT_SGR;
-    else if (n == KS_SGR_MOUSE_RELEASE)
+    ಅನ್ಯಥಾ ಯದಿ (n == KS_SGR_MOUSE_RELEASE)
 	has_mouse_termcode &= ~HMT_SGR_REL;
-    else
+    ಅನ್ಯಥಾ
 	has_mouse_termcode &= ~HMT_NORMAL;
 }
 #endif
@@ -1687,10 +1687,10 @@ del_mouse_termcode(
 /*
  * setmouse() - switch mouse on/off depending on current mode and 'mouse'
  */
-    void
-setmouse(void)
+    ಶೂನ್ಯ
+setmouse(ಶೂನ್ಯ)
 {
-    int	    checkfor;
+    ಪೂರ್ಣಾಙ್ಕ	    checkfor;
 
 #ifdef FEAT_MOUSESHAPE
     update_mouseshape(-1);
@@ -1699,37 +1699,37 @@ setmouse(void)
     // Should be outside proc, but may break MOUSESHAPE
 #ifdef FEAT_GUI
     // In the GUI the mouse is always enabled.
-    if (gui.in_use)
-	return;
+    ಯದಿ (gui.in_use)
+	ಪ್ರತ್ಯಾಗಮ;
 #endif
     // be quick when mouse is off
-    if (*p_mouse == NUL || has_mouse_termcode == 0)
-	return;
+    ಯದಿ (*p_mouse == NUL || has_mouse_termcode == 0)
+	ಪ್ರತ್ಯಾಗಮ;
 
     // don't switch mouse on when not in raw mode (Ex mode)
-    if (cur_tmode != TMODE_RAW)
+    ಯದಿ (cur_tmode != TMODE_RAW)
     {
 	mch_setmouse(FALSE);
-	return;
+	ಪ್ರತ್ಯಾಗಮ;
     }
 
-    if (VIsual_active)
+    ಯದಿ (VIsual_active)
 	checkfor = MOUSE_VISUAL;
-    else if (State == MODE_HITRETURN || State == MODE_ASKMORE
+    ಅನ್ಯಥಾ ಯದಿ (State == MODE_HITRETURN || State == MODE_ASKMORE
 						     || State == MODE_SETWSIZE)
 	checkfor = MOUSE_RETURN;
-    else if (State & MODE_INSERT)
-	checkfor = MOUSE_INSERT;
-    else if (State & MODE_CMDLINE)
+    ಅನ್ಯಥಾ ಯದಿ (State & MODE_ಸೇರಿಸು)
+	checkfor = MOUSE_ಸೇರಿಸು;
+    ಅನ್ಯಥಾ ಯದಿ (State & MODE_CMDLINE)
 	checkfor = MOUSE_COMMAND;
-    else if (State == MODE_CONFIRM || State == MODE_EXTERNCMD)
+    ಅನ್ಯಥಾ ಯದಿ (State == MODE_CONFIRM || State == MODE_EXTERNCMD)
 	checkfor = ' '; // don't use mouse for ":confirm" or ":!cmd"
-    else
+    ಅನ್ಯಥಾ
 	checkfor = MOUSE_NORMAL;    // assume normal mode
 
-    if (mouse_has(checkfor))
+    ಯದಿ (mouse_has(checkfor))
 	mch_setmouse(TRUE);
-    else
+    ಅನ್ಯಥಾ
 	mch_setmouse(FALSE);
 }
 
@@ -1740,32 +1740,32 @@ setmouse(void)
  * - the current buffer is a help file and 'h' is in 'mouse' and we are in a
  *   normal editing mode (not at hit-return message).
  */
-    int
-mouse_has(int c)
+    ಪೂರ್ಣಾಙ್ಕ
+mouse_has(ಪೂರ್ಣಾಙ್ಕ c)
 {
     char_u	*p;
 
-    for (p = p_mouse; *p; ++p)
-	switch (*p)
+    ಪ್ರತಿ (p = p_mouse; *p; ++p)
+	ವಿಕಲ್ಪ (*p)
 	{
-	    case 'a': if (vim_strchr((char_u *)MOUSE_A, c) != NULL)
-			  return TRUE;
-		      break;
-	    case MOUSE_HELP: if (c != MOUSE_RETURN && curbuf->b_help)
-				 return TRUE;
-			     break;
-	    default: if (c == *p) return TRUE; break;
+	    ಪಕ್ಷ 'a': ಯದಿ (vim_strchr((char_u *)MOUSE_A, c) != ರಿಕ್ತ)
+			  ಪ್ರತ್ಯಾಗಮ TRUE;
+		      ಭಙ್ಗ;
+	    ಪಕ್ಷ MOUSE_HELP: ಯದಿ (c != MOUSE_RETURN && curbuf->b_help)
+				 ಪ್ರತ್ಯಾಗಮ TRUE;
+			     ಭಙ್ಗ;
+	    ಸ್ವಭಾವ: ಯದಿ (c == *p) ಪ್ರತ್ಯಾಗಮ TRUE; ಭಙ್ಗ;
 	}
-    return FALSE;
+    ಪ್ರತ್ಯಾಗಮ FALSE;
 }
 
 /*
  * Return TRUE when 'mousemodel' is set to "popup" or "popup_setpos".
  */
-    int
-mouse_model_popup(void)
+    ಪೂರ್ಣಾಙ್ಕ
+mouse_model_popup(ಶೂನ್ಯ)
 {
-    return (p_mousem[0] == 'p');
+    ಪ್ರತ್ಯಾಗಮ (p_mousem[0] == 'p');
 }
 
 /*
@@ -1774,78 +1774,78 @@ mouse_model_popup(void)
  * "winid" is stored as the "winid" key in the info dict (0 for tabline).
  * Returns TRUE if the function was called and handled the click.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
 stl_click_handler_regions(
 	stl_click_region_T  *regions,
-	int		    region_count,
-	int		    winid,
+	ಪೂರ್ಣಾಙ್ಕ		    region_ಎಣಿಕೆ,
+	ಪೂರ್ಣಾಙ್ಕ		    winid,
 	char_u		    *area_name,
-	int		    mrow,
-	int		    mcol,
-	int		    which_button,
-	int		    mods)
+	ಪೂರ್ಣಾಙ್ಕ		    mrow,
+	ಪೂರ್ಣಾಙ್ಕ		    mcol,
+	ಪೂರ್ಣಾಙ್ಕ		    which_button,
+	ಪೂರ್ಣಾಙ್ಕ		    mods)
 {
 #ifdef FEAT_EVAL
-    int		n;
-    int		nclicks;
+    ಪೂರ್ಣಾಙ್ಕ		n;
+    ಪೂರ್ಣಾಙ್ಕ		nclicks;
     char_u	button_str[2];
     char_u	mods_str[4];
-    int		mi = 0;
+    ಪೂರ್ಣಾಙ್ಕ		mi = 0;
     dict_T	*info;
     typval_T	argvars[2];
     typval_T	rettv;
     funcexe_T	funcexe;
-    int		col = mcol;
+    ಪೂರ್ಣಾಙ್ಕ		col = mcol;
 
-    if (regions == NULL || region_count == 0)
-	return FALSE;
+    ಯದಿ (regions == ರಿಕ್ತ || region_ಎಣಿಕೆ == 0)
+	ಪ್ರತ್ಯಾಗಮ FALSE;
 
     // Find the click region at the given row and column.
-    for (n = 0; n < region_count; n++)
+    ಪ್ರತಿ (n = 0; n < region_ಎಣಿಕೆ; n++)
     {
-	if (regions[n].row == mrow
+	ಯದಿ (regions[n].row == mrow
 		&& col >= regions[n].col_start
 		&& col < regions[n].col_end)
-	    break;
+	    ಭಙ್ಗ;
     }
-    if (n >= region_count || regions[n].funcname == NULL)
-	return FALSE;
+    ಯದಿ (n >= region_ಎಣಿಕೆ || regions[n].funcname == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FALSE;
 
     // Build the info dictionary.
     info = dict_alloc();
-    if (info == NULL)
-	return FALSE;
+    ಯದಿ (info == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FALSE;
 
-    dict_add_number(info, "minwid", regions[n].minwid);
+    dict_add_ಸಂಖ್ಯೆ(info, "minwid", regions[n].minwid);
 
     // Determine number of clicks.
     // MOD_MASK_2CLICK=0x20, MOD_MASK_3CLICK=0x40, MOD_MASK_4CLICK=0x60
     nclicks = ((mods & MOD_MASK_MULTI_CLICK) >> 5) + 1;
-    if (nclicks > 3)
+    ಯದಿ (nclicks > 3)
 	nclicks = 3;
-    dict_add_number(info, "nclicks", nclicks);
+    dict_add_ಸಂಖ್ಯೆ(info, "nclicks", nclicks);
 
     // Button.
-    if (which_button == MOUSE_LEFT)
+    ಯದಿ (which_button == MOUSE_ಎಡ)
 	button_str[0] = 'l';
-    else if (which_button == MOUSE_RIGHT)
+    ಅನ್ಯಥಾ ಯದಿ (which_button == MOUSE_ಬಲ)
 	button_str[0] = 'r';
-    else
+    ಅನ್ಯಥಾ
 	button_str[0] = 'm';
     button_str[1] = NUL;
     dict_add_string_len(info, "button", button_str, 1);
 
     // Modifiers.
-    if (mods & MOD_MASK_SHIFT)
+    ಯದಿ (mods & MOD_MASK_SHIFT)
 	mods_str[mi++] = 's';
-    if (mods & MOD_MASK_CTRL)
+    ಯದಿ (mods & MOD_MASK_CTRL)
 	mods_str[mi++] = 'c';
-    if (mods & MOD_MASK_ALT)
+    ಯದಿ (mods & MOD_MASK_ALT)
 	mods_str[mi++] = 'a';
     mods_str[mi] = NUL;
     dict_add_string_len(info, "mods", mods_str, mi);
 
-    dict_add_number(info, "winid", winid);
+    dict_add_ಸಂಖ್ಯೆ(info, "winid", winid);
 
     // "area": which option the clicked region belongs to.  Lets a shared
     // dispatcher distinguish 'statusline', 'tabline' and 'tabpanel' without
@@ -1853,8 +1853,8 @@ stl_click_handler_regions(
     dict_add_string(info, "area", area_name);
 
     // Expose tab page number for 'tabpanel' regions.
-    if (regions[n].tabnr > 0)
-	dict_add_number(info, "tabnr", regions[n].tabnr);
+    ಯದಿ (regions[n].tabnr > 0)
+	dict_add_ಸಂಖ್ಯೆ(info, "tabnr", regions[n].tabnr);
 
     // Call the function with the info dict as argument.
     argvars[0].v_type = VAR_DICT;
@@ -1862,44 +1862,44 @@ stl_click_handler_regions(
     ++info->dv_refcount;
     argvars[1].v_type = VAR_UNKNOWN;
 
-    rettv.v_type = VAR_NUMBER;
-    rettv.vval.v_number = 0;
+    rettv.v_type = VAR_ಸಂಖ್ಯೆ;
+    rettv.vval.v_ಸಂಖ್ಯೆ = 0;
 
     CLEAR_FIELD(funcexe);
     funcexe.fe_evaluate = TRUE;
-    (void)call_func(regions[n].funcname, -1,
+    (ಶೂನ್ಯ)call_func(regions[n].funcname, -1,
 					    &rettv, 1, argvars, &funcexe);
 
-    n = (int)rettv.vval.v_number;
+    n = (ಪೂರ್ಣಾಙ್ಕ)rettv.vval.v_ಸಂಖ್ಯೆ;
     clear_tv(&rettv);
     dict_unref(info);
 
-    if (n != 0)
+    ಯದಿ (n != 0)
     {
 	// Make sure the tabline gets redrawn too when the callback asks for
 	// a redraw (redraw_statuslines() only redraws the tabline when
 	// redraw_tabline is set).  For tabpanel the whole screen needs to be
 	// refreshed.
-	if (winid == 0)
+	ಯದಿ (winid == 0)
 	    redraw_tabline = TRUE;
 # ifdef FEAT_TABPANEL
-	if (STRCMP(area_name, "tabpanel") == 0)
+	ಯದಿ (STRCMP(area_name, "tabpanel") == 0)
 	    redraw_all_later(UPD_NOT_VALID);
 # endif
 	redraw_statuslines();
     }
 
-    return TRUE;
-#else
-    (void)regions;
-    (void)region_count;
-    (void)winid;
-    (void)area_name;
-    (void)mrow;
-    (void)mcol;
-    (void)which_button;
-    (void)mods;
-    return FALSE;
+    ಪ್ರತ್ಯಾಗಮ TRUE;
+#ಅನ್ಯಥಾ
+    (ಶೂನ್ಯ)regions;
+    (ಶೂನ್ಯ)region_ಎಣಿಕೆ;
+    (ಶೂನ್ಯ)winid;
+    (ಶೂನ್ಯ)area_name;
+    (ಶೂನ್ಯ)mrow;
+    (ಶೂನ್ಯ)mcol;
+    (ಶೂನ್ಯ)which_button;
+    (ಶೂನ್ಯ)mods;
+    ಪ್ರತ್ಯಾಗಮ FALSE;
 #endif
 }
 
@@ -1907,12 +1907,12 @@ stl_click_handler_regions(
  * Call a statusline click handler function for window "wp".
  * Returns TRUE if the function was called and handled the click.
  */
-    static int
-stl_click_handler(win_T *wp, int mrow, int mcol, int which_button, int mods)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+stl_click_handler(win_T *wp, ಪೂರ್ಣಾಙ್ಕ mrow, ಪೂರ್ಣಾಙ್ಕ mcol, ಪೂರ್ಣಾಙ್ಕ which_button, ಪೂರ್ಣಾಙ್ಕ mods)
 {
-    if (wp == NULL)
-	return FALSE;
-    return stl_click_handler_regions(wp->w_stl_click, wp->w_stl_click_count,
+    ಯದಿ (wp == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FALSE;
+    ಪ್ರತ್ಯಾಗಮ stl_click_handler_regions(wp->w_stl_click, wp->w_stl_click_ಎಣಿಕೆ,
 				wp->w_id, (char_u *)"statusline",
 				mrow, mcol, which_button, mods);
 }
@@ -1922,10 +1922,10 @@ stl_click_handler(win_T *wp, int mrow, int mcol, int which_button, int mods)
 /*
  * Reset the window being dragged.  To be called when switching tab page.
  */
-    void
-reset_dragwin(void)
+    ಶೂನ್ಯ
+reset_dragwin(ಶೂನ್ಯ)
 {
-    dragwin = NULL;
+    dragwin = ರಿಕ್ತ;
 }
 
 /*
@@ -1954,212 +1954,212 @@ reset_dragwin(void)
  * If flags has MOUSE_SETPOS, nothing is done, only the current position is
  * remembered.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 jump_to_mouse(
-    int		flags,
-    int		*inclusive,	// used for inclusive operator, can be NULL
-    int		which_button)	// MOUSE_LEFT, MOUSE_RIGHT, MOUSE_MIDDLE
+    ಪೂರ್ಣಾಙ್ಕ		flags,
+    ಪೂರ್ಣಾಙ್ಕ		*inclusive,	// used for inclusive operator, can be NULL
+    ಪೂರ್ಣಾಙ್ಕ		which_button)	// MOUSE_LEFT, MOUSE_RIGHT, MOUSE_MIDDLE
 {
-    static int	on_status_line = 0;	// #lines below bottom of window
-    static int	on_sep_line = 0;	// on separator right of window
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ	on_status_ಸಾಲು = 0;	// #lines below bottom of window
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ	on_sep_ಸಾಲು = 0;	// on separator right of window
 #ifdef FEAT_MENU
-    static int  in_winbar = FALSE;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ  in_winbar = FALSE;
 #endif
 #ifdef FEAT_PROP_POPUP
-    static int   in_popup_win = FALSE;
-    static win_T *click_in_popup_win = NULL;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ   in_popup_win = FALSE;
+    ಸ್ಥಿರ win_T *click_in_popup_win = ರಿಕ್ತ;
 #endif
-    static int	prev_row = -1;
-    static int	prev_col = -1;
-    static int	did_drag = FALSE;	// drag was noticed
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ	prev_row = -1;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ	prev_col = -1;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ	did_drag = FALSE;	// drag was noticed
 
     win_T	*wp, *old_curwin;
     pos_T	old_cursor;
-    int		count;
-    int		first;
-    int		row = mouse_row;
-    int		col = mouse_col;
+    ಪೂರ್ಣಾಙ್ಕ		ಎಣಿಕೆ;
+    ಪೂರ್ಣಾಙ್ಕ		first;
+    ಪೂರ್ಣಾಙ್ಕ		row = mouse_row;
+    ಪೂರ್ಣಾಙ್ಕ		col = mouse_col;
     colnr_T	col_from_screen = -1;
 #ifdef FEAT_FOLDING
-    int		mouse_char = ' ';
+    ಪೂರ್ಣಾಙ್ಕ		mouse_char = ' ';
 #endif
 
     mouse_past_bottom = FALSE;
     mouse_past_eol = FALSE;
 
-    if (flags & MOUSE_RELEASED)
+    ಯದಿ (flags & MOUSE_RELEASED)
     {
 	// On button release we may change window focus if positioned on a
 	// status line and no dragging happened.
-	if (dragwin != NULL && !did_drag)
+	ಯದಿ (dragwin != ರಿಕ್ತ && !did_drag)
 	    flags &= ~(MOUSE_FOCUS | MOUSE_DID_MOVE);
-	dragwin = NULL;
+	dragwin = ರಿಕ್ತ;
 	did_drag = FALSE;
 #ifdef FEAT_PROP_POPUP
-	if (click_in_popup_win != NULL && popup_dragwin == NULL)
+	ಯದಿ (click_in_popup_win != ರಿಕ್ತ && popup_dragwin == ರಿಕ್ತ)
 	    popup_close_for_mouse_click(click_in_popup_win);
 
-	popup_dragwin = NULL;
-	click_in_popup_win = NULL;
+	popup_dragwin = ರಿಕ್ತ;
+	click_in_popup_win = ರಿಕ್ತ;
 #endif
     }
 
-    if ((flags & MOUSE_DID_MOVE)
+    ಯದಿ ((flags & MOUSE_DID_MOVE)
 	    && prev_row == mouse_row
 	    && prev_col == mouse_col)
     {
 retnomove:
 	// before moving the cursor for a left click which is NOT in a status
 	// line, stop Visual mode
-	if (on_status_line)
-	    return IN_STATUS_LINE;
-	if (on_sep_line)
-	    return IN_SEP_LINE;
+	ಯದಿ (on_status_ಸಾಲು)
+	    ಪ್ರತ್ಯಾಗಮ IN_STATUS_ಸಾಲು;
+	ಯದಿ (on_sep_ಸಾಲು)
+	    ಪ್ರತ್ಯಾಗಮ IN_SEP_ಸಾಲು;
 #ifdef FEAT_MENU
-	if (in_winbar)
+	ಯದಿ (in_winbar)
 	{
 	    // A quick second click may arrive as a double-click, but we use it
 	    // as a second click in the WinBar.
-	    if ((mod_mask & MOD_MASK_MULTI_CLICK) && !(flags & MOUSE_RELEASED))
+	    ಯದಿ ((mod_mask & MOD_MASK_MULTI_CLICK) && !(flags & MOUSE_RELEASED))
 	    {
 		wp = mouse_find_win(&row, &col, FAIL_POPUP);
-		if (wp == NULL)
-		    return IN_UNKNOWN;
+		ಯದಿ (wp == ರಿಕ್ತ)
+		    ಪ್ರತ್ಯಾಗಮ IN_UNKNOWN;
 		winbar_click(wp, col);
 	    }
-	    return IN_OTHER_WIN | MOUSE_WINBAR;
+	    ಪ್ರತ್ಯಾಗಮ IN_OTHER_WIN | MOUSE_WINBAR;
 	}
 #endif
-	if (flags & MOUSE_MAY_STOP_VIS)
+	ಯದಿ (flags & MOUSE_MAY_STOP_VIS)
 	{
 	    end_visual_mode_keep_button();
 	    redraw_curbuf_later(UPD_INVERTED);	// delete the inversion
 	}
-#if defined(FEAT_CLIPBOARD)
+#ಯದಿ defined(FEAT_CLIPBOARD)
 	// Continue a modeless selection in another window.
-	if (cmdwin_type != 0 && row < cmdwin_win->w_winrow)
-	    return IN_OTHER_WIN;
+	ಯದಿ (cmdwin_type != 0 && row < cmdwin_win->w_winrow)
+	    ಪ್ರತ್ಯಾಗಮ IN_OTHER_WIN;
 #endif
 #ifdef FEAT_PROP_POPUP
 	// Continue a modeless selection in a popup window or dragging it.
-	if (in_popup_win)
+	ಯದಿ (in_popup_win)
 	{
-	    click_in_popup_win = NULL;  // don't close it on release
-	    if (popup_dragwin != NULL)
+	    click_in_popup_win = ರಿಕ್ತ;  // don't close it on release
+	    ಯದಿ (popup_dragwin != ರಿಕ್ತ)
 	    {
 		// dragging a popup window
 		popup_drag(popup_dragwin);
-		return IN_UNKNOWN;
+		ಪ್ರತ್ಯಾಗಮ IN_UNKNOWN;
 	    }
-	    return IN_OTHER_WIN;
+	    ಪ್ರತ್ಯಾಗಮ IN_OTHER_WIN;
 	}
 #endif
-	return IN_BUFFER;
+	ಪ್ರತ್ಯಾಗಮ IN_BUFFER;
     }
 
     prev_row = mouse_row;
     prev_col = mouse_col;
 
-    if (flags & MOUSE_SETPOS)
-	goto retnomove;				// ugly goto...
+    ಯದಿ (flags & MOUSE_SETPOS)
+	ಗಚ್ಛ retnomove;				// ugly goto...
 
     old_curwin = curwin;
     old_cursor = curwin->w_cursor;
 
-    if (!(flags & MOUSE_FOCUS))
+    ಯದಿ (!(flags & MOUSE_FOCUS))
     {
-	if (row < 0 || col < 0) // check if it makes sense
-	    return IN_UNKNOWN;
+	ಯದಿ (row < 0 || col < 0) // check if it makes sense
+	    ಪ್ರತ್ಯಾಗಮ IN_UNKNOWN;
 
 	// find the window where the row is in and adjust "row" and "col" to be
 	// relative to top-left of the window
 	wp = mouse_find_win(&row, &col, FIND_POPUP);
-	if (wp == NULL)
-	    return IN_UNKNOWN;
-	dragwin = NULL;
+	ಯದಿ (wp == ರಿಕ್ತ)
+	    ಪ್ರತ್ಯಾಗಮ IN_UNKNOWN;
+	dragwin = ರಿಕ್ತ;
 
 #ifdef FEAT_PROP_POPUP
 	// Click in a popup window may start dragging or modeless selection,
 	// but not much else.
-	if (WIN_IS_POPUP(wp))
+	ಯದಿ (WIN_IS_POPUP(wp))
 	{
-	    on_sep_line = 0;
-	    on_status_line = 0;
+	    on_sep_ಸಾಲು = 0;
+	    on_status_ಸಾಲು = 0;
 	    in_popup_win = TRUE;
-	    if (which_button == MOUSE_LEFT && popup_close_if_on_X(wp, row, col))
+	    ಯದಿ (which_button == MOUSE_ಎಡ && popup_close_if_on_X(wp, row, col))
 	    {
-		return IN_UNKNOWN;
+		ಪ್ರತ್ಯಾಗಮ IN_UNKNOWN;
 	    }
-	    else if (((wp->w_popup_flags & (POPF_DRAG | POPF_RESIZE))
+	    ಅನ್ಯಥಾ ಯದಿ (((wp->w_popup_flags & (POPF_DRAG | POPF_RESIZE))
 					      && popup_on_border(wp, row, col))
 				       || (wp->w_popup_flags & POPF_DRAGALL))
 	    {
 		popup_dragwin = wp;
 		popup_start_drag(wp, row, col);
-		return IN_UNKNOWN;
+		ಪ್ರತ್ಯಾಗಮ IN_UNKNOWN;
 	    }
 	    // Only close on release, otherwise it's not possible to drag or do
 	    // modeless selection.
-	    else if (wp->w_popup_close == POPCLOSE_CLICK
-		    && which_button == MOUSE_LEFT)
+	    ಅನ್ಯಥಾ ಯದಿ (wp->w_popup_close == POPCLOSE_CLICK
+		    && which_button == MOUSE_ಎಡ)
 	    {
 		click_in_popup_win = wp;
 	    }
-	    else if (which_button == MOUSE_LEFT)
+	    ಅನ್ಯಥಾ ಯದಿ (which_button == MOUSE_ಎಡ)
 		// If the click is in the scrollbar, may scroll up/down.
 		popup_handle_scrollbar_click(wp, row, col);
 # ifdef FEAT_CLIPBOARD
-	    return IN_OTHER_WIN;
-# else
-	    return IN_UNKNOWN;
+	    ಪ್ರತ್ಯಾಗಮ IN_OTHER_WIN;
+# ಅನ್ಯಥಾ
+	    ಪ್ರತ್ಯಾಗಮ IN_UNKNOWN;
 # endif
 	}
 	in_popup_win = FALSE;
-	popup_dragwin = NULL;
+	popup_dragwin = ರಿಕ್ತ;
 #endif
 #ifdef FEAT_MENU
-	if (row == -1)
+	ಯದಿ (row == -1)
 	{
 	    // A click in the window toolbar does not enter another window or
 	    // change Visual highlighting.
 	    winbar_click(wp, col);
 	    in_winbar = TRUE;
-	    return IN_OTHER_WIN | MOUSE_WINBAR;
+	    ಪ್ರತ್ಯಾಗಮ IN_OTHER_WIN | MOUSE_WINBAR;
 	}
 	in_winbar = FALSE;
 #endif
 
 	// winpos and height may change in win_enter()!
-	if (row >= wp->w_height)		// In (or below) status line
+	ಯದಿ (row >= wp->w_height)		// In (or below) status line
 	{
-	    on_status_line = row - wp->w_height + 1;
+	    on_status_ಸಾಲು = row - wp->w_height + 1;
 	    dragwin = wp;
 	}
-	else
-	    on_status_line = 0;
-	if (col >= wp->w_width)		// In separator line
+	ಅನ್ಯಥಾ
+	    on_status_ಸಾಲು = 0;
+	ಯದಿ (col >= wp->w_width)		// In separator line
 	{
-	    on_sep_line = col - wp->w_width + 1;
+	    on_sep_ಸಾಲು = col - wp->w_width + 1;
 	    dragwin = wp;
 	}
-	else
-	    on_sep_line = 0;
+	ಅನ್ಯಥಾ
+	    on_sep_ಸಾಲು = 0;
 
 	// The rightmost character of the status line might be a vertical
 	// separator character if there is no connecting window to the right.
-	if (on_status_line && on_sep_line)
+	ಯದಿ (on_status_ಸಾಲು && on_sep_ಸಾಲು)
 	{
-	    if (stl_connected(wp))
-		on_sep_line = 0;
-	    else
-		on_status_line = 0;
+	    ಯದಿ (stl_connected(wp))
+		on_sep_ಸಾಲು = 0;
+	    ಅನ್ಯಥಾ
+		on_status_ಸಾಲು = 0;
 	}
 
 	// Before jumping to another buffer, or moving the cursor for a left
 	// click, stop Visual mode.
-	if (VIsual_active
+	ಯದಿ (VIsual_active
 		&& (wp->w_buffer != curwin->w_buffer
-		    || (!on_status_line && !on_sep_line
+		    || (!on_status_ಸಾಲು && !on_sep_ಸಾಲು
 #ifdef FEAT_FOLDING
 			&& (
 # ifdef FEAT_RIGHTLEFT
@@ -2173,33 +2173,33 @@ retnomove:
 	    end_visual_mode_keep_button();
 	    redraw_curbuf_later(UPD_INVERTED);	// delete the inversion
 	}
-	if (cmdwin_type != 0 && wp != cmdwin_win)
+	ಯದಿ (cmdwin_type != 0 && wp != cmdwin_win)
 	{
 	    // A click outside the command-line window: Use modeless
 	    // selection if possible.  Allow dragging the status lines.
-	    on_sep_line = 0;
+	    on_sep_ಸಾಲು = 0;
 #ifdef FEAT_CLIPBOARD
-	    if (on_status_line)
-		return IN_STATUS_LINE;
-	    return IN_OTHER_WIN;
-#else
+	    ಯದಿ (on_status_ಸಾಲು)
+		ಪ್ರತ್ಯಾಗಮ IN_STATUS_ಸಾಲು;
+	    ಪ್ರತ್ಯಾಗಮ IN_OTHER_WIN;
+#ಅನ್ಯಥಾ
 	    row = 0;
 	    col += wp->w_wincol;
 	    wp = cmdwin_win;
 #endif
 	}
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_TERMINAL)
-	if (popup_is_popup(curwin) && curbuf->b_term != NULL)
+#ಯದಿ defined(FEAT_PROP_POPUP) && defined(FEAT_TERMINAL)
+	ಯದಿ (popup_is_popup(curwin) && curbuf->b_term != ರಿಕ್ತ)
 	    // terminal in popup window: don't jump to another window
-	    return IN_OTHER_WIN;
+	    ಪ್ರತ್ಯಾಗಮ IN_OTHER_WIN;
 #endif
 	// Only change window focus when not clicking on or dragging the
 	// status line.  Do change focus when releasing the mouse button
 	// (MOUSE_FOCUS was set above if we dragged first).
-	if (dragwin == NULL || (flags & MOUSE_RELEASED))
+	ಯದಿ (dragwin == ರಿಕ್ತ || (flags & MOUSE_RELEASED))
 	    win_enter(wp, TRUE);		// can make wp invalid!
 
-	if (curwin != old_curwin)
+	ಯದಿ (curwin != old_curwin)
 	{
 #ifdef CHECK_DOUBLE_CLICK
 	    // set topline, to be able to check for double click ourselves
@@ -2210,21 +2210,21 @@ retnomove:
 	    term_win_entered();
 #endif
 	}
-	if (on_status_line)			// In (or below) status line
+	ಯದಿ (on_status_ಸಾಲು)			// In (or below) status line
 	{
 	    // Don't use start_arrow() if we're in the same window
-	    if (curwin == old_curwin)
-		return IN_STATUS_LINE;
-	    else
-		return IN_STATUS_LINE | CURSOR_MOVED;
+	    ಯದಿ (curwin == old_curwin)
+		ಪ್ರತ್ಯಾಗಮ IN_STATUS_ಸಾಲು;
+	    ಅನ್ಯಥಾ
+		ಪ್ರತ್ಯಾಗಮ IN_STATUS_ಸಾಲು | CURSOR_MOVED;
 	}
-	if (on_sep_line)			// In (or below) status line
+	ಯದಿ (on_sep_ಸಾಲು)			// In (or below) status line
 	{
 	    // Don't use start_arrow() if we're in the same window
-	    if (curwin == old_curwin)
-		return IN_SEP_LINE;
-	    else
-		return IN_SEP_LINE | CURSOR_MOVED;
+	    ಯದಿ (curwin == old_curwin)
+		ಪ್ರತ್ಯಾಗಮ IN_SEP_ಸಾಲು;
+	    ಅನ್ಯಥಾ
+		ಪ್ರತ್ಯಾಗಮ IN_SEP_ಸಾಲು | CURSOR_MOVED;
 	}
 
 	curwin->w_cursor.lnum = curwin->w_topline;
@@ -2236,63 +2236,63 @@ retnomove:
 # endif
 #endif
     }
-    else if (on_status_line && which_button == MOUSE_LEFT)
+    ಅನ್ಯಥಾ ಯದಿ (on_status_ಸಾಲು && which_button == MOUSE_ಎಡ)
     {
-	if (dragwin != NULL)
+	ಯದಿ (dragwin != ರಿಕ್ತ)
 	{
 	    // Drag the status line
-	    count = row - W_WINROW(dragwin) - dragwin->w_height + 1
-							     - on_status_line;
-	    win_drag_status_line(dragwin, count);
-	    did_drag |= count;
+	    ಎಣಿಕೆ = row - W_WINROW(dragwin) - dragwin->w_height + 1
+							     - on_status_ಸಾಲು;
+	    win_drag_status_ಸಾಲು(dragwin, ಎಣಿಕೆ);
+	    did_drag |= ಎಣಿಕೆ;
 	}
-	return IN_STATUS_LINE;			// Cursor didn't move
+	ಪ್ರತ್ಯಾಗಮ IN_STATUS_ಸಾಲು;			// Cursor didn't move
     }
-    else if (on_sep_line && which_button == MOUSE_LEFT)
+    ಅನ್ಯಥಾ ಯದಿ (on_sep_ಸಾಲು && which_button == MOUSE_ಎಡ)
     {
-	if (dragwin != NULL)
+	ಯದಿ (dragwin != ರಿಕ್ತ)
 	{
 	    // Drag the separator column
-	    count = col - dragwin->w_wincol - dragwin->w_width + 1
-								- on_sep_line;
-	    win_drag_vsep_line(dragwin, count);
-	    did_drag |= count;
+	    ಎಣಿಕೆ = col - dragwin->w_wincol - dragwin->w_width + 1
+								- on_sep_ಸಾಲು;
+	    win_drag_vsep_ಸಾಲು(dragwin, ಎಣಿಕೆ);
+	    did_drag |= ಎಣಿಕೆ;
 	}
-	return IN_SEP_LINE;			// Cursor didn't move
+	ಪ್ರತ್ಯಾಗಮ IN_SEP_ಸಾಲು;			// Cursor didn't move
     }
 #ifdef FEAT_MENU
-    else if (in_winbar)
+    ಅನ್ಯಥಾ ಯದಿ (in_winbar)
     {
 	// After a click on the window toolbar don't start Visual mode.
-	return IN_OTHER_WIN | MOUSE_WINBAR;
+	ಪ್ರತ್ಯಾಗಮ IN_OTHER_WIN | MOUSE_WINBAR;
     }
 #endif
-    else // keep_window_focus must be TRUE
+    ಅನ್ಯಥಾ // keep_window_focus must be TRUE
     {
 	// before moving the cursor for a left click, stop Visual mode
-	if (flags & MOUSE_MAY_STOP_VIS)
+	ಯದಿ (flags & MOUSE_MAY_STOP_VIS)
 	{
 	    end_visual_mode_keep_button();
 	    redraw_curbuf_later(UPD_INVERTED);	// delete the inversion
 	}
 
-#if defined(FEAT_CLIPBOARD)
+#ಯದಿ defined(FEAT_CLIPBOARD)
 	// Continue a modeless selection in another window.
-	if (cmdwin_type != 0 && row < cmdwin_win->w_winrow)
-	    return IN_OTHER_WIN;
+	ಯದಿ (cmdwin_type != 0 && row < cmdwin_win->w_winrow)
+	    ಪ್ರತ್ಯಾಗಮ IN_OTHER_WIN;
 #endif
 #ifdef FEAT_PROP_POPUP
-	if (in_popup_win)
+	ಯದಿ (in_popup_win)
 	{
-	    if (popup_dragwin != NULL)
+	    ಯದಿ (popup_dragwin != ರಿಕ್ತ)
 	    {
 		// dragging a popup window
 		popup_drag(popup_dragwin);
-		return IN_UNKNOWN;
+		ಪ್ರತ್ಯಾಗಮ IN_UNKNOWN;
 	    }
 	    // continue a modeless selection in a popup window
-	    click_in_popup_win = NULL;
-	    return IN_OTHER_WIN;
+	    click_in_popup_win = ರಿಕ್ತ;
+	    ಪ್ರತ್ಯಾಗಮ IN_OTHER_WIN;
 	}
 #endif
 
@@ -2301,27 +2301,27 @@ retnomove:
 
 	// When clicking beyond the end of the window, scroll the screen.
 	// Scroll by however many rows outside the window we are.
-	if (row < 0)
+	ಯದಿ (row < 0)
 	{
-	    count = 0;
-	    for (first = TRUE; curwin->w_topline > 1; )
+	    ಎಣಿಕೆ = 0;
+	    ಪ್ರತಿ (first = TRUE; curwin->w_topline > 1; )
 	    {
 #ifdef FEAT_DIFF
-		if (curwin->w_topfill < diff_check_fill(curwin, curwin->w_topline))
-		    ++count;
-		else
+		ಯದಿ (curwin->w_topfill < diff_check_fill(curwin, curwin->w_topline))
+		    ++ಎಣಿಕೆ;
+		ಅನ್ಯಥಾ
 #endif
-		    count += plines(curwin->w_topline - 1);
-		if (!first && count > -row)
-		    break;
+		    ಎಣಿಕೆ += plines(curwin->w_topline - 1);
+		ಯದಿ (!first && ಎಣಿಕೆ > -row)
+		    ಭಙ್ಗ;
 		first = FALSE;
 #ifdef FEAT_FOLDING
-		(void)hasFolding(curwin->w_topline, &curwin->w_topline, NULL);
+		(ಶೂನ್ಯ)hasFolding(curwin->w_topline, &curwin->w_topline, ರಿಕ್ತ);
 #endif
 #ifdef FEAT_DIFF
-		if (curwin->w_topfill < diff_check_fill(curwin, curwin->w_topline))
+		ಯದಿ (curwin->w_topfill < diff_check_fill(curwin, curwin->w_topline))
 		    ++curwin->w_topfill;
-		else
+		ಅನ್ಯಥಾ
 #endif
 		{
 		    --curwin->w_topline;
@@ -2338,29 +2338,29 @@ retnomove:
 	    redraw_later(UPD_VALID);
 	    row = 0;
 	}
-	else if (row >= curwin->w_height)
+	ಅನ್ಯಥಾ ಯದಿ (row >= curwin->w_height)
 	{
-	    count = 0;
-	    for (first = TRUE; curwin->w_topline < curbuf->b_ml.ml_line_count; )
+	    ಎಣಿಕೆ = 0;
+	    ಪ್ರತಿ (first = TRUE; curwin->w_topline < curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ; )
 	    {
 #ifdef FEAT_DIFF
-		if (curwin->w_topfill > 0)
-		    ++count;
-		else
+		ಯದಿ (curwin->w_topfill > 0)
+		    ++ಎಣಿಕೆ;
+		ಅನ್ಯಥಾ
 #endif
-		    count += plines(curwin->w_topline);
-		if (!first && count > row - curwin->w_height + 1)
-		    break;
+		    ಎಣಿಕೆ += plines(curwin->w_topline);
+		ಯದಿ (!first && ಎಣಿಕೆ > row - curwin->w_height + 1)
+		    ಭಙ್ಗ;
 		first = FALSE;
 #ifdef FEAT_FOLDING
-		if (hasFolding(curwin->w_topline, NULL, &curwin->w_topline)
-			&& curwin->w_topline == curbuf->b_ml.ml_line_count)
-		    break;
+		ಯದಿ (hasFolding(curwin->w_topline, ರಿಕ್ತ, &curwin->w_topline)
+			&& curwin->w_topline == curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
+		    ಭಙ್ಗ;
 #endif
 #ifdef FEAT_DIFF
-		if (curwin->w_topfill > 0)
+		ಯದಿ (curwin->w_topfill > 0)
 		    --curwin->w_topfill;
-		else
+		ಅನ್ಯಥಾ
 #endif
 		{
 		    ++curwin->w_topline;
@@ -2378,42 +2378,42 @@ retnomove:
 		      ~(VALID_WROW|VALID_CROW|VALID_BOTLINE|VALID_BOTLINE_AP);
 	    row = curwin->w_height - 1;
 	}
-	else if (row == 0)
+	ಅನ್ಯಥಾ ಯದಿ (row == 0)
 	{
 	    // When dragging the mouse, while the text has been scrolled up as
 	    // far as it goes, moving the mouse in the top line should scroll
 	    // the text down (done later when recomputing w_topline).
-	    if (mouse_dragging > 0
+	    ಯದಿ (mouse_dragging > 0
 		    && curwin->w_cursor.lnum
-				       == curwin->w_buffer->b_ml.ml_line_count
+				       == curwin->w_buffer->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ
 		    && curwin->w_cursor.lnum == curwin->w_topline)
 		curwin->w_valid &= ~(VALID_TOPLINE);
 	}
     }
 
-    if (prev_row >= W_WINROW(curwin)
+    ಯದಿ (prev_row >= W_WINROW(curwin)
 	&& prev_row < W_WINROW(curwin) + curwin->w_height
 	&& prev_col >= curwin->w_wincol && prev_col < W_ENDCOL(curwin)
-						       && ScreenLines != NULL)
+						       && Screen_ಸಾಲುಗಳು != ರಿಕ್ತ)
     {
-	int off = LineOffset[prev_row] + prev_col;
+	ಪೂರ್ಣಾಙ್ಕ off = ಸಾಲು_Offset[prev_row] + prev_col;
 
 	// Only use ScreenCols[] after the window was redrawn.  Mainly matters
 	// for tests, a user would not click before redrawing.
 	// Do not use when 'virtualedit' is active.
-	if (curwin->w_redr_type <= UPD_VALID_NO_UPDATE)
+	ಯದಿ (curwin->w_redr_type <= UPD_VALID_NO_UPDATE)
 	    col_from_screen = ScreenCols[off];
 #ifdef FEAT_FOLDING
 	// Remember the character under the mouse, it might be a '-' or '+' in
 	// the fold column.
-	mouse_char = enc_utf8 && ScreenLinesUC[off] != 0
-				       ? ScreenLinesUC[off] : ScreenLines[off];
+	mouse_char = enc_utf8 && Screen_ಸಾಲುಗಳು_UC[off] != 0
+				       ? Screen_ಸಾಲುಗಳು_UC[off] : Screen_ಸಾಲುಗಳು[off];
 #endif
     }
 
 #ifdef FEAT_FOLDING
     // Check for position outside of the fold column.
-    if (
+    ಯದಿ (
 # ifdef FEAT_RIGHTLEFT
 	    curwin->w_p_rl ? col < curwin->w_width - curwin->w_p_fdc :
 # endif
@@ -2423,11 +2423,11 @@ retnomove:
 #endif
 
     // compute the position in the buffer line from the posn on the screen
-    if (mouse_comp_pos(curwin, &row, &col, &curwin->w_cursor.lnum, NULL))
+    ಯದಿ (mouse_comp_pos(curwin, &row, &col, &curwin->w_cursor.lnum, ರಿಕ್ತ))
 	mouse_past_bottom = TRUE;
 
     // Start Visual mode before coladvance(), for when 'sel' != "old"
-    if ((flags & MOUSE_MAY_VIS) && !VIsual_active)
+    ಯದಿ ((flags & MOUSE_MAY_VIS) && !VIsual_active)
     {
 	check_visual_highlight();
 	VIsual = old_cursor;
@@ -2436,11 +2436,11 @@ retnomove:
 	// if 'selectmode' contains "mouse", start Select mode
 	may_start_select('o');
 	setmouse();
-	if (p_smd && msg_silent == 0)
+	ಯದಿ (p_smd && ಸಂದೇಶ_silent == 0)
 	    redraw_cmdline = TRUE;	// show visual mode later
     }
 
-    if (col_from_screen >= 0)
+    ಯದಿ (col_from_screen >= 0)
     {
 	// Use the virtual column from ScreenCols[], it is accurate also after
 	// concealed characters.
@@ -2449,98 +2449,98 @@ retnomove:
 
     curwin->w_curswant = col;
     curwin->w_set_curswant = false;	// May still have been TRUE
-    if (coladvance(col) == FAIL)	// Mouse click beyond end of line
+    ಯದಿ (coladvance(col) == FAIL)	// Mouse click beyond end of line
     {
-	if (inclusive != NULL)
+	ಯದಿ (inclusive != ರಿಕ್ತ)
 	    *inclusive = TRUE;
 	mouse_past_eol = TRUE;
     }
-    else if (inclusive != NULL)
+    ಅನ್ಯಥಾ ಯದಿ (inclusive != ರಿಕ್ತ)
 	*inclusive = FALSE;
 
-    count = IN_BUFFER;
-    if (curwin != old_curwin || curwin->w_cursor.lnum != old_cursor.lnum
+    ಎಣಿಕೆ = IN_BUFFER;
+    ಯದಿ (curwin != old_curwin || curwin->w_cursor.lnum != old_cursor.lnum
 	    || curwin->w_cursor.col != old_cursor.col)
-	count |= CURSOR_MOVED;		// Cursor has moved
+	ಎಣಿಕೆ |= CURSOR_MOVED;		// Cursor has moved
 
 #ifdef FEAT_FOLDING
-    if (mouse_char == curwin->w_fill_chars.foldclosed)
-	count |= MOUSE_FOLD_OPEN;
-    else if (mouse_char != ' ')
-	count |= MOUSE_FOLD_CLOSE;
+    ಯದಿ (mouse_char == curwin->w_fill_chars.foldclosed)
+	ಎಣಿಕೆ |= MOUSE_FOLD_OPEN;
+    ಅನ್ಯಥಾ ಯದಿ (mouse_char != ' ')
+	ಎಣಿಕೆ |= MOUSE_FOLD_CLOSE;
 #endif
 
-    return count;
+    ಪ್ರತ್ಯಾಗಮ ಎಣಿಕೆ;
 }
 
 /*
  * Make a horizontal scroll to "leftcol".
  * Return TRUE if the cursor moved, FALSE otherwise.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 do_mousescroll_horiz(long_u leftcol)
 {
-    if (curwin->w_p_wrap)
-	return FALSE;  // no horizontal scrolling when wrapping
+    ಯದಿ (curwin->w_p_wrap)
+	ಪ್ರತ್ಯಾಗಮ FALSE;  // no horizontal scrolling when wrapping
 
-    if (curwin->w_leftcol == (colnr_T)leftcol)
-	return FALSE;  // already there
+    ಯದಿ (curwin->w_leftcol == (colnr_T)leftcol)
+	ಪ್ರತ್ಯಾಗಮ FALSE;  // already there
 
     // When the line of the cursor is too short, move the cursor to the
     // longest visible line.
-    if (
+    ಯದಿ (
 #ifdef FEAT_GUI
-	    (!gui.in_use || vim_strchr(p_go, GO_HORSCROLL) == NULL) &&
+	    (!gui.in_use || vim_strchr(p_go, GO_HORSCROLL) == ರಿಕ್ತ) &&
 #endif
 		    !virtual_active()
-	    && (long)leftcol > scroll_line_len(curwin->w_cursor.lnum))
+	    && (long)leftcol > scroll_ಸಾಲು_len(curwin->w_cursor.lnum))
     {
 	curwin->w_cursor.lnum = ui_find_longest_lnum();
 	curwin->w_cursor.col = 0;
     }
 
-    return set_leftcol((colnr_T)leftcol);
+    ಪ್ರತ್ಯಾಗಮ set_leftcol((colnr_T)leftcol);
 }
 
 /*
  * Normal and Visual modes implementation for scrolling in direction
  * "cap->arg", which is one of the MSCR_ values.
  */
-    void
+    ಶೂನ್ಯ
 nv_mousescroll(cmdarg_T *cap)
 {
     win_T   *old_curwin = curwin;
 
 #ifdef FEAT_TABPANEL
-    if (mouse_row >= 0 && mouse_col >= 0
+    ಯದಿ (mouse_row >= 0 && mouse_col >= 0
 	    && (cap->arg == MSCR_UP || cap->arg == MSCR_DOWN)
 	    && mouse_on_tabpanel())
     {
-	(void)tabpanel_scroll(cap->arg == MSCR_UP ? 1 : -1,
+	(ಶೂನ್ಯ)tabpanel_scroll(cap->arg == MSCR_UP ? 1 : -1,
 		mouse_vert_step > 0 ? mouse_vert_step : 3);
-	return;
+	ಪ್ರತ್ಯಾಗಮ;
     }
 #endif
 
-    if (mouse_row >= 0 && mouse_col >= 0)
+    ಯದಿ (mouse_row >= 0 && mouse_col >= 0)
     {
 	// Find the window at the mouse pointer coordinates.
 	// NOTE: Must restore "curwin" to "old_curwin" before returning!
-	int row = mouse_row;
-	int col = mouse_col;
+	ಪೂರ್ಣಾಙ್ಕ row = mouse_row;
+	ಪೂರ್ಣಾಙ್ಕ col = mouse_col;
 	curwin = mouse_find_win(&row, &col, FIND_POPUP);
-	if (curwin == NULL)
+	ಯದಿ (curwin == ರಿಕ್ತ)
 	{
 	    curwin = old_curwin;
-	    return;
+	    ಪ್ರತ್ಯಾಗಮ;
 	}
 
 #ifdef FEAT_PROP_POPUP
-	if (WIN_IS_POPUP(curwin) && !curwin->w_has_scrollbar)
+	ಯದಿ (WIN_IS_POPUP(curwin) && !curwin->w_has_scrollbar)
 	{
 	    // cannot scroll this popup window
 	    curwin = old_curwin;
-	    return;
+	    ಪ್ರತ್ಯಾಗಮ;
 	}
 #endif
 	curbuf = curwin->w_buffer;
@@ -2557,16 +2557,16 @@ nv_mousescroll(cmdarg_T *cap)
 /*
  * Mouse clicks and drags.
  */
-    void
+    ಶೂನ್ಯ
 nv_mouse(cmdarg_T *cap)
 {
-    (void)do_mouse(cap->oap, cap->cmdchar, BACKWARD, cap->count1, 0);
+    (ಶೂನ್ಯ)do_mouse(cap->oap, cap->cmdchar, BACKWARD, cap->count1, 0);
 }
 
-static int	held_button = MOUSE_RELEASE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ	held_button = MOUSE_RELEASE;
 
-    void
-reset_held_button(void)
+    ಶೂನ್ಯ
+reset_held_button(ಶೂನ್ಯ)
 {
     held_button = MOUSE_RELEASE;
 }
@@ -2575,45 +2575,45 @@ reset_held_button(void)
  * Check if typebuf 'tp' contains a terminal mouse code and returns the
  * modifiers found in typebuf in 'modifiers'.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 check_termcode_mouse(
     char_u	*tp,
-    int		*slen,
-    char_u	*key_name,
+    ಪೂರ್ಣಾಙ್ಕ		*slen,
+    char_u	*ಕೀಲಿ_name,
     char_u	*modifiers_start,
-    int		idx,
-    int		*modifiers)
+    ಪೂರ್ಣಾಙ್ಕ		idx,
+    ಪೂರ್ಣಾಙ್ಕ		*modifiers)
 {
-    int		j;
+    ಪೂರ್ಣಾಙ್ಕ		j;
     char_u	*p;
-#if !defined(UNIX) || defined(FEAT_MOUSE_XTERM) || defined(FEAT_GUI) \
+#ಯದಿ !defined(UNIX) || defined(FEAT_MOUSE_XTERM) || defined(FEAT_GUI) \
     || defined(FEAT_MOUSE_GPM) || defined(FEAT_SYSMOUSE)
     char_u	bytes[6];
-    int		num_bytes;
+    ಪೂರ್ಣಾಙ್ಕ		ಅಂಕೆ_bytes;
 #endif
-    int		mouse_code = 0;	    // init for GCC
-    int		is_click, is_drag;
-    int		is_release, release_is_ambiguous;
-    int		wheel_code = 0;
-    int		current_button;
-    static int	orig_num_clicks = 1;
-    static int	orig_mouse_code = 0x0;
+    ಪೂರ್ಣಾಙ್ಕ		mouse_code = 0;	    // init for GCC
+    ಪೂರ್ಣಾಙ್ಕ		is_click, is_drag;
+    ಪೂರ್ಣಾಙ್ಕ		is_release, release_is_ambiguous;
+    ಪೂರ್ಣಾಙ್ಕ		wheel_code = 0;
+    ಪೂರ್ಣಾಙ್ಕ		current_button;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ	orig_ಅಂಕೆ_clicks = 1;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ	orig_mouse_code = 0x0;
 #ifdef CHECK_DOUBLE_CLICK
-    static int	orig_mouse_col = 0;
-    static int	orig_mouse_row = 0;
-    static struct timeval  orig_mouse_time = {0, 0};
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ	orig_mouse_col = 0;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ	orig_mouse_row = 0;
+    ಸ್ಥಿರ ಸಂರಚನಾ timeval  orig_mouse_time = {0, 0};
     // time of previous mouse click
-    struct timeval  mouse_time;		// time of current mouse click
+    ಸಂರಚನಾ timeval  mouse_time;		// time of current mouse click
     long	timediff;		// elapsed time in msec
 #endif
 
     is_click = is_drag = is_release = release_is_ambiguous = FALSE;
 
-#if !defined(UNIX) || defined(FEAT_MOUSE_XTERM) || defined(FEAT_GUI) \
+#ಯದಿ !defined(UNIX) || defined(FEAT_MOUSE_XTERM) || defined(FEAT_GUI) \
     || defined(FEAT_MOUSE_GPM) || defined(FEAT_SYSMOUSE)
-    if (key_name[0] == KS_MOUSE
+    ಯದಿ (ಕೀಲಿ_name[0] == KS_MOUSE
 # ifdef FEAT_MOUSE_GPM
-	    || key_name[0] == KS_GPM_MOUSE
+	    || ಕೀಲಿ_name[0] == KS_GPM_MOUSE
 # endif
        )
     {
@@ -2642,48 +2642,48 @@ check_termcode_mouse(
 	 * this avoids trouble with mouse clicks at an unexpected moment and
 	 * allows for mapping them.
 	 */
-	for (;;)
+	ಪ್ರತಿ (;;)
 	{
 	    // For the GUI and for MS-Windows two bytes each are used for row
 	    // and column.  Allows for more than 223 columns.
-# if defined(FEAT_GUI) || defined(MSWIN)
-	    if (TRUE
-#  if defined(FEAT_GUI) && !defined(MSWIN)
+# ಯದಿ defined(FEAT_GUI) || defined(MSWIN)
+	    ಯದಿ (TRUE
+#  ಯದಿ defined(FEAT_GUI) && !defined(MSWIN)
 		&& gui.in_use
 #  endif
 		)
 	    {
-		num_bytes = get_bytes_from_buf(tp + *slen, bytes, 5);
-		if (num_bytes == -1)	// not enough coordinates
-		    return -1;
+		ಅಂಕೆ_bytes = get_bytes_from_buf(tp + *slen, bytes, 5);
+		ಯದಿ (ಅಂಕೆ_bytes == -1)	// not enough coordinates
+		    ಪ್ರತ್ಯಾಗಮ -1;
 		mouse_code = bytes[0];
 		mouse_col = 128 * (bytes[1] - ' ' - 1)
 		    + bytes[2] - ' ' - 1;
 		mouse_row = 128 * (bytes[3] - ' ' - 1)
 		    + bytes[4] - ' ' - 1;
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 # endif
 	    {
-		num_bytes = get_bytes_from_buf(tp + *slen, bytes, 3);
-		if (num_bytes == -1)	// not enough coordinates
-		    return -1;
+		ಅಂಕೆ_bytes = get_bytes_from_buf(tp + *slen, bytes, 3);
+		ಯದಿ (ಅಂಕೆ_bytes == -1)	// not enough coordinates
+		    ಪ್ರತ್ಯಾಗಮ -1;
 		mouse_code = bytes[0];
 		mouse_col = bytes[1] - ' ' - 1;
 		mouse_row = bytes[2] - ' ' - 1;
 	    }
-	    *slen += num_bytes;
+	    *slen += ಅಂಕೆ_bytes;
 
 	    // If the following bytes is also a mouse code and it has the same
 	    // code, dump this one and get the next.  This makes dragging a
 	    // whole lot faster.
 # ifdef FEAT_GUI
-	    if (gui.in_use)
+	    ಯದಿ (gui.in_use)
 		j = 3;
-	    else
+	    ಅನ್ಯಥಾ
 # endif
 		j = get_termcode_len(idx);
-	    if (STRNCMP(tp, tp + *slen, (size_t)j) == 0
+	    ಯದಿ (STRNCMP(tp, tp + *slen, (size_t)j) == 0
 		    && tp[*slen + j] == mouse_code
 		    && tp[*slen + j + 1] != NUL
 		    && tp[*slen + j + 2] != NUL
@@ -2694,14 +2694,14 @@ check_termcode_mouse(
 # endif
 	       )
 		*slen += j;
-	    else
-		break;
+	    ಅನ್ಯಥಾ
+		ಭಙ್ಗ;
 	}
     }
 
-    if (key_name[0] == KS_URXVT_MOUSE
-	    || key_name[0] == KS_SGR_MOUSE
-	    || key_name[0] == KS_SGR_MOUSE_RELEASE)
+    ಯದಿ (ಕೀಲಿ_name[0] == KS_URXVT_MOUSE
+	    || ಕೀಲಿ_name[0] == KS_SGR_MOUSE
+	    || ಕೀಲಿ_name[0] == KS_SGR_MOUSE_RELEASE)
     {
 	// URXVT 1015 mouse reporting mode:
 	// Almost identical to xterm mouse mode, except the values are decimal
@@ -2726,21 +2726,21 @@ check_termcode_mouse(
 	//	    ^----- column
 	//	 ^-------- code
 	p = modifiers_start;
-	if (p == NULL)
-	    return -1;
+	ಯದಿ (p == ರಿಕ್ತ)
+	    ಪ್ರತ್ಯಾಗಮ -1;
 
 	mouse_code = getdigits(&p);
-	if (*p++ != ';')
-	    return -1;
+	ಯದಿ (*p++ != ';')
+	    ಪ್ರತ್ಯಾಗಮ -1;
 
 	// when mouse reporting is SGR, add 32 to mouse code
-	if (key_name[0] == KS_SGR_MOUSE
-		|| key_name[0] == KS_SGR_MOUSE_RELEASE)
+	ಯದಿ (ಕೀಲಿ_name[0] == KS_SGR_MOUSE
+		|| ಕೀಲಿ_name[0] == KS_SGR_MOUSE_RELEASE)
 	    mouse_code += 32;
 
 	mouse_col = getdigits(&p) - 1;
-	if (*p++ != ';')
-	    return -1;
+	ಯದಿ (*p++ != ';')
+	    ಪ್ರತ್ಯಾಗಮ -1;
 
 	mouse_row = getdigits(&p) - 1;
 
@@ -2749,61 +2749,61 @@ check_termcode_mouse(
 	*modifiers = 0;
     }
 
-    if (key_name[0] == KS_SGR_MOUSE
-	    || key_name[0] == KS_SGR_MOUSE_RELEASE)
+    ಯದಿ (ಕೀಲಿ_name[0] == KS_SGR_MOUSE
+	    || ಕೀಲಿ_name[0] == KS_SGR_MOUSE_RELEASE)
     {
-	if (key_name[0] == KS_SGR_MOUSE_RELEASE)
+	ಯದಿ (ಕೀಲಿ_name[0] == KS_SGR_MOUSE_RELEASE)
 	{
 	    is_release = TRUE;
 	    // This is used below to set held_button.
 	    mouse_code |= MOUSE_RELEASE;
 	}
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	release_is_ambiguous = TRUE;
-	if ((mouse_code & MOUSE_RELEASE) == MOUSE_RELEASE)
+	ಯದಿ ((mouse_code & MOUSE_RELEASE) == MOUSE_RELEASE)
 	    is_release = TRUE;
     }
 
-    if (key_name[0] == KS_MOUSE
+    ಯದಿ (ಕೀಲಿ_name[0] == KS_MOUSE
 # ifdef FEAT_MOUSE_GPM
-	    || key_name[0] == KS_GPM_MOUSE
+	    || ಕೀಲಿ_name[0] == KS_GPM_MOUSE
 # endif
 # ifdef FEAT_MOUSE_URXVT
-	    || key_name[0] == KS_URXVT_MOUSE
+	    || ಕೀಲಿ_name[0] == KS_URXVT_MOUSE
 # endif
-	    || key_name[0] == KS_SGR_MOUSE
-	    || key_name[0] == KS_SGR_MOUSE_RELEASE)
+	    || ಕೀಲಿ_name[0] == KS_SGR_MOUSE
+	    || ಕೀಲಿ_name[0] == KS_SGR_MOUSE_RELEASE)
     {
-# if !defined(MSWIN)
+# ಯದಿ !defined(MSWIN)
 	/*
 	 * Handle old style mouse events.
 	 * Recognize the xterm mouse wheel, but not in the GUI, the
 	 * Linux console with GPM and the MS-DOS or Win32 console
 	 * (multi-clicks use >= 0x60).
 	 */
-	if (mouse_code >= MOUSEWHEEL_LOW && mouse_code < MOUSESIDEBUTTONS_LOW
+	ಯದಿ (mouse_code >= MOUSEWHEEL_ಕೆಳಗಿನ && mouse_code < MOUSESIDEBUTTONS_ಕೆಳಗಿನ
 #  ifdef FEAT_GUI
 		&& !gui.in_use
 #  endif
 #  ifdef FEAT_MOUSE_GPM
-		&& key_name[0] != KS_GPM_MOUSE
+		&& ಕೀಲಿ_name[0] != KS_GPM_MOUSE
 #  endif
 	   )
 	{
-#  if defined(UNIX)
-	    if (use_xterm_mouse() > 1 && mouse_code >= 0x80)
+#  ಯದಿ defined(UNIX)
+	    ಯದಿ (use_xterm_mouse() > 1 && mouse_code >= 0x80)
 		// mouse-move event, using MOUSE_DRAG works
 		mouse_code = MOUSE_DRAG;
-	    else
+	    ಅನ್ಯಥಾ
 #  endif
 		// Keep the mouse_code before it's changed, so that we
 		// remember that it was a mouse wheel click.
 		wheel_code = mouse_code;
 	}
 #  ifdef FEAT_MOUSE_XTERM
-	else if (held_button == MOUSE_RELEASE
+	ಅನ್ಯಥಾ ಯದಿ (held_button == MOUSE_RELEASE
 #   ifdef FEAT_GUI
 		&& !gui.in_use
 #   endif
@@ -2813,23 +2813,23 @@ check_termcode_mouse(
 	    // Apparently 0x23 and 0x24 are used by rxvt scroll wheel.
 	    // And 0x40 and 0x41 are used by some xterm emulator.
 	    wheel_code = mouse_code - (mouse_code >= 0x40 ? 0x40 : 0x23)
-							      + MOUSEWHEEL_LOW;
+							      + MOUSEWHEEL_ಕೆಳಗಿನ;
 	}
 #  endif
 
-#  if defined(UNIX)
-	else if (use_xterm_mouse() > 1)
+#  ಯದಿ defined(UNIX)
+	ಅನ್ಯಥಾ ಯದಿ (use_xterm_mouse() > 1)
 	{
-	    if (mouse_code & MOUSE_DRAG_XTERM)
+	    ಯದಿ (mouse_code & MOUSE_DRAG_XTERM)
 		mouse_code |= MOUSE_DRAG;
 	}
 #  endif
 #  ifdef FEAT_XCLIPBOARD
-	else if (!(mouse_code & MOUSE_DRAG & ~MOUSE_CLICK_MASK))
+	ಅನ್ಯಥಾ ಯದಿ (!(mouse_code & MOUSE_DRAG & ~MOUSE_CLICK_MASK))
 	{
-	    if (is_release)
+	    ಯದಿ (is_release)
 		stop_xterm_trace();
-	    else
+	    ಅನ್ಯಥಾ
 		start_xterm_trace(mouse_code);
 	}
 #  endif
@@ -2837,31 +2837,31 @@ check_termcode_mouse(
     }
 #endif // !UNIX || FEAT_MOUSE_XTERM
 #ifdef FEAT_MOUSE_NET
-    if (key_name[0] == KS_NETTERM_MOUSE)
+    ಯದಿ (ಕೀಲಿ_name[0] == KS_NETTERM_MOUSE)
     {
-	int mc, mr;
+	ಪೂರ್ಣಾಙ್ಕ mc, mr;
 
 	// expect a rather limited sequence like: balancing {
 	// \033}6,45\r
 	// '6' is the row, 45 is the column
 	p = tp + *slen;
 	mr = getdigits(&p);
-	if (*p++ != ',')
-	    return -1;
+	ಯದಿ (*p++ != ',')
+	    ಪ್ರತ್ಯಾಗಮ -1;
 	mc = getdigits(&p);
-	if (*p++ != '\r')
-	    return -1;
+	ಯದಿ (*p++ != '\r')
+	    ಪ್ರತ್ಯಾಗಮ -1;
 
 	mouse_col = mc - 1;
 	mouse_row = mr - 1;
-	mouse_code = MOUSE_LEFT;
-	*slen += (int)(p - (tp + *slen));
+	mouse_code = MOUSE_ಎಡ;
+	*slen += (ಪೂರ್ಣಾಙ್ಕ)(p - (tp + *slen));
     }
 #endif	// FEAT_MOUSE_NET
 #ifdef FEAT_MOUSE_JSB
-    if (key_name[0] == KS_JSBTERM_MOUSE)
+    ಯದಿ (ಕೀಲಿ_name[0] == KS_JSBTERM_MOUSE)
     {
-	int mult, val, iter, button, status;
+	ಪೂರ್ಣಾಙ್ಕ mult, val, iter, button, status;
 
 	/*
 	 * JSBTERM Input Model
@@ -2879,112 +2879,112 @@ check_termcode_mouse(
 	 */
 	p = tp + *slen;
 	button = mouse_code = 0;
-	switch (*p++)
+	ವಿಕಲ್ಪ (*p++)
 	{
-	    case 'L': button = 1; break;
-	    case '-': break;
-	    case 'x': break; // ignore sequence
-	    default:  return -1; // Unknown Result
+	    ಪಕ್ಷ 'L': button = 1; ಭಙ್ಗ;
+	    ಪಕ್ಷ '-': ಭಙ್ಗ;
+	    ಪಕ್ಷ 'x': ಭಙ್ಗ; // ignore sequence
+	    ಸ್ವಭಾವ:  ಪ್ರತ್ಯಾಗಮ -1; // Unknown Result
 	}
-	switch (*p++)
+	ವಿಕಲ್ಪ (*p++)
 	{
-	    case 'M': button |= 2; break;
-	    case '-': break;
-	    case 'x': break; // ignore sequence
-	    default:  return -1; // Unknown Result
+	    ಪಕ್ಷ 'M': button |= 2; ಭಙ್ಗ;
+	    ಪಕ್ಷ '-': ಭಙ್ಗ;
+	    ಪಕ್ಷ 'x': ಭಙ್ಗ; // ignore sequence
+	    ಸ್ವಭಾವ:  ಪ್ರತ್ಯಾಗಮ -1; // Unknown Result
 	}
-	switch (*p++)
+	ವಿಕಲ್ಪ (*p++)
 	{
-	    case 'R': button |= 4; break;
-	    case '-': break;
-	    case 'x': break; // ignore sequence
-	    default:  return -1; // Unknown Result
+	    ಪಕ್ಷ 'R': button |= 4; ಭಙ್ಗ;
+	    ಪಕ್ಷ '-': ಭಙ್ಗ;
+	    ಪಕ್ಷ 'x': ಭಙ್ಗ; // ignore sequence
+	    ಸ್ವಭಾವ:  ಪ್ರತ್ಯಾಗಮ -1; // Unknown Result
 	}
 	status = *p++;
-	for (val = 0, mult = 100, iter = 0; iter < 3; iter++,
+	ಪ್ರತಿ (val = 0, mult = 100, iter = 0; iter < 3; iter++,
 		mult /= 10, p++)
-	    if (*p >= '0' && *p <= '9')
+	    ಯದಿ (*p >= '0' && *p <= '9')
 		val += (*p - '0') * mult;
-	    else
-		return -1;
+	    ಅನ್ಯಥಾ
+		ಪ್ರತ್ಯಾಗಮ -1;
 	mouse_col = val;
-	for (val = 0, mult = 100, iter = 0; iter < 3; iter++,
+	ಪ್ರತಿ (val = 0, mult = 100, iter = 0; iter < 3; iter++,
 		mult /= 10, p++)
-	    if (*p >= '0' && *p <= '9')
+	    ಯದಿ (*p >= '0' && *p <= '9')
 		val += (*p - '0') * mult;
-	    else
-		return -1;
+	    ಅನ್ಯಥಾ
+		ಪ್ರತ್ಯಾಗಮ -1;
 	mouse_row = val;
-	switch (*p++)
+	ವಿಕಲ್ಪ (*p++)
 	{
-	    case 's': button |= 8; break;  // SHIFT key Pressed
-	    case '-': break;  // Not Pressed
-	    case 'x': break;  // Not Reporting
-	    default:  return -1; // Unknown Result
+	    ಪಕ್ಷ 's': button |= 8; ಭಙ್ಗ;  // SHIFT key Pressed
+	    ಪಕ್ಷ '-': ಭಙ್ಗ;  // Not Pressed
+	    ಪಕ್ಷ 'x': ಭಙ್ಗ;  // Not Reporting
+	    ಸ್ವಭಾವ:  ಪ್ರತ್ಯಾಗಮ -1; // Unknown Result
 	}
-	switch (*p++)
+	ವಿಕಲ್ಪ (*p++)
 	{
-	    case 'c': button |= 16; break;  // CTRL key Pressed
-	    case '-': break;  // Not Pressed
-	    case 'x': break;  // Not Reporting
-	    default:  return -1; // Unknown Result
+	    ಪಕ್ಷ 'c': button |= 16; ಭಙ್ಗ;  // CTRL key Pressed
+	    ಪಕ್ಷ '-': ಭಙ್ಗ;  // Not Pressed
+	    ಪಕ್ಷ 'x': ಭಙ್ಗ;  // Not Reporting
+	    ಸ್ವಭಾವ:  ಪ್ರತ್ಯಾಗಮ -1; // Unknown Result
 	}
-	if (*p++ != '\033')
-	    return -1;
-	if (*p++ != '\\')
-	    return -1;
-	switch (status)
+	ಯದಿ (*p++ != '\033')
+	    ಪ್ರತ್ಯಾಗಮ -1;
+	ಯದಿ (*p++ != '\\')
+	    ಪ್ರತ್ಯಾಗಮ -1;
+	ವಿಕಲ್ಪ (status)
 	{
-	    case 'D': // Double Click
-	    case 'S': // Single Click
-		if (button & 1) mouse_code |= MOUSE_LEFT;
-		if (button & 2) mouse_code |= MOUSE_MIDDLE;
-		if (button & 4) mouse_code |= MOUSE_RIGHT;
-		if (button & 8) mouse_code |= MOUSE_SHIFT;
-		if (button & 16) mouse_code |= MOUSE_CTRL;
-		break;
-	    case 'm': // Mouse move
-		if (button & 1) mouse_code |= MOUSE_LEFT;
-		if (button & 2) mouse_code |= MOUSE_MIDDLE;
-		if (button & 4) mouse_code |= MOUSE_RIGHT;
-		if (button & 8) mouse_code |= MOUSE_SHIFT;
-		if (button & 16) mouse_code |= MOUSE_CTRL;
-		if ((button & 7) != 0)
+	    ಪಕ್ಷ 'D': // Double Click
+	    ಪಕ್ಷ 'S': // Single Click
+		ಯದಿ (button & 1) mouse_code |= MOUSE_ಎಡ;
+		ಯದಿ (button & 2) mouse_code |= MOUSE_ಮಧ್ಯ;
+		ಯದಿ (button & 4) mouse_code |= MOUSE_ಬಲ;
+		ಯದಿ (button & 8) mouse_code |= MOUSE_SHIFT;
+		ಯದಿ (button & 16) mouse_code |= MOUSE_CTRL;
+		ಭಙ್ಗ;
+	    ಪಕ್ಷ 'm': // Mouse move
+		ಯದಿ (button & 1) mouse_code |= MOUSE_ಎಡ;
+		ಯದಿ (button & 2) mouse_code |= MOUSE_ಮಧ್ಯ;
+		ಯದಿ (button & 4) mouse_code |= MOUSE_ಬಲ;
+		ಯದಿ (button & 8) mouse_code |= MOUSE_SHIFT;
+		ಯದಿ (button & 16) mouse_code |= MOUSE_CTRL;
+		ಯದಿ ((button & 7) != 0)
 		{
 		    held_button = mouse_code;
 		    mouse_code |= MOUSE_DRAG;
 		}
 		is_drag = TRUE;
 		showmode();
-		break;
-	    case 'd': // Button Down
-		if (button & 1) mouse_code |= MOUSE_LEFT;
-		if (button & 2) mouse_code |= MOUSE_MIDDLE;
-		if (button & 4) mouse_code |= MOUSE_RIGHT;
-		if (button & 8) mouse_code |= MOUSE_SHIFT;
-		if (button & 16) mouse_code |= MOUSE_CTRL;
-		break;
-	    case 'u': // Button Up
+		ಭಙ್ಗ;
+	    ಪಕ್ಷ 'd': // Button Down
+		ಯದಿ (button & 1) mouse_code |= MOUSE_ಎಡ;
+		ಯದಿ (button & 2) mouse_code |= MOUSE_ಮಧ್ಯ;
+		ಯದಿ (button & 4) mouse_code |= MOUSE_ಬಲ;
+		ಯದಿ (button & 8) mouse_code |= MOUSE_SHIFT;
+		ಯದಿ (button & 16) mouse_code |= MOUSE_CTRL;
+		ಭಙ್ಗ;
+	    ಪಕ್ಷ 'u': // Button Up
 		is_release = TRUE;
-		if (button & 1)
-		    mouse_code |= MOUSE_LEFT;
-		if (button & 2)
-		    mouse_code |= MOUSE_MIDDLE;
-		if (button & 4)
-		    mouse_code |= MOUSE_RIGHT;
-		if (button & 8)
+		ಯದಿ (button & 1)
+		    mouse_code |= MOUSE_ಎಡ;
+		ಯದಿ (button & 2)
+		    mouse_code |= MOUSE_ಮಧ್ಯ;
+		ಯದಿ (button & 4)
+		    mouse_code |= MOUSE_ಬಲ;
+		ಯದಿ (button & 8)
 		    mouse_code |= MOUSE_SHIFT;
-		if (button & 16)
+		ಯದಿ (button & 16)
 		    mouse_code |= MOUSE_CTRL;
-		break;
-	    default: return -1; // Unknown Result
+		ಭಙ್ಗ;
+	    ಸ್ವಭಾವ: ಪ್ರತ್ಯಾಗಮ -1; // Unknown Result
 	}
 
 	*slen += (p - (tp + *slen));
     }
 #endif // FEAT_MOUSE_JSB
 #ifdef FEAT_MOUSE_DEC
-    if (key_name[0] == KS_DEC_MOUSE)
+    ಯದಿ (ಕೀಲಿ_name[0] == KS_DEC_MOUSE)
     {
 	/*
 	 * The DEC Locator Input Model
@@ -3033,53 +3033,53 @@ check_termcode_mouse(
 	 *   ASCII decimal value.  The page coordinate may be omitted if the
 	 *   locator is on page one (the default).  We ignore it anyway.
 	 */
-	int Pe, Pb, Pr, Pc;
+	ಪೂರ್ಣಾಙ್ಕ Pe, Pb, Pr, Pc;
 
 	p = tp + *slen;
 
 	// get event status
 	Pe = getdigits(&p);
-	if (*p++ != ';')
-	    return -1;
+	ಯದಿ (*p++ != ';')
+	    ಪ್ರತ್ಯಾಗಮ -1;
 
 	// get button status
 	Pb = getdigits(&p);
-	if (*p++ != ';')
-	    return -1;
+	ಯದಿ (*p++ != ';')
+	    ಪ್ರತ್ಯಾಗಮ -1;
 
 	// get row status
 	Pr = getdigits(&p);
-	if (*p++ != ';')
-	    return -1;
+	ಯದಿ (*p++ != ';')
+	    ಪ್ರತ್ಯಾಗಮ -1;
 
 	// get column status
 	Pc = getdigits(&p);
 
 	// the page parameter is optional
-	if (*p == ';')
+	ಯದಿ (*p == ';')
 	{
 	    p++;
-	    (void)getdigits(&p);
+	    (ಶೂನ್ಯ)getdigits(&p);
 	}
-	if (*p++ != '&')
-	    return -1;
-	if (*p++ != 'w')
-	    return -1;
+	ಯದಿ (*p++ != '&')
+	    ಪ್ರತ್ಯಾಗಮ -1;
+	ಯದಿ (*p++ != 'w')
+	    ಪ್ರತ್ಯಾಗಮ -1;
 
 	mouse_code = 0;
-	switch (Pe)
+	ವಿಕಲ್ಪ (Pe)
 	{
-	    case  0: return -1; // position request while unavailable
-	    case  1: // a response to a locator position request includes
+	    ಪಕ್ಷ  0: ಪ್ರತ್ಯಾಗಮ -1; // position request while unavailable
+	    ಪಕ್ಷ  1: // a response to a locator position request includes
 		     //	the status of all buttons
 		     Pb &= 7;   // mask off and ignore fourth button
-		     if (Pb & 4)
-			 mouse_code  = MOUSE_LEFT;
-		     if (Pb & 2)
-			 mouse_code  = MOUSE_MIDDLE;
-		     if (Pb & 1)
-			 mouse_code  = MOUSE_RIGHT;
-		     if (Pb)
+		     ಯದಿ (Pb & 4)
+			 mouse_code  = MOUSE_ಎಡ;
+		     ಯದಿ (Pb & 2)
+			 mouse_code  = MOUSE_ಮಧ್ಯ;
+		     ಯದಿ (Pb & 1)
+			 mouse_code  = MOUSE_ಬಲ;
+		     ಯದಿ (Pb)
 		     {
 			 held_button = mouse_code;
 			 mouse_code |= MOUSE_DRAG;
@@ -3087,90 +3087,90 @@ check_termcode_mouse(
 		     }
 		     is_drag = TRUE;
 		     showmode();
-		     break;
-	    case  2: mouse_code = MOUSE_LEFT;
+		     ಭಙ್ಗ;
+	    ಪಕ್ಷ  2: mouse_code = MOUSE_ಎಡ;
 		     WantQueryMouse = TRUE;
-		     break;
-	    case  3: mouse_code = MOUSE_LEFT;
+		     ಭಙ್ಗ;
+	    ಪಕ್ಷ  3: mouse_code = MOUSE_ಎಡ;
 		     is_release = TRUE;
-		     break;
-	    case  4: mouse_code = MOUSE_MIDDLE;
+		     ಭಙ್ಗ;
+	    ಪಕ್ಷ  4: mouse_code = MOUSE_ಮಧ್ಯ;
 		     WantQueryMouse = TRUE;
-		     break;
-	    case  5: mouse_code = MOUSE_MIDDLE;
+		     ಭಙ್ಗ;
+	    ಪಕ್ಷ  5: mouse_code = MOUSE_ಮಧ್ಯ;
 		     is_release = TRUE;
-		     break;
-	    case  6: mouse_code = MOUSE_RIGHT;
+		     ಭಙ್ಗ;
+	    ಪಕ್ಷ  6: mouse_code = MOUSE_ಬಲ;
 		     WantQueryMouse = TRUE;
-		     break;
-	    case  7: mouse_code = MOUSE_RIGHT;
+		     ಭಙ್ಗ;
+	    ಪಕ್ಷ  7: mouse_code = MOUSE_ಬಲ;
 		     is_release = TRUE;
-		     break;
-	    case  8: return -1; // fourth button down
-	    case  9: return -1; // fourth button up
-	    case 10: return -1; // mouse outside of filter rectangle
-	    default: return -1; // should never occur
+		     ಭಙ್ಗ;
+	    ಪಕ್ಷ  8: ಪ್ರತ್ಯಾಗಮ -1; // fourth button down
+	    ಪಕ್ಷ  9: ಪ್ರತ್ಯಾಗಮ -1; // fourth button up
+	    ಪಕ್ಷ 10: ಪ್ರತ್ಯಾಗಮ -1; // mouse outside of filter rectangle
+	    ಸ್ವಭಾವ: ಪ್ರತ್ಯಾಗಮ -1; // should never occur
 	}
 
 	mouse_col = Pc - 1;
 	mouse_row = Pr - 1;
 
-	*slen += (int)(p - (tp + *slen));
+	*slen += (ಪೂರ್ಣಾಙ್ಕ)(p - (tp + *slen));
     }
 #endif // FEAT_MOUSE_DEC
 #ifdef FEAT_MOUSE_PTERM
-    if (key_name[0] == KS_PTERM_MOUSE)
+    ಯದಿ (ಕೀಲಿ_name[0] == KS_PTERM_MOUSE)
     {
-	int button, num_clicks, action;
+	ಪೂರ್ಣಾಙ್ಕ button, ಅಂಕೆ_clicks, action;
 
 	p = tp + *slen;
 
 	action = getdigits(&p);
-	if (*p++ != ';')
-	    return -1;
+	ಯದಿ (*p++ != ';')
+	    ಪ್ರತ್ಯಾಗಮ -1;
 
 	mouse_row = getdigits(&p);
-	if (*p++ != ';')
-	    return -1;
+	ಯದಿ (*p++ != ';')
+	    ಪ್ರತ್ಯಾಗಮ -1;
 	mouse_col = getdigits(&p);
-	if (*p++ != ';')
-	    return -1;
+	ಯದಿ (*p++ != ';')
+	    ಪ್ರತ್ಯಾಗಮ -1;
 
 	button = getdigits(&p);
 	mouse_code = 0;
 
-	switch (button)
+	ವಿಕಲ್ಪ (button)
 	{
-	    case 4: mouse_code = MOUSE_LEFT; break;
-	    case 1: mouse_code = MOUSE_RIGHT; break;
-	    case 2: mouse_code = MOUSE_MIDDLE; break;
-	    default: return -1;
+	    ಪಕ್ಷ 4: mouse_code = MOUSE_ಎಡ; ಭಙ್ಗ;
+	    ಪಕ್ಷ 1: mouse_code = MOUSE_ಬಲ; ಭಙ್ಗ;
+	    ಪಕ್ಷ 2: mouse_code = MOUSE_ಮಧ್ಯ; ಭಙ್ಗ;
+	    ಸ್ವಭಾವ: ಪ್ರತ್ಯಾಗಮ -1;
 	}
 
-	switch (action)
+	ವಿಕಲ್ಪ (action)
 	{
-	    case 31: // Initial press
-		if (*p++ != ';')
-		    return -1;
+	    ಪಕ್ಷ 31: // Initial press
+		ಯದಿ (*p++ != ';')
+		    ಪ್ರತ್ಯಾಗಮ -1;
 
-		num_clicks = getdigits(&p); // Not used
-		break;
+		ಅಂಕೆ_clicks = getdigits(&p); // Not used
+		ಭಙ್ಗ;
 
-	    case 32: // Release
+	    ಪಕ್ಷ 32: // Release
 		is_release = TRUE;
-		break;
+		ಭಙ್ಗ;
 
-	    case 33: // Drag
+	    ಪಕ್ಷ 33: // Drag
 		held_button = mouse_code;
 		mouse_code |= MOUSE_DRAG;
-		break;
+		ಭಙ್ಗ;
 
-	    default:
-		return -1;
+	    ಸ್ವಭಾವ:
+		ಪ್ರತ್ಯಾಗಮ -1;
 	}
 
-	if (*p++ != 't')
-	    return -1;
+	ಯದಿ (*p++ != 't')
+	    ಪ್ರತ್ಯಾಗಮ -1;
 
 	*slen += (p - (tp + *slen));
     }
@@ -3178,10 +3178,10 @@ check_termcode_mouse(
 
     // Interpret the mouse code
     current_button = (mouse_code & MOUSE_CLICK_MASK);
-    if (is_release)
+    ಯದಿ (is_release)
 	current_button |= MOUSE_RELEASE;
 
-    if (current_button == MOUSE_RELEASE
+    ಯದಿ (current_button == MOUSE_RELEASE
 #ifdef FEAT_MOUSE_XTERM
 	    && wheel_code == 0
 #endif
@@ -3194,13 +3194,13 @@ check_termcode_mouse(
 	 * (can happen when you hold down two buttons and then let them go, or
 	 * click in the menu bar, but not on a menu, and drag into the text).
 	 */
-	if ((mouse_code & MOUSE_DRAG) == MOUSE_DRAG)
+	ಯದಿ ((mouse_code & MOUSE_DRAG) == MOUSE_DRAG)
 	    is_drag = TRUE;
 	current_button = held_button;
     }
-    else
+    ಅನ್ಯಥಾ
     {
-      if (wheel_code == 0)
+      ಯದಿ (wheel_code == 0)
       {
 #ifdef CHECK_DOUBLE_CLICK
 # ifdef FEAT_MOUSE_GPM
@@ -3209,21 +3209,21 @@ check_termcode_mouse(
 	 * not for GPM mouse events.
 	 */
 #  ifdef FEAT_GUI
-	if (key_name[0] != KS_GPM_MOUSE && !gui.in_use)
-#  else
-	    if (key_name[0] != KS_GPM_MOUSE)
+	ಯದಿ (ಕೀಲಿ_name[0] != KS_GPM_MOUSE && !gui.in_use)
+#  ಅನ್ಯಥಾ
+	    ಯದಿ (ಕೀಲಿ_name[0] != KS_GPM_MOUSE)
 #  endif
-# else
+# ಅನ್ಯಥಾ
 #  ifdef FEAT_GUI
-		if (!gui.in_use)
+		ಯದಿ (!gui.in_use)
 #  endif
 # endif
 		{
 		    /*
 		     * Compute the time elapsed since the previous mouse click.
 		     */
-		    gettimeofday(&mouse_time, NULL);
-		    if (orig_mouse_time.tv_sec == 0)
+		    gettimeofday(&mouse_time, ರಿಕ್ತ);
+		    ಯದಿ (orig_mouse_time.tv_sec == 0)
 		    {
 			/*
 			 * Avoid computing the difference between mouse_time
@@ -3233,12 +3233,12 @@ check_termcode_mouse(
 			 */
 			timediff = p_mouset;
 		    }
-		    else
+		    ಅನ್ಯಥಾ
 			timediff = time_diff_ms(&orig_mouse_time, &mouse_time);
 		    orig_mouse_time = mouse_time;
-		    if (mouse_code == orig_mouse_code
+		    ಯದಿ (mouse_code == orig_mouse_code
 			    && timediff < p_mouset
-			    && orig_num_clicks != 4
+			    && orig_ಅಂಕೆ_clicks != 4
 			    && orig_mouse_col == mouse_col
 			    && orig_mouse_row == mouse_row
 			    && (is_mouse_topline(curwin)
@@ -3246,83 +3246,83 @@ check_termcode_mouse(
 				// when window contents changes.
 				|| (mouse_row == 0 && firstwin->w_winrow > 0))
 		       )
-			++orig_num_clicks;
-		    else
-			orig_num_clicks = 1;
+			++orig_ಅಂಕೆ_clicks;
+		    ಅನ್ಯಥಾ
+			orig_ಅಂಕೆ_clicks = 1;
 		    orig_mouse_col = mouse_col;
 		    orig_mouse_row = mouse_row;
 		    set_mouse_topline(curwin);
 		}
-# if defined(FEAT_GUI) || defined(FEAT_MOUSE_GPM)
-		else
-		    orig_num_clicks = NUM_MOUSE_CLICKS(mouse_code);
+# ಯದಿ defined(FEAT_GUI) || defined(FEAT_MOUSE_GPM)
+		ಅನ್ಯಥಾ
+		    orig_ಅಂಕೆ_clicks = ಅಂಕೆ_MOUSE_CLICKS(mouse_code);
 # endif
-#else
-	orig_num_clicks = NUM_MOUSE_CLICKS(mouse_code);
+#ಅನ್ಯಥಾ
+	orig_ಅಂಕೆ_clicks = ಅಂಕೆ_MOUSE_CLICKS(mouse_code);
 #endif
 	is_click = TRUE;
       }
       orig_mouse_code = mouse_code;
     }
-    if (!is_drag)
+    ಯದಿ (!is_drag)
 	held_button = mouse_code & MOUSE_CLICK_MASK;
 
     /*
      * Translate the actual mouse event into a pseudo mouse event.
      * First work out what modifiers are to be used.
      */
-    if (orig_mouse_code & MOUSE_SHIFT)
+    ಯದಿ (orig_mouse_code & MOUSE_SHIFT)
 	*modifiers |= MOD_MASK_SHIFT;
-    if (orig_mouse_code & MOUSE_CTRL)
+    ಯದಿ (orig_mouse_code & MOUSE_CTRL)
 	*modifiers |= MOD_MASK_CTRL;
-    if (orig_mouse_code & MOUSE_ALT)
+    ಯದಿ (orig_mouse_code & MOUSE_ALT)
 	*modifiers |= MOD_MASK_ALT;
-    if (orig_num_clicks == 2)
+    ಯದಿ (orig_ಅಂಕೆ_clicks == 2)
 	*modifiers |= MOD_MASK_2CLICK;
-    else if (orig_num_clicks == 3)
+    ಅನ್ಯಥಾ ಯದಿ (orig_ಅಂಕೆ_clicks == 3)
 	*modifiers |= MOD_MASK_3CLICK;
-    else if (orig_num_clicks == 4)
+    ಅನ್ಯಥಾ ಯದಿ (orig_ಅಂಕೆ_clicks == 4)
 	*modifiers |= MOD_MASK_4CLICK;
 
     // Work out our pseudo mouse event. Note that MOUSE_RELEASE gets added,
     // then it's not mouse up/down.
-    key_name[0] = KS_EXTRA;
-    if (wheel_code != 0 && (!is_release || release_is_ambiguous))
+    ಕೀಲಿ_name[0] = KS_EXTRA;
+    ಯದಿ (wheel_code != 0 && (!is_release || release_is_ambiguous))
     {
-	if (wheel_code & MOUSE_CTRL)
+	ಯದಿ (wheel_code & MOUSE_CTRL)
 	    *modifiers |= MOD_MASK_CTRL;
-	if (wheel_code & MOUSE_ALT)
+	ಯದಿ (wheel_code & MOUSE_ALT)
 	    *modifiers |= MOD_MASK_ALT;
 
-	if (wheel_code & 1 && wheel_code & 2)
-	    key_name[1] = (int)KE_MOUSELEFT;
-	else if (wheel_code & 2)
-	    key_name[1] = (int)KE_MOUSERIGHT;
-	else if (wheel_code & 1)
-	    key_name[1] = (int)KE_MOUSEUP;
-	else
-	    key_name[1] = (int)KE_MOUSEDOWN;
+	ಯದಿ (wheel_code & 1 && wheel_code & 2)
+	    ಕೀಲಿ_name[1] = (ಪೂರ್ಣಾಙ್ಕ)KE_MOUSELEFT;
+	ಅನ್ಯಥಾ ಯದಿ (wheel_code & 2)
+	    ಕೀಲಿ_name[1] = (ಪೂರ್ಣಾಙ್ಕ)KE_MOUSERIGHT;
+	ಅನ್ಯಥಾ ಯದಿ (wheel_code & 1)
+	    ಕೀಲಿ_name[1] = (ಪೂರ್ಣಾಙ್ಕ)KE_MOUSEUP;
+	ಅನ್ಯಥಾ
+	    ಕೀಲಿ_name[1] = (ಪೂರ್ಣಾಙ್ಕ)KE_MOUSEDOWN;
 
 	held_button = MOUSE_RELEASE;
     }
-    else
+    ಅನ್ಯಥಾ
     {
-#if defined(UNIX)
-	if (use_xterm_mouse() && orig_mouse_code >= MOUSESIDEBUTTONS_LOW)
+#ಯದಿ defined(UNIX)
+	ಯದಿ (use_xterm_mouse() && orig_mouse_code >= MOUSESIDEBUTTONS_ಕೆಳಗಿನ)
 	    current_button = (current_button) ? MOUSE_X2 : MOUSE_X1;
 #endif
-	key_name[1] = get_pseudo_mouse_code(current_button, is_click, is_drag);
+	ಕೀಲಿ_name[1] = get_pseudo_mouse_code(current_button, is_click, is_drag);
     }
 
 
     // Make sure the mouse position is valid.  Some terminals may return weird
     // values.
-    if (mouse_col >= Columns)
+    ಯದಿ (mouse_col >= Columns)
 	mouse_col = Columns - 1;
-    if (mouse_row >= Rows)
+    ಯದಿ (mouse_row >= Rows)
 	mouse_row = Rows - 1;
 
-    return 0;
+    ಪ್ರತ್ಯಾಗಮ 0;
 }
 
 // Functions also used for popup windows.
@@ -3336,117 +3336,117 @@ check_termcode_mouse(
  * put in the cache.
  * Returns TRUE if the position is below the last line.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 mouse_comp_pos(
     win_T	*win,
-    int		*rowp,
-    int		*colp,
+    ಪೂರ್ಣಾಙ್ಕ		*rowp,
+    ಪೂರ್ಣಾಙ್ಕ		*colp,
     linenr_T	*lnump,
-    int		*plines_cache)
+    ಪೂರ್ಣಾಙ್ಕ		*plines_cache)
 {
-    int		col = *colp;
-    int		row = *rowp;
+    ಪೂರ್ಣಾಙ್ಕ		col = *colp;
+    ಪೂರ್ಣಾಙ್ಕ		row = *rowp;
     linenr_T	lnum;
-    int		retval = FALSE;
-    int		off;
-    int		count;
+    ಪೂರ್ಣಾಙ್ಕ		retval = FALSE;
+    ಪೂರ್ಣಾಙ್ಕ		off;
+    ಪೂರ್ಣಾಙ್ಕ		ಎಣಿಕೆ;
 
 #ifdef FEAT_RIGHTLEFT
-    if (win->w_p_rl)
+    ಯದಿ (win->w_p_rl)
 	col = win->w_width - 1 - col;
 #endif
 
     lnum = win->w_topline;
 
-    while (row > 0)
+    ಯಾವತ್ (row > 0)
     {
-	int cache_idx = lnum - win->w_topline;
+	ಪೂರ್ಣಾಙ್ಕ cache_idx = lnum - win->w_topline;
 
 	// Only "Rows" lines are cached, with folding we'll run out of entries
 	// and use the slow way.
-	if (plines_cache != NULL && cache_idx < Rows
+	ಯದಿ (plines_cache != ರಿಕ್ತ && cache_idx < Rows
 						&& plines_cache[cache_idx] > 0)
-	    count = plines_cache[cache_idx];
-	else
+	    ಎಣಿಕೆ = plines_cache[cache_idx];
+	ಅನ್ಯಥಾ
 	{
 #ifdef FEAT_DIFF
 	    // Don't include filler lines in "count"
-	    if (win->w_p_diff
+	    ಯದಿ (win->w_p_diff
 # ifdef FEAT_FOLDING
-		    && !hasFoldingWin(win, lnum, NULL, NULL, TRUE, NULL)
+		    && !hasFoldingWin(win, lnum, ರಿಕ್ತ, ರಿಕ್ತ, TRUE, ರಿಕ್ತ)
 # endif
 		    )
 	    {
-		if (lnum == win->w_topline)
+		ಯದಿ (lnum == win->w_topline)
 		    row -= win->w_topfill;
-		else
+		ಅನ್ಯಥಾ
 		    row -= diff_check_fill(win, lnum);
-		count = plines_win_nofill(win, lnum, FALSE);
+		ಎಣಿಕೆ = plines_win_nofill(win, lnum, FALSE);
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 #endif
-		count = plines_win(win, lnum, FALSE);
-	    if (plines_cache != NULL && cache_idx < Rows)
-		plines_cache[cache_idx] = count;
+		ಎಣಿಕೆ = plines_win(win, lnum, FALSE);
+	    ಯದಿ (plines_cache != ರಿಕ್ತ && cache_idx < Rows)
+		plines_cache[cache_idx] = ಎಣಿಕೆ;
 	}
 
-	if (win->w_skipcol > 0 && lnum == win->w_topline)
+	ಯದಿ (win->w_skipcol > 0 && lnum == win->w_topline)
 	{
-	    int width1 = win->w_width - win_col_off(win);
+	    ಪೂರ್ಣಾಙ್ಕ width1 = win->w_width - win_col_off(win);
 
-	    if (width1 > 0)
+	    ಯದಿ (width1 > 0)
 	    {
-		int skip_lines = 0;
+		ಪೂರ್ಣಾಙ್ಕ skip_ಸಾಲುಗಳು = 0;
 
 		// Adjust for 'smoothscroll' clipping the top screen lines.
 		// A similar formula is used in curs_columns().
-		if (win->w_skipcol > width1)
-		    skip_lines = (win->w_skipcol - width1)
+		ಯದಿ (win->w_skipcol > width1)
+		    skip_ಸಾಲುಗಳು = (win->w_skipcol - width1)
 					    / (width1 + win_col_off2(win)) + 1;
-		else if (win->w_skipcol > 0)
-		    skip_lines = 1;
+		ಅನ್ಯಥಾ ಯದಿ (win->w_skipcol > 0)
+		    skip_ಸಾಲುಗಳು = 1;
 
-		count -= skip_lines;
+		ಎಣಿಕೆ -= skip_ಸಾಲುಗಳು;
 	    }
 	}
 
-	if (count > row)
-	    break;	// Position is in this buffer line.
+	ಯದಿ (ಎಣಿಕೆ > row)
+	    ಭಙ್ಗ;	// Position is in this buffer line.
 #ifdef FEAT_FOLDING
-	(void)hasFoldingWin(win, lnum, NULL, &lnum, TRUE, NULL);
+	(ಶೂನ್ಯ)hasFoldingWin(win, lnum, ರಿಕ್ತ, &lnum, TRUE, ರಿಕ್ತ);
 #endif
-	if (lnum == win->w_buffer->b_ml.ml_line_count)
+	ಯದಿ (lnum == win->w_buffer->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
 	{
 	    retval = TRUE;
-	    break;		// past end of file
+	    ಭಙ್ಗ;		// past end of file
 	}
-	row -= count;
+	row -= ಎಣಿಕೆ;
 	++lnum;
     }
 
-    if (!retval)
+    ಯದಿ (!retval)
     {
 	// Compute the column without wrapping.
 	off = win_col_off(win) - win_col_off2(win);
-	if (col < off)
+	ಯದಿ (col < off)
 	    col = off;
 	col += row * (win->w_width - off);
 
 	// Add skip column for the topline.
-	if (lnum == win->w_topline)
+	ಯದಿ (lnum == win->w_topline)
 	    col += win->w_skipcol;
     }
 
-    if (!win->w_p_wrap)
+    ಯದಿ (!win->w_p_wrap)
 	col += win->w_leftcol;
 
     // skip line number and fold column in front of the line
     col -= win_col_off(win);
-    if (col <= 0)
+    ಯದಿ (col <= 0)
     {
 #ifdef FEAT_NETBEANS_INTG
 	// if mouse is clicked on the gutter, then inform the netbeans server
-	if (*colp < win_col_off(win))
+	ಯದಿ (*colp < win_col_off(win))
 	    netbeans_gutter_click(lnum);
 #endif
 	col = 0;
@@ -3455,7 +3455,7 @@ mouse_comp_pos(
     *colp = col;
     *rowp = row;
     *lnump = lnum;
-    return retval;
+    ಪ್ರತ್ಯಾಗಮ retval;
 }
 
 /*
@@ -3467,63 +3467,63 @@ mouse_comp_pos(
  * Returns NULL when something is wrong.
  */
     win_T *
-mouse_find_win(int *rowp, int *colp, mouse_find_T popup UNUSED)
+mouse_find_win(ಪೂರ್ಣಾಙ್ಕ *rowp, ಪೂರ್ಣಾಙ್ಕ *colp, mouse_find_T popup UNUSED)
 {
     frame_T	*fp;
     win_T	*wp;
 
 #ifdef FEAT_PROP_POPUP
-    win_T	*pwp = NULL;
+    win_T	*pwp = ರಿಕ್ತ;
 
-    if (popup != IGNORE_POPUP)
+    ಯದಿ (popup != IGNORE_POPUP)
     {
 	popup_reset_handled(POPUP_HANDLED_1);
-	while ((wp = find_next_popup(TRUE, POPUP_HANDLED_1)) != NULL)
+	ಯಾವತ್ ((wp = find_next_popup(TRUE, POPUP_HANDLED_1)) != ರಿಕ್ತ)
 	{
-	    if (*rowp >= wp->w_winrow && *rowp < wp->w_winrow + popup_height(wp)
+	    ಯದಿ (*rowp >= wp->w_winrow && *rowp < wp->w_winrow + popup_height(wp)
 		    && *colp >= wp->w_wincol
 				    && *colp < wp->w_wincol + popup_width(wp))
 		pwp = wp;
 	}
-	if (pwp != NULL)
+	ಯದಿ (pwp != ರಿಕ್ತ)
 	{
-	    if (popup == FAIL_POPUP)
-		return NULL;
+	    ಯದಿ (popup == FAIL_POPUP)
+		ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
 	    *rowp -= pwp->w_winrow;
 	    *colp -= pwp->w_wincol;
-	    return pwp;
+	    ಪ್ರತ್ಯಾಗಮ pwp;
 	}
     }
 #endif
 
     fp = topframe;
 
-    if (*colp < firstwin->w_wincol
+    ಯದಿ (*colp < firstwin->w_wincol
 	    || *colp >= firstwin->w_wincol + fp->fr_width
 	    || *rowp < firstwin->w_winrow)
-	return NULL;
+	ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
 
     *rowp -= firstwin->w_winrow;
     *colp -= firstwin->w_wincol;
-    for (;;)
+    ಪ್ರತಿ (;;)
     {
-	if (fp->fr_layout == FR_LEAF)
-	    break;
-	if (fp->fr_layout == FR_ROW)
+	ಯದಿ (fp->fr_layout == FR_LEAF)
+	    ಭಙ್ಗ;
+	ಯದಿ (fp->fr_layout == FR_ROW)
 	{
-	    for (fp = fp->fr_child; fp->fr_next != NULL; fp = fp->fr_next)
+	    ಪ್ರತಿ (fp = fp->fr_child; fp->fr_next != ರಿಕ್ತ; fp = fp->fr_next)
 	    {
-		if (*colp < fp->fr_width)
-		    break;
+		ಯದಿ (*colp < fp->fr_width)
+		    ಭಙ್ಗ;
 		*colp -= fp->fr_width;
 	    }
 	}
-	else    // fr_layout == FR_COL
+	ಅನ್ಯಥಾ    // fr_layout == FR_COL
 	{
-	    for (fp = fp->fr_child; fp->fr_next != NULL; fp = fp->fr_next)
+	    ಪ್ರತಿ (fp = fp->fr_child; fp->fr_next != ರಿಕ್ತ; fp = fp->fr_next)
 	    {
-		if (*rowp < fp->fr_height)
-		    break;
+		ಯದಿ (*rowp < fp->fr_height)
+		    ಭಙ್ಗ;
 		*rowp -= fp->fr_height;
 	    }
 	}
@@ -3531,58 +3531,58 @@ mouse_find_win(int *rowp, int *colp, mouse_find_T popup UNUSED)
     // When using a timer that closes a window the window might not actually
     // exist.
     FOR_ALL_WINDOWS(wp)
-	if (wp == fp->fr_win)
+	ಯದಿ (wp == fp->fr_win)
 	{
 #ifdef FEAT_MENU
 	    *rowp -= wp->w_winbar_height;
 #endif
-	    return wp;
+	    ಪ್ರತ್ಯಾಗಮ wp;
 	}
-    return NULL;
+    ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
 }
 
-#if defined(NEED_VCOL2COL) || defined(FEAT_BEVAL) || defined(FEAT_PROP_POPUP) \
+#ಯದಿ defined(NEED_VCOL2COL) || defined(FEAT_BEVAL) || defined(FEAT_PROP_POPUP) \
 	|| defined(FEAT_EVAL)
 /*
  * Convert a virtual (screen) column to a character column.
  * The first column is zero.
  */
-    int
-vcol2col(win_T *wp, linenr_T lnum, int vcol, colnr_T *coladdp)
+    ಪೂರ್ಣಾಙ್ಕ
+vcol2col(win_T *wp, linenr_T lnum, ಪೂರ್ಣಾಙ್ಕ vcol, colnr_T *coladdp)
 {
-    char_u	    *line;
+    char_u	    *ಸಾಲು;
     chartabsize_T   cts;
 
     // try to advance to the specified column
-    line = ml_get_buf(wp->w_buffer, lnum, FALSE);
-    init_chartabsize_arg(&cts, wp, lnum, 0, line, line);
-    while (cts.cts_vcol < vcol && *cts.cts_ptr != NUL)
+    ಸಾಲು = ml_get_buf(wp->w_buffer, lnum, FALSE);
+    init_chartabsize_arg(&cts, wp, lnum, 0, ಸಾಲು, ಸಾಲು);
+    ಯಾವತ್ (cts.cts_vcol < vcol && *cts.cts_ptr != NUL)
     {
-	int size = win_lbr_chartabsize(&cts, NULL, NULL);
-	if (cts.cts_vcol + size > vcol)
-	    break;
+	ಪೂರ್ಣಾಙ್ಕ size = win_lbr_chartabsize(&cts, ರಿಕ್ತ, ರಿಕ್ತ);
+	ಯದಿ (cts.cts_vcol + size > vcol)
+	    ಭಙ್ಗ;
 	cts.cts_vcol += size;
 	MB_PTR_ADV(cts.cts_ptr);
     }
     clear_chartabsize_arg(&cts);
 
-    if (coladdp != NULL)
+    ಯದಿ (coladdp != ರಿಕ್ತ)
 	*coladdp = vcol - cts.cts_vcol;
-    return (int)(cts.cts_ptr - line);
+    ಪ್ರತ್ಯಾಗಮ (ಪೂರ್ಣಾಙ್ಕ)(cts.cts_ptr - ಸಾಲು);
 }
 #endif
 
-#if defined(FEAT_EVAL)
+#ಯದಿ defined(FEAT_EVAL)
 /*
  * "getmousepos()" function.
  */
-    void
+    ಶೂನ್ಯ
 f_getmousepos(typval_T *argvars UNUSED, typval_T *rettv)
 {
     dict_T	*d;
     win_T	*wp;
-    int		row = mouse_row;
-    int		col = mouse_col;
+    ಪೂರ್ಣಾಙ್ಕ		row = mouse_row;
+    ಪೂರ್ಣಾಙ್ಕ		col = mouse_col;
     varnumber_T winid = 0;
     varnumber_T winrow = 0;
     varnumber_T wincol = 0;
@@ -3590,48 +3590,48 @@ f_getmousepos(typval_T *argvars UNUSED, typval_T *rettv)
     varnumber_T column = 0;
     colnr_T	coladd = 0;
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    ಯದಿ (rettv_dict_alloc(rettv) == FAIL)
+	ಪ್ರತ್ಯಾಗಮ;
     d = rettv->vval.v_dict;
 
-    dict_add_number(d, "screenrow", (varnumber_T)mouse_row + 1);
-    dict_add_number(d, "screencol", (varnumber_T)mouse_col + 1);
+    dict_add_ಸಂಖ್ಯೆ(d, "screenrow", (varnumber_T)mouse_row + 1);
+    dict_add_ಸಂಖ್ಯೆ(d, "screencol", (varnumber_T)mouse_col + 1);
 
     wp = mouse_find_win(&row, &col, FIND_POPUP);
-    if (wp != NULL)
+    ಯದಿ (wp != ರಿಕ್ತ)
     {
-	int	top_off = 0;
-	int	left_off = 0;
-	int	height = wp->w_height + wp->w_status_height;
+	ಪೂರ್ಣಾಙ್ಕ	ತುದಿ_off = 0;
+	ಪೂರ್ಣಾಙ್ಕ	ಎಡ_off = 0;
+	ಪೂರ್ಣಾಙ್ಕ	height = wp->w_height + wp->w_status_height;
 
 # ifdef FEAT_PROP_POPUP
-	if (WIN_IS_POPUP(wp))
+	ಯದಿ (WIN_IS_POPUP(wp))
 	{
-	    top_off = popup_top_extra(wp);
-	    left_off = popup_left_extra(wp);
+	    ತುದಿ_off = popup_ತುದಿ_extra(wp);
+	    ಎಡ_off = popup_ಎಡ_extra(wp);
 	    height = popup_height(wp);
 	}
 # endif
-	if (row < height)
+	ಯದಿ (row < height)
 	{
 	    winid = wp->w_id;
 	    winrow = row + 1;
 	    wincol = col + 1;
-	    row -= top_off;
-	    col -= left_off;
-	    if (row >= 0 && row < wp->w_height && col >= 0 && col < wp->w_width)
+	    row -= ತುದಿ_off;
+	    col -= ಎಡ_off;
+	    ಯದಿ (row >= 0 && row < wp->w_height && col >= 0 && col < wp->w_width)
 	    {
-		(void)mouse_comp_pos(wp, &row, &col, &lnum, NULL);
+		(ಶೂನ್ಯ)mouse_comp_pos(wp, &row, &col, &lnum, ರಿಕ್ತ);
 		col = vcol2col(wp, lnum, col, &coladd);
 		column = col + 1;
 	    }
 	}
     }
-    dict_add_number(d, "winid", winid);
-    dict_add_number(d, "winrow", winrow);
-    dict_add_number(d, "wincol", wincol);
-    dict_add_number(d, "line", (varnumber_T)lnum);
-    dict_add_number(d, "column", column);
-    dict_add_number(d, "coladd", coladd);
+    dict_add_ಸಂಖ್ಯೆ(d, "winid", winid);
+    dict_add_ಸಂಖ್ಯೆ(d, "winrow", winrow);
+    dict_add_ಸಂಖ್ಯೆ(d, "wincol", wincol);
+    dict_add_ಸಂಖ್ಯೆ(d, "line", (varnumber_T)lnum);
+    dict_add_ಸಂಖ್ಯೆ(d, "column", column);
+    dict_add_ಸಂಖ್ಯೆ(d, "coladd", coladd);
 }
 #endif

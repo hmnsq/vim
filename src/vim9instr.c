@@ -12,15 +12,15 @@
  */
 
 #define USING_FLOAT_STUFF
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-#if defined(FEAT_EVAL)
+#ಯದಿ defined(FEAT_EVAL)
 
 /////////////////////////////////////////////////////////////////////
 // Following generate_ functions expect the caller to call ga_grow().
 
-#define RETURN_NULL_IF_SKIP(cctx) if (cctx->ctx_skip == SKIP_YES) return NULL
-#define RETURN_OK_IF_SKIP(cctx) if (cctx->ctx_skip == SKIP_YES) return OK
+#define RETURN_NULL_IF_SKIP(cctx) ಯದಿ (cctx->ctx_skip == SKIP_YES) ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ
+#define RETURN_OK_IF_SKIP(cctx) ಯದಿ (cctx->ctx_skip == SKIP_YES) ಪ್ರತ್ಯಾಗಮ OK
 
 /*
  * Generate an instruction without arguments.
@@ -33,14 +33,14 @@ generate_instr(cctx_T *cctx, isntype_T isn_type)
     isn_T	*isn;
 
     RETURN_NULL_IF_SKIP(cctx);
-    if (GA_GROW_FAILS(instr, 1))
-	return NULL;
+    ಯದಿ (GA_GROW_FAILS(instr, 1))
+	ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
     isn = ((isn_T *)instr->ga_data) + instr->ga_len;
     isn->isn_type = isn_type;
     isn->isn_lnum = cctx->ctx_lnum + 1;
     ++instr->ga_len;
 
-    return isn;
+    ಪ್ರತ್ಯಾಗಮ isn;
 }
 
 /*
@@ -49,18 +49,18 @@ generate_instr(cctx_T *cctx, isntype_T isn_type)
  * Returns a pointer to the new instruction, NULL if failed.
  */
     isn_T *
-generate_instr_drop(cctx_T *cctx, isntype_T isn_type, int drop)
+generate_instr_drop(cctx_T *cctx, isntype_T isn_type, ಪೂರ್ಣಾಙ್ಕ drop)
 {
     RETURN_NULL_IF_SKIP(cctx);
-    cctx->ctx_type_stack.ga_len -= drop;
-    return generate_instr(cctx, isn_type);
+    cctx->ctx_type_ರಾಶಿ.ga_len -= drop;
+    ಪ್ರತ್ಯಾಗಮ generate_instr(cctx, isn_type);
 }
 
 /*
  * Generate instruction "isn_type" and put "type" on the type stack,
  * use "decl_type" for the declared type.
  */
-    static isn_T *
+    ಸ್ಥಿರ isn_T *
 generate_instr_type2(
 	cctx_T	    *cctx,
 	isntype_T   isn_type,
@@ -69,14 +69,14 @@ generate_instr_type2(
 {
     isn_T	*isn;
 
-    if ((isn = generate_instr(cctx, isn_type)) == NULL)
-	return NULL;
+    ಯದಿ ((isn = generate_instr(cctx, isn_type)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
 
-    if (push_type_stack2(cctx, type == NULL ? &t_any : type,
-			       decl_type == NULL ? &t_any : decl_type) == FAIL)
-	return NULL;
+    ಯದಿ (ತಳ್ಳು_type_stack2(cctx, type == ರಿಕ್ತ ? &t_any : type,
+			       decl_type == ರಿಕ್ತ ? &t_any : decl_type) == FAIL)
+	ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
 
-    return isn;
+    ಪ್ರತ್ಯಾಗಮ isn;
 }
 
 /*
@@ -87,7 +87,7 @@ generate_instr_type2(
     isn_T *
 generate_instr_type(cctx_T *cctx, isntype_T isn_type, type_T *type)
 {
-    return generate_instr_type2(cctx, isn_type, type, &t_any);
+    ಪ್ರತ್ಯಾಗಮ generate_instr_type2(cctx, isn_type, type, &t_any);
 }
 
 /*
@@ -100,86 +100,86 @@ generate_instr_debug(cctx_T *cctx)
     dfunc_T	*dfunc = ((dfunc_T *)def_functions.ga_data)
 					       + cctx->ctx_ufunc->uf_dfunc_idx;
 
-    if ((isn = generate_instr(cctx, ISN_DEBUG)) == NULL)
-	return NULL;
+    ಯದಿ ((isn = generate_instr(cctx, ISN_DEBUG)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
     isn->isn_arg.debug.dbg_var_names_len = dfunc->df_var_names.ga_len;
     isn->isn_arg.debug.dbg_break_lnum = cctx->ctx_prev_lnum;
-    return isn;
+    ಪ್ರತ್ಯಾಗಮ isn;
 }
 
 /*
  * Generate an ISN_CONSTRUCT instruction.
  * The object will have "size" members.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_CONSTRUCT(cctx_T *cctx, class_T *cl)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_CONSTRUCT)) == NULL)
-	return FAIL;
-    isn->isn_arg.construct.construct_size = sizeof(object_T)
-			       + cl->class_obj_member_count * sizeof(typval_T);
+    ಯದಿ ((isn = generate_instr(cctx, ISN_CONSTRUCT)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    isn->isn_arg.construct.construct_size = ಪರಿಮಾಣ(object_T)
+			       + cl->class_obj_member_ಎಣಿಕೆ * ಪರಿಮಾಣ(typval_T);
     isn->isn_arg.construct.construct_class = cl;
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate ISN_GET_OBJ_MEMBER - access member of object at bottom of stack by
  * index.
  */
-    int
-generate_GET_OBJ_MEMBER(cctx_T *cctx, int idx, type_T *type)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_GET_OBJ_MEMBER(cctx_T *cctx, ಪೂರ್ಣಾಙ್ಕ idx, type_T *type)
 {
     RETURN_OK_IF_SKIP(cctx);
 
     // drop the object type
     isn_T *isn = generate_instr_drop(cctx, ISN_GET_OBJ_MEMBER, 1);
-    if (isn == NULL)
-	return FAIL;
+    ಯದಿ (isn == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
 
-    isn->isn_arg.classmember.cm_class = NULL;
+    isn->isn_arg.classmember.cm_class = ರಿಕ್ತ;
     isn->isn_arg.classmember.cm_idx = idx;
-    return push_type_stack2(cctx, type, &t_any);
+    ಪ್ರತ್ಯಾಗಮ ತಳ್ಳು_type_stack2(cctx, type, &t_any);
 }
 
 /*
  * Generate ISN_GET_ITF_MEMBER - access member of interface at bottom of stack
  * by index.
  */
-    int
-generate_GET_ITF_MEMBER(cctx_T *cctx, class_T *itf, int idx, type_T *type)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_GET_ITF_MEMBER(cctx_T *cctx, class_T *itf, ಪೂರ್ಣಾಙ್ಕ idx, type_T *type)
 {
     RETURN_OK_IF_SKIP(cctx);
 
     // drop the object type
     isn_T *isn = generate_instr_drop(cctx, ISN_GET_ITF_MEMBER, 1);
-    if (isn == NULL)
-	return FAIL;
+    ಯದಿ (isn == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
 
     isn->isn_arg.classmember.cm_class = itf;
     ++itf->class_refcount;
     isn->isn_arg.classmember.cm_idx = idx;
-    return push_type_stack2(cctx, type, &t_any);
+    ಪ್ರತ್ಯಾಗಮ ತಳ್ಳು_type_stack2(cctx, type, &t_any);
 }
 
 /*
  * Generate ISN_STORE_THIS - store value in member of "this" object with member
  * index "idx".
  */
-    int
-generate_STORE_THIS(cctx_T *cctx, int idx)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_STORE_THIS(cctx_T *cctx, ಪೂರ್ಣಾಙ್ಕ idx)
 {
     RETURN_OK_IF_SKIP(cctx);
 
     // drop the value type
     isn_T *isn = generate_instr_drop(cctx, ISN_STORE_THIS, 1);
-    if (isn == NULL)
-	return FAIL;
+    ಯದಿ (isn == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
 
-    isn->isn_arg.number = idx;
-    return OK;
+    isn->isn_arg.ಸಂಖ್ಯೆ = idx;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
@@ -189,109 +189,109 @@ generate_STORE_THIS(cctx_T *cctx, int idx)
  * strings.  When tostring_flags has TOSTRING_INTERPOLATE, convert a List or a
  * Dict to the corresponding textual representation.
  */
-    int
-may_generate_2STRING(int offset, int tostring_flags, cctx_T *cctx)
+    ಪೂರ್ಣಾಙ್ಕ
+may_generate_2STRING(ಪೂರ್ಣಾಙ್ಕ offset, ಪೂರ್ಣಾಙ್ಕ tostring_flags, cctx_T *cctx)
 {
     isn_T	*isn;
     isntype_T	isntype = ISN_2STRING;
     type_T	*type;
 
     RETURN_OK_IF_SKIP(cctx);
-    type = get_type_on_stack(cctx, -1 - offset);
+    type = get_type_on_ರಾಶಿ(cctx, -1 - offset);
 
-    switch (type->tt_type)
+    ವಿಕಲ್ಪ (type->tt_type)
     {
 	// nothing to be done
-	case VAR_STRING: return OK;
+	ಪಕ್ಷ VAR_STRING: ಪ್ರತ್ಯಾಗಮ OK;
 
 	// conversion possible
-	case VAR_SPECIAL:
-	case VAR_BOOL:
-	case VAR_NUMBER:
-	case VAR_FLOAT:
-			 break;
+	ಪಕ್ಷ VAR_SPECIAL:
+	ಪಕ್ಷ VAR_BOOL:
+	ಪಕ್ಷ VAR_ಸಂಖ್ಯೆ:
+	ಪಕ್ಷ VAR_FLOAT:
+			 ಭಙ್ಗ;
 
 	// conversion possible (with runtime check)
-	case VAR_ANY:
-	case VAR_UNKNOWN:
+	ಪಕ್ಷ VAR_ANY:
+	ಪಕ್ಷ VAR_UNKNOWN:
 			 isntype = ISN_2STRING_ANY;
-			 break;
+			 ಭಙ್ಗ;
 
 	// conversion possible when tolerant
-	case VAR_LIST:
-	case VAR_TUPLE:
-	case VAR_DICT:
-			 if (tostring_flags & TOSTRING_TOLERANT)
+	ಪಕ್ಷ VAR_LIST:
+	ಪಕ್ಷ VAR_TUPLE:
+	ಪಕ್ಷ VAR_DICT:
+			 ಯದಿ (tostring_flags & TOSTRING_TOLERANT)
 			 {
 			     isntype = ISN_2STRING_ANY;
-			     break;
+			     ಭಙ್ಗ;
 			 }
-			 if (tostring_flags & TOSTRING_INTERPOLATE)
-			     break;
+			 ಯದಿ (tostring_flags & TOSTRING_INTERPOLATE)
+			     ಭಙ್ಗ;
 			 // FALLTHROUGH
 
 	// conversion not possible
-	case VAR_VOID:
-	case VAR_BLOB:
-	case VAR_FUNC:
-	case VAR_PARTIAL:
-	case VAR_JOB:
-	case VAR_CHANNEL:
-	case VAR_INSTR:
-	case VAR_CLASS:
-	case VAR_OBJECT:
-	case VAR_TYPEALIAS:
+	ಪಕ್ಷ VAR_VOID:
+	ಪಕ್ಷ VAR_BLOB:
+	ಪಕ್ಷ VAR_FUNC:
+	ಪಕ್ಷ VAR_PARTIAL:
+	ಪಕ್ಷ VAR_JOB:
+	ಪಕ್ಷ VAR_CHANNEL:
+	ಪಕ್ಷ VAR_INSTR:
+	ಪಕ್ಷ VAR_CLASS:
+	ಪಕ್ಷ VAR_OBJECT:
+	ಪಕ್ಷ VAR_TYPEALIAS:
 			 to_string_error(type->tt_type);
-			 return FAIL;
+			 ಪ್ರತ್ಯಾಗಮ FAIL;
     }
 
-    set_type_on_stack(cctx, &t_string, -1 - offset);
-    if ((isn = generate_instr(cctx, isntype)) == NULL)
-	return FAIL;
+    set_type_on_ರಾಶಿ(cctx, &t_string, -1 - offset);
+    ಯದಿ ((isn = generate_instr(cctx, isntype)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     isn->isn_arg.tostring.offset = offset;
     isn->isn_arg.tostring.flags = tostring_flags;
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
-    static int
-check_number_or_float(type_T *typ1, type_T *typ2, char_u *op)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+check_ಸಂಖ್ಯೆ_or_float(type_T *typ1, type_T *typ2, char_u *op)
 {
     vartype_T	    type1 = typ1->tt_type;
     vartype_T	    type2 = typ2->tt_type;
-    if (!((type1 == VAR_NUMBER || type1 == VAR_FLOAT
+    ಯದಿ (!((type1 == VAR_ಸಂಖ್ಯೆ || type1 == VAR_FLOAT
 				   || type1 == VAR_ANY || type1 == VAR_UNKNOWN)
-	    && (type2 == VAR_NUMBER || type2 == VAR_FLOAT
+	    && (type2 == VAR_ಸಂಖ್ಯೆ || type2 == VAR_FLOAT
 				 || type2 == VAR_ANY || type2 == VAR_UNKNOWN)))
     {
-	if (check_type_is_value(typ1) == FAIL
-		|| check_type_is_value(typ2) == FAIL)
-	    return FAIL;
-	if (*op == '+')
+	ಯದಿ (check_type_is_ಮೌಲ್ಯ(typ1) == FAIL
+		|| check_type_is_ಮೌಲ್ಯ(typ2) == FAIL)
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
+	ಯದಿ (*op == '+')
 	    emsg(_(e_wrong_argument_type_for_plus));
-	else
-	    semsg(_(e_char_requires_number_or_float_arguments), *op);
-	return FAIL;
+	ಅನ್ಯಥಾ
+	    semsg(_(e_char_requires_ಸಂಖ್ಯೆ_or_float_arguments), *op);
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     }
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Append the tuple item types from "tuple_type" to the grow array "gap".
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
 ga_append_tuple_types(type_T *tuple_type, garray_T *gap)
 {
-    for (int i = 0; i < tuple_type->tt_argcount; i++)
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 0; i < tuple_type->tt_argcount; i++)
     {
-	if (ga_grow(gap, 1) == FAIL)
-	    return FAIL;
+	ಯದಿ (ga_grow(gap, 1) == FAIL)
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
 
 	((type_T **)gap->ga_data)[gap->ga_len] = tuple_type->tt_args[i];
 	gap->ga_len++;
     }
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
@@ -301,85 +301,85 @@ ga_append_tuple_types(type_T *tuple_type, garray_T *gap)
  *
  * Returns OK on success and FAIL on memory allocation failure.
  */
-    static int
-set_tuple_union_type_on_stack(type_T *type1, type_T *type2, cctx_T *cctx)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+set_tuple_union_type_on_ರಾಶಿ(type_T *type1, type_T *type2, cctx_T *cctx)
 {
     // The concatenated tuple has the union of types from both the tuples
     garray_T	tuple_types_ga;
 
-    ga_init2(&tuple_types_ga, sizeof(type_T *), 10);
+    ga_init2(&tuple_types_ga, ಪರಿಮಾಣ(type_T *), 10);
 
-    if (type1->tt_argcount > 0)
+    ಯದಿ (type1->tt_argcount > 0)
 	ga_append_tuple_types(type1, &tuple_types_ga);
-    if (!(type1->tt_flags & TTFLAG_VARARGS) && (type2->tt_argcount > 0))
+    ಯದಿ (!(type1->tt_flags & TTFLAG_VARARGS) && (type2->tt_argcount > 0))
 	ga_append_tuple_types(type2, &tuple_types_ga);
 
     type_T *new_tuple_type = get_tuple_type(&tuple_types_ga,
 							cctx->ctx_type_list);
     // result inherits the variadic flag from the operands
-    if ((new_tuple_type->tt_flags & TTFLAG_STATIC) == 0)
+    ಯದಿ ((new_tuple_type->tt_flags & TTFLAG_STATIC) == 0)
 	new_tuple_type->tt_flags |= (type1->tt_flags & TTFLAG_VARARGS)
 					| (type2->tt_flags & TTFLAG_VARARGS);
 
     // set the type on the stack for the resulting tuple
-    set_type_on_stack(cctx, new_tuple_type, 0);
+    set_type_on_ರಾಶಿ(cctx, new_tuple_type, 0);
 
     ga_clear(&tuple_types_ga);
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate instruction for "+".  For a list this creates a new list.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_add_instr(
 	cctx_T	    *cctx,
 	vartype_T   vartype,
 	type_T	    *type1,
 	type_T	    *type2,
-	exprtype_T  expr_type)
+	exprtype_T  ಅಭಿವ್ಯಕ್ತಿ_type)
 {
     isn_T	*isn = generate_instr_drop(cctx,
-		      vartype == VAR_NUMBER ? ISN_OPNR
+		      vartype == VAR_ಸಂಖ್ಯೆ ? ISN_OPNR
 		    : vartype == VAR_LIST ? ISN_ADDLIST
 		    : vartype == VAR_TUPLE ? ISN_ADDTUPLE
 		    : vartype == VAR_BLOB ? ISN_ADDBLOB
 		    : vartype == VAR_FLOAT ? ISN_OPFLOAT
 		    : ISN_OPANY, 1);
 
-    if (vartype != VAR_LIST && vartype != VAR_BLOB && vartype != VAR_TUPLE
+    ಯದಿ (vartype != VAR_LIST && vartype != VAR_BLOB && vartype != VAR_TUPLE
 	    && type1->tt_type != VAR_ANY
 	    && type1->tt_type != VAR_UNKNOWN
 	    && type2->tt_type != VAR_ANY
 	    && type2->tt_type != VAR_UNKNOWN
-	    && check_number_or_float(type1, type2, (char_u *)"+") == FAIL)
-	return FAIL;
+	    && check_ಸಂಖ್ಯೆ_or_float(type1, type2, (char_u *)"+") == FAIL)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
 
-    if (isn != NULL)
+    ಯದಿ (isn != ರಿಕ್ತ)
     {
-	if (isn->isn_type == ISN_ADDLIST)
-	    isn->isn_arg.op.op_type = expr_type;
-	else
-	    isn->isn_arg.op.op_type = EXPR_ADD;
+	ಯದಿ (isn->isn_type == ISN_ADDLIST)
+	    isn->isn_arg.op.op_type = ಅಭಿವ್ಯಕ್ತಿ_type;
+	ಅನ್ಯಥಾ
+	    isn->isn_arg.op.op_type = ಅಭಿವ್ಯಕ್ತಿ_ADD;
     }
 
     // When concatenating two lists with different member types the member type
     // becomes "any".
-    if (vartype == VAR_LIST
+    ಯದಿ (vartype == VAR_LIST
 	    && type1->tt_type == VAR_LIST && type2->tt_type == VAR_LIST
 	    && type1->tt_member != type2->tt_member)
-	set_type_on_stack(cctx, &t_list_any, 0);
-    else if (vartype == VAR_TUPLE)
+	set_type_on_ರಾಶಿ(cctx, &t_list_any, 0);
+    ಅನ್ಯಥಾ ಯದಿ (vartype == VAR_TUPLE)
     {
-	if (!check_tuples_addable(type1, type2))
-	    return FAIL;
+	ಯದಿ (!check_tuples_addable(type1, type2))
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
 
-	if (set_tuple_union_type_on_stack(type1, type2, cctx) == FAIL)
-	    return FAIL;
+	ಯದಿ (set_tuple_union_type_on_ರಾಶಿ(type1, type2, cctx) == FAIL)
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
     }
 
-    return isn == NULL ? FAIL : OK;
+    ಪ್ರತ್ಯಾಗಮ isn == ರಿಕ್ತ ? FAIL : OK;
 }
 
 /*
@@ -390,21 +390,21 @@ generate_add_instr(
     vartype_T
 operator_type(type_T *type1, type_T *type2)
 {
-    if (type1->tt_type == type2->tt_type
-	    && (type1->tt_type == VAR_NUMBER
+    ಯದಿ (type1->tt_type == type2->tt_type
+	    && (type1->tt_type == VAR_ಸಂಖ್ಯೆ
 		|| type1->tt_type == VAR_LIST
 		|| type1->tt_type == VAR_TUPLE
 		|| type1->tt_type == VAR_FLOAT
 		|| type1->tt_type == VAR_BLOB))
-	return type1->tt_type;
-    return VAR_ANY;
+	ಪ್ರತ್ಯಾಗಮ type1->tt_type;
+    ಪ್ರತ್ಯಾಗಮ VAR_ANY;
 }
 
 /*
  * Generate an instruction with two arguments.  The instruction depends on the
  * type of the arguments.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_two_op(cctx_T *cctx, char_u *op)
 {
     type_T	*type1;
@@ -415,76 +415,76 @@ generate_two_op(cctx_T *cctx, char_u *op)
     RETURN_OK_IF_SKIP(cctx);
 
     // Get the known type of the two items on the stack.
-    type1 = get_type_on_stack(cctx, 1);
-    type2 = get_type_on_stack(cctx, 0);
+    type1 = get_type_on_ರಾಶಿ(cctx, 1);
+    type2 = get_type_on_ರಾಶಿ(cctx, 0);
     vartype = operator_type(type1, type2);
 
-    switch (*op)
+    ವಿಕಲ್ಪ (*op)
     {
-	case '+':
-		  if (generate_add_instr(cctx, vartype, type1, type2,
-							    EXPR_COPY) == FAIL)
-		      return FAIL;
-		  break;
+	ಪಕ್ಷ '+':
+		  ಯದಿ (generate_add_instr(cctx, vartype, type1, type2,
+							    ಅಭಿವ್ಯಕ್ತಿ_COPY) == FAIL)
+		      ಪ್ರತ್ಯಾಗಮ FAIL;
+		  ಭಙ್ಗ;
 
-	case '-':
-	case '*':
-	case '/': if (check_number_or_float(type1, type2, op) == FAIL)
-		      return FAIL;
-		  if (vartype == VAR_NUMBER)
+	ಪಕ್ಷ '-':
+	ಪಕ್ಷ '*':
+	ಪಕ್ಷ '/': ಯದಿ (check_ಸಂಖ್ಯೆ_or_float(type1, type2, op) == FAIL)
+		      ಪ್ರತ್ಯಾಗಮ FAIL;
+		  ಯದಿ (vartype == VAR_ಸಂಖ್ಯೆ)
 		      isn = generate_instr_drop(cctx, ISN_OPNR, 1);
-		  else if (vartype == VAR_FLOAT)
+		  ಅನ್ಯಥಾ ಯದಿ (vartype == VAR_FLOAT)
 		      isn = generate_instr_drop(cctx, ISN_OPFLOAT, 1);
-		  else
+		  ಅನ್ಯಥಾ
 		      isn = generate_instr_drop(cctx, ISN_OPANY, 1);
-		  if (isn != NULL)
+		  ಯದಿ (isn != ರಿಕ್ತ)
 		      isn->isn_arg.op.op_type = *op == '*'
-				 ? EXPR_MULT : *op == '/'? EXPR_DIV : EXPR_SUB;
-		  break;
+				 ? ಅಭಿವ್ಯಕ್ತಿ_MULT : *op == '/'? ಅಭಿವ್ಯಕ್ತಿ_DIV : ಅಭಿವ್ಯಕ್ತಿ_SUB;
+		  ಭಙ್ಗ;
 
-	case '%': if ((type1->tt_type != VAR_ANY
+	ಪಕ್ಷ '%': ಯದಿ ((type1->tt_type != VAR_ANY
 			      && type1->tt_type != VAR_UNKNOWN
-					       && type1->tt_type != VAR_NUMBER)
+					       && type1->tt_type != VAR_ಸಂಖ್ಯೆ)
 			  || (type2->tt_type != VAR_ANY
 			      && type2->tt_type != VAR_UNKNOWN
-					      && type2->tt_type != VAR_NUMBER))
+					      && type2->tt_type != VAR_ಸಂಖ್ಯೆ))
 		  {
-		      emsg(_(e_percent_requires_number_arguments));
-		      return FAIL;
+		      emsg(_(e_percent_requires_ಸಂಖ್ಯೆ_arguments));
+		      ಪ್ರತ್ಯಾಗಮ FAIL;
 		  }
 		  isn = generate_instr_drop(cctx,
-			      vartype == VAR_NUMBER ? ISN_OPNR : ISN_OPANY, 1);
-		  if (isn != NULL)
-		      isn->isn_arg.op.op_type = EXPR_REM;
-		  break;
+			      vartype == VAR_ಸಂಖ್ಯೆ ? ISN_OPNR : ISN_OPANY, 1);
+		  ಯದಿ (isn != ರಿಕ್ತ)
+		      isn->isn_arg.op.op_type = ಅಭಿವ್ಯಕ್ತಿ_REM;
+		  ಭಙ್ಗ;
     }
 
     // correct type of result
-    if (vartype == VAR_ANY)
+    ಯದಿ (vartype == VAR_ANY)
     {
 	type_T *type = &t_any;
 
 	// float+number and number+float results in float
-	if ((type1->tt_type == VAR_NUMBER || type1->tt_type == VAR_FLOAT)
-	      && (type2->tt_type == VAR_NUMBER || type2->tt_type == VAR_FLOAT))
+	ಯದಿ ((type1->tt_type == VAR_ಸಂಖ್ಯೆ || type1->tt_type == VAR_FLOAT)
+	      && (type2->tt_type == VAR_ಸಂಖ್ಯೆ || type2->tt_type == VAR_FLOAT))
 	    type = &t_float;
-	set_type_on_stack(cctx, type, 0);
+	set_type_on_ರಾಶಿ(cctx, type, 0);
     }
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Choose correct error message for the specified type information.
  */
-    static isntype_T
-compare_isn_not_values(typval_T *tv, type_T *type)
+    ಸ್ಥಿರ isntype_T
+compare_isn_not_ಮೌಲ್ಯಗಳು(typval_T *tv, type_T *type)
 {
-    if (tv != NULL)
-	(void)check_typval_is_value(tv);
-    else
-	(void)check_type_is_value(type);
-    return ISN_DROP;
+    ಯದಿ (tv != ರಿಕ್ತ)
+	(ಶೂನ್ಯ)check_typval_is_ಮೌಲ್ಯ(tv);
+    ಅನ್ಯಥಾ
+	(ಶೂನ್ಯ)check_type_is_ಮೌಲ್ಯ(type);
+    ಪ್ರತ್ಯಾಗಮ ISN_DROP;
 }
 
 /*
@@ -492,7 +492,7 @@ compare_isn_not_values(typval_T *tv, type_T *type)
  * Either "tv1" and "tv2" are passed or "type1" and "type2".
  * Return ISN_DROP when failed.
  */
-    static isntype_T
+    ಸ್ಥಿರ isntype_T
 get_compare_isn(
 	exprtype_T  exprtype,
 	typval_T    *tv1,
@@ -501,133 +501,133 @@ get_compare_isn(
 	type_T	    *type2)
 {
     isntype_T	isntype = ISN_DROP;
-    vartype_T	vartype1 = tv1 != NULL ? tv1->v_type : type1->tt_type;
-    vartype_T	vartype2 = tv2 != NULL ? tv2->v_type : type2->tt_type;
+    vartype_T	vartype1 = tv1 != ರಿಕ್ತ ? tv1->v_type : type1->tt_type;
+    vartype_T	vartype2 = tv2 != ರಿಕ್ತ ? tv2->v_type : type2->tt_type;
 
-    if (vartype1 == VAR_CLASS || vartype1 == VAR_TYPEALIAS)
-	return compare_isn_not_values(tv1, type1);
-    if (vartype2 == VAR_CLASS || vartype2 == VAR_TYPEALIAS)
-	return compare_isn_not_values(tv2, type2);
+    ಯದಿ (vartype1 == VAR_CLASS || vartype1 == VAR_TYPEALIAS)
+	ಪ್ರತ್ಯಾಗಮ compare_isn_not_ಮೌಲ್ಯಗಳು(tv1, type1);
+    ಯದಿ (vartype2 == VAR_CLASS || vartype2 == VAR_TYPEALIAS)
+	ಪ್ರತ್ಯಾಗಮ compare_isn_not_ಮೌಲ್ಯಗಳು(tv2, type2);
 
-    if (vartype1 == vartype2)
+    ಯದಿ (vartype1 == vartype2)
     {
-	switch (vartype1)
+	ವಿಕಲ್ಪ (vartype1)
 	{
-	    case VAR_BOOL: isntype = ISN_COMPAREBOOL; break;
-	    case VAR_SPECIAL: isntype = ISN_COMPARESPECIAL; break;
-	    case VAR_NUMBER: isntype = ISN_COMPARENR; break;
-	    case VAR_FLOAT: isntype = ISN_COMPAREFLOAT; break;
-	    case VAR_STRING: isntype = ISN_COMPARESTRING; break;
-	    case VAR_BLOB: isntype = ISN_COMPAREBLOB; break;
-	    case VAR_LIST: isntype = ISN_COMPARELIST; break;
-	    case VAR_TUPLE: isntype = ISN_COMPARETUPLE; break;
-	    case VAR_DICT: isntype = ISN_COMPAREDICT; break;
-	    case VAR_FUNC: isntype = ISN_COMPAREFUNC; break;
-	    case VAR_OBJECT: isntype = ISN_COMPAREOBJECT; break;
-	    default: isntype = ISN_COMPAREANY; break;
+	    ಪಕ್ಷ VAR_BOOL: isntype = ISN_COMPAREBOOL; ಭಙ್ಗ;
+	    ಪಕ್ಷ VAR_SPECIAL: isntype = ISN_COMPARESPECIAL; ಭಙ್ಗ;
+	    ಪಕ್ಷ VAR_ಸಂಖ್ಯೆ: isntype = ISN_COMPARENR; ಭಙ್ಗ;
+	    ಪಕ್ಷ VAR_FLOAT: isntype = ISN_COMPAREFLOAT; ಭಙ್ಗ;
+	    ಪಕ್ಷ VAR_STRING: isntype = ISN_COMPARESTRING; ಭಙ್ಗ;
+	    ಪಕ್ಷ VAR_BLOB: isntype = ISN_COMPAREBLOB; ಭಙ್ಗ;
+	    ಪಕ್ಷ VAR_LIST: isntype = ISN_COMPARELIST; ಭಙ್ಗ;
+	    ಪಕ್ಷ VAR_TUPLE: isntype = ISN_COMPARETUPLE; ಭಙ್ಗ;
+	    ಪಕ್ಷ VAR_DICT: isntype = ISN_COMPAREDICT; ಭಙ್ಗ;
+	    ಪಕ್ಷ VAR_FUNC: isntype = ISN_COMPAREFUNC; ಭಙ್ಗ;
+	    ಪಕ್ಷ VAR_OBJECT: isntype = ISN_COMPAREOBJECT; ಭಙ್ಗ;
+	    ಸ್ವಭಾವ: isntype = ISN_COMPAREANY; ಭಙ್ಗ;
 	}
     }
-    else if (vartype1 == VAR_ANY || vartype2 == VAR_ANY
-	    || ((vartype1 == VAR_NUMBER || vartype1 == VAR_FLOAT)
-			  && (vartype2 == VAR_NUMBER || vartype2 == VAR_FLOAT))
+    ಅನ್ಯಥಾ ಯದಿ (vartype1 == VAR_ANY || vartype2 == VAR_ANY
+	    || ((vartype1 == VAR_ಸಂಖ್ಯೆ || vartype1 == VAR_FLOAT)
+			  && (vartype2 == VAR_ಸಂಖ್ಯೆ || vartype2 == VAR_FLOAT))
 	    || (vartype1 == VAR_FUNC && vartype2 == VAR_PARTIAL)
 	    || (vartype1 == VAR_PARTIAL && vartype2 == VAR_FUNC))
 	isntype = ISN_COMPAREANY;
-    else if (vartype1 == VAR_SPECIAL || vartype2 == VAR_SPECIAL)
+    ಅನ್ಯಥಾ ಯದಿ (vartype1 == VAR_SPECIAL || vartype2 == VAR_SPECIAL)
     {
-	if ((vartype1 == VAR_SPECIAL
-		&& (tv1 != NULL ? tv1->vval.v_number == VVAL_NONE
+	ಯದಿ ((vartype1 == VAR_SPECIAL
+		&& (tv1 != ರಿಕ್ತ ? tv1->vval.v_ಸಂಖ್ಯೆ == VVAL_NONE
 							    : type1 == &t_none)
 		&& vartype2 != VAR_STRING)
 	    || (vartype2 == VAR_SPECIAL
-		&& (tv2 != NULL ? tv2->vval.v_number == VVAL_NONE
+		&& (tv2 != ರಿಕ್ತ ? tv2->vval.v_ಸಂಖ್ಯೆ == VVAL_NONE
 							    : type2 == &t_none)
 		&& vartype1 != VAR_STRING))
 	{
 	    semsg(_(e_cannot_compare_str_with_str),
 			       vartype_name(vartype1), vartype_name(vartype2));
-	    return ISN_DROP;
+	    ಪ್ರತ್ಯಾಗಮ ISN_DROP;
 	}
 	// although comparing null with number, float or bool is not useful, we
 	// allow it
 	isntype = ISN_COMPARENULL;
     }
 
-    if ((exprtype == EXPR_IS || exprtype == EXPR_ISNOT)
+    ಯದಿ ((exprtype == ಅಭಿವ್ಯಕ್ತಿ_IS || exprtype == ಅಭಿವ್ಯಕ್ತಿ_ISNOT)
 	    && (isntype == ISN_COMPAREBOOL
 	    || isntype == ISN_COMPARESPECIAL
 	    || isntype == ISN_COMPARENR
 	    || isntype == ISN_COMPAREFLOAT))
     {
 	semsg(_(e_cannot_use_str_with_str),
-		exprtype == EXPR_IS ? "is" : "isnot" , vartype_name(vartype1));
-	return ISN_DROP;
+		exprtype == ಅಭಿವ್ಯಕ್ತಿ_IS ? "is" : "isnot" , vartype_name(vartype1));
+	ಪ್ರತ್ಯಾಗಮ ISN_DROP;
     }
-    if (!(exprtype == EXPR_IS || exprtype == EXPR_ISNOT
-		|| exprtype == EXPR_EQUAL || exprtype == EXPR_NEQUAL)
+    ಯದಿ (!(exprtype == ಅಭಿವ್ಯಕ್ತಿ_IS || exprtype == ಅಭಿವ್ಯಕ್ತಿ_ISNOT
+		|| exprtype == ಅಭಿವ್ಯಕ್ತಿ_EQUAL || exprtype == ಅಭಿವ್ಯಕ್ತಿ_NEQUAL)
 	    && (isntype == ISN_COMPAREOBJECT))
     {
 	semsg(_(e_invalid_operation_for_str), vartype_name(vartype1));
-	return ISN_DROP;
+	ಪ್ರತ್ಯಾಗಮ ISN_DROP;
     }
-    if (isntype == ISN_DROP
+    ಯದಿ (isntype == ISN_DROP
 	    || (isntype != ISN_COMPARENULL
-		&& (((exprtype != EXPR_EQUAL
-			&& exprtype != EXPR_NEQUAL
+		&& (((exprtype != ಅಭಿವ್ಯಕ್ತಿ_EQUAL
+			&& exprtype != ಅಭಿವ್ಯಕ್ತಿ_NEQUAL
 			&& (vartype1 == VAR_BOOL || vartype1 == VAR_SPECIAL
 			  || vartype2 == VAR_BOOL || vartype2 == VAR_SPECIAL)))
-		    || ((exprtype != EXPR_EQUAL
-			 && exprtype != EXPR_NEQUAL
-			 && exprtype != EXPR_IS
-			 && exprtype != EXPR_ISNOT
+		    || ((exprtype != ಅಭಿವ್ಯಕ್ತಿ_EQUAL
+			 && exprtype != ಅಭಿವ್ಯಕ್ತಿ_NEQUAL
+			 && exprtype != ಅಭಿವ್ಯಕ್ತಿ_IS
+			 && exprtype != ಅಭಿವ್ಯಕ್ತಿ_ISNOT
 			 && (vartype1 == VAR_BLOB || vartype2 == VAR_BLOB
 			  || vartype1 == VAR_LIST || vartype2 == VAR_LIST))))))
     {
 	semsg(_(e_cannot_compare_str_with_str),
 		vartype_name(vartype1), vartype_name(vartype2));
-	return ISN_DROP;
+	ಪ್ರತ್ಯಾಗಮ ISN_DROP;
     }
-    return isntype;
+    ಪ್ರತ್ಯಾಗಮ isntype;
 }
 
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 check_compare_types(exprtype_T type, typval_T *tv1, typval_T *tv2)
 {
-    if (get_compare_isn(type, tv1, tv2, NULL, NULL) == ISN_DROP)
-	return FAIL;
-    return OK;
+    ಯದಿ (get_compare_isn(type, tv1, tv2, ರಿಕ್ತ, ರಿಕ್ತ) == ISN_DROP)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_COMPARE* instruction with a boolean result.
  */
-    int
-generate_COMPARE(cctx_T *cctx, exprtype_T exprtype, int ic)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_COMPARE(cctx_T *cctx, exprtype_T exprtype, ಪೂರ್ಣಾಙ್ಕ ic)
 {
     isntype_T	isntype;
     isn_T	*isn;
-    garray_T	*stack = &cctx->ctx_type_stack;
+    garray_T	*ರಾಶಿ = &cctx->ctx_type_ರಾಶಿ;
 
     RETURN_OK_IF_SKIP(cctx);
 
     // Get the known type of the two items on the stack.  If they are matching
     // use a type-specific instruction. Otherwise fall back to runtime type
     // checking.
-    isntype = get_compare_isn(exprtype, NULL, NULL,
-		       get_type_on_stack(cctx, 1), get_type_on_stack(cctx, 0));
-    if (isntype == ISN_DROP)
-	return FAIL;
+    isntype = get_compare_isn(exprtype, ರಿಕ್ತ, ರಿಕ್ತ,
+		       get_type_on_ರಾಶಿ(cctx, 1), get_type_on_ರಾಶಿ(cctx, 0));
+    ಯದಿ (isntype == ISN_DROP)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
 
-    if ((isn = generate_instr(cctx, isntype)) == NULL)
-	return FAIL;
+    ಯದಿ ((isn = generate_instr(cctx, isntype)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     isn->isn_arg.op.op_type = exprtype;
     isn->isn_arg.op.op_ic = ic;
 
     // takes two arguments, puts one bool back
-    --stack->ga_len;
-    set_type_on_stack(cctx, &t_bool, 0);
+    --ರಾಶಿ->ga_len;
+    set_type_on_ರಾಶಿ(cctx, &t_bool, 0);
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
@@ -636,94 +636,94 @@ generate_COMPARE(cctx_T *cctx, exprtype_T exprtype, int ic)
  * greater or equal to one.
  * The caller ensures all the "count" elements on the stack have the right type.
  */
-    int
-generate_CONCAT(cctx_T *cctx, int count)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_CONCAT(cctx_T *cctx, ಪೂರ್ಣಾಙ್ಕ ಎಣಿಕೆ)
 {
     isn_T	*isn;
-    garray_T	*stack = &cctx->ctx_type_stack;
+    garray_T	*ರಾಶಿ = &cctx->ctx_type_ರಾಶಿ;
 
     RETURN_OK_IF_SKIP(cctx);
 
-    if ((isn = generate_instr(cctx, ISN_CONCAT)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = count;
+    ಯದಿ ((isn = generate_instr(cctx, ISN_CONCAT)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    isn->isn_arg.ಸಂಖ್ಯೆ = ಎಣಿಕೆ;
 
     // drop the argument types
-    stack->ga_len -= count - 1;
+    ರಾಶಿ->ga_len -= ಎಣಿಕೆ - 1;
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_2BOOL instruction.
  * "offset" is the offset in the type stack.
  */
-    int
-generate_2BOOL(cctx_T *cctx, int invert, int offset)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_2BOOL(cctx_T *cctx, ಪೂರ್ಣಾಙ್ಕ invert, ಪೂರ್ಣಾಙ್ಕ offset)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_2BOOL)) == NULL)
-	return FAIL;
+    ಯದಿ ((isn = generate_instr(cctx, ISN_2BOOL)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     isn->isn_arg.tobool.invert = invert;
     isn->isn_arg.tobool.offset = offset;
 
     // type becomes bool
-    set_type_on_stack(cctx, &t_bool, -1 - offset);
+    set_type_on_ರಾಶಿ(cctx, &t_bool, -1 - offset);
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_COND2BOOL instruction.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_COND2BOOL(cctx_T *cctx)
 {
     RETURN_OK_IF_SKIP(cctx);
-    if (generate_instr(cctx, ISN_COND2BOOL) == NULL)
-	return FAIL;
+    ಯದಿ (generate_instr(cctx, ISN_COND2BOOL) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
 
     // type becomes bool
-    set_type_on_stack(cctx, &t_bool, 0);
+    set_type_on_ರಾಶಿ(cctx, &t_bool, 0);
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_TYPECHECK(
 	cctx_T	    *cctx,
 	type_T	    *expected,
-	int	    typechk_flags,	// type check flags
-	int	    offset,
-	int	    is_var,
-	int	    argidx)
+	ಪೂರ್ಣಾಙ್ಕ	    typechk_flags,	// type check flags
+	ಪೂರ್ಣಾಙ್ಕ	    offset,
+	ಪೂರ್ಣಾಙ್ಕ	    is_var,
+	ಪೂರ್ಣಾಙ್ಕ	    argidx)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_CHECKTYPE)) == NULL)
-	return FAIL;
+    ಯದಿ ((isn = generate_instr(cctx, ISN_CHECKTYPE)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     type_T *tt;
-    if ((expected->tt_type == VAR_FLOAT
-		&& (typechk_flags & TYPECHK_NUMBER_OK))
+    ಯದಿ ((expected->tt_type == VAR_FLOAT
+		&& (typechk_flags & TYPECHK_ಸಂಖ್ಯೆ_OK))
 	    || (expected->tt_type == VAR_LIST
 		&& (typechk_flags & TYPECHK_TUPLE_OK)))
     {
 	// always allocate, also for static types
 	tt = ALLOC_ONE(type_T);
-	if (tt != NULL)
+	ಯದಿ (tt != ರಿಕ್ತ)
 	{
 	    *tt = *expected;
 	    tt->tt_flags &= ~TTFLAG_STATIC;
-	    if (typechk_flags & TYPECHK_NUMBER_OK)
-		tt->tt_flags |= TTFLAG_NUMBER_OK;
-	    else
+	    ಯದಿ (typechk_flags & TYPECHK_ಸಂಖ್ಯೆ_OK)
+		tt->tt_flags |= TTFLAG_ಸಂಖ್ಯೆ_OK;
+	    ಅನ್ಯಥಾ
 		tt->tt_flags |= TTFLAG_TUPLE_OK;
 	}
     }
-    else
+    ಅನ್ಯಥಾ
 	tt = alloc_type(expected);
 
     isn->isn_arg.type.ct_type = tt;
@@ -732,12 +732,12 @@ generate_TYPECHECK(
     isn->isn_arg.type.ct_arg_idx = (int8_T)argidx;
 
     // type becomes expected
-    set_type_on_stack(cctx, expected, -1 - offset);
+    set_type_on_ರಾಶಿ(cctx, expected, -1 - offset);
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_SETTYPE(
 	cctx_T	    *cctx,
 	type_T	    *expected)
@@ -745,195 +745,195 @@ generate_SETTYPE(
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_SETTYPE)) == NULL)
-	return FAIL;
+    ಯದಿ ((isn = generate_instr(cctx, ISN_SETTYPE)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     isn->isn_arg.type.ct_type = alloc_type(expected);
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_PUSHOBJ instruction.  Object is always NULL.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_PUSHOBJ(cctx_T *cctx)
 {
     RETURN_OK_IF_SKIP(cctx);
-    if (generate_instr_type(cctx, ISN_PUSHOBJ, &t_object_any) == NULL)
-	return FAIL;
-    return OK;
+    ಯದಿ (generate_instr_type(cctx, ISN_PUSHOBJ, &t_object_any) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_PUSHCLASS instruction.  "class" can be NULL.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
 generate_PUSHCLASS(cctx_T *cctx, class_T *class)
 {
     RETURN_OK_IF_SKIP(cctx);
     isn_T *isn = generate_instr_type(cctx, ISN_PUSHCLASS,
-				  class == NULL ? &t_any : &class->class_type);
-    if (isn == NULL)
-	return FAIL;
+				  class == ರಿಕ್ತ ? &t_any : &class->class_type);
+    ಯದಿ (isn == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     isn->isn_arg.classarg = class;
-    if (class != NULL)
+    ಯದಿ (class != ರಿಕ್ತ)
 	++class->class_refcount;
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate a PUSH instruction for "tv".
  * "tv" will be consumed or cleared.
  */
-    int
-generate_tv_PUSH(cctx_T *cctx, typval_T *tv)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_tv_ತಳ್ಳು(cctx_T *cctx, typval_T *tv)
 {
-    switch (tv->v_type)
+    ವಿಕಲ್ಪ (tv->v_type)
     {
-	case VAR_BOOL:
-	    generate_PUSHBOOL(cctx, tv->vval.v_number);
-	    break;
-	case VAR_SPECIAL:
-	    generate_PUSHSPEC(cctx, tv->vval.v_number);
-	    break;
-	case VAR_NUMBER:
-	    generate_PUSHNR(cctx, tv->vval.v_number);
-	    break;
-	case VAR_FLOAT:
+	ಪಕ್ಷ VAR_BOOL:
+	    generate_PUSHBOOL(cctx, tv->vval.v_ಸಂಖ್ಯೆ);
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ VAR_SPECIAL:
+	    generate_PUSHSPEC(cctx, tv->vval.v_ಸಂಖ್ಯೆ);
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ VAR_ಸಂಖ್ಯೆ:
+	    generate_PUSHNR(cctx, tv->vval.v_ಸಂಖ್ಯೆ);
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ VAR_FLOAT:
 	    generate_PUSHF(cctx, tv->vval.v_float);
-	    break;
-	case VAR_BLOB:
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ VAR_BLOB:
 	    generate_PUSHBLOB(cctx, tv->vval.v_blob);
-	    tv->vval.v_blob = NULL;
-	    break;
-	case VAR_LIST:
-	    if (tv->vval.v_list != NULL)
+	    tv->vval.v_blob = ರಿಕ್ತ;
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ VAR_LIST:
+	    ಯದಿ (tv->vval.v_list != ರಿಕ್ತ)
 		iemsg("non-empty list constant not supported");
 	    generate_NEWLIST(cctx, 0, TRUE);
-	    break;
-	case VAR_TUPLE:
-	    if (tv->vval.v_tuple != NULL)
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ VAR_TUPLE:
+	    ಯದಿ (tv->vval.v_tuple != ರಿಕ್ತ)
 		iemsg("non-empty tuple constant not supported");
 	    generate_NEWTUPLE(cctx, 0, TRUE);
-	    break;
-	case VAR_DICT:
-	    if (tv->vval.v_dict != NULL)
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ VAR_DICT:
+	    ಯದಿ (tv->vval.v_dict != ರಿಕ್ತ)
 		iemsg("non-empty dict constant not supported");
 	    generate_NEWDICT(cctx, 0, TRUE);
-	    break;
+	    ಭಙ್ಗ;
 #ifdef FEAT_JOB_CHANNEL
-	case VAR_JOB:
-	    if (tv->vval.v_job != NULL)
+	ಪಕ್ಷ VAR_JOB:
+	    ಯದಿ (tv->vval.v_job != ರಿಕ್ತ)
 		iemsg("non-null job constant not supported");
 	    generate_PUSHJOB(cctx);
-	    break;
-	case VAR_CHANNEL:
-	    if (tv->vval.v_channel != NULL)
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ VAR_CHANNEL:
+	    ಯದಿ (tv->vval.v_channel != ರಿಕ್ತ)
 		iemsg("non-null channel constant not supported");
 	    generate_PUSHCHANNEL(cctx);
-	    break;
+	    ಭಙ್ಗ;
 #endif
-	case VAR_FUNC:
-	    if (tv->vval.v_string != NULL)
+	ಪಕ್ಷ VAR_FUNC:
+	    ಯದಿ (tv->vval.v_string != ರಿಕ್ತ)
 		iemsg("non-null function constant not supported");
-	    generate_PUSHFUNC(cctx, NULL, &t_func_unknown, TRUE);
-	    break;
-	case VAR_PARTIAL:
-	    if (tv->vval.v_partial != NULL)
+	    generate_PUSHFUNC(cctx, ರಿಕ್ತ, &t_func_unknown, TRUE);
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ VAR_PARTIAL:
+	    ಯದಿ (tv->vval.v_partial != ರಿಕ್ತ)
 		iemsg("non-null partial constant not supported");
-	    if (generate_instr_type(cctx, ISN_NEWPARTIAL, &t_func_unknown)
-								   == NULL)
-		return FAIL;
-	    break;
-	case VAR_STRING:
+	    ಯದಿ (generate_instr_type(cctx, ISN_NEWPARTIAL, &t_func_unknown)
+								   == ರಿಕ್ತ)
+		ಪ್ರತ್ಯಾಗಮ FAIL;
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ VAR_STRING:
 	    generate_PUSHS(cctx, &tv->vval.v_string);
-	    tv->vval.v_string = NULL;
-	    break;
-	case VAR_OBJECT:
-	    if (tv->vval.v_object != NULL)
+	    tv->vval.v_string = ರಿಕ್ತ;
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ VAR_OBJECT:
+	    ಯದಿ (tv->vval.v_object != ರಿಕ್ತ)
 	    {
 		emsg(_(e_cannot_use_non_null_object));
-		return FAIL;
+		ಪ್ರತ್ಯಾಗಮ FAIL;
 	    }
 	    generate_PUSHOBJ(cctx);
-	    break;
-	case VAR_CLASS:
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ VAR_CLASS:
 	    generate_PUSHCLASS(cctx, tv->vval.v_class);
-	    break;
-	default:
+	    ಭಙ್ಗ;
+	ಸ್ವಭಾವ:
 	    siemsg("constant type %d not supported", tv->v_type);
 	    clear_tv(tv);
-	    return FAIL;
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
     }
     tv->v_type = VAR_UNKNOWN;
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_PUSHNR instruction.
  */
-    int
-generate_PUSHNR(cctx_T *cctx, varnumber_T number)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_PUSHNR(cctx_T *cctx, varnumber_T ಸಂಖ್ಯೆ)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type(cctx, ISN_PUSHNR, &t_number)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = number;
+    ಯದಿ ((isn = generate_instr_type(cctx, ISN_PUSHNR, &t_ಸಂಖ್ಯೆ)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    isn->isn_arg.ಸಂಖ್ಯೆ = ಸಂಖ್ಯೆ;
 
-    if (number == 0 || number == 1)
+    ಯದಿ (ಸಂಖ್ಯೆ == 0 || ಸಂಖ್ಯೆ == 1)
 	// A 0 or 1 number can also be used as a bool.
-	set_type_on_stack(cctx, &t_number_bool, 0);
-    return OK;
+	set_type_on_ರಾಶಿ(cctx, &t_ಸಂಖ್ಯೆ_bool, 0);
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_PUSHBOOL instruction.
  */
-    int
-generate_PUSHBOOL(cctx_T *cctx, varnumber_T number)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_PUSHBOOL(cctx_T *cctx, varnumber_T ಸಂಖ್ಯೆ)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type(cctx, ISN_PUSHBOOL, &t_bool)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = number;
+    ಯದಿ ((isn = generate_instr_type(cctx, ISN_PUSHBOOL, &t_bool)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    isn->isn_arg.ಸಂಖ್ಯೆ = ಸಂಖ್ಯೆ;
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_PUSHSPEC instruction.
  */
-    int
-generate_PUSHSPEC(cctx_T *cctx, varnumber_T number)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_PUSHSPEC(cctx_T *cctx, varnumber_T ಸಂಖ್ಯೆ)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type(cctx, ISN_PUSHSPEC,
-			     number == VVAL_NULL ? &t_null : &t_none)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = number;
+    ಯದಿ ((isn = generate_instr_type(cctx, ISN_PUSHSPEC,
+			     ಸಂಖ್ಯೆ == VVAL_NULL ? &t_null : &t_none)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    isn->isn_arg.ಸಂಖ್ಯೆ = ಸಂಖ್ಯೆ;
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_PUSHF instruction.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_PUSHF(cctx_T *cctx, float_T fnumber)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type(cctx, ISN_PUSHF, &t_float)) == NULL)
-	return FAIL;
+    ಯದಿ ((isn = generate_instr_type(cctx, ISN_PUSHF, &t_float)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     isn->isn_arg.fnumber = fnumber;
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
@@ -942,58 +942,58 @@ generate_PUSHF(cctx_T *cctx, float_T fnumber)
  * Note that if "str" is used in the instruction OK is returned and "*str" is
  * not set to NULL.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_PUSHS(cctx_T *cctx, char_u **str)
 {
     isn_T	*isn;
-    int		ret = OK;
+    ಪೂರ್ಣಾಙ್ಕ		ret = OK;
 
-    if (cctx->ctx_skip != SKIP_YES)
+    ಯದಿ (cctx->ctx_skip != SKIP_YES)
     {
-	if ((isn = generate_instr_type(cctx, ISN_PUSHS, &t_string)) == NULL)
+	ಯದಿ ((isn = generate_instr_type(cctx, ISN_PUSHS, &t_string)) == ರಿಕ್ತ)
 	    ret = FAIL;
-	else
+	ಅನ್ಯಥಾ
 	{
-	    isn->isn_arg.string = str == NULL ? NULL : *str;
-	    return OK;
+	    isn->isn_arg.string = str == ರಿಕ್ತ ? ರಿಕ್ತ : *str;
+	    ಪ್ರತ್ಯಾಗಮ OK;
 	}
     }
-    if (str != NULL)
+    ಯದಿ (str != ರಿಕ್ತ)
 	VIM_CLEAR(*str);
-    return ret;
+    ಪ್ರತ್ಯಾಗಮ ret;
 }
 
 /*
  * Generate an ISN_PUSHCHANNEL instruction.  Channel is always NULL.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_PUSHCHANNEL(cctx_T *cctx)
 {
     RETURN_OK_IF_SKIP(cctx);
 #ifdef FEAT_JOB_CHANNEL
-    if (generate_instr_type(cctx, ISN_PUSHCHANNEL, &t_channel) == NULL)
-	return FAIL;
-    return OK;
-#else
+    ಯದಿ (generate_instr_type(cctx, ISN_PUSHCHANNEL, &t_channel) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    ಪ್ರತ್ಯಾಗಮ OK;
+#ಅನ್ಯಥಾ
     emsg(_(e_channel_job_feature_not_available));
-    return FAIL;
+    ಪ್ರತ್ಯಾಗಮ FAIL;
 #endif
 }
 
 /*
  * Generate an ISN_PUSHJOB instruction.  Job is always NULL.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_PUSHJOB(cctx_T *cctx)
 {
     RETURN_OK_IF_SKIP(cctx);
 #ifdef FEAT_JOB_CHANNEL
-    if (generate_instr_type(cctx, ISN_PUSHJOB, &t_job) == NULL)
-	return FAIL;
-    return OK;
-#else
+    ಯದಿ (generate_instr_type(cctx, ISN_PUSHJOB, &t_job) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    ಪ್ರತ್ಯಾಗಮ OK;
+#ಅನ್ಯಥಾ
     emsg(_(e_channel_job_feature_not_available));
-    return FAIL;
+    ಪ್ರತ್ಯಾಗಮ FAIL;
 #endif
 }
 
@@ -1001,18 +1001,18 @@ generate_PUSHJOB(cctx_T *cctx)
  * Generate an ISN_PUSHBLOB instruction.
  * Consumes "blob".
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_PUSHBLOB(cctx_T *cctx, blob_T *blob)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type2(cctx, ISN_PUSHBLOB,
-					&t_blob, &t_blob)) == NULL)
-	return FAIL;
+    ಯದಿ ((isn = generate_instr_type2(cctx, ISN_PUSHBLOB,
+					&t_blob, &t_blob)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     isn->isn_arg.blob = blob;
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
@@ -1020,25 +1020,25 @@ generate_PUSHBLOB(cctx_T *cctx, blob_T *blob)
  * When "may_prefix" is TRUE prefix "g:" unless "name" is script-local or
  * autoload.
  */
-    int
-generate_PUSHFUNC(cctx_T *cctx, char_u *name, type_T *type, int may_prefix)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_PUSHFUNC(cctx_T *cctx, char_u *name, type_T *type, ಪೂರ್ಣಾಙ್ಕ may_prefix)
 {
     isn_T	*isn;
     char_u	*funcname;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type(cctx, ISN_PUSHFUNC, type)) == NULL)
-	return FAIL;
-    if (name == NULL)
-	funcname = NULL;
-    else if (!may_prefix
+    ಯದಿ ((isn = generate_instr_type(cctx, ISN_PUSHFUNC, type)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    ಯದಿ (name == ರಿಕ್ತ)
+	funcname = ರಿಕ್ತ;
+    ಅನ್ಯಥಾ ಯದಿ (!may_prefix
 	    || *name == K_SPECIAL			    // script-local
-	    || vim_strchr(name, AUTOLOAD_CHAR) != NULL)	    // autoload
+	    || vim_strchr(name, AUTOLOAD_CHAR) != ರಿಕ್ತ)	    // autoload
 	funcname = vim_strsave(name);
-    else
+    ಅನ್ಯಥಾ
     {
 	funcname = alloc(STRLEN(name) + 3);
-	if (funcname != NULL)
+	ಯದಿ (funcname != ರಿಕ್ತ)
 	{
 	    STRCPY(funcname, "g:");
 	    STRCPY(funcname + 2, name);
@@ -1046,24 +1046,24 @@ generate_PUSHFUNC(cctx_T *cctx, char_u *name, type_T *type, int may_prefix)
     }
 
     isn->isn_arg.string = funcname;
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_AUTOLOAD instruction.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_AUTOLOAD(cctx_T *cctx, char_u *name, type_T *type)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type(cctx, ISN_AUTOLOAD, type)) == NULL)
-	return FAIL;
+    ಯದಿ ((isn = generate_instr_type(cctx, ISN_AUTOLOAD, type)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     isn->isn_arg.string = vim_strsave(name);
-    if (isn->isn_arg.string == NULL)
-	return FAIL;
-    return OK;
+    ಯದಿ (isn->isn_arg.string == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
@@ -1072,57 +1072,57 @@ generate_AUTOLOAD(cctx_T *cctx, char_u *name, type_T *type)
  * value below the list with values.
  * Caller must check the type is a list.
  */
-    int
-generate_GETITEM(cctx_T *cctx, int index, int with_op)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_GETITEM(cctx_T *cctx, ಪೂರ್ಣಾಙ್ಕ index, ಪೂರ್ಣಾಙ್ಕ with_op)
 {
     isn_T	*isn;
-    type_T	*type = get_type_on_stack(cctx, with_op ? 1 : 0);
+    type_T	*type = get_type_on_ರಾಶಿ(cctx, with_op ? 1 : 0);
     type_T	*item_type = &t_any;
 
     RETURN_OK_IF_SKIP(cctx);
 
     item_type = get_item_type(type);
-    if ((isn = generate_instr(cctx, ISN_GETITEM)) == NULL)
-	return FAIL;
+    ಯದಿ ((isn = generate_instr(cctx, ISN_GETITEM)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     isn->isn_arg.getitem.gi_index = index;
     isn->isn_arg.getitem.gi_with_op = with_op;
 
     // add the item type to the type stack
-    return push_type_stack(cctx, item_type);
+    ಪ್ರತ್ಯಾಗಮ ತಳ್ಳು_type_ರಾಶಿ(cctx, item_type);
 }
 
 /*
  * Set the type of the tuple that is left after dropping the first "count"
  * items of the tuple with type "type".
  */
-    static void
-set_tuple_slice_type_on_stack(type_T *type, int count, cctx_T *cctx)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+set_tuple_slice_type_on_ರಾಶಿ(type_T *type, ಪೂರ್ಣಾಙ್ಕ ಎಣಿಕೆ, cctx_T *cctx)
 {
     garray_T	tuple_types_ga;
 
     // The item types are only known for a tuple with a fixed number of items.
-    if ((type->tt_flags & TTFLAG_VARARGS) || type->tt_argcount <= count)
+    ಯದಿ ((type->tt_flags & TTFLAG_VARARGS) || type->tt_argcount <= ಎಣಿಕೆ)
     {
-	set_type_on_stack(cctx, &t_tuple_any, 0);
-	return;
+	set_type_on_ರಾಶಿ(cctx, &t_tuple_any, 0);
+	ಪ್ರತ್ಯಾಗಮ;
     }
 
-    ga_init2(&tuple_types_ga, sizeof(type_T *), 10);
+    ga_init2(&tuple_types_ga, ಪರಿಮಾಣ(type_T *), 10);
 
-    for (int i = count; i < type->tt_argcount; i++)
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = ಎಣಿಕೆ; i < type->tt_argcount; i++)
     {
-	if (ga_grow(&tuple_types_ga, 1) == FAIL)
+	ಯದಿ (ga_grow(&tuple_types_ga, 1) == FAIL)
 	{
 	    ga_clear(&tuple_types_ga);
-	    set_type_on_stack(cctx, &t_tuple_any, 0);
-	    return;
+	    set_type_on_ರಾಶಿ(cctx, &t_tuple_any, 0);
+	    ಪ್ರತ್ಯಾಗಮ;
 	}
 	((type_T **)tuple_types_ga.ga_data)[tuple_types_ga.ga_len] =
 							     type->tt_args[i];
 	tuple_types_ga.ga_len++;
     }
 
-    set_type_on_stack(cctx,
+    set_type_on_ರಾಶಿ(cctx,
 		get_tuple_type(&tuple_types_ga, cctx->ctx_type_list), 0);
 
     ga_clear(&tuple_types_ga);
@@ -1131,308 +1131,308 @@ set_tuple_slice_type_on_stack(type_T *type, int count, cctx_T *cctx)
 /*
  * Generate an ISN_SLICE instruction with "count".
  */
-    int
-generate_SLICE(cctx_T *cctx, int count)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_SLICE(cctx_T *cctx, ಪೂರ್ಣಾಙ್ಕ ಎಣಿಕೆ)
 {
     isn_T	*isn;
     type_T	*type;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_SLICE)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = count;
+    ಯದಿ ((isn = generate_instr(cctx, ISN_SLICE)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    isn->isn_arg.ಸಂಖ್ಯೆ = ಎಣಿಕೆ;
 
     // Slicing a tuple leaves a tuple with the remaining item types, not the
     // type of the whole tuple.
-    type = get_type_on_stack(cctx, 0);
-    if (type->tt_type == VAR_TUPLE)
-	set_tuple_slice_type_on_stack(type, count, cctx);
+    type = get_type_on_ರಾಶಿ(cctx, 0);
+    ಯದಿ (type->tt_type == VAR_TUPLE)
+	set_tuple_slice_type_on_ರಾಶಿ(type, ಎಣಿಕೆ, cctx);
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_CHECKLEN instruction with "min_len".
  */
-    int
-generate_CHECKLEN(cctx_T *cctx, int min_len, int more_OK)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_CHECKLEN(cctx_T *cctx, ಪೂರ್ಣಾಙ್ಕ min_len, ಪೂರ್ಣಾಙ್ಕ more_OK)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
 
-    if ((isn = generate_instr(cctx, ISN_CHECKLEN)) == NULL)
-	return FAIL;
+    ಯದಿ ((isn = generate_instr(cctx, ISN_CHECKLEN)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     isn->isn_arg.checklen.cl_min_len = min_len;
     isn->isn_arg.checklen.cl_more_OK = more_OK;
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_STORE instruction.
  */
-    int
-generate_STORE(cctx_T *cctx, isntype_T isn_type, int idx, char_u *name)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_STORE(cctx_T *cctx, isntype_T isn_type, ಪೂರ್ಣಾಙ್ಕ idx, char_u *name)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_drop(cctx, isn_type, 1)) == NULL)
-	return FAIL;
-    if (name != NULL)
+    ಯದಿ ((isn = generate_instr_drop(cctx, isn_type, 1)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    ಯದಿ (name != ರಿಕ್ತ)
 	isn->isn_arg.string = vim_strsave(name);
-    else
-	isn->isn_arg.number = idx;
+    ಅನ್ಯಥಾ
+	isn->isn_arg.ಸಂಖ್ಯೆ = idx;
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_LOAD_CLASSMEMBER ("load" == TRUE) or ISN_STORE_CLASSMEMBER
  * ("load" == FALSE) instruction.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_CLASSMEMBER(
 	cctx_T	    *cctx,
-	int	    load,
+	ಪೂರ್ಣಾಙ್ಕ	    load,
 	class_T	    *cl,
-	int	    idx)
+	ಪೂರ್ಣಾಙ್ಕ	    idx)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if (load)
+    ಯದಿ (load)
     {
 	ocmember_T *m = &cl->class_class_members[idx];
 	isn = generate_instr_type(cctx, ISN_LOAD_CLASSMEMBER, m->ocm_type);
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	isn = generate_instr_drop(cctx, ISN_STORE_CLASSMEMBER, 1);
     }
-    if (isn == NULL)
-	return FAIL;
+    ಯದಿ (isn == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     isn->isn_arg.classmember.cm_class = cl;
     ++cl->class_refcount;
     isn->isn_arg.classmember.cm_idx = idx;
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_STOREOUTER instruction.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
 generate_STOREOUTER(
 	cctx_T	    *cctx,
-	int	    idx,
-	int	    level,
-	int	    loop_depth,
-	int	    loop_idx)
+	ಪೂರ್ಣಾಙ್ಕ	    idx,
+	ಪೂರ್ಣಾಙ್ಕ	    level,
+	ಪೂರ್ಣಾಙ್ಕ	    loop_depth,
+	ಪೂರ್ಣಾಙ್ಕ	    loop_idx)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_drop(cctx, ISN_STOREOUTER, 1)) == NULL)
-	return FAIL;
-    if (level == 1 && loop_idx >= 0 && idx >= loop_idx)
+    ಯದಿ ((isn = generate_instr_drop(cctx, ISN_STOREOUTER, 1)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    ಯದಿ (level == 1 && loop_idx >= 0 && idx >= loop_idx)
     {
 	// Store a variable defined in a loop.  A copy will be made at the end
 	// of the loop.
 	isn->isn_arg.outer.outer_idx = idx - loop_idx;
 	isn->isn_arg.outer.outer_depth = -loop_depth - 1;
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	isn->isn_arg.outer.outer_idx = idx;
 	isn->isn_arg.outer.outer_depth = level;
     }
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_STORENR instruction (short for ISN_PUSHNR + ISN_STORE)
  */
-    int
-generate_STORENR(cctx_T *cctx, int idx, varnumber_T value)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_STORENR(cctx_T *cctx, ಪೂರ್ಣಾಙ್ಕ idx, varnumber_T ಮೌಲ್ಯ)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_STORENR)) == NULL)
-	return FAIL;
+    ಯದಿ ((isn = generate_instr(cctx, ISN_STORENR)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     isn->isn_arg.storenr.stnr_idx = idx;
-    isn->isn_arg.storenr.stnr_val = value;
+    isn->isn_arg.storenr.stnr_val = ಮೌಲ್ಯ;
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_STOREOPT or ISN_STOREFUNCOPT instruction
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
 generate_STOREOPT(
 	cctx_T	    *cctx,
 	isntype_T   isn_type,
 	char_u	    *name,
-	int	    opt_flags)
+	ಪೂರ್ಣಾಙ್ಕ	    opt_flags)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_drop(cctx, isn_type, 1)) == NULL)
-	return FAIL;
+    ಯದಿ ((isn = generate_instr_drop(cctx, isn_type, 1)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     isn->isn_arg.storeopt.so_name = vim_strsave(name);
     isn->isn_arg.storeopt.so_flags = opt_flags;
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_LOAD or similar instruction.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_LOAD(
 	cctx_T	    *cctx,
 	isntype_T   isn_type,
-	int	    idx,
+	ಪೂರ್ಣಾಙ್ಕ	    idx,
 	char_u	    *name,
 	type_T	    *type)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type2(cctx, isn_type, type, type)) == NULL)
-	return FAIL;
-    if (name != NULL)
+    ಯದಿ ((isn = generate_instr_type2(cctx, isn_type, type, type)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    ಯದಿ (name != ರಿಕ್ತ)
 	isn->isn_arg.string = vim_strsave(name);
-    else
-	isn->isn_arg.number = idx;
+    ಅನ್ಯಥಾ
+	isn->isn_arg.ಸಂಖ್ಯೆ = idx;
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_LOADOUTER instruction
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_LOADOUTER(
 	cctx_T	    *cctx,
-	int	    idx,
-	int	    nesting,
-	int	    loop_depth,
-	int	    loop_idx,
+	ಪೂರ್ಣಾಙ್ಕ	    idx,
+	ಪೂರ್ಣಾಙ್ಕ	    nesting,
+	ಪೂರ್ಣಾಙ್ಕ	    loop_depth,
+	ಪೂರ್ಣಾಙ್ಕ	    loop_idx,
 	type_T	    *type)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type2(cctx, ISN_LOADOUTER, type, type)) == NULL)
-	return FAIL;
-    if (nesting == 1 && loop_idx >= 0 && idx >= loop_idx)
+    ಯದಿ ((isn = generate_instr_type2(cctx, ISN_LOADOUTER, type, type)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    ಯದಿ (nesting == 1 && loop_idx >= 0 && idx >= loop_idx)
     {
 	// Load a variable defined in a loop.  A copy will be made at the end
 	// of the loop.
 	isn->isn_arg.outer.outer_idx = idx - loop_idx;
 	isn->isn_arg.outer.outer_depth = -loop_depth - 1;
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	isn->isn_arg.outer.outer_idx = idx;
 	isn->isn_arg.outer.outer_depth = nesting;
     }
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_LOADV instruction for v:var.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_LOADV(
 	cctx_T	    *cctx,
 	char_u	    *name)
 {
-    int	    di_flags;
-    int	    vidx = find_vim_var(name, &di_flags);
+    ಪೂರ್ಣಾಙ್ಕ	    di_flags;
+    ಪೂರ್ಣಾಙ್ಕ	    vidx = find_vim_var(name, &di_flags);
     type_T  *type;
 
     RETURN_OK_IF_SKIP(cctx);
-    if (vidx < 0)
+    ಯದಿ (vidx < 0)
     {
 	semsg(_(e_variable_not_found_str), name);
-	return FAIL;
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     }
     type = get_vim_var_type(vidx, cctx->ctx_type_list);
-    return generate_LOAD(cctx, ISN_LOADV, vidx, NULL, type);
+    ಪ್ರತ್ಯಾಗಮ generate_LOAD(cctx, ISN_LOADV, vidx, ರಿಕ್ತ, type);
 }
 
 /*
  * Generate an ISN_UNLET instruction.
  */
-    int
-generate_UNLET(cctx_T *cctx, isntype_T isn_type, char_u *name, int forceit)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_UNLET(cctx_T *cctx, isntype_T isn_type, char_u *name, ಪೂರ್ಣಾಙ್ಕ forceit)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, isn_type)) == NULL)
-	return FAIL;
+    ಯದಿ ((isn = generate_instr(cctx, isn_type)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     isn->isn_arg.unlet.ul_name = vim_strsave(name);
     isn->isn_arg.unlet.ul_forceit = forceit;
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_LOCKCONST instruction.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_LOCKCONST(cctx_T *cctx)
 {
     RETURN_OK_IF_SKIP(cctx);
-    if (generate_instr(cctx, ISN_LOCKCONST) == NULL)
-	return FAIL;
-    return OK;
+    ಯದಿ (generate_instr(cctx, ISN_LOCKCONST) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_LOADS instruction.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_OLDSCRIPT(
 	cctx_T	    *cctx,
 	isntype_T   isn_type,
 	char_u	    *name,
-	int	    sid,
+	ಪೂರ್ಣಾಙ್ಕ	    sid,
 	type_T	    *type)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if (isn_type == ISN_LOADS || isn_type == ISN_LOADEXPORT)
+    ಯದಿ (isn_type == ISN_LOADS || isn_type == ISN_LOADEXPORT)
 	isn = generate_instr_type(cctx, isn_type, type);
-    else
+    ಅನ್ಯಥಾ
 	isn = generate_instr_drop(cctx, isn_type, 1);
-    if (isn == NULL)
-	return FAIL;
+    ಯದಿ (isn == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     isn->isn_arg.loadstore.ls_name = vim_strsave(name);
     isn->isn_arg.loadstore.ls_sid = sid;
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_LOADSCRIPT or ISN_STORESCRIPT instruction.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_VIM9SCRIPT(
 	cctx_T	    *cctx,
 	isntype_T   isn_type,
-	int	    sid,
-	int	    idx,
+	ಪೂರ್ಣಾಙ್ಕ	    sid,
+	ಪೂರ್ಣಾಙ್ಕ	    idx,
 	type_T	    *type)
 {
     isn_T	*isn;
@@ -1440,32 +1440,32 @@ generate_VIM9SCRIPT(
     scriptitem_T *si = SCRIPT_ITEM(sid);
 
     RETURN_OK_IF_SKIP(cctx);
-    if (isn_type == ISN_LOADSCRIPT)
+    ಯದಿ (isn_type == ISN_LOADSCRIPT)
 	isn = generate_instr_type2(cctx, isn_type, type, type);
-    else
+    ಅನ್ಯಥಾ
 	isn = generate_instr_drop(cctx, isn_type, 1);
-    if (isn == NULL)
-	return FAIL;
+    ಯದಿ (isn == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
 
     // This requires three arguments, which doesn't fit in an instruction, thus
     // we need to allocate a struct for this.
     sref = ALLOC_ONE(scriptref_T);
-    if (sref == NULL)
-	return FAIL;
+    ಯದಿ (sref == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     isn->isn_arg.script.scriptref = sref;
     sref->sref_sid = sid;
     sref->sref_idx = idx;
     sref->sref_seq = si->sn_script_seq;
     sref->sref_type = type;
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_NEWLIST instruction for "count" items.
  * "use_null" is TRUE for null_list.
  */
-    int
-generate_NEWLIST(cctx_T *cctx, int count, int use_null)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_NEWLIST(cctx_T *cctx, ಪೂರ್ಣಾಙ್ಕ ಎಣಿಕೆ, ಪೂರ್ಣಾಙ್ಕ use_null)
 {
     isn_T	*isn;
     type_T	*member_type;
@@ -1473,49 +1473,49 @@ generate_NEWLIST(cctx_T *cctx, int count, int use_null)
     type_T	*decl_type;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_NEWLIST)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = use_null ? -1 : count;
+    ಯದಿ ((isn = generate_instr(cctx, ISN_NEWLIST)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    isn->isn_arg.ಸಂಖ್ಯೆ = use_null ? -1 : ಎಣಿಕೆ;
 
     // Get the member type and the declared member type from all the items on
     // the stack.
-    if ((member_type = get_member_type_from_stack(count, 1, cctx)) == NULL)
-	return FAIL;
+    ಯದಿ ((member_type = get_member_type_from_ರಾಶಿ(ಎಣಿಕೆ, 1, cctx)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     type = get_list_type(member_type, cctx->ctx_type_list);
     decl_type = get_list_type(&t_any, cctx->ctx_type_list);
 
     // drop the value types
-    cctx->ctx_type_stack.ga_len -= count;
+    cctx->ctx_type_ರಾಶಿ.ga_len -= ಎಣಿಕೆ;
 
     // add the list type to the type stack
-    return push_type_stack2(cctx, type, decl_type);
+    ಪ್ರತ್ಯಾಗಮ ತಳ್ಳು_type_stack2(cctx, type, decl_type);
 }
 
 /*
  * Generate an ISN_NEWTUPLE instruction for "count" items.
  * "use_null" is TRUE for null_tuple.
  */
-    int
-generate_NEWTUPLE(cctx_T *cctx, int count, int use_null)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_NEWTUPLE(cctx_T *cctx, ಪೂರ್ಣಾಙ್ಕ ಎಣಿಕೆ, ಪೂರ್ಣಾಙ್ಕ use_null)
 {
     isn_T	*isn;
     type_T	*type;
     type_T	*decl_type;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_NEWTUPLE)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = use_null ? -1 : count;
+    ಯದಿ ((isn = generate_instr(cctx, ISN_NEWTUPLE)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    isn->isn_arg.ಸಂಖ್ಯೆ = use_null ? -1 : ಎಣಿಕೆ;
 
     // Get the member type and the declared member type from all the items on
     // the stack.
     garray_T	tuple_types_ga;
-    ga_init2(&tuple_types_ga, sizeof(type_T *), 10);
+    ga_init2(&tuple_types_ga, ಪರಿಮಾಣ(type_T *), 10);
 
-    if (get_tuple_type_from_stack(count, &tuple_types_ga, cctx) < 0)
+    ಯದಿ (get_tuple_type_from_ರಾಶಿ(ಎಣಿಕೆ, &tuple_types_ga, cctx) < 0)
     {
 	ga_clear(&tuple_types_ga);
-	return FAIL;
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     }
 
     type = get_tuple_type(&tuple_types_ga, cctx->ctx_type_list);
@@ -1524,18 +1524,18 @@ generate_NEWTUPLE(cctx_T *cctx, int count, int use_null)
     ga_clear(&tuple_types_ga);
 
     // drop the value types
-    cctx->ctx_type_stack.ga_len -= count;
+    cctx->ctx_type_ರಾಶಿ.ga_len -= ಎಣಿಕೆ;
 
     // add the tuple type to the type stack
-    return push_type_stack2(cctx, type, decl_type);
+    ಪ್ರತ್ಯಾಗಮ ತಳ್ಳು_type_stack2(cctx, type, decl_type);
 }
 
 /*
  * Generate an ISN_NEWDICT instruction.
  * "use_null" is TRUE for null_dict.
  */
-    int
-generate_NEWDICT(cctx_T *cctx, int count, int use_null)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_NEWDICT(cctx_T *cctx, ಪೂರ್ಣಾಙ್ಕ ಎಣಿಕೆ, ಪೂರ್ಣಾಙ್ಕ use_null)
 {
     isn_T	*isn;
     type_T	*member_type;
@@ -1543,20 +1543,20 @@ generate_NEWDICT(cctx_T *cctx, int count, int use_null)
     type_T	*decl_type;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_NEWDICT)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = use_null ? -1 : count;
+    ಯದಿ ((isn = generate_instr(cctx, ISN_NEWDICT)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    isn->isn_arg.ಸಂಖ್ಯೆ = use_null ? -1 : ಎಣಿಕೆ;
 
-    if ((member_type = get_member_type_from_stack(count, 2, cctx)) == NULL)
-	return FAIL;
+    ಯದಿ ((member_type = get_member_type_from_ರಾಶಿ(ಎಣಿಕೆ, 2, cctx)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     type = get_dict_type(member_type, cctx->ctx_type_list);
     decl_type = get_dict_type(&t_any, cctx->ctx_type_list);
 
     // drop the key and value types
-    cctx->ctx_type_stack.ga_len -= 2 * count;
+    cctx->ctx_type_ರಾಶಿ.ga_len -= 2 * ಎಣಿಕೆ;
 
     // add the dict type to the type stack
-    return push_type_stack2(cctx, type, decl_type);
+    ಪ್ರತ್ಯಾಗಮ ತಳ್ಳು_type_stack2(cctx, type, decl_type);
 }
 
 /*
@@ -1567,37 +1567,37 @@ generate_NEWDICT(cctx_T *cctx, int count, int use_null)
  * be set later.  The index is used instead of a pointer to the instruction
  * because the instruction memory can be reallocated.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_FUNCREF(
 	cctx_T	    *cctx,
 	ufunc_T	    *ufunc,
 	class_T	    *cl,
-	int	    object_method,
-	int	    fi,
-	int	    *isn_idx)
+	ಪೂರ್ಣಾಙ್ಕ	    object_method,
+	ಪೂರ್ಣಾಙ್ಕ	    fi,
+	ಪೂರ್ಣಾಙ್ಕ	    *isn_idx)
 {
     isn_T	    *isn;
     type_T	    *type;
     funcref_extra_T *extra;
     loopvarinfo_T   loopinfo;
-    int		    has_vars;
+    ಪೂರ್ಣಾಙ್ಕ		    has_vars;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_FUNCREF)) == NULL)
-	return FAIL;
-    if (isn_idx != NULL)
+    ಯದಿ ((isn = generate_instr(cctx, ISN_FUNCREF)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    ಯದಿ (isn_idx != ರಿಕ್ತ)
 	// save the index of the new instruction
 	*isn_idx = cctx->ctx_instr.ga_len - 1;
 
     has_vars = get_loop_var_info(cctx, &loopinfo);
-    if (ufunc->uf_def_status == UF_NOT_COMPILED || has_vars || cl != NULL)
+    ಯದಿ (ufunc->uf_def_status == UF_NOT_COMPILED || has_vars || cl != ರಿಕ್ತ)
     {
 	extra = ALLOC_CLEAR_ONE(funcref_extra_T);
-	if (extra == NULL)
-	    return FAIL;
+	ಯದಿ (extra == ರಿಕ್ತ)
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
 	isn->isn_arg.funcref.fr_extra = extra;
 	extra->fre_loopvar_info = loopinfo;
-	if (cl != NULL)
+	ಯದಿ (cl != ರಿಕ್ತ)
 	{
 	    extra->fre_class = cl;
 	    ++cl->class_refcount;
@@ -1605,13 +1605,13 @@ generate_FUNCREF(
 	    extra->fre_method_idx = fi;
 	}
     }
-    if (ufunc->uf_def_status == UF_NOT_COMPILED || cl != NULL)
+    ಯದಿ (ufunc->uf_def_status == UF_NOT_COMPILED || cl != ರಿಕ್ತ)
 	extra->fre_func_name = vim_strnsave(ufunc->uf_name, ufunc->uf_namelen);
-    if (ufunc->uf_def_status != UF_NOT_COMPILED && cl == NULL)
+    ಯದಿ (ufunc->uf_def_status != UF_NOT_COMPILED && cl == ರಿಕ್ತ)
     {
-	if (isn_idx == NULL && ufunc->uf_def_status == UF_TO_BE_COMPILED)
+	ಯದಿ (isn_idx == ರಿಕ್ತ && ufunc->uf_def_status == UF_TO_BE_COMPILED)
 	    // compile the function now, we need the uf_dfunc_idx value
-	    (void)compile_def_function(ufunc, FALSE, CT_NONE, NULL);
+	    (ಶೂನ್ಯ)compile_def_function(ufunc, FALSE, CT_NONE, ರಿಕ್ತ);
 	isn->isn_arg.funcref.fr_dfunc_idx = ufunc->uf_dfunc_idx;
     }
 
@@ -1622,12 +1622,12 @@ generate_FUNCREF(
     // If the referenced function is a closure, it may use items further up in
     // the nested context, including this one.  But not a function defined at
     // the script level.
-    if ((ufunc->uf_flags & FC_CLOSURE)
+    ಯದಿ ((ufunc->uf_flags & FC_CLOSURE)
 			       && func_name_refcount(cctx->ctx_ufunc->uf_name))
 	cctx->ctx_ufunc->uf_flags |= FC_CLOSURE;
 
-    type = ufunc->uf_func_type == NULL ? &t_func_any : ufunc->uf_func_type;
-    return push_type_stack(cctx, type);
+    type = ufunc->uf_func_type == ರಿಕ್ತ ? &t_func_any : ufunc->uf_func_type;
+    ಪ್ರತ್ಯಾಗಮ ತಳ್ಳು_type_ರಾಶಿ(cctx, type);
 }
 
 /*
@@ -1635,26 +1635,26 @@ generate_FUNCREF(
  * "lambda_name" and "func_name" must be in allocated memory and will be
  * consumed.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_NEWFUNC(
 	cctx_T	*cctx,
 	char_u	*lambda_name,
 	char_u	*func_name)
 {
     isn_T	*isn;
-    int		ret = OK;
+    ಪೂರ್ಣಾಙ್ಕ		ret = OK;
 
-    if (cctx->ctx_skip != SKIP_YES)
+    ಯದಿ (cctx->ctx_skip != SKIP_YES)
     {
-	if ((isn = generate_instr(cctx, ISN_NEWFUNC)) == NULL)
+	ಯದಿ ((isn = generate_instr(cctx, ISN_NEWFUNC)) == ರಿಕ್ತ)
 	    ret = FAIL;
-	else
+	ಅನ್ಯಥಾ
 	{
 	    newfuncarg_T *arg = ALLOC_CLEAR_ONE(newfuncarg_T);
 
-	    if (arg == NULL)
+	    ಯದಿ (arg == ರಿಕ್ತ)
 		ret = FAIL;
-	    else
+	    ಅನ್ಯಥಾ
 	    {
 		// Reserve an extra variable to keep track of the number of
 		// closures created.
@@ -1663,139 +1663,139 @@ generate_NEWFUNC(
 		isn->isn_arg.newfunc.nf_arg = arg;
 		arg->nfa_lambda = lambda_name;
 		arg->nfa_global = func_name;
-		(void)get_loop_var_info(cctx, &arg->nfa_loopvar_info);
-		return OK;
+		(ಶೂನ್ಯ)get_loop_var_info(cctx, &arg->nfa_loopvar_info);
+		ಪ್ರತ್ಯಾಗಮ OK;
 	    }
 	}
     }
     vim_free(lambda_name);
     vim_free(func_name);
-    return ret;
+    ಪ್ರತ್ಯಾಗಮ ret;
 }
 
 /*
  * Generate an ISN_DEF instruction: list functions
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_DEF(cctx_T *cctx, char_u *name, size_t len)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_DEF)) == NULL)
-	return FAIL;
-    if (len > 0)
+    ಯದಿ ((isn = generate_instr(cctx, ISN_DEF)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    ಯದಿ (len > 0)
     {
 	isn->isn_arg.string = vim_strnsave(name, len);
-	if (isn->isn_arg.string == NULL)
-	    return FAIL;
+	ಯದಿ (isn->isn_arg.string == ರಿಕ್ತ)
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
     }
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_JUMP instruction.
  */
-    int
-generate_JUMP(cctx_T *cctx, jumpwhen_T when, int where)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_JUMP(cctx_T *cctx, jumpwhen_T when, ಪೂರ್ಣಾಙ್ಕ where)
 {
     isn_T	*isn;
-    garray_T	*stack = &cctx->ctx_type_stack;
+    garray_T	*ರಾಶಿ = &cctx->ctx_type_ರಾಶಿ;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_JUMP)) == NULL)
-	return FAIL;
+    ಯದಿ ((isn = generate_instr(cctx, ISN_JUMP)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     isn->isn_arg.jump.jump_when = when;
     isn->isn_arg.jump.jump_where = where;
 
-    if (when != JUMP_ALWAYS && stack->ga_len > 0)
-	--stack->ga_len;
+    ಯದಿ (when != JUMP_ALWAYS && ರಾಶಿ->ga_len > 0)
+	--ರಾಶಿ->ga_len;
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_WHILE instruction.  Similar to ISN_JUMP for :while
  */
-    int
-generate_WHILE(cctx_T *cctx, int funcref_idx)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_WHILE(cctx_T *cctx, ಪೂರ್ಣಾಙ್ಕ funcref_idx)
 {
     isn_T	*isn;
-    garray_T	*stack = &cctx->ctx_type_stack;
+    garray_T	*ರಾಶಿ = &cctx->ctx_type_ರಾಶಿ;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_WHILE)) == NULL)
-	return FAIL;
+    ಯದಿ ((isn = generate_instr(cctx, ISN_WHILE)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     isn->isn_arg.whileloop.while_funcref_idx = funcref_idx;
     isn->isn_arg.whileloop.while_end = 0;  // filled in later
 
-    if (stack->ga_len > 0)
-	--stack->ga_len;
+    ಯದಿ (ರಾಶಿ->ga_len > 0)
+	--ರಾಶಿ->ga_len;
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_JUMP_IF_ARG_SET or ISN_JUMP_IF_ARG_NOT_SET instruction.
  */
-    int
-generate_JUMP_IF_ARG(cctx_T *cctx, isntype_T isn_type, int arg_off)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_JUMP_IF_ARG(cctx_T *cctx, isntype_T isn_type, ಪೂರ್ಣಾಙ್ಕ arg_off)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, isn_type)) == NULL)
-	return FAIL;
+    ಯದಿ ((isn = generate_instr(cctx, isn_type)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     isn->isn_arg.jumparg.jump_arg_off = arg_off;
     // jump_where is set later
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
-    int
-generate_FOR(cctx_T *cctx, int loop_idx)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_FOR(cctx_T *cctx, ಪೂರ್ಣಾಙ್ಕ loop_idx)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_FOR)) == NULL)
-	return FAIL;
+    ಯದಿ ((isn = generate_instr(cctx, ISN_FOR)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     isn->isn_arg.forloop.for_loop_idx = loop_idx;
 
     // type doesn't matter, will be stored next
-    return push_type_stack(cctx, &t_any);
+    ಪ್ರತ್ಯಾಗಮ ತಳ್ಳು_type_ರಾಶಿ(cctx, &t_any);
 }
 
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_ENDLOOP(cctx_T *cctx, loop_info_T *loop_info)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_ENDLOOP)) == NULL)
-	return FAIL;
+    ಯದಿ ((isn = generate_instr(cctx, ISN_ENDLOOP)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     isn->isn_arg.endloop.end_depth = loop_info->li_depth;
     isn->isn_arg.endloop.end_funcref_idx = loop_info->li_funcref_idx;
-    isn->isn_arg.endloop.end_var_idx = loop_info->li_local_count;
-    isn->isn_arg.endloop.end_var_count =
-			   cctx->ctx_locals.ga_len - loop_info->li_local_count;
-    return OK;
+    isn->isn_arg.endloop.end_var_idx = loop_info->li_local_ಎಣಿಕೆ;
+    isn->isn_arg.endloop.end_var_ಎಣಿಕೆ =
+			   cctx->ctx_locals.ga_len - loop_info->li_local_ಎಣಿಕೆ;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_TRYCONT instruction.
  */
-    int
-generate_TRYCONT(cctx_T *cctx, int levels, int where)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_TRYCONT(cctx_T *cctx, ಪೂರ್ಣಾಙ್ಕ levels, ಪೂರ್ಣಾಙ್ಕ where)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_TRYCONT)) == NULL)
-	return FAIL;
+    ಯದಿ ((isn = generate_instr(cctx, ISN_TRYCONT)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     isn->isn_arg.trycont.tct_levels = levels;
     isn->isn_arg.trycont.tct_where = where;
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
@@ -1803,65 +1803,65 @@ generate_TRYCONT(cctx_T *cctx, int levels, int where)
  * Give an error and return FAIL if something is wrong.
  * When "method_call" is NULL no code is generated.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 check_internal_func_args(
 	cctx_T	*cctx,
-	int	func_idx,
-	int	argcount,
-	int	method_call,
+	ಪೂರ್ಣಾಙ್ಕ	func_idx,
+	ಪೂರ್ಣಾಙ್ಕ	argcount,
+	ಪೂರ್ಣಾಙ್ಕ	method_call,
 	type2_T **argtypes,
 	type2_T *shuffled_argtypes)
 {
-    garray_T	*stack = &cctx->ctx_type_stack;
-    int		argoff = check_internal_func(func_idx, argcount);
+    garray_T	*ರಾಶಿ = &cctx->ctx_type_ರಾಶಿ;
+    ಪೂರ್ಣಾಙ್ಕ		argoff = check_internal_func(func_idx, argcount);
 
-    if (argoff < 0)
-	return FAIL;
+    ಯದಿ (argoff < 0)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
 
-    if (method_call && argoff > 1)
+    ಯದಿ (method_call && argoff > 1)
     {
-	if (argcount < argoff)
+	ಯದಿ (argcount < argoff)
 	{
 	    semsg(_(e_not_enough_arguments_for_function_str),
 						 internal_func_name(func_idx));
-	    return FAIL;
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
 	}
 
 	isn_T	*isn = generate_instr(cctx, ISN_SHUFFLE);
-	if (isn  == NULL)
-	    return FAIL;
+	ಯದಿ (isn  == ರಿಕ್ತ)
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
 	isn->isn_arg.shuffle.shfl_item = argcount;
 	isn->isn_arg.shuffle.shfl_up = argoff - 1;
     }
 
-    if (argcount > 0)
+    ಯದಿ (argcount > 0)
     {
-	type2_T	*typep = ((type2_T *)stack->ga_data) + stack->ga_len - argcount;
+	type2_T	*typep = ((type2_T *)ರಾಶಿ->ga_data) + ರಾಶಿ->ga_len - argcount;
 
 	// Check the types of the arguments.
-	if (method_call && argoff > 1)
+	ಯದಿ (method_call && argoff > 1)
 	{
-	    int i;
+	    ಪೂರ್ಣಾಙ್ಕ i;
 
-	    for (i = 0; i < argcount; ++i)
+	    ಪ್ರತಿ (i = 0; i < argcount; ++i)
 		shuffled_argtypes[i] = (i < argoff - 1)
 				    ? typep[i + 1]
 				    : (i == argoff - 1) ? typep[0] : typep[i];
 	    *argtypes = shuffled_argtypes;
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
-	    int i;
+	    ಪೂರ್ಣಾಙ್ಕ i;
 
-	    for (i = 0; i < argcount; ++i)
+	    ಪ್ರತಿ (i = 0; i < argcount; ++i)
 		shuffled_argtypes[i] = typep[i];
 	    *argtypes = shuffled_argtypes;
 	}
-	if (internal_func_check_arg_types(*argtypes, func_idx, argcount,
+	ಯದಿ (internal_func_check_arg_types(*argtypes, func_idx, argcount,
 								 cctx) == FAIL)
-	    return FAIL;
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
     }
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
@@ -1869,51 +1869,51 @@ check_internal_func_args(
  * "method_call" is TRUE for "value->method()"
  * Return FAIL if the number of arguments is wrong.
  */
-    int
-generate_BCALL(cctx_T *cctx, int func_idx, int argcount, int method_call)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_BCALL(cctx_T *cctx, ಪೂರ್ಣಾಙ್ಕ func_idx, ಪೂರ್ಣಾಙ್ಕ argcount, ಪೂರ್ಣಾಙ್ಕ method_call)
 {
     isn_T	*isn;
-    garray_T	*stack = &cctx->ctx_type_stack;
-    type2_T	*argtypes = NULL;
+    garray_T	*ರಾಶಿ = &cctx->ctx_type_ರಾಶಿ;
+    type2_T	*argtypes = ರಿಕ್ತ;
     type2_T	shuffled_argtypes[MAX_FUNC_ARGS];
-    type2_T	*maptype = NULL;
+    type2_T	*maptype = ರಿಕ್ತ;
     type_T	*type;
     type_T	*decl_type;
 
     RETURN_OK_IF_SKIP(cctx);
 
-    if (check_internal_func_args(cctx, func_idx, argcount, method_call,
+    ಯದಿ (check_internal_func_args(cctx, func_idx, argcount, method_call,
 					 &argtypes, shuffled_argtypes) == FAIL)
-	return FAIL;
+	ಪ್ರತ್ಯಾಗಮ FAIL;
 
-    if (internal_func_is_map(func_idx))
+    ಯದಿ (internal_func_is_map(func_idx))
 	maptype = argtypes;
 
-    if ((isn = generate_instr(cctx, ISN_BCALL)) == NULL)
-	return FAIL;
+    ಯದಿ ((isn = generate_instr(cctx, ISN_BCALL)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     isn->isn_arg.bfunc.cbf_idx = func_idx;
     isn->isn_arg.bfunc.cbf_argcount = argcount;
 
     // Drop the argument types and push the return type.
-    stack->ga_len -= argcount;
+    ರಾಶಿ->ga_len -= argcount;
     type = internal_func_ret_type(func_idx, argcount, argtypes, &decl_type,
 							  cctx->ctx_type_list);
-    if (push_type_stack2(cctx, type, decl_type) == FAIL)
-	return FAIL;
+    ಯದಿ (ತಳ್ಳು_type_stack2(cctx, type, decl_type) == FAIL)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
 
-    if (maptype != NULL && maptype[0].type_decl->tt_member != NULL
+    ಯದಿ (maptype != ರಿಕ್ತ && maptype[0].type_decl->tt_member != ರಿಕ್ತ
 				  && maptype[0].type_decl->tt_member != &t_any)
 	// Check that map() didn't change the item types.
 	generate_TYPECHECK(cctx, maptype[0].type_decl, 0, -1, FALSE, 1);
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_LISTAPPEND instruction.  Works like add().
  * Argument count is already checked.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_LISTAPPEND(cctx_T *cctx)
 {
     type_T	*list_type;
@@ -1923,42 +1923,42 @@ generate_LISTAPPEND(cctx_T *cctx)
     // Caller already checked that list_type is a list.
     // For checking the item type we use the declared type of the list and the
     // current type of the added item, adding a string to [1, 2] is OK.
-    list_type = get_decl_type_on_stack(cctx, 1);
-    if (arg_type_modifiable(list_type, 1) == FAIL)
-	return FAIL;
-    item_type = get_type_on_stack(cctx, 0);
+    list_type = get_decl_type_on_ರಾಶಿ(cctx, 1);
+    ಯದಿ (arg_type_modifiable(list_type, 1) == FAIL)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    item_type = get_type_on_ರಾಶಿ(cctx, 0);
     expected = list_type->tt_member;
-    if (need_type(item_type, expected, 0, -1, 0, cctx, FALSE, FALSE) == FAIL)
-	return FAIL;
+    ಯದಿ (need_type(item_type, expected, 0, -1, 0, cctx, FALSE, FALSE) == FAIL)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
 
-    if (generate_instr(cctx, ISN_LISTAPPEND) == NULL)
-	return FAIL;
+    ಯದಿ (generate_instr(cctx, ISN_LISTAPPEND) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
 
-    --cctx->ctx_type_stack.ga_len;	    // drop the argument
-    return OK;
+    --cctx->ctx_type_ರಾಶಿ.ga_len;	    // drop the argument
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_BLOBAPPEND instruction.  Works like add().
  * Argument count is already checked.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_BLOBAPPEND(cctx_T *cctx)
 {
     type_T	*item_type;
 
     // Caller already checked that blob_type is a blob, check it is modifiable.
-    if (arg_type_modifiable(get_decl_type_on_stack(cctx, 1), 1) == FAIL)
-	return FAIL;
-    item_type = get_type_on_stack(cctx, 0);
-    if (need_type(item_type, &t_number, 0, -1, 0, cctx, FALSE, FALSE) == FAIL)
-	return FAIL;
+    ಯದಿ (arg_type_modifiable(get_decl_type_on_ರಾಶಿ(cctx, 1), 1) == FAIL)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    item_type = get_type_on_ರಾಶಿ(cctx, 0);
+    ಯದಿ (need_type(item_type, &t_ಸಂಖ್ಯೆ, 0, -1, 0, cctx, FALSE, FALSE) == FAIL)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
 
-    if (generate_instr(cctx, ISN_BLOBAPPEND) == NULL)
-	return FAIL;
+    ಯದಿ (generate_instr(cctx, ISN_BLOBAPPEND) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
 
-    --cctx->ctx_type_stack.ga_len;	    // drop the argument
-    return OK;
+    --cctx->ctx_type_ರಾಶಿ.ga_len;	    // drop the argument
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
@@ -1968,29 +1968,29 @@ generate_BLOBAPPEND(cctx_T *cctx)
  *   ISN_UCALL      - uncompiled function, or
  *                    compiled script-local function called from a lambda
  */
-    static isntype_T
+    ಸ್ಥಿರ isntype_T
 isn_get_calltype(
 	cctx_T	    *cctx,
 	ufunc_T	    *ufunc,
 	class_T	    *cl)
 {
-    if (cl != NULL)
-	return ISN_METHODCALL;
+    ಯದಿ (cl != ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ ISN_METHODCALL;
 
-    if (ufunc->uf_def_status == UF_NOT_COMPILED)
-	return ISN_UCALL;
+    ಯದಿ (ufunc->uf_def_status == UF_NOT_COMPILED)
+	ಪ್ರತ್ಯಾಗಮ ISN_UCALL;
 
     // function invoked from a lambda
-    if (cctx->ctx_ufunc->uf_flags & FC_LAMBDA)
+    ಯದಿ (cctx->ctx_ufunc->uf_flags & FC_LAMBDA)
     {
 	// Script-local funcs in a lambda may be redefined by re-sourcing;
 	// resolve by name at runtime.  Patched to ISN_DCALL on next call once
 	// recompiled.
-	if (ufunc->uf_name[0] == K_SPECIAL)
-	    return ISN_UCALL;
+	ಯದಿ (ufunc->uf_name[0] == K_SPECIAL)
+	    ಪ್ರತ್ಯಾಗಮ ISN_UCALL;
     }
 
-    return ISN_DCALL;
+    ಪ್ರತ್ಯಾಗಮ ISN_DCALL;
 }
 
 /*
@@ -2001,92 +2001,92 @@ isn_get_calltype(
  * directly to determine ufunc.
  * Return FAIL if the number of arguments is wrong.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_CALL(
 	cctx_T	    *cctx,
 	ufunc_T	    *ufunc,
 	class_T	    *cl,
-	int	    mi,
-	int	    pushed_argcount,
-	int	    is_super)
+	ಪೂರ್ಣಾಙ್ಕ	    mi,
+	ಪೂರ್ಣಾಙ್ಕ	    pushed_argcount,
+	ಪೂರ್ಣಾಙ್ಕ	    is_super)
 {
     isn_T	*isn;
-    int		regular_args = ufunc->uf_args.ga_len;
-    int		argcount = pushed_argcount;
+    ಪೂರ್ಣಾಙ್ಕ		regular_args = ufunc->uf_args.ga_len;
+    ಪೂರ್ಣಾಙ್ಕ		argcount = pushed_argcount;
 
     RETURN_OK_IF_SKIP(cctx);
-    if (argcount > regular_args && !has_varargs(ufunc))
+    ಯದಿ (argcount > regular_args && !has_varargs(ufunc))
     {
 	semsg(_(e_too_many_arguments_for_function_str),
 						   printable_func_name(ufunc));
-	return FAIL;
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     }
-    if (argcount < regular_args - ufunc->uf_def_args.ga_len)
+    ಯದಿ (argcount < regular_args - ufunc->uf_def_args.ga_len)
     {
 	semsg(_(e_not_enough_arguments_for_function_str),
 						   printable_func_name(ufunc));
-	return FAIL;
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     }
 
-    if (ufunc->uf_def_status != UF_NOT_COMPILED
+    ಯದಿ (ufunc->uf_def_status != UF_NOT_COMPILED
 	    && ufunc->uf_def_status != UF_COMPILE_ERROR)
     {
-	int		i;
+	ಪೂರ್ಣಾಙ್ಕ		i;
 	compiletype_T	compile_type;
 
-	for (i = 0; i < argcount; ++i)
+	ಪ್ರತಿ (i = 0; i < argcount; ++i)
 	{
 	    type_T *expected;
 	    type_T *actual;
 
-	    actual = get_type_on_stack(cctx, argcount - i - 1);
-	    if (check_type_is_value(actual) == FAIL)
-		return FAIL;
-	    if (actual->tt_type == VAR_SPECIAL
+	    actual = get_type_on_ರಾಶಿ(cctx, argcount - i - 1);
+	    ಯದಿ (check_type_is_ಮೌಲ್ಯ(actual) == FAIL)
+		ಪ್ರತ್ಯಾಗಮ FAIL;
+	    ಯದಿ (actual->tt_type == VAR_SPECIAL
 			      && i >= regular_args - ufunc->uf_def_args.ga_len)
 	    {
 		// assume v:none used for default argument value
-		continue;
+		ಅನುವರ್ತ;
 	    }
-	    if (i < regular_args)
+	    ಯದಿ (i < regular_args)
 	    {
-		if (ufunc->uf_arg_types == NULL)
-		    continue;
+		ಯದಿ (ufunc->uf_arg_types == ರಿಕ್ತ)
+		    ಅನುವರ್ತ;
 		expected = ufunc->uf_arg_types[i];
 	    }
-	    else if (ufunc->uf_va_type == NULL
+	    ಅನ್ಯಥಾ ಯದಿ (ufunc->uf_va_type == ರಿಕ್ತ
 					   || ufunc->uf_va_type == &t_list_any)
 		// possibly a lambda or "...: any"
 		expected = &t_any;
-	    else
+	    ಅನ್ಯಥಾ
 		expected = ufunc->uf_va_type->tt_member;
-	    if (need_type(actual, expected, 0,
+	    ಯದಿ (need_type(actual, expected, 0,
 			      -argcount + i, i + 1, cctx, TRUE, FALSE) == FAIL)
 	    {
 		arg_type_mismatch(expected, actual, i + 1);
-		return FAIL;
+		ಪ್ರತ್ಯಾಗಮ FAIL;
 	    }
 	}
 	compile_type = get_compile_type(ufunc);
-	if (func_needs_compiling(ufunc, compile_type)
-		&& compile_def_function(ufunc, ufunc->uf_ret_type == NULL,
-						   compile_type, NULL) == FAIL)
-	    return FAIL;
+	ಯದಿ (func_needs_compiling(ufunc, compile_type)
+		&& compile_def_function(ufunc, ufunc->uf_ret_type == ರಿಕ್ತ,
+						   compile_type, ರಿಕ್ತ) == FAIL)
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
     }
-    if (ufunc->uf_def_status == UF_COMPILE_ERROR)
+    ಯದಿ (ufunc->uf_def_status == UF_COMPILE_ERROR)
     {
 	emsg_funcname(e_call_to_function_that_failed_to_compile_str,
 							       ufunc->uf_name);
-	return FAIL;
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     }
 
-    if ((isn = generate_instr(cctx, isn_get_calltype(cctx, ufunc, cl))) == NULL)
-	return FAIL;
-    if (cl != NULL /* isn->isn_type == ISN_METHODCALL */)
+    ಯದಿ ((isn = generate_instr(cctx, isn_get_calltype(cctx, ufunc, cl))) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    ಯದಿ (cl != ರಿಕ್ತ /* isn->isn_type == ISN_METHODCALL */)
     {
 	isn->isn_arg.mfunc = ALLOC_ONE(cmfunc_T);
-	if (isn->isn_arg.mfunc == NULL)
-	    return FAIL;
+	ಯದಿ (isn->isn_arg.mfunc == ರಿಕ್ತ)
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
 	isn->isn_arg.mfunc->cmf_itf = cl;
 	++cl->class_refcount;
 	isn->isn_arg.mfunc->cmf_idx = mi;
@@ -2095,19 +2095,19 @@ generate_CALL(
 	// For a generic method "ufunc" has the type arguments, the method of
 	// the object class is created with the same type arguments when
 	// called.
-	isn->isn_arg.mfunc->cmf_ufunc = NULL;
-	if (ufunc != cl->class_obj_methods[mi])
+	isn->isn_arg.mfunc->cmf_ufunc = ರಿಕ್ತ;
+	ಯದಿ (ufunc != cl->class_obj_methods[mi])
 	    isn->isn_arg.mfunc->cmf_ufunc = ufunc;
-	isn->isn_arg.mfunc->cmf_cache_cl = NULL;
-	isn->isn_arg.mfunc->cmf_cache_generic = NULL;
-	isn->isn_arg.mfunc->cmf_cache_ufunc = NULL;
+	isn->isn_arg.mfunc->cmf_cache_cl = ರಿಕ್ತ;
+	isn->isn_arg.mfunc->cmf_cache_generic = ರಿಕ್ತ;
+	isn->isn_arg.mfunc->cmf_cache_ufunc = ರಿಕ್ತ;
     }
-    else if (isn->isn_type == ISN_DCALL)
+    ಅನ್ಯಥಾ ಯದಿ (isn->isn_type == ISN_DCALL)
     {
 	isn->isn_arg.dfunc.cdf_idx = ufunc->uf_dfunc_idx;
 	isn->isn_arg.dfunc.cdf_argcount = argcount;
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	// A user function may be deleted and redefined later, can't use the
 	// ufunc pointer, need to look it up again at runtime.
@@ -2116,296 +2116,296 @@ generate_CALL(
     }
 
     // drop the argument types
-    cctx->ctx_type_stack.ga_len -= argcount;
+    cctx->ctx_type_ರಾಶಿ.ga_len -= argcount;
 
     // For an object or class method call, drop the object/class type.
-    if (ufunc->uf_class != NULL)
+    ಯದಿ (ufunc->uf_class != ರಿಕ್ತ)
     {
 	// When a class method is called without the class name prefix, then
 	// the type will not be in the stack.
-	type_T *stype = get_type_on_stack(cctx, 0);
-	if (stype->tt_type == VAR_CLASS || stype->tt_type == VAR_OBJECT)
-	    cctx->ctx_type_stack.ga_len--;
+	type_T *stype = get_type_on_ರಾಶಿ(cctx, 0);
+	ಯದಿ (stype->tt_type == VAR_CLASS || stype->tt_type == VAR_OBJECT)
+	    cctx->ctx_type_ರಾಶಿ.ga_len--;
     }
 
     // add return type
-    return push_type_stack(cctx, ufunc->uf_ret_type);
+    ಪ್ರತ್ಯಾಗಮ ತಳ್ಳು_type_ರಾಶಿ(cctx, ufunc->uf_ret_type);
 }
 
 /*
  * Generate an ISN_UCALL instruction when the function isn't defined yet.
  */
-    int
-generate_UCALL(cctx_T *cctx, char_u *name, int argcount)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_UCALL(cctx_T *cctx, char_u *name, ಪೂರ್ಣಾಙ್ಕ argcount)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_UCALL)) == NULL)
-	return FAIL;
+    ಯದಿ ((isn = generate_instr(cctx, ISN_UCALL)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     isn->isn_arg.ufunc.cuf_name = vim_strsave(name);
     isn->isn_arg.ufunc.cuf_argcount = argcount;
 
     // drop the argument types
-    cctx->ctx_type_stack.ga_len -= argcount;
+    cctx->ctx_type_ರಾಶಿ.ga_len -= argcount;
 
     // add return value
-    return push_type_stack(cctx, &t_any);
+    ಪ್ರತ್ಯಾಗಮ ತಳ್ಳು_type_ರಾಶಿ(cctx, &t_any);
 }
 
 /*
  * Check the arguments of function "type" against the types on the stack.
  * Returns OK or FAIL;
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 check_func_args_from_type(
 	cctx_T	*cctx,
 	type_T	*type,
-	int	argcount,
-	int	at_top,
+	ಪೂರ್ಣಾಙ್ಕ	argcount,
+	ಪೂರ್ಣಾಙ್ಕ	at_ತುದಿ,
 	char_u	*name)
 {
-    if (type->tt_argcount != -1)
+    ಯದಿ (type->tt_argcount != -1)
     {
-	int	    varargs = (type->tt_flags & TTFLAG_VARARGS) ? 1 : 0;
+	ಪೂರ್ಣಾಙ್ಕ	    varargs = (type->tt_flags & TTFLAG_VARARGS) ? 1 : 0;
 
-	if (argcount < type->tt_min_argcount - varargs)
+	ಯದಿ (argcount < type->tt_min_argcount - varargs)
 	{
 	    emsg_funcname(e_not_enough_arguments_for_function_str, name);
-	    return FAIL;
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
 	}
-	if (!varargs && argcount > type->tt_argcount)
+	ಯದಿ (!varargs && argcount > type->tt_argcount)
 	{
 	    emsg_funcname(e_too_many_arguments_for_function_str, name);
-	    return FAIL;
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
 	}
-	if (type->tt_args != NULL)
+	ಯದಿ (type->tt_args != ರಿಕ್ತ)
 	{
-	    int i;
+	    ಪೂರ್ಣಾಙ್ಕ i;
 
-	    for (i = 0; i < argcount; ++i)
+	    ಪ್ರತಿ (i = 0; i < argcount; ++i)
 	    {
-		int	offset = -argcount + i - (at_top ? 0 : 1);
-		type_T	*actual = get_type_on_stack(cctx, -1 - offset);
+		ಪೂರ್ಣಾಙ್ಕ	offset = -argcount + i - (at_ತುದಿ ? 0 : 1);
+		type_T	*actual = get_type_on_ರಾಶಿ(cctx, -1 - offset);
 		type_T	*expected;
 
-		if (check_type_is_value(actual) == FAIL)
-		    return FAIL;
-		if (varargs && i >= type->tt_argcount - 1)
+		ಯದಿ (check_type_is_ಮೌಲ್ಯ(actual) == FAIL)
+		    ಪ್ರತ್ಯಾಗಮ FAIL;
+		ಯದಿ (varargs && i >= type->tt_argcount - 1)
 		{
 		    expected = type->tt_args[type->tt_argcount - 1];
-		    if (expected != NULL && expected->tt_type == VAR_LIST)
+		    ಯದಿ (expected != ರಿಕ್ತ && expected->tt_type == VAR_LIST)
 			expected = expected->tt_member;
-		    if (expected == NULL)
+		    ಯದಿ (expected == ರಿಕ್ತ)
 			expected = &t_any;
 		}
-		else if (i >= type->tt_min_argcount
+		ಅನ್ಯಥಾ ಯದಿ (i >= type->tt_min_argcount
 					     && actual->tt_type == VAR_SPECIAL)
 		    expected = &t_any;
-		else
+		ಅನ್ಯಥಾ
 		    expected = type->tt_args[i];
-		if (need_type(actual, expected, 0,
+		ಯದಿ (need_type(actual, expected, 0,
 				     offset, i + 1, cctx, TRUE, FALSE) == FAIL)
 		{
 		    arg_type_mismatch(expected, actual, i + 1);
-		    return FAIL;
+		    ಪ್ರತ್ಯಾಗಮ FAIL;
 		}
 	    }
 	}
     }
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_PCALL instruction.
  * "type" is the type of the FuncRef.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_PCALL(
 	cctx_T	*cctx,
-	int	argcount,
+	ಪೂರ್ಣಾಙ್ಕ	argcount,
 	char_u	*name,
 	type_T	*type,
-	int	at_top)
+	ಪೂರ್ಣಾಙ್ಕ	at_ತುದಿ)
 {
     isn_T	*isn;
     type_T	*ret_type;
 
     RETURN_OK_IF_SKIP(cctx);
 
-    if (type->tt_type == VAR_ANY || type->tt_type == VAR_UNKNOWN
+    ಯದಿ (type->tt_type == VAR_ANY || type->tt_type == VAR_UNKNOWN
 						|| type == &t_object_any)
 	ret_type = &t_any;
-    else if (type->tt_type == VAR_FUNC || type->tt_type == VAR_PARTIAL)
+    ಅನ್ಯಥಾ ಯದಿ (type->tt_type == VAR_FUNC || type->tt_type == VAR_PARTIAL)
     {
-	if (check_func_args_from_type(cctx, type, argcount, at_top, name)
+	ಯದಿ (check_func_args_from_type(cctx, type, argcount, at_ತುದಿ, name)
 								       == FAIL)
-	    return FAIL;
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
 
 	ret_type = type->tt_member;
-	if (ret_type == &t_unknown)
+	ಯದಿ (ret_type == &t_unknown)
 	    // return type not known yet, use a runtime check
 	    ret_type = &t_any;
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	semsg(_(e_not_callable_type_str), name);
-	return FAIL;
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     }
 
-    if ((isn = generate_instr(cctx, ISN_PCALL)) == NULL)
-	return FAIL;
-    isn->isn_arg.pfunc.cpf_top = at_top;
+    ಯದಿ ((isn = generate_instr(cctx, ISN_PCALL)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    isn->isn_arg.pfunc.cpf_ತುದಿ = at_ತುದಿ;
     isn->isn_arg.pfunc.cpf_argcount = argcount;
 
     // drop the arguments and the funcref/partial
-    cctx->ctx_type_stack.ga_len -= argcount + 1;
+    cctx->ctx_type_ರಾಶಿ.ga_len -= argcount + 1;
 
     // push the return value
-    push_type_stack(cctx, ret_type);
+    ತಳ್ಳು_type_ರಾಶಿ(cctx, ret_type);
 
     // If partial is above the arguments it must be cleared and replaced with
     // the return value.
-    if (at_top && generate_instr(cctx, ISN_PCALL_END) == NULL)
-	return FAIL;
+    ಯದಿ (at_ತುದಿ && generate_instr(cctx, ISN_PCALL_END) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_DEFER instruction.
  */
-    int
-generate_DEFER(cctx_T *cctx, int var_idx, int argcount)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_DEFER(cctx_T *cctx, ಪೂರ್ಣಾಙ್ಕ var_idx, ಪೂರ್ಣಾಙ್ಕ argcount)
 {
     isn_T *isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_drop(cctx, ISN_DEFER, argcount + 1)) == NULL)
-	return FAIL;
+    ಯದಿ ((isn = generate_instr_drop(cctx, ISN_DEFER, argcount + 1)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     isn->isn_arg.defer.defer_var_idx = var_idx;
     isn->isn_arg.defer.defer_argcount = argcount;
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_STRINGMEMBER instruction.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_STRINGMEMBER(cctx_T *cctx, char_u *name, size_t len)
 {
     isn_T	*isn;
     type_T	*type;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_STRINGMEMBER)) == NULL)
-	return FAIL;
+    ಯದಿ ((isn = generate_instr(cctx, ISN_STRINGMEMBER)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     isn->isn_arg.string = vim_strnsave(name, len);
 
     // check for dict type
-    type = get_type_on_stack(cctx, 0);
-    if (type->tt_type != VAR_DICT
+    type = get_type_on_ರಾಶಿ(cctx, 0);
+    ಯದಿ (type->tt_type != VAR_DICT
 	    && type->tt_type != VAR_OBJECT
 	    && type->tt_type != VAR_ANY
 	    && type->tt_type != VAR_UNKNOWN)
     {
-	char *tofree;
+	ವರ್ಣ *tofree;
 
-	semsg(_(e_expected_dictionary_for_using_key_str_but_got_str),
+	semsg(_(e_expected_dictionary_for_using_ಕೀಲಿ_str_but_got_str),
 					       name, type_name(type, &tofree));
 	vim_free(tofree);
-	return FAIL;
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     }
     // change dict type to dict member type
-    if (type->tt_type == VAR_DICT)
+    ಯದಿ (type->tt_type == VAR_DICT)
     {
 	type_T *ntype = type->tt_member->tt_type == VAR_UNKNOWN
 						    ? &t_any : type->tt_member;
-	set_type_on_stack(cctx, ntype, 0);
+	set_type_on_ರಾಶಿ(cctx, ntype, 0);
     }
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_ECHO instruction.
  */
-    int
-generate_ECHO(cctx_T *cctx, int with_white, int count)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_ECHO(cctx_T *cctx, ಪೂರ್ಣಾಙ್ಕ with_white, ಪೂರ್ಣಾಙ್ಕ ಎಣಿಕೆ)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_drop(cctx, ISN_ECHO, count)) == NULL)
-	return FAIL;
+    ಯದಿ ((isn = generate_instr_drop(cctx, ISN_ECHO, ಎಣಿಕೆ)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     isn->isn_arg.echo.echo_with_white = with_white;
-    isn->isn_arg.echo.echo_count = count;
+    isn->isn_arg.echo.echo_ಎಣಿಕೆ = ಎಣಿಕೆ;
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_EXECUTE/ISN_ECHOMSG/ISN_ECHOERR instruction.
  */
-    int
-generate_MULT_EXPR(cctx_T *cctx, isntype_T isn_type, int count)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_MULT_ಅಭಿವ್ಯಕ್ತಿ(cctx_T *cctx, isntype_T isn_type, ಪೂರ್ಣಾಙ್ಕ ಎಣಿಕೆ)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_drop(cctx, isn_type, count)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = count;
-    return OK;
+    ಯದಿ ((isn = generate_instr_drop(cctx, isn_type, ಎಣಿಕೆ)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    isn->isn_arg.ಸಂಖ್ಯೆ = ಎಣಿಕೆ;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_ECHOWINDOW instruction
  */
-    int
-generate_ECHOWINDOW(cctx_T *cctx, int count, long time)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_ECHOWINDOW(cctx_T *cctx, ಪೂರ್ಣಾಙ್ಕ ಎಣಿಕೆ, long time)
 {
     isn_T	*isn;
 
-    if ((isn = generate_instr_drop(cctx, ISN_ECHOWINDOW, count)) == NULL)
-	return FAIL;
-    isn->isn_arg.echowin.ewin_count = count;
+    ಯದಿ ((isn = generate_instr_drop(cctx, ISN_ECHOWINDOW, ಎಣಿಕೆ)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    isn->isn_arg.echowin.ewin_ಎಣಿಕೆ = ಎಣಿಕೆ;
     isn->isn_arg.echowin.ewin_time = time;
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_SOURCE instruction.
  */
-    int
-generate_SOURCE(cctx_T *cctx, int sid)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_SOURCE(cctx_T *cctx, ಪೂರ್ಣಾಙ್ಕ sid)
 {
     isn_T	*isn;
 
-    if ((isn = generate_instr(cctx, ISN_SOURCE)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = sid;
+    ಯದಿ ((isn = generate_instr(cctx, ISN_SOURCE)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    isn->isn_arg.ಸಂಖ್ಯೆ = sid;
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an ISN_PUT or ISN_IPUT instruction depending on fixindent.
  */
-    int
-generate_PUT(cctx_T *cctx, int regname, linenr_T lnum, int fixindent)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_PUT(cctx_T *cctx, ಪೂರ್ಣಾಙ್ಕ regname, linenr_T lnum, ಪೂರ್ಣಾಙ್ಕ fixindent)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
     isn = (fixindent) ? generate_instr(cctx, ISN_IPUT) :
 			generate_instr(cctx, ISN_PUT);
-    if (isn == NULL)
-	return FAIL;
+    ಯದಿ (isn == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     isn->isn_arg.put.put_regname = regname;
     isn->isn_arg.put.put_lnum = lnum;
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
@@ -2416,147 +2416,147 @@ generate_PUT(cctx_T *cctx, int regname, linenr_T lnum, int fixindent)
  * - if the root item is a function argument
  * A copy is made of "line".
  */
-    int
-generate_LOCKUNLOCK(cctx_T *cctx, char_u *line, int is_arg)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_LOCKUNLOCK(cctx_T *cctx, char_u *ಸಾಲು, ಪೂರ್ಣಾಙ್ಕ is_arg)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_LOCKUNLOCK)) == NULL)
-	return FAIL;
-    class_T *cl = cctx->ctx_ufunc != NULL ? cctx->ctx_ufunc->uf_class : NULL;
-    isn->isn_arg.lockunlock.lu_string = vim_strsave(line);
+    ಯದಿ ((isn = generate_instr(cctx, ISN_LOCKUNLOCK)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    class_T *cl = cctx->ctx_ufunc != ರಿಕ್ತ ? cctx->ctx_ufunc->uf_class : ರಿಕ್ತ;
+    isn->isn_arg.lockunlock.lu_string = vim_strsave(ಸಾಲು);
     isn->isn_arg.lockunlock.lu_cl_exec = cl;
-    if (cl != NULL)
+    ಯದಿ (cl != ರಿಕ್ತ)
 	++cl->class_refcount;
     isn->isn_arg.lockunlock.lu_is_arg = is_arg;
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an EXEC instruction that takes a string argument.
  * A copy is made of "line".
  */
-    int
-generate_EXEC_copy(cctx_T *cctx, isntype_T isntype, char_u *line)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_EXEC_copy(cctx_T *cctx, isntype_T isntype, char_u *ಸಾಲು)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, isntype)) == NULL)
-	return FAIL;
-    isn->isn_arg.string = vim_strsave(line);
-    return OK;
+    ಯದಿ ((isn = generate_instr(cctx, isntype)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    isn->isn_arg.string = vim_strsave(ಸಾಲು);
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an EXEC instruction that takes a string argument.
  * "str" must be allocated, it is consumed.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_EXEC(cctx_T *cctx, isntype_T isntype, char_u *str)
 {
     isn_T	*isn;
-    int		ret = OK;
+    ಪೂರ್ಣಾಙ್ಕ		ret = OK;
 
-    if (cctx->ctx_skip != SKIP_YES)
+    ಯದಿ (cctx->ctx_skip != SKIP_YES)
     {
-	if ((isn = generate_instr(cctx, isntype)) == NULL)
+	ಯದಿ ((isn = generate_instr(cctx, isntype)) == ರಿಕ್ತ)
 	    ret = FAIL;
-	else
+	ಅನ್ಯಥಾ
 	{
 	    isn->isn_arg.string = str;
-	    return OK;
+	    ಪ್ರತ್ಯಾಗಮ OK;
 	}
     }
     vim_free(str);
-    return ret;
+    ಪ್ರತ್ಯಾಗಮ ret;
 }
 
-    int
-generate_LEGACY_EVAL(cctx_T *cctx, char_u *line)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_LEGACY_EVAL(cctx_T *cctx, char_u *ಸಾಲು)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_LEGACY_EVAL)) == NULL)
-	return FAIL;
-    isn->isn_arg.string = vim_strsave(line);
+    ಯದಿ ((isn = generate_instr(cctx, ISN_LEGACY_EVAL)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    isn->isn_arg.string = vim_strsave(ಸಾಲು);
 
-    return push_type_stack(cctx, &t_any);
+    ಪ್ರತ್ಯಾಗಮ ತಳ್ಳು_type_ರಾಶಿ(cctx, &t_any);
 }
 
-    int
-generate_EXECCONCAT(cctx_T *cctx, int count)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_EXECCONCAT(cctx_T *cctx, ಪೂರ್ಣಾಙ್ಕ ಎಣಿಕೆ)
 {
     isn_T	*isn;
 
-    if ((isn = generate_instr_drop(cctx, ISN_EXECCONCAT, count)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = count;
-    return OK;
+    ಯದಿ ((isn = generate_instr_drop(cctx, ISN_EXECCONCAT, ಎಣಿಕೆ)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    isn->isn_arg.ಸಂಖ್ಯೆ = ಎಣಿಕೆ;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate ISN_RANGE.  Consumes "range".  Return OK/FAIL.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_RANGE(cctx_T *cctx, char_u *range)
 {
     isn_T	*isn;
 
-    if ((isn = generate_instr(cctx, ISN_RANGE)) == NULL)
-	return FAIL;
+    ಯದಿ ((isn = generate_instr(cctx, ISN_RANGE)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     isn->isn_arg.string = range;
 
-    return push_type_stack(cctx, &t_number);
+    ಪ್ರತ್ಯಾಗಮ ತಳ್ಳು_type_ರಾಶಿ(cctx, &t_ಸಂಖ್ಯೆ);
 }
 
-    int
-generate_UNPACK(cctx_T *cctx, int var_count, int semicolon)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_UNPACK(cctx_T *cctx, ಪೂರ್ಣಾಙ್ಕ var_ಎಣಿಕೆ, ಪೂರ್ಣಾಙ್ಕ semicolon)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_UNPACK)) == NULL)
-	return FAIL;
-    isn->isn_arg.unpack.unp_count = var_count;
+    ಯದಿ ((isn = generate_instr(cctx, ISN_UNPACK)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    isn->isn_arg.unpack.unp_ಎಣಿಕೆ = var_ಎಣಿಕೆ;
     isn->isn_arg.unpack.unp_semicolon = semicolon;
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Generate an instruction for any command modifiers.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_cmdmods(cctx_T *cctx, cmdmod_T *cmod)
 {
     isn_T	*isn;
 
-    if (has_cmdmod(cmod, FALSE))
+    ಯದಿ (has_cmdmod(cmod, FALSE))
     {
 	cctx->ctx_has_cmdmod = TRUE;
 
-	if ((isn = generate_instr(cctx, ISN_CMDMOD)) == NULL)
-	    return FAIL;
+	ಯದಿ ((isn = generate_instr(cctx, ISN_CMDMOD)) == ರಿಕ್ತ)
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
 	isn->isn_arg.cmdmod.cf_cmdmod = ALLOC_ONE(cmdmod_T);
-	if (isn->isn_arg.cmdmod.cf_cmdmod == NULL)
-	    return FAIL;
-	mch_memmove(isn->isn_arg.cmdmod.cf_cmdmod, cmod, sizeof(cmdmod_T));
+	ಯದಿ (isn->isn_arg.cmdmod.cf_cmdmod == ರಿಕ್ತ)
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
+	mch_memmove(isn->isn_arg.cmdmod.cf_cmdmod, cmod, ಪರಿಮಾಣ(cmdmod_T));
 	// filter program now belongs to the instruction
-	cmod->cmod_filter_regmatch.regprog = NULL;
+	cmod->cmod_filter_regmatch.regprog = ರಿಕ್ತ;
     }
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_undo_cmdmods(cctx_T *cctx)
 {
-    if (cctx->ctx_has_cmdmod && generate_instr(cctx, ISN_CMDMOD_REV) == NULL)
-	return FAIL;
+    ಯದಿ (cctx->ctx_has_cmdmod && generate_instr(cctx, ISN_CMDMOD_REV) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     cctx->ctx_has_cmdmod = FALSE;
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
@@ -2564,117 +2564,117 @@ generate_undo_cmdmods(cctx_T *cctx)
  * "lhs" might be NULL.
  * Return FAIL when out of memory.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_store_var(
 	cctx_T		*cctx,
 	assign_dest_T	dest,
-	int		opt_flags,
-	int		vimvaridx,
+	ಪೂರ್ಣಾಙ್ಕ		opt_flags,
+	ಪೂರ್ಣಾಙ್ಕ		vimvaridx,
 	type_T		*type,
 	char_u		*name,
 	lhs_T		*lhs)
 {
-    switch (dest)
+    ವಿಕಲ್ಪ (dest)
     {
-	case dest_option:
-	    return generate_STOREOPT(cctx, ISN_STOREOPT,
+	ಪಕ್ಷ dest_option:
+	    ಪ್ರತ್ಯಾಗಮ generate_STOREOPT(cctx, ISN_STOREOPT,
 					skip_option_env_lead(name), opt_flags);
-	case dest_func_option:
-	    return generate_STOREOPT(cctx, ISN_STOREFUNCOPT,
+	ಪಕ್ಷ dest_func_option:
+	    ಪ್ರತ್ಯಾಗಮ generate_STOREOPT(cctx, ISN_STOREFUNCOPT,
 					skip_option_env_lead(name), opt_flags);
-	case dest_global:
+	ಪಕ್ಷ dest_global:
 	    // include g: with the name, easier to execute that way
-	    return generate_STORE(cctx, vim_strchr(name, AUTOLOAD_CHAR) == NULL
+	    ಪ್ರತ್ಯಾಗಮ generate_STORE(cctx, vim_strchr(name, AUTOLOAD_CHAR) == ರಿಕ್ತ
 					? ISN_STOREG : ISN_STOREAUTO, 0, name);
-	case dest_buffer:
+	ಪಕ್ಷ dest_buffer:
 	    // include b: with the name, easier to execute that way
-	    return generate_STORE(cctx, ISN_STOREB, 0, name);
-	case dest_window:
+	    ಪ್ರತ್ಯಾಗಮ generate_STORE(cctx, ISN_STOREB, 0, name);
+	ಪಕ್ಷ dest_window:
 	    // include w: with the name, easier to execute that way
-	    return generate_STORE(cctx, ISN_STOREW, 0, name);
-	case dest_tab:
+	    ಪ್ರತ್ಯಾಗಮ generate_STORE(cctx, ISN_STOREW, 0, name);
+	ಪಕ್ಷ dest_tab:
 	    // include t: with the name, easier to execute that way
-	    return generate_STORE(cctx, ISN_STORET, 0, name);
-	case dest_env:
-	    return generate_STORE(cctx, ISN_STOREENV, 0, name + 1);
-	case dest_reg:
-	    return generate_STORE(cctx, ISN_STOREREG,
-					 name[1] == '@' ? '"' : name[1], NULL);
-	case dest_vimvar:
-	    return generate_STORE(cctx, ISN_STOREV, vimvaridx, NULL);
-	case dest_script:
-	case dest_script_v9:
+	    ಪ್ರತ್ಯಾಗಮ generate_STORE(cctx, ISN_STORET, 0, name);
+	ಪಕ್ಷ dest_env:
+	    ಪ್ರತ್ಯಾಗಮ generate_STORE(cctx, ISN_STOREENV, 0, name + 1);
+	ಪಕ್ಷ dest_reg:
+	    ಪ್ರತ್ಯಾಗಮ generate_STORE(cctx, ISN_STOREREG,
+					 name[1] == '@' ? '"' : name[1], ರಿಕ್ತ);
+	ಪಕ್ಷ dest_vimvar:
+	    ಪ್ರತ್ಯಾಗಮ generate_STORE(cctx, ISN_STOREV, vimvaridx, ರಿಕ್ತ);
+	ಪಕ್ಷ dest_script:
+	ಪಕ್ಷ dest_script_v9:
 	    {
-		int	    scriptvar_idx = lhs->lhs_scriptvar_idx;
-		int	    scriptvar_sid = lhs->lhs_scriptvar_sid;
-		if (scriptvar_idx < 0)
+		ಪೂರ್ಣಾಙ್ಕ	    scriptvar_idx = lhs->lhs_scriptvar_idx;
+		ಪೂರ್ಣಾಙ್ಕ	    scriptvar_sid = lhs->lhs_scriptvar_sid;
+		ಯದಿ (scriptvar_idx < 0)
 		{
 		    isntype_T   isn_type = ISN_STORES;
 
 		    // If "sn_import_autoload", generate ISN_STOREEXPORT (not
 		    // ISN_STORES) if destination is in a vim9script or if
 		    // there is no "sn_autoload_prefix".
-		    if (SCRIPT_ID_VALID(scriptvar_sid)
+		    ಯದಿ (SCRIPT_ID_VALID(scriptvar_sid)
 			     && SCRIPT_ITEM(scriptvar_sid)->sn_import_autoload
 			     && ((SCRIPT_ITEM(scriptvar_sid)
-						  ->sn_autoload_prefix == NULL)
+						  ->sn_autoload_prefix == ರಿಕ್ತ)
 				|| lhs->lhs_dest == dest_script_v9))
 		    {
 			// "import autoload './dir/script.vim'" - load script
 			// first
-			if (generate_SOURCE(cctx, scriptvar_sid) == FAIL)
-			    return FAIL;
+			ಯದಿ (generate_SOURCE(cctx, scriptvar_sid) == FAIL)
+			    ಪ್ರತ್ಯಾಗಮ FAIL;
 			isn_type = ISN_STOREEXPORT;
 		    }
 
 		    // "s:" may be included in the name.
-		    return generate_OLDSCRIPT(cctx, isn_type, name,
+		    ಪ್ರತ್ಯಾಗಮ generate_OLDSCRIPT(cctx, isn_type, name,
 							  scriptvar_sid, type);
 		}
-		return generate_VIM9SCRIPT(cctx, ISN_STORESCRIPT,
+		ಪ್ರತ್ಯಾಗಮ generate_VIM9SCRIPT(cctx, ISN_STORESCRIPT,
 					   scriptvar_sid, scriptvar_idx, type);
 	    }
-	case dest_class_member:
-	    return generate_CLASSMEMBER(cctx, FALSE,
+	ಪಕ್ಷ dest_class_member:
+	    ಪ್ರತ್ಯಾಗಮ generate_CLASSMEMBER(cctx, FALSE,
 				     lhs->lhs_class, lhs->lhs_classmember_idx);
 
-	case dest_local:
-	case dest_expr:
+	ಪಕ್ಷ dest_local:
+	ಪಕ್ಷ dest_ಅಭಿವ್ಯಕ್ತಿ:
 	    // cannot happen
-	    break;
+	    ಭಙ್ಗ;
     }
-    return FAIL;
+    ಪ್ರತ್ಯಾಗಮ FAIL;
 }
 
 /*
  * Return TRUE when inside a "for" or "while" loop.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 inside_loop_scope(cctx_T *cctx)
 {
     scope_T	*scope = cctx->ctx_scope;
 
-    for (;;)
+    ಪ್ರತಿ (;;)
     {
-	if (scope == NULL)
-	    break;
-	if (scope->se_type == FOR_SCOPE || scope->se_type == WHILE_SCOPE)
-	    return TRUE;
+	ಯದಿ (scope == ರಿಕ್ತ)
+	    ಭಙ್ಗ;
+	ಯದಿ (scope->se_type == FOR_SCOPE || scope->se_type == WHILE_SCOPE)
+	    ಪ್ರತ್ಯಾಗಮ TRUE;
 	scope = scope->se_outer;
     }
-    return FALSE;
+    ಪ್ರತ್ಯಾಗಮ FALSE;
 }
 
-    int
-generate_store_lhs(cctx_T *cctx, lhs_T *lhs, int instr_count, int is_decl)
+    ಪೂರ್ಣಾಙ್ಕ
+generate_store_lhs(cctx_T *cctx, lhs_T *lhs, ಪೂರ್ಣಾಙ್ಕ instr_ಎಣಿಕೆ, ಪೂರ್ಣಾಙ್ಕ is_decl)
 {
-    if (lhs->lhs_dest != dest_local)
-	return generate_store_var(cctx, lhs->lhs_dest,
+    ಯದಿ (lhs->lhs_dest != dest_local)
+	ಪ್ರತ್ಯಾಗಮ generate_store_var(cctx, lhs->lhs_dest,
 			    lhs->lhs_opt_flags, lhs->lhs_vimvaridx,
 			    lhs->lhs_type, lhs->lhs_name, lhs);
 
-    if (lhs->lhs_lvar == NULL)
-	return OK;
+    ಯದಿ (lhs->lhs_lvar == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ OK;
 
     garray_T	*instr = &cctx->ctx_instr;
     isn_T		*isn = ((isn_T *)instr->ga_data) + instr->ga_len - 1;
@@ -2682,34 +2682,34 @@ generate_store_lhs(cctx_T *cctx, lhs_T *lhs, int instr_count, int is_decl)
     // Optimization: turn "var = 123" from ISN_PUSHNR + ISN_STORE into
     // ISN_STORENR.
     // And "var = 0" does not need any instruction.
-    if (lhs->lhs_lvar->lv_from_outer == 0
-	    && instr->ga_len == instr_count + 1
+    ಯದಿ (lhs->lhs_lvar->lv_from_outer == 0
+	    && instr->ga_len == instr_ಎಣಿಕೆ + 1
 	    && isn->isn_type == ISN_PUSHNR)
     {
-	varnumber_T val = isn->isn_arg.number;
-	garray_T    *stack = &cctx->ctx_type_stack;
+	varnumber_T val = isn->isn_arg.ಸಂಖ್ಯೆ;
+	garray_T    *ರಾಶಿ = &cctx->ctx_type_ರಾಶಿ;
 
-	if (val == 0 && is_decl && !inside_loop_scope(cctx))
+	ಯದಿ (val == 0 && is_decl && !inside_loop_scope(cctx))
 	{
 	    // zero is the default value, no need to do anything
 	    --instr->ga_len;
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
 	    isn->isn_type = ISN_STORENR;
 	    isn->isn_arg.storenr.stnr_idx = lhs->lhs_lvar->lv_idx;
 	    isn->isn_arg.storenr.stnr_val = val;
 	}
-	if (stack->ga_len > 0)
-	    --stack->ga_len;
+	ಯದಿ (ರಾಶಿ->ga_len > 0)
+	    --ರಾಶಿ->ga_len;
     }
-    else if (lhs->lhs_lvar->lv_from_outer > 0)
+    ಅನ್ಯಥಾ ಯದಿ (lhs->lhs_lvar->lv_from_outer > 0)
 	generate_STOREOUTER(cctx, lhs->lhs_lvar->lv_idx,
 		lhs->lhs_lvar->lv_from_outer, lhs->lhs_lvar->lv_loop_depth,
 		lhs->lhs_lvar->lv_loop_idx);
-    else
-	generate_STORE(cctx, ISN_STORE, lhs->lhs_lvar->lv_idx, NULL);
-    return OK;
+    ಅನ್ಯಥಾ
+	generate_STORE(cctx, ISN_STORE, lhs->lhs_lvar->lv_idx, ರಿಕ್ತ);
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
@@ -2717,23 +2717,23 @@ generate_store_lhs(cctx_T *cctx, lhs_T *lhs, int instr_count, int is_decl)
  * object member variable initialization expression in the context of the
  * script where the class is defined.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 generate_SCRIPTCTX_SET(cctx_T *cctx, sctx_T new_sctx)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_SCRIPTCTX_SET)) == NULL)
-	return FAIL;
+    ಯದಿ ((isn = generate_instr(cctx, ISN_SCRIPTCTX_SET)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     isn->isn_arg.setsctx = new_sctx;
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
-#if defined(FEAT_PROFILE)
-    void
-may_generate_prof_end(cctx_T *cctx, int prof_lnum)
+#ಯದಿ defined(FEAT_PROFILE)
+    ಶೂನ್ಯ
+may_generate_prof_end(cctx_T *cctx, ಪೂರ್ಣಾಙ್ಕ prof_lnum)
 {
-    if (cctx->ctx_compile_type == CT_PROFILE && prof_lnum >= 0)
+    ಯದಿ (cctx->ctx_compile_type == CT_PROFILE && prof_lnum >= 0)
 	generate_instr(cctx, ISN_PROF_END);
 }
 #endif
@@ -2742,155 +2742,155 @@ may_generate_prof_end(cctx_T *cctx, int prof_lnum)
 /*
  * Delete an instruction, free what it contains.
  */
-    void
+    ಶೂನ್ಯ
 delete_instr(isn_T *isn)
 {
-    switch (isn->isn_type)
+    ವಿಕಲ್ಪ (isn->isn_type)
     {
-	case ISN_AUTOLOAD:
-	case ISN_DEF:
-	case ISN_EXEC:
-	case ISN_EXECRANGE:
-	case ISN_EXEC_SPLIT:
-	case ISN_LEGACY_EVAL:
-	case ISN_LOADAUTO:
-	case ISN_LOADB:
-	case ISN_LOADENV:
-	case ISN_LOADG:
-	case ISN_LOADOPT:
-	case ISN_LOADT:
-	case ISN_LOADW:
-	case ISN_PUSHEXC:
-	case ISN_PUSHFUNC:
-	case ISN_PUSHS:
-	case ISN_RANGE:
-	case ISN_STOREAUTO:
-	case ISN_STOREB:
-	case ISN_STOREENV:
-	case ISN_STOREG:
-	case ISN_STORET:
-	case ISN_STOREW:
-	case ISN_STRINGMEMBER:
+	ಪಕ್ಷ ISN_AUTOLOAD:
+	ಪಕ್ಷ ISN_DEF:
+	ಪಕ್ಷ ISN_EXEC:
+	ಪಕ್ಷ ISN_EXECRANGE:
+	ಪಕ್ಷ ISN_EXEC_SPLIT:
+	ಪಕ್ಷ ISN_LEGACY_EVAL:
+	ಪಕ್ಷ ISN_LOADAUTO:
+	ಪಕ್ಷ ISN_LOADB:
+	ಪಕ್ಷ ISN_LOADENV:
+	ಪಕ್ಷ ISN_LOADG:
+	ಪಕ್ಷ ISN_LOADOPT:
+	ಪಕ್ಷ ISN_LOADT:
+	ಪಕ್ಷ ISN_LOADW:
+	ಪಕ್ಷ ISN_PUSHEXC:
+	ಪಕ್ಷ ISN_PUSHFUNC:
+	ಪಕ್ಷ ISN_PUSHS:
+	ಪಕ್ಷ ISN_RANGE:
+	ಪಕ್ಷ ISN_STOREAUTO:
+	ಪಕ್ಷ ISN_STOREB:
+	ಪಕ್ಷ ISN_STOREENV:
+	ಪಕ್ಷ ISN_STOREG:
+	ಪಕ್ಷ ISN_STORET:
+	ಪಕ್ಷ ISN_STOREW:
+	ಪಕ್ಷ ISN_STRINGMEMBER:
 	    vim_free(isn->isn_arg.string);
-	    break;
+	    ಭಙ್ಗ;
 
-	case ISN_LOCKUNLOCK:
+	ಪಕ್ಷ ISN_LOCKUNLOCK:
 	    class_unref(isn->isn_arg.lockunlock.lu_cl_exec);
 	    vim_free(isn->isn_arg.lockunlock.lu_string);
-	    break;
+	    ಭಙ್ಗ;
 
-	case ISN_SUBSTITUTE:
+	ಪಕ್ಷ ISN_SUBSTITUTE:
 	    {
-		int	idx;
+		ಪೂರ್ಣಾಙ್ಕ	idx;
 		isn_T	*list = isn->isn_arg.subs.subs_instr;
 
 		vim_free(isn->isn_arg.subs.subs_cmd);
-		for (idx = 0; list[idx].isn_type != ISN_FINISH; ++idx)
+		ಪ್ರತಿ (idx = 0; list[idx].isn_type != ISN_FINISH; ++idx)
 		    delete_instr(list + idx);
 		vim_free(list);
 	    }
-	    break;
+	    ಭಙ್ಗ;
 
-	case ISN_INSTR:
+	ಪಕ್ಷ ISN_INSTR:
 	    {
-		int	idx;
+		ಪೂರ್ಣಾಙ್ಕ	idx;
 		isn_T	*list = isn->isn_arg.instr;
 
-		for (idx = 0; list[idx].isn_type != ISN_FINISH; ++idx)
+		ಪ್ರತಿ (idx = 0; list[idx].isn_type != ISN_FINISH; ++idx)
 		    delete_instr(list + idx);
 		vim_free(list);
 	    }
-	    break;
+	    ಭಙ್ಗ;
 
-	case ISN_LOADS:
-	case ISN_LOADEXPORT:
-	case ISN_STORES:
-	case ISN_STOREEXPORT:
+	ಪಕ್ಷ ISN_LOADS:
+	ಪಕ್ಷ ISN_LOADEXPORT:
+	ಪಕ್ಷ ISN_STORES:
+	ಪಕ್ಷ ISN_STOREEXPORT:
 	    vim_free(isn->isn_arg.loadstore.ls_name);
-	    break;
+	    ಭಙ್ಗ;
 
-	case ISN_UNLET:
-	case ISN_UNLETENV:
+	ಪಕ್ಷ ISN_UNLET:
+	ಪಕ್ಷ ISN_UNLETENV:
 	    vim_free(isn->isn_arg.unlet.ul_name);
-	    break;
+	    ಭಙ್ಗ;
 
-	case ISN_STOREOPT:
-	case ISN_STOREFUNCOPT:
+	ಪಕ್ಷ ISN_STOREOPT:
+	ಪಕ್ಷ ISN_STOREFUNCOPT:
 	    vim_free(isn->isn_arg.storeopt.so_name);
-	    break;
+	    ಭಙ್ಗ;
 
-	case ISN_PUSHBLOB:   // push blob isn_arg.blob
+	ಪಕ್ಷ ISN_PUSHBLOB:   // push blob isn_arg.blob
 	    blob_unref(isn->isn_arg.blob);
-	    break;
+	    ಭಙ್ಗ;
 
-	case ISN_PUSHCLASS:
+	ಪಕ್ಷ ISN_PUSHCLASS:
 	    class_unref(isn->isn_arg.classarg);
-	    break;
+	    ಭಙ್ಗ;
 
-	case ISN_UCALL:
+	ಪಕ್ಷ ISN_UCALL:
 	    vim_free(isn->isn_arg.ufunc.cuf_name);
-	    break;
+	    ಭಙ್ಗ;
 
-	case ISN_FUNCREF:
+	ಪಕ್ಷ ISN_FUNCREF:
 	    {
 		funcref_T	*funcref = &isn->isn_arg.funcref;
 		funcref_extra_T *extra = funcref->fr_extra;
 
-		if (extra == NULL || extra->fre_func_name == NULL)
+		ಯದಿ (extra == ರಿಕ್ತ || extra->fre_func_name == ರಿಕ್ತ)
 		{
 		    dfunc_T *dfunc = ((dfunc_T *)def_functions.ga_data)
 						       + funcref->fr_dfunc_idx;
 		    ufunc_T *ufunc = dfunc->df_ufunc;
 
-		    if (ufunc != NULL && func_name_refcount(ufunc->uf_name))
+		    ಯದಿ (ufunc != ರಿಕ್ತ && func_name_refcount(ufunc->uf_name))
 			func_ptr_unref(ufunc);
 		}
-		if (extra != NULL)
+		ಯದಿ (extra != ರಿಕ್ತ)
 		{
 		    char_u *name = extra->fre_func_name;
 
-		    if (name != NULL)
+		    ಯದಿ (name != ರಿಕ್ತ)
 		    {
 			func_unref(name);
 			vim_free(name);
 		    }
-		    if (extra->fre_class != NULL)
+		    ಯದಿ (extra->fre_class != ರಿಕ್ತ)
 			class_unref(extra->fre_class);
 		    vim_free(extra);
 		}
 	    }
-	    break;
+	    ಭಙ್ಗ;
 
-	case ISN_DCALL:
+	ಪಕ್ಷ ISN_DCALL:
 	    {
 		dfunc_T *dfunc = ((dfunc_T *)def_functions.ga_data)
 		    + isn->isn_arg.dfunc.cdf_idx;
 
-		if (dfunc->df_ufunc != NULL
+		ಯದಿ (dfunc->df_ufunc != ರಿಕ್ತ
 			&& func_name_refcount(dfunc->df_ufunc->uf_name))
 		    func_ptr_unref(dfunc->df_ufunc);
 	    }
-	    break;
+	    ಭಙ್ಗ;
 
-	case ISN_METHODCALL:
+	ಪಕ್ಷ ISN_METHODCALL:
 	    {
 		cmfunc_T  *mfunc = isn->isn_arg.mfunc;
 		class_unref(mfunc->cmf_itf);
 		class_unref(mfunc->cmf_cache_cl);
 		vim_free(mfunc);
 	    }
-	    break;
+	    ಭಙ್ಗ;
 
-	case ISN_NEWFUNC:
+	ಪಕ್ಷ ISN_NEWFUNC:
 	    {
 		newfuncarg_T *arg = isn->isn_arg.newfunc.nf_arg;
 
-		if (arg != NULL)
+		ಯದಿ (arg != ರಿಕ್ತ)
 		{
 		    ufunc_T *ufunc = find_func_even_dead(
 					      arg->nfa_lambda, FFED_IS_GLOBAL);
 
-		    if (ufunc != NULL)
+		    ಯದಿ (ufunc != ರಿಕ್ತ)
 		    {
 			unlink_def_function(ufunc);
 			func_ptr_unref(ufunc);
@@ -2901,168 +2901,168 @@ delete_instr(isn_T *isn)
 		    vim_free(arg);
 		}
 	    }
-	    break;
+	    ಭಙ್ಗ;
 
-	case ISN_CHECKTYPE:
-	case ISN_SETTYPE:
+	ಪಕ್ಷ ISN_CHECKTYPE:
+	ಪಕ್ಷ ISN_SETTYPE:
 	    free_type(isn->isn_arg.type.ct_type);
-	    break;
+	    ಭಙ್ಗ;
 
-	case ISN_CMDMOD:
+	ಪಕ್ಷ ISN_CMDMOD:
 	    vim_regfree(isn->isn_arg.cmdmod.cf_cmdmod
 		    ->cmod_filter_regmatch.regprog);
 	    vim_free(isn->isn_arg.cmdmod.cf_cmdmod);
-	    break;
+	    ಭಙ್ಗ;
 
-	case ISN_LOADSCRIPT:
-	case ISN_STORESCRIPT:
+	ಪಕ್ಷ ISN_LOADSCRIPT:
+	ಪಕ್ಷ ISN_STORESCRIPT:
 	    vim_free(isn->isn_arg.script.scriptref);
-	    break;
+	    ಭಙ್ಗ;
 
-	case ISN_LOAD_CLASSMEMBER:
-	case ISN_STORE_CLASSMEMBER:
-	case ISN_GET_ITF_MEMBER:
+	ಪಕ್ಷ ISN_LOAD_CLASSMEMBER:
+	ಪಕ್ಷ ISN_STORE_CLASSMEMBER:
+	ಪಕ್ಷ ISN_GET_ITF_MEMBER:
 	    class_unref(isn->isn_arg.classmember.cm_class);
-	    break;
+	    ಭಙ್ಗ;
 
-	case ISN_STOREINDEX:
+	ಪಕ್ಷ ISN_STOREINDEX:
 	    class_unref(isn->isn_arg.storeindex.si_class);
-	    break;
+	    ಭಙ್ಗ;
 
-	case ISN_TRY:
+	ಪಕ್ಷ ISN_TRY:
 	    vim_free(isn->isn_arg.tryref.try_ref);
-	    break;
+	    ಭಙ್ಗ;
 
-	case ISN_CEXPR_CORE:
+	ಪಕ್ಷ ISN_CEXPR_CORE:
 	    vim_free(isn->isn_arg.cexpr.cexpr_ref->cer_cmdline);
 	    vim_free(isn->isn_arg.cexpr.cexpr_ref);
-	    break;
+	    ಭಙ್ಗ;
 
-	case ISN_2BOOL:
-	case ISN_2STRING:
-	case ISN_2STRING_ANY:
-	case ISN_ADDBLOB:
-	case ISN_ADDLIST:
-	case ISN_ADDTUPLE:
-	case ISN_ANYINDEX:
-	case ISN_ANYSLICE:
-	case ISN_BCALL:
-	case ISN_BLOBAPPEND:
-	case ISN_BLOBINDEX:
-	case ISN_BLOBSLICE:
-	case ISN_CATCH:
-	case ISN_CEXPR_AUCMD:
-	case ISN_CHECKLEN:
-	case ISN_CLEARDICT:
-	case ISN_CMDMOD_REV:
-	case ISN_COMPAREANY:
-	case ISN_COMPAREBLOB:
-	case ISN_COMPAREBOOL:
-	case ISN_COMPAREDICT:
-	case ISN_COMPAREFLOAT:
-	case ISN_COMPAREFUNC:
-	case ISN_COMPARELIST:
-	case ISN_COMPARETUPLE:
-	case ISN_COMPARENR:
-	case ISN_COMPARENULL:
-	case ISN_COMPAREOBJECT:
-	case ISN_COMPARESPECIAL:
-	case ISN_COMPARESTRING:
-	case ISN_CONCAT:
-	case ISN_CONSTRUCT:
-	case ISN_COND2BOOL:
-	case ISN_DEBUG:
-	case ISN_DEFER:
-	case ISN_DROP:
-	case ISN_ECHO:
-	case ISN_ECHOCONSOLE:
-	case ISN_ECHOERR:
-	case ISN_ECHOMSG:
-	case ISN_ECHOWINDOW:
-	case ISN_ENDLOOP:
-	case ISN_ENDTRY:
-	case ISN_EXECCONCAT:
-	case ISN_EXECUTE:
-	case ISN_FINALLY:
-	case ISN_FINISH:
-	case ISN_FOR:
-	case ISN_GETITEM:
-	case ISN_GET_OBJ_MEMBER:
-	case ISN_JUMP:
-	case ISN_JUMP_IF_ARG_NOT_SET:
-	case ISN_JUMP_IF_ARG_SET:
-	case ISN_LISTAPPEND:
-	case ISN_LISTINDEX:
-	case ISN_LISTSLICE:
-	case ISN_TUPLEINDEX:
-	case ISN_TUPLESLICE:
-	case ISN_LOAD:
-	case ISN_LOADBDICT:
-	case ISN_LOADGDICT:
-	case ISN_LOADOUTER:
-	case ISN_LOADREG:
-	case ISN_LOADTDICT:
-	case ISN_LOADV:
-	case ISN_LOADWDICT:
-	case ISN_LOCKCONST:
-	case ISN_MEMBER:
-	case ISN_NEGATENR:
-	case ISN_NEWDICT:
-	case ISN_NEWLIST:
-	case ISN_NEWTUPLE:
-	case ISN_NEWPARTIAL:
-	case ISN_OPANY:
-	case ISN_OPFLOAT:
-	case ISN_OPNR:
-	case ISN_PCALL:
-	case ISN_PCALL_END:
-	case ISN_PROF_END:
-	case ISN_PROF_START:
-	case ISN_PUSHBOOL:
-	case ISN_PUSHCHANNEL:
-	case ISN_PUSHF:
-	case ISN_PUSHJOB:
-	case ISN_PUSHNR:
-	case ISN_PUSHOBJ:
-	case ISN_PUSHSPEC:
-	case ISN_PUT:
-	case ISN_IPUT:
-	case ISN_REDIREND:
-	case ISN_REDIRSTART:
-	case ISN_RETURN:
-	case ISN_RETURN_OBJECT:
-	case ISN_RETURN_VOID:
-	case ISN_SHUFFLE:
-	case ISN_SLICE:
-	case ISN_SOURCE:
-	case ISN_STORE:
-	case ISN_STORENR:
-	case ISN_STOREOUTER:
-	case ISN_STORE_THIS:
-	case ISN_STORERANGE:
-	case ISN_STOREREG:
-	case ISN_STOREV:
-	case ISN_STRINDEX:
-	case ISN_STRSLICE:
-	case ISN_THROW:
-	case ISN_TRYCONT:
-	case ISN_UNLETINDEX:
-	case ISN_UNLETRANGE:
-	case ISN_UNPACK:
-	case ISN_USEDICT:
-	case ISN_WHILE:
-	case ISN_SCRIPTCTX_SET:
+	ಪಕ್ಷ ISN_2BOOL:
+	ಪಕ್ಷ ISN_2STRING:
+	ಪಕ್ಷ ISN_2STRING_ANY:
+	ಪಕ್ಷ ISN_ADDBLOB:
+	ಪಕ್ಷ ISN_ADDLIST:
+	ಪಕ್ಷ ISN_ADDTUPLE:
+	ಪಕ್ಷ ISN_ANYINDEX:
+	ಪಕ್ಷ ISN_ANYSLICE:
+	ಪಕ್ಷ ISN_BCALL:
+	ಪಕ್ಷ ISN_BLOBAPPEND:
+	ಪಕ್ಷ ISN_BLOBINDEX:
+	ಪಕ್ಷ ISN_BLOBSLICE:
+	ಪಕ್ಷ ISN_CATCH:
+	ಪಕ್ಷ ISN_CEXPR_AUCMD:
+	ಪಕ್ಷ ISN_CHECKLEN:
+	ಪಕ್ಷ ISN_CLEARDICT:
+	ಪಕ್ಷ ISN_CMDMOD_REV:
+	ಪಕ್ಷ ISN_COMPAREANY:
+	ಪಕ್ಷ ISN_COMPAREBLOB:
+	ಪಕ್ಷ ISN_COMPAREBOOL:
+	ಪಕ್ಷ ISN_COMPAREDICT:
+	ಪಕ್ಷ ISN_COMPAREFLOAT:
+	ಪಕ್ಷ ISN_COMPAREFUNC:
+	ಪಕ್ಷ ISN_COMPARELIST:
+	ಪಕ್ಷ ISN_COMPARETUPLE:
+	ಪಕ್ಷ ISN_COMPARENR:
+	ಪಕ್ಷ ISN_COMPARENULL:
+	ಪಕ್ಷ ISN_COMPAREOBJECT:
+	ಪಕ್ಷ ISN_COMPARESPECIAL:
+	ಪಕ್ಷ ISN_COMPARESTRING:
+	ಪಕ್ಷ ISN_CONCAT:
+	ಪಕ್ಷ ISN_CONSTRUCT:
+	ಪಕ್ಷ ISN_COND2BOOL:
+	ಪಕ್ಷ ISN_DEBUG:
+	ಪಕ್ಷ ISN_DEFER:
+	ಪಕ್ಷ ISN_DROP:
+	ಪಕ್ಷ ISN_ECHO:
+	ಪಕ್ಷ ISN_ECHOCONSOLE:
+	ಪಕ್ಷ ISN_ECHOERR:
+	ಪಕ್ಷ ISN_ECHOMSG:
+	ಪಕ್ಷ ISN_ECHOWINDOW:
+	ಪಕ್ಷ ISN_ENDLOOP:
+	ಪಕ್ಷ ISN_ENDTRY:
+	ಪಕ್ಷ ISN_EXECCONCAT:
+	ಪಕ್ಷ ISN_EXECUTE:
+	ಪಕ್ಷ ISN_FINALLY:
+	ಪಕ್ಷ ISN_FINISH:
+	ಪಕ್ಷ ISN_FOR:
+	ಪಕ್ಷ ISN_GETITEM:
+	ಪಕ್ಷ ISN_GET_OBJ_MEMBER:
+	ಪಕ್ಷ ISN_JUMP:
+	ಪಕ್ಷ ISN_JUMP_IF_ARG_NOT_SET:
+	ಪಕ್ಷ ISN_JUMP_IF_ARG_SET:
+	ಪಕ್ಷ ISN_LISTAPPEND:
+	ಪಕ್ಷ ISN_LISTINDEX:
+	ಪಕ್ಷ ISN_LISTSLICE:
+	ಪಕ್ಷ ISN_TUPLEINDEX:
+	ಪಕ್ಷ ISN_TUPLESLICE:
+	ಪಕ್ಷ ISN_LOAD:
+	ಪಕ್ಷ ISN_LOADBDICT:
+	ಪಕ್ಷ ISN_LOADGDICT:
+	ಪಕ್ಷ ISN_LOADOUTER:
+	ಪಕ್ಷ ISN_LOADREG:
+	ಪಕ್ಷ ISN_LOADTDICT:
+	ಪಕ್ಷ ISN_LOADV:
+	ಪಕ್ಷ ISN_LOADWDICT:
+	ಪಕ್ಷ ISN_LOCKCONST:
+	ಪಕ್ಷ ISN_MEMBER:
+	ಪಕ್ಷ ISN_NEGATENR:
+	ಪಕ್ಷ ISN_NEWDICT:
+	ಪಕ್ಷ ISN_NEWLIST:
+	ಪಕ್ಷ ISN_NEWTUPLE:
+	ಪಕ್ಷ ISN_NEWPARTIAL:
+	ಪಕ್ಷ ISN_OPANY:
+	ಪಕ್ಷ ISN_OPFLOAT:
+	ಪಕ್ಷ ISN_OPNR:
+	ಪಕ್ಷ ISN_PCALL:
+	ಪಕ್ಷ ISN_PCALL_END:
+	ಪಕ್ಷ ISN_PROF_END:
+	ಪಕ್ಷ ISN_PROF_START:
+	ಪಕ್ಷ ISN_PUSHBOOL:
+	ಪಕ್ಷ ISN_PUSHCHANNEL:
+	ಪಕ್ಷ ISN_PUSHF:
+	ಪಕ್ಷ ISN_PUSHJOB:
+	ಪಕ್ಷ ISN_PUSHNR:
+	ಪಕ್ಷ ISN_PUSHOBJ:
+	ಪಕ್ಷ ISN_PUSHSPEC:
+	ಪಕ್ಷ ISN_PUT:
+	ಪಕ್ಷ ISN_IPUT:
+	ಪಕ್ಷ ISN_REDIREND:
+	ಪಕ್ಷ ISN_REDIRSTART:
+	ಪಕ್ಷ ISN_RETURN:
+	ಪಕ್ಷ ISN_RETURN_OBJECT:
+	ಪಕ್ಷ ISN_RETURN_VOID:
+	ಪಕ್ಷ ISN_SHUFFLE:
+	ಪಕ್ಷ ISN_SLICE:
+	ಪಕ್ಷ ISN_SOURCE:
+	ಪಕ್ಷ ISN_STORE:
+	ಪಕ್ಷ ISN_STORENR:
+	ಪಕ್ಷ ISN_STOREOUTER:
+	ಪಕ್ಷ ISN_STORE_THIS:
+	ಪಕ್ಷ ISN_STORERANGE:
+	ಪಕ್ಷ ISN_STOREREG:
+	ಪಕ್ಷ ISN_STOREV:
+	ಪಕ್ಷ ISN_STRINDEX:
+	ಪಕ್ಷ ISN_STRSLICE:
+	ಪಕ್ಷ ISN_THROW:
+	ಪಕ್ಷ ISN_TRYCONT:
+	ಪಕ್ಷ ISN_UNLETINDEX:
+	ಪಕ್ಷ ISN_UNLETRANGE:
+	ಪಕ್ಷ ISN_UNPACK:
+	ಪಕ್ಷ ISN_USEDICT:
+	ಪಕ್ಷ ISN_WHILE:
+	ಪಕ್ಷ ISN_SCRIPTCTX_SET:
 	// nothing allocated
-	break;
+	ಭಙ್ಗ;
     }
 }
 
-    void
+    ಶೂನ್ಯ
 clear_instr_ga(garray_T *gap)
 {
-    int idx;
+    ಪೂರ್ಣಾಙ್ಕ idx;
 
-    for (idx = 0; idx < gap->ga_len; ++idx)
+    ಪ್ರತಿ (idx = 0; idx < gap->ga_len; ++idx)
 	delete_instr(((isn_T *)gap->ga_data) + idx);
     ga_clear(gap);
 }

@@ -11,18 +11,18 @@
  * time.c: functions related to time and timers
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
 /*
  * Cache of the current timezone name as retrieved from TZ, or an empty string
  * where unset, up to 64 octets long including trailing null byte.
  */
-#if defined(HAVE_LOCALTIME_R) && defined(HAVE_TZSET)
-static char	tz_cache[64];
+#ಯದಿ defined(HAVE_LOCALTIME_R) && defined(HAVE_TZSET)
+ಸ್ಥಿರ ವರ್ಣ	tz_cache[64];
 #endif
 
 #define FOR_ALL_TIMERS(t) \
-    for ((t) = first_timer; (t) != NULL; (t) = (t)->tr_next)
+    ಪ್ರತಿ ((t) = first_timer; (t) != ರಿಕ್ತ; (t) = (t)->tr_next)
 
 /*
  * Call either localtime(3) or localtime_r(3) from POSIX libc time.h, with the
@@ -34,27 +34,27 @@ static char	tz_cache[64];
  * standard doesn't require localtime_r(3) implementations to do that as it
  * does with localtime(3), and we don't want to call tzset(3) every time.
  */
-    static struct tm *
+    ಸ್ಥಿರ ಸಂರಚನಾ tm *
 vim_localtime(
-    const time_t	*timep,		// timestamp for local representation
-    struct tm		*result UNUSED)	// pointer to caller return buffer
+    ಧ್ರುವ time_t	*timep,		// timestamp for local representation
+    ಸಂರಚನಾ tm		*result UNUSED)	// pointer to caller return buffer
 {
 #ifdef HAVE_LOCALTIME_R
 # ifdef HAVE_TZSET
-    char		*tz;		// pointer for TZ environment var
+    ವರ್ಣ		*tz;		// pointer for TZ environment var
 
-    tz = (char *)mch_getenv((char_u *)"TZ");
-    if (tz == NULL)
+    tz = (ವರ್ಣ *)mch_getenv((char_u *)"TZ");
+    ಯದಿ (tz == ರಿಕ್ತ)
 	tz = "";
-    if (STRNCMP(tz_cache, tz, sizeof(tz_cache) - 1) != 0)
+    ಯದಿ (STRNCMP(tz_cache, tz, ಪರಿಮಾಣ(tz_cache) - 1) != 0)
     {
 	tzset();
-	vim_strncpy((char_u *)tz_cache, (char_u *)tz, sizeof(tz_cache) - 1);
+	vim_strncpy((char_u *)tz_cache, (char_u *)tz, ಪರಿಮಾಣ(tz_cache) - 1);
     }
 # endif	// HAVE_TZSET
-    return localtime_r(timep, result);
-#else
-    return localtime(timep);
+    ಪ್ರತ್ಯಾಗಮ localtime_r(timep, result);
+#ಅನ್ಯಥಾ
+    ಪ್ರತ್ಯಾಗಮ localtime(timep);
 #endif	// HAVE_LOCALTIME_R
 }
 
@@ -63,12 +63,12 @@ vim_localtime(
  * was used.
  */
     time_T
-vim_time(void)
+vim_time(ಶೂನ್ಯ)
 {
 #ifdef FEAT_EVAL
-    return time_for_testing == 0 ? time(NULL) : time_for_testing;
-#else
-    return time(NULL);
+    ಪ್ರತ್ಯಾಗಮ time_for_testing == 0 ? time(ರಿಕ್ತ) : time_for_testing;
+#ಅನ್ಯಥಾ
+    ಪ್ರತ್ಯಾಗಮ time(ರಿಕ್ತ);
 #endif
 }
 
@@ -79,22 +79,22 @@ vim_time(void)
  * When "add_newline" is TRUE add a newline like ctime() does.
  * Uses a static buffer.
  */
-    char *
-get_ctime(time_t thetime, int add_newline)
+    ವರ್ಣ *
+get_ctime(time_t thetime, ಪೂರ್ಣಾಙ್ಕ add_newline)
 {
-    static char buf[100];  // hopefully enough for every language
+    ಸ್ಥಿರ ವರ್ಣ buf[100];  // hopefully enough for every language
 #ifdef HAVE_STRFTIME
-    struct tm	tmval;
-    struct tm	*curtime;
+    ಸಂರಚನಾ tm	tmval;
+    ಸಂರಚನಾ tm	*curtime;
 
     curtime = vim_localtime(&thetime, &tmval);
     // MSVC returns NULL for an invalid value of seconds.
-    if (curtime == NULL)
-	vim_strncpy((char_u *)buf, (char_u *)_("(Invalid)"), sizeof(buf) - 2);
-    else
+    ಯದಿ (curtime == ರಿಕ್ತ)
+	vim_strncpy((char_u *)buf, (char_u *)_("(Invalid)"), ಪರಿಮಾಣ(buf) - 2);
+    ಅನ್ಯಥಾ
     {
 	// xgettext:no-c-format
-	if (strftime(buf, sizeof(buf) - 2, _("%a %b %d %H:%M:%S %Y"), curtime)
+	ಯದಿ (strftime(buf, ಪರಿಮಾಣ(buf) - 2, _("%a %b %d %H:%M:%S %Y"), curtime)
 									  == 0)
 	{
 	    // Quoting "man strftime":
@@ -102,77 +102,77 @@ get_ctime(time_t thetime, int add_newline)
 	    // > null byte) would exceed max bytes, then strftime() returns 0,
 	    // > and the contents of the array are undefined.
 	    vim_strncpy((char_u *)buf, (char_u *)_("(Invalid)"),
-							      sizeof(buf) - 2);
+							      ಪರಿಮಾಣ(buf) - 2);
 	}
 # ifdef MSWIN
-	if (enc_codepage >= 0 && (int)GetACP() != enc_codepage)
+	ಯದಿ (enc_codepage >= 0 && (ಪೂರ್ಣಾಙ್ಕ)GetACP() != enc_codepage)
 	{
-	    char_u	*to_free = NULL;
-	    int		len;
+	    char_u	*to_free = ರಿಕ್ತ;
+	    ಪೂರ್ಣಾಙ್ಕ		len;
 
-	    acp_to_enc((char_u *)buf, (int)strlen(buf), &to_free, &len);
-	    if (to_free != NULL)
+	    acp_to_enc((char_u *)buf, (ಪೂರ್ಣಾಙ್ಕ)strlen(buf), &to_free, &len);
+	    ಯದಿ (to_free != ರಿಕ್ತ)
 	    {
-		STRNCPY(buf, to_free, sizeof(buf) - 2);
+		STRNCPY(buf, to_free, ಪರಿಮಾಣ(buf) - 2);
 		vim_free(to_free);
 	    }
 	}
 # endif
     }
-#else
+#ಅನ್ಯಥಾ
     STRCPY(buf, "(unknown)");
 #endif
-    if (add_newline)
+    ಯದಿ (add_newline)
 	STRCAT(buf, "\n");
-    return buf;
+    ಪ್ರತ್ಯಾಗಮ buf;
 }
 
-#if defined(FEAT_EVAL)
+#ಯದಿ defined(FEAT_EVAL)
 
-# if defined(MACOS_X)
+# ಯದಿ defined(MACOS_X)
 #  include <time.h>	// for time_t
 # endif
 
 /*
  * "localtime()" function
  */
-    void
+    ಶೂನ್ಯ
 f_localtime(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    rettv->vval.v_number = (varnumber_T)time(NULL);
+    rettv->vval.v_ಸಂಖ್ಯೆ = (varnumber_T)time(ರಿಕ್ತ);
 }
 
-# if defined(FEAT_RELTIME)
+# ಯದಿ defined(FEAT_RELTIME)
 /*
  * Convert a List to proftime_T.
  * Return FAIL when there is something wrong.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
 list2proftime(typval_T *arg, proftime_T *tm)
 {
     long	n1, n2;
-    int	error = FALSE;
+    ಪೂರ್ಣಾಙ್ಕ	error = FALSE;
 
-    if (arg->v_type != VAR_LIST || arg->vval.v_list == NULL
+    ಯದಿ (arg->v_type != VAR_LIST || arg->vval.v_list == ರಿಕ್ತ
 					     || arg->vval.v_list->lv_len != 2)
-	return FAIL;
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     n1 = list_find_nr(arg->vval.v_list, 0L, &error);
     n2 = list_find_nr(arg->vval.v_list, 1L, &error);
 #  ifdef MSWIN
-    tm->HighPart = n1;
-    tm->LowPart = n2;
-#  else
+    tm->ಮೇಲಿನ_Part = n1;
+    tm->ಕೆಳಗಿನ_Part = n2;
+#  ಅನ್ಯಥಾ
     tm->tv_sec = n1;
     tm->tv_fsec = n2;
 #  endif
-    return error ? FAIL : OK;
+    ಪ್ರತ್ಯಾಗಮ error ? FAIL : OK;
 }
 # endif // FEAT_RELTIME
 
 /*
  * "reltime()" function
  */
-    void
+    ಶೂನ್ಯ
 f_reltime(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
 # ifdef FEAT_RELTIME
@@ -180,59 +180,59 @@ f_reltime(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
     proftime_T	start;
     long	n1, n2;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ಯದಿ (rettv_list_alloc(rettv) == FAIL)
+	ಪ್ರತ್ಯಾಗಮ;
 
-    if (in_vim9script()
+    ಯದಿ (in_vim9script()
 	    && (check_for_opt_list_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type != VAR_UNKNOWN
 		    && check_for_opt_list_arg(argvars, 1) == FAIL)))
-	return;
+	ಪ್ರತ್ಯಾಗಮ;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    ಯದಿ (argvars[0].v_type == VAR_UNKNOWN)
     {
 	// No arguments: get current time.
 	profile_start(&res);
     }
-    else if (argvars[1].v_type == VAR_UNKNOWN)
+    ಅನ್ಯಥಾ ಯದಿ (argvars[1].v_type == VAR_UNKNOWN)
     {
-	if (list2proftime(&argvars[0], &res) == FAIL)
+	ಯದಿ (list2proftime(&argvars[0], &res) == FAIL)
 	{
-	    if (in_vim9script())
+	    ಯದಿ (in_vim9script())
 		emsg(_(e_invalid_argument));
-	    return;
+	    ಪ್ರತ್ಯಾಗಮ;
 	}
 	profile_end(&res);
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	// Two arguments: compute the difference.
-	if (list2proftime(&argvars[0], &start) == FAIL
+	ಯದಿ (list2proftime(&argvars[0], &start) == FAIL
 		|| list2proftime(&argvars[1], &res) == FAIL)
 	{
-	    if (in_vim9script())
+	    ಯದಿ (in_vim9script())
 		emsg(_(e_invalid_argument));
-	    return;
+	    ಪ್ರತ್ಯಾಗಮ;
 	}
 	profile_sub(&res, &start);
     }
 
 #  ifdef MSWIN
-    n1 = res.HighPart;
-    n2 = res.LowPart;
-#  else
+    n1 = res.ಮೇಲಿನ_Part;
+    n2 = res.ಕೆಳಗಿನ_Part;
+#  ಅನ್ಯಥಾ
     n1 = res.tv_sec;
     n2 = res.tv_fsec;
 #  endif
-    list_append_number(rettv->vval.v_list, (varnumber_T)n1);
-    list_append_number(rettv->vval.v_list, (varnumber_T)n2);
+    list_append_ಸಂಖ್ಯೆ(rettv->vval.v_list, (varnumber_T)n1);
+    list_append_ಸಂಖ್ಯೆ(rettv->vval.v_list, (varnumber_T)n2);
 # endif
 }
 
 /*
  * "reltimefloat()" function
  */
-    void
+    ಶೂನ್ಯ
 f_reltimefloat(typval_T *argvars UNUSED, typval_T *rettv)
 {
 # ifdef FEAT_RELTIME
@@ -242,12 +242,12 @@ f_reltimefloat(typval_T *argvars UNUSED, typval_T *rettv)
     rettv->v_type = VAR_FLOAT;
     rettv->vval.v_float = 0;
 # ifdef FEAT_RELTIME
-    if (in_vim9script() && check_for_list_arg(argvars, 0) == FAIL)
-	return;
+    ಯದಿ (in_vim9script() && check_for_list_arg(argvars, 0) == FAIL)
+	ಪ್ರತ್ಯಾಗಮ;
 
-    if (list2proftime(&argvars[0], &tm) == OK)
+    ಯದಿ (list2proftime(&argvars[0], &tm) == OK)
 	rettv->vval.v_float = profile_float(&tm);
-    else if (in_vim9script())
+    ಅನ್ಯಥಾ ಯದಿ (in_vim9script())
 	emsg(_(e_invalid_argument));
 # endif
 }
@@ -255,76 +255,76 @@ f_reltimefloat(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "reltimestr()" function
  */
-    void
+    ಶೂನ್ಯ
 f_reltimestr(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ರಿಕ್ತ;
 # ifdef FEAT_RELTIME
-    if (in_vim9script() && check_for_list_arg(argvars, 0) == FAIL)
-	return;
+    ಯದಿ (in_vim9script() && check_for_list_arg(argvars, 0) == FAIL)
+	ಪ್ರತ್ಯಾಗಮ;
 
     proftime_T	tm;
-    if (list2proftime(&argvars[0], &tm) == OK)
+    ಯದಿ (list2proftime(&argvars[0], &tm) == OK)
     {
 #  ifdef MSWIN
-	rettv->vval.v_string = vim_strsave((char_u *)profile_msg(&tm));
-#  else
-	static char buf[50];
+	rettv->vval.v_string = vim_strsave((char_u *)profile_ಸಂದೇಶ(&tm));
+#  ಅನ್ಯಥಾ
+	ಸ್ಥಿರ ವರ್ಣ buf[50];
 	long usec = tm.tv_fsec / (TV_FSEC_SEC / 1000000);
-	vim_snprintf(buf, sizeof(buf), "%3ld.%06ld", (long)tm.tv_sec, usec);
+	vim_snprintf(buf, ಪರಿಮಾಣ(buf), "%3ld.%06ld", (long)tm.tv_sec, usec);
 	rettv->vval.v_string = vim_strsave((char_u *)buf);
 #  endif
     }
-    else if (in_vim9script())
+    ಅನ್ಯಥಾ ಯದಿ (in_vim9script())
 	emsg(_(e_invalid_argument));
 # endif
 }
 
-# if defined(HAVE_STRFTIME)
+# ಯದಿ defined(HAVE_STRFTIME)
 /*
  * "strftime({format}[, {time}])" function
  */
-    void
+    ಶೂನ್ಯ
 f_strftime(typval_T *argvars, typval_T *rettv)
 {
-    struct tm	tmval;
-    struct tm	*curtime;
+    ಸಂರಚನಾ tm	tmval;
+    ಸಂರಚನಾ tm	*curtime;
     time_t	seconds;
     char_u	*p;
 
-    if (in_vim9script()
+    ಯದಿ (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_ಸಂಖ್ಯೆ_arg(argvars, 1) == FAIL))
+	ಪ್ರತ್ಯಾಗಮ;
 
     rettv->v_type = VAR_STRING;
 
     p = tv_get_string(&argvars[0]);
-    if (argvars[1].v_type == VAR_UNKNOWN)
-	seconds = time(NULL);
-    else
-	seconds = (time_t)tv_get_number(&argvars[1]);
+    ಯದಿ (argvars[1].v_type == VAR_UNKNOWN)
+	seconds = time(ರಿಕ್ತ);
+    ಅನ್ಯಥಾ
+	seconds = (time_t)tv_get_ಸಂಖ್ಯೆ(&argvars[1]);
     curtime = vim_localtime(&seconds, &tmval);
     // MSVC returns NULL for an invalid value of seconds.
-    if (curtime == NULL)
+    ಯದಿ (curtime == ರಿಕ್ತ)
     {
 	rettv->vval.v_string = vim_strsave((char_u *)_("(Invalid)"));
-	return;
+	ಪ್ರತ್ಯಾಗಮ;
     }
 
 #  ifdef MSWIN
     WCHAR	    result_buf[256];
     WCHAR	    *wp;
 
-    wp = enc_to_utf16(p, NULL);
-    if (wp != NULL)
-	(void)wcsftime(result_buf, ARRAY_LENGTH(result_buf), wp, curtime);
-    else
+    wp = enc_to_utf16(p, ರಿಕ್ತ);
+    ಯದಿ (wp != ರಿಕ್ತ)
+	(ಶೂನ್ಯ)wcsftime(result_buf, ARRAY_LENGTH(result_buf), wp, curtime);
+    ಅನ್ಯಥಾ
 	result_buf[0] = NUL;
-    rettv->vval.v_string = utf16_to_enc(result_buf, NULL);
+    rettv->vval.v_string = utf16_to_enc(result_buf, ರಿಕ್ತ);
     vim_free(wp);
-#  else
+#  ಅನ್ಯಥಾ
     char_u	    result_buf[256];
     vimconv_T   conv;
     char_u	    *enc;
@@ -332,44 +332,44 @@ f_strftime(typval_T *argvars, typval_T *rettv)
     conv.vc_type = CONV_NONE;
     enc = enc_locale();
     convert_setup(&conv, p_enc, enc);
-    if (conv.vc_type != CONV_NONE)
-	p = string_convert(&conv, p, NULL);
-    if (p == NULL || strftime((char *)result_buf, sizeof(result_buf),
-		(char *)p, curtime) == 0)
+    ಯದಿ (conv.vc_type != CONV_NONE)
+	p = string_convert(&conv, p, ರಿಕ್ತ);
+    ಯದಿ (p == ರಿಕ್ತ || strftime((ವರ್ಣ *)result_buf, ಪರಿಮಾಣ(result_buf),
+		(ವರ್ಣ *)p, curtime) == 0)
 	result_buf[0] = NUL;
 
-    if (conv.vc_type != CONV_NONE)
+    ಯದಿ (conv.vc_type != CONV_NONE)
 	vim_free(p);
     convert_setup(&conv, enc, p_enc);
-    if (conv.vc_type != CONV_NONE)
-	rettv->vval.v_string = string_convert(&conv, result_buf, NULL);
-    else
+    ಯದಿ (conv.vc_type != CONV_NONE)
+	rettv->vval.v_string = string_convert(&conv, result_buf, ರಿಕ್ತ);
+    ಅನ್ಯಥಾ
 	rettv->vval.v_string = vim_strsave(result_buf);
 
     // Release conversion descriptors
-    convert_setup(&conv, NULL, NULL);
+    convert_setup(&conv, ರಿಕ್ತ, ರಿಕ್ತ);
     vim_free(enc);
 #  endif
 }
 # endif
 
-# if defined(HAVE_STRPTIME)
+# ಯದಿ defined(HAVE_STRPTIME)
 /*
  * "strptime({format}, {timestring})" function
  */
-    void
+    ಶೂನ್ಯ
 f_strptime(typval_T *argvars, typval_T *rettv)
 {
-    struct tm	tmval;
+    ಸಂರಚನಾ tm	tmval;
     char_u	*fmt;
     char_u	*str;
     vimconv_T   conv;
     char_u	*enc;
 
-    if (in_vim9script()
+    ಯದಿ (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	ಪ್ರತ್ಯಾಗಮ;
 
     CLEAR_FIELD(tmval);
     tmval.tm_isdst = -1;
@@ -379,46 +379,46 @@ f_strptime(typval_T *argvars, typval_T *rettv)
     conv.vc_type = CONV_NONE;
     enc = enc_locale();
     convert_setup(&conv, p_enc, enc);
-    if (conv.vc_type != CONV_NONE)
-	fmt = string_convert(&conv, fmt, NULL);
+    ಯದಿ (conv.vc_type != CONV_NONE)
+	fmt = string_convert(&conv, fmt, ರಿಕ್ತ);
 #  ifdef HAVE_TZSET
     // Pick up any change to $TZ so mktime() uses the requested timezone.
     tzset();
 #  endif
-    if (fmt == NULL
-	    || strptime((char *)str, (char *)fmt, &tmval) == NULL
-	    || (rettv->vval.v_number = mktime(&tmval)) == -1)
-	rettv->vval.v_number = 0;
+    ಯದಿ (fmt == ರಿಕ್ತ
+	    || strptime((ವರ್ಣ *)str, (ವರ್ಣ *)fmt, &tmval) == ರಿಕ್ತ
+	    || (rettv->vval.v_ಸಂಖ್ಯೆ = mktime(&tmval)) == -1)
+	rettv->vval.v_ಸಂಖ್ಯೆ = 0;
 
-    if (conv.vc_type != CONV_NONE)
+    ಯದಿ (conv.vc_type != CONV_NONE)
 	vim_free(fmt);
-    convert_setup(&conv, NULL, NULL);
+    convert_setup(&conv, ರಿಕ್ತ, ರಿಕ್ತ);
     vim_free(enc);
 }
 # endif
 
-# if defined(FEAT_TIMERS)
-static timer_T	*first_timer = NULL;
-static long	last_timer_id = 0;
+# ಯದಿ defined(FEAT_TIMERS)
+ಸ್ಥಿರ timer_T	*first_timer = ರಿಕ್ತ;
+ಸ್ಥಿರ long	last_timer_id = 0;
 
 /*
  * Return time left, in "msec", until "due".  Negative if past "due".
  */
     long
-proftime_time_left(proftime_T *due, proftime_T *now)
+proftime_time_ಎಡ(proftime_T *due, proftime_T *now)
 {
 #  ifdef MSWIN
     LARGE_INTEGER fr;
 
-    if (now->QuadPart > due->QuadPart)
-	return 0;
+    ಯದಿ (now->QuadPart > due->QuadPart)
+	ಪ್ರತ್ಯಾಗಮ 0;
     QueryPerformanceFrequency(&fr);
-    return (long)(((double)(due->QuadPart - now->QuadPart)
-		   / (double)fr.QuadPart) * 1000);
-#  else
-    if (now->tv_sec > due->tv_sec)
-	return 0;
-    return (due->tv_sec - now->tv_sec) * 1000
+    ಪ್ರತ್ಯಾಗಮ (long)(((ದ್ವಿಗುಣ)(due->QuadPart - now->QuadPart)
+		   / (ದ್ವಿಗುಣ)fr.QuadPart) * 1000);
+#  ಅನ್ಯಥಾ
+    ಯದಿ (now->tv_sec > due->tv_sec)
+	ಪ್ರತ್ಯಾಗಮ 0;
+    ಪ್ರತ್ಯಾಗಮ (due->tv_sec - now->tv_sec) * 1000
 	+ (due->tv_fsec - now->tv_fsec) / (TV_FSEC_SEC / 1000);
 #  endif
 }
@@ -426,12 +426,12 @@ proftime_time_left(proftime_T *due, proftime_T *now)
 /*
  * Insert a timer in the list of timers.
  */
-    static void
-insert_timer(timer_T *timer)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ಸೇರಿಸು_timer(timer_T *timer)
 {
     timer->tr_next = first_timer;
-    timer->tr_prev = NULL;
-    if (first_timer != NULL)
+    timer->tr_prev = ರಿಕ್ತ;
+    ಯದಿ (first_timer != ರಿಕ್ತ)
 	first_timer->tr_prev = timer;
     first_timer = timer;
     did_add_timer = TRUE;
@@ -440,18 +440,18 @@ insert_timer(timer_T *timer)
 /*
  * Take a timer out of the list of timers.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 remove_timer(timer_T *timer)
 {
-    if (timer->tr_prev == NULL)
+    ಯದಿ (timer->tr_prev == ರಿಕ್ತ)
 	first_timer = timer->tr_next;
-    else
+    ಅನ್ಯಥಾ
 	timer->tr_prev->tr_next = timer->tr_next;
-    if (timer->tr_next != NULL)
+    ಯದಿ (timer->tr_next != ರಿಕ್ತ)
 	timer->tr_next->tr_prev = timer->tr_prev;
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 free_timer(timer_T *timer)
 {
     free_callback(&timer->tr_callback);
@@ -463,30 +463,30 @@ free_timer(timer_T *timer)
  * Caller should set the callback.
  */
     timer_T *
-create_timer(long msec, int repeat)
+create_timer(long msec, ಪೂರ್ಣಾಙ್ಕ repeat)
 {
     timer_T	*timer = ALLOC_CLEAR_ONE(timer_T);
     long	prev_id = last_timer_id;
 
-    if (timer == NULL)
-	return NULL;
-    if (++last_timer_id <= prev_id)
+    ಯದಿ (timer == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
+    ಯದಿ (++last_timer_id <= prev_id)
 	// Overflow!  Might cause duplicates...
 	last_timer_id = 0;
     timer->tr_id = last_timer_id;
-    insert_timer(timer);
-    if (repeat != 0)
+    ಸೇರಿಸು_timer(timer);
+    ಯದಿ (repeat != 0)
 	timer->tr_repeat = repeat - 1;
     timer->tr_interval = msec;
 
     timer_start(timer);
-    return timer;
+    ಪ್ರತ್ಯಾಗಮ timer;
 }
 
 /*
  * (Re)start a timer.
  */
-    void
+    ಶೂನ್ಯ
 timer_start(timer_T *timer)
 {
     profile_setlimit(timer->tr_interval, &timer->tr_due);
@@ -496,24 +496,24 @@ timer_start(timer_T *timer)
 /*
  * Invoke the callback of "timer".
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 timer_callback(timer_T *timer)
 {
     typval_T	rettv;
     typval_T	argv[2];
 
 #  ifdef FEAT_EVAL
-    if (ch_log_active())
+    ಯದಿ (ch_log_active())
     {
 	callback_T *cb = &timer->tr_callback;
 
-	ch_log(NULL, "invoking timer callback %s",
-	       cb->cb_partial != NULL ? cb->cb_partial->pt_name : cb->cb_name);
+	ch_log(ರಿಕ್ತ, "invoking timer callback %s",
+	       cb->cb_partial != ರಿಕ್ತ ? cb->cb_partial->pt_name : cb->cb_name);
     }
 #  endif
 
-    argv[0].v_type = VAR_NUMBER;
-    argv[0].vval.v_number = (varnumber_T)timer->tr_id;
+    argv[0].v_type = VAR_ಸಂಖ್ಯೆ;
+    argv[0].vval.v_ಸಂಖ್ಯೆ = (varnumber_T)timer->tr_id;
     argv[1].v_type = VAR_UNKNOWN;
 
     rettv.v_type = VAR_UNKNOWN;
@@ -521,7 +521,7 @@ timer_callback(timer_T *timer)
     clear_tv(&rettv);
 
 #  ifdef FEAT_EVAL
-    ch_log(NULL, "timer callback finished");
+    ch_log(ರಿಕ್ತ, "timer callback finished");
 #  endif
 }
 
@@ -531,42 +531,42 @@ timer_callback(timer_T *timer)
  * Returns -1 if there are no pending timers.
  */
     long
-check_due_timer(void)
+check_due_timer(ಶೂನ್ಯ)
 {
     timer_T	*timer;
     timer_T	*timer_next;
     long	this_due;
     long	next_due = -1;
     proftime_T	now;
-    int		did_one = FALSE;
-    int		need_update_screen = FALSE;
+    ಪೂರ್ಣಾಙ್ಕ		did_one = FALSE;
+    ಪೂರ್ಣಾಙ್ಕ		need_update_screen = FALSE;
     long	current_id = last_timer_id;
 
     // Don't run any timers while exiting, dealing with an error or at the
     // debug prompt.
-    if (exiting || aborting() || debug_mode)
-	return next_due;
+    ಯದಿ (exiting || aborting() || debug_mode)
+	ಪ್ರತ್ಯಾಗಮ next_due;
 
     profile_start(&now);
-    for (timer = first_timer; timer != NULL && !got_int; timer = timer_next)
+    ಪ್ರತಿ (timer = first_timer; timer != ರಿಕ್ತ && !got_int; timer = timer_next)
     {
 	timer_next = timer->tr_next;
 
-	if (timer->tr_id == -1 || timer->tr_firing || timer->tr_paused)
-	    continue;
-	this_due = proftime_time_left(&timer->tr_due, &now);
-	if (this_due <= 1)
+	ಯದಿ (timer->tr_id == -1 || timer->tr_firing || timer->tr_paused)
+	    ಅನುವರ್ತ;
+	this_due = proftime_time_ಎಡ(&timer->tr_due, &now);
+	ಯದಿ (this_due <= 1)
 	{
 	    // Save and restore a lot of flags, because the timer fires while
 	    // waiting for a character, which might be halfway a command.
-	    int save_timer_busy = timer_busy;
-	    int save_vgetc_busy = vgetc_busy;
-	    int save_did_emsg = did_emsg;
-	    int prev_uncaught_emsg = uncaught_emsg;
-	    int save_called_emsg = called_emsg;
-	    int save_must_redraw = must_redraw;
-	    int save_ex_pressedreturn = get_pressedreturn();
-	    int save_may_garbage_collect = may_garbage_collect;
+	    ಪೂರ್ಣಾಙ್ಕ save_timer_busy = timer_busy;
+	    ಪೂರ್ಣಾಙ್ಕ save_vgetc_busy = vgetc_busy;
+	    ಪೂರ್ಣಾಙ್ಕ save_did_emsg = did_emsg;
+	    ಪೂರ್ಣಾಙ್ಕ prev_uncaught_emsg = uncaught_emsg;
+	    ಪೂರ್ಣಾಙ್ಕ save_called_emsg = called_emsg;
+	    ಪೂರ್ಣಾಙ್ಕ save_must_redraw = must_redraw;
+	    ಪೂರ್ಣಾಙ್ಕ save_ex_pressedreturn = get_pressedreturn();
+	    ಪೂರ್ಣಾಙ್ಕ save_may_garbage_collect = may_garbage_collect;
 	    vimvars_save_T	vvsave;
 	    exception_state_T	estate;
 
@@ -593,15 +593,15 @@ check_due_timer(void)
 	    did_one = TRUE;
 	    timer_busy = save_timer_busy;
 	    vgetc_busy = save_vgetc_busy;
-	    if (uncaught_emsg > prev_uncaught_emsg)
-		++timer->tr_emsg_count;
-	    else
-		timer->tr_emsg_count = 0;
+	    ಯದಿ (uncaught_emsg > prev_uncaught_emsg)
+		++timer->tr_emsg_ಎಣಿಕೆ;
+	    ಅನ್ಯಥಾ
+		timer->tr_emsg_ಎಣಿಕೆ = 0;
 	    did_emsg = save_did_emsg;
 	    called_emsg = save_called_emsg;
 	    exception_state_restore(&estate);
 	    restore_vimvars(&vvsave);
-	    if (must_redraw != 0)
+	    ಯದಿ (must_redraw != 0)
 		need_update_screen = TRUE;
 	    must_redraw = must_redraw > save_must_redraw
 					      ? must_redraw : save_must_redraw;
@@ -610,22 +610,22 @@ check_due_timer(void)
 
 	    // Only fire the timer again if it repeats and stop_timer() wasn't
 	    // called while inside the callback (tr_id == -1).
-	    if (timer->tr_repeat != 0 && timer->tr_id != -1
-		    && timer->tr_emsg_count < 3)
+	    ಯದಿ (timer->tr_repeat != 0 && timer->tr_id != -1
+		    && timer->tr_emsg_ಎಣಿಕೆ < 3)
 	    {
 		profile_setlimit(timer->tr_interval, &timer->tr_due);
-		this_due = proftime_time_left(&timer->tr_due, &now);
-		if (this_due < 1)
+		this_due = proftime_time_ಎಡ(&timer->tr_due, &now);
+		ಯದಿ (this_due < 1)
 		    this_due = 1;
-		if (timer->tr_repeat > 0)
+		ಯದಿ (timer->tr_repeat > 0)
 		    --timer->tr_repeat;
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 	    {
 		this_due = -1;
-		if (timer->tr_keep)
+		ಯದಿ (timer->tr_keep)
 		    timer->tr_paused = TRUE;
-		else
+		ಅನ್ಯಥಾ
 		{
 		    remove_timer(timer);
 		    free_timer(timer);
@@ -639,33 +639,33 @@ check_due_timer(void)
 	    draw_image_placements();
 #  endif
 	}
-	if (this_due > 0 && (next_due == -1 || next_due > this_due))
+	ಯದಿ (this_due > 0 && (next_due == -1 || next_due > this_due))
 	    next_due = this_due;
     }
 
-    if (did_one)
+    ಯದಿ (did_one)
 	redraw_after_callback(need_update_screen, FALSE);
 
 #  ifdef FEAT_BEVAL_TERM
-    if (bevalexpr_due_set)
+    ಯದಿ (bevalexpr_due_set)
     {
-	this_due = proftime_time_left(&bevalexpr_due, &now);
-	if (this_due <= 1)
+	this_due = proftime_time_ಎಡ(&bevalexpr_due, &now);
+	ಯದಿ (this_due <= 1)
 	{
 	    bevalexpr_due_set = FALSE;
-	    if (balloonEval == NULL)
+	    ಯದಿ (balloonEval == ರಿಕ್ತ)
 	    {
 		balloonEval = ALLOC_CLEAR_ONE(BalloonEval);
 		balloonEvalForTerm = TRUE;
 	    }
-	    if (balloonEval != NULL)
+	    ಯದಿ (balloonEval != ರಿಕ್ತ)
 	    {
 		general_beval_cb(balloonEval, 0);
 		setcursor();
 		out_flush();
 	    }
 	}
-	else if (next_due == -1 || next_due > this_due)
+	ಅನ್ಯಥಾ ಯದಿ (next_due == -1 || next_due > this_due)
 	    next_due = this_due;
     }
 #  endif
@@ -674,57 +674,57 @@ check_due_timer(void)
     next_due = term_check_timers(next_due, &now);
 #  endif
 
-    return current_id != last_timer_id ? 1 : next_due;
+    ಪ್ರತ್ಯಾಗಮ current_id != last_timer_id ? 1 : next_due;
 }
 
 /*
  * Find a timer by ID.  Returns NULL if not found;
  */
-    static timer_T *
+    ಸ್ಥಿರ timer_T *
 find_timer(long id)
 {
     timer_T *timer;
 
-    if (id < 0)
-	return NULL;
+    ಯದಿ (id < 0)
+	ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
 
     FOR_ALL_TIMERS(timer)
-	if (timer->tr_id == id)
-	    return timer;
-    return NULL;
+	ಯದಿ (timer->tr_id == id)
+	    ಪ್ರತ್ಯಾಗಮ timer;
+    ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
 }
 
 
 /*
  * Stop a timer and delete it.
  */
-    void
+    ಶೂನ್ಯ
 stop_timer(timer_T *timer)
 {
-    if (timer->tr_firing)
+    ಯದಿ (timer->tr_firing)
 	// Free the timer after the callback returns.
 	timer->tr_id = -1;
-    else
+    ಅನ್ಯಥಾ
     {
 	remove_timer(timer);
 	free_timer(timer);
     }
 }
 
-    static void
-stop_all_timers(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+stop_all_timers(ಶೂನ್ಯ)
 {
     timer_T *timer;
     timer_T *timer_next;
 
-    for (timer = first_timer; timer != NULL; timer = timer_next)
+    ಪ್ರತಿ (timer = first_timer; timer != ರಿಕ್ತ; timer = timer_next)
     {
 	timer_next = timer->tr_next;
 	stop_timer(timer);
     }
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 add_timer_info(typval_T *rettv, timer_T *timer)
 {
     list_T	*list = rettv->vval.v_list;
@@ -733,90 +733,90 @@ add_timer_info(typval_T *rettv, timer_T *timer)
     long	remaining;
     proftime_T	now;
 
-    if (dict == NULL)
-	return;
+    ಯದಿ (dict == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ;
     list_append_dict(list, dict);
 
-    dict_add_number(dict, "id", timer->tr_id);
-    dict_add_number(dict, "time", (long)timer->tr_interval);
+    dict_add_ಸಂಖ್ಯೆ(dict, "id", timer->tr_id);
+    dict_add_ಸಂಖ್ಯೆ(dict, "time", (long)timer->tr_interval);
 
     profile_start(&now);
-    remaining = proftime_time_left(&timer->tr_due, &now);
-    dict_add_number(dict, "remaining", (long)remaining);
+    remaining = proftime_time_ಎಡ(&timer->tr_due, &now);
+    dict_add_ಸಂಖ್ಯೆ(dict, "remaining", (long)remaining);
 
-    dict_add_number(dict, "repeat",
+    dict_add_ಸಂಖ್ಯೆ(dict, "repeat",
 	    (long)(timer->tr_repeat < 0 ? -1
 			     : timer->tr_repeat + (timer->tr_firing ? 0 : 1)));
-    dict_add_number(dict, "paused", (long)(timer->tr_paused));
+    dict_add_ಸಂಖ್ಯೆ(dict, "paused", (long)(timer->tr_paused));
 
     di = dictitem_alloc((char_u *)"callback");
-    if (di != NULL)
+    ಯದಿ (di != ರಿಕ್ತ)
     {
-	if (dict_add(dict, di) == FAIL)
+	ಯದಿ (dict_add(dict, di) == FAIL)
 	    vim_free(di);
-	else
+	ಅನ್ಯಥಾ
 	    put_callback(&timer->tr_callback, &di->di_tv);
     }
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 add_timer_info_all(typval_T *rettv)
 {
     timer_T *timer;
 
     FOR_ALL_TIMERS(timer)
-	if (timer->tr_id != -1)
+	ಯದಿ (timer->tr_id != -1)
 	    add_timer_info(rettv, timer);
 }
 
 /*
  * Mark references in partials of timers.
  */
-    int
-set_ref_in_timer(int copyID)
+    ಪೂರ್ಣಾಙ್ಕ
+set_ref_in_timer(ಪೂರ್ಣಾಙ್ಕ copyID)
 {
-    int		abort = FALSE;
+    ಪೂರ್ಣಾಙ್ಕ		abort = FALSE;
     timer_T	*timer;
     typval_T	tv;
 
-    for (timer = first_timer; !abort && timer != NULL; timer = timer->tr_next)
+    ಪ್ರತಿ (timer = first_timer; !abort && timer != ರಿಕ್ತ; timer = timer->tr_next)
     {
-	if (timer->tr_callback.cb_partial != NULL)
+	ಯದಿ (timer->tr_callback.cb_partial != ರಿಕ್ತ)
 	{
 	    tv.v_type = VAR_PARTIAL;
 	    tv.vval.v_partial = timer->tr_callback.cb_partial;
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
 	    tv.v_type = VAR_FUNC;
 	    tv.vval.v_string = timer->tr_callback.cb_name;
 	}
-	abort = abort || set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
+	abort = abort || set_ref_in_item(&tv, copyID, ರಿಕ್ತ, ರಿಕ್ತ, ರಿಕ್ತ);
     }
-    return abort;
+    ಪ್ರತ್ಯಾಗಮ abort;
 }
 
 /*
  * Return TRUE if "timer" exists in the list of timers.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 timer_valid(timer_T *timer)
 {
-    if (timer == NULL)
-	return FALSE;
+    ಯದಿ (timer == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FALSE;
 
     timer_T *t;
     FOR_ALL_TIMERS(t)
-	if (t == timer)
-	    return TRUE;
-    return FALSE;
+	ಯದಿ (t == timer)
+	    ಪ್ರತ್ಯಾಗಮ TRUE;
+    ಪ್ರತ್ಯಾಗಮ FALSE;
 }
 
-#  if defined(EXITFREE)
-    void
-timer_free_all(void)
+#  ಯದಿ defined(EXITFREE)
+    ಶೂನ್ಯ
+timer_free_all(ಶೂನ್ಯ)
 {
-    while (first_timer != NULL)
+    ಯಾವತ್ (first_timer != ರಿಕ್ತ)
     {
 	timer_T *timer = first_timer;
 	remove_timer(timer);
@@ -828,126 +828,126 @@ timer_free_all(void)
 /*
  * "timer_info([timer])" function
  */
-    void
+    ಶೂನ್ಯ
 f_timer_info(typval_T *argvars, typval_T *rettv)
 {
-    timer_T *timer = NULL;
+    timer_T *timer = ರಿಕ್ತ;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ಯದಿ (rettv_list_alloc(rettv) == FAIL)
+	ಪ್ರತ್ಯಾಗಮ;
 
-    if (check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    ಯದಿ (check_for_opt_ಸಂಖ್ಯೆ_arg(argvars, 0) == FAIL)
+	ಪ್ರತ್ಯಾಗಮ;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    ಯದಿ (argvars[0].v_type != VAR_UNKNOWN)
     {
-	timer = find_timer((int)tv_get_number(&argvars[0]));
-	if (timer != NULL)
+	timer = find_timer((ಪೂರ್ಣಾಙ್ಕ)tv_get_ಸಂಖ್ಯೆ(&argvars[0]));
+	ಯದಿ (timer != ರಿಕ್ತ)
 	    add_timer_info(rettv, timer);
     }
-    else
+    ಅನ್ಯಥಾ
 	add_timer_info_all(rettv);
 }
 
 /*
  * "timer_pause(timer, paused)" function
  */
-    void
+    ಶೂನ್ಯ
 f_timer_pause(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    timer_T	*timer = NULL;
+    timer_T	*timer = ರಿಕ್ತ;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    ಯದಿ (in_vim9script()
+	    && (check_for_ಸಂಖ್ಯೆ_arg(argvars, 0) == FAIL
 		|| check_for_bool_arg(argvars, 1) == FAIL))
-	return;
+	ಪ್ರತ್ಯಾಗಮ;
 
-    if (argvars[0].v_type != VAR_NUMBER)
+    ಯದಿ (argvars[0].v_type != VAR_ಸಂಖ್ಯೆ)
     {
-	emsg(_(e_number_expected));
-	return;
+	emsg(_(e_ಸಂಖ್ಯೆ_expected));
+	ಪ್ರತ್ಯಾಗಮ;
     }
 
-    int	paused = (int)tv_get_bool(&argvars[1]);
+    ಪೂರ್ಣಾಙ್ಕ	paused = (ಪೂರ್ಣಾಙ್ಕ)tv_get_bool(&argvars[1]);
 
-    timer = find_timer((int)tv_get_number(&argvars[0]));
-    if (timer != NULL)
+    timer = find_timer((ಪೂರ್ಣಾಙ್ಕ)tv_get_ಸಂಖ್ಯೆ(&argvars[0]));
+    ಯದಿ (timer != ರಿಕ್ತ)
 	timer->tr_paused = paused;
 }
 
 /*
  * "timer_start(time, callback [, options])" function
  */
-    void
+    ಶೂನ್ಯ
 f_timer_start(typval_T *argvars, typval_T *rettv)
 {
     long	msec;
     timer_T	*timer;
-    int		repeat = 0;
+    ಪೂರ್ಣಾಙ್ಕ		repeat = 0;
     callback_T	callback;
     dict_T	*dict;
 
-    rettv->vval.v_number = -1;
-    if (check_secure())
-	return;
+    rettv->vval.v_ಸಂಖ್ಯೆ = -1;
+    ಯದಿ (check_secure())
+	ಪ್ರತ್ಯಾಗಮ;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    ಯದಿ (in_vim9script()
+	    && (check_for_ಸಂಖ್ಯೆ_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 2) == FAIL))
-	return;
+	ಪ್ರತ್ಯಾಗಮ;
 
-    msec = (long)tv_get_number(&argvars[0]);
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    msec = (long)tv_get_ಸಂಖ್ಯೆ(&argvars[0]);
+    ಯದಿ (argvars[2].v_type != VAR_UNKNOWN)
     {
-	if (check_for_nonnull_dict_arg(argvars, 2) == FAIL)
-	    return;
+	ಯದಿ (check_for_nonnull_dict_arg(argvars, 2) == FAIL)
+	    ಪ್ರತ್ಯಾಗಮ;
 
 	dict = argvars[2].vval.v_dict;
-	if (dict_has_key(dict, "repeat"))
-	    repeat = dict_get_number(dict, "repeat");
+	ಯದಿ (dict_has_ಕೀಲಿ(dict, "repeat"))
+	    repeat = dict_get_ಸಂಖ್ಯೆ(dict, "repeat");
     }
 
     callback = get_callback(&argvars[1]);
-    if (callback.cb_name == NULL)
-	return;
-    if (in_vim9script() && *callback.cb_name == NUL)
+    ಯದಿ (callback.cb_name == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ;
+    ಯದಿ (in_vim9script() && *callback.cb_name == NUL)
     {
 	// empty callback is not useful for a timer
 	emsg(_(e_invalid_callback_argument));
 	free_callback(&callback);
-	return;
+	ಪ್ರತ್ಯಾಗಮ;
     }
 
     timer = create_timer(msec, repeat);
-    if (timer == NULL)
+    ಯದಿ (timer == ರಿಕ್ತ)
     {
 	free_callback(&callback);
-	return;
+	ಪ್ರತ್ಯಾಗಮ;
     }
     set_callback(&timer->tr_callback, &callback);
-    rettv->vval.v_number = (varnumber_T)timer->tr_id;
+    rettv->vval.v_ಸಂಖ್ಯೆ = (varnumber_T)timer->tr_id;
 }
 
 /*
  * "timer_stop(timer)" function
  */
-    void
+    ಶೂನ್ಯ
 f_timer_stop(typval_T *argvars, typval_T *rettv UNUSED)
 {
     timer_T *timer;
 
-    if (check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    ಯದಿ (check_for_ಸಂಖ್ಯೆ_arg(argvars, 0) == FAIL)
+	ಪ್ರತ್ಯಾಗಮ;
 
-    timer = find_timer((int)tv_get_number(&argvars[0]));
-    if (timer != NULL)
+    timer = find_timer((ಪೂರ್ಣಾಙ್ಕ)tv_get_ಸಂಖ್ಯೆ(&argvars[0]));
+    ಯದಿ (timer != ರಿಕ್ತ)
 	stop_timer(timer);
 }
 
 /*
  * "timer_stopall()" function
  */
-    void
+    ಶೂನ್ಯ
 f_timer_stopall(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
     stop_all_timers();
@@ -955,20 +955,20 @@ f_timer_stopall(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 
 # endif // FEAT_TIMERS
 
-# if defined(STARTUPTIME)
-static struct timeval	prev_timeval;
+# ಯದಿ defined(STARTUPTIME)
+ಸ್ಥಿರ ಸಂರಚನಾ timeval	prev_timeval;
 
 #  ifdef MSWIN
 /*
  * Windows doesn't have gettimeofday(), although it does have struct timeval.
  */
-    static int
-gettimeofday(struct timeval *tv, char *dummy UNUSED)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+gettimeofday(ಸಂರಚನಾ timeval *tv, ವರ್ಣ *dummy UNUSED)
 {
     long t = clock();
     tv->tv_sec = t / CLOCKS_PER_SEC;
     tv->tv_usec = (t - tv->tv_sec * CLOCKS_PER_SEC) * 1000000 / CLOCKS_PER_SEC;
-    return 0;
+    ಪ್ರತ್ಯಾಗಮ 0;
 }
 #  endif
 
@@ -976,21 +976,21 @@ gettimeofday(struct timeval *tv, char *dummy UNUSED)
  * Save the previous time before doing something that could nest.
  * set "*tv_rel" to the time elapsed so far.
  */
-    void
-time_push(void *tv_rel, void *tv_start)
+    ಶೂನ್ಯ
+time_ತಳ್ಳು(ಶೂನ್ಯ *tv_rel, ಶೂನ್ಯ *tv_start)
 {
-    *((struct timeval *)tv_rel) = prev_timeval;
-    gettimeofday(&prev_timeval, NULL);
-    ((struct timeval *)tv_rel)->tv_usec = prev_timeval.tv_usec
-					- ((struct timeval *)tv_rel)->tv_usec;
-    ((struct timeval *)tv_rel)->tv_sec = prev_timeval.tv_sec
-					 - ((struct timeval *)tv_rel)->tv_sec;
-    if (((struct timeval *)tv_rel)->tv_usec < 0)
+    *((ಸಂರಚನಾ timeval *)tv_rel) = prev_timeval;
+    gettimeofday(&prev_timeval, ರಿಕ್ತ);
+    ((ಸಂರಚನಾ timeval *)tv_rel)->tv_usec = prev_timeval.tv_usec
+					- ((ಸಂರಚನಾ timeval *)tv_rel)->tv_usec;
+    ((ಸಂರಚನಾ timeval *)tv_rel)->tv_sec = prev_timeval.tv_sec
+					 - ((ಸಂರಚನಾ timeval *)tv_rel)->tv_sec;
+    ಯದಿ (((ಸಂರಚನಾ timeval *)tv_rel)->tv_usec < 0)
     {
-	((struct timeval *)tv_rel)->tv_usec += 1000000;
-	--((struct timeval *)tv_rel)->tv_sec;
+	((ಸಂರಚನಾ timeval *)tv_rel)->tv_usec += 1000000;
+	--((ಸಂರಚನಾ timeval *)tv_rel)->tv_sec;
     }
-    *(struct timeval *)tv_start = prev_timeval;
+    *(ಸಂರಚನಾ timeval *)tv_start = prev_timeval;
 }
 
 /*
@@ -999,21 +999,21 @@ time_push(void *tv_rel, void *tv_start)
  * Note: The arguments are (void *) to avoid trouble with systems that don't
  * have struct timeval.
  */
-    void
-time_pop(
-    void	*tp)	// actually (struct timeval *)
+    ಶೂನ್ಯ
+time_ತೆಗೆ(
+    ಶೂನ್ಯ	*tp)	// actually (struct timeval *)
 {
-    prev_timeval.tv_usec -= ((struct timeval *)tp)->tv_usec;
-    prev_timeval.tv_sec -= ((struct timeval *)tp)->tv_sec;
-    if (prev_timeval.tv_usec < 0)
+    prev_timeval.tv_usec -= ((ಸಂರಚನಾ timeval *)tp)->tv_usec;
+    prev_timeval.tv_sec -= ((ಸಂರಚನಾ timeval *)tp)->tv_sec;
+    ಯದಿ (prev_timeval.tv_usec < 0)
     {
 	prev_timeval.tv_usec += 1000000;
 	--prev_timeval.tv_sec;
     }
 }
 
-    static void
-time_diff(struct timeval *then, struct timeval *now)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+time_diff(ಸಂರಚನಾ timeval *then, ಸಂರಚನಾ timeval *now)
 {
     long	usec;
     long	msec;
@@ -1024,32 +1024,32 @@ time_diff(struct timeval *then, struct timeval *now)
     fprintf(time_fd, "%03ld.%03ld", msec, usec >= 0 ? usec : usec + 1000L);
 }
 
-    void
-time_msg(
-    char	*mesg,
-    void	*tv_start)  // only for do_source: start time; actually
+    ಶೂನ್ಯ
+time_ಸಂದೇಶ(
+    ವರ್ಣ	*mesg,
+    ಶೂನ್ಯ	*tv_start)  // only for do_source: start time; actually
 			    // (struct timeval *)
 {
-    static struct timeval	start;
-    struct timeval		now;
+    ಸ್ಥಿರ ಸಂರಚನಾ timeval	start;
+    ಸಂರಚನಾ timeval		now;
 
-    if (time_fd == NULL)
-	return;
+    ಯದಿ (time_fd == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ;
 
-    if (strstr(mesg, "STARTING") != NULL)
+    ಯದಿ (strstr(mesg, "STARTING") != ರಿಕ್ತ)
     {
-	gettimeofday(&start, NULL);
+	gettimeofday(&start, ರಿಕ್ತ);
 	prev_timeval = start;
 	fprintf(time_fd, "\n\ntimes in msec\n");
 	fprintf(time_fd, " clock   self+sourced   self:  sourced script\n");
 	fprintf(time_fd, " clock   elapsed:              other lines\n\n");
     }
-    gettimeofday(&now, NULL);
+    gettimeofday(&now, ರಿಕ್ತ);
     time_diff(&start, &now);
-    if (((struct timeval *)tv_start) != NULL)
+    ಯದಿ (((ಸಂರಚನಾ timeval *)tv_start) != ರಿಕ್ತ)
     {
 	fprintf(time_fd, "  ");
-	time_diff(((struct timeval *)tv_start), &now);
+	time_diff(((ಸಂರಚನಾ timeval *)tv_start), &now);
     }
     fprintf(time_fd, "  ");
     time_diff(&prev_timeval, &now);
@@ -1059,7 +1059,7 @@ time_msg(
 # endif	// STARTUPTIME
 #endif // FEAT_EVAL
 
-#if defined(FEAT_SPELL) || defined(FEAT_PERSISTENT_UNDO)
+#ಯದಿ defined(FEAT_SPELL) || defined(FEAT_PERSISTENT_UNDO)
 /*
  * Read 8 bytes from "fd" and turn them into a time_T, MSB first.
  * Returns -1 when encountering EOF.
@@ -1067,41 +1067,41 @@ time_msg(
     time_T
 get8ctime(FILE *fd)
 {
-    int		c;
+    ಪೂರ್ಣಾಙ್ಕ		c;
     time_T	n = 0;
-    int		i;
+    ಪೂರ್ಣಾಙ್ಕ		i;
 
-    for (i = 0; i < 8; ++i)
+    ಪ್ರತಿ (i = 0; i < 8; ++i)
     {
 	c = getc(fd);
-	if (c == EOF) return -1;
+	ಯದಿ (c == EOF) ಪ್ರತ್ಯಾಗಮ -1;
 	n = (n << 8) + c;
     }
-    return n;
+    ಪ್ರತ್ಯಾಗಮ n;
 }
 
 /*
  * Write time_T to file "fd" in 8 bytes.
  * Returns FAIL when the write failed.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 put_time(FILE *fd, time_T the_time)
 {
     char_u	buf[8];
 
     time_to_bytes(the_time, buf);
-    return fwrite(buf, (size_t)8, (size_t)1, fd) == 1 ? OK : FAIL;
+    ಪ್ರತ್ಯಾಗಮ fwrite(buf, (size_t)8, (size_t)1, fd) == 1 ? OK : FAIL;
 }
 
 /*
  * Write time_T to "buf[8]".
  */
-    void
+    ಶೂನ್ಯ
 time_to_bytes(time_T the_time, char_u *buf)
 {
-    int		c;
-    int		i;
-    int		bi = 0;
+    ಪೂರ್ಣಾಙ್ಕ		c;
+    ಪೂರ್ಣಾಙ್ಕ		i;
+    ಪೂರ್ಣಾಙ್ಕ		bi = 0;
     time_T	wtime = the_time;
 
     // time_T can be up to 8 bytes in size, more than long_u, thus we
@@ -1111,17 +1111,17 @@ time_to_bytes(time_T the_time, char_u *buf)
     // truncate if time_T is 8 bytes.  So only use a cast when it is 4 bytes,
     // it's safe to assume that long_u is 4 bytes or more and when using 8
     // bytes the top bit won't be set.
-    for (i = 7; i >= 0; --i)
+    ಪ್ರತಿ (i = 7; i >= 0; --i)
     {
-	if (i + 1 > (int)sizeof(time_T))
+	ಯದಿ (i + 1 > (ಪೂರ್ಣಾಙ್ಕ)ಪರಿಮಾಣ(time_T))
 	    // ">>" doesn't work well when shifting more bits than avail
 	    buf[bi++] = 0;
-	else
+	ಅನ್ಯಥಾ
 	{
-# if defined(SIZEOF_TIME_T) && SIZEOF_TIME_T > 4
-	    c = (int)(wtime >> (i * 8));
-# else
-	    c = (int)((long_u)wtime >> (i * 8));
+# ಯದಿ defined(SIZEOF_TIME_T) && SIZEOF_TIME_T > 4
+	    c = (ಪೂರ್ಣಾಙ್ಕ)(wtime >> (i * 8));
+# ಅನ್ಯಥಾ
+	    c = (ಪೂರ್ಣಾಙ್ಕ)((long_u)wtime >> (i * 8));
 # endif
 	    buf[bi++] = c;
 	}
@@ -1133,32 +1133,32 @@ time_to_bytes(time_T the_time, char_u *buf)
 /*
  * Put timestamp "tt" in "buf[buflen]" in a nice format.
  */
-    void
+    ಶೂನ್ಯ
 add_time(char_u *buf, size_t buflen, time_t tt)
 {
 #ifdef HAVE_STRFTIME
-    struct tm	tmval;
-    struct tm	*curtime;
+    ಸಂರಚನಾ tm	tmval;
+    ಸಂರಚನಾ tm	*curtime;
     size_t	n;
 
-    if (vim_time() - tt >= 100)
+    ಯದಿ (vim_time() - tt >= 100)
     {
 	curtime = vim_localtime(&tt, &tmval);
-	if (vim_time() - tt < (60L * 60L * 12L))
+	ಯದಿ (vim_time() - tt < (60L * 60L * 12L))
 	    // within 12 hours
-	    n = strftime((char *)buf, buflen, "%H:%M:%S", curtime);
-	else
+	    n = strftime((ವರ್ಣ *)buf, buflen, "%H:%M:%S", curtime);
+	ಅನ್ಯಥಾ
 	    // longer ago
-	    n = strftime((char *)buf, buflen, "%Y/%m/%d %H:%M:%S", curtime);
-	if (n == 0)
+	    n = strftime((ವರ್ಣ *)buf, buflen, "%Y/%m/%d %H:%M:%S", curtime);
+	ಯದಿ (n == 0)
 	    buf[0] = NUL;
     }
-    else
+    ಅನ್ಯಥಾ
 #endif
     {
 	long seconds = (long)(vim_time() - tt);
 
-	vim_snprintf((char *)buf, buflen,
+	vim_snprintf((ವರ್ಣ *)buf, buflen,
 		NGETTEXT("%ld second ago", "%ld seconds ago", seconds),
 		seconds);
     }

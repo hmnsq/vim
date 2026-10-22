@@ -33,20 +33,20 @@
 #define	    BACKTRACKING_ENGINE	1
 #define	    NFA_ENGINE		2
 
-typedef struct regengine regengine_T;
+ಪ್ರಕಾರನಿರ್ದೇಶ ಸಂರಚನಾ regengine regengine_T;
 
 /*
  * Structure returned by vim_regcomp() to pass on to vim_regexec().
  * This is the general structure. For the actual matcher, two specific
  * structures are used. See code below.
  */
-typedef struct regprog
+ಪ್ರಕಾರನಿರ್ದೇಶ ಸಂರಚನಾ regprog
 {
     regengine_T		*engine;
     unsigned		regflags;
     unsigned		re_engine;   // automatic, backtracking or nfa engine
     unsigned		re_flags;    // second argument for vim_regcomp()
-    int			re_in_use;   // prog is being executed
+    ಪೂರ್ಣಾಙ್ಕ			re_in_use;   // prog is being executed
 } regprog_T;
 
 /*
@@ -54,21 +54,21 @@ typedef struct regprog
  * These fields are only to be used in regexp.c!
  * See regexp.c for an explanation.
  */
-typedef struct
+ಪ್ರಕಾರನಿರ್ದೇಶ ಸಂರಚನಾ
 {
     // These four members implement regprog_T
     regengine_T		*engine;
     unsigned		regflags;
     unsigned		re_engine;
     unsigned		re_flags;
-    int			re_in_use;
+    ಪೂರ್ಣಾಙ್ಕ			re_in_use;
 
-    int			regstart;
+    ಪೂರ್ಣಾಙ್ಕ			regstart;
     char_u		reganch;
     char_u		*regmust;
-    int			regmlen;
+    ಪೂರ್ಣಾಙ್ಕ			regmlen;
 #ifdef DEBUG
-    int			regsz;
+    ಪೂರ್ಣಾಙ್ಕ			regsz;
 #endif
 #ifdef FEAT_SYN_HL
     char_u		reghasz;
@@ -80,44 +80,44 @@ typedef struct
  * Structure representing a NFA state.
  * An NFA state may have no outgoing edge, when it is a NFA_MATCH state.
  */
-typedef struct nfa_state nfa_state_T;
-struct nfa_state
+ಪ್ರಕಾರನಿರ್ದೇಶ ಸಂರಚನಾ nfa_state nfa_state_T;
+ಸಂರಚನಾ nfa_state
 {
-    int			c;
+    ಪೂರ್ಣಾಙ್ಕ			c;
     nfa_state_T		*out;
     nfa_state_T		*out1;
-    int			id;
-    int			lastlist[2]; // 0: normal, 1: recursive
-    int			val;
+    ಪೂರ್ಣಾಙ್ಕ			id;
+    ಪೂರ್ಣಾಙ್ಕ			lastlist[2]; // 0: normal, 1: recursive
+    ಪೂರ್ಣಾಙ್ಕ			val;
 };
 
 /*
  * Structure used by the NFA matcher.
  */
-typedef struct
+ಪ್ರಕಾರನಿರ್ದೇಶ ಸಂರಚನಾ
 {
     // These three members implement regprog_T
     regengine_T		*engine;
     unsigned		regflags;
     unsigned		re_engine;
     unsigned		re_flags;
-    int			re_in_use;
+    ಪೂರ್ಣಾಙ್ಕ			re_in_use;
 
     nfa_state_T		*start;		// points into state[]
 
-    int			reganch;	// pattern starts with ^
-    int			regstart;	// char at start of pattern
+    ಪೂರ್ಣಾಙ್ಕ			reganch;	// pattern starts with ^
+    ಪೂರ್ಣಾಙ್ಕ			regstart;	// char at start of pattern
     char_u		*match_text;	// plain text to match with
 
-    int			has_zend;	// pattern contains \ze
-    int			has_backref;	// pattern contains \1 .. \9
+    ಪೂರ್ಣಾಙ್ಕ			has_zend;	// pattern contains \ze
+    ಪೂರ್ಣಾಙ್ಕ			has_backref;	// pattern contains \1 .. \9
 #ifdef FEAT_SYN_HL
-    int			reghasz;
+    ಪೂರ್ಣಾಙ್ಕ			reghasz;
 #endif
     char_u		*pattern;
-    int			nsubexp;	// number of ()
-    int			nstate;
-    void		*listbuf[2];	// cached list buffers for
+    ಪೂರ್ಣಾಙ್ಕ			nsubexp;	// number of ()
+    ಪೂರ್ಣಾಙ್ಕ			nstate;
+    ಶೂನ್ಯ		*listbuf[2];	// cached list buffers for
 					// nfa_regmatch()
     nfa_state_T		state[1];	// actually longer..
 } nfa_regprog_T;
@@ -127,14 +127,14 @@ typedef struct
  * Sub-match "no" starts at "startp[no]" and ends just before "endp[no]".
  * When there is no match, the pointer is NULL.
  */
-typedef struct
+ಪ್ರಕಾರನಿರ್ದೇಶ ಸಂರಚನಾ
 {
     regprog_T		*regprog;
     char_u		*startp[NSUBEXP];
     char_u		*endp[NSUBEXP];
 
     colnr_T		rm_matchcol;   // match start without "\zs"
-    int			rm_ic;
+    ಪೂರ್ಣಾಙ್ಕ			rm_ic;
 } regmatch_T;
 
 /*
@@ -145,14 +145,14 @@ typedef struct
  * always 0.
  * When there is no match, the line number is -1.
  */
-typedef struct
+ಪ್ರಕಾರನಿರ್ದೇಶ ಸಂರಚನಾ
 {
     regprog_T		*regprog;
     lpos_T		startpos[NSUBEXP];
     lpos_T		endpos[NSUBEXP];
 
     colnr_T		rmm_matchcol;   // match start without "\zs"
-    int			rmm_ic;
+    ಪೂರ್ಣಾಙ್ಕ			rmm_ic;
     colnr_T		rmm_maxcol;	// when not zero: maximum column
 } regmmatch_T;
 
@@ -161,24 +161,24 @@ typedef struct
  * Use a reference count to avoid the need to copy this around.  When it goes
  * from 1 to zero the matches need to be freed.
  */
-typedef struct
+ಪ್ರಕಾರನಿರ್ದೇಶ ಸಂರಚನಾ
 {
     short		refcnt;
     char_u		*matches[NSUBEXP];
 } reg_extmatch_T;
 
-struct regengine
+ಸಂರಚನಾ regengine
 {
     // bt_regcomp or nfa_regcomp
-    regprog_T	*(*regcomp)(char_u*, int);
+    regprog_T	*(*regcomp)(char_u*, ಪೂರ್ಣಾಙ್ಕ);
     // bt_regfree or nfa_regfree
-    void	(*regfree)(regprog_T *);
+    ಶೂನ್ಯ	(*regfree)(regprog_T *);
     // bt_regexec_nl or nfa_regexec_nl
-    int		(*regexec_nl)(regmatch_T *, char_u *, colnr_T, int);
+    ಪೂರ್ಣಾಙ್ಕ		(*regexec_nl)(regmatch_T *, char_u *, colnr_T, ಪೂರ್ಣಾಙ್ಕ);
     // bt_regexec_mult or nfa_regexec_mult
-    long	(*regexec_multi)(regmmatch_T *, win_T *, buf_T *, linenr_T, colnr_T, int *);
+    long	(*regexec_multi)(regmmatch_T *, win_T *, buf_T *, linenr_T, colnr_T, ಪೂರ್ಣಾಙ್ಕ *);
 #ifdef DEBUG
-    char_u	*expr;
+    char_u	*ಅಭಿವ್ಯಕ್ತಿ;
 #endif
 };
 

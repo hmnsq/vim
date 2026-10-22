@@ -13,37 +13,37 @@
  * Ron Aaron <ronaharon@yahoo.com> wrote this and the DLL support code.
  * Adapted by Ken Takata.
  */
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
 // cproto doesn't create a prototype for VimMain()
 #ifdef VIMDLL
 __declspec(dllimport)
 #endif
-int VimMain(int argc, char **argv);
+ಪೂರ್ಣಾಙ್ಕ VimMain(ಪೂರ್ಣಾಙ್ಕ argc, ವರ್ಣ **argv);
 
 #ifdef VIMDLL
 # define SaveInst(hInst)    // Do nothing
-#else
-void SaveInst(HINSTANCE hInst);
+#ಅನ್ಯಥಾ
+ಶೂನ್ಯ SaveInst(HINSTANCE hInst);
 #endif
 
 #ifdef FEAT_GUI
-    int WINAPI
+    ಪೂರ್ಣಾಙ್ಕ WINAPI
 wWinMain(
     HINSTANCE	hInstance,
     HINSTANCE	hPrevInst UNUSED,
-    LPWSTR	lpszCmdLine UNUSED,
-    int		nCmdShow UNUSED)
+    LPWSTR	lpsz_Cmd_ಸಾಲು UNUSED,
+    ಪೂರ್ಣಾಙ್ಕ		nCmdShow UNUSED)
 {
     SaveInst(hInstance);
-    return VimMain(0, NULL);
+    ಪ್ರತ್ಯಾಗಮ VimMain(0, ರಿಕ್ತ);
 }
-#else
-    int
-wmain(int argc UNUSED, wchar_t **argv UNUSED)
+#ಅನ್ಯಥಾ
+    ಪೂರ್ಣಾಙ್ಕ
+wmain(ಪೂರ್ಣಾಙ್ಕ argc UNUSED, wchar_t **argv UNUSED)
 {
-    SaveInst(GetModuleHandleW(NULL));
-    return VimMain(0, NULL);
+    SaveInst(GetModuleHandleW(ರಿಕ್ತ));
+    ಪ್ರತ್ಯಾಗಮ VimMain(0, ರಿಕ್ತ);
 }
 #endif
 
@@ -57,37 +57,37 @@ wmain(int argc UNUSED, wchar_t **argv UNUSED)
 // For MinGW, the -nostdlib compiler option and the --entry linker option are
 // needed.
 # ifdef FEAT_GUI
-    void WINAPI
-wWinMainCRTStartup(void)
+    ಶೂನ್ಯ WINAPI
+wWinMainCRTStartup(ಶೂನ್ಯ)
 {
-    VimMain(0, NULL);
+    VimMain(0, ರಿಕ್ತ);
 }
-# else
-    void
-wmainCRTStartup(void)
+# ಅನ್ಯಥಾ
+    ಶೂನ್ಯ
+wmainCRTStartup(ಶೂನ್ಯ)
 {
-    VimMain(0, NULL);
+    VimMain(0, ರಿಕ್ತ);
 }
 # endif
 #endif	// USE_OWNSTARTUP
 
 
-#if defined(VIMDLL) && defined(FEAT_MZSCHEME)
+#ಯದಿ defined(VIMDLL) && defined(FEAT_MZSCHEME)
 
-# if defined(_MSC_VER)
-static __declspec(thread) void *tls_space;
-extern intptr_t _tls_index;
+# ಯದಿ defined(_MSC_VER)
+ಸ್ಥಿರ __declspec(thread) ಶೂನ್ಯ *tls_space;
+ಬಾಹ್ಯ intptr_t _tls_index;
 # elif defined(__MINGW32__)
-static __thread void *tls_space;
-extern intptr_t _tls_index;
+ಸ್ಥಿರ __thread ಶೂನ್ಯ *tls_space;
+ಬಾಹ್ಯ intptr_t _tls_index;
 # endif
 
 // Get TLS information that is needed for if_mzsch.
-    __declspec(dllexport) void
-get_tls_info(void ***ptls_space, intptr_t *ptls_index)
+    __declspec(dllexport) ಶೂನ್ಯ
+get_tls_info(ಶೂನ್ಯ ***ptls_space, intptr_t *ptls_index)
 {
     *ptls_space = &tls_space;
     *ptls_index = _tls_index;
-    return;
+    ಪ್ರತ್ಯಾಗಮ;
 }
 #endif

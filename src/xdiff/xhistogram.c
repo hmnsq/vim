@@ -41,79 +41,79 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "xinclude.h"
+#ಅನ್ತರ್ಭಾವ "xinclude.h"
 
 #define MAX_PTR	UINT_MAX
 #define MAX_CNT	UINT_MAX
 
-#define LINE_END(n) (line##n + count##n - 1)
-#define LINE_END_PTR(n) (*line##n + *count##n - 1)
+#define ಸಾಲು_END(n) (ಸಾಲು##n + ಎಣಿಕೆ##n - 1)
+#define ಸಾಲು_END_PTR(n) (*ಸಾಲು##n + *ಎಣಿಕೆ##n - 1)
 
-struct histindex {
-	struct record {
-		unsigned int ptr, cnt;
-		struct record *next;
+ಸಂರಚನಾ histindex {
+	ಸಂರಚನಾ record {
+		unsigned ಪೂರ್ಣಾಙ್ಕ ptr, cnt;
+		ಸಂರಚನಾ record *next;
 	} **records, /* an occurrence */
-	  **line_map; /* map of line to record chain */
+	  **ಸಾಲು_map; /* map of line to record chain */
 	chastore_t rcha;
-	unsigned int *next_ptrs;
-	unsigned int table_bits,
+	unsigned ಪೂರ್ಣಾಙ್ಕ *next_ptrs;
+	unsigned ಪೂರ್ಣಾಙ್ಕ table_bits,
 		     records_size,
-		     line_map_size;
+		     ಸಾಲು_map_size;
 
-	unsigned int max_chain_length,
-		     key_shift,
+	unsigned ಪೂರ್ಣಾಙ್ಕ max_chain_length,
+		     ಕೀಲಿ_shift,
 		     ptr_shift;
 
-	unsigned int cnt,
+	unsigned ಪೂರ್ಣಾಙ್ಕ cnt,
 		     has_common;
 
 	xdfenv_t *env;
-	xpparam_t const *xpp;
+	xpparam_t ಧ್ರುವ *xpp;
 };
 
-struct region {
-	unsigned int begin1, end1;
-	unsigned int begin2, end2;
+ಸಂರಚನಾ region {
+	unsigned ಪೂರ್ಣಾಙ್ಕ begin1, end1;
+	unsigned ಪೂರ್ಣಾಙ್ಕ begin2, end2;
 };
 
-#define LINE_MAP(i, a) (i->line_map[(a) - i->ptr_shift])
+#define ಸಾಲು_MAP(i, a) (i->ಸಾಲು_map[(a) - i->ptr_shift])
 
 #define NEXT_PTR(index, ptr) \
 	(index->next_ptrs[(ptr) - index->ptr_shift])
 
 #define CNT(index, ptr) \
-	((LINE_MAP(index, ptr))->cnt)
+	((ಸಾಲು_MAP(index, ptr))->cnt)
 
 #define REC(env, s, l) \
 	(&env->xdf##s.recs[l - 1])
 
-static int cmp_recs(xrecord_t *r1, xrecord_t *r2)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ cmp_recs(xrecord_t *r1, xrecord_t *r2)
 {
-	return r1->ha == r2->ha;
+	ಪ್ರತ್ಯಾಗಮ r1->ha == r2->ha;
 
 }
 
 #define CMP(i, s1, l1, s2, l2) \
 	(cmp_recs(REC(i->env, s1, l1), REC(i->env, s2, l2)))
 
-#define TABLE_HASH(index, side, line) \
-	XDL_HASHLONG((REC(index->env, side, line))->ha, index->table_bits)
+#define TABLE_HASH(index, side, ಸಾಲು) \
+	XDL_HASHLONG((REC(index->env, side, ಸಾಲು))->ha, index->table_bits)
 
-static int scanA(struct histindex *index, int line1, int count1)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ scanA(ಸಂರಚನಾ histindex *index, ಪೂರ್ಣಾಙ್ಕ line1, ಪೂರ್ಣಾಙ್ಕ count1)
 {
-	unsigned int ptr, tbl_idx;
-	unsigned int chain_len;
-	struct record **rec_chain, *rec;
+	unsigned ಪೂರ್ಣಾಙ್ಕ ptr, tbl_idx;
+	unsigned ಪೂರ್ಣಾಙ್ಕ chain_len;
+	ಸಂರಚನಾ record **rec_chain, *rec;
 
-	for (ptr = LINE_END(1); (unsigned int)line1 <= ptr; ptr--) {
+	ಪ್ರತಿ (ptr = ಸಾಲು_END(1); (unsigned ಪೂರ್ಣಾಙ್ಕ)line1 <= ptr; ptr--) {
 		tbl_idx = TABLE_HASH(index, 1, ptr);
 		rec_chain = index->records + tbl_idx;
 		rec = *rec_chain;
 
 		chain_len = 0;
-		while (rec) {
-			if (CMP(index, 1, rec->ptr, 1, ptr)) {
+		ಯಾವತ್ (rec) {
+			ಯದಿ (CMP(index, 1, rec->ptr, 1, ptr)) {
 				/*
 				 * ptr is identical to another element. Insert
 				 * it onto the front of the existing element
@@ -123,57 +123,57 @@ static int scanA(struct histindex *index, int line1, int count1)
 				rec->ptr = ptr;
 				/* cap rec->cnt at MAX_CNT */
 				rec->cnt = (rec->cnt < MAX_CNT) ? rec->cnt + 1 : rec->cnt;
-				LINE_MAP(index, ptr) = rec;
-				goto continue_scan;
+				ಸಾಲು_MAP(index, ptr) = rec;
+				ಗಚ್ಛ continue_scan;
 			}
 
 			rec = rec->next;
 			chain_len++;
 		}
 
-		if (chain_len == index->max_chain_length)
-			return -1;
+		ಯದಿ (chain_len == index->max_chain_length)
+			ಪ್ರತ್ಯಾಗಮ -1;
 
 		/*
 		 * This is the first time we have ever seen this particular
 		 * element in the sequence. Construct a new chain for it.
 		 */
-		if (!(rec = xdl_cha_alloc(&index->rcha)))
-			return -1;
+		ಯದಿ (!(rec = xdl_cha_alloc(&index->rcha)))
+			ಪ್ರತ್ಯಾಗಮ -1;
 		rec->ptr = ptr;
 		rec->cnt = 1;
 		rec->next = *rec_chain;
 		*rec_chain = rec;
-		LINE_MAP(index, ptr) = rec;
+		ಸಾಲು_MAP(index, ptr) = rec;
 
 continue_scan:
 		; /* no op */
 	}
 
-	return 0;
+	ಪ್ರತ್ಯಾಗಮ 0;
 }
 
-static int try_lcs(struct histindex *index, struct region *lcs, int b_ptr,
-	int line1, int count1, int line2, int count2)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ try_lcs(ಸಂರಚನಾ histindex *index, ಸಂರಚನಾ region *lcs, ಪೂರ್ಣಾಙ್ಕ b_ptr,
+	ಪೂರ್ಣಾಙ್ಕ line1, ಪೂರ್ಣಾಙ್ಕ count1, ಪೂರ್ಣಾಙ್ಕ line2, ಪೂರ್ಣಾಙ್ಕ count2)
 {
-	unsigned int b_next = b_ptr + 1;
-	struct record *rec = index->records[TABLE_HASH(index, 2, b_ptr)];
-	unsigned int as, ae, bs, be, np, rc;
-	int should_break;
+	unsigned ಪೂರ್ಣಾಙ್ಕ b_next = b_ptr + 1;
+	ಸಂರಚನಾ record *rec = index->records[TABLE_HASH(index, 2, b_ptr)];
+	unsigned ಪೂರ್ಣಾಙ್ಕ as, ae, bs, be, np, rc;
+	ಪೂರ್ಣಾಙ್ಕ should_break;
 
-	for (; rec; rec = rec->next) {
-		if (rec->cnt > index->cnt) {
-			if (!index->has_common)
+	ಪ್ರತಿ (; rec; rec = rec->next) {
+		ಯದಿ (rec->cnt > index->cnt) {
+			ಯದಿ (!index->has_common)
 				index->has_common = CMP(index, 1, rec->ptr, 2, b_ptr);
-			continue;
+			ಅನುವರ್ತ;
 		}
 
 		as = rec->ptr;
-		if (!CMP(index, 1, as, 2, b_ptr))
-			continue;
+		ಯದಿ (!CMP(index, 1, as, 2, b_ptr))
+			ಅನುವರ್ತ;
 
 		index->has_common = 1;
-		for (;;) {
+		ಪ್ರತಿ (;;) {
 			should_break = 0;
 			np = NEXT_PTR(index, as);
 			bs = b_ptr;
@@ -181,24 +181,24 @@ static int try_lcs(struct histindex *index, struct region *lcs, int b_ptr,
 			be = bs;
 			rc = rec->cnt;
 
-			while ((unsigned int)line1 < as && (unsigned int)line2 < bs
+			ಯಾವತ್ ((unsigned ಪೂರ್ಣಾಙ್ಕ)line1 < as && (unsigned ಪೂರ್ಣಾಙ್ಕ)line2 < bs
 				&& CMP(index, 1, as - 1, 2, bs - 1)) {
 				as--;
 				bs--;
-				if (1 < rc)
+				ಯದಿ (1 < rc)
 					rc = XDL_MIN(rc, CNT(index, as));
 			}
-			while (ae < (unsigned int)LINE_END(1) && be < (unsigned int)LINE_END(2)
+			ಯಾವತ್ (ae < (unsigned ಪೂರ್ಣಾಙ್ಕ)ಸಾಲು_END(1) && be < (unsigned ಪೂರ್ಣಾಙ್ಕ)ಸಾಲು_END(2)
 				&& CMP(index, 1, ae + 1, 2, be + 1)) {
 				ae++;
 				be++;
-				if (1 < rc)
+				ಯದಿ (1 < rc)
 					rc = XDL_MIN(rc, CNT(index, ae));
 			}
 
-			if (b_next <= be)
+			ಯದಿ (b_next <= be)
 				b_next = be + 1;
-			if (lcs->end1 - lcs->begin1 < ae - as || rc < index->cnt) {
+			ಯದಿ (lcs->end1 - lcs->begin1 < ae - as || rc < index->cnt) {
 				lcs->begin1 = as;
 				lcs->begin2 = bs;
 				lcs->end1 = ae;
@@ -206,165 +206,165 @@ static int try_lcs(struct histindex *index, struct region *lcs, int b_ptr,
 				index->cnt = rc;
 			}
 
-			if (np == 0)
-				break;
+			ಯದಿ (np == 0)
+				ಭಙ್ಗ;
 
-			while (np <= ae) {
+			ಯಾವತ್ (np <= ae) {
 				np = NEXT_PTR(index, np);
-				if (np == 0) {
+				ಯದಿ (np == 0) {
 					should_break = 1;
-					break;
+					ಭಙ್ಗ;
 				}
 			}
 
-			if (should_break)
-				break;
+			ಯದಿ (should_break)
+				ಭಙ್ಗ;
 
 			as = np;
 		}
 	}
-	return b_next;
+	ಪ್ರತ್ಯಾಗಮ b_next;
 }
 
-static int fall_back_to_classic_diff(xpparam_t const *xpp, xdfenv_t *env,
-		int line1, int count1, int line2, int count2)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ fall_back_to_classic_diff(xpparam_t ಧ್ರುವ *xpp, xdfenv_t *env,
+		ಪೂರ್ಣಾಙ್ಕ line1, ಪೂರ್ಣಾಙ್ಕ count1, ಪೂರ್ಣಾಙ್ಕ line2, ಪೂರ್ಣಾಙ್ಕ count2)
 {
 	xpparam_t xpparam;
 
-	memset(&xpparam, 0, sizeof(xpparam));
+	memset(&xpparam, 0, ಪರಿಮಾಣ(xpparam));
 	xpparam.flags = xpp->flags & ~XDF_DIFF_ALGORITHM_MASK;
 
-	return xdl_fall_back_diff(env, &xpparam,
+	ಪ್ರತ್ಯಾಗಮ xdl_fall_back_diff(env, &xpparam,
 				  line1, count1, line2, count2);
 }
 
-static inline void free_index(struct histindex *index)
+ಸ್ಥಿರ ಅನ್ತಃಸ್ಥ ಶೂನ್ಯ free_index(ಸಂರಚನಾ histindex *index)
 {
 	xdl_free(index->records);
-	xdl_free(index->line_map);
+	xdl_free(index->ಸಾಲು_map);
 	xdl_free(index->next_ptrs);
 	xdl_cha_free(&index->rcha);
 }
 
-static int find_lcs(xpparam_t const *xpp, xdfenv_t *env,
-		    struct region *lcs,
-		    int line1, int count1, int line2, int count2)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ find_lcs(xpparam_t ಧ್ರುವ *xpp, xdfenv_t *env,
+		    ಸಂರಚನಾ region *lcs,
+		    ಪೂರ್ಣಾಙ್ಕ line1, ಪೂರ್ಣಾಙ್ಕ count1, ಪೂರ್ಣಾಙ್ಕ line2, ಪೂರ್ಣಾಙ್ಕ count2)
 {
-	int b_ptr;
-	int ret = -1;
-	struct histindex index;
+	ಪೂರ್ಣಾಙ್ಕ b_ptr;
+	ಪೂರ್ಣಾಙ್ಕ ret = -1;
+	ಸಂರಚನಾ histindex index;
 
-	memset(&index, 0, sizeof(index));
+	memset(&index, 0, ಪರಿಮಾಣ(index));
 
 	index.env = env;
 	index.xpp = xpp;
 
-	index.records = NULL;
-	index.line_map = NULL;
+	index.records = ರಿಕ್ತ;
+	index.ಸಾಲು_map = ರಿಕ್ತ;
 	/* in case of early xdl_cha_free() */
-	index.rcha.head = NULL;
+	index.rcha.head = ರಿಕ್ತ;
 
 	index.table_bits = xdl_hashbits(count1);
 	index.records_size = 1 << index.table_bits;
-	if (!XDL_CALLOC_ARRAY(index.records, index.records_size))
-		goto cleanup;
+	ಯದಿ (!XDL_CALLOC_ARRAY(index.records, index.records_size))
+		ಗಚ್ಛ cleanup;
 
-	index.line_map_size = count1;
-	if (!XDL_CALLOC_ARRAY(index.line_map, index.line_map_size))
-		goto cleanup;
+	index.ಸಾಲು_map_size = count1;
+	ಯದಿ (!XDL_CALLOC_ARRAY(index.ಸಾಲು_map, index.ಸಾಲು_map_size))
+		ಗಚ್ಛ cleanup;
 
-	if (!XDL_CALLOC_ARRAY(index.next_ptrs, index.line_map_size))
-		goto cleanup;
+	ಯದಿ (!XDL_CALLOC_ARRAY(index.next_ptrs, index.ಸಾಲು_map_size))
+		ಗಚ್ಛ cleanup;
 
 	/* lines / 4 + 1 comes from xprepare.c:xdl_prepare_ctx() */
-	if (xdl_cha_init(&index.rcha, sizeof(struct record), count1 / 4 + 1) < 0)
-		goto cleanup;
+	ಯದಿ (xdl_cha_init(&index.rcha, ಪರಿಮಾಣ(ಸಂರಚನಾ record), count1 / 4 + 1) < 0)
+		ಗಚ್ಛ cleanup;
 
 	index.ptr_shift = line1;
 	index.max_chain_length = 64;
 
-	if (scanA(&index, line1, count1))
-		goto cleanup;
+	ಯದಿ (scanA(&index, line1, count1))
+		ಗಚ್ಛ cleanup;
 
 	index.cnt = index.max_chain_length + 1;
 
-	for (b_ptr = line2; b_ptr <= LINE_END(2); )
+	ಪ್ರತಿ (b_ptr = line2; b_ptr <= ಸಾಲು_END(2); )
 		b_ptr = try_lcs(&index, lcs, b_ptr, line1, count1, line2, count2);
 
-	if (index.has_common && index.max_chain_length < index.cnt)
+	ಯದಿ (index.has_common && index.max_chain_length < index.cnt)
 		ret = 1;
-	else
+	ಅನ್ಯಥಾ
 		ret = 0;
 
 cleanup:
 	free_index(&index);
-	return ret;
+	ಪ್ರತ್ಯಾಗಮ ret;
 }
 
-static int histogram_diff(xpparam_t const *xpp, xdfenv_t *env,
-	int line1, int count1, int line2, int count2)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ histogram_diff(xpparam_t ಧ್ರುವ *xpp, xdfenv_t *env,
+	ಪೂರ್ಣಾಙ್ಕ line1, ಪೂರ್ಣಾಙ್ಕ count1, ಪೂರ್ಣಾಙ್ಕ line2, ಪೂರ್ಣಾಙ್ಕ count2)
 {
-	struct region lcs;
-	int lcs_found;
-	int result;
+	ಸಂರಚನಾ region lcs;
+	ಪೂರ್ಣಾಙ್ಕ lcs_found;
+	ಪೂರ್ಣಾಙ್ಕ result;
 redo:
 	result = -1;
 
-	if (count1 <= 0 && count2 <= 0)
-		return 0;
+	ಯದಿ (count1 <= 0 && count2 <= 0)
+		ಪ್ರತ್ಯಾಗಮ 0;
 
-	if ((unsigned int)LINE_END(1) >= MAX_PTR)
-		return -1;
+	ಯದಿ ((unsigned ಪೂರ್ಣಾಙ್ಕ)ಸಾಲು_END(1) >= MAX_PTR)
+		ಪ್ರತ್ಯಾಗಮ -1;
 
-	if (!count1) {
-		while(count2--)
+	ಯದಿ (!count1) {
+		ಯಾವತ್(count2--)
 			env->xdf2.changed[line2++ - 1] = true;
-		return 0;
-	} else if (!count2) {
-		while(count1--)
+		ಪ್ರತ್ಯಾಗಮ 0;
+	} ಅನ್ಯಥಾ ಯದಿ (!count2) {
+		ಯಾವತ್(count1--)
 			env->xdf1.changed[line1++ - 1] = true;
-		return 0;
+		ಪ್ರತ್ಯಾಗಮ 0;
 	}
 
-	memset(&lcs, 0, sizeof(lcs));
+	memset(&lcs, 0, ಪರಿಮಾಣ(lcs));
 	lcs_found = find_lcs(xpp, env, &lcs, line1, count1, line2, count2);
-	if (lcs_found < 0)
-		goto out;
-	else if (lcs_found)
+	ಯದಿ (lcs_found < 0)
+		ಗಚ್ಛ out;
+	ಅನ್ಯಥಾ ಯದಿ (lcs_found)
 		result = fall_back_to_classic_diff(xpp, env, line1, count1, line2, count2);
-	else {
-		if (lcs.begin1 == 0 && lcs.begin2 == 0) {
-			while (count1--)
+	ಅನ್ಯಥಾ {
+		ಯದಿ (lcs.begin1 == 0 && lcs.begin2 == 0) {
+			ಯಾವತ್ (count1--)
 				env->xdf1.changed[line1++ - 1] = true;
-			while (count2--)
+			ಯಾವತ್ (count2--)
 				env->xdf2.changed[line2++ - 1] = true;
 			result = 0;
-		} else {
+		} ಅನ್ಯಥಾ {
 			result = histogram_diff(xpp, env,
 						line1, lcs.begin1 - line1,
 						line2, lcs.begin2 - line2);
-			if (result)
-				goto out;
+			ಯದಿ (result)
+				ಗಚ್ಛ out;
 			/*
 			 * result = histogram_diff(xpp, env,
 			 *            lcs.end1 + 1, LINE_END(1) - lcs.end1,
 			 *            lcs.end2 + 1, LINE_END(2) - lcs.end2);
 			 * but let's optimize tail recursion ourself:
 			*/
-			count1 = LINE_END(1) - lcs.end1;
+			count1 = ಸಾಲು_END(1) - lcs.end1;
 			line1 = lcs.end1 + 1;
-			count2 = LINE_END(2) - lcs.end2;
+			count2 = ಸಾಲು_END(2) - lcs.end2;
 			line2 = lcs.end2 + 1;
-			goto redo;
+			ಗಚ್ಛ redo;
 		}
 	}
 out:
-	return result;
+	ಪ್ರತ್ಯಾಗಮ result;
 }
 
-int xdl_do_histogram_diff(xpparam_t const *xpp, xdfenv_t *env)
+ಪೂರ್ಣಾಙ್ಕ xdl_do_histogram_diff(xpparam_t ಧ್ರುವ *xpp, xdfenv_t *env)
 {
-	return histogram_diff(xpp, env,
+	ಪ್ರತ್ಯಾಗಮ histogram_diff(xpp, env,
 		env->xdf1.dstart + 1, env->xdf1.dend - env->xdf1.dstart + 1,
 		env->xdf2.dstart + 1, env->xdf2.dend - env->xdf2.dstart + 1);
 }

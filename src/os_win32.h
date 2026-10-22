@@ -10,10 +10,10 @@
  * Win32 machine-dependent things.
  */
 
-#include "os_dos.h"		// common MS-DOS and Win32 stuff
-#include <direct.h>		// for _mkdir()
+#ಅನ್ತರ್ಭಾವ "os_dos.h"		// common MS-DOS and Win32 stuff
+#ಅನ್ತರ್ಭಾವ <direct.h>		// for _mkdir()
 
-#define BINARY_FILE_IO
+#define ದ್ವಿಮಾನ_FILE_IO
 #define USE_EXE_NAME		// use argv[0] for $VIM
 #define USE_TERM_CONSOLE
 #ifndef HAVE_STRING_H
@@ -51,10 +51,10 @@
 #define HAVE_ACL
 
 #define USE_FNAME_CASE		// adjust case of file names
-#if !defined(FEAT_CLIPBOARD)
+#ಯದಿ !defined(FEAT_CLIPBOARD)
 # define FEAT_CLIPBOARD		// include clipboard support
 #endif
-#if defined(__DATE__) && defined(__TIME__)
+#ಯದಿ defined(__DATE__) && defined(__TIME__)
 # define HAVE_DATE_TIME
 #endif
 #ifndef FEAT_GUI_MSWIN		// GUI works different
@@ -65,7 +65,7 @@
 
 #define HAVE_PUTENV		// at least Bcc 5.2 and MSC have it
 
-#if defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
+#ಯದಿ defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
 # define NO_CONSOLE		// don't include console-only code
 #endif
 
@@ -75,10 +75,10 @@
 
 #define FNAME_ILLEGAL "\"*?><|" // illegal characters in a file name
 
-#include <signal.h>
-#include <stdlib.h>
-#include <time.h>
-#include <sys/types.h>
+#ಅನ್ತರ್ಭಾವ <signal.h>
+#ಅನ್ತರ್ಭಾವ <stdlib.h>
+#ಅನ್ತರ್ಭಾವ <time.h>
+#ಅನ್ತರ್ಭಾವ <sys/types.h>
 
 #ifndef STRICT
 # define STRICT
@@ -89,9 +89,9 @@
 
 // Must include winsock2.h before windows.h since it conflicts with winsock.h
 // (included in windows.h).
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <windows.h>
+#ಅನ್ತರ್ಭಾವ <winsock2.h>
+#ಅನ್ತರ್ಭಾವ <ws2tcpip.h>
+#ಅನ್ತರ್ಭಾವ <windows.h>
 
 // Weird: rpcndr.h defines "small" to "char", which causes trouble
 #undef small
@@ -100,7 +100,7 @@
 # define SM_CXPADDEDBORDER     92
 #endif
 
-typedef void (*sighandler_T)(int, int);
+ಪ್ರಕಾರನಿರ್ದೇಶ ಶೂನ್ಯ (*sighandler_T)(ಪೂರ್ಣಾಙ್ಕ, ಪೂರ್ಣಾಙ್ಕ);
 
 /*
  * Win32 has plenty of memory, use large buffers
@@ -146,12 +146,12 @@ typedef void (*sighandler_T)(int, int);
  * This is usually defined in the DDK, copy the definition here to avoid
  * adding it as a dependence only for a single structure.
  */
-typedef struct _REPARSE_DATA_BUFFER {
+ಪ್ರಕಾರನಿರ್ದೇಶ ಸಂರಚನಾ _REPARSE_DATA_BUFFER {
     ULONG  ReparseTag;
     USHORT ReparseDataLength;
     USHORT Reserved;
-    union {
-	struct {
+    ಸಙ್ಘ {
+	ಸಂರಚನಾ {
 	    USHORT SubstituteNameOffset;
 	    USHORT SubstituteNameLength;
 	    USHORT PrintNameOffset;
@@ -159,19 +159,19 @@ typedef struct _REPARSE_DATA_BUFFER {
 	    ULONG  Flags;
 	    WCHAR  PathBuffer[1];
 	} SymbolicLinkReparseBuffer;
-	struct {
+	ಸಂರಚನಾ {
 	    USHORT SubstituteNameOffset;
 	    USHORT SubstituteNameLength;
 	    USHORT PrintNameOffset;
 	    USHORT PrintNameLength;
 	    WCHAR  PathBuffer[1];
 	} MountPointReparseBuffer;
-	struct {
+	ಸಂರಚನಾ {
 	    UCHAR DataBuffer[1];
 	} GenericReparseBuffer;
-	struct
+	ಸಂರಚನಾ
 	{
-	    ULONG StringCount;
+	    ULONG String_ಎಣಿಕೆ;
 	    WCHAR StringList[1];
 	} AppExecLinkReparseBuffer;
     } DUMMYUNIONNAME;
@@ -202,14 +202,14 @@ typedef struct _REPARSE_DATA_BUFFER {
 # define TRACE4(sz, p1, p2, p3, p4) Trace(_T(sz), p1, p2, p3, p4)
 
 // In debug version, writes trace messages to debug stream
-void __cdecl
-Trace(char *pszFormat, ...);
+ಶೂನ್ಯ __cdecl
+Trace(ವರ್ಣ *pszFormat, ...);
 
-#else // !_DEBUG
+#ಅನ್ಯಥಾ // !_DEBUG
 
   // These macros should all compile away to nothing
-# define ASSERT(f)		((void)0)
-# define TRACE			1 ? (void)0 : (void)printf
+# define ASSERT(f)		((ಶೂನ್ಯ)0)
+# define TRACE			1 ? (ಶೂನ್ಯ)0 : (ಶೂನ್ಯ)printf
 # define TRACE0(sz)
 # define TRACE1(sz, p1)
 # define TRACE2(sz, p1, p2)
@@ -220,15 +220,15 @@ Trace(char *pszFormat, ...);
 
 
 #define ASSERT_POINTER(p, type) \
-    ASSERT(((p) != NULL)  &&  IsValidAddress((p), sizeof(type), FALSE))
+    ASSERT(((p) != ರಿಕ್ತ)  &&  IsValidAddress((p), ಪರಿಮಾಣ(type), FALSE))
 
 #define ASSERT_NULL_OR_POINTER(p, type) \
-    ASSERT(((p) == NULL)  ||  IsValidAddress((p), sizeof(type), FALSE))
+    ASSERT(((p) == ರಿಕ್ತ)  ||  IsValidAddress((p), ಪರಿಮಾಣ(type), FALSE))
 
 #ifndef HAVE_SETENV
 # define HAVE_SETENV
 #endif
-#define mch_getenv(x) (char_u *)getenv((char *)(x))
+#define mch_getenv(x) (char_u *)getenv((ವರ್ಣ *)(x))
 #define vim_mkdir(x, y) mch_mkdir(x)
 
 // Windows Version
@@ -236,4 +236,4 @@ Trace(char *pszFormat, ...);
     (((major) << 24) | ((minor) << 16) | (build))
 
 // The Windows CRT does not declare strptime(); Vim provides it in strptime.c.
-char *strptime(const char *buf, const char *fmt, struct tm *tm);
+ವರ್ಣ *strptime(ಧ್ರುವ ವರ್ಣ *buf, ಧ್ರುವ ವರ್ಣ *fmt, ಸಂರಚನಾ tm *tm);

@@ -10,10 +10,10 @@
 /*
  * textobject.c: functions for text objects
  */
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-static int cls(void);
-static int skip_chars(int, int);
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ cls(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ skip_chars(ಪೂರ್ಣಾಙ್ಕ, ಪೂರ್ಣಾಙ್ಕ);
 
 /*
  * Find the start of the next sentence, searching in the direction specified
@@ -22,137 +22,137 @@ static int skip_chars(int, int);
  * otherwise.  See ":h sentence" for the precise definition of a "sentence"
  * text object.
  */
-    int
-findsent(int dir, long count)
+    ಪೂರ್ಣಾಙ್ಕ
+findsent(ಪೂರ್ಣಾಙ್ಕ dir, long ಎಣಿಕೆ)
 {
     pos_T	pos, tpos;
     pos_T	prev_pos;
-    int		c;
-    int		(*func)(pos_T *);
-    int		startlnum;
-    int		noskip = FALSE;	    // do not skip blanks
-    int		cpo_J;
-    int		found_dot;
+    ಪೂರ್ಣಾಙ್ಕ		c;
+    ಪೂರ್ಣಾಙ್ಕ		(*func)(pos_T *);
+    ಪೂರ್ಣಾಙ್ಕ		startlnum;
+    ಪೂರ್ಣಾಙ್ಕ		noskip = FALSE;	    // do not skip blanks
+    ಪೂರ್ಣಾಙ್ಕ		cpo_J;
+    ಪೂರ್ಣಾಙ್ಕ		found_dot;
 
     pos = curwin->w_cursor;
-    if (dir == FORWARD)
+    ಯದಿ (dir == FORWARD)
 	func = incl;
-    else
+    ಅನ್ಯಥಾ
 	func = decl;
 
-    while (count--)
+    ಯಾವತ್ (ಎಣಿಕೆ--)
     {
 	prev_pos = pos;
 
 	/*
 	 * if on an empty line, skip up to a non-empty line
 	 */
-	if (gchar_pos(&pos) == NUL)
+	ಯದಿ (gchar_pos(&pos) == NUL)
 	{
-	    do
-		if ((*func)(&pos) == -1)
-		    break;
-	    while (gchar_pos(&pos) == NUL);
-	    if (dir == FORWARD)
-		goto found;
+	    ಕುರು
+		ಯದಿ ((*func)(&pos) == -1)
+		    ಭಙ್ಗ;
+	    ಯಾವತ್ (gchar_pos(&pos) == NUL);
+	    ಯದಿ (dir == FORWARD)
+		ಗಚ್ಛ found;
 	}
 	/*
 	 * if on the start of a paragraph or a section and searching forward,
 	 * go to the next line
 	 */
-	else if (dir == FORWARD && pos.col == 0 &&
+	ಅನ್ಯಥಾ ಯದಿ (dir == FORWARD && pos.col == 0 &&
 						startPS(pos.lnum, NUL, FALSE))
 	{
-	    if (pos.lnum == curbuf->b_ml.ml_line_count)
-		return FAIL;
+	    ಯದಿ (pos.lnum == curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
+		ಪ್ರತ್ಯಾಗಮ FAIL;
 	    ++pos.lnum;
-	    goto found;
+	    ಗಚ್ಛ found;
 	}
-	else if (dir == BACKWARD)
+	ಅನ್ಯಥಾ ಯದಿ (dir == BACKWARD)
 	    decl(&pos);
 
 	// go back to the previous non-white non-punctuation character
 	found_dot = FALSE;
-	while (c = gchar_pos(&pos), VIM_ISWHITE(c)
-				|| vim_strchr((char_u *)".!?)]\"'", c) != NULL)
+	ಯಾವತ್ (c = gchar_pos(&pos), VIM_ISWHITE(c)
+				|| vim_strchr((char_u *)".!?)]\"'", c) != ರಿಕ್ತ)
 	{
 	    tpos = pos;
-	    if (decl(&tpos) == -1 || (LINEEMPTY(tpos.lnum) && dir == FORWARD))
-		break;
+	    ಯದಿ (decl(&tpos) == -1 || (LINEEMPTY(tpos.lnum) && dir == FORWARD))
+		ಭಙ್ಗ;
 
-	    if (found_dot)
-		break;
-	    if (vim_strchr((char_u *) ".!?", c) != NULL)
+	    ಯದಿ (found_dot)
+		ಭಙ್ಗ;
+	    ಯದಿ (vim_strchr((char_u *) ".!?", c) != ರಿಕ್ತ)
 		found_dot = TRUE;
 
-	    if (vim_strchr((char_u *) ")]\"'", c) != NULL
-		&& vim_strchr((char_u *) ".!?)]\"'", gchar_pos(&tpos)) == NULL)
-		break;
+	    ಯದಿ (vim_strchr((char_u *) ")]\"'", c) != ರಿಕ್ತ
+		&& vim_strchr((char_u *) ".!?)]\"'", gchar_pos(&tpos)) == ರಿಕ್ತ)
+		ಭಙ್ಗ;
 
 	    decl(&pos);
 	}
 
 	// remember the line where the search started
 	startlnum = pos.lnum;
-	cpo_J = vim_strchr(p_cpo, CPO_ENDOFSENT) != NULL;
+	cpo_J = vim_strchr(p_cpo, CPO_ENDOFSENT) != ರಿಕ್ತ;
 
-	for (;;)		// find end of sentence
+	ಪ್ರತಿ (;;)		// find end of sentence
 	{
 	    c = gchar_pos(&pos);
-	    if (c == NUL || (pos.col == 0 && startPS(pos.lnum, NUL, FALSE)))
+	    ಯದಿ (c == NUL || (pos.col == 0 && startPS(pos.lnum, NUL, FALSE)))
 	    {
-		if (dir == BACKWARD && pos.lnum != startlnum)
+		ಯದಿ (dir == BACKWARD && pos.lnum != startlnum)
 		    ++pos.lnum;
-		break;
+		ಭಙ್ಗ;
 	    }
-	    if (c == '.' || c == '!' || c == '?')
+	    ಯದಿ (c == '.' || c == '!' || c == '?')
 	    {
 		tpos = pos;
-		do
-		    if ((c = inc(&tpos)) == -1)
-			break;
-		while (vim_strchr((char_u *)")]\"'", c = gchar_pos(&tpos))
-			!= NULL);
-		if (c == -1  || (!cpo_J && (c == ' ' || c == '\t')) || c == NUL
+		ಕುರು
+		    ಯದಿ ((c = inc(&tpos)) == -1)
+			ಭಙ್ಗ;
+		ಯಾವತ್ (vim_strchr((char_u *)")]\"'", c = gchar_pos(&tpos))
+			!= ರಿಕ್ತ);
+		ಯದಿ (c == -1  || (!cpo_J && (c == ' ' || c == '\t')) || c == NUL
 		    || (cpo_J && (c == ' ' && inc(&tpos) >= 0
 			      && gchar_pos(&tpos) == ' ')))
 		{
 		    pos = tpos;
-		    if (gchar_pos(&pos) == NUL) // skip NUL at EOL
+		    ಯದಿ (gchar_pos(&pos) == NUL) // skip NUL at EOL
 			inc(&pos);
-		    break;
+		    ಭಙ್ಗ;
 		}
 	    }
-	    if ((*func)(&pos) == -1)
+	    ಯದಿ ((*func)(&pos) == -1)
 	    {
-		if (count)
-		    return FAIL;
+		ಯದಿ (ಎಣಿಕೆ)
+		    ಪ್ರತ್ಯಾಗಮ FAIL;
 		noskip = TRUE;
-		break;
+		ಭಙ್ಗ;
 	    }
 	}
 found:
 	    // skip white space
-	while (!noskip && ((c = gchar_pos(&pos)) == ' ' || c == '\t'))
-	    if (incl(&pos) == -1)
-		break;
+	ಯಾವತ್ (!noskip && ((c = gchar_pos(&pos)) == ' ' || c == '\t'))
+	    ಯದಿ (incl(&pos) == -1)
+		ಭಙ್ಗ;
 
-	if (EQUAL_POS(prev_pos, pos))
+	ಯದಿ (EQUAL_POS(prev_pos, pos))
 	{
 	    // didn't actually move, advance one character and try again
-	    if ((*func)(&pos) == -1)
+	    ಯದಿ ((*func)(&pos) == -1)
 	    {
-		if (count)
-		    return FAIL;
-		break;
+		ಯದಿ (ಎಣಿಕೆ)
+		    ಪ್ರತ್ಯಾಗಮ FAIL;
+		ಭಙ್ಗ;
 	    }
-	    ++count;
+	    ++ಎಣಿಕೆ;
 	}
     }
 
     setpcmark();
     curwin->w_cursor = pos;
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
@@ -163,39 +163,39 @@ found:
  * If 'both' is TRUE also stop at '}'.
  * Return TRUE if the next paragraph or section was found.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 findpar(
-    int		*pincl,	    // Return: TRUE if last char is to be included
-    int		dir,
-    long	count,
-    int		what,
-    int		both)
+    ಪೂರ್ಣಾಙ್ಕ		*pincl,	    // Return: TRUE if last char is to be included
+    ಪೂರ್ಣಾಙ್ಕ		dir,
+    long	ಎಣಿಕೆ,
+    ಪೂರ್ಣಾಙ್ಕ		what,
+    ಪೂರ್ಣಾಙ್ಕ		both)
 {
     linenr_T	curr;
-    int		did_skip;   // TRUE after separating lines have been skipped
-    int		first;	    // TRUE on first line
-    int		posix = (vim_strchr(p_cpo, CPO_PARA) != NULL);
+    ಪೂರ್ಣಾಙ್ಕ		did_skip;   // TRUE after separating lines have been skipped
+    ಪೂರ್ಣಾಙ್ಕ		first;	    // TRUE on first line
+    ಪೂರ್ಣಾಙ್ಕ		posix = (vim_strchr(p_cpo, CPO_PARA) != ರಿಕ್ತ);
 #ifdef FEAT_FOLDING
     linenr_T	fold_first;	// first line of a closed fold
     linenr_T	fold_last;	// last line of a closed fold
-    int		fold_skipped;	// TRUE if a closed fold was skipped this
+    ಪೂರ್ಣಾಙ್ಕ		fold_skipped;	// TRUE if a closed fold was skipped this
 				// iteration
 #endif
 
     curr = curwin->w_cursor.lnum;
 
-    while (count--)
+    ಯಾವತ್ (ಎಣಿಕೆ--)
     {
 	did_skip = FALSE;
-	for (first = TRUE; ; first = FALSE)
+	ಪ್ರತಿ (first = TRUE; ; first = FALSE)
 	{
-	    if (*ml_get(curr) != NUL)
+	    ಯದಿ (*ml_get(curr) != NUL)
 		did_skip = TRUE;
 
 #ifdef FEAT_FOLDING
 	    // skip folded lines
 	    fold_skipped = FALSE;
-	    if (first && hasFolding(curr, &fold_first, &fold_last))
+	    ಯದಿ (first && hasFolding(curr, &fold_first, &fold_last))
 	    {
 		curr = ((dir > 0) ? fold_last : fold_first) + dir;
 		fold_skipped = TRUE;
@@ -205,71 +205,71 @@ findpar(
 	    // POSIX has its own ideas of what a paragraph boundary is and it
 	    // doesn't match historical Vi: It also stops at a "{" in the
 	    // first column and at an empty line.
-	    if (!first && did_skip && (startPS(curr, what, both)
+	    ಯದಿ (!first && did_skip && (startPS(curr, what, both)
 			   || (posix && what == NUL && *ml_get(curr) == '{')))
-		break;
+		ಭಙ್ಗ;
 
 #ifdef FEAT_FOLDING
-	    if (fold_skipped)
+	    ಯದಿ (fold_skipped)
 		curr -= dir;
 #endif
-	    if ((curr += dir) < 1 || curr > curbuf->b_ml.ml_line_count)
+	    ಯದಿ ((curr += dir) < 1 || curr > curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
 	    {
-		if (count)
-		    return FALSE;
+		ಯದಿ (ಎಣಿಕೆ)
+		    ಪ್ರತ್ಯಾಗಮ FALSE;
 		curr -= dir;
-		break;
+		ಭಙ್ಗ;
 	    }
 	}
     }
     setpcmark();
-    if (both && *ml_get(curr) == '}')	// include line with '}'
+    ಯದಿ (both && *ml_get(curr) == '}')	// include line with '}'
 	++curr;
     curwin->w_cursor.lnum = curr;
-    if (curr == curbuf->b_ml.ml_line_count && what != '}' && dir == FORWARD)
+    ಯದಿ (curr == curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ && what != '}' && dir == FORWARD)
     {
-	char_u *line = ml_get(curr);
+	char_u *ಸಾಲು = ml_get(curr);
 
 	// Put the cursor on the last character in the last line and make the
 	// motion inclusive.
-	if ((curwin->w_cursor.col = ml_get_len(curr)) != 0)
+	ಯದಿ ((curwin->w_cursor.col = ml_get_len(curr)) != 0)
 	{
 	    --curwin->w_cursor.col;
 	    curwin->w_cursor.col -=
-			     (*mb_head_off)(line, line + curwin->w_cursor.col);
+			     (*mb_head_off)(ಸಾಲು, ಸಾಲು + curwin->w_cursor.col);
 	    *pincl = TRUE;
 	}
     }
-    else
+    ಅನ್ಯಥಾ
 	curwin->w_cursor.col = 0;
-    return TRUE;
+    ಪ್ರತ್ಯಾಗಮ TRUE;
 }
 
 /*
  * check if the string 's' is a nroff macro that is in option 'opt'
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
 inmacro(char_u *opt, char_u *s)
 {
     char_u	*macro;
 
-    for (macro = opt; macro[0]; ++macro)
+    ಪ್ರತಿ (macro = opt; macro[0]; ++macro)
     {
 	// Accept two characters in the option being equal to two characters
 	// in the line.  A space in the option matches with a space in the
 	// line or the line having ended.
-	if (       (macro[0] == s[0]
+	ಯದಿ (       (macro[0] == s[0]
 		    || (macro[0] == ' '
 			&& (s[0] == NUL || s[0] == ' ')))
 		&& (macro[1] == s[1]
 		    || ((macro[1] == NUL || macro[1] == ' ')
 			&& (s[0] == NUL || s[1] == NUL || s[1] == ' '))))
-	    break;
+	    ಭಙ್ಗ;
 	++macro;
-	if (macro[0] == NUL)
-	    break;
+	ಯದಿ (macro[0] == NUL)
+	    ಭಙ್ಗ;
     }
-    return (macro[0] != NUL);
+    ಪ್ರತ್ಯಾಗಮ (macro[0] != NUL);
 }
 
 /*
@@ -277,18 +277,18 @@ inmacro(char_u *opt, char_u *s)
  * If 'para' is '{' or '}' only check for sections.
  * If 'both' is TRUE also stop at '}'
  */
-    int
-startPS(linenr_T lnum, int para, int both)
+    ಪೂರ್ಣಾಙ್ಕ
+startPS(linenr_T lnum, ಪೂರ್ಣಾಙ್ಕ para, ಪೂರ್ಣಾಙ್ಕ both)
 {
     char_u	*s;
 
     s = ml_get(lnum);
-    if (*s == para || *s == '\f' || (both && *s == '}'))
-	return TRUE;
-    if (*s == '.' && (inmacro(p_sections, s + 1) ||
+    ಯದಿ (*s == para || *s == '\f' || (both && *s == '}'))
+	ಪ್ರತ್ಯಾಗಮ TRUE;
+    ಯದಿ (*s == '.' && (inmacro(p_sections, s + 1) ||
 					   (!para && inmacro(p_para, s + 1))))
-	return TRUE;
-    return FALSE;
+	ಪ್ರತ್ಯಾಗಮ TRUE;
+    ಪ್ರತ್ಯಾಗಮ FALSE;
 }
 
 /*
@@ -307,7 +307,7 @@ startPS(linenr_T lnum, int para, int both)
  * 2 or higher - keyword characters (letters, digits and underscore)
  */
 
-static int	cls_bigword;	// TRUE for "W", "B" or "E"
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ	cls_bigword;	// TRUE for "W", "B" or "E"
 
 /*
  * cls() - returns the class of character at curwin->w_cursor
@@ -316,38 +316,38 @@ static int	cls_bigword;	// TRUE for "W", "B" or "E"
  * from class 2 and higher are reported as class 1 since only white space
  * boundaries are of interest.
  */
-    static int
-cls(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+cls(ಶೂನ್ಯ)
 {
-    int	    c;
+    ಪೂರ್ಣಾಙ್ಕ	    c;
 
     c = gchar_cursor();
-    if (c == ' ' || c == '\t' || c == NUL)
-	return 0;
-    if (enc_dbcs != 0 && c > 0xFF)
+    ಯದಿ (c == ' ' || c == '\t' || c == NUL)
+	ಪ್ರತ್ಯಾಗಮ 0;
+    ಯದಿ (enc_dbcs != 0 && c > 0xFF)
     {
 	// If cls_bigword, report multi-byte chars as class 1.
-	if (enc_dbcs == DBCS_KOR && cls_bigword)
-	    return 1;
+	ಯದಿ (enc_dbcs == DBCS_KOR && cls_bigword)
+	    ಪ್ರತ್ಯಾಗಮ 1;
 
 	// process code leading/trailing bytes
-	return dbcs_class(((unsigned)c >> 8), (c & 0xFF));
+	ಪ್ರತ್ಯಾಗಮ dbcs_class(((unsigned)c >> 8), (c & 0xFF));
     }
-    if (enc_utf8)
+    ಯದಿ (enc_utf8)
     {
 	c = utf_class(c);
-	if (c != 0 && cls_bigword)
-	    return 1;
-	return c;
+	ಯದಿ (c != 0 && cls_bigword)
+	    ಪ್ರತ್ಯಾಗಮ 1;
+	ಪ್ರತ್ಯಾಗಮ c;
     }
 
     // If cls_bigword is TRUE, report all non-blanks as class 1.
-    if (cls_bigword)
-	return 1;
+    ಯದಿ (cls_bigword)
+	ಪ್ರತ್ಯಾಗಮ 1;
 
-    if (vim_iswordc(c))
-	return 2;
-    return 1;
+    ಯದಿ (vim_iswordc(c))
+	ಪ್ರತ್ಯಾಗಮ 2;
+    ಪ್ರತ್ಯಾಗಮ 1;
 }
 
 
@@ -357,24 +357,24 @@ cls(void)
  * Returns FAIL if the cursor was already at the end of the file.
  * If eol is TRUE, last word stops at end of line (for operators).
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 fwd_word(
-    long	count,
-    int		bigword,    // "W", "E" or "B"
-    int		eol)
+    long	ಎಣಿಕೆ,
+    ಪೂರ್ಣಾಙ್ಕ		bigword,    // "W", "E" or "B"
+    ಪೂರ್ಣಾಙ್ಕ		eol)
 {
-    int		sclass;	    // starting class
-    int		i;
-    int		last_line;
+    ಪೂರ್ಣಾಙ್ಕ		sclass;	    // starting class
+    ಪೂರ್ಣಾಙ್ಕ		i;
+    ಪೂರ್ಣಾಙ್ಕ		last_ಸಾಲು;
 
     curwin->w_cursor.coladd = 0;
     cls_bigword = bigword;
-    while (--count >= 0)
+    ಯಾವತ್ (--ಎಣಿಕೆ >= 0)
     {
 #ifdef FEAT_FOLDING
 	// When inside a range of folded lines, move to the last char of the
 	// last line.
-	if (hasFolding(curwin->w_cursor.lnum, NULL, &curwin->w_cursor.lnum))
+	ಯದಿ (hasFolding(curwin->w_cursor.lnum, ರಿಕ್ತ, &curwin->w_cursor.lnum))
 	    coladvance((colnr_T)MAXCOL);
 #endif
 	sclass = cls();
@@ -383,41 +383,41 @@ fwd_word(
 	 * We always move at least one character, unless on the last
 	 * character in the buffer.
 	 */
-	last_line = (curwin->w_cursor.lnum == curbuf->b_ml.ml_line_count);
+	last_ಸಾಲು = (curwin->w_cursor.lnum == curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ);
 	i = inc_cursor();
-	if (i == -1 || (i >= 1 && last_line)) // started at last char in file
-	    return FAIL;
-	if (i >= 1 && eol && count == 0)      // started at last char in line
-	    return OK;
+	ಯದಿ (i == -1 || (i >= 1 && last_ಸಾಲು)) // started at last char in file
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
+	ಯದಿ (i >= 1 && eol && ಎಣಿಕೆ == 0)      // started at last char in line
+	    ಪ್ರತ್ಯಾಗಮ OK;
 
 	/*
 	 * Go one char past end of current word (if any)
 	 */
-	if (sclass != 0)
-	    while (cls() == sclass)
+	ಯದಿ (sclass != 0)
+	    ಯಾವತ್ (cls() == sclass)
 	    {
 		i = inc_cursor();
-		if (i == -1 || (i >= 1 && eol && count == 0))
-		    return OK;
+		ಯದಿ (i == -1 || (i >= 1 && eol && ಎಣಿಕೆ == 0))
+		    ಪ್ರತ್ಯಾಗಮ OK;
 	    }
 
 	/*
 	 * go to next non-white
 	 */
-	while (cls() == 0)
+	ಯಾವತ್ (cls() == 0)
 	{
 	    /*
 	     * We'll stop if we land on a blank line
 	     */
-	    if (curwin->w_cursor.col == 0 && *ml_get_curline() == NUL)
-		break;
+	    ಯದಿ (curwin->w_cursor.col == 0 && *ml_get_curline() == NUL)
+		ಭಙ್ಗ;
 
 	    i = inc_cursor();
-	    if (i == -1 || (i >= 1 && eol && count == 0))
-		return OK;
+	    ಯದಿ (i == -1 || (i >= 1 && eol && ಎಣಿಕೆ == 0))
+		ಪ್ರತ್ಯಾಗಮ OK;
 	}
     }
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
@@ -427,45 +427,45 @@ fwd_word(
  *
  * Returns FAIL if top of the file was reached.
  */
-    int
-bck_word(long count, int bigword, int stop)
+    ಪೂರ್ಣಾಙ್ಕ
+bck_word(long ಎಣಿಕೆ, ಪೂರ್ಣಾಙ್ಕ bigword, ಪೂರ್ಣಾಙ್ಕ stop)
 {
-    int		sclass;	    // starting class
+    ಪೂರ್ಣಾಙ್ಕ		sclass;	    // starting class
 
     curwin->w_cursor.coladd = 0;
     cls_bigword = bigword;
-    while (--count >= 0)
+    ಯಾವತ್ (--ಎಣಿಕೆ >= 0)
     {
 #ifdef FEAT_FOLDING
 	// When inside a range of folded lines, move to the first char of the
 	// first line.
-	if (hasFolding(curwin->w_cursor.lnum, &curwin->w_cursor.lnum, NULL))
+	ಯದಿ (hasFolding(curwin->w_cursor.lnum, &curwin->w_cursor.lnum, ರಿಕ್ತ))
 	    curwin->w_cursor.col = 0;
 #endif
 	sclass = cls();
-	if (dec_cursor() == -1)		// started at start of file
-	    return FAIL;
+	ಯದಿ (dec_cursor() == -1)		// started at start of file
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
 
-	if (!stop || sclass == cls() || sclass == 0)
+	ಯದಿ (!stop || sclass == cls() || sclass == 0)
 	{
 	    /*
 	     * Skip white space before the word.
 	     * Stop on an empty line.
 	     */
-	    while (cls() == 0)
+	    ಯಾವತ್ (cls() == 0)
 	    {
-		if (curwin->w_cursor.col == 0
+		ಯದಿ (curwin->w_cursor.col == 0
 				      && LINEEMPTY(curwin->w_cursor.lnum))
-		    goto finished;
-		if (dec_cursor() == -1) // hit start of file, stop here
-		    return OK;
+		    ಗಚ್ಛ finished;
+		ಯದಿ (dec_cursor() == -1) // hit start of file, stop here
+		    ಪ್ರತ್ಯಾಗಮ OK;
 	    }
 
 	    /*
 	     * Move backward to start of this word.
 	     */
-	    if (skip_chars(cls(), BACKWARD))
-		return OK;
+	    ಯದಿ (skip_chars(cls(), BACKWARD))
+		ಪ್ರತ್ಯಾಗಮ OK;
 	}
 
 	inc_cursor();			// overshot - forward one
@@ -473,7 +473,7 @@ finished:
 	stop = FALSE;
     }
     adjust_skipcol();
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
@@ -491,73 +491,73 @@ finished:
  * If stop is TRUE and we are already on the end of a word, move one less.
  * If empty is TRUE stop on an empty line.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 end_word(
-    long	count,
-    int		bigword,
-    int		stop,
-    int		empty)
+    long	ಎಣಿಕೆ,
+    ಪೂರ್ಣಾಙ್ಕ		bigword,
+    ಪೂರ್ಣಾಙ್ಕ		stop,
+    ಪೂರ್ಣಾಙ್ಕ		empty)
 {
-    int		sclass;	    // starting class
+    ಪೂರ್ಣಾಙ್ಕ		sclass;	    // starting class
 
     curwin->w_cursor.coladd = 0;
     cls_bigword = bigword;
 
     // If adjusted cursor position previously, unadjust it.
-    if (*p_sel == 'e' && VIsual_active && VIsual_mode == 'v'
+    ಯದಿ (*p_sel == 'e' && VIsual_active && VIsual_mode == 'v'
 		&& VIsual_select_exclu_adj)
 	unadjust_for_sel();
 
-    while (--count >= 0)
+    ಯಾವತ್ (--ಎಣಿಕೆ >= 0)
     {
 #ifdef FEAT_FOLDING
 	// When inside a range of folded lines, move to the last char of the
 	// last line.
-	if (hasFolding(curwin->w_cursor.lnum, NULL, &curwin->w_cursor.lnum))
+	ಯದಿ (hasFolding(curwin->w_cursor.lnum, ರಿಕ್ತ, &curwin->w_cursor.lnum))
 	    coladvance((colnr_T)MAXCOL);
 #endif
 	sclass = cls();
-	if (inc_cursor() == -1)
-	    return FAIL;
+	ಯದಿ (inc_cursor() == -1)
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
 
 	/*
 	 * If we're in the middle of a word, we just have to move to the end
 	 * of it.
 	 */
-	if (cls() == sclass && sclass != 0)
+	ಯದಿ (cls() == sclass && sclass != 0)
 	{
 	    /*
 	     * Move forward to end of the current word
 	     */
-	    if (skip_chars(sclass, FORWARD))
-		return FAIL;
+	    ಯದಿ (skip_chars(sclass, FORWARD))
+		ಪ್ರತ್ಯಾಗಮ FAIL;
 	}
-	else if (!stop || sclass == 0)
+	ಅನ್ಯಥಾ ಯದಿ (!stop || sclass == 0)
 	{
 	    /*
 	     * We were at the end of a word. Go to the end of the next word.
 	     * First skip white space, if 'empty' is TRUE, stop at empty line.
 	     */
-	    while (cls() == 0)
+	    ಯಾವತ್ (cls() == 0)
 	    {
-		if (empty && curwin->w_cursor.col == 0
+		ಯದಿ (empty && curwin->w_cursor.col == 0
 					  && LINEEMPTY(curwin->w_cursor.lnum))
-		    goto finished;
-		if (inc_cursor() == -1)	    // hit end of file, stop here
-		    return FAIL;
+		    ಗಚ್ಛ finished;
+		ಯದಿ (inc_cursor() == -1)	    // hit end of file, stop here
+		    ಪ್ರತ್ಯಾಗಮ FAIL;
 	    }
 
 	    /*
 	     * Move forward to the end of this word.
 	     */
-	    if (skip_chars(cls(), FORWARD))
-		return FAIL;
+	    ಯದಿ (skip_chars(cls(), FORWARD))
+		ಪ್ರತ್ಯಾಗಮ FAIL;
 	}
 	dec_cursor();			// overshot - one char backward
 finished:
 	stop = FALSE;			// we move only one word less
     }
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
@@ -565,97 +565,97 @@ finished:
  *
  * Returns FAIL if start of the file was reached.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 bckend_word(
-    long	count,
-    int		bigword,    // TRUE for "B"
-    int		eol)	    // TRUE: stop at end of line.
+    long	ಎಣಿಕೆ,
+    ಪೂರ್ಣಾಙ್ಕ		bigword,    // TRUE for "B"
+    ಪೂರ್ಣಾಙ್ಕ		eol)	    // TRUE: stop at end of line.
 {
-    int		sclass;	    // starting class
-    int		i;
+    ಪೂರ್ಣಾಙ್ಕ		sclass;	    // starting class
+    ಪೂರ್ಣಾಙ್ಕ		i;
 
     curwin->w_cursor.coladd = 0;
     cls_bigword = bigword;
-    while (--count >= 0)
+    ಯಾವತ್ (--ಎಣಿಕೆ >= 0)
     {
 	sclass = cls();
-	if ((i = dec_cursor()) == -1)
-	    return FAIL;
-	if (eol && i == 1)
-	    return OK;
+	ಯದಿ ((i = dec_cursor()) == -1)
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
+	ಯದಿ (eol && i == 1)
+	    ಪ್ರತ್ಯಾಗಮ OK;
 
 	/*
 	 * Move backward to before the start of this word.
 	 */
-	if (sclass != 0)
+	ಯದಿ (sclass != 0)
 	{
-	    while (cls() == sclass)
-		if ((i = dec_cursor()) == -1 || (eol && i == 1))
-		    return OK;
+	    ಯಾವತ್ (cls() == sclass)
+		ಯದಿ ((i = dec_cursor()) == -1 || (eol && i == 1))
+		    ಪ್ರತ್ಯಾಗಮ OK;
 	}
 
 	/*
 	 * Move backward to end of the previous word
 	 */
-	while (cls() == 0)
+	ಯಾವತ್ (cls() == 0)
 	{
-	    if (curwin->w_cursor.col == 0 && LINEEMPTY(curwin->w_cursor.lnum))
-		break;
-	    if ((i = dec_cursor()) == -1 || (eol && i == 1))
-		return OK;
+	    ಯದಿ (curwin->w_cursor.col == 0 && LINEEMPTY(curwin->w_cursor.lnum))
+		ಭಙ್ಗ;
+	    ಯದಿ ((i = dec_cursor()) == -1 || (eol && i == 1))
+		ಪ್ರತ್ಯಾಗಮ OK;
 	}
     }
     adjust_skipcol();
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Skip a row of characters of the same class.
  * Return TRUE when end-of-file reached, FALSE otherwise.
  */
-    static int
-skip_chars(int cclass, int dir)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+skip_chars(ಪೂರ್ಣಾಙ್ಕ cclass, ಪೂರ್ಣಾಙ್ಕ dir)
 {
-    while (cls() == cclass)
-	if ((dir == FORWARD ? inc_cursor() : dec_cursor()) == -1)
-	    return TRUE;
-    return FALSE;
+    ಯಾವತ್ (cls() == cclass)
+	ಯದಿ ((dir == FORWARD ? inc_cursor() : dec_cursor()) == -1)
+	    ಪ್ರತ್ಯಾಗಮ TRUE;
+    ಪ್ರತ್ಯಾಗಮ FALSE;
 }
 
 /*
  * Go back to the start of the word or the start of white space
  */
-    static void
-back_in_line(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+back_in_ಸಾಲು(ಶೂನ್ಯ)
 {
-    int		sclass;		    // starting class
+    ಪೂರ್ಣಾಙ್ಕ		sclass;		    // starting class
 
     sclass = cls();
-    for (;;)
+    ಪ್ರತಿ (;;)
     {
-	if (curwin->w_cursor.col == 0)	    // stop at start of line
-	    break;
+	ಯದಿ (curwin->w_cursor.col == 0)	    // stop at start of line
+	    ಭಙ್ಗ;
 	dec_cursor();
-	if (cls() != sclass)		    // stop at start of word
+	ಯದಿ (cls() != sclass)		    // stop at start of word
 	{
 	    inc_cursor();
-	    break;
+	    ಭಙ್ಗ;
 	}
     }
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 find_first_blank(pos_T *posp)
 {
-    int	    c;
+    ಪೂರ್ಣಾಙ್ಕ	    c;
 
-    while (decl(posp) != -1)
+    ಯಾವತ್ (decl(posp) != -1)
     {
 	c = gchar_pos(posp);
-	if (!VIM_ISWHITE(c))
+	ಯದಿ (!VIM_ISWHITE(c))
 	{
 	    incl(posp);
-	    break;
+	    ಭಙ್ಗ;
 	}
     }
 }
@@ -663,17 +663,17 @@ find_first_blank(pos_T *posp)
 /*
  * Skip count/2 sentences and count/2 separating white spaces.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 findsent_forward(
-    long    count,
-    int	    at_start_sent)	// cursor is at start of sentence
+    long    ಎಣಿಕೆ,
+    ಪೂರ್ಣಾಙ್ಕ	    at_start_sent)	// cursor is at start of sentence
 {
-    while (count--)
+    ಯಾವತ್ (ಎಣಿಕೆ--)
     {
 	findsent(FORWARD, 1L);
-	if (at_start_sent)
+	ಯದಿ (at_start_sent)
 	    find_first_blank(&curwin->w_cursor);
-	if (count == 0 || at_start_sent)
+	ಯದಿ (ಎಣಿಕೆ == 0 || at_start_sent)
 	    decl(&curwin->w_cursor);
 	at_start_sent = !at_start_sent;
     }
@@ -683,35 +683,35 @@ findsent_forward(
  * Find word under cursor, cursor at end.
  * Used while an operator is pending, and in Visual mode.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 current_word(
     oparg_T	*oap,
-    long	count,
-    int		include,	// TRUE: include word and white space
-    int		bigword)	// FALSE == word, TRUE == WORD
+    long	ಎಣಿಕೆ,
+    ಪೂರ್ಣಾಙ್ಕ		include,	// TRUE: include word and white space
+    ಪೂರ್ಣಾಙ್ಕ		bigword)	// FALSE == word, TRUE == WORD
 {
     pos_T	start_pos;
     pos_T	pos;
-    int		inclusive = TRUE;
-    int		include_white = FALSE;
+    ಪೂರ್ಣಾಙ್ಕ		inclusive = TRUE;
+    ಪೂರ್ಣಾಙ್ಕ		include_white = FALSE;
 
     cls_bigword = bigword;
     CLEAR_POS(&start_pos);
 
     // Correct cursor when 'selection' is exclusive
-    if (VIsual_active && *p_sel == 'e' && LT_POS(VIsual, curwin->w_cursor))
+    ಯದಿ (VIsual_active && *p_sel == 'e' && LT_POS(VIsual, curwin->w_cursor))
 	dec_cursor();
 
     /*
      * When Visual mode is not active, or when the VIsual area is only one
      * character, select the word and/or white space under the cursor.
      */
-    if (!VIsual_active || EQUAL_POS(curwin->w_cursor, VIsual))
+    ಯದಿ (!VIsual_active || EQUAL_POS(curwin->w_cursor, VIsual))
     {
 	/*
 	 * Go to start of current word or white space.
 	 */
-	back_in_line();
+	back_in_ಸಾಲು();
 	start_pos = curwin->w_cursor;
 
 	/*
@@ -719,12 +719,12 @@ current_word(
 	 * ("	word"), or start is not on white space, and white space should
 	 * not be included ("word"), find end of word.
 	 */
-	if ((cls() == 0) == include)
+	ಯದಿ ((cls() == 0) == include)
 	{
-	    if (end_word(1L, bigword, TRUE, TRUE) == FAIL)
-		return FAIL;
+	    ಯದಿ (end_word(1L, bigword, TRUE, TRUE) == FAIL)
+		ಪ್ರತ್ಯಾಗಮ FAIL;
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
 	    /*
 	     * If the start is not on white space, and white space should be
@@ -734,83 +734,83 @@ current_word(
 	     * word) back up to end of the line.
 	     */
 	    fwd_word(1L, bigword, TRUE);
-	    if (curwin->w_cursor.col == 0)
+	    ಯದಿ (curwin->w_cursor.col == 0)
 		decl(&curwin->w_cursor);
-	    else
+	    ಅನ್ಯಥಾ
 		oneleft();
 
-	    if (include)
+	    ಯದಿ (include)
 		include_white = TRUE;
 	}
 
-	if (VIsual_active)
+	ಯದಿ (VIsual_active)
 	{
 	    // should do something when inclusive == FALSE !
 	    VIsual = start_pos;
 	    redraw_curbuf_later(UPD_INVERTED);	// update the inversion
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
 	    oap->start = start_pos;
 	    oap->motion_type = MCHAR;
 	}
-	--count;
+	--ಎಣಿಕೆ;
     }
 
     /*
      * When count is still > 0, extend with more objects.
      */
-    while (count > 0)
+    ಯಾವತ್ (ಎಣಿಕೆ > 0)
     {
 	inclusive = TRUE;
-	if (VIsual_active && LT_POS(curwin->w_cursor, VIsual))
+	ಯದಿ (VIsual_active && LT_POS(curwin->w_cursor, VIsual))
 	{
 	    /*
 	     * In Visual mode, with cursor at start: move cursor back.
 	     */
-	    if (decl(&curwin->w_cursor) == -1)
-		return FAIL;
-	    if (include != (cls() != 0))
+	    ಯದಿ (decl(&curwin->w_cursor) == -1)
+		ಪ್ರತ್ಯಾಗಮ FAIL;
+	    ಯದಿ (include != (cls() != 0))
 	    {
-		if (bck_word(1L, bigword, TRUE) == FAIL)
-		    return FAIL;
+		ಯದಿ (bck_word(1L, bigword, TRUE) == FAIL)
+		    ಪ್ರತ್ಯಾಗಮ FAIL;
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 	    {
-		if (bckend_word(1L, bigword, TRUE) == FAIL)
-		    return FAIL;
-		(void)incl(&curwin->w_cursor);
+		ಯದಿ (bckend_word(1L, bigword, TRUE) == FAIL)
+		    ಪ್ರತ್ಯಾಗಮ FAIL;
+		(ಶೂನ್ಯ)incl(&curwin->w_cursor);
 	    }
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
 	    /*
 	     * Move cursor forward one word and/or white area.
 	     */
-	    if (incl(&curwin->w_cursor) == -1)
-		return FAIL;
-	    if (include != (cls() == 0))
+	    ಯದಿ (incl(&curwin->w_cursor) == -1)
+		ಪ್ರತ್ಯಾಗಮ FAIL;
+	    ಯದಿ (include != (cls() == 0))
 	    {
-		if (fwd_word(1L, bigword, TRUE) == FAIL && count > 1)
-		    return FAIL;
+		ಯದಿ (fwd_word(1L, bigword, TRUE) == FAIL && ಎಣಿಕೆ > 1)
+		    ಪ್ರತ್ಯಾಗಮ FAIL;
 		/*
 		 * If end is just past a new-line, we don't want to include
 		 * the first character on the line.
 		 * Put cursor on last char of white.
 		 */
-		if (oneleft() == FAIL)
+		ಯದಿ (oneleft() == FAIL)
 		    inclusive = FALSE;
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 	    {
-		if (end_word(1L, bigword, TRUE, TRUE) == FAIL)
-		    return FAIL;
+		ಯದಿ (end_word(1L, bigword, TRUE, TRUE) == FAIL)
+		    ಪ್ರತ್ಯಾಗಮ FAIL;
 	    }
 	}
-	--count;
+	--ಎಣಿಕೆ;
     }
 
-    if (include_white && (cls() != 0
+    ಯದಿ (include_white && (cls() != 0
 		 || (curwin->w_cursor.col == 0 && !inclusive)))
     {
 	/*
@@ -823,48 +823,48 @@ current_word(
 	 */
 	pos = curwin->w_cursor;	// save cursor position
 	curwin->w_cursor = start_pos;
-	if (oneleft() == OK)
+	ಯದಿ (oneleft() == OK)
 	{
-	    back_in_line();
-	    if (cls() == 0 && curwin->w_cursor.col > 0)
+	    back_in_ಸಾಲು();
+	    ಯದಿ (cls() == 0 && curwin->w_cursor.col > 0)
 	    {
-		if (VIsual_active)
+		ಯದಿ (VIsual_active)
 		    VIsual = curwin->w_cursor;
-		else
+		ಅನ್ಯಥಾ
 		    oap->start = curwin->w_cursor;
 	    }
 	}
 	curwin->w_cursor = pos;	// put cursor back at end
     }
 
-    if (VIsual_active)
+    ಯದಿ (VIsual_active)
     {
-	if (*p_sel == 'e' && inclusive && LTOREQ_POS(VIsual, curwin->w_cursor))
+	ಯದಿ (*p_sel == 'e' && inclusive && LTOREQ_POS(VIsual, curwin->w_cursor))
 	    inc_cursor();
-	if (VIsual_mode == 'V')
+	ಯದಿ (VIsual_mode == 'V')
 	{
 	    VIsual_mode = 'v';
 	    redraw_cmdline = TRUE;		// show mode later
 	}
     }
-    else
+    ಅನ್ಯಥಾ
 	oap->inclusive = inclusive;
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Find sentence(s) under the cursor, cursor at end.
  * When Visual active, extend it by one or more sentences.
  */
-    int
-current_sent(oparg_T *oap, long count, int include)
+    ಪೂರ್ಣಾಙ್ಕ
+current_sent(oparg_T *oap, long ಎಣಿಕೆ, ಪೂರ್ಣಾಙ್ಕ include)
 {
     pos_T	start_pos;
     pos_T	pos;
-    int		start_blank;
-    int		c;
-    int		at_start_sent;
+    ಪೂರ್ಣಾಙ್ಕ		start_blank;
+    ಪೂರ್ಣಾಙ್ಕ		c;
+    ಪೂರ್ಣಾಙ್ಕ		at_start_sent;
     long	ncount;
 
     start_pos = curwin->w_cursor;
@@ -874,10 +874,10 @@ current_sent(oparg_T *oap, long count, int include)
     /*
      * When the Visual area is bigger than one character: Extend it.
      */
-    if (VIsual_active && !EQUAL_POS(start_pos, VIsual))
+    ಯದಿ (VIsual_active && !EQUAL_POS(start_pos, VIsual))
     {
 extend:
-	if (LT_POS(start_pos, VIsual))
+	ಯದಿ (LT_POS(start_pos, VIsual))
 	{
 	    /*
 	     * Cursor at start of Visual area.
@@ -888,38 +888,38 @@ extend:
 	     */
 	    at_start_sent = TRUE;
 	    decl(&pos);
-	    while (LT_POS(pos, curwin->w_cursor))
+	    ಯಾವತ್ (LT_POS(pos, curwin->w_cursor))
 	    {
 		c = gchar_pos(&pos);
-		if (!VIM_ISWHITE(c))
+		ಯದಿ (!VIM_ISWHITE(c))
 		{
 		    at_start_sent = FALSE;
-		    break;
+		    ಭಙ್ಗ;
 		}
 		incl(&pos);
 	    }
-	    if (!at_start_sent)
+	    ಯದಿ (!at_start_sent)
 	    {
 		findsent(BACKWARD, 1L);
-		if (EQUAL_POS(curwin->w_cursor, start_pos))
+		ಯದಿ (EQUAL_POS(curwin->w_cursor, start_pos))
 		    at_start_sent = TRUE;  // exactly at start of sentence
-		else
+		ಅನ್ಯಥಾ
 		    // inside a sentence, go to its end (start of next)
 		    findsent(FORWARD, 1L);
 	    }
-	    if (include)	// "as" gets twice as much as "is"
-		count *= 2;
-	    while (count--)
+	    ಯದಿ (include)	// "as" gets twice as much as "is"
+		ಎಣಿಕೆ *= 2;
+	    ಯಾವತ್ (ಎಣಿಕೆ--)
 	    {
-		if (at_start_sent)
+		ಯದಿ (at_start_sent)
 		    find_first_blank(&curwin->w_cursor);
 		c = gchar_cursor();
-		if (!at_start_sent || (!include && !VIM_ISWHITE(c)))
+		ಯದಿ (!at_start_sent || (!include && !VIM_ISWHITE(c)))
 		    findsent(BACKWARD, 1L);
 		at_start_sent = !at_start_sent;
 	    }
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
 	    /*
 	     * Cursor at end of Visual area.
@@ -931,126 +931,126 @@ extend:
 	    incl(&pos);
 	    at_start_sent = TRUE;
 	    // not just before a sentence
-	    if (!EQUAL_POS(pos, curwin->w_cursor))
+	    ಯದಿ (!EQUAL_POS(pos, curwin->w_cursor))
 	    {
 		at_start_sent = FALSE;
-		while (LT_POS(pos, curwin->w_cursor))
+		ಯಾವತ್ (LT_POS(pos, curwin->w_cursor))
 		{
 		    c = gchar_pos(&pos);
-		    if (!VIM_ISWHITE(c))
+		    ಯದಿ (!VIM_ISWHITE(c))
 		    {
 			at_start_sent = TRUE;
-			break;
+			ಭಙ್ಗ;
 		    }
 		    incl(&pos);
 		}
-		if (at_start_sent)	// in the sentence
+		ಯದಿ (at_start_sent)	// in the sentence
 		    findsent(BACKWARD, 1L);
-		else		// in/before white before a sentence
+		ಅನ್ಯಥಾ		// in/before white before a sentence
 		    curwin->w_cursor = start_pos;
 	    }
 
-	    if (include)	// "as" gets twice as much as "is"
-		count *= 2;
-	    findsent_forward(count, at_start_sent);
-	    if (*p_sel == 'e')
+	    ಯದಿ (include)	// "as" gets twice as much as "is"
+		ಎಣಿಕೆ *= 2;
+	    findsent_forward(ಎಣಿಕೆ, at_start_sent);
+	    ಯದಿ (*p_sel == 'e')
 		++curwin->w_cursor.col;
 	}
-	return OK;
+	ಪ್ರತ್ಯಾಗಮ OK;
     }
 
     /*
      * If the cursor started on a blank, check if it is just before the start
      * of the next sentence.
      */
-    while (c = gchar_pos(&pos), VIM_ISWHITE(c))	// VIM_ISWHITE() is a macro
+    ಯಾವತ್ (c = gchar_pos(&pos), VIM_ISWHITE(c))	// VIM_ISWHITE() is a macro
 	incl(&pos);
-    if (EQUAL_POS(pos, curwin->w_cursor))
+    ಯದಿ (EQUAL_POS(pos, curwin->w_cursor))
     {
 	start_blank = TRUE;
 	find_first_blank(&start_pos);	// go back to first blank
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	start_blank = FALSE;
 	findsent(BACKWARD, 1L);
 	start_pos = curwin->w_cursor;
     }
-    if (include)
-	ncount = count * 2;
-    else
+    ಯದಿ (include)
+	ncount = ಎಣಿಕೆ * 2;
+    ಅನ್ಯಥಾ
     {
-	ncount = count;
-	if (start_blank)
+	ncount = ಎಣಿಕೆ;
+	ಯದಿ (start_blank)
 	    --ncount;
     }
-    if (ncount > 0)
+    ಯದಿ (ncount > 0)
 	findsent_forward(ncount, TRUE);
-    else
+    ಅನ್ಯಥಾ
 	decl(&curwin->w_cursor);
 
-    if (include)
+    ಯದಿ (include)
     {
 	/*
 	 * If the blank in front of the sentence is included, exclude the
 	 * blanks at the end of the sentence, go back to the first blank.
 	 * If there are no trailing blanks, try to include leading blanks.
 	 */
-	if (start_blank)
+	ಯದಿ (start_blank)
 	{
 	    find_first_blank(&curwin->w_cursor);
 	    c = gchar_pos(&curwin->w_cursor);	// VIM_ISWHITE() is a macro
-	    if (VIM_ISWHITE(c))
+	    ಯದಿ (VIM_ISWHITE(c))
 		decl(&curwin->w_cursor);
 	}
-	else if (c = gchar_cursor(), !VIM_ISWHITE(c))
+	ಅನ್ಯಥಾ ಯದಿ (c = gchar_cursor(), !VIM_ISWHITE(c))
 	    find_first_blank(&start_pos);
     }
 
-    if (VIsual_active)
+    ಯದಿ (VIsual_active)
     {
 	// Avoid getting stuck with "is" on a single space before a sentence.
-	if (EQUAL_POS(start_pos, curwin->w_cursor))
-	    goto extend;
-	if (*p_sel == 'e')
+	ಯದಿ (EQUAL_POS(start_pos, curwin->w_cursor))
+	    ಗಚ್ಛ extend;
+	ಯದಿ (*p_sel == 'e')
 	    ++curwin->w_cursor.col;
 	VIsual = start_pos;
 	VIsual_mode = 'v';
 	redraw_cmdline = TRUE;		// show mode later
 	redraw_curbuf_later(UPD_INVERTED);	// update the inversion
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	// include a newline after the sentence, if there is one
-	if (incl(&curwin->w_cursor) == -1)
+	ಯದಿ (incl(&curwin->w_cursor) == -1)
 	    oap->inclusive = TRUE;
-	else
+	ಅನ್ಯಥಾ
 	    oap->inclusive = FALSE;
 	oap->start = start_pos;
 	oap->motion_type = MCHAR;
     }
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Find block under the cursor, cursor at end.
  * "what" and "other" are two matching parenthesis/brace/etc.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 current_block(
     oparg_T	*oap,
-    long	count,
-    int		include,	// TRUE == include white space
-    int		what,		// '(', '{', etc.
-    int		other)		// ')', '}', etc.
+    long	ಎಣಿಕೆ,
+    ಪೂರ್ಣಾಙ್ಕ		include,	// TRUE == include white space
+    ಪೂರ್ಣಾಙ್ಕ		what,		// '(', '{', etc.
+    ಪೂರ್ಣಾಙ್ಕ		other)		// ')', '}', etc.
 {
     pos_T	old_pos;
-    pos_T	*pos = NULL;
+    pos_T	*pos = ರಿಕ್ತ;
     pos_T	start_pos;
     pos_T	*end_pos;
     pos_T	old_start, old_end;
     char_u	*save_cpo;
-    int		sol = FALSE;		// '{' at start of line
+    ಪೂರ್ಣಾಙ್ಕ		sol = FALSE;		// '{' at start of line
 
     old_pos = curwin->w_cursor;
     old_end = curwin->w_cursor;		// remember where we started
@@ -1059,23 +1059,23 @@ current_block(
     /*
      * If we start on '(', '{', ')', '}', etc., use the whole block inclusive.
      */
-    if (!VIsual_active || EQUAL_POS(VIsual, curwin->w_cursor))
+    ಯದಿ (!VIsual_active || EQUAL_POS(VIsual, curwin->w_cursor))
     {
 	setpcmark();
-	if (what == '{')		// ignore indent
-	    while (inindent(1))
-		if (inc_cursor() != 0)
-		    break;
-	if (gchar_cursor() == what)
+	ಯದಿ (what == '{')		// ignore indent
+	    ಯಾವತ್ (inindent(1))
+		ಯದಿ (inc_cursor() != 0)
+		    ಭಙ್ಗ;
+	ಯದಿ (gchar_cursor() == what)
 	    // cursor on '(' or '{', move cursor just after it
 	    ++curwin->w_cursor.col;
     }
-    else if (LT_POS(VIsual, curwin->w_cursor))
+    ಅನ್ಯಥಾ ಯದಿ (LT_POS(VIsual, curwin->w_cursor))
     {
 	old_start = VIsual;
 	curwin->w_cursor = VIsual;	    // cursor at low end of Visual
     }
-    else
+    ಅನ್ಯಥಾ
 	old_end = VIsual;
 
     /*
@@ -1085,23 +1085,23 @@ current_block(
      * user wants.
      */
     save_cpo = p_cpo;
-    p_cpo = (char_u *)(vim_strchr(p_cpo, CPO_MATCHBSL) != NULL ? "%M" : "%");
-    if ((pos = findmatch(NULL, what)) != NULL)
+    p_cpo = (char_u *)(vim_strchr(p_cpo, CPO_MATCHBSL) != ರಿಕ್ತ ? "%M" : "%");
+    ಯದಿ ((pos = findmatch(ರಿಕ್ತ, what)) != ರಿಕ್ತ)
     {
-	while (count-- > 0)
+	ಯಾವತ್ (ಎಣಿಕೆ-- > 0)
 	{
-	    if ((pos = findmatch(NULL, what)) == NULL)
-		break;
+	    ಯದಿ ((pos = findmatch(ರಿಕ್ತ, what)) == ರಿಕ್ತ)
+		ಭಙ್ಗ;
 	    curwin->w_cursor = *pos;
 	    start_pos = *pos;   // the findmatch for end_pos will overwrite *pos
 	}
     }
-    else
+    ಅನ್ಯಥಾ
     {
-	while (count-- > 0)
+	ಯಾವತ್ (ಎಣಿಕೆ-- > 0)
 	{
-	    if ((pos = findmatchlimit(NULL, what, FM_FORWARD, 0)) == NULL)
-		break;
+	    ಯದಿ ((pos = findmatchlimit(ರಿಕ್ತ, what, FM_FORWARD, 0)) == ರಿಕ್ತ)
+		ಭಙ್ಗ;
 	    curwin->w_cursor = *pos;
 	    start_pos = *pos;   // the findmatch for end_pos will overwrite *pos
 	}
@@ -1112,10 +1112,10 @@ current_block(
      * Search for matching ')', '}', etc.
      * Put this position in curwin->w_cursor.
      */
-    if (pos == NULL || (end_pos = findmatch(NULL, other)) == NULL)
+    ಯದಿ (pos == ರಿಕ್ತ || (end_pos = findmatch(ರಿಕ್ತ, other)) == ರಿಕ್ತ)
     {
 	curwin->w_cursor = old_pos;
-	return FAIL;
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     }
     curwin->w_cursor = *end_pos;
 
@@ -1125,26 +1125,26 @@ current_block(
      * indent.  But only if the resulting area is not smaller than what we
      * started with.
      */
-    while (!include)
+    ಯಾವತ್ (!include)
     {
 	incl(&start_pos);
 	sol = (curwin->w_cursor.col == 0);
 	decl(&curwin->w_cursor);
-	while (inindent(1))
+	ಯಾವತ್ (inindent(1))
 	{
 	    sol = TRUE;
-	    if (decl(&curwin->w_cursor) != 0)
-		break;
+	    ಯದಿ (decl(&curwin->w_cursor) != 0)
+		ಭಙ್ಗ;
 	}
 
 	/*
 	 * In Visual mode, when resulting area is empty
 	 * i.e. there is no inner block to select, abort.
 	 */
-	if (EQUAL_POS(start_pos, *end_pos) && VIsual_active)
+	ಯದಿ (EQUAL_POS(start_pos, *end_pos) && VIsual_active)
 	{
 	    curwin->w_cursor = old_pos;
-	    return FAIL;
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
 	}
 
 	/*
@@ -1152,143 +1152,143 @@ current_block(
 	 * started with, extend it to the next block, and then exclude again.
 	 * Don't try to expand the area if the area is empty.
 	 */
-	if (!LT_POS(start_pos, old_start) && !LT_POS(old_end, curwin->w_cursor)
+	ಯದಿ (!LT_POS(start_pos, old_start) && !LT_POS(old_end, curwin->w_cursor)
 		&& !EQUAL_POS(start_pos, curwin->w_cursor)
 		&& VIsual_active)
 	{
 	    curwin->w_cursor = old_start;
 	    decl(&curwin->w_cursor);
-	    if ((pos = findmatch(NULL, what)) == NULL)
+	    ಯದಿ ((pos = findmatch(ರಿಕ್ತ, what)) == ರಿಕ್ತ)
 	    {
 		curwin->w_cursor = old_pos;
-		return FAIL;
+		ಪ್ರತ್ಯಾಗಮ FAIL;
 	    }
 	    start_pos = *pos;
 	    curwin->w_cursor = *pos;
-	    if ((end_pos = findmatch(NULL, other)) == NULL)
+	    ಯದಿ ((end_pos = findmatch(ರಿಕ್ತ, other)) == ರಿಕ್ತ)
 	    {
 		curwin->w_cursor = old_pos;
-		return FAIL;
+		ಪ್ರತ್ಯಾಗಮ FAIL;
 	    }
 	    curwin->w_cursor = *end_pos;
 	}
-	else
-	    break;
+	ಅನ್ಯಥಾ
+	    ಭಙ್ಗ;
     }
 
-    if (VIsual_active)
+    ಯದಿ (VIsual_active)
     {
-	if (*p_sel == 'e')
+	ಯದಿ (*p_sel == 'e')
 	    inc(&curwin->w_cursor);
-	if (sol && gchar_cursor() != NUL)
+	ಯದಿ (sol && gchar_cursor() != NUL)
 	    inc(&curwin->w_cursor);	// include the line break
 	VIsual = start_pos;
 	VIsual_mode = 'v';
 	redraw_curbuf_later(UPD_INVERTED);	// update the inversion
 	showmode();
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	oap->start = start_pos;
 	oap->motion_type = MCHAR;
 	oap->inclusive = FALSE;
-	if (sol)
+	ಯದಿ (sol)
 	    incl(&curwin->w_cursor);
-	else if (LTOREQ_POS(start_pos, curwin->w_cursor))
+	ಅನ್ಯಥಾ ಯದಿ (LTOREQ_POS(start_pos, curwin->w_cursor))
 	    // Include the character under the cursor.
 	    oap->inclusive = TRUE;
-	else
+	ಅನ್ಯಥಾ
 	    // End is before the start (no text in between <>, [], etc.): don't
 	    // operate on any text.
 	    curwin->w_cursor = start_pos;
     }
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
-#if defined(FEAT_EVAL)
+#ಯದಿ defined(FEAT_EVAL)
 /*
  * Return TRUE if the cursor is on a "<aaa>" tag.  Ignore "<aaa/>".
  * When "end_tag" is TRUE return TRUE if the cursor is on "</aaa>".
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
 in_html_tag(
-    int		end_tag)
+    ಪೂರ್ಣಾಙ್ಕ		end_tag)
 {
-    char_u	*line = ml_get_curline();
+    char_u	*ಸಾಲು = ml_get_curline();
     char_u	*p;
-    int		c;
-    int		lc = NUL;
+    ಪೂರ್ಣಾಙ್ಕ		c;
+    ಪೂರ್ಣಾಙ್ಕ		lc = NUL;
     pos_T	pos;
 
-    if (enc_dbcs)
+    ಯದಿ (enc_dbcs)
     {
-	char_u	*lp = NULL;
+	char_u	*lp = ರಿಕ್ತ;
 
 	// We search forward until the cursor, because searching backwards is
 	// very slow for DBCS encodings.
-	for (p = line; p < line + curwin->w_cursor.col; MB_PTR_ADV(p))
-	    if (*p == '>' || *p == '<')
+	ಪ್ರತಿ (p = ಸಾಲು; p < ಸಾಲು + curwin->w_cursor.col; MB_PTR_ADV(p))
+	    ಯದಿ (*p == '>' || *p == '<')
 	    {
 		lc = *p;
 		lp = p;
 	    }
-	if (*p != '<')	    // check for '<' under cursor
+	ಯದಿ (*p != '<')	    // check for '<' under cursor
 	{
-	    if (lc != '<')
-		return FALSE;
+	    ಯದಿ (lc != '<')
+		ಪ್ರತ್ಯಾಗಮ FALSE;
 	    p = lp;
 	}
     }
-    else
+    ಅನ್ಯಥಾ
     {
-	for (p = line + curwin->w_cursor.col; p > line; )
+	ಪ್ರತಿ (p = ಸಾಲು + curwin->w_cursor.col; p > ಸಾಲು; )
 	{
-	    if (*p == '<')	// find '<' under/before cursor
-		break;
-	    MB_PTR_BACK(line, p);
-	    if (*p == '>')	// find '>' before cursor
-		break;
+	    ಯದಿ (*p == '<')	// find '<' under/before cursor
+		ಭಙ್ಗ;
+	    MB_PTR_BACK(ಸಾಲು, p);
+	    ಯದಿ (*p == '>')	// find '>' before cursor
+		ಭಙ್ಗ;
 	}
-	if (*p != '<')
-	    return FALSE;
+	ಯದಿ (*p != '<')
+	    ಪ್ರತ್ಯಾಗಮ FALSE;
     }
 
     pos.lnum = curwin->w_cursor.lnum;
-    pos.col = (colnr_T)(p - line);
+    pos.col = (colnr_T)(p - ಸಾಲು);
 
     MB_PTR_ADV(p);
-    if (end_tag)
+    ಯದಿ (end_tag)
 	// check that there is a '/' after the '<'
-	return *p == '/';
+	ಪ್ರತ್ಯಾಗಮ *p == '/';
 
     // check that there is no '/' after the '<'
-    if (*p == '/')
-	return FALSE;
+    ಯದಿ (*p == '/')
+	ಪ್ರತ್ಯಾಗಮ FALSE;
 
     // check that the matching '>' is not preceded by '/'
-    for (;;)
+    ಪ್ರತಿ (;;)
     {
-	if (inc(&pos) < 0)
-	    return FALSE;
+	ಯದಿ (inc(&pos) < 0)
+	    ಪ್ರತ್ಯಾಗಮ FALSE;
 	c = *ml_get_pos(&pos);
-	if (c == '>')
-	    break;
+	ಯದಿ (c == '>')
+	    ಭಙ್ಗ;
 	lc = c;
     }
-    return lc != '/';
+    ಪ್ರತ್ಯಾಗಮ lc != '/';
 }
 
 /*
  * Find tag block under the cursor, cursor at end.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 current_tagblock(
     oparg_T	*oap,
-    long	count_arg,
-    int		include)	// TRUE == include white space
+    long	ಎಣಿಕೆ_arg,
+    ಪೂರ್ಣಾಙ್ಕ		include)	// TRUE == include white space
 {
-    long	count = count_arg;
+    long	ಎಣಿಕೆ = ಎಣಿಕೆ_arg;
     long	n;
     pos_T	old_pos;
     pos_T	start_pos;
@@ -1297,56 +1297,56 @@ current_tagblock(
     char_u	*spat, *epat;
     char_u	*p;
     char_u	*cp;
-    int		len;
-    int		r;
-    int		do_include = include;
-    int		save_p_ws = p_ws;
-    int		retval = FAIL;
-    int		is_inclusive = TRUE;
+    ಪೂರ್ಣಾಙ್ಕ		len;
+    ಪೂರ್ಣಾಙ್ಕ		r;
+    ಪೂರ್ಣಾಙ್ಕ		do_include = include;
+    ಪೂರ್ಣಾಙ್ಕ		save_p_ws = p_ws;
+    ಪೂರ್ಣಾಙ್ಕ		retval = FAIL;
+    ಪೂರ್ಣಾಙ್ಕ		is_inclusive = TRUE;
 
     p_ws = FALSE;
 
     old_pos = curwin->w_cursor;
     old_end = curwin->w_cursor;		    // remember where we started
     old_start = old_end;
-    if (!VIsual_active || *p_sel == 'e')
+    ಯದಿ (!VIsual_active || *p_sel == 'e')
 	decl(&old_end);			    // old_end is inclusive
 
     /*
      * If we start on "<aaa>" select that block.
      */
-    if (!VIsual_active || EQUAL_POS(VIsual, curwin->w_cursor))
+    ಯದಿ (!VIsual_active || EQUAL_POS(VIsual, curwin->w_cursor))
     {
 	setpcmark();
 
 	// ignore indent
-	while (inindent(1))
-	    if (inc_cursor() != 0)
-		break;
+	ಯಾವತ್ (inindent(1))
+	    ಯದಿ (inc_cursor() != 0)
+		ಭಙ್ಗ;
 
-	if (in_html_tag(FALSE))
+	ಯದಿ (in_html_tag(FALSE))
 	{
 	    // cursor on start tag, move to its '>'
-	    while (*ml_get_cursor() != '>')
-		if (inc_cursor() < 0)
-		    break;
+	    ಯಾವತ್ (*ml_get_cursor() != '>')
+		ಯದಿ (inc_cursor() < 0)
+		    ಭಙ್ಗ;
 	}
-	else if (in_html_tag(TRUE))
+	ಅನ್ಯಥಾ ಯದಿ (in_html_tag(TRUE))
 	{
 	    // cursor on end tag, move to just before it
-	    while (*ml_get_cursor() != '<')
-		if (dec_cursor() < 0)
-		    break;
+	    ಯಾವತ್ (*ml_get_cursor() != '<')
+		ಯದಿ (dec_cursor() < 0)
+		    ಭಙ್ಗ;
 	    dec_cursor();
 	    old_end = curwin->w_cursor;
 	}
     }
-    else if (LT_POS(VIsual, curwin->w_cursor))
+    ಅನ್ಯಥಾ ಯದಿ (LT_POS(VIsual, curwin->w_cursor))
     {
 	old_start = VIsual;
 	curwin->w_cursor = VIsual;	    // cursor at low end of Visual
     }
-    else
+    ಅನ್ಯಥಾ
 	old_end = VIsual;
 
 again:
@@ -1354,15 +1354,15 @@ again:
      * Search backwards for unclosed "<aaa>".
      * Put this position in start_pos.
      */
-    for (n = 0; n < count; ++n)
+    ಪ್ರತಿ (n = 0; n < ಎಣಿಕೆ; ++n)
     {
-	if (do_searchpair((char_u *)"<[^ \t>/!]\\+\\%(\\_s\\_[^>]\\{-}[^/]>\\|$\\|\\_s\\=>\\)",
+	ಯದಿ (do_searchpair((char_u *)"<[^ \t>/!]\\+\\%(\\_s\\_[^>]\\{-}[^/]>\\|$\\|\\_s\\=>\\)",
 		    (char_u *)"",
-		    (char_u *)"</[^>]*>", BACKWARD, NULL, 0,
-						  NULL, (linenr_T)0, 0L) <= 0)
+		    (char_u *)"</[^>]*>", BACKWARD, ರಿಕ್ತ, 0,
+						  ರಿಕ್ತ, (linenr_T)0, 0L) <= 0)
 	{
 	    curwin->w_cursor = old_pos;
-	    goto theend;
+	    ಗಚ್ಛ theend;
 	}
     }
     start_pos = curwin->w_cursor;
@@ -1372,223 +1372,223 @@ again:
      */
     inc_cursor();
     p = ml_get_cursor();
-    for (cp = p; *cp != NUL && *cp != '>' && !VIM_ISWHITE(*cp); MB_PTR_ADV(cp))
+    ಪ್ರತಿ (cp = p; *cp != NUL && *cp != '>' && !VIM_ISWHITE(*cp); MB_PTR_ADV(cp))
 	;
-    len = (int)(cp - p);
-    if (len == 0)
+    len = (ಪೂರ್ಣಾಙ್ಕ)(cp - p);
+    ಯದಿ (len == 0)
     {
 	curwin->w_cursor = old_pos;
-	goto theend;
+	ಗಚ್ಛ theend;
     }
     spat = alloc(len + 39);
     epat = alloc(len + 9);
-    if (spat == NULL || epat == NULL)
+    ಯದಿ (spat == ರಿಕ್ತ || epat == ರಿಕ್ತ)
     {
 	vim_free(spat);
 	vim_free(epat);
 	curwin->w_cursor = old_pos;
-	goto theend;
+	ಗಚ್ಛ theend;
     }
-    sprintf((char *)spat, "<%.*s\\>\\%%(\\_s\\_[^>]\\{-}\\_[^/]>\\|\\_s\\?>\\)\\c", len, p);
-    sprintf((char *)epat, "</%.*s>\\c", len, p);
+    sprintf((ವರ್ಣ *)spat, "<%.*s\\>\\%%(\\_s\\_[^>]\\{-}\\_[^/]>\\|\\_s\\?>\\)\\c", len, p);
+    sprintf((ವರ್ಣ *)epat, "</%.*s>\\c", len, p);
 
-    r = do_searchpair(spat, (char_u *)"", epat, FORWARD, NULL,
-						    0, NULL, (linenr_T)0, 0L);
+    r = do_searchpair(spat, (char_u *)"", epat, FORWARD, ರಿಕ್ತ,
+						    0, ರಿಕ್ತ, (linenr_T)0, 0L);
 
     vim_free(spat);
     vim_free(epat);
 
-    if (r < 1 || LT_POS(curwin->w_cursor, old_end))
+    ಯದಿ (r < 1 || LT_POS(curwin->w_cursor, old_end))
     {
 	// Can't find other end or it's before the previous end.  Could be a
 	// HTML tag that doesn't have a matching end.  Search backwards for
 	// another starting tag.
-	count = 1;
+	ಎಣಿಕೆ = 1;
 	curwin->w_cursor = start_pos;
-	goto again;
+	ಗಚ್ಛ again;
     }
 
-    if (do_include)
+    ಯದಿ (do_include)
     {
 	// Include up to the '>'.
-	while (*ml_get_cursor() != '>')
-	    if (inc_cursor() < 0)
-		break;
+	ಯಾವತ್ (*ml_get_cursor() != '>')
+	    ಯದಿ (inc_cursor() < 0)
+		ಭಙ್ಗ;
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	char_u *c = ml_get_cursor();
 
 	// Exclude the '<' of the end tag.
 	// If the closing tag is on new line, do not decrement cursor, but
 	// make operation exclusive, so that the linefeed will be selected
-	if (*c == '<' && !VIsual_active && curwin->w_cursor.col == 0)
+	ಯದಿ (*c == '<' && !VIsual_active && curwin->w_cursor.col == 0)
 	    // do not decrement cursor
 	    is_inclusive = FALSE;
-	else if (*c == '<')
+	ಅನ್ಯಥಾ ಯದಿ (*c == '<')
 	    dec_cursor();
     }
     end_pos = curwin->w_cursor;
 
-    if (!do_include)
+    ಯದಿ (!do_include)
     {
 	// Exclude the start tag,
 	// but skip over '>' if it appears in quotes
-	int in_quotes = FALSE;
+	ಪೂರ್ಣಾಙ್ಕ in_quotes = FALSE;
 	curwin->w_cursor = start_pos;
-	while (inc_cursor() >= 0)
+	ಯಾವತ್ (inc_cursor() >= 0)
 	{
 	    p = ml_get_cursor();
-	    if (*p == '>' && !in_quotes)
+	    ಯದಿ (*p == '>' && !in_quotes)
 	    {
 		inc_cursor();
 		start_pos = curwin->w_cursor;
-		break;
+		ಭಙ್ಗ;
 	    }
-	    else if (*p == '"' || *p == '\'')
+	    ಅನ್ಯಥಾ ಯದಿ (*p == '"' || *p == '\'')
 		in_quotes = !in_quotes;
 	}
 	curwin->w_cursor = end_pos;
 
 	// If we are in Visual mode and now have the same text as before set
 	// "do_include" and try again.
-	if (VIsual_active && EQUAL_POS(start_pos, old_start)
+	ಯದಿ (VIsual_active && EQUAL_POS(start_pos, old_start)
 						&& EQUAL_POS(end_pos, old_end))
 	{
 	    do_include = TRUE;
 	    curwin->w_cursor = old_start;
-	    count = count_arg;
-	    goto again;
+	    ಎಣಿಕೆ = ಎಣಿಕೆ_arg;
+	    ಗಚ್ಛ again;
 	}
     }
 
-    if (VIsual_active)
+    ಯದಿ (VIsual_active)
     {
 	// If the end is before the start there is no text between tags, select
 	// the char under the cursor.
-	if (LT_POS(end_pos, start_pos))
+	ಯದಿ (LT_POS(end_pos, start_pos))
 	    curwin->w_cursor = start_pos;
-	else if (*p_sel == 'e')
+	ಅನ್ಯಥಾ ಯದಿ (*p_sel == 'e')
 	    inc_cursor();
 	VIsual = start_pos;
 	VIsual_mode = 'v';
 	redraw_curbuf_later(UPD_INVERTED);	// update the inversion
 	showmode();
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	oap->start = start_pos;
 	oap->motion_type = MCHAR;
-	if (LT_POS(end_pos, start_pos))
+	ಯದಿ (LT_POS(end_pos, start_pos))
 	{
 	    // End is before the start: there is no text between tags; operate
 	    // on an empty area.
 	    curwin->w_cursor = start_pos;
 	    oap->inclusive = FALSE;
 	}
-	else
+	ಅನ್ಯಥಾ
 	    oap->inclusive = is_inclusive;
     }
     retval = OK;
 
 theend:
     p_ws = save_p_ws;
-    return retval;
+    ಪ್ರತ್ಯಾಗಮ retval;
 }
 #endif
 
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 current_par(
     oparg_T	*oap,
-    long	count,
-    int		include,	// TRUE == include white space
-    int		type)		// 'p' for paragraph, 'S' for section
+    long	ಎಣಿಕೆ,
+    ಪೂರ್ಣಾಙ್ಕ		include,	// TRUE == include white space
+    ಪೂರ್ಣಾಙ್ಕ		type)		// 'p' for paragraph, 'S' for section
 {
     linenr_T	start_lnum;
     linenr_T	end_lnum;
-    int		white_in_front;
-    int		dir;
-    int		start_is_white;
-    int		prev_start_is_white;
-    int		retval = OK;
-    int		do_white = FALSE;
-    int		t;
-    int		i;
+    ಪೂರ್ಣಾಙ್ಕ		white_in_front;
+    ಪೂರ್ಣಾಙ್ಕ		dir;
+    ಪೂರ್ಣಾಙ್ಕ		start_is_white;
+    ಪೂರ್ಣಾಙ್ಕ		prev_start_is_white;
+    ಪೂರ್ಣಾಙ್ಕ		retval = OK;
+    ಪೂರ್ಣಾಙ್ಕ		do_white = FALSE;
+    ಪೂರ್ಣಾಙ್ಕ		t;
+    ಪೂರ್ಣಾಙ್ಕ		i;
 
-    if (type == 'S')	    // not implemented yet
-	return FAIL;
+    ಯದಿ (type == 'S')	    // not implemented yet
+	ಪ್ರತ್ಯಾಗಮ FAIL;
 
     start_lnum = curwin->w_cursor.lnum;
 
     /*
      * When visual area is more than one line: extend it.
      */
-    if (VIsual_active && start_lnum != VIsual.lnum)
+    ಯದಿ (VIsual_active && start_lnum != VIsual.lnum)
     {
 extend:
-	if (start_lnum < VIsual.lnum)
+	ಯದಿ (start_lnum < VIsual.lnum)
 	    dir = BACKWARD;
-	else
+	ಅನ್ಯಥಾ
 	    dir = FORWARD;
-	for (i = count; --i >= 0; )
+	ಪ್ರತಿ (i = ಎಣಿಕೆ; --i >= 0; )
 	{
-	    if (start_lnum ==
-			   (dir == BACKWARD ? 1 : curbuf->b_ml.ml_line_count))
+	    ಯದಿ (start_lnum ==
+			   (dir == BACKWARD ? 1 : curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ))
 	    {
 		retval = FAIL;
-		break;
+		ಭಙ್ಗ;
 	    }
 
 	    prev_start_is_white = -1;
-	    for (t = 0; t < 2; ++t)
+	    ಪ್ರತಿ (t = 0; t < 2; ++t)
 	    {
 		start_lnum += dir;
 		start_is_white = linewhite(start_lnum);
-		if (prev_start_is_white == start_is_white)
+		ಯದಿ (prev_start_is_white == start_is_white)
 		{
 		    start_lnum -= dir;
-		    break;
+		    ಭಙ್ಗ;
 		}
-		for (;;)
+		ಪ್ರತಿ (;;)
 		{
-		    if (start_lnum == (dir == BACKWARD
-					    ? 1 : curbuf->b_ml.ml_line_count))
-			break;
-		    if (start_is_white != linewhite(start_lnum + dir)
+		    ಯದಿ (start_lnum == (dir == BACKWARD
+					    ? 1 : curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ))
+			ಭಙ್ಗ;
+		    ಯದಿ (start_is_white != linewhite(start_lnum + dir)
 			    || (!start_is_white
 				    && startPS(start_lnum + (dir > 0
 							     ? 1 : 0), 0, 0)))
-			break;
+			ಭಙ್ಗ;
 		    start_lnum += dir;
 		}
-		if (!include)
-		    break;
-		if (start_lnum == (dir == BACKWARD
-					    ? 1 : curbuf->b_ml.ml_line_count))
-		    break;
+		ಯದಿ (!include)
+		    ಭಙ್ಗ;
+		ಯದಿ (start_lnum == (dir == BACKWARD
+					    ? 1 : curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ))
+		    ಭಙ್ಗ;
 		prev_start_is_white = start_is_white;
 	    }
 	}
 	curwin->w_cursor.lnum = start_lnum;
 	curwin->w_cursor.col = 0;
-	return retval;
+	ಪ್ರತ್ಯಾಗಮ retval;
     }
 
     /*
      * First move back to the start_lnum of the paragraph or white lines
      */
     white_in_front = linewhite(start_lnum);
-    while (start_lnum > 1)
+    ಯಾವತ್ (start_lnum > 1)
     {
-	if (white_in_front)	    // stop at first white line
+	ಯದಿ (white_in_front)	    // stop at first white line
 	{
-	    if (!linewhite(start_lnum - 1))
-		break;
+	    ಯದಿ (!linewhite(start_lnum - 1))
+		ಭಙ್ಗ;
 	}
-	else		// stop at first non-white line of start of paragraph
+	ಅನ್ಯಥಾ		// stop at first non-white line of start of paragraph
 	{
-	    if (linewhite(start_lnum - 1) || startPS(start_lnum, 0, 0))
-		break;
+	    ಯದಿ (linewhite(start_lnum - 1) || startPS(start_lnum, 0, 0))
+		ಭಙ್ಗ;
 	}
 	--start_lnum;
     }
@@ -1597,41 +1597,41 @@ extend:
      * Move past the end of any white lines.
      */
     end_lnum = start_lnum;
-    while (end_lnum <= curbuf->b_ml.ml_line_count && linewhite(end_lnum))
+    ಯಾವತ್ (end_lnum <= curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ && linewhite(end_lnum))
 	++end_lnum;
 
     --end_lnum;
-    i = count;
-    if (!include && white_in_front)
+    i = ಎಣಿಕೆ;
+    ಯದಿ (!include && white_in_front)
 	--i;
-    while (i--)
+    ಯಾವತ್ (i--)
     {
-	if (end_lnum == curbuf->b_ml.ml_line_count)
-	    return FAIL;
+	ಯದಿ (end_lnum == curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
 
-	if (!include)
+	ಯದಿ (!include)
 	    do_white = linewhite(end_lnum + 1);
 
-	if (include || !do_white)
+	ಯದಿ (include || !do_white)
 	{
 	    ++end_lnum;
 	    /*
 	     * skip to end of paragraph
 	     */
-	    while (end_lnum < curbuf->b_ml.ml_line_count
+	    ಯಾವತ್ (end_lnum < curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ
 		    && !linewhite(end_lnum + 1)
 		    && !startPS(end_lnum + 1, 0, 0))
 		++end_lnum;
 	}
 
-	if (i == 0 && white_in_front && include)
-	    break;
+	ಯದಿ (i == 0 && white_in_front && include)
+	    ಭಙ್ಗ;
 
 	/*
 	 * skip to end of white lines after paragraph
 	 */
-	if (include || do_white)
-	    while (end_lnum < curbuf->b_ml.ml_line_count
+	ಯದಿ (include || do_white)
+	    ಯಾವತ್ (end_lnum < curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ
 						   && linewhite(end_lnum + 1))
 		++end_lnum;
     }
@@ -1640,17 +1640,17 @@ extend:
      * If there are no empty lines at the end, try to find some empty lines at
      * the start (unless that has been done already).
      */
-    if (!white_in_front && !linewhite(end_lnum) && include)
-	while (start_lnum > 1 && linewhite(start_lnum - 1))
+    ಯದಿ (!white_in_front && !linewhite(end_lnum) && include)
+	ಯಾವತ್ (start_lnum > 1 && linewhite(start_lnum - 1))
 	    --start_lnum;
 
-    if (VIsual_active)
+    ಯದಿ (VIsual_active)
     {
 	// Problem: when doing "Vipipip" nothing happens in a single white
 	// line, we get stuck there.  Trap this here.
-	if (VIsual_mode == 'V' && start_lnum == curwin->w_cursor.lnum)
-	    goto extend;
-	if (VIsual.lnum != start_lnum)
+	ಯದಿ (VIsual_mode == 'V' && start_lnum == curwin->w_cursor.lnum)
+	    ಗಚ್ಛ extend;
+	ಯದಿ (VIsual.lnum != start_lnum)
 	{
 	    VIsual.lnum = start_lnum;
 	    VIsual.col = 0;
@@ -1659,7 +1659,7 @@ extend:
 	redraw_curbuf_later(UPD_INVERTED);	// update the inversion
 	showmode();
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	oap->start.lnum = start_lnum;
 	oap->start.col = 0;
@@ -1668,7 +1668,7 @@ extend:
     curwin->w_cursor.lnum = end_lnum;
     curwin->w_cursor.col = 0;
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
@@ -1677,34 +1677,34 @@ extend:
  * as a quote.
  * Returns column number of "quotechar" or -1 when not found.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
 find_next_quote(
-    char_u	*line,
-    int		col,
-    int		quotechar,
+    char_u	*ಸಾಲು,
+    ಪೂರ್ಣಾಙ್ಕ		col,
+    ಪೂರ್ಣಾಙ್ಕ		quotechar,
     char_u	*escape)	// escape characters, can be NULL
 {
-    int		c;
+    ಪೂರ್ಣಾಙ್ಕ		c;
 
-    for (;;)
+    ಪ್ರತಿ (;;)
     {
-	c = line[col];
-	if (c == NUL)
-	    return -1;
-	else if (escape != NULL && vim_strchr(escape, c))
+	c = ಸಾಲು[col];
+	ಯದಿ (c == NUL)
+	    ಪ್ರತ್ಯಾಗಮ -1;
+	ಅನ್ಯಥಾ ಯದಿ (escape != ರಿಕ್ತ && vim_strchr(escape, c))
 	{
 	    ++col;
-	    if (line[col] == NUL)
-		return -1;
+	    ಯದಿ (ಸಾಲು[col] == NUL)
+		ಪ್ರತ್ಯಾಗಮ -1;
 	}
-	else if (c == quotechar)
-	    break;
-	if (has_mbyte)
-	    col += (*mb_ptr2len)(line + col);
-	else
+	ಅನ್ಯಥಾ ಯದಿ (c == quotechar)
+	    ಭಙ್ಗ;
+	ಯದಿ (has_mbyte)
+	    col += (*mb_ptr2len)(ಸಾಲು + col);
+	ಅನ್ಯಥಾ
 	    ++col;
     }
-    return col;
+    ಪ್ರತ್ಯಾಗಮ col;
 }
 
 /*
@@ -1713,80 +1713,80 @@ find_next_quote(
  * as a quote.
  * Return the found column or zero.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
 find_prev_quote(
-    char_u	*line,
-    int		col_start,
-    int		quotechar,
+    char_u	*ಸಾಲು,
+    ಪೂರ್ಣಾಙ್ಕ		col_start,
+    ಪೂರ್ಣಾಙ್ಕ		quotechar,
     char_u	*escape)	// escape characters, can be NULL
 {
-    int		n;
+    ಪೂರ್ಣಾಙ್ಕ		n;
 
-    while (col_start > 0)
+    ಯಾವತ್ (col_start > 0)
     {
 	--col_start;
-	col_start -= (*mb_head_off)(line, line + col_start);
+	col_start -= (*mb_head_off)(ಸಾಲು, ಸಾಲು + col_start);
 	n = 0;
-	if (escape != NULL)
-	    while (col_start - n > 0 && vim_strchr(escape,
-					     line[col_start - n - 1]) != NULL)
+	ಯದಿ (escape != ರಿಕ್ತ)
+	    ಯಾವತ್ (col_start - n > 0 && vim_strchr(escape,
+					     ಸಾಲು[col_start - n - 1]) != ರಿಕ್ತ)
 	    ++n;
-	if (n & 1)
+	ಯದಿ (n & 1)
 	    col_start -= n;	// uneven number of escape chars, skip it
-	else if (line[col_start] == quotechar)
-	    break;
+	ಅನ್ಯಥಾ ಯದಿ (ಸಾಲು[col_start] == quotechar)
+	    ಭಙ್ಗ;
     }
-    return col_start;
+    ಪ್ರತ್ಯಾಗಮ col_start;
 }
 
 /*
  * Find quote under the cursor, cursor at end.
  * Returns TRUE if found, else FALSE.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 current_quote(
     oparg_T	*oap,
-    long	count,
-    int		include,	// TRUE == include quote char
-    int		quotechar)	// Quote character
+    long	ಎಣಿಕೆ,
+    ಪೂರ್ಣಾಙ್ಕ		include,	// TRUE == include quote char
+    ಪೂರ್ಣಾಙ್ಕ		quotechar)	// Quote character
 {
-    char_u	*line = ml_get_curline();
-    int		col_end;
-    int		col_start = curwin->w_cursor.col;
-    int		inclusive = FALSE;
-    int		vis_empty = TRUE;	// Visual selection <= 1 char
-    int		vis_bef_curs = FALSE;	// Visual starts before cursor
-    int		did_exclusive_adj = FALSE;  // adjusted pos for 'selection'
-    int		inside_quotes = FALSE;	// Looks like "i'" done before
-    int		selected_quote = FALSE;	// Has quote inside selection
-    int		i;
-    int		restore_vis_bef = FALSE; // restore VIsual on abort
+    char_u	*ಸಾಲು = ml_get_curline();
+    ಪೂರ್ಣಾಙ್ಕ		col_end;
+    ಪೂರ್ಣಾಙ್ಕ		col_start = curwin->w_cursor.col;
+    ಪೂರ್ಣಾಙ್ಕ		inclusive = FALSE;
+    ಪೂರ್ಣಾಙ್ಕ		vis_empty = TRUE;	// Visual selection <= 1 char
+    ಪೂರ್ಣಾಙ್ಕ		vis_bef_curs = FALSE;	// Visual starts before cursor
+    ಪೂರ್ಣಾಙ್ಕ		did_exclusive_adj = FALSE;  // adjusted pos for 'selection'
+    ಪೂರ್ಣಾಙ್ಕ		inside_quotes = FALSE;	// Looks like "i'" done before
+    ಪೂರ್ಣಾಙ್ಕ		selected_quote = FALSE;	// Has quote inside selection
+    ಪೂರ್ಣಾಙ್ಕ		i;
+    ಪೂರ್ಣಾಙ್ಕ		restore_vis_bef = FALSE; // restore VIsual on abort
 
     // When 'selection' is "exclusive" move the cursor to where it would be
     // with 'selection' "inclusive", so that the logic is the same for both.
     // The cursor then is moved forward after adjusting the area.
-    if (VIsual_active)
+    ಯದಿ (VIsual_active)
     {
 	// this only works within one line
-	if (VIsual.lnum != curwin->w_cursor.lnum)
-	    return FALSE;
+	ಯದಿ (VIsual.lnum != curwin->w_cursor.lnum)
+	    ಪ್ರತ್ಯಾಗಮ FALSE;
 
 	vis_bef_curs = LT_POS(VIsual, curwin->w_cursor);
 	vis_empty = EQUAL_POS(VIsual, curwin->w_cursor);
-	if (*p_sel == 'e')
+	ಯದಿ (*p_sel == 'e')
 	{
-	    if (vis_bef_curs)
+	    ಯದಿ (vis_bef_curs)
 	    {
 		dec_cursor();
 		did_exclusive_adj = TRUE;
 	    }
-	    else if (!vis_empty)
+	    ಅನ್ಯಥಾ ಯದಿ (!vis_empty)
 	    {
 		dec(&VIsual);
 		did_exclusive_adj = TRUE;
 	    }
 	    vis_empty = EQUAL_POS(VIsual, curwin->w_cursor);
-	    if (!vis_bef_curs && !vis_empty)
+	    ಯದಿ (!vis_bef_curs && !vis_empty)
 	    {
 		// VIsual needs to be the start of Visual selection.
 		pos_T t = curwin->w_cursor;
@@ -1799,72 +1799,72 @@ current_quote(
 	}
     }
 
-    if (!vis_empty)
+    ಯದಿ (!vis_empty)
     {
 	// Check if the existing selection exactly spans the text inside
 	// quotes.
-	if (vis_bef_curs)
+	ಯದಿ (vis_bef_curs)
 	{
 	    inside_quotes = VIsual.col > 0
-			&& line[VIsual.col - 1] == quotechar
-			&& line[curwin->w_cursor.col] != NUL
-			&& line[curwin->w_cursor.col + 1] == quotechar;
+			&& ಸಾಲು[VIsual.col - 1] == quotechar
+			&& ಸಾಲು[curwin->w_cursor.col] != NUL
+			&& ಸಾಲು[curwin->w_cursor.col + 1] == quotechar;
 	    i = VIsual.col;
 	    col_end = curwin->w_cursor.col;
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
 	    inside_quotes = curwin->w_cursor.col > 0
-			&& line[curwin->w_cursor.col - 1] == quotechar
-			&& line[VIsual.col] != NUL
-			&& line[VIsual.col + 1] == quotechar;
+			&& ಸಾಲು[curwin->w_cursor.col - 1] == quotechar
+			&& ಸಾಲು[VIsual.col] != NUL
+			&& ಸಾಲು[VIsual.col + 1] == quotechar;
 	    i = curwin->w_cursor.col;
 	    col_end = VIsual.col;
 	}
 
 	// Find out if we have a quote in the selection.
-	while (i <= col_end)
+	ಯಾವತ್ (i <= col_end)
 	{
 	    // check for going over the end of the line, which can happen if
 	    // the line was changed after the Visual area was selected.
-	    if (line[i] == NUL)
-		break;
-	    if (line[i++] == quotechar)
+	    ಯದಿ (ಸಾಲು[i] == NUL)
+		ಭಙ್ಗ;
+	    ಯದಿ (ಸಾಲು[i++] == quotechar)
 	    {
 		selected_quote = TRUE;
-		break;
+		ಭಙ್ಗ;
 	    }
 	}
     }
 
-    if (!vis_empty && line[col_start] == quotechar)
+    ಯದಿ (!vis_empty && ಸಾಲು[col_start] == quotechar)
     {
 	// Already selecting something and on a quote character.  Find the
 	// next quoted string.
-	if (vis_bef_curs)
+	ಯದಿ (vis_bef_curs)
 	{
 	    // Assume we are on a closing quote: move to after the next
 	    // opening quote.
-	    col_start = find_next_quote(line, col_start + 1, quotechar, NULL);
-	    if (col_start < 0)
-		goto abort_search;
-	    col_end = find_next_quote(line, col_start + 1, quotechar,
+	    col_start = find_next_quote(ಸಾಲು, col_start + 1, quotechar, ರಿಕ್ತ);
+	    ಯದಿ (col_start < 0)
+		ಗಚ್ಛ abort_ಹುಡುಕು;
+	    col_end = find_next_quote(ಸಾಲು, col_start + 1, quotechar,
 							      curbuf->b_p_qe);
-	    if (col_end < 0)
+	    ಯದಿ (col_end < 0)
 	    {
 		// We were on a starting quote perhaps?
 		col_end = col_start;
 		col_start = curwin->w_cursor.col;
 	    }
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
-	    col_end = find_prev_quote(line, col_start, quotechar, NULL);
-	    if (line[col_end] != quotechar)
-		goto abort_search;
-	    col_start = find_prev_quote(line, col_end, quotechar,
+	    col_end = find_prev_quote(ಸಾಲು, col_start, quotechar, ರಿಕ್ತ);
+	    ಯದಿ (ಸಾಲು[col_end] != quotechar)
+		ಗಚ್ಛ abort_ಹುಡುಕು;
+	    col_start = find_prev_quote(ಸಾಲು, col_end, quotechar,
 							      curbuf->b_p_qe);
-	    if (line[col_start] != quotechar)
+	    ಯದಿ (ಸಾಲು[col_start] != quotechar)
 	    {
 		// We were on an ending quote perhaps?
 		col_start = col_end;
@@ -1872,18 +1872,18 @@ current_quote(
 	    }
 	}
     }
-    else
+    ಅನ್ಯಥಾ
 
-    if (line[col_start] == quotechar || !vis_empty)
+    ಯದಿ (ಸಾಲು[col_start] == quotechar || !vis_empty)
     {
-	int	first_col = col_start;
+	ಪೂರ್ಣಾಙ್ಕ	first_col = col_start;
 
-	if (!vis_empty)
+	ಯದಿ (!vis_empty)
 	{
-	    if (vis_bef_curs)
-		first_col = find_next_quote(line, col_start, quotechar, NULL);
-	    else
-		first_col = find_prev_quote(line, col_start, quotechar, NULL);
+	    ಯದಿ (vis_bef_curs)
+		first_col = find_next_quote(ಸಾಲು, col_start, quotechar, ರಿಕ್ತ);
+	    ಅನ್ಯಥಾ
+		first_col = find_prev_quote(ಸಾಲು, col_start, quotechar, ರಿಕ್ತ);
 	}
 
 	// The cursor is on a quote, we don't know if it's the opening or
@@ -1891,78 +1891,78 @@ current_quote(
 	// Also do this when there is a Visual area, a' may leave the cursor
 	// in between two strings.
 	col_start = 0;
-	for (;;)
+	ಪ್ರತಿ (;;)
 	{
 	    // Find open quote character.
-	    col_start = find_next_quote(line, col_start, quotechar, NULL);
-	    if (col_start < 0 || col_start > first_col)
-		goto abort_search;
+	    col_start = find_next_quote(ಸಾಲು, col_start, quotechar, ರಿಕ್ತ);
+	    ಯದಿ (col_start < 0 || col_start > first_col)
+		ಗಚ್ಛ abort_ಹುಡುಕು;
 	    // Find close quote character.
-	    col_end = find_next_quote(line, col_start + 1, quotechar,
+	    col_end = find_next_quote(ಸಾಲು, col_start + 1, quotechar,
 							      curbuf->b_p_qe);
-	    if (col_end < 0)
-		goto abort_search;
+	    ಯದಿ (col_end < 0)
+		ಗಚ್ಛ abort_ಹುಡುಕು;
 	    // If is cursor between start and end quote character, it is
 	    // target text object.
-	    if (col_start <= first_col && first_col <= col_end)
-		break;
+	    ಯದಿ (col_start <= first_col && first_col <= col_end)
+		ಭಙ್ಗ;
 	    col_start = col_end + 1;
 	}
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	// Search backward for a starting quote.
-	col_start = find_prev_quote(line, col_start, quotechar, curbuf->b_p_qe);
-	if (line[col_start] != quotechar)
+	col_start = find_prev_quote(ಸಾಲು, col_start, quotechar, curbuf->b_p_qe);
+	ಯದಿ (ಸಾಲು[col_start] != quotechar)
 	{
 	    // No quote before the cursor, look after the cursor.
-	    col_start = find_next_quote(line, col_start, quotechar, NULL);
-	    if (col_start < 0)
-		goto abort_search;
+	    col_start = find_next_quote(ಸಾಲು, col_start, quotechar, ರಿಕ್ತ);
+	    ಯದಿ (col_start < 0)
+		ಗಚ್ಛ abort_ಹುಡುಕು;
 	}
 
 	// Find close quote character.
-	col_end = find_next_quote(line, col_start + 1, quotechar,
+	col_end = find_next_quote(ಸಾಲು, col_start + 1, quotechar,
 							      curbuf->b_p_qe);
-	if (col_end < 0)
-	    goto abort_search;
+	ಯದಿ (col_end < 0)
+	    ಗಚ್ಛ abort_ಹುಡುಕು;
     }
 
     // When "include" is TRUE, include spaces after closing quote or before
     // the starting quote.
-    if (include)
+    ಯದಿ (include)
     {
-	if (VIM_ISWHITE(line[col_end + 1]))
-	    while (VIM_ISWHITE(line[col_end + 1]))
+	ಯದಿ (VIM_ISWHITE(ಸಾಲು[col_end + 1]))
+	    ಯಾವತ್ (VIM_ISWHITE(ಸಾಲು[col_end + 1]))
 		++col_end;
-	else
-	    while (col_start > 0 && VIM_ISWHITE(line[col_start - 1]))
+	ಅನ್ಯಥಾ
+	    ಯಾವತ್ (col_start > 0 && VIM_ISWHITE(ಸಾಲು[col_start - 1]))
 		--col_start;
     }
 
     // Set start position.  After vi" another i" must include the ".
     // For v2i" include the quotes.
-    if (!include && count < 2 && (vis_empty || !inside_quotes))
+    ಯದಿ (!include && ಎಣಿಕೆ < 2 && (vis_empty || !inside_quotes))
 	++col_start;
     curwin->w_cursor.col = col_start;
-    if (VIsual_active)
+    ಯದಿ (VIsual_active)
     {
 	// Set the start of the Visual area when the Visual area was empty, we
 	// were just inside quotes or the Visual area didn't start at a quote
 	// and didn't include a quote.
-	if (vis_empty
+	ಯದಿ (vis_empty
 		|| (vis_bef_curs
 		    && !selected_quote
 		    && (inside_quotes
-			|| (line[VIsual.col] != quotechar
+			|| (ಸಾಲು[VIsual.col] != quotechar
 			    && (VIsual.col == 0
-				|| line[VIsual.col - 1] != quotechar)))))
+				|| ಸಾಲು[VIsual.col - 1] != quotechar)))))
 	{
 	    VIsual = curwin->w_cursor;
 	    redraw_curbuf_later(UPD_INVERTED);
 	}
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	oap->start = curwin->w_cursor;
 	oap->motion_type = MCHAR;
@@ -1970,54 +1970,54 @@ current_quote(
 
     // Set end position.
     curwin->w_cursor.col = col_end;
-    if ((include || count > 1 // After vi" another i" must include the ".
+    ಯದಿ ((include || ಎಣಿಕೆ > 1 // After vi" another i" must include the ".
 		|| (!vis_empty && inside_quotes)
 	) && inc_cursor() == 2)
 	inclusive = TRUE;
-    if (VIsual_active)
+    ಯದಿ (VIsual_active)
     {
-	if (vis_empty || vis_bef_curs)
+	ಯದಿ (vis_empty || vis_bef_curs)
 	{
 	    // decrement cursor when 'selection' is not exclusive
-	    if (*p_sel != 'e')
+	    ಯದಿ (*p_sel != 'e')
 		dec_cursor();
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
 	    // Cursor is at start of Visual area.  Set the end of the Visual
 	    // area when it was just inside quotes or it didn't end at a
 	    // quote.
-	    if (inside_quotes
+	    ಯದಿ (inside_quotes
 		    || (!selected_quote
-			&& line[VIsual.col] != quotechar
-			&& (line[VIsual.col] == NUL
-			    || line[VIsual.col + 1] != quotechar)))
+			&& ಸಾಲು[VIsual.col] != quotechar
+			&& (ಸಾಲು[VIsual.col] == NUL
+			    || ಸಾಲು[VIsual.col + 1] != quotechar)))
 	    {
 		dec_cursor();
 		VIsual = curwin->w_cursor;
 	    }
 	    curwin->w_cursor.col = col_start;
 	}
-	if (VIsual_mode == 'V')
+	ಯದಿ (VIsual_mode == 'V')
 	{
 	    VIsual_mode = 'v';
 	    redraw_cmdline = TRUE;		// show mode later
 	}
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	// Set inclusive and other oap's flags.
 	oap->inclusive = inclusive;
     }
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 
-abort_search:
-    if (VIsual_active && *p_sel == 'e')
+abort_ಹುಡುಕು:
+    ಯದಿ (VIsual_active && *p_sel == 'e')
     {
-	if (did_exclusive_adj)
+	ಯದಿ (did_exclusive_adj)
 	    inc_cursor();
-	if (restore_vis_bef)
+	ಯದಿ (restore_vis_bef)
 	{
 	    pos_T t = curwin->w_cursor;
 
@@ -2025,5 +2025,5 @@ abort_search:
 	    VIsual = t;
 	}
     }
-    return FALSE;
+    ಪ್ರತ್ಯಾಗಮ FALSE;
 }

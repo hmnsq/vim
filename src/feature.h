@@ -41,9 +41,9 @@
 /*
  * +small is now an alias for +tiny
  */
-#if defined(FEAT_SMALL)
+#ಯದಿ defined(FEAT_SMALL)
 # undef FEAT_SMALL
-# if !defined(FEAT_TINY)
+# ಯದಿ !defined(FEAT_TINY)
 #  define FEAT_TINY
 # endif
 #endif
@@ -51,9 +51,9 @@
 /*
  * +big is now an alias for +normal
  */
-#if defined(FEAT_BIG)
+#ಯದಿ defined(FEAT_BIG)
 # undef FEAT_BIG
-# if !defined(FEAT_NORMAL)
+# ಯದಿ !defined(FEAT_NORMAL)
 #  define FEAT_NORMAL
 # endif
 #endif
@@ -62,7 +62,7 @@
  * Uncomment one of these to override the default.  For unix use a configure
  * argument, see Makefile.
  */
-#if !defined(FEAT_TINY) && !defined(FEAT_NORMAL) && !defined(FEAT_HUGE)
+#ಯದಿ !defined(FEAT_TINY) && !defined(FEAT_NORMAL) && !defined(FEAT_HUGE)
 // #define FEAT_TINY
 // #define FEAT_NORMAL
 // #define FEAT_HUGE
@@ -73,10 +73,10 @@
  * Memory is cheap.
  * Otherwise use +normal
  */
-#if !defined(FEAT_TINY) && !defined(FEAT_NORMAL) && !defined(FEAT_HUGE)
-# if defined(UNIX) || defined(MSWIN) || defined(MACOS_X)
+#ಯದಿ !defined(FEAT_TINY) && !defined(FEAT_NORMAL) && !defined(FEAT_HUGE)
+# ಯದಿ defined(UNIX) || defined(MSWIN) || defined(MACOS_X)
 #  define FEAT_HUGE
-# else
+# ಅನ್ಯಥಾ
 #  define FEAT_NORMAL
 # endif
 #endif
@@ -182,7 +182,7 @@
  * +extra_search	'hlsearch' and 'incsearch' options.
  */
 #ifdef FEAT_NORMAL
-# define FEAT_SEARCH_EXTRA
+# define FEAT_ಹುಡುಕು_EXTRA
 #endif
 
 /*
@@ -204,7 +204,7 @@
  *			Note that this isn't perfect, but enough users say they
  *			use it to keep supporting it.
  */
-#if defined(FEAT_HUGE) && !defined(DISABLE_RIGHTLEFT)
+#ಯದಿ defined(FEAT_HUGE) && !defined(DISABLE_RIGHTLEFT)
 # define FEAT_RIGHTLEFT
 #endif
 
@@ -212,7 +212,7 @@
  * +arabic		Arabic keymap and shaping support.
  *			Requires FEAT_RIGHTLEFT
  */
-#if defined(FEAT_HUGE) && !defined(DISABLE_ARABIC)
+#ಯದಿ defined(FEAT_HUGE) && !defined(DISABLE_ARABIC)
 # define FEAT_ARABIC
 #endif
 #ifdef FEAT_ARABIC
@@ -232,7 +232,7 @@
 /*
  * +cscope		Unix only: Cscope support.
  */
-#if defined(UNIX) && defined(FEAT_HUGE) && defined(ENABLE_CSCOPE)
+#ಯದಿ defined(UNIX) && defined(FEAT_HUGE) && defined(ENABLE_CSCOPE)
 # define FEAT_CSCOPE
 #endif
 
@@ -251,7 +251,7 @@
 /*
  * +profile		Profiling for functions and scripts.
  */
-#if defined(FEAT_HUGE) \
+#ಯದಿ defined(FEAT_HUGE) \
 	&& defined(FEAT_EVAL) \
 	&& ((defined(HAVE_GETTIMEOFDAY) && defined(HAVE_SYS_TIME_H)) \
 		|| defined(MSWIN))
@@ -261,7 +261,7 @@
 /*
  * +reltime		reltime() function
  */
-#if defined(FEAT_NORMAL) \
+#ಯದಿ defined(FEAT_NORMAL) \
 	&& defined(FEAT_EVAL) \
 	&& ((defined(HAVE_GETTIMEOFDAY) && defined(HAVE_SYS_TIME_H) \
 		&& (!defined(MACOS_X) || defined(HAVE_DISPATCH_DISPATCH_H))) \
@@ -272,14 +272,14 @@
 /*
  * +timers		timer_start()
  */
-#if defined(FEAT_RELTIME) && (defined(UNIX) || defined(MSWIN) || defined(VMS))
+#ಯದಿ defined(FEAT_RELTIME) && (defined(UNIX) || defined(MSWIN) || defined(VMS))
 # define FEAT_TIMERS
 #endif
 
 /*
  *			Insert mode completion with 'completefunc'.
  */
-#if defined(FEAT_EVAL)
+#ಯದಿ defined(FEAT_EVAL)
 # define FEAT_COMPL_FUNC
 #endif
 
@@ -287,16 +287,16 @@
  * +printer		":hardcopy" command
  * +postscript		Printing uses PostScript file output.
  */
-#if defined(FEAT_NORMAL) && (defined(MSWIN) || defined(FEAT_EVAL)) \
+#ಯದಿ defined(FEAT_NORMAL) && (defined(MSWIN) || defined(FEAT_EVAL)) \
 	&& !defined(AMIGA)
 # define FEAT_PRINTER
 #endif
-#if defined(FEAT_PRINTER) && !defined(FEAT_PRINT_PANGO) \
+#ಯದಿ defined(FEAT_PRINTER) && !defined(FEAT_PRINT_PANGO) \
     && ((defined(MSWIN) && defined(MSWINPS)) \
 	    || (!defined(MSWIN) && defined(FEAT_EVAL)))
 # define FEAT_POSTSCRIPT
 #endif
-#if !defined(FEAT_PRINTER) && defined(FEAT_PRINT_PANGO)
+#ಯದಿ !defined(FEAT_PRINTER) && defined(FEAT_PRINT_PANGO)
 # undef FEAT_PRINT_PANGO
 #endif
 
@@ -304,7 +304,7 @@
  * +diff		Displaying diffs in a nice way.
  *			Can be enabled in autoconf already.
  */
-#if defined(FEAT_NORMAL) && !defined(FEAT_DIFF)
+#ಯದಿ defined(FEAT_NORMAL) && !defined(FEAT_DIFF)
 # define FEAT_DIFF
 #endif
 
@@ -342,7 +342,7 @@
  * +syntax		syntax highlighting.  When using this, it's a good
  *			idea to have +eval too.
  */
-#if defined(FEAT_NORMAL)
+#ಯದಿ defined(FEAT_NORMAL)
 # define FEAT_SYN_HL
 #endif
 
@@ -350,28 +350,28 @@
  * +conceal		'conceal' option.  Depends on syntax highlighting
  *			as this is how the concealed text is defined.
  */
-#if defined(FEAT_NORMAL) && defined(FEAT_SYN_HL)
+#ಯದಿ defined(FEAT_NORMAL) && defined(FEAT_SYN_HL)
 # define FEAT_CONCEAL
 #endif
 
 /*
  * +spell		spell checking
  */
-#if defined(FEAT_NORMAL)
+#ಯದಿ defined(FEAT_NORMAL)
 # define FEAT_SPELL
 #endif
 
 /*
  * +cryptv		Encryption (originally by Mohsin Ahmed <mosh@sasi.com>).
  */
-#if defined(FEAT_NORMAL) && !defined(FEAT_CRYPT)
+#ಯದಿ defined(FEAT_NORMAL) && !defined(FEAT_CRYPT)
 # define FEAT_CRYPT
 #endif
 
 /*
  * libsodium - add advanced cryptography support
  */
-#if defined(HAVE_SODIUM) && defined(FEAT_CRYPT)
+#ಯದಿ defined(HAVE_SODIUM) && defined(FEAT_CRYPT)
 # define FEAT_SODIUM
 #endif
 
@@ -379,7 +379,7 @@
  * +mksession		":mksession" command.
  *			fully depends on +eval
  */
-#if defined(FEAT_EVAL)
+#ಯದಿ defined(FEAT_EVAL)
 # define FEAT_SESSION
 #endif
 
@@ -391,7 +391,7 @@
 #ifdef FEAT_NORMAL
 # define FEAT_MULTI_LANG
 #endif
-#if defined(HAVE_GETTEXT) && defined(FEAT_MULTI_LANG) \
+#ಯದಿ defined(HAVE_GETTEXT) && defined(FEAT_MULTI_LANG) \
 	&& (defined(HAVE_LOCALE_H) || defined(X_LOCALE))
 # define FEAT_GETTEXT
 #endif
@@ -400,16 +400,16 @@
  * +multi_byte_ime	Win32 IME input method.  Only for far-east Windows, so
  *			IME can be used to input chars.  Not tested much!
  */
-#if defined(FEAT_GUI_MSWIN) && !defined(FEAT_MBYTE_IME)
+#ಯದಿ defined(FEAT_GUI_MSWIN) && !defined(FEAT_MBYTE_IME)
 // #define FEAT_MBYTE_IME
 #endif
 
-#if defined(FEAT_HUGE) && defined(FEAT_GUI_HAIKU) && !defined(FEAT_MBYTE_IME)
+#ಯದಿ defined(FEAT_HUGE) && defined(FEAT_GUI_HAIKU) && !defined(FEAT_MBYTE_IME)
 # define FEAT_MBYTE_IME
 #endif
 
 // Use iconv() when it's available.
-#if (defined(HAVE_ICONV_H) && defined(HAVE_ICONV)) || defined(DYNAMIC_ICONV)
+#ಯದಿ (defined(HAVE_ICONV_H) && defined(HAVE_ICONV)) || defined(DYNAMIC_ICONV)
 # define USE_ICONV
 #endif
 
@@ -422,11 +422,11 @@
 // #define FEAT_XIM
 #endif
 
-#if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
+#ಯದಿ defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
 # define USE_XIM 1		// needed for GTK include files
 #endif
 
-#if defined(FEAT_XIM)
+#ಯದಿ defined(FEAT_XIM)
 // # define X_LOCALE			// for OS with incomplete locale
 					// support, like old linux versions.
 #endif
@@ -435,13 +435,13 @@
  * +xfontset		X fontset support.  For outputting wide characters.
  */
 #ifndef FEAT_XFONTSET
-# if defined(HAVE_X11) && !defined(FEAT_GUI_GTK)
+# ಯದಿ defined(HAVE_X11) && !defined(FEAT_GUI_GTK)
 #  define FEAT_XFONTSET
-# else
+# ಅನ್ಯಥಾ
 // #  define FEAT_XFONTSET
 # endif
-#else
-# if defined(USE_GTK4)
+#ಅನ್ಯಥಾ
+# ಯದಿ defined(USE_GTK4)
 #  undef FEAT_XFONTSET
 # endif
 #endif
@@ -450,10 +450,10 @@
  * +libcall		libcall() function
  */
 // Using dlopen() also requires dlsym() to be available.
-#if defined(HAVE_DLOPEN) && defined(HAVE_DLSYM)
+#ಯದಿ defined(HAVE_DLOPEN) && defined(HAVE_DLSYM)
 # define USE_DLOPEN
 #endif
-#if defined(FEAT_EVAL) && (defined(MSWIN) || ((defined(UNIX) || defined(VMS)) \
+#ಯದಿ defined(FEAT_EVAL) && (defined(MSWIN) || ((defined(UNIX) || defined(VMS)) \
 	&& (defined(USE_DLOPEN) || defined(HAVE_SHL_LOAD))))
 # define FEAT_LIBCALL
 #endif
@@ -471,22 +471,22 @@
 /*
  * popup menu in a terminal
  */
-#if defined(FEAT_MENU) && !defined(ALWAYS_USE_GUI)
+#ಯದಿ defined(FEAT_MENU) && !defined(ALWAYS_USE_GUI)
 # define FEAT_TERM_POPUP_MENU
 #endif
 
 /*
  * sound
  */
-#if !defined(FEAT_SOUND) && defined(HAVE_CANBERRA)
+#ಯದಿ !defined(FEAT_SOUND) && defined(HAVE_CANBERRA)
 # define FEAT_SOUND
 #endif
-#if defined(FEAT_SOUND) && defined(HAVE_CANBERRA)
+#ಯದಿ defined(FEAT_SOUND) && defined(HAVE_CANBERRA)
 # define FEAT_SOUND_CANBERRA
 #endif
 
 // There are two ways to use XPM.
-#if (defined(HAVE_XM_XPMP_H) && defined(FEAT_GUI_MOTIF)) \
+#ಯದಿ (defined(HAVE_XM_XPMP_H) && defined(FEAT_GUI_MOTIF)) \
 		|| defined(HAVE_X11_XPM_H)
 # define HAVE_XPM 1
 #endif
@@ -495,7 +495,7 @@
  * +toolbar		Include code for a toolbar (for the Win32 GUI, GTK
  *			always has it).  But only if menus are enabled.
  */
-#if defined(FEAT_NORMAL) && defined(FEAT_MENU) \
+#ಯದಿ defined(FEAT_NORMAL) && defined(FEAT_MENU) \
 	&& (defined(FEAT_GUI_GTK) \
 		|| defined(FEAT_GUI_MSWIN) \
 		|| (defined(FEAT_GUI_MOTIF) && defined(HAVE_XPM)) \
@@ -506,14 +506,14 @@
 #endif
 
 
-#if defined(FEAT_TOOLBAR) && !defined(FEAT_MENU)
+#ಯದಿ defined(FEAT_TOOLBAR) && !defined(FEAT_MENU)
 # define FEAT_MENU
 #endif
 
 /*
  * GUI dark theme variant
  */
-#if (defined(FEAT_GUI_GTK) && (defined(USE_GTK3) || defined(USE_GTK4))) \
+#ಯದಿ (defined(FEAT_GUI_GTK) && (defined(USE_GTK3) || defined(USE_GTK4))) \
 	|| defined(FEAT_GUI_MSWIN)
 # define FEAT_GUI_DARKTHEME
 #endif
@@ -521,7 +521,7 @@
 /*
  * GUI tabline
  */
-#if defined(FEAT_NORMAL) \
+#ಯದಿ defined(FEAT_NORMAL) \
     && (defined(FEAT_GUI_GTK) \
 	|| (defined(FEAT_GUI_MOTIF) && defined(HAVE_XM_NOTEBOOK_H)) \
 	|| defined(FEAT_GUI_HAIKU) \
@@ -540,9 +540,9 @@
  * +browse		":browse" command.
  *			or just the ":browse" command modifier
  */
-#if defined(FEAT_NORMAL)
+#ಯದಿ defined(FEAT_NORMAL)
 # define FEAT_BROWSE_CMD
-# if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_MOTIF) \
+# ಯದಿ defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_MOTIF) \
 	|| defined(FEAT_GUI_GTK) || defined(FEAT_GUI_HAIKU) || defined(FEAT_GUI_PHOTON)
 #  define FEAT_BROWSE
 # endif
@@ -553,7 +553,7 @@
  * there is no terminal version, and on Windows we can't figure out how to
  * fork one off with :gui.
  */
-#if defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
+#ಯದಿ defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
 # define ALWAYS_USE_GUI
 #endif
 
@@ -563,24 +563,24 @@
  *			When none of these defined there is no dialog support.
  */
 #ifdef FEAT_NORMAL
-# if (defined(FEAT_GUI_MOTIF) && defined(HAVE_X11_XPM_H)) \
+# ಯದಿ (defined(FEAT_GUI_MOTIF) && defined(HAVE_X11_XPM_H)) \
 	|| defined(FEAT_GUI_GTK) \
 	|| defined(FEAT_GUI_PHOTON) \
 	|| defined(FEAT_GUI_HAIKU) \
 	|| defined(FEAT_GUI_MSWIN)
 #  define FEAT_CON_DIALOG
 #  define FEAT_GUI_DIALOG
-# else
+# ಅನ್ಯಥಾ
 #  define FEAT_CON_DIALOG
 # endif
 #endif
-#if !defined(FEAT_GUI_DIALOG) && (defined(FEAT_GUI_MOTIF) \
+#ಯದಿ !defined(FEAT_GUI_DIALOG) && (defined(FEAT_GUI_MOTIF) \
 	|| defined(FEAT_GUI_GTK) \
 	|| defined(FEAT_GUI_MSWIN))
 // need a dialog to show error messages when starting from the desktop
 # define FEAT_GUI_DIALOG
 #endif
-#if defined(FEAT_GUI_DIALOG) && \
+#ಯದಿ defined(FEAT_GUI_DIALOG) && \
 	(defined(FEAT_GUI_MOTIF) \
 	 || defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN) \
 	 || defined(FEAT_GUI_PHOTON) \
@@ -594,7 +594,7 @@
 /*
  * +termguicolors	'termguicolors' option.
  */
-#if (defined(FEAT_NORMAL) && defined(FEAT_SYN_HL)) && !defined(ALWAYS_USE_GUI)
+#ಯದಿ (defined(FEAT_NORMAL) && defined(FEAT_SYN_HL)) && !defined(ALWAYS_USE_GUI)
 # define FEAT_TERMGUICOLORS
 #endif
 
@@ -641,7 +641,7 @@
  * STARTUPTIME		Time the startup process.  Writes a file with
  *			timestamps.
  */
-#if defined(FEAT_NORMAL) \
+#ಯದಿ defined(FEAT_NORMAL) \
 	&& ((defined(HAVE_GETTIMEOFDAY) && defined(HAVE_SYS_TIME_H)) \
 		|| defined(MSWIN))
 # define STARTUPTIME 1
@@ -814,7 +814,7 @@
  * +X11			Unix only.  Include code for xterm title saving and X
  *			clipboard.  Only works if HAVE_X11 is also defined.
  */
-#if (defined(FEAT_NORMAL) || defined(FEAT_GUI_MOTIF)) && !defined(USE_GTK4)
+#ಯದಿ (defined(FEAT_NORMAL) || defined(FEAT_GUI_MOTIF)) && !defined(USE_GTK4)
 # define WANT_X11
 #endif
 
@@ -822,7 +822,7 @@
  * +wayland		Unix only.  Include code for the Wayland protocol,
  *                      only works if HAVE_WAYLAND is defined.
  */
-#if defined(FEAT_NORMAL) && defined(UNIX)
+#ಯದಿ defined(FEAT_NORMAL) && defined(UNIX)
 # define WANT_WAYLAND
 #endif
 
@@ -835,10 +835,10 @@
  * If your GUI wants to support SM itself, change this ifdef.
  * I'm assuming that any X11 implementation will cope with this for now.
  */
-#if defined(HAVE_X11) && defined(WANT_X11) && defined(HAVE_X11_SM_SMLIB_H)
+#ಯದಿ defined(HAVE_X11) && defined(WANT_X11) && defined(HAVE_X11_SM_SMLIB_H)
 # define USE_XSMP
 #endif
-#if defined(USE_XSMP_INTERACT) && !defined(USE_XSMP)
+#ಯದಿ defined(USE_XSMP_INTERACT) && !defined(USE_XSMP)
 # undef USE_XSMP_INTERACT
 #endif
 
@@ -860,7 +860,7 @@
  *			DOS_MOUSE is defined.
  */
 // Amiga console has no mouse support
-#if defined(UNIX) || defined(VMS)
+#ಯದಿ defined(UNIX) || defined(VMS)
 # define FEAT_MOUSE_XTERM
 # ifdef FEAT_NORMAL
 #  define FEAT_MOUSE_NET
@@ -868,10 +868,10 @@
 #  define FEAT_MOUSE_URXVT
 # endif
 #endif
-#if defined(MSWIN)
+#ಯದಿ defined(MSWIN)
 # define DOS_MOUSE
 #endif
-#if defined(__QNX__)
+#ಯದಿ defined(__QNX__)
 # define FEAT_MOUSE_PTERM
 #endif
 
@@ -882,7 +882,7 @@
  * FEAT_MOUSE_JSB
  * FEAT_MOUSE_PTERM
  */
-#if defined(FEAT_NORMAL) && defined(HAVE_GPM)
+#ಯದಿ defined(FEAT_NORMAL) && defined(HAVE_GPM)
 # define FEAT_MOUSE_GPM
 /*
  * +mouse_gpm/dyn   Load libgpm dynamically.
@@ -892,12 +892,12 @@
 # endif
 #endif
 
-#if defined(FEAT_NORMAL) && defined(HAVE_SYSMOUSE)
+#ಯದಿ defined(FEAT_NORMAL) && defined(HAVE_SYSMOUSE)
 # define FEAT_SYSMOUSE
 #endif
 
 // urxvt is a small variation of mouse_xterm, and shares its code
-#if defined(FEAT_MOUSE_URXVT) && !defined(FEAT_MOUSE_XTERM)
+#ಯದಿ defined(FEAT_MOUSE_URXVT) && !defined(FEAT_MOUSE_XTERM)
 # define FEAT_MOUSE_XTERM
 #endif
 
@@ -917,7 +917,7 @@
 # endif
 #endif
 
-#if defined(FEAT_NORMAL) \
+#ಯದಿ defined(FEAT_NORMAL) \
 	&& (defined(UNIX) || defined(VMS)) \
 	&& defined(WANT_X11) && defined(HAVE_X11) \
 	&& !defined(USE_GTK4)
@@ -927,7 +927,7 @@
 # endif
 #endif
 
-#if defined(FEAT_NORMAL) && defined(UNIX) \
+#ಯದಿ defined(FEAT_NORMAL) && defined(UNIX) \
     && defined(HAVE_WAYLAND) && defined(WANT_WAYLAND)
 # define FEAT_WAYLAND_CLIPBOARD
 # ifndef FEAT_CLIPBOARD
@@ -938,16 +938,16 @@
 /*
  * +dnd		Drag'n'drop support.  Always used for the GTK+ GUI.
  */
-#if defined(FEAT_CLIPBOARD) && defined(FEAT_GUI_GTK)
+#ಯದಿ defined(FEAT_CLIPBOARD) && defined(FEAT_GUI_GTK)
 # define FEAT_DND
 #endif
 
-#if defined(FEAT_GUI_MSWIN)
+#ಯದಿ defined(FEAT_GUI_MSWIN)
 # define MSWIN_FIND_REPLACE	// include code for find/replace dialog
 # define MSWIN_FR_BUFSIZE 256
 #endif
 
-#if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MOTIF) \
+#ಯದಿ defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MOTIF) \
 	|| defined(MSWIN_FIND_REPLACE)
 # define FIND_REPLACE_DIALOG 1
 #endif
@@ -955,14 +955,14 @@
 /*
  * The +channel feature requires +eval.
  */
-#if !defined(FEAT_EVAL) && defined(FEAT_JOB_CHANNEL)
+#ಯದಿ !defined(FEAT_EVAL) && defined(FEAT_JOB_CHANNEL)
 # undef FEAT_JOB_CHANNEL
 #endif
 
 /*
  * +socketserver	 Use channels for clientserver communication
  */
-#if (defined(UNIX) || defined(MSWIN)) && defined(FEAT_JOB_CHANNEL)
+#ಯದಿ (defined(UNIX) || defined(MSWIN)) && defined(FEAT_JOB_CHANNEL)
 # define FEAT_SOCKETSERVER
 #endif
 
@@ -970,10 +970,10 @@
  * +clientserver	Remote control via the remote_send() function
  *			and the --remote argument
  */
-#if (defined(MSWIN) || defined(FEAT_XCLIPBOARD) || defined(FEAT_SOCKETSERVER)) \
+#ಯದಿ (defined(MSWIN) || defined(FEAT_XCLIPBOARD) || defined(FEAT_SOCKETSERVER)) \
     && defined(FEAT_EVAL)
 # define FEAT_CLIENTSERVER
-# if defined(FEAT_SOCKETSERVER) && (defined(FEAT_XCLIPBOARD) || defined(MSWIN))
+# ಯದಿ defined(FEAT_SOCKETSERVER) && (defined(FEAT_XCLIPBOARD) || defined(MSWIN))
 #  define FEAT_CLIENTSERVER_BACKENDS
 # endif
 #endif
@@ -982,11 +982,11 @@
  * +autoservername	Automatically generate a servername for clientserver
  *			when --servername is not passed on the command line.
  */
-#if defined(FEAT_CLIENTSERVER) && !defined(FEAT_AUTOSERVERNAME)
+#ಯದಿ defined(FEAT_CLIENTSERVER) && !defined(FEAT_AUTOSERVERNAME)
 # ifdef MSWIN
     // Always enabled on MS-Windows.
 #  define FEAT_AUTOSERVERNAME
-# else
+# ಅನ್ಯಥಾ
     // Enable here if you don't use configure.
 // # define FEAT_AUTOSERVERNAME
 # endif
@@ -997,7 +997,7 @@
  *			to check if mouse dragging can be used and if term
  *			codes can be obtained.
  */
-#if defined(HAVE_TGETENT)
+#ಯದಿ defined(HAVE_TGETENT)
 # define FEAT_TERMRESPONSE
 #endif
 
@@ -1007,10 +1007,10 @@
  */
 #ifdef FEAT_NORMAL
 // Win32 console can change cursor shape
-# if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+# ಯದಿ defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 #  define MCH_CURSOR_SHAPE
 # endif
-# if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_MOTIF) \
+# ಯದಿ defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_MOTIF) \
 	|| defined(FEAT_GUI_GTK) \
 	|| defined(FEAT_GUI_PHOTON)
 #  define FEAT_MOUSESHAPE
@@ -1019,7 +1019,7 @@
 
 // GUI and some consoles can change the shape of the cursor.  The code is also
 // needed for the 'mouseshape' and 'concealcursor' options.
-#if defined(FEAT_GUI) \
+#ಯದಿ defined(FEAT_GUI) \
 	    || defined(MCH_CURSOR_SHAPE) \
 	    || defined(FEAT_MOUSESHAPE) \
 	    || defined(FEAT_CONCEAL) \
@@ -1027,7 +1027,7 @@
 # define CURSOR_SHAPE
 #endif
 
-#if defined(FEAT_MZSCHEME) && (defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)    \
+#ಯದಿ defined(FEAT_MZSCHEME) && (defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)    \
 	|| defined(FEAT_GUI_MOTIF))
 # define MZSCHEME_GUI_THREADS
 #endif
@@ -1035,7 +1035,7 @@
 /*
  * +ARP			Amiga only. Use arp.library, DOS 2.0 is not required.
  */
-#if defined(AMIGA) && !defined(NO_ARP) && !defined(__amigaos4__) \
+#ಯದಿ defined(AMIGA) && !defined(NO_ARP) && !defined(__amigaos4__) \
 	&& !defined(__MORPHOS__) && !defined(__AROS__)
 # define FEAT_ARP
 #endif
@@ -1066,7 +1066,7 @@
 /*
  * The Netbeans feature requires +eval and +job_channel
  */
-#if (!defined(FEAT_EVAL) || !defined(FEAT_JOB_CHANNEL)) && defined(FEAT_NETBEANS_INTG)
+#ಯದಿ (!defined(FEAT_EVAL) || !defined(FEAT_JOB_CHANNEL)) && defined(FEAT_NETBEANS_INTG)
 # undef FEAT_NETBEANS_INTG
 #endif
 
@@ -1074,13 +1074,13 @@
  * +terminal		":terminal" command.  Runs a terminal in a window.
  *			requires +channel
  */
-#if defined(FEAT_TERMINAL) && !defined(FEAT_JOB_CHANNEL)
+#ಯದಿ defined(FEAT_TERMINAL) && !defined(FEAT_JOB_CHANNEL)
 # undef FEAT_TERMINAL
 #endif
-#if defined(FEAT_TERMINAL) && !defined(CURSOR_SHAPE)
+#ಯದಿ defined(FEAT_TERMINAL) && !defined(CURSOR_SHAPE)
 # define CURSOR_SHAPE
 #endif
-#if defined(FEAT_TERMINAL) && !defined(FEAT_SYN_HL)
+#ಯದಿ defined(FEAT_TERMINAL) && !defined(FEAT_SYN_HL)
 // simplify the code a bit by enabling +syntax when +terminal is enabled
 # define FEAT_SYN_HL
 #endif
@@ -1088,13 +1088,13 @@
 /*
  * +autoshelldir	    'autoshelldir' option.
  */
-#if defined(FEAT_TERMINAL)
+#ಯದಿ defined(FEAT_TERMINAL)
 # define FEAT_AUTOSHELLDIR
 #endif
 /*
  * +textprop and +popupwin	Text PROPerties and POPUP windows
  */
-#if defined(FEAT_EVAL) && defined(FEAT_SYN_HL)
+#ಯದಿ defined(FEAT_EVAL) && defined(FEAT_SYN_HL)
 # define FEAT_PROP_POPUP
 #endif
 
@@ -1103,21 +1103,21 @@
  * +image	    Render images in the terminal and GUI
  * +image_popup	    Render images in popup windows
  */
-#if defined(FEAT_HUGE) && defined(FEAT_PROP_POPUP) && defined(HAVE_PIXMAN)
+#ಯದಿ defined(FEAT_HUGE) && defined(FEAT_PROP_POPUP) && defined(HAVE_PIXMAN)
 # define ALLOW_IMAGE
 #endif
 
-#if defined(ALLOW_IMAGE) && !defined(ALWAYS_USE_GUI)
+#ಯದಿ defined(ALLOW_IMAGE) && !defined(ALWAYS_USE_GUI)
 # define FEAT_IMAGE_SIXEL
 # define FEAT_IMAGE_KITTY
 #endif
 
-#if defined(ALLOW_IMAGE) && ((defined(FEAT_GUI_GTK) \
+#ಯದಿ defined(ALLOW_IMAGE) && ((defined(FEAT_GUI_GTK) \
 	    && (defined(USE_GTK4) || defined(USE_GTK3))) || defined(FEAT_GUI_MSWIN))
 # define FEAT_IMAGE_GUI
 #endif
 
-#if defined(FEAT_IMAGE_SIXEL) || defined(FEAT_IMAGE_KITTY) \
+#ಯದಿ defined(FEAT_IMAGE_SIXEL) || defined(FEAT_IMAGE_KITTY) \
     || defined(FEAT_IMAGE_GUI)
 # define FEAT_IMAGE_POPUP
 # define FEAT_IMAGE
@@ -1130,11 +1130,11 @@
 /*
  * +message_window	use a popup for messages when 'cmdheight' is zero
  */
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_TIMERS)
+#ಯದಿ defined(FEAT_PROP_POPUP) && defined(FEAT_TIMERS)
 # define HAS_MESSAGE_WINDOW
 #endif
 
-#if defined(FEAT_SYN_HL) && defined(FEAT_RELTIME)
+#ಯದಿ defined(FEAT_SYN_HL) && defined(FEAT_RELTIME)
 // Can limit syntax highlight time to 'redrawtime'.
 # define SYN_TIME_LIMIT 1
 #endif
@@ -1144,9 +1144,9 @@
  * +signs		Allow signs to be displayed to the left of text lines.
  *			Adds the ":sign" command.
  */
-#if defined(FEAT_NORMAL) || defined(FEAT_NETBEANS_INTG) || defined(FEAT_PROP_POPUP)
+#ಯದಿ defined(FEAT_NORMAL) || defined(FEAT_NETBEANS_INTG) || defined(FEAT_PROP_POPUP)
 # define FEAT_SIGNS
-# if (defined(FEAT_GUI_MOTIF) && defined(HAVE_X11_XPM_H)) \
+# ಯದಿ (defined(FEAT_GUI_MOTIF) && defined(HAVE_X11_XPM_H)) \
 	|| defined(FEAT_GUI_GTK) \
 	|| (defined(MSWIN) && defined(FEAT_GUI))
 #  define FEAT_SIGN_ICONS
@@ -1158,43 +1158,43 @@
  *			debugger and for tooltips.
  *			Only for GUIs where it was implemented.
  */
-#if (defined(FEAT_GUI_MOTIF) \
+#ಯದಿ (defined(FEAT_GUI_MOTIF) \
 	|| defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)) \
 	&& (   ((defined(FEAT_TOOLBAR) || defined(FEAT_GUI_TABLINE)) \
 		&& !defined(FEAT_GUI_GTK) && !defined(FEAT_GUI_MSWIN)) \
 	    || defined(FEAT_NETBEANS_INTG) || defined(FEAT_EVAL))
 # define FEAT_BEVAL_GUI
-# if !defined(FEAT_XFONTSET) && !defined(FEAT_GUI_GTK) \
+# ಯದಿ !defined(FEAT_XFONTSET) && !defined(FEAT_GUI_GTK) \
 	&& !defined(FEAT_GUI_MSWIN)
 #  define FEAT_XFONTSET
 # endif
 #endif
 
-#if defined(FEAT_BEVAL_GUI) && defined(FEAT_GUI_MOTIF)
+#ಯದಿ defined(FEAT_BEVAL_GUI) && defined(FEAT_GUI_MOTIF)
 # define FEAT_BEVAL_TIP		// balloon eval used for toolbar tooltip
 #endif
 
 /*
  * +balloon_eval_term	Allow balloon expression evaluation in the terminal.
  */
-#if defined(FEAT_HUGE) && defined(FEAT_TIMERS) && \
+#ಯದಿ defined(FEAT_HUGE) && defined(FEAT_TIMERS) && \
 	(defined(UNIX) || defined(VMS) || \
 	 (defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))))
 # define FEAT_BEVAL_TERM
 #endif
 
-#if defined(FEAT_BEVAL_GUI) || defined(FEAT_BEVAL_TERM)
+#ಯದಿ defined(FEAT_BEVAL_GUI) || defined(FEAT_BEVAL_TERM)
 # define FEAT_BEVAL
 #endif
 
 // Motif is X11
-#if defined(FEAT_GUI_MOTIF)
+#ಯದಿ defined(FEAT_GUI_MOTIF)
 # define FEAT_GUI_X11
 #endif
 
-#if defined(FEAT_NETBEANS_INTG)
+#ಯದಿ defined(FEAT_NETBEANS_INTG)
 // NetBeans uses menus.
-# if !defined(FEAT_MENU)
+# ಯದಿ !defined(FEAT_MENU)
 #  define FEAT_MENU
 # endif
 #endif
@@ -1202,7 +1202,7 @@
 /*
  * +autochdir		'autochdir' option.
  */
-#if defined(FEAT_NETBEANS_INTG) || defined(FEAT_NORMAL)
+#ಯದಿ defined(FEAT_NETBEANS_INTG) || defined(FEAT_NORMAL)
 # define FEAT_AUTOCHDIR
 #endif
 
@@ -1217,7 +1217,7 @@
 /*
  * +filterpipe
  */
-#if (defined(UNIX) && !defined(USE_SYSTEM)) \
+#ಯದಿ (defined(UNIX) && !defined(USE_SYSTEM)) \
 	    || (defined(MSWIN) && defined(FEAT_GUI_MSWIN))
 # define FEAT_FILTERPIPE
 #endif
@@ -1225,11 +1225,11 @@
 /*
  * +vtp: Win32 virtual console.
  */
-#if (!defined(FEAT_GUI) || defined(VIMDLL)) && defined(MSWIN)
+#ಯದಿ (!defined(FEAT_GUI) || defined(VIMDLL)) && defined(MSWIN)
 # define FEAT_VTP
 #endif
 
-#if defined(DYNAMIC_PERL) \
+#ಯದಿ defined(DYNAMIC_PERL) \
 	|| defined(DYNAMIC_PYTHON) || defined(DYNAMIC_PYTHON3) \
 	|| defined(DYNAMIC_RUBY) \
 	|| defined(DYNAMIC_TCL) \
@@ -1245,6 +1245,6 @@
  * currently Unix only: XATTR support
  */
 
-#if defined(FEAT_NORMAL) && defined(HAVE_XATTR) && !defined(MACOS_X)
+#ಯದಿ defined(FEAT_NORMAL) && defined(HAVE_XATTR) && !defined(MACOS_X)
 # define FEAT_XATTR
 #endif

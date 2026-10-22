@@ -12,17 +12,17 @@
  *	  op_change, op_yank, do_join
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-static void shift_block(oparg_T *oap, int amount);
-static void	mb_adjust_opend(oparg_T *oap);
-static int	do_addsub(int op_type, pos_T *pos, int length, linenr_T Prenum1);
-static void	pbyte(pos_T lp, int c);
+ಸ್ಥಿರ ಶೂನ್ಯ shift_block(oparg_T *oap, ಪೂರ್ಣಾಙ್ಕ amount);
+ಸ್ಥಿರ ಶೂನ್ಯ	mb_adjust_opend(oparg_T *oap);
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ	do_addsub(ಪೂರ್ಣಾಙ್ಕ op_type, pos_T *pos, ಪೂರ್ಣಾಙ್ಕ length, linenr_T Prenum1);
+ಸ್ಥಿರ ಶೂನ್ಯ	pbyte(pos_T lp, ಪೂರ್ಣಾಙ್ಕ c);
 #define PBYTE(lp, c) pbyte(lp, c)
 
 
 // Flags for third item in "opchars".
-#define OPF_LINES  1	// operator always works on lines
+#define OPF_ಸಾಲುಗಳು  1	// operator always works on lines
 #define OPF_CHANGE 2	// operator changes text
 
 /*
@@ -30,35 +30,35 @@ static void	pbyte(pos_T lp, int c);
  * IMPORTANT: Index must correspond with defines in vim.h!!!
  * The third field holds OPF_ flags.
  */
-static const char opchars[][3] =
+ಸ್ಥಿರ ಧ್ರುವ ವರ್ಣ opchars[][3] =
 {
     {NUL, NUL, 0},			// OP_NOP
     {'d', NUL, OPF_CHANGE},		// OP_DELETE
     {'y', NUL, 0},			// OP_YANK
     {'c', NUL, OPF_CHANGE},		// OP_CHANGE
-    {'<', NUL, OPF_LINES | OPF_CHANGE},	// OP_LSHIFT
-    {'>', NUL, OPF_LINES | OPF_CHANGE},	// OP_RSHIFT
-    {'!', NUL, OPF_LINES | OPF_CHANGE},	// OP_FILTER
+    {'<', NUL, OPF_ಸಾಲುಗಳು | OPF_CHANGE},	// OP_LSHIFT
+    {'>', NUL, OPF_ಸಾಲುಗಳು | OPF_CHANGE},	// OP_RSHIFT
+    {'!', NUL, OPF_ಸಾಲುಗಳು | OPF_CHANGE},	// OP_FILTER
     {'g', '~', OPF_CHANGE},		// OP_TILDE
-    {'=', NUL, OPF_LINES | OPF_CHANGE},	// OP_INDENT
-    {'g', 'q', OPF_LINES | OPF_CHANGE},	// OP_FORMAT
-    {':', NUL, OPF_LINES},		// OP_COLON
+    {'=', NUL, OPF_ಸಾಲುಗಳು | OPF_CHANGE},	// OP_INDENT
+    {'g', 'q', OPF_ಸಾಲುಗಳು | OPF_CHANGE},	// OP_FORMAT
+    {':', NUL, OPF_ಸಾಲುಗಳು},		// OP_COLON
     {'g', 'U', OPF_CHANGE},		// OP_UPPER
     {'g', 'u', OPF_CHANGE},		// OP_LOWER
-    {'J', NUL, OPF_LINES | OPF_CHANGE},	// DO_JOIN
-    {'g', 'J', OPF_LINES | OPF_CHANGE},	// DO_JOIN_NS
+    {'J', NUL, OPF_ಸಾಲುಗಳು | OPF_CHANGE},	// DO_JOIN
+    {'g', 'J', OPF_ಸಾಲುಗಳು | OPF_CHANGE},	// DO_JOIN_NS
     {'g', '?', OPF_CHANGE},		// OP_ROT13
     {'r', NUL, OPF_CHANGE},		// OP_REPLACE
     {'I', NUL, OPF_CHANGE},		// OP_INSERT
     {'A', NUL, OPF_CHANGE},		// OP_APPEND
-    {'z', 'f', OPF_LINES},		// OP_FOLD
-    {'z', 'o', OPF_LINES},		// OP_FOLDOPEN
-    {'z', 'O', OPF_LINES},		// OP_FOLDOPENREC
-    {'z', 'c', OPF_LINES},		// OP_FOLDCLOSE
-    {'z', 'C', OPF_LINES},		// OP_FOLDCLOSEREC
-    {'z', 'd', OPF_LINES},		// OP_FOLDDEL
-    {'z', 'D', OPF_LINES},		// OP_FOLDDELREC
-    {'g', 'w', OPF_LINES | OPF_CHANGE},	// OP_FORMAT2
+    {'z', 'f', OPF_ಸಾಲುಗಳು},		// OP_FOLD
+    {'z', 'o', OPF_ಸಾಲುಗಳು},		// OP_FOLDOPEN
+    {'z', 'O', OPF_ಸಾಲುಗಳು},		// OP_FOLDOPENREC
+    {'z', 'c', OPF_ಸಾಲುಗಳು},		// OP_FOLDCLOSE
+    {'z', 'C', OPF_ಸಾಲುಗಳು},		// OP_FOLDCLOSEREC
+    {'z', 'd', OPF_ಸಾಲುಗಳು},		// OP_FOLDDEL
+    {'z', 'D', OPF_ಸಾಲುಗಳು},		// OP_FOLDDELREC
+    {'g', 'w', OPF_ಸಾಲುಗಳು | OPF_CHANGE},	// OP_FORMAT2
     {'g', '@', OPF_CHANGE},		// OP_FUNCTION
     {Ctrl_A, NUL, OPF_CHANGE},		// OP_NR_ADD
     {Ctrl_X, NUL, OPF_CHANGE},		// OP_NR_SUB
@@ -68,51 +68,51 @@ static const char opchars[][3] =
  * Translate a command name into an operator type.
  * Must only be called with a valid operator name!
  */
-    int
-get_op_type(int char1, int char2)
+    ಪೂರ್ಣಾಙ್ಕ
+get_op_type(ಪೂರ್ಣಾಙ್ಕ char1, ಪೂರ್ಣಾಙ್ಕ char2)
 {
-    int		i;
+    ಪೂರ್ಣಾಙ್ಕ		i;
 
-    if (char1 == 'r')		// ignore second character
-	return OP_REPLACE;
-    if (char1 == '~')		// when tilde is an operator
-	return OP_TILDE;
-    if (char1 == 'g' && char2 == Ctrl_A)	// add
-	return OP_NR_ADD;
-    if (char1 == 'g' && char2 == Ctrl_X)	// subtract
-	return OP_NR_SUB;
-    if (char1 == 'z' && char2 == 'y')	// OP_YANK
-	return OP_YANK;
-    for (i = 0; ; ++i)
+    ಯದಿ (char1 == 'r')		// ignore second character
+	ಪ್ರತ್ಯಾಗಮ OP_REPLACE;
+    ಯದಿ (char1 == '~')		// when tilde is an operator
+	ಪ್ರತ್ಯಾಗಮ OP_TILDE;
+    ಯದಿ (char1 == 'g' && char2 == Ctrl_A)	// add
+	ಪ್ರತ್ಯಾಗಮ OP_NR_ADD;
+    ಯದಿ (char1 == 'g' && char2 == Ctrl_X)	// subtract
+	ಪ್ರತ್ಯಾಗಮ OP_NR_SUB;
+    ಯದಿ (char1 == 'z' && char2 == 'y')	// OP_YANK
+	ಪ್ರತ್ಯಾಗಮ OP_YANK;
+    ಪ್ರತಿ (i = 0; ; ++i)
     {
-	if (opchars[i][0] == char1 && opchars[i][1] == char2)
-	    break;
-	if (i == (int)ARRAY_LENGTH(opchars) - 1)
+	ಯದಿ (opchars[i][0] == char1 && opchars[i][1] == char2)
+	    ಭಙ್ಗ;
+	ಯದಿ (i == (ಪೂರ್ಣಾಙ್ಕ)ARRAY_LENGTH(opchars) - 1)
 	{
 	    internal_error("get_op_type()");
-	    break;
+	    ಭಙ್ಗ;
 	}
     }
-    return i;
+    ಪ್ರತ್ಯಾಗಮ i;
 }
 
 /*
  * Return TRUE if operator "op" always works on whole lines.
  */
-    static int
-op_on_lines(int op)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+op_on_ಸಾಲುಗಳು(ಪೂರ್ಣಾಙ್ಕ op)
 {
-    return opchars[op][2] & OPF_LINES;
+    ಪ್ರತ್ಯಾಗಮ opchars[op][2] & OPF_ಸಾಲುಗಳು;
 }
 
-#if defined(FEAT_JOB_CHANNEL)
+#ಯದಿ defined(FEAT_JOB_CHANNEL)
 /*
  * Return TRUE if operator "op" changes text.
  */
-    int
-op_is_change(int op)
+    ಪೂರ್ಣಾಙ್ಕ
+op_is_change(ಪೂರ್ಣಾಙ್ಕ op)
 {
-    return opchars[op][2] & OPF_CHANGE;
+    ಪ್ರತ್ಯಾಗಮ opchars[op][2] & OPF_CHANGE;
 }
 #endif
 
@@ -120,65 +120,65 @@ op_is_change(int op)
  * Get first operator command character.
  * Returns 'g' or 'z' if there is another command character.
  */
-    int
-get_op_char(int optype)
+    ಪೂರ್ಣಾಙ್ಕ
+get_op_char(ಪೂರ್ಣಾಙ್ಕ optype)
 {
-    return opchars[optype][0];
+    ಪ್ರತ್ಯಾಗಮ opchars[optype][0];
 }
 
 /*
  * Get second operator command character.
  */
-    int
-get_extra_op_char(int optype)
+    ಪೂರ್ಣಾಙ್ಕ
+get_extra_op_char(ಪೂರ್ಣಾಙ್ಕ optype)
 {
-    return opchars[optype][1];
+    ಪ್ರತ್ಯಾಗಮ opchars[optype][1];
 }
 
 /*
  * op_shift - handle a shift operation
  */
-    void
-op_shift(oparg_T *oap, int curs_top, int amount)
+    ಶೂನ್ಯ
+op_shift(oparg_T *oap, ಪೂರ್ಣಾಙ್ಕ curs_ತುದಿ, ಪೂರ್ಣಾಙ್ಕ amount)
 {
     long	    i;
-    int		    first_char;
-    int		    block_col = 0;
+    ಪೂರ್ಣಾಙ್ಕ		    first_char;
+    ಪೂರ್ಣಾಙ್ಕ		    block_col = 0;
 
-    if (u_save((linenr_T)(oap->start.lnum - 1),
+    ಯದಿ (u_save((linenr_T)(oap->start.lnum - 1),
 				       (linenr_T)(oap->end.lnum + 1)) == FAIL)
-	return;
+	ಪ್ರತ್ಯಾಗಮ;
 
-    if (oap->block_mode)
+    ಯದಿ (oap->block_mode)
 	block_col = curwin->w_cursor.col;
 
-    for (i = oap->line_count; --i >= 0; )
+    ಪ್ರತಿ (i = oap->ಸಾಲು_ಎಣಿಕೆ; --i >= 0; )
     {
 	first_char = *ml_get_curline();
-	if (first_char == NUL)				// empty line
+	ಯದಿ (first_char == NUL)				// empty line
 	    curwin->w_cursor.col = 0;
-	else if (oap->block_mode)
+	ಅನ್ಯಥಾ ಯದಿ (oap->block_mode)
 	    shift_block(oap, amount);
-	else
+	ಅನ್ಯಥಾ
 	    // Move the line right if it doesn't start with '#', 'smartindent'
 	    // isn't set or 'cindent' isn't set or '#' isn't in 'cino'.
-	    if (first_char != '#' || !preprocs_left())
-		shift_line(oap->op_type == OP_LSHIFT, p_sr, amount, FALSE);
+	    ಯದಿ (first_char != '#' || !preprocs_ಎಡ())
+		shift_ಸಾಲು(oap->op_type == OP_LSHIFT, p_sr, amount, FALSE);
 	++curwin->w_cursor.lnum;
     }
 
-    changed_lines(oap->start.lnum, 0, oap->end.lnum + 1, 0L);
-    if (oap->block_mode)
+    changed_ಸಾಲುಗಳು(oap->start.lnum, 0, oap->end.lnum + 1, 0L);
+    ಯದಿ (oap->block_mode)
     {
 	curwin->w_cursor.lnum = oap->start.lnum;
 	curwin->w_cursor.col = block_col;
     }
-    else if (curs_top)	    // put cursor on first line, for ">>"
+    ಅನ್ಯಥಾ ಯದಿ (curs_ತುದಿ)	    // put cursor on first line, for ">>"
     {
 	curwin->w_cursor.lnum = oap->start.lnum;
 	beginline(BL_SOL | BL_FIX);   // shift_line() may have set cursor.col
     }
-    else
+    ಅನ್ಯಥಾ
 	--curwin->w_cursor.lnum;	// put cursor on last line, for ":>"
 
 #ifdef FEAT_FOLDING
@@ -187,33 +187,33 @@ op_shift(oparg_T *oap, int curs_top, int amount)
 #endif
 
 
-    if (oap->line_count > p_report)
+    ಯದಿ (oap->ಸಾಲು_ಎಣಿಕೆ > p_report)
     {
-	char	    *op;
-	char	    *msg_line_single;
-	char	    *msg_line_plural;
+	ವರ್ಣ	    *op;
+	ವರ್ಣ	    *ಸಂದೇಶ_ಸಾಲು_single;
+	ವರ್ಣ	    *ಸಂದೇಶ_ಸಾಲು_plural;
 
-	if (oap->op_type == OP_RSHIFT)
+	ಯದಿ (oap->op_type == OP_RSHIFT)
 	    op = ">";
-	else
+	ಅನ್ಯಥಾ
 	    op = "<";
-	msg_line_single = NGETTEXT("%ld line %sed %d time",
+	ಸಂದೇಶ_ಸಾಲು_single = NGETTEXT("%ld line %sed %d time",
 					     "%ld line %sed %d times", amount);
-	msg_line_plural = NGETTEXT("%ld lines %sed %d time",
+	ಸಂದೇಶ_ಸಾಲು_plural = NGETTEXT("%ld lines %sed %d time",
 					    "%ld lines %sed %d times", amount);
-	vim_snprintf((char *)IObuff, IOSIZE,
-		NGETTEXT(msg_line_single, msg_line_plural, oap->line_count),
-		oap->line_count, op, amount);
-	msg_attr_keep((char *)IObuff, 0, TRUE);
+	vim_snprintf((ವರ್ಣ *)IObuff, IOSIZE,
+		NGETTEXT(ಸಂದೇಶ_ಸಾಲು_single, ಸಂದೇಶ_ಸಾಲು_plural, oap->ಸಾಲು_ಎಣಿಕೆ),
+		oap->ಸಾಲು_ಎಣಿಕೆ, op, amount);
+	ಸಂದೇಶ_attr_keep((ವರ್ಣ *)IObuff, 0, TRUE);
     }
 
-    if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    ಯದಿ ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
     {
 	// Set "'[" and "']" marks.
 	curbuf->b_op_start = oap->start;
 	curbuf->b_op_end.lnum = oap->end.lnum;
 	curbuf->b_op_end.col = ml_get_len(oap->end.lnum);
-	if (curbuf->b_op_end.col > 0)
+	ಯದಿ (curbuf->b_op_end.col > 0)
 	    --curbuf->b_op_end.col;
     }
 }
@@ -224,100 +224,100 @@ op_shift(oparg_T *oap, int curs_top, int amount)
  * index greater than the length of the array is given, the last tabstop width
  * in the array is returned.
  */
-    static int
-get_vts(int *vts_array, int index)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+get_vts(ಪೂರ್ಣಾಙ್ಕ *vts_array, ಪೂರ್ಣಾಙ್ಕ index)
 {
-    int	ts;
+    ಪೂರ್ಣಾಙ್ಕ	ts;
 
-    if (index < 1)
+    ಯದಿ (index < 1)
 	ts = 0;
-    else if (index <= vts_array[0])
+    ಅನ್ಯಥಾ ಯದಿ (index <= vts_array[0])
 	ts = vts_array[index];
-    else
+    ಅನ್ಯಥಾ
 	ts = vts_array[vts_array[0]];
 
-    return ts;
+    ಪ್ರತ್ಯಾಗಮ ts;
 }
 
 /*
  * Return the sum of all the tabstops through the index-th.
  */
-    static int
-get_vts_sum(int *vts_array, int index)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+get_vts_sum(ಪೂರ್ಣಾಙ್ಕ *vts_array, ಪೂರ್ಣಾಙ್ಕ index)
 {
-    int	sum = 0;
-    int	i;
+    ಪೂರ್ಣಾಙ್ಕ	sum = 0;
+    ಪೂರ್ಣಾಙ್ಕ	i;
 
     // Perform the summation for indices within the actual array.
-    for (i = 1; i <= index && i <= vts_array[0]; i++)
+    ಪ್ರತಿ (i = 1; i <= index && i <= vts_array[0]; i++)
 	sum += vts_array[i];
 
     // Add tabstops whose indices exceed the actual array.
-    if (i <= index)
+    ಯದಿ (i <= index)
 	sum += vts_array[vts_array[0]] * (index - vts_array[0]);
 
-    return sum;
+    ಪ್ರತ್ಯಾಗಮ sum;
 }
 #endif
 
-    static vimlong_T
+    ಸ್ಥಿರ vimlong_T
 get_new_sw_indent(
-    int		left,		// TRUE if shift is to the left
-    int		round,		// TRUE if new indent is to be to a tabstop
+    ಪೂರ್ಣಾಙ್ಕ		ಎಡ,		// TRUE if shift is to the left
+    ಪೂರ್ಣಾಙ್ಕ		round,		// TRUE if new indent is to be to a tabstop
     vimlong_T	amount,		// Number of shifts
     vimlong_T	sw_val)
 {
-    vimlong_T	count = get_indent();
+    vimlong_T	ಎಣಿಕೆ = get_indent();
     vimlong_T	i, j;
 
-    if (round)			// round off indent
+    ಯದಿ (round)			// round off indent
     {
-	i = trim_to_int(count) / sw_val;	// number of 'shiftwidth' rounded down
-	j = trim_to_int(count) % sw_val;	// extra spaces
-	if (j && left)		// first remove extra spaces
+	i = trim_to_int(ಎಣಿಕೆ) / sw_val;	// number of 'shiftwidth' rounded down
+	j = trim_to_int(ಎಣಿಕೆ) % sw_val;	// extra spaces
+	ಯದಿ (j && ಎಡ)		// first remove extra spaces
 	    --amount;
-	if (left)
+	ಯದಿ (ಎಡ)
 	{
 	    i -= amount;
-	    if (i < 0)
+	    ಯದಿ (i < 0)
 		i = 0;
 	}
-	else
+	ಅನ್ಯಥಾ
 	    i += amount;
-	count = i * sw_val;
+	ಎಣಿಕೆ = i * sw_val;
     }
-    else			// original vi indent
+    ಅನ್ಯಥಾ			// original vi indent
     {
-	if (left)
+	ಯದಿ (ಎಡ)
 	{
-	    count -= sw_val * amount;
-	    if (count < 0)
-		count = 0;
+	    ಎಣಿಕೆ -= sw_val * amount;
+	    ಯದಿ (ಎಣಿಕೆ < 0)
+		ಎಣಿಕೆ = 0;
 	}
-	else
-	    count += sw_val * amount;
+	ಅನ್ಯಥಾ
+	    ಎಣಿಕೆ += sw_val * amount;
     }
 
-    return count;
+    ಪ್ರತ್ಯಾಗಮ ಎಣಿಕೆ;
 }
 
 #ifdef FEAT_VARTABS
-    static vimlong_T
+    ಸ್ಥಿರ vimlong_T
 get_new_vts_indent(
-    int	left,			// TRUE if shift is to the left
-    int	round,			// TRUE if new indent is to be to a tabstop
-    int	amount,			// Number of shifts
-    int	*vts_array)
+    ಪೂರ್ಣಾಙ್ಕ	ಎಡ,			// TRUE if shift is to the left
+    ಪೂರ್ಣಾಙ್ಕ	round,			// TRUE if new indent is to be to a tabstop
+    ಪೂರ್ಣಾಙ್ಕ	amount,			// Number of shifts
+    ಪೂರ್ಣಾಙ್ಕ	*vts_array)
 {
     vimlong_T	indent = get_indent();
-    int		vtsi = 0;
-    int		vts_indent = 0;
-    int		ts = 0;		// Silence uninitialized variable warning.
-    int		offset;		// Extra indent spaces to the right of the
+    ಪೂರ್ಣಾಙ್ಕ		vtsi = 0;
+    ಪೂರ್ಣಾಙ್ಕ		vts_indent = 0;
+    ಪೂರ್ಣಾಙ್ಕ		ts = 0;		// Silence uninitialized variable warning.
+    ಪೂರ್ಣಾಙ್ಕ		offset;		// Extra indent spaces to the right of the
 				// tabstop
 
     // Find the tabstop at or to the left of the current indent.
-    while (vts_indent <= indent)
+    ಯಾವತ್ (vts_indent <= indent)
     {
 	vtsi++;
 	ts = get_vts(vts_array, vtsi);
@@ -328,32 +328,32 @@ get_new_vts_indent(
 
     offset = indent - vts_indent;
 
-    if (round)
+    ಯದಿ (round)
     {
-	if (left)
+	ಯದಿ (ಎಡ)
 	{
-	    if (offset == 0)
+	    ಯದಿ (offset == 0)
 		indent = get_vts_sum(vts_array, vtsi - amount);
-	    else
+	    ಅನ್ಯಥಾ
 		indent = get_vts_sum(vts_array, vtsi - (amount - 1));
 	}
-	else
+	ಅನ್ಯಥಾ
 	    indent = get_vts_sum(vts_array, vtsi + amount);
     }
-    else
+    ಅನ್ಯಥಾ
     {
-	if (left)
+	ಯದಿ (ಎಡ)
 	{
-	    if (amount > vtsi)
+	    ಯದಿ (amount > vtsi)
 		indent = 0;
-	    else
+	    ಅನ್ಯಥಾ
 		indent = get_vts_sum(vts_array, vtsi - amount) + offset;
 	}
-	else
+	ಅನ್ಯಥಾ
 	    indent = get_vts_sum(vts_array, vtsi + amount) + offset;
     }
 
-    return indent;
+    ಪ್ರತ್ಯಾಗಮ indent;
 }
 #endif
 
@@ -367,91 +367,91 @@ get_new_vts_indent(
  * 'varsofttabstop' affecting the shiftwidth, and neither affects the
  * shiftwidth in current versions of Vim, so they are not considered here.
  */
-    void
-shift_line(
-    int	left,			// TRUE if shift is to the left
-    int	round,			// TRUE if new indent is to be to a tabstop
-    int	amount,			// Number of shifts
-    int	call_changed_bytes)	// call changed_bytes()
+    ಶೂನ್ಯ
+shift_ಸಾಲು(
+    ಪೂರ್ಣಾಙ್ಕ	ಎಡ,			// TRUE if shift is to the left
+    ಪೂರ್ಣಾಙ್ಕ	round,			// TRUE if new indent is to be to a tabstop
+    ಪೂರ್ಣಾಙ್ಕ	amount,			// Number of shifts
+    ಪೂರ್ಣಾಙ್ಕ	call_changed_bytes)	// call changed_bytes()
 {
-    vimlong_T	count;
+    vimlong_T	ಎಣಿಕೆ;
     long	sw_val = curbuf->b_p_sw;
     long	ts_val = curbuf->b_p_ts;
 #ifdef FEAT_VARTABS
-    int		*vts_array = curbuf->b_p_vts_array;
+    ಪೂರ್ಣಾಙ್ಕ		*vts_array = curbuf->b_p_vts_array;
 #endif
 
-    if (sw_val != 0)
+    ಯದಿ (sw_val != 0)
 	// 'shiftwidth' is not zero; use it as the shift size.
-	count = get_new_sw_indent(left, round, amount, sw_val);
-    else
+	ಎಣಿಕೆ = get_new_sw_indent(ಎಡ, round, amount, sw_val);
+    ಅನ್ಯಥಾ
 #ifdef FEAT_VARTABS
-	if ((vts_array == NULL) || (vts_array[0] == 0))
+	ಯದಿ ((vts_array == ರಿಕ್ತ) || (vts_array[0] == 0))
 #endif
     {
 	// 'shiftwidth is zero and 'vartabstop' is empty; use 'tabstop' as the
 	// shift size.
-	count = get_new_sw_indent(left, round, amount, ts_val);
+	ಎಣಿಕೆ = get_new_sw_indent(ಎಡ, round, amount, ts_val);
     }
 #ifdef FEAT_VARTABS
-    else
+    ಅನ್ಯಥಾ
     {
 	// 'shiftwidth is zero and 'vartabstop' is defined; use 'vartabstop'
 	// to determine the new indent.
-	count = get_new_vts_indent(left, round, amount, vts_array);
+	ಎಣಿಕೆ = get_new_vts_indent(ಎಡ, round, amount, vts_array);
     }
 #endif
 
     // Set new indent
-    if (State & VREPLACE_FLAG)
-	change_indent(INDENT_SET, trim_to_int(count), FALSE, NUL, call_changed_bytes);
-    else
-	(void)set_indent(trim_to_int(count), call_changed_bytes ? SIN_CHANGED : 0);
+    ಯದಿ (State & VREPLACE_FLAG)
+	change_indent(INDENT_SET, trim_to_int(ಎಣಿಕೆ), FALSE, NUL, call_changed_bytes);
+    ಅನ್ಯಥಾ
+	(ಶೂನ್ಯ)set_indent(trim_to_int(ಎಣಿಕೆ), call_changed_bytes ? SIN_CHANGED : 0);
 }
 
 /*
  * Shift one line of the current block one shiftwidth right or left.
  * Leaves cursor on first character in block.
  */
-    static void
-shift_block(oparg_T *oap, int amount)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+shift_block(oparg_T *oap, ಪೂರ್ಣಾಙ್ಕ amount)
 {
-    int			left = (oap->op_type == OP_LSHIFT);
-    int			oldstate = State;
-    int			total;
+    ಪೂರ್ಣಾಙ್ಕ			ಎಡ = (oap->op_type == OP_LSHIFT);
+    ಪೂರ್ಣಾಙ್ಕ			oldstate = State;
+    ಪೂರ್ಣಾಙ್ಕ			total;
     char_u		*newp, *oldp;
     size_t		newlen, oldlen;
-    int			oldcol = curwin->w_cursor.col;
-    int			sw_val = (int)get_sw_value_indent(curbuf, left);
-    int			ts_val = (int)curbuf->b_p_ts;
-    struct block_def	bd;
-    int			incr;
+    ಪೂರ್ಣಾಙ್ಕ			oldcol = curwin->w_cursor.col;
+    ಪೂರ್ಣಾಙ್ಕ			sw_val = (ಪೂರ್ಣಾಙ್ಕ)get_sw_ಮೌಲ್ಯ_indent(curbuf, ಎಡ);
+    ಪೂರ್ಣಾಙ್ಕ			ts_val = (ಪೂರ್ಣಾಙ್ಕ)curbuf->b_p_ts;
+    ಸಂರಚನಾ block_def	bd;
+    ಪೂರ್ಣಾಙ್ಕ			incr;
     colnr_T		ws_vcol;
-    int			added;
-    size_t		new_line_len;	// the length of the line after the
+    ಪೂರ್ಣಾಙ್ಕ			added;
+    size_t		new_ಸಾಲು_len;	// the length of the line after the
 					// block shift
 #ifdef FEAT_RIGHTLEFT
-    int			old_p_ri = p_ri;
+    ಪೂರ್ಣಾಙ್ಕ			old_p_ri = p_ri;
 
     p_ri = 0;			// don't want revins in indent
 #endif
 
-    State = MODE_INSERT;	// don't want MODE_REPLACE for State
+    State = MODE_ಸೇರಿಸು;	// don't want MODE_REPLACE for State
     block_prep(oap, &bd, curwin->w_cursor.lnum, TRUE);
-    if (bd.is_short)
-	return;
+    ಯದಿ (bd.is_short)
+	ಪ್ರತ್ಯಾಗಮ;
 
     // total is number of screen columns to be inserted/removed
-    total = (int)((unsigned)amount * (unsigned)sw_val);
-    if ((total / sw_val) != amount)
-	return; // multiplication overflow
+    total = (ಪೂರ್ಣಾಙ್ಕ)((unsigned)amount * (unsigned)sw_val);
+    ಯದಿ ((total / sw_val) != amount)
+	ಪ್ರತ್ಯಾಗಮ; // multiplication overflow
 
     oldp = ml_get_curline();
     oldlen = ml_get_curline_len();
 
-    if (!left)
+    ಯದಿ (!ಎಡ)
     {
-	int		tabs = 0, spaces = 0;
+	ಪೂರ್ಣಾಙ್ಕ		tabs = 0, spaces = 0;
 	chartabsize_T	cts;
 
 	/*
@@ -462,26 +462,26 @@ shift_block(oparg_T *oap, int amount)
 	 */
 	total += bd.pre_whitesp; // all virtual WS up to & incl a split TAB
 	ws_vcol = bd.start_vcol - bd.pre_whitesp;
-	if (bd.startspaces)
+	ಯದಿ (bd.startspaces)
 	{
-	    if (has_mbyte)
+	    ಯದಿ (has_mbyte)
 	    {
-		if ((*mb_ptr2len)(bd.textstart) == 1)
+		ಯದಿ ((*mb_ptr2len)(bd.textstart) == 1)
 		    ++bd.textstart;
-		else
+		ಅನ್ಯಥಾ
 		{
 		    ws_vcol = 0;
 		    bd.startspaces = 0;
 		}
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 		++bd.textstart;
 	}
 
 	// TODO: is passing bd.textstart for start of the line OK?
 	init_chartabsize_arg(&cts, curwin, curwin->w_cursor.lnum,
 				   bd.start_vcol, bd.textstart, bd.textstart);
-	for ( ; VIM_ISWHITE(*cts.cts_ptr); )
+	ಪ್ರತಿ ( ; VIM_ISWHITE(*cts.cts_ptr); )
 	{
 	    incr = lbr_chartabsize_adv(&cts);
 	    total += incr;
@@ -494,26 +494,26 @@ shift_block(oparg_T *oap, int amount)
 	// OK, now total=all the VWS reqd, and textstart points at the 1st
 	// non-ws char in the block.
 #ifdef FEAT_VARTABS
-	if (!curbuf->b_p_et)
+	ಯದಿ (!curbuf->b_p_et)
 	    tabstop_fromto(ws_vcol, ws_vcol + total,
 				ts_val, curbuf->b_p_vts_array, &tabs, &spaces);
-	else
+	ಅನ್ಯಥಾ
 	    spaces = total;
-#else
-	if (!curbuf->b_p_et)
+#ಅನ್ಯಥಾ
+	ಯದಿ (!curbuf->b_p_et)
 	    tabs = ((ws_vcol % ts_val) + total) / ts_val; // number of tabs
-	if (tabs > 0)
+	ಯದಿ (tabs > 0)
 	    spaces = ((ws_vcol % ts_val) + total) % ts_val; // number of spp
-	else
+	ಅನ್ಯಥಾ
 	    spaces = total;
 #endif
 	// if we're splitting a TAB, allow for it
 	bd.textcol -= bd.pre_whitesp_c - (bd.startspaces != 0);
 
-	new_line_len = bd.textcol + tabs + spaces + (oldlen - (bd.textstart - oldp));
-	newp = alloc(new_line_len + 1);
-	if (newp == NULL)
-	    return;
+	new_ಸಾಲು_len = bd.textcol + tabs + spaces + (oldlen - (bd.textstart - oldp));
+	newp = alloc(new_ಸಾಲು_len + 1);
+	ಯದಿ (newp == ರಿಕ್ತ)
+	    ಪ್ರತ್ಯಾಗಮ;
 	mch_memmove(newp, oldp, (size_t)bd.textcol);
 	newlen = bd.textcol;
 	vim_memset(newp + newlen, TAB, (size_t)tabs);
@@ -521,7 +521,7 @@ shift_block(oparg_T *oap, int amount)
 	vim_memset(newp + newlen, ' ', (size_t)spaces);
 	STRCPY(newp + newlen + spaces, bd.textstart);
     }
-    else // left
+    ಅನ್ಯಥಾ //ಎಡ
     {
 	colnr_T	    destination_col;	// column to which text in block will
 					// be shifted
@@ -549,7 +549,7 @@ shift_block(oparg_T *oap, int amount)
 	// If "bd.startspaces" is set, "bd.textstart" points to the character,
 	// the part of which is displayed at the block's beginning. Let's start
 	// searching from the next character.
-	if (bd.startspaces)
+	ಯದಿ (bd.startspaces)
 	    MB_PTR_ADV(non_white);
 
 	// The character's column is in "bd.start_vcol".
@@ -557,7 +557,7 @@ shift_block(oparg_T *oap, int amount)
 
 	init_chartabsize_arg(&cts, curwin, curwin->w_cursor.lnum,
 				   non_white_col, bd.textstart, non_white);
-	while (VIM_ISWHITE(*cts.cts_ptr))
+	ಯಾವತ್ (VIM_ISWHITE(*cts.cts_ptr))
 	{
 	    incr = lbr_chartabsize_adv(&cts);
 	    cts.cts_vcol += incr;
@@ -582,15 +582,15 @@ shift_block(oparg_T *oap, int amount)
 	// If "bd.startspaces" is set, "bd.textstart" points to the character
 	// preceding the block. We have to subtract its width to obtain its
 	// column number.
-	if (bd.startspaces)
+	ಯದಿ (bd.startspaces)
 	    verbatim_copy_width -= bd.start_char_vcols;
 	init_chartabsize_arg(&cts, curwin, 0, verbatim_copy_width,
 					     bd.textstart, verbatim_copy_end);
-	while (cts.cts_vcol < destination_col)
+	ಯಾವತ್ (cts.cts_vcol < destination_col)
 	{
 	    incr = lbr_chartabsize(&cts);
-	    if (cts.cts_vcol + incr > destination_col)
-		break;
+	    ಯದಿ (cts.cts_vcol + incr > destination_col)
+		ಭಙ್ಗ;
 	    cts.cts_vcol += incr;
 	    MB_PTR_ADV(cts.cts_ptr);
 	}
@@ -608,11 +608,11 @@ shift_block(oparg_T *oap, int amount)
 	// - "fill" number of spaces,
 	// - the rest of the line, pointed to by non_white.
 	fixedlen = verbatim_copy_end - oldp;
-	new_line_len = fixedlen + fill + (oldlen - (non_white - oldp));
+	new_ಸಾಲು_len = fixedlen + fill + (oldlen - (non_white - oldp));
 
-	newp = alloc(new_line_len + 1);
-	if (newp == NULL)
-	    return;
+	newp = alloc(new_ಸಾಲು_len + 1);
+	ಯದಿ (newp == ರಿಕ್ತ)
+	    ಪ್ರತ್ಯಾಗಮ;
 	mch_memmove(newp, oldp, fixedlen);
 	newlen = fixedlen;
 	vim_memset(newp + newlen, ' ', (size_t)fill);
@@ -624,10 +624,10 @@ shift_block(oparg_T *oap, int amount)
     // compute the number of bytes added or subtracted.
     // note new_line_len and oldlen are unsigned so we have
     // to be careful about how we calculate this.
-    if (new_line_len >= oldlen)
-	added = (int)(new_line_len - oldlen);
-    else
-	added = 0 - (int)(oldlen - new_line_len);
+    ಯದಿ (new_ಸಾಲು_len >= oldlen)
+	added = (ಪೂರ್ಣಾಙ್ಕ)(new_ಸಾಲು_len - oldlen);
+    ಅನ್ಯಥಾ
+	added = 0 - (ಪೂರ್ಣಾಙ್ಕ)(oldlen - new_ಸಾಲು_len);
     inserted_bytes(curwin->w_cursor.lnum, bd.textcol, added);
     State = oldstate;
     curwin->w_cursor.col = oldcol;
@@ -640,74 +640,74 @@ shift_block(oparg_T *oap, int amount)
  * Insert string "s" (b_insert ? before : after) block :AKelly
  * Caller must prepare for undo.
  */
-    static void
-block_insert(
+    ಸ್ಥಿರ ಶೂನ್ಯ
+block_ಸೇರಿಸು(
     oparg_T		*oap,
     char_u		*s,
     size_t		slen,
-    int			b_insert,
-    struct block_def	*bdp)
+    ಪೂರ್ಣಾಙ್ಕ			b_ಸೇರಿಸು,
+    ಸಂರಚನಾ block_def	*bdp)
 {
-    int		ts_val;
-    int		count = 0;	// extra spaces to replace a cut TAB
-    int		spaces = 0;	// non-zero if cutting a TAB
+    ಪೂರ್ಣಾಙ್ಕ		ts_val;
+    ಪೂರ್ಣಾಙ್ಕ		ಎಣಿಕೆ = 0;	// extra spaces to replace a cut TAB
+    ಪೂರ್ಣಾಙ್ಕ		spaces = 0;	// non-zero if cutting a TAB
     colnr_T	offset;		// pointer along new line
     colnr_T	startcol;	// column where insert starts
     char_u	*newp, *oldp;	// new, old lines
     linenr_T	lnum;		// loop var
-    int		oldstate = State;
+    ಪೂರ್ಣಾಙ್ಕ		oldstate = State;
 
-    State = MODE_INSERT;	// don't want MODE_REPLACE for State
+    State = MODE_ಸೇರಿಸು;	// don't want MODE_REPLACE for State
 
-    for (lnum = oap->start.lnum + 1; lnum <= oap->end.lnum; lnum++)
+    ಪ್ರತಿ (lnum = oap->start.lnum + 1; lnum <= oap->end.lnum; lnum++)
     {
 	block_prep(oap, bdp, lnum, TRUE);
-	if (bdp->is_short && b_insert)
-	    continue;	// OP_INSERT, line ends before block start
+	ಯದಿ (bdp->is_short && b_ಸೇರಿಸು)
+	    ಅನುವರ್ತ;	// OP_INSERT, line ends before block start
 
 	oldp = ml_get(lnum);
 
-	if (b_insert)
+	ಯದಿ (b_ಸೇರಿಸು)
 	{
 	    ts_val = bdp->start_char_vcols;
 	    spaces = bdp->startspaces;
-	    if (spaces != 0)
-		count = ts_val - 1; // we're cutting a TAB
+	    ಯದಿ (spaces != 0)
+		ಎಣಿಕೆ = ts_val - 1; // we're cutting a TAB
 	    offset = bdp->textcol;
 	}
-	else // append
+	ಅನ್ಯಥಾ // append
 	{
 	    ts_val = bdp->end_char_vcols;
-	    if (!bdp->is_short) // spaces = padding after block
+	    ಯದಿ (!bdp->is_short) // spaces = padding after block
 	    {
 		spaces = (bdp->endspaces ? ts_val - bdp->endspaces : 0);
-		if (spaces != 0)
-		    count = ts_val - 1; // we're cutting a TAB
+		ಯದಿ (spaces != 0)
+		    ಎಣಿಕೆ = ts_val - 1; // we're cutting a TAB
 		offset = bdp->textcol + bdp->textlen - (spaces != 0);
 	    }
-	    else // spaces = padding to block edge
+	    ಅನ್ಯಥಾ // spaces = padding to block edge
 	    {
 		// if $ used, just append to EOL (ie spaces==0)
-		if (!bdp->is_MAX)
+		ಯದಿ (!bdp->is_MAX)
 		    spaces = (oap->end_vcol - bdp->end_vcol) + 1;
-		count = spaces;
+		ಎಣಿಕೆ = spaces;
 		offset = bdp->textcol + bdp->textlen;
 	    }
 	}
 
-	if (has_mbyte && spaces > 0)
+	ಯದಿ (has_mbyte && spaces > 0)
 	    // avoid copying part of a multi-byte character
 	    offset -= (*mb_head_off)(oldp, oldp + offset);
 
-	if (spaces < 0)  // can happen when the cursor was moved
+	ಯದಿ (spaces < 0)  // can happen when the cursor was moved
 	    spaces = 0;
 
 	// Make sure the allocated size matches what is actually copied below.
 	newp = alloc(ml_get_len(lnum) + spaces + slen
 		    + (spaces > 0 && !bdp->is_short ? ts_val - spaces : 0)
-								  + count + 1);
-	if (newp == NULL)
-	    continue;
+								  + ಎಣಿಕೆ + 1);
+	ಯದಿ (newp == ರಿಕ್ತ)
+	    ಅನುವರ್ತ;
 
 	// copy up to shifted part
 	mch_memmove(newp, oldp, (size_t)offset);
@@ -719,11 +719,11 @@ block_insert(
 
 	// copy the new text
 	mch_memmove(newp + startcol, s, slen);
-	offset += (int)slen;
+	offset += (ಪೂರ್ಣಾಙ್ಕ)slen;
 
-	if (spaces > 0 && !bdp->is_short)
+	ಯದಿ (spaces > 0 && !bdp->is_short)
 	{
-	    if (*oldp == TAB)
+	    ಯದಿ (*oldp == TAB)
 	    {
 		// insert post-padding
 		vim_memset(newp + offset + spaces, ' ',
@@ -731,30 +731,30 @@ block_insert(
 		// we're splitting a TAB, don't copy it
 		oldp++;
 		// We allowed for that TAB, remember this now
-		count++;
+		ಎಣಿಕೆ++;
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 		// Not a TAB, no extra spaces
-		count = spaces;
+		ಎಣಿಕೆ = spaces;
 	}
 
-	if (spaces > 0)
-	    offset += count;
+	ಯದಿ (spaces > 0)
+	    offset += ಎಣಿಕೆ;
 	STRCPY(newp + offset, oldp);
 
 	ml_replace(lnum, newp, FALSE);
 
-	if (b_insert)
+	ಯದಿ (b_ಸೇರಿಸು)
 	    // correct any text properties
-	    inserted_bytes(lnum, startcol, (int)slen);
+	    inserted_bytes(lnum, startcol, (ಪೂರ್ಣಾಙ್ಕ)slen);
 
-	if (lnum == oap->end.lnum)
+	ಯದಿ (lnum == oap->end.lnum)
 	{
 	    // Set "']" mark to the end of the block instead of the end of
 	    // the insert in the first line.
 	    curbuf->b_op_end.lnum = oap->end.lnum;
 	    curbuf->b_op_end.col = offset;
-	    if (curbuf->b_visual.vi_end.coladd)
+	    ಯದಿ (curbuf->b_visual.vi_end.coladd)
 	    {
 		curbuf->b_visual.vi_end.col += curbuf->b_visual.vi_end.coladd;
 		curbuf->b_visual.vi_end.coladd = 0;
@@ -762,7 +762,7 @@ block_insert(
 	}
     } // for all lnum
 
-    changed_lines(oap->start.lnum + 1, 0, oap->end.lnum + 1, 0L);
+    changed_ಸಾಲುಗಳು(oap->start.lnum + 1, 0, oap->end.lnum + 1, 0L);
 
     State = oldstate;
 }
@@ -772,31 +772,31 @@ block_insert(
  *
  * Return FAIL if undo failed, OK otherwise.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 op_delete(oparg_T *oap)
 {
-    int			n;
+    ಪೂರ್ಣಾಙ್ಕ			n;
     linenr_T		lnum;
     char_u		*ptr;
     char_u		*newp, *oldp;
-    struct block_def	bd;
-    linenr_T		old_lcount = curbuf->b_ml.ml_line_count;
-    int			did_yank = FALSE;
+    ಸಂರಚನಾ block_def	bd;
+    linenr_T		old_lcount = curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
+    ಪೂರ್ಣಾಙ್ಕ			did_yank = FALSE;
 
-    if (curbuf->b_ml.ml_flags & ML_EMPTY)	    // nothing to do
-	return OK;
+    ಯದಿ (curbuf->b_ml.ml_flags & ML_EMPTY)	    // nothing to do
+	ಪ್ರತ್ಯಾಗಮ OK;
 
     // Nothing to delete, return here.	Do prepare undo, for op_change().
-    if (oap->empty)
-	return u_save_cursor();
+    ಯದಿ (oap->empty)
+	ಪ್ರತ್ಯಾಗಮ u_save_cursor();
 
-    if (!curbuf->b_p_ma)
+    ಯದಿ (!curbuf->b_p_ma)
     {
 	emsg(_(e_cannot_make_changes_modifiable_is_off));
-	return FAIL;
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     }
 
-    if (VIsual_select && oap->is_VIsual)
+    ಯದಿ (VIsual_select && oap->is_VIsual)
 	// use register given with CTRL_R, defaults to zero
 	oap->regname = VIsual_select_reg;
 
@@ -804,7 +804,7 @@ op_delete(oparg_T *oap)
     adjust_clip_reg(&oap->regname);
 #endif
 
-    if (has_mbyte)
+    ಯದಿ (has_mbyte)
 	mb_adjust_opend(oap);
 
     /*
@@ -812,19 +812,19 @@ op_delete(oparg_T *oap)
      * line and motion_type == MCHAR and the result is a blank line, make the
      * delete linewise.  Don't do this for the change command or Visual mode.
      */
-    if (       oap->motion_type == MCHAR
+    ಯದಿ (       oap->motion_type == MCHAR
 	    && !oap->is_VIsual
 	    && !oap->block_mode
-	    && oap->line_count > 1
+	    && oap->ಸಾಲು_ಎಣಿಕೆ > 1
 	    && oap->motion_force == NUL
-	    && (vim_strchr(p_cpo, CPO_WORD) != NULL)
+	    && (vim_strchr(p_cpo, CPO_WORD) != ರಿಕ್ತ)
 	    && oap->op_type == OP_DELETE)
     {
 	ptr = ml_get(oap->end.lnum) + oap->end.col;
-	if (*ptr != NUL)
+	ಯದಿ (*ptr != NUL)
 	    ptr += oap->inclusive;
 	ptr = skipwhite(ptr);
-	if (*ptr == NUL && inindent(0))
+	ಯದಿ (*ptr == NUL && inindent(0))
 	    oap->motion_type = MLINE;
     }
 
@@ -832,8 +832,8 @@ op_delete(oparg_T *oap)
      * Check for trying to delete (e.g. "D") in an empty line.
      * Note: For the change operator it is ok.
      */
-    if (       oap->motion_type == MCHAR
-	    && oap->line_count == 1
+    ಯದಿ (       oap->motion_type == MCHAR
+	    && oap->ಸಾಲು_ಎಣಿಕೆ == 1
 	    && oap->op_type == OP_DELETE
 	    && *ml_get(oap->start.lnum) == NUL)
     {
@@ -841,13 +841,13 @@ op_delete(oparg_T *oap)
 	 * It's an error to operate on an empty region, when 'E' included in
 	 * 'cpoptions' (Vi compatible).
 	 */
-	if (virtual_op)
+	ಯದಿ (virtual_op)
 	    // Virtual editing: Nothing gets deleted, but we set the '[ and ']
 	    // marks as if it happened.
-	    goto setmarks;
-	if (vim_strchr(p_cpo, CPO_EMPTYREGION) != NULL)
+	    ಗಚ್ಛ setmarks;
+	ಯದಿ (vim_strchr(p_cpo, CPO_EMPTYREGION) != ರಿಕ್ತ)
 	    beep_flush();
-	return OK;
+	ಪ್ರತ್ಯಾಗಮ OK;
     }
 
     /*
@@ -855,27 +855,27 @@ op_delete(oparg_T *oap)
      * If a yank register was specified, put the deleted text into that
      * register.  For the black hole register '_' don't yank anything.
      */
-    if (oap->regname != '_')
+    ಯದಿ (oap->regname != '_')
     {
 #ifdef FEAT_CLIPBOARD_PROVIDER
 	inc_clip_provider();
 #endif
-	if (oap->regname != 0)
+	ಯದಿ (oap->regname != 0)
 	{
 	    // check for read-only register
-	    if (!valid_yank_reg(oap->regname, TRUE))
+	    ಯದಿ (!valid_yank_reg(oap->regname, TRUE))
 	    {
 		beep_flush();
 #ifdef FEAT_CLIPBOARD_PROVIDER
 		dec_clip_provider();
 #endif
-		return OK;
+		ಪ್ರತ್ಯಾಗಮ OK;
 	    }
 	    get_yank_register(oap->regname, TRUE); // yank into specif'd reg.
-	    if (op_yank(oap, TRUE, FALSE) == OK)   // yank without message
+	    ಯದಿ (op_yank(oap, TRUE, FALSE) == OK)   // yank without message
 		did_yank = TRUE;
 	}
-	else
+	ಅನ್ಯಥಾ
 	    reset_y_append(); // not appending to unnamed register
 
 	/*
@@ -883,27 +883,27 @@ op_delete(oparg_T *oap)
 	 * delete contains a line break, or when using a specific operator (Vi
 	 * compatible)
 	 */
-	if (oap->motion_type == MLINE || oap->line_count > 1
+	ಯದಿ (oap->motion_type == MLINE || oap->ಸಾಲು_ಎಣಿಕೆ > 1
 							   || oap->use_reg_one)
 	{
 	    shift_delete_registers();
-	    if (op_yank(oap, TRUE, FALSE) == OK)
+	    ಯದಿ (op_yank(oap, TRUE, FALSE) == OK)
 		did_yank = TRUE;
 	}
 
 	// Yank into small delete register when no named register specified
 	// and the delete is within one line.
-	if ((
+	ಯದಿ ((
 #ifdef HAVE_CLIPMETHOD
 	    ((clip_unnamed & CLIP_UNNAMED) && oap->regname == '*') ||
 	    ((clip_unnamed & CLIP_UNNAMED_PLUS) && oap->regname == '+') ||
 #endif
 	    oap->regname == 0) && oap->motion_type != MLINE
-						      && oap->line_count == 1)
+						      && oap->ಸಾಲು_ಎಣಿಕೆ == 1)
 	{
 	    oap->regname = '-';
 	    get_yank_register(oap->regname, TRUE);
-	    if (op_yank(oap, TRUE, FALSE) == OK)
+	    ಯದಿ (op_yank(oap, TRUE, FALSE) == OK)
 		did_yank = TRUE;
 	    oap->regname = 0;
 	}
@@ -914,25 +914,25 @@ op_delete(oparg_T *oap)
 	 * And it avoids doing a delete of something we can't put back if we
 	 * want.
 	 */
-	if (!did_yank)
+	ಯದಿ (!did_yank)
 	{
-	    int msg_silent_save = msg_silent;
+	    ಪೂರ್ಣಾಙ್ಕ ಸಂದೇಶ_silent_save = ಸಂದೇಶ_silent;
 
-	    msg_silent = 0;	// must display the prompt
+	    ಸಂದೇಶ_silent = 0;	// must display the prompt
 	    n = ask_yesno((char_u *)_("cannot yank; delete anyway"), TRUE);
-	    msg_silent = msg_silent_save;
-	    if (n != 'y')
+	    ಸಂದೇಶ_silent = ಸಂದೇಶ_silent_save;
+	    ಯದಿ (n != 'y')
 	    {
 		emsg(_(e_command_aborted));
 #ifdef FEAT_CLIPBOARD_PROVIDER
 		dec_clip_provider();
 #endif
-		return FAIL;
+		ಪ್ರತ್ಯಾಗಮ FAIL;
 	    }
 	}
 
-#if defined(FEAT_EVAL)
-	if (did_yank && has_textyankpost())
+#ಯದಿ defined(FEAT_EVAL)
+	ಯದಿ (did_yank && has_textyankpost())
 	    yank_do_autocmd(oap, get_y_current());
 #endif
 #ifdef FEAT_CLIPBOARD_PROVIDER
@@ -943,20 +943,20 @@ op_delete(oparg_T *oap)
     /*
      * block mode delete
      */
-    if (oap->block_mode)
+    ಯದಿ (oap->block_mode)
     {
-	if (u_save((linenr_T)(oap->start.lnum - 1),
+	ಯದಿ (u_save((linenr_T)(oap->start.lnum - 1),
 			       (linenr_T)(oap->end.lnum + 1)) == FAIL)
-	    return FAIL;
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
 
-	for (lnum = curwin->w_cursor.lnum; lnum <= oap->end.lnum; ++lnum)
+	ಪ್ರತಿ (lnum = curwin->w_cursor.lnum; lnum <= oap->end.lnum; ++lnum)
 	{
 	    block_prep(oap, &bd, lnum, TRUE);
-	    if (bd.textlen == 0)	// nothing to delete
-		continue;
+	    ಯದಿ (bd.textlen == 0)	// nothing to delete
+		ಅನುವರ್ತ;
 
 	    // Adjust cursor position for tab replaced by spaces and 'lbr'.
-	    if (lnum == curwin->w_cursor.lnum)
+	    ಯದಿ (lnum == curwin->w_cursor.lnum)
 	    {
 		curwin->w_cursor.col = bd.textcol + bd.startspaces;
 		curwin->w_cursor.coladd = 0;
@@ -968,8 +968,8 @@ op_delete(oparg_T *oap)
 	    n = bd.textlen - bd.startspaces - bd.endspaces;
 	    oldp = ml_get(lnum);
 	    newp = alloc(ml_get_len(lnum) + 1 - n);
-	    if (newp == NULL)
-		continue;
+	    ಯದಿ (newp == ರಿಕ್ತ)
+		ಅನುವರ್ತ;
 	    // copy up to deleted part
 	    mch_memmove(newp, oldp, (size_t)bd.textcol);
 	    // insert spaces
@@ -982,68 +982,68 @@ op_delete(oparg_T *oap)
 	    ml_replace(lnum, newp, FALSE);
 
 #ifdef FEAT_PROP_POPUP
-	    if (curbuf->b_has_textprop && n != 0)
+	    ಯದಿ (curbuf->b_has_textprop && n != 0)
 		adjust_prop_columns(lnum, bd.textcol, -n, 0);
 #endif
 	}
 
 	check_cursor_col();
-	changed_lines(curwin->w_cursor.lnum, curwin->w_cursor.col,
+	changed_ಸಾಲುಗಳು(curwin->w_cursor.lnum, curwin->w_cursor.col,
 						       oap->end.lnum + 1, 0L);
-	oap->line_count = 0;	    // no lines deleted
+	oap->ಸಾಲು_ಎಣಿಕೆ = 0;	    // no lines deleted
     }
-    else if (oap->motion_type == MLINE)
+    ಅನ್ಯಥಾ ಯದಿ (oap->motion_type == MLINE)
     {
-	if (oap->op_type == OP_CHANGE)
+	ಯದಿ (oap->op_type == OP_CHANGE)
 	{
 	    // Delete the lines except the first one.  Temporarily move the
 	    // cursor to the next line.  Save the current line number, if the
 	    // last line is deleted it may be changed.
-	    if (oap->line_count > 1)
+	    ಯದಿ (oap->ಸಾಲು_ಎಣಿಕೆ > 1)
 	    {
 		lnum = curwin->w_cursor.lnum;
 		++curwin->w_cursor.lnum;
-		del_lines((long)(oap->line_count - 1), TRUE);
+		del_ಸಾಲುಗಳು((long)(oap->ಸಾಲು_ಎಣಿಕೆ - 1), TRUE);
 		curwin->w_cursor.lnum = lnum;
 	    }
-	    if (u_save_cursor() == FAIL)
-		return FAIL;
-	    if (curbuf->b_p_ai)		    // don't delete indent
+	    ಯದಿ (u_save_cursor() == FAIL)
+		ಪ್ರತ್ಯಾಗಮ FAIL;
+	    ಯದಿ (curbuf->b_p_ai)		    // don't delete indent
 	    {
 		beginline(BL_WHITE);	    // cursor on first non-white
 		did_ai = TRUE;		    // delete the indent when ESC hit
 		ai_col = curwin->w_cursor.col;
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 		beginline(0);		    // cursor in column 0
-	    truncate_line(FALSE);   // delete the rest of the line,
+	    truncate_ಸಾಲು(FALSE);   // delete the rest of the line,
 				    // leaving cursor past last char in line
-	    if (oap->line_count > 1)
+	    ಯದಿ (oap->ಸಾಲು_ಎಣಿಕೆ > 1)
 		u_clearline();	    // "U" command not possible after "2cc"
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
-	    del_lines(oap->line_count, TRUE);
+	    del_ಸಾಲುಗಳು(oap->ಸಾಲು_ಎಣಿಕೆ, TRUE);
 	    beginline(BL_WHITE | BL_FIX);
 	    u_clearline();	// "U" command not possible after "dd"
 	}
     }
-    else
+    ಅನ್ಯಥಾ
     {
-	if (virtual_op)
+	ಯದಿ (virtual_op)
 	{
-	    int		endcol = 0;
+	    ಪೂರ್ಣಾಙ್ಕ		endcol = 0;
 
 	    // For virtualedit: break the tabs that are partly included.
-	    if (gchar_pos(&oap->start) == '\t')
+	    ಯದಿ (gchar_pos(&oap->start) == '\t')
 	    {
-		if (u_save_cursor() == FAIL)	// save first line for undo
-		    return FAIL;
-		if (oap->line_count == 1)
+		ಯದಿ (u_save_cursor() == FAIL)	// save first line for undo
+		    ಪ್ರತ್ಯಾಗಮ FAIL;
+		ಯದಿ (oap->ಸಾಲು_ಎಣಿಕೆ == 1)
 		    endcol = getviscol2(oap->end.col, oap->end.coladd);
 		coladvance_force(getviscol2(oap->start.col, oap->start.coladd));
 		oap->start = curwin->w_cursor;
-		if (oap->line_count == 1)
+		ಯದಿ (oap->ಸಾಲು_ಎಣಿಕೆ == 1)
 		{
 		    coladvance(endcol);
 		    oap->end.col = curwin->w_cursor.col;
@@ -1053,29 +1053,29 @@ op_delete(oparg_T *oap)
 	    }
 
 	    // Break a tab only when it's included in the area.
-	    if (gchar_pos(&oap->end) == '\t'
-				     && (int)oap->end.coladd < oap->inclusive)
+	    ಯದಿ (gchar_pos(&oap->end) == '\t'
+				     && (ಪೂರ್ಣಾಙ್ಕ)oap->end.coladd < oap->inclusive)
 	    {
 		// save last line for undo
-		if (u_save((linenr_T)(oap->end.lnum - 1),
+		ಯದಿ (u_save((linenr_T)(oap->end.lnum - 1),
 				       (linenr_T)(oap->end.lnum + 1)) == FAIL)
-		    return FAIL;
+		    ಪ್ರತ್ಯಾಗಮ FAIL;
 		curwin->w_cursor = oap->end;
 		coladvance_force(getviscol2(oap->end.col, oap->end.coladd));
 		oap->end = curwin->w_cursor;
 		curwin->w_cursor = oap->start;
 	    }
-	    if (has_mbyte)
+	    ಯದಿ (has_mbyte)
 		mb_adjust_opend(oap);
 	}
 
-	if (oap->line_count == 1)	// delete characters within one line
+	ಯದಿ (oap->ಸಾಲು_ಎಣಿಕೆ == 1)	// delete characters within one line
 	{
-	    if (u_save_cursor() == FAIL)	// save line for undo
-		return FAIL;
+	    ಯದಿ (u_save_cursor() == FAIL)	// save line for undo
+		ಪ್ರತ್ಯಾಗಮ FAIL;
 
 	    // if 'cpoptions' contains '$', display '$' at end of change
-	    if (       vim_strchr(p_cpo, CPO_DOLLAR) != NULL
+	    ಯದಿ (       vim_strchr(p_cpo, CPO_DOLLAR) != ರಿಕ್ತ
 		    && oap->op_type == OP_CHANGE
 		    && oap->end.lnum == curwin->w_cursor.lnum
 		    && !oap->is_VIsual)
@@ -1083,92 +1083,92 @@ op_delete(oparg_T *oap)
 
 	    n = oap->end.col - oap->start.col + 1 - !oap->inclusive;
 
-	    if (virtual_op)
+	    ಯದಿ (virtual_op)
 	    {
 		// fix up things for virtualedit-delete:
 		// break the tabs which are going to get in our way
-		int		len = ml_get_curline_len();
+		ಪೂರ್ಣಾಙ್ಕ		len = ml_get_curline_len();
 
-		if (oap->end.coladd != 0
-			&& (int)oap->end.col >= len - 1
-			&& !(oap->start.coladd && (int)oap->end.col >= len - 1))
+		ಯದಿ (oap->end.coladd != 0
+			&& (ಪೂರ್ಣಾಙ್ಕ)oap->end.col >= len - 1
+			&& !(oap->start.coladd && (ಪೂರ್ಣಾಙ್ಕ)oap->end.col >= len - 1))
 		    n++;
 		// Delete at least one char (e.g, when on a control char).
-		if (n == 0 && oap->start.coladd != oap->end.coladd)
+		ಯದಿ (n == 0 && oap->start.coladd != oap->end.coladd)
 		    n = 1;
 
 		// When deleted a char in the line, reset coladd.
-		if (gchar_cursor() != NUL)
+		ಯದಿ (gchar_cursor() != NUL)
 		    curwin->w_cursor.coladd = 0;
 	    }
-	    (void)del_bytes((long)n, !virtual_op,
+	    (ಶೂನ್ಯ)del_bytes((long)n, !virtual_op,
 			    oap->op_type == OP_DELETE && !oap->is_VIsual);
 	}
-	else				// delete characters between lines
+	ಅನ್ಯಥಾ				// delete characters between lines
 	{
 	    pos_T   curpos;
 
 	    // save deleted and changed lines for undo
-	    if (u_save((linenr_T)(curwin->w_cursor.lnum - 1),
-		 (linenr_T)(curwin->w_cursor.lnum + oap->line_count)) == FAIL)
-		return FAIL;
+	    ಯದಿ (u_save((linenr_T)(curwin->w_cursor.lnum - 1),
+		 (linenr_T)(curwin->w_cursor.lnum + oap->ಸಾಲು_ಎಣಿಕೆ)) == FAIL)
+		ಪ್ರತ್ಯಾಗಮ FAIL;
 
-	    truncate_line(TRUE);	// delete from cursor to end of line
+	    truncate_ಸಾಲು(TRUE);	// delete from cursor to end of line
 
 	    curpos = curwin->w_cursor;	// remember curwin->w_cursor
 	    ++curwin->w_cursor.lnum;
-	    del_lines((long)(oap->line_count - 2), FALSE);
+	    del_ಸಾಲುಗಳು((long)(oap->ಸಾಲು_ಎಣಿಕೆ - 2), FALSE);
 
 	    // delete from start of line until op_end
 	    n = (oap->end.col + 1 - !oap->inclusive);
 	    curwin->w_cursor.col = 0;
-	    (void)del_bytes((long)n, !virtual_op,
+	    (ಶೂನ್ಯ)del_bytes((long)n, !virtual_op,
 			    oap->op_type == OP_DELETE && !oap->is_VIsual);
 	    curwin->w_cursor = curpos;	// restore curwin->w_cursor
-	    (void)do_join(2, FALSE, FALSE, FALSE, FALSE);
+	    (ಶೂನ್ಯ)do_join(2, FALSE, FALSE, FALSE, FALSE);
 	}
-	if (oap->op_type == OP_DELETE)
+	ಯದಿ (oap->op_type == OP_DELETE)
 	    auto_format(FALSE, TRUE);
     }
 
-    msgmore(curbuf->b_ml.ml_line_count - old_lcount);
+    msgmore(curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ - old_lcount);
 
 setmarks:
-    if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    ಯದಿ ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
     {
-	if (oap->block_mode)
+	ಯದಿ (oap->block_mode)
 	{
 	    curbuf->b_op_end.lnum = oap->end.lnum;
 	    curbuf->b_op_end.col = oap->start.col;
 	}
-	else
+	ಅನ್ಯಥಾ
 	    curbuf->b_op_end = oap->start;
 	curbuf->b_op_start = oap->start;
     }
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Adjust end of operating area for ending on a multi-byte character.
  * Used for deletion.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 mb_adjust_opend(oparg_T *oap)
 {
-    char_u	*line;
+    char_u	*ಸಾಲು;
     char_u	*ptr;
 
-    if (!oap->inclusive)
-	return;
+    ಯದಿ (!oap->inclusive)
+	ಪ್ರತ್ಯಾಗಮ;
 
-    line = ml_get(oap->end.lnum);
-    ptr = line + oap->end.col;
-    if (*ptr != NUL)
+    ಸಾಲು = ml_get(oap->end.lnum);
+    ptr = ಸಾಲು + oap->end.col;
+    ಯದಿ (*ptr != NUL)
     {
-	ptr -= (*mb_head_off)(line, ptr);
+	ptr -= (*mb_head_off)(ಸಾಲು, ptr);
 	ptr += (*mb_ptr2len)(ptr) - 1;
-	oap->end.col = ptr - line;
+	oap->end.col = ptr - ಸಾಲು;
     }
 }
 
@@ -1176,10 +1176,10 @@ mb_adjust_opend(oparg_T *oap)
  * Replace the character under the cursor with "c".
  * This takes care of multi-byte characters.
  */
-    static void
-replace_character(int c)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+replace_character(ಪೂರ್ಣಾಙ್ಕ c)
 {
-    int n = State;
+    ಪೂರ್ಣಾಙ್ಕ n = State;
 
     State = MODE_REPLACE;
     ins_char(c);
@@ -1191,57 +1191,57 @@ replace_character(int c)
 /*
  * Replace a whole area with one character.
  */
-    int
-op_replace(oparg_T *oap, int c)
+    ಪೂರ್ಣಾಙ್ಕ
+op_replace(oparg_T *oap, ಪೂರ್ಣಾಙ್ಕ c)
 {
-    int			n, numc;
-    int			num_chars;
+    ಪೂರ್ಣಾಙ್ಕ			n, numc;
+    ಪೂರ್ಣಾಙ್ಕ			ಅಂಕೆ_chars;
     char_u		*newp, *oldp;
     size_t		newlen, oldlen;
-    struct block_def	bd;
-    char_u		*after_p = NULL;
-    int			had_ctrl_v_cr = FALSE;
+    ಸಂರಚನಾ block_def	bd;
+    char_u		*after_p = ರಿಕ್ತ;
+    ಪೂರ್ಣಾಙ್ಕ			had_ctrl_v_cr = FALSE;
 
-    if ((curbuf->b_ml.ml_flags & ML_EMPTY ) || oap->empty)
-	return OK;	    // nothing to do
+    ಯದಿ ((curbuf->b_ml.ml_flags & ML_EMPTY ) || oap->empty)
+	ಪ್ರತ್ಯಾಗಮ OK;	    // nothing to do
 
-    if (c == REPLACE_CR_NCHAR)
+    ಯದಿ (c == REPLACE_CR_NCHAR)
     {
 	had_ctrl_v_cr = TRUE;
 	c = CAR;
     }
-    else if (c == REPLACE_NL_NCHAR)
+    ಅನ್ಯಥಾ ಯದಿ (c == REPLACE_NL_NCHAR)
     {
 	had_ctrl_v_cr = TRUE;
 	c = NL;
     }
 
-    if (has_mbyte)
+    ಯದಿ (has_mbyte)
 	mb_adjust_opend(oap);
 
-    if (u_save((linenr_T)(oap->start.lnum - 1),
+    ಯದಿ (u_save((linenr_T)(oap->start.lnum - 1),
 				       (linenr_T)(oap->end.lnum + 1)) == FAIL)
-	return FAIL;
+	ಪ್ರತ್ಯಾಗಮ FAIL;
 
     /*
      * block mode replace
      */
-    if (oap->block_mode)
+    ಯದಿ (oap->block_mode)
     {
 	bd.is_MAX = (curwin->w_curswant == MAXCOL);
-	for ( ; curwin->w_cursor.lnum <= oap->end.lnum; ++curwin->w_cursor.lnum)
+	ಪ್ರತಿ ( ; curwin->w_cursor.lnum <= oap->end.lnum; ++curwin->w_cursor.lnum)
 	{
 	    curwin->w_cursor.col = 0;  // make sure cursor position is valid
 	    block_prep(oap, &bd, curwin->w_cursor.lnum, TRUE);
-	    if (bd.textlen == 0 && (!virtual_op || bd.is_MAX))
-		continue;	    // nothing to replace
+	    ಯದಿ (bd.textlen == 0 && (!virtual_op || bd.is_MAX))
+		ಅನುವರ್ತ;	    // nothing to replace
 
 	    // n == number of extra chars required
 	    // If we split a TAB, it may be replaced by several characters.
 	    // Thus the number of characters may increase!
 	    // If the range starts in virtual space, count the initial
 	    // coladd offset as part of "startspaces"
-	    if (virtual_op && bd.is_short && *bd.textstart == NUL)
+	    ಯದಿ (virtual_op && bd.is_short && *bd.textstart == NUL)
 	    {
 		pos_T vpos;
 
@@ -1250,7 +1250,7 @@ op_replace(oparg_T *oap, int c)
 		bd.startspaces += vpos.coladd;
 		n = bd.startspaces;
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 		// allow for pre spaces
 		n = (bd.startspaces ? bd.start_char_vcols - 1 : 0);
 
@@ -1260,14 +1260,14 @@ op_replace(oparg_T *oap, int c)
 		    && bd.end_char_vcols > 0) ? bd.end_char_vcols - 1 : 0;
 	    // Figure out how many characters to replace.
 	    numc = oap->end_vcol - oap->start_vcol + 1;
-	    if (bd.is_short && (!virtual_op || bd.is_MAX))
+	    ಯದಿ (bd.is_short && (!virtual_op || bd.is_MAX))
 		numc -= (oap->end_vcol - bd.end_vcol) + 1;
 
 	    // A double-wide character can be replaced only up to half the
 	    // times.
-	    if ((*mb_char2cells)(c) > 1)
+	    ಯದಿ ((*mb_char2cells)(c) > 1)
 	    {
-		if ((numc & 1) && !bd.is_short)
+		ಯದಿ ((numc & 1) && !bd.is_short)
 		{
 		    ++bd.endspaces;
 		    ++n;
@@ -1276,7 +1276,7 @@ op_replace(oparg_T *oap, int c)
 	    }
 
 	    // Compute bytes needed, move character count to num_chars.
-	    num_chars = numc;
+	    ಅಂಕೆ_chars = numc;
 	    numc *= (*mb_char2len)(c);
 	    // oldlen includes textlen, so don't double count
 	    n += numc - bd.textlen;
@@ -1284,8 +1284,8 @@ op_replace(oparg_T *oap, int c)
 	    oldp = ml_get_curline();
 	    oldlen = ml_get_curline_len();
 	    newp = alloc(oldlen + 1 + n);
-	    if (newp == NULL)
-		continue;
+	    ಯದಿ (newp == ರಿಕ್ತ)
+		ಅನುವರ್ತ;
 	    vim_memset(newp, NUL, (size_t)(oldlen + 1 + n));
 	    // copy up to deleted part
 	    mch_memmove(newp, oldp, (size_t)bd.textcol);
@@ -1296,19 +1296,19 @@ op_replace(oparg_T *oap, int c)
 	    // insert replacement chars CHECK FOR ALLOCATED SPACE
 	    // REPLACE_CR_NCHAR/REPLACE_NL_NCHAR is used for entering CR
 	    // literally.
-	    if (had_ctrl_v_cr || (c != '\r' && c != '\n'))
+	    ಯದಿ (had_ctrl_v_cr || (c != '\r' && c != '\n'))
 	    {
-		if (has_mbyte)
+		ಯದಿ (has_mbyte)
 		{
-		    while (--num_chars >= 0)
+		    ಯಾವತ್ (--ಅಂಕೆ_chars >= 0)
 			newlen += (*mb_char2bytes)(c, newp + newlen);
 		}
-		else
+		ಅನ್ಯಥಾ
 		{
 		    vim_memset(newp + newlen, c, (size_t)numc);
 		    newlen += numc;
 		}
-		if (!bd.is_short)
+		ಯದಿ (!bd.is_short)
 		{
 		    // insert post-spaces
 		    vim_memset(newp + newlen, ' ', (size_t)bd.endspaces);
@@ -1317,67 +1317,67 @@ op_replace(oparg_T *oap, int c)
 				oldp + bd.textcol + bd.textlen);
 		}
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 	    {
 		// Replacing with \r or \n means splitting the line.
 		after_p = alloc(oldlen + 1 + n - newlen);
-		if (after_p != NULL)
+		ಯದಿ (after_p != ರಿಕ್ತ)
 		    STRCPY(after_p, oldp + bd.textcol + bd.textlen);
 	    }
 
 	    // replace the line
 	    ml_replace(curwin->w_cursor.lnum, newp, FALSE);
-	    if (after_p != NULL)
+	    ಯದಿ (after_p != ರಿಕ್ತ)
 	    {
 		ml_append(curwin->w_cursor.lnum++, after_p, 0, FALSE);
-		appended_lines_mark(curwin->w_cursor.lnum, 1L);
+		appended_ಸಾಲುಗಳು_mark(curwin->w_cursor.lnum, 1L);
 		oap->end.lnum++;
 		vim_free(after_p);
 	    }
 	}
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	/*
 	 * MCHAR and MLINE motion replace.
 	 */
-	if (oap->motion_type == MLINE)
+	ಯದಿ (oap->motion_type == MLINE)
 	{
 	    oap->start.col = 0;
 	    curwin->w_cursor.col = 0;
 	    oap->end.col = ml_get_len(oap->end.lnum);
-	    if (oap->end.col)
+	    ಯದಿ (oap->end.col)
 		--oap->end.col;
 	}
-	else if (!oap->inclusive)
+	ಅನ್ಯಥಾ ಯದಿ (!oap->inclusive)
 	    dec(&(oap->end));
 
-	while (LTOREQ_POS(curwin->w_cursor, oap->end))
+	ಯಾವತ್ (LTOREQ_POS(curwin->w_cursor, oap->end))
 	{
-	    int done = FALSE;
+	    ಪೂರ್ಣಾಙ್ಕ done = FALSE;
 
 	    n = gchar_cursor();
-	    if (n != NUL)
+	    ಯದಿ (n != NUL)
 	    {
-		int new_byte_len = (*mb_char2len)(c);
-		int old_byte_len = mb_ptr2len(ml_get_cursor());
+		ಪೂರ್ಣಾಙ್ಕ new_byte_len = (*mb_char2len)(c);
+		ಪೂರ್ಣಾಙ್ಕ old_byte_len = mb_ptr2len(ml_get_cursor());
 
-		if (new_byte_len > 1 || old_byte_len > 1)
+		ಯದಿ (new_byte_len > 1 || old_byte_len > 1)
 		{
 		    // This is slow, but it handles replacing a single-byte
 		    // with a multi-byte and the other way around.
-		    if (curwin->w_cursor.lnum == oap->end.lnum)
+		    ಯದಿ (curwin->w_cursor.lnum == oap->end.lnum)
 			oap->end.col += new_byte_len - old_byte_len;
 		    replace_character(c);
 		    done = TRUE;
 		}
-		else
+		ಅನ್ಯಥಾ
 		{
-		    if (n == TAB)
+		    ಯದಿ (n == TAB)
 		    {
-			int end_vcol = 0;
+			ಪೂರ್ಣಾಙ್ಕ end_vcol = 0;
 
-			if (curwin->w_cursor.lnum == oap->end.lnum)
+			ಯದಿ (curwin->w_cursor.lnum == oap->end.lnum)
 			{
 			    // oap->end has to be recalculated when
 			    // the tab breaks
@@ -1385,22 +1385,22 @@ op_replace(oparg_T *oap, int c)
 							     oap->end.coladd);
 			}
 			coladvance_force(getviscol());
-			if (curwin->w_cursor.lnum == oap->end.lnum)
+			ಯದಿ (curwin->w_cursor.lnum == oap->end.lnum)
 			    getvpos(&oap->end, end_vcol);
 		    }
 		    // with "coladd" set may move to just after a TAB
-		    if (gchar_cursor() != NUL)
+		    ಯದಿ (gchar_cursor() != NUL)
 		    {
 			PBYTE(curwin->w_cursor, c);
 			done = TRUE;
 		    }
 		}
 	    }
-	    if (!done && virtual_op && curwin->w_cursor.lnum == oap->end.lnum)
+	    ಯದಿ (!done && virtual_op && curwin->w_cursor.lnum == oap->end.lnum)
 	    {
-		int virtcols = oap->end.coladd;
+		ಪೂರ್ಣಾಙ್ಕ virtcols = oap->end.coladd;
 
-		if (curwin->w_cursor.lnum == oap->start.lnum
+		ಯದಿ (curwin->w_cursor.lnum == oap->start.lnum
 			&& oap->start.col == oap->end.col && oap->start.coladd)
 		    virtcols -= oap->start.coladd;
 
@@ -1409,59 +1409,59 @@ op_replace(oparg_T *oap, int c)
 		// trample the NUL byte.
 		coladvance_force(getviscol2(oap->end.col, oap->end.coladd) + 1);
 		curwin->w_cursor.col -= (virtcols + 1);
-		for (; virtcols >= 0; virtcols--)
+		ಪ್ರತಿ (; virtcols >= 0; virtcols--)
 		{
-		    if ((*mb_char2len)(c) > 1)
+		    ಯದಿ ((*mb_char2len)(c) > 1)
 		       replace_character(c);
-		    else
+		    ಅನ್ಯಥಾ
 			PBYTE(curwin->w_cursor, c);
-		    if (inc(&curwin->w_cursor) == -1)
-			break;
+		    ಯದಿ (inc(&curwin->w_cursor) == -1)
+			ಭಙ್ಗ;
 		}
 	    }
 
 	    // Advance to next character, stop at the end of the file.
-	    if (inc_cursor() == -1)
-		break;
+	    ಯದಿ (inc_cursor() == -1)
+		ಭಙ್ಗ;
 	}
     }
 
     curwin->w_cursor = oap->start;
     check_cursor();
-    changed_lines(oap->start.lnum, oap->start.col, oap->end.lnum + 1, 0L);
+    changed_ಸಾಲುಗಳು(oap->start.lnum, oap->start.col, oap->end.lnum + 1, 0L);
 
-    if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    ಯದಿ ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
     {
 	// Set "'[" and "']" marks.
 	curbuf->b_op_start = oap->start;
 	curbuf->b_op_end = oap->end;
     }
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
-static int swapchars(int op_type, pos_T *pos, int length);
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ swapchars(ಪೂರ್ಣಾಙ್ಕ op_type, pos_T *pos, ಪೂರ್ಣಾಙ್ಕ length);
 
 /*
  * Handle the (non-standard vi) tilde operator.  Also for "gu", "gU" and "g?".
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 op_tilde(oparg_T *oap)
 {
     pos_T		pos;
-    struct block_def	bd;
-    int			did_change = FALSE;
+    ಸಂರಚನಾ block_def	bd;
+    ಪೂರ್ಣಾಙ್ಕ			did_change = FALSE;
 
-    if (u_save((linenr_T)(oap->start.lnum - 1),
+    ಯದಿ (u_save((linenr_T)(oap->start.lnum - 1),
 				       (linenr_T)(oap->end.lnum + 1)) == FAIL)
-	return;
+	ಪ್ರತ್ಯಾಗಮ;
 
     pos = oap->start;
-    if (oap->block_mode)		    // Visual block mode
+    ಯದಿ (oap->block_mode)		    // Visual block mode
     {
-	for (; pos.lnum <= oap->end.lnum; ++pos.lnum)
+	ಪ್ರತಿ (; pos.lnum <= oap->end.lnum; ++pos.lnum)
 	{
-	    int one_change;
+	    ಪೂರ್ಣಾಙ್ಕ one_change;
 
 	    block_prep(oap, &bd, pos.lnum, FALSE);
 	    pos.col = bd.textcol;
@@ -1469,7 +1469,7 @@ op_tilde(oparg_T *oap)
 	    did_change |= one_change;
 
 #ifdef FEAT_NETBEANS_INTG
-	    if (netbeans_active() && one_change)
+	    ಯದಿ (netbeans_active() && one_change)
 	    {
 		char_u *ptr;
 
@@ -1482,82 +1482,82 @@ op_tilde(oparg_T *oap)
 	    }
 #endif
 	}
-	if (did_change)
-	    changed_lines(oap->start.lnum, 0, oap->end.lnum + 1, 0L);
+	ಯದಿ (did_change)
+	    changed_ಸಾಲುಗಳು(oap->start.lnum, 0, oap->end.lnum + 1, 0L);
     }
-    else				    // not block mode
+    ಅನ್ಯಥಾ				    // not block mode
     {
-	if (oap->motion_type == MLINE)
+	ಯದಿ (oap->motion_type == MLINE)
 	{
 	    oap->start.col = 0;
 	    pos.col = 0;
 	    oap->end.col = ml_get_len(oap->end.lnum);
-	    if (oap->end.col)
+	    ಯದಿ (oap->end.col)
 		--oap->end.col;
 	}
-	else if (!oap->inclusive)
+	ಅನ್ಯಥಾ ಯದಿ (!oap->inclusive)
 	    dec(&(oap->end));
 
-	if (pos.lnum == oap->end.lnum)
+	ಯದಿ (pos.lnum == oap->end.lnum)
 	    did_change = swapchars(oap->op_type, &pos,
 						  oap->end.col - pos.col + 1);
-	else
-	    for (;;)
+	ಅನ್ಯಥಾ
+	    ಪ್ರತಿ (;;)
 	    {
 		did_change |= swapchars(oap->op_type, &pos,
 			pos.lnum == oap->end.lnum ? oap->end.col + 1
 						  : ml_get_pos_len(&pos));
-		if (LTOREQ_POS(oap->end, pos) || inc(&pos) == -1)
-		    break;
+		ಯದಿ (LTOREQ_POS(oap->end, pos) || inc(&pos) == -1)
+		    ಭಙ್ಗ;
 	    }
-	if (did_change)
+	ಯದಿ (did_change)
 	{
-	    changed_lines(oap->start.lnum, oap->start.col, oap->end.lnum + 1,
+	    changed_ಸಾಲುಗಳು(oap->start.lnum, oap->start.col, oap->end.lnum + 1,
 									  0L);
 #ifdef FEAT_NETBEANS_INTG
-	    if (netbeans_active())
+	    ಯದಿ (netbeans_active())
 	    {
 		char_u *ptr;
-		int count;
+		ಪೂರ್ಣಾಙ್ಕ ಎಣಿಕೆ;
 
 		pos = oap->start;
-		while (pos.lnum < oap->end.lnum)
+		ಯಾವತ್ (pos.lnum < oap->end.lnum)
 		{
 		    ptr = ml_get_buf(curbuf, pos.lnum, FALSE);
-		    count = ml_get_buf_len(curbuf, pos.lnum) - pos.col;
-		    netbeans_removed(curbuf, pos.lnum, pos.col, (long)count);
+		    ಎಣಿಕೆ = ml_get_buf_len(curbuf, pos.lnum) - pos.col;
+		    netbeans_removed(curbuf, pos.lnum, pos.col, (long)ಎಣಿಕೆ);
 		    // get the line again, it may have been flushed
 		    ptr = ml_get_buf(curbuf, pos.lnum, FALSE);
 		    netbeans_inserted(curbuf, pos.lnum, pos.col,
-							&ptr[pos.col], count);
+							&ptr[pos.col], ಎಣಿಕೆ);
 		    pos.col = 0;
 		    pos.lnum++;
 		}
-		count = oap->end.col - pos.col + 1;
-		netbeans_removed(curbuf, pos.lnum, pos.col, (long)count);
+		ಎಣಿಕೆ = oap->end.col - pos.col + 1;
+		netbeans_removed(curbuf, pos.lnum, pos.col, (long)ಎಣಿಕೆ);
 		// get the line again, it may have been flushed
 		ptr = ml_get_buf(curbuf, pos.lnum, FALSE);
 		netbeans_inserted(curbuf, pos.lnum, pos.col,
-							&ptr[pos.col], count);
+							&ptr[pos.col], ಎಣಿಕೆ);
 	    }
 #endif
 	}
     }
 
-    if (!did_change && oap->is_VIsual)
+    ಯದಿ (!did_change && oap->is_VIsual)
 	// No change: need to remove the Visual selection
 	redraw_curbuf_later(UPD_INVERTED);
 
-    if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    ಯದಿ ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
     {
 	// Set '[ and '] marks.
 	curbuf->b_op_start = oap->start;
 	curbuf->b_op_end = oap->end;
     }
 
-    if (oap->line_count > p_report)
+    ಯದಿ (oap->ಸಾಲು_ಎಣಿಕೆ > p_report)
 	smsg(NGETTEXT("%ld line changed", "%ld lines changed",
-					    oap->line_count), oap->line_count);
+					    oap->ಸಾಲು_ಎಣಿಕೆ), oap->ಸಾಲು_ಎಣಿಕೆ);
 }
 
 /*
@@ -1567,27 +1567,27 @@ op_tilde(oparg_T *oap)
  * Also works correctly when the number of bytes changes.
  * Returns TRUE if some character was changed.
  */
-    static int
-swapchars(int op_type, pos_T *pos, int length)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+swapchars(ಪೂರ್ಣಾಙ್ಕ op_type, pos_T *pos, ಪೂರ್ಣಾಙ್ಕ length)
 {
-    int todo;
-    int	did_change = 0;
+    ಪೂರ್ಣಾಙ್ಕ todo;
+    ಪೂರ್ಣಾಙ್ಕ	did_change = 0;
 
-    for (todo = length; todo > 0; --todo)
+    ಪ್ರತಿ (todo = length; todo > 0; --todo)
     {
-	if (has_mbyte)
+	ಯದಿ (has_mbyte)
 	{
-	    int len = (*mb_ptr2len)(ml_get_pos(pos));
+	    ಪೂರ್ಣಾಙ್ಕ len = (*mb_ptr2len)(ml_get_pos(pos));
 
 	    // we're counting bytes, not characters
-	    if (len > 0)
+	    ಯದಿ (len > 0)
 		todo -= len - 1;
 	}
 	did_change |= swapchar(op_type, pos);
-	if (inc(pos) == -1)    // at end of file
-	    break;
+	ಯದಿ (inc(pos) == -1)    // at end of file
+	    ಭಙ್ಗ;
     }
-    return did_change;
+    ಪ್ರತ್ಯಾಗಮ did_change;
 }
 
 /*
@@ -1597,20 +1597,20 @@ swapchars(int op_type, pos_T *pos, int length)
  * else swap case of character at 'pos'
  * returns TRUE when something actually changed.
  */
-    int
-swapchar(int op_type, pos_T *pos)
+    ಪೂರ್ಣಾಙ್ಕ
+swapchar(ಪೂರ್ಣಾಙ್ಕ op_type, pos_T *pos)
 {
-    int	    c;
-    int	    nc;
+    ಪೂರ್ಣಾಙ್ಕ	    c;
+    ಪೂರ್ಣಾಙ್ಕ	    nc;
 
     c = gchar_pos(pos);
 
     // Only do rot13 encoding for ASCII characters.
-    if (c >= 0x80 && op_type == OP_ROT13)
-	return FALSE;
+    ಯದಿ (c >= 0x80 && op_type == OP_ROT13)
+	ಪ್ರತ್ಯಾಗಮ FALSE;
 
     // ~ is OP_NOP, g~ is OP_TILDE, gU is OP_UPPER
-    if ((op_type == OP_UPPER || op_type == OP_NOP || op_type == OP_TILDE)
+    ಯದಿ ((op_type == OP_UPPER || op_type == OP_NOP || op_type == OP_TILDE)
 	    && c == 0xdf
 	    && (enc_latin1like || STRCMP(p_enc, "iso-8859-2") == 0))
     {
@@ -1621,29 +1621,29 @@ swapchar(int op_type, pos_T *pos)
 	del_char(FALSE);
 	ins_char(0x1E9E);
 	curwin->w_cursor = sp;
-	return TRUE;
+	ಪ್ರತ್ಯಾಗಮ TRUE;
     }
 
-    if (enc_dbcs != 0 && c >= 0x100)	// No lower/uppercase letter
-	return FALSE;
+    ಯದಿ (enc_dbcs != 0 && c >= 0x100)	// No lower/uppercase letter
+	ಪ್ರತ್ಯಾಗಮ FALSE;
     nc = c;
-    if (MB_ISLOWER(c))
+    ಯದಿ (MB_ISLOWER(c))
     {
-	if (op_type == OP_ROT13)
+	ಯದಿ (op_type == OP_ROT13)
 	    nc = ROT13(c, 'a');
-	else if (op_type != OP_LOWER)
+	ಅನ್ಯಥಾ ಯದಿ (op_type != OP_LOWER)
 	    nc = MB_TOUPPER(c);
     }
-    else if (MB_ISUPPER(c))
+    ಅನ್ಯಥಾ ಯದಿ (MB_ISUPPER(c))
     {
-	if (op_type == OP_ROT13)
+	ಯದಿ (op_type == OP_ROT13)
 	    nc = ROT13(c, 'A');
-	else if (op_type != OP_UPPER)
+	ಅನ್ಯಥಾ ಯದಿ (op_type != OP_UPPER)
 	    nc = MB_TOLOWER(c);
     }
-    if (nc != c)
+    ಯದಿ (nc != c)
     {
-	if (enc_utf8 && (c >= 0x80 || nc >= 0x80))
+	ಯದಿ (enc_utf8 && (c >= 0x80 || nc >= 0x80))
 	{
 	    pos_T   sp = curwin->w_cursor;
 
@@ -1653,26 +1653,26 @@ swapchar(int op_type, pos_T *pos)
 	    ins_char(nc);
 	    curwin->w_cursor = sp;
 	}
-	else
+	ಅನ್ಯಥಾ
 	    PBYTE(*pos, nc);
-	return TRUE;
+	ಪ್ರತ್ಯಾಗಮ TRUE;
     }
-    return FALSE;
+    ಪ್ರತ್ಯಾಗಮ FALSE;
 }
 
 /*
  * op_insert - Insert and append operators for Visual mode.
  */
-    void
-op_insert(oparg_T *oap, long count1)
+    ಶೂನ್ಯ
+op_ಸೇರಿಸು(oparg_T *oap, long count1)
 {
     long		pre_textlen = 0;
     colnr_T		ind_pre_col = 0, ind_post_col;
-    int			ind_pre_vcol = 0, ind_post_vcol = 0;
-    struct block_def	bd;
-    int			i;
+    ಪೂರ್ಣಾಙ್ಕ			ind_pre_vcol = 0, ind_post_vcol = 0;
+    ಸಂರಚನಾ block_def	bd;
+    ಪೂರ್ಣಾಙ್ಕ			i;
     pos_T		t1;
-    pos_T		start_insert;
+    pos_T		start_ಸೇರಿಸು;
 
     // edit() changes this - record it for OP_APPEND
     bd.is_MAX = (curwin->w_curswant == MAXCOL);
@@ -1681,7 +1681,7 @@ op_insert(oparg_T *oap, long count1)
     curwin->w_cursor.lnum = oap->start.lnum;
     update_screen(UPD_INVERTED);
 
-    if (oap->block_mode)
+    ಯದಿ (oap->block_mode)
     {
 	// When 'virtualedit' is used, need to insert the extra spaces before
 	// doing block_prep().  When only "block" is used, virtual edit is
@@ -1690,17 +1690,17 @@ op_insert(oparg_T *oap, long count1)
 	// coladvance_force() uses get_ve_flags() to get the 'virtualedit'
 	// state for the current window.  To override that state, we need to
 	// set the window-local value of ve_flags rather than the global value.
-	if (curwin->w_cursor.coladd > 0)
+	ಯದಿ (curwin->w_cursor.coladd > 0)
 	{
-	    int		old_ve_flags = curwin->w_ve_flags;
+	    ಪೂರ್ಣಾಙ್ಕ		old_ve_flags = curwin->w_ve_flags;
 
-	    if (u_save_cursor() == FAIL)
-		return;
+	    ಯದಿ (u_save_cursor() == FAIL)
+		ಪ್ರತ್ಯಾಗಮ;
 
 	    curwin->w_ve_flags = VE_ALL;
 	    coladvance_force(oap->op_type == OP_APPEND
 					   ? oap->end_vcol + 1 : getviscol());
-	    if (oap->op_type == OP_APPEND)
+	    ಯದಿ (oap->op_type == OP_APPEND)
 		--curwin->w_cursor.col;
 	    curwin->w_ve_flags = old_ve_flags;
 	}
@@ -1710,74 +1710,74 @@ op_insert(oparg_T *oap, long count1)
 	ind_pre_col = (colnr_T)getwhitecols_curline();
 	ind_pre_vcol = get_indent();
 	pre_textlen = ml_get_len(oap->start.lnum) - bd.textcol;
-	if (oap->op_type == OP_APPEND)
+	ಯದಿ (oap->op_type == OP_APPEND)
 	    pre_textlen -= bd.textlen;
     }
 
-    if (oap->op_type == OP_APPEND)
+    ಯದಿ (oap->op_type == OP_APPEND)
     {
-	if (oap->block_mode && curwin->w_cursor.coladd == 0)
+	ಯದಿ (oap->block_mode && curwin->w_cursor.coladd == 0)
 	{
 	    // Move the cursor to the character right of the block.
 	    curwin->w_set_curswant = true;
-	    while (*ml_get_cursor() != NUL
+	    ಯಾವತ್ (*ml_get_cursor() != NUL
 		    && (curwin->w_cursor.col < bd.textcol + bd.textlen))
 		++curwin->w_cursor.col;
-	    if (bd.is_short && !bd.is_MAX)
+	    ಯದಿ (bd.is_short && !bd.is_MAX)
 	    {
 		// First line was too short, make it longer and adjust the
 		// values in "bd".
-		if (u_save_cursor() == FAIL)
-		    return;
-		for (i = 0; i < bd.endspaces; ++i)
+		ಯದಿ (u_save_cursor() == FAIL)
+		    ಪ್ರತ್ಯಾಗಮ;
+		ಪ್ರತಿ (i = 0; i < bd.endspaces; ++i)
 		    ins_char(' ');
 		bd.textlen += bd.endspaces;
 	    }
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
 	    curwin->w_cursor = oap->end;
 	    check_cursor_col();
 
 	    // Works just like an 'i'nsert on the next character.
-	    if (!LINEEMPTY(curwin->w_cursor.lnum)
+	    ಯದಿ (!LINEEMPTY(curwin->w_cursor.lnum)
 		    && oap->start_vcol != oap->end_vcol)
 		inc_cursor();
 	}
     }
 
     t1 = oap->start;
-    start_insert = curwin->w_cursor;
-    (void)edit(NUL, FALSE, (linenr_T)count1);
+    start_ಸೇರಿಸು = curwin->w_cursor;
+    (ಶೂನ್ಯ)edit(NUL, FALSE, (linenr_T)count1);
 
     // When a tab was inserted, and the characters in front of the tab
     // have been converted to a tab as well, the column of the cursor
     // might have actually been reduced, so need to adjust here.
-    if (t1.lnum == curbuf->b_op_start_orig.lnum
+    ಯದಿ (t1.lnum == curbuf->b_op_start_orig.lnum
 	    && LT_POS(curbuf->b_op_start_orig, t1))
 	oap->start = curbuf->b_op_start_orig;
 
     // If user has moved off this line, we don't know what to do, so do
     // nothing.
     // Also don't repeat the insert when Insert mode ended with CTRL-C.
-    if (curwin->w_cursor.lnum != oap->start.lnum || got_int)
-	return;
+    ಯದಿ (curwin->w_cursor.lnum != oap->start.lnum || got_int)
+	ಪ್ರತ್ಯಾಗಮ;
 
-    if (oap->block_mode)
+    ಯದಿ (oap->block_mode)
     {
-	int			ins_len;
+	ಪೂರ್ಣಾಙ್ಕ			ins_len;
 	char_u			*firstline, *ins_text;
-	struct block_def	bd2;
-	int			did_indent = FALSE;
+	ಸಂರಚನಾ block_def	bd2;
+	ಪೂರ್ಣಾಙ್ಕ			did_indent = FALSE;
 	size_t			len;
 	size_t			add;
 	// offset when cursor was moved in insert mode
-	int			offset = 0;
+	ಪೂರ್ಣಾಙ್ಕ			offset = 0;
 
 	// If indent kicked in, the firstline might have changed
 	// but only do that, if the indent actually increased.
 	ind_post_col = (colnr_T)getwhitecols_curline();
-	if (curbuf->b_op_start.col > ind_pre_col && ind_post_col > ind_pre_col)
+	ಯದಿ (curbuf->b_op_start.col > ind_pre_col && ind_post_col > ind_pre_col)
 	{
 	    bd.textcol += ind_post_col - ind_pre_col;
 	    ind_post_vcol = get_indent();
@@ -1788,13 +1788,13 @@ op_insert(oparg_T *oap, long count1)
 	// The user may have moved the cursor before inserting something, try
 	// to adjust the block for that.  But only do it, if the difference
 	// does not come from indent kicking in.
-	if (oap->start.lnum == curbuf->b_op_start_orig.lnum
+	ಯದಿ (oap->start.lnum == curbuf->b_op_start_orig.lnum
 						  && !bd.is_MAX && !did_indent)
 	{
-	    int t = getviscol2(curbuf->b_op_start_orig.col,
+	    ಪೂರ್ಣಾಙ್ಕ t = getviscol2(curbuf->b_op_start_orig.col,
 					       curbuf->b_op_start_orig.coladd);
 
-	    if (oap->op_type == OP_INSERT
+	    ಯದಿ (oap->op_type == OP_ಸೇರಿಸು
 		    && oap->start.col + oap->start.coladd
 			    != curbuf->b_op_start_orig.col
 					      + curbuf->b_op_start_orig.coladd)
@@ -1803,7 +1803,7 @@ op_insert(oparg_T *oap, long count1)
 		pre_textlen -= t - oap->start_vcol;
 		oap->start_vcol = t;
 	    }
-	    else if (oap->op_type == OP_APPEND
+	    ಅನ್ಯಥಾ ಯದಿ (oap->op_type == OP_APPEND
 		    && oap->start.col + oap->start.coladd
 			    >= curbuf->b_op_start_orig.col
 					      + curbuf->b_op_start_orig.coladd)
@@ -1813,7 +1813,7 @@ op_insert(oparg_T *oap, long count1)
 		pre_textlen += bd.textlen;
 		pre_textlen -= t - oap->start_vcol;
 		oap->start_vcol = t;
-		oap->op_type = OP_INSERT;
+		oap->op_type = OP_ಸೇರಿಸು;
 	    }
 	}
 
@@ -1823,7 +1823,7 @@ op_insert(oparg_T *oap, long count1)
 	//
 	// if indent was added and the inserted text was after the indent,
 	// correct the selection for the new indent.
-	if (did_indent && bd.textcol - ind_post_col > 0)
+	ಯದಿ (did_indent && bd.textcol - ind_post_col > 0)
 	{
 	    oap->start.col += ind_post_col - ind_pre_col;
 	    oap->start_vcol += ind_post_vcol - ind_pre_vcol;
@@ -1831,7 +1831,7 @@ op_insert(oparg_T *oap, long count1)
 	    oap->end_vcol += ind_post_vcol - ind_pre_vcol;
 	}
 	block_prep(oap, &bd2, oap->start.lnum, TRUE);
-	if (did_indent && bd.textcol - ind_post_col > 0)
+	ಯದಿ (did_indent && bd.textcol - ind_post_col > 0)
 	{
 	    // undo for where "oap" is used below
 	    oap->start.col -= ind_post_col - ind_pre_col;
@@ -1839,12 +1839,12 @@ op_insert(oparg_T *oap, long count1)
 	    oap->end.col -= ind_post_col - ind_pre_col;
 	    oap->end_vcol -= ind_post_vcol - ind_pre_vcol;
 	}
-	if (!bd.is_MAX || bd2.textlen < bd.textlen)
+	ಯದಿ (!bd.is_MAX || bd2.textlen < bd.textlen)
 	{
-	    if (oap->op_type == OP_APPEND)
+	    ಯದಿ (oap->op_type == OP_APPEND)
 	    {
 		pre_textlen += bd2.textlen - bd.textlen;
-		if (bd2.endspaces)
+		ಯದಿ (bd2.endspaces)
 		    --bd2.textlen;
 	    }
 	    bd.textcol = bd2.textcol;
@@ -1858,36 +1858,36 @@ op_insert(oparg_T *oap, long count1)
 	firstline = ml_get(oap->start.lnum);
 	len = ml_get_len(oap->start.lnum);
 	add = bd.textcol;
-	if (oap->op_type == OP_APPEND)
+	ಯದಿ (oap->op_type == OP_APPEND)
 	{
 	    add += bd.textlen;
 	    // account for pressing cursor in insert mode when '$' was used
-	    if (bd.is_MAX
-		&& (start_insert.lnum == Insstart.lnum
-					   && start_insert.col > Insstart.col))
+	    ಯದಿ (bd.is_MAX
+		&& (start_ಸೇರಿಸು.lnum == Insstart.lnum
+					   && start_ಸೇರಿಸು.col > Insstart.col))
 	    {
-		offset = (start_insert.col - Insstart.col);
+		offset = (start_ಸೇರಿಸು.col - Insstart.col);
 		add -= offset;
-		if (oap->end_vcol > offset)
+		ಯದಿ (oap->end_vcol > offset)
 		    oap->end_vcol -= (offset + 1);
-		else
+		ಅನ್ಯಥಾ
 		    // moved outside of the visual block, what to do?
-		    return;
+		    ಪ್ರತ್ಯಾಗಮ;
 	    }
 	}
-	if (add > len)
+	ಯದಿ (add > len)
 	    add = len;  // short line, point to the NUL
 	firstline += add;
 	len -= add;
-	if (pre_textlen >= 0 && (ins_len = (int)len - pre_textlen - offset) > 0)
+	ಯದಿ (pre_textlen >= 0 && (ins_len = (ಪೂರ್ಣಾಙ್ಕ)len - pre_textlen - offset) > 0)
 	{
 	    ins_text = vim_strnsave(firstline, ins_len);
-	    if (ins_text != NULL)
+	    ಯದಿ (ins_text != ರಿಕ್ತ)
 	    {
 		// block handled here
-		if (u_save(oap->start.lnum,
+		ಯದಿ (u_save(oap->start.lnum,
 					 (linenr_T)(oap->end.lnum + 1)) == OK)
-		    block_insert(oap, ins_text, ins_len, (oap->op_type == OP_INSERT),
+		    block_ಸೇರಿಸು(oap, ins_text, ins_len, (oap->op_type == OP_ಸೇರಿಸು),
 									 &bd);
 
 		curwin->w_cursor.col = oap->start.col;
@@ -1903,20 +1903,20 @@ op_insert(oparg_T *oap, long count1)
  *
  * return TRUE if edit() returns because of a CTRL-O command
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 op_change(oparg_T *oap)
 {
     colnr_T		l;
-    int			retval;
+    ಪೂರ್ಣಾಙ್ಕ			retval;
     linenr_T		linenr;
     long		pre_textlen = 0;
     long		pre_indent = 0;
     char_u		*firstline;
     char_u		*ins_text, *newp, *oldp;
-    struct block_def	bd;
+    ಸಂರಚನಾ block_def	bd;
 
     l = oap->start.col;
-    if (oap->motion_type == MLINE)
+    ಯದಿ (oap->motion_type == MLINE)
     {
 	l = 0;
 	can_si = may_do_si();	// Like opening a new line, do smart indent
@@ -1924,24 +1924,24 @@ op_change(oparg_T *oap)
 
     // First delete the text in the region.  In an empty buffer only need to
     // save for undo
-    if (curbuf->b_ml.ml_flags & ML_EMPTY)
+    ಯದಿ (curbuf->b_ml.ml_flags & ML_EMPTY)
     {
-	if (u_save_cursor() == FAIL)
-	    return FALSE;
+	ಯದಿ (u_save_cursor() == FAIL)
+	    ಪ್ರತ್ಯಾಗಮ FALSE;
     }
-    else if (op_delete(oap) == FAIL)
-	return FALSE;
+    ಅನ್ಯಥಾ ಯದಿ (op_delete(oap) == FAIL)
+	ಪ್ರತ್ಯಾಗಮ FALSE;
 
-    if ((l > curwin->w_cursor.col) && !LINEEMPTY(curwin->w_cursor.lnum)
+    ಯದಿ ((l > curwin->w_cursor.col) && !LINEEMPTY(curwin->w_cursor.lnum)
 							 && !virtual_op)
 	inc_cursor();
 
     // check for still on same line (<CR> in inserted text meaningless)
     // skip blank lines too
-    if (oap->block_mode)
+    ಯದಿ (oap->block_mode)
     {
 	// Add spaces before getting the current line length.
-	if (virtual_op && (curwin->w_cursor.coladd > 0
+	ಯದಿ (virtual_op && (curwin->w_cursor.coladd > 0
 						    || gchar_cursor() == NUL))
 	    coladvance_force(getviscol());
 	firstline = ml_get(oap->start.lnum);
@@ -1950,11 +1950,11 @@ op_change(oparg_T *oap)
 	bd.textcol = curwin->w_cursor.col;
     }
 
-    if (oap->motion_type == MLINE)
+    ಯದಿ (oap->motion_type == MLINE)
 	fix_indent();
 
     // Reset finish_op now, don't want it set inside edit().
-    int save_finish_op = finish_op;
+    ಪೂರ್ಣಾಙ್ಕ save_finish_op = finish_op;
     finish_op = FALSE;
 
     retval = edit(NUL, FALSE, (linenr_T)1);
@@ -1966,14 +1966,14 @@ op_change(oparg_T *oap)
      * block.
      * Don't repeat the insert when Insert mode ended with CTRL-C.
      */
-    if (oap->block_mode && oap->start.lnum != oap->end.lnum && !got_int)
+    ಯದಿ (oap->block_mode && oap->start.lnum != oap->end.lnum && !got_int)
     {
-	int	ins_len;
+	ಪೂರ್ಣಾಙ್ಕ	ins_len;
 
 	// Auto-indenting may have changed the indent.  If the cursor was past
 	// the indent, exclude that indent change from the inserted text.
 	firstline = ml_get(oap->start.lnum);
-	if (bd.textcol > (colnr_T)pre_indent)
+	ಯದಿ (bd.textcol > (colnr_T)pre_indent)
 	{
 	    long new_indent = (long)getwhitecols(firstline);
 
@@ -1981,36 +1981,36 @@ op_change(oparg_T *oap)
 	    bd.textcol += new_indent - pre_indent;
 	}
 
-	ins_len = (int)ml_get_len(oap->start.lnum) - pre_textlen;
-	if (ins_len > 0)
+	ins_len = (ಪೂರ್ಣಾಙ್ಕ)ml_get_len(oap->start.lnum) - pre_textlen;
+	ಯದಿ (ins_len > 0)
 	{
 	    // Subsequent calls to ml_get() flush the firstline data - take a
 	    // copy of the inserted text.
-	    if ((ins_text = alloc(ins_len + 1)) != NULL)
+	    ಯದಿ ((ins_text = alloc(ins_len + 1)) != ರಿಕ್ತ)
 	    {
 		vim_strncpy(ins_text, firstline + bd.textcol, ins_len);
-		for (linenr = oap->start.lnum + 1; linenr <= oap->end.lnum;
+		ಪ್ರತಿ (linenr = oap->start.lnum + 1; linenr <= oap->end.lnum;
 								     linenr++)
 		{
 		    block_prep(oap, &bd, linenr, TRUE);
-		    if (!bd.is_short || virtual_op)
+		    ಯದಿ (!bd.is_short || virtual_op)
 		    {
 			pos_T vpos;
 			size_t newlen;
 
 			// If the block starts in virtual space, count the
 			// initial coladd offset as part of "startspaces"
-			if (bd.is_short)
+			ಯದಿ (bd.is_short)
 			{
 			    vpos.lnum = linenr;
-			    (void)getvpos(&vpos, oap->start_vcol);
+			    (ಶೂನ್ಯ)getvpos(&vpos, oap->start_vcol);
 			}
-			else
+			ಅನ್ಯಥಾ
 			    vpos.coladd = 0;
 			oldp = ml_get(linenr);
 			newp = alloc(ml_get_len(linenr) + vpos.coladd + ins_len + 1);
-			if (newp == NULL)
-			    continue;
+			ಯದಿ (newp == ರಿಕ್ತ)
+			    ಅನುವರ್ತ;
 			// copy up to block start
 			mch_memmove(newp, oldp, (size_t)bd.textcol);
 			newlen = bd.textcol;
@@ -2021,50 +2021,50 @@ op_change(oparg_T *oap)
 			ml_replace(linenr, newp, FALSE);
 #ifdef FEAT_PROP_POPUP
 			// Shift the properties for linenr as edit() would do.
-			if (curbuf->b_has_textprop)
+			ಯದಿ (curbuf->b_has_textprop)
 			    adjust_prop_columns(linenr, bd.textcol,
-						     vpos.coladd + (int)ins_len, 0);
+						     vpos.coladd + (ಪೂರ್ಣಾಙ್ಕ)ins_len, 0);
 #endif
 		    }
 		}
 		check_cursor();
 
-		changed_lines(oap->start.lnum + 1, 0, oap->end.lnum + 1, 0L);
+		changed_ಸಾಲುಗಳು(oap->start.lnum + 1, 0, oap->end.lnum + 1, 0L);
 	    }
 	    vim_free(ins_text);
 	}
     }
     auto_format(FALSE, TRUE);
 
-    return retval;
+    ಪ್ರತ್ಯಾಗಮ retval;
 }
 
 /*
  * When the cursor is on the NUL past the end of the line and it should not be
  * there move it left.
  */
-    void
-adjust_cursor_eol(void)
+    ಶೂನ್ಯ
+adjust_cursor_eol(ಶೂನ್ಯ)
 {
-    unsigned int cur_ve_flags = get_ve_flags();
+    unsigned ಪೂರ್ಣಾಙ್ಕ cur_ve_flags = get_ve_flags();
 
-    int adj_cursor = (curwin->w_cursor.col > 0
+    ಪೂರ್ಣಾಙ್ಕ adj_cursor = (curwin->w_cursor.col > 0
 				&& gchar_cursor() == NUL
 				&& (cur_ve_flags & VE_ONEMORE) == 0
 				&& (cur_ve_flags & VE_ALL) == 0
-				&& !(restart_edit || (State & MODE_INSERT)));
-    if (!adj_cursor)
-	return;
+				&& !(restart_edit || (State & MODE_ಸೇರಿಸು)));
+    ಯದಿ (!adj_cursor)
+	ಪ್ರತ್ಯಾಗಮ;
 
     // Put the cursor on the last character in the line.
     dec_cursor();
 
-    if (cur_ve_flags == VE_ALL)
+    ಯದಿ (cur_ve_flags == VE_ALL)
     {
 	colnr_T	    scol, ecol;
 
 	// Coladd is set to the width of the last character.
-	getvcol(curwin, &curwin->w_cursor, &scol, NULL, &ecol, 0);
+	getvcol(curwin, &curwin->w_cursor, &scol, ರಿಕ್ತ, &ecol, 0);
 	curwin->w_cursor.coladd = ecol - scol + 1;
     }
 }
@@ -2083,58 +2083,58 @@ adjust_cursor_eol(void)
  */
     char_u *
 skip_comment(
-    char_u   *line,
-    int      process,
-    int	     include_space,
-    int      *is_comment)
+    char_u   *ಸಾಲು,
+    ಪೂರ್ಣಾಙ್ಕ      process,
+    ಪೂರ್ಣಾಙ್ಕ	     include_space,
+    ಪೂರ್ಣಾಙ್ಕ      *is_comment)
 {
-    char_u *comment_flags = NULL;
-    int    lead_len;
-    int    leader_offset = get_last_leader_offset(line, &comment_flags);
+    char_u *comment_flags = ರಿಕ್ತ;
+    ಪೂರ್ಣಾಙ್ಕ    lead_len;
+    ಪೂರ್ಣಾಙ್ಕ    leader_offset = get_last_leader_offset(ಸಾಲು, &comment_flags);
 
     *is_comment = FALSE;
-    if (leader_offset != -1)
+    ಯದಿ (leader_offset != -1)
     {
 	// Let's check whether the line ends with an unclosed comment.
 	// If the last comment leader has COM_END in flags, there's no comment.
-	while (*comment_flags)
+	ಯಾವತ್ (*comment_flags)
 	{
-	    if (*comment_flags == COM_END
+	    ಯದಿ (*comment_flags == COM_END
 		    || *comment_flags == ':')
-		break;
+		ಭಙ್ಗ;
 	    ++comment_flags;
 	}
-	if (*comment_flags != COM_END)
+	ಯದಿ (*comment_flags != COM_END)
 	    *is_comment = TRUE;
     }
 
-    if (process == FALSE)
-	return line;
+    ಯದಿ (process == FALSE)
+	ಪ್ರತ್ಯಾಗಮ ಸಾಲು;
 
-    lead_len = get_leader_len(line, &comment_flags, FALSE, include_space);
+    lead_len = get_leader_len(ಸಾಲು, &comment_flags, FALSE, include_space);
 
-    if (lead_len == 0)
-	return line;
+    ಯದಿ (lead_len == 0)
+	ಪ್ರತ್ಯಾಗಮ ಸಾಲು;
 
     // Find:
     // - COM_END,
     // - colon,
     // whichever comes first.
-    while (*comment_flags)
+    ಯಾವತ್ (*comment_flags)
     {
-	if (*comment_flags == COM_END
+	ಯದಿ (*comment_flags == COM_END
 		|| *comment_flags == ':')
-	    break;
+	    ಭಙ್ಗ;
 	++comment_flags;
     }
 
     // If we found a colon, it means that we are not processing a line
     // starting with a closing part of a three-part comment. That's good,
     // because we don't want to remove those as this would be annoying.
-    if (*comment_flags == ':' || *comment_flags == NUL)
-	line += lead_len;
+    ಯದಿ (*comment_flags == ':' || *comment_flags == NUL)
+	ಸಾಲು += lead_len;
 
-    return line;
+    ಪ್ರತ್ಯಾಗಮ ಸಾಲು;
 }
 
 /*
@@ -2147,49 +2147,49 @@ skip_comment(
  *
  * return FAIL for failure, OK otherwise
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 do_join(
-    long    count,
-    int	    insert_space,
-    int	    save_undo,
-    int	    use_formatoptions UNUSED,
-    int	    setmark)
+    long    ಎಣಿಕೆ,
+    ಪೂರ್ಣಾಙ್ಕ	    ಸೇರಿಸು_space,
+    ಪೂರ್ಣಾಙ್ಕ	    save_undo,
+    ಪೂರ್ಣಾಙ್ಕ	    use_formatoptions UNUSED,
+    ಪೂರ್ಣಾಙ್ಕ	    setmark)
 {
-    char_u	*curr = NULL;
-    char_u      *curr_start = NULL;
+    char_u	*curr = ರಿಕ್ತ;
+    char_u      *curr_start = ರಿಕ್ತ;
     char_u	*cend;
     char_u	*newp;
     size_t	newp_len;
     char_u	*spaces;	// number of spaces inserted before a line
-    int		endcurr1 = NUL;
-    int		endcurr2 = NUL;
-    int		currsize = 0;	// size of the current line
-    int		sumsize = 0;	// size of the long new line
+    ಪೂರ್ಣಾಙ್ಕ		endcurr1 = NUL;
+    ಪೂರ್ಣಾಙ್ಕ		endcurr2 = NUL;
+    ಪೂರ್ಣಾಙ್ಕ		currsize = 0;	// size of the current line
+    ಪೂರ್ಣಾಙ್ಕ		sumsize = 0;	// size of the long new line
     linenr_T	t;
     colnr_T	col = 0;
-    int		ret = OK;
-    int		*comments = NULL;
-    int		remove_comments = (use_formatoptions == TRUE)
+    ಪೂರ್ಣಾಙ್ಕ		ret = OK;
+    ಪೂರ್ಣಾಙ್ಕ		*comments = ರಿಕ್ತ;
+    ಪೂರ್ಣಾಙ್ಕ		remove_comments = (use_formatoptions == TRUE)
 				  && has_format_option(FO_REMOVE_COMS);
-    int		prev_was_comment;
+    ಪೂರ್ಣಾಙ್ಕ		prev_was_comment;
 
-    if (save_undo && u_save((linenr_T)(curwin->w_cursor.lnum - 1),
-			    (linenr_T)(curwin->w_cursor.lnum + count)) == FAIL)
-	return FAIL;
+    ಯದಿ (save_undo && u_save((linenr_T)(curwin->w_cursor.lnum - 1),
+			    (linenr_T)(curwin->w_cursor.lnum + ಎಣಿಕೆ)) == FAIL)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
 
     // Allocate an array to store the number of spaces inserted before each
     // line.  We will use it to pre-compute the length of the new line and the
     // proper placement of each original line in the new one.
-    spaces = lalloc_clear(count, TRUE);
-    if (spaces == NULL)
-	return FAIL;
-    if (remove_comments)
+    spaces = lalloc_clear(ಎಣಿಕೆ, TRUE);
+    ಯದಿ (spaces == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
+    ಯದಿ (remove_comments)
     {
-	comments = lalloc_clear(count * sizeof(int), TRUE);
-	if (comments == NULL)
+	comments = lalloc_clear(ಎಣಿಕೆ * ಪರಿಮಾಣ(ಪೂರ್ಣಾಙ್ಕ), TRUE);
+	ಯದಿ (comments == ರಿಕ್ತ)
 	{
 	    vim_free(spaces);
-	    return FAIL;
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
 	}
     }
 
@@ -2198,36 +2198,36 @@ do_join(
      * and setup the array of space strings lengths
      * This loops forward over the joined lines.
      */
-    for (t = 0; t < count; ++t)
+    ಪ್ರತಿ (t = 0; t < ಎಣಿಕೆ; ++t)
     {
 	curr = curr_start = ml_get((linenr_T)(curwin->w_cursor.lnum + t));
-	if (t == 0 && setmark && (cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+	ಯದಿ (t == 0 && setmark && (cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
 	{
 	    // Set the '[ mark.
 	    curwin->w_buffer->b_op_start.lnum = curwin->w_cursor.lnum;
 	    curwin->w_buffer->b_op_start.col  = (colnr_T)STRLEN(curr);
 	}
-	if (remove_comments)
+	ಯದಿ (remove_comments)
 	{
 	    // We don't want to remove the comment leader if the
 	    // previous line is not a comment.
-	    if (t > 0 && prev_was_comment)
+	    ಯದಿ (t > 0 && prev_was_comment)
 	    {
 
-		char_u *new_curr = skip_comment(curr, TRUE, insert_space,
+		char_u *new_curr = skip_comment(curr, TRUE, ಸೇರಿಸು_space,
 							   &prev_was_comment);
-		comments[t] = (int)(new_curr - curr);
+		comments[t] = (ಪೂರ್ಣಾಙ್ಕ)(new_curr - curr);
 		curr = new_curr;
 	    }
-	    else
-		curr = skip_comment(curr, FALSE, insert_space,
+	    ಅನ್ಯಥಾ
+		curr = skip_comment(curr, FALSE, ಸೇರಿಸು_space,
 							   &prev_was_comment);
 	}
 
-	if (insert_space && t > 0)
+	ಯದಿ (ಸೇರಿಸು_space && t > 0)
 	{
 	    curr = skipwhite(curr);
-	    if (*curr != NUL && *curr != ')'
+	    ಯದಿ (*curr != NUL && *curr != ')'
 		    && sumsize != 0 && endcurr1 != TAB
 		    && (!has_format_option(FO_MBYTE_JOIN)
 			|| (mb_ptr2char(curr) < 0x100 && endcurr1 < 0x100))
@@ -2239,59 +2239,59 @@ do_join(
 	       )
 	    {
 		// don't add a space if the line is ending in a space
-		if (endcurr1 == ' ')
+		ಯದಿ (endcurr1 == ' ')
 		    endcurr1 = endcurr2;
-		else
+		ಅನ್ಯಥಾ
 		    ++spaces[t];
 		// extra space when 'joinspaces' set and line ends in '.'
-		if (       p_js
+		ಯದಿ (       p_js
 			&& (endcurr1 == '.'
-			    || (vim_strchr(p_cpo, CPO_JOINSP) == NULL
+			    || (vim_strchr(p_cpo, CPO_JOINSP) == ರಿಕ್ತ
 				&& (endcurr1 == '?' || endcurr1 == '!'))))
 		    ++spaces[t];
 	    }
 	}
-	currsize = (int)STRLEN(curr);
+	currsize = (ಪೂರ್ಣಾಙ್ಕ)STRLEN(curr);
 	sumsize += currsize + spaces[t];
 	endcurr1 = endcurr2 = NUL;
-	if (insert_space && currsize > 0)
+	ಯದಿ (ಸೇರಿಸು_space && currsize > 0)
 	{
-	    if (has_mbyte)
+	    ಯದಿ (has_mbyte)
 	    {
 		cend = curr + currsize;
 		MB_PTR_BACK(curr, cend);
 		endcurr1 = (*mb_ptr2char)(cend);
-		if (cend > curr)
+		ಯದಿ (cend > curr)
 		{
 		    MB_PTR_BACK(curr, cend);
 		    endcurr2 = (*mb_ptr2char)(cend);
 		}
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 	    {
 		endcurr1 = *(curr + currsize - 1);
-		if (currsize > 1)
+		ಯದಿ (currsize > 1)
 		    endcurr2 = *(curr + currsize - 2);
 	    }
 	}
-	line_breakcheck();
-	if (got_int)
+	ಸಾಲು_breakcheck();
+	ಯದಿ (got_int)
 	{
 	    ret = FAIL;
-	    goto theend;
+	    ಗಚ್ಛ theend;
 	}
     }
 
     // store the column position before last line
-    col = sumsize - currsize - spaces[count - 1];
+    col = sumsize - currsize - spaces[ಎಣಿಕೆ - 1];
 
     // allocate the space for the new line
     newp_len = sumsize + 1;
     newp = alloc(newp_len);
-    if (newp == NULL)
+    ಯದಿ (newp == ರಿಕ್ತ)
     {
 	ret = FAIL;
-	goto theend;
+	ಗಚ್ಛ theend;
     }
     cend = newp + sumsize;
     *cend = 0;
@@ -2308,20 +2308,20 @@ do_join(
     unpacked_memline_T um = um_open_at_no_props(
 				curwin->w_buffer, curwin->w_cursor.lnum, 0);
     // um_open_at_no_props may have invalidated "curr".
-    int curr_off = (int)(curr - curr_start);
+    ಪೂರ್ಣಾಙ್ಕ curr_off = (ಪೂರ್ಣಾಙ್ಕ)(curr - curr_start);
 
-    curr = curr_start = ml_get((linenr_T)(curwin->w_cursor.lnum + count - 1));
+    curr = curr_start = ml_get((linenr_T)(curwin->w_cursor.lnum + ಎಣಿಕೆ - 1));
     curr += curr_off;
 #endif
 
-    for (t = count - 1; ; --t)
+    ಪ್ರತಿ (t = ಎಣಿಕೆ - 1; ; --t)
     {
-	int spaces_removed;
+	ಪೂರ್ಣಾಙ್ಕ spaces_removed;
 
 	cend -= currsize;
 	mch_memmove(cend, curr, (size_t)currsize);
 
-	if (spaces[t] > 0)
+	ಯದಿ (spaces[t] > 0)
 	{
 	    cend -= spaces[t];
 	    vim_memset(cend, ' ', (size_t)(spaces[t]));
@@ -2335,31 +2335,31 @@ do_join(
 			 (long)(cend - newp - spaces_removed), spaces_removed);
 #ifdef FEAT_PROP_POPUP
 	prepend_joined_props(&um, curwin->w_cursor.lnum + t,
-		t == count - 1, (long)(cend - newp), spaces_removed);
+		t == ಎಣಿಕೆ - 1, (long)(cend - newp), spaces_removed);
 #endif
-	if (t == 0)
-	    break;
+	ಯದಿ (t == 0)
+	    ಭಙ್ಗ;
 	curr = curr_start = ml_get((linenr_T)(curwin->w_cursor.lnum + t - 1));
-	if (remove_comments)
+	ಯದಿ (remove_comments)
 	    curr += comments[t - 1];
-	if (insert_space && t > 1)
+	ಯದಿ (ಸೇರಿಸು_space && t > 1)
 	    curr = skipwhite(curr);
-	currsize = (int)STRLEN(curr);
+	currsize = (ಪೂರ್ಣಾಙ್ಕ)STRLEN(curr);
     }
 
 #ifdef FEAT_PROP_POPUP
-    if (um.buf != NULL)
+    ಯದಿ (um.buf != ರಿಕ್ತ)
     {
 	um_set_text(&um, newp);
 	um_reverse_props(&um);
 	um_close(&um);
-	newp = NULL;  // um_set_text took ownership
+	newp = ರಿಕ್ತ;  // um_set_text took ownership
     }
-    else
+    ಅನ್ಯಥಾ
 #endif
     ml_replace_len(curwin->w_cursor.lnum, newp, (colnr_T)newp_len, TRUE, FALSE);
 
-    if (setmark && (cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    ಯದಿ (setmark && (cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
     {
 	// Set the '] mark.
 	curwin->w_buffer->b_op_end.lnum = curwin->w_cursor.lnum;
@@ -2368,7 +2368,7 @@ do_join(
 
     // Only report the change in the first line here, del_lines() will report
     // the deleted line.
-    changed_lines(curwin->w_cursor.lnum, currsize,
+    changed_ಸಾಲುಗಳು(curwin->w_cursor.lnum, currsize,
 					       curwin->w_cursor.lnum + 1, 0L);
     /*
      * Delete following lines. To do this we move the cursor there
@@ -2377,7 +2377,7 @@ do_join(
      */
     t = curwin->w_cursor.lnum;
     ++curwin->w_cursor.lnum;
-    del_lines(count - 1, FALSE);
+    del_ಸಾಲುಗಳು(ಎಣಿಕೆ - 1, FALSE);
     curwin->w_cursor.lnum = t;
 
     /*
@@ -2386,7 +2386,7 @@ do_join(
      * vim:	      use the column of the last join
      */
     curwin->w_cursor.col =
-		    (vim_strchr(p_cpo, CPO_JOINCOL) != NULL ? currsize : col);
+		    (vim_strchr(p_cpo, CPO_JOINCOL) != ರಿಕ್ತ ? currsize : col);
     check_cursor_col();
 
     curwin->w_cursor.coladd = 0;
@@ -2394,9 +2394,9 @@ do_join(
 
 theend:
     vim_free(spaces);
-    if (remove_comments)
+    ಯದಿ (remove_comments)
 	vim_free(comments);
-    return ret;
+    ಪ್ರತ್ಯಾಗಮ ret;
 }
 
 #ifdef FEAT_LINEBREAK
@@ -2407,25 +2407,25 @@ theend:
  * Reset 'linebreak' and take care of side effects.
  * Returns the previous value, to be passed to restore_lbr().
  */
-    int
-reset_lbr(void)
+    ಪೂರ್ಣಾಙ್ಕ
+reset_lbr(ಶೂನ್ಯ)
 {
-    if (!curwin->w_p_lbr)
-	return FALSE;
+    ಯದಿ (!curwin->w_p_lbr)
+	ಪ್ರತ್ಯಾಗಮ FALSE;
     // changing 'linebreak' may require w_virtcol to be updated
     curwin->w_p_lbr = FALSE;
     curwin->w_valid &= ~(VALID_WROW|VALID_WCOL|VALID_VIRTCOL);
-    return TRUE;
+    ಪ್ರತ್ಯಾಗಮ TRUE;
 }
 
 /*
  * Restore 'linebreak' and take care of side effects.
  */
-    void
-restore_lbr(int lbr_saved)
+    ಶೂನ್ಯ
+restore_lbr(ಪೂರ್ಣಾಙ್ಕ lbr_saved)
 {
-    if (curwin->w_p_lbr || !lbr_saved)
-	return;
+    ಯದಿ (curwin->w_p_lbr || !lbr_saved)
+	ಪ್ರತ್ಯಾಗಮ;
 
     // changing 'linebreak' may require w_virtcol to be updated
     curwin->w_p_lbr = TRUE;
@@ -2446,23 +2446,23 @@ restore_lbr(int lbr_saved)
  * - start/endspaces is the number of columns of the first/last yanked char
  *   that are to be yanked.
  */
-    void
+    ಶೂನ್ಯ
 block_prep(
     oparg_T		*oap,
-    struct block_def	*bdp,
+    ಸಂರಚನಾ block_def	*bdp,
     linenr_T		lnum,
-    int			is_del)
+    ಪೂರ್ಣಾಙ್ಕ			is_del)
 {
-    int		incr = 0;
+    ಪೂರ್ಣಾಙ್ಕ		incr = 0;
     char_u	*pend;
     char_u	*pstart;
-    char_u	*line;
+    char_u	*ಸಾಲು;
     char_u	*prev_pstart;
     char_u	*prev_pend;
     chartabsize_T cts;
 #ifdef FEAT_LINEBREAK
 		// Avoid a problem with unwanted linebreaks in block mode.
-    int		lbr_saved = reset_lbr();
+    ಪೂರ್ಣಾಙ್ಕ		lbr_saved = reset_lbr();
 #endif
 
     bdp->startspaces = 0;
@@ -2477,20 +2477,20 @@ block_prep(
     bdp->end_char_vcols = 0;
     bdp->start_char_vcols = 0;
 
-    line = ml_get(lnum);
-    prev_pstart = line;
-    init_chartabsize_arg(&cts, curwin, lnum, bdp->start_vcol, line, line);
-    while (cts.cts_vcol < oap->start_vcol && *cts.cts_ptr != NUL)
+    ಸಾಲು = ml_get(lnum);
+    prev_pstart = ಸಾಲು;
+    init_chartabsize_arg(&cts, curwin, lnum, bdp->start_vcol, ಸಾಲು, ಸಾಲು);
+    ಯಾವತ್ (cts.cts_vcol < oap->start_vcol && *cts.cts_ptr != NUL)
     {
 	// Count a tab for what it's worth (if list mode not on)
 	incr = lbr_chartabsize(&cts);
 	cts.cts_vcol += incr;
-	if (VIM_ISWHITE(*cts.cts_ptr))
+	ಯದಿ (VIM_ISWHITE(*cts.cts_ptr))
 	{
 	    bdp->pre_whitesp += incr;
 	    bdp->pre_whitesp_c++;
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
 	    bdp->pre_whitesp = 0;
 	    bdp->pre_whitesp_c = 0;
@@ -2503,36 +2503,36 @@ block_prep(
     clear_chartabsize_arg(&cts);
 
     bdp->start_char_vcols = incr;
-    if (bdp->start_vcol < oap->start_vcol)	// line too short
+    ಯದಿ (bdp->start_vcol < oap->start_vcol)	// line too short
     {
 	bdp->end_vcol = bdp->start_vcol;
 	bdp->is_short = TRUE;
-	if (!is_del || oap->op_type == OP_APPEND)
+	ಯದಿ (!is_del || oap->op_type == OP_APPEND)
 	    bdp->endspaces = oap->end_vcol - oap->start_vcol + 1;
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	// notice: this converts partly selected Multibyte characters to
 	// spaces, too.
 	bdp->startspaces = bdp->start_vcol - oap->start_vcol;
-	if (is_del && bdp->startspaces)
+	ಯದಿ (is_del && bdp->startspaces)
 	    bdp->startspaces = bdp->start_char_vcols - bdp->startspaces;
 	pend = pstart;
 	bdp->end_vcol = bdp->start_vcol;
-	if (bdp->end_vcol > oap->end_vcol)	// it's all in one character
+	ಯದಿ (bdp->end_vcol > oap->end_vcol)	// it's all in one character
 	{
 	    bdp->is_oneChar = TRUE;
-	    if (oap->op_type == OP_INSERT)
+	    ಯದಿ (oap->op_type == OP_ಸೇರಿಸು)
 		bdp->endspaces = bdp->start_char_vcols - bdp->startspaces;
-	    else if (oap->op_type == OP_APPEND)
+	    ಅನ್ಯಥಾ ಯದಿ (oap->op_type == OP_APPEND)
 	    {
 		bdp->startspaces += oap->end_vcol - oap->start_vcol + 1;
 		bdp->endspaces = bdp->start_char_vcols - bdp->startspaces;
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 	    {
 		bdp->startspaces = oap->end_vcol - oap->start_vcol + 1;
-		if (is_del && oap->op_type != OP_LSHIFT)
+		ಯದಿ (is_del && oap->op_type != OP_LSHIFT)
 		{
 		    // just putting the sum of those two into
 		    // bdp->startspaces doesn't work for Visual replace,
@@ -2543,12 +2543,12 @@ block_prep(
 		}
 	    }
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
 	    init_chartabsize_arg(&cts, curwin, lnum, bdp->end_vcol,
-								  line, pend);
+								  ಸಾಲು, pend);
 	    prev_pend = pend;
-	    while (cts.cts_vcol <= oap->end_vcol && *cts.cts_ptr != NUL)
+	    ಯಾವತ್ (cts.cts_vcol <= oap->end_vcol && *cts.cts_ptr != NUL)
 	    {
 		// count a tab for what it's worth (if list mode not on)
 		prev_pend = cts.cts_ptr;
@@ -2559,7 +2559,7 @@ block_prep(
 	    pend = cts.cts_ptr;
 	    clear_chartabsize_arg(&cts);
 
-	    if (bdp->end_vcol <= oap->end_vcol
+	    ಯದಿ (bdp->end_vcol <= oap->end_vcol
 		    && (!is_del
 			|| oap->op_type == OP_APPEND
 			|| oap->op_type == OP_REPLACE)) // line too short
@@ -2569,29 +2569,29 @@ block_prep(
 		// Disadvantage: can lead to trailing spaces when the line is
 		// short where the text is put
 		// if (!is_del || oap->op_type == OP_APPEND)
-		if (oap->op_type == OP_APPEND || virtual_op)
+		ಯದಿ (oap->op_type == OP_APPEND || virtual_op)
 		    bdp->endspaces = oap->end_vcol - bdp->end_vcol
 							     + oap->inclusive;
-		else
+		ಅನ್ಯಥಾ
 		    bdp->endspaces = 0; // replace doesn't add characters
 	    }
-	    else if (bdp->end_vcol > oap->end_vcol)
+	    ಅನ್ಯಥಾ ಯದಿ (bdp->end_vcol > oap->end_vcol)
 	    {
 		bdp->endspaces = bdp->end_vcol - oap->end_vcol - 1;
-		if (!is_del && bdp->endspaces)
+		ಯದಿ (!is_del && bdp->endspaces)
 		{
 		    bdp->endspaces = incr - bdp->endspaces;
-		    if (pend != pstart)
+		    ಯದಿ (pend != pstart)
 			pend = prev_pend;
 		}
 	    }
 	}
 	bdp->end_char_vcols = incr;
-	if (is_del && bdp->startspaces)
+	ಯದಿ (is_del && bdp->startspaces)
 	    pstart = prev_pstart;
-	bdp->textlen = (int)(pend - pstart);
+	bdp->textlen = (ಪೂರ್ಣಾಙ್ಕ)(pend - pstart);
     }
-    bdp->textcol = (colnr_T) (pstart - line);
+    bdp->textcol = (colnr_T) (pstart - ಸಾಲು);
     bdp->textstart = pstart;
 #ifdef FEAT_LINEBREAK
     restore_lbr(lbr_saved);
@@ -2601,18 +2601,18 @@ block_prep(
 /*
  * Get block text from "start" to "end"
  */
-    void
+    ಶೂನ್ಯ
 charwise_block_prep(
     pos_T		start,
     pos_T		end,
-    struct block_def	*bdp,
+    ಸಂರಚನಾ block_def	*bdp,
     linenr_T		lnum,
-    int			inclusive)
+    ಪೂರ್ಣಾಙ್ಕ			inclusive)
 {
     colnr_T startcol = 0, endcol = MAXCOL;
     colnr_T cs, ce;
     char_u *p;
-    int	plen = ml_get_len(lnum);
+    ಪೂರ್ಣಾಙ್ಕ	plen = ml_get_len(lnum);
 
     p = ml_get(lnum);
     bdp->startspaces = 0;
@@ -2620,45 +2620,45 @@ charwise_block_prep(
     bdp->is_oneChar = FALSE;
     bdp->start_char_vcols = 0;
 
-    if (lnum == start.lnum)
+    ಯದಿ (lnum == start.lnum)
     {
 	startcol = start.col;
-	if (virtual_op)
+	ಯದಿ (virtual_op)
 	{
-	    getvcol(curwin, &start, &cs, NULL, &ce, 0);
-	    if (ce != cs && start.coladd > 0)
+	    getvcol(curwin, &start, &cs, ರಿಕ್ತ, &ce, 0);
+	    ಯದಿ (ce != cs && start.coladd > 0)
 	    {
 		// Part of a tab selected -- but don't
 		// double-count it.
 		bdp->start_char_vcols = ce - cs + 1;
 		bdp->startspaces = bdp->start_char_vcols - start.coladd;
-		if (bdp->startspaces < 0)
+		ಯದಿ (bdp->startspaces < 0)
 		    bdp->startspaces = 0;
 		startcol++;
 	    }
 	}
     }
 
-    if (lnum == end.lnum)
+    ಯದಿ (lnum == end.lnum)
     {
 	endcol = end.col;
-	if (virtual_op)
+	ಯದಿ (virtual_op)
 	{
-	    getvcol(curwin, &end, &cs, NULL, &ce, 0);
-	    if (p[endcol] == NUL || (cs + end.coladd < ce
+	    getvcol(curwin, &end, &cs, ರಿಕ್ತ, &ce, 0);
+	    ಯದಿ (p[endcol] == NUL || (cs + end.coladd < ce
 			// Don't add space for double-wide
 			// char; endcol will be on last byte
 			// of multi-byte char.
 			&& (*mb_head_off)(p, p + endcol) == 0))
 	    {
-		if (start.lnum == end.lnum && start.col == end.col)
+		ಯದಿ (start.lnum == end.lnum && start.col == end.col)
 		{
 		    // Special case: inside a single char
 		    bdp->is_oneChar = TRUE;
 		    bdp->startspaces = end.coladd - start.coladd + inclusive;
 		    endcol = startcol;
 		}
-		else
+		ಅನ್ಯಥಾ
 		{
 		    bdp->endspaces = end.coladd + inclusive;
 		    endcol -= inclusive;
@@ -2666,11 +2666,11 @@ charwise_block_prep(
 	    }
 	}
     }
-    if (endcol == MAXCOL)
+    ಯದಿ (endcol == MAXCOL)
 	endcol = ml_get_len(lnum);
-    if (startcol > endcol || bdp->is_oneChar)
+    ಯದಿ (startcol > endcol || bdp->is_oneChar)
 	bdp->textlen = 0;
-    else
+    ಅನ್ಯಥಾ
 	bdp->textlen = endcol - startcol + inclusive;
     bdp->textcol = startcol;
     bdp->textstart = startcol <= plen ? p + startcol : p;
@@ -2679,15 +2679,15 @@ charwise_block_prep(
 /*
  * Handle the add/subtract operator.
  */
-    void
+    ಶೂನ್ಯ
 op_addsub(
     oparg_T	*oap,
     linenr_T	Prenum1,	    // Amount of add/subtract
-    int		g_cmd)		    // was g<c-a>/g<c-x>
+    ಪೂರ್ಣಾಙ್ಕ		g_cmd)		    // was g<c-a>/g<c-x>
 {
     pos_T		pos;
-    struct block_def	bd;
-    int			change_cnt = 0;
+    ಸಂರಚನಾ block_def	bd;
+    ಪೂರ್ಣಾಙ್ಕ			change_cnt = 0;
     linenr_T		amount = Prenum1;
 
     // do_addsub() might trigger re-evaluation of 'foldexpr' halfway, when the
@@ -2697,83 +2697,83 @@ op_addsub(
     disable_fold_update++;
 #endif
 
-    if (!VIsual_active)
+    ಯದಿ (!VIsual_active)
     {
 	pos = curwin->w_cursor;
-	if (u_save_cursor() == FAIL)
+	ಯದಿ (u_save_cursor() == FAIL)
 	{
 #ifdef FEAT_FOLDING
 	    disable_fold_update--;
 #endif
-	    return;
+	    ಪ್ರತ್ಯಾಗಮ;
 	}
 	change_cnt = do_addsub(oap->op_type, &pos, 0, amount);
 #ifdef FEAT_FOLDING
 	disable_fold_update--;
 #endif
-	if (change_cnt)
-	    changed_lines(pos.lnum, 0, pos.lnum + 1, 0L);
+	ಯದಿ (change_cnt)
+	    changed_ಸಾಲುಗಳು(pos.lnum, 0, pos.lnum + 1, 0L);
     }
-    else
+    ಅನ್ಯಥಾ
     {
-	int	one_change;
-	int	length;
+	ಪೂರ್ಣಾಙ್ಕ	one_change;
+	ಪೂರ್ಣಾಙ್ಕ	length;
 	pos_T	startpos;
 
-	if (u_save((linenr_T)(oap->start.lnum - 1),
+	ಯದಿ (u_save((linenr_T)(oap->start.lnum - 1),
 					(linenr_T)(oap->end.lnum + 1)) == FAIL)
 	{
 #ifdef FEAT_FOLDING
 	    disable_fold_update--;
 #endif
-	    return;
+	    ಪ್ರತ್ಯಾಗಮ;
 	}
 
 	pos = oap->start;
-	for (; pos.lnum <= oap->end.lnum; ++pos.lnum)
+	ಪ್ರತಿ (; pos.lnum <= oap->end.lnum; ++pos.lnum)
 	{
-	    if (oap->block_mode)		    // Visual block mode
+	    ಯದಿ (oap->block_mode)		    // Visual block mode
 	    {
 		block_prep(oap, &bd, pos.lnum, FALSE);
 		pos.col = bd.textcol;
 		length = bd.textlen;
 	    }
-	    else if (oap->motion_type == MLINE)
+	    ಅನ್ಯಥಾ ಯದಿ (oap->motion_type == MLINE)
 	    {
 		curwin->w_cursor.col = 0;
 		pos.col = 0;
 		length = ml_get_len(pos.lnum);
 	    }
-	    else // oap->motion_type == MCHAR
+	    ಅನ್ಯಥಾ // oap->motion_type == MCHAR
 	    {
-		if (pos.lnum == oap->start.lnum && !oap->inclusive)
+		ಯದಿ (pos.lnum == oap->start.lnum && !oap->inclusive)
 		    dec(&(oap->end));
 		length = ml_get_len(pos.lnum);
 		pos.col = 0;
-		if (pos.lnum == oap->start.lnum)
+		ಯದಿ (pos.lnum == oap->start.lnum)
 		{
 		    pos.col += oap->start.col;
 		    length -= oap->start.col;
 		}
-		if (pos.lnum == oap->end.lnum)
+		ಯದಿ (pos.lnum == oap->end.lnum)
 		{
 		    length = ml_get_len(oap->end.lnum);
-		    if (oap->end.col >= length)
+		    ಯದಿ (oap->end.col >= length)
 			oap->end.col = length - 1;
 		    length = oap->end.col - pos.col + 1;
 		}
 	    }
 	    one_change = do_addsub(oap->op_type, &pos, length, amount);
-	    if (one_change)
+	    ಯದಿ (one_change)
 	    {
 		// Remember the start position of the first change.
-		if (change_cnt == 0)
+		ಯದಿ (change_cnt == 0)
 		    startpos = curbuf->b_op_start;
 		++change_cnt;
 	    }
 
 #ifdef FEAT_NETBEANS_INTG
-	    if (netbeans_active() && one_change)
+	    ಯದಿ (netbeans_active() && one_change)
 	    {
 		char_u *ptr;
 
@@ -2783,26 +2783,26 @@ op_addsub(
 						&ptr[pos.col], length);
 	    }
 #endif
-	    if (g_cmd && one_change)
+	    ಯದಿ (g_cmd && one_change)
 		amount += Prenum1;
 	}
 
 #ifdef FEAT_FOLDING
 	disable_fold_update--;
 #endif
-	if (change_cnt)
-	    changed_lines(oap->start.lnum, 0, oap->end.lnum + 1, 0L);
+	ಯದಿ (change_cnt)
+	    changed_ಸಾಲುಗಳು(oap->start.lnum, 0, oap->end.lnum + 1, 0L);
 
-	if (!change_cnt && oap->is_VIsual)
+	ಯದಿ (!change_cnt && oap->is_VIsual)
 	    // No change: need to remove the Visual selection
 	    redraw_curbuf_later(UPD_INVERTED);
 
 	// Set '[ mark if something changed. Keep the last end
 	// position from do_addsub().
-	if (change_cnt > 0 && (cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+	ಯದಿ (change_cnt > 0 && (cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
 	    curbuf->b_op_start = startpos;
 
-	if (change_cnt > p_report)
+	ಯದಿ (change_cnt > p_report)
 	    smsg(NGETTEXT("%d line changed", "%d lines changed",
 						      change_cnt), change_cnt);
     }
@@ -2814,49 +2814,49 @@ op_addsub(
  *
  * Returns TRUE if some character was changed.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
 do_addsub(
-    int		op_type,
+    ಪೂರ್ಣಾಙ್ಕ		op_type,
     pos_T	*pos,
-    int		length,
+    ಪೂರ್ಣಾಙ್ಕ		length,
     linenr_T	Prenum1)
 {
-    int		col;
-    int		pre;		// 'X'/'x': hex; '0': octal; 'B'/'b': bin
-    static int	hexupper = FALSE;	// 0xABC
+    ಪೂರ್ಣಾಙ್ಕ		col;
+    ಪೂರ್ಣಾಙ್ಕ		pre;		// 'X'/'x': hex; '0': octal; 'B'/'b': bin
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ	hexupper = FALSE;	// 0xABC
     uvarnumber_T	n;
     uvarnumber_T	oldn;
     char_u	*ptr;
-    int		linelen;
-    int		c;
-    int		todel;
-    int		do_hex;
-    int		do_oct;
-    int		do_bin;
-    int		do_alpha;
-    int		do_unsigned;
-    int		do_blank;
-    int		blank_unsigned = FALSE;	// blank: treat as unsigned?
-    int		firstdigit;
-    int		subtract;
-    int		negative = FALSE;
-    int		was_positive = TRUE;
-    int		visual = VIsual_active;
-    int		did_change = FALSE;
+    ಪೂರ್ಣಾಙ್ಕ		linelen;
+    ಪೂರ್ಣಾಙ್ಕ		c;
+    ಪೂರ್ಣಾಙ್ಕ		todel;
+    ಪೂರ್ಣಾಙ್ಕ		do_hex;
+    ಪೂರ್ಣಾಙ್ಕ		do_oct;
+    ಪೂರ್ಣಾಙ್ಕ		do_bin;
+    ಪೂರ್ಣಾಙ್ಕ		do_alpha;
+    ಪೂರ್ಣಾಙ್ಕ		do_unsigned;
+    ಪೂರ್ಣಾಙ್ಕ		do_blank;
+    ಪೂರ್ಣಾಙ್ಕ		blank_unsigned = FALSE;	// blank: treat as unsigned?
+    ಪೂರ್ಣಾಙ್ಕ		firstdigit;
+    ಪೂರ್ಣಾಙ್ಕ		subtract;
+    ಪೂರ್ಣಾಙ್ಕ		negative = FALSE;
+    ಪೂರ್ಣಾಙ್ಕ		was_positive = TRUE;
+    ಪೂರ್ಣಾಙ್ಕ		visual = VIsual_active;
+    ಪೂರ್ಣಾಙ್ಕ		did_change = FALSE;
     pos_T	save_cursor = curwin->w_cursor;
-    int		maxlen = 0;
+    ಪೂರ್ಣಾಙ್ಕ		maxlen = 0;
     pos_T	startpos;
     pos_T	endpos;
     colnr_T	save_coladd = 0;
 
-    do_hex = (vim_strchr(curbuf->b_p_nf, 'x') != NULL);	// "heX"
-    do_oct = (vim_strchr(curbuf->b_p_nf, 'o') != NULL);	// "Octal"
-    do_bin = (vim_strchr(curbuf->b_p_nf, 'b') != NULL);	// "Bin"
-    do_alpha = (vim_strchr(curbuf->b_p_nf, 'p') != NULL);	// "alPha"
-    do_unsigned = (vim_strchr(curbuf->b_p_nf, 'u') != NULL);	// "Unsigned"
-    do_blank = (vim_strchr(curbuf->b_p_nf, 'k') != NULL);	// "blanK"
+    do_hex = (vim_strchr(curbuf->b_p_nf, 'x') != ರಿಕ್ತ);	// "heX"
+    do_oct = (vim_strchr(curbuf->b_p_nf, 'o') != ರಿಕ್ತ);	// "Octal"
+    do_bin = (vim_strchr(curbuf->b_p_nf, 'b') != ರಿಕ್ತ);	// "Bin"
+    do_alpha = (vim_strchr(curbuf->b_p_nf, 'p') != ರಿಕ್ತ);	// "alPha"
+    do_unsigned = (vim_strchr(curbuf->b_p_nf, 'u') != ರಿಕ್ತ);	// "Unsigned"
+    do_blank = (vim_strchr(curbuf->b_p_nf, 'k') != ರಿಕ್ತ);	// "blanK"
 
-    if (virtual_active())
+    ಯದಿ (virtual_active())
     {
 	save_coladd = pos->coladd;
 	pos->coladd = 0;
@@ -2867,31 +2867,31 @@ do_addsub(
     linelen = ml_get_len(pos->lnum);
     col = pos->col;
 
-    if (col + !!save_coladd >= linelen)
-	goto theend;
+    ಯದಿ (col + !!save_coladd >= linelen)
+	ಗಚ್ಛ theend;
 
     /*
      * First check if we are on a hexadecimal number, after the "0x".
      */
-    if (!VIsual_active)
+    ಯದಿ (!VIsual_active)
     {
-	if (do_bin)
-	    while (col > 0 && vim_isbdigit(ptr[col]))
+	ಯದಿ (do_bin)
+	    ಯಾವತ್ (col > 0 && vim_isbdigit(ptr[col]))
 	    {
 		--col;
-		if (has_mbyte)
+		ಯದಿ (has_mbyte)
 		    col -= (*mb_head_off)(ptr, ptr + col);
 	    }
 
-	if (do_hex)
-	    while (col > 0 && vim_isxdigit(ptr[col]))
+	ಯದಿ (do_hex)
+	    ಯಾವತ್ (col > 0 && vim_isxdigit(ptr[col]))
 	    {
 		--col;
-		if (has_mbyte)
+		ಯದಿ (has_mbyte)
 		    col -= (*mb_head_off)(ptr, ptr + col);
 	    }
 
-	if (       do_bin
+	ಯದಿ (       do_bin
 		&& do_hex
 		&& ! ((col > 0
 		    && (ptr[col] == 'X'
@@ -2906,15 +2906,15 @@ do_addsub(
 
 	    col = pos->col;
 
-	    while (col > 0 && vim_isdigit(ptr[col]))
+	    ಯಾವತ್ (col > 0 && vim_isdigit(ptr[col]))
 	    {
 		col--;
-		if (has_mbyte)
+		ಯದಿ (has_mbyte)
 		    col -= (*mb_head_off)(ptr, ptr + col);
 	    }
 	}
 
-	if ((       do_hex
+	ಯದಿ ((       do_hex
 		&& col > 0
 		&& (ptr[col] == 'X'
 		    || ptr[col] == 'x')
@@ -2933,54 +2933,54 @@ do_addsub(
 	{
 	    // Found hexadecimal or binary number, move to its start.
 	    --col;
-	    if (has_mbyte)
+	    ಯದಿ (has_mbyte)
 		col -= (*mb_head_off)(ptr, ptr + col);
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
 	    /*
 	     * Search forward and then backward to find the start of number.
 	     */
 	    col = pos->col;
 
-	    while (ptr[col] != NUL
+	    ಯಾವತ್ (ptr[col] != NUL
 		    && !vim_isdigit(ptr[col])
 		    && !(do_alpha && ASCII_ISALPHA(ptr[col])))
 		col += mb_ptr2len(ptr + col);
 
-	    while (col > 0
+	    ಯಾವತ್ (col > 0
 		    && vim_isdigit(ptr[col - 1])
 		    && !(do_alpha && ASCII_ISALPHA(ptr[col])))
 	    {
 		--col;
-		if (has_mbyte)
+		ಯದಿ (has_mbyte)
 		    col -= (*mb_head_off)(ptr, ptr + col);
 	    }
 	}
     }
 
-    if (visual)
+    ಯದಿ (visual)
     {
-	while (ptr[col] != NUL && length > 0
+	ಯಾವತ್ (ptr[col] != NUL && length > 0
 		&& !vim_isdigit(ptr[col])
 		&& !(do_alpha && ASCII_ISALPHA(ptr[col])))
 	{
-	    int mb_len = mb_ptr2len(ptr + col);
+	    ಪೂರ್ಣಾಙ್ಕ mb_len = mb_ptr2len(ptr + col);
 
 	    col += mb_len;
 	    length -= mb_len;
 	}
 
-	if (length == 0)
-	    goto theend;
+	ಯದಿ (length == 0)
+	    ಗಚ್ಛ theend;
 
-	if (col > pos->col && ptr[col - 1] == '-'
+	ಯದಿ (col > pos->col && ptr[col - 1] == '-'
 		&& (!has_mbyte || !(*mb_head_off)(ptr, ptr + col - 1))
 		&& !do_unsigned)
 	{
-	    if (do_blank && col >= 2 && !VIM_ISWHITE(ptr[col - 2]))
+	    ಯದಿ (do_blank && col >= 2 && !VIM_ISWHITE(ptr[col - 2]))
 		blank_unsigned = TRUE;
-	    else
+	    ಅನ್ಯಥಾ
 	    {
 		negative = TRUE;
 		was_positive = FALSE;
@@ -2992,66 +2992,66 @@ do_addsub(
      * If a number was found, and saving for undo works, replace the number.
      */
     firstdigit = ptr[col];
-    if (!VIM_ISDIGIT(firstdigit) && !(do_alpha && ASCII_ISALPHA(firstdigit)))
+    ಯದಿ (!VIM_ISDIGIT(firstdigit) && !(do_alpha && ASCII_ISALPHA(firstdigit)))
     {
 	beep_flush();
-	goto theend;
+	ಗಚ್ಛ theend;
     }
 
-    if (do_alpha && ASCII_ISALPHA(firstdigit))
+    ಯದಿ (do_alpha && ASCII_ISALPHA(firstdigit))
     {
 	// decrement or increment alphabetic character
-	if (op_type == OP_NR_SUB)
+	ಯದಿ (op_type == OP_NR_SUB)
 	{
-	    if (CharOrd(firstdigit) < Prenum1)
+	    ಯದಿ (CharOrd(firstdigit) < Prenum1)
 	    {
-		if (SAFE_isupper(firstdigit))
+		ಯದಿ (SAFE_isupper(firstdigit))
 		    firstdigit = 'A';
-		else
+		ಅನ್ಯಥಾ
 		    firstdigit = 'a';
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 		firstdigit -= Prenum1;
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
-	    if (26 - CharOrd(firstdigit) - 1 < Prenum1)
+	    ಯದಿ (26 - CharOrd(firstdigit) - 1 < Prenum1)
 	    {
-		if (SAFE_isupper(firstdigit))
+		ಯದಿ (SAFE_isupper(firstdigit))
 		    firstdigit = 'Z';
-		else
+		ಅನ್ಯಥಾ
 		    firstdigit = 'z';
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 		firstdigit += Prenum1;
 	}
 	curwin->w_cursor.col = col;
-	if (!did_change)
+	ಯದಿ (!did_change)
 	    startpos = curwin->w_cursor;
 	did_change = TRUE;
-	(void)del_char(FALSE);
+	(ಶೂನ್ಯ)del_char(FALSE);
 	ins_char(firstdigit);
 	endpos = curwin->w_cursor;
 	curwin->w_cursor.col = col;
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	char_u	*buf1;
-	int	buf1len;
+	ಪೂರ್ಣಾಙ್ಕ	buf1len;
 	char_u	buf2[NUMBUFLEN];
-	int	buf2len;
+	ಪೂರ್ಣಾಙ್ಕ	buf2len;
 	pos_T	save_pos;
-	int	i;
+	ಪೂರ್ಣಾಙ್ಕ	i;
 
-	if (col > 0 && ptr[col - 1] == '-'
+	ಯದಿ (col > 0 && ptr[col - 1] == '-'
 		&& (!has_mbyte ||
 		    !(*mb_head_off)(ptr, ptr + col - 1))
 		&& !visual
 		&& !do_unsigned)
 	{
-	    if (do_blank && col >= 2 && !VIM_ISWHITE(ptr[col - 2]))
+	    ಯದಿ (do_blank && col >= 2 && !VIM_ISWHITE(ptr[col - 2]))
 		blank_unsigned = TRUE;
-	    else
+	    ಅನ್ಯಥಾ
 	    {
 		// negative number
 		--col;
@@ -3060,19 +3060,19 @@ do_addsub(
 	}
 
 	// get the number value (unsigned)
-	if (visual && VIsual_mode != 'V')
+	ಯದಿ (visual && VIsual_mode != 'V')
 	    maxlen = (curbuf->b_visual.vi_curswant == MAXCOL
 		    ? linelen - col : length);
 
-	int overflow = FALSE;
+	ಪೂರ್ಣಾಙ್ಕ overflow = FALSE;
 	vim_str2nr(ptr + col, &pre, &length,
 		0 + (do_bin ? STR2NR_BIN : 0)
 		    + (do_oct ? STR2NR_OCT : 0)
 		    + (do_hex ? STR2NR_HEX : 0),
-		NULL, &n, maxlen, FALSE, &overflow);
+		ರಿಕ್ತ, &n, maxlen, FALSE, &overflow);
 
 	// ignore leading '-' for hex and octal and bin numbers
-	if (pre && negative)
+	ಯದಿ (pre && negative)
 	{
 	    ++col;
 	    --length;
@@ -3080,56 +3080,56 @@ do_addsub(
 	}
 	// add or subtract
 	subtract = FALSE;
-	if (op_type == OP_NR_SUB)
+	ಯದಿ (op_type == OP_NR_SUB)
 	    subtract ^= TRUE;
-	if (negative)
+	ಯದಿ (negative)
 	    subtract ^= TRUE;
 
 	oldn = n;
-	if (!overflow)  // if number is too big don't add/subtract
+	ಯದಿ (!overflow)  // if number is too big don't add/subtract
 	{
-	    if (subtract)
+	    ಯದಿ (subtract)
 		n -= (uvarnumber_T)Prenum1;
-	    else
+	    ಅನ್ಯಥಾ
 		n += (uvarnumber_T)Prenum1;
 	}
 
 	// handle wraparound for decimal numbers
-	if (!pre)
+	ಯದಿ (!pre)
 	{
-	    if (subtract)
+	    ಯದಿ (subtract)
 	    {
-		if (n > oldn)
+		ಯದಿ (n > oldn)
 		{
 		    n = 1 + (n ^ (uvarnumber_T)-1);
 		    negative ^= TRUE;
 		}
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 	    {
 		// add
-		if (n < oldn)
+		ಯದಿ (n < oldn)
 		{
 		    n = (n ^ (uvarnumber_T)-1);
 		    negative ^= TRUE;
 		}
 	    }
-	    if (n == 0)
+	    ಯದಿ (n == 0)
 		negative = FALSE;
 	}
 
-	if ((do_unsigned || blank_unsigned) && negative)
+	ಯದಿ ((do_unsigned || blank_unsigned) && negative)
 	{
-	    if (subtract)
+	    ಯದಿ (subtract)
 		// sticking at zero.
 		n = (uvarnumber_T)0;
-	    else
+	    ಅನ್ಯಥಾ
 		// sticking at 2^64 - 1.
 		n = (uvarnumber_T)(-1);
 	    negative = FALSE;
 	}
 
-	if (visual && !was_positive && !negative && col > 0)
+	ಯದಿ (visual && !was_positive && !negative && col > 0)
 	{
 	    // need to remove the '-'
 	    col--;
@@ -3140,7 +3140,7 @@ do_addsub(
 	 * Delete the old number.
 	 */
 	curwin->w_cursor.col = col;
-	if (!did_change)
+	ಯದಿ (!did_change)
 	    startpos = curwin->w_cursor;
 	did_change = TRUE;
 	todel = length;
@@ -3149,17 +3149,17 @@ do_addsub(
 	 * Don't include the '-' in the length, only the length of the
 	 * part after it is kept the same.
 	 */
-	if (c == '-')
+	ಯದಿ (c == '-')
 	    --length;
 
 	save_pos = curwin->w_cursor;
-	for (i = 0; i < todel; ++i)
+	ಪ್ರತಿ (i = 0; i < todel; ++i)
 	{
-	    if (c < 0x100 && SAFE_isalpha(c))
+	    ಯದಿ (c < 0x100 && SAFE_isalpha(c))
 	    {
-		if (SAFE_isupper(c))
+		ಯದಿ (SAFE_isupper(c))
 		    hexupper = TRUE;
-		else
+		ಅನ್ಯಥಾ
 		    hexupper = FALSE;
 	    }
 	    inc_cursor();
@@ -3173,17 +3173,17 @@ do_addsub(
 	 * Allocate a bit too much.
 	 */
 	buf1 = alloc(length + NUMBUFLEN);
-	if (buf1 == NULL)
-	    goto theend;
+	ಯದಿ (buf1 == ರಿಕ್ತ)
+	    ಗಚ್ಛ theend;
 	ptr = buf1;
-	if (negative && (!visual || was_positive))
+	ಯದಿ (negative && (!visual || was_positive))
 	    *ptr++ = '-';
-	if (pre)
+	ಯದಿ (pre)
 	{
 	    *ptr++ = '0';
 	    --length;
 	}
-	if (pre == 'b' || pre == 'B' ||
+	ಯದಿ (pre == 'b' || pre == 'B' ||
 	    pre == 'x' || pre == 'X')
 	{
 	    *ptr++ = pre;
@@ -3193,28 +3193,28 @@ do_addsub(
 	/*
 	 * Put the number characters in buf2[].
 	 */
-	if (pre == 'b' || pre == 'B')
+	ಯದಿ (pre == 'b' || pre == 'B')
 	{
-	    int bit = 0;
-	    int bits = sizeof(uvarnumber_T) * 8;
+	    ಪೂರ್ಣಾಙ್ಕ bit = 0;
+	    ಪೂರ್ಣಾಙ್ಕ bits = ಪರಿಮಾಣ(uvarnumber_T) * 8;
 
 	    // leading zeros
-	    for (bit = bits; bit > 0; bit--)
-		if ((n >> (bit - 1)) & 0x1) break;
+	    ಪ್ರತಿ (bit = bits; bit > 0; bit--)
+		ಯದಿ ((n >> (bit - 1)) & 0x1) ಭಙ್ಗ;
 
-	    for (buf2len = 0; bit > 0 && buf2len < (NUMBUFLEN - 1); bit--)
+	    ಪ್ರತಿ (buf2len = 0; bit > 0 && buf2len < (NUMBUFLEN - 1); bit--)
 		buf2[buf2len++] = ((n >> (bit - 1)) & 0x1) ? '1' : '0';
 
 	    buf2[buf2len] = NUL;
 	}
-	else if (pre == 0)
-	    buf2len = vim_snprintf((char *)buf2, NUMBUFLEN, "%llu", n);
-	else if (pre == '0')
-	    buf2len = vim_snprintf((char *)buf2, NUMBUFLEN, "%llo", n);
-	else if (pre && hexupper)
-	    buf2len = vim_snprintf((char *)buf2, NUMBUFLEN, "%llX", n);
-	else
-	    buf2len = vim_snprintf((char *)buf2, NUMBUFLEN, "%llx", n);
+	ಅನ್ಯಥಾ ಯದಿ (pre == 0)
+	    buf2len = vim_snprintf((ವರ್ಣ *)buf2, NUMBUFLEN, "%llu", n);
+	ಅನ್ಯಥಾ ಯದಿ (pre == '0')
+	    buf2len = vim_snprintf((ವರ್ಣ *)buf2, NUMBUFLEN, "%llo", n);
+	ಅನ್ಯಥಾ ಯದಿ (pre && hexupper)
+	    buf2len = vim_snprintf((ವರ್ಣ *)buf2, NUMBUFLEN, "%llX", n);
+	ಅನ್ಯಥಾ
+	    buf2len = vim_snprintf((ವರ್ಣ *)buf2, NUMBUFLEN, "%llx", n);
 	length -= buf2len;
 
 	/*
@@ -3223,11 +3223,11 @@ do_addsub(
 	 * Don't do this when
 	 * the result may look like an octal number.
 	 */
-	if (firstdigit == '0' && !(do_oct && pre == 0))
-	    while (length-- > 0)
+	ಯದಿ (firstdigit == '0' && !(do_oct && pre == 0))
+	    ಯಾವತ್ (length-- > 0)
 		*ptr++ = '0';
 	*ptr = NUL;
-	buf1len = (int)(ptr - buf1);
+	buf1len = (ಪೂರ್ಣಾಙ್ಕ)(ptr - buf1);
 
 	STRCPY(buf1 + buf1len, buf2);
 	buf1len += buf2len;
@@ -3236,51 +3236,51 @@ do_addsub(
 	// text properties will be adjusted.  Then delete the old number
 	// afterwards.
 	save_pos = curwin->w_cursor;
-	if (todel > 0)
+	ಯದಿ (todel > 0)
 	    inc_cursor();
 	ins_str(buf1, (size_t)buf1len);		// insert the new number
 	vim_free(buf1);
 
 	// del_char() will also mark line needing displaying
-	if (todel > 0)
+	ಯದಿ (todel > 0)
 	{
-	    int bytes_after = ml_get_curline_len() - curwin->w_cursor.col;
+	    ಪೂರ್ಣಾಙ್ಕ bytes_after = ml_get_curline_len() - curwin->w_cursor.col;
 
 	    // Delete the one character before the insert.
 	    curwin->w_cursor = save_pos;
-	    (void)del_char(FALSE);
+	    (ಶೂನ್ಯ)del_char(FALSE);
 	    curwin->w_cursor.col = ml_get_curline_len() - bytes_after;
 	    --todel;
 	}
-	while (todel-- > 0)
-	    (void)del_char(FALSE);
+	ಯಾವತ್ (todel-- > 0)
+	    (ಶೂನ್ಯ)del_char(FALSE);
 
 	endpos = curwin->w_cursor;
-	if (did_change && curwin->w_cursor.col)
+	ಯದಿ (did_change && curwin->w_cursor.col)
 	    --curwin->w_cursor.col;
     }
 
-    if (did_change && (cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    ಯದಿ (did_change && (cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
     {
 	// set the '[ and '] marks
 	curbuf->b_op_start = startpos;
 	curbuf->b_op_end = endpos;
-	if (curbuf->b_op_end.col > 0)
+	ಯದಿ (curbuf->b_op_end.col > 0)
 	    --curbuf->b_op_end.col;
     }
 
 theend:
-    if (visual)
+    ಯದಿ (visual)
 	curwin->w_cursor = save_cursor;
-    else if (did_change)
+    ಅನ್ಯಥಾ ಯದಿ (did_change)
 	curwin->w_set_curswant = true;
-    else if (virtual_active())
+    ಅನ್ಯಥಾ ಯದಿ (virtual_active())
 	curwin->w_cursor.coladd = save_coladd;
 
-    return did_change;
+    ಪ್ರತ್ಯಾಗಮ did_change;
 }
 
-    void
+    ಶೂನ್ಯ
 clear_oparg(oparg_T *oap)
 {
     CLEAR_POINTER(oap);
@@ -3300,47 +3300,47 @@ clear_oparg(oparg_T *oap)
  *  case, eol_size will be added to the character count to account for
  *  the size of the EOL character.
  */
-    static varnumber_T
-line_count_info(
-    char_u	*line,
+    ಸ್ಥಿರ varnumber_T
+ಸಾಲು_ಎಣಿಕೆ_info(
+    char_u	*ಸಾಲು,
     varnumber_T	*wc,
     varnumber_T	*cc,
     varnumber_T	limit,
-    int		eol_size)
+    ಪೂರ್ಣಾಙ್ಕ		eol_size)
 {
     varnumber_T	i;
-    varnumber_T	words = 0;
+    varnumber_T	ಪದಗಳು = 0;
     varnumber_T	chars = 0;
-    int		is_word = 0;
+    ಪೂರ್ಣಾಙ್ಕ		is_word = 0;
 
-    for (i = 0; i < limit && line[i] != NUL; )
+    ಪ್ರತಿ (i = 0; i < limit && ಸಾಲು[i] != NUL; )
     {
-	if (is_word)
+	ಯದಿ (is_word)
 	{
-	    if (vim_isspace(line[i]))
+	    ಯದಿ (vim_isspace(ಸಾಲು[i]))
 	    {
-		words++;
+		ಪದಗಳು++;
 		is_word = 0;
 	    }
 	}
-	else if (!vim_isspace(line[i]))
+	ಅನ್ಯಥಾ ಯದಿ (!vim_isspace(ಸಾಲು[i]))
 	    is_word = 1;
 	++chars;
-	i += (*mb_ptr2len)(line + i);
+	i += (*mb_ptr2len)(ಸಾಲು + i);
     }
 
-    if (is_word)
-	words++;
-    *wc += words;
+    ಯದಿ (is_word)
+	ಪದಗಳು++;
+    *wc += ಪದಗಳು;
 
     // Add eol_size if the end of line was reached before hitting limit.
-    if (i < limit && line[i] == NUL)
+    ಯದಿ (i < limit && ಸಾಲು[i] == NUL)
     {
 	i += eol_size;
 	chars += eol_size;
     }
     *cc += chars;
-    return i;
+    ಪ್ರತ್ಯಾಗಮ i;
 }
 
 /*
@@ -3349,61 +3349,61 @@ line_count_info(
  * the *_count_cursor variables store running totals for the selection.)
  * When "dict" is not NULL store the info there instead of showing it.
  */
-    void
+    ಶೂನ್ಯ
 cursor_pos_info(dict_T *dict)
 {
     char_u	*p;
     char_u	buf1[50];
     char_u	buf2[40];
     linenr_T	lnum;
-    varnumber_T	byte_count = 0;
-    varnumber_T	bom_count  = 0;
-    varnumber_T	byte_count_cursor = 0;
-    varnumber_T	char_count = 0;
-    varnumber_T	char_count_cursor = 0;
-    varnumber_T	word_count = 0;
-    varnumber_T	word_count_cursor = 0;
-    int		eol_size;
+    varnumber_T	byte_ಎಣಿಕೆ = 0;
+    varnumber_T	bom_ಎಣಿಕೆ  = 0;
+    varnumber_T	byte_ಎಣಿಕೆ_cursor = 0;
+    varnumber_T	char_ಎಣಿಕೆ = 0;
+    varnumber_T	char_ಎಣಿಕೆ_cursor = 0;
+    varnumber_T	word_ಎಣಿಕೆ = 0;
+    varnumber_T	word_ಎಣಿಕೆ_cursor = 0;
+    ಪೂರ್ಣಾಙ್ಕ		eol_size;
     varnumber_T	last_check = 100000L;
-    long	line_count_selected = 0;
+    long	ಸಾಲು_ಎಣಿಕೆ_selected = 0;
     pos_T	min_pos, max_pos;
     oparg_T	oparg;
-    struct block_def	bd;
+    ಸಂರಚನಾ block_def	bd;
 
     /*
      * Compute the length of the file in characters.
      */
-    if (curbuf->b_ml.ml_flags & ML_EMPTY)
+    ಯದಿ (curbuf->b_ml.ml_flags & ML_EMPTY)
     {
-	if (dict == NULL)
+	ಯದಿ (dict == ರಿಕ್ತ)
 	{
-	    msg(_(no_lines_msg));
-	    return;
+	    ಸಂದೇಶ(_(no_ಸಾಲುಗಳು_ಸಂದೇಶ));
+	    ಪ್ರತ್ಯಾಗಮ;
 	}
     }
-    else
+    ಅನ್ಯಥಾ
     {
-	if (get_fileformat(curbuf) == EOL_DOS)
+	ಯದಿ (get_fileformat(curbuf) == EOL_DOS)
 	    eol_size = 2;
-	else
+	ಅನ್ಯಥಾ
 	    eol_size = 1;
 
-	if (VIsual_active)
+	ಯದಿ (VIsual_active)
 	{
-	    if (LT_POS(VIsual, curwin->w_cursor))
+	    ಯದಿ (LT_POS(VIsual, curwin->w_cursor))
 	    {
 		min_pos = VIsual;
 		max_pos = curwin->w_cursor;
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 	    {
 		min_pos = curwin->w_cursor;
 		max_pos = VIsual;
 	    }
-	    if (*p_sel == 'e' && max_pos.col > 0)
+	    ಯದಿ (*p_sel == 'e' && max_pos.col > 0)
 		--max_pos.col;
 
-	    if (VIsual_mode == Ctrl_V)
+	    ಯದಿ (VIsual_mode == Ctrl_V)
 	    {
 #ifdef FEAT_LINEBREAK
 		char_u * saved_sbr = p_sbr;
@@ -3422,51 +3422,51 @@ cursor_pos_info(dict_T *dict)
 		p_sbr = saved_sbr;
 		curwin->w_p_sbr = saved_w_sbr;
 #endif
-		if (curwin->w_curswant == MAXCOL)
+		ಯದಿ (curwin->w_curswant == MAXCOL)
 		    oparg.end_vcol = MAXCOL;
 		// Swap the start, end vcol if needed
-		if (oparg.end_vcol < oparg.start_vcol)
+		ಯದಿ (oparg.end_vcol < oparg.start_vcol)
 		{
 		    oparg.end_vcol += oparg.start_vcol;
 		    oparg.start_vcol = oparg.end_vcol - oparg.start_vcol;
 		    oparg.end_vcol -= oparg.start_vcol;
 		}
 	    }
-	    line_count_selected = max_pos.lnum - min_pos.lnum + 1;
+	    ಸಾಲು_ಎಣಿಕೆ_selected = max_pos.lnum - min_pos.lnum + 1;
 	}
 
-	for (lnum = 1; lnum <= curbuf->b_ml.ml_line_count; ++lnum)
+	ಪ್ರತಿ (lnum = 1; lnum <= curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ; ++lnum)
 	{
 	    // Check for a CTRL-C every 100000 characters.
-	    if (byte_count > last_check)
+	    ಯದಿ (byte_ಎಣಿಕೆ > last_check)
 	    {
 		ui_breakcheck();
-		if (got_int)
-		    return;
-		last_check = byte_count + 100000L;
+		ಯದಿ (got_int)
+		    ಪ್ರತ್ಯಾಗಮ;
+		last_check = byte_ಎಣಿಕೆ + 100000L;
 	    }
 
 	    // Do extra processing for VIsual mode.
-	    if (VIsual_active
+	    ಯದಿ (VIsual_active
 		    && lnum >= min_pos.lnum && lnum <= max_pos.lnum)
 	    {
-		char_u	    *s = NULL;
+		char_u	    *s = ರಿಕ್ತ;
 		long	    len = 0L;
 
-		switch (VIsual_mode)
+		ವಿಕಲ್ಪ (VIsual_mode)
 		{
-		    case Ctrl_V:
+		    ಪಕ್ಷ Ctrl_V:
 			virtual_op = virtual_active();
 			block_prep(&oparg, &bd, lnum, 0);
 			virtual_op = MAYBE;
 			s = bd.textstart;
 			len = (long)bd.textlen;
-			break;
-		    case 'V':
+			ಭಙ್ಗ;
+		    ಪಕ್ಷ 'V':
 			s = ml_get(lnum);
 			len = MAXCOL;
-			break;
-		    case 'v':
+			ಭಙ್ಗ;
+		    ಪಕ್ಷ 'v':
 			{
 			    colnr_T start_col = (lnum == min_pos.lnum)
 							   ? min_pos.col : 0;
@@ -3476,138 +3476,138 @@ cursor_pos_info(dict_T *dict)
 			    s = ml_get(lnum) + start_col;
 			    len = end_col;
 			}
-			break;
+			ಭಙ್ಗ;
 		}
-		if (s != NULL)
+		ಯದಿ (s != ರಿಕ್ತ)
 		{
-		    byte_count_cursor += line_count_info(s, &word_count_cursor,
-					   &char_count_cursor, len, eol_size);
-		    if (lnum == curbuf->b_ml.ml_line_count
+		    byte_ಎಣಿಕೆ_cursor += ಸಾಲು_ಎಣಿಕೆ_info(s, &word_ಎಣಿಕೆ_cursor,
+					   &char_ಎಣಿಕೆ_cursor, len, eol_size);
+		    ಯದಿ (lnum == curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ
 			    && !curbuf->b_p_eol
 			    && (curbuf->b_p_bin || !curbuf->b_p_fixeol)
 			    && (long)STRLEN(s) < len)
-			byte_count_cursor -= eol_size;
+			byte_ಎಣಿಕೆ_cursor -= eol_size;
 		}
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 	    {
 		// In non-visual mode, check for the line the cursor is on
-		if (lnum == curwin->w_cursor.lnum)
+		ಯದಿ (lnum == curwin->w_cursor.lnum)
 		{
-		    word_count_cursor += word_count;
-		    char_count_cursor += char_count;
-		    byte_count_cursor = byte_count +
-			line_count_info(ml_get(lnum),
-				&word_count_cursor, &char_count_cursor,
+		    word_ಎಣಿಕೆ_cursor += word_ಎಣಿಕೆ;
+		    char_ಎಣಿಕೆ_cursor += char_ಎಣಿಕೆ;
+		    byte_ಎಣಿಕೆ_cursor = byte_ಎಣಿಕೆ +
+			ಸಾಲು_ಎಣಿಕೆ_info(ml_get(lnum),
+				&word_ಎಣಿಕೆ_cursor, &char_ಎಣಿಕೆ_cursor,
 				(varnumber_T)(curwin->w_cursor.col + 1),
 				eol_size);
 		}
 	    }
 	    // Add to the running totals
-	    byte_count += line_count_info(ml_get(lnum), &word_count,
-					 &char_count, (varnumber_T)MAXCOL,
+	    byte_ಎಣಿಕೆ += ಸಾಲು_ಎಣಿಕೆ_info(ml_get(lnum), &word_ಎಣಿಕೆ,
+					 &char_ಎಣಿಕೆ, (varnumber_T)MAXCOL,
 					 eol_size);
 	}
 
 	// Correction for when last line doesn't have an EOL.
-	if (!curbuf->b_p_eol && (curbuf->b_p_bin || !curbuf->b_p_fixeol))
-	    byte_count -= eol_size;
+	ಯದಿ (!curbuf->b_p_eol && (curbuf->b_p_bin || !curbuf->b_p_fixeol))
+	    byte_ಎಣಿಕೆ -= eol_size;
 
-	if (dict == NULL)
+	ಯದಿ (dict == ರಿಕ್ತ)
 	{
-	    if (VIsual_active)
+	    ಯದಿ (VIsual_active)
 	    {
-		if (VIsual_mode == Ctrl_V && curwin->w_curswant < MAXCOL)
+		ಯದಿ (VIsual_mode == Ctrl_V && curwin->w_curswant < MAXCOL)
 		{
 		    getvcols(curwin, &min_pos, &max_pos,
 						&min_pos.col, &max_pos.col, 0);
-		    vim_snprintf((char *)buf1, sizeof(buf1), _("%ld Cols; "),
+		    vim_snprintf((ವರ್ಣ *)buf1, ಪರಿಮಾಣ(buf1), _("%ld Cols; "),
 			    (long)(oparg.end_vcol - oparg.start_vcol + 1));
 		}
-		else
+		ಅನ್ಯಥಾ
 		    buf1[0] = NUL;
 
-		if (char_count_cursor == byte_count_cursor
-						    && char_count == byte_count)
-		    vim_snprintf((char *)IObuff, IOSIZE,
+		ಯದಿ (char_ಎಣಿಕೆ_cursor == byte_ಎಣಿಕೆ_cursor
+						    && char_ಎಣಿಕೆ == byte_ಎಣಿಕೆ)
+		    vim_snprintf((ವರ್ಣ *)IObuff, IOSIZE,
 			    _("Selected %s%ld of %ld Lines; %lld of %lld Words; %lld of %lld Bytes"),
-			    buf1, line_count_selected,
-			    (long)curbuf->b_ml.ml_line_count,
-			    word_count_cursor,
-			    word_count,
-			    byte_count_cursor,
-			    byte_count);
-		else
-		    vim_snprintf((char *)IObuff, IOSIZE,
+			    buf1, ಸಾಲು_ಎಣಿಕೆ_selected,
+			    (long)curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ,
+			    word_ಎಣಿಕೆ_cursor,
+			    word_ಎಣಿಕೆ,
+			    byte_ಎಣಿಕೆ_cursor,
+			    byte_ಎಣಿಕೆ);
+		ಅನ್ಯಥಾ
+		    vim_snprintf((ವರ್ಣ *)IObuff, IOSIZE,
 			    _("Selected %s%ld of %ld Lines; %lld of %lld Words; %lld of %lld Chars; %lld of %lld Bytes"),
-			    buf1, line_count_selected,
-			    (long)curbuf->b_ml.ml_line_count,
-			    word_count_cursor,
-			    word_count,
-			    char_count_cursor,
-			    char_count,
-			    byte_count_cursor,
-			    byte_count);
+			    buf1, ಸಾಲು_ಎಣಿಕೆ_selected,
+			    (long)curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ,
+			    word_ಎಣಿಕೆ_cursor,
+			    word_ಎಣಿಕೆ,
+			    char_ಎಣಿಕೆ_cursor,
+			    char_ಎಣಿಕೆ,
+			    byte_ಎಣಿಕೆ_cursor,
+			    byte_ಎಣಿಕೆ);
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 	    {
 		p = ml_get_curline();
 		validate_virtcol();
-		col_print(buf1, sizeof(buf1), (int)curwin->w_cursor.col + 1,
-			(int)curwin->w_virtcol + 1);
-		col_print(buf2, sizeof(buf2), ml_get_curline_len(),
+		col_print(buf1, ಪರಿಮಾಣ(buf1), (ಪೂರ್ಣಾಙ್ಕ)curwin->w_cursor.col + 1,
+			(ಪೂರ್ಣಾಙ್ಕ)curwin->w_virtcol + 1);
+		col_print(buf2, ಪರಿಮಾಣ(buf2), ml_get_curline_len(),
 							   linetabsize_str(p));
 
-		if (char_count_cursor == byte_count_cursor
-			&& char_count == byte_count)
-		    vim_snprintf((char *)IObuff, IOSIZE,
+		ಯದಿ (char_ಎಣಿಕೆ_cursor == byte_ಎಣಿಕೆ_cursor
+			&& char_ಎಣಿಕೆ == byte_ಎಣಿಕೆ)
+		    vim_snprintf((ವರ್ಣ *)IObuff, IOSIZE,
 			_("Col %s of %s; Line %ld of %ld; Word %lld of %lld; Byte %lld of %lld"),
-			(char *)buf1, (char *)buf2,
+			(ವರ್ಣ *)buf1, (ವರ್ಣ *)buf2,
 			(long)curwin->w_cursor.lnum,
-			(long)curbuf->b_ml.ml_line_count,
-			word_count_cursor, word_count,
-			byte_count_cursor, byte_count);
-		else
-		    vim_snprintf((char *)IObuff, IOSIZE,
+			(long)curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ,
+			word_ಎಣಿಕೆ_cursor, word_ಎಣಿಕೆ,
+			byte_ಎಣಿಕೆ_cursor, byte_ಎಣಿಕೆ);
+		ಅನ್ಯಥಾ
+		    vim_snprintf((ವರ್ಣ *)IObuff, IOSIZE,
 			_("Col %s of %s; Line %ld of %ld; Word %lld of %lld; Char %lld of %lld; Byte %lld of %lld"),
-			(char *)buf1, (char *)buf2,
+			(ವರ್ಣ *)buf1, (ವರ್ಣ *)buf2,
 			(long)curwin->w_cursor.lnum,
-			(long)curbuf->b_ml.ml_line_count,
-			word_count_cursor, word_count,
-			char_count_cursor, char_count,
-			byte_count_cursor, byte_count);
+			(long)curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ,
+			word_ಎಣಿಕೆ_cursor, word_ಎಣಿಕೆ,
+			char_ಎಣಿಕೆ_cursor, char_ಎಣಿಕೆ,
+			byte_ಎಣಿಕೆ_cursor, byte_ಎಣಿಕೆ);
 	    }
 	}
 
-	bom_count = bomb_size();
-	if (dict == NULL && bom_count > 0)
+	bom_ಎಣಿಕೆ = bomb_size();
+	ಯದಿ (dict == ರಿಕ್ತ && bom_ಎಣಿಕೆ > 0)
 	{
 	    size_t len = STRLEN(IObuff);
 
-	    vim_snprintf((char *)IObuff + len, IOSIZE - len,
-				 _("(+%lld for BOM)"), bom_count);
+	    vim_snprintf((ವರ್ಣ *)IObuff + len, IOSIZE - len,
+				 _("(+%lld for BOM)"), bom_ಎಣಿಕೆ);
 	}
-	if (dict == NULL)
+	ಯದಿ (dict == ರಿಕ್ತ)
 	{
 	    // Don't shorten this message, the user asked for it.
 	    p = p_shm;
 	    p_shm = (char_u *)"";
-	    msg((char *)IObuff);
+	    ಸಂದೇಶ((ವರ್ಣ *)IObuff);
 	    p_shm = p;
 	}
     }
-#if defined(FEAT_EVAL)
-    if (dict != NULL)
+#ಯದಿ defined(FEAT_EVAL)
+    ಯದಿ (dict != ರಿಕ್ತ)
     {
-	dict_add_number(dict, "words", word_count);
-	dict_add_number(dict, "chars", char_count);
-	dict_add_number(dict, "bytes", byte_count + bom_count);
-	dict_add_number(dict, VIsual_active ? "visual_bytes" : "cursor_bytes",
-		byte_count_cursor);
-	dict_add_number(dict, VIsual_active ? "visual_chars" : "cursor_chars",
-		char_count_cursor);
-	dict_add_number(dict, VIsual_active ? "visual_words" : "cursor_words",
-		word_count_cursor);
+	dict_add_ಸಂಖ್ಯೆ(dict, "words", word_ಎಣಿಕೆ);
+	dict_add_ಸಂಖ್ಯೆ(dict, "chars", char_ಎಣಿಕೆ);
+	dict_add_ಸಂಖ್ಯೆ(dict, "bytes", byte_ಎಣಿಕೆ + bom_ಎಣಿಕೆ);
+	dict_add_ಸಂಖ್ಯೆ(dict, VIsual_active ? "visual_bytes" : "cursor_bytes",
+		byte_ಎಣಿಕೆ_cursor);
+	dict_add_ಸಂಖ್ಯೆ(dict, VIsual_active ? "visual_chars" : "cursor_chars",
+		char_ಎಣಿಕೆ_cursor);
+	dict_add_ಸಂಖ್ಯೆ(dict, VIsual_active ? "visual_words" : "cursor_words",
+		word_ಎಣಿಕೆ_cursor);
     }
 #endif
 }
@@ -3615,27 +3615,27 @@ cursor_pos_info(dict_T *dict)
 /*
  * Handle indent and format operators and visual mode ":".
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 op_colon(oparg_T *oap)
 {
     stuffcharReadbuff(':');
-    if (oap->is_VIsual)
+    ಯದಿ (oap->is_VIsual)
 	stuffReadbuff((char_u *)"'<,'>");
-    else
+    ಅನ್ಯಥಾ
     {
 	// Make the range look nice, so it can be repeated.
-	if (oap->start.lnum == curwin->w_cursor.lnum)
+	ಯದಿ (oap->start.lnum == curwin->w_cursor.lnum)
 	    stuffcharReadbuff('.');
-	else
+	ಅನ್ಯಥಾ
 	    stuffnumReadbuff((long)oap->start.lnum);
 
 #ifdef FEAT_FOLDING
 	// When using !! on a closed fold the range ".!" works best to operate
 	// on, it will be made the whole closed fold later.
 	linenr_T endOfStartFold = oap->start.lnum;
-	(void)hasFolding(oap->start.lnum, NULL, &endOfStartFold);
+	(ಶೂನ್ಯ)hasFolding(oap->start.lnum, ರಿಕ್ತ, &endOfStartFold);
 #endif
-	if (oap->end.lnum != oap->start.lnum
+	ಯದಿ (oap->end.lnum != oap->start.lnum
 #ifdef FEAT_FOLDING
 		&& oap->end.lnum != endOfStartFold
 #endif
@@ -3643,42 +3643,42 @@ op_colon(oparg_T *oap)
 	{
 	    // Make it a range with the end line.
 	    stuffcharReadbuff(',');
-	    if (oap->end.lnum == curwin->w_cursor.lnum)
+	    ಯದಿ (oap->end.lnum == curwin->w_cursor.lnum)
 		stuffcharReadbuff('.');
-	    else if (oap->end.lnum == curbuf->b_ml.ml_line_count)
+	    ಅನ್ಯಥಾ ಯದಿ (oap->end.lnum == curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
 		stuffcharReadbuff('$');
-	    else if (oap->start.lnum == curwin->w_cursor.lnum
+	    ಅನ್ಯಥಾ ಯದಿ (oap->start.lnum == curwin->w_cursor.lnum
 #ifdef FEAT_FOLDING
 		    // do not use ".+number" for a closed fold, it would count
 		    // folded lines twice
-		    && !hasFolding(oap->end.lnum, NULL, NULL)
+		    && !hasFolding(oap->end.lnum, ರಿಕ್ತ, ರಿಕ್ತ)
 #endif
 		    )
 	    {
 		stuffReadbuff((char_u *)".+");
-		stuffnumReadbuff((long)oap->line_count - 1);
+		stuffnumReadbuff((long)oap->ಸಾಲು_ಎಣಿಕೆ - 1);
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 		stuffnumReadbuff((long)oap->end.lnum);
 	}
     }
-    if (oap->op_type != OP_COLON)
+    ಯದಿ (oap->op_type != OP_COLON)
 	stuffReadbuff((char_u *)"!");
-    if (oap->op_type == OP_INDENT)
+    ಯದಿ (oap->op_type == OP_INDENT)
     {
-	if (*get_equalprg() == NUL)
+	ಯದಿ (*get_equalprg() == NUL)
 	    stuffReadbuff((char_u *)"indent");
-	else
+	ಅನ್ಯಥಾ
 	    stuffReadbuff(get_equalprg());
 	stuffReadbuff((char_u *)"\n");
     }
-    else if (oap->op_type == OP_FORMAT)
+    ಅನ್ಯಥಾ ಯದಿ (oap->op_type == OP_FORMAT)
     {
-	if (*curbuf->b_p_fp != NUL)
+	ಯದಿ (*curbuf->b_p_fp != NUL)
 	    stuffReadbuff(curbuf->b_p_fp);
-	else if (*p_fp != NUL)
+	ಅನ್ಯಥಾ ಯದಿ (*p_fp != NUL)
 	    stuffReadbuff(p_fp);
-	else
+	ಅನ್ಯಥಾ
 	    stuffReadbuff((char_u *)"fmt");
 	stuffReadbuff((char_u *)"\n']");
     }
@@ -3687,24 +3687,24 @@ op_colon(oparg_T *oap)
 }
 
 // callback function for 'operatorfunc'
-static callback_T opfunc_cb;
+ಸ್ಥಿರ callback_T opfunc_cb;
 
 /*
  * Process the 'operatorfunc' option value.
  * Returns OK or FAIL.
  */
-    char *
+    ವರ್ಣ *
 did_set_operatorfunc(optset_T *args UNUSED)
 {
-    if (option_set_callback_func(p_opfunc, &opfunc_cb) == FAIL)
-	return e_invalid_argument;
+    ಯದಿ (option_set_callback_func(p_opfunc, &opfunc_cb) == FAIL)
+	ಪ್ರತ್ಯಾಗಮ e_invalid_argument;
 
-    return NULL;
+    ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
 }
 
-#if defined(EXITFREE)
-    void
-free_operatorfunc_option(void)
+#ಯದಿ defined(EXITFREE)
+    ಶೂನ್ಯ
+free_operatorfunc_option(ಶೂನ್ಯ)
 {
 # ifdef FEAT_EVAL
     free_callback(&opfunc_cb);
@@ -3712,26 +3712,26 @@ free_operatorfunc_option(void)
 }
 #endif
 
-#if defined(FEAT_EVAL)
+#ಯದಿ defined(FEAT_EVAL)
 /*
  * Mark the global 'operatorfunc' callback with "copyID" so that it is not
  * garbage collected.
  */
-    int
-set_ref_in_opfunc(int copyID UNUSED)
+    ಪೂರ್ಣಾಙ್ಕ
+set_ref_in_opfunc(ಪೂರ್ಣಾಙ್ಕ copyID UNUSED)
 {
-    int abort = FALSE;
+    ಪೂರ್ಣಾಙ್ಕ abort = FALSE;
 
     abort = set_ref_in_callback(&opfunc_cb, copyID);
 
-    return abort;
+    ಪ್ರತ್ಯಾಗಮ abort;
 }
 #endif
 
 /*
  * Handle the "g@" operator: call 'operatorfunc'.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 op_function(oparg_T *oap UNUSED)
 {
 #ifdef FEAT_EVAL
@@ -3740,47 +3740,47 @@ op_function(oparg_T *oap UNUSED)
     pos_T	orig_end = curbuf->b_op_end;
     typval_T	rettv;
 
-    if (*p_opfunc == NUL)
+    ಯದಿ (*p_opfunc == NUL)
 	emsg(_(e_operatorfunc_is_empty));
-    else
+    ಅನ್ಯಥಾ
     {
 	// Set '[ and '] marks to text to be operated on.
 	curbuf->b_op_start = oap->start;
 	curbuf->b_op_end = oap->end;
-	if (oap->motion_type != MLINE && !oap->inclusive)
+	ಯದಿ (oap->motion_type != MLINE && !oap->inclusive)
 	    // Exclude the end position.
 	    decl(&curbuf->b_op_end);
 
 	argv[0].v_type = VAR_STRING;
-	if (oap->block_mode)
+	ಯದಿ (oap->block_mode)
 	    argv[0].vval.v_string = (char_u *)"block";
-	else if (oap->motion_type == MLINE)
+	ಅನ್ಯಥಾ ಯದಿ (oap->motion_type == MLINE)
 	    argv[0].vval.v_string = (char_u *)"line";
-	else
+	ಅನ್ಯಥಾ
 	    argv[0].vval.v_string = (char_u *)"char";
 	argv[1].v_type = VAR_UNKNOWN;
 
 	// Reset virtual_op so that 'virtualedit' can be changed in the
 	// function.
-	int save_virtual_op = virtual_op;
+	ಪೂರ್ಣಾಙ್ಕ save_virtual_op = virtual_op;
 	virtual_op = MAYBE;
 
 	// Reset finish_op so that mode() returns the right value.
-	int save_finish_op = finish_op;
+	ಪೂರ್ಣಾಙ್ಕ save_finish_op = finish_op;
 	finish_op = FALSE;
 
-	if (call_callback(&opfunc_cb, 0, &rettv, 1, argv) != FAIL)
+	ಯದಿ (call_callback(&opfunc_cb, 0, &rettv, 1, argv) != FAIL)
 	    clear_tv(&rettv);
 
 	virtual_op = save_virtual_op;
 	finish_op = save_finish_op;
-	if (cmdmod.cmod_flags & CMOD_LOCKMARKS)
+	ಯದಿ (cmdmod.cmod_flags & CMOD_LOCKMARKS)
 	{
 	    curbuf->b_op_start = orig_start;
 	    curbuf->b_op_end = orig_end;
 	}
     }
-#else
+#ಅನ್ಯಥಾ
     emsg(_(e_eval_feature_not_available));
 #endif
 }
@@ -3788,57 +3788,57 @@ op_function(oparg_T *oap UNUSED)
 /*
  * Calculate start/end virtual columns for operating in block mode.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 get_op_vcol(
     oparg_T	*oap,
     colnr_T	redo_VIsual_vcol,
-    int		initial)    // when TRUE adjust position for 'selectmode'
+    ಪೂರ್ಣಾಙ್ಕ		initial)    // when TRUE adjust position for 'selectmode'
 {
     colnr_T	    start, end;
 
-    if (VIsual_mode != Ctrl_V
+    ಯದಿ (VIsual_mode != Ctrl_V
 	    || (!initial && oap->end.col < curwin->w_width))
-	return;
+	ಪ್ರತ್ಯಾಗಮ;
 
     oap->block_mode = TRUE;
 
     // prevent from moving onto a trail byte
-    if (has_mbyte)
+    ಯದಿ (has_mbyte)
 	mb_adjustpos(curwin->w_buffer, &oap->end);
 
-    getvvcol(curwin, &(oap->start), &oap->start_vcol, NULL, &oap->end_vcol, 0);
+    getvvcol(curwin, &(oap->start), &oap->start_vcol, ರಿಕ್ತ, &oap->end_vcol, 0);
 
-    if (!redo_VIsual_busy)
+    ಯದಿ (!redo_VIsual_busy)
     {
-	getvvcol(curwin, &(oap->end), &start, NULL, &end, 0);
+	getvvcol(curwin, &(oap->end), &start, ರಿಕ್ತ, &end, 0);
 
-	if (start < oap->start_vcol)
+	ಯದಿ (start < oap->start_vcol)
 	    oap->start_vcol = start;
-	if (end > oap->end_vcol)
+	ಯದಿ (end > oap->end_vcol)
 	{
-	    if (initial && *p_sel == 'e' && start >= 1
+	    ಯದಿ (initial && *p_sel == 'e' && start >= 1
 				    && start - 1 >= oap->end_vcol)
 		oap->end_vcol = start - 1;
-	    else
+	    ಅನ್ಯಥಾ
 		oap->end_vcol = end;
 	}
     }
 
     // if '$' was used, get oap->end_vcol from longest line
-    if (curwin->w_curswant == MAXCOL)
+    ಯದಿ (curwin->w_curswant == MAXCOL)
     {
 	curwin->w_cursor.col = MAXCOL;
 	oap->end_vcol = 0;
-	for (curwin->w_cursor.lnum = oap->start.lnum;
+	ಪ್ರತಿ (curwin->w_cursor.lnum = oap->start.lnum;
 		curwin->w_cursor.lnum <= oap->end.lnum;
 					++curwin->w_cursor.lnum)
 	{
-	    getvvcol(curwin, &curwin->w_cursor, NULL, NULL, &end, 0);
-	    if (end > oap->end_vcol)
+	    getvvcol(curwin, &curwin->w_cursor, ರಿಕ್ತ, ರಿಕ್ತ, &end, 0);
+	    ಯದಿ (end > oap->end_vcol)
 		oap->end_vcol = end;
 	}
     }
-    else if (redo_VIsual_busy)
+    ಅನ್ಯಥಾ ಯದಿ (redo_VIsual_busy)
 	oap->end_vcol = oap->start_vcol + redo_VIsual_vcol - 1;
     // Correct oap->end.col and oap->start.col to be the
     // upper-left and lower-right corner of the block area.
@@ -3855,18 +3855,18 @@ get_op_vcol(
 }
 
 // Information for redoing the previous Visual selection.
-typedef struct {
-    int		rv_mode;	// 'v', 'V', or Ctrl-V
-    linenr_T	rv_line_count;	// number of lines
+ಪ್ರಕಾರನಿರ್ದೇಶ ಸಂರಚನಾ {
+    ಪೂರ್ಣಾಙ್ಕ		rv_mode;	// 'v', 'V', or Ctrl-V
+    linenr_T	rv_ಸಾಲು_ಎಣಿಕೆ;	// number of lines
     colnr_T	rv_vcol;	// number of cols or end column
-    long	rv_count;	// count for Visual operator
-    int		rv_arg;		// extra argument
+    long	rv_ಎಣಿಕೆ;	// count for Visual operator
+    ಪೂರ್ಣಾಙ್ಕ		rv_arg;		// extra argument
 } redo_VIsual_T;
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
 is_ex_cmdchar(cmdarg_T *cap)
 {
-    return cap->cmdchar == ':'
+    ಪ್ರತ್ಯಾಗಮ cap->cmdchar == ':'
 	|| cap->cmdchar == K_COMMAND
 	|| cap->cmdchar == K_SCRIPT_COMMAND;
 }
@@ -3875,29 +3875,29 @@ is_ex_cmdchar(cmdarg_T *cap)
  * Handle an operator after Visual mode or when the movement is finished.
  * "gui_yank" is true when yanking text for the clipboard.
  */
-    void
-do_pending_operator(cmdarg_T *cap, int old_col, int gui_yank)
+    ಶೂನ್ಯ
+do_pending_operator(cmdarg_T *cap, ಪೂರ್ಣಾಙ್ಕ old_col, ಪೂರ್ಣಾಙ್ಕ gui_yank)
 {
     oparg_T	*oap = cap->oap;
     pos_T	old_cursor;
-    int		empty_region_error;
-    int		restart_edit_save;
+    ಪೂರ್ಣಾಙ್ಕ		empty_region_error;
+    ಪೂರ್ಣಾಙ್ಕ		restart_edit_save;
 #ifdef FEAT_LINEBREAK
-    int		lbr_saved = curwin->w_p_lbr;
+    ಪೂರ್ಣಾಙ್ಕ		lbr_saved = curwin->w_p_lbr;
 #endif
 
     // The visual area is remembered for redo
-    static redo_VIsual_T   redo_VIsual = {NUL, 0, 0, 0,0};
+    ಸ್ಥಿರ redo_VIsual_T   redo_VIsual = {NUL, 0, 0, 0,0};
 
-    int		    include_line_break = FALSE;
+    ಪೂರ್ಣಾಙ್ಕ		    include_ಸಾಲು_break = FALSE;
 
-#if defined(FEAT_CLIPBOARD)
+#ಯದಿ defined(FEAT_CLIPBOARD)
     // Yank the visual area into the GUI selection register before we operate
     // on it and lose it forever.
     // Don't do it if a specific register was specified, so that ""x"*P works.
     // This could call do_pending_operator() recursively, but that's OK
     // because gui_yank will be TRUE for the nested call.
-    if ((clip_star.available || clip_plus.available)
+    ಯದಿ ((clip_star.available || clip_plus.available)
 	    && oap->op_type != OP_NOP
 	    && !gui_yank
 	    && VIsual_active
@@ -3908,34 +3908,34 @@ do_pending_operator(cmdarg_T *cap, int old_col, int gui_yank)
     old_cursor = curwin->w_cursor;
 
     // If an operation is pending, handle it...
-    if ((finish_op || VIsual_active) && oap->op_type != OP_NOP)
+    ಯದಿ ((finish_op || VIsual_active) && oap->op_type != OP_NOP)
     {
 	// Yank can be redone when 'y' is in 'cpoptions', but not when yanking
 	// for the clipboard.
-	int	redo_yank = vim_strchr(p_cpo, CPO_YANK) != NULL && !gui_yank;
+	ಪೂರ್ಣಾಙ್ಕ	redo_yank = vim_strchr(p_cpo, CPO_YANK) != ರಿಕ್ತ && !gui_yank;
 
 #ifdef FEAT_LINEBREAK
 	// Avoid a problem with unwanted linebreaks in block mode.
-	(void)reset_lbr();
+	(ಶೂನ್ಯ)reset_lbr();
 #endif
 	oap->is_VIsual = VIsual_active;
-	if (oap->motion_force == 'V')
+	ಯದಿ (oap->motion_force == 'V')
 	    oap->motion_type = MLINE;
-	else if (oap->motion_force == 'v')
+	ಅನ್ಯಥಾ ಯದಿ (oap->motion_force == 'v')
 	{
 	    // If the motion was linewise, "inclusive" will not have been set.
 	    // Use "exclusive" to be consistent.  Makes "dvj" work nice.
-	    if (oap->motion_type == MLINE)
+	    ಯದಿ (oap->motion_type == MLINE)
 		oap->inclusive = FALSE;
 	    // If the motion already was characterwise, toggle "inclusive"
-	    else if (oap->motion_type == MCHAR)
+	    ಅನ್ಯಥಾ ಯದಿ (oap->motion_type == MCHAR)
 		oap->inclusive = !oap->inclusive;
 	    oap->motion_type = MCHAR;
 	}
-	else if (oap->motion_force == Ctrl_V)
+	ಅನ್ಯಥಾ ಯದಿ (oap->motion_force == Ctrl_V)
 	{
 	    // Change line- or characterwise motion into Visual block mode.
-	    if (!VIsual_active)
+	    ಯದಿ (!VIsual_active)
 	    {
 		VIsual_active = TRUE;
 		VIsual = oap->start;
@@ -3947,7 +3947,7 @@ do_pending_operator(cmdarg_T *cap, int old_col, int gui_yank)
 
 	// Only redo yank when 'y' flag is in 'cpoptions'.
 	// Never redo "zf" (define fold).
-	if ((redo_yank || oap->op_type != OP_YANK)
+	ಯದಿ ((redo_yank || oap->op_type != OP_YANK)
 		&& ((!VIsual_active || oap->motion_force)
 		    // Also redo Operator-pending Visual mode mappings
 		    || (VIsual_active
@@ -3967,26 +3967,26 @@ do_pending_operator(cmdarg_T *cap, int old_col, int gui_yank)
 	    prep_redo(oap->regname, cap->count0,
 		    get_op_char(oap->op_type), get_extra_op_char(oap->op_type),
 		    oap->motion_force, cap->cmdchar, cap->nchar);
-	    if (cap->cmdchar == '/' || cap->cmdchar == '?') // was a search
+	    ಯದಿ (cap->cmdchar == '/' || cap->cmdchar == '?') // was a search
 	    {
 		// If 'cpoptions' does not contain 'r', insert the search
 		// pattern to really repeat the same command.
-		if (vim_strchr(p_cpo, CPO_REDO) == NULL)
+		ಯದಿ (vim_strchr(p_cpo, CPO_REDO) == ರಿಕ್ತ)
 		    AppendToRedobuffLit(cap->searchbuf, -1);
 		AppendToRedobuff(NL_STR);
 	    }
-	    else if (is_ex_cmdchar(cap))
+	    ಅನ್ಯಥಾ ಯದಿ (is_ex_cmdchar(cap))
 	    {
 		// do_cmdline() has stored the first typed line in
 		// "repeat_cmdline".  When several lines are typed repeating
 		// won't be possible.
-		if (repeat_cmdline == NULL)
+		ಯದಿ (repeat_cmdline == ರಿಕ್ತ)
 		    ResetRedobuff();
-		else
+		ಅನ್ಯಥಾ
 		{
-		    if (cap->cmdchar == ':')
+		    ಯದಿ (cap->cmdchar == ':')
 			AppendToRedobuffLit(repeat_cmdline, -1);
-		    else
+		    ಅನ್ಯಥಾ
 			AppendToRedobuffSpec(repeat_cmdline);
 		    AppendToRedobuff(NL_STR);
 		    VIM_CLEAR(repeat_cmdline);
@@ -3994,43 +3994,43 @@ do_pending_operator(cmdarg_T *cap, int old_col, int gui_yank)
 	    }
 	}
 
-	if (redo_VIsual_busy)
+	ಯದಿ (redo_VIsual_busy)
 	{
 	    // Redo of an operation on a Visual area. Use the same size from
 	    // redo_VIsual.rv_line_count and redo_VIsual.rv_vcol.
 	    oap->start = curwin->w_cursor;
-	    curwin->w_cursor.lnum += redo_VIsual.rv_line_count - 1;
-	    if (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
-		curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
+	    curwin->w_cursor.lnum += redo_VIsual.rv_ಸಾಲು_ಎಣಿಕೆ - 1;
+	    ಯದಿ (curwin->w_cursor.lnum > curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
+		curwin->w_cursor.lnum = curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ;
 	    VIsual_mode = redo_VIsual.rv_mode;
-	    if (redo_VIsual.rv_vcol == MAXCOL || VIsual_mode == 'v')
+	    ಯದಿ (redo_VIsual.rv_vcol == MAXCOL || VIsual_mode == 'v')
 	    {
-		if (VIsual_mode == 'v')
+		ಯದಿ (VIsual_mode == 'v')
 		{
-		    if (redo_VIsual.rv_line_count <= 1)
+		    ಯದಿ (redo_VIsual.rv_ಸಾಲು_ಎಣಿಕೆ <= 1)
 		    {
 			validate_virtcol();
 			curwin->w_curswant =
 				     curwin->w_virtcol + redo_VIsual.rv_vcol - 1;
 		    }
-		    else
+		    ಅನ್ಯಥಾ
 			curwin->w_curswant = redo_VIsual.rv_vcol;
 		}
-		else
+		ಅನ್ಯಥಾ
 		{
 		    curwin->w_curswant = MAXCOL;
 		}
 		coladvance(curwin->w_curswant);
 	    }
-	    cap->count0 = redo_VIsual.rv_count;
-	    if (redo_VIsual.rv_count != 0)
-		cap->count1 = redo_VIsual.rv_count;
-	    else
+	    cap->count0 = redo_VIsual.rv_ಎಣಿಕೆ;
+	    ಯದಿ (redo_VIsual.rv_ಎಣಿಕೆ != 0)
+		cap->count1 = redo_VIsual.rv_ಎಣಿಕೆ;
+	    ಅನ್ಯಥಾ
 		cap->count1 = 1;
 	}
-	else if (VIsual_active)
+	ಅನ್ಯಥಾ ಯದಿ (VIsual_active)
 	{
-	    if (!gui_yank)
+	    ಯದಿ (!gui_yank)
 	    {
 		// Save the current VIsual area for '< and '> marks, and "gv"
 		curbuf->b_visual.vi_start = VIsual;
@@ -4046,15 +4046,15 @@ do_pending_operator(cmdarg_T *cap, int old_col, int gui_yank)
 	    // In Select mode, a linewise selection is operated upon like a
 	    // characterwise selection.
 	    // Special case: gH<Del> deletes the last line.
-	    if (VIsual_select && VIsual_mode == 'V'
+	    ಯದಿ (VIsual_select && VIsual_mode == 'V'
 					    && cap->oap->op_type != OP_DELETE)
 	    {
-		if (LT_POS(VIsual, curwin->w_cursor))
+		ಯದಿ (LT_POS(VIsual, curwin->w_cursor))
 		{
 		    VIsual.col = 0;
 		    curwin->w_cursor.col = ml_get_len(curwin->w_cursor.lnum);
 		}
-		else
+		ಅನ್ಯಥಾ
 		{
 		    curwin->w_cursor.col = 0;
 		    VIsual.col = ml_get_len(VIsual.lnum);
@@ -4063,11 +4063,11 @@ do_pending_operator(cmdarg_T *cap, int old_col, int gui_yank)
 	    }
 	    // If 'selection' is "exclusive", backup one character for
 	    // charwise selections.
-	    else if (VIsual_mode == 'v')
-		include_line_break = unadjust_for_sel();
+	    ಅನ್ಯಥಾ ಯದಿ (VIsual_mode == 'v')
+		include_ಸಾಲು_break = unadjust_for_sel();
 
 	    oap->start = VIsual;
-	    if (VIsual_mode == 'V')
+	    ಯದಿ (VIsual_mode == 'V')
 	    {
 		oap->start.col = 0;
 		oap->start.coladd = 0;
@@ -4076,17 +4076,17 @@ do_pending_operator(cmdarg_T *cap, int old_col, int gui_yank)
 
 	// Set oap->start to the first position of the operated text, oap->end
 	// to the end of the operated text.  w_cursor is equal to oap->start.
-	if (LT_POS(oap->start, curwin->w_cursor))
+	ಯದಿ (LT_POS(oap->start, curwin->w_cursor))
 	{
 #ifdef FEAT_FOLDING
 	    // Include folded lines completely.
-	    if (!VIsual_active)
+	    ಯದಿ (!VIsual_active)
 	    {
-		if (hasFolding(oap->start.lnum, &oap->start.lnum, NULL))
+		ಯದಿ (hasFolding(oap->start.lnum, &oap->start.lnum, ರಿಕ್ತ))
 		    oap->start.col = 0;
-		if ((curwin->w_cursor.col > 0 || oap->inclusive
+		ಯದಿ ((curwin->w_cursor.col > 0 || oap->inclusive
 						  || oap->motion_type == MLINE)
-			&& hasFolding(curwin->w_cursor.lnum, NULL,
+			&& hasFolding(curwin->w_cursor.lnum, ರಿಕ್ತ,
 						      &curwin->w_cursor.lnum))
 		    curwin->w_cursor.col = ml_get_curline_len();
 	    }
@@ -4099,16 +4099,16 @@ do_pending_operator(cmdarg_T *cap, int old_col, int gui_yank)
 	    // automatically.
 	    curwin->w_valid &= ~VALID_VIRTCOL;
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
 #ifdef FEAT_FOLDING
 	    // Include folded lines completely.
-	    if (!VIsual_active && oap->motion_type == MLINE)
+	    ಯದಿ (!VIsual_active && oap->motion_type == MLINE)
 	    {
-		if (hasFolding(curwin->w_cursor.lnum, &curwin->w_cursor.lnum,
-									NULL))
+		ಯದಿ (hasFolding(curwin->w_cursor.lnum, &curwin->w_cursor.lnum,
+									ರಿಕ್ತ))
 		    curwin->w_cursor.col = 0;
-		if (hasFolding(oap->start.lnum, NULL, &oap->start.lnum))
+		ಯದಿ (hasFolding(oap->start.lnum, ರಿಕ್ತ, &oap->start.lnum))
 		    oap->start.col = ml_get_len(oap->start.lnum);
 	    }
 #endif
@@ -4118,42 +4118,42 @@ do_pending_operator(cmdarg_T *cap, int old_col, int gui_yank)
 
 	// Just in case lines were deleted that make the position invalid.
 	check_pos(curwin->w_buffer, &oap->end);
-	oap->line_count = oap->end.lnum - oap->start.lnum + 1;
+	oap->ಸಾಲು_ಎಣಿಕೆ = oap->end.lnum - oap->start.lnum + 1;
 
 	// Set "virtual_op" before resetting VIsual_active.
 	virtual_op = virtual_active();
 
-	if (VIsual_active || redo_VIsual_busy)
+	ಯದಿ (VIsual_active || redo_VIsual_busy)
 	{
 	    get_op_vcol(oap, redo_VIsual.rv_vcol, TRUE);
 
-	    if (!redo_VIsual_busy && !gui_yank)
+	    ಯದಿ (!redo_VIsual_busy && !gui_yank)
 	    {
 		// Prepare to reselect and redo Visual: this is based on the
 		// size of the Visual text
 		resel_VIsual_mode = VIsual_mode;
-		if (curwin->w_curswant == MAXCOL)
+		ಯದಿ (curwin->w_curswant == MAXCOL)
 		    resel_VIsual_vcol = MAXCOL;
-		else
+		ಅನ್ಯಥಾ
 		{
-		    if (VIsual_mode != Ctrl_V)
+		    ಯದಿ (VIsual_mode != Ctrl_V)
 			getvvcol(curwin, &(oap->end),
-						NULL, NULL, &oap->end_vcol, 0);
-		    if (VIsual_mode == Ctrl_V || oap->line_count <= 1)
+						ರಿಕ್ತ, ರಿಕ್ತ, &oap->end_vcol, 0);
+		    ಯದಿ (VIsual_mode == Ctrl_V || oap->ಸಾಲು_ಎಣಿಕೆ <= 1)
 		    {
-			if (VIsual_mode != Ctrl_V)
+			ಯದಿ (VIsual_mode != Ctrl_V)
 			    getvvcol(curwin, &(oap->start),
-					      &oap->start_vcol, NULL, NULL, 0);
+					      &oap->start_vcol, ರಿಕ್ತ, ರಿಕ್ತ, 0);
 			resel_VIsual_vcol = oap->end_vcol - oap->start_vcol + 1;
 		    }
-		    else
+		    ಅನ್ಯಥಾ
 			resel_VIsual_vcol = oap->end_vcol;
 		}
-		resel_VIsual_line_count = oap->line_count;
+		resel_VIsual_ಸಾಲು_ಎಣಿಕೆ = oap->ಸಾಲು_ಎಣಿಕೆ;
 	    }
 
 	    // can't redo yank (unless 'y' is in 'cpoptions') and ":"
-	    if ((redo_yank || oap->op_type != OP_YANK)
+	    ಯದಿ ((redo_yank || oap->op_type != OP_YANK)
 		    && oap->op_type != OP_COLON
 #ifdef FEAT_FOLDING
 		    && oap->op_type != OP_FOLD
@@ -4169,38 +4169,38 @@ do_pending_operator(cmdarg_T *cap, int old_col, int gui_yank)
 	    {
 		// Prepare for redoing.  Only use the nchar field for "r",
 		// otherwise it might be the second char of the operator.
-		if (cap->cmdchar == 'g' && (cap->nchar == 'n'
+		ಯದಿ (cap->cmdchar == 'g' && (cap->nchar == 'n'
 							|| cap->nchar == 'N'))
 		    prep_redo(oap->regname, cap->count0,
 			    get_op_char(oap->op_type),
 			    get_extra_op_char(oap->op_type),
 			    oap->motion_force, cap->cmdchar, cap->nchar);
-		else if (!is_ex_cmdchar(cap))
+		ಅನ್ಯಥಾ ಯದಿ (!is_ex_cmdchar(cap))
 		{
-		    int opchar = get_op_char(oap->op_type);
-		    int extra_opchar = get_extra_op_char(oap->op_type);
-		    int nchar = oap->op_type == OP_REPLACE ? cap->nchar : NUL;
+		    ಪೂರ್ಣಾಙ್ಕ opchar = get_op_char(oap->op_type);
+		    ಪೂರ್ಣಾಙ್ಕ extra_opchar = get_extra_op_char(oap->op_type);
+		    ಪೂರ್ಣಾಙ್ಕ nchar = oap->op_type == OP_REPLACE ? cap->nchar : NUL;
 
 		    // reverse what nv_replace() did
-		    if (nchar == REPLACE_CR_NCHAR)
+		    ಯದಿ (nchar == REPLACE_CR_NCHAR)
 			nchar = CAR;
-		    else if (nchar == REPLACE_NL_NCHAR)
+		    ಅನ್ಯಥಾ ಯದಿ (nchar == REPLACE_NL_NCHAR)
 			nchar = NL;
 
-		    if (opchar == 'g' && extra_opchar == '@')
+		    ಯದಿ (opchar == 'g' && extra_opchar == '@')
 			// also repeat the count for 'operatorfunc'
 			prep_redo_num2(oap->regname, 0L, NUL, 'v',
 				     cap->count0, opchar, extra_opchar, nchar);
-		    else
+		    ಅನ್ಯಥಾ
 			prep_redo(oap->regname, 0L, NUL, 'v',
 						  opchar, extra_opchar, nchar);
 		}
-		if (!redo_VIsual_busy)
+		ಯದಿ (!redo_VIsual_busy)
 		{
 		    redo_VIsual.rv_mode = resel_VIsual_mode;
 		    redo_VIsual.rv_vcol = resel_VIsual_vcol;
-		    redo_VIsual.rv_line_count = resel_VIsual_line_count;
-		    redo_VIsual.rv_count = cap->count0;
+		    redo_VIsual.rv_ಸಾಲು_ಎಣಿಕೆ = resel_VIsual_ಸಾಲು_ಎಣಿಕೆ;
+		    redo_VIsual.rv_ಎಣಿಕೆ = cap->count0;
 		    redo_VIsual.rv_arg = cap->arg;
 		}
 	    }
@@ -4208,27 +4208,27 @@ do_pending_operator(cmdarg_T *cap, int old_col, int gui_yank)
 	    // oap->inclusive defaults to TRUE.
 	    // If oap->end is on a NUL (empty line) oap->inclusive becomes
 	    // FALSE.  This makes "d}P" and "v}dP" work the same.
-	    if (oap->motion_force == NUL || oap->motion_type == MLINE)
+	    ಯದಿ (oap->motion_force == NUL || oap->motion_type == MLINE)
 		oap->inclusive = TRUE;
-	    if (VIsual_mode == 'V')
+	    ಯದಿ (VIsual_mode == 'V')
 		oap->motion_type = MLINE;
-	    else
+	    ಅನ್ಯಥಾ
 	    {
 		oap->motion_type = MCHAR;
-		if (VIsual_mode != Ctrl_V && *ml_get_pos(&(oap->end)) == NUL
-			&& (include_line_break || !virtual_op))
+		ಯದಿ (VIsual_mode != Ctrl_V && *ml_get_pos(&(oap->end)) == NUL
+			&& (include_ಸಾಲು_break || !virtual_op))
 		{
 		    oap->inclusive = FALSE;
 		    // Try to include the newline, unless it's an operator
 		    // that works on lines only.
-		    if (*p_sel != 'o'
-			    && !op_on_lines(oap->op_type)
-			    && oap->end.lnum < curbuf->b_ml.ml_line_count)
+		    ಯದಿ (*p_sel != 'o'
+			    && !op_on_ಸಾಲುಗಳು(oap->op_type)
+			    && oap->end.lnum < curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
 		    {
 			++oap->end.lnum;
 			oap->end.col = 0;
 			oap->end.coladd = 0;
-			++oap->line_count;
+			++oap->ಸಾಲು_ಎಣಿಕೆ;
 		    }
 		}
 	    }
@@ -4240,13 +4240,13 @@ do_pending_operator(cmdarg_T *cap, int old_col, int gui_yank)
 	    // With OP_YANK and sometimes with OP_COLON and OP_FILTER there is
 	    // no screen redraw, so it is done here to remove the inverted
 	    // part.
-	    if (!gui_yank)
+	    ಯದಿ (!gui_yank)
 	    {
 		VIsual_active = FALSE;
 		setmouse();
 		mouse_dragging = 0;
 		may_clear_cmdline();
-		if ((oap->op_type == OP_YANK
+		ಯದಿ ((oap->op_type == OP_YANK
 			    || oap->op_type == OP_COLON
 			    || oap->op_type == OP_FUNCTION
 			    || oap->op_type == OP_FILTER)
@@ -4262,12 +4262,12 @@ do_pending_operator(cmdarg_T *cap, int old_col, int gui_yank)
 	}
 
 	// Include the trailing byte of a multi-byte char.
-	if (has_mbyte && oap->inclusive)
+	ಯದಿ (has_mbyte && oap->inclusive)
 	{
-	    int		l;
+	    ಪೂರ್ಣಾಙ್ಕ		l;
 
 	    l = (*mb_ptr2len)(ml_get_pos(&oap->end));
-	    if (l > 1)
+	    ಯದಿ (l > 1)
 		oap->end.col += l - 1;
 	}
 	curwin->w_set_curswant = true;
@@ -4283,11 +4283,11 @@ do_pending_operator(cmdarg_T *cap, int old_col, int gui_yank)
 	// For delete, change and yank, it's an error to operate on an
 	// empty region, when 'E' included in 'cpoptions' (Vi compatible).
 	empty_region_error = (oap->empty
-				&& vim_strchr(p_cpo, CPO_EMPTYREGION) != NULL);
+				&& vim_strchr(p_cpo, CPO_EMPTYREGION) != ರಿಕ್ತ);
 
 	// Force a redraw when operating on an empty Visual region, when
 	// 'modifiable is off or creating a fold.
-	if (oap->is_VIsual && (oap->empty || !curbuf->b_p_ma
+	ಯದಿ (oap->is_VIsual && (oap->empty || !curbuf->b_p_ma
 #ifdef FEAT_FOLDING
 		    || oap->op_type == OP_FOLD
 #endif
@@ -4304,108 +4304,108 @@ do_pending_operator(cmdarg_T *cap, int old_col, int gui_yank)
 	// character in the previous line. If op_start is on or before the
 	// first non-blank in the line, the operator becomes linewise
 	// (strange, but that's the way vi does it).
-	if (	   oap->motion_type == MCHAR
+	ಯದಿ (	   oap->motion_type == MCHAR
 		&& oap->inclusive == FALSE
 		&& !(cap->retval & CA_NO_ADJ_OP_END)
 		&& oap->end.col == 0
 		&& (!oap->is_VIsual || *p_sel == 'o')
 		&& !oap->block_mode
-		&& oap->line_count > 1)
+		&& oap->ಸಾಲು_ಎಣಿಕೆ > 1)
 	{
 	    oap->end_adjusted = TRUE;	    // remember that we did this
-	    --oap->line_count;
+	    --oap->ಸಾಲು_ಎಣಿಕೆ;
 	    --oap->end.lnum;
-	    if (inindent(0))
+	    ಯದಿ (inindent(0))
 		oap->motion_type = MLINE;
-	    else
+	    ಅನ್ಯಥಾ
 	    {
 		oap->end.col = ml_get_len(oap->end.lnum);
-		if (oap->end.col)
+		ಯದಿ (oap->end.col)
 		{
 		    --oap->end.col;
 		    oap->inclusive = TRUE;
 		}
 	    }
 	}
-	else
+	ಅನ್ಯಥಾ
 	    oap->end_adjusted = FALSE;
 
-	switch (oap->op_type)
+	ವಿಕಲ್ಪ (oap->op_type)
 	{
-	case OP_LSHIFT:
-	case OP_RSHIFT:
-	    op_shift(oap, TRUE, oap->is_VIsual ? (int)cap->count1 : 1);
+	ಪಕ್ಷ OP_LSHIFT:
+	ಪಕ್ಷ OP_RSHIFT:
+	    op_shift(oap, TRUE, oap->is_VIsual ? (ಪೂರ್ಣಾಙ್ಕ)cap->count1 : 1);
 	    auto_format(FALSE, TRUE);
-	    break;
+	    ಭಙ್ಗ;
 
-	case OP_JOIN_NS:
-	case OP_JOIN:
-	    if (oap->line_count < 2)
-		oap->line_count = 2;
-	    if (curwin->w_cursor.lnum + oap->line_count - 1 >
-						   curbuf->b_ml.ml_line_count)
+	ಪಕ್ಷ OP_JOIN_NS:
+	ಪಕ್ಷ OP_JOIN:
+	    ಯದಿ (oap->ಸಾಲು_ಎಣಿಕೆ < 2)
+		oap->ಸಾಲು_ಎಣಿಕೆ = 2;
+	    ಯದಿ (curwin->w_cursor.lnum + oap->ಸಾಲು_ಎಣಿಕೆ - 1 >
+						   curbuf->b_ml.ml_ಸಾಲು_ಎಣಿಕೆ)
 		beep_flush();
-	    else
+	    ಅನ್ಯಥಾ
 	    {
-		(void)do_join(oap->line_count, oap->op_type == OP_JOIN,
+		(ಶೂನ್ಯ)do_join(oap->ಸಾಲು_ಎಣಿಕೆ, oap->op_type == OP_JOIN,
 							    TRUE, TRUE, TRUE);
 		auto_format(FALSE, TRUE);
 	    }
-	    break;
+	    ಭಙ್ಗ;
 
-	case OP_DELETE:
+	ಪಕ್ಷ OP_DELETE:
 	    VIsual_reselect = FALSE;	    // don't reselect now
-	    if (empty_region_error)
+	    ಯದಿ (empty_region_error)
 	    {
 		vim_beep(BO_OPER);
 		CancelRedo();
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 	    {
-		(void)op_delete(oap);
+		(ಶೂನ್ಯ)op_delete(oap);
 		// save cursor line for undo if it wasn't saved yet
-		if (oap->motion_type == MLINE && has_format_option(FO_AUTO)
+		ಯದಿ (oap->motion_type == MLINE && has_format_option(FO_AUTO)
 						      && u_save_cursor() == OK)
 		    auto_format(FALSE, TRUE);
 	    }
-	    break;
+	    ಭಙ್ಗ;
 
-	case OP_YANK:
-	    if (empty_region_error)
+	ಪಕ್ಷ OP_YANK:
+	    ಯದಿ (empty_region_error)
 	    {
-		if (!gui_yank)
+		ಯದಿ (!gui_yank)
 		{
 		    vim_beep(BO_OPER);
 		    CancelRedo();
 		}
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 	    {
 #ifdef FEAT_LINEBREAK
 		restore_lbr(lbr_saved);
 #endif
 		oap->excl_tr_ws = cap->cmdchar == 'z';
-		(void)op_yank(oap, FALSE, !gui_yank);
+		(ಶೂನ್ಯ)op_yank(oap, FALSE, !gui_yank);
 	    }
 	    check_cursor_col();
-	    break;
+	    ಭಙ್ಗ;
 
-	case OP_CHANGE:
+	ಪಕ್ಷ OP_CHANGE:
 	    VIsual_reselect = FALSE;	    // don't reselect now
-	    if (empty_region_error)
+	    ಯದಿ (empty_region_error)
 	    {
 		vim_beep(BO_OPER);
 		CancelRedo();
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 	    {
 		// This is a new edit command, not a restart.  Need to
 		// remember it to make 'insertmode' work with mappings for
 		// Visual mode.  But do this only once and not when typed and
 		// 'insertmode' isn't set.
-		if (p_im || !KeyTyped)
+		ಯದಿ (p_im || !ಕೀಲಿ_Typed)
 		    restart_edit_save = restart_edit;
-		else
+		ಅನ್ಯಥಾ
 		    restart_edit_save = 0;
 		restart_edit = 0;
 #ifdef FEAT_LINEBREAK
@@ -4416,79 +4416,79 @@ do_pending_operator(cmdarg_T *cap, int old_col, int gui_yank)
 		// trigger TextChangedI
 		curbuf->b_last_changedtick_i = CHANGEDTICK(curbuf);
 
-		if (op_change(oap))	// will call edit()
+		ಯದಿ (op_change(oap))	// will call edit()
 		    cap->retval |= CA_COMMAND_BUSY;
-		if (restart_edit == 0)
+		ಯದಿ (restart_edit == 0)
 		    restart_edit = restart_edit_save;
 	    }
-	    break;
+	    ಭಙ್ಗ;
 
-	case OP_FILTER:
-	    if (vim_strchr(p_cpo, CPO_FILTER) != NULL)
+	ಪಕ್ಷ OP_FILTER:
+	    ಯದಿ (vim_strchr(p_cpo, CPO_FILTER) != ರಿಕ್ತ)
 		AppendToRedobuff((char_u *)"!\r");  // use any last used !cmd
-	    else
+	    ಅನ್ಯಥಾ
 		bangredo = TRUE;    // do_bang() will put cmd in redo buffer
 	    // FALLTHROUGH
 
-	case OP_INDENT:
-	case OP_COLON:
+	ಪಕ್ಷ OP_INDENT:
+	ಪಕ್ಷ OP_COLON:
 
 	    // If 'equalprg' is empty, do the indenting internally.
-	    if (oap->op_type == OP_INDENT && *get_equalprg() == NUL)
+	    ಯದಿ (oap->op_type == OP_INDENT && *get_equalprg() == NUL)
 	    {
-		if (curbuf->b_p_lisp)
+		ಯದಿ (curbuf->b_p_lisp)
 		{
 #ifdef FEAT_EVAL
-		    if (use_indentexpr_for_lisp())
-			op_reindent(oap, get_expr_indent);
-		    else
+		    ಯದಿ (use_indentexpr_for_lisp())
+			op_reindent(oap, get_ಅಭಿವ್ಯಕ್ತಿ_indent);
+		    ಅನ್ಯಥಾ
 #endif
 			op_reindent(oap, get_lisp_indent);
-		    break;
+		    ಭಙ್ಗ;
 		}
 		op_reindent(oap,
 #ifdef FEAT_EVAL
-			*curbuf->b_p_inde != NUL ? get_expr_indent :
+			*curbuf->b_p_inde != NUL ? get_ಅಭಿವ್ಯಕ್ತಿ_indent :
 #endif
 			    get_c_indent);
-		break;
+		ಭಙ್ಗ;
 	    }
 
 	    op_colon(oap);
-	    break;
+	    ಭಙ್ಗ;
 
-	case OP_TILDE:
-	case OP_UPPER:
-	case OP_LOWER:
-	case OP_ROT13:
-	    if (empty_region_error)
+	ಪಕ್ಷ OP_TILDE:
+	ಪಕ್ಷ OP_UPPER:
+	ಪಕ್ಷ OP_LOWER:
+	ಪಕ್ಷ OP_ROT13:
+	    ಯದಿ (empty_region_error)
 	    {
 		vim_beep(BO_OPER);
 		CancelRedo();
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 		op_tilde(oap);
 	    check_cursor_col();
-	    break;
+	    ಭಙ್ಗ;
 
-	case OP_FORMAT:
-#if defined(FEAT_EVAL)
-	    if (*curbuf->b_p_fex != NUL)
+	ಪಕ್ಷ OP_FORMAT:
+#ಯದಿ defined(FEAT_EVAL)
+	    ಯದಿ (*curbuf->b_p_fex != NUL)
 		op_formatexpr(oap);	// use expression
-	    else
+	    ಅನ್ಯಥಾ
 #endif
 	    {
-		if (*p_fp != NUL || *curbuf->b_p_fp != NUL)
+		ಯದಿ (*p_fp != NUL || *curbuf->b_p_fp != NUL)
 		    op_colon(oap);		// use external command
-		else
+		ಅನ್ಯಥಾ
 		    op_format(oap, FALSE);	// use internal function
 	    }
-	    break;
-	case OP_FORMAT2:
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ OP_FORMAT2:
 	    op_format(oap, TRUE);	// use internal function
-	    break;
+	    ಭಙ್ಗ;
 
-	case OP_FUNCTION:
+	ಪಕ್ಷ OP_FUNCTION:
 	    {
 		redo_VIsual_T   save_redo_VIsual = redo_VIsual;
 
@@ -4503,18 +4503,18 @@ do_pending_operator(cmdarg_T *cap, int old_col, int gui_yank)
 		// Restore the info for redoing Visual mode, the function may
 		// invoke another operator and unintentionally change it.
 		redo_VIsual = save_redo_VIsual;
-		break;
+		ಭಙ್ಗ;
 	    }
 
-	case OP_INSERT:
-	case OP_APPEND:
+	ಪಕ್ಷ OP_ಸೇರಿಸು:
+	ಪಕ್ಷ OP_APPEND:
 	    VIsual_reselect = FALSE;	// don't reselect now
-	    if (empty_region_error)
+	    ಯದಿ (empty_region_error)
 	    {
 		vim_beep(BO_OPER);
 		CancelRedo();
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 	    {
 		// This is a new edit command, not a restart.  Need to
 		// remember it to make 'insertmode' work with mappings for
@@ -4529,31 +4529,31 @@ do_pending_operator(cmdarg_T *cap, int old_col, int gui_yank)
 		// trigger TextChangedI
 		curbuf->b_last_changedtick_i = CHANGEDTICK(curbuf);
 
-		op_insert(oap, cap->count1);
+		op_ಸೇರಿಸು(oap, cap->count1);
 #ifdef FEAT_LINEBREAK
 		// Reset linebreak, so that formatting works correctly.
-		(void)reset_lbr();
+		(ಶೂನ್ಯ)reset_lbr();
 #endif
 
 		// TODO: when inserting in several lines, should format all
 		// the lines.
 		auto_format(FALSE, TRUE);
 
-		if (restart_edit == 0)
+		ಯದಿ (restart_edit == 0)
 		    restart_edit = restart_edit_save;
-		else
+		ಅನ್ಯಥಾ
 		    cap->retval |= CA_COMMAND_BUSY;
 	    }
-	    break;
+	    ಭಙ್ಗ;
 
-	case OP_REPLACE:
+	ಪಕ್ಷ OP_REPLACE:
 	    VIsual_reselect = FALSE;	// don't reselect now
-	    if (empty_region_error)
+	    ಯದಿ (empty_region_error)
 	    {
 		vim_beep(BO_OPER);
 		CancelRedo();
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 	    {
 #ifdef FEAT_LINEBREAK
 		// Restore linebreak, so that when the user edits it looks as
@@ -4562,18 +4562,18 @@ do_pending_operator(cmdarg_T *cap, int old_col, int gui_yank)
 #endif
 		op_replace(oap, cap->nchar);
 	    }
-	    break;
+	    ಭಙ್ಗ;
 
 #ifdef FEAT_FOLDING
-	case OP_FOLD:
+	ಪಕ್ಷ OP_FOLD:
 	    VIsual_reselect = FALSE;	// don't reselect now
 	    foldCreate(oap->start.lnum, oap->end.lnum);
-	    break;
+	    ಭಙ್ಗ;
 
-	case OP_FOLDOPEN:
-	case OP_FOLDOPENREC:
-	case OP_FOLDCLOSE:
-	case OP_FOLDCLOSEREC:
+	ಪಕ್ಷ OP_FOLDOPEN:
+	ಪಕ್ಷ OP_FOLDOPENREC:
+	ಪಕ್ಷ OP_FOLDCLOSE:
+	ಪಕ್ಷ OP_FOLDCLOSEREC:
 	    VIsual_reselect = FALSE;	// don't reselect now
 	    opFoldRange(oap->start.lnum, oap->end.lnum,
 		    oap->op_type == OP_FOLDOPEN
@@ -4581,23 +4581,23 @@ do_pending_operator(cmdarg_T *cap, int old_col, int gui_yank)
 		    oap->op_type == OP_FOLDOPENREC
 					  || oap->op_type == OP_FOLDCLOSEREC,
 					  oap->is_VIsual);
-	    break;
+	    ಭಙ್ಗ;
 
-	case OP_FOLDDEL:
-	case OP_FOLDDELREC:
+	ಪಕ್ಷ OP_FOLDDEL:
+	ಪಕ್ಷ OP_FOLDDELREC:
 	    VIsual_reselect = FALSE;	// don't reselect now
 	    deleteFold(oap->start.lnum, oap->end.lnum,
 			       oap->op_type == OP_FOLDDELREC, oap->is_VIsual);
-	    break;
+	    ಭಙ್ಗ;
 #endif
-	case OP_NR_ADD:
-	case OP_NR_SUB:
-	    if (empty_region_error)
+	ಪಕ್ಷ OP_NR_ADD:
+	ಪಕ್ಷ OP_NR_SUB:
+	    ಯದಿ (empty_region_error)
 	    {
 		vim_beep(BO_OPER);
 		CancelRedo();
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 	    {
 		VIsual_active = TRUE;
 #ifdef FEAT_LINEBREAK
@@ -4607,25 +4607,25 @@ do_pending_operator(cmdarg_T *cap, int old_col, int gui_yank)
 		VIsual_active = FALSE;
 	    }
 	    check_cursor_col();
-	    break;
-	default:
+	    ಭಙ್ಗ;
+	ಸ್ವಭಾವ:
 	    clearopbeep(oap);
 	}
 	virtual_op = MAYBE;
-	if (!gui_yank)
+	ಯದಿ (!gui_yank)
 	{
 	    // if 'sol' not set, go back to old column for some commands
-	    if (!p_sol && oap->motion_type == MLINE && !oap->end_adjusted
+	    ಯದಿ (!p_sol && oap->motion_type == MLINE && !oap->end_adjusted
 		    && (oap->op_type == OP_LSHIFT || oap->op_type == OP_RSHIFT
 						|| oap->op_type == OP_DELETE))
 	    {
 #ifdef FEAT_LINEBREAK
-		(void)reset_lbr();
+		(ಶೂನ್ಯ)reset_lbr();
 #endif
 		coladvance(curwin->w_curswant = old_col);
 	    }
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
 	    curwin->w_cursor = old_cursor;
 	}
@@ -4641,14 +4641,14 @@ do_pending_operator(cmdarg_T *cap, int old_col, int gui_yank)
 // put byte 'c' at position 'lp', but
 // verify, that the position to place
 // is actually safe
-    static void
-pbyte(pos_T lp, int c)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+pbyte(pos_T lp, ಪೂರ್ಣಾಙ್ಕ c)
 {
     char_u *p = ml_get_buf(curbuf, lp.lnum, TRUE);
-    int	len = curbuf->b_ml.ml_line_len;
+    ಪೂರ್ಣಾಙ್ಕ	len = curbuf->b_ml.ml_ಸಾಲು_len;
 
     // safety check
-    if (lp.col >= len)
+    ಯದಿ (lp.col >= len)
 	lp.col = (len > 1 ? len - 2 : 0);
     *(p + lp.col) = c;
 }

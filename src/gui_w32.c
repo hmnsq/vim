@@ -23,219 +23,219 @@
  * e.g., replace LONG with LONG_PTR, etc.
  */
 
-#include "vim.h"
+#ಅನ್ತರ್ಭಾವ "vim.h"
 
-#if defined(FEAT_DIRECTX)
+#ಯದಿ defined(FEAT_DIRECTX)
 # include "gui_dwrite.h"
 #endif
 
 // values for "dead_key"
-#define DEAD_KEY_OFF			0	// no dead key
-#define DEAD_KEY_SET_DEFAULT		1	// dead key pressed
-#define DEAD_KEY_TRANSIENT_IN_ON_CHAR	2	// wait for next key press
-#define DEAD_KEY_SKIP_ON_CHAR		3	// skip next _OnChar()
+#define DEAD_ಕೀಲಿ_OFF			0	// no dead key
+#define DEAD_ಕೀಲಿ_SET_DEFAULT		1	// dead key pressed
+#define DEAD_ಕೀಲಿ_TRANSIENT_IN_ON_CHAR	2	// wait for next key press
+#define DEAD_ಕೀಲಿ_SKIP_ON_CHAR		3	// skip next _OnChar()
 
-#if defined(FEAT_DIRECTX)
-static DWriteContext *s_dwc = NULL;
-static int s_directx_enabled = 0;
-static int s_directx_load_attempted = 0;
-# define IS_ENABLE_DIRECTX() (s_directx_enabled && s_dwc != NULL && enc_utf8)
-static int directx_enabled(void);
-static void directx_binddc(void);
+#ಯದಿ defined(FEAT_DIRECTX)
+ಸ್ಥಿರ DWriteContext *s_dwc = ರಿಕ್ತ;
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ s_directx_enabled = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ s_directx_load_attempted = 0;
+# define IS_ENABLE_DIRECTX() (s_directx_enabled && s_dwc != ರಿಕ್ತ && enc_utf8)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ directx_enabled(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಶೂನ್ಯ directx_binddc(ಶೂನ್ಯ);
 #endif
 
 #ifdef FEAT_MENU
-static int gui_mswin_get_menu_height(int fix_window);
-#else
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ gui_mswin_get_menu_height(ಪೂರ್ಣಾಙ್ಕ fix_window);
+#ಅನ್ಯಥಾ
 # define gui_mswin_get_menu_height(fix_window)	0
 #endif
 
-typedef struct keycode_trans_strategy {
-    void (*ptr_on_char) (HWND /*hwnd UNUSED*/, UINT /*cch*/, int /*cRepeat UNUSED*/);
-    void (*ptr_on_sys_char) (HWND /*hwnd UNUSED*/, UINT /*cch*/, int /*cRepeat UNUSED*/);
-    void (*ptr_process_message_usual_key) (UINT /*vk*/, const MSG* /*pmsg*/);
-    int  (*ptr_get_active_modifiers)(void);
-    int  (*is_experimental)(void);
+ಪ್ರಕಾರನಿರ್ದೇಶ ಸಂರಚನಾ keycode_trans_strategy {
+    ಶೂನ್ಯ (*ptr_on_char) (HWND /*hwnd UNUSED*/, UINT /*cch*/, ಪೂರ್ಣಾಙ್ಕ /*cRepeat UNUSED*/);
+    ಶೂನ್ಯ (*ptr_on_sys_char) (HWND /*hwnd UNUSED*/, UINT /*cch*/, ಪೂರ್ಣಾಙ್ಕ /*cRepeat UNUSED*/);
+    ಶೂನ್ಯ (*ptr_process_message_usual_ಕೀಲಿ) (UINT /*vk*/, ಧ್ರುವ ಸಂದೇಶ_2* /*pmsg*/);
+    ಪೂರ್ಣಾಙ್ಕ  (*ptr_get_active_modifiers)(ಶೂನ್ಯ);
+    ಪೂರ್ಣಾಙ್ಕ  (*is_experimental)(ಶೂನ್ಯ);
 } keycode_trans_strategy;
 
 // forward declarations for input instance initializer
-static void _OnChar_experimental(HWND /*hwnd UNUSED*/, UINT /*cch*/, int /*cRepeat UNUSED*/);
-static void _OnSysChar_experimental(HWND /*hwnd UNUSED*/, UINT /*cch*/, int /*cRepeat UNUSED*/);
-static void process_message_usual_key_experimental(UINT /*vk*/, const MSG* /*pmsg*/);
-static int  get_active_modifiers_experimental(void);
-static int  is_experimental_true(void);
+ಸ್ಥಿರ ಶೂನ್ಯ _OnChar_experimental(HWND /*hwnd UNUSED*/, UINT /*cch*/, ಪೂರ್ಣಾಙ್ಕ /*cRepeat UNUSED*/);
+ಸ್ಥಿರ ಶೂನ್ಯ _OnSysChar_experimental(HWND /*hwnd UNUSED*/, UINT /*cch*/, ಪೂರ್ಣಾಙ್ಕ /*cRepeat UNUSED*/);
+ಸ್ಥಿರ ಶೂನ್ಯ process_message_usual_ಕೀಲಿ_experimental(UINT /*vk*/, ಧ್ರುವ ಸಂದೇಶ_2* /*pmsg*/);
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ  get_active_modifiers_experimental(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ  is_experimental_true(ಶೂನ್ಯ);
 
 keycode_trans_strategy keycode_trans_strategy_experimental = {
       _OnChar_experimental      // ptr_on_char
     , _OnSysChar_experimental // ptr_on_sys_char
-    , process_message_usual_key_experimental // ptr_process_message_usual_key
+    , process_message_usual_ಕೀಲಿ_experimental // ptr_process_message_usual_key
     , get_active_modifiers_experimental
     , is_experimental_true
 };
 
 // forward declarations for input instance initializer
-static void _OnChar_classic(HWND /*hwnd UNUSED*/, UINT /*cch*/, int /*cRepeat UNUSED*/);
-static void _OnSysChar_classic(HWND /*hwnd UNUSED*/, UINT /*cch*/, int /*cRepeat UNUSED*/);
-static void process_message_usual_key_classic(UINT /*vk*/, const MSG* /*pmsg*/);
-static int  get_active_modifiers_classic(void);
-static int  is_experimental_false(void);
+ಸ್ಥಿರ ಶೂನ್ಯ _OnChar_classic(HWND /*hwnd UNUSED*/, UINT /*cch*/, ಪೂರ್ಣಾಙ್ಕ /*cRepeat UNUSED*/);
+ಸ್ಥಿರ ಶೂನ್ಯ _OnSysChar_classic(HWND /*hwnd UNUSED*/, UINT /*cch*/, ಪೂರ್ಣಾಙ್ಕ /*cRepeat UNUSED*/);
+ಸ್ಥಿರ ಶೂನ್ಯ process_message_usual_ಕೀಲಿ_classic(UINT /*vk*/, ಧ್ರುವ ಸಂದೇಶ_2* /*pmsg*/);
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ  get_active_modifiers_classic(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ  is_experimental_false(ಶೂನ್ಯ);
 
 keycode_trans_strategy keycode_trans_strategy_classic = {
       _OnChar_classic      // ptr_on_char
     , _OnSysChar_classic // ptr_on_sys_char
-    , process_message_usual_key_classic // ptr_process_message_usual_key
+    , process_message_usual_ಕೀಲಿ_classic // ptr_process_message_usual_key
     , get_active_modifiers_classic
     , is_experimental_false
 };
 
-keycode_trans_strategy *keycode_trans_strategy_used = NULL;
+keycode_trans_strategy *keycode_trans_strategy_used = ರಿಕ್ತ;
 
-static int is_experimental_true(void)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ is_experimental_true(ಶೂನ್ಯ)
 {
-    return 1;
+    ಪ್ರತ್ಯಾಗಮ 1;
 }
 
-static int is_experimental_false(void)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ is_experimental_false(ಶೂನ್ಯ)
 {
-    return 0;
+    ಪ್ರತ್ಯಾಗಮ 0;
 }
 
 /*
  * Initialize the keycode translation strategy.
  */
-static void keycode_trans_strategy_init(void)
+ಸ್ಥಿರ ಶೂನ್ಯ keycode_trans_strategy_init(ಶೂನ್ಯ)
 {
-    const char *strategy = NULL;
+    ಧ್ರುವ ವರ್ಣ *strategy = ರಿಕ್ತ;
 
     // set default value as fallback
     keycode_trans_strategy_used = &keycode_trans_strategy_classic;
 
     strategy = getenv("VIM_KEYCODE_TRANS_STRATEGY");
-    if (strategy == NULL)
+    ಯದಿ (strategy == ರಿಕ್ತ)
     {
-	return;
+	ಪ್ರತ್ಯಾಗಮ;
     }
 
-    if (STRICMP(strategy, "classic") == 0)
+    ಯದಿ (STRICMP(strategy, "classic") == 0)
     {
 	keycode_trans_strategy_used = &keycode_trans_strategy_classic;
-	return;
+	ಪ್ರತ್ಯಾಗಮ;
     }
 
-    if (STRICMP(strategy, "experimental") == 0)
+    ಯದಿ (STRICMP(strategy, "experimental") == 0)
     {
 	keycode_trans_strategy_used = &keycode_trans_strategy_experimental;
-	return;
+	ಪ್ರತ್ಯಾಗಮ;
     }
 
 }
 
-#if defined(FEAT_RENDER_OPTIONS)
-    int
+#ಯದಿ defined(FEAT_RENDER_OPTIONS)
+    ಪೂರ್ಣಾಙ್ಕ
 gui_mch_set_rendering_options(char_u *s)
 {
 # ifdef FEAT_DIRECTX
     char_u  *p, *q;
 
-    int	    dx_enable = 0;
-    int	    dx_flags = 0;
-    float   dx_gamma = 0.0f;
-    float   dx_contrast = 0.0f;
-    float   dx_level = 0.0f;
-    int	    dx_geom = 0;
-    int	    dx_renmode = 0;
-    int	    dx_taamode = 0;
+    ಪೂರ್ಣಾಙ್ಕ	    dx_enable = 0;
+    ಪೂರ್ಣಾಙ್ಕ	    dx_flags = 0;
+    ಭಿನ್ನ   dx_gamma = 0.0f;
+    ಭಿನ್ನ   dx_contrast = 0.0f;
+    ಭಿನ್ನ   dx_level = 0.0f;
+    ಪೂರ್ಣಾಙ್ಕ	    dx_geom = 0;
+    ಪೂರ್ಣಾಙ್ಕ	    dx_renmode = 0;
+    ಪೂರ್ಣಾಙ್ಕ	    dx_taamode = 0;
     // parse string as rendering options.
-    for (p = s; p != NULL && *p != NUL; )
+    ಪ್ರತಿ (p = s; p != ರಿಕ್ತ && *p != NUL; )
     {
 	char_u  item[256];
 	char_u  name[128];
-	char_u  value[128];
+	char_u  ಮೌಲ್ಯ[128];
 
-	copy_option_part(&p, item, sizeof(item), ",");
-	if (p == NULL)
-	    break;
+	copy_option_part(&p, item, ಪರಿಮಾಣ(item), ",");
+	ಯದಿ (p == ರಿಕ್ತ)
+	    ಭಙ್ಗ;
 	q = &item[0];
-	copy_option_part(&q, name, sizeof(name), ":");
-	if (q == NULL)
-	    return FAIL;
-	copy_option_part(&q, value, sizeof(value), ":");
+	copy_option_part(&q, name, ಪರಿಮಾಣ(name), ":");
+	ಯದಿ (q == ರಿಕ್ತ)
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
+	copy_option_part(&q, ಮೌಲ್ಯ, ಪರಿಮಾಣ(ಮೌಲ್ಯ), ":");
 
-	if (STRCMP(name, "type") == 0)
+	ಯದಿ (STRCMP(name, "type") == 0)
 	{
-	    if (STRCMP(value, "directx") == 0)
+	    ಯದಿ (STRCMP(ಮೌಲ್ಯ, "directx") == 0)
 		dx_enable = 1;
-	    else
-		return FAIL;
+	    ಅನ್ಯಥಾ
+		ಪ್ರತ್ಯಾಗಮ FAIL;
 	}
-	else if (STRCMP(name, "gamma") == 0)
+	ಅನ್ಯಥಾ ಯದಿ (STRCMP(name, "gamma") == 0)
 	{
 	    dx_flags |= 1 << 0;
-	    dx_gamma = (float)atof((char *)value);
+	    dx_gamma = (ಭಿನ್ನ)atof((ವರ್ಣ *)ಮೌಲ್ಯ);
 	}
-	else if (STRCMP(name, "contrast") == 0)
+	ಅನ್ಯಥಾ ಯದಿ (STRCMP(name, "contrast") == 0)
 	{
 	    dx_flags |= 1 << 1;
-	    dx_contrast = (float)atof((char *)value);
+	    dx_contrast = (ಭಿನ್ನ)atof((ವರ್ಣ *)ಮೌಲ್ಯ);
 	}
-	else if (STRCMP(name, "level") == 0)
+	ಅನ್ಯಥಾ ಯದಿ (STRCMP(name, "level") == 0)
 	{
 	    dx_flags |= 1 << 2;
-	    dx_level = (float)atof((char *)value);
+	    dx_level = (ಭಿನ್ನ)atof((ವರ್ಣ *)ಮೌಲ್ಯ);
 	}
-	else if (STRCMP(name, "geom") == 0)
+	ಅನ್ಯಥಾ ಯದಿ (STRCMP(name, "geom") == 0)
 	{
 	    dx_flags |= 1 << 3;
-	    dx_geom = atoi((char *)value);
-	    if (dx_geom < 0 || dx_geom > 2)
-		return FAIL;
+	    dx_geom = atoi((ವರ್ಣ *)ಮೌಲ್ಯ);
+	    ಯದಿ (dx_geom < 0 || dx_geom > 2)
+		ಪ್ರತ್ಯಾಗಮ FAIL;
 	}
-	else if (STRCMP(name, "renmode") == 0)
+	ಅನ್ಯಥಾ ಯದಿ (STRCMP(name, "renmode") == 0)
 	{
 	    dx_flags |= 1 << 4;
-	    dx_renmode = atoi((char *)value);
-	    if (dx_renmode < 0 || dx_renmode > 6)
-		return FAIL;
+	    dx_renmode = atoi((ವರ್ಣ *)ಮೌಲ್ಯ);
+	    ಯದಿ (dx_renmode < 0 || dx_renmode > 6)
+		ಪ್ರತ್ಯಾಗಮ FAIL;
 	}
-	else if (STRCMP(name, "taamode") == 0)
+	ಅನ್ಯಥಾ ಯದಿ (STRCMP(name, "taamode") == 0)
 	{
 	    dx_flags |= 1 << 5;
-	    dx_taamode = atoi((char *)value);
-	    if (dx_taamode < 0 || dx_taamode > 3)
-		return FAIL;
+	    dx_taamode = atoi((ವರ್ಣ *)ಮೌಲ್ಯ);
+	    ಯದಿ (dx_taamode < 0 || dx_taamode > 3)
+		ಪ್ರತ್ಯಾಗಮ FAIL;
 	}
-	else if (STRCMP(name, "scrlines") == 0)
+	ಅನ್ಯಥಾ ಯದಿ (STRCMP(name, "scrlines") == 0)
 	{
 	    // Deprecated.  Simply ignore it.
 	}
-	else
-	    return FAIL;
+	ಅನ್ಯಥಾ
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
     }
 
-    if (!gui.in_use)
-	return OK;  // only checking the syntax of the value
+    ಯದಿ (!gui.in_use)
+	ಪ್ರತ್ಯಾಗಮ OK;  // only checking the syntax of the value
 
     // Enable DirectX/DirectWrite
-    if (dx_enable)
+    ಯದಿ (dx_enable)
     {
-	if (!directx_enabled())
-	    return FAIL;
-	DWriteContext_SetRenderingParams(s_dwc, NULL);
-	if (dx_flags)
+	ಯದಿ (!directx_enabled())
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
+	DWriteContext_SetRenderingParams(s_dwc, ರಿಕ್ತ);
+	ಯದಿ (dx_flags)
 	{
 	    DWriteRenderingParams param;
 	    DWriteContext_GetRenderingParams(s_dwc, &param);
-	    if (dx_flags & (1 << 0))
+	    ಯದಿ (dx_flags & (1 << 0))
 		param.gamma = dx_gamma;
-	    if (dx_flags & (1 << 1))
+	    ಯದಿ (dx_flags & (1 << 1))
 		param.enhancedContrast = dx_contrast;
-	    if (dx_flags & (1 << 2))
+	    ಯದಿ (dx_flags & (1 << 2))
 		param.clearTypeLevel = dx_level;
-	    if (dx_flags & (1 << 3))
+	    ಯದಿ (dx_flags & (1 << 3))
 		param.pixelGeometry = dx_geom;
-	    if (dx_flags & (1 << 4))
+	    ಯದಿ (dx_flags & (1 << 4))
 		param.renderingMode = dx_renmode;
-	    if (dx_flags & (1 << 5))
+	    ಯದಿ (dx_flags & (1 << 5))
 		param.textAntialiasMode = dx_taamode;
 	    DWriteContext_SetRenderingParams(s_dwc, &param);
 	}
@@ -243,9 +243,9 @@ gui_mch_set_rendering_options(char_u *s)
     s_directx_enabled = dx_enable;
     gui.directx_enabled = IS_ENABLE_DIRECTX();
 
-    return OK;
-# else
-    return FAIL;
+    ಪ್ರತ್ಯಾಗಮ OK;
+# ಅನ್ಯಥಾ
+    ಪ್ರತ್ಯಾಗಮ FAIL;
 # endif
 }
 #endif
@@ -255,26 +255,26 @@ gui_mch_set_rendering_options(char_u *s)
  */
 #ifndef HANDLE_WM_XBUTTONUP
 # define HANDLE_WM_XBUTTONUP(hwnd, wParam, lParam, fn) \
-   ((fn)((hwnd), (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), (UINT)(wParam)), 0L)
+   ((fn)((hwnd), (ಪೂರ್ಣಾಙ್ಕ)(short)LOWORD(lParam), (ಪೂರ್ಣಾಙ್ಕ)(short)HIWORD(lParam), (UINT)(wParam)), 0L)
 #endif
 #ifndef HANDLE_WM_XBUTTONDOWN
 # define HANDLE_WM_XBUTTONDOWN(hwnd, wParam, lParam, fn) \
-   ((fn)((hwnd), FALSE, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), (UINT)(wParam)), 0L)
+   ((fn)((hwnd), FALSE, (ಪೂರ್ಣಾಙ್ಕ)(short)LOWORD(lParam), (ಪೂರ್ಣಾಙ್ಕ)(short)HIWORD(lParam), (UINT)(wParam)), 0L)
 #endif
 #ifndef HANDLE_WM_XBUTTONDBLCLK
 # define HANDLE_WM_XBUTTONDBLCLK(hwnd, wParam, lParam, fn) \
-   ((fn)((hwnd), TRUE, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), (UINT)(wParam)), 0L)
+   ((fn)((hwnd), TRUE, (ಪೂರ್ಣಾಙ್ಕ)(short)LOWORD(lParam), (ಪೂರ್ಣಾಙ್ಕ)(short)HIWORD(lParam), (UINT)(wParam)), 0L)
 #endif
 
 
-#include "version.h"	// used by dialog box routine for default title
+#ಅನ್ತರ್ಭಾವ "version.h"	// used by dialog box routine for default title
 #ifdef DEBUG
 # include <tchar.h>
 #endif
 
-#include <shellapi.h>
-#include <commctrl.h>
-#include <windowsx.h>
+#ಅನ್ತರ್ಭಾವ <shellapi.h>
+#ಅನ್ತರ್ಭಾವ <commctrl.h>
+#ಅನ್ತರ್ಭಾವ <windowsx.h>
 
 #ifdef FEAT_MENU
 # define MENUHINTS		// show menu hints in command line
@@ -327,74 +327,74 @@ gui_mch_set_rendering_options(char_u *s)
 # define DWMWA_TEXT_COLOR		36
 #endif
 
-static void _OnPaint(HWND hwnd);
-static void fill_rect(const RECT *rcp, HBRUSH hbr, COLORREF color);
-static void clear_rect(RECT *rcp);
+ಸ್ಥಿರ ಶೂನ್ಯ _OnPaint(HWND hwnd);
+ಸ್ಥಿರ ಶೂನ್ಯ fill_rect(ಧ್ರುವ RECT *rcp, HBRUSH hbr, COLORREF color);
+ಸ್ಥಿರ ಶೂನ್ಯ clear_rect(RECT *rcp);
 
-static WORD		s_dlgfntheight;		// height of the dialog font
-static WORD		s_dlgfntwidth;		// width of the dialog font
+ಸ್ಥಿರ WORD		s_dlgfntheight;		// height of the dialog font
+ಸ್ಥಿರ WORD		s_dlgfntwidth;		// width of the dialog font
 
 #ifdef FEAT_MENU
-static HMENU		s_menuBar = NULL;
+ಸ್ಥಿರ HMENU		s_menuBar = ರಿಕ್ತ;
 #endif
 #ifdef FEAT_TEAROFF
-static void rebuild_tearoff(vimmenu_T *menu);
-static HBITMAP	s_htearbitmap;	    // bitmap used to indicate tearoff
+ಸ್ಥಿರ ಶೂನ್ಯ rebuild_tearoff(vimmenu_T *menu);
+ಸ್ಥಿರ HBITMAP	s_htearbitmap;	    // bitmap used to indicate tearoff
 #endif
 
 // Flag that is set while processing a message that must not be interrupted by
 // processing another message.
-static int		s_busy_processing = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ		s_busy_processing = FALSE;
 
-static int		destroying = FALSE;	// call DestroyWindow() ourselves
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ		destroying = FALSE;	// call DestroyWindow() ourselves
 
 #ifdef MSWIN_FIND_REPLACE
-static UINT		s_findrep_msg = 0;
-static FINDREPLACEW	s_findrep_struct;
-static HWND		s_findrep_hwnd = NULL;
-static int		s_findrep_is_find;	// TRUE for find dialog, FALSE
+ಸ್ಥಿರ UINT		s_findrep_ಸಂದೇಶ = 0;
+ಸ್ಥಿರ FINDREPLACEW	s_findrep_struct;
+ಸ್ಥಿರ HWND		s_findrep_hwnd = ರಿಕ್ತ;
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ		s_findrep_is_find;	// TRUE for find dialog, FALSE
 						// for find/replace dialog
 #endif
 
-HWND			s_hwnd = NULL;
-static HDC		s_hdc = NULL;
-static HBRUSH		s_brush = NULL;
+HWND			s_hwnd = ರಿಕ್ತ;
+ಸ್ಥಿರ HDC		s_hdc = ರಿಕ್ತ;
+ಸ್ಥಿರ HBRUSH		s_brush = ರಿಕ್ತ;
 
 #ifdef FEAT_TOOLBAR
-static HWND		s_toolbarhwnd = NULL;
-static WNDPROC		s_toolbar_wndproc = NULL;
+ಸ್ಥಿರ HWND		s_toolbarhwnd = ರಿಕ್ತ;
+ಸ್ಥಿರ WNDPROC		s_toolbar_wndproc = ರಿಕ್ತ;
 #endif
 
 #ifdef FEAT_GUI_TABLINE
-static HWND		s_tabhwnd = NULL;
-static WNDPROC		s_tabline_wndproc = NULL;
-static int		showing_tabline = 0;
+ಸ್ಥಿರ HWND		s_tabhwnd = ರಿಕ್ತ;
+ಸ್ಥಿರ WNDPROC		s_tabline_wndproc = ರಿಕ್ತ;
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ		showing_tabline = 0;
 #endif
 
-static WPARAM		s_wParam = 0;
+ಸ್ಥಿರ WPARAM		s_wParam = 0;
 
-static HWND		s_textArea = NULL;
+ಸ್ಥಿರ HWND		s_textArea = ರಿಕ್ತ;
 
 // Set when the text area was painted with the background color only, because
 // the screen contents were not available yet.
-static bool		s_textarea_bg_only = false;
+ಸ್ಥಿರ bool		s_textarea_bg_only = false;
 
-static UINT		s_uMsg = 0;
+ಸ್ಥಿರ UINT		s_u_ಸಂದೇಶ = 0;
 
-static char_u		*s_textfield; // Used by dialogs to pass back strings
+ಸ್ಥಿರ char_u		*s_textfield; // Used by dialogs to pass back strings
 
-static int		s_need_activate = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ		s_need_activate = FALSE;
 
 // This variable is set when waiting for an event, which is the only moment
 // scrollbar dragging can be done directly.  It's not allowed while commands
 // are executed, because it may move the cursor and that may cause unexpected
 // problems (e.g., while ":s" is working).
-static int allow_scrollbar = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ allow_scrollbar = FALSE;
 
 #ifndef _DPI_AWARENESS_CONTEXTS_
-typedef HANDLE DPI_AWARENESS_CONTEXT;
+ಪ್ರಕಾರನಿರ್ದೇಶ HANDLE DPI_AWARENESS_CONTEXT;
 
-typedef enum DPI_AWARENESS {
+ಪ್ರಕಾರನಿರ್ದೇಶ ಗಣನಾ DPI_AWARENESS {
     DPI_AWARENESS_INVALID	    = -1,
     DPI_AWARENESS_UNAWARE	    = 0,
     DPI_AWARENESS_SYSTEM_AWARE	    = 1,
@@ -409,75 +409,75 @@ typedef enum DPI_AWARENESS {
 #endif
 
 #define DEFAULT_DPI	96
-static int		s_dpi = DEFAULT_DPI;
-static BOOL		s_in_dpichanged = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ		s_dpi = DEFAULT_DPI;
+ಸ್ಥಿರ BOOL		s_in_dpichanged = FALSE;
 #ifdef FEAT_MBYTE_IME
-static DPI_AWARENESS	s_process_dpi_aware = DPI_AWARENESS_INVALID;
+ಸ್ಥಿರ DPI_AWARENESS	s_process_dpi_aware = DPI_AWARENESS_INVALID;
 #endif
-static RECT		s_suggested_rect;
+ಸ್ಥಿರ RECT		s_suggested_rect;
 
-static UINT (WINAPI *pGetDpiForSystem)(void) = NULL;
-static UINT (WINAPI *pGetDpiForWindow)(HWND hwnd) = NULL;
-static int (WINAPI *pGetSystemMetricsForDpi)(int, UINT) = NULL;
+ಸ್ಥಿರ UINT (WINAPI *pGetDpiForSystem)(ಶೂನ್ಯ) = ರಿಕ್ತ;
+ಸ್ಥಿರ UINT (WINAPI *pGetDpiForWindow)(HWND hwnd) = ರಿಕ್ತ;
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ (WINAPI *pGetSystemMetricsForDpi)(ಪೂರ್ಣಾಙ್ಕ, UINT) = ರಿಕ್ತ;
 //static INT (WINAPI *pGetWindowDpiAwarenessContext)(HWND hwnd) = NULL;
-static DPI_AWARENESS_CONTEXT (WINAPI *pSetThreadDpiAwarenessContext)(DPI_AWARENESS_CONTEXT dpiContext) = NULL;
+ಸ್ಥಿರ DPI_AWARENESS_CONTEXT (WINAPI *pSetThreadDpiAwarenessContext)(DPI_AWARENESS_CONTEXT dpiContext) = ರಿಕ್ತ;
 #ifdef FEAT_MBYTE_IME
-static DPI_AWARENESS (WINAPI *pGetAwarenessFromDpiAwarenessContext)(DPI_AWARENESS_CONTEXT) = NULL;
+ಸ್ಥಿರ DPI_AWARENESS (WINAPI *pGetAwarenessFromDpiAwarenessContext)(DPI_AWARENESS_CONTEXT) = ರಿಕ್ತ;
 #endif
 
-static HINSTANCE hLibDwm = NULL;
-static HRESULT (WINAPI *pDwmSetWindowAttribute)(HWND, DWORD, LPCVOID, DWORD);
-static void dyn_dwm_load(void);
+ಸ್ಥಿರ HINSTANCE hLibDwm = ರಿಕ್ತ;
+ಸ್ಥಿರ HRESULT (WINAPI *pDwmSetWindowAttribute)(HWND, DWORD, LPCVOID, DWORD);
+ಸ್ಥಿರ ಶೂನ್ಯ dyn_dwm_load(ಶೂನ್ಯ);
 
-static int fullscreen_on = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ fullscreen_on = FALSE;
 
 #ifdef FEAT_GUI_DARKTHEME
 
-static HINSTANCE hUxThemeLib = NULL;
-static DWORD (WINAPI *pSetPreferredAppMode)(DWORD) = NULL;
-static void (WINAPI *pFlushMenuThemes)(void) = NULL;
-static void dyn_uxtheme_load(void);
+ಸ್ಥಿರ HINSTANCE hUxThemeLib = ರಿಕ್ತ;
+ಸ್ಥಿರ DWORD (WINAPI *pSetPreferredAppMode)(DWORD) = ರಿಕ್ತ;
+ಸ್ಥಿರ ಶೂನ್ಯ (WINAPI *pFlushMenuThemes)(ಶೂನ್ಯ) = ರಿಕ್ತ;
+ಸ್ಥಿರ ಶೂನ್ಯ dyn_uxtheme_load(ಶೂನ್ಯ);
 #endif
 
-    static int WINAPI
-stubGetSystemMetricsForDpi(int nIndex, UINT dpi UNUSED)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ WINAPI
+stubGetSystemMetricsForDpi(ಪೂರ್ಣಾಙ್ಕ nIndex, UINT dpi UNUSED)
 {
-    return GetSystemMetrics(nIndex);
+    ಪ್ರತ್ಯಾಗಮ GetSystemMetrics(nIndex);
 }
 
-    static int
-adjust_fontsize_by_dpi(int size)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+adjust_fontsize_by_dpi(ಪೂರ್ಣಾಙ್ಕ size)
 {
-    return size * s_dpi / (int)pGetDpiForSystem();
+    ಪ್ರತ್ಯಾಗಮ size * s_dpi / (ಪೂರ್ಣಾಙ್ಕ)pGetDpiForSystem();
 }
 
-    static int
-adjust_by_system_dpi(int size)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+adjust_by_system_dpi(ಪೂರ್ಣಾಙ್ಕ size)
 {
-    return size * (int)pGetDpiForSystem() / DEFAULT_DPI;
+    ಪ್ರತ್ಯಾಗಮ size * (ಪೂರ್ಣಾಙ್ಕ)pGetDpiForSystem() / DEFAULT_DPI;
 }
 
-#if defined(FEAT_DIRECTX)
-    static int
-directx_enabled(void)
+#ಯದಿ defined(FEAT_DIRECTX)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+directx_enabled(ಶೂನ್ಯ)
 {
-    if (s_dwc != NULL)
-	return 1;
-    else if (s_directx_load_attempted)
-	return 0;
+    ಯದಿ (s_dwc != ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ 1;
+    ಅನ್ಯಥಾ ಯದಿ (s_directx_load_attempted)
+	ಪ್ರತ್ಯಾಗಮ 0;
     // load DirectX
     DWrite_Init();
     s_directx_load_attempted = 1;
     s_dwc = DWriteContext_Open();
     directx_binddc();
-    return s_dwc != NULL ? 1 : 0;
+    ಪ್ರತ್ಯಾಗಮ s_dwc != ರಿಕ್ತ ? 1 : 0;
 }
 
-    static void
-directx_binddc(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+directx_binddc(ಶೂನ್ಯ)
 {
-    if (s_textArea == NULL)
-	return;
+    ಯದಿ (s_textArea == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ;
 
     RECT	rect;
     GetClientRect(s_textArea, &rect);
@@ -485,19 +485,19 @@ directx_binddc(void)
 }
 #endif
 
-extern int current_font_height;	    // this is in os_mswin.c
+ಬಾಹ್ಯ ಪೂರ್ಣಾಙ್ಕ current_font_height;	    // this is in os_mswin.c
 
-static struct
+ಸ್ಥಿರ ಸಂರಚನಾ
 {
-    UINT    key_sym;
+    UINT    ಕೀಲಿ_sym;
     char_u  vim_code0;
     char_u  vim_code1;
-} special_keys[] =
+} special_ಕೀಲಿಗಳು[] =
 {
     {VK_UP,		'k', 'u'},
     {VK_DOWN,		'k', 'd'},
-    {VK_LEFT,		'k', 'l'},
-    {VK_RIGHT,		'k', 'r'},
+    {VK_ಎಡ,		'k', 'l'},
+    {VK_ಬಲ,		'k', 'r'},
 
     {VK_F1,		'k', '1'},
     {VK_F2,		'k', '2'},
@@ -531,7 +531,7 @@ static struct
 
     {VK_HELP,		'%', '1'},
     {VK_BACK,		'k', 'b'},
-    {VK_INSERT,		'k', 'I'},
+    {VK_ಸೇರಿಸು,		'k', 'I'},
     {VK_DELETE,		'k', 'D'},
     {VK_HOME,		'k', 'h'},
     {VK_END,		'@', '7'},
@@ -568,25 +568,25 @@ static struct
 };
 
 // Local variables
-static int	s_button_pending = -1;
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ	s_button_pending = -1;
 
 // s_getting_focus is set when we got focus but didn't see mouse-up event yet,
 // so don't reset s_button_pending.
-static int	s_getting_focus = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ	s_getting_focus = FALSE;
 
-static int	s_x_pending;
-static int	s_y_pending;
-static UINT	s_kFlags_pending;
-static UINT_PTR	s_wait_timer = 0;	  // Timer for get char from user
-static int	s_timed_out = FALSE;
-static int	dead_key = DEAD_KEY_OFF;
-static UINT	surrogate_pending_ch = 0; // 0: no surrogate pending,
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ	s_x_pending;
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ	s_y_pending;
+ಸ್ಥಿರ UINT	s_kFlags_pending;
+ಸ್ಥಿರ UINT_PTR	s_wait_timer = 0;	  // Timer for get char from user
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ	s_timed_out = FALSE;
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ	dead_ಕೀಲಿ = DEAD_ಕೀಲಿ_OFF;
+ಸ್ಥಿರ UINT	surrogate_pending_ch = 0; // 0: no surrogate pending,
 					  // else a high surrogate
 
 #ifdef FEAT_BEVAL_GUI
 // balloon-eval WM_NOTIFY_HANDLER
-static void Handle_WM_Notify(HWND hwnd, LPNMHDR pnmh);
-static void track_user_activity(UINT uMsg);
+ಸ್ಥಿರ ಶೂನ್ಯ Handle_WM_Notify(HWND hwnd, LPNMHDR pnmh);
+ಸ್ಥಿರ ಶೂನ್ಯ track_user_activity(UINT u_ಸಂದೇಶ);
 #endif
 
 /*
@@ -596,34 +596,34 @@ static void track_user_activity(UINT uMsg);
  */
 #ifdef FEAT_MBYTE_IME
 // holds LOGFONTW for 'guifontwide' if available, otherwise 'guifont'
-static LOGFONTW norm_logfont;
+ಸ್ಥಿರ LOGFONTW norm_logfont;
 // holds LOGFONTW for 'guifont' always.
-static LOGFONTW sub_logfont;
+ಸ್ಥಿರ LOGFONTW sub_logfont;
 #endif
 
 #ifdef FEAT_MBYTE_IME
-static LRESULT _OnImeNotify(HWND hWnd, DWORD dwCommand, DWORD dwData);
+ಸ್ಥಿರ LRESULT _OnImeNotify(HWND hWnd, DWORD dwCommand, DWORD dwData);
 #endif
 
-#if defined(FEAT_BROWSE)
-static char_u *convert_filter(char_u *s);
+#ಯದಿ defined(FEAT_BROWSE)
+ಸ್ಥಿರ char_u *convert_filter(char_u *s);
 #endif
 
 #ifdef DEBUG_PRINT_ERROR
 /*
  * Print out the last Windows error message
  */
-    static void
-print_windows_error(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+print_windows_error(ಶೂನ್ಯ)
 {
-    LPVOID  lpMsgBuf;
+    LPVOID  lp_ಸಂದೇಶ_Buf;
 
     FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-		  NULL, GetLastError(),
+		  ರಿಕ್ತ, GetLastError(),
 		  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		  (LPTSTR) &lpMsgBuf, 0, NULL);
-    TRACE1("Error: %s\n", lpMsgBuf);
-    LocalFree(lpMsgBuf);
+		  (LPTSTR) &lp_ಸಂದೇಶ_Buf, 0, ರಿಕ್ತ);
+    TRACE1("Error: %s\n", lp_ಸಂದೇಶ_Buf);
+    LocalFree(lp_ಸಂದೇಶ_Buf);
 }
 #endif
 
@@ -640,25 +640,25 @@ print_windows_error(void)
 #define BLINK_OFF   1
 #define BLINK_ON    2
 
-static int		blink_state = BLINK_NONE;
-static long_u		blink_waittime = 700;
-static long_u		blink_ontime = 400;
-static long_u		blink_offtime = 250;
-static UINT_PTR		blink_timer = 0;
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ		blink_state = BLINK_NONE;
+ಸ್ಥಿರ long_u		blink_waittime = 700;
+ಸ್ಥಿರ long_u		blink_ontime = 400;
+ಸ್ಥಿರ long_u		blink_offtime = 250;
+ಸ್ಥಿರ UINT_PTR		blink_timer = 0;
 
-    int
-gui_mch_is_blinking(void)
+    ಪೂರ್ಣಾಙ್ಕ
+gui_mch_is_blinking(ಶೂನ್ಯ)
 {
-    return blink_state != BLINK_NONE;
+    ಪ್ರತ್ಯಾಗಮ blink_state != BLINK_NONE;
 }
 
-    int
-gui_mch_is_blink_off(void)
+    ಪೂರ್ಣಾಙ್ಕ
+gui_mch_is_blink_off(ಶೂನ್ಯ)
 {
-    return blink_state == BLINK_OFF;
+    ಪ್ರತ್ಯಾಗಮ blink_state == BLINK_OFF;
 }
 
-    void
+    ಶೂನ್ಯ
 gui_mch_set_blinking(long wait, long on, long off)
 {
     blink_waittime = wait;
@@ -666,51 +666,51 @@ gui_mch_set_blinking(long wait, long on, long off)
     blink_offtime = off;
 }
 
-    static VOID CALLBACK
+    ಸ್ಥಿರ VOID CALLBACK
 _OnBlinkTimer(
     HWND hwnd,
-    UINT uMsg UNUSED,
+    UINT u_ಸಂದೇಶ UNUSED,
     UINT_PTR idEvent,
     DWORD dwTime UNUSED)
 {
-    MSG msg;
+    ಸಂದೇಶ_2 ಸಂದೇಶ;
 
     /*
     TRACE2("Got timer event, id %d, blink_timer %d\n", idEvent, blink_timer);
     */
 
-    KillTimer(NULL, idEvent);
+    KillTimer(ರಿಕ್ತ, idEvent);
 
     // Eat spurious WM_TIMER messages
-    while (PeekMessageW(&msg, hwnd, WM_TIMER, WM_TIMER, PM_REMOVE))
+    ಯಾವತ್ (PeekMessageW(&ಸಂದೇಶ, hwnd, WM_TIMER, WM_TIMER, PM_REMOVE))
 	;
 
-    if (blink_state == BLINK_ON)
+    ಯದಿ (blink_state == BLINK_ON)
     {
 	gui_undraw_cursor();
 	blink_state = BLINK_OFF;
-	blink_timer = SetTimer(NULL, 0, (UINT)blink_offtime, _OnBlinkTimer);
+	blink_timer = SetTimer(ರಿಕ್ತ, 0, (UINT)blink_offtime, _OnBlinkTimer);
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	gui_update_cursor(TRUE, FALSE);
 	blink_state = BLINK_ON;
-	blink_timer = SetTimer(NULL, 0, (UINT)blink_ontime, _OnBlinkTimer);
+	blink_timer = SetTimer(ರಿಕ್ತ, 0, (UINT)blink_ontime, _OnBlinkTimer);
     }
     gui_mch_flush();
 }
 
-    static void
-gui_mswin_rm_blink_timer(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+gui_mswin_rm_blink_timer(ಶೂನ್ಯ)
 {
-    MSG msg;
+    ಸಂದೇಶ_2 ಸಂದೇಶ;
 
-    if (blink_timer == 0)
-	return;
+    ಯದಿ (blink_timer == 0)
+	ಪ್ರತ್ಯಾಗಮ;
 
-    KillTimer(NULL, blink_timer);
+    KillTimer(ರಿಕ್ತ, blink_timer);
     // Eat spurious WM_TIMER messages
-    while (PeekMessageW(&msg, s_hwnd, WM_TIMER, WM_TIMER, PM_REMOVE))
+    ಯಾವತ್ (PeekMessageW(&ಸಂದೇಶ, s_hwnd, WM_TIMER, WM_TIMER, PM_REMOVE))
 	;
     blink_timer = 0;
 }
@@ -718,11 +718,11 @@ gui_mswin_rm_blink_timer(void)
 /*
  * Stop the cursor blinking.  Show the cursor if it wasn't shown.
  */
-    void
-gui_mch_stop_blink(int may_call_gui_update_cursor)
+    ಶೂನ್ಯ
+gui_mch_stop_blink(ಪೂರ್ಣಾಙ್ಕ may_call_gui_update_cursor)
 {
     gui_mswin_rm_blink_timer();
-    if (blink_state == BLINK_OFF && may_call_gui_update_cursor)
+    ಯದಿ (blink_state == BLINK_OFF && may_call_gui_update_cursor)
     {
 	gui_update_cursor(TRUE, FALSE);
 	gui_mch_flush();
@@ -734,15 +734,15 @@ gui_mch_stop_blink(int may_call_gui_update_cursor)
  * Start the cursor blinking.  If it was already blinking, this restarts the
  * waiting time and shows the cursor.
  */
-    void
-gui_mch_start_blink(void)
+    ಶೂನ್ಯ
+gui_mch_start_blink(ಶೂನ್ಯ)
 {
     gui_mswin_rm_blink_timer();
 
     // Only switch blinking on if none of the times is zero
-    if (blink_waittime && blink_ontime && blink_offtime && gui.in_focus)
+    ಯದಿ (blink_waittime && blink_ontime && blink_offtime && gui.in_focus)
     {
-	blink_timer = SetTimer(NULL, 0, (UINT)blink_waittime, _OnBlinkTimer);
+	blink_timer = SetTimer(ರಿಕ್ತ, 0, (UINT)blink_waittime, _OnBlinkTimer);
 	blink_state = BLINK_ON;
 	gui_update_cursor(TRUE, FALSE);
 	gui_mch_flush();
@@ -753,35 +753,35 @@ gui_mch_start_blink(void)
  * Call-back routines.
  */
 
-    static VOID CALLBACK
+    ಸ್ಥಿರ VOID CALLBACK
 _OnTimer(
     HWND hwnd,
-    UINT uMsg UNUSED,
+    UINT u_ಸಂದೇಶ UNUSED,
     UINT_PTR idEvent,
     DWORD dwTime UNUSED)
 {
-    MSG msg;
+    ಸಂದೇಶ_2 ಸಂದೇಶ;
 
     /*
     TRACE2("Got timer event, id %d, s_wait_timer %d\n", idEvent, s_wait_timer);
     */
-    KillTimer(NULL, idEvent);
+    KillTimer(ರಿಕ್ತ, idEvent);
     s_timed_out = TRUE;
 
     // Eat spurious WM_TIMER messages
-    while (PeekMessageW(&msg, hwnd, WM_TIMER, WM_TIMER, PM_REMOVE))
+    ಯಾವತ್ (PeekMessageW(&ಸಂದೇಶ, hwnd, WM_TIMER, WM_TIMER, PM_REMOVE))
 	;
-    if (idEvent == s_wait_timer)
+    ಯದಿ (idEvent == s_wait_timer)
 	s_wait_timer = 0;
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 _OnDeadChar(
     HWND hwnd UNUSED,
     UINT ch UNUSED,
-    int cRepeat UNUSED)
+    ಪೂರ್ಣಾಙ್ಕ cRepeat UNUSED)
 {
-    dead_key = DEAD_KEY_SET_DEFAULT;
+    dead_ಕೀಲಿ = DEAD_ಕೀಲಿ_SET_DEFAULT;
 }
 
 /*
@@ -795,15 +795,15 @@ _OnDeadChar(
  * of UTF-16 code units to a single Unicode code point, presuming it is the
  * matching low surrogate.
  */
-    static int
-char_to_string(int ch, char_u *string, int slen, int had_alt)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+char_to_string(ಪೂರ್ಣಾಙ್ಕ ch, char_u *string, ಪೂರ್ಣಾಙ್ಕ slen, ಪೂರ್ಣಾಙ್ಕ had_alt)
 {
-    int		len;
-    int		i;
+    ಪೂರ್ಣಾಙ್ಕ		len;
+    ಪೂರ್ಣಾಙ್ಕ		i;
     WCHAR	wstring[2];
-    char_u	*ws = NULL;
+    char_u	*ws = ರಿಕ್ತ;
 
-    if (surrogate_pending_ch != 0)
+    ಯದಿ (surrogate_pending_ch != 0)
     {
 	// We don't guarantee ch is a low surrogate to match the high surrogate
 	// we already have; it should be, but if it isn't, tough luck.
@@ -812,14 +812,14 @@ char_to_string(int ch, char_u *string, int slen, int had_alt)
 	surrogate_pending_ch = 0;
 	len = 2;
     }
-    else if (ch >= 0xD800 && ch <= 0xDBFF)	// high surrogate
+    ಅನ್ಯಥಾ ಯದಿ (ch >= 0xD800 && ch <= 0xDBFF)	// high surrogate
     {
 	// We don't have the entire code point yet, only the first UTF-16 code
 	// unit; so just remember it and use it in the next call.
 	surrogate_pending_ch = ch;
-	return 0;
+	ಪ್ರತ್ಯಾಗಮ 0;
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	wstring[0] = ch;
 	len = 1;
@@ -828,54 +828,54 @@ char_to_string(int ch, char_u *string, int slen, int had_alt)
     // "ch" is a UTF-16 character.  Convert it to a string of bytes.  When
     // "enc_codepage" is non-zero use the standard Win32 function,
     // otherwise use our own conversion function (e.g., for UTF-8).
-    if (enc_codepage > 0)
+    ಯದಿ (enc_codepage > 0)
     {
 	len = WideCharToMultiByte(enc_codepage, 0, wstring, len,
-		(LPSTR)string, slen, 0, NULL);
+		(LPSTR)string, slen, 0, ರಿಕ್ತ);
 	// If we had included the ALT key into the character but now the
 	// upper bit is no longer set, that probably means the conversion
 	// failed.  Convert the original character and set the upper bit
 	// afterwards.
-	if (had_alt && len == 1 && ch >= 0x80 && string[0] < 0x80)
+	ಯದಿ (had_alt && len == 1 && ch >= 0x80 && string[0] < 0x80)
 	{
 	    wstring[0] = ch & 0x7f;
 	    len = WideCharToMultiByte(enc_codepage, 0, wstring, len,
-		    (LPSTR)string, slen, 0, NULL);
-	    if (len == 1) // safety check
+		    (LPSTR)string, slen, 0, ರಿಕ್ತ);
+	    ಯದಿ (len == 1) // safety check
 		string[0] |= 0x80;
 	}
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	ws = utf16_to_enc(wstring, &len);
-	if (ws == NULL)
+	ಯದಿ (ws == ರಿಕ್ತ)
 	    len = 0;
-	else
+	ಅನ್ಯಥಾ
 	{
-	    if (len > slen)	// just in case
+	    ಯದಿ (len > slen)	// just in case
 		len = slen;
 	    mch_memmove(string, ws, len);
 	    vim_free(ws);
 	}
     }
 
-    if (len == 0)
+    ಯದಿ (len == 0)
     {
 	string[0] = ch;
 	len = 1;
     }
 
-    for (i = 0; i < len; ++i)
-	if (string[i] == CSI && len <= slen - 2)
+    ಪ್ರತಿ (i = 0; i < len; ++i)
+	ಯದಿ (string[i] == CSI && len <= slen - 2)
 	{
 	    // Insert CSI as K_CSI.
 	    mch_memmove(string + i + 3, string + i + 1, len - i - 1);
 	    string[++i] = KS_EXTRA;
-	    string[++i] = (int)KE_CSI;
+	    string[++i] = (ಪೂರ್ಣಾಙ್ಕ)KE_CSI;
 	    len += 2;
 	}
 
-    return len;
+    ಪ್ರತ್ಯಾಗಮ len;
 }
 
 /*
@@ -887,42 +887,42 @@ char_to_string(int ch, char_u *string, int slen, int had_alt)
  * area, and usages not via "get_active_modifiers_via_ptr" should
  * be watched.
  */
-    static int
-get_active_modifiers_experimental(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+get_active_modifiers_experimental(ಶೂನ್ಯ)
 {
-    int modifiers = 0;
+    ಪೂರ್ಣಾಙ್ಕ modifiers = 0;
 
-    if (GetKeyState(VK_CONTROL) & 0x8000)
+    ಯದಿ (Get_ಕೀಲಿ_State(VK_CONTROL) & 0x8000)
 	modifiers |= MOD_MASK_CTRL;
-    if (GetKeyState(VK_SHIFT) & 0x8000)
+    ಯದಿ (Get_ಕೀಲಿ_State(VK_SHIFT) & 0x8000)
 	modifiers |= MOD_MASK_SHIFT;
     // Windows handles Ctrl + Alt as AltGr and vice-versa. We can distinguish
     // the two cases by checking whether the left or the right Alt key is
     // pressed.
-    if (GetKeyState(VK_LMENU) & 0x8000)
+    ಯದಿ (Get_ಕೀಲಿ_State(VK_LMENU) & 0x8000)
 	modifiers |= MOD_MASK_ALT;
-    if ((modifiers & MOD_MASK_CTRL) && (GetKeyState(VK_RMENU) & 0x8000))
+    ಯದಿ ((modifiers & MOD_MASK_CTRL) && (Get_ಕೀಲಿ_State(VK_RMENU) & 0x8000))
 	modifiers &= ~MOD_MASK_CTRL;
     // Add RightALT only if it is hold alone (without Ctrl), because if AltGr
     // is pressed, Windows claims that Ctrl is hold as well. That way we can
     // recognize Right-ALT alone and be sure that not AltGr is hold.
-    if (!(GetKeyState(VK_CONTROL) & 0x8000)
-	    &&  (GetKeyState(VK_RMENU) & 0x8000)
-	    && !(GetKeyState(VK_LMENU) & 0x8000)) // seems AltGr has both set
+    ಯದಿ (!(Get_ಕೀಲಿ_State(VK_CONTROL) & 0x8000)
+	    &&  (Get_ಕೀಲಿ_State(VK_RMENU) & 0x8000)
+	    && !(Get_ಕೀಲಿ_State(VK_LMENU) & 0x8000)) // seems AltGr has both set
 	modifiers |= MOD_MASK_ALT;
 
-    return modifiers;
+    ಪ್ರತ್ಯಾಗಮ modifiers;
 }
 
 /*
  * "Classic" implementation, existing prior to v8.2.4807
  */
-    static int
-get_active_modifiers_classic(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+get_active_modifiers_classic(ಶೂನ್ಯ)
 {
-    int modifiers = 0;
+    ಪೂರ್ಣಾಙ್ಕ modifiers = 0;
 
-    if (GetKeyState(VK_SHIFT) & 0x8000)
+    ಯದಿ (Get_ಕೀಲಿ_State(VK_SHIFT) & 0x8000)
 	modifiers |= MOD_MASK_SHIFT;
     /*
      * Don't use caps-lock as shift, because these are special keys
@@ -933,35 +933,35 @@ get_active_modifiers_classic(void)
     if (GetKeyState(VK_CAPITAL) & 0x0001)
 	modifiers ^= MOD_MASK_SHIFT;
     */
-    if (GetKeyState(VK_CONTROL) & 0x8000)
+    ಯದಿ (Get_ಕೀಲಿ_State(VK_CONTROL) & 0x8000)
 	modifiers |= MOD_MASK_CTRL;
-    if (GetKeyState(VK_MENU) & 0x8000)
+    ಯದಿ (Get_ಕೀಲಿ_State(VK_MENU) & 0x8000)
 	modifiers |= MOD_MASK_ALT;
 
-    return modifiers;
+    ಪ್ರತ್ಯಾಗಮ modifiers;
 }
 
-    static int
-get_active_modifiers(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+get_active_modifiers(ಶೂನ್ಯ)
 {
-    return get_active_modifiers_experimental();
+    ಪ್ರತ್ಯಾಗಮ get_active_modifiers_experimental();
 }
 
-    static int
-get_active_modifiers_via_ptr(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+get_active_modifiers_via_ptr(ಶೂನ್ಯ)
 {
     // marshal to corresponding implementation
-    return keycode_trans_strategy_used->ptr_get_active_modifiers();
+    ಪ್ರತ್ಯಾಗಮ keycode_trans_strategy_used->ptr_get_active_modifiers();
 }
 
 /*
  * Key hit, add it to the input buffer.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 _OnChar(
     HWND hwnd UNUSED,
     UINT cch,
-    int cRepeat UNUSED)
+    ಪೂರ್ಣಾಙ್ಕ cRepeat UNUSED)
 {
     // marshal to corresponding implementation
     keycode_trans_strategy_used->ptr_on_char(hwnd, cch, cRepeat);
@@ -971,93 +971,93 @@ _OnChar(
  * Experimental implementation, introduced in v8.2.4807
  * "processing key event in Win32 GUI is not ideal"
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 _OnChar_experimental(
     HWND hwnd UNUSED,
     UINT cch,
-    int cRepeat UNUSED)
+    ಪೂರ್ಣಾಙ್ಕ cRepeat UNUSED)
 {
     char_u	string[40];
-    int		len = 0;
-    int		modifiers;
-    int		ch = cch;   // special keys are negative
+    ಪೂರ್ಣಾಙ್ಕ		len = 0;
+    ಪೂರ್ಣಾಙ್ಕ		modifiers;
+    ಪೂರ್ಣಾಙ್ಕ		ch = cch;   // special keys are negative
 
-    if (dead_key == DEAD_KEY_SKIP_ON_CHAR)
-	return;
+    ಯದಿ (dead_ಕೀಲಿ == DEAD_ಕೀಲಿ_SKIP_ON_CHAR)
+	ಪ್ರತ್ಯಾಗಮ;
 
     //  keep DEAD_KEY_TRANSIENT_IN_ON_CHAR value for later handling in
     //  process_message()
-    if (dead_key != DEAD_KEY_TRANSIENT_IN_ON_CHAR)
-	dead_key = DEAD_KEY_OFF;
+    ಯದಿ (dead_ಕೀಲಿ != DEAD_ಕೀಲಿ_TRANSIENT_IN_ON_CHAR)
+	dead_ಕೀಲಿ = DEAD_ಕೀಲಿ_OFF;
 
     modifiers = get_active_modifiers_experimental();
 
-    ch = simplify_key(ch, &modifiers);
+    ch = simplify_ಕೀಲಿ(ch, &modifiers);
 
     // Some keys need adjustment when the Ctrl modifier is used.
-    ++no_reduce_keys;
-    ch = may_adjust_key_for_ctrl(modifiers, ch);
-    --no_reduce_keys;
+    ++no_reduce_ಕೀಲಿಗಳು;
+    ch = may_adjust_ಕೀಲಿ_for_ctrl(modifiers, ch);
+    --no_reduce_ಕೀಲಿಗಳು;
 
     // remove the SHIFT modifier for keys where it's already included, e.g.,
     // '(' and '*'
     modifiers = may_remove_shift_modifier(modifiers, ch);
 
     // Unify modifiers somewhat.  No longer use ALT to set the 8th bit.
-    ch = extract_modifiers(ch, &modifiers, FALSE, NULL);
-    if (ch == CSI)
+    ch = extract_modifiers(ch, &modifiers, FALSE, ರಿಕ್ತ);
+    ಯದಿ (ch == CSI)
 	ch = K_CSI;
 
-    if (modifiers)
+    ಯದಿ (modifiers)
     {
 	string[0] = CSI;
 	string[1] = KS_MODIFIER;
 	string[2] = modifiers;
-	add_to_input_buf(string, 3);
+	add_to_ಒಳಹರಿವು_buf(string, 3);
     }
 
     len = char_to_string(ch, string, 40, FALSE);
-    if (len == 1 && string[0] == Ctrl_C && ctrl_c_interrupts)
+    ಯದಿ (len == 1 && string[0] == Ctrl_C && ctrl_c_interrupts)
     {
-	trash_input_buf();
+	trash_ಒಳಹರಿವು_buf();
 	got_int = TRUE;
     }
 
-    add_to_input_buf(string, len);
+    add_to_ಒಳಹರಿವು_buf(string, len);
 }
 
 /*
  * "Classic" implementation, existing prior to v8.2.4807
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 _OnChar_classic(
     HWND hwnd UNUSED,
     UINT ch,
-    int cRepeat UNUSED)
+    ಪೂರ್ಣಾಙ್ಕ cRepeat UNUSED)
 {
     char_u	string[40];
-    int		len = 0;
+    ಪೂರ್ಣಾಙ್ಕ		len = 0;
 
-    dead_key = 0;
+    dead_ಕೀಲಿ = 0;
 
     len = char_to_string(ch, string, 40, FALSE);
-    if (len == 1 && string[0] == Ctrl_C && ctrl_c_interrupts)
+    ಯದಿ (len == 1 && string[0] == Ctrl_C && ctrl_c_interrupts)
     {
-	trash_input_buf();
+	trash_ಒಳಹರಿವು_buf();
 	got_int = TRUE;
     }
 
-    add_to_input_buf(string, len);
+    add_to_ಒಳಹರಿವು_buf(string, len);
 }
 
 /*
  * Alt-Key hit, add it to the input buffer.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 _OnSysChar(
     HWND hwnd UNUSED,
     UINT cch,
-    int cRepeat UNUSED)
+    ಪೂರ್ಣಾಙ್ಕ cRepeat UNUSED)
 {
     // marshal to corresponding implementation
     keycode_trans_strategy_used->ptr_on_sys_char(hwnd, cch, cRepeat);
@@ -1067,73 +1067,73 @@ _OnSysChar(
  * Experimental implementation, introduced in v8.2.4807
  * "processing key event in Win32 GUI is not ideal"
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 _OnSysChar_experimental(
     HWND hwnd UNUSED,
     UINT cch,
-    int cRepeat UNUSED)
+    ಪೂರ್ಣಾಙ್ಕ cRepeat UNUSED)
 {
     char_u	string[40]; // Enough for multibyte character
-    int		len;
-    int		modifiers;
-    int		ch = cch;   // special keys are negative
+    ಪೂರ್ಣಾಙ್ಕ		len;
+    ಪೂರ್ಣಾಙ್ಕ		modifiers;
+    ಪೂರ್ಣಾಙ್ಕ		ch = cch;   // special keys are negative
 
-    dead_key = DEAD_KEY_OFF;
+    dead_ಕೀಲಿ = DEAD_ಕೀಲಿ_OFF;
 
     // OK, we have a character key (given by ch) which was entered with the
     // ALT key pressed. Eg, if the user presses Alt-A, then ch == 'A'. Note
     // that the system distinguishes Alt-a and Alt-A (Alt-Shift-a unless
     // CAPSLOCK is pressed) at this point.
     modifiers = get_active_modifiers_experimental();
-    ch = simplify_key(ch, &modifiers);
+    ch = simplify_ಕೀಲಿ(ch, &modifiers);
     // remove the SHIFT modifier for keys where it's already included, e.g.,
     // '(' and '*'
     modifiers = may_remove_shift_modifier(modifiers, ch);
 
     // Unify modifiers somewhat.  No longer use ALT to set the 8th bit.
-    ch = extract_modifiers(ch, &modifiers, FALSE, NULL);
-    if (ch == CSI)
+    ch = extract_modifiers(ch, &modifiers, FALSE, ರಿಕ್ತ);
+    ಯದಿ (ch == CSI)
 	ch = K_CSI;
 
     len = 0;
-    if (modifiers)
+    ಯದಿ (modifiers)
     {
 	string[len++] = CSI;
 	string[len++] = KS_MODIFIER;
 	string[len++] = modifiers;
     }
 
-    if (IS_SPECIAL((int)ch))
+    ಯದಿ (IS_SPECIAL((ಪೂರ್ಣಾಙ್ಕ)ch))
     {
 	string[len++] = CSI;
-	string[len++] = K_SECOND((int)ch);
-	string[len++] = K_THIRD((int)ch);
+	string[len++] = K_SECOND((ಪೂರ್ಣಾಙ್ಕ)ch);
+	string[len++] = K_THIRD((ಪೂರ್ಣಾಙ್ಕ)ch);
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	// Although the documentation isn't clear about it, we assume "ch" is
 	// a Unicode character.
 	len += char_to_string(ch, string + len, 40 - len, TRUE);
     }
 
-    add_to_input_buf(string, len);
+    add_to_ಒಳಹರಿವು_buf(string, len);
 }
 
 /*
  * "Classic" implementation, existing prior to v8.2.4807
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 _OnSysChar_classic(
     HWND hwnd UNUSED,
     UINT cch,
-    int cRepeat UNUSED)
+    ಪೂರ್ಣಾಙ್ಕ cRepeat UNUSED)
 {
     char_u	string[40]; // Enough for multibyte character
-    int		len;
-    int		modifiers;
-    int		ch = cch;   // special keys are negative
+    ಪೂರ್ಣಾಙ್ಕ		len;
+    ಪೂರ್ಣಾಙ್ಕ		modifiers;
+    ಪೂರ್ಣಾಙ್ಕ		ch = cch;   // special keys are negative
 
-    dead_key = 0;
+    dead_ಕೀಲಿ = 0;
 
     // TRACE("OnSysChar(%d, %c)\n", ch, ch);
 
@@ -1142,140 +1142,140 @@ _OnSysChar_classic(
     // that the system distinguishes Alt-a and Alt-A (Alt-Shift-a unless
     // CAPSLOCK is pressed) at this point.
     modifiers = MOD_MASK_ALT;
-    if (GetKeyState(VK_SHIFT) & 0x8000)
+    ಯದಿ (Get_ಕೀಲಿ_State(VK_SHIFT) & 0x8000)
 	modifiers |= MOD_MASK_SHIFT;
-    if (GetKeyState(VK_CONTROL) & 0x8000)
+    ಯದಿ (Get_ಕೀಲಿ_State(VK_CONTROL) & 0x8000)
 	modifiers |= MOD_MASK_CTRL;
 
-    ch = simplify_key(ch, &modifiers);
+    ch = simplify_ಕೀಲಿ(ch, &modifiers);
     // remove the SHIFT modifier for keys where it's already included, e.g.,
     // '(' and '*'
     modifiers = may_remove_shift_modifier(modifiers, ch);
 
     // Unify modifiers somewhat.  No longer use ALT to set the 8th bit.
-    ch = extract_modifiers(ch, &modifiers, FALSE, NULL);
-    if (ch == CSI)
+    ch = extract_modifiers(ch, &modifiers, FALSE, ರಿಕ್ತ);
+    ಯದಿ (ch == CSI)
 	ch = K_CSI;
 
     len = 0;
-    if (modifiers)
+    ಯದಿ (modifiers)
     {
 	string[len++] = CSI;
 	string[len++] = KS_MODIFIER;
 	string[len++] = modifiers;
     }
 
-    if (IS_SPECIAL((int)ch))
+    ಯದಿ (IS_SPECIAL((ಪೂರ್ಣಾಙ್ಕ)ch))
     {
 	string[len++] = CSI;
-	string[len++] = K_SECOND((int)ch);
-	string[len++] = K_THIRD((int)ch);
+	string[len++] = K_SECOND((ಪೂರ್ಣಾಙ್ಕ)ch);
+	string[len++] = K_THIRD((ಪೂರ್ಣಾಙ್ಕ)ch);
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	// Although the documentation isn't clear about it, we assume "ch" is
 	// a Unicode character.
 	len += char_to_string(ch, string + len, 40 - len, TRUE);
     }
 
-    add_to_input_buf(string, len);
+    add_to_ಒಳಹರಿವು_buf(string, len);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 _OnMouseEvent(
-    int button,
-    int x,
-    int y,
-    int repeated_click,
-    UINT keyFlags)
+    ಪೂರ್ಣಾಙ್ಕ button,
+    ಪೂರ್ಣಾಙ್ಕ x,
+    ಪೂರ್ಣಾಙ್ಕ y,
+    ಪೂರ್ಣಾಙ್ಕ repeated_click,
+    UINT ಕೀಲಿ_Flags)
 {
-    int vim_modifiers = 0x0;
+    ಪೂರ್ಣಾಙ್ಕ vim_modifiers = 0x0;
 
     s_getting_focus = FALSE;
 
-    if (keyFlags & MK_SHIFT)
+    ಯದಿ (ಕೀಲಿ_Flags & MK_SHIFT)
 	vim_modifiers |= MOUSE_SHIFT;
-    if (keyFlags & MK_CONTROL)
+    ಯದಿ (ಕೀಲಿ_Flags & MK_CONTROL)
 	vim_modifiers |= MOUSE_CTRL;
-    if (GetKeyState(VK_LMENU) & 0x8000)
+    ಯದಿ (Get_ಕೀಲಿ_State(VK_LMENU) & 0x8000)
 	vim_modifiers |= MOUSE_ALT;
 
     gui_send_mouse_event(button, x, y, repeated_click, vim_modifiers);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 _OnMouseButtonDown(
     HWND hwnd UNUSED,
     BOOL fDoubleClick UNUSED,
-    int x,
-    int y,
-    UINT keyFlags)
+    ಪೂರ್ಣಾಙ್ಕ x,
+    ಪೂರ್ಣಾಙ್ಕ y,
+    UINT ಕೀಲಿ_Flags)
 {
-    static LONG	s_prevTime = 0;
+    ಸ್ಥಿರ LONG	s_prevTime = 0;
 
     LONG    currentTime = GetMessageTime();
-    int	    button = -1;
-    int	    repeated_click;
+    ಪೂರ್ಣಾಙ್ಕ	    button = -1;
+    ಪೂರ್ಣಾಙ್ಕ	    repeated_click;
 
     // Give main window the focus: this is so the cursor isn't hollow.
-    (void)SetFocus(s_hwnd);
+    (ಶೂನ್ಯ)SetFocus(s_hwnd);
 
-    if (s_uMsg == WM_LBUTTONDOWN || s_uMsg == WM_LBUTTONDBLCLK)
-	button = MOUSE_LEFT;
-    else if (s_uMsg == WM_MBUTTONDOWN || s_uMsg == WM_MBUTTONDBLCLK)
-	button = MOUSE_MIDDLE;
-    else if (s_uMsg == WM_RBUTTONDOWN || s_uMsg == WM_RBUTTONDBLCLK)
-	button = MOUSE_RIGHT;
-    else if (s_uMsg == WM_XBUTTONDOWN || s_uMsg == WM_XBUTTONDBLCLK)
+    ಯದಿ (s_u_ಸಂದೇಶ == WM_LBUTTONDOWN || s_u_ಸಂದೇಶ == WM_LBUTTONDBLCLK)
+	button = MOUSE_ಎಡ;
+    ಅನ್ಯಥಾ ಯದಿ (s_u_ಸಂದೇಶ == WM_MBUTTONDOWN || s_u_ಸಂದೇಶ == WM_MBUTTONDBLCLK)
+	button = MOUSE_ಮಧ್ಯ;
+    ಅನ್ಯಥಾ ಯದಿ (s_u_ಸಂದೇಶ == WM_RBUTTONDOWN || s_u_ಸಂದೇಶ == WM_RBUTTONDBLCLK)
+	button = MOUSE_ಬಲ;
+    ಅನ್ಯಥಾ ಯದಿ (s_u_ಸಂದೇಶ == WM_XBUTTONDOWN || s_u_ಸಂದೇಶ == WM_XBUTTONDBLCLK)
     {
 	button = ((GET_XBUTTON_WPARAM(s_wParam) == 1) ? MOUSE_X1 : MOUSE_X2);
     }
-    else if (s_uMsg == WM_CAPTURECHANGED)
+    ಅನ್ಯಥಾ ಯದಿ (s_u_ಸಂದೇಶ == WM_CAPTURECHANGED)
     {
 	// on W95/NT4, somehow you get in here with an odd Msg
 	// if you press one button while holding down the other..
-	if (s_button_pending == MOUSE_LEFT)
-	    button = MOUSE_RIGHT;
-	else
-	    button = MOUSE_LEFT;
+	ಯದಿ (s_button_pending == MOUSE_ಎಡ)
+	    button = MOUSE_ಬಲ;
+	ಅನ್ಯಥಾ
+	    button = MOUSE_ಎಡ;
     }
 
-    if (button < 0)
-	return;
+    ಯದಿ (button < 0)
+	ಪ್ರತ್ಯಾಗಮ;
 
-    repeated_click = ((int)(currentTime - s_prevTime) < p_mouset);
+    repeated_click = ((ಪೂರ್ಣಾಙ್ಕ)(currentTime - s_prevTime) < p_mouset);
 
     /*
      * Holding down the left and right buttons simulates pushing the middle
      * button.
      */
-    if (repeated_click
-	    && ((button == MOUSE_LEFT && s_button_pending == MOUSE_RIGHT)
-		|| (button == MOUSE_RIGHT
-		    && s_button_pending == MOUSE_LEFT)))
+    ಯದಿ (repeated_click
+	    && ((button == MOUSE_ಎಡ && s_button_pending == MOUSE_ಬಲ)
+		|| (button == MOUSE_ಬಲ
+		    && s_button_pending == MOUSE_ಎಡ)))
     {
 	/*
 	 * Hmm, gui.c will ignore more than one button down at a time, so
 	 * pretend we let go of it first.
 	 */
 	gui_send_mouse_event(MOUSE_RELEASE, x, y, FALSE, 0x0);
-	button = MOUSE_MIDDLE;
+	button = MOUSE_ಮಧ್ಯ;
 	repeated_click = FALSE;
 	s_button_pending = -1;
-	_OnMouseEvent(button, x, y, repeated_click, keyFlags);
+	_OnMouseEvent(button, x, y, repeated_click, ಕೀಲಿ_Flags);
     }
-    else if ((repeated_click)
-	    || (mouse_model_popup() && (button == MOUSE_RIGHT)))
+    ಅನ್ಯಥಾ ಯದಿ ((repeated_click)
+	    || (mouse_model_popup() && (button == MOUSE_ಬಲ)))
     {
-	if (s_button_pending > -1)
+	ಯದಿ (s_button_pending > -1)
 	{
-	    _OnMouseEvent(s_button_pending, x, y, FALSE, keyFlags);
+	    _OnMouseEvent(s_button_pending, x, y, FALSE, ಕೀಲಿ_Flags);
 	    s_button_pending = -1;
 	}
 	// TRACE("Button down at x %d, y %d\n", x, y);
-	_OnMouseEvent(button, x, y, repeated_click, keyFlags);
+	_OnMouseEvent(button, x, y, repeated_click, ಕೀಲಿ_Flags);
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	/*
 	 * If this is the first press (i.e. not a multiple click) don't
@@ -1293,40 +1293,40 @@ _OnMouseButtonDown(
 	s_button_pending = button;
 	s_x_pending = x;
 	s_y_pending = y;
-	s_kFlags_pending = keyFlags;
+	s_kFlags_pending = ಕೀಲಿ_Flags;
     }
 
     s_prevTime = currentTime;
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 _OnMouseMoveOrRelease(
     HWND hwnd UNUSED,
-    int x,
-    int y,
-    UINT keyFlags)
+    ಪೂರ್ಣಾಙ್ಕ x,
+    ಪೂರ್ಣಾಙ್ಕ y,
+    UINT ಕೀಲಿ_Flags)
 {
-    int button;
+    ಪೂರ್ಣಾಙ್ಕ button;
 
     s_getting_focus = FALSE;
-    if (s_button_pending > -1)
+    ಯದಿ (s_button_pending > -1)
     {
 	// Delayed action for mouse down event
 	_OnMouseEvent(s_button_pending, s_x_pending,
 					s_y_pending, FALSE, s_kFlags_pending);
 	s_button_pending = -1;
     }
-    if (s_uMsg == WM_MOUSEMOVE)
+    ಯದಿ (s_u_ಸಂದೇಶ == WM_MOUSEMOVE)
     {
 	/*
 	 * It's only a MOUSE_DRAG if one or more mouse buttons are being held
 	 * down.
 	 */
-	if (!(keyFlags & (MK_LBUTTON | MK_MBUTTON | MK_RBUTTON
+	ಯದಿ (!(ಕೀಲಿ_Flags & (MK_LBUTTON | MK_MBUTTON | MK_RBUTTON
 						| MK_XBUTTON1 | MK_XBUTTON2)))
 	{
 	    gui_mouse_moved(x, y);
-	    return;
+	    ಪ್ರತ್ಯಾಗಮ;
 	}
 
 	/*
@@ -1337,25 +1337,25 @@ _OnMouseMoveOrRelease(
 	button = MOUSE_DRAG;
 	// TRACE("  move at x %d, y %d\n", x, y);
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	ReleaseCapture();
 	button = MOUSE_RELEASE;
 	// TRACE("  up at x %d, y %d\n", x, y);
     }
 
-    _OnMouseEvent(button, x, y, FALSE, keyFlags);
+    _OnMouseEvent(button, x, y, FALSE, ಕೀಲಿ_Flags);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 _OnSizeTextArea(
     HWND hwnd UNUSED,
     UINT state UNUSED,
-    int cx UNUSED,
-    int cy UNUSED)
+    ಪೂರ್ಣಾಙ್ಕ cx UNUSED,
+    ಪೂರ್ಣಾಙ್ಕ cy UNUSED)
 {
-#if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX())
+#ಯದಿ defined(FEAT_DIRECTX)
+    ಯದಿ (IS_ENABLE_DIRECTX())
 	directx_binddc();
 #endif
 }
@@ -1364,42 +1364,42 @@ _OnSizeTextArea(
 /*
  * Find the vimmenu_T with the given id
  */
-    static vimmenu_T *
+    ಸ್ಥಿರ vimmenu_T *
 gui_mswin_find_menu(
     vimmenu_T	*pMenu,
-    int		id)
+    ಪೂರ್ಣಾಙ್ಕ		id)
 {
     vimmenu_T	*pChildMenu;
 
-    while (pMenu)
+    ಯಾವತ್ (pMenu)
     {
-	if (pMenu->id == (UINT)id)
-	    break;
-	if (pMenu->children != NULL)
+	ಯದಿ (pMenu->id == (UINT)id)
+	    ಭಙ್ಗ;
+	ಯದಿ (pMenu->children != ರಿಕ್ತ)
 	{
 	    pChildMenu = gui_mswin_find_menu(pMenu->children, id);
-	    if (pChildMenu)
+	    ಯದಿ (pChildMenu)
 	    {
 		pMenu = pChildMenu;
-		break;
+		ಭಙ್ಗ;
 	    }
 	}
 	pMenu = pMenu->next;
     }
-    return pMenu;
+    ಪ್ರತ್ಯಾಗಮ pMenu;
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 _OnMenu(
     HWND	hwnd UNUSED,
-    int		id,
+    ಪೂರ್ಣಾಙ್ಕ		id,
     HWND	hwndCtl UNUSED,
     UINT	codeNotify UNUSED)
 {
     vimmenu_T	*pMenu;
 
-    pMenu = gui_mswin_find_menu(root_menu, id);
-    if (pMenu)
+    pMenu = gui_mswin_find_menu(ಬೇರು_menu, id);
+    ಯದಿ (pMenu)
 	gui_menu_cb(pMenu);
 }
 #endif
@@ -1408,115 +1408,115 @@ _OnMenu(
 /*
  * Handle a Find/Replace window message.
  */
-    static void
-_OnFindRepl(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+_OnFindRepl(ಶೂನ್ಯ)
 {
-    int	    flags = 0;
-    int	    down;
+    ಪೂರ್ಣಾಙ್ಕ	    flags = 0;
+    ಪೂರ್ಣಾಙ್ಕ	    down;
 
-    if (s_findrep_struct.Flags & FR_DIALOGTERM)
+    ಯದಿ (s_findrep_struct.Flags & FR_DIALOGTERM)
 	// Give main window the focus back.
-	(void)SetFocus(s_hwnd);
+	(ಶೂನ್ಯ)SetFocus(s_hwnd);
 
-    if (s_findrep_struct.Flags & FR_FINDNEXT)
+    ಯದಿ (s_findrep_struct.Flags & FR_FINDNEXT)
     {
 	flags = FRD_FINDNEXT;
 
 	// Give main window the focus back: this is so the cursor isn't
 	// hollow.
-	(void)SetFocus(s_hwnd);
+	(ಶೂನ್ಯ)SetFocus(s_hwnd);
     }
-    else if (s_findrep_struct.Flags & FR_REPLACE)
+    ಅನ್ಯಥಾ ಯದಿ (s_findrep_struct.Flags & FR_REPLACE)
     {
 	flags = FRD_REPLACE;
 
 	// Give main window the focus back: this is so the cursor isn't
 	// hollow.
-	(void)SetFocus(s_hwnd);
+	(ಶೂನ್ಯ)SetFocus(s_hwnd);
     }
-    else if (s_findrep_struct.Flags & FR_REPLACEALL)
+    ಅನ್ಯಥಾ ಯದಿ (s_findrep_struct.Flags & FR_REPLACEALL)
     {
 	flags = FRD_REPLACEALL;
     }
 
-    if (flags == 0)
-	return;
+    ಯದಿ (flags == 0)
+	ಪ್ರತ್ಯಾಗಮ;
 
     char_u	*p, *q;
 
     // Call the generic GUI function to do the actual work.
-    if (s_findrep_struct.Flags & FR_WHOLEWORD)
+    ಯದಿ (s_findrep_struct.Flags & FR_WHOLEWORD)
 	flags |= FRD_WHOLE_WORD;
-    if (s_findrep_struct.Flags & FR_MATCHCASE)
+    ಯದಿ (s_findrep_struct.Flags & FR_MATCHCASE)
 	flags |= FRD_MATCH_CASE;
     down = (s_findrep_struct.Flags & FR_DOWN) != 0;
-    p = utf16_to_enc(s_findrep_struct.lpstrFindWhat, NULL);
-    q = utf16_to_enc(s_findrep_struct.lpstrReplaceWith, NULL);
-    if (p != NULL && q != NULL)
+    p = utf16_to_enc(s_findrep_struct.lpstrFindWhat, ರಿಕ್ತ);
+    q = utf16_to_enc(s_findrep_struct.lpstrReplaceWith, ರಿಕ್ತ);
+    ಯದಿ (p != ರಿಕ್ತ && q != ರಿಕ್ತ)
 	gui_do_findrepl(flags, p, q, down);
     vim_free(p);
     vim_free(q);
 }
 #endif
 
-    static void
-HandleMouseHide(UINT uMsg, LPARAM lParam)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+HandleMouseHide(UINT u_ಸಂದೇಶ, LPARAM lParam)
 {
-    static LPARAM last_lParam = 0L;
+    ಸ್ಥಿರ LPARAM last_lParam = 0L;
 
     // We sometimes get a mousemove when the mouse didn't move...
-    if (uMsg == WM_MOUSEMOVE || uMsg == WM_NCMOUSEMOVE)
+    ಯದಿ (u_ಸಂದೇಶ == WM_MOUSEMOVE || u_ಸಂದೇಶ == WM_NCMOUSEMOVE)
     {
-	if (lParam == last_lParam)
-	    return;
+	ಯದಿ (lParam == last_lParam)
+	    ಪ್ರತ್ಯಾಗಮ;
 	last_lParam = lParam;
     }
 
     // Handle specially, to centralise coding. We need to be sure we catch all
     // possible events which should cause us to restore the cursor (as it is a
     // shared resource, we take full responsibility for it).
-    switch (uMsg)
+    ವಿಕಲ್ಪ (u_ಸಂದೇಶ)
     {
-    case WM_KEYUP:
-    case WM_CHAR:
+    ಪಕ್ಷ WM_KEYUP:
+    ಪಕ್ಷ WM_CHAR:
 	/*
 	 * blank out the pointer if necessary
 	 */
-	if (p_mh)
+	ಯದಿ (p_mh)
 	    gui_mch_mousehide(TRUE);
-	break;
+	ಭಙ್ಗ;
 
-    case WM_SYSKEYUP:	 // show the pointer when a system-key is pressed
-    case WM_SYSCHAR:
-    case WM_MOUSEMOVE:	 // show the pointer on any mouse action
-    case WM_LBUTTONDOWN:
-    case WM_LBUTTONUP:
-    case WM_MBUTTONDOWN:
-    case WM_MBUTTONUP:
-    case WM_RBUTTONDOWN:
-    case WM_RBUTTONUP:
-    case WM_XBUTTONDOWN:
-    case WM_XBUTTONUP:
-    case WM_NCMOUSEMOVE:
-    case WM_NCLBUTTONDOWN:
-    case WM_NCLBUTTONUP:
-    case WM_NCMBUTTONDOWN:
-    case WM_NCMBUTTONUP:
-    case WM_NCRBUTTONDOWN:
-    case WM_NCRBUTTONUP:
-    case WM_KILLFOCUS:
+    ಪಕ್ಷ WM_SYSKEYUP:	 // show the pointer when a system-key is pressed
+    ಪಕ್ಷ WM_SYSCHAR:
+    ಪಕ್ಷ WM_MOUSEMOVE:	 // show the pointer on any mouse action
+    ಪಕ್ಷ WM_LBUTTONDOWN:
+    ಪಕ್ಷ WM_LBUTTONUP:
+    ಪಕ್ಷ WM_MBUTTONDOWN:
+    ಪಕ್ಷ WM_MBUTTONUP:
+    ಪಕ್ಷ WM_RBUTTONDOWN:
+    ಪಕ್ಷ WM_RBUTTONUP:
+    ಪಕ್ಷ WM_XBUTTONDOWN:
+    ಪಕ್ಷ WM_XBUTTONUP:
+    ಪಕ್ಷ WM_NCMOUSEMOVE:
+    ಪಕ್ಷ WM_NCLBUTTONDOWN:
+    ಪಕ್ಷ WM_NCLBUTTONUP:
+    ಪಕ್ಷ WM_NCMBUTTONDOWN:
+    ಪಕ್ಷ WM_NCMBUTTONUP:
+    ಪಕ್ಷ WM_NCRBUTTONDOWN:
+    ಪಕ್ಷ WM_NCRBUTTONUP:
+    ಪಕ್ಷ WM_KILLFOCUS:
 	/*
 	 * if the pointer is currently hidden, then we should show it.
 	 */
 	gui_mch_mousehide(FALSE);
-	break;
+	ಭಙ್ಗ;
     }
 }
 
-    static LRESULT CALLBACK
+    ಸ್ಥಿರ LRESULT CALLBACK
 _TextAreaWndProc(
     HWND hwnd,
-    UINT uMsg,
+    UINT u_ಸಂದೇಶ,
     WPARAM wParam,
     LPARAM lParam)
 {
@@ -1525,61 +1525,61 @@ _TextAreaWndProc(
 	  hwnd, uMsg, wParam, lParam);
     */
 
-    HandleMouseHide(uMsg, lParam);
+    HandleMouseHide(u_ಸಂದೇಶ, lParam);
 
-    s_uMsg = uMsg;
+    s_u_ಸಂದೇಶ = u_ಸಂದೇಶ;
     s_wParam = wParam;
 
 #ifdef FEAT_BEVAL_GUI
-    track_user_activity(uMsg);
+    track_user_activity(u_ಸಂದೇಶ);
 #endif
 
-    switch (uMsg)
+    ವಿಕಲ್ಪ (u_ಸಂದೇಶ)
     {
-	HANDLE_MSG(hwnd, WM_LBUTTONDBLCLK,_OnMouseButtonDown);
-	HANDLE_MSG(hwnd, WM_LBUTTONDOWN,_OnMouseButtonDown);
-	HANDLE_MSG(hwnd, WM_LBUTTONUP,	_OnMouseMoveOrRelease);
-	HANDLE_MSG(hwnd, WM_MBUTTONDBLCLK,_OnMouseButtonDown);
-	HANDLE_MSG(hwnd, WM_MBUTTONDOWN,_OnMouseButtonDown);
-	HANDLE_MSG(hwnd, WM_MBUTTONUP,	_OnMouseMoveOrRelease);
-	HANDLE_MSG(hwnd, WM_MOUSEMOVE,	_OnMouseMoveOrRelease);
-	HANDLE_MSG(hwnd, WM_PAINT,	_OnPaint);
-	HANDLE_MSG(hwnd, WM_RBUTTONDBLCLK,_OnMouseButtonDown);
-	HANDLE_MSG(hwnd, WM_RBUTTONDOWN,_OnMouseButtonDown);
-	HANDLE_MSG(hwnd, WM_RBUTTONUP,	_OnMouseMoveOrRelease);
-	HANDLE_MSG(hwnd, WM_XBUTTONDBLCLK,_OnMouseButtonDown);
-	HANDLE_MSG(hwnd, WM_XBUTTONDOWN,_OnMouseButtonDown);
-	HANDLE_MSG(hwnd, WM_XBUTTONUP,	_OnMouseMoveOrRelease);
-	HANDLE_MSG(hwnd, WM_SIZE,	_OnSizeTextArea);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_LBUTTONDBLCLK,_OnMouseButtonDown);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_LBUTTONDOWN,_OnMouseButtonDown);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_LBUTTONUP,	_OnMouseMoveOrRelease);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_MBUTTONDBLCLK,_OnMouseButtonDown);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_MBUTTONDOWN,_OnMouseButtonDown);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_MBUTTONUP,	_OnMouseMoveOrRelease);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_MOUSEMOVE,	_OnMouseMoveOrRelease);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_PAINT,	_OnPaint);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_RBUTTONDBLCLK,_OnMouseButtonDown);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_RBUTTONDOWN,_OnMouseButtonDown);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_RBUTTONUP,	_OnMouseMoveOrRelease);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_XBUTTONDBLCLK,_OnMouseButtonDown);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_XBUTTONDOWN,_OnMouseButtonDown);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_XBUTTONUP,	_OnMouseMoveOrRelease);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_SIZE,	_OnSizeTextArea);
 
 #ifdef FEAT_BEVAL_GUI
-	case WM_NOTIFY: Handle_WM_Notify(hwnd, (LPNMHDR)lParam);
-	    return TRUE;
+	ಪಕ್ಷ WM_NOTIFY: Handle_WM_Notify(hwnd, (LPNMHDR)lParam);
+	    ಪ್ರತ್ಯಾಗಮ TRUE;
 #endif
-	default:
-	    return DefWindowProcW(hwnd, uMsg, wParam, lParam);
+	ಸ್ವಭಾವ:
+	    ಪ್ರತ್ಯಾಗಮ DefWindowProcW(hwnd, u_ಸಂದೇಶ, wParam, lParam);
     }
 }
 
-    static void
-dyn_dwm_load(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+dyn_dwm_load(ಶೂನ್ಯ)
 {
     hLibDwm = vimLoadLib("dwmapi.dll");
-    if (hLibDwm == NULL)
-	return;
+    ಯದಿ (hLibDwm == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ;
 
     pDwmSetWindowAttribute = (HRESULT (WINAPI *)(HWND, DWORD, LPCVOID, DWORD))
 	GetProcAddress(hLibDwm, "DwmSetWindowAttribute");
 
-    if (pDwmSetWindowAttribute == NULL)
+    ಯದಿ (pDwmSetWindowAttribute == ರಿಕ್ತ)
     {
 	FreeLibrary(hLibDwm);
-	hLibDwm = NULL;
-	return;
+	hLibDwm = ರಿಕ್ತ;
+	ಪ್ರತ್ಯಾಗಮ;
     }
 }
 
-extern DWORD win_version; // this is in os_mswin.c
+ಬಾಹ್ಯ DWORD win_version; // this is in os_mswin.c
 
 /*
  * Set TitleBar's color. Handle hl-TitleBar and hl-TitleBarNC.
@@ -1588,65 +1588,65 @@ extern DWORD win_version; // this is in os_mswin.c
  * if "TitleBar guibg=NONE guifg=NONE" reset the window back to using the
  * system's default behavior for the border color.
  */
-    void
-gui_mch_set_titlebar_colors(void)
+    ಶೂನ್ಯ
+gui_mch_set_titlebar_colors(ಶೂನ್ಯ)
 {
 #define DWMWA_COLOR_DEFAULT 0xFFFFFFFF
-    if (pDwmSetWindowAttribute == NULL || win_version < MAKE_VER(10, 0, 22000))
-	return;
+    ಯದಿ (pDwmSetWindowAttribute == ರಿಕ್ತ || win_version < MAKE_VER(10, 0, 22000))
+	ಪ್ರತ್ಯಾಗಮ;
 
     guicolor_T captionColor = DWMWA_COLOR_DEFAULT;
     guicolor_T textColor = DWMWA_COLOR_DEFAULT;
 
-    if (vim_strchr(p_go, GO_TITLEBAR) != NULL)
+    ಯದಿ (vim_strchr(p_go, GO_TITLEBAR) != ರಿಕ್ತ)
     {
-	if (gui.in_focus)
+	ಯದಿ (gui.in_focus)
 	{
 	    captionColor = gui.title_bg_pixel;
 	    textColor = gui.title_fg_pixel;
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
 	    captionColor = gui.titlenc_bg_pixel;
 	    textColor = gui.titlenc_fg_pixel;
 	}
 
-	if (captionColor == INVALCOLOR)
+	ಯದಿ (captionColor == INVALCOLOR)
 	    captionColor = DWMWA_COLOR_DEFAULT;
-	if (textColor == INVALCOLOR)
+	ಯದಿ (textColor == INVALCOLOR)
 	    textColor = DWMWA_COLOR_DEFAULT;
     }
 
     pDwmSetWindowAttribute(s_hwnd, DWMWA_CAPTION_COLOR,
-	    &captionColor, sizeof(captionColor));
+	    &captionColor, ಪರಿಮಾಣ(captionColor));
     pDwmSetWindowAttribute(s_hwnd, DWMWA_TEXT_COLOR,
-	    &textColor, sizeof(textColor));
+	    &textColor, ಪರಿಮಾಣ(textColor));
 }
 
 /*
  * Called when the foreground or background color has been changed.
  */
-    void
-gui_mch_new_colors(void)
+    ಶೂನ್ಯ
+gui_mch_new_colors(ಶೂನ್ಯ)
 {
     HBRUSH prevBrush;
 
     s_brush = CreateSolidBrush(gui.back_pixel);
     prevBrush = (HBRUSH)SetClassLongPtr(
 				s_hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)s_brush);
-    InvalidateRect(s_hwnd, NULL, TRUE);
+    InvalidateRect(s_hwnd, ರಿಕ್ತ, TRUE);
     // The text area is a child window, the invalidation above does not
     // include it.
-    if (s_textarea_bg_only && s_textArea != NULL)
-	InvalidateRect(s_textArea, NULL, TRUE);
+    ಯದಿ (s_textarea_bg_only && s_textArea != ರಿಕ್ತ)
+	InvalidateRect(s_textArea, ರಿಕ್ತ, TRUE);
     DeleteObject(prevBrush);
 }
 
 /*
  * Set the colors to their default values.
  */
-    void
-gui_mch_def_colors(void)
+    ಶೂನ್ಯ
+gui_mch_def_colors(ಶೂನ್ಯ)
 {
     gui.norm_pixel = GetSysColor(COLOR_WINDOWTEXT);
     gui.back_pixel = GetSysColor(COLOR_WINDOW);
@@ -1657,18 +1657,18 @@ gui_mch_def_colors(void)
 /*
  * Open the GUI window which was created by a call to gui_mch_init().
  */
-    int
-gui_mch_open(void)
+    ಪೂರ್ಣಾಙ್ಕ
+gui_mch_open(ಶೂನ್ಯ)
 {
     // Actually open the window, if not already visible
     // (may be done already in gui_mch_set_shellsize)
-    if (!IsWindowVisible(s_hwnd))
+    ಯದಿ (!IsWindowVisible(s_hwnd))
     {
 	ShowWindow(s_hwnd, SW_SHOWDEFAULT);
 
 	// Waiting for the message loop leaves the window undrawn while a
 	// slow VimEnter autocommand runs. The flush presents the DirectX draw.
-	if (s_textArea != NULL)
+	ಯದಿ (s_textArea != ರಿಕ್ತ)
 	{
 	    UpdateWindow(s_textArea);
 	    gui_mch_flush();
@@ -1681,67 +1681,67 @@ gui_mch_open(void)
     s_findrep_struct.lpstrReplaceWith[0] = NUL;
 #endif
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Get the position of the top left corner of the window.
  */
-    int
-gui_mch_get_winpos(int *x, int *y)
+    ಪೂರ್ಣಾಙ್ಕ
+gui_mch_get_winpos(ಪೂರ್ಣಾಙ್ಕ *x, ಪೂರ್ಣಾಙ್ಕ *y)
 {
     RECT    rect;
 
     GetWindowRect(s_hwnd, &rect);
-    *x = rect.left;
-    *y = rect.top;
-    return OK;
+    *x = rect.ಎಡ;
+    *y = rect.ತುದಿ;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Set the position of the top left corner of the window to the given
  * coordinates.
  */
-    void
-gui_mch_set_winpos(int x, int y)
+    ಶೂನ್ಯ
+gui_mch_set_winpos(ಪೂರ್ಣಾಙ್ಕ x, ಪೂರ್ಣಾಙ್ಕ y)
 {
-    SetWindowPos(s_hwnd, NULL, x, y, 0, 0,
+    SetWindowPos(s_hwnd, ರಿಕ್ತ, x, y, 0, 0,
 		 SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
 }
-    void
-gui_mch_set_text_area_pos(int x, int y, int w, int h)
+    ಶೂನ್ಯ
+gui_mch_set_text_area_pos(ಪೂರ್ಣಾಙ್ಕ x, ಪೂರ್ಣಾಙ್ಕ y, ಪೂರ್ಣಾಙ್ಕ w, ಪೂರ್ಣಾಙ್ಕ h)
 {
-    static int oldx = 0;
-    static int oldy = 0;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ oldx = 0;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ oldy = 0;
 
-    SetWindowPos(s_textArea, NULL, x, y, w, h, SWP_NOZORDER | SWP_NOACTIVATE);
+    SetWindowPos(s_textArea, ರಿಕ್ತ, x, y, w, h, SWP_NOZORDER | SWP_NOACTIVATE);
 
 #ifdef FEAT_TOOLBAR
-    if (vim_strchr(p_go, GO_TOOLBAR) != NULL)
+    ಯದಿ (vim_strchr(p_go, GO_TOOLBAR) != ರಿಕ್ತ)
 	SendMessage(s_toolbarhwnd, WM_SIZE,
 	      (WPARAM)0, MAKELPARAM(w, gui.toolbar_height));
 #endif
-#if defined(FEAT_GUI_TABLINE)
-    if (showing_tabline)
+#ಯದಿ defined(FEAT_GUI_TABLINE)
+    ಯದಿ (showing_tabline)
     {
-	int	top = 0;
+	ಪೂರ್ಣಾಙ್ಕ	ತುದಿ = 0;
 	RECT	rect;
 
 # ifdef FEAT_TOOLBAR
-	if (vim_strchr(p_go, GO_TOOLBAR) != NULL)
-	    top = gui.toolbar_height;
+	ಯದಿ (vim_strchr(p_go, GO_TOOLBAR) != ರಿಕ್ತ)
+	    ತುದಿ = gui.toolbar_height;
 # endif
 	GetClientRect(s_hwnd, &rect);
-	MoveWindow(s_tabhwnd, 0, top, rect.right, gui.tabline_height, TRUE);
+	MoveWindow(s_tabhwnd, 0, ತುದಿ, rect.ಬಲ, gui.tabline_height, TRUE);
     }
 #endif
 
     // When side scroll bar is unshown, the size of window will change.
     // then, the text area move left or right. thus client rect should be
     // forcedly redrawn. (Yasuhiro Matsumoto)
-    if (oldx != x || oldy != y)
+    ಯದಿ (oldx != x || oldy != y)
     {
-	InvalidateRect(s_hwnd, NULL, FALSE);
+	InvalidateRect(s_hwnd, ರಿಕ್ತ, FALSE);
 	oldx = x;
 	oldy = y;
     }
@@ -1752,10 +1752,10 @@ gui_mch_set_text_area_pos(int x, int y, int w, int h)
  * Scrollbar stuff:
  */
 
-    void
+    ಶೂನ್ಯ
 gui_mch_enable_scrollbar(
     scrollbar_T     *sb,
-    int		    flag)
+    ಪೂರ್ಣಾಙ್ಕ		    flag)
 {
     ShowScrollBar(sb->id, SB_CTL, flag);
 
@@ -1764,82 +1764,82 @@ gui_mch_enable_scrollbar(
     // NT 4.0 it's not...
 }
 
-    void
+    ಶೂನ್ಯ
 gui_mch_set_scrollbar_pos(
     scrollbar_T *sb,
-    int		x,
-    int		y,
-    int		w,
-    int		h)
+    ಪೂರ್ಣಾಙ್ಕ		x,
+    ಪೂರ್ಣಾಙ್ಕ		y,
+    ಪೂರ್ಣಾಙ್ಕ		w,
+    ಪೂರ್ಣಾಙ್ಕ		h)
 {
-    SetWindowPos(sb->id, NULL, x, y, w, h,
+    SetWindowPos(sb->id, ರಿಕ್ತ, x, y, w, h,
 			      SWP_NOZORDER | SWP_NOACTIVATE | SWP_SHOWWINDOW);
 }
 
-    int
-gui_mch_get_scrollbar_xpadding(void)
+    ಪೂರ್ಣಾಙ್ಕ
+gui_mch_get_scrollbar_xpadding(ಶೂನ್ಯ)
 {
     RECT    rcTxt, rcWnd;
-    int	    xpad;
+    ಪೂರ್ಣಾಙ್ಕ	    xpad;
 
     GetWindowRect(s_textArea, &rcTxt);
     GetWindowRect(s_hwnd, &rcWnd);
-    xpad = rcWnd.right - rcTxt.right - gui.scrollbar_width
+    xpad = rcWnd.ಬಲ - rcTxt.ಬಲ - gui.scrollbar_width
 	- pGetSystemMetricsForDpi(SM_CXFRAME, s_dpi)
 	- pGetSystemMetricsForDpi(SM_CXPADDEDBORDER, s_dpi);
-    return (xpad < 0) ? 0 : xpad;
+    ಪ್ರತ್ಯಾಗಮ (xpad < 0) ? 0 : xpad;
 }
 
-    int
-gui_mch_get_scrollbar_ypadding(void)
+    ಪೂರ್ಣಾಙ್ಕ
+gui_mch_get_scrollbar_ypadding(ಶೂನ್ಯ)
 {
     RECT    rcTxt, rcWnd;
-    int	    ypad;
+    ಪೂರ್ಣಾಙ್ಕ	    ypad;
 
     GetWindowRect(s_textArea, &rcTxt);
     GetWindowRect(s_hwnd, &rcWnd);
     ypad = rcWnd.bottom - rcTxt.bottom - gui.scrollbar_height
 	- pGetSystemMetricsForDpi(SM_CYFRAME, s_dpi)
 	- pGetSystemMetricsForDpi(SM_CXPADDEDBORDER, s_dpi);
-    return (ypad < 0) ? 0 : ypad;
+    ಪ್ರತ್ಯಾಗಮ (ypad < 0) ? 0 : ypad;
 }
 
-    void
+    ಶೂನ್ಯ
 gui_mch_create_scrollbar(
     scrollbar_T *sb,
-    int		orient)	// SBAR_VERT or SBAR_HORIZ
+    ಪೂರ್ಣಾಙ್ಕ		orient)	// SBAR_VERT or SBAR_HORIZ
 {
     sb->id = CreateWindow(
 	"SCROLLBAR", "Scrollbar",
 	WS_CHILD | ((orient == SBAR_VERT) ? SBS_VERT : SBS_HORZ), 0, 0,
 	10,				// Any value will do for now
 	10,				// Any value will do for now
-	s_hwnd, NULL,
-	g_hinst, NULL);
+	s_hwnd, ರಿಕ್ತ,
+	g_hinst, ರಿಕ್ತ);
 }
 
 /*
  * Find the scrollbar with the given hwnd.
  */
-    static scrollbar_T *
+    ಸ್ಥಿರ scrollbar_T *
 gui_mswin_find_scrollbar(HWND hwnd)
 {
     win_T	*wp;
 
-    if (gui.bottom_sbar.id == hwnd)
-	return &gui.bottom_sbar;
+    ಯದಿ (gui.bottom_sbar.id == hwnd)
+	ಪ್ರತ್ಯಾಗಮ &gui.bottom_sbar;
     FOR_ALL_WINDOWS(wp)
     {
-	if (wp->w_scrollbars[SBAR_LEFT].id == hwnd)
-	    return &wp->w_scrollbars[SBAR_LEFT];
-	if (wp->w_scrollbars[SBAR_RIGHT].id == hwnd)
-	    return &wp->w_scrollbars[SBAR_RIGHT];
+	ಯದಿ (wp->w_scrollbars[SBAR_ಎಡ].id == hwnd)
+	    ಪ್ರತ್ಯಾಗಮ &wp->w_scrollbars[SBAR_ಎಡ];
+	ಯದಿ (wp->w_scrollbars[SBAR_ಬಲ].id == hwnd)
+	    ಪ್ರತ್ಯಾಗಮ &wp->w_scrollbars[SBAR_ಬಲ];
     }
-    return NULL;
+    ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
 }
 
-    static void
-update_scrollbar_size(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+update_scrollbar_size(ಶೂನ್ಯ)
 {
     gui.scrollbar_width = pGetSystemMetricsForDpi(SM_CXVSCROLL, s_dpi);
     gui.scrollbar_height = pGetSystemMetricsForDpi(SM_CYHSCROLL, s_dpi);
@@ -1848,7 +1848,7 @@ update_scrollbar_size(void)
 /*
  * Get the average character size of a font.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 GetAverageFontSize(HDC hdc, SIZE *size)
 {
     // GetTextMetrics() may not return the right value in tmAveCharWidth
@@ -1862,8 +1862,8 @@ GetAverageFontSize(HDC hdc, SIZE *size)
 /*
  * Get the character size of a font.
  */
-    static void
-GetFontSize(GuiFont font, int *char_width, int *char_height)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+GetFontSize(GuiFont font, ಪೂರ್ಣಾಙ್ಕ *char_width, ಪೂರ್ಣಾಙ್ಕ *char_height)
 {
     HWND    hwnd = GetDesktopWindow();
     HDC	    hdc = GetWindowDC(hwnd);
@@ -1874,9 +1874,9 @@ GetFontSize(GuiFont font, int *char_width, int *char_height)
     GetTextMetrics(hdc, &tm);
     GetAverageFontSize(hdc, &size);
 
-    if (char_width)
+    ಯದಿ (char_width)
 	*char_width = size.cx + tm.tmOverhang;
-    if (char_height)
+    ಯದಿ (char_height)
 	*char_height = tm.tmHeight + p_linespace;
 
     SelectFont(hdc, hfntOld);
@@ -1887,7 +1887,7 @@ GetFontSize(GuiFont font, int *char_width, int *char_height)
 /*
  * Update the character size in "gui" structure with the specified font.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 UpdateFontSize(GuiFont font)
 {
     GetFontSize(font, &gui.char_width, &gui.char_height);
@@ -1896,31 +1896,31 @@ UpdateFontSize(GuiFont font)
 /*
  * Adjust gui.char_height (after 'linespace' was changed).
  */
-    int
-gui_mch_adjust_charheight(void)
+    ಪೂರ್ಣಾಙ್ಕ
+gui_mch_adjust_charheight(ಶೂನ್ಯ)
 {
     UpdateFontSize(gui.norm_font);
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
-    static GuiFont
+    ಸ್ಥಿರ GuiFont
 get_font_handle(LOGFONTW *lf)
 {
-    HFONT   font = NULL;
+    HFONT   font = ರಿಕ್ತ;
 
     // Load the font
     font = CreateFontIndirectW(lf);
 
-    if (font == NULL)
-	return NOFONT;
+    ಯದಿ (font == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ NOFONT;
 
-    return (GuiFont)font;
+    ಪ್ರತ್ಯಾಗಮ (GuiFont)font;
 }
 
-    static int
-pixels_to_points(int pixels, int vertical)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+pixels_to_points(ಪೂರ್ಣಾಙ್ಕ pixels, ಪೂರ್ಣಾಙ್ಕ vertical)
 {
-    int		points;
+    ಪೂರ್ಣಾಙ್ಕ		points;
     HWND	hwnd;
     HDC		hdc;
 
@@ -1932,28 +1932,28 @@ pixels_to_points(int pixels, int vertical)
 
     ReleaseDC(hwnd, hdc);
 
-    return points;
+    ಪ್ರತ್ಯಾಗಮ points;
 }
 
     GuiFont
 gui_mch_get_font(
     char_u	*name,
-    int		giveErrorIfMissing)
+    ಪೂರ್ಣಾಙ್ಕ		giveErrorIfMissing)
 {
     LOGFONTW	lf;
     GuiFont	font = NOFONT;
 
-    if (get_logfont(&lf, name, NULL, giveErrorIfMissing) == OK)
+    ಯದಿ (get_logfont(&lf, name, ರಿಕ್ತ, giveErrorIfMissing) == OK)
     {
 	lf.lfHeight = adjust_fontsize_by_dpi(lf.lfHeight);
 	font = get_font_handle(&lf);
     }
-    if (font == NOFONT && giveErrorIfMissing)
+    ಯದಿ (font == NOFONT && giveErrorIfMissing)
 	semsg(_(e_unknown_font_str), name);
-    return font;
+    ಪ್ರತ್ಯಾಗಮ font;
 }
 
-#if defined(FEAT_EVAL)
+#ಯದಿ defined(FEAT_EVAL)
 /*
  * Return the name of font "font" in allocated memory.
  * Don't know how to get the actual name, thus use the provided name.
@@ -1961,16 +1961,16 @@ gui_mch_get_font(
     char_u *
 gui_mch_get_fontname(GuiFont font UNUSED, char_u *name)
 {
-    if (name == NULL)
-	return NULL;
-    return vim_strsave(name);
+    ಯದಿ (name == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
+    ಪ್ರತ್ಯಾಗಮ vim_strsave(name);
 }
 #endif
 
-    void
+    ಶೂನ್ಯ
 gui_mch_free_font(GuiFont font)
 {
-    if (font)
+    ಯದಿ (font)
 	DeleteObject((HFONT)font);
 }
 
@@ -1981,15 +1981,15 @@ gui_mch_free_font(GuiFont font)
     guicolor_T
 gui_mch_get_color(char_u *name)
 {
-    int i;
+    ಪೂರ್ಣಾಙ್ಕ i;
 
-    typedef struct SysColorTable
+    ಪ್ರಕಾರನಿರ್ದೇಶ ಸಂರಚನಾ SysColorTable
     {
-	char	    *name;
-	int	    color;
+	ವರ್ಣ	    *name;
+	ಪೂರ್ಣಾಙ್ಕ	    color;
     } SysColorTable;
 
-    static SysColorTable sys_table[] =
+    ಸ್ಥಿರ SysColorTable sys_table[] =
     {
 	{"SYS_3DDKSHADOW", COLOR_3DDKSHADOW},
 	{"SYS_3DHILIGHT", COLOR_3DHILIGHT},
@@ -2029,71 +2029,71 @@ gui_mch_get_color(char_u *name)
     /*
      * Try to look up a system colour.
      */
-    for (i = 0; i < (int)ARRAY_LENGTH(sys_table); i++)
-	if (STRICMP(name, sys_table[i].name) == 0)
-	    return GetSysColor(sys_table[i].color);
+    ಪ್ರತಿ (i = 0; i < (ಪೂರ್ಣಾಙ್ಕ)ARRAY_LENGTH(sys_table); i++)
+	ಯದಿ (STRICMP(name, sys_table[i].name) == 0)
+	    ಪ್ರತ್ಯಾಗಮ GetSysColor(sys_table[i].color);
 
-    return gui_get_color_cmn(name);
+    ಪ್ರತ್ಯಾಗಮ gui_get_color_cmn(name);
 }
 
     guicolor_T
-gui_mch_get_rgb_color(int r, int g, int b)
+gui_mch_get_rgb_color(ಪೂರ್ಣಾಙ್ಕ r, ಪೂರ್ಣಾಙ್ಕ g, ಪೂರ್ಣಾಙ್ಕ b)
 {
-    return gui_get_rgb_color_cmn(r, g, b);
+    ಪ್ರತ್ಯಾಗಮ gui_get_rgb_color_cmn(r, g, b);
 }
 
 /*
  * Return OK if the key with the termcap name "name" is supported.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 gui_mch_haskey(char_u *name)
 {
-    int i;
+    ಪೂರ್ಣಾಙ್ಕ i;
 
-    for (i = 0; special_keys[i].vim_code1 != NUL; i++)
-	if (name[0] == special_keys[i].vim_code0
-				       && name[1] == special_keys[i].vim_code1)
-	    return OK;
-    return FAIL;
+    ಪ್ರತಿ (i = 0; special_ಕೀಲಿಗಳು[i].vim_code1 != NUL; i++)
+	ಯದಿ (name[0] == special_ಕೀಲಿಗಳು[i].vim_code0
+				       && name[1] == special_ಕೀಲಿಗಳು[i].vim_code1)
+	    ಪ್ರತ್ಯಾಗಮ OK;
+    ಪ್ರತ್ಯಾಗಮ FAIL;
 }
 
-    void
-gui_mch_beep(void)
+    ಶೂನ್ಯ
+gui_mch_beep(ಶೂನ್ಯ)
 {
     MessageBeep((UINT)-1);
 }
 /*
  * Invert a rectangle from row r, column c, for nr rows and nc columns.
  */
-    void
+    ಶೂನ್ಯ
 gui_mch_invert_rectangle(
-    int	    r,
-    int	    c,
-    int	    nr,
-    int	    nc)
+    ಪೂರ್ಣಾಙ್ಕ	    r,
+    ಪೂರ್ಣಾಙ್ಕ	    c,
+    ಪೂರ್ಣಾಙ್ಕ	    nr,
+    ಪೂರ್ಣಾಙ್ಕ	    nc)
 {
     RECT    rc;
 
-#if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX())
+#ಯದಿ defined(FEAT_DIRECTX)
+    ಯದಿ (IS_ENABLE_DIRECTX())
 	DWriteContext_Flush(s_dwc);
 #endif
 
     /*
      * Note: InvertRect() excludes right and bottom of rectangle.
      */
-    rc.left = FILL_X(c);
-    rc.top = FILL_Y(r);
-    rc.right = rc.left + nc * gui.char_width;
-    rc.bottom = rc.top + nr * gui.char_height;
+    rc.ಎಡ = FILL_X(c);
+    rc.ತುದಿ = FILL_Y(r);
+    rc.ಬಲ = rc.ಎಡ + nc * gui.char_width;
+    rc.bottom = rc.ತುದಿ + nr * gui.char_height;
     InvertRect(s_hdc, &rc);
 }
 
 /*
  * Iconify the GUI window.
  */
-    void
-gui_mch_iconify(void)
+    ಶೂನ್ಯ
+gui_mch_iconify(ಶೂನ್ಯ)
 {
     ShowWindow(s_hwnd, SW_MINIMIZE);
 }
@@ -2101,26 +2101,26 @@ gui_mch_iconify(void)
 /*
  * Draw a cursor without focus.
  */
-    void
+    ಶೂನ್ಯ
 gui_mch_draw_hollow_cursor(guicolor_T color)
 {
     HBRUSH  hbr;
     RECT    rc;
 
-#if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX())
+#ಯದಿ defined(FEAT_DIRECTX)
+    ಯದಿ (IS_ENABLE_DIRECTX())
 	DWriteContext_Flush(s_dwc);
 #endif
 
     /*
      * Note: FrameRect() excludes right and bottom of rectangle.
      */
-    rc.left = FILL_X(gui.col);
-    rc.top = FILL_Y(gui.row);
-    rc.right = rc.left + gui.char_width;
-    if (mb_lefthalve(gui.row, gui.col))
-	rc.right += gui.char_width;
-    rc.bottom = rc.top + gui.char_height;
+    rc.ಎಡ = FILL_X(gui.col);
+    rc.ತುದಿ = FILL_Y(gui.row);
+    rc.ಬಲ = rc.ಎಡ + gui.char_width;
+    ಯದಿ (mb_lefthalve(gui.row, gui.col))
+	rc.ಬಲ += gui.char_width;
+    rc.bottom = rc.ತುದಿ + gui.char_height;
     hbr = CreateSolidBrush(color);
     FrameRect(s_hdc, &rc, hbr);
     DeleteBrush(hbr);
@@ -2129,10 +2129,10 @@ gui_mch_draw_hollow_cursor(guicolor_T color)
  * Draw part of a cursor, "w" pixels wide, and "h" pixels high, using
  * color "color".
  */
-    void
+    ಶೂನ್ಯ
 gui_mch_draw_part_cursor(
-    int		w,
-    int		h,
+    ಪೂರ್ಣಾಙ್ಕ		w,
+    ಪೂರ್ಣಾಙ್ಕ		h,
     guicolor_T	color)
 {
     RECT	rc;
@@ -2140,17 +2140,17 @@ gui_mch_draw_part_cursor(
     /*
      * Note: FillRect() excludes right and bottom of rectangle.
      */
-    rc.left =
+    rc.ಎಡ =
 #ifdef FEAT_RIGHTLEFT
 		// vertical line should be on the right of current point
-		CURSOR_BAR_RIGHT ? FILL_X(gui.col + 1) - w :
+		CURSOR_BAR_ಬಲ ? FILL_X(gui.col + 1) - w :
 #endif
 		    FILL_X(gui.col);
-    rc.top = FILL_Y(gui.row) + gui.char_height - h;
-    rc.right = rc.left + w;
-    rc.bottom = rc.top + h;
+    rc.ತುದಿ = FILL_Y(gui.row) + gui.char_height - h;
+    rc.ಬಲ = rc.ಎಡ + w;
+    rc.bottom = rc.ತುದಿ + h;
 
-    fill_rect(&rc, NULL, color);
+    fill_rect(&rc, ರಿಕ್ತ, color);
 }
 
 
@@ -2158,57 +2158,57 @@ gui_mch_draw_part_cursor(
  * Generates a VK_SPACE when the internal dead_key flag is set to output the
  * dead key's nominal character and re-post the original message.
  */
-    static void
-outputDeadKey_rePost_Ex(MSG originalMsg, int dead_key2set)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+output_Dead_ಕೀಲಿ_re_Post_Ex(ಸಂದೇಶ_2 original_ಸಂದೇಶ, ಪೂರ್ಣಾಙ್ಕ dead_key2set)
 {
-    static MSG deadCharExpel;
+    ಸ್ಥಿರ ಸಂದೇಶ_2 deadCharExpel;
 
-    if (dead_key == DEAD_KEY_OFF)
-	return;
+    ಯದಿ (dead_ಕೀಲಿ == DEAD_ಕೀಲಿ_OFF)
+	ಪ್ರತ್ಯಾಗಮ;
 
-    dead_key = dead_key2set;
+    dead_ಕೀಲಿ = dead_key2set;
 
     // Make Windows generate the dead key's character
-    deadCharExpel.message = originalMsg.message;
-    deadCharExpel.hwnd    = originalMsg.hwnd;
+    deadCharExpel.message = original_ಸಂದೇಶ.message;
+    deadCharExpel.hwnd    = original_ಸಂದೇಶ.hwnd;
     deadCharExpel.wParam  = VK_SPACE;
 
     TranslateMessage(&deadCharExpel);
 
     // re-generate the current character free of the dead char influence
-    PostMessage(originalMsg.hwnd, originalMsg.message, originalMsg.wParam,
-							  originalMsg.lParam);
+    PostMessage(original_ಸಂದೇಶ.hwnd, original_ಸಂದೇಶ.message, original_ಸಂದೇಶ.wParam,
+							  original_ಸಂದೇಶ.lParam);
 }
 
 /*
  * Wrapper for outputDeadKey_rePost_Ex which always reset dead_key value.
  */
-    static void
-outputDeadKey_rePost(MSG originalMsg)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+output_Dead_ಕೀಲಿ_re_Post(ಸಂದೇಶ_2 original_ಸಂದೇಶ)
 {
-    outputDeadKey_rePost_Ex(originalMsg, DEAD_KEY_OFF);
+    output_Dead_ಕೀಲಿ_re_Post_Ex(original_ಸಂದೇಶ, DEAD_ಕೀಲಿ_OFF);
 }
 
 /*
  * Refactored out part of process_message(), responsible for
  * handling the case of "not a special key"
  */
-static void process_message_usual_key(UINT vk, const MSG *pmsg)
+ಸ್ಥಿರ ಶೂನ್ಯ process_message_usual_ಕೀಲಿ(UINT vk, ಧ್ರುವ ಸಂದೇಶ_2 *pmsg)
 {
     // marshal to corresponding implementation
-    keycode_trans_strategy_used->ptr_process_message_usual_key(vk, pmsg);
+    keycode_trans_strategy_used->ptr_process_message_usual_ಕೀಲಿ(vk, pmsg);
 }
 
 /*
  * Experimental implementation, introduced in v8.2.4807
  * "processing key event in Win32 GUI is not ideal"
  */
-    static void
-process_message_usual_key_experimental(UINT vk, const MSG *pmsg)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+process_message_usual_ಕೀಲಿ_experimental(UINT vk, ಧ್ರುವ ಸಂದೇಶ_2 *pmsg)
 {
     WCHAR	ch[8];
-    int		len;
-    int		i;
+    ಪೂರ್ಣಾಙ್ಕ		len;
+    ಪೂರ್ಣಾಙ್ಕ		i;
     UINT	scan_code;
     BYTE	keyboard_state[256];
 
@@ -2216,13 +2216,13 @@ process_message_usual_key_experimental(UINT vk, const MSG *pmsg)
     // really care about the presence of Ctrl/Alt as those modifiers are
     // handled by Vim separately.
     memset(keyboard_state, 0, 256);
-    if (GetKeyState(VK_SHIFT) & 0x8000)
+    ಯದಿ (Get_ಕೀಲಿ_State(VK_SHIFT) & 0x8000)
 	keyboard_state[VK_SHIFT] = 0x80;
-    if (GetKeyState(VK_CAPITAL) & 0x0001)
+    ಯದಿ (Get_ಕೀಲಿ_State(VK_CAPITAL) & 0x0001)
 	keyboard_state[VK_CAPITAL] = 0x01;
     // Alt-Gr is synthesized as Alt + Ctrl.
-    if ((GetKeyState(VK_RMENU) & 0x8000)
-				 && (GetKeyState(VK_CONTROL) & 0x8000))
+    ಯದಿ ((Get_ಕೀಲಿ_State(VK_RMENU) & 0x8000)
+				 && (Get_ಕೀಲಿ_State(VK_CONTROL) & 0x8000))
     {
 	keyboard_state[VK_MENU] = 0x80;
 	keyboard_state[VK_CONTROL] = 0x80;
@@ -2230,32 +2230,32 @@ process_message_usual_key_experimental(UINT vk, const MSG *pmsg)
 
     // Translate the virtual key according to the current keyboard
     // layout.
-    scan_code = MapVirtualKey(vk, MAPVK_VK_TO_VSC);
+    scan_code = Map_Virtual_ಕೀಲಿ(vk, MAPVK_VK_TO_VSC);
     // Convert the scan-code into a sequence of zero or more unicode
     // codepoints.
     // If this is a dead key ToUnicode returns a negative value.
     len = ToUnicode(vk, scan_code, keyboard_state, ch, ARRAY_LENGTH(ch),
 	    0);
-    if (len < 0)
-	dead_key = DEAD_KEY_SET_DEFAULT;
+    ಯದಿ (len < 0)
+	dead_ಕೀಲಿ = DEAD_ಕೀಲಿ_SET_DEFAULT;
 
-    if (len <= 0)
+    ಯದಿ (len <= 0)
     {
-	int wm_char = NUL;
+	ಪೂರ್ಣಾಙ್ಕ wm_char = NUL;
 
-	if (dead_key == DEAD_KEY_SET_DEFAULT
-		&& (GetKeyState(VK_CONTROL) & 0x8000))
+	ಯದಿ (dead_ಕೀಲಿ == DEAD_ಕೀಲಿ_SET_DEFAULT
+		&& (Get_ಕೀಲಿ_State(VK_CONTROL) & 0x8000))
 	{
-	    if (   // AZERTY CTRL+dead_circumflex
+	    ಯದಿ (   // AZERTY CTRL+dead_circumflex
 		   (vk == 221 && scan_code == 26)
 		   // QWERTZ CTRL+dead_circumflex
 		|| (vk == 220 && scan_code == 41))
 		wm_char = '[';
-	    if (   // QWERTZ CTRL+dead_two-overdots
+	    ಯದಿ (   // QWERTZ CTRL+dead_two-overdots
 		   (vk == 192 && scan_code == 27))
 		wm_char = ']';
 	}
-	if (wm_char != NUL)
+	ಯದಿ (wm_char != NUL)
 	{
 	    // post WM_CHAR='[' - which will be interpreted with CTRL
 	    // still hold as ESC
@@ -2263,20 +2263,20 @@ process_message_usual_key_experimental(UINT vk, const MSG *pmsg)
 	    // ask _OnChar() to not touch this state, wait for next key
 	    // press and maintain knowledge that we are "poisoned" with
 	    // "dead state"
-	    dead_key = DEAD_KEY_TRANSIENT_IN_ON_CHAR;
+	    dead_ಕೀಲಿ = DEAD_ಕೀಲಿ_TRANSIENT_IN_ON_CHAR;
 	}
-	return;
+	ಪ್ರತ್ಯಾಗಮ;
     }
 
     // Post the message as TranslateMessage would do.
-    if (pmsg->message == WM_KEYDOWN)
+    ಯದಿ (pmsg->message == WM_KEYDOWN)
     {
-	for (i = 0; i < len; i++)
+	ಪ್ರತಿ (i = 0; i < len; i++)
 	    PostMessageW(pmsg->hwnd, WM_CHAR, ch[i], pmsg->lParam);
     }
-    else
+    ಅನ್ಯಥಾ
     {
-	for (i = 0; i < len; i++)
+	ಪ್ರತಿ (i = 0; i < len; i++)
 	    PostMessageW(pmsg->hwnd, WM_SYSCHAR, ch[i], pmsg->lParam);
     }
 }
@@ -2284,41 +2284,41 @@ process_message_usual_key_experimental(UINT vk, const MSG *pmsg)
 /*
  * "Classic" implementation, existing prior to v8.2.4807
  */
-    static void
-process_message_usual_key_classic(UINT vk, const MSG *pmsg)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+process_message_usual_ಕೀಲಿ_classic(UINT vk, ಧ್ರುವ ಸಂದೇಶ_2 *pmsg)
 {
     char_u	string[40];
 
     // Some keys need C-S- where they should only need C-.
     // Ignore 0xff, Windows XP sends it when NUMLOCK has changed since
     // system startup (Helmut Stiegler, 2003 Oct 3).
-    if (vk != 0xff
-	    && (GetKeyState(VK_CONTROL) & 0x8000)
-	    && !(GetKeyState(VK_SHIFT) & 0x8000)
-	    && !(GetKeyState(VK_MENU) & 0x8000))
+    ಯದಿ (vk != 0xff
+	    && (Get_ಕೀಲಿ_State(VK_CONTROL) & 0x8000)
+	    && !(Get_ಕೀಲಿ_State(VK_SHIFT) & 0x8000)
+	    && !(Get_ಕೀಲಿ_State(VK_MENU) & 0x8000))
     {
 	// CTRL-6 is '^'; Japanese keyboard maps '^' to vk == 0xDE
-	if (vk == '6' || MapVirtualKey(vk, 2) == (UINT)'^')
+	ಯದಿ (vk == '6' || Map_Virtual_ಕೀಲಿ(vk, 2) == (UINT)'^')
 	{
 	    string[0] = Ctrl_HAT;
-	    add_to_input_buf(string, 1);
+	    add_to_ಒಳಹರಿವು_buf(string, 1);
 	}
 	// vk == 0xBD AZERTY for CTRL-'-', but CTRL-[ for * QWERTY!
-	else if (vk == 0xBD)	// QWERTY for CTRL-'-'
+	ಅನ್ಯಥಾ ಯದಿ (vk == 0xBD)	// QWERTY for CTRL-'-'
 	{
 	    string[0] = Ctrl__;
-	    add_to_input_buf(string, 1);
+	    add_to_ಒಳಹರಿವು_buf(string, 1);
 	}
 	// CTRL-2 is '@'; Japanese keyboard maps '@' to vk == 0xC0
-	else if (vk == '2' || MapVirtualKey(vk, 2) == (UINT)'@')
+	ಅನ್ಯಥಾ ಯದಿ (vk == '2' || Map_Virtual_ಕೀಲಿ(vk, 2) == (UINT)'@')
 	{
 	    string[0] = Ctrl_AT;
-	    add_to_input_buf(string, 1);
+	    add_to_ಒಳಹರಿವು_buf(string, 1);
 	}
-	else
+	ಅನ್ಯಥಾ
 	    TranslateMessage(pmsg);
     }
-    else
+    ಅನ್ಯಥಾ
 	TranslateMessage(pmsg);
 }
 
@@ -2326,55 +2326,55 @@ process_message_usual_key_classic(UINT vk, const MSG *pmsg)
  * Process a single Windows message.
  * If one is not available we hang until one is.
  */
-    static void
-process_message(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+process_message(ಶೂನ್ಯ)
 {
-    MSG		msg;
+    ಸಂದೇಶ_2		ಸಂದೇಶ;
     UINT	vk = 0;		// Virtual key
     char_u	string[40];
-    int		i;
-    int		modifiers = 0;
-    int		key;
+    ಪೂರ್ಣಾಙ್ಕ		i;
+    ಪೂರ್ಣಾಙ್ಕ		modifiers = 0;
+    ಪೂರ್ಣಾಙ್ಕ		ಕೀಲಿ;
 #ifdef FEAT_MENU
-    static char_u k10[] = {K_SPECIAL, 'k', ';', 0};
+    ಸ್ಥಿರ char_u k10[] = {K_SPECIAL, 'k', ';', 0};
 #endif
-    static int  keycode_trans_strategy_initialized = 0;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ  keycode_trans_strategy_initialized = 0;
 
     // lazy initialize - first time only
-    if (!keycode_trans_strategy_initialized)
+    ಯದಿ (!keycode_trans_strategy_initialized)
     {
 	keycode_trans_strategy_initialized = 1;
 	keycode_trans_strategy_init();
     }
 
-    GetMessageW(&msg, NULL, 0, 0);
+    GetMessageW(&ಸಂದೇಶ, ರಿಕ್ತ, 0, 0);
 
 #ifdef FEAT_OLE
     // Look after OLE Automation commands
-    if (msg.message == WM_OLE)
+    ಯದಿ (ಸಂದೇಶ.message == WM_OLE)
     {
-	char_u *str = (char_u *)msg.lParam;
-	if (str == NULL || *str == NUL)
+	char_u *str = (char_u *)ಸಂದೇಶ.lParam;
+	ಯದಿ (str == ರಿಕ್ತ || *str == NUL)
 	{
 	    // Message can't be ours, forward it.  Fixes problem with Ultramon
 	    // 3.0.4
-	    DispatchMessageW(&msg);
+	    DispatchMessageW(&ಸಂದೇಶ);
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
-	    add_to_input_buf(str, (int)STRLEN(str));
+	    add_to_ಒಳಹರಿವು_buf(str, (ಪೂರ್ಣಾಙ್ಕ)STRLEN(str));
 	    vim_free(str);  // was allocated in CVim::SendKeys()
 	}
-	return;
+	ಪ್ರತ್ಯಾಗಮ;
     }
 #endif
 
 #ifdef MSWIN_FIND_REPLACE
     // Don't process messages used by the dialog
-    if (s_findrep_hwnd != NULL && IsDialogMessageW(s_findrep_hwnd, &msg))
+    ಯದಿ (s_findrep_hwnd != ರಿಕ್ತ && IsDialogMessageW(s_findrep_hwnd, &ಸಂದೇಶ))
     {
-	HandleMouseHide(msg.message, msg.lParam);
-	return;
+	HandleMouseHide(ಸಂದೇಶ.message, ಸಂದೇಶ.lParam);
+	ಪ್ರತ್ಯಾಗಮ;
     }
 #endif
 
@@ -2382,9 +2382,9 @@ process_message(void)
      * Check if it's a special key that we recognise.  If not, call
      * TranslateMessage().
      */
-    if (msg.message == WM_KEYDOWN || msg.message == WM_SYSKEYDOWN)
+    ಯದಿ (ಸಂದೇಶ.message == WM_KEYDOWN || ಸಂದೇಶ.message == WM_SYSKEYDOWN)
     {
-	vk = (int) msg.wParam;
+	vk = (ಪೂರ್ಣಾಙ್ಕ) ಸಂದೇಶ.wParam;
 
 	/*
 	 * Handle dead keys in special conditions in other cases we let Windows
@@ -2405,13 +2405,13 @@ process_message(void)
 	 * We are at the moment after WM_CHAR with DEAD_KEY_SKIP_ON_CHAR event
 	 * was handled by _WndProc, this keypress we want to process normally
 	 */
-	if (keycode_trans_strategy_used->is_experimental()
-		&& dead_key == DEAD_KEY_SKIP_ON_CHAR)
+	ಯದಿ (keycode_trans_strategy_used->is_experimental()
+		&& dead_ಕೀಲಿ == DEAD_ಕೀಲಿ_SKIP_ON_CHAR)
 	{
-	    dead_key = DEAD_KEY_OFF;
+	    dead_ಕೀಲಿ = DEAD_ಕೀಲಿ_OFF;
 	}
 
-	if (dead_key != DEAD_KEY_OFF)
+	ಯದಿ (dead_ಕೀಲಿ != DEAD_ಕೀಲಿ_OFF)
 	{
 	    /*
 	     * Expel the dead key pressed with Ctrl in a special way.
@@ -2431,18 +2431,18 @@ process_message(void)
 	     * outputDeadKey_rePost() since we do not wish to reset dead_key
 	     * value.
 	     */
-	    if (keycode_trans_strategy_used->is_experimental() &&
-		    dead_key == DEAD_KEY_TRANSIENT_IN_ON_CHAR)
+	    ಯದಿ (keycode_trans_strategy_used->is_experimental() &&
+		    dead_ಕೀಲಿ == DEAD_ಕೀಲಿ_TRANSIENT_IN_ON_CHAR)
 	    {
-		outputDeadKey_rePost_Ex(msg,
-				       /*dead_key2set=*/DEAD_KEY_SKIP_ON_CHAR);
-		return;
+		output_Dead_ಕೀಲಿ_re_Post_Ex(ಸಂದೇಶ,
+				       /*dead_key2set=*/DEAD_ಕೀಲಿ_SKIP_ON_CHAR);
+		ಪ್ರತ್ಯಾಗಮ;
 	    }
 
-	    if (dead_key != DEAD_KEY_SET_DEFAULT)
+	    ಯದಿ (dead_ಕೀಲಿ != DEAD_ಕೀಲಿ_SET_DEFAULT)
 	    {
 		// should never happen - is there a way to make ASSERT here?
-		return;
+		ಪ್ರತ್ಯಾಗಮ;
 	    }
 
 	    /*
@@ -2457,44 +2457,44 @@ process_message(void)
 	     * char and VK_BACK or VK_ESCAPE. That is most likely what the
 	     * user expects.
 	     */
-	    if ((vk == VK_SPACE || vk == VK_BACK || vk == VK_ESCAPE))
+	    ಯದಿ ((vk == VK_SPACE || vk == VK_BACK || vk == VK_ESCAPE))
 	    {
-		dead_key = DEAD_KEY_OFF;
-		TranslateMessage(&msg);
-		return;
+		dead_ಕೀಲಿ = DEAD_ಕೀಲಿ_OFF;
+		TranslateMessage(&ಸಂದೇಶ);
+		ಪ್ರತ್ಯಾಗಮ;
 	    }
 	    // In modes where we are not typing, dead keys should behave
 	    // normally
-	    else if ((get_real_state()
-			    & (MODE_INSERT | MODE_CMDLINE | MODE_SELECT)) == 0)
+	    ಅನ್ಯಥಾ ಯದಿ ((get_real_state()
+			    & (MODE_ಸೇರಿಸು | MODE_CMDLINE | MODE_SELECT)) == 0)
 	    {
-		outputDeadKey_rePost(msg);
-		return;
+		output_Dead_ಕೀಲಿ_re_Post(ಸಂದೇಶ);
+		ಪ್ರತ್ಯಾಗಮ;
 	    }
 	}
 
 	// Check for CTRL-BREAK
-	if (vk == VK_CANCEL)
+	ಯದಿ (vk == VK_CANCEL)
 	{
-	    trash_input_buf();
+	    trash_ಒಳಹರಿವು_buf();
 	    got_int = TRUE;
 	    ctrl_break_was_pressed = TRUE;
 	    string[0] = Ctrl_C;
-	    add_to_input_buf(string, 1);
+	    add_to_ಒಳಹರಿವು_buf(string, 1);
 	}
 
 	// This is an IME event or a synthetic keystroke, let Windows handle it.
-	if (vk == VK_PROCESSKEY || vk == VK_PACKET)
+	ಯದಿ (vk == VK_PROCESSKEY || vk == VK_PACKET)
 	{
-	    TranslateMessage(&msg);
-	    return;
+	    TranslateMessage(&ಸಂದೇಶ);
+	    ಪ್ರತ್ಯಾಗಮ;
 	}
 
-	for (i = 0; special_keys[i].key_sym != 0; i++)
+	ಪ್ರತಿ (i = 0; special_ಕೀಲಿಗಳು[i].ಕೀಲಿ_sym != 0; i++)
 	{
 	    // ignore VK_SPACE when ALT key pressed: system menu
-	    if (special_keys[i].key_sym == vk
-		    && (vk != VK_SPACE || !(GetKeyState(VK_MENU) & 0x8000)))
+	    ಯದಿ (special_ಕೀಲಿಗಳು[i].ಕೀಲಿ_sym == vk
+		    && (vk != VK_SPACE || !(Get_ಕೀಲಿ_State(VK_MENU) & 0x8000)))
 	    {
 		/*
 		 * Behave as expected if we have a dead key and the special key
@@ -2502,83 +2502,83 @@ process_message(void)
 		 * character output (such as a NUMPAD printable character or
 		 * the TAB key, etc...).
 		 */
-		if (dead_key == DEAD_KEY_SET_DEFAULT
-			&& (special_keys[i].vim_code0 == 'K'
+		ಯದಿ (dead_ಕೀಲಿ == DEAD_ಕೀಲಿ_SET_DEFAULT
+			&& (special_ಕೀಲಿಗಳು[i].vim_code0 == 'K'
 						|| vk == VK_TAB || vk == CAR))
 		{
-		    outputDeadKey_rePost(msg);
-		    return;
+		    output_Dead_ಕೀಲಿ_re_Post(ಸಂದೇಶ);
+		    ಪ್ರತ್ಯಾಗಮ;
 		}
 
 #ifdef FEAT_MENU
 		// Check for <F10>: Windows selects the menu.  When <F10> is
 		// mapped we want to use the mapping instead.
-		if (vk == VK_F10
+		ಯದಿ (vk == VK_F10
 			&& gui.menu_is_active
 			&& check_map(k10, State, FALSE, TRUE, FALSE,
-							  NULL, NULL) == NULL)
-		    break;
+							  ರಿಕ್ತ, ರಿಕ್ತ) == ರಿಕ್ತ)
+		    ಭಙ್ಗ;
 #endif
 		modifiers = get_active_modifiers_via_ptr();
 
-		if (special_keys[i].vim_code1 == NUL)
-		    key = special_keys[i].vim_code0;
-		else
-		    key = TO_SPECIAL(special_keys[i].vim_code0,
-						   special_keys[i].vim_code1);
-		key = simplify_key(key, &modifiers);
-		if (key == CSI)
-		    key = K_CSI;
+		ಯದಿ (special_ಕೀಲಿಗಳು[i].vim_code1 == NUL)
+		    ಕೀಲಿ = special_ಕೀಲಿಗಳು[i].vim_code0;
+		ಅನ್ಯಥಾ
+		    ಕೀಲಿ = TO_SPECIAL(special_ಕೀಲಿಗಳು[i].vim_code0,
+						   special_ಕೀಲಿಗಳು[i].vim_code1);
+		ಕೀಲಿ = simplify_ಕೀಲಿ(ಕೀಲಿ, &modifiers);
+		ಯದಿ (ಕೀಲಿ == CSI)
+		    ಕೀಲಿ = K_CSI;
 
-		if (modifiers)
+		ಯದಿ (modifiers)
 		{
 		    string[0] = CSI;
 		    string[1] = KS_MODIFIER;
 		    string[2] = modifiers;
-		    add_to_input_buf(string, 3);
+		    add_to_ಒಳಹರಿವು_buf(string, 3);
 		}
 
-		if (IS_SPECIAL(key))
+		ಯದಿ (IS_SPECIAL(ಕೀಲಿ))
 		{
 		    string[0] = CSI;
-		    string[1] = K_SECOND(key);
-		    string[2] = K_THIRD(key);
-		    add_to_input_buf(string, 3);
+		    string[1] = K_SECOND(ಕೀಲಿ);
+		    string[2] = K_THIRD(ಕೀಲಿ);
+		    add_to_ಒಳಹರಿವು_buf(string, 3);
 		}
-		else
+		ಅನ್ಯಥಾ
 		{
-		    int	len;
+		    ಪೂರ್ಣಾಙ್ಕ	len;
 
 		    // Handle "key" as a Unicode character.
-		    len = char_to_string(key, string, 40, FALSE);
-		    add_to_input_buf(string, len);
+		    len = char_to_string(ಕೀಲಿ, string, 40, FALSE);
+		    add_to_ಒಳಹರಿವು_buf(string, len);
 		}
-		break;
+		ಭಙ್ಗ;
 	    }
 	}
 
 	// Not a special key.
-	if (special_keys[i].key_sym == 0)
+	ಯದಿ (special_ಕೀಲಿಗಳು[i].ಕೀಲಿ_sym == 0)
 	{
-	    process_message_usual_key(vk, &msg);
+	    process_message_usual_ಕೀಲಿ(vk, &ಸಂದೇಶ);
 	}
     }
 #ifdef FEAT_MBYTE_IME
-    else if (msg.message == WM_IME_NOTIFY)
-	_OnImeNotify(msg.hwnd, (DWORD)msg.wParam, (DWORD)msg.lParam);
-    else if (msg.message == WM_KEYUP && im_get_status())
+    ಅನ್ಯಥಾ ಯದಿ (ಸಂದೇಶ.message == WM_IME_NOTIFY)
+	_OnImeNotify(ಸಂದೇಶ.hwnd, (DWORD)ಸಂದೇಶ.wParam, (DWORD)ಸಂದೇಶ.lParam);
+    ಅನ್ಯಥಾ ಯದಿ (ಸಂದೇಶ.message == WM_KEYUP && im_get_status())
 	// added for non-MS IME (Yasuhiro Matsumoto)
-	TranslateMessage(&msg);
+	TranslateMessage(&ಸಂದೇಶ);
 #endif
 
 #ifdef FEAT_MENU
     // Check for <F10>: Default effect is to select the menu.  When <F10> is
     // mapped we need to stop it here to avoid strange effects (e.g., for the
     // key-up event)
-    if (vk != VK_F10 || check_map(k10, State, FALSE, TRUE, FALSE,
-							  NULL, NULL) == NULL)
+    ಯದಿ (vk != VK_F10 || check_map(k10, State, FALSE, TRUE, FALSE,
+							  ರಿಕ್ತ, ರಿಕ್ತ) == ರಿಕ್ತ)
 #endif
-	DispatchMessageW(&msg);
+	DispatchMessageW(&ಸಂದೇಶ);
 }
 
 /*
@@ -2587,28 +2587,28 @@ process_message(void)
  * nothing in the event queue (& no timers pending), then we return
  * immediately.
  */
-    void
-gui_mch_update(void)
+    ಶೂನ್ಯ
+gui_mch_update(ಶೂನ್ಯ)
 {
-    MSG	    msg;
+    ಸಂದೇಶ_2	    ಸಂದೇಶ;
 
-    if (!s_busy_processing)
-	while (PeekMessageW(&msg, NULL, 0, 0, PM_NOREMOVE)
-						  && !vim_is_input_buf_full())
+    ಯದಿ (!s_busy_processing)
+	ಯಾವತ್ (PeekMessageW(&ಸಂದೇಶ, ರಿಕ್ತ, 0, 0, PM_NOREMOVE)
+						  && !vim_is_ಒಳಹರಿವು_buf_full())
 	    process_message();
 }
 
-    static void
-remove_any_timer(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+remove_any_timer(ಶೂನ್ಯ)
 {
-    MSG		msg;
+    ಸಂದೇಶ_2		ಸಂದೇಶ;
 
-    if (s_wait_timer != 0 && !s_timed_out)
+    ಯದಿ (s_wait_timer != 0 && !s_timed_out)
     {
-	KillTimer(NULL, s_wait_timer);
+	KillTimer(ರಿಕ್ತ, s_wait_timer);
 
 	// Eat spurious WM_TIMER messages
-	while (PeekMessageW(&msg, s_hwnd, WM_TIMER, WM_TIMER, PM_REMOVE))
+	ಯಾವತ್ (PeekMessageW(&ಸಂದೇಶ, s_hwnd, WM_TIMER, WM_TIMER, PM_REMOVE))
 	    ;
 	s_wait_timer = 0;
     }
@@ -2618,16 +2618,16 @@ remove_any_timer(void)
 // A client message may be handled re-entrantly, e.g. during a redraw while a
 // command line is being read; inserting the keys into the typeahead buffer
 // then corrupts it. Store them here until a safe point.
-static garray_T	server_pending_ga = {0, 0, 0, 0, NULL};
+ಸ್ಥಿರ garray_T	server_pending_ga = {0, 0, 0, 0, ರಿಕ್ತ};
 
 /*
  * Store keys received from a client, to be inserted into the typeahead buffer
  * later by server_flush_input().
  */
-    void
-server_add_input(char_u *str)
+    ಶೂನ್ಯ
+server_add_ಒಳಹರಿವು(char_u *str)
 {
-    if (server_pending_ga.ga_data == NULL)
+    ಯದಿ (server_pending_ga.ga_data == ರಿಕ್ತ)
 	ga_init2(&server_pending_ga, 1, 200);
     ga_concat(&server_pending_ga, str);
 }
@@ -2637,18 +2637,18 @@ server_add_input(char_u *str)
  * buffer is empty, so that they are not mixed into a command that is currently
  * being read.
  */
-    static void
-server_flush_input(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+server_flush_ಒಳಹರಿವು(ಶೂನ್ಯ)
 {
     char_u  *str;
 
-    if (server_pending_ga.ga_len == 0 || typebuf.tb_len != 0)
-	return;
+    ಯದಿ (server_pending_ga.ga_len == 0 || typebuf.tb_len != 0)
+	ಪ್ರತ್ಯಾಗಮ;
     str = vim_strnsave(server_pending_ga.ga_data, server_pending_ga.ga_len);
     server_pending_ga.ga_len = 0;
-    if (str != NULL)
+    ಯದಿ (str != ರಿಕ್ತ)
     {
-	server_to_input_buf(str);
+	server_to_ಒಳಹರಿವು_buf(str);
 	vim_free(str);
     }
 }
@@ -2663,42 +2663,42 @@ server_flush_input(void)
  * Returns OK if a character was found to be available within the given time,
  * or FAIL otherwise.
  */
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 gui_mch_wait_for_chars(long wtime)
 {
-    int		focus;
+    ಪೂರ್ಣಾಙ್ಕ		focus;
 
     s_timed_out = FALSE;
 
-    if (wtime >= 0)
+    ಯದಿ (wtime >= 0)
     {
 	// Don't do anything while processing a (scroll) message.
-	if (s_busy_processing)
-	    return FAIL;
+	ಯದಿ (s_busy_processing)
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
 
 	// When called with "wtime" zero, just want one msec.
-	s_wait_timer = SetTimer(NULL, 0, (UINT)(wtime == 0 ? 1 : wtime),
+	s_wait_timer = SetTimer(ರಿಕ್ತ, 0, (UINT)(wtime == 0 ? 1 : wtime),
 								_OnTimer);
     }
 
     allow_scrollbar = TRUE;
 
     focus = gui.in_focus;
-    while (!s_timed_out)
+    ಯಾವತ್ (!s_timed_out)
     {
 	// Stop or start blinking when focus changes
-	if (gui.in_focus != focus)
+	ಯದಿ (gui.in_focus != focus)
 	{
-	    if (gui.in_focus)
+	    ಯದಿ (gui.in_focus)
 		gui_mch_start_blink();
-	    else
+	    ಅನ್ಯಥಾ
 		gui_mch_stop_blink(TRUE);
 	    focus = gui.in_focus;
 	}
 
-	if (s_need_activate)
+	ಯದಿ (s_need_activate)
 	{
-	    (void)SetForegroundWindow(s_hwnd);
+	    (ಶೂನ್ಯ)SetForegroundWindow(s_hwnd);
 	    s_need_activate = FALSE;
 	}
 
@@ -2707,33 +2707,33 @@ gui_mch_wait_for_chars(long wtime)
 #endif
 #ifdef MESSAGE_QUEUE
 	// Check channel I/O while waiting for a message.
-	for (;;)
+	ಪ್ರತಿ (;;)
 	{
-	    MSG msg;
+	    ಸಂದೇಶ_2 ಸಂದೇಶ;
 
 	    parse_queued_messages();
 # ifdef FEAT_CLIENTSERVER
 	    // Insert keys from a client that were postponed to this safe point.
-	    server_flush_input();
+	    server_flush_ಒಳಹರಿವು();
 # endif
 # ifdef FEAT_TIMERS
-	    if (did_add_timer)
-		break;
+	    ಯದಿ (did_add_timer)
+		ಭಙ್ಗ;
 # endif
-	    if (PeekMessageW(&msg, NULL, 0, 0, PM_NOREMOVE))
+	    ಯದಿ (PeekMessageW(&ಸಂದೇಶ, ರಿಕ್ತ, 0, 0, PM_NOREMOVE))
 	    {
 		process_message();
-		break;
+		ಭಙ್ಗ;
 	    }
-	    else if (input_available()
+	    ಅನ್ಯಥಾ ಯದಿ (ಒಳಹರಿವು_available()
 		    // TODO: The 10 msec is a compromise between laggy response
 		    // and consuming more CPU time.  Better would be to handle
 		    // channel messages when they arrive.
-		    || MsgWaitForMultipleObjects(0, NULL, FALSE, 10,
+		    || ಸಂದೇಶ_Wait_For_Multiple_Objects(0, ರಿಕ್ತ, FALSE, 10,
 						  QS_ALLINPUT) != WAIT_TIMEOUT)
-		break;
+		ಭಙ್ಗ;
 	}
-#else
+#ಅನ್ಯಥಾ
 	// Don't use gui_mch_update() because then we will spin-lock until a
 	// char arrives, instead we use GetMessage() to hang until an
 	// event arrives.  No need to check for input_buf_full because we are
@@ -2741,7 +2741,7 @@ gui_mch_wait_for_chars(long wtime)
 	process_message();
 #endif
 
-	if (input_available())
+	ಯದಿ (ಒಳಹರಿವು_available())
 	{
 	    remove_any_timer();
 	    allow_scrollbar = FALSE;
@@ -2749,35 +2749,35 @@ gui_mch_wait_for_chars(long wtime)
 	    // Clear pending mouse button, the release event may have been
 	    // taken by the dialog window.  But don't do this when getting
 	    // focus, we need the mouse-up event then.
-	    if (!s_getting_focus)
+	    ಯದಿ (!s_getting_focus)
 		s_button_pending = -1;
 
-	    return OK;
+	    ಪ್ರತ್ಯಾಗಮ OK;
 	}
 
 #ifdef FEAT_TIMERS
-	if (did_add_timer)
+	ಯದಿ (did_add_timer)
 	{
 	    // Need to recompute the waiting time.
 	    remove_any_timer();
-	    break;
+	    ಭಙ್ಗ;
 	}
 #endif
     }
     allow_scrollbar = FALSE;
-    return FAIL;
+    ಪ್ರತ್ಯಾಗಮ FAIL;
 }
 
 /*
  * Clear a rectangular region of the screen from text pos (row1, col1) to
  * (row2, col2) inclusive.
  */
-    void
+    ಶೂನ್ಯ
 gui_mch_clear_block(
-    int		row1,
-    int		col1,
-    int		row2,
-    int		col2)
+    ಪೂರ್ಣಾಙ್ಕ		row1,
+    ಪೂರ್ಣಾಙ್ಕ		col1,
+    ಪೂರ್ಣಾಙ್ಕ		row2,
+    ಪೂರ್ಣಾಙ್ಕ		col2)
 {
     RECT	rc;
 
@@ -2786,9 +2786,9 @@ gui_mch_clear_block(
      * spilled over to the window border.
      * Note: FillRect() excludes right and bottom of rectangle.
      */
-    rc.left = FILL_X(col1);
-    rc.top = FILL_Y(row1);
-    rc.right = FILL_X(col2 + 1) + (col2 == Columns - 1);
+    rc.ಎಡ = FILL_X(col1);
+    rc.ತುದಿ = FILL_Y(row1);
+    rc.ಬಲ = FILL_X(col2 + 1) + (col2 == Columns - 1);
     rc.bottom = FILL_Y(row2 + 1);
     clear_rect(&rc);
 }
@@ -2796,14 +2796,14 @@ gui_mch_clear_block(
 /*
  * Clear the whole text window.
  */
-    void
-gui_mch_clear_all(void)
+    ಶೂನ್ಯ
+gui_mch_clear_all(ಶೂನ್ಯ)
 {
     RECT    rc;
 
-    rc.left = 0;
-    rc.top = 0;
-    rc.right = Columns * gui.char_width + 2 * gui.border_width;
+    rc.ಎಡ = 0;
+    rc.ತುದಿ = 0;
+    rc.ಬಲ = Columns * gui.char_width + 2 * gui.border_width;
     rc.bottom = Rows * gui.char_height + 2 * gui.border_width;
     clear_rect(&rc);
 }
@@ -2811,32 +2811,32 @@ gui_mch_clear_all(void)
  * Menu stuff.
  */
 
-    void
-gui_mch_enable_menu(int flag)
+    ಶೂನ್ಯ
+gui_mch_enable_menu(ಪೂರ್ಣಾಙ್ಕ flag)
 {
 #ifdef FEAT_MENU
-    SetMenu(s_hwnd, flag ? s_menuBar : NULL);
+    SetMenu(s_hwnd, flag ? s_menuBar : ರಿಕ್ತ);
 #endif
 }
 
-    void
+    ಶೂನ್ಯ
 gui_mch_set_menu_pos(
-    int	    x UNUSED,
-    int	    y UNUSED,
-    int	    w UNUSED,
-    int	    h UNUSED)
+    ಪೂರ್ಣಾಙ್ಕ	    x UNUSED,
+    ಪೂರ್ಣಾಙ್ಕ	    y UNUSED,
+    ಪೂರ್ಣಾಙ್ಕ	    w UNUSED,
+    ಪೂರ್ಣಾಙ್ಕ	    h UNUSED)
 {
     // It will be in the right place anyway
 }
 
-#if defined(FEAT_MENU)
+#ಯದಿ defined(FEAT_MENU)
 /*
  * Make menu item hidden or not hidden
  */
-    void
+    ಶೂನ್ಯ
 gui_mch_menu_hidden(
     vimmenu_T	*menu,
-    int		hidden)
+    ಪೂರ್ಣಾಙ್ಕ		hidden)
 {
     /*
      * This doesn't do what we want.  Hmm, just grey the menu items for now.
@@ -2853,8 +2853,8 @@ gui_mch_menu_hidden(
 /*
  * This is called after setting all the menus to grey/hidden or not.
  */
-    void
-gui_mch_draw_menubar(void)
+    ಶೂನ್ಯ
+gui_mch_draw_menubar(ಶೂನ್ಯ)
 {
     DrawMenuBar(s_hwnd);
 }
@@ -2866,72 +2866,72 @@ gui_mch_draw_menubar(void)
     guicolor_T
 gui_mch_get_rgb(guicolor_T pixel)
 {
-    return (guicolor_T)((GetRValue(pixel) << 16) + (GetGValue(pixel) << 8)
+    ಪ್ರತ್ಯಾಗಮ (guicolor_T)((GetRValue(pixel) << 16) + (GetGValue(pixel) << 8)
 							   + GetBValue(pixel));
 }
 
-#if defined(FEAT_GUI_DIALOG)
+#ಯದಿ defined(FEAT_GUI_DIALOG)
 /*
  * Convert pixels in X to dialog units
  */
-    static WORD
-PixelToDialogX(int numPixels)
+    ಸ್ಥಿರ WORD
+PixelToDialogX(ಪೂರ್ಣಾಙ್ಕ ಅಂಕೆ_Pixels)
 {
-    return (WORD)((numPixels * 4) / s_dlgfntwidth);
+    ಪ್ರತ್ಯಾಗಮ (WORD)((ಅಂಕೆ_Pixels * 4) / s_dlgfntwidth);
 }
 
 /*
  * Convert pixels in Y to dialog units
  */
-    static WORD
-PixelToDialogY(int numPixels)
+    ಸ್ಥಿರ WORD
+PixelToDialogY(ಪೂರ್ಣಾಙ್ಕ ಅಂಕೆ_Pixels)
 {
-    return (WORD)((numPixels * 8) / s_dlgfntheight);
+    ಪ್ರತ್ಯಾಗಮ (WORD)((ಅಂಕೆ_Pixels * 8) / s_dlgfntheight);
 }
 
 /*
  * Return the width in pixels of the given text in the given DC.
  */
-    static int
-GetTextWidth(HDC hdc, char_u *str, int len)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+GetTextWidth(HDC hdc, char_u *str, ಪೂರ್ಣಾಙ್ಕ len)
 {
     SIZE    size;
 
     GetTextExtentPoint(hdc, (LPCSTR)str, len, &size);
-    return size.cx;
+    ಪ್ರತ್ಯಾಗಮ size.cx;
 }
 
 /*
  * Return the width in pixels of the given text in the given DC, taking care
  * of 'encoding' to active codepage conversion.
  */
-    static int
-GetTextWidthEnc(HDC hdc, char_u *str, int len)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+GetTextWidthEnc(HDC hdc, char_u *str, ಪೂರ್ಣಾಙ್ಕ len)
 {
     SIZE	size;
     WCHAR	*wstr;
-    int		n;
-    int		wlen = len;
+    ಪೂರ್ಣಾಙ್ಕ		n;
+    ಪೂರ್ಣಾಙ್ಕ		wlen = len;
 
     wstr = enc_to_utf16(str, &wlen);
-    if (wstr == NULL)
-	return 0;
+    ಯದಿ (wstr == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ 0;
 
     n = GetTextExtentPointW(hdc, wstr, wlen, &size);
     vim_free(wstr);
-    if (n)
-	return size.cx;
-    return 0;
+    ಯದಿ (n)
+	ಪ್ರತ್ಯಾಗಮ size.cx;
+    ಪ್ರತ್ಯಾಗಮ 0;
 }
 
-static void get_work_area(RECT *spi_rect);
+ಸ್ಥಿರ ಶೂನ್ಯ get_work_area(RECT *spi_rect);
 
 /*
  * A quick little routine that will center one window over another, handy for
  * dialog boxes.  Taken from the Win32SDK samples and modified for multiple
  * monitors.
  */
-    static BOOL
+    ಸ್ಥಿರ BOOL
 CenterWindow(
     HWND hwndChild,
     HWND hwndParent)
@@ -2939,115 +2939,115 @@ CenterWindow(
     HMONITOR	    mon;
     MONITORINFO	    moninfo;
     RECT	    rChild, rParent, rScreen;
-    int		    wChild, hChild, wParent, hParent;
-    int		    xNew, yNew;
+    ಪೂರ್ಣಾಙ್ಕ		    wChild, hChild, wParent, hParent;
+    ಪೂರ್ಣಾಙ್ಕ		    xNew, yNew;
     HDC		    hdc;
 
     GetWindowRect(hwndChild, &rChild);
-    wChild = rChild.right - rChild.left;
-    hChild = rChild.bottom - rChild.top;
+    wChild = rChild.ಬಲ - rChild.ಎಡ;
+    hChild = rChild.bottom - rChild.ತುದಿ;
 
     // If Vim is minimized put the window in the middle of the screen.
-    if (hwndParent == NULL || IsMinimized(hwndParent))
+    ಯದಿ (hwndParent == ರಿಕ್ತ || IsMinimized(hwndParent))
 	get_work_area(&rParent);
-    else
+    ಅನ್ಯಥಾ
 	GetWindowRect(hwndParent, &rParent);
-    wParent = rParent.right - rParent.left;
-    hParent = rParent.bottom - rParent.top;
+    wParent = rParent.ಬಲ - rParent.ಎಡ;
+    hParent = rParent.bottom - rParent.ತುದಿ;
 
-    moninfo.cbSize = sizeof(MONITORINFO);
+    moninfo.cbSize = ಪರಿಮಾಣ(MONITORINFO);
     mon = MonitorFromWindow(hwndChild, MONITOR_DEFAULTTOPRIMARY);
-    if (mon != NULL && GetMonitorInfo(mon, &moninfo))
+    ಯದಿ (mon != ರಿಕ್ತ && GetMonitorInfo(mon, &moninfo))
     {
 	rScreen = moninfo.rcWork;
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	hdc = GetDC(hwndChild);
-	rScreen.left = 0;
-	rScreen.top = 0;
-	rScreen.right = GetDeviceCaps(hdc, HORZRES);
+	rScreen.ಎಡ = 0;
+	rScreen.ತುದಿ = 0;
+	rScreen.ಬಲ = GetDeviceCaps(hdc, HORZRES);
 	rScreen.bottom = GetDeviceCaps(hdc, VERTRES);
 	ReleaseDC(hwndChild, hdc);
     }
 
-    xNew = rParent.left + ((wParent - wChild) / 2);
-    if (xNew < rScreen.left)
-	xNew = rScreen.left;
-    else if ((xNew + wChild) > rScreen.right)
-	xNew = rScreen.right - wChild;
+    xNew = rParent.ಎಡ + ((wParent - wChild) / 2);
+    ಯದಿ (xNew < rScreen.ಎಡ)
+	xNew = rScreen.ಎಡ;
+    ಅನ್ಯಥಾ ಯದಿ ((xNew + wChild) > rScreen.ಬಲ)
+	xNew = rScreen.ಬಲ - wChild;
 
-    yNew = rParent.top + ((hParent - hChild) / 2);
-    if (yNew < rScreen.top)
-	yNew = rScreen.top;
-    else if ((yNew + hChild) > rScreen.bottom)
+    yNew = rParent.ತುದಿ + ((hParent - hChild) / 2);
+    ಯದಿ (yNew < rScreen.ತುದಿ)
+	yNew = rScreen.ತುದಿ;
+    ಅನ್ಯಥಾ ಯದಿ ((yNew + hChild) > rScreen.bottom)
 	yNew = rScreen.bottom - hChild;
 
-    return SetWindowPos(hwndChild, NULL, xNew, yNew, 0, 0,
+    ಪ್ರತ್ಯಾಗಮ SetWindowPos(hwndChild, ರಿಕ್ತ, xNew, yNew, 0, 0,
 						   SWP_NOSIZE | SWP_NOZORDER);
 }
 #endif // FEAT_GUI_DIALOG
 
-#if defined(FEAT_TOOLBAR)
-    void
-gui_mch_show_toolbar(int showit)
+#ಯದಿ defined(FEAT_TOOLBAR)
+    ಶೂನ್ಯ
+gui_mch_show_toolbar(ಪೂರ್ಣಾಙ್ಕ showit)
 {
-    if (s_toolbarhwnd == NULL)
-	return;
+    ಯದಿ (s_toolbarhwnd == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ;
 
-    if (showit)
+    ಯದಿ (showit)
     {
 	// Enable unicode support
 	SendMessage(s_toolbarhwnd, TB_SETUNICODEFORMAT, (WPARAM)TRUE,
 								(LPARAM)0);
 	ShowWindow(s_toolbarhwnd, SW_SHOW);
     }
-    else
+    ಅನ್ಯಥಾ
 	ShowWindow(s_toolbarhwnd, SW_HIDE);
 }
 
 // The number of bitmaps is fixed.  Exit is missing!
-# define TOOLBAR_BITMAP_COUNT 31
+# define TOOLBAR_BITMAP_ಎಣಿಕೆ 31
 
 #endif
 
-#if defined(FEAT_GUI_TABLINE)
-    static void
+#ಯದಿ defined(FEAT_GUI_TABLINE)
+    ಸ್ಥಿರ ಶೂನ್ಯ
 add_tabline_popup_menu_entry(HMENU pmenu, UINT item_id, char_u *item_text)
 {
     WCHAR	    *wn;
     MENUITEMINFOW   infow;
 
-    wn = enc_to_utf16(item_text, NULL);
-    if (wn == NULL)
-	return;
+    wn = enc_to_utf16(item_text, ರಿಕ್ತ);
+    ಯದಿ (wn == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ;
 
-    infow.cbSize = sizeof(infow);
+    infow.cbSize = ಪರಿಮಾಣ(infow);
     infow.fMask = MIIM_TYPE | MIIM_ID;
     infow.wID = item_id;
     infow.fType = MFT_STRING;
     infow.dwTypeData = wn;
     infow.cch = (UINT)wcslen(wn);
-    InsertMenuItemW(pmenu, item_id, FALSE, &infow);
+    ಸೇರಿಸು_Menu_Item_W(pmenu, item_id, FALSE, &infow);
     vim_free(wn);
 }
 
-    static void
-show_tabline_popup_menu(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+show_tabline_popup_menu(ಶೂನ್ಯ)
 {
     HMENU	    tab_pmenu;
     long	    rval;
     POINT	    pt;
 
     // When ignoring events don't show the menu.
-    if (hold_gui_events || cmdwin_type != 0)
-	return;
+    ಯದಿ (hold_gui_events || cmdwin_type != 0)
+	ಪ್ರತ್ಯಾಗಮ;
 
     tab_pmenu = CreatePopupMenu();
-    if (tab_pmenu == NULL)
-	return;
+    ಯದಿ (tab_pmenu == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ;
 
-    if (first_tabpage->tp_next != NULL)
+    ಯದಿ (first_tabpage->tp_next != ರಿಕ್ತ)
 	add_tabline_popup_menu_entry(tab_pmenu,
 				TABLINE_MENU_CLOSE, (char_u *)_("Close tab"));
     add_tabline_popup_menu_entry(tab_pmenu,
@@ -3057,45 +3057,45 @@ show_tabline_popup_menu(void)
 
     GetCursorPos(&pt);
     rval = TrackPopupMenuEx(tab_pmenu, TPM_RETURNCMD, pt.x, pt.y, s_tabhwnd,
-									NULL);
+									ರಿಕ್ತ);
 
     DestroyMenu(tab_pmenu);
 
     // Add the string cmd into input buffer
-    if (rval > 0)
+    ಯದಿ (rval > 0)
     {
 	TCHITTESTINFO htinfo;
-	int idx;
+	ಪೂರ್ಣಾಙ್ಕ idx;
 
-	if (ScreenToClient(s_tabhwnd, &pt) == 0)
-	    return;
+	ಯದಿ (ScreenToClient(s_tabhwnd, &pt) == 0)
+	    ಪ್ರತ್ಯಾಗಮ;
 
 	htinfo.pt.x = pt.x;
 	htinfo.pt.y = pt.y;
 	idx = TabCtrl_HitTest(s_tabhwnd, &htinfo);
-	if (idx == -1)
+	ಯದಿ (idx == -1)
 	    idx = 0;
-	else
+	ಅನ್ಯಥಾ
 	    idx += 1;
 
-	send_tabline_menu_event(idx, (int)rval);
+	send_tabline_menu_event(idx, (ಪೂರ್ಣಾಙ್ಕ)rval);
     }
 }
 
 /*
  * Show or hide the tabline.
  */
-    void
-gui_mch_show_tabline(int showit)
+    ಶೂನ್ಯ
+gui_mch_show_tabline(ಪೂರ್ಣಾಙ್ಕ showit)
 {
-    if (s_tabhwnd == NULL)
-	return;
+    ಯದಿ (s_tabhwnd == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ;
 
-    if (!showit != !showing_tabline)
+    ಯದಿ (!showit != !showing_tabline)
     {
-	if (showit)
+	ಯದಿ (showit)
 	    ShowWindow(s_tabhwnd, SW_SHOW);
-	else
+	ಅನ್ಯಥಾ
 	    ShowWindow(s_tabhwnd, SW_HIDE);
 	showing_tabline = showit;
     }
@@ -3104,27 +3104,27 @@ gui_mch_show_tabline(int showit)
 /*
  * Return TRUE when tabline is displayed.
  */
-    int
-gui_mch_showing_tabline(void)
+    ಪೂರ್ಣಾಙ್ಕ
+gui_mch_showing_tabline(ಶೂನ್ಯ)
 {
-    return s_tabhwnd != NULL && showing_tabline;
+    ಪ್ರತ್ಯಾಗಮ s_tabhwnd != ರಿಕ್ತ && showing_tabline;
 }
 
 /*
  * Update the labels of the tabline.
  */
-    void
-gui_mch_update_tabline(void)
+    ಶೂನ್ಯ
+gui_mch_update_tabline(ಶೂನ್ಯ)
 {
     tabpage_T	*tp;
     TCITEM	tie;
-    int		nr = 0;
-    int		curtabidx = 0;
-    int		tabadded = 0;
-    WCHAR	*wstr = NULL;
+    ಪೂರ್ಣಾಙ್ಕ		nr = 0;
+    ಪೂರ್ಣಾಙ್ಕ		curtabidx = 0;
+    ಪೂರ್ಣಾಙ್ಕ		tabadded = 0;
+    WCHAR	*wstr = ರಿಕ್ತ;
 
-    if (s_tabhwnd == NULL)
-	return;
+    ಯದಿ (s_tabhwnd == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ;
 
     // Enable unicode support
     SendMessage(s_tabhwnd, CCM_SETUNICODEFORMAT, (WPARAM)TRUE, (LPARAM)0);
@@ -3136,24 +3136,24 @@ gui_mch_update_tabline(void)
     SendMessage(s_tabhwnd, WM_SETREDRAW, (WPARAM)FALSE, 0);
 
     // Add a label for each tab page.  They all contain the same text area.
-    for (tp = first_tabpage; tp != NULL; tp = tp->tp_next, ++nr)
+    ಪ್ರತಿ (tp = first_tabpage; tp != ರಿಕ್ತ; tp = tp->tp_next, ++nr)
     {
-	if (tp == curtab)
+	ಯದಿ (tp == curtab)
 	    curtabidx = nr;
 
-	if (nr >= TabCtrl_GetItemCount(s_tabhwnd))
+	ಯದಿ (nr >= Tab_Ctrl_Get_Item_ಎಣಿಕೆ(s_tabhwnd))
 	{
 	    // Add the tab
 	    tie.pszText = "-Empty-";
-	    TabCtrl_InsertItem(s_tabhwnd, nr, &tie);
+	    Tab_Ctrl_ಸೇರಿಸು_Item(s_tabhwnd, nr, &tie);
 	    tabadded = 1;
 	}
 
 	get_tabline_label(tp, FALSE);
 	tie.pszText = (LPSTR)NameBuff;
 
-	wstr = enc_to_utf16(NameBuff, NULL);
-	if (wstr != NULL)
+	wstr = enc_to_utf16(NameBuff, ರಿಕ್ತ);
+	ಯದಿ (wstr != ರಿಕ್ತ)
 	{
 	    TCITEMW		tiw;
 
@@ -3166,68 +3166,68 @@ gui_mch_update_tabline(void)
     }
 
     // Remove any old labels.
-    while (nr < TabCtrl_GetItemCount(s_tabhwnd))
+    ಯಾವತ್ (nr < Tab_Ctrl_Get_Item_ಎಣಿಕೆ(s_tabhwnd))
 	TabCtrl_DeleteItem(s_tabhwnd, nr);
 
-    if (!tabadded && TabCtrl_GetCurSel(s_tabhwnd) != curtabidx)
+    ಯದಿ (!tabadded && TabCtrl_GetCurSel(s_tabhwnd) != curtabidx)
 	TabCtrl_SetCurSel(s_tabhwnd, curtabidx);
 
     // Re-enable redraw and redraw.
     SendMessage(s_tabhwnd, WM_SETREDRAW, (WPARAM)TRUE, 0);
-    RedrawWindow(s_tabhwnd, NULL, NULL,
+    RedrawWindow(s_tabhwnd, ರಿಕ್ತ, ರಿಕ್ತ,
 		    RDW_ERASE | RDW_FRAME | RDW_INVALIDATE | RDW_ALLCHILDREN);
 
-    if (tabadded && TabCtrl_GetCurSel(s_tabhwnd) != curtabidx)
+    ಯದಿ (tabadded && TabCtrl_GetCurSel(s_tabhwnd) != curtabidx)
 	TabCtrl_SetCurSel(s_tabhwnd, curtabidx);
 }
 
 /*
  * Set the current tab to "nr".  First tab is 1.
  */
-    void
-gui_mch_set_curtab(int nr)
+    ಶೂನ್ಯ
+gui_mch_set_curtab(ಪೂರ್ಣಾಙ್ಕ nr)
 {
-    if (s_tabhwnd == NULL)
-	return;
+    ಯದಿ (s_tabhwnd == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ;
 
-    if (TabCtrl_GetCurSel(s_tabhwnd) != nr - 1)
+    ಯದಿ (TabCtrl_GetCurSel(s_tabhwnd) != nr - 1)
 	TabCtrl_SetCurSel(s_tabhwnd, nr - 1);
 }
 
 #endif
 
 #ifdef FEAT_GUI_DARKTHEME
-    void
-gui_mch_set_dark_theme(int dark)
+    ಶೂನ್ಯ
+gui_mch_set_dark_theme(ಪೂರ್ಣಾಙ್ಕ dark)
 {
-    if (pDwmSetWindowAttribute != NULL && win_version >= MAKE_VER(10, 0, 18985))
+    ಯದಿ (pDwmSetWindowAttribute != ರಿಕ್ತ && win_version >= MAKE_VER(10, 0, 18985))
 	pDwmSetWindowAttribute(s_hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &dark,
-		sizeof(dark));
+		ಪರಿಮಾಣ(dark));
 
-    if (pSetPreferredAppMode != NULL && win_version >= MAKE_VER(10, 0, 18362))
+    ಯದಿ (pSetPreferredAppMode != ರಿಕ್ತ && win_version >= MAKE_VER(10, 0, 18362))
 	pSetPreferredAppMode(dark);
 
-    if (pFlushMenuThemes != NULL && win_version >= MAKE_VER(10, 0, 18362))
+    ಯದಿ (pFlushMenuThemes != ರಿಕ್ತ && win_version >= MAKE_VER(10, 0, 18362))
 	pFlushMenuThemes();
 }
 
-    static void
-dyn_uxtheme_load(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+dyn_uxtheme_load(ಶೂನ್ಯ)
 {
     hUxThemeLib = vimLoadLib("uxtheme.dll");
-    if (hUxThemeLib == NULL)
-	return;
+    ಯದಿ (hUxThemeLib == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ;
 
     pSetPreferredAppMode = (DWORD (WINAPI *)(DWORD))
 	GetProcAddress(hUxThemeLib, MAKEINTRESOURCE(135));
-    pFlushMenuThemes = (void (WINAPI *)(void))
+    pFlushMenuThemes = (ಶೂನ್ಯ (WINAPI *)(ಶೂನ್ಯ))
 	GetProcAddress(hUxThemeLib, MAKEINTRESOURCE(136));
 
-    if (pSetPreferredAppMode == NULL || pFlushMenuThemes == NULL)
+    ಯದಿ (pSetPreferredAppMode == ರಿಕ್ತ || pFlushMenuThemes == ರಿಕ್ತ)
     {
 	FreeLibrary(hUxThemeLib);
-	hUxThemeLib = NULL;
-	return;
+	hUxThemeLib = ರಿಕ್ತ;
+	ಪ್ರತ್ಯಾಗಮ;
     }
 }
 
@@ -3237,30 +3237,30 @@ dyn_uxtheme_load(void)
  * When flag is true, set fullscreen on.
  * When flag is false, set fullscreen off.
  */
-    void
-gui_mch_set_fullscreen(int flag)
+    ಶೂನ್ಯ
+gui_mch_set_fullscreen(ಪೂರ್ಣಾಙ್ಕ flag)
 {
-    static RECT normal_rect;
-    static LONG_PTR normal_style, normal_exstyle;
+    ಸ್ಥಿರ RECT normal_rect;
+    ಸ್ಥಿರ LONG_PTR normal_style, normal_exstyle;
     HMONITOR	mon;
     MONITORINFO	moninfo;
     RECT	rc;
 
-    if (!full_screen) // Windows not set yet.
-	return;
+    ಯದಿ (!full_screen) // Windows not set yet.
+	ಪ್ರತ್ಯಾಗಮ;
 
-    if (flag)
+    ಯದಿ (flag)
     {
-	if (fullscreen_on)
-	    return;
+	ಯದಿ (fullscreen_on)
+	    ಪ್ರತ್ಯಾಗಮ;
 
 	// Enter fullscreen mode
 	GetWindowRect(s_hwnd, &rc);
 
-	moninfo.cbSize = sizeof(MONITORINFO);
+	moninfo.cbSize = ಪರಿಮಾಣ(MONITORINFO);
 	mon = MonitorFromRect(&rc, MONITOR_DEFAULTTONEAREST);
-	if (mon == NULL || !GetMonitorInfo(mon, &moninfo))
-	    return;
+	ಯದಿ (mon == ರಿಕ್ತ || !GetMonitorInfo(mon, &moninfo))
+	    ಪ್ರತ್ಯಾಗಮ;
 
 	// Save current window state
 	GetWindowRect(s_hwnd, &normal_rect);
@@ -3273,30 +3273,30 @@ gui_mch_set_fullscreen(int flag)
 	SetWindowLongPtr(s_hwnd, GWL_EXSTYLE,
 		normal_exstyle & ~(WS_EX_DLGMODALFRAME | WS_EX_WINDOWEDGE |
 		    WS_EX_CLIENTEDGE | WS_EX_STATICEDGE));
-	SetWindowPos(s_hwnd, NULL,
-		moninfo.rcMonitor.left,
-		moninfo.rcMonitor.top,
-		moninfo.rcMonitor.right - moninfo.rcMonitor.left,
-		moninfo.rcMonitor.bottom - moninfo.rcMonitor.top,
+	SetWindowPos(s_hwnd, ರಿಕ್ತ,
+		moninfo.rcMonitor.ಎಡ,
+		moninfo.rcMonitor.ತುದಿ,
+		moninfo.rcMonitor.ಬಲ - moninfo.rcMonitor.ಎಡ,
+		moninfo.rcMonitor.bottom - moninfo.rcMonitor.ತುದಿ,
 		SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
 
 	fullscreen_on = TRUE;
     }
-    else
+    ಅನ್ಯಥಾ
     {
-	if (!fullscreen_on)
-	    return;
+	ಯದಿ (!fullscreen_on)
+	    ಪ್ರತ್ಯಾಗಮ;
 
 	// Exit fullscreen mode
 	SetWindowLongPtr(s_hwnd, GWL_STYLE, normal_style);
 	SetWindowLongPtr(s_hwnd, GWL_EXSTYLE, normal_exstyle);
 
 	// Restore original window position and size
-	SetWindowPos(s_hwnd, NULL,
-		normal_rect.left,
-		normal_rect.top,
-		normal_rect.right - normal_rect.left,
-		normal_rect.bottom - normal_rect.top,
+	SetWindowPos(s_hwnd, ರಿಕ್ತ,
+		normal_rect.ಎಡ,
+		normal_rect.ತುದಿ,
+		normal_rect.ಬಲ - normal_rect.ಎಡ,
+		normal_rect.bottom - normal_rect.ತುದಿ,
 		SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
 
 	fullscreen_on = FALSE;
@@ -3306,34 +3306,34 @@ gui_mch_set_fullscreen(int flag)
 /*
  * ":simalt" command.
  */
-    void
+    ಶೂನ್ಯ
 ex_simalt(exarg_T *eap)
 {
-    char_u	*keys = eap->arg;
-    int		fill_typebuf = FALSE;
-    char_u	key_name[4];
+    char_u	*ಕೀಲಿಗಳು = eap->arg;
+    ಪೂರ್ಣಾಙ್ಕ		fill_typebuf = FALSE;
+    char_u	ಕೀಲಿ_name[4];
 
     PostMessage(s_hwnd, WM_SYSCOMMAND, (WPARAM)SC_KEYMENU, (LPARAM)0);
-    while (*keys)
+    ಯಾವತ್ (*ಕೀಲಿಗಳು)
     {
-	if (*keys == '~')
-	    *keys = ' ';	    // for showing system menu
-	PostMessage(s_hwnd, WM_CHAR, (WPARAM)*keys, (LPARAM)0);
-	keys++;
+	ಯದಿ (*ಕೀಲಿಗಳು == '~')
+	    *ಕೀಲಿಗಳು = ' ';	    // for showing system menu
+	PostMessage(s_hwnd, WM_CHAR, (WPARAM)*ಕೀಲಿಗಳು, (LPARAM)0);
+	ಕೀಲಿಗಳು++;
 	fill_typebuf = TRUE;
     }
-    if (fill_typebuf)
+    ಯದಿ (fill_typebuf)
     {
 	// Put a NOP in the typeahead buffer so that the message will get
 	// processed.
-	key_name[0] = K_SPECIAL;
-	key_name[1] = KS_EXTRA;
-	key_name[2] = KE_NOP;
-	key_name[3] = NUL;
-#if defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
+	ಕೀಲಿ_name[0] = K_SPECIAL;
+	ಕೀಲಿ_name[1] = KS_EXTRA;
+	ಕೀಲಿ_name[2] = KE_NOP;
+	ಕೀಲಿ_name[3] = NUL;
+#ಯದಿ defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
 	typebuf_was_filled = TRUE;
 #endif
-	(void)ins_typebuf(key_name, REMAP_NONE, 0, TRUE, FALSE);
+	(ಶೂನ್ಯ)ins_typebuf(ಕೀಲಿ_name, REMAP_NONE, 0, TRUE, FALSE);
     }
 }
 
@@ -3343,11 +3343,11 @@ ex_simalt(exarg_T *eap)
  * the replace dialog first, and the other way around.
  */
 #ifdef MSWIN_FIND_REPLACE
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 initialise_findrep(char_u *initial_string)
 {
-    int		wword = FALSE;
-    int		mcase = !p_ic;
+    ಪೂರ್ಣಾಙ್ಕ		wword = FALSE;
+    ಪೂರ್ಣಾಙ್ಕ		mcase = !p_ic;
     char_u	*entry_text;
 
     // Get the search string to use.
@@ -3355,16 +3355,16 @@ initialise_findrep(char_u *initial_string)
 
     s_findrep_struct.hwndOwner = s_hwnd;
     s_findrep_struct.Flags = FR_DOWN;
-    if (mcase)
+    ಯದಿ (mcase)
 	s_findrep_struct.Flags |= FR_MATCHCASE;
-    if (wword)
+    ಯದಿ (wword)
 	s_findrep_struct.Flags |= FR_WHOLEWORD;
-    if (entry_text != NULL && *entry_text != NUL)
+    ಯದಿ (entry_text != ರಿಕ್ತ && *entry_text != NUL)
     {
-	WCHAR *p = enc_to_utf16(entry_text, NULL);
-	if (p != NULL)
+	WCHAR *p = enc_to_utf16(entry_text, ರಿಕ್ತ);
+	ಯದಿ (p != ರಿಕ್ತ)
 	{
-	    int len = s_findrep_struct.wFindWhatLen - 1;
+	    ಪೂರ್ಣಾಙ್ಕ len = s_findrep_struct.wFindWhatLen - 1;
 
 	    wcsncpy(s_findrep_struct.lpstrFindWhat, p, len);
 	    s_findrep_struct.lpstrFindWhat[len] = NUL;
@@ -3375,42 +3375,42 @@ initialise_findrep(char_u *initial_string)
 }
 #endif
 
-    static void
-set_window_title(HWND hwnd, char *title)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+set_window_title(HWND hwnd, ವರ್ಣ *title)
 {
-    if (title != NULL)
+    ಯದಿ (title != ರಿಕ್ತ)
     {
 	WCHAR	*wbuf;
 
 	// Convert the title from 'encoding' to UTF-16.
-	wbuf = (WCHAR *)enc_to_utf16((char_u *)title, NULL);
-	if (wbuf != NULL)
+	wbuf = (WCHAR *)enc_to_utf16((char_u *)title, ರಿಕ್ತ);
+	ಯದಿ (wbuf != ರಿಕ್ತ)
 	{
 	    SetWindowTextW(hwnd, wbuf);
 	    vim_free(wbuf);
 	}
     }
-    else
-	(void)SetWindowTextW(hwnd, NULL);
+    ಅನ್ಯಥಾ
+	(ಶೂನ್ಯ)SetWindowTextW(hwnd, ರಿಕ್ತ);
 }
 
-    void
+    ಶೂನ್ಯ
 gui_mch_find_dialog(exarg_T *eap)
 {
 #ifdef MSWIN_FIND_REPLACE
-    if (s_findrep_msg != 0)
+    ಯದಿ (s_findrep_ಸಂದೇಶ != 0)
     {
-	if (IsWindow(s_findrep_hwnd) && !s_findrep_is_find)
+	ಯದಿ (IsWindow(s_findrep_hwnd) && !s_findrep_is_find)
 	    DestroyWindow(s_findrep_hwnd);
 
-	if (!IsWindow(s_findrep_hwnd))
+	ಯದಿ (!IsWindow(s_findrep_hwnd))
 	{
 	    initialise_findrep(eap->arg);
 	    s_findrep_hwnd = FindTextW(&s_findrep_struct);
 	}
 
 	set_window_title(s_findrep_hwnd, _("Find string"));
-	(void)SetFocus(s_findrep_hwnd);
+	(ಶೂನ್ಯ)SetFocus(s_findrep_hwnd);
 
 	s_findrep_is_find = TRUE;
     }
@@ -3418,23 +3418,23 @@ gui_mch_find_dialog(exarg_T *eap)
 }
 
 
-    void
+    ಶೂನ್ಯ
 gui_mch_replace_dialog(exarg_T *eap)
 {
 #ifdef MSWIN_FIND_REPLACE
-    if (s_findrep_msg != 0)
+    ಯದಿ (s_findrep_ಸಂದೇಶ != 0)
     {
-	if (IsWindow(s_findrep_hwnd) && s_findrep_is_find)
+	ಯದಿ (IsWindow(s_findrep_hwnd) && s_findrep_is_find)
 	    DestroyWindow(s_findrep_hwnd);
 
-	if (!IsWindow(s_findrep_hwnd))
+	ಯದಿ (!IsWindow(s_findrep_hwnd))
 	{
 	    initialise_findrep(eap->arg);
 	    s_findrep_hwnd = ReplaceTextW(&s_findrep_struct);
 	}
 
 	set_window_title(s_findrep_hwnd, _("Find & Replace"));
-	(void)SetFocus(s_findrep_hwnd);
+	(ಶೂನ್ಯ)SetFocus(s_findrep_hwnd);
 
 	s_findrep_is_find = FALSE;
     }
@@ -3445,30 +3445,30 @@ gui_mch_replace_dialog(exarg_T *eap)
 /*
  * Set visibility of the pointer.
  */
-    void
-gui_mch_mousehide(int hide)
+    ಶೂನ್ಯ
+gui_mch_mousehide(ಪೂರ್ಣಾಙ್ಕ hide)
 {
-    if (hide == gui.pointer_hidden)
-	return;
+    ಯದಿ (hide == gui.pointer_hidden)
+	ಪ್ರತ್ಯಾಗಮ;
 
     ShowCursor(!hide);
     gui.pointer_hidden = hide;
 }
 
 #ifdef FEAT_MENU
-    static void
-gui_mch_show_popupmenu_at(vimmenu_T *menu, int x, int y)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+gui_mch_show_popupmenu_at(vimmenu_T *menu, ಪೂರ್ಣಾಙ್ಕ x, ಪೂರ್ಣಾಙ್ಕ y)
 {
     // Unhide the mouse, we don't get move events here.
     gui_mch_mousehide(FALSE);
 
-    (void)TrackPopupMenu(
+    (ಶೂನ್ಯ)TrackPopupMenu(
 	(HMENU)menu->submenu_id,
 	TPM_LEFTALIGN | TPM_LEFTBUTTON,
 	x, y,
-	(int)0,	    //reserved param
+	(ಪೂರ್ಣಾಙ್ಕ)0,	    //reserved param
 	s_hwnd,
-	NULL);
+	ರಿಕ್ತ);
     /*
      * NOTE: The pop-up menu can eat the mouse up event.
      * We deal with this in normal.c.
@@ -3479,8 +3479,8 @@ gui_mch_show_popupmenu_at(vimmenu_T *menu, int x, int y)
 /*
  * Got a message when the system will go down.
  */
-    static void
-_OnEndSession(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+_OnEndSession(ಶೂನ್ಯ)
 {
     getout_preserve_modified(1);
 }
@@ -3489,7 +3489,7 @@ _OnEndSession(void)
  * Get this message when the user clicks on the cross in the top right corner
  * of a Windows95 window.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 _OnClose(HWND hwnd UNUSED)
 {
     gui_shell_closed();
@@ -3498,63 +3498,63 @@ _OnClose(HWND hwnd UNUSED)
 /*
  * Get a message when the window is being destroyed.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 _OnDestroy(HWND hwnd)
 {
-    if (!destroying)
+    ಯದಿ (!destroying)
 	_OnClose(hwnd);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 _OnPaint(
     HWND hwnd)
 {
-    if (IsMinimized(hwnd))
-	return;
+    ಯದಿ (IsMinimized(hwnd))
+	ಪ್ರತ್ಯಾಗಮ;
 
     PAINTSTRUCT ps;
 
     out_flush();	    // make sure all output has been processed
-    (void)BeginPaint(hwnd, &ps);
+    (ಶೂನ್ಯ)BeginPaint(hwnd, &ps);
 
     // prevent multi-byte characters from misprinting on an invalid
     // rectangle
-    if (has_mbyte)
+    ಯದಿ (has_mbyte)
     {
 	RECT rect;
 
 	GetClientRect(hwnd, &rect);
-	ps.rcPaint.left = rect.left;
-	ps.rcPaint.right = rect.right;
+	ps.rcPaint.ಎಡ = rect.ಎಡ;
+	ps.rcPaint.ಬಲ = rect.ಬಲ;
     }
 
-    if (!IsRectEmpty(&ps.rcPaint))
+    ಯದಿ (!IsRectEmpty(&ps.rcPaint))
     {
 	// The text area has no background brush, thus undefined pixels remain
 	// visible until the screen contents are drawn.
-	if (!screen_cleared || ScreenLines == NULL)
+	ಯದಿ (!screen_cleared || Screen_ಸಾಲುಗಳು == ರಿಕ್ತ)
 	{
 	    clear_rect(&ps.rcPaint);
 	    s_textarea_bg_only = true;
 	}
-	else
+	ಅನ್ಯಥಾ
 	    s_textarea_bg_only = false;
-	gui_redraw(ps.rcPaint.left, ps.rcPaint.top,
-		ps.rcPaint.right - ps.rcPaint.left + 1,
-		ps.rcPaint.bottom - ps.rcPaint.top + 1);
+	gui_redraw(ps.rcPaint.ಎಡ, ps.rcPaint.ತುದಿ,
+		ps.rcPaint.ಬಲ - ps.rcPaint.ಎಡ + 1,
+		ps.rcPaint.bottom - ps.rcPaint.ತುದಿ + 1);
     }
 
     EndPaint(hwnd, &ps);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 _OnSize(
     HWND hwnd,
     UINT state UNUSED,
-    int cx,
-    int cy)
+    ಪೂರ್ಣಾಙ್ಕ cx,
+    ಪೂರ್ಣಾಙ್ಕ cy)
 {
-    if (!IsMinimized(hwnd) && !s_in_dpichanged)
+    ಯದಿ (!IsMinimized(hwnd) && !s_in_dpichanged)
     {
 	gui_resize_shell(cx, cy);
 
@@ -3563,32 +3563,32 @@ _OnSize(
     }
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 _OnSetFocus(
     HWND hwnd,
     HWND hwndOldFocus)
 {
     gui_focus_change(TRUE);
     s_getting_focus = TRUE;
-    (void)DefWindowProcW(hwnd, WM_SETFOCUS, (WPARAM)hwndOldFocus, 0);
+    (ಶೂನ್ಯ)DefWindowProcW(hwnd, WM_SETFOCUS, (WPARAM)hwndOldFocus, 0);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 _OnKillFocus(
     HWND hwnd,
     HWND hwndNewFocus)
 {
-    if (destroying)
-	return;
+    ಯದಿ (destroying)
+	ಪ್ರತ್ಯಾಗಮ;
     gui_focus_change(FALSE);
     s_getting_focus = FALSE;
-    (void)DefWindowProcW(hwnd, WM_KILLFOCUS, (WPARAM)hwndNewFocus, 0);
+    (ಶೂನ್ಯ)DefWindowProcW(hwnd, WM_KILLFOCUS, (WPARAM)hwndNewFocus, 0);
 }
 
 /*
  * Get a message when the user switches back to vim
  */
-    static LRESULT
+    ಸ್ಥಿರ LRESULT
 _OnActivateApp(
     HWND hwnd,
     BOOL fActivate,
@@ -3596,10 +3596,10 @@ _OnActivateApp(
 {
     // we call gui_focus_change() in _OnSetFocus()
     // gui_focus_change((int)fActivate);
-    return DefWindowProcW(hwnd, WM_ACTIVATEAPP, fActivate, (DWORD)dwThreadId);
+    ಪ್ರತ್ಯಾಗಮ DefWindowProcW(hwnd, WM_ACTIVATEAPP, fActivate, (DWORD)dwThreadId);
 }
 
-    void
+    ಶೂನ್ಯ
 gui_mch_destroy_scrollbar(scrollbar_T *sb)
 {
     DestroyWindow(sb->id);
@@ -3608,41 +3608,41 @@ gui_mch_destroy_scrollbar(scrollbar_T *sb)
 /*
  * Get current mouse coordinates in text window.
  */
-    void
-gui_mch_getmouse(int *x, int *y)
+    ಶೂನ್ಯ
+gui_mch_getmouse(ಪೂರ್ಣಾಙ್ಕ *x, ಪೂರ್ಣಾಙ್ಕ *y)
 {
     RECT rct;
     POINT mp;
 
-    (void)GetWindowRect(s_textArea, &rct);
-    (void)GetCursorPos(&mp);
-    *x = (int)(mp.x - rct.left);
-    *y = (int)(mp.y - rct.top);
+    (ಶೂನ್ಯ)GetWindowRect(s_textArea, &rct);
+    (ಶೂನ್ಯ)GetCursorPos(&mp);
+    *x = (ಪೂರ್ಣಾಙ್ಕ)(mp.x - rct.ಎಡ);
+    *y = (ಪೂರ್ಣಾಙ್ಕ)(mp.y - rct.ತುದಿ);
 }
 
 /*
  * Move mouse pointer to character at (x, y).
  */
-    void
-gui_mch_setmouse(int x, int y)
+    ಶೂನ್ಯ
+gui_mch_setmouse(ಪೂರ್ಣಾಙ್ಕ x, ಪೂರ್ಣಾಙ್ಕ y)
 {
     RECT rct;
 
-    (void)GetWindowRect(s_textArea, &rct);
-    (void)SetCursorPos(x + gui.border_offset + rct.left,
-		       y + gui.border_offset + rct.top);
+    (ಶೂನ್ಯ)GetWindowRect(s_textArea, &rct);
+    (ಶೂನ್ಯ)SetCursorPos(x + gui.border_offset + rct.ಎಡ,
+		       y + gui.border_offset + rct.ತುದಿ);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 gui_mswin_get_valid_dimensions(
-    int w,
-    int h,
-    int *valid_w,
-    int *valid_h,
-    int *cols,
-    int *rows)
+    ಪೂರ್ಣಾಙ್ಕ w,
+    ಪೂರ್ಣಾಙ್ಕ h,
+    ಪೂರ್ಣಾಙ್ಕ *valid_w,
+    ಪೂರ್ಣಾಙ್ಕ *valid_h,
+    ಪೂರ್ಣಾಙ್ಕ *cols,
+    ಪೂರ್ಣಾಙ್ಕ *rows)
 {
-    int	    base_width, base_height;
+    ಪೂರ್ಣಾಙ್ಕ	    base_width, base_height;
 
     base_width = gui_get_base_width()
 	+ (pGetSystemMetricsForDpi(SM_CXFRAME, s_dpi) +
@@ -3658,23 +3658,23 @@ gui_mswin_get_valid_dimensions(
     *valid_h = base_height + *rows * gui.char_height;
 }
 
-    void
-gui_mch_flash(int msec)
+    ಶೂನ್ಯ
+gui_mch_flash(ಪೂರ್ಣಾಙ್ಕ msec)
 {
     RECT    rc;
 
-#if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX())
+#ಯದಿ defined(FEAT_DIRECTX)
+    ಯದಿ (IS_ENABLE_DIRECTX())
 	DWriteContext_Flush(s_dwc);
 #endif
 
     /*
      * Note: InvertRect() excludes right and bottom of rectangle.
      */
-    rc.left = 0;
-    rc.top = 0;
-    rc.right = gui.num_cols * gui.char_width;
-    rc.bottom = gui.num_rows * gui.char_height;
+    rc.ಎಡ = 0;
+    rc.ತುದಿ = 0;
+    rc.ಬಲ = gui.ಅಂಕೆ_cols * gui.char_width;
+    rc.bottom = gui.ಅಂಕೆ_rows * gui.char_height;
     InvertRect(s_hdc, &rc);
     gui_mch_flush();			// make sure it's displayed
 
@@ -3686,12 +3686,12 @@ gui_mch_flash(int msec)
 /*
  * Check if the specified point is on-screen. (multi-monitor aware)
  */
-    static BOOL
-is_point_onscreen(int x, int y)
+    ಸ್ಥಿರ BOOL
+is_point_onscreen(ಪೂರ್ಣಾಙ್ಕ x, ಪೂರ್ಣಾಙ್ಕ y)
 {
     POINT   pt = {x, y};
 
-    return MonitorFromPoint(pt, MONITOR_DEFAULTTONULL) != NULL;
+    ಪ್ರತ್ಯಾಗಮ MonitorFromPoint(pt, MONITOR_DEFAULTTONULL) != ರಿಕ್ತ;
 }
 
 /*
@@ -3701,29 +3701,29 @@ is_point_onscreen(int x, int y)
  * the window portion that is off-screen.  Scrolling by DWriteContext_Scroll()
  * only works when the whole window is on-screen.
  */
-    static BOOL
+    ಸ್ಥಿರ BOOL
 is_window_onscreen(HWND hwnd)
 {
     RECT    rc;
     POINT   p1, p2;
 
     GetClientRect(hwnd, &rc);
-    p1.x = rc.left;
-    p1.y = rc.top;
-    p2.x = rc.right - 1;
+    p1.x = rc.ಎಡ;
+    p1.y = rc.ತುದಿ;
+    p2.x = rc.ಬಲ - 1;
     p2.y = rc.bottom - 1;
     ClientToScreen(hwnd, &p1);
     ClientToScreen(hwnd, &p2);
 
-    if (!is_point_onscreen(p1.x, p1.y))
-	return FALSE;
-    if (!is_point_onscreen(p1.x, p2.y))
-	return FALSE;
-    if (!is_point_onscreen(p2.x, p1.y))
-	return FALSE;
-    if (!is_point_onscreen(p2.x, p2.y))
-	return FALSE;
-    return TRUE;
+    ಯದಿ (!is_point_onscreen(p1.x, p1.y))
+	ಪ್ರತ್ಯಾಗಮ FALSE;
+    ಯದಿ (!is_point_onscreen(p1.x, p2.y))
+	ಪ್ರತ್ಯಾಗಮ FALSE;
+    ಯದಿ (!is_point_onscreen(p2.x, p1.y))
+	ಪ್ರತ್ಯಾಗಮ FALSE;
+    ಯದಿ (!is_point_onscreen(p2.x, p2.y))
+	ಪ್ರತ್ಯಾಗಮ FALSE;
+    ಪ್ರತ್ಯಾಗಮ TRUE;
 }
 
 /*
@@ -3731,26 +3731,26 @@ is_window_onscreen(HWND hwnd)
  * The SW_INVALIDATE is required when part of the window is covered or
  * off-screen. Refer to MS KB Q75236.
  */
-    static int
-get_scroll_flags(void)
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
+get_scroll_flags(ಶೂನ್ಯ)
 {
     HWND	hwnd;
     RECT	rcVim, rcOther, rcDest;
 
     // Check if the window is (partly) off-screen.
-    if (!is_window_onscreen(s_hwnd))
-	return SW_INVALIDATE;
+    ಯದಿ (!is_window_onscreen(s_hwnd))
+	ಪ್ರತ್ಯಾಗಮ SW_INVALIDATE;
 
     // Check if there is a window (partly) on top of us.
     GetWindowRect(s_hwnd, &rcVim);
-    for (hwnd = s_hwnd; (hwnd = GetWindow(hwnd, GW_HWNDPREV)) != (HWND)0; )
-	if (IsWindowVisible(hwnd))
+    ಪ್ರತಿ (hwnd = s_hwnd; (hwnd = GetWindow(hwnd, GW_HWNDPREV)) != (HWND)0; )
+	ಯದಿ (IsWindowVisible(hwnd))
 	{
 	    GetWindowRect(hwnd, &rcOther);
-	    if (IntersectRect(&rcDest, &rcVim, &rcOther))
-		return SW_INVALIDATE;
+	    ಯದಿ (IntersectRect(&rcDest, &rcVim, &rcOther))
+		ಪ್ರತ್ಯಾಗಮ SW_INVALIDATE;
 	}
-    return 0;
+    ಪ್ರತ್ಯಾಗಮ 0;
 }
 
 /*
@@ -3761,8 +3761,8 @@ get_scroll_flags(void)
  * The problem can be avoided by calling GetPixel() to get a pixel in
  * the region before ScrollWindowEx().
  */
-    static void
-intel_gpu_workaround(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+intel_gpu_workaround(ಶೂನ್ಯ)
 {
     GetPixel(s_hdc, FILL_X(gui.col), FILL_Y(gui.row));
 }
@@ -3771,33 +3771,33 @@ intel_gpu_workaround(void)
  * Delete the given number of lines from the given row, scrolling up any
  * text further down within the scroll region.
  */
-    void
-gui_mch_delete_lines(
-    int	    row,
-    int	    num_lines)
+    ಶೂನ್ಯ
+gui_mch_delete_ಸಾಲುಗಳು(
+    ಪೂರ್ಣಾಙ್ಕ	    row,
+    ಪೂರ್ಣಾಙ್ಕ	    ಅಂಕೆ_ಸಾಲುಗಳು)
 {
     RECT	rc;
 
-    rc.left = FILL_X(gui.scroll_region_left);
-    rc.right = FILL_X(gui.scroll_region_right + 1);
-    rc.top = FILL_Y(row);
+    rc.ಎಡ = FILL_X(gui.scroll_region_ಎಡ);
+    rc.ಬಲ = FILL_X(gui.scroll_region_ಬಲ + 1);
+    rc.ತುದಿ = FILL_Y(row);
     rc.bottom = FILL_Y(gui.scroll_region_bot + 1);
 
-#if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX() && is_window_onscreen(s_hwnd))
+#ಯದಿ defined(FEAT_DIRECTX)
+    ಯದಿ (IS_ENABLE_DIRECTX() && is_window_onscreen(s_hwnd))
     {
-	DWriteContext_Scroll(s_dwc, 0, -num_lines * gui.char_height, &rc);
+	DWriteContext_Scroll(s_dwc, 0, -ಅಂಕೆ_ಸಾಲುಗಳು * gui.char_height, &rc);
     }
-    else
+    ಅನ್ಯಥಾ
 #endif
     {
-#if defined(FEAT_DIRECTX)
-	if (IS_ENABLE_DIRECTX())
+#ಯದಿ defined(FEAT_DIRECTX)
+	ಯದಿ (IS_ENABLE_DIRECTX())
 	    DWriteContext_Flush(s_dwc);
 #endif
 	intel_gpu_workaround();
-	ScrollWindowEx(s_textArea, 0, -num_lines * gui.char_height,
-				    &rc, &rc, NULL, NULL, get_scroll_flags());
+	ScrollWindowEx(s_textArea, 0, -ಅಂಕೆ_ಸಾಲುಗಳು * gui.char_height,
+				    &rc, &rc, ರಿಕ್ತ, ರಿಕ್ತ, get_scroll_flags());
 	UpdateWindow(s_textArea);
     }
 
@@ -3807,59 +3807,59 @@ gui_mch_delete_lines(
     // It's probably fixed by disabling drawing the cursor while scrolling.
     // gui.cursor_is_valid = false;
 
-    gui_clear_block(gui.scroll_region_bot - num_lines + 1,
-						       gui.scroll_region_left,
-	gui.scroll_region_bot, gui.scroll_region_right);
+    gui_clear_block(gui.scroll_region_bot - ಅಂಕೆ_ಸಾಲುಗಳು + 1,
+						       gui.scroll_region_ಎಡ,
+	gui.scroll_region_bot, gui.scroll_region_ಬಲ);
 }
 
 /*
  * Insert the given number of lines before the given row, scrolling down any
  * following text within the scroll region.
  */
-    void
-gui_mch_insert_lines(
-    int		row,
-    int		num_lines)
+    ಶೂನ್ಯ
+gui_mch_ಸೇರಿಸು_ಸಾಲುಗಳು(
+    ಪೂರ್ಣಾಙ್ಕ		row,
+    ಪೂರ್ಣಾಙ್ಕ		ಅಂಕೆ_ಸಾಲುಗಳು)
 {
     RECT	rc;
 
-    rc.left = FILL_X(gui.scroll_region_left);
-    rc.right = FILL_X(gui.scroll_region_right + 1);
-    rc.top = FILL_Y(row);
+    rc.ಎಡ = FILL_X(gui.scroll_region_ಎಡ);
+    rc.ಬಲ = FILL_X(gui.scroll_region_ಬಲ + 1);
+    rc.ತುದಿ = FILL_Y(row);
     rc.bottom = FILL_Y(gui.scroll_region_bot + 1);
 
-#if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX() && is_window_onscreen(s_hwnd))
+#ಯದಿ defined(FEAT_DIRECTX)
+    ಯದಿ (IS_ENABLE_DIRECTX() && is_window_onscreen(s_hwnd))
     {
-	DWriteContext_Scroll(s_dwc, 0, num_lines * gui.char_height, &rc);
+	DWriteContext_Scroll(s_dwc, 0, ಅಂಕೆ_ಸಾಲುಗಳು * gui.char_height, &rc);
     }
-    else
+    ಅನ್ಯಥಾ
 #endif
     {
-#if defined(FEAT_DIRECTX)
-	if (IS_ENABLE_DIRECTX())
+#ಯದಿ defined(FEAT_DIRECTX)
+	ಯದಿ (IS_ENABLE_DIRECTX())
 	    DWriteContext_Flush(s_dwc);
 #endif
 	intel_gpu_workaround();
 	// The SW_INVALIDATE is required when part of the window is covered or
 	// off-screen.  How do we avoid it when it's not needed?
-	ScrollWindowEx(s_textArea, 0, num_lines * gui.char_height,
-				    &rc, &rc, NULL, NULL, get_scroll_flags());
+	ScrollWindowEx(s_textArea, 0, ಅಂಕೆ_ಸಾಲುಗಳು * gui.char_height,
+				    &rc, &rc, ರಿಕ್ತ, ರಿಕ್ತ, get_scroll_flags());
 	UpdateWindow(s_textArea);
     }
 
-    gui_clear_block(row, gui.scroll_region_left,
-				row + num_lines - 1, gui.scroll_region_right);
+    gui_clear_block(row, gui.scroll_region_ಎಡ,
+				row + ಅಂಕೆ_ಸಾಲುಗಳು - 1, gui.scroll_region_ಬಲ);
 }
 
 
-    void
-gui_mch_exit(int rc UNUSED)
+    ಶೂನ್ಯ
+gui_mch_exit(ಪೂರ್ಣಾಙ್ಕ rc UNUSED)
 {
-#if defined(FEAT_DIRECTX)
+#ಯದಿ defined(FEAT_DIRECTX)
     DWriteContext_Close(s_dwc);
     DWrite_Final();
-    s_dwc = NULL;
+    s_dwc = ರಿಕ್ತ;
 #endif
 
     ReleaseDC(s_textArea, s_hdc);
@@ -3867,61 +3867,61 @@ gui_mch_exit(int rc UNUSED)
 
 #ifdef FEAT_TEAROFF
     // Unload the tearoff bitmap
-    (void)DeleteObject((HGDIOBJ)s_htearbitmap);
+    (ಶೂನ್ಯ)DeleteObject((HGDIOBJ)s_htearbitmap);
 #endif
 
     // Destroy our window (if we have one).
-    if (s_hwnd != NULL)
+    ಯದಿ (s_hwnd != ರಿಕ್ತ)
     {
 	destroying = TRUE;	// ignore WM_DESTROY message now
 	DestroyWindow(s_hwnd);
     }
 }
 
-    static char_u *
+    ಸ್ಥಿರ char_u *
 logfont2name(LOGFONTW lf)
 {
-    char	*charset_name;
-    char	*quality_name;
-    char	*font_name;
+    ವರ್ಣ	*charset_name;
+    ವರ್ಣ	*quality_name;
+    ವರ್ಣ	*font_name;
     size_t	res_size;
-    char	*res;
+    ವರ್ಣ	*res;
 
-    font_name = (char *)utf16_to_enc(lf.lfFaceName, NULL);
-    if (font_name == NULL)
-	return NULL;
-    charset_name = charset_id2name((int)lf.lfCharSet);
-    quality_name = quality_id2name((int)lf.lfQuality);
+    font_name = (ವರ್ಣ *)utf16_to_enc(lf.lfFaceName, ರಿಕ್ತ);
+    ಯದಿ (font_name == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
+    charset_name = charset_id2name((ಪೂರ್ಣಾಙ್ಕ)lf.lfCharSet);
+    quality_name = quality_id2name((ಪೂರ್ಣಾಙ್ಕ)lf.lfQuality);
 
     res_size = STRLEN(font_name) + 30
-		    + (charset_name == NULL ? 0 : STRLEN(charset_name) + 2)
-		    + (quality_name == NULL ? 0 : STRLEN(quality_name) + 2);
+		    + (charset_name == ರಿಕ್ತ ? 0 : STRLEN(charset_name) + 2)
+		    + (quality_name == ರಿಕ್ತ ? 0 : STRLEN(quality_name) + 2);
     res = alloc(res_size);
-    if (res != NULL)
+    ಯದಿ (res != ರಿಕ್ತ)
     {
-	char	*p;
-	int	points;
+	ವರ್ಣ	*p;
+	ಪೂರ್ಣಾಙ್ಕ	points;
 	size_t	res_len;
 
 	// replace spaces in font_name with underscores.
-	for (p = font_name; *p != NUL; ++p)
+	ಪ್ರತಿ (p = font_name; *p != NUL; ++p)
 	{
-	    if (isspace(*p))
+	    ಯದಿ (isspace(*p))
 		*p = '_';
 	}
 
 	// make a normal font string out of the lf thing:
 	points = pixels_to_points(
 			 lf.lfHeight < 0 ? -lf.lfHeight : lf.lfHeight, TRUE);
-	if (lf.lfWeight == FW_NORMAL || lf.lfWeight == FW_BOLD)
+	ಯದಿ (lf.lfWeight == FW_NORMAL || lf.lfWeight == FW_BOLD)
 	    res_len = vim_snprintf_safelen(
-		(char *)res, res_size, "%s:h%d", font_name, points);
-	else
+		(ವರ್ಣ *)res, res_size, "%s:h%d", font_name, points);
+	ಅನ್ಯಥಾ
 	    res_len = vim_snprintf_safelen(
-		(char *)res, res_size, "%s:h%d:W%ld", font_name, points, lf.lfWeight);
+		(ವರ್ಣ *)res, res_size, "%s:h%d:W%ld", font_name, points, lf.lfWeight);
 
 	res_len += vim_snprintf_safelen(
-	    (char *)res + res_len,
+	    (ವರ್ಣ *)res + res_len,
 	    res_size - res_len,
 	    "%s%s%s%s",
 	    lf.lfItalic ? ":i" : "",
@@ -3929,16 +3929,16 @@ logfont2name(LOGFONTW lf)
 	    lf.lfUnderline ? ":u" : "",
 	    lf.lfStrikeOut ? ":s" : "");
 
-	if (charset_name != NULL)
-	    res_len += vim_snprintf_safelen((char *)res + res_len,
+	ಯದಿ (charset_name != ರಿಕ್ತ)
+	    res_len += vim_snprintf_safelen((ವರ್ಣ *)res + res_len,
 		res_size - res_len, ":c%s", charset_name);
-	if (quality_name != NULL)
-	    vim_snprintf((char *)res + res_len,
+	ಯದಿ (quality_name != ರಿಕ್ತ)
+	    vim_snprintf((ವರ್ಣ *)res + res_len,
 		res_size - res_len, ":q%s", quality_name);
     }
 
     vim_free(font_name);
-    return (char_u *)res;
+    ಪ್ರತ್ಯಾಗಮ (char_u *)res;
 }
 
 
@@ -3947,20 +3947,20 @@ logfont2name(LOGFONTW lf)
  * Set correct LOGFONTW to IME.  Use 'guifontwide' if available, otherwise use
  * 'guifont'.
  */
-    static void
-update_im_font(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+update_im_font(ಶೂನ್ಯ)
 {
     LOGFONTW	lf_wide, lf;
 
-    if (p_guifontwide != NULL && *p_guifontwide != NUL
+    ಯದಿ (p_guifontwide != ರಿಕ್ತ && *p_guifontwide != NUL
 	    && gui.wide_font != NOFONT
-	    && GetObjectW((HFONT)gui.wide_font, sizeof(lf_wide), &lf_wide))
+	    && GetObjectW((HFONT)gui.wide_font, ಪರಿಮಾಣ(lf_wide), &lf_wide))
 	norm_logfont = lf_wide;
-    else
+    ಅನ್ಯಥಾ
 	norm_logfont = sub_logfont;
 
     lf = norm_logfont;
-    if (s_process_dpi_aware == DPI_AWARENESS_UNAWARE)
+    ಯದಿ (s_process_dpi_aware == DPI_AWARENESS_UNAWARE)
 	// Work around when PerMonitorV2 is not enabled in the process level.
 	lf.lfHeight = lf.lfHeight * DEFAULT_DPI / s_dpi;
     im_set_font(&lf);
@@ -3970,8 +3970,8 @@ update_im_font(void)
 /*
  * Handler of gui.wide_font (p_guifontwide) changed notification.
  */
-    void
-gui_mch_wide_font_changed(void)
+    ಶೂನ್ಯ
+gui_mch_wide_font_changed(ಶೂನ್ಯ)
 {
     LOGFONTW lf;
 
@@ -3986,20 +3986,20 @@ gui_mch_wide_font_changed(void)
     gui_mch_free_font(gui.wide_boldital_font);
     gui.wide_boldital_font = NOFONT;
 
-    if (gui.wide_font
-	&& GetObjectW((HFONT)gui.wide_font, sizeof(lf), &lf))
+    ಯದಿ (gui.wide_font
+	&& GetObjectW((HFONT)gui.wide_font, ಪರಿಮಾಣ(lf), &lf))
     {
-	if (!lf.lfItalic)
+	ಯದಿ (!lf.lfItalic)
 	{
 	    lf.lfItalic = TRUE;
 	    gui.wide_ital_font = get_font_handle(&lf);
 	    lf.lfItalic = FALSE;
 	}
-	if (lf.lfWeight < FW_BOLD)
+	ಯದಿ (lf.lfWeight < FW_BOLD)
 	{
 	    lf.lfWeight = FW_BOLD;
 	    gui.wide_bold_font = get_font_handle(&lf);
-	    if (!lf.lfItalic)
+	    ಯದಿ (!lf.lfItalic)
 	    {
 		lf.lfItalic = TRUE;
 		gui.wide_boldital_font = get_font_handle(&lf);
@@ -4012,83 +4012,83 @@ gui_mch_wide_font_changed(void)
  * Initialise vim to use the font with the given name.
  * Return FAIL if the font could not be loaded, OK otherwise.
  */
-    int
-gui_mch_init_font(char_u *font_name, int fontset UNUSED)
+    ಪೂರ್ಣಾಙ್ಕ
+gui_mch_init_font(char_u *font_name, ಪೂರ್ಣಾಙ್ಕ fontset UNUSED)
 {
     LOGFONTW	lf, lfOrig;
     GuiFont	font = NOFONT;
     char_u	*p;
 
     // Load the font
-    if (get_logfont(&lf, font_name, NULL, TRUE) == OK)
+    ಯದಿ (get_logfont(&lf, font_name, ರಿಕ್ತ, TRUE) == OK)
     {
 	lfOrig = lf;
 	lf.lfHeight = adjust_fontsize_by_dpi(lf.lfHeight);
 	font = get_font_handle(&lf);
     }
-    if (font == NOFONT)
-	return FAIL;
+    ಯದಿ (font == NOFONT)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
 
-#if defined(FEAT_DIRECTX)
+#ಯದಿ defined(FEAT_DIRECTX)
     // Parse font features from guifont (e.g., ":fss19=1:fcalt=0:fliga=1").
     {
 	DWriteFontFeature features[DWRITE_MAX_FONT_FEATURES];
-	int		    feat_count = 0;
+	ಪೂರ್ಣಾಙ್ಕ		    feat_ಎಣಿಕೆ = 0;
 	char_u		    *fp;
 
-	if (font_name != NULL)
+	ಯದಿ (font_name != ರಿಕ್ತ)
 	{
 	    // Find each ":f" option in font_name.
-	    for (fp = font_name; *fp != NUL; fp++)
+	    ಪ್ರತಿ (fp = font_name; *fp != NUL; fp++)
 	    {
-		if (*fp == ':' && *(fp + 1) == 'f')
+		ಯದಿ (*fp == ':' && *(fp + 1) == 'f')
 		{
 		    char_u tag[5];
-		    int    ti = 0;
-		    unsigned int param = 1;
+		    ಪೂರ್ಣಾಙ್ಕ    ti = 0;
+		    unsigned ಪೂರ್ಣಾಙ್ಕ param = 1;
 
 		    fp += 2;  // skip ":f"
-		    while (*fp != NUL && *fp != '=' && *fp != ':'
+		    ಯಾವತ್ (*fp != NUL && *fp != '=' && *fp != ':'
 			    && ti < 4)
 			tag[ti++] = *fp++;
 		    tag[ti] = NUL;
 
-		    if (ti != 4)
-			continue;  // invalid tag length
+		    ಯದಿ (ti != 4)
+			ಅನುವರ್ತ;  // invalid tag length
 
-		    if (*fp == '=')
+		    ಯದಿ (*fp == '=')
 		    {
 			fp++;
-			param = (unsigned int)atoi((char *)fp);
-			while (*fp >= '0' && *fp <= '9')
+			param = (unsigned ಪೂರ್ಣಾಙ್ಕ)atoi((ವರ್ಣ *)fp);
+			ಯಾವತ್ (*fp >= '0' && *fp <= '9')
 			    fp++;
 		    }
 
-		    if (feat_count < DWRITE_MAX_FONT_FEATURES)
+		    ಯದಿ (feat_ಎಣಿಕೆ < DWRITE_MAX_FONT_FEATURES)
 		    {
-			features[feat_count].tag =
-			    ((unsigned int)tag[0])
-			    | ((unsigned int)tag[1] << 8)
-			    | ((unsigned int)tag[2] << 16)
-			    | ((unsigned int)tag[3] << 24);
-			features[feat_count].parameter = param;
-			feat_count++;
+			features[feat_ಎಣಿಕೆ].tag =
+			    ((unsigned ಪೂರ್ಣಾಙ್ಕ)tag[0])
+			    | ((unsigned ಪೂರ್ಣಾಙ್ಕ)tag[1] << 8)
+			    | ((unsigned ಪೂರ್ಣಾಙ್ಕ)tag[2] << 16)
+			    | ((unsigned ಪೂರ್ಣಾಙ್ಕ)tag[3] << 24);
+			features[feat_ಎಣಿಕೆ].parameter = param;
+			feat_ಎಣಿಕೆ++;
 		    }
 
 		    fp--;  // adjust for loop increment
 		}
 	    }
 	}
-	DWriteContext_SetFontFeatures(s_dwc, features, feat_count);
+	DWriteContext_SetFontFeatures(s_dwc, features, feat_ಎಣಿಕೆ);
     }
 #endif
 
-    if (font_name == NULL)
+    ಯದಿ (font_name == ರಿಕ್ತ)
 	font_name = (char_u *)"";
 #ifdef FEAT_MBYTE_IME
     norm_logfont = lf;
     sub_logfont = lf;
-    if (!s_in_dpichanged)
+    ಯದಿ (!s_in_dpichanged)
 	update_im_font();
 #endif
     gui_mch_free_font(gui.norm_font);
@@ -4097,17 +4097,17 @@ gui_mch_init_font(char_u *font_name, int fontset UNUSED)
     UpdateFontSize(font);
 
     p = logfont2name(lfOrig);
-    if (p != NULL)
+    ಯದಿ (p != ರಿಕ್ತ)
     {
 	hl_set_font_name(p);
 
 	// When setting 'guifont' to "*" replace it with the actual font name.
-	if (STRCMP(font_name, "*") == 0 && STRCMP(p_guifont, "*") == 0)
+	ಯದಿ (STRCMP(font_name, "*") == 0 && STRCMP(p_guifont, "*") == 0)
 	{
 	    vim_free(p_guifont);
 	    p_guifont = p;
 	}
-	else
+	ಅನ್ಯಥಾ
 	    vim_free(p);
     }
 
@@ -4118,55 +4118,55 @@ gui_mch_init_font(char_u *font_name, int fontset UNUSED)
     gui_mch_free_font(gui.boldital_font);
     gui.boldital_font = NOFONT;
 
-    if (!lf.lfItalic)
+    ಯದಿ (!lf.lfItalic)
     {
 	lf.lfItalic = TRUE;
 	gui.ital_font = get_font_handle(&lf);
 	lf.lfItalic = FALSE;
     }
-    if (lf.lfWeight < FW_BOLD)
+    ಯದಿ (lf.lfWeight < FW_BOLD)
     {
 	lf.lfWeight = FW_BOLD;
 	gui.bold_font = get_font_handle(&lf);
-	if (!lf.lfItalic)
+	ಯದಿ (!lf.lfItalic)
 	{
 	    lf.lfItalic = TRUE;
 	    gui.boldital_font = get_font_handle(&lf);
 	}
     }
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Return TRUE if the GUI window is maximized, filling the whole screen.
  * Also return TRUE if the window is snapped.
  */
-    int
-gui_mch_maximized(void)
+    ಪೂರ್ಣಾಙ್ಕ
+gui_mch_maximized(ಶೂನ್ಯ)
 {
     WINDOWPLACEMENT wp;
     RECT	    rc;
 
-    wp.length = sizeof(WINDOWPLACEMENT);
-    if (GetWindowPlacement(s_hwnd, &wp))
+    wp.length = ಪರಿಮಾಣ(WINDOWPLACEMENT);
+    ಯದಿ (GetWindowPlacement(s_hwnd, &wp))
     {
-	if (wp.showCmd == SW_SHOWMAXIMIZED
+	ಯದಿ (wp.showCmd == SW_SHOWMAXIMIZED
 	    || (wp.showCmd == SW_SHOWMINIMIZED
 		    && wp.flags == WPF_RESTORETOMAXIMIZED))
-	    return TRUE;
-	if (wp.showCmd == SW_SHOWMINIMIZED)
-	    return FALSE;
+	    ಪ್ರತ್ಯಾಗಮ TRUE;
+	ಯದಿ (wp.showCmd == SW_SHOWMINIMIZED)
+	    ಪ್ರತ್ಯಾಗಮ FALSE;
 
 	// Assume the window is snapped when the sizes from two APIs differ.
 	GetWindowRect(s_hwnd, &rc);
-	if ((rc.right - rc.left !=
-		    wp.rcNormalPosition.right - wp.rcNormalPosition.left)
-		|| (rc.bottom - rc.top !=
-		    wp.rcNormalPosition.bottom - wp.rcNormalPosition.top))
-	    return TRUE;
+	ಯದಿ ((rc.ಬಲ - rc.ಎಡ !=
+		    wp.rcNormalPosition.ಬಲ - wp.rcNormalPosition.ಎಡ)
+		|| (rc.bottom - rc.ತುದಿ !=
+		    wp.rcNormalPosition.bottom - wp.rcNormalPosition.ತುದಿ))
+	    ಪ್ರತ್ಯಾಗಮ TRUE;
     }
-    return FALSE;
+    ಪ್ರತ್ಯಾಗಮ FALSE;
 }
 
 /*
@@ -4174,46 +4174,46 @@ gui_mch_maximized(void)
  * is set.  Compute the new Rows and Columns.  This is like resizing the
  * window.
  */
-    void
-gui_mch_newfont(void)
+    ಶೂನ್ಯ
+gui_mch_newfont(ಶೂನ್ಯ)
 {
     RECT	rect;
 
     GetWindowRect(s_hwnd, &rect);
-    if (win_socket_id == 0)
+    ಯದಿ (win_socket_id == 0)
     {
-	gui_resize_shell(rect.right - rect.left
+	gui_resize_shell(rect.ಬಲ - rect.ಎಡ
 	    - (pGetSystemMetricsForDpi(SM_CXFRAME, s_dpi) +
 	       pGetSystemMetricsForDpi(SM_CXPADDEDBORDER, s_dpi)) * 2,
-	    rect.bottom - rect.top
+	    rect.bottom - rect.ತುದಿ
 	    - (pGetSystemMetricsForDpi(SM_CYFRAME, s_dpi) +
 	       pGetSystemMetricsForDpi(SM_CXPADDEDBORDER, s_dpi)) * 2
 	    - pGetSystemMetricsForDpi(SM_CYCAPTION, s_dpi)
 	    - gui_mswin_get_menu_height(FALSE));
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	// Inside another window, don't use the frame and border.
-	gui_resize_shell(rect.right - rect.left,
-	    rect.bottom - rect.top - gui_mswin_get_menu_height(FALSE));
+	gui_resize_shell(rect.ಬಲ - rect.ಎಡ,
+	    rect.bottom - rect.ತುದಿ - gui_mswin_get_menu_height(FALSE));
     }
 }
 
 /*
  * Set the window title
  */
-    void
+    ಶೂನ್ಯ
 gui_mch_settitle(
     char_u  *title,
     char_u  *icon UNUSED)
 {
-    set_window_title(s_hwnd, (title == NULL ? "VIM" : (char *)title));
+    set_window_title(s_hwnd, (title == ರಿಕ್ತ ? "VIM" : (ವರ್ಣ *)title));
 }
 
-#if defined(FEAT_MOUSESHAPE)
+#ಯದಿ defined(FEAT_MOUSESHAPE)
 // Table for shape IDCs.  Keep in sync with the mshape_names[] table in
 // misc2.c!
-static LPCSTR mshape_idcs[] =
+ಸ್ಥಿರ LPCSTR mshape_idcs[] =
 {
     IDC_ARROW,			// arrow
     MAKEINTRESOURCE(0),		// blank
@@ -4234,51 +4234,51 @@ static LPCSTR mshape_idcs[] =
     IDC_ARROW			// last one
 };
 
-    void
-mch_set_mouse_shape(int shape)
+    ಶೂನ್ಯ
+mch_set_mouse_shape(ಪೂರ್ಣಾಙ್ಕ shape)
 {
     LPCSTR idc;
 
-    if (shape == MSHAPE_HIDE)
+    ಯದಿ (shape == MSHAPE_HIDE)
 	ShowCursor(FALSE);
-    else
+    ಅನ್ಯಥಾ
     {
-	if (shape >= MSHAPE_NUMBERED)
+	ಯದಿ (shape >= MSHAPE_NUMBERED)
 	    idc = IDC_ARROW;
-	else
+	ಅನ್ಯಥಾ
 	    idc = mshape_idcs[shape];
-	SetClassLongPtr(s_textArea, GCLP_HCURSOR, (LONG_PTR)LoadCursor(NULL, idc));
-	if (!p_mh)
+	SetClassLongPtr(s_textArea, GCLP_HCURSOR, (LONG_PTR)LoadCursor(ರಿಕ್ತ, idc));
+	ಯದಿ (!p_mh)
 	{
 	    POINT mp;
 
 	    // Set the position to make it redrawn with the new shape.
-	    (void)GetCursorPos(&mp);
-	    (void)SetCursorPos(mp.x, mp.y);
+	    (ಶೂನ್ಯ)GetCursorPos(&mp);
+	    (ಶೂನ್ಯ)SetCursorPos(mp.x, mp.y);
 	    ShowCursor(TRUE);
 	}
     }
 }
 #endif
 
-#if defined(FEAT_BROWSE)
+#ಯದಿ defined(FEAT_BROWSE)
 /*
  * Wide version of convert_filter().
  */
-    static WCHAR *
+    ಸ್ಥಿರ WCHAR *
 convert_filterW(char_u *s)
 {
     char_u *tmp;
-    int len;
+    ಪೂರ್ಣಾಙ್ಕ len;
     WCHAR *res;
 
     tmp = convert_filter(s);
-    if (tmp == NULL)
-	return NULL;
-    len = (int)STRLEN(s) + 3;
+    ಯದಿ (tmp == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
+    len = (ಪೂರ್ಣಾಙ್ಕ)STRLEN(s) + 3;
     res = enc_to_utf16(tmp, &len);
     vim_free(tmp);
-    return res;
+    ಪ್ರತ್ಯಾಗಮ res;
 }
 
 /*
@@ -4293,7 +4293,7 @@ convert_filterW(char_u *s)
  */
     char_u *
 gui_mch_browse(
-	int saving,
+	ಪೂರ್ಣಾಙ್ಕ saving,
 	char_u *title,
 	char_u *dflt,
 	char_u *ext,
@@ -4305,24 +4305,24 @@ gui_mch_browse(
     OPENFILENAMEW	fileStruct;
     WCHAR		fileBuf[MAXPATHL];
     WCHAR		*wp;
-    int			i;
-    WCHAR		*titlep = NULL;
-    WCHAR		*extp = NULL;
-    WCHAR		*initdirp = NULL;
+    ಪೂರ್ಣಾಙ್ಕ			i;
+    WCHAR		*titlep = ರಿಕ್ತ;
+    WCHAR		*extp = ರಿಕ್ತ;
+    WCHAR		*initdirp = ರಿಕ್ತ;
     WCHAR		*filterp;
     char_u		*p, *q;
     BOOL		ret;
 
-    if (dflt == NULL)
+    ಯದಿ (dflt == ರಿಕ್ತ)
 	fileBuf[0] = NUL;
-    else
+    ಅನ್ಯಥಾ
     {
-	wp = enc_to_utf16(dflt, NULL);
-	if (wp == NULL)
+	wp = enc_to_utf16(dflt, ರಿಕ್ತ);
+	ಯದಿ (wp == ರಿಕ್ತ)
 	    fileBuf[0] = NUL;
-	else
+	ಅನ್ಯಥಾ
 	{
-	    for (i = 0; wp[i] != NUL && i < MAXPATHL - 1; ++i)
+	    ಪ್ರತಿ (i = 0; wp[i] != NUL && i < MAXPATHL - 1; ++i)
 		fileBuf[i] = wp[i];
 	    fileBuf[i] = NUL;
 	    vim_free(wp);
@@ -4336,16 +4336,16 @@ gui_mch_browse(
 # ifdef OPENFILENAME_SIZE_VERSION_400W
     // be compatible with Windows NT 4.0
     fileStruct.lStructSize = OPENFILENAME_SIZE_VERSION_400W;
-# else
-    fileStruct.lStructSize = sizeof(fileStruct);
+# ಅನ್ಯಥಾ
+    fileStruct.lStructSize = ಪರಿಮಾಣ(fileStruct);
 # endif
 
-    if (title != NULL)
-	titlep = enc_to_utf16(title, NULL);
+    ಯದಿ (title != ರಿಕ್ತ)
+	titlep = enc_to_utf16(title, ರಿಕ್ತ);
     fileStruct.lpstrTitle = titlep;
 
-    if (ext != NULL)
-	extp = enc_to_utf16(ext, NULL);
+    ಯದಿ (ext != ರಿಕ್ತ)
+	extp = enc_to_utf16(ext, ರಿಕ್ತ);
     fileStruct.lpstrDefExt = extp;
 
     fileStruct.lpstrFile = fileBuf;
@@ -4353,14 +4353,14 @@ gui_mch_browse(
     fileStruct.lpstrFilter = filterp;
     fileStruct.hwndOwner = s_hwnd;		// main Vim window is owner
     // has an initial dir been specified?
-    if (initdir != NULL && *initdir != NUL)
+    ಯದಿ (initdir != ರಿಕ್ತ && *initdir != NUL)
     {
 	// Must have backslashes here, no matter what 'shellslash' says
-	initdirp = enc_to_utf16(initdir, NULL);
-	if (initdirp != NULL)
+	initdirp = enc_to_utf16(initdir, ರಿಕ್ತ);
+	ಯದಿ (initdirp != ರಿಕ್ತ)
 	{
-	    for (wp = initdirp; *wp != NUL; ++wp)
-		if (*wp == '/')
+	    ಪ್ರತಿ (wp = initdirp; *wp != NUL; ++wp)
+		ಯದಿ (*wp == '/')
 		    *wp = '\\';
 	}
 	fileStruct.lpstrInitialDir = initdirp;
@@ -4376,12 +4376,12 @@ gui_mch_browse(
      */
     fileStruct.Flags = (OFN_NOCHANGEDIR | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY);
 # ifdef FEAT_SHORTCUT
-    if (curbuf->b_p_bin)
+    ಯದಿ (curbuf->b_p_bin)
 	fileStruct.Flags |= OFN_NODEREFERENCELINKS;
 # endif
-    if (saving)
+    ಯದಿ (saving)
 	ret = GetSaveFileNameW(&fileStruct);
-    else
+    ಅನ್ಯಥಾ
 	ret = GetOpenFileNameW(&fileStruct);
 
     vim_free(filterp);
@@ -4389,13 +4389,13 @@ gui_mch_browse(
     vim_free(titlep);
     vim_free(extp);
 
-    if (!ret)
-	return NULL;
+    ಯದಿ (!ret)
+	ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
 
     // Convert from UTF-16 to 'encoding'.
-    p = utf16_to_enc(fileBuf, NULL);
-    if (p == NULL)
-	return NULL;
+    p = utf16_to_enc(fileBuf, ರಿಕ್ತ);
+    ಯದಿ (p == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
 
     // Give focus back to main window (when using MDI).
     SetFocus(s_hwnd);
@@ -4403,7 +4403,7 @@ gui_mch_browse(
     // Shorten the file name if possible
     q = vim_strsave(shorten_fname1(p));
     vim_free(p);
-    return q;
+    ಪ್ರತ್ಯಾಗಮ q;
 }
 
 
@@ -4414,7 +4414,7 @@ gui_mch_browse(
  *
  * Keep in sync with convert_filterW() above!
  */
-    static char_u *
+    ಸ್ಥಿರ char_u *
 convert_filter(char_u *s)
 {
     char_u	*res;
@@ -4422,19 +4422,19 @@ convert_filter(char_u *s)
     unsigned	i;
 
     res = alloc(s_len + 3);
-    if (res != NULL)
+    ಯದಿ (res != ರಿಕ್ತ)
     {
-	for (i = 0; i < s_len; ++i)
-	    if (s[i] == '\t' || s[i] == '\n')
+	ಪ್ರತಿ (i = 0; i < s_len; ++i)
+	    ಯದಿ (s[i] == '\t' || s[i] == '\n')
 		res[i] = '\0';
-	    else
+	    ಅನ್ಯಥಾ
 		res[i] = s[i];
 	res[s_len] = NUL;
 	// Add two extra NULs to make sure it's properly terminated.
 	res[s_len + 1] = NUL;
 	res[s_len + 2] = NUL;
     }
-    return res;
+    ಪ್ರತ್ಯಾಗಮ res;
 }
 
 /*
@@ -4445,12 +4445,12 @@ gui_mch_browsedir(char_u *title, char_u *initdir)
 {
     // We fake this: Use a filter that doesn't select anything and a default
     // file name that won't be used.
-    return gui_mch_browse(0, title, (char_u *)_("Not Used"), NULL,
+    ಪ್ರತ್ಯಾಗಮ gui_mch_browse(0, title, (char_u *)_("Not Used"), ರಿಕ್ತ,
 			      initdir, (char_u *)_("Directory\t*.nothing\n"));
 }
 #endif // FEAT_BROWSE
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 _OnDropFiles(
     HWND hwnd UNUSED,
     HDROP hDrop)
@@ -4458,8 +4458,8 @@ _OnDropFiles(
 #define BUFPATHLEN _MAX_PATH
 #define DRAGQVAL 0xFFFFFFFF
     WCHAR   wszFile[BUFPATHLEN];
-    char    szFile[BUFPATHLEN];
-    UINT    cFiles = DragQueryFile(hDrop, DRAGQVAL, NULL, 0);
+    ವರ್ಣ    szFile[BUFPATHLEN];
+    UINT    cFiles = DragQueryFile(hDrop, DRAGQVAL, ರಿಕ್ತ, 0);
     UINT    i;
     char_u  **fnames;
     POINT   pt;
@@ -4473,12 +4473,12 @@ _OnDropFiles(
 
     fnames = ALLOC_MULT(char_u *, cFiles);
 
-    if (fnames != NULL)
-	for (i = 0; i < cFiles; ++i)
+    ಯದಿ (fnames != ರಿಕ್ತ)
+	ಪ್ರತಿ (i = 0; i < cFiles; ++i)
 	{
-	    if (DragQueryFileW(hDrop, i, wszFile, BUFPATHLEN) > 0)
-		fnames[i] = utf16_to_enc(wszFile, NULL);
-	    else
+	    ಯದಿ (DragQueryFileW(hDrop, i, wszFile, BUFPATHLEN) > 0)
+		fnames[i] = utf16_to_enc(wszFile, ರಿಕ್ತ);
+	    ಅನ್ಯಥಾ
 	    {
 		DragQueryFile(hDrop, i, szFile, BUFPATHLEN);
 		fnames[i] = vim_strsave((char_u *)szFile);
@@ -4487,16 +4487,16 @@ _OnDropFiles(
 
     DragFinish(hDrop);
 
-    if (fnames == NULL)
-	return;
+    ಯದಿ (fnames == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ;
 
-    int kbd_modifiers = get_active_modifiers();
+    ಪೂರ್ಣಾಙ್ಕ kbd_modifiers = get_active_modifiers();
 
-    if ((kbd_modifiers & MOD_MASK_SHIFT) != 0)
+    ಯದಿ ((kbd_modifiers & MOD_MASK_SHIFT) != 0)
 	modifiers |= MOUSE_SHIFT;
-    if ((kbd_modifiers & MOD_MASK_CTRL) != 0)
+    ಯದಿ ((kbd_modifiers & MOD_MASK_CTRL) != 0)
 	modifiers |= MOUSE_CTRL;
-    if ((kbd_modifiers & MOD_MASK_ALT) != 0)
+    ಯದಿ ((kbd_modifiers & MOD_MASK_ALT) != 0)
 	modifiers |= MOUSE_ALT;
 
     gui_handle_drop(pt.x, pt.y, modifiers, fnames, cFiles);
@@ -4504,28 +4504,28 @@ _OnDropFiles(
     s_need_activate = TRUE;
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
 _OnScroll(
     HWND hwnd UNUSED,
     HWND hwndCtl,
     UINT code,
-    int pos)
+    ಪೂರ್ಣಾಙ್ಕ pos)
 {
-    static UINT	prev_code = 0;   // code of previous call
+    ಸ್ಥಿರ UINT	prev_code = 0;   // code of previous call
     scrollbar_T *sb, *sb_info;
     long	val;
-    int		dragging = FALSE;
-    int		dont_scroll_save = dont_scroll;
+    ಪೂರ್ಣಾಙ್ಕ		dragging = FALSE;
+    ಪೂರ್ಣಾಙ್ಕ		dont_scroll_save = dont_scroll;
     SCROLLINFO	si;
 
-    si.cbSize = sizeof(si);
+    si.cbSize = ಪರಿಮಾಣ(si);
     si.fMask = SIF_POS;
 
     sb = gui_mswin_find_scrollbar(hwndCtl);
-    if (sb == NULL)
-	return 0;
+    ಯದಿ (sb == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ 0;
 
-    if (sb->wp != NULL)		// Left or right scrollbar
+    ಯದಿ (sb->wp != ರಿಕ್ತ)		// Left or right scrollbar
     {
 	/*
 	 * Careful: need to get scrollbar info out of first (left) scrollbar
@@ -4534,38 +4534,38 @@ _OnScroll(
 	 */
 	sb_info = &sb->wp->w_scrollbars[0];
     }
-    else	    // Bottom scrollbar
+    ಅನ್ಯಥಾ	    // Bottom scrollbar
 	sb_info = sb;
-    val = sb_info->value;
+    val = sb_info->ಮೌಲ್ಯ;
 
-    switch (code)
+    ವಿಕಲ್ಪ (code)
     {
-	case SB_THUMBTRACK:
+	ಪಕ್ಷ SB_THUMBTRACK:
 	    val = pos;
 	    dragging = TRUE;
-	    if (sb->scroll_shift > 0)
+	    ಯದಿ (sb->scroll_shift > 0)
 		val <<= sb->scroll_shift;
-	    break;
-	case SB_LINEDOWN:
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ SB_LINEDOWN:
 	    val++;
-	    break;
-	case SB_LINEUP:
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ SB_LINEUP:
 	    val--;
-	    break;
-	case SB_PAGEDOWN:
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ SB_PAGEDOWN:
 	    val += (sb_info->size > 2 ? sb_info->size - 2 : 1);
-	    break;
-	case SB_PAGEUP:
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ SB_PAGEUP:
 	    val -= (sb_info->size > 2 ? sb_info->size - 2 : 1);
-	    break;
-	case SB_TOP:
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ SB_ತುದಿ:
 	    val = 0;
-	    break;
-	case SB_BOTTOM:
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ SB_BOTTOM:
 	    val = sb_info->max;
-	    break;
-	case SB_ENDSCROLL:
-	    if (prev_code == SB_THUMBTRACK)
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ SB_ENDSCROLL:
+	    ಯದಿ (prev_code == SB_THUMBTRACK)
 	    {
 		/*
 		 * "pos" only gives us 16-bit data.  In case of large file,
@@ -4573,14 +4573,14 @@ _OnScroll(
 		 * is not valid while the scrollbar is being dragged.
 		 */
 		val = GetScrollPos(hwndCtl, SB_CTL);
-		if (sb->scroll_shift > 0)
+		ಯದಿ (sb->scroll_shift > 0)
 		    val <<= sb->scroll_shift;
 	    }
-	    break;
+	    ಭಙ್ಗ;
 
-	default:
+	ಸ್ವಭಾವ:
 	    // TRACE("Unknown scrollbar event %d\n", code);
-	    return 0;
+	    ಪ್ರತ್ಯಾಗಮ 0;
     }
     prev_code = code;
 
@@ -4590,10 +4590,10 @@ _OnScroll(
     /*
      * When moving a vertical scrollbar, move the other vertical scrollbar too.
      */
-    if (sb->wp != NULL)
+    ಯದಿ (sb->wp != ರಿಕ್ತ)
     {
 	scrollbar_T *sba = sb->wp->w_scrollbars;
-	HWND    id = sba[ (sb == sba + SBAR_LEFT) ? SBAR_RIGHT : SBAR_LEFT].id;
+	HWND    id = sba[ (sb == sba + SBAR_ಎಡ) ? SBAR_ಬಲ : SBAR_ಎಡ].id;
 
 	SetScrollInfo(id, SB_CTL, &si, TRUE);
     }
@@ -4613,7 +4613,7 @@ _OnScroll(
     s_busy_processing = FALSE;
     dont_scroll = dont_scroll_save;
 
-    return 0;
+    ಪ್ರತ್ಯಾಗಮ 0;
 }
 
 
@@ -4634,16 +4634,16 @@ _OnScroll(
 # define ID_BEVAL_TOOLTIP   200
 # define BEVAL_TEXT_LEN	    MAXPATHL
 
-static BalloonEval  *cur_beval = NULL;
-static UINT_PTR	    beval_timer_id = 0;
-static DWORD	    last_user_activity = 0;
+ಸ್ಥಿರ BalloonEval  *cur_beval = ರಿಕ್ತ;
+ಸ್ಥಿರ UINT_PTR	    beval_timer_id = 0;
+ಸ್ಥಿರ DWORD	    last_user_activity = 0;
 #endif // defined(FEAT_BEVAL_GUI)
 
 
 // Local variables:
 
 #ifdef FEAT_MENU
-static UINT	s_menu_id = 100;
+ಸ್ಥಿರ UINT	s_menu_id = 100;
 #endif
 
 /*
@@ -4663,7 +4663,7 @@ static UINT	s_menu_id = 100;
 /*
  * stuff for dialogs, menus, tearoffs etc.
  */
-static PWORD
+ಸ್ಥಿರ PWORD
 add_dialog_element(
 	PWORD p,
 	DWORD lStyle,
@@ -4673,58 +4673,58 @@ add_dialog_element(
 	WORD h,
 	WORD Id,
 	WORD clss,
-	const char *caption);
-static LPWORD lpwAlign(LPWORD);
-static int nCopyAnsiToWideChar(LPWORD, LPSTR, BOOL);
-#if defined(FEAT_MENU) && defined(FEAT_TEAROFF)
-static void gui_mch_tearoff(char_u *title, vimmenu_T *menu, int initX, int initY);
+	ಧ್ರುವ ವರ್ಣ *caption);
+ಸ್ಥಿರ LPWORD lpwAlign(LPWORD);
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ nCopyAnsiToWideChar(LPWORD, LPSTR, BOOL);
+#ಯದಿ defined(FEAT_MENU) && defined(FEAT_TEAROFF)
+ಸ್ಥಿರ ಶೂನ್ಯ gui_mch_tearoff(char_u *title, vimmenu_T *menu, ಪೂರ್ಣಾಙ್ಕ initX, ಪೂರ್ಣಾಙ್ಕ initY);
 #endif
-static void get_dialog_font_metrics(void);
+ಸ್ಥಿರ ಶೂನ್ಯ get_dialog_font_metrics(ಶೂನ್ಯ);
 
-static int dialog_default_button = -1;
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ dialog_default_button = -1;
 
 #ifdef FEAT_TOOLBAR
-static void initialise_toolbar(void);
-static void update_toolbar_size(void);
-static LRESULT CALLBACK toolbar_wndproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-static int get_toolbar_bitmap(vimmenu_T *menu);
-#else
+ಸ್ಥಿರ ಶೂನ್ಯ initialise_toolbar(ಶೂನ್ಯ);
+ಸ್ಥಿರ ಶೂನ್ಯ update_toolbar_size(ಶೂನ್ಯ);
+ಸ್ಥಿರ LRESULT CALLBACK toolbar_wndproc(HWND hwnd, UINT u_ಸಂದೇಶ, WPARAM wParam, LPARAM lParam);
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ get_toolbar_bitmap(vimmenu_T *menu);
+#ಅನ್ಯಥಾ
 # define update_toolbar_size()
 #endif
 
 #ifdef FEAT_GUI_TABLINE
-static void initialise_tabline(void);
-static LRESULT CALLBACK tabline_wndproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+ಸ್ಥಿರ ಶೂನ್ಯ initialise_tabline(ಶೂನ್ಯ);
+ಸ್ಥಿರ LRESULT CALLBACK tabline_wndproc(HWND hwnd, UINT u_ಸಂದೇಶ, WPARAM wParam, LPARAM lParam);
 #endif
 
 #ifdef FEAT_MBYTE_IME
-static LRESULT _OnImeComposition(HWND hwnd, WPARAM dbcs, LPARAM param);
-static char_u *GetResultStr(HWND hwnd, int GCS, int *lenp);
+ಸ್ಥಿರ LRESULT _OnImeComposition(HWND hwnd, WPARAM dbcs, LPARAM param);
+ಸ್ಥಿರ char_u *GetResultStr(HWND hwnd, ಪೂರ್ಣಾಙ್ಕ GCS, ಪೂರ್ಣಾಙ್ಕ *lenp);
 #endif
-#if defined(FEAT_MBYTE_IME) && defined(DYNAMIC_IME)
+#ಯದಿ defined(FEAT_MBYTE_IME) && defined(DYNAMIC_IME)
 # ifdef NOIME
-typedef struct tagCOMPOSITIONFORM {
+ಪ್ರಕಾರನಿರ್ದೇಶ ಸಂರಚನಾ tagCOMPOSITIONFORM {
     DWORD dwStyle;
     POINT ptCurrentPos;
     RECT  rcArea;
 } COMPOSITIONFORM, *PCOMPOSITIONFORM, NEAR *NPCOMPOSITIONFORM, FAR *LPCOMPOSITIONFORM;
-typedef HANDLE HIMC;
+ಪ್ರಕಾರನಿರ್ದೇಶ HANDLE HIMC;
 # endif
 
-static HINSTANCE hLibImm = NULL;
-static LONG (WINAPI *pImmGetCompositionStringW)(HIMC, DWORD, LPVOID, DWORD);
-static HIMC (WINAPI *pImmGetContext)(HWND);
-static HIMC (WINAPI *pImmAssociateContext)(HWND, HIMC);
-static BOOL (WINAPI *pImmReleaseContext)(HWND, HIMC);
-static BOOL (WINAPI *pImmGetOpenStatus)(HIMC);
-static BOOL (WINAPI *pImmSetOpenStatus)(HIMC, BOOL);
-static BOOL (WINAPI *pImmGetCompositionFontW)(HIMC, LPLOGFONTW);
-static BOOL (WINAPI *pImmSetCompositionFontW)(HIMC, LPLOGFONTW);
-static BOOL (WINAPI *pImmSetCompositionWindow)(HIMC, LPCOMPOSITIONFORM);
-static BOOL (WINAPI *pImmGetConversionStatus)(HIMC, LPDWORD, LPDWORD);
-static BOOL (WINAPI *pImmSetConversionStatus)(HIMC, DWORD, DWORD);
-static void dyn_imm_load(void);
-#else
+ಸ್ಥಿರ HINSTANCE hLibImm = ರಿಕ್ತ;
+ಸ್ಥಿರ LONG (WINAPI *pImmGetCompositionStringW)(HIMC, DWORD, LPVOID, DWORD);
+ಸ್ಥಿರ HIMC (WINAPI *pImmGetContext)(HWND);
+ಸ್ಥಿರ HIMC (WINAPI *pImmAssociateContext)(HWND, HIMC);
+ಸ್ಥಿರ BOOL (WINAPI *pImmReleaseContext)(HWND, HIMC);
+ಸ್ಥಿರ BOOL (WINAPI *pImmGetOpenStatus)(HIMC);
+ಸ್ಥಿರ BOOL (WINAPI *pImmSetOpenStatus)(HIMC, BOOL);
+ಸ್ಥಿರ BOOL (WINAPI *pImmGetCompositionFontW)(HIMC, LPLOGFONTW);
+ಸ್ಥಿರ BOOL (WINAPI *pImmSetCompositionFontW)(HIMC, LPLOGFONTW);
+ಸ್ಥಿರ BOOL (WINAPI *pImmSetCompositionWindow)(HIMC, LPCOMPOSITIONFORM);
+ಸ್ಥಿರ BOOL (WINAPI *pImmGetConversionStatus)(HIMC, LPDWORD, LPDWORD);
+ಸ್ಥಿರ BOOL (WINAPI *pImmSetConversionStatus)(HIMC, DWORD, DWORD);
+ಸ್ಥಿರ ಶೂನ್ಯ dyn_imm_load(ಶೂನ್ಯ);
+#ಅನ್ಯಥಾ
 # define pImmGetCompositionStringW ImmGetCompositionStringW
 # define pImmGetContext		  ImmGetContext
 # define pImmAssociateContext	  ImmAssociateContext
@@ -4742,24 +4742,24 @@ static void dyn_imm_load(void);
 /*
  * Figure out how high the menu bar is at the moment.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
 gui_mswin_get_menu_height(
-    int	    fix_window)	    // If TRUE, resize window if menu height changed
+    ಪೂರ್ಣಾಙ್ಕ	    fix_window)	    // If TRUE, resize window if menu height changed
 {
-    static int	old_menu_height = -1;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ	old_menu_height = -1;
 
     RECT    rc1, rc2;
-    int	    num;
-    int	    menu_height;
+    ಪೂರ್ಣಾಙ್ಕ	    ಅಂಕೆ;
+    ಪೂರ್ಣಾಙ್ಕ	    menu_height;
 
-    if (gui.menu_is_active)
-	num = GetMenuItemCount(s_menuBar);
-    else
-	num = 0;
+    ಯದಿ (gui.menu_is_active)
+	ಅಂಕೆ = Get_Menu_Item_ಎಣಿಕೆ(s_menuBar);
+    ಅನ್ಯಥಾ
+	ಅಂಕೆ = 0;
 
-    if (num == 0)
+    ಯದಿ (ಅಂಕೆ == 0)
 	menu_height = 0;
-    else if (IsMinimized(s_hwnd))
+    ಅನ್ಯಥಾ ಯದಿ (IsMinimized(s_hwnd))
     {
 	// The height of the menu cannot be determined while the window is
 	// minimized.  Take the previous height if the menu is changed in that
@@ -4767,7 +4767,7 @@ gui_mswin_get_menu_height(
 	// increases due to the unaccounted-for menu height.
 	menu_height = old_menu_height == -1 ? 0 : old_menu_height;
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	/*
 	 * In case 'lines' is set in _vimrc/_gvimrc window width doesn't
@@ -4777,20 +4777,20 @@ gui_mswin_get_menu_height(
 	 * should wrap over more than one line.
 	 */
 	GetMenuItemRect(s_hwnd, s_menuBar, 0, &rc1);
-	if (gui.starting)
-	    menu_height = rc1.bottom - rc1.top + 1;
-	else
+	ಯದಿ (gui.starting)
+	    menu_height = rc1.bottom - rc1.ತುದಿ + 1;
+	ಅನ್ಯಥಾ
 	{
-	    GetMenuItemRect(s_hwnd, s_menuBar, num - 1, &rc2);
-	    menu_height = rc2.bottom - rc1.top + 1;
+	    GetMenuItemRect(s_hwnd, s_menuBar, ಅಂಕೆ - 1, &rc2);
+	    menu_height = rc2.bottom - rc1.ತುದಿ + 1;
 	}
     }
 
-    if (fix_window && menu_height != old_menu_height)
+    ಯದಿ (fix_window && menu_height != old_menu_height)
 	gui_set_shellsize(FALSE, FALSE, RESIZE_VERT);
     old_menu_height = menu_height;
 
-    return menu_height;
+    ಪ್ರತ್ಯಾಗಮ menu_height;
 }
 #endif // FEAT_MENU
 
@@ -4798,26 +4798,26 @@ gui_mswin_get_menu_height(
 /*
  * Setup for the Intellimouse
  */
-    static long
-mouse_vertical_scroll_step(void)
+    ಸ್ಥಿರ long
+mouse_vertical_scroll_step(ಶೂನ್ಯ)
 {
     UINT val;
-    if (SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &val, 0))
-	return (val != WHEEL_PAGESCROLL) ? (long)val : -1;
-    return 3; // Safe default;
+    ಯದಿ (SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &val, 0))
+	ಪ್ರತ್ಯಾಗಮ (val != WHEEL_PAGESCROLL) ? (long)val : -1;
+    ಪ್ರತ್ಯಾಗಮ 3; // Safe default;
 }
 
-    static long
-mouse_horizontal_scroll_step(void)
+    ಸ್ಥಿರ long
+mouse_horizontal_scroll_step(ಶೂನ್ಯ)
 {
     UINT val;
-    if (SystemParametersInfo(SPI_GETWHEELSCROLLCHARS, 0, &val, 0))
-	return (long)val;
-    return 3; // Safe default;
+    ಯದಿ (SystemParametersInfo(SPI_GETWHEELSCROLLCHARS, 0, &val, 0))
+	ಪ್ರತ್ಯಾಗಮ (long)val;
+    ಪ್ರತ್ಯಾಗಮ 3; // Safe default;
 }
 
-    static void
-init_mouse_wheel(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+init_mouse_wheel(ಶೂನ್ಯ)
 {
     // Get the default values for the horizontal and vertical scroll steps from
     // the system.
@@ -4828,20 +4828,20 @@ init_mouse_wheel(void)
 /*
  * Mouse scroll event handler.
  */
-    static void
-_OnMouseWheel(HWND hwnd UNUSED, WPARAM wParam, LPARAM lParam, int horizontal)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+_OnMouseWheel(HWND hwnd UNUSED, WPARAM wParam, LPARAM lParam, ಪೂರ್ಣಾಙ್ಕ horizontal)
 {
-    int		button;
+    ಪೂರ್ಣಾಙ್ಕ		button;
     win_T	*wp;
-    int		modifiers = 0;
-    int		kbd_modifiers;
-    int		zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+    ಪೂರ್ಣಾಙ್ಕ		modifiers = 0;
+    ಪೂರ್ಣಾಙ್ಕ		kbd_modifiers;
+    ಪೂರ್ಣಾಙ್ಕ		zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
     POINT	pt;
 
     wp = gui_mouse_window(FIND_POPUP);
 
 #ifdef FEAT_PROP_POPUP
-    if (wp != NULL && popup_is_popup(wp))
+    ಯದಿ (wp != ರಿಕ್ತ && popup_is_popup(wp))
     {
 	cmdarg_T cap;
 	oparg_T	oa;
@@ -4850,12 +4850,12 @@ _OnMouseWheel(HWND hwnd UNUSED, WPARAM wParam, LPARAM lParam, int horizontal)
 	mouse_row = wp->w_winrow;
 	mouse_col = wp->w_wincol;
 	CLEAR_FIELD(cap);
-	if (horizontal)
+	ಯದಿ (horizontal)
 	{
-	    cap.arg = zDelta < 0 ? MSCR_LEFT : MSCR_RIGHT;
+	    cap.arg = zDelta < 0 ? MSCR_ಎಡ : MSCR_ಬಲ;
 	    cap.cmdchar = zDelta < 0 ? K_MOUSELEFT : K_MOUSERIGHT;
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
 	    cap.arg = zDelta < 0 ? MSCR_UP : MSCR_DOWN;
 	    cap.cmdchar = zDelta < 0 ? K_MOUSEUP : K_MOUSEDOWN;
@@ -4869,23 +4869,23 @@ _OnMouseWheel(HWND hwnd UNUSED, WPARAM wParam, LPARAM lParam, int horizontal)
     }
 #endif
 
-    if (wp == NULL || !p_scf)
+    ಯದಿ (wp == ರಿಕ್ತ || !p_scf)
 	wp = curwin;
 
     // Translate the scroll event into an event that Vim can process so that
     // the user has a chance to map the scrollwheel buttons.
-    if (horizontal)
+    ಯದಿ (horizontal)
 	button = zDelta >= 0 ? MOUSE_6 : MOUSE_7;
-    else
+    ಅನ್ಯಥಾ
 	button = zDelta >= 0 ? MOUSE_4 : MOUSE_5;
 
     kbd_modifiers = get_active_modifiers();
 
-    if ((kbd_modifiers & MOD_MASK_SHIFT) != 0)
+    ಯದಿ ((kbd_modifiers & MOD_MASK_SHIFT) != 0)
 	modifiers |= MOUSE_SHIFT;
-    if ((kbd_modifiers & MOD_MASK_CTRL) != 0)
+    ಯದಿ ((kbd_modifiers & MOD_MASK_CTRL) != 0)
 	modifiers |= MOUSE_CTRL;
-    if ((kbd_modifiers & MOD_MASK_ALT) != 0)
+    ಯದಿ ((kbd_modifiers & MOD_MASK_ALT) != 0)
 	modifiers |= MOUSE_ALT;
 
     // The cursor position is relative to the upper-left corner of the screen.
@@ -4901,30 +4901,30 @@ _OnMouseWheel(HWND hwnd UNUSED, WPARAM wParam, LPARAM lParam, int horizontal)
  * Get Menu Font.
  * Return OK or FAIL.
  */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
 gui_w32_get_menu_font(LOGFONTW *lf)
 {
     NONCLIENTMETRICSW nm;
 
-    nm.cbSize = sizeof(NONCLIENTMETRICSW);
-    if (!SystemParametersInfoW(
+    nm.cbSize = ಪರಿಮಾಣ(NONCLIENTMETRICSW);
+    ಯದಿ (!SystemParametersInfoW(
 	    SPI_GETNONCLIENTMETRICS,
-	    sizeof(NONCLIENTMETRICSW),
+	    ಪರಿಮಾಣ(NONCLIENTMETRICSW),
 	    &nm,
 	    0))
-	return FAIL;
+	ಪ್ರತ್ಯಾಗಮ FAIL;
     *lf = nm.lfMenuFont;
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 #endif
 
 
-#if defined(FEAT_GUI_TABLINE) && defined(USE_SYSMENU_FONT)
+#ಯದಿ defined(FEAT_GUI_TABLINE) && defined(USE_SYSMENU_FONT)
 /*
  * Set the GUI tabline font to the system menu font
  */
-    static void
-set_tabline_font(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+set_tabline_font(ಶೂನ್ಯ)
 {
     LOGFONTW	lfSysmenu;
     HFONT	font;
@@ -4933,8 +4933,8 @@ set_tabline_font(void)
     HFONT	hfntOld;
     TEXTMETRIC	tm;
 
-    if (gui_w32_get_menu_font(&lfSysmenu) != OK)
-	return;
+    ಯದಿ (gui_w32_get_menu_font(&lfSysmenu) != OK)
+	ಪ್ರತ್ಯಾಗಮ;
 
     lfSysmenu.lfHeight = adjust_fontsize_by_dpi(lfSysmenu.lfHeight);
     font = CreateFontIndirectW(&lfSysmenu);
@@ -4959,43 +4959,43 @@ set_tabline_font(void)
      */
     gui.tabline_height = tm.tmHeight + tm.tmInternalLeading + 7;
 }
-#else
+#ಅನ್ಯಥಾ
 # define set_tabline_font()
 #endif
 
 /*
  * Invoked when a setting was changed.
  */
-    static LRESULT CALLBACK
+    ಸ್ಥಿರ LRESULT CALLBACK
 _OnSettingChange(UINT param)
 {
-    switch (param)
+    ವಿಕಲ್ಪ (param)
     {
-	case SPI_SETWHEELSCROLLLINES:
+	ಪಕ್ಷ SPI_SETWHEELSCROLLLINES:
 	    mouse_set_vert_scroll_step(mouse_vertical_scroll_step());
-	    break;
-	case SPI_SETWHEELSCROLLCHARS:
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ SPI_SETWHEELSCROLLCHARS:
 	    mouse_set_hor_scroll_step(mouse_horizontal_scroll_step());
-	    break;
-	case SPI_SETNONCLIENTMETRICS:
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ SPI_SETNONCLIENTMETRICS:
 	    set_tabline_font();
-	    break;
-	default:
-	    break;
+	    ಭಙ್ಗ;
+	ಸ್ವಭಾವ:
+	    ಭಙ್ಗ;
     }
-    return 0;
+    ಪ್ರತ್ಯಾಗಮ 0;
 }
 
 #ifdef FEAT_NETBEANS_INTG
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 _OnWindowPosChanged(
     HWND hwnd,
-    const LPWINDOWPOS lpwpos)
+    ಧ್ರುವ LPWINDOWPOS lpwpos)
 {
-    static int x = 0, y = 0, cx = 0, cy = 0;
-    extern int WSInitialized;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ x = 0, y = 0, cx = 0, cy = 0;
+    ಬಾಹ್ಯ ಪೂರ್ಣಾಙ್ಕ WSInitialized;
 
-    if (WSInitialized && (lpwpos->x != x || lpwpos->y != y
+    ಯದಿ (WSInitialized && (lpwpos->x != x || lpwpos->y != y
 				     || lpwpos->cx != cx || lpwpos->cy != cy))
     {
 	x = lpwpos->x;
@@ -5010,85 +5010,85 @@ _OnWindowPosChanged(
 #endif
 
 
-static HWND hwndTip = NULL;
+ಸ್ಥಿರ HWND hwndTip = ರಿಕ್ತ;
 
-    static void
-show_sizing_tip(int cols, int rows)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+show_sizing_tip(ಪೂರ್ಣಾಙ್ಕ cols, ಪೂರ್ಣಾಙ್ಕ rows)
 {
     TOOLINFOA ti;
-    char buf[32];
+    ವರ್ಣ buf[32];
 
-    ti.cbSize = sizeof(ti);
+    ti.cbSize = ಪರಿಮಾಣ(ti);
     ti.hwnd = s_hwnd;
     ti.uId = (UINT_PTR)s_hwnd;
     ti.uFlags = TTF_SUBCLASS | TTF_IDISHWND;
     ti.lpszText = buf;
     sprintf(buf, "%dx%d", cols, rows);
-    if (hwndTip == NULL)
+    ಯದಿ (hwndTip == ರಿಕ್ತ)
     {
-	hwndTip = CreateWindowExA(0, TOOLTIPS_CLASSA, NULL,
+	hwndTip = CreateWindowExA(0, TOOLTIPS_CLASSA, ರಿಕ್ತ,
 		WS_POPUP | TTS_ALWAYSTIP | TTS_NOPREFIX,
 		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-		s_hwnd, NULL, GetModuleHandle(NULL), NULL);
+		s_hwnd, ರಿಕ್ತ, GetModuleHandle(ರಿಕ್ತ), ರಿಕ್ತ);
 	SendMessage(hwndTip, TTM_ADDTOOL, 0, (LPARAM)&ti);
 	SendMessage(hwndTip, TTM_TRACKACTIVATE, TRUE, (LPARAM)&ti);
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	SendMessage(hwndTip, TTM_UPDATETIPTEXT, 0, (LPARAM)&ti);
     }
     SendMessage(hwndTip, TTM_POPUP, 0, 0);
 }
 
-    static void
-destroy_sizing_tip(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+destroy_sizing_tip(ಶೂನ್ಯ)
 {
-    if (hwndTip == NULL)
-	return;
+    ಯದಿ (hwndTip == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ;
 
     DestroyWindow(hwndTip);
-    hwndTip = NULL;
+    hwndTip = ರಿಕ್ತ;
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
 _DuringSizing(
     UINT fwSide,
     LPRECT lprc)
 {
-    int	    w, h;
-    int	    valid_w, valid_h;
-    int	    w_offset, h_offset;
-    int	    cols, rows;
+    ಪೂರ್ಣಾಙ್ಕ	    w, h;
+    ಪೂರ್ಣಾಙ್ಕ	    valid_w, valid_h;
+    ಪೂರ್ಣಾಙ್ಕ	    w_offset, h_offset;
+    ಪೂರ್ಣಾಙ್ಕ	    cols, rows;
 
-    w = lprc->right - lprc->left;
-    h = lprc->bottom - lprc->top;
+    w = lprc->ಬಲ - lprc->ಎಡ;
+    h = lprc->bottom - lprc->ತುದಿ;
     gui_mswin_get_valid_dimensions(w, h, &valid_w, &valid_h, &cols, &rows);
     w_offset = w - valid_w;
     h_offset = h - valid_h;
 
-    if (fwSide == WMSZ_LEFT || fwSide == WMSZ_TOPLEFT
+    ಯದಿ (fwSide == WMSZ_ಎಡ || fwSide == WMSZ_TOPLEFT
 			    || fwSide == WMSZ_BOTTOMLEFT)
-	lprc->left += w_offset;
-    else if (fwSide == WMSZ_RIGHT || fwSide == WMSZ_TOPRIGHT
+	lprc->ಎಡ += w_offset;
+    ಅನ್ಯಥಾ ಯದಿ (fwSide == WMSZ_ಬಲ || fwSide == WMSZ_TOPRIGHT
 			    || fwSide == WMSZ_BOTTOMRIGHT)
-	lprc->right -= w_offset;
+	lprc->ಬಲ -= w_offset;
 
-    if (fwSide == WMSZ_TOP || fwSide == WMSZ_TOPLEFT
+    ಯದಿ (fwSide == WMSZ_ತುದಿ || fwSide == WMSZ_TOPLEFT
 			    || fwSide == WMSZ_TOPRIGHT)
-	lprc->top += h_offset;
-    else if (fwSide == WMSZ_BOTTOM || fwSide == WMSZ_BOTTOMLEFT
+	lprc->ತುದಿ += h_offset;
+    ಅನ್ಯಥಾ ಯದಿ (fwSide == WMSZ_BOTTOM || fwSide == WMSZ_BOTTOMLEFT
 			    || fwSide == WMSZ_BOTTOMRIGHT)
 	lprc->bottom -= h_offset;
 
     show_sizing_tip(cols, rows);
-    return TRUE;
+    ಪ್ರತ್ಯಾಗಮ TRUE;
 }
 
 #ifdef FEAT_GUI_TABLINE
-    static void
-_OnRButtonUp(HWND hwnd, int x, int y, UINT keyFlags)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+_OnRButtonUp(HWND hwnd, ಪೂರ್ಣಾಙ್ಕ x, ಪೂರ್ಣಾಙ್ಕ y, UINT ಕೀಲಿ_Flags)
 {
-    if (gui_mch_showing_tabline())
+    ಯದಿ (gui_mch_showing_tabline())
     {
 	POINT pt;
 	RECT rect;
@@ -5098,81 +5098,81 @@ _OnRButtonUp(HWND hwnd, int x, int y, UINT keyFlags)
 	 */
 	GetCursorPos(&pt);
 	GetWindowRect(s_textArea, &rect);
-	if (pt.y < rect.top)
+	ಯದಿ (pt.y < rect.ತುದಿ)
 	{
 	    show_tabline_popup_menu();
-	    return;
+	    ಪ್ರತ್ಯಾಗಮ;
 	}
     }
-    FORWARD_WM_RBUTTONUP(hwnd, x, y, keyFlags, DefWindowProcW);
+    FORWARD_WM_RBUTTONUP(hwnd, x, y, ಕೀಲಿ_Flags, DefWindowProcW);
 }
 
-    static void
-_OnLButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y, UINT keyFlags)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+_OnLButtonDown(HWND hwnd, BOOL fDoubleClick, ಪೂರ್ಣಾಙ್ಕ x, ಪೂರ್ಣಾಙ್ಕ y, UINT ಕೀಲಿ_Flags)
 {
     /*
      * If the user double clicked the tabline, create a new tab
      */
-    if (gui_mch_showing_tabline())
+    ಯದಿ (gui_mch_showing_tabline())
     {
 	POINT pt;
 	RECT rect;
 
 	GetCursorPos(&pt);
 	GetWindowRect(s_textArea, &rect);
-	if (pt.y < rect.top)
+	ಯದಿ (pt.y < rect.ತುದಿ)
 	    send_tabline_menu_event(0, TABLINE_MENU_NEW);
     }
-    FORWARD_WM_LBUTTONDOWN(hwnd, fDoubleClick, x, y, keyFlags, DefWindowProcW);
+    FORWARD_WM_LBUTTONDOWN(hwnd, fDoubleClick, x, y, ಕೀಲಿ_Flags, DefWindowProcW);
 }
 #endif
 
-    static UINT
-_OnNCHitTest(HWND hwnd, int xPos, int yPos)
+    ಸ್ಥಿರ UINT
+_OnNCHitTest(HWND hwnd, ಪೂರ್ಣಾಙ್ಕ xPos, ಪೂರ್ಣಾಙ್ಕ yPos)
 {
     UINT	result;
-    int		x, y;
+    ಪೂರ್ಣಾಙ್ಕ		x, y;
 
     result = FORWARD_WM_NCHITTEST(hwnd, xPos, yPos, DefWindowProcW);
-    if (result != HTCLIENT)
-	return result;
+    ಯದಿ (result != HTCLIENT)
+	ಪ್ರತ್ಯಾಗಮ result;
 
 #ifdef FEAT_GUI_TABLINE
-    if (gui_mch_showing_tabline())
+    ಯದಿ (gui_mch_showing_tabline())
     {
 	RECT rct;
 
 	// If the cursor is on the GUI tabline, don't process this event
 	GetWindowRect(s_textArea, &rct);
-	if (yPos < rct.top)
-	    return result;
+	ಯದಿ (yPos < rct.ತುದಿ)
+	    ಪ್ರತ್ಯಾಗಮ result;
     }
 #endif
-    (void)gui_mch_get_winpos(&x, &y);
+    (ಶೂನ್ಯ)gui_mch_get_winpos(&x, &y);
     xPos -= x;
 
-    if (xPos < 48) // <VN> TODO should use system metric?
-	return HTBOTTOMLEFT;
-    else
-	return HTBOTTOMRIGHT;
+    ಯದಿ (xPos < 48) // <VN> TODO should use system metric?
+	ಪ್ರತ್ಯಾಗಮ HTBOTTOMLEFT;
+    ಅನ್ಯಥಾ
+	ಪ್ರತ್ಯಾಗಮ HTBOTTOMRIGHT;
 }
 
-#if defined(FEAT_TOOLBAR) || defined(FEAT_GUI_TABLINE)
-    static LRESULT
+#ಯದಿ defined(FEAT_TOOLBAR) || defined(FEAT_GUI_TABLINE)
+    ಸ್ಥಿರ LRESULT
 _OnNotify(HWND hwnd, UINT id, NMHDR *hdr)
 {
-    switch (hdr->code)
+    ವಿಕಲ್ಪ (hdr->code)
     {
-	case TTN_GETDISPINFOW:
-	case TTN_GETDISPINFO:
+	ಪಕ್ಷ TTN_GETDISPINFOW:
+	ಪಕ್ಷ TTN_GETDISPINFO:
 	    {
-		char_u		*str = NULL;
-		static void	*tt_text = NULL;
+		char_u		*str = ರಿಕ್ತ;
+		ಸ್ಥಿರ ಶೂನ್ಯ	*tt_text = ರಿಕ್ತ;
 
 		VIM_CLEAR(tt_text);
 
 # ifdef FEAT_GUI_TABLINE
-		if (gui_mch_showing_tabline()
+		ಯದಿ (gui_mch_showing_tabline()
 			&& hdr->hwndFrom == TabCtrl_GetToolTips(s_tabhwnd))
 		{
 		    POINT	pt;
@@ -5183,10 +5183,10 @@ _OnNotify(HWND hwnd, UINT id, NMHDR *hdr)
 		     * Get the cursor position within the tab control
 		     */
 		    GetCursorPos(&pt);
-		    if (ScreenToClient(s_tabhwnd, &pt) != 0)
+		    ಯದಿ (ScreenToClient(s_tabhwnd, &pt) != 0)
 		    {
 			TCHITTESTINFO htinfo;
-			int idx;
+			ಪೂರ್ಣಾಙ್ಕ idx;
 
 			/*
 			 * Get the tab under the cursor
@@ -5194,12 +5194,12 @@ _OnNotify(HWND hwnd, UINT id, NMHDR *hdr)
 			htinfo.pt.x = pt.x;
 			htinfo.pt.y = pt.y;
 			idx = TabCtrl_HitTest(s_tabhwnd, &htinfo);
-			if (idx != -1)
+			ಯದಿ (idx != -1)
 			{
 			    tabpage_T *tp;
 
 			    tp = find_tabpage(idx + 1);
-			    if (tp != NULL)
+			    ಯದಿ (tp != ರಿಕ್ತ)
 			    {
 				get_tabline_label(tp, TRUE);
 				str = NameBuff;
@@ -5210,122 +5210,122 @@ _OnNotify(HWND hwnd, UINT id, NMHDR *hdr)
 # endif
 # ifdef FEAT_TOOLBAR
 #  ifdef FEAT_GUI_TABLINE
-		else
+		ಅನ್ಯಥಾ
 #  endif
 		{
 		    UINT	idButton;
 		    vimmenu_T	*pMenu;
 
 		    idButton = (UINT) hdr->idFrom;
-		    pMenu = gui_mswin_find_menu(root_menu, idButton);
-		    if (pMenu)
+		    pMenu = gui_mswin_find_menu(ಬೇರು_menu, idButton);
+		    ಯದಿ (pMenu)
 			str = pMenu->strings[MENU_INDEX_TIP];
 		}
 # endif
-		if (str == NULL)
-		    break;
+		ಯದಿ (str == ರಿಕ್ತ)
+		    ಭಙ್ಗ;
 
 		// Set the maximum width, this also enables using \n for
 		// line break.
 		SendMessage(hdr->hwndFrom, TTM_SETMAXTIPWIDTH, 0, 500);
 
-		if (hdr->code == TTN_GETDISPINFOW)
+		ಯದಿ (hdr->code == TTN_GETDISPINFOW)
 		{
 		    LPNMTTDISPINFOW	lpdi = (LPNMTTDISPINFOW)hdr;
 
-		    tt_text = enc_to_utf16(str, NULL);
+		    tt_text = enc_to_utf16(str, ರಿಕ್ತ);
 		    lpdi->lpszText = tt_text;
 		    // can't show tooltip if failed
 		}
-		else
+		ಅನ್ಯಥಾ
 		{
 		    LPNMTTDISPINFO	lpdi = (LPNMTTDISPINFO)hdr;
 		    size_t		len = STRLEN(str);
 
-		    if (len < sizeof(lpdi->szText)
-			    || ((tt_text = vim_strnsave(str, len)) == NULL))
+		    ಯದಿ (len < ಪರಿಮಾಣ(lpdi->szText)
+			    || ((tt_text = vim_strnsave(str, len)) == ರಿಕ್ತ))
 			vim_strncpy((char_u *)lpdi->szText, str,
-				sizeof(lpdi->szText) - 1);
-		    else
+				ಪರಿಮಾಣ(lpdi->szText) - 1);
+		    ಅನ್ಯಥಾ
 			lpdi->lpszText = tt_text;
 		}
 	    }
-	    break;
+	    ಭಙ್ಗ;
 
 # ifdef FEAT_GUI_TABLINE
-	case TCN_SELCHANGE:
-	    if (gui_mch_showing_tabline() && (hdr->hwndFrom == s_tabhwnd))
+	ಪಕ್ಷ TCN_SELCHANGE:
+	    ಯದಿ (gui_mch_showing_tabline() && (hdr->hwndFrom == s_tabhwnd))
 	    {
 		send_tabline_event(TabCtrl_GetCurSel(s_tabhwnd) + 1);
-		return 0L;
+		ಪ್ರತ್ಯಾಗಮ 0L;
 	    }
-	    break;
+	    ಭಙ್ಗ;
 
-	case NM_RCLICK:
-	    if (gui_mch_showing_tabline() && (hdr->hwndFrom == s_tabhwnd))
+	ಪಕ್ಷ NM_RCLICK:
+	    ಯದಿ (gui_mch_showing_tabline() && (hdr->hwndFrom == s_tabhwnd))
 	    {
 		show_tabline_popup_menu();
-		return 0L;
+		ಪ್ರತ್ಯಾಗಮ 0L;
 	    }
-	    break;
+	    ಭಙ್ಗ;
 # endif
 
-	default:
-	    break;
+	ಸ್ವಭಾವ:
+	    ಭಙ್ಗ;
     }
-    return DefWindowProcW(hwnd, WM_NOTIFY, (WPARAM)id, (LPARAM)hdr);
+    ಪ್ರತ್ಯಾಗಮ DefWindowProcW(hwnd, WM_NOTIFY, (WPARAM)id, (LPARAM)hdr);
 }
 #endif
 
-#if defined(MENUHINTS) && defined(FEAT_MENU)
-    static LRESULT
+#ಯದಿ defined(MENUHINTS) && defined(FEAT_MENU)
+    ಸ್ಥಿರ LRESULT
 _OnMenuSelect(HWND hwnd, WPARAM wParam, LPARAM lParam)
 {
-    if (((UINT) HIWORD(wParam)
+    ಯದಿ (((UINT) HIWORD(wParam)
 		& (0xffff ^ (MF_MOUSESELECT + MF_BITMAP + MF_POPUP)))
 	    == MF_HILITE
 	    && (State & MODE_CMDLINE) == 0)
     {
 	vimmenu_T   *pMenu;
-	static int  did_menu_tip = FALSE;
+	ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ  did_menu_tip = FALSE;
 
-	if (did_menu_tip)
+	ಯದಿ (did_menu_tip)
 	{
-	    msg_clr_cmdline();
+	    ಸಂದೇಶ_clr_cmdline();
 	    setcursor();
 	    out_flush();
 	    did_menu_tip = FALSE;
 	}
 
-	pMenu = gui_mswin_find_menu(root_menu, (UINT)LOWORD(wParam));
-	if (pMenu != NULL && pMenu->strings[MENU_INDEX_TIP] != NULL)
+	pMenu = gui_mswin_find_menu(ಬೇರು_menu, (UINT)LOWORD(wParam));
+	ಯದಿ (pMenu != ರಿಕ್ತ && pMenu->strings[MENU_INDEX_TIP] != ರಿಕ್ತ)
 	{
 	    MENUITEMINFO menuinfo;
 
-	    menuinfo.cbSize = sizeof(MENUITEMINFO);
+	    menuinfo.cbSize = ಪರಿಮಾಣ(MENUITEMINFO);
 	    menuinfo.fMask = MIIM_ID;		    // We only want to check if the menu item exists,
 						    // so retrieve something simple.
-	    if (GetMenuItemInfo(s_menuBar, pMenu->id, FALSE, &menuinfo))
+	    ಯದಿ (GetMenuItemInfo(s_menuBar, pMenu->id, FALSE, &menuinfo))
 	    {
-		++msg_hist_off;
-		msg((char *)pMenu->strings[MENU_INDEX_TIP]);
-		--msg_hist_off;
+		++ಸಂದೇಶ_hist_off;
+		ಸಂದೇಶ((ವರ್ಣ *)pMenu->strings[MENU_INDEX_TIP]);
+		--ಸಂದೇಶ_hist_off;
 		setcursor();
 		out_flush();
 		did_menu_tip = TRUE;
 	    }
 	}
-	return 0L;
+	ಪ್ರತ್ಯಾಗಮ 0L;
     }
-    return DefWindowProcW(hwnd, WM_MENUSELECT, wParam, lParam);
+    ಪ್ರತ್ಯಾಗಮ DefWindowProcW(hwnd, WM_MENUSELECT, wParam, lParam);
 }
 #endif
 
-    static BOOL
+    ಸ್ಥಿರ BOOL
 _OnGetDpiScaledSize(HWND hwnd UNUSED, UINT dpi, SIZE *size)
 {
-    int		old_width, old_height;
-    int		new_width, new_height;
+    ಪೂರ್ಣಾಙ್ಕ		old_width, old_height;
+    ಪೂರ್ಣಾಙ್ಕ		new_width, new_height;
     LOGFONTW	lf;
     HFONT	font;
 
@@ -5333,15 +5333,15 @@ _OnGetDpiScaledSize(HWND hwnd UNUSED, UINT dpi, SIZE *size)
 
     // Calculate new approximate size.
     GetFontSize(gui.norm_font, &old_width, &old_height);    // Current size
-    GetObjectW((HFONT)gui.norm_font, sizeof(lf), &lf);
-    lf.lfHeight = lf.lfHeight * (int)dpi / s_dpi;
+    GetObjectW((HFONT)gui.norm_font, ಪರಿಮಾಣ(lf), &lf);
+    lf.lfHeight = lf.lfHeight * (ಪೂರ್ಣಾಙ್ಕ)dpi / s_dpi;
     font = CreateFontIndirectW(&lf);
-    if (font)
+    ಯದಿ (font)
     {
 	GetFontSize((GuiFont)font, &new_width, &new_height);	// New size
 	DeleteFont(font);
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	new_width = old_width;
 	new_height = old_height;
@@ -5350,10 +5350,10 @@ _OnGetDpiScaledSize(HWND hwnd UNUSED, UINT dpi, SIZE *size)
     size->cy = size->cy * new_height / old_height;
     //TRACE("New approx. SIZE=(%d,%d)", size->cx, size->cy);
 
-    return TRUE;
+    ಪ್ರತ್ಯಾಗಮ TRUE;
 }
 
-    static LRESULT
+    ಸ್ಥಿರ LRESULT
 _OnDpiChanged(HWND hwnd, UINT xdpi UNUSED, UINT ydpi, RECT *rc)
 {
     s_dpi = ydpi;
@@ -5374,162 +5374,162 @@ _OnDpiChanged(HWND hwnd, UINT xdpi UNUSED, UINT ydpi, RECT *rc)
 #ifdef FEAT_MBYTE_IME
     im_set_position(gui.row, gui.col);
 #endif
-    InvalidateRect(hwnd, NULL, TRUE);
+    InvalidateRect(hwnd, ರಿಕ್ತ, TRUE);
 
     s_in_dpichanged = FALSE;
-    return 0L;
+    ಪ್ರತ್ಯಾಗಮ 0L;
 }
 
 
-    static LRESULT CALLBACK
+    ಸ್ಥಿರ LRESULT CALLBACK
 _WndProc(
     HWND hwnd,
-    UINT uMsg,
+    UINT u_ಸಂದೇಶ,
     WPARAM wParam,
     LPARAM lParam)
 {
     // ch_log(NULL, "WndProc: hwnd = %08x, msg = %x, wParam = %x, lParam = %x",
 	    // hwnd, uMsg, wParam, lParam);
 
-    HandleMouseHide(uMsg, lParam);
+    HandleMouseHide(u_ಸಂದೇಶ, lParam);
 
-    s_uMsg = uMsg;
+    s_u_ಸಂದೇಶ = u_ಸಂದೇಶ;
     s_wParam = wParam;
 
-    switch (uMsg)
+    ವಿಕಲ್ಪ (u_ಸಂದೇಶ)
     {
-	HANDLE_MSG(hwnd, WM_DEADCHAR,	_OnDeadChar);
-	HANDLE_MSG(hwnd, WM_SYSDEADCHAR, _OnDeadChar);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_DEADCHAR,	_OnDeadChar);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_SYSDEADCHAR, _OnDeadChar);
 	// HANDLE_MSG(hwnd, WM_ACTIVATE,    _OnActivate);
-	HANDLE_MSG(hwnd, WM_CLOSE,	_OnClose);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_CLOSE,	_OnClose);
 	// HANDLE_MSG(hwnd, WM_COMMAND,	_OnCommand);
-	HANDLE_MSG(hwnd, WM_DESTROY,	_OnDestroy);
-	HANDLE_MSG(hwnd, WM_DROPFILES,	_OnDropFiles);
-	HANDLE_MSG(hwnd, WM_HSCROLL,	_OnScroll);
-	HANDLE_MSG(hwnd, WM_KILLFOCUS,	_OnKillFocus);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_DESTROY,	_OnDestroy);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_DROPFILES,	_OnDropFiles);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_HSCROLL,	_OnScroll);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_KILLFOCUS,	_OnKillFocus);
 #ifdef FEAT_MENU
-	HANDLE_MSG(hwnd, WM_COMMAND,	_OnMenu);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_COMMAND,	_OnMenu);
 #endif
 	// HANDLE_MSG(hwnd, WM_MOVE,	    _OnMove);
 	// HANDLE_MSG(hwnd, WM_NCACTIVATE,  _OnNCActivate);
-	HANDLE_MSG(hwnd, WM_SETFOCUS,	_OnSetFocus);
-	HANDLE_MSG(hwnd, WM_SIZE,	_OnSize);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_SETFOCUS,	_OnSetFocus);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_SIZE,	_OnSize);
 	// HANDLE_MSG(hwnd, WM_SYSCOMMAND,  _OnSysCommand);
 	// HANDLE_MSG(hwnd, WM_SYSKEYDOWN,  _OnAltKey);
-	HANDLE_MSG(hwnd, WM_VSCROLL,	_OnScroll);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_VSCROLL,	_OnScroll);
 	// HANDLE_MSG(hwnd, WM_WINDOWPOSCHANGING,	_OnWindowPosChanging);
-	HANDLE_MSG(hwnd, WM_ACTIVATEAPP, _OnActivateApp);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_ACTIVATEAPP, _OnActivateApp);
 #ifdef FEAT_NETBEANS_INTG
-	HANDLE_MSG(hwnd, WM_WINDOWPOSCHANGED, _OnWindowPosChanged);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_WINDOWPOSCHANGED, _OnWindowPosChanged);
 #endif
 #ifdef FEAT_GUI_TABLINE
-	HANDLE_MSG(hwnd, WM_RBUTTONUP,	_OnRButtonUp);
-	HANDLE_MSG(hwnd, WM_LBUTTONDBLCLK,  _OnLButtonDown);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_RBUTTONUP,	_OnRButtonUp);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_LBUTTONDBLCLK,  _OnLButtonDown);
 #endif
-	HANDLE_MSG(hwnd, WM_NCHITTEST,	_OnNCHitTest);
+	HANDLE_ಸಂದೇಶ(hwnd, WM_NCHITTEST,	_OnNCHitTest);
 
-    case WM_QUERYENDSESSION:	// System wants to go down.
+    ಪಕ್ಷ WM_QUERYENDSESSION:	// System wants to go down.
 	gui_shell_closed();	// Will exit when no changed buffers.
-	return FALSE;		// Do NOT allow system to go down.
+	ಪ್ರತ್ಯಾಗಮ FALSE;		// Do NOT allow system to go down.
 
-    case WM_ENDSESSION:
-	if (wParam)	// system only really goes down when wParam is TRUE
+    ಪಕ್ಷ WM_ENDSESSION:
+	ಯದಿ (wParam)	// system only really goes down when wParam is TRUE
 	{
 	    _OnEndSession();
-	    return 0L;
+	    ಪ್ರತ್ಯಾಗಮ 0L;
 	}
-	break;
+	ಭಙ್ಗ;
 
-    case WM_CHAR:
+    ಪಕ್ಷ WM_CHAR:
 	// Don't use HANDLE_MSG() for WM_CHAR, it truncates wParam to a single
 	// byte while we want the UTF-16 character value.
-	_OnChar(hwnd, (UINT)wParam, (int)(short)LOWORD(lParam));
-	return 0L;
+	_OnChar(hwnd, (UINT)wParam, (ಪೂರ್ಣಾಙ್ಕ)(short)LOWORD(lParam));
+	ಪ್ರತ್ಯಾಗಮ 0L;
 
-    case WM_SYSCHAR:
+    ಪಕ್ಷ WM_SYSCHAR:
 	/*
 	 * if 'winaltkeys' is "no", or it's "menu" and it's not a menu
 	 * shortcut key, handle like a typed ALT key, otherwise call Windows
 	 * ALT key handling.
 	 */
 #ifdef FEAT_MENU
-	if (	!gui.menu_is_active
+	ಯದಿ (	!gui.menu_is_active
 		|| p_wak[0] == 'n'
-		|| (p_wak[0] == 'm' && !gui_is_menu_shortcut((int)wParam))
+		|| (p_wak[0] == 'm' && !gui_is_menu_shortcut((ಪೂರ್ಣಾಙ್ಕ)wParam))
 		)
 #endif
 	{
-	    _OnSysChar(hwnd, (UINT)wParam, (int)(short)LOWORD(lParam));
-	    return 0L;
+	    _OnSysChar(hwnd, (UINT)wParam, (ಪೂರ್ಣಾಙ್ಕ)(short)LOWORD(lParam));
+	    ಪ್ರತ್ಯಾಗಮ 0L;
 	}
 #ifdef FEAT_MENU
-	else
-	    return DefWindowProcW(hwnd, uMsg, wParam, lParam);
+	ಅನ್ಯಥಾ
+	    ಪ್ರತ್ಯಾಗಮ DefWindowProcW(hwnd, u_ಸಂದೇಶ, wParam, lParam);
 #endif
 
-    case WM_SYSKEYUP:
+    ಪಕ್ಷ WM_SYSKEYUP:
 #ifdef FEAT_MENU
 	// This used to be done only when menu is active: ALT key is used for
 	// that.  But that caused problems when menu is disabled and using
 	// Alt-Tab-Esc: get into a strange state where no mouse-moved events
 	// are received, mouse pointer remains hidden.
-	return DefWindowProcW(hwnd, uMsg, wParam, lParam);
-#else
-	return 0L;
+	ಪ್ರತ್ಯಾಗಮ DefWindowProcW(hwnd, u_ಸಂದೇಶ, wParam, lParam);
+#ಅನ್ಯಥಾ
+	ಪ್ರತ್ಯಾಗಮ 0L;
 #endif
 
-    case WM_EXITSIZEMOVE:
+    ಪಕ್ಷ WM_EXITSIZEMOVE:
 	destroy_sizing_tip();
-	break;
+	ಭಙ್ಗ;
 
-    case WM_SIZING:	// HANDLE_MSG doesn't seem to handle this one
-	return _DuringSizing((UINT)wParam, (LPRECT)lParam);
+    ಪಕ್ಷ WM_SIZING:	// HANDLE_MSG doesn't seem to handle this one
+	ಪ್ರತ್ಯಾಗಮ _DuringSizing((UINT)wParam, (LPRECT)lParam);
 
-    case WM_MOUSEWHEEL:
-    case WM_MOUSEHWHEEL:
-	_OnMouseWheel(hwnd, wParam, lParam, uMsg == WM_MOUSEHWHEEL);
-	return 0L;
+    ಪಕ್ಷ WM_MOUSEWHEEL:
+    ಪಕ್ಷ WM_MOUSEHWHEEL:
+	_OnMouseWheel(hwnd, wParam, lParam, u_ಸಂದೇಶ == WM_MOUSEHWHEEL);
+	ಪ್ರತ್ಯಾಗಮ 0L;
 
 	// Notification for change in SystemParametersInfo()
-    case WM_SETTINGCHANGE:
-	return _OnSettingChange((UINT)wParam);
+    ಪಕ್ಷ WM_SETTINGCHANGE:
+	ಪ್ರತ್ಯಾಗಮ _OnSettingChange((UINT)wParam);
 
-#if defined(FEAT_TOOLBAR) || defined(FEAT_GUI_TABLINE)
-    case WM_NOTIFY:
-	return _OnNotify(hwnd, (UINT)wParam, (NMHDR*)lParam);
+#ಯದಿ defined(FEAT_TOOLBAR) || defined(FEAT_GUI_TABLINE)
+    ಪಕ್ಷ WM_NOTIFY:
+	ಪ್ರತ್ಯಾಗಮ _OnNotify(hwnd, (UINT)wParam, (NMHDR*)lParam);
 #endif
 
-#if defined(MENUHINTS) && defined(FEAT_MENU)
-    case WM_MENUSELECT:
-	return _OnMenuSelect(hwnd, wParam, lParam);
+#ಯದಿ defined(MENUHINTS) && defined(FEAT_MENU)
+    ಪಕ್ಷ WM_MENUSELECT:
+	ಪ್ರತ್ಯಾಗಮ _OnMenuSelect(hwnd, wParam, lParam);
 #endif
 
 #ifdef FEAT_MBYTE_IME
-    case WM_IME_NOTIFY:
-	if (!_OnImeNotify(hwnd, (DWORD)wParam, (DWORD)lParam))
-	    return DefWindowProcW(hwnd, uMsg, wParam, lParam);
-	return 1L;
+    ಪಕ್ಷ WM_IME_NOTIFY:
+	ಯದಿ (!_OnImeNotify(hwnd, (DWORD)wParam, (DWORD)lParam))
+	    ಪ್ರತ್ಯಾಗಮ DefWindowProcW(hwnd, u_ಸಂದೇಶ, wParam, lParam);
+	ಪ್ರತ್ಯಾಗಮ 1L;
 
-    case WM_IME_COMPOSITION:
-	if (!_OnImeComposition(hwnd, wParam, lParam))
-	    return DefWindowProcW(hwnd, uMsg, wParam, lParam);
-	return 1L;
+    ಪಕ್ಷ WM_IME_COMPOSITION:
+	ಯದಿ (!_OnImeComposition(hwnd, wParam, lParam))
+	    ಪ್ರತ್ಯಾಗಮ DefWindowProcW(hwnd, u_ಸಂದೇಶ, wParam, lParam);
+	ಪ್ರತ್ಯಾಗಮ 1L;
 #endif
-    case WM_GETDPISCALEDSIZE:
-	return _OnGetDpiScaledSize(hwnd, (UINT)wParam, (SIZE *)lParam);
-    case WM_DPICHANGED:
-	return _OnDpiChanged(hwnd, (UINT)LOWORD(wParam), (UINT)HIWORD(wParam),
+    ಪಕ್ಷ WM_GETDPISCALEDSIZE:
+	ಪ್ರತ್ಯಾಗಮ _OnGetDpiScaledSize(hwnd, (UINT)wParam, (SIZE *)lParam);
+    ಪಕ್ಷ WM_DPICHANGED:
+	ಪ್ರತ್ಯಾಗಮ _OnDpiChanged(hwnd, (UINT)LOWORD(wParam), (UINT)HIWORD(wParam),
 		(RECT*)lParam);
 
-    default:
+    ಸ್ವಭಾವ:
 #ifdef MSWIN_FIND_REPLACE
-	if (uMsg == s_findrep_msg && s_findrep_msg != 0)
+	ಯದಿ (u_ಸಂದೇಶ == s_findrep_ಸಂದೇಶ && s_findrep_ಸಂದೇಶ != 0)
 	    _OnFindRepl();
 #endif
-	break;
+	ಭಙ್ಗ;
     }
 
-    return DefWindowProcW(hwnd, uMsg, wParam, lParam);
+    ಪ್ರತ್ಯಾಗಮ DefWindowProcW(hwnd, u_ಸಂದೇಶ, wParam, lParam);
 }
 
 /*
@@ -5537,37 +5537,37 @@ _WndProc(
  */
 
 // parent window, if specified with -P
-HWND vim_parent_hwnd = NULL;
+HWND vim_parent_hwnd = ರಿಕ್ತ;
 
-    static BOOL CALLBACK
+    ಸ್ಥಿರ BOOL CALLBACK
 FindWindowTitle(HWND hwnd, LPARAM lParam)
 {
-    char	buf[2048];
-    char	*title = (char *)lParam;
+    ವರ್ಣ	buf[2048];
+    ವರ್ಣ	*title = (ವರ್ಣ *)lParam;
 
-    if (GetWindowText(hwnd, buf, sizeof(buf)))
+    ಯದಿ (GetWindowText(hwnd, buf, ಪರಿಮಾಣ(buf)))
     {
-	if (strstr(buf, title) != NULL)
+	ಯದಿ (strstr(buf, title) != ರಿಕ್ತ)
 	{
 	    // Found it.  Store the window ref. and quit searching if MDI
 	    // works.
-	    vim_parent_hwnd = FindWindowEx(hwnd, NULL, "MDIClient", NULL);
-	    if (vim_parent_hwnd != NULL)
-		return FALSE;
+	    vim_parent_hwnd = FindWindowEx(hwnd, ರಿಕ್ತ, "MDIClient", ರಿಕ್ತ);
+	    ಯದಿ (vim_parent_hwnd != ರಿಕ್ತ)
+		ಪ್ರತ್ಯಾಗಮ FALSE;
 	}
     }
-    return TRUE;	// continue searching
+    ಪ್ರತ್ಯಾಗಮ TRUE;	// continue searching
 }
 
 /*
  * Invoked for '-P "title"' argument: search for parent application to open
  * our window in.
  */
-    void
-gui_mch_set_parent(char *title)
+    ಶೂನ್ಯ
+gui_mch_set_parent(ವರ್ಣ *title)
 {
     EnumWindows(FindWindowTitle, (LPARAM)title);
-    if (vim_parent_hwnd == NULL)
+    ಯದಿ (vim_parent_hwnd == ರಿಕ್ತ)
     {
 	semsg(_(e_cannot_find_window_title_str), title);
 	mch_exit(2);
@@ -5575,10 +5575,10 @@ gui_mch_set_parent(char *title)
 }
 
 #ifndef FEAT_OLE
-    static void
-ole_error(char *arg)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+ole_error(ವರ್ಣ *arg)
 {
-    char buf[IOSIZE];
+    ವರ್ಣ buf[IOSIZE];
 
 # ifdef VIMDLL
     gui.in_use = mch_is_gui_executable();
@@ -5591,97 +5591,97 @@ ole_error(char *arg)
 }
 #endif
 
-#if defined(GUI_MAY_SPAWN)
-    static char *
-gvim_error(void)
+#ಯದಿ defined(GUI_MAY_SPAWN)
+    ಸ್ಥಿರ ವರ್ಣ *
+gvim_error(ಶೂನ್ಯ)
 {
-    char *msg = _(e_gui_cannot_be_used_cannot_execute_gvim_exe);
+    ವರ್ಣ *ಸಂದೇಶ = _(e_gui_cannot_be_used_cannot_execute_gvim_exe);
 
-    if (starting)
+    ಯದಿ (starting)
     {
-	mch_errmsg(msg);
+	mch_errmsg(ಸಂದೇಶ);
 	mch_errmsg("\n");
 	mch_exit(2);
     }
-    return msg;
+    ಪ್ರತ್ಯಾಗಮ ಸಂದೇಶ;
 }
 
-    char *
+    ವರ್ಣ *
 gui_mch_do_spawn(char_u *arg)
 {
-    int			len;
-# if defined(FEAT_SESSION) && defined(EXPERIMENTAL_GUI_CMD)
-    char_u		*session = NULL;
-    LPWSTR		tofree1 = NULL;
+    ಪೂರ್ಣಾಙ್ಕ			len;
+# ಯದಿ defined(FEAT_SESSION) && defined(EXPERIMENTAL_GUI_CMD)
+    char_u		*session = ರಿಕ್ತ;
+    LPWSTR		tofree1 = ರಿಕ್ತ;
 # endif
     WCHAR		name[MAX_PATH];
-    LPWSTR		cmd, newcmd = NULL, p, warg, tofree2 = NULL;
-    STARTUPINFOW	si = {sizeof(si)};
+    LPWSTR		cmd, newcmd = ರಿಕ್ತ, p, warg, tofree2 = ರಿಕ್ತ;
+    STARTUPINFOW	si = {ಪರಿಮಾಣ(si)};
     PROCESS_INFORMATION pi;
 
-    if (!GetModuleFileNameW(g_hinst, name, MAX_PATH))
-	goto error;
+    ಯದಿ (!GetModuleFileNameW(g_hinst, name, MAX_PATH))
+	ಗಚ್ಛ error;
     p = wcsrchr(name, L'\\');
-    if (p == NULL)
-	goto error;
+    ಯದಿ (p == ರಿಕ್ತ)
+	ಗಚ್ಛ error;
     // Replace the executable name from vim(d).exe to gvim(d).exe.
 # ifdef DEBUG
     wcscpy(p + 1, L"gvimd.exe");
-# else
+# ಅನ್ಯಥಾ
     wcscpy(p + 1, L"gvim.exe");
 # endif
 
-# if defined(FEAT_SESSION) && defined(EXPERIMENTAL_GUI_CMD)
-    if (starting)
+# ಯದಿ defined(FEAT_SESSION) && defined(EXPERIMENTAL_GUI_CMD)
+    ಯದಿ (starting)
 # endif
     {
 	// Pass the command line to the new process.
-	p = GetCommandLineW();
+	p = Get_Command_ಸಾಲು_W();
 	// Skip 1st argument.
-	while (*p && *p != L' ' && *p != L'\t')
+	ಯಾವತ್ (*p && *p != L' ' && *p != L'\t')
 	{
-	    if (*p == L'"')
+	    ಯದಿ (*p == L'"')
 	    {
 		// Skip quoted strings
-		while (*++p && *p != L'"');
+		ಯಾವತ್ (*++p && *p != L'"');
 	    }
 
 	    ++p;
 	}
 	cmd = p;
     }
-# if defined(FEAT_SESSION) && defined(EXPERIMENTAL_GUI_CMD)
-    else
+# ಯದಿ defined(FEAT_SESSION) && defined(EXPERIMENTAL_GUI_CMD)
+    ಅನ್ಯಥಾ
     {
 	// Create a session file and pass it to the new process.
 	LPWSTR	wsession;
 	char_u	*savebg;
-	int	ret;
+	ಪೂರ್ಣಾಙ್ಕ	ret;
 
 	session = vim_tempname('s', FALSE);
-	if (session == NULL)
-	    goto error;
+	ಯದಿ (session == ರಿಕ್ತ)
+	    ಗಚ್ಛ error;
 	savebg = p_bg;
 	p_bg = vim_strnsave((char_u *)"light", 5);	// Set 'bg' to "light".
-	if (p_bg == NULL)
+	ಯದಿ (p_bg == ರಿಕ್ತ)
 	{
 	    p_bg = savebg;
-	    goto error;
+	    ಗಚ್ಛ error;
 	}
 	ret = write_session_file(session);
 	vim_free(p_bg);
 	p_bg = savebg;
-	if (!ret)
-	    goto error;
-	wsession = enc_to_utf16(session, NULL);
-	if (wsession == NULL)
-	    goto error;
-	len = (int)wcslen(wsession) * 2 + 27 + 1;
+	ಯದಿ (!ret)
+	    ಗಚ್ಛ error;
+	wsession = enc_to_utf16(session, ರಿಕ್ತ);
+	ಯದಿ (wsession == ರಿಕ್ತ)
+	    ಗಚ್ಛ error;
+	len = (ಪೂರ್ಣಾಙ್ಕ)wcslen(wsession) * 2 + 27 + 1;
 	cmd = ALLOC_MULT(WCHAR, len);
-	if (cmd == NULL)
+	ಯದಿ (cmd == ರಿಕ್ತ)
 	{
 	    vim_free(wsession);
-	    goto error;
+	    ಗಚ್ಛ error;
 	}
 	tofree1 = cmd;
 	_snwprintf(cmd, len, L" -S \"%s\" -c \"call delete('%s')\"",
@@ -5691,41 +5691,41 @@ gui_mch_do_spawn(char_u *arg)
 # endif
 
     // Check additional arguments to the `:gui` command.
-    if (arg != NULL)
+    ಯದಿ (arg != ರಿಕ್ತ)
     {
-	warg = enc_to_utf16(arg, NULL);
-	if (warg == NULL)
-	    goto error;
+	warg = enc_to_utf16(arg, ರಿಕ್ತ);
+	ಯದಿ (warg == ರಿಕ್ತ)
+	    ಗಚ್ಛ error;
 	tofree2 = warg;
     }
-    else
+    ಅನ್ಯಥಾ
 	warg = L"";
 
     // Set up the new command line.
-    len = (int)wcslen(name) + (int)wcslen(cmd) + (int)wcslen(warg) + 4;
+    len = (ಪೂರ್ಣಾಙ್ಕ)wcslen(name) + (ಪೂರ್ಣಾಙ್ಕ)wcslen(cmd) + (ಪೂರ್ಣಾಙ್ಕ)wcslen(warg) + 4;
     newcmd = ALLOC_MULT(WCHAR, len);
-    if (newcmd == NULL)
-	goto error;
+    ಯದಿ (newcmd == ರಿಕ್ತ)
+	ಗಚ್ಛ error;
     _snwprintf(newcmd, len, L"\"%s\"%s %s", name, cmd, warg);
 
     // Spawn a new GUI process.
-    if (!CreateProcessW(NULL, newcmd, NULL, NULL, TRUE, 0,
-		NULL, NULL, &si, &pi))
-	goto error;
+    ಯದಿ (!CreateProcessW(ರಿಕ್ತ, newcmd, ರಿಕ್ತ, ರಿಕ್ತ, TRUE, 0,
+		ರಿಕ್ತ, ರಿಕ್ತ, &si, &pi))
+	ಗಚ್ಛ error;
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
     mch_exit(0);
 
 error:
-# if defined(FEAT_SESSION) && defined(EXPERIMENTAL_GUI_CMD)
-    if (session)
+# ಯದಿ defined(FEAT_SESSION) && defined(EXPERIMENTAL_GUI_CMD)
+    ಯದಿ (session)
 	mch_remove(session);
     vim_free(session);
     vim_free(tofree1);
 # endif
     vim_free(newcmd);
     vim_free(tofree2);
-    return gvim_error();
+    ಪ್ರತ್ಯಾಗಮ gvim_error();
 }
 #endif
 
@@ -5734,46 +5734,46 @@ error:
  * deleted from argv, and *argc is decremented accordingly.  This is called
  * when Vim is started, whether or not the GUI has been started.
  */
-    void
-gui_mch_prepare(int *argc, char **argv)
+    ಶೂನ್ಯ
+gui_mch_prepare(ಪೂರ್ಣಾಙ್ಕ *argc, ವರ್ಣ **argv)
 {
-    int		silent = FALSE;
-    int		idx;
+    ಪೂರ್ಣಾಙ್ಕ		silent = FALSE;
+    ಪೂರ್ಣಾಙ್ಕ		idx;
 
     // Check for special OLE command line parameters
-    if ((*argc == 2 || *argc == 3) && (argv[1][0] == '-' || argv[1][0] == '/'))
+    ಯದಿ ((*argc == 2 || *argc == 3) && (argv[1][0] == '-' || argv[1][0] == '/'))
     {
 	// Check for a "-silent" argument first.
-	if (*argc == 3 && STRICMP(argv[1] + 1, "silent") == 0
+	ಯದಿ (*argc == 3 && STRICMP(argv[1] + 1, "silent") == 0
 		&& (argv[2][0] == '-' || argv[2][0] == '/'))
 	{
 	    silent = TRUE;
 	    idx = 2;
 	}
-	else
+	ಅನ್ಯಥಾ
 	    idx = 1;
 
 	// Register Vim as an OLE Automation server
-	if (STRICMP(argv[idx] + 1, "register") == 0)
+	ಯದಿ (STRICMP(argv[idx] + 1, "register") == 0)
 	{
 #ifdef FEAT_OLE
 	    RegisterMe(silent);
 	    mch_exit(0);
-#else
-	    if (!silent)
+#ಅನ್ಯಥಾ
+	    ಯದಿ (!silent)
 		ole_error("register");
 	    mch_exit(2);
 #endif
 	}
 
 	// Unregister Vim as an OLE Automation server
-	if (STRICMP(argv[idx] + 1, "unregister") == 0)
+	ಯದಿ (STRICMP(argv[idx] + 1, "unregister") == 0)
 	{
 #ifdef FEAT_OLE
 	    UnregisterMe(!silent);
 	    mch_exit(0);
-#else
-	    if (!silent)
+#ಅನ್ಯಥಾ
+	    ಯದಿ (!silent)
 		ole_error("unregister");
 	    mch_exit(2);
 #endif
@@ -5783,11 +5783,11 @@ gui_mch_prepare(int *argc, char **argv)
 	// application wants to treat the case when it is started manually
 	// differently from the case where it is started via automation (and
 	// we don't).
-	if (STRICMP(argv[idx] + 1, "embedding") == 0)
+	ಯದಿ (STRICMP(argv[idx] + 1, "embedding") == 0)
 	{
 #ifdef FEAT_OLE
 	    *argc = 1;
-#else
+#ಅನ್ಯಥಾ
 	    ole_error("embedding");
 	    mch_exit(2);
 #endif
@@ -5796,14 +5796,14 @@ gui_mch_prepare(int *argc, char **argv)
 
 #ifdef FEAT_OLE
 # ifdef VIMDLL
-    if (mch_is_gui_executable())
+    ಯದಿ (mch_is_gui_executable())
 # endif
     {
-	int	bDoRestart = FALSE;
+	ಪೂರ್ಣಾಙ್ಕ	bDoRestart = FALSE;
 
 	InitOLE(&bDoRestart);
 	// automatically exit after registering
-	if (bDoRestart)
+	ಯದಿ (bDoRestart)
 	    mch_exit(0);
     }
 #endif
@@ -5811,67 +5811,67 @@ gui_mch_prepare(int *argc, char **argv)
 #ifdef FEAT_NETBEANS_INTG
     {
 	// stolen from gui_x11.c
-	int arg;
+	ಪೂರ್ಣಾಙ್ಕ arg;
 
-	for (arg = 1; arg < *argc; arg++)
-	    if (strncmp("-nb", argv[arg], 3) == 0)
+	ಪ್ರತಿ (arg = 1; arg < *argc; arg++)
+	    ಯದಿ (strncmp("-nb", argv[arg], 3) == 0)
 	    {
 		netbeansArg = argv[arg];
 		mch_memmove(&argv[arg], &argv[arg + 1],
-					    (--*argc - arg) * sizeof(char *));
-		argv[*argc] = NULL;
-		break;	// enough?
+					    (--*argc - arg) * ಪರಿಮಾಣ(ವರ್ಣ *));
+		argv[*argc] = ರಿಕ್ತ;
+		ಭಙ್ಗ;	// enough?
 	    }
     }
 #endif
 }
 
-    static void
-load_dpi_func(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+load_dpi_func(ಶೂನ್ಯ)
 {
     HMODULE	hUser32;
 
     hUser32 = GetModuleHandle("user32.dll");
-    if (hUser32 == NULL)
-	goto fail;
+    ಯದಿ (hUser32 == ರಿಕ್ತ)
+	ಗಚ್ಛ fail;
 
-    pGetDpiForSystem = (UINT (WINAPI *)(void))GetProcAddress(hUser32, "GetDpiForSystem");
+    pGetDpiForSystem = (UINT (WINAPI *)(ಶೂನ್ಯ))GetProcAddress(hUser32, "GetDpiForSystem");
     pGetDpiForWindow = (UINT (WINAPI *)(HWND))GetProcAddress(hUser32, "GetDpiForWindow");
-    pGetSystemMetricsForDpi = (int (WINAPI *)(int, UINT))GetProcAddress(hUser32, "GetSystemMetricsForDpi");
+    pGetSystemMetricsForDpi = (ಪೂರ್ಣಾಙ್ಕ (WINAPI *)(ಪೂರ್ಣಾಙ್ಕ, UINT))GetProcAddress(hUser32, "GetSystemMetricsForDpi");
     //pGetWindowDpiAwarenessContext = (void*)GetProcAddress(hUser32, "GetWindowDpiAwarenessContext");
     pSetThreadDpiAwarenessContext = (DPI_AWARENESS_CONTEXT (WINAPI *)(DPI_AWARENESS_CONTEXT))GetProcAddress(hUser32, "SetThreadDpiAwarenessContext");
 #ifdef FEAT_MBYTE_IME
     pGetAwarenessFromDpiAwarenessContext = (DPI_AWARENESS (WINAPI *)(DPI_AWARENESS_CONTEXT))GetProcAddress(hUser32, "GetAwarenessFromDpiAwarenessContext");
 #endif
 
-    if (pSetThreadDpiAwarenessContext != NULL)
+    ಯದಿ (pSetThreadDpiAwarenessContext != ರಿಕ್ತ)
     {
 	DPI_AWARENESS_CONTEXT oldctx = pSetThreadDpiAwarenessContext(
 		DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
-	if (oldctx != NULL)
+	ಯದಿ (oldctx != ರಿಕ್ತ)
 	{
 	    TRACE("DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 enabled");
 #ifdef FEAT_MBYTE_IME
 	    s_process_dpi_aware = pGetAwarenessFromDpiAwarenessContext(oldctx);
 # ifdef DEBUG
-	    if (s_process_dpi_aware == DPI_AWARENESS_UNAWARE)
+	    ಯದಿ (s_process_dpi_aware == DPI_AWARENESS_UNAWARE)
 	    {
 		TRACE("WARNING: PerMonitorV2 is not enabled in the process level for some reasons. IME window may not shown correctly.");
 	    }
 # endif
 #endif
-	    return;
+	    ಪ್ರತ್ಯಾಗಮ;
 	}
     }
 
 fail:
     // Disable PerMonitorV2 APIs.
     pGetDpiForSystem = vimGetDpiForSystem;
-    pGetDpiForWindow = NULL;
+    pGetDpiForWindow = ರಿಕ್ತ;
     pGetSystemMetricsForDpi = stubGetSystemMetricsForDpi;
-    pSetThreadDpiAwarenessContext = NULL;
+    pSetThreadDpiAwarenessContext = ರಿಕ್ತ;
 #ifdef FEAT_MBYTE_IME
-    pGetAwarenessFromDpiAwarenessContext = NULL;
+    pGetAwarenessFromDpiAwarenessContext = ರಿಕ್ತ;
 #endif
 }
 
@@ -5879,17 +5879,17 @@ fail:
  * Initialise the GUI.	Create all the windows, set up all the call-backs
  * etc.
  */
-    int
-gui_mch_init(void)
+    ಪೂರ್ಣಾಙ್ಕ
+gui_mch_init(ಶೂನ್ಯ)
 {
-    const WCHAR szVimWndClassW[] = VIM_CLASSW;
-    const WCHAR szTextAreaClassW[] = L"VimTextArea";
+    ಧ್ರುವ WCHAR szVimWndClassW[] = VIM_CLASSW;
+    ಧ್ರುವ WCHAR szTextAreaClassW[] = L"VimTextArea";
     WNDCLASSW wndclassw;
 
     // Return here if the window was already opened (happens when
     // gui_mch_dialog() is called early).
-    if (s_hwnd != NULL)
-	goto theend;
+    ಯದಿ (s_hwnd != ರಿಕ್ತ)
+	ಗಚ್ಛ theend;
 
     /*
      * Load the tearoff bitmap
@@ -5921,7 +5921,7 @@ gui_mch_init(void)
 
     // First try using the wide version, so that we can use any title.
     // Otherwise only characters in the active codepage will work.
-    if (GetClassInfoW(g_hinst, szVimWndClassW, &wndclassw) == 0)
+    ಯದಿ (GetClassInfoW(g_hinst, szVimWndClassW, &wndclassw) == 0)
     {
 	wndclassw.style = CS_DBLCLKS;
 	wndclassw.lpfnWndProc = _WndProc;
@@ -5929,16 +5929,16 @@ gui_mch_init(void)
 	wndclassw.cbWndExtra = 0;
 	wndclassw.hInstance = g_hinst;
 	wndclassw.hIcon = LoadIcon(wndclassw.hInstance, "IDR_VIM");
-	wndclassw.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wndclassw.hCursor = LoadCursor(ರಿಕ್ತ, IDC_ARROW);
 	wndclassw.hbrBackground = s_brush;
-	wndclassw.lpszMenuName = NULL;
+	wndclassw.lpszMenuName = ರಿಕ್ತ;
 	wndclassw.lpszClassName = szVimWndClassW;
 
-	if (RegisterClassW(&wndclassw) == 0)
-	    return FAIL;
+	ಯದಿ (RegisterClassW(&wndclassw) == 0)
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
     }
 
-    if (vim_parent_hwnd != NULL)
+    ಯದಿ (vim_parent_hwnd != ರಿಕ್ತ)
     {
 #ifdef HAVE_TRY_EXCEPT
 	__try
@@ -5956,8 +5956,8 @@ gui_mch_init(void)
 		gui_win_y == -1 ? CW_USEDEFAULT : gui_win_y,
 		100,				// Any value will do
 		100,				// Any value will do
-		vim_parent_hwnd, NULL,
-		g_hinst, NULL);
+		vim_parent_hwnd, ರಿಕ್ತ,
+		g_hinst, ರಿಕ್ತ);
 #ifdef HAVE_TRY_EXCEPT
 	}
 	__except(EXCEPTION_EXECUTE_HANDLER)
@@ -5965,17 +5965,17 @@ gui_mch_init(void)
 	    // NOP
 	}
 #endif
-	if (s_hwnd == NULL)
+	ಯದಿ (s_hwnd == ರಿಕ್ತ)
 	{
 	    emsg(_(e_unable_to_open_window_inside_mdi_application));
 	    mch_exit(2);
 	}
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	// If the provided windowid is not valid reset it to zero, so that it
 	// is ignored and we open our own window.
-	if (IsWindow((HWND)win_socket_id) <= 0)
+	ಯದಿ (IsWindow((HWND)win_socket_id) <= 0)
 	    win_socket_id = 0;
 
 	// Create a window.  If win_socket_id is not zero without border and
@@ -5988,45 +5988,45 @@ gui_mch_init(void)
 		gui_win_y == -1 ? CW_USEDEFAULT : gui_win_y,
 		100,				// Any value will do
 		100,				// Any value will do
-		NULL, NULL,
-		g_hinst, NULL);
-	if (s_hwnd != NULL && win_socket_id != 0)
+		ರಿಕ್ತ, ರಿಕ್ತ,
+		g_hinst, ರಿಕ್ತ);
+	ಯದಿ (s_hwnd != ರಿಕ್ತ && win_socket_id != 0)
 	{
 	    SetParent(s_hwnd, (HWND)win_socket_id);
 	    ShowWindow(s_hwnd, SW_SHOWMAXIMIZED);
 	}
     }
 
-    if (s_hwnd == NULL)
-	return FAIL;
+    ಯದಿ (s_hwnd == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
 
-    if (pGetDpiForWindow != NULL)
+    ಯದಿ (pGetDpiForWindow != ರಿಕ್ತ)
     {
 	s_dpi = pGetDpiForWindow(s_hwnd);
 	update_scrollbar_size();
 	//TRACE("System DPI: %d, DPI: %d", pGetDpiForSystem(), s_dpi);
     }
 
-#if defined(FEAT_MBYTE_IME) && defined(DYNAMIC_IME)
+#ಯದಿ defined(FEAT_MBYTE_IME) && defined(DYNAMIC_IME)
     dyn_imm_load();
 #endif
 
     // Create the text area window
-    if (GetClassInfoW(g_hinst, szTextAreaClassW, &wndclassw) == 0)
+    ಯದಿ (GetClassInfoW(g_hinst, szTextAreaClassW, &wndclassw) == 0)
     {
 	wndclassw.style = CS_OWNDC;
 	wndclassw.lpfnWndProc = _TextAreaWndProc;
 	wndclassw.cbClsExtra = 0;
 	wndclassw.cbWndExtra = 0;
 	wndclassw.hInstance = g_hinst;
-	wndclassw.hIcon = NULL;
-	wndclassw.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wndclassw.hbrBackground = NULL;
-	wndclassw.lpszMenuName = NULL;
+	wndclassw.hIcon = ರಿಕ್ತ;
+	wndclassw.hCursor = LoadCursor(ರಿಕ್ತ, IDC_ARROW);
+	wndclassw.hbrBackground = ರಿಕ್ತ;
+	wndclassw.lpszMenuName = ರಿಕ್ತ;
 	wndclassw.lpszClassName = szTextAreaClassW;
 
-	if (RegisterClassW(&wndclassw) == 0)
-	    return FAIL;
+	ಯದಿ (RegisterClassW(&wndclassw) == 0)
+	    ಪ್ರತ್ಯಾಗಮ FAIL;
     }
 
     s_textArea = CreateWindowExW(
@@ -6035,18 +6035,18 @@ gui_mch_init(void)
 	WS_CHILD | WS_VISIBLE, 0, 0,
 	100,				// Any value will do for now
 	100,				// Any value will do for now
-	s_hwnd, NULL,
-	g_hinst, NULL);
+	s_hwnd, ರಿಕ್ತ,
+	g_hinst, ರಿಕ್ತ);
 
-    if (s_textArea == NULL)
-	return FAIL;
+    ಯದಿ (s_textArea == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
 
 #ifdef FEAT_LIBCALL
     // Try loading an icon from $RUNTIMEPATH/bitmaps/vim.ico.
     {
-	HANDLE	hIcon = NULL;
+	HANDLE	hIcon = ರಿಕ್ತ;
 
-	if (mch_icon_load(&hIcon) == OK && hIcon != NULL)
+	ಯದಿ (mch_icon_load(&hIcon) == OK && hIcon != ರಿಕ್ತ)
 	    SendMessage(s_hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
     }
 #endif
@@ -6110,10 +6110,10 @@ gui_mch_init(void)
     /*
      * Initialise the dialog box stuff
      */
-    s_findrep_msg = RegisterWindowMessage(FINDMSGSTRING);
+    s_findrep_ಸಂದೇಶ = RegisterWindowMessage(FINDMSGSTRING);
 
     // Initialise the struct
-    s_findrep_struct.lStructSize = sizeof(s_findrep_struct);
+    s_findrep_struct.lStructSize = ಪರಿಮಾಣ(s_findrep_struct);
     s_findrep_struct.lpstrFindWhat = ALLOC_MULT(WCHAR, MSWIN_FR_BUFSIZE);
     s_findrep_struct.lpstrFindWhat[0] = NUL;
     s_findrep_struct.lpstrReplaceWith = ALLOC_MULT(WCHAR, MSWIN_FR_BUFSIZE);
@@ -6128,22 +6128,22 @@ gui_mch_init(void)
 #endif
 
 #ifdef FEAT_RENDER_OPTIONS
-    if (p_rop)
-	(void)gui_mch_set_rendering_options(p_rop);
+    ಯದಿ (p_rop)
+	(ಶೂನ್ಯ)gui_mch_set_rendering_options(p_rop);
 #endif
 
 theend:
     // Display any pending error messages
     display_errors();
 
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
 /*
  * Get the size of the screen, taking position on multiple monitors into
  * account (if supported).
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 get_work_area(RECT *spi_rect)
 {
     HMONITOR	    mon;
@@ -6151,13 +6151,13 @@ get_work_area(RECT *spi_rect)
 
     // work out which monitor the window is on, and get *its* work area
     mon = MonitorFromWindow(s_hwnd, MONITOR_DEFAULTTOPRIMARY);
-    if (mon != NULL)
+    ಯದಿ (mon != ರಿಕ್ತ)
     {
-	moninfo.cbSize = sizeof(MONITORINFO);
-	if (GetMonitorInfo(mon, &moninfo))
+	moninfo.cbSize = ಪರಿಮಾಣ(MONITORINFO);
+	ಯದಿ (GetMonitorInfo(mon, &moninfo))
 	{
 	    *spi_rect = moninfo.rcWork;
-	    return;
+	    ಪ್ರತ್ಯಾಗಮ;
 	}
     }
     // this is the old method...
@@ -6167,19 +6167,19 @@ get_work_area(RECT *spi_rect)
 /*
  * Set the size of the window to the given width and height in pixels.
  */
-    void
+    ಶೂನ್ಯ
 gui_mch_set_shellsize(
-	int width,
-	int height,
-	int min_width UNUSED,
-	int min_height UNUSED,
-	int base_width UNUSED,
-	int base_height UNUSED,
-	int direction)
+	ಪೂರ್ಣಾಙ್ಕ width,
+	ಪೂರ್ಣಾಙ್ಕ height,
+	ಪೂರ್ಣಾಙ್ಕ min_width UNUSED,
+	ಪೂರ್ಣಾಙ್ಕ min_height UNUSED,
+	ಪೂರ್ಣಾಙ್ಕ base_width UNUSED,
+	ಪೂರ್ಣಾಙ್ಕ base_height UNUSED,
+	ಪೂರ್ಣಾಙ್ಕ direction)
 {
     RECT	workarea_rect;
     RECT	window_rect;
-    int		win_width, win_height;
+    ಪೂರ್ಣಾಙ್ಕ		win_width, win_height;
 
     // Try to keep window completely on screen.
     // Get position of the screen work area.  This is the part that is not
@@ -6189,13 +6189,13 @@ gui_mch_set_shellsize(
     // Resizing a maximized window looks very strange, unzoom it first.
     // But don't do it when still starting up, it may have been requested in
     // the shortcut.
-    if (IsZoomed(s_hwnd) && starting == 0)
+    ಯದಿ (IsZoomed(s_hwnd) && starting == 0)
 	ShowWindow(s_hwnd, SW_SHOWNORMAL);
 
-    if (s_in_dpichanged)
+    ಯದಿ (s_in_dpichanged)
 	// Use the suggested position when in WM_DPICHANGED.
 	window_rect = s_suggested_rect;
-    else
+    ಅನ್ಯಥಾ
 	// Use current position.
 	GetWindowRect(s_hwnd, &window_rect);
 
@@ -6210,35 +6210,35 @@ gui_mch_set_shellsize(
     // The following should take care of keeping Vim on the same monitor, no
     // matter if the secondary monitor is left or right of the primary
     // monitor.
-    window_rect.right = window_rect.left + win_width;
-    window_rect.bottom = window_rect.top + win_height;
+    window_rect.ಬಲ = window_rect.ಎಡ + win_width;
+    window_rect.bottom = window_rect.ತುದಿ + win_height;
 
     // If the window is going off the screen, move it on to the screen.
     // Don't adjust the position when in WM_DPICHANGED.
-    if (!s_in_dpichanged)
+    ಯದಿ (!s_in_dpichanged)
     {
-	if ((direction & RESIZE_HOR)
-		&& window_rect.right > workarea_rect.right)
+	ಯದಿ ((direction & RESIZE_HOR)
+		&& window_rect.ಬಲ > workarea_rect.ಬಲ)
 	    OffsetRect(&window_rect,
-		    workarea_rect.right - window_rect.right, 0);
+		    workarea_rect.ಬಲ - window_rect.ಬಲ, 0);
 
-	if ((direction & RESIZE_HOR)
-		&& window_rect.left < workarea_rect.left)
+	ಯದಿ ((direction & RESIZE_HOR)
+		&& window_rect.ಎಡ < workarea_rect.ಎಡ)
 	    OffsetRect(&window_rect,
-		    workarea_rect.left - window_rect.left, 0);
+		    workarea_rect.ಎಡ - window_rect.ಎಡ, 0);
 
-	if ((direction & RESIZE_VERT)
+	ಯದಿ ((direction & RESIZE_VERT)
 		&& window_rect.bottom > workarea_rect.bottom)
 	    OffsetRect(&window_rect,
 		    0, workarea_rect.bottom - window_rect.bottom);
 
-	if ((direction & RESIZE_VERT)
-		&& window_rect.top < workarea_rect.top)
+	ಯದಿ ((direction & RESIZE_VERT)
+		&& window_rect.ತುದಿ < workarea_rect.ತುದಿ)
 	    OffsetRect(&window_rect,
-		    0, workarea_rect.top - window_rect.top);
+		    0, workarea_rect.ತುದಿ - window_rect.ತುದಿ);
     }
 
-    MoveWindow(s_hwnd, window_rect.left, window_rect.top,
+    MoveWindow(s_hwnd, window_rect.ಎಡ, window_rect.ತುದಿ,
 						win_width, win_height, TRUE);
 
     //TRACE("New pos: %d,%d  New size: %d,%d",
@@ -6252,7 +6252,7 @@ gui_mch_set_shellsize(
 }
 
 
-    void
+    ಶೂನ್ಯ
 gui_mch_set_scrollbar_thumb(
     scrollbar_T *sb,
     long	val,
@@ -6262,7 +6262,7 @@ gui_mch_set_scrollbar_thumb(
     SCROLLINFO	info;
 
     sb->scroll_shift = 0;
-    while (max > 32767)
+    ಯಾವತ್ (max > 32767)
     {
 	max = (max + 1) >> 1;
 	val  >>= 1;
@@ -6270,10 +6270,10 @@ gui_mch_set_scrollbar_thumb(
 	++sb->scroll_shift;
     }
 
-    if (sb->scroll_shift > 0)
+    ಯದಿ (sb->scroll_shift > 0)
 	++size;
 
-    info.cbSize = sizeof(info);
+    info.cbSize = ಪರಿಮಾಣ(info);
     info.fMask = SIF_POS | SIF_RANGE | SIF_PAGE;
     info.nPos = val;
     info.nMin = 0;
@@ -6286,7 +6286,7 @@ gui_mch_set_scrollbar_thumb(
 /*
  * Set the current text font.
  */
-    void
+    ಶೂನ್ಯ
 gui_mch_set_font(GuiFont font)
 {
     gui.currFont = font;
@@ -6296,7 +6296,7 @@ gui_mch_set_font(GuiFont font)
 /*
  * Set the current text foreground color.
  */
-    void
+    ಶೂನ್ಯ
 gui_mch_set_fg_color(guicolor_T color)
 {
     gui.currFgColor = color;
@@ -6305,7 +6305,7 @@ gui_mch_set_fg_color(guicolor_T color)
 /*
  * Set the current text background color.
  */
-    void
+    ಶೂನ್ಯ
 gui_mch_set_bg_color(guicolor_T color)
 {
     gui.currBgColor = color;
@@ -6314,7 +6314,7 @@ gui_mch_set_bg_color(guicolor_T color)
 /*
  * Set the current text special color.
  */
-    void
+    ಶೂನ್ಯ
 gui_mch_set_sp_color(guicolor_T color)
 {
     gui.currSpColor = color;
@@ -6333,21 +6333,21 @@ gui_mch_set_sp_color(guicolor_T color)
 /*
  * handle WM_IME_NOTIFY message
  */
-    static LRESULT
+    ಸ್ಥಿರ LRESULT
 _OnImeNotify(HWND hWnd, DWORD dwCommand, DWORD dwData UNUSED)
 {
     LRESULT lResult = 0;
     HIMC hImc;
 
-    if (!pImmGetContext || (hImc = pImmGetContext(hWnd)) == (HIMC)0)
-	return lResult;
-    switch (dwCommand)
+    ಯದಿ (!pImmGetContext || (hImc = pImmGetContext(hWnd)) == (HIMC)0)
+	ಪ್ರತ್ಯಾಗಮ lResult;
+    ವಿಕಲ್ಪ (dwCommand)
     {
-	case IMN_SETOPENSTATUS:
-	    if (pImmGetOpenStatus(hImc))
+	ಪಕ್ಷ IMN_SETOPENSTATUS:
+	    ಯದಿ (pImmGetOpenStatus(hImc))
 	    {
 		LOGFONTW lf = norm_logfont;
-		if (s_process_dpi_aware == DPI_AWARENESS_UNAWARE)
+		ಯದಿ (s_process_dpi_aware == DPI_AWARENESS_UNAWARE)
 		    // Work around when PerMonitorV2 is not enabled in the process level.
 		    lf.lfHeight = lf.lfHeight * DEFAULT_DPI / s_dpi;
 		pImmSetCompositionFontW(hImc, &lf);
@@ -6355,15 +6355,15 @@ _OnImeNotify(HWND hWnd, DWORD dwCommand, DWORD dwData UNUSED)
 
 		// Disable langmap
 		State &= ~MODE_LANGMAP;
-		if (State & MODE_INSERT)
+		ಯದಿ (State & MODE_ಸೇರಿಸು)
 		{
-# if defined(FEAT_KEYMAP)
+# ಯದಿ defined(FEAT_KEYMAP)
 		    // Unshown 'keymap' in status lines
-		    if (curbuf->b_p_iminsert == B_IMODE_LMAP)
+		    ಯದಿ (curbuf->b_p_iminsert == B_IMODE_LMAP)
 		    {
 			// Save cursor position
-			int old_row = gui.row;
-			int old_col = gui.col;
+			ಪೂರ್ಣಾಙ್ಕ old_row = gui.row;
+			ಪೂರ್ಣಾಙ್ಕ old_col = gui.col;
 
 			// This must be called here before
 			// status_redraw_curbuf(), otherwise the mode
@@ -6381,29 +6381,29 @@ _OnImeNotify(HWND hWnd, DWORD dwCommand, DWORD dwData UNUSED)
 	    gui_update_cursor(TRUE, FALSE);
 	    gui_mch_flush();
 	    lResult = 0;
-	    break;
+	    ಭಙ್ಗ;
     }
     pImmReleaseContext(hWnd, hImc);
-    return lResult;
+    ಪ್ರತ್ಯಾಗಮ lResult;
 }
 
-    static LRESULT
+    ಸ್ಥಿರ LRESULT
 _OnImeComposition(HWND hwnd, WPARAM dbcs UNUSED, LPARAM param)
 {
     char_u	*ret;
-    int		len;
+    ಪೂರ್ಣಾಙ್ಕ		len;
 
-    if ((param & GCS_RESULTSTR) == 0) // Composition unfinished.
-	return 0;
+    ಯದಿ ((param & GCS_RESULTSTR) == 0) // Composition unfinished.
+	ಪ್ರತ್ಯಾಗಮ 0;
 
     ret = GetResultStr(hwnd, GCS_RESULTSTR, &len);
-    if (ret != NULL)
+    ಯದಿ (ret != ರಿಕ್ತ)
     {
-	add_to_input_buf_csi(ret, len);
+	add_to_ಒಳಹರಿವು_buf_csi(ret, len);
 	vim_free(ret);
-	return 1;
+	ಪ್ರತ್ಯಾಗಮ 1;
     }
-    return 0;
+    ಪ್ರತ್ಯಾಗಮ 0;
 }
 
 /*
@@ -6412,50 +6412,50 @@ _OnImeComposition(HWND hwnd, WPARAM dbcs UNUSED, LPARAM param)
  * This handles WM_IME_COMPOSITION with GCS_RESULTSTR flag on.
  * get complete composition string
  */
-    static char_u *
-GetResultStr(HWND hwnd, int GCS, int *lenp)
+    ಸ್ಥಿರ char_u *
+GetResultStr(HWND hwnd, ಪೂರ್ಣಾಙ್ಕ GCS, ಪೂರ್ಣಾಙ್ಕ *lenp)
 {
     HIMC	hIMC;		// Input context handle.
     LONG	ret;
-    WCHAR	*buf = NULL;
-    char_u	*convbuf = NULL;
+    WCHAR	*buf = ರಿಕ್ತ;
+    char_u	*convbuf = ರಿಕ್ತ;
 
-    if (!pImmGetContext || (hIMC = pImmGetContext(hwnd)) == (HIMC)0)
-	return NULL;
+    ಯದಿ (!pImmGetContext || (hIMC = pImmGetContext(hwnd)) == (HIMC)0)
+	ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
 
     // Get the length of the composition string.
-    ret = pImmGetCompositionStringW(hIMC, GCS, NULL, 0);
-    if (ret <= 0)
-	return NULL;
+    ret = pImmGetCompositionStringW(hIMC, GCS, ರಿಕ್ತ, 0);
+    ಯದಿ (ret <= 0)
+	ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
 
     // Allocate the requested buffer plus space for the NUL character.
-    buf = alloc(ret + sizeof(WCHAR));
-    if (buf == NULL)
-	return NULL;
+    buf = alloc(ret + ಪರಿಮಾಣ(WCHAR));
+    ಯದಿ (buf == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
 
     // Reads in the composition string.
     pImmGetCompositionStringW(hIMC, GCS, buf, ret);
-    *lenp = ret / sizeof(WCHAR);
+    *lenp = ret / ಪರಿಮಾಣ(WCHAR);
 
     convbuf = utf16_to_enc(buf, lenp);
     pImmReleaseContext(hwnd, hIMC);
     vim_free(buf);
-    return convbuf;
+    ಪ್ರತ್ಯಾಗಮ convbuf;
 }
 #endif
 
 // For global functions we need prototypes.
-#if defined(FEAT_MBYTE_IME)
+#ಯದಿ defined(FEAT_MBYTE_IME)
 
 /*
  * set font to IM.
  */
-    void
+    ಶೂನ್ಯ
 im_set_font(LOGFONTW *lf)
 {
     HIMC hImc;
 
-    if (pImmGetContext && (hImc = pImmGetContext(s_hwnd)) != (HIMC)0)
+    ಯದಿ (pImmGetContext && (hImc = pImmGetContext(s_hwnd)) != (HIMC)0)
     {
 	pImmSetCompositionFontW(hImc, lf);
 	pImmReleaseContext(s_hwnd, hImc);
@@ -6465,12 +6465,12 @@ im_set_font(LOGFONTW *lf)
 /*
  * Notify cursor position to IM.
  */
-    void
-im_set_position(int row, int col)
+    ಶೂನ್ಯ
+im_set_position(ಪೂರ್ಣಾಙ್ಕ row, ಪೂರ್ಣಾಙ್ಕ col)
 {
     HIMC hImc;
 
-    if (pImmGetContext && (hImc = pImmGetContext(s_hwnd)) != (HIMC)0)
+    ಯದಿ (pImmGetContext && (hImc = pImmGetContext(s_hwnd)) != (HIMC)0)
     {
 	COMPOSITIONFORM	cfs;
 
@@ -6478,7 +6478,7 @@ im_set_position(int row, int col)
 	cfs.ptCurrentPos.x = FILL_X(col);
 	cfs.ptCurrentPos.y = FILL_Y(row);
 	MapWindowPoints(s_textArea, s_hwnd, &cfs.ptCurrentPos, 1);
-	if (s_process_dpi_aware == DPI_AWARENESS_UNAWARE)
+	ಯದಿ (s_process_dpi_aware == DPI_AWARENESS_UNAWARE)
 	{
 	    // Work around when PerMonitorV2 is not enabled in the process level.
 	    cfs.ptCurrentPos.x = cfs.ptCurrentPos.x * DEFAULT_DPI / s_dpi;
@@ -6493,65 +6493,65 @@ im_set_position(int row, int col)
 /*
  * Set IM status on ("active" is TRUE) or off ("active" is FALSE).
  */
-    void
-im_set_active(int active)
+    ಶೂನ್ಯ
+im_set_active(ಪೂರ್ಣಾಙ್ಕ active)
 {
     HIMC	hImc;
-    static HIMC	hImcOld = (HIMC)0;
+    ಸ್ಥಿರ HIMC	hImcOld = (HIMC)0;
 
 # ifdef VIMDLL
-    if (!gui.in_use && !gui.starting)
+    ಯದಿ (!gui.in_use && !gui.starting)
     {
 	mbyte_im_set_active(active);
-	return;
+	ಪ್ರತ್ಯಾಗಮ;
     }
 # endif
 
-    if (!pImmGetContext)    // if NULL imm32.dll wasn't loaded (yet)
-	return;
+    ಯದಿ (!pImmGetContext)    // if NULL imm32.dll wasn't loaded (yet)
+	ಪ್ರತ್ಯಾಗಮ;
 
-    if (p_imdisable)
+    ಯದಿ (p_imdisable)
     {
-	if (hImcOld == (HIMC)0)
+	ಯದಿ (hImcOld == (HIMC)0)
 	{
 	    hImcOld = pImmGetContext(s_hwnd);
-	    if (hImcOld)
+	    ಯದಿ (hImcOld)
 		pImmAssociateContext(s_hwnd, (HIMC)0);
 	}
 	active = FALSE;
     }
-    else if (hImcOld != (HIMC)0)
+    ಅನ್ಯಥಾ ಯದಿ (hImcOld != (HIMC)0)
     {
 	pImmAssociateContext(s_hwnd, hImcOld);
 	hImcOld = (HIMC)0;
     }
 
     hImc = pImmGetContext(s_hwnd);
-    if (!hImc)
-	return;
+    ಯದಿ (!hImc)
+	ಪ್ರತ್ಯಾಗಮ;
 
     /*
      * for Korean ime
      */
     HKL hKL = GetKeyboardLayout(0);
 
-    if (LOWORD(hKL) == MAKELANGID(LANG_KOREAN, SUBLANG_KOREAN))
+    ಯದಿ (LOWORD(hKL) == MAKELANGID(LANG_KOREAN, SUBLANG_KOREAN))
     {
-	static DWORD dwConversionSaved = 0, dwSentenceSaved = 0;
-	static BOOL bSaved = FALSE;
+	ಸ್ಥಿರ DWORD dwConversionSaved = 0, dwSentenceSaved = 0;
+	ಸ್ಥಿರ BOOL bSaved = FALSE;
 
-	if (active)
+	ಯದಿ (active)
 	{
 	    // if we have a saved conversion status, restore it
-	    if (bSaved)
+	    ಯದಿ (bSaved)
 		pImmSetConversionStatus(hImc, dwConversionSaved,
 			dwSentenceSaved);
 	    bSaved = FALSE;
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
 	    // save conversion status and disable korean
-	    if (pImmGetConversionStatus(hImc, &dwConversionSaved,
+	    ಯದಿ (pImmGetConversionStatus(hImc, &dwConversionSaved,
 			&dwSentenceSaved))
 	    {
 		bSaved = TRUE;
@@ -6570,23 +6570,23 @@ im_set_active(int active)
 /*
  * Get IM status.  When IM is on, return not 0.  Else return 0.
  */
-    int
-im_get_status(void)
+    ಪೂರ್ಣಾಙ್ಕ
+im_get_status(ಶೂನ್ಯ)
 {
-    int		status = 0;
+    ಪೂರ್ಣಾಙ್ಕ		status = 0;
     HIMC	hImc;
 
 # ifdef VIMDLL
-    if (!gui.in_use && !gui.starting)
-	return mbyte_im_get_status();
+    ಯದಿ (!gui.in_use && !gui.starting)
+	ಪ್ರತ್ಯಾಗಮ mbyte_im_get_status();
 # endif
 
-    if (pImmGetContext && (hImc = pImmGetContext(s_hwnd)) != (HIMC)0)
+    ಯದಿ (pImmGetContext && (hImc = pImmGetContext(s_hwnd)) != (HIMC)0)
     {
 	status = pImmGetOpenStatus(hImc) ? 1 : 0;
 	pImmReleaseContext(s_hwnd, hImc);
     }
-    return status;
+    ಪ್ರತ್ಯಾಗಮ status;
 }
 
 #endif // FEAT_MBYTE_IME
@@ -6595,24 +6595,24 @@ im_get_status(void)
 /*
  * Convert latin9 text "text[len]" to ucs-2 in "unicodebuf".
  */
-    static void
-latin9_to_ucs(char_u *text, int len, WCHAR *unicodebuf)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+latin9_to_ucs(char_u *text, ಪೂರ್ಣಾಙ್ಕ len, WCHAR *unicodebuf)
 {
-    int		c;
+    ಪೂರ್ಣಾಙ್ಕ		c;
 
-    while (--len >= 0)
+    ಯಾವತ್ (--len >= 0)
     {
 	c = *text++;
-	switch (c)
+	ವಿಕಲ್ಪ (c)
 	{
-	    case 0xa4: c = 0x20ac; break;   // euro
-	    case 0xa6: c = 0x0160; break;   // S hat
-	    case 0xa8: c = 0x0161; break;   // S -hat
-	    case 0xb4: c = 0x017d; break;   // Z hat
-	    case 0xb8: c = 0x017e; break;   // Z -hat
-	    case 0xbc: c = 0x0152; break;   // OE
-	    case 0xbd: c = 0x0153; break;   // oe
-	    case 0xbe: c = 0x0178; break;   // Y
+	    ಪಕ್ಷ 0xa4: c = 0x20ac; ಭಙ್ಗ;   // euro
+	    ಪಕ್ಷ 0xa6: c = 0x0160; ಭಙ್ಗ;   // S hat
+	    ಪಕ್ಷ 0xa8: c = 0x0161; ಭಙ್ಗ;   // S -hat
+	    ಪಕ್ಷ 0xb4: c = 0x017d; ಭಙ್ಗ;   // Z hat
+	    ಪಕ್ಷ 0xb8: c = 0x017e; ಭಙ್ಗ;   // Z -hat
+	    ಪಕ್ಷ 0xbc: c = 0x0152; ಭಙ್ಗ;   // OE
+	    ಪಕ್ಷ 0xbd: c = 0x0153; ಭಙ್ಗ;   // oe
+	    ಪಕ್ಷ 0xbe: c = 0x0178; ಭಙ್ಗ;   // Y
 	}
 	*unicodebuf++ = c;
     }
@@ -6631,102 +6631,102 @@ latin9_to_ucs(char_u *text, int len, WCHAR *unicodebuf)
  * 'rightleft' mode.  It makes display take *slightly* longer, but not
  * noticeably so.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 RevOut( HDC hdc,
-	int col,
-	int row,
+	ಪೂರ್ಣಾಙ್ಕ col,
+	ಪೂರ್ಣಾಙ್ಕ row,
 	UINT foptions,
 	CONST RECT *pcliprect,
 	LPCTSTR text,
 	UINT len,
 	CONST INT *padding)
 {
-    int		ix;
+    ಪೂರ್ಣಾಙ್ಕ		ix;
 
-    for (ix = 0; ix < (int)len; ++ix)
+    ಪ್ರತಿ (ix = 0; ix < (ಪೂರ್ಣಾಙ್ಕ)len; ++ix)
 	ExtTextOut(hdc, col + TEXT_X(ix), row, foptions,
 					pcliprect, text + ix, 1, padding);
 }
 #endif
 
-    static void
-draw_line(
-    int		x1,
-    int		y1,
-    int		x2,
-    int		y2,
+    ಸ್ಥಿರ ಶೂನ್ಯ
+draw_ಸಾಲು(
+    ಪೂರ್ಣಾಙ್ಕ		x1,
+    ಪೂರ್ಣಾಙ್ಕ		y1,
+    ಪೂರ್ಣಾಙ್ಕ		x2,
+    ಪೂರ್ಣಾಙ್ಕ		y2,
     COLORREF	color)
 {
-#if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX())
-	DWriteContext_DrawLine(s_dwc, x1, y1, x2, y2, color);
-    else
+#ಯದಿ defined(FEAT_DIRECTX)
+    ಯದಿ (IS_ENABLE_DIRECTX())
+	DWrite_Context_Draw_ಸಾಲು(s_dwc, x1, y1, x2, y2, color);
+    ಅನ್ಯಥಾ
 #endif
     {
 	HPEN	hpen = CreatePen(PS_SOLID, 1, color);
 	HPEN	old_pen = SelectObject(s_hdc, hpen);
-	MoveToEx(s_hdc, x1, y1, NULL);
+	MoveToEx(s_hdc, x1, y1, ರಿಕ್ತ);
 	// Note: LineTo() excludes the last pixel in the line.
-	LineTo(s_hdc, x2, y2);
+	ಸಾಲು_To(s_hdc, x2, y2);
 	DeleteObject(SelectObject(s_hdc, old_pen));
     }
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 set_pixel(
-    int		x,
-    int		y,
+    ಪೂರ್ಣಾಙ್ಕ		x,
+    ಪೂರ್ಣಾಙ್ಕ		y,
     COLORREF	color)
 {
-#if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX())
+#ಯದಿ defined(FEAT_DIRECTX)
+    ಯದಿ (IS_ENABLE_DIRECTX())
 	DWriteContext_SetPixel(s_dwc, x, y, color);
-    else
+    ಅನ್ಯಥಾ
 #endif
 	SetPixel(s_hdc, x, y, color);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 fill_rect(
-    const RECT	*rcp,
+    ಧ್ರುವ RECT	*rcp,
     HBRUSH	hbr,
     COLORREF	color)
 {
-#if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX())
+#ಯದಿ defined(FEAT_DIRECTX)
+    ಯದಿ (IS_ENABLE_DIRECTX())
 	DWriteContext_FillRect(s_dwc, rcp, color);
-    else
+    ಅನ್ಯಥಾ
 #endif
     {
 	HBRUSH	hbr2;
 
-	if (hbr == NULL)
+	ಯದಿ (hbr == ರಿಕ್ತ)
 	    hbr2 = CreateSolidBrush(color);
-	else
+	ಅನ್ಯಥಾ
 	    hbr2 = hbr;
 	FillRect(s_hdc, rcp, hbr2);
-	if (hbr == NULL)
+	ಯದಿ (hbr == ರಿಕ್ತ)
 	    DeleteBrush(hbr2);
     }
 }
 
-    void
+    ಶೂನ್ಯ
 gui_mch_draw_string(
-    int		row,
-    int		col,
+    ಪೂರ್ಣಾಙ್ಕ		row,
+    ಪೂರ್ಣಾಙ್ಕ		col,
     char_u	*text,
-    int		len,
-    int		flags)
+    ಪೂರ್ಣಾಙ್ಕ		len,
+    ಪೂರ್ಣಾಙ್ಕ		flags)
 {
-    static int	*padding = NULL;
-    static int	pad_size = 0;
-    const RECT	*pcliprect = NULL;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ	*padding = ರಿಕ್ತ;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ	pad_size = 0;
+    ಧ್ರುವ RECT	*pcliprect = ರಿಕ್ತ;
     UINT	foptions = 0;
-    static WCHAR *unicodebuf = NULL;
-    static int   *unicodepdy = NULL;
-    static int	unibuflen = 0;
-    int		n = 0;
-    int		y;
+    ಸ್ಥಿರ WCHAR *unicodebuf = ರಿಕ್ತ;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ   *unicodepdy = ರಿಕ್ತ;
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ	unibuflen = 0;
+    ಪೂರ್ಣಾಙ್ಕ		n = 0;
+    ಪೂರ್ಣಾಙ್ಕ		y;
 
     /*
      * Italic and bold text seems to have an extra row of pixels at the bottom
@@ -6741,44 +6741,44 @@ gui_mch_draw_string(
      * pixels.	We still need this code because otherwise the top row of pixels
      * becomes a problem. - webb.
      */
-    static HBRUSH	hbr_cache[2] = {NULL, NULL};
-    static guicolor_T	brush_color[2] = {INVALCOLOR, INVALCOLOR};
-    static int		brush_lru = 0;
+    ಸ್ಥಿರ HBRUSH	hbr_cache[2] = {ರಿಕ್ತ, ರಿಕ್ತ};
+    ಸ್ಥಿರ guicolor_T	brush_color[2] = {INVALCOLOR, INVALCOLOR};
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ		brush_lru = 0;
     HBRUSH		hbr;
     RECT		rc;
 
-    if (!(flags & DRAW_TRANSP))
+    ಯದಿ (!(flags & DRAW_TRANSP))
     {
 	/*
 	 * Clear background first.
 	 * Note: FillRect() excludes right and bottom of rectangle.
 	 */
-	rc.left = FILL_X(col);
-	rc.top = FILL_Y(row);
-	if (has_mbyte)
+	rc.ಎಡ = FILL_X(col);
+	rc.ತುದಿ = FILL_Y(row);
+	ಯದಿ (has_mbyte)
 	{
 	    // Compute the length in display cells.
-	    rc.right = FILL_X(col + mb_string2cells(text, len));
+	    rc.ಬಲ = FILL_X(col + mb_string2cells(text, len));
 	}
-	else
-	    rc.right = FILL_X(col + len);
+	ಅನ್ಯಥಾ
+	    rc.ಬಲ = FILL_X(col + len);
 	rc.bottom = FILL_Y(row + 1);
 
 	// Cache the created brush, that saves a lot of time.  We need two:
 	// one for cursor background and one for the normal background.
-	if (gui.currBgColor == brush_color[0])
+	ಯದಿ (gui.currBgColor == brush_color[0])
 	{
 	    hbr = hbr_cache[0];
 	    brush_lru = 1;
 	}
-	else if (gui.currBgColor == brush_color[1])
+	ಅನ್ಯಥಾ ಯದಿ (gui.currBgColor == brush_color[1])
 	{
 	    hbr = hbr_cache[1];
 	    brush_lru = 0;
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
-	    if (hbr_cache[brush_lru] != NULL)
+	    ಯದಿ (hbr_cache[brush_lru] != ರಿಕ್ತ)
 		DeleteBrush(hbr_cache[brush_lru]);
 	    hbr_cache[brush_lru] = CreateSolidBrush(gui.currBgColor);
 	    brush_color[brush_lru] = gui.currBgColor;
@@ -6794,7 +6794,7 @@ gui_mch_draw_string(
 	 * When drawing block cursor, prevent inverted character spilling
 	 * over character cell (can happen with bold/italic)
 	 */
-	if (flags & DRAW_CURSOR)
+	ಯದಿ (flags & DRAW_CURSOR)
 	{
 	    pcliprect = &rc;
 	    foptions = ETO_CLIPPED;
@@ -6803,7 +6803,7 @@ gui_mch_draw_string(
 	// DirectWrite anti-aliasing can extend glyph pixels beyond cell
 	// boundaries, leaving artifacts when adjacent cells are not
 	// redrawn.  Clip to the cell rect to prevent this.
-	else if (IS_ENABLE_DIRECTX())
+	ಅನ್ಯಥಾ ಯದಿ (IS_ENABLE_DIRECTX())
 	{
 	    pcliprect = &rc;
 	    foptions = ETO_CLIPPED;
@@ -6814,22 +6814,22 @@ gui_mch_draw_string(
     SelectFont(s_hdc, gui.currFont);
 
 #ifdef FEAT_DIRECTX
-    if (IS_ENABLE_DIRECTX())
+    ಯದಿ (IS_ENABLE_DIRECTX())
 	DWriteContext_SetFont(s_dwc, (HFONT)gui.currFont);
 #endif
 
-    if (pad_size != Columns || padding == NULL || padding[0] != gui.char_width)
+    ಯದಿ (pad_size != Columns || padding == ರಿಕ್ತ || padding[0] != gui.char_width)
     {
-	int	i;
+	ಪೂರ್ಣಾಙ್ಕ	i;
 
 	vim_free(padding);
 	pad_size = Columns;
 
 	// Don't give an out-of-memory message here, it would call us
 	// recursively.
-	padding = LALLOC_MULT(int, pad_size);
-	if (padding != NULL)
-	    for (i = 0; i < pad_size; i++)
+	padding = LALLOC_MULT(ಪೂರ್ಣಾಙ್ಕ, pad_size);
+	ಯದಿ (padding != ರಿಕ್ತ)
+	    ಪ್ರತಿ (i = 0; i < pad_size; i++)
 		padding[i] = gui.char_width;
     }
 
@@ -6842,89 +6842,89 @@ gui_mch_draw_string(
 
     // Check if there are any UTF-8 characters.  If not, use normal text
     // output to speed up output.
-    if (enc_utf8)
-	for (n = 0; n < len; ++n)
-	    if (text[n] >= 0x80)
-		break;
+    ಯದಿ (enc_utf8)
+	ಪ್ರತಿ (n = 0; n < len; ++n)
+	    ಯದಿ (text[n] >= 0x80)
+		ಭಙ್ಗ;
 
-#if defined(FEAT_DIRECTX)
+#ಯದಿ defined(FEAT_DIRECTX)
     // Quick hack to enable DirectWrite.  To use DirectWrite (antialias), it is
     // required that unicode drawing routine, currently.  So this forces it
     // enabled.
-    if (IS_ENABLE_DIRECTX())
+    ಯದಿ (IS_ENABLE_DIRECTX())
 	n = 0; // Keep n < len, to enter block for unicode.
 #endif
 
     // Check if the Unicode buffer exists and is big enough.  Create it
     // with the same length as the multi-byte string, the number of wide
     // characters is always equal or smaller.
-    if ((enc_utf8
-		|| (enc_codepage > 0 && (int)GetACP() != enc_codepage)
+    ಯದಿ ((enc_utf8
+		|| (enc_codepage > 0 && (ಪೂರ್ಣಾಙ್ಕ)GetACP() != enc_codepage)
 		|| enc_latin9)
-	    && (unicodebuf == NULL || len > unibuflen))
+	    && (unicodebuf == ರಿಕ್ತ || len > unibuflen))
     {
 	vim_free(unicodebuf);
 	unicodebuf = LALLOC_MULT(WCHAR, len);
 
 	vim_free(unicodepdy);
-	unicodepdy = LALLOC_MULT(int, len);
+	unicodepdy = LALLOC_MULT(ಪೂರ್ಣಾಙ್ಕ, len);
 
 	unibuflen = len;
     }
 
-    if (enc_utf8 && n < len && unicodebuf != NULL)
+    ಯದಿ (enc_utf8 && n < len && unicodebuf != ರಿಕ್ತ)
     {
 	// Output UTF-8 characters.  Composing characters should be
 	// handled here.
-	int		i;
-	int		wlen;	// string length in words
-	int		cells;	// cell width of string up to composing char
-	int		cw;	// width of current cell
-	int		c;
+	ಪೂರ್ಣಾಙ್ಕ		i;
+	ಪೂರ್ಣಾಙ್ಕ		wlen;	// string length in words
+	ಪೂರ್ಣಾಙ್ಕ		cells;	// cell width of string up to composing char
+	ಪೂರ್ಣಾಙ್ಕ		cw;	// width of current cell
+	ಪೂರ್ಣಾಙ್ಕ		c;
 
 	wlen = 0;
 	cells = 0;
-	for (i = 0; i < len; )
+	ಪ್ರತಿ (i = 0; i < len; )
 	{
 	    c = utf_ptr2char(text + i);
-	    if (c >= 0x10000)
+	    ಯದಿ (c >= 0x10000)
 	    {
 		// Turn into UTF-16 encoding.
 		unicodebuf[wlen++] = ((c - 0x10000) >> 10) + 0xD800;
 		unicodebuf[wlen++] = ((c - 0x10000) & 0x3ff) + 0xDC00;
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 	    {
 		unicodebuf[wlen++] = c;
 	    }
 
-	    if (utf_iscomposing(c))
+	    ಯದಿ (utf_iscomposing(c))
 		cw = 0;
-	    else
+	    ಅನ್ಯಥಾ
 	    {
 		cw = utf_char2cells(c);
-		if (cw > 2)		// don't use 4 for unprintable char
+		ಯದಿ (cw > 2)		// don't use 4 for unprintable char
 		    cw = 1;
 	    }
 
-	    if (unicodepdy != NULL)
+	    ಯದಿ (unicodepdy != ರಿಕ್ತ)
 	    {
 		// Use unicodepdy to make characters fit as we expect, even
 		// when the font uses different widths (e.g., bold character
 		// is wider).
-		if (c >= 0x10000)
+		ಯದಿ (c >= 0x10000)
 		{
 		    unicodepdy[wlen - 2] = cw * gui.char_width;
 		    unicodepdy[wlen - 1] = 0;
 		}
-		else
+		ಅನ್ಯಥಾ
 		    unicodepdy[wlen - 1] = cw * gui.char_width;
 	    }
 	    cells += cw;
 	    i += utf_ptr2len_len(text + i, len - i);
 	}
-#if defined(FEAT_DIRECTX)
-	if (IS_ENABLE_DIRECTX())
+#ಯದಿ defined(FEAT_DIRECTX)
+	ಯದಿ (IS_ENABLE_DIRECTX())
 	{
 	    // Add one to "cells" for italics.
 	    DWriteContext_DrawText(s_dwc, unicodebuf, wlen,
@@ -6933,39 +6933,39 @@ gui_mch_draw_string(
 		    gui.char_width, gui.currFgColor,
 		    foptions, pcliprect, unicodepdy);
 	}
-	else
+	ಅನ್ಯಥಾ
 #endif
 	    ExtTextOutW(s_hdc, TEXT_X(col), TEXT_Y(row),
 		    foptions, pcliprect, unicodebuf, wlen, unicodepdy);
 	len = cells;	// used for underlining
     }
-    else if ((enc_codepage > 0 && (int)GetACP() != enc_codepage) || enc_latin9)
+    ಅನ್ಯಥಾ ಯದಿ ((enc_codepage > 0 && (ಪೂರ್ಣಾಙ್ಕ)GetACP() != enc_codepage) || enc_latin9)
     {
 	// If we want to display codepage data, and the current CP is not the
 	// ANSI one, we need to go via Unicode.
-	if (unicodebuf != NULL)
+	ಯದಿ (unicodebuf != ರಿಕ್ತ)
 	{
-	    if (enc_latin9)
+	    ಯದಿ (enc_latin9)
 		latin9_to_ucs(text, len, unicodebuf);
-	    else
+	    ಅನ್ಯಥಾ
 		len = MultiByteToWideChar(enc_codepage,
 			MB_PRECOMPOSED,
-			(char *)text, len,
+			(ವರ್ಣ *)text, len,
 			(LPWSTR)unicodebuf, unibuflen);
-	    if (len != 0)
+	    ಯದಿ (len != 0)
 	    {
 		// Use unicodepdy to make characters fit as we expect, even
 		// when the font uses different widths (e.g., bold character
 		// is wider).
-		if (unicodepdy != NULL)
+		ಯದಿ (unicodepdy != ರಿಕ್ತ)
 		{
-		    int i;
-		    int cw;
+		    ಪೂರ್ಣಾಙ್ಕ i;
+		    ಪೂರ್ಣಾಙ್ಕ cw;
 
-		    for (i = 0; i < len; ++i)
+		    ಪ್ರತಿ (i = 0; i < len; ++i)
 		    {
 			cw = utf_char2cells(unicodebuf[i]);
-			if (cw > 2)
+			ಯದಿ (cw > 2)
 			    cw = 1;
 			unicodepdy[i] = cw * gui.char_width;
 		    }
@@ -6975,47 +6975,47 @@ gui_mch_draw_string(
 	    }
 	}
     }
-    else
+    ಅನ್ಯಥಾ
     {
 #ifdef FEAT_RIGHTLEFT
 	// Windows will mess up RL text, so we have to draw it character by
 	// character.  Only do this if RL is on, since it's slow.
-	if (curwin->w_p_rl)
+	ಯದಿ (curwin->w_p_rl)
 	    RevOut(s_hdc, TEXT_X(col), TEXT_Y(row),
-			 foptions, pcliprect, (char *)text, len, padding);
-	else
+			 foptions, pcliprect, (ವರ್ಣ *)text, len, padding);
+	ಅನ್ಯಥಾ
 #endif
 	    ExtTextOut(s_hdc, TEXT_X(col), TEXT_Y(row),
-			 foptions, pcliprect, (char *)text, len, padding);
+			 foptions, pcliprect, (ವರ್ಣ *)text, len, padding);
     }
 
     // Underline
-    if (flags & DRAW_UNDERL)
+    ಯದಿ (flags & DRAW_UNDERL)
     {
 	// When p_linespace is 0, overwrite the bottom row of pixels.
 	// Otherwise put the line just below the character.
 	y = FILL_Y(row + 1) - 1;
-	if (p_linespace > 1)
+	ಯದಿ (p_linespace > 1)
 	    y -= p_linespace - 1;
-	draw_line(FILL_X(col), y, FILL_X(col + len), y, gui.currFgColor);
+	draw_ಸಾಲು(FILL_X(col), y, FILL_X(col + len), y, gui.currFgColor);
     }
 
     // Strikethrough
-    if (flags & DRAW_STRIKE)
+    ಯದಿ (flags & DRAW_STRIKE)
     {
 	y = FILL_Y(row + 1) - gui.char_height/2;
-	draw_line(FILL_X(col), y, FILL_X(col + len), y, gui.currSpColor);
+	draw_ಸಾಲು(FILL_X(col), y, FILL_X(col + len), y, gui.currSpColor);
     }
 
     // Undercurl
-    if (flags & DRAW_UNDERC)
+    ಯದಿ (flags & DRAW_UNDERC)
     {
-	int			x;
-	int			offset;
-	static const int	val[8] = {1, 0, 0, 0, 1, 2, 2, 2 };
+	ಪೂರ್ಣಾಙ್ಕ			x;
+	ಪೂರ್ಣಾಙ್ಕ			offset;
+	ಸ್ಥಿರ ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ	val[8] = {1, 0, 0, 0, 1, 2, 2, 2 };
 
 	y = FILL_Y(row + 1) - 1;
-	for (x = FILL_X(col); x < FILL_X(col + len); ++x)
+	ಪ್ರತಿ (x = FILL_X(col); x < FILL_X(col + len); ++x)
 	{
 	    offset = val[x % 8];
 	    set_pixel(x, y - offset, gui.currSpColor);
@@ -7031,39 +7031,39 @@ gui_mch_draw_string(
 /*
  * Flush any output to the screen
  */
-    void
-gui_mch_flush(void)
+    ಶೂನ್ಯ
+gui_mch_flush(ಶೂನ್ಯ)
 {
-#if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX())
+#ಯದಿ defined(FEAT_DIRECTX)
+    ಯದಿ (IS_ENABLE_DIRECTX())
 	DWriteContext_Flush(s_dwc);
 #endif
 
     GdiFlush();
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 clear_rect(RECT *rcp)
 {
-    fill_rect(rcp, NULL, gui.back_pixel);
+    fill_rect(rcp, ರಿಕ್ತ, gui.back_pixel);
 }
 
 
-    void
-gui_mch_get_screen_dimensions(int *screen_w, int *screen_h)
+    ಶೂನ್ಯ
+gui_mch_get_screen_dimensions(ಪೂರ್ಣಾಙ್ಕ *screen_w, ಪೂರ್ಣಾಙ್ಕ *screen_h)
 {
     RECT	workarea_rect;
 
     get_work_area(&workarea_rect);
 
-    *screen_w = workarea_rect.right - workarea_rect.left
+    *screen_w = workarea_rect.ಬಲ - workarea_rect.ಎಡ
 		- (pGetSystemMetricsForDpi(SM_CXFRAME, s_dpi) +
 		   pGetSystemMetricsForDpi(SM_CXPADDEDBORDER, s_dpi)) * 2;
 
     // FIXME: dirty trick: Because the gui_get_base_height() doesn't include
     // the menubar for MSwin, we subtract it from the screen height, so that
     // the window size can be made to fit on the screen.
-    *screen_h = workarea_rect.bottom - workarea_rect.top
+    *screen_h = workarea_rect.bottom - workarea_rect.ತುದಿ
 		- (pGetSystemMetricsForDpi(SM_CYFRAME, s_dpi) +
 		   pGetSystemMetricsForDpi(SM_CXPADDEDBORDER, s_dpi)) * 2
 		- pGetSystemMetricsForDpi(SM_CYCAPTION, s_dpi)
@@ -7071,30 +7071,30 @@ gui_mch_get_screen_dimensions(int *screen_w, int *screen_h)
 }
 
 
-#if defined(FEAT_MENU)
+#ಯದಿ defined(FEAT_MENU)
 /*
  * Add a sub menu to the menu bar.
  */
-    void
+    ಶೂನ್ಯ
 gui_mch_add_menu(
     vimmenu_T	*menu,
-    int		pos)
+    ಪೂರ್ಣಾಙ್ಕ		pos)
 {
     vimmenu_T	*parent = menu->parent;
 
     menu->submenu_id = CreatePopupMenu();
     menu->id = s_menu_id++;
 
-    if (menu_is_menubar(menu->name))
+    ಯದಿ (menu_is_menubar(menu->name))
     {
 	WCHAR	*wn;
 	MENUITEMINFOW	infow;
 
-	wn = enc_to_utf16(menu->name, NULL);
-	if (wn == NULL)
-	    return;
+	wn = enc_to_utf16(menu->name, ರಿಕ್ತ);
+	ಯದಿ (wn == ರಿಕ್ತ)
+	    ಪ್ರತ್ಯಾಗಮ;
 
-	infow.cbSize = sizeof(infow);
+	infow.cbSize = ಪರಿಮಾಣ(infow);
 	infow.fMask = MIIM_DATA | MIIM_TYPE | MIIM_ID
 	    | MIIM_SUBMENU;
 	infow.dwItemData = (long_u)menu;
@@ -7103,71 +7103,71 @@ gui_mch_add_menu(
 	infow.dwTypeData = wn;
 	infow.cch = (UINT)wcslen(wn);
 	infow.hSubMenu = menu->submenu_id;
-	InsertMenuItemW((parent == NULL)
+	ಸೇರಿಸು_Menu_Item_W((parent == ರಿಕ್ತ)
 		? s_menuBar : parent->submenu_id,
 		(UINT)pos, TRUE, &infow);
 	vim_free(wn);
     }
 
     // Fix window size if menu may have wrapped
-    if (parent == NULL)
+    ಯದಿ (parent == ರಿಕ್ತ)
 	gui_mswin_get_menu_height(!gui.starting);
 # ifdef FEAT_TEAROFF
-    else if (IsWindow(parent->tearoff_handle))
+    ಅನ್ಯಥಾ ಯದಿ (IsWindow(parent->tearoff_handle))
 	rebuild_tearoff(parent);
 # endif
 }
 
-    void
+    ಶೂನ್ಯ
 gui_mch_show_popupmenu(vimmenu_T *menu)
 {
     POINT mp;
 
-    (void)GetCursorPos(&mp);
-    gui_mch_show_popupmenu_at(menu, (int)mp.x, (int)mp.y);
+    (ಶೂನ್ಯ)GetCursorPos(&mp);
+    gui_mch_show_popupmenu_at(menu, (ಪೂರ್ಣಾಙ್ಕ)mp.x, (ಪೂರ್ಣಾಙ್ಕ)mp.y);
 }
 
-    void
-gui_make_popup(char_u *path_name, int mouse_pos)
+    ಶೂನ್ಯ
+gui_make_popup(char_u *path_name, ಪೂರ್ಣಾಙ್ಕ mouse_pos)
 {
     vimmenu_T	*menu = gui_find_menu(path_name);
 
-    if (menu == NULL)
-	return;
+    ಯದಿ (menu == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ;
 
     POINT	p;
 
     // Find the position of the current cursor
     GetDCOrgEx(s_hdc, &p);
-    if (mouse_pos)
+    ಯದಿ (mouse_pos)
     {
-	int	mx, my;
+	ಪೂರ್ಣಾಙ್ಕ	mx, my;
 
 	gui_mch_getmouse(&mx, &my);
 	p.x += mx;
 	p.y += my;
     }
-    else if (curwin != NULL)
+    ಅನ್ಯಥಾ ಯದಿ (curwin != ರಿಕ್ತ)
     {
 	p.x += TEXT_X(curwin->w_wincol + curwin->w_wcol + 1);
 	p.y += TEXT_Y(W_WINROW(curwin) + curwin->w_wrow + 1);
     }
-    msg_scroll = FALSE;
-    gui_mch_show_popupmenu_at(menu, (int)p.x, (int)p.y);
+    ಸಂದೇಶ_scroll = FALSE;
+    gui_mch_show_popupmenu_at(menu, (ಪೂರ್ಣಾಙ್ಕ)p.x, (ಪೂರ್ಣಾಙ್ಕ)p.y);
 }
 
-# if defined(FEAT_TEAROFF)
+# ಯದಿ defined(FEAT_TEAROFF)
 /*
  * Given a menu descriptor, e.g. "File.New", find it in the menu hierarchy and
  * create it as a pseudo-"tearoff menu".
  */
-    void
+    ಶೂನ್ಯ
 gui_make_tearoff(char_u *path_name)
 {
     vimmenu_T	*menu = gui_find_menu(path_name);
 
     // Found the menu, so tear it off.
-    if (menu != NULL)
+    ಯದಿ (menu != ರಿಕ್ತ)
 	gui_mch_tearoff(menu->dname, menu, 0xffffL, 0xffffL);
 }
 # endif
@@ -7175,36 +7175,36 @@ gui_make_tearoff(char_u *path_name)
 /*
  * Add a menu item to a menu
  */
-    void
+    ಶೂನ್ಯ
 gui_mch_add_menu_item(
     vimmenu_T	*menu,
-    int		idx)
+    ಪೂರ್ಣಾಙ್ಕ		idx)
 {
     vimmenu_T	*parent = menu->parent;
 
     menu->id = s_menu_id++;
-    menu->submenu_id = NULL;
+    menu->submenu_id = ರಿಕ್ತ;
 
 # ifdef FEAT_TEAROFF
-    if (STRNCMP(menu->name, TEAR_STRING, TEAR_LEN) == 0)
+    ಯದಿ (STRNCMP(menu->name, TEAR_STRING, TEAR_LEN) == 0)
     {
-	InsertMenu(parent->submenu_id, (UINT)idx, MF_BITMAP|MF_BYPOSITION,
+	ಸೇರಿಸು_Menu(parent->submenu_id, (UINT)idx, MF_BITMAP|MF_BYPOSITION,
 		(UINT)menu->id, (LPCTSTR) s_htearbitmap);
     }
-    else
+    ಅನ್ಯಥಾ
 # endif
 # ifdef FEAT_TOOLBAR
-    if (menu_is_toolbar(parent->name))
+    ಯದಿ (menu_is_toolbar(parent->name))
     {
 	TBBUTTON newtb;
 
 	CLEAR_FIELD(newtb);
-	if (menu_is_separator(menu->name))
+	ಯದಿ (menu_is_separator(menu->name))
 	{
 	    newtb.iBitmap = 0;
 	    newtb.fsStyle = TBSTYLE_SEP;
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
 	    newtb.iBitmap = get_toolbar_bitmap(menu);
 	    newtb.fsStyle = TBSTYLE_BUTTON;
@@ -7216,22 +7216,22 @@ gui_mch_add_menu_item(
 							     (LPARAM)&newtb);
 	menu->submenu_id = (HMENU)-1;
     }
-    else
+    ಅನ್ಯಥಾ
 # endif
     {
 	WCHAR	*wn;
 
-	wn = enc_to_utf16(menu->name, NULL);
-	if (wn != NULL)
+	wn = enc_to_utf16(menu->name, ರಿಕ್ತ);
+	ಯದಿ (wn != ರಿಕ್ತ)
 	{
-	    InsertMenuW(parent->submenu_id, (UINT)idx,
+	    ಸೇರಿಸು_Menu_W(parent->submenu_id, (UINT)idx,
 		    (menu_is_separator(menu->name)
 		     ? MF_SEPARATOR : MF_STRING) | MF_BYPOSITION,
 		    (UINT)menu->id, wn);
 	    vim_free(wn);
 	}
 # ifdef FEAT_TEAROFF
-	if (IsWindow(parent->tearoff_handle))
+	ಯದಿ (IsWindow(parent->tearoff_handle))
 	    rebuild_tearoff(parent);
 # endif
     }
@@ -7240,37 +7240,37 @@ gui_mch_add_menu_item(
 /*
  * Destroy the machine specific menu widget.
  */
-    void
+    ಶೂನ್ಯ
 gui_mch_destroy_menu(vimmenu_T *menu)
 {
 # ifdef FEAT_TOOLBAR
     /*
      * is this a toolbar button?
      */
-    if (menu->submenu_id == (HMENU)-1)
+    ಯದಿ (menu->submenu_id == (HMENU)-1)
     {
-	int iButton;
+	ಪೂರ್ಣಾಙ್ಕ iButton;
 
-	iButton = (int)SendMessage(s_toolbarhwnd, TB_COMMANDTOINDEX,
+	iButton = (ಪೂರ್ಣಾಙ್ಕ)SendMessage(s_toolbarhwnd, TB_COMMANDTOINDEX,
 							 (WPARAM)menu->id, 0);
 	SendMessage(s_toolbarhwnd, TB_DELETEBUTTON, (WPARAM)iButton, 0);
     }
-    else
+    ಅನ್ಯಥಾ
 # endif
     {
-	if (menu->parent != NULL
+	ಯದಿ (menu->parent != ರಿಕ್ತ
 		&& menu_is_popup(menu->parent->dname)
-		&& menu->parent->submenu_id != NULL)
+		&& menu->parent->submenu_id != ರಿಕ್ತ)
 	    RemoveMenu(menu->parent->submenu_id, menu->id, MF_BYCOMMAND);
-	else
+	ಅನ್ಯಥಾ
 	    RemoveMenu(s_menuBar, menu->id, MF_BYCOMMAND);
-	if (menu->submenu_id != NULL)
+	ಯದಿ (menu->submenu_id != ರಿಕ್ತ)
 	    DestroyMenu(menu->submenu_id);
 # ifdef FEAT_TEAROFF
-	if (IsWindow(menu->tearoff_handle))
+	ಯದಿ (IsWindow(menu->tearoff_handle))
 	    DestroyWindow(menu->tearoff_handle);
-	if (menu->parent != NULL
-		&& menu->parent->children != NULL
+	ಯದಿ (menu->parent != ರಿಕ್ತ
+		&& menu->parent->children != ರಿಕ್ತ
 		&& IsWindow(menu->parent->tearoff_handle))
 	{
 	    // This menu must not show up when rebuilding the tearoff window.
@@ -7282,7 +7282,7 @@ gui_mch_destroy_menu(vimmenu_T *menu)
 }
 
 # ifdef FEAT_TEAROFF
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 rebuild_tearoff(vimmenu_T *menu)
 {
     //hackish
@@ -7290,31 +7290,31 @@ rebuild_tearoff(vimmenu_T *menu)
     RECT	trect;
     RECT	rct;
     RECT	roct;
-    int		x, y;
+    ಪೂರ್ಣಾಙ್ಕ		x, y;
 
     HWND thwnd = menu->tearoff_handle;
 
     GetWindowText(thwnd, (LPSTR)tbuf, 127);
-    if (GetWindowRect(thwnd, &trect)
+    ಯದಿ (GetWindowRect(thwnd, &trect)
 	    && GetWindowRect(s_hwnd, &rct)
 	    && GetClientRect(s_hwnd, &roct))
     {
-	x = trect.left - rct.left;
-	y = (trect.top -  rct.bottom  + roct.bottom);
+	x = trect.ಎಡ - rct.ಎಡ;
+	y = (trect.ತುದಿ -  rct.bottom  + roct.bottom);
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	x = y = 0xffffL;
     }
     DestroyWindow(thwnd);
-    if (menu->children != NULL)
+    ಯದಿ (menu->children != ರಿಕ್ತ)
     {
 	gui_mch_tearoff(tbuf, menu, x, y);
-	if (IsWindow(menu->tearoff_handle))
-	    (void) SetWindowPos(menu->tearoff_handle,
-				NULL,
-				(int)trect.left,
-				(int)trect.top,
+	ಯದಿ (IsWindow(menu->tearoff_handle))
+	    (ಶೂನ್ಯ) SetWindowPos(menu->tearoff_handle,
+				ರಿಕ್ತ,
+				(ಪೂರ್ಣಾಙ್ಕ)trect.ಎಡ,
+				(ಪೂರ್ಣಾಙ್ಕ)trect.ತುದಿ,
 				0, 0,
 				SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
     }
@@ -7324,25 +7324,25 @@ rebuild_tearoff(vimmenu_T *menu)
 /*
  * Make a menu either grey or not grey.
  */
-    void
+    ಶೂನ್ಯ
 gui_mch_menu_grey(
     vimmenu_T	*menu,
-    int	    grey)
+    ಪೂರ್ಣಾಙ್ಕ	    grey)
 {
 # ifdef FEAT_TOOLBAR
     /*
      * is this a toolbar button?
      */
-    if (menu->submenu_id == (HMENU)-1)
+    ಯದಿ (menu->submenu_id == (HMENU)-1)
 	SendMessage(s_toolbarhwnd, TB_ENABLEBUTTON,
 		(WPARAM)menu->id, (LPARAM) MAKELONG((grey ? FALSE : TRUE), 0));
-    else
+    ಅನ್ಯಥಾ
 # endif
-	(void)EnableMenuItem(menu->parent ? menu->parent->submenu_id : s_menuBar,
+	(ಶೂನ್ಯ)EnableMenuItem(menu->parent ? menu->parent->submenu_id : s_menuBar,
 		menu->id, MF_BYCOMMAND | (grey ? MF_GRAYED : MF_ENABLED));
 
 # ifdef FEAT_TEAROFF
-    if ((menu->parent != NULL) && (IsWindow(menu->parent->tearoff_handle)))
+    ಯದಿ ((menu->parent != ರಿಕ್ತ) && (IsWindow(menu->parent->tearoff_handle)))
     {
 	WORD menuID;
 	HWND menuHandle;
@@ -7350,12 +7350,12 @@ gui_mch_menu_grey(
 	/*
 	 * A tearoff button has changed state.
 	 */
-	if (menu->children == NULL)
+	ಯದಿ (menu->children == ರಿಕ್ತ)
 	    menuID = (WORD)(menu->id);
-	else
+	ಅನ್ಯಥಾ
 	    menuID = (WORD)((long_u)(menu->submenu_id) | (DWORD)0x8000);
 	menuHandle = GetDlgItem(menu->parent->tearoff_handle, menuID);
-	if (menuHandle)
+	ಯದಿ (menuHandle)
 	    EnableWindow(menuHandle, !grey);
 
     }
@@ -7370,7 +7370,7 @@ gui_mch_menu_grey(
 #define add_word(x)		*p++ = (x)
 #define add_long(x)		dwp = (DWORD *)p; *dwp++ = (x); p = (WORD *)dwp
 
-#if defined(FEAT_GUI_DIALOG)
+#ಯದಿ defined(FEAT_GUI_DIALOG)
 /*
  * stuff for dialogs
  */
@@ -7382,45 +7382,45 @@ gui_mch_menu_grey(
  * pressed, return that button's ID - IDCANCEL (2), which is the button's
  * number.
  */
-    static LRESULT CALLBACK
+    ಸ್ಥಿರ LRESULT CALLBACK
 dialog_callback(
     HWND hwnd,
     UINT message,
     WPARAM wParam,
     LPARAM lParam UNUSED)
 {
-    if (message == WM_INITDIALOG)
+    ಯದಿ (message == WM_INITDIALOG)
     {
 	CenterWindow(hwnd, GetWindow(hwnd, GW_OWNER));
 	// Set focus to the dialog.  Set the default button, if specified.
-	(void)SetFocus(hwnd);
-	if (dialog_default_button > IDCANCEL)
-	    (void)SetFocus(GetDlgItem(hwnd, dialog_default_button));
-	else
+	(ಶೂನ್ಯ)SetFocus(hwnd);
+	ಯದಿ (dialog_default_button > IDCANCEL)
+	    (ಶೂನ್ಯ)SetFocus(GetDlgItem(hwnd, dialog_default_button));
+	ಅನ್ಯಥಾ
 	    // We don't have a default, set focus on another element of the
 	    // dialog window, probably the icon
-	    (void)SetFocus(GetDlgItem(hwnd, DLG_NONBUTTON_CONTROL));
-	return FALSE;
+	    (ಶೂನ್ಯ)SetFocus(GetDlgItem(hwnd, DLG_NONBUTTON_CONTROL));
+	ಪ್ರತ್ಯಾಗಮ FALSE;
     }
 
-    if (message == WM_COMMAND)
+    ಯದಿ (message == WM_COMMAND)
     {
-	int	button = LOWORD(wParam);
+	ಪೂರ್ಣಾಙ್ಕ	button = LOWORD(wParam);
 
 	// Don't end the dialog if something was selected that was
 	// not a button.
-	if (button >= DLG_NONBUTTON_CONTROL)
-	    return TRUE;
+	ಯದಿ (button >= DLG_NONBUTTON_CONTROL)
+	    ಪ್ರತ್ಯಾಗಮ TRUE;
 
 	// If the edit box exists, copy the string.
-	if (s_textfield != NULL)
+	ಯದಿ (s_textfield != ರಿಕ್ತ)
 	{
 	    WCHAR  *wp = ALLOC_MULT(WCHAR, IOSIZE);
 	    char_u *p;
 
 	    GetDlgItemTextW(hwnd, DLG_NONBUTTON_CONTROL + 2, wp, IOSIZE);
-	    p = utf16_to_enc(wp, NULL);
-	    if (p != NULL)
+	    p = utf16_to_enc(wp, ರಿಕ್ತ);
+	    ಯದಿ (p != ರಿಕ್ತ)
 	    {
 		vim_strncpy(s_textfield, p, IOSIZE);
 		vim_free(p);
@@ -7432,22 +7432,22 @@ dialog_callback(
 	 * Need to check for IDOK because if the user just hits Return to
 	 * accept the default value, some reason this is what we get.
 	 */
-	if (button == IDOK)
+	ಯದಿ (button == IDOK)
 	{
-	    if (dialog_default_button > IDCANCEL)
+	    ಯದಿ (dialog_default_button > IDCANCEL)
 		EndDialog(hwnd, dialog_default_button);
 	}
-	else
+	ಅನ್ಯಥಾ
 	    EndDialog(hwnd, button - IDCANCEL);
-	return TRUE;
+	ಪ್ರತ್ಯಾಗಮ TRUE;
     }
 
-    if ((message == WM_SYSCOMMAND) && (wParam == SC_CLOSE))
+    ಯದಿ ((message == WM_SYSCOMMAND) && (wParam == SC_CLOSE))
     {
 	EndDialog(hwnd, 0);
-	return TRUE;
+	ಪ್ರತ್ಯಾಗಮ TRUE;
     }
-    return FALSE;
+    ಪ್ರತ್ಯಾಗಮ FALSE;
 }
 
 /*
@@ -7467,7 +7467,7 @@ dialog_callback(
  * If stubbing out this fn, return 1.
  */
 
-static const char *dlg_icons[] = // must match names in resource file
+ಸ್ಥಿರ ಧ್ರುವ ವರ್ಣ *dlg_icons[] = // must match names in resource file
 {
     "IDR_VIM",
     "IDR_VIM_ERROR",
@@ -7476,28 +7476,28 @@ static const char *dlg_icons[] = // must match names in resource file
     "IDR_VIM_QUESTION"
 };
 
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 gui_mch_dialog(
-    int		 type,
+    ಪೂರ್ಣಾಙ್ಕ		 type,
     char_u	*title,
     char_u	*message,
     char_u	*buttons,
-    int		 dfltbutton,
+    ಪೂರ್ಣಾಙ್ಕ		 dfltbutton,
     char_u	*textfield,
-    int		ex_cmd UNUSED)
+    ಪೂರ್ಣಾಙ್ಕ		ex_cmd UNUSED)
 {
     WORD	*p, *pdlgtemplate, *pnumitems;
     DWORD	*dwp;
-    int		numButtons;
-    int		*buttonWidths, *buttonPositions;
-    int		buttonYpos;
-    int		nchar, i;
+    ಪೂರ್ಣಾಙ್ಕ		ಅಂಕೆ_Buttons;
+    ಪೂರ್ಣಾಙ್ಕ		*buttonWidths, *buttonPositions;
+    ಪೂರ್ಣಾಙ್ಕ		buttonYpos;
+    ಪೂರ್ಣಾಙ್ಕ		nchar, i;
     DWORD	lStyle;
-    int		dlgwidth = 0;
-    int		dlgheight;
-    int		editboxheight;
-    int		horizWidth = 0;
-    int		msgheight;
+    ಪೂರ್ಣಾಙ್ಕ		dlgwidth = 0;
+    ಪೂರ್ಣಾಙ್ಕ		dlgheight;
+    ಪೂರ್ಣಾಙ್ಕ		editboxheight;
+    ಪೂರ್ಣಾಙ್ಕ		horizWidth = 0;
+    ಪೂರ್ಣಾಙ್ಕ		msgheight;
     char_u	*pstart;
     char_u	*pend;
     char_u	*last_white;
@@ -7507,43 +7507,43 @@ gui_mch_dialog(
     HDC		hdc;
     HFONT	font, oldFont;
     TEXTMETRIC	fontInfo;
-    int		fontHeight;
-    int		textWidth, minButtonWidth, messageWidth;
-    int		maxDialogWidth;
-    int		maxDialogHeight;
-    int		scroll_flag = 0;
-    int		vertical;
-    int		dlgPaddingX;
-    int		dlgPaddingY;
+    ಪೂರ್ಣಾಙ್ಕ		fontHeight;
+    ಪೂರ್ಣಾಙ್ಕ		textWidth, minButtonWidth, messageWidth;
+    ಪೂರ್ಣಾಙ್ಕ		maxDialogWidth;
+    ಪೂರ್ಣಾಙ್ಕ		maxDialogHeight;
+    ಪೂರ್ಣಾಙ್ಕ		scroll_flag = 0;
+    ಪೂರ್ಣಾಙ್ಕ		vertical;
+    ಪೂರ್ಣಾಙ್ಕ		dlgPaddingX;
+    ಪೂರ್ಣಾಙ್ಕ		dlgPaddingY;
 # ifdef USE_SYSMENU_FONT
     LOGFONTW	lfSysmenu;
-    int		use_lfSysmenu = FALSE;
+    ಪೂರ್ಣಾಙ್ಕ		use_lfSysmenu = FALSE;
 # endif
     garray_T	ga;
-    int		l;
-    int		dlg_icon_width;
-    int		dlg_icon_height;
-    int		dpi;
+    ಪೂರ್ಣಾಙ್ಕ		l;
+    ಪೂರ್ಣಾಙ್ಕ		dlg_icon_width;
+    ಪೂರ್ಣಾಙ್ಕ		dlg_icon_height;
+    ಪೂರ್ಣಾಙ್ಕ		dpi;
 
 # ifndef NO_CONSOLE
     // Don't output anything in silent mode ("ex -s")
 #  ifdef VIMDLL
-    if (!(gui.in_use || gui.starting))
+    ಯದಿ (!(gui.in_use || gui.starting))
 #  endif
-	if (silent_mode)
-	    return dfltbutton;   // return default option
+	ಯದಿ (silent_mode)
+	    ಪ್ರತ್ಯಾಗಮ dfltbutton;   // return default option
 # endif
 
-    if (s_hwnd == NULL)
+    ಯದಿ (s_hwnd == ರಿಕ್ತ)
     {
 	load_dpi_func();
 	s_dpi = dpi = pGetDpiForSystem();
 	get_dialog_font_metrics();
     }
-    else
+    ಅನ್ಯಥಾ
 	dpi = pGetDpiForSystem();
 
-    if ((type < 0) || (type > VIM_LAST_TYPE))
+    ಯದಿ ((type < 0) || (type > VIM_LAST_TYPE))
 	type = 0;
 
     // allocate some memory for dialog template
@@ -7551,8 +7551,8 @@ gui_mch_dialog(
     pdlgtemplate = p = (PWORD)LocalAlloc(LPTR,
 					DLG_ALLOC_SIZE + STRLEN(message) * 2);
 
-    if (p == NULL)
-	return -1;
+    ಯದಿ (p == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ -1;
 
     /*
      * make a copy of 'buttons' to fiddle with it.  compiler grizzles because
@@ -7560,30 +7560,30 @@ gui_mch_dialog(
      * const.
      */
     tbuffer = vim_strsave(buttons);
-    if (tbuffer == NULL)
-	return -1;
+    ಯದಿ (tbuffer == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ -1;
 
     --dfltbutton;   // Change from one-based to zero-based
 
     // Count buttons
-    numButtons = 1;
-    for (i = 0; tbuffer[i] != '\0'; i++)
+    ಅಂಕೆ_Buttons = 1;
+    ಪ್ರತಿ (i = 0; tbuffer[i] != '\0'; i++)
     {
-	if (tbuffer[i] == DLG_BUTTON_SEP)
-	    numButtons++;
+	ಯದಿ (tbuffer[i] == DLG_BUTTON_SEP)
+	    ಅಂಕೆ_Buttons++;
     }
-    if (dfltbutton >= numButtons)
+    ಯದಿ (dfltbutton >= ಅಂಕೆ_Buttons)
 	dfltbutton = -1;
 
     // Allocate array to hold the width of each button
-    buttonWidths = ALLOC_MULT(int, numButtons);
-    if (buttonWidths == NULL)
-	return -1;
+    buttonWidths = ALLOC_MULT(ಪೂರ್ಣಾಙ್ಕ, ಅಂಕೆ_Buttons);
+    ಯದಿ (buttonWidths == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ -1;
 
     // Allocate array to hold the X position of each button
-    buttonPositions = ALLOC_MULT(int, numButtons);
-    if (buttonPositions == NULL)
-	return -1;
+    buttonPositions = ALLOC_MULT(ಪೂರ್ಣಾಙ್ಕ, ಅಂಕೆ_Buttons);
+    ಯದಿ (buttonPositions == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ -1;
 
     /*
      * Calculate how big the dialog must be.
@@ -7591,12 +7591,12 @@ gui_mch_dialog(
     hwnd = GetDesktopWindow();
     hdc = GetWindowDC(hwnd);
 # ifdef USE_SYSMENU_FONT
-    if (gui_w32_get_menu_font(&lfSysmenu) == OK)
+    ಯದಿ (gui_w32_get_menu_font(&lfSysmenu) == OK)
     {
 	font = CreateFontIndirectW(&lfSysmenu);
 	use_lfSysmenu = TRUE;
     }
-    else
+    ಅನ್ಯಥಾ
 # endif
 	font = CreateFont(-DLG_FONT_POINT_SIZE, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, VARIABLE_PITCH, DLG_FONT_NAME);
@@ -7612,33 +7612,33 @@ gui_mch_dialog(
     minButtonWidth = GetTextWidth(hdc, (char_u *)"Cancel", 6);
 
     // Maximum width of a dialog, if possible
-    if (s_hwnd == NULL)
+    ಯದಿ (s_hwnd == ರಿಕ್ತ)
     {
 	RECT	workarea_rect;
 
 	// We don't have a window, use the desktop area.
 	get_work_area(&workarea_rect);
-	maxDialogWidth = workarea_rect.right - workarea_rect.left - 100;
-	if (maxDialogWidth > adjust_by_system_dpi(600))
+	maxDialogWidth = workarea_rect.ಬಲ - workarea_rect.ಎಡ - 100;
+	ಯದಿ (maxDialogWidth > adjust_by_system_dpi(600))
 	    maxDialogWidth = adjust_by_system_dpi(600);
 	// Leave some room for the taskbar.
-	maxDialogHeight = workarea_rect.bottom - workarea_rect.top - 150;
+	maxDialogHeight = workarea_rect.bottom - workarea_rect.ತುದಿ - 150;
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	// Use our own window for the size, unless it's very small.
 	GetWindowRect(s_hwnd, &rect);
-	maxDialogWidth = rect.right - rect.left
+	maxDialogWidth = rect.ಬಲ - rect.ಎಡ
 		       - (pGetSystemMetricsForDpi(SM_CXFRAME, dpi) +
 			  pGetSystemMetricsForDpi(SM_CXPADDEDBORDER, dpi)) * 2;
-	if (maxDialogWidth < adjust_by_system_dpi(DLG_MIN_MAX_WIDTH))
+	ಯದಿ (maxDialogWidth < adjust_by_system_dpi(DLG_MIN_MAX_WIDTH))
 	    maxDialogWidth = adjust_by_system_dpi(DLG_MIN_MAX_WIDTH);
 
-	maxDialogHeight = rect.bottom - rect.top
+	maxDialogHeight = rect.bottom - rect.ತುದಿ
 		       - (pGetSystemMetricsForDpi(SM_CYFRAME, dpi) +
 			  pGetSystemMetricsForDpi(SM_CXPADDEDBORDER, dpi)) * 4
 		       - pGetSystemMetricsForDpi(SM_CYCAPTION, dpi);
-	if (maxDialogHeight < adjust_by_system_dpi(DLG_MIN_MAX_HEIGHT))
+	ಯದಿ (maxDialogHeight < adjust_by_system_dpi(DLG_MIN_MAX_HEIGHT))
 	    maxDialogHeight = adjust_by_system_dpi(DLG_MIN_MAX_HEIGHT);
     }
 
@@ -7648,8 +7648,8 @@ gui_mch_dialog(
     pstart = message;
     messageWidth = 0;
     msgheight = 0;
-    ga_init2(&ga, sizeof(char), 500);
-    do
+    ga_init2(&ga, ಪರಿಮಾಣ(ವರ್ಣ), 500);
+    ಕುರು
     {
 	msgheight += fontHeight;    // at least one line
 
@@ -7657,46 +7657,46 @@ gui_mch_dialog(
 	// at a word boundary, which would mean we can't compute the number of
 	// wrapped lines.
 	textWidth = 0;
-	last_white = NULL;
-	for (pend = pstart; *pend != NUL && *pend != '\n'; )
+	last_white = ರಿಕ್ತ;
+	ಪ್ರತಿ (pend = pstart; *pend != NUL && *pend != '\n'; )
 	{
 	    l = (*mb_ptr2len)(pend);
-	    if (l == 1 && VIM_ISWHITE(*pend)
+	    ಯದಿ (l == 1 && VIM_ISWHITE(*pend)
 					&& textWidth > maxDialogWidth * 3 / 4)
 		last_white = pend;
 	    textWidth += GetTextWidthEnc(hdc, pend, l);
-	    if (textWidth >= maxDialogWidth)
+	    ಯದಿ (textWidth >= maxDialogWidth)
 	    {
 		// Line will wrap.
 		messageWidth = maxDialogWidth;
 		msgheight += fontHeight;
 		textWidth = 0;
 
-		if (last_white != NULL)
+		ಯದಿ (last_white != ರಿಕ್ತ)
 		{
 		    // break the line just after a space
-		    if (pend > last_white)
-			ga.ga_len -= (int)(pend - (last_white + 1));
+		    ಯದಿ (pend > last_white)
+			ga.ga_len -= (ಪೂರ್ಣಾಙ್ಕ)(pend - (last_white + 1));
 		    pend = last_white + 1;
-		    last_white = NULL;
+		    last_white = ರಿಕ್ತ;
 		}
 		ga_append(&ga, '\r');
 		ga_append(&ga, '\n');
-		continue;
+		ಅನುವರ್ತ;
 	    }
 
-	    while (--l >= 0)
+	    ಯಾವತ್ (--l >= 0)
 		ga_append(&ga, *pend++);
 	}
-	if (textWidth > messageWidth)
+	ಯದಿ (textWidth > messageWidth)
 	    messageWidth = textWidth;
 
 	ga_append(&ga, '\r');
 	ga_append(&ga, '\n');
 	pstart = pend + 1;
-    } while (*pend != NUL);
+    } ಯಾವತ್ (*pend != NUL);
 
-    if (ga.ga_data != NULL)
+    ಯದಿ (ga.ga_data != ರಿಕ್ತ)
 	message = ga.ga_data;
 
     messageWidth += 10;		// roundoff space
@@ -7708,60 +7708,60 @@ gui_mch_dialog(
     dlgwidth = messageWidth + dlg_icon_width + 3 * dlgPaddingX
 			     + pGetSystemMetricsForDpi(SM_CXVSCROLL, dpi);
 
-    if (msgheight < dlg_icon_height)
+    ಯದಿ (msgheight < dlg_icon_height)
 	msgheight = dlg_icon_height;
 
     /*
      * Check button names.  A long one will make the dialog wider.
      * When called early (-register error message) p_go isn't initialized.
      */
-    vertical = (p_go != NULL && vim_strchr(p_go, GO_VERTICAL) != NULL);
-    if (!vertical)
+    vertical = (p_go != ರಿಕ್ತ && vim_strchr(p_go, GO_VERTICAL) != ರಿಕ್ತ);
+    ಯದಿ (!vertical)
     {
 	// Place buttons horizontally if they fit.
 	horizWidth = dlgPaddingX;
 	pstart = tbuffer;
 	i = 0;
-	do
+	ಕುರು
 	{
 	    pend = vim_strchr(pstart, DLG_BUTTON_SEP);
-	    if (pend == NULL)
+	    ಯದಿ (pend == ರಿಕ್ತ)
 		pend = pstart + STRLEN(pstart);	// Last button name.
-	    textWidth = GetTextWidthEnc(hdc, pstart, (int)(pend - pstart));
-	    if (textWidth < minButtonWidth)
+	    textWidth = GetTextWidthEnc(hdc, pstart, (ಪೂರ್ಣಾಙ್ಕ)(pend - pstart));
+	    ಯದಿ (textWidth < minButtonWidth)
 		textWidth = minButtonWidth;
 	    textWidth += dlgPaddingX;	    // Padding within button
 	    buttonWidths[i] = textWidth;
 	    buttonPositions[i++] = horizWidth;
 	    horizWidth += textWidth + dlgPaddingX; // Pad between buttons
 	    pstart = pend + 1;
-	} while (*pend != NUL);
+	} ಯಾವತ್ (*pend != NUL);
 
-	if (horizWidth > maxDialogWidth)
+	ಯದಿ (horizWidth > maxDialogWidth)
 	    vertical = TRUE;	// Too wide to fit on the screen.
-	else if (horizWidth > dlgwidth)
+	ಅನ್ಯಥಾ ಯದಿ (horizWidth > dlgwidth)
 	    dlgwidth = horizWidth;
     }
 
-    if (vertical)
+    ಯದಿ (vertical)
     {
 	// Stack buttons vertically.
 	pstart = tbuffer;
-	do
+	ಕುರು
 	{
 	    pend = vim_strchr(pstart, DLG_BUTTON_SEP);
-	    if (pend == NULL)
+	    ಯದಿ (pend == ರಿಕ್ತ)
 		pend = pstart + STRLEN(pstart);	// Last button name.
-	    textWidth = GetTextWidthEnc(hdc, pstart, (int)(pend - pstart));
+	    textWidth = GetTextWidthEnc(hdc, pstart, (ಪೂರ್ಣಾಙ್ಕ)(pend - pstart));
 	    textWidth += dlgPaddingX;		// Padding within button
 	    textWidth += DLG_VERT_PADDING_X * 2; // Padding around button
-	    if (textWidth > dlgwidth)
+	    ಯದಿ (textWidth > dlgwidth)
 		dlgwidth = textWidth;
 	    pstart = pend + 1;
-	} while (*pend != NUL);
+	} ಯಾವತ್ (*pend != NUL);
     }
 
-    if (dlgwidth < DLG_MIN_WIDTH)
+    ಯದಿ (dlgwidth < DLG_MIN_WIDTH)
 	dlgwidth = DLG_MIN_WIDTH;	// Don't allow a really thin dialog!
 
     // start to fill in the dlgtemplate information.  addressing by WORDs
@@ -7776,19 +7776,19 @@ gui_mch_dialog(
     add_word(PixelToDialogX(dlgwidth));	// cx
 
     // Dialog height.
-    if (vertical)
+    ಯದಿ (vertical)
 	dlgheight = msgheight + 2 * dlgPaddingY
-			   + DLG_VERT_PADDING_Y + 2 * fontHeight * numButtons;
-    else
+			   + DLG_VERT_PADDING_Y + 2 * fontHeight * ಅಂಕೆ_Buttons;
+    ಅನ್ಯಥಾ
 	dlgheight = msgheight + 3 * dlgPaddingY + 2 * fontHeight;
 
     // Dialog needs to be taller if contains an edit box.
     editboxheight = fontHeight + dlgPaddingY + 4 * DLG_VERT_PADDING_Y;
-    if (textfield != NULL)
+    ಯದಿ (textfield != ರಿಕ್ತ)
 	dlgheight += editboxheight;
 
     // Restrict the size to a maximum.  Causes a scrollbar to show up.
-    if (dlgheight > maxDialogHeight)
+    ಯದಿ (dlgheight > maxDialogHeight)
     {
 	msgheight = msgheight - (dlgheight - maxDialogHeight);
 	dlgheight = maxDialogHeight;
@@ -7809,15 +7809,15 @@ gui_mch_dialog(
 
     // do the font, since DS_3DLOOK doesn't work properly
 # ifdef USE_SYSMENU_FONT
-    if (use_lfSysmenu)
+    ಯದಿ (use_lfSysmenu)
     {
 	// point size
 	*p++ = -MulDiv(lfSysmenu.lfHeight, 72,
 		GetDeviceCaps(hdc, LOGPIXELSY));
 	wcscpy(p, lfSysmenu.lfFaceName);
-	nchar = (int)wcslen(lfSysmenu.lfFaceName) + 1;
+	nchar = (ಪೂರ್ಣಾಙ್ಕ)wcslen(lfSysmenu.lfFaceName) + 1;
     }
-    else
+    ಅನ್ಯಥಾ
 # endif
     {
 	*p++ = DLG_FONT_POINT_SIZE;		// point size
@@ -7827,21 +7827,21 @@ gui_mch_dialog(
 
     buttonYpos = msgheight + 2 * dlgPaddingY;
 
-    if (textfield != NULL)
+    ಯದಿ (textfield != ರಿಕ್ತ)
 	buttonYpos += editboxheight;
 
     pstart = tbuffer;
-    if (!vertical)
+    ಯದಿ (!vertical)
 	horizWidth = (dlgwidth - horizWidth) / 2;	// Now it's X offset
-    for (i = 0; i < numButtons; i++)
+    ಪ್ರತಿ (i = 0; i < ಅಂಕೆ_Buttons; i++)
     {
 	// get end of this button.
-	for (	pend = pstart;
+	ಪ್ರತಿ (	pend = pstart;
 		*pend && (*pend != DLG_BUTTON_SEP);
 		pend++)
 	    ;
 
-	if (*pend)
+	ಯದಿ (*pend)
 	    *pend = '\0';
 
 	/*
@@ -7857,7 +7857,7 @@ gui_mch_dialog(
 	 * dialog.  Also needed for when the textfield is the default control.
 	 * It appears to work now (perhaps not on Win95?).
 	 */
-	if (vertical)
+	ಯದಿ (vertical)
 	{
 	    p = add_dialog_element(p,
 		    (i == dfltbutton
@@ -7867,9 +7867,9 @@ gui_mch_dialog(
 				   + 2 * fontHeight * i),
 		    PixelToDialogX(dlgwidth - 2 * DLG_VERT_PADDING_X),
 		    (WORD)(PixelToDialogY(2 * fontHeight) - 1),
-		    (WORD)(IDCANCEL + 1 + i), (WORD)0x0080, (char *)pstart);
+		    (WORD)(IDCANCEL + 1 + i), (WORD)0x0080, (ವರ್ಣ *)pstart);
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
 	    p = add_dialog_element(p,
 		    (i == dfltbutton
@@ -7878,11 +7878,11 @@ gui_mch_dialog(
 		    PixelToDialogY(buttonYpos), // TBK
 		    PixelToDialogX(buttonWidths[i]),
 		    (WORD)(PixelToDialogY(2 * fontHeight) - 1),
-		    (WORD)(IDCANCEL + 1 + i), (WORD)0x0080, (char *)pstart);
+		    (WORD)(IDCANCEL + 1 + i), (WORD)0x0080, (ವರ್ಣ *)pstart);
 	}
 	pstart = pend + 1;	//next button
     }
-    *pnumitems += numButtons;
+    *pnumitems += ಅಂಕೆ_Buttons;
 
     // Vim icon
     p = add_dialog_element(p, SS_ICON,
@@ -7894,22 +7894,22 @@ gui_mch_dialog(
 	    dlg_icons[type]);
 
     // Dialog message
-    p = add_dialog_element(p, ES_LEFT|scroll_flag|ES_MULTILINE|ES_READONLY,
+    p = add_dialog_element(p, ES_ಎಡ|scroll_flag|ES_MULTILINE|ES_READONLY,
 	    PixelToDialogX(2 * dlgPaddingX + dlg_icon_width),
 	    PixelToDialogY(dlgPaddingY),
 	    (WORD)(PixelToDialogX(messageWidth) + 1),
 	    PixelToDialogY(msgheight),
-	    DLG_NONBUTTON_CONTROL + 1, (WORD)0x0081, (char *)message);
+	    DLG_NONBUTTON_CONTROL + 1, (WORD)0x0081, (ವರ್ಣ *)message);
 
     // Edit box
-    if (textfield != NULL)
+    ಯದಿ (textfield != ರಿಕ್ತ)
     {
-	p = add_dialog_element(p, ES_LEFT|ES_AUTOHSCROLL|WS_TABSTOP|WS_BORDER,
+	p = add_dialog_element(p, ES_ಎಡ|ES_AUTOHSCROLL|WS_TABSTOP|WS_BORDER,
 		PixelToDialogX(2 * dlgPaddingX),
 		PixelToDialogY(2 * dlgPaddingY + msgheight),
 		PixelToDialogX(dlgwidth - 4 * dlgPaddingX),
 		PixelToDialogY(fontHeight + dlgPaddingY),
-		DLG_NONBUTTON_CONTROL + 2, (WORD)0x0081, (char *)textfield);
+		DLG_NONBUTTON_CONTROL + 2, (WORD)0x0081, (ವರ್ಣ *)textfield);
 	*pnumitems += 1;
     }
 
@@ -7923,19 +7923,19 @@ gui_mch_dialog(
     // If we have an edit box, make that the default. We also need to tell
     // dialog_callback() if this dialog contains an edit box or not. We do
     // this by setting s_textfield if it does.
-    if (textfield != NULL)
+    ಯದಿ (textfield != ರಿಕ್ತ)
     {
 	dialog_default_button = DLG_NONBUTTON_CONTROL + 2;
 	s_textfield = textfield;
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	dialog_default_button = IDCANCEL + 1 + dfltbutton;
-	s_textfield = NULL;
+	s_textfield = ರಿಕ್ತ;
     }
 
     // show the dialog box modally and get a return value
-    nchar = (int)DialogBoxIndirect(
+    nchar = (ಪೂರ್ಣಾಙ್ಕ)DialogBoxIndirect(
 	    g_hinst,
 	    (LPDLGTEMPLATE)pdlgtemplate,
 	    s_hwnd,
@@ -7948,9 +7948,9 @@ gui_mch_dialog(
     vim_free(ga.ga_data);
 
     // Focus back to our window (for when MDI is used).
-    (void)SetFocus(s_hwnd);
+    (ಶೂನ್ಯ)SetFocus(s_hwnd);
 
-    return nchar;
+    ಪ್ರತ್ಯಾಗಮ nchar;
 }
 
 #endif // FEAT_GUI_DIALOG
@@ -7971,7 +7971,7 @@ gui_mch_dialog(
  *  TODO: use the length information noted here to enable the dialog creation
  *  routines to work out more exactly how much memory they need to alloc.
  */
-    static PWORD
+    ಸ್ಥಿರ PWORD
 add_dialog_element(
     PWORD p,
     DWORD lStyle,
@@ -7981,9 +7981,9 @@ add_dialog_element(
     WORD h,
     WORD Id,
     WORD clss,
-    const char *caption)
+    ಧ್ರುವ ವರ್ಣ *caption)
 {
-    int nchar;
+    ಪೂರ್ಣಾಙ್ಕ nchar;
 
     p = lpwAlign(p);	// Align to dword boundary
     lStyle = lStyle | WS_VISIBLE | WS_CHILD;
@@ -8005,7 +8005,7 @@ add_dialog_element(
 
     *p++ = 0;  // advance pointer over nExtraStuff WORD   - 2 more
 
-    return p;	// total = 15 + strlen(caption) words
+    ಪ್ರತ್ಯಾಗಮ p;	// total = 15 + strlen(caption) words
 		// bytes read = 2 * total
 }
 
@@ -8014,7 +8014,7 @@ add_dialog_element(
  * Helper routine.  Take an input pointer, return closest pointer that is
  * aligned on a DWORD (4 byte) boundary.  Taken from the Win32SDK samples.
  */
-    static LPWORD
+    ಸ್ಥಿರ LPWORD
 lpwAlign(
     LPWORD lpIn)
 {
@@ -8024,7 +8024,7 @@ lpwAlign(
     ul += 3;
     ul >>= 2;
     ul <<= 2;
-    return (LPWORD)ul;
+    ಪ್ರತ್ಯಾಗಮ (LPWORD)ul;
 }
 
 /*
@@ -8034,40 +8034,40 @@ lpwAlign(
  * char NULL).  Partly taken from the Win32SDK samples.
  * If "use_enc" is TRUE, 'encoding' is used for "lpAnsiIn". If FALSE, current
  * ACP is used for "lpAnsiIn". */
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
 nCopyAnsiToWideChar(
     LPWORD lpWCStr,
     LPSTR lpAnsiIn,
     BOOL use_enc)
 {
-    int		nChar = 0;
-    int		len = lstrlen(lpAnsiIn) + 1;	// include NUL character
-    int		i;
+    ಪೂರ್ಣಾಙ್ಕ		nChar = 0;
+    ಪೂರ್ಣಾಙ್ಕ		len = lstrlen(lpAnsiIn) + 1;	// include NUL character
+    ಪೂರ್ಣಾಙ್ಕ		i;
     WCHAR	*wn;
 
-    if (use_enc && enc_codepage >= 0 && (int)GetACP() != enc_codepage)
+    ಯದಿ (use_enc && enc_codepage >= 0 && (ಪೂರ್ಣಾಙ್ಕ)GetACP() != enc_codepage)
     {
 	// Not a codepage, use our own conversion function.
-	wn = enc_to_utf16((char_u *)lpAnsiIn, NULL);
-	if (wn != NULL)
+	wn = enc_to_utf16((char_u *)lpAnsiIn, ರಿಕ್ತ);
+	ಯದಿ (wn != ರಿಕ್ತ)
 	{
 	    wcscpy(lpWCStr, wn);
-	    nChar = (int)wcslen(wn) + 1;
+	    nChar = (ಪೂರ್ಣಾಙ್ಕ)wcslen(wn) + 1;
 	    vim_free(wn);
 	}
     }
-    if (nChar == 0)
+    ಯದಿ (nChar == 0)
 	// Use Win32 conversion function.
 	nChar = MultiByteToWideChar(
 		enc_codepage > 0 ? enc_codepage : CP_ACP,
 		MB_PRECOMPOSED,
 		lpAnsiIn, len,
 		lpWCStr, len);
-    for (i = 0; i < nChar; ++i)
-	if (lpWCStr[i] == (WORD)'\t')	// replace tabs with spaces
+    ಪ್ರತಿ (i = 0; i < nChar; ++i)
+	ಯದಿ (lpWCStr[i] == (WORD)'\t')	// replace tabs with spaces
 	    lpWCStr[i] = (WORD)' ';
 
-    return nChar;
+    ಪ್ರತ್ಯಾಗಮ nChar;
 }
 
 
@@ -8075,21 +8075,21 @@ nCopyAnsiToWideChar(
 /*
  * Lookup menu handle from "menu_id".
  */
-    static HMENU
+    ಸ್ಥಿರ HMENU
 tearoff_lookup_menuhandle(
     vimmenu_T *menu,
     WORD menu_id)
 {
-    for ( ; menu != NULL; menu = menu->next)
+    ಪ್ರತಿ ( ; menu != ರಿಕ್ತ; menu = menu->next)
     {
-	if (menu->modes == 0)	// this menu has just been deleted
-	    continue;
-	if (menu_is_separator(menu->dname))
-	    continue;
-	if ((WORD)((long_u)(menu->submenu_id) | (DWORD)0x8000) == menu_id)
-	    return menu->submenu_id;
+	ಯದಿ (menu->modes == 0)	// this menu has just been deleted
+	    ಅನುವರ್ತ;
+	ಯದಿ (menu_is_separator(menu->dname))
+	    ಅನುವರ್ತ;
+	ಯದಿ ((WORD)((long_u)(menu->submenu_id) | (DWORD)0x8000) == menu_id)
+	    ಪ್ರತ್ಯಾಗಮ menu->submenu_id;
     }
-    return NULL;
+    ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
 }
 
 /*
@@ -8097,49 +8097,49 @@ tearoff_lookup_menuhandle(
  * "tearoff menus" Very simple - forward button presses (to fool Vim into
  * thinking its menus have been clicked), and go away when closed.
  */
-    static LRESULT CALLBACK
+    ಸ್ಥಿರ LRESULT CALLBACK
 tearoff_callback(
     HWND hwnd,
     UINT message,
     WPARAM wParam,
     LPARAM lParam)
 {
-    if (message == WM_INITDIALOG)
+    ಯದಿ (message == WM_INITDIALOG)
     {
 	SetWindowLongPtr(hwnd, DWLP_USER, (LONG_PTR)lParam);
-	return (TRUE);
+	ಪ್ರತ್ಯಾಗಮ (TRUE);
     }
 
     // May show the mouse pointer again.
     HandleMouseHide(message, lParam);
 
-    if (message == WM_COMMAND)
+    ಯದಿ (message == WM_COMMAND)
     {
-	if ((WORD)(LOWORD(wParam)) & 0x8000)
+	ಯದಿ ((WORD)(LOWORD(wParam)) & 0x8000)
 	{
 	    POINT   mp;
 	    RECT    rect;
 
-	    if (GetCursorPos(&mp) && GetWindowRect(hwnd, &rect))
+	    ಯದಿ (GetCursorPos(&mp) && GetWindowRect(hwnd, &rect))
 	    {
 		vimmenu_T *menu;
 
 		menu = (vimmenu_T*)GetWindowLongPtr(hwnd, DWLP_USER);
-		(void)TrackPopupMenu(
+		(ಶೂನ್ಯ)TrackPopupMenu(
 			 tearoff_lookup_menuhandle(menu, LOWORD(wParam)),
 			 TPM_LEFTALIGN | TPM_LEFTBUTTON,
-			 (int)rect.right - 8,
-			 (int)mp.y,
-			 (int)0,	    // reserved param
+			 (ಪೂರ್ಣಾಙ್ಕ)rect.ಬಲ - 8,
+			 (ಪೂರ್ಣಾಙ್ಕ)mp.y,
+			 (ಪೂರ್ಣಾಙ್ಕ)0,	    // reserved param
 			 s_hwnd,
-			 NULL);
+			 ರಿಕ್ತ);
 		/*
 		 * NOTE: The pop-up menu can eat the mouse up event.
 		 * We deal with this in normal.c.
 		 */
 	    }
 	}
-	else
+	ಅನ್ಯಥಾ
 	    // Pass on messages to the main Vim window
 	    PostMessage(s_hwnd, WM_COMMAND, LOWORD(wParam), 0);
 	/*
@@ -8147,20 +8147,20 @@ tearoff_callback(
 	 * choosing a tearoff button you can start typing again
 	 * straight away.
 	 */
-	(void)SetFocus(s_hwnd);
-	return TRUE;
+	(ಶೂನ್ಯ)SetFocus(s_hwnd);
+	ಪ್ರತ್ಯಾಗಮ TRUE;
     }
-    if ((message == WM_SYSCOMMAND) && (wParam == SC_CLOSE))
+    ಯದಿ ((message == WM_SYSCOMMAND) && (wParam == SC_CLOSE))
     {
 	DestroyWindow(hwnd);
-	return TRUE;
+	ಪ್ರತ್ಯಾಗಮ TRUE;
     }
 
     // When moved around, give main window the focus back.
-    if (message == WM_EXITSIZEMOVE)
-	(void)SetActiveWindow(s_hwnd);
+    ಯದಿ (message == WM_EXITSIZEMOVE)
+	(ಶೂನ್ಯ)SetActiveWindow(s_hwnd);
 
-    return FALSE;
+    ಪ್ರತ್ಯಾಗಮ FALSE;
 }
 #endif
 
@@ -8170,8 +8170,8 @@ tearoff_callback(
  * We don't use the GetDialogBaseUnits() API, because we don't use the
  * (old-style) system font.
  */
-    static void
-get_dialog_font_metrics(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+get_dialog_font_metrics(ಶೂನ್ಯ)
 {
     HDC		    hdc;
     HFONT	    hfontTools = 0;
@@ -8181,9 +8181,9 @@ get_dialog_font_metrics(void)
 #endif
 
 #ifdef USE_SYSMENU_FONT
-    if (gui_w32_get_menu_font(&lfSysmenu) == OK)
+    ಯದಿ (gui_w32_get_menu_font(&lfSysmenu) == OK)
 	hfontTools = CreateFontIndirectW(&lfSysmenu);
-    else
+    ಅನ್ಯಥಾ
 #endif
 	hfontTools = CreateFont(-DLG_FONT_POINT_SIZE, 0, 0, 0, 0, 0, 0, 0,
 				0, 0, 0, 0, VARIABLE_PITCH, DLG_FONT_NAME);
@@ -8197,81 +8197,81 @@ get_dialog_font_metrics(void)
     s_dlgfntheight = (WORD)size.cy;
 }
 
-#if defined(FEAT_MENU) && defined(FEAT_TEAROFF)
+#ಯದಿ defined(FEAT_MENU) && defined(FEAT_TEAROFF)
 /*
  * Create a pseudo-"tearoff menu" based on the child
  * items of a given menu pointer.
  */
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 gui_mch_tearoff(
     char_u	*title,
     vimmenu_T	*menu,
-    int		initX,
-    int		initY)
+    ಪೂರ್ಣಾಙ್ಕ		initX,
+    ಪೂರ್ಣಾಙ್ಕ		initY)
 {
     WORD	*p, *pdlgtemplate, *pnumitems, *ptrueheight;
-    int		template_len;
-    int		nchar, textWidth, submenuWidth;
+    ಪೂರ್ಣಾಙ್ಕ		template_len;
+    ಪೂರ್ಣಾಙ್ಕ		nchar, textWidth, submenuWidth;
     DWORD	lStyle;
     DWORD	lExtendedStyle;
     WORD	dlgwidth;
     WORD	menuID;
     vimmenu_T	*pmenu;
-    vimmenu_T	*top_menu;
+    vimmenu_T	*ತುದಿ_menu;
     vimmenu_T	*the_menu = menu;
     HWND	hwnd;
     HDC		hdc;
     HFONT	font, oldFont;
-    int		col, spaceWidth, len;
-    int		columnWidths[2];
+    ಪೂರ್ಣಾಙ್ಕ		col, spaceWidth, len;
+    ಪೂರ್ಣಾಙ್ಕ		columnWidths[2];
     char_u	*label, *text;
-    int		acLen = 0;
-    int		nameLen;
-    int		padding0, padding1, padding2 = 0;
-    int		sepPadding=0;
-    int		x;
-    int		y;
+    ಪೂರ್ಣಾಙ್ಕ		acLen = 0;
+    ಪೂರ್ಣಾಙ್ಕ		nameLen;
+    ಪೂರ್ಣಾಙ್ಕ		padding0, padding1, padding2 = 0;
+    ಪೂರ್ಣಾಙ್ಕ		sepPadding=0;
+    ಪೂರ್ಣಾಙ್ಕ		x;
+    ಪೂರ್ಣಾಙ್ಕ		y;
 # ifdef USE_SYSMENU_FONT
     LOGFONTW	lfSysmenu;
-    int		use_lfSysmenu = FALSE;
+    ಪೂರ್ಣಾಙ್ಕ		use_lfSysmenu = FALSE;
 # endif
 
     /*
      * If this menu is already torn off, move it to the mouse position.
      */
-    if (IsWindow(menu->tearoff_handle))
+    ಯದಿ (IsWindow(menu->tearoff_handle))
     {
 	POINT mp;
-	if (GetCursorPos(&mp))
+	ಯದಿ (GetCursorPos(&mp))
 	{
-	    SetWindowPos(menu->tearoff_handle, NULL, mp.x, mp.y, 0, 0,
+	    SetWindowPos(menu->tearoff_handle, ರಿಕ್ತ, mp.x, mp.y, 0, 0,
 		    SWP_NOACTIVATE | SWP_NOSIZE | SWP_NOZORDER);
 	}
-	return;
+	ಪ್ರತ್ಯಾಗಮ;
     }
 
     /*
      * Create a new tearoff.
      */
-    if (*title == MNU_HIDDEN_CHAR)
+    ಯದಿ (*title == MNU_HIDDEN_CHAR)
 	title++;
 
     // Allocate memory to store the dialog template.  It's made bigger when
     // needed.
     template_len = DLG_ALLOC_SIZE;
     pdlgtemplate = p = (WORD *)LocalAlloc(LPTR, template_len);
-    if (p == NULL)
-	return;
+    ಯದಿ (p == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ;
 
     hwnd = GetDesktopWindow();
     hdc = GetWindowDC(hwnd);
 # ifdef USE_SYSMENU_FONT
-    if (gui_w32_get_menu_font(&lfSysmenu) == OK)
+    ಯದಿ (gui_w32_get_menu_font(&lfSysmenu) == OK)
     {
 	font = CreateFontIndirectW(&lfSysmenu);
 	use_lfSysmenu = TRUE;
     }
-    else
+    ಅನ್ಯಥಾ
 # endif
 	font = CreateFont(-DLG_FONT_POINT_SIZE, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, VARIABLE_PITCH, DLG_FONT_NAME);
@@ -8285,32 +8285,32 @@ gui_mch_tearoff(
     // Figure out max width of the text column, the accelerator column and the
     // optional submenu column.
     submenuWidth = 0;
-    for (col = 0; col < 2; col++)
+    ಪ್ರತಿ (col = 0; col < 2; col++)
     {
 	columnWidths[col] = 0;
 	FOR_ALL_CHILD_MENUS(menu, pmenu)
 	{
 	    // Use "dname" here to compute the width of the visible text.
 	    text = (col == 0) ? pmenu->dname : pmenu->actext;
-	    if (text != NULL && *text != NUL)
+	    ಯದಿ (text != ರಿಕ್ತ && *text != NUL)
 	    {
-		textWidth = GetTextWidthEnc(hdc, text, (int)STRLEN(text));
-		if (textWidth > columnWidths[col])
+		textWidth = GetTextWidthEnc(hdc, text, (ಪೂರ್ಣಾಙ್ಕ)STRLEN(text));
+		ಯದಿ (textWidth > columnWidths[col])
 		    columnWidths[col] = textWidth;
 	    }
-	    if (pmenu->children != NULL)
+	    ಯದಿ (pmenu->children != ರಿಕ್ತ)
 		submenuWidth = TEAROFF_COLUMN_PADDING * spaceWidth;
 	}
     }
-    if (columnWidths[1] == 0)
+    ಯದಿ (columnWidths[1] == 0)
     {
 	// no accelerators
-	if (submenuWidth != 0)
+	ಯದಿ (submenuWidth != 0)
 	    columnWidths[0] += submenuWidth;
-	else
+	ಅನ್ಯಥಾ
 	    columnWidths[0] += spaceWidth;
     }
-    else
+    ಅನ್ಯಥಾ
     {
 	// there is an accelerator column
 	columnWidths[0] += TEAROFF_COLUMN_PADDING * spaceWidth;
@@ -8321,14 +8321,14 @@ gui_mch_tearoff(
      * Now find the total width of our 'menu'.
      */
     textWidth = columnWidths[0] + columnWidths[1];
-    if (submenuWidth != 0)
+    ಯದಿ (submenuWidth != 0)
     {
 	submenuWidth = GetTextWidth(hdc, (char_u *)TEAROFF_SUBMENU_LABEL,
-				  (int)STRLEN_LITERAL(TEAROFF_SUBMENU_LABEL));
+				  (ಪೂರ್ಣಾಙ್ಕ)STRLEN_LITERAL(TEAROFF_SUBMENU_LABEL));
 	textWidth += submenuWidth;
     }
-    dlgwidth = GetTextWidthEnc(hdc, title, (int)STRLEN(title));
-    if (textWidth > dlgwidth)
+    dlgwidth = GetTextWidthEnc(hdc, title, (ಪೂರ್ಣಾಙ್ಕ)STRLEN(title));
+    ಯದಿ (textWidth > dlgwidth)
 	dlgwidth = textWidth;
     dlgwidth += 2 * TEAROFF_PADDING_X + TEAROFF_BUTTON_PAD_X;
 
@@ -8343,13 +8343,13 @@ gui_mch_tearoff(
     pnumitems = p;	// save where the number of items must be stored
     *p++ = 0;		// NumberOfItems(will change later)
     gui_mch_getmouse(&x, &y);
-    if (initX == 0xffffL)
+    ಯದಿ (initX == 0xffffL)
 	*p++ = PixelToDialogX(x); // x
-    else
+    ಅನ್ಯಥಾ
 	*p++ = PixelToDialogX(initX); // x
-    if (initY == 0xffffL)
+    ಯದಿ (initY == 0xffffL)
 	*p++ = PixelToDialogY(y); // y
-    else
+    ಅನ್ಯಥಾ
 	*p++ = PixelToDialogY(initY); // y
     *p++ = PixelToDialogX(dlgwidth);    // cx
     ptrueheight = p;
@@ -8365,15 +8365,15 @@ gui_mch_tearoff(
 
     // do the font, since DS_3DLOOK doesn't work properly
 # ifdef USE_SYSMENU_FONT
-    if (use_lfSysmenu)
+    ಯದಿ (use_lfSysmenu)
     {
 	// point size
 	*p++ = -MulDiv(lfSysmenu.lfHeight, 72,
 		GetDeviceCaps(hdc, LOGPIXELSY));
 	wcscpy(p, lfSysmenu.lfFaceName);
-	nchar = (int)wcslen(lfSysmenu.lfFaceName) + 1;
+	nchar = (ಪೂರ್ಣಾಙ್ಕ)wcslen(lfSysmenu.lfFaceName) + 1;
     }
-    else
+    ಅನ್ಯಥಾ
 # endif
     {
 	*p++ = DLG_FONT_POINT_SIZE;		// point size
@@ -8385,33 +8385,33 @@ gui_mch_tearoff(
      * Loop over all the items in the menu.
      * But skip over the tearbar.
      */
-    if (STRCMP(menu->children->name, TEAR_STRING) == 0)
+    ಯದಿ (STRCMP(menu->children->name, TEAR_STRING) == 0)
 	menu = menu->children->next;
-    else
+    ಅನ್ಯಥಾ
 	menu = menu->children;
-    top_menu = menu;
-    for ( ; menu != NULL; menu = menu->next)
+    ತುದಿ_menu = menu;
+    ಪ್ರತಿ ( ; menu != ರಿಕ್ತ; menu = menu->next)
     {
-	if (menu->modes == 0)	// this menu has just been deleted
-	    continue;
-	if (menu_is_separator(menu->dname))
+	ಯದಿ (menu->modes == 0)	// this menu has just been deleted
+	    ಅನುವರ್ತ;
+	ಯದಿ (menu_is_separator(menu->dname))
 	{
 	    sepPadding += 3;
-	    continue;
+	    ಅನುವರ್ತ;
 	}
 
 	// Check if there still is plenty of room in the template.  Make it
 	// larger when needed.
-	if (((char *)p - (char *)pdlgtemplate) + 1000 > template_len)
+	ಯದಿ (((ವರ್ಣ *)p - (ವರ್ಣ *)pdlgtemplate) + 1000 > template_len)
 	{
 	    WORD    *newp;
 
 	    newp = (WORD *)LocalAlloc(LPTR, template_len + 4096);
-	    if (newp != NULL)
+	    ಯದಿ (newp != ರಿಕ್ತ)
 	    {
 		template_len += 4096;
 		mch_memmove(newp, pdlgtemplate,
-					    (char *)p - (char *)pdlgtemplate);
+					    (ವರ್ಣ *)p - (ವರ್ಣ *)pdlgtemplate);
 		p = newp + (p - pdlgtemplate);
 		pnumitems = newp + (pnumitems - pdlgtemplate);
 		ptrueheight = newp + (ptrueheight - pdlgtemplate);
@@ -8423,60 +8423,60 @@ gui_mch_tearoff(
 	// Figure out minimal length of this menu label.  Use "name" for the
 	// actual text, "dname" for estimating the displayed size.  "name"
 	// has "&a" for mnemonic and includes the accelerator.
-	len = nameLen = (int)STRLEN(menu->name);
+	len = nameLen = (ಪೂರ್ಣಾಙ್ಕ)STRLEN(menu->name);
 	padding0 = (columnWidths[0] - GetTextWidthEnc(hdc, menu->dname,
-				      (int)STRLEN(menu->dname))) / spaceWidth;
+				      (ಪೂರ್ಣಾಙ್ಕ)STRLEN(menu->dname))) / spaceWidth;
 	len += padding0;
 
-	if (menu->actext != NULL)
+	ಯದಿ (menu->actext != ರಿಕ್ತ)
 	{
-	    acLen = (int)STRLEN(menu->actext);
+	    acLen = (ಪೂರ್ಣಾಙ್ಕ)STRLEN(menu->actext);
 	    len += acLen;
 	    textWidth = GetTextWidthEnc(hdc, menu->actext, acLen);
 	}
-	else
+	ಅನ್ಯಥಾ
 	    textWidth = 0;
 	padding1 = (columnWidths[1] - textWidth) / spaceWidth;
 	len += padding1;
 
-	if (menu->children == NULL)
+	ಯದಿ (menu->children == ರಿಕ್ತ)
 	{
 	    padding2 = submenuWidth / spaceWidth;
 	    len += padding2;
 	    menuID = (WORD)(menu->id);
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
-	    len += (int)STRLEN_LITERAL(TEAROFF_SUBMENU_LABEL);
+	    len += (ಪೂರ್ಣಾಙ್ಕ)STRLEN_LITERAL(TEAROFF_SUBMENU_LABEL);
 	    menuID = (WORD)((long_u)(menu->submenu_id) | (DWORD)0x8000);
 	}
 
 	// Allocate menu label and fill it in
 	text = label = alloc(len + 1);
-	if (label == NULL)
-	    break;
+	ಯದಿ (label == ರಿಕ್ತ)
+	    ಭಙ್ಗ;
 
 	vim_strncpy(text, menu->name, nameLen);
 	text = vim_strchr(text, TAB);	    // stop at TAB before actext
-	if (text == NULL)
+	ಯದಿ (text == ರಿಕ್ತ)
 	    text = label + nameLen;	    // no actext, use whole name
-	while (padding0-- > 0)
+	ಯಾವತ್ (padding0-- > 0)
 	    *text++ = ' ';
-	if (menu->actext != NULL)
+	ಯದಿ (menu->actext != ರಿಕ್ತ)
 	{
 	    STRNCPY(text, menu->actext, acLen);
 	    text += acLen;
 	}
-	while (padding1-- > 0)
+	ಯಾವತ್ (padding1-- > 0)
 	    *text++ = ' ';
-	if (menu->children != NULL)
+	ಯದಿ (menu->children != ರಿಕ್ತ)
 	{
 	    STRCPY(text, TEAROFF_SUBMENU_LABEL);
 	    text += STRLEN_LITERAL(TEAROFF_SUBMENU_LABEL);
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
-	    while (padding2-- > 0)
+	    ಯಾವತ್ (padding2-- > 0)
 		*text++ = ' ';
 	}
 	*text = NUL;
@@ -8486,12 +8486,12 @@ gui_mch_tearoff(
 	 * W95/NT4 it makes the tear-off look more like a menu.
 	 */
 	p = add_dialog_element(p,
-		BS_PUSHBUTTON|BS_LEFT,
+		BS_PUSHBUTTON|BS_ಎಡ,
 		(WORD)PixelToDialogX(TEAROFF_PADDING_X),
 		(WORD)(sepPadding + 1 + 13 * (*pnumitems)),
 		(WORD)PixelToDialogX(dlgwidth - 2 * TEAROFF_PADDING_X),
 		(WORD)12,
-		menuID, (WORD)0x0080, (char *)label);
+		menuID, (WORD)0x0080, (ವರ್ಣ *)label);
 	vim_free(label);
 	(*pnumitems)++;
     }
@@ -8505,7 +8505,7 @@ gui_mch_tearoff(
 	    (LPDLGTEMPLATE)pdlgtemplate,
 	    s_hwnd,
 	    (DLGPROC)tearoff_callback,
-	    (LPARAM)top_menu);
+	    (LPARAM)ತುದಿ_menu);
 
     LocalFree(LocalHandle(pdlgtemplate));
     SelectFont(hdc, oldFont);
@@ -8517,14 +8517,14 @@ gui_mch_tearoff(
      * a tearoff, the user doesn't have to click with the mouse just to start
      * typing again!
      */
-    (void)SetActiveWindow(s_hwnd);
+    (ಶೂನ್ಯ)SetActiveWindow(s_hwnd);
 
     // make sure the right buttons are enabled
     force_menu_update = TRUE;
 }
 #endif
 
-#if defined(FEAT_TOOLBAR)
+#ಯದಿ defined(FEAT_TOOLBAR)
 # include "gui_w32_rc.h"
 
 /*
@@ -8532,8 +8532,8 @@ gui_mch_tearoff(
  *  (just like the menu, there are no defaults, it's all
  *  set up through menu.vim)
  */
-    static void
-initialise_toolbar(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+initialise_toolbar(ಶೂನ್ಯ)
 {
     InitCommonControls();
     s_toolbarhwnd = CreateToolbarEx(
@@ -8543,13 +8543,13 @@ initialise_toolbar(void)
 		    31,			//number of images in initial bitmap
 		    g_hinst,
 		    IDR_TOOLBAR1,	// id of initial bitmap
-		    NULL,
+		    ರಿಕ್ತ,
 		    0,			// initial number of buttons
 		    TOOLBAR_BUTTON_WIDTH, //api guide is wrong!
 		    TOOLBAR_BUTTON_HEIGHT,
 		    TOOLBAR_BUTTON_WIDTH,
 		    TOOLBAR_BUTTON_HEIGHT,
-		    sizeof(TBBUTTON)
+		    ಪರಿಮಾಣ(TBBUTTON)
 		    );
 
     // Remove transparency from the toolbar to prevent the main window
@@ -8559,18 +8559,18 @@ initialise_toolbar(void)
 
     s_toolbar_wndproc = SubclassWindow(s_toolbarhwnd, toolbar_wndproc);
 
-    gui_mch_show_toolbar(vim_strchr(p_go, GO_TOOLBAR) != NULL);
+    gui_mch_show_toolbar(vim_strchr(p_go, GO_TOOLBAR) != ರಿಕ್ತ);
 
     update_toolbar_size();
 }
 
-    static void
-update_toolbar_size(void)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+update_toolbar_size(ಶೂನ್ಯ)
 {
-    int		w, h;
+    ಪೂರ್ಣಾಙ್ಕ		w, h;
     TBMETRICS	tbm;
 
-    tbm.cbSize = sizeof(TBMETRICS);
+    tbm.cbSize = ಪರಿಮಾಣ(TBMETRICS);
     tbm.dwMask = TBMF_PAD | TBMF_BUTTONSPACING;
     SendMessage(s_toolbarhwnd, TB_GETMETRICS, 0, (LPARAM)&tbm);
     //TRACE("Pad: %d, %d", tbm.cxPad, tbm.cyPad);
@@ -8590,35 +8590,35 @@ update_toolbar_size(void)
     // It would be nice if the toolbar images are resized based on DPI.
 }
 
-    static LRESULT CALLBACK
+    ಸ್ಥಿರ LRESULT CALLBACK
 toolbar_wndproc(
     HWND hwnd,
-    UINT uMsg,
+    UINT u_ಸಂದೇಶ,
     WPARAM wParam,
     LPARAM lParam)
 {
-    HandleMouseHide(uMsg, lParam);
-    return CallWindowProc(s_toolbar_wndproc, hwnd, uMsg, wParam, lParam);
+    HandleMouseHide(u_ಸಂದೇಶ, lParam);
+    ಪ್ರತ್ಯಾಗಮ CallWindowProc(s_toolbar_wndproc, hwnd, u_ಸಂದೇಶ, wParam, lParam);
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
 get_toolbar_bitmap(vimmenu_T *menu)
 {
-    int i = -1;
+    ಪೂರ್ಣಾಙ್ಕ i = -1;
 
     /*
      * Check user bitmaps first, unless builtin is specified.
      */
-    if (!menu->icon_builtin)
+    ಯದಿ (!menu->icon_builtin)
     {
 	char_u fname[MAXPATHL];
-	HANDLE hbitmap = NULL;
+	HANDLE hbitmap = ರಿಕ್ತ;
 
-	if (menu->iconfile != NULL)
+	ಯದಿ (menu->iconfile != ರಿಕ್ತ)
 	{
 	    gui_find_iconfile(menu->iconfile, fname, "bmp");
 	    hbitmap = LoadImage(
-			NULL,
+			ರಿಕ್ತ,
 			(LPCSTR)fname,
 			IMAGE_BITMAP,
 			TOOLBAR_BUTTON_WIDTH,
@@ -8632,14 +8632,14 @@ get_toolbar_bitmap(vimmenu_T *menu)
 	 * If the LoadImage call failed, or the "icon=" file
 	 * didn't exist or wasn't specified, try the menu name
 	 */
-	if (hbitmap == NULL
+	ಯದಿ (hbitmap == ರಿಕ್ತ
 		&& (gui_find_bitmap(
 # ifdef FEAT_MULTI_LANG
-			    menu->en_dname != NULL ? menu->en_dname :
+			    menu->en_dname != ರಿಕ್ತ ? menu->en_dname :
 # endif
 					menu->dname, fname, "bmp") == OK))
 	    hbitmap = LoadImage(
-		    NULL,
+		    ರಿಕ್ತ,
 		    (LPCSTR)fname,
 		    IMAGE_BITMAP,
 		    TOOLBAR_BUTTON_WIDTH,
@@ -8648,35 +8648,35 @@ get_toolbar_bitmap(vimmenu_T *menu)
 		    LR_LOADMAP3DCOLORS
 		);
 
-	if (hbitmap != NULL)
+	ಯದಿ (hbitmap != ರಿಕ್ತ)
 	{
 	    TBADDBITMAP tbAddBitmap;
 
-	    tbAddBitmap.hInst = NULL;
+	    tbAddBitmap.hInst = ರಿಕ್ತ;
 	    tbAddBitmap.nID = (long_u)hbitmap;
 
-	    i = (int)SendMessage(s_toolbarhwnd, TB_ADDBITMAP,
+	    i = (ಪೂರ್ಣಾಙ್ಕ)SendMessage(s_toolbarhwnd, TB_ADDBITMAP,
 			    (WPARAM)1, (LPARAM)&tbAddBitmap);
 	    // i will be set to -1 if it fails
 	}
     }
-    if (i == -1 && menu->iconidx >= 0 && menu->iconidx < TOOLBAR_BITMAP_COUNT)
+    ಯದಿ (i == -1 && menu->iconidx >= 0 && menu->iconidx < TOOLBAR_BITMAP_ಎಣಿಕೆ)
 	i = menu->iconidx;
 
-    return i;
+    ಪ್ರತ್ಯಾಗಮ i;
 }
 #endif
 
-#if defined(FEAT_GUI_TABLINE)
-    static void
-initialise_tabline(void)
+#ಯದಿ defined(FEAT_GUI_TABLINE)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+initialise_tabline(ಶೂನ್ಯ)
 {
     InitCommonControls();
 
     s_tabhwnd = CreateWindow(WC_TABCONTROL, "Vim tabline",
 	    WS_CHILD|TCS_FOCUSNEVER|TCS_TOOLTIPS,
 	    CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-	    CW_USEDEFAULT, s_hwnd, NULL, g_hinst, NULL);
+	    CW_USEDEFAULT, s_hwnd, ರಿಕ್ತ, g_hinst, ರಿಕ್ತ);
     s_tabline_wndproc = SubclassWindow(s_tabhwnd, tabline_wndproc);
 
     gui.tabline_height = TABLINE_HEIGHT;
@@ -8687,85 +8687,85 @@ initialise_tabline(void)
 /*
  * Get tabpage_T from POINT.
  */
-    static tabpage_T *
+    ಸ್ಥಿರ tabpage_T *
 GetTabFromPoint(
     HWND    hWnd,
     POINT   pt)
 {
-    tabpage_T	*ptp = NULL;
+    tabpage_T	*ptp = ರಿಕ್ತ;
 
-    if (gui_mch_showing_tabline())
+    ಯದಿ (gui_mch_showing_tabline())
     {
 	TCHITTESTINFO htinfo;
 	htinfo.pt = pt;
 	// ignore if a window under cursor is not tabcontrol.
-	if (s_tabhwnd == hWnd)
+	ಯದಿ (s_tabhwnd == hWnd)
 	{
-	    int idx = TabCtrl_HitTest(s_tabhwnd, &htinfo);
-	    if (idx != -1)
+	    ಪೂರ್ಣಾಙ್ಕ idx = TabCtrl_HitTest(s_tabhwnd, &htinfo);
+	    ಯದಿ (idx != -1)
 		ptp = find_tabpage(idx + 1);
 	}
     }
-    return ptp;
+    ಪ್ರತ್ಯಾಗಮ ptp;
 }
 
-static POINT	    s_pt = {0, 0};
-static HCURSOR      s_hCursor = NULL;
+ಸ್ಥಿರ POINT	    s_pt = {0, 0};
+ಸ್ಥಿರ HCURSOR      s_hCursor = ರಿಕ್ತ;
 
-    static LRESULT CALLBACK
+    ಸ್ಥಿರ LRESULT CALLBACK
 tabline_wndproc(
     HWND hwnd,
-    UINT uMsg,
+    UINT u_ಸಂದೇಶ,
     WPARAM wParam,
     LPARAM lParam)
 {
     POINT	pt;
     tabpage_T	*tp;
     RECT	rect;
-    int		nCenter;
-    int		idx0;
-    int		idx1;
+    ಪೂರ್ಣಾಙ್ಕ		nCenter;
+    ಪೂರ್ಣಾಙ್ಕ		idx0;
+    ಪೂರ್ಣಾಙ್ಕ		idx1;
 
-    HandleMouseHide(uMsg, lParam);
+    HandleMouseHide(u_ಸಂದೇಶ, lParam);
 
-    switch (uMsg)
+    ವಿಕಲ್ಪ (u_ಸಂದೇಶ)
     {
-	case WM_LBUTTONDOWN:
+	ಪಕ್ಷ WM_LBUTTONDOWN:
 	    {
 		s_pt.x = GET_X_LPARAM(lParam);
 		s_pt.y = GET_Y_LPARAM(lParam);
 		SetCapture(hwnd);
 		s_hCursor = GetCursor(); // backup default cursor
-		break;
+		ಭಙ್ಗ;
 	    }
-	case WM_MOUSEMOVE:
-	    if (GetCapture() == hwnd
+	ಪಕ್ಷ WM_MOUSEMOVE:
+	    ಯದಿ (GetCapture() == hwnd
 		    && ((wParam & MK_LBUTTON)) != 0)
 	    {
 		pt.x = GET_X_LPARAM(lParam);
 		pt.y = s_pt.y;
-		if (abs(pt.x - s_pt.x) >
+		ಯದಿ (abs(pt.x - s_pt.x) >
 			pGetSystemMetricsForDpi(SM_CXDRAG, s_dpi))
 		{
-		    SetCursor(LoadCursor(NULL, IDC_SIZEWE));
+		    SetCursor(LoadCursor(ರಿಕ್ತ, IDC_SIZEWE));
 
 		    tp = GetTabFromPoint(hwnd, pt);
-		    if (tp != NULL)
+		    ಯದಿ (tp != ರಿಕ್ತ)
 		    {
 			idx0 = tabpage_index(curtab) - 1;
 			idx1 = tabpage_index(tp) - 1;
 
 			TabCtrl_GetItemRect(hwnd, idx1, &rect);
-			nCenter = rect.left + (rect.right - rect.left) / 2;
+			nCenter = rect.ಎಡ + (rect.ಬಲ - rect.ಎಡ) / 2;
 
 			// Check if the mouse cursor goes over the center of
 			// the next tab to prevent "flickering".
-			if ((idx0 < idx1) && (nCenter < pt.x))
+			ಯದಿ ((idx0 < idx1) && (nCenter < pt.x))
 			{
 			    tabpage_move(idx1 + 1);
 			    update_screen(0);
 			}
-			else if ((idx1 < idx0) && (pt.x < nCenter))
+			ಅನ್ಯಥಾ ಯದಿ ((idx1 < idx0) && (pt.x < nCenter))
 			{
 			    tabpage_move(idx1);
 			    update_screen(0);
@@ -8773,58 +8773,58 @@ tabline_wndproc(
 		    }
 		}
 	    }
-	    break;
-	case WM_LBUTTONUP:
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ WM_LBUTTONUP:
 	    {
-		if (GetCapture() == hwnd)
+		ಯದಿ (GetCapture() == hwnd)
 		{
 		    SetCursor(s_hCursor);
 		    ReleaseCapture();
 		}
-		break;
+		ಭಙ್ಗ;
 	    }
-	case WM_MBUTTONUP:
+	ಪಕ್ಷ WM_MBUTTONUP:
 	    {
 		TCHITTESTINFO htinfo;
 
 		htinfo.pt.x = GET_X_LPARAM(lParam);
 		htinfo.pt.y = GET_Y_LPARAM(lParam);
 		idx0 = TabCtrl_HitTest(hwnd, &htinfo);
-		if (idx0 != -1)
+		ಯದಿ (idx0 != -1)
 		{
 		    idx0 += 1;
 		    send_tabline_menu_event(idx0, TABLINE_MENU_CLOSE);
 		}
-		break;
+		ಭಙ್ಗ;
 	    }
-	default:
-	    break;
+	ಸ್ವಭಾವ:
+	    ಭಙ್ಗ;
     }
 
-    return CallWindowProc(s_tabline_wndproc, hwnd, uMsg, wParam, lParam);
+    ಪ್ರತ್ಯಾಗಮ CallWindowProc(s_tabline_wndproc, hwnd, u_ಸಂದೇಶ, wParam, lParam);
 }
 #endif
 
-#if defined(FEAT_OLE) || defined(FEAT_EVAL)
+#ಯದಿ defined(FEAT_OLE) || defined(FEAT_EVAL)
 /*
  * Make the GUI window come to the foreground.
  */
-    void
-gui_mch_set_foreground(void)
+    ಶೂನ್ಯ
+gui_mch_set_foreground(ಶೂನ್ಯ)
 {
-    if (IsIconic(s_hwnd))
+    ಯದಿ (IsIconic(s_hwnd))
 	 SendMessage(s_hwnd, WM_SYSCOMMAND, SC_RESTORE, 0);
     SetForegroundWindow(s_hwnd);
 }
 #endif
 
-#if defined(FEAT_MBYTE_IME) && defined(DYNAMIC_IME)
-    static void
-dyn_imm_load(void)
+#ಯದಿ defined(FEAT_MBYTE_IME) && defined(DYNAMIC_IME)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+dyn_imm_load(ಶೂನ್ಯ)
 {
     hLibImm = vimLoadLib("imm32.dll");
-    if (hLibImm == NULL)
-	return;
+    ಯದಿ (hLibImm == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ;
 
     pImmGetCompositionStringW
 	    = (LONG (WINAPI *)(HIMC, DWORD, LPVOID, DWORD))GetProcAddress(hLibImm, "ImmGetCompositionStringW");
@@ -8849,36 +8849,36 @@ dyn_imm_load(void)
     pImmSetConversionStatus
 	    = (BOOL (WINAPI *)(HIMC, DWORD, DWORD))GetProcAddress(hLibImm, "ImmSetConversionStatus");
 
-    if (       pImmGetCompositionStringW == NULL
-	    || pImmGetContext == NULL
-	    || pImmAssociateContext == NULL
-	    || pImmReleaseContext == NULL
-	    || pImmGetOpenStatus == NULL
-	    || pImmSetOpenStatus == NULL
-	    || pImmGetCompositionFontW == NULL
-	    || pImmSetCompositionFontW == NULL
-	    || pImmSetCompositionWindow == NULL
-	    || pImmGetConversionStatus == NULL
-	    || pImmSetConversionStatus == NULL)
+    ಯದಿ (       pImmGetCompositionStringW == ರಿಕ್ತ
+	    || pImmGetContext == ರಿಕ್ತ
+	    || pImmAssociateContext == ರಿಕ್ತ
+	    || pImmReleaseContext == ರಿಕ್ತ
+	    || pImmGetOpenStatus == ರಿಕ್ತ
+	    || pImmSetOpenStatus == ರಿಕ್ತ
+	    || pImmGetCompositionFontW == ರಿಕ್ತ
+	    || pImmSetCompositionFontW == ರಿಕ್ತ
+	    || pImmSetCompositionWindow == ರಿಕ್ತ
+	    || pImmGetConversionStatus == ರಿಕ್ತ
+	    || pImmSetConversionStatus == ರಿಕ್ತ)
     {
 	FreeLibrary(hLibImm);
-	hLibImm = NULL;
-	pImmGetContext = NULL;
-	return;
+	hLibImm = ರಿಕ್ತ;
+	pImmGetContext = ರಿಕ್ತ;
+	ಪ್ರತ್ಯಾಗಮ;
     }
 
-    return;
+    ಪ್ರತ್ಯಾಗಮ;
 }
 
 #endif
 
-#if defined(FEAT_SIGN_ICONS)
+#ಯದಿ defined(FEAT_SIGN_ICONS)
 
 # ifdef FEAT_XPM_W32
 #  define IMAGE_XPM   100
 # endif
 
-typedef struct _signicon_t
+ಪ್ರಕಾರನಿರ್ದೇಶ ಸಂರಚನಾ _signicon_t
 {
     HANDLE	hImage;
     UINT	uType;
@@ -8887,17 +8887,17 @@ typedef struct _signicon_t
 # endif
 } signicon_t;
 
-    void
-gui_mch_drawsign(int row, int col, int typenr)
+    ಶೂನ್ಯ
+gui_mch_drawsign(ಪೂರ್ಣಾಙ್ಕ row, ಪೂರ್ಣಾಙ್ಕ col, ಪೂರ್ಣಾಙ್ಕ typenr)
 {
     signicon_t *sign;
-    int x, y, w, h;
+    ಪೂರ್ಣಾಙ್ಕ x, y, w, h;
 
-    if (!gui.in_use || (sign = (signicon_t *)sign_get_image(typenr)) == NULL)
-	return;
+    ಯದಿ (!gui.in_use || (sign = (signicon_t *)sign_get_image(typenr)) == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ;
 
-# if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX())
+# ಯದಿ defined(FEAT_DIRECTX)
+    ಯದಿ (IS_ENABLE_DIRECTX())
 	DWriteContext_Flush(s_dwc);
 # endif
 
@@ -8905,9 +8905,9 @@ gui_mch_drawsign(int row, int col, int typenr)
     y = TEXT_Y(row);
     w = gui.char_width * 2;
     h = gui.char_height;
-    switch (sign->uType)
+    ವಿಕಲ್ಪ (sign->uType)
     {
-	case IMAGE_BITMAP:
+	ಪಕ್ಷ IMAGE_BITMAP:
 	    {
 		HDC hdcMem;
 		HBITMAP hbmpOld;
@@ -8918,13 +8918,13 @@ gui_mch_drawsign(int row, int col, int typenr)
 		SelectObject(hdcMem, hbmpOld);
 		DeleteDC(hdcMem);
 	    }
-	    break;
-	case IMAGE_ICON:
-	case IMAGE_CURSOR:
-	    DrawIconEx(s_hdc, x, y, (HICON)sign->hImage, w, h, 0, NULL, DI_NORMAL);
-	    break;
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ IMAGE_ICON:
+	ಪಕ್ಷ IMAGE_CURSOR:
+	    DrawIconEx(s_hdc, x, y, (HICON)sign->hImage, w, h, 0, ರಿಕ್ತ, DI_NORMAL);
+	    ಭಙ್ಗ;
 # ifdef FEAT_XPM_W32
-	case IMAGE_XPM:
+	ಪಕ್ಷ IMAGE_XPM:
 	    {
 		HDC hdcMem;
 		HBITMAP hbmpOld;
@@ -8940,98 +8940,98 @@ gui_mch_drawsign(int row, int col, int typenr)
 		SelectObject(hdcMem, hbmpOld);
 		DeleteDC(hdcMem);
 	    }
-	    break;
+	    ಭಙ್ಗ;
 # endif
     }
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 close_signicon_image(signicon_t *sign)
 {
-    if (sign == NULL)
-	return;
+    ಯದಿ (sign == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ;
 
-    switch (sign->uType)
+    ವಿಕಲ್ಪ (sign->uType)
     {
-	case IMAGE_BITMAP:
+	ಪಕ್ಷ IMAGE_BITMAP:
 	    DeleteObject((HGDIOBJ)sign->hImage);
-	    break;
-	case IMAGE_CURSOR:
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ IMAGE_CURSOR:
 	    DestroyCursor((HCURSOR)sign->hImage);
-	    break;
-	case IMAGE_ICON:
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ IMAGE_ICON:
 	    DestroyIcon((HICON)sign->hImage);
-	    break;
+	    ಭಙ್ಗ;
 # ifdef FEAT_XPM_W32
-	case IMAGE_XPM:
+	ಪಕ್ಷ IMAGE_XPM:
 	    DeleteObject((HBITMAP)sign->hImage);
 	    DeleteObject((HBITMAP)sign->hShape);
-	    break;
+	    ಭಙ್ಗ;
 # endif
     }
 }
 
-    void *
+    ಶೂನ್ಯ *
 gui_mch_register_sign(char_u *signfile)
 {
     signicon_t	sign, *psign;
     char_u	*ext;
 
-    sign.hImage = NULL;
+    sign.hImage = ರಿಕ್ತ;
     ext = signfile + STRLEN(signfile) - 4; // get extension
-    if (ext > signfile)
+    ಯದಿ (ext > signfile)
     {
-	int do_load = 1;
+	ಪೂರ್ಣಾಙ್ಕ do_load = 1;
 
-	if (STRICMP(ext, ".bmp") == 0)
+	ಯದಿ (STRICMP(ext, ".bmp") == 0)
 	    sign.uType =  IMAGE_BITMAP;
-	else if (STRICMP(ext, ".ico") == 0)
+	ಅನ್ಯಥಾ ಯದಿ (STRICMP(ext, ".ico") == 0)
 	    sign.uType =  IMAGE_ICON;
-	else if (STRICMP(ext, ".cur") == 0 || STRICMP(ext, ".ani") == 0)
+	ಅನ್ಯಥಾ ಯದಿ (STRICMP(ext, ".cur") == 0 || STRICMP(ext, ".ani") == 0)
 	    sign.uType =  IMAGE_CURSOR;
-	else
+	ಅನ್ಯಥಾ
 	    do_load = 0;
 
-	if (do_load)
-	    sign.hImage = (HANDLE)LoadImage(NULL, (LPCSTR)signfile, sign.uType,
+	ಯದಿ (do_load)
+	    sign.hImage = (HANDLE)LoadImage(ರಿಕ್ತ, (LPCSTR)signfile, sign.uType,
 		    gui.char_width * 2, gui.char_height,
 		    LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 # ifdef FEAT_XPM_W32
-	if (STRICMP(ext, ".xpm") == 0)
+	ಯದಿ (STRICMP(ext, ".xpm") == 0)
 	{
 	    sign.uType = IMAGE_XPM;
-	    LoadXpmImage((char *)signfile, (HBITMAP *)&sign.hImage,
+	    LoadXpmImage((ವರ್ಣ *)signfile, (HBITMAP *)&sign.hImage,
 		    (HBITMAP *)&sign.hShape);
 	}
 # endif
     }
 
-    psign = NULL;
-    if (sign.hImage && (psign = ALLOC_ONE(signicon_t)) != NULL)
+    psign = ರಿಕ್ತ;
+    ಯದಿ (sign.hImage && (psign = ALLOC_ONE(signicon_t)) != ರಿಕ್ತ)
 	*psign = sign;
 
-    if (!psign)
+    ಯದಿ (!psign)
     {
-	if (sign.hImage)
+	ಯದಿ (sign.hImage)
 	    close_signicon_image(&sign);
 	emsg(_(e_couldnt_read_in_sign_data));
     }
-    return (void *)psign;
+    ಪ್ರತ್ಯಾಗಮ (ಶೂನ್ಯ *)psign;
 
 }
 
-    void
-gui_mch_destroy_sign(void *sign)
+    ಶೂನ್ಯ
+gui_mch_destroy_sign(ಶೂನ್ಯ *sign)
 {
-    if (sign == NULL)
-	return;
+    ಯದಿ (sign == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ;
 
     close_signicon_image((signicon_t *)sign);
     vim_free(sign);
 }
 #endif
 
-#if defined(FEAT_BEVAL_GUI)
+#ಯದಿ defined(FEAT_BEVAL_GUI)
 
 /*
  * BALLOON-EVAL IMPLEMENTATION FOR WINDOWS.
@@ -9054,42 +9054,42 @@ gui_mch_destroy_sign(void *sign)
  * 5) WM_NOTIFY:TTN_POP destroys created tooltip
  */
 
-    static void
-make_tooltip(BalloonEval *beval, char *text, POINT pt)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+make_tooltip(BalloonEval *beval, ವರ್ಣ *text, POINT pt)
 {
     TOOLINFOW	*pti;
     RECT	rect;
 
     pti = ALLOC_ONE(TOOLINFOW);
-    if (pti == NULL)
-	return;
+    ಯದಿ (pti == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ;
 
     beval->balloon = CreateWindowExW(WS_EX_TOPMOST, TOOLTIPS_CLASSW,
-	    NULL, WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP,
+	    ರಿಕ್ತ, WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP,
 	    CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-	    beval->target, NULL, g_hinst, NULL);
+	    beval->target, ರಿಕ್ತ, g_hinst, ರಿಕ್ತ);
 
     SetWindowPos(beval->balloon, HWND_TOPMOST, 0, 0, 0, 0,
 	    SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 
-    pti->cbSize = sizeof(TOOLINFOW);
+    pti->cbSize = ಪರಿಮಾಣ(TOOLINFOW);
     pti->uFlags = TTF_SUBCLASS;
     pti->hwnd = beval->target;
     pti->hinst = 0; // Don't use string resources
     pti->uId = ID_BEVAL_TOOLTIP;
 
     pti->lpszText = LPSTR_TEXTCALLBACKW;
-    beval->tofree = enc_to_utf16((char_u*)text, NULL);
+    beval->tofree = enc_to_utf16((char_u*)text, ರಿಕ್ತ);
     pti->lParam = (LPARAM)beval->tofree;
     // switch multiline tooltips on
-    if (GetClientRect(s_textArea, &rect))
+    ಯದಿ (GetClientRect(s_textArea, &rect))
 	SendMessageW(beval->balloon, TTM_SETMAXTIPWIDTH, 0,
-		(LPARAM)rect.right);
+		(LPARAM)rect.ಬಲ);
 
     // Limit ballooneval bounding rect to CursorPos neighbourhood.
-    pti->rect.left = pt.x - 3;
-    pti->rect.top = pt.y - 3;
-    pti->rect.right = pt.x + 3;
+    pti->rect.ಎಡ = pt.x - 3;
+    pti->rect.ತುದಿ = pt.y - 3;
+    pti->rect.ಬಲ = pt.x + 3;
     pti->rect.bottom = pt.y + 3;
 
     SendMessageW(beval->balloon, TTM_ADDTOOLW, 0, (LPARAM)pti);
@@ -9108,35 +9108,35 @@ make_tooltip(BalloonEval *beval, char *text, POINT pt)
     vim_free(pti);
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 delete_tooltip(BalloonEval *beval)
 {
     PostMessage(beval->balloon, WM_CLOSE, 0, 0);
 }
 
-    static VOID CALLBACK
+    ಸ್ಥಿರ VOID CALLBACK
 beval_timer_proc(
     HWND	hwnd UNUSED,
-    UINT	uMsg UNUSED,
+    UINT	u_ಸಂದೇಶ UNUSED,
     UINT_PTR	idEvent UNUSED,
     DWORD	dwTime)
 {
     POINT	pt;
     RECT	rect;
 
-    if (cur_beval == NULL || cur_beval->showState == ShS_SHOWING || !p_beval)
-	return;
+    ಯದಿ (cur_beval == ರಿಕ್ತ || cur_beval->showState == ShS_SHOWING || !p_beval)
+	ಪ್ರತ್ಯಾಗಮ;
 
     GetCursorPos(&pt);
-    if (WindowFromPoint(pt) != s_textArea)
-	return;
+    ಯದಿ (WindowFromPoint(pt) != s_textArea)
+	ಪ್ರತ್ಯಾಗಮ;
 
     ScreenToClient(s_textArea, &pt);
     GetClientRect(s_textArea, &rect);
-    if (!PtInRect(&rect, pt))
-	return;
+    ಯದಿ (!PtInRect(&rect, pt))
+	ಪ್ರತ್ಯಾಗಮ;
 
-    if (last_user_activity > 0
+    ಯದಿ (last_user_activity > 0
 	    && (dwTime - last_user_activity) >= (DWORD)p_bdlay
 	    && (cur_beval->showState != ShS_PENDING
 		|| abs(cur_beval->x - pt.x) > 3
@@ -9148,136 +9148,136 @@ beval_timer_proc(
 	cur_beval->x = pt.x;
 	cur_beval->y = pt.y;
 
-	if (cur_beval->msgCB != NULL)
-	    (*cur_beval->msgCB)(cur_beval, 0);
+	ಯದಿ (cur_beval->ಸಂದೇಶ_CB != ರಿಕ್ತ)
+	    (*cur_beval->ಸಂದೇಶ_CB)(cur_beval, 0);
     }
 }
 
-    void
+    ಶೂನ್ಯ
 gui_mch_disable_beval_area(BalloonEval *beval UNUSED)
 {
     KillTimer(s_textArea, beval_timer_id);
 }
 
-    void
+    ಶೂನ್ಯ
 gui_mch_enable_beval_area(BalloonEval *beval)
 {
-    if (beval == NULL)
-	return;
+    ಯದಿ (beval == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ;
     beval_timer_id = SetTimer(s_textArea, 0, (UINT)(p_bdlay / 2),
 							     beval_timer_proc);
 }
 
-    void
+    ಶೂನ್ಯ
 gui_mch_post_balloon(BalloonEval *beval, char_u *mesg)
 {
     POINT   pt;
 
-    vim_free(beval->msg);
-    beval->msg = mesg == NULL ? NULL : vim_strsave(mesg);
-    if (beval->msg == NULL)
+    vim_free(beval->ಸಂದೇಶ);
+    beval->ಸಂದೇಶ = mesg == ರಿಕ್ತ ? ರಿಕ್ತ : vim_strsave(mesg);
+    ಯದಿ (beval->ಸಂದೇಶ == ರಿಕ್ತ)
     {
 	delete_tooltip(beval);
 	beval->showState = ShS_NEUTRAL;
-	return;
+	ಪ್ರತ್ಯಾಗಮ;
     }
 
-    if (beval->showState == ShS_SHOWING)
-	return;
+    ಯದಿ (beval->showState == ShS_SHOWING)
+	ಪ್ರತ್ಯಾಗಮ;
     GetCursorPos(&pt);
     ScreenToClient(s_textArea, &pt);
 
-    if (abs(beval->x - pt.x) < 3 && abs(beval->y - pt.y) < 3)
+    ಯದಿ (abs(beval->x - pt.x) < 3 && abs(beval->y - pt.y) < 3)
     {
 	// cursor is still here
 	gui_mch_disable_beval_area(cur_beval);
 	beval->showState = ShS_SHOWING;
-	make_tooltip(beval, (char *)mesg, pt);
+	make_tooltip(beval, (ವರ್ಣ *)mesg, pt);
     }
 }
 
     BalloonEval *
 gui_mch_create_beval_area(
-    void	*target UNUSED,	// ignored, always use s_textArea
+    ಶೂನ್ಯ	*target UNUSED,	// ignored, always use s_textArea
     char_u	*mesg,
-    void	(*mesgCB)(BalloonEval *, int),
-    void	*clientData)
+    ಶೂನ್ಯ	(*mesgCB)(BalloonEval *, ಪೂರ್ಣಾಙ್ಕ),
+    ಶೂನ್ಯ	*clientData)
 {
     // partially stolen from gui_beval.c
     BalloonEval	*beval;
 
-    if (mesg != NULL && mesgCB != NULL)
+    ಯದಿ (mesg != ರಿಕ್ತ && mesgCB != ರಿಕ್ತ)
     {
 	iemsg(e_cannot_create_ballooneval_with_both_message_and_callback);
-	return NULL;
+	ಪ್ರತ್ಯಾಗಮ ರಿಕ್ತ;
     }
 
     beval = ALLOC_CLEAR_ONE(BalloonEval);
-    if (beval != NULL)
+    ಯದಿ (beval != ರಿಕ್ತ)
     {
 	beval->target = s_textArea;
 
 	beval->showState = ShS_NEUTRAL;
-	beval->msg = mesg;
-	beval->msgCB = mesgCB;
+	beval->ಸಂದೇಶ = mesg;
+	beval->ಸಂದೇಶ_CB = mesgCB;
 	beval->clientData = clientData;
 
 	InitCommonControls();
 	cur_beval = beval;
 
-	if (p_beval)
+	ಯದಿ (p_beval)
 	    gui_mch_enable_beval_area(beval);
     }
-    return beval;
+    ಪ್ರತ್ಯಾಗಮ beval;
 }
 
-    static void
+    ಸ್ಥಿರ ಶೂನ್ಯ
 Handle_WM_Notify(HWND hwnd UNUSED, LPNMHDR pnmh)
 {
-    if (pnmh->idFrom != ID_BEVAL_TOOLTIP) // it is not our tooltip
-	return;
+    ಯದಿ (pnmh->idFrom != ID_BEVAL_TOOLTIP) // it is not our tooltip
+	ಪ್ರತ್ಯಾಗಮ;
 
-    if (cur_beval == NULL)
-	return;
+    ಯದಿ (cur_beval == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ;
 
-    switch (pnmh->code)
+    ವಿಕಲ್ಪ (pnmh->code)
     {
-	case TTN_SHOW:
-	    break;
-	case TTN_POP: // Before tooltip disappear
+	ಪಕ್ಷ TTN_SHOW:
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ TTN_ತೆಗೆ: // Before tooltip disappear
 	    delete_tooltip(cur_beval);
 	    gui_mch_enable_beval_area(cur_beval);
 
 	    cur_beval->showState = ShS_NEUTRAL;
-	    break;
-	case TTN_GETDISPINFO:
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ TTN_GETDISPINFO:
 	    {
 		// if you get there then we have new common controls
 		NMTTDISPINFO *info = (NMTTDISPINFO *)pnmh;
 		info->lpszText = (LPSTR)info->lParam;
 		info->uFlags |= TTF_DI_SETITEM;
 	    }
-	    break;
-	case TTN_GETDISPINFOW:
+	    ಭಙ್ಗ;
+	ಪಕ್ಷ TTN_GETDISPINFOW:
 	    {
 		// if we get here then we have new common controls
 		NMTTDISPINFOW *info = (NMTTDISPINFOW *)pnmh;
 		info->lpszText = (LPWSTR)info->lParam;
 		info->uFlags |= TTF_DI_SETITEM;
 	    }
-	    break;
+	    ಭಙ್ಗ;
     }
 }
 
-    static void
-track_user_activity(UINT uMsg)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+track_user_activity(UINT u_ಸಂದೇಶ)
 {
-    if ((uMsg >= WM_MOUSEFIRST && uMsg <= WM_MOUSELAST)
-	    || (uMsg >= WM_KEYFIRST && uMsg <= WM_KEYLAST))
-	last_user_activity = GetTickCount();
+    ಯದಿ ((u_ಸಂದೇಶ >= WM_MOUSEFIRST && u_ಸಂದೇಶ <= WM_MOUSELAST)
+	    || (u_ಸಂದೇಶ >= WM_KEYFIRST && u_ಸಂದೇಶ <= WM_KEYLAST))
+	last_user_activity = Get_Tick_ಎಣಿಕೆ();
 }
 
-    void
+    ಶೂನ್ಯ
 gui_mch_destroy_beval_area(BalloonEval *beval)
 {
 # ifdef FEAT_VARTABS
@@ -9288,30 +9288,30 @@ gui_mch_destroy_beval_area(BalloonEval *beval)
 }
 #endif // FEAT_BEVAL_GUI
 
-#if defined(FEAT_NETBEANS_INTG)
+#ಯದಿ defined(FEAT_NETBEANS_INTG)
 /*
  * We have multiple signs to draw at the same location. Draw the
  * multi-sign indicator (down-arrow) instead. This is the Win32 version.
  */
-    void
-netbeans_draw_multisign_indicator(int row)
+    ಶೂನ್ಯ
+netbeans_draw_multisign_indicator(ಪೂರ್ಣಾಙ್ಕ row)
 {
-    int i;
-    int y;
-    int x;
+    ಪೂರ್ಣಾಙ್ಕ i;
+    ಪೂರ್ಣಾಙ್ಕ y;
+    ಪೂರ್ಣಾಙ್ಕ x;
 
-    if (!netbeans_active())
-	return;
+    ಯದಿ (!netbeans_active())
+	ಪ್ರತ್ಯಾಗಮ;
 
     x = 0;
     y = TEXT_Y(row);
 
-# if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX())
+# ಯದಿ defined(FEAT_DIRECTX)
+    ಯದಿ (IS_ENABLE_DIRECTX())
 	DWriteContext_Flush(s_dwc);
 # endif
 
-    for (i = 0; i < gui.char_height - 3; i++)
+    ಪ್ರತಿ (i = 0; i < gui.char_height - 3; i++)
 	SetPixel(s_hdc, x+2, y++, gui.currFgColor);
 
     SetPixel(s_hdc, x+0, y, gui.currFgColor);
@@ -9324,48 +9324,48 @@ netbeans_draw_multisign_indicator(int row)
 }
 #endif
 
-#if defined(FEAT_EVAL)
+#ಯದಿ defined(FEAT_EVAL)
 
 // TODO: at the moment, this is just a copy of test_gui_mouse_event.
 // But, we could instead generate actual Win32 mouse event messages,
 // ie. to make it consistent with test_gui_w32_sendevent_keyboard.
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
 test_gui_w32_sendevent_mouse(dict_T *args)
 {
-    if (!dict_has_key(args, "row") || !dict_has_key(args, "col"))
-	return FALSE;
+    ಯದಿ (!dict_has_ಕೀಲಿ(args, "row") || !dict_has_ಕೀಲಿ(args, "col"))
+	ಪ್ರತ್ಯಾಗಮ FALSE;
 
     // Note: "move" is optional, requires fewer arguments
-    int move = (int)dict_get_bool(args, "move", FALSE);
+    ಪೂರ್ಣಾಙ್ಕ move = (ಪೂರ್ಣಾಙ್ಕ)dict_get_bool(args, "move", FALSE);
 
-    if (!move && (!dict_has_key(args, "button")
-	    || !dict_has_key(args, "multiclick")
-	    || !dict_has_key(args, "modifiers")))
-	return FALSE;
+    ಯದಿ (!move && (!dict_has_ಕೀಲಿ(args, "button")
+	    || !dict_has_ಕೀಲಿ(args, "multiclick")
+	    || !dict_has_ಕೀಲಿ(args, "modifiers")))
+	ಪ್ರತ್ಯಾಗಮ FALSE;
 
-    int row = (int)dict_get_number(args, "row");
-    int col = (int)dict_get_number(args, "col");
+    ಪೂರ್ಣಾಙ್ಕ row = (ಪೂರ್ಣಾಙ್ಕ)dict_get_ಸಂಖ್ಯೆ(args, "row");
+    ಪೂರ್ಣಾಙ್ಕ col = (ಪೂರ್ಣಾಙ್ಕ)dict_get_ಸಂಖ್ಯೆ(args, "col");
 
-    if (move)
+    ಯದಿ (move)
     {
 	// the "move" argument expects row and col coordnates to be in pixels,
 	// unless "cell" is specified and is TRUE.
-	if (dict_get_bool(args, "cell", FALSE))
+	ಯದಿ (dict_get_bool(args, "cell", FALSE))
 	{
 	    // calculate the middle of the character cell
 	    // Note: Cell coordinates are 1-based from Vim script
-	    int pY = (row - 1) * gui.char_height + gui.char_height / 2;
-	    int pX = (col - 1) * gui.char_width + gui.char_width / 2;
+	    ಪೂರ್ಣಾಙ್ಕ pY = (row - 1) * gui.char_height + gui.char_height / 2;
+	    ಪೂರ್ಣಾಙ್ಕ pX = (col - 1) * gui.char_width + gui.char_width / 2;
 	    gui_mouse_moved(pX, pY);
 	}
-	else
+	ಅನ್ಯಥಾ
 	    gui_mouse_moved(col, row);
     }
-    else
+    ಅನ್ಯಥಾ
     {
-	int button = (int)dict_get_number(args, "button");
-	int repeated_click = (int)dict_get_number(args, "multiclick");
-	int_u mods = (int)dict_get_number(args, "modifiers");
+	ಪೂರ್ಣಾಙ್ಕ button = (ಪೂರ್ಣಾಙ್ಕ)dict_get_ಸಂಖ್ಯೆ(args, "button");
+	ಪೂರ್ಣಾಙ್ಕ repeated_click = (ಪೂರ್ಣಾಙ್ಕ)dict_get_ಸಂಖ್ಯೆ(args, "multiclick");
+	int_u mods = (ಪೂರ್ಣಾಙ್ಕ)dict_get_ಸಂಖ್ಯೆ(args, "modifiers");
 
 	// Reset the scroll values to known values.
 	// XXX: Remove this when/if the scroll step is made configurable.
@@ -9375,172 +9375,172 @@ test_gui_w32_sendevent_mouse(dict_T *args)
 	gui_send_mouse_event(button, TEXT_X(col - 1), TEXT_Y(row - 1),
 							repeated_click, mods);
     }
-    return TRUE;
+    ಪ್ರತ್ಯಾಗಮ TRUE;
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
 test_gui_w32_sendevent_keyboard(dict_T *args)
 {
-    INPUT inputs[1];
-    INPUT modkeys[3];
-    SecureZeroMemory(inputs, sizeof(INPUT));
-    SecureZeroMemory(modkeys, 3 * sizeof(INPUT));
+    ಒಳಹರಿವು_2 inputs[1];
+    ಒಳಹರಿವು_2 modkeys[3];
+    SecureZeroMemory(inputs, ಪರಿಮಾಣ(ಒಳಹರಿವು_2));
+    SecureZeroMemory(modkeys, 3 * ಪರಿಮಾಣ(ಒಳಹರಿವು_2));
 
     char_u *event = dict_get_string(args, "event", TRUE);
 
-    if (event && (STRICMP(event, "keydown") == 0
+    ಯದಿ (event && (STRICMP(event, "keydown") == 0
 				      || STRICMP(event, "keyup") == 0))
     {
-	WORD vkCode = dict_get_number_def(args, "keycode", 0);
-	if (vkCode <= 0 || vkCode >= 0xFF)
+	WORD vkCode = dict_get_ಸಂಖ್ಯೆ_def(args, "keycode", 0);
+	ಯದಿ (vkCode <= 0 || vkCode >= 0xFF)
 	{
 	    semsg(_(e_invalid_argument_nr), (long)vkCode);
-	    return FALSE;
+	    ಪ್ರತ್ಯಾಗಮ FALSE;
 	}
 
-	BOOL isModKey = (vkCode == VK_SHIFT || vkCode == VK_CONTROL
+	BOOL is_Mod_ಕೀಲಿ = (vkCode == VK_SHIFT || vkCode == VK_CONTROL
 	    || vkCode == VK_MENU || vkCode == VK_LSHIFT || vkCode == VK_RSHIFT
 	    || vkCode == VK_LCONTROL || vkCode == VK_RCONTROL
 	    || vkCode == VK_LMENU || vkCode == VK_RMENU );
 
 	BOOL unwrapMods = FALSE;
-	int mods = (int)dict_get_number(args, "modifiers");
+	ಪೂರ್ಣಾಙ್ಕ mods = (ಪೂರ್ಣಾಙ್ಕ)dict_get_ಸಂಖ್ಯೆ(args, "modifiers");
 
 	// If there are modifiers in the args, and it is not a keyup event and
 	// vkCode is not a modifier key, then we generate virtual modifier key
 	// messages before sending the actual key message.
-	if (mods && STRICMP(event, "keydown") == 0 && !isModKey)
+	ಯದಿ (mods && STRICMP(event, "keydown") == 0 && !is_Mod_ಕೀಲಿ)
 	{
-	    int n = 0;
-	    if (mods & MOD_MASK_SHIFT)
+	    ಪೂರ್ಣಾಙ್ಕ n = 0;
+	    ಯದಿ (mods & MOD_MASK_SHIFT)
 	    {
-		modkeys[n].type = INPUT_KEYBOARD;
+		modkeys[n].type = ಒಳಹರಿವು_KEYBOARD;
 		modkeys[n].ki.wVk = VK_LSHIFT;
 		n++;
 	    }
-	    if (mods & MOD_MASK_CTRL)
+	    ಯದಿ (mods & MOD_MASK_CTRL)
 	    {
-		modkeys[n].type = INPUT_KEYBOARD;
+		modkeys[n].type = ಒಳಹರಿವು_KEYBOARD;
 		modkeys[n].ki.wVk = VK_LCONTROL;
 		n++;
 	    }
-	    if (mods & MOD_MASK_ALT)
+	    ಯದಿ (mods & MOD_MASK_ALT)
 	    {
-		modkeys[n].type = INPUT_KEYBOARD;
+		modkeys[n].type = ಒಳಹರಿವು_KEYBOARD;
 		modkeys[n].ki.wVk = VK_LMENU;
 		n++;
 	    }
-	    if (n)
+	    ಯದಿ (n)
 	    {
-		(void)SetForegroundWindow(s_hwnd);
-		SendInput(n, modkeys, sizeof(INPUT));
+		(ಶೂನ್ಯ)SetForegroundWindow(s_hwnd);
+		Send_ಒಳಹರಿವು(n, modkeys, ಪರಿಮಾಣ(ಒಳಹರಿವು_2));
 	    }
 	}
 
-	inputs[0].type = INPUT_KEYBOARD;
+	inputs[0].type = ಒಳಹರಿವು_KEYBOARD;
 	inputs[0].ki.wVk = vkCode;
-	if (STRICMP(event, "keyup") == 0)
+	ಯದಿ (STRICMP(event, "keyup") == 0)
 	{
 	    inputs[0].ki.dwFlags = KEYEVENTF_KEYUP;
-	    if (!isModKey)
+	    ಯದಿ (!is_Mod_ಕೀಲಿ)
 		unwrapMods = TRUE;
 	}
 
-	(void)SetForegroundWindow(s_hwnd);
-	SendInput(ARRAYSIZE(inputs), inputs, sizeof(INPUT));
+	(ಶೂನ್ಯ)SetForegroundWindow(s_hwnd);
+	Send_ಒಳಹರಿವು(ARRAYSIZE(inputs), inputs, ಪರಿಮಾಣ(ಒಳಹರಿವು_2));
 	vim_free(event);
 
-	if (unwrapMods)
+	ಯದಿ (unwrapMods)
 	{
-	    modkeys[0].type = INPUT_KEYBOARD;
+	    modkeys[0].type = ಒಳಹರಿವು_KEYBOARD;
 	    modkeys[0].ki.wVk = VK_LSHIFT;
 	    modkeys[0].ki.dwFlags = KEYEVENTF_KEYUP;
 
-	    modkeys[1].type = INPUT_KEYBOARD;
+	    modkeys[1].type = ಒಳಹರಿವು_KEYBOARD;
 	    modkeys[1].ki.wVk = VK_LCONTROL;
 	    modkeys[1].ki.dwFlags = KEYEVENTF_KEYUP;
 
-	    modkeys[2].type = INPUT_KEYBOARD;
+	    modkeys[2].type = ಒಳಹರಿವು_KEYBOARD;
 	    modkeys[2].ki.wVk = VK_LMENU;
 	    modkeys[2].ki.dwFlags = KEYEVENTF_KEYUP;
 
-	    (void)SetForegroundWindow(s_hwnd);
-	    SendInput(3, modkeys, sizeof(INPUT));
+	    (ಶೂನ್ಯ)SetForegroundWindow(s_hwnd);
+	    Send_ಒಳಹರಿವು(3, modkeys, ಪರಿಮಾಣ(ಒಳಹರಿವು_2));
 	}
     }
-    else
+    ಅನ್ಯಥಾ
     {
-	if (event == NULL)
+	ಯದಿ (event == ರಿಕ್ತ)
 	{
 	    semsg(_(e_missing_argument_str), "event");
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
-	    semsg(_(e_invalid_value_for_argument_str_str), "event", event);
+	    semsg(_(e_invalid_ಮೌಲ್ಯ_for_argument_str_str), "event", event);
 	    vim_free(event);
 	}
-	return FALSE;
+	ಪ್ರತ್ಯಾಗಮ FALSE;
     }
-    return TRUE;
+    ಪ್ರತ್ಯಾಗಮ TRUE;
 }
 
-    static int
+    ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ
 test_gui_w32_sendevent_set_keycode_trans_strategy(dict_T *args)
 {
-    int handled = 0;
+    ಪೂರ್ಣಾಙ್ಕ handled = 0;
     char_u *strategy = dict_get_string(args, "strategy", TRUE);
 
-    if (strategy)
+    ಯದಿ (strategy)
     {
-	if (STRICMP(strategy, "classic") == 0)
+	ಯದಿ (STRICMP(strategy, "classic") == 0)
 	{
 	    handled = 1;
 	    keycode_trans_strategy_used = &keycode_trans_strategy_classic;
 	}
-	else if (STRICMP(strategy, "experimental") == 0)
+	ಅನ್ಯಥಾ ಯದಿ (STRICMP(strategy, "experimental") == 0)
 	{
 	    handled = 1;
 	    keycode_trans_strategy_used = &keycode_trans_strategy_experimental;
 	}
     }
 
-    if (!handled)
+    ಯದಿ (!handled)
     {
-	if (strategy == NULL)
+	ಯದಿ (strategy == ರಿಕ್ತ)
 	{
 	    semsg(_(e_missing_argument_str), "strategy");
 	}
-	else
+	ಅನ್ಯಥಾ
 	{
-	    semsg(_(e_invalid_value_for_argument_str_str), "strategy", strategy);
+	    semsg(_(e_invalid_ಮೌಲ್ಯ_for_argument_str_str), "strategy", strategy);
 	    vim_free(strategy);
 	}
-	return FALSE;
+	ಪ್ರತ್ಯಾಗಮ FALSE;
     }
-    return TRUE;
+    ಪ್ರತ್ಯಾಗಮ TRUE;
 }
 
 
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 test_gui_w32_sendevent(char_u *event, dict_T *args)
 {
-    if (STRICMP(event, "key") == 0)
-	return test_gui_w32_sendevent_keyboard(args);
-    else if (STRICMP(event, "mouse") == 0)
-	return test_gui_w32_sendevent_mouse(args);
-    else if (STRICMP(event, "set_keycode_trans_strategy") == 0)
-	return test_gui_w32_sendevent_set_keycode_trans_strategy(args);
-    else
+    ಯದಿ (STRICMP(event, "key") == 0)
+	ಪ್ರತ್ಯಾಗಮ test_gui_w32_sendevent_keyboard(args);
+    ಅನ್ಯಥಾ ಯದಿ (STRICMP(event, "mouse") == 0)
+	ಪ್ರತ್ಯಾಗಮ test_gui_w32_sendevent_mouse(args);
+    ಅನ್ಯಥಾ ಯದಿ (STRICMP(event, "set_keycode_trans_strategy") == 0)
+	ಪ್ರತ್ಯಾಗಮ test_gui_w32_sendevent_set_keycode_trans_strategy(args);
+    ಅನ್ಯಥಾ
     {
-	semsg(_(e_invalid_value_for_argument_str_str), "event", event);
-	return FALSE;
+	semsg(_(e_invalid_ಮೌಲ್ಯ_for_argument_str_str), "event", event);
+	ಪ್ರತ್ಯಾಗಮ FALSE;
     }
 }
 #endif
 
-#if defined(FEAT_IMAGE_GUI)
+#ಯದಿ defined(FEAT_IMAGE_GUI)
 
-typedef struct
+ಪ್ರಕಾರನಿರ್ದೇಶ ಸಂರಚನಾ
 {
     HBITMAP hbm;
     HDC	    hdc;
@@ -9552,48 +9552,48 @@ typedef struct
  * has 4 bytes per pixel and the alpha channel is flattened onto the GUI window
  * background colour (pre-multiplied blend).
  */
-    static void
-upload_popup_image_pixels(uint8_t *dst, uint8_t *src, int iw, int ih, image_format_T fmt)
+    ಸ್ಥಿರ ಶೂನ್ಯ
+upload_popup_image_pixels(uint8_t *dst, uint8_t *src, ಪೂರ್ಣಾಙ್ಕ iw, ಪೂರ್ಣಾಙ್ಕ ih, image_format_T fmt)
 {
-    int		y, x;
-    int		stride = iw * 4;
-    int		src_bpp = fmt == IMAGE_FORMAT_RGBA ? 4 : 3;
+    ಪೂರ್ಣಾಙ್ಕ		y, x;
+    ಪೂರ್ಣಾಙ್ಕ		stride = iw * 4;
+    ಪೂರ್ಣಾಙ್ಕ		src_bpp = fmt == IMAGE_FORMAT_RGBA ? 4 : 3;
     COLORREF	bg = fmt == IMAGE_FORMAT_RGBA ? gui_mch_get_rgb(gui.back_pixel) : 0;
     BYTE	bg_r = GetRValue(bg);
     BYTE	bg_g = GetGValue(bg);
     BYTE	bg_b = GetBValue(bg);
 
-    for (y = 0; y < ih; y++)
+    ಪ್ರತಿ (y = 0; y < ih; y++)
     {
 	uint8_t *s = src + (size_t)y * iw * src_bpp;
 	uint8_t *d = dst + (size_t)y * stride;
 
-	for (x = 0; x < iw; x++)
+	ಪ್ರತಿ (x = 0; x < iw; x++)
 	{
-	    if (fmt == IMAGE_FORMAT_RGBA)
+	    ಯದಿ (fmt == IMAGE_FORMAT_RGBA)
 	    {
-		int a = s[3];
+		ಪೂರ್ಣಾಙ್ಕ a = s[3];
 
-		if (a == 255)
+		ಯದಿ (a == 255)
 		{
 		    d[0] = s[2];
 		    d[1] = s[1];
 		    d[2] = s[0];
 		}
-		else if (a == 0)
+		ಅನ್ಯಥಾ ಯದಿ (a == 0)
 		{
 		    d[0] = (uint8_t )bg_b;
 		    d[1] = (uint8_t)bg_g;
 		    d[2] = (uint8_t)bg_r;
 		}
-		else
+		ಅನ್ಯಥಾ
 		{
 		    d[0] = (uint8_t)((s[2] * a + bg_b * (255 - a)) / 255);
 		    d[1] = (uint8_t)((s[1] * a + bg_g * (255 - a)) / 255);
 		    d[2] = (uint8_t)((s[0] * a + bg_r * (255 - a)) / 255);
 		}
 	    }
-	    else
+	    ಅನ್ಯಥಾ
 	    {
 		d[0] = s[2];	// B
 		d[1] = s[1];	// G
@@ -9606,42 +9606,42 @@ upload_popup_image_pixels(uint8_t *dst, uint8_t *src, int iw, int ih, image_form
     }
 }
 
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 image_gui_init(image_T *img)
 {
     image_gdi_T *ctx = ALLOC_CLEAR_ONE(image_gdi_T);
     BITMAPINFO	bmi;
     HBITMAP	hbm;
     HDC		mem_dc;
-    int		iw, ih;
-    void	*bits = NULL;
+    ಪೂರ್ಣಾಙ್ಕ		iw, ih;
+    ಶೂನ್ಯ	*bits = ರಿಕ್ತ;
 
-    if (ctx == NULL)
-	return FAIL;
+    ಯದಿ (ctx == ರಿಕ್ತ)
+	ಪ್ರತ್ಯಾಗಮ FAIL;
 
     image_get_dimensions(img, &iw, &ih);
 
     CLEAR_FIELD(bmi);
-    bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bmi.bmiHeader.biSize = ಪರಿಮಾಣ(BITMAPINFOHEADER);
     bmi.bmiHeader.biWidth = iw;
     bmi.bmiHeader.biHeight = -ih; // Top-down
     bmi.bmiHeader.biPlanes = 1;
-    bmi.bmiHeader.biBitCount = 32;
+    bmi.bmiHeader.bi_Bit_ಎಣಿಕೆ = 32;
     bmi.bmiHeader.biCompression = BI_RGB;
 
-    hbm = CreateDIBSection(s_hdc, &bmi, DIB_RGB_COLORS, &bits, NULL, 0);
-    if (hbm == NULL || bits == NULL)
+    hbm = CreateDIBSection(s_hdc, &bmi, DIB_RGB_COLORS, &bits, ರಿಕ್ತ, 0);
+    ಯದಿ (hbm == ರಿಕ್ತ || bits == ರಿಕ್ತ)
     {
-	if (hbm != NULL)
+	ಯದಿ (hbm != ರಿಕ್ತ)
 	    DeleteObject(hbm);
-	return false;
+	ಪ್ರತ್ಯಾಗಮ false;
     }
 
     mem_dc = CreateCompatibleDC(s_hdc);
-    if (mem_dc == NULL)
+    ಯದಿ (mem_dc == ರಿಕ್ತ)
     {
 	DeleteObject(hbm);
-	return false;
+	ಪ್ರತ್ಯಾಗಮ false;
     }
 
     SelectObject(mem_dc, hbm);
@@ -9651,10 +9651,10 @@ image_gui_init(image_T *img)
     ctx->hdc = mem_dc;
 
     img->backend_data = ctx;
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
-    void
+    ಶೂನ್ಯ
 image_gui_uninit(image_T *img)
 {
     image_gdi_T *ctx = img->backend_data;
@@ -9664,42 +9664,42 @@ image_gui_uninit(image_T *img)
     vim_free(ctx);
 }
 
-    int
+    ಪೂರ್ಣಾಙ್ಕ
 image_placement_gui_init(image_placement_T *place UNUSED)
 {
-    return OK;
+    ಪ್ರತ್ಯಾಗಮ OK;
 }
 
-    void
+    ಶೂನ್ಯ
 image_placement_gui_uninit(image_placement_T *place UNUSED)
 {
 }
 
-    void
+    ಶೂನ್ಯ
 image_placement_gui_draw(image_placement_T *place)
 {
     image_T	    *img = place->img;
     image_gdi_T	    *ictx = img->backend_data;
     pixman_box32_t  *rects;
-    int		    n_rects;
+    ಪೂರ್ಣಾಙ್ಕ		    n_rects;
 
     rects = pixman_region32_rectangles(&place->visible, &n_rects);
-    if (rects == NULL || n_rects == 0)
-	return;
+    ಯದಿ (rects == ರಿಕ್ತ || n_rects == 0)
+	ಪ್ರತ್ಯಾಗಮ;
 
-# if defined(FEAT_DIRECTX)
+# ಯದಿ defined(FEAT_DIRECTX)
     // Commit any pending DirectWrite output so popup text and borders are on
     // s_hdc before we blit on top.
-    if (IS_ENABLE_DIRECTX())
+    ಯದಿ (IS_ENABLE_DIRECTX())
 	DWriteContext_Flush(s_dwc);
 # endif
 
-    for (int i = 0; i < n_rects; i++)
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 0; i < n_rects; i++)
     {
 	pixman_box32_t	rect = rects[i];
-	int		row, col;
-	int		posx, posy;
-	int		x, y, w, h;
+	ಪೂರ್ಣಾಙ್ಕ		row, col;
+	ಪೂರ್ಣಾಙ್ಕ		posx, posy;
+	ಪೂರ್ಣಾಙ್ಕ		x, y, w, h;
 
 	image_placement_subrect(place, rect, &row, &col, &x, &y, &w, &h, true);
 	posx = FILL_X(col);
@@ -9710,7 +9710,7 @@ image_placement_gui_draw(image_placement_T *place)
     }
 }
 
-    void
+    ಶೂನ್ಯ
 image_placement_gui_clear(image_placement_T *place UNUSED)
 {
 }

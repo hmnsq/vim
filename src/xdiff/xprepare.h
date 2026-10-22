@@ -20,14 +20,14 @@
  *
  */
 
-#if !defined(XPREPARE_H)
+#ಯದಿ !defined(XPREPARE_H)
 #define XPREPARE_H
 
 
 
-int xdl_prepare_env(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
+ಪೂರ್ಣಾಙ್ಕ xdl_prepare_env(mmfile_t *mf1, mmfile_t *mf2, xpparam_t ಧ್ರುವ *xpp,
 		    xdfenv_t *xe);
-void xdl_free_env(xdfenv_t *xe);
+ಶೂನ್ಯ xdl_free_env(xdfenv_t *xe);
 
 
 

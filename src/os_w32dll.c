@@ -15,13 +15,13 @@
 #ifndef WIN32_LEAN_AND_MEAN
 # define WIN32_LEAN_AND_MEAN
 #endif
-#include <windows.h>
+#ಅನ್ತರ್ಭಾವ <windows.h>
 
-void SaveInst(HINSTANCE hInst);
+ಶೂನ್ಯ SaveInst(HINSTANCE hInst);
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
-    if (fdwReason == DLL_PROCESS_ATTACH)
+    ಯದಿ (fdwReason == DLL_PROCESS_ATTACH)
 	SaveInst(hinstDLL);
-    return TRUE;
+    ಪ್ರತ್ಯಾಗಮ TRUE;
 }
