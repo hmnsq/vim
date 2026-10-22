@@ -20,46 +20,46 @@
  *
  */
 
-#if !defined(XMACROS_H)
+#यदि !defined(XMACROS_H)
 #define XMACROS_H
 
 
 // SIZE_MAX may not be defined on older platforms without <stdint.h>.
 #ifndef SIZE_MAX
-# define SIZE_MAX ((size_t)(-1))
+# define SIZE_MAX ((माप_प्रकार)(-1))
 #endif
 
 #define XDL_MIN(a, b) ((a) < (b) ? (a): (b))
 #define XDL_MAX(a, b) ((a) > (b) ? (a): (b))
 #define XDL_ABS(v) ((v) >= 0 ? (v): -(v))
 #define XDL_ISDIGIT(c) ((c) >= '0' && (c) <= '9')
-#define XDL_ISSPACE(c) (isspace((unsigned char)(c)))
+#define XDL_ISSPACE(c) (है_खाली((अचिन्हित वर्ण)(c)))
 #define XDL_ADDBITS(v,b)	((v) + ((v) >> (b)))
 #define XDL_MASKBITS(b)		((1UL << (b)) - 1)
-#define XDL_HASHLONG(v,b)	(XDL_ADDBITS((unsigned long)(v), b) & XDL_MASKBITS(b))
+#define XDL_HASHLONG(v,b)	(XDL_ADDBITS((अचिन्हित दीर्घ)(v), b) & XDL_MASKBITS(b))
 #define XDL_LE32_PUT(p, v) \
-do { \
-	unsigned char *__p = (unsigned char *) (p); \
-	*__p++ = (unsigned char) (v); \
-	*__p++ = (unsigned char) ((v) >> 8); \
-	*__p++ = (unsigned char) ((v) >> 16); \
-	*__p = (unsigned char) ((v) >> 24); \
-} while (0)
+गर { \
+	अचिन्हित वर्ण *__p = (अचिन्हित वर्ण *) (p); \
+	*__p++ = (अचिन्हित वर्ण) (v); \
+	*__p++ = (अचिन्हित वर्ण) ((v) >> 8); \
+	*__p++ = (अचिन्हित वर्ण) ((v) >> 16); \
+	*__p = (अचिन्हित वर्ण) ((v) >> 24); \
+} जबसम्म (0)
 #define XDL_LE32_GET(p, v) \
-do { \
-	unsigned char const *__p = (unsigned char const *) (p); \
-	(v) = (unsigned long) __p[0] | ((unsigned long) __p[1]) << 8 | \
-		((unsigned long) __p[2]) << 16 | ((unsigned long) __p[3]) << 24; \
-} while (0)
+गर { \
+	अचिन्हित वर्ण अचर *__p = (अचिन्हित वर्ण अचर *) (p); \
+	(v) = (अचिन्हित दीर्घ) __p[0] | ((अचिन्हित दीर्घ) __p[1]) << 8 | \
+		((अचिन्हित दीर्घ) __p[2]) << 16 | ((अचिन्हित दीर्घ) __p[3]) << 24; \
+} जबसम्म (0)
 
 /* Allocate an array of nr elements, returns NULL on failure */
 #define XDL_ALLOC_ARRAY(p, nr)				\
-	((p) = SIZE_MAX / sizeof(*(p)) >= (size_t)(nr)	\
-		? xdl_malloc((nr) * sizeof(*(p)))	\
-		: NULL)
+	((p) = SIZE_MAX / परिमाण(*(p)) >= (माप_प्रकार)(nr)	\
+		? xdl_malloc((nr) * परिमाण(*(p)))	\
+		: रिक्त)
 
 /* Allocate an array of nr zeroed out elements, returns NULL on failure */
-#define XDL_CALLOC_ARRAY(p, nr)	((p) = xdl_calloc(nr, sizeof(*(p))))
+#define XDL_CALLOC_ARRAY(p, nr)	((p) = xdl_calloc(nr, परिमाण(*(p))))
 
 /*
  * Ensure array p can accommodate at least nr elements, growing the
@@ -69,6 +69,6 @@ do { \
  */
 #define XDL_ALLOC_GROW(p, nr, alloc)	\
 	(-!((nr) <= (alloc) ||		\
-	    ((p) = xdl_alloc_grow_helper((p), (nr), &(alloc), sizeof(*(p))))))
+	    ((p) = xdl_alloc_grow_helper((p), (nr), &(alloc), परिमाण(*(p))))))
 
 #endif /* #if !defined(XMACROS_H) */

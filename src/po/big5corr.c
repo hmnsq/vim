@@ -18,40 +18,40 @@
  *
  */
 
-#include <stdio.h>
-#include <string.h>
+#अन्तर्भाव <stdio.h>
+#अन्तर्भाव <string.h>
 
-	int
-main(int argc, char **argv)
+	पूर्णाङ्क
+main(पूर्णाङ्क argc, वर्ण **argv)
 {
-	char buffer[BUFSIZ];
-	char *p;
+	वर्ण buffer[बफ_मान];
+	वर्ण *p;
 
-	while (fgets(buffer, BUFSIZ, stdin) != NULL)
+	जबसम्म (ख_माला_लो(buffer, बफ_मान, मानक_निवेश) != रिक्त)
 	{
-		for (p = buffer; *p != 0; p++)
+		लागि (p = buffer; *p != 0; p++)
 		{
-			if (strncmp(p, "charset=utf-8", 13) == 0
-				|| strncmp(p, "charset=UTF-8", 13) == 0)
+			यदि (म_भेदन(p, "charset=utf-8", 13) == 0
+				|| म_भेदन(p, "charset=UTF-8", 13) == 0)
 			{
-				fputs("charset=BIG-5", stdout);
+				ख_माला_दो("charset=BIG-5", मानक_निकास);
 				p += 12;
 			}
-			else if (strncmp(p, "# Original translations", 23) == 0)
+			अन्यथा यदि (म_भेदन(p, "# Original translations", 23) == 0)
 			{
-				fputs("# Generated from zh_TW.UTF-8.po, DO NOT EDIT.", stdout);
-				while (p[1] != '\n')
+				ख_माला_दो("# Generated from zh_TW.UTF-8.po, DO NOT EDIT.", मानक_निकास);
+				जबसम्म (p[1] != '\n')
 					++p;
 			}
-			else
+			अन्यथा
 			{
-				if (*(unsigned char *)p >= 0xA1)
+				यदि (*(अचिन्हित वर्ण *)p >= 0xA1)
 				{
-					putchar(*p++);
-					if (*p == '\\')
-						putchar(*p);
+					अक्षर_दो(*p++);
+					यदि (*p == '\\')
+						अक्षर_दो(*p);
 				}
-				putchar(*p);
+				अक्षर_दो(*p);
 			}
 		}
 	}

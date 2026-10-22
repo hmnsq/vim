@@ -33,20 +33,20 @@
 #define	    BACKTRACKING_ENGINE	1
 #define	    NFA_ENGINE		2
 
-typedef struct regengine regengine_T;
+प्रकारनिर्देश संरचना regengine regengine_T;
 
 /*
  * Structure returned by vim_regcomp() to pass on to vim_regexec().
  * This is the general structure. For the actual matcher, two specific
  * structures are used. See code below.
  */
-typedef struct regprog
+प्रकारनिर्देश संरचना regprog
 {
     regengine_T		*engine;
-    unsigned		regflags;
-    unsigned		re_engine;   // automatic, backtracking or nfa engine
-    unsigned		re_flags;    // second argument for vim_regcomp()
-    int			re_in_use;   // prog is being executed
+    अचिन्हित		regflags;
+    अचिन्हित		re_engine;   // automatic, backtracking or nfa engine
+    अचिन्हित		re_flags;    // second argument for vim_regcomp()
+    पूर्णाङ्क			re_in_use;   // prog is being executed
 } regprog_T;
 
 /*
@@ -54,21 +54,21 @@ typedef struct regprog
  * These fields are only to be used in regexp.c!
  * See regexp.c for an explanation.
  */
-typedef struct
+प्रकारनिर्देश संरचना
 {
     // These four members implement regprog_T
     regengine_T		*engine;
-    unsigned		regflags;
-    unsigned		re_engine;
-    unsigned		re_flags;
-    int			re_in_use;
+    अचिन्हित		regflags;
+    अचिन्हित		re_engine;
+    अचिन्हित		re_flags;
+    पूर्णाङ्क			re_in_use;
 
-    int			regstart;
+    पूर्णाङ्क			regstart;
     char_u		reganch;
     char_u		*regmust;
-    int			regmlen;
+    पूर्णाङ्क			regmlen;
 #ifdef DEBUG
-    int			regsz;
+    पूर्णाङ्क			regsz;
 #endif
 #ifdef FEAT_SYN_HL
     char_u		reghasz;
@@ -80,44 +80,44 @@ typedef struct
  * Structure representing a NFA state.
  * An NFA state may have no outgoing edge, when it is a NFA_MATCH state.
  */
-typedef struct nfa_state nfa_state_T;
-struct nfa_state
+प्रकारनिर्देश संरचना nfa_state nfa_state_T;
+संरचना nfa_state
 {
-    int			c;
+    पूर्णाङ्क			c;
     nfa_state_T		*out;
     nfa_state_T		*out1;
-    int			id;
-    int			lastlist[2]; // 0: normal, 1: recursive
-    int			val;
+    पूर्णाङ्क			id;
+    पूर्णाङ्क			lastlist[2]; // 0: normal, 1: recursive
+    पूर्णाङ्क			val;
 };
 
 /*
  * Structure used by the NFA matcher.
  */
-typedef struct
+प्रकारनिर्देश संरचना
 {
     // These three members implement regprog_T
     regengine_T		*engine;
-    unsigned		regflags;
-    unsigned		re_engine;
-    unsigned		re_flags;
-    int			re_in_use;
+    अचिन्हित		regflags;
+    अचिन्हित		re_engine;
+    अचिन्हित		re_flags;
+    पूर्णाङ्क			re_in_use;
 
     nfa_state_T		*start;		// points into state[]
 
-    int			reganch;	// pattern starts with ^
-    int			regstart;	// char at start of pattern
+    पूर्णाङ्क			reganch;	// pattern starts with ^
+    पूर्णाङ्क			regstart;	// char at start of pattern
     char_u		*match_text;	// plain text to match with
 
-    int			has_zend;	// pattern contains \ze
-    int			has_backref;	// pattern contains \1 .. \9
+    पूर्णाङ्क			has_zend;	// pattern contains \ze
+    पूर्णाङ्क			has_backref;	// pattern contains \1 .. \9
 #ifdef FEAT_SYN_HL
-    int			reghasz;
+    पूर्णाङ्क			reghasz;
 #endif
     char_u		*pattern;
-    int			nsubexp;	// number of ()
-    int			nstate;
-    void		*listbuf[2];	// cached list buffers for
+    पूर्णाङ्क			nsubexp;	// number of ()
+    पूर्णाङ्क			nstate;
+    शून्य		*listbuf[2];	// cached list buffers for
 					// nfa_regmatch()
     nfa_state_T		state[1];	// actually longer..
 } nfa_regprog_T;
@@ -127,14 +127,14 @@ typedef struct
  * Sub-match "no" starts at "startp[no]" and ends just before "endp[no]".
  * When there is no match, the pointer is NULL.
  */
-typedef struct
+प्रकारनिर्देश संरचना
 {
     regprog_T		*regprog;
     char_u		*startp[NSUBEXP];
     char_u		*endp[NSUBEXP];
 
     colnr_T		rm_matchcol;   // match start without "\zs"
-    int			rm_ic;
+    पूर्णाङ्क			rm_ic;
 } regmatch_T;
 
 /*
@@ -145,14 +145,14 @@ typedef struct
  * always 0.
  * When there is no match, the line number is -1.
  */
-typedef struct
+प्रकारनिर्देश संरचना
 {
     regprog_T		*regprog;
     lpos_T		startpos[NSUBEXP];
     lpos_T		endpos[NSUBEXP];
 
     colnr_T		rmm_matchcol;   // match start without "\zs"
-    int			rmm_ic;
+    पूर्णाङ्क			rmm_ic;
     colnr_T		rmm_maxcol;	// when not zero: maximum column
 } regmmatch_T;
 
@@ -161,24 +161,24 @@ typedef struct
  * Use a reference count to avoid the need to copy this around.  When it goes
  * from 1 to zero the matches need to be freed.
  */
-typedef struct
+प्रकारनिर्देश संरचना
 {
-    short		refcnt;
+    लघु		refcnt;
     char_u		*matches[NSUBEXP];
 } reg_extmatch_T;
 
-struct regengine
+संरचना regengine
 {
     // bt_regcomp or nfa_regcomp
-    regprog_T	*(*regcomp)(char_u*, int);
+    regprog_T	*(*regcomp)(char_u*, पूर्णाङ्क);
     // bt_regfree or nfa_regfree
-    void	(*regfree)(regprog_T *);
+    शून्य	(*regfree)(regprog_T *);
     // bt_regexec_nl or nfa_regexec_nl
-    int		(*regexec_nl)(regmatch_T *, char_u *, colnr_T, int);
+    पूर्णाङ्क		(*regexec_nl)(regmatch_T *, char_u *, colnr_T, पूर्णाङ्क);
     // bt_regexec_mult or nfa_regexec_mult
-    long	(*regexec_multi)(regmmatch_T *, win_T *, buf_T *, linenr_T, colnr_T, int *);
+    दीर्घ	(*regexec_multi)(regmmatch_T *, win_T *, buf_T *, linenr_T, colnr_T, पूर्णाङ्क *);
 #ifdef DEBUG
-    char_u	*expr;
+    char_u	*अभिव्यक्ति;
 #endif
 };
 

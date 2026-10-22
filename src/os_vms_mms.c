@@ -1,77 +1,77 @@
-#include	<stdio.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<unixio.h>
-#include	"vim.h"
-int main(int argc, char *argv[])
+#अन्तर्भाव	<stdio.h>
+#अन्तर्भाव	<stdlib.h>
+#अन्तर्भाव	<string.h>
+#अन्तर्भाव	<unixio.h>
+#अन्तर्भाव	"vim.h"
+पूर्णाङ्क main(पूर्णाङ्क argc, वर्ण *argv[])
 {
-    FILE	*fpi, *fpo;
-    char	cmd[132], buf[BUFSIZ], *argp, *error_file, target[132], *mms;
-    int		err = 0, err_line = 0;
+    खाता	*fpi, *fpo;
+    वर्ण	cmd[132], buf[बफ_मान], *argp, *error_file, target[132], *mms;
+    पूर्णाङ्क		err = 0, err_पङ्क्ति = 0;
 
     mms = "mms";
     argc--;
     argv++;
-    while (argc-- > 0)
+    जबसम्म (argc-- > 0)
     {
 	argp = *argv++;
-	if (*argp == '-')
+	यदि (*argp == '-')
 	{
-	    switch (*++argp)
+	    विकल्प (*++argp)
 	    {
-		case 'm':
+		पक्ष 'm':
 		    mms = ++argp;
-		    break;
-		case 'e':
-		    if (!*(error_file = ++argp))
+		    रोक;
+		पक्ष 'e':
+		    यदि (!*(error_file = ++argp))
 		    {
 			error_file = *argv++;
 			argc--;
 		    }
-		    break;
-		default:
-		    break;
+		    रोक;
+		स्वभाव:
+		    रोक;
 	    }
 	}
-	else
+	अन्यथा
 	{
-	    if (*target)
-		strcat(target, " ");
-	    strcat(target, argp);
+	    यदि (*target)
+		म_जोड़ो(target, " ");
+	    म_जोड़ो(target, argp);
 	}
     }
-    vim_snprintf(cmd, sizeof(cmd), "%s/output=tmp:errors.vim_tmp %s",
+    vim_snprintf(cmd, परिमाण(cmd), "%s/output=tmp:errors.vim_tmp %s",
 								 mms, target);
-    system(cmd);
-    fpi = fopen("tmp:errors.vim_tmp", "r");
-    fpo = fopen(error_file, "w");
-    while (fgets(buf, BUFSIZ, fpi))
+    प्रणाली(cmd);
+    fpi = ख_खोलो("tmp:errors.vim_tmp", "r");
+    fpo = ख_खोलो(error_file, "w");
+    जबसम्म (ख_माला_लो(buf, बफ_मान, fpi))
     {
-	if (!memcmp(buf, "%CC-", 4))
+	यदि (!स_भेद(buf, "%CC-", 4))
 	{
-	    err_line++;
-	    buf[strlen(buf)-1] = '\0';
+	    err_पङ्क्ति++;
+	    buf[म_माप(buf)-1] = '\0';
 	    err++;
 	}
-	else
+	अन्यथा
 	{
-	    if (err_line)
+	    यदि (err_पङ्क्ति)
 	    {
-		if (strstr(buf, _("At line")))
+		यदि (म_माला(buf, _("At line")))
 		{
-		    err_line = 0;
-		    fprintf(fpo, "@");
+		    err_पङ्क्ति = 0;
+		    ख_लिखो(fpo, "@");
 		}
-		else
-		    buf[strlen(buf)-1] = '\0';
+		अन्यथा
+		    buf[म_माप(buf)-1] = '\0';
 	    }
 	}
-	fprintf(fpo, "%s", buf);
+	ख_लिखो(fpo, "%s", buf);
     }
-    fclose(fpi);
-    fclose(fpo);
-    while (!delete("tmp:errors.vim_tmp"))
+    ख_बंद(fpi);
+    ख_बंद(fpo);
+    जबसम्म (!delete("tmp:errors.vim_tmp"))
 	/*nop*/;
-    exit(err ? 44 : 1);
-    return(0);
+    निकास(err ? 44 : 1);
+    फर्काऊ(0);
 }

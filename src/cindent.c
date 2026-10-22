@@ -15,7 +15,7 @@
  * Below "XXX" means that this function may unlock the current line.
  */
 
-#include "vim.h"
+#अन्तर्भाव "vim.h"
 
 // values for the "lookfor" state
 #define LOOKFOR_INITIAL		0
@@ -29,121 +29,121 @@
 #define LOOKFOR_NOBREAK		8
 #define LOOKFOR_CPP_BASECLASS	9
 #define LOOKFOR_ENUM_OR_INIT	10
-#define LOOKFOR_JS_KEY		11
+#define LOOKFOR_JS_साँचो		11
 #define LOOKFOR_COMMA		12
 
 /*
  * Return TRUE if the string "line" starts with a word from 'cinwords'.
  */
-    int
-cin_is_cinword(char_u *line)
+    पूर्णाङ्क
+cin_is_cinword(char_u *पङ्क्ति)
 {
     char_u	*cinw;
     char_u	*cinw_buf;
-    int		cinw_len;
-    int		retval = FALSE;
-    int		len;
+    पूर्णाङ्क		cinw_len;
+    पूर्णाङ्क		retval = FALSE;
+    पूर्णाङ्क		len;
 
-    cinw_len = (int)STRLEN(curbuf->b_p_cinw) + 1;
+    cinw_len = (पूर्णाङ्क)STRLEN(curbuf->b_p_cinw) + 1;
     cinw_buf = alloc(cinw_len);
-    if (cinw_buf == NULL)
-	return FALSE;
+    यदि (cinw_buf == रिक्त)
+	फर्काऊ FALSE;
 
-    line = skipwhite(line);
-    for (cinw = curbuf->b_p_cinw; *cinw; )
+    पङ्क्ति = skipwhite(पङ्क्ति);
+    लागि (cinw = curbuf->b_p_cinw; *cinw; )
     {
 	len = copy_option_part(&cinw, cinw_buf, cinw_len, ",");
-	if (STRNCMP(line, cinw_buf, len) == 0
-		&& (!vim_iswordc(line[len]) || !vim_iswordc(line[len - 1])))
+	यदि (STRNCMP(पङ्क्ति, cinw_buf, len) == 0
+		&& (!vim_iswordc(पङ्क्ति[len]) || !vim_iswordc(पङ्क्ति[len - 1])))
 	{
 	    retval = TRUE;
-	    break;
+	    रोक;
 	}
     }
     vim_free(cinw_buf);
-    return retval;
+    फर्काऊ retval;
 }
 
 /*
  * Skip to the end of a "string" and a 'c' character.
  * If there is no string or character, return argument unmodified.
  */
-    static char_u *
+    स्थिर char_u *
 skip_string(char_u *p)
 {
-    int	    i;
+    पूर्णाङ्क	    i;
 
     // We loop, because strings may be concatenated: "date""time".
-    for ( ; ; ++p)
+    लागि ( ; ; ++p)
     {
-	if (p[0] == '\'')		    // 'c' or '\n' or '\000'
+	यदि (p[0] == '\'')		    // 'c' or '\n' or '\000'
 	{
-	    if (p[1] == NUL)		    // ' at end of line
-		break;
+	    यदि (p[1] == NUL)		    // ' at end of line
+		रोक;
 	    i = 2;
-	    if (p[1] == '\\' && p[2] != NUL)    // '\n' or '\000'
+	    यदि (p[1] == '\\' && p[2] != NUL)    // '\n' or '\000'
 	    {
 		++i;
-		while (vim_isdigit(p[i - 1]))   // '\000'
+		जबसम्म (vim_isdigit(p[i - 1]))   // '\000'
 		    ++i;
 	    }
-	    if (p[i - 1] != NUL && p[i] == '\'')    // check for trailing '
+	    यदि (p[i - 1] != NUL && p[i] == '\'')    // check for trailing '
 	    {
 		p += i;
-		continue;
+		जारी;
 	    }
 	}
-	else if (p[0] == '"')		    // start of string
+	अन्यथा यदि (p[0] == '"')		    // start of string
 	{
-	    for (++p; p[0]; ++p)
+	    लागि (++p; p[0]; ++p)
 	    {
-		if (p[0] == '\\' && p[1] != NUL)
+		यदि (p[0] == '\\' && p[1] != NUL)
 		    ++p;
-		else if (p[0] == '"')	    // end of string
-		    break;
+		अन्यथा यदि (p[0] == '"')	    // end of string
+		    रोक;
 	    }
-	    if (p[0] == '"')
-		continue; // continue for another string
+	    यदि (p[0] == '"')
+		जारी; // continue for another string
 	}
-	else if (p[0] == 'R' && p[1] == '"')
+	अन्यथा यदि (p[0] == 'R' && p[1] == '"')
 	{
 	    // Raw string: R"[delim](...)[delim]"
 	    char_u *delim = p + 2;
 	    char_u *paren = vim_strchr(delim, '(');
 
-	    if (paren != NULL)
+	    यदि (paren != रिक्त)
 	    {
-		size_t delim_len = paren - delim;
+		माप_प्रकार delim_len = paren - delim;
 
-		for (p += 3; *p; ++p)
-		    if (p[0] == ')' && STRNCMP(p + 1, delim, delim_len) == 0
+		लागि (p += 3; *p; ++p)
+		    यदि (p[0] == ')' && STRNCMP(p + 1, delim, delim_len) == 0
 			    && p[delim_len + 1] == '"')
 		    {
 			p += delim_len + 1;
-			break;
+			रोक;
 		    }
-		if (p[0] == '"')
-		    continue; // continue for another string
+		यदि (p[0] == '"')
+		    जारी; // continue for another string
 	    }
 	}
-	break;				    // no string found
+	रोक;				    // no string found
     }
-    if (!*p)
+    यदि (!*p)
 	--p;				    // backup from NUL
-    return p;
+    फर्काऊ p;
 }
 
 /*
  * Return TRUE if "line[col]" is inside a C string.
  */
-    int
-is_pos_in_string(char_u *line, colnr_T col)
+    पूर्णाङ्क
+is_pos_in_string(char_u *पङ्क्ति, colnr_T col)
 {
     char_u *p;
 
-    for (p = line; *p && (colnr_T)(p - line) < col; ++p)
+    लागि (p = पङ्क्ति; *p && (colnr_T)(p - पङ्क्ति) < col; ++p)
 	p = skip_string(p);
-    return !((colnr_T)(p - line) <= col);
+    फर्काऊ !((colnr_T)(p - पङ्क्ति) <= col);
 }
 
 /*
@@ -152,68 +152,68 @@ is_pos_in_string(char_u *line, colnr_T col)
  * The line is scanned once (skipping strings), so this stays linear even on
  * lines with many slashes (e.g. base64 data).
  */
-    int
-check_linecomment(char_u *line)
+    पूर्णाङ्क
+check_linecomment(char_u *पङ्क्ति)
 {
     char_u  *p;
 
-    p = line;
+    p = पङ्क्ति;
     // skip Lispish one-line comments
-    if (curbuf->b_p_lisp)
+    यदि (curbuf->b_p_lisp)
     {
-	if (vim_strchr(p, ';') != NULL) // there may be comments
+	यदि (vim_strchr(p, ';') != रिक्त) // there may be comments
 	{
-	    int in_str = FALSE;	// inside of string
+	    पूर्णाङ्क in_str = FALSE;	// inside of string
 
-	    p = line;		// scan from start
-	    while ((p = vim_strpbrk(p, (char_u *)"\";")) != NULL)
+	    p = पङ्क्ति;		// scan from start
+	    जबसम्म ((p = vim_strpbrk(p, (char_u *)"\";")) != रिक्त)
 	    {
-		if (*p == '"')
+		यदि (*p == '"')
 		{
-		    if (in_str)
+		    यदि (in_str)
 		    {
-			if (*(p - 1) != '\\') // skip escaped quote
+			यदि (*(p - 1) != '\\') // skip escaped quote
 			    in_str = FALSE;
 		    }
-		    else if (p == line || ((p - line) >= 2
+		    अन्यथा यदि (p == पङ्क्ति || ((p - पङ्क्ति) >= 2
 				      // skip #\" form
 				      && *(p - 1) != '\\' && *(p - 2) != '#'))
 			in_str = TRUE;
 		}
-		else if (!in_str && ((p - line) < 2
+		अन्यथा यदि (!in_str && ((p - पङ्क्ति) < 2
 				    || (*(p - 1) != '\\' && *(p - 2) != '#'))
-			       && !is_pos_in_string(line, (colnr_T)(p - line)))
-		    break;	// found!
+			       && !is_pos_in_string(पङ्क्ति, (colnr_T)(p - पङ्क्ति)))
+		    रोक;	// found!
 		++p;
 	    }
 	}
-	else
-	    p = NULL;
+	अन्यथा
+	    p = रिक्त;
     }
-    else
+    अन्यथा
     {
 	// Scan the line once, skipping over strings, char constants and raw
 	// strings, instead of testing each '/' with is_pos_in_string() (which
 	// rescans from the start, making this quadratic on lines with many
 	// slashes).
-	for ( ; *p != NUL; ++p)
+	लागि ( ; *p != NUL; ++p)
 	{
 	    p = skip_string(p);
-	    if (*p == NUL)
-		break;
+	    यदि (*p == NUL)
+		रोक;
 	    // Accept a double /, unless it's preceded with * and followed by
 	    // *, because * / / * is an end and start of a C comment.
-	    if (p[0] == '/' && p[1] == '/'
-				 && (p == line || p[-1] != '*' || p[2] != '*'))
-		break;
+	    यदि (p[0] == '/' && p[1] == '/'
+				 && (p == पङ्क्ति || p[-1] != '*' || p[2] != '*'))
+		रोक;
 	}
-	if (*p == NUL)
-	    p = NULL;
+	यदि (*p == NUL)
+	    p = रिक्त;
     }
 
-    if (p == NULL)
-	return MAXCOL;
-    return (int)(p - line);
+    यदि (p == रिक्त)
+	फर्काऊ MAXCOL;
+    फर्काऊ (पूर्णाङ्क)(p - पङ्क्ति);
 }
 
 /*
@@ -221,36 +221,36 @@ check_linecomment(char_u *line)
  * Search starts at w_cursor.lnum and goes backwards.
  * Return NULL when not inside a comment.
  */
-    static pos_T *
-ind_find_start_comment(void)	    // XXX
+    स्थिर pos_T *
+ind_find_start_comment(शून्य)	    // XXX
 {
-    return find_start_comment(curbuf->b_ind_maxcomment);
+    फर्काऊ find_start_comment(curbuf->b_ind_maxcomment);
 }
 
     pos_T *
-find_start_comment(int ind_maxcomment)	// XXX
+find_start_comment(पूर्णाङ्क ind_maxcomment)	// XXX
 {
     pos_T	*pos;
-    int		cur_maxcomment = ind_maxcomment;
+    पूर्णाङ्क		cur_maxcomment = ind_maxcomment;
 
-    for (;;)
+    लागि (;;)
     {
-	pos = findmatchlimit(NULL, '*', FM_BACKWARD, cur_maxcomment);
-	if (pos == NULL)
-	    break;
+	pos = findmatchlimit(रिक्त, '*', FM_BACKWARD, cur_maxcomment);
+	यदि (pos == रिक्त)
+	    रोक;
 
 	// Check if the comment start we found is inside a string.
 	// If it is then restrict the search to below this line and try again.
-	if (!is_pos_in_string(ml_get(pos->lnum), pos->col))
-	    break;
+	यदि (!is_pos_in_string(ml_get(pos->lnum), pos->col))
+	    रोक;
 	cur_maxcomment = curwin->w_cursor.lnum - pos->lnum - 1;
-	if (cur_maxcomment <= 0)
+	यदि (cur_maxcomment <= 0)
 	{
-	    pos = NULL;
-	    break;
+	    pos = रिक्त;
+	    रोक;
 	}
     }
-    return pos;
+    फर्काऊ pos;
 }
 
 /*
@@ -258,30 +258,30 @@ find_start_comment(int ind_maxcomment)	// XXX
  * Search starts at w_cursor.lnum and goes backwards.
  * Return NULL when not inside a raw string.
  */
-    static pos_T *
-find_start_rawstring(int ind_maxcomment)	// XXX
+    स्थिर pos_T *
+find_start_rawstring(पूर्णाङ्क ind_maxcomment)	// XXX
 {
     pos_T	*pos;
-    int		cur_maxcomment = ind_maxcomment;
+    पूर्णाङ्क		cur_maxcomment = ind_maxcomment;
 
-    for (;;)
+    लागि (;;)
     {
-	pos = findmatchlimit(NULL, 'R', FM_BACKWARD, cur_maxcomment);
-	if (pos == NULL)
-	    break;
+	pos = findmatchlimit(रिक्त, 'R', FM_BACKWARD, cur_maxcomment);
+	यदि (pos == रिक्त)
+	    रोक;
 
 	// Check if the raw string start we found is inside a string.
 	// If it is then restrict the search to below this line and try again.
-	if (!is_pos_in_string(ml_get(pos->lnum), pos->col))
-	    break;
+	यदि (!is_pos_in_string(ml_get(pos->lnum), pos->col))
+	    रोक;
 	cur_maxcomment = curwin->w_cursor.lnum - pos->lnum - 1;
-	if (cur_maxcomment <= 0)
+	यदि (cur_maxcomment <= 0)
 	{
-	    pos = NULL;
-	    break;
+	    pos = रिक्त;
+	    रोक;
 	}
     }
-    return pos;
+    फर्काऊ pos;
 }
 
 /*
@@ -292,15 +292,15 @@ find_start_rawstring(int ind_maxcomment)	// XXX
  * Return NULL when not inside a comment or raw string.
  * "CORS" -> Comment Or Raw String
  */
-    static pos_T *
+    स्थिर pos_T *
 ind_find_start_CORS(linenr_T *is_raw)	    // XXX
 {
-    static pos_T comment_pos_copy;
+    स्थिर pos_T comment_pos_copy;
     pos_T	*comment_pos;
     pos_T	*rs_pos;
 
     comment_pos = find_start_comment(curbuf->b_ind_maxcomment);
-    if (comment_pos != NULL)
+    यदि (comment_pos != रिक्त)
     {
 	// Need to make a copy of the static pos in findmatchlimit(),
 	// calling find_start_rawstring() may change it.
@@ -311,24 +311,24 @@ ind_find_start_CORS(linenr_T *is_raw)	    // XXX
 
     // If comment_pos is before rs_pos the raw string is inside the comment.
     // If rs_pos is before comment_pos the comment is inside the raw string.
-    if (comment_pos == NULL || (rs_pos != NULL
+    यदि (comment_pos == रिक्त || (rs_pos != रिक्त
 					     && LT_POS(*rs_pos, *comment_pos)))
     {
-	if (is_raw != NULL && rs_pos != NULL)
+	यदि (is_raw != रिक्त && rs_pos != रिक्त)
 	    *is_raw = rs_pos->lnum;
-	return rs_pos;
+	फर्काऊ rs_pos;
     }
-    return comment_pos;
+    फर्काऊ comment_pos;
 }
 
 
 /*
  * Return TRUE if C-indenting is on.
  */
-    int
-cindent_on(void)
+    पूर्णाङ्क
+cindent_on(शून्य)
 {
-    return (!p_paste && (curbuf->b_p_cin
+    फर्काऊ (!p_paste && (curbuf->b_p_cin
 #ifdef FEAT_EVAL
 		    || *curbuf->b_p_inde != NUL
 #endif
@@ -336,8 +336,8 @@ cindent_on(void)
 }
 
 // Find result cache for cpp_baseclass
-typedef struct {
-    int	    found;
+प्रकारनिर्देश संरचना {
+    पूर्णाङ्क	    found;
     lpos_T  lpos;
 } cpp_baseclass_cache_T;
 
@@ -345,10 +345,10 @@ typedef struct {
  * Skip over white space and C comments within the line.
  * Also skip over Perl/shell comments if desired.
  */
-    static char_u *
+    स्थिर char_u *
 cin_skipcomment(char_u *s)
 {
-    while (*s)
+    जबसम्म (*s)
     {
 	char_u *prev_s = s;
 
@@ -356,184 +356,184 @@ cin_skipcomment(char_u *s)
 
 	// Perl/shell # comment comment continues until eol.  Require a space
 	// before # to avoid recognizing $#array.
-	if (curbuf->b_ind_hash_comment != 0 && s != prev_s && *s == '#')
+	यदि (curbuf->b_ind_hash_comment != 0 && s != prev_s && *s == '#')
 	{
 	    s += STRLEN(s);
-	    break;
+	    रोक;
 	}
-	if (*s != '/')
-	    break;
+	यदि (*s != '/')
+	    रोक;
 	++s;
-	if (*s == '/')		// slash-slash comment continues till eol
+	यदि (*s == '/')		// slash-slash comment continues till eol
 	{
 	    s += STRLEN(s);
-	    break;
+	    रोक;
 	}
-	if (*s != '*')
-	    break;
-	for (++s; *s; ++s)	// skip slash-star comment
-	    if (s[0] == '*' && s[1] == '/')
+	यदि (*s != '*')
+	    रोक;
+	लागि (++s; *s; ++s)	// skip slash-star comment
+	    यदि (s[0] == '*' && s[1] == '/')
 	    {
 		s += 2;
-		break;
+		रोक;
 	    }
     }
-    return s;
+    फर्काऊ s;
 }
 
 /*
  * Return TRUE if there is no code at *s.  White space and comments are
  * not considered code.
  */
-    static int
+    स्थिर पूर्णाङ्क
 cin_nocode(char_u *s)
 {
-    return *cin_skipcomment(s) == NUL;
+    फर्काऊ *cin_skipcomment(s) == NUL;
 }
 
 /*
  * Recognize the start of a C or C++ comment.
  */
-    static int
+    स्थिर पूर्णाङ्क
 cin_iscomment(char_u *p)
 {
-    return (p[0] == '/' && (p[1] == '*' || p[1] == '/'));
+    फर्काऊ (p[0] == '/' && (p[1] == '*' || p[1] == '/'));
 }
 
 /*
  * Recognize the start of a "//" comment.
  */
-    static int
+    स्थिर पूर्णाङ्क
 cin_islinecomment(char_u *p)
 {
-    return (p[0] == '/' && p[1] == '/');
+    फर्काऊ (p[0] == '/' && p[1] == '/');
 }
 
 /*
  * Check previous lines for a "//" line comment, skipping over blank lines.
  */
-    static pos_T *
-find_line_comment(void) // XXX
+    स्थिर pos_T *
+find_पङ्क्ति_comment(शून्य) // XXX
 {
-    static pos_T pos;
-    char_u	 *line;
+    स्थिर pos_T pos;
+    char_u	 *पङ्क्ति;
     char_u	 *p;
 
     pos = curwin->w_cursor;
-    while (--pos.lnum > 0)
+    जबसम्म (--pos.lnum > 0)
     {
-	line = ml_get(pos.lnum);
-	p = skipwhite(line);
-	if (cin_islinecomment(p))
+	पङ्क्ति = ml_get(pos.lnum);
+	p = skipwhite(पङ्क्ति);
+	यदि (cin_islinecomment(p))
 	{
-	    pos.col = (int)(p - line);
-	    return &pos;
+	    pos.col = (पूर्णाङ्क)(p - पङ्क्ति);
+	    फर्काऊ &pos;
 	}
-	if (*p != NUL)
-	    break;
+	यदि (*p != NUL)
+	    रोक;
     }
-    return NULL;
+    फर्काऊ रिक्त;
 }
 
 /*
  * Return TRUE if "text" starts with "key:".
  */
-    static int
-cin_has_js_key(char_u *text)
+    स्थिर पूर्णाङ्क
+cin_has_js_साँचो(char_u *text)
 {
     char_u *s = skipwhite(text);
-    int	    quote = -1;
+    पूर्णाङ्क	    quote = -1;
 
-    if (*s == '\'' || *s == '"')
+    यदि (*s == '\'' || *s == '"')
     {
 	// can be 'key': or "key":
 	quote = *s;
 	++s;
     }
-    if (!vim_isIDc(*s))	    // need at least one ID character
-	return FALSE;
+    यदि (!vim_isIDc(*s))	    // need at least one ID character
+	फर्काऊ FALSE;
 
-    while (vim_isIDc(*s))
+    जबसम्म (vim_isIDc(*s))
 	++s;
-    if (*s == quote)
+    यदि (*s == quote)
 	++s;
 
     s = cin_skipcomment(s);
 
     // "::" is not a label, it's C++
-    return (*s == ':' && s[1] != ':');
+    फर्काऊ (*s == ':' && s[1] != ':');
 }
 
 /*
  * Check if string matches "label:"; move to character after ':' if true.
  * "*s" must point to the start of the label, if there is one.
  */
-    static int
+    स्थिर पूर्णाङ्क
 cin_islabel_skip(char_u **s)
 {
-    if (!vim_isIDc(**s))	    // need at least one ID character
-	return FALSE;
+    यदि (!vim_isIDc(**s))	    // need at least one ID character
+	फर्काऊ FALSE;
 
-    while (vim_isIDc(**s))
+    जबसम्म (vim_isIDc(**s))
     {
-	if (has_mbyte)
+	यदि (has_mbyte)
 	    (*s) += (*mb_ptr2len)(*s);
-	else
+	अन्यथा
 	    (*s)++;
     }
 
     *s = cin_skipcomment(*s);
 
     // "::" is not a label, it's C++
-    return (**s == ':' && *++*s != ':');
+    फर्काऊ (**s == ':' && *++*s != ':');
 }
 
 /*
  * Recognize a scope declaration label from the 'cinscopedecls' option.
  */
-    static int
+    स्थिर पूर्णाङ्क
 cin_isscopedecl(char_u *p)
 {
-    size_t  cinsd_len;
+    माप_प्रकार  cinsd_len;
     char_u  *cinsd_buf;
     char_u  *cinsd;
-    size_t  len;
+    माप_प्रकार  len;
     char_u  *skip;
     char_u  *s = cin_skipcomment(p);
-    int	    found = FALSE;
+    पूर्णाङ्क	    found = FALSE;
 
     cinsd_len = STRLEN(curbuf->b_p_cinsd) + 1;
     cinsd_buf = alloc(cinsd_len);
-    if (cinsd_buf == NULL)
-	return FALSE;
+    यदि (cinsd_buf == रिक्त)
+	फर्काऊ FALSE;
 
-    for (cinsd = curbuf->b_p_cinsd; *cinsd; )
+    लागि (cinsd = curbuf->b_p_cinsd; *cinsd; )
     {
-	len = copy_option_part(&cinsd, cinsd_buf, (int)cinsd_len, ",");
-	if (STRNCMP(s, cinsd_buf, len) == 0)
+	len = copy_option_part(&cinsd, cinsd_buf, (पूर्णाङ्क)cinsd_len, ",");
+	यदि (STRNCMP(s, cinsd_buf, len) == 0)
 	{
 	    skip = cin_skipcomment(s + len);
-	    if (*skip == ':' && skip[1] != ':')
+	    यदि (*skip == ':' && skip[1] != ':')
 	    {
 		found = TRUE;
-		break;
+		रोक;
 	    }
 	}
     }
 
     vim_free(cinsd_buf);
-    return found;
+    फर्काऊ found;
 }
 
 /*
  * Recognize a preprocessor statement: Any line that starts with '#'.
  */
-    static int
+    स्थिर पूर्णाङ्क
 cin_ispreproc(char_u *s)
 {
-    if (*skipwhite(s) == '#')
-	return TRUE;
-    return FALSE;
+    यदि (*skipwhite(s) == '#')
+	फर्काऊ TRUE;
+    फर्काऊ FALSE;
 }
 
 /*
@@ -542,46 +542,46 @@ cin_ispreproc(char_u *s)
  * start and return the line in "*pp".
  * Put the amount of indent in "*amount".
  */
-    static int
-cin_ispreproc_cont(char_u **pp, linenr_T *lnump, int *amount)
+    स्थिर पूर्णाङ्क
+cin_ispreproc_cont(char_u **pp, linenr_T *lnump, पूर्णाङ्क *amount)
 {
-    char_u	*line = *pp;
+    char_u	*पङ्क्ति = *pp;
     linenr_T	lnum = *lnump;
-    int		retval = FALSE;
-    int		candidate_amount = *amount;
+    पूर्णाङ्क		retval = FALSE;
+    पूर्णाङ्क		candidate_amount = *amount;
 
-    if (*line != NUL && line[STRLEN(line) - 1] == '\\')
+    यदि (*पङ्क्ति != NUL && पङ्क्ति[STRLEN(पङ्क्ति) - 1] == '\\')
 	candidate_amount = get_indent_lnum(lnum);
 
-    for (;;)
+    लागि (;;)
     {
-	if (cin_ispreproc(line))
+	यदि (cin_ispreproc(पङ्क्ति))
 	{
 	    retval = TRUE;
 	    *lnump = lnum;
-	    break;
+	    रोक;
 	}
-	if (lnum == 1)
-	    break;
-	line = ml_get(--lnum);
-	if (*line == NUL || line[STRLEN(line) - 1] != '\\')
-	    break;
+	यदि (lnum == 1)
+	    रोक;
+	पङ्क्ति = ml_get(--lnum);
+	यदि (*पङ्क्ति == NUL || पङ्क्ति[STRLEN(पङ्क्ति) - 1] != '\\')
+	    रोक;
     }
 
-    if (lnum != *lnump)
+    यदि (lnum != *lnump)
 	*pp = ml_get(*lnump);
-    if (retval)
+    यदि (retval)
 	*amount = candidate_amount;
-    return retval;
+    फर्काऊ retval;
 }
 
-    static int
+    स्थिर पूर्णाङ्क
 cin_iselse(
     char_u  *p)
 {
-    if (*p == '}')	    // accept "} else"
+    यदि (*p == '}')	    // accept "} else"
 	p = cin_skipcomment(p + 1);
-    return (STRNCMP(p, "else", 4) == 0 && !vim_isIDc(p[4]));
+    फर्काऊ (STRNCMP(p, "else", 4) == 0 && !vim_isIDc(p[4]));
 }
 
 /*
@@ -593,66 +593,66 @@ cin_iselse(
  * Return the character terminating the line (ending char's have precedence if
  * both apply in order to determine initializations).
  */
-    static int
+    स्थिर पूर्णाङ्क
 cin_isterminated(
     char_u	*s,
-    int		incl_open,	// include '{' at the end as terminator
-    int		incl_comma)	// recognize a trailing comma
+    पूर्णाङ्क		incl_open,	// include '{' at the end as terminator
+    पूर्णाङ्क		incl_comma)	// recognize a trailing comma
 {
     char_u	found_start = 0;
-    unsigned	n_open = 0;
-    int		is_else = FALSE;
+    अचिन्हित	n_open = 0;
+    पूर्णाङ्क		is_else = FALSE;
 
     s = cin_skipcomment(s);
 
-    if (*s == '{' || (*s == '}' && !cin_iselse(s)))
+    यदि (*s == '{' || (*s == '}' && !cin_iselse(s)))
 	found_start = *s;
 
-    if (!found_start)
+    यदि (!found_start)
 	is_else = cin_iselse(s);
 
-    while (*s)
+    जबसम्म (*s)
     {
 	// skip over comments, "" strings and 'c'haracters
 	s = skip_string(cin_skipcomment(s));
-	if (*s == '}' && n_open > 0)
+	यदि (*s == '}' && n_open > 0)
 	    --n_open;
-	if ((!is_else || n_open == 0)
+	यदि ((!is_else || n_open == 0)
 		&& (*s == ';' || *s == '}' || (incl_comma && *s == ','))
 		&& cin_nocode(s + 1))
-	    return *s;
-	else if (*s == '{')
+	    फर्काऊ *s;
+	अन्यथा यदि (*s == '{')
 	{
-	    if (incl_open && cin_nocode(s + 1))
-		return *s;
-	    else
+	    यदि (incl_open && cin_nocode(s + 1))
+		फर्काऊ *s;
+	    अन्यथा
 		++n_open;
 	}
 
-	if (*s)
+	यदि (*s)
 	    s++;
     }
-    return found_start;
+    फर्काऊ found_start;
 }
 
 /*
  * Return TRUE when "s" starts with "word" and then a non-ID character.
  */
-    static int
-cin_starts_with(char_u *s, char *word)
+    स्थिर पूर्णाङ्क
+cin_starts_with(char_u *s, वर्ण *word)
 {
-    int l = (int)STRLEN(word);
+    पूर्णाङ्क l = (पूर्णाङ्क)STRLEN(word);
 
-    return (STRNCMP(s, word, l) == 0 && !vim_isIDc(s[l]));
+    फर्काऊ (STRNCMP(s, word, l) == 0 && !vim_isIDc(s[l]));
 }
 
 /*
  * Recognize a "default" switch label.
  */
-    static int
+    स्थिर पूर्णाङ्क
 cin_isdefault(char_u *s)
 {
-    return (STRNCMP(s, "default", 7) == 0
+    फर्काऊ (STRNCMP(s, "default", 7) == 0
 	    && *(s = cin_skipcomment(s + 7)) == ':'
 	    && s[1] != ':');
 }
@@ -660,53 +660,53 @@ cin_isdefault(char_u *s)
 /*
  * Recognize a switch label: "case .*:" or "default:".
  */
-    static int
+    स्थिर पूर्णाङ्क
 cin_iscase(
     char_u *s,
-    int strict) // Allow relaxed check of case statement for JS
+    पूर्णाङ्क strict) // Allow relaxed check of case statement for JS
 {
     s = cin_skipcomment(s);
-    if (cin_starts_with(s, "case"))
+    यदि (cin_starts_with(s, "case"))
     {
-	for (s += 4; *s; ++s)
+	लागि (s += 4; *s; ++s)
 	{
 	    s = cin_skipcomment(s);
-	    if (*s == NUL)
-		break;
-	    if (*s == ':')
+	    यदि (*s == NUL)
+		रोक;
+	    यदि (*s == ':')
 	    {
-		if (s[1] == ':')	// skip over "::" for C++
+		यदि (s[1] == ':')	// skip over "::" for C++
 		    ++s;
-		else
-		    return TRUE;
+		अन्यथा
+		    फर्काऊ TRUE;
 	    }
-	    if (*s == '\'' && s[1] && s[2] == '\'')
+	    यदि (*s == '\'' && s[1] && s[2] == '\'')
 		s += 2;			// skip over ':'
-	    else if (*s == '/' && (s[1] == '*' || s[1] == '/'))
-		return FALSE;		// stop at comment
-	    else if (*s == '"')
+	    अन्यथा यदि (*s == '/' && (s[1] == '*' || s[1] == '/'))
+		फर्काऊ FALSE;		// stop at comment
+	    अन्यथा यदि (*s == '"')
 	    {
 		// JS etc.
-		if (strict)
-		    return FALSE;		// stop at string
-		else
-		    return TRUE;
+		यदि (strict)
+		    फर्काऊ FALSE;		// stop at string
+		अन्यथा
+		    फर्काऊ TRUE;
 	    }
 	}
-	return FALSE;
+	फर्काऊ FALSE;
     }
 
-    if (cin_isdefault(s))
-	return TRUE;
-    return FALSE;
+    यदि (cin_isdefault(s))
+	फर्काऊ TRUE;
+    फर्काऊ FALSE;
 }
 
 /*
  * Recognize a label: "label:".
  * Note: curwin->w_cursor must be where we are looking for the label.
  */
-    static int
-cin_islabel(void)		// XXX
+    स्थिर पूर्णाङ्क
+cin_islabel(शून्य)		// XXX
 {
     char_u	*s;
 
@@ -714,94 +714,94 @@ cin_islabel(void)		// XXX
 
     // Exclude "default" from labels, since it should be indented
     // like a switch label.  Same for C++ scope declarations.
-    if (cin_isdefault(s))
-	return FALSE;
-    if (cin_isscopedecl(s))
-	return FALSE;
+    यदि (cin_isdefault(s))
+	फर्काऊ FALSE;
+    यदि (cin_isscopedecl(s))
+	फर्काऊ FALSE;
 
-    if (!cin_islabel_skip(&s))
-	return FALSE;
+    यदि (!cin_islabel_skip(&s))
+	फर्काऊ FALSE;
 
-    if (ind_find_start_CORS(NULL))
-	return FALSE; // Don't accept a label in a comment or a raw string.
+    यदि (ind_find_start_CORS(रिक्त))
+	फर्काऊ FALSE; // Don't accept a label in a comment or a raw string.
 
     // Only accept a label if the previous line is terminated or is a case
     // label.
     pos_T	cursor_save;
     pos_T	*trypos;
-    char_u	*line;
+    char_u	*पङ्क्ति;
 
     cursor_save = curwin->w_cursor;
-    while (curwin->w_cursor.lnum > 1)
+    जबसम्म (curwin->w_cursor.lnum > 1)
     {
 	--curwin->w_cursor.lnum;
 
 	// If we're in a comment or raw string now, skip to the start of
 	// it.
 	curwin->w_cursor.col = 0;
-	if ((trypos = ind_find_start_CORS(NULL)) != NULL) // XXX
+	यदि ((trypos = ind_find_start_CORS(रिक्त)) != रिक्त) // XXX
 	    curwin->w_cursor = *trypos;
 
-	line = ml_get_curline();
-	if (cin_ispreproc(line))	// ignore #defines, #if, etc.
-	    continue;
-	if (*(line = cin_skipcomment(line)) == NUL)
-	    continue;
+	पङ्क्ति = ml_get_curline();
+	यदि (cin_ispreproc(पङ्क्ति))	// ignore #defines, #if, etc.
+	    जारी;
+	यदि (*(पङ्क्ति = cin_skipcomment(पङ्क्ति)) == NUL)
+	    जारी;
 
 	curwin->w_cursor = cursor_save;
-	if (cin_isterminated(line, TRUE, FALSE)
-		|| cin_isscopedecl(line)
-		|| cin_iscase(line, TRUE)
-		|| (cin_islabel_skip(&line) && cin_nocode(line)))
-	    return TRUE;
-	return FALSE;
+	यदि (cin_isterminated(पङ्क्ति, TRUE, FALSE)
+		|| cin_isscopedecl(पङ्क्ति)
+		|| cin_iscase(पङ्क्ति, TRUE)
+		|| (cin_islabel_skip(&पङ्क्ति) && cin_nocode(पङ्क्ति)))
+	    फर्काऊ TRUE;
+	फर्काऊ FALSE;
     }
     curwin->w_cursor = cursor_save;
-    return TRUE;		// label at start of file???
+    फर्काऊ TRUE;		// label at start of file???
 }
 
 /*
  * Return TRUE if string "s" ends with the string "find", possibly followed by
  * white space and comments.  Skip strings and comments.
  */
-    static int
+    स्थिर पूर्णाङ्क
 cin_ends_in(char_u *s, char_u *find)
 {
     char_u	*p = s;
     char_u	*r;
-    int		len = (int)STRLEN(find);
+    पूर्णाङ्क		len = (पूर्णाङ्क)STRLEN(find);
 
-    while (*p != NUL)
+    जबसम्म (*p != NUL)
     {
 	p = cin_skipcomment(p);
-	if (STRNCMP(p, find, len) == 0)
+	यदि (STRNCMP(p, find, len) == 0)
 	{
 	    r = skipwhite(p + len);
-	    if (cin_nocode(r))
-		return TRUE;
+	    यदि (cin_nocode(r))
+		फर्काऊ TRUE;
 	}
-	if (*p != NUL)
+	यदि (*p != NUL)
 	    ++p;
     }
-    return FALSE;
+    फर्काऊ FALSE;
 }
 
 /*
  * Strings can be concatenated with comments between:
  * "string0" |*comment*| "string1"
  */
-    static char_u *
+    स्थिर char_u *
 cin_skip_comment_and_string(char_u *s)
 {
-    char_u *r = NULL, *p = s;
-    do
+    char_u *r = रिक्त, *p = s;
+    गर
     {
 	r = p;
 	p = cin_skipcomment(p);
-	if (*p)
+	यदि (*p)
 	    p = skip_string(p);
-    } while (p != r);
-    return p;
+    } जबसम्म (p != r);
+    फर्काऊ p;
 }
 
 /*
@@ -809,49 +809,49 @@ cin_skip_comment_and_string(char_u *s)
  * =|return [&][(typecast)] [{]
  * The number of opening braces is arbitrary.
  */
-    static int
+    स्थिर पूर्णाङ्क
 cin_is_compound_init(char_u *s)
 {
-    char_u *p = s, *r = NULL;
+    char_u *p = s, *r = रिक्त;
 
-    while (*p)
+    जबसम्म (*p)
     {
-	if (*p == '=')
+	यदि (*p == '=')
 	    p = r = cin_skipcomment(p + 1);
-	else if (STRNCMP(p, "return", 6) == 0 && !vim_isIDc(p[6])
+	अन्यथा यदि (STRNCMP(p, "return", 6) == 0 && !vim_isIDc(p[6])
 		&& (p == s || (p > s && !vim_isIDc(p[-1]))))
 	    p = r = cin_skipcomment(p + 6);
-	else
+	अन्यथा
 	    p = cin_skip_comment_and_string(p + 1);
     }
-    if (!r)
-	return FALSE;
+    यदि (!r)
+	फर्काऊ FALSE;
     p = r; // p points now after '=' or "return"
 
-    if (cin_nocode(p))
-	return TRUE;
+    यदि (cin_nocode(p))
+	फर्काऊ TRUE;
 
-    if (*p == '&')
+    यदि (*p == '&')
 	p = cin_skipcomment(p + 1);
 
-    if (*p == '(') // skip a typecast
+    यदि (*p == '(') // skip a typecast
     {
-	int open_count = 1;
-	do
+	पूर्णाङ्क open_गन्ती = 1;
+	गर
 	{
 	    p = cin_skip_comment_and_string(p + 1);
-	    if (cin_nocode(p))
-		return TRUE;
-	    open_count += (*p == '(') - (*p == ')');
-	} while (open_count);
+	    यदि (cin_nocode(p))
+		फर्काऊ TRUE;
+	    open_गन्ती += (*p == '(') - (*p == ')');
+	} जबसम्म (open_गन्ती);
 	p = cin_skipcomment(p + 1);
-	if (cin_nocode(p))
-	    return TRUE;
+	यदि (cin_nocode(p))
+	    फर्काऊ TRUE;
     }
 
-    while (*p == '{')
+    जबसम्म (*p == '{')
 	p = cin_skipcomment(p + 1);
-    return cin_nocode(p);
+    फर्काऊ cin_nocode(p);
 }
 
 /*
@@ -859,39 +859,39 @@ cin_is_compound_init(char_u *s)
  * "[typedef] [static|public|protected|private] enum"
  * Call another function to recognize structure initialization.
  */
-    static int
-cin_isinit(void)
+    स्थिर पूर्णाङ्क
+cin_isinit(शून्य)
 {
     char_u	*s;
-    static char *skip[] = {"static", "public", "protected", "private"};
+    स्थिर वर्ण *skip[] = {"static", "public", "protected", "private"};
 
     s = cin_skipcomment(ml_get_curline());
 
-    if (cin_starts_with(s, "typedef"))
+    यदि (cin_starts_with(s, "typedef"))
 	s = cin_skipcomment(s + 7);
 
-    for (;;)
+    लागि (;;)
     {
-	int i, l;
+	पूर्णाङ्क i, l;
 
-	for (i = 0; i < (int)ARRAY_LENGTH(skip); ++i)
+	लागि (i = 0; i < (पूर्णाङ्क)ARRAY_LENGTH(skip); ++i)
 	{
-	    l = (int)strlen(skip[i]);
-	    if (cin_starts_with(s, skip[i]))
+	    l = (पूर्णाङ्क)म_माप(skip[i]);
+	    यदि (cin_starts_with(s, skip[i]))
 	    {
 		s = cin_skipcomment(s + l);
 		l = 0;
-		break;
+		रोक;
 	    }
 	}
-	if (l != 0)
-	    break;
+	यदि (l != 0)
+	    रोक;
     }
 
-    if (cin_starts_with(s, "enum"))
-	return TRUE;
+    यदि (cin_starts_with(s, "enum"))
+	फर्काऊ TRUE;
 
-    return cin_is_compound_init(s);
+    फर्काऊ cin_is_compound_init(s);
 }
 
 // Maximum number of lines to search back for a "namespace" line.
@@ -900,104 +900,104 @@ cin_isinit(void)
 /*
  * Recognize a "namespace" scope declaration.
  */
-    static int
+    स्थिर पूर्णाङ्क
 cin_is_cpp_namespace(char_u *s)
 {
     char_u	*p;
-    int		has_name = FALSE;
-    int		has_name_start = FALSE;
+    पूर्णाङ्क		has_name = FALSE;
+    पूर्णाङ्क		has_name_start = FALSE;
 
     s = cin_skipcomment(s);
 
     // skip over "inline" and "export" in any order
-    while ((STRNCMP(s, "inline", 6) == 0 || STRNCMP(s, "export", 6) == 0)
+    जबसम्म ((STRNCMP(s, "inline", 6) == 0 || STRNCMP(s, "export", 6) == 0)
 					&& (s[6] == NUL || !vim_iswordc(s[6])))
 	s = cin_skipcomment(skipwhite(s + 6));
 
-    if (STRNCMP(s, "namespace", 9) == 0 && (s[9] == NUL || !vim_iswordc(s[9])))
+    यदि (STRNCMP(s, "namespace", 9) == 0 && (s[9] == NUL || !vim_iswordc(s[9])))
     {
 	p = cin_skipcomment(skipwhite(s + 9));
-	while (*p != NUL)
+	जबसम्म (*p != NUL)
 	{
-	    if (VIM_ISWHITE(*p))
+	    यदि (VIM_ISWHITE(*p))
 	    {
 		has_name = TRUE; // found end of a name
 		p = cin_skipcomment(skipwhite(p));
 	    }
-	    else if (*p == '{')
+	    अन्यथा यदि (*p == '{')
 	    {
-		break;
+		रोक;
 	    }
-	    else if (vim_iswordc(*p))
+	    अन्यथा यदि (vim_iswordc(*p))
 	    {
 		has_name_start = TRUE;
-		if (has_name)
-		    return FALSE; // word character after skipping past name
+		यदि (has_name)
+		    फर्काऊ FALSE; // word character after skipping past name
 		++p;
 	    }
-	    else if (p[0] == ':' && p[1] == ':' && vim_iswordc(p[2]))
+	    अन्यथा यदि (p[0] == ':' && p[1] == ':' && vim_iswordc(p[2]))
 	    {
-		if (!has_name_start || has_name)
-		    return FALSE;
+		यदि (!has_name_start || has_name)
+		    फर्काऊ FALSE;
 		// C++ 17 nested namespace
 		p += 3;
 	    }
-	    else
+	    अन्यथा
 	    {
-		return FALSE;
+		फर्काऊ FALSE;
 	    }
 	}
-	return TRUE;
+	फर्काऊ TRUE;
     }
-    return FALSE;
+    फर्काऊ FALSE;
 }
 
 /*
  * Recognize a `extern "C"` or `extern "C++"` linkage specifications.
  */
-    static int
+    स्थिर पूर्णाङ्क
 cin_is_cpp_extern_c(char_u *s)
 {
     char_u	*p;
-    int		has_string_literal = FALSE;
+    पूर्णाङ्क		has_string_literal = FALSE;
 
     s = cin_skipcomment(s);
-    if (STRNCMP(s, "extern", 6) == 0 && (s[6] == NUL || !vim_iswordc(s[6])))
+    यदि (STRNCMP(s, "extern", 6) == 0 && (s[6] == NUL || !vim_iswordc(s[6])))
     {
 	p = cin_skipcomment(skipwhite(s + 6));
-	while (*p != NUL)
+	जबसम्म (*p != NUL)
 	{
-	    if (VIM_ISWHITE(*p))
+	    यदि (VIM_ISWHITE(*p))
 	    {
 		p = cin_skipcomment(skipwhite(p));
 	    }
-	    else if (*p == '{')
+	    अन्यथा यदि (*p == '{')
 	    {
-		break;
+		रोक;
 	    }
-	    else if (p[0] == '"' && p[1] == 'C' && p[2] == '"')
+	    अन्यथा यदि (p[0] == '"' && p[1] == 'C' && p[2] == '"')
 	    {
-		if (has_string_literal)
-		    return FALSE;
+		यदि (has_string_literal)
+		    फर्काऊ FALSE;
 		has_string_literal = TRUE;
 		p += 3;
 	    }
-	    else if (p[0] == '"' && p[1] == 'C' && p[2] == '+' && p[3] == '+'
+	    अन्यथा यदि (p[0] == '"' && p[1] == 'C' && p[2] == '+' && p[3] == '+'
 		    && p[4] == '"')
 	    {
-		if (has_string_literal)
-		    return FALSE;
+		यदि (has_string_literal)
+		    फर्काऊ FALSE;
 		has_string_literal = TRUE;
 		p += 5;
 	    }
-	    else
+	    अन्यथा
 	    {
-		return FALSE;
+		फर्काऊ FALSE;
 	    }
 	}
-	return has_string_literal ? TRUE : FALSE;
+	फर्काऊ has_string_literal ? TRUE : FALSE;
     }
-    return FALSE;
+    फर्काऊ FALSE;
 }
 
 /*
@@ -1006,34 +1006,34 @@ cin_is_cpp_extern_c(char_u *s)
  *	  case 234:    a = b;
  *		       ^
  */
-    static char_u *
+    स्थिर char_u *
 after_label(char_u *l)
 {
-    for ( ; *l; ++l)
+    लागि ( ; *l; ++l)
     {
-	if (*l == ':')
+	यदि (*l == ':')
 	{
-	    if (l[1] == ':')	    // skip over "::" for C++
+	    यदि (l[1] == ':')	    // skip over "::" for C++
 		++l;
-	    else if (!cin_iscase(l + 1, FALSE))
-		break;
+	    अन्यथा यदि (!cin_iscase(l + 1, FALSE))
+		रोक;
 	}
-	else if (*l == '\'' && l[1] && l[2] == '\'')
+	अन्यथा यदि (*l == '\'' && l[1] && l[2] == '\'')
 	    l += 2;		    // skip over 'x'
     }
-    if (*l == NUL)
-	return NULL;
+    यदि (*l == NUL)
+	फर्काऊ रिक्त;
     l = cin_skipcomment(l + 1);
-    if (*l == NUL)
-	return NULL;
-    return l;
+    यदि (*l == NUL)
+	फर्काऊ रिक्त;
+    फर्काऊ l;
 }
 
 /*
  * Get indent of line "lnum", skipping a label.
  * Return 0 if there is nothing after the label.
  */
-    static int
+    स्थिर पूर्णाङ्क
 get_indent_nolabel (linenr_T lnum)	// XXX
 {
     char_u	*l;
@@ -1043,13 +1043,13 @@ get_indent_nolabel (linenr_T lnum)	// XXX
 
     l = ml_get(lnum);
     p = after_label(l);
-    if (p == NULL)
-	return 0;
+    यदि (p == रिक्त)
+	फर्काऊ 0;
 
     fp.col = (colnr_T)(p - l);
     fp.lnum = lnum;
-    getvcol(curwin, &fp, &col, NULL, NULL, 0);
-    return (int)col;
+    getvcol(curwin, &fp, &col, रिक्त, रिक्त, 0);
+    फर्काऊ (पूर्णाङ्क)col;
 }
 
 /*
@@ -1058,25 +1058,25 @@ get_indent_nolabel (linenr_T lnum)	// XXX
  *   label:	if (asdf && asdfasdf)
  *		^
  */
-    static int
+    स्थिर पूर्णाङ्क
 skip_label(linenr_T lnum, char_u **pp)
 {
     char_u	*l;
-    int		amount;
+    पूर्णाङ्क		amount;
     pos_T	cursor_save;
 
     cursor_save = curwin->w_cursor;
     curwin->w_cursor.lnum = lnum;
     l = ml_get_curline();
 				    // XXX
-    if (cin_iscase(l, FALSE) || cin_isscopedecl(l) || cin_islabel())
+    यदि (cin_iscase(l, FALSE) || cin_isscopedecl(l) || cin_islabel())
     {
 	amount = get_indent_nolabel(lnum);
 	l = after_label(ml_get_curline());
-	if (l == NULL)		// just in case
+	यदि (l == रिक्त)		// just in case
 	    l = ml_get_curline();
     }
-    else
+    अन्यथा
     {
 	amount = get_indent();
 	l = ml_get_curline();
@@ -1084,7 +1084,7 @@ skip_label(linenr_T lnum, char_u **pp)
     *pp = l;
 
     curwin->w_cursor = cursor_save;
-    return amount;
+    फर्काऊ amount;
 }
 
 /*
@@ -1094,46 +1094,46 @@ skip_label(linenr_T lnum, char_u **pp)
  *  enum bla    c,		indent of "c"
  * Returns zero when it doesn't look like a declaration.
  */
-    static int
-cin_first_id_amount(void)
+    स्थिर पूर्णाङ्क
+cin_first_id_amount(शून्य)
 {
-    char_u	*line, *p, *s;
-    int		len;
+    char_u	*पङ्क्ति, *p, *s;
+    पूर्णाङ्क		len;
     pos_T	fp;
     colnr_T	col;
 
-    line = ml_get_curline();
-    p = skipwhite(line);
-    len = (int)(skiptowhite(p) - p);
-    if (len == 6 && STRNCMP(p, "static", 6) == 0)
+    पङ्क्ति = ml_get_curline();
+    p = skipwhite(पङ्क्ति);
+    len = (पूर्णाङ्क)(skiptowhite(p) - p);
+    यदि (len == 6 && STRNCMP(p, "static", 6) == 0)
     {
 	p = skipwhite(p + 6);
-	len = (int)(skiptowhite(p) - p);
+	len = (पूर्णाङ्क)(skiptowhite(p) - p);
     }
-    if (len == 6 && STRNCMP(p, "struct", 6) == 0)
+    यदि (len == 6 && STRNCMP(p, "struct", 6) == 0)
 	p = skipwhite(p + 6);
-    else if (len == 4 && STRNCMP(p, "enum", 4) == 0)
+    अन्यथा यदि (len == 4 && STRNCMP(p, "enum", 4) == 0)
 	p = skipwhite(p + 4);
-    else if ((len == 8 && STRNCMP(p, "unsigned", 8) == 0)
+    अन्यथा यदि ((len == 8 && STRNCMP(p, "unsigned", 8) == 0)
 	    || (len == 6 && STRNCMP(p, "signed", 6) == 0))
     {
 	s = skipwhite(p + len);
-	if ((STRNCMP(s, "int", 3) == 0 && VIM_ISWHITE(s[3]))
+	यदि ((STRNCMP(s, "int", 3) == 0 && VIM_ISWHITE(s[3]))
 		|| (STRNCMP(s, "long", 4) == 0 && VIM_ISWHITE(s[4]))
 		|| (STRNCMP(s, "short", 5) == 0 && VIM_ISWHITE(s[5]))
 		|| (STRNCMP(s, "char", 4) == 0 && VIM_ISWHITE(s[4])))
 	    p = s;
     }
-    for (len = 0; vim_isIDc(p[len]); ++len)
+    लागि (len = 0; vim_isIDc(p[len]); ++len)
 	;
-    if (len == 0 || !VIM_ISWHITE(p[len]) || cin_nocode(p))
-	return 0;
+    यदि (len == 0 || !VIM_ISWHITE(p[len]) || cin_nocode(p))
+	फर्काऊ 0;
 
     p = skipwhite(p + len);
     fp.lnum = curwin->w_cursor.lnum;
-    fp.col = (colnr_T)(p - line);
-    getvcol(curwin, &fp, &col, NULL, NULL, 0);
-    return (int)col;
+    fp.col = (colnr_T)(p - पङ्क्ति);
+    getvcol(curwin, &fp, &col, रिक्त, रिक्त, 0);
+    फर्काऊ (पूर्णाङ्क)col;
 }
 
 /*
@@ -1145,165 +1145,165 @@ cin_first_id_amount(void)
  *	       asdf\
  *	       here";
  */
-    static int
+    स्थिर पूर्णाङ्क
 cin_get_equal_amount(linenr_T lnum)
 {
-    char_u	*line;
+    char_u	*पङ्क्ति;
     char_u	*s;
     colnr_T	col;
     pos_T	fp;
 
-    if (lnum > 1)
+    यदि (lnum > 1)
     {
-	line = ml_get(lnum - 1);
-	if (*line != NUL && line[STRLEN(line) - 1] == '\\')
-	    return -1;
+	पङ्क्ति = ml_get(lnum - 1);
+	यदि (*पङ्क्ति != NUL && पङ्क्ति[STRLEN(पङ्क्ति) - 1] == '\\')
+	    फर्काऊ -1;
     }
 
-    line = s = ml_get(lnum);
-    while (*s != NUL && vim_strchr((char_u *)"=;{}\"'", *s) == NULL)
+    पङ्क्ति = s = ml_get(lnum);
+    जबसम्म (*s != NUL && vim_strchr((char_u *)"=;{}\"'", *s) == रिक्त)
     {
-	if (cin_iscomment(s))	// ignore comments
+	यदि (cin_iscomment(s))	// ignore comments
 	    s = cin_skipcomment(s);
-	else
+	अन्यथा
 	    ++s;
     }
-    if (*s != '=')
-	return 0;
+    यदि (*s != '=')
+	फर्काऊ 0;
 
     s = skipwhite(s + 1);
-    if (cin_nocode(s))
-	return 0;
+    यदि (cin_nocode(s))
+	फर्काऊ 0;
 
-    if (*s == '"')	// nice alignment for continued strings
+    यदि (*s == '"')	// nice alignment for continued strings
 	++s;
 
     fp.lnum = lnum;
-    fp.col = (colnr_T)(s - line);
-    getvcol(curwin, &fp, &col, NULL, NULL, 0);
-    return (int)col;
+    fp.col = (colnr_T)(s - पङ्क्ति);
+    getvcol(curwin, &fp, &col, रिक्त, रिक्त, 0);
+    फर्काऊ (पूर्णाङ्क)col;
 }
 
 /*
  * Skip strings, chars and comments until at or past "trypos".
  * Return the column found.
  */
-    static int
+    स्थिर पूर्णाङ्क
 cin_skip2pos(pos_T *trypos)
 {
-    char_u	*line;
+    char_u	*पङ्क्ति;
     char_u	*p;
     char_u	*new_p;
 
-    p = line = ml_get(trypos->lnum);
-    while (*p && (colnr_T)(p - line) < trypos->col)
+    p = पङ्क्ति = ml_get(trypos->lnum);
+    जबसम्म (*p && (colnr_T)(p - पङ्क्ति) < trypos->col)
     {
-	if (cin_iscomment(p))
+	यदि (cin_iscomment(p))
 	    p = cin_skipcomment(p);
-	else
+	अन्यथा
 	{
 	    new_p = skip_string(p);
-	    if (new_p == p)
+	    यदि (new_p == p)
 		++p;
-	    else
+	    अन्यथा
 		p = new_p;
 	}
     }
-    return (int)(p - line);
+    फर्काऊ (पूर्णाङ्क)(p - पङ्क्ति);
 }
 
-    static pos_T *
-find_match_char(int c, int ind_maxparen)	// XXX
+    स्थिर pos_T *
+find_match_char(पूर्णाङ्क c, पूर्णाङ्क ind_maxparen)	// XXX
 {
     pos_T	cursor_save;
     pos_T	*trypos;
-    static pos_T pos_copy;
-    int		ind_maxp_wk;
+    स्थिर pos_T pos_copy;
+    पूर्णाङ्क		ind_maxp_wk;
 
     cursor_save = curwin->w_cursor;
     ind_maxp_wk = ind_maxparen;
 retry:
-    if ((trypos = findmatchlimit(NULL, c, FM_SKIPCOMM, ind_maxp_wk)) != NULL)
+    यदि ((trypos = findmatchlimit(रिक्त, c, FM_SKIPCOMM, ind_maxp_wk)) != रिक्त)
     {
 	// check if the ( is in a // comment
-	if ((colnr_T)cin_skip2pos(trypos) > trypos->col)
+	यदि ((colnr_T)cin_skip2pos(trypos) > trypos->col)
 	{
-	    ind_maxp_wk = ind_maxparen - (int)(cursor_save.lnum - trypos->lnum);
-	    if (ind_maxp_wk > 0)
+	    ind_maxp_wk = ind_maxparen - (पूर्णाङ्क)(cursor_save.lnum - trypos->lnum);
+	    यदि (ind_maxp_wk > 0)
 	    {
 		curwin->w_cursor = *trypos;
 		curwin->w_cursor.col = 0;	// XXX
-		goto retry;
+		गच्छ retry;
 	    }
-	    trypos = NULL;
+	    trypos = रिक्त;
 	}
-	else
+	अन्यथा
 	{
 	    pos_T	*trypos_wk;
 
 	    pos_copy = *trypos;	    // copy trypos, findmatch will change it
 	    trypos = &pos_copy;
 	    curwin->w_cursor = *trypos;
-	    if ((trypos_wk = ind_find_start_CORS(NULL)) != NULL) // XXX
+	    यदि ((trypos_wk = ind_find_start_CORS(रिक्त)) != रिक्त) // XXX
 	    {
-		ind_maxp_wk = ind_maxparen - (int)(cursor_save.lnum
+		ind_maxp_wk = ind_maxparen - (पूर्णाङ्क)(cursor_save.lnum
 			- trypos_wk->lnum);
-		if (ind_maxp_wk > 0)
+		यदि (ind_maxp_wk > 0)
 		{
 		    curwin->w_cursor = *trypos_wk;
-		    goto retry;
+		    गच्छ retry;
 		}
-		trypos = NULL;
+		trypos = रिक्त;
 	    }
 	}
     }
     curwin->w_cursor = cursor_save;
-    return trypos;
+    फर्काऊ trypos;
 }
 
 /*
  * Find the matching '(', ignoring it if it is in a comment.
  * Return NULL if no match found.
  */
-    static pos_T *
-find_match_paren(int ind_maxparen)	// XXX
+    स्थिर pos_T *
+find_match_paren(पूर्णाङ्क ind_maxparen)	// XXX
 {
-    return find_match_char('(', ind_maxparen);
+    फर्काऊ find_match_char('(', ind_maxparen);
 }
 
 /*
  * Set w_cursor.col to the column number of the last unmatched ')' or '{' in
  * line "l".  "l" must point to the start of the line.
  */
-    static int
-find_last_paren(char_u *l, int start, int end)
+    स्थिर पूर्णाङ्क
+find_last_paren(char_u *l, पूर्णाङ्क start, पूर्णाङ्क end)
 {
-    int		i;
-    int		retval = FALSE;
-    int		open_count = 0;
+    पूर्णाङ्क		i;
+    पूर्णाङ्क		retval = FALSE;
+    पूर्णाङ्क		open_गन्ती = 0;
 
     curwin->w_cursor.col = 0;		    // default is start of line
 
-    for (i = 0; l[i] != NUL; i++)
+    लागि (i = 0; l[i] != NUL; i++)
     {
-	i = (int)(cin_skipcomment(l + i) - l); // ignore parens in comments
-	if (l[i] == NUL)
-	    break;
-	i = (int)(skip_string(l + i) - l);    // ignore parens in quotes
-	if (l[i] == start)
-	    ++open_count;
-	else if (l[i] == end)
+	i = (पूर्णाङ्क)(cin_skipcomment(l + i) - l); // ignore parens in comments
+	यदि (l[i] == NUL)
+	    रोक;
+	i = (पूर्णाङ्क)(skip_string(l + i) - l);    // ignore parens in quotes
+	यदि (l[i] == start)
+	    ++open_गन्ती;
+	अन्यथा यदि (l[i] == end)
 	{
-	    if (open_count > 0)
-		--open_count;
-	    else
+	    यदि (open_गन्ती > 0)
+		--open_गन्ती;
+	    अन्यथा
 	    {
 		curwin->w_cursor.col = i;
 		retval = TRUE;
 	    }
 	}
     }
-    return retval;
+    फर्काऊ retval;
 }
 
 /*
@@ -1316,7 +1316,7 @@ find_last_paren(char_u *l, int start, int end)
  * "first_lnum" is where we start looking.
  * "min_lnum" is the line before which we will not be looking.
  */
-    static int
+    स्थिर पूर्णाङ्क
 cin_isfuncdecl(
     char_u	**sp,
     linenr_T	first_lnum,
@@ -1325,24 +1325,24 @@ cin_isfuncdecl(
     char_u	*s;
     linenr_T	lnum = first_lnum;
     linenr_T	save_lnum = curwin->w_cursor.lnum;
-    int		retval = FALSE;
+    पूर्णाङ्क		retval = FALSE;
     pos_T	*trypos;
-    int		just_started = TRUE;
+    पूर्णाङ्क		just_started = TRUE;
 
-    if (sp == NULL)
+    यदि (sp == रिक्त)
 	s = ml_get(lnum);
-    else
+    अन्यथा
 	s = *sp;
 
     curwin->w_cursor.lnum = lnum;
-    if (find_last_paren(s, '(', ')')
-	&& (trypos = find_match_paren(curbuf->b_ind_maxparen)) != NULL)
+    यदि (find_last_paren(s, '(', ')')
+	&& (trypos = find_match_paren(curbuf->b_ind_maxparen)) != रिक्त)
     {
 	lnum = trypos->lnum;
-	if (lnum < min_lnum)
+	यदि (lnum < min_lnum)
 	{
 	    curwin->w_cursor.lnum = save_lnum;
-	    return FALSE;
+	    फर्काऊ FALSE;
 	}
 
 	s = ml_get(lnum);
@@ -1350,34 +1350,34 @@ cin_isfuncdecl(
     curwin->w_cursor.lnum = save_lnum;
 
     // Ignore line starting with #.
-    if (cin_ispreproc(s))
-	return FALSE;
+    यदि (cin_ispreproc(s))
+	फर्काऊ FALSE;
 
-    while (*s && *s != '(' && *s != ';' && *s != '\'' && *s != '"')
+    जबसम्म (*s && *s != '(' && *s != ';' && *s != '\'' && *s != '"')
     {
-	if (cin_iscomment(s))	// ignore comments
+	यदि (cin_iscomment(s))	// ignore comments
 	    s = cin_skipcomment(s);
-	else if (*s == ':')
+	अन्यथा यदि (*s == ':')
 	{
-	    if (*(s + 1) == ':')
+	    यदि (*(s + 1) == ':')
 		s += 2;
-	    else
+	    अन्यथा
 		// To avoid a mistake in the following situation:
 		// A::A(int a, int b)
 		//     : a(0)  // <--not a function decl
 		//     , b(0)
 		// {...
-		return FALSE;
+		फर्काऊ FALSE;
 	}
-	else
+	अन्यथा
 	    ++s;
     }
-    if (*s != '(')
-	return FALSE;		// ';', ' or "  before any () or no '('
+    यदि (*s != '(')
+	फर्काऊ FALSE;		// ';', ' or "  before any () or no '('
 
-    while (*s && *s != ';' && *s != '\'' && *s != '"')
+    जबसम्म (*s && *s != ';' && *s != '\'' && *s != '"')
     {
-	if (*s == ')' && cin_nocode(s + 1))
+	यदि (*s == ')' && cin_nocode(s + 1))
 	{
 	    // ')' at the end: may have found a match
 	    // Check for the previous line not to end in a backslash:
@@ -1385,38 +1385,38 @@ cin_isfuncdecl(
 	    //		 defined(y)
 	    lnum = first_lnum - 1;
 	    s = ml_get(lnum);
-	    if (*s == NUL || s[STRLEN(s) - 1] != '\\')
+	    यदि (*s == NUL || s[STRLEN(s) - 1] != '\\')
 		retval = TRUE;
-	    goto done;
+	    गच्छ done;
 	}
-	if ((*s == ',' && cin_nocode(s + 1)) || s[1] == NUL || cin_nocode(s))
+	यदि ((*s == ',' && cin_nocode(s + 1)) || s[1] == NUL || cin_nocode(s))
 	{
-	    int comma = (*s == ',');
+	    पूर्णाङ्क comma = (*s == ',');
 
 	    // ',' at the end: continue looking in the next line.
 	    // At the end: check for ',' in the next line, for this style:
 	    // func(arg1
 	    //       , arg2)
-	    for (;;)
+	    लागि (;;)
 	    {
-		if (lnum >= curbuf->b_ml.ml_line_count)
-		    break;
+		यदि (lnum >= curbuf->b_ml.ml_पङ्क्ति_गन्ती)
+		    रोक;
 		s = ml_get(++lnum);
-		if (!cin_ispreproc(s))
-		    break;
+		यदि (!cin_ispreproc(s))
+		    रोक;
 	    }
-	    if (lnum >= curbuf->b_ml.ml_line_count)
-		break;
+	    यदि (lnum >= curbuf->b_ml.ml_पङ्क्ति_गन्ती)
+		रोक;
 	    // Require a comma at end of the line or a comma or ')' at the
 	    // start of next line.
 	    s = skipwhite(s);
-	    if (!just_started && (!comma && *s != ',' && *s != ')'))
-		break;
+	    यदि (!just_started && (!comma && *s != ',' && *s != ')'))
+		रोक;
 	    just_started = FALSE;
 	}
-	else if (cin_iscomment(s))	// ignore comments
+	अन्यथा यदि (cin_iscomment(s))	// ignore comments
 	    s = cin_skipcomment(s);
-	else
+	अन्यथा
 	{
 	    ++s;
 	    just_started = FALSE;
@@ -1424,22 +1424,22 @@ cin_isfuncdecl(
     }
 
 done:
-    if (lnum != first_lnum && sp != NULL)
+    यदि (lnum != first_lnum && sp != रिक्त)
 	*sp = ml_get(first_lnum);
 
-    return retval;
+    फर्काऊ retval;
 }
 
-    static int
+    स्थिर पूर्णाङ्क
 cin_isif(char_u *p)
 {
-    return (STRNCMP(p, "if", 2) == 0 && !vim_isIDc(p[2]));
+    फर्काऊ (STRNCMP(p, "if", 2) == 0 && !vim_isIDc(p[2]));
 }
 
-    static int
+    स्थिर पूर्णाङ्क
 cin_isdo(char_u *p)
 {
-    return (STRNCMP(p, "do", 2) == 0 && !vim_isIDc(p[2]));
+    फर्काऊ (STRNCMP(p, "do", 2) == 0 && !vim_isIDc(p[2]));
 }
 
 /*
@@ -1447,34 +1447,34 @@ cin_isdo(char_u *p)
  * We only accept a "while (condition) ;", with only white space between the
  * ')' and ';'. The condition may be spread over several lines.
  */
-    static int
+    स्थिर पूर्णाङ्क
 cin_iswhileofdo (char_u *p, linenr_T lnum)	// XXX
 {
     pos_T	cursor_save;
     pos_T	*trypos;
-    int		retval = FALSE;
+    पूर्णाङ्क		retval = FALSE;
 
     p = cin_skipcomment(p);
-    if (*p == '}')		// accept "} while (cond);"
+    यदि (*p == '}')		// accept "} while (cond);"
 	p = cin_skipcomment(p + 1);
-    if (cin_starts_with(p, "while"))
+    यदि (cin_starts_with(p, "while"))
     {
 	cursor_save = curwin->w_cursor;
 	curwin->w_cursor.lnum = lnum;
 	curwin->w_cursor.col = 0;
 	p = ml_get_curline();
-	while (*p && *p != 'w')	// skip any '}', until the 'w' of the "while"
+	जबसम्म (*p && *p != 'w')	// skip any '}', until the 'w' of the "while"
 	{
 	    ++p;
 	    ++curwin->w_cursor.col;
 	}
-	if ((trypos = findmatchlimit(NULL, 0, FM_SKIPCOMM,
-					      curbuf->b_ind_maxparen)) != NULL
+	यदि ((trypos = findmatchlimit(रिक्त, 0, FM_SKIPCOMM,
+					      curbuf->b_ind_maxparen)) != रिक्त
 		&& *cin_skipcomment(ml_get_pos(trypos) + 1) == ';')
 	    retval = TRUE;
 	curwin->w_cursor = cursor_save;
     }
-    return retval;
+    फर्काऊ retval;
 }
 
 /*
@@ -1483,42 +1483,42 @@ cin_iswhileofdo (char_u *p, linenr_T lnum)	// XXX
  * Otherwise return !0 and update "*poffset" to point to the place where the
  * string was found.
  */
-    static int
-cin_is_if_for_while_before_offset(char_u *line, int *poffset)
+    स्थिर पूर्णाङ्क
+cin_is_if_for_while_before_offset(char_u *पङ्क्ति, पूर्णाङ्क *poffset)
 {
-    int offset = *poffset;
+    पूर्णाङ्क offset = *poffset;
 
-    if (offset-- < 2)
-	return 0;
-    while (offset > 2 && VIM_ISWHITE(line[offset]))
+    यदि (offset-- < 2)
+	फर्काऊ 0;
+    जबसम्म (offset > 2 && VIM_ISWHITE(पङ्क्ति[offset]))
 	--offset;
 
     offset -= 1;
-    if (STRNCMP(line + offset, "if", 2) == 0)
-	goto probablyFound;
+    यदि (STRNCMP(पङ्क्ति + offset, "if", 2) == 0)
+	गच्छ probablyFound;
 
-    if (offset >= 1)
+    यदि (offset >= 1)
     {
 	offset -= 1;
-	if (STRNCMP(line + offset, "for", 3) == 0)
-	    goto probablyFound;
+	यदि (STRNCMP(पङ्क्ति + offset, "for", 3) == 0)
+	    गच्छ probablyFound;
 
-	if (offset >= 2)
+	यदि (offset >= 2)
 	{
 	    offset -= 2;
-	    if (STRNCMP(line + offset, "while", 5) == 0)
-		goto probablyFound;
+	    यदि (STRNCMP(पङ्क्ति + offset, "while", 5) == 0)
+		गच्छ probablyFound;
 	}
     }
-    return 0;
+    फर्काऊ 0;
 
 probablyFound:
-    if (!offset || !vim_isIDc(line[offset - 1]))
+    यदि (!offset || !vim_isIDc(पङ्क्ति[offset - 1]))
     {
 	*poffset = offset;
-	return 1;
+	फर्काऊ 1;
     }
-    return 0;
+    फर्काऊ 0;
 }
 
 /*
@@ -1529,59 +1529,59 @@ probablyFound:
  *	       && bar);  <-- here
  * Adjust the cursor to the line with "while".
  */
-    static int
-cin_iswhileofdo_end(int terminated)
+    स्थिर पूर्णाङ्क
+cin_iswhileofdo_end(पूर्णाङ्क terminated)
 {
-    char_u	*line;
+    char_u	*पङ्क्ति;
     char_u	*p;
     char_u	*s;
     pos_T	*trypos;
-    int		i;
+    पूर्णाङ्क		i;
 
-    if (terminated != ';')	// there must be a ';' at the end
-	return FALSE;
+    यदि (terminated != ';')	// there must be a ';' at the end
+	फर्काऊ FALSE;
 
-    p = line = ml_get_curline();
-    while (*p != NUL)
+    p = पङ्क्ति = ml_get_curline();
+    जबसम्म (*p != NUL)
     {
 	p = cin_skipcomment(p);
-	if (*p == ')')
+	यदि (*p == ')')
 	{
 	    s = skipwhite(p + 1);
-	    if (*s == ';' && cin_nocode(s + 1))
+	    यदि (*s == ';' && cin_nocode(s + 1))
 	    {
 		// Found ");" at end of the line, now check there is "while"
 		// before the matching '('.  XXX
-		i = (int)(p - line);
+		i = (पूर्णाङ्क)(p - पङ्क्ति);
 		curwin->w_cursor.col = i;
 		trypos = find_match_paren(curbuf->b_ind_maxparen);
-		if (trypos != NULL)
+		यदि (trypos != रिक्त)
 		{
 		    s = cin_skipcomment(ml_get(trypos->lnum));
-		    if (*s == '}')		// accept "} while (cond);"
+		    यदि (*s == '}')		// accept "} while (cond);"
 			s = cin_skipcomment(s + 1);
-		    if (cin_starts_with(s, "while"))
+		    यदि (cin_starts_with(s, "while"))
 		    {
 			curwin->w_cursor.lnum = trypos->lnum;
-			return TRUE;
+			फर्काऊ TRUE;
 		    }
 		}
 
 		// Searching may have made "line" invalid, get it again.
-		line = ml_get_curline();
-		p = line + i;
+		पङ्क्ति = ml_get_curline();
+		p = पङ्क्ति + i;
 	    }
 	}
-	if (*p != NUL)
+	यदि (*p != NUL)
 	    ++p;
     }
-    return FALSE;
+    फर्काऊ FALSE;
 }
 
-    static int
+    स्थिर पूर्णाङ्क
 cin_isbreak(char_u *p)
 {
-    return (STRNCMP(p, "break", 5) == 0 && !vim_isIDc(p[5]));
+    फर्काऊ (STRNCMP(p, "break", 5) == 0 && !vim_isIDc(p[5]));
 }
 
 /*
@@ -1597,27 +1597,27 @@ cin_isbreak(char_u *p)
  *
  * This is a lot of guessing.  Watch out for "cond ? func() : foo".
  */
-    static int
+    स्थिर पूर्णाङ्क
 cin_is_cpp_baseclass(
     cpp_baseclass_cache_T *cached) // input and output
 {
     lpos_T	*pos = &cached->lpos;	    // find position
     char_u	*s;
-    int		class_or_struct, lookfor_ctor_init, cpp_base_class;
+    पूर्णाङ्क		class_or_struct, lookfor_ctor_init, cpp_base_class;
     linenr_T	lnum = curwin->w_cursor.lnum;
-    char_u	*line = ml_get_curline();
+    char_u	*पङ्क्ति = ml_get_curline();
 
-    if (pos->lnum <= lnum)
-	return cached->found;	// Use the cached result
+    यदि (pos->lnum <= lnum)
+	फर्काऊ cached->found;	// Use the cached result
 
     pos->col = 0;
 
-    s = skipwhite(line);
-    if (*s == '#')		// skip #define FOO x ? (x) : x
-	return FALSE;
+    s = skipwhite(पङ्क्ति);
+    यदि (*s == '#')		// skip #define FOO x ? (x) : x
+	फर्काऊ FALSE;
     s = cin_skipcomment(s);
-    if (*s == NUL)
-	return FALSE;
+    यदि (*s == NUL)
+	फर्काऊ FALSE;
 
     cpp_base_class = lookfor_ctor_init = class_or_struct = FALSE;
 
@@ -1633,61 +1633,61 @@ cin_is_cpp_baseclass(
     //		: something(4),
     //		somethingelse(3)
     //	{}
-    while (lnum > 1)
+    जबसम्म (lnum > 1)
     {
-	line = ml_get(lnum - 1);
-	s = skipwhite(line);
-	if (*s == '#' || *s == NUL)
-	    break;
-	while (*s != NUL)
+	पङ्क्ति = ml_get(lnum - 1);
+	s = skipwhite(पङ्क्ति);
+	यदि (*s == '#' || *s == NUL)
+	    रोक;
+	जबसम्म (*s != NUL)
 	{
 	    s = cin_skipcomment(s);
-	    if (*s == '{' || *s == '}'
+	    यदि (*s == '{' || *s == '}'
 		    || (*s == ';' && cin_nocode(s + 1)))
-		break;
-	    if (*s != NUL)
+		रोक;
+	    यदि (*s != NUL)
 		++s;
 	}
-	if (*s != NUL)
-	    break;
+	यदि (*s != NUL)
+	    रोक;
 	--lnum;
     }
 
     pos->lnum = lnum;
-    line = ml_get(lnum);
-    s = line;
-    for (;;)
+    पङ्क्ति = ml_get(lnum);
+    s = पङ्क्ति;
+    लागि (;;)
     {
-	if (*s == NUL)
+	यदि (*s == NUL)
 	{
-	    if (lnum == curwin->w_cursor.lnum)
-		break;
+	    यदि (lnum == curwin->w_cursor.lnum)
+		रोक;
 	    // Continue in the cursor line.
-	    line = ml_get(++lnum);
-	    s = line;
+	    पङ्क्ति = ml_get(++lnum);
+	    s = पङ्क्ति;
 	}
-	if (s == line)
+	यदि (s == पङ्क्ति)
 	{
 	    // don't recognize "case (foo):" as a baseclass
-	    if (cin_iscase(s, FALSE))
-		break;
-	    s = cin_skipcomment(line);
-	    if (*s == NUL)
-		continue;
+	    यदि (cin_iscase(s, FALSE))
+		रोक;
+	    s = cin_skipcomment(पङ्क्ति);
+	    यदि (*s == NUL)
+		जारी;
 	}
 
-	if (s[0] == '"' || (s[0] == 'R' && s[1] == '"'))
+	यदि (s[0] == '"' || (s[0] == 'R' && s[1] == '"'))
 	    s = skip_string(s) + 1;
-	else if (s[0] == ':')
+	अन्यथा यदि (s[0] == ':')
 	{
-	    if (s[1] == ':')
+	    यदि (s[1] == ':')
 	    {
 		// skip double colon. It can't be a constructor
 		// initialization any more
 		lookfor_ctor_init = FALSE;
 		s = cin_skipcomment(s + 2);
 	    }
-	    else if (lookfor_ctor_init || class_or_struct)
+	    अन्यथा यदि (lookfor_ctor_init || class_or_struct)
 	    {
 		// we have something found, that looks like the start of
 		// cpp-base-class-declaration or constructor-initialization
@@ -1696,56 +1696,56 @@ cin_is_cpp_baseclass(
 		pos->col = 0;
 		s = cin_skipcomment(s + 1);
 	    }
-	    else
+	    अन्यथा
 		s = cin_skipcomment(s + 1);
 	}
-	else if ((STRNCMP(s, "class", 5) == 0 && !vim_isIDc(s[5]))
+	अन्यथा यदि ((STRNCMP(s, "class", 5) == 0 && !vim_isIDc(s[5]))
 		|| (STRNCMP(s, "struct", 6) == 0 && !vim_isIDc(s[6])))
 	{
 	    class_or_struct = TRUE;
 	    lookfor_ctor_init = FALSE;
 
-	    if (*s == 'c')
+	    यदि (*s == 'c')
 		s = cin_skipcomment(s + 5);
-	    else
+	    अन्यथा
 		s = cin_skipcomment(s + 6);
 	}
-	else
+	अन्यथा
 	{
-	    if (s[0] == '{' || s[0] == '}' || s[0] == ';')
+	    यदि (s[0] == '{' || s[0] == '}' || s[0] == ';')
 	    {
 		cpp_base_class = lookfor_ctor_init = class_or_struct = FALSE;
 	    }
-	    else if (s[0] == ')')
+	    अन्यथा यदि (s[0] == ')')
 	    {
 		// Constructor-initialization is assumed if we come across
 		// something like "):"
 		class_or_struct = FALSE;
 		lookfor_ctor_init = TRUE;
 	    }
-	    else if (s[0] == '?')
+	    अन्यथा यदि (s[0] == '?')
 	    {
 		// Avoid seeing '() :' after '?' as constructor init.
-		return FALSE;
+		फर्काऊ FALSE;
 	    }
-	    else if (!vim_isIDc(s[0]))
+	    अन्यथा यदि (!vim_isIDc(s[0]))
 	    {
 		// if it is not an identifier, we are wrong
 		class_or_struct = FALSE;
 		lookfor_ctor_init = FALSE;
 	    }
-	    else if (pos->col == 0)
+	    अन्यथा यदि (pos->col == 0)
 	    {
 		// it can't be a constructor-initialization any more
 		lookfor_ctor_init = FALSE;
 
 		// the first statement starts here: lineup with this one...
-		if (cpp_base_class)
-		    pos->col = (colnr_T)(s - line);
+		यदि (cpp_base_class)
+		    pos->col = (colnr_T)(s - पङ्क्ति);
 	    }
 
 	    // When the line ends in a comma don't align with it.
-	    if (lnum == curwin->w_cursor.lnum && *s == ',' && cin_nocode(s + 1))
+	    यदि (lnum == curwin->w_cursor.lnum && *s == ',' && cin_nocode(s + 1))
 		pos->col = 0;
 
 	    s = cin_skipcomment(s + 1);
@@ -1753,36 +1753,36 @@ cin_is_cpp_baseclass(
     }
 
     cached->found = cpp_base_class;
-    if (cpp_base_class)
+    यदि (cpp_base_class)
 	pos->lnum = lnum;
-    return cpp_base_class;
+    फर्काऊ cpp_base_class;
 }
 
-    static int
-get_baseclass_amount(int col)
+    स्थिर पूर्णाङ्क
+get_baseclass_amount(पूर्णाङ्क col)
 {
-    int		amount;
+    पूर्णाङ्क		amount;
     colnr_T	vcol;
     pos_T	*trypos;
 
-    if (col == 0)
+    यदि (col == 0)
     {
 	amount = get_indent();
-	if (find_last_paren(ml_get_curline(), '(', ')')
-		&& (trypos = find_match_paren(curbuf->b_ind_maxparen)) != NULL)
+	यदि (find_last_paren(ml_get_curline(), '(', ')')
+		&& (trypos = find_match_paren(curbuf->b_ind_maxparen)) != रिक्त)
 	    amount = get_indent_lnum(trypos->lnum); // XXX
-	if (!cin_ends_in(ml_get_curline(), (char_u *)","))
+	यदि (!cin_ends_in(ml_get_curline(), (char_u *)","))
 	    amount += curbuf->b_ind_cpp_baseclass;
     }
-    else
+    अन्यथा
     {
 	curwin->w_cursor.col = col;
-	getvcol(curwin, &curwin->w_cursor, &vcol, NULL, NULL, 0);
-	amount = (int)vcol;
+	getvcol(curwin, &curwin->w_cursor, &vcol, रिक्त, रिक्त, 0);
+	amount = (पूर्णाङ्क)vcol;
     }
-    if (amount < curbuf->b_ind_cpp_baseclass)
+    यदि (amount < curbuf->b_ind_cpp_baseclass)
 	amount = curbuf->b_ind_cpp_baseclass;
-    return amount;
+    फर्काऊ amount;
 }
 
 /*
@@ -1795,30 +1795,30 @@ get_baseclass_amount(int col)
 // {
 // }
 
-    static pos_T *
-find_start_brace(void)	    // XXX
+    स्थिर pos_T *
+find_start_brace(शून्य)	    // XXX
 {
     pos_T	    cursor_save;
     pos_T	    *trypos;
     pos_T	    *pos;
-    static pos_T    pos_copy;
+    स्थिर pos_T    pos_copy;
 
     cursor_save = curwin->w_cursor;
-    while ((trypos = findmatchlimit(NULL, '{', FM_BLOCKSTOP | FM_SKIPCOMM, 0)) != NULL)
+    जबसम्म ((trypos = findmatchlimit(रिक्त, '{', FM_BLOCKSTOP | FM_SKIPCOMM, 0)) != रिक्त)
     {
 	pos_copy = *trypos;	// copy pos_T, next findmatch will change it
 	trypos = &pos_copy;
 	curwin->w_cursor = *trypos;
-	pos = NULL;
+	pos = रिक्त;
 	// ignore the { if it's in a // or / *  * / comment
-	if ((colnr_T)cin_skip2pos(trypos) == trypos->col
-		       && (pos = ind_find_start_CORS(NULL)) == NULL) // XXX
-	    break;
-	if (pos != NULL)
+	यदि ((colnr_T)cin_skip2pos(trypos) == trypos->col
+		       && (pos = ind_find_start_CORS(रिक्त)) == रिक्त) // XXX
+	    रोक;
+	यदि (pos != रिक्त)
 	    curwin->w_cursor = *pos;
     }
     curwin->w_cursor = cursor_save;
-    return trypos;
+    फर्काऊ trypos;
 }
 
 /*
@@ -1826,24 +1826,24 @@ find_start_brace(void)	    // XXX
  * unmatched {.
  * Return NULL if no match found.
  */
-    static pos_T *
-find_match_paren_after_brace (int ind_maxparen)	    // XXX
+    स्थिर pos_T *
+find_match_paren_after_brace (पूर्णाङ्क ind_maxparen)	    // XXX
 {
     pos_T	*trypos = find_match_paren(ind_maxparen);
 
-    if (trypos == NULL)
-	return NULL;
+    यदि (trypos == रिक्त)
+	फर्काऊ रिक्त;
 
     pos_T	*tryposBrace = find_start_brace();
 
     // If both an unmatched '(' and '{' is found.  Ignore the '('
     // position if the '{' is further down.
-    if (tryposBrace != NULL
+    यदि (tryposBrace != रिक्त
 	    && (trypos->lnum != tryposBrace->lnum
 		? trypos->lnum < tryposBrace->lnum
 		: trypos->col < tryposBrace->col))
-	trypos = NULL;
-    return trypos;
+	trypos = रिक्त;
+    फर्काऊ trypos;
 }
 
 /*
@@ -1852,37 +1852,37 @@ find_match_paren_after_brace (int ind_maxparen)	    // XXX
  * matching paren above the cursor line doesn't find a match because of
  * looking a few lines further.
  */
-    static int
+    स्थिर पूर्णाङ्क
 corr_ind_maxparen(pos_T *startpos)
 {
-    long	n = (long)startpos->lnum - (long)curwin->w_cursor.lnum;
+    दीर्घ	n = (दीर्घ)startpos->lnum - (दीर्घ)curwin->w_cursor.lnum;
 
-    if (n > 0 && n < curbuf->b_ind_maxparen / 2)
-	return curbuf->b_ind_maxparen - (int)n;
-    return curbuf->b_ind_maxparen;
+    यदि (n > 0 && n < curbuf->b_ind_maxparen / 2)
+	फर्काऊ curbuf->b_ind_maxparen - (पूर्णाङ्क)n;
+    फर्काऊ curbuf->b_ind_maxparen;
 }
 
 /*
  * Parse 'cinoptions' and set the values in "curbuf".
  * Must be called when 'cinoptions', 'shiftwidth' and/or 'tabstop' changes.
  */
-    void
+    शून्य
 parse_cino(buf_T *buf)
 {
     char_u	*p;
     char_u	*l;
     char_u	*digits;
     vimlong_T	n;
-    int		divider;
-    int		fraction = 0;
-    int		sw;
-    long	t = get_sw_value(buf);
+    पूर्णाङ्क		divider;
+    पूर्णाङ्क		fraction = 0;
+    पूर्णाङ्क		sw;
+    दीर्घ	t = get_sw_मान(buf);
 
     // needed for cino-(, it will be multiplied by 2 again
-    if (t > INT_MAX / 2)
-	sw = INT_MAX / 2;
-    else
-	sw = (int)t;
+    यदि (t > पूर्णांक_उच्च / 2)
+	sw = पूर्णांक_उच्च / 2;
+    अन्यथा
+	sw = (पूर्णाङ्क)t;
 
     // Set the default values.
 
@@ -1912,7 +1912,7 @@ parse_cino(buf_T *buf)
 
     // Spaces from the edge of the line an open brace sitting in the leftmost
     // column is imagined to be.
-    buf->b_ind_open_left_imag = 0;
+    buf->b_ind_open_बायाँ_imag = 0;
 
     // Spaces jump labels should be shifted to the left if N is non-negative,
     // otherwise the jump label will be put to column 1.
@@ -2016,105 +2016,105 @@ parse_cino(buf_T *buf)
     // Handle C #pragma directives
     buf->b_ind_pragma = 0;
 
-    for (p = buf->b_p_cino; *p; )
+    लागि (p = buf->b_p_cino; *p; )
     {
 	l = p++;
-	if (*p == '-')
+	यदि (*p == '-')
 	    ++p;
 	digits = p;	    // remember where the digits start
 	n = getdigits(&p);
 	divider = 0;
-	if (*p == '.')	    // ".5s" means a fraction
+	यदि (*p == '.')	    // ".5s" means a fraction
 	{
-	    fraction = atol((char *)++p);
-	    while (VIM_ISDIGIT(*p))
+	    fraction = म_से_द((वर्ण *)++p);
+	    जबसम्म (VIM_ISDIGIT(*p))
 	    {
 		++p;
-		if (divider)
+		यदि (divider)
 		    divider *= 10;
-		else
+		अन्यथा
 		    divider = 10;
 	    }
 	}
-	if (*p == 's')	    // "2s" means two times 'shiftwidth'
+	यदि (*p == 's')	    // "2s" means two times 'shiftwidth'
 	{
-	    if (p == digits)
+	    यदि (p == digits)
 		n = sw;	// just "s" is one 'shiftwidth'
-	    else
+	    अन्यथा
 	    {
 		n *= sw;
-		if (divider)
+		यदि (divider)
 		    n += ((vimlong_T)sw * fraction + divider / 2) / divider;
 	    }
 	    ++p;
 	}
-	if (l[1] == '-')
+	यदि (l[1] == '-')
 	    n = -n;
 
 	n = trim_to_int(n);
 
 	// When adding an entry here, also update the default 'cinoptions' in
 	// doc/indent.txt, and add explanation for it!
-	switch (*l)
+	विकल्प (*l)
 	{
-	    case '>': buf->b_ind_level = (int)n; break;
-	    case 'e': buf->b_ind_open_imag = (int)n; break;
-	    case 'n': buf->b_ind_no_brace = (int)n; break;
-	    case 'f': buf->b_ind_first_open = (int)n; break;
-	    case '{': buf->b_ind_open_extra = (int)n; break;
-	    case '}': buf->b_ind_close_extra = (int)n; break;
-	    case '^': buf->b_ind_open_left_imag = (int)n; break;
-	    case 'L': buf->b_ind_jump_label = (int)n; break;
-	    case ':': buf->b_ind_case = (int)n; break;
-	    case '=': buf->b_ind_case_code = (int)n; break;
-	    case 'b': buf->b_ind_case_break = (int)n; break;
-	    case 'p': buf->b_ind_param = (int)n; break;
-	    case 't': buf->b_ind_func_type = (int)n; break;
-	    case '/': buf->b_ind_comment = (int)n; break;
-	    case 'c': buf->b_ind_in_comment = (int)n; break;
-	    case 'C': buf->b_ind_in_comment2 = (int)n; break;
-	    case 'i': buf->b_ind_cpp_baseclass = (int)n; break;
-	    case '+': buf->b_ind_continuation = (int)n; break;
-	    case '(': buf->b_ind_unclosed = (int)n; break;
-	    case 'u': buf->b_ind_unclosed2 = (int)n; break;
-	    case 'U': buf->b_ind_unclosed_noignore = (int)n; break;
-	    case 'W': buf->b_ind_unclosed_wrapped = (int)n; break;
-	    case 'w': buf->b_ind_unclosed_whiteok = (int)n; break;
-	    case 'm': buf->b_ind_matching_paren = (int)n; break;
-	    case 'M': buf->b_ind_paren_prev = (int)n; break;
-	    case ')': buf->b_ind_maxparen = (int)n; break;
-	    case '*': buf->b_ind_maxcomment = (int)n; break;
-	    case 'g': buf->b_ind_scopedecl = (int)n; break;
-	    case 'h': buf->b_ind_scopedecl_code = (int)n; break;
-	    case 'j': buf->b_ind_java = (int)n; break;
-	    case 'J': buf->b_ind_js = (int)n; break;
-	    case 'l': buf->b_ind_keep_case_label = (int)n; break;
-	    case '#': buf->b_ind_hash_comment = (int)n; break;
-	    case 'N': buf->b_ind_cpp_namespace = (int)n; break;
-	    case 'k': buf->b_ind_if_for_while = (int)n; break;
-	    case 'E': buf->b_ind_cpp_extern_c = (int)n; break;
-	    case 'P': buf->b_ind_pragma = (int)n; break;
+	    पक्ष '>': buf->b_ind_level = (पूर्णाङ्क)n; रोक;
+	    पक्ष 'e': buf->b_ind_open_imag = (पूर्णाङ्क)n; रोक;
+	    पक्ष 'n': buf->b_ind_no_brace = (पूर्णाङ्क)n; रोक;
+	    पक्ष 'f': buf->b_ind_first_open = (पूर्णाङ्क)n; रोक;
+	    पक्ष '{': buf->b_ind_open_extra = (पूर्णाङ्क)n; रोक;
+	    पक्ष '}': buf->b_ind_close_extra = (पूर्णाङ्क)n; रोक;
+	    पक्ष '^': buf->b_ind_open_बायाँ_imag = (पूर्णाङ्क)n; रोक;
+	    पक्ष 'L': buf->b_ind_jump_label = (पूर्णाङ्क)n; रोक;
+	    पक्ष ':': buf->b_ind_case = (पूर्णाङ्क)n; रोक;
+	    पक्ष '=': buf->b_ind_case_code = (पूर्णाङ्क)n; रोक;
+	    पक्ष 'b': buf->b_ind_case_break = (पूर्णाङ्क)n; रोक;
+	    पक्ष 'p': buf->b_ind_param = (पूर्णाङ्क)n; रोक;
+	    पक्ष 't': buf->b_ind_func_type = (पूर्णाङ्क)n; रोक;
+	    पक्ष '/': buf->b_ind_comment = (पूर्णाङ्क)n; रोक;
+	    पक्ष 'c': buf->b_ind_in_comment = (पूर्णाङ्क)n; रोक;
+	    पक्ष 'C': buf->b_ind_in_comment2 = (पूर्णाङ्क)n; रोक;
+	    पक्ष 'i': buf->b_ind_cpp_baseclass = (पूर्णाङ्क)n; रोक;
+	    पक्ष '+': buf->b_ind_continuation = (पूर्णाङ्क)n; रोक;
+	    पक्ष '(': buf->b_ind_unclosed = (पूर्णाङ्क)n; रोक;
+	    पक्ष 'u': buf->b_ind_unclosed2 = (पूर्णाङ्क)n; रोक;
+	    पक्ष 'U': buf->b_ind_unclosed_noignore = (पूर्णाङ्क)n; रोक;
+	    पक्ष 'W': buf->b_ind_unclosed_wrapped = (पूर्णाङ्क)n; रोक;
+	    पक्ष 'w': buf->b_ind_unclosed_whiteok = (पूर्णाङ्क)n; रोक;
+	    पक्ष 'm': buf->b_ind_matching_paren = (पूर्णाङ्क)n; रोक;
+	    पक्ष 'M': buf->b_ind_paren_prev = (पूर्णाङ्क)n; रोक;
+	    पक्ष ')': buf->b_ind_maxparen = (पूर्णाङ्क)n; रोक;
+	    पक्ष '*': buf->b_ind_maxcomment = (पूर्णाङ्क)n; रोक;
+	    पक्ष 'g': buf->b_ind_scopedecl = (पूर्णाङ्क)n; रोक;
+	    पक्ष 'h': buf->b_ind_scopedecl_code = (पूर्णाङ्क)n; रोक;
+	    पक्ष 'j': buf->b_ind_java = (पूर्णाङ्क)n; रोक;
+	    पक्ष 'J': buf->b_ind_js = (पूर्णाङ्क)n; रोक;
+	    पक्ष 'l': buf->b_ind_keep_case_label = (पूर्णाङ्क)n; रोक;
+	    पक्ष '#': buf->b_ind_hash_comment = (पूर्णाङ्क)n; रोक;
+	    पक्ष 'N': buf->b_ind_cpp_namespace = (पूर्णाङ्क)n; रोक;
+	    पक्ष 'k': buf->b_ind_if_for_while = (पूर्णाङ्क)n; रोक;
+	    पक्ष 'E': buf->b_ind_cpp_extern_c = (पूर्णाङ्क)n; रोक;
+	    पक्ष 'P': buf->b_ind_pragma = (पूर्णाङ्क)n; रोक;
 	}
-	if (*p == ',')
+	यदि (*p == ',')
 	    ++p;
     }
 }
 
-    static int
-find_match(int lookfor, linenr_T ourscope)
+    स्थिर पूर्णाङ्क
+find_match(पूर्णाङ्क lookfor, linenr_T ourscope)
 {
     char_u	*look;
     pos_T	*theirscope;
     char_u	*mightbeif;
-    int		elselevel;
-    int		whilelevel;
+    पूर्णाङ्क		elselevel;
+    पूर्णाङ्क		whilelevel;
 
-    if (lookfor == LOOKFOR_IF)
+    यदि (lookfor == LOOKFOR_IF)
     {
 	elselevel = 1;
 	whilelevel = 0;
     }
-    else
+    अन्यथा
     {
 	elselevel = 0;
 	whilelevel = 1;
@@ -2122,13 +2122,13 @@ find_match(int lookfor, linenr_T ourscope)
 
     curwin->w_cursor.col = 0;
 
-    while (curwin->w_cursor.lnum > ourscope + 1)
+    जबसम्म (curwin->w_cursor.lnum > ourscope + 1)
     {
 	curwin->w_cursor.lnum--;
 	curwin->w_cursor.col = 0;
 
 	look = cin_skipcomment(ml_get_curline());
-	if (cin_iselse(look)
+	यदि (cin_iselse(look)
 		|| cin_isif(look)
 		|| cin_isdo(look)			    // XXX
 		|| cin_iswhileofdo(look, curwin->w_cursor.lnum))
@@ -2136,90 +2136,90 @@ find_match(int lookfor, linenr_T ourscope)
 	    // if we've gone outside the braces entirely,
 	    // we must be out of scope...
 	    theirscope = find_start_brace();  // XXX
-	    if (theirscope == NULL)
-		break;
+	    यदि (theirscope == रिक्त)
+		रोक;
 
 	    // and if the brace enclosing this is further
 	    // back than the one enclosing the else, we're
 	    // out of luck too.
-	    if (theirscope->lnum < ourscope)
-		break;
+	    यदि (theirscope->lnum < ourscope)
+		रोक;
 
 	    // and if they're enclosed in a *deeper* brace,
 	    // then we can ignore it because it's in a
 	    // different scope...
-	    if (theirscope->lnum > ourscope)
-		continue;
+	    यदि (theirscope->lnum > ourscope)
+		जारी;
 
 	    look = cin_skipcomment(ml_get_curline());
 	    // When looking for if, we ignore "if" and "else" in a deeper do-while loop.
-	    if (!(lookfor == LOOKFOR_IF && whilelevel))
+	    यदि (!(lookfor == LOOKFOR_IF && whilelevel))
 	    {
 		// if it was an "else" (that's not an "else if")
 		// then we need to go back to another if, so
 		// increment elselevel
-		if (cin_iselse(look))
+		यदि (cin_iselse(look))
 		{
 		    mightbeif = cin_skipcomment(look + 4);
-		    if (!cin_isif(mightbeif))
+		    यदि (!cin_isif(mightbeif))
 			++elselevel;
-		    continue;
+		    जारी;
 		}
 
 		// If it's an "if" decrement elselevel
-		if (cin_isif(look))
+		यदि (cin_isif(look))
 		{
 		    elselevel--;
 		    // When looking for an "if" ignore "while"s that
 		    // get in the way.
-		    if (elselevel == 0 && lookfor == LOOKFOR_IF)
+		    यदि (elselevel == 0 && lookfor == LOOKFOR_IF)
 			whilelevel = 0;
 		}
 	    }
 
 	    // if it was a "while" then we need to go back to
 	    // another "do", so increment whilelevel.  XXX
-	    if (cin_iswhileofdo(look, curwin->w_cursor.lnum))
+	    यदि (cin_iswhileofdo(look, curwin->w_cursor.lnum))
 	    {
 		++whilelevel;
-		continue;
+		जारी;
 	    }
 
 	    // If it's a "do" decrement whilelevel
-	    if (cin_isdo(look))
+	    यदि (cin_isdo(look))
 		whilelevel--;
 
 	    // if we've used up all the elses, then
 	    // this must be the if that we want!
 	    // match the indent level of that if.
-	    if (elselevel <= 0 && whilelevel <= 0)
-		return OK;
+	    यदि (elselevel <= 0 && whilelevel <= 0)
+		फर्काऊ OK;
 	}
     }
-    return FAIL;
+    फर्काऊ FAIL;
 }
 
 /*
  * Return the desired indent for C code.
  * Return -1 if the indent should be left alone (inside a raw string).
  */
-    int
-get_c_indent(void)
+    पूर्णाङ्क
+get_c_indent(शून्य)
 {
     pos_T	cur_curpos;
-    int		amount;
-    int		scope_amount;
-    int		cur_amount = MAXCOL;
+    पूर्णाङ्क		amount;
+    पूर्णाङ्क		scope_amount;
+    पूर्णाङ्क		cur_amount = MAXCOL;
     colnr_T	col;
     char_u	*theline;
     char_u	*linecopy;
     pos_T	*trypos;
     pos_T	*comment_pos;
-    pos_T	*tryposBrace = NULL;
+    pos_T	*tryposBrace = रिक्त;
     pos_T	tryposCopy;
     pos_T	our_paren_pos;
     char_u	*start;
-    int		start_brace;
+    पूर्णाङ्क		start_brace;
 #define BRACE_IN_COL0		1	    // '{' is in column 0
 #define BRACE_AT_START		2	    // '{' is at start of line
 #define BRACE_AT_END		3	    // '{' is at end of line
@@ -2227,43 +2227,43 @@ get_c_indent(void)
     char_u	*l;
     char_u	*look;
     char_u	terminated;
-    int		lookfor;
-    int		whilelevel;
+    पूर्णाङ्क		lookfor;
+    पूर्णाङ्क		whilelevel;
     linenr_T	lnum;
-    int		n;
-    int		iscase;
-    int		lookfor_break;
-    int		lookfor_cpp_namespace = FALSE;
-    int		cont_amount = 0;    // amount for continuation line
-    int		original_line_islabel;
-    int		added_to_amount = 0;
-    int		js_cur_has_key = 0;
+    पूर्णाङ्क		n;
+    पूर्णाङ्क		iscase;
+    पूर्णाङ्क		lookfor_break;
+    पूर्णाङ्क		lookfor_cpp_namespace = FALSE;
+    पूर्णाङ्क		cont_amount = 0;    // amount for continuation line
+    पूर्णाङ्क		original_पङ्क्ति_islabel;
+    पूर्णाङ्क		added_to_amount = 0;
+    पूर्णाङ्क		js_cur_has_साँचो = 0;
     linenr_T	raw_string_start = 0;
     cpp_baseclass_cache_T cache_cpp_baseclass = { FALSE, { MAXLNUM, 0 } };
 
     // make a copy, value is changed below
-    int		ind_continuation = curbuf->b_ind_continuation;
+    पूर्णाङ्क		ind_continuation = curbuf->b_ind_continuation;
 
     // remember where the cursor was when we started
     cur_curpos = curwin->w_cursor;
 
     // if we are at line 1 zero indent is fine, right?
-    if (cur_curpos.lnum == 1)
-	return 0;
+    यदि (cur_curpos.lnum == 1)
+	फर्काऊ 0;
 
     // Get a copy of the current contents of the line.
     // This is required, because only the most recent line obtained with
     // ml_get is valid!
     linecopy = vim_strsave(ml_get(cur_curpos.lnum));
-    if (linecopy == NULL)
-	return 0;
+    यदि (linecopy == रिक्त)
+	फर्काऊ 0;
 
     // In insert mode and the cursor is on a ')' truncate the line at the
     // cursor position.  We don't want to line up with the matching '(' when
     // inserting new stuff.
     // For unknown reasons the cursor might be past the end of the line, thus
     // check for that.
-    if ((State & MODE_INSERT)
+    यदि ((State & MODE_घुसाउ)
 	    && curwin->w_cursor.col < (colnr_T)STRLEN(linecopy)
 	    && linecopy[curwin->w_cursor.col] == ')')
 	linecopy[curwin->w_cursor.col] = NUL;
@@ -2274,182 +2274,182 @@ get_c_indent(void)
 
     curwin->w_cursor.col = 0;
 
-    original_line_islabel = cin_islabel();  // XXX
+    original_पङ्क्ति_islabel = cin_islabel();  // XXX
 
     // If we are inside a raw string don't change the indent.
     // Ignore a raw string inside a comment.
     comment_pos = ind_find_start_comment();
-    if (comment_pos != NULL)
+    यदि (comment_pos != रिक्त)
     {
 	// findmatchlimit() static pos is overwritten, make a copy
 	tryposCopy = *comment_pos;
 	comment_pos = &tryposCopy;
     }
     trypos = find_start_rawstring(curbuf->b_ind_maxcomment);
-    if (trypos != NULL && (comment_pos == NULL
+    यदि (trypos != रिक्त && (comment_pos == रिक्त
 					     || LT_POS(*trypos, *comment_pos)))
     {
 	amount = -1;
-	goto laterend;
+	गच्छ laterend;
     }
 
     // #defines and so on go at the left when included in 'cinkeys',
     // excluding pragmas when customized in 'cinoptions'
-    if (*theline == '#' && (*linecopy == '#' || in_cinkeys('#', ' ', TRUE)))
+    यदि (*theline == '#' && (*linecopy == '#' || in_cinkeys('#', ' ', TRUE)))
     {
 	char_u *directive = skipwhite(theline + 1);
-	if (curbuf->b_ind_pragma == 0 || STRNCMP(directive, "pragma", 6) != 0)
+	यदि (curbuf->b_ind_pragma == 0 || STRNCMP(directive, "pragma", 6) != 0)
 	{
 	    amount = curbuf->b_ind_hash_comment;
-	    goto theend;
+	    गच्छ theend;
 	}
     }
 
     // Is it a non-case label?	Then that goes at the left margin too unless:
     //  - JS flag is set.
     //  - 'L' item has a positive value.
-    if (original_line_islabel && !curbuf->b_ind_js
+    यदि (original_पङ्क्ति_islabel && !curbuf->b_ind_js
 					      && curbuf->b_ind_jump_label < 0)
     {
 	amount = 0;
-	goto theend;
+	गच्छ theend;
     }
 
     // If we're inside a "//" comment and there is a "//" comment in a
     // previous line, lineup with that one.
-    if (cin_islinecomment(theline))
+    यदि (cin_islinecomment(theline))
     {
 	pos_T	linecomment_pos;
 
-	trypos = find_line_comment(); // XXX
-	if (trypos == NULL && curwin->w_cursor.lnum > 1)
+	trypos = find_पङ्क्ति_comment(); // XXX
+	यदि (trypos == रिक्त && curwin->w_cursor.lnum > 1)
 	{
 	    // There may be a statement before the comment, search from the end
 	    // of the line for a comment start.
 	    linecomment_pos.col =
 			  check_linecomment(ml_get(curwin->w_cursor.lnum - 1));
-	    if (linecomment_pos.col != MAXCOL)
+	    यदि (linecomment_pos.col != MAXCOL)
 	    {
 		trypos = &linecomment_pos;
 		trypos->lnum = curwin->w_cursor.lnum - 1;
 	    }
 	}
-	if (trypos  != NULL)
+	यदि (trypos  != रिक्त)
 	{
 	    // find how indented the line beginning the comment is
-	    getvcol(curwin, trypos, &col, NULL, NULL, 0);
+	    getvcol(curwin, trypos, &col, रिक्त, रिक्त, 0);
 	    amount = col;
-	    goto theend;
+	    गच्छ theend;
 	}
     }
 
     // If we're inside a comment and not looking at the start of the
     // comment, try using the 'comments' option.
-    if (!cin_iscomment(theline) && comment_pos != NULL) // XXX
+    यदि (!cin_iscomment(theline) && comment_pos != रिक्त) // XXX
     {
-	int	lead_start_len = 2;
-	int	lead_middle_len = 1;
+	पूर्णाङ्क	lead_start_len = 2;
+	पूर्णाङ्क	lead_बीच_len = 1;
 	char_u	lead_start[COM_MAX_LEN];	// start-comment string
-	char_u	lead_middle[COM_MAX_LEN];	// middle-comment string
+	char_u	lead_बीच[COM_MAX_LEN];	// middle-comment string
 	char_u	lead_end[COM_MAX_LEN];		// end-comment string
-	int	lead_end_len;
+	पूर्णाङ्क	lead_end_len;
 	char_u	*p;
-	int	start_align = 0;
-	int	start_off = 0;
-	int	done = FALSE;
+	पूर्णाङ्क	start_align = 0;
+	पूर्णाङ्क	start_off = 0;
+	पूर्णाङ्क	done = FALSE;
 
 	// find how indented the line beginning the comment is
-	getvcol(curwin, comment_pos, &col, NULL, NULL, 0);
+	getvcol(curwin, comment_pos, &col, रिक्त, रिक्त, 0);
 	amount = col;
 	*lead_start = NUL;
-	*lead_middle = NUL;
+	*lead_बीच = NUL;
 
 	p = curbuf->b_p_com;
-	while (*p != NUL)
+	जबसम्म (*p != NUL)
 	{
-	    int	align = 0;
-	    int	off = 0;
-	    int what = 0;
+	    पूर्णाङ्क	align = 0;
+	    पूर्णाङ्क	off = 0;
+	    पूर्णाङ्क what = 0;
 
-	    while (*p != NUL && *p != ':')
+	    जबसम्म (*p != NUL && *p != ':')
 	    {
-		if (*p == COM_START || *p == COM_END || *p == COM_MIDDLE)
+		यदि (*p == COM_START || *p == COM_END || *p == COM_बीच)
 		    what = *p++;
-		else if (*p == COM_LEFT || *p == COM_RIGHT)
+		अन्यथा यदि (*p == COM_बायाँ || *p == COM_दायाँ)
 		    align = *p++;
-		else if (VIM_ISDIGIT(*p) || *p == '-')
+		अन्यथा यदि (VIM_ISDIGIT(*p) || *p == '-')
 		    off = getdigits(&p);
-		else
+		अन्यथा
 		    ++p;
 	    }
 
-	    if (*p == ':')
+	    यदि (*p == ':')
 		++p;
 	    lead_end_len = copy_option_part(&p, lead_end, COM_MAX_LEN, ",");
-	    if (what == COM_START)
+	    यदि (what == COM_START)
 	    {
 		STRCPY(lead_start, lead_end);
 		lead_start_len = lead_end_len;
 		start_off = off;
 		start_align = align;
 	    }
-	    else if (what == COM_MIDDLE)
+	    अन्यथा यदि (what == COM_बीच)
 	    {
-		STRCPY(lead_middle, lead_end);
-		lead_middle_len = lead_end_len;
+		STRCPY(lead_बीच, lead_end);
+		lead_बीच_len = lead_end_len;
 	    }
-	    else if (what == COM_END)
+	    अन्यथा यदि (what == COM_END)
 	    {
 		// If our line starts with the middle comment string, line it
 		// up with the comment opener per the 'comments' option.
-		if (STRNCMP(theline, lead_middle, lead_middle_len) == 0
+		यदि (STRNCMP(theline, lead_बीच, lead_बीच_len) == 0
 			&& STRNCMP(theline, lead_end, lead_end_len) != 0)
 		{
 		    done = TRUE;
-		    if (curwin->w_cursor.lnum > 1)
+		    यदि (curwin->w_cursor.lnum > 1)
 		    {
 			// If the start comment string matches in the previous
 			// line, use the indent of that line plus offset.  If
 			// the middle comment string matches in the previous
 			// line, use the indent of that line.  XXX
 			look = skipwhite(ml_get(curwin->w_cursor.lnum - 1));
-			if (STRNCMP(look, lead_start, lead_start_len) == 0)
+			यदि (STRNCMP(look, lead_start, lead_start_len) == 0)
 			    amount = get_indent_lnum(curwin->w_cursor.lnum - 1);
-			else if (STRNCMP(look, lead_middle,
-							lead_middle_len) == 0)
+			अन्यथा यदि (STRNCMP(look, lead_बीच,
+							lead_बीच_len) == 0)
 			{
 			    amount = get_indent_lnum(curwin->w_cursor.lnum - 1);
-			    break;
+			    रोक;
 			}
 			// If the start comment string doesn't match with the
 			// start of the comment, skip this entry.  XXX
-			else if (STRNCMP(ml_get(comment_pos->lnum)
+			अन्यथा यदि (STRNCMP(ml_get(comment_pos->lnum)
 							    + comment_pos->col,
 					     lead_start, lead_start_len) != 0)
-			    continue;
+			    जारी;
 		    }
-		    if (start_off != 0)
+		    यदि (start_off != 0)
 			amount += start_off;
-		    else if (start_align == COM_RIGHT)
+		    अन्यथा यदि (start_align == COM_दायाँ)
 			amount += vim_strsize(lead_start)
-						   - vim_strsize(lead_middle);
-		    break;
+						   - vim_strsize(lead_बीच);
+		    रोक;
 		}
 
 		// If our line starts with the end comment string, line it up
 		// with the middle comment
-		if (STRNCMP(theline, lead_middle, lead_middle_len) != 0
+		यदि (STRNCMP(theline, lead_बीच, lead_बीच_len) != 0
 			&& STRNCMP(theline, lead_end, lead_end_len) == 0)
 		{
 		    amount = get_indent_lnum(curwin->w_cursor.lnum - 1);
 								     // XXX
-		    if (off != 0)
+		    यदि (off != 0)
 			amount += off;
-		    else if (align == COM_RIGHT)
+		    अन्यथा यदि (align == COM_दायाँ)
 			amount += vim_strsize(lead_start)
-						   - vim_strsize(lead_middle);
+						   - vim_strsize(lead_बीच);
 		    done = TRUE;
-		    break;
+		    रोक;
 		}
 	    }
 	}
@@ -2457,11 +2457,11 @@ get_c_indent(void)
 	// If our line starts with an asterisk, line up with the
 	// asterisk in the comment opener; otherwise, line up
 	// with the first character of the comment text.
-	if (done)
+	यदि (done)
 	    ;
-	else if (theline[0] == '*')
+	अन्यथा यदि (theline[0] == '*')
 	    amount += 1;
-	else
+	अन्यथा
 	{
 	    // If we are more than one line away from the comment opener, take
 	    // the indent of the previous non-empty line.  If 'cino' has "CO"
@@ -2469,103 +2469,103 @@ get_c_indent(void)
 	    // white characters after it line up with the text after it;
 	    // otherwise, add the amount specified by "c" in 'cino'
 	    amount = -1;
-	    for (lnum = cur_curpos.lnum - 1; lnum > comment_pos->lnum; --lnum)
+	    लागि (lnum = cur_curpos.lnum - 1; lnum > comment_pos->lnum; --lnum)
 	    {
-		if (linewhite(lnum))		    // skip blank lines
-		    continue;
+		यदि (linewhite(lnum))		    // skip blank lines
+		    जारी;
 		amount = get_indent_lnum(lnum);	    // XXX
-		break;
+		रोक;
 	    }
-	    if (amount == -1)			    // use the comment opener
+	    यदि (amount == -1)			    // use the comment opener
 	    {
-		if (!curbuf->b_ind_in_comment2)
+		यदि (!curbuf->b_ind_in_comment2)
 		{
 		    start = ml_get(comment_pos->lnum);
 		    look = start + comment_pos->col + 2; // skip / and *
-		    if (*look != NUL)		    // if something after it
+		    यदि (*look != NUL)		    // if something after it
 			comment_pos->col = (colnr_T)(skipwhite(look) - start);
 		}
-		getvcol(curwin, comment_pos, &col, NULL, NULL, 0);
+		getvcol(curwin, comment_pos, &col, रिक्त, रिक्त, 0);
 		amount = col;
-		if (curbuf->b_ind_in_comment2 || *look == NUL)
+		यदि (curbuf->b_ind_in_comment2 || *look == NUL)
 		    amount += curbuf->b_ind_in_comment;
 	    }
 	}
-	goto theend;
+	गच्छ theend;
     }
 
     // Are we looking at a ']' that has a match?
-    if (*skipwhite(theline) == ']'
-	    && (trypos = find_match_char('[', curbuf->b_ind_maxparen)) != NULL)
+    यदि (*skipwhite(theline) == ']'
+	    && (trypos = find_match_char('[', curbuf->b_ind_maxparen)) != रिक्त)
     {
 	// align with the line containing the '['.
 	amount = get_indent_lnum(trypos->lnum);
-	goto theend;
+	गच्छ theend;
     }
 
     // Are we inside parentheses or braces?  XXX
-    if (((trypos = find_match_paren(curbuf->b_ind_maxparen)) != NULL
+    यदि (((trypos = find_match_paren(curbuf->b_ind_maxparen)) != रिक्त
 		&& curbuf->b_ind_java == 0)
-	    || (tryposBrace = find_start_brace()) != NULL
-	    || trypos != NULL)
+	    || (tryposBrace = find_start_brace()) != रिक्त
+	    || trypos != रिक्त)
     {
-      if (trypos != NULL && tryposBrace != NULL)
+      यदि (trypos != रिक्त && tryposBrace != रिक्त)
       {
 	  // Both an unmatched '(' and '{' is found.  Use the one which is
 	  // closer to the current cursor position, set the other to NULL.
-	  if (trypos->lnum != tryposBrace->lnum
+	  यदि (trypos->lnum != tryposBrace->lnum
 		  ? trypos->lnum < tryposBrace->lnum
 		  : trypos->col < tryposBrace->col)
-	      trypos = NULL;
-	  else
-	      tryposBrace = NULL;
+	      trypos = रिक्त;
+	  अन्यथा
+	      tryposBrace = रिक्त;
       }
 
-      if (trypos != NULL)
+      यदि (trypos != रिक्त)
       {
 	// If the matching paren is more than one line away, use the indent of
 	// a previous non-empty line that matches the same paren.
-	if (theline[0] == ')' && curbuf->b_ind_paren_prev)
+	यदि (theline[0] == ')' && curbuf->b_ind_paren_prev)
 	{
 	    // Line up with the start of the matching paren line.
 	    amount = get_indent_lnum(curwin->w_cursor.lnum - 1);  // XXX
 	}
-	else
+	अन्यथा
 	{
 	    amount = -1;
 	    our_paren_pos = *trypos;
-	    for (lnum = cur_curpos.lnum - 1; lnum > our_paren_pos.lnum; --lnum)
+	    लागि (lnum = cur_curpos.lnum - 1; lnum > our_paren_pos.lnum; --lnum)
 	    {
 		l = skipwhite(ml_get(lnum));
-		if (cin_nocode(l))		// skip comment lines
-		    continue;
-		if (cin_ispreproc_cont(&l, &lnum, &amount))
-		    continue;			// ignore #define, #if, etc.
+		यदि (cin_nocode(l))		// skip comment lines
+		    जारी;
+		यदि (cin_ispreproc_cont(&l, &lnum, &amount))
+		    जारी;			// ignore #define, #if, etc.
 		curwin->w_cursor.lnum = lnum;
 
 		// Skip a comment or raw string.  XXX
-		if ((trypos = ind_find_start_CORS(NULL)) != NULL)
+		यदि ((trypos = ind_find_start_CORS(रिक्त)) != रिक्त)
 		{
 		    lnum = trypos->lnum + 1;
-		    continue;
+		    जारी;
 		}
 
 		// XXX
-		if ((trypos = find_match_paren(
-			corr_ind_maxparen(&cur_curpos))) != NULL
+		यदि ((trypos = find_match_paren(
+			corr_ind_maxparen(&cur_curpos))) != रिक्त
 			&& trypos->lnum == our_paren_pos.lnum
 			&& trypos->col == our_paren_pos.col)
 		{
 		    amount = get_indent_lnum(lnum);	// XXX
 
-		    if (theline[0] == ')')
+		    यदि (theline[0] == ')')
 		    {
-			if (our_paren_pos.lnum != lnum
+			यदि (our_paren_pos.lnum != lnum
 				&& cur_amount > amount)
 			    cur_amount = amount;
 			amount = -1;
 		    }
-		    break;
+		    रोक;
 		}
 	    }
 	}
@@ -2573,55 +2573,55 @@ get_c_indent(void)
 	// Line up with line where the matching paren is. XXX
 	// If the line starts with a '(' or the indent for unclosed
 	// parentheses is zero, line up with the unclosed parentheses.
-	if (amount == -1)
+	यदि (amount == -1)
 	{
-	    int	    ignore_paren_col = 0;
-	    int	    is_if_for_while = 0;
+	    पूर्णाङ्क	    ignore_paren_col = 0;
+	    पूर्णाङ्क	    is_if_for_while = 0;
 
-	    if (curbuf->b_ind_if_for_while)
+	    यदि (curbuf->b_ind_if_for_while)
 	    {
 		// Look for the outermost opening parenthesis on this line
 		// and check whether it belongs to an "if", "for" or "while".
 
 		pos_T	    cursor_save = curwin->w_cursor;
 		pos_T	    outermost;
-		char_u	    *line;
+		char_u	    *पङ्क्ति;
 
 		trypos = &our_paren_pos;
-		do
+		गर
 		{
 		    outermost = *trypos;
 		    curwin->w_cursor.lnum = outermost.lnum;
 		    curwin->w_cursor.col = outermost.col;
 
 		    trypos = find_match_paren(curbuf->b_ind_maxparen);
-		} while (trypos && trypos->lnum == outermost.lnum);
+		} जबसम्म (trypos && trypos->lnum == outermost.lnum);
 
 		curwin->w_cursor = cursor_save;
 
-		line = ml_get(outermost.lnum);
+		पङ्क्ति = ml_get(outermost.lnum);
 
 		is_if_for_while =
-		    cin_is_if_for_while_before_offset(line, &outermost.col);
+		    cin_is_if_for_while_before_offset(पङ्क्ति, &outermost.col);
 	    }
 
 	    amount = skip_label(our_paren_pos.lnum, &look);
 	    look = skipwhite(look);
-	    if (*look == '(')
+	    यदि (*look == '(')
 	    {
 		linenr_T    save_lnum = curwin->w_cursor.lnum;
-		char_u	    *line;
-		int	    look_col;
+		char_u	    *पङ्क्ति;
+		पूर्णाङ्क	    look_col;
 
 		// Ignore a '(' in front of the line that has a match before
 		// our matching '('.
 		curwin->w_cursor.lnum = our_paren_pos.lnum;
-		line = ml_get_curline();
-		look_col = (int)(look - line);
+		पङ्क्ति = ml_get_curline();
+		look_col = (पूर्णाङ्क)(look - पङ्क्ति);
 		curwin->w_cursor.col = look_col + 1;
-		if ((trypos = findmatchlimit(NULL, ')', FM_SKIPCOMM,
+		यदि ((trypos = findmatchlimit(रिक्त, ')', FM_SKIPCOMM,
 						      curbuf->b_ind_maxparen))
-								      != NULL
+								      != रिक्त
 			  && trypos->lnum == our_paren_pos.lnum
 			  && trypos->col < our_paren_pos.col)
 		    ignore_paren_col = trypos->col + 1;
@@ -2629,7 +2629,7 @@ get_c_indent(void)
 		curwin->w_cursor.lnum = save_lnum;
 		look = ml_get(our_paren_pos.lnum) + look_col;
 	    }
-	    if (theline[0] == ')' || (curbuf->b_ind_unclosed == 0
+	    यदि (theline[0] == ')' || (curbuf->b_ind_unclosed == 0
 						      && is_if_for_while == 0)
 		    || (!curbuf->b_ind_unclosed_noignore && *look == '('
 						    && ignore_paren_col == 0))
@@ -2641,104 +2641,104 @@ get_c_indent(void)
 		// indent of the current line or the indentation of the next
 		// outer paren and add b_ind_unclosed_wrapped (for very long
 		// lines).
-		if (theline[0] != ')')
+		यदि (theline[0] != ')')
 		{
 		    cur_amount = MAXCOL;
 		    l = ml_get(our_paren_pos.lnum);
-		    if (curbuf->b_ind_unclosed_wrapped
+		    यदि (curbuf->b_ind_unclosed_wrapped
 				       && cin_ends_in(l, (char_u *)"("))
 		    {
 			// look for opening unmatched paren, indent one level
 			// for each additional level
 			n = 1;
-			for (col = 0; col < our_paren_pos.col; ++col)
+			लागि (col = 0; col < our_paren_pos.col; ++col)
 			{
-			    switch (l[col])
+			    विकल्प (l[col])
 			    {
-				case '(':
-				case '{': ++n;
-					  break;
+				पक्ष '(':
+				पक्ष '{': ++n;
+					  रोक;
 
-				case ')':
-				case '}': if (n > 1)
+				पक्ष ')':
+				पक्ष '}': यदि (n > 1)
 					      --n;
-					  break;
+					  रोक;
 			    }
 			}
 
 			our_paren_pos.col = 0;
 			amount += n * curbuf->b_ind_unclosed_wrapped;
 		    }
-		    else if (curbuf->b_ind_unclosed_whiteok)
+		    अन्यथा यदि (curbuf->b_ind_unclosed_whiteok)
 			our_paren_pos.col++;
-		    else
+		    अन्यथा
 		    {
 			col = our_paren_pos.col + 1;
-			while (VIM_ISWHITE(l[col]))
+			जबसम्म (VIM_ISWHITE(l[col]))
 			    col++;
-			if (l[col] != NUL)	// In case of trailing space
+			यदि (l[col] != NUL)	// In case of trailing space
 			    our_paren_pos.col = col;
-			else
+			अन्यथा
 			    our_paren_pos.col++;
 		    }
 		}
 
 		// Find how indented the paren is, or the character after it
 		// if we did the above "if".
-		if (our_paren_pos.col > 0)
+		यदि (our_paren_pos.col > 0)
 		{
-		    getvcol(curwin, &our_paren_pos, &col, NULL, NULL, 0);
-		    if (cur_amount > (int)col)
+		    getvcol(curwin, &our_paren_pos, &col, रिक्त, रिक्त, 0);
+		    यदि (cur_amount > (पूर्णाङ्क)col)
 			cur_amount = col;
 		}
 	    }
 
-	    if (theline[0] == ')' && curbuf->b_ind_matching_paren)
+	    यदि (theline[0] == ')' && curbuf->b_ind_matching_paren)
 	    {
 		// Line up with the start of the matching paren line.
 	    }
-	    else if ((curbuf->b_ind_unclosed == 0 && is_if_for_while == 0)
+	    अन्यथा यदि ((curbuf->b_ind_unclosed == 0 && is_if_for_while == 0)
 		     || (!curbuf->b_ind_unclosed_noignore
 				    && *look == '(' && ignore_paren_col == 0))
 	    {
-		if (cur_amount != MAXCOL)
+		यदि (cur_amount != MAXCOL)
 		    amount = cur_amount;
 	    }
-	    else
+	    अन्यथा
 	    {
 		// Add b_ind_unclosed2 for each '(' before our matching one,
 		// but ignore (void) before the line (ignore_paren_col).
 		col = our_paren_pos.col;
-		while ((int)our_paren_pos.col > ignore_paren_col)
+		जबसम्म ((पूर्णाङ्क)our_paren_pos.col > ignore_paren_col)
 		{
 		    --our_paren_pos.col;
-		    switch (*ml_get_pos(&our_paren_pos))
+		    विकल्प (*ml_get_pos(&our_paren_pos))
 		    {
-			case '(': amount += curbuf->b_ind_unclosed2;
+			पक्ष '(': amount += curbuf->b_ind_unclosed2;
 				  col = our_paren_pos.col;
-				  break;
-			case ')': amount -= curbuf->b_ind_unclosed2;
+				  रोक;
+			पक्ष ')': amount -= curbuf->b_ind_unclosed2;
 				  col = MAXCOL;
-				  break;
+				  रोक;
 		    }
 		}
 
 		// Use b_ind_unclosed once, when the first '(' is not inside
 		// braces
-		if (col == MAXCOL)
+		यदि (col == MAXCOL)
 		    amount += curbuf->b_ind_unclosed;
-		else
+		अन्यथा
 		{
 		    curwin->w_cursor.lnum = our_paren_pos.lnum;
 		    curwin->w_cursor.col = col;
-		    if (find_match_paren_after_brace(curbuf->b_ind_maxparen)
-								      != NULL)
+		    यदि (find_match_paren_after_brace(curbuf->b_ind_maxparen)
+								      != रिक्त)
 			amount += curbuf->b_ind_unclosed2;
-		    else
+		    अन्यथा
 		    {
-			if (is_if_for_while)
+			यदि (is_if_for_while)
 			    amount += curbuf->b_ind_if_for_while;
-			else
+			अन्यथा
 			    amount += curbuf->b_ind_unclosed;
 		    }
 		}
@@ -2748,16 +2748,16 @@ get_c_indent(void)
 		//  func_long_name(		    if (x
 		//	arg				    && yy
 		//	)	  ^ not here	       )    ^ not here
-		if (cur_amount < amount)
+		यदि (cur_amount < amount)
 		    amount = cur_amount;
 	    }
 	}
 
 	// add extra indent for a comment
-	if (cin_iscomment(theline))
+	यदि (cin_iscomment(theline))
 	    amount += curbuf->b_ind_comment;
       }
-      else
+      अन्यथा
       {
 	// We are inside braces, there is a { before this line at the position
 	// stored in tryposBrace.
@@ -2774,16 +2774,16 @@ get_c_indent(void)
 	// otherwise, check out the indentation of the line as
 	// a whole and then add the "imaginary indent" to that.
 	look = skipwhite(start);
-	if (*look == '{')
+	यदि (*look == '{')
 	{
-	    getvcol(curwin, trypos, &col, NULL, NULL, 0);
+	    getvcol(curwin, trypos, &col, रिक्त, रिक्त, 0);
 	    amount = col;
-	    if (*start == '{')
+	    यदि (*start == '{')
 		start_brace = BRACE_IN_COL0;
-	    else
+	    अन्यथा
 		start_brace = BRACE_AT_START;
 	}
-	else
+	अन्यथा
 	{
 	    // That opening brace might have been on a continuation
 	    // line.  if so, find the start of the line.
@@ -2792,57 +2792,57 @@ get_c_indent(void)
 	    // Position the cursor over the rightmost paren, so that
 	    // matching it will take us back to the start of the line.
 	    lnum = ourscope;
-	    if (find_last_paren(start, '(', ')')
+	    यदि (find_last_paren(start, '(', ')')
 			&& (trypos = find_match_paren(curbuf->b_ind_maxparen))
-								      != NULL)
+								      != रिक्त)
 		lnum = trypos->lnum;
 
 	    // It could have been something like
 	    //	   case 1: if (asdf &&
 	    //			condition) {
 	    //		    }
-	    if ((curbuf->b_ind_js || curbuf->b_ind_keep_case_label)
+	    यदि ((curbuf->b_ind_js || curbuf->b_ind_keep_case_label)
 			   && cin_iscase(skipwhite(ml_get_curline()), FALSE))
 		amount = get_indent();
-	    else if (curbuf->b_ind_js)
+	    अन्यथा यदि (curbuf->b_ind_js)
 		amount = get_indent_lnum(lnum);
-	    else
+	    अन्यथा
 		amount = skip_label(lnum, &l);
 
 	    start_brace = BRACE_AT_END;
 	}
 
 	// For Javascript check if the line starts with "key:".
-	if (curbuf->b_ind_js)
-	    js_cur_has_key = cin_has_js_key(theline);
+	यदि (curbuf->b_ind_js)
+	    js_cur_has_साँचो = cin_has_js_साँचो(theline);
 
 	// If we're looking at a closing brace, that's where
 	// we want to be.  otherwise, add the amount of room
 	// that an indent is supposed to be.
-	if (theline[0] == '}')
+	यदि (theline[0] == '}')
 	{
 	    // they may want closing braces to line up with something
 	    // other than the open brace.  indulge them, if so.
 	    amount += curbuf->b_ind_close_extra;
 	}
-	else
+	अन्यथा
 	{
 	    // If we're looking at an "else", try to find an "if"
 	    // to match it with.
 	    // If we're looking at a "while", try to find a "do"
 	    // to match it with.
 	    lookfor = LOOKFOR_INITIAL;
-	    if (cin_iselse(theline))
+	    यदि (cin_iselse(theline))
 		lookfor = LOOKFOR_IF;
-	    else if (cin_iswhileofdo(theline, cur_curpos.lnum)) // XXX
+	    अन्यथा यदि (cin_iswhileofdo(theline, cur_curpos.lnum)) // XXX
 		lookfor = LOOKFOR_DO;
-	    if (lookfor != LOOKFOR_INITIAL)
+	    यदि (lookfor != LOOKFOR_INITIAL)
 	    {
 		curwin->w_cursor.lnum = cur_curpos.lnum;
-		if (find_match(lookfor, ourscope) == OK)
+		यदि (find_match(lookfor, ourscope) == OK)
 		{
 		    amount = get_indent();	// XXX
-		    goto theend;
+		    गच्छ theend;
 		}
 	    }
 
@@ -2855,53 +2855,53 @@ get_c_indent(void)
 	    // location of a left-margin brace.  Otherwise, correct the
 	    // location for b_ind_open_extra.
 
-	    if (start_brace == BRACE_IN_COL0)	    // '{' is in column 0
+	    यदि (start_brace == BRACE_IN_COL0)	    // '{' is in column 0
 	    {
-		amount = curbuf->b_ind_open_left_imag;
+		amount = curbuf->b_ind_open_बायाँ_imag;
 		lookfor_cpp_namespace = TRUE;
 	    }
-	    else if (start_brace == BRACE_AT_START &&
+	    अन्यथा यदि (start_brace == BRACE_AT_START &&
 		    lookfor_cpp_namespace)	  // '{' is at start
 	    {
 
 		lookfor_cpp_namespace = TRUE;
 	    }
-	    else
+	    अन्यथा
 	    {
-		if (start_brace == BRACE_AT_END)    // '{' is at end of line
+		यदि (start_brace == BRACE_AT_END)    // '{' is at end of line
 		{
 		    amount += curbuf->b_ind_open_imag;
 
 		    l = skipwhite(ml_get_curline());
-		    if (cin_is_cpp_namespace(l))
+		    यदि (cin_is_cpp_namespace(l))
 			amount += curbuf->b_ind_cpp_namespace;
-		    else if (cin_is_cpp_extern_c(l))
+		    अन्यथा यदि (cin_is_cpp_extern_c(l))
 			amount += curbuf->b_ind_cpp_extern_c;
 		}
-		else
+		अन्यथा
 		{
 		    // Compensate for adding b_ind_open_extra later.
 		    amount -= curbuf->b_ind_open_extra;
-		    if (amount < 0)
+		    यदि (amount < 0)
 			amount = 0;
 		}
 	    }
 
 	    lookfor_break = FALSE;
 
-	    if (cin_iscase(theline, FALSE))	// it's a switch() label
+	    यदि (cin_iscase(theline, FALSE))	// it's a switch() label
 	    {
 		lookfor = LOOKFOR_CASE;	// find a previous switch() label
 		amount += curbuf->b_ind_case;
 	    }
-	    else if (cin_isscopedecl(theline))	// private:, ...
+	    अन्यथा यदि (cin_isscopedecl(theline))	// private:, ...
 	    {
 		lookfor = LOOKFOR_SCOPEDECL;	// class decl is this block
 		amount += curbuf->b_ind_scopedecl;
 	    }
-	    else
+	    अन्यथा
 	    {
-		if (curbuf->b_ind_case_break && cin_isbreak(theline))
+		यदि (curbuf->b_ind_case_break && cin_isbreak(theline))
 		    // break; ...
 		    lookfor_break = TRUE;
 
@@ -2919,14 +2919,14 @@ get_c_indent(void)
 	    // the usual amount relative to the conditional
 	    // that opens the block.
 	    curwin->w_cursor = cur_curpos;
-	    for (;;)
+	    लागि (;;)
 	    {
 		curwin->w_cursor.lnum--;
 		curwin->w_cursor.col = 0;
 
 		// If we went all the way back to the start of our scope, line
 		// up with it.
-		if (curwin->w_cursor.lnum <= ourscope)
+		यदि (curwin->w_cursor.lnum <= ourscope)
 		{
 		    // We reached end of scope:
 		    // If looking for an enum or structure initialization
@@ -2936,48 +2936,48 @@ get_c_indent(void)
 		    // declaration:
 		    // int x,
 		    //     here; <-- add ind_continuation
-		    if (lookfor == LOOKFOR_ENUM_OR_INIT)
+		    यदि (lookfor == LOOKFOR_ENUM_OR_INIT)
 		    {
-			if (curwin->w_cursor.lnum == 0
+			यदि (curwin->w_cursor.lnum == 0
 				|| curwin->w_cursor.lnum
 					  < ourscope - curbuf->b_ind_maxparen)
 			{
 			    // nothing found (abuse curbuf->b_ind_maxparen as
 			    // limit) assume terminated line (i.e. a variable
 			    // initialization)
-			    if (cont_amount > 0)
+			    यदि (cont_amount > 0)
 				amount = cont_amount;
-			    else if (!curbuf->b_ind_js)
+			    अन्यथा यदि (!curbuf->b_ind_js)
 				amount += ind_continuation;
-			    break;
+			    रोक;
 			}
 
 			// If we're in a comment or raw string now, skip to
 			// the start of it.
-			trypos = ind_find_start_CORS(NULL);
-			if (trypos != NULL)
+			trypos = ind_find_start_CORS(रिक्त);
+			यदि (trypos != रिक्त)
 			{
 			    curwin->w_cursor.lnum = trypos->lnum + 1;
 			    curwin->w_cursor.col = 0;
-			    continue;
+			    जारी;
 			}
 
 			l = ml_get_curline();
 
 			// Skip preprocessor directives and blank lines.
-			if (cin_ispreproc_cont(&l, &curwin->w_cursor.lnum,
+			यदि (cin_ispreproc_cont(&l, &curwin->w_cursor.lnum,
 								    &amount))
-			    continue;
+			    जारी;
 
-			if (cin_nocode(l))
-			    continue;
+			यदि (cin_nocode(l))
+			    जारी;
 
 			terminated = cin_isterminated(l, FALSE, TRUE);
 
 			// If we are at top level and the line looks like a
 			// function declaration, we are done
 			// (it's a variable declaration).
-			if (start_brace != BRACE_IN_COL0
+			यदि (start_brace != BRACE_IN_COL0
 			     || !cin_isfuncdecl(&l, curwin->w_cursor.lnum, 0))
 			{
 			    // if the line is terminated with another ','
@@ -2986,38 +2986,38 @@ get_c_indent(void)
 			    // TODO: does not work, if  a function
 			    // declaration is split over multiple lines:
 			    // cin_isfuncdecl returns FALSE then.
-			    if (terminated == ',')
-				break;
+			    यदि (terminated == ',')
+				रोक;
 
 			    // if it is an enum declaration or an assignment,
 			    // we are done.
-			    if (terminated != ';' && cin_isinit())
-				break;
+			    यदि (terminated != ';' && cin_isinit())
+				रोक;
 
 			    // nothing useful found
-			    if (terminated == 0 || terminated == '{')
-				continue;
+			    यदि (terminated == 0 || terminated == '{')
+				जारी;
 			}
 
-			if (terminated != ';')
+			यदि (terminated != ';')
 			{
 			    // Skip parens and braces. Position the cursor
 			    // over the rightmost paren, so that matching it
 			    // will take us back to the start of the line.
 			    // XXX
-			    trypos = NULL;
-			    if (find_last_paren(l, '(', ')'))
+			    trypos = रिक्त;
+			    यदि (find_last_paren(l, '(', ')'))
 				trypos = find_match_paren(
 						      curbuf->b_ind_maxparen);
 
-			    if (trypos == NULL && find_last_paren(l, '{', '}'))
+			    यदि (trypos == रिक्त && find_last_paren(l, '{', '}'))
 				trypos = find_start_brace();
 
-			    if (trypos != NULL)
+			    यदि (trypos != रिक्त)
 			    {
 				curwin->w_cursor.lnum = trypos->lnum + 1;
 				curwin->w_cursor.col = 0;
-				continue;
+				जारी;
 			    }
 			}
 
@@ -3025,89 +3025,89 @@ get_c_indent(void)
 			// like in
 			// int a,
 			//    b;
-			if (cont_amount > 0)
+			यदि (cont_amount > 0)
 			    amount = cont_amount;
-			else
+			अन्यथा
 			    amount += ind_continuation;
 		    }
-		    else if (lookfor == LOOKFOR_UNTERM)
+		    अन्यथा यदि (lookfor == LOOKFOR_UNTERM)
 		    {
-			if (cont_amount > 0)
+			यदि (cont_amount > 0)
 			    amount = cont_amount;
-			else
+			अन्यथा
 			    amount += ind_continuation;
 		    }
-		    else
+		    अन्यथा
 		    {
-			if (lookfor != LOOKFOR_TERM
+			यदि (lookfor != LOOKFOR_TERM
 					&& lookfor != LOOKFOR_CPP_BASECLASS
 					&& lookfor != LOOKFOR_COMMA)
 			{
 			    amount = scope_amount;
-			    if (theline[0] == '{')
+			    यदि (theline[0] == '{')
 			    {
 				amount += curbuf->b_ind_open_extra;
 				added_to_amount = curbuf->b_ind_open_extra;
 			    }
 			}
 
-			if (lookfor_cpp_namespace)
+			यदि (lookfor_cpp_namespace)
 			{
 			    // Looking for C++ namespace, need to look further
 			    // back.
-			    if (curwin->w_cursor.lnum == ourscope)
-				continue;
+			    यदि (curwin->w_cursor.lnum == ourscope)
+				जारी;
 
-			    if (curwin->w_cursor.lnum == 0
+			    यदि (curwin->w_cursor.lnum == 0
 				    || curwin->w_cursor.lnum
 					      < ourscope - FIND_NAMESPACE_LIM)
-				break;
+				रोक;
 
 			    // If we're in a comment or raw string now, skip
 			    // to the start of it.
-			    trypos = ind_find_start_CORS(NULL);
-			    if (trypos != NULL)
+			    trypos = ind_find_start_CORS(रिक्त);
+			    यदि (trypos != रिक्त)
 			    {
 				curwin->w_cursor.lnum = trypos->lnum + 1;
 				curwin->w_cursor.col = 0;
-				continue;
+				जारी;
 			    }
 
 			    l = ml_get_curline();
 
 			    // Skip preprocessor directives and blank lines.
-			    if (cin_ispreproc_cont(&l, &curwin->w_cursor.lnum,
+			    यदि (cin_ispreproc_cont(&l, &curwin->w_cursor.lnum,
 								    &amount))
-				continue;
+				जारी;
 
 			    // Finally the actual check for "namespace".
-			    if (cin_is_cpp_namespace(l))
+			    यदि (cin_is_cpp_namespace(l))
 			    {
 				amount += curbuf->b_ind_cpp_namespace
 							    - added_to_amount;
-				break;
+				रोक;
 			    }
-			    else if (cin_is_cpp_extern_c(l))
+			    अन्यथा यदि (cin_is_cpp_extern_c(l))
 			    {
 				amount += curbuf->b_ind_cpp_extern_c
 							    - added_to_amount;
-				break;
+				रोक;
 			    }
 
-			    if (cin_nocode(l))
-				continue;
+			    यदि (cin_nocode(l))
+				जारी;
 			}
 		    }
-		    break;
+		    रोक;
 		}
 
 		// If we're in a comment or raw string now, skip to the start
 		// of it.  XXX
-		if ((trypos = ind_find_start_CORS(&raw_string_start)) != NULL)
+		यदि ((trypos = ind_find_start_CORS(&raw_string_start)) != रिक्त)
 		{
 		    curwin->w_cursor.lnum = trypos->lnum + 1;
 		    curwin->w_cursor.col = 0;
-		    continue;
+		    जारी;
 		}
 
 		l = ml_get_curline();
@@ -3115,47 +3115,47 @@ get_c_indent(void)
 		// If this is a switch() label, may line up relative to that.
 		// If this is a C++ scope declaration, do the same.
 		iscase = cin_iscase(l, FALSE);
-		if (iscase || cin_isscopedecl(l))
+		यदि (iscase || cin_isscopedecl(l))
 		{
 		    // we are only looking for cpp base class
 		    // declaration/initialization any longer
-		    if (lookfor == LOOKFOR_CPP_BASECLASS)
-			break;
+		    यदि (lookfor == LOOKFOR_CPP_BASECLASS)
+			रोक;
 
 		    // When looking for a "do" we are not interested in
 		    // labels.
-		    if (whilelevel > 0)
-			continue;
+		    यदि (whilelevel > 0)
+			जारी;
 
 		    //	case xx:
 		    //	    c = 99 +	    <- this indent plus continuation
 		    //->	   here;
-		    if (lookfor == LOOKFOR_UNTERM
+		    यदि (lookfor == LOOKFOR_UNTERM
 					   || lookfor == LOOKFOR_ENUM_OR_INIT)
 		    {
-			if (cont_amount > 0)
+			यदि (cont_amount > 0)
 			    amount = cont_amount;
-			else
+			अन्यथा
 			    amount += ind_continuation;
-			break;
+			रोक;
 		    }
 
 		    //	case xx:	<- line up with this case
 		    //	    x = 333;
 		    //	case yy:
-		    if (       (iscase && lookfor == LOOKFOR_CASE)
+		    यदि (       (iscase && lookfor == LOOKFOR_CASE)
 			    || (iscase && lookfor_break)
 			    || (!iscase && lookfor == LOOKFOR_SCOPEDECL))
 		    {
 			// Check that this case label is not for another
 			// switch()		    XXX
-			if ((trypos = find_start_brace()) == NULL
+			यदि ((trypos = find_start_brace()) == रिक्त
 						  || trypos->lnum == ourscope)
 			{
 			    amount = get_indent();	// XXX
-			    break;
+			    रोक;
 			}
-			continue;
+			जारी;
 		    }
 
 		    n = get_indent_nolabel(curwin->w_cursor.lnum);  // XXX
@@ -3168,13 +3168,13 @@ get_c_indent(void)
 		    //	     if (cond)		<- line up with this line
 		    //		 y = y + 1;
 		    // ->    s = 99;
-		    if (lookfor == LOOKFOR_TERM)
+		    यदि (lookfor == LOOKFOR_TERM)
 		    {
-			if (n)
+			यदि (n)
 			    amount = n;
 
-			if (!lookfor_break)
-			    break;
+			यदि (!lookfor_break)
+			    रोक;
 		    }
 
 		    //	 case xx: x = x + 1;	    <- line up with this x
@@ -3182,19 +3182,19 @@ get_c_indent(void)
 		    //
 		    //	 case xx: if (cond)	    <- line up with this if
 		    // ->	       y = y + 1;
-		    if (n)
+		    यदि (n)
 		    {
 			amount = n;
 			l = after_label(ml_get_curline());
-			if (l != NULL && cin_is_cinword(l))
+			यदि (l != रिक्त && cin_is_cinword(l))
 			{
-			    if (theline[0] == '{')
+			    यदि (theline[0] == '{')
 				amount += curbuf->b_ind_open_extra;
-			    else
+			    अन्यथा
 				amount += curbuf->b_ind_level
 						     + curbuf->b_ind_no_brace;
 			}
-			break;
+			रोक;
 		    }
 
 		    // Try to get the indent of a statement before the switch
@@ -3208,28 +3208,28 @@ get_c_indent(void)
 					: curbuf->b_ind_scopedecl_code);
 		    lookfor = curbuf->b_ind_case_break
 					      ? LOOKFOR_NOBREAK : LOOKFOR_ANY;
-		    continue;
+		    जारी;
 		}
 
 		// Looking for a switch() label or C++ scope declaration,
 		// ignore other lines, skip {}-blocks.
-		if (lookfor == LOOKFOR_CASE || lookfor == LOOKFOR_SCOPEDECL)
+		यदि (lookfor == LOOKFOR_CASE || lookfor == LOOKFOR_SCOPEDECL)
 		{
-		    if (find_last_paren(l, '{', '}')
-				     && (trypos = find_start_brace()) != NULL)
+		    यदि (find_last_paren(l, '{', '}')
+				     && (trypos = find_start_brace()) != रिक्त)
 		    {
 			curwin->w_cursor.lnum = trypos->lnum + 1;
 			curwin->w_cursor.col = 0;
 		    }
-		    continue;
+		    जारी;
 		}
 
 		// Ignore jump labels with nothing after them.
-		if (!curbuf->b_ind_js && cin_islabel())
+		यदि (!curbuf->b_ind_js && cin_islabel())
 		{
 		    l = after_label(ml_get_curline());
-		    if (l == NULL || cin_nocode(l))
-			continue;
+		    यदि (l == रिक्त || cin_nocode(l))
+			जारी;
 		}
 
 		// Ignore #defines, #if, etc.
@@ -3237,48 +3237,48 @@ get_c_indent(void)
 		// (need to get the line again, cin_islabel() may have
 		// unlocked it)
 		l = ml_get_curline();
-		if (cin_ispreproc_cont(&l, &curwin->w_cursor.lnum, &amount)
+		यदि (cin_ispreproc_cont(&l, &curwin->w_cursor.lnum, &amount)
 							     || cin_nocode(l))
-		    continue;
+		    जारी;
 
 		// Are we at the start of a cpp base class declaration or
 		// constructor initialization?  XXX
 		n = FALSE;
-		if (lookfor != LOOKFOR_TERM && curbuf->b_ind_cpp_baseclass > 0)
+		यदि (lookfor != LOOKFOR_TERM && curbuf->b_ind_cpp_baseclass > 0)
 		{
 		    n = cin_is_cpp_baseclass(&cache_cpp_baseclass);
 		    l = ml_get_curline();
 		}
-		if (n)
+		यदि (n)
 		{
-		    if (lookfor == LOOKFOR_UNTERM)
+		    यदि (lookfor == LOOKFOR_UNTERM)
 		    {
-			if (cont_amount > 0)
+			यदि (cont_amount > 0)
 			    amount = cont_amount;
-			else
+			अन्यथा
 			    amount += ind_continuation;
 		    }
-		    else if (theline[0] == '{')
+		    अन्यथा यदि (theline[0] == '{')
 		    {
 			// Need to find start of the declaration.
 			lookfor = LOOKFOR_UNTERM;
 			ind_continuation = 0;
-			continue;
+			जारी;
 		    }
-		    else
+		    अन्यथा
 			// XXX
 			amount = get_baseclass_amount(
 						cache_cpp_baseclass.lpos.col);
-		    break;
+		    रोक;
 		}
-		else if (lookfor == LOOKFOR_CPP_BASECLASS)
+		अन्यथा यदि (lookfor == LOOKFOR_CPP_BASECLASS)
 		{
 		    // only look, whether there is a cpp base class
 		    // declaration or initialization before the opening brace.
-		    if (cin_isterminated(l, TRUE, FALSE))
-			break;
-		    else
-			continue;
+		    यदि (cin_isterminated(l, TRUE, FALSE))
+			रोक;
+		    अन्यथा
+			जारी;
 		}
 
 		// What happens next depends on the line being terminated.
@@ -3292,10 +3292,10 @@ get_c_indent(void)
 		// (indented).
 		terminated = cin_isterminated(l, FALSE, TRUE);
 
-		if (js_cur_has_key)
+		यदि (js_cur_has_साँचो)
 		{
-		    js_cur_has_key = 0; // only check the first line
-		    if (curbuf->b_ind_js && terminated == ',')
+		    js_cur_has_साँचो = 0; // only check the first line
+		    यदि (curbuf->b_ind_js && terminated == ',')
 		    {
 			// For Javascript we might be inside an object:
 			//   key: something,  <- align with this
@@ -3304,38 +3304,38 @@ get_c_indent(void)
 			//   key: something +  <- align with this
 			//       something,
 			//   key: something
-			lookfor = LOOKFOR_JS_KEY;
+			lookfor = LOOKFOR_JS_साँचो;
 		    }
 		}
-		if (lookfor == LOOKFOR_JS_KEY && cin_has_js_key(l))
+		यदि (lookfor == LOOKFOR_JS_साँचो && cin_has_js_साँचो(l))
 		{
 		    amount = get_indent();
-		    break;
+		    रोक;
 		}
-		if (lookfor == LOOKFOR_COMMA)
+		यदि (lookfor == LOOKFOR_COMMA)
 		{
-		    if (tryposBrace != NULL && tryposBrace->lnum
+		    यदि (tryposBrace != रिक्त && tryposBrace->lnum
 						    >= curwin->w_cursor.lnum)
-			break;
-		    if (terminated == ',')
+			रोक;
+		    यदि (terminated == ',')
 			// line below current line is the one that starts a
 			// (possibly broken) line ending in a comma.
-			break;
-		    else
+			रोक;
+		    अन्यथा
 		    {
 			amount = get_indent();
-			if (curwin->w_cursor.lnum - 1 == ourscope)
+			यदि (curwin->w_cursor.lnum - 1 == ourscope)
 			    // line above is start of the scope, thus current
 			    // line is the one that stars a (possibly broken)
 			    // line ending in a comma.
-			    break;
+			    रोक;
 		    }
 		}
 
-		if (terminated == 0 || (lookfor != LOOKFOR_UNTERM
+		यदि (terminated == 0 || (lookfor != LOOKFOR_UNTERM
 							&& terminated == ','))
 		{
-		    if (lookfor != LOOKFOR_ENUM_OR_INIT &&
+		    यदि (lookfor != LOOKFOR_ENUM_OR_INIT &&
 			    (*skipwhite(l) == '[' || l[STRLEN(l) - 1] == '['))
 			amount += ind_continuation;
 		    // if we're in the middle of a paren thing,
@@ -3347,25 +3347,25 @@ get_c_indent(void)
 		    // Position the cursor over the rightmost paren, so that
 		    // matching it will take us back to the start of the line.
 		    // Ignore a match before the start of the block.
-		    (void)find_last_paren(l, '(', ')');
+		    (शून्य)find_last_paren(l, '(', ')');
 		    trypos = find_match_paren(corr_ind_maxparen(&cur_curpos));
-		    if (trypos != NULL && (trypos->lnum < tryposBrace->lnum
+		    यदि (trypos != रिक्त && (trypos->lnum < tryposBrace->lnum
 				|| (trypos->lnum == tryposBrace->lnum
 				    && trypos->col < tryposBrace->col)))
-			trypos = NULL;
+			trypos = रिक्त;
 
 		    l = ml_get_curline();
 
 		    // If we are looking for ',', we also look for matching
 		    // braces.
-		    if (trypos == NULL && terminated == ',')
+		    यदि (trypos == रिक्त && terminated == ',')
 		    {
-			if (find_last_paren(l, '{', '}'))
+			यदि (find_last_paren(l, '{', '}'))
 			    trypos = find_start_brace();
 			l = ml_get_curline();
 		    }
 
-		    if (trypos != NULL)
+		    यदि (trypos != रिक्त)
 		    {
 			// Check if we are on a case label now.  This is
 			// handled above.
@@ -3373,11 +3373,11 @@ get_c_indent(void)
 			//			asdf)
 			curwin->w_cursor = *trypos;
 			l = ml_get_curline();
-			if (cin_iscase(l, FALSE) || cin_isscopedecl(l))
+			यदि (cin_iscase(l, FALSE) || cin_isscopedecl(l))
 			{
 			    ++curwin->w_cursor.lnum;
 			    curwin->w_cursor.col = 0;
-			    continue;
+			    जारी;
 			}
 		    }
 
@@ -3386,13 +3386,13 @@ get_c_indent(void)
 		    // char *usethis = "bla{backslash}
 		    //		 bla",
 		    //      here;
-		    if (terminated == ',')
+		    यदि (terminated == ',')
 		    {
-			while (curwin->w_cursor.lnum > 1)
+			जबसम्म (curwin->w_cursor.lnum > 1)
 			{
 			    l = ml_get(curwin->w_cursor.lnum - 1);
-			    if (*l == NUL || l[STRLEN(l) - 1] != '\\')
-				break;
+			    यदि (*l == NUL || l[STRLEN(l) - 1] != '\\')
+				रोक;
 			    --curwin->w_cursor.lnum;
 			    curwin->w_cursor.col = 0;
 			}
@@ -3401,16 +3401,16 @@ get_c_indent(void)
 
 		    // Get indent and pointer to text for current line,
 		    // ignoring any jump label.  XXX
-		    if (curbuf->b_ind_js)
+		    यदि (curbuf->b_ind_js)
 			cur_amount = get_indent();
-		    else
+		    अन्यथा
 			cur_amount = skip_label(curwin->w_cursor.lnum, &l);
 		    // If this is just above the line we are indenting, and it
 		    // starts with a '{', line it up with this line.
 		    //		while (not)
 		    // ->	{
 		    //		}
-		    if (terminated != ',' && lookfor != LOOKFOR_TERM
+		    यदि (terminated != ',' && lookfor != LOOKFOR_TERM
 							 && theline[0] == '{')
 		    {
 			amount = cur_amount;
@@ -3419,36 +3419,36 @@ get_c_indent(void)
 			// in the same line (scope is the same).  Probably:
 			//	{ 1, 2 },
 			// ->	{ 3, 4 }
-			if (*skipwhite(l) != '{')
+			यदि (*skipwhite(l) != '{')
 			    amount += curbuf->b_ind_open_extra;
 
-			if (curbuf->b_ind_cpp_baseclass && !curbuf->b_ind_js)
+			यदि (curbuf->b_ind_cpp_baseclass && !curbuf->b_ind_js)
 			{
 			    // have to look back, whether it is a cpp base
 			    // class declaration or initialization
 			    lookfor = LOOKFOR_CPP_BASECLASS;
-			    continue;
+			    जारी;
 			}
-			break;
+			रोक;
 		    }
 
 		    // Check if we are after an "if", "while", etc.
 		    // Also allow "} else".
-		    if (cin_is_cinword(l) || cin_iselse(skipwhite(l)))
+		    यदि (cin_is_cinword(l) || cin_iselse(skipwhite(l)))
 		    {
 			// Found an unterminated line after an if (), line up
 			// with the last one.
 			//   if (cond)
 			//	    100 +
 			// ->		here;
-			if (lookfor == LOOKFOR_UNTERM
+			यदि (lookfor == LOOKFOR_UNTERM
 					   || lookfor == LOOKFOR_ENUM_OR_INIT)
 			{
-			    if (cont_amount > 0)
+			    यदि (cont_amount > 0)
 				amount = cont_amount;
-			    else
+			    अन्यथा
 				amount += ind_continuation;
-			    break;
+			    रोक;
 			}
 
 			// If this is just above the line we are indenting, we
@@ -3463,13 +3463,13 @@ get_c_indent(void)
 			//		xxx;
 			// ->	here;
 			amount = cur_amount;
-			if (theline[0] == '{')
+			यदि (theline[0] == '{')
 			    amount += curbuf->b_ind_open_extra;
-			if (lookfor != LOOKFOR_TERM)
+			यदि (lookfor != LOOKFOR_TERM)
 			{
 			    amount += curbuf->b_ind_level
 						     + curbuf->b_ind_no_brace;
-			    break;
+			    रोक;
 			}
 
 			// Special trick: when expecting the while () after a
@@ -3478,10 +3478,10 @@ get_c_indent(void)
 			//	    x = 1;
 			// ->  here
 			l = skipwhite(ml_get_curline());
-			if (cin_isdo(l))
+			यदि (cin_isdo(l))
 			{
-			    if (whilelevel == 0)
-				break;
+			    यदि (whilelevel == 0)
+				रोक;
 			    --whilelevel;
 			}
 
@@ -3489,19 +3489,19 @@ get_c_indent(void)
 			// one between the "if" and the matching "else".
 			// Need to use the scope of this "else".  XXX
 			// If whilelevel != 0 continue looking for a "do {".
-			if (cin_iselse(l) && whilelevel == 0)
+			यदि (cin_iselse(l) && whilelevel == 0)
 			{
 			    // If we're looking at "} else", let's make sure we
 			    // find the opening brace of the enclosing scope,
 			    // not the one from "if (condition) {".
-			    if (*l == '}')
+			    यदि (*l == '}')
 				curwin->w_cursor.col =
 					  (colnr_T)(l - ml_get_curline()) + 1;
 
-			    if ((trypos = find_start_brace()) == NULL
+			    यदि ((trypos = find_start_brace()) == रिक्त
 				       || find_match(LOOKFOR_IF, trypos->lnum)
 								      == FAIL)
-				break;
+				रोक;
 			}
 		    }
 
@@ -3509,43 +3509,43 @@ get_c_indent(void)
 		    // "if" or something, we may line up with this line or
 		    // add something for a continuation line, depending on
 		    // the line before this one.
-		    else
+		    अन्यथा
 		    {
 			// Found two unterminated lines on a row, line up with
 			// the last one.
 			//   c = 99 +
 			//	    100 +
 			// ->	    here;
-			if (lookfor == LOOKFOR_UNTERM)
+			यदि (lookfor == LOOKFOR_UNTERM)
 			{
 			    // When line ends in a comma add extra indent
-			    if (terminated == ',')
+			    यदि (terminated == ',')
 				amount += ind_continuation;
-			    break;
+			    रोक;
 			}
 
-			if (lookfor == LOOKFOR_ENUM_OR_INIT)
+			यदि (lookfor == LOOKFOR_ENUM_OR_INIT)
 			{
 			    // Found two lines ending in ',', lineup with the
 			    // lowest one, but check for cpp base class
 			    // declaration/initialization, if it is an
 			    // opening brace or we are looking just for
 			    // enumerations/initializations.
-			    if (terminated == ',')
+			    यदि (terminated == ',')
 			    {
-				if (curbuf->b_ind_cpp_baseclass == 0)
-				    break;
+				यदि (curbuf->b_ind_cpp_baseclass == 0)
+				    रोक;
 
 				lookfor = LOOKFOR_CPP_BASECLASS;
-				continue;
+				जारी;
 			    }
 
 			    // Ignore unterminated lines in between, but
 			    // reduce indent.
-			    if (amount > cur_amount)
+			    यदि (amount > cur_amount)
 				amount = cur_amount;
 			}
-			else
+			अन्यथा
 			{
 			    // Found first unterminated line on a row, may
 			    // line up with this line, remember its indent
@@ -3554,10 +3554,10 @@ get_c_indent(void)
 			    l = ml_get_curline();
 			    amount = cur_amount;
 
-			    n = (int)STRLEN(l);
-			    if (curbuf->b_ind_js && terminated == ',' && (*skipwhite(l) == ']'
+			    n = (पूर्णाङ्क)STRLEN(l);
+			    यदि (curbuf->b_ind_js && terminated == ',' && (*skipwhite(l) == ']'
 					|| (n >=2 && l[n - 2] == ']')))
-				break;
+				रोक;
 
 			    // If previous line ends in ',', check whether we
 			    // are in an initialization or enum
@@ -3568,9 +3568,9 @@ get_c_indent(void)
 			    // or a normal possible continuation line.
 			    // but only, of no other statement has been found
 			    // yet.
-			    if (lookfor == LOOKFOR_INITIAL && terminated == ',')
+			    यदि (lookfor == LOOKFOR_INITIAL && terminated == ',')
 			    {
-				if (curbuf->b_ind_js)
+				यदि (curbuf->b_ind_js)
 				{
 				    // Search for a line ending in a comma
 				    // and line up with the line below it
@@ -3583,39 +3583,39 @@ get_c_indent(void)
 				    //       4 *
 				    //        5,
 				    //     6,
-				    if (cin_iscomment(skipwhite(l)))
-					break;
+				    यदि (cin_iscomment(skipwhite(l)))
+					रोक;
 				    lookfor = LOOKFOR_COMMA;
 				    trypos = find_match_char('[',
 						      curbuf->b_ind_maxparen);
-				    if (trypos != NULL)
+				    यदि (trypos != रिक्त)
 				    {
-					if (trypos->lnum
+					यदि (trypos->lnum
 						 == curwin->w_cursor.lnum - 1)
 					{
 					    // Current line is first inside
 					    // [], line up with it.
-					    break;
+					    रोक;
 					}
 					ourscope = trypos->lnum;
 				    }
 				}
-				else
+				अन्यथा
 				{
 				    lookfor = LOOKFOR_ENUM_OR_INIT;
 				    cont_amount = cin_first_id_amount();
 				}
 			    }
-			    else
+			    अन्यथा
 			    {
-				if (lookfor == LOOKFOR_INITIAL
+				यदि (lookfor == LOOKFOR_INITIAL
 					&& *l != NUL
 					&& l[STRLEN(l) - 1] == '\\')
 								// XXX
 				    cont_amount = cin_get_equal_amount(
 						       curwin->w_cursor.lnum);
-				if (lookfor != LOOKFOR_TERM
-						&& lookfor != LOOKFOR_JS_KEY
+				यदि (lookfor != LOOKFOR_TERM
+						&& lookfor != LOOKFOR_JS_साँचो
 						&& lookfor != LOOKFOR_COMMA
 						&& raw_string_start != curwin->w_cursor.lnum)
 				    lookfor = LOOKFOR_UNTERM;
@@ -3626,28 +3626,28 @@ get_c_indent(void)
 
 		// Check if we are after a while (cond);
 		// If so: Ignore until the matching "do".
-		else if (cin_iswhileofdo_end(terminated)) // XXX
+		अन्यथा यदि (cin_iswhileofdo_end(terminated)) // XXX
 		{
 		    // Found an unterminated line after a while ();, line up
 		    // with the last one.
 		    //	    while (cond);
 		    //	    100 +		<- line up with this one
 		    // ->	    here;
-		    if (lookfor == LOOKFOR_UNTERM
+		    यदि (lookfor == LOOKFOR_UNTERM
 					   || lookfor == LOOKFOR_ENUM_OR_INIT)
 		    {
-			if (cont_amount > 0)
+			यदि (cont_amount > 0)
 			    amount = cont_amount;
-			else
+			अन्यथा
 			    amount += ind_continuation;
-			break;
+			रोक;
 		    }
 
-		    if (whilelevel == 0)
+		    यदि (whilelevel == 0)
 		    {
 			lookfor = LOOKFOR_TERM;
 			amount = get_indent();	    // XXX
-			if (theline[0] == '{')
+			यदि (theline[0] == '{')
 			    amount += curbuf->b_ind_open_extra;
 		    }
 		    ++whilelevel;
@@ -3658,26 +3658,26 @@ get_c_indent(void)
 		// indent of that other statement.
 		// Otherwise the indent of the current statement may be used,
 		// search backwards for the next "normal" statement.
-		else
+		अन्यथा
 		{
 		    // Skip single break line, if before a switch label. It
 		    // may be lined up with the case label.
-		    if (lookfor == LOOKFOR_NOBREAK
+		    यदि (lookfor == LOOKFOR_NOBREAK
 				  && cin_isbreak(skipwhite(ml_get_curline())))
 		    {
 			lookfor = LOOKFOR_ANY;
-			continue;
+			जारी;
 		    }
 
 		    // Handle "do {" line.
-		    if (whilelevel > 0)
+		    यदि (whilelevel > 0)
 		    {
 			l = cin_skipcomment(ml_get_curline());
-			if (cin_isdo(l))
+			यदि (cin_isdo(l))
 			{
 			    amount = get_indent();	// XXX
 			    --whilelevel;
-			    continue;
+			    जारी;
 			}
 		    }
 
@@ -3690,14 +3690,14 @@ get_c_indent(void)
 		    //	 int x = 1;
 		    //	 int foo,
 		    // ->	here;
-		    if (lookfor == LOOKFOR_UNTERM
+		    यदि (lookfor == LOOKFOR_UNTERM
 					   || lookfor == LOOKFOR_ENUM_OR_INIT)
 		    {
-			if (cont_amount > 0)
+			यदि (cont_amount > 0)
 			    amount = cont_amount;
-			else
+			अन्यथा
 			    amount += ind_continuation;
-			break;
+			रोक;
 		    }
 
 		    // Found a terminated line above a terminated line or "if"
@@ -3707,16 +3707,16 @@ get_c_indent(void)
 		    //	     while (asdf)	  ->here;
 		    //		here;
 		    // ->foo;
-		    if (lookfor == LOOKFOR_TERM)
+		    यदि (lookfor == LOOKFOR_TERM)
 		    {
-			if (!lookfor_break && whilelevel == 0)
-			    break;
+			यदि (!lookfor_break && whilelevel == 0)
+			    रोक;
 		    }
 
 		    // First line above the one we're indenting is terminated.
 		    // To know what needs to be done look further backward for
 		    // a terminated line.
-		    else
+		    अन्यथा
 		    {
 			// position the cursor over the rightmost paren, so
 			// that matching it will take us back to the start of
@@ -3726,9 +3726,9 @@ get_c_indent(void)
 			//     here;
 term_again:
 			l = ml_get_curline();
-			if (find_last_paren(l, '(', ')')
+			यदि (find_last_paren(l, '(', ')')
 				&& (trypos = find_match_paren(
-					   curbuf->b_ind_maxparen)) != NULL)
+					   curbuf->b_ind_maxparen)) != रिक्त)
 			{
 			    // Check if we are on a case label now.  This is
 			    // handled above.
@@ -3736,11 +3736,11 @@ term_again:
 			    //			    asdf)
 			    curwin->w_cursor = *trypos;
 			    l = ml_get_curline();
-			    if (cin_iscase(l, FALSE) || cin_isscopedecl(l))
+			    यदि (cin_iscase(l, FALSE) || cin_isscopedecl(l))
 			    {
 				++curwin->w_cursor.lnum;
 				curwin->w_cursor.col = 0;
-				continue;
+				जारी;
 			    }
 			}
 
@@ -3759,11 +3759,11 @@ term_again:
 			// ignoring any jump label.
 			amount = skip_label(curwin->w_cursor.lnum, &l);
 
-			if (theline[0] == '{')
+			यदि (theline[0] == '{')
 			    amount += curbuf->b_ind_open_extra;
 			// See remark above: "Only add b_ind_open_extra.."
 			l = skipwhite(l);
-			if (*l == '{')
+			यदि (*l == '{')
 			    amount -= curbuf->b_ind_open_extra;
 			lookfor = iscase ? LOOKFOR_ANY : LOOKFOR_TERM;
 
@@ -3773,30 +3773,30 @@ term_again:
 			//	     indent this;
 			// Need to use the scope of this "else".  XXX
 			// If whilelevel != 0 continue looking for a "do {".
-			if (lookfor == LOOKFOR_TERM
+			यदि (lookfor == LOOKFOR_TERM
 				&& *l != '}'
 				&& cin_iselse(l)
 				&& whilelevel == 0)
 			{
-			    if ((trypos = find_start_brace()) == NULL
+			    यदि ((trypos = find_start_brace()) == रिक्त
 				       || find_match(LOOKFOR_IF, trypos->lnum)
 								      == FAIL)
-				break;
-			    continue;
+				रोक;
+			    जारी;
 			}
 
 			// If we're at the end of a block, skip to the start of
 			// that block.
 			l = ml_get_curline();
-			if (find_last_paren(l, '{', '}') // XXX
-				     && (trypos = find_start_brace()) != NULL)
+			यदि (find_last_paren(l, '{', '}') // XXX
+				     && (trypos = find_start_brace()) != रिक्त)
 			{
 			    curwin->w_cursor = *trypos;
 			    // if not "else {" check for terminated again
 			    // but skip block for "} else {"
 			    l = cin_skipcomment(ml_get_curline());
-			    if (*l == '}' || !cin_iselse(l))
-				goto term_again;
+			    यदि (*l == '}' || !cin_iselse(l))
+				गच्छ term_again;
 			    ++curwin->w_cursor.lnum;
 			    curwin->w_cursor.col = 0;
 			}
@@ -3807,14 +3807,14 @@ term_again:
       }
 
       // add extra indent for a comment
-      if (cin_iscomment(theline))
+      यदि (cin_iscomment(theline))
 	  amount += curbuf->b_ind_comment;
 
       // subtract extra left-shift for jump labels
-      if (curbuf->b_ind_jump_label > 0 && original_line_islabel)
+      यदि (curbuf->b_ind_jump_label > 0 && original_पङ्क्ति_islabel)
 	  amount -= curbuf->b_ind_jump_label;
 
-      goto theend;
+      गच्छ theend;
     }
 
     // ok -- we're not inside any sort of structure at all!
@@ -3828,10 +3828,10 @@ term_again:
     // prevailing indent and make sure it looks like the start
     // of a function
 
-    if (theline[0] == '{')
+    यदि (theline[0] == '{')
     {
 	amount = curbuf->b_ind_first_open;
-	goto theend;
+	गच्छ theend;
     }
 
     // If the NEXT line is a function declaration, the current
@@ -3839,24 +3839,24 @@ term_again:
     // Don't do this if the current line looks like a comment or if the
     // current line is terminated, ie. ends in ';', or if the current line
     // contains { or }: "void f(condition) {\n if (1)"
-    if (cur_curpos.lnum < curbuf->b_ml.ml_line_count
+    यदि (cur_curpos.lnum < curbuf->b_ml.ml_पङ्क्ति_गन्ती
 	    && !cin_nocode(theline)
-	    && vim_strchr(theline, '{') == NULL
-	    && vim_strchr(theline, '}') == NULL
+	    && vim_strchr(theline, '{') == रिक्त
+	    && vim_strchr(theline, '}') == रिक्त
 	    && !cin_ends_in(theline, (char_u *)":")
 	    && !cin_ends_in(theline, (char_u *)",")
-	    && cin_isfuncdecl(NULL, cur_curpos.lnum + 1,
+	    && cin_isfuncdecl(रिक्त, cur_curpos.lnum + 1,
 			      cur_curpos.lnum + 1)
 	    && !cin_isterminated(theline, FALSE, TRUE))
     {
 	amount = curbuf->b_ind_func_type;
-	goto theend;
+	गच्छ theend;
     }
 
     // search backwards until we find something we recognize
     amount = 0;
     curwin->w_cursor = cur_curpos;
-    while (curwin->w_cursor.lnum > 1)
+    जबसम्म (curwin->w_cursor.lnum > 1)
     {
 	curwin->w_cursor.lnum--;
 	curwin->w_cursor.col = 0;
@@ -3865,34 +3865,34 @@ term_again:
 
 	// If we're in a comment or raw string now, skip to the start
 	// of it.  XXX
-	if ((trypos = ind_find_start_CORS(NULL)) != NULL)
+	यदि ((trypos = ind_find_start_CORS(रिक्त)) != रिक्त)
 	{
 	    curwin->w_cursor.lnum = trypos->lnum + 1;
 	    curwin->w_cursor.col = 0;
-	    continue;
+	    जारी;
 	}
 
 	// Are we at the start of a cpp base class declaration or
 	// constructor initialization?  XXX
 	n = FALSE;
-	if (curbuf->b_ind_cpp_baseclass != 0)
+	यदि (curbuf->b_ind_cpp_baseclass != 0)
 	{
 	    n = cin_is_cpp_baseclass(&cache_cpp_baseclass);
 	    l = ml_get_curline();
 	}
-	if (n)
+	यदि (n)
 	{
 							     // XXX
 	    amount = get_baseclass_amount(cache_cpp_baseclass.lpos.col);
-	    break;
+	    रोक;
 	}
 
 	// Skip preprocessor directives and blank lines.
-	if (cin_ispreproc_cont(&l, &curwin->w_cursor.lnum, &amount))
-	    continue;
+	यदि (cin_ispreproc_cont(&l, &curwin->w_cursor.lnum, &amount))
+	    जारी;
 
-	if (cin_nocode(l))
-	    continue;
+	यदि (cin_nocode(l))
+	    जारी;
 
 	// If the previous line ends in ',', use one level of
 	// indentation:
@@ -3905,13 +3905,13 @@ term_again:
 	// } foo,
 	//   bar;
 	n = 0;
-	if (cin_ends_in(l, (char_u *)",")
+	यदि (cin_ends_in(l, (char_u *)",")
 		     || (*l != NUL && (n = l[STRLEN(l) - 1]) == '\\'))
 	{
 	    // take us back to opening paren
-	    if (find_last_paren(l, '(', ')')
+	    यदि (find_last_paren(l, '(', ')')
 		    && (trypos = find_match_paren(
-				     curbuf->b_ind_maxparen)) != NULL)
+				     curbuf->b_ind_maxparen)) != रिक्त)
 		curwin->w_cursor = *trypos;
 
 	    // For a line ending in ',' that is a continuation line go
@@ -3919,70 +3919,70 @@ term_again:
 	    // char *foo = "bla{backslash}
 	    //		 bla",
 	    //      here;
-	    while (n == 0 && curwin->w_cursor.lnum > 1)
+	    जबसम्म (n == 0 && curwin->w_cursor.lnum > 1)
 	    {
 		l = ml_get(curwin->w_cursor.lnum - 1);
-		if (*l == NUL || l[STRLEN(l) - 1] != '\\')
-		    break;
+		यदि (*l == NUL || l[STRLEN(l) - 1] != '\\')
+		    रोक;
 		--curwin->w_cursor.lnum;
 		curwin->w_cursor.col = 0;
 	    }
 
 	    amount = get_indent();	    // XXX
 
-	    if (amount == 0)
+	    यदि (amount == 0)
 		amount = cin_first_id_amount();
-	    if (amount == 0)
+	    यदि (amount == 0)
 		amount = ind_continuation;
-	    break;
+	    रोक;
 	}
 
 	// If the line looks like a function declaration, and we're
 	// not in a comment, put it the left margin.
-	if (cin_isfuncdecl(NULL, cur_curpos.lnum, 0))  // XXX
-	    break;
+	यदि (cin_isfuncdecl(रिक्त, cur_curpos.lnum, 0))  // XXX
+	    रोक;
 	l = ml_get_curline();
 
 	// Finding the closing '}' of a previous function.  Put
 	// current line at the left margin.  For when 'cino' has "fs".
-	if (*skipwhite(l) == '}')
-	    break;
+	यदि (*skipwhite(l) == '}')
+	    रोक;
 
 	//			    (matching {)
 	// If the previous line ends on '};' (maybe followed by
 	// comments) align at column 0.  For example:
 	// char *string_array[] = { "foo",
 	//     / * x * / "b};ar" }; / * foobar * /
-	if (cin_ends_in(l, (char_u *)"};"))
-	    break;
+	यदि (cin_ends_in(l, (char_u *)"};"))
+	    रोक;
 
 	// If the previous line ends on '[' we are probably in an
 	// array constant:
 	// something = [
 	//     234,  <- extra indent
-	if (cin_ends_in(l, (char_u *)"["))
+	यदि (cin_ends_in(l, (char_u *)"["))
 	{
 	    amount = get_indent() + ind_continuation;
-	    break;
+	    रोक;
 	}
 
 	// Find a line only has a semicolon that belongs to a previous
 	// line ending in '}', e.g. before an #endif.  Don't increase
 	// indent then.
-	if (*(look = skipwhite(l)) == ';' && cin_nocode(look + 1))
+	यदि (*(look = skipwhite(l)) == ';' && cin_nocode(look + 1))
 	{
 	    pos_T curpos_save = curwin->w_cursor;
 
-	    while (curwin->w_cursor.lnum > 1)
+	    जबसम्म (curwin->w_cursor.lnum > 1)
 	    {
 		look = ml_get(--curwin->w_cursor.lnum);
-		if (!(cin_nocode(look) || cin_ispreproc_cont(
+		यदि (!(cin_nocode(look) || cin_ispreproc_cont(
 				      &look, &curwin->w_cursor.lnum, &amount)))
-		    break;
+		    रोक;
 	    }
-	    if (curwin->w_cursor.lnum > 0
+	    यदि (curwin->w_cursor.lnum > 0
 			    && cin_ends_in(look, (char_u *)"}"))
-		break;
+		रोक;
 
 	    curwin->w_cursor = curpos_save;
 	}
@@ -3990,10 +3990,10 @@ term_again:
 	// If the PREVIOUS line is a function declaration, the current
 	// line (and the ones that follow) needs to be indented as
 	// parameters.
-	if (cin_isfuncdecl(&l, curwin->w_cursor.lnum, 0))
+	यदि (cin_isfuncdecl(&l, curwin->w_cursor.lnum, 0))
 	{
 	    amount = curbuf->b_ind_param;
-	    break;
+	    रोक;
 	}
 
 	// If the previous line ends in ';' and the line before the
@@ -4001,12 +4001,12 @@ term_again:
 	// int foo,
 	//     bar;
 	// indent_to_0 here;
-	if (cin_ends_in(l, (char_u *)";"))
+	यदि (cin_ends_in(l, (char_u *)";"))
 	{
 	    l = ml_get(curwin->w_cursor.lnum - 1);
-	    if (cin_ends_in(l, (char_u *)",")
+	    यदि (cin_ends_in(l, (char_u *)",")
 		    || (*l != NUL && l[STRLEN(l) - 1] == '\\'))
-		break;
+		रोक;
 	    l = ml_get_curline();
 	}
 
@@ -4017,14 +4017,14 @@ term_again:
 	// matching it will take us back to the start of the line.
 	find_last_paren(l, '(', ')');
 
-	if ((trypos = find_match_paren(curbuf->b_ind_maxparen)) != NULL)
+	यदि ((trypos = find_match_paren(curbuf->b_ind_maxparen)) != रिक्त)
 	    curwin->w_cursor = *trypos;
 	amount = get_indent();	    // XXX
-	break;
+	रोक;
     }
 
     // add extra indent for a comment
-    if (cin_iscomment(theline))
+    यदि (cin_iscomment(theline))
 	amount += curbuf->b_ind_comment;
 
     // add extra indent if the previous line ended in a backslash:
@@ -4032,21 +4032,21 @@ term_again:
     //		  here";
     //	    char *foo = "asdf{backslash}
     //			 here";
-    if (cur_curpos.lnum > 1)
+    यदि (cur_curpos.lnum > 1)
     {
 	l = ml_get(cur_curpos.lnum - 1);
-	if (*l != NUL && l[STRLEN(l) - 1] == '\\')
+	यदि (*l != NUL && l[STRLEN(l) - 1] == '\\')
 	{
 	    cur_amount = cin_get_equal_amount(cur_curpos.lnum - 1);
-	    if (cur_amount > 0)
+	    यदि (cur_amount > 0)
 		amount = cur_amount;
-	    else if (cur_amount == 0)
+	    अन्यथा यदि (cur_amount == 0)
 		amount += ind_continuation;
 	}
     }
 
 theend:
-    if (amount < 0)
+    यदि (amount < 0)
 	amount = 0;
 
 laterend:
@@ -4055,7 +4055,7 @@ laterend:
 
     vim_free(linecopy);
 
-    return amount;
+    फर्काऊ amount;
 }
 
 /*
@@ -4071,87 +4071,87 @@ laterend:
  *
  * If line_is_empty is TRUE accept keys with '0' before them.
  */
-    int
+    पूर्णाङ्क
 in_cinkeys(
-    int		keytyped,
-    int		when,
-    int		line_is_empty)
+    पूर्णाङ्क		keytyped,
+    पूर्णाङ्क		when,
+    पूर्णाङ्क		पङ्क्ति_is_empty)
 {
     char_u	*look;
-    int		try_match;
-    int		try_match_word;
+    पूर्णाङ्क		try_match;
+    पूर्णाङ्क		try_match_word;
     char_u	*p;
-    char_u	*line;
-    int		icase;
-    int		i;
+    char_u	*पङ्क्ति;
+    पूर्णाङ्क		icase;
+    पूर्णाङ्क		i;
 
-    if (keytyped == NUL)
+    यदि (keytyped == NUL)
 	// Can happen with CTRL-Y and CTRL-E on a short line.
-	return FALSE;
+	फर्काऊ FALSE;
 
 #ifdef FEAT_EVAL
-    if (*curbuf->b_p_inde != NUL)
+    यदि (*curbuf->b_p_inde != NUL)
 	look = curbuf->b_p_indk;	// 'indentexpr' set: use 'indentkeys'
-    else
+    अन्यथा
 #endif
 	look = curbuf->b_p_cink;	// 'indentexpr' empty: use 'cinkeys'
-    while (*look)
+    जबसम्म (*look)
     {
 	// Find out if we want to try a match with this key, depending on
 	// 'when' and a '*' or '!' before the key.
-	switch (when)
+	विकल्प (when)
 	{
-	    case '*': try_match = (*look == '*'); break;
-	    case '!': try_match = (*look == '!'); break;
-	    default: try_match = (*look != '*'); break;
+	    पक्ष '*': try_match = (*look == '*'); रोक;
+	    पक्ष '!': try_match = (*look == '!'); रोक;
+	    स्वभाव: try_match = (*look != '*'); रोक;
 	}
-	if (*look == '*' || *look == '!')
+	यदि (*look == '*' || *look == '!')
 	    ++look;
 
 	// If there is a '0', only accept a match if the line is empty.
 	// But may still match when typing last char of a word.
-	if (*look == '0')
+	यदि (*look == '0')
 	{
 	    try_match_word = try_match;
-	    if (!line_is_empty)
+	    यदि (!पङ्क्ति_is_empty)
 		try_match = FALSE;
 	    ++look;
 	}
-	else
+	अन्यथा
 	    try_match_word = FALSE;
 
 	// does it look like a control character?
-	if (*look == '^' && look[1] >= '?' && look[1] <= '_')
+	यदि (*look == '^' && look[1] >= '?' && look[1] <= '_')
 	{
-	    if (try_match && keytyped == Ctrl_chr(look[1]))
-		return TRUE;
+	    यदि (try_match && keytyped == Ctrl_chr(look[1]))
+		फर्काऊ TRUE;
 	    look += 2;
 	}
 	// 'o' means "o" command, open forward.
 	// 'O' means "O" command, open backward.
-	else if (*look == 'o')
+	अन्यथा यदि (*look == 'o')
 	{
-	    if (try_match && keytyped == KEY_OPEN_FORW)
-		return TRUE;
+	    यदि (try_match && keytyped == साँचो_OPEN_FORW)
+		फर्काऊ TRUE;
 	    ++look;
 	}
-	else if (*look == 'O')
+	अन्यथा यदि (*look == 'O')
 	{
-	    if (try_match && keytyped == KEY_OPEN_BACK)
-		return TRUE;
+	    यदि (try_match && keytyped == साँचो_OPEN_BACK)
+		फर्काऊ TRUE;
 	    ++look;
 	}
 
 	// 'e' means to check for "else" at start of line and just before the
 	// cursor.
-	else if (*look == 'e')
+	अन्यथा यदि (*look == 'e')
 	{
-	    if (try_match && keytyped == 'e' && curwin->w_cursor.col >= 4)
+	    यदि (try_match && keytyped == 'e' && curwin->w_cursor.col >= 4)
 	    {
 		p = ml_get_curline();
-		if (skipwhite(p) == p + curwin->w_cursor.col - 4 &&
+		यदि (skipwhite(p) == p + curwin->w_cursor.col - 4 &&
 			STRNCMP(p + curwin->w_cursor.col - 4, "else", 4) == 0)
-		    return TRUE;
+		    फर्काऊ TRUE;
 	    }
 	    ++look;
 	}
@@ -4159,16 +4159,16 @@ in_cinkeys(
 	// ':' only causes an indent if it is at the end of a label or case
 	// statement, or when it was before typing the ':' (to fix
 	// class::method for C++).
-	else if (*look == ':')
+	अन्यथा यदि (*look == ':')
 	{
-	    if (try_match && keytyped == ':')
+	    यदि (try_match && keytyped == ':')
 	    {
 		p = ml_get_curline();
-		if (cin_iscase(p, FALSE) || cin_isscopedecl(p) || cin_islabel())
-		    return TRUE;
+		यदि (cin_iscase(p, FALSE) || cin_isscopedecl(p) || cin_islabel())
+		    फर्काऊ TRUE;
 		// Need to get the line again after cin_islabel().
 		p = ml_get_curline();
-		if (curwin->w_cursor.col > 2
+		यदि (curwin->w_cursor.col > 2
 			&& p[curwin->w_cursor.col - 1] == ':'
 			&& p[curwin->w_cursor.col - 2] == ':')
 		{
@@ -4177,8 +4177,8 @@ in_cinkeys(
 							    || cin_islabel());
 		    p = ml_get_curline();
 		    p[curwin->w_cursor.col - 1] = ':';
-		    if (i)
-			return TRUE;
+		    यदि (i)
+			फर्काऊ TRUE;
 		}
 	    }
 	    ++look;
@@ -4186,153 +4186,153 @@ in_cinkeys(
 
 
 	// Is it a key in <>, maybe?
-	else if (*look == '<')
+	अन्यथा यदि (*look == '<')
 	{
-	    if (try_match)
+	    यदि (try_match)
 	    {
 		// make up some named keys <o>, <O>, <e>, <0>, <>>, <<>, <*>,
 		// <:> and <!> so that people can re-indent on o, O, e, 0, <,
 		// >, *, : and ! keys if they really really want to.
-		if (vim_strchr((char_u *)"<>!*oOe0:", look[1]) != NULL
+		यदि (vim_strchr((char_u *)"<>!*oOe0:", look[1]) != रिक्त
 						       && keytyped == look[1])
-		    return TRUE;
+		    फर्काऊ TRUE;
 
-		if (keytyped == get_special_key_code(look + 1))
-		    return TRUE;
+		यदि (keytyped == get_special_साँचो_code(look + 1))
+		    फर्काऊ TRUE;
 	    }
-	    while (*look && *look != '>')
+	    जबसम्म (*look && *look != '>')
 		look++;
-	    while (*look == '>')
+	    जबसम्म (*look == '>')
 		look++;
 	}
 
 	// Is it a word: "=word"?
-	else if (*look == '=' && look[1] != ',' && look[1] != NUL)
+	अन्यथा यदि (*look == '=' && look[1] != ',' && look[1] != NUL)
 	{
 	    ++look;
-	    if (*look == '~')
+	    यदि (*look == '~')
 	    {
 		icase = TRUE;
 		++look;
 	    }
-	    else
+	    अन्यथा
 		icase = FALSE;
 	    p = vim_strchr(look, ',');
-	    if (p == NULL)
+	    यदि (p == रिक्त)
 		p = look + STRLEN(look);
-	    if ((try_match || try_match_word)
+	    यदि ((try_match || try_match_word)
 		    && curwin->w_cursor.col >= (colnr_T)(p - look))
 	    {
-		int		match = FALSE;
+		पूर्णाङ्क		match = FALSE;
 
-		if (keytyped == KEY_COMPLETE)
+		यदि (keytyped == साँचो_COMPLETE)
 		{
 		    char_u	*s;
 
 		    // Just completed a word, check if it starts with "look".
 		    // search back for the start of a word.
-		    line = ml_get_curline();
-		    if (has_mbyte)
+		    पङ्क्ति = ml_get_curline();
+		    यदि (has_mbyte)
 		    {
 			char_u	*n;
 
-			for (s = line + curwin->w_cursor.col; s > line; s = n)
+			लागि (s = पङ्क्ति + curwin->w_cursor.col; s > पङ्क्ति; s = n)
 			{
-			    n = mb_prevptr(line, s);
-			    if (!vim_iswordp(n))
-				break;
+			    n = mb_prevptr(पङ्क्ति, s);
+			    यदि (!vim_iswordp(n))
+				रोक;
 			}
 		    }
-		    else
-			for (s = line + curwin->w_cursor.col; s > line; --s)
-			    if (!vim_iswordc(s[-1]))
-				break;
-		    if (s + (p - look) <= line + curwin->w_cursor.col
+		    अन्यथा
+			लागि (s = पङ्क्ति + curwin->w_cursor.col; s > पङ्क्ति; --s)
+			    यदि (!vim_iswordc(s[-1]))
+				रोक;
+		    यदि (s + (p - look) <= पङ्क्ति + curwin->w_cursor.col
 			    && (icase
 				? MB_STRNICMP(s, look, p - look)
 				: STRNCMP(s, look, p - look)) == 0)
 			match = TRUE;
 		}
-		else
+		अन्यथा
 		    // TODO: multi-byte
-		    if (keytyped == (int)p[-1] || (icase
+		    यदि (keytyped == (पूर्णाङ्क)p[-1] || (icase
 				&& keytyped < 256 && keytyped >= 0
-			 && TOLOWER_LOC(keytyped) == TOLOWER_LOC((int)p[-1])))
+			 && TOLOWER_LOC(keytyped) == TOLOWER_LOC((पूर्णाङ्क)p[-1])))
 		{
-		    line = ml_get_cursor();
-		    if ((curwin->w_cursor.col == (colnr_T)(p - look)
-				|| !vim_iswordc(line[-(p - look) - 1]))
+		    पङ्क्ति = ml_get_cursor();
+		    यदि ((curwin->w_cursor.col == (colnr_T)(p - look)
+				|| !vim_iswordc(पङ्क्ति[-(p - look) - 1]))
 			    && (icase
-				? MB_STRNICMP(line - (p - look), look, p - look)
-				: STRNCMP(line - (p - look), look, p - look))
+				? MB_STRNICMP(पङ्क्ति - (p - look), look, p - look)
+				: STRNCMP(पङ्क्ति - (p - look), look, p - look))
 									 == 0)
 			match = TRUE;
 		}
-		if (match && try_match_word && !try_match)
+		यदि (match && try_match_word && !try_match)
 		{
 		    // "0=word": Check if there are only blanks before the
 		    // word.
-		    if (getwhitecols_curline() !=
-				     (int)(curwin->w_cursor.col - (p - look)))
+		    यदि (getwhitecols_curline() !=
+				     (पूर्णाङ्क)(curwin->w_cursor.col - (p - look)))
 			match = FALSE;
 		}
-		if (match)
-		    return TRUE;
+		यदि (match)
+		    फर्काऊ TRUE;
 	    }
 	    look = p;
 	}
 
 	// ok, it's a boring generic character.
-	else
+	अन्यथा
 	{
-	    if (try_match && *look == keytyped)
-		return TRUE;
-	    if (*look != NUL)
+	    यदि (try_match && *look == keytyped)
+		फर्काऊ TRUE;
+	    यदि (*look != NUL)
 		++look;
 	}
 
 	// Skip over ", ".
 	look = skip_to_option_part(look);
     }
-    return FALSE;
+    फर्काऊ FALSE;
 }
 
 /*
  * Do C or expression indenting on the current line.
  */
-    void
-do_c_expr_indent(void)
+    शून्य
+do_c_अभिव्यक्ति_indent(शून्य)
 {
 #ifdef FEAT_EVAL
-    if (*curbuf->b_p_inde != NUL)
-	fixthisline(get_expr_indent);
-    else
+    यदि (*curbuf->b_p_inde != NUL)
+	fixthisline(get_अभिव्यक्ति_indent);
+    अन्यथा
 #endif
 	fixthisline(get_c_indent);
 }
 
-#if defined(FEAT_EVAL)
+#यदि defined(FEAT_EVAL)
 /*
  * "cindent(lnum)" function
  */
-    void
+    शून्य
 f_cindent(typval_T *argvars UNUSED, typval_T *rettv)
 {
     pos_T	pos;
     linenr_T	lnum;
 
-    if (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
-	return;
+    यदि (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
+	फर्काऊ;
 
     pos = curwin->w_cursor;
     lnum = tv_get_lnum(argvars);
-    if (lnum >= 1 && lnum <= curbuf->b_ml.ml_line_count)
+    यदि (lnum >= 1 && lnum <= curbuf->b_ml.ml_पङ्क्ति_गन्ती)
     {
 	curwin->w_cursor.lnum = lnum;
-	rettv->vval.v_number = get_c_indent();
+	rettv->vval.v_सङ्ख्या = get_c_indent();
 	curwin->w_cursor = pos;
     }
-    else
-	rettv->vval.v_number = -1;
+    अन्यथा
+	rettv->vval.v_सङ्ख्या = -1;
 }
 #endif

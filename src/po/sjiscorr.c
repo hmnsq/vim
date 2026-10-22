@@ -2,56 +2,56 @@
 // backslash it needs to be doubled.
 // Public domain.
 
-#include <stdio.h>
-#include <string.h>
+#अन्तर्भाव <stdio.h>
+#अन्तर्भाव <string.h>
 
 #ifdef _WIN32
 #	include <fcntl.h>
 #	include <io.h>
 #endif
 
-	int
-main(int argc, char **argv)
+	पूर्णाङ्क
+main(पूर्णाङ्क argc, वर्ण **argv)
 {
-	char buffer[BUFSIZ];
-	char *p;
+	वर्ण buffer[बफ_मान];
+	वर्ण *p;
 
 	// Windows only: put standard input and output into binary mode so that the
 	// line endings in the output match those in the input.
 #ifdef _WIN32
-	_setmode(_fileno(stdin), _O_BINARY);
-	_setmode(_fileno(stdout), _O_BINARY);
+	_setmode(_fileno(मानक_निवेश), O_द्विआधारी_2);
+	_setmode(_fileno(मानक_निकास), O_द्विआधारी_2);
 #endif
 
-	while (fgets(buffer, BUFSIZ, stdin) != NULL)
+	जबसम्म (ख_माला_लो(buffer, बफ_मान, मानक_निवेश) != रिक्त)
 	{
-		for (p = buffer; *p != 0; p++)
+		लागि (p = buffer; *p != 0; p++)
 		{
-			if (strncmp(p, "charset=utf-8", 13) == 0
-				|| strncmp(p, "charset=UTF-8", 13) == 0)
+			यदि (म_भेदन(p, "charset=utf-8", 13) == 0
+				|| म_भेदन(p, "charset=UTF-8", 13) == 0)
 			{
-				fputs("charset=CP932", stdout);
+				ख_माला_दो("charset=CP932", मानक_निकास);
 				p += 12;
 			}
-			else if (strncmp(p, "# Original translations.", 24) == 0)
+			अन्यथा यदि (म_भेदन(p, "# Original translations.", 24) == 0)
 			{
 				p += 24 - 1; // subtracting 1 by considering "p++" in the loop.
-				fputs("# Generated from ja.po, DO NOT EDIT.", stdout);
+				ख_माला_दो("# Generated from ja.po, DO NOT EDIT.", मानक_निकास);
 			}
-			else if (*(unsigned char *)p == 0x81 && p[1] == '_')
+			अन्यथा यदि (*(अचिन्हित वर्ण *)p == 0x81 && p[1] == '_')
 			{
-				putchar('\\');
+				अक्षर_दो('\\');
 				++p;
 			}
-			else
+			अन्यथा
 			{
-				if (*p & 0x80)
+				यदि (*p & 0x80)
 				{
-					putchar(*p++);
-					if (*p == '\\')
-						putchar(*p);
+					अक्षर_दो(*p++);
+					यदि (*p == '\\')
+						अक्षर_दो(*p);
 				}
-				putchar(*p);
+				अक्षर_दो(*p);
 			}
 		}
 	}

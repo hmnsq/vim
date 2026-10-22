@@ -12,7 +12,7 @@
  */
 
 #define USING_FLOAT_STUFF
-#include "vim.h"
+#अन्तर्भाव "vim.h"
 
 /*
  * Copy "string" into newly allocated memory.
@@ -21,13 +21,13 @@
 vim_strsave(char_u *string)
 {
     char_u	*p;
-    size_t	len;
+    माप_प्रकार	len;
 
     len = STRLEN(string) + 1;
     p = alloc(len);
-    if (p != NULL)
+    यदि (p != रिक्त)
 	mch_memmove(p, string, len);
-    return p;
+    फर्काऊ p;
 }
 
 /*
@@ -37,17 +37,17 @@ vim_strsave(char_u *string)
  * shorter.
  */
     char_u *
-vim_strnsave(char_u *string, size_t len)
+vim_strnsave(char_u *string, माप_प्रकार len)
 {
     char_u	*p;
 
     p = alloc(len + 1);
-    if (p == NULL)
-	return NULL;
+    यदि (p == रिक्त)
+	फर्काऊ रिक्त;
 
     STRNCPY(p, string, len);
     p[len] = NUL;
-    return p;
+    फर्काऊ p;
 }
 
 /*
@@ -57,7 +57,7 @@ vim_strnsave(char_u *string, size_t len)
     char_u *
 vim_strsave_escaped(char_u *string, char_u *esc_chars)
 {
-    return vim_strsave_escaped_ext(string, esc_chars, '\\', FALSE);
+    फर्काऊ vim_strsave_escaped_ext(string, esc_chars, '\\', FALSE);
 }
 
 /*
@@ -69,67 +69,67 @@ vim_strsave_escaped(char_u *string, char_u *esc_chars)
 vim_strsave_escaped_ext(
     char_u	*string,
     char_u	*esc_chars,
-    int		cc,
-    int		bsl)
+    पूर्णाङ्क		cc,
+    पूर्णाङ्क		bsl)
 {
     char_u	*p;
     char_u	*p2;
     char_u	*escaped_string;
-    unsigned	length;
-    int		l;
+    अचिन्हित	length;
+    पूर्णाङ्क		l;
 
     // First count the number of backslashes required.
     // Then allocate the memory and insert them.
     length = 1;				// count the trailing NUL
-    for (p = string; *p; p++)
+    लागि (p = string; *p; p++)
     {
-	if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	यदि (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 	{
 	    length += l;		// count a multibyte char
 	    p += l - 1;
-	    continue;
+	    जारी;
 	}
-	if (vim_strchr(esc_chars, *p) != NULL || (bsl && rem_backslash(p)))
+	यदि (vim_strchr(esc_chars, *p) != रिक्त || (bsl && rem_backslash(p)))
 	    ++length;			// count a backslash
 	++length;			// count an ordinary char
     }
     escaped_string = alloc(length);
-    if (escaped_string == NULL)
-	return NULL;
+    यदि (escaped_string == रिक्त)
+	फर्काऊ रिक्त;
     p2 = escaped_string;
-    for (p = string; *p; p++)
+    लागि (p = string; *p; p++)
     {
-	if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	यदि (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 	{
-	    mch_memmove(p2, p, (size_t)l);
+	    mch_memmove(p2, p, (माप_प्रकार)l);
 	    p2 += l;
 	    p += l - 1;		// skip multibyte char
-	    continue;
+	    जारी;
 	}
-	if (vim_strchr(esc_chars, *p) != NULL || (bsl && rem_backslash(p)))
+	यदि (vim_strchr(esc_chars, *p) != रिक्त || (bsl && rem_backslash(p)))
 	    *p2++ = cc;
 	*p2++ = *p;
     }
     *p2 = NUL;
-    return escaped_string;
+    फर्काऊ escaped_string;
 }
 
 /*
  * Return TRUE when 'shell' has "csh" in the tail.
  */
-    int
-csh_like_shell(void)
+    पूर्णाङ्क
+csh_like_shell(शून्य)
 {
-    return (strstr((char *)gettail(p_sh), "csh") != NULL);
+    फर्काऊ (म_माला((वर्ण *)gettail(p_sh), "csh") != रिक्त);
 }
 
 /*
  * Return TRUE when 'shell' has "fish" in the tail.
  */
-    static int
-fish_like_shell(void)
+    स्थिर पूर्णाङ्क
+fish_like_shell(शून्य)
 {
-    return (strstr((char *)gettail(p_sh), "fish") != NULL);
+    फर्काऊ (म_माला((वर्ण *)gettail(p_sh), "fish") != रिक्त);
 }
 
 /*
@@ -145,19 +145,19 @@ fish_like_shell(void)
  * Returns the result in allocated memory, NULL if we have run out.
  */
     char_u *
-vim_strsave_shellescape(char_u *string, int do_special, int do_newline)
+vim_strsave_shellescape(char_u *string, पूर्णाङ्क do_special, पूर्णाङ्क do_newline)
 {
-    unsigned	length;
+    अचिन्हित	length;
     char_u	*p;
     char_u	*d;
     char_u	*escaped_string;
-    size_t	l;
-    int		csh_like;
-    int		fish_like;
+    माप_प्रकार	l;
+    पूर्णाङ्क		csh_like;
+    पूर्णाङ्क		fish_like;
     char_u	*shname;
-    int		powershell;
+    पूर्णाङ्क		powershell;
 #ifdef MSWIN
-    int		double_quotes;
+    पूर्णाङ्क		double_quotes;
 #endif
 
     // Only csh and similar shells expand '!' within single quotes.  For sh and
@@ -172,85 +172,85 @@ vim_strsave_shellescape(char_u *string, int do_special, int do_newline)
 
     // PowerShell uses its own version for quoting single quotes
     shname = gettail(p_sh);
-    powershell = strstr((char *)shname, "pwsh") != NULL;
+    powershell = म_माला((वर्ण *)shname, "pwsh") != रिक्त;
 #ifdef MSWIN
-    powershell = powershell || strstr((char *)shname, "powershell") != NULL;
+    powershell = powershell || म_माला((वर्ण *)shname, "powershell") != रिक्त;
     // PowerShell only accepts single quotes so override shellslash.
     double_quotes = !powershell && !p_ssl;
 #endif
 
     // First count the number of extra bytes required.
-    length = (unsigned)STRLEN(string) + 3;  // two quotes and a trailing NUL
-    for (p = string; *p != NUL; MB_PTR_ADV(p))
+    length = (अचिन्हित)STRLEN(string) + 3;  // two quotes and a trailing NUL
+    लागि (p = string; *p != NUL; MB_PTR_ADV(p))
     {
 #ifdef MSWIN
-	if (double_quotes)
+	यदि (double_quotes)
 	{
-	    if (*p == '"')
+	    यदि (*p == '"')
 		++length;		// " -> ""
 	}
-	else
+	अन्यथा
 #endif
-	if (*p == '\'')
+	यदि (*p == '\'')
 	{
-	    if (powershell)
+	    यदि (powershell)
 		length += 2;		// ' => ''
-	    else
+	    अन्यथा
 		length += 3;		// ' => '\''
 	}
-	if ((*p == '\n' && (csh_like || do_newline))
+	यदि ((*p == '\n' && (csh_like || do_newline))
 		|| (*p == '!' && (csh_like || do_special)))
 	{
 	    ++length;			// insert backslash
-	    if (csh_like && do_special)
+	    यदि (csh_like && do_special)
 		++length;		// insert backslash
 	}
-	if (do_special && find_cmdline_var(p, &l) >= 0)
+	यदि (do_special && find_cmdline_var(p, &l) >= 0)
 	{
 	    ++length;			// insert backslash
 	    p += l - 1;
 	}
-	if (*p == '\\' && fish_like)
+	यदि (*p == '\\' && fish_like)
 	    ++length;			// insert backslash
     }
 
     // Allocate memory for the result and fill it.
     escaped_string = alloc(length);
-    if (escaped_string != NULL)
+    यदि (escaped_string != रिक्त)
     {
 	d = escaped_string;
 
 	// add opening quote
 #ifdef MSWIN
-	if (double_quotes)
+	यदि (double_quotes)
 	    *d++ = '"';
-	else
+	अन्यथा
 #endif
 	    *d++ = '\'';
 
-	for (p = string; *p != NUL; )
+	लागि (p = string; *p != NUL; )
 	{
 #ifdef MSWIN
-	    if (double_quotes)
+	    यदि (double_quotes)
 	    {
-		if (*p == '"')
+		यदि (*p == '"')
 		{
 		    *d++ = '"';
 		    *d++ = '"';
 		    ++p;
-		    continue;
+		    जारी;
 		}
 	    }
-	    else
+	    अन्यथा
 #endif
-	    if (*p == '\'')
+	    यदि (*p == '\'')
 	    {
-		if (powershell)
+		यदि (powershell)
 		{
 		    *d++ = '\'';
 		    *d++ = '\'';
 		}
-		else
+		अन्यथा
 		{
 		    *d++ = '\'';
 		    *d++ = '\\';
@@ -258,30 +258,30 @@ vim_strsave_shellescape(char_u *string, int do_special, int do_newline)
 		    *d++ = '\'';
 		}
 		++p;
-		continue;
+		जारी;
 	    }
-	    if ((*p == '\n' && (csh_like || do_newline))
+	    यदि ((*p == '\n' && (csh_like || do_newline))
 		    || (*p == '!' && (csh_like || do_special)))
 	    {
 		*d++ = '\\';
-		if (csh_like && do_special)
+		यदि (csh_like && do_special)
 		    *d++ = '\\';
 		*d++ = *p++;
-		continue;
+		जारी;
 	    }
-	    if (do_special && find_cmdline_var(p, &l) >= 0)
+	    यदि (do_special && find_cmdline_var(p, &l) >= 0)
 	    {
 		*d++ = '\\';		// insert backslash
-		memcpy(d, p, l);	// copy the var
+		स_नकल(d, p, l);	// copy the var
 		d += l;
 		p += l;
-		continue;
+		जारी;
 	    }
-	    if (*p == '\\' && fish_like)
+	    यदि (*p == '\\' && fish_like)
 	    {
 		*d++ = '\\';
 		*d++ = *p++;
-		continue;
+		जारी;
 	    }
 
 	    MB_COPY_CHAR(p, d);
@@ -289,15 +289,15 @@ vim_strsave_shellescape(char_u *string, int do_special, int do_newline)
 
 	// add terminating quote and finish with a NUL
 #ifdef MSWIN
-	if (double_quotes)
+	यदि (double_quotes)
 	    *d++ = '"';
-	else
+	अन्यथा
 #endif
 	    *d++ = '\'';
 	*d = NUL;
     }
 
-    return escaped_string;
+    फर्काऊ escaped_string;
 }
 
 /*
@@ -311,7 +311,7 @@ vim_strsave_up(char_u *string)
 
     p1 = vim_strsave(string);
     vim_strup(p1);
-    return p1;
+    फर्काऊ p1;
 }
 
 /*
@@ -319,40 +319,40 @@ vim_strsave_up(char_u *string)
  * This uses ASCII lower-to-upper case translation, language independent.
  */
     char_u *
-vim_strnsave_up(char_u *string, size_t len)
+vim_strnsave_up(char_u *string, माप_प्रकार len)
 {
     char_u *p1;
 
     p1 = vim_strnsave(string, len);
     vim_strup(p1);
-    return p1;
+    फर्काऊ p1;
 }
 
 /*
  * ASCII lower-to-upper case translation, language independent.
  */
-    void
+    शून्य
 vim_strup(
     char_u	*p)
 {
     char_u  *p2;
-    int	    c;
+    पूर्णाङ्क	    c;
 
-    if (p == NULL)
-	return;
+    यदि (p == रिक्त)
+	फर्काऊ;
 
     p2 = p;
-    while ((c = *p2) != NUL)
+    जबसम्म ((c = *p2) != NUL)
 	*p2++ = (c < 'a' || c > 'z') ? c : (c - 0x20);
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_SPELL)
+#यदि defined(FEAT_EVAL) || defined(FEAT_SPELL)
 /*
  * Make string "s" all upper-case and return it in allocated memory.
  * Handles multi-byte characters as well as possible.
  * Returns NULL when out of memory.
  */
-    static char_u *
+    स्थिर char_u *
 strup_save(char_u *orig)
 {
     char_u	*p;
@@ -360,20 +360,20 @@ strup_save(char_u *orig)
 
     res = p = vim_strsave(orig);
 
-    if (res != NULL)
-	while (*p != NUL)
+    यदि (res != रिक्त)
+	जबसम्म (*p != NUL)
 	{
-	    int		l;
+	    पूर्णाङ्क		l;
 
-	    if (enc_utf8)
+	    यदि (enc_utf8)
 	    {
-		int	c, uc;
-		int	newl;
+		पूर्णाङ्क	c, uc;
+		पूर्णाङ्क	newl;
 		char_u	*s;
 
 		c = utf_ptr2char(p);
 		l = utf_ptr2len(p);
-		if (c == 0)
+		यदि (c == 0)
 		{
 		    // overlong sequence, use only the first byte
 		    c = *p;
@@ -384,13 +384,13 @@ strup_save(char_u *orig)
 		// Reallocate string when byte count changes.  This is rare,
 		// thus it's OK to do another malloc()/free().
 		newl = utf_char2len(uc);
-		if (newl != l)
+		यदि (newl != l)
 		{
 		    s = alloc(STRLEN(res) + 1 + newl - l);
-		    if (s == NULL)
+		    यदि (s == रिक्त)
 		    {
 			vim_free(res);
-			return NULL;
+			फर्काऊ रिक्त;
 		    }
 		    mch_memmove(s, res, p - res);
 		    STRCPY(s + (p - res) + newl, p + l);
@@ -402,16 +402,16 @@ strup_save(char_u *orig)
 		utf_char2bytes(uc, p);
 		p += newl;
 	    }
-	    else if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	    अन्यथा यदि (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 		p += l;		// skip multi-byte character
-	    else
+	    अन्यथा
 	    {
 		*p = TOUPPER_LOC(*p); // note that toupper() can be a macro
 		p++;
 	    }
 	}
 
-    return res;
+    फर्काऊ res;
 }
 
 /*
@@ -427,20 +427,20 @@ strlow_save(char_u *orig)
 
     res = p = vim_strsave(orig);
 
-    if (res != NULL)
-	while (*p != NUL)
+    यदि (res != रिक्त)
+	जबसम्म (*p != NUL)
 	{
-	    int		l;
+	    पूर्णाङ्क		l;
 
-	    if (enc_utf8)
+	    यदि (enc_utf8)
 	    {
-		int	c, lc;
-		int	newl;
+		पूर्णाङ्क	c, lc;
+		पूर्णाङ्क	newl;
 		char_u	*s;
 
 		c = utf_ptr2char(p);
 		l = utf_ptr2len(p);
-		if (c == 0)
+		यदि (c == 0)
 		{
 		    // overlong sequence, use only the first byte
 		    c = *p;
@@ -451,13 +451,13 @@ strlow_save(char_u *orig)
 		// Reallocate string when byte count changes.  This is rare,
 		// thus it's OK to do another malloc()/free().
 		newl = utf_char2len(lc);
-		if (newl != l)
+		यदि (newl != l)
 		{
 		    s = alloc(STRLEN(res) + 1 + newl - l);
-		    if (s == NULL)
+		    यदि (s == रिक्त)
 		    {
 			vim_free(res);
-			return NULL;
+			फर्काऊ रिक्त;
 		    }
 		    mch_memmove(s, res, p - res);
 		    STRCPY(s + (p - res) + newl, p + l);
@@ -469,29 +469,29 @@ strlow_save(char_u *orig)
 		utf_char2bytes(lc, p);
 		p += newl;
 	    }
-	    else if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	    अन्यथा यदि (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 		p += l;		// skip multi-byte character
-	    else
+	    अन्यथा
 	    {
 		*p = TOLOWER_LOC(*p); // note that tolower() can be a macro
 		p++;
 	    }
 	}
 
-    return res;
+    फर्काऊ res;
 }
 #endif
 
 /*
  * delete spaces at the end of a string
  */
-    void
+    शून्य
 del_trailing_spaces(char_u *ptr)
 {
     char_u	*q;
 
     q = ptr + STRLEN(ptr);
-    while (--q > ptr && VIM_ISWHITE(q[0]) && q[-1] != '\\' && q[-1] != Ctrl_V)
+    जबसम्म (--q > ptr && VIM_ISWHITE(q[0]) && q[-1] != '\\' && q[-1] != Ctrl_V)
 	*q = NUL;
 }
 
@@ -499,8 +499,8 @@ del_trailing_spaces(char_u *ptr)
  * Like strncpy(), but always terminate the result with one NUL.
  * "to" must be "len + 1" long!
  */
-    void
-vim_strncpy(char_u *to, char_u *from, size_t len)
+    शून्य
+vim_strncpy(char_u *to, char_u *from, माप_प्रकार len)
 {
     STRNCPY(to, from, len);
     to[len] = NUL;
@@ -510,82 +510,82 @@ vim_strncpy(char_u *to, char_u *from, size_t len)
  * Like strcat(), but make sure the result fits in "tosize" bytes and is
  * always NUL terminated. "from" and "to" may overlap.
  */
-    void
-vim_strcat(char_u *to, char_u *from, size_t tosize)
+    शून्य
+vim_strcat(char_u *to, char_u *from, माप_प्रकार tosize)
 {
-    size_t tolen = STRLEN(to);
-    size_t fromlen = STRLEN(from);
+    माप_प्रकार tolen = STRLEN(to);
+    माप_प्रकार fromlen = STRLEN(from);
 
-    if (tolen + fromlen + 1 > tosize)
+    यदि (tolen + fromlen + 1 > tosize)
     {
 	mch_memmove(to + tolen, from, tosize - tolen - 1);
 	to[tosize - 1] = NUL;
     }
-    else
+    अन्यथा
 	mch_memmove(to + tolen, from, fromlen + 1);
 }
 
 /*
  * A version of strlen() that has a maximum length.
  */
-    size_t
-vim_strlen_maxlen(char *s, size_t maxlen)
+    माप_प्रकार
+vim_strlen_maxlen(वर्ण *s, माप_प्रकार maxlen)
 {
-    size_t i;
-    for (i = 0; i < maxlen; ++i)
-	if (s[i] == NUL)
-	    break;
-    return i;
+    माप_प्रकार i;
+    लागि (i = 0; i < maxlen; ++i)
+	यदि (s[i] == NUL)
+	    रोक;
+    फर्काऊ i;
 }
 
-#if !defined(HAVE_STRCASECMP) && !defined(HAVE_STRICMP)
+#यदि !defined(HAVE_STRCASECMP) && !defined(HAVE_STRICMP)
 /*
  * Compare two strings, ignoring case, using current locale.
  * Doesn't work for multi-byte characters.
  * return 0 for match, < 0 for smaller, > 0 for bigger
  */
-    int
-vim_stricmp(char *s1, char *s2)
+    पूर्णाङ्क
+vim_stricmp(वर्ण *s1, वर्ण *s2)
 {
-    int		i;
+    पूर्णाङ्क		i;
 
-    for (;;)
+    लागि (;;)
     {
-	i = (int)TOLOWER_LOC(*s1) - (int)TOLOWER_LOC(*s2);
-	if (i != 0)
-	    return i;			    // this character different
-	if (*s1 == NUL)
-	    break;			    // strings match until NUL
+	i = (पूर्णाङ्क)TOLOWER_LOC(*s1) - (पूर्णाङ्क)TOLOWER_LOC(*s2);
+	यदि (i != 0)
+	    फर्काऊ i;			    // this character different
+	यदि (*s1 == NUL)
+	    रोक;			    // strings match until NUL
 	++s1;
 	++s2;
     }
-    return 0;				    // strings match
+    फर्काऊ 0;				    // strings match
 }
 #endif
 
-#if !defined(HAVE_STRNCASECMP) && !defined(HAVE_STRNICMP)
+#यदि !defined(HAVE_STRNCASECMP) && !defined(HAVE_STRNICMP)
 /*
  * Compare two strings, for length "len", ignoring case, using current locale.
  * Doesn't work for multi-byte characters.
  * return 0 for match, < 0 for smaller, > 0 for bigger
  */
-    int
-vim_strnicmp(char *s1, char *s2, size_t len)
+    पूर्णाङ्क
+vim_strnicmp(वर्ण *s1, वर्ण *s2, माप_प्रकार len)
 {
-    int		i;
+    पूर्णाङ्क		i;
 
-    while (len > 0)
+    जबसम्म (len > 0)
     {
-	i = (int)TOLOWER_LOC(*s1) - (int)TOLOWER_LOC(*s2);
-	if (i != 0)
-	    return i;			    // this character different
-	if (*s1 == NUL)
-	    break;			    // strings match until NUL
+	i = (पूर्णाङ्क)TOLOWER_LOC(*s1) - (पूर्णाङ्क)TOLOWER_LOC(*s2);
+	यदि (i != 0)
+	    फर्काऊ i;			    // this character different
+	यदि (*s1 == NUL)
+	    रोक;			    // strings match until NUL
 	++s1;
 	++s2;
 	--len;
     }
-    return 0;				    // strings match
+    फर्काऊ 0;				    // strings match
 }
 #endif
 
@@ -594,23 +594,23 @@ vim_strnicmp(char *s1, char *s2, size_t len)
  * (mostly matters for turkish locale where i I might be different).
  * return 0 for match, < 0 for smaller, > 0 for bigger
  */
-    int
-vim_strnicmp_asc(char *s1, char *s2, size_t len)
+    पूर्णाङ्क
+vim_strnicmp_asc(वर्ण *s1, वर्ण *s2, माप_प्रकार len)
 {
-    int                i = 0;
+    पूर्णाङ्क                i = 0;
 
-    while (len > 0)
+    जबसम्म (len > 0)
     {
 	i = TOLOWER_ASC(*s1) - TOLOWER_ASC(*s2);
-	if (i != 0)
-	    break;			// this character is different
-	if (*s1 == NUL)
-	    break;			// strings match until NUL
+	यदि (i != 0)
+	    रोक;			// this character is different
+	यदि (*s1 == NUL)
+	    रोक;			// strings match until NUL
 	++s1;
 	++s2;
 	--len;
     }
-    return i;
+    फर्काऊ i;
 }
 
 /*
@@ -620,57 +620,57 @@ vim_strnicmp_asc(char *s1, char *s2, size_t len)
  * end of the string.
  */
     char_u *
-vim_strchr(char_u *string, int c)
+vim_strchr(char_u *string, पूर्णाङ्क c)
 {
     char_u	*p;
-    int		b;
+    पूर्णाङ्क		b;
 
     p = string;
-    if (enc_utf8 && c > 0 && c < 0x80)
-	return vim_strbyte(string, c);
-    if (enc_utf8 && c >= 0x80)
+    यदि (enc_utf8 && c > 0 && c < 0x80)
+	फर्काऊ vim_strbyte(string, c);
+    यदि (enc_utf8 && c >= 0x80)
     {
-	while (*p != NUL)
+	जबसम्म (*p != NUL)
 	{
-	    int l = utfc_ptr2len(p);
+	    पूर्णाङ्क l = utfc_ptr2len(p);
 
 	    // Avoid matching an illegal byte here.
-	    if (utf_ptr2char(p) == c && l > 1)
-		return p;
+	    यदि (utf_ptr2char(p) == c && l > 1)
+		फर्काऊ p;
 	    p += l;
 	}
-	return NULL;
+	फर्काऊ रिक्त;
     }
-    if (enc_dbcs != 0 && c > 255)
+    यदि (enc_dbcs != 0 && c > 255)
     {
-	int	n2 = c & 0xff;
+	पूर्णाङ्क	n2 = c & 0xff;
 
-	c = ((unsigned)c >> 8) & 0xff;
-	while ((b = *p) != NUL)
+	c = ((अचिन्हित)c >> 8) & 0xff;
+	जबसम्म ((b = *p) != NUL)
 	{
-	    if (b == c && p[1] == n2)
-		return p;
+	    यदि (b == c && p[1] == n2)
+		फर्काऊ p;
 	    p += (*mb_ptr2len)(p);
 	}
-	return NULL;
+	फर्काऊ रिक्त;
     }
-    if (has_mbyte)
+    यदि (has_mbyte)
     {
-	while ((b = *p) != NUL)
+	जबसम्म ((b = *p) != NUL)
 	{
-	    if (b == c)
-		return p;
+	    यदि (b == c)
+		फर्काऊ p;
 	    p += (*mb_ptr2len)(p);
 	}
-	return NULL;
+	फर्काऊ रिक्त;
     }
-    while ((b = *p) != NUL)
+    जबसम्म ((b = *p) != NUL)
     {
-	if (b == c)
-	    return p;
+	यदि (b == c)
+	    फर्काऊ p;
 	++p;
     }
-    return NULL;
+    फर्काऊ रिक्त;
 }
 
 /*
@@ -679,13 +679,13 @@ vim_strchr(char_u *string, int c)
  * pointer to the NUL at the end of the string.
  */
     char_u  *
-vim_strbyte(char_u *string, int c)
+vim_strbyte(char_u *string, पूर्णाङ्क c)
 {
     // strchr() converts c to char and also matches the terminating NUL.
     // Keep the byte range and NUL behavior of this function.
-    if (c <= 0 || c > 255)
-	return NULL;
-    return (char_u *)strchr((char *)string, c);
+    यदि (c <= 0 || c > 255)
+	फर्काऊ रिक्त;
+    फर्काऊ (char_u *)म_अक्षर((वर्ण *)string, c);
 }
 
 /*
@@ -697,18 +697,18 @@ vim_strbyte(char_u *string, int c)
  * Does not handle multi-byte char for "c"!
  */
     char_u  *
-vim_strrchr(char_u *string, int c)
+vim_strrchr(char_u *string, पूर्णाङ्क c)
 {
-    char_u	*retval = NULL;
+    char_u	*retval = रिक्त;
     char_u	*p = string;
 
-    while (*p)
+    जबसम्म (*p)
     {
-	if (*p == c)
+	यदि (*p == c)
 	    retval = p;
 	MB_PTR_ADV(p);
     }
-    return retval;
+    फर्काऊ retval;
 }
 
 /*
@@ -723,13 +723,13 @@ vim_strrchr(char_u *string, int c)
     char_u *
 vim_strpbrk(char_u *s, char_u *charset)
 {
-    while (*s)
+    जबसम्म (*s)
     {
-	if (vim_strchr(charset, *s) != NULL)
-	    return s;
+	यदि (vim_strchr(charset, *s) != रिक्त)
+	    फर्काऊ s;
 	MB_PTR_ADV(s);
     }
-    return NULL;
+    फर्काऊ रिक्त;
 }
 # endif
 #endif
@@ -737,37 +737,37 @@ vim_strpbrk(char_u *s, char_u *charset)
 /*
  * Sort an array of strings.
  */
-static int sort_compare(const void *s1, const void *s2);
+स्थिर पूर्णाङ्क sort_compare(अचर शून्य *s1, अचर शून्य *s2);
 
-    static int
-sort_compare(const void *s1, const void *s2)
+    स्थिर पूर्णाङ्क
+sort_compare(अचर शून्य *s1, अचर शून्य *s2)
 {
-    return STRCMP(*(char **)s1, *(char **)s2);
+    फर्काऊ STRCMP(*(वर्ण **)s1, *(वर्ण **)s2);
 }
 
-    void
+    शून्य
 sort_strings(
     char_u	**files,
-    int		count)
+    पूर्णाङ्क		गन्ती)
 {
-    qsort((void *)files, (size_t)count, sizeof(char_u *), sort_compare);
+    क्विक((शून्य *)files, (माप_प्रकार)गन्ती, परिमाण(char_u *), sort_compare);
 }
 
-#if defined(FEAT_QUICKFIX) || defined(FEAT_SPELL)
+#यदि defined(FEAT_QUICKFIX) || defined(FEAT_SPELL)
 /*
  * Return TRUE if string "s" contains a non-ASCII character (128 or higher).
  * When "s" is NULL FALSE is returned.
  */
-    int
+    पूर्णाङ्क
 has_non_ascii(char_u *s)
 {
     char_u	*p;
 
-    if (s != NULL)
-	for (p = s; *p != NUL; ++p)
-	    if (*p >= 128)
-		return TRUE;
-    return FALSE;
+    यदि (s != रिक्त)
+	लागि (p = s; *p != NUL; ++p)
+	    यदि (*p >= 128)
+		फर्काऊ TRUE;
+    फर्काऊ FALSE;
 }
 #endif
 
@@ -779,21 +779,21 @@ has_non_ascii(char_u *s)
 concat_str(char_u *str1, char_u *str2)
 {
     char_u  *dest;
-    size_t  l = str1 == NULL ? 0 : STRLEN(str1);
+    माप_प्रकार  l = str1 == रिक्त ? 0 : STRLEN(str1);
 
-    dest = alloc(l + (str2 == NULL ? 0 : STRLEN(str2)) + 1L);
-    if (dest == NULL)
-	return NULL;
-    if (str1 == NULL)
+    dest = alloc(l + (str2 == रिक्त ? 0 : STRLEN(str2)) + 1L);
+    यदि (dest == रिक्त)
+	फर्काऊ रिक्त;
+    यदि (str1 == रिक्त)
 	*dest = NUL;
-    else
+    अन्यथा
 	STRCPY(dest, str1);
-    if (str2 != NULL)
+    यदि (str2 != रिक्त)
 	STRCPY(dest + l, str2);
-    return dest;
+    फर्काऊ dest;
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_RIGHTLEFT)
+#यदि defined(FEAT_EVAL) || defined(FEAT_RIGHTLEFT)
 /*
  * Reverse text into allocated memory.
  * Returns the allocated string, NULL when out of memory.
@@ -801,190 +801,190 @@ concat_str(char_u *str1, char_u *str2)
     char_u *
 reverse_text(char_u *s)
 {
-    size_t len = STRLEN(s);
+    माप_प्रकार len = STRLEN(s);
     char_u *rev = alloc(len + 1);
-    if (rev == NULL)
-	return NULL;
+    यदि (rev == रिक्त)
+	फर्काऊ रिक्त;
 
-    for (size_t s_i = 0, rev_i = len; s_i < len; ++s_i)
+    लागि (माप_प्रकार s_i = 0, rev_i = len; s_i < len; ++s_i)
     {
-	if (has_mbyte)
+	यदि (has_mbyte)
 	{
-	    int mb_len = (*mb_ptr2len)(s + s_i);
+	    पूर्णाङ्क mb_len = (*mb_ptr2len)(s + s_i);
 	    rev_i -= mb_len;
 	    mch_memmove(rev + rev_i, s + s_i, mb_len);
 	    s_i += mb_len - 1;
 	}
-	else
+	अन्यथा
 	    rev[--rev_i] = s[s_i];
     }
     rev[len] = NUL;
-    return rev;
+    फर्काऊ rev;
 }
 #endif
 
-#if defined(FEAT_EVAL)
+#यदि defined(FEAT_EVAL)
 /*
  * Return string "str" in ' quotes, doubling ' characters.
  * If "str" is NULL an empty string is assumed.
  * If "function" is TRUE make it function('string').
  */
     char_u *
-string_quote(char_u *str, int function)
+string_quote(char_u *str, पूर्णाङ्क function)
 {
-    unsigned	len;
+    अचिन्हित	len;
     char_u	*p, *r, *s;
 
     len = (function ? 13 : 3);
-    if (str != NULL)
+    यदि (str != रिक्त)
     {
-	len += (unsigned)STRLEN(str);
-	for (p = str; *p != NUL; MB_PTR_ADV(p))
-	    if (*p == '\'')
+	len += (अचिन्हित)STRLEN(str);
+	लागि (p = str; *p != NUL; MB_PTR_ADV(p))
+	    यदि (*p == '\'')
 		++len;
     }
     s = r = alloc(len);
-    if (r == NULL)
-	return NULL;
+    यदि (r == रिक्त)
+	फर्काऊ रिक्त;
 
-    if (function)
+    यदि (function)
     {
 	STRCPY(r, "function('");
 	r += 10;
     }
-    else
+    अन्यथा
 	*r++ = '\'';
-    if (str != NULL)
-	for (p = str; *p != NUL; )
+    यदि (str != रिक्त)
+	लागि (p = str; *p != NUL; )
 	{
-	    if (*p == '\'')
+	    यदि (*p == '\'')
 		*r++ = '\'';
 	    MB_COPY_CHAR(p, r);
 	}
     *r++ = '\'';
-    if (function)
+    यदि (function)
 	*r++ = ')';
     *r++ = NUL;
-    return s;
+    फर्काऊ s;
 }
 
 /*
  * Count the number of times "needle" occurs in string "haystack". Case is
  * ignored if "ic" is TRUE.
  */
-    long
-string_count(char_u *haystack, char_u *needle, int ic)
+    दीर्घ
+string_गन्ती(char_u *haystack, char_u *needle, पूर्णाङ्क ic)
 {
-    long	n = 0;
+    दीर्घ	n = 0;
     char_u	*p = haystack;
     char_u	*next;
 
-    if (p == NULL || needle == NULL || *needle == NUL)
-	return 0;
+    यदि (p == रिक्त || needle == रिक्त || *needle == NUL)
+	फर्काऊ 0;
 
-    size_t  needlelen = STRLEN(needle);
-    if (ic)
+    माप_प्रकार  needlelen = STRLEN(needle);
+    यदि (ic)
     {
-	while (*p != NUL)
+	जबसम्म (*p != NUL)
 	{
-	    if (MB_STRNICMP(p, needle, needlelen) == 0)
+	    यदि (MB_STRNICMP(p, needle, needlelen) == 0)
 	    {
 		++n;
 		p += needlelen;
 	    }
-	    else
+	    अन्यथा
 		MB_PTR_ADV(p);
 	}
     }
-    else
-	while ((next = (char_u *)strstr((char *)p, (char *)needle)) != NULL)
+    अन्यथा
+	जबसम्म ((next = (char_u *)म_माला((वर्ण *)p, (वर्ण *)needle)) != रिक्त)
 	{
 	    ++n;
 	    p = next + needlelen;
 	}
 
-    return n;
+    फर्काऊ n;
 }
 
 /*
  * Make a typval_T of the first character of "input" and store it in "output".
  * Return -1 on failure or v_string's length on success.
  */
-    static int
-copy_first_char_to_tv(char_u *input, typval_T *output)
+    स्थिर पूर्णाङ्क
+copy_first_char_to_tv(char_u *आगत, typval_T *output)
 {
     char_u	buf[MB_MAXBYTES + 1];
-    int		len;
+    पूर्णाङ्क		len;
 
-    if (input == NULL || output == NULL)
-	return -1;
+    यदि (आगत == रिक्त || output == रिक्त)
+	फर्काऊ -1;
 
-    len = has_mbyte ? mb_ptr2len(input) : 1;
-    STRNCPY(buf, input, len);
+    len = has_mbyte ? mb_ptr2len(आगत) : 1;
+    STRNCPY(buf, आगत, len);
     buf[len] = NUL;
     output->v_type = VAR_STRING;
     output->vval.v_string = vim_strnsave(buf, len);
 
-    return output->vval.v_string == NULL ? -1 : len;
+    फर्काऊ output->vval.v_string == रिक्त ? -1 : len;
 }
 
 /*
  * Implementation of map() and filter() for a String. Apply "expr" to every
  * character in string "str" and return the result in "rettv".
  */
-    void
+    शून्य
 string_filter_map(
 	char_u		*str,
 	filtermap_T	filtermap,
-	typval_T	*expr,
+	typval_T	*अभिव्यक्ति,
 	typval_T	*rettv)
 {
     char_u	*p;
     typval_T	tv;
     garray_T	ga;
-    int		len = 0;
-    int		idx = 0;
-    int		rem;
+    पूर्णाङ्क		len = 0;
+    पूर्णाङ्क		idx = 0;
+    पूर्णाङ्क		rem;
     typval_T	newtv;
     funccall_T	*fc;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = रिक्त;
 
     // set_vim_var_nr() doesn't set the type
-    set_vim_var_type(VV_KEY, VAR_NUMBER);
+    set_vim_var_type(VV_साँचो, VAR_सङ्ख्या);
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, &newtv);
+    fc = eval_अभिव्यक्ति_get_funccal(अभिव्यक्ति, &newtv);
 
-    ga_init2(&ga, sizeof(char), 80);
-    for (p = str; *p != NUL; p += len)
+    ga_init2(&ga, परिमाण(वर्ण), 80);
+    लागि (p = str; *p != NUL; p += len)
     {
 	len = copy_first_char_to_tv(p, &tv);
-	if (len < 0)
-	    break;
+	यदि (len < 0)
+	    रोक;
 
-	set_vim_var_nr(VV_KEY, idx);
-	if (filter_map_one(&tv, expr, filtermap, fc, &newtv, &rem) == FAIL
+	set_vim_var_nr(VV_साँचो, idx);
+	यदि (filter_map_one(&tv, अभिव्यक्ति, filtermap, fc, &newtv, &rem) == FAIL
 		|| did_emsg)
 	{
 	    clear_tv(&newtv);
 	    clear_tv(&tv);
-	    break;
+	    रोक;
 	}
-	if (filtermap == FILTERMAP_MAP || filtermap == FILTERMAP_MAPNEW)
+	यदि (filtermap == FILTERMAP_MAP || filtermap == FILTERMAP_MAPNEW)
 	{
-	    if (newtv.v_type != VAR_STRING)
+	    यदि (newtv.v_type != VAR_STRING)
 	    {
 		clear_tv(&newtv);
 		clear_tv(&tv);
 		emsg(_(e_string_required));
-		break;
+		रोक;
 	    }
-	    else
+	    अन्यथा
 		ga_concat(&ga, newtv.vval.v_string);
 	}
-	else if (filtermap == FILTERMAP_FOREACH || !rem)
+	अन्यथा यदि (filtermap == FILTERMAP_FOREACH || !rem)
 	    ga_concat(&ga, tv.vval.v_string);
 
 	clear_tv(&newtv);
@@ -994,7 +994,7 @@ string_filter_map(
     }
     ga_append(&ga, NUL);
     rettv->vval.v_string = ga.ga_data;
-    if (fc != NULL)
+    यदि (fc != रिक्त)
 	remove_funccal();
 }
 
@@ -1003,126 +1003,126 @@ string_filter_map(
  * starting with the optional initial value "argvars[2]" and return the result
  * in "rettv".
  */
-    void
+    शून्य
 string_reduce(
 	typval_T	*argvars,
-	typval_T	*expr,
+	typval_T	*अभिव्यक्ति,
 	typval_T	*rettv)
 {
     char_u	*p = tv_get_string(&argvars[0]);
-    int		len;
+    पूर्णाङ्क		len;
     typval_T	argv[3];
-    int		r;
-    int		called_emsg_start = called_emsg;
+    पूर्णाङ्क		r;
+    पूर्णाङ्क		called_emsg_start = called_emsg;
     funccall_T	*fc;
 
-    if (argvars[2].v_type == VAR_UNKNOWN)
+    यदि (argvars[2].v_type == VAR_UNKNOWN)
     {
-	if (*p == NUL)
+	यदि (*p == NUL)
 	{
-	    semsg(_(e_reduce_of_an_empty_str_with_no_initial_value), "String");
-	    return;
+	    semsg(_(e_reduce_of_an_empty_str_with_no_initial_मान), "String");
+	    फर्काऊ;
 	}
 	len = copy_first_char_to_tv(p, rettv);
-	if (len < 0)
-	    return;
+	यदि (len < 0)
+	    फर्काऊ;
 	p += len;
     }
-    else if (check_for_string_arg(argvars, 2) == FAIL)
-	return;
-    else
+    अन्यथा यदि (check_for_string_arg(argvars, 2) == FAIL)
+	फर्काऊ;
+    अन्यथा
 	copy_tv(&argvars[2], rettv);
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, rettv);
+    fc = eval_अभिव्यक्ति_get_funccal(अभिव्यक्ति, rettv);
 
-    for ( ; *p != NUL; p += len)
+    लागि ( ; *p != NUL; p += len)
     {
 	argv[0] = *rettv;
 	rettv->v_type = VAR_UNKNOWN;
 
 	len = copy_first_char_to_tv(p, &argv[1]);
-	if (len < 0)
+	यदि (len < 0)
 	{
 	    *rettv = argv[0];
-	    break;
+	    रोक;
 	}
 
-	r = eval_expr_typval(expr, TRUE, argv, 2, fc, rettv);
+	r = eval_अभिव्यक्ति_typval(अभिव्यक्ति, TRUE, argv, 2, fc, rettv);
 
 	clear_tv(&argv[0]);
 	clear_tv(&argv[1]);
-	if (r == FAIL || called_emsg != called_emsg_start)
-	    break;
+	यदि (r == FAIL || called_emsg != called_emsg_start)
+	    रोक;
     }
 
-    if (fc != NULL)
+    यदि (fc != रिक्त)
 	remove_funccal();
 }
 
 /*
  * Implementation of "byteidx()" and "byteidxcomp()" functions
  */
-    static void
-byteidx_common(typval_T *argvars, typval_T *rettv, int comp)
+    स्थिर शून्य
+byteidx_common(typval_T *argvars, typval_T *rettv, पूर्णाङ्क comp)
 {
-    rettv->vval.v_number = -1;
+    rettv->vval.v_सङ्ख्या = -1;
 
-    if (in_vim9script()
+    यदि (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
+		|| check_for_सङ्ख्या_arg(argvars, 1) == FAIL
 		|| check_for_opt_bool_arg(argvars, 2) == FAIL))
-	return;
+	फर्काऊ;
 
     char_u *str = tv_get_string_chk(&argvars[0]);
-    varnumber_T	idx = tv_get_number_chk(&argvars[1], NULL);
-    if (str == NULL || idx < 0)
-	return;
+    varnumber_T	idx = tv_get_सङ्ख्या_chk(&argvars[1], रिक्त);
+    यदि (str == रिक्त || idx < 0)
+	फर्काऊ;
 
     varnumber_T	utf16idx = FALSE;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    यदि (argvars[2].v_type != VAR_UNKNOWN)
     {
-	int error = FALSE;
+	पूर्णाङ्क error = FALSE;
 	utf16idx = tv_get_bool_chk(&argvars[2], &error);
-	if (error)
-	    return;
-	if (utf16idx < 0 || utf16idx > 1)
+	यदि (error)
+	    फर्काऊ;
+	यदि (utf16idx < 0 || utf16idx > 1)
 	{
-	    semsg(_(e_using_number_as_bool_nr), utf16idx);
-	    return;
+	    semsg(_(e_using_सङ्ख्या_as_bool_nr), utf16idx);
+	    फर्काऊ;
 	}
     }
 
-    int (*ptr2len)(char_u *);
-    if (enc_utf8 && comp)
+    पूर्णाङ्क (*ptr2len)(char_u *);
+    यदि (enc_utf8 && comp)
 	ptr2len = utf_ptr2len;
-    else
+    अन्यथा
 	ptr2len = mb_ptr2len;
 
     char_u *t = str;
-    for ( ; idx > 0; idx--)
+    लागि ( ; idx > 0; idx--)
     {
-	if (*t == NUL)		// EOL reached
-	    return;
-	if (utf16idx)
+	यदि (*t == NUL)		// EOL reached
+	    फर्काऊ;
+	यदि (utf16idx)
 	{
-	    int clen = ptr2len(t);
-	    int c = (clen > 1) ? utf_ptr2char(t) : *t;
-	    if (c > 0xFFFF)
+	    पूर्णाङ्क clen = ptr2len(t);
+	    पूर्णाङ्क c = (clen > 1) ? utf_ptr2char(t) : *t;
+	    यदि (c > 0xFFFF)
 		idx--;
-	    if (idx > 0)
+	    यदि (idx > 0)
 		t += clen;
 	}
-	else if (idx > 0)
+	अन्यथा यदि (idx > 0)
 	    t += ptr2len(t);
     }
-    rettv->vval.v_number = (varnumber_T)(t - str);
+    rettv->vval.v_सङ्ख्या = (varnumber_T)(t - str);
 }
 
 /*
  * "byteidx()" function
  */
-    void
+    शून्य
 f_byteidx(typval_T *argvars, typval_T *rettv)
 {
     byteidx_common(argvars, rettv, FALSE);
@@ -1131,7 +1131,7 @@ f_byteidx(typval_T *argvars, typval_T *rettv)
 /*
  * "byteidxcomp()" function
  */
-    void
+    शून्य
 f_byteidxcomp(typval_T *argvars, typval_T *rettv)
 {
     byteidx_common(argvars, rettv, TRUE);
@@ -1140,114 +1140,114 @@ f_byteidxcomp(typval_T *argvars, typval_T *rettv)
 /*
  * "charidx()" function
  */
-    void
+    शून्य
 f_charidx(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = -1;
+    rettv->vval.v_सङ्ख्या = -1;
 
-    if (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
+    यदि (check_for_string_arg(argvars, 0) == FAIL
+		|| check_for_सङ्ख्या_arg(argvars, 1) == FAIL
 		|| check_for_opt_bool_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL))
-	return;
+	फर्काऊ;
 
     char_u *str = tv_get_string_chk(&argvars[0]);
-    varnumber_T	idx = tv_get_number_chk(&argvars[1], NULL);
-    if (str == NULL || idx < 0)
-	return;
+    varnumber_T	idx = tv_get_सङ्ख्या_chk(&argvars[1], रिक्त);
+    यदि (str == रिक्त || idx < 0)
+	फर्काऊ;
 
     varnumber_T	countcc = FALSE;
     varnumber_T	utf16idx = FALSE;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    यदि (argvars[2].v_type != VAR_UNKNOWN)
     {
 	countcc = tv_get_bool(&argvars[2]);
-	if (argvars[3].v_type != VAR_UNKNOWN)
+	यदि (argvars[3].v_type != VAR_UNKNOWN)
 	    utf16idx = tv_get_bool(&argvars[3]);
     }
 
-    int (*ptr2len)(char_u *);
-    if (enc_utf8 && countcc)
+    पूर्णाङ्क (*ptr2len)(char_u *);
+    यदि (enc_utf8 && countcc)
 	ptr2len = utf_ptr2len;
-    else
+    अन्यथा
 	ptr2len = mb_ptr2len;
 
     char_u	*p;
-    int		len;
-    for (p = str, len = 0; utf16idx ? idx >= 0 : p <= str + idx; len++)
+    पूर्णाङ्क		len;
+    लागि (p = str, len = 0; utf16idx ? idx >= 0 : p <= str + idx; len++)
     {
-	if (*p == NUL)
+	यदि (*p == NUL)
 	{
 	    // If the index is exactly the number of bytes or utf-16 code units
 	    // in the string then return the length of the string in
 	    // characters.
-	    if (utf16idx ? (idx == 0) : (p == (str + idx)))
-		rettv->vval.v_number = len;
-	    return;
+	    यदि (utf16idx ? (idx == 0) : (p == (str + idx)))
+		rettv->vval.v_सङ्ख्या = len;
+	    फर्काऊ;
 	}
-	if (utf16idx)
+	यदि (utf16idx)
 	{
 	    idx--;
-	    int clen = ptr2len(p);
-	    int c = (clen > 1) ? utf_ptr2char(p) : *p;
-	    if (c > 0xFFFF)
+	    पूर्णाङ्क clen = ptr2len(p);
+	    पूर्णाङ्क c = (clen > 1) ? utf_ptr2char(p) : *p;
+	    यदि (c > 0xFFFF)
 		idx--;
 	}
 	p += ptr2len(p);
     }
 
-    rettv->vval.v_number = len > 0 ? len - 1 : 0;
+    rettv->vval.v_सङ्ख्या = len > 0 ? len - 1 : 0;
 }
 
 /*
  * Convert the string "str", from encoding "from" to encoding "to".
  */
-    static int
+    स्थिर पूर्णाङ्क
 convert_string(string_T *str, char_u *from, char_u *to, string_T *ret)
 {
     vimconv_T	vimconv;
 
     vimconv.vc_type = CONV_NONE;
-    if (convert_setup(&vimconv, from, to) == FAIL)
-	return FAIL;
+    यदि (convert_setup(&vimconv, from, to) == FAIL)
+	फर्काऊ FAIL;
     vimconv.vc_fail = TRUE;
-    if (vimconv.vc_type == CONV_NONE)
+    यदि (vimconv.vc_type == CONV_NONE)
     {
 	ret->string = vim_strnsave(str->string, str->length);
-	if (ret->string == NULL)
+	यदि (ret->string == रिक्त)
 	    ret->length = 0;
-	else
+	अन्यथा
 	    ret->length = str->length;
     }
-    else
+    अन्यथा
     {
-	int len = (int)str->length;
+	पूर्णाङ्क len = (पूर्णाङ्क)str->length;
 	ret->string = string_convert(&vimconv, str->string, &len);
 	ret->length = len;
     }
-    convert_setup(&vimconv, NULL, NULL);
+    convert_setup(&vimconv, रिक्त, रिक्त);
 
-    return (ret->string == NULL) ? FAIL : OK;
+    फर्काऊ (ret->string == रिक्त) ? FAIL : OK;
 }
 
 /*
  * Add the bytes from "str" to "blob".
  */
-    static void
+    स्थिर शून्य
 blob_from_string(char_u *str, blob_T *blob)
 {
-    int	    len = (int)STRLEN(str);
+    पूर्णाङ्क	    len = (पूर्णाङ्क)STRLEN(str);
     char_u  *dest;
 
-    if (len == 0)
-	return;
-    if (ga_grow(&blob->bv_ga, len) == FAIL)
-	return;
+    यदि (len == 0)
+	फर्काऊ;
+    यदि (ga_grow(&blob->bv_ga, len) == FAIL)
+	फर्काऊ;
     dest = (char_u *)blob->bv_ga.ga_data + blob->bv_ga.ga_len;
-    mch_memmove(dest, str, (size_t)len);
+    mch_memmove(dest, str, (माप_प्रकार)len);
     // Translate newlines in the string to NUL characters
-    for (int i = 0; i < len; ++i)
-	if (dest[i] == NL)
+    लागि (पूर्णाङ्क i = 0; i < len; ++i)
+	यदि (dest[i] == NL)
 	    dest[i] = NUL;
     blob->bv_ga.ga_len += len;
 }
@@ -1260,45 +1260,45 @@ blob_from_string(char_u *str, blob_T *blob)
  * allocated string is returned and "start_idx" is moved forward by one byte.
  * On return, "start_idx" points to next byte to process in blob.
  */
-    static int
-string_from_blob(blob_T *blob, long *start_idx, string_T *ret)
+    स्थिर पूर्णाङ्क
+string_from_blob(blob_T *blob, दीर्घ *start_idx, string_T *ret)
 {
-    long	blen = blob_len(blob);
-    long	start = *start_idx;
+    दीर्घ	blen = blob_len(blob);
+    दीर्घ	start = *start_idx;
     char_u	*src;
     char_u	*nl;
-    long	line_len;
+    दीर्घ	पङ्क्ति_len;
 
-    if (start >= blen)
+    यदि (start >= blen)
     {
 	ret->string = vim_strsave((char_u *)"");
 	ret->length = 0;
 	*start_idx = blen;
-	return (ret->string == NULL) ? FAIL : OK;
+	फर्काऊ (ret->string == रिक्त) ? FAIL : OK;
     }
 
     src = (char_u *)blob->bv_ga.ga_data + start;
-    nl = (char_u *)memchr(src, NL, (size_t)(blen - start));
-    line_len = (nl == NULL) ? (blen - start) : (long)(nl - src);
+    nl = (char_u *)स_प्रथम(src, NL, (माप_प्रकार)(blen - start));
+    पङ्क्ति_len = (nl == रिक्त) ? (blen - start) : (दीर्घ)(nl - src);
 
-    ret->string = alloc(line_len + 1);
-    if (ret->string == NULL)
+    ret->string = alloc(पङ्क्ति_len + 1);
+    यदि (ret->string == रिक्त)
     {
 	ret->length = 0;
-	return FAIL;
+	फर्काऊ FAIL;
     }
-    if (line_len > 0)
-	mch_memmove(ret->string, src, (size_t)line_len);
-    ret->string[line_len] = NUL;
-    ret->length = (size_t)line_len;
+    यदि (पङ्क्ति_len > 0)
+	mch_memmove(ret->string, src, (माप_प्रकार)पङ्क्ति_len);
+    ret->string[पङ्क्ति_len] = NUL;
+    ret->length = (माप_प्रकार)पङ्क्ति_len;
 
     // A NUL byte in the blob represents a NL in the resulting string.
-    for (long i = 0; i < line_len; i++)
-	if (ret->string[i] == NUL)
+    लागि (दीर्घ i = 0; i < पङ्क्ति_len; i++)
+	यदि (ret->string[i] == NUL)
 	    ret->string[i] = NL;
 
-    *start_idx = start + line_len + (nl != NULL ? 1 : 0);
-    return OK;
+    *start_idx = start + पङ्क्ति_len + (nl != रिक्त ? 1 : 0);
+    फर्काऊ OK;
 }
 
 /*
@@ -1306,22 +1306,22 @@ string_from_blob(blob_T *blob, long *start_idx, string_T *ret)
  * For example: "ucs2be" -> "ucs-2be", "utf16le" -> "utf-16le"
  * Returns allocated string or NULL on allocation failure.
  */
-    static char_u *
+    स्थिर char_u *
 normalize_encoding_name(char_u *enc_skipped)
 {
     char_u *from_encoding_raw = alloc(STRLEN(enc_skipped) + 3);
-    if (from_encoding_raw == NULL)
-	return NULL;
+    यदि (from_encoding_raw == रिक्त)
+	फर्काऊ रिक्त;
 
     char_u *s = enc_skipped;
     char_u *pe = from_encoding_raw;
 
     // Convert to lowercase and replace '_' with '-'
-    while (*s != NUL)
+    जबसम्म (*s != NUL)
     {
-	if (*s == '_')
+	यदि (*s == '_')
 	    *pe++ = '-';
-	else
+	अन्यथा
 	    *pe++ = TOLOWER_ASC(*s);
 	++s;
     }
@@ -1329,7 +1329,7 @@ normalize_encoding_name(char_u *enc_skipped)
 
     // Add hyphen before digit: "ucs2be" -> "ucs-2be", "utf16le" -> "utf-16le"
     char_u *p = from_encoding_raw;
-    if ((STRNCMP(p, "ucs", 3) == 0 && VIM_ISDIGIT(p[3]) && p[3] != NUL && p[4] != '-') ||
+    यदि ((STRNCMP(p, "ucs", 3) == 0 && VIM_ISDIGIT(p[3]) && p[3] != NUL && p[4] != '-') ||
 	(STRNCMP(p, "utf", 3) == 0 && VIM_ISDIGIT(p[3]) && p[3] != NUL && p[4] != '-'))
     {
 	// Insert hyphen after "ucs" or "utf": "ucs2" -> "ucs-2"
@@ -1337,117 +1337,117 @@ normalize_encoding_name(char_u *enc_skipped)
 	p[3] = '-';
     }
 
-    return from_encoding_raw;
+    फर्काऊ from_encoding_raw;
 }
 
 /*
  * "blob2str()" function
  * Converts a blob to a string, ensuring valid UTF-8 encoding.
  */
-    static void
+    स्थिर शून्य
 append_converted_string_to_list(
 	string_T *converted,
-	int validate_utf8,
+	पूर्णाङ्क validate_utf8,
 	list_T *list,
 	char_u *from_encoding)
 {
-    if (converted->string != NULL)
+    यदि (converted->string != रिक्त)
     {
 	// After conversion, the output is a valid UTF-8 string (NUL-terminated)
 	// Split by newlines and add to list
 	char_u *p = converted->string;
 	char_u *end = converted->string + converted->length;
-	while (p < end)
+	जबसम्म (p < end)
 	{
-	    string_T	line;
-	    char_u	*line_start = p;
+	    string_T	पङ्क्ति;
+	    char_u	*पङ्क्ति_start = p;
 
-	    while (p < end && *p != NL)
+	    जबसम्म (p < end && *p != NL)
 		p++;
 
 	    // Add this line to the result list
-	    line.length = (size_t)(p - line_start);
-	    line.string = vim_strnsave(line_start, line.length);
-	    if (line.string != NULL)
+	    पङ्क्ति.length = (माप_प्रकार)(p - पङ्क्ति_start);
+	    पङ्क्ति.string = vim_strnsave(पङ्क्ति_start, पङ्क्ति.length);
+	    यदि (पङ्क्ति.string != रिक्त)
 	    {
-		if (validate_utf8 && !utf_valid_string(line.string, NULL))
+		यदि (validate_utf8 && !utf_valid_string(पङ्क्ति.string, रिक्त))
 		{
-		    vim_free(line.string);
+		    vim_free(पङ्क्ति.string);
 		    semsg(_(e_str_encoding_from_failed), p_enc);
 		    vim_free(converted->string);
-		    return; // Stop processing
+		    फर्काऊ; // Stop processing
 		}
-		if (list_append_string(list, line.string, (int)line.length) == FAIL)
+		यदि (list_append_string(list, पङ्क्ति.string, (पूर्णाङ्क)पङ्क्ति.length) == FAIL)
 		{
-		    vim_free(line.string);
+		    vim_free(पङ्क्ति.string);
 		    vim_free(converted->string);
-		    return; // Stop processing on append failure
+		    फर्काऊ; // Stop processing on append failure
 		}
-		vim_free(line.string);
+		vim_free(पङ्क्ति.string);
 	    }
-	    else
+	    अन्यथा
 	    {
 		// Allocation failure: report error and stop processing
 		emsg(_(e_out_of_memory));
 		vim_free(converted->string);
-		return;
+		फर्काऊ;
 	    }
 
-	    if (*p == NL)
+	    यदि (*p == NL)
 		p++;
 	}
 	vim_free(converted->string);
     }
-    else
+    अन्यथा
     {
 	semsg(_(e_str_encoding_from_failed), from_encoding);
     }
 }
 
-    static int
-append_validated_line_to_list(string_T *line, int validate_utf8, list_T *list)
+    स्थिर पूर्णाङ्क
+append_validated_पङ्क्ति_to_list(string_T *पङ्क्ति, पूर्णाङ्क validate_utf8, list_T *list)
 {
-    if (validate_utf8 && !utf_valid_string(line->string, NULL))
+    यदि (validate_utf8 && !utf_valid_string(पङ्क्ति->string, रिक्त))
     {
 	semsg(_(e_str_encoding_from_failed), p_enc);
-	vim_free(line->string);
-	return FAIL;
+	vim_free(पङ्क्ति->string);
+	फर्काऊ FAIL;
     }
 
-    int ret = list_append_string(list, line->string, (int)line->length);
-    vim_free(line->string);
-    return ret;
+    पूर्णाङ्क ret = list_append_string(list, पङ्क्ति->string, (पूर्णाङ्क)पङ्क्ति->length);
+    vim_free(पङ्क्ति->string);
+    फर्काऊ ret;
 }
 
-    void
+    शून्य
 f_blob2str(typval_T *argvars, typval_T *rettv)
 {
     blob_T	*blob;
-    int		blen;
-    long	idx;
-    int		validate_utf8 = FALSE;
+    पूर्णाङ्क		blen;
+    दीर्घ	idx;
+    पूर्णाङ्क		validate_utf8 = FALSE;
 
-    if (check_for_blob_arg(argvars, 0) == FAIL
+    यदि (check_for_blob_arg(argvars, 0) == FAIL
 	    || check_for_opt_dict_arg(argvars, 1) == FAIL)
-	return;
+	फर्काऊ;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    यदि (rettv_list_alloc(rettv) == FAIL)
+	फर्काऊ;
 
     blob = argvars->vval.v_blob;
-    if (blob == NULL)
-	return;
+    यदि (blob == रिक्त)
+	फर्काऊ;
     blen = blob_len(blob);
 
-    char_u	*from_encoding = NULL;
-    char_u	*from_encoding_raw = NULL;  // Encoding name with endianness preserved for iconv
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    char_u	*from_encoding = रिक्त;
+    char_u	*from_encoding_raw = रिक्त;  // Encoding name with endianness preserved for iconv
+    यदि (argvars[1].v_type != VAR_UNKNOWN)
     {
 	dict_T *d = argvars[1].vval.v_dict;
-	if (d != NULL)
+	यदि (d != रिक्त)
 	{
 	    char_u *enc = dict_get_string(d, "encoding", FALSE);
-	    if (enc != NULL)
+	    यदि (enc != रिक्त)
 	    {
 		char_u *enc_skipped = enc_skip(enc);
 		from_encoding = enc_canonize(enc_skipped);
@@ -1455,20 +1455,20 @@ f_blob2str(typval_T *argvars, typval_T *rettv)
 		// For iconv, preserve the endianness suffix by creating a normalized
 		// version with hyphens: "ucs2be" -> "ucs-2be", "utf16le" -> "utf-16le"
 		from_encoding_raw = normalize_encoding_name(enc_skipped);
-		if (from_encoding_raw == NULL)
+		यदि (from_encoding_raw == रिक्त)
 		{
 		    emsg(_(e_out_of_memory));
 		    VIM_CLEAR(from_encoding);
-		    return;
+		    फर्काऊ;
 		}
 	    }
 	}
     }
 
-    if (STRCMP(p_enc, "utf-8") == 0 || STRCMP(p_enc, "utf8") == 0)
+    यदि (STRCMP(p_enc, "utf-8") == 0 || STRCMP(p_enc, "utf8") == 0)
 	validate_utf8 = TRUE;
 
-    if (from_encoding != NULL && STRCMP(from_encoding, "none") == 0)
+    यदि (from_encoding != रिक्त && STRCMP(from_encoding, "none") == 0)
     {
 	validate_utf8 = FALSE;
 	VIM_CLEAR(from_encoding);
@@ -1476,22 +1476,22 @@ f_blob2str(typval_T *argvars, typval_T *rettv)
     }
 
     // Special handling for UTF-16/UCS-2/UTF-32/UCS-4 encodings: convert entire blob before splitting by newlines
-    int from_prop = 0;
-    if (from_encoding != NULL)
+    पूर्णाङ्क from_prop = 0;
+    यदि (from_encoding != रिक्त)
 	from_prop = enc_canon_props(from_encoding);
-    if (from_encoding != NULL && (from_prop & (ENC_2BYTE | ENC_4BYTE | ENC_2WORD)))
+    यदि (from_encoding != रिक्त && (from_prop & (ENC_2BYTE | ENC_4BYTE | ENC_2WORD)))
     {
 	// Build a temporary buffer from the blob as a whole
 	// Don't use string_from_blob() because it treats NUL as line separator
 	garray_T blob_ga;
-	int nul_size = (from_prop & ENC_4BYTE) ? 4 : 2;
+	पूर्णाङ्क nul_size = (from_prop & ENC_4BYTE) ? 4 : 2;
 	ga_init2(&blob_ga, 1, blen + nul_size);
-	if (ga_grow(&blob_ga, blen + nul_size) == OK)
+	यदि (ga_grow(&blob_ga, blen + nul_size) == OK)
 	{
-	    if (blen > 0)
-		mch_memmove(blob_ga.ga_data, blob->bv_ga.ga_data, (size_t)blen);
+	    यदि (blen > 0)
+		mch_memmove(blob_ga.ga_data, blob->bv_ga.ga_data, (माप_प्रकार)blen);
 	    // NUL terminator (2 bytes for UTF-16/UCS-2, 4 bytes for UTF-32/UCS-4)
-	    vim_memset((char_u *)blob_ga.ga_data + blen, 0, (size_t)nul_size);
+	    vim_memset((char_u *)blob_ga.ga_data + blen, 0, (माप_प्रकार)nul_size);
 	    blob_ga.ga_len = blen + nul_size;
 	}
 
@@ -1500,60 +1500,60 @@ f_blob2str(typval_T *argvars, typval_T *rettv)
 	vimconv.vc_type = CONV_NONE;
 	// Use raw encoding name for iconv to preserve endianness (utf-16be vs utf-16)
 	// from_encoding_raw is guaranteed non-NULL whenever from_encoding != NULL
-	if (convert_setup_ext(&vimconv, from_encoding_raw, FALSE, p_enc, FALSE) == FAIL)
+	यदि (convert_setup_ext(&vimconv, from_encoding_raw, FALSE, p_enc, FALSE) == FAIL)
 	{
 	    ga_clear(&blob_ga);
 	    semsg(_(e_str_encoding_from_failed), from_encoding);
-	    goto done;
+	    गच्छ done;
 	}
 	vimconv.vc_fail = TRUE;
 
 	// Use string_convert_ext with explicit input length
 	string_T    converted;
 
-	int len = blen;
+	पूर्णाङ्क len = blen;
 	converted.string =
-	    string_convert_ext(&vimconv, (char_u *)blob_ga.ga_data, &len, NULL);
+	    string_convert_ext(&vimconv, (char_u *)blob_ga.ga_data, &len, रिक्त);
 	converted.length = len;
-	convert_setup(&vimconv, NULL, NULL);
+	convert_setup(&vimconv, रिक्त, रिक्त);
 	ga_clear(&blob_ga);
 	append_converted_string_to_list(&converted, validate_utf8, rettv->vval.v_list, from_encoding);
     }
-    else
+    अन्यथा
     {
 	// Original logic for non-UTF-16 encodings
 	idx = 0;
-	while (idx < blen)
+	जबसम्म (idx < blen)
 	{
 	    string_T	str;
 
-	    if (string_from_blob(blob, &idx, &str) != OK)
-		break;
+	    यदि (string_from_blob(blob, &idx, &str) != OK)
+		रोक;
 
-	    if (from_encoding != NULL)
+	    यदि (from_encoding != रिक्त)
 	    {
 		// from_encoding_raw is guaranteed non-NULL whenever from_encoding != NULL
-		int	    res;
+		पूर्णाङ्क	    res;
 		string_T    converted;
 
 		res = convert_string(&str, from_encoding_raw, p_enc, &converted);
 		vim_free(str.string);
-		if (res != OK)
+		यदि (res != OK)
 		{
 		    semsg(_(e_str_encoding_from_failed), from_encoding);
-		    goto done;
+		    गच्छ done;
 		}
 		str.string = converted.string;
 		str.length = converted.length;
 	    }
 
-	    if (append_validated_line_to_list(&str, validate_utf8, rettv->vval.v_list) == FAIL)
-		goto done;
+	    यदि (append_validated_पङ्क्ति_to_list(&str, validate_utf8, rettv->vval.v_list) == FAIL)
+		गच्छ done;
 	}
     }
 
     // If the blob ends with a newline, we need to add another empty string.
-    if (blen > 0 && blob_get(blob, blen - 1) == NL)
+    यदि (blen > 0 && blob_get(blob, blen - 1) == NL)
 	list_append_string(rettv->vval.v_list, (char_u *)"", 0);
 
 done:
@@ -1564,35 +1564,35 @@ done:
 /*
  * "str2blob()" function
  */
-    void
+    शून्य
 f_str2blob(typval_T *argvars, typval_T *rettv)
 {
     blob_T	*blob;
     list_T	*list;
     listitem_T	*li;
 
-    if (check_for_list_arg(argvars, 0) == FAIL
+    यदि (check_for_list_arg(argvars, 0) == FAIL
 	    || check_for_opt_dict_arg(argvars, 1) == FAIL)
-	return;
+	फर्काऊ;
 
-    if (rettv_blob_alloc(rettv) == FAIL)
-	return;
+    यदि (rettv_blob_alloc(rettv) == FAIL)
+	फर्काऊ;
 
     blob = rettv->vval.v_blob;
 
     list = argvars[0].vval.v_list;
-    if (list == NULL)
-	return;
+    यदि (list == रिक्त)
+	फर्काऊ;
 
-    char_u	*to_encoding = NULL;
-    char_u	*to_encoding_raw = NULL;  // Encoding name with endianness preserved for iconv
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    char_u	*to_encoding = रिक्त;
+    char_u	*to_encoding_raw = रिक्त;  // Encoding name with endianness preserved for iconv
+    यदि (argvars[1].v_type != VAR_UNKNOWN)
     {
 	dict_T *d = argvars[1].vval.v_dict;
-	if (d != NULL)
+	यदि (d != रिक्त)
 	{
 	    char_u *enc = dict_get_string(d, "encoding", FALSE);
-	    if (enc != NULL)
+	    यदि (enc != रिक्त)
 	    {
 		char_u *enc_skipped = enc_skip(enc);
 		to_encoding = enc_canonize(enc_skipped);
@@ -1600,11 +1600,11 @@ f_str2blob(typval_T *argvars, typval_T *rettv)
 		// For iconv, preserve the endianness suffix by creating a
 		// normalized version with hyphens: "utf16le" -> "utf-16le"
 		to_encoding_raw = normalize_encoding_name(enc_skipped);
-		if (to_encoding_raw == NULL)
+		यदि (to_encoding_raw == रिक्त)
 		{
 		    emsg(_(e_out_of_memory));
 		    VIM_CLEAR(to_encoding);
-		    return;
+		    फर्काऊ;
 		}
 	    }
 	}
@@ -1615,253 +1615,253 @@ f_str2blob(typval_T *argvars, typval_T *rettv)
     // the wide-encoded newline separators and embedded NUL bytes are preserved
     // (mirrors blob2str()).  convert_string() cannot be used here because it
     // treats every Unicode encoding as utf-8, leaving the bytes unconverted.
-    int to_prop = 0;
-    if (to_encoding != NULL)
+    पूर्णाङ्क to_prop = 0;
+    यदि (to_encoding != रिक्त)
 	to_prop = enc_canon_props(to_encoding);
-    if (to_encoding != NULL && (to_prop & (ENC_2BYTE | ENC_4BYTE | ENC_2WORD)))
+    यदि (to_encoding != रिक्त && (to_prop & (ENC_2BYTE | ENC_4BYTE | ENC_2WORD)))
     {
 	garray_T	str_ga;
 
 	ga_init2(&str_ga, 1, 256);
-	FOR_ALL_LIST_ITEMS(list, li)
+	FOR_ALL_LIST_वस्तुहरू(list, li)
 	{
 	    char_u *s;
 
-	    if (li->li_tv.v_type != VAR_STRING)
-		continue;
+	    यदि (li->li_tv.v_type != VAR_STRING)
+		जारी;
 
 	    s = li->li_tv.vval.v_string;
 
 	    // Each list string item is separated by a newline in the blob
-	    if (li != list->lv_first)
+	    यदि (li != list->lv_first)
 		ga_append(&str_ga, NL);
-	    if (s != NULL && *s != NUL)
+	    यदि (s != रिक्त && *s != NUL)
 	    {
-		int slen = (int)STRLEN(s);
+		पूर्णाङ्क slen = (पूर्णाङ्क)STRLEN(s);
 
-		if (ga_grow(&str_ga, slen) == FAIL)
+		यदि (ga_grow(&str_ga, slen) == FAIL)
 		{
 		    ga_clear(&str_ga);
-		    goto done;
+		    गच्छ done;
 		}
 		mch_memmove((char_u *)str_ga.ga_data + str_ga.ga_len, s,
-								(size_t)slen);
+								(माप_प्रकार)slen);
 		str_ga.ga_len += slen;
 	    }
 	}
 
-	if (str_ga.ga_len > 0)
+	यदि (str_ga.ga_len > 0)
 	{
 	    vimconv_T	vimconv;
 
 	    vimconv.vc_type = CONV_NONE;
-	    if (convert_setup_ext(&vimconv, p_enc, FALSE, to_encoding_raw, FALSE)
+	    यदि (convert_setup_ext(&vimconv, p_enc, FALSE, to_encoding_raw, FALSE)
 								    == FAIL)
 	    {
 		ga_clear(&str_ga);
 		semsg(_(e_str_encoding_to_failed), to_encoding);
-		goto done;
+		गच्छ done;
 	    }
 	    vimconv.vc_fail = TRUE;
 
-	    int		len = str_ga.ga_len;
+	    पूर्णाङ्क		len = str_ga.ga_len;
 	    char_u	*converted = string_convert_ext(&vimconv,
-				    (char_u *)str_ga.ga_data, &len, NULL);
-	    convert_setup(&vimconv, NULL, NULL);
+				    (char_u *)str_ga.ga_data, &len, रिक्त);
+	    convert_setup(&vimconv, रिक्त, रिक्त);
 	    ga_clear(&str_ga);
 
-	    if (converted == NULL)
+	    यदि (converted == रिक्त)
 	    {
 		semsg(_(e_str_encoding_to_failed), to_encoding);
-		goto done;
+		गच्छ done;
 	    }
-	    if (len > 0 && ga_grow(&blob->bv_ga, len) == OK)
+	    यदि (len > 0 && ga_grow(&blob->bv_ga, len) == OK)
 	    {
 		mch_memmove((char_u *)blob->bv_ga.ga_data + blob->bv_ga.ga_len,
-						    converted, (size_t)len);
+						    converted, (माप_प्रकार)len);
 		blob->bv_ga.ga_len += len;
 	    }
 	    vim_free(converted);
 	}
-	else
+	अन्यथा
 	    ga_clear(&str_ga);
     }
-    else
+    अन्यथा
     {
-	FOR_ALL_LIST_ITEMS(list, li)
+	FOR_ALL_LIST_वस्तुहरू(list, li)
 	{
-	    if (li->li_tv.v_type != VAR_STRING)
-		continue;
+	    यदि (li->li_tv.v_type != VAR_STRING)
+		जारी;
 
 	    string_T	str = {li->li_tv.vval.v_string, 0};
 
-	    if (str.string == NULL)
+	    यदि (str.string == रिक्त)
 		STR_LITERAL_SET(str, "");
-	    else
+	    अन्यथा
 		str.length = STRLEN(str.string);
 
-	    if (to_encoding != NULL)
+	    यदि (to_encoding != रिक्त)
 	    {
-		int	    res;
+		पूर्णाङ्क	    res;
 		string_T    converted;
 
 		res = convert_string(&str, p_enc, to_encoding, &converted);
-		if (res != OK)
+		यदि (res != OK)
 		{
 		    semsg(_(e_str_encoding_to_failed), to_encoding);
-		    goto done;
+		    गच्छ done;
 		}
 		str.string = converted.string;
 		str.length = converted.length;
 	    }
 
-	    if (li != list->lv_first)
+	    यदि (li != list->lv_first)
 		// Each list string item is separated by a newline in the blob
 		ga_append(&blob->bv_ga, NL);
 
 	    blob_from_string(str.string, blob);
 
-	    if (to_encoding != NULL)
+	    यदि (to_encoding != रिक्त)
 		vim_free(str.string);
 	}
     }
 
 done:
-    if (to_encoding != NULL)
+    यदि (to_encoding != रिक्त)
 	vim_free(to_encoding);
-    if (to_encoding_raw != NULL)
+    यदि (to_encoding_raw != रिक्त)
 	vim_free(to_encoding_raw);
 }
 
 /*
  * "str2list()" function
  */
-    void
+    शून्य
 f_str2list(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
-    int		utf8 = FALSE;
+    पूर्णाङ्क		utf8 = FALSE;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    यदि (rettv_list_alloc(rettv) == FAIL)
+	फर्काऊ;
 
-    if (in_vim9script()
+    यदि (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	फर्काऊ;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
-	utf8 = (int)tv_get_bool_chk(&argvars[1], NULL);
+    यदि (argvars[1].v_type != VAR_UNKNOWN)
+	utf8 = (पूर्णाङ्क)tv_get_bool_chk(&argvars[1], रिक्त);
 
     p = tv_get_string(&argvars[0]);
 
-    if (has_mbyte || utf8)
+    यदि (has_mbyte || utf8)
     {
-	int (*ptr2len)(char_u *);
-	int (*ptr2char)(char_u *);
+	पूर्णाङ्क (*ptr2len)(char_u *);
+	पूर्णाङ्क (*ptr2char)(char_u *);
 
-	if (utf8 || enc_utf8)
+	यदि (utf8 || enc_utf8)
 	{
 	    ptr2len = utf_ptr2len;
 	    ptr2char = utf_ptr2char;
 	}
-	else
+	अन्यथा
 	{
 	    ptr2len = mb_ptr2len;
 	    ptr2char = mb_ptr2char;
 	}
 
-	for ( ; *p != NUL; p += (*ptr2len)(p))
-	    list_append_number(rettv->vval.v_list, (*ptr2char)(p));
+	लागि ( ; *p != NUL; p += (*ptr2len)(p))
+	    list_append_सङ्ख्या(rettv->vval.v_list, (*ptr2char)(p));
     }
-    else
-	for ( ; *p != NUL; ++p)
-	    list_append_number(rettv->vval.v_list, *p);
+    अन्यथा
+	लागि ( ; *p != NUL; ++p)
+	    list_append_सङ्ख्या(rettv->vval.v_list, *p);
 }
 
 /*
  * "str2nr()" function
  */
-    void
+    शून्य
 f_str2nr(typval_T *argvars, typval_T *rettv)
 {
-    int		base = 10;
+    पूर्णाङ्क		base = 10;
     char_u	*p;
     varnumber_T	n;
-    int		what = 0;
-    int		isneg;
+    पूर्णाङ्क		what = 0;
+    पूर्णाङ्क		isneg;
 
-    if (in_vim9script()
+    यदि (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL
+		|| check_for_opt_सङ्ख्या_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 2) == FAIL)))
-	return;
+	फर्काऊ;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    यदि (argvars[1].v_type != VAR_UNKNOWN)
     {
-	base = (int)tv_get_number(&argvars[1]);
-	if (base != 2 && base != 8 && base != 10 && base != 16)
+	base = (पूर्णाङ्क)tv_get_सङ्ख्या(&argvars[1]);
+	यदि (base != 2 && base != 8 && base != 10 && base != 16)
 	{
 	    emsg(_(e_invalid_argument));
-	    return;
+	    फर्काऊ;
 	}
-	if (argvars[2].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[2]))
+	यदि (argvars[2].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[2]))
 	    what |= STR2NR_QUOTE;
     }
 
     p = skipwhite(tv_get_string_strict(&argvars[0]));
     isneg = (*p == '-');
-    if (*p == '+' || *p == '-')
+    यदि (*p == '+' || *p == '-')
 	p = skipwhite(p + 1);
-    switch (base)
+    विकल्प (base)
     {
-	case 2: what |= STR2NR_BIN + STR2NR_FORCE; break;
-	case 8: what |= STR2NR_OCT + STR2NR_OOCT + STR2NR_FORCE; break;
-	case 16: what |= STR2NR_HEX + STR2NR_FORCE; break;
+	पक्ष 2: what |= STR2NR_BIN + STR2NR_FORCE; रोक;
+	पक्ष 8: what |= STR2NR_OCT + STR2NR_OOCT + STR2NR_FORCE; रोक;
+	पक्ष 16: what |= STR2NR_HEX + STR2NR_FORCE; रोक;
     }
-    vim_str2nr(p, NULL, NULL, what, &n, NULL, 0, FALSE, NULL);
+    vim_str2nr(p, रिक्त, रिक्त, what, &n, रिक्त, 0, FALSE, रिक्त);
     // Text after the number is silently ignored.
-    if (isneg)
-	rettv->vval.v_number = -n;
-    else
-	rettv->vval.v_number = n;
+    यदि (isneg)
+	rettv->vval.v_सङ्ख्या = -n;
+    अन्यथा
+	rettv->vval.v_सङ्ख्या = n;
 
 }
 
 /*
  * "strgetchar()" function
  */
-    void
+    शून्य
 f_strgetchar(typval_T *argvars, typval_T *rettv)
 {
     char_u	*str;
-    int		len;
-    int		error = FALSE;
-    int		charidx;
-    int		byteidx = 0;
+    पूर्णाङ्क		len;
+    पूर्णाङ्क		error = FALSE;
+    पूर्णाङ्क		charidx;
+    पूर्णाङ्क		byteidx = 0;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_सङ्ख्या = -1;
 
-    if (in_vim9script()
+    यदि (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_सङ्ख्या_arg(argvars, 1) == FAIL))
+	फर्काऊ;
 
     str = tv_get_string_chk(&argvars[0]);
-    if (str == NULL)
-	return;
-    len = (int)STRLEN(str);
-    charidx = (int)tv_get_number_chk(&argvars[1], &error);
-    if (error)
-	return;
+    यदि (str == रिक्त)
+	फर्काऊ;
+    len = (पूर्णाङ्क)STRLEN(str);
+    charidx = (पूर्णाङ्क)tv_get_सङ्ख्या_chk(&argvars[1], &error);
+    यदि (error)
+	फर्काऊ;
 
-    while (charidx >= 0 && byteidx < len)
+    जबसम्म (charidx >= 0 && byteidx < len)
     {
-	if (charidx == 0)
+	यदि (charidx == 0)
 	{
-	    rettv->vval.v_number = mb_ptr2char(str + byteidx);
-	    break;
+	    rettv->vval.v_सङ्ख्या = mb_ptr2char(str + byteidx);
+	    रोक;
 	}
 	--charidx;
 	byteidx += MB_CPTR2LEN(str + byteidx);
@@ -1871,7 +1871,7 @@ f_strgetchar(typval_T *argvars, typval_T *rettv)
 /*
  * "stridx()" function
  */
-    void
+    शून्य
 f_stridx(typval_T *argvars, typval_T *rettv)
 {
     char_u	buf[NUMBUFLEN];
@@ -1879,40 +1879,40 @@ f_stridx(typval_T *argvars, typval_T *rettv)
     char_u	*haystack;
     char_u	*save_haystack;
     char_u	*pos;
-    int		start_idx;
+    पूर्णाङ्क		start_idx;
 
-    if (in_vim9script()
+    यदि (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL))
-	return;
+		|| check_for_opt_सङ्ख्या_arg(argvars, 2) == FAIL))
+	फर्काऊ;
 
     needle = tv_get_string_chk(&argvars[1]);
     save_haystack = haystack = tv_get_string_buf_chk(&argvars[0], buf);
-    rettv->vval.v_number = -1;
-    if (needle == NULL || haystack == NULL)
-	return;		// type error; errmsg already given
+    rettv->vval.v_सङ्ख्या = -1;
+    यदि (needle == रिक्त || haystack == रिक्त)
+	फर्काऊ;		// type error; errmsg already given
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    यदि (argvars[2].v_type != VAR_UNKNOWN)
     {
-	int	    error = FALSE;
+	पूर्णाङ्क	    error = FALSE;
 
-	start_idx = (int)tv_get_number_chk(&argvars[2], &error);
-	if (error || start_idx >= (int)STRLEN(haystack))
-	    return;
-	if (start_idx >= 0)
+	start_idx = (पूर्णाङ्क)tv_get_सङ्ख्या_chk(&argvars[2], &error);
+	यदि (error || start_idx >= (पूर्णाङ्क)STRLEN(haystack))
+	    फर्काऊ;
+	यदि (start_idx >= 0)
 	    haystack += start_idx;
     }
 
-    pos	= (char_u *)strstr((char *)haystack, (char *)needle);
-    if (pos != NULL)
-	rettv->vval.v_number = (varnumber_T)(pos - save_haystack);
+    pos	= (char_u *)म_माला((वर्ण *)haystack, (वर्ण *)needle);
+    यदि (pos != रिक्त)
+	rettv->vval.v_सङ्ख्या = (varnumber_T)(pos - save_haystack);
 }
 
 /*
  * "string()" function
  */
-    void
+    शून्य
 f_string(typval_T *argvars, typval_T *rettv)
 {
     char_u	*tofree;
@@ -1922,49 +1922,49 @@ f_string(typval_T *argvars, typval_T *rettv)
     rettv->vval.v_string = tv2string(&argvars[0], &tofree, numbuf,
 								get_copyID());
     // Make a copy if we have a value but it's not in allocated memory.
-    if (rettv->vval.v_string != NULL && tofree == NULL)
+    यदि (rettv->vval.v_string != रिक्त && tofree == रिक्त)
 	rettv->vval.v_string = vim_strsave(rettv->vval.v_string);
 }
 
 /*
  * "strlen()" function
  */
-    void
+    शून्य
 f_strlen(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
-	    && check_for_string_or_number_arg(argvars, 0) == FAIL)
-	return;
+    यदि (in_vim9script()
+	    && check_for_string_or_सङ्ख्या_arg(argvars, 0) == FAIL)
+	फर्काऊ;
 
-    rettv->vval.v_number = (varnumber_T)(STRLEN(
+    rettv->vval.v_सङ्ख्या = (varnumber_T)(STRLEN(
 					      tv_get_string(&argvars[0])));
 }
 
-    static void
-strchar_common(typval_T *argvars, typval_T *rettv, int skipcc)
+    स्थिर शून्य
+strchar_common(typval_T *argvars, typval_T *rettv, पूर्णाङ्क skipcc)
 {
     char_u		*s = tv_get_string(&argvars[0]);
     varnumber_T		len = 0;
-    int			(*func_mb_ptr2char_adv)(char_u **pp);
+    पूर्णाङ्क			(*func_mb_ptr2char_adv)(char_u **pp);
 
     func_mb_ptr2char_adv = skipcc ? mb_ptr2char_adv : mb_cptr2char_adv;
-    while (*s != NUL)
+    जबसम्म (*s != NUL)
     {
 	func_mb_ptr2char_adv(&s);
 	++len;
     }
-    rettv->vval.v_number = len;
+    rettv->vval.v_सङ्ख्या = len;
 }
 
 /*
  * "strcharlen()" function
  */
-    void
+    शून्य
 f_strcharlen(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
-	    && check_for_string_or_number_arg(argvars, 0) == FAIL)
-	return;
+    यदि (in_vim9script()
+	    && check_for_string_or_सङ्ख्या_arg(argvars, 0) == FAIL)
+	फर्काऊ;
 
     strchar_common(argvars, rettv, TRUE);
 }
@@ -1972,26 +1972,26 @@ f_strcharlen(typval_T *argvars, typval_T *rettv)
 /*
  * "strchars()" function
  */
-    void
+    शून्य
 f_strchars(typval_T *argvars, typval_T *rettv)
 {
     varnumber_T		skipcc = FALSE;
 
-    if (in_vim9script()
+    यदि (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	फर्काऊ;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    यदि (argvars[1].v_type != VAR_UNKNOWN)
     {
-	int error = FALSE;
+	पूर्णाङ्क error = FALSE;
 	skipcc = tv_get_bool_chk(&argvars[1], &error);
-	if (error)
-	    return;
-	if (skipcc < 0 || skipcc > 1)
+	यदि (error)
+	    फर्काऊ;
+	यदि (skipcc < 0 || skipcc > 1)
 	{
-	    semsg(_(e_using_number_as_bool_nr), skipcc);
-	    return;
+	    semsg(_(e_using_सङ्ख्या_as_bool_nr), skipcc);
+	    फर्काऊ;
 	}
     }
 
@@ -2001,161 +2001,161 @@ f_strchars(typval_T *argvars, typval_T *rettv)
 /*
  * "strutf16len()" function
  */
-    void
+    शून्य
 f_strutf16len(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = -1;
+    rettv->vval.v_सङ्ख्या = -1;
 
-    if (check_for_string_arg(argvars, 0) == FAIL
+    यदि (check_for_string_arg(argvars, 0) == FAIL
 	    || check_for_opt_bool_arg(argvars, 1) == FAIL)
-	return;
+	फर्काऊ;
 
     varnumber_T countcc = FALSE;
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    यदि (argvars[1].v_type != VAR_UNKNOWN)
 	countcc = tv_get_bool(&argvars[1]);
 
     char_u		*s = tv_get_string(&argvars[0]);
     varnumber_T		len = 0;
-    int			(*func_mb_ptr2char_adv)(char_u **pp);
-    int			ch;
+    पूर्णाङ्क			(*func_mb_ptr2char_adv)(char_u **pp);
+    पूर्णाङ्क			ch;
 
     func_mb_ptr2char_adv = countcc ? mb_cptr2char_adv : mb_ptr2char_adv;
-    while (*s != NUL)
+    जबसम्म (*s != NUL)
     {
 	ch = func_mb_ptr2char_adv(&s);
-	if (ch > 0xFFFF)
+	यदि (ch > 0xFFFF)
 	    ++len;
 	++len;
     }
-    rettv->vval.v_number = len;
+    rettv->vval.v_सङ्ख्या = len;
 }
 
 /*
  * "strdisplaywidth()" function
  */
-    void
+    शून्य
 f_strdisplaywidth(typval_T *argvars, typval_T *rettv)
 {
     char_u	*s;
-    int		col = 0;
+    पूर्णाङ्क		col = 0;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_सङ्ख्या = -1;
 
-    if (in_vim9script()
+    यदि (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_सङ्ख्या_arg(argvars, 1) == FAIL))
+	फर्काऊ;
 
     s = tv_get_string(&argvars[0]);
-    if (argvars[1].v_type != VAR_UNKNOWN)
-	col = (int)tv_get_number(&argvars[1]);
+    यदि (argvars[1].v_type != VAR_UNKNOWN)
+	col = (पूर्णाङ्क)tv_get_सङ्ख्या(&argvars[1]);
 
-    rettv->vval.v_number = (varnumber_T)(linetabsize_col(col, s) - col);
+    rettv->vval.v_सङ्ख्या = (varnumber_T)(linetabsize_col(col, s) - col);
 }
 
 /*
  * "strwidth()" function
  */
-    void
+    शून्य
 f_strwidth(typval_T *argvars, typval_T *rettv)
 {
     char_u	*s;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    यदि (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	फर्काऊ;
 
     s = tv_get_string_strict(&argvars[0]);
-    rettv->vval.v_number = (varnumber_T)(mb_string2cells(s, -1));
+    rettv->vval.v_सङ्ख्या = (varnumber_T)(mb_string2cells(s, -1));
 }
 
 /*
  * "strcharpart()" function
  */
-    void
+    शून्य
 f_strcharpart(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
-    int		nchar;
-    int		nbyte = 0;
-    int		charlen;
-    int		skipcc = FALSE;
-    int		len = 0;
-    int		slen;
-    int		error = FALSE;
+    पूर्णाङ्क		nchar;
+    पूर्णाङ्क		nbyte = 0;
+    पूर्णाङ्क		charlen;
+    पूर्णाङ्क		skipcc = FALSE;
+    पूर्णाङ्क		len = 0;
+    पूर्णाङ्क		slen;
+    पूर्णाङ्क		error = FALSE;
 
-    if (in_vim9script()
+    यदि (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL
+		|| check_for_सङ्ख्या_arg(argvars, 1) == FAIL
+		|| check_for_opt_सङ्ख्या_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL)))
-	return;
+	फर्काऊ;
 
     p = tv_get_string(&argvars[0]);
-    slen = (int)STRLEN(p);
+    slen = (पूर्णाङ्क)STRLEN(p);
 
-    nchar = (int)tv_get_number_chk(&argvars[1], &error);
-    if (!error)
+    nchar = (पूर्णाङ्क)tv_get_सङ्ख्या_chk(&argvars[1], &error);
+    यदि (!error)
     {
-	if (argvars[2].v_type != VAR_UNKNOWN
+	यदि (argvars[2].v_type != VAR_UNKNOWN
 					   && argvars[3].v_type != VAR_UNKNOWN)
 	{
 	    skipcc = tv_get_bool_chk(&argvars[3], &error);
-	    if (error)
-		return;
-	    if (skipcc < 0 || skipcc > 1)
+	    यदि (error)
+		फर्काऊ;
+	    यदि (skipcc < 0 || skipcc > 1)
 	    {
-		semsg(_(e_using_number_as_bool_nr), skipcc);
-		return;
+		semsg(_(e_using_सङ्ख्या_as_bool_nr), skipcc);
+		फर्काऊ;
 	    }
 	}
 
-	if (nchar > 0)
-	    while (nchar > 0 && nbyte < slen)
+	यदि (nchar > 0)
+	    जबसम्म (nchar > 0 && nbyte < slen)
 	    {
-		if (skipcc)
+		यदि (skipcc)
 		    nbyte += mb_ptr2len(p + nbyte);
-		else
+		अन्यथा
 		    nbyte += MB_CPTR2LEN(p + nbyte);
 		--nchar;
 	    }
-	else
+	अन्यथा
 	    nbyte = nchar;
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	यदि (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    charlen = (int)tv_get_number(&argvars[2]);
-	    while (charlen > 0 && nbyte + len < slen)
+	    charlen = (पूर्णाङ्क)tv_get_सङ्ख्या(&argvars[2]);
+	    जबसम्म (charlen > 0 && nbyte + len < slen)
 	    {
-		int off = nbyte + len;
+		पूर्णाङ्क off = nbyte + len;
 
-		if (off < 0)
+		यदि (off < 0)
 		    len += 1;
-		else
+		अन्यथा
 		{
-		    if (skipcc)
+		    यदि (skipcc)
 			len += mb_ptr2len(p + off);
-		    else
+		    अन्यथा
 			len += MB_CPTR2LEN(p + off);
 		}
 		--charlen;
 	    }
 	}
-	else
+	अन्यथा
 	    len = slen - nbyte;    // default: all bytes that are available.
     }
 
     // Only return the overlap between the specified part and the actual
     // string.
-    if (nbyte < 0)
+    यदि (nbyte < 0)
     {
 	len += nbyte;
 	nbyte = 0;
     }
-    else if (nbyte > slen)
+    अन्यथा यदि (nbyte > slen)
 	nbyte = slen;
-    if (len < 0)
+    यदि (len < 0)
 	len = 0;
-    else if (nbyte + len > slen)
+    अन्यथा यदि (nbyte + len > slen)
 	len = slen - nbyte;
 
     rettv->v_type = VAR_STRING;
@@ -2165,54 +2165,54 @@ f_strcharpart(typval_T *argvars, typval_T *rettv)
 /*
  * "strpart()" function
  */
-    void
+    शून्य
 f_strpart(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
-    int		n;
-    int		len;
-    int		slen;
-    int		error = FALSE;
+    पूर्णाङ्क		n;
+    पूर्णाङ्क		len;
+    पूर्णाङ्क		slen;
+    पूर्णाङ्क		error = FALSE;
 
-    if (in_vim9script()
+    यदि (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL
+		|| check_for_सङ्ख्या_arg(argvars, 1) == FAIL
+		|| check_for_opt_सङ्ख्या_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL)))
-	return;
+	फर्काऊ;
 
     p = tv_get_string(&argvars[0]);
-    slen = (int)STRLEN(p);
+    slen = (पूर्णाङ्क)STRLEN(p);
 
-    n = (int)tv_get_number_chk(&argvars[1], &error);
-    if (error)
+    n = (पूर्णाङ्क)tv_get_सङ्ख्या_chk(&argvars[1], &error);
+    यदि (error)
 	len = 0;
-    else if (argvars[2].v_type != VAR_UNKNOWN)
-	len = (int)tv_get_number(&argvars[2]);
-    else
+    अन्यथा यदि (argvars[2].v_type != VAR_UNKNOWN)
+	len = (पूर्णाङ्क)tv_get_सङ्ख्या(&argvars[2]);
+    अन्यथा
 	len = slen - n;	    // default len: all bytes that are available.
 
     // Only return the overlap between the specified part and the actual
     // string.
-    if (n < 0)
+    यदि (n < 0)
     {
 	len += n;
 	n = 0;
     }
-    else if (n > slen)
+    अन्यथा यदि (n > slen)
 	n = slen;
-    if (len < 0)
+    यदि (len < 0)
 	len = 0;
-    else if (n + len > slen)
+    अन्यथा यदि (n + len > slen)
 	len = slen - n;
 
-    if (argvars[2].v_type != VAR_UNKNOWN && argvars[3].v_type != VAR_UNKNOWN)
+    यदि (argvars[2].v_type != VAR_UNKNOWN && argvars[3].v_type != VAR_UNKNOWN)
     {
-	int off;
+	पूर्णाङ्क off;
 
 	// length in characters
-	for (off = n; off < slen && len > 0; --len)
+	लागि (off = n; off < slen && len > 0; --len)
 	    off += mb_ptr2len(p + off);
 	len = off - n;
     }
@@ -2224,70 +2224,70 @@ f_strpart(typval_T *argvars, typval_T *rettv)
 /*
  * "strridx()" function
  */
-    void
+    शून्य
 f_strridx(typval_T *argvars, typval_T *rettv)
 {
     char_u	buf[NUMBUFLEN];
     char_u	*needle;
     char_u	*haystack;
     char_u	*rest;
-    char_u	*lastmatch = NULL;
-    int		haystack_len, end_idx;
+    char_u	*lastmatch = रिक्त;
+    पूर्णाङ्क		haystack_len, end_idx;
 
-    if (in_vim9script()
+    यदि (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL))
-	return;
+		|| check_for_opt_सङ्ख्या_arg(argvars, 2) == FAIL))
+	फर्काऊ;
 
     needle = tv_get_string_chk(&argvars[1]);
     haystack = tv_get_string_buf_chk(&argvars[0], buf);
 
-    rettv->vval.v_number = -1;
-    if (needle == NULL || haystack == NULL)
-	return;		// type error; errmsg already given
+    rettv->vval.v_सङ्ख्या = -1;
+    यदि (needle == रिक्त || haystack == रिक्त)
+	फर्काऊ;		// type error; errmsg already given
 
-    haystack_len = (int)STRLEN(haystack);
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    haystack_len = (पूर्णाङ्क)STRLEN(haystack);
+    यदि (argvars[2].v_type != VAR_UNKNOWN)
     {
 	// Third argument: upper limit for index
-	end_idx = (int)tv_get_number_chk(&argvars[2], NULL);
-	if (end_idx < 0)
-	    return;	// can never find a match
+	end_idx = (पूर्णाङ्क)tv_get_सङ्ख्या_chk(&argvars[2], रिक्त);
+	यदि (end_idx < 0)
+	    फर्काऊ;	// can never find a match
     }
-    else
+    अन्यथा
 	end_idx = haystack_len;
 
-    if (*needle == NUL)
+    यदि (*needle == NUL)
     {
 	// Empty string matches past the end.
 	lastmatch = haystack + end_idx;
     }
-    else
+    अन्यथा
     {
-	for (rest = haystack; *rest != '\0'; ++rest)
+	लागि (rest = haystack; *rest != '\0'; ++rest)
 	{
-	    rest = (char_u *)strstr((char *)rest, (char *)needle);
-	    if (rest == NULL || rest > haystack + end_idx)
-		break;
+	    rest = (char_u *)म_माला((वर्ण *)rest, (वर्ण *)needle);
+	    यदि (rest == रिक्त || rest > haystack + end_idx)
+		रोक;
 	    lastmatch = rest;
 	}
     }
 
-    if (lastmatch == NULL)
-	rettv->vval.v_number = -1;
-    else
-	rettv->vval.v_number = (varnumber_T)(lastmatch - haystack);
+    यदि (lastmatch == रिक्त)
+	rettv->vval.v_सङ्ख्या = -1;
+    अन्यथा
+	rettv->vval.v_सङ्ख्या = (varnumber_T)(lastmatch - haystack);
 }
 
 /*
  * "strtrans()" function
  */
-    void
+    शून्य
 f_strtrans(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    यदि (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	फर्काऊ;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = transstr(tv_get_string(&argvars[0]));
@@ -2300,73 +2300,73 @@ f_strtrans(typval_T *argvars, typval_T *rettv)
  * Converts a byte or character offset in a string to the corresponding UTF-16
  * code unit offset.
  */
-    void
+    शून्य
 f_utf16idx(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = -1;
+    rettv->vval.v_सङ्ख्या = -1;
 
-    if (check_for_string_arg(argvars, 0) == FAIL
-	    || check_for_opt_number_arg(argvars, 1) == FAIL
+    यदि (check_for_string_arg(argvars, 0) == FAIL
+	    || check_for_opt_सङ्ख्या_arg(argvars, 1) == FAIL
 	    || check_for_opt_bool_arg(argvars, 2) == FAIL
 	    || (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL))
-	    return;
+	    फर्काऊ;
 
     char_u *str = tv_get_string_chk(&argvars[0]);
-    varnumber_T	idx = tv_get_number_chk(&argvars[1], NULL);
-    if (str == NULL || idx < 0)
-	return;
+    varnumber_T	idx = tv_get_सङ्ख्या_chk(&argvars[1], रिक्त);
+    यदि (str == रिक्त || idx < 0)
+	फर्काऊ;
 
     varnumber_T	countcc = FALSE;
     varnumber_T	charidx = FALSE;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    यदि (argvars[2].v_type != VAR_UNKNOWN)
     {
 	countcc = tv_get_bool(&argvars[2]);
-	if (argvars[3].v_type != VAR_UNKNOWN)
+	यदि (argvars[3].v_type != VAR_UNKNOWN)
 	    charidx = tv_get_bool(&argvars[3]);
     }
 
-    int (*ptr2len)(char_u *);
-    if (enc_utf8 && countcc)
+    पूर्णाङ्क (*ptr2len)(char_u *);
+    यदि (enc_utf8 && countcc)
 	ptr2len = utf_ptr2len;
-    else
+    अन्यथा
 	ptr2len = mb_ptr2len;
 
     char_u	*p;
-    int		len;
-    int		utf16idx = 0;
-    for (p = str, len = 0; charidx ? idx >= 0 : p <= str + idx; len++)
+    पूर्णाङ्क		len;
+    पूर्णाङ्क		utf16idx = 0;
+    लागि (p = str, len = 0; charidx ? idx >= 0 : p <= str + idx; len++)
     {
-	if (*p == NUL)
+	यदि (*p == NUL)
 	{
 	    // If the index is exactly the number of bytes or characters in the
 	    // string then return the length of the string in utf-16 code
 	    // units.
-	    if (charidx ? (idx == 0) : (p == (str + idx)))
-		rettv->vval.v_number = len;
-	    return;
+	    यदि (charidx ? (idx == 0) : (p == (str + idx)))
+		rettv->vval.v_सङ्ख्या = len;
+	    फर्काऊ;
 	}
 	utf16idx = len;
-	int clen = ptr2len(p);
-	int c = (clen > 1) ? utf_ptr2char(p) : *p;
-	if (c > 0xFFFF)
+	पूर्णाङ्क clen = ptr2len(p);
+	पूर्णाङ्क c = (clen > 1) ? utf_ptr2char(p) : *p;
+	यदि (c > 0xFFFF)
 	    len++;
 	p += clen;
-	if (charidx)
+	यदि (charidx)
 	    idx--;
     }
 
-    rettv->vval.v_number = utf16idx;
+    rettv->vval.v_सङ्ख्या = utf16idx;
 }
 
 /*
  * "tolower(string)" function
  */
-    void
+    शून्य
 f_tolower(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    यदि (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	फर्काऊ;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = strlow_save(tv_get_string(&argvars[0]));
@@ -2375,11 +2375,11 @@ f_tolower(typval_T *argvars, typval_T *rettv)
 /*
  * "toupper(string)" function
  */
-    void
+    शून्य
 f_toupper(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    यदि (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	फर्काऊ;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = strup_save(tv_get_string(&argvars[0]));
@@ -2388,29 +2388,29 @@ f_toupper(typval_T *argvars, typval_T *rettv)
 /*
  * "tr(string, fromstr, tostr)" function
  */
-    void
+    शून्य
 f_tr(typval_T *argvars, typval_T *rettv)
 {
     char_u	*in_str;
     char_u	*fromstr;
     char_u	*tostr;
     char_u	*p;
-    int		inlen;
-    int		fromlen;
-    int		tolen;
-    int		idx;
+    पूर्णाङ्क		inlen;
+    पूर्णाङ्क		fromlen;
+    पूर्णाङ्क		tolen;
+    पूर्णाङ्क		idx;
     char_u	*cpstr;
-    int		cplen;
-    int		first = TRUE;
+    पूर्णाङ्क		cplen;
+    पूर्णाङ्क		first = TRUE;
     char_u	buf[NUMBUFLEN];
     char_u	buf2[NUMBUFLEN];
     garray_T	ga;
 
-    if (in_vim9script()
+    यदि (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_string_arg(argvars, 2) == FAIL))
-	return;
+	फर्काऊ;
 
     in_str = tv_get_string(&argvars[0]);
     fromstr = tv_get_string_buf_chk(&argvars[1], buf);
@@ -2418,87 +2418,87 @@ f_tr(typval_T *argvars, typval_T *rettv)
 
     // Default return value: empty string.
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
-    if (fromstr == NULL || tostr == NULL)
-	    return;		// type error; errmsg already given
-    ga_init2(&ga, sizeof(char), 80);
+    rettv->vval.v_string = रिक्त;
+    यदि (fromstr == रिक्त || tostr == रिक्त)
+	    फर्काऊ;		// type error; errmsg already given
+    ga_init2(&ga, परिमाण(वर्ण), 80);
 
-    if (!has_mbyte)
+    यदि (!has_mbyte)
 	// not multi-byte: fromstr and tostr must be the same length
-	if (STRLEN(fromstr) != STRLEN(tostr))
+	यदि (STRLEN(fromstr) != STRLEN(tostr))
 	{
 error:
 	    semsg(_(e_invalid_argument_str), fromstr);
 	    ga_clear(&ga);
-	    return;
+	    फर्काऊ;
 	}
 
     // fromstr and tostr have to contain the same number of chars
-    while (*in_str != NUL)
+    जबसम्म (*in_str != NUL)
     {
-	if (has_mbyte)
+	यदि (has_mbyte)
 	{
 	    inlen = (*mb_ptr2len)(in_str);
 	    cpstr = in_str;
 	    cplen = inlen;
 	    idx = 0;
-	    for (p = fromstr; *p != NUL; p += fromlen)
+	    लागि (p = fromstr; *p != NUL; p += fromlen)
 	    {
 		fromlen = (*mb_ptr2len)(p);
-		if (fromlen == inlen && STRNCMP(in_str, p, inlen) == 0)
+		यदि (fromlen == inlen && STRNCMP(in_str, p, inlen) == 0)
 		{
-		    for (p = tostr; *p != NUL; p += tolen)
+		    लागि (p = tostr; *p != NUL; p += tolen)
 		    {
 			tolen = (*mb_ptr2len)(p);
-			if (idx-- == 0)
+			यदि (idx-- == 0)
 			{
 			    cplen = tolen;
 			    cpstr = p;
-			    break;
+			    रोक;
 			}
 		    }
-		    if (*p == NUL)	// tostr is shorter than fromstr
-			goto error;
-		    break;
+		    यदि (*p == NUL)	// tostr is shorter than fromstr
+			गच्छ error;
+		    रोक;
 		}
 		++idx;
 	    }
 
-	    if (first && cpstr == in_str)
+	    यदि (first && cpstr == in_str)
 	    {
 		// Check that fromstr and tostr have the same number of
 		// (multi-byte) characters.  Done only once when a character
 		// of in_str doesn't appear in fromstr.
 		first = FALSE;
-		for (p = tostr; *p != NUL; p += tolen)
+		लागि (p = tostr; *p != NUL; p += tolen)
 		{
 		    tolen = (*mb_ptr2len)(p);
 		    --idx;
 		}
-		if (idx != 0)
-		    goto error;
+		यदि (idx != 0)
+		    गच्छ error;
 	    }
 
-	    (void)ga_grow(&ga, cplen);
-	    mch_memmove((char *)ga.ga_data + ga.ga_len, cpstr, (size_t)cplen);
+	    (शून्य)ga_grow(&ga, cplen);
+	    mch_memmove((वर्ण *)ga.ga_data + ga.ga_len, cpstr, (माप_प्रकार)cplen);
 	    ga.ga_len += cplen;
 
 	    in_str += inlen;
 	}
-	else
+	अन्यथा
 	{
 	    // When not using multi-byte chars we can do it faster.
 	    p = vim_strchr(fromstr, *in_str);
-	    if (p != NULL)
+	    यदि (p != रिक्त)
 		ga_append(&ga, tostr[p - fromstr]);
-	    else
+	    अन्यथा
 		ga_append(&ga, *in_str);
 	    ++in_str;
 	}
     }
 
     // add a terminating NUL
-    (void)ga_grow(&ga, 1);
+    (शून्य)ga_grow(&ga, 1);
     ga_append(&ga, NUL);
 
     rettv->vval.v_string = ga.ga_data;
@@ -2507,102 +2507,102 @@ error:
 /*
  * "trim({expr})" function
  */
-    void
+    शून्य
 f_trim(typval_T *argvars, typval_T *rettv)
 {
     char_u	buf1[NUMBUFLEN];
     char_u	buf2[NUMBUFLEN];
     char_u	*head;
-    char_u	*mask = NULL;
+    char_u	*mask = रिक्त;
     char_u	*tail;
     char_u	*prev;
     char_u	*p;
-    int		c1;
-    int		dir = 0;
+    पूर्णाङ्क		c1;
+    पूर्णाङ्क		dir = 0;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = रिक्त;
 
-    if (in_vim9script()
+    यदि (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
-	return;
+		    && check_for_opt_सङ्ख्या_arg(argvars, 2) == FAIL)))
+	फर्काऊ;
 
     head = tv_get_string_buf_chk(&argvars[0], buf1);
-    if (head == NULL)
-	return;
+    यदि (head == रिक्त)
+	फर्काऊ;
 
-    if (check_for_opt_string_arg(argvars, 1) == FAIL)
-	return;
+    यदि (check_for_opt_string_arg(argvars, 1) == FAIL)
+	फर्काऊ;
 
-    if (argvars[1].v_type == VAR_STRING)
+    यदि (argvars[1].v_type == VAR_STRING)
     {
 	mask = tv_get_string_buf_chk(&argvars[1], buf2);
-	if (*mask == NUL)
-	    mask = NULL;
+	यदि (*mask == NUL)
+	    mask = रिक्त;
 
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	यदि (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    int	error = 0;
+	    पूर्णाङ्क	error = 0;
 
 	    // leading or trailing characters to trim
-	    dir = (int)tv_get_number_chk(&argvars[2], &error);
-	    if (error)
-		return;
-	    if (dir < 0 || dir > 2)
+	    dir = (पूर्णाङ्क)tv_get_सङ्ख्या_chk(&argvars[2], &error);
+	    यदि (error)
+		फर्काऊ;
+	    यदि (dir < 0 || dir > 2)
 	    {
 		semsg(_(e_invalid_argument_str), tv_get_string(&argvars[2]));
-		return;
+		फर्काऊ;
 	    }
 	}
     }
 
-    if (dir == 0 || dir == 1)
+    यदि (dir == 0 || dir == 1)
     {
 	// Trim leading characters
-	while (*head != NUL)
+	जबसम्म (*head != NUL)
 	{
 	    c1 = PTR2CHAR(head);
-	    if (mask == NULL)
+	    यदि (mask == रिक्त)
 	    {
-		if (c1 > ' ' && c1 != 0xa0)
-		    break;
+		यदि (c1 > ' ' && c1 != 0xa0)
+		    रोक;
 	    }
-	    else
+	    अन्यथा
 	    {
-		for (p = mask; *p != NUL; MB_PTR_ADV(p))
-		    if (c1 == PTR2CHAR(p))
-			break;
-		if (*p == NUL)
-		    break;
+		लागि (p = mask; *p != NUL; MB_PTR_ADV(p))
+		    यदि (c1 == PTR2CHAR(p))
+			रोक;
+		यदि (*p == NUL)
+		    रोक;
 	    }
 	    MB_PTR_ADV(head);
 	}
     }
 
     tail = head + STRLEN(head);
-    if (dir == 0 || dir == 2)
+    यदि (dir == 0 || dir == 2)
     {
 	// Trim trailing characters
-	for (; tail > head; tail = prev)
+	लागि (; tail > head; tail = prev)
 	{
 	    prev = tail;
 	    MB_PTR_BACK(head, prev);
 	    c1 = PTR2CHAR(prev);
-	    if (mask == NULL)
+	    यदि (mask == रिक्त)
 	    {
-		if (c1 > ' ' && c1 != 0xa0)
-		    break;
+		यदि (c1 > ' ' && c1 != 0xa0)
+		    रोक;
 	    }
-	    else
+	    अन्यथा
 	    {
-		for (p = mask; *p != NUL; MB_PTR_ADV(p))
-		    if (c1 == PTR2CHAR(p))
-			break;
-		if (*p == NUL)
-		    break;
+		लागि (p = mask; *p != NUL; MB_PTR_ADV(p))
+		    यदि (c1 == PTR2CHAR(p))
+			रोक;
+		यदि (*p == NUL)
+		    रोक;
 	    }
 	}
     }
@@ -2625,69 +2625,69 @@ f_trim(typval_T *argvars, typval_T *rettv)
  *
  * Returns NULL if input is NULL or memory allocation fails.
  */
-    static char_u *
+    स्थिर char_u *
 uri_decode(char_u *str)
 {
-    if (str == NULL)
-	return NULL;
+    यदि (str == रिक्त)
+	फर्काऊ रिक्त;
 
-    size_t len = STRLEN(str);
+    माप_प्रकार len = STRLEN(str);
 
     char_u *decoded = alloc(len + 1);
-    if (!decoded)
-	return NULL;
+    यदि (!decoded)
+	फर्काऊ रिक्त;
 
     char_u	*p = decoded;
-    size_t	i = 0;
+    माप_प्रकार	i = 0;
 
-    while (i < len)
+    जबसम्म (i < len)
     {
-	if (str[i] == '%')
+	यदि (str[i] == '%')
 	{
-	    if (i + 2 >= len)
+	    यदि (i + 2 >= len)
 	    {
 		// Malformed encoding
 		*p++ = str[i++];
-		if (str[i] != NUL)
+		यदि (str[i] != NUL)
 		    *p++ = str[i++];
 	    }
-	    else
+	    अन्यथा
 	    {
-		int val = hexhex2nr(&str[i + 1]);
-		if (val != -1)
+		पूर्णाङ्क val = hexhex2nr(&str[i + 1]);
+		यदि (val != -1)
 		{
 		    *p++ = (char_u)val;
 		    i += 3;
 		}
-		else
+		अन्यथा
 		{
 		    // invalid hex digits following "%"
-		    for (int j = 0; j < 3; j++)
+		    लागि (पूर्णाङ्क j = 0; j < 3; j++)
 			*p++ = str[i++];
 		}
 	    }
 
 	}
-	else
+	अन्यथा
 	    *p++ = str[i++];
     }
 
     *p = NUL;
 
-    return decoded;
+    फर्काऊ decoded;
 }
 
 /*
  * "uri_decode({str})" function
  */
-    void
+    शून्य
 f_uridecode(typval_T *argvars, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = रिक्त;
 
-    if (check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    यदि (check_for_string_arg(argvars, 0) == FAIL)
+	फर्काऊ;
 
     rettv->vval.v_string = uri_decode(tv_get_string(&argvars[0]));
 }
@@ -2706,76 +2706,76 @@ f_uridecode(typval_T *argvars, typval_T *rettv)
  *
  *   Returns NULL if input is NULL or memory allocation fails.
  */
-    static char_u *
+    स्थिर char_u *
 uri_encode(char_u *str)
 {
-    if (str == NULL)
-	return NULL;
+    यदि (str == रिक्त)
+	फर्काऊ रिक्त;
 
-    size_t len = STRLEN(str);
+    माप_प्रकार len = STRLEN(str);
 
     // Worst case: every character needs encoding => 3x size + 1 for null
     // terminator
     char_u *encoded = alloc(len * 3 + 1);
-    if (encoded == NULL)
-	return NULL;
+    यदि (encoded == रिक्त)
+	फर्काऊ रिक्त;
 
     char_u *p = encoded;
 
-    for (size_t i = 0; i < len; ++i)
+    लागि (माप_प्रकार i = 0; i < len; ++i)
     {
 	char_u c = str[i];
-	if (ASCII_ISALNUM(c) || c == '-' || c == '_' || c == '.' || c == '~')
+	यदि (ASCII_ISALNUM(c) || c == '-' || c == '_' || c == '.' || c == '~')
 	    *p++ = c;
-	else
+	अन्यथा
 	{
-	    sprintf((char *)p, "%%%02X", c);
+	    प्र_लिखो((वर्ण *)p, "%%%02X", c);
 	    p += 3;
 	}
     }
 
     *p = NUL;
 
-    return encoded;
+    फर्काऊ encoded;
 }
 
 /*
  * "uri_encode({str})" function
  */
-    void
+    शून्य
 f_uriencode(typval_T *argvars, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = रिक्त;
 
-    if (check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    यदि (check_for_string_arg(argvars, 0) == FAIL)
+	फर्काऊ;
 
     rettv->vval.v_string = uri_encode(tv_get_string(&argvars[0]));
 }
 
-static char *e_printf = N_(e_insufficient_arguments_for_printf);
+स्थिर वर्ण *e_printf = N_(e_insufficient_arguments_for_printf);
 
 /*
  * Get number argument from "idxp" entry in "tvs".  First entry is 1.
  */
-    static varnumber_T
-tv_nr(typval_T *tvs, int *idxp)
+    स्थिर varnumber_T
+tv_nr(typval_T *tvs, पूर्णाङ्क *idxp)
 {
-    int		idx = *idxp - 1;
+    पूर्णाङ्क		idx = *idxp - 1;
     varnumber_T	n = 0;
-    int		err = FALSE;
+    पूर्णाङ्क		err = FALSE;
 
-    if (tvs[idx].v_type == VAR_UNKNOWN)
+    यदि (tvs[idx].v_type == VAR_UNKNOWN)
 	emsg(_(e_printf));
-    else
+    अन्यथा
     {
 	++*idxp;
-	n = tv_get_number_chk(&tvs[idx], &err);
-	if (err)
+	n = tv_get_सङ्ख्या_chk(&tvs[idx], &err);
+	यदि (err)
 	    n = 0;
     }
-    return n;
+    फर्काऊ n;
 }
 
 /*
@@ -2786,48 +2786,48 @@ tv_nr(typval_T *tvs, int *idxp)
  * a string with the same format as ":echo".  The caller must free "*tofree".
  * Returns NULL for an error.
  */
-    static char *
-tv_str(typval_T *tvs, int *idxp, char_u **tofree)
+    स्थिर वर्ण *
+tv_str(typval_T *tvs, पूर्णाङ्क *idxp, char_u **tofree)
 {
-    int		    idx = *idxp - 1;
-    char	    *s = NULL;
-    static char_u   numbuf[NUMBUFLEN];
+    पूर्णाङ्क		    idx = *idxp - 1;
+    वर्ण	    *s = रिक्त;
+    स्थिर char_u   numbuf[NUMBUFLEN];
 
-    if (tvs[idx].v_type == VAR_UNKNOWN)
+    यदि (tvs[idx].v_type == VAR_UNKNOWN)
 	emsg(_(e_printf));
-    else
+    अन्यथा
     {
 	++*idxp;
-	if (tofree != NULL)
-	    s = (char *)echo_string(&tvs[idx], tofree, numbuf, get_copyID());
-	else
-	    s = (char *)tv_get_string_chk(&tvs[idx]);
+	यदि (tofree != रिक्त)
+	    s = (वर्ण *)echo_string(&tvs[idx], tofree, numbuf, get_copyID());
+	अन्यथा
+	    s = (वर्ण *)tv_get_string_chk(&tvs[idx]);
     }
-    return s;
+    फर्काऊ s;
 }
 
 /*
  * Get float argument from "idxp" entry in "tvs".  First entry is 1.
  */
-    static double
-tv_float(typval_T *tvs, int *idxp)
+    स्थिर द्विगुण
+tv_float(typval_T *tvs, पूर्णाङ्क *idxp)
 {
-    int		idx = *idxp - 1;
-    double	f = 0;
+    पूर्णाङ्क		idx = *idxp - 1;
+    द्विगुण	f = 0;
 
-    if (tvs[idx].v_type == VAR_UNKNOWN)
+    यदि (tvs[idx].v_type == VAR_UNKNOWN)
 	emsg(_(e_printf));
-    else
+    अन्यथा
     {
 	++*idxp;
-	if (tvs[idx].v_type == VAR_FLOAT)
+	यदि (tvs[idx].v_type == VAR_FLOAT)
 	    f = tvs[idx].vval.v_float;
-	else if (tvs[idx].v_type == VAR_NUMBER)
-	    f = (double)tvs[idx].vval.v_number;
-	else
+	अन्यथा यदि (tvs[idx].v_type == VAR_सङ्ख्या)
+	    f = (द्विगुण)tvs[idx].vval.v_सङ्ख्या;
+	अन्यथा
 	    emsg(_(e_expected_float_argument_for_printf));
     }
-    return f;
+    फर्काऊ f;
 }
 
 #endif
@@ -2836,22 +2836,22 @@ tv_float(typval_T *tvs, int *idxp)
  * Return the representation of infinity for printf() function:
  * "-inf", "inf", "+inf", " inf", "-INF", "INF", "+INF" or " INF".
  */
-    static const char *
-infinity_str(int positive,
-	     char fmt_spec,
-	     int force_sign,
-	     int space_for_positive)
+    स्थिर अचर वर्ण *
+infinity_str(पूर्णाङ्क positive,
+	     वर्ण fmt_spec,
+	     पूर्णाङ्क force_sign,
+	     पूर्णाङ्क space_for_positive)
 {
-    static const char *table[] =
+    स्थिर अचर वर्ण *table[] =
     {
 	"-inf", "inf", "+inf", " inf",
 	"-INF", "INF", "+INF", " INF"
     };
-    int idx = positive * (1 + force_sign + force_sign * space_for_positive);
+    पूर्णाङ्क idx = positive * (1 + force_sign + force_sign * space_for_positive);
 
-    if (ASCII_ISUPPER(fmt_spec))
+    यदि (ASCII_ISUPPER(fmt_spec))
 	idx += 4;
-    return table[idx];
+    फर्काऊ table[idx];
 }
 
 /*
@@ -2901,34 +2901,34 @@ infinity_str(int positive,
 #ifndef PROTO
 
 // Like vim_vsnprintf() but append to the string.
-    int
-vim_snprintf_add(char *str, size_t str_m, const char *fmt, ...)
+    पूर्णाङ्क
+vim_snprintf_add(वर्ण *str, माप_प्रकार str_m, अचर वर्ण *fmt, ...)
 {
-    va_list	ap;
-    int		str_l;
-    size_t	len = STRLEN(str);
-    size_t	space;
+    बहु_सूची	ap;
+    पूर्णाङ्क		str_l;
+    माप_प्रकार	len = STRLEN(str);
+    माप_प्रकार	space;
 
-    if (str_m <= len)
+    यदि (str_m <= len)
 	space = 0;
-    else
+    अन्यथा
 	space = str_m - len;
-    va_start(ap, fmt);
+    बहु_शुरू(ap, fmt);
     str_l = vim_vsnprintf(str + len, space, fmt, ap);
-    va_end(ap);
-    return str_l;
+    बहु_पूर्ण(ap);
+    फर्काऊ str_l;
 }
 
-    int
-vim_snprintf(char *str, size_t str_m, const char *fmt, ...)
+    पूर्णाङ्क
+vim_snprintf(वर्ण *str, माप_प्रकार str_m, अचर वर्ण *fmt, ...)
 {
-    va_list	ap;
-    int		str_l;
+    बहु_सूची	ap;
+    पूर्णाङ्क		str_l;
 
-    va_start(ap, fmt);
+    बहु_शुरू(ap, fmt);
     str_l = vim_vsnprintf(str, str_m, fmt, ap);
-    va_end(ap);
-    return str_l;
+    बहु_पूर्ण(ap);
+    फर्काऊ str_l;
 }
 
 /*
@@ -2940,38 +2940,38 @@ vim_snprintf(char *str, size_t str_m, const char *fmt, ...)
  * length because the destination may be shorter than the source. This function
  * guarantees the returned length will never be greater than the destination length.
  */
-    size_t
-vim_snprintf_safelen(char *str, size_t str_m, const char *fmt, ...)
+    माप_प्रकार
+vim_snprintf_safelen(वर्ण *str, माप_प्रकार str_m, अचर वर्ण *fmt, ...)
 {
-    va_list ap;
-    int	    str_l;
+    बहु_सूची ap;
+    पूर्णाङ्क	    str_l;
 
-    if (str_m == 0)
-	return 0;
+    यदि (str_m == 0)
+	फर्काऊ 0;
 
-    va_start(ap, fmt);
-    str_l = vim_vsnprintf_typval(str, str_m, fmt, ap, NULL);
-    va_end(ap);
+    बहु_शुरू(ap, fmt);
+    str_l = vim_vsnprintf_typval(str, str_m, fmt, ap, रिक्त);
+    बहु_पूर्ण(ap);
 
-    if (str_l < 0)
+    यदि (str_l < 0)
     {
 	*str = NUL;
-	return 0;
+	फर्काऊ 0;
     }
-    return ((size_t)str_l >= str_m) ? str_m - 1 : (size_t)str_l;
+    फर्काऊ ((माप_प्रकार)str_l >= str_m) ? str_m - 1 : (माप_प्रकार)str_l;
 }
 
-    int
+    पूर्णाङ्क
 vim_vsnprintf(
-    char	*str,
-    size_t	str_m,
-    const char	*fmt,
-    va_list	ap)
+    वर्ण	*str,
+    माप_प्रकार	str_m,
+    अचर वर्ण	*fmt,
+    बहु_सूची	ap)
 {
-    return vim_vsnprintf_typval(str, str_m, fmt, ap, NULL);
+    फर्काऊ vim_vsnprintf_typval(str, str_m, fmt, ap, रिक्त);
 }
 
-enum
+गणना
 {
     TYPE_UNKNOWN = -1,
     TYPE_INT,
@@ -2989,22 +2989,22 @@ enum
 
 /* Types that can be used in a format string
  */
-    static int
+    स्थिर पूर्णाङ्क
 format_typeof(
-    const char	*type)
+    अचर वर्ण	*type)
 {
     // allowed values: \0, h, l, L
-    char    length_modifier = '\0';
+    वर्ण    length_modifier = '\0';
 
     // current conversion specifier character
-    char    fmt_spec = '\0';
+    वर्ण    fmt_spec = '\0';
 
     // parse 'h', 'l' and 'll' length modifiers
-    if (*type == 'h' || *type == 'l')
+    यदि (*type == 'h' || *type == 'l')
     {
 	length_modifier = *type;
 	type++;
-	if (length_modifier == 'l' && *type == 'l')
+	यदि (length_modifier == 'l' && *type == 'l')
 	{
 	    // double l = __int64 / varnumber_T
 	    length_modifier = 'L';
@@ -3014,305 +3014,305 @@ format_typeof(
     fmt_spec = *type;
 
     // common synonyms:
-    switch (fmt_spec)
+    विकल्प (fmt_spec)
     {
-	case 'i': fmt_spec = 'd'; break;
-	case '*': fmt_spec = 'd'; length_modifier = 'h'; break;
-	case 'D': fmt_spec = 'd'; length_modifier = 'l'; break;
-	case 'U': fmt_spec = 'u'; length_modifier = 'l'; break;
-	case 'O': fmt_spec = 'o'; length_modifier = 'l'; break;
-	default: break;
+	पक्ष 'i': fmt_spec = 'd'; रोक;
+	पक्ष '*': fmt_spec = 'd'; length_modifier = 'h'; रोक;
+	पक्ष 'D': fmt_spec = 'd'; length_modifier = 'l'; रोक;
+	पक्ष 'U': fmt_spec = 'u'; length_modifier = 'l'; रोक;
+	पक्ष 'O': fmt_spec = 'o'; length_modifier = 'l'; रोक;
+	स्वभाव: रोक;
     }
 
     // get parameter value, do initial processing
-    switch (fmt_spec)
+    विकल्प (fmt_spec)
     {
 	// '%' and 'c' behave similar to 's' regarding flags and field
 	// widths
-    case '%':
-	return TYPE_PERCENT;
+    पक्ष '%':
+	फर्काऊ TYPE_PERCENT;
 
-    case 'c':
-	return TYPE_CHAR;
+    पक्ष 'c':
+	फर्काऊ TYPE_CHAR;
 
-    case 's':
-    case 'S':
-	return TYPE_STRING;
+    पक्ष 's':
+    पक्ष 'S':
+	फर्काऊ TYPE_STRING;
 
-    case 'd': case 'u':
-    case 'b': case 'B':
-    case 'o':
-    case 'x': case 'X':
-    case 'p':
+    पक्ष 'd': पक्ष 'u':
+    पक्ष 'b': पक्ष 'B':
+    पक्ष 'o':
+    पक्ष 'x': पक्ष 'X':
+    पक्ष 'p':
 	{
 	    // NOTE: the u, b, o, x, X and p conversion specifiers
 	    // imply the value is unsigned;  d implies a signed
-	    // value
+	    //मान
 
 	    // 0 if numeric argument is zero (or if pointer is
 	    // NULL for 'p'), +1 if greater than zero (or nonzero
 	    // for unsigned arguments), -1 if negative (unsigned
 	    // argument is never negative)
 
-	    if (fmt_spec == 'p')
-		return TYPE_POINTER;
-	    else if (fmt_spec == 'b' || fmt_spec == 'B')
-		return TYPE_UNSIGNEDLONGLONGINT;
-	    else if (fmt_spec == 'd')
+	    यदि (fmt_spec == 'p')
+		फर्काऊ TYPE_POINTER;
+	    अन्यथा यदि (fmt_spec == 'b' || fmt_spec == 'B')
+		फर्काऊ TYPE_UNSIGNEDLONGLONGINT;
+	    अन्यथा यदि (fmt_spec == 'd')
 	    {
 		// signed
-		switch (length_modifier)
+		विकल्प (length_modifier)
 		{
-		case '\0':
-		case 'h':
+		पक्ष '\0':
+		पक्ष 'h':
 		    // char and short arguments are passed as int.
-		    return TYPE_INT;
-		case 'l':
-		    return TYPE_LONGINT;
-		case 'L':
-		    return TYPE_LONGLONGINT;
+		    फर्काऊ TYPE_INT;
+		पक्ष 'l':
+		    फर्काऊ TYPE_LONGINT;
+		पक्ष 'L':
+		    फर्काऊ TYPE_LONGLONGINT;
 		}
 	    }
-	    else
+	    अन्यथा
 	    {
 		// unsigned
-		switch (length_modifier)
+		विकल्प (length_modifier)
 		{
-		    case '\0':
-		    case 'h':
-			return TYPE_UNSIGNEDINT;
-		    case 'l':
-			return TYPE_UNSIGNEDLONGINT;
-		    case 'L':
-			return TYPE_UNSIGNEDLONGLONGINT;
+		    पक्ष '\0':
+		    पक्ष 'h':
+			फर्काऊ TYPE_UNSIGNEDINT;
+		    पक्ष 'l':
+			फर्काऊ TYPE_UNSIGNEDLONGINT;
+		    पक्ष 'L':
+			फर्काऊ TYPE_UNSIGNEDLONGLONGINT;
 		}
 	    }
 	}
-	break;
+	रोक;
 
-    case 'f':
-    case 'F':
-    case 'e':
-    case 'E':
-    case 'g':
-    case 'G':
-	return TYPE_FLOAT;
+    पक्ष 'f':
+    पक्ष 'F':
+    पक्ष 'e':
+    पक्ष 'E':
+    पक्ष 'g':
+    पक्ष 'G':
+	फर्काऊ TYPE_FLOAT;
     }
 
-    return TYPE_UNKNOWN;
+    फर्काऊ TYPE_UNKNOWN;
 }
 
-    static char *
+    स्थिर वर्ण *
 format_typename(
-    const char  *type)
+    अचर वर्ण  *type)
 {
-    switch (format_typeof(type))
+    विकल्प (format_typeof(type))
     {
-	case TYPE_INT:
-	    return typename_int;
+	पक्ष TYPE_INT:
+	    फर्काऊ typename_int;
 
-	case TYPE_LONGINT:
-	    return typename_longint;
+	पक्ष TYPE_LONGINT:
+	    फर्काऊ typename_longint;
 
-	case TYPE_LONGLONGINT:
-	    return typename_longlongint;
+	पक्ष TYPE_LONGLONGINT:
+	    फर्काऊ typename_longlongint;
 
-	case TYPE_UNSIGNEDINT:
-	    return typename_unsignedint;
+	पक्ष TYPE_UNSIGNEDINT:
+	    फर्काऊ typename_unsignedint;
 
-	case TYPE_UNSIGNEDLONGINT:
-	    return typename_unsignedlongint;
+	पक्ष TYPE_UNSIGNEDLONGINT:
+	    फर्काऊ typename_unsignedlongint;
 
-	case TYPE_UNSIGNEDLONGLONGINT:
-	    return typename_unsignedlonglongint;
+	पक्ष TYPE_UNSIGNEDLONGLONGINT:
+	    फर्काऊ typename_unsignedlonglongint;
 
-	case TYPE_POINTER:
-	    return _(typename_pointer);
+	पक्ष TYPE_POINTER:
+	    फर्काऊ _(typename_pointer);
 
-	case TYPE_PERCENT:
-	    return _(typename_percent);
+	पक्ष TYPE_PERCENT:
+	    फर्काऊ _(typename_percent);
 
-	case TYPE_CHAR:
-	    return typename_char;
+	पक्ष TYPE_CHAR:
+	    फर्काऊ typename_char;
 
-	case TYPE_STRING:
-	    return _(typename_string);
+	पक्ष TYPE_STRING:
+	    फर्काऊ _(typename_string);
 
-	case TYPE_FLOAT:
-	    return typename_float;
+	पक्ष TYPE_FLOAT:
+	    फर्काऊ typename_float;
     }
 
-    return _(typename_unknown);
+    फर्काऊ _(typename_unknown);
 }
 
-    static int
+    स्थिर पूर्णाङ्क
 adjust_types(
-    const char ***ap_types,
-    int arg,
-    int *num_posarg,
-    const char *type)
+    अचर वर्ण ***ap_types,
+    पूर्णाङ्क arg,
+    पूर्णाङ्क *अङ्क_posarg,
+    अचर वर्ण *type)
 {
-    if (arg <= 0)
+    यदि (arg <= 0)
     {
 	semsg(_( e_invalid_format_specifier_str), type);
-	return FAIL;
+	फर्काऊ FAIL;
     }
 
-    if (*ap_types == NULL || *num_posarg < arg)
+    यदि (*ap_types == रिक्त || *अङ्क_posarg < arg)
     {
-	int	    idx;
-	const char  **new_types;
+	पूर्णाङ्क	    idx;
+	अचर वर्ण  **new_types;
 
-	if (*ap_types == NULL)
-	    new_types = ALLOC_CLEAR_MULT(const char *, arg);
-	else
-	    new_types = vim_realloc((char **)*ap_types,
-						arg * sizeof(const char *));
+	यदि (*ap_types == रिक्त)
+	    new_types = ALLOC_CLEAR_MULT(अचर वर्ण *, arg);
+	अन्यथा
+	    new_types = vim_realloc((वर्ण **)*ap_types,
+						arg * परिमाण(अचर वर्ण *));
 
-	if (new_types == NULL)
-	    return FAIL;
+	यदि (new_types == रिक्त)
+	    फर्काऊ FAIL;
 
-	for (idx = *num_posarg; idx < arg; ++idx)
-	    new_types[idx] = NULL;
+	लागि (idx = *अङ्क_posarg; idx < arg; ++idx)
+	    new_types[idx] = रिक्त;
 
 	*ap_types = new_types;
-	*num_posarg = arg;
+	*अङ्क_posarg = arg;
     }
 
-    if ((*ap_types)[arg - 1] != NULL)
+    यदि ((*ap_types)[arg - 1] != रिक्त)
     {
-	if ((*ap_types)[arg - 1][0] == '*' || type[0] == '*')
+	यदि ((*ap_types)[arg - 1][0] == '*' || type[0] == '*')
 	{
-	    const char *pt = type;
-	    if (pt[0] == '*')
+	    अचर वर्ण *pt = type;
+	    यदि (pt[0] == '*')
 		pt = (*ap_types)[arg - 1];
 
-	    if (pt[0] != '*')
+	    यदि (pt[0] != '*')
 	    {
-		switch (pt[0])
+		विकल्प (pt[0])
 		{
-		    case 'd':
-		    case 'i': break;
-		    default:
-			semsg(_(e_positional_num_field_spec_reused_str_str), arg, format_typename((*ap_types)[arg - 1]), format_typename(type));
-			return FAIL;
+		    पक्ष 'd':
+		    पक्ष 'i': रोक;
+		    स्वभाव:
+			semsg(_(e_positional_अङ्क_field_spec_reused_str_str), arg, format_typename((*ap_types)[arg - 1]), format_typename(type));
+			फर्काऊ FAIL;
 		}
 	    }
 	}
-	else
+	अन्यथा
 	{
-	    if (format_typeof(type) != format_typeof((*ap_types)[arg - 1]))
+	    यदि (format_typeof(type) != format_typeof((*ap_types)[arg - 1]))
 	    {
-		semsg(_( e_positional_arg_num_type_inconsistent_str_str), arg, format_typename(type), format_typename((*ap_types)[arg - 1]));
-		return FAIL;
+		semsg(_( e_positional_arg_अङ्क_type_inconsistent_str_str), arg, format_typename(type), format_typename((*ap_types)[arg - 1]));
+		फर्काऊ FAIL;
 	    }
 	}
     }
 
     (*ap_types)[arg - 1] = type;
 
-    return OK;
+    फर्काऊ OK;
 }
 
-    static void
-format_overflow_error(const char *pstart)
+    स्थिर शून्य
+format_overflow_error(अचर वर्ण *pstart)
 {
-    size_t	arglen = 0;
-    char	*argcopy = NULL;
-    const char	*p = pstart;
+    माप_प्रकार	arglen = 0;
+    वर्ण	*argcopy = रिक्त;
+    अचर वर्ण	*p = pstart;
 
-    while (VIM_ISDIGIT((int)(*p)))
+    जबसम्म (VIM_ISDIGIT((पूर्णाङ्क)(*p)))
 	++p;
 
     arglen = p - pstart;
-    argcopy = ALLOC_CLEAR_MULT(char, arglen + 1);
-    if (argcopy != NULL)
+    argcopy = ALLOC_CLEAR_MULT(वर्ण, arglen + 1);
+    यदि (argcopy != रिक्त)
     {
-	strncpy(argcopy, pstart, arglen);
+	म_नकलन(argcopy, pstart, arglen);
 	semsg(_( e_val_too_large), argcopy);
-	free(argcopy);
+	मुक्त(argcopy);
     }
-    else
+    अन्यथा
 	semsg(_(e_out_of_memory_allocating_nr_bytes), arglen);
 }
 
 # define MAX_ALLOWED_STRING_WIDTH 1048576    // 1 MiB
 
-    static int
+    स्थिर पूर्णाङ्क
 get_unsigned_int(
-    const char *pstart,
-    const char **p,
-    unsigned int *uj,
-    int overflow_err)
+    अचर वर्ण *pstart,
+    अचर वर्ण **p,
+    अचिन्हित पूर्णाङ्क *uj,
+    पूर्णाङ्क overflow_err)
 {
     *uj = **p - '0';
     ++*p;
 
-    while (VIM_ISDIGIT((int)(**p)) && *uj < MAX_ALLOWED_STRING_WIDTH)
+    जबसम्म (VIM_ISDIGIT((पूर्णाङ्क)(**p)) && *uj < MAX_ALLOWED_STRING_WIDTH)
     {
-	*uj = 10 * *uj + (unsigned int)(**p - '0');
+	*uj = 10 * *uj + (अचिन्हित पूर्णाङ्क)(**p - '0');
 	++*p;
     }
 
-    if (*uj > MAX_ALLOWED_STRING_WIDTH)
+    यदि (*uj > MAX_ALLOWED_STRING_WIDTH)
     {
-	if (overflow_err)
+	यदि (overflow_err)
 	{
 	    format_overflow_error(pstart);
-	    return FAIL;
+	    फर्काऊ FAIL;
 	}
-	else
+	अन्यथा
 	    *uj = MAX_ALLOWED_STRING_WIDTH;
     }
 
-    return OK;
+    फर्काऊ OK;
 }
 
 
-    static int
+    स्थिर पूर्णाङ्क
 parse_fmt_types(
-    const char  ***ap_types,
-    int		*num_posarg,
-    const char  *fmt,
+    अचर वर्ण  ***ap_types,
+    पूर्णाङ्क		*अङ्क_posarg,
+    अचर वर्ण  *fmt,
     typval_T	*tvs UNUSED
     )
 {
-    const char	*p = fmt;
-    const char	*arg = NULL;
+    अचर वर्ण	*p = fmt;
+    अचर वर्ण	*arg = रिक्त;
 
-    int		any_pos = 0;
-    int		any_arg = 0;
-    int		arg_idx;
+    पूर्णाङ्क		any_pos = 0;
+    पूर्णाङ्क		any_arg = 0;
+    पूर्णाङ्क		arg_idx;
 
-# define CHECK_POS_ARG do { \
-    if (any_pos && any_arg) \
+# define CHECK_POS_ARG गर { \
+    यदि (any_pos && any_arg) \
     { \
 	semsg(_( e_cannot_mix_positional_and_non_positional_str), fmt); \
-	goto error; \
+	गच्छ error; \
     } \
-} while (0);
+} जबसम्म (0);
 
-    if (p == NULL)
-	return OK;
+    यदि (p == रिक्त)
+	फर्काऊ OK;
 
-    while (*p != NUL)
+    जबसम्म (*p != NUL)
     {
-	if (*p != '%')
+	यदि (*p != '%')
 	{
-	    const char    *q = strchr(p + 1, '%');
-	    size_t  n = (q == NULL) ? STRLEN(p) : (size_t)(q - p);
+	    अचर वर्ण    *q = म_अक्षर(p + 1, '%');
+	    माप_प्रकार  n = (q == रिक्त) ? STRLEN(p) : (माप_प्रकार)(q - p);
 
 	    p += n;
 	}
-	else
+	अन्यथा
 	{
 	    // allowed values: \0, h, l, L
-	    char	length_modifier = '\0';
+	    वर्ण	length_modifier = '\0';
 
 	    // variable for positional arg
-	    int		pos_arg = -1;
-	    const char	*ptype = NULL;
-	    const char	*pstart = p+1;
+	    पूर्णाङ्क		pos_arg = -1;
+	    अचर वर्ण	*ptype = रिक्त;
+	    अचर वर्ण	*pstart = p+1;
 
 	    p++;  // skip '%'
 
@@ -3320,23 +3320,23 @@ parse_fmt_types(
 	    // argument specifier
 	    ptype = p;
 
-	    while (VIM_ISDIGIT(*ptype))
+	    जबसम्म (VIM_ISDIGIT(*ptype))
 		++ptype;
 
-	    if (*ptype == '$')
+	    यदि (*ptype == '$')
 	    {
-		if (*p == '0')
+		यदि (*p == '0')
 		{
 		    // 0 flag at the wrong place
 		    semsg(_( e_invalid_format_specifier_str), fmt);
-		    goto error;
+		    गच्छ error;
 		}
 
 		// Positional argument
-		unsigned int uj;
+		अचिन्हित पूर्णाङ्क uj;
 
-		if (get_unsigned_int(pstart, &p, &uj, tvs != NULL) == FAIL)
-		    goto error;
+		यदि (get_unsigned_int(pstart, &p, &uj, tvs != रिक्त) == FAIL)
+		    गच्छ error;
 
 		pos_arg = uj;
 
@@ -3347,19 +3347,19 @@ parse_fmt_types(
 	    }
 
 	    // parse flags
-	    while (*p == '0' || *p == '-' || *p == '+' || *p == ' '
+	    जबसम्म (*p == '0' || *p == '-' || *p == '+' || *p == ' '
 						   || *p == '#' || *p == '\'')
 	    {
-		switch (*p)
+		विकल्प (*p)
 		{
-		    case '0': break;
-		    case '-': break;
-		    case '+': break;
-		    case ' ': // If both the ' ' and '+' flags appear, the ' '
+		    पक्ष '0': रोक;
+		    पक्ष '-': रोक;
+		    पक्ष '+': रोक;
+		    पक्ष ' ': // If both the ' ' and '+' flags appear, the ' '
 			      // flag should be ignored
-			      break;
-		    case '#': break;
-		    case '\'': break;
+			      रोक;
+		    पक्ष '#': रोक;
+		    पक्ष '\'': रोक;
 		}
 		p++;
 	    }
@@ -3367,114 +3367,114 @@ parse_fmt_types(
 	    // ignored.
 
 	    // parse field width
-	    if (*(arg = p) == '*')
+	    यदि (*(arg = p) == '*')
 	    {
 		p++;
 
-		if (VIM_ISDIGIT((int)(*p)))
+		यदि (VIM_ISDIGIT((पूर्णाङ्क)(*p)))
 		{
 		    // Positional argument field width
-		    unsigned int uj;
+		    अचिन्हित पूर्णाङ्क uj;
 
-		    if (get_unsigned_int(arg + 1, &p, &uj, tvs != NULL) == FAIL)
-			goto error;
+		    यदि (get_unsigned_int(arg + 1, &p, &uj, tvs != रिक्त) == FAIL)
+			गच्छ error;
 
-		    if (*p != '$')
+		    यदि (*p != '$')
 		    {
 			semsg(_( e_invalid_format_specifier_str), fmt);
-			goto error;
+			गच्छ error;
 		    }
-		    else
+		    अन्यथा
 		    {
 			++p;
 			any_pos = 1;
 			CHECK_POS_ARG;
 
-			if (adjust_types(ap_types, uj, num_posarg, arg) == FAIL)
-			    goto error;
+			यदि (adjust_types(ap_types, uj, अङ्क_posarg, arg) == FAIL)
+			    गच्छ error;
 		    }
 		}
-		else
+		अन्यथा
 		{
 		    any_arg = 1;
 		    CHECK_POS_ARG;
 		}
 	    }
-	    else if (VIM_ISDIGIT((int)(*p)))
+	    अन्यथा यदि (VIM_ISDIGIT((पूर्णाङ्क)(*p)))
 	    {
 		// size_t could be wider than unsigned int; make sure we treat
 		// argument like common implementations do
-		const char *digstart = p;
-		unsigned int uj;
+		अचर वर्ण *digstart = p;
+		अचिन्हित पूर्णाङ्क uj;
 
-		if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-		    goto error;
+		यदि (get_unsigned_int(digstart, &p, &uj, tvs != रिक्त) == FAIL)
+		    गच्छ error;
 
-		if (*p == '$')
+		यदि (*p == '$')
 		{
 		    semsg(_( e_invalid_format_specifier_str), fmt);
-		    goto error;
+		    गच्छ error;
 		}
 	    }
 
 	    // parse precision
-	    if (*p == '.')
+	    यदि (*p == '.')
 	    {
 		p++;
 
-		if (*(arg = p) == '*')
+		यदि (*(arg = p) == '*')
 		{
 		    p++;
 
-		    if (VIM_ISDIGIT((int)(*p)))
+		    यदि (VIM_ISDIGIT((पूर्णाङ्क)(*p)))
 		    {
 			// Parse precision
-			unsigned int uj;
+			अचिन्हित पूर्णाङ्क uj;
 
-			if (get_unsigned_int(arg + 1, &p, &uj, tvs != NULL) == FAIL)
-			    goto error;
+			यदि (get_unsigned_int(arg + 1, &p, &uj, tvs != रिक्त) == FAIL)
+			    गच्छ error;
 
-			if (*p == '$')
+			यदि (*p == '$')
 			{
 			    any_pos = 1;
 			    CHECK_POS_ARG;
 
 			    ++p;
 
-			    if (adjust_types(ap_types, uj, num_posarg, arg) == FAIL)
-				goto error;
+			    यदि (adjust_types(ap_types, uj, अङ्क_posarg, arg) == FAIL)
+				गच्छ error;
 			}
-			else
+			अन्यथा
 			{
 			    semsg(_( e_invalid_format_specifier_str), fmt);
-			    goto error;
+			    गच्छ error;
 			}
 		    }
-		    else
+		    अन्यथा
 		    {
 			any_arg = 1;
 			CHECK_POS_ARG;
 		    }
 		}
-		else if (VIM_ISDIGIT((int)(*p)))
+		अन्यथा यदि (VIM_ISDIGIT((पूर्णाङ्क)(*p)))
 		{
 		    // size_t could be wider than unsigned int; make sure we
 		    // treat argument like common implementations do
-		    const char *digstart = p;
-		    unsigned int uj;
+		    अचर वर्ण *digstart = p;
+		    अचिन्हित पूर्णाङ्क uj;
 
-		    if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-			goto error;
+		    यदि (get_unsigned_int(digstart, &p, &uj, tvs != रिक्त) == FAIL)
+			गच्छ error;
 
-		    if (*p == '$')
+		    यदि (*p == '$')
 		    {
 			semsg(_( e_invalid_format_specifier_str), fmt);
-			goto error;
+			गच्छ error;
 		    }
 		}
 	    }
 
-	    if (pos_arg != -1)
+	    यदि (pos_arg != -1)
 	    {
 		any_pos = 1;
 		CHECK_POS_ARG;
@@ -3483,11 +3483,11 @@ parse_fmt_types(
 	    }
 
 	    // parse 'h', 'l' and 'll' length modifiers
-	    if (*p == 'h' || *p == 'l')
+	    यदि (*p == 'h' || *p == 'l')
 	    {
 		length_modifier = *p;
 		p++;
-		if (length_modifier == 'l' && *p == 'l')
+		यदि (length_modifier == 'l' && *p == 'l')
 		{
 		    // double l = __int64 / varnumber_T
 		    // length_modifier = 'L';
@@ -3495,172 +3495,172 @@ parse_fmt_types(
 		}
 	    }
 
-	    switch (*p)
+	    विकल्प (*p)
 	    {
 		// Check for known format specifiers. % is special!
-		case 'i':
-		case '*':
-		case 'd':
-		case 'u':
-		case 'o':
-		case 'D':
-		case 'U':
-		case 'O':
-		case 'x':
-		case 'X':
-		case 'b':
-		case 'B':
-		case 'c':
-		case 's':
-		case 'S':
-		case 'p':
-		case 'f':
-		case 'F':
-		case 'e':
-		case 'E':
-		case 'g':
-		case 'G':
-		    if (pos_arg != -1)
+		पक्ष 'i':
+		पक्ष '*':
+		पक्ष 'd':
+		पक्ष 'u':
+		पक्ष 'o':
+		पक्ष 'D':
+		पक्ष 'U':
+		पक्ष 'O':
+		पक्ष 'x':
+		पक्ष 'X':
+		पक्ष 'b':
+		पक्ष 'B':
+		पक्ष 'c':
+		पक्ष 's':
+		पक्ष 'S':
+		पक्ष 'p':
+		पक्ष 'f':
+		पक्ष 'F':
+		पक्ष 'e':
+		पक्ष 'E':
+		पक्ष 'g':
+		पक्ष 'G':
+		    यदि (pos_arg != -1)
 		    {
-			if (adjust_types(ap_types, pos_arg, num_posarg, ptype) == FAIL)
-			    goto error;
+			यदि (adjust_types(ap_types, pos_arg, अङ्क_posarg, ptype) == FAIL)
+			    गच्छ error;
 		    }
-		    else
+		    अन्यथा
 		    {
 			any_arg = 1;
 			CHECK_POS_ARG;
 		    }
-		    break;
+		    रोक;
 
-		default:
-		    if (pos_arg != -1)
+		स्वभाव:
+		    यदि (pos_arg != -1)
 		    {
 			semsg(_( e_cannot_mix_positional_and_non_positional_str), fmt);
-			goto error;
+			गच्छ error;
 		    }
 	    }
 
-	    if (*p != NUL)
+	    यदि (*p != NUL)
 		p++;     // step over the just processed conversion specifier
 	}
     }
 
-    for (arg_idx = 0; arg_idx < *num_posarg; ++arg_idx)
+    लागि (arg_idx = 0; arg_idx < *अङ्क_posarg; ++arg_idx)
     {
-	if ((*ap_types)[arg_idx] == NULL)
+	यदि ((*ap_types)[arg_idx] == रिक्त)
 	{
 	    semsg(_(e_fmt_arg_nr_unused_str), arg_idx + 1, fmt);
-	    goto error;
+	    गच्छ error;
 	}
 
-# if defined(FEAT_EVAL)
-	if (tvs != NULL && tvs[arg_idx].v_type == VAR_UNKNOWN)
+# यदि defined(FEAT_EVAL)
+	यदि (tvs != रिक्त && tvs[arg_idx].v_type == VAR_UNKNOWN)
 	{
 	    semsg(_(e_positional_nr_out_of_bounds_str), arg_idx + 1, fmt);
-	    goto error;
+	    गच्छ error;
 	}
 # endif
     }
 
-    return OK;
+    फर्काऊ OK;
 
 error:
-    vim_free((char**)*ap_types);
-    *ap_types = NULL;
-    *num_posarg = 0;
-    return FAIL;
+    vim_free((वर्ण**)*ap_types);
+    *ap_types = रिक्त;
+    *अङ्क_posarg = 0;
+    फर्काऊ FAIL;
 }
 
-    static void
+    स्थिर शून्य
 skip_to_arg(
-    const char	**ap_types,
-    va_list	ap_start,
-    va_list	*ap,
-    int		*arg_idx,
-    int		*arg_cur,
-    const char	*fmt)
+    अचर वर्ण	**ap_types,
+    बहु_सूची	ap_start,
+    बहु_सूची	*ap,
+    पूर्णाङ्क		*arg_idx,
+    पूर्णाङ्क		*arg_cur,
+    अचर वर्ण	*fmt)
 {
-    int		arg_min = 0;
+    पूर्णाङ्क		arg_min = 0;
 
-    if (*arg_cur + 1 == *arg_idx)
+    यदि (*arg_cur + 1 == *arg_idx)
     {
 	++*arg_cur;
 	++*arg_idx;
-	return;
+	फर्काऊ;
     }
 
-    if (*arg_cur >= *arg_idx)
+    यदि (*arg_cur >= *arg_idx)
     {
 	// Reset ap to ap_start and skip arg_idx - 1 types
-	va_end(*ap);
+	बहु_पूर्ण(*ap);
 	va_copy(*ap, ap_start);
     }
-    else
+    अन्यथा
     {
 	// Skip over any we should skip
 	arg_min = *arg_cur;
     }
 
-    for (*arg_cur = arg_min; *arg_cur < *arg_idx - 1; ++*arg_cur)
+    लागि (*arg_cur = arg_min; *arg_cur < *arg_idx - 1; ++*arg_cur)
     {
-	const char *p;
+	अचर वर्ण *p;
 
-	if (ap_types == NULL || ap_types[*arg_cur] == NULL)
+	यदि (ap_types == रिक्त || ap_types[*arg_cur] == रिक्त)
 	{
 	    siemsg(e_aptypes_is_null_nr_str, *arg_cur, fmt);
-	    return;
+	    फर्काऊ;
 	}
 
 	p = ap_types[*arg_cur];
 
-	int fmt_type = format_typeof(p);
+	पूर्णाङ्क fmt_type = format_typeof(p);
 
 	// get parameter value, do initial processing
-	switch (fmt_type)
+	विकल्प (fmt_type)
 	{
-	case TYPE_PERCENT:
-	case TYPE_UNKNOWN:
-	    break;
+	पक्ष TYPE_PERCENT:
+	पक्ष TYPE_UNKNOWN:
+	    रोक;
 
-	case TYPE_CHAR:
-	    va_arg(*ap, int);
-	    break;
+	पक्ष TYPE_CHAR:
+	    बहु_तर्क(*ap, पूर्णाङ्क);
+	    रोक;
 
-	case TYPE_STRING:
-	    va_arg(*ap, char *);
-	    break;
+	पक्ष TYPE_STRING:
+	    बहु_तर्क(*ap, वर्ण *);
+	    रोक;
 
-	case TYPE_POINTER:
-	    va_arg(*ap, void *);
-	    break;
+	पक्ष TYPE_POINTER:
+	    बहु_तर्क(*ap, शून्य *);
+	    रोक;
 
-	case TYPE_INT:
-	    va_arg(*ap, int);
-	    break;
+	पक्ष TYPE_INT:
+	    बहु_तर्क(*ap, पूर्णाङ्क);
+	    रोक;
 
-	case TYPE_LONGINT:
-	    va_arg(*ap, long int);
-	    break;
+	पक्ष TYPE_LONGINT:
+	    बहु_तर्क(*ap, दीर्घ पूर्णाङ्क);
+	    रोक;
 
-	case TYPE_LONGLONGINT:
-	    va_arg(*ap, varnumber_T);
-	    break;
+	पक्ष TYPE_LONGLONGINT:
+	    बहु_तर्क(*ap, varnumber_T);
+	    रोक;
 
-	case TYPE_UNSIGNEDINT:
-	    va_arg(*ap, unsigned int);
-	    break;
+	पक्ष TYPE_UNSIGNEDINT:
+	    बहु_तर्क(*ap, अचिन्हित पूर्णाङ्क);
+	    रोक;
 
-	case TYPE_UNSIGNEDLONGINT:
-	    va_arg(*ap, unsigned long int);
-	    break;
+	पक्ष TYPE_UNSIGNEDLONGINT:
+	    बहु_तर्क(*ap, अचिन्हित दीर्घ पूर्णाङ्क);
+	    रोक;
 
-	case TYPE_UNSIGNEDLONGLONGINT:
-	    va_arg(*ap, uvarnumber_T);
-	    break;
+	पक्ष TYPE_UNSIGNEDLONGLONGINT:
+	    बहु_तर्क(*ap, uvarnumber_T);
+	    रोक;
 
-	case TYPE_FLOAT:
-	    va_arg(*ap, double);
-	    break;
+	पक्ष TYPE_FLOAT:
+	    बहु_तर्क(*ap, द्विगुण);
+	    रोक;
 	}
     }
 
@@ -3670,95 +3670,95 @@ skip_to_arg(
     ++*arg_cur;
     ++*arg_idx;
 
-    return;
+    फर्काऊ;
 }
 
-    int
+    पूर्णाङ्क
 vim_vsnprintf_typval(
-    char	*str,
-    size_t	str_m,
-    const char	*fmt,
-    va_list	ap_start,
+    वर्ण	*str,
+    माप_प्रकार	str_m,
+    अचर वर्ण	*fmt,
+    बहु_सूची	ap_start,
     typval_T	*tvs)
 {
-    size_t	str_l = 0;
-    const char	*p = fmt;
-    int		arg_cur = 0;
-    int		num_posarg = 0;
-    int		arg_idx = 1;
-    va_list	ap;
-    const char	**ap_types = NULL;
+    माप_प्रकार	str_l = 0;
+    अचर वर्ण	*p = fmt;
+    पूर्णाङ्क		arg_cur = 0;
+    पूर्णाङ्क		अङ्क_posarg = 0;
+    पूर्णाङ्क		arg_idx = 1;
+    बहु_सूची	ap;
+    अचर वर्ण	**ap_types = रिक्त;
 
-    if (parse_fmt_types(&ap_types, &num_posarg, fmt, tvs) == FAIL)
-	return 0;
+    यदि (parse_fmt_types(&ap_types, &अङ्क_posarg, fmt, tvs) == FAIL)
+	फर्काऊ 0;
 
     va_copy(ap, ap_start);
 
-    if (p == NULL)
+    यदि (p == रिक्त)
 	p = "";
-    while (*p != NUL)
+    जबसम्म (*p != NUL)
     {
-	if (*p != '%')
+	यदि (*p != '%')
 	{
-	    const char    *q = strchr(p + 1, '%');
-	    size_t  n = (q == NULL) ? STRLEN(p) : (size_t)(q - p);
+	    अचर वर्ण    *q = म_अक्षर(p + 1, '%');
+	    माप_प्रकार  n = (q == रिक्त) ? STRLEN(p) : (माप_प्रकार)(q - p);
 
 	    // Copy up to the next '%' or NUL without any changes.
-	    if (str_l < str_m)
+	    यदि (str_l < str_m)
 	    {
-		size_t avail = str_m - str_l;
+		माप_प्रकार avail = str_m - str_l;
 
 		mch_memmove(str + str_l, p, n > avail ? avail : n);
 	    }
 	    p += n;
 	    str_l += n;
 	}
-	else
+	अन्यथा
 	{
-	    size_t  min_field_width = 0, precision = 0;
-	    int	    zero_padding = 0, precision_specified = 0, justify_left = 0;
-	    int	    alternate_form = 0, force_sign = 0;
+	    माप_प्रकार  min_field_width = 0, precision = 0;
+	    पूर्णाङ्क	    zero_padding = 0, precision_specified = 0, justify_बायाँ = 0;
+	    पूर्णाङ्क	    alternate_form = 0, force_sign = 0;
 
 	    // If both the ' ' and '+' flags appear, the ' ' flag should be
 	    // ignored.
-	    int	    space_for_positive = 1;
+	    पूर्णाङ्क	    space_for_positive = 1;
 
 	    // allowed values: \0, h, l, L
-	    char    length_modifier = '\0';
+	    वर्ण    length_modifier = '\0';
 
 	    // temporary buffer for simple numeric->string conversion
 # define TMP_LEN 350	// On my system 1e308 is the biggest number possible.
 			// That sounds reasonable to use as the maximum
 			// printable.
-	    char    tmp[TMP_LEN];
+	    वर्ण    tmp[TMP_LEN];
 
 	    // string address in case of string argument
-	    const char  *str_arg = NULL;
+	    अचर वर्ण  *str_arg = रिक्त;
 
 	    // natural field width of arg without padding and sign
-	    size_t  str_arg_l;
+	    माप_प्रकार  str_arg_l;
 
 	    // unsigned char argument value - only defined for c conversion.
 	    // N.B. standard explicitly states the char argument for the c
 	    // conversion is unsigned
-	    unsigned char uchar_arg;
+	    अचिन्हित वर्ण uchar_arg;
 
 	    // number of zeros to be inserted for numeric conversions as
 	    // required by the precision or minimal field width
-	    size_t  number_of_zeros_to_pad = 0;
+	    माप_प्रकार  सङ्ख्या_of_zeros_to_pad = 0;
 
 	    // index into tmp where zero padding is to be inserted
-	    size_t  zero_padding_insertion_ind = 0;
+	    माप_प्रकार  zero_padding_insertion_ind = 0;
 
 	    // current conversion specifier character
-	    char    fmt_spec = '\0';
+	    वर्ण    fmt_spec = '\0';
 
 	    // buffer for 's' and 'S' specs
-	    char_u  *tofree = NULL;
+	    char_u  *tofree = रिक्त;
 
 	    // variables for positional arg
-	    int	    pos_arg = -1;
-	    const char	*ptype;
+	    पूर्णाङ्क	    pos_arg = -1;
+	    अचर वर्ण	*ptype;
 
 
 	    p++;  // skip '%'
@@ -3767,17 +3767,17 @@ vim_vsnprintf_typval(
 	    // argument specifier
 	    ptype = p;
 
-	    while (VIM_ISDIGIT(*ptype))
+	    जबसम्म (VIM_ISDIGIT(*ptype))
 		++ptype;
 
-	    if (*ptype == '$')
+	    यदि (*ptype == '$')
 	    {
 		// Positional argument
-		const char *digstart = p;
-		unsigned int uj;
+		अचर वर्ण *digstart = p;
+		अचिन्हित पूर्णाङ्क uj;
 
-		if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-		    goto error;
+		यदि (get_unsigned_int(digstart, &p, &uj, tvs != रिक्त) == FAIL)
+		    गच्छ error;
 
 		pos_arg = uj;
 
@@ -3785,20 +3785,20 @@ vim_vsnprintf_typval(
 	    }
 
 	    // parse flags
-	    while (*p == '0' || *p == '-' || *p == '+' || *p == ' '
+	    जबसम्म (*p == '0' || *p == '-' || *p == '+' || *p == ' '
 						   || *p == '#' || *p == '\'')
 	    {
-		switch (*p)
+		विकल्प (*p)
 		{
-		    case '0': zero_padding = 1; break;
-		    case '-': justify_left = 1; break;
-		    case '+': force_sign = 1; space_for_positive = 0; break;
-		    case ' ': force_sign = 1;
+		    पक्ष '0': zero_padding = 1; रोक;
+		    पक्ष '-': justify_बायाँ = 1; रोक;
+		    पक्ष '+': force_sign = 1; space_for_positive = 0; रोक;
+		    पक्ष ' ': force_sign = 1;
 			      // If both the ' ' and '+' flags appear, the ' '
 			      // flag should be ignored
-			      break;
-		    case '#': alternate_form = 1; break;
-		    case '\'': break;
+			      रोक;
+		    पक्ष '#': alternate_form = 1; रोक;
+		    पक्ष '\'': रोक;
 		}
 		p++;
 	    }
@@ -3806,20 +3806,20 @@ vim_vsnprintf_typval(
 	    // ignored.
 
 	    // parse field width
-	    if (*p == '*')
+	    यदि (*p == '*')
 	    {
-		int j;
-		const char *digstart = p + 1;
+		पूर्णाङ्क j;
+		अचर वर्ण *digstart = p + 1;
 
 		p++;
 
-		if (VIM_ISDIGIT((int)(*p)))
+		यदि (VIM_ISDIGIT((पूर्णाङ्क)(*p)))
 		{
 		    // Positional argument field width
-		    unsigned int uj;
+		    अचिन्हित पूर्णाङ्क uj;
 
-		    if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-			goto error;
+		    यदि (get_unsigned_int(digstart, &p, &uj, tvs != रिक्त) == FAIL)
+			गच्छ error;
 
 		    arg_idx = uj;
 
@@ -3827,77 +3827,77 @@ vim_vsnprintf_typval(
 		}
 
 		j =
-# if defined(FEAT_EVAL)
-		    tvs != NULL ? tv_nr(tvs, &arg_idx) :
+# यदि defined(FEAT_EVAL)
+		    tvs != रिक्त ? tv_nr(tvs, &arg_idx) :
 # endif
 			(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 				     &arg_cur, fmt),
-			va_arg(ap, int));
+			बहु_तर्क(ap, पूर्णाङ्क));
 
-		if (j > MAX_ALLOWED_STRING_WIDTH)
+		यदि (j > MAX_ALLOWED_STRING_WIDTH)
 		{
-		    if (tvs != NULL)
+		    यदि (tvs != रिक्त)
 		    {
 			format_overflow_error(digstart);
-			goto error;
+			गच्छ error;
 		    }
-		    else
+		    अन्यथा
 			j = MAX_ALLOWED_STRING_WIDTH;
 		}
 
-		if (j >= 0)
+		यदि (j >= 0)
 		    min_field_width = j;
-		else
+		अन्यथा
 		{
 		    min_field_width = -j;
-		    justify_left = 1;
+		    justify_बायाँ = 1;
 		}
 	    }
-	    else if (VIM_ISDIGIT((int)(*p)))
+	    अन्यथा यदि (VIM_ISDIGIT((पूर्णाङ्क)(*p)))
 	    {
 		// size_t could be wider than unsigned int; make sure we treat
 		// argument like common implementations do
-		const char *digstart = p;
-		unsigned int uj;
+		अचर वर्ण *digstart = p;
+		अचिन्हित पूर्णाङ्क uj;
 
-		if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-		    goto error;
+		यदि (get_unsigned_int(digstart, &p, &uj, tvs != रिक्त) == FAIL)
+		    गच्छ error;
 
 		min_field_width = uj;
 	    }
 
 	    // parse precision
-	    if (*p == '.')
+	    यदि (*p == '.')
 	    {
 		p++;
 		precision_specified = 1;
 
-		if (VIM_ISDIGIT((int)(*p)))
+		यदि (VIM_ISDIGIT((पूर्णाङ्क)(*p)))
 		{
 		    // size_t could be wider than unsigned int; make sure we
 		    // treat argument like common implementations do
-		    const char *digstart = p;
-		    unsigned int uj;
+		    अचर वर्ण *digstart = p;
+		    अचिन्हित पूर्णाङ्क uj;
 
-		    if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-			goto error;
+		    यदि (get_unsigned_int(digstart, &p, &uj, tvs != रिक्त) == FAIL)
+			गच्छ error;
 
 		    precision = uj;
 		}
-		else if (*p == '*')
+		अन्यथा यदि (*p == '*')
 		{
-		    int j;
-		    const char *digstart = p;
+		    पूर्णाङ्क j;
+		    अचर वर्ण *digstart = p;
 
 		    p++;
 
-		    if (VIM_ISDIGIT((int)(*p)))
+		    यदि (VIM_ISDIGIT((पूर्णाङ्क)(*p)))
 		    {
 			// positional argument
-			unsigned int uj;
+			अचिन्हित पूर्णाङ्क uj;
 
-			if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-			    goto error;
+			यदि (get_unsigned_int(digstart, &p, &uj, tvs != रिक्त) == FAIL)
+			    गच्छ error;
 
 			arg_idx = uj;
 
@@ -3905,27 +3905,27 @@ vim_vsnprintf_typval(
 		    }
 
 		    j =
-# if defined(FEAT_EVAL)
-			tvs != NULL ? tv_nr(tvs, &arg_idx) :
+# यदि defined(FEAT_EVAL)
+			tvs != रिक्त ? tv_nr(tvs, &arg_idx) :
 # endif
 			    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 					 &arg_cur, fmt),
-			    va_arg(ap, int));
+			    बहु_तर्क(ap, पूर्णाङ्क));
 
-		    if (j > MAX_ALLOWED_STRING_WIDTH)
+		    यदि (j > MAX_ALLOWED_STRING_WIDTH)
 		    {
-			if (tvs != NULL)
+			यदि (tvs != रिक्त)
 			{
 			    format_overflow_error(digstart);
-			    goto error;
+			    गच्छ error;
 			}
-			else
+			अन्यथा
 			    j = MAX_ALLOWED_STRING_WIDTH;
 		    }
 
-		    if (j >= 0)
+		    यदि (j >= 0)
 			precision = j;
-		    else
+		    अन्यथा
 		    {
 			precision_specified = 0;
 			precision = 0;
@@ -3934,11 +3934,11 @@ vim_vsnprintf_typval(
 	    }
 
 	    // parse 'h', 'l' and 'll' length modifiers
-	    if (*p == 'h' || *p == 'l')
+	    यदि (*p == 'h' || *p == 'l')
 	    {
 		length_modifier = *p;
 		p++;
-		if (length_modifier == 'l' && *p == 'l')
+		यदि (length_modifier == 'l' && *p == 'l')
 		{
 		    // double l = __int64 / varnumber_T
 		    length_modifier = 'L';
@@ -3948,143 +3948,143 @@ vim_vsnprintf_typval(
 	    fmt_spec = *p;
 
 	    // common synonyms:
-	    switch (fmt_spec)
+	    विकल्प (fmt_spec)
 	    {
-		case 'i': fmt_spec = 'd'; break;
-		case 'D': fmt_spec = 'd'; length_modifier = 'l'; break;
-		case 'U': fmt_spec = 'u'; length_modifier = 'l'; break;
-		case 'O': fmt_spec = 'o'; length_modifier = 'l'; break;
-		default: break;
+		पक्ष 'i': fmt_spec = 'd'; रोक;
+		पक्ष 'D': fmt_spec = 'd'; length_modifier = 'l'; रोक;
+		पक्ष 'U': fmt_spec = 'u'; length_modifier = 'l'; रोक;
+		पक्ष 'O': fmt_spec = 'o'; length_modifier = 'l'; रोक;
+		स्वभाव: रोक;
 	    }
 
-# if defined(FEAT_EVAL)
-	    switch (fmt_spec)
+# यदि defined(FEAT_EVAL)
+	    विकल्प (fmt_spec)
 	    {
-		case 'd': case 'u': case 'o': case 'x': case 'X':
-		    if (tvs != NULL && length_modifier == '\0')
+		पक्ष 'd': पक्ष 'u': पक्ष 'o': पक्ष 'x': पक्ष 'X':
+		    यदि (tvs != रिक्त && length_modifier == '\0')
 			length_modifier = 'L';
 	    }
 # endif
 
-	    if (pos_arg != -1)
+	    यदि (pos_arg != -1)
 		arg_idx = pos_arg;
 
 	    // get parameter value, do initial processing
-	    switch (fmt_spec)
+	    विकल्प (fmt_spec)
 	    {
 		// '%' and 'c' behave similar to 's' regarding flags and field
 		// widths
-	    case '%':
-	    case 'c':
-	    case 's':
-	    case 'S':
+	    पक्ष '%':
+	    पक्ष 'c':
+	    पक्ष 's':
+	    पक्ष 'S':
 		str_arg_l = 1;
-		switch (fmt_spec)
+		विकल्प (fmt_spec)
 		{
-		case '%':
+		पक्ष '%':
 		    str_arg = p;
-		    break;
+		    रोक;
 
-		case 'c':
+		पक्ष 'c':
 		    {
-			int j;
+			पूर्णाङ्क j;
 
 			j =
-# if defined(FEAT_EVAL)
-			    tvs != NULL ? tv_nr(tvs, &arg_idx) :
+# यदि defined(FEAT_EVAL)
+			    tvs != रिक्त ? tv_nr(tvs, &arg_idx) :
 # endif
 				(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 					     &arg_cur, fmt),
-				va_arg(ap, int));
+				बहु_तर्क(ap, पूर्णाङ्क));
 
 			// standard demands unsigned char
-			uchar_arg = (unsigned char)j;
-			str_arg = (char *)&uchar_arg;
-			break;
+			uchar_arg = (अचिन्हित वर्ण)j;
+			str_arg = (वर्ण *)&uchar_arg;
+			रोक;
 		    }
 
-		case 's':
-		case 'S':
+		पक्ष 's':
+		पक्ष 'S':
 		    str_arg =
-# if defined(FEAT_EVAL)
-				tvs != NULL ? tv_str(tvs, &arg_idx, &tofree) :
+# यदि defined(FEAT_EVAL)
+				tvs != रिक्त ? tv_str(tvs, &arg_idx, &tofree) :
 # endif
 				    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 						 &arg_cur, fmt),
-				    va_arg(ap, char *));
+				    बहु_तर्क(ap, वर्ण *));
 
-		    if (str_arg == NULL)
+		    यदि (str_arg == रिक्त)
 		    {
 			str_arg = "[NULL]";
 			str_arg_l = 6;
 		    }
 		    // make sure not to address string beyond the specified
 		    // precision !!!
-		    else if (!precision_specified)
-			str_arg_l = strlen(str_arg);
+		    अन्यथा यदि (!precision_specified)
+			str_arg_l = म_माप(str_arg);
 		    // truncate string if necessary as requested by precision
-		    else if (precision == 0)
+		    अन्यथा यदि (precision == 0)
 			str_arg_l = 0;
-		    else
+		    अन्यथा
 		    {
 			// memchr on HP does not like n > 2^31  !!!
-			const char *q = memchr(str_arg, '\0',
-				  precision <= (size_t)0x7fffffffL ? precision
-						       : (size_t)0x7fffffffL);
+			अचर वर्ण *q = स_प्रथम(str_arg, '\0',
+				  precision <= (माप_प्रकार)0x7fffffffL ? precision
+						       : (माप_प्रकार)0x7fffffffL);
 
-			str_arg_l = (q == NULL) ? precision
-						      : (size_t)(q - str_arg);
+			str_arg_l = (q == रिक्त) ? precision
+						      : (माप_प्रकार)(q - str_arg);
 		    }
-		    if (fmt_spec == 'S')
+		    यदि (fmt_spec == 'S')
 		    {
 			char_u	*p1;
-			size_t	i;
-			int	cell;
+			माप_प्रकार	i;
+			पूर्णाङ्क	cell;
 
-			for (i = 0, p1 = (char_u *)str_arg; *p1;
+			लागि (i = 0, p1 = (char_u *)str_arg; *p1;
 							  p1 += mb_ptr2len(p1))
 			{
 			    cell = mb_ptr2cells(p1);
-			    if (precision_specified && i + cell > precision)
-				break;
+			    यदि (precision_specified && i + cell > precision)
+				रोक;
 			    i += cell;
 			}
 
 			str_arg_l = p1 - (char_u *)str_arg;
-			if (min_field_width != 0)
+			यदि (min_field_width != 0)
 			    min_field_width += str_arg_l - i;
 		    }
-		    break;
+		    रोक;
 
-		default:
-		    break;
+		स्वभाव:
+		    रोक;
 		}
-		break;
+		रोक;
 
-	    case 'd': case 'u':
-	    case 'b': case 'B':
-	    case 'o':
-	    case 'x': case 'X':
-	    case 'p':
+	    पक्ष 'd': पक्ष 'u':
+	    पक्ष 'b': पक्ष 'B':
+	    पक्ष 'o':
+	    पक्ष 'x': पक्ष 'X':
+	    पक्ष 'p':
 		{
 		    // NOTE: the u, b, o, x, X and p conversion specifiers
 		    // imply the value is unsigned;  d implies a signed
-		    // value
+		    //मान
 
 		    // 0 if numeric argument is zero (or if pointer is
 		    // NULL for 'p'), +1 if greater than zero (or nonzero
 		    // for unsigned arguments), -1 if negative (unsigned
 		    // argument is never negative)
-		    int arg_sign = 0;
+		    पूर्णाङ्क arg_sign = 0;
 
 		    // only set for length modifier h, or for no length
 		    // modifiers
-		    int int_arg = 0;
-		    unsigned int uint_arg = 0;
+		    पूर्णाङ्क int_arg = 0;
+		    अचिन्हित पूर्णाङ्क uint_arg = 0;
 
 		    // only set for length modifier l
-		    long int long_arg = 0;
-		    unsigned long int ulong_arg = 0;
+		    दीर्घ पूर्णाङ्क long_arg = 0;
+		    अचिन्हित दीर्घ पूर्णाङ्क ulong_arg = 0;
 
 		    // only set for length modifier ll
 		    varnumber_T llong_arg = 0;
@@ -4095,133 +4095,133 @@ vim_vsnprintf_typval(
 
 		    // pointer argument value -only defined for p
 		    // conversion
-		    void *ptr_arg = NULL;
+		    शून्य *ptr_arg = रिक्त;
 
-		    if (fmt_spec == 'p')
+		    यदि (fmt_spec == 'p')
 		    {
 			length_modifier = '\0';
 			ptr_arg =
-# if defined(FEAT_EVAL)
-				 tvs != NULL ? (void *)tv_str(tvs, &arg_idx,
-									NULL) :
+# यदि defined(FEAT_EVAL)
+				 tvs != रिक्त ? (शून्य *)tv_str(tvs, &arg_idx,
+									रिक्त) :
 # endif
 					(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 						     &arg_cur, fmt),
-					va_arg(ap, void *));
+					बहु_तर्क(ap, शून्य *));
 
-			if (ptr_arg != NULL)
+			यदि (ptr_arg != रिक्त)
 			    arg_sign = 1;
 		    }
-		    else if (fmt_spec == 'b' || fmt_spec == 'B')
+		    अन्यथा यदि (fmt_spec == 'b' || fmt_spec == 'B')
 		    {
 			bin_arg =
-# if defined(FEAT_EVAL)
-				    tvs != NULL ?
+# यदि defined(FEAT_EVAL)
+				    tvs != रिक्त ?
 					   (uvarnumber_T)tv_nr(tvs, &arg_idx) :
 # endif
 					(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 						     &arg_cur, fmt),
-					va_arg(ap, uvarnumber_T));
+					बहु_तर्क(ap, uvarnumber_T));
 
-			if (bin_arg != 0)
+			यदि (bin_arg != 0)
 			    arg_sign = 1;
 		    }
-		    else if (fmt_spec == 'd')
+		    अन्यथा यदि (fmt_spec == 'd')
 		    {
 			// signed
-			switch (length_modifier)
+			विकल्प (length_modifier)
 			{
-			case '\0':
-			case 'h':
+			पक्ष '\0':
+			पक्ष 'h':
 			    // char and short arguments are passed as int.
 			    int_arg =
-# if defined(FEAT_EVAL)
-					tvs != NULL ? tv_nr(tvs, &arg_idx) :
+# यदि defined(FEAT_EVAL)
+					tvs != रिक्त ? tv_nr(tvs, &arg_idx) :
 # endif
 					    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 							 &arg_cur, fmt),
-					    va_arg(ap, int));
+					    बहु_तर्क(ap, पूर्णाङ्क));
 
-			    if (int_arg > 0)
+			    यदि (int_arg > 0)
 				arg_sign =  1;
-			    else if (int_arg < 0)
+			    अन्यथा यदि (int_arg < 0)
 				arg_sign = -1;
-			    break;
-			case 'l':
+			    रोक;
+			पक्ष 'l':
 			    long_arg =
-# if defined(FEAT_EVAL)
-					tvs != NULL ? tv_nr(tvs, &arg_idx) :
+# यदि defined(FEAT_EVAL)
+					tvs != रिक्त ? tv_nr(tvs, &arg_idx) :
 # endif
 					    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 							 &arg_cur, fmt),
-					    va_arg(ap, long int));
+					    बहु_तर्क(ap, दीर्घ पूर्णाङ्क));
 
-			    if (long_arg > 0)
+			    यदि (long_arg > 0)
 				arg_sign =  1;
-			    else if (long_arg < 0)
+			    अन्यथा यदि (long_arg < 0)
 				arg_sign = -1;
-			    break;
-			case 'L':
+			    रोक;
+			पक्ष 'L':
 			    llong_arg =
-# if defined(FEAT_EVAL)
-					tvs != NULL ? tv_nr(tvs, &arg_idx) :
+# यदि defined(FEAT_EVAL)
+					tvs != रिक्त ? tv_nr(tvs, &arg_idx) :
 # endif
 					    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 							 &arg_cur, fmt),
-					    va_arg(ap, varnumber_T));
+					    बहु_तर्क(ap, varnumber_T));
 
-			    if (llong_arg > 0)
+			    यदि (llong_arg > 0)
 				arg_sign =  1;
-			    else if (llong_arg < 0)
+			    अन्यथा यदि (llong_arg < 0)
 				arg_sign = -1;
-			    break;
+			    रोक;
 			}
 		    }
-		    else
+		    अन्यथा
 		    {
 			// unsigned
-			switch (length_modifier)
+			विकल्प (length_modifier)
 			{
-			    case '\0':
-			    case 'h':
+			    पक्ष '\0':
+			    पक्ष 'h':
 				uint_arg =
-# if defined(FEAT_EVAL)
-					    tvs != NULL ? (unsigned)
+# यदि defined(FEAT_EVAL)
+					    tvs != रिक्त ? (अचिन्हित)
 							tv_nr(tvs, &arg_idx) :
 # endif
 						(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 							     &arg_cur, fmt),
-						va_arg(ap, unsigned int));
+						बहु_तर्क(ap, अचिन्हित पूर्णाङ्क));
 
-				if (uint_arg != 0)
+				यदि (uint_arg != 0)
 				    arg_sign = 1;
-				break;
-			    case 'l':
+				रोक;
+			    पक्ष 'l':
 				ulong_arg =
-# if defined(FEAT_EVAL)
-					    tvs != NULL ? (unsigned long)
+# यदि defined(FEAT_EVAL)
+					    tvs != रिक्त ? (अचिन्हित दीर्घ)
 							tv_nr(tvs, &arg_idx) :
 # endif
 						(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 							     &arg_cur, fmt),
-						va_arg(ap, unsigned long int));
+						बहु_तर्क(ap, अचिन्हित दीर्घ पूर्णाङ्क));
 
-				if (ulong_arg != 0)
+				यदि (ulong_arg != 0)
 				    arg_sign = 1;
-				break;
-			    case 'L':
+				रोक;
+			    पक्ष 'L':
 				ullong_arg =
-# if defined(FEAT_EVAL)
-					    tvs != NULL ? (uvarnumber_T)
+# यदि defined(FEAT_EVAL)
+					    tvs != रिक्त ? (uvarnumber_T)
 							tv_nr(tvs, &arg_idx) :
 # endif
 						(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 							     &arg_cur, fmt),
-						va_arg(ap, uvarnumber_T));
+						बहु_तर्क(ap, uvarnumber_T));
 
-				if (ullong_arg != 0)
+				यदि (ullong_arg != 0)
 				    arg_sign = 1;
-				break;
+				रोक;
 			}
 		    }
 
@@ -4233,18 +4233,18 @@ vim_vsnprintf_typval(
 		    //   specified, the '0' flag should be ignored. This is so
 		    //   with Solaris 2.6, Digital UNIX 4.0, HPUX 10, Linux,
 		    //   FreeBSD, NetBSD; but not with Perl.
-		    if (precision_specified)
+		    यदि (precision_specified)
 			zero_padding = 0;
-		    if (fmt_spec == 'd')
+		    यदि (fmt_spec == 'd')
 		    {
-			if (force_sign && arg_sign >= 0)
+			यदि (force_sign && arg_sign >= 0)
 			    tmp[str_arg_l++] = space_for_positive ? ' ' : '+';
 			// leave negative numbers for sprintf to handle, to
 			// avoid handling tricky cases like (short int)-32768
 		    }
-		    else if (alternate_form)
+		    अन्यथा यदि (alternate_form)
 		    {
-			if (arg_sign != 0
+			यदि (arg_sign != 0
 				     && (fmt_spec == 'b' || fmt_spec == 'B'
 				      || fmt_spec == 'x' || fmt_spec == 'X') )
 			{
@@ -4256,107 +4256,107 @@ vim_vsnprintf_typval(
 		    }
 
 		    zero_padding_insertion_ind = str_arg_l;
-		    if (!precision_specified)
+		    यदि (!precision_specified)
 			precision = 1;   // default precision is 1
-		    if (precision == 0 && arg_sign == 0)
+		    यदि (precision == 0 && arg_sign == 0)
 		    {
 			// When zero value is formatted with an explicit
 			// precision 0, the resulting formatted string is
 			// empty (d, i, u, b, B, o, x, X, p).
 		    }
-		    else
+		    अन्यथा
 		    {
-			char	f[6];
-			int	f_l = 0;
+			वर्ण	f[6];
+			पूर्णाङ्क	f_l = 0;
 
 			// construct a simple format string for sprintf
 			f[f_l++] = '%';
-			if (!length_modifier)
+			यदि (!length_modifier)
 			    ;
-			else if (length_modifier == 'L')
+			अन्यथा यदि (length_modifier == 'L')
 			{
 # ifdef MSWIN
 			    f[f_l++] = 'I';
 			    f[f_l++] = '6';
 			    f[f_l++] = '4';
-# else
+# अन्यथा
 			    f[f_l++] = 'l';
 			    f[f_l++] = 'l';
 # endif
 			}
-			else
+			अन्यथा
 			    f[f_l++] = length_modifier;
 			f[f_l++] = fmt_spec;
 			f[f_l++] = '\0';
 
-			if (fmt_spec == 'p')
-			    str_arg_l += sprintf(tmp + str_arg_l, f, ptr_arg);
-			else if (fmt_spec == 'b' || fmt_spec == 'B')
+			यदि (fmt_spec == 'p')
+			    str_arg_l += प्र_लिखो(tmp + str_arg_l, f, ptr_arg);
+			अन्यथा यदि (fmt_spec == 'b' || fmt_spec == 'B')
 			{
-			    char	    b[8 * sizeof(uvarnumber_T)];
-			    size_t	    b_l = 0;
+			    वर्ण	    b[8 * परिमाण(uvarnumber_T)];
+			    माप_प्रकार	    b_l = 0;
 			    uvarnumber_T    bn = bin_arg;
 
-			    do
+			    गर
 			    {
-				b[sizeof(b) - ++b_l] = '0' + (bn & 0x1);
+				b[परिमाण(b) - ++b_l] = '0' + (bn & 0x1);
 				bn >>= 1;
 			    }
-			    while (bn != 0);
+			    जबसम्म (bn != 0);
 
-			    memcpy(tmp + str_arg_l, b + sizeof(b) - b_l, b_l);
+			    स_नकल(tmp + str_arg_l, b + परिमाण(b) - b_l, b_l);
 			    str_arg_l += b_l;
 			}
-			else if (fmt_spec == 'd')
+			अन्यथा यदि (fmt_spec == 'd')
 			{
 			    // signed
-			    switch (length_modifier)
+			    विकल्प (length_modifier)
 			    {
-			    case '\0': str_arg_l += sprintf(
+			    पक्ष '\0': str_arg_l += प्र_लिखो(
 						 tmp + str_arg_l, f,
 						 int_arg);
-				       break;
-			    case 'h': str_arg_l += sprintf(
+				       रोक;
+			    पक्ष 'h': str_arg_l += प्र_लिखो(
 						 tmp + str_arg_l, f,
-						 (short)int_arg);
-				      break;
-			    case 'l': str_arg_l += sprintf(
+						 (लघु)int_arg);
+				      रोक;
+			    पक्ष 'l': str_arg_l += प्र_लिखो(
 						tmp + str_arg_l, f, long_arg);
-				      break;
-			    case 'L': str_arg_l += sprintf(
+				      रोक;
+			    पक्ष 'L': str_arg_l += प्र_लिखो(
 					       tmp + str_arg_l, f, llong_arg);
-				      break;
+				      रोक;
 			    }
 			}
-			else
+			अन्यथा
 			{
 			    // unsigned
-			    switch (length_modifier)
+			    विकल्प (length_modifier)
 			    {
-			    case '\0': str_arg_l += sprintf(
+			    पक्ष '\0': str_arg_l += प्र_लिखो(
 						tmp + str_arg_l, f,
 						uint_arg);
-				       break;
-			    case 'h': str_arg_l += sprintf(
+				       रोक;
+			    पक्ष 'h': str_arg_l += प्र_लिखो(
 						tmp + str_arg_l, f,
-						(unsigned short)uint_arg);
-				      break;
-			    case 'l': str_arg_l += sprintf(
+						(अचिन्हित लघु)uint_arg);
+				      रोक;
+			    पक्ष 'l': str_arg_l += प्र_लिखो(
 					       tmp + str_arg_l, f, ulong_arg);
-				      break;
-			    case 'L': str_arg_l += sprintf(
+				      रोक;
+			    पक्ष 'L': str_arg_l += प्र_लिखो(
 					      tmp + str_arg_l, f, ullong_arg);
-				      break;
+				      रोक;
 			    }
 			}
 
 			// include the optional minus sign and possible
 			// "0x" in the region before the zero padding
 			// insertion point
-			if (zero_padding_insertion_ind < str_arg_l
+			यदि (zero_padding_insertion_ind < str_arg_l
 				&& tmp[zero_padding_insertion_ind] == '-')
 			    zero_padding_insertion_ind++;
-			if (zero_padding_insertion_ind + 1 < str_arg_l
+			यदि (zero_padding_insertion_ind + 1 < str_arg_l
 				&& tmp[zero_padding_insertion_ind]   == '0'
 				&& (tmp[zero_padding_insertion_ind + 1] == 'x'
 				 || tmp[zero_padding_insertion_ind + 1] == 'X'))
@@ -4364,10 +4364,10 @@ vim_vsnprintf_typval(
 		    }
 
 		    {
-			size_t num_of_digits = str_arg_l
+			माप_प्रकार अङ्क_of_digits = str_arg_l
 						 - zero_padding_insertion_ind;
 
-			if (alternate_form && fmt_spec == 'o'
+			यदि (alternate_form && fmt_spec == 'o'
 				// unless zero is already the first
 				// character
 				&& !(zero_padding_insertion_ind < str_arg_l
@@ -4375,71 +4375,71 @@ vim_vsnprintf_typval(
 			{
 			    // assure leading zero for alternate-form
 			    // octal numbers
-			    if (!precision_specified
-					     || precision < num_of_digits + 1)
+			    यदि (!precision_specified
+					     || precision < अङ्क_of_digits + 1)
 			    {
 				// precision is increased to force the
 				// first character to be zero, except if a
 				// zero value is formatted with an
 				// explicit precision of zero
-				precision = num_of_digits + 1;
+				precision = अङ्क_of_digits + 1;
 			    }
 			}
 			// zero padding to specified precision?
-			if (num_of_digits < precision)
-			    number_of_zeros_to_pad = precision - num_of_digits;
+			यदि (अङ्क_of_digits < precision)
+			    सङ्ख्या_of_zeros_to_pad = precision - अङ्क_of_digits;
 		    }
 		    // zero padding to specified minimal field width?
-		    if (!justify_left && zero_padding)
+		    यदि (!justify_बायाँ && zero_padding)
 		    {
-			int n = (int)(min_field_width - (str_arg_l
-						    + number_of_zeros_to_pad));
-			if (n > 0)
-			    number_of_zeros_to_pad += n;
+			पूर्णाङ्क n = (पूर्णाङ्क)(min_field_width - (str_arg_l
+						    + सङ्ख्या_of_zeros_to_pad));
+			यदि (n > 0)
+			    सङ्ख्या_of_zeros_to_pad += n;
 		    }
-		    break;
+		    रोक;
 		}
 
-	    case 'f':
-	    case 'F':
-	    case 'e':
-	    case 'E':
-	    case 'g':
-	    case 'G':
+	    पक्ष 'f':
+	    पक्ष 'F':
+	    पक्ष 'e':
+	    पक्ष 'E':
+	    पक्ष 'g':
+	    पक्ष 'G':
 		{
 		    // Floating point.
-		    double	f;
-		    double	abs_f;
-		    char	format[40];
-		    int		l;
-		    int		remove_trailing_zeroes = FALSE;
+		    द्विगुण	f;
+		    द्विगुण	abs_f;
+		    वर्ण	format[40];
+		    पूर्णाङ्क		l;
+		    पूर्णाङ्क		remove_trailing_zeroes = FALSE;
 
 		    f =
-# if defined(FEAT_EVAL)
-			tvs != NULL ? tv_float(tvs, &arg_idx) :
+# यदि defined(FEAT_EVAL)
+			tvs != रिक्त ? tv_float(tvs, &arg_idx) :
 # endif
 			    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 					 &arg_cur, fmt),
-			    va_arg(ap, double));
+			    बहु_तर्क(ap, द्विगुण));
 
 		    abs_f = f < 0 ? -f : f;
 
-		    if (fmt_spec == 'g' || fmt_spec == 'G')
+		    यदि (fmt_spec == 'g' || fmt_spec == 'G')
 		    {
 			// Would be nice to use %g directly, but it prints
 			// "1.0" as "1", we don't want that.
-			if ((abs_f >= 0.001 && abs_f < 10000000.0)
+			यदि ((abs_f >= 0.001 && abs_f < 10000000.0)
 							      || abs_f == 0.0)
 			    fmt_spec = ASCII_ISUPPER(fmt_spec) ? 'F' : 'f';
-			else
+			अन्यथा
 			    fmt_spec = fmt_spec == 'g' ? 'e' : 'E';
 			remove_trailing_zeroes = TRUE;
 		    }
 
-		    if ((fmt_spec == 'f' || fmt_spec == 'F') &&
+		    यदि ((fmt_spec == 'f' || fmt_spec == 'F') &&
 # ifdef VAX
 			    abs_f > 1.0e38
-# else
+# अन्यथा
 			    abs_f > 1.0e307
 # endif
 			    )
@@ -4450,9 +4450,9 @@ vim_vsnprintf_typval(
 			str_arg_l = STRLEN(tmp);
 			zero_padding = 0;
 		    }
-		    else
+		    अन्यथा
 		    {
-			if (isnan(f))
+			यदि (isnan(f))
 			{
 			    // Not a number: nan or NAN
 			    STRCPY(tmp, ASCII_ISUPPER(fmt_spec) ? "NAN"
@@ -4460,63 +4460,63 @@ vim_vsnprintf_typval(
 			    str_arg_l = 3;
 			    zero_padding = 0;
 			}
-			else if (isinf(f))
+			अन्यथा यदि (isinf(f))
 			{
 			    STRCPY(tmp, infinity_str(f > 0.0, fmt_spec,
 					      force_sign, space_for_positive));
 			    str_arg_l = STRLEN(tmp);
 			    zero_padding = 0;
 			}
-			else
+			अन्यथा
 			{
 			    // Regular float number
 			    format[0] = '%';
 			    l = 1;
-			    if (force_sign)
+			    यदि (force_sign)
 				format[l++] = space_for_positive ? ' ' : '+';
-			    if (precision_specified)
+			    यदि (precision_specified)
 			    {
-				size_t max_prec = TMP_LEN - 10;
+				माप_प्रकार max_prec = TMP_LEN - 10;
 
 				// Make sure we don't get more digits than we
 				// have room for.
-				if ((fmt_spec == 'f' || fmt_spec == 'F')
+				यदि ((fmt_spec == 'f' || fmt_spec == 'F')
 								&& abs_f > 1.0)
-				    max_prec -= (size_t)log10(abs_f);
-				if (precision > max_prec)
+				    max_prec -= (माप_प्रकार)log10(abs_f);
+				यदि (precision > max_prec)
 				    precision = max_prec;
-				l += sprintf(format + l, ".%d", (int)precision);
+				l += प्र_लिखो(format + l, ".%d", (पूर्णाङ्क)precision);
 			    }
 			    format[l] = fmt_spec == 'F' ? 'f' : fmt_spec;
 			    format[l + 1] = NUL;
 
-			    str_arg_l = sprintf(tmp, format, f);
+			    str_arg_l = प्र_लिखो(tmp, format, f);
 			}
 
-			if (remove_trailing_zeroes)
+			यदि (remove_trailing_zeroes)
 			{
-			    int i;
-			    char *tp;
+			    पूर्णाङ्क i;
+			    वर्ण *tp;
 
 			    // Using %g or %G: remove superfluous zeroes.
-			    if (fmt_spec == 'f' || fmt_spec == 'F')
+			    यदि (fmt_spec == 'f' || fmt_spec == 'F')
 				tp = tmp + str_arg_l - 1;
-			    else
+			    अन्यथा
 			    {
-				tp = (char *)vim_strchr((char_u *)tmp,
+				tp = (वर्ण *)vim_strchr((char_u *)tmp,
 						 fmt_spec == 'e' ? 'e' : 'E');
-				if (tp != NULL)
+				यदि (tp != रिक्त)
 				{
 				    // Remove superfluous '+' and leading
 				    // zeroes from the exponent.
-				    if (tp[1] == '+')
+				    यदि (tp[1] == '+')
 				    {
 					// Change "1.0e+07" to "1.0e07"
 					STRMOVE(tp + 1, tp + 2);
 					--str_arg_l;
 				    }
 				    i = (tp[1] == '-') ? 2 : 1;
-				    while (tp[i] == '0')
+				    जबसम्म (tp[i] == '0')
 				    {
 					// Change "1.0e07" to "1.0e7"
 					STRMOVE(tp + i, tp + i + 1);
@@ -4526,10 +4526,10 @@ vim_vsnprintf_typval(
 				}
 			    }
 
-			    if (tp != NULL && !precision_specified)
+			    यदि (tp != रिक्त && !precision_specified)
 				// Remove trailing zeroes, but keep the one
 				// just after a dot.
-				while (tp > tmp + 2 && *tp == '0'
+				जबसम्म (tp > tmp + 2 && *tp == '0'
 							     && tp[-1] != '.')
 				{
 				    STRMOVE(tp, tp + 1);
@@ -4537,16 +4537,16 @@ vim_vsnprintf_typval(
 				    --str_arg_l;
 				}
 			}
-			else
+			अन्यथा
 			{
-			    char *tp;
+			    वर्ण *tp;
 
 			    // Be consistent: some printf("%e") use 1.0e+12
 			    // and some 1.0e+012.  Remove one zero in the last
 			    // case.
-			    tp = (char *)vim_strchr((char_u *)tmp,
+			    tp = (वर्ण *)vim_strchr((char_u *)tmp,
 						 fmt_spec == 'e' ? 'e' : 'E');
-			    if (tp != NULL && (tp[1] == '+' || tp[1] == '-')
+			    यदि (tp != रिक्त && (tp[1] == '+' || tp[1] == '-')
 					  && tp[2] == '0'
 					  && vim_isdigit(tp[3])
 					  && vim_isdigit(tp[4]))
@@ -4556,55 +4556,55 @@ vim_vsnprintf_typval(
 			    }
 			}
 		    }
-		    if (zero_padding && min_field_width > str_arg_l
+		    यदि (zero_padding && min_field_width > str_arg_l
 					      && (tmp[0] == '-' || force_sign))
 		    {
 			// padding 0's should be inserted after the sign
-			number_of_zeros_to_pad = min_field_width - str_arg_l;
+			सङ्ख्या_of_zeros_to_pad = min_field_width - str_arg_l;
 			zero_padding_insertion_ind = 1;
 		    }
 		    str_arg = tmp;
-		    break;
+		    रोक;
 		}
 
-	    default:
+	    स्वभाव:
 		// unrecognized conversion specifier, keep format string
 		// as-is
 		zero_padding = 0;  // turn zero padding off for non-numeric
 				   // conversion
-		justify_left = 1;
+		justify_बायाँ = 1;
 		min_field_width = 0;		    // reset flags
 
 		// discard the unrecognized conversion, just keep *
 		// the unrecognized conversion character
 		str_arg = p;
 		str_arg_l = 0;
-		if (*p != NUL)
+		यदि (*p != NUL)
 		    str_arg_l++;  // include invalid conversion specifier
 				  // unchanged if not at end-of-string
-		break;
+		रोक;
 	    }
 
-	    if (*p != NUL)
+	    यदि (*p != NUL)
 		p++;     // step over the just processed conversion specifier
 
 	    // insert padding to the left as requested by min_field_width;
 	    // this does not include the zero padding in case of numerical
 	    // conversions
-	    if (!justify_left)
+	    यदि (!justify_बायाँ)
 	    {
 		// left padding with blank or zero
-		int pn = (int)(min_field_width - (str_arg_l + number_of_zeros_to_pad));
+		पूर्णाङ्क pn = (पूर्णाङ्क)(min_field_width - (str_arg_l + सङ्ख्या_of_zeros_to_pad));
 
-		if (pn > 0)
+		यदि (pn > 0)
 		{
-		    if (str_l < str_m)
+		    यदि (str_l < str_m)
 		    {
-			size_t avail = str_m - str_l;
+			माप_प्रकार avail = str_m - str_l;
 
 			vim_memset(str + str_l, zero_padding ? '0' : ' ',
-					     (size_t)pn > avail ? avail
-								: (size_t)pn);
+					     (माप_प्रकार)pn > avail ? avail
+								: (माप_प्रकार)pn);
 		    }
 		    str_l += pn;
 		}
@@ -4612,43 +4612,43 @@ vim_vsnprintf_typval(
 
 	    // zero padding as requested by the precision or by the minimal
 	    // field width for numeric conversions required?
-	    if (number_of_zeros_to_pad == 0)
+	    यदि (सङ्ख्या_of_zeros_to_pad == 0)
 	    {
 		// will not copy first part of numeric right now, *
 		// force it to be copied later in its entirety
 		zero_padding_insertion_ind = 0;
 	    }
-	    else
+	    अन्यथा
 	    {
 		// insert first part of numerics (sign or '0x') before zero
 		// padding
-		int zn = (int)zero_padding_insertion_ind;
+		पूर्णाङ्क zn = (पूर्णाङ्क)zero_padding_insertion_ind;
 
-		if (zn > 0)
+		यदि (zn > 0)
 		{
-		    if (str_l < str_m)
+		    यदि (str_l < str_m)
 		    {
-			size_t avail = str_m - str_l;
+			माप_प्रकार avail = str_m - str_l;
 
 			mch_memmove(str + str_l, str_arg,
-					     (size_t)zn > avail ? avail
-								: (size_t)zn);
+					     (माप_प्रकार)zn > avail ? avail
+								: (माप_प्रकार)zn);
 		    }
 		    str_l += zn;
 		}
 
 		// insert zero padding as requested by the precision or min
 		// field width
-		zn = (int)number_of_zeros_to_pad;
-		if (zn > 0)
+		zn = (पूर्णाङ्क)सङ्ख्या_of_zeros_to_pad;
+		यदि (zn > 0)
 		{
-		    if (str_l < str_m)
+		    यदि (str_l < str_m)
 		    {
-			size_t avail = str_m - str_l;
+			माप_प्रकार avail = str_m - str_l;
 
 			vim_memset(str + str_l, '0',
-					     (size_t)zn > avail ? avail
-								: (size_t)zn);
+					     (माप_प्रकार)zn > avail ? avail
+								: (माप_प्रकार)zn);
 		    }
 		    str_l += zn;
 		}
@@ -4657,38 +4657,38 @@ vim_vsnprintf_typval(
 	    // insert formatted string
 	    // (or as-is conversion specifier for unknown conversions)
 	    {
-		int sn = (int)(str_arg_l - zero_padding_insertion_ind);
+		पूर्णाङ्क sn = (पूर्णाङ्क)(str_arg_l - zero_padding_insertion_ind);
 
-		if (sn > 0)
+		यदि (sn > 0)
 		{
-		    if (str_l < str_m)
+		    यदि (str_l < str_m)
 		    {
-			size_t avail = str_m - str_l;
+			माप_प्रकार avail = str_m - str_l;
 
 			mch_memmove(str + str_l,
 				str_arg + zero_padding_insertion_ind,
-				(size_t)sn > avail ? avail : (size_t)sn);
+				(माप_प्रकार)sn > avail ? avail : (माप_प्रकार)sn);
 		    }
 		    str_l += sn;
 		}
 	    }
 
 	    // insert right padding
-	    if (justify_left)
+	    यदि (justify_बायाँ)
 	    {
 		// right blank padding to the field width
-		int pn = (int)(min_field_width
-				      - (str_arg_l + number_of_zeros_to_pad));
+		पूर्णाङ्क pn = (पूर्णाङ्क)(min_field_width
+				      - (str_arg_l + सङ्ख्या_of_zeros_to_pad));
 
-		if (pn > 0)
+		यदि (pn > 0)
 		{
-		    if (str_l < str_m)
+		    यदि (str_l < str_m)
 		    {
-			size_t avail = str_m - str_l;
+			माप_प्रकार avail = str_m - str_l;
 
 			vim_memset(str + str_l, ' ',
-					     (size_t)pn > avail ? avail
-								: (size_t)pn);
+					     (माप_प्रकार)pn > avail ? avail
+								: (माप_प्रकार)pn);
 		    }
 		    str_l += pn;
 		}
@@ -4697,7 +4697,7 @@ vim_vsnprintf_typval(
 	}
     }
 
-    if (str_m > 0)
+    यदि (str_m > 0)
     {
 	// make sure the string is nul-terminated even at the expense of
 	// overwriting the last character (shouldn't happen, but just in case)
@@ -4705,17 +4705,17 @@ vim_vsnprintf_typval(
 	str[str_l <= str_m - 1 ? str_l : str_m - 1] = '\0';
     }
 
-    if (tvs != NULL && tvs[num_posarg != 0 ? num_posarg : arg_idx - 1].v_type != VAR_UNKNOWN)
+    यदि (tvs != रिक्त && tvs[अङ्क_posarg != 0 ? अङ्क_posarg : arg_idx - 1].v_type != VAR_UNKNOWN)
 	emsg(_(e_too_many_arguments_to_printf));
 
 error:
-    vim_free((char*)ap_types);
-    va_end(ap);
+    vim_free((वर्ण*)ap_types);
+    बहु_पूर्ण(ap);
 
     // Return the number of characters formatted (excluding trailing nul
     // character), that is, the number of characters that would have been
     // written to the buffer if it were large enough.
-    return (int)str_l;
+    फर्काऊ (पूर्णाङ्क)str_l;
 }
 
 #endif // PROTO

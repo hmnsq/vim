@@ -10,9 +10,9 @@
 /*
  * crypt_zip.c: Zip encryption support.
  */
-#include "vim.h"
+#अन्तर्भाव "vim.h"
 
-#if defined(FEAT_CRYPT)
+#यदि defined(FEAT_CRYPT)
 /*
  * Optional encryption support.
  * Mohsin Ahmed, mosh@sasi.com, 98-09-24
@@ -24,106 +24,106 @@
  */
 
 // Need a type that should be 32 bits. 64 also works but wastes space.
-typedef unsigned int u32_T;	// int is at least 32 bits
+प्रकारनिर्देश अचिन्हित पूर्णाङ्क u32_T;	// int is at least 32 bits
 
 // The state of encryption, referenced by cryptstate_T.
-typedef struct {
-    u32_T keys[3];
+प्रकारनिर्देश संरचना {
+    u32_T साँचोहरू[3];
 } zip_state_T;
 
 
-static u32_T crc_32_table[256];
+स्थिर u32_T crc_32_table[256];
 
 /*
  * Fill the CRC table, if not done already.
  */
-    static void
-make_crc_tab(void)
+    स्थिर शून्य
+make_crc_tab(शून्य)
 {
     u32_T	s, t, v;
-    static int	done = FALSE;
+    स्थिर पूर्णाङ्क	done = FALSE;
 
-    if (done)
-	return;
-    for (t = 0; t < 256; t++)
+    यदि (done)
+	फर्काऊ;
+    लागि (t = 0; t < 256; t++)
     {
 	v = t;
-	for (s = 0; s < 8; s++)
+	लागि (s = 0; s < 8; s++)
 	    v = (v >> 1) ^ ((v & 1) * (u32_T)0xedb88320L);
 	crc_32_table[t] = v;
     }
     done = TRUE;
 }
 
-#define CRC32(c, b) (crc_32_table[((int)(c) ^ (b)) & 0xff] ^ ((c) >> 8))
+#define CRC32(c, b) (crc_32_table[((पूर्णाङ्क)(c) ^ (b)) & 0xff] ^ ((c) >> 8))
 
 /*
  * Return the next byte in the pseudo-random sequence.
  */
-#define DECRYPT_BYTE_ZIP(keys, t) \
+#define DECRYPT_BYTE_ZIP(साँचोहरू, t) \
 { \
-    short_u temp = (short_u)keys[2] | 2; \
-    t = (int)(((unsigned)(temp * (temp ^ 1U)) >> 8) & 0xff); \
+    short_u temp = (short_u)साँचोहरू[2] | 2; \
+    t = (पूर्णाङ्क)(((अचिन्हित)(temp * (temp ^ 1U)) >> 8) & 0xff); \
 }
 
 /*
  * Update the encryption keys with the next byte of plain text.
  */
-#define UPDATE_KEYS_ZIP(keys, c) do { \
-    keys[0] = CRC32(keys[0], (c)); \
-    keys[1] += keys[0] & 0xff; \
-    keys[1] = keys[1] * 134775813L + 1; \
-    keys[2] = CRC32(keys[2], (int)(keys[1] >> 24)); \
-} while (0)
+#define UPDATE_साँचोहरू_ZIP(साँचोहरू, c) गर { \
+    साँचोहरू[0] = CRC32(साँचोहरू[0], (c)); \
+    साँचोहरू[1] += साँचोहरू[0] & 0xff; \
+    साँचोहरू[1] = साँचोहरू[1] * 134775813L + 1; \
+    साँचोहरू[2] = CRC32(साँचोहरू[2], (पूर्णाङ्क)(साँचोहरू[1] >> 24)); \
+} जबसम्म (0)
 
 /*
  * Initialize for encryption/decryption.
  */
-    int
+    पूर्णाङ्क
 crypt_zip_init(
     cryptstate_T    *state,
-    char_u	    *key,
+    char_u	    *साँचो,
     crypt_arg_T     *arg UNUSED)
 {
     char_u	*p;
     zip_state_T	*zs;
 
     zs = ALLOC_ONE(zip_state_T);
-    if (zs == NULL)
-	return FAIL;
+    यदि (zs == रिक्त)
+	फर्काऊ FAIL;
     state->method_state = zs;
 
     make_crc_tab();
-    zs->keys[0] = 305419896L;
-    zs->keys[1] = 591751049L;
-    zs->keys[2] = 878082192L;
-    for (p = key; *p != NUL; ++p)
-	UPDATE_KEYS_ZIP(zs->keys, (int)*p);
+    zs->साँचोहरू[0] = 305419896L;
+    zs->साँचोहरू[1] = 591751049L;
+    zs->साँचोहरू[2] = 878082192L;
+    लागि (p = साँचो; *p != NUL; ++p)
+	UPDATE_साँचोहरू_ZIP(zs->साँचोहरू, (पूर्णाङ्क)*p);
 
-    return OK;
+    फर्काऊ OK;
 }
 
 /*
  * Encrypt "from[len]" into "to[len]".
  * "from" and "to" can be equal to encrypt in place.
  */
-    void
+    शून्य
 crypt_zip_encode(
     cryptstate_T *state,
     char_u	*from,
-    size_t	len,
+    माप_प्रकार	len,
     char_u	*to,
-    int		last UNUSED)
+    पूर्णाङ्क		last UNUSED)
 {
     zip_state_T *zs = state->method_state;
-    size_t	i;
-    int		ztemp, t;
+    माप_प्रकार	i;
+    पूर्णाङ्क		ztemp, t;
 
-    for (i = 0; i < len; ++i)
+    लागि (i = 0; i < len; ++i)
     {
 	ztemp = from[i];
-	DECRYPT_BYTE_ZIP(zs->keys, t);
-	UPDATE_KEYS_ZIP(zs->keys, ztemp);
+	DECRYPT_BYTE_ZIP(zs->साँचोहरू, t);
+	UPDATE_साँचोहरू_ZIP(zs->साँचोहरू, ztemp);
 	to[i] = t ^ ztemp;
     }
 }
@@ -131,23 +131,23 @@ crypt_zip_encode(
 /*
  * Decrypt "from[len]" into "to[len]".
  */
-    void
+    शून्य
 crypt_zip_decode(
     cryptstate_T *state,
     char_u	*from,
-    size_t	len,
+    माप_प्रकार	len,
     char_u	*to,
-    int		last UNUSED)
+    पूर्णाङ्क		last UNUSED)
 {
     zip_state_T *zs = state->method_state;
-    size_t	i;
+    माप_प्रकार	i;
     short_u	temp;
 
-    for (i = 0; i < len; ++i)
+    लागि (i = 0; i < len; ++i)
     {
-	temp = (short_u)zs->keys[2] | 2;
-	temp = (int)(((unsigned)(temp * (temp ^ 1U)) >> 8) & 0xff);
-	UPDATE_KEYS_ZIP(zs->keys, to[i] = from[i] ^ temp);
+	temp = (short_u)zs->साँचोहरू[2] | 2;
+	temp = (पूर्णाङ्क)(((अचिन्हित)(temp * (temp ^ 1U)) >> 8) & 0xff);
+	UPDATE_साँचोहरू_ZIP(zs->साँचोहरू, to[i] = from[i] ^ temp);
     }
 }
 

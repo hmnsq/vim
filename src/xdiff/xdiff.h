@@ -20,11 +20,11 @@
  *
  */
 
-#if !defined(XDIFF_H)
+#यदि !defined(XDIFF_H)
 #define XDIFF_H
 
 #ifdef __cplusplus
-extern "C" {
+बाह्य "C" {
 #endif /* #ifdef __cplusplus */
 
 /* xpparm_t.flags */
@@ -39,7 +39,7 @@ extern "C" {
 			      XDF_IGNORE_WHITESPACE_AT_EOL | \
 			      XDF_IGNORE_CR_AT_EOL)
 
-#define XDF_IGNORE_BLANK_LINES (1 << 7)
+#define XDF_IGNORE_BLANK_पङ्क्तिहरू (1 << 7)
 
 #define XDF_PATIENCE_DIFF (1 << 14)
 #define XDF_HISTOGRAM_DIFF (1 << 15)
@@ -68,61 +68,61 @@ extern "C" {
 #define XDL_MERGE_DIFF3 1
 #define XDL_MERGE_ZEALOUS_DIFF3 2
 
-typedef struct s_mmfile {
-	char *ptr;
-	long size;
+प्रकारनिर्देश संरचना s_mmfile {
+	वर्ण *ptr;
+	दीर्घ size;
 } mmfile_t;
 
-typedef struct s_mmbuffer {
-	char *ptr;
-	long size;
+प्रकारनिर्देश संरचना s_mmbuffer {
+	वर्ण *ptr;
+	दीर्घ size;
 } mmbuffer_t;
 
-typedef struct s_xpparam {
-	unsigned long flags;
+प्रकारनिर्देश संरचना s_xpparam {
+	अचिन्हित दीर्घ flags;
 
 	/* -I<regex> */
- #if 0  // unused by Vim
+ #यदि 0  // unused by Vim
 	regex_t **ignore_regex;
-	size_t ignore_regex_nr;
+	माप_प्रकार ignore_regex_nr;
 #endif
 
 	/* See Documentation/diff-options.adoc. */
-	char **anchors;
-	size_t anchors_nr;
+	वर्ण **anchors;
+	माप_प्रकार anchors_nr;
 } xpparam_t;
 
-typedef struct s_xdemitcb {
-	void *priv;
-	int (*out_hunk)(void *,
-			long old_begin, long old_nr,
-			long new_begin, long new_nr,
-			const char *func, long funclen);
-	int (*out_line)(void *, mmbuffer_t *, int);
+प्रकारनिर्देश संरचना s_xdemitcb {
+	शून्य *priv;
+	पूर्णाङ्क (*out_hunk)(शून्य *,
+			दीर्घ old_begin, दीर्घ old_nr,
+			दीर्घ new_begin, दीर्घ new_nr,
+			अचर वर्ण *func, दीर्घ funclen);
+	पूर्णाङ्क (*out_पङ्क्ति)(शून्य *, mmbuffer_t *, पूर्णाङ्क);
 } xdemitcb_t;
 
-typedef long (*find_func_t)(const char *line, long line_len, char *buffer, long buffer_size, void *priv);
+प्रकारनिर्देश दीर्घ (*find_func_t)(अचर वर्ण *पङ्क्ति, दीर्घ पङ्क्ति_len, वर्ण *buffer, दीर्घ buffer_size, शून्य *priv);
 
-typedef int (*xdl_emit_hunk_consume_func_t)(long start_a, long count_a,
-					    long start_b, long count_b,
-					    void *cb_data);
+प्रकारनिर्देश पूर्णाङ्क (*xdl_emit_hunk_consume_func_t)(दीर्घ start_a, दीर्घ गन्ती_a,
+					    दीर्घ start_b, दीर्घ गन्ती_b,
+					    शून्य *cb_data);
 
-typedef struct s_xdemitconf {
-	long ctxlen;
-	long interhunkctxlen;
-	unsigned long flags;
+प्रकारनिर्देश संरचना s_xdemitconf {
+	दीर्घ ctxlen;
+	दीर्घ interhunkctxlen;
+	अचिन्हित दीर्घ flags;
 	find_func_t find_func;
-	void *find_func_priv;
+	शून्य *find_func_priv;
 	xdl_emit_hunk_consume_func_t hunk_func;
 } xdemitconf_t;
 
-typedef struct s_bdiffparam {
-	long bsize;
+प्रकारनिर्देश संरचना s_bdiffparam {
+	दीर्घ bsize;
 } bdiffparam_t;
 
 #ifdef VMS
 # include "[]vim.h"
-#else
+#अन्यथा
 # include "../vim.h"
 #endif
 
@@ -131,27 +131,27 @@ typedef struct s_bdiffparam {
 #define xdl_free(ptr) vim_free(ptr)
 #define xdl_realloc(ptr,x) vim_realloc((ptr),(x))
 
-void *xdl_mmfile_first(mmfile_t *mmf, long *size);
-long xdl_mmfile_size(mmfile_t *mmf);
+शून्य *xdl_mmfile_first(mmfile_t *mmf, दीर्घ *size);
+दीर्घ xdl_mmfile_size(mmfile_t *mmf);
 
-int xdl_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
-	     xdemitconf_t const *xecfg, xdemitcb_t *ecb);
+पूर्णाङ्क xdl_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t अचर *xpp,
+	     xdemitconf_t अचर *xecfg, xdemitcb_t *ecb);
 
-typedef struct s_xmparam {
+प्रकारनिर्देश संरचना s_xmparam {
 	xpparam_t xpp;
-	int marker_size;
-	int level;
-	int favor;
-	int style;
-	const char *ancestor;	/* label for orig */
-	const char *file1;	/* label for mf1 */
-	const char *file2;	/* label for mf2 */
+	पूर्णाङ्क marker_size;
+	पूर्णाङ्क level;
+	पूर्णाङ्क favor;
+	पूर्णाङ्क style;
+	अचर वर्ण *ancestor;	/* label for orig */
+	अचर वर्ण *file1;	/* label for mf1 */
+	अचर वर्ण *file2;	/* label for mf2 */
 } xmparam_t;
 
 #define DEFAULT_CONFLICT_MARKER_SIZE 7
 
-int xdl_merge(mmfile_t *orig, mmfile_t *mf1, mmfile_t *mf2,
-		xmparam_t const *xmp, mmbuffer_t *result);
+पूर्णाङ्क xdl_merge(mmfile_t *orig, mmfile_t *mf1, mmfile_t *mf2,
+		xmparam_t अचर *xmp, mmbuffer_t *result);
 
 #ifdef __cplusplus
 }

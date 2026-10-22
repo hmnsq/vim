@@ -1,28 +1,28 @@
 #ifndef __VTERM_INTERNAL_H__
 #define __VTERM_INTERNAL_H__
 
-#include "vterm.h"
+#अन्तर्भाव "vterm.h"
 
-#include <stdarg.h>
+#अन्तर्भाव <stdarg.h>
 
-#if defined(__GNUC__) && !defined(__MINGW32__)
+#यदि defined(__GNUC__) && !defined(__MINGW32__)
 # define INTERNAL __attribute__((visibility("internal")))
-#else
+#अन्यथा
 # define INTERNAL
 #endif
 
-#if defined(__GNUC__) || defined(__MINGW32__)
+#यदि defined(__GNUC__) || defined(__MINGW32__)
 # define UNUSED __attribute__((unused))
-#else
+#अन्यथा
 # define UNUSED
 #endif
 
 #ifdef DEBUG
-# define DEBUG_LOG(s) fprintf(stderr, s)
-# define DEBUG_LOG1(s, a) fprintf(stderr, s, a)
-# define DEBUG_LOG2(s, a, b) fprintf(stderr, s, a, b)
-# define DEBUG_LOG3(s, a, b, c) fprintf(stderr, s, a, b, c)
-#else
+# define DEBUG_LOG(s) ख_लिखो(मानक_त्रुटि, s)
+# define DEBUG_LOG1(s, a) ख_लिखो(मानक_त्रुटि, s, a)
+# define DEBUG_LOG2(s, a, b) ख_लिखो(मानक_त्रुटि, s, a, b)
+# define DEBUG_LOG3(s, a, b, c) ख_लिखो(मानक_त्रुटि, s, a, b, c)
+#अन्यथा
 # define DEBUG_LOG(s)
 # define DEBUG_LOG1(s, a)
 # define DEBUG_LOG2(s, a, b)
@@ -39,132 +39,132 @@
 #define BUFIDX_PRIMARY   0
 #define BUFIDX_ALTSCREEN 1
 
-typedef struct VTermEncoding VTermEncoding;
+प्रकारनिर्देश संरचना VTermEncoding VTermEncoding;
 
-typedef struct {
+प्रकारनिर्देश संरचना {
   VTermEncoding *enc;
 
   // This size should be increased if required by other stateful encodings
-  char           data[4*sizeof(uint32_t)];
+  वर्ण           data[4*परिमाण(uint32_t)];
 } VTermEncodingInstance;
 
-struct VTermPen
+संरचना VTermPen
 {
   VTermColor fg;
   VTermColor bg;
-  unsigned int bold:1;
-  unsigned int underline:2;
-  unsigned int italic:1;
-  unsigned int blink:1;
-  unsigned int reverse:1;
-  unsigned int conceal:1;
-  unsigned int strike:1;
-  unsigned int font:4; /* To store 0-9 */
-  unsigned int small:1;
-  unsigned int baseline:2;
+  अचिन्हित पूर्णाङ्क bold:1;
+  अचिन्हित पूर्णाङ्क underline:2;
+  अचिन्हित पूर्णाङ्क italic:1;
+  अचिन्हित पूर्णाङ्क blink:1;
+  अचिन्हित पूर्णाङ्क reverse:1;
+  अचिन्हित पूर्णाङ्क conceal:1;
+  अचिन्हित पूर्णाङ्क strike:1;
+  अचिन्हित पूर्णाङ्क font:4; /* To store 0-9 */
+  अचिन्हित पूर्णाङ्क small:1;
+  अचिन्हित पूर्णाङ्क baseline:2;
 };
 
-struct VTermState
+संरचना VTermState
 {
   VTerm *vt;
 
-  const VTermStateCallbacks *callbacks;
-  void *cbdata;
-  int callbacks_has_premove;
+  अचर VTermStateCallbacks *callbacks;
+  शून्य *cbdata;
+  पूर्णाङ्क callbacks_has_premove;
 
-  const VTermStateFallbacks *fallbacks;
-  void *fbdata;
+  अचर VTermStateFallbacks *fallbacks;
+  शून्य *fbdata;
 
-  int rows;
-  int cols;
+  पूर्णाङ्क rows;
+  पूर्णाङ्क cols;
 
   /* Current cursor position */
   VTermPos pos;
 
-  int at_phantom; /* True if we're on the "81st" phantom column to defer a wraparound */
+  पूर्णाङ्क at_phantom; /* True if we're on the "81st" phantom column to defer a wraparound */
 
-  int scrollregion_top;
-  int scrollregion_bottom; /* -1 means unbounded */
+  पूर्णाङ्क scrollregion_शीर्ष;
+  पूर्णाङ्क scrollregion_bottom; /* -1 means unbounded */
 #define SCROLLREGION_BOTTOM(state) ((state)->scrollregion_bottom > -1 ? (state)->scrollregion_bottom : (state)->rows)
-  int scrollregion_left;
-#define SCROLLREGION_LEFT(state)  ((state)->mode.leftrightmargin ? (state)->scrollregion_left : 0)
-  int scrollregion_right; /* -1 means unbounded */
-#define SCROLLREGION_RIGHT(state) ((state)->mode.leftrightmargin && (state)->scrollregion_right > -1 ? (state)->scrollregion_right : (state)->cols)
+  पूर्णाङ्क scrollregion_बायाँ;
+#define SCROLLREGION_बायाँ(state)  ((state)->mode.leftrightmargin ? (state)->scrollregion_बायाँ : 0)
+  पूर्णाङ्क scrollregion_दायाँ; /* -1 means unbounded */
+#define SCROLLREGION_दायाँ(state) ((state)->mode.leftrightmargin && (state)->scrollregion_दायाँ > -1 ? (state)->scrollregion_दायाँ : (state)->cols)
 
   /* Bitvector of tab stops */
-  unsigned char *tabstops;
+  अचिन्हित वर्ण *tabstops;
 
   /* Primary and Altscreen; lineinfos[1] is lazily allocated as needed */
-  VTermLineInfo *lineinfos[2];
+  VTerm_पङ्क्ति_Info *lineinfos[2];
 
   /* lineinfo will == lineinfos[0] or lineinfos[1], depending on altscreen */
-  VTermLineInfo *lineinfo;
+  VTerm_पङ्क्ति_Info *lineinfo;
 #define ROWWIDTH(state,row) ((state)->lineinfo[(row)].doublewidth ? ((state)->cols / 2) : (state)->cols)
 #define THISROWWIDTH(state) ROWWIDTH(state, (state)->pos.row)
 
   /* Mouse state */
-  int mouse_col, mouse_row;
-  int mouse_buttons;
-  int mouse_flags;
+  पूर्णाङ्क mouse_col, mouse_row;
+  पूर्णाङ्क mouse_buttons;
+  पूर्णाङ्क mouse_flags;
 
-  enum { MOUSE_X10, MOUSE_UTF8, MOUSE_SGR, MOUSE_RXVT } mouse_protocol;
+  गणना { MOUSE_X10, MOUSE_UTF8, MOUSE_SGR, MOUSE_RXVT } mouse_protocol;
 
   /* Last glyph output, for Unicode recombining purposes */
   uint32_t *combine_chars;
-  size_t combine_chars_size; // Number of ELEMENTS in the above
-  int combine_width; // The width of the glyph above
+  माप_प्रकार combine_chars_size; // Number of ELEMENTS in the above
+  पूर्णाङ्क combine_width; // The width of the glyph above
   VTermPos combine_pos;   // Position before movement
 
-  struct {
-    unsigned int keypad:1;
-    unsigned int cursor:1;
-    unsigned int autowrap:1;
-    unsigned int insert:1;
-    unsigned int newline:1;
-    unsigned int cursor_visible:1;
-    unsigned int cursor_blink:1;
-    unsigned int cursor_shape:2;
-    unsigned int alt_screen:1;
-    unsigned int origin:1;
-    unsigned int screen:1;
-    unsigned int leftrightmargin:1;
-    unsigned int bracketpaste:1;
-    unsigned int report_focus:1;
-    unsigned int modify_other_keys:1;
-    unsigned int kitty_keyboard:1;
+  संरचना {
+    अचिन्हित पूर्णाङ्क keypad:1;
+    अचिन्हित पूर्णाङ्क cursor:1;
+    अचिन्हित पूर्णाङ्क autowrap:1;
+    अचिन्हित पूर्णाङ्क घुसाउ:1;
+    अचिन्हित पूर्णाङ्क newline:1;
+    अचिन्हित पूर्णाङ्क cursor_visible:1;
+    अचिन्हित पूर्णाङ्क cursor_blink:1;
+    अचिन्हित पूर्णाङ्क cursor_shape:2;
+    अचिन्हित पूर्णाङ्क alt_screen:1;
+    अचिन्हित पूर्णाङ्क origin:1;
+    अचिन्हित पूर्णाङ्क screen:1;
+    अचिन्हित पूर्णाङ्क leftrightmargin:1;
+    अचिन्हित पूर्णाङ्क bracketpaste:1;
+    अचिन्हित पूर्णाङ्क report_focus:1;
+    अचिन्हित पूर्णाङ्क modify_other_साँचोहरू:1;
+    अचिन्हित पूर्णाङ्क kitty_keyboard:1;
   } mode;
 
   VTermEncodingInstance encoding[4], encoding_utf8;
-  int gl_set, gr_set, gsingle_set;
+  पूर्णाङ्क gl_set, gr_set, gsingle_set;
 
-  struct VTermPen pen;
+  संरचना VTermPen pen;
 
   VTermColor default_fg;
   VTermColor default_bg;
   VTermColor colors[16]; // Store the 8 ANSI and the 8 ANSI high-brights only
 
-  int bold_is_highbright;
+  पूर्णाङ्क bold_is_highbright;
 
-  unsigned int protected_cell : 1;
+  अचिन्हित पूर्णाङ्क protected_cell : 1;
 
   /* Saved state under DEC mode 1048/1049 */
-  struct {
+  संरचना {
     VTermPos pos;
-    struct VTermPen pen;
+    संरचना VTermPen pen;
 
-    struct {
-      unsigned int cursor_visible:1;
-      unsigned int cursor_blink:1;
-      unsigned int cursor_shape:2;
+    संरचना {
+      अचिन्हित पूर्णाङ्क cursor_visible:1;
+      अचिन्हित पूर्णाङ्क cursor_blink:1;
+      अचिन्हित पूर्णाङ्क cursor_shape:2;
     } mode;
   } saved;
 
   /* Temporary state for DECRQSS parsing */
-  union {
-    char decrqss[4];
-    struct {
+  सङ्घ {
+    वर्ण decrqss[4];
+    संरचना {
       uint16_t mask;
-      enum {
+      गणना {
         SELECTION_INITIAL,
         SELECTION_SELECTED,
         SELECTION_QUERY,
@@ -177,29 +177,29 @@ struct VTermState
     } selection;
   } tmp;
 
-  struct {
-    const VTermSelectionCallbacks *callbacks;
-    void *user;
-    char *buffer;
-    size_t buflen;
+  संरचना {
+    अचर VTermSelectionCallbacks *callbacks;
+    शून्य *user;
+    वर्ण *buffer;
+    माप_प्रकार buflen;
   } selection;
 };
 
-struct VTerm
+संरचना VTerm
 {
-  const VTermAllocatorFunctions *allocator;
-  void *allocdata;
+  अचर VTermAllocatorFunctions *allocator;
+  शून्य *allocdata;
 
-  int rows;
-  int cols;
+  पूर्णाङ्क rows;
+  पूर्णाङ्क cols;
 
-  struct {
-    unsigned int utf8:1;
-    unsigned int ctrl8bit:1;
+  संरचना {
+    अचिन्हित पूर्णाङ्क utf8:1;
+    अचिन्हित पूर्णाङ्क ctrl8bit:1;
   } mode;
 
-  struct {
-    enum VTermParserState {
+  संरचना {
+    गणना VTermParserState {
       NORMAL,
       CSI_LEADER,
       CSI_ARGS,
@@ -214,84 +214,84 @@ struct VTerm
       SOS,
     } state;
 
-    unsigned int in_esc : 1;
+    अचिन्हित पूर्णाङ्क in_esc : 1;
 
-    int intermedlen;
-    char intermed[INTERMED_MAX];
+    पूर्णाङ्क intermedlen;
+    वर्ण intermed[INTERMED_MAX];
 
-    union {
-      struct {
-        int leaderlen;
-        char leader[CSI_LEADER_MAX];
+    सङ्घ {
+      संरचना {
+        पूर्णाङ्क leaderlen;
+        वर्ण leader[CSI_LEADER_MAX];
 
-        int argi;
-        long args[CSI_ARGS_MAX];
+        पूर्णाङ्क argi;
+        दीर्घ args[CSI_ARGS_MAX];
       } csi;
-      struct {
-        int command;
+      संरचना {
+        पूर्णाङ्क command;
       } osc;
-      struct {
-        int commandlen;
-        char command[CSI_LEADER_MAX];
+      संरचना {
+        पूर्णाङ्क commandlen;
+        वर्ण command[CSI_LEADER_MAX];
       } dcs;
     } v;
 
-    const VTermParserCallbacks *callbacks;
-    void *cbdata;
+    अचर VTermParserCallbacks *callbacks;
+    शून्य *cbdata;
 
-    int string_initial;
+    पूर्णाङ्क string_initial;
 
-    int emit_nul;
+    पूर्णाङ्क emit_nul;
   } parser;
 
   /* len == malloc()ed size; cur == number of valid bytes */
 
   VTermOutputCallback *outfunc;
-  void                *outdata;
+  शून्य                *outdata;
 
-  char  *outbuffer;
-  size_t outbuffer_len;
-  size_t outbuffer_cur;
+  वर्ण  *outbuffer;
+  माप_प्रकार outbuffer_len;
+  माप_प्रकार outbuffer_cur;
 
-  char  *tmpbuffer;
-  size_t tmpbuffer_len;
+  वर्ण  *tmpbuffer;
+  माप_प्रकार tmpbuffer_len;
 
   VTermState *state;
   VTermScreen *screen;
 
-  int in_backspace;
+  पूर्णाङ्क in_backspace;
 };
 
-struct VTermEncoding {
-  void (*init) (VTermEncoding *enc, void *data);
-  void (*decode)(VTermEncoding *enc, void *data,
-                 uint32_t cp[], int *cpi, int cplen,
-                 const char bytes[], size_t *pos, size_t len);
+संरचना VTermEncoding {
+  शून्य (*init) (VTermEncoding *enc, शून्य *data);
+  शून्य (*decode)(VTermEncoding *enc, शून्य *data,
+                 uint32_t cp[], पूर्णाङ्क *cpi, पूर्णाङ्क cplen,
+                 अचर वर्ण bytes[], माप_प्रकार *pos, माप_प्रकार len);
 };
 
-typedef enum {
+प्रकारनिर्देश गणना {
   ENC_UTF8,
   ENC_SINGLE_94
 } VTermEncodingType;
 
-void *vterm_allocator_malloc(VTerm *vt, size_t size);
-void  vterm_allocator_free(VTerm *vt, void *ptr);
+शून्य *vterm_allocator_malloc(VTerm *vt, माप_प्रकार size);
+शून्य  vterm_allocator_free(VTerm *vt, शून्य *ptr);
 
-void vterm_push_output_bytes(VTerm *vt, const char *bytes, size_t len);
-void vterm_push_output_vsprintf(VTerm *vt, const char *format, va_list args);
-void vterm_push_output_sprintf(VTerm *vt, const char *format, ...);
-void vterm_push_output_sprintf_ctrl(VTerm *vt, unsigned char ctrl, const char *fmt, ...);
-void vterm_push_output_sprintf_str(VTerm *vt, unsigned char ctrl, int term, const char *fmt, ...);
+शून्य vterm_थप_output_bytes(VTerm *vt, अचर वर्ण *bytes, माप_प्रकार len);
+शून्य vterm_थप_output_vsprintf(VTerm *vt, अचर वर्ण *format, बहु_सूची args);
+शून्य vterm_थप_output_sprintf(VTerm *vt, अचर वर्ण *format, ...);
+शून्य vterm_थप_output_sprintf_ctrl(VTerm *vt, अचिन्हित वर्ण ctrl, अचर वर्ण *fmt, ...);
+शून्य vterm_थप_output_sprintf_str(VTerm *vt, अचिन्हित वर्ण ctrl, पूर्णाङ्क term, अचर वर्ण *fmt, ...);
 
-void vterm_state_free(VTermState *state);
+शून्य vterm_state_free(VTermState *state);
 
-void vterm_state_newpen(VTermState *state);
-void vterm_state_resetpen(VTermState *state);
-void vterm_state_setpen(VTermState *state, const long args[], int argcount);
-int  vterm_state_getpen(VTermState *state, long args[], int argcount);
-void vterm_state_savepen(VTermState *state, int save);
+शून्य vterm_state_newpen(VTermState *state);
+शून्य vterm_state_resetpen(VTermState *state);
+शून्य vterm_state_setpen(VTermState *state, अचर दीर्घ args[], पूर्णाङ्क argcount);
+पूर्णाङ्क  vterm_state_getpen(VTermState *state, दीर्घ args[], पूर्णाङ्क argcount);
+शून्य vterm_state_savepen(VTermState *state, पूर्णाङ्क save);
 
-enum {
+गणना {
   C1_SS3 = 0x8f,
   C1_DCS = 0x90,
   C1_CSI = 0x9b,
@@ -299,30 +299,30 @@ enum {
   C1_OSC = 0x9d,
 };
 
-void vterm_state_push_output_sprintf_CSI(VTermState *vts, const char *format, ...);
+शून्य vterm_state_थप_output_sprintf_CSI(VTermState *vts, अचर वर्ण *format, ...);
 
-void vterm_screen_free(VTermScreen *screen);
+शून्य vterm_screen_free(VTermScreen *screen);
 
-VTermEncoding *vterm_lookup_encoding(VTermEncodingType type, char designation);
+VTermEncoding *vterm_lookup_encoding(VTermEncodingType type, वर्ण designation);
 
-int vterm_unicode_width(uint32_t codepoint);
-int vterm_unicode_is_combining(uint32_t codepoint);
-int vterm_unicode_is_ambiguous(uint32_t codepoint);
-int vterm_get_special_pty_type(void);
+पूर्णाङ्क vterm_unicode_width(uint32_t codepoint);
+पूर्णाङ्क vterm_unicode_is_combining(uint32_t codepoint);
+पूर्णाङ्क vterm_unicode_is_ambiguous(uint32_t codepoint);
+पूर्णाङ्क vterm_get_special_pty_type(शून्य);
 
-#if (defined(_XOPEN_SOURCE) && _XOPEN_SOURCE >= 500) \
+#यदि (defined(_XOPEN_SOURCE) && _XOPEN_SOURCE >= 500) \
 	|| defined(_ISOC99_SOURCE) || defined(_BSD_SOURCE)
 # undef VSNPRINTF
 # define VSNPRINTF vsnprintf
 # undef SNPRINTF
-#else
+#अन्यथा
 # ifdef VSNPRINTF
 // Use a provided vsnprintf() function.
-int VSNPRINTF(char *str, size_t str_m, const char *fmt, va_list ap);
+पूर्णाङ्क VSNPRINTF(वर्ण *str, माप_प्रकार str_m, अचर वर्ण *fmt, बहु_सूची ap);
 # endif
 # ifdef SNPRINTF
 // Use a provided snprintf() function.
-int SNPRINTF(char *str, size_t str_m, const char *fmt, ...);
+पूर्णाङ्क SNPRINTF(वर्ण *str, माप_प्रकार str_m, अचर वर्ण *fmt, ...);
 # endif
 #endif
 #ifndef SNPRINTF
