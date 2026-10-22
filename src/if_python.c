@@ -17,9 +17,9 @@
  * 4. Utility functions for handling the interface between Vim and Python.
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#include <limits.h>
+#ضمن <limits.h>
 
 // uncomment this if used with the debug version of python.
 // Checked on 2.7.4.
@@ -34,7 +34,7 @@
 # undef _POSIX_THREADS
 #endif
 
-#if defined(MSWIN) && defined(HAVE_FCNTL_H)
+#ܐܢ defined(MSWIN) && defined(HAVE_FCNTL_H)
 # undef HAVE_FCNTL_H
 #endif
 
@@ -60,14 +60,14 @@
 
 #define PY_SSIZE_T_CLEAN
 
-#include <Python.h>
+#ضمن <Python.h>
 
-#if !defined(PY_VERSION_HEX) || PY_VERSION_HEX < 0x02050000
+#ܐܢ !defined(PY_VERSION_HEX) || PY_VERSION_HEX < 0x02050000
 # undef PY_SSIZE_T_CLEAN
 #endif
 
 // these are NULL for Python 2
-#define ERRORS_DECODE_ARG NULL
+#define ERRORS_DECODE_ARG عدم
 #define ERRORS_ENCODE_ARG ERRORS_DECODE_ARG
 
 #undef main // Defined in python.h - aargh
@@ -79,11 +79,11 @@
 #define PyBytes_AsStringAndSize PyString_AsStringAndSize
 #define PyBytes_FromStringAndSize   PyString_FromStringAndSize
 
-#if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
+#ܐܢ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
 # define PY_USE_CAPSULE
 #endif
 
-#if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02050000
+#ܐܢ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02050000
 # define PyInt Py_ssize_t
 # define PyInquiry lenfunc
 # define PyIntArgFunc ssizeargfunc
@@ -91,8 +91,8 @@
 # define PyIntObjArgProc ssizeobjargproc
 # define PyIntIntObjArgProc ssizessizeobjargproc
 # define Py_ssize_t_fmt "n"
-#else
-# define PyInt int
+#ܐܚܪܢܐ
+# define PyInt صحيح
 # define lenfunc inquiry
 # define PyInquiry inquiry
 # define PyIntArgFunc intargfunc
@@ -108,12 +108,12 @@
 #define file_input	257
 #define eval_input	258
 
-#if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x020300F0
+#ܐܢ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x020300F0
   // Python 2.3: can invoke ":python" recursively.
 # define PY_CAN_RECURSE
 #endif
 
-#if defined(DYNAMIC_PYTHON)
+#ܐܢ defined(DYNAMIC_PYTHON)
 # ifndef DYNAMIC_PYTHON
 #  define HINSTANCE long_u		// for generating prototypes
 # endif
@@ -123,13 +123,13 @@
 #  define close_dll FreeLibrary
 #  define symbol_from_dll GetProcAddress
 #  define load_dll_error GetWin32Error
-# else
+# ܐܚܪܢܐ
 #  include <dlfcn.h>
-#  define FARPROC void*
-#  define HINSTANCE void*
-#  if defined(PY_NO_RTLD_GLOBAL) && defined(PY3_NO_RTLD_GLOBAL)
+#  define FARPROC فراغ*
+#  define HINSTANCE فراغ*
+#  ܐܢ defined(PY_NO_RTLD_GLOBAL) && defined(PY3_NO_RTLD_GLOBAL)
 #   define load_dll(n) dlopen((n), RTLD_LAZY)
-#  else
+#  ܐܚܪܢܐ
 #   define load_dll(n) dlopen((n), RTLD_LAZY|RTLD_GLOBAL)
 #  endif
 #  define close_dll dlclose
@@ -206,7 +206,7 @@
 # define PyDict_Type (*dll_PyDict_Type)
 # ifdef PyMapping_Keys
 #  define PY_NO_MAPPING_KEYS
-# else
+# ܐܚܪܢܐ
 #  define PyMapping_Keys dll_PyMapping_Keys
 # endif
 # define PyObject_GetItem dll_PyObject_GetItem
@@ -261,11 +261,11 @@
 #  define Py_underscore_GC
 #  define _PyObject_GC_Del dll__PyObject_GC_Del
 #  define _PyObject_GC_UnTrack dll__PyObject_GC_UnTrack
-# else
+# ܐܚܪܢܐ
 #  define PyObject_GC_Del dll_PyObject_GC_Del
 #  define PyObject_GC_UnTrack dll_PyObject_GC_UnTrack
 # endif
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
+# ܐܢ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
 #  define _PyObject_NextNotImplemented (*dll__PyObject_NextNotImplemented)
 # endif
 # define _Py_NoneStruct (*dll__Py_NoneStruct)
@@ -274,7 +274,7 @@
 # define PyObject_Init dll__PyObject_Init
 # define PyObject_GetIter dll_PyObject_GetIter
 # define PyObject_IsTrue dll_PyObject_IsTrue
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02020000
+# ܐܢ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02020000
 #  define PyType_IsSubtype dll_PyType_IsSubtype
 #  ifdef Py_DEBUG
 #   define _Py_NegativeRefcount dll__Py_NegativeRefcount
@@ -282,11 +282,11 @@
 #   define _Py_Dealloc dll__Py_Dealloc
 #  endif
 # endif
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02030000
-#  if defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
+# ܐܢ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02030000
+#  ܐܢ defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
 #   define _PyObject_DebugMalloc dll__PyObject_DebugMalloc
 #   define _PyObject_DebugFree dll__PyObject_DebugFree
-#  else
+#  ܐܚܪܢܐ
 #   define PyObject_Malloc dll_PyObject_Malloc
 #   define PyObject_Free dll_PyObject_Free
 #  endif
@@ -294,178 +294,178 @@
 # ifdef PY_USE_CAPSULE
 #  define PyCapsule_New dll_PyCapsule_New
 #  define PyCapsule_GetPointer dll_PyCapsule_GetPointer
-# else
+# ܐܚܪܢܐ
 #  define PyCObject_FromVoidPtr dll_PyCObject_FromVoidPtr
 #  define PyCObject_AsVoidPtr dll_PyCObject_AsVoidPtr
 # endif
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
+# ܐܢ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
 #  define Py_NoSiteFlag (*dll_Py_NoSiteFlag)
 # endif
 
 /*
  * Pointers for dynamic link
  */
-static int(*dll_PyArg_Parse)(PyObject *, char *, ...);
-static int(*dll_PyArg_ParseTuple)(PyObject *, char *, ...);
-static void(*dll_PyMem_Free)(void *);
-static void* (*dll_PyMem_Malloc)(size_t);
-static int(*dll_PyDict_SetItemString)(PyObject *dp, char *key, PyObject *item);
-static int(*dll_PyErr_BadArgument)(void);
-static PyObject *(*dll_PyErr_NewException)(char *, PyObject *, PyObject *);
-static void(*dll_PyErr_Clear)(void);
-static PyObject*(*dll_PyErr_Format)(PyObject *, const char *, ...);
-static void(*dll_PyErr_PrintEx)(int);
-static PyObject*(*dll_PyErr_NoMemory)(void);
-static PyObject*(*dll_PyErr_Occurred)(void);
-static void(*dll_PyErr_SetNone)(PyObject *);
-static void(*dll_PyErr_SetString)(PyObject *, const char *);
-static void(*dll_PyErr_SetObject)(PyObject *, PyObject *);
-static int(*dll_PyErr_ExceptionMatches)(PyObject *);
-static void(*dll_PyEval_InitThreads)(void);
-static void(*dll_PyEval_RestoreThread)(PyThreadState *);
-static PyThreadState*(*dll_PyEval_SaveThread)(void);
+ساكن صحيح(*dll_PyArg_Parse)(PyObject *, حرف *, ...);
+ساكن صحيح(*dll_PyArg_ParseTuple)(PyObject *, حرف *, ...);
+ساكن فراغ(*dll_PyMem_Free)(فراغ *);
+ساكن فراغ* (*dll_PyMem_Malloc)(size_t);
+ساكن صحيح(*dll_PyDict_SetItemString)(PyObject *dp, حرف *key, PyObject *item);
+ساكن صحيح(*dll_PyErr_BadArgument)(فراغ);
+ساكن PyObject *(*dll_PyErr_NewException)(حرف *, PyObject *, PyObject *);
+ساكن فراغ(*dll_PyErr_Clear)(فراغ);
+ساكن PyObject*(*dll_PyErr_Format)(PyObject *, ثابت حرف *, ...);
+ساكن فراغ(*dll_PyErr_PrintEx)(صحيح);
+ساكن PyObject*(*dll_PyErr_NoMemory)(فراغ);
+ساكن PyObject*(*dll_PyErr_Occurred)(فراغ);
+ساكن فراغ(*dll_PyErr_SetNone)(PyObject *);
+ساكن فراغ(*dll_PyErr_SetString)(PyObject *, ثابت حرف *);
+ساكن فراغ(*dll_PyErr_SetObject)(PyObject *, PyObject *);
+ساكن صحيح(*dll_PyErr_ExceptionMatches)(PyObject *);
+ساكن فراغ(*dll_PyEval_InitThreads)(فراغ);
+ساكن فراغ(*dll_PyEval_RestoreThread)(PyThreadState *);
+ساكن PyThreadState*(*dll_PyEval_SaveThread)(فراغ);
 # ifdef PY_CAN_RECURSE
-static PyGILState_STATE	(*dll_PyGILState_Ensure)(void);
-static void (*dll_PyGILState_Release)(PyGILState_STATE);
+ساكن PyGILState_STATE	(*dll_PyGILState_Ensure)(فراغ);
+ساكن فراغ (*dll_PyGILState_Release)(PyGILState_STATE);
 # endif
-static long(*dll_PyInt_AsLong)(PyObject *);
-static PyObject*(*dll_PyInt_FromLong)(long);
-static long(*dll_PyLong_AsLong)(PyObject *);
-static PyObject*(*dll_PyLong_FromLong)(long);
-static PyTypeObject* dll_PyBool_Type;
-static PyTypeObject* dll_PyInt_Type;
-static PyTypeObject* dll_PyLong_Type;
-static PyObject*(*dll_PyList_GetItem)(PyObject *, PyInt);
-static int(*dll_PyList_Append)(PyObject *, PyObject *);
-static int(*dll_PyList_Insert)(PyObject *, PyInt, PyObject *);
-static PyObject*(*dll_PyList_New)(PyInt size);
-static int(*dll_PyList_SetItem)(PyObject *, PyInt, PyObject *);
-static PyInt(*dll_PyList_Size)(PyObject *);
-static PyTypeObject* dll_PyList_Type;
-static PyObject*(*dll_PyTuple_GetItem)(PyObject *, PyInt);
-static int(*dll_PyTuple_SetItem)(PyObject *, PyInt, PyObject *);
-static PyObject*(*dll_PyTuple_New)(PyInt size);
-static PyInt(*dll_PyTuple_Size)(PyObject *);
-static PyTypeObject* dll_PyTuple_Type;
-static int (*dll_PySequence_Check)(PyObject *);
-static PyInt(*dll_PySequence_Size)(PyObject *);
-static PyObject*(*dll_PySequence_GetItem)(PyObject *, PyInt);
-static PyObject*(*dll_PySequence_Fast)(PyObject *, const char *);
-static int (*dll_PySlice_GetIndicesEx)(PySliceObject *r, PyInt length,
+ساكن long(*dll_PyInt_AsLong)(PyObject *);
+ساكن PyObject*(*dll_PyInt_FromLong)(long);
+ساكن long(*dll_PyLong_AsLong)(PyObject *);
+ساكن PyObject*(*dll_PyLong_FromLong)(long);
+ساكن PyTypeObject* dll_PyBool_Type;
+ساكن PyTypeObject* dll_PyInt_Type;
+ساكن PyTypeObject* dll_PyLong_Type;
+ساكن PyObject*(*dll_PyList_GetItem)(PyObject *, PyInt);
+ساكن صحيح(*dll_PyList_Append)(PyObject *, PyObject *);
+ساكن صحيح(*dll_PyList_Insert)(PyObject *, PyInt, PyObject *);
+ساكن PyObject*(*dll_PyList_New)(PyInt size);
+ساكن صحيح(*dll_PyList_SetItem)(PyObject *, PyInt, PyObject *);
+ساكن PyInt(*dll_PyList_Size)(PyObject *);
+ساكن PyTypeObject* dll_PyList_Type;
+ساكن PyObject*(*dll_PyTuple_GetItem)(PyObject *, PyInt);
+ساكن صحيح(*dll_PyTuple_SetItem)(PyObject *, PyInt, PyObject *);
+ساكن PyObject*(*dll_PyTuple_New)(PyInt size);
+ساكن PyInt(*dll_PyTuple_Size)(PyObject *);
+ساكن PyTypeObject* dll_PyTuple_Type;
+ساكن صحيح (*dll_PySequence_Check)(PyObject *);
+ساكن PyInt(*dll_PySequence_Size)(PyObject *);
+ساكن PyObject*(*dll_PySequence_GetItem)(PyObject *, PyInt);
+ساكن PyObject*(*dll_PySequence_Fast)(PyObject *, ثابت حرف *);
+ساكن صحيح (*dll_PySlice_GetIndicesEx)(PySliceObject *r, PyInt length,
 		     PyInt *start, PyInt *stop, PyInt *step,
 		     PyInt *slicelen);
-static PyObject*(*dll_PyImport_ImportModule)(const char *);
-static PyObject*(*dll_PyDict_New)(void);
-static PyObject*(*dll_PyDict_GetItemString)(PyObject *, const char *);
-static int (*dll_PyDict_Next)(PyObject *, PyInt *, PyObject **, PyObject **);
-static PyTypeObject* dll_PyDict_Type;
+ساكن PyObject*(*dll_PyImport_ImportModule)(ثابت حرف *);
+ساكن PyObject*(*dll_PyDict_New)(فراغ);
+ساكن PyObject*(*dll_PyDict_GetItemString)(PyObject *, ثابت حرف *);
+ساكن صحيح (*dll_PyDict_Next)(PyObject *, PyInt *, PyObject **, PyObject **);
+ساكن PyTypeObject* dll_PyDict_Type;
 # ifndef PY_NO_MAPPING_KEYS
-static PyObject* (*dll_PyMapping_Keys)(PyObject *);
+ساكن PyObject* (*dll_PyMapping_Keys)(PyObject *);
 # endif
-static PyObject* (*dll_PyObject_GetItem)(PyObject *, PyObject *);
-static PyObject* (*dll_PyObject_CallMethod)(PyObject *, char *, PyObject *);
-static int (*dll_PyMapping_Check)(PyObject *);
-static PyObject* (*dll_PyIter_Next)(PyObject *);
-static PyObject*(*dll_PyModule_GetDict)(PyObject *);
-static int(*dll_PyModule_AddObject)(PyObject *, const char *, PyObject *);
-static int(*dll_PyRun_SimpleString)(char *);
-static PyObject *(*dll_PyRun_String)(char *, int, PyObject *, PyObject *);
-static PyObject* (*dll_PyObject_GetAttrString)(PyObject *, const char *);
-static int (*dll_PyObject_HasAttrString)(PyObject *, const char *);
-static int (*dll_PyObject_SetAttrString)(PyObject *, const char *, PyObject *);
-static PyObject* (*dll_PyObject_CallFunctionObjArgs)(PyObject *, ...);
-static PyObject* (*dll_PyObject_CallFunction)(PyObject *, char *, ...);
-static PyObject* (*dll_PyObject_Call)(PyObject *, PyObject *, PyObject *);
-static PyObject* (*dll_PyObject_Repr)(PyObject *);
-static char*(*dll_PyString_AsString)(PyObject *);
-static int(*dll_PyString_AsStringAndSize)(PyObject *, char **, PyInt *);
-static PyObject*(*dll_PyString_FromString)(const char *);
-static PyObject*(*dll_PyString_FromFormat)(const char *, ...);
-static PyObject*(*dll_PyString_FromStringAndSize)(const char *, PyInt);
-static PyInt(*dll_PyString_Size)(PyObject *);
-static PyTypeObject* dll_PyString_Type;
-static PyTypeObject* dll_PyUnicode_Type;
-static PyObject *(*py_PyUnicode_AsEncodedString)(PyObject *, char *, char *);
-static double(*dll_PyFloat_AsDouble)(PyObject *);
-static PyObject*(*dll_PyFloat_FromDouble)(double);
-static PyTypeObject* dll_PyFloat_Type;
-static int(*dll_PyNumber_Check)(PyObject *);
-static PyObject*(*dll_PyNumber_Long)(PyObject *);
-static int(*dll_PySys_SetObject)(char *, PyObject *);
-static PyObject *(*dll_PySys_GetObject)(char *);
-static int(*dll_PySys_SetArgv)(int, char **);
-static PyTypeObject* dll_PyType_Type;
-static PyTypeObject* dll_PyFile_Type;
-static PyTypeObject* dll_PySlice_Type;
-static int (*dll_PyType_Ready)(PyTypeObject *type);
-static PyObject* (*dll_PyType_GenericAlloc)(PyTypeObject *type, PyInt nitems);
-static PyObject*(*dll_Py_BuildValue)(char *, ...);
-static PyObject*(*dll_Py_FindMethod)(struct PyMethodDef[], PyObject *, char *);
-static PyObject*(*dll_Py_InitModule4)(char *, struct PyMethodDef *, char *, PyObject *, int);
-static PyObject*(*dll_PyImport_AddModule)(char *);
-static void(*dll_Py_SetPythonHome)(char *home);
-static void(*dll_Py_Initialize)(void);
-static void(*dll_Py_Finalize)(void);
-static int(*dll_Py_IsInitialized)(void);
-static PyObject*(*dll__PyObject_New)(PyTypeObject *, PyObject *);
-static PyObject*(*dll__PyObject_GC_New)(PyTypeObject *);
+ساكن PyObject* (*dll_PyObject_GetItem)(PyObject *, PyObject *);
+ساكن PyObject* (*dll_PyObject_CallMethod)(PyObject *, حرف *, PyObject *);
+ساكن صحيح (*dll_PyMapping_Check)(PyObject *);
+ساكن PyObject* (*dll_PyIter_Next)(PyObject *);
+ساكن PyObject*(*dll_PyModule_GetDict)(PyObject *);
+ساكن صحيح(*dll_PyModule_AddObject)(PyObject *, ثابت حرف *, PyObject *);
+ساكن صحيح(*dll_PyRun_SimpleString)(حرف *);
+ساكن PyObject *(*dll_PyRun_String)(حرف *, صحيح, PyObject *, PyObject *);
+ساكن PyObject* (*dll_PyObject_GetAttrString)(PyObject *, ثابت حرف *);
+ساكن صحيح (*dll_PyObject_HasAttrString)(PyObject *, ثابت حرف *);
+ساكن صحيح (*dll_PyObject_SetAttrString)(PyObject *, ثابت حرف *, PyObject *);
+ساكن PyObject* (*dll_PyObject_CallFunctionObjArgs)(PyObject *, ...);
+ساكن PyObject* (*dll_PyObject_CallFunction)(PyObject *, حرف *, ...);
+ساكن PyObject* (*dll_PyObject_Call)(PyObject *, PyObject *, PyObject *);
+ساكن PyObject* (*dll_PyObject_Repr)(PyObject *);
+ساكن حرف*(*dll_PyString_AsString)(PyObject *);
+ساكن صحيح(*dll_PyString_AsStringAndSize)(PyObject *, حرف **, PyInt *);
+ساكن PyObject*(*dll_PyString_FromString)(ثابت حرف *);
+ساكن PyObject*(*dll_PyString_FromFormat)(ثابت حرف *, ...);
+ساكن PyObject*(*dll_PyString_FromStringAndSize)(ثابت حرف *, PyInt);
+ساكن PyInt(*dll_PyString_Size)(PyObject *);
+ساكن PyTypeObject* dll_PyString_Type;
+ساكن PyTypeObject* dll_PyUnicode_Type;
+ساكن PyObject *(*py_PyUnicode_AsEncodedString)(PyObject *, حرف *, حرف *);
+ساكن مزدوج(*dll_PyFloat_AsDouble)(PyObject *);
+ساكن PyObject*(*dll_PyFloat_FromDouble)(مزدوج);
+ساكن PyTypeObject* dll_PyFloat_Type;
+ساكن صحيح(*dll_PyNumber_Check)(PyObject *);
+ساكن PyObject*(*dll_PyNumber_Long)(PyObject *);
+ساكن صحيح(*dll_PySys_SetObject)(حرف *, PyObject *);
+ساكن PyObject *(*dll_PySys_GetObject)(حرف *);
+ساكن صحيح(*dll_PySys_SetArgv)(صحيح, حرف **);
+ساكن PyTypeObject* dll_PyType_Type;
+ساكن PyTypeObject* dll_PyFile_Type;
+ساكن PyTypeObject* dll_PySlice_Type;
+ساكن صحيح (*dll_PyType_Ready)(PyTypeObject *type);
+ساكن PyObject* (*dll_PyType_GenericAlloc)(PyTypeObject *type, PyInt nitems);
+ساكن PyObject*(*dll_Py_BuildValue)(حرف *, ...);
+ساكن PyObject*(*dll_Py_FindMethod)(بنية PyMethodDef[], PyObject *, حرف *);
+ساكن PyObject*(*dll_Py_InitModule4)(حرف *, بنية PyMethodDef *, حرف *, PyObject *, صحيح);
+ساكن PyObject*(*dll_PyImport_AddModule)(حرف *);
+ساكن فراغ(*dll_Py_SetPythonHome)(حرف *home);
+ساكن فراغ(*dll_Py_Initialize)(فراغ);
+ساكن فراغ(*dll_Py_Finalize)(فراغ);
+ساكن صحيح(*dll_Py_IsInitialized)(فراغ);
+ساكن PyObject*(*dll__PyObject_New)(PyTypeObject *, PyObject *);
+ساكن PyObject*(*dll__PyObject_GC_New)(PyTypeObject *);
 # ifdef Py_underscore_GC
-static void(*dll__PyObject_GC_Del)(void *);
-static void(*dll__PyObject_GC_UnTrack)(void *);
-# else
-static void(*dll_PyObject_GC_Del)(void *);
-static void(*dll_PyObject_GC_UnTrack)(void *);
+ساكن فراغ(*dll__PyObject_GC_Del)(فراغ *);
+ساكن فراغ(*dll__PyObject_GC_UnTrack)(فراغ *);
+# ܐܚܪܢܐ
+ساكن فراغ(*dll_PyObject_GC_Del)(فراغ *);
+ساكن فراغ(*dll_PyObject_GC_UnTrack)(فراغ *);
 # endif
-static PyObject*(*dll__PyObject_Init)(PyObject *, PyTypeObject *);
-static PyObject* (*dll_PyObject_GetIter)(PyObject *);
-static int (*dll_PyObject_IsTrue)(PyObject *);
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
-static iternextfunc dll__PyObject_NextNotImplemented;
+ساكن PyObject*(*dll__PyObject_Init)(PyObject *, PyTypeObject *);
+ساكن PyObject* (*dll_PyObject_GetIter)(PyObject *);
+ساكن صحيح (*dll_PyObject_IsTrue)(PyObject *);
+# ܐܢ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
+ساكن iternextfunc dll__PyObject_NextNotImplemented;
 # endif
-static PyObject* dll__Py_NoneStruct;
-static PyObject* _Py_ZeroStruct;
-static PyObject* dll__Py_TrueStruct;
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02020000
-static int (*dll_PyType_IsSubtype)(PyTypeObject *, PyTypeObject *);
+ساكن PyObject* dll__Py_NoneStruct;
+ساكن PyObject* _Py_ZeroStruct;
+ساكن PyObject* dll__Py_TrueStruct;
+# ܐܢ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02020000
+ساكن صحيح (*dll_PyType_IsSubtype)(PyTypeObject *, PyTypeObject *);
 #  ifdef Py_DEBUG
-static void (*dll__Py_NegativeRefcount)(const char *fname, int lineno, PyObject *op);
-static PyInt* dll__Py_RefTotal;
-static void (*dll__Py_Dealloc)(PyObject *obj);
+ساكن فراغ (*dll__Py_NegativeRefcount)(ثابت حرف *fname, صحيح lineno, PyObject *op);
+ساكن PyInt* dll__Py_RefTotal;
+ساكن فراغ (*dll__Py_Dealloc)(PyObject *obj);
 #  endif
 # endif
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02030000
-#  if defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
-static void (*dll__PyObject_DebugFree)(void*);
-static void* (*dll__PyObject_DebugMalloc)(size_t);
-#  else
-static void* (*dll_PyObject_Malloc)(size_t);
-static void (*dll_PyObject_Free)(void*);
+# ܐܢ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02030000
+#  ܐܢ defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
+ساكن فراغ (*dll__PyObject_DebugFree)(فراغ*);
+ساكن فراغ* (*dll__PyObject_DebugMalloc)(size_t);
+#  ܐܚܪܢܐ
+ساكن فراغ* (*dll_PyObject_Malloc)(size_t);
+ساكن فراغ (*dll_PyObject_Free)(فراغ*);
 #  endif
 # endif
 # ifdef PY_USE_CAPSULE
-static PyObject* (*dll_PyCapsule_New)(void *, char *, PyCapsule_Destructor);
-static void* (*dll_PyCapsule_GetPointer)(PyObject *, char *);
-# else
-static PyObject* (*dll_PyCObject_FromVoidPtr)(void *cobj, void (*destr)(void *));
-static void* (*dll_PyCObject_AsVoidPtr)(PyObject *);
+ساكن PyObject* (*dll_PyCapsule_New)(فراغ *, حرف *, PyCapsule_Destructor);
+ساكن فراغ* (*dll_PyCapsule_GetPointer)(PyObject *, حرف *);
+# ܐܚܪܢܐ
+ساكن PyObject* (*dll_PyCObject_FromVoidPtr)(فراغ *cobj, فراغ (*destr)(فراغ *));
+ساكن فراغ* (*dll_PyCObject_AsVoidPtr)(PyObject *);
 # endif
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
-static int* dll_Py_NoSiteFlag;
+# ܐܢ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
+ساكن صحيح* dll_Py_NoSiteFlag;
 # endif
 
-static HINSTANCE hinstPython = 0; // Instance of python.dll
+ساكن HINSTANCE hinstPython = 0; // Instance of python.dll
 
 // Imported exception objects
-static PyObject *imp_PyExc_AttributeError;
-static PyObject *imp_PyExc_IndexError;
-static PyObject *imp_PyExc_KeyError;
-static PyObject *imp_PyExc_KeyboardInterrupt;
-static PyObject *imp_PyExc_TypeError;
-static PyObject *imp_PyExc_ValueError;
-static PyObject *imp_PyExc_SystemExit;
-static PyObject *imp_PyExc_RuntimeError;
-static PyObject *imp_PyExc_ImportError;
-static PyObject *imp_PyExc_OverflowError;
+ساكن PyObject *imp_PyExc_AttributeError;
+ساكن PyObject *imp_PyExc_IndexError;
+ساكن PyObject *imp_PyExc_KeyError;
+ساكن PyObject *imp_PyExc_KeyboardInterrupt;
+ساكن PyObject *imp_PyExc_TypeError;
+ساكن PyObject *imp_PyExc_ValueError;
+ساكن PyObject *imp_PyExc_SystemExit;
+ساكن PyObject *imp_PyExc_RuntimeError;
+ساكن PyObject *imp_PyExc_ImportError;
+ساكن PyObject *imp_PyExc_OverflowError;
 
 # define PyExc_AttributeError imp_PyExc_AttributeError
 # define PyExc_IndexError imp_PyExc_IndexError
@@ -482,9 +482,9 @@ static PyObject *imp_PyExc_OverflowError;
  * Table of name to function pointer of python.
  */
 # define PYTHON_PROC FARPROC
-static struct
+ساكن بنية
 {
-    char *name;
+    حرف *name;
     PYTHON_PROC *ptr;
 } python_funcname_table[] =
 {
@@ -492,7 +492,7 @@ static struct
     {"_PyArg_Parse_SizeT", (PYTHON_PROC*)&dll_PyArg_Parse},
     {"_PyArg_ParseTuple_SizeT", (PYTHON_PROC*)&dll_PyArg_ParseTuple},
     {"_Py_BuildValue_SizeT", (PYTHON_PROC*)&dll_Py_BuildValue},
-# else
+# ܐܚܪܢܐ
     {"PyArg_Parse", (PYTHON_PROC*)&dll_PyArg_Parse},
     {"PyArg_ParseTuple", (PYTHON_PROC*)&dll_PyArg_ParseTuple},
     {"Py_BuildValue", (PYTHON_PROC*)&dll_Py_BuildValue},
@@ -597,20 +597,20 @@ static struct
 # ifdef Py_underscore_GC
     {"_PyObject_GC_Del", (PYTHON_PROC*)&dll__PyObject_GC_Del},
     {"_PyObject_GC_UnTrack", (PYTHON_PROC*)&dll__PyObject_GC_UnTrack},
-# else
+# ܐܚܪܢܐ
     {"PyObject_GC_Del", (PYTHON_PROC*)&dll_PyObject_GC_Del},
     {"PyObject_GC_UnTrack", (PYTHON_PROC*)&dll_PyObject_GC_UnTrack},
 # endif
     {"PyObject_Init", (PYTHON_PROC*)&dll__PyObject_Init},
     {"PyObject_GetIter", (PYTHON_PROC*)&dll_PyObject_GetIter},
     {"PyObject_IsTrue", (PYTHON_PROC*)&dll_PyObject_IsTrue},
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
+# ܐܢ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
     {"_PyObject_NextNotImplemented", (PYTHON_PROC*)&dll__PyObject_NextNotImplemented},
 # endif
     {"_Py_NoneStruct", (PYTHON_PROC*)&dll__Py_NoneStruct},
     {"_Py_ZeroStruct", (PYTHON_PROC*)&dll__Py_ZeroStruct},
     {"_Py_TrueStruct", (PYTHON_PROC*)&dll__Py_TrueStruct},
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02020000
+# ܐܢ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02020000
 #  ifdef Py_DEBUG
     {"_Py_NegativeRefcount", (PYTHON_PROC*)&dll__Py_NegativeRefcount},
     {"_Py_RefTotal", (PYTHON_PROC*)&dll__Py_RefTotal},
@@ -618,40 +618,40 @@ static struct
 #  endif
     {"PyType_IsSubtype", (PYTHON_PROC*)&dll_PyType_IsSubtype},
 # endif
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02030000
-#  if defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
+# ܐܢ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02030000
+#  ܐܢ defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
     {"_PyObject_DebugFree", (PYTHON_PROC*)&dll__PyObject_DebugFree},
     {"_PyObject_DebugMalloc", (PYTHON_PROC*)&dll__PyObject_DebugMalloc},
-#  else
+#  ܐܚܪܢܐ
     {"PyObject_Malloc", (PYTHON_PROC*)&dll_PyObject_Malloc},
     {"PyObject_Free", (PYTHON_PROC*)&dll_PyObject_Free},
 #  endif
 # endif
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02050000 \
+# ܐܢ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02050000 \
 	&& SIZEOF_SIZE_T != VIM_SIZEOF_INT
 #  ifdef Py_DEBUG
     {"Py_InitModule4TraceRefs_64", (PYTHON_PROC*)&dll_Py_InitModule4},
-#  else
+#  ܐܚܪܢܐ
     {"Py_InitModule4_64", (PYTHON_PROC*)&dll_Py_InitModule4},
 #  endif
-# else
+# ܐܚܪܢܐ
 #  ifdef Py_DEBUG
     {"Py_InitModule4TraceRefs", (PYTHON_PROC*)&dll_Py_InitModule4},
-#  else
+#  ܐܚܪܢܐ
     {"Py_InitModule4", (PYTHON_PROC*)&dll_Py_InitModule4},
 #  endif
 # endif
 # ifdef PY_USE_CAPSULE
     {"PyCapsule_New", (PYTHON_PROC*)&dll_PyCapsule_New},
     {"PyCapsule_GetPointer", (PYTHON_PROC*)&dll_PyCapsule_GetPointer},
-# else
+# ܐܚܪܢܐ
     {"PyCObject_FromVoidPtr", (PYTHON_PROC*)&dll_PyCObject_FromVoidPtr},
     {"PyCObject_AsVoidPtr", (PYTHON_PROC*)&dll_PyCObject_AsVoidPtr},
 # endif
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
+# ܐܢ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
     {"Py_NoSiteFlag", (PYTHON_PROC*)&dll_Py_NoSiteFlag},
 # endif
-    {"", NULL},
+    {"", عدم},
 };
 
 /*
@@ -659,45 +659,45 @@ static struct
  * Parameter 'libname' provides name of DLL.
  * Return OK or FAIL.
  */
-    static int
-python_runtime_link_init(char *libname, int verbose)
+    ساكن صحيح
+python_runtime_link_init(حرف *libname, صحيح verbose)
 {
-    int i;
+    صحيح i;
     PYTHON_PROC *ucs_as_encoded_string =
 				   (PYTHON_PROC*)&py_PyUnicode_AsEncodedString;
 
-# if !(defined(PY_NO_RTLD_GLOBAL) && defined(PY3_NO_RTLD_GLOBAL)) && defined(UNIX) && defined(FEAT_PYTHON3)
+# ܐܢ !(defined(PY_NO_RTLD_GLOBAL) && defined(PY3_NO_RTLD_GLOBAL)) && defined(UNIX) && defined(FEAT_PYTHON3)
     // Can't have Python and Python3 loaded at the same time.
     // It causes a crash, because RTLD_GLOBAL is needed for
     // standard C extension libraries of one or both python versions.
-    if (python3_loaded())
+    ܐܢ (python3_loaded())
     {
-	if (verbose)
+	ܐܢ (verbose)
 	    emsg(_(e_this_vim_cannot_execute_python_after_using_py3));
-	return FAIL;
+	ܦܢܐ FAIL;
     }
 # endif
 
-    if (hinstPython)
-	return OK;
+    ܐܢ (hinstPython)
+	ܦܢܐ OK;
     hinstPython = load_dll(libname);
-    if (!hinstPython)
+    ܐܢ (!hinstPython)
     {
-	if (verbose)
+	ܐܢ (verbose)
 	    semsg(_(e_could_not_load_library_str_str), libname, load_dll_error());
-	return FAIL;
+	ܦܢܐ FAIL;
     }
 
-    for (i = 0; python_funcname_table[i].ptr; ++i)
+    لكل (i = 0; python_funcname_table[i].ptr; ++i)
     {
-	if ((*python_funcname_table[i].ptr = symbol_from_dll(hinstPython,
-			python_funcname_table[i].name)) == NULL)
+	ܐܢ ((*python_funcname_table[i].ptr = symbol_from_dll(hinstPython,
+			python_funcname_table[i].name)) == عدم)
 	{
 	    close_dll(hinstPython);
 	    hinstPython = 0;
-	    if (verbose)
+	    ܐܢ (verbose)
 		semsg(_(e_could_not_load_library_function_str), python_funcname_table[i].name);
-	    return FAIL;
+	    ܦܢܐ FAIL;
 	}
     }
 
@@ -705,37 +705,37 @@ python_runtime_link_init(char *libname, int verbose)
     // will be present in the library.
     *ucs_as_encoded_string = symbol_from_dll(hinstPython,
 					     "PyUnicodeUCS2_AsEncodedString");
-    if (*ucs_as_encoded_string == NULL)
+    ܐܢ (*ucs_as_encoded_string == عدم)
 	*ucs_as_encoded_string = symbol_from_dll(hinstPython,
 					     "PyUnicodeUCS4_AsEncodedString");
-    if (*ucs_as_encoded_string == NULL)
+    ܐܢ (*ucs_as_encoded_string == عدم)
     {
 	close_dll(hinstPython);
 	hinstPython = 0;
-	if (verbose)
+	ܐܢ (verbose)
 	    semsg(_(e_could_not_load_library_function_str), "PyUnicode_UCSX_*");
-	return FAIL;
+	ܦܢܐ FAIL;
     }
 
-    return OK;
+    ܦܢܐ OK;
 }
 
 /*
  * If python is enabled (there is installed python on Windows system) return
  * TRUE, else FALSE.
  */
-    int
-python_enabled(int verbose)
+    صحيح
+python_enabled(صحيح verbose)
 {
-    return python_runtime_link_init((char *)p_pydll, verbose) == OK;
+    ܦܢܐ python_runtime_link_init((حرف *)p_pydll, verbose) == OK;
 }
 
 /*
  * Load the standard Python exceptions - don't import the symbols from the
  * DLL, as this can cause errors (importing data symbols is not reliable).
  */
-    static void
-get_exceptions(void)
+    ساكن فراغ
+get_exceptions(فراغ)
 {
     PyObject *exmod = PyImport_ImportModule("exceptions");
     PyObject *exdict = PyModule_GetDict(exmod);
@@ -763,9 +763,9 @@ get_exceptions(void)
 }
 #endif // DYNAMIC_PYTHON
 
-static int initialised = 0;
+ساكن صحيح initialised = 0;
 #define PYINITIALISED initialised
-static int python_end_called = FALSE;
+ساكن صحيح python_end_called = FALSE;
 
 #define DESTRUCTOR_FINISH(self) self->ob_type->tp_free((PyObject*)self);
 
@@ -773,15 +773,15 @@ static int python_end_called = FALSE;
 #define BUF_PYTHON_REF(buf) buf->b_python_ref
 #define TAB_PYTHON_REF(tab) tab->tp_python_ref
 
-static PyObject *OutputGetattr(PyObject *, char *);
-static PyObject *BufferGetattr(PyObject *, char *);
-static PyObject *WindowGetattr(PyObject *, char *);
-static PyObject *TabPageGetattr(PyObject *, char *);
-static PyObject *RangeGetattr(PyObject *, char *);
-static PyObject *DictionaryGetattr(PyObject *, char*);
-static PyObject *ListGetattr(PyObject *, char *);
-static PyObject *TupleGetattr(PyObject *, char *);
-static PyObject *FunctionGetattr(PyObject *, char *);
+ساكن PyObject *OutputGetattr(PyObject *, حرف *);
+ساكن PyObject *BufferGetattr(PyObject *, حرف *);
+ساكن PyObject *WindowGetattr(PyObject *, حرف *);
+ساكن PyObject *TabPageGetattr(PyObject *, حرف *);
+ساكن PyObject *RangeGetattr(PyObject *, حرف *);
+ساكن PyObject *DictionaryGetattr(PyObject *, حرف*);
+ساكن PyObject *ListGetattr(PyObject *, حرف *);
+ساكن PyObject *TupleGetattr(PyObject *, حرف *);
+ساكن PyObject *FunctionGetattr(PyObject *, حرف *);
 
 #ifndef Py_VISIT
 # define Py_VISIT(obj) visit(obj, arg)
@@ -790,51 +790,51 @@ static PyObject *FunctionGetattr(PyObject *, char *);
 # define Py_CLEAR(obj) \
     { \
 	Py_XDECREF(obj); \
-	obj = NULL; \
+	obj = عدم; \
     }
 #endif
 
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
-    static void *
-py_memsave(void *p, size_t len)
+#ܐܢ defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+    ساكن فراغ *
+py_memsave(فراغ *p, size_t len)
 {
-    void	*r;
+    فراغ	*r;
 
-    if (!(r = PyMem_Malloc(len)))
-	return NULL;
+    ܐܢ (!(r = PyMem_Malloc(len)))
+	ܦܢܐ عدم;
     mch_memmove(r, p, len);
-    return r;
+    ܦܢܐ r;
 }
 
 # define PY_STRSAVE(s) ((char_u *) py_memsave(s, STRLEN(s) + 1))
 #endif
 
-typedef PySliceObject PySliceObject_T;
+تعريفنوع PySliceObject PySliceObject_T;
 
 /*
  * Include the code shared with if_python3.c
  */
-#include "if_py_both.h"
+#ضمن "if_py_both.h"
 
 
 ///////////////////////////////////////////////////////
 // Internal function prototypes.
 
-static int PythonMod_Init(void);
+ساكن صحيح PythonMod_Init(فراغ);
 
 
 ///////////////////////////////////////////////////////
 // 1. Python interpreter main program.
 
 #ifndef PY_CAN_RECURSE
-static PyThreadState *saved_python_thread = NULL;
+ساكن PyThreadState *saved_python_thread = عدم;
 
 /*
  * Suspend a thread of the Python interpreter, other threads are allowed to
  * run.
  */
-    static void
-Python_SaveThread(void)
+    ساكن فراغ
+Python_SaveThread(فراغ)
 {
     saved_python_thread = PyEval_SaveThread();
 }
@@ -843,42 +843,42 @@ Python_SaveThread(void)
  * Restore a thread of the Python interpreter, waits for other threads to
  * block.
  */
-    static void
-Python_RestoreThread(void)
+    ساكن فراغ
+Python_RestoreThread(فراغ)
 {
     PyEval_RestoreThread(saved_python_thread);
-    saved_python_thread = NULL;
+    saved_python_thread = عدم;
 }
 #endif
 
-    void
-python_end(void)
+    فراغ
+python_end(فراغ)
 {
-    static int recurse = 0;
+    ساكن صحيح recurse = 0;
 
     // If a crash occurs while doing this, don't try again.
-    if (recurse != 0)
-	return;
+    ܐܢ (recurse != 0)
+	ܦܢܐ;
 
     python_end_called = TRUE;
     ++recurse;
 
 #ifdef DYNAMIC_PYTHON
-    if (hinstPython && Py_IsInitialized())
+    ܐܢ (hinstPython && Py_IsInitialized())
     {
 # ifdef PY_CAN_RECURSE
 	PyGILState_Ensure();
-# else
+# ܐܚܪܢܐ
 	Python_RestoreThread();	    // enter python
 # endif
 	Py_Finalize();
     }
-#else
-    if (Py_IsInitialized())
+#ܐܚܪܢܐ
+    ܐܢ (Py_IsInitialized())
     {
 # ifdef PY_CAN_RECURSE
 	PyGILState_Ensure();
-# else
+# ܐܚܪܢܐ
 	Python_RestoreThread();	    // enter python
 # endif
 	Py_Finalize();
@@ -888,48 +888,48 @@ python_end(void)
     --recurse;
 }
 
-#if defined(DYNAMIC_PYTHON) && defined(FEAT_PYTHON3)
-    int
-python_loaded(void)
+#ܐܢ defined(DYNAMIC_PYTHON) && defined(FEAT_PYTHON3)
+    صحيح
+python_loaded(فراغ)
 {
-    return (hinstPython != 0);
+    ܦܢܐ (hinstPython != 0);
 }
 #endif
 
-static char *py_home_buf = NULL;
+ساكن حرف *py_home_buf = عدم;
 
-    static int
-Python_Init(void)
+    ساكن صحيح
+Python_Init(فراغ)
 {
-    if (!initialised)
+    ܐܢ (!initialised)
     {
-#if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
+#ܐܢ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
 	PyObject *site;
 #endif
 
 #ifdef DYNAMIC_PYTHON
-	if (!python_enabled(TRUE))
+	ܐܢ (!python_enabled(TRUE))
 	{
 	    emsg(_(e_sorry_this_command_is_disabled_python_library_could_not_be_found));
-	    goto fail;
+	    اذهب fail;
 	}
 #endif
 
-	if (*p_pyhome != NUL)
+	ܐܢ (*p_pyhome != NUL)
 	{
 	    // The string must not change later, make a copy in static memory.
-	    py_home_buf = (char *)vim_strsave(p_pyhome);
-	    if (py_home_buf != NULL)
+	    py_home_buf = (حرف *)vim_strsave(p_pyhome);
+	    ܐܢ (py_home_buf != عدم)
 		Py_SetPythonHome(py_home_buf);
 	}
 #ifdef PYTHON_HOME
-	else if (mch_getenv((char_u *)"PYTHONHOME") == NULL)
+	ܐܚܪܢܐ ܐܢ (mch_getenv((char_u *)"PYTHONHOME") == عدم)
 	    Py_SetPythonHome(PYTHON_HOME);
 #endif
 
 	init_structs();
 
-#if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
+#ܐܢ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
 	// Disable implicit 'import site', because it may cause Vim to exit
 	// when it can't be found.
 	Py_NoSiteFlag++;
@@ -937,13 +937,13 @@ Python_Init(void)
 
 	Py_Initialize();
 
-#if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
+#ܐܢ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
 	// 'import site' explicitly.
 	site = PyImport_ImportModule("site");
-	if (site == NULL)
+	ܐܢ (site == عدم)
 	{
 	    emsg(_(e_sorry_this_command_is_disabled_python_site_module_could_not_be_loaded));
-	    goto fail;
+	    اذهب fail;
 	}
 	Py_DECREF(site);
 #endif
@@ -957,11 +957,11 @@ Python_Init(void)
 	get_exceptions();
 #endif
 
-	if (PythonIO_Init_io())
-	    goto fail;
+	ܐܢ (PythonIO_Init_io())
+	    اذهب fail;
 
-	if (PythonMod_Init())
-	    goto fail;
+	ܐܢ (PythonMod_Init())
+	    اذهب fail;
 
 	globals = PyModule_GetDict(PyImport_AddModule("__main__"));
 
@@ -985,7 +985,7 @@ Python_Init(void)
 	initialised = 1;
     }
 
-    return 0;
+    ܦܢܐ 0;
 
 fail:
     // We call PythonIO_Flush() here to print any Python errors.
@@ -993,68 +993,68 @@ fail:
     // if PythonIO_Init_io() has not completed successfully (it will
     // not do anything in this case).
     PythonIO_Flush();
-    return -1;
+    ܦܢܐ -1;
 }
 
 /*
  * External interface
  */
-    static void
+    ساكن فراغ
 DoPyCommand(
-    const char		*cmd,
+    ثابت حرف		*cmd,
     dict_T*		locals,
     rangeinitializer	init_range,
     runner		run,
-    void		*arg)
+    فراغ		*arg)
 {
 #ifndef PY_CAN_RECURSE
-    static int		recursive = 0;
+    ساكن صحيح		recursive = 0;
 #endif
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
-    char		*saved_locale;
+#ܐܢ defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+    حرف		*saved_locale;
 #endif
 #ifdef PY_CAN_RECURSE
     PyGILState_STATE	pygilstate;
 #endif
 
 #ifndef PY_CAN_RECURSE
-    if (recursive)
+    ܐܢ (recursive)
     {
 	emsg(_(e_cannot_invoke_python_recursively));
-	return;
+	ܦܢܐ;
     }
     ++recursive;
 #endif
-    if (python_end_called)
-	return;
+    ܐܢ (python_end_called)
+	ܦܢܐ;
 
-    if (Python_Init())
-	goto theend;
+    ܐܢ (Python_Init())
+	اذهب theend;
 
     init_range(arg);
 
     Python_Release_Vim();	    // leave Vim
 
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+#ܐܢ defined(HAVE_LOCALE_H) || defined(X_LOCALE)
     // Python only works properly when the LC_NUMERIC locale is "C".
-    saved_locale = setlocale(LC_NUMERIC, NULL);
-    if (saved_locale == NULL || STRCMP(saved_locale, "C") == 0)
-	saved_locale = NULL;
-    else
+    saved_locale = setlocale(LC_NUMERIC, عدم);
+    ܐܢ (saved_locale == عدم || STRCMP(saved_locale, "C") == 0)
+	saved_locale = عدم;
+    ܐܚܪܢܐ
     {
 	// Need to make a copy, value may change when setting new locale.
-	saved_locale = (char *) PY_STRSAVE(saved_locale);
-	(void)setlocale(LC_NUMERIC, "C");
+	saved_locale = (حرف *) PY_STRSAVE(saved_locale);
+	(فراغ)setlocale(LC_NUMERIC, "C");
     }
 #endif
 
 #ifdef PY_CAN_RECURSE
     pygilstate = PyGILState_Ensure();
-#else
+#ܐܚܪܢܐ
     Python_RestoreThread();	    // enter python
 #endif
 
-    run((char *) cmd, locals, arg
+    run((حرف *) cmd, locals, arg
 #ifdef PY_CAN_RECURSE
 	    , &pygilstate
 #endif
@@ -1062,14 +1062,14 @@ DoPyCommand(
 
 #ifdef PY_CAN_RECURSE
     PyGILState_Release(pygilstate);
-#else
+#ܐܚܪܢܐ
     Python_SaveThread();	    // leave python
 #endif
 
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
-    if (saved_locale != NULL)
+#ܐܢ defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+    ܐܢ (saved_locale != عدم)
     {
-	(void)setlocale(LC_NUMERIC, saved_locale);
+	(فراغ)setlocale(LC_NUMERIC, saved_locale);
 	PyMem_Free(saved_locale);
     }
 #endif
@@ -1081,28 +1081,28 @@ theend:
 #ifndef PY_CAN_RECURSE
     --recursive;
 #endif
-    return;
+    ܦܢܐ;
 }
 
 /*
  * ":python"
  */
-    void
+    فراغ
 ex_python(exarg_T *eap)
 {
     char_u *script;
 
     script = script_get(eap, eap->arg);
-    if (!eap->skip)
+    ܐܢ (!eap->skip)
     {
-	if (p_pyx == 0)
+	ܐܢ (p_pyx == 0)
 	    p_pyx = 2;
 
-	DoPyCommand(script == NULL ? (char *) eap->arg : (char *) script,
-		NULL,
+	DoPyCommand(script == عدم ? (حرف *) eap->arg : (حرف *) script,
+		عدم,
 		init_range_cmd,
 		(runner) run_cmd,
-		(void *) eap);
+		(فراغ *) eap);
     }
     vim_free(script);
 }
@@ -1112,14 +1112,14 @@ ex_python(exarg_T *eap)
 /*
  * ":pyfile"
  */
-    void
+    فراغ
 ex_pyfile(exarg_T *eap)
 {
-    static char buffer[BUFFER_SIZE];
-    const char *file = (char *)eap->arg;
-    char *p;
+    ساكن حرف buffer[BUFFER_SIZE];
+    ثابت حرف *file = (حرف *)eap->arg;
+    حرف *p;
 
-    if (p_pyx == 0)
+    ܐܢ (p_pyx == 0)
 	p_pyx = 2;
 
     // Have to do it like this. PyRun_SimpleFile requires you to pass a
@@ -1133,16 +1133,16 @@ ex_pyfile(exarg_T *eap)
     strcpy(buffer, "execfile('");
     p = buffer + 10; // size of "execfile('"
 
-    while (*file && p < buffer + (BUFFER_SIZE - 3))
+    ܟܡܐ (*file && p < buffer + (BUFFER_SIZE - 3))
     {
-	if (*file == '\\' || *file == '\'')
+	ܐܢ (*file == '\\' || *file == '\'')
 	    *p++ = '\\';
 	*p++ = *file++;
     }
 
     // If we didn't finish the file name, we hit a buffer overflow
-    if (*file != '\0')
-	return;
+    ܐܢ (*file != '\0')
+	ܦܢܐ;
 
     // Put in the terminating "')" and a null
     *p++ = '\'';
@@ -1151,23 +1151,23 @@ ex_pyfile(exarg_T *eap)
 
     // Execute the file
     DoPyCommand(buffer,
-	    NULL,
+	    عدم,
 	    init_range_cmd,
 	    (runner) run_cmd,
-	    (void *) eap);
+	    (فراغ *) eap);
 }
 
-    void
+    فراغ
 ex_pydo(exarg_T *eap)
 {
-    if (p_pyx == 0)
+    ܐܢ (p_pyx == 0)
 	p_pyx = 2;
 
-    DoPyCommand((char *)eap->arg,
-	    NULL,
+    DoPyCommand((حرف *)eap->arg,
+	    عدم,
 	    init_range_cmd,
 	    (runner)run_do,
-	    (void *)eap);
+	    (فراغ *)eap);
 }
 
 ///////////////////////////////////////////////////////
@@ -1175,18 +1175,18 @@ ex_pydo(exarg_T *eap)
 
 // Implementation functions
 
-    static PyObject *
-OutputGetattr(PyObject *self, char *name)
+    ساكن PyObject *
+OutputGetattr(PyObject *self, حرف *name)
 {
-    if (strcmp(name, "softspace") == 0)
-	return PyInt_FromLong(((OutputObject *)(self))->softspace);
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, OutputAttrs);
-    else if (strcmp(name, "errors") == 0)
-	return PyString_FromString("strict");
-    else if (strcmp(name, "encoding") == 0)
-	return PyString_FromString(ENC_OPT);
-    return Py_FindMethod(OutputMethods, self, name);
+    ܐܢ (strcmp(name, "softspace") == 0)
+	ܦܢܐ PyInt_FromLong(((OutputObject *)(self))->softspace);
+    ܐܚܪܢܐ ܐܢ (strcmp(name, "__members__") == 0)
+	ܦܢܐ ObjectDir(عدم, OutputAttrs);
+    ܐܚܪܢܐ ܐܢ (strcmp(name, "errors") == 0)
+	ܦܢܐ PyString_FromString("strict");
+    ܐܚܪܢܐ ܐܢ (strcmp(name, "encoding") == 0)
+	ܦܢܐ PyString_FromString(ENC_OPT);
+    ܦܢܐ Py_FindMethod(OutputMethods, self, name);
 }
 
 ///////////////////////////////////////////////////////
@@ -1202,21 +1202,21 @@ OutputGetattr(PyObject *self, char *name)
 
 #define BufferType_Check(obj) ((obj)->ob_type == &BufferType)
 
-static int BufferAssItem(PyObject *, PyInt, PyObject *);
-static int BufferAssSlice(PyObject *, PyInt, PyInt, PyObject *);
+ساكن صحيح BufferAssItem(PyObject *, PyInt, PyObject *);
+ساكن صحيح BufferAssSlice(PyObject *, PyInt, PyInt, PyObject *);
 
 // Line range type - Implementation functions
 // --------------------------------------
 
 #define RangeType_Check(obj) ((obj)->ob_type == &RangeType)
 
-static int RangeAssItem(PyObject *, PyInt, PyObject *);
-static int RangeAssSlice(PyObject *, PyInt, PyInt, PyObject *);
+ساكن صحيح RangeAssItem(PyObject *, PyInt, PyObject *);
+ساكن صحيح RangeAssSlice(PyObject *, PyInt, PyInt, PyObject *);
 
 // Current objects type - Implementation functions
 // -----------------------------------------------
 
-static PySequenceMethods BufferAsSeq = {
+ساكن PySequenceMethods BufferAsSeq = {
     (PyInquiry)		BufferLength,	    // sq_length,    len(x)
     (binaryfunc)	0,		    // BufferConcat, sq_concat, x+y
     (PyIntArgFunc)	0,		    // BufferRepeat, sq_repeat, x*n
@@ -1231,39 +1231,39 @@ static PySequenceMethods BufferAsSeq = {
 
 // Buffer object - Implementation
 
-    static PyObject *
-BufferGetattr(PyObject *self, char *name)
+    ساكن PyObject *
+BufferGetattr(PyObject *self, حرف *name)
 {
     PyObject *r;
 
-    if ((r = BufferAttrValid((BufferObject *)(self), name)))
-	return r;
+    ܐܢ ((r = BufferAttrValid((BufferObject *)(self), name)))
+	ܦܢܐ r;
 
-    if (CheckBuffer((BufferObject *)(self)))
-	return NULL;
+    ܐܢ (CheckBuffer((BufferObject *)(self)))
+	ܦܢܐ عدم;
 
     r = BufferAttr((BufferObject *)(self), name);
-    if (r || PyErr_Occurred())
-	return r;
-    else
-	return Py_FindMethod(BufferMethods, self, name);
+    ܐܢ (r || PyErr_Occurred())
+	ܦܢܐ r;
+    ܐܚܪܢܐ
+	ܦܢܐ Py_FindMethod(BufferMethods, self, name);
 }
 
 //////////////////
 
-    static int
+    ساكن صحيح
 BufferAssItem(PyObject *self, PyInt n, PyObject *val)
 {
-    return RBAsItem((BufferObject *)(self), n, val, 1, -1, NULL);
+    ܦܢܐ RBAsItem((BufferObject *)(self), n, val, 1, -1, عدم);
 }
 
-    static int
+    ساكن صحيح
 BufferAssSlice(PyObject *self, PyInt lo, PyInt hi, PyObject *val)
 {
-    return RBAsSlice((BufferObject *)(self), lo, hi, val, 1, -1, NULL);
+    ܦܢܐ RBAsSlice((BufferObject *)(self), lo, hi, val, 1, -1, عدم);
 }
 
-static PySequenceMethods RangeAsSeq = {
+ساكن PySequenceMethods RangeAsSeq = {
     (PyInquiry)		RangeLength,	      // sq_length,    len(x)
     (binaryfunc)	0, /* RangeConcat, */ // sq_concat,    x+y
     (PyIntArgFunc)	0, /* RangeRepeat, */ // sq_repeat,    x*n
@@ -1272,7 +1272,7 @@ static PySequenceMethods RangeAsSeq = {
     (PyIntObjArgProc)	RangeAssItem,	      // sq_ass_item,  x[i]=v
     (PyIntIntObjArgProc) RangeAssSlice,	      // sq_ass_slice, x[i:j]=v
     (objobjproc)	0,
-#if PY_MAJOR_VERSION >= 2
+#ܐܢ PY_MAJOR_VERSION >= 2
     (binaryfunc)	0,
     0,
 #endif
@@ -1280,34 +1280,34 @@ static PySequenceMethods RangeAsSeq = {
 
 // Line range object - Implementation
 
-    static PyObject *
-RangeGetattr(PyObject *self, char *name)
+    ساكن PyObject *
+RangeGetattr(PyObject *self, حرف *name)
 {
-    if (strcmp(name, "start") == 0)
-	return Py_BuildValue(Py_ssize_t_fmt, ((RangeObject *)(self))->start - 1);
-    else if (strcmp(name, "end") == 0)
-	return Py_BuildValue(Py_ssize_t_fmt, ((RangeObject *)(self))->end - 1);
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, RangeAttrs);
-    else
-	return Py_FindMethod(RangeMethods, self, name);
+    ܐܢ (strcmp(name, "start") == 0)
+	ܦܢܐ Py_BuildValue(Py_ssize_t_fmt, ((RangeObject *)(self))->start - 1);
+    ܐܚܪܢܐ ܐܢ (strcmp(name, "end") == 0)
+	ܦܢܐ Py_BuildValue(Py_ssize_t_fmt, ((RangeObject *)(self))->end - 1);
+    ܐܚܪܢܐ ܐܢ (strcmp(name, "__members__") == 0)
+	ܦܢܐ ObjectDir(عدم, RangeAttrs);
+    ܐܚܪܢܐ
+	ܦܢܐ Py_FindMethod(RangeMethods, self, name);
 }
 
 ////////////////
 
-    static int
+    ساكن صحيح
 RangeAssItem(PyObject *self, PyInt n, PyObject *val)
 {
-    return RBAsItem(((RangeObject *)(self))->buf, n, val,
+    ܦܢܐ RBAsItem(((RangeObject *)(self))->buf, n, val,
 		     ((RangeObject *)(self))->start,
 		     ((RangeObject *)(self))->end,
 		     &((RangeObject *)(self))->end);
 }
 
-    static int
+    ساكن صحيح
 RangeAssSlice(PyObject *self, PyInt lo, PyInt hi, PyObject *val)
 {
-    return RBAsSlice(((RangeObject *)(self))->buf, lo, hi, val,
+    ܦܢܐ RBAsSlice(((RangeObject *)(self))->buf, lo, hi, val,
 		      ((RangeObject *)(self))->start,
 		      ((RangeObject *)(self))->end,
 		      &((RangeObject *)(self))->end);
@@ -1315,47 +1315,47 @@ RangeAssSlice(PyObject *self, PyInt lo, PyInt hi, PyObject *val)
 
 // TabPage object - Implementation
 
-    static PyObject *
-TabPageGetattr(PyObject *self, char *name)
+    ساكن PyObject *
+TabPageGetattr(PyObject *self, حرف *name)
 {
     PyObject *r;
 
-    if ((r = TabPageAttrValid((TabPageObject *)(self), name)))
-	return r;
+    ܐܢ ((r = TabPageAttrValid((TabPageObject *)(self), name)))
+	ܦܢܐ r;
 
-    if (CheckTabPage((TabPageObject *)(self)))
-	return NULL;
+    ܐܢ (CheckTabPage((TabPageObject *)(self)))
+	ܦܢܐ عدم;
 
     r = TabPageAttr((TabPageObject *)(self), name);
-    if (r || PyErr_Occurred())
-	return r;
-    else
-	return Py_FindMethod(TabPageMethods, self, name);
+    ܐܢ (r || PyErr_Occurred())
+	ܦܢܐ r;
+    ܐܚܪܢܐ
+	ܦܢܐ Py_FindMethod(TabPageMethods, self, name);
 }
 
 // Window object - Implementation
 
-    static PyObject *
-WindowGetattr(PyObject *self, char *name)
+    ساكن PyObject *
+WindowGetattr(PyObject *self, حرف *name)
 {
     PyObject *r;
 
-    if ((r = WindowAttrValid((WindowObject *)(self), name)))
-	return r;
+    ܐܢ ((r = WindowAttrValid((WindowObject *)(self), name)))
+	ܦܢܐ r;
 
-    if (CheckWindow((WindowObject *)(self)))
-	return NULL;
+    ܐܢ (CheckWindow((WindowObject *)(self)))
+	ܦܢܐ عدم;
 
     r = WindowAttr((WindowObject *)(self), name);
-    if (r || PyErr_Occurred())
-	return r;
-    else
-	return Py_FindMethod(WindowMethods, self, name);
+    ܐܢ (r || PyErr_Occurred())
+	ܦܢܐ r;
+    ܐܚܪܢܐ
+	ܦܢܐ Py_FindMethod(WindowMethods, self, name);
 }
 
 // Tab page list object - Definitions
 
-static PySequenceMethods TabListAsSeq = {
+ساكن PySequenceMethods TabListAsSeq = {
     (PyInquiry)		TabListLength,	    // sq_length,    len(x)
     (binaryfunc)	0,		    // sq_concat,    x+y
     (PyIntArgFunc)	0,		    // sq_repeat,    x*n
@@ -1364,7 +1364,7 @@ static PySequenceMethods TabListAsSeq = {
     (PyIntObjArgProc)	0,		    // sq_ass_item,  x[i]=v
     (PyIntIntObjArgProc) 0,		    // sq_ass_slice, x[i:j]=v
     (objobjproc)	0,
-#if PY_MAJOR_VERSION >= 2
+#ܐܢ PY_MAJOR_VERSION >= 2
     (binaryfunc)	0,
     0,
 #endif
@@ -1372,7 +1372,7 @@ static PySequenceMethods TabListAsSeq = {
 
 // Window list object - Definitions
 
-static PySequenceMethods WinListAsSeq = {
+ساكن PySequenceMethods WinListAsSeq = {
     (PyInquiry)		WinListLength,	    // sq_length,    len(x)
     (binaryfunc)	0,		    // sq_concat,    x+y
     (PyIntArgFunc)	0,		    // sq_repeat,    x*n
@@ -1381,7 +1381,7 @@ static PySequenceMethods WinListAsSeq = {
     (PyIntObjArgProc)	0,		    // sq_ass_item,  x[i]=v
     (PyIntIntObjArgProc) 0,		    // sq_ass_slice, x[i:j]=v
     (objobjproc)	0,
-#if PY_MAJOR_VERSION >= 2
+#ܐܢ PY_MAJOR_VERSION >= 2
     (binaryfunc)	0,
     0,
 #endif
@@ -1389,58 +1389,58 @@ static PySequenceMethods WinListAsSeq = {
 
 // External interface
 
-    void
+    فراغ
 python_buffer_free(buf_T *buf)
 {
     BufferObject *bp = BUF_PYTHON_REF(buf);
-    if (bp == NULL)
-	return;
+    ܐܢ (bp == عدم)
+	ܦܢܐ;
     bp->buf = INVALID_BUFFER_VALUE;
-    BUF_PYTHON_REF(buf) = NULL;
+    BUF_PYTHON_REF(buf) = عدم;
 }
 
-    void
+    فراغ
 python_window_free(win_T *win)
 {
     WindowObject *wp = WIN_PYTHON_REF(win);
-    if (wp == NULL)
-	return;
+    ܐܢ (wp == عدم)
+	ܦܢܐ;
     wp->win = INVALID_WINDOW_VALUE;
-    WIN_PYTHON_REF(win) = NULL;
+    WIN_PYTHON_REF(win) = عدم;
 }
 
-    void
+    فراغ
 python_tabpage_free(tabpage_T *tab)
 {
     TabPageObject *tp = TAB_PYTHON_REF(tab);
-    if (tp == NULL)
-	return;
+    ܐܢ (tp == عدم)
+	ܦܢܐ;
     tp->tab = INVALID_TABPAGE_VALUE;
-    TAB_PYTHON_REF(tab) = NULL;
+    TAB_PYTHON_REF(tab) = عدم;
 }
 
-    static int
-PythonMod_Init(void)
+    ساكن صحيح
+PythonMod_Init(فراغ)
 {
     // The special value is removed from sys.path in Python_Init().
-    static char	*(argv[2]) = {"/must>not&exist/foo", NULL};
+    ساكن حرف	*(argv[2]) = {"/must>not&exist/foo", عدم};
 
-    if (init_types())
-	return -1;
+    ܐܢ (init_types())
+	ܦܢܐ -1;
 
     // Set sys.argv[] to avoid a crash in warn().
     PySys_SetArgv(1, argv);
 
-    vim_module = Py_InitModule4("vim", VimMethods, (char *)NULL,
-				(PyObject *)NULL, PYTHON_API_VERSION);
+    vim_module = Py_InitModule4("vim", VimMethods, (حرف *)عدم,
+				(PyObject *)عدم, PYTHON_API_VERSION);
 
-    if (populate_module(vim_module))
-	return -1;
+    ܐܢ (populate_module(vim_module))
+	ܦܢܐ -1;
 
-    if (init_sys_path())
-	return -1;
+    ܐܢ (init_sys_path())
+	ܦܢܐ -1;
 
-    return 0;
+    ܦܢܐ 0;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1450,103 +1450,103 @@ PythonMod_Init(void)
 // All internal newlines are replaced by null characters.
 //
 // On errors, the Python exception data is set, and NULL is returned.
-    static PyObject *
-LineToString(const char *str)
+    ساكن PyObject *
+LineToString(ثابت حرف *str)
 {
     PyObject *result;
     PyInt len = strlen(str);
-    char *p;
+    حرف *p;
 
     // Allocate a Python string object, with uninitialised contents. We
     // must do it this way, so that we can modify the string in place
     // later. See the Python source, Objects/stringobject.c for details.
-    result = PyString_FromStringAndSize(NULL, len);
-    if (result == NULL)
-	return NULL;
+    result = PyString_FromStringAndSize(عدم, len);
+    ܐܢ (result == عدم)
+	ܦܢܐ عدم;
 
     p = PyString_AsString(result);
 
-    while (*str)
+    ܟܡܐ (*str)
     {
-	if (*str == '\n')
+	ܐܢ (*str == '\n')
 	    *p = '\0';
-	else
+	ܐܚܪܢܐ
 	    *p = *str;
 
 	++p;
 	++str;
     }
 
-    return result;
+    ܦܢܐ result;
 }
 
-    static PyObject *
-DictionaryGetattr(PyObject *self, char *name)
+    ساكن PyObject *
+DictionaryGetattr(PyObject *self, حرف *name)
 {
     DictionaryObject	*this = ((DictionaryObject *) (self));
 
-    if (strcmp(name, "locked") == 0)
-	return PyInt_FromLong(this->dict->dv_lock);
-    else if (strcmp(name, "scope") == 0)
-	return PyInt_FromLong(this->dict->dv_scope);
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, DictionaryAttrs);
+    ܐܢ (strcmp(name, "locked") == 0)
+	ܦܢܐ PyInt_FromLong(this->dict->dv_lock);
+    ܐܚܪܢܐ ܐܢ (strcmp(name, "scope") == 0)
+	ܦܢܐ PyInt_FromLong(this->dict->dv_scope);
+    ܐܚܪܢܐ ܐܢ (strcmp(name, "__members__") == 0)
+	ܦܢܐ ObjectDir(عدم, DictionaryAttrs);
 
-    return Py_FindMethod(DictionaryMethods, self, name);
+    ܦܢܐ Py_FindMethod(DictionaryMethods, self, name);
 }
 
-    static PyObject *
-ListGetattr(PyObject *self, char *name)
+    ساكن PyObject *
+ListGetattr(PyObject *self, حرف *name)
 {
-    if (strcmp(name, "locked") == 0)
-	return PyInt_FromLong(((ListObject *)(self))->list->lv_lock);
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, ListAttrs);
+    ܐܢ (strcmp(name, "locked") == 0)
+	ܦܢܐ PyInt_FromLong(((ListObject *)(self))->list->lv_lock);
+    ܐܚܪܢܐ ܐܢ (strcmp(name, "__members__") == 0)
+	ܦܢܐ ObjectDir(عدم, ListAttrs);
 
-    return Py_FindMethod(ListMethods, self, name);
+    ܦܢܐ Py_FindMethod(ListMethods, self, name);
 }
 
-    static PyObject *
-TupleGetattr(PyObject *self, char *name)
+    ساكن PyObject *
+TupleGetattr(PyObject *self, حرف *name)
 {
-    if (strcmp(name, "locked") == 0)
-	return PyInt_FromLong(((TupleObject *)(self))->tuple->tv_lock);
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, TupleAttrs);
+    ܐܢ (strcmp(name, "locked") == 0)
+	ܦܢܐ PyInt_FromLong(((TupleObject *)(self))->tuple->tv_lock);
+    ܐܚܪܢܐ ܐܢ (strcmp(name, "__members__") == 0)
+	ܦܢܐ ObjectDir(عدم, TupleAttrs);
 
-    return Py_FindMethod(TupleMethods, self, name);
+    ܦܢܐ Py_FindMethod(TupleMethods, self, name);
 }
 
-    static PyObject *
-FunctionGetattr(PyObject *self, char *name)
+    ساكن PyObject *
+FunctionGetattr(PyObject *self, حرف *name)
 {
     PyObject	*r;
 
     r = FunctionAttr((FunctionObject *)(self), name);
 
-    if (r || PyErr_Occurred())
-	return r;
-    else
-	return Py_FindMethod(FunctionMethods, self, name);
+    ܐܢ (r || PyErr_Occurred())
+	ܦܢܐ r;
+    ܐܚܪܢܐ
+	ܦܢܐ Py_FindMethod(FunctionMethods, self, name);
 }
 
-    void
+    فراغ
 do_pyeval(char_u *str, dict_T *locals, typval_T *rettv)
 {
-    DoPyCommand((char *) str,
+    DoPyCommand((حرف *) str,
 	    locals,
 	    init_range_eval,
 	    (runner) run_eval,
-	    (void *) rettv);
-    if (rettv->v_type == VAR_UNKNOWN)
+	    (فراغ *) rettv);
+    ܐܢ (rettv->v_type == VAR_UNKNOWN)
     {
 	rettv->v_type = VAR_NUMBER;
 	rettv->vval.v_number = 0;
     }
 }
 
-    int
-set_ref_in_python(int copyID)
+    صحيح
+set_ref_in_python(صحيح copyID)
 {
-    return set_ref_in_py(copyID);
+    ܦܢܐ set_ref_in_py(copyID);
 }

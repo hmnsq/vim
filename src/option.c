@@ -36,42 +36,42 @@
  */
 
 #define IN_OPTION_C
-#include "vim.h"
-#include "optiondefs.h"
+#ضمن "vim.h"
+#ضمن "optiondefs.h"
 
-static void set_options_default(int opt_flags);
-static void set_string_default_esc(char *name, char_u *val, int escape);
-static char_u *find_dup_item(char_u *origval, char_u *newval, size_t newvallen, long_u flags);
-static char_u *option_expand(int opt_idx, char_u *val);
-static void didset_options(void);
-static void didset_options2(void);
-#if defined(FEAT_EVAL)
-static long_u *insecure_flag(win_T *wp, int opt_idx, int opt_flags);
-#else
+ساكن فراغ set_options_default(صحيح opt_flags);
+ساكن فراغ set_string_default_esc(حرف *name, char_u *val, صحيح escape);
+ساكن char_u *find_dup_item(char_u *origval, char_u *newval, size_t newvallen, long_u flags);
+ساكن char_u *option_expand(صحيح opt_idx, char_u *val);
+ساكن فراغ didset_options(فراغ);
+ساكن فراغ didset_options2(فراغ);
+#ܐܢ defined(FEAT_EVAL)
+ساكن long_u *insecure_flag(win_T *wp, صحيح opt_idx, صحيح opt_flags);
+#ܐܚܪܢܐ
 # define insecure_flag(wp, opt_idx, opt_flags) (&options[opt_idx].flags)
 #endif
-static char *set_bool_option(int opt_idx, char_u *varp, int value, int opt_flags);
-static char *set_num_option(int opt_idx, char_u *varp, long value, char *errbuf, size_t errbuflen, int opt_flags);
-static int find_key_option(char_u *arg_arg, int has_lt);
-static void showoptions(int all, int opt_flags);
-static int optval_default(struct vimoption *, char_u *varp, int compatible);
-static void showoneopt(struct vimoption *, int opt_flags);
-static int put_setstring(FILE *fd, bool legacy, char *cmd, char *name, char_u **valuep, long_u flags);
-static int put_setnum(FILE *fd, char *cmd, char *name, long *valuep);
-static int put_setbool(FILE *fd, char *cmd, char *name, int value);
-static int istermoption(struct vimoption *p);
-static int istermoption_idx(int opt_idx);
-static char_u *get_varp_scope(struct vimoption *p, int scope);
-static char_u *get_varp(struct vimoption *);
-static void check_win_options(win_T *win);
-static void option_value2string(struct vimoption *, int scope);
-static void check_winopt(winopt_T *wop);
-static int wc_use_keyname(char_u *varp, long *wcp);
-static void compatible_set(void);
+ساكن حرف *set_bool_option(صحيح opt_idx, char_u *varp, صحيح value, صحيح opt_flags);
+ساكن حرف *set_num_option(صحيح opt_idx, char_u *varp, long value, حرف *errbuf, size_t errbuflen, صحيح opt_flags);
+ساكن صحيح find_key_option(char_u *arg_arg, صحيح has_lt);
+ساكن فراغ showoptions(صحيح all, صحيح opt_flags);
+ساكن صحيح optval_default(بنية vimoption *, char_u *varp, صحيح compatible);
+ساكن فراغ showoneopt(بنية vimoption *, صحيح opt_flags);
+ساكن صحيح put_setstring(FILE *fd, bool legacy, حرف *cmd, حرف *name, char_u **valuep, long_u flags);
+ساكن صحيح put_setnum(FILE *fd, حرف *cmd, حرف *name, long *valuep);
+ساكن صحيح put_setbool(FILE *fd, حرف *cmd, حرف *name, صحيح value);
+ساكن صحيح istermoption(بنية vimoption *p);
+ساكن صحيح istermoption_idx(صحيح opt_idx);
+ساكن char_u *get_varp_scope(بنية vimoption *p, صحيح scope);
+ساكن char_u *get_varp(بنية vimoption *);
+ساكن فراغ check_win_options(win_T *win);
+ساكن فراغ option_value2string(بنية vimoption *, صحيح scope);
+ساكن فراغ check_winopt(winopt_T *wop);
+ساكن صحيح wc_use_keyname(char_u *varp, long *wcp);
+ساكن فراغ compatible_set(فراغ);
 
-#if defined(FEAT_EVAL)
-static char *(p_bin_dep_opts[])    = {"textwidth", "wrapmargin", "modeline", "expandtab", NULL};
-static char *(p_paste_dep_opts[])  = {"autoindent", "expandtab", "ruler", "showmatch", "smarttab",
+#ܐܢ defined(FEAT_EVAL)
+ساكن حرف *(p_bin_dep_opts[])    = {"textwidth", "wrapmargin", "modeline", "expandtab", عدم};
+ساكن حرف *(p_paste_dep_opts[])  = {"autoindent", "expandtab", "ruler", "showmatch", "smarttab",
     "softtabstop", "textwidth", "wrapmargin",
 # ifdef FEAT_RIGHTLEFT
     "hkmap", "revins",
@@ -79,48 +79,48 @@ static char *(p_paste_dep_opts[])  = {"autoindent", "expandtab", "ruler", "showm
 # ifdef FEAT_VARTABS
     "varsofttabstop",
 # endif
-    NULL};
-static void didset_options_sctx(int opt_flags, char **buf);
+    عدم};
+ساكن فراغ didset_options_sctx(صحيح opt_flags, حرف **buf);
 #endif
 
 
 /*
  * Initialize the 'shell' option to a default value.
  */
-    static void
-set_init_default_shell(void)
+    ساكن فراغ
+set_init_default_shell(فراغ)
 {
     char_u	*p;
 
     // Find default value for 'shell' option.
     // Don't use it if it is empty.
-    if (((p = mch_getenv((char_u *)"SHELL")) != NULL && *p != NUL)
-#if defined(MSWIN)
-	    || ((p = mch_getenv((char_u *)"COMSPEC")) != NULL && *p != NUL)
-	    || ((p = (char_u *)default_shell()) != NULL && *p != NUL)
+    ܐܢ (((p = mch_getenv((char_u *)"SHELL")) != عدم && *p != NUL)
+#ܐܢ defined(MSWIN)
+	    || ((p = mch_getenv((char_u *)"COMSPEC")) != عدم && *p != NUL)
+	    || ((p = (char_u *)default_shell()) != عدم && *p != NUL)
 #endif
 	    )
-#if defined(MSWIN)
+#ܐܢ defined(MSWIN)
     {
 	// For MS-Windows put the path in quotes instead of escaping spaces.
 	char_u	    *cmd;
 	size_t	    len;
 
-	if (vim_strchr(p, ' ') != NULL)
+	ܐܢ (vim_strchr(p, ' ') != عدم)
 	{
 	    len = STRLEN(p) + 3;  // two quotes and a trailing NUL
 	    cmd = alloc(len);
-	    if (cmd != NULL)
+	    ܐܢ (cmd != عدم)
 	    {
-		vim_snprintf((char *)cmd, len, "\"%s\"", p);
+		vim_snprintf((حرف *)cmd, len, "\"%s\"", p);
 		set_string_default("sh", cmd);
 		vim_free(cmd);
 	    }
 	}
-	else
+	ܐܚܪܢܐ
 	    set_string_default("sh", p);
     }
-#else
+#ܐܚܪܢܐ
 	set_string_default_esc("sh", p, TRUE);
 #endif
 }
@@ -129,55 +129,55 @@ set_init_default_shell(void)
  * Set the default for 'backupskip' to include environment variables for
  * temp files.
  */
-    static void
-set_init_default_backupskip(void)
+    ساكن فراغ
+set_init_default_backupskip(فراغ)
 {
-    int		opt_idx;
-    int		i;
+    صحيح		opt_idx;
+    صحيح		i;
     char_u	*p;
-    int		plen;
+    صحيح		plen;
 #ifdef UNIX
-    static char	*(names[4]) = {"", "TMPDIR", "TEMP", "TMP"};
-#else
-    static char	*(names[3]) = {"TMPDIR", "TEMP", "TMP"};
+    ساكن حرف	*(names[4]) = {"", "TMPDIR", "TEMP", "TMP"};
+#ܐܚܪܢܐ
+    ساكن حرف	*(names[3]) = {"TMPDIR", "TEMP", "TMP"};
 #endif
     garray_T	ga;
 
     opt_idx = findoption((char_u *)"backupskip");
 
     ga_init2(&ga, 1, 100);
-    for (i = 0; i < (int)ARRAY_LENGTH(names); ++i)
+    لكل (i = 0; i < (صحيح)ARRAY_LENGTH(names); ++i)
     {
-	int		mustfree = FALSE;
+	صحيح		mustfree = FALSE;
 #ifdef UNIX
-	if (*names[i] == NUL)
+	ܐܢ (*names[i] == NUL)
 	{
 # ifdef MACOS_X
 	    p = (char_u *)"/private/tmp";
-	    plen = (int)STRLEN_LITERAL("/private/tmp");
-# else
+	    plen = (صحيح)STRLEN_LITERAL("/private/tmp");
+# ܐܚܪܢܐ
 	    p = (char_u *)"/tmp";
-	    plen = (int)STRLEN_LITERAL("/tmp");
+	    plen = (صحيح)STRLEN_LITERAL("/tmp");
 # endif
 	}
-	else
+	ܐܚܪܢܐ
 #endif
 	{
 	    p = vim_getenv((char_u *)names[i], &mustfree);
 	    plen = 0;	    // will be calculated below
 	}
-	if (p != NULL && *p != NUL)
+	ܐܢ (p != عدم && *p != NUL)
 	{
 	    char_u  *item;
 	    size_t  itemsize;
-	    int	    has_trailing_path_sep = FALSE;
+	    صحيح	    has_trailing_path_sep = FALSE;
 
-	    if (plen == 0)
+	    ܐܢ (plen == 0)
 	    {
 		// the value was retrieved from the environment
-		plen = (int)STRLEN(p);
+		plen = (صحيح)STRLEN(p);
 		// does the value include a trailing path separator?
-		if (after_pathsep(p, p + plen))
+		ܐܢ (after_pathsep(p, p + plen))
 		    has_trailing_path_sep = TRUE;
 	    }
 
@@ -185,28 +185,28 @@ set_init_default_backupskip(void)
 	    // note: the value (and therefore plen) may already include a path separator
 	    itemsize = plen + (has_trailing_path_sep ? 0 : 1) + 2;
 	    item = alloc(itemsize);
-	    if (item != NULL)
+	    ܐܢ (item != عدم)
 	    {
 		// add a preceding comma as a separator after the first item
 		size_t	itemseplen = (ga.ga_len == 0) ? 0 : 1;
 		size_t	itemlen;
 
-		itemlen = vim_snprintf((char *)item, itemsize, "%s%s*", p, (has_trailing_path_sep) ? "" : PATHSEPSTR);
+		itemlen = vim_snprintf((حرف *)item, itemsize, "%s%s*", p, (has_trailing_path_sep) ? "" : PATHSEPSTR);
 
-		if (find_dup_item(ga.ga_data, item, itemlen, options[opt_idx].flags) == NULL
-			&& ga_grow(&ga, (int)(itemseplen + itemlen + 1)) == OK)
+		ܐܢ (find_dup_item(ga.ga_data, item, itemlen, options[opt_idx].flags) == عدم
+			&& ga_grow(&ga, (صحيح)(itemseplen + itemlen + 1)) == OK)
 		{
-		    ga.ga_len += vim_snprintf((char *)ga.ga_data + ga.ga_len,
+		    ga.ga_len += vim_snprintf((حرف *)ga.ga_data + ga.ga_len,
 				    itemseplen + itemlen + 1,
 				    "%s%s", (itemseplen > 0) ? "," : "", item);
 		}
 		vim_free(item);
 	    }
 	}
-	if (mustfree)
+	ܐܢ (mustfree)
 	    vim_free(p);
     }
-    if (ga.ga_data != NULL)
+    ܐܢ (ga.ga_data != عدم)
     {
 	set_string_default("bsk", ga.ga_data);
 	vim_free(ga.ga_data);
@@ -217,35 +217,35 @@ set_init_default_backupskip(void)
  * Initialize the 'maxmemtot' and 'maxmem' options to a default value.
  * 'maxmemtot' and 'maxmem' may have to be adjusted for available memory.
  */
-    static void
-set_init_default_maxmemtot(void)
+    ساكن فراغ
+set_init_default_maxmemtot(فراغ)
 {
-    int		opt_idx;
+    صحيح		opt_idx;
     long_u	n;
 
     opt_idx = findoption((char_u *)"maxmemtot");
-    if (opt_idx < 0)
-	return;
+    ܐܢ (opt_idx < 0)
+	ܦܢܐ;
 
-#if !defined(HAVE_AVAIL_MEM) && !defined(HAVE_TOTAL_MEM)
-    if (options[opt_idx].def_val[VI_DEFAULT] == (char_u *)0L)
+#ܐܢ !defined(HAVE_AVAIL_MEM) && !defined(HAVE_TOTAL_MEM)
+    ܐܢ (options[opt_idx].def_val[VI_DEFAULT] == (char_u *)0L)
 #endif
     {
-#if defined(HAVE_AVAIL_MEM)
+#ܐܢ defined(HAVE_AVAIL_MEM)
 	// Use amount of memory available at this moment.
 	n = (mch_avail_mem(FALSE) >> 1);
-#elif defined(HAVE_TOTAL_MEM)
+#وإلاإذا defined(HAVE_TOTAL_MEM)
 	// Use amount of memory available to Vim.
 	n = (mch_total_mem(FALSE) >> 1);
-#else
+#ܐܚܪܢܐ
 	n = (0x7fffffff >> 11);
 #endif
 	options[opt_idx].def_val[VI_DEFAULT] = (char_u *)n;
 	opt_idx = findoption((char_u *)"maxmem");
-	if (opt_idx >= 0)
+	ܐܢ (opt_idx >= 0)
 	{
-#if !defined(HAVE_AVAIL_MEM) && !defined(HAVE_TOTAL_MEM)
-	    if ((long)(long_i)options[opt_idx].def_val[VI_DEFAULT] > (long)n
+#ܐܢ !defined(HAVE_AVAIL_MEM) && !defined(HAVE_TOTAL_MEM)
+	    ܐܢ ((long)(long_i)options[opt_idx].def_val[VI_DEFAULT] > (long)n
 		    || (long)(long_i)options[opt_idx].def_val[VI_DEFAULT] == 0L)
 #endif
 		options[opt_idx].def_val[VI_DEFAULT] = (char_u *)n;
@@ -256,88 +256,88 @@ set_init_default_maxmemtot(void)
 /*
  * Initialize the 'cdpath' option to a default value.
  */
-    static void
-set_init_default_cdpath(void)
+    ساكن فراغ
+set_init_default_cdpath(فراغ)
 {
-    int		opt_idx;
+    صحيح		opt_idx;
     char_u	*cdpath;
     char_u	*buf;
-    int	i;
-    int	j;
-    int	mustfree = FALSE;
+    صحيح	i;
+    صحيح	j;
+    صحيح	mustfree = FALSE;
 
     cdpath = vim_getenv((char_u *)"CDPATH", &mustfree);
-    if (cdpath == NULL)
-	return;
+    ܐܢ (cdpath == عدم)
+	ܦܢܐ;
 
     buf = alloc((STRLEN(cdpath) << 1) + 2);
-    if (buf != NULL)
+    ܐܢ (buf != عدم)
     {
 	buf[0] = ',';	    // start with ",", current dir first
 	j = 1;
-	for (i = 0; cdpath[i] != NUL; ++i)
+	لكل (i = 0; cdpath[i] != NUL; ++i)
 	{
-	    if (vim_ispathlistsep(cdpath[i]))
+	    ܐܢ (vim_ispathlistsep(cdpath[i]))
 		buf[j++] = ',';
-	    else
+	    ܐܚܪܢܐ
 	    {
-		if (cdpath[i] == ' ' || cdpath[i] == ',')
+		ܐܢ (cdpath[i] == ' ' || cdpath[i] == ',')
 		    buf[j++] = '\\';
 		buf[j++] = cdpath[i];
 	    }
 	}
 	buf[j] = NUL;
 	opt_idx = findoption((char_u *)"cdpath");
-	if (opt_idx >= 0)
+	ܐܢ (opt_idx >= 0)
 	{
 	    options[opt_idx].def_val[VI_DEFAULT] = buf;
 	    options[opt_idx].flags |= P_DEF_ALLOCED;
 	}
-	else
+	ܐܚܪܢܐ
 	    vim_free(buf); // cannot happen
     }
-    if (mustfree)
+    ܐܢ (mustfree)
 	vim_free(cdpath);
 }
 
 /*
  * Initialize the 'printencoding' option to a default value.
  */
-    static void
-set_init_default_printencoding(void)
+    ساكن فراغ
+set_init_default_printencoding(فراغ)
 {
-#if defined(FEAT_POSTSCRIPT) && \
+#ܐܢ defined(FEAT_POSTSCRIPT) && \
     (defined(MSWIN) || defined(VMS) || defined(MAC) || defined(hpux))
     // Set print encoding on platforms that don't default to latin1
     set_string_default("penc",
-# if defined(MSWIN)
+# ܐܢ defined(MSWIN)
 	    (char_u *)"cp1252"
 # elif defined(VMS)
 	    (char_u *)"dec-mcs"
 # elif defined(MAC)
 	    (char_u *)"mac-roman"
-# else // HPUX
+# ܐܚܪܢܐ // HPUX
 	    (char_u *)"hp-roman8"
 # endif
 	    );
 #endif
 }
 
-#if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+#ܐܢ defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
 /*
  * Initialize the 'printexpr' option to a default value.
  */
-    static void
-set_init_default_printexpr(void)
+    ساكن فراغ
+set_init_default_printexpr(فراغ)
 {
     // 'printexpr' must be allocated to be able to evaluate it.
     set_string_default("pexpr",
-# if defined(MSWIN)
+# ܐܢ defined(MSWIN)
 	    (char_u *)"system('copy' . ' ' . v:fname_in . (&printdevice == '' ? ' LPT1:' : (' \"' . &printdevice . '\"'))) . delete(v:fname_in)"
 # elif defined(VMS)
 	    (char_u *)"system('print/delete' . (&printdevice == '' ? '' : ' /queue=' . &printdevice) . ' ' . v:fname_in)"
 
-# else
+# ܐܚܪܢܐ
 	    (char_u *)"system('lpr' . (&printdevice == '' ? '' : ' -P' . &printdevice) . ' ' . v:fname_in) . delete(v:fname_in) + v:shell_error"
 # endif
 	    );
@@ -348,15 +348,15 @@ set_init_default_printexpr(void)
 /*
  * Force restricted-mode on for "nologin" or "false" $SHELL
  */
-    static void
-set_init_restricted_mode(void)
+    ساكن فراغ
+set_init_restricted_mode(فراغ)
 {
     char_u	*p;
 
     p = get_isolated_shell_name();
-    if (p == NULL)
-	return;
-    if (fnamecmp(p, "nologin") == 0 || fnamecmp(p, "false") == 0)
+    ܐܢ (p == عدم)
+	ܦܢܐ;
+    ܐܢ (fnamecmp(p, "nologin") == 0 || fnamecmp(p, "false") == 0)
 	restricted = TRUE;
     vim_free(p);
 }
@@ -367,20 +367,20 @@ set_init_restricted_mode(void)
  * When Vim is started with the "--clean" argument, set the default value
  * for the 'runtimepath' and 'packpath' options.
  */
-    static void
-set_init_clean_rtp(void)
+    ساكن فراغ
+set_init_clean_rtp(فراغ)
 {
-    int		opt_idx;
+    صحيح		opt_idx;
 
     opt_idx = findoption((char_u *)"runtimepath");
-    if (opt_idx >= 0)
+    ܐܢ (opt_idx >= 0)
     {
 	options[opt_idx].def_val[VI_DEFAULT] = (char_u *)CLEAN_RUNTIMEPATH;
 	p_rtp = (char_u *)CLEAN_RUNTIMEPATH;
     }
     opt_idx = findoption((char_u *)"packpath");
-    if (opt_idx < 0)
-	return;
+    ܐܢ (opt_idx < 0)
+	ܦܢܐ;
     options[opt_idx].def_val[VI_DEFAULT] = (char_u *)CLEAN_RUNTIMEPATH;
     p_pp = (char_u *)CLEAN_RUNTIMEPATH;
 }
@@ -394,25 +394,25 @@ set_init_clean_rtp(void)
  * as a fallback as is defined in the XDG base dir specification:
  * <https://specifications.freedesktop.org/basedir/latest/>
  */
-    static void
-set_init_xdg_rtp(void)
+    ساكن فراغ
+set_init_xdg_rtp(فراغ)
 {
-    int		opt_idx;
-    int		has_xdg_env = TRUE;
-    int		should_free_xdg_dir = FALSE;
-    char_u	*vimrc1 = NULL;
-    char_u	*vimrc2 = NULL;
-    char_u	*xdg_dir = NULL;
-    char_u	*xdg_rtp = NULL;
-    string_T	vimrc_xdg = {NULL, 0};
+    صحيح		opt_idx;
+    صحيح		has_xdg_env = TRUE;
+    صحيح		should_free_xdg_dir = FALSE;
+    char_u	*vimrc1 = عدم;
+    char_u	*vimrc2 = عدم;
+    char_u	*xdg_dir = عدم;
+    char_u	*xdg_rtp = عدم;
+    string_T	vimrc_xdg = {عدم, 0};
 
     // initialize chartab, so we can expand $HOME
-    (void)init_chartab();
+    (فراغ)init_chartab();
     vimrc1 = expand_env_save((char_u *)USR_VIMRC_FILE);
     vimrc2 = expand_env_save((char_u *)USR_VIMRC_FILE2);
 
     xdg_dir = mch_getenv("XDG_CONFIG_HOME");
-    if (!xdg_dir)
+    ܐܢ (!xdg_dir)
     {
 	xdg_dir = expand_env_save((char_u *)"~/.config");
 	should_free_xdg_dir = TRUE;
@@ -421,28 +421,28 @@ set_init_xdg_rtp(void)
     concat_fnames(xdg_dir, STRLEN(xdg_dir),
 	(char_u *)"vim/vimrc", STRLEN_LITERAL("vim/vimrc"), TRUE, &vimrc_xdg);
 
-    if (file_is_readable(vimrc1) || file_is_readable(vimrc2) ||
+    ܐܢ (file_is_readable(vimrc1) || file_is_readable(vimrc2) ||
 	    !file_is_readable(vimrc_xdg.string))
-	goto theend;
+	اذهب theend;
 
     xdg_rtp = has_xdg_env ? (char_u *)XDG_RUNTIMEPATH
 	: (char_u *)XDG_RUNTIMEPATH_FB;
 
-    if ((opt_idx = findoption((char_u *)"runtimepath")) < 0)
-	goto theend;
+    ܐܢ ((opt_idx = findoption((char_u *)"runtimepath")) < 0)
+	اذهب theend;
 
     options[opt_idx].def_val[VI_DEFAULT] = xdg_rtp;
     p_rtp = xdg_rtp;
 
-    if ((opt_idx = findoption((char_u *)"packpath")) < 0)
-	goto theend;
+    ܐܢ ((opt_idx = findoption((char_u *)"packpath")) < 0)
+	اذهب theend;
 
     options[opt_idx].def_val[VI_DEFAULT] = xdg_rtp;
     p_pp = xdg_rtp;
 
-# if defined(XDG_VDIR) && defined(FEAT_SESSION)
-    if ((opt_idx = findoption((char_u *)"viewdir")) < 0)
-	goto theend;
+# ܐܢ defined(XDG_VDIR) && defined(FEAT_SESSION)
+    ܐܢ ((opt_idx = findoption((char_u *)"viewdir")) < 0)
+	اذهب theend;
 
     options[opt_idx].def_val[VI_DEFAULT] = (char_u *)XDG_VDIR;
     p_vdir = (char_u *)XDG_VDIR;
@@ -452,7 +452,7 @@ theend:
     vim_free(vimrc1);
     vim_free(vimrc2);
     vim_free(vimrc_xdg.string);
-    if (should_free_xdg_dir)
+    ܐܢ (should_free_xdg_dir)
 	vim_free(xdg_dir);
 }
 #endif
@@ -466,27 +466,27 @@ theend:
  * Don't set the P_ALLOCED flag, because we don't want to free the
  * default.
  */
-    static void
-set_init_expand_env(void)
+    ساكن فراغ
+set_init_expand_env(فراغ)
 {
-    int		opt_idx;
+    صحيح		opt_idx;
     char_u	*p;
 
-    for (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
+    لكل (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
     {
-	if ((options[opt_idx].flags & P_GETTEXT)
-		&& options[opt_idx].var != NULL)
-	    p = (char_u *)_(*(char **)options[opt_idx].var);
-	else
-	    p = option_expand(opt_idx, NULL);
-	if (p != NULL && (p = vim_strsave(p)) != NULL)
+	ܐܢ ((options[opt_idx].flags & P_GETTEXT)
+		&& options[opt_idx].var != عدم)
+	    p = (char_u *)_(*(حرف **)options[opt_idx].var);
+	ܐܚܪܢܐ
+	    p = option_expand(opt_idx, عدم);
+	ܐܢ (p != عدم && (p = vim_strsave(p)) != عدم)
 	{
 	    *(char_u **)options[opt_idx].var = p;
 	    // VIMEXP
 	    // Defaults for all expanded options are currently the same for Vi
 	    // and Vim.  When this changes, add some code here!  Also need to
 	    // split P_DEF_ALLOCED in two.
-	    if (options[opt_idx].flags & P_DEF_ALLOCED)
+	    ܐܢ (options[opt_idx].flags & P_DEF_ALLOCED)
 		vim_free(options[opt_idx].def_val[VI_DEFAULT]);
 	    options[opt_idx].def_val[VI_DEFAULT] = p;
 	    options[opt_idx].flags |= P_DEF_ALLOCED;
@@ -494,94 +494,94 @@ set_init_expand_env(void)
     }
 }
 
-#if defined(MSWIN) && defined(FEAT_GETTEXT)
+#ܐܢ defined(MSWIN) && defined(FEAT_GETTEXT)
 /*
  * Get the display language of Windows and the languages to fall back on, as a
  * colon separated list for gettext, e.g. "ja_JP:en_US".  The list stops after
  * English, untranslated messages are English already.
  * Returns NULL when it cannot be obtained.  The result must be freed.
  */
-    static char_u *
-get_ui_langs(void)
+    ساكن char_u *
+get_ui_langs(فراغ)
 {
     ULONG	num_languages = 0;
     ULONG	bufsize = 0;
     WCHAR	*buffer;
-    char_u	*langs = NULL;
+    char_u	*langs = عدم;
 
-    if (!GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &num_languages, NULL,
+    ܐܢ (!GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &num_languages, عدم,
 								    &bufsize)
 	    || bufsize == 0)
-	return NULL;
+	ܦܢܐ عدم;
 
     buffer = ALLOC_MULT(WCHAR, bufsize);
-    if (buffer == NULL)
-	return NULL;
+    ܐܢ (buffer == عدم)
+	ܦܢܐ عدم;
 
-    if (GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &num_languages, buffer,
+    ܐܢ (GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &num_languages, buffer,
 								    &bufsize))
     {
 	// The list is NUL separated, the result needs the same room.
 	langs = alloc(bufsize);
-	if (langs != NULL)
+	ܐܢ (langs != عدم)
 	{
 	    char_u	*d = langs;
 	    WCHAR	*s = buffer;
 
-	    while (*s != L'\0')
+	    ܟܡܐ (*s != L'\0')
 	    {
 		bool	english = s[0] == L'e' && s[1] == L'n'
 					&& (s[2] == L'\0' || s[2] == L'-');
 
-		if (d > langs)
+		ܐܢ (d > langs)
 		    *d++ = ':';
 		// Locale names are ASCII, "en-US" becomes "en_US".
-		for ( ; *s != L'\0'; ++s)
+		لكل ( ; *s != L'\0'; ++s)
 		    *d++ = *s == L'-' ? '_' : (char_u)*s;
 		++s;
 
-		if (english)
-		    break;
+		ܐܢ (english)
+		    اكسر;
 	    }
 	    *d = NUL;
 	}
     }
     vim_free(buffer);
 
-    return langs;
+    ܦܢܐ langs;
 }
 #endif
 
 /*
  * Initialize the 'LANG' environment variable to a default value.
  */
-    static void
-set_init_lang_env(void)
+    ساكن فراغ
+set_init_lang_env(فراغ)
 {
-#if defined(MSWIN) && defined(FEAT_GETTEXT)
+#ܐܢ defined(MSWIN) && defined(FEAT_GETTEXT)
     // If the language isn't set in the environment, use the display language
     // of Windows.  Not the regional format, which is what the CRT would use
     // for setlocale(LC_ALL, "").
-    if (mch_getenv((char_u *)"LANG") == NULL
-	    && mch_getenv((char_u *)"LANGUAGE") == NULL
-	    && mch_getenv((char_u *)"LC_ALL") == NULL
-	    && mch_getenv((char_u *)"LC_MESSAGES") == NULL)
+    ܐܢ (mch_getenv((char_u *)"LANG") == عدم
+	    && mch_getenv((char_u *)"LANGUAGE") == عدم
+	    && mch_getenv((char_u *)"LC_ALL") == عدم
+	    && mch_getenv((char_u *)"LC_MESSAGES") == عدم)
     {
 	char_u	*langs = get_ui_langs();
 
-	if (langs != NULL && *langs != NUL)
+	ܐܢ (langs != عدم && *langs != NUL)
 	{
 	    char_u	*colon = vim_strchr(langs, ':');
 
 	    // $LANGUAGE is the list gettext picks from, $LANG the language.
 	    vim_setenv((char_u *)"LANGUAGE", langs);
-	    if (colon != NULL)
+	    ܐܢ (colon != عدم)
 		*colon = NUL;
 	    vim_setenv((char_u *)"LANG", langs);
 	}
 	vim_free(langs);
     }
-#elif defined(MACOS_CONVERT)
+#وإلاإذا defined(MACOS_CONVERT)
     // Moved to os_mac_conv.c to avoid dependency problems.
     mac_lang_init();
 #endif
@@ -590,30 +590,30 @@ set_init_lang_env(void)
 /*
  * Initialize the 'encoding' option to a default value.
  */
-    static void
-set_init_default_encoding(void)
+    ساكن فراغ
+set_init_default_encoding(فراغ)
 {
     char_u	*p;
-    int		opt_idx;
+    صحيح		opt_idx;
 
-#if defined(MSWIN) || defined(__MVS__)
+#ܐܢ defined(MSWIN) || defined(__MVS__)
     // MS-Windows has builtin support for conversion to and from Unicode, using
     // "utf-8" for 'encoding' should work best for most users.
     // z/OS built should default to UTF-8 mode as setlocale does not respect utf-8 environment variable locales
     p = vim_strnsave((char_u *)ENC_DFLT, STRLEN_LITERAL(ENC_DFLT));
-#else
+#ܐܚܪܢܐ
     // enc_locale() will try to find the encoding of the current locale.
     // This works best for properly configured systems, old and new.
     p = enc_locale();
 #endif
-    if (p == NULL)
-	return;
+    ܐܢ (p == عدم)
+	ܦܢܐ;
 
     // Try setting 'encoding' and check if the value is valid.
     // If not, go back to the default encoding.
     char_u *save_enc = p_enc;
     p_enc = p;
-    if (STRCMP(p_enc, "gb18030") == 0)
+    ܐܢ (STRCMP(p_enc, "gb18030") == 0)
     {
 	// We don't support "gb18030", but "cp936" is a good substitute
 	// for practical purposes, thus use that.  It's not an alias to
@@ -621,17 +621,17 @@ set_init_default_encoding(void)
 	p_enc = vim_strnsave((char_u *)"cp936", STRLEN_LITERAL("cp936"));
 	vim_free(p);
     }
-    if (mb_init() == NULL)
+    ܐܢ (mb_init() == عدم)
     {
 	opt_idx = findoption((char_u *)"encoding");
-	if (opt_idx >= 0)
+	ܐܢ (opt_idx >= 0)
 	{
 	    options[opt_idx].def_val[VI_DEFAULT] = p_enc;
 	    options[opt_idx].flags |= P_DEF_ALLOCED;
 	}
 
-#if defined(MSWIN) || defined(MACOS_X) || defined(VMS)
-	if (STRCMP(p_enc, "latin1") == 0 || enc_utf8)
+#ܐܢ defined(MSWIN) || defined(MACOS_X) || defined(VMS)
+	ܐܢ (STRCMP(p_enc, "latin1") == 0 || enc_utf8)
 	{
 	    // Adjust the default for 'isprint' and 'iskeyword' to match
 	    // latin1.  Also set the defaults for when 'nocompatible' is
@@ -641,38 +641,38 @@ set_init_default_encoding(void)
 	    set_string_option_direct((char_u *)"isk", -1,
 		    ISK_LATIN1, OPT_FREE, SID_NONE);
 	    opt_idx = findoption((char_u *)"isp");
-	    if (opt_idx >= 0)
+	    ܐܢ (opt_idx >= 0)
 		options[opt_idx].def_val[VIM_DEFAULT] = ISP_LATIN1;
 	    opt_idx = findoption((char_u *)"isk");
-	    if (opt_idx >= 0)
+	    ܐܢ (opt_idx >= 0)
 		options[opt_idx].def_val[VIM_DEFAULT] = ISK_LATIN1;
-	    (void)init_chartab();
+	    (فراغ)init_chartab();
 	}
 #endif
 
-#if defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
+#ܐܢ defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
 	// Win32 console: When GetACP() returns a different value from
 	// GetConsoleCP() set 'termencoding'.
-	if (
+	ܐܢ (
 # ifdef VIMDLL
 		(!gui.in_use && !gui.starting) &&
 # endif
 		GetACP() != GetConsoleCP())
 	{
-	    char	buf[50];
+	    حرف	buf[50];
 	    size_t	buflen;
 
 	    // Win32 console: In ConPTY, GetConsoleCP() returns zero.
 	    // Use an alternative value.
-	    if (GetConsoleCP() == 0)
-		buflen = vim_snprintf(buf, sizeof(buf), "cp%ld", (long)GetACP());
-	    else
-		buflen = vim_snprintf(buf, sizeof(buf), "cp%ld", (long)GetConsoleCP());
+	    ܐܢ (GetConsoleCP() == 0)
+		buflen = vim_snprintf(buf, حجم(buf), "cp%ld", (long)GetACP());
+	    ܐܚܪܢܐ
+		buflen = vim_snprintf(buf, حجم(buf), "cp%ld", (long)GetConsoleCP());
 	    p_tenc = vim_strnsave((char_u *)buf, buflen);
-	    if (p_tenc != NULL)
+	    ܐܢ (p_tenc != عدم)
 	    {
 		opt_idx = findoption((char_u *)"termencoding");
-		if (opt_idx >= 0)
+		ܐܢ (opt_idx >= 0)
 		{
 		    options[opt_idx].def_val[VI_DEFAULT] = p_tenc;
 		    options[opt_idx].flags |= P_DEF_ALLOCED;
@@ -680,16 +680,16 @@ set_init_default_encoding(void)
 		convert_setup(&input_conv, p_tenc, p_enc);
 		convert_setup(&output_conv, p_enc, p_tenc);
 	    }
-	    else
+	    ܐܚܪܢܐ
 		p_tenc = empty_option;
 	}
 #endif
-#if defined(MSWIN)
+#ܐܢ defined(MSWIN)
 	// $HOME may have characters in active code page.
 	init_homedir();
 #endif
     }
-    else
+    ܐܚܪܢܐ
     {
 	vim_free(p_enc);
 	p_enc = save_enc;
@@ -702,8 +702,8 @@ set_init_default_encoding(void)
  * Called only once from main(), just after creating the first buffer.
  * If "clean_arg" is TRUE Vim was started with --clean.
  */
-    void
-set_init_1(int clean_arg)
+    فراغ
+set_init_1(صحيح clean_arg)
 {
 #ifdef FEAT_LANGMAP
     langmap_init();
@@ -713,7 +713,7 @@ set_init_1(int clean_arg)
     p_cp = TRUE;
 
     // Use POSIX compatibility when $VIM_POSIX is set.
-    if (mch_getenv((char_u *)"VIM_POSIX") != NULL)
+    ܐܢ (mch_getenv((char_u *)"VIM_POSIX") != عدم)
     {
 	set_string_default("cpo", (char_u *)CPO_ALL);
 	set_string_default("shm", (char_u *)SHM_POSIX);
@@ -724,7 +724,7 @@ set_init_1(int clean_arg)
     set_init_default_maxmemtot();
     set_init_default_cdpath();
     set_init_default_printencoding();
-#if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+#ܐܢ defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
     set_init_default_printexpr();
 #endif
 
@@ -740,12 +740,12 @@ set_init_1(int clean_arg)
 #endif
 
 #ifdef CLEAN_RUNTIMEPATH
-    if (clean_arg)
+    ܐܢ (clean_arg)
 	set_init_clean_rtp();
 #endif
 
 #ifdef FEAT_GUI
-    if (found_reverse_arg)
+    ܐܢ (found_reverse_arg)
 	set_option_value_give_err((char_u *)"bg", 0L, (char_u *)"dark", 0);
 #endif
 
@@ -776,14 +776,14 @@ set_init_1(int clean_arg)
 
     save_file_ff(curbuf);	// Buffer is unchanged
 
-#if defined(FEAT_ARABIC)
+#ܐܢ defined(FEAT_ARABIC)
     // Detect use of mlterm.
     // Mlterm is a terminal emulator akin to xterm that has some special
     // abilities (bidi namely).
     // NOTE: mlterm's author is being asked to 'set' a variable
     //       instead of an environment variable due to inheritance.
-    if (mch_getenv((char_u *)"MLTERM") != NULL)
-	set_option_value_give_err((char_u *)"tbidi", 1L, NULL, 0);
+    ܐܢ (mch_getenv((char_u *)"MLTERM") != عدم)
+	set_option_value_give_err((char_u *)"tbidi", 1L, عدم, 0);
 #endif
 
     didset_options2();
@@ -796,14 +796,14 @@ set_init_1(int clean_arg)
 #endif
 }
 
-static char_u *fencs_utf8_default = (char_u *)"ucs-bom,utf-8,default,latin1";
+ساكن char_u *fencs_utf8_default = (char_u *)"ucs-bom,utf-8,default,latin1";
 
 /*
  * Set the "fileencodings" option to the default value for when 'encoding' is
  * utf-8.
  */
-    void
-set_fencs_unicode(void)
+    فراغ
+set_fencs_unicode(فراغ)
 {
     set_string_option_direct((char_u *)"fencs", -1, fencs_utf8_default,
 								  OPT_FREE, 0);
@@ -813,83 +813,83 @@ set_fencs_unicode(void)
  * Set an option to its default value.
  * This does not take care of side effects!
  */
-    static void
+    ساكن فراغ
 set_option_default(
-    int		opt_idx,
-    int		opt_flags,	// OPT_FREE, OPT_LOCAL and/or OPT_GLOBAL
-    int		compatible)	// use Vi default value
+    صحيح		opt_idx,
+    صحيح		opt_flags,	// OPT_FREE, OPT_LOCAL and/or OPT_GLOBAL
+    صحيح		compatible)	// use Vi default value
 {
     char_u	*varp;		// pointer to variable for current option
-    int		dvi;		// index in def_val[]
+    صحيح		dvi;		// index in def_val[]
     long_u	flags;
     long_u	*flagsp;
-    int		both = (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0;
+    صحيح		both = (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0;
 
     varp = get_varp_scope(&(options[opt_idx]), both ? OPT_LOCAL : opt_flags);
     flags = options[opt_idx].flags;
-    if (varp != NULL)	    // skip hidden option, nothing to do for it
+    ܐܢ (varp != عدم)	    // skip hidden option, nothing to do for it
     {
 	dvi = ((flags & P_VI_DEF) || compatible) ? VI_DEFAULT : VIM_DEFAULT;
-	if (flags & P_STRING)
+	ܐܢ (flags & P_STRING)
 	{
 	    // 'fencs' default value depends on 'encoding'
-	    if (options[opt_idx].var == (char_u *)&p_fencs && enc_utf8)
+	    ܐܢ (options[opt_idx].var == (char_u *)&p_fencs && enc_utf8)
 		set_fencs_unicode();
 	    // Use set_string_option_direct() for local options to handle
 	    // freeing and allocating the value.
-	    else if (options[opt_idx].indir != PV_NONE)
-		set_string_option_direct(NULL, opt_idx,
+	    ܐܚܪܢܐ ܐܢ (options[opt_idx].indir != PV_NONE)
+		set_string_option_direct(عدم, opt_idx,
 				 options[opt_idx].def_val[dvi], opt_flags, 0);
-	    else
+	    ܐܚܪܢܐ
 	    {
-		if ((opt_flags & OPT_FREE) && (flags & P_ALLOCED))
+		ܐܢ ((opt_flags & OPT_FREE) && (flags & P_ALLOCED))
 		    free_string_option(*(char_u **)(varp));
 		*(char_u **)varp = options[opt_idx].def_val[dvi];
 		options[opt_idx].flags &= ~P_ALLOCED;
 	    }
 	}
-	else if (flags & P_NUM)
+	ܐܚܪܢܐ ܐܢ (flags & P_NUM)
 	{
-	    if (options[opt_idx].indir == PV_SCROLL)
+	    ܐܢ (options[opt_idx].indir == PV_SCROLL)
 		win_comp_scroll(curwin);
-	    else
+	    ܐܚܪܢܐ
 	    {
 		long def_val = (long)(long_i)options[opt_idx].def_val[dvi];
 
-		if ((long *)varp == &curwin->w_p_so
+		ܐܢ ((long *)varp == &curwin->w_p_so
 			|| (long *)varp == &curwin->w_p_siso
 			|| (long *)varp == &curwin->w_p_sop)
 		    // 'scrolloff', 'sidescrolloff', and 'scrolloffpad' local values have a
 		    // different default value than the global default.
 		    *(long *)varp = -1;
-		else
+		ܐܚܪܢܐ
 		    *(long *)varp = def_val;
 		// May also set global value for local option.
-		if (both)
+		ܐܢ (both)
 		    *(long *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL) =
 								def_val;
 	    }
 	}
-	else	// P_BOOL
+	ܐܚܪܢܐ	// P_BOOL
 	{
 	    // the cast to long is required for Manx C, long_i is needed for
 	    // MSVC
-	    *(int *)varp = (int)(long)(long_i)options[opt_idx].def_val[dvi];
+	    *(صحيح *)varp = (صحيح)(long)(long_i)options[opt_idx].def_val[dvi];
 #ifdef UNIX
 	    // 'modeline' defaults to off for root
-	    if (options[opt_idx].indir == PV_ML && getuid() == ROOT_UID)
-		*(int *)varp = FALSE;
+	    ܐܢ (options[opt_idx].indir == PV_ML && getuid() == ROOT_UID)
+		*(صحيح *)varp = FALSE;
 #endif
 	    // May also set global value for local option.
-	    if (both)
-		*(int *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL) =
-								*(int *)varp;
+	    ܐܢ (both)
+		*(صحيح *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL) =
+								*(صحيح *)varp;
 	}
 
 	// The default value is not insecure.
 	flagsp = insecure_flag(curwin, opt_idx, opt_flags);
 	*flagsp = *flagsp & ~P_INSECURE;
-	if (both)
+	ܐܢ (both)
 	{
 	    flagsp = insecure_flag(curwin, opt_idx, OPT_LOCAL);
 	    *flagsp = *flagsp & ~P_INSECURE;
@@ -905,19 +905,19 @@ set_option_default(
  * Set all options (except terminal options) to their default value.
  * When "opt_flags" is non-zero skip 'encoding'.
  */
-    static void
+    ساكن فراغ
 set_options_default(
-    int		opt_flags)	// OPT_FREE, OPT_LOCAL and/or OPT_GLOBAL
+    صحيح		opt_flags)	// OPT_FREE, OPT_LOCAL and/or OPT_GLOBAL
 {
-    int		i;
+    صحيح		i;
     win_T	*wp;
     tabpage_T	*tp;
 
-    for (i = 0; !istermoption_idx(i); i++)
-	if (!(options[i].flags & P_NODEFAULT)
+    لكل (i = 0; !istermoption_idx(i); i++)
+	ܐܢ (!(options[i].flags & P_NODEFAULT)
 		&& (opt_flags == 0
 		    || (options[i].var != (char_u *)&p_enc
-#if defined(FEAT_CRYPT)
+#ܐܢ defined(FEAT_CRYPT)
 			&& options[i].var != (char_u *)&p_cm
 			&& options[i].var != (char_u *)&p_key
 #endif
@@ -935,34 +935,34 @@ set_options_default(
  * Used for 'sh', 'backupskip' and 'term'.
  * When "escape" is TRUE escape spaces with a backslash.
  */
-    static void
-set_string_default_esc(char *name, char_u *val, int escape)
+    ساكن فراغ
+set_string_default_esc(حرف *name, char_u *val, صحيح escape)
 {
     char_u	*p;
-    int		opt_idx;
+    صحيح		opt_idx;
 
-    if (escape && vim_strchr(val, ' ') != NULL)
+    ܐܢ (escape && vim_strchr(val, ' ') != عدم)
 	p = vim_strsave_escaped(val, (char_u *)" ");
-    else
+    ܐܚܪܢܐ
 	p = vim_strsave(val);
-    if (p == NULL)		// we don't want a NULL
-	return;
+    ܐܢ (p == عدم)		// we don't want a NULL
+	ܦܢܐ;
 
     opt_idx = findoption((char_u *)name);
-    if (opt_idx < 0)
+    ܐܢ (opt_idx < 0)
     {
 	vim_free(p);
-	return;
+	ܦܢܐ;
     }
 
-    if (options[opt_idx].flags & P_DEF_ALLOCED)
+    ܐܢ (options[opt_idx].flags & P_DEF_ALLOCED)
 	vim_free(options[opt_idx].def_val[VI_DEFAULT]);
     options[opt_idx].def_val[VI_DEFAULT] = p;
     options[opt_idx].flags |= P_DEF_ALLOCED;
 }
 
-    void
-set_string_default(char *name, char_u *val)
+    فراغ
+set_string_default(حرف *name, char_u *val)
 {
     set_string_default_esc(name, val, FALSE);
 }
@@ -971,76 +971,76 @@ set_string_default(char *name, char_u *val)
  * For an option value that contains comma separated items, find "newval" in
  * "origval".  Return NULL if not found.
  */
-    static char_u *
+    ساكن char_u *
 find_dup_item(char_u *origval, char_u *newval, size_t newvallen, long_u flags)
 {
-    int	    bs = 0;
+    صحيح	    bs = 0;
     char_u  *s;
 
-    if (origval == NULL)
-	return NULL;
+    ܐܢ (origval == عدم)
+	ܦܢܐ عدم;
 
-    for (s = origval; *s != NUL; ++s)
+    لكل (s = origval; *s != NUL; ++s)
     {
-	if ((!(flags & P_COMMA)
+	ܐܢ ((!(flags & P_COMMA)
 		    || s == origval
 		    || (s[-1] == ',' && !(bs & 1)))
 		&& STRNCMP(s, newval, newvallen) == 0
 		&& (!(flags & P_COMMA)
 		    || s[newvallen] == ','
 		    || s[newvallen] == NUL))
-	    return s;
+	    ܦܢܐ s;
 	// Count backslashes.  Only a comma with an even number of backslashes
 	// or a single backslash preceded by a comma before it is recognized as
 	// a separator.
-	if ((s > origval + 1
+	ܐܢ ((s > origval + 1
 		    && s[-1] == '\\'
 		    && s[-2] != ',')
 		|| (s == origval + 1
 		    && s[-1] == '\\'))
 	    ++bs;
-	else
+	ܐܚܪܢܐ
 	    bs = 0;
     }
-    return NULL;
+    ܦܢܐ عدم;
 }
 
 /*
  * Set the Vi-default value of a number option.
  * Used for 'lines' and 'columns'.
  */
-    void
-set_number_default(char *name, long val)
+    فراغ
+set_number_default(حرف *name, long val)
 {
-    int		opt_idx;
+    صحيح		opt_idx;
 
     opt_idx = findoption((char_u *)name);
-    if (opt_idx >= 0)
+    ܐܢ (opt_idx >= 0)
 	options[opt_idx].def_val[VI_DEFAULT] = (char_u *)(long_i)val;
 }
 
-#if defined(FEAT_PROP_POPUP)
+#ܐܢ defined(FEAT_PROP_POPUP)
 /*
  * Set all window-local and buffer-local options to the Vim default.
  * local-global options will use the global value.
  * When "do_buffer" is FALSE don't set buffer-local options.
  */
-    void
-set_local_options_default(win_T *wp, int do_buffer)
+    فراغ
+set_local_options_default(win_T *wp, صحيح do_buffer)
 {
     win_T	*save_curwin = curwin;
-    int		i;
+    صحيح		i;
 
     curwin = wp;
     curbuf = curwin->w_buffer;
     block_autocmds();
 
-    for (i = 0; !istermoption_idx(i); i++)
+    لكل (i = 0; !istermoption_idx(i); i++)
     {
-	struct vimoption    *p = &(options[i]);
+	بنية vimoption    *p = &(options[i]);
 	char_u		    *varp = get_varp_scope(p, OPT_LOCAL);
 
-	if (p->indir != PV_NONE
+	ܐܢ (p->indir != PV_NONE
 		&& (do_buffer || (p->indir & PV_BUF) == 0)
 		&& !(options[i].flags & P_NODEFAULT)
 		&& !optval_default(p, varp, FALSE))
@@ -1053,33 +1053,33 @@ set_local_options_default(win_T *wp, int do_buffer)
 }
 #endif
 
-#if defined(EXITFREE)
+#ܐܢ defined(EXITFREE)
 /*
  * Free all options.
  */
-    void
-free_all_options(void)
+    فراغ
+free_all_options(فراغ)
 {
-    int		i;
+    صحيح		i;
 
-    for (i = 0; !istermoption_idx(i); i++)
+    لكل (i = 0; !istermoption_idx(i); i++)
     {
-	if (options[i].indir == PV_NONE)
+	ܐܢ (options[i].indir == PV_NONE)
 	{
 	    // global option: free value and default value.
-	    if ((options[i].flags & P_ALLOCED) && options[i].var != NULL)
+	    ܐܢ ((options[i].flags & P_ALLOCED) && options[i].var != عدم)
 		free_string_option(*(char_u **)options[i].var);
-	    if (options[i].flags & P_DEF_ALLOCED)
+	    ܐܢ (options[i].flags & P_DEF_ALLOCED)
 		free_string_option(options[i].def_val[VI_DEFAULT]);
 	}
-	else if (options[i].var != VAR_WIN
+	ܐܚܪܢܐ ܐܢ (options[i].var != VAR_WIN
 		&& (options[i].flags & P_STRING))
 	    // buffer-local option: free global value
 	    clear_string_option((char_u **)options[i].var);
     }
     free_operatorfunc_option();
     free_tagfunc_option();
-# if defined(FEAT_EVAL)
+# ܐܢ defined(FEAT_EVAL)
     free_findfunc_option();
 # endif
 }
@@ -1090,34 +1090,34 @@ free_all_options(void)
  * Initialize the options, part two: After getting Rows and Columns and
  * setting 'term'.
  */
-    void
-set_init_2(void)
+    فراغ
+set_init_2(فراغ)
 {
-    int		idx;
+    صحيح		idx;
 
     // 'scroll' defaults to half the window height. The stored default is zero,
     // which results in the actual value computed from the window height.
     idx = findoption((char_u *)"scroll");
-    if (idx >= 0 && !(options[idx].flags & P_WAS_SET))
+    ܐܢ (idx >= 0 && !(options[idx].flags & P_WAS_SET))
 	set_option_default(idx, OPT_LOCAL, p_cp);
     comp_col();
 
     // 'window' is only for backwards compatibility with Vi.
     // Default is Rows - 1.
-    if (!option_was_set((char_u *)"window"))
+    ܐܢ (!option_was_set((char_u *)"window"))
 	p_window = Rows - 1;
     set_number_default("window", Rows - 1);
 
     // For DOS console the default is always black.
-#if !((defined(MSWIN)) && !defined(FEAT_GUI))
+#ܐܢ !((defined(MSWIN)) && !defined(FEAT_GUI))
     // If 'background' wasn't set by the user, try guessing the value,
     // depending on the terminal name.  Only need to check for terminals
     // with a dark background, that can handle color.
     idx = findoption((char_u *)"bg");
-    if (idx >= 0 && !(options[idx].flags & P_WAS_SET)
+    ܐܢ (idx >= 0 && !(options[idx].flags & P_WAS_SET)
 						 && *term_bg_default() == 'd')
     {
-	set_string_option_direct(NULL, idx, (char_u *)"dark", OPT_FREE, 0);
+	set_string_option_direct(عدم, idx, (char_u *)"dark", OPT_FREE, 0);
 	// don't mark it as set, when starting the GUI it may be
 	// changed again
 	options[idx].flags &= ~P_WAS_SET;
@@ -1131,67 +1131,67 @@ set_init_2(void)
     parse_shape_opt(SHAPE_MOUSE);	// set mouse shapes from 'mouseshape'
 #endif
 #ifdef FEAT_PRINTER
-    (void)parse_printoptions(NULL);	// parse 'printoptions' default value
+    (فراغ)parse_printoptions(عدم);	// parse 'printoptions' default value
 #endif
 }
 
 /*
  * Initialize the options, part three: After reading the .vimrc
  */
-    void
-set_init_3(void)
+    فراغ
+set_init_3(فراغ)
 {
-#if defined(UNIX) || defined(MSWIN)
+#ܐܢ defined(UNIX) || defined(MSWIN)
 /*
  * Set 'shellpipe' and 'shellredir', depending on the 'shell' option.
  * This is done after other initializations, where 'shell' might have been
  * set, but only if they have not been set before.
  */
     char_u  *p;
-    int	    idx_srr;
-    int	    do_srr;
+    صحيح	    idx_srr;
+    صحيح	    do_srr;
 # ifdef FEAT_QUICKFIX
-    int	    idx_sp;
-    int	    do_sp;
+    صحيح	    idx_sp;
+    صحيح	    do_sp;
 # endif
 
     idx_srr = findoption((char_u *)"srr");
-    if (idx_srr < 0)
+    ܐܢ (idx_srr < 0)
 	do_srr = FALSE;
-    else
+    ܐܚܪܢܐ
 	do_srr = !(options[idx_srr].flags & P_WAS_SET);
 # ifdef FEAT_QUICKFIX
     idx_sp = findoption((char_u *)"sp");
-    if (idx_sp < 0)
+    ܐܢ (idx_sp < 0)
 	do_sp = FALSE;
-    else
+    ܐܚܪܢܐ
 	do_sp = !(options[idx_sp].flags & P_WAS_SET);
 # endif
     p = get_isolated_shell_name();
-    if (p != NULL)
+    ܐܢ (p != عدم)
     {
 	// Default for p_sp is "| tee", for p_srr is ">".
 	// For known shells it is changed here to include stderr.
-	if (	   fnamecmp(p, "csh") == 0
+	ܐܢ (	   fnamecmp(p, "csh") == 0
 		|| fnamecmp(p, "tcsh") == 0
-# if defined(MSWIN)	// also check with .exe extension
+# ܐܢ defined(MSWIN)	// also check with .exe extension
 		|| fnamecmp(p, "csh.exe") == 0
 		|| fnamecmp(p, "tcsh.exe") == 0
 # endif
 	   )
 	{
-# if defined(FEAT_QUICKFIX)
-	    if (do_sp)
+# ܐܢ defined(FEAT_QUICKFIX)
+	    ܐܢ (do_sp)
 	    {
 #  ifdef MSWIN
 		p_sp = (char_u *)">&";
-#  else
+#  ܐܚܪܢܐ
 		p_sp = (char_u *)"|& tee";
 #  endif
 		options[idx_sp].def_val[VI_DEFAULT] = p_sp;
 	    }
 # endif
-	    if (do_srr)
+	    ܐܢ (do_srr)
 	    {
 		p_srr = (char_u *)">&";
 		options[idx_srr].def_val[VI_DEFAULT] = p_srr;
@@ -1200,27 +1200,27 @@ set_init_3(void)
 # ifdef MSWIN
 	// Windows PowerShell output is UTF-16 with BOM so re-encode to the
 	// current codepage.
-	else if (   fnamecmp(p, "powershell") == 0
+	ܐܚܪܢܐ ܐܢ (   fnamecmp(p, "powershell") == 0
 		    || fnamecmp(p, "powershell.exe") == 0
 		)
 	{
-#  if defined(FEAT_QUICKFIX)
-		if (do_sp)
+#  ܐܢ defined(FEAT_QUICKFIX)
+		ܐܢ (do_sp)
 		{
 		    p_sp = (char_u *)"2>&1 | Out-File -Encoding default";
 		    options[idx_sp].def_val[VI_DEFAULT] = p_sp;
 		}
 #  endif
-		if (do_srr)
+		ܐܢ (do_srr)
 		{
 		    p_srr = (char_u *)"2>&1 | Out-File -Encoding default";
 		    options[idx_srr].def_val[VI_DEFAULT] = p_srr;
 		}
 	}
 # endif
-	else
+	ܐܚܪܢܐ
 	    // Always use POSIX shell style redirection if we reach this
-	    if (       fnamecmp(p, "sh") == 0
+	    ܐܢ (       fnamecmp(p, "sh") == 0
 		    || fnamecmp(p, "ksh") == 0
 		    || fnamecmp(p, "mksh") == 0
 		    || fnamecmp(p, "pdksh") == 0
@@ -1246,21 +1246,21 @@ set_init_3(void)
 # endif
 		    )
 	    {
-# if defined(FEAT_QUICKFIX)
-		if (do_sp)
+# ܐܢ defined(FEAT_QUICKFIX)
+		ܐܢ (do_sp)
 		{
 #  ifdef MSWIN
 		    p_sp = (char_u *)">%s 2>&1";
-#  else
-		    if (fnamecmp(p, "pwsh") == 0)
+#  ܐܚܪܢܐ
+		    ܐܢ (fnamecmp(p, "pwsh") == 0)
 			p_sp = (char_u *)">%s 2>&1";
-		    else
+		    ܐܚܪܢܐ
 			p_sp = (char_u *)"2>&1| tee";
 #  endif
 		    options[idx_sp].def_val[VI_DEFAULT] = p_sp;
 		}
 # endif
-		if (do_srr)
+		ܐܢ (do_srr)
 		{
 		    p_srr = (char_u *)">%s 2>&1";
 		    options[idx_srr].def_val[VI_DEFAULT] = p_srr;
@@ -1270,7 +1270,7 @@ set_init_3(void)
     }
 #endif
 
-#if defined(MSWIN)
+#ܐܢ defined(MSWIN)
     /*
      * Set 'shellcmdflag', 'shellxquote', and 'shellquote' depending on the
      * 'shell' option.
@@ -1286,30 +1286,30 @@ set_init_3(void)
      *
      * For Win32 p_sxq is set instead of p_shq to include shell redirection.
      */
-    if (strstr((char *)gettail(p_sh), "powershell") != NULL)
+    ܐܢ (strstr((حرف *)gettail(p_sh), "powershell") != عدم)
     {
-	int	idx_opt;
+	صحيح	idx_opt;
 
 	idx_opt = findoption((char_u *)"shcf");
-	if (idx_opt >= 0 && !(options[idx_opt].flags & P_WAS_SET))
+	ܐܢ (idx_opt >= 0 && !(options[idx_opt].flags & P_WAS_SET))
 	{
 	    p_shcf = (char_u*)"-Command";
 	    options[idx_opt].def_val[VI_DEFAULT] = p_shcf;
 	}
 
 	idx_opt = findoption((char_u *)"sxq");
-	if (idx_opt >= 0 && !(options[idx_opt].flags & P_WAS_SET))
+	ܐܢ (idx_opt >= 0 && !(options[idx_opt].flags & P_WAS_SET))
 	{
 	    p_sxq = (char_u*)"\"";
 	    options[idx_opt].def_val[VI_DEFAULT] = p_sxq;
 	}
     }
-    else if (strstr((char *)gettail(p_sh), "sh") != NULL)
+    ܐܚܪܢܐ ܐܢ (strstr((حرف *)gettail(p_sh), "sh") != عدم)
     {
-	int	idx3;
+	صحيح	idx3;
 
 	idx3 = findoption((char_u *)"shcf");
-	if (idx3 >= 0 && !(options[idx3].flags & P_WAS_SET))
+	ܐܢ (idx3 >= 0 && !(options[idx3].flags & P_WAS_SET))
 	{
 	    p_shcf = (char_u *)"-c";
 	    options[idx3].def_val[VI_DEFAULT] = p_shcf;
@@ -1317,15 +1317,15 @@ set_init_3(void)
 
 	// Somehow Win32 requires the quotes around the redirection too
 	idx3 = findoption((char_u *)"sxq");
-	if (idx3 >= 0 && !(options[idx3].flags & P_WAS_SET))
+	ܐܢ (idx3 >= 0 && !(options[idx3].flags & P_WAS_SET))
 	{
 	    p_sxq = (char_u *)"\"";
 	    options[idx3].def_val[VI_DEFAULT] = p_sxq;
 	}
     }
-    else if (strstr((char *)gettail(p_sh), "cmd.exe") != NULL)
+    ܐܚܪܢܐ ܐܢ (strstr((حرف *)gettail(p_sh), "cmd.exe") != عدم)
     {
-	int	idx3;
+	صحيح	idx3;
 
 	/*
 	 * cmd.exe on Windows will strip the first and last double quote given
@@ -1341,14 +1341,14 @@ set_init_3(void)
 	 * '"path with spaces/cmd" "a&b"'.
 	 */
 	idx3 = findoption((char_u *)"sxq");
-	if (idx3 >= 0 && !(options[idx3].flags & P_WAS_SET))
+	ܐܢ (idx3 >= 0 && !(options[idx3].flags & P_WAS_SET))
 	{
 	    p_sxq = (char_u *)"(";
 	    options[idx3].def_val[VI_DEFAULT] = p_sxq;
 	}
 
 	idx3 = findoption((char_u *)"shcf");
-	if (idx3 >= 0 && !(options[idx3].flags & P_WAS_SET))
+	ܐܢ (idx3 >= 0 && !(options[idx3].flags & P_WAS_SET))
 	{
 	    p_shcf = (char_u *)"/c";
 	    options[idx3].def_val[VI_DEFAULT] = p_shcf;
@@ -1356,55 +1356,55 @@ set_init_3(void)
     }
 #endif
 
-    if (BUFEMPTY())
+    ܐܢ (BUFEMPTY())
     {
-	int idx_ffs = findoption((char_u *)"ffs");
+	صحيح idx_ffs = findoption((char_u *)"ffs");
 
 	// Apply the first entry of 'fileformats' to the initial buffer.
-	if (idx_ffs >= 0 && (options[idx_ffs].flags & P_WAS_SET))
+	ܐܢ (idx_ffs >= 0 && (options[idx_ffs].flags & P_WAS_SET))
 	    set_fileformat(default_fileformat(), OPT_LOCAL);
     }
 
     set_title_defaults();
 }
 
-#if defined(FEAT_MULTI_LANG)
+#ܐܢ defined(FEAT_MULTI_LANG)
 /*
  * When 'helplang' is still at its default value, set it to "lang".
  * Only the first two characters of "lang" are used.
  */
-    void
+    فراغ
 set_helplang_default(char_u *lang)
 {
-    int		idx;
+    صحيح		idx;
     size_t	langlen;
 
-    if (lang == NULL)	// safety check
-	return;
+    ܐܢ (lang == عدم)	// safety check
+	ܦܢܐ;
 
     langlen = STRLEN(lang);
-    if (langlen < 2)	// safety check
-	return;
+    ܐܢ (langlen < 2)	// safety check
+	ܦܢܐ;
 
     idx = findoption((char_u *)"hlg");
-    if (idx < 0 || (options[idx].flags & P_WAS_SET))
-	return;
+    ܐܢ (idx < 0 || (options[idx].flags & P_WAS_SET))
+	ܦܢܐ;
 
-    if (options[idx].flags & P_ALLOCED)
+    ܐܢ (options[idx].flags & P_ALLOCED)
 	free_string_option(p_hlg);
     p_hlg = vim_strnsave(lang, langlen);
-    if (p_hlg == NULL)
+    ܐܢ (p_hlg == عدم)
 	p_hlg = empty_option;
-    else
+    ܐܚܪܢܐ
     {
 	// zh_CN becomes "cn", zh_TW becomes "tw"
-	if (STRNICMP(p_hlg, "zh_", 3) == 0 && langlen >= 5)
+	ܐܢ (STRNICMP(p_hlg, "zh_", 3) == 0 && langlen >= 5)
 	{
 	    p_hlg[0] = TOLOWER_ASC(p_hlg[3]);
 	    p_hlg[1] = TOLOWER_ASC(p_hlg[4]);
 	}
 	// any C like setting, such as C.UTF-8, becomes "en"
-	else if (langlen >= 1 && *p_hlg == 'C')
+	ܐܚܪܢܐ ܐܢ (langlen >= 1 && *p_hlg == 'C')
 	{
 	    p_hlg[0] = 'e';
 	    p_hlg[1] = 'n';
@@ -1422,68 +1422,68 @@ set_helplang_default(char_u *lang)
  * they can be reset.  This reduces startup time when using X on a remote
  * machine.
  */
-    void
-set_title_defaults(void)
+    فراغ
+set_title_defaults(فراغ)
 {
-    int	    idx1;
+    صحيح	    idx1;
     long    val;
 
     // If GUI is (going to be) used, we can always set the window title and
     // icon name.  Saves a bit of time, because the X11 display server does
     // not need to be contacted.
     idx1 = findoption((char_u *)"title");
-    if (idx1 >= 0 && !(options[idx1].flags & P_WAS_SET))
+    ܐܢ (idx1 >= 0 && !(options[idx1].flags & P_WAS_SET))
     {
 #ifdef FEAT_GUI
-	if (gui.starting || gui.in_use)
+	ܐܢ (gui.starting || gui.in_use)
 	    val = TRUE;
-	else
+	ܐܚܪܢܐ
 #endif
 	    val = mch_can_restore_title();
 	options[idx1].def_val[VI_DEFAULT] = (char_u *)(long_i)val;
 	p_title = val;
     }
     idx1 = findoption((char_u *)"icon");
-    if (idx1 < 0 || (options[idx1].flags & P_WAS_SET))
+    ܐܢ (idx1 < 0 || (options[idx1].flags & P_WAS_SET))
     {
-	return;
+	ܦܢܐ;
     }
 
 #ifdef FEAT_GUI
-    if (gui.starting || gui.in_use)
+    ܐܢ (gui.starting || gui.in_use)
 	val = TRUE;
-    else
+    ܐܚܪܢܐ
 #endif
 	val = mch_can_restore_icon();
     options[idx1].def_val[VI_DEFAULT] = (char_u *)(long_i)val;
     p_icon = val;
 }
 
-    void
+    فراغ
 ex_set(exarg_T *eap)
 {
-    int		flags = 0;
+    صحيح		flags = 0;
 
-    if (eap->cmdidx == CMD_setlocal)
+    ܐܢ (eap->cmdidx == CMD_setlocal)
 	flags = OPT_LOCAL;
-    else if (eap->cmdidx == CMD_setglobal)
+    ܐܚܪܢܐ ܐܢ (eap->cmdidx == CMD_setglobal)
 	flags = OPT_GLOBAL;
-#if defined(FEAT_EVAL) && defined(FEAT_BROWSE)
-    if ((cmdmod.cmod_flags & CMOD_BROWSE) && flags == 0)
+#ܐܢ defined(FEAT_EVAL) && defined(FEAT_BROWSE)
+    ܐܢ ((cmdmod.cmod_flags & CMOD_BROWSE) && flags == 0)
 	ex_options(eap);
-    else
+    ܐܚܪܢܐ
 #endif
     {
-	if (eap->forceit)
+	ܐܢ (eap->forceit)
 	    flags |= OPT_ONECOLUMN;
-	(void)do_set(eap->arg, flags);
+	(فراغ)do_set(eap->arg, flags);
     }
 }
 
 /*
  * :set boolean option prefix
  */
-typedef enum {
+تعريفنوع تعداد {
     PREFIX_NO = 0,	// "no" prefix
     PREFIX_NONE,	// no prefix
     PREFIX_INV,		// "inv" prefix
@@ -1492,25 +1492,25 @@ typedef enum {
 /*
  * Return the prefix type for the option name in *argp.
  */
-    static set_prefix_T
+    ساكن set_prefix_T
 get_option_prefix(char_u **argp)
 {
-    int		prefix = PREFIX_NONE;
+    صحيح		prefix = PREFIX_NONE;
     char_u	*arg = *argp;
 
-    if (STRNCMP(arg, "no", 2) == 0 && STRNCMP(arg, "novice", 6) != 0)
+    ܐܢ (STRNCMP(arg, "no", 2) == 0 && STRNCMP(arg, "novice", 6) != 0)
     {
 	prefix = PREFIX_NO;
 	arg += 2;
     }
-    else if (STRNCMP(arg, "inv", 3) == 0)
+    ܐܚܪܢܐ ܐܢ (STRNCMP(arg, "inv", 3) == 0)
     {
 	prefix = PREFIX_INV;
 	arg += 3;
     }
 
     *argp = arg;
-    return prefix;
+    ܦܢܐ prefix;
 }
 
 /*
@@ -1521,51 +1521,51 @@ get_option_prefix(char_u **argp)
  * Returns FAIL if an option starting with "<" doesn't end with a ">",
  * otherwise returns OK.
  */
-    static int
-parse_option_name(char_u *arg, int *opt_idxp, int *lenp, int *keyp)
+    ساكن صحيح
+parse_option_name(char_u *arg, صحيح *opt_idxp, صحيح *lenp, صحيح *keyp)
 {
-    int	key = 0;
-    int	len;
-    int	opt_idx;
+    صحيح	key = 0;
+    صحيح	len;
+    صحيح	opt_idx;
 
-    if (*arg == '<')
+    ܐܢ (*arg == '<')
     {
 	opt_idx = -1;
 	// look out for <t_>;>
-	if (arg[1] == 't' && arg[2] == '_' && arg[3] && arg[4])
+	ܐܢ (arg[1] == 't' && arg[2] == '_' && arg[3] && arg[4])
 	    len = 5;
-	else
+	ܐܚܪܢܐ
 	{
 	    len = 1;
-	    while (arg[len] != NUL && arg[len] != '>')
+	    ܟܡܐ (arg[len] != NUL && arg[len] != '>')
 		++len;
 	}
-	if (arg[len] != '>')
-	    return FAIL;
+	ܐܢ (arg[len] != '>')
+	    ܦܢܐ FAIL;
 
 	arg[len] = NUL;			    // put NUL after name
-	if (arg[1] == 't' && arg[2] == '_') // could be term code
+	ܐܢ (arg[1] == 't' && arg[2] == '_') // could be term code
 	    opt_idx = findoption(arg + 1);
 	arg[len++] = '>';		    // restore '>'
-	if (opt_idx == -1)
+	ܐܢ (opt_idx == -1)
 	    key = find_key_option(arg + 1, TRUE);
     }
-    else
+    ܐܚܪܢܐ
     {
-	int	nextchar;   // next non-white char after option name
+	صحيح	nextchar;   // next non-white char after option name
 
 	len = 0;
 	// The two characters after "t_" may not be alphanumeric.
-	if (arg[0] == 't' && arg[1] == '_' && arg[2] && arg[3])
+	ܐܢ (arg[0] == 't' && arg[1] == '_' && arg[2] && arg[3])
 	    len = 4;
-	else
-	    while (ASCII_ISALNUM(arg[len]) || arg[len] == '_')
+	ܐܚܪܢܐ
+	    ܟܡܐ (ASCII_ISALNUM(arg[len]) || arg[len] == '_')
 		++len;
 	nextchar = arg[len];
 	arg[len] = NUL;			    // put NUL after name
 	opt_idx = findoption(arg);
 	arg[len] = nextchar;		    // restore nextchar
-	if (opt_idx == -1)
+	ܐܢ (opt_idx == -1)
 	    key = find_key_option(arg, FALSE);
     }
 
@@ -1573,32 +1573,32 @@ parse_option_name(char_u *arg, int *opt_idxp, int *lenp, int *keyp)
     *lenp = len;
     *opt_idxp = opt_idx;
 
-    return OK;
+    ܦܢܐ OK;
 }
 
 /*
  * Get the option operator (+=, ^=, -=).
  */
-    static set_op_T
+    ساكن set_op_T
 get_opt_op(char_u *arg)
 {
     set_op_T op = OP_NONE;
 
-    if (*arg != NUL && *(arg + 1) == '=')
+    ܐܢ (*arg != NUL && *(arg + 1) == '=')
     {
-	if (*arg == '+')
+	ܐܢ (*arg == '+')
 	    op = OP_ADDING;		// "+="
-	else if (*arg == '^')
+	ܐܚܪܢܐ ܐܢ (*arg == '^')
 	    op = OP_PREPENDING;		// "^="
-	else if (*arg == '-')
+	ܐܚܪܢܐ ܐܢ (*arg == '-')
 	    op = OP_REMOVING;		// "-="
     }
 
-    return op;
+    ܦܢܐ op;
 }
 
 // Options that are allowed in a modeline when 'modelinestrict' is on.
-static char *modeline_whitelist[] =
+ساكن حرف *modeline_whitelist[] =
 {
     "autoindent",
     "cindent",
@@ -1621,19 +1621,19 @@ static char *modeline_whitelist[] =
     "textwidth",
     "varsofttabstop",
     "vartabstop",
-    NULL
+    عدم
 };
 
 /*
  * Return TRUE if option "name" is in the modeline whitelist.
  */
-    static bool
-is_modeline_whitelisted(char *name)
+    ساكن bool
+is_modeline_whitelisted(حرف *name)
 {
-    for (int i = 0; modeline_whitelist[i] != NULL; i++)
-	if (STRCMP(name, modeline_whitelist[i]) == 0)
-	    return true;
-    return false;
+    لكل (صحيح i = 0; modeline_whitelist[i] != عدم; i++)
+	ܐܢ (STRCMP(name, modeline_whitelist[i]) == 0)
+	    ܦܢܐ true;
+    ܦܢܐ false;
 }
 
 /*
@@ -1641,123 +1641,123 @@ is_modeline_whitelisted(char *name)
  * Returns FAIL if the option can be skipped or cannot be changed. Returns OK
  * if it can be changed.
  */
-    static int
+    ساكن صحيح
 validate_opt_idx(
-	int opt_idx,
-	int opt_flags,
+	صحيح opt_idx,
+	صحيح opt_flags,
 	long_u flags,
-	char **errmsg,
+	حرف **errmsg,
 	set_prefix_T prefix)
 {
     // Skip all options that are not window-local (used when showing
     // an already loaded buffer in a window).
-    if ((opt_flags & OPT_WINONLY)
+    ܐܢ ((opt_flags & OPT_WINONLY)
 	    && (opt_idx < 0 || options[opt_idx].var != VAR_WIN))
-	return FAIL;
+	ܦܢܐ FAIL;
 
     // Skip all options that are window-local (used for :vimgrep).
-    if ((opt_flags & OPT_NOWIN) && opt_idx >= 0
+    ܐܢ ((opt_flags & OPT_NOWIN) && opt_idx >= 0
 	    && options[opt_idx].var == VAR_WIN)
-	return FAIL;
+	ܦܢܐ FAIL;
 
     // Disallow changing some options from modelines.
-    if (opt_flags & OPT_MODELINE)
+    ܐܢ (opt_flags & OPT_MODELINE)
     {
-	if (flags & (P_SECURE | P_NO_ML))
+	ܐܢ (flags & (P_SECURE | P_NO_ML))
 	{
 	    *errmsg = e_not_allowed_in_modeline;
-	    return FAIL;
+	    ܦܢܐ FAIL;
 	}
-	if ((flags & P_MLE) && !p_mle)
+	ܐܢ ((flags & P_MLE) && !p_mle)
 	{
 	    *errmsg = e_not_allowed_in_modeline_when_modelineexpr_is_off;
-	    return FAIL;
+	    ܦܢܐ FAIL;
 	}
 	// When 'modelinestrict' is on, only whitelisted options may be
 	// set from a modeline.  Silently skip others.
-	if (p_mlstr && opt_idx >= 0)
+	ܐܢ (p_mlstr && opt_idx >= 0)
 	{
 	    // special case: allow disabling modeline
-	    if (options[opt_idx].indir == PV_ML && prefix == PREFIX_NO)
-		return OK;
-	    else if (!is_modeline_whitelisted(options[opt_idx].fullname))
-		return FAIL;
+	    ܐܢ (options[opt_idx].indir == PV_ML && prefix == PREFIX_NO)
+		ܦܢܐ OK;
+	    ܐܚܪܢܐ ܐܢ (!is_modeline_whitelisted(options[opt_idx].fullname))
+		ܦܢܐ FAIL;
 	}
 #ifdef FEAT_DIFF
 	// In diff mode some options are overruled.  This avoids that
 	// 'foldmethod' becomes "marker" instead of "diff" and that
 	// "wrap" gets set.
-	if (curwin->w_p_diff
+	ܐܢ (curwin->w_p_diff
 		&& opt_idx >= 0  // shut up coverity warning
 		&& (
 # ifdef FEAT_FOLDING
 		    options[opt_idx].indir == PV_FDM ||
 # endif
 		    options[opt_idx].indir == PV_WRAP))
-	    return FAIL;
+	    ܦܢܐ FAIL;
 #endif
     }
 
 #ifdef HAVE_SANDBOX
     // Disallow changing some options in the sandbox
-    if (sandbox != 0 && (flags & P_SECURE))
+    ܐܢ (sandbox != 0 && (flags & P_SECURE))
     {
 	*errmsg = e_not_allowed_in_sandbox;
-	return FAIL;
+	ܦܢܐ FAIL;
     }
 #endif
 
-    return OK;
+    ܦܢܐ OK;
 }
 
 /*
  * Get the Vim/Vi default value for a string option.
  */
-    static char_u *
+    ساكن char_u *
 stropt_get_default_val(
-    int		opt_idx,
+    صحيح		opt_idx,
     char_u	*varp,
-    int		flags,
-    int		cp_val)
+    صحيح		flags,
+    صحيح		cp_val)
 {
     char_u	*newval;
 
     newval = options[opt_idx].def_val[((flags & P_VI_DEF) || cp_val)
 	? VI_DEFAULT : VIM_DEFAULT];
-    if ((char_u **)varp == &p_bg)
+    ܐܢ ((char_u **)varp == &p_bg)
     {
 	// guess the value of 'background'
 #ifdef FEAT_GUI
-	if (gui.in_use)
+	ܐܢ (gui.in_use)
 	    newval = gui_bg_default();
-	else
+	ܐܚܪܢܐ
 #endif
 	    newval = term_bg_default();
     }
-    else if ((char_u **)varp == &p_fencs && enc_utf8)
+    ܐܚܪܢܐ ܐܢ ((char_u **)varp == &p_fencs && enc_utf8)
 	newval = fencs_utf8_default;
 
     // expand environment variables and ~ since the default value was
     // already expanded, only required when an environment variable was set
     // later
-    if (newval == NULL)
+    ܐܢ (newval == عدم)
 	newval = empty_option;
-    else
+    ܐܚܪܢܐ
     {
 	char_u *s = option_expand(opt_idx, newval);
-	if (s == NULL)
+	ܐܢ (s == عدم)
 	    s = newval;
 	newval = vim_strsave(s);
     }
 
-    return newval;
+    ܦܢܐ newval;
 }
 
 /*
  * Convert the 'backspace' option number value to a string: for adding,
  * prepending and removing string.
  */
-    static void
+    ساكن فراغ
 opt_backspace_nr2str(
     char_u	*varp,
     char_u	**origval_p,
@@ -1765,29 +1765,29 @@ opt_backspace_nr2str(
     char_u	**origval_g_p,
     char_u	**oldval_p)
 {
-    int		i = getdigits((char_u **)varp);
+    صحيح		i = getdigits((char_u **)varp);
 
-    switch (i)
+    بدل (i)
     {
-	case 0:
+	حالة 0:
 	    *(char_u **)varp = empty_option;
-	    break;
-	case 1:
+	    اكسر;
+	حالة 1:
 	    *(char_u **)varp = vim_strnsave((char_u *)"indent,eol", STRLEN_LITERAL("indent,eol"));
-	    break;
-	case 2:
+	    اكسر;
+	حالة 2:
 	    *(char_u **)varp = vim_strnsave((char_u *)"indent,eol,start", STRLEN_LITERAL("indent,eol,start"));
-	    break;
-	case 3:
+	    اكسر;
+	حالة 3:
 	    *(char_u **)varp = vim_strnsave((char_u *)"indent,eol,nostop", STRLEN_LITERAL("indent,eol,nostop"));
-	    break;
+	    اكسر;
     }
     vim_free(*oldval_p);
-    if (*origval_p == *oldval_p)
+    ܐܢ (*origval_p == *oldval_p)
 	*origval_p = *(char_u **)varp;
-    if (*origval_l_p == *oldval_p)
+    ܐܢ (*origval_l_p == *oldval_p)
 	*origval_l_p = *(char_u **)varp;
-    if (*origval_g_p == *oldval_p)
+    ܐܢ (*origval_g_p == *oldval_p)
 	*origval_g_p = *(char_u **)varp;
     *oldval_p = *(char_u **)varp;
 }
@@ -1797,42 +1797,42 @@ opt_backspace_nr2str(
  * compatibility with Vim 3.0.
  * Note: 'argp' is a pointer to a char_u pointer and is updated.
  */
-    static char_u *
+    ساكن char_u *
 opt_whichwrap_nr2str(char_u **argp, char_u *whichwrap)
 {
     size_t  len = 0;
 
     *whichwrap = NUL;
-    int i = getdigits(argp);
-    if (i & 1)
+    صحيح i = getdigits(argp);
+    ܐܢ (i & 1)
     {
 	STRCPY(whichwrap, "b,");
 	len += 2;
     }
-    if (i & 2)
+    ܐܢ (i & 2)
     {
 	STRCPY(whichwrap + len, "s,");
 	len += 2;
     }
-    if (i & 4)
+    ܐܢ (i & 4)
     {
 	STRCPY(whichwrap + len, "h,l,");
 	len += 4;
     }
-    if (i & 8)
+    ܐܢ (i & 8)
     {
 	STRCPY(whichwrap + len, "<,>,");
 	len += 4;
     }
-    if (i & 16)
+    ܐܢ (i & 16)
     {
 	STRCPY(whichwrap + len, "[,],");
 	len += 4;
     }
-    if (*whichwrap != NUL)	// remove trailing ,
+    ܐܢ (*whichwrap != NUL)	// remove trailing ,
 	whichwrap[len - 1] = NUL;
 
-    return whichwrap;
+    ܦܢܐ whichwrap;
 }
 
 /*
@@ -1840,25 +1840,25 @@ opt_whichwrap_nr2str(char_u **argp, char_u *whichwrap)
  * Can't use set_string_option_direct(), because we need to remove the
  * backslashes.
  */
-    static char_u *
+    ساكن char_u *
 stropt_copy_value(
     char_u	*origval,
     char_u	**argp,
     set_op_T	op,
-    int		flags UNUSED)
+    صحيح		flags UNUSED)
 {
     char_u	*arg = *argp;
     unsigned	newlen;
     char_u	*newval;
-    char_u	*s = NULL;
+    char_u	*s = عدم;
 
     // get a bit too much
     newlen = (unsigned)STRLEN(arg) + 1;
-    if (op != OP_NONE)
+    ܐܢ (op != OP_NONE)
 	newlen += (unsigned)STRLEN(origval) + 1;
     newval = alloc(newlen);
-    if (newval == NULL)  // out of mem, don't change
-	return NULL;
+    ܐܢ (newval == عدم)  // out of mem, don't change
+	ܦܢܐ عدم;
     s = newval;
 
     // Copy the string, skip over escaped chars.
@@ -1866,11 +1866,11 @@ stropt_copy_value(
     // are not removed, and keep backslash at start, for "\\machine\path",
     // but do remove it for "\\\\machine\\path".
     // The reverse is found in escape_option_str_cmdline().
-    while (*arg != NUL && !VIM_ISWHITE(*arg))
+    ܟܡܐ (*arg != NUL && !VIM_ISWHITE(*arg))
     {
-	int i;
+	صحيح i;
 
-	if (*arg == '\\' && arg[1] != NUL
+	ܐܢ (*arg == '\\' && arg[1] != NUL
 #ifdef BACKSLASH_IN_FILENAME
 		&& !((flags & P_EXPAND)
 		    && vim_isfilec(arg[1])
@@ -1880,69 +1880,69 @@ stropt_copy_value(
 #endif
 	   )
 	    ++arg;	// remove backslash
-	if (has_mbyte && (i = (*mb_ptr2len)(arg)) > 1)
+	ܐܢ (has_mbyte && (i = (*mb_ptr2len)(arg)) > 1)
 	{
 	    // copy multibyte char
 	    mch_memmove(s, arg, (size_t)i);
 	    arg += i;
 	    s += i;
 	}
-	else
+	ܐܚܪܢܐ
 	    *s++ = *arg++;
     }
     *s = NUL;
 
     *argp = arg;
-    return newval;
+    ܦܢܐ newval;
 }
 
 /*
  * Expand environment variables and ~ in string option value 'newval'.
  */
-    static char_u *
+    ساكن char_u *
 stropt_expand_envvar(
-    int		opt_idx,
+    صحيح		opt_idx,
     char_u	*origval,
     char_u	*newval,
     set_op_T	op)
 {
     char_u *s = option_expand(opt_idx, newval);
-    if (s == NULL)
-	return newval;
+    ܐܢ (s == عدم)
+	ܦܢܐ newval;
 
     vim_free(newval);
     unsigned newlen = (unsigned)STRLEN(s) + 1;
-    if (op != OP_NONE)
+    ܐܢ (op != OP_NONE)
 	newlen += (unsigned)STRLEN(origval) + 1;
 
     newval = alloc(newlen);
-    if (newval == NULL)
-	return NULL;
+    ܐܢ (newval == عدم)
+	ܦܢܐ عدم;
 
     STRCPY(newval, s);
 
-    return newval;
+    ܦܢܐ newval;
 }
 
 /*
  * Concatenate the original and new values of a string option, adding a "," if
  * needed.
  */
-    static void
+    ساكن فراغ
 stropt_concat_with_comma(
     char_u	*origval,
     char_u	*newval,
     set_op_T	op,
-    int		flags)
+    صحيح		flags)
 {
-    int		len = 0;
+    صحيح		len = 0;
 
-    int comma = ((flags & P_COMMA) && *origval != NUL && *newval != NUL);
-    if (op == OP_ADDING)
+    صحيح comma = ((flags & P_COMMA) && *origval != NUL && *newval != NUL);
+    ܐܢ (op == OP_ADDING)
     {
-	len = (int)STRLEN(origval);
+	len = (صحيح)STRLEN(origval);
 	// strip a trailing comma, would get 2
-	if (comma && len > 1
+	ܐܢ (comma && len > 1
 		&& (flags & P_ONECOMMA) == P_ONECOMMA
 		&& origval[len - 1] == ','
 		&& origval[len - 2] != '\\')
@@ -1950,12 +1950,12 @@ stropt_concat_with_comma(
 	mch_memmove(newval + len + comma, newval, STRLEN(newval) + 1);
 	mch_memmove(newval, origval, (size_t)len);
     }
-    else
+    ܐܚܪܢܐ
     {
-	len = (int)STRLEN(newval);
+	len = (صحيح)STRLEN(newval);
 	STRMOVE(newval + len + comma, origval);
     }
-    if (comma)
+    ܐܢ (comma)
 	newval[len] = ',';
 }
 
@@ -1963,29 +1963,29 @@ stropt_concat_with_comma(
  * Remove a value from a string option.  Copy string option value in "origval"
  * to "newval" and then remove the string "strval" of length "len".
  */
-    static void
+    ساكن فراغ
 stropt_remove_val(
     char_u	*origval,
     char_u	*newval,
-    int		flags,
+    صحيح		flags,
     char_u	*strval,
-    int		len)
+    صحيح		len)
 {
     // Remove newval[] from origval[]. (Note: "len" has been set above
     // and is used here).
     STRCPY(newval, origval);
-    if (*strval)
+    ܐܢ (*strval)
     {
 	// may need to remove a comma
-	if (flags & P_COMMA)
+	ܐܢ (flags & P_COMMA)
 	{
-	    if (strval == origval)
+	    ܐܢ (strval == origval)
 	    {
 		// include comma after string
-		if (strval[len] == ',')
+		ܐܢ (strval[len] == ',')
 		    ++len;
 	    }
-	    else
+	    ܐܚܪܢܐ
 	    {
 		// include comma before string
 		--strval;
@@ -2002,43 +2002,43 @@ stropt_remove_val(
  * Returns a pointer to the found item in "src", or NULL if not found.
  * Sets "*itemlenp" to the length of the found item (up to ',' or NUL).
  */
-    static char_u *
-find_key_item(char_u *src, char_u *key, int keylen, int *itemlenp)
+    ساكن char_u *
+find_key_item(char_u *src, char_u *key, صحيح keylen, صحيح *itemlenp)
 {
     char_u  *p = src;
 
-    while (*p != NUL)
+    ܟܡܐ (*p != NUL)
     {
 	// Check if this item starts with the same key
-	if ((p == src || *(p - 1) == ',')
+	ܐܢ ((p == src || *(p - 1) == ',')
 		&& STRNCMP(p, key, keylen) == 0)
 	{
 	    // Find the end of this item
 	    char_u *end = vim_strchr(p, ',');
-	    if (end == NULL)
+	    ܐܢ (end == عدم)
 		end = p + STRLEN(p);
-	    *itemlenp = (int)(end - p);
-	    return p;
+	    *itemlenp = (صحيح)(end - p);
+	    ܦܢܐ p;
 	}
 	++p;
     }
-    return NULL;
+    ܦܢܐ عدم;
 }
 
 /*
  * Remove one item of length "itemlen" at position "item" from comma-separated
  * string "str" in-place.  Handles the comma before or after the item.
  */
-    static void
-remove_comma_item(char_u *str, char_u *item, int itemlen)
+    ساكن فراغ
+remove_comma_item(char_u *str, char_u *item, صحيح itemlen)
 {
-    if (item[itemlen] == ',')
+    ܐܢ (item[itemlen] == ',')
 	// Remove item and trailing comma
 	STRMOVE(item, item + itemlen + 1);
-    else if (item > str && *(item - 1) == ',')
+    ܐܚܪܢܐ ܐܢ (item > str && *(item - 1) == ',')
 	// Last item: remove leading comma and item
 	STRMOVE(item - 1, item + itemlen);
-    else
+    ܐܚܪܢܐ
 	// Only item
 	*item = NUL;
 }
@@ -2047,23 +2047,23 @@ remove_comma_item(char_u *str, char_u *item, int itemlen)
  * Remove all items matching "key" (with ':') from comma-separated string "str"
  * in-place.  If "skip" is not NULL, the item at that position is kept.
  */
-    static void
-remove_key_item(char_u *str, char_u *key, int keylen, char_u *skip)
+    ساكن فراغ
+remove_key_item(char_u *str, char_u *key, صحيح keylen, char_u *skip)
 {
-    int	    itemlen;
+    صحيح	    itemlen;
     char_u  *found;
 
-    while ((found = find_key_item(str, key, keylen, &itemlen)) != NULL)
+    ܟܡܐ ((found = find_key_item(str, key, keylen, &itemlen)) != عدم)
     {
-	if (found == skip)
+	ܐܢ (found == skip)
 	{
 	    // Search for the next match after this one.
 	    char_u *next = found + itemlen;
-	    if (*next == ',')
+	    ܐܢ (*next == ',')
 		++next;
 	    found = find_key_item(next, key, keylen, &itemlen);
-	    if (found == NULL)
-		break;
+	    ܐܢ (found == عدم)
+		اكسر;
 	}
 
 	remove_comma_item(str, found, itemlen);
@@ -2074,12 +2074,12 @@ remove_key_item(char_u *str, char_u *key, int keylen, char_u *skip)
  * Append a comma-separated item to the end of "str" in-place.
  * Adds a comma before the item if "str" is not empty.
  */
-    static void
-append_item(char_u *str, char_u *item, int item_len)
+    ساكن فراغ
+append_item(char_u *str, char_u *item, صحيح item_len)
 {
-    int len = (int)STRLEN(str);
+    صحيح len = (صحيح)STRLEN(str);
 
-    if (len > 0)
+    ܐܢ (len > 0)
 	str[len++] = ',';
     mch_memmove(str + len, item, (size_t)item_len);
     str[len + item_len] = NUL;
@@ -2089,15 +2089,15 @@ append_item(char_u *str, char_u *item, int item_len)
  * Prepend a comma-separated item to the beginning of "str" in-place.
  * Adds a comma after the item if "str" is not empty.
  */
-    static void
-prepend_item(char_u *str, char_u *item, int item_len)
+    ساكن فراغ
+prepend_item(char_u *str, char_u *item, صحيح item_len)
 {
-    int len = (int)STRLEN(str);
-    int comma = (len > 0) ? 1 : 0;
+    صحيح len = (صحيح)STRLEN(str);
+    صحيح comma = (len > 0) ? 1 : 0;
 
     mch_memmove(str + item_len + comma, str, (size_t)len + 1);
     mch_memmove(str, item, (size_t)item_len);
-    if (comma)
+    ܐܢ (comma)
 	str[item_len] = ',';
 }
 
@@ -2121,12 +2121,12 @@ prepend_item(char_u *str, char_u *item, int item_len)
  * normal add/remove logic).  Returns false if newval is a single non-colon
  * item, meaning the caller should use the existing code path.
  */
-    static bool
+    ساكن bool
 stropt_handle_keymatch(
     char_u	*origval,
     char_u	*newval,
     set_op_T	op,
-    int		flags UNUSED)
+    صحيح		flags UNUSED)
 {
     char_u  *p;
     char_u  *item_start;
@@ -2134,13 +2134,13 @@ stropt_handle_keymatch(
     // Check if newval contains any "key:value" item or multiple
     // comma-separated items.  If neither, let the caller use the existing
     // code path.
-    if (vim_strchr(newval, ':') == NULL && vim_strchr(newval, ',') == NULL)
-	return false;
+    ܐܢ (vim_strchr(newval, ':') == عدم && vim_strchr(newval, ',') == عدم)
+	ܦܢܐ false;
 
     // Work on a copy of newval for iteration.
     char_u *newval_copy = vim_strsave(newval);
-    if (newval_copy == NULL)
-	return false;
+    ܐܢ (newval_copy == عدم)
+	ܦܢܐ false;
 
     // Build the result in newval.  Start with a copy of origval, then
     // modify it per-item.  newval buffer has room for origval + arg.
@@ -2148,27 +2148,27 @@ stropt_handle_keymatch(
 
     // Process each item individually, modifying newval in-place.
     item_start = newval_copy;
-    for (;;)
+    لكل (;;)
     {
 	p = vim_strchr(item_start, ',');
-	int item_len = (p == NULL)
-			    ? (int)STRLEN(item_start) : (int)(p - item_start);
+	صحيح item_len = (p == عدم)
+			    ? (صحيح)STRLEN(item_start) : (صحيح)(p - item_start);
 
-	if (item_len > 0)
+	ܐܢ (item_len > 0)
 	{
 	    char_u *colon = vim_strchr(item_start, ':');
-	    if (colon != NULL && colon < item_start + item_len)
+	    ܐܢ (colon != عدم && colon < item_start + item_len)
 	    {
-		int keylen = (int)(colon - item_start) + 1;
+		صحيح keylen = (صحيح)(colon - item_start) + 1;
 
-		if (op == OP_ADDING || op == OP_PREPENDING)
+		ܐܢ (op == OP_ADDING || op == OP_PREPENDING)
 		{
-		    int old_itemlen;
+		    صحيح old_itemlen;
 		    char_u *found = find_key_item(newval, item_start,
 						       keylen, &old_itemlen);
-		    if (found != NULL)
+		    ܐܢ (found != عدم)
 		    {
-			if (old_itemlen == item_len
+			ܐܢ (old_itemlen == item_len
 				&& STRNCMP(found, item_start,
 							 item_len) == 0)
 			{
@@ -2177,94 +2177,94 @@ stropt_handle_keymatch(
 			    remove_key_item(newval, item_start,
 							   keylen, found);
 			}
-			else
+			ܐܚܪܢܐ
 			{
 			    // Key match with different value: remove all
 			    // items with the same key, then add.
 			    remove_key_item(newval, item_start,
-							    keylen, NULL);
-			    if (op == OP_PREPENDING)
+							    keylen, عدم);
+			    ܐܢ (op == OP_PREPENDING)
 				prepend_item(newval, item_start, item_len);
-			    else
+			    ܐܚܪܢܐ
 				append_item(newval, item_start, item_len);
 			}
 		    }
-		    else
+		    ܐܚܪܢܐ
 		    {
 			// New item.
-			if (op == OP_PREPENDING)
+			ܐܢ (op == OP_PREPENDING)
 			    prepend_item(newval, item_start, item_len);
-			else
+			ܐܚܪܢܐ
 			    append_item(newval, item_start, item_len);
 		    }
 		}
-		else if (op == OP_REMOVING)
-		    remove_key_item(newval, item_start, keylen, NULL);
+		ܐܚܪܢܐ ܐܢ (op == OP_REMOVING)
+		    remove_key_item(newval, item_start, keylen, عدم);
 	    }
-	    else
+	    ܐܚܪܢܐ
 	    {
-		if (op == OP_ADDING || op == OP_PREPENDING)
+		ܐܢ (op == OP_ADDING || op == OP_PREPENDING)
 		{
 		    char_u *found = find_dup_item(newval, item_start,
 							   item_len, P_COMMA);
-		    if (found == NULL)
+		    ܐܢ (found == عدم)
 		    {
 			// New item.
-			if (op == OP_PREPENDING)
+			ܐܢ (op == OP_PREPENDING)
 			    prepend_item(newval, item_start, item_len);
-			else
+			ܐܚܪܢܐ
 			    append_item(newval, item_start, item_len);
 		    }
 		    // else: exact duplicate — do nothing
 		}
-		else if (op == OP_REMOVING)
+		ܐܚܪܢܐ ܐܢ (op == OP_REMOVING)
 		{
 		    char_u *found = find_dup_item(newval, item_start,
 							   item_len, P_COMMA);
-		    if (found != NULL)
+		    ܐܢ (found != عدم)
 			remove_comma_item(newval, found, item_len);
 		}
 	    }
 	}
 
-	if (p == NULL)
-	    break;
+	ܐܢ (p == عدم)
+	    اكسر;
 	item_start = p + 1;
     }
 
     vim_free(newval_copy);
 
-    return true;
+    ܦܢܐ true;
 }
 
 /*
  * Remove flags that appear twice in the string option value 'newval'.
  */
-    static void
-stropt_remove_dupflags(char_u *newval, int flags)
+    ساكن فراغ
+stropt_remove_dupflags(char_u *newval, صحيح flags)
 {
     char_u	*s = newval;
 
     // Remove flags that appear twice.
-    while (*s)
+    ܟܡܐ (*s)
     {
 	// if options have P_FLAGLIST and P_ONECOMMA such as 'whichwrap'
-	if (flags & P_ONECOMMA)
+	ܐܢ (flags & P_ONECOMMA)
 	{
-	    if (*s != ',' && *(s + 1) == ',' && vim_strchr(s + 2, *s) != NULL)
+	    ܐܢ (*s != ',' && *(s + 1) == ',' && vim_strchr(s + 2, *s) != عدم)
 	    {
 		// Remove the duplicated value and the next comma.
 		STRMOVE(s, s + 2);
-		continue;
+		استمر;
 	    }
 	}
-	else
+	ܐܚܪܢܐ
 	{
-	    if ((!(flags & P_COMMA) || *s != ',')
-		    && vim_strchr(s + 1, *s) != NULL)
+	    ܐܢ ((!(flags & P_COMMA) || *s != ',')
+		    && vim_strchr(s + 1, *s) != عدم)
 	    {
 		STRMOVE(s, s + 1);
-		continue;
+		استمر;
 	    }
 	}
 	++s;
@@ -2279,10 +2279,10 @@ stropt_remove_dupflags(char_u *newval, int flags)
  *	set {opt}={val}
  *	set {opt}:{val}
  */
-    static char_u *
+    ساكن char_u *
 stropt_get_newval(
-    int		nextchar,
-    int		opt_idx,
+    صحيح		nextchar,
+    صحيح		opt_idx,
     char_u	**argp,
     char_u	*varp,
     char_u	**origval_arg,
@@ -2290,8 +2290,8 @@ stropt_get_newval(
     char_u	**origval_g_arg,
     char_u	**oldval_arg,
     set_op_T    *op_arg,
-    int		flags,
-    int		cp_val)
+    صحيح		flags,
+    صحيح		cp_val)
 {
     char_u	*arg = *argp;
     char_u	*origval = *origval_arg;
@@ -2299,32 +2299,32 @@ stropt_get_newval(
     char_u	*origval_g = *origval_g_arg;
     char_u	*oldval = *oldval_arg;
     set_op_T    op = *op_arg;
-    char_u	*save_arg = NULL;
+    char_u	*save_arg = عدم;
     char_u	*newval;
-    char_u	*s = NULL;
+    char_u	*s = عدم;
     char_u	whichwrap[80];
 
-    if (nextchar == '&')	// set to default val
+    ܐܢ (nextchar == '&')	// set to default val
 	newval = stropt_get_default_val(opt_idx, varp, flags, cp_val);
-    else if (nextchar == '<')	// set to global val
+    ܐܚܪܢܐ ܐܢ (nextchar == '<')	// set to global val
 	newval = vim_strsave(*(char_u **)get_varp_scope(
 					     &(options[opt_idx]), OPT_GLOBAL));
-    else
+    ܐܚܪܢܐ
     {
 	++arg;	// jump to after the '=' or ':'
 
 	// Set 'keywordprg' to ":help" if an empty
 	// value was passed to :set by the user.
-	if (varp == (char_u *)&p_kp && (*arg == NUL || *arg == ' '))
+	ܐܢ (varp == (char_u *)&p_kp && (*arg == NUL || *arg == ' '))
 	{
 	    save_arg = arg;
 	    arg = (char_u *)":help";
 	}
 	// Convert 'backspace' number to string
-	else if (varp == (char_u *)&p_bs && VIM_ISDIGIT(**(char_u **)varp))
+	ܐܚܪܢܐ ܐܢ (varp == (char_u *)&p_bs && VIM_ISDIGIT(**(char_u **)varp))
 	    opt_backspace_nr2str(varp, &origval, &origval_l, &origval_g,
 								&oldval);
-	else if (varp == (char_u *)&p_ww && VIM_ISDIGIT(*arg))
+	ܐܚܪܢܐ ܐܢ (varp == (char_u *)&p_ww && VIM_ISDIGIT(*arg))
 	{
 	    // Convert 'whichwrap' number to string, for backwards
 	    // compatibility with Vim 3.0.
@@ -2334,68 +2334,68 @@ stropt_get_newval(
 	}
 	// Remove '>' before 'dir' and 'bdir', for backwards compatibility with
 	// version 3.0
-	else if (*arg == '>' && (varp == (char_u *)&p_dir
+	ܐܚܪܢܐ ܐܢ (*arg == '>' && (varp == (char_u *)&p_dir
 		    || varp == (char_u *)&p_bdir))
 	    ++arg;
 
 	// Copy the new string into allocated memory.
 	newval = stropt_copy_value(origval, &arg, op, flags);
-	if (newval == NULL)
-	    goto done;
+	ܐܢ (newval == عدم)
+	    اذهب done;
 
 	// Expand environment variables and ~.
 	// Don't do it when adding without inserting a comma.
-	if (op == OP_NONE || (flags & P_COMMA))
+	ܐܢ (op == OP_NONE || (flags & P_COMMA))
 	{
 	    newval = stropt_expand_envvar(opt_idx, origval, newval, op);
-	    if (newval == NULL)
-		goto done;
+	    ܐܢ (newval == عدم)
+		اذهب done;
 	}
 
 	// For P_COMMA|P_COLON options with "key:value" items: process
 	// each item individually by matching on the key part.  If
 	// handled, skip the normal add/remove logic below.
-	if ((flags & P_COMMA) && (flags & P_COLON) && op != OP_NONE
+	ܐܢ ((flags & P_COMMA) && (flags & P_COLON) && op != OP_NONE
 		&& stropt_handle_keymatch(origval, newval, op, flags))
 	    ;  // fully handled
-	else
+	ܐܚܪܢܐ
 	{
 	    // locate newval[] in origval[] when removing it and when
 	    // adding to avoid duplicates
-	    int len = 0;
-	    if (op == OP_REMOVING || (flags & P_NODUP))
+	    صحيح len = 0;
+	    ܐܢ (op == OP_REMOVING || (flags & P_NODUP))
 	    {
-		len = (int)STRLEN(newval);
+		len = (صحيح)STRLEN(newval);
 		s = find_dup_item(origval, newval, len, flags);
 
 		// do not add if already there
-		if ((op == OP_ADDING || op == OP_PREPENDING) && s != NULL)
+		ܐܢ ((op == OP_ADDING || op == OP_PREPENDING) && s != عدم)
 		{
 		    op = OP_NONE;
 		    STRCPY(newval, origval);
 		}
 
 		// if no duplicate, move pointer to end of original value
-		if (s == NULL)
-		    s = origval + (int)STRLEN(origval);
+		ܐܢ (s == عدم)
+		    s = origval + (صحيح)STRLEN(origval);
 	    }
 
 	    // concatenate the two strings; add a ',' if needed
-	    if (op == OP_ADDING || op == OP_PREPENDING)
+	    ܐܢ (op == OP_ADDING || op == OP_PREPENDING)
 		stropt_concat_with_comma(origval, newval, op, flags);
-	    else if (op == OP_REMOVING)
+	    ܐܚܪܢܐ ܐܢ (op == OP_REMOVING)
 		// Remove newval[] from origval[]. (Note: "len" has been
 		// set above and is used here).
 		stropt_remove_val(origval, newval, flags, s, len);
 	}
 
-	if (flags & P_FLAGLIST)
+	ܐܢ (flags & P_FLAGLIST)
 	    // Remove flags that appear twice.
 	    stropt_remove_dupflags(newval, flags);
     }
 
 done:
-    if (save_arg != NULL)
+    ܐܢ (save_arg != عدم)
 	arg = save_arg;  // arg was temporarily changed, restore it
     *argp = arg;
     *origval_arg = origval;
@@ -2404,54 +2404,54 @@ done:
     *oldval_arg = oldval;
     *op_arg = op;
 
-    return newval;
+    ܦܢܐ newval;
 }
 
 /*
  * Part of do_set() for string options.
  * Returns FAIL on failure, do not process further options.
  */
-    static int
+    ساكن صحيح
 do_set_option_string(
-	int	    opt_idx,
-	int	    opt_flags,
+	صحيح	    opt_idx,
+	صحيح	    opt_flags,
 	char_u	    **argp,
-	int	    nextchar,
+	صحيح	    nextchar,
 	set_op_T    op_arg,
 	long_u	    flags,
-	int	    cp_val,
+	صحيح	    cp_val,
 	char_u	    *varp_arg,
-	char	    *errbuf,
+	حرف	    *errbuf,
 	size_t	    errbuflen,
-	int	    *value_checked,
-	char	    **errmsg)
+	صحيح	    *value_checked,
+	حرف	    **errmsg)
 {
     char_u	*arg = *argp;
     set_op_T    op = op_arg;
     char_u	*varp = varp_arg;
-    char_u	*oldval = NULL; // previous value if *varp
+    char_u	*oldval = عدم; // previous value if *varp
     char_u	*newval;
-    char_u	*origval = NULL;
-    char_u	*origval_l = NULL;
-    char_u	*origval_g = NULL;
-#if defined(FEAT_EVAL)
-    char_u	*saved_origval = NULL;
-    char_u	*saved_origval_l = NULL;
-    char_u	*saved_origval_g = NULL;
-    char_u	*saved_newval = NULL;
+    char_u	*origval = عدم;
+    char_u	*origval_l = عدم;
+    char_u	*origval_g = عدم;
+#ܐܢ defined(FEAT_EVAL)
+    char_u	*saved_origval = عدم;
+    char_u	*saved_origval_l = عدم;
+    char_u	*saved_origval_g = عدم;
+    char_u	*saved_newval = عدم;
 #endif
 
     // When using ":set opt=val" for a global option
     // with a local value the local value will be
     // reset, use the global value here.
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0
-	    && ((int)options[opt_idx].indir & PV_BOTH))
+    ܐܢ ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0
+	    && ((صحيح)options[opt_idx].indir & PV_BOTH))
 	varp = options[opt_idx].var;
 
     // The old value is kept until we are sure that the new value is valid.
     oldval = *(char_u **)varp;
 
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+    ܐܢ ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
     {
 	origval_l = *(char_u **)get_varp_scope(
 			   &(options[opt_idx]), OPT_LOCAL);
@@ -2460,16 +2460,16 @@ do_set_option_string(
 
 	// A global-local string option might have an empty option as value to
 	// indicate that the global value should be used.
-	if (((int)options[opt_idx].indir & PV_BOTH)
+	ܐܢ (((صحيح)options[opt_idx].indir & PV_BOTH)
 						  && origval_l == empty_option)
 	    origval_l = origval_g;
     }
 
     // When setting the local value of a global option, the old value may be
     // the global value.
-    if (((int)options[opt_idx].indir & PV_BOTH) && (opt_flags & OPT_LOCAL))
+    ܐܢ (((صحيح)options[opt_idx].indir & PV_BOTH) && (opt_flags & OPT_LOCAL))
 	origval = *(char_u **)get_varp(&options[opt_idx]);
-    else
+    ܐܚܪܢܐ
 	origval = oldval;
 
     // Get the new value for the option
@@ -2479,37 +2479,37 @@ do_set_option_string(
 
     // Set the new value.
     *(char_u **)(varp) = newval;
-    if (newval == NULL)
+    ܐܢ (newval == عدم)
 	*(char_u **)(varp) = empty_option;
 
-#if defined(FEAT_EVAL)
-    if (!starting
+#ܐܢ defined(FEAT_EVAL)
+    ܐܢ (!starting
 # ifdef FEAT_CRYPT
 	    && options[opt_idx].indir != PV_KEY
 # endif
-		      && origval != NULL && newval != NULL)
+		      && origval != عدم && newval != عدم)
     {
 	// origval may be freed by did_set_string_option(), make a copy.
 	saved_origval = vim_strsave(origval);
 	// newval (and varp) may become invalid if the buffer is closed by
 	// autocommands.
 	saved_newval = vim_strsave(newval);
-	if (origval_l != NULL)
+	ܐܢ (origval_l != عدم)
 	    saved_origval_l = vim_strsave(origval_l);
-	if (origval_g != NULL)
+	ܐܢ (origval_g != عدم)
 	    saved_origval_g = vim_strsave(origval_g);
     }
 #endif
 
     {
 	long_u	*p = insecure_flag(curwin, opt_idx, opt_flags);
-	int	secure_saved = secure;
+	صحيح	secure_saved = secure;
 
 	// When an option is set in the sandbox, from a modeline or in secure
 	// mode, then deal with side effects in secure mode.  Also when the
 	// value was set with the P_INSECURE flag and is not completely
 	// replaced.
-	if ((opt_flags & OPT_MODELINE)
+	ܐܢ ((opt_flags & OPT_MODELINE)
 #ifdef HAVE_SANDBOX
 	      || sandbox != 0
 #endif
@@ -2526,8 +2526,8 @@ do_set_option_string(
 	secure = secure_saved;
     }
 
-#if defined(FEAT_EVAL)
-    if (*errmsg == NULL)
+#ܐܢ defined(FEAT_EVAL)
+    ܐܢ (*errmsg == عدم)
 	trigger_optionset_string(opt_idx, opt_flags, saved_origval,
 			       saved_origval_l, saved_origval_g, saved_newval);
     vim_free(saved_origval);
@@ -2537,93 +2537,93 @@ do_set_option_string(
 #endif
 
     *argp = arg;
-    return *errmsg == NULL ? OK : FAIL;
+    ܦܢܐ *errmsg == عدم ? OK : FAIL;
 }
 
 /*
  * Set a boolean option.
  * Returns an untranslated error message or NULL.
  */
-    static char *
+    ساكن حرف *
 do_set_option_bool(
-    int		opt_idx,
-    int		opt_flags,
+    صحيح		opt_idx,
+    صحيح		opt_flags,
     set_prefix_T prefix,
     long_u	flags,
     char_u	*varp,
-    int		nextchar,
-    int		afterchar,
-    int		cp_val)
+    صحيح		nextchar,
+    صحيح		afterchar,
+    صحيح		cp_val)
 
 {
     varnumber_T	value;
 
-    if (nextchar == '=' || nextchar == ':')
-	return e_invalid_argument;
-    if (opt_idx < 0 || varp == NULL)
-	return NULL;  // "cannot happen"
+    ܐܢ (nextchar == '=' || nextchar == ':')
+	ܦܢܐ e_invalid_argument;
+    ܐܢ (opt_idx < 0 || varp == عدم)
+	ܦܢܐ عدم;  // "cannot happen"
 
     // ":set opt!": invert
     // ":set opt&": reset to default value
     // ":set opt<": reset to global value
-    if (nextchar == '!')
-	value = *(int *)(varp) ^ 1;
-    else if (nextchar == '&')
-	value = (int)(long)(long_i)options[opt_idx].def_val[
+    ܐܢ (nextchar == '!')
+	value = *(صحيح *)(varp) ^ 1;
+    ܐܚܪܢܐ ܐܢ (nextchar == '&')
+	value = (صحيح)(long)(long_i)options[opt_idx].def_val[
 	    ((flags & P_VI_DEF) || cp_val) ? VI_DEFAULT : VIM_DEFAULT];
-    else if (nextchar == '<')
+    ܐܚܪܢܐ ܐܢ (nextchar == '<')
     {
 	// For 'autoread' -1 means to use global value.
-	if ((int *)varp == &curbuf->b_p_ar && opt_flags == OPT_LOCAL)
+	ܐܢ ((صحيح *)varp == &curbuf->b_p_ar && opt_flags == OPT_LOCAL)
 	    value = -1;
-	else if ((int *)varp == &curbuf->b_p_ac && opt_flags == OPT_LOCAL)
+	ܐܚܪܢܐ ܐܢ ((صحيح *)varp == &curbuf->b_p_ac && opt_flags == OPT_LOCAL)
 	    value = -1;
 #ifdef HAVE_FSYNC
-	else if ((int *)varp == &curbuf->b_p_fs && opt_flags == OPT_LOCAL)
+	ܐܚܪܢܐ ܐܢ ((صحيح *)varp == &curbuf->b_p_fs && opt_flags == OPT_LOCAL)
 	    value = -1;
 #endif
-	else
-	    value = *(int *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL);
+	ܐܚܪܢܐ
+	    value = *(صحيح *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL);
     }
-    else
+    ܐܚܪܢܐ
     {
 	// ":set invopt": invert
 	// ":set opt" or ":set noopt": set or reset
-	if (nextchar != NUL && !VIM_ISWHITE(afterchar))
-	    return e_trailing_characters;
-	if (prefix == PREFIX_INV)
-	    value = *(int *)(varp) ^ 1;
-	else
+	ܐܢ (nextchar != NUL && !VIM_ISWHITE(afterchar))
+	    ܦܢܐ e_trailing_characters;
+	ܐܢ (prefix == PREFIX_INV)
+	    value = *(صحيح *)(varp) ^ 1;
+	ܐܚܪܢܐ
 	    value = prefix == PREFIX_NO ? 0 : 1;
     }
 
-    return set_bool_option(opt_idx, varp, (int)value, opt_flags);
+    ܦܢܐ set_bool_option(opt_idx, varp, (صحيح)value, opt_flags);
 }
 
 /*
  * Set a numeric option.
  * Returns an untranslated error message or NULL.
  */
-    static char *
+    ساكن حرف *
 do_set_option_numeric(
-    int		opt_idx,
-    int		opt_flags,
+    صحيح		opt_idx,
+    صحيح		opt_flags,
     char_u	**argp,
-    int		nextchar,
+    صحيح		nextchar,
     set_op_T	op,
     long_u	flags,
-    int		cp_val,
+    صحيح		cp_val,
     char_u	*varp,
-    char	*errbuf,
+    حرف	*errbuf,
     size_t	errbuflen)
 {
     char_u		*arg = *argp;
     varnumber_T		value;
-    int			i;
-    char		*errmsg = NULL;
+    صحيح			i;
+    حرف		*errmsg = عدم;
 
-    if (opt_idx < 0 || varp == NULL)
-	return NULL;  // "cannot happen"
+    ܐܢ (opt_idx < 0 || varp == عدم)
+	ܦܢܐ عدم;  // "cannot happen"
 		      //
     /*
      * Different ways to set a number option:
@@ -2636,24 +2636,24 @@ do_set_option_numeric(
      * other	    error
      */
     ++arg;
-    if (nextchar == '&')
+    ܐܢ (nextchar == '&')
 	value = (long)(long_i)options[opt_idx].def_val[
 	    ((flags & P_VI_DEF) || cp_val) ? VI_DEFAULT : VIM_DEFAULT];
-    else if (nextchar == '<')
+    ܐܚܪܢܐ ܐܢ (nextchar == '<')
     {
-	if ((long *)varp == &curbuf->b_p_ul && opt_flags == OPT_LOCAL)
+	ܐܢ ((long *)varp == &curbuf->b_p_ul && opt_flags == OPT_LOCAL)
 	    // for 'undolevels' NO_LOCAL_UNDOLEVEL means using the global value
 	    value = NO_LOCAL_UNDOLEVEL;
-	else if (opt_flags == OPT_LOCAL
+	ܐܚܪܢܐ ܐܢ (opt_flags == OPT_LOCAL
 		    && ((long *)varp == &curwin->w_p_siso
 		     || (long *)varp == &curwin->w_p_so
 		     || (long *)varp == &curwin->w_p_sop))
 	    // for 'scrolloff'/'sidescrolloff'/'scrolloffpad' -1 means using the global value
 	    value = -1;
-	else
+	ܐܚܪܢܐ
 	    value = *(long *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL);
     }
-    else if (((long *)varp == &p_wc || (long *)varp == &p_wcm)
+    ܐܚܪܢܐ ܐܢ (((long *)varp == &p_wc || (long *)varp == &p_wcm)
 	    && (*arg == '<'
 		|| *arg == '^'
 		|| (*arg != NUL
@@ -2661,39 +2661,39 @@ do_set_option_numeric(
 		    && !VIM_ISDIGIT(*arg))))
     {
 	value = string_to_key(arg, FALSE);
-	if (value == 0)
+	ܐܢ (value == 0)
 	{
 	    errmsg = e_invalid_argument;
-	    goto skip;
+	    اذهب skip;
 	}
     }
-    else if (*arg == '-' || VIM_ISDIGIT(*arg))
+    ܐܚܪܢܐ ܐܢ (*arg == '-' || VIM_ISDIGIT(*arg))
     {
 	// Allow negative (for 'undolevels'), octal and hex numbers.
-	vim_str2nr(arg, NULL, &i, STR2NR_ALL, &value, NULL, 0, TRUE, NULL);
-	if (i == 0 || (arg[i] != NUL && !VIM_ISWHITE(arg[i])))
+	vim_str2nr(arg, عدم, &i, STR2NR_ALL, &value, عدم, 0, TRUE, عدم);
+	ܐܢ (i == 0 || (arg[i] != NUL && !VIM_ISWHITE(arg[i])))
 	{
 	    errmsg = e_number_required_after_equal;
-	    goto skip;
+	    اذهب skip;
 	}
     }
-    else
+    ܐܚܪܢܐ
     {
 	errmsg = e_number_required_after_equal;
-	goto skip;
+	اذهب skip;
     }
 
-    if (op == OP_ADDING)
+    ܐܢ (op == OP_ADDING)
 	value = *(long *)varp + value;
-    else if (op == OP_PREPENDING)
+    ܐܚܪܢܐ ܐܢ (op == OP_PREPENDING)
 	value = *(long *)varp * value;
-    else if (op == OP_REMOVING)
+    ܐܚܪܢܐ ܐܢ (op == OP_REMOVING)
 	value = *(long *)varp - value;
 
-    if ((long *)varp == &curwin->w_p_sop && value < -1)
+    ܐܢ ((long *)varp == &curwin->w_p_sop && value < -1)
     {
 	errmsg = e_invalid_argument;
-	goto skip;
+	اذهب skip;
     }
 
     errmsg = set_num_option(opt_idx, varp, value, errbuf, errbuflen,
@@ -2701,121 +2701,121 @@ do_set_option_numeric(
 
 skip:
     *argp = arg;
-    return errmsg;
+    ܦܢܐ errmsg;
 }
 
 /*
  * Set a key code (t_xx) option
  */
-    static char *
-do_set_option_keycode(char_u **argp, char_u *key_name, int nextchar)
+    ساكن حرف *
+do_set_option_keycode(char_u **argp, char_u *key_name, صحيح nextchar)
 {
     char_u	*arg = *argp;
     char_u	*p;
 
-    if (nextchar == '&')
+    ܐܢ (nextchar == '&')
     {
-	if (add_termcap_entry(key_name, TRUE) == FAIL)
-	    return e_not_found_in_termcap;
+	ܐܢ (add_termcap_entry(key_name, TRUE) == FAIL)
+	    ܦܢܐ e_not_found_in_termcap;
     }
-    else
+    ܐܚܪܢܐ
     {
 	++arg; // jump to after the '=' or ':'
-	for (p = arg; *p && !VIM_ISWHITE(*p); ++p)
-	    if (*p == '\\' && p[1] != NUL)
+	لكل (p = arg; *p && !VIM_ISWHITE(*p); ++p)
+	    ܐܢ (*p == '\\' && p[1] != NUL)
 		++p;
 	nextchar = *p;
 	*p = NUL;
 	add_termcode(key_name, arg, FALSE);
 	*p = nextchar;
     }
-    if (full_screen)
+    ܐܢ (full_screen)
 	ttest(FALSE);
     redraw_all_later(UPD_CLEAR);
 
     *argp = arg;
-    return NULL;
+    ܦܢܐ عدم;
 }
 
 /*
  * Set an option to a new value.
  */
-    static char *
+    ساكن حرف *
 do_set_option_value(
-    int		opt_idx,
-    int		opt_flags,
+    صحيح		opt_idx,
+    صحيح		opt_flags,
     char_u	**argp,
     set_prefix_T prefix,
     set_op_T	op,
     long_u	flags,
     char_u	*varp,
     char_u	*key_name,
-    int		nextchar,
-    int		afterchar,
-    int		cp_val,
-    int		*stopopteval,
-    char	*errbuf,
+    صحيح		nextchar,
+    صحيح		afterchar,
+    صحيح		cp_val,
+    صحيح		*stopopteval,
+    حرف	*errbuf,
     size_t	errbuflen)
 {
-    int		value_checked = FALSE;
-    char	*errmsg = NULL;
+    صحيح		value_checked = FALSE;
+    حرف	*errmsg = عدم;
     char_u	*arg = *argp;
 
-    if (flags & P_BOOL)
+    ܐܢ (flags & P_BOOL)
     {
 	// boolean option
 	errmsg = do_set_option_bool(opt_idx, opt_flags, prefix, flags, varp,
 						nextchar, afterchar, cp_val);
-	if (errmsg != NULL)
-	    goto skip;
+	ܐܢ (errmsg != عدم)
+	    اذهب skip;
     }
-    else
+    ܐܚܪܢܐ
     {
 	// numeric or string option
-	if (vim_strchr((char_u *)"=:&<", nextchar) == NULL
+	ܐܢ (vim_strchr((char_u *)"=:&<", nextchar) == عدم
 		|| prefix != PREFIX_NONE)
 	{
 	    errmsg = e_invalid_argument;
-	    goto skip;
+	    اذهب skip;
 	}
 
-	if (flags & P_NUM)
+	ܐܢ (flags & P_NUM)
 	{
 	    // numeric option
 	    errmsg = do_set_option_numeric(opt_idx, opt_flags, &arg, nextchar,
 						op, flags, cp_val, varp,
 						errbuf, errbuflen);
-	    if (errmsg != NULL)
-		goto skip;
+	    ܐܢ (errmsg != عدم)
+		اذهب skip;
 	}
-	else if (opt_idx >= 0)
+	ܐܚܪܢܐ ܐܢ (opt_idx >= 0)
 	{
 	    // string option
-	    if (do_set_option_string(opt_idx, opt_flags, &arg, nextchar, op,
+	    ܐܢ (do_set_option_string(opt_idx, opt_flags, &arg, nextchar, op,
 					flags, cp_val, varp, errbuf, errbuflen,
 					&value_checked, &errmsg) == FAIL)
 	    {
-		if (errmsg != NULL)
-		    goto skip;
+		ܐܢ (errmsg != عدم)
+		    اذهب skip;
 		*stopopteval = TRUE;
-		goto skip;
+		اذهب skip;
 	    }
 	}
-	else
+	ܐܚܪܢܐ
 	{
 	    // key code option
 	    errmsg = do_set_option_keycode(&arg, key_name, nextchar);
-	    if (errmsg != NULL)
-		goto skip;
+	    ܐܢ (errmsg != عدم)
+		اذهب skip;
 	}
     }
 
-    if (opt_idx >= 0)
+    ܐܢ (opt_idx >= 0)
 	did_set_option(opt_idx, opt_flags, op == OP_NONE, value_checked);
 
 skip:
     *argp = arg;
-    return errmsg;
+    ܦܢܐ errmsg;
 }
 
 /*
@@ -2823,103 +2823,103 @@ skip:
  * Return NULL if OK, return an untranslated error message when something is
  * wrong.  "errbuf[errbuflen]" can be used to create the error message.
  */
-    static char *
+    ساكن حرف *
 do_set_option(
-    int		opt_flags,
+    صحيح		opt_flags,
     char_u	**argp,
     char_u	*arg_start,
     char_u	**startarg,
-    int		*did_show,
-    int		*stopopteval,
-    char	*errbuf,
+    صحيح		*did_show,
+    صحيح		*stopopteval,
+    حرف	*errbuf,
     size_t	errbuflen)
 {
-    int		opt_idx;
+    صحيح		opt_idx;
     char_u	*arg;
     set_prefix_T prefix;	// no prefix, "no" prefix or "inv" prefix
     set_op_T	op;
     long_u	flags;		// flags for current option
     char_u	*varp;		// pointer to variable for current option
     char_u	key_name[2];
-    int		nextchar;	// next non-white char after option name
-    int		afterchar;	// character just after option name
-    char	*errmsg = NULL;
-    int		key;
-    int		len;
+    صحيح		nextchar;	// next non-white char after option name
+    صحيح		afterchar;	// character just after option name
+    حرف	*errmsg = عدم;
+    صحيح		key;
+    صحيح		len;
 
     prefix = get_option_prefix(argp);
     arg = *argp;
 
     // find end of name
     key = 0;
-    if (parse_option_name(arg, &opt_idx, &len, &key) == FAIL)
-	return e_invalid_argument;
+    ܐܢ (parse_option_name(arg, &opt_idx, &len, &key) == FAIL)
+	ܦܢܐ e_invalid_argument;
 
     // remember character after option name
     afterchar = arg[len];
 
-    if (in_vim9script())
+    ܐܢ (in_vim9script())
     {
 	char_u *p = skipwhite(arg + len);
 
 	// disallow white space before =val, +=val, -=val, ^=val
-	if (p > arg + len && (p[0] == '='
-		    || (vim_strchr((char_u *)"+-^", p[0]) != NULL
+	ܐܢ (p > arg + len && (p[0] == '='
+		    || (vim_strchr((char_u *)"+-^", p[0]) != عدم
 			&& p[1] == '=')))
 	{
 	    errmsg = e_no_white_space_allowed_between_option_and;
 	    arg = p;
 	    *startarg = p;
-	    goto skip;
+	    اذهب skip;
 	}
     }
-    else
+    ܐܚܪܢܐ
 	// skip white space, allow ":set ai  ?", ":set hlsearch  !"
-	while (VIM_ISWHITE(arg[len]))
+	ܟܡܐ (VIM_ISWHITE(arg[len]))
 	    ++len;
 
     op = get_opt_op(arg + len);
-    if (op != OP_NONE)
+    ܐܢ (op != OP_NONE)
 	len++;
 
     nextchar = arg[len];
 
-    if (opt_idx == -1 && key == 0)	// found a mismatch: skip
+    ܐܢ (opt_idx == -1 && key == 0)	// found a mismatch: skip
     {
-	if (in_vim9script() && arg > arg_start
-		&& vim_strchr((char_u *)"!&<", *arg) != NULL)
+	ܐܢ (in_vim9script() && arg > arg_start
+		&& vim_strchr((char_u *)"!&<", *arg) != عدم)
 	    errmsg = e_no_white_space_allowed_between_option_and;
-	else
+	ܐܚܪܢܐ
 	    errmsg = e_unknown_option;
-	goto skip;
+	اذهب skip;
     }
 
-    if (opt_idx >= 0)
+    ܐܢ (opt_idx >= 0)
     {
-	if (options[opt_idx].var == NULL)   // hidden option: skip
+	ܐܢ (options[opt_idx].var == عدم)   // hidden option: skip
 	{
 	    // Only give an error message when requesting the value of
 	    // a hidden option, ignore setting it.
-	    if (vim_strchr((char_u *)"=:!&<", nextchar) == NULL
+	    ܐܢ (vim_strchr((char_u *)"=:!&<", nextchar) == عدم
 		    && (!(options[opt_idx].flags & P_BOOL)
 			|| nextchar == '?'))
 		errmsg = e_option_not_supported;
-	    goto skip;
+	    اذهب skip;
 	}
 
 	flags = options[opt_idx].flags;
 	varp = get_varp_scope(&(options[opt_idx]), opt_flags);
     }
-    else
+    ܐܚܪܢܐ
     {
 	flags = P_STRING;
-	varp = NULL;
-	if (key < 0)
+	varp = عدم;
+	ܐܢ (key < 0)
 	{
 	    key_name[0] = KEY2TERMCAP0(key);
 	    key_name[1] = KEY2TERMCAP1(key);
 	}
-	else
+	ܐܚܪܢܐ
 	{
 	    key_name[0] = KS_KEY;
 	    key_name[1] = (key & 0xff);
@@ -2927,85 +2927,85 @@ do_set_option(
     }
 
     // Make sure the option value can be changed.
-    if (validate_opt_idx(opt_idx, opt_flags, flags, &errmsg, prefix) == FAIL)
-	goto skip;
+    ܐܢ (validate_opt_idx(opt_idx, opt_flags, flags, &errmsg, prefix) == FAIL)
+	اذهب skip;
 
-    int cp_val = p_cp;
-    if (vim_strchr((char_u *)"?=:!&<", nextchar) != NULL)
+    صحيح cp_val = p_cp;
+    ܐܢ (vim_strchr((char_u *)"?=:!&<", nextchar) != عدم)
     {
 	arg += len;
-	if (nextchar == '&' && arg[1] == 'v' && arg[2] == 'i')
+	ܐܢ (nextchar == '&' && arg[1] == 'v' && arg[2] == 'i')
 	{
-	    if (arg[3] == 'm')	// "opt&vim": set to Vim default
+	    ܐܢ (arg[3] == 'm')	// "opt&vim": set to Vim default
 	    {
 		cp_val = FALSE;
 		arg += 3;
 	    }
-	    else		// "opt&vi": set to Vi default
+	    ܐܚܪܢܐ		// "opt&vi": set to Vi default
 	    {
 		cp_val = TRUE;
 		arg += 2;
 	    }
 	}
-	if (vim_strchr((char_u *)"?!&<", nextchar) != NULL
+	ܐܢ (vim_strchr((char_u *)"?!&<", nextchar) != عدم
 		&& arg[1] != NUL && !VIM_ISWHITE(arg[1]))
 	{
 	    errmsg = e_trailing_characters;
-	    goto skip;
+	    اذهب skip;
 	}
     }
 
     // Allow '=' and ':' for historical reasons (MSDOS command.com).
     // Allows only one '=' character per "set" command line. grrr. (jw)
-    if (nextchar == '?'
+    ܐܢ (nextchar == '?'
 	    || (prefix == PREFIX_NONE
-		&& vim_strchr((char_u *)"=:&<", nextchar) == NULL
+		&& vim_strchr((char_u *)"=:&<", nextchar) == عدم
 		&& !(flags & P_BOOL)))
     {
 	// print value
-	if (*did_show)
+	ܐܢ (*did_show)
 	    msg_putchar('\n');	    // cursor below last one
-	else
+	ܐܚܪܢܐ
 	{
 	    gotocmdline(TRUE);	    // cursor at status line
 	    *did_show = TRUE;	    // remember that we did a line
 	}
-	if (opt_idx >= 0)
+	ܐܢ (opt_idx >= 0)
 	{
 	    showoneopt(&options[opt_idx], opt_flags);
 #ifdef FEAT_EVAL
-	    if (p_verbose > 0)
+	    ܐܢ (p_verbose > 0)
 	    {
 		// Mention where the option was last set.
-		if (varp == options[opt_idx].var)
+		ܐܢ (varp == options[opt_idx].var)
 		    last_set_msg(options[opt_idx].script_ctx);
-		else if ((int)options[opt_idx].indir & PV_WIN)
+		ܐܚܪܢܐ ܐܢ ((صحيح)options[opt_idx].indir & PV_WIN)
 		    last_set_msg(curwin->w_p_script_ctx[
-			    (int)options[opt_idx].indir & PV_MASK]);
-		else if ((int)options[opt_idx].indir & PV_BUF)
+			    (صحيح)options[opt_idx].indir & PV_MASK]);
+		ܐܚܪܢܐ ܐܢ ((صحيح)options[opt_idx].indir & PV_BUF)
 		    last_set_msg(curbuf->b_p_script_ctx[
-			    (int)options[opt_idx].indir & PV_MASK]);
+			    (صحيح)options[opt_idx].indir & PV_MASK]);
 	    }
 #endif
 	}
-	else
+	ܐܚܪܢܐ
 	{
 	    char_u	    *p;
 
 	    p = find_termcode(key_name);
-	    if (p == NULL)
+	    ܐܢ (p == عدم)
 	    {
 		errmsg = e_key_code_not_set;
-		goto skip;
+		اذهب skip;
 	    }
-	    else
-		(void)show_one_termcode(key_name, p, TRUE);
+	    ܐܚܪܢܐ
+		(فراغ)show_one_termcode(key_name, p, TRUE);
 	}
-	if (nextchar != '?'
+	ܐܢ (nextchar != '?'
 		&& nextchar != NUL && !VIM_ISWHITE(afterchar))
 	    errmsg = e_trailing_characters;
     }
-    else
+    ܐܚܪܢܐ
     {
 	errmsg = do_set_option_value(opt_idx, opt_flags, &arg, prefix, op,
 					flags, varp, key_name, nextchar,
@@ -3015,7 +3015,7 @@ do_set_option(
 
 skip:
     *argp = arg;
-    return errmsg;
+    ܦܢܐ errmsg;
 }
 
 /*
@@ -3034,31 +3034,31 @@ skip:
  *
  * Returns FAIL if an error is detected, OK otherwise.
  */
-    int
+    صحيح
 do_set(
     char_u	*arg_start,	// option string (may be written to!)
-    int		opt_flags)
+    صحيح		opt_flags)
 {
     char_u	*arg = arg_start;
-    int		i;
-    int		did_show = FALSE;   // already showed one value
+    صحيح		i;
+    صحيح		did_show = FALSE;   // already showed one value
 
-    if (*arg == NUL)
+    ܐܢ (*arg == NUL)
     {
 	showoptions(0, opt_flags);
 	did_show = TRUE;
-	goto theend;
+	اذهب theend;
     }
 
-    while (*arg != NUL)		// loop to process all options
+    ܟܡܐ (*arg != NUL)		// loop to process all options
     {
-	if (STRNCMP(arg, "all", 3) == 0 && !ASCII_ISALPHA(arg[3])
+	ܐܢ (STRNCMP(arg, "all", 3) == 0 && !ASCII_ISALPHA(arg[3])
 						&& !(opt_flags & OPT_MODELINE))
 	{
 	    // ":set all"  show all options.
 	    // ":set all&" set all options to their default value.
 	    arg += 3;
-	    if (*arg == '&')
+	    ܐܢ (*arg == '&')
 	    {
 		++arg;
 		// Only for :set command set global value of local options.
@@ -3067,50 +3067,50 @@ do_set(
 		didset_options2();
 		redraw_all_later(UPD_CLEAR);
 	    }
-	    else
+	    ܐܚܪܢܐ
 	    {
 		showoptions(1, opt_flags);
 		did_show = TRUE;
 	    }
 	}
-	else if (STRNCMP(arg, "termcap", 7) == 0 && !(opt_flags & OPT_MODELINE))
+	ܐܚܪܢܐ ܐܢ (STRNCMP(arg, "termcap", 7) == 0 && !(opt_flags & OPT_MODELINE))
 	{
 	    showoptions(2, opt_flags);
 	    show_termcodes(opt_flags);
 	    did_show = TRUE;
 	    arg += 7;
 	}
-	else
+	ܐܚܪܢܐ
 	{
-	    int		stopopteval = FALSE;
-	    char	*errmsg = NULL;
-	    char	errbuf[ERR_BUFLEN];
+	    صحيح		stopopteval = FALSE;
+	    حرف	*errmsg = عدم;
+	    حرف	errbuf[ERR_BUFLEN];
 	    char_u	*startarg = arg;
 
 	    errmsg = do_set_option(opt_flags, &arg, arg_start, &startarg,
 					&did_show, &stopopteval, errbuf,
 					ERR_BUFLEN);
-	    if (stopopteval)
-		break;
+	    ܐܢ (stopopteval)
+		اكسر;
 
 	    // Advance to next argument.
 	    // - skip until a blank found, taking care of backslashes
 	    // - skip blanks
 	    // - skip one "=val" argument (for hidden options ":set gfn =xx")
-	    for (i = 0; i < 2 ; ++i)
+	    لكل (i = 0; i < 2 ; ++i)
 	    {
-		while (*arg != NUL && !VIM_ISWHITE(*arg))
-		    if (*arg++ == '\\' && *arg != NUL)
+		ܟܡܐ (*arg != NUL && !VIM_ISWHITE(*arg))
+		    ܐܢ (*arg++ == '\\' && *arg != NUL)
 			++arg;
 		arg = skipwhite(arg);
-		if (*arg != '=')
-		    break;
+		ܐܢ (*arg != '=')
+		    اكسر;
 	    }
 
-	    if (errmsg != NULL)
+	    ܐܢ (errmsg != عدم)
 	    {
-		i = vim_snprintf((char *)IObuff, IOSIZE, "%s", (char_u *)_(errmsg)) + 2;
-		if (i + (arg - startarg) < IOSIZE)
+		i = vim_snprintf((حرف *)IObuff, IOSIZE, "%s", (char_u *)_(errmsg)) + 2;
+		ܐܢ (i + (arg - startarg) < IOSIZE)
 		{
 		    // append the argument with the error
 		    STRCPY(IObuff + i - 2, ": ");
@@ -3121,10 +3121,10 @@ do_set(
 		trans_characters(IObuff, IOSIZE);
 
 		++no_wait_return;		// wait_return() done later
-		emsg((char *)IObuff);	// show error highlighted
+		emsg((حرف *)IObuff);	// show error highlighted
 		--no_wait_return;
 
-		return FAIL;
+		ܦܢܐ FAIL;
 	    }
 	}
 
@@ -3132,7 +3132,7 @@ do_set(
     }
 
 theend:
-    if (silent_mode && did_show)
+    ܐܢ (silent_mode && did_show)
     {
 	// After displaying option values in silent mode.
 	silent_mode = FALSE;
@@ -3144,24 +3144,24 @@ theend:
 	info_message = FALSE;	// use mch_msg(), not mch_errmsg()
     }
 
-    return OK;
+    ܦܢܐ OK;
 }
 
 /*
  * Call this when an option has been given a new value through a user command.
  * Sets the P_WAS_SET flag and takes care of the P_INSECURE flag.
  */
-    void
+    فراغ
 did_set_option(
-    int	    opt_idx,
-    int	    opt_flags,	    // possibly with OPT_MODELINE
-    int	    new_value,	    // value was replaced completely
-    int	    value_checked)  // value was checked to be safe, no need to set the
+    صحيح	    opt_idx,
+    صحيح	    opt_flags,	    // possibly with OPT_MODELINE
+    صحيح	    new_value,	    // value was replaced completely
+    صحيح	    value_checked)  // value was checked to be safe, no need to set the
 			    // P_INSECURE flag.
 {
     long_u	*flagsp;
-    long_u	*flagsp_local = NULL;
-    int		both = (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0;
+    long_u	*flagsp_local = عدم;
+    صحيح		both = (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0;
 
     options[opt_idx].flags |= P_WAS_SET;
 
@@ -3169,22 +3169,22 @@ did_set_option(
     // set the P_INSECURE flag.  Otherwise, if a new value is stored reset the
     // flag.
     flagsp = insecure_flag(curwin, opt_idx, opt_flags);
-    if (both)
+    ܐܢ (both)
 	flagsp_local = insecure_flag(curwin, opt_idx, OPT_LOCAL);
-    if (!value_checked && (secure
+    ܐܢ (!value_checked && (secure
 #ifdef HAVE_SANDBOX
 	    || sandbox != 0
 #endif
 	    || (opt_flags & OPT_MODELINE)))
     {
 	*flagsp = *flagsp | P_INSECURE;
-	if (flagsp_local != NULL)
+	ܐܢ (flagsp_local != عدم)
 	    *flagsp_local = *flagsp_local | P_INSECURE;
     }
-    else if (new_value)
+    ܐܚܪܢܐ ܐܢ (new_value)
     {
 	*flagsp = *flagsp & ~P_INSECURE;
-	if (flagsp_local != NULL)
+	ܐܢ (flagsp_local != عدم)
 	    *flagsp_local = *flagsp_local & ~P_INSECURE;
     }
 }
@@ -3194,21 +3194,21 @@ did_set_option(
  * Used for 'cedit', 'termwinkey', 'wildchar' and 'wildcharm' options.
  * When "multi_byte" is TRUE allow for multi-byte characters.
  */
-    int
-string_to_key(char_u *arg, int multi_byte)
+    صحيح
+string_to_key(char_u *arg, صحيح multi_byte)
 {
-    if (*arg == '<' && arg[1])
-	return find_key_option(arg + 1, TRUE);
-    if (*arg == '^' && arg[1])
+    ܐܢ (*arg == '<' && arg[1])
+	ܦܢܐ find_key_option(arg + 1, TRUE);
+    ܐܢ (*arg == '^' && arg[1])
     {
-	int key = Ctrl_chr(arg[1]);
-	if (key == 0)		// ^@ is <Nul>
+	صحيح key = Ctrl_chr(arg[1]);
+	ܐܢ (key == 0)		// ^@ is <Nul>
 	    key = K_ZERO;
-	return key;
+	ܦܢܐ key;
     }
-    if (multi_byte)
-	return PTR2CHAR(arg);
-    return *arg;
+    ܐܢ (multi_byte)
+	ܦܢܐ PTR2CHAR(arg);
+    ܦܢܐ *arg;
 }
 
 /*
@@ -3217,10 +3217,10 @@ string_to_key(char_u *arg, int multi_byte)
  * When switching the title or icon off, call mch_restore_title() to get
  * the old value back.
  */
-    void
-did_set_title(void)
+    فراغ
+did_set_title(فراغ)
 {
-    if (starting != NO_SCREEN
+    ܐܢ (starting != NO_SCREEN
 #ifdef FEAT_GUI
 	    && !gui.starting
 #endif
@@ -3231,26 +3231,26 @@ did_set_title(void)
 /*
  * set_options_bin -  called when 'bin' changes value.
  */
-    void
+    فراغ
 set_options_bin(
-    int		oldval,
-    int		newval,
-    int		opt_flags)	// OPT_LOCAL and/or OPT_GLOBAL
+    صحيح		oldval,
+    صحيح		newval,
+    صحيح		opt_flags)	// OPT_LOCAL and/or OPT_GLOBAL
 {
     // The option values that are changed when 'bin' changes are
     // copied when 'bin is set and restored when 'bin' is reset.
-    if (newval)
+    ܐܢ (newval)
     {
-	if (!oldval)		// switched on
+	ܐܢ (!oldval)		// switched on
 	{
-	    if (!(opt_flags & OPT_GLOBAL))
+	    ܐܢ (!(opt_flags & OPT_GLOBAL))
 	    {
 		curbuf->b_p_tw_nobin = curbuf->b_p_tw;
 		curbuf->b_p_wm_nobin = curbuf->b_p_wm;
 		curbuf->b_p_ml_nobin = curbuf->b_p_ml;
 		curbuf->b_p_et_nobin = curbuf->b_p_et;
 	    }
-	    if (!(opt_flags & OPT_LOCAL))
+	    ܐܢ (!(opt_flags & OPT_LOCAL))
 	    {
 		p_tw_nobin = p_tw;
 		p_wm_nobin = p_wm;
@@ -3259,14 +3259,14 @@ set_options_bin(
 	    }
 	}
 
-	if (!(opt_flags & OPT_GLOBAL))
+	ܐܢ (!(opt_flags & OPT_GLOBAL))
 	{
 	    curbuf->b_p_tw = 0;	// no automatic line wrap
 	    curbuf->b_p_wm = 0;	// no automatic line wrap
 	    curbuf->b_p_ml = 0;	// no modelines
 	    curbuf->b_p_et = 0;	// no expandtab
 	}
-	if (!(opt_flags & OPT_LOCAL))
+	ܐܢ (!(opt_flags & OPT_LOCAL))
 	{
 	    p_tw = 0;
 	    p_wm = 0;
@@ -3275,16 +3275,16 @@ set_options_bin(
 	    p_bin = TRUE;	// needed when called for the "-b" argument
 	}
     }
-    else if (oldval)		// switched off
+    ܐܚܪܢܐ ܐܢ (oldval)		// switched off
     {
-	if (!(opt_flags & OPT_GLOBAL))
+	ܐܢ (!(opt_flags & OPT_GLOBAL))
 	{
 	    curbuf->b_p_tw = curbuf->b_p_tw_nobin;
 	    curbuf->b_p_wm = curbuf->b_p_wm_nobin;
 	    curbuf->b_p_ml = curbuf->b_p_ml_nobin;
 	    curbuf->b_p_et = curbuf->b_p_et_nobin;
 	}
-	if (!(opt_flags & OPT_LOCAL))
+	ܐܢ (!(opt_flags & OPT_LOCAL))
 	{
 	    p_tw = p_tw_nobin;
 	    p_wm = p_wm_nobin;
@@ -3292,7 +3292,7 @@ set_options_bin(
 	    p_et = p_et_nobin;
 	}
     }
-#if defined(FEAT_EVAL)
+#ܐܢ defined(FEAT_EVAL)
     // Remember where the dependent option were reset
     didset_options_sctx(opt_flags, p_bin_dep_opts);
 #endif
@@ -3304,19 +3304,19 @@ set_options_bin(
  * If "val" is NULL expand the current value of the option.
  * Return pointer to NameBuff, or NULL when not expanded.
  */
-    static char_u *
-option_expand(int opt_idx, char_u *val)
+    ساكن char_u *
+option_expand(صحيح opt_idx, char_u *val)
 {
     // if option doesn't need expansion nothing to do
-    if (!(options[opt_idx].flags & P_EXPAND) || options[opt_idx].var == NULL)
-	return NULL;
+    ܐܢ (!(options[opt_idx].flags & P_EXPAND) || options[opt_idx].var == عدم)
+	ܦܢܐ عدم;
 
     // If val is longer than MAXPATHL no meaningful expansion can be done,
     // expand_env() would truncate the string.
-    if (val != NULL && STRLEN(val) > MAXPATHL)
-	return NULL;
+    ܐܢ (val != عدم && STRLEN(val) > MAXPATHL)
+	ܦܢܐ عدم;
 
-    if (val == NULL)
+    ܐܢ (val == عدم)
 	val = *(char_u **)options[opt_idx].var;
 
     /*
@@ -3326,43 +3326,43 @@ option_expand(int opt_idx, char_u *val)
      * For 'spellsuggest' expand after "file:".
      */
     char_u ** var = (char_u **)options[opt_idx].var;
-    int esc = var == &p_tags || var == &p_path;
+    صحيح esc = var == &p_tags || var == &p_path;
 
     expand_env_esc(val, NameBuff, MAXPATHL,
-	    esc ? (char_u *)" \t" : NULL, FALSE,
+	    esc ? (char_u *)" \t" : عدم, FALSE,
 #ifdef FEAT_SPELL
 	    var == &p_sps ? (char_u *)"file:" :
 #endif
-				  NULL);
-    if (STRCMP(NameBuff, val) == 0)   // they are the same
-	return NULL;
+				  عدم);
+    ܐܢ (STRCMP(NameBuff, val) == 0)   // they are the same
+	ܦܢܐ عدم;
 
-    return NameBuff;
+    ܦܢܐ NameBuff;
 }
 
 /*
  * After setting various option values: recompute variables that depend on
  * option values.
  */
-    static void
-didset_options(void)
+    ساكن فراغ
+didset_options(فراغ)
 {
     // initialize the table for 'iskeyword' et.al.
-    (void)init_chartab();
+    (فراغ)init_chartab();
 
     didset_string_options();
 
 #ifdef FEAT_SPELL
-    (void)spell_check_msm();
-    (void)spell_check_sps();
-    (void)compile_cap_prog(curwin->w_s);
-    (void)did_set_spell_option();
+    (فراغ)spell_check_msm();
+    (فراغ)spell_check_sps();
+    (فراغ)compile_cap_prog(curwin->w_s);
+    (فراغ)did_set_spell_option();
 #endif
     // set cedit_key
-    (void)did_set_cedit(NULL);
+    (فراغ)did_set_cedit(عدم);
 #ifdef FEAT_LINEBREAK
     // initialize the table for 'breakat'.
-    did_set_breakat(NULL);
+    did_set_breakat(عدم);
 #endif
     after_copy_winopt(curwin);
 }
@@ -3370,43 +3370,43 @@ didset_options(void)
 /*
  * More side effects of setting options.
  */
-    static void
-didset_options2(void)
+    ساكن فراغ
+didset_options2(فراغ)
 {
     // Initialize the highlight_attr[] table.
-    (void)highlight_changed();
+    (فراغ)highlight_changed();
 
     // Parse default for 'wildmode'
     check_opt_wim();
 
     // Parse default for 'listchars'.
-    (void)set_listchars_option(curwin, curwin->w_p_lcs, TRUE, NULL, 0);
+    (فراغ)set_listchars_option(curwin, curwin->w_p_lcs, TRUE, عدم, 0);
 
     // Parse default for 'fillchars'.
-    (void)set_fillchars_option(curwin, curwin->w_p_fcs, TRUE, NULL, 0);
+    (فراغ)set_fillchars_option(curwin, curwin->w_p_fcs, TRUE, عدم, 0);
 
 #ifdef FEAT_CLIPBOARD
     // Parse default for 'clipboard'
-    (void)did_set_clipboard(NULL);
+    (فراغ)did_set_clipboard(عدم);
 #endif
 #ifdef FEAT_VARTABS
     vim_free(curbuf->b_p_vsts_array);
-    (void)tabstop_set(curbuf->b_p_vsts, &curbuf->b_p_vsts_array);
+    (فراغ)tabstop_set(curbuf->b_p_vsts, &curbuf->b_p_vsts_array);
     vim_free(curbuf->b_p_vts_array);
-    (void)tabstop_set(curbuf->b_p_vts,  &curbuf->b_p_vts_array);
+    (فراغ)tabstop_set(curbuf->b_p_vts,  &curbuf->b_p_vts_array);
 #endif
 }
 
 /*
  * Check for string options that are NULL (normally only termcap options).
  */
-    void
-check_options(void)
+    فراغ
+check_options(فراغ)
 {
-    int		opt_idx;
+    صحيح		opt_idx;
 
-    for (opt_idx = 0; options[opt_idx].fullname != NULL; opt_idx++)
-	if ((options[opt_idx].flags & P_STRING) && options[opt_idx].var != NULL)
+    لكل (opt_idx = 0; options[opt_idx].fullname != عدم; opt_idx++)
+	ܐܢ ((options[opt_idx].flags & P_STRING) && options[opt_idx].var != عدم)
 	    check_string_option((char_u **)get_varp(&(options[opt_idx])));
 }
 
@@ -3414,50 +3414,50 @@ check_options(void)
  * Return the option index found by a pointer into term_strings[].
  * Return -1 if not found.
  */
-    int
+    صحيح
 get_term_opt_idx(char_u **p)
 {
-    int opt_idx;
+    صحيح opt_idx;
 
-    for (opt_idx = 1; options[opt_idx].fullname != NULL; opt_idx++)
-	if (options[opt_idx].var == (char_u *)p)
-	    return opt_idx;
-    return -1; // cannot happen: didn't find it!
+    لكل (opt_idx = 1; options[opt_idx].fullname != عدم; opt_idx++)
+	ܐܢ (options[opt_idx].var == (char_u *)p)
+	    ܦܢܐ opt_idx;
+    ܦܢܐ -1; // cannot happen: didn't find it!
 }
 
 /*
  * Mark a terminal option as allocated, found by a pointer into term_strings[].
  * Return the option index or -1 if not found.
  */
-    int
+    صحيح
 set_term_option_alloced(char_u **p)
 {
-    int		opt_idx = get_term_opt_idx(p);
+    صحيح		opt_idx = get_term_opt_idx(p);
 
-    if (opt_idx >= 0)
+    ܐܢ (opt_idx >= 0)
 	options[opt_idx].flags |= P_ALLOCED;
-    return opt_idx;
+    ܦܢܐ opt_idx;
 }
 
-#if defined(FEAT_EVAL)
+#ܐܢ defined(FEAT_EVAL)
 /*
  * Return TRUE when option "opt" was set from a modeline or in secure mode.
  * Return FALSE when it wasn't.
  * Return -1 for an unknown option.
  */
-    int
-was_set_insecurely(win_T *wp, char_u *opt, int opt_flags)
+    صحيح
+was_set_insecurely(win_T *wp, char_u *opt, صحيح opt_flags)
 {
-    int	    idx = findoption(opt);
+    صحيح	    idx = findoption(opt);
     long_u  *flagp;
 
-    if (idx >= 0)
+    ܐܢ (idx >= 0)
     {
 	flagp = insecure_flag(wp, idx, opt_flags);
-	return (*flagp & P_INSECURE) != 0;
+	ܦܢܐ (*flagp & P_INSECURE) != 0;
     }
     internal_error("was_set_insecurely()");
-    return -1;
+    ܦܢܐ -1;
 }
 
 /*
@@ -3466,59 +3466,59 @@ was_set_insecurely(win_T *wp, char_u *opt, int opt_flags)
  * NOTE: Caller must make sure that "curwin" is set to the window from which
  * the option is used.
  */
-    static long_u *
-insecure_flag(win_T *wp, int opt_idx, int opt_flags)
+    ساكن long_u *
+insecure_flag(win_T *wp, صحيح opt_idx, صحيح opt_flags)
 {
-    if (opt_flags & OPT_LOCAL)
-	switch ((int)options[opt_idx].indir)
+    ܐܢ (opt_flags & OPT_LOCAL)
+	بدل ((صحيح)options[opt_idx].indir)
 	{
-	    case PV_WRAP:	return &wp->w_p_wrap_flags;
+	    حالة PV_WRAP:	ܦܢܐ &wp->w_p_wrap_flags;
 # ifdef FEAT_STL_OPT
-	    case PV_STL:	return &wp->w_p_stl_flags;
+	    حالة PV_STL:	ܦܢܐ &wp->w_p_stl_flags;
 # endif
 # ifdef FEAT_EVAL
 #  ifdef FEAT_FOLDING
-	    case PV_FDE:	return &wp->w_p_fde_flags;
-	    case PV_FDT:	return &wp->w_p_fdt_flags;
+	    حالة PV_FDE:	ܦܢܐ &wp->w_p_fde_flags;
+	    حالة PV_FDT:	ܦܢܐ &wp->w_p_fdt_flags;
 #  endif
 #  ifdef FEAT_BEVAL
-	    case PV_BEXPR:	return &wp->w_buffer->b_p_bexpr_flags;
+	    حالة PV_BEXPR:	ܦܢܐ &wp->w_buffer->b_p_bexpr_flags;
 #  endif
-	    case PV_INDE:	return &wp->w_buffer->b_p_inde_flags;
-	    case PV_FEX:	return &wp->w_buffer->b_p_fex_flags;
+	    حالة PV_INDE:	ܦܢܐ &wp->w_buffer->b_p_inde_flags;
+	    حالة PV_FEX:	ܦܢܐ &wp->w_buffer->b_p_fex_flags;
 #  ifdef FEAT_FIND_ID
-	    case PV_INEX:	return &wp->w_buffer->b_p_inex_flags;
+	    حالة PV_INEX:	ܦܢܐ &wp->w_buffer->b_p_inex_flags;
 #  endif
 #  ifdef FEAT_COMPL_FUNC
-	    case PV_CPT:	return &wp->w_buffer->b_p_cpt_flags;
+	    حالة PV_CPT:	ܦܢܐ &wp->w_buffer->b_p_cpt_flags;
 #  endif
 # endif
 	}
-    else
+    ܐܚܪܢܐ
 	// For global value of window-local options, use flags in w_allbuf_opt.
-	switch ((int)options[opt_idx].indir)
+	بدل ((صحيح)options[opt_idx].indir)
 	{
-	    case PV_WRAP:	return &wp->w_allbuf_opt.wo_wrap_flags;
-# if defined(FEAT_EVAL) && defined(FEAT_FOLDING)
-	    case PV_FDE:	return &wp->w_allbuf_opt.wo_fde_flags;
-	    case PV_FDT:	return &wp->w_allbuf_opt.wo_fdt_flags;
+	    حالة PV_WRAP:	ܦܢܐ &wp->w_allbuf_opt.wo_wrap_flags;
+# ܐܢ defined(FEAT_EVAL) && defined(FEAT_FOLDING)
+	    حالة PV_FDE:	ܦܢܐ &wp->w_allbuf_opt.wo_fde_flags;
+	    حالة PV_FDT:	ܦܢܐ &wp->w_allbuf_opt.wo_fdt_flags;
 # endif
 	}
 
     // Nothing special, return global flags field.
-    return &options[opt_idx].flags;
+    ܦܢܐ &options[opt_idx].flags;
 }
 #endif
 
 /*
  * Redraw the window title and/or tab page text later.
  */
-    void
-redraw_titles(void)
+    فراغ
+redraw_titles(فراغ)
 {
     need_maketitle = TRUE;
     redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#ܐܢ defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
 #endif
 }
@@ -3527,53 +3527,53 @@ redraw_titles(void)
  * Return TRUE if "val" is a valid name: only consists of alphanumeric ASCII
  * characters or characters in "allowed".
  */
-    int
-valid_name(char_u *val, char *allowed)
+    صحيح
+valid_name(char_u *val, حرف *allowed)
 {
     char_u *s;
 
-    for (s = val; *s != NUL; ++s)
-	if (!ASCII_ISALNUM(*s) && vim_strchr((char_u *)allowed, *s) == NULL)
-	    return FALSE;
-    return TRUE;
+    لكل (s = val; *s != NUL; ++s)
+	ܐܢ (!ASCII_ISALNUM(*s) && vim_strchr((char_u *)allowed, *s) == عدم)
+	    ܦܢܐ FALSE;
+    ܦܢܐ TRUE;
 }
 
-#if defined(FEAT_EVAL)
+#ܐܢ defined(FEAT_EVAL)
 /*
  * Set the script_ctx for an option, taking care of setting the buffer- or
  * window-local value.
  */
-    void
-set_option_sctx_idx(int opt_idx, int opt_flags, sctx_T script_ctx)
+    فراغ
+set_option_sctx_idx(صحيح opt_idx, صحيح opt_flags, sctx_T script_ctx)
 {
-    int		both = (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0;
-    int		indir = (int)options[opt_idx].indir;
+    صحيح		both = (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0;
+    صحيح		indir = (صحيح)options[opt_idx].indir;
     sctx_T	new_script_ctx = script_ctx;
 
     // Modeline already has the line number set.
-    if (!(opt_flags & OPT_MODELINE))
+    ܐܢ (!(opt_flags & OPT_MODELINE))
 	new_script_ctx.sc_lnum += SOURCING_LNUM;
 
     // ":legacy" and ":vim9cmd" change the execution context of an option.
-    if (cmdmod.cmod_flags & CMOD_VIM9CMD)
+    ܐܢ (cmdmod.cmod_flags & CMOD_VIM9CMD)
 	new_script_ctx.sc_version = SCRIPT_VERSION_VIM9;
-    if (cmdmod.cmod_flags & CMOD_LEGACY)
+    ܐܢ (cmdmod.cmod_flags & CMOD_LEGACY)
 	// It is a bit confusing, but "MAX" is actually the legacy Vim script
 	// version before Vim9.
 	new_script_ctx.sc_version = SCRIPT_VERSION_MAX;
 
     // Remember where the option was set.  For local options need to do that
     // in the buffer or window structure.
-    if (both || (opt_flags & OPT_GLOBAL) || (indir & (PV_BUF|PV_WIN)) == 0)
+    ܐܢ (both || (opt_flags & OPT_GLOBAL) || (indir & (PV_BUF|PV_WIN)) == 0)
 	options[opt_idx].script_ctx = new_script_ctx;
-    if (both || (opt_flags & OPT_LOCAL))
+    ܐܢ (both || (opt_flags & OPT_LOCAL))
     {
-	if (indir & PV_BUF)
+	ܐܢ (indir & PV_BUF)
 	    curbuf->b_p_script_ctx[indir & PV_MASK] = new_script_ctx;
-	else if (indir & PV_WIN)
+	ܐܚܪܢܐ ܐܢ (indir & PV_WIN)
 	{
 	    curwin->w_p_script_ctx[indir & PV_MASK] = new_script_ctx;
-	    if (both)
+	    ܐܢ (both)
 		// also setting the "all buffers" value
 		curwin->w_allbuf_opt.wo_script_ctx[indir & PV_MASK] =
 								new_script_ctx;
@@ -3588,26 +3588,26 @@ set_option_sctx_idx(int opt_idx, int opt_flags, sctx_T script_ctx)
  * OPT_LOCAL, selecting global or buffer/window context, respectively.
  */
     bool
-is_option_value_vim9(int opt_idx, int opt_flags)
+is_option_value_vim9(صحيح opt_idx, صحيح opt_flags)
 {
-    int		indir = (int)options[opt_idx].indir;
-    sctx_T	*sctx = NULL;
+    صحيح		indir = (صحيح)options[opt_idx].indir;
+    sctx_T	*sctx = عدم;
 
-    if ((opt_flags & OPT_GLOBAL) || (indir & (PV_BUF|PV_WIN)) == 0)
+    ܐܢ ((opt_flags & OPT_GLOBAL) || (indir & (PV_BUF|PV_WIN)) == 0)
 	sctx = &options[opt_idx].script_ctx;
 
-    if ((opt_flags & OPT_LOCAL) || (indir & (PV_BUF|PV_WIN)))
+    ܐܢ ((opt_flags & OPT_LOCAL) || (indir & (PV_BUF|PV_WIN)))
     {
-	if (indir & PV_BUF)
+	ܐܢ (indir & PV_BUF)
 	    sctx = &curbuf->b_p_script_ctx[indir & PV_MASK];
-	else if (indir & PV_WIN)
+	ܐܚܪܢܐ ܐܢ (indir & PV_WIN)
 	    sctx = &curwin->w_p_script_ctx[indir & PV_MASK];
     }
 
     // If "sc_sid" is not set, it means the option value was not modified from
     // the default yet.  As we move towards Vim9 all the default values should
     // be valid Vim9.
-    return !SCRIPT_ID_VALID(sctx->sc_sid) ||
+    ܦܢܐ !SCRIPT_ID_VALID(sctx->sc_sid) ||
 	sctx->sc_version >= SCRIPT_VERSION_VIM9;
 }
 
@@ -3616,14 +3616,14 @@ is_option_value_vim9(int opt_idx, int opt_flags)
  *
  */
     sctx_T *
-get_option_sctx(char *name)
+get_option_sctx(حرف *name)
 {
-    int idx = findoption((char_u *)name);
+    صحيح idx = findoption((char_u *)name);
 
-    if (idx >= 0)
-	return &options[idx].script_ctx;
+    ܐܢ (idx >= 0)
+	ܦܢܐ &options[idx].script_ctx;
     siemsg("no such option: %s", name);
-    return NULL;
+    ܦܢܐ عدم;
 }
 
 /*
@@ -3631,15 +3631,15 @@ get_option_sctx(char *name)
  * "name" must be the two character code, e.g. "RV".
  * When "name" is NULL use "opt_idx".
  */
-    void
-set_term_option_sctx_idx(char *name, int opt_idx)
+    فراغ
+set_term_option_sctx_idx(حرف *name, صحيح opt_idx)
 {
     char_u  buf[5];
-    int	    idx;
+    صحيح	    idx;
 
-    if (name == NULL)
+    ܐܢ (name == عدم)
 	idx = opt_idx;
-    else
+    ܐܚܪܢܐ
     {
 	buf[0] = 't';
 	buf[1] = '_';
@@ -3648,97 +3648,97 @@ set_term_option_sctx_idx(char *name, int opt_idx)
 	buf[4] = 0;
 	idx = findoption(buf);
     }
-    if (idx >= 0)
+    ܐܢ (idx >= 0)
 	set_option_sctx_idx(idx, OPT_GLOBAL, current_sctx);
 }
 #endif
 
-#if defined(FEAT_EVAL)
+#ܐܢ defined(FEAT_EVAL)
 /*
  * Apply the OptionSet autocommand.
  */
-    static void
+    ساكن فراغ
 apply_optionset_autocmd(
-	int	opt_idx,
+	صحيح	opt_idx,
 	long	opt_flags,
 	long	oldval,
 	long	oldval_g,
 	long	newval,
-	char	*errmsg)
+	حرف	*errmsg)
 {
     char_u buf_old[12], buf_new[12], buf_type[12];
     size_t  buf_oldlen;
     size_t  len;
 
     // Don't do this while starting up, failure or recursively.
-    if (starting || errmsg != NULL || *get_vim_var_str(VV_OPTION_TYPE) != NUL)
-	return;
+    ܐܢ (starting || errmsg != عدم || *get_vim_var_str(VV_OPTION_TYPE) != NUL)
+	ܦܢܐ;
 
-    len = vim_snprintf_safelen((char *)buf_new, sizeof(buf_new), "%ld", newval);
-    set_vim_var_string(VV_OPTION_NEW, buf_new, (int)len);
-    len = vim_snprintf_safelen((char *)buf_type, sizeof(buf_type), "%s",
+    len = vim_snprintf_safelen((حرف *)buf_new, حجم(buf_new), "%ld", newval);
+    set_vim_var_string(VV_OPTION_NEW, buf_new, (صحيح)len);
+    len = vim_snprintf_safelen((حرف *)buf_type, حجم(buf_type), "%s",
 				(opt_flags & OPT_LOCAL) ? "local" : "global");
-    set_vim_var_string(VV_OPTION_TYPE, buf_type, (int)len);
+    set_vim_var_string(VV_OPTION_TYPE, buf_type, (صحيح)len);
 
-    buf_oldlen = vim_snprintf_safelen((char *)buf_old, sizeof(buf_old), "%ld", oldval);
-    set_vim_var_string(VV_OPTION_OLD, buf_old, (int)buf_oldlen);
+    buf_oldlen = vim_snprintf_safelen((حرف *)buf_old, حجم(buf_old), "%ld", oldval);
+    set_vim_var_string(VV_OPTION_OLD, buf_old, (صحيح)buf_oldlen);
 
-    if (opt_flags & OPT_LOCAL)
+    ܐܢ (opt_flags & OPT_LOCAL)
     {
 	set_vim_var_string(VV_OPTION_COMMAND, (char_u *)"setlocal", STRLEN_LITERAL("setlocal"));
-	set_vim_var_string(VV_OPTION_OLDLOCAL, buf_old, (int)buf_oldlen);
+	set_vim_var_string(VV_OPTION_OLDLOCAL, buf_old, (صحيح)buf_oldlen);
     }
-    if (opt_flags & OPT_GLOBAL)
+    ܐܢ (opt_flags & OPT_GLOBAL)
     {
 	set_vim_var_string(VV_OPTION_COMMAND, (char_u *)"setglobal", STRLEN_LITERAL("setglobal"));
-	set_vim_var_string(VV_OPTION_OLDGLOBAL, buf_old, (int)buf_oldlen);
+	set_vim_var_string(VV_OPTION_OLDGLOBAL, buf_old, (صحيح)buf_oldlen);
     }
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+    ܐܢ ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
     {
 	char_u	buf_old_global[12];
 	size_t	buf_old_globallen;
 
-	buf_old_globallen = vim_snprintf_safelen((char *)buf_old_global,
-	    sizeof(buf_old_global), "%ld", oldval_g);
+	buf_old_globallen = vim_snprintf_safelen((حرف *)buf_old_global,
+	    حجم(buf_old_global), "%ld", oldval_g);
 
 	set_vim_var_string(VV_OPTION_COMMAND, (char_u *)"set", STRLEN_LITERAL("set"));
-	set_vim_var_string(VV_OPTION_OLDLOCAL, buf_old, (int)buf_oldlen);
-	set_vim_var_string(VV_OPTION_OLDGLOBAL, buf_old_global, (int)buf_old_globallen);
+	set_vim_var_string(VV_OPTION_OLDLOCAL, buf_old, (صحيح)buf_oldlen);
+	set_vim_var_string(VV_OPTION_OLDGLOBAL, buf_old_global, (صحيح)buf_old_globallen);
     }
-    if (opt_flags & OPT_MODELINE)
+    ܐܢ (opt_flags & OPT_MODELINE)
     {
 	set_vim_var_string(VV_OPTION_COMMAND, (char_u *)"modeline", STRLEN_LITERAL("modeline"));
-	set_vim_var_string(VV_OPTION_OLDLOCAL, buf_old, (int)buf_oldlen);
+	set_vim_var_string(VV_OPTION_OLDLOCAL, buf_old, (صحيح)buf_oldlen);
     }
     apply_autocmds(EVENT_OPTIONSET, (char_u *)options[opt_idx].fullname,
-	    NULL, FALSE, NULL);
+	    عدم, FALSE, عدم);
     reset_v_option_vars();
 }
 #endif
 
-#if defined(FEAT_ARABIC)
+#ܐܢ defined(FEAT_ARABIC)
 /*
  * Process the updated 'arabic' option value.
  */
-    char *
+    حرف *
 did_set_arabic(optset_T *args UNUSED)
 {
-    char *errmsg = NULL;
+    حرف *errmsg = عدم;
 
-    if (curwin->w_p_arab)
+    ܐܢ (curwin->w_p_arab)
     {
 	// 'arabic' is set, handle various sub-settings.
-	if (!p_tbidi)
+	ܐܢ (!p_tbidi)
 	{
 	    // set rightleft mode
-	    if (!curwin->w_p_rl)
+	    ܐܢ (!curwin->w_p_rl)
 	    {
 		curwin->w_p_rl = TRUE;
 		changed_window_setting();
 	    }
 
 	    // Enable Arabic shaping (major part of what Arabic requires)
-	    if (!p_arshape)
+	    ܐܢ (!p_arshape)
 	    {
 		p_arshape = TRUE;
 		redraw_later_clear();
@@ -3747,9 +3747,9 @@ did_set_arabic(optset_T *args UNUSED)
 
 	// Arabic requires a utf-8 encoding, inform the user if it's not
 	// set.
-	if (STRCMP(p_enc, "utf-8") != 0)
+	ܐܢ (STRCMP(p_enc, "utf-8") != 0)
 	{
-	    static char *w_arabic = N_("W17: Arabic requires UTF-8, do ':set encoding=utf-8'");
+	    ساكن حرف *w_arabic = N_("W17: Arabic requires UTF-8, do ':set encoding=utf-8'");
 
 	    msg_source(HL_ATTR(HLF_W));
 	    msg_attr(_(w_arabic), HL_ATTR(HLF_W));
@@ -3767,13 +3767,13 @@ did_set_arabic(optset_T *args UNUSED)
 								OPT_LOCAL);
 # endif
     }
-    else
+    ܐܚܪܢܐ
     {
 	// 'arabic' is reset, handle various sub-settings.
-	if (!p_tbidi)
+	ܐܢ (!p_tbidi)
 	{
 	    // reset rightleft mode
-	    if (curwin->w_p_rl)
+	    ܐܢ (curwin->w_p_rl)
 	    {
 		curwin->w_p_rl = FALSE;
 		changed_window_setting();
@@ -3793,101 +3793,101 @@ did_set_arabic(optset_T *args UNUSED)
 # endif
     }
 
-    return errmsg;
+    ܦܢܐ errmsg;
 }
 #endif
 
-#if defined(FEAT_AUTOCHDIR)
+#ܐܢ defined(FEAT_AUTOCHDIR)
 /*
  * Process the updated 'autochdir' option value.
  */
-    char *
+    حرف *
 did_set_autochdir(optset_T *args UNUSED)
 {
     // Change directories when the 'acd' option is set now.
     DO_AUTOCHDIR;
-    return NULL;
+    ܦܢܐ عدم;
 }
 #endif
 
-#if defined(FEAT_BEVAL_GUI)
+#ܐܢ defined(FEAT_BEVAL_GUI)
 /*
  * Process the updated 'ballooneval' option value.
  */
-    char *
+    حرف *
 did_set_ballooneval(optset_T *args)
 {
-    if (balloonEvalForTerm)
-	return NULL;
+    ܐܢ (balloonEvalForTerm)
+	ܦܢܐ عدم;
 
-    if (p_beval && !args->os_oldval.boolean)
+    ܐܢ (p_beval && !args->os_oldval.boolean)
 	gui_mch_enable_beval_area(balloonEval);
-    else if (!p_beval && args->os_oldval.boolean)
+    ܐܚܪܢܐ ܐܢ (!p_beval && args->os_oldval.boolean)
 	gui_mch_disable_beval_area(balloonEval);
 
-    return NULL;
+    ܦܢܐ عدم;
 }
 #endif
 
-#if defined(FEAT_BEVAL_TERM)
+#ܐܢ defined(FEAT_BEVAL_TERM)
 /*
  * Process the updated 'balloonevalterm' option value.
  */
-    char *
+    حرف *
 did_set_balloonevalterm(optset_T *args UNUSED)
 {
     mch_bevalterm_changed();
-    return NULL;
+    ܦܢܐ عدم;
 }
 #endif
 
 /*
  * Process the updated 'binary' option value.
  */
-    char *
+    حرف *
 did_set_binary(optset_T *args)
 {
     // when 'bin' is set also set some other options
     set_options_bin(args->os_oldval.boolean, curbuf->b_p_bin, args->os_flags);
     redraw_titles();
 
-    return NULL;
+    ܦܢܐ عدم;
 }
 
 /*
  * Process the updated 'buflisted' option value.
  */
-    char *
+    حرف *
 did_set_buflisted(optset_T *args)
 {
     // when 'buflisted' changes, trigger autocommands
-    if (args->os_oldval.boolean != curbuf->b_p_bl)
+    ܐܢ (args->os_oldval.boolean != curbuf->b_p_bl)
 	apply_autocmds(curbuf->b_p_bl ? EVENT_BUFADD : EVENT_BUFDELETE,
-						NULL, NULL, TRUE, curbuf);
-    return NULL;
+						عدم, عدم, TRUE, curbuf);
+    ܦܢܐ عدم;
 }
 
 /*
  * Process the new 'cmdheight' option value.
  */
-    char *
+    حرف *
 did_set_cmdheight(optset_T *args)
 {
     long old_value = args->os_oldval.number;
-    char *errmsg = NULL;
+    حرف *errmsg = عدم;
 
     // if p_ch changed value, change the command line height
-    if (p_ch < MIN_CMDHEIGHT)
+    ܐܢ (p_ch < MIN_CMDHEIGHT)
     {
 	errmsg = e_argument_must_be_positive;
 	p_ch = MIN_CMDHEIGHT;
     }
-    if (p_ch > Rows - min_rows() + MIN_CMDHEIGHT)
+    ܐܢ (p_ch > Rows - min_rows() + MIN_CMDHEIGHT)
 	p_ch = Rows - min_rows() + MIN_CMDHEIGHT;
 
     // Only compute the new window layout when startup has been
     // completed. Otherwise the frame sizes may be wrong.
-    if ((p_ch != old_value
+    ܐܢ ((p_ch != old_value
 		|| tabline_height() + topframe->fr_height != Rows - p_ch)
 	    && full_screen
 #ifdef FEAT_GUI
@@ -3896,67 +3896,67 @@ did_set_cmdheight(optset_T *args)
        )
 	command_height();
 
-    return errmsg;
+    ܦܢܐ errmsg;
 }
 
 /*
  * Process the updated 'compatible' option value.
  */
-    char *
+    حرف *
 did_set_compatible(optset_T *args UNUSED)
 {
     compatible_set();
-    return NULL;
+    ܦܢܐ عدم;
 }
 
-#if defined(FEAT_CONCEAL)
+#ܐܢ defined(FEAT_CONCEAL)
 /*
  * Process the new 'conceallevel' option value.
  */
-    char *
+    حرف *
 did_set_conceallevel(optset_T *args UNUSED)
 {
-    char *errmsg = NULL;
+    حرف *errmsg = عدم;
 
-    if (curwin->w_p_cole < 0)
+    ܐܢ (curwin->w_p_cole < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	curwin->w_p_cole = 0;
     }
-    else if (curwin->w_p_cole > 3)
+    ܐܚܪܢܐ ܐܢ (curwin->w_p_cole > 3)
     {
 	errmsg = e_invalid_argument;
 	curwin->w_p_cole = 3;
     }
-    if (curwin->w_allbuf_opt.wo_cole < 0)
+    ܐܢ (curwin->w_allbuf_opt.wo_cole < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	curwin->w_allbuf_opt.wo_cole = 0;
     }
-    else if (curwin->w_allbuf_opt.wo_cole > 3)
+    ܐܚܪܢܐ ܐܢ (curwin->w_allbuf_opt.wo_cole > 3)
     {
 	errmsg = e_invalid_argument;
 	curwin->w_allbuf_opt.wo_cole = 3;
     }
 
-    return errmsg;
+    ܦܢܐ errmsg;
 }
 #endif
 
-#if defined(FEAT_DIFF)
+#ܐܢ defined(FEAT_DIFF)
 /*
  * Process the updated 'diff' option value.
  */
-    char *
+    حرف *
 did_set_diff(optset_T *args UNUSED)
 {
     // May add or remove the buffer from the list of diff buffers.
     diff_buf_adjust(curwin);
 # ifdef FEAT_FOLDING
-    if (foldmethodIsDiff(curwin))
+    ܐܢ (foldmethodIsDiff(curwin))
 	foldUpdateAll(curwin);
 # endif
-    return NULL;
+    ܦܢܐ عدم;
 }
 #endif
 
@@ -3964,352 +3964,352 @@ did_set_diff(optset_T *args UNUSED)
  * Process the updated 'endoffile' or 'endofline' or 'fixendofline' or 'bomb'
  * option value.
  */
-    char *
+    حرف *
 did_set_eof_eol_fixeol_bomb(optset_T *args UNUSED)
 {
     // redraw the window title and tab page text
     redraw_titles();
-    return NULL;
+    ܦܢܐ عدم;
 }
 
 /*
  * Process the updated 'equalalways' option value.
  */
-    char *
+    حرف *
 did_set_equalalways(optset_T *args)
 {
-    if (p_ea && !args->os_oldval.boolean)
+    ܐܢ (p_ea && !args->os_oldval.boolean)
 	win_equal(curwin, FALSE, 0);
 
-    return NULL;
+    ܦܢܐ عدم;
 }
 
-#if defined(FEAT_FOLDING)
+#ܐܢ defined(FEAT_FOLDING)
 /*
  * Process the new 'foldcolumn' option value.
  */
-    char *
+    حرف *
 did_set_foldcolumn(optset_T *args UNUSED)
 {
-    char *errmsg = NULL;
+    حرف *errmsg = عدم;
 
-    if (curwin->w_p_fdc < 0)
+    ܐܢ (curwin->w_p_fdc < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	curwin->w_p_fdc = 0;
     }
-    else if (curwin->w_p_fdc > 12)
+    ܐܚܪܢܐ ܐܢ (curwin->w_p_fdc > 12)
     {
 	errmsg = e_invalid_argument;
 	curwin->w_p_fdc = 12;
     }
-    if (curwin->w_allbuf_opt.wo_fdc < 0)
+    ܐܢ (curwin->w_allbuf_opt.wo_fdc < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	curwin->w_allbuf_opt.wo_fdc = 0;
     }
-    else if (curwin->w_allbuf_opt.wo_fdc > 12)
+    ܐܚܪܢܐ ܐܢ (curwin->w_allbuf_opt.wo_fdc > 12)
     {
 	errmsg = e_invalid_argument;
 	curwin->w_allbuf_opt.wo_fdc = 12;
     }
 
-    return errmsg;
+    ܦܢܐ errmsg;
 }
 
 /*
  * Process the new 'foldlevel' option value.
  */
-    char *
+    حرف *
 did_set_foldlevel(optset_T *args UNUSED)
 {
-    if (curwin->w_p_fdl < 0)
+    ܐܢ (curwin->w_p_fdl < 0)
 	curwin->w_p_fdl = 0;
     newFoldLevel();
-    return NULL;
+    ܦܢܐ عدم;
 }
 
 /*
  * Process the new 'foldminlines' option value.
  */
-    char *
+    حرف *
 did_set_foldminlines(optset_T *args UNUSED)
 {
     foldUpdateAll(curwin);
-    return NULL;
+    ܦܢܐ عدم;
 }
 
 /*
  * Process the new 'foldnestmax' option value.
  */
-    char *
+    حرف *
 did_set_foldnestmax(optset_T *args UNUSED)
 {
-    if (foldmethodIsSyntax(curwin) || foldmethodIsIndent(curwin))
+    ܐܢ (foldmethodIsSyntax(curwin) || foldmethodIsIndent(curwin))
 	foldUpdateAll(curwin);
-    return NULL;
+    ܦܢܐ عدم;
 }
 #endif
 
-#if defined(FEAT_SEARCH_EXTRA)
+#ܐܢ defined(FEAT_SEARCH_EXTRA)
 /*
  * Process the updated 'hlsearch' option value.
  */
-    char *
+    حرف *
 did_set_hlsearch(optset_T *args UNUSED)
 {
     // when 'hlsearch' is set or reset: reset no_hlsearch
     set_no_hlsearch(FALSE);
-    return NULL;
+    ܦܢܐ عدم;
 }
 #endif
 
 /*
  * Process the updated 'ignorecase' option value.
  */
-    char *
+    حرف *
 did_set_ignorecase(optset_T *args UNUSED)
 {
     // when 'ignorecase' is set or reset and 'hlsearch' is set, redraw
-    if (p_hls)
+    ܐܢ (p_hls)
 	redraw_all_later(UPD_SOME_VALID);
-    return NULL;
+    ܦܢܐ عدم;
 }
 
-#if defined(HAVE_INPUT_METHOD)
+#ܐܢ defined(HAVE_INPUT_METHOD)
 /*
  * Process the updated 'imdisable' option value.
  */
-    char *
+    حرف *
 did_set_imdisable(optset_T *args UNUSED)
 {
     // Only de-activate it here, it will be enabled when changing mode.
-    if (p_imdisable)
+    ܐܢ (p_imdisable)
 	im_set_active(FALSE);
-    else if (State & MODE_INSERT)
+    ܐܚܪܢܐ ܐܢ (State & MODE_INSERT)
 	// When the option is set from an autocommand, it may need to take
 	// effect right away.
 	im_set_active(curbuf->b_p_iminsert == B_IMODE_IM);
-    return NULL;
+    ܦܢܐ عدم;
 }
 #endif
 
 /*
  * Process the new 'iminsert' option value.
  */
-    char *
+    حرف *
 did_set_iminsert(optset_T *args UNUSED)
 {
-    char *errmsg = NULL;
+    حرف *errmsg = عدم;
 
-    if (curbuf->b_p_iminsert < 0 || curbuf->b_p_iminsert > B_IMODE_LAST)
+    ܐܢ (curbuf->b_p_iminsert < 0 || curbuf->b_p_iminsert > B_IMODE_LAST)
     {
 	errmsg = e_invalid_argument;
 	curbuf->b_p_iminsert = B_IMODE_NONE;
     }
     p_iminsert = curbuf->b_p_iminsert;
-    if (termcap_active)	// don't do this in the alternate screen
+    ܐܢ (termcap_active)	// don't do this in the alternate screen
 	showmode();
-#if defined(FEAT_KEYMAP)
+#ܐܢ defined(FEAT_KEYMAP)
     // Show/unshow value of 'keymap' in status lines.
     status_redraw_curbuf();
 #endif
 
-    return errmsg;
+    ܦܢܐ errmsg;
 }
 
 /*
  * Process the new 'imsearch' option value.
  */
-    char *
+    حرف *
 did_set_imsearch(optset_T *args UNUSED)
 {
-    char *errmsg = NULL;
+    حرف *errmsg = عدم;
 
-    if (curbuf->b_p_imsearch < -1 || curbuf->b_p_imsearch > B_IMODE_LAST)
+    ܐܢ (curbuf->b_p_imsearch < -1 || curbuf->b_p_imsearch > B_IMODE_LAST)
     {
 	errmsg = e_invalid_argument;
 	curbuf->b_p_imsearch = B_IMODE_NONE;
     }
     p_imsearch = curbuf->b_p_imsearch;
 
-    return errmsg;
+    ܦܢܐ errmsg;
 }
 
-#if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
+#ܐܢ defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
 /*
  * Process the new 'imstyle' option value.
  */
-    char *
+    حرف *
 did_set_imstyle(optset_T *args UNUSED)
 {
-    char *errmsg = NULL;
+    حرف *errmsg = عدم;
 
-    if (p_imst != IM_ON_THE_SPOT && p_imst != IM_OVER_THE_SPOT)
+    ܐܢ (p_imst != IM_ON_THE_SPOT && p_imst != IM_OVER_THE_SPOT)
 	errmsg = e_invalid_argument;
 
-    return errmsg;
+    ܦܢܐ errmsg;
 }
 #endif
 
 /*
  * Process the updated 'insertmode' option value.
  */
-    char *
+    حرف *
 did_set_insertmode(optset_T *args)
 {
     // when 'insertmode' is set from an autocommand need to do work here
-    if (p_im)
+    ܐܢ (p_im)
     {
-	if ((State & MODE_INSERT) == 0)
+	ܐܢ ((State & MODE_INSERT) == 0)
 	    need_start_insertmode = TRUE;
 	stop_insert_mode = FALSE;
     }
     // only reset if it was set previously
-    else if (args->os_oldval.boolean)
+    ܐܚܪܢܐ ܐܢ (args->os_oldval.boolean)
     {
 	need_start_insertmode = FALSE;
 	stop_insert_mode = TRUE;
-	if (restart_edit != 0 && mode_displayed)
+	ܐܢ (restart_edit != 0 && mode_displayed)
 	    clear_cmdline = TRUE;	// remove "(insert)"
 	restart_edit = 0;
     }
 
-    return NULL;
+    ܦܢܐ عدم;
 }
 
-#if defined(FEAT_LANGMAP)
+#ܐܢ defined(FEAT_LANGMAP)
 /*
  * Process the updated 'langnoremap' option value.
  */
-    char *
+    حرف *
 did_set_langnoremap(optset_T *args UNUSED)
 {
     // 'langnoremap' -> !'langremap'
     p_lrm = !p_lnr;
-    return NULL;
+    ܦܢܐ عدم;
 }
 
 /*
  * Process the updated 'langremap' option value.
  */
-    char *
+    حرف *
 did_set_langremap(optset_T *args UNUSED)
 {
     // 'langremap' -> !'langnoremap'
     p_lnr = !p_lrm;
-    return NULL;
+    ܦܢܐ عدم;
 }
 #endif
 
 /*
  * Process the new 'laststatus' option value.
  */
-    char *
+    حرف *
 did_set_laststatus(optset_T *args UNUSED)
 {
     last_status(FALSE);	// (re)set last window status line
-    return NULL;
+    ܦܢܐ عدم;
 }
 
-#if defined(FEAT_GUI)
+#ܐܢ defined(FEAT_GUI)
 /*
  * Process the new 'linespace' option value.
  */
-    char *
+    حرف *
 did_set_linespace(optset_T *args UNUSED)
 {
     // Recompute gui.char_height and resize the Vim window to keep the
     // same number of lines.
-    if (gui.in_use && gui_mch_adjust_charheight() == OK)
+    ܐܢ (gui.in_use && gui_mch_adjust_charheight() == OK)
 	gui_set_shellsize(FALSE, FALSE, RESIZE_VERT);
-    return NULL;
+    ܦܢܐ عدم;
 }
 #endif
 
 /*
  * Process the updated 'lisp' option value.
  */
-    char *
+    حرف *
 did_set_lisp(optset_T *args UNUSED)
 {
     // When 'lisp' option changes include/exclude '-' in keyword characters.
-    (void)buf_init_chartab(curbuf, FALSE);	    // ignore errors
-    return NULL;
+    (فراغ)buf_init_chartab(curbuf, FALSE);	    // ignore errors
+    ܦܢܐ عدم;
 }
 
 /*
  * Process the new 'maxcombine' option value.
  */
-    char *
+    حرف *
 did_set_maxcombine(optset_T *args UNUSED)
 {
-    if (p_mco > MAX_MCO)
+    ܐܢ (p_mco > MAX_MCO)
 	p_mco = MAX_MCO;
-    else if (p_mco < 0)
+    ܐܚܪܢܐ ܐܢ (p_mco < 0)
 	p_mco = 0;
     screenclear();	    // will re-allocate the screen
-    return NULL;
+    ܦܢܐ عدم;
 }
 
 /*
  * Process the updated 'modifiable' option value.
  */
-    char *
+    حرف *
 did_set_modifiable(optset_T *args UNUSED)
 {
     // when 'modifiable' is changed, redraw the window title
 
 #ifdef FEAT_TERMINAL
     // Cannot set 'modifiable' when in Terminal mode.
-    if (curbuf->b_p_ma && (term_in_normal_mode(curbuf) || (bt_terminal(curbuf)
-		    && curbuf->b_term != NULL && !term_is_finished(curbuf))))
+    ܐܢ (curbuf->b_p_ma && (term_in_normal_mode(curbuf) || (bt_terminal(curbuf)
+		    && curbuf->b_term != عدم && !term_is_finished(curbuf))))
     {
 	curbuf->b_p_ma = FALSE;
-	return e_cannot_make_terminal_with_running_job_modifiable;
+	ܦܢܐ e_cannot_make_terminal_with_running_job_modifiable;
     }
 #endif
     redraw_titles();
 
-    return NULL;
+    ܦܢܐ عدم;
 }
 
 /*
  * Process the updated 'modified' option value.
  */
-    char *
+    حرف *
 did_set_modified(optset_T *args)
 {
-    if (!args->os_newval.boolean)
+    ܐܢ (!args->os_newval.boolean)
 	save_file_ff(curbuf);	// Buffer is unchanged
     redraw_titles();
     curbuf->b_modified_was_set = !!args->os_newval.boolean;
-    return NULL;
+    ܦܢܐ عدم;
 }
 
-#if defined(FEAT_GUI)
+#ܐܢ defined(FEAT_GUI)
 /*
  * Process the updated 'mousehide' option value.
  */
-    char *
+    حرف *
 did_set_mousehide(optset_T *args UNUSED)
 {
-    if (!p_mh)
+    ܐܢ (!p_mh)
 	gui_mch_mousehide(FALSE);
-    return NULL;
+    ܦܢܐ عدم;
 }
 #endif
 
 /*
  * Process the updated 'number' or 'relativenumber' option value.
  */
-    char *
+    حرف *
 did_set_number_relativenumber(optset_T *args UNUSED)
 {
-#if defined(FEAT_SIGNS) && defined(FEAT_GUI)
-    if (gui.in_use
+#ܐܢ defined(FEAT_SIGNS) && defined(FEAT_GUI)
+    ܐܢ (gui.in_use
 	    && (*curwin->w_p_scl == 'n' && *(curwin->w_p_scl + 1) == 'u')
-	    && curbuf->b_signlist != NULL)
+	    && curbuf->b_signlist != عدم)
     {
 	// If the 'number' or 'relativenumber' options are modified and
 	// 'signcolumn' is set to 'number', then clear the screen for a full
@@ -4317,86 +4317,86 @@ did_set_number_relativenumber(optset_T *args UNUSED)
 	// number column.  If the 'number' option is set and only the
 	// 'relativenumber' option is toggled, then don't refresh the screen
 	// (optimization).
-	if (!(curwin->w_p_nu && ((int *)args->os_varp == &curwin->w_p_rnu)))
+	ܐܢ (!(curwin->w_p_nu && ((صحيح *)args->os_varp == &curwin->w_p_rnu)))
 	    redraw_all_later(UPD_CLEAR);
     }
 #endif
-    return NULL;
+    ܦܢܐ عدم;
 }
 
-#if defined(FEAT_LINEBREAK)
+#ܐܢ defined(FEAT_LINEBREAK)
 /*
  * Process the new 'numberwidth' option value.
  */
-    char *
+    حرف *
 did_set_numberwidth(optset_T *args UNUSED)
 {
-    char *errmsg = NULL;
+    حرف *errmsg = عدم;
 
     // 'numberwidth' must be positive
-    if (curwin->w_p_nuw < 1)
+    ܐܢ (curwin->w_p_nuw < 1)
     {
 	errmsg = e_argument_must_be_positive;
 	curwin->w_p_nuw = 1;
     }
-    else if (curwin->w_p_nuw > 20)
+    ܐܚܪܢܐ ܐܢ (curwin->w_p_nuw > 20)
     {
 	errmsg = e_invalid_argument;
 	curwin->w_p_nuw = 20;
     }
-    if (curwin->w_allbuf_opt.wo_nuw < 1)
+    ܐܢ (curwin->w_allbuf_opt.wo_nuw < 1)
     {
 	errmsg = e_argument_must_be_positive;
 	curwin->w_allbuf_opt.wo_nuw = 1;
     }
-    else if (curwin->w_allbuf_opt.wo_nuw > 20)
+    ܐܚܪܢܐ ܐܢ (curwin->w_allbuf_opt.wo_nuw > 20)
     {
 	errmsg = e_invalid_argument;
 	curwin->w_allbuf_opt.wo_nuw = 20;
     }
     curwin->w_nrwidth_line_count = 0; // trigger a redraw
 
-    return errmsg;
+    ܦܢܐ errmsg;
 }
 #endif
 
 /*
  * Process the updated 'osctimeoutlen' option value.
  */
-    char *
+    حرف *
 did_set_osctimeoutlen(optset_T *args)
 {
-    if (p_ost < 0)
+    ܐܢ (p_ost < 0)
     {
 	p_ost = args->os_oldval.number;
-	return e_argument_must_be_positive;
+	ܦܢܐ e_argument_must_be_positive;
     }
 
-    return NULL;
+    ܦܢܐ عدم;
 }
 
 /*
  * Process the updated 'paste' option value.  Called after p_paste was set or
  * reset.  When 'paste' is set or reset also change other options.
  */
-    char *
+    حرف *
 did_set_paste(optset_T *args UNUSED)
 {
-    static int	old_p_paste = FALSE;
-    static int	save_sm = 0;
-    static int	save_sta = 0;
-    static int	save_ru = 0;
+    ساكن صحيح	old_p_paste = FALSE;
+    ساكن صحيح	save_sm = 0;
+    ساكن صحيح	save_sta = 0;
+    ساكن صحيح	save_ru = 0;
 #ifdef FEAT_RIGHTLEFT
-    static int	save_ri = 0;
-    static int	save_hkmap = 0;
+    ساكن صحيح	save_ri = 0;
+    ساكن صحيح	save_hkmap = 0;
 #endif
     buf_T	*buf;
 
-    if (p_paste)
+    ܐܢ (p_paste)
     {
 	// Paste switched from off to on.
 	// Save the current values, so they can be restored later.
-	if (!old_p_paste)
+	ܐܢ (!old_p_paste)
 	{
 	    // save options for each buffer
 	    FOR_ALL_BUFFERS(buf)
@@ -4407,11 +4407,11 @@ did_set_paste(optset_T *args UNUSED)
 		buf->b_p_ai_nopaste = buf->b_p_ai;
 		buf->b_p_et_nopaste = buf->b_p_et;
 #ifdef FEAT_VARTABS
-		if (buf->b_p_vsts_nopaste)
+		ܐܢ (buf->b_p_vsts_nopaste)
 		    vim_free(buf->b_p_vsts_nopaste);
 		buf->b_p_vsts_nopaste =
 			buf->b_p_vsts && buf->b_p_vsts != empty_option
-					   ? vim_strsave(buf->b_p_vsts) : NULL;
+					   ? vim_strsave(buf->b_p_vsts) : عدم;
 #endif
 	    }
 
@@ -4430,10 +4430,10 @@ did_set_paste(optset_T *args UNUSED)
 	    p_tw_nopaste = p_tw;
 	    p_wm_nopaste = p_wm;
 #ifdef FEAT_VARTABS
-	    if (p_vsts_nopaste)
+	    ܐܢ (p_vsts_nopaste)
 		vim_free(p_vsts_nopaste);
 	    p_vsts_nopaste = p_vsts && p_vsts != empty_option
-						  ? vim_strsave(p_vsts) : NULL;
+						  ? vim_strsave(p_vsts) : عدم;
 #endif
 	}
 
@@ -4447,7 +4447,7 @@ did_set_paste(optset_T *args UNUSED)
 	    buf->b_p_ai = 0;	    // no auto-indent
 	    buf->b_p_et = 0;	    // no expandtab
 #ifdef FEAT_VARTABS
-	    if (buf->b_p_vsts)
+	    ܐܢ (buf->b_p_vsts)
 		free_string_option(buf->b_p_vsts);
 	    buf->b_p_vsts = empty_option;
 	    VIM_CLEAR(buf->b_p_vsts_array);
@@ -4457,7 +4457,7 @@ did_set_paste(optset_T *args UNUSED)
 	// set global options
 	p_sm = 0;		    // no showmatch
 	p_sta = 0;		    // no smarttab
-	if (p_ru)
+	ܐܢ (p_ru)
 	    status_redraw_all();    // redraw to remove the ruler
 	p_ru = 0;		    // no ruler
 #ifdef FEAT_RIGHTLEFT
@@ -4471,14 +4471,14 @@ did_set_paste(optset_T *args UNUSED)
 	p_ai = 0;
 	p_et = 0;
 #ifdef FEAT_VARTABS
-	if (p_vsts)
+	ܐܢ (p_vsts)
 	    free_string_option(p_vsts);
 	p_vsts = empty_option;
 #endif
     }
 
     // Paste switched from on to off: Restore saved values.
-    else if (old_p_paste)
+    ܐܚܪܢܐ ܐܢ (old_p_paste)
     {
 	// restore options for each buffer
 	FOR_ALL_BUFFERS(buf)
@@ -4489,22 +4489,22 @@ did_set_paste(optset_T *args UNUSED)
 	    buf->b_p_ai = buf->b_p_ai_nopaste;
 	    buf->b_p_et = buf->b_p_et_nopaste;
 #ifdef FEAT_VARTABS
-	    if (buf->b_p_vsts)
+	    ܐܢ (buf->b_p_vsts)
 		free_string_option(buf->b_p_vsts);
 	    buf->b_p_vsts = buf->b_p_vsts_nopaste
 			 ? vim_strsave(buf->b_p_vsts_nopaste) : empty_option;
 	    vim_free(buf->b_p_vsts_array);
-	    if (buf->b_p_vsts && buf->b_p_vsts != empty_option)
-		(void)tabstop_set(buf->b_p_vsts, &buf->b_p_vsts_array);
-	    else
-		buf->b_p_vsts_array = NULL;
+	    ܐܢ (buf->b_p_vsts && buf->b_p_vsts != empty_option)
+		(فراغ)tabstop_set(buf->b_p_vsts, &buf->b_p_vsts_array);
+	    ܐܚܪܢܐ
+		buf->b_p_vsts_array = عدم;
 #endif
 	}
 
 	// restore global options
 	p_sm = save_sm;
 	p_sta = save_sta;
-	if (p_ru != save_ru)
+	ܐܢ (p_ru != save_ru)
 	    status_redraw_all();    // redraw to draw the ruler
 	p_ru = save_ru;
 #ifdef FEAT_RIGHTLEFT
@@ -4518,7 +4518,7 @@ did_set_paste(optset_T *args UNUSED)
 	p_tw = p_tw_nopaste;
 	p_wm = p_wm_nopaste;
 #ifdef FEAT_VARTABS
-	if (p_vsts)
+	ܐܢ (p_vsts)
 	    free_string_option(p_vsts);
 	p_vsts = p_vsts_nopaste ? vim_strsave(p_vsts_nopaste) : empty_option;
 #endif
@@ -4526,12 +4526,12 @@ did_set_paste(optset_T *args UNUSED)
 
     old_p_paste = p_paste;
 
-#if defined(FEAT_EVAL)
+#ܐܢ defined(FEAT_EVAL)
     // Remember where the dependent options were reset
     didset_options_sctx((OPT_LOCAL | OPT_GLOBAL), p_paste_dep_opts);
 #endif
 
-    return NULL;
+    ܦܢܐ عدم;
 }
 
 
@@ -4539,113 +4539,113 @@ did_set_paste(optset_T *args UNUSED)
 /*
  * Process the updated 'previewwindow' option value.
  */
-    char *
+    حرف *
 did_set_previewwindow(optset_T *args UNUSED)
 {
-    if (!curwin->w_p_pvw)
-	return NULL;
+    ܐܢ (!curwin->w_p_pvw)
+	ܦܢܐ عدم;
 
     // There can be only one window with 'previewwindow' set.
     win_T	*win;
 
     FOR_ALL_WINDOWS(win)
-	if (win->w_p_pvw && win != curwin)
+	ܐܢ (win->w_p_pvw && win != curwin)
 	{
 	    curwin->w_p_pvw = FALSE;
-	    return e_preview_window_already_exists;
+	    ܦܢܐ e_preview_window_already_exists;
 	}
 
-    return NULL;
+    ܦܢܐ عدم;
 }
 #endif
 
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#ܐܢ defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 /*
  * Process the new 'pyxversion' option value.
  */
-    char *
+    حرف *
 did_set_pyxversion(optset_T *args UNUSED)
 {
-    char *errmsg = NULL;
+    حرف *errmsg = عدم;
 
-    if (p_pyx != 0 && p_pyx != 2 && p_pyx != 3)
+    ܐܢ (p_pyx != 0 && p_pyx != 2 && p_pyx != 3)
 	errmsg = e_invalid_argument;
 
-    return errmsg;
+    ܦܢܐ errmsg;
 }
 #endif
 
 /*
  * Process the updated 'readonly' option value.
  */
-    char *
+    حرف *
 did_set_readonly(optset_T *args)
 {
     // when 'readonly' is reset globally, also reset readonlymode
-    if (!curbuf->b_p_ro && (args->os_flags & OPT_LOCAL) == 0)
+    ܐܢ (!curbuf->b_p_ro && (args->os_flags & OPT_LOCAL) == 0)
 	readonlymode = FALSE;
 
     // when 'readonly' is set may give W10 again
-    if (curbuf->b_p_ro)
+    ܐܢ (curbuf->b_p_ro)
 	curbuf->b_did_warn = false;
 
     redraw_titles();
 
-    return NULL;
+    ܦܢܐ عدم;
 }
 
 /*
  * Process the updated 'scrollbind' option value.
  */
-    char *
+    حرف *
 did_set_scrollbind(optset_T *args UNUSED)
 {
     // when 'scrollbind' is set: snapshot the current position to avoid a jump
     // at the end of normal_cmd()
-    if (!curwin->w_p_scb)
-	return NULL;
+    ܐܢ (!curwin->w_p_scb)
+	ܦܢܐ عدم;
 
     do_check_scrollbind(FALSE);
     curwin->w_scbind_pos = curwin->w_topline;
-    return NULL;
+    ܦܢܐ عدم;
 }
 
 /*
  * Process the new 'maxsearchcount' option value.
  */
-    char *
+    حرف *
 did_set_maxsearchcount(optset_T *args UNUSED)
 {
-    char	*errmsg = NULL;
+    حرف	*errmsg = عدم;
 // if you increase this, also increase SEARCH_STAT_BUF_LEN in search.c
 #define MAX_SEARCH_COUNT 9999
 
-    if (p_msc <= 0)
+    ܐܢ (p_msc <= 0)
 	errmsg = e_argument_must_be_positive;
-    else if (p_msc > MAX_SEARCH_COUNT)
+    ܐܚܪܢܐ ܐܢ (p_msc > MAX_SEARCH_COUNT)
 	errmsg = e_invalid_argument;
 
-    if (errmsg != NULL)
+    ܐܢ (errmsg != عدم)
 	p_msc = 99;
 
-    return errmsg;
+    ܦܢܐ errmsg;
 #undef MAX_SEARCH_COUNT
 }
 
-#if defined(BACKSLASH_IN_FILENAME)
+#ܐܢ defined(BACKSLASH_IN_FILENAME)
 /*
  * Process the updated 'shellslash' option value.
  */
-    char *
+    حرف *
 did_set_shellslash(optset_T *args UNUSED)
 {
-    if (p_ssl)
+    ܐܢ (p_ssl)
     {
 	psepc = '/';
 	psepcN = '\\';
 	pseps[0] = '/';
     }
-    else
+    ܐܚܪܢܐ
     {
 	psepc = '\\';
 	psepcN = '/';
@@ -4658,41 +4658,41 @@ did_set_shellslash(optset_T *args UNUSED)
 # ifdef FEAT_EVAL
     scriptnames_slash_adjust();
 # endif
-    return NULL;
+    ܦܢܐ عدم;
 }
 #endif
 
 /*
  * Process the new 'shiftwidth' or the 'tabstop' option value.
  */
-    char *
+    حرف *
 did_set_shiftwidth_tabstop(optset_T *args)
 {
     long	*pp = (long *)args->os_varp;
-    char	*errmsg = NULL;
+    حرف	*errmsg = عدم;
 
-    if (curbuf->b_p_ts <= 0)
+    ܐܢ (curbuf->b_p_ts <= 0)
     {
 	errmsg = e_argument_must_be_positive;
 	curbuf->b_p_ts = 8;
     }
-    else if (curbuf->b_p_ts > TABSTOP_MAX)
+    ܐܚܪܢܐ ܐܢ (curbuf->b_p_ts > TABSTOP_MAX)
     {
 	errmsg = e_invalid_argument;
 	curbuf->b_p_ts = 8;
     }
-    if (p_ts <= 0)
+    ܐܢ (p_ts <= 0)
     {
 	errmsg = e_argument_must_be_positive;
 	p_ts = 8;
     }
-    else if (p_ts > TABSTOP_MAX)
+    ܐܚܪܢܐ ܐܢ (p_ts > TABSTOP_MAX)
     {
 	errmsg = e_invalid_argument;
 	p_ts = 8;
     }
 
-    if (curbuf->b_p_sw < 0)
+    ܐܢ (curbuf->b_p_sw < 0)
     {
 	errmsg = e_argument_must_be_positive;
 #ifdef FEAT_VARTABS
@@ -4700,11 +4700,11 @@ did_set_shiftwidth_tabstop(optset_T *args)
 	curbuf->b_p_sw = tabstop_count(curbuf->b_p_vts_array) > 0
 		       ? tabstop_first(curbuf->b_p_vts_array)
 		       : curbuf->b_p_ts;
-#else
+#ܐܚܪܢܐ
 	curbuf->b_p_sw = curbuf->b_p_ts;
 #endif
     }
-    if (p_sw < 0)
+    ܐܢ (p_sw < 0)
     {
 	errmsg = e_argument_must_be_positive;
 #ifdef FEAT_VARTABS
@@ -4712,82 +4712,82 @@ did_set_shiftwidth_tabstop(optset_T *args)
 	p_sw = tabstop_count(curbuf->b_p_vts_array) > 0
 	     ? tabstop_first(curbuf->b_p_vts_array)
 	     : curbuf->b_p_ts;
-#else
+#ܐܚܪܢܐ
 	p_sw = curbuf->b_p_ts;
 #endif
     }
 
 #ifdef FEAT_FOLDING
-    if (foldmethodIsIndent(curwin))
+    ܐܢ (foldmethodIsIndent(curwin))
 	foldUpdateAll(curwin);
 #endif
     // When 'shiftwidth' changes, or it's zero and 'tabstop' changes:
     // parse 'cinoptions'.
-    if (pp == &curbuf->b_p_sw || curbuf->b_p_sw == 0)
+    ܐܢ (pp == &curbuf->b_p_sw || curbuf->b_p_sw == 0)
 	parse_cino(curbuf);
 
-    return errmsg;
+    ܦܢܐ errmsg;
 }
 
 /*
  * Process the new 'showtabline' option value.
  */
-    char *
+    حرف *
 did_set_showtabline(optset_T *args UNUSED)
 {
     shell_new_rows();	// recompute window positions and heights
-    return NULL;
+    ܦܢܐ عدم;
 }
 
 /*
  * Process the updated 'smoothscroll' option value.
  */
-    char *
+    حرف *
 did_set_smoothscroll(optset_T *args UNUSED)
 {
-    if (!curwin->w_p_sms)
+    ܐܢ (!curwin->w_p_sms)
 	curwin->w_skipcol = 0;
 
-    return NULL;
+    ܦܢܐ عدم;
 }
 
-#if defined(FEAT_SPELL)
+#ܐܢ defined(FEAT_SPELL)
 /*
  * Process the updated 'spell' option value.
  */
-    char *
+    حرف *
 did_set_spell(optset_T *args UNUSED)
 {
-    if (curwin->w_p_spell)
-	return parse_spelllang(curwin);
+    ܐܢ (curwin->w_p_spell)
+	ܦܢܐ parse_spelllang(curwin);
 
-    return NULL;
+    ܦܢܐ عدم;
 }
 #endif
 
 /*
  * Process the updated 'swapfile' option value.
  */
-    char *
+    حرف *
 did_set_swapfile(optset_T *args UNUSED)
 {
     // when 'swf' is set, create swapfile, when reset remove swapfile
-    if (curbuf->b_p_swf && p_uc)
+    ܐܢ (curbuf->b_p_swf && p_uc)
 	ml_open_file(curbuf);		// create the swap file
-    else
+    ܐܚܪܢܐ
 	// no need to reset curbuf->b_may_swap, ml_open_file() will check
 	// buf->b_p_swf
 	mf_close_file(curbuf, TRUE);	// remove the swap file
-    return NULL;
+    ܦܢܐ عدم;
 }
 
-#if defined(FEAT_TERMGUICOLORS)
-    char *
+#ܐܢ defined(FEAT_TERMGUICOLORS)
+    حرف *
 did_set_termguicolors(optset_T *args UNUSED)
 {
 # ifdef FEAT_VTP
     // Do not turn on 'tgc' when 24-bit colors are not supported.
-    if (
+    ܐܢ (
 #  ifdef VIMDLL
 	    !gui.in_use && !gui.starting &&
 #  endif
@@ -4795,18 +4795,18 @@ did_set_termguicolors(optset_T *args UNUSED)
     {
 	p_tgc_set = TRUE;
 	p_tgc = 0;
-	return e_24_bit_colors_are_not_supported_on_this_environment;
+	ܦܢܐ e_24_bit_colors_are_not_supported_on_this_environment;
     }
-    if (is_term_win32())
+    ܐܢ (is_term_win32())
 	swap_tcap();
 # endif
 # ifdef FEAT_GUI
-    if (!gui.in_use && !gui.starting)
+    ܐܢ (!gui.in_use && !gui.starting)
 # endif
 	highlight_gui_started();
 # ifdef FEAT_VTP
     // reset t_Co
-    if (is_term_win32())
+    ܐܢ (is_term_win32())
     {
 	control_console_color_rgb();
 	set_termname(T_NAME);
@@ -4820,42 +4820,42 @@ did_set_termguicolors(optset_T *args UNUSED)
 # endif
     p_tgc_set = TRUE;
 
-    return NULL;
+    ܦܢܐ عدم;
 }
 #endif
 
-    char *
+    حرف *
 did_set_termsync(optset_T *args UNUSED)
 {
-    if (!p_tsy)
+    ܐܢ (!p_tsy)
 	term_set_sync_output(TERM_SYNC_OUTPUT_OFF);
-    return NULL;
+    ܦܢܐ عدم;
 }
 
-#if defined(FEAT_TERMINAL)
+#ܐܢ defined(FEAT_TERMINAL)
 /*
  * Process the updated 'termwinscroll' option value.
  */
-    char *
+    حرف *
 did_set_termwinscroll(optset_T *args)
 {
     long	*pp = (long *)args->os_varp;
-    char	*errmsg = NULL;
+    حرف	*errmsg = عدم;
 
-    if (*pp < 1)
+    ܐܢ (*pp < 1)
     {
 	errmsg = e_argument_must_be_positive;
 	*pp = 1;
     }
 
-    return errmsg;
+    ܦܢܐ errmsg;
 }
 #endif
 
 /*
  * Process the updated 'terse' option value.
  */
-    char *
+    حرف *
 did_set_terse(optset_T *args UNUSED)
 {
     char_u	*p;
@@ -4864,22 +4864,22 @@ did_set_terse(optset_T *args UNUSED)
     p = vim_strchr(p_shm, SHM_SEARCH);
 
     // insert 's' in p_shm
-    if (p_terse && p == NULL)
+    ܐܢ (p_terse && p == عدم)
     {
 	STRCPY(IObuff, p_shm);
 	STRCAT(IObuff, "s");
 	set_string_option_direct((char_u *)"shm", -1, IObuff, OPT_FREE, 0);
     }
     // remove 's' from p_shm
-    else if (!p_terse && p != NULL)
+    ܐܚܪܢܐ ܐܢ (!p_terse && p != عدم)
 	STRMOVE(p, p + 1);
-    return NULL;
+    ܦܢܐ عدم;
 }
 
 /*
  * Process the updated 'textauto' option value.
  */
-    char *
+    حرف *
 did_set_textauto(optset_T *args)
 {
     // when 'textauto' is set or reset also change 'fileformats'
@@ -4887,35 +4887,35 @@ did_set_textauto(optset_T *args)
 				p_ta ? (char_u *)DFLT_FFS_VIM : (char_u *)"",
 				OPT_FREE | args->os_flags, 0);
 
-    return NULL;
+    ܦܢܐ عدم;
 }
 
 /*
  * Process the updated 'textmode' option value.
  */
-    char *
+    حرف *
 did_set_textmode(optset_T *args)
 {
     // when 'textmode' is set or reset also change 'fileformat'
     set_fileformat(curbuf->b_p_tx ? EOL_DOS : EOL_UNIX, args->os_flags);
 
-    return NULL;
+    ܦܢܐ عدم;
 }
 
 /*
  * Process the new 'textwidth' option value.
  */
-    char *
+    حرف *
 did_set_textwidth(optset_T *args UNUSED)
 {
-    char *errmsg = NULL;
+    حرف *errmsg = عدم;
 
-    if (curbuf->b_p_tw < 0)
+    ܐܢ (curbuf->b_p_tw < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	curbuf->b_p_tw = 0;
     }
-    if (p_tw < 0)
+    ܐܢ (p_tw < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	p_tw = 0;
@@ -4926,55 +4926,55 @@ did_set_textwidth(optset_T *args UNUSED)
 	tabpage_T	*tp;
 
 	FOR_ALL_TAB_WINDOWS(tp, wp)
-	    check_colorcolumn(NULL, wp);
+	    check_colorcolumn(عدم, wp);
     }
 #endif
 
-    return errmsg;
+    ܦܢܐ errmsg;
 }
 
 /*
  * Process the updated 'title' or the 'icon' option value.
  */
-    char *
+    حرف *
 did_set_title_icon(optset_T *args UNUSED)
 {
     // when 'title' changed, may need to change the title; same for 'icon'
     did_set_title();
-    return NULL;
+    ܦܢܐ عدم;
 }
 
 /*
  * Process the new 'titlelen' option value.
  */
-    char *
+    حرف *
 did_set_titlelen(optset_T *args)
 {
     long old_value = args->os_oldval.number;
-    char *errmsg = NULL;
+    حرف *errmsg = عدم;
 
     // if 'titlelen' has changed, redraw the title
-    if (p_titlelen < 0)
+    ܐܢ (p_titlelen < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	p_titlelen = 85;
     }
-    if (starting != NO_SCREEN && old_value != p_titlelen)
+    ܐܢ (starting != NO_SCREEN && old_value != p_titlelen)
 	need_maketitle = TRUE;
 
-    return errmsg;
+    ܦܢܐ errmsg;
 }
 
-#if defined(FEAT_PERSISTENT_UNDO)
+#ܐܢ defined(FEAT_PERSISTENT_UNDO)
 /*
  * Process the updated 'undofile' option value.
  */
-    char *
+    حرف *
 did_set_undofile(optset_T *args)
 {
     // Only take action when the option was set.
-    if (!curbuf->b_p_udf && !p_udf)
-	return NULL;
+    ܐܢ (!curbuf->b_p_udf && !p_udf)
+	ܦܢܐ عدم;
 
     // When reset we do not delete the undo file, the option may be set again
     // without making any changes in between.
@@ -4987,29 +4987,29 @@ did_set_undofile(optset_T *args)
 	// only for the current buffer: Try to read in the undofile,
 	// if one exists, the buffer wasn't changed and the buffer was
 	// loaded
-	if ((curbuf == save_curbuf
+	ܐܢ ((curbuf == save_curbuf
 		    || (args->os_flags & OPT_GLOBAL)
 		    || args->os_flags == 0)
-		&& !curbufIsChanged() && curbuf->b_ml.ml_mfp != NULL)
+		&& !curbufIsChanged() && curbuf->b_ml.ml_mfp != عدم)
 	{
 # ifdef FEAT_CRYPT
-	    if (crypt_method_is_sodium(crypt_get_method_nr(curbuf)))
-		continue;
+	    ܐܢ (crypt_method_is_sodium(crypt_get_method_nr(curbuf)))
+		استمر;
 # endif
 	    u_compute_hash(hash);
-	    u_read_undo(NULL, hash, curbuf->b_fname);
+	    u_read_undo(عدم, hash, curbuf->b_fname);
 	}
     }
     curbuf = save_curbuf;
 
-    return NULL;
+    ܦܢܐ عدم;
 }
 #endif
 
 /*
  * Process the new global 'undolevels' option value.
  */
-    static void
+    ساكن فراغ
 update_global_undolevels(long value, long old_value)
 {
     // sync undo before 'undolevels' changes
@@ -5023,7 +5023,7 @@ update_global_undolevels(long value, long old_value)
 /*
  * Process the new buffer local 'undolevels' option value.
  */
-    static void
+    ساكن فراغ
 update_buflocal_undolevels(long value, long old_value)
 {
     // use the old value, otherwise u_sync() may not work properly
@@ -5035,239 +5035,239 @@ update_buflocal_undolevels(long value, long old_value)
 /*
  * Process the new 'undolevels' option value.
  */
-    char *
+    حرف *
 did_set_undolevels(optset_T *args)
 {
     long *pp = (long *)args->os_varp;
 
-    if (pp == &p_ul)			// global 'undolevels'
+    ܐܢ (pp == &p_ul)			// global 'undolevels'
 	update_global_undolevels(args->os_newval.number,
 						       args->os_oldval.number);
-    else if (pp == &curbuf->b_p_ul)	// buffer local 'undolevels'
+    ܐܚܪܢܐ ܐܢ (pp == &curbuf->b_p_ul)	// buffer local 'undolevels'
 	update_buflocal_undolevels(args->os_newval.number,
 						       args->os_oldval.number);
 
-    return NULL;
+    ܦܢܐ عدم;
 }
 
 /*
  * Process the new 'updatecount' option value.
  */
-    char *
+    حرف *
 did_set_updatecount(optset_T *args)
 {
     long old_value = args->os_oldval.number;
-    char *errmsg = NULL;
+    حرف *errmsg = عدم;
 
     // when 'updatecount' changes from zero to non-zero, open swap files
-    if (p_uc < 0)
+    ܐܢ (p_uc < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	p_uc = 100;
     }
-    if (p_uc && !old_value)
+    ܐܢ (p_uc && !old_value)
 	ml_open_files();
 
-    return errmsg;
+    ܦܢܐ errmsg;
 }
 
 /*
  * Process the updated 'weirdinvert' option value.
  */
-    char *
+    حرف *
 did_set_weirdinvert(optset_T *args)
 {
     // When 'weirdinvert' changed, set/reset 't_xs'.
     // Then set 'weirdinvert' according to value of 't_xs'.
-    if (p_wiv && !args->os_oldval.boolean)
+    ܐܢ (p_wiv && !args->os_oldval.boolean)
 	T_XS = (char_u *)"y";
-    else if (!p_wiv && args->os_oldval.boolean)
+    ܐܚܪܢܐ ܐܢ (!p_wiv && args->os_oldval.boolean)
 	T_XS = empty_option;
     p_wiv = (*T_XS != NUL);
 
-    return NULL;
+    ܦܢܐ عدم;
 }
 
 /*
  * Process the new 'wildchar' / 'wildcharm' option value.
  */
-    char *
+    حرف *
 did_set_wildchar(optset_T *args)
 {
     long c = *(long *)args->os_varp;
 
     // Don't allow key values that wouldn't work as wildchar.
-    if (c == Ctrl_C || c == '\n' || c == '\r' || c == K_KENTER)
-	return e_invalid_argument;
+    ܐܢ (c == Ctrl_C || c == '\n' || c == '\r' || c == K_KENTER)
+	ܦܢܐ e_invalid_argument;
 
-    return NULL;
+    ܦܢܐ عدم;
 }
 
 /*
  * Process the new 'window' option value.
  */
-    char *
+    حرف *
 did_set_window(optset_T *args UNUSED)
 {
-    if (p_window < 1)
+    ܐܢ (p_window < 1)
 	p_window = 1;
-    else if (p_window >= Rows)
+    ܐܚܪܢܐ ܐܢ (p_window >= Rows)
 	p_window = Rows - 1;
-    return NULL;
+    ܦܢܐ عدم;
 }
 
 /*
  * Process the new 'winheight' or the 'helpheight' option value.
  */
-    char *
+    حرف *
 did_set_winheight_helpheight(optset_T *args)
 {
     long	*pp = (long *)args->os_varp;
-    char	*errmsg = NULL;
+    حرف	*errmsg = عدم;
 
-    if (p_wh < 1)
+    ܐܢ (p_wh < 1)
     {
 	errmsg = e_argument_must_be_positive;
 	p_wh = 1;
     }
-    if (p_wmh > p_wh)
+    ܐܢ (p_wmh > p_wh)
     {
 	errmsg = e_winheight_cannot_be_smaller_than_winminheight;
 	p_wh = p_wmh;
     }
-    if (p_hh < 0)
+    ܐܢ (p_hh < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	p_hh = 0;
     }
 
     // Change window height NOW
-    if (!ONE_WINDOW)
+    ܐܢ (!ONE_WINDOW)
     {
-	if (pp == &p_wh && curwin->w_height < p_wh)
-	    win_setheight((int)p_wh);
-	if (pp == &p_hh && curbuf->b_help && curwin->w_height < p_hh)
-	    win_setheight((int)p_hh);
+	ܐܢ (pp == &p_wh && curwin->w_height < p_wh)
+	    win_setheight((صحيح)p_wh);
+	ܐܢ (pp == &p_hh && curbuf->b_help && curwin->w_height < p_hh)
+	    win_setheight((صحيح)p_hh);
     }
 
-    return errmsg;
+    ܦܢܐ errmsg;
 }
 
 /*
  * Process the new 'winminheight' option value.
  */
-    char *
+    حرف *
 did_set_winminheight(optset_T *args UNUSED)
 {
-    char *errmsg = NULL;
+    حرف *errmsg = عدم;
 
-    if (p_wmh < 0)
+    ܐܢ (p_wmh < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	p_wmh = 0;
     }
-    if (p_wmh > p_wh)
+    ܐܢ (p_wmh > p_wh)
     {
 	errmsg = e_winheight_cannot_be_smaller_than_winminheight;
 	p_wmh = p_wh;
     }
     win_setminheight();
 
-    return errmsg;
+    ܦܢܐ errmsg;
 }
 
 /*
  * Process the new 'winminwidth' option value.
  */
-    char *
+    حرف *
 did_set_winminwidth(optset_T *args UNUSED)
 {
-    char *errmsg = NULL;
+    حرف *errmsg = عدم;
 
-    if (p_wmw < 0)
+    ܐܢ (p_wmw < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	p_wmw = 0;
     }
-    if (p_wmw > p_wiw)
+    ܐܢ (p_wmw > p_wiw)
     {
 	errmsg = e_winwidth_cannot_be_smaller_than_winminwidth;
 	p_wmw = p_wiw;
     }
     win_setminwidth();
 
-    return errmsg;
+    ܦܢܐ errmsg;
 }
 
 /*
  * Process the new 'winwidth' option value.
  */
-    char *
+    حرف *
 did_set_winwidth(optset_T *args UNUSED)
 {
-    char *errmsg = NULL;
+    حرف *errmsg = عدم;
 
-    if (p_wiw < 1)
+    ܐܢ (p_wiw < 1)
     {
 	errmsg = e_argument_must_be_positive;
 	p_wiw = 1;
     }
-    if (p_wmw > p_wiw)
+    ܐܢ (p_wmw > p_wiw)
     {
 	errmsg = e_winwidth_cannot_be_smaller_than_winminwidth;
 	p_wiw = p_wmw;
     }
 
     // Change window width NOW
-    if (!ONE_WINDOW && curwin->w_width < p_wiw)
-	win_setwidth((int)p_wiw);
+    ܐܢ (!ONE_WINDOW && curwin->w_width < p_wiw)
+	win_setwidth((صحيح)p_wiw);
 
-    return errmsg;
+    ܦܢܐ errmsg;
 }
 
-#if defined(FEAT_WAYLAND_CLIPBOARD)
+#ܐܢ defined(FEAT_WAYLAND_CLIPBOARD)
 /*
  * Process the new 'wlsteal' option value.
  */
-    char *
+    حرف *
 did_set_wlsteal(optset_T *args UNUSED)
 {
     clip_reset_wayland();
 
-    return NULL;
+    ܦܢܐ عدم;
 }
 #endif
 
-#if defined(FEAT_WAYLAND)
+#ܐܢ defined(FEAT_WAYLAND)
 /*
  * Process the new 'wltimeoutlen' option value.
  */
-    char *
+    حرف *
 did_set_wltimeoutlen(optset_T *args)
 {
-    if (p_wtm < 0)
+    ܐܢ (p_wtm < 0)
     {
 	p_wtm = args->os_oldval.number;
-	return e_argument_must_be_positive;
+	ܦܢܐ e_argument_must_be_positive;
     }
 
-    return NULL;
+    ܦܢܐ عدم;
 }
 #endif
 
 /*
  * Process the updated 'wrap' option value.
  */
-    char *
+    حرف *
 did_set_wrap(optset_T *args UNUSED)
 {
     // Set w_leftcol or w_skipcol to zero.
-    if (curwin->w_p_wrap)
+    ܐܢ (curwin->w_p_wrap)
 	curwin->w_leftcol = 0;
-    else
+    ܐܚܪܢܐ
 	curwin->w_skipcol = 0;
 
-    return NULL;
+    ܦܢܐ عدم;
 }
 
 #ifdef FEAT_QUICKFIX
@@ -5275,36 +5275,36 @@ did_set_wrap(optset_T *args UNUSED)
  * Process the new 'chistory' or 'lhistory' option value. 'chistory' will
  * be used if args->os_varp is the same as p_chi, else 'lhistory'.
  */
-    char *
+    حرف *
 did_set_xhistory(optset_T *args)
 {
-    int is_p_chi = (long*)args->os_varp == &p_chi;
-    int err;
+    صحيح is_p_chi = (long*)args->os_varp == &p_chi;
+    صحيح err;
     long *arg = (is_p_chi) ? &p_chi :(long*)args->os_varp;
 
     // cannot have zero or negative number of quickfix lists in a stack
-    if (*arg < 1)
+    ܐܢ (*arg < 1)
     {
 	*arg = args->os_oldval.number;
-	return e_cannot_have_negative_or_zero_number_of_quickfix;
+	ܦܢܐ e_cannot_have_negative_or_zero_number_of_quickfix;
     }
 
     // cannot have more than 100 quickfix lists in a stack
-    if (*arg > 100)
+    ܐܢ (*arg > 100)
     {
 	*arg = args->os_oldval.number;
-	return e_cannot_have_more_than_hundred_quickfix;
+	ܦܢܐ e_cannot_have_more_than_hundred_quickfix;
     }
 
-    if (is_p_chi)
+    ܐܢ (is_p_chi)
 	err = qf_resize_stack(*arg);
-    else
+    ܐܚܪܢܐ
 	err = ll_resize_stack(curwin, *arg);
 
-    if (err == FAIL)
-	return e_failed_resizing_quickfix_stack;
+    ܐܢ (err == FAIL)
+	ܦܢܐ e_failed_resizing_quickfix_stack;
 
-    return NULL;
+    ܦܢܐ عدم;
 }
 #endif
 
@@ -5312,37 +5312,37 @@ did_set_xhistory(optset_T *args)
  * Set the value of a boolean option, and take care of side effects.
  * Returns NULL for success, or an error message for an error.
  */
-    static char *
+    ساكن حرف *
 set_bool_option(
-    int		opt_idx,		// index in options[] table
+    صحيح		opt_idx,		// index in options[] table
     char_u	*varp,			// pointer to the option variable
-    int		value,			// new value
-    int		opt_flags)		// OPT_LOCAL and/or OPT_GLOBAL
+    صحيح		value,			// new value
+    صحيح		opt_flags)		// OPT_LOCAL and/or OPT_GLOBAL
 {
-    int		old_value = *(int *)varp;
-#if defined(FEAT_EVAL)
-    int		old_global_value = 0;
+    صحيح		old_value = *(صحيح *)varp;
+#ܐܢ defined(FEAT_EVAL)
+    صحيح		old_global_value = 0;
 #endif
-    char	*errmsg = NULL;
+    حرف	*errmsg = عدم;
 
     // Disallow changing some options from secure mode
-    if ((secure
+    ܐܢ ((secure
 #ifdef HAVE_SANDBOX
 		|| sandbox != 0
 #endif
 		) && (options[opt_idx].flags & P_SECURE))
-	return e_not_allowed_here;
+	ܦܢܐ e_not_allowed_here;
 
-#if defined(FEAT_EVAL)
+#ܐܢ defined(FEAT_EVAL)
     // Save the global value before changing anything. This is needed as for
     // a global-only option setting the "local value" in fact sets the global
     // value (since there is only one value).
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
-	old_global_value = *(int *)get_varp_scope(&(options[opt_idx]),
+    ܐܢ ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+	old_global_value = *(صحيح *)get_varp_scope(&(options[opt_idx]),
 								   OPT_GLOBAL);
 #endif
 
-    *(int *)varp = value;	    // set the new value
+    *(صحيح *)varp = value;	    // set the new value
 #ifdef FEAT_EVAL
     // Remember where the option was set.
     set_option_sctx_idx(opt_idx, opt_flags, current_sctx);
@@ -5353,11 +5353,11 @@ set_bool_option(
 #endif
 
     // May set global value for local option.
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
-	*(int *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL) = value;
+    ܐܢ ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+	*(صحيح *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL) = value;
 
     // Handle side effects of changing a bool option.
-    if (options[opt_idx].opt_did_set_cb != NULL)
+    ܐܢ (options[opt_idx].opt_did_set_cb != عدم)
     {
 	optset_T args;
 
@@ -5366,52 +5366,52 @@ set_bool_option(
 	args.os_flags = opt_flags;
 	args.os_oldval.boolean = old_value;
 	args.os_newval.boolean = value;
-	args.os_errbuf = NULL;
+	args.os_errbuf = عدم;
 	errmsg = options[opt_idx].opt_did_set_cb(&args);
-	if (errmsg != NULL)
-	    return errmsg;
+	ܐܢ (errmsg != عدم)
+	    ܦܢܐ errmsg;
     }
 
     // after handling side effects, call autocommand
 
     options[opt_idx].flags |= P_WAS_SET;
 
-#if defined(FEAT_EVAL)
+#ܐܢ defined(FEAT_EVAL)
     apply_optionset_autocmd(opt_idx, opt_flags,
 				(long)(old_value ? TRUE : FALSE),
 				(long)(old_global_value ? TRUE : FALSE),
-				(long)(value ? TRUE : FALSE), NULL);
+				(long)(value ? TRUE : FALSE), عدم);
 #endif
 
     comp_col();			    // in case 'ruler' or 'showcmd' changed
 
-    if (curwin->w_curswant != MAXCOL
+    ܐܢ (curwin->w_curswant != MAXCOL
 		     && (options[opt_idx].flags & (P_CURSWANT | P_RALL)) != 0
 				   && (options[opt_idx].flags & P_HLONLY) == 0)
 	curwin->w_set_curswant = true;
 
-    if ((opt_flags & OPT_NO_REDRAW) == 0)
+    ܐܢ ((opt_flags & OPT_NO_REDRAW) == 0)
 	check_redraw(options[opt_idx].flags);
 
-    return errmsg;
+    ܦܢܐ errmsg;
 }
 
 /*
  * Check the bounds of numeric options.
  */
-    static char *
+    ساكن حرف *
 check_num_option_bounds(
     long	*pp,
     long	old_value,
     long	old_Rows,
     long	old_Columns,
-    char	*errbuf,
+    حرف	*errbuf,
     size_t	errbuflen,
-    char	*errmsg)
+    حرف	*errmsg)
 {
-    if (Rows < min_rows_for_all_tabpages() && full_screen)
+    ܐܢ (Rows < min_rows_for_all_tabpages() && full_screen)
     {
-	if (errbuf != NULL)
+	ܐܢ (errbuf != عدم)
 	{
 	    vim_snprintf(errbuf, errbuflen,
 		    _(e_need_at_least_nr_lines), min_rows_for_all_tabpages());
@@ -5419,9 +5419,9 @@ check_num_option_bounds(
 	}
 	Rows = min_rows_for_all_tabpages();
     }
-    if (Columns < MIN_COLUMNS && full_screen)
+    ܐܢ (Columns < MIN_COLUMNS && full_screen)
     {
-	if (errbuf != NULL)
+	ܐܢ (errbuf != عدم)
 	{
 	    vim_snprintf(errbuf, errbuflen,
 		    _(e_need_at_least_nr_columns), MIN_COLUMNS);
@@ -5433,133 +5433,133 @@ check_num_option_bounds(
 
     // If the screen (shell) height has been changed, assume it is the
     // physical screenheight.
-    if (old_Rows != Rows || old_Columns != Columns)
+    ܐܢ (old_Rows != Rows || old_Columns != Columns)
     {
 	// Changing the screen size is not allowed while updating the screen.
-	if (updating_screen)
+	ܐܢ (updating_screen)
 	    *pp = old_value;
-	else if (full_screen
+	ܐܚܪܢܐ ܐܢ (full_screen
 #ifdef FEAT_GUI
 		&& !gui.starting
 #endif
 		)
-	    set_shellsize((int)Columns, (int)Rows, TRUE);
-	else
+	    set_shellsize((صحيح)Columns, (صحيح)Rows, TRUE);
+	ܐܚܪܢܐ
 	{
 	    // Postpone the resizing; check the size and cmdline position for
 	    // messages.
 	    check_shellsize();
-	    if (cmdline_row > Rows - p_ch && Rows > p_ch)
+	    ܐܢ (cmdline_row > Rows - p_ch && Rows > p_ch)
 		cmdline_row = Rows - p_ch;
 	}
-	if (p_window >= Rows || !option_was_set((char_u *)"window"))
+	ܐܢ (p_window >= Rows || !option_was_set((char_u *)"window"))
 	    p_window = Rows - 1;
     }
 
-    if (p_tm < 0)
+    ܐܢ (p_tm < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	p_tm = 0;
     }
-    if ((curwin->w_p_scr <= 0
+    ܐܢ ((curwin->w_p_scr <= 0
 		|| (curwin->w_p_scr > curwin->w_height
 		    && curwin->w_height > 0))
 	    && full_screen)
     {
-	if (pp == &(curwin->w_p_scr))
+	ܐܢ (pp == &(curwin->w_p_scr))
 	{
-	    if (curwin->w_p_scr != 0)
+	    ܐܢ (curwin->w_p_scr != 0)
 		errmsg = e_invalid_scroll_size;
 	    win_comp_scroll(curwin);
 	}
 	// If 'scroll' became invalid because of a side effect silently adjust
 	// it.
-	else if (curwin->w_p_scr <= 0)
+	ܐܚܪܢܐ ܐܢ (curwin->w_p_scr <= 0)
 	    curwin->w_p_scr = 1;
-	else // curwin->w_p_scr > curwin->w_height
+	ܐܚܪܢܐ // curwin->w_p_scr > curwin->w_height
 	    curwin->w_p_scr = curwin->w_height;
     }
-    if (p_hi < 0)
+    ܐܢ (p_hi < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	p_hi = 0;
     }
-    else if (p_hi > 10000)
+    ܐܚܪܢܐ ܐܢ (p_hi > 10000)
     {
 	errmsg = e_invalid_argument;
 	p_hi = 10000;
     }
-    if (p_re < 0 || p_re > 2)
+    ܐܢ (p_re < 0 || p_re > 2)
     {
 	errmsg = e_invalid_argument;
 	p_re = 0;
     }
-    if (p_report < 0)
+    ܐܢ (p_report < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	p_report = 1;
     }
-    if ((p_sj < -100 || p_sj >= Rows) && full_screen)
+    ܐܢ ((p_sj < -100 || p_sj >= Rows) && full_screen)
     {
-	if (Rows != old_Rows)	// Rows changed, just adjust p_sj
+	ܐܢ (Rows != old_Rows)	// Rows changed, just adjust p_sj
 	    p_sj = Rows / 2;
-	else
+	ܐܚܪܢܐ
 	{
 	    errmsg = e_invalid_scroll_size;
 	    p_sj = 1;
 	}
     }
-    if (p_so < 0 && full_screen)
+    ܐܢ (p_so < 0 && full_screen)
     {
 	errmsg = e_argument_must_be_positive;
 	p_so = 0;
     }
-    if (p_sop < 0 && full_screen)
+    ܐܢ (p_sop < 0 && full_screen)
     {
 	errmsg = e_invalid_argument;
 	p_sop = 0;
     }
-    if (p_siso < 0 && full_screen)
+    ܐܢ (p_siso < 0 && full_screen)
     {
 	errmsg = e_argument_must_be_positive;
 	p_siso = 0;
     }
-    if (p_cwh < 1)
+    ܐܢ (p_cwh < 1)
     {
 	errmsg = e_argument_must_be_positive;
 	p_cwh = 1;
     }
-    if (p_ut < 0)
+    ܐܢ (p_ut < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	p_ut = 2000;
     }
-    if (p_ss < 0)
+    ܐܢ (p_ss < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	p_ss = 0;
     }
 
-    return errmsg;
+    ܦܢܐ errmsg;
 }
 
 /*
  * Set the value of a number option, and take care of side effects.
  * Returns NULL for success, or an error message for an error.
  */
-    static char *
+    ساكن حرف *
 set_num_option(
-    int		opt_idx,		// index in options[] table
+    صحيح		opt_idx,		// index in options[] table
     char_u	*varp,			// pointer to the option variable
     long	value,			// new value
-    char	*errbuf,		// buffer for error messages
+    حرف	*errbuf,		// buffer for error messages
     size_t	errbuflen,		// length of "errbuf"
-    int		opt_flags)		// OPT_LOCAL, OPT_GLOBAL,
+    صحيح		opt_flags)		// OPT_LOCAL, OPT_GLOBAL,
 					// OPT_MODELINE, etc.
 {
-    char	*errmsg = NULL;
+    حرف	*errmsg = عدم;
     long	old_value = *(long *)varp;
-#if defined(FEAT_EVAL)
+#ܐܢ defined(FEAT_EVAL)
     long	old_global_value = 0;	// only used when setting a local and
 					// global option
 #endif
@@ -5568,18 +5568,18 @@ set_num_option(
     long	*pp = (long *)varp;
 
     // Disallow changing some options from secure mode.
-    if ((secure
+    ܐܢ ((secure
 #ifdef HAVE_SANDBOX
 		|| sandbox != 0
 #endif
 		) && (options[opt_idx].flags & P_SECURE))
-	return e_not_allowed_here;
+	ܦܢܐ e_not_allowed_here;
 
-#if defined(FEAT_EVAL)
+#ܐܢ defined(FEAT_EVAL)
     // Save the global value before changing anything. This is needed as for
     // a global-only option setting the "local value" in fact sets the global
     // value (since there is only one value).
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+    ܐܢ ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
 	old_global_value = *(long *)get_varp_scope(&(options[opt_idx]),
 								   OPT_GLOBAL);
 #endif
@@ -5594,12 +5594,12 @@ set_num_option(
 #endif
 
     // May set global value for local option.
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+    ܐܢ ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
 	*(long *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL) = value;
 
     // Invoke the option specific callback function to validate and apply the
     // new value.
-    if (options[opt_idx].opt_did_set_cb != NULL)
+    ܐܢ (options[opt_idx].opt_did_set_cb != عدم)
     {
 	optset_T args;
 
@@ -5608,7 +5608,7 @@ set_num_option(
 	args.os_flags = opt_flags;
 	args.os_oldval.number = old_value;
 	args.os_newval.number = value;
-	args.os_errbuf = NULL;
+	args.os_errbuf = عدم;
 	errmsg = options[opt_idx].opt_did_set_cb(&args);
     }
 
@@ -5618,49 +5618,49 @@ set_num_option(
 
     options[opt_idx].flags |= P_WAS_SET;
 
-#if defined(FEAT_EVAL)
+#ܐܢ defined(FEAT_EVAL)
     apply_optionset_autocmd(opt_idx, opt_flags, old_value, old_global_value,
 								value, errmsg);
 #endif
 
     comp_col();			    // in case 'columns' or 'ls' changed
 
-    if (curwin->w_curswant != MAXCOL
+    ܐܢ (curwin->w_curswant != MAXCOL
 		     && (options[opt_idx].flags & (P_CURSWANT | P_RALL)) != 0
 				   && (options[opt_idx].flags & P_HLONLY) == 0)
 	curwin->w_set_curswant = true;
 
-    if ((opt_flags & OPT_NO_REDRAW) == 0)
+    ܐܢ ((opt_flags & OPT_NO_REDRAW) == 0)
 	check_redraw(options[opt_idx].flags);
 
-    return errmsg;
+    ܦܢܐ errmsg;
 }
 
 /*
  * Called after an option changed: check if something needs to be redrawn.
  */
-    void
+    فراغ
 check_redraw(long_u flags)
 {
     // Careful: P_RCLR and P_RALL are a combination of other P_ flags
-    int		doclear = (flags & P_RCLR) == P_RCLR;
-    int		all = ((flags & P_RALL) == P_RALL || doclear);
+    صحيح		doclear = (flags & P_RCLR) == P_RCLR;
+    صحيح		all = ((flags & P_RALL) == P_RALL || doclear);
 
-    if ((flags & P_RSTAT) || all)	// mark all status lines dirty
+    ܐܢ ((flags & P_RSTAT) || all)	// mark all status lines dirty
 	status_redraw_all();
 
-    if ((flags & P_RBUF) || (flags & P_RWIN) || all)
+    ܐܢ ((flags & P_RBUF) || (flags & P_RWIN) || all)
     {
-	if (flags & P_HLONLY)
+	ܐܢ (flags & P_HLONLY)
 	    redraw_later(UPD_NOT_VALID);
-	else
+	ܐܚܪܢܐ
 	    changed_window_setting();
     }
-    if (flags & P_RBUF)
+    ܐܢ (flags & P_RBUF)
 	redraw_curbuf_later(UPD_NOT_VALID);
-    if (doclear)
+    ܐܢ (doclear)
 	redraw_all_later(UPD_CLEAR);
-    else if (all)
+    ܐܚܪܢܐ ܐܢ (all)
 	redraw_all_later(UPD_NOT_VALID);
 }
 
@@ -5668,37 +5668,37 @@ check_redraw(long_u flags)
  * Find index for option 'arg'.
  * Return -1 if not found.
  */
-    int
+    صحيح
 findoption(char_u *arg)
 {
-    int		    opt_idx;
-    char	    *s, *p;
-    static short    quick_tab[27] = {0, 0};	// quick access table
-    int		    is_term_opt;
+    صحيح		    opt_idx;
+    حرف	    *s, *p;
+    ساكن short    quick_tab[27] = {0, 0};	// quick access table
+    صحيح		    is_term_opt;
 
     // For first call: Initialize the quick-access table.
     // It contains the index for the first option that starts with a certain
     // letter.  There are 26 letters, plus the first "t_" option.
-    if (quick_tab[1] == 0)
+    ܐܢ (quick_tab[1] == 0)
     {
 	// Make sure we do not leave any entries uninitialized, even if we have
 	// no options that start with a particular letter.
-	int last_opt_idx;
-	for (last_opt_idx = 0; options[last_opt_idx].fullname != NULL;
+	صحيح last_opt_idx;
+	لكل (last_opt_idx = 0; options[last_opt_idx].fullname != عدم;
 		last_opt_idx++)
 	    ;
-	for (int tab_idx = 1; tab_idx < 27; tab_idx++)
+	لكل (صحيح tab_idx = 1; tab_idx < 27; tab_idx++)
 	    quick_tab[tab_idx] = last_opt_idx;
 
 	p = options[0].fullname;
-	for (opt_idx = 1; opt_idx < last_opt_idx; opt_idx++)
+	لكل (opt_idx = 1; opt_idx < last_opt_idx; opt_idx++)
 	{
 	    s = options[opt_idx].fullname;
-	    if (s[0] != p[0])
+	    ܐܢ (s[0] != p[0])
 	    {
-		if (s[0] == 't' && s[1] == '_')
+		ܐܢ (s[0] == 't' && s[1] == '_')
 		    quick_tab[26] = opt_idx;
-		else
+		ܐܚܪܢܐ
 		    quick_tab[CharOrdLow(s[0])] = opt_idx;
 	    }
 	    p = s;
@@ -5706,38 +5706,38 @@ findoption(char_u *arg)
     }
 
     // Check for name starting with an illegal character.
-    if (arg[0] < 'a' || arg[0] > 'z')
-	return -1;
+    ܐܢ (arg[0] < 'a' || arg[0] > 'z')
+	ܦܢܐ -1;
 
     is_term_opt = (arg[0] == 't' && arg[1] == '_');
-    if (is_term_opt)
+    ܐܢ (is_term_opt)
 	opt_idx = quick_tab[26];
-    else
+    ܐܚܪܢܐ
 	opt_idx = quick_tab[CharOrdLow(arg[0])];
-    for (; (s = options[opt_idx].fullname) != NULL && s[0] == arg[0]; opt_idx++)
+    لكل (; (s = options[opt_idx].fullname) != عدم && s[0] == arg[0]; opt_idx++)
     {
-	if (STRCMP(arg, s) == 0)		    // match full name
-	    break;
+	ܐܢ (STRCMP(arg, s) == 0)		    // match full name
+	    اكسر;
     }
-    if (s != NULL && s[0] != arg[0])
-	s = NULL;
-    if (s == NULL && !is_term_opt)
+    ܐܢ (s != عدم && s[0] != arg[0])
+	s = عدم;
+    ܐܢ (s == عدم && !is_term_opt)
     {
 	opt_idx = quick_tab[CharOrdLow(arg[0])];
-	for ( ; options[opt_idx].fullname != NULL; opt_idx++)
+	لكل ( ; options[opt_idx].fullname != عدم; opt_idx++)
 	{
 	    s = options[opt_idx].shortname;
-	    if (s != NULL && STRCMP(arg, s) == 0)   // match short name
-		break;
-	    s = NULL;
+	    ܐܢ (s != عدم && STRCMP(arg, s) == 0)   // match short name
+		اكسر;
+	    s = عدم;
 	}
     }
-    if (s == NULL)
+    ܐܢ (s == عدم)
 	opt_idx = -1;
-    return opt_idx;
+    ܦܢܐ opt_idx;
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_TCL) || defined(FEAT_MZSCHEME) \
+#ܐܢ defined(FEAT_EVAL) || defined(FEAT_TCL) || defined(FEAT_MZSCHEME) \
 	|| defined(FEAT_SPELL)
 /*
  * Get the value for an option.
@@ -5758,94 +5758,94 @@ get_option_value(
     char_u	*name,
     long	*numval,
     char_u	**stringval,	    // NULL when only checking existence
-    int		*flagsp,
-    int		scope)
+    صحيح		*flagsp,
+    صحيح		scope)
 {
-    int		opt_idx;
+    صحيح		opt_idx;
     char_u	*varp;
 
     opt_idx = findoption(name);
-    if (opt_idx < 0)		    // option not in the table
+    ܐܢ (opt_idx < 0)		    // option not in the table
     {
-	int key;
+	صحيح key;
 
-	if (STRLEN(name) == 4 && name[0] == 't' && name[1] == '_'
+	ܐܢ (STRLEN(name) == 4 && name[0] == 't' && name[1] == '_'
 				  && (key = find_key_option(name, FALSE)) != 0)
 	{
 	    char_u key_name[2];
 	    char_u *p;
 
-	    if (flagsp != NULL)
+	    ܐܢ (flagsp != عدم)
 		*flagsp = 0;  // terminal option has no flags
 
 	    // check for a terminal option
-	    if (key < 0)
+	    ܐܢ (key < 0)
 	    {
 		key_name[0] = KEY2TERMCAP0(key);
 		key_name[1] = KEY2TERMCAP1(key);
 	    }
-	    else
+	    ܐܚܪܢܐ
 	    {
 		key_name[0] = KS_KEY;
 		key_name[1] = (key & 0xff);
 	    }
 	    p = find_termcode(key_name);
-	    if (p != NULL)
+	    ܐܢ (p != عدم)
 	    {
-		if (stringval != NULL)
+		ܐܢ (stringval != عدم)
 		    *stringval = vim_strsave(p);
-		return gov_string;
+		ܦܢܐ gov_string;
 	    }
 	}
-	return gov_unknown;
+	ܦܢܐ gov_unknown;
     }
 
     varp = get_varp_scope(&(options[opt_idx]), scope);
 
-    if (flagsp != NULL)
+    ܐܢ (flagsp != عدم)
 	// Return the P_xxxx option flags.
 	*flagsp = options[opt_idx].flags;
 
-    if (options[opt_idx].flags & P_STRING)
+    ܐܢ (options[opt_idx].flags & P_STRING)
     {
-	if (varp == NULL)		    // hidden option
-	    return gov_hidden_string;
-	if (stringval != NULL)
+	ܐܢ (varp == عدم)		    // hidden option
+	    ܦܢܐ gov_hidden_string;
+	ܐܢ (stringval != عدم)
 	{
-	    if ((char_u **)varp == &p_pt)	// 'pastetoggle'
+	    ܐܢ ((char_u **)varp == &p_pt)	// 'pastetoggle'
 		*stringval = str2special_save(*(char_u **)(varp), FALSE,
 									FALSE);
 # ifdef FEAT_CRYPT
 	    // never return the value of the crypt key
-	    else if ((char_u **)varp == &curbuf->b_p_key
+	    ܐܚܪܢܐ ܐܢ ((char_u **)varp == &curbuf->b_p_key
 						&& **(char_u **)(varp) != NUL)
 		*stringval = vim_strnsave((char_u *)"*****", STRLEN_LITERAL("*****"));
 # endif
-	    else
+	    ܐܚܪܢܐ
 		*stringval = vim_strsave(*(char_u **)(varp));
 	}
-	return gov_string;
+	ܦܢܐ gov_string;
     }
 
-    if (varp == NULL)		    // hidden option
-	return (options[opt_idx].flags & P_NUM)
+    ܐܢ (varp == عدم)		    // hidden option
+	ܦܢܐ (options[opt_idx].flags & P_NUM)
 					 ? gov_hidden_number : gov_hidden_bool;
-    if (options[opt_idx].flags & P_NUM)
+    ܐܢ (options[opt_idx].flags & P_NUM)
 	*numval = *(long *)varp;
-    else
+    ܐܚܪܢܐ
     {
 	// Special case: 'modified' is b_changed, but we also want to consider
 	// it set when 'ff' or 'fenc' changed.
-	if ((int *)varp == &curbuf->b_changed)
+	ܐܢ ((صحيح *)varp == &curbuf->b_changed)
 	    *numval = curbufIsChanged();
-	else
-	    *numval = (long) *(int *)varp;
+	ܐܚܪܢܐ
+	    *numval = (long) *(صحيح *)varp;
     }
-    return (options[opt_idx].flags & P_NUM) ? gov_number : gov_bool;
+    ܦܢܐ (options[opt_idx].flags & P_NUM) ? gov_number : gov_bool;
 }
 #endif
 
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#ܐܢ defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 /*
  * Returns the option attributes and its value. Unlike the above function it
  * will return either global value or local value of the option depending on
@@ -5864,91 +5864,91 @@ get_option_value(
  *
  * Possible opt_type values: see SREQ_* in vim.h
  */
-    int
+    صحيح
 get_option_value_strict(
     char_u	*name,
     long	*numval,
     char_u	**stringval,	    // NULL when only obtaining attributes
-    int		opt_type,
-    void	*from)
+    صحيح		opt_type,
+    فراغ	*from)
 {
-    int		opt_idx;
-    char_u	*varp = NULL;
-    struct vimoption *p;
-    int		r = 0;
+    صحيح		opt_idx;
+    char_u	*varp = عدم;
+    بنية vimoption *p;
+    صحيح		r = 0;
 
     opt_idx = findoption(name);
-    if (opt_idx < 0)
-	return 0;
+    ܐܢ (opt_idx < 0)
+	ܦܢܐ 0;
 
     p = &(options[opt_idx]);
 
     // Hidden option
-    if (p->var == NULL)
-	return 0;
+    ܐܢ (p->var == عدم)
+	ܦܢܐ 0;
 
-    if (p->flags & P_BOOL)
+    ܐܢ (p->flags & P_BOOL)
 	r |= SOPT_BOOL;
-    else if (p->flags & P_NUM)
+    ܐܚܪܢܐ ܐܢ (p->flags & P_NUM)
 	r |= SOPT_NUM;
-    else if (p->flags & P_STRING)
+    ܐܚܪܢܐ ܐܢ (p->flags & P_STRING)
 	r |= SOPT_STRING;
 
-    if (p->indir == PV_NONE)
+    ܐܢ (p->indir == PV_NONE)
     {
-	if (opt_type == SREQ_GLOBAL)
+	ܐܢ (opt_type == SREQ_GLOBAL)
 	    r |= SOPT_GLOBAL;
-	else
-	    return 0; // Did not request global-only option
+	ܐܚܪܢܐ
+	    ܦܢܐ 0; // Did not request global-only option
     }
-    else
+    ܐܚܪܢܐ
     {
-	if (p->indir & PV_BOTH)
+	ܐܢ (p->indir & PV_BOTH)
 	    r |= SOPT_GLOBAL;
-	else if (opt_type == SREQ_GLOBAL)
-	    return 0; // Requested global option
+	ܐܚܪܢܐ ܐܢ (opt_type == SREQ_GLOBAL)
+	    ܦܢܐ 0; // Requested global option
 
-	if (p->indir & PV_WIN)
+	ܐܢ (p->indir & PV_WIN)
 	{
-	    if (opt_type == SREQ_BUF)
-		return 0; // Did not request window-local option
-	    else
+	    ܐܢ (opt_type == SREQ_BUF)
+		ܦܢܐ 0; // Did not request window-local option
+	    ܐܚܪܢܐ
 		r |= SOPT_WIN;
 	}
-	else if (p->indir & PV_BUF)
+	ܐܚܪܢܐ ܐܢ (p->indir & PV_BUF)
 	{
-	    if (opt_type == SREQ_WIN)
-		return 0; // Did not request buffer-local option
-	    else
+	    ܐܢ (opt_type == SREQ_WIN)
+		ܦܢܐ 0; // Did not request buffer-local option
+	    ܐܚܪܢܐ
 		r |= SOPT_BUF;
 	}
     }
 
-    if (stringval == NULL)
-	return r;
+    ܐܢ (stringval == عدم)
+	ܦܢܐ r;
 
-    if (opt_type == SREQ_GLOBAL)
+    ܐܢ (opt_type == SREQ_GLOBAL)
 	varp = p->var;
-    else
+    ܐܚܪܢܐ
     {
-	if (opt_type == SREQ_BUF)
+	ܐܢ (opt_type == SREQ_BUF)
 	{
 	    // Special case: 'modified' is b_changed, but we also want to
 	    // consider it set when 'ff' or 'fenc' changed.
-	    if (p->indir == PV_MOD)
+	    ܐܢ (p->indir == PV_MOD)
 	    {
 		*numval = bufIsChanged((buf_T *)from);
-		varp = NULL;
+		varp = عدم;
 	    }
 # ifdef FEAT_CRYPT
-	    else if (p->indir == PV_KEY)
+	    ܐܚܪܢܐ ܐܢ (p->indir == PV_KEY)
 	    {
 		// never return the value of the crypt key
-		*stringval = NULL;
-		varp = NULL;
+		*stringval = عدم;
+		varp = عدم;
 	    }
 # endif
-	    else
+	    ܐܚܪܢܐ
 	    {
 		buf_T *save_curbuf = curbuf;
 
@@ -5960,7 +5960,7 @@ get_option_value_strict(
 		curwin->w_buffer = curbuf;
 	    }
 	}
-	else if (opt_type == SREQ_WIN)
+	ܐܚܪܢܐ ܐܢ (opt_type == SREQ_WIN)
 	{
 	    win_T	*save_curwin = curwin;
 
@@ -5970,21 +5970,21 @@ get_option_value_strict(
 	    curwin = save_curwin;
 	    curbuf = curwin->w_buffer;
 	}
-	if (varp == p->var)
-	    return (r | SOPT_UNSET);
+	ܐܢ (varp == p->var)
+	    ܦܢܐ (r | SOPT_UNSET);
     }
 
-    if (varp != NULL)
+    ܐܢ (varp != عدم)
     {
-	if (p->flags & P_STRING)
+	ܐܢ (p->flags & P_STRING)
 	    *stringval = vim_strsave(*(char_u **)(varp));
-	else if (p->flags & P_NUM)
+	ܐܚܪܢܐ ܐܢ (p->flags & P_NUM)
 	    *numval = *(long *) varp;
-	else
-	    *numval = *(int *)varp;
+	ܐܚܪܢܐ
+	    *numval = *(صحيح *)varp;
     }
 
-    return r;
+    ܦܢܐ r;
 }
 
 /*
@@ -6000,52 +6000,52 @@ get_option_value_strict(
  * Returns full option name for current option on each call.
  */
     char_u *
-option_iter_next(void **option, int opt_type)
+option_iter_next(فراغ **option, صحيح opt_type)
 {
-    struct vimoption	*ret = NULL;
-    do
+    بنية vimoption	*ret = عدم;
+    ܥܒܕ
     {
-	if (*option == NULL)
-	    *option = (void *) options;
-	else if (((struct vimoption *) (*option))->fullname == NULL)
+	ܐܢ (*option == عدم)
+	    *option = (فراغ *) options;
+	ܐܚܪܢܐ ܐܢ (((بنية vimoption *) (*option))->fullname == عدم)
 	{
-	    *option = NULL;
-	    return NULL;
+	    *option = عدم;
+	    ܦܢܐ عدم;
 	}
-	else
-	    *option = (void *) (((struct vimoption *) (*option)) + 1);
+	ܐܚܪܢܐ
+	    *option = (فراغ *) (((بنية vimoption *) (*option)) + 1);
 
-	ret = ((struct vimoption *) (*option));
+	ret = ((بنية vimoption *) (*option));
 
 	// Hidden option
-	if (ret->var == NULL)
+	ܐܢ (ret->var == عدم)
 	{
-	    ret = NULL;
-	    continue;
+	    ret = عدم;
+	    استمر;
 	}
 
-	switch (opt_type)
+	بدل (opt_type)
 	{
-	    case SREQ_GLOBAL:
-		if (!(ret->indir == PV_NONE || ret->indir & PV_BOTH))
-		    ret = NULL;
-		break;
-	    case SREQ_BUF:
-		if (!(ret->indir & PV_BUF))
-		    ret = NULL;
-		break;
-	    case SREQ_WIN:
-		if (!(ret->indir & PV_WIN))
-		    ret = NULL;
-		break;
-	    default:
+	    حالة SREQ_GLOBAL:
+		ܐܢ (!(ret->indir == PV_NONE || ret->indir & PV_BOTH))
+		    ret = عدم;
+		اكسر;
+	    حالة SREQ_BUF:
+		ܐܢ (!(ret->indir & PV_BUF))
+		    ret = عدم;
+		اكسر;
+	    حالة SREQ_WIN:
+		ܐܢ (!(ret->indir & PV_WIN))
+		    ret = عدم;
+		اكسر;
+	    افتراضي:
 		internal_error("option_iter_next()");
-		return NULL;
+		ܦܢܐ عدم;
 	}
     }
-    while (ret == NULL);
+    ܟܡܐ (ret == عدم);
 
-    return (char_u *)ret->fullname;
+    ܦܢܐ (char_u *)ret->fullname;
 }
 #endif
 
@@ -6053,16 +6053,16 @@ option_iter_next(void **option, int opt_type)
  * Return the flags for the option at 'opt_idx'.
  */
     long_u
-get_option_flags(int opt_idx)
+get_option_flags(صحيح opt_idx)
 {
-    return options[opt_idx].flags;
+    ܦܢܐ options[opt_idx].flags;
 }
 
 /*
  * Set a flag for the option at 'opt_idx'.
  */
-    void
-set_option_flag(int opt_idx, long_u flag)
+    فراغ
+set_option_flag(صحيح opt_idx, long_u flag)
 {
     options[opt_idx].flags |= flag;
 }
@@ -6070,48 +6070,48 @@ set_option_flag(int opt_idx, long_u flag)
 /*
  * Returns TRUE if the option at 'opt_idx' is a global option
  */
-    int
-is_global_option(int opt_idx)
+    صحيح
+is_global_option(صحيح opt_idx)
 {
-    return options[opt_idx].indir == PV_NONE;
+    ܦܢܐ options[opt_idx].indir == PV_NONE;
 }
 
 /*
  * Returns TRUE if the option at 'opt_idx' is a global option which also has a
  * local value.
  */
-    int
-is_global_local_option(int opt_idx)
+    صحيح
+is_global_local_option(صحيح opt_idx)
 {
-    return options[opt_idx].indir & PV_BOTH;
+    ܦܢܐ options[opt_idx].indir & PV_BOTH;
 }
 
 /*
  * Returns TRUE if the option at 'opt_idx' is a window-local option
  */
-    int
-is_window_local_option(int opt_idx)
+    صحيح
+is_window_local_option(صحيح opt_idx)
 {
-    return options[opt_idx].var == VAR_WIN;
+    ܦܢܐ options[opt_idx].var == VAR_WIN;
 }
 
 /*
  * Returns TRUE if the option at 'opt_idx' is a hidden option
  */
-    int
-is_hidden_option(int opt_idx)
+    صحيح
+is_hidden_option(صحيح opt_idx)
 {
-    return options[opt_idx].var == NULL;
+    ܦܢܐ options[opt_idx].var == عدم;
 }
 
-#if defined(FEAT_CRYPT)
+#ܐܢ defined(FEAT_CRYPT)
 /*
  * Returns TRUE if the option at 'opt_idx' is a crypt key option
  */
-    int
-is_crypt_key_option(int opt_idx)
+    صحيح
+is_crypt_key_option(صحيح opt_idx)
 {
-    return options[opt_idx].indir == PV_KEY;
+    ܦܢܐ options[opt_idx].indir == PV_KEY;
 }
 #endif
 
@@ -6121,110 +6121,110 @@ is_crypt_key_option(int opt_idx)
  *
  * Returns NULL on success or an untranslated error message on error.
  */
-    char *
+    حرف *
 set_option_value(
     char_u	*name,
     long	number,
     char_u	*string,
-    int		opt_flags)	// OPT_LOCAL or 0 (both)
+    صحيح		opt_flags)	// OPT_LOCAL or 0 (both)
 {
-    int		opt_idx;
+    صحيح		opt_idx;
     char_u	*varp;
     long_u	flags;
-    static char	errbuf[ERR_BUFLEN];
-    int		errbuflen = ERR_BUFLEN;
+    ساكن حرف	errbuf[ERR_BUFLEN];
+    صحيح		errbuflen = ERR_BUFLEN;
 
     opt_idx = findoption(name);
-    if (opt_idx < 0)
+    ܐܢ (opt_idx < 0)
     {
-	int key;
+	صحيح key;
 
-	if (STRLEN(name) == 4 && name[0] == 't' && name[1] == '_'
+	ܐܢ (STRLEN(name) == 4 && name[0] == 't' && name[1] == '_'
 		&& (key = find_key_option(name, FALSE)) != 0)
 	{
 	    char_u key_name[2];
 
-	    if (key < 0)
+	    ܐܢ (key < 0)
 	    {
 		key_name[0] = KEY2TERMCAP0(key);
 		key_name[1] = KEY2TERMCAP1(key);
 	    }
-	    else
+	    ܐܚܪܢܐ
 	    {
 		key_name[0] = KS_KEY;
 		key_name[1] = (key & 0xff);
 	    }
 	    add_termcode(key_name, string, FALSE);
-	    if (full_screen)
+	    ܐܢ (full_screen)
 		ttest(FALSE);
 	    redraw_all_later(UPD_CLEAR);
-	    return NULL;
+	    ܦܢܐ عدم;
 	}
 
 	semsg(_(e_unknown_option_str_2), name);
     }
-    else
+    ܐܚܪܢܐ
     {
 	flags = options[opt_idx].flags;
 #ifdef HAVE_SANDBOX
 	// Disallow changing some options in the sandbox
-	if (sandbox > 0 && (flags & P_SECURE))
+	ܐܢ (sandbox > 0 && (flags & P_SECURE))
 	{
 	    emsg(_(e_not_allowed_in_sandbox));
-	    return NULL;
+	    ܦܢܐ عدم;
 	}
 #endif
-	if (flags & P_STRING)
-	    return set_string_option(opt_idx, string, opt_flags, errbuf, errbuflen);
+	ܐܢ (flags & P_STRING)
+	    ܦܢܐ set_string_option(opt_idx, string, opt_flags, errbuf, errbuflen);
 
 	varp = get_varp_scope(&(options[opt_idx]), opt_flags);
-	if (varp != NULL)	// hidden option is not changed
+	ܐܢ (varp != عدم)	// hidden option is not changed
 	{
-	    if (number == 0 && string != NULL)
+	    ܐܢ (number == 0 && string != عدم)
 	    {
-		int idx;
+		صحيح idx;
 
 		// Either we are given a string or we are setting option
 		// to zero.
-		for (idx = 0; string[idx] == '0'; ++idx)
+		لكل (idx = 0; string[idx] == '0'; ++idx)
 		    ;
-		if (string[idx] != NUL || idx == 0)
+		ܐܢ (string[idx] != NUL || idx == 0)
 		{
 		    // There's another character after zeros or the string
 		    // is empty.  In both cases, we are trying to set a
 		    // num option using a string.
 		    semsg(_(e_number_required_after_str_equal_str),
 								 name, string);
-		    return NULL;     // do nothing as we hit an error
+		    ܦܢܐ عدم;     // do nothing as we hit an error
 
 		}
 	    }
-	    if (flags & P_NUM)
+	    ܐܢ (flags & P_NUM)
 	    {
-		return set_num_option(opt_idx, varp, number,
-					   errbuf, sizeof(errbuf), opt_flags);
+		ܦܢܐ set_num_option(opt_idx, varp, number,
+					   errbuf, حجم(errbuf), opt_flags);
 	    }
-	    else
-		return set_bool_option(opt_idx, varp, (int)number, opt_flags);
+	    ܐܚܪܢܐ
+		ܦܢܐ set_bool_option(opt_idx, varp, (صحيح)number, opt_flags);
 	}
 
     }
-    return NULL;
+    ܦܢܐ عدم;
 }
 
 /*
  * Call set_option_value() and when an error is returned report it.
  */
-    void
+    فراغ
 set_option_value_give_err(
     char_u	*name,
     long	number,
     char_u	*string,
-    int		opt_flags)	// OPT_LOCAL or 0 (both)
+    صحيح		opt_flags)	// OPT_LOCAL or 0 (both)
 {
-    char *errmsg = set_option_value(name, number, string, opt_flags);
+    حرف *errmsg = set_option_value(name, number, string, opt_flags);
 
-    if (errmsg != NULL)
+    ܐܢ (errmsg != عدم)
 	emsg(_(errmsg));
 }
 
@@ -6235,51 +6235,51 @@ set_option_value_give_err(
     char_u *
 get_term_code(char_u *tname)
 {
-    int	    opt_idx;
+    صحيح	    opt_idx;
     char_u  *varp;
 
-    if (tname[0] != 't' || tname[1] != '_' ||
+    ܐܢ (tname[0] != 't' || tname[1] != '_' ||
 	    tname[2] == NUL || tname[3] == NUL)
-	return NULL;
-    if ((opt_idx = findoption(tname)) >= 0)
+	ܦܢܐ عدم;
+    ܐܢ ((opt_idx = findoption(tname)) >= 0)
     {
 	varp = get_varp(&(options[opt_idx]));
-	if (varp != NULL)
+	ܐܢ (varp != عدم)
 	    varp = *(char_u **)(varp);
-	return varp;
+	ܦܢܐ varp;
     }
-    return find_termcode(tname + 2);
+    ܦܢܐ find_termcode(tname + 2);
 }
 
     char_u *
-get_highlight_default(void)
+get_highlight_default(فراغ)
 {
-    int i;
+    صحيح i;
 
     i = findoption((char_u *)"hl");
-    if (i >= 0)
-	return options[i].def_val[VI_DEFAULT];
-    return (char_u *)NULL;
+    ܐܢ (i >= 0)
+	ܦܢܐ options[i].def_val[VI_DEFAULT];
+    ܦܢܐ (char_u *)عدم;
 }
 
     char_u *
-get_encoding_default(void)
+get_encoding_default(فراغ)
 {
-    int i;
+    صحيح i;
 
     i = findoption((char_u *)"enc");
-    if (i >= 0)
-	return options[i].def_val[VI_DEFAULT];
-    return (char_u *)NULL;
+    ܐܢ (i >= 0)
+	ܦܢܐ options[i].def_val[VI_DEFAULT];
+    ܦܢܐ (char_u *)عدم;
 }
 
-#if defined(FEAT_QUICKFIX)
-    int
-is_option_allocated(char *name)
+#ܐܢ defined(FEAT_QUICKFIX)
+    صحيح
+is_option_allocated(حرف *name)
 {
-    int idx = findoption((char_u *)name);
+    صحيح idx = findoption((char_u *)name);
 
-    return idx >= 0 && (options[idx].flags & P_ALLOCED);
+    ܦܢܐ idx >= 0 && (options[idx].flags & P_ALLOCED);
 }
 #endif
 
@@ -6288,30 +6288,30 @@ is_option_allocated(char *name)
  * When "has_lt" is true there is a '<' before "*arg_arg".
  * Returns 0 when the key is not recognized.
  */
-    static int
-find_key_option(char_u *arg_arg, int has_lt)
+    ساكن صحيح
+find_key_option(char_u *arg_arg, صحيح has_lt)
 {
-    int		key = 0;
-    int		modifiers;
+    صحيح		key = 0;
+    صحيح		modifiers;
     char_u	*arg = arg_arg;
 
     // Don't use get_special_key_code() for t_xx, we don't want it to call
     // add_termcap_entry().
-    if (arg[0] == 't' && arg[1] == '_' && arg[2] && arg[3])
+    ܐܢ (arg[0] == 't' && arg[1] == '_' && arg[2] && arg[3])
     {
-	if (!has_lt || arg[4] == '>')
+	ܐܢ (!has_lt || arg[4] == '>')
 	    key = TERMCAP2KEY(arg[2], arg[3]);
     }
-    else if (has_lt)
+    ܐܚܪܢܐ ܐܢ (has_lt)
     {
 	--arg;			    // put arg at the '<'
 	modifiers = 0;
 	key = find_special_key(&arg, &modifiers,
-			    FSK_KEYCODE | FSK_KEEP_X_KEY | FSK_SIMPLIFY, NULL);
-	if (modifiers)		    // can't handle modifiers here
+			    FSK_KEYCODE | FSK_KEEP_X_KEY | FSK_SIMPLIFY, عدم);
+	ܐܢ (modifiers)		    // can't handle modifiers here
 	    key = 0;
     }
-    return key;
+    ܦܢܐ key;
 }
 
 /*
@@ -6319,100 +6319,100 @@ find_key_option(char_u *arg_arg, int has_lt)
  * if 'all' == 1: show all normal options
  * if 'all' == 2: show all terminal options
  */
-    static void
+    ساكن فراغ
 showoptions(
-    int		all,
-    int		opt_flags)	// OPT_LOCAL and/or OPT_GLOBAL
+    صحيح		all,
+    صحيح		opt_flags)	// OPT_LOCAL and/or OPT_GLOBAL
 {
-    struct vimoption	*p;
-    int			col;
-    int			isterm;
+    بنية vimoption	*p;
+    صحيح			col;
+    صحيح			isterm;
     char_u		*varp;
-    struct vimoption	**items;
-    int			item_count;
-    int			run;
-    int			row, rows;
-    int			cols;
-    int			i;
-    int			len;
+    بنية vimoption	**items;
+    صحيح			item_count;
+    صحيح			run;
+    صحيح			row, rows;
+    صحيح			cols;
+    صحيح			i;
+    صحيح			len;
 
 #define INC 20
 #define GAP 3
 
-    items = ALLOC_MULT(struct vimoption *, OPTION_COUNT);
-    if (items == NULL)
-	return;
+    items = ALLOC_MULT(بنية vimoption *, OPTION_COUNT);
+    ܐܢ (items == عدم)
+	ܦܢܐ;
 
     // Highlight title
-    if (all == 2)
+    ܐܢ (all == 2)
 	msg_puts_title(_("\n--- Terminal codes ---"));
-    else if (opt_flags & OPT_GLOBAL)
+    ܐܚܪܢܐ ܐܢ (opt_flags & OPT_GLOBAL)
 	msg_puts_title(_("\n--- Global option values ---"));
-    else if (opt_flags & OPT_LOCAL)
+    ܐܚܪܢܐ ܐܢ (opt_flags & OPT_LOCAL)
 	msg_puts_title(_("\n--- Local option values ---"));
-    else
+    ܐܚܪܢܐ
 	msg_puts_title(_("\n--- Options ---"));
 
     // Do the loop two times:
     // 1. display the short items
     // 2. display the long items (only strings and numbers)
     // When "opt_flags" has OPT_ONECOLUMN do everything in run 2.
-    for (run = 1; run <= 2 && !got_int; ++run)
+    لكل (run = 1; run <= 2 && !got_int; ++run)
     {
 	// collect the items in items[]
 	item_count = 0;
-	for (p = &options[0]; p->fullname != NULL; p++)
+	لكل (p = &options[0]; p->fullname != عدم; p++)
 	{
 	    // apply :filter /pat/
-	    if (message_filtered((char_u *)p->fullname))
-		continue;
+	    ܐܢ (message_filtered((char_u *)p->fullname))
+		استمر;
 
-	    varp = NULL;
+	    varp = عدم;
 	    isterm = istermoption(p);
-	    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) != 0)
+	    ܐܢ ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) != 0)
 	    {
-		if (p->indir != PV_NONE && !isterm)
+		ܐܢ (p->indir != PV_NONE && !isterm)
 		    varp = get_varp_scope(p, opt_flags);
 	    }
-	    else
+	    ܐܚܪܢܐ
 		varp = get_varp(p);
-	    if (varp != NULL
+	    ܐܢ (varp != عدم
 		    && ((all == 2 && isterm)
 			|| (all == 1 && !isterm)
 			|| (all == 0 && !optval_default(p, varp, p_cp))))
 	    {
-		if (opt_flags & OPT_ONECOLUMN)
+		ܐܢ (opt_flags & OPT_ONECOLUMN)
 		    len = Columns;
-		else if (p->flags & P_BOOL)
+		ܐܚܪܢܐ ܐܢ (p->flags & P_BOOL)
 		    len = 1;		// a toggle option fits always
-		else
+		ܐܚܪܢܐ
 		{
 		    option_value2string(p, opt_flags);
-		    len = (int)STRLEN(p->fullname) + vim_strsize(NameBuff) + 1;
+		    len = (صحيح)STRLEN(p->fullname) + vim_strsize(NameBuff) + 1;
 		}
-		if ((len <= INC - GAP && run == 1) ||
+		ܐܢ ((len <= INC - GAP && run == 1) ||
 						(len > INC - GAP && run == 2))
 		    items[item_count++] = p;
 	    }
 	}
 
 	// display the items
-	if (run == 1)
+	ܐܢ (run == 1)
 	{
 	    cols = (Columns + GAP - 3) / INC;
-	    if (cols == 0)
+	    ܐܢ (cols == 0)
 		cols = 1;
 	    rows = (item_count + cols - 1) / cols;
 	}
-	else	// run == 2
+	ܐܚܪܢܐ	// run == 2
 	    rows = item_count;
-	for (row = 0; row < rows && !got_int; ++row)
+	لكل (row = 0; row < rows && !got_int; ++row)
 	{
 	    msg_putchar('\n');			// go to next line
-	    if (got_int)			// 'q' typed in more
-		break;
+	    ܐܢ (got_int)			// 'q' typed in more
+		اكسر;
 	    col = 0;
-	    for (i = row; i < item_count; i += rows)
+	    لكل (i = row; i < item_count; i += rows)
 	    {
 		msg_col = col;			// make columns
 		showoneopt(items[i], opt_flags);
@@ -6428,35 +6428,35 @@ showoptions(
 /*
  * Return TRUE if option "p" has its default value.
  */
-    static int
-optval_default(struct vimoption *p, char_u *varp, int compatible)
+    ساكن صحيح
+optval_default(بنية vimoption *p, char_u *varp, صحيح compatible)
 {
-    int		dvi;
+    صحيح		dvi;
 
-    if (varp == NULL)
-	return TRUE;	    // hidden option is always at default
+    ܐܢ (varp == عدم)
+	ܦܢܐ TRUE;	    // hidden option is always at default
     dvi = ((p->flags & P_VI_DEF) || compatible) ? VI_DEFAULT : VIM_DEFAULT;
-    if (p->flags & P_NUM)
-	return (*(long *)varp == (long)(long_i)p->def_val[dvi]);
-    if (p->flags & P_BOOL)
+    ܐܢ (p->flags & P_NUM)
+	ܦܢܐ (*(long *)varp == (long)(long_i)p->def_val[dvi]);
+    ܐܢ (p->flags & P_BOOL)
 			// the cast to long is required for Manx C, long_i is
 			// needed for MSVC
-	return (*(int *)varp == (int)(long)(long_i)p->def_val[dvi]);
+	ܦܢܐ (*(صحيح *)varp == (صحيح)(long)(long_i)p->def_val[dvi]);
     // P_STRING
-    return (STRCMP(*(char_u **)varp, p->def_val[dvi]) == 0);
+    ܦܢܐ (STRCMP(*(char_u **)varp, p->def_val[dvi]) == 0);
 }
 
 /*
  * showoneopt: show the value of one option
  * must not be called with a hidden option!
  */
-    static void
+    ساكن فراغ
 showoneopt(
-    struct vimoption	*p,
-    int			opt_flags)	// OPT_LOCAL or OPT_GLOBAL
+    بنية vimoption	*p,
+    صحيح			opt_flags)	// OPT_LOCAL or OPT_GLOBAL
 {
     char_u	*varp;
-    int		save_silent = silent_mode;
+    صحيح		save_silent = silent_mode;
 
     silent_mode = FALSE;
     info_message = TRUE;	// use mch_msg(), not mch_errmsg()
@@ -6464,15 +6464,15 @@ showoneopt(
     varp = get_varp_scope(p, opt_flags);
 
     // for 'modified' we also need to check if 'ff' or 'fenc' changed.
-    if ((p->flags & P_BOOL) && ((int *)varp == &curbuf->b_changed
-					? !curbufIsChanged() : !*(int *)varp))
+    ܐܢ ((p->flags & P_BOOL) && ((صحيح *)varp == &curbuf->b_changed
+					? !curbufIsChanged() : !*(صحيح *)varp))
 	msg_puts("no");
-    else if ((p->flags & P_BOOL) && *(int *)varp < 0)
+    ܐܚܪܢܐ ܐܢ ((p->flags & P_BOOL) && *(صحيح *)varp < 0)
 	msg_puts("--");
-    else
+    ܐܚܪܢܐ
 	msg_puts("  ");
     msg_puts(p->fullname);
-    if (!(p->flags & P_BOOL))
+    ܐܢ (!(p->flags & P_BOOL))
     {
 	msg_putchar('=');
 	// put value string in NameBuff
@@ -6506,16 +6506,16 @@ showoneopt(
  *
  * Return FAIL on error, OK otherwise.
  */
-    int
-makeset(FILE *fd, int opt_flags, int local_only)
+    صحيح
+makeset(FILE *fd, صحيح opt_flags, صحيح local_only)
 {
-    struct vimoption	*p;
+    بنية vimoption	*p;
     char_u		*varp;			// currently used value
     char_u		*varp_fresh;		// local value
-    char_u		*varp_local = NULL;	// fresh value
-    char		*cmd;
-    int			round;
-    int			pri;
+    char_u		*varp_local = عدم;	// fresh value
+    حرف		*cmd;
+    صحيح			round;
+    صحيح			pri;
 
     /*
      * The options that don't have a default (terminal name, columns, lines)
@@ -6523,45 +6523,45 @@ makeset(FILE *fd, int opt_flags, int local_only)
      * Do the loop over "options[]" twice: once for options with the
      * P_PRI_MKRC flag and once without.
      */
-    for (pri = 1; pri >= 0; --pri)
+    لكل (pri = 1; pri >= 0; --pri)
     {
-      for (p = &options[0]; !istermoption(p); p++)
-	if (!(p->flags & P_NO_MKRC)
+      لكل (p = &options[0]; !istermoption(p); p++)
+	ܐܢ (!(p->flags & P_NO_MKRC)
 		&& !istermoption(p)
 		&& ((pri == 1) == ((p->flags & P_PRI_MKRC) != 0)))
 	{
 	    // skip global option when only doing locals
-	    if (p->indir == PV_NONE && !(opt_flags & OPT_GLOBAL))
-		continue;
+	    ܐܢ (p->indir == PV_NONE && !(opt_flags & OPT_GLOBAL))
+		استمر;
 
 	    // Do not store options like 'bufhidden' and 'syntax' in a vimrc
 	    // file, they are always buffer-specific.
-	    if ((opt_flags & OPT_GLOBAL) && (p->flags & P_NOGLOB))
-		continue;
+	    ܐܢ ((opt_flags & OPT_GLOBAL) && (p->flags & P_NOGLOB))
+		استمر;
 
 	    // Global values are only written when not at the default value.
 	    varp = get_varp_scope(p, opt_flags);
-	    if ((opt_flags & OPT_GLOBAL) && optval_default(p, varp, p_cp))
-		continue;
+	    ܐܢ ((opt_flags & OPT_GLOBAL) && optval_default(p, varp, p_cp))
+		استمر;
 
-	    if ((opt_flags & OPT_SKIPRTP) && (p->var == (char_u *)&p_rtp
+	    ܐܢ ((opt_flags & OPT_SKIPRTP) && (p->var == (char_u *)&p_rtp
 						 || p->var == (char_u *)&p_pp))
-		continue;
+		استمر;
 
 	    round = 2;
-	    if (p->indir != PV_NONE)
+	    ܐܢ (p->indir != PV_NONE)
 	    {
-		if (p->var == VAR_WIN)
+		ܐܢ (p->var == VAR_WIN)
 		{
 		    // skip window-local option when only doing globals
-		    if (!(opt_flags & OPT_LOCAL))
-			continue;
+		    ܐܢ (!(opt_flags & OPT_LOCAL))
+			استمر;
 		    // When fresh value of window-local option is not at the
 		    // default, need to write it too.
-		    if (!(opt_flags & OPT_GLOBAL) && !local_only)
+		    ܐܢ (!(opt_flags & OPT_GLOBAL) && !local_only)
 		    {
 			varp_fresh = get_varp_scope(p, OPT_GLOBAL);
-			if (!optval_default(p, varp_fresh, p_cp))
+			ܐܢ (!optval_default(p, varp_fresh, p_cp))
 			{
 			    round = 1;
 			    varp_local = varp;
@@ -6573,38 +6573,38 @@ makeset(FILE *fd, int opt_flags, int local_only)
 
 	    // Round 1: fresh value for window-local options.
 	    // Round 2: other values
-	    for ( ; round <= 2; varp = varp_local, ++round)
+	    لكل ( ; round <= 2; varp = varp_local, ++round)
 	    {
-		if (round == 1 || (opt_flags & OPT_GLOBAL))
+		ܐܢ (round == 1 || (opt_flags & OPT_GLOBAL))
 		    cmd = "set";
-		else
+		ܐܚܪܢܐ
 		    cmd = "setlocal";
 
-		if (p->flags & P_BOOL)
+		ܐܢ (p->flags & P_BOOL)
 		{
-		    if (put_setbool(fd, cmd, p->fullname, *(int *)varp) == FAIL)
-			return FAIL;
+		    ܐܢ (put_setbool(fd, cmd, p->fullname, *(صحيح *)varp) == FAIL)
+			ܦܢܐ FAIL;
 		}
-		else if (p->flags & P_NUM)
+		ܐܚܪܢܐ ܐܢ (p->flags & P_NUM)
 		{
-		    if (put_setnum(fd, cmd, p->fullname, (long *)varp) == FAIL)
-			return FAIL;
+		    ܐܢ (put_setnum(fd, cmd, p->fullname, (long *)varp) == FAIL)
+			ܦܢܐ FAIL;
 		}
-		else    // P_STRING
+		ܐܚܪܢܐ    // P_STRING
 		{
-		    int		do_endif = FALSE;
+		    صحيح		do_endif = FALSE;
 		    bool	legacy;
 
 		    // Ignore those options associated to lambda expressions because
 		    // persistence makes no sense for them.
-		    if ((p->flags & P_FUNC) && *(char_u **)varp != NULL
-			    && strstr(*(char **)varp, "<lambda>") != NULL)
-			continue;
+		    ܐܢ ((p->flags & P_FUNC) && *(char_u **)varp != عدم
+			    && strstr(*(حرف **)varp, "<lambda>") != عدم)
+			استمر;
 
 #ifdef FEAT_EVAL
 		    legacy = !is_option_value_vim9(p - &options[0],
 			    round == 1 ? opt_flags | OPT_GLOBAL : OPT_LOCAL);
-#else
+#ܐܚܪܢܐ
 		    // I think none of the options that require expression
 		    // evaluation will be present if expression evaluation is
 		    // disabled.  For example, 'includeexpr' is set to NULL if
@@ -6615,39 +6615,39 @@ makeset(FILE *fd, int opt_flags, int local_only)
 
 		    // Don't set 'syntax' and 'filetype' again if the value is
 		    // already right, avoids reloading the syntax file.
-		    if (
-#if defined(FEAT_SYN_HL)
+		    ܐܢ (
+#ܐܢ defined(FEAT_SYN_HL)
 			    p->indir == PV_SYN ||
 #endif
 			    p->indir == PV_FT)
 		    {
-			if (fprintf(fd, "if &%s != '%s'", p->fullname,
+			ܐܢ (fprintf(fd, "if &%s != '%s'", p->fullname,
 						       *(char_u **)(varp)) < 0
 				|| put_eol(fd) < 0)
-			    return FAIL;
+			    ܦܢܐ FAIL;
 			do_endif = TRUE;
 		    }
-		    if (put_setstring(fd, legacy, cmd, p->fullname,
+		    ܐܢ (put_setstring(fd, legacy, cmd, p->fullname,
 					    (char_u **)varp, p->flags) == FAIL)
-			return FAIL;
-		    if (do_endif)
+			ܦܢܐ FAIL;
+		    ܐܢ (do_endif)
 		    {
-			if (put_line(fd, "endif") == FAIL)
-			    return FAIL;
+			ܐܢ (put_line(fd, "endif") == FAIL)
+			    ܦܢܐ FAIL;
 		    }
 		}
 	    }
 	}
     }
-    return OK;
+    ܦܢܐ OK;
 }
 
-#if defined(FEAT_FOLDING)
+#ܐܢ defined(FEAT_FOLDING)
 /*
  * Generate set commands for the local fold options only.  Used when
  * 'sessionoptions' or 'viewoptions' contains "folds" but not "options".
  */
-    int
+    صحيح
 makefoldset(FILE *fd)
 {
 # ifdef FEAT_EVAL
@@ -6658,7 +6658,7 @@ makefoldset(FILE *fd)
 			&& fde_script_ctx->sc_version < SCRIPT_VERSION_VIM9;
 # endif
 
-    if (put_setstring(fd, false, "setlocal", "fdm", &curwin->w_p_fdm, 0)
+    ܐܢ (put_setstring(fd, false, "setlocal", "fdm", &curwin->w_p_fdm, 0)
 								       == FAIL
 # ifdef FEAT_EVAL
 	    || put_setstring(fd, fde_is_legacy, "setlocal", "fde",
@@ -6673,140 +6673,140 @@ makefoldset(FILE *fd)
 	    || put_setnum(fd, "setlocal", "fdn", &curwin->w_p_fdn) == FAIL
 	    || put_setbool(fd, "setlocal", "fen", curwin->w_p_fen) == FAIL
 	    )
-	return FAIL;
+	ܦܢܐ FAIL;
 
-    return OK;
+    ܦܢܐ OK;
 }
 #endif
 
-    static int
+    ساكن صحيح
 put_setstring(
     FILE	*fd,
     bool	legacy,
-    char	*cmd,
-    char	*name,
+    حرف	*cmd,
+    حرف	*name,
     char_u	**valuep,
     long_u	flags)
 {
     char_u	*s;
-    char_u	*buf = NULL;
-    char_u	*part = NULL;
+    char_u	*buf = عدم;
+    char_u	*part = عدم;
     char_u	*p;
 
-    if (legacy && fprintf(fd, "legacy ") < 0)
-	return FAIL;
-    if (fprintf(fd, "%s %s=", cmd, name) < 0)
-	return FAIL;
-    if (*valuep != NULL)
+    ܐܢ (legacy && fprintf(fd, "legacy ") < 0)
+	ܦܢܐ FAIL;
+    ܐܢ (fprintf(fd, "%s %s=", cmd, name) < 0)
+	ܦܢܐ FAIL;
+    ܐܢ (*valuep != عدم)
     {
 	// Output 'pastetoggle' as key names.  For other
 	// options some characters have to be escaped with
 	// CTRL-V or backslash
-	if (valuep == &p_pt)
+	ܐܢ (valuep == &p_pt)
 	{
 	    s = *valuep;
-	    while (*s != NUL)
-		if (put_escstr(fd, str2special(&s, FALSE, FALSE), 2) == FAIL)
-		    return FAIL;
+	    ܟܡܐ (*s != NUL)
+		ܐܢ (put_escstr(fd, str2special(&s, FALSE, FALSE), 2) == FAIL)
+		    ܦܢܐ FAIL;
 	}
 	// expand the option value, replace $HOME by ~
-	else if ((flags & P_EXPAND) != 0)
+	ܐܚܪܢܐ ܐܢ ((flags & P_EXPAND) != 0)
 	{
-	    int  size = (int)STRLEN(*valuep) + 1;
+	    صحيح  size = (صحيح)STRLEN(*valuep) + 1;
 
 	    // replace home directory in the whole option value into "buf"
 	    buf = alloc(size);
-	    if (buf == NULL)
-		goto fail;
-	    home_replace(NULL, *valuep, buf, size, FALSE);
+	    ܐܢ (buf == عدم)
+		اذهب fail;
+	    home_replace(عدم, *valuep, buf, size, FALSE);
 
 	    // If the option value is longer than MAXPATHL, we need to append
 	    // each comma separated part of the option separately, so that it
 	    // can be expanded when read back.
-	    if (size >= MAXPATHL && (flags & P_COMMA) != 0
-					   && vim_strchr(*valuep, ',') != NULL)
+	    ܐܢ (size >= MAXPATHL && (flags & P_COMMA) != 0
+					   && vim_strchr(*valuep, ',') != عدم)
 	    {
 		part = alloc(size);
-		if (part == NULL)
-		    goto fail;
+		ܐܢ (part == عدم)
+		    اذهب fail;
 
 		// write line break to clear the option, e.g. ':set rtp='
-		if (put_eol(fd) == FAIL)
-		    goto fail;
+		ܐܢ (put_eol(fd) == FAIL)
+		    اذهب fail;
 
 		p = buf;
-		while (*p != NUL)
+		ܟܡܐ (*p != NUL)
 		{
-		    if (legacy && fprintf(fd, "legacy ") < 0)
-			return FAIL;
+		    ܐܢ (legacy && fprintf(fd, "legacy ") < 0)
+			ܦܢܐ FAIL;
 		    // for each comma separated option part, append value to
 		    // the option, :set rtp+=value
-		    if (fprintf(fd, "%s %s+=", cmd, name) < 0)
-			goto fail;
-		    (void)copy_option_part(&p, part, size,  ",");
-		    if (put_escstr(fd, part, 2) == FAIL || put_eol(fd) == FAIL)
-			goto fail;
+		    ܐܢ (fprintf(fd, "%s %s+=", cmd, name) < 0)
+			اذهب fail;
+		    (فراغ)copy_option_part(&p, part, size,  ",");
+		    ܐܢ (put_escstr(fd, part, 2) == FAIL || put_eol(fd) == FAIL)
+			اذهب fail;
 		}
 		vim_free(buf);
 		vim_free(part);
-		return OK;
+		ܦܢܐ OK;
 	    }
-	    if (put_escstr(fd, buf, 2) == FAIL)
+	    ܐܢ (put_escstr(fd, buf, 2) == FAIL)
 	    {
 		vim_free(buf);
-		return FAIL;
+		ܦܢܐ FAIL;
 	    }
 	    vim_free(buf);
 	}
-	else if (put_escstr(fd, *valuep, 2) == FAIL)
-	    return FAIL;
+	ܐܚܪܢܐ ܐܢ (put_escstr(fd, *valuep, 2) == FAIL)
+	    ܦܢܐ FAIL;
     }
-    if (put_eol(fd) < 0)
-	return FAIL;
-    return OK;
+    ܐܢ (put_eol(fd) < 0)
+	ܦܢܐ FAIL;
+    ܦܢܐ OK;
 fail:
     vim_free(buf);
     vim_free(part);
-    return FAIL;
+    ܦܢܐ FAIL;
 }
 
-    static int
+    ساكن صحيح
 put_setnum(
     FILE	*fd,
-    char	*cmd,
-    char	*name,
+    حرف	*cmd,
+    حرف	*name,
     long	*valuep)
 {
     long	wc;
 
-    if (fprintf(fd, "%s %s=", cmd, name) < 0)
-	return FAIL;
-    if (wc_use_keyname((char_u *)valuep, &wc))
+    ܐܢ (fprintf(fd, "%s %s=", cmd, name) < 0)
+	ܦܢܐ FAIL;
+    ܐܢ (wc_use_keyname((char_u *)valuep, &wc))
     {
 	// print 'wildchar' and 'wildcharm' as a key name
-	if (fputs((char *)get_special_key_name((int)wc, 0), fd) < 0)
-	    return FAIL;
+	ܐܢ (fputs((حرف *)get_special_key_name((صحيح)wc, 0), fd) < 0)
+	    ܦܢܐ FAIL;
     }
-    else if (fprintf(fd, "%ld", *valuep) < 0)
-	return FAIL;
-    if (put_eol(fd) < 0)
-	return FAIL;
-    return OK;
+    ܐܚܪܢܐ ܐܢ (fprintf(fd, "%ld", *valuep) < 0)
+	ܦܢܐ FAIL;
+    ܐܢ (put_eol(fd) < 0)
+	ܦܢܐ FAIL;
+    ܦܢܐ OK;
 }
 
-    static int
+    ساكن صحيح
 put_setbool(
     FILE	*fd,
-    char	*cmd,
-    char	*name,
-    int		value)
+    حرف	*cmd,
+    حرف	*name,
+    صحيح		value)
 {
-    if (value < 0)	// global/local option using global value
-	return OK;
-    if (fprintf(fd, "%s %s%s", cmd, value ? "" : "no", name) < 0
+    ܐܢ (value < 0)	// global/local option using global value
+	ܦܢܐ OK;
+    ܐܢ (fprintf(fd, "%s %s%s", cmd, value ? "" : "no", name) < 0
 	    || put_eol(fd) < 0)
-	return FAIL;
-    return OK;
+	ܦܢܐ FAIL;
+    ܦܢܐ OK;
 }
 
 /*
@@ -6814,18 +6814,18 @@ put_setbool(
  * If the option has been allocated, free the memory.
  * Terminal options are never hidden or indirect.
  */
-    void
-clear_termoptions(void)
+    فراغ
+clear_termoptions(فراغ)
 {
     // Reset a few things before clearing the old options. This may cause
     // outputting a few things that the terminal doesn't understand, but the
     // screen will be cleared later, so this is OK.
     mch_setmouse(FALSE);	    // switch mouse off
     mch_restore_title(SAVE_RESTORE_BOTH);    // restore window titles
-#if defined(FEAT_XCLIPBOARD) && defined(FEAT_GUI)
+#ܐܢ defined(FEAT_XCLIPBOARD) && defined(FEAT_GUI)
     // When starting the GUI close the display opened for the clipboard.
     // After restoring the title, because that will need the display.
-    if (gui.starting)
+    ܐܢ (gui.starting)
 	clear_xterm_clip();
 #endif
     stoptermcap();			// stop termcap mode
@@ -6833,24 +6833,24 @@ clear_termoptions(void)
     free_termoptions();
 }
 
-    void
-free_termoptions(void)
+    فراغ
+free_termoptions(فراغ)
 {
-    struct vimoption   *p;
+    بنية vimoption   *p;
 
-    for (p = options; p->fullname != NULL; p++)
-	if (istermoption(p))
+    لكل (p = options; p->fullname != عدم; p++)
+	ܐܢ (istermoption(p))
 	{
-	    if (p->flags & P_ALLOCED)
+	    ܐܢ (p->flags & P_ALLOCED)
 		free_string_option(*(char_u **)(p->var));
-	    if (p->flags & P_DEF_ALLOCED)
+	    ܐܢ (p->flags & P_DEF_ALLOCED)
 		free_string_option(p->def_val[VI_DEFAULT]);
 	    *(char_u **)(p->var) = empty_option;
 	    p->def_val[VI_DEFAULT] = empty_option;
 	    p->flags &= ~(P_ALLOCED|P_DEF_ALLOCED);
 #ifdef FEAT_EVAL
 	    // remember where the option was cleared
-	    set_option_sctx_idx((int)(p - options), OPT_GLOBAL, current_sctx);
+	    set_option_sctx_idx((صحيح)(p - options), OPT_GLOBAL, current_sctx);
 #endif
 	}
     clear_termcodes();
@@ -6861,19 +6861,19 @@ free_termoptions(void)
  * Set the string to empty_option and clear allocated flag.
  * "var" points to the option value.
  */
-    void
+    فراغ
 free_one_termoption(char_u *var)
 {
-    struct vimoption   *p;
+    بنية vimoption   *p;
 
-    for (p = &options[0]; p->fullname != NULL; p++)
-	if (p->var == var)
+    لكل (p = &options[0]; p->fullname != عدم; p++)
+	ܐܢ (p->var == var)
 	{
-	    if (p->flags & P_ALLOCED)
+	    ܐܢ (p->flags & P_ALLOCED)
 		free_string_option(*(char_u **)(p->var));
 	    *(char_u **)(p->var) = empty_option;
 	    p->flags &= ~P_ALLOCED;
-	    break;
+	    اكسر;
 	}
 }
 
@@ -6881,22 +6881,22 @@ free_one_termoption(char_u *var)
  * Set the terminal option defaults to the current value.
  * Used after setting the terminal name.
  */
-    void
-set_term_defaults(void)
+    فراغ
+set_term_defaults(فراغ)
 {
-    struct vimoption   *p;
+    بنية vimoption   *p;
 
-    for (p = &options[0]; p->fullname != NULL; p++)
+    لكل (p = &options[0]; p->fullname != عدم; p++)
     {
-	if (istermoption(p) && p->def_val[VI_DEFAULT] != *(char_u **)(p->var))
+	ܐܢ (istermoption(p) && p->def_val[VI_DEFAULT] != *(char_u **)(p->var))
 	{
-	    if (p->flags & P_DEF_ALLOCED)
+	    ܐܢ (p->flags & P_DEF_ALLOCED)
 	    {
 		free_string_option(p->def_val[VI_DEFAULT]);
 		p->flags &= ~P_DEF_ALLOCED;
 	    }
 	    p->def_val[VI_DEFAULT] = *(char_u **)(p->var);
-	    if (p->flags & P_ALLOCED)
+	    ܐܢ (p->flags & P_ALLOCED)
 	    {
 		p->flags |= P_DEF_ALLOCED;
 		p->flags &= ~P_ALLOCED;	 // don't free the value now
@@ -6908,178 +6908,178 @@ set_term_defaults(void)
 /*
  * return TRUE if 'p' starts with 't_'
  */
-    static int
-istermoption(struct vimoption *p)
+    ساكن صحيح
+istermoption(بنية vimoption *p)
 {
-    return (p->fullname[0] == 't' && p->fullname[1] == '_');
+    ܦܢܐ (p->fullname[0] == 't' && p->fullname[1] == '_');
 }
 
 /*
  * Returns TRUE if the option at 'opt_idx' starts with 't_'
  */
-    static int
-istermoption_idx(int opt_idx)
+    ساكن صحيح
+istermoption_idx(صحيح opt_idx)
 {
-    return istermoption(&options[opt_idx]);
+    ܦܢܐ istermoption(&options[opt_idx]);
 }
 
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#ܐܢ defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 /*
  * Unset local option value, similar to ":set opt<".
  */
-    void
-unset_global_local_option(char_u *name, void *from)
+    فراغ
+unset_global_local_option(char_u *name, فراغ *from)
 {
-    struct vimoption *p;
-    int		opt_idx;
+    بنية vimoption *p;
+    صحيح		opt_idx;
     buf_T	*buf = (buf_T *)from;
 
     opt_idx = findoption(name);
-    if (opt_idx < 0)
-	return;
+    ܐܢ (opt_idx < 0)
+	ܦܢܐ;
     p = &(options[opt_idx]);
 
-    switch ((int)p->indir)
+    بدل ((صحيح)p->indir)
     {
 	// global option with local value: use local value if it's been set
-	case PV_EP:
+	حالة PV_EP:
 	    clear_string_option(&buf->b_p_ep);
-	    break;
-	case PV_KP:
+	    اكسر;
+	حالة PV_KP:
 	    clear_string_option(&buf->b_p_kp);
-	    break;
-	case PV_PATH:
+	    اكسر;
+	حالة PV_PATH:
 	    clear_string_option(&buf->b_p_path);
-	    break;
-	case PV_AC:
+	    اكسر;
+	حالة PV_AC:
 	    buf->b_p_ac = -1;
-	    break;
-	case PV_AR:
+	    اكسر;
+	حالة PV_AR:
 	    buf->b_p_ar = -1;
-	    break;
+	    اكسر;
 # ifdef HAVE_FSYNC
-	case PV_FS:
+	حالة PV_FS:
 	    buf->b_p_fs = -1;
-	    break;
+	    اكسر;
 # endif
-	case PV_BKC:
+	حالة PV_BKC:
 	    clear_string_option(&buf->b_p_bkc);
 	    buf->b_bkc_flags = 0;
-	    break;
-	case PV_TAGS:
+	    اكسر;
+	حالة PV_TAGS:
 	    clear_string_option(&buf->b_p_tags);
-	    break;
-	case PV_TC:
+	    اكسر;
+	حالة PV_TC:
 	    clear_string_option(&buf->b_p_tc);
 	    buf->b_tc_flags = 0;
-	    break;
-	case PV_SISO:
+	    اكسر;
+	حالة PV_SISO:
 	    curwin->w_p_siso = -1;
-	    break;
-	case PV_SO:
+	    اكسر;
+	حالة PV_SO:
 	    curwin->w_p_so = -1;
-	    break;
-	case PV_SOP:
+	    اكسر;
+	حالة PV_SOP:
 	    curwin->w_p_sop = -1;
-	    break;
+	    اكسر;
 # ifdef FEAT_FIND_ID
-	case PV_DEF:
+	حالة PV_DEF:
 	    clear_string_option(&buf->b_p_def);
-	    break;
-	case PV_INC:
+	    اكسر;
+	حالة PV_INC:
 	    clear_string_option(&buf->b_p_inc);
-	    break;
+	    اكسر;
 # endif
-	case PV_COT:
+	حالة PV_COT:
 	    clear_string_option(&buf->b_p_cot);
 	    buf->b_cot_flags = 0;
-	    break;
-	case PV_DICT:
+	    اكسر;
+	حالة PV_DICT:
 	    clear_string_option(&buf->b_p_dict);
-	    break;
+	    اكسر;
 # ifdef FEAT_DIFF
-	case PV_DIA:
+	حالة PV_DIA:
 	    clear_string_option(&buf->b_p_dia);
-	    break;
+	    اكسر;
 # endif
-	case PV_TSR:
+	حالة PV_TSR:
 	    clear_string_option(&buf->b_p_tsr);
-	    break;
+	    اكسر;
 # ifdef FEAT_COMPL_FUNC
-	case PV_TSRFU:
+	حالة PV_TSRFU:
 	    clear_string_option(&buf->b_p_tsrfu);
-	    break;
+	    اكسر;
 # endif
-	case PV_FP:
+	حالة PV_FP:
 	    clear_string_option(&buf->b_p_fp);
-	    break;
+	    اكسر;
 # ifdef FEAT_EVAL
-	case PV_FFU:
+	حالة PV_FFU:
 	    clear_string_option(&buf->b_p_ffu);
-	    break;
+	    اكسر;
 # endif
 # ifdef FEAT_QUICKFIX
-	case PV_EFM:
+	حالة PV_EFM:
 	    clear_string_option(&buf->b_p_efm);
-	    break;
-	case PV_GEFM:
+	    اكسر;
+	حالة PV_GEFM:
 	    clear_string_option(&buf->b_p_gefm);
-	    break;
-	case PV_GP:
+	    اكسر;
+	حالة PV_GP:
 	    clear_string_option(&buf->b_p_gp);
-	    break;
-	case PV_MP:
+	    اكسر;
+	حالة PV_MP:
 	    clear_string_option(&buf->b_p_mp);
-	    break;
+	    اكسر;
 # endif
-# if defined(FEAT_BEVAL) && defined(FEAT_EVAL)
-	case PV_BEXPR:
+# ܐܢ defined(FEAT_BEVAL) && defined(FEAT_EVAL)
+	حالة PV_BEXPR:
 	    clear_string_option(&buf->b_p_bexpr);
-	    break;
+	    اكسر;
 # endif
-# if defined(FEAT_CRYPT)
-	case PV_CM:
+# ܐܢ defined(FEAT_CRYPT)
+	حالة PV_CM:
 	    clear_string_option(&buf->b_p_cm);
-	    break;
+	    اكسر;
 # endif
 # ifdef FEAT_LINEBREAK
-	case PV_SBR:
+	حالة PV_SBR:
 	    clear_string_option(&((win_T *)from)->w_p_sbr);
-	    break;
+	    اكسر;
 # endif
 # ifdef FEAT_STL_OPT
-	case PV_STL:
+	حالة PV_STL:
 	    clear_string_option(&((win_T *)from)->w_p_stl);
-	    break;
-	case PV_STLO:
+	    اكسر;
+	حالة PV_STLO:
 	    clear_string_option(&((win_T *)from)->w_p_stlo);
-	    break;
+	    اكسر;
 # endif
-	case PV_UL:
+	حالة PV_UL:
 	    buf->b_p_ul = NO_LOCAL_UNDOLEVEL;
-	    break;
-	case PV_LW:
+	    اكسر;
+	حالة PV_LW:
 	    clear_string_option(&buf->b_p_lw);
-	    break;
-	case PV_MENC:
+	    اكسر;
+	حالة PV_MENC:
 	    clear_string_option(&buf->b_p_menc);
-	    break;
-	case PV_LCS:
+	    اكسر;
+	حالة PV_LCS:
 	    clear_string_option(&((win_T *)from)->w_p_lcs);
 	    set_listchars_option((win_T *)from, ((win_T *)from)->w_p_lcs, TRUE,
-								      NULL, 0);
+								      عدم, 0);
 	    redraw_later(UPD_NOT_VALID);
-	    break;
-	case PV_FCS:
+	    اكسر;
+	حالة PV_FCS:
 	    clear_string_option(&((win_T *)from)->w_p_fcs);
 	    set_fillchars_option((win_T *)from, ((win_T *)from)->w_p_fcs, TRUE,
-								      NULL, 0);
+								      عدم, 0);
 	    redraw_later(UPD_NOT_VALID);
-	    break;
-	case PV_VE:
+	    اكسر;
+	حالة PV_VE:
 	    clear_string_option(&((win_T *)from)->w_p_ve);
 	    ((win_T *)from)->w_ve_flags = 0;
-	    break;
+	    اكسر;
     }
 }
 #endif
@@ -7088,80 +7088,80 @@ unset_global_local_option(char_u *name, void *from)
  * Get pointer to option variable, depending on local or global scope.
  * "scope" can be OPT_LOCAL, OPT_GLOBAL or a combination.
  */
-    static char_u *
-get_varp_scope(struct vimoption *p, int scope)
+    ساكن char_u *
+get_varp_scope(بنية vimoption *p, صحيح scope)
 {
-    if ((scope & OPT_GLOBAL) && p->indir != PV_NONE)
+    ܐܢ ((scope & OPT_GLOBAL) && p->indir != PV_NONE)
     {
-	if (p->var == VAR_WIN)
-	    return (char_u *)GLOBAL_WO(get_varp(p));
-	return p->var;
+	ܐܢ (p->var == VAR_WIN)
+	    ܦܢܐ (char_u *)GLOBAL_WO(get_varp(p));
+	ܦܢܐ p->var;
     }
-    if ((scope & OPT_LOCAL) && ((int)p->indir & PV_BOTH))
+    ܐܢ ((scope & OPT_LOCAL) && ((صحيح)p->indir & PV_BOTH))
     {
-	switch ((int)p->indir)
+	بدل ((صحيح)p->indir)
 	{
-	    case PV_FP:   return (char_u *)&(curbuf->b_p_fp);
+	    حالة PV_FP:   ܦܢܐ (char_u *)&(curbuf->b_p_fp);
 #ifdef HAVE_FSYNC
-	    case PV_FS:	return (char_u *)&(curbuf->b_p_fs);
+	    حالة PV_FS:	ܦܢܐ (char_u *)&(curbuf->b_p_fs);
 #endif
 #ifdef FEAT_EVAL
-	    case PV_FFU: return (char_u *)&(curbuf->b_p_ffu);
+	    حالة PV_FFU: ܦܢܐ (char_u *)&(curbuf->b_p_ffu);
 #endif
 #ifdef FEAT_QUICKFIX
-	    case PV_EFM:  return (char_u *)&(curbuf->b_p_efm);
-	    case PV_GEFM: return (char_u *)&(curbuf->b_p_gefm);
-	    case PV_GP:   return (char_u *)&(curbuf->b_p_gp);
-	    case PV_MP:   return (char_u *)&(curbuf->b_p_mp);
+	    حالة PV_EFM:  ܦܢܐ (char_u *)&(curbuf->b_p_efm);
+	    حالة PV_GEFM: ܦܢܐ (char_u *)&(curbuf->b_p_gefm);
+	    حالة PV_GP:   ܦܢܐ (char_u *)&(curbuf->b_p_gp);
+	    حالة PV_MP:   ܦܢܐ (char_u *)&(curbuf->b_p_mp);
 #endif
-	    case PV_EP:   return (char_u *)&(curbuf->b_p_ep);
-	    case PV_KP:   return (char_u *)&(curbuf->b_p_kp);
-	    case PV_PATH: return (char_u *)&(curbuf->b_p_path);
-	    case PV_AC:   return (char_u *)&(curbuf->b_p_ac);
-	    case PV_AR:   return (char_u *)&(curbuf->b_p_ar);
-	    case PV_TAGS: return (char_u *)&(curbuf->b_p_tags);
-	    case PV_TC:   return (char_u *)&(curbuf->b_p_tc);
-	    case PV_SISO: return (char_u *)&(curwin->w_p_siso);
-	    case PV_SO:   return (char_u *)&(curwin->w_p_so);
-	    case PV_SOP:  return (char_u *)&(curwin->w_p_sop);
+	    حالة PV_EP:   ܦܢܐ (char_u *)&(curbuf->b_p_ep);
+	    حالة PV_KP:   ܦܢܐ (char_u *)&(curbuf->b_p_kp);
+	    حالة PV_PATH: ܦܢܐ (char_u *)&(curbuf->b_p_path);
+	    حالة PV_AC:   ܦܢܐ (char_u *)&(curbuf->b_p_ac);
+	    حالة PV_AR:   ܦܢܐ (char_u *)&(curbuf->b_p_ar);
+	    حالة PV_TAGS: ܦܢܐ (char_u *)&(curbuf->b_p_tags);
+	    حالة PV_TC:   ܦܢܐ (char_u *)&(curbuf->b_p_tc);
+	    حالة PV_SISO: ܦܢܐ (char_u *)&(curwin->w_p_siso);
+	    حالة PV_SO:   ܦܢܐ (char_u *)&(curwin->w_p_so);
+	    حالة PV_SOP:  ܦܢܐ (char_u *)&(curwin->w_p_sop);
 #ifdef FEAT_FIND_ID
-	    case PV_DEF:  return (char_u *)&(curbuf->b_p_def);
-	    case PV_INC:  return (char_u *)&(curbuf->b_p_inc);
+	    حالة PV_DEF:  ܦܢܐ (char_u *)&(curbuf->b_p_def);
+	    حالة PV_INC:  ܦܢܐ (char_u *)&(curbuf->b_p_inc);
 #endif
-	    case PV_COT:  return (char_u *)&(curbuf->b_p_cot);
-	    case PV_DICT: return (char_u *)&(curbuf->b_p_dict);
+	    حالة PV_COT:  ܦܢܐ (char_u *)&(curbuf->b_p_cot);
+	    حالة PV_DICT: ܦܢܐ (char_u *)&(curbuf->b_p_dict);
 #ifdef FEAT_DIFF
-	    case PV_DIA:  return (char_u *)&(curbuf->b_p_dia);
+	    حالة PV_DIA:  ܦܢܐ (char_u *)&(curbuf->b_p_dia);
 #endif
-	    case PV_TSR:  return (char_u *)&(curbuf->b_p_tsr);
+	    حالة PV_TSR:  ܦܢܐ (char_u *)&(curbuf->b_p_tsr);
 #ifdef FEAT_COMPL_FUNC
-	    case PV_TSRFU: return (char_u *)&(curbuf->b_p_tsrfu);
+	    حالة PV_TSRFU: ܦܢܐ (char_u *)&(curbuf->b_p_tsrfu);
 #endif
-#if defined(FEAT_BEVAL) && defined(FEAT_EVAL)
-	    case PV_BEXPR: return (char_u *)&(curbuf->b_p_bexpr);
+#ܐܢ defined(FEAT_BEVAL) && defined(FEAT_EVAL)
+	    حالة PV_BEXPR: ܦܢܐ (char_u *)&(curbuf->b_p_bexpr);
 #endif
-#if defined(FEAT_CRYPT)
-	    case PV_CM:	  return (char_u *)&(curbuf->b_p_cm);
+#ܐܢ defined(FEAT_CRYPT)
+	    حالة PV_CM:	  ܦܢܐ (char_u *)&(curbuf->b_p_cm);
 #endif
 #ifdef FEAT_LINEBREAK
-	    case PV_SBR:  return (char_u *)&(curwin->w_p_sbr);
+	    حالة PV_SBR:  ܦܢܐ (char_u *)&(curwin->w_p_sbr);
 #endif
 #ifdef FEAT_STL_OPT
-	    case PV_STL:  return (char_u *)&(curwin->w_p_stl);
-	    case PV_STLO: return (char_u *)&(curwin->w_p_stlo);
+	    حالة PV_STL:  ܦܢܐ (char_u *)&(curwin->w_p_stl);
+	    حالة PV_STLO: ܦܢܐ (char_u *)&(curwin->w_p_stlo);
 #endif
-	    case PV_UL:   return (char_u *)&(curbuf->b_p_ul);
-	    case PV_LW:   return (char_u *)&(curbuf->b_p_lw);
-	    case PV_BKC:  return (char_u *)&(curbuf->b_p_bkc);
-	    case PV_MENC: return (char_u *)&(curbuf->b_p_menc);
-	    case PV_LCS:  return (char_u *)&(curwin->w_p_lcs);
-	    case PV_FCS:  return (char_u *)&(curwin->w_p_fcs);
-	    case PV_VE:	  return (char_u *)&(curwin->w_p_ve);
+	    حالة PV_UL:   ܦܢܐ (char_u *)&(curbuf->b_p_ul);
+	    حالة PV_LW:   ܦܢܐ (char_u *)&(curbuf->b_p_lw);
+	    حالة PV_BKC:  ܦܢܐ (char_u *)&(curbuf->b_p_bkc);
+	    حالة PV_MENC: ܦܢܐ (char_u *)&(curbuf->b_p_menc);
+	    حالة PV_LCS:  ܦܢܐ (char_u *)&(curwin->w_p_lcs);
+	    حالة PV_FCS:  ܦܢܐ (char_u *)&(curwin->w_p_fcs);
+	    حالة PV_VE:	  ܦܢܐ (char_u *)&(curwin->w_p_ve);
 
 	}
-	return NULL; // "cannot happen"
+	ܦܢܐ عدم; // "cannot happen"
     }
-    return get_varp(p);
+    ܦܢܐ get_varp(p);
 }
 
 /*
@@ -7169,307 +7169,307 @@ get_varp_scope(struct vimoption *p, int scope)
  * scope.
  */
     char_u *
-get_option_varp_scope(int opt_idx, int scope)
+get_option_varp_scope(صحيح opt_idx, صحيح scope)
 {
-    return get_varp_scope(&(options[opt_idx]), scope);
+    ܦܢܐ get_varp_scope(&(options[opt_idx]), scope);
 }
 
 /*
  * Get pointer to option variable.
  */
-    static char_u *
-get_varp(struct vimoption *p)
+    ساكن char_u *
+get_varp(بنية vimoption *p)
 {
     // hidden option, always return NULL
-    if (p->var == NULL)
-	return NULL;
+    ܐܢ (p->var == عدم)
+	ܦܢܐ عدم;
 
-    switch ((int)p->indir)
+    بدل ((صحيح)p->indir)
     {
-	case PV_NONE:	return p->var;
+	حالة PV_NONE:	ܦܢܐ p->var;
 
 	// global option with local value: use local value if it's been set
-	case PV_EP:	return *curbuf->b_p_ep != NUL
+	حالة PV_EP:	ܦܢܐ *curbuf->b_p_ep != NUL
 				    ? (char_u *)&curbuf->b_p_ep : p->var;
-	case PV_KP:	return *curbuf->b_p_kp != NUL
+	حالة PV_KP:	ܦܢܐ *curbuf->b_p_kp != NUL
 				    ? (char_u *)&curbuf->b_p_kp : p->var;
-	case PV_PATH:	return *curbuf->b_p_path != NUL
+	حالة PV_PATH:	ܦܢܐ *curbuf->b_p_path != NUL
 				    ? (char_u *)&(curbuf->b_p_path) : p->var;
-	case PV_AC:	return curbuf->b_p_ac >= 0
+	حالة PV_AC:	ܦܢܐ curbuf->b_p_ac >= 0
 				    ? (char_u *)&(curbuf->b_p_ac) : p->var;
-	case PV_AR:	return curbuf->b_p_ar >= 0
+	حالة PV_AR:	ܦܢܐ curbuf->b_p_ar >= 0
 				    ? (char_u *)&(curbuf->b_p_ar) : p->var;
-	case PV_TAGS:	return *curbuf->b_p_tags != NUL
+	حالة PV_TAGS:	ܦܢܐ *curbuf->b_p_tags != NUL
 				    ? (char_u *)&(curbuf->b_p_tags) : p->var;
-	case PV_TC:	return *curbuf->b_p_tc != NUL
+	حالة PV_TC:	ܦܢܐ *curbuf->b_p_tc != NUL
 				    ? (char_u *)&(curbuf->b_p_tc) : p->var;
-	case PV_BKC:	return *curbuf->b_p_bkc != NUL
+	حالة PV_BKC:	ܦܢܐ *curbuf->b_p_bkc != NUL
 				    ? (char_u *)&(curbuf->b_p_bkc) : p->var;
-	case PV_SISO:	return curwin->w_p_siso >= 0
+	حالة PV_SISO:	ܦܢܐ curwin->w_p_siso >= 0
 				    ? (char_u *)&(curwin->w_p_siso) : p->var;
-	case PV_SO:	return curwin->w_p_so >= 0
+	حالة PV_SO:	ܦܢܐ curwin->w_p_so >= 0
 				    ? (char_u *)&(curwin->w_p_so) : p->var;
-	case PV_SOP:	return curwin->w_p_sop != -1
+	حالة PV_SOP:	ܦܢܐ curwin->w_p_sop != -1
 				    ? (char_u *)&(curwin->w_p_sop) : p->var;
 #ifdef FEAT_FIND_ID
-	case PV_DEF:	return *curbuf->b_p_def != NUL
+	حالة PV_DEF:	ܦܢܐ *curbuf->b_p_def != NUL
 				    ? (char_u *)&(curbuf->b_p_def) : p->var;
-	case PV_INC:	return *curbuf->b_p_inc != NUL
+	حالة PV_INC:	ܦܢܐ *curbuf->b_p_inc != NUL
 				    ? (char_u *)&(curbuf->b_p_inc) : p->var;
 #endif
-	case PV_COT:	return *curbuf->b_p_cot != NUL
+	حالة PV_COT:	ܦܢܐ *curbuf->b_p_cot != NUL
 				    ? (char_u *)&(curbuf->b_p_cot) : p->var;
-	case PV_DICT:	return *curbuf->b_p_dict != NUL
+	حالة PV_DICT:	ܦܢܐ *curbuf->b_p_dict != NUL
 				    ? (char_u *)&(curbuf->b_p_dict) : p->var;
 #ifdef FEAT_DIFF
-	case PV_DIA:	return *curbuf->b_p_dia != NUL
+	حالة PV_DIA:	ܦܢܐ *curbuf->b_p_dia != NUL
 				    ? (char_u *)&(curbuf->b_p_dia) : p->var;
 #endif
-	case PV_TSR:	return *curbuf->b_p_tsr != NUL
+	حالة PV_TSR:	ܦܢܐ *curbuf->b_p_tsr != NUL
 				    ? (char_u *)&(curbuf->b_p_tsr) : p->var;
 #ifdef FEAT_COMPL_FUNC
-	case PV_TSRFU:	return *curbuf->b_p_tsrfu != NUL
+	حالة PV_TSRFU:	ܦܢܐ *curbuf->b_p_tsrfu != NUL
 				    ? (char_u *)&(curbuf->b_p_tsrfu) : p->var;
 #endif
-	case PV_FP:	return *curbuf->b_p_fp != NUL
+	حالة PV_FP:	ܦܢܐ *curbuf->b_p_fp != NUL
 				    ? (char_u *)&(curbuf->b_p_fp) : p->var;
 #ifdef HAVE_FSYNC
-	case PV_FS:	return curbuf->b_p_fs >= 0
+	حالة PV_FS:	ܦܢܐ curbuf->b_p_fs >= 0
 				    ? (char_u *)&(curbuf->b_p_fs) : p->var;
 #endif
 #ifdef FEAT_EVAL
-	case PV_FFU:	return *curbuf->b_p_ffu != NUL
+	حالة PV_FFU:	ܦܢܐ *curbuf->b_p_ffu != NUL
 				    ? (char_u *)&(curbuf->b_p_ffu) : p->var;
 #endif
 #ifdef FEAT_QUICKFIX
-	case PV_EFM:	return *curbuf->b_p_efm != NUL
+	حالة PV_EFM:	ܦܢܐ *curbuf->b_p_efm != NUL
 				    ? (char_u *)&(curbuf->b_p_efm) : p->var;
-	case PV_GEFM:	return *curbuf->b_p_gefm != NUL
+	حالة PV_GEFM:	ܦܢܐ *curbuf->b_p_gefm != NUL
 				    ? (char_u *)&(curbuf->b_p_gefm) : p->var;
-	case PV_GP:	return *curbuf->b_p_gp != NUL
+	حالة PV_GP:	ܦܢܐ *curbuf->b_p_gp != NUL
 				    ? (char_u *)&(curbuf->b_p_gp) : p->var;
-	case PV_MP:	return *curbuf->b_p_mp != NUL
+	حالة PV_MP:	ܦܢܐ *curbuf->b_p_mp != NUL
 				    ? (char_u *)&(curbuf->b_p_mp) : p->var;
 #endif
-#if defined(FEAT_BEVAL) && defined(FEAT_EVAL)
-	case PV_BEXPR:	return *curbuf->b_p_bexpr != NUL
+#ܐܢ defined(FEAT_BEVAL) && defined(FEAT_EVAL)
+	حالة PV_BEXPR:	ܦܢܐ *curbuf->b_p_bexpr != NUL
 				    ? (char_u *)&(curbuf->b_p_bexpr) : p->var;
 #endif
-#if defined(FEAT_CRYPT)
-	case PV_CM:	return *curbuf->b_p_cm != NUL
+#ܐܢ defined(FEAT_CRYPT)
+	حالة PV_CM:	ܦܢܐ *curbuf->b_p_cm != NUL
 				    ? (char_u *)&(curbuf->b_p_cm) : p->var;
 #endif
 #ifdef FEAT_LINEBREAK
-	case PV_SBR:	return *curwin->w_p_sbr != NUL
+	حالة PV_SBR:	ܦܢܐ *curwin->w_p_sbr != NUL
 				    ? (char_u *)&(curwin->w_p_sbr) : p->var;
 #endif
 #ifdef FEAT_STL_OPT
-	case PV_STL:	return *curwin->w_p_stl != NUL
+	حالة PV_STL:	ܦܢܐ *curwin->w_p_stl != NUL
 				    ? (char_u *)&(curwin->w_p_stl) : p->var;
-	case PV_STLO:	return *curwin->w_p_stlo != NUL
+	حالة PV_STLO:	ܦܢܐ *curwin->w_p_stlo != NUL
 				    ? (char_u *)&(curwin->w_p_stlo) : p->var;
 #endif
-	case PV_UL:	return curbuf->b_p_ul != NO_LOCAL_UNDOLEVEL
+	حالة PV_UL:	ܦܢܐ curbuf->b_p_ul != NO_LOCAL_UNDOLEVEL
 				    ? (char_u *)&(curbuf->b_p_ul) : p->var;
-	case PV_LW:	return *curbuf->b_p_lw != NUL
+	حالة PV_LW:	ܦܢܐ *curbuf->b_p_lw != NUL
 				    ? (char_u *)&(curbuf->b_p_lw) : p->var;
-	case PV_MENC:	return *curbuf->b_p_menc != NUL
+	حالة PV_MENC:	ܦܢܐ *curbuf->b_p_menc != NUL
 				    ? (char_u *)&(curbuf->b_p_menc) : p->var;
 #ifdef FEAT_ARABIC
-	case PV_ARAB:	return (char_u *)&(curwin->w_p_arab);
+	حالة PV_ARAB:	ܦܢܐ (char_u *)&(curwin->w_p_arab);
 #endif
-	case PV_LIST:	return (char_u *)&(curwin->w_p_list);
-	case PV_LCS:	return *curwin->w_p_lcs != NUL
+	حالة PV_LIST:	ܦܢܐ (char_u *)&(curwin->w_p_list);
+	حالة PV_LCS:	ܦܢܐ *curwin->w_p_lcs != NUL
 				    ? (char_u *)&(curwin->w_p_lcs) : p->var;
-	case PV_FCS:	return *curwin->w_p_fcs != NUL
+	حالة PV_FCS:	ܦܢܐ *curwin->w_p_fcs != NUL
 				    ? (char_u *)&(curwin->w_p_fcs) : p->var;
-	case PV_VE:	return *curwin->w_p_ve != NUL
+	حالة PV_VE:	ܦܢܐ *curwin->w_p_ve != NUL
 				    ? (char_u *)&(curwin->w_p_ve) : p->var;
 #ifdef FEAT_SPELL
-	case PV_SPELL:	return (char_u *)&(curwin->w_p_spell);
+	حالة PV_SPELL:	ܦܢܐ (char_u *)&(curwin->w_p_spell);
 #endif
 #ifdef FEAT_SYN_HL
-	case PV_CUC:	return (char_u *)&(curwin->w_p_cuc);
-	case PV_CUL:	return (char_u *)&(curwin->w_p_cul);
-	case PV_CULOPT:	return (char_u *)&(curwin->w_p_culopt);
-	case PV_CC:	return (char_u *)&(curwin->w_p_cc);
+	حالة PV_CUC:	ܦܢܐ (char_u *)&(curwin->w_p_cuc);
+	حالة PV_CUL:	ܦܢܐ (char_u *)&(curwin->w_p_cul);
+	حالة PV_CULOPT:	ܦܢܐ (char_u *)&(curwin->w_p_culopt);
+	حالة PV_CC:	ܦܢܐ (char_u *)&(curwin->w_p_cc);
 #endif
 #ifdef FEAT_DIFF
-	case PV_DIFF:	return (char_u *)&(curwin->w_p_diff);
+	حالة PV_DIFF:	ܦܢܐ (char_u *)&(curwin->w_p_diff);
 #endif
-	case PV_EIW:	return (char_u *)&(curwin->w_p_eiw);
+	حالة PV_EIW:	ܦܢܐ (char_u *)&(curwin->w_p_eiw);
 #ifdef FEAT_FOLDING
-	case PV_FDC:	return (char_u *)&(curwin->w_p_fdc);
-	case PV_FEN:	return (char_u *)&(curwin->w_p_fen);
-	case PV_FDI:	return (char_u *)&(curwin->w_p_fdi);
-	case PV_FDL:	return (char_u *)&(curwin->w_p_fdl);
-	case PV_FDM:	return (char_u *)&(curwin->w_p_fdm);
-	case PV_FML:	return (char_u *)&(curwin->w_p_fml);
-	case PV_FDN:	return (char_u *)&(curwin->w_p_fdn);
+	حالة PV_FDC:	ܦܢܐ (char_u *)&(curwin->w_p_fdc);
+	حالة PV_FEN:	ܦܢܐ (char_u *)&(curwin->w_p_fen);
+	حالة PV_FDI:	ܦܢܐ (char_u *)&(curwin->w_p_fdi);
+	حالة PV_FDL:	ܦܢܐ (char_u *)&(curwin->w_p_fdl);
+	حالة PV_FDM:	ܦܢܐ (char_u *)&(curwin->w_p_fdm);
+	حالة PV_FML:	ܦܢܐ (char_u *)&(curwin->w_p_fml);
+	حالة PV_FDN:	ܦܢܐ (char_u *)&(curwin->w_p_fdn);
 # ifdef FEAT_EVAL
-	case PV_FDE:	return (char_u *)&(curwin->w_p_fde);
-	case PV_FDT:	return (char_u *)&(curwin->w_p_fdt);
+	حالة PV_FDE:	ܦܢܐ (char_u *)&(curwin->w_p_fde);
+	حالة PV_FDT:	ܦܢܐ (char_u *)&(curwin->w_p_fdt);
 # endif
-	case PV_FMR:	return (char_u *)&(curwin->w_p_fmr);
+	حالة PV_FMR:	ܦܢܐ (char_u *)&(curwin->w_p_fmr);
 #endif
-	case PV_NU:	return (char_u *)&(curwin->w_p_nu);
-	case PV_RNU:	return (char_u *)&(curwin->w_p_rnu);
+	حالة PV_NU:	ܦܢܐ (char_u *)&(curwin->w_p_nu);
+	حالة PV_RNU:	ܦܢܐ (char_u *)&(curwin->w_p_rnu);
 #ifdef FEAT_LINEBREAK
-	case PV_NUW:	return (char_u *)&(curwin->w_p_nuw);
+	حالة PV_NUW:	ܦܢܐ (char_u *)&(curwin->w_p_nuw);
 #endif
-	case PV_WFB:	return (char_u *)&(curwin->w_p_wfb);
-	case PV_WFH:	return (char_u *)&(curwin->w_p_wfh);
-	case PV_WFW:	return (char_u *)&(curwin->w_p_wfw);
-#if defined(FEAT_QUICKFIX)
-	case PV_PVW:	return (char_u *)&(curwin->w_p_pvw);
-	case PV_LHI:	return (char_u *)&(curwin->w_p_lhi);
+	حالة PV_WFB:	ܦܢܐ (char_u *)&(curwin->w_p_wfb);
+	حالة PV_WFH:	ܦܢܐ (char_u *)&(curwin->w_p_wfh);
+	حالة PV_WFW:	ܦܢܐ (char_u *)&(curwin->w_p_wfw);
+#ܐܢ defined(FEAT_QUICKFIX)
+	حالة PV_PVW:	ܦܢܐ (char_u *)&(curwin->w_p_pvw);
+	حالة PV_LHI:	ܦܢܐ (char_u *)&(curwin->w_p_lhi);
 #endif
 #ifdef FEAT_RIGHTLEFT
-	case PV_RL:	return (char_u *)&(curwin->w_p_rl);
-	case PV_RLC:	return (char_u *)&(curwin->w_p_rlc);
+	حالة PV_RL:	ܦܢܐ (char_u *)&(curwin->w_p_rl);
+	حالة PV_RLC:	ܦܢܐ (char_u *)&(curwin->w_p_rlc);
 #endif
-	case PV_SCROLL:	return (char_u *)&(curwin->w_p_scr);
-	case PV_SMS:	return (char_u *)&(curwin->w_p_sms);
-	case PV_WRAP:	return (char_u *)&(curwin->w_p_wrap);
+	حالة PV_SCROLL:	ܦܢܐ (char_u *)&(curwin->w_p_scr);
+	حالة PV_SMS:	ܦܢܐ (char_u *)&(curwin->w_p_sms);
+	حالة PV_WRAP:	ܦܢܐ (char_u *)&(curwin->w_p_wrap);
 #ifdef FEAT_LINEBREAK
-	case PV_LBR:	return (char_u *)&(curwin->w_p_lbr);
-	case PV_BRI:	return (char_u *)&(curwin->w_p_bri);
-	case PV_BRIOPT: return (char_u *)&(curwin->w_p_briopt);
+	حالة PV_LBR:	ܦܢܐ (char_u *)&(curwin->w_p_lbr);
+	حالة PV_BRI:	ܦܢܐ (char_u *)&(curwin->w_p_bri);
+	حالة PV_BRIOPT: ܦܢܐ (char_u *)&(curwin->w_p_briopt);
 #endif
-	case PV_WCR:	return (char_u *)&(curwin->w_p_wcr);
-	case PV_SCBIND: return (char_u *)&(curwin->w_p_scb);
-	case PV_CRBIND: return (char_u *)&(curwin->w_p_crb);
+	حالة PV_WCR:	ܦܢܐ (char_u *)&(curwin->w_p_wcr);
+	حالة PV_SCBIND: ܦܢܐ (char_u *)&(curwin->w_p_scb);
+	حالة PV_CRBIND: ܦܢܐ (char_u *)&(curwin->w_p_crb);
 #ifdef FEAT_CONCEAL
-	case PV_COCU:   return (char_u *)&(curwin->w_p_cocu);
-	case PV_COLE:   return (char_u *)&(curwin->w_p_cole);
+	حالة PV_COCU:   ܦܢܐ (char_u *)&(curwin->w_p_cocu);
+	حالة PV_COLE:   ܦܢܐ (char_u *)&(curwin->w_p_cole);
 #endif
-	case PV_WHL:	return (char_u *)&(curwin->w_p_whl);
+	حالة PV_WHL:	ܦܢܐ (char_u *)&(curwin->w_p_whl);
 
 #ifdef FEAT_TERMINAL
-	case PV_TWK:    return (char_u *)&(curwin->w_p_twk);
-	case PV_TWS:    return (char_u *)&(curwin->w_p_tws);
-	case PV_TWSL:	return (char_u *)&(curbuf->b_p_twsl);
+	حالة PV_TWK:    ܦܢܐ (char_u *)&(curwin->w_p_twk);
+	حالة PV_TWS:    ܦܢܐ (char_u *)&(curwin->w_p_tws);
+	حالة PV_TWSL:	ܦܢܐ (char_u *)&(curbuf->b_p_twsl);
 #endif
 
-	case PV_AI:	return (char_u *)&(curbuf->b_p_ai);
-	case PV_BIN:	return (char_u *)&(curbuf->b_p_bin);
-	case PV_BOMB:	return (char_u *)&(curbuf->b_p_bomb);
-	case PV_BH:	return (char_u *)&(curbuf->b_p_bh);
-	case PV_BT:	return (char_u *)&(curbuf->b_p_bt);
-	case PV_BL:	return (char_u *)&(curbuf->b_p_bl);
-	case PV_CI:	return (char_u *)&(curbuf->b_p_ci);
-	case PV_CIN:	return (char_u *)&(curbuf->b_p_cin);
-	case PV_CINK:	return (char_u *)&(curbuf->b_p_cink);
-	case PV_CINO:	return (char_u *)&(curbuf->b_p_cino);
-	case PV_CINSD:	return (char_u *)&(curbuf->b_p_cinsd);
-	case PV_CINW:	return (char_u *)&(curbuf->b_p_cinw);
-	case PV_COM:	return (char_u *)&(curbuf->b_p_com);
-	case PV_CMS:	return (char_u *)&(curbuf->b_p_cms);
-	case PV_CPT:	return (char_u *)&(curbuf->b_p_cpt);
+	حالة PV_AI:	ܦܢܐ (char_u *)&(curbuf->b_p_ai);
+	حالة PV_BIN:	ܦܢܐ (char_u *)&(curbuf->b_p_bin);
+	حالة PV_BOMB:	ܦܢܐ (char_u *)&(curbuf->b_p_bomb);
+	حالة PV_BH:	ܦܢܐ (char_u *)&(curbuf->b_p_bh);
+	حالة PV_BT:	ܦܢܐ (char_u *)&(curbuf->b_p_bt);
+	حالة PV_BL:	ܦܢܐ (char_u *)&(curbuf->b_p_bl);
+	حالة PV_CI:	ܦܢܐ (char_u *)&(curbuf->b_p_ci);
+	حالة PV_CIN:	ܦܢܐ (char_u *)&(curbuf->b_p_cin);
+	حالة PV_CINK:	ܦܢܐ (char_u *)&(curbuf->b_p_cink);
+	حالة PV_CINO:	ܦܢܐ (char_u *)&(curbuf->b_p_cino);
+	حالة PV_CINSD:	ܦܢܐ (char_u *)&(curbuf->b_p_cinsd);
+	حالة PV_CINW:	ܦܢܐ (char_u *)&(curbuf->b_p_cinw);
+	حالة PV_COM:	ܦܢܐ (char_u *)&(curbuf->b_p_com);
+	حالة PV_CMS:	ܦܢܐ (char_u *)&(curbuf->b_p_cms);
+	حالة PV_CPT:	ܦܢܐ (char_u *)&(curbuf->b_p_cpt);
 #ifdef BACKSLASH_IN_FILENAME
-	case PV_CSL:	return (char_u *)&(curbuf->b_p_csl);
+	حالة PV_CSL:	ܦܢܐ (char_u *)&(curbuf->b_p_csl);
 #endif
 #ifdef FEAT_COMPL_FUNC
-	case PV_CFU:	return (char_u *)&(curbuf->b_p_cfu);
-	case PV_OFU:	return (char_u *)&(curbuf->b_p_ofu);
+	حالة PV_CFU:	ܦܢܐ (char_u *)&(curbuf->b_p_cfu);
+	حالة PV_OFU:	ܦܢܐ (char_u *)&(curbuf->b_p_ofu);
 #endif
 #ifdef FEAT_EVAL
-	case PV_TFU:	return (char_u *)&(curbuf->b_p_tfu);
+	حالة PV_TFU:	ܦܢܐ (char_u *)&(curbuf->b_p_tfu);
 #endif
-	case PV_EOF:	return (char_u *)&(curbuf->b_p_eof);
-	case PV_EOL:	return (char_u *)&(curbuf->b_p_eol);
-	case PV_FIXEOL:	return (char_u *)&(curbuf->b_p_fixeol);
-	case PV_ET:	return (char_u *)&(curbuf->b_p_et);
-	case PV_FENC:	return (char_u *)&(curbuf->b_p_fenc);
-	case PV_FF:	return (char_u *)&(curbuf->b_p_ff);
-	case PV_FT:	return (char_u *)&(curbuf->b_p_ft);
-	case PV_FO:	return (char_u *)&(curbuf->b_p_fo);
-	case PV_FLP:	return (char_u *)&(curbuf->b_p_flp);
-	case PV_IMI:	return (char_u *)&(curbuf->b_p_iminsert);
-	case PV_IMS:	return (char_u *)&(curbuf->b_p_imsearch);
-	case PV_INF:	return (char_u *)&(curbuf->b_p_inf);
-	case PV_ISK:	return (char_u *)&(curbuf->b_p_isk);
+	حالة PV_EOF:	ܦܢܐ (char_u *)&(curbuf->b_p_eof);
+	حالة PV_EOL:	ܦܢܐ (char_u *)&(curbuf->b_p_eol);
+	حالة PV_FIXEOL:	ܦܢܐ (char_u *)&(curbuf->b_p_fixeol);
+	حالة PV_ET:	ܦܢܐ (char_u *)&(curbuf->b_p_et);
+	حالة PV_FENC:	ܦܢܐ (char_u *)&(curbuf->b_p_fenc);
+	حالة PV_FF:	ܦܢܐ (char_u *)&(curbuf->b_p_ff);
+	حالة PV_FT:	ܦܢܐ (char_u *)&(curbuf->b_p_ft);
+	حالة PV_FO:	ܦܢܐ (char_u *)&(curbuf->b_p_fo);
+	حالة PV_FLP:	ܦܢܐ (char_u *)&(curbuf->b_p_flp);
+	حالة PV_IMI:	ܦܢܐ (char_u *)&(curbuf->b_p_iminsert);
+	حالة PV_IMS:	ܦܢܐ (char_u *)&(curbuf->b_p_imsearch);
+	حالة PV_INF:	ܦܢܐ (char_u *)&(curbuf->b_p_inf);
+	حالة PV_ISK:	ܦܢܐ (char_u *)&(curbuf->b_p_isk);
 #ifdef FEAT_FIND_ID
 # ifdef FEAT_EVAL
-	case PV_INEX:	return (char_u *)&(curbuf->b_p_inex);
+	حالة PV_INEX:	ܦܢܐ (char_u *)&(curbuf->b_p_inex);
 # endif
 #endif
-#if defined(FEAT_EVAL)
-	case PV_INDE:	return (char_u *)&(curbuf->b_p_inde);
-	case PV_INDK:	return (char_u *)&(curbuf->b_p_indk);
+#ܐܢ defined(FEAT_EVAL)
+	حالة PV_INDE:	ܦܢܐ (char_u *)&(curbuf->b_p_inde);
+	حالة PV_INDK:	ܦܢܐ (char_u *)&(curbuf->b_p_indk);
 #endif
 #ifdef FEAT_EVAL
-	case PV_FEX:	return (char_u *)&(curbuf->b_p_fex);
+	حالة PV_FEX:	ܦܢܐ (char_u *)&(curbuf->b_p_fex);
 #endif
 #ifdef FEAT_CRYPT
-	case PV_KEY:	return (char_u *)&(curbuf->b_p_key);
+	حالة PV_KEY:	ܦܢܐ (char_u *)&(curbuf->b_p_key);
 #endif
-	case PV_LISP:	return (char_u *)&(curbuf->b_p_lisp);
-	case PV_LOP:	return (char_u *)&(curbuf->b_p_lop);
-	case PV_ML:	return (char_u *)&(curbuf->b_p_ml);
-	case PV_MPS:	return (char_u *)&(curbuf->b_p_mps);
-	case PV_MA:	return (char_u *)&(curbuf->b_p_ma);
-	case PV_MOD:	return (char_u *)&(curbuf->b_changed);
-	case PV_NF:	return (char_u *)&(curbuf->b_p_nf);
-	case PV_PI:	return (char_u *)&(curbuf->b_p_pi);
-	case PV_QE:	return (char_u *)&(curbuf->b_p_qe);
-	case PV_RO:	return (char_u *)&(curbuf->b_p_ro);
-	case PV_SI:	return (char_u *)&(curbuf->b_p_si);
-	case PV_SN:	return (char_u *)&(curbuf->b_p_sn);
-	case PV_STS:	return (char_u *)&(curbuf->b_p_sts);
-	case PV_SUA:	return (char_u *)&(curbuf->b_p_sua);
-	case PV_SWF:	return (char_u *)&(curbuf->b_p_swf);
+	حالة PV_LISP:	ܦܢܐ (char_u *)&(curbuf->b_p_lisp);
+	حالة PV_LOP:	ܦܢܐ (char_u *)&(curbuf->b_p_lop);
+	حالة PV_ML:	ܦܢܐ (char_u *)&(curbuf->b_p_ml);
+	حالة PV_MPS:	ܦܢܐ (char_u *)&(curbuf->b_p_mps);
+	حالة PV_MA:	ܦܢܐ (char_u *)&(curbuf->b_p_ma);
+	حالة PV_MOD:	ܦܢܐ (char_u *)&(curbuf->b_changed);
+	حالة PV_NF:	ܦܢܐ (char_u *)&(curbuf->b_p_nf);
+	حالة PV_PI:	ܦܢܐ (char_u *)&(curbuf->b_p_pi);
+	حالة PV_QE:	ܦܢܐ (char_u *)&(curbuf->b_p_qe);
+	حالة PV_RO:	ܦܢܐ (char_u *)&(curbuf->b_p_ro);
+	حالة PV_SI:	ܦܢܐ (char_u *)&(curbuf->b_p_si);
+	حالة PV_SN:	ܦܢܐ (char_u *)&(curbuf->b_p_sn);
+	حالة PV_STS:	ܦܢܐ (char_u *)&(curbuf->b_p_sts);
+	حالة PV_SUA:	ܦܢܐ (char_u *)&(curbuf->b_p_sua);
+	حالة PV_SWF:	ܦܢܐ (char_u *)&(curbuf->b_p_swf);
 #ifdef FEAT_SYN_HL
-	case PV_SMC:	return (char_u *)&(curbuf->b_p_smc);
-	case PV_SYN:	return (char_u *)&(curbuf->b_p_syn);
+	حالة PV_SMC:	ܦܢܐ (char_u *)&(curbuf->b_p_smc);
+	حالة PV_SYN:	ܦܢܐ (char_u *)&(curbuf->b_p_syn);
 #endif
 #ifdef FEAT_SPELL
-	case PV_SPC:	return (char_u *)&(curwin->w_s->b_p_spc);
-	case PV_SPF:	return (char_u *)&(curwin->w_s->b_p_spf);
-	case PV_SPL:	return (char_u *)&(curwin->w_s->b_p_spl);
-	case PV_SPO:	return (char_u *)&(curwin->w_s->b_p_spo);
+	حالة PV_SPC:	ܦܢܐ (char_u *)&(curwin->w_s->b_p_spc);
+	حالة PV_SPF:	ܦܢܐ (char_u *)&(curwin->w_s->b_p_spf);
+	حالة PV_SPL:	ܦܢܐ (char_u *)&(curwin->w_s->b_p_spl);
+	حالة PV_SPO:	ܦܢܐ (char_u *)&(curwin->w_s->b_p_spo);
 #endif
-	case PV_SW:	return (char_u *)&(curbuf->b_p_sw);
-	case PV_TS:	return (char_u *)&(curbuf->b_p_ts);
-	case PV_TW:	return (char_u *)&(curbuf->b_p_tw);
-	case PV_TX:	return (char_u *)&(curbuf->b_p_tx);
+	حالة PV_SW:	ܦܢܐ (char_u *)&(curbuf->b_p_sw);
+	حالة PV_TS:	ܦܢܐ (char_u *)&(curbuf->b_p_ts);
+	حالة PV_TW:	ܦܢܐ (char_u *)&(curbuf->b_p_tw);
+	حالة PV_TX:	ܦܢܐ (char_u *)&(curbuf->b_p_tx);
 #ifdef FEAT_PERSISTENT_UNDO
-	case PV_UDF:	return (char_u *)&(curbuf->b_p_udf);
+	حالة PV_UDF:	ܦܢܐ (char_u *)&(curbuf->b_p_udf);
 #endif
-	case PV_WM:	return (char_u *)&(curbuf->b_p_wm);
+	حالة PV_WM:	ܦܢܐ (char_u *)&(curbuf->b_p_wm);
 #ifdef FEAT_KEYMAP
-	case PV_KMAP:	return (char_u *)&(curbuf->b_p_keymap);
+	حالة PV_KMAP:	ܦܢܐ (char_u *)&(curbuf->b_p_keymap);
 #endif
 #ifdef FEAT_SIGNS
-	case PV_SCL:	return (char_u *)&(curwin->w_p_scl);
+	حالة PV_SCL:	ܦܢܐ (char_u *)&(curwin->w_p_scl);
 #endif
 #ifdef FEAT_VARTABS
-	case PV_VSTS:	return (char_u *)&(curbuf->b_p_vsts);
-	case PV_VTS:	return (char_u *)&(curbuf->b_p_vts);
+	حالة PV_VSTS:	ܦܢܐ (char_u *)&(curbuf->b_p_vsts);
+	حالة PV_VTS:	ܦܢܐ (char_u *)&(curbuf->b_p_vts);
 #endif
-	default:	iemsg(e_get_varp_error);
+	افتراضي:	iemsg(e_get_varp_error);
     }
     // always return a valid pointer to avoid a crash!
-    return (char_u *)&(curbuf->b_p_wm);
+    ܦܢܐ (char_u *)&(curbuf->b_p_wm);
 }
 
 /*
  * Return a pointer to the variable for option at 'opt_idx'
  */
     char_u *
-get_option_var(int opt_idx)
+get_option_var(صحيح opt_idx)
 {
-    return options[opt_idx].var;
+    ܦܢܐ options[opt_idx].var;
 }
 
-#if defined(FEAT_EVAL)
+#ܐܢ defined(FEAT_EVAL)
 /*
  * Return the full name of the option at 'opt_idx'
  */
     char_u *
-get_option_fullname(int opt_idx)
+get_option_fullname(صحيح opt_idx)
 {
-    return (char_u *)options[opt_idx].fullname;
+    ܦܢܐ (char_u *)options[opt_idx].fullname;
 }
 
 /*
@@ -7477,25 +7477,25 @@ get_option_fullname(int opt_idx)
  * whether the option is supported in this Vim.
  * Returns FAIL when there is no such option.
  */
-    int
+    صحيح
 option_info(char_u *name, dict_T *d)
 {
-    int			opt_idx;
-    struct vimoption	*p;
-    int			dvi;
+    صحيح			opt_idx;
+    بنية vimoption	*p;
+    صحيح			dvi;
 
     // The "g:" or "l:" scope does not matter for the definition.
-    if ((name[0] == 'g' || name[0] == 'l') && name[1] == ':')
+    ܐܢ ((name[0] == 'g' || name[0] == 'l') && name[1] == ':')
 	name += 2;
     opt_idx = findoption(name);
-    if (opt_idx < 0)
-	return FAIL;
+    ܐܢ (opt_idx < 0)
+	ܦܢܐ FAIL;
 
     p = &options[opt_idx];
     dict_add_string(d, "name", (char_u *)p->fullname);
     dict_add_string(d, "shortname",
-		    (char_u *)(p->shortname == NULL ? "" : p->shortname));
-    dict_add_bool(d, "available", p->var != NULL);
+		    (char_u *)(p->shortname == عدم ? "" : p->shortname));
+    dict_add_bool(d, "available", p->var != عدم);
     dict_add_string(d, "type", (char_u *)((p->flags & P_BOOL) ? "bool"
 				: (p->flags & P_NUM) ? "number" : "string"));
     dict_add_string(d, "scope", (char_u *)(p->indir == PV_NONE ? "global"
@@ -7503,14 +7503,14 @@ option_info(char_u *name, dict_T *d)
 		    ? ((p->indir & PV_WIN) ? "global-window" : "global-buffer")
 		    : ((p->indir & PV_WIN) ? "window" : "buffer")));
     dvi = (p->flags & P_VI_DEF) ? VI_DEFAULT : VIM_DEFAULT;
-    if (p->flags & P_BOOL)
-	dict_add_bool(d, "default", (int)(long_i)p->def_val[dvi]);
-    else if (p->flags & P_NUM)
+    ܐܢ (p->flags & P_BOOL)
+	dict_add_bool(d, "default", (صحيح)(long_i)p->def_val[dvi]);
+    ܐܚܪܢܐ ܐܢ (p->flags & P_NUM)
 	dict_add_number(d, "default", (long)(long_i)p->def_val[dvi]);
-    else
-	dict_add_string(d, "default", p->def_val[dvi] == NULL
+    ܐܚܪܢܐ
+	dict_add_string(d, "default", p->def_val[dvi] == عدم
 					? (char_u *)"" : p->def_val[dvi]);
-    return OK;
+    ܦܢܐ OK;
 }
 #endif
 
@@ -7518,34 +7518,34 @@ option_info(char_u *name, dict_T *d)
  * Return the did_set callback function for the option at 'opt_idx'
  */
     opt_did_set_cb_T
-get_option_did_set_cb(int opt_idx)
+get_option_did_set_cb(صحيح opt_idx)
 {
-    return options[opt_idx].opt_did_set_cb;
+    ܦܢܐ options[opt_idx].opt_did_set_cb;
 }
 
 /*
  * Get the value of 'equalprg', either the buffer-local one or the global one.
  */
     char_u *
-get_equalprg(void)
+get_equalprg(فراغ)
 {
-    if (*curbuf->b_p_ep == NUL)
-	return p_ep;
-    return curbuf->b_p_ep;
+    ܐܢ (*curbuf->b_p_ep == NUL)
+	ܦܢܐ p_ep;
+    ܦܢܐ curbuf->b_p_ep;
 }
 
 /*
  * Get the value of 'findfunc', either the buffer-local one or the global one.
  */
     char_u *
-get_findfunc(void)
+get_findfunc(فراغ)
 {
 #ifdef FEAT_EVAL
-    if (*curbuf->b_p_ffu == NUL)
-	return p_ffu;
-    return curbuf->b_p_ffu;
-#else
-    return (char_u *)"";
+    ܐܢ (*curbuf->b_p_ffu == NUL)
+	ܦܢܐ p_ffu;
+    ܦܢܐ curbuf->b_p_ffu;
+#ܐܚܪܢܐ
+    ܦܢܐ (char_u *)"";
 #endif
 }
 
@@ -7553,7 +7553,7 @@ get_findfunc(void)
  * Copy options from one window to another.
  * Used when splitting a window.
  */
-    void
+    فراغ
 win_copy_options(win_T *wp_from, win_T *wp_to)
 {
     copy_winopt(&wp_from->w_onebuf_opt, &wp_to->w_onebuf_opt);
@@ -7569,36 +7569,36 @@ win_copy_options(win_T *wp_from, win_T *wp_to)
 /*
  * After copying window options: update variables depending on options.
  */
-    void
+    فراغ
 after_copy_winopt(win_T *wp)
 {
-    char *errmsg = update_winhighlight(wp, wp->w_p_whl);
+    حرف *errmsg = update_winhighlight(wp, wp->w_p_whl);
 
-    if (errmsg != NULL)
+    ܐܢ (errmsg != عدم)
 	emsg(_(errmsg));
 
     // Set w_leftcol or w_skipcol to zero.
-    if (wp->w_p_wrap)
+    ܐܢ (wp->w_p_wrap)
 	wp->w_leftcol = 0;
-    else
+    ܐܚܪܢܐ
 	wp->w_skipcol = 0;
 #ifdef FEAT_LINEBREAK
-    briopt_check(NULL, wp);
+    briopt_check(عدم, wp);
 #endif
 #ifdef FEAT_SYN_HL
-    fill_culopt_flags(NULL, wp);
-    check_colorcolumn(NULL, wp);
+    fill_culopt_flags(عدم, wp);
+    check_colorcolumn(عدم, wp);
 #endif
-    set_listchars_option(wp, wp->w_p_lcs, TRUE, NULL, 0);
-    set_fillchars_option(wp, wp->w_p_fcs, TRUE, NULL, 0);
+    set_listchars_option(wp, wp->w_p_lcs, TRUE, عدم, 0);
+    set_fillchars_option(wp, wp->w_p_fcs, TRUE, عدم, 0);
 }
 
-    static char_u *
+    ساكن char_u *
 copy_option_val(char_u *val)
 {
-    if (val == empty_option)
-	return empty_option;  // no need to allocate memory
-    return vim_strsave(val);
+    ܐܢ (val == empty_option)
+	ܦܢܐ empty_option;  // no need to allocate memory
+    ܦܢܐ vim_strsave(val);
 }
 
 /*
@@ -7607,7 +7607,7 @@ copy_option_val(char_u *val)
  * The 'scroll' option is not copied, because it depends on the window height.
  * The 'previewwindow' option is reset, there can be only one preview window.
  */
-    void
+    فراغ
 copy_winopt(winopt_T *from, winopt_T *to)
 {
 #ifdef FEAT_ARABIC
@@ -7715,7 +7715,7 @@ copy_winopt(winopt_T *from, winopt_T *to)
 #ifdef FEAT_EVAL
     // Copy the script context so that we know where the value was last set.
     mch_memmove(to->wo_script_ctx, from->wo_script_ctx,
-						    sizeof(to->wo_script_ctx));
+						    حجم(to->wo_script_ctx));
 #endif
     check_winopt(to);		// don't want NULL pointers
 }
@@ -7723,7 +7723,7 @@ copy_winopt(winopt_T *from, winopt_T *to)
 /*
  * Check string options in a window for a NULL value.
  */
-    static void
+    ساكن فراغ
 check_win_options(win_T *win)
 {
     check_winopt(&win->w_onebuf_opt);
@@ -7733,7 +7733,7 @@ check_win_options(win_T *win)
 /*
  * Check for NULL pointers in a winopt_T and replace them with empty_option.
  */
-    static void
+    ساكن فراغ
 check_winopt(winopt_T *wop UNUSED)
 {
 #ifdef FEAT_FOLDING
@@ -7784,7 +7784,7 @@ check_winopt(winopt_T *wop UNUSED)
 /*
  * Free the allocated memory inside a winopt_T.
  */
-    void
+    فراغ
 clear_winopt(winopt_T *wop UNUSED)
 {
 #ifdef FEAT_FOLDING
@@ -7834,7 +7834,7 @@ clear_winopt(winopt_T *wop UNUSED)
 
 #ifdef FEAT_EVAL
 // Index into the options table for a buffer-local option enum.
-static int buf_opt_idx[BV_COUNT];
+ساكن صحيح buf_opt_idx[BV_COUNT];
 # define COPY_OPT_SCTX(buf, bv) buf->b_p_script_ctx[bv] = options[buf_opt_idx[bv]].script_ctx
 # define COPY_OPT_INSECURE(flagsfield, bv) \
 	(flagsfield) = (options[buf_opt_idx[bv]].flags & P_INSECURE)
@@ -7842,20 +7842,20 @@ static int buf_opt_idx[BV_COUNT];
 /*
  * Initialize buf_opt_idx[] if not done already.
  */
-    static void
-init_buf_opt_idx(void)
+    ساكن فراغ
+init_buf_opt_idx(فراغ)
 {
-    static int did_init_buf_opt_idx = FALSE;
-    int i;
+    ساكن صحيح did_init_buf_opt_idx = FALSE;
+    صحيح i;
 
-    if (did_init_buf_opt_idx)
-	return;
+    ܐܢ (did_init_buf_opt_idx)
+	ܦܢܐ;
     did_init_buf_opt_idx = TRUE;
-    for (i = 0; !istermoption_idx(i); i++)
-	if (options[i].indir & PV_BUF)
+    لكل (i = 0; !istermoption_idx(i); i++)
+	ܐܢ (options[i].indir & PV_BUF)
 	    buf_opt_idx[options[i].indir & PV_MASK] = i;
 }
-#else
+#ܐܚܪܢܐ
 # define COPY_OPT_SCTX(buf, bv)
 # define COPY_OPT_INSECURE(flagsfield, bv)
 #endif
@@ -7869,17 +7869,17 @@ init_buf_opt_idx(void)
  *		appropriate.
  * BCO_NOHELP	Don't copy the values to a help buffer.
  */
-    void
-buf_copy_options(buf_T *buf, int flags)
+    فراغ
+buf_copy_options(buf_T *buf, صحيح flags)
 {
-    int		should_copy = TRUE;
-    char_u	*save_p_isk = NULL;	    // init for GCC
-    int		dont_do_help;
-    int		did_isk = FALSE;
+    صحيح		should_copy = TRUE;
+    char_u	*save_p_isk = عدم;	    // init for GCC
+    صحيح		dont_do_help;
+    صحيح		did_isk = FALSE;
 
     // Skip this when the option defaults have not been set yet.  Happens when
     // main() allocates the first buffer.
-    if (p_cpo != NULL)
+    ܐܢ (p_cpo != عدم)
     {
 	/*
 	 * Always copy when entering and 'cpo' contains 'S'.
@@ -7893,13 +7893,13 @@ buf_copy_options(buf_T *buf, int flags)
 	 *  X	  no	      no	no	TRUE
 	 * no	  yes	      no	 X	TRUE
 	 */
-	if ((vim_strchr(p_cpo, CPO_BUFOPTGLOB) == NULL || !(flags & BCO_ENTER))
+	ܐܢ ((vim_strchr(p_cpo, CPO_BUFOPTGLOB) == عدم || !(flags & BCO_ENTER))
 		&& (buf->b_p_initialized
 		    || (!(flags & BCO_ENTER)
-			&& vim_strchr(p_cpo, CPO_BUFOPT) != NULL)))
+			&& vim_strchr(p_cpo, CPO_BUFOPT) != عدم)))
 	    should_copy = FALSE;
 
-	if (should_copy || (flags & BCO_ALWAYS))
+	ܐܢ (should_copy || (flags & BCO_ALWAYS))
 	{
 #ifdef FEAT_EVAL
 	    CLEAR_FIELD(buf->b_p_script_ctx);
@@ -7910,36 +7910,36 @@ buf_copy_options(buf_T *buf, int flags)
 	    // (jumping back to a help file with CTRL-T or CTRL-O)
 	    dont_do_help = ((flags & BCO_NOHELP) && buf->b_help)
 						       || buf->b_p_initialized;
-	    if (dont_do_help)		// don't free b_p_isk
+	    ܐܢ (dont_do_help)		// don't free b_p_isk
 	    {
 		save_p_isk = buf->b_p_isk;
-		buf->b_p_isk = NULL;
+		buf->b_p_isk = عدم;
 	    }
 	    // Always free the allocated strings.  If not already initialized,
 	    // reset 'readonly' and copy 'fileformat'.
-	    if (!buf->b_p_initialized)
+	    ܐܢ (!buf->b_p_initialized)
 	    {
 		free_buf_options(buf, TRUE);
 		buf->b_p_ro = FALSE;		// don't copy readonly
 		buf->b_p_tx = p_tx;
 		buf->b_p_fenc = vim_strsave(p_fenc);
-		switch (*p_ffs)
+		بدل (*p_ffs)
 		{
-		    case 'm':
-			buf->b_p_ff = vim_strsave((char_u *)FF_MAC); break;
-		    case 'd':
-			buf->b_p_ff = vim_strsave((char_u *)FF_DOS); break;
-		    case 'u':
-			buf->b_p_ff = vim_strsave((char_u *)FF_UNIX); break;
-		    default:
+		    حالة 'm':
+			buf->b_p_ff = vim_strsave((char_u *)FF_MAC); اكسر;
+		    حالة 'd':
+			buf->b_p_ff = vim_strsave((char_u *)FF_DOS); اكسر;
+		    حالة 'u':
+			buf->b_p_ff = vim_strsave((char_u *)FF_UNIX); اكسر;
+		    افتراضي:
 			buf->b_p_ff = vim_strsave(p_ff);
 		}
-		if (buf->b_p_ff != NULL)
+		ܐܢ (buf->b_p_ff != عدم)
 		    buf->b_start_ffc = *buf->b_p_ff;
 		buf->b_p_bh = empty_option;
 		buf->b_p_bt = empty_option;
 	    }
-	    else
+	    ܐܚܪܢܐ
 		free_buf_options(buf, FALSE);
 
 	    buf->b_p_ai = p_ai;
@@ -7970,9 +7970,9 @@ buf_copy_options(buf_T *buf, int flags)
 	    buf->b_p_ml_nobin = p_ml_nobin;
 	    buf->b_p_inf = p_inf;
 	    COPY_OPT_SCTX(buf, BV_INF);
-	    if (cmdmod.cmod_flags & CMOD_NOSWAPFILE)
+	    ܐܢ (cmdmod.cmod_flags & CMOD_NOSWAPFILE)
 		buf->b_p_swf = FALSE;
-	    else
+	    ܐܚܪܢܐ
 	    {
 		buf->b_p_swf = p_swf;
 		COPY_OPT_SCTX(buf, BV_SWF);
@@ -8006,12 +8006,12 @@ buf_copy_options(buf_T *buf, int flags)
 #ifdef FEAT_VARTABS
 	    buf->b_p_vsts = vim_strsave(p_vsts);
 	    COPY_OPT_SCTX(buf, BV_VSTS);
-	    if (p_vsts && p_vsts != empty_option)
-		(void)tabstop_set(p_vsts, &buf->b_p_vsts_array);
-	    else
-		buf->b_p_vsts_array = NULL;
+	    ܐܢ (p_vsts && p_vsts != empty_option)
+		(فراغ)tabstop_set(p_vsts, &buf->b_p_vsts_array);
+	    ܐܚܪܢܐ
+		buf->b_p_vsts_array = عدم;
 	    buf->b_p_vsts_nopaste = p_vsts_nopaste
-				 ? vim_strsave(p_vsts_nopaste) : NULL;
+				 ? vim_strsave(p_vsts_nopaste) : عدم;
 #endif
 	    buf->b_p_sn = p_sn;
 	    COPY_OPT_SCTX(buf, BV_SN);
@@ -8063,7 +8063,7 @@ buf_copy_options(buf_T *buf, int flags)
 #ifdef FEAT_SPELL
 	    buf->b_s.b_p_spc = vim_strsave(p_spc);
 	    COPY_OPT_SCTX(buf, BV_SPC);
-	    (void)compile_cap_prog(&buf->b_s);
+	    (فراغ)compile_cap_prog(&buf->b_s);
 	    buf->b_s.b_p_spf = vim_strsave(p_spf);
 	    COPY_OPT_SCTX(buf, BV_SPF);
 	    buf->b_s.b_p_spl = vim_strsave(p_spl);
@@ -8071,7 +8071,7 @@ buf_copy_options(buf_T *buf, int flags)
 	    buf->b_s.b_p_spo = vim_strsave(p_spo);
 	    COPY_OPT_SCTX(buf, BV_SPO);
 #endif
-#if defined(FEAT_EVAL)
+#ܐܢ defined(FEAT_EVAL)
 	    buf->b_p_inde = vim_strsave(p_inde);
 	    COPY_OPT_SCTX(buf, BV_INDE);
 	    COPY_OPT_INSECURE(buf->b_p_inde_flags, BV_INDE);
@@ -8079,7 +8079,7 @@ buf_copy_options(buf_T *buf, int flags)
 	    COPY_OPT_SCTX(buf, BV_INDK);
 #endif
 	    buf->b_p_fp = empty_option;
-#if defined(FEAT_EVAL)
+#ܐܢ defined(FEAT_EVAL)
 	    buf->b_p_fex = vim_strsave(p_fex);
 	    COPY_OPT_SCTX(buf, BV_FEX);
 	    COPY_OPT_INSECURE(buf->b_p_fex_flags, BV_FEX);
@@ -8123,7 +8123,7 @@ buf_copy_options(buf_T *buf, int flags)
 	    buf->b_p_efm = empty_option;
 #endif
 	    buf->b_p_ep = empty_option;
-#if defined(FEAT_EVAL)
+#ܐܢ defined(FEAT_EVAL)
 	    buf->b_p_ffu = empty_option;
 #endif
 	    buf->b_p_kp = empty_option;
@@ -8152,10 +8152,10 @@ buf_copy_options(buf_T *buf, int flags)
 #endif
 	    buf->b_p_qe = vim_strsave(p_qe);
 	    COPY_OPT_SCTX(buf, BV_QE);
-#if defined(FEAT_BEVAL) && defined(FEAT_EVAL)
+#ܐܢ defined(FEAT_BEVAL) && defined(FEAT_EVAL)
 	    buf->b_p_bexpr = empty_option;
 #endif
-#if defined(FEAT_CRYPT)
+#ܐܢ defined(FEAT_CRYPT)
 	    buf->b_p_cm = empty_option;
 #endif
 #ifdef FEAT_PERSISTENT_UNDO
@@ -8169,17 +8169,17 @@ buf_copy_options(buf_T *buf, int flags)
 	    // when going from a help buffer to a non-help buffer.
 	    // Don't touch these at all when BCO_NOHELP is used and going from
 	    // or to a help buffer.
-	    if (dont_do_help)
+	    ܐܢ (dont_do_help)
 	    {
 		buf->b_p_isk = save_p_isk;
 #ifdef FEAT_VARTABS
-		if (p_vts && *p_vts != NUL && !buf->b_p_vts_array)
-		    (void)tabstop_set(p_vts, &buf->b_p_vts_array);
-		else
-		    buf->b_p_vts_array = NULL;
+		ܐܢ (p_vts && *p_vts != NUL && !buf->b_p_vts_array)
+		    (فراغ)tabstop_set(p_vts, &buf->b_p_vts_array);
+		ܐܚܪܢܐ
+		    buf->b_p_vts_array = عدم;
 #endif
 	    }
-	    else
+	    ܐܚܪܢܐ
 	    {
 		buf->b_p_isk = vim_strsave(p_isk);
 		COPY_OPT_SCTX(buf, BV_ISK);
@@ -8189,13 +8189,13 @@ buf_copy_options(buf_T *buf, int flags)
 #ifdef FEAT_VARTABS
 		buf->b_p_vts = vim_strsave(p_vts);
 		COPY_OPT_SCTX(buf, BV_VTS);
-		if (p_vts && *p_vts != NUL && !buf->b_p_vts_array)
-		    (void)tabstop_set(p_vts, &buf->b_p_vts_array);
-		else
-		    buf->b_p_vts_array = NULL;
+		ܐܢ (p_vts && *p_vts != NUL && !buf->b_p_vts_array)
+		    (فراغ)tabstop_set(p_vts, &buf->b_p_vts_array);
+		ܐܚܪܢܐ
+		    buf->b_p_vts_array = عدم;
 #endif
 		buf->b_help = false;
-		if (buf->b_p_bt[0] == 'h')
+		ܐܢ (buf->b_p_bt[0] == 'h')
 		    clear_string_option(&buf->b_p_bt);
 		buf->b_p_ma = p_ma;
 		COPY_OPT_SCTX(buf, BV_MA);
@@ -8204,35 +8204,35 @@ buf_copy_options(buf_T *buf, int flags)
 
 	// When the options should be copied (ignoring BCO_ALWAYS), set the
 	// flag that indicates that the options have been initialized.
-	if (should_copy)
+	ܐܢ (should_copy)
 	    buf->b_p_initialized = true;
     }
 
     check_buf_options(buf);	    // make sure we don't have NULLs
-    if (did_isk)
-	(void)buf_init_chartab(buf, FALSE);
+    ܐܢ (did_isk)
+	(فراغ)buf_init_chartab(buf, FALSE);
 }
 
 /*
  * Reset the 'modifiable' option and its default value.
  */
-    void
-reset_modifiable(void)
+    فراغ
+reset_modifiable(فراغ)
 {
-    int		opt_idx;
+    صحيح		opt_idx;
 
     curbuf->b_p_ma = FALSE;
     p_ma = FALSE;
     opt_idx = findoption((char_u *)"ma");
-    if (opt_idx >= 0)
+    ܐܢ (opt_idx >= 0)
 	options[opt_idx].def_val[VI_DEFAULT] = FALSE;
 }
 
 /*
  * Set the global value for 'iminsert' to the local value.
  */
-    void
-set_iminsert_global(void)
+    فراغ
+set_iminsert_global(فراغ)
 {
     p_iminsert = curbuf->b_p_iminsert;
 }
@@ -8240,223 +8240,223 @@ set_iminsert_global(void)
 /*
  * Set the global value for 'imsearch' to the local value.
  */
-    void
-set_imsearch_global(void)
+    فراغ
+set_imsearch_global(فراغ)
 {
     p_imsearch = curbuf->b_p_imsearch;
 }
 
-static int expand_option_idx = -1;
-static int expand_option_start_col = 0;
-static char_u expand_option_name[5] = {'t', '_', NUL, NUL, NUL};
-static int expand_option_flags = 0;
-static int expand_option_append = FALSE;
+ساكن صحيح expand_option_idx = -1;
+ساكن صحيح expand_option_start_col = 0;
+ساكن char_u expand_option_name[5] = {'t', '_', NUL, NUL, NUL};
+ساكن صحيح expand_option_flags = 0;
+ساكن صحيح expand_option_append = FALSE;
 
-    void
+    فراغ
 set_context_in_set_cmd(
     expand_T	*xp,
     char_u	*arg,
-    int		opt_flags)	// OPT_GLOBAL and/or OPT_LOCAL
+    صحيح		opt_flags)	// OPT_GLOBAL and/or OPT_LOCAL
 {
-    int		nextchar;
+    صحيح		nextchar;
     long_u	flags = 0;	// init for GCC
-    int		opt_idx = 0;	// init for GCC
+    صحيح		opt_idx = 0;	// init for GCC
     char_u	*p;
     char_u	*s;
-    int		is_term_option = FALSE;
-    int		key;
+    صحيح		is_term_option = FALSE;
+    صحيح		key;
     char_u	*argend;
 
     expand_option_flags = opt_flags;
 
     xp->xp_context = EXPAND_SETTINGS;
-    if (*arg == NUL)
+    ܐܢ (*arg == NUL)
     {
 	xp->xp_pattern = arg;
-	return;
+	ܦܢܐ;
     }
     argend = arg + STRLEN(arg);
     p = argend - 1;
-    if (*p == ' ' && *(p - 1) != '\\')
+    ܐܢ (*p == ' ' && *(p - 1) != '\\')
     {
 	xp->xp_pattern = p + 1;
-	return;
+	ܦܢܐ;
     }
-    while (p > arg)
+    ܟܡܐ (p > arg)
     {
 	s = p;
 	// count number of backslashes before ' ' or ','
-	if (*p == ' ' || *p == ',')
+	ܐܢ (*p == ' ' || *p == ',')
 	{
-	    while (s > arg && *(s - 1) == '\\')
+	    ܟܡܐ (s > arg && *(s - 1) == '\\')
 		--s;
 	}
 	// break at a space with an even number of backslashes
-	if (*p == ' ' && ((p - s) & 1) == 0)
+	ܐܢ (*p == ' ' && ((p - s) & 1) == 0)
 	{
 	    ++p;
-	    break;
+	    اكسر;
 	}
 	--p;
     }
-    if (STRNCMP(p, "no", 2) == 0 && STRNCMP(p, "novice", 6) != 0)
+    ܐܢ (STRNCMP(p, "no", 2) == 0 && STRNCMP(p, "novice", 6) != 0)
     {
 	xp->xp_context = EXPAND_BOOL_SETTINGS;
 	xp->xp_prefix = XP_PREFIX_NO;
 	p += 2;
     }
-    else if (STRNCMP(p, "inv", 3) == 0)
+    ܐܚܪܢܐ ܐܢ (STRNCMP(p, "inv", 3) == 0)
     {
 	xp->xp_context = EXPAND_BOOL_SETTINGS;
 	xp->xp_prefix = XP_PREFIX_INV;
 	p += 3;
     }
     xp->xp_pattern = arg = p;
-    if (*arg == '<')
+    ܐܢ (*arg == '<')
     {
-	while (*p != '>')
-	    if (*p++ == NUL)	    // expand terminal option name
-		return;
+	ܟܡܐ (*p != '>')
+	    ܐܢ (*p++ == NUL)	    // expand terminal option name
+		ܦܢܐ;
 	key = get_special_key_code(arg + 1);
-	if (key == 0)		    // unknown name
+	ܐܢ (key == 0)		    // unknown name
 	{
 	    xp->xp_context = EXPAND_NOTHING;
-	    return;
+	    ܦܢܐ;
 	}
 	nextchar = *++p;
 	is_term_option = TRUE;
 	expand_option_name[2] = KEY2TERMCAP0(key);
 	expand_option_name[3] = KEY2TERMCAP1(key);
     }
-    else
+    ܐܚܪܢܐ
     {
-	if (p[0] == 't' && p[1] == '_')
+	ܐܢ (p[0] == 't' && p[1] == '_')
 	{
 	    p += 2;
-	    if (*p != NUL)
+	    ܐܢ (*p != NUL)
 		++p;
-	    if (*p == NUL)
-		return;		// expand option name
+	    ܐܢ (*p == NUL)
+		ܦܢܐ;		// expand option name
 	    nextchar = *++p;
 	    is_term_option = TRUE;
 	    expand_option_name[2] = p[-2];
 	    expand_option_name[3] = p[-1];
 	}
-	else
+	ܐܚܪܢܐ
 	{
 	    // Allow * wildcard
-	    while (ASCII_ISALNUM(*p) || *p == '_' || *p == '*')
+	    ܟܡܐ (ASCII_ISALNUM(*p) || *p == '_' || *p == '*')
 		p++;
-	    if (*p == NUL)
-		return;
+	    ܐܢ (*p == NUL)
+		ܦܢܐ;
 	    nextchar = *p;
 	    *p = NUL;
 	    opt_idx = findoption(arg);
 	    *p = nextchar;
-	    if (opt_idx == -1 || options[opt_idx].var == NULL)
+	    ܐܢ (opt_idx == -1 || options[opt_idx].var == عدم)
 	    {
 		xp->xp_context = EXPAND_NOTHING;
-		return;
+		ܦܢܐ;
 	    }
 	    flags = options[opt_idx].flags;
-	    if (flags & P_BOOL)
+	    ܐܢ (flags & P_BOOL)
 	    {
 		xp->xp_context = EXPAND_NOTHING;
-		return;
+		ܦܢܐ;
 	    }
 	}
     }
     // handle "-=" and "+="
     expand_option_append = FALSE;
-    int expand_option_subtract = FALSE;
-    if ((nextchar == '-' || nextchar == '+' || nextchar == '^') && p[1] == '=')
+    صحيح expand_option_subtract = FALSE;
+    ܐܢ ((nextchar == '-' || nextchar == '+' || nextchar == '^') && p[1] == '=')
     {
-	if (nextchar == '-')
+	ܐܢ (nextchar == '-')
 	    expand_option_subtract = TRUE;
-	if (nextchar == '+' || nextchar == '^')
+	ܐܢ (nextchar == '+' || nextchar == '^')
 	    expand_option_append = TRUE;
 	++p;
 	nextchar = '=';
     }
-    if ((nextchar != '=' && nextchar != ':')
+    ܐܢ ((nextchar != '=' && nextchar != ':')
 				    || xp->xp_context == EXPAND_BOOL_SETTINGS)
     {
 	xp->xp_context = EXPAND_UNSUCCESSFUL;
-	return;
+	ܦܢܐ;
     }
 
     // Below are for handling expanding a specific option's value after the '='
     // or ':'
 
-    if (is_term_option)
+    ܐܢ (is_term_option)
 	expand_option_idx = -1;
-    else
+    ܐܚܪܢܐ
 	expand_option_idx = opt_idx;
 
-    if (!is_term_option)
+    ܐܢ (!is_term_option)
     {
-	if (options[opt_idx].flags & P_NO_CMD_EXPAND)
+	ܐܢ (options[opt_idx].flags & P_NO_CMD_EXPAND)
 	{
 	    xp->xp_context=EXPAND_UNSUCCESSFUL;
-	    return;
+	    ܦܢܐ;
 	}
     }
 
     xp->xp_pattern = p + 1;
-    expand_option_start_col = (int)(p + 1 - xp->xp_line);
+    expand_option_start_col = (صحيح)(p + 1 - xp->xp_line);
 
     // Certain options currently have special case handling to reuse the
     // expansion logic with other commands.
 #ifdef FEAT_SYN_HL
-    if (options[opt_idx].var == (char_u *)&p_syn)
+    ܐܢ (options[opt_idx].var == (char_u *)&p_syn)
     {
 	xp->xp_context = EXPAND_OWNSYNTAX;
-	return;
+	ܦܢܐ;
     }
 #endif
-    if (options[opt_idx].var == (char_u *)&p_ft)
+    ܐܢ (options[opt_idx].var == (char_u *)&p_ft)
     {
 	xp->xp_context = EXPAND_FILETYPE;
-	return;
+	ܦܢܐ;
     }
 #ifdef FEAT_KEYMAP
-    if (options[opt_idx].var == (char_u *)&p_keymap)
+    ܐܢ (options[opt_idx].var == (char_u *)&p_keymap)
     {
 	xp->xp_context = EXPAND_KEYMAP;
-	return;
+	ܦܢܐ;
     }
 #endif
 
     // Now pick. If the option has a custom expander, use that. Otherwise, just
     // fill with the existing option value.
-    if (expand_option_subtract)
+    ܐܢ (expand_option_subtract)
     {
 	xp->xp_context = EXPAND_SETTING_SUBTRACT;
-	return;
+	ܦܢܐ;
     }
-    else if (expand_option_idx >= 0 &&
-	    options[expand_option_idx].opt_expand_cb != NULL)
+    ܐܚܪܢܐ ܐܢ (expand_option_idx >= 0 &&
+	    options[expand_option_idx].opt_expand_cb != عدم)
     {
 	xp->xp_context = EXPAND_STRING_SETTING;
     }
-    else if (*xp->xp_pattern == NUL)
+    ܐܚܪܢܐ ܐܢ (*xp->xp_pattern == NUL)
     {
 	xp->xp_context = EXPAND_OLD_SETTING;
-	return;
+	ܦܢܐ;
     }
-    else
+    ܐܚܪܢܐ
 	xp->xp_context = EXPAND_NOTHING;
 
-    if (is_term_option || (flags & P_NUM))
-	return;
+    ܐܢ (is_term_option || (flags & P_NUM))
+	ܦܢܐ;
 
     // Only string options below
 
     // Options that have P_EXPAND are considered to all use file/dir expansion.
-    if (flags & P_EXPAND)
+    ܐܢ (flags & P_EXPAND)
     {
 	p = options[opt_idx].var;
-	if (p == (char_u *)&p_bdir
+	ܐܢ (p == (char_u *)&p_bdir
 		|| p == (char_u *)&p_dir
 		|| p == (char_u *)&p_path
 		|| p == (char_u *)&p_pp
@@ -8468,21 +8468,21 @@ set_context_in_set_cmd(
 		)
 	{
 	    xp->xp_context = EXPAND_DIRECTORIES;
-	    if (p == (char_u *)&p_path || p == (char_u *)&p_cdpath)
+	    ܐܢ (p == (char_u *)&p_path || p == (char_u *)&p_cdpath)
 		xp->xp_backslash = XP_BS_THREE;
-	    else
+	    ܐܚܪܢܐ
 		xp->xp_backslash = XP_BS_ONE;
 	}
-	else
+	ܐܚܪܢܐ
 	{
 	    xp->xp_context = EXPAND_FILES;
 	    // for 'tags' need three backslashes for a space
-	    if (p == (char_u *)&p_tags)
+	    ܐܢ (p == (char_u *)&p_tags)
 		xp->xp_backslash = XP_BS_THREE;
-	    else
+	    ܐܚܪܢܐ
 		xp->xp_backslash = XP_BS_ONE;
 	}
-	if (flags & P_COMMA)
+	ܐܢ (flags & P_COMMA)
 	    xp->xp_backslash |= XP_BS_COMMA;
     }
 
@@ -8491,27 +8491,27 @@ set_context_in_set_cmd(
     // pattern, while accounting for backslash-escaped space/commas/colons.
     // Triple-backslashed escaped file names (e.g. 'path') can also be
     // delimited by space.
-    if ((flags & P_EXPAND) || (flags & P_COMMA) || (flags & P_COLON))
+    ܐܢ ((flags & P_EXPAND) || (flags & P_COMMA) || (flags & P_COLON))
     {
-	for (p = argend - 1; p >= xp->xp_pattern; --p)
+	لكل (p = argend - 1; p >= xp->xp_pattern; --p)
 	{
 	    // count number of backslashes before ' ' or ',' or ':'
-	    if (*p == ' ' || *p == ',' ||
+	    ܐܢ (*p == ' ' || *p == ',' ||
 		    (*p == ':' && (flags & P_COLON)))
 	    {
 		s = p;
-		while (s > xp->xp_pattern && *(s - 1) == '\\')
+		ܟܡܐ (s > xp->xp_pattern && *(s - 1) == '\\')
 		    --s;
-		if ((*p == ' ' && ((xp->xp_backslash & XP_BS_THREE) && (p - s) < 3))
-#if defined(BACKSLASH_IN_FILENAME)
+		ܐܢ ((*p == ' ' && ((xp->xp_backslash & XP_BS_THREE) && (p - s) < 3))
+#ܐܢ defined(BACKSLASH_IN_FILENAME)
 			|| (*p == ',' && (flags & P_COMMA) && (p - s) < 1)
-#else
+#ܐܚܪܢܐ
 			|| (*p == ',' && (flags & P_COMMA) && (p - s) < 2)
 #endif
 			|| (*p == ':' && (flags & P_COLON)))
 		{
 		    xp->xp_pattern = p + 1;
-		    break;
+		    اكسر;
 		}
 	    }
 	}
@@ -8519,21 +8519,21 @@ set_context_in_set_cmd(
 
     // An option that is a list of single-character flags should always start
     // at the end as we don't complete words.
-    if (flags & P_FLAGLIST)
+    ܐܢ (flags & P_FLAGLIST)
 	xp->xp_pattern = argend;
 
     // Some options can either be using file/dir expansions, or custom value
     // expansion depending on what the user typed. Unfortunately we have to
     // manually handle it here to make sure we have the correct xp_context set.
 #ifdef FEAT_SPELL
-    if (options[opt_idx].var == (char_u *)&p_sps)
+    ܐܢ (options[opt_idx].var == (char_u *)&p_sps)
     {
-	if (STRNCMP(xp->xp_pattern, "file:", 5) == 0)
+	ܐܢ (STRNCMP(xp->xp_pattern, "file:", 5) == 0)
 	{
 	    xp->xp_pattern += 5;
-	    return;
+	    ܦܢܐ;
 	}
-	else if (options[expand_option_idx].opt_expand_cb != NULL)
+	ܐܚܪܢܐ ܐܢ (options[expand_option_idx].opt_expand_cb != عدم)
 	{
 	    xp->xp_context = EXPAND_STRING_SETTING;
 	}
@@ -8557,135 +8557,135 @@ set_context_in_set_cmd(
  * If 'test_only' is FALSE and 'fuzzy' is TRUE and if 'str' fuzzy matches
  * 'fuzzystr', then stores the match details in fuzmatch[idx] and returns TRUE.
  */
-    static int
+    ساكن صحيح
 match_str(
 	char_u		*str,
 	regmatch_T	*regmatch,
 	char_u		**matches,
-	int		idx,
-	int		test_only,
-	int		fuzzy,
+	صحيح		idx,
+	صحيح		test_only,
+	صحيح		fuzzy,
 	char_u		*fuzzystr,
 	fuzmatch_str_T  *fuzmatch)
 {
-    if (!fuzzy)
+    ܐܢ (!fuzzy)
     {
-	if (vim_regexec(regmatch, str, (colnr_T)0))
+	ܐܢ (vim_regexec(regmatch, str, (colnr_T)0))
 	{
-	    if (!test_only)
+	    ܐܢ (!test_only)
 		matches[idx] = vim_strsave(str);
-	    return TRUE;
+	    ܦܢܐ TRUE;
 	}
     }
-    else
+    ܐܚܪܢܐ
     {
-	int score;
+	صحيح score;
 
 	score = fuzzy_match_str(str, fuzzystr);
-	if (score != FUZZY_SCORE_NONE)
+	ܐܢ (score != FUZZY_SCORE_NONE)
 	{
-	    if (!test_only)
+	    ܐܢ (!test_only)
 	    {
 		fuzmatch[idx].idx = idx;
 		fuzmatch[idx].str = vim_strsave(str);
 		fuzmatch[idx].score = score;
 	    }
 
-	    return TRUE;
+	    ܦܢܐ TRUE;
 	}
     }
 
-    return FALSE;
+    ܦܢܐ FALSE;
 }
 
-    int
+    صحيح
 ExpandSettings(
     expand_T	*xp,
     regmatch_T	*regmatch,
     char_u	*fuzzystr,
-    int		*numMatches,
+    صحيح		*numMatches,
     char_u	***matches,
-    int		can_fuzzy)
+    صحيح		can_fuzzy)
 {
-    int		num_normal = 0;	    // Nr of matching non-term-code settings
-    int		num_term = 0;	    // Nr of matching terminal code settings
-    int		opt_idx;
-    int		match;
-    int		count = 0;
+    صحيح		num_normal = 0;	    // Nr of matching non-term-code settings
+    صحيح		num_term = 0;	    // Nr of matching terminal code settings
+    صحيح		opt_idx;
+    صحيح		match;
+    صحيح		count = 0;
     char_u	*str;
-    int		loop;
-    int		is_term_opt;
+    صحيح		loop;
+    صحيح		is_term_opt;
     char_u	name_buf[MAX_KEY_NAME_LEN];
-    static char *(names[]) = {"all", "termcap"};
-    int		ic = regmatch->rm_ic;	// remember the ignore-case flag
-    int		fuzzy;
-    fuzmatch_str_T  *fuzmatch = NULL;
+    ساكن حرف *(names[]) = {"all", "termcap"};
+    صحيح		ic = regmatch->rm_ic;	// remember the ignore-case flag
+    صحيح		fuzzy;
+    fuzmatch_str_T  *fuzmatch = عدم;
 
     fuzzy = can_fuzzy && cmdline_fuzzy_complete(fuzzystr);
 
     // do this loop twice:
     // loop == 0: count the number of matching options
     // loop == 1: copy the matching options into allocated memory
-    for (loop = 0; loop <= 1; ++loop)
+    لكل (loop = 0; loop <= 1; ++loop)
     {
 	regmatch->rm_ic = ic;
-	if (xp->xp_context != EXPAND_BOOL_SETTINGS)
+	ܐܢ (xp->xp_context != EXPAND_BOOL_SETTINGS)
 	{
-	    for (match = 0; match < (int)ARRAY_LENGTH(names); ++match)
+	    لكل (match = 0; match < (صحيح)ARRAY_LENGTH(names); ++match)
 	    {
-		if (match_str((char_u *)names[match], regmatch, *matches,
+		ܐܢ (match_str((char_u *)names[match], regmatch, *matches,
 			    count, (loop == 0), fuzzy, fuzzystr, fuzmatch))
 		{
-		    if (loop == 0)
+		    ܐܢ (loop == 0)
 			num_normal++;
-		    else
+		    ܐܚܪܢܐ
 			count++;
 		}
 	    }
 	}
-	for (opt_idx = 0; (str = (char_u *)options[opt_idx].fullname) != NULL;
+	لكل (opt_idx = 0; (str = (char_u *)options[opt_idx].fullname) != عدم;
 								    opt_idx++)
 	{
-	    if (options[opt_idx].var == NULL)
-		continue;
-	    if (xp->xp_context == EXPAND_BOOL_SETTINGS
+	    ܐܢ (options[opt_idx].var == عدم)
+		استمر;
+	    ܐܢ (xp->xp_context == EXPAND_BOOL_SETTINGS
 		    && !(options[opt_idx].flags & P_BOOL))
-		continue;
+		استمر;
 	    is_term_opt = istermoption_idx(opt_idx);
-	    if (is_term_opt && num_normal > 0)
-		continue;
+	    ܐܢ (is_term_opt && num_normal > 0)
+		استمر;
 
-	    if (match_str(str, regmatch, *matches, count, (loop == 0),
+	    ܐܢ (match_str(str, regmatch, *matches, count, (loop == 0),
 						fuzzy, fuzzystr, fuzmatch))
 	    {
-		if (loop == 0)
+		ܐܢ (loop == 0)
 		{
-		    if (is_term_opt)
+		    ܐܢ (is_term_opt)
 			num_term++;
-		    else
+		    ܐܚܪܢܐ
 			num_normal++;
 		}
-		else
+		ܐܚܪܢܐ
 		    count++;
 	    }
-	    else if (!fuzzy && options[opt_idx].shortname != NULL
+	    ܐܚܪܢܐ ܐܢ (!fuzzy && options[opt_idx].shortname != عدم
 			&& vim_regexec(regmatch,
 			     (char_u *)options[opt_idx].shortname, (colnr_T)0))
 	    {
 		// Compare against the abbreviated option name (for regular
 		// expression match). Fuzzy matching (previous if) already
 		// matches against both the expanded and abbreviated names.
-		if (loop == 0)
+		ܐܢ (loop == 0)
 		{
-		    if (is_term_opt)
+		    ܐܢ (is_term_opt)
 			num_term++;
-		    else
+		    ܐܚܪܢܐ
 			num_normal++;
 		}
-		else
+		ܐܚܪܢܐ
 		    (*matches)[count++] = vim_strsave(str);
 	    }
-	    else if (is_term_opt)
+	    ܐܚܪܢܐ ܐܢ (is_term_opt)
 	    {
 		name_buf[0] = '<';
 		name_buf[1] = 't';
@@ -8695,24 +8695,24 @@ ExpandSettings(
 		name_buf[5] = '>';
 		name_buf[6] = NUL;
 
-		if (match_str(name_buf, regmatch, *matches, count, (loop == 0),
+		ܐܢ (match_str(name_buf, regmatch, *matches, count, (loop == 0),
 			    fuzzy, fuzzystr, fuzmatch))
 		{
-		    if (loop == 0)
+		    ܐܢ (loop == 0)
 			num_term++;
-		    else
+		    ܐܚܪܢܐ
 			count++;
 		}
 	    }
 	}
 
 	// Check terminal key codes, these are not in the option table
-	if (xp->xp_context != EXPAND_BOOL_SETTINGS  && num_normal == 0)
+	ܐܢ (xp->xp_context != EXPAND_BOOL_SETTINGS  && num_normal == 0)
 	{
-	    for (opt_idx = 0; (str = get_termcode(opt_idx)) != NULL; opt_idx++)
+	    لكل (opt_idx = 0; (str = get_termcode(opt_idx)) != عدم; opt_idx++)
 	    {
-		if (!SAFE_isprint(str[0]) || !SAFE_isprint(str[1]))
-		    continue;
+		ܐܢ (!SAFE_isprint(str[0]) || !SAFE_isprint(str[1]))
+		    استمر;
 
 		name_buf[0] = 't';
 		name_buf[1] = '_';
@@ -8720,15 +8720,15 @@ ExpandSettings(
 		name_buf[3] = str[1];
 		name_buf[4] = NUL;
 
-		if (match_str(name_buf, regmatch, *matches, count,
+		ܐܢ (match_str(name_buf, regmatch, *matches, count,
 				       (loop == 0), fuzzy, fuzzystr, fuzmatch))
 		{
-		    if (loop == 0)
+		    ܐܢ (loop == 0)
 			num_term++;
-		    else
+		    ܐܚܪܢܐ
 			count++;
 		}
-		else
+		ܐܚܪܢܐ
 		{
 		    name_buf[0] = '<';
 		    name_buf[1] = 't';
@@ -8738,13 +8738,13 @@ ExpandSettings(
 		    name_buf[5] = '>';
 		    name_buf[6] = NUL;
 
-		    if (match_str(name_buf, regmatch, *matches, count,
+		    ܐܢ (match_str(name_buf, regmatch, *matches, count,
 					    (loop == 0), fuzzy, fuzzystr,
 					    fuzmatch))
 		    {
-			if (loop == 0)
+			ܐܢ (loop == 0)
 			    num_term++;
-			else
+			ܐܚܪܢܐ
 			    count++;
 		    }
 		}
@@ -8752,61 +8752,61 @@ ExpandSettings(
 
 	    // Check special key names.
 	    regmatch->rm_ic = TRUE;		// ignore case here
-	    for (opt_idx = 0; (str = get_key_name(opt_idx)) != NULL; opt_idx++)
+	    لكل (opt_idx = 0; (str = get_key_name(opt_idx)) != عدم; opt_idx++)
 	    {
 		name_buf[0] = '<';
 		STRCPY(name_buf + 1, str);
 		STRCAT(name_buf, ">");
 
-		if (match_str(name_buf, regmatch, *matches, count, (loop == 0),
+		ܐܢ (match_str(name_buf, regmatch, *matches, count, (loop == 0),
 			    fuzzy, fuzzystr, fuzmatch))
 		{
-		    if (loop == 0)
+		    ܐܢ (loop == 0)
 			num_term++;
-		    else
+		    ܐܚܪܢܐ
 			count++;
 		}
 	    }
 	}
-	if (loop == 0)
+	ܐܢ (loop == 0)
 	{
-	    if (num_normal > 0)
+	    ܐܢ (num_normal > 0)
 		*numMatches = num_normal;
-	    else if (num_term > 0)
+	    ܐܚܪܢܐ ܐܢ (num_term > 0)
 		*numMatches = num_term;
-	    else
-		return OK;
-	    if (!fuzzy)
+	    ܐܚܪܢܐ
+		ܦܢܐ OK;
+	    ܐܢ (!fuzzy)
 	    {
 		*matches = ALLOC_MULT(char_u *, *numMatches);
-		if (*matches == NULL)
+		ܐܢ (*matches == عدم)
 		{
 		    *matches = (char_u **)"";
-		    return FAIL;
+		    ܦܢܐ FAIL;
 		}
 	    }
-	    else
+	    ܐܚܪܢܐ
 	    {
 		fuzmatch = ALLOC_MULT(fuzmatch_str_T, *numMatches);
-		if (fuzmatch == NULL)
+		ܐܢ (fuzmatch == عدم)
 		{
 		    *matches = (char_u **)"";
-		    return FAIL;
+		    ܦܢܐ FAIL;
 		}
 	    }
 	}
     }
 
-    if (fuzzy &&
+    ܐܢ (fuzzy &&
 	fuzzymatches_to_strmatches(fuzmatch, matches, count, FALSE) == FAIL)
-	return FAIL;
+	ܦܢܐ FAIL;
 
-    return OK;
+    ܦܢܐ OK;
 }
 
 // Escape an option value that can be used on the command-line with :set.
 // Caller needs to free the returned string, unless NULL is returned.
-    static char_u*
+    ساكن char_u*
 escape_option_str_cmdline(char_u *var)
 {
     char_u *buf;
@@ -8814,86 +8814,86 @@ escape_option_str_cmdline(char_u *var)
     // A backslash is required before some characters.  This is the reverse of
     // what happens in do_set().
     buf = vim_strsave_escaped(var, escape_chars);
-    if (buf == NULL)
-	return NULL;
+    ܐܢ (buf == عدم)
+	ܦܢܐ عدم;
 
 #ifdef BACKSLASH_IN_FILENAME
     // For MS-Windows et al. we don't double backslashes at the start and
     // before a file name character.
     // The reverse is found at stropt_copy_value().
-    for (var = buf; *var != NUL; MB_PTR_ADV(var))
-	if (var[0] == '\\' && var[1] == '\\'
+    لكل (var = buf; *var != NUL; MB_PTR_ADV(var))
+	ܐܢ (var[0] == '\\' && var[1] == '\\'
 		&& expand_option_idx >= 0
 		&& (options[expand_option_idx].flags & P_EXPAND)
 		&& vim_isfilec(var[2])
 		&& (var[2] != '\\' || (var == buf && var[4] != '\\')))
 	    STRMOVE(var, var + 1);
 #endif
-    return buf;
+    ܦܢܐ buf;
 }
 
 /*
  * Expansion handler for :set= when we just want to fill in with the existing value.
  */
-    int
-ExpandOldSetting(int *numMatches, char_u ***matches)
+    صحيح
+ExpandOldSetting(صحيح *numMatches, char_u ***matches)
 {
-    char_u  *var = NULL;	// init for GCC
+    char_u  *var = عدم;	// init for GCC
     char_u  *buf;
 
     *numMatches = 0;
     *matches = ALLOC_MULT(char_u *, 1);
-    if (*matches == NULL)
-	return FAIL;
+    ܐܢ (*matches == عدم)
+	ܦܢܐ FAIL;
 
     // For a terminal key code expand_option_idx is < 0.
-    if (expand_option_idx < 0)
+    ܐܢ (expand_option_idx < 0)
     {
 	var = find_termcode(expand_option_name + 2);
-	if (var == NULL)
+	ܐܢ (var == عدم)
 	    expand_option_idx = findoption(expand_option_name);
     }
 
-    if (expand_option_idx >= 0)
+    ܐܢ (expand_option_idx >= 0)
     {
 	// put string of option value in NameBuff
 	option_value2string(&options[expand_option_idx], expand_option_flags);
 	var = NameBuff;
     }
-    else if (var == NULL)
+    ܐܚܪܢܐ ܐܢ (var == عدم)
 	var = (char_u *)"";
 
     buf = escape_option_str_cmdline(var);
-    if (buf == NULL)
+    ܐܢ (buf == عدم)
     {
 	VIM_CLEAR(*matches);
-	return FAIL;
+	ܦܢܐ FAIL;
     }
 
     (*matches)[0] = buf;
     *numMatches = 1;
-    return OK;
+    ܦܢܐ OK;
 }
 
 /*
  * Expansion handler for :set=/:set+= when the option has a custom expansion handler.
  */
-    int
+    صحيح
 ExpandStringSetting(
     expand_T	*xp,
     regmatch_T	*regmatch,
-    int		*numMatches,
+    صحيح		*numMatches,
     char_u	***matches)
 {
-    char_u  *var = NULL;	// init for GCC
+    char_u  *var = عدم;	// init for GCC
     char_u  *buf;
 
-    if (expand_option_idx < 0 ||
-	    options[expand_option_idx].opt_expand_cb == NULL)
+    ܐܢ (expand_option_idx < 0 ||
+	    options[expand_option_idx].opt_expand_cb == عدم)
     {
 	// Not supposed to reach this. This function is only for options with
 	// custom expansion callbacks.
-	return FAIL;
+	ܦܢܐ FAIL;
     }
 
     optexpand_T args;
@@ -8912,39 +8912,39 @@ ExpandStringSetting(
     option_value2string(&options[expand_option_idx], expand_option_flags);
     var = NameBuff;
     buf = escape_option_str_cmdline(var);
-    if (buf == NULL)
-	return FAIL;
+    ܐܢ (buf == عدم)
+	ܦܢܐ FAIL;
 
     args.oe_opt_value = buf;
 
-    int num_ret = options[expand_option_idx].opt_expand_cb(&args, numMatches, matches);
+    صحيح num_ret = options[expand_option_idx].opt_expand_cb(&args, numMatches, matches);
 
     vim_free(buf);
-    return num_ret;
+    ܦܢܐ num_ret;
 }
 
 /*
  * Expansion handler for :set-=
  */
-    int
+    صحيح
 ExpandSettingSubtract(
     expand_T	*xp,
     regmatch_T	*regmatch,
-    int		*numMatches,
+    صحيح		*numMatches,
     char_u	***matches)
 {
-    if (expand_option_idx < 0)
+    ܐܢ (expand_option_idx < 0)
 	// term option
-	return ExpandOldSetting(numMatches, matches);
+	ܦܢܐ ExpandOldSetting(numMatches, matches);
 
     char_u *option_val = *(char_u**)get_option_varp_scope(
 	expand_option_idx, expand_option_flags);
 
     long_u option_flags =  options[expand_option_idx].flags;
 
-    if (option_flags & P_NUM)
-	return ExpandOldSetting(numMatches, matches);
-    else if (option_flags & P_COMMA)
+    ܐܢ (option_flags & P_NUM)
+	ܦܢܐ ExpandOldSetting(numMatches, matches);
+    ܐܚܪܢܐ ܐܢ (option_flags & P_COMMA)
     {
 	// Split the option by comma, then present each option to the user if
 	// it matches the pattern.
@@ -8957,156 +8957,156 @@ ExpandSettingSubtract(
 	char_u	    *next_val;
 	char_u	    *comma;
 
-	if (*option_val == NUL)
-	    return FAIL;
+	ܐܢ (*option_val == NUL)
+	    ܦܢܐ FAIL;
 
 	// Make a copy as we need to inject null characters destructively.
 	option_copy = vim_strsave(option_val);
-	if (option_copy == NULL)
-	    return FAIL;
+	ܐܢ (option_copy == عدم)
+	    ܦܢܐ FAIL;
 	next_val = option_copy;
 
-	ga_init2(&ga, sizeof(char_u *), 10);
+	ga_init2(&ga, حجم(char_u *), 10);
 
-	do
+	ܥܒܕ
 	{
 	    item = next_val;
 	    comma = vim_strchr(next_val, ',');
-	    while (comma != NULL && comma != next_val && *(comma - 1) == '\\')
+	    ܟܡܐ (comma != عدم && comma != next_val && *(comma - 1) == '\\')
 	    {
 		// "\," is interpreted as a literal comma rather than option
 		// separator when reading options in copy_option_part(). Skip
 		// it.
 		comma = vim_strchr(comma + 1, ',');
 	    }
-	    if (comma != NULL)
+	    ܐܢ (comma != عدم)
 	    {
 		*comma = NUL; // null-terminate this value, required by later functions
 		next_val = comma + 1;
 	    }
-	    else
-		next_val = NULL;
+	    ܐܚܪܢܐ
+		next_val = عدم;
 
-	    if (*item == NUL)
+	    ܐܢ (*item == NUL)
 		// empty value, don't add to list
-		continue;
+		استمر;
 
-	    if (!vim_regexec(regmatch, item, (colnr_T)0))
-		continue;
+	    ܐܢ (!vim_regexec(regmatch, item, (colnr_T)0))
+		استمر;
 
 	    char_u *buf = escape_option_str_cmdline(item);
-	    if (buf == NULL)
+	    ܐܢ (buf == عدم)
 	    {
 		vim_free(option_copy);
 		ga_clear_strings(&ga);
-		return FAIL;
+		ܦܢܐ FAIL;
 	    }
-	    if (ga_add_string(&ga, buf) != OK)
+	    ܐܢ (ga_add_string(&ga, buf) != OK)
 	    {
 		vim_free(buf);
-		break;
+		اكسر;
 	    }
-	} while (next_val != NULL);
+	} ܟܡܐ (next_val != عدم);
 
 	vim_free(option_copy);
 
 	*matches = ga.ga_data;
 	*numMatches = ga.ga_len;
-	return OK;
+	ܦܢܐ OK;
     }
-    else if (option_flags & P_FLAGLIST)
+    ܐܚܪܢܐ ܐܢ (option_flags & P_FLAGLIST)
     {
 	// Only present the flags that are set on the option as the other flags
 	// are not meaningful to do set-= on.
 
-	if (*xp->xp_pattern != NUL)
+	ܐܢ (*xp->xp_pattern != NUL)
 	{
 	    // Don't suggest anything if cmdline is non-empty. Vim's set-=
 	    // behavior requires consecutive strings and it's usually
 	    // unintuitive to users if they try to subtract multiple flags at
 	    // once.
-	    return FAIL;
+	    ܦܢܐ FAIL;
 	}
 
 	size_t num_flags = STRLEN(option_val);
-	if (num_flags == 0)
-	    return FAIL;
+	ܐܢ (num_flags == 0)
+	    ܦܢܐ FAIL;
 
 	*matches = ALLOC_MULT(char_u *, num_flags + 1);
-	if (*matches == NULL)
-	    return FAIL;
+	ܐܢ (*matches == عدم)
+	    ܦܢܐ FAIL;
 
-	int count = 0;
+	صحيح count = 0;
 	char_u *p;
 
 	p = vim_strnsave(option_val, num_flags);
-	if (p == NULL)
+	ܐܢ (p == عدم)
 	{
 	    VIM_CLEAR(*matches);
-	    return FAIL;
+	    ܦܢܐ FAIL;
 	}
 	(*matches)[count++] = p;
 
-	if (num_flags > 1)
+	ܐܢ (num_flags > 1)
 	{
 	    // If more than one flags, split the flags up and expose each
 	    // character as individual choice.
-	    for (char_u *flag = option_val; *flag != NUL; flag++)
+	    لكل (char_u *flag = option_val; *flag != NUL; flag++)
 	    {
 		p = vim_strnsave(flag, 1);
-		if (p == NULL)
-		    break;
+		ܐܢ (p == عدم)
+		    اكسر;
 		(*matches)[count++] = p;
 	    }
 	}
 
 	*numMatches = count;
-	return OK;
+	ܦܢܐ OK;
     }
 
-    return ExpandOldSetting(numMatches, matches);
+    ܦܢܐ ExpandOldSetting(numMatches, matches);
 }
 
 /*
  * Get the value for the numeric or string option *opp in a nice format into
  * NameBuff[].  Must not be called with a hidden option!
  */
-    static void
+    ساكن فراغ
 option_value2string(
-    struct vimoption	*opp,
-    int			scope)	// OPT_GLOBAL and/or OPT_LOCAL
+    بنية vimoption	*opp,
+    صحيح			scope)	// OPT_GLOBAL and/or OPT_LOCAL
 {
     char_u	*varp;
 
     varp = get_varp_scope(opp, scope);
 
-    if (opp->flags & P_NUM)
+    ܐܢ (opp->flags & P_NUM)
     {
 	long wc = 0;
 
-	if (wc_use_keyname(varp, &wc))
-	    STRCPY(NameBuff, get_special_key_name((int)wc, 0));
-	else if (wc != 0)
-	    STRCPY(NameBuff, transchar((int)wc));
-	else
-	    sprintf((char *)NameBuff, "%ld", *(long *)varp);
+	ܐܢ (wc_use_keyname(varp, &wc))
+	    STRCPY(NameBuff, get_special_key_name((صحيح)wc, 0));
+	ܐܚܪܢܐ ܐܢ (wc != 0)
+	    STRCPY(NameBuff, transchar((صحيح)wc));
+	ܐܚܪܢܐ
+	    sprintf((حرف *)NameBuff, "%ld", *(long *)varp);
     }
-    else    // P_STRING
+    ܐܚܪܢܐ    // P_STRING
     {
 	varp = *(char_u **)(varp);
-	if (varp == NULL)		    // just in case
+	ܐܢ (varp == عدم)		    // just in case
 	    NameBuff[0] = NUL;
 #ifdef FEAT_CRYPT
 	// don't show the actual value of 'key', only that it's set
-	else if (opp->var == (char_u *)&p_key && *varp)
+	ܐܚܪܢܐ ܐܢ (opp->var == (char_u *)&p_key && *varp)
 	    STRCPY(NameBuff, "*****");
 #endif
-	else if (opp->flags & P_EXPAND)
-	    home_replace(NULL, varp, NameBuff, MAXPATHL, FALSE);
+	ܐܚܪܢܐ ܐܢ (opp->flags & P_EXPAND)
+	    home_replace(عدم, varp, NameBuff, MAXPATHL, FALSE);
 	// Translate 'pastetoggle' into special key names
-	else if ((char_u **)opp->var == &p_pt)
+	ܐܚܪܢܐ ܐܢ ((char_u **)opp->var == &p_pt)
 	    str2specialbuf(p_pt, NameBuff, MAXPATHL);
-	else
+	ܐܚܪܢܐ
 	    vim_strncpy(NameBuff, varp, MAXPATHL - 1);
     }
 }
@@ -9116,29 +9116,29 @@ option_value2string(
  * printed as a keyname.
  * "*wcp" is set to the value of the option if it's 'wildchar' or 'wildcharm'.
  */
-    static int
+    ساكن صحيح
 wc_use_keyname(char_u *varp, long *wcp)
 {
-    if (((long *)varp == &p_wc) || ((long *)varp == &p_wcm))
+    ܐܢ (((long *)varp == &p_wc) || ((long *)varp == &p_wcm))
     {
 	*wcp = *(long *)varp;
-	if (IS_SPECIAL(*wcp) || find_special_key_in_table((int)*wcp) >= 0)
-	    return TRUE;
+	ܐܢ (IS_SPECIAL(*wcp) || find_special_key_in_table((صحيح)*wcp) >= 0)
+	    ܦܢܐ TRUE;
     }
-    return FALSE;
+    ܦܢܐ FALSE;
 }
 
 /*
  * Return TRUE if "x" is present in 'shortmess' option, or
  * 'shortmess' contains 'a' and "x" is present in SHM_A.
  */
-    int
-shortmess(int x)
+    صحيح
+shortmess(صحيح x)
 {
-    return p_shm != NULL &&
-	    (   vim_strchr(p_shm, x) != NULL
-	    || (vim_strchr(p_shm, 'a') != NULL
-		&& vim_strchr((char_u *)SHM_A, x) != NULL));
+    ܦܢܐ p_shm != عدم &&
+	    (   vim_strchr(p_shm, x) != عدم
+	    || (vim_strchr(p_shm, 'a') != عدم
+		&& vim_strchr((char_u *)SHM_A, x) != عدم));
 }
 
 /*
@@ -9149,31 +9149,31 @@ shortmess(int x)
  * Don't do this if the 'compatible' option has been set or reset before.
  * When "fname" is not NULL, use it to set $"envname" when it wasn't set yet.
  */
-    void
+    فراغ
 vimrc_found(char_u *fname, char_u *envname)
 {
-    int		opt_idx;
-    int		dofree = FALSE;
+    صحيح		opt_idx;
+    صحيح		dofree = FALSE;
     char_u	*p;
 
-    if (!option_was_set((char_u *)"cp"))
+    ܐܢ (!option_was_set((char_u *)"cp"))
     {
 	p_cp = FALSE;
-	for (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
-	    if (!(options[opt_idx].flags & (P_WAS_SET|P_VI_DEF)))
+	لكل (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
+	    ܐܢ (!(options[opt_idx].flags & (P_WAS_SET|P_VI_DEF)))
 		set_option_default(opt_idx, OPT_FREE, FALSE);
 	didset_options();
 	didset_options2();
     }
 
-    if (fname != NULL)
+    ܐܢ (fname != عدم)
     {
 	p = vim_getenv(envname, &dofree);
-	if (p == NULL)
+	ܐܢ (p == عدم)
 	{
 	    // Set $MYVIMRC to the first vimrc file found.
 	    p = FullName_save(fname, FALSE);
-	    if (p != NULL)
+	    ܐܢ (p != عدم)
 	    {
 		vim_setenv(envname, p);
 		vim_free(p);
@@ -9181,7 +9181,7 @@ vimrc_found(char_u *fname, char_u *envname)
 	    // Set $MYVIMDIR
 	    export_myvimdir();
 	}
-	else if (dofree)
+	ܐܚܪܢܐ ܐܢ (dofree)
 	    vim_free(p);
     }
 }
@@ -9189,18 +9189,18 @@ vimrc_found(char_u *fname, char_u *envname)
 /*
  * Set 'compatible' on or off.  Called for "-C" and "-N" command line arg.
  */
-    void
-change_compatible(int on)
+    فراغ
+change_compatible(صحيح on)
 {
-    int	    opt_idx;
+    صحيح	    opt_idx;
 
-    if (p_cp != on)
+    ܐܢ (p_cp != on)
     {
 	p_cp = on;
 	compatible_set();
     }
     opt_idx = findoption((char_u *)"cp");
-    if (opt_idx >= 0)
+    ܐܢ (opt_idx >= 0)
 	options[opt_idx].flags |= P_WAS_SET;
 }
 
@@ -9208,32 +9208,32 @@ change_compatible(int on)
  * Return TRUE when option "name" has been set.
  * Only works correctly for global options.
  */
-    int
+    صحيح
 option_was_set(char_u *name)
 {
-    int idx;
+    صحيح idx;
 
     idx = findoption(name);
-    if (idx < 0)	// unknown option
-	return FALSE;
-    if (options[idx].flags & P_WAS_SET)
-	return TRUE;
-    return FALSE;
+    ܐܢ (idx < 0)	// unknown option
+	ܦܢܐ FALSE;
+    ܐܢ (options[idx].flags & P_WAS_SET)
+	ܦܢܐ TRUE;
+    ܦܢܐ FALSE;
 }
 
 /*
  * Reset the flag indicating option "name" was set.
  */
-    int
+    صحيح
 reset_option_was_set(char_u *name)
 {
-    int idx = findoption(name);
+    صحيح idx = findoption(name);
 
-    if (idx < 0)
-	return FAIL;
+    ܐܢ (idx < 0)
+	ܦܢܐ FAIL;
 
     options[idx].flags &= ~P_WAS_SET;
-    return OK;
+    ܦܢܐ OK;
 }
 
 /*
@@ -9244,13 +9244,13 @@ reset_option_was_set(char_u *name)
  * When 'compatible' is unset: Set all options that have a different default
  * for Vim (without the P_VI_DEF flag) to that default.
  */
-    static void
-compatible_set(void)
+    ساكن فراغ
+compatible_set(فراغ)
 {
-    int	    opt_idx;
+    صحيح	    opt_idx;
 
-    for (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
-	if (	   ((options[opt_idx].flags & P_VIM) && p_cp)
+    لكل (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
+	ܐܢ (	   ((options[opt_idx].flags & P_VIM) && p_cp)
 		|| (!(options[opt_idx].flags & P_VI_DEF) && !p_cp))
 	    set_option_default(opt_idx, OPT_FREE, p_cp);
     didset_options();
@@ -9260,22 +9260,22 @@ compatible_set(void)
 /*
  * Check if backspacing over something is allowed.
  */
-    int
+    صحيح
 can_bs(
-    int		what)	    // BS_INDENT, BS_EOL, BS_START or BS_NOSTOP
+    صحيح		what)	    // BS_INDENT, BS_EOL, BS_START or BS_NOSTOP
 {
 #ifdef FEAT_JOB_CHANNEL
-    if (what == BS_START && bt_prompt(curbuf))
-	return FALSE;
+    ܐܢ (what == BS_START && bt_prompt(curbuf))
+	ܦܢܐ FALSE;
 #endif
-    switch (*p_bs)
+    بدل (*p_bs)
     {
-	case '3':       return TRUE;
-	case '2':	return (what != BS_NOSTOP);
-	case '1':	return (what != BS_START);
-	case '0':	return FALSE;
+	حالة '3':       ܦܢܐ TRUE;
+	حالة '2':	ܦܢܐ (what != BS_NOSTOP);
+	حالة '1':	ܦܢܐ (what != BS_START);
+	حالة '0':	ܦܢܐ FALSE;
     }
-    return vim_strchr(p_bs, what) != NULL;
+    ܦܢܐ vim_strchr(p_bs, what) != عدم;
 }
 
 /*
@@ -9283,9 +9283,9 @@ can_bs(
  * global value when appropriate.
  */
     long
-get_scrolloff_value(void)
+get_scrolloff_value(فراغ)
 {
-    return curwin->w_p_so < 0 ? p_so : curwin->w_p_so;
+    ܦܢܐ curwin->w_p_so < 0 ? p_so : curwin->w_p_so;
 }
 
 /*
@@ -9293,9 +9293,9 @@ get_scrolloff_value(void)
  * global value when appropriate.
  */
     long
-get_scrolloffpad_value(void)
+get_scrolloffpad_value(فراغ)
 {
-    return curwin->w_p_sop == -1 ? p_sop : curwin->w_p_sop;
+    ܦܢܐ curwin->w_p_sop == -1 ? p_sop : curwin->w_p_sop;
 }
 
 /*
@@ -9303,167 +9303,167 @@ get_scrolloffpad_value(void)
  * global value when appropriate.
  */
     long
-get_sidescrolloff_value(void)
+get_sidescrolloff_value(فراغ)
 {
-    return curwin->w_p_siso < 0 ? p_siso : curwin->w_p_siso;
+    ܦܢܐ curwin->w_p_siso < 0 ? p_siso : curwin->w_p_siso;
 }
 
 /*
  * Get the local or global value of 'backupcopy' flags.
  */
-    unsigned int
+    unsigned صحيح
 get_bkc_flags(buf_T *buf)
 {
-    return buf->b_bkc_flags ? buf->b_bkc_flags : bkc_flags;
+    ܦܢܐ buf->b_bkc_flags ? buf->b_bkc_flags : bkc_flags;
 }
 
-#if defined(FEAT_LINEBREAK)
+#ܐܢ defined(FEAT_LINEBREAK)
 /*
  * Get the local or global value of 'formatlistpat'.
  */
     char_u *
 get_flp_value(buf_T *buf)
 {
-    if (buf->b_p_flp == NULL || *buf->b_p_flp == NUL)
-	return p_flp;
-    return buf->b_p_flp;
+    ܐܢ (buf->b_p_flp == عدم || *buf->b_p_flp == NUL)
+	ܦܢܐ p_flp;
+    ܦܢܐ buf->b_p_flp;
 }
 #endif
 
 /*
  * Get the local or global value of 'virtualedit' flags.
  */
-    unsigned int
-get_ve_flags(void)
+    unsigned صحيح
+get_ve_flags(فراغ)
 {
-    return (curwin->w_ve_flags ? curwin->w_ve_flags : ve_flags)
+    ܦܢܐ (curwin->w_ve_flags ? curwin->w_ve_flags : ve_flags)
 	    & ~(VE_NONE | VE_NONEU);
 }
 
-#if defined(FEAT_LINEBREAK)
+#ܐܢ defined(FEAT_LINEBREAK)
 /*
  * Get the local or global value of 'showbreak'.
  */
     char_u *
 get_showbreak_value(win_T *win)
 {
-    if (win->w_p_sbr == NULL || *win->w_p_sbr == NUL)
-	return p_sbr;
-    if (STRCMP(win->w_p_sbr, "NONE") == 0)
-	return empty_option;
-    return win->w_p_sbr;
+    ܐܢ (win->w_p_sbr == عدم || *win->w_p_sbr == NUL)
+	ܦܢܐ p_sbr;
+    ܐܢ (STRCMP(win->w_p_sbr, "NONE") == 0)
+	ܦܢܐ empty_option;
+    ܦܢܐ win->w_p_sbr;
 }
 #endif
 
-#if defined(FEAT_EVAL)
+#ܐܢ defined(FEAT_EVAL)
 /*
  * Get window or buffer local options.
  */
     dict_T *
-get_winbuf_options(int bufopt)
+get_winbuf_options(صحيح bufopt)
 {
     dict_T	*d;
-    int		opt_idx;
+    صحيح		opt_idx;
 
     d = dict_alloc();
-    if (d == NULL)
-	return NULL;
+    ܐܢ (d == عدم)
+	ܦܢܐ عدم;
 
-    for (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
+    لكل (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
     {
-	struct vimoption *opt = &options[opt_idx];
+	بنية vimoption *opt = &options[opt_idx];
 
-	if ((bufopt && (opt->indir & PV_BUF))
+	ܐܢ ((bufopt && (opt->indir & PV_BUF))
 					 || (!bufopt && (opt->indir & PV_WIN)))
 	{
 	    char_u *varp = get_varp(opt);
 
-	    if (varp != NULL)
+	    ܐܢ (varp != عدم)
 	    {
-		if (opt->flags & P_STRING)
+		ܐܢ (opt->flags & P_STRING)
 		    dict_add_string(d, opt->fullname, *(char_u **)varp);
-		else if (opt->flags & P_NUM)
+		ܐܚܪܢܐ ܐܢ (opt->flags & P_NUM)
 		    dict_add_number(d, opt->fullname, *(long *)varp);
-		else
-		    dict_add_number(d, opt->fullname, *(int *)varp);
+		ܐܚܪܢܐ
+		    dict_add_number(d, opt->fullname, *(صحيح *)varp);
 	    }
 	}
     }
 
-    return d;
+    ܦܢܐ d;
 }
 #endif
 
-#if defined(FEAT_SYN_HL)
+#ܐܢ defined(FEAT_SYN_HL)
 /*
  * This is called when 'culopt' is changed
  */
-    int
+    صحيح
 fill_culopt_flags(char_u *val, win_T *wp)
 {
     char_u	*p;
     char_u	culopt_flags_new = 0;
 
-    if (val == NULL)
+    ܐܢ (val == عدم)
 	p = wp->w_p_culopt;
-    else
+    ܐܚܪܢܐ
 	p = val;
-    while (*p != NUL)
+    ܟܡܐ (*p != NUL)
     {
 	// Note: Keep this in sync with p_culopt_values.
-	if (STRNCMP(p, "line", 4) == 0)
+	ܐܢ (STRNCMP(p, "line", 4) == 0)
 	{
 	    p += 4;
 	    culopt_flags_new |= CULOPT_LINE;
 	}
-	else if (STRNCMP(p, "both", 4) == 0)
+	ܐܚܪܢܐ ܐܢ (STRNCMP(p, "both", 4) == 0)
 	{
 	    p += 4;
 	    culopt_flags_new |= CULOPT_LINE | CULOPT_NBR;
 	}
-	else if (STRNCMP(p, "number", 6) == 0)
+	ܐܚܪܢܐ ܐܢ (STRNCMP(p, "number", 6) == 0)
 	{
 	    p += 6;
 	    culopt_flags_new |= CULOPT_NBR;
 	}
-	else if (STRNCMP(p, "screenline", 10) == 0)
+	ܐܚܪܢܐ ܐܢ (STRNCMP(p, "screenline", 10) == 0)
 	{
 	    p += 10;
 	    culopt_flags_new |= CULOPT_SCRLINE;
 	}
 
-	if (*p != ',' && *p != NUL)
-	    return FAIL;
-	if (*p == ',')
+	ܐܢ (*p != ',' && *p != NUL)
+	    ܦܢܐ FAIL;
+	ܐܢ (*p == ',')
 	    ++p;
     }
 
     // Can't have both "line" and "screenline".
-    if ((culopt_flags_new & CULOPT_LINE) && (culopt_flags_new & CULOPT_SCRLINE))
-	return FAIL;
+    ܐܢ ((culopt_flags_new & CULOPT_LINE) && (culopt_flags_new & CULOPT_SCRLINE))
+	ܦܢܐ FAIL;
     wp->w_p_culopt_flags = culopt_flags_new;
 
-    return OK;
+    ܦܢܐ OK;
 }
 #endif
 
 /*
  * Get the value of 'magic' adjusted for Vim9 script.
  */
-    int
-magic_isset(void)
+    صحيح
+magic_isset(فراغ)
 {
-    switch (magic_overruled)
+    بدل (magic_overruled)
     {
-	case OPTION_MAGIC_ON:      return TRUE;
-	case OPTION_MAGIC_OFF:     return FALSE;
-	case OPTION_MAGIC_NOT_SET: break;
+	حالة OPTION_MAGIC_ON:      ܦܢܐ TRUE;
+	حالة OPTION_MAGIC_OFF:     ܦܢܐ FALSE;
+	حالة OPTION_MAGIC_NOT_SET: اكسر;
     }
 #ifdef FEAT_EVAL
-    if (in_vim9script())
-	return TRUE;
+    ܐܢ (in_vim9script())
+	ܦܢܐ TRUE;
 #endif
-    return p_magic;
+    ܦܢܐ p_magic;
 }
 
 /*
@@ -9472,66 +9472,66 @@ magic_isset(void)
  * Returns OK if the option is successfully set to a function, otherwise
  * returns FAIL.
  */
-    int
+    صحيح
 option_set_callback_func(char_u *optval UNUSED, callback_T *optcb UNUSED)
 {
 #ifdef FEAT_EVAL
     typval_T	*tv;
     callback_T	cb;
-    int		funcname = FALSE;
+    صحيح		funcname = FALSE;
 
-    if (optval == NULL || *optval == NUL)
+    ܐܢ (optval == عدم || *optval == NUL)
     {
 	free_callback(optcb);
-	return OK;
+	ܦܢܐ OK;
     }
 
-    if (*optval == '{' || (in_vim9script() && *optval == '(')
+    ܐܢ (*optval == '{' || (in_vim9script() && *optval == '(')
 	    || (STRNCMP(optval, "function(", 9) == 0)
 	    || (STRNCMP(optval, "funcref(", 8) == 0))
 	// Lambda expression or a funcref
-	tv = eval_expr(optval, NULL);
-    else
+	tv = eval_expr(optval, عدم);
+    ܐܚܪܢܐ
     {
 	// treat everything else as a function name string
 	tv = alloc_string_tv(vim_strsave(optval));
 	funcname = TRUE;
     }
-    if (tv == NULL)
-	return FAIL;
+    ܐܢ (tv == عدم)
+	ܦܢܐ FAIL;
 
     cb = get_callback(tv);
-    if (cb.cb_name == NULL || *cb.cb_name == NUL)
+    ܐܢ (cb.cb_name == عدم || *cb.cb_name == NUL)
     {
 	free_tv(tv);
-	return FAIL;
+	ܦܢܐ FAIL;
     }
 
     free_callback(optcb);
     set_callback(optcb, &cb);
     free_tv(tv);
 
-    char_u  *dot = NULL;
-    if (in_vim9script() && funcname
-				&& ((dot = vim_strchr(optval, '.')) != NULL))
+    char_u  *dot = عدم;
+    ܐܢ (in_vim9script() && funcname
+				&& ((dot = vim_strchr(optval, '.')) != عدم))
     {
-	if (optcb->cb_free_name)
+	ܐܢ (optcb->cb_free_name)
 	    vim_free(optcb->cb_name);
 
 	imported_T *import = find_imported(optval, dot - optval, FALSE);
-	if (import != NULL && SCRIPT_ID_VALID(import->imp_sid)
+	ܐܢ (import != عدم && SCRIPT_ID_VALID(import->imp_sid)
 				&& !(import->imp_flags & IMP_FLAGS_AUTOLOAD))
 	{
 	    char_u	fnamebuf[MAX_FUNC_NAME_LEN];
 
 	    // Imported non-autoloaded function.  Replace the import script
 	    // name (import.funcname) with the script ID (<SNR>123_funcname)
-	    vim_snprintf((char *)fnamebuf, sizeof(fnamebuf), "<SNR>%d_%s",
+	    vim_snprintf((حرف *)fnamebuf, حجم(fnamebuf), "<SNR>%d_%s",
 						import->imp_sid, dot + 1);
 	    optcb->cb_name = vim_strsave(fnamebuf);
 	    optcb->cb_free_name = TRUE;
 	}
-	else
+	ܐܚܪܢܐ
 	{
 	    // Imported autoloaded function.  Store the function name as
 	    // "import.funcname".
@@ -9543,35 +9543,35 @@ option_set_callback_func(char_u *optval UNUSED, callback_T *optcb UNUSED)
     // "import#funcname".
     expand_autload_callback(optcb);
 
-    return OK;
-#else
-    return FAIL;
+    ܦܢܐ OK;
+#ܐܚܪܢܐ
+    ܦܢܐ FAIL;
 #endif
 }
 
-#if defined(FEAT_TABPANEL)
+#ܐܢ defined(FEAT_TABPANEL)
 /*
  * Process the new 'showtabpanel' option value.
  */
-    char *
+    حرف *
 did_set_showtabpanel(optset_T *args UNUSED)
 {
     shell_new_columns();
-    return NULL;
+    ܦܢܐ عدم;
 }
 #endif
 
-#if defined(FEAT_EVAL)
-    static void
-didset_options_sctx(int opt_flags, char **buf)
+#ܐܢ defined(FEAT_EVAL)
+    ساكن فراغ
+didset_options_sctx(صحيح opt_flags, حرف **buf)
 {
-	for (int i = 0; ; ++i)
+	لكل (صحيح i = 0; ; ++i)
 	{
-	    if (buf[i] == NULL)
-		break;
+	    ܐܢ (buf[i] == عدم)
+		اكسر;
 
-	    int idx = findoption((char_u *)buf[i]);
-	    if (idx >= 0)
+	    صحيح idx = findoption((char_u *)buf[i]);
+	    ܐܢ (idx >= 0)
 		set_option_sctx_idx(idx, opt_flags, current_sctx);
 	}
 }

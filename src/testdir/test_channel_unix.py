@@ -5,26 +5,26 @@
 #
 # This requires Python 2.6 or later.
 
-from __future__ import print_function
-from test_channel import ThreadedTCPServer, TestingRequestHandler, \
+من __future__ استورد print_function
+من test_channel استورد ThreadedTCPServer, TestingRequestHandler, \
     writePortInFile
-import socket
-import threading
-import os
+استورد socket
+استورد threading
+استورد os
 
-try:
+حاول:
     FileNotFoundError
-except NameError:
+استثناء NameError:
     # Python 2
     FileNotFoundError = (IOError, OSError)
 
-if not hasattr(socket, "AF_UNIX"):
-    raise NotImplementedError("Unix sockets are not supported on this platform")
+ܐܢ ܠܐ hasattr(socket, "AF_UNIX"):
+    ارفع NotImplementedError("Unix sockets are not supported on this platform")
 
-class ThreadedUnixServer(ThreadedTCPServer):
+صنف ThreadedUnixServer(ThreadedTCPServer):
     address_family = socket.AF_UNIX
 
-class ThreadedUnixRequestHandler(TestingRequestHandler):
+صنف ThreadedUnixRequestHandler(TestingRequestHandler):
     pass
 
 def main(path):
@@ -32,7 +32,7 @@ def main(path):
 
     # Start a thread with the server.  That thread will then start a new thread
     # for each connection.
-    server_thread = threading.Thread(target=server.serve_forever)
+    server_thread = threading.خيط(target=server.serve_forever)
     server_thread.start()
 
     # Signal the test harness we're ready, the port value has no meaning.
@@ -42,15 +42,15 @@ def main(path):
 
     # Main thread terminates, but the server continues running
     # until server.shutdown() is called.
-    try:
-        while server_thread.is_alive():
+    حاول:
+        ܟܡܐ server_thread.is_alive():
             server_thread.join(1)
-    except (KeyboardInterrupt, SystemExit):
+    استثناء (KeyboardInterrupt, SystemExit):
         server.shutdown()
 
-if __name__ == "__main__":
-    try:
+ܐܢ __name__ == "__main__":
+    حاول:
         os.remove("Xtestsocket")
-    except FileNotFoundError:
+    استثناء FileNotFoundError:
         pass
     main("Xtestsocket")
