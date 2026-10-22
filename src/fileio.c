@@ -13,14 +13,14 @@
 
 #include "vim.h"
 
-#if defined(__TANDEM)
+#အကယ်၍ defined(__TANDEM)
 # include <limits.h>		// for SSIZE_MAX
 #endif
-#if (defined(UNIX) || defined(VMS)) && defined(FEAT_EVAL)
+#အကယ်၍ (defined(UNIX) || defined(VMS)) && defined(FEAT_EVAL)
 # include <pwd.h>
 # include <grp.h>
 #endif
-#if defined(VMS) && defined(HAVE_XOS_R_H)
+#အကယ်၍ defined(VMS) && defined(HAVE_XOS_R_H)
 # include <x11/xos_r.h>
 #endif
 
@@ -31,23 +31,23 @@
 // non-ASCII bytes (high bit set) in multiple bytes at once.
 #define NONASCII_MASK (((long_u)-1 / 0xFF) * 0x80)
 
-#if defined(__hpux) && !defined(HAVE_DIRFD)
+#အကယ်၍ defined(__hpux) && !defined(HAVE_DIRFD)
 # define dirfd(x) ((x)->__dd_fd)
 # define HAVE_DIRFD
 #endif
 
-static char_u *next_fenc(char_u **pp, int *alloced);
+static char_u *next_fenc(char_u **pp, ကိန်းပြည့် *alloced);
 #ifdef FEAT_EVAL
-static char_u *readfile_charconvert(char_u *fname, char_u *fenc, int *fdp);
+static char_u *readfile_charconvert(char_u *fname, char_u *fenc, ကိန်းပြည့် *fdp);
 #endif
 #ifdef FEAT_CRYPT
-static char_u *check_for_cryptkey(char_u *cryptkey, char_u *ptr, long *sizep, off_T *filesizep, int newfile, char_u *fname, int *did_ask);
+static char_u *check_for_cryptkey(char_u *cryptkey, char_u *ptr, long *sizep, off_T *filesizep, ကိန်းပြည့် newfile, char_u *fname, ကိန်းပြည့် *did_ask);
 #endif
 static linenr_T readfile_linenr(linenr_T linecnt, char_u *p, char_u *endp);
-static char_u *check_for_bom(char_u *p, long size, int *lenp, int flags);
+static char_u *check_for_bom(char_u *p, long size, ကိန်းပြည့် *lenp, ကိန်းပြည့် flags);
 
 #ifdef FEAT_EVAL
-static int readdirex_sort;
+static ကိန်းပြည့် readdirex_sort;
 #endif
 
     void
@@ -55,26 +55,26 @@ filemess(
     buf_T	*buf,
     char_u	*name,
     char_u	*s,
-    int		attr)
+    ကိန်းပြည့်		attr)
 {
-    int		msg_scroll_save;
-    int		prev_msg_col = msg_col;
+    ကိန်းပြည့်		msg_scroll_save;
+    ကိန်းပြည့်		prev_msg_col = msg_col;
     size_t	len;
 
-    if (msg_silent != 0)
-	return;
+    အကယ်၍ (msg_silent != 0)
+	ပြန်ပေး;
     msg_add_fname(buf, name);	    // put file name in IObuff with quotes
 
     // If it's extremely long, truncate it.
     len = STRLEN(IObuff);
-    if (len > IOSIZE - 100)
+    အကယ်၍ (len > IOSIZE - 100)
     {
 	len = IOSIZE - 100;
 	IObuff[len] = NUL;
     }
 
     // Avoid an over-long translation to cause trouble.
-    if (*s != NUL)
+    အကယ်၍ (*s != NUL)
 	STRNCPY(IObuff + len, s, 99);
 
     /*
@@ -83,12 +83,12 @@ filemess(
      * calling filemess().
      */
     msg_scroll_save = msg_scroll;
-    if (shortmess(SHM_OVERALL) && !exiting && p_verbose == 0)
+    အကယ်၍ (shortmess(SHM_OVERALL) && !exiting && p_verbose == 0)
 	msg_scroll = FALSE;
-    if (!msg_scroll)	// wait a bit when overwriting an error msg
+    အကယ်၍ (!msg_scroll)	// wait a bit when overwriting an error msg
 	check_for_delay(FALSE);
     msg_start();
-    if (prev_msg_col != 0 && msg_col == 0)
+    အကယ်၍ (prev_msg_col != 0 && msg_col == 0)
 	msg_putchar('\r');  // overwrite any previous message.
     msg_scroll = msg_scroll_save;
     msg_scrolled_ign = TRUE;
@@ -125,7 +125,7 @@ filemess(
  *
  * return FAIL for failure, NOTDONE for directory (failure), or OK
  */
-    int
+    ကိန်းပြည့်
 readfile(
     char_u	*fname,
     char_u	*sfname,
@@ -133,17 +133,17 @@ readfile(
     linenr_T	lines_to_skip,
     linenr_T	lines_to_read,
     exarg_T	*eap,			// can be NULL!
-    int		flags)
+    ကိန်းပြည့်		flags)
 {
-    int		retval = FAIL;	// jump to "theend" instead of returning
-    int		fd = 0;
-    int		newfile = (flags & READ_NEW);
-    int		check_readonly;
-    int		filtering = (flags & READ_FILTER);
-    int		read_stdin = (flags & READ_STDIN);
-    int		read_buffer = (flags & READ_BUFFER);
-    int		read_fifo = (flags & READ_FIFO);
-    int		set_options = newfile || read_buffer
+    ကိန်းပြည့်		retval = FAIL;	// jump to "theend" instead of returning
+    ကိန်းပြည့်		fd = 0;
+    ကိန်းပြည့်		newfile = (flags & READ_NEW);
+    ကိန်းပြည့်		check_readonly;
+    ကိန်းပြည့်		filtering = (flags & READ_FILTER);
+    ကိန်းပြည့်		read_stdin = (flags & READ_STDIN);
+    ကိန်းပြည့်		read_buffer = (flags & READ_BUFFER);
+    ကိန်းပြည့်		read_fifo = (flags & READ_FIFO);
+    ကိန်းပြည့်		set_options = newfile || read_buffer
 					   || (eap != NULL && eap->read_edit);
     linenr_T	read_buf_lnum = 1;	// next line to read from curbuf
     colnr_T	read_buf_col = 0;	// next char to read from this line
@@ -153,86 +153,86 @@ readfile(
     char_u	*buffer = NULL;		// read buffer
     char_u	*new_buffer = NULL;	// init to shut up gcc
     char_u	*line_start = NULL;	// init to shut up gcc
-    int		wasempty;		// buffer was empty before reading
+    ကိန်းပြည့်		wasempty;		// buffer was empty before reading
     colnr_T	len;
     long	size = 0;
     char_u	*p;
     off_T	filesize = 0;
-    int		skip_read = FALSE;
+    ကိန်းပြည့်		skip_read = FALSE;
 #ifdef FEAT_CRYPT
     off_T       filesize_disk = 0;      // file size read from disk
     off_T       filesize_count = 0;     // counter
     char_u	*cryptkey = NULL;
-    int		did_ask_for_key = FALSE;
+    ကိန်းပြည့်		did_ask_for_key = FALSE;
 #endif
 #ifdef FEAT_PERSISTENT_UNDO
     context_sha256_T sha_ctx;
-    int		read_undo_file = FALSE;
+    ကိန်းပြည့်		read_undo_file = FALSE;
 #endif
-    int		split = 0;		// number of split lines
+    ကိန်းပြည့်		split = 0;		// number of split lines
 #define UNKNOWN	 0x0fffffff		// file size is unknown
     linenr_T	linecnt;
-    int		error = FALSE;		// errors encountered
-    int		ff_error = EOL_UNKNOWN; // file format with errors
+    ကိန်းပြည့်		error = FALSE;		// errors encountered
+    ကိန်းပြည့်		ff_error = EOL_UNKNOWN; // file format with errors
     long	linerest = 0;		// remaining chars in line
 #ifdef UNIX
-    int		perm = 0;
-    int		swap_mode = -1;		// protection bits for swap file
-#else
-    int		perm;
+    ကိန်းပြည့်		perm = 0;
+    ကိန်းပြည့်		swap_mode = -1;		// protection bits for swap file
+#မဟုတ်ပါက
+    ကိန်းပြည့်		perm;
 #endif
-    int		fileformat = 0;		// end-of-line format
-    int		keep_fileformat = FALSE;
+    ကိန်းပြည့်		fileformat = 0;		// end-of-line format
+    ကိန်းပြည့်		keep_fileformat = FALSE;
     stat_T	st;
-    int		file_readonly;
+    ကိန်းပြည့်		file_readonly;
     linenr_T	skip_count = 0;
     linenr_T	read_count = 0;
-    int		msg_save = msg_scroll;
+    ကိန်းပြည့်		msg_save = msg_scroll;
     linenr_T	read_no_eol_lnum = 0;   // non-zero lnum when last line of
 					// last read was missing the eol
-    int		try_mac;
-    int		try_dos;
-    int		try_unix;
-    int		file_rewind = FALSE;
-    int		can_retry;
+    ကိန်းပြည့်		try_mac;
+    ကိန်းပြည့်		try_dos;
+    ကိန်းပြည့်		try_unix;
+    ကိန်းပြည့်		file_rewind = FALSE;
+    ကိန်းပြည့်		can_retry;
     linenr_T	conv_error = 0;		// line nr with conversion error
     linenr_T	illegal_byte = 0;	// line nr with illegal byte
-    int		keep_dest_enc = FALSE;	// don't retry when char doesn't fit
+    ကိန်းပြည့်		keep_dest_enc = FALSE;	// don't retry when char doesn't fit
 					// in destination encoding
-    int		bad_char_behavior = BAD_REPLACE;
+    ကိန်းပြည့်		bad_char_behavior = BAD_REPLACE;
 					// BAD_KEEP, BAD_DROP or character to
 					// replace with
     char_u	*tmpname = NULL;	// name of 'charconvert' output file
-    int		fio_flags = 0;
+    ကိန်းပြည့်		fio_flags = 0;
     char_u	*fenc;			// fileencoding to use
-    int		fenc_alloced;		// fenc_next is in allocated memory
+    ကိန်းပြည့်		fenc_alloced;		// fenc_next is in allocated memory
     char_u	*fenc_next = NULL;	// next item in 'fencs' or NULL
-    int		advance_fenc = FALSE;
+    ကိန်းပြည့်		advance_fenc = FALSE;
     long	real_size = 0;
 #ifdef USE_ICONV
     iconv_t	iconv_fd = (iconv_t)-1;	// descriptor for iconv() or -1
 # ifdef FEAT_EVAL
-    int		did_iconv = FALSE;	// TRUE when iconv() failed and trying
+    ကိန်းပြည့်		did_iconv = FALSE;	// TRUE when iconv() failed and trying
 					// 'charconvert' next
 # endif
 #endif
-    int		converted = FALSE;	// TRUE if conversion done
-    int		notconverted = FALSE;	// TRUE if conversion wanted but it
+    ကိန်းပြည့်		converted = FALSE;	// TRUE if conversion done
+    ကိန်းပြည့်		notconverted = FALSE;	// TRUE if conversion wanted but it
 					// wasn't possible
     char_u	conv_rest[CONV_RESTLEN];
-    int		conv_restlen = 0;	// nr of bytes in conv_rest[]
+    ကိန်းပြည့်		conv_restlen = 0;	// nr of bytes in conv_rest[]
     pos_T	orig_start;
     buf_T	*old_curbuf;
     char_u	*old_b_ffname;
     char_u	*old_b_fname;
-    int		using_b_ffname;
-    int		using_b_fname;
-    static char *msg_is_a_directory = N_("is a directory");
+    ကိန်းပြည့်		using_b_ffname;
+    ကိန်းပြည့်		using_b_fname;
+    static var_na *msg_is_a_directory = N_("is a directory");
 #ifdef FEAT_CRYPT
-    int		eof = FALSE;
+    ကိန်းပြည့်		eof = FALSE;
 #endif
 #ifdef FEAT_SODIUM
-    int		may_need_lseek = FALSE;
+    ကိန်းပြည့်		may_need_lseek = FALSE;
 #endif
     size_t	fnamelen = 0;
 
@@ -246,13 +246,13 @@ readfile(
      * Don't do this for a read from a filter.
      * Only do this when 'cpoptions' contains the 'f' flag.
      */
-    if (curbuf->b_ffname == NULL
+    အကယ်၍ (curbuf->b_ffname == NULL
 	    && !filtering
 	    && fname != NULL
 	    && vim_strchr(p_cpo, CPO_FNAMER) != NULL
 	    && !(flags & READ_DUMMY))
     {
-	if (set_rw_fname(fname, sfname) == FAIL)
+	အကယ်၍ (set_rw_fname(fname, sfname) == FAIL)
 	    goto theend;
     }
 
@@ -280,9 +280,9 @@ readfile(
      * Don't do this for MS-DOS, a "cd" in a sub-shell may have moved us to
      * another directory, which we don't detect.
      */
-    if (sfname == NULL)
+    အကယ်၍ (sfname == NULL)
 	sfname = fname;
-#if defined(UNIX)
+#အကယ်၍ defined(UNIX)
     fname = sfname;
 #endif
 
@@ -290,7 +290,7 @@ readfile(
      * The BufReadCmd and FileReadCmd events intercept the reading process by
      * executing the associated commands instead.
      */
-    if (!filtering && !read_stdin && !read_buffer)
+    အကယ်၍ (!filtering && !read_stdin && !read_buffer)
     {
 	orig_start = curbuf->b_op_start;
 
@@ -298,14 +298,14 @@ readfile(
 	curbuf->b_op_start.lnum = ((from == 0) ? 1 : from);
 	curbuf->b_op_start.col = 0;
 
-	if (newfile)
+	အကယ်၍ (newfile)
 	{
-	    if (apply_autocmds_exarg(EVENT_BUFREADCMD, NULL, sfname,
+	    အကယ်၍ (apply_autocmds_exarg(EVENT_BUFREADCMD, NULL, sfname,
 							  FALSE, curbuf, eap))
 	    {
 		retval = OK;
 #ifdef FEAT_EVAL
-		if (aborting())
+		အကယ်၍ (aborting())
 		    retval = FAIL;
 #endif
 		// The BufReadCmd code usually uses ":read" to get the text and
@@ -313,17 +313,17 @@ readfile(
 		// consider this to work like ":edit", thus reset the
 		// BF_NOTEDITED flag.  Then ":write" will work to overwrite the
 		// same file.
-		if (retval == OK)
+		အကယ်၍ (retval == OK)
 		    curbuf->b_flags &= ~BF_NOTEDITED;
 		goto theend;
 	    }
 	}
-	else if (apply_autocmds_exarg(EVENT_FILEREADCMD, sfname, sfname,
+	မဟုတ်ပါက အကယ်၍ (apply_autocmds_exarg(EVENT_FILEREADCMD, sfname, sfname,
 							    FALSE, NULL, eap))
 	{
 #ifdef FEAT_EVAL
 	    retval = aborting() ? FAIL : OK;
-#else
+#မဟုတ်ပါက
 	    retval = OK;
 #endif
 	    goto theend;
@@ -331,7 +331,7 @@ readfile(
 
 	curbuf->b_op_start = orig_start;
 
-	if (flags & READ_NOFILE)
+	အကယ်၍ (flags & READ_NOFILE)
 	{
 	    // Return NOTDONE instead of FAIL so that BufEnter can be triggered
 	    // and other operations don't fail.
@@ -340,17 +340,17 @@ readfile(
 	}
     }
 
-    if ((shortmess(SHM_OVER) || curbuf->b_help) && p_verbose == 0)
+    အကယ်၍ ((shortmess(SHM_OVER) || curbuf->b_help) && p_verbose == 0)
 	msg_scroll = FALSE;	// overwrite previous file message
-    else
+    မဟုတ်ပါက
 	msg_scroll = TRUE;	// don't overwrite previous file message
 
-    if (fname != NULL && *fname != NUL)
+    အကယ်၍ (fname != NULL && *fname != NUL)
     {
 	fnamelen = STRLEN(fname);
 
 	// If the name is too long we might crash further on, quit here.
-	if (fnamelen >= MAXPATHL)
+	အကယ်၍ (fnamelen >= MAXPATHL)
 	{
 	    filemess(curbuf, fname, (char_u *)_("Illegal file name"), 0);
 	    msg_end();
@@ -361,7 +361,7 @@ readfile(
 	// If the name ends in a path separator, we can't open it.  Check here,
 	// because reading the file may actually work, but then creating the
 	// swap file may destroy it!  Reported on MS-DOS and Win 95.
-	if (after_pathsep(fname, fname + fnamelen))
+	အကယ်၍ (after_pathsep(fname, fname + fnamelen))
 	{
 	    filemess(curbuf, fname, (char_u *)_(msg_is_a_directory), 0);
 	    msg_end();
@@ -370,15 +370,15 @@ readfile(
 	    goto theend;
 	}
     }
-#if defined(UNIX) || defined(VMS)
-    if (!read_stdin && fname != NULL)
+#အကယ်၍ defined(UNIX) || defined(VMS)
+    အကယ်၍ (!read_stdin && fname != NULL)
 	perm = mch_getperm(fname);
 #endif
 
-    if (!read_stdin && !read_buffer && !read_fifo)
+    အကယ်၍ (!read_stdin && !read_buffer && !read_fifo)
     {
-#if defined(UNIX) || defined(VMS)
-	if (perm >= 0 && !S_ISREG(perm)		    // not a regular file ...
+#အကယ်၍ defined(UNIX) || defined(VMS)
+	အကယ်၍ (perm >= 0 && !S_ISREG(perm)		    // not a regular file ...
 		      && !S_ISFIFO(perm)	    // ... or fifo
 		      && !S_ISSOCK(perm)	    // ... or socket
 # ifdef OPEN_CHR_FILES
@@ -391,24 +391,24 @@ readfile(
 	     * On Unix it is possible to read a directory, so we have to
 	     * check for it before the mch_open().
 	     */
-	    if (S_ISDIR(perm))
+	    အကယ်၍ (S_ISDIR(perm))
 	    {
 		filemess(curbuf, fname, (char_u *)_(msg_is_a_directory), 0);
 		retval = NOTDONE;
 	    }
-	    else
+	    မဟုတ်ပါက
 		filemess(curbuf, fname, (char_u *)_("is not a file"), 0);
 	    msg_end();
 	    msg_scroll = msg_save;
 	    goto theend;
 	}
 #endif
-#if defined(MSWIN)
+#အကယ်၍ defined(MSWIN)
 	/*
 	 * MS-Windows allows opening a device, but we will probably get stuck
 	 * trying to read it.
 	 */
-	if (!p_odev && mch_nodetype(fname) == NODE_WRITABLE)
+	အကယ်၍ (!p_odev && mch_nodetype(fname) == NODE_WRITABLE)
 	{
 	    filemess(curbuf, fname, (char_u *)_("is a device (disabled with 'opendevice' option)"), 0);
 	    msg_end();
@@ -428,13 +428,13 @@ readfile(
      * Only set/reset b_p_ro when BF_CHECK_RO is set.
      */
     check_readonly = (newfile && (curbuf->b_flags & BF_CHECK_RO));
-    if (check_readonly && !readonlymode)
+    အကယ်၍ (check_readonly && !readonlymode)
 	curbuf->b_p_ro = FALSE;
 
-    if (newfile && !read_stdin && !read_buffer && !read_fifo)
+    အကယ်၍ (newfile && !read_stdin && !read_buffer && !read_fifo)
     {
 	// Remember time of file.
-	if (mch_stat((char *)fname, &st) >= 0)
+	အကယ်၍ (mch_stat((var_na *)fname, &st) >= 0)
 	{
 	    buf_store_time(curbuf, &st, fname);
 	    curbuf->b_mtime_read = curbuf->b_mtime;
@@ -462,7 +462,7 @@ readfile(
 	    curbuf->b_fab_mrs = st.st_fab_mrs;
 #endif
 	}
-	else
+	မဟုတ်ပါက
 	{
 	    curbuf->b_mtime = 0;
 	    curbuf->b_mtime_ns = 0;
@@ -482,39 +482,39 @@ readfile(
  * for Amiga: check readonly by trying to open the file for writing
  */
     file_readonly = FALSE;
-    if (read_stdin)
+    အကယ်၍ (read_stdin)
     {
-#if defined(MSWIN)
+#အကယ်၍ defined(MSWIN)
 	// Force binary I/O on stdin to avoid CR-LF -> LF conversion.
 	setmode(0, O_BINARY);
 #endif
     }
-    else if (!read_buffer)
+    မဟုတ်ပါက အကယ်၍ (!read_buffer)
     {
 #ifdef USE_MCH_ACCESS
-	if (
+	အကယ်၍ (
 # ifdef UNIX
 	    !(perm & 0222) ||
 # endif
-				mch_access((char *)fname, W_OK))
+				mch_access((var_na *)fname, W_OK))
 	    file_readonly = TRUE;
-	fd = mch_open((char *)fname, O_RDONLY | O_EXTRA, 0);
-#else
-	if (!newfile
+	fd = mch_open((var_na *)fname, O_RDONLY | O_EXTRA, 0);
+#မဟုတ်ပါက
+	အကယ်၍ (!newfile
 		|| readonlymode
-		|| (fd = mch_open((char *)fname, O_RDWR | O_EXTRA, 0)) < 0)
+		|| (fd = mch_open((var_na *)fname, O_RDWR | O_EXTRA, 0)) < 0)
 	{
 	    file_readonly = TRUE;
 	    // try to open ro
-	    fd = mch_open((char *)fname, O_RDONLY | O_EXTRA, 0);
+	    fd = mch_open((var_na *)fname, O_RDONLY | O_EXTRA, 0);
 	}
 #endif
     }
 
-    if (fd < 0)			    // cannot open at all
+    အကယ်၍ (fd < 0)			    // cannot open at all
     {
 #ifndef UNIX
-	int	isdir_f;
+	ကိန်းပြည့်	isdir_f;
 #endif
 	msg_scroll = msg_save;
 #ifndef UNIX
@@ -523,16 +523,16 @@ readfile(
 	 */
 	isdir_f = (mch_isdir(fname));
 	perm = mch_getperm(fname);  // check if the file exists
-	if (isdir_f)
+	အကယ်၍ (isdir_f)
 	{
 	    filemess(curbuf, sfname, (char_u *)_(msg_is_a_directory), 0);
 	    curbuf->b_p_ro = TRUE;	// must use "w!" now
 	}
-	else
+	မဟုတ်ပါက
 #endif
-	    if (newfile)
+	    အကယ်၍ (newfile)
 	    {
-		if (perm < 0
+		အကယ်၍ (perm < 0
 #ifdef ENOENT
 			&& errno == ENOENT
 #endif
@@ -547,11 +547,11 @@ readfile(
 		    // Create a swap file now, so that other Vims are warned
 		    // that we are editing this file.  Don't do this for a
 		    // "nofile" or "nowrite" buffer type.
-		    if (!bt_dontwrite(curbuf))
+		    အကယ်၍ (!bt_dontwrite(curbuf))
 		    {
 			check_need_swap(newfile);
 			// SwapExists autocommand may mess things up
-			if (curbuf != old_curbuf
+			အကယ်၍ (curbuf != old_curbuf
 				|| (using_b_ffname
 					&& (old_b_ffname != curbuf->b_ffname))
 				|| (using_b_fname
@@ -561,10 +561,10 @@ readfile(
 			    goto theend;
 			}
 		    }
-		    if (dir_of_file_exists(fname))
+		    အကယ်၍ (dir_of_file_exists(fname))
 			filemess(curbuf, sfname,
 					      (char_u *)new_file_message(), 0);
-		    else
+		    မဟုတ်ပါက
 			filemess(curbuf, sfname,
 					   (char_u *)_("[New DIRECTORY]"), 0);
 #ifdef FEAT_VIMINFO
@@ -573,20 +573,20 @@ readfile(
 		    check_marks_read();
 #endif
 		    // Set forced 'fileencoding'.
-		    if (eap != NULL)
+		    အကယ်၍ (eap != NULL)
 			set_forced_fenc(eap);
 		    apply_autocmds_exarg(EVENT_BUFNEWFILE, sfname, sfname,
 							  FALSE, curbuf, eap);
 		    // remember the current fileformat
 		    save_file_ff(curbuf);
 
-#if defined(FEAT_EVAL)
-		    if (!aborting())   // autocmds may abort script processing
+#အကယ်၍ defined(FEAT_EVAL)
+		    အကယ်၍ (!aborting())   // autocmds may abort script processing
 #endif
 			retval = OK;	    // a new file is not an error
 		    goto theend;
 		}
-		else
+		မဟုတ်ပါက
 		{
 		    filemess(curbuf, sfname, (char_u *)(
 #ifdef EFBIG
@@ -607,14 +607,14 @@ readfile(
      * Only set the 'ro' flag for readonly files the first time they are
      * loaded.	Help files always get readonly mode
      */
-    if ((check_readonly && file_readonly) || curbuf->b_help)
+    အကယ်၍ ((check_readonly && file_readonly) || curbuf->b_help)
 	curbuf->b_p_ro = TRUE;
 
-    if (set_options)
+    အကယ်၍ (set_options)
     {
 	// Don't change 'eol' if reading from buffer as it will already be
 	// correctly set when reading stdin.
-	if (!read_buffer)
+	အကယ်၍ (!read_buffer)
 	{
 	    curbuf->b_p_eof = FALSE;
 	    curbuf->b_start_eof = FALSE;
@@ -628,21 +628,21 @@ readfile(
     // Create a swap file now, so that other Vims are warned that we are
     // editing this file.
     // Don't do this for a "nofile" or "nowrite" buffer type.
-    if (!bt_dontwrite(curbuf))
+    အကယ်၍ (!bt_dontwrite(curbuf))
     {
 	check_need_swap(newfile);
-	if (!read_stdin && (curbuf != old_curbuf
+	အကယ်၍ (!read_stdin && (curbuf != old_curbuf
 		|| (using_b_ffname && (old_b_ffname != curbuf->b_ffname))
 		|| (using_b_fname && (old_b_fname != curbuf->b_fname))))
 	{
 	    emsg(_(e_autocommands_changed_buffer_or_buffer_name));
-	    if (!read_buffer)
+	    အကယ်၍ (!read_buffer)
 		close(fd);
 	    goto theend;
 	}
 #ifdef UNIX
 	// Set swap file protection bits after creating it.
-	if (swap_mode > 0 && curbuf->b_ml.ml_mfp != NULL
+	အကယ်၍ (swap_mode > 0 && curbuf->b_ml.ml_mfp != NULL
 			  && curbuf->b_ml.ml_mfp->mf_fname != NULL)
 	{
 	    char_u *swap_fname = curbuf->b_ml.ml_mfp->mf_fname;
@@ -654,11 +654,11 @@ readfile(
 	     * avoids making the swap file readable to more users when the
 	     * primary group of the user is too permissive.
 	     */
-	    if ((swap_mode & 044) == 040)
+	    အကယ်၍ ((swap_mode & 044) == 040)
 	    {
 		stat_T	swap_st;
 
-		if (mch_stat((char *)swap_fname, &swap_st) >= 0
+		အကယ်၍ (mch_stat((var_na *)swap_fname, &swap_st) >= 0
 			&& st.st_gid != swap_st.st_gid
 # ifdef HAVE_FCHOWN
 			&& fchown(curbuf->b_ml.ml_mfp->mf_fd, -1, st.st_gid)
@@ -674,9 +674,9 @@ readfile(
     }
 
     // If "Quit" selected at ATTENTION dialog, don't load the file
-    if (swap_exists_action == SEA_QUIT)
+    အကယ်၍ (swap_exists_action == SEA_QUIT)
     {
-	if (!read_buffer && !read_stdin)
+	အကယ်၍ (!read_buffer && !read_stdin)
 	    close(fd);
 	goto theend;
     }
@@ -694,16 +694,16 @@ readfile(
     try_dos = (vim_strchr(p_ffs, 'd') != NULL);
     try_unix = (vim_strchr(p_ffs, 'x') != NULL);
 
-    if (!read_buffer)
+    အကယ်၍ (!read_buffer)
     {
-	int	m = msg_scroll;
-	int	n = msg_scrolled;
+	ကိန်းပြည့်	m = msg_scroll;
+	ကိန်းပြည့်	n = msg_scrolled;
 
 	/*
 	 * The file must be closed again, the autocommands may want to change
 	 * the file before reading it.
 	 */
-	if (!read_stdin)
+	အကယ်၍ (!read_stdin)
 	    close(fd);		// ignore errors
 
 	/*
@@ -712,16 +712,16 @@ readfile(
 	 * output was done.
 	 */
 	msg_scroll = TRUE;
-	if (filtering)
+	အကယ်၍ (filtering)
 	    apply_autocmds_exarg(EVENT_FILTERREADPRE, NULL, sfname,
 							  FALSE, curbuf, eap);
-	else if (read_stdin)
+	မဟုတ်ပါက အကယ်၍ (read_stdin)
 	    apply_autocmds_exarg(EVENT_STDINREADPRE, NULL, sfname,
 							  FALSE, curbuf, eap);
-	else if (newfile)
+	မဟုတ်ပါက အကယ်၍ (newfile)
 	    apply_autocmds_exarg(EVENT_BUFREADPRE, NULL, sfname,
 							  FALSE, curbuf, eap);
-	else
+	မဟုတ်ပါက
 	    apply_autocmds_exarg(EVENT_FILEREADPRE, sfname, sfname,
 							    FALSE, NULL, eap);
 	// autocommands may have changed it
@@ -730,11 +730,11 @@ readfile(
 	try_unix = (vim_strchr(p_ffs, 'x') != NULL);
 	curbuf->b_op_start = orig_start;
 
-	if (msg_scrolled == n)
+	အကယ်၍ (msg_scrolled == n)
 	    msg_scroll = m;
 
 #ifdef FEAT_EVAL
-	if (aborting())	    // autocmds may abort script processing
+	အကယ်၍ (aborting())	    // autocmds may abort script processing
 	{
 	    --no_wait_return;
 	    msg_scroll = msg_save;
@@ -749,16 +749,16 @@ readfile(
 	 * Don't allow the autocommands to change the buffer name either
 	 * (cd for example) if it invalidates fname or sfname.
 	 */
-	if (!read_stdin && (curbuf != old_curbuf
+	အကယ်၍ (!read_stdin && (curbuf != old_curbuf
 		|| (using_b_ffname && (old_b_ffname != curbuf->b_ffname))
 		|| (using_b_fname && (old_b_fname != curbuf->b_fname))
-		|| (fd = mch_open((char *)fname, O_RDONLY | O_EXTRA, 0)) < 0))
+		|| (fd = mch_open((var_na *)fname, O_RDONLY | O_EXTRA, 0)) < 0))
 	{
 	    --no_wait_return;
 	    msg_scroll = msg_save;
-	    if (fd < 0)
+	    အကယ်၍ (fd < 0)
 		emsg(_(e_readpre_autocommands_made_file_unreadable));
-	    else
+	    မဟုတ်ပါက
 		emsg(_(e_readpre_autocommands_must_not_change_current_buffer));
 	    curbuf->b_p_ro = TRUE;	// must use "w!" now
 	    goto theend;
@@ -768,7 +768,7 @@ readfile(
     // Autocommands may add lines to the file, need to check if it is empty
     wasempty = (curbuf->b_ml.ml_flags & ML_EMPTY);
 
-    if (!recoverymode && !filtering && !(flags & READ_DUMMY))
+    အကယ်၍ (!recoverymode && !filtering && !(flags & READ_DUMMY))
     {
 	/*
 	 * Show the user that we are busy reading the input.  Sometimes this
@@ -776,34 +776,34 @@ readfile(
 	 * still be running, don't move the cursor to the last line, unless
 	 * always using the GUI.
 	 */
-	if (read_stdin)
+	အကယ်၍ (read_stdin)
 	{
-	    if (!is_not_a_term())
+	    အကယ်၍ (!is_not_a_term())
 	    {
 #ifndef ALWAYS_USE_GUI
 # ifdef VIMDLL
-		if (!gui.in_use)
+		အကယ်၍ (!gui.in_use)
 # endif
 		    mch_msg(_("Vim: Reading from stdin...\n"));
 #endif
 #ifdef FEAT_GUI
 		// Also write a message in the GUI window, if there is one.
-		if (gui.in_use && !gui.dying && !gui.starting)
+		အကယ်၍ (gui.in_use && !gui.dying && !gui.starting)
 		{
 		    size_t  plen = STRLEN(_("Reading from stdin..."));
 
 		    // make a copy, gui_write() may try to change it
 		    p = vim_strnsave((char_u *)_("Reading from stdin..."), plen);
-		    if (p != NULL)
+		    အကယ်၍ (p != NULL)
 		    {
-			gui_write(p, (int)plen);
+			gui_write(p, (ကိန်းပြည့်)plen);
 			vim_free(p);
 		    }
 		}
 #endif
 	    }
 	}
-	else if (!read_buffer)
+	မဟုတ်ပါက အကယ်၍ (!read_buffer)
 	    filemess(curbuf, sfname, (char_u *)"", 0);
     }
 
@@ -816,33 +816,33 @@ readfile(
     linecnt = curbuf->b_ml.ml_line_count;
 
     // "++bad=" argument.
-    if (eap != NULL && eap->bad_char != 0)
+    အကယ်၍ (eap != NULL && eap->bad_char != 0)
     {
 	bad_char_behavior = eap->bad_char;
-	if (set_options)
+	အကယ်၍ (set_options)
 	    curbuf->b_bad_char = eap->bad_char;
     }
-    else
+    မဟုတ်ပါက
 	curbuf->b_bad_char = 0;
 
     /*
      * Decide which 'encoding' to use or use first.
      */
-    if (eap != NULL && eap->force_enc != 0)
+    အကယ်၍ (eap != NULL && eap->force_enc != 0)
     {
 	fenc = enc_canonize(eap->cmd + eap->force_enc);
 	fenc_alloced = TRUE;
 	keep_dest_enc = TRUE;
     }
-    else if (curbuf->b_p_bin)
+    မဟုတ်ပါက အကယ်၍ (curbuf->b_p_bin)
     {
 	fenc = (char_u *)"";		// binary: don't convert
 	fenc_alloced = FALSE;
     }
-    else if (curbuf->b_help)
+    မဟုတ်ပါက အကယ်၍ (curbuf->b_help)
     {
 	char_u	    firstline[80];
-	int	    fc;
+	ကိန်းပြည့်	    fc;
 
 	// Help files are either utf-8 or latin1.  Try utf-8 first, if this
 	// fails it must be latin1.
@@ -852,25 +852,25 @@ readfile(
 	// That is only in *.??x files.
 	fenc = (char_u *)"latin1";
 	c = enc_utf8;
-	if (!c && !read_stdin)
+	အကယ်၍ (!c && !read_stdin)
 	{
 	    fc = fname[fnamelen - 1];
-	    if (TOLOWER_ASC(fc) == 'x')
+	    အကယ်၍ (TOLOWER_ASC(fc) == 'x')
 	    {
 		// Read the first line (and a bit more).  Immediately rewind to
 		// the start of the file.  If the read() fails "len" is -1.
 		len = read_eintr(fd, firstline, 80);
 		vim_lseek(fd, (off_T)0L, SEEK_SET);
-		for (p = firstline; p < firstline + len; ++p)
-		    if (*p >= 0x80)
+		အတွက် (p = firstline; p < firstline + len; ++p)
+		    အကယ်၍ (*p >= 0x80)
 		    {
 			c = TRUE;
-			break;
+			bha_nga;
 		    }
 	    }
 	}
 
-	if (c)
+	အကယ်၍ (c)
 	{
 	    fenc_next = fenc;
 	    fenc = (char_u *)"utf-8";
@@ -878,17 +878,17 @@ readfile(
 	    // When the file is utf-8 but a character doesn't fit in
 	    // 'encoding' don't retry.  In help text editing utf-8 bytes
 	    // doesn't make sense.
-	    if (!enc_utf8)
+	    အကယ်၍ (!enc_utf8)
 		keep_dest_enc = TRUE;
 	}
 	fenc_alloced = FALSE;
     }
-    else if (*p_fencs == NUL)
+    မဟုတ်ပါက အကယ်၍ (*p_fencs == NUL)
     {
 	fenc = curbuf->b_p_fenc;	// use format from buffer
 	fenc_alloced = FALSE;
     }
-    else
+    မဟုတ်ပါက
     {
 	fenc_next = p_fencs;		// try items in 'fileencodings'
 	fenc = next_fenc(&fenc_next, &fenc_alloced);
@@ -915,24 +915,24 @@ readfile(
      */
 retry:
 
-    if (file_rewind)
+    အကယ်၍ (file_rewind)
     {
-	if (read_buffer)
+	အကယ်၍ (read_buffer)
 	{
 	    read_buf_lnum = 1;
 	    read_buf_col = 0;
 	}
-	else if (read_stdin || vim_lseek(fd, (off_T)0L, SEEK_SET) != 0)
+	မဟုတ်ပါက အကယ်၍ (read_stdin || vim_lseek(fd, (off_T)0L, SEEK_SET) != 0)
 	{
 	    // Can't rewind the file, give up.
 	    error = TRUE;
 	    goto failed;
 	}
 	// Delete the previously read lines.
-	while (lnum > from)
+	နေစဉ် (lnum > from)
 	    ml_delete(lnum--);
 	file_rewind = FALSE;
-	if (set_options)
+	အကယ်၍ (set_options)
 	{
 	    curbuf->b_p_bomb = FALSE;
 	    curbuf->b_start_bomb = FALSE;
@@ -944,25 +944,25 @@ retry:
      * When retrying with another "fenc" and the first time "fileformat"
      * will be reset.
      */
-    if (keep_fileformat)
+    အကယ်၍ (keep_fileformat)
 	keep_fileformat = FALSE;
-    else
+    မဟုတ်ပါက
     {
-	if (eap != NULL && eap->force_ff != 0)
+	အကယ်၍ (eap != NULL && eap->force_ff != 0)
 	{
 	    fileformat = get_fileformat_force(curbuf, eap);
 	    try_unix = try_dos = try_mac = FALSE;
 	}
-	else if (curbuf->b_p_bin)
+	မဟုတ်ပါက အကယ်၍ (curbuf->b_p_bin)
 	    fileformat = EOL_UNIX;		// binary: use Unix format
-	else if (*p_ffs == NUL)
+	မဟုတ်ပါက အကယ်၍ (*p_ffs == NUL)
 	    fileformat = get_fileformat(curbuf);// use format from buffer
-	else
+	မဟုတ်ပါက
 	    fileformat = EOL_UNKNOWN;		// detect from file
     }
 
 #ifdef USE_ICONV
-    if (iconv_fd != (iconv_t)-1)
+    အကယ်၍ (iconv_fd != (iconv_t)-1)
     {
 	// aborted conversion with iconv(), close the descriptor
 	iconv_close(iconv_fd);
@@ -970,39 +970,39 @@ retry:
     }
 #endif
 
-    if (advance_fenc)
+    အကယ်၍ (advance_fenc)
     {
 	/*
 	 * Try the next entry in 'fileencodings'.
 	 */
 	advance_fenc = FALSE;
 
-	if (eap != NULL && eap->force_enc != 0)
+	အကယ်၍ (eap != NULL && eap->force_enc != 0)
 	{
 	    // Conversion given with "++cc=" wasn't possible, read
 	    // without conversion.
 	    notconverted = TRUE;
 	    conv_error = 0;
-	    if (fenc_alloced)
+	    အကယ်၍ (fenc_alloced)
 		vim_free(fenc);
 	    fenc = (char_u *)"";
 	    fenc_alloced = FALSE;
 	}
-	else
+	မဟုတ်ပါက
 	{
-	    if (fenc_alloced)
+	    အကယ်၍ (fenc_alloced)
 		vim_free(fenc);
-	    if (fenc_next != NULL)
+	    အကယ်၍ (fenc_next != NULL)
 	    {
 		fenc = next_fenc(&fenc_next, &fenc_alloced);
 	    }
-	    else
+	    မဟုတ်ပါက
 	    {
 		fenc = (char_u *)"";
 		fenc_alloced = FALSE;
 	    }
 	}
-	if (tmpname != NULL)
+	အကယ်၍ (tmpname != NULL)
 	{
 	    mch_remove(tmpname);		// delete converted file
 	    VIM_CLEAR(tmpname);
@@ -1015,11 +1015,11 @@ retry:
      */
     fio_flags = 0;
     converted = need_conversion(fenc);
-    if (converted)
+    အကယ်၍ (converted)
     {
 	// "ucs-bom" means we need to check the first bytes of the file
 	// for a BOM.
-	if (STRCMP(fenc, ENC_UCSBOM) == 0)
+	အကယ်၍ (STRCMP(fenc, ENC_UCSBOM) == 0)
 	    fio_flags = FIO_UCSBOM;
 
 	/*
@@ -1031,7 +1031,7 @@ retry:
 	 * conversion to UTF-8 except how the resulting character is put in
 	 * the buffer.
 	 */
-	else if (enc_utf8 || STRCMP(p_enc, "latin1") == 0)
+	မဟုတ်ပါက အကယ်၍ (enc_utf8 || STRCMP(p_enc, "latin1") == 0)
 	    fio_flags = get_fio_flags(fenc);
 
 #ifdef MSWIN
@@ -1039,13 +1039,13 @@ retry:
 	 * Conversion from an MS-Windows codepage to UTF-8 or another codepage
 	 * is handled with MultiByteToWideChar().
 	 */
-	if (fio_flags == 0)
+	အကယ်၍ (fio_flags == 0)
 	    fio_flags = get_win_fio_flags(fenc);
 #endif
 
 #ifdef MACOS_CONVERT
 	// Conversion from Apple MacRoman to latin1 or UTF-8
-	if (fio_flags == 0)
+	အကယ်၍ (fio_flags == 0)
 	    fio_flags = get_mac_fio_flags(fenc);
 #endif
 
@@ -1053,7 +1053,7 @@ retry:
 	/*
 	 * Try using iconv() if we can't convert internally.
 	 */
-	if (fio_flags == 0
+	အကယ်၍ (fio_flags == 0
 # ifdef FEAT_EVAL
 		&& !did_iconv
 # endif
@@ -1067,7 +1067,7 @@ retry:
 	 * Use the 'charconvert' expression when conversion is required
 	 * and we can't do it internally or with iconv().
 	 */
-	if (fio_flags == 0 && !read_stdin && !read_buffer && *p_ccv != NUL
+	အကယ်၍ (fio_flags == 0 && !read_stdin && !read_buffer && *p_ccv != NUL
 						    && !read_fifo
 # ifdef USE_ICONV
 						    && iconv_fd == (iconv_t)-1
@@ -1079,14 +1079,14 @@ retry:
 # endif
 	    // Skip conversion when it's already done (retry for wrong
 	    // "fileformat").
-	    if (tmpname == NULL)
+	    အကယ်၍ (tmpname == NULL)
 	    {
 		tmpname = readfile_charconvert(fname, fenc, &fd);
-		if (tmpname == NULL)
+		အကယ်၍ (tmpname == NULL)
 		{
 		    // Conversion failed.  Try another one.
 		    advance_fenc = TRUE;
-		    if (fd < 0)
+		    အကယ်၍ (fd < 0)
 		    {
 			// Re-opening the original file failed!
 			emsg(_(e_conversion_mad_file_unreadable));
@@ -1097,10 +1097,10 @@ retry:
 		}
 	    }
 	}
-	else
+	မဟုတ်ပါက
 #endif
 	{
-	    if (fio_flags == 0
+	    အကယ်၍ (fio_flags == 0
 #ifdef USE_ICONV
 		    && iconv_fd == (iconv_t)-1
 #endif
@@ -1119,7 +1119,7 @@ retry:
     // stdin or fixed at a specific encoding.
     can_retry = (*fenc != NUL && !read_stdin && !read_fifo && !keep_dest_enc);
 
-    if (!skip_read)
+    အကယ်၍ (!skip_read)
     {
 	linerest = 0;
 	filesize = 0;
@@ -1137,11 +1137,11 @@ retry:
 				  && !read_fifo
 				  && !read_stdin
 				  && !read_buffer);
-	if (read_undo_file)
+	အကယ်၍ (read_undo_file)
 	    sha256_start(&sha_ctx);
 #endif
 #ifdef FEAT_CRYPT
-	if (curbuf->b_cryptstate != NULL)
+	အကယ်၍ (curbuf->b_cryptstate != NULL)
 	{
 	    // Need to free the state, but keep the key, don't want to ask for
 	    // it again.
@@ -1151,7 +1151,7 @@ retry:
 #endif
     }
 
-    while (!error && !got_int)
+    နေစဉ် (!error && !got_int)
     {
 	/*
 	 * We allocate as much space for the file as we can get, plus
@@ -1159,16 +1159,16 @@ retry:
 	 * The amount is limited by the fact that read() only can read
 	 * up to max_unsigned characters (and other things).
 	 */
-	if (!skip_read)
+	အကယ်၍ (!skip_read)
 	{
-#if defined(SSIZE_MAX) && (SSIZE_MAX < 0x10000L)
+#အကယ်၍ defined(SSIZE_MAX) && (SSIZE_MAX < 0x10000L)
 		size = SSIZE_MAX;		    // use max I/O size, 52K
-#else
+#မဟုတ်ပါက
 		// Use buffer >= 64K.  Add linerest to double the size if the
 		// line gets very long, to avoid a lot of copying. But don't
 		// read more than 1 Mbyte at a time, so we can be interrupted.
 		size = 0x10000L + linerest;
-		if (size > 0x100000L)
+		အကယ်၍ (size > 0x100000L)
 		    size = 0x100000L;
 #endif
 	}
@@ -1179,29 +1179,29 @@ retry:
 	// after that read, the line length won't exceed MAXCOL - 1 (because
 	// we add 1 for the NUL when casting to colnr_T).  If this check fires,
 	// we insert a synthetic newline immediately, so linerest doesn't grow.
-	if (size < 0 || size + linerest + 1 < 0 || linerest >= MAXCOL - size)
+	အကယ်၍ (size < 0 || size + linerest + 1 < 0 || linerest >= MAXCOL - size)
 	{
 	    ++split;
 	    *ptr = NL;		    // split line by inserting a NL
 	    size = 1;
 	}
-	else
+	မဟုတ်ပါက
 	{
-	    if (!skip_read)
+	    အကယ်၍ (!skip_read)
 	    {
-		for ( ; size >= 10; size = (long)((long_u)size >> 1))
+		အတွက် ( ; size >= 10; size = (long)((long_u)size >> 1))
 		{
-		    if ((new_buffer = lalloc(size + linerest + 1,
+		    အကယ်၍ ((new_buffer = lalloc(size + linerest + 1,
 							      FALSE)) != NULL)
-			break;
+			bha_nga;
 		}
-		if (new_buffer == NULL)
+		အကယ်၍ (new_buffer == NULL)
 		{
 		    do_outofmem_msg((long_u)(size * 2 + linerest + 1));
 		    error = TRUE;
-		    break;
+		    bha_nga;
 		}
-		if (linerest)	// copy characters from the previous buffer
+		အကယ်၍ (linerest)	// copy characters from the previous buffer
 		    mch_memmove(new_buffer, ptr - linerest, (size_t)linerest);
 		vim_free(buffer);
 		buffer = new_buffer;
@@ -1218,30 +1218,30 @@ retry:
 		// multiple of 2
 		// ucs-4 to utf-8: 4 bytes become up to 6 bytes, size must be
 		// multiple of 4
-		real_size = (int)size;
+		real_size = (ကိန်းပြည့်)size;
 #ifdef USE_ICONV
-		if (iconv_fd != (iconv_t)-1)
+		အကယ်၍ (iconv_fd != (iconv_t)-1)
 		    size = size / ICONV_MULT;
-		else
+		မဟုတ်ပါက
 #endif
-		    if (fio_flags & FIO_LATIN1)
+		    အကယ်၍ (fio_flags & FIO_LATIN1)
 		    size = size / 2;
-		else if (fio_flags & (FIO_UCS2 | FIO_UTF16))
+		မဟုတ်ပါက အကယ်၍ (fio_flags & (FIO_UCS2 | FIO_UTF16))
 		    size = (size * 2 / 3) & ~1;
-		else if (fio_flags & FIO_UCS4)
+		မဟုတ်ပါက အကယ်၍ (fio_flags & FIO_UCS4)
 		    size = (size * 2 / 3) & ~3;
-		else if (fio_flags == FIO_UCSBOM)
+		မဟုတ်ပါက အကယ်၍ (fio_flags == FIO_UCSBOM)
 		    size = size / ICONV_MULT;	// worst case
 #ifdef MSWIN
-		else if (fio_flags & FIO_CODEPAGE)
+		မဟုတ်ပါက အကယ်၍ (fio_flags & FIO_CODEPAGE)
 		    size = size / ICONV_MULT;	// also worst case
 #endif
 #ifdef MACOS_CONVERT
-		else if (fio_flags & FIO_MACROMAN)
+		မဟုတ်ပါက အကယ်၍ (fio_flags & FIO_MACROMAN)
 		    size = size / ICONV_MULT;	// also worst case
 #endif
 
-		if (conv_restlen > 0)
+		အကယ်၍ (conv_restlen > 0)
 		{
 		    // Insert unconverted bytes from previous line.
 		    mch_memmove(ptr, conv_rest, conv_restlen);
@@ -1249,68 +1249,68 @@ retry:
 		    size -= conv_restlen;
 		}
 
-		if (read_buffer)
+		အကယ်၍ (read_buffer)
 		{
 		    /*
 		     * Read bytes from curbuf.  Used for converting text read
 		     * from stdin.
 		     */
-		    if (read_buf_lnum > from)
+		    အကယ်၍ (read_buf_lnum > from)
 			size = 0;
-		    else
+		    မဟုတ်ပါက
 		    {
-			int	n, ni;
+			ကိန်းပြည့်	n, ni;
 			long	tlen;
 
 			tlen = 0;
-			for (;;)
+			အတွက် (;;)
 			{
 			    p = ml_get(read_buf_lnum) + read_buf_col;
 			    n = ml_get_len(read_buf_lnum) - read_buf_col;
-			    if ((int)tlen + n + 1 > size)
+			    အကယ်၍ ((ကိန်းပြည့်)tlen + n + 1 > size)
 			    {
 				// Filled up to "size", append partial line.
 				// Change NL to NUL to reverse the effect done
 				// below.
-				n = (int)(size - tlen);
-				for (ni = 0; ni < n; ++ni)
+				n = (ကိန်းပြည့်)(size - tlen);
+				အတွက် (ni = 0; ni < n; ++ni)
 				{
-				    if (p[ni] == NL)
+				    အကယ်၍ (p[ni] == NL)
 					ptr[tlen++] = NUL;
-				    else
+				    မဟုတ်ပါက
 					ptr[tlen++] = p[ni];
 				}
 				read_buf_col += n;
-				break;
+				bha_nga;
 			    }
 
 			    // Append whole line and new-line.  Change NL
 			    // to NUL to reverse the effect done below.
-			    for (ni = 0; ni < n; ++ni)
+			    အတွက် (ni = 0; ni < n; ++ni)
 			    {
-				if (p[ni] == NL)
+				အကယ်၍ (p[ni] == NL)
 				    ptr[tlen++] = NUL;
-				else
+				မဟုတ်ပါက
 				    ptr[tlen++] = p[ni];
 			    }
 			    ptr[tlen++] = NL;
 			    read_buf_col = 0;
-			    if (++read_buf_lnum > from)
+			    အကယ်၍ (++read_buf_lnum > from)
 			    {
 				// When the last line didn't have an
 				// end-of-line don't add it now either.
-				if (!curbuf->b_p_eol)
+				အကယ်၍ (!curbuf->b_p_eol)
 				    --tlen;
 				size = tlen;
 #ifdef FEAT_CRYPT
 				eof = TRUE;
 #endif
-				break;
+				bha_nga;
 			    }
 			}
 		    }
 		}
-		else
+		မဟုတ်ပါက
 		{
 		    /*
 		     * Read bytes from the file.
@@ -1329,7 +1329,7 @@ retry:
 		    //
 		    // Be careful with changing it, it needs to stay the same
 		    // for reading back previously encrypted files!
-		    if (filesize == 0)
+		    အကယ်၍ (filesize == 0)
 		    {
 			// set size to 8K + Sodium Crypt Metadata
 			size = WRITEBUFSIZE + crypt_get_max_header_len()
@@ -1338,14 +1338,14 @@ retry:
 			may_need_lseek = TRUE;
 		    }
 
-		    else if (filesize > 0 && (curbuf->b_cryptstate != NULL
+		    မဟုတ်ပါက အကယ်၍ (filesize > 0 && (curbuf->b_cryptstate != NULL
 				&& crypt_method_is_sodium(
 					     curbuf->b_cryptstate->method_nr)))
 		    {
 			size = WRITEBUFSIZE + crypto_secretstream_xchacha20poly1305_ABYTES;
 			// need to rewind by - add_len from CRYPT_M_SOD2 (see
 			// description above)
-			if (curbuf->b_cryptstate->method_nr == CRYPT_M_SOD
+			အကယ်၍ (curbuf->b_cryptstate->method_nr == CRYPT_M_SOD
 						     && !eof && may_need_lseek)
 			{
 			    lseek(fd, crypt_get_header_len(
@@ -1368,13 +1368,13 @@ retry:
 		/*
 		 * At start of file: Check for magic number of encryption.
 		 */
-		if (filesize == 0 && size > 0)
+		အကယ်၍ (filesize == 0 && size > 0)
 		{
 		    cryptkey = check_for_cryptkey(cryptkey, ptr, &size,
 						  &filesize, newfile, sfname,
 						  &did_ask_for_key);
-# if defined(CRYPT_NOT_INPLACE) && defined(FEAT_PERSISTENT_UNDO)
-		    if (curbuf->b_cryptstate != NULL
+# အကယ်၍ defined(CRYPT_NOT_INPLACE) && defined(FEAT_PERSISTENT_UNDO)
+		    အကယ်၍ (curbuf->b_cryptstate != NULL
 				 && !crypt_works_inplace(curbuf->b_cryptstate))
 			// reading undo file requires crypt_decode_inplace()
 			read_undo_file = FALSE;
@@ -1384,66 +1384,66 @@ retry:
 		 * Decrypt the read bytes.  This is done before checking for
 		 * EOF because the crypt layer may be buffering.
 		 */
-		if (cryptkey != NULL && curbuf->b_cryptstate != NULL
+		အကယ်၍ (cryptkey != NULL && curbuf->b_cryptstate != NULL
 								   && size > 0)
 		{
 # ifdef CRYPT_NOT_INPLACE
-		    if (crypt_works_inplace(curbuf->b_cryptstate))
+		    အကယ်၍ (crypt_works_inplace(curbuf->b_cryptstate))
 		    {
 # endif
 			crypt_decode_inplace(curbuf->b_cryptstate, ptr,
 								    size, eof);
 # ifdef CRYPT_NOT_INPLACE
 		    }
-		    else
+		    မဟုတ်ပါက
 		    {
 			char_u	*newptr = NULL;
-			int	decrypted_size;
+			ကိန်းပြည့်	decrypted_size;
 
 			decrypted_size = crypt_decode_alloc(
 				    curbuf->b_cryptstate, ptr, size,
 								 &newptr, eof);
 
-			if (decrypted_size < 0)
+			အကယ်၍ (decrypted_size < 0)
 			{
 			    // error message already given
 			    error = TRUE;
 			    vim_free(newptr);
-			    break;
+			    bha_nga;
 			}
 			// If the crypt layer is buffering, not producing
 			// anything yet, need to read more.
-			if (decrypted_size == 0)
+			အကယ်၍ (decrypted_size == 0)
 			    continue;
 
-			if (linerest == 0)
+			အကယ်၍ (linerest == 0)
 			{
 			    // Simple case: reuse returned buffer (may be
 			    // NULL, checked later).
 			    new_buffer = newptr;
 			}
-			else
+			မဟုတ်ပါက
 			{
 			    long_u	new_size;
 
 			    // Need new buffer to add bytes carried over.
 			    new_size = (long_u)(decrypted_size + linerest + 1);
 			    new_buffer = lalloc(new_size, FALSE);
-			    if (new_buffer == NULL)
+			    အကယ်၍ (new_buffer == NULL)
 			    {
 				do_outofmem_msg(new_size);
 				error = TRUE;
-				break;
+				bha_nga;
 			    }
 
 			    mch_memmove(new_buffer, buffer, linerest + conv_restlen);
-			    if (newptr != NULL)
+			    အကယ်၍ (newptr != NULL)
 				mch_memmove(new_buffer + linerest + conv_restlen,
 					newptr, decrypted_size);
 			    vim_free(newptr);
 			}
 
-			if (new_buffer != NULL)
+			အကယ်၍ (new_buffer != NULL)
 			{
 			    vim_free(buffer);
 			    buffer = new_buffer;
@@ -1458,11 +1458,11 @@ retry:
 		}
 #endif
 
-		if (size <= 0)
+		အကယ်၍ (size <= 0)
 		{
-		    if (size < 0)		    // read error
+		    အကယ်၍ (size < 0)		    // read error
 			error = TRUE;
-		    else if (conv_restlen > 0)
+		    မဟုတ်ပါက အကယ်၍ (conv_restlen > 0)
 		    {
 			/*
 			 * Reached end-of-file but some trailing bytes could
@@ -1470,40 +1470,40 @@ retry:
 			 */
 
 			// When we did a conversion report an error.
-			if (fio_flags != 0
+			အကယ်၍ (fio_flags != 0
 #ifdef USE_ICONV
 				|| iconv_fd != (iconv_t)-1
 #endif
 			   )
 			{
-			    if (can_retry)
+			    အကယ်၍ (can_retry)
 				goto rewind_retry;
-			    if (conv_error == 0)
+			    အကယ်၍ (conv_error == 0)
 				conv_error = curbuf->b_ml.ml_line_count
 								- linecnt + 1;
 			}
 			// Remember the first linenr with an illegal byte
-			else if (illegal_byte == 0)
+			မဟုတ်ပါက အကယ်၍ (illegal_byte == 0)
 			    illegal_byte = curbuf->b_ml.ml_line_count
 								- linecnt + 1;
-			if (bad_char_behavior == BAD_DROP)
+			အကယ်၍ (bad_char_behavior == BAD_DROP)
 			{
 			    *(ptr - conv_restlen) = NUL;
 			    conv_restlen = 0;
 			}
-			else
+			မဟုတ်ပါက
 			{
 			    // Replace the trailing bytes with the replacement
 			    // character if we were converting; if we weren't,
 			    // leave the UTF8 checking code to do it, as it
 			    // works slightly differently.
-			    if (bad_char_behavior != BAD_KEEP && (fio_flags != 0
+			    အကယ်၍ (bad_char_behavior != BAD_KEEP && (fio_flags != 0
 #ifdef USE_ICONV
 				    || iconv_fd != (iconv_t)-1
 #endif
 			       ))
 			    {
-				while (conv_restlen > 0)
+				နေစဉ် (conv_restlen > 0)
 				{
 				    *(--ptr) = bad_char_behavior;
 				    --conv_restlen;
@@ -1511,7 +1511,7 @@ retry:
 			    }
 			    fio_flags = 0;	// don't convert this
 #ifdef USE_ICONV
-			    if (iconv_fd != (iconv_t)-1)
+			    အကယ်၍ (iconv_fd != (iconv_t)-1)
 			    {
 				iconv_close(iconv_fd);
 				iconv_fd = (iconv_t)-1;
@@ -1529,7 +1529,7 @@ retry:
 	     * converting with 'charconvert' or when a BOM has already been
 	     * found.
 	     */
-	    if ((filesize == 0
+	    အကယ်၍ ((filesize == 0
 #ifdef FEAT_CRYPT
 		   || (cryptkey != NULL
 			&& filesize == crypt_get_header_len(
@@ -1542,38 +1542,38 @@ retry:
 			    && (*fenc == 'u' || (*fenc == NUL && enc_utf8)))))
 	    {
 		char_u	*ccname;
-		int	blen;
+		ကိန်းပြည့်	blen;
 
 		// no BOM detection in a short file or in binary mode
-		if (size < 2 || curbuf->b_p_bin)
+		အကယ်၍ (size < 2 || curbuf->b_p_bin)
 		    ccname = NULL;
-		else
+		မဟုတ်ပါက
 		    ccname = check_for_bom(ptr, size, &blen,
 		      fio_flags == FIO_UCSBOM ? FIO_ALL : get_fio_flags(fenc));
-		if (ccname != NULL)
+		အကယ်၍ (ccname != NULL)
 		{
 		    // Remove BOM from the text
 		    filesize += blen;
 		    size -= blen;
 		    mch_memmove(ptr, ptr + blen, (size_t)size);
-		    if (set_options)
+		    အကယ်၍ (set_options)
 		    {
 			curbuf->b_p_bomb = TRUE;
 			curbuf->b_start_bomb = TRUE;
 		    }
 		}
 
-		if (fio_flags == FIO_UCSBOM)
+		အကယ်၍ (fio_flags == FIO_UCSBOM)
 		{
-		    if (ccname == NULL)
+		    အကယ်၍ (ccname == NULL)
 		    {
 			// No BOM detected: retry with next encoding.
 			advance_fenc = TRUE;
 		    }
-		    else
+		    မဟုတ်ပါက
 		    {
 			// BOM detected: set "fenc" and jump back
-			if (fenc_alloced)
+			အကယ်၍ (fenc_alloced)
 			    vim_free(fenc);
 			fenc = ccname;
 			fenc_alloced = FALSE;
@@ -1591,26 +1591,26 @@ retry:
 	    /*
 	     * Break here for a read error or end-of-file.
 	     */
-	    if (size <= 0)
-		break;
+	    အကယ်၍ (size <= 0)
+		bha_nga;
 
 
 #ifdef USE_ICONV
-	    if (iconv_fd != (iconv_t)-1)
+	    အကယ်၍ (iconv_fd != (iconv_t)-1)
 	    {
 		/*
 		 * Attempt conversion of the read bytes to 'encoding' using
 		 * iconv().
 		 */
-		const char	*fromp;
-		char		*top;
+		const var_na	*fromp;
+		var_na		*top;
 		size_t		from_size;
 		size_t		to_size;
 
-		fromp = (char *)ptr;
+		fromp = (var_na *)ptr;
 		from_size = size;
 		ptr += size;
-		top = (char *)ptr;
+		top = (var_na *)ptr;
 		to_size = real_size - size;
 
 		/*
@@ -1618,38 +1618,38 @@ retry:
 		 * another conversion.  Except for when there is no
 		 * alternative (help files).
 		 */
-		while ((iconv(iconv_fd, (void *)&fromp, &from_size,
+		နေစဉ် ((iconv(iconv_fd, (void *)&fromp, &from_size,
 							       &top, &to_size)
 			    == (size_t)-1 && ICONV_ERRNO != ICONV_EINVAL)
 						  || from_size > CONV_RESTLEN)
 		{
-		    if (can_retry)
+		    အကယ်၍ (can_retry)
 			goto rewind_retry;
-		    if (conv_error == 0)
+		    အကယ်၍ (conv_error == 0)
 			conv_error = readfile_linenr(linecnt,
 							  ptr, (char_u *)top);
 
 		    // Deal with a bad byte and continue with the next.
 		    ++fromp;
 		    --from_size;
-		    if (bad_char_behavior == BAD_KEEP)
+		    အကယ်၍ (bad_char_behavior == BAD_KEEP)
 		    {
 			*top++ = *(fromp - 1);
 			--to_size;
 		    }
-		    else if (bad_char_behavior != BAD_DROP)
+		    မဟုတ်ပါက အကယ်၍ (bad_char_behavior != BAD_DROP)
 		    {
 			*top++ = bad_char_behavior;
 			--to_size;
 		    }
 		}
 
-		if (from_size > 0)
+		အကယ်၍ (from_size > 0)
 		{
 		    // Some remaining characters, keep them for the next
 		    // round.
 		    mch_memmove(conv_rest, (char_u *)fromp, from_size);
-		    conv_restlen = (int)from_size;
+		    conv_restlen = (ကိန်းပြည့်)from_size;
 		}
 
 		// move the linerest to before the converted characters
@@ -1660,15 +1660,15 @@ retry:
 #endif
 
 #ifdef MSWIN
-	    if (fio_flags & FIO_CODEPAGE)
+	    အကယ်၍ (fio_flags & FIO_CODEPAGE)
 	    {
 		char_u	*src, *dst;
 		WCHAR	ucs2buf[3];
-		int	ucs2len;
-		int	codepage = FIO_GET_CP(fio_flags);
-		int	bytelen;
-		int	found_bad;
-		char	replstr[2];
+		ကိန်းပြည့်	ucs2len;
+		ကိန်းပြည့်	codepage = FIO_GET_CP(fio_flags);
+		ကိန်းပြည့်	bytelen;
+		ကိန်းပြည့်	found_bad;
+		var_na	replstr[2];
 
 		/*
 		 * Conversion from an MS-Windows codepage or UTF-8 to UTF-8 or
@@ -1683,9 +1683,9 @@ retry:
 		 */
 
 		// Replacement string for WideCharToMultiByte().
-		if (bad_char_behavior > 0)
+		အကယ်၍ (bad_char_behavior > 0)
 		    replstr[0] = bad_char_behavior;
-		else
+		မဟုတ်ပါက
 		    replstr[0] = '?';
 		replstr[1] = NUL;
 
@@ -1700,111 +1700,111 @@ retry:
 		 * Do the conversion.
 		 */
 		dst = ptr;
-		while (size > 0)
+		နေစဉ် (size > 0)
 		{
 		    found_bad = FALSE;
 
 # ifdef CP_UTF8	// VC 4.1 doesn't define CP_UTF8
-		    if (codepage == CP_UTF8)
+		    အကယ်၍ (codepage == CP_UTF8)
 		    {
 			// Handle CP_UTF8 input ourselves to be able to handle
 			// trailing bytes properly.
 			// Get one UTF-8 character from src.
-			bytelen = (int)utf_ptr2len_len(src, size);
-			if (bytelen > size)
+			bytelen = (ကိန်းပြည့်)utf_ptr2len_len(src, size);
+			အကယ်၍ (bytelen > size)
 			{
 			    // Only got some bytes of a character.  Normally
 			    // it's put in "conv_rest", but if it's too long
 			    // deal with it as if they were illegal bytes.
-			    if (bytelen <= CONV_RESTLEN)
-				break;
+			    အကယ်၍ (bytelen <= CONV_RESTLEN)
+				bha_nga;
 
 			    // weird overlong byte sequence
 			    bytelen = size;
 			    found_bad = TRUE;
 			}
-			else
+			မဟုတ်ပါက
 			{
-			    int	    u8c = utf_ptr2char(src);
+			    ကိန်းပြည့်	    u8c = utf_ptr2char(src);
 
-			    if (u8c > 0xffff || (*src >= 0x80 && bytelen == 1))
+			    အကယ်၍ (u8c > 0xffff || (*src >= 0x80 && bytelen == 1))
 				found_bad = TRUE;
 			    ucs2buf[0] = u8c;
 			    ucs2len = 1;
 			}
 		    }
-		    else
+		    မဟုတ်ပါက
 # endif
 		    {
 			// We don't know how long the byte sequence is, try
 			// from one to three bytes.
-			for (bytelen = 1; bytelen <= size && bytelen <= 3;
+			အတွက် (bytelen = 1; bytelen <= size && bytelen <= 3;
 								    ++bytelen)
 			{
 			    ucs2len = MultiByteToWideChar(codepage,
 							 MB_ERR_INVALID_CHARS,
 							 (LPCSTR)src, bytelen,
 								   ucs2buf, 3);
-			    if (ucs2len > 0)
-				break;
+			    အကယ်၍ (ucs2len > 0)
+				bha_nga;
 			}
-			if (ucs2len == 0)
+			အကယ်၍ (ucs2len == 0)
 			{
 			    // If we have only one byte then it's probably an
 			    // incomplete byte sequence.  Otherwise discard
 			    // one byte as a bad character.
-			    if (size == 1)
-				break;
+			    အကယ်၍ (size == 1)
+				bha_nga;
 			    found_bad = TRUE;
 			    bytelen = 1;
 			}
 		    }
 
-		    if (!found_bad)
+		    အကယ်၍ (!found_bad)
 		    {
-			int	i;
+			ကိန်းပြည့်	i;
 
 			// Convert "ucs2buf[ucs2len]" to 'enc' in "dst".
-			if (enc_utf8)
+			အကယ်၍ (enc_utf8)
 			{
 			    // From UCS-2 to UTF-8.  Cannot fail.
-			    for (i = 0; i < ucs2len; ++i)
+			    အတွက် (i = 0; i < ucs2len; ++i)
 				dst += utf_char2bytes(ucs2buf[i], dst);
 			}
-			else
+			မဟုတ်ပါက
 			{
 			    BOOL	bad = FALSE;
-			    int		dstlen;
+			    ကိန်းပြည့်		dstlen;
 
 			    // From UCS-2 to "enc_codepage".  If the
 			    // conversion uses the default character "?",
 			    // the data doesn't fit in this encoding.
 			    dstlen = WideCharToMultiByte(enc_codepage, 0,
 				    (LPCWSTR)ucs2buf, ucs2len,
-				    (LPSTR)dst, (int)(src - dst),
+				    (LPSTR)dst, (ကိန်းပြည့်)(src - dst),
 				    replstr, &bad);
-			    if (bad)
+			    အကယ်၍ (bad)
 				found_bad = TRUE;
-			    else
+			    မဟုတ်ပါက
 				dst += dstlen;
 			}
 		    }
 
-		    if (found_bad)
+		    အကယ်၍ (found_bad)
 		    {
 			// Deal with bytes we can't convert.
-			if (can_retry)
+			အကယ်၍ (can_retry)
 			    goto rewind_retry;
-			if (conv_error == 0)
+			အကယ်၍ (conv_error == 0)
 			    conv_error = readfile_linenr(linecnt, ptr, dst);
-			if (bad_char_behavior != BAD_DROP)
+			အကယ်၍ (bad_char_behavior != BAD_DROP)
 			{
-			    if (bad_char_behavior == BAD_KEEP)
+			    အကယ်၍ (bad_char_behavior == BAD_KEEP)
 			    {
 				mch_memmove(dst, src, bytelen);
 				dst += bytelen;
 			    }
-			    else
+			    မဟုတ်ပါက
 				*dst++ = bad_char_behavior;
 			}
 		    }
@@ -1813,7 +1813,7 @@ retry:
 		    size -= bytelen;
 		}
 
-		if (size > 0)
+		အကယ်၍ (size > 0)
 		{
 		    // An incomplete byte sequence remaining.
 		    mch_memmove(conv_rest, src, size);
@@ -1823,23 +1823,23 @@ retry:
 		// The new size is equal to how much "dst" was advanced.
 		size = (long)(dst - ptr);
 	    }
-	    else
+	    မဟုတ်ပါက
 #endif
 #ifdef MACOS_CONVERT
-	    if (fio_flags & FIO_MACROMAN)
+	    အကယ်၍ (fio_flags & FIO_MACROMAN)
 	    {
 		/*
 		 * Conversion from Apple MacRoman char encoding to UTF-8 or
 		 * latin1.  This is in os_mac_conv.c.
 		 */
-		if (macroman2enc(ptr, &size, real_size) == FAIL)
+		အကယ်၍ (macroman2enc(ptr, &size, real_size) == FAIL)
 		    goto rewind_retry;
 	    }
-	    else
+	    မဟုတ်ပါက
 #endif
-	    if (fio_flags != 0)
+	    အကယ်၍ (fio_flags != 0)
 	    {
-		int	u8c;
+		ကိန်းပြည့်	u8c;
 		char_u	*dest;
 		char_u	*tail = NULL;
 
@@ -1852,107 +1852,107 @@ retry:
 		 * to after the next character to convert.
 		 */
 		dest = ptr + real_size;
-		if (fio_flags == FIO_LATIN1 || fio_flags == FIO_UTF8)
+		အကယ်၍ (fio_flags == FIO_LATIN1 || fio_flags == FIO_UTF8)
 		{
 		    p = ptr + size;
-		    if (fio_flags == FIO_UTF8)
+		    အကယ်၍ (fio_flags == FIO_UTF8)
 		    {
 			// Check for a trailing incomplete UTF-8 sequence
 			tail = ptr + size - 1;
-			while (tail > ptr && (*tail & 0xc0) == 0x80)
+			နေစဉ် (tail > ptr && (*tail & 0xc0) == 0x80)
 			    --tail;
-			if (tail + utf_byte2len(*tail) <= ptr + size)
+			အကယ်၍ (tail + utf_byte2len(*tail) <= ptr + size)
 			    tail = NULL;
-			else
+			မဟုတ်ပါက
 			    p = tail;
 		    }
 		}
-		else if (fio_flags & (FIO_UCS2 | FIO_UTF16))
+		မဟုတ်ပါက အကယ်၍ (fio_flags & (FIO_UCS2 | FIO_UTF16))
 		{
 		    // Check for a trailing byte
 		    p = ptr + (size & ~1);
-		    if (size & 1)
+		    အကယ်၍ (size & 1)
 			tail = p;
-		    if ((fio_flags & FIO_UTF16) && p > ptr)
+		    အကယ်၍ ((fio_flags & FIO_UTF16) && p > ptr)
 		    {
 			// Check for a trailing leading word
-			if (fio_flags & FIO_ENDIAN_L)
+			အကယ်၍ (fio_flags & FIO_ENDIAN_L)
 			{
 			    u8c = (*--p << 8);
 			    u8c += *--p;
 			}
-			else
+			မဟုတ်ပါက
 			{
 			    u8c = *--p;
 			    u8c += (*--p << 8);
 			}
-			if (u8c >= 0xd800 && u8c <= 0xdbff)
+			အကယ်၍ (u8c >= 0xd800 && u8c <= 0xdbff)
 			    tail = p;
-			else
+			မဟုတ်ပါက
 			    p += 2;
 		    }
 		}
-		else //  FIO_UCS4
+		မဟုတ်ပါက //  FIO_UCS4
 		{
 		    // Check for trailing 1, 2 or 3 bytes
 		    p = ptr + (size & ~3);
-		    if (size & 3)
+		    အကယ်၍ (size & 3)
 			tail = p;
 		}
 
 		// If there is a trailing incomplete sequence move it to
 		// conv_rest[].
-		if (tail != NULL)
+		အကယ်၍ (tail != NULL)
 		{
-		    conv_restlen = (int)((ptr + size) - tail);
+		    conv_restlen = (ကိန်းပြည့်)((ptr + size) - tail);
 		    mch_memmove(conv_rest, (char_u *)tail, conv_restlen);
 		    size -= conv_restlen;
 		}
 
 
-		while (p > ptr)
+		နေစဉ် (p > ptr)
 		{
-		    if (fio_flags & FIO_LATIN1)
+		    အကယ်၍ (fio_flags & FIO_LATIN1)
 			u8c = *--p;
-		    else if (fio_flags & (FIO_UCS2 | FIO_UTF16))
+		    မဟုတ်ပါက အကယ်၍ (fio_flags & (FIO_UCS2 | FIO_UTF16))
 		    {
-			if (fio_flags & FIO_ENDIAN_L)
+			အကယ်၍ (fio_flags & FIO_ENDIAN_L)
 			{
 			    u8c = (*--p << 8);
 			    u8c += *--p;
 			}
-			else
+			မဟုတ်ပါက
 			{
 			    u8c = *--p;
 			    u8c += (*--p << 8);
 			}
-			if ((fio_flags & FIO_UTF16)
+			အကယ်၍ ((fio_flags & FIO_UTF16)
 					    && u8c >= 0xdc00 && u8c <= 0xdfff)
 			{
-			    int u16c;
+			    ကိန်းပြည့် u16c;
 
-			    if (p == ptr)
+			    အကယ်၍ (p == ptr)
 			    {
 				// Missing leading word.
-				if (can_retry)
+				အကယ်၍ (can_retry)
 				    goto rewind_retry;
-				if (conv_error == 0)
+				အကယ်၍ (conv_error == 0)
 				    conv_error = readfile_linenr(linecnt,
 								      ptr, p);
-				if (bad_char_behavior == BAD_DROP)
+				အကယ်၍ (bad_char_behavior == BAD_DROP)
 				    continue;
-				if (bad_char_behavior != BAD_KEEP)
+				အကယ်၍ (bad_char_behavior != BAD_KEEP)
 				    u8c = bad_char_behavior;
 			    }
 
 			    // found second word of double-word, get the first
 			    // word and compute the resulting character
-			    if (fio_flags & FIO_ENDIAN_L)
+			    အကယ်၍ (fio_flags & FIO_ENDIAN_L)
 			    {
 				u16c = (*--p << 8);
 				u16c += *--p;
 			    }
-			    else
+			    မဟုတ်ပါက
 			    {
 				u16c = *--p;
 				u16c += (*--p << 8);
@@ -1961,30 +1961,30 @@ retry:
 							      + (u8c & 0x3ff);
 
 			    // Check if the word is indeed a leading word.
-			    if (u16c < 0xd800 || u16c > 0xdbff)
+			    အကယ်၍ (u16c < 0xd800 || u16c > 0xdbff)
 			    {
-				if (can_retry)
+				အကယ်၍ (can_retry)
 				    goto rewind_retry;
-				if (conv_error == 0)
+				အကယ်၍ (conv_error == 0)
 				    conv_error = readfile_linenr(linecnt,
 								      ptr, p);
-				if (bad_char_behavior == BAD_DROP)
+				အကယ်၍ (bad_char_behavior == BAD_DROP)
 				    continue;
-				if (bad_char_behavior != BAD_KEEP)
+				အကယ်၍ (bad_char_behavior != BAD_KEEP)
 				    u8c = bad_char_behavior;
 			    }
 			}
 		    }
-		    else if (fio_flags & FIO_UCS4)
+		    မဟုတ်ပါက အကယ်၍ (fio_flags & FIO_UCS4)
 		    {
-			if (fio_flags & FIO_ENDIAN_L)
+			အကယ်၍ (fio_flags & FIO_ENDIAN_L)
 			{
 			    u8c = (unsigned)*--p << 24;
 			    u8c += (unsigned)*--p << 16;
 			    u8c += (unsigned)*--p << 8;
 			    u8c += *--p;
 			}
-			else	// big endian
+			မဟုတ်ပါက	// big endian
 			{
 			    u8c = *--p;
 			    u8c += (unsigned)*--p << 8;
@@ -1992,59 +1992,59 @@ retry:
 			    u8c += (unsigned)*--p << 24;
 			}
 		    }
-		    else    // UTF-8
+		    မဟုတ်ပါက    // UTF-8
 		    {
-			if (*--p < 0x80)
+			အကယ်၍ (*--p < 0x80)
 			    u8c = *p;
-			else
+			မဟုတ်ပါက
 			{
 			    len = utf_head_off(ptr, p);
 			    p -= len;
 			    u8c = utf_ptr2char(p);
-			    if (len == 0)
+			    အကယ်၍ (len == 0)
 			    {
 				// Not a valid UTF-8 character, retry with
 				// another fenc when possible, otherwise just
 				// report the error.
-				if (can_retry)
+				အကယ်၍ (can_retry)
 				    goto rewind_retry;
-				if (conv_error == 0)
+				အကယ်၍ (conv_error == 0)
 				    conv_error = readfile_linenr(linecnt,
 								      ptr, p);
-				if (bad_char_behavior == BAD_DROP)
+				အကယ်၍ (bad_char_behavior == BAD_DROP)
 				    continue;
-				if (bad_char_behavior != BAD_KEEP)
+				အကယ်၍ (bad_char_behavior != BAD_KEEP)
 				    u8c = bad_char_behavior;
 			    }
 			}
 		    }
-		    if (enc_utf8)	// produce UTF-8
+		    အကယ်၍ (enc_utf8)	// produce UTF-8
 		    {
 			dest -= utf_char2len(u8c);
 			(void)utf_char2bytes(u8c, dest);
 		    }
-		    else		// produce Latin1
+		    မဟုတ်ပါက		// produce Latin1
 		    {
 			--dest;
-			if (u8c >= 0x100)
+			အကယ်၍ (u8c >= 0x100)
 			{
 			    // character doesn't fit in latin1, retry with
 			    // another fenc when possible, otherwise just
 			    // report the error.
-			    if (can_retry)
+			    အကယ်၍ (can_retry)
 				goto rewind_retry;
-			    if (conv_error == 0)
+			    အကယ်၍ (conv_error == 0)
 				conv_error = readfile_linenr(linecnt, ptr, p);
-			    if (bad_char_behavior == BAD_DROP)
+			    အကယ်၍ (bad_char_behavior == BAD_DROP)
 				++dest;
-			    else if (bad_char_behavior == BAD_KEEP)
+			    မဟုတ်ပါက အကယ်၍ (bad_char_behavior == BAD_KEEP)
 				*dest = u8c;
-			    else if (eap != NULL && eap->bad_char != 0)
+			    မဟုတ်ပါက အကယ်၍ (eap != NULL && eap->bad_char != 0)
 				*dest = bad_char_behavior;
-			    else
+			    မဟုတ်ပါက
 				*dest = 0xBF;
 			}
-			else
+			မဟုတ်ပါက
 			    *dest = u8c;
 		    }
 		}
@@ -2055,103 +2055,103 @@ retry:
 		size = (long)((ptr + real_size) - dest);
 		ptr = dest;
 	    }
-	    else if (enc_utf8 && !curbuf->b_p_bin)
+	    မဟုတ်ပါက အကယ်၍ (enc_utf8 && !curbuf->b_p_bin)
 	    {
-		int  incomplete_tail = FALSE;
+		ကိန်းပြည့်  incomplete_tail = FALSE;
 
 		// Reading UTF-8: Check if the bytes are valid UTF-8.
-		for (p = ptr; ; )
+		အတွက် (p = ptr; ; )
 		{
-		    int	 todo;
-		    int	 l;
+		    ကိန်းပြည့်	 todo;
+		    ကိန်းပြည့်	 l;
 
 		    // Skip ASCII bytes quickly using word-at-a-time check.
 		    {
 			char_u *ascii_end = ptr + size;
-			while (ascii_end - p >= (long)sizeof(long_u))
+			နေစဉ် (ascii_end - p >= (long)parimaa_na(long_u))
 			{
 			    long_u word;
-			    memcpy(&word, p, sizeof(long_u));
-			    if (word & NONASCII_MASK)
-				break;
-			    p += sizeof(long_u);
+			    memcpy(&word, p, parimaa_na(long_u));
+			    အကယ်၍ (word & NONASCII_MASK)
+				bha_nga;
+			    p += parimaa_na(long_u);
 			}
-			while (p < ascii_end && *p < 0x80)
+			နေစဉ် (p < ascii_end && *p < 0x80)
 			    ++p;
 		    }
 
-		    todo = (int)((ptr + size) - p);
-		    if (todo <= 0)
-			break;
-		    if (*p >= 0x80)
+		    todo = (ကိန်းပြည့်)((ptr + size) - p);
+		    အကယ်၍ (todo <= 0)
+			bha_nga;
+		    အကယ်၍ (*p >= 0x80)
 		    {
 			// A length of 1 means it's an illegal byte.  Accept
 			// an incomplete character at the end though, the next
 			// read() will get the next bytes, we'll check it
 			// then.
 			l = utf_ptr2len_len(p, todo);
-			if (l > todo && !incomplete_tail)
+			အကယ်၍ (l > todo && !incomplete_tail)
 			{
 			    // Avoid retrying with a different encoding when
 			    // a truncated file is more likely, or attempting
 			    // to read the rest of an incomplete sequence when
 			    // we have already done so.
-			    if (p > ptr || filesize > 0)
+			    အကယ်၍ (p > ptr || filesize > 0)
 				incomplete_tail = TRUE;
 			    // Incomplete byte sequence, move it to conv_rest[]
 			    // and try to read the rest of it, unless we've
 			    // already done so.
-			    if (p > ptr)
+			    အကယ်၍ (p > ptr)
 			    {
 				conv_restlen = todo;
 				mch_memmove(conv_rest, p, conv_restlen);
 				size -= conv_restlen;
-				break;
+				bha_nga;
 			    }
 			}
-			if (l == 1 || l > todo)
+			အကယ်၍ (l == 1 || l > todo)
 			{
 			    // Illegal byte.  If we can try another encoding
 			    // do that, unless at EOF where a truncated
 			    // file is more likely than a conversion error.
-			    if (can_retry && !incomplete_tail)
-				break;
+			    အကယ်၍ (can_retry && !incomplete_tail)
+				bha_nga;
 #ifdef USE_ICONV
 			    // When we did a conversion report an error.
-			    if (iconv_fd != (iconv_t)-1 && conv_error == 0)
+			    အကယ်၍ (iconv_fd != (iconv_t)-1 && conv_error == 0)
 				conv_error = readfile_linenr(linecnt, ptr, p);
 #endif
 			    // Remember the first linenr with an illegal byte
-			    if (conv_error == 0 && illegal_byte == 0)
+			    အကယ်၍ (conv_error == 0 && illegal_byte == 0)
 				illegal_byte = readfile_linenr(linecnt, ptr, p);
 
 			    // Drop, keep or replace the bad byte.
-			    if (bad_char_behavior == BAD_DROP)
+			    အကယ်၍ (bad_char_behavior == BAD_DROP)
 			    {
 				mch_memmove(p, p + 1, todo - 1);
 				--size;
 			    }
-			    else
+			    မဟုတ်ပါက
 			    {
-				if (bad_char_behavior != BAD_KEEP)
+				အကယ်၍ (bad_char_behavior != BAD_KEEP)
 				    *p = bad_char_behavior;
 				++p;
 			    }
 			}
-			else
+			မဟုတ်ပါက
 			    p += l;
 		    }
 		}
-		if (p < ptr + size && !incomplete_tail)
+		အကယ်၍ (p < ptr + size && !incomplete_tail)
 		{
 		    // Detected a UTF-8 error.
 rewind_retry:
 		    // Retry reading with another conversion.
-#if defined(FEAT_EVAL) && defined(USE_ICONV)
-		    if (*p_ccv != NUL && iconv_fd != (iconv_t)-1)
+#အကယ်၍ defined(FEAT_EVAL) && defined(USE_ICONV)
+		    အကယ်၍ (*p_ccv != NUL && iconv_fd != (iconv_t)-1)
 			// iconv() failed, try 'charconvert'
 			did_iconv = TRUE;
-		    else
+		    မဟုတ်ပါက
 #endif
 			// use next item from 'fileencodings'
 			advance_fenc = TRUE;
@@ -2166,67 +2166,67 @@ rewind_retry:
 	    /*
 	     * when reading the first part of a file: guess EOL type
 	     */
-	    if (fileformat == EOL_UNKNOWN)
+	    အကယ်၍ (fileformat == EOL_UNKNOWN)
 	    {
 		// First try finding a NL, for Dos and Unix
-		if (try_dos || try_unix)
+		အကယ်၍ (try_dos || try_unix)
 		{
 		    // Reset the carriage return counter.
-		    if (try_mac)
+		    အကယ်၍ (try_mac)
 			try_mac = 1;
 
-		    for (p = ptr; p < ptr + size; ++p)
+		    အတွက် (p = ptr; p < ptr + size; ++p)
 		    {
-			if (*p == NL)
+			အကယ်၍ (*p == NL)
 			{
-			    if (!try_unix
+			    အကယ်၍ (!try_unix
 				    || (try_dos && p > ptr && p[-1] == CAR))
 				fileformat = EOL_DOS;
-			    else
+			    မဟုတ်ပါက
 				fileformat = EOL_UNIX;
-			    break;
+			    bha_nga;
 			}
-			else if (*p == CAR && try_mac)
+			မဟုတ်ပါက အကယ်၍ (*p == CAR && try_mac)
 			    try_mac++;
 		    }
 
 		    // Don't give in to EOL_UNIX if EOL_MAC is more likely
-		    if (fileformat == EOL_UNIX && try_mac)
+		    အကယ်၍ (fileformat == EOL_UNIX && try_mac)
 		    {
 			// Need to reset the counters when retrying fenc.
 			try_mac = 1;
 			try_unix = 1;
-			for (; p >= ptr && *p != CAR; p--)
+			အတွက် (; p >= ptr && *p != CAR; p--)
 			    ;
-			if (p >= ptr)
+			အကယ်၍ (p >= ptr)
 			{
-			    for (p = ptr; p < ptr + size; ++p)
+			    အတွက် (p = ptr; p < ptr + size; ++p)
 			    {
-				if (*p == NL)
+				အကယ်၍ (*p == NL)
 				    try_unix++;
-				else if (*p == CAR)
+				မဟုတ်ပါက အကယ်၍ (*p == CAR)
 				    try_mac++;
 			    }
-			    if (try_mac > try_unix)
+			    အကယ်၍ (try_mac > try_unix)
 				fileformat = EOL_MAC;
 			}
 		    }
-		    else if (fileformat == EOL_UNKNOWN && try_mac == 1)
+		    မဟုတ်ပါက အကယ်၍ (fileformat == EOL_UNKNOWN && try_mac == 1)
 			// Looking for CR but found no end-of-line markers at
 			// all: use the default format.
 			fileformat = default_fileformat();
 		}
 
 		// No NL found: may use Mac format
-		if (fileformat == EOL_UNKNOWN && try_mac)
+		အကယ်၍ (fileformat == EOL_UNKNOWN && try_mac)
 		    fileformat = EOL_MAC;
 
 		// Still nothing found?  Use first format in 'ffs'
-		if (fileformat == EOL_UNKNOWN)
+		အကယ်၍ (fileformat == EOL_UNKNOWN)
 		    fileformat = default_fileformat();
 
 		// if editing a new file: may set p_tx and p_ff
-		if (set_options)
+		အကယ်၍ (set_options)
 		    set_fileformat(fileformat, OPT_LOCAL);
 	    }
 	}
@@ -2235,76 +2235,76 @@ rewind_retry:
 	 * This loop is executed once for every character read.
 	 * Keep it fast!
 	 */
-	if (fileformat == EOL_MAC)
+	အကယ်၍ (fileformat == EOL_MAC)
 	{
 	    --ptr;
-	    while (++ptr, --size >= 0)
+	    နေစဉ် (++ptr, --size >= 0)
 	    {
 		// catch most common case first
-		if ((c = *ptr) != NUL && c != CAR && c != NL)
+		အကယ်၍ ((c = *ptr) != NUL && c != CAR && c != NL)
 		    continue;
-		if (c == NUL)
+		အကယ်၍ (c == NUL)
 		    *ptr = NL;	// NULs are replaced by newlines!
-		else if (c == NL)
+		မဟုတ်ပါက အကယ်၍ (c == NL)
 		    *ptr = CAR;	// NLs are replaced by CRs!
-		else
+		မဟုတ်ပါက
 		{
-		    if (skip_count == 0)
+		    အကယ်၍ (skip_count == 0)
 		    {
 			*ptr = NUL;	    // end of line
 			len = (colnr_T) (ptr - line_start + 1);
-			if (ml_append(lnum, line_start, len, newfile) == FAIL)
+			အကယ်၍ (ml_append(lnum, line_start, len, newfile) == FAIL)
 			{
 			    error = TRUE;
-			    break;
+			    bha_nga;
 			}
 #ifdef FEAT_PERSISTENT_UNDO
-			if (read_undo_file)
+			အကယ်၍ (read_undo_file)
 			    sha256_update(&sha_ctx, line_start, len);
 #endif
 			++lnum;
-			if (--read_count == 0)
+			အကယ်၍ (--read_count == 0)
 			{
 			    error = TRUE;	// break loop
 			    line_start = ptr;	// nothing left to write
-			    break;
+			    bha_nga;
 			}
 		    }
-		    else
+		    မဟုတ်ပါက
 			--skip_count;
 		    line_start = ptr + 1;
 		}
 	    }
 	}
-	else
+	မဟုတ်ပါက
 	{
 	    // Use memchr() for SIMD-optimized newline scanning instead
 	    // of scanning each byte individually.
 	    char_u *end = ptr + size;
 
-	    while (ptr < end)
+	    နေစဉ် (ptr < end)
 	    {
 		char_u *nl = (char_u *)memchr(ptr, NL, end - ptr);
 		char_u *nul_scan;
 
-		if (nl == NULL)
+		အကယ်၍ (nl == NULL)
 		{
 		    // No more newlines in buffer.
 		    // Replace any NUL bytes with NL in remaining data.
-		    while ((nul_scan = (char_u *)memchr(ptr, NUL,
+		    နေစဉ် ((nul_scan = (char_u *)memchr(ptr, NUL,
 						      end - ptr)) != NULL)
 		    {
 			*nul_scan = NL;
 			ptr = nul_scan + 1;
 		    }
 		    ptr = end;
-		    break;
+		    bha_nga;
 		}
 
 		// Replace NUL bytes with NL before the newline.
 		{
 		    char_u *scan = ptr;
-		    while ((nul_scan = (char_u *)memchr(scan, NUL,
+		    နေစဉ် ((nul_scan = (char_u *)memchr(scan, NUL,
 						       nl - scan)) != NULL)
 		    {
 			*nul_scan = NL;
@@ -2314,13 +2314,13 @@ rewind_retry:
 
 		// Process the newline.
 		ptr = nl;
-		if (skip_count == 0)
+		အကယ်၍ (skip_count == 0)
 		{
 		    *ptr = NUL;		// end of line
 		    len = (colnr_T)(ptr - line_start + 1);
-		    if (fileformat == EOL_DOS)
+		    အကယ်၍ (fileformat == EOL_DOS)
 		    {
-			if (ptr > line_start && ptr[-1] == CAR)
+			အကယ်၍ (ptr > line_start && ptr[-1] == CAR)
 			{
 			    // remove CR before NL
 			    ptr[-1] = NUL;
@@ -2332,16 +2332,16 @@ rewind_retry:
 			 * the lines read so far and start all over again.
 			 * Otherwise give an error message later.
 			 */
-			else if (ff_error != EOL_DOS)
+			မဟုတ်ပါက အကယ်၍ (ff_error != EOL_DOS)
 			{
-			    if (   try_unix
+			    အကယ်၍ (   try_unix
 				&& !read_stdin
 				&& (read_buffer
 				    || vim_lseek(fd, (off_T)0L, SEEK_SET)
 								      == 0))
 			    {
 				fileformat = EOL_UNIX;
-				if (set_options)
+				အကယ်၍ (set_options)
 				    set_fileformat(EOL_UNIX, OPT_LOCAL);
 				file_rewind = TRUE;
 				keep_fileformat = TRUE;
@@ -2350,24 +2350,24 @@ rewind_retry:
 			    ff_error = EOL_DOS;
 			}
 		    }
-		    if (ml_append(lnum, line_start, len, newfile) == FAIL)
+		    အကယ်၍ (ml_append(lnum, line_start, len, newfile) == FAIL)
 		    {
 			error = TRUE;
-			break;
+			bha_nga;
 		    }
 #ifdef FEAT_PERSISTENT_UNDO
-		    if (read_undo_file)
+		    အကယ်၍ (read_undo_file)
 			sha256_update(&sha_ctx, line_start, len);
 #endif
 		    ++lnum;
-		    if (--read_count == 0)
+		    အကယ်၍ (--read_count == 0)
 		    {
 			error = TRUE;	    // break loop
 			line_start = ptr;   // nothing left to write
-			break;
+			bha_nga;
 		    }
 		}
-		else
+		မဟုတ်ပါက
 		    --skip_count;
 		line_start = ptr + 1;
 		++ptr;
@@ -2380,7 +2380,7 @@ rewind_retry:
 
 failed:
     // not an error, max. number of lines reached
-    if (error && read_count == 0)
+    အကယ်၍ (error && read_count == 0)
 	error = FALSE;
 
     // In Dos format ignore a trailing CTRL-Z, unless 'binary' is set.
@@ -2389,50 +2389,50 @@ failed:
     // system that keeps file length properly the CTRL-Z should be dropped.
     // Set the 'endoffile' option so the user can decide what to write later.
     // In Unix format the CTRL-Z is just another character.
-    if (linerest != 0
+    အကယ်၍ (linerest != 0
 	    && !curbuf->b_p_bin
 	    && fileformat == EOL_DOS
 	    && ptr[-1] == Ctrl_Z)
     {
 	ptr--;
 	linerest--;
-	if (set_options)
+	အကယ်၍ (set_options)
 	    curbuf->b_p_eof = TRUE;
     }
 
     // If we get EOF in the middle of a line, note the fact by resetting
     // 'endofline' and add the line normally.
-    if (!error
+    အကယ်၍ (!error
 	    && !got_int
 	    && linerest != 0)
     {
 	// remember for when writing
-	if (set_options)
+	အကယ်၍ (set_options)
 	    curbuf->b_p_eol = FALSE;
 	*ptr = NUL;
 	len = (colnr_T)(ptr - line_start + 1);
-	if (ml_append(lnum, line_start, len, newfile) == FAIL)
+	အကယ်၍ (ml_append(lnum, line_start, len, newfile) == FAIL)
 	    error = TRUE;
-	else
+	မဟုတ်ပါက
 	{
 #ifdef FEAT_PERSISTENT_UNDO
-	    if (read_undo_file)
+	    အကယ်၍ (read_undo_file)
 		sha256_update(&sha_ctx, line_start, len);
 #endif
 	    read_no_eol_lnum = ++lnum;
 	}
     }
 
-    if (set_options)
+    အကယ်၍ (set_options)
 	save_file_ff(curbuf);		// remember the current file format
 
 #ifdef FEAT_CRYPT
-    if (curbuf->b_cryptstate != NULL)
+    အကယ်၍ (curbuf->b_cryptstate != NULL)
     {
 	crypt_free_state(curbuf->b_cryptstate);
 	curbuf->b_cryptstate = NULL;
     }
-    if (cryptkey != NULL && cryptkey != curbuf->b_p_key)
+    အကယ်၍ (cryptkey != NULL && cryptkey != curbuf->b_p_key)
 	crypt_free_key(cryptkey);
     // Don't set cryptkey to NULL, it's used below as a flag that
     // encryption was used.
@@ -2440,31 +2440,31 @@ failed:
 
     // If editing a new file: set 'fenc' for the current buffer.
     // Also for ":read ++edit file".
-    if (set_options)
+    အကယ်၍ (set_options)
 	set_string_option_direct((char_u *)"fenc", -1, fenc,
 						       OPT_FREE|OPT_LOCAL, 0);
-    if (fenc_alloced)
+    အကယ်၍ (fenc_alloced)
 	vim_free(fenc);
 #ifdef USE_ICONV
-    if (iconv_fd != (iconv_t)-1)
+    အကယ်၍ (iconv_fd != (iconv_t)-1)
 	iconv_close(iconv_fd);
 #endif
 
-    if (!read_buffer && !read_stdin)
+    အကယ်၍ (!read_buffer && !read_stdin)
 	close(fd);				// errors are ignored
 #ifdef HAVE_FD_CLOEXEC
-    else
+    မဟုတ်ပါက
     {
-	int fdflags = fcntl(fd, F_GETFD);
+	ကိန်းပြည့် fdflags = fcntl(fd, F_GETFD);
 
-	if (fdflags >= 0 && (fdflags & FD_CLOEXEC) == 0)
+	အကယ်၍ (fdflags >= 0 && (fdflags & FD_CLOEXEC) == 0)
 	    (void)fcntl(fd, F_SETFD, fdflags | FD_CLOEXEC);
     }
 #endif
     vim_free(buffer);
 
 #ifdef HAVE_DUP
-    if (read_stdin)
+    အကယ်၍ (read_stdin)
     {
 	// Use stderr for stdin, makes shell commands work.
 	close(0);
@@ -2472,7 +2472,7 @@ failed:
     }
 #endif
 
-    if (tmpname != NULL)
+    အကယ်၍ (tmpname != NULL)
     {
 	mch_remove(tmpname);		// delete converted file
 	vim_free(tmpname);
@@ -2482,10 +2482,10 @@ failed:
     /*
      * In recovery mode everything but autocommands is skipped.
      */
-    if (!recoverymode)
+    အကယ်၍ (!recoverymode)
     {
 	// need to delete the last line, which comes from the empty buffer
-	if (newfile && wasempty && !(curbuf->b_ml.ml_flags & ML_EMPTY))
+	အကယ်၍ (newfile && wasempty && !(curbuf->b_ml.ml_flags & ML_EMPTY))
 	{
 #ifdef FEAT_NETBEANS_INTG
 	    netbeansFireChanges = 0;
@@ -2497,9 +2497,9 @@ failed:
 	    --linecnt;
 	}
 	linecnt = curbuf->b_ml.ml_line_count - linecnt;
-	if (filesize == 0)
+	အကယ်၍ (filesize == 0)
 	    linecnt = 0;
-	if (newfile || read_buffer)
+	အကယ်၍ (newfile || read_buffer)
 	{
 	    redraw_curbuf_later(UPD_NOT_VALID);
 #ifdef FEAT_DIFF
@@ -2513,7 +2513,7 @@ failed:
 	    foldUpdateAll(curwin);
 #endif
 	}
-	else if (linecnt)		// appended at least one line
+	မဟုတ်ပါက အကယ်၍ (linecnt)		// appended at least one line
 	    appended_lines_mark(from, linecnt);
 
 #ifndef ALWAYS_USE_GUI
@@ -2522,7 +2522,7 @@ failed:
 	 * the screen will have been messed up.
 	 * Switch on raw mode now and clear the screen.
 	 */
-	if (read_stdin)
+	အကယ်၍ (read_stdin)
 	{
 	    settmode(TMODE_RAW);	// set to raw mode
 	    starttermcap();
@@ -2530,12 +2530,12 @@ failed:
 	}
 #endif
 
-	if (got_int)
+	အကယ်၍ (got_int)
 	{
-	    if (!(flags & READ_DUMMY))
+	    အကယ်၍ (!(flags & READ_DUMMY))
 	    {
 		filemess(curbuf, sfname, (char_u *)_(e_interrupted), 0);
-		if (newfile)
+		အကယ်၍ (newfile)
 		    curbuf->b_p_ro = TRUE;	// must use "w!" now
 	    }
 	    msg_scroll = msg_save;
@@ -2546,103 +2546,103 @@ failed:
 	    goto theend;
 	}
 
-	if (!filtering && !(flags & READ_DUMMY))
+	အကယ်၍ (!filtering && !(flags & READ_DUMMY))
 	{
-	    int	buflen;
+	    ကိန်းပြည့်	buflen;
 
 	    msg_add_fname(curbuf, sfname);   // fname in IObuff with quotes
 	    c = FALSE;
 
-	    buflen = (int)STRLEN(IObuff);
+	    buflen = (ကိန်းပြည့်)STRLEN(IObuff);
 #ifdef UNIX
-	    if (S_ISFIFO(perm))			    // fifo
+	    အကယ်၍ (S_ISFIFO(perm))			    // fifo
 	    {
-		buflen += vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
+		buflen += vim_snprintf((var_na *)IObuff + buflen, IOSIZE - buflen,
 			_("[fifo]"));
 		c = TRUE;
 	    }
-	    if (S_ISSOCK(perm))			    // or socket
+	    အကယ်၍ (S_ISSOCK(perm))			    // or socket
 	    {
-		buflen += vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
+		buflen += vim_snprintf((var_na *)IObuff + buflen, IOSIZE - buflen,
 			_("[socket]"));
 		c = TRUE;
 	    }
 # ifdef OPEN_CHR_FILES
-	    if (S_ISCHR(perm))			    // or character special
+	    အကယ်၍ (S_ISCHR(perm))			    // or character special
 	    {
-		buflen += vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
+		buflen += vim_snprintf((var_na *)IObuff + buflen, IOSIZE - buflen,
 			_("[character special]"));
 		c = TRUE;
 	    }
 # endif
 #endif
-	    if (curbuf->b_p_ro)
+	    အကယ်၍ (curbuf->b_p_ro)
 	    {
-		buflen += vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
+		buflen += vim_snprintf((var_na *)IObuff + buflen, IOSIZE - buflen,
 			"%s", shortmess(SHM_RO) ? _("[RO]") : _("[readonly]"));
 		c = TRUE;
 	    }
-	    if (read_no_eol_lnum)
+	    အကယ်၍ (read_no_eol_lnum)
 	    {
 		msg_add_eol();
 		c = TRUE;
 	    }
-	    if (ff_error == EOL_DOS)
+	    အကယ်၍ (ff_error == EOL_DOS)
 	    {
-		buflen += vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
+		buflen += vim_snprintf((var_na *)IObuff + buflen, IOSIZE - buflen,
 			_("[CR missing]"));
 		c = TRUE;
 	    }
-	    if (split)
+	    အကယ်၍ (split)
 	    {
-		buflen += vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
+		buflen += vim_snprintf((var_na *)IObuff + buflen, IOSIZE - buflen,
 			_("[long lines split]"));
 		c = TRUE;
 	    }
-	    if (notconverted)
+	    အကယ်၍ (notconverted)
 	    {
-		buflen += vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
+		buflen += vim_snprintf((var_na *)IObuff + buflen, IOSIZE - buflen,
 			_("[NOT converted]"));
 		c = TRUE;
 	    }
-	    else if (converted)
+	    မဟုတ်ပါက အကယ်၍ (converted)
 	    {
-		buflen += vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
+		buflen += vim_snprintf((var_na *)IObuff + buflen, IOSIZE - buflen,
 			_("[converted]"));
 		c = TRUE;
 	    }
 #ifdef FEAT_CRYPT
-	    if (cryptkey != NULL)
+	    အကယ်၍ (cryptkey != NULL)
 	    {
 		crypt_append_msg(curbuf);
 		c = TRUE;
 	    }
 #endif
-	    if (conv_error != 0)
+	    အကယ်၍ (conv_error != 0)
 	    {
-		vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
+		vim_snprintf((var_na *)IObuff + buflen, IOSIZE - buflen,
 			_("[CONVERSION ERROR in line %ld]"), (long)conv_error);
 		c = TRUE;
 	    }
-	    else if (illegal_byte > 0)
+	    မဟုတ်ပါက အကယ်၍ (illegal_byte > 0)
 	    {
-		vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
+		vim_snprintf((var_na *)IObuff + buflen, IOSIZE - buflen,
 			_("[ILLEGAL BYTE in line %ld]"), (long)illegal_byte);
 		c = TRUE;
 	    }
-	    else if (error)
+	    မဟုတ်ပါက အကယ်၍ (error)
 	    {
-		vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
+		vim_snprintf((var_na *)IObuff + buflen, IOSIZE - buflen,
 			_("[READ ERRORS]"));
 		c = TRUE;
 	    }
-	    if (msg_add_fileformat(fileformat))
+	    အကယ်၍ (msg_add_fileformat(fileformat))
 		c = TRUE;
 #ifdef FEAT_CRYPT
-	    if (cryptkey != NULL)
+	    အကယ်၍ (cryptkey != NULL)
 		msg_add_lines(c, (long)linecnt, filesize
 			 - crypt_get_header_len(crypt_get_method_nr(curbuf)));
-	    else
+	    မဟုတ်ပါက
 #endif
 		msg_add_lines(c, (long)linecnt, filesize);
 
@@ -2651,16 +2651,16 @@ failed:
 #ifdef ALWAYS_USE_GUI
 	    // Don't show the message when reading stdin, it would end up in a
 	    // message box (which might be shown when exiting!)
-	    if (read_stdin || read_buffer)
+	    အကယ်၍ (read_stdin || read_buffer)
 		p = msg_may_trunc(FALSE, IObuff);
-	    else
+	    မဟုတ်ပါက
 #endif
 	    {
-		if (msg_col > 0)
+		အကယ်၍ (msg_col > 0)
 		    msg_putchar('\r');  // overwrite previous message
-		p = (char_u *)msg_trunc_attr((char *)IObuff, FALSE, 0);
+		p = (char_u *)msg_trunc_attr((var_na *)IObuff, FALSE, 0);
 	    }
-	    if (read_stdin || read_buffer || restart_edit != 0
+	    အကယ်၍ (read_stdin || read_buffer || restart_edit != 0
 		    || (msg_scrolled != 0 && !need_wait_return))
 		// Need to repeat the message after redrawing when:
 		// - When reading from stdin (the screen will be cleared next).
@@ -2673,7 +2673,7 @@ failed:
 	}
 
 	// with errors writing the file requires ":w!"
-	if (newfile && (error
+	အကယ်၍ (newfile && (error
 		    || conv_error != 0
 		    || (illegal_byte > 0 && bad_char_behavior != BAD_KEEP)))
 	    curbuf->b_p_ro = TRUE;
@@ -2684,14 +2684,14 @@ failed:
 	 * In Ex mode: cursor at last new line.
 	 * Otherwise: cursor at first new line.
 	 */
-	if (exmode_active)
+	အကယ်၍ (exmode_active)
 	    curwin->w_cursor.lnum = from + linecnt;
-	else
+	မဟုတ်ပါက
 	    curwin->w_cursor.lnum = from + 1;
 	check_cursor_lnum();
 	beginline(BL_WHITE | BL_FIX);	    // on first non-blank
 
-	if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+	အကယ်၍ ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
 	{
 	    // Set '[ and '] marks to the newly read lines.
 	    curbuf->b_op_start.lnum = from + 1;
@@ -2708,8 +2708,8 @@ failed:
 	 * It's correct again after reading the file, thus reset the timestamp
 	 * here.
 	 */
-	if (newfile && !read_stdin && !read_buffer
-					 && mch_stat((char *)fname, &st) >= 0)
+	အကယ်၍ (newfile && !read_stdin && !read_buffer
+					 && mch_stat((var_na *)fname, &st) >= 0)
 	{
 	    buf_store_time(curbuf, &st, fname);
 	    curbuf->b_mtime_read = curbuf->b_mtime;
@@ -2736,14 +2736,14 @@ failed:
 
     // When reloading a buffer put the cursor at the first line that is
     // different.
-    if (flags & READ_KEEP_UNDO)
+    အကယ်၍ (flags & READ_KEEP_UNDO)
 	u_find_first_changed();
 
 #ifdef FEAT_PERSISTENT_UNDO
     /*
      * When opening a new file locate undo info and read it.
      */
-    if (read_undo_file)
+    အကယ်၍ (read_undo_file)
     {
 	char_u	hash[UNDO_HASH_SIZE];
 
@@ -2752,14 +2752,14 @@ failed:
     }
 #endif
 
-    if (!read_stdin && !read_fifo && (!read_buffer || sfname != NULL))
+    အကယ်၍ (!read_stdin && !read_fifo && (!read_buffer || sfname != NULL))
     {
-	int m = msg_scroll;
-	int n = msg_scrolled;
+	ကိန်းပြည့် m = msg_scroll;
+	ကိန်းပြည့် n = msg_scrolled;
 
 	// Save the fileformat now, otherwise the buffer will be considered
 	// modified if the format/encoding was automatically detected.
-	if (set_options)
+	အကယ်၍ (set_options)
 	    save_file_ff(curbuf);
 
 	/*
@@ -2768,14 +2768,14 @@ failed:
 	 * output was done.
 	 */
 	msg_scroll = TRUE;
-	if (filtering)
+	အကယ်၍ (filtering)
 	    apply_autocmds_exarg(EVENT_FILTERREADPOST, NULL, sfname,
 							  FALSE, curbuf, eap);
-	else if (newfile || (read_buffer && sfname != NULL))
+	မဟုတ်ပါက အကယ်၍ (newfile || (read_buffer && sfname != NULL))
 	{
 	    apply_autocmds_exarg(EVENT_BUFREADPOST, NULL, sfname,
 							  FALSE, curbuf, eap);
-	    if (!curbuf->b_au_did_filetype && *curbuf->b_p_ft != NUL)
+	    အကယ်၍ (!curbuf->b_au_did_filetype && *curbuf->b_p_ft != NUL)
 		/*
 		 * EVENT_FILETYPE was not triggered but the buffer already has a
 		 * filetype. Trigger EVENT_FILETYPE using the existing filetype.
@@ -2783,40 +2783,40 @@ failed:
 		apply_autocmds(EVENT_FILETYPE, curbuf->b_p_ft, curbuf->b_fname,
 			TRUE, curbuf);
 	}
-	else
+	မဟုတ်ပါက
 	    apply_autocmds_exarg(EVENT_FILEREADPOST, sfname, sfname,
 							    FALSE, NULL, eap);
-	if (msg_scrolled == n)
+	အကယ်၍ (msg_scrolled == n)
 	    msg_scroll = m;
 #ifdef FEAT_EVAL
-	if (aborting())	    // autocmds may abort script processing
+	အကယ်၍ (aborting())	    // autocmds may abort script processing
 	    goto theend;
 #endif
     }
 
-    if (!(recoverymode && error))
+    အကယ်၍ (!(recoverymode && error))
 	retval = OK;
 
 theend:
-    if (curbuf->b_ml.ml_mfp != NULL
+    အကယ်၍ (curbuf->b_ml.ml_mfp != NULL
 		       && curbuf->b_ml.ml_mfp->mf_dirty == MF_DIRTY_YES_NOSYNC)
 	// OK to sync the swap file now
 	curbuf->b_ml.ml_mfp->mf_dirty = MF_DIRTY_YES;
 
-    return retval;
+    ပြန်ပေး retval;
 }
 
-#if defined(OPEN_CHR_FILES)
+#အကယ်၍ defined(OPEN_CHR_FILES)
 /*
  * Returns TRUE if the file name argument is of the form "/dev/fd/\d\+",
  * which is the name of files used for process substitution output by
  * some shells on some operating systems, e.g., bash on SunOS.
  * Do not accept "/dev/fd/[012]", opening these may hang Vim.
  */
-    int
+    ကိန်းပြည့်
 is_dev_fd_file(char_u *fname)
 {
-    return (STRNCMP(fname, "/dev/fd/", 8) == 0
+    ပြန်ပေး (STRNCMP(fname, "/dev/fd/", 8) == 0
 	    && VIM_ISDIGIT(fname[8])
 	    && *skipdigits(fname + 9) == NUL
 	    && (fname[9] != NUL
@@ -2839,10 +2839,10 @@ readfile_linenr(
     linenr_T	lnum;
 
     lnum = curbuf->b_ml.ml_line_count - linecnt + 1;
-    for (s = p; s < endp; ++s)
-	if (*s == '\n')
+    အတွက် (s = p; s < endp; ++s)
+	အကယ်၍ (*s == '\n')
 	    ++lnum;
-    return lnum;
+    ပြန်ပေး lnum;
 }
 
 /*
@@ -2850,14 +2850,14 @@ readfile_linenr(
  * equal to the buffer "buf".  Used for calling readfile().
  * Returns OK or FAIL.
  */
-    int
+    ကိန်းပြည့်
 prep_exarg(exarg_T *eap, buf_T *buf)
 {
     eap->cmd = alloc(15 + (unsigned)STRLEN(buf->b_p_fenc));
-    if (eap->cmd == NULL)
-	return FAIL;
+    အကယ်၍ (eap->cmd == NULL)
+	ပြန်ပေး FAIL;
 
-    sprintf((char *)eap->cmd, "e ++enc=%s", buf->b_p_fenc);
+    sprintf((var_na *)eap->cmd, "e ++enc=%s", buf->b_p_fenc);
     eap->force_enc = 8;
     eap->bad_char = buf->b_bad_char;
     eap->force_ff = *buf->b_p_ff;
@@ -2865,28 +2865,28 @@ prep_exarg(exarg_T *eap, buf_T *buf)
     eap->force_bin = buf->b_p_bin ? FORCE_BIN : FORCE_NOBIN;
     eap->read_edit = FALSE;
     eap->forceit = FALSE;
-    return OK;
+    ပြန်ပေး OK;
 }
 
 /*
  * Set default or forced 'fileformat' and 'binary'.
  */
     void
-set_file_options(int set_options, exarg_T *eap)
+set_file_options(ကိန်းပြည့် set_options, exarg_T *eap)
 {
     // set default 'fileformat'
-    if (set_options)
+    အကယ်၍ (set_options)
     {
-	if (eap != NULL && eap->force_ff != 0)
+	အကယ်၍ (eap != NULL && eap->force_ff != 0)
 	    set_fileformat(get_fileformat_force(curbuf, eap), OPT_LOCAL);
-	else if (*p_ffs != NUL)
+	မဟုတ်ပါက အကယ်၍ (*p_ffs != NUL)
 	    set_fileformat(default_fileformat(), OPT_LOCAL);
     }
 
     // set or reset 'binary'
-    if (eap != NULL && eap->force_bin != 0)
+    အကယ်၍ (eap != NULL && eap->force_bin != 0)
     {
-	int	oldval = curbuf->b_p_bin;
+	ကိန်းပြည့်	oldval = curbuf->b_p_bin;
 
 	curbuf->b_p_bin = (eap->force_bin == FORCE_BIN);
 	set_options_bin(oldval, curbuf->b_p_bin, OPT_LOCAL);
@@ -2899,12 +2899,12 @@ set_file_options(int set_options, exarg_T *eap)
     void
 set_forced_fenc(exarg_T *eap)
 {
-    if (eap->force_enc == 0)
-	return;
+    အကယ်၍ (eap->force_enc == 0)
+	ပြန်ပေး;
 
     char_u *fenc = enc_canonize(eap->cmd + eap->force_enc);
 
-    if (fenc != NULL)
+    အကယ်၍ (fenc != NULL)
 	set_string_option_direct((char_u *)"fenc", -1,
 		fenc, OPT_FREE|OPT_LOCAL, 0);
     vim_free(fenc);
@@ -2919,43 +2919,43 @@ set_forced_fenc(exarg_T *eap)
  * is set to TRUE.
  */
     static char_u *
-next_fenc(char_u **pp, int *alloced)
+next_fenc(char_u **pp, ကိန်းပြည့် *alloced)
 {
     char_u	*p;
     char_u	*r;
 
     *alloced = FALSE;
-    if (**pp == NUL)
+    အကယ်၍ (**pp == NUL)
     {
 	*pp = NULL;
-	return (char_u *)"";
+	ပြန်ပေး (char_u *)"";
     }
     p = vim_strchr(*pp, ',');
-    if (p == NULL)
+    အကယ်၍ (p == NULL)
     {
 	r = enc_canonize(*pp);
 	*pp += STRLEN(*pp);
     }
-    else
+    မဟုတ်ပါက
     {
 	r = vim_strnsave(*pp, p - *pp);
 	*pp = p + 1;
-	if (r != NULL)
+	အကယ်၍ (r != NULL)
 	{
 	    p = enc_canonize(r);
 	    vim_free(r);
 	    r = p;
 	}
     }
-    if (r != NULL)
+    အကယ်၍ (r != NULL)
 	*alloced = TRUE;
-    else
+    မဟုတ်ပါက
     {
 	// out of memory
 	r = (char_u *)"";
 	*pp = NULL;
     }
-    return r;
+    ပြန်ပေး r;
 }
 
 #ifdef FEAT_EVAL
@@ -2971,32 +2971,32 @@ next_fenc(char_u **pp, int *alloced)
 readfile_charconvert(
     char_u	*fname,		// name of input file
     char_u	*fenc,		// converted from
-    int		*fdp)		// in/out: file descriptor of file
+    ကိန်းပြည့်		*fdp)		// in/out: file descriptor of file
 {
     char_u	*tmpname;
-    char	*errmsg = NULL;
+    var_na	*errmsg = NULL;
 
     tmpname = vim_tempname('r', FALSE);
-    if (tmpname == NULL)
+    အကယ်၍ (tmpname == NULL)
 	errmsg = _("Can't find temp file for conversion");
-    else
+    မဟုတ်ပါက
     {
 	close(*fdp);		// close the input file, ignore errors
 	*fdp = -1;
-	if (eval_charconvert(fenc, enc_utf8 ? (char_u *)"utf-8" : p_enc,
+	အကယ်၍ (eval_charconvert(fenc, enc_utf8 ? (char_u *)"utf-8" : p_enc,
 						      fname, tmpname) == FAIL)
 	    errmsg = _("Conversion with 'charconvert' failed");
-	if (errmsg == NULL && (*fdp = mch_open((char *)tmpname,
+	အကယ်၍ (errmsg == NULL && (*fdp = mch_open((var_na *)tmpname,
 						  O_RDONLY | O_EXTRA, 0)) < 0)
 	    errmsg = _("can't read output of 'charconvert'");
     }
 
-    if (errmsg != NULL)
+    အကယ်၍ (errmsg != NULL)
     {
 	// Don't use emsg(), it breaks mappings, the retry with
 	// another type of conversion might still work.
 	msg(errmsg);
-	if (tmpname != NULL)
+	အကယ်၍ (tmpname != NULL)
 	{
 	    mch_remove(tmpname);	// delete converted file
 	    VIM_CLEAR(tmpname);
@@ -3004,14 +3004,14 @@ readfile_charconvert(
     }
 
     // If the input file is closed, open it (caller should check for error).
-    if (*fdp < 0)
-	*fdp = mch_open((char *)fname, O_RDONLY | O_EXTRA, 0);
+    အကယ်၍ (*fdp < 0)
+	*fdp = mch_open((var_na *)fname, O_RDONLY | O_EXTRA, 0);
 
-    return tmpname;
+    ပြန်ပေး tmpname;
 }
 #endif
 
-#if defined(FEAT_CRYPT)
+#အကယ်၍ defined(FEAT_CRYPT)
 /*
  * Check for magic number used for encryption.  Applies to the current buffer.
  * If found, the magic number is removed from ptr[*sizep] and *sizep and
@@ -3024,14 +3024,14 @@ check_for_cryptkey(
     char_u	*ptr,		// pointer to read bytes
     long	*sizep,		// length of read bytes
     off_T	*filesizep,	// nr of bytes used from file
-    int		newfile,	// editing a new buffer
+    ကိန်းပြည့်		newfile,	// editing a new buffer
     char_u	*fname,		// file name to display
-    int		*did_ask)	// flag: whether already asked for key
+    ကိန်းပြည့်		*did_ask)	// flag: whether already asked for key
 {
-    int method = crypt_method_nr_from_magic((char *)ptr, *sizep);
-    int b_p_ro = curbuf->b_p_ro;
+    ကိန်းပြည့် method = crypt_method_nr_from_magic((var_na *)ptr, *sizep);
+    ကိန်းပြည့် b_p_ro = curbuf->b_p_ro;
 
-    if (method >= 0)
+    အကယ်၍ (method >= 0)
     {
 	// Mark the buffer as read-only until the decryption has taken place.
 	// Avoids accidentally overwriting the file with garbage.
@@ -3039,14 +3039,14 @@ check_for_cryptkey(
 
 	// Set the cryptmethod local to the buffer.
 	crypt_set_cm_option(curbuf, method);
-	if (cryptkey == NULL && !*did_ask)
+	အကယ်၍ (cryptkey == NULL && !*did_ask)
 	{
-	    if (*curbuf->b_p_key)
+	    အကယ်၍ (*curbuf->b_p_key)
 	    {
 		cryptkey = curbuf->b_p_key;
 		crypt_check_swapfile_curbuf();
 	    }
-	    else
+	    မဟုတ်ပါက
 	    {
 		// When newfile is TRUE, store the typed key in the 'key'
 		// option and don't free it.  bf needs hash of the key saved.
@@ -3059,26 +3059,26 @@ check_for_cryptkey(
 		*did_ask = TRUE;
 
 		// check if empty key entered
-		if (cryptkey != NULL && *cryptkey == NUL)
+		အကယ်၍ (cryptkey != NULL && *cryptkey == NUL)
 		{
-		    if (cryptkey != curbuf->b_p_key)
+		    အကယ်၍ (cryptkey != curbuf->b_p_key)
 			vim_free(cryptkey);
 		    cryptkey = NULL;
 		}
 	    }
 	}
 
-	if (cryptkey != NULL)
+	အကယ်၍ (cryptkey != NULL)
 	{
-	    int header_len;
+	    ကိန်းပြည့် header_len;
 
 	    header_len = crypt_get_header_len(method);
-	    if (*sizep < header_len)
+	    အကယ်၍ (*sizep < header_len)
 	    {
 		// invalid header, buffer can't be encrypted
-		if (cryptkey != curbuf->b_p_key)
+		အကယ်၍ (cryptkey != curbuf->b_p_key)
 		    vim_free(cryptkey);
-		return NULL;
+		ပြန်ပေး NULL;
 	    }
 
 	    curbuf->b_cryptstate = crypt_create_from_header(
@@ -3096,54 +3096,54 @@ check_for_cryptkey(
     }
     // When starting to edit a new file which does not have encryption, clear
     // the 'key' option, except when starting up (called with -x argument)
-    else if (newfile && *curbuf->b_p_key != NUL && !starting)
+    မဟုတ်ပါက အကယ်၍ (newfile && *curbuf->b_p_key != NUL && !starting)
 	set_option_value_give_err((char_u *)"key", 0L, (char_u *)"", OPT_LOCAL);
 
-    return cryptkey;
+    ပြန်ပေး cryptkey;
 }
 #endif  // FEAT_CRYPT
 
 /*
  * Return TRUE if a file appears to be read-only from the file permissions.
  */
-    int
+    ကိန်းပြည့်
 check_file_readonly(
     char_u	*fname,		// full path to file
-    int		perm UNUSED)	// known permissions on file
+    ကိန်းပြည့်		perm UNUSED)	// known permissions on file
 {
 #ifndef USE_MCH_ACCESS
-    int	    fd = 0;
+    ကိန်းပြည့်	    fd = 0;
 #endif
 
-    return (
+    ပြန်ပေး (
 #ifdef USE_MCH_ACCESS
 # ifdef UNIX
 	(perm & 0222) == 0 ||
 # endif
-	mch_access((char *)fname, W_OK)
-#else
-	(fd = mch_open((char *)fname, O_RDWR | O_EXTRA, 0)) < 0
+	mch_access((var_na *)fname, W_OK)
+#မဟုတ်ပါက
+	(fd = mch_open((var_na *)fname, O_RDWR | O_EXTRA, 0)) < 0
 					? TRUE : (close(fd), FALSE)
 #endif
 	);
 }
 
-#if defined(HAVE_FSYNC)
+#အကယ်၍ defined(HAVE_FSYNC)
 /*
  * Call fsync() with Mac-specific exception.
  * Return fsync() result: zero for success.
  */
-    int
-vim_fsync(int fd)
+    ကိန်းပြည့်
+vim_fsync(ကိန်းပြည့် fd)
 {
-    int r;
+    ကိန်းပြည့် r;
 
 # ifdef MACOS_X
     r = fcntl(fd, F_FULLFSYNC);
-    if (r != 0)  // F_FULLFSYNC not working or not supported
+    အကယ်၍ (r != 0)  // F_FULLFSYNC not working or not supported
 # endif
 	r = fsync(fd);
-    return r;
+    ပြန်ပေး r;
 }
 #endif
 
@@ -3151,47 +3151,47 @@ vim_fsync(int fd)
  * Set the name of the current buffer.  Use when the buffer doesn't have a
  * name and a ":r" or ":w" command with a file name is used.
  */
-    int
+    ကိန်းပြည့်
 set_rw_fname(char_u *fname, char_u *sfname)
 {
     buf_T	*buf = curbuf;
 
     // It's like the unnamed buffer is deleted....
-    if (curbuf->b_p_bl)
+    အကယ်၍ (curbuf->b_p_bl)
 	apply_autocmds(EVENT_BUFDELETE, NULL, NULL, FALSE, curbuf);
     apply_autocmds(EVENT_BUFWIPEOUT, NULL, NULL, FALSE, curbuf);
 #ifdef FEAT_EVAL
-    if (aborting())	    // autocmds may abort script processing
-	return FAIL;
+    အကယ်၍ (aborting())	    // autocmds may abort script processing
+	ပြန်ပေး FAIL;
 #endif
-    if (curbuf != buf)
+    အကယ်၍ (curbuf != buf)
     {
 	// We are in another buffer now, don't do the renaming.
 	emsg(_(e_autocommands_changed_buffer_or_buffer_name));
-	return FAIL;
+	ပြန်ပေး FAIL;
     }
 
-    if (setfname(curbuf, fname, sfname, FALSE) == OK)
+    အကယ်၍ (setfname(curbuf, fname, sfname, FALSE) == OK)
 	curbuf->b_flags |= BF_NOTEDITED;
 
     // ....and a new named one is created
     apply_autocmds(EVENT_BUFNEW, NULL, NULL, FALSE, curbuf);
-    if (curbuf->b_p_bl)
+    အကယ်၍ (curbuf->b_p_bl)
 	apply_autocmds(EVENT_BUFADD, NULL, NULL, FALSE, curbuf);
 #ifdef FEAT_EVAL
-    if (aborting())	    // autocmds may abort script processing
-	return FAIL;
+    အကယ်၍ (aborting())	    // autocmds may abort script processing
+	ပြန်ပေး FAIL;
 #endif
 
     // Do filetype detection now if 'filetype' is empty.
-    if (*curbuf->b_p_ft == NUL)
+    အကယ်၍ (*curbuf->b_p_ft == NUL)
     {
-	if (au_has_group((char_u *)"filetypedetect"))
+	အကယ်၍ (au_has_group((char_u *)"filetypedetect"))
 	    (void)do_doautocmd((char_u *)"filetypedetect BufRead", FALSE, NULL);
 	do_modelines(0);
     }
 
-    return OK;
+    ပြန်ပေး OK;
 }
 
 /*
@@ -3202,7 +3202,7 @@ msg_add_fname(buf_T *buf, char_u *fname)
 {
     size_t  IObufflen = 0;
 
-    if (fname == NULL)
+    အကယ်၍ (fname == NULL)
 	fname = (char_u *)"-stdin-";
     IObuff[IObufflen++] = '"';
     IObufflen += home_replace(buf, fname, IObuff + IObufflen, IOSIZE - 4, TRUE);
@@ -3213,29 +3213,29 @@ msg_add_fname(buf_T *buf, char_u *fname)
  * Append message for text mode to IObuff.
  * Return TRUE if something appended.
  */
-    int
-msg_add_fileformat(int eol_type)
+    ကိန်းပြည့်
+msg_add_fileformat(ကိန်းပြည့် eol_type)
 {
 #ifndef USE_CRNL
-    if (eol_type == EOL_DOS)
+    အကယ်၍ (eol_type == EOL_DOS)
     {
 	STRCAT(IObuff, shortmess(SHM_TEXT) ? _("[dos]") : _("[dos format]"));
-	return TRUE;
+	ပြန်ပေး TRUE;
     }
 #endif
-    if (eol_type == EOL_MAC)
+    အကယ်၍ (eol_type == EOL_MAC)
     {
 	STRCAT(IObuff, shortmess(SHM_TEXT) ? _("[mac]") : _("[mac format]"));
-	return TRUE;
+	ပြန်ပေး TRUE;
     }
 #ifdef USE_CRNL
-    if (eol_type == EOL_UNIX)
+    အကယ်၍ (eol_type == EOL_UNIX)
     {
 	STRCAT(IObuff, shortmess(SHM_TEXT) ? _("[unix]") : _("[unix format]"));
-	return TRUE;
+	ပြန်ပေး TRUE;
     }
 #endif
-    return FALSE;
+    ပြန်ပေး FALSE;
 }
 
 /*
@@ -3243,21 +3243,21 @@ msg_add_fileformat(int eol_type)
  */
     void
 msg_add_lines(
-    int	    insert_space,
+    ကိန်းပြည့်	    insert_space,
     long    lnum,
     off_T   nchars)
 {
-    int  len = (int)STRLEN(IObuff);
+    ကိန်းပြည့်  len = (ကိန်းပြည့်)STRLEN(IObuff);
 
-    if (shortmess(SHM_LINES))
-	vim_snprintf((char *)IObuff + len, IOSIZE - (size_t)len,
+    အကယ်၍ (shortmess(SHM_LINES))
+	vim_snprintf((var_na *)IObuff + len, IOSIZE - (size_t)len,
 		// l10n: L as in line, B as in byte
 		_("%s%ldL, %lldB"), insert_space ? " " : "", lnum, (varnumber_T)nchars);
-    else
+    မဟုတ်ပါက
     {
-	len += vim_snprintf((char *)IObuff + len, IOSIZE - (size_t)len,
+	len += vim_snprintf((var_na *)IObuff + len, IOSIZE - (size_t)len,
 		NGETTEXT("%s%ld line, ", "%s%ld lines, ", lnum), insert_space ? " " : "", lnum);
-	vim_snprintf((char *)IObuff + len, IOSIZE - (size_t)len,
+	vim_snprintf((var_na *)IObuff + len, IOSIZE - (size_t)len,
 		NGETTEXT("%lld byte", "%lld bytes", nchars), (varnumber_T)nchars);
     }
 }
@@ -3271,19 +3271,19 @@ msg_add_eol(void)
     STRCAT(IObuff, shortmess(SHM_LAST) ? _("[noeol]") : _("[Incomplete last line]"));
 }
 
-    int
+    ကိန်းပြည့်
 time_differs(stat_T *st, long mtime, long mtime_ns UNUSED)
 {
-    return
+    ပြန်ပေး
 #ifdef ST_MTIM_NSEC
 	(long)st->ST_MTIM_NSEC != mtime_ns ||
 #endif
-#if defined(__linux__) || defined(MSWIN)
+#အကယ်၍ defined(__linux__) || defined(MSWIN)
 	// On a FAT filesystem, esp. under Linux, there are only 5 bits to store
 	// the seconds.  Since the roundoff is done when flushing the inode, the
 	// time may change unexpectedly by one second!!!
 	(long)st->st_mtime - mtime > 1 || mtime - (long)st->st_mtime > 1
-#else
+#မဟုတ်ပါက
 	(long)st->st_mtime != mtime
 #endif
 	;
@@ -3293,19 +3293,19 @@ time_differs(stat_T *st, long mtime, long mtime_ns UNUSED)
  * Return TRUE if file encoding "fenc" requires conversion from or to
  * 'encoding'.
  */
-    int
+    ကိန်းပြည့်
 need_conversion(char_u *fenc)
 {
-    int		same_encoding;
-    int		enc_flags;
-    int		fenc_flags;
+    ကိန်းပြည့်		same_encoding;
+    ကိန်းပြည့်		enc_flags;
+    ကိန်းပြည့်		fenc_flags;
 
-    if (*fenc == NUL || STRCMP(p_enc, fenc) == 0)
+    အကယ်၍ (*fenc == NUL || STRCMP(p_enc, fenc) == 0)
     {
 	same_encoding = TRUE;
 	fenc_flags = 0;
     }
-    else
+    မဟုတ်ပါက
     {
 	// Ignore difference between "ansi" and "latin1", "ucs-4" and
 	// "ucs-4be", etc.
@@ -3313,16 +3313,16 @@ need_conversion(char_u *fenc)
 	fenc_flags = get_fio_flags(fenc);
 	same_encoding = (enc_flags != 0 && fenc_flags == enc_flags);
     }
-    if (same_encoding)
+    အကယ်၍ (same_encoding)
     {
 	// Specified encoding matches with 'encoding'.  This requires
 	// conversion when 'encoding' is Unicode but not UTF-8.
-	return enc_unicode != 0;
+	ပြန်ပေး enc_unicode != 0;
     }
 
     // Encodings differ.  However, conversion is not needed when 'enc' is any
     // Unicode encoding and the file is UTF-8.
-    return !(enc_utf8 && fenc_flags == FIO_UTF8);
+    ပြန်ပေး !(enc_utf8 && fenc_flags == FIO_UTF8);
 }
 
 /*
@@ -3330,84 +3330,84 @@ need_conversion(char_u *fenc)
  * internal conversion.
  * if "ptr" is an empty string, use 'encoding'.
  */
-    int
+    ကိန်းပြည့်
 get_fio_flags(char_u *ptr)
 {
-    int		prop;
+    ကိန်းပြည့်		prop;
 
-    if (*ptr == NUL)
+    အကယ်၍ (*ptr == NUL)
 	ptr = p_enc;
 
     prop = enc_canon_props(ptr);
-    if (prop & ENC_UNICODE)
+    အကယ်၍ (prop & ENC_UNICODE)
     {
-	if (prop & ENC_2BYTE)
+	အကယ်၍ (prop & ENC_2BYTE)
 	{
-	    if (prop & ENC_ENDIAN_L)
-		return FIO_UCS2 | FIO_ENDIAN_L;
-	    return FIO_UCS2;
+	    အကယ်၍ (prop & ENC_ENDIAN_L)
+		ပြန်ပေး FIO_UCS2 | FIO_ENDIAN_L;
+	    ပြန်ပေး FIO_UCS2;
 	}
-	if (prop & ENC_4BYTE)
+	အကယ်၍ (prop & ENC_4BYTE)
 	{
-	    if (prop & ENC_ENDIAN_L)
-		return FIO_UCS4 | FIO_ENDIAN_L;
-	    return FIO_UCS4;
+	    အကယ်၍ (prop & ENC_ENDIAN_L)
+		ပြန်ပေး FIO_UCS4 | FIO_ENDIAN_L;
+	    ပြန်ပေး FIO_UCS4;
 	}
-	if (prop & ENC_2WORD)
+	အကယ်၍ (prop & ENC_2WORD)
 	{
-	    if (prop & ENC_ENDIAN_L)
-		return FIO_UTF16 | FIO_ENDIAN_L;
-	    return FIO_UTF16;
+	    အကယ်၍ (prop & ENC_ENDIAN_L)
+		ပြန်ပေး FIO_UTF16 | FIO_ENDIAN_L;
+	    ပြန်ပေး FIO_UTF16;
 	}
-	return FIO_UTF8;
+	ပြန်ပေး FIO_UTF8;
     }
-    if (prop & ENC_LATIN1)
-	return FIO_LATIN1;
+    အကယ်၍ (prop & ENC_LATIN1)
+	ပြန်ပေး FIO_LATIN1;
     // must be ENC_DBCS, requires iconv()
-    return 0;
+    ပြန်ပေး 0;
 }
 
-#if defined(MSWIN)
+#အကယ်၍ defined(MSWIN)
 /*
  * Check "ptr" for a MS-Windows codepage name and return the FIO_ flags needed
  * for the conversion MS-Windows can do for us.  Also accept "utf-8".
  * Used for conversion between 'encoding' and 'fileencoding'.
  */
-    int
+    ကိန်းပြည့်
 get_win_fio_flags(char_u *ptr)
 {
-    int		cp;
+    ကိန်းပြည့်		cp;
 
     // Cannot do this when 'encoding' is not utf-8 and not a codepage.
-    if (!enc_utf8 && enc_codepage <= 0)
-	return 0;
+    အကယ်၍ (!enc_utf8 && enc_codepage <= 0)
+	ပြန်ပေး 0;
 
     cp = encname2codepage(ptr);
-    if (cp == 0)
+    အကယ်၍ (cp == 0)
     {
 # ifdef CP_UTF8	// VC 4.1 doesn't define CP_UTF8
-	if (STRCMP(ptr, "utf-8") == 0)
+	အကယ်၍ (STRCMP(ptr, "utf-8") == 0)
 	    cp = CP_UTF8;
-	else
+	မဟုတ်ပါက
 # endif
-	    return 0;
+	    ပြန်ပေး 0;
     }
-    return FIO_PUT_CP(cp) | FIO_CODEPAGE;
+    ပြန်ပေး FIO_PUT_CP(cp) | FIO_CODEPAGE;
 }
 #endif
 
-#if defined(MACOS_CONVERT)
+#အကယ်၍ defined(MACOS_CONVERT)
 /*
  * Check "ptr" for a Carbon supported encoding and return the FIO_ flags
  * needed for the internal conversion to/from utf-8 or latin1.
  */
-    int
+    ကိန်းပြည့်
 get_mac_fio_flags(char_u *ptr)
 {
-    if ((enc_utf8 || STRCMP(p_enc, "latin1") == 0)
+    အကယ်၍ ((enc_utf8 || STRCMP(p_enc, "latin1") == 0)
 				     && (enc_canon_props(ptr) & ENC_MACROMAN))
-	return FIO_MACROMAN;
-    return 0;
+	ပြန်ပေး FIO_MACROMAN;
+    ပြန်ပေး 0;
 }
 #endif
 
@@ -3421,42 +3421,42 @@ get_mac_fio_flags(char_u *ptr)
 check_for_bom(
     char_u	*p,
     long	size,
-    int		*lenp,
-    int		flags)
+    ကိန်းပြည့်		*lenp,
+    ကိန်းပြည့်		flags)
 {
-    char	*name = NULL;
-    int		len = 2;
+    var_na	*name = NULL;
+    ကိန်းပြည့်		len = 2;
 
-    if (p[0] == 0xef && p[1] == 0xbb && size >= 3 && p[2] == 0xbf
+    အကယ်၍ (p[0] == 0xef && p[1] == 0xbb && size >= 3 && p[2] == 0xbf
 	    && (flags == FIO_ALL || flags == FIO_UTF8 || flags == 0))
     {
 	name = "utf-8";		// EF BB BF
 	len = 3;
     }
-    else if (p[0] == 0xff && p[1] == 0xfe)
+    မဟုတ်ပါက အကယ်၍ (p[0] == 0xff && p[1] == 0xfe)
     {
-	if (size >= 4 && p[2] == 0 && p[3] == 0
+	အကယ်၍ (size >= 4 && p[2] == 0 && p[3] == 0
 	    && (flags == FIO_ALL || flags == (FIO_UCS4 | FIO_ENDIAN_L)))
 	{
 	    name = "ucs-4le";	// FF FE 00 00
 	    len = 4;
 	}
-	else if (flags == (FIO_UCS2 | FIO_ENDIAN_L))
+	မဟုတ်ပါက အကယ်၍ (flags == (FIO_UCS2 | FIO_ENDIAN_L))
 	    name = "ucs-2le";	// FF FE
-	else if (flags == FIO_ALL || flags == (FIO_UTF16 | FIO_ENDIAN_L))
+	မဟုတ်ပါက အကယ်၍ (flags == FIO_ALL || flags == (FIO_UTF16 | FIO_ENDIAN_L))
 	    // utf-16le is preferred, it also works for ucs-2le text
 	    name = "utf-16le";	// FF FE
     }
-    else if (p[0] == 0xfe && p[1] == 0xff
+    မဟုတ်ပါက အကယ်၍ (p[0] == 0xfe && p[1] == 0xff
 	    && (flags == FIO_ALL || flags == FIO_UCS2 || flags == FIO_UTF16))
     {
 	// Default to utf-16, it works also for ucs-2 text.
-	if (flags == FIO_UCS2)
+	အကယ်၍ (flags == FIO_UCS2)
 	    name = "ucs-2";	// FE FF
-	else
+	မဟုတ်ပါက
 	    name = "utf-16";	// FE FF
     }
-    else if (size >= 4 && p[0] == 0 && p[1] == 0 && p[2] == 0xfe
+    မဟုတ်ပါက အကယ်၍ (size >= 4 && p[0] == 0 && p[1] == 0 && p[2] == 0xfe
 	    && p[3] == 0xff && (flags == FIO_ALL || flags == FIO_UCS4))
     {
 	name = "ucs-4";		// 00 00 FE FF
@@ -3464,7 +3464,7 @@ check_for_bom(
     }
 
     *lenp = len;
-    return (char_u *)name;
+    ပြန်ပေး (char_u *)name;
 }
 
 /*
@@ -3479,16 +3479,16 @@ shorten_fname1(char_u *full_path)
     char_u	*p = full_path;
 
     dirname = alloc(MAXPATHL);
-    if (dirname == NULL)
-	return full_path;
-    if (mch_dirname(dirname, MAXPATHL) == OK)
+    အကယ်၍ (dirname == NULL)
+	ပြန်ပေး full_path;
+    အကယ်၍ (mch_dirname(dirname, MAXPATHL) == OK)
     {
 	p = shorten_fname(full_path, dirname);
-	if (p == NULL || *p == NUL)
+	အကယ်၍ (p == NULL || *p == NUL)
 	    p = full_path;
     }
     vim_free(dirname);
-    return p;
+    ပြန်ပေး p;
 }
 
 /*
@@ -3500,49 +3500,49 @@ shorten_fname1(char_u *full_path)
     char_u *
 shorten_fname(char_u *full_path, char_u *dir_name)
 {
-    int		len;
+    ကိန်းပြည့်		len;
     char_u	*p;
 
-    if (full_path == NULL)
-	return NULL;
-    len = (int)STRLEN(dir_name);
-    if (fnamencmp(dir_name, full_path, len) == 0)
+    အကယ်၍ (full_path == NULL)
+	ပြန်ပေး NULL;
+    len = (ကိန်းပြည့်)STRLEN(dir_name);
+    အကယ်၍ (fnamencmp(dir_name, full_path, len) == 0)
     {
 	p = full_path + len;
-#if defined(MSWIN)
+#အကယ်၍ defined(MSWIN)
 	/*
 	 * MS-Windows: when a file is in the root directory, dir_name will end
 	 * in a slash, since C: by itself does not define a specific dir. In
 	 * this case p may already be correct. <negri>
 	 */
-	if (!((len > 2) && (*(p - 2) == ':')))
+	အကယ်၍ (!((len > 2) && (*(p - 2) == ':')))
 #endif
 	{
-	    if (vim_ispathsep(*p))
+	    အကယ်၍ (vim_ispathsep(*p))
 		do
 		    ++p;
-		while (vim_ispathsep_nocolon(*p));
+		နေစဉ် (vim_ispathsep_nocolon(*p));
 #ifndef VMS   // the path separator is always part of the path
-	    else
+	    မဟုတ်ပါက
 		p = NULL;
 #endif
 	}
     }
-#if defined(MSWIN)
+#အကယ်၍ defined(MSWIN)
     /*
      * When using a file in the current drive, remove the drive name:
      * "A:\dir\file" -> "\dir\file".  This helps when moving a session file on
      * a floppy from "A:\dir" to "B:\dir".
      */
-    else if (len > 3
+    မဟုတ်ပါက အကယ်၍ (len > 3
 	    && TOUPPER_LOC(full_path[0]) == TOUPPER_LOC(dir_name[0])
 	    && full_path[1] == ':'
 	    && vim_ispathsep(full_path[2]))
 	p = full_path + 2;
 #endif
-    else
+    မဟုတ်ပါက
 	p = NULL;
-    return p;
+    ပြန်ပေး p;
 }
 
 /*
@@ -3555,26 +3555,26 @@ shorten_fname(char_u *full_path, char_u *dir_name)
  * name.
  */
     void
-shorten_buf_fname(buf_T *buf, char_u *dirname, int force)
+shorten_buf_fname(buf_T *buf, char_u *dirname, ကိန်းပြည့် force)
 {
     char_u	*p;
 
-    if (buf->b_fname != NULL
+    အကယ်၍ (buf->b_fname != NULL
 	    && !bt_nofilename(buf)
 	    && !path_with_url(buf->b_fname)
 	    && (force
 		|| buf->b_sfname == NULL
 		|| mch_isFullName(buf->b_sfname)))
     {
-	if (buf->b_sfname != buf->b_ffname)
+	အကယ်၍ (buf->b_sfname != buf->b_ffname)
 	    VIM_CLEAR(buf->b_sfname);
 	p = shorten_fname(buf->b_ffname, dirname);
-	if (p != NULL)
+	အကယ်၍ (p != NULL)
 	{
 	    buf->b_sfname = vim_strsave(p);
 	    buf->b_fname = buf->b_sfname;
 	}
-	if (p == NULL || buf->b_fname == NULL)
+	အကယ်၍ (p == NULL || buf->b_fname == NULL)
 	    buf->b_fname = buf->b_ffname;
     }
 }
@@ -3583,7 +3583,7 @@ shorten_buf_fname(buf_T *buf, char_u *dirname, int force)
  * Shorten filenames for all buffers.
  */
     void
-shorten_fnames(int force)
+shorten_fnames(ကိန်းပြည့် force)
 {
     char_u	dirname[MAXPATHL];
     buf_T	*buf;
@@ -3599,33 +3599,33 @@ shorten_fnames(int force)
     }
     status_redraw_all();
     redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#အကယ်၍ defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
 #endif
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+#အကယ်၍ defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
     popup_update_preview_title();
 #endif
 }
 
-#if (defined(FEAT_DND) && defined(FEAT_GUI_GTK)) \
+#အကယ်၍ (defined(FEAT_DND) && defined(FEAT_GUI_GTK)) \
 	|| defined(FEAT_GUI_MSWIN) \
 	|| defined(FEAT_GUI_HAIKU)
 /*
  * Shorten all filenames in "fnames[count]" by current directory.
  */
     void
-shorten_filenames(char_u **fnames, int count)
+shorten_filenames(char_u **fnames, ကိန်းပြည့် count)
 {
-    int		i;
+    ကိန်းပြည့်		i;
     char_u	dirname[MAXPATHL];
     char_u	*p;
 
-    if (fnames == NULL || count < 1)
-	return;
-    mch_dirname(dirname, sizeof(dirname));
-    for (i = 0; i < count; ++i)
+    အကယ်၍ (fnames == NULL || count < 1)
+	ပြန်ပေး;
+    mch_dirname(dirname, parimaa_na(dirname));
+    အတွက် (i = 0; i < count; ++i)
     {
-	if ((p = shorten_fname(fnames[i], dirname)) != NULL)
+	အကယ်၍ ((p = shorten_fname(fnames[i], dirname)) != NULL)
 	{
 	    // shorten_fname() returns pointer in given "fnames[i]".  If free
 	    // "fnames[i]" first, "p" becomes invalid.  So we need to copy
@@ -3653,56 +3653,56 @@ shorten_filenames(char_u **fnames, int count)
 modname(
     char_u *fname,
     char_u *ext,
-    int	    prepend_dot)	// may prepend a '.' to file name
+    ကိန်းပြည့်	    prepend_dot)	// may prepend a '.' to file name
 {
-    return buf_modname((curbuf->b_p_sn || curbuf->b_shortname),
+    ပြန်ပေး buf_modname((curbuf->b_p_sn || curbuf->b_shortname),
 						     fname, ext, prepend_dot);
 }
 
     char_u *
 buf_modname(
-    int	    shortname,		// use 8.3 file name
+    ကိန်းပြည့်	    shortname,		// use 8.3 file name
     char_u  *fname,
     char_u  *ext,
-    int	    prepend_dot)	// may prepend a '.' to file name
+    ကိန်းပြည့်	    prepend_dot)	// may prepend a '.' to file name
 {
     char_u	*retval;
     char_u	*s;
     char_u	*e;
     char_u	*ptr;
     size_t	ptrlen;
-    int		fnamelen, extlen;
+    ကိန်းပြည့်		fnamelen, extlen;
 
-    extlen = (int)STRLEN(ext);
+    extlen = (ကိန်းပြည့်)STRLEN(ext);
 
     /*
      * If there is no file name we must get the name of the current directory
      * (we need the full path in case :cd is used).
      */
-    if (fname == NULL || *fname == NUL)
+    အကယ်၍ (fname == NULL || *fname == NUL)
     {
 	retval = alloc(MAXPATHL + extlen + 3);
-	if (retval == NULL)
-	    return NULL;
-	if (mch_dirname(retval, MAXPATHL) == FAIL ||
-				     (fnamelen = (int)STRLEN(retval)) == 0)
+	အကယ်၍ (retval == NULL)
+	    ပြန်ပေး NULL;
+	အကယ်၍ (mch_dirname(retval, MAXPATHL) == FAIL ||
+				     (fnamelen = (ကိန်းပြည့်)STRLEN(retval)) == 0)
 	{
 	    vim_free(retval);
-	    return NULL;
+	    ပြန်ပေး NULL;
 	}
-	if (!after_pathsep(retval, retval + fnamelen))
+	အကယ်၍ (!after_pathsep(retval, retval + fnamelen))
 	{
 	    retval[fnamelen++] = PATHSEP;
 	    retval[fnamelen] = NUL;
 	}
 	prepend_dot = FALSE;	    // nothing to prepend a dot to
     }
-    else
+    မဟုတ်ပါက
     {
-	fnamelen = (int)STRLEN(fname);
+	fnamelen = (ကိန်းပြည့်)STRLEN(fname);
 	retval = alloc(fnamelen + extlen + 3);
-	if (retval == NULL)
-	    return NULL;
+	အကယ်၍ (retval == NULL)
+	    ပြန်ပေး NULL;
 	STRCPY(retval, fname);
 #ifdef VMS
 	vms_remove_version(retval); // we do not need versions here
@@ -3715,21 +3715,21 @@ buf_modname(
      * Then truncate what is after the '/', '\' or ':' to 8 characters for
      * MSDOS and 26 characters for AMIGA, a lot more for UNIX.
      */
-    for (ptr = retval + fnamelen; ptr > retval; MB_PTR_BACK(retval, ptr))
+    အတွက် (ptr = retval + fnamelen; ptr > retval; MB_PTR_BACK(retval, ptr))
     {
-	if (*ext == '.' && shortname)
-	    if (*ptr == '.')	// replace '.' by '_'
+	အကယ်၍ (*ext == '.' && shortname)
+	    အကယ်၍ (*ptr == '.')	// replace '.' by '_'
 		*ptr = '_';
-	if (vim_ispathsep(*ptr))
+	အကယ်၍ (vim_ispathsep(*ptr))
 	{
 	    ++ptr;
-	    break;
+	    bha_nga;
 	}
     }
 
     // the file name has at most BASENAMELEN characters.
     ptrlen = (size_t)(fnamelen - (ptr - retval));
-    if (ptrlen > (unsigned)BASENAMELEN)
+    အကယ်၍ (ptrlen > (unsigned)BASENAMELEN)
     {
 	ptrlen = BASENAMELEN;
 	ptr[ptrlen] = NUL;
@@ -3740,26 +3740,26 @@ buf_modname(
     /*
      * For 8.3 file names we may have to reduce the length.
      */
-    if (shortname)
+    အကယ်၍ (shortname)
     {
 	/*
 	 * If there is no file name, or the file name ends in '/', and the
 	 * extension starts with '.', put a '_' before the dot, because just
 	 * ".ext" is invalid.
 	 */
-	if (fname == NULL || *fname == NUL
+	အကယ်၍ (fname == NULL || *fname == NUL
 				   || vim_ispathsep(fname[STRLEN(fname) - 1]))
 	{
-	    if (*ext == '.')
+	    အကယ်၍ (*ext == '.')
 		*s++ = '_';
 	}
 	/*
 	 * If the extension starts with '.', truncate the base name at 8
 	 * characters
 	 */
-	else if (*ext == '.')
+	မဟုတ်ပါက အကယ်၍ (*ext == '.')
 	{
-	    if ((size_t)(s - ptr) > (size_t)8)
+	    အကယ်၍ ((size_t)(s - ptr) > (size_t)8)
 	    {
 		s = ptr + 8;
 		*s = '\0';
@@ -3769,13 +3769,13 @@ buf_modname(
 	 * If the extension doesn't start with '.', and the file name
 	 * doesn't have an extension yet, append a '.'
 	 */
-	else if ((e = vim_strchr(ptr, '.')) == NULL)
+	မဟုတ်ပါက အကယ်၍ ((e = vim_strchr(ptr, '.')) == NULL)
 	    *s++ = '.';
 	/*
 	 * If the extension doesn't start with '.', and there already is an
 	 * extension, it may need to be truncated
 	 */
-	else if ((int)(ptrlen - (e - retval)) + extlen > 4)
+	မဟုတ်ပါက အကယ်၍ ((ကိန်းပြည့်)(ptrlen - (e - retval)) + extlen > 4)
 	    s = e + 4 - extlen;
     }
 #ifdef MSWIN
@@ -3784,7 +3784,7 @@ buf_modname(
      * '_' before the dot, because just ".ext" may be invalid if it's on a
      * FAT partition, and on HPFS it doesn't matter.
      */
-    else if ((fname == NULL || *fname == NUL) && *ext == '.')
+    မဟုတ်ပါက အကယ်၍ ((fname == NULL || *fname == NUL) && *ext == '.')
 	*s++ = '_';
 #endif
 
@@ -3796,7 +3796,7 @@ buf_modname(
     /*
      * Prepend the dot.
      */
-    if (prepend_dot && !shortname && *(e = gettail(retval)) != '.')
+    အကယ်၍ (prepend_dot && !shortname && *(e = gettail(retval)) != '.')
     {
 	mch_memmove(e + 1, e, (size_t)(((fnamelen + extlen) - (e - retval)) + 1));	// +1 for NUL
 	*e = '.';
@@ -3806,21 +3806,21 @@ buf_modname(
      * Check that, after appending the extension, the file name is really
      * different.
      */
-    if (fname != NULL && STRCMP(fname, retval) == 0)
+    အကယ်၍ (fname != NULL && STRCMP(fname, retval) == 0)
     {
 	// we search for a character that can be replaced by '_'
-	while (--s >= ptr)
+	နေစဉ် (--s >= ptr)
 	{
-	    if (*s != '_')
+	    အကယ်၍ (*s != '_')
 	    {
 		*s = '_';
-		break;
+		bha_nga;
 	    }
 	}
-	if (s < ptr)	// fname was "________.<ext>", how tricky!
+	အကယ်၍ (s < ptr)	// fname was "________.<ext>", how tricky!
 	    *ptr = 'v';
     }
-    return retval;
+    ပြန်ပေး retval;
 }
 
 /*
@@ -3828,24 +3828,24 @@ buf_modname(
  * rest of the line is thrown away.  Returns TRUE for end-of-file.
  * If the line is truncated then buf[size - 2] will not be NUL.
  */
-    int
-vim_fgets(char_u *buf, int size, FILE *fp)
+    ကိန်းပြည့်
+vim_fgets(char_u *buf, ကိန်းပြည့် size, FILE *fp)
 {
-    char	*eof;
+    var_na	*eof;
 #define FGETS_SIZE 200
-    char	tbuf[FGETS_SIZE];
+    var_na	tbuf[FGETS_SIZE];
 
     // safety check
-    if (size < 2)
+    အကယ်၍ (size < 2)
     {
-	if (size == 1)
+	အကယ်၍ (size == 1)
 	    buf[0] = NUL;
-	return TRUE;
+	ပြန်ပေး TRUE;
     }
 
     buf[size - 2] = NUL;
-    eof = fgets((char *)buf, size, fp);
-    if (buf[size - 2] != NUL && buf[size - 2] != '\n')
+    eof = fgets((var_na *)buf, size, fp);
+    အကယ်၍ (buf[size - 2] != NUL && buf[size - 2] != '\n')
     {
 	buf[size - 1] = NUL;	    // Truncate the line
 
@@ -3853,10 +3853,10 @@ vim_fgets(char_u *buf, int size, FILE *fp)
 	do
 	{
 	    tbuf[FGETS_SIZE - 2] = NUL;
-	    vim_ignoredp = fgets((char *)tbuf, FGETS_SIZE, fp);
-	} while (tbuf[FGETS_SIZE - 2] != NUL && tbuf[FGETS_SIZE - 2] != '\n');
+	    vim_ignoredp = fgets((var_na *)tbuf, FGETS_SIZE, fp);
+	} နေစဉ် (tbuf[FGETS_SIZE - 2] != NUL && tbuf[FGETS_SIZE - 2] != '\n');
     }
-    return (eof == NULL);
+    ပြန်ပေး (eof == NULL);
 }
 
 /*
@@ -3864,35 +3864,35 @@ vim_fgets(char_u *buf, int size, FILE *fp)
  * function will (attempts to?) copy the file across if rename fails -- webb
  * Return -1 for failure, 0 for success.
  */
-    int
+    ကိန်းပြည့်
 vim_rename(char_u *from, char_u *to)
 {
-    int		n;
-    int		ret;
+    ကိန်းပြည့်		n;
+    ကိန်းပြည့်		ret;
 #ifdef AMIGA
     BPTR	flock;
 #endif
     stat_T	st;
-    int		use_tmp_file = FALSE;
+    ကိန်းပြည့်		use_tmp_file = FALSE;
 
     /*
      * When the names are identical, there is nothing to do.  When they refer
      * to the same file (ignoring case and slash/backslash differences) but
      * the file name differs we need to go through a temp file.
      */
-    if (fnamecmp(from, to) == 0)
+    အကယ်၍ (fnamecmp(from, to) == 0)
     {
-	if (p_fic && STRCMP(gettail(from), gettail(to)) != 0)
+	အကယ်၍ (p_fic && STRCMP(gettail(from), gettail(to)) != 0)
 	    use_tmp_file = TRUE;
-	else
-	    return 0;
+	မဟုတ်ပါက
+	    ပြန်ပေး 0;
     }
 
     /*
      * Fail if the "from" file doesn't exist.  Avoids that "to" is deleted.
      */
-    if (mch_stat((char *)from, &st) < 0)
-	return -1;
+    အကယ်၍ (mch_stat((var_na *)from, &st) < 0)
+	ပြန်ပေး -1;
 
 #ifdef UNIX
     {
@@ -3901,7 +3901,7 @@ vim_rename(char_u *from, char_u *to)
 	// It's possible for the source and destination to be the same file.
 	// This happens when "from" and "to" differ in case and are on a FAT32
 	// filesystem.  In that case go through a temp file name.
-	if (mch_stat((char *)to, &st_to) >= 0
+	အကယ်၍ (mch_stat((var_na *)to, &st_to) >= 0
 		&& st.st_dev == st_to.st_dev
 		&& st.st_ino == st_to.st_ino)
 	    use_tmp_file = TRUE;
@@ -3914,7 +3914,7 @@ vim_rename(char_u *from, char_u *to)
 	// It's possible for the source and destination to be the same file.
 	// In that case go through a temp file name.  This makes rename("foo",
 	// "./foo") a no-op (in a complicated way).
-	if (win32_fileinfo(from, &info1) == FILEINFO_OK
+	အကယ်၍ (win32_fileinfo(from, &info1) == FILEINFO_OK
 		&& win32_fileinfo(to, &info2) == FILEINFO_OK
 		&& info1.dwVolumeSerialNumber == info2.dwVolumeSerialNumber
 		&& info1.nFileIndexHigh == info2.nFileIndexHigh
@@ -3923,37 +3923,37 @@ vim_rename(char_u *from, char_u *to)
     }
 #endif
 
-    if (use_tmp_file)
+    အကယ်၍ (use_tmp_file)
     {
-	char	tempname[MAXPATHL + 1];
+	var_na	tempname[MAXPATHL + 1];
 
 	/*
 	 * Find a name that doesn't exist and is in the same directory.
 	 * Rename "from" to "tempname" and then rename "tempname" to "to".
 	 */
-	if (STRLEN(from) >= MAXPATHL - 5)
-	    return -1;
+	အကယ်၍ (STRLEN(from) >= MAXPATHL - 5)
+	    ပြန်ပေး -1;
 	STRCPY(tempname, from);
-	for (n = 123; n < 99999; ++n)
+	အတွက် (n = 123; n < 99999; ++n)
 	{
-	    sprintf((char *)gettail((char_u *)tempname), "%d", n);
-	    if (mch_stat(tempname, &st) < 0)
+	    sprintf((var_na *)gettail((char_u *)tempname), "%d", n);
+	    အကယ်၍ (mch_stat(tempname, &st) < 0)
 	    {
-		if (mch_rename((char *)from, tempname) == 0)
+		အကယ်၍ (mch_rename((var_na *)from, tempname) == 0)
 		{
-		    if (mch_rename(tempname, (char *)to) == 0)
-			return 0;
+		    အကယ်၍ (mch_rename(tempname, (var_na *)to) == 0)
+			ပြန်ပေး 0;
 		    // Strange, the second step failed.  Try moving the
 		    // file back and return failure.
-		    (void)mch_rename(tempname, (char *)from);
-		    return -1;
+		    (void)mch_rename(tempname, (var_na *)from);
+		    ပြန်ပေး -1;
 		}
 		// If it fails for one temp name it will most likely fail
 		// for any temp name, give up.
-		return -1;
+		ပြန်ပေး -1;
 	    }
 	}
-	return -1;
+	ပြန်ပေး -1;
     }
 
     /*
@@ -3980,30 +3980,30 @@ vim_rename(char_u *from, char_u *to)
 #endif
     mch_remove(to);
 #ifdef AMIGA
-    if (flock)
+    အကယ်၍ (flock)
 	UnLock(flock);
 #endif
 
     /*
      * First try a normal rename, return if it works.
      */
-    if (mch_rename((char *)from, (char *)to) == 0)
-	return 0;
+    အကယ်၍ (mch_rename((var_na *)from, (var_na *)to) == 0)
+	ပြန်ပေး 0;
 
     /*
      * Rename() failed, try copying the file.
      */
     ret = vim_copyfile(from, to);
-    if (ret != OK)
-	return -1;
+    အကယ်၍ (ret != OK)
+	ပြန်ပေး -1;
 
     /*
      * Remove copied original file
      */
-    if (mch_stat((char *)from, &st) >= 0)
+    အကယ်၍ (mch_stat((var_na *)from, &st) >= 0)
 	mch_remove(from);
 
-    return 0;
+    ပြန်ပေး 0;
 }
 
 
@@ -4011,40 +4011,40 @@ vim_rename(char_u *from, char_u *to)
  * Create the new file with same permissions as the original.
  * Return FAIL for failure, OK for success.
  */
-    int
+    ကိန်းပြည့်
 vim_copyfile(char_u *from, char_u *to)
 {
-    int		fd_in;
-    int		fd_out;
-    int		n;
-    char	*errmsg = NULL;
-    char	*buffer;
+    ကိန်းပြည့်		fd_in;
+    ကိန်းပြည့်		fd_out;
+    ကိန်းပြည့်		n;
+    var_na	*errmsg = NULL;
+    var_na	*buffer;
     long	perm;
 #ifdef HAVE_ACL
     vim_acl_T	acl;		// ACL from original file
 #endif
 
 #ifdef HAVE_READLINK
-    int		ret;
-    int		len;
+    ကိန်းပြည့်		ret;
+    ကိန်းပြည့်		len;
     stat_T	st;
-    char	linkbuf[MAXPATHL + 1];
+    var_na	linkbuf[MAXPATHL + 1];
 
-    ret = mch_lstat((char *)from, &st);
-    if (ret >= 0 && S_ISLNK(st.st_mode))
+    ret = mch_lstat((var_na *)from, &st);
+    အကယ်၍ (ret >= 0 && S_ISLNK(st.st_mode))
     {
 	ret = -1;
 
-	len = readlink((char *)from, linkbuf, MAXPATHL);
-	if (len > 0)
+	len = readlink((var_na *)from, linkbuf, MAXPATHL);
+	အကယ်၍ (len > 0)
 	{
 	    linkbuf[len] = NUL;
 
 	    // Create link
-	    ret = symlink(linkbuf, (char *)to);
+	    ret = symlink(linkbuf, (var_na *)to);
 	}
 
-	return ret == 0 ? OK : FAIL;
+	ပြန်ပေး ret == 0 ? OK : FAIL;
     }
 #endif
 
@@ -4053,50 +4053,50 @@ vim_copyfile(char_u *from, char_u *to)
     // For systems that support ACL: get the ACL from the original file.
     acl = mch_get_acl(from);
 #endif
-    fd_in = mch_open((char *)from, O_RDONLY|O_EXTRA, 0);
-    if (fd_in == -1)
+    fd_in = mch_open((var_na *)from, O_RDONLY|O_EXTRA, 0);
+    အကယ်၍ (fd_in == -1)
     {
 #ifdef HAVE_ACL
 	mch_free_acl(acl);
 #endif
-	return FAIL;
+	ပြန်ပေး FAIL;
     }
 
     // Create the new file with same permissions as the original.
-    fd_out = mch_open((char *)to,
-		       O_CREAT|O_EXCL|O_WRONLY|O_EXTRA|O_NOFOLLOW, (int)perm);
-    if (fd_out == -1)
+    fd_out = mch_open((var_na *)to,
+		       O_CREAT|O_EXCL|O_WRONLY|O_EXTRA|O_NOFOLLOW, (ကိန်းပြည့်)perm);
+    အကယ်၍ (fd_out == -1)
     {
 	close(fd_in);
 #ifdef HAVE_ACL
 	mch_free_acl(acl);
 #endif
-	return FAIL;
+	ပြန်ပေး FAIL;
     }
 
     buffer = alloc(WRITEBUFSIZE);
-    if (buffer == NULL)
+    အကယ်၍ (buffer == NULL)
     {
 	close(fd_out);
 	close(fd_in);
 #ifdef HAVE_ACL
 	mch_free_acl(acl);
 #endif
-	return FAIL;
+	ပြန်ပေး FAIL;
     }
 
-    while ((n = read_eintr(fd_in, buffer, WRITEBUFSIZE)) > 0)
-	if (write_eintr(fd_out, buffer, n) != n)
+    နေစဉ် ((n = read_eintr(fd_in, buffer, WRITEBUFSIZE)) > 0)
+	အကယ်၍ (write_eintr(fd_out, buffer, n) != n)
 	{
 	    errmsg = _(e_error_writing_to_str);
-	    break;
+	    bha_nga;
 	}
 
     vim_free(buffer);
     close(fd_in);
-    if (close(fd_out) < 0)
+    အကယ်၍ (close(fd_out) < 0)
 	errmsg = _(e_error_closing_str);
-    if (n < 0)
+    အကယ်၍ (n < 0)
     {
 	errmsg = _(e_error_reading_str);
 	to = from;
@@ -4108,18 +4108,18 @@ vim_copyfile(char_u *from, char_u *to)
     mch_set_acl(to, acl);
     mch_free_acl(acl);
 #endif
-#if defined(HAVE_SELINUX) || defined(HAVE_SMACK)
+#အကယ်၍ defined(HAVE_SELINUX) || defined(HAVE_SMACK)
     mch_copy_sec(from, to);
 #endif
-    if (errmsg != NULL)
+    အကယ်၍ (errmsg != NULL)
     {
 	semsg(errmsg, to);
-	return FAIL;
+	ပြန်ပေး FAIL;
     }
-    return OK;
+    ပြန်ပေး OK;
 }
 
-static int already_warned = FALSE;
+static ကိန်းပြည့် already_warned = FALSE;
 
 /*
  * Check if any not hidden buffer has been changed.
@@ -4129,32 +4129,32 @@ static int already_warned = FALSE;
  * Returns TRUE if some message was written (screen should be redrawn and
  * cursor positioned).
  */
-    int
+    ကိန်းပြည့်
 check_timestamps(
-    int		focus)		// called for GUI focus event
+    ကိန်းပြည့်		focus)		// called for GUI focus event
 {
     buf_T	*buf;
-    int		didit = 0;
-    int		n;
+    ကိန်းပြည့်		didit = 0;
+    ကိန်းပြည့်		n;
 
     // Don't check timestamps while system() or another low-level function may
     // cause us to lose and gain focus.
-    if (no_check_timestamps > 0)
-	return FALSE;
+    အကယ်၍ (no_check_timestamps > 0)
+	ပြန်ပေး FALSE;
 
     // Avoid doing a check twice.  The OK/Reload dialog can cause a focus
     // event and we would keep on checking if the file is steadily growing.
     // Do check again after typing something.
-    if (focus && did_check_timestamps)
+    အကယ်၍ (focus && did_check_timestamps)
     {
 	need_check_timestamps = TRUE;
-	return FALSE;
+	ပြန်ပေး FALSE;
     }
 
-    if (!stuff_empty() || global_busy || !typebuf_typed()
+    အကယ်၍ (!stuff_empty() || global_busy || !typebuf_typed()
 			|| autocmd_busy || curbuf_lock > 0 || allbuf_lock > 0)
 	need_check_timestamps = TRUE;		// check later
-    else
+    မဟုတ်ပါက
     {
 	++no_wait_return;
 	did_check_timestamps = TRUE;
@@ -4162,15 +4162,15 @@ check_timestamps(
 	FOR_ALL_BUFFERS(buf)
 	{
 	    // Only check buffers in a window.
-	    if (buf->b_nwindows > 0)
+	    အကယ်၍ (buf->b_nwindows > 0)
 	    {
 		bufref_T bufref;
 
 		set_bufref(&bufref, buf);
 		n = buf_check_timestamp(buf, focus);
-		if (didit < n)
+		အကယ်၍ (didit < n)
 		    didit = n;
-		if (n > 0 && !bufref_valid(&bufref))
+		အကယ်၍ (n > 0 && !bufref_valid(&bufref))
 		{
 		    // Autocommands have removed the buffer, start at the
 		    // first one again.
@@ -4181,14 +4181,14 @@ check_timestamps(
 	}
 	--no_wait_return;
 	need_check_timestamps = FALSE;
-	if (need_wait_return && didit == 2)
+	အကယ်၍ (need_wait_return && didit == 2)
 	{
 	    // make sure msg isn't overwritten
 	    msg_puts("\n");
 	    out_flush();
 	}
     }
-    return didit;
+    ပြန်ပေး didit;
 }
 
 /*
@@ -4196,44 +4196,44 @@ check_timestamps(
  * Return OK or FAIL.  When FAIL "tobuf" is incomplete and/or "frombuf" is not
  * empty.
  */
-    static int
+    static ကိန်းပြည့်
 move_lines(buf_T *frombuf, buf_T *tobuf)
 {
     buf_T	*tbuf = curbuf;
-    int		retval = OK;
+    ကိန်းပြည့်		retval = OK;
     linenr_T	lnum;
     char_u	*p;
 
     // Copy the lines in "frombuf" to "tobuf".
     curbuf = tobuf;
-    for (lnum = 1; lnum <= frombuf->b_ml.ml_line_count; ++lnum)
+    အတွက် (lnum = 1; lnum <= frombuf->b_ml.ml_line_count; ++lnum)
     {
 	p = vim_strnsave(ml_get_buf(frombuf, lnum, FALSE), ml_get_buf_len(frombuf, lnum));
-	if (p == NULL || ml_append(lnum - 1, p, 0, FALSE) == FAIL)
+	အကယ်၍ (p == NULL || ml_append(lnum - 1, p, 0, FALSE) == FAIL)
 	{
 	    vim_free(p);
 	    retval = FAIL;
-	    break;
+	    bha_nga;
 	}
 	vim_free(p);
     }
 
     // Delete all the lines in "frombuf".
-    if (retval != FAIL)
+    အကယ်၍ (retval != FAIL)
     {
 	curbuf = frombuf;
-	for (lnum = curbuf->b_ml.ml_line_count; lnum > 0; --lnum)
-	    if (ml_delete(lnum) == FAIL)
+	အတွက် (lnum = curbuf->b_ml.ml_line_count; lnum > 0; --lnum)
+	    အကယ်၍ (ml_delete(lnum) == FAIL)
 	    {
 		// Oops!  We could try putting back the saved lines, but that
 		// might fail again...
 		retval = FAIL;
-		break;
+		bha_nga;
 	    }
     }
 
     curbuf = tbuf;
-    return retval;
+    ပြန်ပေး retval;
 }
 
 /*
@@ -4243,32 +4243,32 @@ move_lines(buf_T *frombuf, buf_T *tobuf)
  * return 2 if a message has been displayed.
  * return 0 otherwise.
  */
-    int
+    ကိန်းပြည့်
 buf_check_timestamp(
     buf_T	*buf,
-    int		focus UNUSED)	// called for GUI focus event
+    ကိန်းပြည့်		focus UNUSED)	// called for GUI focus event
 {
     stat_T	st;
-    int		stat_res;
-    int		retval = 0;
-    char	*mesg = NULL;
-    char	*mesg2 = "";
-    int		helpmesg = FALSE;
-    enum {
+    ကိန်းပြည့်		stat_res;
+    ကိန်းပြည့်		retval = 0;
+    var_na	*mesg = NULL;
+    var_na	*mesg2 = "";
+    ကိန်းပြည့်		helpmesg = FALSE;
+    ga_nanaa {
 	RELOAD_NONE,
 	RELOAD_NORMAL,
 	RELOAD_DETECT
     }		reload = RELOAD_NONE;
-#if defined(FEAT_CON_DIALOG) || defined(FEAT_GUI_DIALOG)
-    int		can_reload = FALSE;
+#အကယ်၍ defined(FEAT_CON_DIALOG) || defined(FEAT_GUI_DIALOG)
+    ကိန်းပြည့်		can_reload = FALSE;
 #endif
     off_T	orig_size = buf->b_orig_size;
-    int		orig_mode = buf->b_orig_mode;
+    ကိန်းပြည့်		orig_mode = buf->b_orig_mode;
 #ifdef FEAT_GUI
-    int		save_mouse_correct = need_mouse_correct;
+    ကိန်းပြည့်		save_mouse_correct = need_mouse_correct;
 #endif
-    static int	busy = FALSE;
-    int		n;
+    static ကိန်းပြည့်	busy = FALSE;
+    ကိန်းပြည့်		n;
     bufref_T	bufref;
 
     set_bufref(&bufref, buf);
@@ -4276,7 +4276,7 @@ buf_check_timestamp(
     // If there is no file name, the buffer is not loaded, 'buftype' is
     // set, we are in the middle of a save or being called recursively: ignore
     // this buffer.
-    if (buf->b_ffname == NULL
+    အကယ်၍ (buf->b_ffname == NULL
 	    || buf->b_ml.ml_mfp == NULL
 	    || !bt_normal(buf)
 	    || buf->b_saving
@@ -4288,16 +4288,16 @@ buf_check_timestamp(
 	    || buf->b_term != NULL
 #endif
 	    )
-	return 0;
+	ပြန်ပေး 0;
 
-    if (       !(buf->b_flags & BF_NOTEDITED)
+    အကယ်၍ (       !(buf->b_flags & BF_NOTEDITED)
 	    && buf->b_mtime != 0
-	    && ((stat_res = mch_stat((char *)buf->b_ffname, &st)) < 0
+	    && ((stat_res = mch_stat((var_na *)buf->b_ffname, &st)) < 0
 		|| time_differs(&st, buf->b_mtime, buf->b_mtime_ns)
 		|| st.st_size != buf->b_orig_size
 #ifdef HAVE_ST_MODE
-		|| (int)st.st_mode != buf->b_orig_mode
-#else
+		|| (ကိန်းပြည့်)st.st_mode != buf->b_orig_mode
+#မဟုတ်ပါက
 		|| mch_getperm(buf->b_ffname) != buf->b_orig_mode
 #endif
 		))
@@ -4308,19 +4308,19 @@ buf_check_timestamp(
 
 	// set b_mtime to stop further warnings (e.g., when executing
 	// FileChangedShell autocmd)
-	if (stat_res < 0)
+	အကယ်၍ (stat_res < 0)
 	{
 	    // Check the file again later to see if it re-appears.
 	    buf->b_mtime = -1;
 	    buf->b_orig_size = 0;
 	    buf->b_orig_mode = 0;
 	}
-	else
+	မဟုတ်ပါက
 	    buf_store_time(buf, &st, buf->b_ffname);
 
 	// Don't do anything for a directory.  Might contain the file
 	// explorer.
-	if (mch_isdir(buf->b_fname))
+	အကယ်၍ (mch_isdir(buf->b_fname))
 	    ;
 
 	/*
@@ -4328,24 +4328,24 @@ buf_check_timestamp(
 	 * exists, reload the buffer.  Use the buffer-local option value if it
 	 * was set, the global option value otherwise.
 	 */
-	else if ((buf->b_p_ar >= 0 ? buf->b_p_ar : p_ar)
+	မဟုတ်ပါက အကယ်၍ ((buf->b_p_ar >= 0 ? buf->b_p_ar : p_ar)
 				       && !bufIsChanged(buf) && stat_res >= 0)
 	    reload = RELOAD_NORMAL;
-	else
+	မဟုတ်ပါက
 	{
-	    char    *reason;
+	    var_na    *reason;
 #ifdef FEAT_EVAL
 	    size_t  reasonlen;
 #endif
 
-	    if (stat_res < 0)
+	    အကယ်၍ (stat_res < 0)
 	    {
 		reason = "deleted";
 #ifdef FEAT_EVAL
 		reasonlen = STRLEN_LITERAL("deleted");
 #endif
 	    }
-	    else if (bufIsChanged(buf))
+	    မဟုတ်ပါက အကယ်၍ (bufIsChanged(buf))
 	    {
 		reason = "conflict";
 #ifdef FEAT_EVAL
@@ -4357,21 +4357,21 @@ buf_check_timestamp(
 	     * warning when only the timestamp was set (e.g., checked out of
 	     * CVS).  Always warn when the buffer was changed.
 	     */
-	    else if (orig_size != buf->b_orig_size || buf_contents_changed(buf))
+	    မဟုတ်ပါက အကယ်၍ (orig_size != buf->b_orig_size || buf_contents_changed(buf))
 	    {
 		reason = "changed";
 #ifdef FEAT_EVAL
 		reasonlen = STRLEN_LITERAL("changed");
 #endif
 	    }
-	    else if (orig_mode != buf->b_orig_mode)
+	    မဟုတ်ပါက အကယ်၍ (orig_mode != buf->b_orig_mode)
 	    {
 		reason = "mode";
 #ifdef FEAT_EVAL
 		reasonlen = STRLEN_LITERAL("mode");
 #endif
 	    }
-	    else
+	    မဟုတ်ပါက
 	    {
 		reason = "time";
 #ifdef FEAT_EVAL
@@ -4386,7 +4386,7 @@ buf_check_timestamp(
 	     */
 	    busy = TRUE;
 #ifdef FEAT_EVAL
-	    set_vim_var_string(VV_FCS_REASON, (char_u *)reason, (int)reasonlen);
+	    set_vim_var_string(VV_FCS_REASON, (char_u *)reason, (ကိန်းပြည့်)reasonlen);
 	    set_vim_var_string(VV_FCS_CHOICE, (char_u *)"", 0);
 #endif
 	    ++allbuf_lock;
@@ -4394,52 +4394,52 @@ buf_check_timestamp(
 				      buf->b_fname, buf->b_fname, FALSE, buf);
 	    --allbuf_lock;
 	    busy = FALSE;
-	    if (n)
+	    အကယ်၍ (n)
 	    {
-		if (!bufref_valid(&bufref))
+		အကယ်၍ (!bufref_valid(&bufref))
 		    emsg(_(e_filechangedshell_autocommand_deleted_buffer));
 #ifdef FEAT_EVAL
 		char_u	*s = get_vim_var_str(VV_FCS_CHOICE);
-		if (STRCMP(s, "reload") == 0 && *reason != 'd')
+		အကယ်၍ (STRCMP(s, "reload") == 0 && *reason != 'd')
 		    reload = RELOAD_NORMAL;
-		else if (STRCMP(s, "edit") == 0)
+		မဟုတ်ပါက အကယ်၍ (STRCMP(s, "edit") == 0)
 		    reload = RELOAD_DETECT;
-		else if (STRCMP(s, "ask") == 0)
+		မဟုတ်ပါက အကယ်၍ (STRCMP(s, "ask") == 0)
 		    n = FALSE;
-		else
+		မဟုတ်ပါက
 #endif
-		    return 2;
+		    ပြန်ပေး 2;
 	    }
-	    if (!n)
+	    အကယ်၍ (!n)
 	    {
-		if (*reason == 'd')
+		အကယ်၍ (*reason == 'd')
 		{
 		    // Only give the message once.
-		    if (prev_b_mtime != -1)
+		    အကယ်၍ (prev_b_mtime != -1)
 			mesg = _(e_file_str_no_longer_available);
 		}
-		else
+		မဟုတ်ပါက
 		{
 		    helpmesg = TRUE;
-#if defined(FEAT_CON_DIALOG) || defined(FEAT_GUI_DIALOG)
+#အကယ်၍ defined(FEAT_CON_DIALOG) || defined(FEAT_GUI_DIALOG)
 		    can_reload = TRUE;
 #endif
-		    if (reason[2] == 'n')
+		    အကယ်၍ (reason[2] == 'n')
 		    {
 			mesg = _("W12: Warning: File \"%s\" has changed and the buffer was changed in Vim as well");
 			mesg2 = _("See \":help W12\" for more info.");
 		    }
-		    else if (reason[1] == 'h')
+		    မဟုတ်ပါက အကယ်၍ (reason[1] == 'h')
 		    {
 			mesg = _("W11: Warning: File \"%s\" has changed since editing started");
 			mesg2 = _("See \":help W11\" for more info.");
 		    }
-		    else if (*reason == 'm')
+		    မဟုတ်ပါက အကယ်၍ (*reason == 'm')
 		    {
 			mesg = _("W16: Warning: Mode of file \"%s\" has changed since editing started");
 			mesg2 = _("See \":help W16\" for more info.");
 		    }
-		    else
+		    မဟုတ်ပါက
 		    {
 			// Only timestamp changed, store it to avoid a warning
 			// in check_mtime() later.
@@ -4451,35 +4451,35 @@ buf_check_timestamp(
 	}
 
     }
-    else if ((buf->b_flags & BF_NEW) && !(buf->b_flags & BF_NEW_W)
+    မဟုတ်ပါက အကယ်၍ ((buf->b_flags & BF_NEW) && !(buf->b_flags & BF_NEW_W)
 						&& vim_fexists(buf->b_ffname))
     {
 	retval = 1;
 	mesg = _("W13: Warning: File \"%s\" has been created after editing started");
 	buf->b_flags |= BF_NEW_W;
-#if defined(FEAT_CON_DIALOG) || defined(FEAT_GUI_DIALOG)
+#အကယ်၍ defined(FEAT_CON_DIALOG) || defined(FEAT_GUI_DIALOG)
 	can_reload = TRUE;
 #endif
     }
 
-    if (mesg != NULL)
+    အကယ်၍ (mesg != NULL)
     {
 	char_u *path;
 
 	path = home_replace_save(buf, buf->b_fname);
-	if (path != NULL)
+	အကယ်၍ (path != NULL)
 	{
 	    size_t  tbufsize;
-	    char    *tbuf;
+	    var_na    *tbuf;
 
-	    if (!helpmesg)
+	    အကယ်၍ (!helpmesg)
 		mesg2 = "";
 	    tbufsize = STRLEN(mesg) + STRLEN(path) + 2 + STRLEN(mesg2) + 1; // +2 for either '\n' or "; "
 									    // and +1 for NUL
 	    tbuf = alloc(tbufsize);
-	    if (tbuf != NULL)
+	    အကယ်၍ (tbuf != NULL)
 	    {
-		int tbuflen;
+		ကိန်းပြည့် tbuflen;
 
 		tbuflen = vim_snprintf(tbuf, tbufsize, mesg, path);
 #ifdef FEAT_EVAL
@@ -4487,49 +4487,49 @@ buf_check_timestamp(
 		// mesg2 has been appended.
 		set_vim_var_string(VV_WARNINGMSG, (char_u *)tbuf, tbuflen);
 #endif
-#if defined(FEAT_CON_DIALOG) || defined(FEAT_GUI_DIALOG)
-		if (can_reload)
+#အကယ်၍ defined(FEAT_CON_DIALOG) || defined(FEAT_GUI_DIALOG)
+		အကယ်၍ (can_reload)
 		{
-		    if (*mesg2 != NUL)
+		    အကယ်၍ (*mesg2 != NUL)
 			vim_snprintf(tbuf + tbuflen, tbufsize - tbuflen, "\n%s", mesg2);
 		    switch (do_dialog(VIM_WARNING, (char_u *)_("Warning"),
 			    (char_u *)tbuf,
 			    (char_u *)_("&OK\n&Load File\nLoad File &and Options"),
 			    1, NULL, TRUE))
 		    {
-			case 2:
+			pak_sa 2:
 			    reload = RELOAD_NORMAL;
-			    break;
-			case 3:
+			    bha_nga;
+			pak_sa 3:
 			    reload = RELOAD_DETECT;
-			    break;
+			    bha_nga;
 		    }
 		}
-		else
+		မဟုတ်ပါက
 #endif
-		if (State > MODE_NORMAL_BUSY || (State & MODE_CMDLINE)
+		အကယ်၍ (State > MODE_NORMAL_BUSY || (State & MODE_CMDLINE)
 								 || already_warned)
 		{
-		    if (*mesg2 != NUL)
+		    အကယ်၍ (*mesg2 != NUL)
 			vim_snprintf(tbuf + tbuflen, tbufsize - tbuflen, "; %s", mesg2);
 		    emsg(tbuf);
 		    retval = 2;
 		}
-		else
+		မဟုတ်ပါက
 		{
-		    if (!autocmd_busy)
+		    အကယ်၍ (!autocmd_busy)
 		    {
 			msg_start();
 			msg_puts_attr(tbuf, HL_ATTR(HLF_E) + MSG_HIST);
-			if (*mesg2 != NUL)
+			အကယ်၍ (*mesg2 != NUL)
 			    msg_puts_attr(mesg2, HL_ATTR(HLF_W) + MSG_HIST);
 			msg_clr_eos();
 			(void)msg_end();
-			if (emsg_silent == 0 && !in_assert_fails)
+			အကယ်၍ (emsg_silent == 0 && !in_assert_fails)
 			{
 			    out_flush();
 #ifdef FEAT_GUI
-			    if (!focus)
+			    အကယ်၍ (!focus)
 #endif
 				// give the user some time to think about it
 				ui_delay(1004L, TRUE);
@@ -4547,12 +4547,12 @@ buf_check_timestamp(
 	}
     }
 
-    if (reload != RELOAD_NONE)
+    အကယ်၍ (reload != RELOAD_NONE)
     {
 	// Reload the buffer.
 	buf_reload(buf, orig_mode, reload == RELOAD_DETECT);
 #ifdef FEAT_PERSISTENT_UNDO
-	if (bufref_valid(&bufref) && buf->b_p_udf && buf->b_ffname != NULL)
+	အကယ်၍ (bufref_valid(&bufref) && buf->b_p_udf && buf->b_ffname != NULL)
 	{
 	    char_u	    hash[UNDO_HASH_SIZE];
 	    buf_T	    *save_curbuf = curbuf;
@@ -4567,7 +4567,7 @@ buf_check_timestamp(
     }
 
     // Trigger FileChangedShell when the file was changed in any way.
-    if (bufref_valid(&bufref) && retval != 0)
+    အကယ်၍ (bufref_valid(&bufref) && retval != 0)
 	(void)apply_autocmds(EVENT_FILECHANGEDSHELLPOST,
 				      buf->b_fname, buf->b_fname, FALSE, buf);
 #ifdef FEAT_GUI
@@ -4576,7 +4576,7 @@ buf_check_timestamp(
     need_mouse_correct = save_mouse_correct;
 #endif
 
-    return retval;
+    ပြန်ပေး retval;
 }
 
 /*
@@ -4586,42 +4586,42 @@ buf_check_timestamp(
  * buf->b_orig_mode may have been reset already.
  */
     void
-buf_reload(buf_T *buf, int orig_mode, int reload_options)
+buf_reload(buf_T *buf, ကိန်းပြည့် orig_mode, ကိန်းပြည့် reload_options)
 {
     exarg_T	ea;
     pos_T	old_cursor;
     linenr_T	old_topline;
-    int		old_ro = buf->b_p_ro;
+    ကိန်းပြည့်		old_ro = buf->b_p_ro;
     buf_T	*savebuf;
     bufref_T	bufref;
-    int		saved = OK;
+    ကိန်းပြည့်		saved = OK;
     aco_save_T	aco;
-    int		flags = READ_NEW;
-    int		prepped = OK;
+    ကိန်းပြည့်		flags = READ_NEW;
+    ကိန်းပြည့်		prepped = OK;
 
     // Set curwin/curbuf for "buf" and save some things.
     aucmd_prepbuf(&aco, buf);
-    if (curbuf != buf)
+    အကယ်၍ (curbuf != buf)
     {
 	// Failed to find a window for "buf", it is dangerous to continue,
 	// better bail out.
-	return;
+	ပြန်ပေး;
     }
 
     // Unless reload_options is set, we only want to read the text from the
     // file, not reset the syntax highlighting, clear marks, diff status, etc.
     // Force the fileformat and encoding to be the same.
-    if (reload_options)
+    အကယ်၍ (reload_options)
 	CLEAR_FIELD(ea);
-    else
+    မဟုတ်ပါက
 	prepped = prep_exarg(&ea, buf);
 
-    if (prepped == OK)
+    အကယ်၍ (prepped == OK)
     {
 	old_cursor = curwin->w_cursor;
 	old_topline = curwin->w_topline;
 
-	if (p_ur < 0 || curbuf->b_ml.ml_line_count <= p_ur)
+	အကယ်၍ (p_ur < 0 || curbuf->b_ml.ml_line_count <= p_ur)
 	{
 	    // Save all the text, so that the reload can be undone.
 	    // Sync first so that this is a separate undo-able action.
@@ -4637,14 +4637,14 @@ buf_reload(buf_T *buf, int orig_mode, int reload_options)
 	 * the old contents.  Can't use memory only, the file might be
 	 * too big.  Use a hidden buffer to move the buffer contents to.
 	 */
-	if (BUFEMPTY() || saved == FAIL)
+	အကယ်၍ (BUFEMPTY() || saved == FAIL)
 	    savebuf = NULL;
-	else
+	မဟုတ်ပါက
 	{
 	    // Allocate a buffer without putting it in the buffer list.
 	    savebuf = buflist_new(NULL, NULL, (linenr_T)1, BLN_DUMMY);
 	    set_bufref(&bufref, savebuf);
-	    if (savebuf != NULL && buf == curbuf)
+	    အကယ်၍ (savebuf != NULL && buf == curbuf)
 	    {
 		// Open the memline.
 		curbuf = savebuf;
@@ -4653,7 +4653,7 @@ buf_reload(buf_T *buf, int orig_mode, int reload_options)
 		curbuf = buf;
 		curwin->w_buffer = buf;
 	    }
-	    if (savebuf == NULL || saved == FAIL || buf != curbuf
+	    အကယ်၍ (savebuf == NULL || saved == FAIL || buf != curbuf
 				      || move_lines(buf, savebuf) == FAIL)
 	    {
 		semsg(_(e_could_not_prepare_for_reloading_str), buf->b_fname);
@@ -4661,41 +4661,41 @@ buf_reload(buf_T *buf, int orig_mode, int reload_options)
 	    }
 	}
 
-	if (saved == OK)
+	အကယ်၍ (saved == OK)
 	{
-	    int old_msg_silent = msg_silent;
+	    ကိန်းပြည့် old_msg_silent = msg_silent;
 
 	    curbuf->b_flags |= BF_CHECK_RO;	// check for RO again
 	    curbuf->b_keep_filetype = true;	// don't detect 'filetype'
 
-	    if (shortmess(SHM_FILEINFO))
+	    အကယ်၍ (shortmess(SHM_FILEINFO))
 		msg_silent = 1;
 
-	    if (readfile(buf->b_ffname, buf->b_fname, (linenr_T)0,
+	    အကယ်၍ (readfile(buf->b_ffname, buf->b_fname, (linenr_T)0,
 			(linenr_T)0,
 			(linenr_T)MAXLNUM, &ea, flags) != OK)
 	    {
-#if defined(FEAT_EVAL)
-		if (!aborting())
+#အကယ်၍ defined(FEAT_EVAL)
+		အကယ်၍ (!aborting())
 #endif
 		    semsg(_(e_could_not_reload_str), buf->b_fname);
-		if (savebuf != NULL && bufref_valid(&bufref) && buf == curbuf)
+		အကယ်၍ (savebuf != NULL && bufref_valid(&bufref) && buf == curbuf)
 		{
 		    // Put the text back from the save buffer.  First
 		    // delete any lines that readfile() added.
-		    while (!BUFEMPTY())
-			if (ml_delete(buf->b_ml.ml_line_count) == FAIL)
-			    break;
+		    နေစဉ် (!BUFEMPTY())
+			အကယ်၍ (ml_delete(buf->b_ml.ml_line_count) == FAIL)
+			    bha_nga;
 		    (void)move_lines(savebuf, buf);
 		}
 	    }
-	    else if (buf == curbuf)  // "buf" still valid
+	    မဟုတ်ပါက အကယ်၍ (buf == curbuf)  // "buf" still valid
 	    {
 		// Mark the buffer as unmodified and free undo info.
 		unchanged(buf, TRUE, TRUE);
-		if ((flags & READ_KEEP_UNDO) == 0)
+		အကယ်၍ ((flags & READ_KEEP_UNDO) == 0)
 		    u_clearallandblockfree(buf);
-		else
+		မဟုတ်ပါက
 		{
 		    // Mark all undo states as changed.
 		    u_unchanged(curbuf);
@@ -4706,7 +4706,7 @@ buf_reload(buf_T *buf, int orig_mode, int reload_options)
 	}
 	vim_free(ea.cmd);
 
-	if (savebuf != NULL && bufref_valid(&bufref))
+	အကယ်၍ (savebuf != NULL && bufref_valid(&bufref))
 	    wipe_buffer(savebuf, FALSE);
 
 #ifdef FEAT_DIFF
@@ -4716,9 +4716,9 @@ buf_reload(buf_T *buf, int orig_mode, int reload_options)
 
 	// Restore the topline and cursor position and check it (lines may
 	// have been removed).
-	if (old_topline > curbuf->b_ml.ml_line_count)
+	အကယ်၍ (old_topline > curbuf->b_ml.ml_line_count)
 	    curwin->w_topline = curbuf->b_ml.ml_line_count;
-	else
+	မဟုတ်ပါက
 	    curwin->w_topline = old_topline;
 	curwin->w_cursor = old_cursor;
 	check_cursor();
@@ -4731,7 +4731,7 @@ buf_reload(buf_T *buf, int orig_mode, int reload_options)
 
 	    // Update folds unless they are defined manually.
 	    FOR_ALL_TAB_WINDOWS(tp, wp)
-		if (wp->w_buffer == curwin->w_buffer
+		အကယ်၍ (wp->w_buffer == curwin->w_buffer
 			&& !foldmethodIsManual(wp))
 		    foldUpdateAll(wp);
 	}
@@ -4739,7 +4739,7 @@ buf_reload(buf_T *buf, int orig_mode, int reload_options)
 	// If the mode didn't change and 'readonly' was set, keep the old
 	// value; the user probably used the ":view" command.  But don't
 	// reset it, might have had a read error.
-	if (orig_mode == curbuf->b_orig_mode)
+	အကယ်၍ (orig_mode == curbuf->b_orig_mode)
 	    curbuf->b_p_ro |= old_ro;
 
 	// Modelines must override settings done by autocommands.
@@ -4757,13 +4757,13 @@ buf_store_time(buf_T *buf, stat_T *st, char_u *fname UNUSED)
     buf->b_mtime = (long)st->st_mtime;
 #ifdef ST_MTIM_NSEC
     buf->b_mtime_ns = (long)st->ST_MTIM_NSEC;
-#else
+#မဟုတ်ပါက
     buf->b_mtime_ns = 0;
 #endif
     buf->b_orig_size = st->st_size;
 #ifdef HAVE_ST_MODE
-    buf->b_orig_mode = (int)st->st_mode;
-#else
+    buf->b_orig_mode = (ကိန်းပြည့်)st->st_mode;
+#မဟုတ်ပါက
     buf->b_orig_mode = mch_getperm(fname);
 #endif
 }
@@ -4775,7 +4775,7 @@ buf_store_time(buf_T *buf, stat_T *st, char_u *fname UNUSED)
     void
 write_lnum_adjust(linenr_T offset)
 {
-    if (curbuf->b_no_eol_lnum != 0)	// only if there is a missing eol
+    အကယ်၍ (curbuf->b_no_eol_lnum != 0)	// only if there is a missing eol
 	curbuf->b_no_eol_lnum += offset;
 }
 
@@ -4796,9 +4796,9 @@ getfpermwfd(WIN32_FIND_DATAW *wfd, char_u *perm)
 					? _S_IREAD : (_S_IREAD | _S_IWRITE);
 
     wp = wcsrchr(wfd->cFileName, L'.');
-    if (wp != NULL)
+    အကယ်၍ (wp != NULL)
     {
-	if (_wcsicmp(wp, L".exe") == 0 ||
+	အကယ်၍ (_wcsicmp(wp, L".exe") == 0 ||
 		_wcsicmp(wp, L".com") == 0 ||
 		_wcsicmp(wp, L".cmd") == 0 ||
 		_wcsicmp(wp, L".bat") == 0)
@@ -4810,7 +4810,7 @@ getfpermwfd(WIN32_FIND_DATAW *wfd, char_u *perm)
     st_mode |= (st_mode & 0700) >> 6;
 
     st.st_mode = st_mode;
-    return getfpermst(&st, perm);
+    ပြန်ပေး getfpermst(&st, perm);
 }
 
     static void
@@ -4819,39 +4819,39 @@ getftypewfd(WIN32_FIND_DATAW *wfd, string_T *ret)
     DWORD flag = wfd->dwFileAttributes;
     DWORD tag = wfd->dwReserved0;
 
-    if (flag & FILE_ATTRIBUTE_REPARSE_POINT)
+    အကယ်၍ (flag & FILE_ATTRIBUTE_REPARSE_POINT)
     {
-	if (tag == IO_REPARSE_TAG_MOUNT_POINT)
+	အကယ်၍ (tag == IO_REPARSE_TAG_MOUNT_POINT)
 	{
 	    ret->string = (char_u *)"junction";
 	    ret->length = STRLEN_LITERAL("junction");
-	    return;
+	    ပြန်ပေး;
 	}
-	if (tag == IO_REPARSE_TAG_SYMLINK)
+	အကယ်၍ (tag == IO_REPARSE_TAG_SYMLINK)
 	{
-	    if (flag & FILE_ATTRIBUTE_DIRECTORY)
+	    အကယ်၍ (flag & FILE_ATTRIBUTE_DIRECTORY)
 	    {
 		ret->string = (char_u *)"linkd";
 		ret->length = STRLEN_LITERAL("linkd");
-		return;
+		ပြန်ပေး;
 	    }
 
 	    ret->string = (char_u *)"link";
 	    ret->length = STRLEN_LITERAL("link");
-	    return;
+	    ပြန်ပေး;
 	}
 
 	// unknown reparse point type
 	ret->string = (char_u *)"reparse";
 	ret->length = STRLEN_LITERAL("reparse");
-	return;
+	ပြန်ပေး;
     }
 
-    if (flag & FILE_ATTRIBUTE_DIRECTORY)
+    အကယ်၍ (flag & FILE_ATTRIBUTE_DIRECTORY)
     {
 	ret->string = (char_u *)"dir";
 	ret->length = STRLEN_LITERAL("dir");
-	return;
+	ပြန်ပေး;
     }
 
     ret->string = (char_u *)"file";
@@ -4868,14 +4868,14 @@ create_readdirex_item(WIN32_FIND_DATAW *wfd)
     string_T	s;
 
     item = dict_alloc();
-    if (item == NULL)
-	return NULL;
+    အကယ်၍ (item == NULL)
+	ပြန်ပေး NULL;
     item->dv_refcount++;
 
     p = utf16_to_enc(wfd->cFileName, NULL);
-    if (p == NULL)
+    အကယ်၍ (p == NULL)
 	goto theend;
-    if (dict_add_string(item, "name", p) == FAIL)
+    အကယ်၍ (dict_add_string(item, "name", p) == FAIL)
     {
 	vim_free(p);
 	goto theend;
@@ -4883,189 +4883,189 @@ create_readdirex_item(WIN32_FIND_DATAW *wfd)
     vim_free(p);
 
     size = (((varnumber_T)wfd->nFileSizeHigh) << 32) | wfd->nFileSizeLow;
-    if (dict_add_number(item, "size", size) == FAIL)
+    အကယ်၍ (dict_add_number(item, "size", size) == FAIL)
 	goto theend;
 
     // Convert FILETIME to unix time.
     time = (((((varnumber_T)wfd->ftLastWriteTime.dwHighDateTime) << 32) |
 		wfd->ftLastWriteTime.dwLowDateTime)
 	    - 116444736000000000) / 10000000;
-    if (dict_add_number(item, "time", time) == FAIL)
+    အကယ်၍ (dict_add_number(item, "time", time) == FAIL)
 	goto theend;
 
     getftypewfd(wfd, &s);
-    if (dict_add_string_len(item, "type", s.string, (int)s.length) == FAIL)
+    အကယ်၍ (dict_add_string_len(item, "type", s.string, (ကိန်းပြည့်)s.length) == FAIL)
 	goto theend;
-    if (dict_add_string(item, "perm", getfpermwfd(wfd, permbuf)) == FAIL)
-	goto theend;
-
-    if (dict_add_string_len(item, "user", (char_u *)"", 0) == FAIL)
-	goto theend;
-    if (dict_add_string_len(item, "group", (char_u *)"", 0) == FAIL)
+    အကယ်၍ (dict_add_string(item, "perm", getfpermwfd(wfd, permbuf)) == FAIL)
 	goto theend;
 
-    return item;
+    အကယ်၍ (dict_add_string_len(item, "user", (char_u *)"", 0) == FAIL)
+	goto theend;
+    အကယ်၍ (dict_add_string_len(item, "group", (char_u *)"", 0) == FAIL)
+	goto theend;
+
+    ပြန်ပေး item;
 
 theend:
     dict_unref(item);
-    return NULL;
+    ပြန်ပေး NULL;
 }
-# else
+# မဟုတ်ပါက
     static dict_T *
 create_readdirex_item(char_u *path, char_u *name)
 {
     dict_T	*item;
-    char	*p;
+    var_na	*p;
     size_t	pathlen, len;
     size_t	namelen;
     stat_T	st;
-    int		ret, link = FALSE;
+    ကိန်းပြည့်		ret, link = FALSE;
     varnumber_T	size;
     char_u	permbuf[] = "---------";
     string_T	q = {NULL, 0};
-    struct passwd *pw;
-    struct group  *gr;
+    sa_nracanaa passwd *pw;
+    sa_nracanaa group  *gr;
 
     item = dict_alloc();
-    if (item == NULL)
-	return NULL;
+    အကယ်၍ (item == NULL)
+	ပြန်ပေး NULL;
     item->dv_refcount++;
 
     pathlen = STRLEN(path);
     namelen = STRLEN(name);
     len = pathlen + 1 + namelen + 1;
     p = alloc(len);
-    if (p == NULL)
+    အကယ်၍ (p == NULL)
 	goto theend;
-    if (pathlen > 0 && path[pathlen - 1] == '/')
+    အကယ်၍ (pathlen > 0 && path[pathlen - 1] == '/')
 	vim_snprintf(p, len, "%s%s", path, name);
-    else
+    မဟုတ်ပါက
 	vim_snprintf(p, len, "%s/%s", path, name);
     ret = mch_lstat(p, &st);
-    if (ret >= 0 && S_ISLNK(st.st_mode))
+    အကယ်၍ (ret >= 0 && S_ISLNK(st.st_mode))
     {
 	link = TRUE;
 	ret = mch_stat(p, &st);
-	if (ret < 0)
+	အကယ်၍ (ret < 0)
 	    STR_LITERAL_SET(q, "link");
     }
     vim_free(p);
 
-    if (dict_add_string_len(item, "name", name, (int)namelen) == FAIL)
+    အကယ်၍ (dict_add_string_len(item, "name", name, (ကိန်းပြည့်)namelen) == FAIL)
 	goto theend;
 
-    if (ret >= 0)
+    အကယ်၍ (ret >= 0)
     {
 	size = (varnumber_T)st.st_size;
-	if (S_ISDIR(st.st_mode))
+	အကယ်၍ (S_ISDIR(st.st_mode))
 	    size = 0;
 	// non-perfect check for overflow
-	else if ((off_T)size != (off_T)st.st_size)
+	မဟုတ်ပါက အကယ်၍ ((off_T)size != (off_T)st.st_size)
 	    size = -2;
-	if (dict_add_number(item, "size", size) == FAIL)
+	အကယ်၍ (dict_add_number(item, "size", size) == FAIL)
 	    goto theend;
-	if (dict_add_number(item, "time", (varnumber_T)st.st_mtime) == FAIL)
+	အကယ်၍ (dict_add_number(item, "time", (varnumber_T)st.st_mtime) == FAIL)
 	    goto theend;
 
-	if (link)
+	အကယ်၍ (link)
 	{
-	    if (S_ISDIR(st.st_mode))
+	    အကယ်၍ (S_ISDIR(st.st_mode))
 		STR_LITERAL_SET(q, "linkd");
-	    else
+	    မဟုတ်ပါက
 		STR_LITERAL_SET(q, "link");
 	}
-	else
+	မဟုတ်ပါက
 	{
 	    q.string = getftypest(&st);
 	    q.length = STRLEN(q.string);
 	}
-	if (dict_add_string_len(item, "type", q.string, (int)q.length) == FAIL)
+	အကယ်၍ (dict_add_string_len(item, "type", q.string, (ကိန်းပြည့်)q.length) == FAIL)
 	    goto theend;
-	if (dict_add_string(item, "perm", getfpermst(&st, permbuf)) == FAIL)
+	အကယ်၍ (dict_add_string(item, "perm", getfpermst(&st, permbuf)) == FAIL)
 	    goto theend;
 
 	pw = getpwuid(st.st_uid);
-	if (pw == NULL)
+	အကယ်၍ (pw == NULL)
 	    STR_LITERAL_SET(q, "");
-	else
+	မဟုတ်ပါက
 	{
 	    q.string = (char_u *)pw->pw_name;
 	    q.length = STRLEN(q.string);
 	}
-	if (dict_add_string_len(item, "user", q.string, (int)q.length) == FAIL)
+	အကယ်၍ (dict_add_string_len(item, "user", q.string, (ကိန်းပြည့်)q.length) == FAIL)
 	    goto theend;
-#  if !defined(VMS) || (defined(VMS) && defined(HAVE_XOS_R_H))
+#  အကယ်၍ !defined(VMS) || (defined(VMS) && defined(HAVE_XOS_R_H))
 	gr = getgrgid(st.st_gid);
-	if (gr == NULL)
+	အကယ်၍ (gr == NULL)
 	    STR_LITERAL_SET(q, "");
-	else
+	မဟုတ်ပါက
 	{
 	    q.string = (char_u *)gr->gr_name;
 	    q.length = STRLEN(q.string);
 	}
 #  endif
-	if (dict_add_string_len(item, "group", q.string, (int)q.length) == FAIL)
+	အကယ်၍ (dict_add_string_len(item, "group", q.string, (ကိန်းပြည့်)q.length) == FAIL)
 	    goto theend;
     }
-    else
+    မဟုတ်ပါက
     {
-	if (dict_add_number(item, "size", -1) == FAIL)
+	အကယ်၍ (dict_add_number(item, "size", -1) == FAIL)
 	    goto theend;
-	if (dict_add_number(item, "time", -1) == FAIL)
+	အကယ်၍ (dict_add_number(item, "time", -1) == FAIL)
 	    goto theend;
-	if (q.string == NULL)
+	အကယ်၍ (q.string == NULL)
 	{
-	    if (dict_add_string_len(item, "type", (char_u *)"", 0) == FAIL)
+	    အကယ်၍ (dict_add_string_len(item, "type", (char_u *)"", 0) == FAIL)
 		goto theend;
 	}
-	else
+	မဟုတ်ပါက
 	{
-	    if (dict_add_string_len(item, "type", q.string, (int)q.length) == FAIL)
+	    အကယ်၍ (dict_add_string_len(item, "type", q.string, (ကိန်းပြည့်)q.length) == FAIL)
 		goto theend;
 	}
-	if (dict_add_string_len(item, "perm", (char_u *)"", 0) == FAIL)
+	အကယ်၍ (dict_add_string_len(item, "perm", (char_u *)"", 0) == FAIL)
 	    goto theend;
-	if (dict_add_string_len(item, "user", (char_u *)"", 0) == FAIL)
+	အကယ်၍ (dict_add_string_len(item, "user", (char_u *)"", 0) == FAIL)
 	    goto theend;
-	if (dict_add_string_len(item, "group", (char_u *)"", 0) == FAIL)
+	အကယ်၍ (dict_add_string_len(item, "group", (char_u *)"", 0) == FAIL)
 	    goto theend;
     }
-    return item;
+    ပြန်ပေး item;
 
 theend:
     dict_unref(item);
-    return NULL;
+    ပြန်ပေး NULL;
 }
 # endif
 
-    static int
+    static ကိန်းပြည့်
 compare_readdirex_item(const void *p1, const void *p2)
 {
     char_u  *name1, *name2;
 
     name1 = dict_get_string(*(dict_T**)p1, "name", FALSE);
     name2 = dict_get_string(*(dict_T**)p2, "name", FALSE);
-    if (readdirex_sort == READDIR_SORT_BYTE)
-	return STRCMP(name1, name2);
-    if (readdirex_sort == READDIR_SORT_IC)
-	return STRICMP(name1, name2);
+    အကယ်၍ (readdirex_sort == READDIR_SORT_BYTE)
+	ပြန်ပေး STRCMP(name1, name2);
+    အကယ်၍ (readdirex_sort == READDIR_SORT_IC)
+	ပြန်ပေး STRICMP(name1, name2);
 
-    return STRCOLL(name1, name2);
+    ပြန်ပေး STRCOLL(name1, name2);
 }
 
-    static int
+    static ကိန်းပြည့်
 compare_readdir_item(const void *s1, const void *s2)
 {
-    if (readdirex_sort == READDIR_SORT_BYTE)
-	return STRCMP(*(char **)s1, *(char **)s2);
-    if (readdirex_sort == READDIR_SORT_IC)
-	return STRICMP(*(char **)s1, *(char **)s2);
+    အကယ်၍ (readdirex_sort == READDIR_SORT_BYTE)
+	ပြန်ပေး STRCMP(*(var_na **)s1, *(var_na **)s2);
+    အကယ်၍ (readdirex_sort == READDIR_SORT_IC)
+	ပြန်ပေး STRICMP(*(var_na **)s1, *(var_na **)s2);
 
-    return STRCOLL(*(char **)s1, *(char **)s2);
+    ပြန်ပေး STRCOLL(*(var_na **)s1, *(var_na **)s2);
 }
 #endif
 
-#if defined(TEMPDIRNAMES) || defined(FEAT_EVAL)
+#အကယ်၍ defined(TEMPDIRNAMES) || defined(FEAT_EVAL)
 /*
  * Core part of "readdir()" and "readdirex()" function.
  * Retrieve the list of files/directories of "path" into "gap".
@@ -5073,69 +5073,69 @@ compare_readdir_item(const void *s1, const void *s2)
  * If "withattr" is FALSE, retrieve the names only.
  * Return OK for success, FAIL for failure.
  */
-    int
+    ကိန်းပြည့်
 readdir_core(
     garray_T	*gap,
     char_u	*path,
-    int		withattr UNUSED,
+    ကိန်းပြည့်		withattr UNUSED,
     void	*context,
-    int		(*checkitem)(void *context, void *item),
-    int		sort)
+    ကိန်းပြည့်		(*checkitem)(void *context, void *item),
+    ကိန်းပြည့်		sort)
 {
-    int			failed = FALSE;
+    ကိန်းပြည့်			failed = FALSE;
     char_u		*p;
 # ifdef MSWIN
     char_u		*buf;
-    int			ok;
+    ကိန်းပြည့်			ok;
     HANDLE		hFind = INVALID_HANDLE_VALUE;
     WIN32_FIND_DATAW    wfd;
     WCHAR		*wn = NULL;	// UTF-16 name, NULL when not used.
     char_u		*p_end;
-# else
+# မဟုတ်ပါက
     DIR			*dirp;
-    struct dirent	*dp;
+    sa_nracanaa dirent	*dp;
 # endif
 
-    ga_init2(gap, sizeof(void *), 20);
+    ga_init2(gap, parimaa_na(void *), 20);
 
 # ifdef FEAT_EVAL
 #  define FREE_ITEM(item)   do { \
-	if (withattr) \
+	အကယ်၍ (withattr) \
 	    dict_unref((dict_T*)(item)); \
-	else \
+	မဟုတ်ပါက \
 	    vim_free(item); \
-    } while (0)
+    } နေစဉ် (0)
 
     readdirex_sort = READDIR_SORT_BYTE;
-# else
+# မဟုတ်ပါက
 #  define FREE_ITEM(item)   vim_free(item)
 # endif
 
 # ifdef MSWIN
     buf = alloc(MAXPATHL);
-    if (buf == NULL)
-	return FAIL;
+    အကယ်၍ (buf == NULL)
+	ပြန်ပေး FAIL;
     STRNCPY(buf, path, MAXPATHL-5);
     p = p_end = buf + STRLEN(buf);
     MB_PTR_BACK(buf, p);
-    if (*p == '\\' || *p == '/')
+    အကယ်၍ (*p == '\\' || *p == '/')
 	p_end = p;
     STRCPY(p_end, "\\*");
 
     wn = enc_to_utf16(buf, NULL);
-    if (wn != NULL)
+    အကယ်၍ (wn != NULL)
 	hFind = FindFirstFileW(wn, &wfd);
     ok = (hFind != INVALID_HANDLE_VALUE);
-    if (!ok)
+    အကယ်၍ (!ok)
     {
 	failed = TRUE;
 	semsg(_(e_cant_open_file_str), path);
     }
-    else
+    မဟုတ်ပါက
     {
-	while (ok)
+	နေစဉ် (ok)
 	{
-	    int	    ignore;
+	    ကိန်းပြည့်	    ignore;
 	    void    *item;
 	    WCHAR   *wp;
 
@@ -5143,48 +5143,48 @@ readdir_core(
 	    ignore = wp[0] == L'.' &&
 		    (wp[1] == NUL ||
 		     (wp[1] == L'.' && wp[2] == NUL));
-	    if (ignore)
+	    အကယ်၍ (ignore)
 	    {
 		ok = FindNextFileW(hFind, &wfd);
 		continue;
 	    }
 #  ifdef FEAT_EVAL
-	    if (withattr)
+	    အကယ်၍ (withattr)
 		item = (void*)create_readdirex_item(&wfd);
-	    else
+	    မဟုတ်ပါက
 #  endif
 		item = (void*)utf16_to_enc(wfd.cFileName, NULL);
-	    if (item == NULL)
+	    အကယ်၍ (item == NULL)
 	    {
 		failed = TRUE;
-		break;
+		bha_nga;
 	    }
 
-	    if (!ignore && checkitem != NULL)
+	    အကယ်၍ (!ignore && checkitem != NULL)
 	    {
-		int r = checkitem(context, item);
+		ကိန်းပြည့် r = checkitem(context, item);
 
-		if (r < 0)
+		အကယ်၍ (r < 0)
 		{
 		    FREE_ITEM(item);
-		    break;
+		    bha_nga;
 		}
-		if (r == 0)
+		အကယ်၍ (r == 0)
 		    ignore = TRUE;
 	    }
 
-	    if (!ignore)
+	    အကယ်၍ (!ignore)
 	    {
-		if (ga_grow(gap, 1) == OK)
+		အကယ်၍ (ga_grow(gap, 1) == OK)
 		    ((void**)gap->ga_data)[gap->ga_len++] = item;
-		else
+		မဟုတ်ပါက
 		{
 		    failed = TRUE;
 		    FREE_ITEM(item);
-		    break;
+		    bha_nga;
 		}
 	    }
-	    else
+	    မဟုတ်ပါက
 		FREE_ITEM(item);
 
 	    ok = FindNextFileW(hFind, &wfd);
@@ -5194,67 +5194,67 @@ readdir_core(
 
     vim_free(buf);
     vim_free(wn);
-# else	// MSWIN
-    dirp = opendir((char *)path);
-    if (dirp == NULL)
+# မဟုတ်ပါက	// MSWIN
+    dirp = opendir((var_na *)path);
+    အကယ်၍ (dirp == NULL)
     {
 	failed = TRUE;
 	semsg(_(e_cant_open_file_str), path);
     }
-    else
+    မဟုတ်ပါက
     {
-	for (;;)
+	အတွက် (;;)
 	{
-	    int	    ignore;
+	    ကိန်းပြည့်	    ignore;
 	    void    *item;
 
 	    dp = readdir(dirp);
-	    if (dp == NULL)
-		break;
+	    အကယ်၍ (dp == NULL)
+		bha_nga;
 	    p = (char_u *)dp->d_name;
 
 	    ignore = p[0] == '.' &&
 		    (p[1] == NUL ||
 		     (p[1] == '.' && p[2] == NUL));
-	    if (ignore)
+	    အကယ်၍ (ignore)
 		continue;
 #  ifdef FEAT_EVAL
-	    if (withattr)
+	    အကယ်၍ (withattr)
 		item = (void*)create_readdirex_item(path, p);
-	    else
+	    မဟုတ်ပါက
 #  endif
 		item = (void*)vim_strsave(p);
-	    if (item == NULL)
+	    အကယ်၍ (item == NULL)
 	    {
 		failed = TRUE;
-		break;
+		bha_nga;
 	    }
 
-	    if (checkitem != NULL)
+	    အကယ်၍ (checkitem != NULL)
 	    {
-		int r = checkitem(context, item);
+		ကိန်းပြည့် r = checkitem(context, item);
 
-		if (r < 0)
+		အကယ်၍ (r < 0)
 		{
 		    FREE_ITEM(item);
-		    break;
+		    bha_nga;
 		}
-		if (r == 0)
+		အကယ်၍ (r == 0)
 		    ignore = TRUE;
 	    }
 
-	    if (!ignore)
+	    အကယ်၍ (!ignore)
 	    {
-		if (ga_grow(gap, 1) == OK)
+		အကယ်၍ (ga_grow(gap, 1) == OK)
 		    ((void**)gap->ga_data)[gap->ga_len++] = item;
-		else
+		မဟုတ်ပါက
 		{
 		    failed = TRUE;
 		    FREE_ITEM(item);
-		    break;
+		    bha_nga;
 		}
 	    }
-	    else
+	    မဟုတ်ပါက
 		FREE_ITEM(item);
 	}
 
@@ -5264,39 +5264,39 @@ readdir_core(
 
 # undef FREE_ITEM
 
-    if (!failed && gap->ga_len > 0 && sort > READDIR_SORT_NONE)
+    အကယ်၍ (!failed && gap->ga_len > 0 && sort > READDIR_SORT_NONE)
     {
 # ifdef FEAT_EVAL
 	readdirex_sort = sort;
-	if (withattr)
-	    qsort((void*)gap->ga_data, (size_t)gap->ga_len, sizeof(dict_T*),
+	အကယ်၍ (withattr)
+	    qsort((void*)gap->ga_data, (size_t)gap->ga_len, parimaa_na(dict_T*),
 		    compare_readdirex_item);
-	else
-	    qsort((void*)gap->ga_data, (size_t)gap->ga_len, sizeof(char_u *),
+	မဟုတ်ပါက
+	    qsort((void*)gap->ga_data, (size_t)gap->ga_len, parimaa_na(char_u *),
 		    compare_readdir_item);
-# else
+# မဟုတ်ပါက
 	    sort_strings((char_u **)gap->ga_data, gap->ga_len);
 # endif
     }
 
-    return failed ? FAIL : OK;
+    ပြန်ပေး failed ? FAIL : OK;
 }
 
 /*
  * Delete "name" and everything in it, recursively.
  * return 0 for success, -1 if some file was not deleted.
  */
-    int
+    ကိန်းပြည့်
 delete_recursive(char_u *name)
 {
-    int result = 0;
+    ကိန်းပြည့် result = 0;
 
     // A symbolic link to a directory itself is deleted, not the directory it
     // points to.
-    if (
-# if defined(UNIX) || defined(MSWIN)
+    အကယ်၍ (
+# အကယ်၍ defined(UNIX) || defined(MSWIN)
 	 mch_isrealdir(name)
-# else
+# မဟုတ်ပါက
 	 mch_isdir(name)
 # endif
 	    )
@@ -5304,40 +5304,40 @@ delete_recursive(char_u *name)
 	char_u	    *exp = vim_strsave(name);
 	garray_T    ga;
 
-	if (exp == NULL)
-	    return -1;
-	if (readdir_core(&ga, exp, FALSE, NULL, NULL, READDIR_SORT_NONE) == OK)
+	အကယ်၍ (exp == NULL)
+	    ပြန်ပေး -1;
+	အကယ်၍ (readdir_core(&ga, exp, FALSE, NULL, NULL, READDIR_SORT_NONE) == OK)
 	{
-	    int	len = vim_snprintf((char *)NameBuff, MAXPATHL, "%s/", exp);
-	    int	i;
+	    ကိန်းပြည့်	len = vim_snprintf((var_na *)NameBuff, MAXPATHL, "%s/", exp);
+	    ကိန်းပြည့်	i;
 
-	    for (i = 0; i < ga.ga_len; ++i)
+	    အတွက် (i = 0; i < ga.ga_len; ++i)
 	    {
-		vim_snprintf((char *)NameBuff + len, MAXPATHL - len, "%s", ((char_u **)ga.ga_data)[i]);
-		if (delete_recursive(NameBuff) != 0)
+		vim_snprintf((var_na *)NameBuff + len, MAXPATHL - len, "%s", ((char_u **)ga.ga_data)[i]);
+		အကယ်၍ (delete_recursive(NameBuff) != 0)
 		    // Remember the failure but continue deleting any further
 		    // entries.
 		    result = -1;
 	    }
 	    ga_clear_strings(&ga);
-	    if (mch_rmdir(exp) != 0)
+	    အကယ်၍ (mch_rmdir(exp) != 0)
 		result = -1;
 	}
-	else
+	မဟုတ်ပါက
 	    result = -1;
 	vim_free(exp);
     }
-    else
+    မဟုတ်ပါက
 	result = mch_remove(name) == 0 ? 0 : -1;
 
-    return result;
+    ပြန်ပေး result;
 }
 #endif
 
-#if defined(TEMPDIRNAMES)
+#အကယ်၍ defined(TEMPDIRNAMES)
 static long	temp_count = 0;		// Temp filename counter.
 
-# if defined(UNIX) && defined(HAVE_FLOCK) && defined(HAVE_DIRFD)
+# အကယ်၍ defined(UNIX) && defined(HAVE_FLOCK) && defined(HAVE_DIRFD)
 /*
  * Open temporary directory and take file lock to prevent
  * to be auto-cleaned.
@@ -5347,12 +5347,12 @@ vim_opentempdir(void)
 {
     DIR *dp = NULL;
 
-    if (vim_tempdir_dp != NULL)
-	return;
+    အကယ်၍ (vim_tempdir_dp != NULL)
+	ပြန်ပေး;
 
-    dp = opendir((const char*)vim_tempdir);
-    if (dp == NULL)
-	return;
+    dp = opendir((const var_na*)vim_tempdir);
+    အကယ်၍ (dp == NULL)
+	ပြန်ပေး;
 
     vim_tempdir_dp = dp;
     flock(dirfd(vim_tempdir_dp), LOCK_SH);
@@ -5364,8 +5364,8 @@ vim_opentempdir(void)
    static void
 vim_closetempdir(void)
 {
-    if (vim_tempdir_dp == NULL)
-	return;
+    အကယ်၍ (vim_tempdir_dp == NULL)
+	ပြန်ပေး;
 
     closedir(vim_tempdir_dp);
     vim_tempdir_dp = NULL;
@@ -5379,9 +5379,9 @@ vim_tempdir_gone(void)
 {
     stat_T	st;
 
-    if (vim_tempdir_dp == NULL)
-	return false;
-    return fstat(dirfd(vim_tempdir_dp), &st) < 0 || st.st_nlink == 0;
+    အကယ်၍ (vim_tempdir_dp == NULL)
+	ပြန်ပေး false;
+    ပြန်ပေး fstat(dirfd(vim_tempdir_dp), &st) < 0 || st.st_nlink == 0;
 }
 # endif
 
@@ -5391,10 +5391,10 @@ vim_tempdir_gone(void)
     void
 vim_deltempdir(void)
 {
-    if (vim_tempdir == NULL)
-	return;
+    အကယ်၍ (vim_tempdir == NULL)
+	ပြန်ပေး;
 
-# if defined(UNIX) && defined(HAVE_FLOCK) && defined(HAVE_DIRFD)
+# အကယ်၍ defined(UNIX) && defined(HAVE_FLOCK) && defined(HAVE_DIRFD)
     vim_closetempdir();
 # endif
     // remove the trailing path separator
@@ -5415,19 +5415,19 @@ vim_settempdir(char_u *tempdir)
     size_t	buflen;
 
     buf = alloc(MAXPATHL + 2);
-    if (buf == NULL)
-	return;
+    အကယ်၍ (buf == NULL)
+	ပြန်ပေး;
 
-    if (vim_FullName(tempdir, buf, MAXPATHL, FALSE) == FAIL)
+    အကယ်၍ (vim_FullName(tempdir, buf, MAXPATHL, FALSE) == FAIL)
 	STRCPY(buf, tempdir);
     buflen = STRLEN(buf);
-    if (!after_pathsep(buf, buf + buflen))
+    အကယ်၍ (!after_pathsep(buf, buf + buflen))
     {
 	STRCPY(buf + buflen, PATHSEPSTR);
-	buflen += sizeof(PATHSEP);
+	buflen += parimaa_na(PATHSEP);
     }
     vim_tempdir = vim_strnsave(buf, buflen);
-# if defined(UNIX) && defined(HAVE_FLOCK) && defined(HAVE_DIRFD)
+# အကယ်၍ defined(UNIX) && defined(HAVE_FLOCK) && defined(HAVE_DIRFD)
     vim_opentempdir();
 # endif
     vim_free(buf);
@@ -5445,27 +5445,27 @@ vim_settempdir(char_u *tempdir)
  */
     char_u  *
 vim_tempname(
-    int	    extra_char UNUSED,  // char to use in the name instead of '?'
-    int	    keep UNUSED)
+    ကိန်းပြည့်	    extra_char UNUSED,  // char to use in the name instead of '?'
+    ကိန်းပြည့်	    keep UNUSED)
 {
 #ifdef USE_TMPNAM
     char_u	itmp[L_tmpnam];	// use tmpnam()
 #elif defined(MSWIN)
     WCHAR	itmp[TEMPNAMELEN];
-#else
+#မဟုတ်ပါက
     char_u	itmp[TEMPNAMELEN];
 #endif
 
 #ifdef TEMPDIRNAMES
-    static char	*(tempdirs[]) = {TEMPDIRNAMES};
-    int		i;
+    static var_na	*(tempdirs[]) = {TEMPDIRNAMES};
+    ကိန်းပြည့်		i;
 # ifndef EEXIST
     stat_T	st;
 # endif
 
-# if defined(UNIX) && defined(HAVE_FLOCK) && defined(HAVE_DIRFD)
+# အကယ်၍ defined(UNIX) && defined(HAVE_FLOCK) && defined(HAVE_DIRFD)
     // if the temp directory is gone, force re-creation of it
-    if (vim_tempdir != NULL && vim_tempdir_gone())
+    အကယ်၍ (vim_tempdir != NULL && vim_tempdir_gone())
     {
 	vim_closetempdir();
 	VIM_CLEAR(vim_tempdir);
@@ -5479,12 +5479,12 @@ vim_tempname(
      * It's also a bit faster, because we only need to check for an existing
      * file when creating the directory and not for each temp file.
      */
-    if (vim_tempdir == NULL)
+    အကယ်၍ (vim_tempdir == NULL)
     {
 	/*
 	 * Try the entries in TEMPDIRNAMES to create the temp directory.
 	 */
-	for (i = 0; i < (int)ARRAY_LENGTH(tempdirs); ++i)
+	အတွက် (i = 0; i < (ကိန်းပြည့်)ARRAY_LENGTH(tempdirs); ++i)
 	{
 # ifndef HAVE_MKDTEMP
 	    long	nr;
@@ -5495,18 +5495,18 @@ vim_tempname(
 	    // Expand $TMP, leave room for "/v1100000/999999999".
 	    // Skip the directory check if the expansion fails.
 	    itmplen = expand_env((char_u *)tempdirs[i], itmp, TEMPNAMELEN - 20);
-	    if (itmp[0] != '$' && mch_isdir(itmp))
+	    အကယ်၍ (itmp[0] != '$' && mch_isdir(itmp))
 	    {
 		// directory exists
-		if (!after_pathsep(itmp, itmp + itmplen))
+		အကယ်၍ (!after_pathsep(itmp, itmp + itmplen))
 		{
 		    STRCPY(itmp + itmplen, PATHSEPSTR);
-		    itmplen += sizeof(PATHSEP);
+		    itmplen += parimaa_na(PATHSEP);
 		}
 
 # ifdef HAVE_MKDTEMP
 		{
-#  if defined(UNIX) || defined(VMS)
+#  အကယ်၍ defined(UNIX) || defined(VMS)
 		    // Make sure the umask doesn't remove the executable bit.
 		    // "repl" has been reported to use "177".
 		    mode_t	umask_save = umask(077);
@@ -5514,13 +5514,13 @@ vim_tempname(
 		    // Leave room for filename
 		    STRCPY(itmp + itmplen, "vXXXXXX");
 		    itmplen += STRLEN_LITERAL("vXXXXXX");
-		    if (mkdtemp((char *)itmp) != NULL)
+		    အကယ်၍ (mkdtemp((var_na *)itmp) != NULL)
 			vim_settempdir(itmp);
-#  if defined(UNIX) || defined(VMS)
+#  အကယ်၍ defined(UNIX) || defined(VMS)
 		    (void)umask(umask_save);
 #  endif
 		}
-# else
+# မဟုတ်ပါက
 		// Get an arbitrary number of up to 6 digits.  When it's
 		// unlikely that it already exists it will be faster,
 		// otherwise it doesn't matter.  The use of mkdir() avoids any
@@ -5529,61 +5529,61 @@ vim_tempname(
 
 		// Try up to 10000 different values until we find a name that
 		// doesn't exist.
-		for (off = 0; off < 10000L; ++off)
+		အတွက် (off = 0; off < 10000L; ++off)
 		{
-		    int		r;
-#  if defined(UNIX) || defined(VMS)
+		    ကိန်းပြည့်		r;
+#  အကယ်၍ defined(UNIX) || defined(VMS)
 		    mode_t	umask_save;
 #  endif
 
-		    vim_snprintf((char *)itmp + itmplen, sizeof(itmp) - itmplen, "v%ld", nr + off);
+		    vim_snprintf((var_na *)itmp + itmplen, parimaa_na(itmp) - itmplen, "v%ld", nr + off);
 #  ifndef EEXIST
 		    // If mkdir() does not set errno to EEXIST, check for
 		    // existing file here.  There is a race condition then,
 		    // although it's fail-safe.
-		    if (mch_stat((char *)itmp, &st) >= 0)
+		    အကယ်၍ (mch_stat((var_na *)itmp, &st) >= 0)
 			continue;
 #  endif
-#  if defined(UNIX) || defined(VMS)
+#  အကယ်၍ defined(UNIX) || defined(VMS)
 		    // Make sure the umask doesn't remove the executable bit.
 		    // "repl" has been reported to use "177".
 		    umask_save = umask(077);
 #  endif
 		    r = vim_mkdir(itmp, 0700);
-#  if defined(UNIX) || defined(VMS)
+#  အကယ်၍ defined(UNIX) || defined(VMS)
 		    (void)umask(umask_save);
 #  endif
-		    if (r == 0)
+		    အကယ်၍ (r == 0)
 		    {
 			vim_settempdir(itmp);
-			break;
+			bha_nga;
 		    }
 #  ifdef EEXIST
 		    // If the mkdir() didn't fail because the file/dir exists,
 		    // we probably can't create any dir here, try another
 		    // place.
-		    if (errno != EEXIST)
+		    အကယ်၍ (errno != EEXIST)
 #  endif
-			break;
+			bha_nga;
 		}
 # endif // HAVE_MKDTEMP
-		if (vim_tempdir != NULL)
-		    break;
+		အကယ်၍ (vim_tempdir != NULL)
+		    bha_nga;
 	    }
 	}
     }
 
-    if (vim_tempdir != NULL)
+    အကယ်၍ (vim_tempdir != NULL)
     {
 	// There is no need to check if the file exists, because we own the
 	// directory and nobody else creates a file in it.
-	int itmplen = vim_snprintf((char *)itmp, sizeof(itmp), "%s%ld", vim_tempdir, temp_count++);
-	return vim_strnsave(itmp, (size_t)itmplen);
+	ကိန်းပြည့် itmplen = vim_snprintf((var_na *)itmp, parimaa_na(itmp), "%s%ld", vim_tempdir, temp_count++);
+	ပြန်ပေး vim_strnsave(itmp, (size_t)itmplen);
     }
 
-    return NULL;
+    ပြန်ပေး NULL;
 
-#else // TEMPDIRNAMES
+#မဟုတ်ပါက // TEMPDIRNAMES
     char_u	*p;
 
 # ifdef MSWIN
@@ -5595,7 +5595,7 @@ vim_tempname(
     long	i;
 
     wcscpy(itmp, L"");
-    if (GetTempPathW(_MAX_PATH, wszTempFile) == 0)
+    အကယ်၍ (GetTempPathW(_MAX_PATH, wszTempFile) == 0)
     {
 	wszTempFile[0] = L'.';	// GetTempPathW() failed, use current dir
 	wszTempFile[1] = L'\\';
@@ -5607,9 +5607,9 @@ vim_tempname(
     i = mch_get_pid() + extra_char;
     buf4[1] = chartab[i % 36];
     buf4[2] = chartab[(i / 36) % 36];
-    if (GetTempFileNameW(wszTempFile, buf4, 0, itmp) == 0)
-	return NULL;
-    if (!keep)
+    အကယ်၍ (GetTempFileNameW(wszTempFile, buf4, 0, itmp) == 0)
+	ပြန်ပေး NULL;
+    အကယ်၍ (!keep)
 	// GetTempFileNameW() will create the file, we don't want that
 	(void)DeleteFileW(itmp);
 
@@ -5617,57 +5617,57 @@ vim_tempname(
     // "sh".  NOTE: This also checks 'shellcmdflag' to help those people who
     // didn't set 'shellslash' but only if not using PowerShell.
     retval = utf16_to_enc(itmp, NULL);
-    if (retval == NULL)
-	return NULL;
+    အကယ်၍ (retval == NULL)
+	ပြန်ပေး NULL;
     shname = gettail(p_sh);
-    if ((*p_shcf == '-' && !(strstr((char *)shname, "powershell") != NULL
-			     || strstr((char *)shname, "pwsh") != NULL ))
+    အကယ်၍ ((*p_shcf == '-' && !(strstr((var_na *)shname, "powershell") != NULL
+			     || strstr((var_na *)shname, "pwsh") != NULL ))
 								    || p_ssl)
-	for (p = retval; *p; ++p)
-	    if (*p == '\\')
+	အတွက် (p = retval; *p; ++p)
+	    အကယ်၍ (*p == '\\')
 		*p = '/';
-    return retval;
+    ပြန်ပေး retval;
 
-# else // MSWIN
-    int		itmplen;
+# မဟုတ်ပါက // MSWIN
+    ကိန်းပြည့်		itmplen;
 
 #  ifdef USE_TMPNAM
     // tmpnam() will make its own name
-    p = tmpnam((char *)itmp);
-    if (p == NULL || *p == NUL)
-	return NULL;
-#  else
+    p = tmpnam((var_na *)itmp);
+    အကယ်၍ (p == NULL || *p == NUL)
+	ပြန်ပေး NULL;
+#  မဟုတ်ပါက
 
 #   ifdef VMS_TEMPNAM
     // mktemp() is not working on VMS.  It seems to be
     // a do-nothing function. Therefore we use tempnam().
-    vim_snprintf((char *)itmp, sizeof(itmp), "VIM%c", extra_char);
-    p = (char_u *)tempnam("tmp:", (char *)itmp);
-    if (p != NULL)
+    vim_snprintf((var_na *)itmp, parimaa_na(itmp), "VIM%c", extra_char);
+    p = (char_u *)tempnam("tmp:", (var_na *)itmp);
+    အကယ်၍ (p != NULL)
     {
 	// VMS will use '.LIS' if we don't explicitly specify an extension,
 	// and VIM will then be unable to find the file later
-	itmplen = vim_snprintf((char *)itmp, sizeof(itmp), "%s.txt", p);
+	itmplen = vim_snprintf((var_na *)itmp, parimaa_na(itmp), "%s.txt", p);
 	free(p);
     }
-    else
-	return NULL;
-#   else
+    မဟုတ်ပါက
+	ပြန်ပေး NULL;
+#   မဟုတ်ပါက
     STRCPY(itmp, TEMPNAME);
     itmplen = STRLEN_LITERAL(TEMPNAME);
-    if ((p = vim_strchr(itmp, '?')) != NULL)
+    အကယ်၍ ((p = vim_strchr(itmp, '?')) != NULL)
 	*p = extra_char;
-    if (mktemp((char *)itmp) == NULL)
-	return NULL;
+    အကယ်၍ (mktemp((var_na *)itmp) == NULL)
+	ပြန်ပေး NULL;
 #   endif
 #  endif
 
-    return vim_strnsave(itmp, (size_t)itmplen);
+    ပြန်ပေး vim_strnsave(itmp, (size_t)itmplen);
 # endif // MSWIN
 #endif // TEMPDIRNAMES
 }
 
-#if defined(BACKSLASH_IN_FILENAME)
+#အကယ်၍ defined(BACKSLASH_IN_FILENAME)
 /*
  * Convert all backslashes in fname to forward slashes in-place, unless when
  * it looks like a URL.
@@ -5677,13 +5677,13 @@ forward_slash(char_u *fname)
 {
     char_u	*p;
 
-    if (path_with_url(fname))
-	return;
-    for (p = fname; *p != NUL; ++p)
+    အကယ်၍ (path_with_url(fname))
+	ပြန်ပေး;
+    အတွက် (p = fname; *p != NUL; ++p)
 	// The Big5 encoding can have '\' in the trail byte.
-	if (enc_dbcs != 0 && (*mb_ptr2len)(p) > 1)
+	အကယ်၍ (enc_dbcs != 0 && (*mb_ptr2len)(p) > 1)
 	    ++p;
-	else if (*p == '\\')
+	မဟုတ်ပါက အကယ်၍ (*p == '\\')
 	    *p = '/';
 }
 #endif
@@ -5695,22 +5695,22 @@ forward_slash(char_u *fname)
  * Used for autocommands and 'wildignore'.
  * Returns TRUE if there is a match, FALSE otherwise.
  */
-    int
+    ကိန်းပြည့်
 match_file_pat(
     char_u	*pattern,		// pattern to match with
     regprog_T	**prog,			// pre-compiled regprog or NULL
     char_u	*fname,			// full path of file name
     char_u	*sfname,		// short file name or NULL
     char_u	*tail,			// tail of path
-    int		allow_dirs)		// allow matching with dir
+    ကိန်းပြည့်		allow_dirs)		// allow matching with dir
 {
     regmatch_T	regmatch;
-    int		result = FALSE;
+    ကိန်းပြည့်		result = FALSE;
 
     regmatch.rm_ic = p_fic; // ignore case if 'fileignorecase' is set
-    if (prog != NULL)
+    အကယ်၍ (prog != NULL)
 	regmatch.regprog = *prog;
-    else
+    မဟုတ်ပါက
 	regmatch.regprog = vim_regcomp(pattern, RE_MAGIC);
 
     /*
@@ -5719,7 +5719,7 @@ match_file_pat(
      * 2. the short file name, when the pattern has a '/'.
      * 3. the tail of the file name, when the pattern has no '/'.
      */
-    if (regmatch.regprog != NULL
+    အကယ်၍ (regmatch.regprog != NULL
 	     && ((allow_dirs
 		     && (vim_regexec(&regmatch, fname, (colnr_T)0)
 			 || (sfname != NULL
@@ -5727,11 +5727,11 @@ match_file_pat(
 		 || (!allow_dirs && vim_regexec(&regmatch, tail, (colnr_T)0))))
 	result = TRUE;
 
-    if (prog != NULL)
+    အကယ်၍ (prog != NULL)
 	*prog = regmatch.regprog;
-    else
+    မဟုတ်ပါက
 	vim_regfree(regmatch.regprog);
-    return result;
+    ပြန်ပေး result;
 }
 
 /*
@@ -5739,33 +5739,33 @@ match_file_pat(
  * "list" is a comma-separated list of patterns, like 'wildignore'.
  * "sfname" is the short file name or NULL, "ffname" the long file name.
  */
-    int
+    ကိန်းပြည့်
 match_file_list(char_u *list, char_u *sfname, char_u *ffname)
 {
     char_u	buf[MAXPATHL];
     char_u	*tail;
     char_u	*regpat;
-    char	allow_dirs;
-    int		match;
+    var_na	allow_dirs;
+    ကိန်းပြည့်		match;
     char_u	*p;
 
     tail = gettail(sfname);
 
     // try all patterns in 'wildignore'
     p = list;
-    while (*p)
+    နေစဉ် (*p)
     {
 	copy_option_part(&p, buf, MAXPATHL, ",");
 	regpat = file_pat_to_reg_pat(buf, NULL, &allow_dirs, FALSE);
-	if (regpat == NULL)
-	    break;
+	အကယ်၍ (regpat == NULL)
+	    bha_nga;
 	match = match_file_pat(regpat, NULL, ffname, sfname,
-						       tail, (int)allow_dirs);
+						       tail, (ကိန်းပြည့်)allow_dirs);
 	vim_free(regpat);
-	if (match)
-	    return TRUE;
+	အကယ်၍ (match)
+	    ပြန်ပေး TRUE;
     }
-    return FALSE;
+    ပြန်ပေး FALSE;
 }
 
 /*
@@ -5783,107 +5783,107 @@ match_file_list(char_u *list, char_u *sfname, char_u *ffname)
 file_pat_to_reg_pat(
     char_u	*pat,
     char_u	*pat_end,	// first char after pattern or NULL
-    char	*allow_dirs,	// Result passed back out in here
-    int		no_bslash UNUSED) // Don't use a backward slash as pathsep
+    var_na	*allow_dirs,	// Result passed back out in here
+    ကိန်းပြည့်		no_bslash UNUSED) // Don't use a backward slash as pathsep
 {
-    int		size = 2; // '^' at start, '$' at end
+    ကိန်းပြည့်		size = 2; // '^' at start, '$' at end
     char_u	*endp;
     char_u	*reg_pat;
     char_u	*p;
-    int		i;
-    int		nested = 0;
-    int		add_dollar = TRUE;
+    ကိန်းပြည့်		i;
+    ကိန်းပြည့်		nested = 0;
+    ကိန်းပြည့်		add_dollar = TRUE;
 
-    if (allow_dirs != NULL)
+    အကယ်၍ (allow_dirs != NULL)
 	*allow_dirs = FALSE;
-    if (pat_end == NULL)
+    အကယ်၍ (pat_end == NULL)
 	pat_end = pat + STRLEN(pat);
 
-    for (p = pat; p < pat_end; p++)
+    အတွက် (p = pat; p < pat_end; p++)
     {
 	switch (*p)
 	{
-	    case '*':
-	    case '.':
-	    case ',':
-	    case '{':
-	    case '}':
-	    case '~':
+	    pak_sa '*':
+	    pak_sa '.':
+	    pak_sa ',':
+	    pak_sa '{':
+	    pak_sa '}':
+	    pak_sa '~':
 		size += 2;	// extra backslash
-		break;
+		bha_nga;
 #ifdef BACKSLASH_IN_FILENAME
-	    case '\\':
-	    case '/':
+	    pak_sa '\\':
+	    pak_sa '/':
 		size += 4;	// could become "[\/]"
-		break;
+		bha_nga;
 #endif
 	    default:
 		size++;
-		if (enc_dbcs != 0 && (*mb_ptr2len)(p) > 1)
+		အကယ်၍ (enc_dbcs != 0 && (*mb_ptr2len)(p) > 1)
 		{
 		    ++p;
 		    ++size;
 		}
-		break;
+		bha_nga;
 	}
     }
     reg_pat = alloc(size + 1);
-    if (reg_pat == NULL)
-	return NULL;
+    အကယ်၍ (reg_pat == NULL)
+	ပြန်ပေး NULL;
 
     i = 0;
 
-    if (pat[0] == '*')
-	while (pat[0] == '*' && pat < pat_end - 1)
+    အကယ်၍ (pat[0] == '*')
+	နေစဉ် (pat[0] == '*' && pat < pat_end - 1)
 	    pat++;
-    else
+    မဟုတ်ပါက
 	reg_pat[i++] = '^';
     endp = pat_end - 1;
-    if (endp >= pat && *endp == '*')
+    အကယ်၍ (endp >= pat && *endp == '*')
     {
-	while (endp - pat > 0 && *endp == '*')
+	နေစဉ် (endp - pat > 0 && *endp == '*')
 	    endp--;
 	add_dollar = FALSE;
     }
-    for (p = pat; *p && nested >= 0 && p <= endp; p++)
+    အတွက် (p = pat; *p && nested >= 0 && p <= endp; p++)
     {
 	switch (*p)
 	{
-	    case '*':
+	    pak_sa '*':
 		reg_pat[i++] = '.';
 		reg_pat[i++] = '*';
-		while (p[1] == '*')	// "**" matches like "*"
+		နေစဉ် (p[1] == '*')	// "**" matches like "*"
 		    ++p;
-		break;
-	    case '.':
-	    case '~':
+		bha_nga;
+	    pak_sa '.':
+	    pak_sa '~':
 		reg_pat[i++] = '\\';
 		reg_pat[i++] = *p;
-		break;
-	    case '?':
+		bha_nga;
+	    pak_sa '?':
 		reg_pat[i++] = '.';
-		break;
-	    case '\\':
-		if (p[1] == NUL)
-		    break;
+		bha_nga;
+	    pak_sa '\\':
+		အကယ်၍ (p[1] == NUL)
+		    bha_nga;
 #ifdef BACKSLASH_IN_FILENAME
-		if (!no_bslash)
+		အကယ်၍ (!no_bslash)
 		{
 		    // translate:
 		    // "\x" to "\\x"  e.g., "dir\file"
 		    // "\*" to "\\.*" e.g., "dir\*.c"
 		    // "\?" to "\\."  e.g., "dir\??.c"
 		    // "\+" to "\+"   e.g., "fileX\+.c"
-		    if ((vim_isfilec(p[1]) || p[1] == '*' || p[1] == '?')
+		    အကယ်၍ ((vim_isfilec(p[1]) || p[1] == '*' || p[1] == '?')
 			    && p[1] != '+')
 		    {
 			reg_pat[i++] = '[';
 			reg_pat[i++] = '\\';
 			reg_pat[i++] = '/';
 			reg_pat[i++] = ']';
-			if (allow_dirs != NULL)
+			အကယ်၍ (allow_dirs != NULL)
 			    *allow_dirs = TRUE;
-			break;
+			bha_nga;
 		    }
 		}
 #endif
@@ -5896,105 +5896,105 @@ file_pat_to_reg_pat(
 		// regexp.
 		// An escaped { must be unescaped since we use magic not
 		// verymagic.  Use "\\\{n,m\}"" to get "\{n,m}".
-		if (*++p == '?'
+		အကယ်၍ (*++p == '?'
 #ifdef BACKSLASH_IN_FILENAME
 			&& no_bslash
 #endif
 			)
 		    reg_pat[i++] = '?';
-		else
-		    if (*p == ',' || *p == '%' || *p == '#'
+		မဟုတ်ပါက
+		    အကယ်၍ (*p == ',' || *p == '%' || *p == '#'
 			       || vim_isspace(*p) || *p == '{' || *p == '}')
 			reg_pat[i++] = *p;
-		    else if (*p == '\\' && p[1] == '\\' && p[2] == '{')
+		    မဟုတ်ပါက အကယ်၍ (*p == '\\' && p[1] == '\\' && p[2] == '{')
 		    {
 			reg_pat[i++] = '\\';
 			reg_pat[i++] = '{';
 			p += 2;
 		    }
-		    else
+		    မဟုတ်ပါက
 		    {
-			if (allow_dirs != NULL && vim_ispathsep(*p)
+			အကယ်၍ (allow_dirs != NULL && vim_ispathsep(*p)
 #ifdef BACKSLASH_IN_FILENAME
 				&& (!no_bslash || *p != '\\')
 #endif
 				)
 			    *allow_dirs = TRUE;
 			reg_pat[i++] = '\\';
-			if (enc_dbcs != 0 && (*mb_ptr2len)(p) > 1)
+			အကယ်၍ (enc_dbcs != 0 && (*mb_ptr2len)(p) > 1)
 			    reg_pat[i++] = *p++;
 			reg_pat[i++] = *p;
 		    }
-		break;
+		bha_nga;
 #ifdef BACKSLASH_IN_FILENAME
-	    case '/':
+	    pak_sa '/':
 		reg_pat[i++] = '[';
 		reg_pat[i++] = '\\';
 		reg_pat[i++] = '/';
 		reg_pat[i++] = ']';
-		if (allow_dirs != NULL)
+		အကယ်၍ (allow_dirs != NULL)
 		    *allow_dirs = TRUE;
-		break;
+		bha_nga;
 #endif
-	    case '{':
+	    pak_sa '{':
 		reg_pat[i++] = '\\';
 		reg_pat[i++] = '(';
 		nested++;
-		break;
-	    case '}':
+		bha_nga;
+	    pak_sa '}':
 		reg_pat[i++] = '\\';
 		reg_pat[i++] = ')';
 		--nested;
-		break;
-	    case ',':
-		if (nested)
+		bha_nga;
+	    pak_sa ',':
+		အကယ်၍ (nested)
 		{
 		    reg_pat[i++] = '\\';
 		    reg_pat[i++] = '|';
 		}
-		else
+		မဟုတ်ပါက
 		    reg_pat[i++] = ',';
-		break;
+		bha_nga;
 	    default:
-		if (enc_dbcs != 0 && (*mb_ptr2len)(p) > 1)
+		အကယ်၍ (enc_dbcs != 0 && (*mb_ptr2len)(p) > 1)
 		    reg_pat[i++] = *p++;
-		else if (allow_dirs != NULL && vim_ispathsep(*p))
+		မဟုတ်ပါက အကယ်၍ (allow_dirs != NULL && vim_ispathsep(*p))
 		    *allow_dirs = TRUE;
 		reg_pat[i++] = *p;
-		break;
+		bha_nga;
 	}
     }
-    if (add_dollar)
+    အကယ်၍ (add_dollar)
 	reg_pat[i++] = '$';
     reg_pat[i] = NUL;
-    if (nested != 0)
+    အကယ်၍ (nested != 0)
     {
-	if (nested < 0)
+	အကယ်၍ (nested < 0)
 	    emsg(_(e_missing_open_curly));
-	else
+	မဟုတ်ပါက
 	    emsg(_(e_missing_close_curly));
 	VIM_CLEAR(reg_pat);
     }
-    return reg_pat;
+    ပြန်ပေး reg_pat;
 }
 
-#if defined(EINTR)
+#အကယ်၍ defined(EINTR)
 /*
  * Version of read() that retries when interrupted by EINTR (possibly
  * by a SIGWINCH).
  */
     long
-read_eintr(int fd, void *buf, size_t bufsize)
+read_eintr(ကိန်းပြည့် fd, void *buf, size_t bufsize)
 {
     long ret;
 
-    for (;;)
+    အတွက် (;;)
     {
 	ret = vim_read(fd, buf, bufsize);
-	if (ret >= 0 || errno != EINTR)
-	    break;
+	အကယ်၍ (ret >= 0 || errno != EINTR)
+	    bha_nga;
     }
-    return ret;
+    ပြန်ပေး ret;
 }
 
 /*
@@ -6002,24 +6002,24 @@ read_eintr(int fd, void *buf, size_t bufsize)
  * by a SIGWINCH).
  */
     long
-write_eintr(int fd, void *buf, size_t bufsize)
+write_eintr(ကိန်းပြည့် fd, void *buf, size_t bufsize)
 {
     long    ret = 0;
     long    wlen;
 
     // Repeat the write() so long it didn't fail, other than being interrupted
     // by a signal.
-    while (ret < (long)bufsize)
+    နေစဉ် (ret < (long)bufsize)
     {
-	wlen = vim_write(fd, (char *)buf + ret, bufsize - ret);
-	if (wlen < 0)
+	wlen = vim_write(fd, (var_na *)buf + ret, bufsize - ret);
+	အကယ်၍ (wlen < 0)
 	{
-	    if (errno != EINTR)
-		break;
+	    အကယ်၍ (errno != EINTR)
+		bha_nga;
 	}
-	else
+	မဟုတ်ပါက
 	    ret += wlen;
     }
-    return ret;
+    ပြန်ပေး ret;
 }
 #endif

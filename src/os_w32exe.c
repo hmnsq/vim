@@ -19,31 +19,31 @@
 #ifdef VIMDLL
 __declspec(dllimport)
 #endif
-int VimMain(int argc, char **argv);
+ကိန်းပြည့် VimMain(ကိန်းပြည့် argc, var_na **argv);
 
 #ifdef VIMDLL
 # define SaveInst(hInst)    // Do nothing
-#else
+#မဟုတ်ပါက
 void SaveInst(HINSTANCE hInst);
 #endif
 
 #ifdef FEAT_GUI
-    int WINAPI
+    ကိန်းပြည့် WINAPI
 wWinMain(
     HINSTANCE	hInstance,
     HINSTANCE	hPrevInst UNUSED,
     LPWSTR	lpszCmdLine UNUSED,
-    int		nCmdShow UNUSED)
+    ကိန်းပြည့်		nCmdShow UNUSED)
 {
     SaveInst(hInstance);
-    return VimMain(0, NULL);
+    ပြန်ပေး VimMain(0, NULL);
 }
-#else
-    int
-wmain(int argc UNUSED, wchar_t **argv UNUSED)
+#မဟုတ်ပါက
+    ကိန်းပြည့်
+wmain(ကိန်းပြည့် argc UNUSED, wchar_t **argv UNUSED)
 {
     SaveInst(GetModuleHandleW(NULL));
-    return VimMain(0, NULL);
+    ပြန်ပေး VimMain(0, NULL);
 }
 #endif
 
@@ -62,7 +62,7 @@ wWinMainCRTStartup(void)
 {
     VimMain(0, NULL);
 }
-# else
+# မဟုတ်ပါက
     void
 wmainCRTStartup(void)
 {
@@ -72,9 +72,9 @@ wmainCRTStartup(void)
 #endif	// USE_OWNSTARTUP
 
 
-#if defined(VIMDLL) && defined(FEAT_MZSCHEME)
+#အကယ်၍ defined(VIMDLL) && defined(FEAT_MZSCHEME)
 
-# if defined(_MSC_VER)
+# အကယ်၍ defined(_MSC_VER)
 static __declspec(thread) void *tls_space;
 extern intptr_t _tls_index;
 # elif defined(__MINGW32__)
@@ -88,6 +88,6 @@ get_tls_info(void ***ptls_space, intptr_t *ptls_index)
 {
     *ptls_space = &tls_space;
     *ptls_index = _tls_index;
-    return;
+    ပြန်ပေး;
 }
 #endif

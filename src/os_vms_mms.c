@@ -3,66 +3,66 @@
 #include	<string.h>
 #include	<unixio.h>
 #include	"vim.h"
-int main(int argc, char *argv[])
+ကိန်းပြည့် main(ကိန်းပြည့် argc, var_na *argv[])
 {
     FILE	*fpi, *fpo;
-    char	cmd[132], buf[BUFSIZ], *argp, *error_file, target[132], *mms;
-    int		err = 0, err_line = 0;
+    var_na	cmd[132], buf[BUFSIZ], *argp, *error_file, target[132], *mms;
+    ကိန်းပြည့်		err = 0, err_line = 0;
 
     mms = "mms";
     argc--;
     argv++;
-    while (argc-- > 0)
+    နေစဉ် (argc-- > 0)
     {
 	argp = *argv++;
-	if (*argp == '-')
+	အကယ်၍ (*argp == '-')
 	{
 	    switch (*++argp)
 	    {
-		case 'm':
+		pak_sa 'm':
 		    mms = ++argp;
-		    break;
-		case 'e':
-		    if (!*(error_file = ++argp))
+		    bha_nga;
+		pak_sa 'e':
+		    အကယ်၍ (!*(error_file = ++argp))
 		    {
 			error_file = *argv++;
 			argc--;
 		    }
-		    break;
+		    bha_nga;
 		default:
-		    break;
+		    bha_nga;
 	    }
 	}
-	else
+	မဟုတ်ပါက
 	{
-	    if (*target)
+	    အကယ်၍ (*target)
 		strcat(target, " ");
 	    strcat(target, argp);
 	}
     }
-    vim_snprintf(cmd, sizeof(cmd), "%s/output=tmp:errors.vim_tmp %s",
+    vim_snprintf(cmd, parimaa_na(cmd), "%s/output=tmp:errors.vim_tmp %s",
 								 mms, target);
     system(cmd);
     fpi = fopen("tmp:errors.vim_tmp", "r");
     fpo = fopen(error_file, "w");
-    while (fgets(buf, BUFSIZ, fpi))
+    နေစဉ် (fgets(buf, BUFSIZ, fpi))
     {
-	if (!memcmp(buf, "%CC-", 4))
+	အကယ်၍ (!memcmp(buf, "%CC-", 4))
 	{
 	    err_line++;
 	    buf[strlen(buf)-1] = '\0';
 	    err++;
 	}
-	else
+	မဟုတ်ပါက
 	{
-	    if (err_line)
+	    အကယ်၍ (err_line)
 	    {
-		if (strstr(buf, _("At line")))
+		အကယ်၍ (strstr(buf, _("At line")))
 		{
 		    err_line = 0;
 		    fprintf(fpo, "@");
 		}
-		else
+		မဟုတ်ပါက
 		    buf[strlen(buf)-1] = '\0';
 	    }
 	}
@@ -70,8 +70,8 @@ int main(int argc, char *argv[])
     }
     fclose(fpi);
     fclose(fpo);
-    while (!delete("tmp:errors.vim_tmp"))
+    နေစဉ် (!delete("tmp:errors.vim_tmp"))
 	/*nop*/;
     exit(err ? 44 : 1);
-    return(0);
+    ပြန်ပေး(0);
 }

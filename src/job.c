@@ -12,61 +12,61 @@
 
 #include "vim.h"
 
-#if defined(FEAT_JOB_CHANNEL)
+#အကယ်၍ defined(FEAT_JOB_CHANNEL)
 
 #define FOR_ALL_JOBS(job) \
-    for ((job) = first_job; (job) != NULL; (job) = (job)->jv_next)
+    အတွက် ((job) = first_job; (job) != NULL; (job) = (job)->jv_next)
 
-    static int
-handle_mode(typval_T *item, jobopt_T *opt, ch_mode_T *modep, int jo)
+    static ကိန်းပြည့်
+handle_mode(typval_T *item, jobopt_T *opt, ch_mode_T *modep, ကိန်းပြည့် jo)
 {
     char_u	*val = tv_get_string(item);
 
     opt->jo_set |= jo;
-    if (STRCMP(val, "nl") == 0)
+    အကယ်၍ (STRCMP(val, "nl") == 0)
 	*modep = CH_MODE_NL;
-    else if (STRCMP(val, "raw") == 0)
+    မဟုတ်ပါက အကယ်၍ (STRCMP(val, "raw") == 0)
 	*modep = CH_MODE_RAW;
-    else if (STRCMP(val, "blob") == 0)
+    မဟုတ်ပါက အကယ်၍ (STRCMP(val, "blob") == 0)
 	*modep = CH_MODE_BLOB;
-    else if (STRCMP(val, "js") == 0)
+    မဟုတ်ပါက အကယ်၍ (STRCMP(val, "js") == 0)
 	*modep = CH_MODE_JS;
-    else if (STRCMP(val, "json") == 0)
+    မဟုတ်ပါက အကယ်၍ (STRCMP(val, "json") == 0)
 	*modep = CH_MODE_JSON;
-    else if (STRCMP(val, "lsp") == 0)
+    မဟုတ်ပါက အကယ်၍ (STRCMP(val, "lsp") == 0)
 	*modep = CH_MODE_LSP;
-    else if (STRCMP(val, "dap") == 0)
+    မဟုတ်ပါက အကယ်၍ (STRCMP(val, "dap") == 0)
 	*modep = CH_MODE_DAP;
-    else
+    မဟုတ်ပါက
     {
 	semsg(_(e_invalid_argument_str), val);
-	return FAIL;
+	ပြန်ပေး FAIL;
     }
-    return OK;
+    ပြန်ပေး OK;
 }
 
-    static int
+    static ကိန်းပြည့်
 handle_io(typval_T *item, ch_part_T part, jobopt_T *opt)
 {
     char_u	*val = tv_get_string(item);
 
     opt->jo_set |= JO_OUT_IO << (part - PART_OUT);
-    if (STRCMP(val, "null") == 0)
+    အကယ်၍ (STRCMP(val, "null") == 0)
 	opt->jo_io[part] = JIO_NULL;
-    else if (STRCMP(val, "pipe") == 0)
+    မဟုတ်ပါက အကယ်၍ (STRCMP(val, "pipe") == 0)
 	opt->jo_io[part] = JIO_PIPE;
-    else if (STRCMP(val, "file") == 0)
+    မဟုတ်ပါက အကယ်၍ (STRCMP(val, "file") == 0)
 	opt->jo_io[part] = JIO_FILE;
-    else if (STRCMP(val, "buffer") == 0)
+    မဟုတ်ပါက အကယ်၍ (STRCMP(val, "buffer") == 0)
 	opt->jo_io[part] = JIO_BUFFER;
-    else if (STRCMP(val, "out") == 0 && part == PART_ERR)
+    မဟုတ်ပါက အကယ်၍ (STRCMP(val, "out") == 0 && part == PART_ERR)
 	opt->jo_io[part] = JIO_OUT;
-    else
+    မဟုတ်ပါက
     {
 	semsg(_(e_invalid_argument_str), val);
-	return FAIL;
+	ပြန်ပေး FAIL;
     }
-    return OK;
+    ပြန်ပေး OK;
 }
 
 /*
@@ -81,12 +81,12 @@ clear_job_options(jobopt_T *opt)
     static void
 unref_job_callback(callback_T *cb)
 {
-    if (cb->cb_partial != NULL)
+    အကယ်၍ (cb->cb_partial != NULL)
 	partial_unref(cb->cb_partial);
-    else if (cb->cb_name != NULL)
+    မဟုတ်ပါက အကယ်၍ (cb->cb_name != NULL)
     {
 	func_unref(cb->cb_name);
-	if (cb->cb_free_name)
+	အကယ်၍ (cb->cb_free_name)
 	    vim_free(cb->cb_name);
     }
 }
@@ -103,17 +103,17 @@ free_job_options(jobopt_T *opt)
     unref_job_callback(&opt->jo_close_cb);
     unref_job_callback(&opt->jo_exit_cb);
 
-    if (opt->jo_env != NULL)
+    အကယ်၍ (opt->jo_env != NULL)
 	dict_unref(opt->jo_env);
 }
 
 /*
  * Get the PART_ number from the first character of an option name.
  */
-    static int
-part_from_char(int c)
+    static ကိန်းပြည့်
+part_from_char(ကိန်းပြည့် c)
 {
-    return c == 'i' ? PART_IN : c == 'o' ? PART_OUT: PART_ERR;
+    ပြန်ပေး c == 'i' ? PART_IN : c == 'o' ? PART_OUT: PART_ERR;
 }
 
 /*
@@ -122,629 +122,629 @@ part_from_char(int c)
  * Only accept JO_ options in "supported" and JO2_ options in "supported2".
  * If an option value is invalid return FAIL.
  */
-    int
-get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
+    ကိန်းပြည့်
+get_job_options(typval_T *tv, jobopt_T *opt, ကိန်းပြည့် supported, ကိန်းပြည့် supported2)
 {
     typval_T	*item;
     char_u	*val;
     dict_T	*dict;
-    int		todo;
+    ကိန်းပြည့်		todo;
     hashitem_T	*hi;
     ch_part_T	part;
 
-    if (tv->v_type == VAR_UNKNOWN)
-	return OK;
-    if (tv->v_type != VAR_DICT)
+    အကယ်၍ (tv->v_type == VAR_UNKNOWN)
+	ပြန်ပေး OK;
+    အကယ်၍ (tv->v_type != VAR_DICT)
     {
 	emsg(_(e_dictionary_required));
-	return FAIL;
+	ပြန်ပေး FAIL;
     }
     dict = tv->vval.v_dict;
-    if (dict == NULL)
-	return OK;
+    အကယ်၍ (dict == NULL)
+	ပြန်ပေး OK;
 
-    todo = (int)dict->dv_hashtab.ht_used;
+    todo = (ကိန်းပြည့်)dict->dv_hashtab.ht_used;
     FOR_ALL_HASHTAB_ITEMS(&dict->dv_hashtab, hi, todo)
-	if (!HASHITEM_EMPTY(hi))
+	အကယ်၍ (!HASHITEM_EMPTY(hi))
 	{
 	    item = &dict_lookup(hi)->di_tv;
 
-	    if (STRCMP(hi->hi_key, "mode") == 0)
+	    အကယ်၍ (STRCMP(hi->hi_key, "mode") == 0)
 	    {
-		if (!(supported & JO_MODE))
-		    break;
-		if (handle_mode(item, opt, &opt->jo_mode, JO_MODE) == FAIL)
-		    return FAIL;
+		အကယ်၍ (!(supported & JO_MODE))
+		    bha_nga;
+		အကယ်၍ (handle_mode(item, opt, &opt->jo_mode, JO_MODE) == FAIL)
+		    ပြန်ပေး FAIL;
 	    }
-	    else if (STRCMP(hi->hi_key, "in_mode") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "in_mode") == 0)
 	    {
-		if (!(supported & JO_IN_MODE))
-		    break;
-		if (handle_mode(item, opt, &opt->jo_in_mode, JO_IN_MODE)
+		အကယ်၍ (!(supported & JO_IN_MODE))
+		    bha_nga;
+		အကယ်၍ (handle_mode(item, opt, &opt->jo_in_mode, JO_IN_MODE)
 								      == FAIL)
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 	    }
-	    else if (STRCMP(hi->hi_key, "out_mode") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "out_mode") == 0)
 	    {
-		if (!(supported & JO_OUT_MODE))
-		    break;
-		if (handle_mode(item, opt, &opt->jo_out_mode, JO_OUT_MODE)
+		အကယ်၍ (!(supported & JO_OUT_MODE))
+		    bha_nga;
+		အကယ်၍ (handle_mode(item, opt, &opt->jo_out_mode, JO_OUT_MODE)
 								      == FAIL)
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 	    }
-	    else if (STRCMP(hi->hi_key, "err_mode") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "err_mode") == 0)
 	    {
-		if (!(supported & JO_ERR_MODE))
-		    break;
-		if (handle_mode(item, opt, &opt->jo_err_mode, JO_ERR_MODE)
+		အကယ်၍ (!(supported & JO_ERR_MODE))
+		    bha_nga;
+		အကယ်၍ (handle_mode(item, opt, &opt->jo_err_mode, JO_ERR_MODE)
 								      == FAIL)
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 	    }
-	    else if (STRCMP(hi->hi_key, "noblock") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "noblock") == 0)
 	    {
-		if (!(supported & JO_MODE))
-		    break;
+		အကယ်၍ (!(supported & JO_MODE))
+		    bha_nga;
 		opt->jo_noblock = tv_get_bool(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "in_io") == 0
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "in_io") == 0
 		    || STRCMP(hi->hi_key, "out_io") == 0
 		    || STRCMP(hi->hi_key, "err_io") == 0)
 	    {
-		if (!(supported & JO_OUT_IO))
-		    break;
-		if (handle_io(item, part_from_char(*hi->hi_key), opt) == FAIL)
-		    return FAIL;
+		အကယ်၍ (!(supported & JO_OUT_IO))
+		    bha_nga;
+		အကယ်၍ (handle_io(item, part_from_char(*hi->hi_key), opt) == FAIL)
+		    ပြန်ပေး FAIL;
 	    }
-	    else if (STRCMP(hi->hi_key, "in_name") == 0
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "in_name") == 0
 		    || STRCMP(hi->hi_key, "out_name") == 0
 		    || STRCMP(hi->hi_key, "err_name") == 0)
 	    {
 		part = part_from_char(*hi->hi_key);
 
-		if (!(supported & JO_OUT_IO))
-		    break;
+		အကယ်၍ (!(supported & JO_OUT_IO))
+		    bha_nga;
 		opt->jo_set |= JO_OUT_NAME << (part - PART_OUT);
 		opt->jo_io_name[part] = tv_get_string_buf_chk(item,
 						   opt->jo_io_name_buf[part]);
 	    }
-	    else if (STRCMP(hi->hi_key, "pty") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "pty") == 0)
 	    {
-		if (!(supported & JO_MODE))
-		    break;
+		အကယ်၍ (!(supported & JO_MODE))
+		    bha_nga;
 		opt->jo_pty = tv_get_bool(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "in_buf") == 0
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "in_buf") == 0
 		    || STRCMP(hi->hi_key, "out_buf") == 0
 		    || STRCMP(hi->hi_key, "err_buf") == 0)
 	    {
 		part = part_from_char(*hi->hi_key);
 
-		if (!(supported & JO_OUT_IO))
-		    break;
+		အကယ်၍ (!(supported & JO_OUT_IO))
+		    bha_nga;
 		opt->jo_set |= JO_OUT_BUF << (part - PART_OUT);
 		opt->jo_io_buf[part] = tv_get_number(item);
-		if (opt->jo_io_buf[part] <= 0)
+		အကယ်၍ (opt->jo_io_buf[part] <= 0)
 		{
 		    semsg(_(e_invalid_value_for_argument_str_str),
 					      hi->hi_key, tv_get_string(item));
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 		}
-		if (buflist_findnr(opt->jo_io_buf[part]) == NULL)
+		အကယ်၍ (buflist_findnr(opt->jo_io_buf[part]) == NULL)
 		{
 		    semsg(_(e_buffer_nr_does_not_exist),
 						   (long)opt->jo_io_buf[part]);
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "out_modifiable") == 0
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "out_modifiable") == 0
 		    || STRCMP(hi->hi_key, "err_modifiable") == 0)
 	    {
 		part = part_from_char(*hi->hi_key);
 
-		if (!(supported & JO_OUT_IO))
-		    break;
+		အကယ်၍ (!(supported & JO_OUT_IO))
+		    bha_nga;
 		opt->jo_set |= JO_OUT_MODIFIABLE << (part - PART_OUT);
 		opt->jo_modifiable[part] = tv_get_bool(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "out_msg") == 0
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "out_msg") == 0
 		    || STRCMP(hi->hi_key, "err_msg") == 0)
 	    {
 		part = part_from_char(*hi->hi_key);
 
-		if (!(supported & JO_OUT_IO))
-		    break;
+		အကယ်၍ (!(supported & JO_OUT_IO))
+		    bha_nga;
 		opt->jo_set2 |= JO2_OUT_MSG << (part - PART_OUT);
 		opt->jo_message[part] = tv_get_bool(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "in_top") == 0
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "in_top") == 0
 		    || STRCMP(hi->hi_key, "in_bot") == 0)
 	    {
 		linenr_T *lp;
 
-		if (!(supported & JO_OUT_IO))
-		    break;
-		if (hi->hi_key[3] == 't')
+		အကယ်၍ (!(supported & JO_OUT_IO))
+		    bha_nga;
+		အကယ်၍ (hi->hi_key[3] == 't')
 		{
 		    lp = &opt->jo_in_top;
 		    opt->jo_set |= JO_IN_TOP;
 		}
-		else
+		မဟုတ်ပါက
 		{
 		    lp = &opt->jo_in_bot;
 		    opt->jo_set |= JO_IN_BOT;
 		}
 		*lp = tv_get_number(item);
-		if (*lp < 0)
+		အကယ်၍ (*lp < 0)
 		{
 		    semsg(_(e_invalid_value_for_argument_str_str),
 					      hi->hi_key, tv_get_string(item));
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "channel") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "channel") == 0)
 	    {
-		if (!(supported & JO_OUT_IO))
-		    break;
+		အကယ်၍ (!(supported & JO_OUT_IO))
+		    bha_nga;
 		opt->jo_set |= JO_CHANNEL;
-		if (item->v_type != VAR_CHANNEL)
+		အကယ်၍ (item->v_type != VAR_CHANNEL)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "channel");
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 		}
 		opt->jo_channel = item->vval.v_channel;
 	    }
-	    else if (STRCMP(hi->hi_key, "callback") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "callback") == 0)
 	    {
-		if (!(supported & JO_CALLBACK))
-		    break;
+		အကယ်၍ (!(supported & JO_CALLBACK))
+		    bha_nga;
 		opt->jo_set |= JO_CALLBACK;
 		opt->jo_callback = get_callback(item);
-		if (opt->jo_callback.cb_name == NULL)
+		အကယ်၍ (opt->jo_callback.cb_name == NULL)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "callback");
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "out_cb") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "out_cb") == 0)
 	    {
-		if (!(supported & JO_OUT_CALLBACK))
-		    break;
+		အကယ်၍ (!(supported & JO_OUT_CALLBACK))
+		    bha_nga;
 		opt->jo_set |= JO_OUT_CALLBACK;
 		opt->jo_out_cb = get_callback(item);
-		if (opt->jo_out_cb.cb_name == NULL)
+		အကယ်၍ (opt->jo_out_cb.cb_name == NULL)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "out_cb");
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "err_cb") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "err_cb") == 0)
 	    {
-		if (!(supported & JO_ERR_CALLBACK))
-		    break;
+		အကယ်၍ (!(supported & JO_ERR_CALLBACK))
+		    bha_nga;
 		opt->jo_set |= JO_ERR_CALLBACK;
 		opt->jo_err_cb = get_callback(item);
-		if (opt->jo_err_cb.cb_name == NULL)
+		အကယ်၍ (opt->jo_err_cb.cb_name == NULL)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "err_cb");
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "close_cb") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "close_cb") == 0)
 	    {
-		if (!(supported & JO_CLOSE_CALLBACK))
-		    break;
+		အကယ်၍ (!(supported & JO_CLOSE_CALLBACK))
+		    bha_nga;
 		opt->jo_set |= JO_CLOSE_CALLBACK;
 		opt->jo_close_cb = get_callback(item);
-		if (opt->jo_close_cb.cb_name == NULL)
+		အကယ်၍ (opt->jo_close_cb.cb_name == NULL)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "close_cb");
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "drop") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "drop") == 0)
 	    {
-		int never = FALSE;
+		ကိန်းပြည့် never = FALSE;
 		val = tv_get_string(item);
 
-		if (STRCMP(val, "never") == 0)
+		အကယ်၍ (STRCMP(val, "never") == 0)
 		    never = TRUE;
-		else if (STRCMP(val, "auto") != 0)
+		မဟုတ်ပါက အကယ်၍ (STRCMP(val, "auto") != 0)
 		{
 		    semsg(_(e_invalid_value_for_argument_str_str), "drop", val);
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 		}
 		opt->jo_drop_never = never;
 	    }
-	    else if (STRCMP(hi->hi_key, "exit_cb") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "exit_cb") == 0)
 	    {
-		if (!(supported & JO_EXIT_CB))
-		    break;
+		အကယ်၍ (!(supported & JO_EXIT_CB))
+		    bha_nga;
 		opt->jo_set |= JO_EXIT_CB;
 		opt->jo_exit_cb = get_callback(item);
-		if (opt->jo_exit_cb.cb_name == NULL)
+		အကယ်၍ (opt->jo_exit_cb.cb_name == NULL)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "exit_cb");
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 		}
 	    }
 #ifdef FEAT_TERMINAL
-	    else if (STRCMP(hi->hi_key, "term_name") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "term_name") == 0)
 	    {
-		if (!(supported2 & JO2_TERM_NAME))
-		    break;
+		အကယ်၍ (!(supported2 & JO2_TERM_NAME))
+		    bha_nga;
 		opt->jo_set2 |= JO2_TERM_NAME;
 		opt->jo_term_name = tv_get_string_buf_chk(item,
 						       opt->jo_term_name_buf);
-		if (opt->jo_term_name == NULL)
+		အကယ်၍ (opt->jo_term_name == NULL)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "term_name");
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "term_finish") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "term_finish") == 0)
 	    {
-		if (!(supported2 & JO2_TERM_FINISH))
-		    break;
+		အကယ်၍ (!(supported2 & JO2_TERM_FINISH))
+		    bha_nga;
 		val = tv_get_string(item);
-		if (STRCMP(val, "open") != 0 && STRCMP(val, "close") != 0
+		အကယ်၍ (STRCMP(val, "open") != 0 && STRCMP(val, "close") != 0
 			&& STRCMP(val, "noclose") != 0)
 		{
 		    semsg(_(e_invalid_value_for_argument_str_str),
 							   "term_finish", val);
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 		}
 		opt->jo_set2 |= JO2_TERM_FINISH;
 		opt->jo_term_finish = *val;
 	    }
-	    else if (STRCMP(hi->hi_key, "term_opencmd") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "term_opencmd") == 0)
 	    {
 		char_u *p;
 
-		if (!(supported2 & JO2_TERM_OPENCMD))
-		    break;
+		အကယ်၍ (!(supported2 & JO2_TERM_OPENCMD))
+		    bha_nga;
 		opt->jo_set2 |= JO2_TERM_OPENCMD;
 		p = opt->jo_term_opencmd = tv_get_string_buf_chk(item,
 						    opt->jo_term_opencmd_buf);
-		if (p != NULL)
+		အကယ်၍ (p != NULL)
 		{
 		    // Must have %d and no other %.
 		    p = vim_strchr(p, '%');
-		    if (p != NULL && (p[1] != 'd'
+		    အကယ်၍ (p != NULL && (p[1] != 'd'
 					    || vim_strchr(p + 2, '%') != NULL))
 			p = NULL;
 		}
-		if (p == NULL)
+		အကယ်၍ (p == NULL)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "term_opencmd");
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "eof_chars") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "eof_chars") == 0)
 	    {
-		if (!(supported2 & JO2_EOF_CHARS))
-		    break;
+		အကယ်၍ (!(supported2 & JO2_EOF_CHARS))
+		    bha_nga;
 		opt->jo_set2 |= JO2_EOF_CHARS;
 		opt->jo_eof_chars = tv_get_string_buf_chk(item,
 						       opt->jo_eof_chars_buf);
-		if (opt->jo_eof_chars == NULL)
+		အကယ်၍ (opt->jo_eof_chars == NULL)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "eof_chars");
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "term_rows") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "term_rows") == 0)
 	    {
-		int error = FALSE;
+		ကိန်းပြည့် error = FALSE;
 
-		if (!(supported2 & JO2_TERM_ROWS))
-		    break;
+		အကယ်၍ (!(supported2 & JO2_TERM_ROWS))
+		    bha_nga;
 		opt->jo_set2 |= JO2_TERM_ROWS;
 		opt->jo_term_rows = tv_get_number_chk(item, &error);
-		if (error)
-		    return FAIL;
-		if (opt->jo_term_rows < 0 || opt->jo_term_rows > 1000)
+		အကယ်၍ (error)
+		    ပြန်ပေး FAIL;
+		အကယ်၍ (opt->jo_term_rows < 0 || opt->jo_term_rows > 1000)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "term_rows");
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "term_cols") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "term_cols") == 0)
 	    {
-		int error = FALSE;
+		ကိန်းပြည့် error = FALSE;
 
-		if (!(supported2 & JO2_TERM_COLS))
-		    break;
+		အကယ်၍ (!(supported2 & JO2_TERM_COLS))
+		    bha_nga;
 		opt->jo_set2 |= JO2_TERM_COLS;
 		opt->jo_term_cols = tv_get_number_chk(item, &error);
-		if (error)
-		    return FAIL;
-		if (opt->jo_term_cols < 0 || opt->jo_term_cols > 1000)
+		အကယ်၍ (error)
+		    ပြန်ပေး FAIL;
+		အကယ်၍ (opt->jo_term_cols < 0 || opt->jo_term_cols > 1000)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "term_cols");
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "vertical") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "vertical") == 0)
 	    {
-		if (!(supported2 & JO2_VERTICAL))
-		    break;
+		အကယ်၍ (!(supported2 & JO2_VERTICAL))
+		    bha_nga;
 		opt->jo_set2 |= JO2_VERTICAL;
 		opt->jo_vertical = tv_get_bool(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "curwin") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "curwin") == 0)
 	    {
-		if (!(supported2 & JO2_CURWIN))
-		    break;
+		အကယ်၍ (!(supported2 & JO2_CURWIN))
+		    bha_nga;
 		opt->jo_set2 |= JO2_CURWIN;
 		opt->jo_curwin = tv_get_bool(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "bufnr") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "bufnr") == 0)
 	    {
-		int nr;
+		ကိန်းပြည့် nr;
 
-		if (!(supported2 & JO2_CURWIN))
-		    break;
+		အကယ်၍ (!(supported2 & JO2_CURWIN))
+		    bha_nga;
 		opt->jo_set2 |= JO2_BUFNR;
 		nr = tv_get_number(item);
-		if (nr <= 0)
+		အကယ်၍ (nr <= 0)
 		{
 		    semsg(_(e_invalid_value_for_argument_str_str), hi->hi_key, tv_get_string(item));
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 		}
 		opt->jo_bufnr_buf = buflist_findnr(nr);
-		if (opt->jo_bufnr_buf == NULL)
+		အကယ်၍ (opt->jo_bufnr_buf == NULL)
 		{
 		    semsg(_(e_buffer_nr_does_not_exist), (long)nr);
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 		}
-		if (opt->jo_bufnr_buf->b_nwindows == 0
+		အကယ်၍ (opt->jo_bufnr_buf->b_nwindows == 0
 			|| opt->jo_bufnr_buf->b_term == NULL)
 		{
 		    semsg(_(e_invalid_argument_str), "bufnr");
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "hidden") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "hidden") == 0)
 	    {
-		if (!(supported2 & JO2_HIDDEN))
-		    break;
+		အကယ်၍ (!(supported2 & JO2_HIDDEN))
+		    bha_nga;
 		opt->jo_set2 |= JO2_HIDDEN;
 		opt->jo_hidden = tv_get_bool(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "norestore") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "norestore") == 0)
 	    {
-		if (!(supported2 & JO2_NORESTORE))
-		    break;
+		အကယ်၍ (!(supported2 & JO2_NORESTORE))
+		    bha_nga;
 		opt->jo_set2 |= JO2_NORESTORE;
 		opt->jo_term_norestore = tv_get_bool(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "term_kill") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "term_kill") == 0)
 	    {
-		if (!(supported2 & JO2_TERM_KILL))
-		    break;
+		အကယ်၍ (!(supported2 & JO2_TERM_KILL))
+		    bha_nga;
 		opt->jo_set2 |= JO2_TERM_KILL;
 		opt->jo_term_kill = tv_get_string_buf_chk(item,
 						       opt->jo_term_kill_buf);
-		if (opt->jo_term_kill == NULL)
+		အကယ်၍ (opt->jo_term_kill == NULL)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "term_kill");
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "tty_type") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "tty_type") == 0)
 	    {
 		char_u *p;
 
-		if (!(supported2 & JO2_TTY_TYPE))
-		    break;
+		အကယ်၍ (!(supported2 & JO2_TTY_TYPE))
+		    bha_nga;
 		opt->jo_set2 |= JO2_TTY_TYPE;
 		p = tv_get_string_chk(item);
-		if (p == NULL)
+		အကယ်၍ (p == NULL)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "tty_type");
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 		}
 		// Allow empty string, "winpty", "conpty".
-		if (!(*p == NUL || STRCMP(p, "winpty") == 0
+		အကယ်၍ (!(*p == NUL || STRCMP(p, "winpty") == 0
 						  || STRCMP(p, "conpty") == 0))
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "tty_type");
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 		}
 		opt->jo_tty_type = p[0];
 	    }
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-	    else if (STRCMP(hi->hi_key, "ansi_colors") == 0)
+# အကယ်၍ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "ansi_colors") == 0)
 	    {
-		int		n = 0;
+		ကိန်းပြည့်		n = 0;
 		listitem_T	*li;
 		long_u		rgb[16];
 
-		if (!(supported2 & JO2_ANSI_COLORS))
-		    break;
+		အကယ်၍ (!(supported2 & JO2_ANSI_COLORS))
+		    bha_nga;
 
-		if (item == NULL || item->v_type != VAR_LIST
+		အကယ်၍ (item == NULL || item->v_type != VAR_LIST
 			|| item->vval.v_list == NULL
 			|| item->vval.v_list->lv_first == &range_list_item)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "ansi_colors");
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 		}
 
 		li = item->vval.v_list->lv_first;
-		for (; li != NULL && n < 16; li = li->li_next, n++)
+		အတွက် (; li != NULL && n < 16; li = li->li_next, n++)
 		{
 		    char_u	*color_name;
 		    guicolor_T	guicolor;
-		    int		called_emsg_before = called_emsg;
+		    ကိန်းပြည့်		called_emsg_before = called_emsg;
 
 		    color_name = tv_get_string_chk(&li->li_tv);
-		    if (color_name == NULL)
-			return FAIL;
+		    အကယ်၍ (color_name == NULL)
+			ပြန်ပေး FAIL;
 
 		    guicolor = GUI_GET_COLOR(color_name);
-		    if (guicolor == INVALCOLOR)
+		    အကယ်၍ (guicolor == INVALCOLOR)
 		    {
-			if (called_emsg_before == called_emsg)
+			အကယ်၍ (called_emsg_before == called_emsg)
 			    // may not get the error if the GUI didn't start
 			    semsg(_(e_cannot_allocate_color_str), color_name);
-			return FAIL;
+			ပြန်ပေး FAIL;
 		    }
 
 		    rgb[n] = GUI_MCH_GET_RGB(guicolor);
 		}
 
-		if (n != 16 || li != NULL)
+		အကယ်၍ (n != 16 || li != NULL)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "ansi_colors");
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 		}
 
 		opt->jo_set2 |= JO2_ANSI_COLORS;
-		memcpy(opt->jo_ansi_colors, rgb, sizeof(rgb));
+		memcpy(opt->jo_ansi_colors, rgb, parimaa_na(rgb));
 	    }
 # endif
-	    else if (STRCMP(hi->hi_key, "term_highlight") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "term_highlight") == 0)
 	    {
 		char_u *p;
 
-		if (!(supported2 & JO2_TERM_HIGHLIGHT))
-		    break;
+		အကယ်၍ (!(supported2 & JO2_TERM_HIGHLIGHT))
+		    bha_nga;
 		opt->jo_set2 |= JO2_TERM_HIGHLIGHT;
 		p = tv_get_string_buf_chk(item, opt->jo_term_highlight_buf);
-		if (p == NULL || *p == NUL)
+		အကယ်၍ (p == NULL || *p == NUL)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "term_highlight");
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 		}
 		opt->jo_term_highlight = p;
 	    }
-	    else if (STRCMP(hi->hi_key, "term_api") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "term_api") == 0)
 	    {
-		if (!(supported2 & JO2_TERM_API))
-		    break;
+		အကယ်၍ (!(supported2 & JO2_TERM_API))
+		    bha_nga;
 		opt->jo_set2 |= JO2_TERM_API;
 		opt->jo_term_api = tv_get_string_buf_chk(item,
 							opt->jo_term_api_buf);
-		if (opt->jo_term_api == NULL)
+		အကယ်၍ (opt->jo_term_api == NULL)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "term_api");
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 		}
 	    }
 #endif
-	    else if (STRCMP(hi->hi_key, "env") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "env") == 0)
 	    {
-		if (!(supported2 & JO2_ENV))
-		    break;
-		if (item->v_type != VAR_DICT)
+		အကယ်၍ (!(supported2 & JO2_ENV))
+		    bha_nga;
+		အကယ်၍ (item->v_type != VAR_DICT)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "env");
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 		}
 		opt->jo_set2 |= JO2_ENV;
 		opt->jo_env = item->vval.v_dict;
-		if (opt->jo_env != NULL)
+		အကယ်၍ (opt->jo_env != NULL)
 		    ++opt->jo_env->dv_refcount;
 	    }
-	    else if (STRCMP(hi->hi_key, "cwd") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "cwd") == 0)
 	    {
-		if (!(supported2 & JO2_CWD))
-		    break;
+		အကယ်၍ (!(supported2 & JO2_CWD))
+		    bha_nga;
 		opt->jo_cwd = tv_get_string_buf_chk(item, opt->jo_cwd_buf);
-		if (opt->jo_cwd == NULL || !mch_isdir(opt->jo_cwd)
+		အကယ်၍ (opt->jo_cwd == NULL || !mch_isdir(opt->jo_cwd)
 #ifndef MSWIN  // Win32 directories don't have the concept of "executable"
-				|| mch_access((char *)opt->jo_cwd, X_OK) != 0
+				|| mch_access((var_na *)opt->jo_cwd, X_OK) != 0
 #endif
 				)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "cwd");
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 		}
 		opt->jo_set2 |= JO2_CWD;
 	    }
-	    else if (STRCMP(hi->hi_key, "waittime") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "waittime") == 0)
 	    {
-		if (!(supported & JO_WAITTIME))
-		    break;
+		အကယ်၍ (!(supported & JO_WAITTIME))
+		    bha_nga;
 		opt->jo_set |= JO_WAITTIME;
 		opt->jo_waittime = tv_get_number(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "timeout") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "timeout") == 0)
 	    {
-		if (!(supported & JO_TIMEOUT))
-		    break;
+		အကယ်၍ (!(supported & JO_TIMEOUT))
+		    bha_nga;
 		opt->jo_set |= JO_TIMEOUT;
 		opt->jo_timeout = tv_get_number(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "out_timeout") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "out_timeout") == 0)
 	    {
-		if (!(supported & JO_OUT_TIMEOUT))
-		    break;
+		အကယ်၍ (!(supported & JO_OUT_TIMEOUT))
+		    bha_nga;
 		opt->jo_set |= JO_OUT_TIMEOUT;
 		opt->jo_out_timeout = tv_get_number(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "err_timeout") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "err_timeout") == 0)
 	    {
-		if (!(supported & JO_ERR_TIMEOUT))
-		    break;
+		အကယ်၍ (!(supported & JO_ERR_TIMEOUT))
+		    bha_nga;
 		opt->jo_set |= JO_ERR_TIMEOUT;
 		opt->jo_err_timeout = tv_get_number(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "part") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "part") == 0)
 	    {
-		if (!(supported & JO_PART))
-		    break;
+		အကယ်၍ (!(supported & JO_PART))
+		    bha_nga;
 		opt->jo_set |= JO_PART;
 		val = tv_get_string(item);
-		if (STRCMP(val, "err") == 0)
+		အကယ်၍ (STRCMP(val, "err") == 0)
 		    opt->jo_part = PART_ERR;
-		else if (STRCMP(val, "out") == 0)
+		မဟုတ်ပါက အကယ်၍ (STRCMP(val, "out") == 0)
 		    opt->jo_part = PART_OUT;
-		else
+		မဟုတ်ပါက
 		{
 		    semsg(_(e_invalid_value_for_argument_str_str), "part", val);
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "id") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "id") == 0)
 	    {
-		if (!(supported & JO_ID))
-		    break;
+		အကယ်၍ (!(supported & JO_ID))
+		    bha_nga;
 		opt->jo_set |= JO_ID;
 		opt->jo_id = tv_get_number(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "stoponexit") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "stoponexit") == 0)
 	    {
-		if (!(supported & JO_STOPONEXIT))
-		    break;
+		အကယ်၍ (!(supported & JO_STOPONEXIT))
+		    bha_nga;
 		opt->jo_set |= JO_STOPONEXIT;
 		opt->jo_stoponexit = tv_get_string_buf_chk(item,
 						      opt->jo_stoponexit_buf);
-		if (opt->jo_stoponexit == NULL)
+		အကယ်၍ (opt->jo_stoponexit == NULL)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "stoponexit");
-		    return FAIL;
+		    ပြန်ပေး FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "block_write") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(hi->hi_key, "block_write") == 0)
 	    {
-		if (!(supported & JO_BLOCK_WRITE))
-		    break;
+		အကယ်၍ (!(supported & JO_BLOCK_WRITE))
+		    bha_nga;
 		opt->jo_set |= JO_BLOCK_WRITE;
 		opt->jo_block_write = tv_get_number(item);
 	    }
-	    else
-		break;
+	    မဟုတ်ပါက
+		bha_nga;
 	    --todo;
 	}
-    if (todo > 0)
+    အကယ်၍ (todo > 0)
     {
 	semsg(_(e_invalid_argument_str), hi->hi_key);
-	return FAIL;
+	ပြန်ပေး FAIL;
     }
 
-    return OK;
+    ပြန်ပေး OK;
 }
 
 static job_T *first_job = NULL;
@@ -752,10 +752,10 @@ static job_T *first_job = NULL;
     static void
 job_free_contents(job_T *job)
 {
-    int		i;
+    ကိန်းပြည့်		i;
 
     ch_log(job->jv_channel, "Freeing job");
-    if (job->jv_channel != NULL)
+    အကယ်၍ (job->jv_channel != NULL)
     {
 	// The link from the channel to the job doesn't count as a reference,
 	// thus don't decrement the refcount of the job.  The reference from
@@ -777,9 +777,9 @@ job_free_contents(job_T *job)
     vim_free(job->jv_tty_type);
 #endif
     free_callback(&job->jv_exit_cb);
-    if (job->jv_argv != NULL)
+    အကယ်၍ (job->jv_argv != NULL)
     {
-	for (i = 0; job->jv_argv[i] != NULL; i++)
+	အတွက် (i = 0; job->jv_argv[i] != NULL; i++)
 	    vim_free(job->jv_argv[i]);
 	vim_free(job->jv_argv);
     }
@@ -791,11 +791,11 @@ job_free_contents(job_T *job)
     static void
 job_unlink(job_T *job)
 {
-    if (job->jv_next != NULL)
+    အကယ်၍ (job->jv_next != NULL)
 	job->jv_next->jv_prev = job->jv_prev;
-    if (job->jv_prev == NULL)
+    အကယ်၍ (job->jv_prev == NULL)
 	first_job = job->jv_next;
-    else
+    မဟုတ်ပါက
 	job->jv_prev->jv_next = job->jv_next;
 }
 
@@ -809,8 +809,8 @@ job_free_job(job_T *job)
     static void
 job_free(job_T *job)
 {
-    if (in_free_unref_items)
-	return;
+    အကယ်၍ (in_free_unref_items)
+	ပြန်ပေး;
 
     job_free_contents(job);
     job_free_job(job);
@@ -834,7 +834,7 @@ free_jobs_to_free_later(void)
 {
     job_T *job;
 
-    while (jobs_to_free != NULL)
+    နေစဉ် (jobs_to_free != NULL)
     {
 	job = jobs_to_free;
 	jobs_to_free = job->jv_next;
@@ -843,11 +843,11 @@ free_jobs_to_free_later(void)
     }
 }
 
-#if defined(EXITFREE)
+#အကယ်၍ defined(EXITFREE)
     void
 job_free_all(void)
 {
-    while (first_job != NULL)
+    နေစဉ် (first_job != NULL)
 	job_free(first_job);
     free_jobs_to_free_later();
 
@@ -860,29 +860,29 @@ job_free_all(void)
 /*
  * Return TRUE if we need to check if the process of "job" has ended.
  */
-    static int
+    static ကိန်းပြည့်
 job_need_end_check(job_T *job)
 {
-    return job->jv_status == JOB_STARTED
+    ပြန်ပေး job->jv_status == JOB_STARTED
 	    && (job->jv_stoponexit != NULL || job->jv_exit_cb.cb_name != NULL);
 }
 
 /*
  * Return TRUE if the channel of "job" is still useful.
  */
-    static int
+    static ကိန်းပြည့်
 job_channel_still_useful(job_T *job)
 {
-    return job->jv_channel != NULL && channel_still_useful(job->jv_channel);
+    ပြန်ပေး job->jv_channel != NULL && channel_still_useful(job->jv_channel);
 }
 
 /*
  * Return TRUE if the channel of "job" is closeable.
  */
-    static int
+    static ကိန်းပြည့်
 job_channel_can_close(job_T *job)
 {
-    return job->jv_channel != NULL && channel_can_close(job->jv_channel);
+    ပြန်ပေး job->jv_channel != NULL && channel_can_close(job->jv_channel);
 }
 
 /*
@@ -890,37 +890,37 @@ job_channel_can_close(job_T *job)
  * it has not ended yet and there is a "stoponexit" flag, an exit callback
  * or when the associated channel will do something with the job output.
  */
-    static int
+    static ကိန်းပြည့်
 job_still_useful(job_T *job)
 {
-    return job_need_end_check(job) || job_channel_still_useful(job);
+    ပြန်ပေး job_need_end_check(job) || job_channel_still_useful(job);
 }
 
-#if defined(GUI_MAY_FORK) || defined(GUI_MAY_SPAWN)
+#အကယ်၍ defined(GUI_MAY_FORK) || defined(GUI_MAY_SPAWN)
 /*
  * Return TRUE when there is any running job that we care about.
  */
-    int
+    ကိန်းပြည့်
 job_any_running(void)
 {
     job_T	*job;
 
     FOR_ALL_JOBS(job)
-	if (job_still_useful(job))
+	အကယ်၍ (job_still_useful(job))
 	{
 	    ch_log(NULL, "GUI not forking because a job is running");
-	    return TRUE;
+	    ပြန်ပေး TRUE;
 	}
-    return FALSE;
+    ပြန်ပေး FALSE;
 }
 #endif
 
 // Unix uses argv[] for the command, other systems use a string.
-#if defined(UNIX)
+#အကယ်၍ defined(UNIX)
 # define USE_ARGV
 #endif
 
-#if !defined(USE_ARGV)
+#အကယ်၍ !defined(USE_ARGV)
 /*
  * Escape one argument for an external command.
  * Returns the escaped string in allocated memory.  NULL when out of memory.
@@ -928,73 +928,73 @@ job_any_running(void)
     static char_u *
 win32_escape_arg(char_u *arg)
 {
-    int		slen, dlen;
-    int		escaping = 0;
-    int		i;
+    ကိန်းပြည့်		slen, dlen;
+    ကိန်းပြည့်		escaping = 0;
+    ကိန်းပြည့်		i;
     char_u	*s, *d;
     char_u	*escaped_arg;
-    int		has_spaces = FALSE;
+    ကိန်းပြည့်		has_spaces = FALSE;
 
     // First count the number of extra bytes required.
-    slen = (int)STRLEN(arg);
+    slen = (ကိန်းပြည့်)STRLEN(arg);
     dlen = slen;
-    for (s = arg; *s != NUL; MB_PTR_ADV(s))
+    အတွက် (s = arg; *s != NUL; MB_PTR_ADV(s))
     {
-	if (*s == '"' || *s == '\\')
+	အကယ်၍ (*s == '"' || *s == '\\')
 	    ++dlen;
-	if (*s == ' ' || *s == '\t')
+	အကယ်၍ (*s == ' ' || *s == '\t')
 	    has_spaces = TRUE;
     }
 
-    if (has_spaces)
+    အကယ်၍ (has_spaces)
 	dlen += 2;
 
-    if (dlen == slen)
-	return vim_strsave(arg);
+    အကယ်၍ (dlen == slen)
+	ပြန်ပေး vim_strsave(arg);
 
     // Allocate memory for the result and fill it.
     escaped_arg = alloc(dlen + 1);
-    if (escaped_arg == NULL)
-	return NULL;
+    အကယ်၍ (escaped_arg == NULL)
+	ပြန်ပေး NULL;
     memset(escaped_arg, 0, dlen+1);
 
     d = escaped_arg;
 
-    if (has_spaces)
+    အကယ်၍ (has_spaces)
 	*d++ = '"';
 
-    for (s = arg; *s != NUL;)
+    အတွက် (s = arg; *s != NUL;)
     {
 	switch (*s)
 	{
-	    case '"':
-		for (i = 0; i < escaping; i++)
+	    pak_sa '"':
+		အတွက် (i = 0; i < escaping; i++)
 		    *d++ = '\\';
 		escaping = 0;
 		*d++ = '\\';
 		*d++ = *s++;
-		break;
-	    case '\\':
+		bha_nga;
+	    pak_sa '\\':
 		escaping++;
 		*d++ = *s++;
-		break;
+		bha_nga;
 	    default:
 		escaping = 0;
 		MB_COPY_CHAR(s, d);
-		break;
+		bha_nga;
 	}
     }
 
     // add terminating quote and finish with a NUL
-    if (has_spaces)
+    အကယ်၍ (has_spaces)
     {
-	for (i = 0; i < escaping; i++)
+	အတွက် (i = 0; i < escaping; i++)
 	    *d++ = '\\';
 	*d++ = '"';
     }
     *d = NUL;
 
-    return escaped_arg;
+    ပြန်ပေး escaped_arg;
 }
 
 /*
@@ -1002,7 +1002,7 @@ win32_escape_arg(char_u *arg)
  * The result is put in gap->ga_data.
  * Returns FAIL when out of memory.
  */
-    int
+    ကိန်းပြည့်
 win32_build_cmd(list_T *l, garray_T *gap)
 {
     listitem_T  *li;
@@ -1012,17 +1012,17 @@ win32_build_cmd(list_T *l, garray_T *gap)
     FOR_ALL_LIST_ITEMS(l, li)
     {
 	s = tv_get_string_chk(&li->li_tv);
-	if (s == NULL)
-	    return FAIL;
+	အကယ်၍ (s == NULL)
+	    ပြန်ပေး FAIL;
 	s = win32_escape_arg(s);
-	if (s == NULL)
-	    return FAIL;
+	အကယ်၍ (s == NULL)
+	    ပြန်ပေး FAIL;
 	ga_concat(gap, s);
 	vim_free(s);
-	if (li->li_next != NULL)
+	အကယ်၍ (li->li_next != NULL)
 	    ga_append(gap, ' ');
     }
-    return OK;
+    ပြန်ပေး OK;
 }
 #endif
 
@@ -1036,17 +1036,17 @@ win32_build_cmd(list_T *l, garray_T *gap)
     void
 job_cleanup(job_T *job)
 {
-    if (job->jv_status != JOB_ENDED)
-	return;
+    အကယ်၍ (job->jv_status != JOB_ENDED)
+	ပြန်ပေး;
 
     // Ready to cleanup the job.
     job->jv_status = JOB_FINISHED;
 
     // When only channel-in is kept open, close explicitly.
-    if (job->jv_channel != NULL)
+    အကယ်၍ (job->jv_channel != NULL)
 	ch_close_part(job->jv_channel, PART_IN);
 
-    if (job->jv_exit_cb.cb_name != NULL)
+    အကယ်၍ (job->jv_exit_cb.cb_name != NULL)
     {
 	typval_T	argv[3];
 	typval_T	rettv;
@@ -1065,12 +1065,12 @@ job_cleanup(job_T *job)
 	channel_need_redraw = TRUE;
     }
 
-    if (job->jv_channel != NULL && job->jv_channel->ch_anonymous_pipe)
+    အကယ်၍ (job->jv_channel != NULL && job->jv_channel->ch_anonymous_pipe)
 	job->jv_channel->ch_killing = TRUE;
 
     // Do not free the job in case the close callback of the associated channel
     // isn't invoked yet and may get information by job_info().
-    if (job->jv_refcount == 0 && !job_channel_still_useful(job))
+    အကယ်၍ (job->jv_refcount == 0 && !job_channel_still_useful(job))
 	// The job was already unreferenced and the associated channel was
 	// detached, now that it ended it can be freed. However, a caller might
 	// still use it, thus free it a bit later.
@@ -1080,21 +1080,21 @@ job_cleanup(job_T *job)
 /*
  * Mark references in jobs that are still useful.
  */
-    int
-set_ref_in_job(int copyID)
+    ကိန်းပြည့်
+set_ref_in_job(ကိန်းပြည့် copyID)
 {
-    int		abort = FALSE;
+    ကိန်းပြည့်		abort = FALSE;
     job_T	*job;
     typval_T	tv;
 
-    for (job = first_job; !abort && job != NULL; job = job->jv_next)
-	if (job_still_useful(job))
+    အတွက် (job = first_job; !abort && job != NULL; job = job->jv_next)
+	အကယ်၍ (job_still_useful(job))
 	{
 	    tv.v_type = VAR_JOB;
 	    tv.vval.v_job = job;
 	    abort = abort || set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
 	}
-    return abort;
+    ပြန်ပေး abort;
 }
 
 /*
@@ -1103,21 +1103,21 @@ set_ref_in_job(int copyID)
     void
 job_unref(job_T *job)
 {
-    if (job == NULL || --job->jv_refcount > 0)
-	return;
+    အကယ်၍ (job == NULL || --job->jv_refcount > 0)
+	ပြန်ပေး;
 
     // Do not free the job if there is a channel where the close callback
     // may get the job info.
-    if (job_channel_still_useful(job))
-	return;
+    အကယ်၍ (job_channel_still_useful(job))
+	ပြန်ပေး;
 
     // Do not free the job when it has not ended yet and there is a
     // "stoponexit" flag or an exit callback.
-    if (!job_need_end_check(job))
+    အကယ်၍ (!job_need_end_check(job))
     {
 	job_free(job);
     }
-    else if (job->jv_channel != NULL)
+    မဟုတ်ပါက အကယ်၍ (job->jv_channel != NULL)
     {
 	// Do remove the link to the channel, otherwise it hangs
 	// around until Vim exits. See job_free() for refcount.
@@ -1128,14 +1128,14 @@ job_unref(job_T *job)
     }
 }
 
-    int
-free_unused_jobs_contents(int copyID, int mask)
+    ကိန်းပြည့်
+free_unused_jobs_contents(ကိန်းပြည့် copyID, ကိန်းပြည့် mask)
 {
-    int		did_free = FALSE;
+    ကိန်းပြည့်		did_free = FALSE;
     job_T	*job;
 
     FOR_ALL_JOBS(job)
-	if ((job->jv_copyID & mask) != (copyID & mask)
+	အကယ်၍ ((job->jv_copyID & mask) != (copyID & mask)
 						    && !job_still_useful(job))
 	{
 	    // Free the channel and ordinary items it contains, but don't
@@ -1143,19 +1143,19 @@ free_unused_jobs_contents(int copyID, int mask)
 	    job_free_contents(job);
 	    did_free = TRUE;
 	}
-    return did_free;
+    ပြန်ပေး did_free;
 }
 
     void
-free_unused_jobs(int copyID, int mask)
+free_unused_jobs(ကိန်းပြည့် copyID, ကိန်းပြည့် mask)
 {
     job_T	*job;
     job_T	*job_next;
 
-    for (job = first_job; job != NULL; job = job_next)
+    အတွက် (job = first_job; job != NULL; job = job_next)
     {
 	job_next = job->jv_next;
-	if ((job->jv_copyID & mask) != (copyID & mask)
+	အကယ်၍ ((job->jv_copyID & mask) != (copyID & mask)
 						    && !job_still_useful(job))
 	{
 	    // Free the job struct itself.
@@ -1173,41 +1173,41 @@ job_alloc(void)
     job_T *job;
 
     job = ALLOC_CLEAR_ONE(job_T);
-    if (job == NULL)
-	return NULL;
+    အကယ်၍ (job == NULL)
+	ပြန်ပေး NULL;
 
     job->jv_refcount = 1;
     job->jv_stoponexit = vim_strsave((char_u *)"term");
 
-    if (first_job != NULL)
+    အကယ်၍ (first_job != NULL)
     {
 	first_job->jv_prev = job;
 	job->jv_next = first_job;
     }
     first_job = job;
-    return job;
+    ပြန်ပေး job;
 }
 
     void
 job_set_options(job_T *job, jobopt_T *opt)
 {
-    if (opt->jo_set & JO_STOPONEXIT)
+    အကယ်၍ (opt->jo_set & JO_STOPONEXIT)
     {
 	vim_free(job->jv_stoponexit);
-	if (opt->jo_stoponexit == NULL || *opt->jo_stoponexit == NUL)
+	အကယ်၍ (opt->jo_stoponexit == NULL || *opt->jo_stoponexit == NUL)
 	    job->jv_stoponexit = NULL;
-	else
+	မဟုတ်ပါက
 	    job->jv_stoponexit = vim_strsave(opt->jo_stoponexit);
     }
-    if (opt->jo_set & JO_EXIT_CB)
+    အကယ်၍ (opt->jo_set & JO_EXIT_CB)
     {
 	free_callback(&job->jv_exit_cb);
-	if (opt->jo_exit_cb.cb_name == NULL || *opt->jo_exit_cb.cb_name == NUL)
+	အကယ်၍ (opt->jo_exit_cb.cb_name == NULL || *opt->jo_exit_cb.cb_name == NUL)
 	{
 	    job->jv_exit_cb.cb_name = NULL;
 	    job->jv_exit_cb.cb_partial = NULL;
 	}
-	else
+	မဟုတ်ပါက
 	    copy_callback(&job->jv_exit_cb, &opt->jo_exit_cb);
     }
 }
@@ -1221,7 +1221,7 @@ job_stop_on_exit(void)
     job_T	*job;
 
     FOR_ALL_JOBS(job)
-	if (job->jv_status == JOB_STARTED && job->jv_stoponexit != NULL)
+	အကယ်၍ (job->jv_status == JOB_STARTED && job->jv_stoponexit != NULL)
 	    mch_signal_job(job, job->jv_stoponexit);
 }
 
@@ -1229,7 +1229,7 @@ job_stop_on_exit(void)
  * Return TRUE when there is any job that has an exit callback and might exit,
  * which means job_check_ended() should be called more often.
  */
-    int
+    ကိန်းပြည့်
 has_pending_job(void)
 {
     job_T	    *job;
@@ -1237,11 +1237,11 @@ has_pending_job(void)
     FOR_ALL_JOBS(job)
 	// Only should check if the channel has been closed, if the channel is
 	// open the job won't exit.
-	if ((job->jv_status == JOB_STARTED && !job_channel_still_useful(job))
+	အကယ်၍ ((job->jv_status == JOB_STARTED && !job_channel_still_useful(job))
 		    || (job->jv_status == JOB_FINISHED
 					      && job_channel_can_close(job)))
-	    return TRUE;
-    return FALSE;
+	    ပြန်ပေး TRUE;
+    ပြန်ပေး FALSE;
 }
 
 #define MAX_CHECK_ENDED 8
@@ -1250,24 +1250,24 @@ has_pending_job(void)
  * Called once in a while: check if any jobs that seem useful have ended.
  * Returns TRUE if a job did end.
  */
-    int
+    ကိန်းပြည့်
 job_check_ended(void)
 {
-    int		i;
-    int		did_end = FALSE;
+    ကိန်းပြည့်		i;
+    ကိန်းပြည့်		did_end = FALSE;
 
     // be quick if there are no jobs to check
-    if (first_job == NULL)
-	return did_end;
+    အကယ်၍ (first_job == NULL)
+	ပြန်ပေး did_end;
 
-    for (i = 0; i < MAX_CHECK_ENDED; ++i)
+    အတွက် (i = 0; i < MAX_CHECK_ENDED; ++i)
     {
 	// NOTE: mch_detect_ended_job() must only return a job of which the
 	// status was just set to JOB_ENDED.
 	job_T	*job = mch_detect_ended_job(first_job);
 
-	if (job == NULL)
-	    break;
+	အကယ်၍ (job == NULL)
+	    bha_nga;
 	did_end = TRUE;
 	job_cleanup(job); // may add "job" to jobs_to_free
     }
@@ -1275,12 +1275,12 @@ job_check_ended(void)
     // Actually free jobs that were cleaned up.
     free_jobs_to_free_later();
 
-    if (channel_need_redraw)
+    အကယ်၍ (channel_need_redraw)
     {
 	channel_need_redraw = FALSE;
 	redraw_after_callback(TRUE, FALSE);
     }
-    return did_end;
+    ပြန်ပေး did_end;
 }
 
 /*
@@ -1293,15 +1293,15 @@ job_check_ended(void)
     job_T *
 job_start(
 	typval_T    *argvars,
-	char	    **argv_arg UNUSED,
+	var_na	    **argv_arg UNUSED,
 	jobopt_T    *opt_arg,
 	job_T	    **term_job)
 {
     job_T	*job;
     char_u	*cmd = NULL;
-    char	**argv = NULL;
-    int		argc = 0;
-    int		i;
+    var_na	**argv = NULL;
+    ကိန်းပြည့်		argc = 0;
+    ကိန်းပြည့်		i;
 #ifndef USE_ARGV
     garray_T	ga;
 #endif
@@ -1309,22 +1309,22 @@ job_start(
     ch_part_T	part;
 
     job = job_alloc();
-    if (job == NULL)
-	return NULL;
+    အကယ်၍ (job == NULL)
+	ပြန်ပေး NULL;
 
     job->jv_status = JOB_FAILED;
 #ifndef USE_ARGV
-    ga_init2(&ga, sizeof(char*), 20);
+    ga_init2(&ga, parimaa_na(var_na*), 20);
 #endif
 
-    if (opt_arg != NULL)
+    အကယ်၍ (opt_arg != NULL)
 	opt = *opt_arg;
-    else
+    မဟုတ်ပါက
     {
 	// Default mode is NL.
 	clear_job_options(&opt);
 	opt.jo_mode = CH_MODE_NL;
-	if (get_job_options(&argvars[1], &opt,
+	အကယ်၍ (get_job_options(&argvars[1], &opt,
 		    JO_MODE_ALL + JO_CB_ALL + JO_TIMEOUT_ALL + JO_STOPONEXIT
 			 + JO_EXIT_CB + JO_OUT_IO + JO_BLOCK_WRITE,
 		     JO2_ENV + JO2_CWD) == FAIL)
@@ -1332,8 +1332,8 @@ job_start(
     }
 
     // Check that when io is "file" that there is a file name.
-    for (part = PART_OUT; part < PART_COUNT; ++part)
-	if ((opt.jo_set & (JO_OUT_IO << (part - PART_OUT)))
+    အတွက် (part = PART_OUT; part < PART_COUNT; ++part)
+	အကယ်၍ ((opt.jo_set & (JO_OUT_IO << (part - PART_OUT)))
 		&& opt.jo_io[part] == JIO_FILE
 		&& (!(opt.jo_set & (JO_OUT_NAME << (part - PART_OUT)))
 		    || *opt.jo_io_name[part] == NUL))
@@ -1342,37 +1342,37 @@ job_start(
 	    goto theend;
 	}
 
-    if ((opt.jo_set & JO_IN_IO) && opt.jo_io[PART_IN] == JIO_BUFFER)
+    အကယ်၍ ((opt.jo_set & JO_IN_IO) && opt.jo_io[PART_IN] == JIO_BUFFER)
     {
 	buf_T *buf = NULL;
 
 	// check that we can find the buffer before starting the job
-	if (opt.jo_set & JO_IN_BUF)
+	အကယ်၍ (opt.jo_set & JO_IN_BUF)
 	{
 	    buf = buflist_findnr(opt.jo_io_buf[PART_IN]);
-	    if (buf == NULL)
+	    အကယ်၍ (buf == NULL)
 		semsg(_(e_buffer_nr_does_not_exist),
 						 (long)opt.jo_io_buf[PART_IN]);
 	}
-	else if (!(opt.jo_set & JO_IN_NAME))
+	မဟုတ်ပါက အကယ်၍ (!(opt.jo_set & JO_IN_NAME))
 	{
 	    emsg(_(e_in_io_buffer_requires_in_buf_or_in_name_to_be_set));
 	}
-	else
+	မဟုတ်ပါက
 	    buf = buflist_find_by_name(opt.jo_io_name[PART_IN], FALSE);
-	if (buf == NULL)
+	အကယ်၍ (buf == NULL)
 	    goto theend;
-	if (buf->b_ml.ml_mfp == NULL)
+	အကယ်၍ (buf->b_ml.ml_mfp == NULL)
 	{
 	    char_u	numbuf[NUMBUFLEN];
 	    char_u	*s;
 
-	    if (opt.jo_set & JO_IN_BUF)
+	    အကယ်၍ (opt.jo_set & JO_IN_BUF)
 	    {
-		sprintf((char *)numbuf, "%d", opt.jo_io_buf[PART_IN]);
+		sprintf((var_na *)numbuf, "%d", opt.jo_io_buf[PART_IN]);
 		s = numbuf;
 	    }
-	    else
+	    မဟုတ်ပါက
 		s = opt.jo_io_name[PART_IN];
 	    semsg(_(e_buffer_must_be_loaded_str), s);
 	    goto theend;
@@ -1383,58 +1383,58 @@ job_start(
     job_set_options(job, &opt);
 
 #ifdef USE_ARGV
-    if (argv_arg != NULL)
+    အကယ်၍ (argv_arg != NULL)
     {
 	// Make a copy of argv_arg for job->jv_argv.
-	for (i = 0; argv_arg[i] != NULL; i++)
+	အတွက် (i = 0; argv_arg[i] != NULL; i++)
 	    argc++;
-	argv = ALLOC_MULT(char *, argc + 1);
-	if (argv == NULL)
+	argv = ALLOC_MULT(var_na *, argc + 1);
+	အကယ်၍ (argv == NULL)
 	    goto theend;
-	for (i = 0; i < argc; i++)
-	    argv[i] = (char *)vim_strsave((char_u *)argv_arg[i]);
+	အတွက် (i = 0; i < argc; i++)
+	    argv[i] = (var_na *)vim_strsave((char_u *)argv_arg[i]);
 	argv[argc] = NULL;
     }
-    else
+    မဟုတ်ပါက
 #endif
-    if (argvars[0].v_type == VAR_STRING)
+    အကယ်၍ (argvars[0].v_type == VAR_STRING)
     {
 	// Command is a string.
 	cmd = argvars[0].vval.v_string;
-	if (cmd == NULL || *skipwhite(cmd) == NUL)
+	အကယ်၍ (cmd == NULL || *skipwhite(cmd) == NUL)
 	{
 	    emsg(_(e_invalid_argument));
 	    goto theend;
 	}
 
-	if (build_argv_from_string(cmd, &argv, &argc) == FAIL)
+	အကယ်၍ (build_argv_from_string(cmd, &argv, &argc) == FAIL)
 	    goto theend;
     }
-    else if (argvars[0].v_type != VAR_LIST
+    မဟုတ်ပါက အကယ်၍ (argvars[0].v_type != VAR_LIST
 	    || argvars[0].vval.v_list == NULL
 	    || argvars[0].vval.v_list->lv_len < 1)
     {
 	emsg(_(e_invalid_argument));
 	goto theend;
     }
-    else
+    မဟုတ်ပါက
     {
 	list_T *l = argvars[0].vval.v_list;
 
-	if (build_argv_from_list(l, &argv, &argc) == FAIL)
+	အကယ်၍ (build_argv_from_list(l, &argv, &argc) == FAIL)
 	    goto theend;
 
 	// Empty command is invalid.
-	if (argc == 0 || *skipwhite((char_u *)argv[0]) == NUL)
+	အကယ်၍ (argc == 0 || *skipwhite((char_u *)argv[0]) == NUL)
 	{
 	    emsg(_(e_invalid_argument));
 	    goto theend;
 	}
 #ifndef USE_ARGV
-	if (win32_build_cmd(l, &ga) == FAIL)
+	အကယ်၍ (win32_build_cmd(l, &ga) == FAIL)
 	    goto theend;
 	cmd = ga.ga_data;
-	if (cmd == NULL || *skipwhite(cmd) == NUL)
+	အကယ်၍ (cmd == NULL || *skipwhite(cmd) == NUL)
 	{
 	    emsg(_(e_invalid_argument));
 	    goto theend;
@@ -1445,70 +1445,70 @@ job_start(
     // Save the command used to start the job.
     job->jv_argv = argv;
 
-    if (term_job != NULL)
+    အကယ်၍ (term_job != NULL)
 	*term_job = job;
 
 #ifdef USE_ARGV
-    if (ch_log_active())
+    အကယ်၍ (ch_log_active())
     {
 	garray_T    ga;
 
-	ga_init2(&ga, sizeof(char), 200);
-	for (i = 0; i < argc; ++i)
+	ga_init2(&ga, parimaa_na(var_na), 200);
+	အတွက် (i = 0; i < argc; ++i)
 	{
-	    if (i > 0)
+	    အကယ်၍ (i > 0)
 		GA_CONCAT_LITERAL(&ga, "  ");
 	    ga_concat(&ga, (char_u *)argv[i]);
 	}
 	ga_append(&ga, NUL);
-	ch_log(NULL, "Starting job: %s", (char *)ga.ga_data);
+	ch_log(NULL, "Starting job: %s", (var_na *)ga.ga_data);
 	ga_clear(&ga);
     }
     mch_job_start(argv, job, &opt, term_job != NULL);
-#else
-    ch_log(NULL, "Starting job: %s", (char *)cmd);
-    mch_job_start((char *)cmd, job, &opt);
+#မဟုတ်ပါက
+    ch_log(NULL, "Starting job: %s", (var_na *)cmd);
+    mch_job_start((var_na *)cmd, job, &opt);
 #endif
 
     // If the channel is reading from a buffer, write lines now.
-    if (job->jv_channel != NULL)
+    အကယ်၍ (job->jv_channel != NULL)
 	channel_write_in(job->jv_channel);
 
 theend:
 #ifndef USE_ARGV
     vim_free(ga.ga_data);
 #endif
-    if (argv != NULL && argv != job->jv_argv)
+    အကယ်၍ (argv != NULL && argv != job->jv_argv)
     {
-	for (i = 0; argv[i] != NULL; i++)
+	အတွက် (i = 0; argv[i] != NULL; i++)
 	    vim_free(argv[i]);
 	vim_free(argv);
     }
     free_job_options(&opt);
-    return job;
+    ပြန်ပေး job;
 }
 
 /*
  * Get the status of "job" and invoke the exit callback when needed.
  * The returned string is not allocated.
  */
-    char *
+    var_na *
 job_status(job_T *job)
 {
-    char	*result;
+    var_na	*result;
 
-    if (job->jv_status >= JOB_ENDED)
+    အကယ်၍ (job->jv_status >= JOB_ENDED)
 	// No need to check, dead is dead.
 	result = "dead";
-    else if (job->jv_status == JOB_FAILED)
+    မဟုတ်ပါက အကယ်၍ (job->jv_status == JOB_FAILED)
 	result = "fail";
-    else
+    မဟုတ်ပါက
     {
 	result = mch_job_status(job);
-	if (job->jv_status == JOB_ENDED)
+	အကယ်၍ (job->jv_status == JOB_ENDED)
 	    job_cleanup(job);
     }
-    return result;
+    ပြန်ပေး result;
 }
 
 /*
@@ -1516,45 +1516,45 @@ job_status(job_T *job)
  * When "type" is not NULL use this for the type.
  * Otherwise use argvars[1] for the type.
  */
-    int
-job_stop(job_T *job, typval_T *argvars, char *type)
+    ကိန်းပြည့်
+job_stop(job_T *job, typval_T *argvars, var_na *type)
 {
     char_u *arg;
 
-    if (type != NULL)
+    အကယ်၍ (type != NULL)
 	arg = (char_u *)type;
-    else if (argvars[1].v_type == VAR_UNKNOWN)
+    မဟုတ်ပါက အကယ်၍ (argvars[1].v_type == VAR_UNKNOWN)
 	arg = (char_u *)"";
-    else
+    မဟုတ်ပါက
     {
 	arg = tv_get_string_chk(&argvars[1]);
-	if (arg == NULL)
+	အကယ်၍ (arg == NULL)
 	{
 	    emsg(_(e_invalid_argument));
-	    return 0;
+	    ပြန်ပေး 0;
 	}
     }
-    if (job->jv_status == JOB_FAILED)
+    အကယ်၍ (job->jv_status == JOB_FAILED)
     {
 	ch_log(job->jv_channel, "Job failed to start, job_stop() skipped");
-	return 0;
+	ပြန်ပေး 0;
     }
-    if (job->jv_status == JOB_ENDED)
+    အကယ်၍ (job->jv_status == JOB_ENDED)
     {
 	ch_log(job->jv_channel, "Job has already ended, job_stop() skipped");
-	return 0;
+	ပြန်ပေး 0;
     }
-    ch_log(job->jv_channel, "Stopping job with '%s'", (char *)arg);
-    if (mch_signal_job(job, arg) == FAIL)
-	return 0;
+    ch_log(job->jv_channel, "Stopping job with '%s'", (var_na *)arg);
+    အကယ်၍ (mch_signal_job(job, arg) == FAIL)
+	ပြန်ပေး 0;
 
     // Assume that only "kill" will kill the job.
-    if (job->jv_channel != NULL && STRCMP(arg, "kill") == 0)
+    အကယ်၍ (job->jv_channel != NULL && STRCMP(arg, "kill") == 0)
 	job->jv_channel->ch_job_killed = TRUE;
 
     // We don't try freeing the job, obviously the caller still has a
     // reference to it.
-    return 1;
+    ပြန်ပေး 1;
 }
 
     void
@@ -1572,12 +1572,12 @@ invoke_prompt_callback(void)
     curwin->w_cursor.lnum = lnum + 1;
     curwin->w_cursor.col = 0;
 
-    if (curbuf->b_prompt_callback.cb_name == NULL
+    အကယ်၍ (curbuf->b_prompt_callback.cb_name == NULL
 	    || *curbuf->b_prompt_callback.cb_name == NUL)
-	return;
+	ပြန်ပေး;
     text = ml_get(lnum);
     prompt = prompt_text();
-    if (STRLEN(text) >= STRLEN(prompt))
+    အကယ်၍ (STRLEN(text) >= STRLEN(prompt))
 	text += STRLEN(prompt);
     argv[0].v_type = VAR_STRING;
     argv[0].vval.v_string = vim_strsave(text);
@@ -1591,22 +1591,22 @@ invoke_prompt_callback(void)
 /*
  * Return TRUE when the interrupt callback was invoked.
  */
-    int
+    ကိန်းပြည့်
 invoke_prompt_interrupt(void)
 {
     typval_T	rettv;
     typval_T	argv[1];
-    int		ret;
+    ကိန်းပြည့်		ret;
 
-    if (curbuf->b_prompt_interrupt.cb_name == NULL
+    အကယ်၍ (curbuf->b_prompt_interrupt.cb_name == NULL
 	    || *curbuf->b_prompt_interrupt.cb_name == NUL)
-	return FALSE;
+	ပြန်ပေး FALSE;
     argv[0].v_type = VAR_UNKNOWN;
 
     got_int = FALSE; // don't skip executing commands
     ret = call_callback(&curbuf->b_prompt_interrupt, -1, &rettv, 0, argv);
     clear_tv(&rettv);
-    return ret == FAIL ? FALSE : TRUE;
+    ပြန်ပေး ret == FAIL ? FALSE : TRUE;
 }
 
 /*
@@ -1615,9 +1615,9 @@ invoke_prompt_interrupt(void)
     static char_u *
 buf_prompt_text(buf_T* buf)
 {
-    if (buf->b_prompt_text == NULL)
-	return (char_u *)"% ";
-    return buf->b_prompt_text;
+    အကယ်၍ (buf->b_prompt_text == NULL)
+	ပြန်ပေး (char_u *)"% ";
+    ပြန်ပေး buf->b_prompt_text;
 }
 
 /*
@@ -1626,7 +1626,7 @@ buf_prompt_text(buf_T* buf)
     char_u *
 prompt_text(void)
 {
-    return buf_prompt_text(curbuf);
+    ပြန်ပေး buf_prompt_text(curbuf);
 }
 
 
@@ -1635,19 +1635,19 @@ prompt_text(void)
  * Move the cursor to this line.
  */
     void
-init_prompt(int cmdchar_todo)
+init_prompt(ကိန်းပြည့် cmdchar_todo)
 {
     char_u *prompt = prompt_text();
     char_u *text;
 
     curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
     text = ml_get_curline();
-    if (STRNCMP(text, prompt, STRLEN(prompt)) != 0)
+    အကယ်၍ (STRNCMP(text, prompt, STRLEN(prompt)) != 0)
     {
 	// prompt is missing, insert it or append a line with it
-	if (*text == NUL)
+	အကယ်၍ (*text == NUL)
 	    ml_replace(curbuf->b_ml.ml_line_count, prompt, TRUE);
-	else
+	မဟုတ်ပါက
 	    ml_append(curbuf->b_ml.ml_line_count, prompt, 0, FALSE);
 	curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
 	coladvance((colnr_T)MAXCOL);
@@ -1655,14 +1655,14 @@ init_prompt(int cmdchar_todo)
     }
 
     // Insert always starts after the prompt, allow editing text after it.
-    if (Insstart_orig.lnum != curwin->w_cursor.lnum
-				   || Insstart_orig.col != (int)STRLEN(prompt))
-	set_insstart(curwin->w_cursor.lnum, (int)STRLEN(prompt));
+    အကယ်၍ (Insstart_orig.lnum != curwin->w_cursor.lnum
+				   || Insstart_orig.col != (ကိန်းပြည့်)STRLEN(prompt))
+	set_insstart(curwin->w_cursor.lnum, (ကိန်းပြည့်)STRLEN(prompt));
 
-    if (cmdchar_todo == 'A')
+    အကယ်၍ (cmdchar_todo == 'A')
 	coladvance((colnr_T)MAXCOL);
-    if (curwin->w_cursor.col < (int)STRLEN(prompt))
-	curwin->w_cursor.col = (int)STRLEN(prompt);
+    အကယ်၍ (curwin->w_cursor.col < (ကိန်းပြည့်)STRLEN(prompt))
+	curwin->w_cursor.col = (ကိန်းပြည့်)STRLEN(prompt);
     // Make sure the cursor is in a valid position.
     check_cursor();
 }
@@ -1670,11 +1670,11 @@ init_prompt(int cmdchar_todo)
 /*
  * Return TRUE if the cursor is in the editable position of the prompt line.
  */
-    int
+    ကိန်းပြည့်
 prompt_curpos_editable(void)
 {
-    return curwin->w_cursor.lnum == curbuf->b_ml.ml_line_count
-	&& curwin->w_cursor.col >= (int)STRLEN(prompt_text());
+    ပြန်ပေး curwin->w_cursor.lnum == curbuf->b_ml.ml_line_count
+	&& curwin->w_cursor.col >= (ကိန်းပြည့်)STRLEN(prompt_text());
 }
 
 /*
@@ -1686,19 +1686,19 @@ f_prompt_setcallback(typval_T *argvars, typval_T *rettv UNUSED)
     buf_T	*buf;
     callback_T	callback;
 
-    if (check_secure())
-	return;
+    အကယ်၍ (check_secure())
+	ပြန်ပေး;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    အကယ်၍ (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
+	ပြန်ပေး;
 
     buf = tv_get_buf(&argvars[0], FALSE);
-    if (buf == NULL)
-	return;
+    အကယ်၍ (buf == NULL)
+	ပြန်ပေး;
 
     callback = get_callback(&argvars[1]);
-    if (callback.cb_name == NULL)
-	return;
+    အကယ်၍ (callback.cb_name == NULL)
+	ပြန်ပေး;
 
     free_callback(&buf->b_prompt_callback);
     set_callback(&buf->b_prompt_callback, &callback);
@@ -1713,19 +1713,19 @@ f_prompt_setinterrupt(typval_T *argvars, typval_T *rettv UNUSED)
     buf_T	*buf;
     callback_T	callback;
 
-    if (check_secure())
-	return;
+    အကယ်၍ (check_secure())
+	ပြန်ပေး;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    အကယ်၍ (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
+	ပြန်ပေး;
 
     buf = tv_get_buf(&argvars[0], FALSE);
-    if (buf == NULL)
-	return;
+    အကယ်၍ (buf == NULL)
+	ပြန်ပေး;
 
     callback = get_callback(&argvars[1]);
-    if (callback.cb_name == NULL)
-	return;
+    အကယ်၍ (callback.cb_name == NULL)
+	ပြန်ပေး;
 
     free_callback(&buf->b_prompt_interrupt);
     set_callback(&buf->b_prompt_interrupt, &callback);
@@ -1744,15 +1744,15 @@ f_prompt_getprompt(typval_T *argvars, typval_T *rettv)
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    အကယ်၍ (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
+	ပြန်ပေး;
 
     buf = tv_get_buf_from_arg(&argvars[0]);
-    if (buf == NULL)
-	return;
+    အကယ်၍ (buf == NULL)
+	ပြန်ပေး;
 
-    if (!bt_prompt(buf))
-	return;
+    အကယ်၍ (!bt_prompt(buf))
+	ပြန်ပေး;
 
     rettv->vval.v_string = vim_strsave(buf_prompt_text(buf));
 }
@@ -1766,16 +1766,16 @@ f_prompt_setprompt(typval_T *argvars, typval_T *rettv UNUSED)
     buf_T	*buf;
     char_u	*text;
 
-    if (in_vim9script()
+    အကယ်၍ (in_vim9script()
 	    && (check_for_buffer_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	ပြန်ပေး;
 
-    if (check_secure())
-	return;
+    အကယ်၍ (check_secure())
+	ပြန်ပေး;
     buf = tv_get_buf(&argvars[0], FALSE);
-    if (buf == NULL)
-	return;
+    အကယ်၍ (buf == NULL)
+	ပြန်ပေး;
 
     text = tv_get_string(&argvars[1]);
     vim_free(buf->b_prompt_text);
@@ -1791,16 +1791,16 @@ get_job_arg(typval_T *tv)
 {
     job_T *job;
 
-    if (tv->v_type != VAR_JOB)
+    အကယ်၍ (tv->v_type != VAR_JOB)
     {
 	semsg(_(e_invalid_argument_str), tv_get_string(tv));
-	return NULL;
+	ပြန်ပေး NULL;
     }
     job = tv->vval.v_job;
 
-    if (job == NULL)
+    အကယ်၍ (job == NULL)
 	emsg(_(e_not_valid_job));
-    return job;
+    ပြန်ပေး job;
 }
 
 /*
@@ -1811,16 +1811,16 @@ f_job_getchannel(typval_T *argvars, typval_T *rettv)
 {
     job_T	*job;
 
-    if (in_vim9script() && check_for_job_arg(argvars, 0) == FAIL)
-	return;
+    အကယ်၍ (in_vim9script() && check_for_job_arg(argvars, 0) == FAIL)
+	ပြန်ပေး;
 
     job = get_job_arg(&argvars[0]);
-    if (job == NULL)
-	return;
+    အကယ်၍ (job == NULL)
+	ပြန်ပေး;
 
     rettv->v_type = VAR_CHANNEL;
     rettv->vval.v_channel = job->jv_channel;
-    if (job->jv_channel != NULL)
+    အကယ်၍ (job->jv_channel != NULL)
 	++job->jv_channel->ch_refcount;
 }
 
@@ -1833,23 +1833,23 @@ job_info(job_T *job, dict_T *dict)
     dictitem_T	*item;
     varnumber_T	nr;
     list_T	*l;
-    int		i;
+    ကိန်းပြည့်		i;
 
     dict_add_string(dict, "status", (char_u *)job_status(job));
 
     item = dictitem_alloc((char_u *)"channel");
-    if (item == NULL)
-	return;
+    အကယ်၍ (item == NULL)
+	ပြန်ပေး;
     item->di_tv.v_type = VAR_CHANNEL;
     item->di_tv.vval.v_channel = job->jv_channel;
-    if (job->jv_channel != NULL)
+    အကယ်၍ (job->jv_channel != NULL)
 	++job->jv_channel->ch_refcount;
-    if (dict_add(dict, item) == FAIL)
+    အကယ်၍ (dict_add(dict, item) == FAIL)
 	dictitem_free(item);
 
 #ifdef UNIX
     nr = job->jv_pid;
-#else
+#မဟုတ်ပါက
     nr = job->jv_proc_info.dwProcessId;
 #endif
     dict_add_number(dict, "process", nr);
@@ -1867,16 +1867,16 @@ job_info(job_T *job, dict_T *dict)
 #endif
 
     l = list_alloc();
-    if (l == NULL)
-	return;
+    အကယ်၍ (l == NULL)
+	ပြန်ပေး;
 
-    if (dict_add_list(dict, "cmd", l) == FAIL)
+    အကယ်၍ (dict_add_list(dict, "cmd", l) == FAIL)
     {
 	list_unref(l);
-	return;
+	ပြန်ပေး;
     }
-    if (job->jv_argv != NULL)
-	for (i = 0; job->jv_argv[i] != NULL; i++)
+    အကယ်၍ (job->jv_argv != NULL)
+	အတွက် (i = 0; job->jv_argv[i] != NULL; i++)
 	    list_append_string(l, (char_u *)job->jv_argv[i], -1);
 }
 
@@ -1894,8 +1894,8 @@ job_info_all(list_T *l)
 	tv.v_type = VAR_JOB;
 	tv.vval.v_job = job;
 
-	if (list_append_tv(l, &tv) != OK)
-	    return;
+	အကယ်၍ (list_append_tv(l, &tv) != OK)
+	    ပြန်ပေး;
     }
 }
 
@@ -1905,18 +1905,18 @@ job_info_all(list_T *l)
     void
 f_job_info(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_opt_job_arg(argvars, 0) == FAIL)
-	return;
+    အကယ်၍ (in_vim9script() && check_for_opt_job_arg(argvars, 0) == FAIL)
+	ပြန်ပေး;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    အကယ်၍ (argvars[0].v_type != VAR_UNKNOWN)
     {
 	job_T	*job;
 
 	job = get_job_arg(&argvars[0]);
-	if (job != NULL && rettv_dict_alloc(rettv) == OK)
+	အကယ်၍ (job != NULL && rettv_dict_alloc(rettv) == OK)
 	    job_info(job, rettv->vval.v_dict);
     }
-    else if (rettv_list_alloc(rettv) == OK)
+    မဟုတ်ပါက အကယ်၍ (rettv_list_alloc(rettv) == OK)
 	job_info_all(rettv->vval.v_list);
 }
 
@@ -1929,16 +1929,16 @@ f_job_setoptions(typval_T *argvars, typval_T *rettv UNUSED)
     job_T	*job;
     jobopt_T	opt;
 
-    if (in_vim9script()
+    အကယ်၍ (in_vim9script()
 	    && (check_for_job_arg(argvars, 0) == FAIL
 		|| check_for_dict_arg(argvars, 1) == FAIL))
-	return;
+	ပြန်ပေး;
 
     job = get_job_arg(&argvars[0]);
-    if (job == NULL)
-	return;
+    အကယ်၍ (job == NULL)
+	ပြန်ပေး;
     clear_job_options(&opt);
-    if (get_job_options(&argvars[1], &opt, JO_STOPONEXIT + JO_EXIT_CB, 0) == OK)
+    အကယ်၍ (get_job_options(&argvars[1], &opt, JO_STOPONEXIT + JO_EXIT_CB, 0) == OK)
 	job_set_options(job, &opt);
     free_job_options(&opt);
 }
@@ -1950,13 +1950,13 @@ f_job_setoptions(typval_T *argvars, typval_T *rettv UNUSED)
 f_job_start(typval_T *argvars, typval_T *rettv)
 {
     rettv->v_type = VAR_JOB;
-    if (check_restricted() || check_secure())
-	return;
+    အကယ်၍ (check_restricted() || check_secure())
+	ပြန်ပေး;
 
-    if (in_vim9script()
+    အကယ်၍ (in_vim9script()
 	    && (check_for_string_or_list_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	ပြန်ပေး;
 
     rettv->vval.v_job = job_start(argvars, NULL, NULL, NULL);
 }
@@ -1967,20 +1967,20 @@ f_job_start(typval_T *argvars, typval_T *rettv)
     void
 f_job_status(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_job_arg(argvars, 0) == FAIL)
-	return;
+    အကယ်၍ (in_vim9script() && check_for_job_arg(argvars, 0) == FAIL)
+	ပြန်ပေး;
 
-    if (argvars[0].v_type == VAR_JOB && argvars[0].vval.v_job == NULL)
+    အကယ်၍ (argvars[0].v_type == VAR_JOB && argvars[0].vval.v_job == NULL)
     {
 	// A job that never started returns "fail".
 	rettv->v_type = VAR_STRING;
 	rettv->vval.v_string = vim_strsave((char_u *)"fail");
     }
-    else
+    မဟုတ်ပါက
     {
 	job_T	*job = get_job_arg(&argvars[0]);
 
-	if (job != NULL)
+	အကယ်၍ (job != NULL)
 	{
 	    rettv->v_type = VAR_STRING;
 	    rettv->vval.v_string = vim_strsave((char_u *)job_status(job));
@@ -1996,13 +1996,13 @@ f_job_stop(typval_T *argvars, typval_T *rettv)
 {
     job_T	*job;
 
-    if (in_vim9script()
+    အကယ်၍ (in_vim9script()
 	    && (check_for_job_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_or_number_arg(argvars, 1) == FAIL))
-	return;
+	ပြန်ပေး;
 
     job = get_job_arg(&argvars[0]);
-    if (job != NULL)
+    အကယ်၍ (job != NULL)
 	rettv->vval.v_number = job_stop(job, argvars, NULL);
 }
 
@@ -2014,29 +2014,29 @@ f_job_stop(typval_T *argvars, typval_T *rettv)
 job_to_string_buf(typval_T *varp, char_u *buf)
 {
     job_T *job = varp->vval.v_job;
-    char  *status;
+    var_na  *status;
 
-    if (job == NULL)
+    အကယ်၍ (job == NULL)
     {
-	vim_snprintf((char *)buf, NUMBUFLEN, "no process");
-	return buf;
+	vim_snprintf((var_na *)buf, NUMBUFLEN, "no process");
+	ပြန်ပေး buf;
     }
     status = job->jv_status == JOB_FAILED ? "fail"
 		    : job->jv_status >= JOB_ENDED ? "dead"
 		    : "run";
 #ifdef UNIX
-    vim_snprintf((char *)buf, NUMBUFLEN,
+    vim_snprintf((var_na *)buf, NUMBUFLEN,
 		"process %ld %s", (long)job->jv_pid, status);
 #elif defined(MSWIN)
-    vim_snprintf((char *)buf, NUMBUFLEN,
+    vim_snprintf((var_na *)buf, NUMBUFLEN,
 		"process %ld %s",
 		(long)job->jv_proc_info.dwProcessId,
 		status);
-#else
+#မဟုတ်ပါက
     // fall-back
-    vim_snprintf((char *)buf, NUMBUFLEN, "process ? %s", status);
+    vim_snprintf((var_na *)buf, NUMBUFLEN, "process ? %s", status);
 #endif
-    return buf;
+    ပြန်ပေး buf;
 }
 
 #endif // FEAT_JOB_CHANNEL

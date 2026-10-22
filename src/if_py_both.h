@@ -13,15 +13,15 @@
  * Common code for if_python.c and if_python3.c.
  */
 
-#if PY_VERSION_HEX < 0x02050000
-typedef int Py_ssize_t;  // Python 2.4 and earlier don't have this type.
+#အကယ်၍ PY_VERSION_HEX < 0x02050000
+typedef ကိန်းပြည့် Py_ssize_t;  // Python 2.4 and earlier don't have this type.
 #endif
 
 // Use values that are known to work, others may make Vim crash.
-#define ENC_OPT (enc_utf8 ? "utf-8" : enc_dbcs ? "euc-jp" : (char *)p_enc)
+#define ENC_OPT (enc_utf8 ? "utf-8" : enc_dbcs ? "euc-jp" : (var_na *)p_enc)
 #define DOPY_FUNC "_vim_pydo"
 
-static const char *vim_special_path = "_vim_path_";
+static const var_na *vim_special_path = "_vim_path_";
 
 #define PyErr_SET_STRING(exc, str) PyErr_SetString(exc, _(str))
 #define PyErr_SetVim(str) PyErr_SetString(VimError, str)
@@ -34,7 +34,7 @@ static const char *vim_special_path = "_vim_path_";
 // Limited Python API. Need to call only exposed functions and remap macros.
 // PyTypeObject is an opaque struct.
 
-typedef struct {
+typedef sa_nracanaa {
     lenfunc sq_length;
     binaryfunc sq_concat;
     ssizeargfunc sq_repeat;
@@ -48,7 +48,7 @@ typedef struct {
     ssizeargfunc sq_inplace_repeat;
 } PySequenceMethods;
 
-typedef struct {
+typedef sa_nracanaa {
     lenfunc mp_length;
     binaryfunc mp_subscript;
     objobjargproc mp_ass_subscript;
@@ -56,8 +56,8 @@ typedef struct {
 
 // This struct emulates the concrete _typeobject struct to allow the code to
 // work the same way in both limited and full Python APIs.
-struct typeobject_wrapper {
-    const char *tp_name;
+sa_nracanaa typeobject_wrapper {
+    const var_na *tp_name;
     Py_ssize_t tp_basicsize;
     unsigned long tp_flags;
 
@@ -74,7 +74,7 @@ struct typeobject_wrapper {
     getattrofunc tp_getattro;
     setattrofunc tp_setattro;
 
-    const char *tp_doc;
+    const var_na *tp_doc;
 
     traverseproc tp_traverse;
 
@@ -83,15 +83,15 @@ struct typeobject_wrapper {
     getiterfunc tp_iter;
     iternextfunc tp_iternext;
 
-    struct PyMethodDef *tp_methods;
-    struct _typeobject *tp_base;
+    sa_nracanaa PyMethodDef *tp_methods;
+    sa_nracanaa _typeobject *tp_base;
     allocfunc tp_alloc;
     newfunc tp_new;
     freefunc tp_free;
 };
 
 # define DEFINE_PY_TYPE_OBJECT(type) \
-    static struct typeobject_wrapper type; \
+    static sa_nracanaa typeobject_wrapper type; \
     static PyTypeObject* type##Ptr = NULL
 
 // PyObject_HEAD_INIT_TYPE and PyObject_FINISH_INIT_TYPE need to come in pairs
@@ -108,12 +108,12 @@ struct typeobject_wrapper {
 static PyObject* Vim_PyObject_New(PyTypeObject *type, size_t objsize)
 {
     PyObject *obj = (PyObject *)PyObject_Malloc(objsize);
-    if (obj == NULL)
-	return PyErr_NoMemory();
-    return PyObject_Init(obj, type);
+    အကယ်၍ (obj == NULL)
+	ပြန်ပေး PyErr_NoMemory();
+    ပြန်ပေး PyObject_Init(obj, type);
 }
 # undef PyObject_NEW
-# define PyObject_NEW(type, typeobj) ((type *)Vim_PyObject_New(typeobj, sizeof(type)))
+# define PyObject_NEW(type, typeobj) ((type *)Vim_PyObject_New(typeobj, parimaa_na(type)))
 
 // This is a somewhat convoluted because limited API doesn't expose an easy way
 // to get the tp_name field, and so we have to manually reconstruct it as
@@ -125,30 +125,30 @@ static PyObject* Vim_PyObject_New(PyTypeObject *type, size_t objsize)
 # define PyErr_FORMAT_TYPE(msg, obj) \
     do { \
 	PyObject* qualname = PyObject_GetAttrString((PyObject*)(obj)->ob_type, "__qualname__"); \
-	if (qualname == NULL) \
+	အကယ်၍ (qualname == NULL) \
 	{ \
 	    PyErr_FORMAT(PyExc_TypeError, msg, "(NULL)"); \
-	    break; \
+	    bha_nga; \
 	} \
 	PyObject* module = PyObject_GetAttrString((PyObject*)(obj)->ob_type, "__module__"); \
 	PyObject* full; \
-	if (module == NULL || PyUnicode_CompareWithASCIIString(module, "builtins") == 0 \
+	အကယ်၍ (module == NULL || PyUnicode_CompareWithASCIIString(module, "builtins") == 0 \
 		|| PyUnicode_CompareWithASCIIString(module, "__main__") == 0) \
 	{ \
 	    full = qualname; \
 	    Py_INCREF(full); \
 	} \
-	else \
+	မဟုတ်ပါက \
 	    full = PyUnicode_FromFormat("%U.%U", module, qualname); \
 	PyObject* full_bytes = PyUnicode_AsUTF8String(full); \
-	const char* full_str = PyBytes_AsString(full_bytes); \
+	const var_na* full_str = PyBytes_AsString(full_bytes); \
 	full_str = full_str == NULL ? "(NULL)" : full_str; \
 	PyErr_FORMAT(PyExc_TypeError, msg, full_str); \
 	Py_DECREF(qualname); \
 	Py_XDECREF(module); \
 	Py_XDECREF(full); \
 	Py_XDECREF(full_bytes); \
-    } while (0)
+    } နေစဉ် (0)
 
 # define PyList_GET_ITEM(list, i) PyList_GetItem(list, i)
 # define PyList_GET_SIZE(o) PyList_Size(o)
@@ -161,7 +161,7 @@ static PyObject* Vim_PyObject_New(PyTypeObject *type, size_t objsize)
 # define PyTuple_GET_ITEM(o, pos) PyTuple_GetItem(o, pos)
 # define PyTuple_GET_SIZE(o) PyTuple_Size(o)
 
-# if Py_LIMITED_API < 0x03080000
+# အကယ်၍ Py_LIMITED_API < 0x03080000
 // PyIter_check only became part of stable ABI in 3.8, and there is no easy way
 // to check for it in the API. We simply return false as a compromise. This
 // does mean we should avoid compiling with stable ABI < 3.8.
@@ -169,7 +169,7 @@ static PyObject* Vim_PyObject_New(PyTypeObject *type, size_t objsize)
 #  define PyIter_Check(obj) (FALSE)
 # endif
 
-static PyTypeObject* AddHeapType(struct typeobject_wrapper* type_object)
+static PyTypeObject* AddHeapType(sa_nracanaa typeobject_wrapper* type_object)
 {
     PyType_Spec type_spec;
     type_spec.name = type_object->tp_name;
@@ -183,16 +183,16 @@ static PyTypeObject* AddHeapType(struct typeobject_wrapper* type_object)
     size_t slot_i = 0;
 
 # define ADD_TP_SLOT(slot_name) \
-    if (slot_i >= 40) return NULL; /* this should never happen */ \
-    if (type_object->slot_name != NULL) \
+    အကယ်၍ (slot_i >= 40) ပြန်ပေး NULL; /* this should never happen */ \
+    အကယ်၍ (type_object->slot_name != NULL) \
     { \
 	slots[slot_i].slot = Py_##slot_name; \
 	slots[slot_i].pfunc = (void*)type_object->slot_name; \
 	++slot_i; \
     }
 # define ADD_TP_SUB_SLOT(sub_slot, slot_name) \
-    if (slot_i >= 40) return NULL; /* this should never happen */ \
-    if (type_object->sub_slot != NULL && type_object->sub_slot->slot_name != NULL) \
+    အကယ်၍ (slot_i >= 40) ပြန်ပေး NULL; /* this should never happen */ \
+    အကယ်၍ (type_object->sub_slot != NULL && type_object->sub_slot->slot_name != NULL) \
     { \
 	slots[slot_i].slot = Py_##slot_name; \
 	slots[slot_i].pfunc = (void*)type_object->sub_slot->slot_name; \
@@ -233,7 +233,7 @@ static PyTypeObject* AddHeapType(struct typeobject_wrapper* type_object)
     type_spec.slots = slots;
 
     PyObject* newtype = PyType_FromSpec(&type_spec);
-    return (PyTypeObject*)newtype;
+    ပြန်ပေး (PyTypeObject*)newtype;
 }
 
 // Add a heap type, since static types do not work in limited API
@@ -248,44 +248,44 @@ static PyTypeObject* AddHeapType(struct typeobject_wrapper* type_object)
 // will be no long-term leak.
 # define PYTYPE_READY(type) \
     type##Ptr = AddHeapType(&(type)); \
-    if (type##Ptr == NULL) \
-	return -1;
+    အကယ်၍ (type##Ptr == NULL) \
+	ပြန်ပေး -1;
 # define PYTYPE_CLEANUP(type) \
     type##Ptr = NULL;
 
 // Limited API does not provide PyRun_* functions. Need to implement manually
 // using PyCompile and PyEval.
-static PyObject* Vim_PyRun_String(const char *str, int start, PyObject *globals, PyObject *locals)
+static PyObject* Vim_PyRun_String(const var_na *str, ကိန်းပြည့် start, PyObject *globals, PyObject *locals)
 {
     // Just pass "" for filename for now.
     PyObject* compiled = Py_CompileString(str, "", start);
-    if (compiled == NULL)
-	return NULL;
+    အကယ်၍ (compiled == NULL)
+	ပြန်ပေး NULL;
 
     PyObject* eval_result = PyEval_EvalCode(compiled, globals, locals);
     Py_DECREF(compiled);
-    return eval_result;
+    ပြန်ပေး eval_result;
 }
-static int Vim_PyRun_SimpleString(const char *str)
+static ကိန်းပြည့် Vim_PyRun_SimpleString(const var_na *str)
 {
     // This function emulates CPython's implementation.
     PyObject* m = PyImport_AddModule("__main__");
-    if (m == NULL)
-	return -1;
+    အကယ်၍ (m == NULL)
+	ပြန်ပေး -1;
     PyObject* d = PyModule_GetDict(m);
     PyObject* output = Vim_PyRun_String(str, Py_file_input, d, d);
-    if (output == NULL)
+    အကယ်၍ (output == NULL)
     {
 	PyErr_PrintEx(TRUE);
-	return -1;
+	ပြန်ပေး -1;
     }
     Py_DECREF(output);
-    return 0;
+    ပြန်ပေး 0;
 }
 # define PyRun_String Vim_PyRun_String
 # define PyRun_SimpleString Vim_PyRun_SimpleString
 
-#else // !defined(USE_LIMITED_API)
+#မဟုတ်ပါက // !defined(USE_LIMITED_API)
 
 // Full Python API. Can make use of structs and macros directly.
 # define DEFINE_PY_TYPE_OBJECT(type) \
@@ -305,8 +305,8 @@ static int Vim_PyRun_SimpleString(const char *str)
 
 // Add a static type
 # define PYTYPE_READY(type) \
-    if (PyType_Ready(type##Ptr)) \
-	return -1;
+    အကယ်၍ (PyType_Ready(type##Ptr)) \
+	ပြန်ပေး -1;
 
 #endif
 
@@ -329,19 +329,19 @@ static int Vim_PyRun_SimpleString(const char *str)
 #define INVALID_TABPAGE_VALUE ((tabpage_T *)(-1))
 
 typedef void (*rangeinitializer)(void *);
-typedef void (*runner)(const char *, dict_T *, void *
+typedef void (*runner)(const var_na *, dict_T *, void *
 #ifdef PY_CAN_RECURSE
 	, PyGILState_STATE *
 #endif
 	);
 
-static int ConvertFromPyObject(PyObject *, typval_T *);
-static int _ConvertFromPyObject(PyObject *, typval_T *, PyObject *);
-static int ConvertFromPyMapping(PyObject *, typval_T *);
-static int ConvertFromPySequence(PyObject *, typval_T *);
+static ကိန်းပြည့် ConvertFromPyObject(PyObject *, typval_T *);
+static ကိန်းပြည့် _ConvertFromPyObject(PyObject *, typval_T *, PyObject *);
+static ကိန်းပြည့် ConvertFromPyMapping(PyObject *, typval_T *);
+static ကိန်းပြည့် ConvertFromPySequence(PyObject *, typval_T *);
 static PyObject *WindowNew(win_T *, tabpage_T *);
 static PyObject *BufferNew (buf_T *);
-static PyObject *LineToString(const char *);
+static PyObject *LineToString(const var_na *);
 
 static PyInt RangeStart;
 static PyInt RangeEnd;
@@ -354,12 +354,12 @@ static PyObject *py_getcwd;
 static PyObject *vim_module;
 static PyObject *vim_special_path_object;
 
-#if PY_VERSION_HEX >= 0x030700f0
+#အကယ်၍ PY_VERSION_HEX >= 0x030700f0
 static PyObject *py_find_spec;
-#else
+#မဟုတ်ပါက
 static PyObject *py_load_module;
 #endif
-#if PY_VERSION_HEX < 0x30c00a7
+#အကယ်၍ PY_VERSION_HEX < 0x30c00a7
 static PyObject *py_find_module;
 #endif
 
@@ -393,45 +393,45 @@ StringToChars(PyObject *obj, PyObject **todecref)
 {
     char_u	*str;
 
-    if (PyBytes_Check(obj))
+    အကယ်၍ (PyBytes_Check(obj))
     {
 
-	if (PyBytes_AsStringAndSize(obj, (char **) &str, NULL) == -1
+	အကယ်၍ (PyBytes_AsStringAndSize(obj, (var_na **) &str, NULL) == -1
 		|| str == NULL)
-	    return NULL;
+	    ပြန်ပေး NULL;
 
 	*todecref = NULL;
     }
-    else if (PyUnicode_Check(obj))
+    မဟုတ်ပါက အကယ်၍ (PyUnicode_Check(obj))
     {
 	PyObject	*bytes;
 
-	if (!(bytes = PyUnicode_AsEncodedString(obj, ENC_OPT,
+	အကယ်၍ (!(bytes = PyUnicode_AsEncodedString(obj, ENC_OPT,
 							   ERRORS_ENCODE_ARG)))
-	    return NULL;
+	    ပြန်ပေး NULL;
 
-	if (PyBytes_AsStringAndSize(bytes, (char **) &str, NULL) == -1
+	အကယ်၍ (PyBytes_AsStringAndSize(bytes, (var_na **) &str, NULL) == -1
 		|| str == NULL)
 	{
 	    Py_DECREF(bytes);
-	    return NULL;
+	    ပြန်ပေး NULL;
 	}
 
 	*todecref = bytes;
     }
-    else
+    မဟုတ်ပါက
     {
-#if PY_MAJOR_VERSION < 3
+#အကယ်၍ PY_MAJOR_VERSION < 3
 	PyErr_FORMAT_TYPE(N_("expected str() or unicode() instance, but got %s"),
 		obj);
-#else
+#မဟုတ်ပါက
 	PyErr_FORMAT_TYPE(N_("expected bytes() or str() instance, but got %s"),
 		obj);
 #endif
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
-    return (char_u *) str;
+    ပြန်ပေး (char_u *) str;
 }
 
 #define NUMBER_LONG     1
@@ -439,161 +439,161 @@ StringToChars(PyObject *obj, PyObject **todecref)
 #define NUMBER_NATURAL  4
 #define NUMBER_UNSIGNED 8
 
-    static int
-NumberToLong(PyObject *obj, long *result, int flags)
+    static ကိန်းပြည့်
+NumberToLong(PyObject *obj, long *result, ကိန်းပြည့် flags)
 {
-#if PY_MAJOR_VERSION < 3
-    if (PyInt_Check(obj))
+#အကယ်၍ PY_MAJOR_VERSION < 3
+    အကယ်၍ (PyInt_Check(obj))
     {
 	*result = PyInt_AsLong(obj);
-	if (PyErr_Occurred())
-	    return -1;
+	အကယ်၍ (PyErr_Occurred())
+	    ပြန်ပေး -1;
     }
-    else
+    မဟုတ်ပါက
 #endif
-    if (PyLong_Check(obj))
+    အကယ်၍ (PyLong_Check(obj))
     {
 	*result = PyLong_AsLong(obj);
-	if (PyErr_Occurred())
-	    return -1;
+	အကယ်၍ (PyErr_Occurred())
+	    ပြန်ပေး -1;
     }
-    else if (PyNumber_Check(obj))
+    မဟုတ်ပါက အကယ်၍ (PyNumber_Check(obj))
     {
 	PyObject	*num;
 
-	if (!(num = PyNumber_Long(obj)))
-	    return -1;
+	အကယ်၍ (!(num = PyNumber_Long(obj)))
+	    ပြန်ပေး -1;
 
 	*result = PyLong_AsLong(num);
 
 	Py_DECREF(num);
 
-	if (PyErr_Occurred())
-	    return -1;
+	အကယ်၍ (PyErr_Occurred())
+	    ပြန်ပေး -1;
     }
-    else
+    မဟုတ်ပါက
     {
-#if PY_MAJOR_VERSION < 3
+#အကယ်၍ PY_MAJOR_VERSION < 3
 	PyErr_FORMAT_TYPE(
 		N_("expected int(), long() or something supporting "
 		   "coercing to long(), but got %s"),
 		obj);
-#else
+#မဟုတ်ပါက
 	PyErr_FORMAT_TYPE(
 		N_("expected int() or something supporting coercing to int(), "
 		   "but got %s"),
 		obj);
 #endif
-	return -1;
+	ပြန်ပေး -1;
     }
 
-    if (flags & NUMBER_INT)
+    အကယ်၍ (flags & NUMBER_INT)
     {
-	if (*result > INT_MAX)
+	အကယ်၍ (*result > INT_MAX)
 	{
 	    PyErr_SET_STRING(PyExc_OverflowError,
 		    N_("value is too large to fit into C int type"));
-	    return -1;
+	    ပြန်ပေး -1;
 	}
-	else if (*result < INT_MIN)
+	မဟုတ်ပါက အကယ်၍ (*result < INT_MIN)
 	{
 	    PyErr_SET_STRING(PyExc_OverflowError,
 		    N_("value is too small to fit into C int type"));
-	    return -1;
+	    ပြန်ပေး -1;
 	}
     }
 
-    if (flags & NUMBER_NATURAL)
+    အကယ်၍ (flags & NUMBER_NATURAL)
     {
-	if (*result <= 0)
+	အကယ်၍ (*result <= 0)
 	{
 	    PyErr_SET_STRING(PyExc_ValueError,
 		    N_("number must be greater than zero"));
-	    return -1;
+	    ပြန်ပေး -1;
 	}
     }
-    else if (flags & NUMBER_UNSIGNED)
+    မဟုတ်ပါက အကယ်၍ (flags & NUMBER_UNSIGNED)
     {
-	if (*result < 0)
+	အကယ်၍ (*result < 0)
 	{
 	    PyErr_SET_STRING(PyExc_ValueError,
 		    N_("number must be greater or equal to zero"));
-	    return -1;
+	    ပြန်ပေး -1;
 	}
     }
 
-    return 0;
+    ပြန်ပေး 0;
 }
 
-    static int
-add_string(PyObject *list, char *s)
+    static ကိန်းပြည့်
+add_string(PyObject *list, var_na *s)
 {
     PyObject	*string;
 
-    if (!(string = PyString_FromString(s)))
-	return -1;
+    အကယ်၍ (!(string = PyString_FromString(s)))
+	ပြန်ပေး -1;
 
-    if (PyList_Append(list, string))
+    အကယ်၍ (PyList_Append(list, string))
     {
 	Py_DECREF(string);
-	return -1;
+	ပြန်ပေး -1;
     }
 
     Py_DECREF(string);
-    return 0;
+    ပြန်ပေး 0;
 }
 
     static PyObject *
-ObjectDir(PyObject *self, char **attributes)
+ObjectDir(PyObject *self, var_na **attributes)
 {
     PyMethodDef	*method;
-    char	**attr;
+    var_na	**attr;
     PyObject	*ret;
 
-    if (!(ret = PyList_New(0)))
-	return NULL;
+    အကယ်၍ (!(ret = PyList_New(0)))
+	ပြန်ပေး NULL;
 
-    if (self)
-	for (method = Py_TYPE_GET_TP_METHODS(self->ob_type) ; method->ml_name != NULL ; ++method)
-	    if (add_string(ret, (char *)method->ml_name))
+    အကယ်၍ (self)
+	အတွက် (method = Py_TYPE_GET_TP_METHODS(self->ob_type) ; method->ml_name != NULL ; ++method)
+	    အကယ်၍ (add_string(ret, (var_na *)method->ml_name))
 	    {
 		Py_DECREF(ret);
-		return NULL;
+		ပြန်ပေး NULL;
 	    }
 
-    for (attr = attributes ; *attr ; ++attr)
-	if (add_string(ret, *attr))
+    အတွက် (attr = attributes ; *attr ; ++attr)
+	အကယ်၍ (add_string(ret, *attr))
 	{
 	    Py_DECREF(ret);
-	    return NULL;
+	    ပြန်ပေး NULL;
 	}
 
-#if PY_MAJOR_VERSION < 3
-    if (add_string(ret, "__members__"))
+#အကယ်၍ PY_MAJOR_VERSION < 3
+    အကယ်၍ (add_string(ret, "__members__"))
     {
 	Py_DECREF(ret);
-	return NULL;
+	ပြန်ပေး NULL;
     }
 #endif
 
-    return ret;
+    ပြန်ပေး ret;
 }
 
 // Output buffer management
 
 // Function to write a line, points to either msg() or emsg().
-typedef int (*writefn)(char *);
+typedef ကိန်းပြည့် (*writefn)(var_na *);
 
 DEFINE_PY_TYPE_OBJECT(OutputType);
 
-typedef struct
+typedef sa_nracanaa
 {
     PyObject_HEAD
     long softspace;
     long error;
 } OutputObject;
 
-static char *OutputAttrs[] = {
+static var_na *OutputAttrs[] = {
     "softspace",
     NULL
 };
@@ -601,29 +601,29 @@ static char *OutputAttrs[] = {
     static PyObject *
 OutputDir(PyObject *self, PyObject *args UNUSED)
 {
-    return ObjectDir(self, OutputAttrs);
+    ပြန်ပေး ObjectDir(self, OutputAttrs);
 }
 
-    static int
-OutputSetattr(PyObject *self_obj, char *name, PyObject *valObject)
+    static ကိန်းပြည့်
+OutputSetattr(PyObject *self_obj, var_na *name, PyObject *valObject)
 {
     OutputObject *self = (OutputObject*)self_obj;
-    if (valObject == NULL)
+    အကယ်၍ (valObject == NULL)
     {
 	PyErr_SET_STRING(PyExc_AttributeError,
 		N_("can't delete OutputObject attributes"));
-	return -1;
+	ပြန်ပေး -1;
     }
 
-    if (strcmp(name, "softspace") == 0)
+    အကယ်၍ (strcmp(name, "softspace") == 0)
     {
-	if (NumberToLong(valObject, &(self->softspace), NUMBER_UNSIGNED))
-	    return -1;
-	return 0;
+	အကယ်၍ (NumberToLong(valObject, &(self->softspace), NUMBER_UNSIGNED))
+	    ပြန်ပေး -1;
+	ပြန်ပေး 0;
     }
 
     PyErr_FORMAT(PyExc_AttributeError, N_("invalid attribute: %s"), name);
-    return -1;
+    ပြန်ပေး -1;
 }
 
 // Buffer IO, we write one whole line at a time.
@@ -633,22 +633,22 @@ static writefn old_fn = NULL;
     static void
 PythonIO_Flush(void)
 {
-    if (old_fn != NULL && io_ga.ga_len > 0)
+    အကယ်၍ (old_fn != NULL && io_ga.ga_len > 0)
     {
-	((char *)io_ga.ga_data)[io_ga.ga_len] = NUL;
+	((var_na *)io_ga.ga_data)[io_ga.ga_len] = NUL;
 	// We don't know what emsg_severe should be here, so ... hope?
-	old_fn((char *)io_ga.ga_data);
+	old_fn((var_na *)io_ga.ga_data);
     }
     io_ga.ga_len = 0;
 }
 
     static void
-writer(writefn fn, char_u *str, PyInt n, int severe)
+writer(writefn fn, char_u *str, PyInt n, ကိန်းပြည့် severe)
 {
     char_u *ptr;
 
     // Flush when switching output function.
-    if (fn != old_fn)
+    အကယ်၍ (fn != old_fn)
 	PythonIO_Flush();
     old_fn = fn;
 
@@ -657,41 +657,41 @@ writer(writefn fn, char_u *str, PyInt n, int severe)
     // For normal messages: Do not output when "got_int" was set.  This avoids
     // a loop gone crazy flooding the terminal with messages.  Also for when
     // "q" is pressed at the more-prompt.
-    while (n > 0 && (ptr = memchr(str, '\n', n)) != NULL
+    နေစဉ် (n > 0 && (ptr = memchr(str, '\n', n)) != NULL
 					  && (fn == (writefn)emsg || !got_int))
     {
 	PyInt len = ptr - str;
 
-	if (ga_grow(&io_ga, (int)(len + 1)) == FAIL)
-	    break;
+	အကယ်၍ (ga_grow(&io_ga, (ကိန်းပြည့်)(len + 1)) == FAIL)
+	    bha_nga;
 
-	mch_memmove(((char *)io_ga.ga_data) + io_ga.ga_len, str, (size_t)len);
-	((char *)io_ga.ga_data)[io_ga.ga_len + len] = NUL;
+	mch_memmove(((var_na *)io_ga.ga_data) + io_ga.ga_len, str, (size_t)len);
+	((var_na *)io_ga.ga_data)[io_ga.ga_len + len] = NUL;
 	emsg_severe = severe;
-	fn((char *)io_ga.ga_data);
+	fn((var_na *)io_ga.ga_data);
 	str = ptr + 1;
 	n -= len + 1;
 	io_ga.ga_len = 0;
     }
 
     // Put the remaining text into io_ga for later printing.
-    if (n > 0 && (fn == (writefn)emsg || !got_int)
-					&& ga_grow(&io_ga, (int)(n + 1)) == OK)
+    အကယ်၍ (n > 0 && (fn == (writefn)emsg || !got_int)
+					&& ga_grow(&io_ga, (ကိန်းပြည့်)(n + 1)) == OK)
     {
-	mch_memmove(((char *)io_ga.ga_data) + io_ga.ga_len, str, (size_t)n);
-	io_ga.ga_len += (int)n;
+	mch_memmove(((var_na *)io_ga.ga_data) + io_ga.ga_len, str, (size_t)n);
+	io_ga.ga_len += (ကိန်းပြည့်)n;
     }
 }
 
-    static int
+    static ကိန်းပြည့်
 write_output(OutputObject *self, PyObject *string)
 {
     Py_ssize_t	len = 0;
-    char	*str = NULL;
-    int		error = self->error;
+    var_na	*str = NULL;
+    ကိန်းပြည့်		error = self->error;
 
-    if (!PyArg_Parse(string, "et#", ENC_OPT, &str, &len))
-	return -1;
+    အကယ်၍ (!PyArg_Parse(string, "et#", ENC_OPT, &str, &len))
+	ပြန်ပေး -1;
 
     Py_BEGIN_ALLOW_THREADS
     Python_Lock_Vim();
@@ -700,17 +700,17 @@ write_output(OutputObject *self, PyObject *string)
     Py_END_ALLOW_THREADS
     PyMem_Free(str);
 
-    return 0;
+    ပြန်ပေး 0;
 }
 
     static PyObject *
 OutputWrite(OutputObject *self, PyObject *string)
 {
-    if (write_output(self, string))
-	return NULL;
+    အကယ်၍ (write_output(self, string))
+	ပြန်ပေး NULL;
 
     Py_INCREF(Py_None);
-    return Py_None;
+    ပြန်ပေး Py_None;
 }
 
     static PyObject *
@@ -719,16 +719,16 @@ OutputWritelines(OutputObject *self, PyObject *seq)
     PyObject	*iterator;
     PyObject	*item;
 
-    if (!(iterator = PyObject_GetIter(seq)))
-	return NULL;
+    အကယ်၍ (!(iterator = PyObject_GetIter(seq)))
+	ပြန်ပေး NULL;
 
-    while ((item = PyIter_Next(iterator)))
+    နေစဉ် ((item = PyIter_Next(iterator)))
     {
-	if (write_output(self, item))
+	အကယ်၍ (write_output(self, item))
 	{
 	    Py_DECREF(iterator);
 	    Py_DECREF(item);
-	    return NULL;
+	    ပြန်ပေး NULL;
 	}
 	Py_DECREF(item);
     }
@@ -736,11 +736,11 @@ OutputWritelines(OutputObject *self, PyObject *seq)
     Py_DECREF(iterator);
 
     // Iterator may have finished due to an exception
-    if (PyErr_Occurred())
-	return NULL;
+    အကယ်၍ (PyErr_Occurred())
+	ပြန်ပေး NULL;
 
     Py_INCREF(Py_None);
-    return Py_None;
+    ပြန်ပေး Py_None;
 }
 
     static PyObject *
@@ -748,7 +748,7 @@ AlwaysNone(PyObject *self UNUSED, PyObject *args UNUSED)
 {
     // do nothing
     Py_INCREF(Py_None);
-    return Py_None;
+    ပြန်ပေး Py_None;
 }
 #define ALWAYS_NONE AlwaysNone(NULL, NULL)
 
@@ -758,7 +758,7 @@ AlwaysFalse(PyObject *self UNUSED, PyObject *args UNUSED)
     // do nothing
     PyObject	*ret = Py_False;
     Py_INCREF(ret);
-    return ret;
+    ပြန်ပေး ret;
 }
 #define ALWAYS_FALSE AlwaysFalse(NULL, NULL)
 
@@ -768,13 +768,13 @@ AlwaysTrue(PyObject *self UNUSED, PyObject *args UNUSED)
     // do nothing
     PyObject	*ret = Py_True;
     Py_INCREF(ret);
-    return ret;
+    ပြန်ပေး ret;
 }
 #define ALWAYS_TRUE AlwaysTrue(NULL, NULL)
 
 /***************/
 
-static struct PyMethodDef OutputMethods[] = {
+static sa_nracanaa PyMethodDef OutputMethods[] = {
     // name,	    function,				calling,	doc
     {"write",	    (PyCFunction)OutputWrite,		METH_O,		""},
     {"writelines",  (PyCFunction)OutputWritelines,	METH_O,		""},
@@ -803,30 +803,30 @@ static OutputObject Error =
     1
 };
 
-    static int
+    static ကိန်းပြည့်
 PythonIO_Init_io(void)
 {
-    if (PySys_SetObject("stdout", (PyObject *)(void *)&Output))
-	return -1;
-    if (PySys_SetObject("stderr", (PyObject *)(void *)&Error))
-	return -1;
+    အကယ်၍ (PySys_SetObject("stdout", (PyObject *)(void *)&Output))
+	ပြန်ပေး -1;
+    အကယ်၍ (PySys_SetObject("stderr", (PyObject *)(void *)&Error))
+	ပြန်ပေး -1;
 
-    if (PyErr_Occurred())
+    အကယ်၍ (PyErr_Occurred())
     {
 	emsg(_(e_python_error_initialising_io_object));
-	return -1;
+	ပြန်ပေး -1;
     }
 
-    return 0;
+    ပြန်ပေး 0;
 }
 
-#if PY_VERSION_HEX < 0x030700f0
-static PyObject *call_load_module(char *name, int len, PyObject *find_module_result);
+#အကယ်၍ PY_VERSION_HEX < 0x030700f0
+static PyObject *call_load_module(var_na *name, ကိန်းပြည့် len, PyObject *find_module_result);
 
-typedef struct
+typedef sa_nracanaa
 {
     PyObject_HEAD
-    char	*fullname;
+    var_na	*fullname;
     PyObject	*result;
 } LoaderObject;
 DEFINE_PY_TYPE_OBJECT(LoaderType);
@@ -843,18 +843,18 @@ LoaderDestructor(PyObject *self_obj)
     static PyObject *
 LoaderLoadModule(LoaderObject *self, PyObject *args UNUSED)
 {
-    char	*fullname = self->fullname;
+    var_na	*fullname = self->fullname;
     PyObject	*result = self->result;
     PyObject	*module;
 
-    if (!fullname)
+    အကယ်၍ (!fullname)
     {
 	module = result ? result : Py_None;
 	Py_INCREF(module);
-	return module;
+	ပြန်ပေး module;
     }
 
-    module = call_load_module(fullname, (int)STRLEN(fullname), result);
+    module = call_load_module(fullname, (ကိန်းပြည့်)STRLEN(fullname), result);
 
     self->fullname = NULL;
     self->result = module;
@@ -862,20 +862,20 @@ LoaderLoadModule(LoaderObject *self, PyObject *args UNUSED)
     vim_free(fullname);
     Py_DECREF(result);
 
-    if (!module)
+    အကယ်၍ (!module)
     {
-	if (PyErr_Occurred())
-	    return NULL;
+	အကယ်၍ (PyErr_Occurred())
+	    ပြန်ပေး NULL;
 
 	Py_INCREF(Py_None);
-	return Py_None;
+	ပြန်ပေး Py_None;
     }
 
     Py_INCREF(module);
-    return module;
+    ပြန်ပေး module;
 }
 
-static struct PyMethodDef LoaderMethods[] = {
+static sa_nracanaa PyMethodDef LoaderMethods[] = {
     // name,	    function,				calling,	doc
     {"load_module", (PyCFunction)LoaderLoadModule,	METH_VARARGS,	""},
     { NULL,	    NULL,				0,		NULL}
@@ -892,7 +892,7 @@ VimTryStart(void)
     ++trylevel;
 }
 
-    static int
+    static ကိန်းပြည့်
 VimTryEnd(void)
 {
     --trylevel;
@@ -900,62 +900,62 @@ VimTryEnd(void)
     // generates strange error messages if I e.g. try calling Test() in a cycle
     did_emsg = FALSE;
     // Keyboard interrupt should be preferred over anything else
-    if (got_int)
+    အကယ်၍ (got_int)
     {
-	if (did_throw)
+	အကယ်၍ (did_throw)
 	    discard_current_exception();
 	got_int = FALSE;
 	PyErr_SetNone(PyExc_KeyboardInterrupt);
-	return -1;
+	ပြန်ပေး -1;
     }
-    else if (msg_list != NULL && *msg_list != NULL)
+    မဟုတ်ပါက အကယ်၍ (msg_list != NULL && *msg_list != NULL)
     {
-	int	should_free;
-	char	*msg;
+	ကိန်းပြည့်	should_free;
+	var_na	*msg;
 
 	msg = get_exception_string(*msg_list, ET_ERROR, NULL, &should_free);
 
-	if (msg == NULL)
+	အကယ်၍ (msg == NULL)
 	{
 	    PyErr_NoMemory();
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 
 	PyErr_SetVim(msg);
 
 	free_global_msglist();
 
-	if (should_free)
+	အကယ်၍ (should_free)
 	    vim_free(msg);
 
-	return -1;
+	ပြန်ပေး -1;
     }
-    else if (!did_throw)
-	return (PyErr_Occurred() ? -1 : 0);
+    မဟုတ်ပါက အကယ်၍ (!did_throw)
+	ပြန်ပေး (PyErr_Occurred() ? -1 : 0);
     // Python exception is preferred over Vim one; unlikely to occur though
-    else if (PyErr_Occurred())
+    မဟုတ်ပါက အကယ်၍ (PyErr_Occurred())
     {
 	discard_current_exception();
-	return -1;
+	ပြန်ပေး -1;
     }
     // Finally transform Vim script exception to python one
-    else
+    မဟုတ်ပါက
     {
-	PyErr_SetVim((char *)current_exception->value);
+	PyErr_SetVim((var_na *)current_exception->value);
 	discard_current_exception();
-	return -1;
+	ပြန်ပေး -1;
     }
 }
 
-    static int
+    static ကိန်းပြည့်
 VimCheckInterrupt(void)
 {
-    if (got_int)
+    အကယ်၍ (got_int)
     {
 	PyErr_SetNone(PyExc_KeyboardInterrupt);
-	return 1;
+	ပြန်ပေး 1;
     }
-    return 0;
+    ပြန်ပေး 0;
 }
 
 // Vim module - Implementation
@@ -967,8 +967,8 @@ VimCommand(PyObject *self UNUSED, PyObject *string)
     PyObject	*ret;
     PyObject	*todecref;
 
-    if (!(cmd = StringToChars(string, &todecref)))
-	return NULL;
+    အကယ်၍ (!(cmd = StringToChars(string, &todecref)))
+	ပြန်ပေး NULL;
 
     Py_BEGIN_ALLOW_THREADS
     Python_Lock_Vim();
@@ -980,14 +980,14 @@ VimCommand(PyObject *self UNUSED, PyObject *string)
     Python_Release_Vim();
     Py_END_ALLOW_THREADS
 
-    if (VimTryEnd())
+    အကယ်၍ (VimTryEnd())
 	ret = NULL;
-    else
+    မဟုတ်ပါက
 	ret = Py_None;
 
     Py_XINCREF(ret);
     Py_XDECREF(todecref);
-    return ret;
+    ပြန်ပေး ret;
 }
 
 /*
@@ -998,23 +998,23 @@ VimCommand(PyObject *self UNUSED, PyObject *string)
  * you call VimToPython.
  */
     static PyObject *
-VimToPython(typval_T *our_tv, int depth, PyObject *lookup_dict)
+VimToPython(typval_T *our_tv, ကိန်းပြည့် depth, PyObject *lookup_dict)
 {
     PyObject	*ret;
     PyObject	*newObj;
-    char	ptrBuf[sizeof(void *) * 2 + 3];
+    var_na	ptrBuf[parimaa_na(void *) * 2 + 3];
 
     // Avoid infinite recursion
-    if (depth > 100)
+    အကယ်၍ (depth > 100)
     {
 	Py_INCREF(Py_None);
 	ret = Py_None;
-	return ret;
+	ပြန်ပေး ret;
     }
 
     // Check if we run into a recursive loop.  The item must be in lookup_dict
     // then and we can use it again.
-    if ((our_tv->v_type == VAR_LIST && our_tv->vval.v_list != NULL)
+    အကယ်၍ ((our_tv->v_type == VAR_LIST && our_tv->vval.v_list != NULL)
 	    || (our_tv->v_type == VAR_TUPLE && our_tv->vval.v_tuple != NULL)
 	    || (our_tv->v_type == VAR_DICT && our_tv->vval.v_dict != NULL))
     {
@@ -1024,99 +1024,99 @@ VimToPython(typval_T *our_tv, int depth, PyObject *lookup_dict)
 			(void *)our_tv->vval.v_tuple
 			: (void *)our_tv->vval.v_dict);
 
-	if ((ret = PyDict_GetItemString(lookup_dict, ptrBuf)))
+	အကယ်၍ ((ret = PyDict_GetItemString(lookup_dict, ptrBuf)))
 	{
 	    Py_INCREF(ret);
-	    return ret;
+	    ပြန်ပေး ret;
 	}
     }
 
-    if (our_tv->v_type == VAR_STRING)
+    အကယ်၍ (our_tv->v_type == VAR_STRING)
 	ret = PyString_FromString(our_tv->vval.v_string == NULL
-					? "" : (char *)our_tv->vval.v_string);
-    else if (our_tv->v_type == VAR_NUMBER)
+					? "" : (var_na *)our_tv->vval.v_string);
+    မဟုတ်ပါက အကယ်၍ (our_tv->v_type == VAR_NUMBER)
     {
-	char buf[NUMBUFLEN];
+	var_na buf[NUMBUFLEN];
 
 	// For backwards compatibility numbers are stored as strings.
 	sprintf(buf, "%lld", (long long)our_tv->vval.v_number);
-	ret = PyString_FromString((char *)buf);
+	ret = PyString_FromString((var_na *)buf);
     }
-    else if (our_tv->v_type == VAR_FLOAT)
+    မဟုတ်ပါက အကယ်၍ (our_tv->v_type == VAR_FLOAT)
     {
-	char buf[NUMBUFLEN];
+	var_na buf[NUMBUFLEN];
 
 	sprintf(buf, "%f", our_tv->vval.v_float);
-	ret = PyString_FromString((char *)buf);
+	ret = PyString_FromString((var_na *)buf);
     }
-    else if (our_tv->v_type == VAR_LIST)
+    မဟုတ်ပါက အကယ်၍ (our_tv->v_type == VAR_LIST)
     {
 	list_T		*list = our_tv->vval.v_list;
 	listitem_T	*curr;
 
-	if (list == NULL)
-	    return NULL;
+	အကယ်၍ (list == NULL)
+	    ပြန်ပေး NULL;
 
-	if (!(ret = PyList_New(0)))
-	    return NULL;
+	အကယ်၍ (!(ret = PyList_New(0)))
+	    ပြန်ပေး NULL;
 
-	if (PyDict_SetItemString(lookup_dict, ptrBuf, ret))
+	အကယ်၍ (PyDict_SetItemString(lookup_dict, ptrBuf, ret))
 	{
 	    Py_DECREF(ret);
-	    return NULL;
+	    ပြန်ပေး NULL;
 	}
 
 	CHECK_LIST_MATERIALIZE(list);
 	FOR_ALL_LIST_ITEMS(list, curr)
 	{
-	    if (!(newObj = VimToPython(&curr->li_tv, depth + 1, lookup_dict)))
+	    အကယ်၍ (!(newObj = VimToPython(&curr->li_tv, depth + 1, lookup_dict)))
 	    {
 		Py_DECREF(ret);
-		return NULL;
+		ပြန်ပေး NULL;
 	    }
-	    if (PyList_Append(ret, newObj))
+	    အကယ်၍ (PyList_Append(ret, newObj))
 	    {
 		Py_DECREF(newObj);
 		Py_DECREF(ret);
-		return NULL;
+		ပြန်ပေး NULL;
 	    }
 	    Py_DECREF(newObj);
 	}
     }
-    else if (our_tv->v_type == VAR_TUPLE)
+    မဟုတ်ပါက အကယ်၍ (our_tv->v_type == VAR_TUPLE)
     {
 	tuple_T	*tuple = our_tv->vval.v_tuple;
-	int	len;
+	ကိန်းပြည့်	len;
 
-	if (tuple == NULL)
-	    return NULL;
+	အကယ်၍ (tuple == NULL)
+	    ပြန်ပေး NULL;
 
 	len = TUPLE_LEN(tuple);
 
 	ret = PyTuple_New(len);
-	if (ret == NULL)
-	    return NULL;
+	အကယ်၍ (ret == NULL)
+	    ပြန်ပေး NULL;
 
-	for (int idx = 0; idx < len; idx++)
+	အတွက် (ကိန်းပြည့် idx = 0; idx < len; idx++)
 	{
 	    typval_T	*item_tv = TUPLE_ITEM(tuple, idx);
 
 	    newObj = VimToPython(item_tv, depth + 1, lookup_dict);
-	    if (!newObj)
+	    အကယ်၍ (!newObj)
 	    {
 		Py_DECREF(ret);
-		return NULL;
+		ပြန်ပေး NULL;
 	    }
 	    PyTuple_SetItem(ret, idx, newObj);
 	}
 
-	if (PyDict_SetItemString(lookup_dict, ptrBuf, ret))
+	အကယ်၍ (PyDict_SetItemString(lookup_dict, ptrBuf, ret))
 	{
 	    Py_DECREF(ret);
-	    return NULL;
+	    ပြန်ပေး NULL;
 	}
     }
-    else if (our_tv->v_type == VAR_DICT)
+    မဟုတ်ပါက အကယ်၍ (our_tv->v_type == VAR_DICT)
     {
 
 	hashtab_T	*ht;
@@ -1124,72 +1124,72 @@ VimToPython(typval_T *our_tv, int depth, PyObject *lookup_dict)
 	hashitem_T	*hi;
 	dictitem_T	*di;
 
-	if (our_tv->vval.v_dict == NULL)
-	    return NULL;
+	အကယ်၍ (our_tv->vval.v_dict == NULL)
+	    ပြန်ပေး NULL;
 	ht = &our_tv->vval.v_dict->dv_hashtab;
 
-	if (!(ret = PyDict_New()))
-	    return NULL;
+	အကယ်၍ (!(ret = PyDict_New()))
+	    ပြန်ပေး NULL;
 
-	if (PyDict_SetItemString(lookup_dict, ptrBuf, ret))
+	အကယ်၍ (PyDict_SetItemString(lookup_dict, ptrBuf, ret))
 	{
 	    Py_DECREF(ret);
-	    return NULL;
+	    ပြန်ပေး NULL;
 	}
 
 	todo = ht->ht_used;
-	for (hi = ht->ht_array; todo > 0; ++hi)
+	အတွက် (hi = ht->ht_array; todo > 0; ++hi)
 	{
-	    if (!HASHITEM_EMPTY(hi))
+	    အကယ်၍ (!HASHITEM_EMPTY(hi))
 	    {
 		--todo;
 
 		di = dict_lookup(hi);
-		if (!(newObj = VimToPython(&di->di_tv, depth + 1, lookup_dict)))
+		အကယ်၍ (!(newObj = VimToPython(&di->di_tv, depth + 1, lookup_dict)))
 		{
 		    Py_DECREF(ret);
-		    return NULL;
+		    ပြန်ပေး NULL;
 		}
-		if (PyDict_SetItemString(ret, (char *)hi->hi_key, newObj))
+		အကယ်၍ (PyDict_SetItemString(ret, (var_na *)hi->hi_key, newObj))
 		{
 		    Py_DECREF(ret);
 		    Py_DECREF(newObj);
-		    return NULL;
+		    ပြန်ပေး NULL;
 		}
 	    }
 	}
     }
-    else if (our_tv->v_type == VAR_BOOL)
+    မဟုတ်ပါက အကယ်၍ (our_tv->v_type == VAR_BOOL)
     {
-	if (our_tv->vval.v_number == VVAL_FALSE)
+	အကယ်၍ (our_tv->vval.v_number == VVAL_FALSE)
 	{
 	    ret = Py_False;
 	    Py_INCREF(ret);
 	}
-	else
+	မဟုတ်ပါက
 	{
 	    ret = Py_True;
 	    Py_INCREF(ret);
 	}
-	return ret;
+	ပြန်ပေး ret;
     }
-    else if (our_tv->v_type == VAR_SPECIAL)
+    မဟုတ်ပါက အကယ်၍ (our_tv->v_type == VAR_SPECIAL)
     {
 	Py_INCREF(Py_None);
 	ret = Py_None;
-	return ret;
+	ပြန်ပေး ret;
     }
-    else if (our_tv->v_type == VAR_BLOB)
+    မဟုတ်ပါက အကယ်၍ (our_tv->v_type == VAR_BLOB)
 	ret = PyBytes_FromStringAndSize(
-		(char*) our_tv->vval.v_blob->bv_ga.ga_data,
+		(var_na*) our_tv->vval.v_blob->bv_ga.ga_data,
 		(Py_ssize_t) our_tv->vval.v_blob->bv_ga.ga_len);
-    else
+    မဟုတ်ပါက
     {
 	Py_INCREF(Py_None);
 	ret = Py_None;
     }
 
-    return ret;
+    ပြန်ပေး ret;
 }
 
     static PyObject *
@@ -1202,11 +1202,11 @@ VimEval(PyObject *self UNUSED, PyObject *args)
     PyObject	*ret;
     PyObject	*lookup_dict;
 
-    if (!PyArg_ParseTuple(args, "O", &string))
-	return NULL;
+    အကယ်၍ (!PyArg_ParseTuple(args, "O", &string))
+	ပြန်ပေး NULL;
 
-    if (!(expr = StringToChars(string, &todecref)))
-	return NULL;
+    အကယ်၍ (!(expr = StringToChars(string, &todecref)))
+	ပြန်ပေး NULL;
 
     Py_BEGIN_ALLOW_THREADS
     Python_Lock_Vim();
@@ -1217,20 +1217,20 @@ VimEval(PyObject *self UNUSED, PyObject *args)
 
     Py_XDECREF(todecref);
 
-    if (VimTryEnd())
-	return NULL;
+    အကယ်၍ (VimTryEnd())
+	ပြန်ပေး NULL;
 
-    if (our_tv == NULL)
+    အကယ်၍ (our_tv == NULL)
     {
 	PyErr_SET_VIM(N_("invalid expression"));
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
     // Convert the Vim type into a Python type.  Create a dictionary that's
     // used to check for recursive loops.
-    if (!(lookup_dict = PyDict_New()))
+    အကယ်၍ (!(lookup_dict = PyDict_New()))
 	ret = NULL;
-    else
+    မဟုတ်ပါက
     {
 	ret = VimToPython(our_tv, 1, lookup_dict);
 	Py_DECREF(lookup_dict);
@@ -1243,7 +1243,7 @@ VimEval(PyObject *self UNUSED, PyObject *args)
     Python_Release_Vim();
     Py_END_ALLOW_THREADS
 
-    return ret;
+    ပြန်ပေး ret;
 }
 
 static PyObject *ConvertToPyObject(typval_T *);
@@ -1256,8 +1256,8 @@ VimEvalPy(PyObject *self UNUSED, PyObject *string)
     char_u	*expr;
     PyObject	*todecref;
 
-    if (!(expr = StringToChars(string, &todecref)))
-	return NULL;
+    အကယ်၍ (!(expr = StringToChars(string, &todecref)))
+	ပြန်ပေး NULL;
 
     Py_BEGIN_ALLOW_THREADS
     Python_Lock_Vim();
@@ -1268,13 +1268,13 @@ VimEvalPy(PyObject *self UNUSED, PyObject *string)
 
     Py_XDECREF(todecref);
 
-    if (VimTryEnd())
-	return NULL;
+    အကယ်၍ (VimTryEnd())
+	ပြန်ပေး NULL;
 
-    if (our_tv == NULL)
+    အကယ်၍ (our_tv == NULL)
     {
 	PyErr_SET_VIM(N_("invalid expression"));
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
     ret = ConvertToPyObject(our_tv);
@@ -1284,7 +1284,7 @@ VimEvalPy(PyObject *self UNUSED, PyObject *string)
     Python_Release_Vim();
     Py_END_ALLOW_THREADS
 
-    return ret;
+    ပြန်ပေး ret;
 }
 
     static PyObject *
@@ -1292,16 +1292,16 @@ VimStrwidth(PyObject *self UNUSED, PyObject *string)
 {
     char_u	*str;
     PyObject	*todecref;
-    int		len;
+    ကိန်းပြည့်		len;
 
-    if (!(str = StringToChars(string, &todecref)))
-	return NULL;
+    အကယ်၍ (!(str = StringToChars(string, &todecref)))
+	ပြန်ပေး NULL;
 
-    len = mb_string2cells(str, (int)STRLEN(str));
+    len = mb_string2cells(str, (ကိန်းပြည့်)STRLEN(str));
 
     Py_XDECREF(todecref);
 
-    return PyLong_FromLong(len);
+    ပြန်ပေး PyLong_FromLong(len);
 }
 
     static PyObject *
@@ -1312,37 +1312,37 @@ _VimChdir(PyObject *_chdir, PyObject *args, PyObject *kwargs)
     PyObject	*todecref;
     char_u	*new_dir;
 
-    if (_chdir == NULL)
-	return NULL;
-    if (!(ret = PyObject_Call(_chdir, args, kwargs)))
-	return NULL;
+    အကယ်၍ (_chdir == NULL)
+	ပြန်ပေး NULL;
+    အကယ်၍ (!(ret = PyObject_Call(_chdir, args, kwargs)))
+	ပြန်ပေး NULL;
 
-    if (!(newwd = PyObject_CallFunctionObjArgs(py_getcwd, NULL)))
+    အကယ်၍ (!(newwd = PyObject_CallFunctionObjArgs(py_getcwd, NULL)))
     {
 	Py_DECREF(ret);
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
-    if (!(new_dir = StringToChars(newwd, &todecref)))
+    အကယ်၍ (!(new_dir = StringToChars(newwd, &todecref)))
     {
 	Py_DECREF(ret);
 	Py_DECREF(newwd);
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
     VimTryStart();
 
-    if (vim_chdir(new_dir))
+    အကယ်၍ (vim_chdir(new_dir))
     {
 	Py_DECREF(ret);
 	Py_DECREF(newwd);
 	Py_XDECREF(todecref);
 
-	if (VimTryEnd())
-	    return NULL;
+	အကယ်၍ (VimTryEnd())
+	    ပြန်ပေး NULL;
 
 	PyErr_SET_VIM(N_("failed to change directory"));
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
     Py_DECREF(newwd);
@@ -1350,28 +1350,28 @@ _VimChdir(PyObject *_chdir, PyObject *args, PyObject *kwargs)
 
     post_chdir(CDSCOPE_GLOBAL);
 
-    if (VimTryEnd())
+    အကယ်၍ (VimTryEnd())
     {
 	Py_DECREF(ret);
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
-    return ret;
+    ပြန်ပေး ret;
 }
 
     static PyObject *
 VimChdir(PyObject *self UNUSED, PyObject *args, PyObject *kwargs)
 {
-    return _VimChdir(py_chdir, args, kwargs);
+    ပြန်ပေး _VimChdir(py_chdir, args, kwargs);
 }
 
     static PyObject *
 VimFchdir(PyObject *self UNUSED, PyObject *args, PyObject *kwargs)
 {
-    return _VimChdir(py_fchdir, args, kwargs);
+    ပြန်ပေး _VimChdir(py_fchdir, args, kwargs);
 }
 
-typedef struct {
+typedef sa_nracanaa {
     PyObject	*callable;
     PyObject	*result;
 } map_rtp_data;
@@ -1383,10 +1383,10 @@ map_rtp_callback(char_u *path, void *_data)
     PyObject	*pathObject;
     map_rtp_data	*mr_data = *((map_rtp_data **) data);
 
-    if (!(pathObject = PyString_FromString((char *)path)))
+    အကယ်၍ (!(pathObject = PyString_FromString((var_na *)path)))
     {
 	*data = NULL;
-	return;
+	ပြန်ပေး;
     }
 
     mr_data->result = PyObject_CallFunctionObjArgs(mr_data->callable,
@@ -1394,9 +1394,9 @@ map_rtp_callback(char_u *path, void *_data)
 
     Py_DECREF(pathObject);
 
-    if (!mr_data->result || mr_data->result != Py_None)
+    အကယ်၍ (!mr_data->result || mr_data->result != Py_None)
 	*data = NULL;
-    else
+    မဟုတ်ပါက
     {
 	Py_DECREF(mr_data->result);
 	mr_data->result = NULL;
@@ -1413,17 +1413,17 @@ VimForeachRTP(PyObject *self UNUSED, PyObject *callable)
 
     do_in_runtimepath(NULL, 0, &map_rtp_callback, &data);
 
-    if (data.result == NULL)
+    အကယ်၍ (data.result == NULL)
     {
-	if (PyErr_Occurred())
-	    return NULL;
-	else
+	အကယ်၍ (PyErr_Occurred())
+	    ပြန်ပေး NULL;
+	မဟုတ်ပါက
 	{
 	    Py_INCREF(Py_None);
-	    return Py_None;
+	    ပြန်ပေး Py_None;
 	}
     }
-    return data.result;
+    ပြန်ပေး data.result;
 }
 
 /*
@@ -1436,25 +1436,25 @@ map_finder_callback(char_u *path, void *_data)
     void	**data = (void **) _data;
     PyObject	*list = *((PyObject **) data);
     PyObject	*pathObject1, *pathObject2;
-    char	*pathbuf;
+    var_na	*pathbuf;
     size_t	pathlen;
 
     pathlen = STRLEN(path);
 
-#if PY_MAJOR_VERSION < 3
+#အကယ်၍ PY_MAJOR_VERSION < 3
 # define PY_MAIN_DIR_STRING "python2"
-#else
+#မဟုတ်ပါက
 # define PY_MAIN_DIR_STRING "python3"
 #endif
 #define PY_ALTERNATE_DIR_STRING "pythonx"
 
 #define PYTHONX_STRING_LENGTH 7 // STRLEN("pythonx")
-    if (!(pathbuf = PyMem_New(char,
+    အကယ်၍ (!(pathbuf = PyMem_New(var_na,
 		    pathlen + STRLEN(PATHSEPSTR) + PYTHONX_STRING_LENGTH + 1)))
     {
 	PyErr_NoMemory();
 	*data = NULL;
-	return;
+	ပြန်ပေး;
     }
 
     mch_memmove(pathbuf, path, pathlen + 1);
@@ -1464,27 +1464,27 @@ map_finder_callback(char_u *path, void *_data)
     mch_memmove(pathbuf + pathlen, PY_MAIN_DIR_STRING,
 	    PYTHONX_STRING_LENGTH + 1);
 
-    if (!(pathObject1 = PyString_FromString(pathbuf)))
+    အကယ်၍ (!(pathObject1 = PyString_FromString(pathbuf)))
     {
 	*data = NULL;
 	PyMem_Free(pathbuf);
-	return;
+	ပြန်ပေး;
     }
 
     mch_memmove(pathbuf + pathlen, PY_ALTERNATE_DIR_STRING,
 	    PYTHONX_STRING_LENGTH + 1);
 
-    if (!(pathObject2 = PyString_FromString(pathbuf)))
+    အကယ်၍ (!(pathObject2 = PyString_FromString(pathbuf)))
     {
 	Py_DECREF(pathObject1);
 	PyMem_Free(pathbuf);
 	*data = NULL;
-	return;
+	ပြန်ပေး;
     }
 
     PyMem_Free(pathbuf);
 
-    if (PyList_Append(list, pathObject1)
+    အကယ်၍ (PyList_Append(list, pathObject1)
 	    || PyList_Append(list, pathObject2))
 	*data = NULL;
 
@@ -1497,49 +1497,49 @@ Vim_GetPaths(PyObject *self UNUSED, PyObject *args UNUSED)
 {
     PyObject	*ret;
 
-    if (!(ret = PyList_New(0)))
-	return NULL;
+    အကယ်၍ (!(ret = PyList_New(0)))
+	ပြန်ပေး NULL;
 
     do_in_runtimepath(NULL, 0, &map_finder_callback, ret);
 
-    if (PyErr_Occurred())
+    အကယ်၍ (PyErr_Occurred())
     {
 	Py_DECREF(ret);
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
-    return ret;
+    ပြန်ပေး ret;
 }
 
-#if PY_VERSION_HEX >= 0x030700f0
+#အကယ်၍ PY_VERSION_HEX >= 0x030700f0
     static PyObject *
 FinderFindSpec(PyObject *self, PyObject *args)
 {
-    char	*fullname;
+    var_na	*fullname;
     PyObject	*paths;
     PyObject	*target = Py_None;
     PyObject	*spec;
 
-    if (!PyArg_ParseTuple(args, "s|O", &fullname, &target))
-	return NULL;
+    အကယ်၍ (!PyArg_ParseTuple(args, "s|O", &fullname, &target))
+	ပြန်ပေး NULL;
 
-    if (!(paths = Vim_GetPaths(self, NULL)))
-	return NULL;
+    အကယ်၍ (!(paths = Vim_GetPaths(self, NULL)))
+	ပြန်ပေး NULL;
 
     spec = PyObject_CallFunction(py_find_spec, "sOO", fullname, paths, target);
 
     Py_DECREF(paths);
 
-    if (!spec)
+    အကယ်၍ (!spec)
     {
-	if (PyErr_Occurred())
-	    return NULL;
+	အကယ်၍ (PyErr_Occurred())
+	    ပြန်ပေး NULL;
 
 	Py_INCREF(Py_None);
-	return Py_None;
+	ပြန်ပေး Py_None;
     }
 
-    return spec;
+    ပြန်ပေး spec;
 }
 
     static PyObject *
@@ -1547,82 +1547,82 @@ FinderFindModule(PyObject* self UNUSED, PyObject* args UNUSED)
 {
     // Apparently returning None works.
     Py_INCREF(Py_None);
-    return Py_None;
+    ပြန်ပေး Py_None;
 }
-#else
+#မဟုတ်ပါက
     static PyObject *
-call_load_module(char *name, int len, PyObject *find_module_result)
+call_load_module(var_na *name, ကိန်းပြည့် len, PyObject *find_module_result)
 {
     PyObject	*fd, *pathname, *description;
 
-    if (!PyTuple_Check(find_module_result))
+    အကယ်၍ (!PyTuple_Check(find_module_result))
     {
 	PyErr_FORMAT_TYPE(
 		N_("expected 3-tuple as imp.find_module() result, but got %s"),
 		find_module_result);
-	return NULL;
+	ပြန်ပေး NULL;
     }
-    if (PyTuple_GET_SIZE(find_module_result) != 3)
+    အကယ်၍ (PyTuple_GET_SIZE(find_module_result) != 3)
     {
 	PyErr_FORMAT(PyExc_TypeError,
 		N_("expected 3-tuple as imp.find_module() result, but got "
 		   "tuple of size %d"),
-		(int) PyTuple_GET_SIZE(find_module_result));
-	return NULL;
+		(ကိန်းပြည့်) PyTuple_GET_SIZE(find_module_result));
+	ပြန်ပေး NULL;
     }
 
-    if (!(fd = PyTuple_GET_ITEM(find_module_result, 0))
+    အကယ်၍ (!(fd = PyTuple_GET_ITEM(find_module_result, 0))
 	    || !(pathname = PyTuple_GET_ITEM(find_module_result, 1))
 	    || !(description = PyTuple_GET_ITEM(find_module_result, 2)))
     {
 	PyErr_SET_STRING(PyExc_RuntimeError,
 		N_("internal error: imp.find_module returned tuple with NULL"));
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
-    return PyObject_CallFunction(py_load_module,
+    ပြန်ပေး PyObject_CallFunction(py_load_module,
 	    "s#OOO", name, len, fd, pathname, description);
 }
 
     static PyObject *
-find_module(char *fullname, char *tail, PyObject *new_path)
+find_module(var_na *fullname, var_na *tail, PyObject *new_path)
 {
     PyObject	*find_module_result;
     PyObject	*module;
-    char	*dot;
+    var_na	*dot;
 
-    if ((dot = (char *)vim_strchr((char_u *) tail, '.')))
+    အကယ်၍ ((dot = (var_na *)vim_strchr((char_u *) tail, '.')))
     {
 	/*
 	 * There is a dot in the name: call find_module recursively without the
 	 * first component
 	 */
 	PyObject	*newest_path;
-	int		partlen = (int) (dot - 1 - tail);
+	ကိန်းပြည့်		partlen = (ကိန်းပြည့်) (dot - 1 - tail);
 
-	if (!(find_module_result = PyObject_CallFunction(py_find_module,
+	အကယ်၍ (!(find_module_result = PyObject_CallFunction(py_find_module,
 			"s#O", tail, partlen, new_path)))
 	{
-	    if (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_ImportError))
+	    အကယ်၍ (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_ImportError))
 		PyErr_Clear();
-	    return NULL;
+	    ပြန်ပေး NULL;
 	}
 
-	if (!(module = call_load_module(
+	အကယ်၍ (!(module = call_load_module(
 			fullname,
-			((int) (tail - fullname)) + partlen,
+			((ကိန်းပြည့်) (tail - fullname)) + partlen,
 			find_module_result)))
 	{
 	    Py_DECREF(find_module_result);
-	    return NULL;
+	    ပြန်ပေး NULL;
 	}
 
 	Py_DECREF(find_module_result);
 
-	if (!(newest_path = PyObject_GetAttrString(module, "__path__")))
+	အကယ်၍ (!(newest_path = PyObject_GetAttrString(module, "__path__")))
 	{
 	    Py_DECREF(module);
-	    return NULL;
+	    ပြန်ပေး NULL;
 	}
 
 	Py_DECREF(module);
@@ -1631,92 +1631,92 @@ find_module(char *fullname, char *tail, PyObject *new_path)
 
 	Py_DECREF(newest_path);
 
-	return find_module_result;
+	ပြန်ပေး find_module_result;
     }
-    else
+    မဟုတ်ပါက
     {
-	if (!(find_module_result = PyObject_CallFunction(py_find_module,
+	အကယ်၍ (!(find_module_result = PyObject_CallFunction(py_find_module,
 			"sO", tail, new_path)))
 	{
-	    if (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_ImportError))
+	    အကယ်၍ (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_ImportError))
 		PyErr_Clear();
-	    return NULL;
+	    ပြန်ပေး NULL;
 	}
 
-	return find_module_result;
+	ပြန်ပေး find_module_result;
     }
 }
 
     static PyObject *
 FinderFindModule(PyObject *self, PyObject *args)
 {
-    char	*fullname;
+    var_na	*fullname;
     PyObject	*result;
     PyObject	*new_path;
     LoaderObject	*loader;
 
-    if (!PyArg_ParseTuple(args, "s", &fullname))
-	return NULL;
+    အကယ်၍ (!PyArg_ParseTuple(args, "s", &fullname))
+	ပြန်ပေး NULL;
 
-    if (!(new_path = Vim_GetPaths(self, NULL)))
-	return NULL;
+    အကယ်၍ (!(new_path = Vim_GetPaths(self, NULL)))
+	ပြန်ပေး NULL;
 
     result = find_module(fullname, fullname, new_path);
 
     Py_DECREF(new_path);
 
-    if (!result)
+    အကယ်၍ (!result)
     {
-	if (PyErr_Occurred())
-	    return NULL;
+	အကယ်၍ (PyErr_Occurred())
+	    ပြန်ပေး NULL;
 
 	Py_INCREF(Py_None);
-	return Py_None;
+	ပြန်ပေး Py_None;
     }
 
-    if (!(fullname = (char *)vim_strsave((char_u *)fullname)))
+    အကယ်၍ (!(fullname = (var_na *)vim_strsave((char_u *)fullname)))
     {
 	Py_DECREF(result);
 	PyErr_NoMemory();
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
-    if (!(loader = PyObject_NEW(LoaderObject, LoaderTypePtr)))
+    အကယ်၍ (!(loader = PyObject_NEW(LoaderObject, LoaderTypePtr)))
     {
 	vim_free(fullname);
 	Py_DECREF(result);
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
     loader->fullname = fullname;
     loader->result = result;
 
-    return (PyObject *) loader;
+    ပြန်ပေး (PyObject *) loader;
 }
 #endif
 
     static PyObject *
 VimPathHook(PyObject *self UNUSED, PyObject *args)
 {
-    char	*path;
+    var_na	*path;
 
-    if (PyArg_ParseTuple(args, "s", &path)
+    အကယ်၍ (PyArg_ParseTuple(args, "s", &path)
 	    && STRCMP(path, vim_special_path) == 0)
     {
 	Py_INCREF(vim_module);
-	return vim_module;
+	ပြန်ပေး vim_module;
     }
 
     PyErr_Clear();
     PyErr_SetNone(PyExc_ImportError);
-    return NULL;
+    ပြန်ပေး NULL;
 }
 
 /*
  * Vim module - Definitions
  */
 
-static struct PyMethodDef VimMethods[] = {
+static sa_nracanaa PyMethodDef VimMethods[] = {
     // name,	    function,			calling,			documentation
     {"command",	    VimCommand,			METH_O,				"Execute a Vim ex-mode command" },
     {"eval",	    VimEval,			METH_VARARGS,			"Evaluate an expression using Vim evaluator" },
@@ -1725,7 +1725,7 @@ static struct PyMethodDef VimMethods[] = {
     {"chdir",	    (PyCFunction)(void *)VimChdir,	METH_VARARGS|METH_KEYWORDS,	"Change directory"},
     {"fchdir",	    (PyCFunction)(void *)VimFchdir,	METH_VARARGS|METH_KEYWORDS,	"Change directory"},
     {"foreach_rtp", VimForeachRTP,		METH_O,				"Call given callable for each path in &rtp"},
-#if PY_VERSION_HEX >= 0x030700f0
+#အကယ်၍ PY_VERSION_HEX >= 0x030700f0
     {"find_spec",   FinderFindSpec,		METH_VARARGS,			"Internal use only, returns spec object for any input it receives"},
 #endif
     {"find_module", FinderFindModule,		METH_VARARGS,			"Internal use only, returns loader object for any input it receives"},
@@ -1742,13 +1742,13 @@ DEFINE_PY_TYPE_OBJECT(IterType);
 
 typedef PyObject *(*nextfun)(void **);
 typedef void (*destructorfun)(void *);
-typedef int (*traversefun)(void *, visitproc, void *);
-typedef int (*clearfun)(void **);
+typedef ကိန်းပြည့် (*traversefun)(void *, visitproc, void *);
+typedef ကိန်းပြည့် (*clearfun)(void **);
 
 // Main purpose of this object is removing the need for do python
 // initialization (i.e. PyType_Ready and setting type attributes) for a big
 // bunch of objects.
-typedef struct
+typedef sa_nracanaa
 {
     PyObject_HEAD
     void *cur;
@@ -1773,31 +1773,31 @@ IterNew(void *start, destructorfun destruct, nextfun next, traversefun traverse,
     self->clear = clear;
     self->iter_object = iter_object;
 
-    if (iter_object)
+    အကယ်၍ (iter_object)
 	Py_INCREF(iter_object);
 
-    return (PyObject *)(self);
+    ပြန်ပေး (PyObject *)(self);
 }
 
     static void
 IterDestructor(PyObject *self_obj)
 {
     IterObject *self = (IterObject*)self_obj;
-    if (self->iter_object)
+    အကယ်၍ (self->iter_object)
 	Py_DECREF(self->iter_object);
     PyObject_GC_UnTrack((void *)(self));
     self->destruct(self->cur);
     PyObject_GC_Del((void *)(self));
 }
 
-    static int
+    static ကိန်းပြည့်
 IterTraverse(PyObject *self_obj, visitproc visit, void *arg)
 {
     IterObject *self = (IterObject*)self_obj;
-    if (self->traverse != NULL)
-	return self->traverse(self->cur, visit, arg);
-    else
-	return 0;
+    အကယ်၍ (self->traverse != NULL)
+	ပြန်ပေး self->traverse(self->cur, visit, arg);
+    မဟုတ်ပါက
+	ပြန်ပေး 0;
 }
 
 // Mac OSX defines clear() somewhere.
@@ -1805,33 +1805,33 @@ IterTraverse(PyObject *self_obj, visitproc visit, void *arg)
 # undef clear
 #endif
 
-    static int
+    static ကိန်းပြည့်
 IterClear(PyObject *self_obj)
 {
     IterObject *self = (IterObject*)self_obj;
-    if (self->clear != NULL)
-	return self->clear(&self->cur);
-    else
-	return 0;
+    အကယ်၍ (self->clear != NULL)
+	ပြန်ပေး self->clear(&self->cur);
+    မဟုတ်ပါက
+	ပြန်ပေး 0;
 }
 
     static PyObject *
 IterNext(PyObject *self_obj)
 {
     IterObject *self = (IterObject*)self_obj;
-    return self->next(&self->cur);
+    ပြန်ပေး self->next(&self->cur);
 }
 
     static PyObject *
 IterIter(PyObject *self)
 {
     Py_INCREF(self);
-    return self;
+    ပြန်ပေး self;
 }
 
-typedef struct pylinkedlist_S {
-    struct pylinkedlist_S	*pll_next;
-    struct pylinkedlist_S	*pll_prev;
+typedef sa_nracanaa pylinkedlist_S {
+    sa_nracanaa pylinkedlist_S	*pll_next;
+    sa_nracanaa pylinkedlist_S	*pll_prev;
     PyObject			*pll_obj;
 } pylinkedlist_T;
 
@@ -1843,29 +1843,29 @@ static pylinkedlist_T *lastfunc = NULL;
     static void
 pyll_remove(pylinkedlist_T *ref, pylinkedlist_T **last)
 {
-    if (ref->pll_prev == NULL)
+    အကယ်၍ (ref->pll_prev == NULL)
     {
-	if (ref->pll_next == NULL)
+	အကယ်၍ (ref->pll_next == NULL)
 	{
 	    *last = NULL;
-	    return;
+	    ပြန်ပေး;
 	}
     }
-    else
+    မဟုတ်ပါက
 	ref->pll_prev->pll_next = ref->pll_next;
 
-    if (ref->pll_next == NULL)
+    အကယ်၍ (ref->pll_next == NULL)
 	*last = ref->pll_prev;
-    else
+    မဟုတ်ပါက
 	ref->pll_next->pll_prev = ref->pll_prev;
 }
 
     static void
 pyll_add(PyObject *self, pylinkedlist_T *ref, pylinkedlist_T **last)
 {
-    if (*last == NULL)
+    အကယ်၍ (*last == NULL)
 	ref->pll_prev = NULL;
-    else
+    မဟုတ်ပါက
     {
 	(*last)->pll_next = ref;
 	ref->pll_prev = *last;
@@ -1877,7 +1877,7 @@ pyll_add(PyObject *self, pylinkedlist_T *ref, pylinkedlist_T **last)
 
 DEFINE_PY_TYPE_OBJECT(DictionaryType);
 
-typedef struct
+typedef sa_nracanaa
 {
     PyObject_HEAD
     dict_T	*dict;
@@ -1894,14 +1894,14 @@ DictionaryNew(PyTypeObject *subtype, dict_T *dict)
     DictionaryObject	*self;
 
     self = (DictionaryObject *) Py_TYPE_GET_TP_ALLOC(subtype)(subtype, 0);
-    if (self == NULL)
-	return NULL;
+    အကယ်၍ (self == NULL)
+	ပြန်ပေး NULL;
     self->dict = dict;
     ++dict->dv_refcount;
 
     pyll_add((PyObject *)(self), &self->ref, &lastdict);
 
-    return (PyObject *)(self);
+    ပြန်ပေး (PyObject *)(self);
 }
 
     static dict_T *
@@ -1909,14 +1909,14 @@ py_dict_alloc(void)
 {
     dict_T	*ret;
 
-    if (!(ret = dict_alloc()))
+    အကယ်၍ (!(ret = dict_alloc()))
     {
 	PyErr_NoMemory();
-	return NULL;
+	ပြန်ပေး NULL;
     }
     ++ret->dv_refcount;
 
-    return ret;
+    ပြန်ပေး ret;
 }
 
     static PyObject *
@@ -1925,26 +1925,26 @@ DictionaryConstructor(PyTypeObject *subtype, PyObject *args, PyObject *kwargs)
     DictionaryObject	*self;
     dict_T	*dict;
 
-    if (!(dict = py_dict_alloc()))
-	return NULL;
+    အကယ်၍ (!(dict = py_dict_alloc()))
+	ပြန်ပေး NULL;
 
     self = (DictionaryObject *) DictionaryNew(subtype, dict);
 
     --dict->dv_refcount;
 
-    if (kwargs || PyTuple_Size(args))
+    အကယ်၍ (kwargs || PyTuple_Size(args))
     {
 	PyObject	*tmp;
-	if (!(tmp = DictionaryUpdate(self, args, kwargs)))
+	အကယ်၍ (!(tmp = DictionaryUpdate(self, args, kwargs)))
 	{
 	    Py_DECREF(self);
-	    return NULL;
+	    ပြန်ပေး NULL;
 	}
 
 	Py_DECREF(tmp);
     }
 
-    return (PyObject *)(self);
+    ပြန်ပေး (PyObject *)(self);
 }
 
     static void
@@ -1957,7 +1957,7 @@ DictionaryDestructor(PyObject *self_obj)
     DESTRUCTOR_FINISH(self);
 }
 
-static char *DictionaryAttrs[] = {
+static var_na *DictionaryAttrs[] = {
     "locked", "scope",
     NULL
 };
@@ -1965,51 +1965,51 @@ static char *DictionaryAttrs[] = {
     static PyObject *
 DictionaryDir(PyObject *self, PyObject *args UNUSED)
 {
-    return ObjectDir(self, DictionaryAttrs);
+    ပြန်ပေး ObjectDir(self, DictionaryAttrs);
 }
 
-    static int
-DictionarySetattr(PyObject *self_obj, char *name, PyObject *valObject)
+    static ကိန်းပြည့်
+DictionarySetattr(PyObject *self_obj, var_na *name, PyObject *valObject)
 {
     DictionaryObject *self = (DictionaryObject*)self_obj;
-    if (valObject == NULL)
+    အကယ်၍ (valObject == NULL)
     {
 	PyErr_SET_STRING(PyExc_AttributeError,
 		N_("cannot delete vim.Dictionary attributes"));
-	return -1;
+	ပြန်ပေး -1;
     }
 
-    if (strcmp(name, "locked") == 0)
+    အကယ်၍ (strcmp(name, "locked") == 0)
     {
-	if (self->dict->dv_lock == VAR_FIXED)
+	အကယ်၍ (self->dict->dv_lock == VAR_FIXED)
 	{
 	    PyErr_SET_STRING(PyExc_TypeError,
 		    N_("cannot modify fixed dictionary"));
-	    return -1;
+	    ပြန်ပေး -1;
 	}
-	else
+	မဟုတ်ပါက
 	{
-	    int		istrue = PyObject_IsTrue(valObject);
-	    if (istrue == -1)
-		return -1;
-	    else if (istrue)
+	    ကိန်းပြည့်		istrue = PyObject_IsTrue(valObject);
+	    အကယ်၍ (istrue == -1)
+		ပြန်ပေး -1;
+	    မဟုတ်ပါက အကယ်၍ (istrue)
 		self->dict->dv_lock = VAR_LOCKED;
-	    else
+	    မဟုတ်ပါက
 		self->dict->dv_lock = 0;
 	}
-	return 0;
+	ပြန်ပေး 0;
     }
-    else
+    မဟုတ်ပါက
     {
 	PyErr_FORMAT(PyExc_AttributeError, N_("cannot set attribute %s"), name);
-	return -1;
+	ပြန်ပေး -1;
     }
 }
 
     static PyInt
 DictionaryLength(DictionaryObject *self)
 {
-    return ((PyInt) (self->dict->dv_hashtab.ht_used));
+    ပြန်ပေး ((PyInt) (self->dict->dv_hashtab.ht_used));
 }
 
 #define DICT_FLAG_HAS_DEFAULT	0x01
@@ -2019,7 +2019,7 @@ DictionaryLength(DictionaryObject *self)
 #define DICT_FLAG_RETURN_PAIR	0x10
 
     static PyObject *
-_DictionaryItem(DictionaryObject *self, PyObject *args, int flags)
+_DictionaryItem(DictionaryObject *self, PyObject *args, ကိန်းပြည့် flags)
 {
     PyObject	*keyObject;
     PyObject	*defObject = ((flags & DICT_FLAG_NONE_DEFAULT)? Py_None : NULL);
@@ -2030,97 +2030,97 @@ _DictionaryItem(DictionaryObject *self, PyObject *args, int flags)
     hashitem_T	*hi;
     PyObject	*todecref;
 
-    if (flags & DICT_FLAG_HAS_DEFAULT)
+    အကယ်၍ (flags & DICT_FLAG_HAS_DEFAULT)
     {
-	if (!PyArg_ParseTuple(args, "O|O", &keyObject, &defObject))
-	    return NULL;
+	အကယ်၍ (!PyArg_ParseTuple(args, "O|O", &keyObject, &defObject))
+	    ပြန်ပေး NULL;
     }
-    else
+    မဟုတ်ပါက
 	keyObject = args;
 
-    if (flags & DICT_FLAG_RETURN_BOOL)
+    အကယ်၍ (flags & DICT_FLAG_RETURN_BOOL)
 	defObject = Py_False;
 
-    if (!(key = StringToChars(keyObject, &todecref)))
-	return NULL;
+    အကယ်၍ (!(key = StringToChars(keyObject, &todecref)))
+	ပြန်ပေး NULL;
 
-    if (*key == NUL)
+    အကယ်၍ (*key == NUL)
     {
 	RAISE_NO_EMPTY_KEYS;
 	Py_XDECREF(todecref);
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
     hi = hash_find(&dict->dv_hashtab, key);
 
     Py_XDECREF(todecref);
 
-    if (HASHITEM_EMPTY(hi))
+    အကယ်၍ (HASHITEM_EMPTY(hi))
     {
-	if (defObject)
+	အကယ်၍ (defObject)
 	{
 	    Py_INCREF(defObject);
-	    return defObject;
+	    ပြန်ပေး defObject;
 	}
-	else
+	မဟုတ်ပါက
 	{
 	    PyErr_SetObject(PyExc_KeyError, keyObject);
-	    return NULL;
+	    ပြန်ပေး NULL;
 	}
     }
-    else if (flags & DICT_FLAG_RETURN_BOOL)
+    မဟုတ်ပါက အကယ်၍ (flags & DICT_FLAG_RETURN_BOOL)
     {
 	ret = Py_True;
 	Py_INCREF(ret);
-	return ret;
+	ပြန်ပေး ret;
     }
 
     di = dict_lookup(hi);
 
-    if (!(ret = ConvertToPyObject(&di->di_tv)))
-	return NULL;
+    အကယ်၍ (!(ret = ConvertToPyObject(&di->di_tv)))
+	ပြန်ပေး NULL;
 
-    if (flags & DICT_FLAG_POP)
+    အကယ်၍ (flags & DICT_FLAG_POP)
     {
-	if (dict->dv_lock)
+	အကယ်၍ (dict->dv_lock)
 	{
 	    RAISE_LOCKED_DICTIONARY;
 	    Py_DECREF(ret);
-	    return NULL;
+	    ပြန်ပေး NULL;
 	}
 
 	hash_remove(&dict->dv_hashtab, hi, "Python remove variable");
 	dictitem_free(di);
     }
 
-    return ret;
+    ပြန်ပေး ret;
 }
 
     static PyObject *
 DictionaryItem(DictionaryObject *self, PyObject *keyObject)
 {
-    return _DictionaryItem(self, keyObject, 0);
+    ပြန်ပေး _DictionaryItem(self, keyObject, 0);
 }
 
-    static int
+    static ကိန်းပြည့်
 DictionaryContains(DictionaryObject *self, PyObject *keyObject)
 {
     PyObject	*rObj = _DictionaryItem(self, keyObject, DICT_FLAG_RETURN_BOOL);
-    int		ret;
+    ကိန်းပြည့်		ret;
 
-    if (rObj == NULL)
-	return -1;
+    အကယ်၍ (rObj == NULL)
+	ပြန်ပေး -1;
 
     ret = (rObj == Py_True);
 
     Py_DECREF(rObj);
 
-    return ret;
+    ပြန်ပေး ret;
 }
 
-typedef struct
+typedef sa_nracanaa
 {
-    int		dii_changed;
+    ကိန်းပြည့်		dii_changed;
     hashtab_T	*dii_ht;
     hashitem_T	*dii_hi;
     long_u	dii_todo;
@@ -2132,25 +2132,25 @@ DictionaryIterNext(void **arg)
     PyObject	*ret;
     dictiterinfo_T **dii = (dictiterinfo_T**)arg;
 
-    if (!(*dii)->dii_todo)
-	return NULL;
+    အကယ်၍ (!(*dii)->dii_todo)
+	ပြန်ပေး NULL;
 
-    if ((*dii)->dii_ht->ht_changed != (*dii)->dii_changed)
+    အကယ်၍ ((*dii)->dii_ht->ht_changed != (*dii)->dii_changed)
     {
 	PyErr_SET_STRING(PyExc_RuntimeError,
 		N_("hashtab changed during iteration"));
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
-    while (((*dii)->dii_todo) && HASHITEM_EMPTY((*dii)->dii_hi))
+    နေစဉ် (((*dii)->dii_todo) && HASHITEM_EMPTY((*dii)->dii_hi))
 	++((*dii)->dii_hi);
 
     --((*dii)->dii_todo);
 
-    if (!(ret = PyBytes_FromString((char *)(*dii)->dii_hi->hi_key)))
-	return NULL;
+    အကယ်၍ (!(ret = PyBytes_FromString((var_na *)(*dii)->dii_hi->hi_key)))
+	ပြန်ပေး NULL;
 
-    return ret;
+    ပြန်ပေး ret;
 }
 
     static PyObject *
@@ -2160,10 +2160,10 @@ DictionaryIter(PyObject *self_obj)
     dictiterinfo_T	*dii;
     hashtab_T		*ht;
 
-    if (!(dii = PyMem_New(dictiterinfo_T, 1)))
+    အကယ်၍ (!(dii = PyMem_New(dictiterinfo_T, 1)))
     {
 	PyErr_NoMemory();
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
     ht = &self->dict->dv_hashtab;
@@ -2172,12 +2172,12 @@ DictionaryIter(PyObject *self_obj)
     dii->dii_hi = ht->ht_array;
     dii->dii_todo = ht->ht_used;
 
-    return IterNew(dii,
+    ပြန်ပေး IterNew(dii,
 	    PyMem_Free, DictionaryIterNext,
 	    NULL, NULL, (PyObject *)self);
 }
 
-    static int
+    static ကိန်းပြည့်
 DictionaryAssItem(
 	DictionaryObject *self, PyObject *keyObject, PyObject *valObject)
 {
@@ -2187,73 +2187,73 @@ DictionaryAssItem(
     dictitem_T	*di;
     PyObject	*todecref;
 
-    if (dict->dv_lock)
+    အကယ်၍ (dict->dv_lock)
     {
 	RAISE_LOCKED_DICTIONARY;
-	return -1;
+	ပြန်ပေး -1;
     }
 
-    if (!(key = StringToChars(keyObject, &todecref)))
-	return -1;
+    အကယ်၍ (!(key = StringToChars(keyObject, &todecref)))
+	ပြန်ပေး -1;
 
-    if (*key == NUL)
+    အကယ်၍ (*key == NUL)
     {
 	RAISE_NO_EMPTY_KEYS;
 	Py_XDECREF(todecref);
-	return -1;
+	ပြန်ပေး -1;
     }
 
     di = dict_find(dict, key, -1);
 
-    if (valObject == NULL)
+    အကယ်၍ (valObject == NULL)
     {
 	hashitem_T	*hi;
 
-	if (di == NULL)
+	အကယ်၍ (di == NULL)
 	{
 	    Py_XDECREF(todecref);
 	    PyErr_SetObject(PyExc_KeyError, keyObject);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 	hi = hash_find(&dict->dv_hashtab, di->di_key);
 	hash_remove(&dict->dv_hashtab, hi, "Python remove item");
 	dictitem_free(di);
 	Py_XDECREF(todecref);
-	return 0;
+	ပြန်ပေး 0;
     }
 
-    if (ConvertFromPyObject(valObject, &tv) == -1)
+    အကယ်၍ (ConvertFromPyObject(valObject, &tv) == -1)
     {
 	Py_XDECREF(todecref);
-	return -1;
+	ပြန်ပေး -1;
     }
 
-    if (di == NULL)
+    အကယ်၍ (di == NULL)
     {
-	if (!(di = dictitem_alloc(key)))
+	အကယ်၍ (!(di = dictitem_alloc(key)))
 	{
 	    Py_XDECREF(todecref);
 	    PyErr_NoMemory();
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 	di->di_tv.v_type = VAR_UNKNOWN;
 
-	if (dict_add(dict, di) == FAIL)
+	အကယ်၍ (dict_add(dict, di) == FAIL)
 	{
 	    dictitem_free(di);
 	    RAISE_KEY_ADD_FAIL(key);
 	    Py_XDECREF(todecref);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
     }
-    else
+    မဟုတ်ပါက
 	clear_tv(&di->di_tv);
 
     Py_XDECREF(todecref);
 
     copy_tv(&tv, &di->di_tv);
     clear_tv(&tv);
-    return 0;
+    ပြန်ပေး 0;
 }
 
 typedef PyObject *(*hi_to_py)(hashitem_T *);
@@ -2269,33 +2269,33 @@ DictionaryListObjects(DictionaryObject *self, hi_to_py hiconvert)
     PyObject	*newObj;
 
     ret = PyList_New(todo);
-    for (hi = dict->dv_hashtab.ht_array; todo > 0; ++hi)
+    အတွက် (hi = dict->dv_hashtab.ht_array; todo > 0; ++hi)
     {
-	if (!HASHITEM_EMPTY(hi))
+	အကယ်၍ (!HASHITEM_EMPTY(hi))
 	{
-	    if (!(newObj = hiconvert(hi)))
+	    အကယ်၍ (!(newObj = hiconvert(hi)))
 	    {
 		Py_DECREF(ret);
-		return NULL;
+		ပြန်ပေး NULL;
 	    }
 	    PyList_SET_ITEM(ret, i, newObj);
 	    --todo;
 	    ++i;
 	}
     }
-    return ret;
+    ပြန်ပေး ret;
 }
 
     static PyObject *
 dict_key(hashitem_T *hi)
 {
-    return PyBytes_FromString((char *)(hi->hi_key));
+    ပြန်ပေး PyBytes_FromString((var_na *)(hi->hi_key));
 }
 
     static PyObject *
 DictionaryListKeys(DictionaryObject *self, PyObject *args UNUSED)
 {
-    return DictionaryListObjects(self, dict_key);
+    ပြန်ပေး DictionaryListObjects(self, dict_key);
 }
 
     static PyObject *
@@ -2304,13 +2304,13 @@ dict_val(hashitem_T *hi)
     dictitem_T	*di;
 
     di = dict_lookup(hi);
-    return ConvertToPyObject(&di->di_tv);
+    ပြန်ပေး ConvertToPyObject(&di->di_tv);
 }
 
     static PyObject *
 DictionaryListValues(DictionaryObject *self, PyObject *args UNUSED)
 {
-    return DictionaryListObjects(self, dict_val);
+    ပြန်ပေး DictionaryListObjects(self, dict_val);
 }
 
     static PyObject *
@@ -2320,13 +2320,13 @@ dict_item(hashitem_T *hi)
     PyObject	*valObject;
     PyObject	*ret;
 
-    if (!(keyObject = dict_key(hi)))
-	return NULL;
+    အကယ်၍ (!(keyObject = dict_key(hi)))
+	ပြန်ပေး NULL;
 
-    if (!(valObject = dict_val(hi)))
+    အကယ်၍ (!(valObject = dict_val(hi)))
     {
 	Py_DECREF(keyObject);
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
     ret = Py_BuildValue("(OO)", keyObject, valObject);
@@ -2334,13 +2334,13 @@ dict_item(hashitem_T *hi)
     Py_DECREF(keyObject);
     Py_DECREF(valObject);
 
-    return ret;
+    ပြန်ပေး ret;
 }
 
     static PyObject *
 DictionaryListItems(DictionaryObject *self, PyObject *args UNUSED)
 {
-    return DictionaryListObjects(self, dict_item);
+    ပြန်ပေး DictionaryListObjects(self, dict_item);
 }
 
     static PyObject *
@@ -2348,49 +2348,49 @@ DictionaryUpdate(DictionaryObject *self, PyObject *args, PyObject *kwargs)
 {
     dict_T	*dict = self->dict;
 
-    if (dict->dv_lock)
+    အကယ်၍ (dict->dv_lock)
     {
 	RAISE_LOCKED_DICTIONARY;
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
-    if (kwargs)
+    အကယ်၍ (kwargs)
     {
 	typval_T	tv;
 
-	if (ConvertFromPyMapping(kwargs, &tv) == -1)
-	    return NULL;
+	အကယ်၍ (ConvertFromPyMapping(kwargs, &tv) == -1)
+	    ပြန်ပေး NULL;
 
 	VimTryStart();
 	dict_extend(self->dict, tv.vval.v_dict, (char_u *) "force", NULL);
 	clear_tv(&tv);
-	if (VimTryEnd())
-	    return NULL;
+	အကယ်၍ (VimTryEnd())
+	    ပြန်ပေး NULL;
     }
-    else
+    မဟုတ်ပါက
     {
 	PyObject	*obj = NULL;
 
-	if (!PyArg_ParseTuple(args, "|O", &obj))
-	    return NULL;
+	အကယ်၍ (!PyArg_ParseTuple(args, "|O", &obj))
+	    ပြန်ပေး NULL;
 
-	if (obj == NULL)
+	အကယ်၍ (obj == NULL)
 	{
 	    Py_INCREF(Py_None);
-	    return Py_None;
+	    ပြန်ပေး Py_None;
 	}
 
-	if (PyObject_HasAttrString(obj, "keys"))
-	    return DictionaryUpdate(self, NULL, obj);
-	else
+	အကယ်၍ (PyObject_HasAttrString(obj, "keys"))
+	    ပြန်ပေး DictionaryUpdate(self, NULL, obj);
+	မဟုတ်ပါက
 	{
 	    PyObject	*iterator;
 	    PyObject	*item;
 
-	    if (!(iterator = PyObject_GetIter(obj)))
-		return NULL;
+	    အကယ်၍ (!(iterator = PyObject_GetIter(obj)))
+		ပြန်ပေး NULL;
 
-	    while ((item = PyIter_Next(iterator)))
+	    နေစဉ် ((item = PyIter_Next(iterator)))
 	    {
 		PyObject	*fast;
 		PyObject	*keyObject;
@@ -2400,92 +2400,92 @@ DictionaryUpdate(DictionaryObject *self, PyObject *args, PyObject *kwargs)
 		dictitem_T	*di;
 		hashitem_T	*hi;
 
-		if (!(fast = PySequence_Fast(item, "")))
+		အကယ်၍ (!(fast = PySequence_Fast(item, "")))
 		{
 		    Py_DECREF(iterator);
 		    Py_DECREF(item);
-		    return NULL;
+		    ပြန်ပေး NULL;
 		}
 
 		Py_DECREF(item);
 
-		if (PySequence_Size(fast) != 2)
+		အကယ်၍ (PySequence_Size(fast) != 2)
 		{
 		    Py_DECREF(iterator);
 		    Py_DECREF(fast);
 		    PyErr_FORMAT(PyExc_ValueError,
 			    N_("expected sequence element of size 2, "
 			    "but got sequence of size %d"),
-			    (int) PySequence_Size(fast));
-		    return NULL;
+			    (ကိန်းပြည့်) PySequence_Size(fast));
+		    ပြန်ပေး NULL;
 		}
 
 		keyObject = PySequence_GetItem(fast, 0);
 
-		if (!(key = StringToChars(keyObject, &todecref)))
+		အကယ်၍ (!(key = StringToChars(keyObject, &todecref)))
 		{
 		    Py_DECREF(iterator);
 		    Py_DECREF(fast);
-		    return NULL;
+		    ပြန်ပေး NULL;
 		}
 
 		di = dictitem_alloc(key);
 
 		Py_XDECREF(todecref);
 
-		if (di == NULL)
+		အကယ်၍ (di == NULL)
 		{
 		    Py_DECREF(fast);
 		    Py_DECREF(iterator);
 		    PyErr_NoMemory();
-		    return NULL;
+		    ပြန်ပေး NULL;
 		}
 		di->di_tv.v_type = VAR_UNKNOWN;
 
 		valObject = PySequence_GetItem(fast, 1);
 
-		if (ConvertFromPyObject(valObject, &di->di_tv) == -1)
+		အကယ်၍ (ConvertFromPyObject(valObject, &di->di_tv) == -1)
 		{
 		    Py_DECREF(iterator);
 		    Py_DECREF(fast);
 		    dictitem_free(di);
-		    return NULL;
+		    ပြန်ပေး NULL;
 		}
 
 		Py_DECREF(fast);
 
 		hi = hash_find(&dict->dv_hashtab, di->di_key);
-		if (!HASHITEM_EMPTY(hi) || dict_add(dict, di) == FAIL)
+		အကယ်၍ (!HASHITEM_EMPTY(hi) || dict_add(dict, di) == FAIL)
 		{
 		    RAISE_KEY_ADD_FAIL(di->di_key);
 		    Py_DECREF(iterator);
 		    dictitem_free(di);
-		    return NULL;
+		    ပြန်ပေး NULL;
 		}
 	    }
 
 	    Py_DECREF(iterator);
 
 	    // Iterator may have finished due to an exception
-	    if (PyErr_Occurred())
-		return NULL;
+	    အကယ်၍ (PyErr_Occurred())
+		ပြန်ပေး NULL;
 	}
     }
     Py_INCREF(Py_None);
-    return Py_None;
+    ပြန်ပေး Py_None;
 }
 
     static PyObject *
 DictionaryGet(DictionaryObject *self, PyObject *args)
 {
-    return _DictionaryItem(self, args,
+    ပြန်ပေး _DictionaryItem(self, args,
 			    DICT_FLAG_HAS_DEFAULT|DICT_FLAG_NONE_DEFAULT);
 }
 
     static PyObject *
 DictionaryPop(DictionaryObject *self, PyObject *args)
 {
-    return _DictionaryItem(self, args, DICT_FLAG_HAS_DEFAULT|DICT_FLAG_POP);
+    ပြန်ပေး _DictionaryItem(self, args, DICT_FLAG_HAS_DEFAULT|DICT_FLAG_POP);
 }
 
     static PyObject *
@@ -2496,37 +2496,37 @@ DictionaryPopItem(DictionaryObject *self, PyObject *args UNUSED)
     PyObject	*valObject;
     dictitem_T	*di;
 
-    if (self->dict->dv_hashtab.ht_used == 0)
+    အကယ်၍ (self->dict->dv_hashtab.ht_used == 0)
     {
 	PyErr_SetNone(PyExc_KeyError);
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
     hi = self->dict->dv_hashtab.ht_array;
-    while (HASHITEM_EMPTY(hi))
+    နေစဉ် (HASHITEM_EMPTY(hi))
 	++hi;
 
     di = dict_lookup(hi);
 
-    if (!(valObject = ConvertToPyObject(&di->di_tv)))
-	return NULL;
+    အကယ်၍ (!(valObject = ConvertToPyObject(&di->di_tv)))
+	ပြန်ပေး NULL;
 
-    if (!(ret = Py_BuildValue("(" Py_bytes_fmt "O)", hi->hi_key, valObject)))
+    အကယ်၍ (!(ret = Py_BuildValue("(" Py_bytes_fmt "O)", hi->hi_key, valObject)))
     {
 	Py_DECREF(valObject);
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
     hash_remove(&self->dict->dv_hashtab, hi, "Python pop item");
     dictitem_free(di);
 
-    return ret;
+    ပြန်ပေး ret;
 }
 
     static PyObject *
 DictionaryHasKey(DictionaryObject *self, PyObject *keyObject)
 {
-    return _DictionaryItem(self, keyObject, DICT_FLAG_RETURN_BOOL);
+    ပြန်ပေး _DictionaryItem(self, keyObject, DICT_FLAG_RETURN_BOOL);
 }
 
 static PySequenceMethods DictionaryAsSeq = {
@@ -2548,7 +2548,7 @@ static PyMappingMethods DictionaryAsMapping = {
     (objobjargproc) DictionaryAssItem,
 };
 
-static struct PyMethodDef DictionaryMethods[] = {
+static sa_nracanaa PyMethodDef DictionaryMethods[] = {
     {"keys",	(PyCFunction)DictionaryListKeys,	METH_NOARGS,	""},
     {"values",	(PyCFunction)DictionaryListValues,	METH_NOARGS,	""},
     {"items",	(PyCFunction)DictionaryListItems,	METH_NOARGS,	""},
@@ -2563,7 +2563,7 @@ static struct PyMethodDef DictionaryMethods[] = {
 
 DEFINE_PY_TYPE_OBJECT(ListType);
 
-typedef struct
+typedef sa_nracanaa
 {
     PyObject_HEAD
     list_T	*list;
@@ -2577,19 +2577,19 @@ ListNew(PyTypeObject *subtype, list_T *list)
 {
     ListObject	*self;
 
-    if (list == NULL)
-	return NULL;
+    အကယ်၍ (list == NULL)
+	ပြန်ပေး NULL;
 
     self = (ListObject *) Py_TYPE_GET_TP_ALLOC(subtype)(subtype, 0);
-    if (self == NULL)
-	return NULL;
+    အကယ်၍ (self == NULL)
+	ပြန်ပေး NULL;
     self->list = list;
     ++list->lv_refcount;
     CHECK_LIST_MATERIALIZE(list);
 
     pyll_add((PyObject *)(self), &self->ref, &lastlist);
 
-    return (PyObject *)(self);
+    ပြန်ပေး (PyObject *)(self);
 }
 
     static list_T *
@@ -2597,44 +2597,44 @@ py_list_alloc(void)
 {
     list_T	*ret;
 
-    if (!(ret = list_alloc()))
+    အကယ်၍ (!(ret = list_alloc()))
     {
 	PyErr_NoMemory();
-	return NULL;
+	ပြန်ပေး NULL;
     }
     ++ret->lv_refcount;
 
-    return ret;
+    ပြန်ပေး ret;
 }
 
-    static int
+    static ကိန်းပြည့်
 list_py_concat(list_T *l, PyObject *obj, PyObject *lookup_dict)
 {
     PyObject	*iterator;
     PyObject	*item;
     listitem_T	*li;
 
-    if (!(iterator = PyObject_GetIter(obj)))
-	return -1;
+    အကယ်၍ (!(iterator = PyObject_GetIter(obj)))
+	ပြန်ပေး -1;
 
-    while ((item = PyIter_Next(iterator)))
+    နေစဉ် ((item = PyIter_Next(iterator)))
     {
-	if (!(li = listitem_alloc()))
+	အကယ်၍ (!(li = listitem_alloc()))
 	{
 	    PyErr_NoMemory();
 	    Py_DECREF(item);
 	    Py_DECREF(iterator);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 	li->li_tv.v_lock = 0;
 	li->li_tv.v_type = VAR_UNKNOWN;
 
-	if (_ConvertFromPyObject(item, &li->li_tv, lookup_dict) == -1)
+	အကယ်၍ (_ConvertFromPyObject(item, &li->li_tv, lookup_dict) == -1)
 	{
 	    Py_DECREF(item);
 	    Py_DECREF(iterator);
 	    listitem_free(l, li);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 
 	Py_DECREF(item);
@@ -2645,10 +2645,10 @@ list_py_concat(list_T *l, PyObject *obj, PyObject *lookup_dict)
     Py_DECREF(iterator);
 
     // Iterator may have finished due to an exception
-    if (PyErr_Occurred())
-	return -1;
+    အကယ်၍ (PyErr_Occurred())
+	ပြန်ပေး -1;
 
-    return 0;
+    ပြန်ပေး 0;
 }
 
     static PyObject *
@@ -2657,40 +2657,40 @@ ListConstructor(PyTypeObject *subtype, PyObject *args, PyObject *kwargs)
     list_T	*list;
     PyObject	*obj = NULL;
 
-    if (kwargs)
+    အကယ်၍ (kwargs)
     {
 	PyErr_SET_STRING(PyExc_TypeError,
 		N_("list constructor does not accept keyword arguments"));
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
-    if (!PyArg_ParseTuple(args, "|O", &obj))
-	return NULL;
+    အကယ်၍ (!PyArg_ParseTuple(args, "|O", &obj))
+	ပြန်ပေး NULL;
 
-    if (!(list = py_list_alloc()))
-	return NULL;
+    အကယ်၍ (!(list = py_list_alloc()))
+	ပြန်ပေး NULL;
 
-    if (obj)
+    အကယ်၍ (obj)
     {
 	PyObject	*lookup_dict;
 
-	if (!(lookup_dict = PyDict_New()))
+	အကယ်၍ (!(lookup_dict = PyDict_New()))
 	{
 	    list_unref(list);
-	    return NULL;
+	    ပြန်ပေး NULL;
 	}
 
-	if (list_py_concat(list, obj, lookup_dict) == -1)
+	အကယ်၍ (list_py_concat(list, obj, lookup_dict) == -1)
 	{
 	    Py_DECREF(lookup_dict);
 	    list_unref(list);
-	    return NULL;
+	    ပြန်ပေး NULL;
 	}
 
 	Py_DECREF(lookup_dict);
     }
 
-    return ListNew(subtype, list);
+    ပြန်ပေး ListNew(subtype, list);
 }
 
     static void
@@ -2706,7 +2706,7 @@ ListDestructor(PyObject *self_obj)
     static PyInt
 ListLength(ListObject *self)
 {
-    return ((PyInt) (self->list->lv_len));
+    ပြန်ပေး ((PyInt) (self->list->lv_len));
 }
 
     static PyObject *
@@ -2714,20 +2714,20 @@ ListIndex(ListObject *self, Py_ssize_t index)
 {
     listitem_T	*li;
 
-    if (index >= ListLength(self))
+    အကယ်၍ (index >= ListLength(self))
     {
 	PyErr_SET_STRING(PyExc_IndexError, N_("list index out of range"));
-	return NULL;
+	ပြန်ပေး NULL;
     }
     li = list_find(self->list, (long) index);
-    if (li == NULL)
+    အကယ်၍ (li == NULL)
     {
 	// No more suitable format specifications in python-2.3
 	PyErr_VIM_FORMAT(N_("internal error: failed to get Vim list item %d"),
-		(int) index);
-	return NULL;
+		(ကိန်းပြည့်) index);
+	ပြန်ပေး NULL;
     }
-    return ConvertToPyObject(&li->li_tv);
+    ပြန်ပေး ConvertToPyObject(&li->li_tv);
 }
 
     static PyObject *
@@ -2737,62 +2737,62 @@ ListSlice(ListObject *self, Py_ssize_t first, Py_ssize_t step,
     PyInt	i;
     PyObject	*list;
 
-    if (step == 0)
+    အကယ်၍ (step == 0)
     {
 	PyErr_SET_STRING(PyExc_ValueError, N_("slice step cannot be zero"));
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
     list = PyList_New(slicelen);
-    if (list == NULL)
-	return NULL;
+    အကယ်၍ (list == NULL)
+	ပြန်ပေး NULL;
 
-    for (i = 0; i < slicelen; ++i)
+    အတွက် (i = 0; i < slicelen; ++i)
     {
 	PyObject	*item;
 
 	item = ListIndex(self, first + i*step);
-	if (item == NULL)
+	အကယ်၍ (item == NULL)
 	{
 	    Py_DECREF(list);
-	    return NULL;
+	    ပြန်ပေး NULL;
 	}
 
 	PyList_SET_ITEM(list, i, item);
     }
 
-    return list;
+    ပြန်ပေး list;
 }
 
     static PyObject *
 ListItem(ListObject *self, PyObject* idx)
 {
-#if PY_MAJOR_VERSION < 3
-    if (PyInt_Check(idx))
+#အကယ်၍ PY_MAJOR_VERSION < 3
+    အကယ်၍ (PyInt_Check(idx))
     {
 	long _idx = PyInt_AsLong(idx);
-	return ListIndex(self, _idx);
+	ပြန်ပေး ListIndex(self, _idx);
     }
-    else
+    မဟုတ်ပါက
 #endif
-    if (PyLong_Check(idx))
+    အကယ်၍ (PyLong_Check(idx))
     {
 	long _idx = PyLong_AsLong(idx);
-	return ListIndex(self, _idx);
+	ပြန်ပေး ListIndex(self, _idx);
     }
-    else if (PySlice_Check(idx))
+    မဟုတ်ပါက အကယ်၍ (PySlice_Check(idx))
     {
 	Py_ssize_t start, stop, step, slicelen;
 
-	if (PySlice_GetIndicesEx((PySliceObject_T *)idx, ListLength(self),
+	အကယ်၍ (PySlice_GetIndicesEx((PySliceObject_T *)idx, ListLength(self),
 				 &start, &stop, &step, &slicelen) < 0)
-	    return NULL;
-	return ListSlice(self, start, step, slicelen);
+	    ပြန်ပေး NULL;
+	ပြန်ပေး ListSlice(self, start, step, slicelen);
     }
-    else
+    မဟုတ်ပါက
     {
 	RAISE_INVALID_INDEX_TYPE(idx);
-	return NULL;
+	ပြန်ပေး NULL;
     }
 }
 
@@ -2800,12 +2800,12 @@ ListItem(ListObject *self, PyObject* idx)
 list_restore(Py_ssize_t numadded, Py_ssize_t numreplaced, Py_ssize_t slicelen,
 	list_T *l, listitem_T **lis, listitem_T *lastaddedli)
 {
-    while (numreplaced--)
+    နေစဉ် (numreplaced--)
     {
 	list_insert(l, lis[numreplaced], lis[slicelen + numreplaced]);
 	listitem_remove(l, lis[slicelen + numreplaced]);
     }
-    while (numadded--)
+    နေစဉ် (numadded--)
     {
 	listitem_T	*next;
 
@@ -2815,7 +2815,7 @@ list_restore(Py_ssize_t numadded, Py_ssize_t numreplaced, Py_ssize_t slicelen,
     }
 }
 
-    static int
+    static ကိန်းပြည့်
 ListAssSlice(ListObject *self, Py_ssize_t first,
 	     Py_ssize_t step, Py_ssize_t slicelen, PyObject *obj)
 {
@@ -2835,30 +2835,30 @@ ListAssSlice(ListObject *self, Py_ssize_t first,
 
     size = ListLength(self);
 
-    if (l->lv_lock)
+    အကယ်၍ (l->lv_lock)
     {
 	RAISE_LOCKED_LIST;
-	return -1;
+	ပြန်ပေး -1;
     }
 
-    if (step == 0)
+    အကယ်၍ (step == 0)
     {
 	PyErr_SET_STRING(PyExc_ValueError, N_("slice step cannot be zero"));
-	return -1;
+	ပြန်ပေး -1;
     }
 
-    if (step != 1 && slicelen == 0)
+    အကယ်၍ (step != 1 && slicelen == 0)
     {
 	// Nothing to do. Only error out if obj has some items.
-	int		ret = 0;
+	ကိန်းပြည့်		ret = 0;
 
-	if (obj == NULL)
-	    return 0;
+	အကယ်၍ (obj == NULL)
+	    ပြန်ပေး 0;
 
-	if (!(iterator = PyObject_GetIter(obj)))
-	    return -1;
+	အကယ်၍ (!(iterator = PyObject_GetIter(obj)))
+	    ပြန်ပေး -1;
 
-	if ((item = PyIter_Next(iterator)))
+	အကယ်၍ ((item = PyIter_Next(iterator)))
 	{
 	    PyErr_FORMAT(PyExc_ValueError,
 		    N_("attempt to assign sequence of size greater than %d "
@@ -2867,77 +2867,77 @@ ListAssSlice(ListObject *self, Py_ssize_t first,
 	    ret = -1;
 	}
 	Py_DECREF(iterator);
-	return ret;
+	ပြန်ပေး ret;
     }
 
-    if (obj != NULL)
+    အကယ်၍ (obj != NULL)
 	// XXX May allocate zero bytes.
-	if (!(lis = PyMem_New(listitem_T *, slicelen * 2)))
+	အကယ်၍ (!(lis = PyMem_New(listitem_T *, slicelen * 2)))
 	{
 	    PyErr_NoMemory();
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 
-    if (first == size)
+    အကယ်၍ (first == size)
 	li = NULL;
-    else
+    မဟုတ်ပါက
     {
 	li = list_find(l, (long) first);
-	if (li == NULL)
+	အကယ်၍ (li == NULL)
 	{
 	    PyErr_VIM_FORMAT(N_("internal error: no Vim list item %d"),
-		    (int)first);
-	    if (obj != NULL)
+		    (ကိန်းပြည့်)first);
+	    အကယ်၍ (obj != NULL)
 		PyMem_Free(lis);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 	i = slicelen;
-	while (i-- && li != NULL)
+	နေစဉ် (i-- && li != NULL)
 	{
 	    j = step;
 	    next = li;
-	    if (step > 0)
-		while (next != NULL && ((next = next->li_next) != NULL) && --j);
-	    else
-		while (next != NULL && ((next = next->li_prev) != NULL) && ++j);
+	    အကယ်၍ (step > 0)
+		နေစဉ် (next != NULL && ((next = next->li_next) != NULL) && --j);
+	    မဟုတ်ပါက
+		နေစဉ် (next != NULL && ((next = next->li_prev) != NULL) && ++j);
 
-	    if (obj == NULL)
+	    အကယ်၍ (obj == NULL)
 		listitem_remove(l, li);
-	    else
+	    မဟုတ်ပါက
 		lis[slicelen - i - 1] = li;
 
 	    li = next;
 	}
-	if (li == NULL && i != -1)
+	အကယ်၍ (li == NULL && i != -1)
 	{
 	    PyErr_SET_VIM(N_("internal error: not enough list items"));
-	    if (obj != NULL)
+	    အကယ်၍ (obj != NULL)
 		PyMem_Free(lis);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
     }
 
-    if (obj == NULL)
-	return 0;
+    အကယ်၍ (obj == NULL)
+	ပြန်ပေး 0;
 
-    if (!(iterator = PyObject_GetIter(obj)))
+    အကယ်၍ (!(iterator = PyObject_GetIter(obj)))
     {
 	PyMem_Free(lis);
-	return -1;
+	ပြန်ပေး -1;
     }
 
     i = 0;
-    while ((item = PyIter_Next(iterator)))
+    နေစဉ် ((item = PyIter_Next(iterator)))
     {
-	if (ConvertFromPyObject(item, &v) == -1)
+	အကယ်၍ (ConvertFromPyObject(item, &v) == -1)
 	{
 	    Py_DECREF(iterator);
 	    Py_DECREF(item);
 	    PyMem_Free(lis);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 	Py_DECREF(item);
-	if (list_insert_tv(l, &v, numreplaced < slicelen
+	အကယ်၍ (list_insert_tv(l, &v, numreplaced < slicelen
 				    ? lis[numreplaced]
 				    : li) == FAIL)
 	{
@@ -2945,66 +2945,66 @@ ListAssSlice(ListObject *self, Py_ssize_t first,
 	    PyErr_SET_VIM(N_("internal error: failed to add item to list"));
 	    list_restore(numadded, numreplaced, slicelen, l, lis, lastaddedli);
 	    PyMem_Free(lis);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
-	if (numreplaced < slicelen)
+	အကယ်၍ (numreplaced < slicelen)
 	{
 	    lis[slicelen + numreplaced] = lis[numreplaced]->li_prev;
 	    vimlist_remove(l, lis[numreplaced], lis[numreplaced]);
 	    numreplaced++;
 	}
-	else
+	မဟုတ်ပါက
 	{
-	    if (li)
+	    အကယ်၍ (li)
 		lastaddedli = li->li_prev;
-	    else
+	    မဟုတ်ပါက
 		lastaddedli = l->lv_u.mat.lv_last;
 	    numadded++;
 	}
 	clear_tv(&v);
-	if (step != 1 && i >= slicelen)
+	အကယ်၍ (step != 1 && i >= slicelen)
 	{
 	    Py_DECREF(iterator);
 	    PyErr_FORMAT(PyExc_ValueError,
 		    N_("attempt to assign sequence of size greater than %d "
-			"to extended slice"), (int) slicelen);
+			"to extended slice"), (ကိန်းပြည့်) slicelen);
 	    list_restore(numadded, numreplaced, slicelen, l, lis, lastaddedli);
 	    PyMem_Free(lis);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 	++i;
     }
     Py_DECREF(iterator);
 
-    if (step != 1 && i != slicelen)
+    အကယ်၍ (step != 1 && i != slicelen)
     {
 	PyErr_FORMAT2(PyExc_ValueError,
 		N_("attempt to assign sequence of size %d to extended slice "
-		    "of size %d"), (int) i, (int) slicelen);
+		    "of size %d"), (ကိန်းပြည့်) i, (ကိန်းပြည့်) slicelen);
 	list_restore(numadded, numreplaced, slicelen, l, lis, lastaddedli);
 	PyMem_Free(lis);
-	return -1;
+	ပြန်ပေး -1;
     }
 
-    if (PyErr_Occurred())
+    အကယ်၍ (PyErr_Occurred())
     {
 	list_restore(numadded, numreplaced, slicelen, l, lis, lastaddedli);
 	PyMem_Free(lis);
-	return -1;
+	ပြန်ပေး -1;
     }
 
-    for (i = 0; i < numreplaced; i++)
+    အတွက် (i = 0; i < numreplaced; i++)
 	listitem_free(l, lis[i]);
-    if (step == 1)
-	for (i = numreplaced; i < slicelen; i++)
+    အကယ်၍ (step == 1)
+	အတွက် (i = numreplaced; i < slicelen; i++)
 	    listitem_remove(l, lis[i]);
 
     PyMem_Free(lis);
 
-    return 0;
+    ပြန်ပေး 0;
 }
 
-    static int
+    static ကိန်းပြည့်
 ListAssIndex(ListObject *self, Py_ssize_t index, PyObject *obj)
 {
     typval_T	tv;
@@ -3012,90 +3012,90 @@ ListAssIndex(ListObject *self, Py_ssize_t index, PyObject *obj)
     listitem_T	*li;
     Py_ssize_t	length = ListLength(self);
 
-    if (l->lv_lock)
+    အကယ်၍ (l->lv_lock)
     {
 	RAISE_LOCKED_LIST;
-	return -1;
+	ပြန်ပေး -1;
     }
-    if (index > length || (index == length && obj == NULL))
+    အကယ်၍ (index > length || (index == length && obj == NULL))
     {
 	PyErr_SET_STRING(PyExc_IndexError, N_("list index out of range"));
-	return -1;
+	ပြန်ပေး -1;
     }
 
-    if (obj == NULL)
+    အကယ်၍ (obj == NULL)
     {
 	li = list_find(l, (long) index);
-	if (li == NULL)
+	အကယ်၍ (li == NULL)
 	{
 	    PyErr_VIM_FORMAT(N_("internal error: failed to get Vim "
-			"list item %d"), (int) index);
-	    return -1;
+			"list item %d"), (ကိန်းပြည့်) index);
+	    ပြန်ပေး -1;
 	}
 	vimlist_remove(l, li, li);
 	clear_tv(&li->li_tv);
 	vim_free(li);
-	return 0;
+	ပြန်ပေး 0;
     }
 
-    if (ConvertFromPyObject(obj, &tv) == -1)
-	return -1;
+    အကယ်၍ (ConvertFromPyObject(obj, &tv) == -1)
+	ပြန်ပေး -1;
 
-    if (index == length)
+    အကယ်၍ (index == length)
     {
-	if (list_append_tv(l, &tv) == FAIL)
+	အကယ်၍ (list_append_tv(l, &tv) == FAIL)
 	{
 	    clear_tv(&tv);
 	    PyErr_SET_VIM(N_("failed to add item to list"));
-	    return -1;
+	    ပြန်ပေး -1;
 	}
     }
-    else
+    မဟုတ်ပါက
     {
 	li = list_find(l, (long) index);
-	if (li == NULL)
+	အကယ်၍ (li == NULL)
 	{
 	    PyErr_VIM_FORMAT(N_("internal error: failed to get Vim "
-			"list item %d"), (int) index);
-	    return -1;
+			"list item %d"), (ကိန်းပြည့်) index);
+	    ပြန်ပေး -1;
 	}
 	clear_tv(&li->li_tv);
 	copy_tv(&tv, &li->li_tv);
 	clear_tv(&tv);
     }
-    return 0;
+    ပြန်ပေး 0;
 }
 
-    static int
+    static ကိန်းပြည့်
 ListAssItem(ListObject *self, PyObject *idx, PyObject *obj)
 {
-#if PY_MAJOR_VERSION < 3
-    if (PyInt_Check(idx))
+#အကယ်၍ PY_MAJOR_VERSION < 3
+    အကယ်၍ (PyInt_Check(idx))
     {
 	long _idx = PyInt_AsLong(idx);
-	return (int)ListAssIndex(self, _idx, obj);
+	ပြန်ပေး (ကိန်းပြည့်)ListAssIndex(self, _idx, obj);
     }
-    else
+    မဟုတ်ပါက
 #endif
-    if (PyLong_Check(idx))
+    အကယ်၍ (PyLong_Check(idx))
     {
 	long _idx = PyLong_AsLong(idx);
-	return (int)ListAssIndex(self, _idx, obj);
+	ပြန်ပေး (ကိန်းပြည့်)ListAssIndex(self, _idx, obj);
     }
-    else if (PySlice_Check(idx))
+    မဟုတ်ပါက အကယ်၍ (PySlice_Check(idx))
     {
 	Py_ssize_t start, stop, step, slicelen;
 
-	if (PySlice_GetIndicesEx((PySliceObject_T *)idx, ListLength(self),
+	အကယ်၍ (PySlice_GetIndicesEx((PySliceObject_T *)idx, ListLength(self),
 				 &start, &stop, &step, &slicelen) < 0)
-	    return -1;
-	return (int)ListAssSlice(self, start, step, slicelen,
+	    ပြန်ပေး -1;
+	ပြန်ပေး (ကိန်းပြည့်)ListAssSlice(self, start, step, slicelen,
 		obj);
     }
-    else
+    မဟုတ်ပါက
     {
 	RAISE_INVALID_INDEX_TYPE(idx);
-	return -1;
+	ပြန်ပေး -1;
     }
 }
 
@@ -3105,27 +3105,27 @@ ListConcatInPlace(ListObject *self, PyObject *obj)
     list_T	*l = self->list;
     PyObject	*lookup_dict;
 
-    if (l->lv_lock)
+    အကယ်၍ (l->lv_lock)
     {
 	RAISE_LOCKED_LIST;
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
-    if (!(lookup_dict = PyDict_New()))
-	return NULL;
+    အကယ်၍ (!(lookup_dict = PyDict_New()))
+	ပြန်ပေး NULL;
 
-    if (list_py_concat(l, obj, lookup_dict) == -1)
+    အကယ်၍ (list_py_concat(l, obj, lookup_dict) == -1)
     {
 	Py_DECREF(lookup_dict);
-	return NULL;
+	ပြန်ပေး NULL;
     }
     Py_DECREF(lookup_dict);
 
     Py_INCREF((PyObject *)self);
-    return (PyObject *)(self);
+    ပြန်ပေး (PyObject *)(self);
 }
 
-typedef struct
+typedef sa_nracanaa
 {
     listwatch_T	lw;
     list_T	*list;
@@ -3146,15 +3146,15 @@ ListIterNext(void **arg)
     PyObject	*ret;
     listiterinfo_T **lii = (listiterinfo_T**)arg;
 
-    if (!((*lii)->lw.lw_item))
-	return NULL;
+    အကယ်၍ (!((*lii)->lw.lw_item))
+	ပြန်ပေး NULL;
 
-    if (!(ret = ConvertToPyObject(&((*lii)->lw.lw_item->li_tv))))
-	return NULL;
+    အကယ်၍ (!(ret = ConvertToPyObject(&((*lii)->lw.lw_item->li_tv))))
+	ပြန်ပေး NULL;
 
     (*lii)->lw.lw_item = (*lii)->lw.lw_item->li_next;
 
-    return ret;
+    ပြန်ပေး ret;
 }
 
     static PyObject *
@@ -3164,10 +3164,10 @@ ListIter(PyObject *self_obj)
     listiterinfo_T	*lii;
     list_T	*l = self->list;
 
-    if (!(lii = PyMem_New(listiterinfo_T, 1)))
+    အကယ်၍ (!(lii = PyMem_New(listiterinfo_T, 1)))
     {
 	PyErr_NoMemory();
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
     CHECK_LIST_MATERIALIZE(l);
@@ -3176,12 +3176,12 @@ ListIter(PyObject *self_obj)
     lii->list = l;
     ++l->lv_refcount;
 
-    return IterNew(lii,
+    ပြန်ပေး IterNew(lii,
 	    ListIterDestruct, ListIterNext,
 	    NULL, NULL, (PyObject *)self);
 }
 
-static char *ListAttrs[] = {
+static var_na *ListAttrs[] = {
     "locked",
     NULL
 };
@@ -3189,43 +3189,43 @@ static char *ListAttrs[] = {
     static PyObject *
 ListDir(PyObject *self, PyObject *args UNUSED)
 {
-    return ObjectDir(self, ListAttrs);
+    ပြန်ပေး ObjectDir(self, ListAttrs);
 }
 
-    static int
-ListSetattr(PyObject *self_obj, char *name, PyObject *valObject)
+    static ကိန်းပြည့်
+ListSetattr(PyObject *self_obj, var_na *name, PyObject *valObject)
 {
     ListObject *self = (ListObject*)self_obj;
-    if (valObject == NULL)
+    အကယ်၍ (valObject == NULL)
     {
 	PyErr_SET_STRING(PyExc_AttributeError,
 		N_("cannot delete vim.List attributes"));
-	return -1;
+	ပြန်ပေး -1;
     }
 
-    if (strcmp(name, "locked") == 0)
+    အကယ်၍ (strcmp(name, "locked") == 0)
     {
-	if (self->list->lv_lock == VAR_FIXED)
+	အကယ်၍ (self->list->lv_lock == VAR_FIXED)
 	{
 	    PyErr_SET_STRING(PyExc_TypeError, N_("cannot modify fixed list"));
-	    return -1;
+	    ပြန်ပေး -1;
 	}
-	else
+	မဟုတ်ပါက
 	{
-	    int		istrue = PyObject_IsTrue(valObject);
-	    if (istrue == -1)
-		return -1;
-	    else if (istrue)
+	    ကိန်းပြည့်		istrue = PyObject_IsTrue(valObject);
+	    အကယ်၍ (istrue == -1)
+		ပြန်ပေး -1;
+	    မဟုတ်ပါက အကယ်၍ (istrue)
 		self->list->lv_lock = VAR_LOCKED;
-	    else
+	    မဟုတ်ပါက
 		self->list->lv_lock = 0;
 	}
-	return 0;
+	ပြန်ပေး 0;
     }
-    else
+    မဟုတ်ပါက
     {
 	PyErr_FORMAT(PyExc_AttributeError, N_("cannot set attribute %s"), name);
-	return -1;
+	ပြန်ပေး -1;
     }
 }
 
@@ -3248,7 +3248,7 @@ static PyMappingMethods ListAsMapping = {
     /* mp_ass_subscript */ (objobjargproc) ListAssItem,
 };
 
-static struct PyMethodDef ListMethods[] = {
+static sa_nracanaa PyMethodDef ListMethods[] = {
     {"extend",	(PyCFunction)ListConcatInPlace,	METH_O,		""},
     {"__dir__",	(PyCFunction)ListDir,		METH_NOARGS,	""},
     { NULL,	NULL,				0,		NULL}
@@ -3256,7 +3256,7 @@ static struct PyMethodDef ListMethods[] = {
 
 DEFINE_PY_TYPE_OBJECT(TupleType);
 
-typedef struct
+typedef sa_nracanaa
 {
     PyObject_HEAD
     tuple_T	*tuple;
@@ -3270,18 +3270,18 @@ TupleNew(PyTypeObject *subtype, tuple_T *tuple)
 {
     TupleObject	*self;
 
-    if (tuple == NULL)
-	return NULL;
+    အကယ်၍ (tuple == NULL)
+	ပြန်ပေး NULL;
 
     self = (TupleObject *) Py_TYPE_GET_TP_ALLOC(subtype)(subtype, 0);
-    if (self == NULL)
-	return NULL;
+    အကယ်၍ (self == NULL)
+	ပြန်ပေး NULL;
     self->tuple = tuple;
     ++tuple->tv_refcount;
 
     pyll_add((PyObject *)(self), &self->ref, &lasttuple);
 
-    return (PyObject *)(self);
+    ပြန်ပေး (PyObject *)(self);
 }
 
     static tuple_T *
@@ -3289,52 +3289,52 @@ py_tuple_alloc(void)
 {
     tuple_T	*ret;
 
-    if (!(ret = tuple_alloc()))
+    အကယ်၍ (!(ret = tuple_alloc()))
     {
 	PyErr_NoMemory();
-	return NULL;
+	ပြန်ပေး NULL;
     }
     ++ret->tv_refcount;
 
-    return ret;
+    ပြန်ပေး ret;
 }
 
-    static int
+    static ကိန်းပြည့်
 tuple_py_concat(tuple_T *t, PyObject *obj, PyObject *lookup_dict)
 {
     PyObject	*iterator;
     PyObject	*item;
 
-    if (!(iterator = PyObject_GetIter(obj)))
-	return -1;
+    အကယ်၍ (!(iterator = PyObject_GetIter(obj)))
+	ပြန်ပေး -1;
 
-    while ((item = PyIter_Next(iterator)))
+    နေစဉ် ((item = PyIter_Next(iterator)))
     {
 	typval_T    new_tv;
 
-	if (_ConvertFromPyObject(item, &new_tv, lookup_dict) == -1)
+	အကယ်၍ (_ConvertFromPyObject(item, &new_tv, lookup_dict) == -1)
 	{
 	    Py_DECREF(item);
 	    Py_DECREF(iterator);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 
 	Py_DECREF(item);
 
-	if (tuple_append_tv(t, &new_tv) == FAIL)
+	အကယ်၍ (tuple_append_tv(t, &new_tv) == FAIL)
 	{
 	    Py_DECREF(iterator);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
     }
 
     Py_DECREF(iterator);
 
     // Iterator may have finished due to an exception
-    if (PyErr_Occurred())
-	return -1;
+    အကယ်၍ (PyErr_Occurred())
+	ပြန်ပေး -1;
 
-    return 0;
+    ပြန်ပေး 0;
 }
 
     static PyObject *
@@ -3343,40 +3343,40 @@ TupleConstructor(PyTypeObject *subtype, PyObject *args, PyObject *kwargs)
     tuple_T	*tuple;
     PyObject	*obj = NULL;
 
-    if (kwargs)
+    အကယ်၍ (kwargs)
     {
 	PyErr_SET_STRING(PyExc_TypeError,
 		N_("tuple constructor does not accept keyword arguments"));
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
-    if (!PyArg_ParseTuple(args, "|O", &obj))
-	return NULL;
+    အကယ်၍ (!PyArg_ParseTuple(args, "|O", &obj))
+	ပြန်ပေး NULL;
 
-    if (!(tuple = py_tuple_alloc()))
-	return NULL;
+    အကယ်၍ (!(tuple = py_tuple_alloc()))
+	ပြန်ပေး NULL;
 
-    if (obj)
+    အကယ်၍ (obj)
     {
 	PyObject	*lookup_dict;
 
-	if (!(lookup_dict = PyDict_New()))
+	အကယ်၍ (!(lookup_dict = PyDict_New()))
 	{
 	    tuple_unref(tuple);
-	    return NULL;
+	    ပြန်ပေး NULL;
 	}
 
-	if (tuple_py_concat(tuple, obj, lookup_dict) == -1)
+	အကယ်၍ (tuple_py_concat(tuple, obj, lookup_dict) == -1)
 	{
 	    Py_DECREF(lookup_dict);
 	    tuple_unref(tuple);
-	    return NULL;
+	    ပြန်ပေး NULL;
 	}
 
 	Py_DECREF(lookup_dict);
     }
 
-    return TupleNew(subtype, tuple);
+    ပြန်ပေး TupleNew(subtype, tuple);
 }
 
     static void
@@ -3392,7 +3392,7 @@ TupleDestructor(PyObject *self_obj)
     static PyInt
 TupleLength(TupleObject *self)
 {
-    return ((PyInt)(tuple_len(self->tuple)));
+    ပြန်ပေး ((PyInt)(tuple_len(self->tuple)));
 }
 
     static PyObject *
@@ -3400,15 +3400,15 @@ TupleIndex(TupleObject *self, Py_ssize_t index)
 {
     PyInt	len = TupleLength(self);
 
-    if (index < 0)
+    အကယ်၍ (index < 0)
 	index = len + index;
 
-    if (index < 0 || index >= len)
+    အကယ်၍ (index < 0 || index >= len)
     {
 	PyErr_SET_STRING(PyExc_IndexError, N_("tuple index out of range"));
-	return NULL;
+	ပြန်ပေး NULL;
     }
-    return ConvertToPyObject(TUPLE_ITEM(self->tuple, index));
+    ပြန်ပေး ConvertToPyObject(TUPLE_ITEM(self->tuple, index));
 }
 
 /*
@@ -3426,62 +3426,62 @@ TupleSlice(
     PyObject	*tuple;
 
     tuple = PyTuple_New(slicelen);
-    if (tuple == NULL)
-	return NULL;
+    အကယ်၍ (tuple == NULL)
+	ပြန်ပေး NULL;
 
-    for (i = 0; i < slicelen; ++i)
+    အတွက် (i = 0; i < slicelen; ++i)
     {
 	PyObject	*item;
 
 	item = TupleIndex(self, first + i * step);
-	if (item == NULL)
+	အကယ်၍ (item == NULL)
 	{
 	    Py_DECREF(tuple);
-	    return NULL;
+	    ပြန်ပေး NULL;
 	}
 
 	PyTuple_SetItem(tuple, i, item);
     }
 
-    return tuple;
+    ပြန်ပေး tuple;
 }
 
     static PyObject *
 TupleItem(TupleObject *self, PyObject* idx)
 {
-#if PY_MAJOR_VERSION < 3
-    if (PyInt_Check(idx))
+#အကယ်၍ PY_MAJOR_VERSION < 3
+    အကယ်၍ (PyInt_Check(idx))
     {
 	long _idx = PyInt_AsLong(idx);
-	return TupleIndex(self, _idx);
+	ပြန်ပေး TupleIndex(self, _idx);
     }
-    else
+    မဟုတ်ပါက
 #endif
-    if (PyLong_Check(idx))
+    အကယ်၍ (PyLong_Check(idx))
     {
 	long _idx = PyLong_AsLong(idx);
-	return TupleIndex(self, _idx);
+	ပြန်ပေး TupleIndex(self, _idx);
     }
-    else if (PySlice_Check(idx))
+    မဟုတ်ပါက အကယ်၍ (PySlice_Check(idx))
     {
 	Py_ssize_t start, stop, step, slicelen;
 
-	if (PySlice_GetIndicesEx((PySliceObject_T *)idx, TupleLength(self),
+	အကယ်၍ (PySlice_GetIndicesEx((PySliceObject_T *)idx, TupleLength(self),
 				 &start, &stop, &step, &slicelen) < 0)
-	    return NULL;
-	return TupleSlice(self, start, step, slicelen);
+	    ပြန်ပေး NULL;
+	ပြန်ပေး TupleSlice(self, start, step, slicelen);
     }
-    else
+    မဟုတ်ပါက
     {
 	RAISE_INVALID_INDEX_TYPE(idx);
-	return NULL;
+	ပြန်ပေး NULL;
     }
 }
 
-typedef struct
+typedef sa_nracanaa
 {
     tuple_T	*tuple;
-    int		index;
+    ကိန်းပြည့်		index;
 } tupleiterinfo_T;
 
     static void
@@ -3498,15 +3498,15 @@ TupleIterNext(void **arg)
     PyObject	*ret;
     tupleiterinfo_T **tii = (tupleiterinfo_T**)arg;
 
-    if ((*tii)->index >= TUPLE_LEN((*tii)->tuple))
-	return NULL;
+    အကယ်၍ ((*tii)->index >= TUPLE_LEN((*tii)->tuple))
+	ပြန်ပေး NULL;
 
-    if (!(ret = ConvertToPyObject(TUPLE_ITEM((*tii)->tuple, (*tii)->index))))
-	return NULL;
+    အကယ်၍ (!(ret = ConvertToPyObject(TUPLE_ITEM((*tii)->tuple, (*tii)->index))))
+	ပြန်ပေး NULL;
 
     (*tii)->index++;
 
-    return ret;
+    ပြန်ပေး ret;
 }
 
     static PyObject *
@@ -3516,22 +3516,22 @@ TupleIter(PyObject *self_obj)
     tupleiterinfo_T	*tii;
     tuple_T	*t = self->tuple;
 
-    if (!(tii = PyMem_New(tupleiterinfo_T, 1)))
+    အကယ်၍ (!(tii = PyMem_New(tupleiterinfo_T, 1)))
     {
 	PyErr_NoMemory();
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
     tii->tuple = t;
     tii->index = 0;
     ++t->tv_refcount;
 
-    return IterNew(tii,
+    ပြန်ပေး IterNew(tii,
 	    TupleIterDestruct, TupleIterNext,
 	    NULL, NULL, (PyObject *)self);
 }
 
-static char *TupleAttrs[] = {
+static var_na *TupleAttrs[] = {
     "locked",
     NULL
 };
@@ -3539,43 +3539,43 @@ static char *TupleAttrs[] = {
     static PyObject *
 TupleDir(PyObject *self, PyObject *args UNUSED)
 {
-    return ObjectDir(self, TupleAttrs);
+    ပြန်ပေး ObjectDir(self, TupleAttrs);
 }
 
-    static int
-TupleSetattr(PyObject *self_obj, char *name, PyObject *valObject)
+    static ကိန်းပြည့်
+TupleSetattr(PyObject *self_obj, var_na *name, PyObject *valObject)
 {
     TupleObject *self = (TupleObject*)self_obj;
-    if (valObject == NULL)
+    အကယ်၍ (valObject == NULL)
     {
 	PyErr_SET_STRING(PyExc_AttributeError,
 		N_("cannot delete vim.Tuple attributes"));
-	return -1;
+	ပြန်ပေး -1;
     }
 
-    if (strcmp(name, "locked") == 0)
+    အကယ်၍ (strcmp(name, "locked") == 0)
     {
-	if (self->tuple->tv_lock == VAR_FIXED)
+	အကယ်၍ (self->tuple->tv_lock == VAR_FIXED)
 	{
 	    PyErr_SET_STRING(PyExc_TypeError, N_("cannot modify fixed tuple"));
-	    return -1;
+	    ပြန်ပေး -1;
 	}
-	else
+	မဟုတ်ပါက
 	{
-	    int		istrue = PyObject_IsTrue(valObject);
-	    if (istrue == -1)
-		return -1;
-	    else if (istrue)
+	    ကိန်းပြည့်		istrue = PyObject_IsTrue(valObject);
+	    အကယ်၍ (istrue == -1)
+		ပြန်ပေး -1;
+	    မဟုတ်ပါက အကယ်၍ (istrue)
 		self->tuple->tv_lock = VAR_LOCKED;
-	    else
+	    မဟုတ်ပါက
 		self->tuple->tv_lock = 0;
 	}
-	return 0;
+	ပြန်ပေး 0;
     }
-    else
+    မဟုတ်ပါက
     {
 	PyErr_FORMAT(PyExc_AttributeError, N_("cannot set attribute %s"), name);
-	return -1;
+	ပြန်ပေး -1;
     }
 }
 
@@ -3598,20 +3598,20 @@ static PyMappingMethods TupleAsMapping = {
     /* mp_ass_subscript */ (objobjargproc) 0,
 };
 
-static struct PyMethodDef TupleMethods[] = {
+static sa_nracanaa PyMethodDef TupleMethods[] = {
     {"__dir__",	(PyCFunction)TupleDir,		METH_NOARGS,	""},
     { NULL,	NULL,				0,		NULL}
 };
 
-typedef struct
+typedef sa_nracanaa
 {
     PyObject_HEAD
     char_u	*name;
-    int		argc;
+    ကိန်းပြည့်		argc;
     typval_T	*argv;
     dict_T	*self;
     pylinkedlist_T	ref;
-    int		auto_rebind;
+    ကိန်းပြည့်		auto_rebind;
 } FunctionObject;
 
 DEFINE_PY_TYPE_OBJECT(FunctionType);
@@ -3620,53 +3620,53 @@ DEFINE_PY_TYPE_OBJECT(FunctionType);
     FunctionNew(FunctionTypePtr, (name), (argc), (argv), (self), (pt_auto))
 
     static PyObject *
-FunctionNew(PyTypeObject *subtype, char_u *name, int argc, typval_T *argv,
-	dict_T *selfdict, int auto_rebind)
+FunctionNew(PyTypeObject *subtype, char_u *name, ကိန်းပြည့် argc, typval_T *argv,
+	dict_T *selfdict, ကိန်းပြည့် auto_rebind)
 {
     FunctionObject	*self;
 
     self = (FunctionObject *) Py_TYPE_GET_TP_ALLOC(subtype)(subtype, 0);
-    if (self == NULL)
-	return NULL;
+    အကယ်၍ (self == NULL)
+	ပြန်ပေး NULL;
 
-    if (isdigit((unsigned char)*name))
+    အကယ်၍ (isdigit((unsigned var_na)*name))
     {
-	if (!translated_function_exists(name, FALSE))
+	အကယ်၍ (!translated_function_exists(name, FALSE))
 	{
 	    PyErr_FORMAT(PyExc_ValueError,
 		    N_("unnamed function %s does not exist"), name);
-	    return NULL;
+	    ပြန်ပေး NULL;
 	}
 	self->name = vim_strsave(name);
     }
-    else
+    မဟုတ်ပါက
     {
 	char_u *p;
 
-	if ((p = get_expanded_name(name,
+	အကယ်၍ ((p = get_expanded_name(name,
 			    vim_strchr(name, AUTOLOAD_CHAR) == NULL)) == NULL)
 	{
 	    PyErr_FORMAT(PyExc_ValueError,
 		    N_("function %s does not exist"), name);
-	    return NULL;
+	    ပြန်ပေး NULL;
 	}
 
-	if (p[0] == K_SPECIAL && p[1] == KS_EXTRA && p[2] == (int)KE_SNR)
+	အကယ်၍ (p[0] == K_SPECIAL && p[1] == KS_EXTRA && p[2] == (ကိန်းပြည့်)KE_SNR)
 	{
 	    char_u *np;
 	    size_t len = STRLEN(p) + 1;
 
-	    if ((np = alloc(len + 2)) == NULL)
+	    အကယ်၍ ((np = alloc(len + 2)) == NULL)
 	    {
 		vim_free(p);
-		return NULL;
+		ပြန်ပေး NULL;
 	    }
 	    mch_memmove(np, "<SNR>", 5);
 	    mch_memmove(np + 5, p + 3, len - 3);
 	    vim_free(p);
 	    self->name = np;
 	}
-	else
+	မဟုတ်ပါက
 	    self->name = p;
     }
 
@@ -3676,10 +3676,10 @@ FunctionNew(PyTypeObject *subtype, char_u *name, int argc, typval_T *argv,
     self->self = selfdict;
     self->auto_rebind = selfdict == NULL ? TRUE : auto_rebind;
 
-    if (self->argv || self->self)
+    အကယ်၍ (self->argv || self->self)
 	pyll_add((PyObject *)(self), &self->ref, &lastfunc);
 
-    return (PyObject *)(self);
+    ပြန်ပေး (PyObject *)(self);
 }
 
     static PyObject *
@@ -3694,42 +3694,42 @@ FunctionConstructor(PyTypeObject *subtype, PyObject *args, PyObject *kwargs)
     typval_T	argstv;
     list_T	*argslist = NULL;
     dict_T	*selfdict = NULL;
-    int		argc = 0;
-    int		auto_rebind = TRUE;
+    ကိန်းပြည့်		argc = 0;
+    ကိန်းပြည့်		auto_rebind = TRUE;
     typval_T	*argv = NULL;
     typval_T	*curtv;
     listitem_T	*li;
 
-    if (kwargs != NULL)
+    အကယ်၍ (kwargs != NULL)
     {
 	selfdictObject = PyDict_GetItemString(kwargs, "self");
-	if (selfdictObject != NULL)
+	အကယ်၍ (selfdictObject != NULL)
 	{
-	    if (ConvertFromPyMapping(selfdictObject, &selfdicttv) == -1)
-		return NULL;
+	    အကယ်၍ (ConvertFromPyMapping(selfdictObject, &selfdicttv) == -1)
+		ပြန်ပေး NULL;
 	    selfdict = selfdicttv.vval.v_dict;
 	}
 	argsObject = PyDict_GetItemString(kwargs, "args");
-	if (argsObject != NULL)
+	အကယ်၍ (argsObject != NULL)
 	{
-	    if (ConvertFromPySequence(argsObject, &argstv) == -1)
+	    အကယ်၍ (ConvertFromPySequence(argsObject, &argstv) == -1)
 	    {
 		dict_unref(selfdict);
-		return NULL;
+		ပြန်ပေး NULL;
 	    }
 	    argslist = argstv.vval.v_list;
 	    CHECK_LIST_MATERIALIZE(argslist);
 
 	    argc = argslist->lv_len;
-	    if (argc != 0)
+	    အကယ်၍ (argc != 0)
 	    {
 		argv = PyMem_New(typval_T, (size_t) argc);
-		if (argv == NULL)
+		အကယ်၍ (argv == NULL)
 		{
 		    PyErr_NoMemory();
 		    dict_unref(selfdict);
 		    list_unref(argslist);
-		    return NULL;
+		    ပြန်ပေး NULL;
 		}
 		curtv = argv;
 		FOR_ALL_LIST_ITEMS(argslist, li)
@@ -3737,57 +3737,57 @@ FunctionConstructor(PyTypeObject *subtype, PyObject *args, PyObject *kwargs)
 	    }
 	    list_unref(argslist);
 	}
-	if (selfdict != NULL)
+	အကယ်၍ (selfdict != NULL)
 	{
 	    auto_rebind = FALSE;
 	    autoRebindObject = PyDict_GetItemString(kwargs, "auto_rebind");
-	    if (autoRebindObject != NULL)
+	    အကယ်၍ (autoRebindObject != NULL)
 	    {
 		auto_rebind = PyObject_IsTrue(autoRebindObject);
-		if (auto_rebind == -1)
+		အကယ်၍ (auto_rebind == -1)
 		{
 		    dict_unref(selfdict);
 		    list_unref(argslist);
-		    return NULL;
+		    ပြန်ပေး NULL;
 		}
 	    }
 	}
     }
 
-    if (!PyArg_ParseTuple(args, "et", "ascii", &name))
+    အကယ်၍ (!PyArg_ParseTuple(args, "et", "ascii", &name))
     {
 	dict_unref(selfdict);
-	while (argc--)
+	နေစဉ် (argc--)
 	    clear_tv(&argv[argc]);
 	PyMem_Free(argv);
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
     self = FunctionNew(subtype, name, argc, argv, selfdict, auto_rebind);
 
     PyMem_Free(name);
 
-    return self;
+    ပြန်ပေး self;
 }
 
     static void
 FunctionDestructor(PyObject *self_obj)
 {
     FunctionObject *self = (FunctionObject*)self_obj;
-    int i;
+    ကိန်းပြည့် i;
     func_unref(self->name);
     vim_free(self->name);
-    for (i = 0; i < self->argc; ++i)
+    အတွက် (i = 0; i < self->argc; ++i)
 	clear_tv(&self->argv[i]);
     PyMem_Free(self->argv);
     dict_unref(self->self);
-    if (self->argv || self->self)
+    အကယ်၍ (self->argv || self->self)
 	pyll_remove(&self->ref, &lastfunc);
 
     DESTRUCTOR_FINISH(self);
 }
 
-static char *FunctionAttrs[] = {
+static var_na *FunctionAttrs[] = {
     "softspace", "args", "self", "auto_rebind",
     NULL
 };
@@ -3795,36 +3795,36 @@ static char *FunctionAttrs[] = {
     static PyObject *
 FunctionDir(PyObject *self, PyObject *args UNUSED)
 {
-    return ObjectDir(self, FunctionAttrs);
+    ပြန်ပေး ObjectDir(self, FunctionAttrs);
 }
 
     static PyObject *
-FunctionAttr(FunctionObject *self, char *name)
+FunctionAttr(FunctionObject *self, var_na *name)
 {
     list_T *list;
-    int i;
-    if (strcmp(name, "name") == 0)
-	return PyString_FromString((char *)(self->name));
-    else if (strcmp(name, "args") == 0)
+    ကိန်းပြည့် i;
+    အကယ်၍ (strcmp(name, "name") == 0)
+	ပြန်ပေး PyString_FromString((var_na *)(self->name));
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "args") == 0)
     {
-	if (self->argv == NULL || (list = list_alloc()) == NULL)
-	    return ALWAYS_NONE;
+	အကယ်၍ (self->argv == NULL || (list = list_alloc()) == NULL)
+	    ပြန်ပေး ALWAYS_NONE;
 
-	for (i = 0; i < self->argc; ++i)
+	အတွက် (i = 0; i < self->argc; ++i)
 	    list_append_tv(list, &self->argv[i]);
-	return NEW_LIST(list);
+	ပြန်ပေး NEW_LIST(list);
     }
-    else if (strcmp(name, "self") == 0)
-	return self->self == NULL
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "self") == 0)
+	ပြန်ပေး self->self == NULL
 	    ? ALWAYS_NONE
 	    : NEW_DICTIONARY(self->self);
-    else if (strcmp(name, "auto_rebind") == 0)
-	return self->auto_rebind
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "auto_rebind") == 0)
+	ပြန်ပေး self->auto_rebind
 	    ? ALWAYS_TRUE
 	    : ALWAYS_FALSE;
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, FunctionAttrs);
-    return NULL;
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "__members__") == 0)
+	ပြန်ပေး ObjectDir(NULL, FunctionAttrs);
+    ပြန်ပေး NULL;
 }
 
 /*
@@ -3834,33 +3834,33 @@ FunctionAttr(FunctionObject *self, char *name)
  * that may be stored in a variable (i.e. may be freed by Vim).
  */
     static void
-set_partial(FunctionObject *self, partial_T *pt, int exported)
+set_partial(FunctionObject *self, partial_T *pt, ကိန်းပြည့် exported)
 {
-    int i;
+    ကိန်းပြည့် i;
 
     pt->pt_name = self->name;
-    if (self->argv)
+    အကယ်၍ (self->argv)
     {
 	pt->pt_argc = self->argc;
-	if (exported)
+	အကယ်၍ (exported)
 	{
 	    pt->pt_argv = ALLOC_CLEAR_MULT(typval_T, self->argc);
-	    for (i = 0; i < pt->pt_argc; ++i)
+	    အတွက် (i = 0; i < pt->pt_argc; ++i)
 		copy_tv(&self->argv[i], &pt->pt_argv[i]);
 	}
-	else
+	မဟုတ်ပါက
 	    pt->pt_argv = self->argv;
     }
-    else
+    မဟုတ်ပါက
     {
 	pt->pt_argc = 0;
 	pt->pt_argv = NULL;
     }
     pt->pt_auto = self->auto_rebind || !exported;
     pt->pt_dict = self->self;
-    if (exported && self->self)
+    အကယ်၍ (exported && self->self)
 	++pt->pt_dict->dv_refcount;
-    if (exported)
+    အကယ်၍ (exported)
 	pt->pt_name = vim_strsave(pt->pt_name);
     pt->pt_refcount = 1;
 }
@@ -3876,28 +3876,28 @@ FunctionCall(PyObject *self_obj, PyObject *argsObject, PyObject *kwargs)
     dict_T	*selfdict = NULL;
     PyObject	*selfdictObject;
     PyObject	*ret;
-    int		error;
+    ကိန်းပြည့်		error;
     partial_T	pt;
     partial_T	*pt_ptr = NULL;
 
-    if (ConvertFromPySequence(argsObject, &args) == -1)
-	return NULL;
+    အကယ်၍ (ConvertFromPySequence(argsObject, &args) == -1)
+	ပြန်ပေး NULL;
 
-    if (kwargs != NULL)
+    အကယ်၍ (kwargs != NULL)
     {
 	selfdictObject = PyDict_GetItemString(kwargs, "self");
-	if (selfdictObject != NULL)
+	အကယ်၍ (selfdictObject != NULL)
 	{
-	    if (ConvertFromPyMapping(selfdictObject, &selfdicttv) == -1)
+	    အကယ်၍ (ConvertFromPyMapping(selfdictObject, &selfdicttv) == -1)
 	    {
 		clear_tv(&args);
-		return NULL;
+		ပြန်ပေး NULL;
 	    }
 	    selfdict = selfdicttv.vval.v_dict;
 	}
     }
 
-    if (self->argv || self->self)
+    အကယ်၍ (self->argv || self->self)
     {
 	CLEAR_FIELD(pt);
 	set_partial(self, &pt, FALSE);
@@ -3913,22 +3913,22 @@ FunctionCall(PyObject *self_obj, PyObject *argsObject, PyObject *kwargs)
     Python_Release_Vim();
     Py_END_ALLOW_THREADS
 
-    if (VimTryEnd())
+    အကယ်၍ (VimTryEnd())
 	ret = NULL;
-    else if (error != OK)
+    မဟုတ်ပါက အကယ်၍ (error != OK)
     {
 	ret = NULL;
-	PyErr_VIM_FORMAT(N_("failed to run function %s"), (char *)name);
+	PyErr_VIM_FORMAT(N_("failed to run function %s"), (var_na *)name);
     }
-    else
+    မဟုတ်ပါက
 	ret = ConvertToPyObject(&rettv);
 
     clear_tv(&args);
     clear_tv(&rettv);
-    if (selfdict != NULL)
+    အကယ်၍ (selfdict != NULL)
 	clear_tv(&selfdicttv);
 
-    return ret;
+    ပြန်ပေး ret;
 }
 
     static PyObject *
@@ -3937,25 +3937,25 @@ FunctionRepr(PyObject *self_obj)
     FunctionObject *self = (FunctionObject*)self_obj;
     PyObject *ret;
     garray_T repr_ga;
-    int i;
+    ကိန်းပြည့် i;
     char_u *tofree = NULL;
     typval_T tv;
     char_u numbuf[NUMBUFLEN];
 
-    ga_init2(&repr_ga, sizeof(char), 70);
+    ga_init2(&repr_ga, parimaa_na(var_na), 70);
     ga_concat(&repr_ga, (char_u *)"<vim.Function '");
-    if (self->name)
+    အကယ်၍ (self->name)
 	ga_concat(&repr_ga, self->name);
-    else
+    မဟုတ်ပါက
 	ga_concat(&repr_ga, (char_u *)"<NULL>");
     ga_append(&repr_ga, '\'');
-    if (self->argv)
+    အကယ်၍ (self->argv)
     {
 	ga_concat(&repr_ga, (char_u *)", args=[");
 	++emsg_silent;
-	for (i = 0; i < self->argc; i++)
+	အတွက် (i = 0; i < self->argc; i++)
 	{
-	    if (i != 0)
+	    အကယ်၍ (i != 0)
 		ga_concat(&repr_ga, (char_u *)", ");
 	    ga_concat(&repr_ga, tv2string(&self->argv[i], &tofree, numbuf,
 			get_copyID()));
@@ -3964,7 +3964,7 @@ FunctionRepr(PyObject *self_obj)
 	--emsg_silent;
 	ga_append(&repr_ga, ']');
     }
-    if (self->self)
+    အကယ်၍ (self->self)
     {
 	ga_concat(&repr_ga, (char_u *)", self=");
 	tv.v_type = VAR_DICT;
@@ -3973,16 +3973,16 @@ FunctionRepr(PyObject *self_obj)
 	ga_concat(&repr_ga, tv2string(&tv, &tofree, numbuf, get_copyID()));
 	--emsg_silent;
 	vim_free(tofree);
-	if (self->auto_rebind)
+	အကယ်၍ (self->auto_rebind)
 	    ga_concat(&repr_ga, (char_u *)", auto_rebind=True");
     }
     ga_append(&repr_ga, '>');
-    ret = PyString_FromString((char *)repr_ga.ga_data);
+    ret = PyString_FromString((var_na *)repr_ga.ga_data);
     ga_clear(&repr_ga);
-    return ret;
+    ပြန်ပေး ret;
 }
 
-static struct PyMethodDef FunctionMethods[] = {
+static sa_nracanaa PyMethodDef FunctionMethods[] = {
     {"__dir__",	(PyCFunction)FunctionDir,   METH_NOARGS,		""},
     { NULL,	NULL,			0,				NULL}
 };
@@ -3993,40 +3993,40 @@ static struct PyMethodDef FunctionMethods[] = {
 
 DEFINE_PY_TYPE_OBJECT(OptionsType);
 
-typedef int (*checkfun)(void *);
+typedef ကိန်းပြည့် (*checkfun)(void *);
 
-typedef struct
+typedef sa_nracanaa
 {
     PyObject_HEAD
-    int		opt_type;
+    ကိန်းပြည့်		opt_type;
     void	*from;
     checkfun	Check;
     PyObject	*fromObj;
 } OptionsObject;
 
-    static int
+    static ကိန်းပြည့်
 dummy_check(void *arg UNUSED)
 {
-    return 0;
+    ပြန်ပေး 0;
 }
 
     static PyObject *
-OptionsNew(int opt_type, void *from, checkfun Check, PyObject *fromObj)
+OptionsNew(ကိန်းပြည့် opt_type, void *from, checkfun Check, PyObject *fromObj)
 {
     OptionsObject	*self;
 
     self = PyObject_GC_New(OptionsObject, OptionsTypePtr);
-    if (self == NULL)
-	return NULL;
+    အကယ်၍ (self == NULL)
+	ပြန်ပေး NULL;
 
     self->opt_type = opt_type;
     self->from = from;
     self->Check = Check;
     self->fromObj = fromObj;
-    if (fromObj)
+    အကယ်၍ (fromObj)
 	Py_INCREF(fromObj);
 
-    return (PyObject *)(self);
+    ပြန်ပေး (PyObject *)(self);
 }
 
     static void
@@ -4038,42 +4038,42 @@ OptionsDestructor(PyObject *self_obj)
     PyObject_GC_Del((void *)(self));
 }
 
-    static int
+    static ကိန်းပြည့်
 OptionsTraverse(PyObject *self_obj, visitproc visit, void *arg)
 {
     OptionsObject *self = (OptionsObject*)self_obj;
     Py_VISIT(self->fromObj);
-    return 0;
+    ပြန်ပေး 0;
 }
 
-    static int
+    static ကိန်းပြည့်
 OptionsClear(PyObject *self_obj)
 {
     OptionsObject *self = (OptionsObject*)self_obj;
     Py_CLEAR(self->fromObj);
-    return 0;
+    ပြန်ပေး 0;
 }
 
     static PyObject *
 OptionsItem(OptionsObject *self, PyObject *keyObject)
 {
     char_u	*key;
-    int		flags;
+    ကိန်းပြည့်		flags;
     long	numval;
     char_u	*stringval;
     PyObject	*todecref;
 
-    if (self->Check(self->fromObj))
-	return NULL;
+    အကယ်၍ (self->Check(self->fromObj))
+	ပြန်ပေး NULL;
 
-    if (!(key = StringToChars(keyObject, &todecref)))
-	return NULL;
+    အကယ်၍ (!(key = StringToChars(keyObject, &todecref)))
+	ပြန်ပေး NULL;
 
-    if (*key == NUL)
+    အကယ်၍ (*key == NUL)
     {
 	RAISE_NO_EMPTY_KEYS;
 	Py_XDECREF(todecref);
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
     flags = get_option_value_strict(key, &numval, &stringval,
@@ -4081,79 +4081,79 @@ OptionsItem(OptionsObject *self, PyObject *keyObject)
 
     Py_XDECREF(todecref);
 
-    if (flags == 0)
+    အကယ်၍ (flags == 0)
     {
 	PyErr_SetObject(PyExc_KeyError, keyObject);
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
-    if (flags & SOPT_UNSET)
+    အကယ်၍ (flags & SOPT_UNSET)
     {
 	Py_INCREF(Py_None);
-	return Py_None;
+	ပြန်ပေး Py_None;
     }
-    else if (flags & SOPT_BOOL)
+    မဟုတ်ပါက အကယ်၍ (flags & SOPT_BOOL)
     {
 	PyObject	*ret;
 	ret = numval ? Py_True : Py_False;
 	Py_INCREF(ret);
-	return ret;
+	ပြန်ပေး ret;
     }
-    else if (flags & SOPT_NUM)
-	return PyInt_FromLong(numval);
-    else if (flags & SOPT_STRING)
+    မဟုတ်ပါက အကယ်၍ (flags & SOPT_NUM)
+	ပြန်ပေး PyInt_FromLong(numval);
+    မဟုတ်ပါက အကယ်၍ (flags & SOPT_STRING)
     {
-	if (stringval)
+	အကယ်၍ (stringval)
 	{
-	    PyObject	*ret = PyBytes_FromString((char *)stringval);
+	    PyObject	*ret = PyBytes_FromString((var_na *)stringval);
 	    vim_free(stringval);
-	    return ret;
+	    ပြန်ပေး ret;
 	}
-	else
+	မဟုတ်ပါက
 	{
 	    PyErr_SET_STRING(PyExc_RuntimeError,
 		    N_("unable to get option value"));
-	    return NULL;
+	    ပြန်ပေး NULL;
 	}
     }
-    else
+    မဟုတ်ပါက
     {
 	PyErr_SET_VIM(N_("internal error: unknown option type"));
-	return NULL;
+	ပြန်ပေး NULL;
     }
 }
 
-    static int
+    static ကိန်းပြည့်
 OptionsContains(OptionsObject *self, PyObject *keyObject)
 {
     char_u	*key;
     PyObject	*todecref;
 
-    if (!(key = StringToChars(keyObject, &todecref)))
-	return -1;
+    အကယ်၍ (!(key = StringToChars(keyObject, &todecref)))
+	ပြန်ပေး -1;
 
-    if (*key == NUL)
+    အကယ်၍ (*key == NUL)
     {
 	Py_XDECREF(todecref);
-	return 0;
+	ပြန်ပေး 0;
     }
 
-    if (get_option_value_strict(key, NULL, NULL, self->opt_type, NULL))
+    အကယ်၍ (get_option_value_strict(key, NULL, NULL, self->opt_type, NULL))
     {
 	Py_XDECREF(todecref);
-	return 1;
+	ပြန်ပေး 1;
     }
-    else
+    မဟုတ်ပါက
     {
 	Py_XDECREF(todecref);
-	return 0;
+	ပြန်ပေး 0;
     }
 }
 
-typedef struct
+typedef sa_nracanaa
 {
     void	*lastoption;
-    int		opt_type;
+    ကိန်းပြည့်		opt_type;
 } optiterinfo_T;
 
     static PyObject *
@@ -4162,10 +4162,10 @@ OptionsIterNext(void **arg)
     char_u	*name;
     optiterinfo_T **oii = (optiterinfo_T**)arg;
 
-    if ((name = option_iter_next(&((*oii)->lastoption), (*oii)->opt_type)))
-	return PyString_FromString((char *)name);
+    အကယ်၍ ((name = option_iter_next(&((*oii)->lastoption), (*oii)->opt_type)))
+	ပြန်ပေး PyString_FromString((var_na *)name);
 
-    return NULL;
+    ပြန်ပေး NULL;
 }
 
     static PyObject *
@@ -4174,178 +4174,178 @@ OptionsIter(PyObject *self_obj)
     OptionsObject	*self = (OptionsObject*)self_obj;
     optiterinfo_T	*oii;
 
-    if (!(oii = PyMem_New(optiterinfo_T, 1)))
+    အကယ်၍ (!(oii = PyMem_New(optiterinfo_T, 1)))
     {
 	PyErr_NoMemory();
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
     oii->opt_type = self->opt_type;
     oii->lastoption = NULL;
 
-    return IterNew(oii,
+    ပြန်ပေး IterNew(oii,
 	    PyMem_Free, OptionsIterNext,
 	    NULL, NULL, (PyObject *)self);
 }
 
-    static int
-set_option_value_err(char_u *key, int numval, char_u *stringval, int opt_flags)
+    static ကိန်းပြည့်
+set_option_value_err(char_u *key, ကိန်းပြည့် numval, char_u *stringval, ကိန်းပြည့် opt_flags)
 {
-    char	*errmsg;
+    var_na	*errmsg;
 
-    if ((errmsg = set_option_value(key, numval, stringval, opt_flags)))
+    အကယ်၍ ((errmsg = set_option_value(key, numval, stringval, opt_flags)))
     {
-	if (VimTryEnd())
-	    return FAIL;
+	အကယ်၍ (VimTryEnd())
+	    ပြန်ပေး FAIL;
 	PyErr_SetVim(errmsg);
-	return FAIL;
+	ပြန်ပေး FAIL;
     }
-    return OK;
+    ပြန်ပေး OK;
 }
 
-    static int
+    static ကိန်းပြည့်
 set_option_value_for(
 	char_u *key,
-	int numval,
+	ကိန်းပြည့် numval,
 	char_u *stringval,
-	int opt_flags,
-	int opt_type,
+	ကိန်းပြည့် opt_flags,
+	ကိန်းပြည့် opt_type,
 	void *from)
 {
     switchwin_T	switchwin;
     bufref_T	save_curbuf;
-    int		set_ret = 0;
+    ကိန်းပြည့်		set_ret = 0;
 
     VimTryStart();
     switch (opt_type)
     {
-	case SREQ_WIN:
-	    if (switch_win(&switchwin, (win_T *)from,
+	pak_sa SREQ_WIN:
+	    အကယ်၍ (switch_win(&switchwin, (win_T *)from,
 			      win_find_tabpage((win_T *)from), FALSE) == FAIL)
 	    {
 		restore_win(&switchwin, TRUE);
-		if (VimTryEnd())
-		    return -1;
+		အကယ်၍ (VimTryEnd())
+		    ပြန်ပေး -1;
 		PyErr_SET_VIM(N_("problem while switching windows"));
-		return -1;
+		ပြန်ပေး -1;
 	    }
 	    set_ret = set_option_value_err(key, numval, stringval, opt_flags);
 	    restore_win(&switchwin, TRUE);
-	    break;
-	case SREQ_BUF:
+	    bha_nga;
+	pak_sa SREQ_BUF:
 	    switch_buffer(&save_curbuf, (buf_T *)from);
 	    set_ret = set_option_value_err(key, numval, stringval, opt_flags);
 	    restore_buffer(&save_curbuf);
-	    break;
-	case SREQ_GLOBAL:
+	    bha_nga;
+	pak_sa SREQ_GLOBAL:
 	    set_ret = set_option_value_err(key, numval, stringval, opt_flags);
-	    break;
+	    bha_nga;
     }
-    if (set_ret == FAIL)
-	return -1;
-    return VimTryEnd();
+    အကယ်၍ (set_ret == FAIL)
+	ပြန်ပေး -1;
+    ပြန်ပေး VimTryEnd();
 }
 
-    static int
+    static ကိန်းပြည့်
 OptionsAssItem(OptionsObject *self, PyObject *keyObject, PyObject *valObject)
 {
     char_u	*key;
-    int		flags;
-    int		opt_flags;
-    int		ret = 0;
+    ကိန်းပြည့်		flags;
+    ကိန်းပြည့်		opt_flags;
+    ကိန်းပြည့်		ret = 0;
     PyObject	*todecref;
 
-    if (self->Check(self->fromObj))
-	return -1;
+    အကယ်၍ (self->Check(self->fromObj))
+	ပြန်ပေး -1;
 
-    if (!(key = StringToChars(keyObject, &todecref)))
-	return -1;
+    အကယ်၍ (!(key = StringToChars(keyObject, &todecref)))
+	ပြန်ပေး -1;
 
-    if (*key == NUL)
+    အကယ်၍ (*key == NUL)
     {
 	RAISE_NO_EMPTY_KEYS;
 	Py_XDECREF(todecref);
-	return -1;
+	ပြန်ပေး -1;
     }
 
     flags = get_option_value_strict(key, NULL, NULL,
 				    self->opt_type, self->from);
 
-    if (flags == 0)
+    အကယ်၍ (flags == 0)
     {
 	PyErr_SetObject(PyExc_KeyError, keyObject);
 	Py_XDECREF(todecref);
-	return -1;
+	ပြန်ပေး -1;
     }
 
-    if (valObject == NULL)
+    အကယ်၍ (valObject == NULL)
     {
-	if (self->opt_type == SREQ_GLOBAL)
+	အကယ်၍ (self->opt_type == SREQ_GLOBAL)
 	{
 	    PyErr_FORMAT(PyExc_ValueError,
 		    N_("unable to unset global option %s"), key);
 	    Py_XDECREF(todecref);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
-	else if (!(flags & SOPT_GLOBAL))
+	မဟုတ်ပါက အကယ်၍ (!(flags & SOPT_GLOBAL))
 	{
 	    PyErr_FORMAT(PyExc_ValueError,
 		    N_("unable to unset option %s "
 		       "which does not have global value"), key);
 	    Py_XDECREF(todecref);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
-	else
+	မဟုတ်ပါက
 	{
 	    unset_global_local_option(key, self->from);
 	    Py_XDECREF(todecref);
-	    return 0;
+	    ပြန်ပေး 0;
 	}
     }
 
     opt_flags = (self->opt_type ? OPT_LOCAL : OPT_GLOBAL);
 
-    if (flags & SOPT_BOOL)
+    အကယ်၍ (flags & SOPT_BOOL)
     {
-	int	istrue = PyObject_IsTrue(valObject);
+	ကိန်းပြည့်	istrue = PyObject_IsTrue(valObject);
 
-	if (istrue == -1)
+	အကယ်၍ (istrue == -1)
 	    ret = -1;
-	else
+	မဟုတ်ပါက
 	    ret = set_option_value_for(key, istrue, NULL,
 				    opt_flags, self->opt_type, self->from);
     }
-    else if (flags & SOPT_NUM)
+    မဟုတ်ပါက အကယ်၍ (flags & SOPT_NUM)
     {
 	long	val;
 
-	if (NumberToLong(valObject, &val, NUMBER_INT))
+	အကယ်၍ (NumberToLong(valObject, &val, NUMBER_INT))
 	{
 	    Py_XDECREF(todecref);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 
-	ret = set_option_value_for(key, (int) val, NULL, opt_flags,
+	ret = set_option_value_for(key, (ကိန်းပြည့်) val, NULL, opt_flags,
 				self->opt_type, self->from);
     }
-    else
+    မဟုတ်ပါက
     {
 	char_u		*val;
 	PyObject	*todecref2;
 
-	if ((val = StringToChars(valObject, &todecref2)))
+	အကယ်၍ ((val = StringToChars(valObject, &todecref2)))
 	{
 	    ret = set_option_value_for(key, 0, val, opt_flags,
 				    self->opt_type, self->from);
 	    Py_XDECREF(todecref2);
 	}
-	else
+	မဟုတ်ပါက
 	    ret = -1;
     }
 
     Py_XDECREF(todecref);
 
-    return ret;
+    ပြန်ပေး ret;
 }
 
 static PySequenceMethods OptionsAsSeq = {
@@ -4369,7 +4369,7 @@ static PyMappingMethods OptionsAsMapping = {
 
 // Tabpage object
 
-typedef struct
+typedef sa_nracanaa
 {
     PyObject_HEAD
     tabpage_T	*tab;
@@ -4379,16 +4379,16 @@ static PyObject *WinListNew(TabPageObject *tabObject);
 
 DEFINE_PY_TYPE_OBJECT(TabPageType);
 
-    static int
+    static ကိန်းပြည့်
 CheckTabPage(TabPageObject *self)
 {
-    if (self->tab == INVALID_TABPAGE_VALUE)
+    အကယ်၍ (self->tab == INVALID_TABPAGE_VALUE)
     {
 	PyErr_SET_VIM(N_("attempt to refer to deleted tab page"));
-	return -1;
+	ပြန်ပေး -1;
     }
 
-    return 0;
+    ပြန်ပေး 0;
 }
 
     static PyObject *
@@ -4396,34 +4396,34 @@ TabPageNew(tabpage_T *tab)
 {
     TabPageObject *self;
 
-    if (TAB_PYTHON_REF(tab))
+    အကယ်၍ (TAB_PYTHON_REF(tab))
     {
 	self = TAB_PYTHON_REF(tab);
 	Py_INCREF((PyObject *)self);
     }
-    else
+    မဟုတ်ပါက
     {
 	self = PyObject_NEW(TabPageObject, TabPageTypePtr);
-	if (self == NULL)
-	    return NULL;
+	အကယ်၍ (self == NULL)
+	    ပြန်ပေး NULL;
 	self->tab = tab;
 	TAB_PYTHON_REF(tab) = self;
     }
 
-    return (PyObject *)(self);
+    ပြန်ပေး (PyObject *)(self);
 }
 
     static void
 TabPageDestructor(PyObject *self_obj)
 {
     TabPageObject *self = (TabPageObject*)self_obj;
-    if (self->tab && self->tab != INVALID_TABPAGE_VALUE)
+    အကယ်၍ (self->tab && self->tab != INVALID_TABPAGE_VALUE)
 	TAB_PYTHON_REF(self->tab) = NULL;
 
     DESTRUCTOR_FINISH(self);
 }
 
-static char *TabPageAttrs[] = {
+static var_na *TabPageAttrs[] = {
     "windows", "number", "vars", "window", "valid",
     NULL
 };
@@ -4431,63 +4431,63 @@ static char *TabPageAttrs[] = {
     static PyObject *
 TabPageDir(PyObject *self, PyObject *args UNUSED)
 {
-    return ObjectDir(self, TabPageAttrs);
+    ပြန်ပေး ObjectDir(self, TabPageAttrs);
 }
 
     static PyObject *
-TabPageAttrValid(TabPageObject *self, char *name)
+TabPageAttrValid(TabPageObject *self, var_na *name)
 {
     PyObject	*ret;
 
-    if (strcmp(name, "valid") != 0)
-	return NULL;
+    အကယ်၍ (strcmp(name, "valid") != 0)
+	ပြန်ပေး NULL;
 
     ret = ((self->tab == INVALID_TABPAGE_VALUE) ? Py_False : Py_True);
     Py_INCREF(ret);
-    return ret;
+    ပြန်ပေး ret;
 }
 
     static PyObject *
-TabPageAttr(TabPageObject *self, char *name)
+TabPageAttr(TabPageObject *self, var_na *name)
 {
-    if (strcmp(name, "windows") == 0)
-	return WinListNew(self);
-    else if (strcmp(name, "number") == 0)
-	return PyLong_FromLong((long) get_tab_number(self->tab));
-    else if (strcmp(name, "vars") == 0)
-	return NEW_DICTIONARY(self->tab->tp_vars);
-    else if (strcmp(name, "window") == 0)
+    အကယ်၍ (strcmp(name, "windows") == 0)
+	ပြန်ပေး WinListNew(self);
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "number") == 0)
+	ပြန်ပေး PyLong_FromLong((long) get_tab_number(self->tab));
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "vars") == 0)
+	ပြန်ပေး NEW_DICTIONARY(self->tab->tp_vars);
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "window") == 0)
     {
 	// For current tab window.c does not bother to set or update tp_curwin
-	if (self->tab == curtab)
-	    return WindowNew(curwin, curtab);
-	else
-	    return WindowNew(self->tab->tp_curwin, self->tab);
+	အကယ်၍ (self->tab == curtab)
+	    ပြန်ပေး WindowNew(curwin, curtab);
+	မဟုတ်ပါက
+	    ပြန်ပေး WindowNew(self->tab->tp_curwin, self->tab);
     }
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, TabPageAttrs);
-    return NULL;
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "__members__") == 0)
+	ပြန်ပေး ObjectDir(NULL, TabPageAttrs);
+    ပြန်ပေး NULL;
 }
 
     static PyObject *
 TabPageRepr(PyObject *self_obj)
 {
     TabPageObject *self = (TabPageObject*)self_obj;
-    if (self->tab == INVALID_TABPAGE_VALUE)
-	return PyString_FromFormat("<tabpage object (deleted) at %p>", (void *)self);
-    else
+    အကယ်၍ (self->tab == INVALID_TABPAGE_VALUE)
+	ပြန်ပေး PyString_FromFormat("<tabpage object (deleted) at %p>", (void *)self);
+    မဟုတ်ပါက
     {
-	int	t = get_tab_number(self->tab);
+	ကိန်းပြည့်	t = get_tab_number(self->tab);
 
-	if (t == 0)
-	    return PyString_FromFormat("<tabpage object (unknown) at %p>",
+	အကယ်၍ (t == 0)
+	    ပြန်ပေး PyString_FromFormat("<tabpage object (unknown) at %p>",
 					(void *)self);
-	else
-	    return PyString_FromFormat("<tabpage %d>", t - 1);
+	မဟုတ်ပါက
+	    ပြန်ပေး PyString_FromFormat("<tabpage %d>", t - 1);
     }
 }
 
-static struct PyMethodDef TabPageMethods[] = {
+static sa_nracanaa PyMethodDef TabPageMethods[] = {
     // name,	    function,			calling,	documentation
     {"__dir__",	    (PyCFunction)TabPageDir,	METH_NOARGS,	""},
     { NULL,	    NULL,			0,		NULL}
@@ -4500,7 +4500,7 @@ static struct PyMethodDef TabPageMethods[] = {
 DEFINE_PY_TYPE_OBJECT(TabListType);
 static PySequenceMethods TabListAsSeq;
 
-typedef struct
+typedef sa_nracanaa
 {
     PyObject_HEAD
 } TabListObject;
@@ -4516,13 +4516,13 @@ TabListLength(PyObject *self UNUSED)
     tabpage_T	*tp = first_tabpage;
     PyInt	n = 0;
 
-    while (tp != NULL)
+    နေစဉ် (tp != NULL)
     {
 	++n;
 	tp = tp->tp_next;
     }
 
-    return n;
+    ပြန်ပေး n;
 }
 
     static PyObject *
@@ -4530,19 +4530,19 @@ TabListItem(PyObject *self UNUSED, PyInt n)
 {
     tabpage_T	*tp;
 
-    for (tp = first_tabpage; tp != NULL; tp = tp->tp_next, --n)
-	if (n == 0)
-	    return TabPageNew(tp);
+    အတွက် (tp = first_tabpage; tp != NULL; tp = tp->tp_next, --n)
+	အကယ်၍ (n == 0)
+	    ပြန်ပေး TabPageNew(tp);
 
     PyErr_SET_STRING(PyExc_IndexError, N_("no such tab page"));
-    return NULL;
+    ပြန်ပေး NULL;
 }
 
 /*
  * Window object
  */
 
-typedef struct
+typedef sa_nracanaa
 {
     PyObject_HEAD
     win_T	*win;
@@ -4551,22 +4551,22 @@ typedef struct
 
 DEFINE_PY_TYPE_OBJECT(WindowType);
 
-    static int
+    static ကိန်းပြည့်
 CheckWindow(WindowObject *self)
 {
-    if (self->win == INVALID_WINDOW_VALUE)
+    အကယ်၍ (self->win == INVALID_WINDOW_VALUE)
     {
 	PyErr_SET_VIM(N_("attempt to refer to deleted window"));
-	return -1;
+	ပြန်ပေး -1;
     }
 
-    return 0;
+    ပြန်ပေး 0;
 }
 
-    static int
+    static ကိန်းပြည့်
 CheckWindowCb(void *self)
 {
-    return CheckWindow((WindowObject*)self);
+    ပြန်ပေး CheckWindow((WindowObject*)self);
 }
 
     static PyObject *
@@ -4590,23 +4590,23 @@ WindowNew(win_T *win, tabpage_T *tab)
 
     WindowObject *self;
 
-    if (WIN_PYTHON_REF(win))
+    အကယ်၍ (WIN_PYTHON_REF(win))
     {
 	self = WIN_PYTHON_REF(win);
 	Py_INCREF((PyObject *)self);
     }
-    else
+    မဟုတ်ပါက
     {
 	self = PyObject_GC_New(WindowObject, WindowTypePtr);
-	if (self == NULL)
-	    return NULL;
+	အကယ်၍ (self == NULL)
+	    ပြန်ပေး NULL;
 	self->win = win;
 	WIN_PYTHON_REF(win) = self;
     }
 
     self->tabObject = ((TabPageObject *)(TabPageNew(tab)));
 
-    return (PyObject *)(self);
+    ပြန်ပေး (PyObject *)(self);
 }
 
     static void
@@ -4614,47 +4614,47 @@ WindowDestructor(PyObject *self_obj)
 {
     WindowObject *self = (WindowObject*)self_obj;
     PyObject_GC_UnTrack((void *)(self));
-    if (self->win && self->win != INVALID_WINDOW_VALUE)
+    အကယ်၍ (self->win && self->win != INVALID_WINDOW_VALUE)
 	WIN_PYTHON_REF(self->win) = NULL;
     Py_XDECREF(((PyObject *)(self->tabObject)));
     PyObject_GC_Del((void *)(self));
 }
 
-    static int
+    static ကိန်းပြည့်
 WindowTraverse(PyObject *self_obj, visitproc visit, void *arg)
 {
     WindowObject *self = (WindowObject*)self_obj;
     Py_VISIT(((PyObject *)(self->tabObject)));
-    return 0;
+    ပြန်ပေး 0;
 }
 
-    static int
+    static ကိန်းပြည့်
 WindowClear(PyObject *self_obj)
 {
     WindowObject *self = (WindowObject*)self_obj;
     Py_CLEAR(self->tabObject);
-    return 0;
+    ပြန်ပေး 0;
 }
 
     static win_T *
 get_firstwin(TabPageObject *tabObject)
 {
-    if (tabObject)
+    အကယ်၍ (tabObject)
     {
-	if (CheckTabPage(tabObject))
-	    return NULL;
+	အကယ်၍ (CheckTabPage(tabObject))
+	    ပြန်ပေး NULL;
 	// For current tab window.c does not bother to set or update tp_firstwin
-	else if (tabObject->tab == curtab)
-	    return firstwin;
-	else
-	    return tabObject->tab->tp_firstwin;
+	မဟုတ်ပါက အကယ်၍ (tabObject->tab == curtab)
+	    ပြန်ပေး firstwin;
+	မဟုတ်ပါက
+	    ပြန်ပေး tabObject->tab->tp_firstwin;
     }
-    else
-	return firstwin;
+    မဟုတ်ပါက
+	ပြန်ပေး firstwin;
 }
 
 // Use the same order as in the WindowAttr() function.
-static char *WindowAttrs[] = {
+static var_na *WindowAttrs[] = {
     "buffer",
     "cursor",
     "height",
@@ -4672,93 +4672,93 @@ static char *WindowAttrs[] = {
     static PyObject *
 WindowDir(PyObject *self, PyObject *args UNUSED)
 {
-    return ObjectDir(self, WindowAttrs);
+    ပြန်ပေး ObjectDir(self, WindowAttrs);
 }
 
     static PyObject *
-WindowAttrValid(WindowObject *self, char *name)
+WindowAttrValid(WindowObject *self, var_na *name)
 {
     PyObject	*ret;
 
-    if (strcmp(name, "valid") != 0)
-	return NULL;
+    အကယ်၍ (strcmp(name, "valid") != 0)
+	ပြန်ပေး NULL;
 
     ret = ((self->win == INVALID_WINDOW_VALUE) ? Py_False : Py_True);
     Py_INCREF(ret);
-    return ret;
+    ပြန်ပေး ret;
 }
 
     static PyObject *
-WindowAttr(WindowObject *self, char *name)
+WindowAttr(WindowObject *self, var_na *name)
 {
-    if (strcmp(name, "buffer") == 0)
-	return (PyObject *)BufferNew(self->win->w_buffer);
-    else if (strcmp(name, "cursor") == 0)
+    အကယ်၍ (strcmp(name, "buffer") == 0)
+	ပြန်ပေး (PyObject *)BufferNew(self->win->w_buffer);
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "cursor") == 0)
     {
 	pos_T *pos = &self->win->w_cursor;
 
-	return Py_BuildValue("(ll)", (long)(pos->lnum), (long)(pos->col));
+	ပြန်ပေး Py_BuildValue("(ll)", (long)(pos->lnum), (long)(pos->col));
     }
-    else if (strcmp(name, "height") == 0)
-	return PyLong_FromLong((long)(self->win->w_height));
-    else if (strcmp(name, "row") == 0)
-	return PyLong_FromLong((long)(self->win->w_winrow));
-    else if (strcmp(name, "width") == 0)
-	return PyLong_FromLong((long)(self->win->w_width));
-    else if (strcmp(name, "col") == 0)
-	return PyLong_FromLong((long)(self->win->w_wincol));
-    else if (strcmp(name, "vars") == 0)
-	return NEW_DICTIONARY(self->win->w_vars);
-    else if (strcmp(name, "options") == 0)
-	return OptionsNew(SREQ_WIN, self->win, CheckWindowCb,
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "height") == 0)
+	ပြန်ပေး PyLong_FromLong((long)(self->win->w_height));
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "row") == 0)
+	ပြန်ပေး PyLong_FromLong((long)(self->win->w_winrow));
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "width") == 0)
+	ပြန်ပေး PyLong_FromLong((long)(self->win->w_width));
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "col") == 0)
+	ပြန်ပေး PyLong_FromLong((long)(self->win->w_wincol));
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "vars") == 0)
+	ပြန်ပေး NEW_DICTIONARY(self->win->w_vars);
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "options") == 0)
+	ပြန်ပေး OptionsNew(SREQ_WIN, self->win, CheckWindowCb,
 			(PyObject *) self);
-    else if (strcmp(name, "number") == 0)
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "number") == 0)
     {
-	if (CheckTabPage(self->tabObject))
-	    return NULL;
-	return PyLong_FromLong((long)
+	အကယ်၍ (CheckTabPage(self->tabObject))
+	    ပြန်ပေး NULL;
+	ပြန်ပေး PyLong_FromLong((long)
 		get_win_number(self->win, get_firstwin(self->tabObject)));
     }
-    else if (strcmp(name, "tabpage") == 0)
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "tabpage") == 0)
     {
 	Py_INCREF((PyObject *)self->tabObject);
-	return (PyObject *)(self->tabObject);
+	ပြန်ပေး (PyObject *)(self->tabObject);
     }
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, WindowAttrs);
-    else
-	return NULL;
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "__members__") == 0)
+	ပြန်ပေး ObjectDir(NULL, WindowAttrs);
+    မဟုတ်ပါက
+	ပြန်ပေး NULL;
 }
 
-    static int
-WindowSetattr(PyObject *self_obj, char *name, PyObject *valObject)
+    static ကိန်းပြည့်
+WindowSetattr(PyObject *self_obj, var_na *name, PyObject *valObject)
 {
     WindowObject *self = (WindowObject*)self_obj;
-    if (CheckWindow(self))
-	return -1;
+    အကယ်၍ (CheckWindow(self))
+	ပြန်ပေး -1;
 
-    if (strcmp(name, "buffer") == 0)
+    အကယ်၍ (strcmp(name, "buffer") == 0)
     {
 	PyErr_SET_STRING(PyExc_TypeError, N_("readonly attribute: buffer"));
-	return -1;
+	ပြန်ပေး -1;
     }
-    else if (strcmp(name, "cursor") == 0)
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "cursor") == 0)
     {
 	long lnum;
 	long col;
 
-	if (!PyArg_Parse(valObject, "(ll)", &lnum, &col))
-	    return -1;
+	အကယ်၍ (!PyArg_Parse(valObject, "(ll)", &lnum, &col))
+	    ပြန်ပေး -1;
 
-	if (lnum <= 0 || lnum > self->win->w_buffer->b_ml.ml_line_count)
+	အကယ်၍ (lnum <= 0 || lnum > self->win->w_buffer->b_ml.ml_line_count)
 	{
 	    PyErr_SET_VIM(N_("cursor position outside buffer"));
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 
 	// Check for keyboard interrupts
-	if (VimCheckInterrupt())
-	    return -1;
+	အကယ်၍ (VimCheckInterrupt())
+	    ပြန်ပေး -1;
 
 	self->win->w_cursor.lnum = lnum;
 	self->win->w_cursor.col = col;
@@ -4768,15 +4768,15 @@ WindowSetattr(PyObject *self_obj, char *name, PyObject *valObject)
 	check_cursor_col_win(self->win);
 
 	update_screen(UPD_VALID);
-	return 0;
+	ပြန်ပေး 0;
     }
-    else if (strcmp(name, "height") == 0)
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "height") == 0)
     {
 	long	height;
 	win_T	*savewin;
 
-	if (NumberToLong(valObject, &height, NUMBER_INT|NUMBER_UNSIGNED))
-	    return -1;
+	အကယ်၍ (NumberToLong(valObject, &height, NUMBER_INT|NUMBER_UNSIGNED))
+	    ပြန်ပေး -1;
 
 #ifdef FEAT_GUI
 	need_mouse_correct = TRUE;
@@ -4786,21 +4786,21 @@ WindowSetattr(PyObject *self_obj, char *name, PyObject *valObject)
 	curbuf = curwin->w_buffer;
 
 	VimTryStart();
-	win_setheight((int) height);
+	win_setheight((ကိန်းပြည့်) height);
 	curwin = savewin;
 	curbuf = curwin->w_buffer;
-	if (VimTryEnd())
-	    return -1;
+	အကယ်၍ (VimTryEnd())
+	    ပြန်ပေး -1;
 
-	return 0;
+	ပြန်ပေး 0;
     }
-    else if (strcmp(name, "width") == 0)
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "width") == 0)
     {
 	long	width;
 	win_T	*savewin;
 
-	if (NumberToLong(valObject, &width, NUMBER_INT|NUMBER_UNSIGNED))
-	    return -1;
+	အကယ်၍ (NumberToLong(valObject, &width, NUMBER_INT|NUMBER_UNSIGNED))
+	    ပြန်ပေး -1;
 
 #ifdef FEAT_GUI
 	need_mouse_correct = TRUE;
@@ -4810,18 +4810,18 @@ WindowSetattr(PyObject *self_obj, char *name, PyObject *valObject)
 	curbuf = curwin->w_buffer;
 
 	VimTryStart();
-	win_setwidth((int) width);
+	win_setwidth((ကိန်းပြည့်) width);
 	curwin = savewin;
 	curbuf = curwin->w_buffer;
-	if (VimTryEnd())
-	    return -1;
+	အကယ်၍ (VimTryEnd())
+	    ပြန်ပေး -1;
 
-	return 0;
+	ပြန်ပေး 0;
     }
-    else
+    မဟုတ်ပါက
     {
 	PyErr_SetString(PyExc_AttributeError, name);
-	return -1;
+	ပြန်ပေး -1;
     }
 }
 
@@ -4829,21 +4829,21 @@ WindowSetattr(PyObject *self_obj, char *name, PyObject *valObject)
 WindowRepr(PyObject *self_obj)
 {
     WindowObject *self = (WindowObject*)self_obj;
-    if (self->win == INVALID_WINDOW_VALUE)
-	return PyString_FromFormat("<window object (deleted) at %p>", (void *)self);
-    else
+    အကယ်၍ (self->win == INVALID_WINDOW_VALUE)
+	ပြန်ပေး PyString_FromFormat("<window object (deleted) at %p>", (void *)self);
+    မဟုတ်ပါက
     {
-	int	w = get_win_number(self->win, firstwin);
+	ကိန်းပြည့်	w = get_win_number(self->win, firstwin);
 
-	if (w == 0)
-	    return PyString_FromFormat("<window object (unknown) at %p>",
+	အကယ်၍ (w == 0)
+	    ပြန်ပေး PyString_FromFormat("<window object (unknown) at %p>",
 								      (void *)self);
-	else
-	    return PyString_FromFormat("<window %d>", w - 1);
+	မဟုတ်ပါက
+	    ပြန်ပေး PyString_FromFormat("<window %d>", w - 1);
     }
 }
 
-static struct PyMethodDef WindowMethods[] = {
+static sa_nracanaa PyMethodDef WindowMethods[] = {
     // name,	    function,			calling,	documentation
     {"__dir__",	    (PyCFunction)WindowDir,	METH_NOARGS,	""},
     { NULL,	    NULL,			0,		NULL}
@@ -4856,7 +4856,7 @@ static struct PyMethodDef WindowMethods[] = {
 DEFINE_PY_TYPE_OBJECT(WinListType);
 static PySequenceMethods WinListAsSeq;
 
-typedef struct
+typedef sa_nracanaa
 {
     PyObject_HEAD
     TabPageObject	*tabObject;
@@ -4877,7 +4877,7 @@ WinListNew(TabPageObject *tabObject)
     self->tabObject = tabObject;
     Py_INCREF((PyObject *)tabObject);
 
-    return (PyObject *)(self);
+    ပြန်ပေး (PyObject *)(self);
 }
 
     static void
@@ -4885,7 +4885,7 @@ WinListDestructor(WinListObject *self)
 {
     TabPageObject	*tabObject = self->tabObject;
 
-    if (tabObject)
+    အကယ်၍ (tabObject)
     {
 	Py_DECREF((PyObject *)(tabObject));
     }
@@ -4899,16 +4899,16 @@ WinListLength(WinListObject *self)
     win_T	*w;
     PyInt	n = 0;
 
-    if (!(w = get_firstwin(self->tabObject)))
-	return -1;
+    အကယ်၍ (!(w = get_firstwin(self->tabObject)))
+	ပြန်ပေး -1;
 
-    while (w != NULL)
+    နေစဉ် (w != NULL)
     {
 	++n;
 	w = W_NEXT(w);
     }
 
-    return n;
+    ပြန်ပေး n;
 }
 
     static PyObject *
@@ -4916,15 +4916,15 @@ WinListItem(WinListObject *self, PyInt n)
 {
     win_T *w;
 
-    if (!(w = get_firstwin(self->tabObject)))
-	return NULL;
+    အကယ်၍ (!(w = get_firstwin(self->tabObject)))
+	ပြန်ပေး NULL;
 
-    for (; w != NULL; w = W_NEXT(w), --n)
-	if (n == 0)
-	    return WindowNew(w, self->tabObject? self->tabObject->tab: curtab);
+    အတွက် (; w != NULL; w = W_NEXT(w), --n)
+	အကယ်၍ (n == 0)
+	    ပြန်ပေး WindowNew(w, self->tabObject? self->tabObject->tab: curtab);
 
     PyErr_SET_STRING(PyExc_IndexError, N_("no such window"));
-    return NULL;
+    ပြန်ပေး NULL;
 }
 
 /*
@@ -4936,47 +4936,47 @@ WinListItem(WinListObject *self, PyInt n)
  *
  * On errors, the Python exception data is set, and NULL is returned.
  */
-    static char *
+    static var_na *
 StringToLine(PyObject *obj)
 {
-    char	*str;
-    char	*save;
+    var_na	*str;
+    var_na	*save;
     PyObject	*bytes = NULL;
     Py_ssize_t	len = 0;
     PyInt	i;
-    char	*p;
+    var_na	*p;
 
-    if (PyBytes_Check(obj))
+    အကယ်၍ (PyBytes_Check(obj))
     {
-	if (PyBytes_AsStringAndSize(obj, &str, &len) == -1
+	အကယ်၍ (PyBytes_AsStringAndSize(obj, &str, &len) == -1
 		|| str == NULL)
-	    return NULL;
+	    ပြန်ပေး NULL;
     }
-    else if (PyUnicode_Check(obj))
+    မဟုတ်ပါက အကယ်၍ (PyUnicode_Check(obj))
     {
-	if (!(bytes = PyUnicode_AsEncodedString(obj, ENC_OPT,
+	အကယ်၍ (!(bytes = PyUnicode_AsEncodedString(obj, ENC_OPT,
 							   ERRORS_ENCODE_ARG)))
-	    return NULL;
+	    ပြန်ပေး NULL;
 
-	if (PyBytes_AsStringAndSize(bytes, &str, &len) == -1
+	အကယ်၍ (PyBytes_AsStringAndSize(bytes, &str, &len) == -1
 		|| str == NULL)
 	{
 	    Py_DECREF(bytes);
-	    return NULL;
+	    ပြန်ပေး NULL;
 	}
     }
-    else
+    မဟုတ်ပါက
     {
-#if PY_MAJOR_VERSION < 3
+#အကယ်၍ PY_MAJOR_VERSION < 3
 	PyErr_FORMAT_TYPE(
 		N_("expected str() or unicode() instance, but got %s"),
 		obj);
-#else
+#မဟုတ်ပါက
 	PyErr_FORMAT_TYPE(
 		N_("expected bytes() or str() instance, but got %s"),
 		obj);
 #endif
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
     /*
@@ -4986,15 +4986,15 @@ StringToLine(PyObject *obj)
      * A trailing newline is removed, so that append(f.readlines()) works.
      */
     p = memchr(str, '\n', len);
-    if (p != NULL)
+    အကယ်၍ (p != NULL)
     {
-	if (p == str + len - 1)
+	အကယ်၍ (p == str + len - 1)
 	    --len;
-	else
+	မဟုတ်ပါက
 	{
 	    PyErr_SET_VIM(N_("string cannot contain newlines"));
 	    Py_XDECREF(bytes);
-	    return NULL;
+	    ပြန်ပေး NULL;
 	}
     }
 
@@ -5003,25 +5003,25 @@ StringToLine(PyObject *obj)
      * newline characters, as is the Vim convention.
      */
     save = alloc(len+1);
-    if (save == NULL)
+    အကယ်၍ (save == NULL)
     {
 	PyErr_NoMemory();
 	Py_XDECREF(bytes);
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
-    for (i = 0; i < len; ++i)
+    အတွက် (i = 0; i < len; ++i)
     {
-	if (str[i] == '\0')
+	အကယ်၍ (str[i] == '\0')
 	    save[i] = '\n';
-	else
+	မဟုတ်ပါက
 	    save[i] = str[i];
     }
 
     save[i] = '\0';
     Py_XDECREF(bytes);  // Python 2 does nothing here
 
-    return save;
+    ပြန်ပေး save;
 }
 
 /*
@@ -5032,7 +5032,7 @@ StringToLine(PyObject *obj)
     static PyObject *
 GetBufferLine(buf_T *buf, PyInt n)
 {
-    return LineToString((char *)ml_get_buf(buf, (linenr_T)n, FALSE));
+    ပြန်ပေး LineToString((var_na *)ml_get_buf(buf, (linenr_T)n, FALSE));
 }
 
 
@@ -5048,24 +5048,24 @@ GetBufferLineList(buf_T *buf, PyInt lo, PyInt hi)
     PyInt	n = hi - lo;
     PyObject	*list = PyList_New(n);
 
-    if (list == NULL)
-	return NULL;
+    အကယ်၍ (list == NULL)
+	ပြန်ပေး NULL;
 
-    for (i = 0; i < n; ++i)
+    အတွက် (i = 0; i < n; ++i)
     {
 	linenr_T	lnum = (linenr_T)(lo + i);
-	char		*text;
+	var_na		*text;
 	PyObject	*string;
 
-	if (lnum > buf->b_ml.ml_line_count)
+	အကယ်၍ (lnum > buf->b_ml.ml_line_count)
 	    text = "";
-	else
-	    text = (char *)ml_get_buf(buf, lnum, FALSE);
+	မဟုတ်ပါက
+	    text = (var_na *)ml_get_buf(buf, lnum, FALSE);
 	string = LineToString(text);
-	if (string == NULL)
+	အကယ်၍ (string == NULL)
 	{
 	    Py_DECREF(list);
-	    return NULL;
+	    ပြန်ပေး NULL;
 	}
 
 	PyList_SET_ITEM(list, i, string);
@@ -5075,7 +5075,7 @@ GetBufferLineList(buf_T *buf, PyInt lo, PyInt hi)
     // the caller should Py_DECREF() the object when it is finished
     // with it).
 
-    return list;
+    ပြန်ပေး list;
 }
 
 /*
@@ -5086,21 +5086,21 @@ GetBufferLineList(buf_T *buf, PyInt lo, PyInt hi)
     static void
 py_fix_cursor(linenr_T lo, linenr_T hi, linenr_T extra)
 {
-    if (curwin->w_cursor.lnum >= lo)
+    အကယ်၍ (curwin->w_cursor.lnum >= lo)
     {
 	// Adjust the cursor position if it's in/after the changed
 	// lines.
-	if (curwin->w_cursor.lnum >= hi)
+	အကယ်၍ (curwin->w_cursor.lnum >= hi)
 	{
 	    curwin->w_cursor.lnum += extra;
 	    check_cursor_col();
 	}
-	else if (extra < 0)
+	မဟုတ်ပါက အကယ်၍ (extra < 0)
 	{
 	    curwin->w_cursor.lnum = lo;
 	    check_cursor();
 	}
-	else
+	မဟုတ်ပါက
 	    check_cursor_col();
 	changed_cline_bef_curs();
     }
@@ -5116,7 +5116,7 @@ py_fix_cursor(linenr_T lo, linenr_T hi, linenr_T extra)
  * If OK is returned and len_change is not NULL, *len_change
  * is set to the change in the buffer length.
  */
-    static int
+    static ကိန်းပြည့်
 SetBufferLine(buf_T *buf, PyInt n, PyObject *line, PyInt *len_change)
 {
     bufref_T	save_curbuf = {NULL, 0, 0};
@@ -5127,7 +5127,7 @@ SetBufferLine(buf_T *buf, PyInt n, PyObject *line, PyInt *len_change)
     //	  1. NULL, or None - this is a deletion.
     //	  2. A string	   - this is a replacement.
     //	  3. Anything else - this is an error.
-    if (line == Py_None || line == NULL)
+    အကယ်၍ (line == Py_None || line == NULL)
     {
 	PyErr_Clear();
 	switchwin.sw_curwin = NULL;
@@ -5135,18 +5135,18 @@ SetBufferLine(buf_T *buf, PyInt n, PyObject *line, PyInt *len_change)
 
 	VimTryStart();
 
-	if (u_savedel((linenr_T)n, 1L) == FAIL)
+	အကယ်၍ (u_savedel((linenr_T)n, 1L) == FAIL)
 	    RAISE_UNDO_FAIL;
-	else if (ml_delete((linenr_T)n) == FAIL)
+	မဟုတ်ပါက အကယ်၍ (ml_delete((linenr_T)n) == FAIL)
 	    RAISE_DELETE_LINE_FAIL;
-	else
+	မဟုတ်ပါက
 	{
-	    if (buf == curbuf && (switchwin.sw_curwin != NULL
+	    အကယ်၍ (buf == curbuf && (switchwin.sw_curwin != NULL
 					   || save_curbuf.br_buf == NULL))
 		// Using an existing window for the buffer, adjust the cursor
 		// position.
 		py_fix_cursor((linenr_T)n, (linenr_T)n + 1, (linenr_T)-1);
-	    if (save_curbuf.br_buf == NULL)
+	    အကယ်၍ (save_curbuf.br_buf == NULL)
 		// Only adjust marks if we managed to switch to a window that
 		// holds the buffer, otherwise line numbers will be invalid.
 		deleted_lines_mark((linenr_T)n, 1L);
@@ -5154,20 +5154,20 @@ SetBufferLine(buf_T *buf, PyInt n, PyObject *line, PyInt *len_change)
 
 	restore_win_for_buf(&switchwin, &save_curbuf);
 
-	if (VimTryEnd())
-	    return FAIL;
+	အကယ်၍ (VimTryEnd())
+	    ပြန်ပေး FAIL;
 
-	if (len_change)
+	အကယ်၍ (len_change)
 	    *len_change = -1;
 
-	return OK;
+	ပြန်ပေး OK;
     }
-    else if (PyBytes_Check(line) || PyUnicode_Check(line))
+    မဟုတ်ပါက အကယ်၍ (PyBytes_Check(line) || PyUnicode_Check(line))
     {
-	char	*save = StringToLine(line);
+	var_na	*save = StringToLine(line);
 
-	if (save == NULL)
-	    return FAIL;
+	အကယ်၍ (save == NULL)
+	    ပြန်ပေး FAIL;
 
 	VimTryStart();
 
@@ -5175,37 +5175,37 @@ SetBufferLine(buf_T *buf, PyInt n, PyObject *line, PyInt *len_change)
 	PyErr_Clear();
 	switch_to_win_for_buf(buf, &switchwin, &save_curbuf);
 
-	if (u_savesub((linenr_T)n) == FAIL)
+	အကယ်၍ (u_savesub((linenr_T)n) == FAIL)
 	{
 	    RAISE_UNDO_FAIL;
 	    vim_free(save);
 	}
-	else if (ml_replace((linenr_T)n, (char_u *)save, FALSE) == FAIL)
+	မဟုတ်ပါက အကယ်၍ (ml_replace((linenr_T)n, (char_u *)save, FALSE) == FAIL)
 	{
 	    RAISE_REPLACE_LINE_FAIL;
 	    vim_free(save);
 	}
-	else
+	မဟုတ်ပါက
 	    changed_bytes((linenr_T)n, 0);
 
 	restore_win_for_buf(&switchwin, &save_curbuf);
 
 	// Check that the cursor is not beyond the end of the line now.
-	if (buf == curbuf)
+	အကယ်၍ (buf == curbuf)
 	    check_cursor_col();
 
-	if (VimTryEnd())
-	    return FAIL;
+	အကယ်၍ (VimTryEnd())
+	    ပြန်ပေး FAIL;
 
-	if (len_change)
+	အကယ်၍ (len_change)
 	    *len_change = 0;
 
-	return OK;
+	ပြန်ပေး OK;
     }
-    else
+    မဟုတ်ပါက
     {
 	PyErr_BadArgument();
-	return FAIL;
+	ပြန်ပေး FAIL;
     }
 }
 
@@ -5218,7 +5218,7 @@ SetBufferLine(buf_T *buf, PyInt n, PyObject *line, PyInt *len_change)
  * If OK is returned and len_change is not NULL, *len_change
  * is set to the change in the buffer length.
  */
-    static int
+    static ကိန်းပြည့်
 SetBufferLineList(
 	buf_T *buf,
 	PyInt lo,
@@ -5234,34 +5234,34 @@ SetBufferLineList(
     //	  1. NULL, or None - this is a deletion.
     //	  2. A list	   - this is a replacement.
     //	  3. Anything else - this is an error.
-    if (list == Py_None || list == NULL)
+    အကယ်၍ (list == Py_None || list == NULL)
     {
 	PyInt	i;
-	PyInt	n = (int)(hi - lo);
+	PyInt	n = (ကိန်းပြည့်)(hi - lo);
 
 	PyErr_Clear();
 	VimTryStart();
 	switchwin.sw_curwin = NULL;
 	switch_to_win_for_buf(buf, &switchwin, &save_curbuf);
 
-	if (u_savedel((linenr_T)lo, (long)n) == FAIL)
+	အကယ်၍ (u_savedel((linenr_T)lo, (long)n) == FAIL)
 	    RAISE_UNDO_FAIL;
-	else
+	မဟုတ်ပါက
 	{
-	    for (i = 0; i < n; ++i)
+	    အတွက် (i = 0; i < n; ++i)
 	    {
-		if (ml_delete((linenr_T)lo) == FAIL)
+		အကယ်၍ (ml_delete((linenr_T)lo) == FAIL)
 		{
 		    RAISE_DELETE_LINE_FAIL;
-		    break;
+		    bha_nga;
 		}
 	    }
-	    if (buf == curbuf && (switchwin.sw_curwin != NULL
+	    အကယ်၍ (buf == curbuf && (switchwin.sw_curwin != NULL
 					       || save_curbuf.br_buf == NULL))
 		// Using an existing window for the buffer, adjust the cursor
 		// position.
 		py_fix_cursor((linenr_T)lo, (linenr_T)hi, (linenr_T)-n);
-	    if (save_curbuf.br_buf == NULL)
+	    အကယ်၍ (save_curbuf.br_buf == NULL)
 		// Only adjust marks if we managed to switch to a window that
 		// holds the buffer, otherwise line numbers will be invalid.
 		deleted_lines_mark((linenr_T)lo, (long)i);
@@ -5269,45 +5269,45 @@ SetBufferLineList(
 
 	restore_win_for_buf(&switchwin, &save_curbuf);
 
-	if (VimTryEnd())
-	    return FAIL;
+	အကယ်၍ (VimTryEnd())
+	    ပြန်ပေး FAIL;
 
-	if (len_change)
+	အကယ်၍ (len_change)
 	    *len_change = -n;
 
-	return OK;
+	ပြန်ပေး OK;
     }
-    else if (PyList_Check(list))
+    မဟုတ်ပါက အကယ်၍ (PyList_Check(list))
     {
 	PyInt	i;
 	PyInt	new_len = PyList_Size(list);
 	PyInt	old_len = hi - lo;
 	PyInt	extra = 0;	// lines added to text, can be negative
-	char	**array;
+	var_na	**array;
 
-	if (new_len == 0)	// avoid allocating zero bytes
+	အကယ်၍ (new_len == 0)	// avoid allocating zero bytes
 	    array = NULL;
-	else
+	မဟုတ်ပါက
 	{
-	    array = PyMem_New(char *, new_len);
-	    if (array == NULL)
+	    array = PyMem_New(var_na *, new_len);
+	    အကယ်၍ (array == NULL)
 	    {
 		PyErr_NoMemory();
-		return FAIL;
+		ပြန်ပေး FAIL;
 	    }
 	}
 
-	for (i = 0; i < new_len; ++i)
+	အတွက် (i = 0; i < new_len; ++i)
 	{
 	    PyObject *line;
 
-	    if (!(line = PyList_GetItem(list, i)) ||
+	    အကယ်၍ (!(line = PyList_GetItem(list, i)) ||
 		!(array[i] = StringToLine(line)))
 	    {
-		while (i)
+		နေစဉ် (i)
 		    vim_free(array[--i]);
 		PyMem_Free(array);
-		return FAIL;
+		ပြန်ပေး FAIL;
 	    }
 	}
 
@@ -5318,19 +5318,19 @@ SetBufferLineList(
 	switchwin.sw_curwin = NULL;
 	switch_to_win_for_buf(buf, &switchwin, &save_curbuf);
 
-	if (u_save((linenr_T)(lo-1), (linenr_T)hi) == FAIL)
+	အကယ်၍ (u_save((linenr_T)(lo-1), (linenr_T)hi) == FAIL)
 	    RAISE_UNDO_FAIL;
 
 	// If the size of the range is reducing (ie, new_len < old_len) we
 	// need to delete some old_len. We do this at the start, by
 	// repeatedly deleting line "lo".
-	if (!PyErr_Occurred())
+	အကယ်၍ (!PyErr_Occurred())
 	{
-	    for (i = 0; i < old_len - new_len; ++i)
-		if (ml_delete((linenr_T)lo) == FAIL)
+	    အတွက် (i = 0; i < old_len - new_len; ++i)
+		အကယ်၍ (ml_delete((linenr_T)lo) == FAIL)
 		{
 		    RAISE_DELETE_LINE_FAIL;
-		    break;
+		    bha_nga;
 		}
 	    extra -= i;
 	}
@@ -5338,31 +5338,31 @@ SetBufferLineList(
 	// For as long as possible, replace the existing old_len with the
 	// new old_len. This is a more efficient operation, as it requires
 	// less memory allocation and freeing.
-	if (!PyErr_Occurred())
+	အကယ်၍ (!PyErr_Occurred())
 	{
-	    for (i = 0; i < old_len && i < new_len; ++i)
-		if (ml_replace((linenr_T)(lo+i), (char_u *)array[i], FALSE)
+	    အတွက် (i = 0; i < old_len && i < new_len; ++i)
+		အကယ်၍ (ml_replace((linenr_T)(lo+i), (char_u *)array[i], FALSE)
 								      == FAIL)
 		{
 		    RAISE_REPLACE_LINE_FAIL;
-		    break;
+		    bha_nga;
 		}
 	}
-	else
+	မဟုတ်ပါက
 	    i = 0;
 
 	// Now we may need to insert the remaining new old_len. If we do, we
 	// must free the strings as we finish with them (we can't pass the
 	// responsibility to Vim in this case).
-	if (!PyErr_Occurred())
+	အကယ်၍ (!PyErr_Occurred())
 	{
-	    while (i < new_len)
+	    နေစဉ် (i < new_len)
 	    {
-		if (ml_append((linenr_T)(lo + i - 1),
+		အကယ်၍ (ml_append((linenr_T)(lo + i - 1),
 					(char_u *)array[i], 0, FALSE) == FAIL)
 		{
 		    RAISE_INSERT_LINE_FAIL;
-		    break;
+		    bha_nga;
 		}
 		vim_free(array[i]);
 		++i;
@@ -5371,7 +5371,7 @@ SetBufferLineList(
 	}
 
 	// Free any left-over old_len, as a result of an error
-	while (i < new_len)
+	နေစဉ် (i < new_len)
 	{
 	    vim_free(array[i]);
 	    ++i;
@@ -5386,14 +5386,14 @@ SetBufferLineList(
 	// changed range, and move any in the remainder of the buffer.
 	// Only adjust marks if we managed to switch to a window that holds
 	// the buffer, otherwise line numbers will be invalid.
-	if (save_curbuf.br_buf == NULL)
+	အကယ်၍ (save_curbuf.br_buf == NULL)
 	{
 	    mark_adjust((linenr_T)lo, (linenr_T)(hi - 1),
 						  (long)MAXLNUM, (long)extra);
 	    changed_lines((linenr_T)lo, 0, (linenr_T)hi, (long)extra);
 	}
 
-	if (buf == curbuf && (switchwin.sw_curwin != NULL
+	အကယ်၍ (buf == curbuf && (switchwin.sw_curwin != NULL
 					   || save_curbuf.br_buf == NULL))
 	    // Using an existing window for the buffer, adjust the cursor
 	    // position.
@@ -5402,18 +5402,18 @@ SetBufferLineList(
 	// END of region without "return".
 	restore_win_for_buf(&switchwin, &save_curbuf);
 
-	if (VimTryEnd())
-	    return FAIL;
+	အကယ်၍ (VimTryEnd())
+	    ပြန်ပေး FAIL;
 
-	if (len_change)
+	အကယ်၍ (len_change)
 	    *len_change = new_len - old_len;
 
-	return OK;
+	ပြန်ပေး OK;
     }
-    else
+    မဟုတ်ပါက
     {
 	PyErr_BadArgument();
-	return FAIL;
+	ပြန်ပေး FAIL;
     }
 }
 
@@ -5426,7 +5426,7 @@ SetBufferLineList(
  * If OK is returned and len_change is not NULL, *len_change
  * is set to the change in the buffer length.
  */
-    static int
+    static ကိန်းပြည့်
 InsertBufferLines(buf_T *buf, PyInt n, PyObject *lines, PyInt *len_change)
 {
     bufref_T	save_curbuf = {NULL, 0, 0};
@@ -5434,22 +5434,22 @@ InsertBufferLines(buf_T *buf, PyInt n, PyObject *lines, PyInt *len_change)
 
     // First of all, we check the type of the supplied Python object.
     // It must be a string or a list, or the call is in error.
-    if (PyBytes_Check(lines) || PyUnicode_Check(lines))
+    အကယ်၍ (PyBytes_Check(lines) || PyUnicode_Check(lines))
     {
-	char		*str = StringToLine(lines);
+	var_na		*str = StringToLine(lines);
 
-	if (str == NULL)
-	    return FAIL;
+	အကယ်၍ (str == NULL)
+	    ပြန်ပေး FAIL;
 
 	PyErr_Clear();
 	VimTryStart();
 	switch_to_win_for_buf(buf, &switchwin, &save_curbuf);
 
-	if (u_save((linenr_T)n, (linenr_T)(n + 1)) == FAIL)
+	အကယ်၍ (u_save((linenr_T)n, (linenr_T)(n + 1)) == FAIL)
 	    RAISE_UNDO_FAIL;
-	else if (ml_append((linenr_T)n, (char_u *)str, 0, FALSE) == FAIL)
+	မဟုတ်ပါက အကယ်၍ (ml_append((linenr_T)n, (char_u *)str, 0, FALSE) == FAIL)
 	    RAISE_INSERT_LINE_FAIL;
-	else if (save_curbuf.br_buf == NULL)
+	မဟုတ်ပါက အကယ်၍ (save_curbuf.br_buf == NULL)
 	    // Only adjust marks if we managed to switch to a window that
 	    // holds the buffer, otherwise line numbers will be invalid.
 	    appended_lines_mark((linenr_T)n, 1L);
@@ -5458,38 +5458,38 @@ InsertBufferLines(buf_T *buf, PyInt n, PyObject *lines, PyInt *len_change)
 	restore_win_for_buf(&switchwin, &save_curbuf);
 	update_screen(UPD_VALID);
 
-	if (VimTryEnd())
-	    return FAIL;
+	အကယ်၍ (VimTryEnd())
+	    ပြန်ပေး FAIL;
 
-	if (len_change)
+	အကယ်၍ (len_change)
 	    *len_change = 1;
 
-	return OK;
+	ပြန်ပေး OK;
     }
-    else if (PyList_Check(lines))
+    မဟုတ်ပါက အကယ်၍ (PyList_Check(lines))
     {
 	PyInt	i;
 	PyInt	size = PyList_Size(lines);
-	char	**array;
+	var_na	**array;
 
-	array = PyMem_New(char *, size);
-	if (array == NULL)
+	array = PyMem_New(var_na *, size);
+	အကယ်၍ (array == NULL)
 	{
 	    PyErr_NoMemory();
-	    return FAIL;
+	    ပြန်ပေး FAIL;
 	}
 
-	for (i = 0; i < size; ++i)
+	အတွက် (i = 0; i < size; ++i)
 	{
 	    PyObject *line;
 
-	    if (!(line = PyList_GetItem(lines, i)) ||
+	    အကယ်၍ (!(line = PyList_GetItem(lines, i)) ||
 		!(array[i] = StringToLine(line)))
 	    {
-		while (i)
+		နေစဉ် (i)
 		    vim_free(array[--i]);
 		PyMem_Free(array);
-		return FAIL;
+		ပြန်ပေး FAIL;
 	    }
 	}
 
@@ -5497,26 +5497,26 @@ InsertBufferLines(buf_T *buf, PyInt n, PyObject *lines, PyInt *len_change)
 	VimTryStart();
 	switch_to_win_for_buf(buf, &switchwin, &save_curbuf);
 
-	if (u_save((linenr_T)n, (linenr_T)(n + 1)) == FAIL)
+	အကယ်၍ (u_save((linenr_T)n, (linenr_T)(n + 1)) == FAIL)
 	    RAISE_UNDO_FAIL;
-	else
+	မဟုတ်ပါက
 	{
-	    for (i = 0; i < size; ++i)
+	    အတွက် (i = 0; i < size; ++i)
 	    {
-		if (ml_append((linenr_T)(n + i),
+		အကယ်၍ (ml_append((linenr_T)(n + i),
 					(char_u *)array[i], 0, FALSE) == FAIL)
 		{
 		    RAISE_INSERT_LINE_FAIL;
 
 		    // Free the rest of the lines
-		    while (i < size)
+		    နေစဉ် (i < size)
 			vim_free(array[i++]);
 
-		    break;
+		    bha_nga;
 		}
 		vim_free(array[i]);
 	    }
-	    if (i > 0 && save_curbuf.br_buf == NULL)
+	    အကယ်၍ (i > 0 && save_curbuf.br_buf == NULL)
 		// Only adjust marks if we managed to switch to a window that
 		// holds the buffer, otherwise line numbers will be invalid.
 		appended_lines_mark((linenr_T)n, (long)i);
@@ -5529,18 +5529,18 @@ InsertBufferLines(buf_T *buf, PyInt n, PyObject *lines, PyInt *len_change)
 
 	update_screen(UPD_VALID);
 
-	if (VimTryEnd())
-	    return FAIL;
+	အကယ်၍ (VimTryEnd())
+	    ပြန်ပေး FAIL;
 
-	if (len_change)
+	အကယ်၍ (len_change)
 	    *len_change = size;
 
-	return OK;
+	ပြန်ပေး OK;
     }
-    else
+    မဟုတ်ပါက
     {
 	PyErr_BadArgument();
-	return FAIL;
+	ပြန်ပေး FAIL;
     }
 }
 
@@ -5549,49 +5549,49 @@ InsertBufferLines(buf_T *buf, PyInt n, PyObject *lines, PyInt *len_change)
  * -------------------------------------------
  */
 
-typedef struct
+typedef sa_nracanaa
 {
     PyObject_HEAD
     buf_T *buf;
 } BufferObject;
 
-    static int
+    static ကိန်းပြည့်
 CheckBuffer(BufferObject *self)
 {
-    if (self->buf == INVALID_BUFFER_VALUE)
+    အကယ်၍ (self->buf == INVALID_BUFFER_VALUE)
     {
 	PyErr_SET_VIM(N_("attempt to refer to deleted buffer"));
-	return -1;
+	ပြန်ပေး -1;
     }
 
-    return 0;
+    ပြန်ပေး 0;
 }
 
-    static int
+    static ကိန်းပြည့်
 CheckBufferCb(void *self)
 {
-    return CheckBuffer((BufferObject*)self);
+    ပြန်ပေး CheckBuffer((BufferObject*)self);
 }
 
     static PyObject *
 RBItem(BufferObject *self, PyInt n, PyInt start, PyInt end)
 {
-    if (CheckBuffer(self))
-	return NULL;
+    အကယ်၍ (CheckBuffer(self))
+	ပြန်ပေး NULL;
 
-    if (end == -1)
+    အကယ်၍ (end == -1)
 	end = self->buf->b_ml.ml_line_count;
 
-    if (n < 0)
+    အကယ်၍ (n < 0)
 	n += end - start + 1;
 
-    if (n < 0 || n > end - start)
+    အကယ်၍ (n < 0 || n > end - start)
     {
 	PyErr_SET_STRING(PyExc_IndexError, N_("line number out of range"));
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
-    return GetBufferLine(self->buf, n+start);
+    ပြန်ပေး GetBufferLine(self->buf, n+start);
 }
 
     static PyObject *
@@ -5599,26 +5599,26 @@ RBSlice(BufferObject *self, PyInt lo, PyInt hi, PyInt start, PyInt end)
 {
     PyInt size;
 
-    if (CheckBuffer(self))
-	return NULL;
+    အကယ်၍ (CheckBuffer(self))
+	ပြန်ပေး NULL;
 
-    if (end == -1)
+    အကယ်၍ (end == -1)
 	end = self->buf->b_ml.ml_line_count;
 
     size = end - start + 1;
 
-    if (lo < 0)
+    အကယ်၍ (lo < 0)
 	lo = 0;
-    else if (lo > size)
+    မဟုတ်ပါက အကယ်၍ (lo > size)
 	lo = size;
-    if (hi < 0)
+    အကယ်၍ (hi < 0)
 	hi = 0;
-    if (hi < lo)
+    အကယ်၍ (hi < lo)
 	hi = lo;
-    else if (hi > size)
+    မဟုတ်ပါက အကယ်၍ (hi > size)
 	hi = size;
 
-    return GetBufferLineList(self->buf, lo+start, hi+start);
+    ပြန်ပေး GetBufferLineList(self->buf, lo+start, hi+start);
 }
 
     static PyInt
@@ -5632,28 +5632,28 @@ RBAsItem(
 {
     PyInt len_change;
 
-    if (CheckBuffer(self))
-	return -1;
+    အကယ်၍ (CheckBuffer(self))
+	ပြန်ပေး -1;
 
-    if (end == -1)
+    အကယ်၍ (end == -1)
 	end = self->buf->b_ml.ml_line_count;
 
-    if (n < 0)
+    အကယ်၍ (n < 0)
 	n += end - start + 1;
 
-    if (n < 0 || n > end - start)
+    အကယ်၍ (n < 0 || n > end - start)
     {
 	PyErr_SET_STRING(PyExc_IndexError, N_("line number out of range"));
-	return -1;
+	ပြန်ပေး -1;
     }
 
-    if (SetBufferLine(self->buf, n+start, valObject, &len_change) == FAIL)
-	return -1;
+    အကယ်၍ (SetBufferLine(self->buf, n+start, valObject, &len_change) == FAIL)
+	ပြန်ပေး -1;
 
-    if (new_end)
+    အကယ်၍ (new_end)
 	*new_end = end + len_change;
 
-    return 0;
+    ပြန်ပေး 0;
 }
 
     static PyInt
@@ -5670,34 +5670,34 @@ RBAsSlice(
     PyInt len_change;
 
     // Self must be a valid buffer
-    if (CheckBuffer(self))
-	return -1;
+    အကယ်၍ (CheckBuffer(self))
+	ပြန်ပေး -1;
 
-    if (end == -1)
+    အကယ်၍ (end == -1)
 	end = self->buf->b_ml.ml_line_count;
 
     // Sort out the slice range
     size = end - start + 1;
 
-    if (lo < 0)
+    အကယ်၍ (lo < 0)
 	lo = 0;
-    else if (lo > size)
+    မဟုတ်ပါက အကယ်၍ (lo > size)
 	lo = size;
-    if (hi < 0)
+    အကယ်၍ (hi < 0)
 	hi = 0;
-    if (hi < lo)
+    အကယ်၍ (hi < lo)
 	hi = lo;
-    else if (hi > size)
+    မဟုတ်ပါက အကယ်၍ (hi > size)
 	hi = size;
 
-    if (SetBufferLineList(self->buf, lo + start, hi + start,
+    အကယ်၍ (SetBufferLineList(self->buf, lo + start, hi + start,
 						valObject, &len_change) == FAIL)
-	return -1;
+	ပြန်ပေး -1;
 
-    if (new_end)
+    အကယ်၍ (new_end)
 	*new_end = end + len_change;
 
-    return 0;
+    ပြန်ပေး 0;
 }
 
 
@@ -5714,31 +5714,31 @@ RBAppend(
     PyInt max;
     PyInt n;
 
-    if (CheckBuffer(self))
-	return NULL;
+    အကယ်၍ (CheckBuffer(self))
+	ပြန်ပေး NULL;
 
-    if (end == -1)
+    အကယ်၍ (end == -1)
 	end = self->buf->b_ml.ml_line_count;
 
     max = n = end - start + 1;
 
-    if (!PyArg_ParseTuple(args, "O|n", &lines, &n))
-	return NULL;
+    အကယ်၍ (!PyArg_ParseTuple(args, "O|n", &lines, &n))
+	ပြန်ပေး NULL;
 
-    if (n < 0 || n > max)
+    အကယ်၍ (n < 0 || n > max)
     {
 	PyErr_SET_STRING(PyExc_IndexError, N_("line number out of range"));
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
-    if (InsertBufferLines(self->buf, n + start - 1, lines, &len_change) == FAIL)
-	return NULL;
+    အကယ်၍ (InsertBufferLines(self->buf, n + start - 1, lines, &len_change) == FAIL)
+	ပြန်ပေး NULL;
 
-    if (new_end)
+    အကယ်၍ (new_end)
 	*new_end = end + len_change;
 
     Py_INCREF(Py_None);
-    return Py_None;
+    ပြန်ပေး Py_None;
 }
 
 // Range object
@@ -5747,7 +5747,7 @@ DEFINE_PY_TYPE_OBJECT(RangeType);
 static PySequenceMethods RangeAsSeq;
 static PyMappingMethods RangeAsMapping;
 
-typedef struct
+typedef sa_nracanaa
 {
     PyObject_HEAD
     BufferObject *buf;
@@ -5761,14 +5761,14 @@ RangeNew(buf_T *buf, PyInt start, PyInt end)
     BufferObject *bufr;
     RangeObject *self;
     self = PyObject_GC_New(RangeObject, RangeTypePtr);
-    if (self == NULL)
-	return NULL;
+    အကယ်၍ (self == NULL)
+	ပြန်ပေး NULL;
 
     bufr = (BufferObject *)BufferNew(buf);
-    if (bufr == NULL)
+    အကယ်၍ (bufr == NULL)
     {
 	Py_DECREF(self);
-	return NULL;
+	ပြန်ပေး NULL;
     }
     Py_INCREF((PyObject *)bufr);
 
@@ -5776,7 +5776,7 @@ RangeNew(buf_T *buf, PyInt start, PyInt end)
     self->start = start;
     self->end = end;
 
-    return (PyObject *)(self);
+    ပြန်ပေး (PyObject *)(self);
 }
 
     static void
@@ -5788,45 +5788,45 @@ RangeDestructor(PyObject *self_obj)
     PyObject_GC_Del((void *)(self));
 }
 
-    static int
+    static ကိန်းပြည့်
 RangeTraverse(PyObject *self_obj, visitproc visit, void *arg)
 {
     RangeObject *self = (RangeObject*)self_obj;
     Py_VISIT(((PyObject *)(self->buf)));
-    return 0;
+    ပြန်ပေး 0;
 }
 
-    static int
+    static ကိန်းပြည့်
 RangeClear(PyObject *self_obj)
 {
     RangeObject *self = (RangeObject*)self_obj;
     Py_CLEAR(self->buf);
-    return 0;
+    ပြန်ပေး 0;
 }
 
     static PyInt
 RangeLength(RangeObject *self)
 {
     // HOW DO WE SIGNAL AN ERROR FROM THIS FUNCTION?
-    if (CheckBuffer(self->buf))
-	return -1; // ???
+    အကယ်၍ (CheckBuffer(self->buf))
+	ပြန်ပေး -1; // ???
 
-    return (self->end - self->start + 1);
+    ပြန်ပေး (self->end - self->start + 1);
 }
 
     static PyObject *
 RangeItem(RangeObject *self, PyInt n)
 {
-    return RBItem(self->buf, n, self->start, self->end);
+    ပြန်ပေး RBItem(self->buf, n, self->start, self->end);
 }
 
     static PyObject *
 RangeSlice(RangeObject *self, PyInt lo, PyInt hi)
 {
-    return RBSlice(self->buf, lo, hi, self->start, self->end);
+    ပြန်ပေး RBSlice(self->buf, lo, hi, self->start, self->end);
 }
 
-static char *RangeAttrs[] = {
+static var_na *RangeAttrs[] = {
     "start", "end",
     NULL
 };
@@ -5834,35 +5834,35 @@ static char *RangeAttrs[] = {
     static PyObject *
 RangeDir(PyObject *self, PyObject *args UNUSED)
 {
-    return ObjectDir(self, RangeAttrs);
+    ပြန်ပေး ObjectDir(self, RangeAttrs);
 }
 
     static PyObject *
 RangeAppend(RangeObject *self, PyObject *args)
 {
-    return RBAppend(self->buf, args, self->start, self->end, &self->end);
+    ပြန်ပေး RBAppend(self->buf, args, self->start, self->end, &self->end);
 }
 
     static PyObject *
 RangeRepr(PyObject *self_obj)
 {
     RangeObject *self = (RangeObject*)self_obj;
-    if (self->buf->buf == INVALID_BUFFER_VALUE)
-	return PyString_FromFormat("<range object (for deleted buffer) at %p>",
+    အကယ်၍ (self->buf->buf == INVALID_BUFFER_VALUE)
+	ပြန်ပေး PyString_FromFormat("<range object (for deleted buffer) at %p>",
 				    (void *)self);
-    else
+    မဟုတ်ပါက
     {
-	char *name = (char *)self->buf->buf->b_fname;
+	var_na *name = (var_na *)self->buf->buf->b_fname;
 
-	if (name == NULL)
+	အကယ်၍ (name == NULL)
 	    name = "";
 
-	return PyString_FromFormat("<range %s (%d:%d)>",
-				    name, (int)self->start, (int)self->end);
+	ပြန်ပေး PyString_FromFormat("<range %s (%d:%d)>",
+				    name, (ကိန်းပြည့်)self->start, (ကိန်းပြည့်)self->end);
     }
 }
 
-static struct PyMethodDef RangeMethods[] = {
+static sa_nracanaa PyMethodDef RangeMethods[] = {
     // name,	function,			calling,	documentation
     {"append",	(PyCFunction)RangeAppend,	METH_VARARGS,	"Append data to the Vim range" },
     {"__dir__",	(PyCFunction)RangeDir,		METH_NOARGS,	""},
@@ -5896,28 +5896,28 @@ BufferNew(buf_T *buf)
 
     BufferObject *self;
 
-    if (BUF_PYTHON_REF(buf) != NULL)
+    အကယ်၍ (BUF_PYTHON_REF(buf) != NULL)
     {
 	self = BUF_PYTHON_REF(buf);
 	Py_INCREF((PyObject *)self);
     }
-    else
+    မဟုတ်ပါက
     {
 	self = PyObject_NEW(BufferObject, BufferTypePtr);
-	if (self == NULL)
-	    return NULL;
+	အကယ်၍ (self == NULL)
+	    ပြန်ပေး NULL;
 	self->buf = buf;
 	BUF_PYTHON_REF(buf) = self;
     }
 
-    return (PyObject *)(self);
+    ပြန်ပေး (PyObject *)(self);
 }
 
     static void
 BufferDestructor(PyObject *self_obj)
 {
     BufferObject *self = (BufferObject*)self_obj;
-    if (self->buf && self->buf != INVALID_BUFFER_VALUE)
+    အကယ်၍ (self->buf && self->buf != INVALID_BUFFER_VALUE)
 	BUF_PYTHON_REF(self->buf) = NULL;
 
     DESTRUCTOR_FINISH(self);
@@ -5927,25 +5927,25 @@ BufferDestructor(PyObject *self_obj)
 BufferLength(BufferObject *self)
 {
     // HOW DO WE SIGNAL AN ERROR FROM THIS FUNCTION?
-    if (CheckBuffer(self))
-	return -1; // ???
+    အကယ်၍ (CheckBuffer(self))
+	ပြန်ပေး -1; // ???
 
-    return (PyInt)(self->buf->b_ml.ml_line_count);
+    ပြန်ပေး (PyInt)(self->buf->b_ml.ml_line_count);
 }
 
     static PyObject *
 BufferItem(BufferObject *self, PyInt n)
 {
-    return RBItem(self, n, 1, -1);
+    ပြန်ပေး RBItem(self, n, 1, -1);
 }
 
     static PyObject *
 BufferSlice(BufferObject *self, PyInt lo, PyInt hi)
 {
-    return RBSlice(self, lo, hi, 1, -1);
+    ပြန်ပေး RBSlice(self, lo, hi, 1, -1);
 }
 
-static char *BufferAttrs[] = {
+static var_na *BufferAttrs[] = {
     "name", "number", "vars", "options", "valid",
     NULL
 };
@@ -5953,88 +5953,88 @@ static char *BufferAttrs[] = {
     static PyObject *
 BufferDir(PyObject *self, PyObject *args UNUSED)
 {
-    return ObjectDir(self, BufferAttrs);
+    ပြန်ပေး ObjectDir(self, BufferAttrs);
 }
 
     static PyObject *
-BufferAttrValid(BufferObject *self, char *name)
+BufferAttrValid(BufferObject *self, var_na *name)
 {
     PyObject	*ret;
 
-    if (strcmp(name, "valid") != 0)
-	return NULL;
+    အကယ်၍ (strcmp(name, "valid") != 0)
+	ပြန်ပေး NULL;
 
     ret = ((self->buf == INVALID_BUFFER_VALUE) ? Py_False : Py_True);
     Py_INCREF(ret);
-    return ret;
+    ပြန်ပေး ret;
 }
 
     static PyObject *
-BufferAttr(BufferObject *self, char *name)
+BufferAttr(BufferObject *self, var_na *name)
 {
-    if (strcmp(name, "name") == 0)
-	return PyString_FromString((self->buf->b_ffname == NULL
-				    ? "" : (char *)self->buf->b_ffname));
-    else if (strcmp(name, "number") == 0)
-	return Py_BuildValue(Py_ssize_t_fmt, self->buf->b_fnum);
-    else if (strcmp(name, "vars") == 0)
-	return NEW_DICTIONARY(self->buf->b_vars);
-    else if (strcmp(name, "options") == 0)
-	return OptionsNew(SREQ_BUF, self->buf, CheckBufferCb,
+    အကယ်၍ (strcmp(name, "name") == 0)
+	ပြန်ပေး PyString_FromString((self->buf->b_ffname == NULL
+				    ? "" : (var_na *)self->buf->b_ffname));
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "number") == 0)
+	ပြန်ပေး Py_BuildValue(Py_ssize_t_fmt, self->buf->b_fnum);
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "vars") == 0)
+	ပြန်ပေး NEW_DICTIONARY(self->buf->b_vars);
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "options") == 0)
+	ပြန်ပေး OptionsNew(SREQ_BUF, self->buf, CheckBufferCb,
 			(PyObject *) self);
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, BufferAttrs);
-    else
-	return NULL;
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "__members__") == 0)
+	ပြန်ပေး ObjectDir(NULL, BufferAttrs);
+    မဟုတ်ပါက
+	ပြန်ပေး NULL;
 }
 
-    static int
-BufferSetattr(PyObject *self_obj, char *name, PyObject *valObject)
+    static ကိန်းပြည့်
+BufferSetattr(PyObject *self_obj, var_na *name, PyObject *valObject)
 {
     BufferObject *self = (BufferObject*)self_obj;
-    if (CheckBuffer(self))
-	return -1;
+    အကယ်၍ (CheckBuffer(self))
+	ပြန်ပေး -1;
 
-    if (strcmp(name, "name") == 0)
+    အကယ်၍ (strcmp(name, "name") == 0)
     {
 	char_u		*val;
 	aco_save_T	aco;
-	int		ren_ret = OK;
+	ကိန်းပြည့်		ren_ret = OK;
 	PyObject	*todecref;
 
-	if (!(val = StringToChars(valObject, &todecref)))
-	    return -1;
+	အကယ်၍ (!(val = StringToChars(valObject, &todecref)))
+	    ပြန်ပေး -1;
 
 	VimTryStart();
 	// Using aucmd_*: autocommands will be executed by rename_buffer
 	aucmd_prepbuf(&aco, self->buf);
-	if (curbuf == self->buf)
+	အကယ်၍ (curbuf == self->buf)
 	{
 	    ren_ret = rename_buffer(val);
 	    aucmd_restbuf(&aco);
 	}
 	Py_XDECREF(todecref);
-	if (VimTryEnd())
-	    return -1;
+	အကယ်၍ (VimTryEnd())
+	    ပြန်ပေး -1;
 
-	if (ren_ret == FAIL)
+	အကယ်၍ (ren_ret == FAIL)
 	{
 	    PyErr_SET_VIM(N_("failed to rename buffer"));
-	    return -1;
+	    ပြန်ပေး -1;
 	}
-	return 0;
+	ပြန်ပေး 0;
     }
-    else
+    မဟုတ်ပါက
     {
 	PyErr_SetString(PyExc_AttributeError, name);
-	return -1;
+	ပြန်ပေး -1;
     }
 }
 
     static PyObject *
 BufferAppend(BufferObject *self, PyObject *args)
 {
-    return RBAppend(self, args, 1, -1, NULL);
+    ပြန်ပေး RBAppend(self, args, 1, -1, NULL);
 }
 
     static PyObject *
@@ -6046,18 +6046,18 @@ BufferMark(BufferObject *self, PyObject *pmarkObject)
     bufref_T	savebuf;
     PyObject	*todecref;
 
-    if (CheckBuffer(self))
-	return NULL;
+    အကယ်၍ (CheckBuffer(self))
+	ပြန်ပေး NULL;
 
-    if (!(pmark = StringToChars(pmarkObject, &todecref)))
-	return NULL;
+    အကယ်၍ (!(pmark = StringToChars(pmarkObject, &todecref)))
+	ပြန်ပေး NULL;
 
-    if (pmark[0] == '\0' || pmark[1] != '\0')
+    အကယ်၍ (pmark[0] == '\0' || pmark[1] != '\0')
     {
 	PyErr_SET_STRING(PyExc_ValueError,
 		N_("mark name must be a single character"));
 	Py_XDECREF(todecref);
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
     mark = *pmark;
@@ -6068,23 +6068,23 @@ BufferMark(BufferObject *self, PyObject *pmarkObject)
     switch_buffer(&savebuf, self->buf);
     posp = getmark(mark, FALSE);
     restore_buffer(&savebuf);
-    if (VimTryEnd())
-	return NULL;
+    အကယ်၍ (VimTryEnd())
+	ပြန်ပေး NULL;
 
-    if (posp == NULL)
+    အကယ်၍ (posp == NULL)
     {
 	PyErr_SET_VIM(N_("invalid mark name"));
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
-    if (posp->lnum <= 0)
+    အကယ်၍ (posp->lnum <= 0)
     {
 	// Or raise an error?
 	Py_INCREF(Py_None);
-	return Py_None;
+	ပြန်ပေး Py_None;
     }
 
-    return Py_BuildValue("(ll)", (long)(posp->lnum), (long)(posp->col));
+    ပြန်ပေး Py_BuildValue("(ll)", (long)(posp->lnum), (long)(posp->col));
 }
 
     static PyObject *
@@ -6093,33 +6093,33 @@ BufferRange(BufferObject *self, PyObject *args)
     PyInt start;
     PyInt end;
 
-    if (CheckBuffer(self))
-	return NULL;
+    အကယ်၍ (CheckBuffer(self))
+	ပြန်ပေး NULL;
 
-    if (!PyArg_ParseTuple(args, "nn", &start, &end))
-	return NULL;
+    အကယ်၍ (!PyArg_ParseTuple(args, "nn", &start, &end))
+	ပြန်ပေး NULL;
 
-    return RangeNew(self->buf, start, end);
+    ပြန်ပေး RangeNew(self->buf, start, end);
 }
 
     static PyObject *
 BufferRepr(PyObject *self_obj)
 {
     BufferObject *self = (BufferObject*)self_obj;
-    if (self->buf == INVALID_BUFFER_VALUE)
-	return PyString_FromFormat("<buffer object (deleted) at %p>", (void *)self);
-    else
+    အကယ်၍ (self->buf == INVALID_BUFFER_VALUE)
+	ပြန်ပေး PyString_FromFormat("<buffer object (deleted) at %p>", (void *)self);
+    မဟုတ်ပါက
     {
-	char	*name = (char *)self->buf->b_fname;
+	var_na	*name = (var_na *)self->buf->b_fname;
 
-	if (name == NULL)
+	အကယ်၍ (name == NULL)
 	    name = "";
 
-	return PyString_FromFormat("<buffer %s>", name);
+	ပြန်ပေး PyString_FromFormat("<buffer %s>", name);
     }
 }
 
-static struct PyMethodDef BufferMethods[] = {
+static sa_nracanaa PyMethodDef BufferMethods[] = {
     // name,	    function,			calling,	documentation
     {"append",	    (PyCFunction)BufferAppend,	METH_VARARGS,	"Append data to Vim buffer" },
     {"mark",	    (PyCFunction)BufferMark,	METH_O,		"Return (row,col) representing position of named mark" },
@@ -6134,7 +6134,7 @@ static struct PyMethodDef BufferMethods[] = {
 
 DEFINE_PY_TYPE_OBJECT(BufMapType);
 
-typedef struct
+typedef sa_nracanaa
 {
     PyObject_HEAD
 } BufMapObject;
@@ -6150,13 +6150,13 @@ BufMapLength(PyObject *self UNUSED)
     buf_T	*b = firstbuf;
     PyInt	n = 0;
 
-    while (b)
+    နေစဉ် (b)
     {
 	++n;
 	b = b->b_next;
     }
 
-    return n;
+    ပြန်ပေး n;
 }
 
     static PyObject *
@@ -6165,17 +6165,17 @@ BufMapItem(PyObject *self UNUSED, PyObject *keyObject)
     buf_T	*b;
     long	bnr;
 
-    if (NumberToLong(keyObject, &bnr, NUMBER_INT|NUMBER_NATURAL))
-	return NULL;
+    အကယ်၍ (NumberToLong(keyObject, &bnr, NUMBER_INT|NUMBER_NATURAL))
+	ပြန်ပေး NULL;
 
-    b = buflist_findnr((int) bnr);
+    b = buflist_findnr((ကိန်းပြည့်) bnr);
 
-    if (b)
-	return BufferNew(b);
-    else
+    အကယ်၍ (b)
+	ပြန်ပေး BufferNew(b);
+    မဟုတ်ပါက
     {
 	PyErr_SetObject(PyExc_KeyError, keyObject);
-	return NULL;
+	ပြန်ပေး NULL;
     }
 }
 
@@ -6184,28 +6184,28 @@ BufMapIterDestruct(void* arg)
 {
     PyObject *buffer = (PyObject*)arg;
     // Iteration was stopped before all buffers were processed
-    if (buffer)
+    အကယ်၍ (buffer)
     {
 	Py_DECREF(buffer);
     }
 }
 
-    static int
+    static ကိန်းပြည့်
 BufMapIterTraverse(void *iter, visitproc visit, void *arg)
 {
     PyObject *buffer = (PyObject*)iter;
-    if (buffer)
+    အကယ်၍ (buffer)
 	Py_VISIT(buffer);
-    return 0;
+    ပြန်ပေး 0;
 }
 
-    static int
+    static ကိန်းပြည့်
 BufMapIterClear(void **iter)
 {
     PyObject **buffer = (PyObject**)iter;
-    if (*buffer)
+    အကယ်၍ (*buffer)
 	Py_CLEAR(*buffer);
-    return 0;
+    ပြန်ပေး 0;
 }
 
     static PyObject *
@@ -6215,25 +6215,25 @@ BufMapIterNext(void **arg)
     PyObject	*ret;
     PyObject	**buffer = (PyObject**)arg;
 
-    if (!*buffer)
-	return NULL;
+    အကယ်၍ (!*buffer)
+	ပြန်ပေး NULL;
 
     ret = *buffer;
 
-    if (CheckBuffer((BufferObject *)(ret)))
+    အကယ်၍ (CheckBuffer((BufferObject *)(ret)))
     {
 	*buffer = NULL;
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
-    if (!((BufferObject *)(ret))->buf->b_next)
+    အကယ်၍ (!((BufferObject *)(ret))->buf->b_next)
 	next = NULL;
-    else if (!(next = BufferNew(((BufferObject *)(ret))->buf->b_next)))
-	return NULL;
+    မဟုတ်ပါက အကယ်၍ (!(next = BufferNew(((BufferObject *)(ret))->buf->b_next)))
+	ပြန်ပေး NULL;
     *buffer = next;
     // Do not increment reference: we no longer hold it (decref), but whoever
     // on other side will hold (incref). Decref+incref = nothing.
-    return ret;
+    ပြန်ပေး ret;
 }
 
     static PyObject *
@@ -6242,7 +6242,7 @@ BufMapIter(PyObject *self)
     PyObject *buffer;
 
     buffer = BufferNew(firstbuf);
-    return IterNew(buffer,
+    ပြန်ပေး IterNew(buffer,
 	    BufMapIterDestruct, BufMapIterNext,
 	    BufMapIterTraverse, BufMapIterClear,
 	    self);
@@ -6256,7 +6256,7 @@ static PyMappingMethods BufMapAsMapping = {
 
 // Current items object
 
-static char *CurrentAttrs[] = {
+static var_na *CurrentAttrs[] = {
     "buffer", "window", "line", "range", "tabpage",
     NULL
 };
@@ -6264,140 +6264,140 @@ static char *CurrentAttrs[] = {
     static PyObject *
 CurrentDir(PyObject *self, PyObject *args UNUSED)
 {
-    return ObjectDir(self, CurrentAttrs);
+    ပြန်ပေး ObjectDir(self, CurrentAttrs);
 }
 
     static PyObject *
-CurrentGetattr(PyObject *self UNUSED, char *name)
+CurrentGetattr(PyObject *self UNUSED, var_na *name)
 {
-    if (strcmp(name, "buffer") == 0)
-	return (PyObject *)BufferNew(curbuf);
-    else if (strcmp(name, "window") == 0)
-	return (PyObject *)WindowNew(curwin, curtab);
-    else if (strcmp(name, "tabpage") == 0)
-	return (PyObject *)TabPageNew(curtab);
-    else if (strcmp(name, "line") == 0)
-	return GetBufferLine(curbuf, (PyInt)curwin->w_cursor.lnum);
-    else if (strcmp(name, "range") == 0)
-	return RangeNew(curbuf, RangeStart, RangeEnd);
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, CurrentAttrs);
-    else
-#if PY_MAJOR_VERSION < 3
-	return Py_FindMethod(WindowMethods, self, name);
-#else
-	return NULL;
+    အကယ်၍ (strcmp(name, "buffer") == 0)
+	ပြန်ပေး (PyObject *)BufferNew(curbuf);
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "window") == 0)
+	ပြန်ပေး (PyObject *)WindowNew(curwin, curtab);
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "tabpage") == 0)
+	ပြန်ပေး (PyObject *)TabPageNew(curtab);
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "line") == 0)
+	ပြန်ပေး GetBufferLine(curbuf, (PyInt)curwin->w_cursor.lnum);
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "range") == 0)
+	ပြန်ပေး RangeNew(curbuf, RangeStart, RangeEnd);
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "__members__") == 0)
+	ပြန်ပေး ObjectDir(NULL, CurrentAttrs);
+    မဟုတ်ပါက
+#အကယ်၍ PY_MAJOR_VERSION < 3
+	ပြန်ပေး Py_FindMethod(WindowMethods, self, name);
+#မဟုတ်ပါက
+	ပြန်ပေး NULL;
 #endif
 }
 
-    static int
-CurrentSetattr(PyObject *self UNUSED, char *name, PyObject *valObject)
+    static ကိန်းပြည့်
+CurrentSetattr(PyObject *self UNUSED, var_na *name, PyObject *valObject)
 {
-    if (strcmp(name, "line") == 0)
+    အကယ်၍ (strcmp(name, "line") == 0)
     {
-	if (SetBufferLine(curbuf, (PyInt)curwin->w_cursor.lnum, valObject,
+	အကယ်၍ (SetBufferLine(curbuf, (PyInt)curwin->w_cursor.lnum, valObject,
 			  NULL) == FAIL)
-	    return -1;
+	    ပြန်ပေး -1;
 
-	return 0;
+	ပြန်ပေး 0;
     }
-    else if (strcmp(name, "buffer") == 0)
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "buffer") == 0)
     {
-	int count;
+	ကိန်းပြည့် count;
 
-	if (valObject->ob_type != BufferTypePtr)
+	အကယ်၍ (valObject->ob_type != BufferTypePtr)
 	{
 	    PyErr_FORMAT_TYPE(
 		    N_("expected vim.Buffer object, but got %s"),
 		    valObject);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 
-	if (CheckBuffer((BufferObject *)(valObject)))
-	    return -1;
+	အကယ်၍ (CheckBuffer((BufferObject *)(valObject)))
+	    ပြန်ပေး -1;
 	count = ((BufferObject *)(valObject))->buf->b_fnum;
 
 	VimTryStart();
-	if (do_buffer(DOBUF_GOTO, DOBUF_FIRST, FORWARD, count, 0) == FAIL)
+	အကယ်၍ (do_buffer(DOBUF_GOTO, DOBUF_FIRST, FORWARD, count, 0) == FAIL)
 	{
-	    if (VimTryEnd())
-		return -1;
+	    အကယ်၍ (VimTryEnd())
+		ပြန်ပေး -1;
 	    PyErr_VIM_FORMAT(N_("failed to switch to buffer %d"), count);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 
-	return VimTryEnd();
+	ပြန်ပေး VimTryEnd();
     }
-    else if (strcmp(name, "window") == 0)
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "window") == 0)
     {
-	int count;
+	ကိန်းပြည့် count;
 
-	if (valObject->ob_type != WindowTypePtr)
+	အကယ်၍ (valObject->ob_type != WindowTypePtr)
 	{
 	    PyErr_FORMAT_TYPE(
 		    N_("expected vim.Window object, but got %s"),
 		    valObject);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 
-	if (CheckWindow((WindowObject *)(valObject)))
-	    return -1;
+	အကယ်၍ (CheckWindow((WindowObject *)(valObject)))
+	    ပြန်ပေး -1;
 	count = get_win_number(((WindowObject *)(valObject))->win, firstwin);
 
-	if (!count)
+	အကယ်၍ (!count)
 	{
 	    PyErr_SET_STRING(PyExc_ValueError,
 		    N_("failed to find window in the current tab page"));
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 
 	VimTryStart();
 	win_goto(((WindowObject *)(valObject))->win);
-	if (((WindowObject *)(valObject))->win != curwin)
+	အကယ်၍ (((WindowObject *)(valObject))->win != curwin)
 	{
-	    if (VimTryEnd())
-		return -1;
+	    အကယ်၍ (VimTryEnd())
+		ပြန်ပေး -1;
 	    PyErr_SET_STRING(PyExc_RuntimeError,
 		    N_("did not switch to the specified window"));
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 
-	return VimTryEnd();
+	ပြန်ပေး VimTryEnd();
     }
-    else if (strcmp(name, "tabpage") == 0)
+    မဟုတ်ပါက အကယ်၍ (strcmp(name, "tabpage") == 0)
     {
-	if (valObject->ob_type != TabPageTypePtr)
+	အကယ်၍ (valObject->ob_type != TabPageTypePtr)
 	{
 	    PyErr_FORMAT_TYPE(
 		    N_("expected vim.TabPage object, but got %s"),
 		    valObject);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 
-	if (CheckTabPage((TabPageObject *)(valObject)))
-	    return -1;
+	အကယ်၍ (CheckTabPage((TabPageObject *)(valObject)))
+	    ပြန်ပေး -1;
 
 	VimTryStart();
 	goto_tabpage_tp(((TabPageObject *)(valObject))->tab, TRUE, TRUE);
-	if (((TabPageObject *)(valObject))->tab != curtab)
+	အကယ်၍ (((TabPageObject *)(valObject))->tab != curtab)
 	{
-	    if (VimTryEnd())
-		return -1;
+	    အကယ်၍ (VimTryEnd())
+		ပြန်ပေး -1;
 	    PyErr_SET_STRING(PyExc_RuntimeError,
 		    N_("did not switch to the specified tab page"));
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 
-	return VimTryEnd();
+	ပြန်ပေး VimTryEnd();
     }
-    else
+    မဟုတ်ပါက
     {
 	PyErr_SetString(PyExc_AttributeError, name);
-	return -1;
+	ပြန်ပေး -1;
     }
 }
 
-static struct PyMethodDef CurrentMethods[] = {
+static sa_nracanaa PyMethodDef CurrentMethods[] = {
     // name,	    function,			calling,	documentation
     {"__dir__",	    (PyCFunction)CurrentDir,	METH_NOARGS,	""},
     { NULL,	    NULL,			0,		NULL}
@@ -6419,32 +6419,32 @@ init_range_eval(void *rettv UNUSED)
 }
 
     static void
-run_cmd(const char *cmd, dict_T* locals UNUSED, void *arg UNUSED
+run_cmd(const var_na *cmd, dict_T* locals UNUSED, void *arg UNUSED
 #ifdef PY_CAN_RECURSE
 	, PyGILState_STATE *pygilstate UNUSED
 #endif
 	)
 {
     PyObject	*run_ret;
-    run_ret = PyRun_String((char *)cmd, Py_file_input, globals, globals);
-    if (run_ret != NULL)
+    run_ret = PyRun_String((var_na *)cmd, Py_file_input, globals, globals);
+    အကယ်၍ (run_ret != NULL)
     {
 	Py_DECREF(run_ret);
     }
-    else if (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_SystemExit))
+    မဟုတ်ပါက အကယ်၍ (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_SystemExit))
     {
 	emsg(_(e_cant_handle_systemexit_of_python_exception_in_vim));
 	PyErr_Clear();
     }
-    else
+    မဟုတ်ပါက
 	PyErr_PrintEx(1);
 }
 
-static const char	*code_hdr = "def " DOPY_FUNC "(line, linenr):\n ";
-static int		code_hdr_len = 30;
+static const var_na	*code_hdr = "def " DOPY_FUNC "(line, linenr):\n ";
+static ကိန်းပြည့်		code_hdr_len = 30;
 
     static void
-run_do(const char *cmd, dict_T* locals UNUSED, void *arg UNUSED
+run_do(const var_na *cmd, dict_T* locals UNUSED, void *arg UNUSED
 #ifdef PY_CAN_RECURSE
 	, PyGILState_STATE *pygilstate
 #endif
@@ -6452,45 +6452,45 @@ run_do(const char *cmd, dict_T* locals UNUSED, void *arg UNUSED
 {
     PyInt	lnum;
     size_t	len;
-    char	*code;
-    int		status;
+    var_na	*code;
+    ကိန်းပြည့်		status;
     PyObject	*pyfunc, *pymain;
     PyObject	*run_ret;
     buf_T	*was_curbuf = curbuf;
 
-    if (u_save((linenr_T)RangeStart - 1, (linenr_T)RangeEnd + 1) != OK)
+    အကယ်၍ (u_save((linenr_T)RangeStart - 1, (linenr_T)RangeEnd + 1) != OK)
     {
 	emsg(_("cannot save undo information"));
-	return;
+	ပြန်ပေး;
     }
 
     len = code_hdr_len + STRLEN(cmd);
-    code = PyMem_New(char, len + 1);
+    code = PyMem_New(var_na, len + 1);
     memcpy(code, code_hdr, code_hdr_len);
     STRCPY(code + code_hdr_len, cmd);
     run_ret = PyRun_String(code, Py_file_input, globals, globals);
     status = -1;
-    if (run_ret != NULL)
+    အကယ်၍ (run_ret != NULL)
     {
 	status = 0;
 	Py_DECREF(run_ret);
     }
-    else if (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_SystemExit))
+    မဟုတ်ပါက အကယ်၍ (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_SystemExit))
     {
 	PyMem_Free(code);
 	emsg(_(e_cant_handle_systemexit_of_python_exception_in_vim));
 	PyErr_Clear();
-	return;
+	ပြန်ပေး;
     }
-    else
+    မဟုတ်ပါက
 	PyErr_PrintEx(1);
 
     PyMem_Free(code);
 
-    if (status)
+    အကယ်၍ (status)
     {
 	emsg(_("failed to run the code"));
-	return;
+	ပြန်ပေး;
     }
 
     status = 0;
@@ -6500,7 +6500,7 @@ run_do(const char *cmd, dict_T* locals UNUSED, void *arg UNUSED
     PyGILState_Release(*pygilstate);
 #endif
 
-    for (lnum = RangeStart; lnum <= RangeEnd; ++lnum)
+    အတွက် (lnum = RangeStart; lnum <= RangeEnd; ++lnum)
     {
 	PyObject	*line;
 	PyObject	*linenr;
@@ -6510,10 +6510,10 @@ run_do(const char *cmd, dict_T* locals UNUSED, void *arg UNUSED
 	*pygilstate = PyGILState_Ensure();
 #endif
 	// Check the line number, the command my have deleted lines.
-	if (lnum > curbuf->b_ml.ml_line_count
+	အကယ်၍ (lnum > curbuf->b_ml.ml_line_count
 		|| !(line = GetBufferLine(curbuf, lnum)))
 	    goto err;
-	if (!(linenr = PyInt_FromLong((long) lnum)))
+	အကယ်၍ (!(linenr = PyInt_FromLong((long) lnum)))
 	{
 	    Py_DECREF(line);
 	    goto err;
@@ -6521,19 +6521,19 @@ run_do(const char *cmd, dict_T* locals UNUSED, void *arg UNUSED
 	ret = PyObject_CallFunctionObjArgs(pyfunc, line, linenr, NULL);
 	Py_DECREF(line);
 	Py_DECREF(linenr);
-	if (!ret)
+	အကယ်၍ (!ret)
 	    goto err;
 
 	// Check that the command didn't switch to another buffer.
 	// Check the line number, the command my have deleted lines.
-	if (curbuf != was_curbuf || lnum > curbuf->b_ml.ml_line_count)
+	အကယ်၍ (curbuf != was_curbuf || lnum > curbuf->b_ml.ml_line_count)
 	{
 	    Py_XDECREF(ret);
 	    goto err;
 	}
 
-	if (ret != Py_None)
-	    if (SetBufferLine(curbuf, lnum, ret, NULL) == FAIL)
+	အကယ်၍ (ret != Py_None)
+	    အကယ်၍ (SetBufferLine(curbuf, lnum, ret, NULL) == FAIL)
 	    {
 		Py_XDECREF(ret);
 		goto err;
@@ -6555,19 +6555,19 @@ err:
     status = 1;
 out:
 #ifdef PY_CAN_RECURSE
-    if (!status)
+    အကယ်၍ (!status)
 	*pygilstate = PyGILState_Ensure();
 #endif
     Py_DECREF(pyfunc);
     PyObject_SetAttrString(pymain, DOPY_FUNC, NULL);
-    if (status)
-	return;
+    အကယ်၍ (status)
+	ပြန်ပေး;
     check_cursor();
     update_curbuf(UPD_NOT_VALID);
 }
 
     static void
-run_eval(const char *cmd, dict_T *locals, void *arg
+run_eval(const var_na *cmd, dict_T *locals, void *arg
 #ifdef PY_CAN_RECURSE
 	, PyGILState_STATE *pygilstate UNUSED
 #endif
@@ -6577,94 +6577,94 @@ run_eval(const char *cmd, dict_T *locals, void *arg
     typval_T	*rettv = (typval_T*)arg;
     PyObject	*pylocals = locals ? NEW_DICTIONARY(locals) : globals;
 
-    run_ret = PyRun_String((char *)cmd, Py_eval_input, globals, pylocals);
-    if (run_ret == NULL)
+    run_ret = PyRun_String((var_na *)cmd, Py_eval_input, globals, pylocals);
+    အကယ်၍ (run_ret == NULL)
     {
-	if (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_SystemExit))
+	အကယ်၍ (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_SystemExit))
 	{
 	    emsg(_(e_cant_handle_systemexit_of_python_exception_in_vim));
 	    PyErr_Clear();
 	}
-	else
+	မဟုတ်ပါက
 	{
-	    if (PyErr_Occurred() && !msg_silent)
+	    အကယ်၍ (PyErr_Occurred() && !msg_silent)
 		PyErr_PrintEx(0);
 	    emsg(_(e_eval_did_not_return_valid_python_object));
 	}
     }
-    else
+    မဟုတ်ပါက
     {
-	if (ConvertFromPyObject(run_ret, rettv) == -1)
+	အကယ်၍ (ConvertFromPyObject(run_ret, rettv) == -1)
 	    emsg(_(e_failed_to_convert_returned_python_object_to_vim_value));
 	Py_DECREF(run_ret);
     }
     PyErr_Clear();
 }
 
-    static int
-set_ref_in_py(const int copyID)
+    static ကိန်းပြည့်
+set_ref_in_py(const ကိန်းပြည့် copyID)
 {
     pylinkedlist_T	*cur;
     list_T		*ll;
     tuple_T		*tt;
-    int			i;
-    int			abort = FALSE;
+    ကိန်းပြည့်			i;
+    ကိန်းပြည့်			abort = FALSE;
     FunctionObject	*func;
 
-    if (lastdict != NULL)
+    အကယ်၍ (lastdict != NULL)
     {
-	for (cur = lastdict ; !abort && cur != NULL ; cur = cur->pll_prev)
+	အတွက် (cur = lastdict ; !abort && cur != NULL ; cur = cur->pll_prev)
 	    abort = set_ref_in_dict(((DictionaryObject *)(cur->pll_obj))->dict,
 								       copyID);
     }
 
-    if (lastlist != NULL)
+    အကယ်၍ (lastlist != NULL)
     {
-	for (cur = lastlist ; !abort && cur != NULL ; cur = cur->pll_prev)
+	အတွက် (cur = lastlist ; !abort && cur != NULL ; cur = cur->pll_prev)
 	{
 	    ll = ((ListObject *) (cur->pll_obj))->list;
 	    abort = set_ref_in_list(ll, copyID);
 	}
     }
 
-    if (lasttuple != NULL)
+    အကယ်၍ (lasttuple != NULL)
     {
-	for (cur = lasttuple ; !abort && cur != NULL ; cur = cur->pll_prev)
+	အတွက် (cur = lasttuple ; !abort && cur != NULL ; cur = cur->pll_prev)
 	{
 	    tt = ((TupleObject *) (cur->pll_obj))->tuple;
 	    abort = set_ref_in_tuple(tt, copyID);
 	}
     }
 
-    if (lastfunc != NULL)
+    အကယ်၍ (lastfunc != NULL)
     {
-	for (cur = lastfunc ; !abort && cur != NULL ; cur = cur->pll_prev)
+	အတွက် (cur = lastfunc ; !abort && cur != NULL ; cur = cur->pll_prev)
 	{
 	    func = (FunctionObject *) cur->pll_obj;
 	    abort = set_ref_in_dict(func->self, copyID);
-	    if (func->argc)
-		for (i = 0; !abort && i < func->argc; ++i)
+	    အကယ်၍ (func->argc)
+		အတွက် (i = 0; !abort && i < func->argc; ++i)
 		    abort = abort
 			|| set_ref_in_item(&func->argv[i], copyID, NULL, NULL, NULL);
 	}
     }
 
-    return abort;
+    ပြန်ပေး abort;
 }
 
-    static int
+    static ကိန်းပြည့်
 set_string_copy(char_u *str, typval_T *tv)
 {
     tv->vval.v_string = vim_strsave(str);
-    if (tv->vval.v_string == NULL)
+    အကယ်၍ (tv->vval.v_string == NULL)
     {
 	PyErr_NoMemory();
-	return -1;
+	ပြန်ပေး -1;
     }
-    return 0;
+    ပြန်ပေး 0;
 }
 
-    static int
+    static ကိန်းပြည့်
 pydict_to_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 {
     dict_T	*dict;
@@ -6674,69 +6674,69 @@ pydict_to_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
     PyObject	*valObject;
     Py_ssize_t	iter = 0;
 
-    if (!(dict = py_dict_alloc()))
-	return -1;
+    အကယ်၍ (!(dict = py_dict_alloc()))
+	ပြန်ပေး -1;
 
     tv->v_type = VAR_DICT;
     tv->vval.v_dict = dict;
 
-    while (PyDict_Next(obj, &iter, &keyObject, &valObject))
+    နေစဉ် (PyDict_Next(obj, &iter, &keyObject, &valObject))
     {
 	PyObject	*todecref = NULL;
 
-	if (keyObject == NULL || valObject == NULL)
+	အကယ်၍ (keyObject == NULL || valObject == NULL)
 	{
 	    dict_unref(dict);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 
-	if (!(key = StringToChars(keyObject, &todecref)))
+	အကယ်၍ (!(key = StringToChars(keyObject, &todecref)))
 	{
 	    dict_unref(dict);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 
-	if (*key == NUL)
+	အကယ်၍ (*key == NUL)
 	{
 	    dict_unref(dict);
 	    Py_XDECREF(todecref);
 	    RAISE_NO_EMPTY_KEYS;
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 
 	di = dictitem_alloc(key);
 
 	Py_XDECREF(todecref);
 
-	if (di == NULL)
+	အကယ်၍ (di == NULL)
 	{
 	    PyErr_NoMemory();
 	    dict_unref(dict);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 
-	if (_ConvertFromPyObject(valObject, &di->di_tv, lookup_dict) == -1)
+	အကယ်၍ (_ConvertFromPyObject(valObject, &di->di_tv, lookup_dict) == -1)
 	{
 	    vim_free(di);
 	    dict_unref(dict);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 
-	if (dict_add(dict, di) == FAIL)
+	အကယ်၍ (dict_add(dict, di) == FAIL)
 	{
 	    RAISE_KEY_ADD_FAIL(di->di_key);
 	    clear_tv(&di->di_tv);
 	    vim_free(di);
 	    dict_unref(dict);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
     }
 
     --dict->dv_refcount;
-    return 0;
+    ပြန်ပေး 0;
 }
 
-    static int
+    static ကိန်းပြည့်
 pymap_to_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 {
     dict_T	*dict;
@@ -6747,55 +6747,55 @@ pymap_to_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
     PyObject	*keyObject;
     PyObject	*valObject;
 
-    if (!(dict = py_dict_alloc()))
-	return -1;
+    အကယ်၍ (!(dict = py_dict_alloc()))
+	ပြန်ပေး -1;
 
     tv->v_type = VAR_DICT;
     tv->vval.v_dict = dict;
 
-    if (!(list = PyMapping_Keys(obj)))
+    အကယ်၍ (!(list = PyMapping_Keys(obj)))
     {
 	dict_unref(dict);
-	return -1;
+	ပြန်ပေး -1;
     }
 
-    if (!(iterator = PyObject_GetIter(list)))
+    အကယ်၍ (!(iterator = PyObject_GetIter(list)))
     {
 	dict_unref(dict);
 	Py_DECREF(list);
-	return -1;
+	ပြန်ပေး -1;
     }
     Py_DECREF(list);
 
-    while ((keyObject = PyIter_Next(iterator)))
+    နေစဉ် ((keyObject = PyIter_Next(iterator)))
     {
 	PyObject	*todecref;
 
-	if (!(key = StringToChars(keyObject, &todecref)))
+	အကယ်၍ (!(key = StringToChars(keyObject, &todecref)))
 	{
 	    Py_DECREF(keyObject);
 	    Py_DECREF(iterator);
 	    dict_unref(dict);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 
-	if (*key == NUL)
+	အကယ်၍ (*key == NUL)
 	{
 	    Py_DECREF(keyObject);
 	    Py_DECREF(iterator);
 	    Py_XDECREF(todecref);
 	    dict_unref(dict);
 	    RAISE_NO_EMPTY_KEYS;
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 
-	if (!(valObject = PyObject_GetItem(obj, keyObject)))
+	အကယ်၍ (!(valObject = PyObject_GetItem(obj, keyObject)))
 	{
 	    Py_DECREF(keyObject);
 	    Py_DECREF(iterator);
 	    Py_XDECREF(todecref);
 	    dict_unref(dict);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 
 	di = dictitem_alloc(key);
@@ -6803,163 +6803,163 @@ pymap_to_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 	Py_DECREF(keyObject);
 	Py_XDECREF(todecref);
 
-	if (di == NULL)
+	အကယ်၍ (di == NULL)
 	{
 	    Py_DECREF(iterator);
 	    Py_DECREF(valObject);
 	    dict_unref(dict);
 	    PyErr_NoMemory();
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 
-	if (_ConvertFromPyObject(valObject, &di->di_tv, lookup_dict) == -1)
+	အကယ်၍ (_ConvertFromPyObject(valObject, &di->di_tv, lookup_dict) == -1)
 	{
 	    Py_DECREF(iterator);
 	    Py_DECREF(valObject);
 	    vim_free(di);
 	    dict_unref(dict);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 
 	Py_DECREF(valObject);
 
-	if (dict_add(dict, di) == FAIL)
+	အကယ်၍ (dict_add(dict, di) == FAIL)
 	{
 	    RAISE_KEY_ADD_FAIL(di->di_key);
 	    Py_DECREF(iterator);
 	    dictitem_free(di);
 	    dict_unref(dict);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
     }
     Py_DECREF(iterator);
     --dict->dv_refcount;
-    return 0;
+    ပြန်ပေး 0;
 }
 
-    static int
+    static ကိန်းပြည့်
 pyseq_to_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 {
     list_T	*l;
 
-    if (!(l = py_list_alloc()))
-	return -1;
+    အကယ်၍ (!(l = py_list_alloc()))
+	ပြန်ပေး -1;
 
     tv->v_type = VAR_LIST;
     tv->vval.v_list = l;
 
-    if (list_py_concat(l, obj, lookup_dict) == -1)
+    အကယ်၍ (list_py_concat(l, obj, lookup_dict) == -1)
     {
 	list_unref(l);
-	return -1;
+	ပြန်ပေး -1;
     }
 
     --l->lv_refcount;
-    return 0;
+    ပြန်ပေး 0;
 }
 
-    static int
+    static ကိန်းပြည့်
 pytuple_to_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 {
     tuple_T	*t;
 
-    if (!(t = py_tuple_alloc()))
-	return -1;
+    အကယ်၍ (!(t = py_tuple_alloc()))
+	ပြန်ပေး -1;
 
     tv->v_type = VAR_TUPLE;
     tv->vval.v_tuple = t;
 
-    if (tuple_py_concat(t, obj, lookup_dict) == -1)
+    အကယ်၍ (tuple_py_concat(t, obj, lookup_dict) == -1)
     {
 	tuple_unref(t);
-	return -1;
+	ပြန်ပေး -1;
     }
 
     --t->tv_refcount;
-    return 0;
+    ပြန်ပေး 0;
 }
 
-typedef int (*pytotvfunc)(PyObject *, typval_T *, PyObject *);
+typedef ကိန်းပြည့် (*pytotvfunc)(PyObject *, typval_T *, PyObject *);
 
-    static int
+    static ကိန်းပြည့်
 convert_dl(PyObject *obj, typval_T *tv,
 				    pytotvfunc py_to_tv, PyObject *lookup_dict)
 {
     PyObject	*capsule;
-    char	hexBuf[sizeof(void *) * 2 + 3];
+    var_na	hexBuf[parimaa_na(void *) * 2 + 3];
 
     sprintf(hexBuf, "%p", (void *)obj);
 
 #ifdef PY_USE_CAPSULE
     capsule = PyDict_GetItemString(lookup_dict, hexBuf);
-#else
+#မဟုတ်ပါက
     capsule = (PyObject *)PyDict_GetItemString(lookup_dict, hexBuf);
 #endif
-    if (capsule == NULL)
+    အကယ်၍ (capsule == NULL)
     {
 #ifdef PY_USE_CAPSULE
 	capsule = PyCapsule_New(tv, NULL, NULL);
-#else
+#မဟုတ်ပါက
 	capsule = PyCObject_FromVoidPtr(tv, NULL);
 #endif
-	if (PyDict_SetItemString(lookup_dict, hexBuf, capsule))
+	အကယ်၍ (PyDict_SetItemString(lookup_dict, hexBuf, capsule))
 	{
 	    Py_DECREF(capsule);
 	    tv->v_type = VAR_UNKNOWN;
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 
 	Py_DECREF(capsule);
 
-	if (py_to_tv(obj, tv, lookup_dict) == -1)
+	အကယ်၍ (py_to_tv(obj, tv, lookup_dict) == -1)
 	{
 	    tv->v_type = VAR_UNKNOWN;
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 	// As we are not using copy_tv which increments reference count we must
 	// do it ourself.
-	if (tv->v_type == VAR_DICT)
+	အကယ်၍ (tv->v_type == VAR_DICT)
 	    ++tv->vval.v_dict->dv_refcount;
-	else if (tv->v_type == VAR_LIST)
+	မဟုတ်ပါက အကယ်၍ (tv->v_type == VAR_LIST)
 	    ++tv->vval.v_list->lv_refcount;
-	else if (tv->v_type == VAR_TUPLE)
+	မဟုတ်ပါက အကယ်၍ (tv->v_type == VAR_TUPLE)
 	    ++tv->vval.v_tuple->tv_refcount;
     }
-    else
+    မဟုတ်ပါက
     {
 	typval_T	*v;
 
 #ifdef PY_USE_CAPSULE
 	v = PyCapsule_GetPointer(capsule, NULL);
-#else
+#မဟုတ်ပါက
 	v = PyCObject_AsVoidPtr(capsule);
 #endif
 	copy_tv(v, tv);
     }
-    return 0;
+    ပြန်ပေး 0;
 }
 
-    static int
+    static ကိန်းပြည့်
 ConvertFromPyMapping(PyObject *obj, typval_T *tv)
 {
     PyObject	*lookup_dict;
-    int		ret;
+    ကိန်းပြည့်		ret;
 
-    if (!(lookup_dict = PyDict_New()))
-	return -1;
+    အကယ်၍ (!(lookup_dict = PyDict_New()))
+	ပြန်ပေး -1;
 
-    if (PyType_IsSubtype(obj->ob_type, DictionaryTypePtr))
+    အကယ်၍ (PyType_IsSubtype(obj->ob_type, DictionaryTypePtr))
     {
 	tv->v_type = VAR_DICT;
 	tv->vval.v_dict = (((DictionaryObject *)(obj))->dict);
 	++tv->vval.v_dict->dv_refcount;
 	ret = 0;
     }
-    else if (PyDict_Check(obj))
+    မဟုတ်ပါက အကယ်၍ (PyDict_Check(obj))
 	ret = convert_dl(obj, tv, pydict_to_tv, lookup_dict);
-    else if (PyMapping_Check(obj))
+    မဟုတ်ပါက အကယ်၍ (PyMapping_Check(obj))
 	ret = convert_dl(obj, tv, pymap_to_tv, lookup_dict);
-    else
+    မဟုတ်ပါက
     {
 	PyErr_FORMAT_TYPE(
 		N_("unable to convert %s to a Vim dictionary"),
@@ -6967,28 +6967,28 @@ ConvertFromPyMapping(PyObject *obj, typval_T *tv)
 	ret = -1;
     }
     Py_DECREF(lookup_dict);
-    return ret;
+    ပြန်ပေး ret;
 }
 
-    static int
+    static ကိန်းပြည့်
 ConvertFromPySequence(PyObject *obj, typval_T *tv)
 {
     PyObject	*lookup_dict;
-    int		ret;
+    ကိန်းပြည့်		ret;
 
-    if (!(lookup_dict = PyDict_New()))
-	return -1;
+    အကယ်၍ (!(lookup_dict = PyDict_New()))
+	ပြန်ပေး -1;
 
-    if (PyType_IsSubtype(obj->ob_type, ListTypePtr))
+    အကယ်၍ (PyType_IsSubtype(obj->ob_type, ListTypePtr))
     {
 	tv->v_type = VAR_LIST;
 	tv->vval.v_list = (((ListObject *)(obj))->list);
 	++tv->vval.v_list->lv_refcount;
 	ret = 0;
     }
-    else if (PyIter_Check(obj) || PySequence_Check(obj))
+    မဟုတ်ပါက အကယ်၍ (PyIter_Check(obj) || PySequence_Check(obj))
 	ret = convert_dl(obj, tv, pyseq_to_tv, lookup_dict);
-    else
+    မဟုတ်ပါက
     {
 	PyErr_FORMAT_TYPE(
 		N_("unable to convert %s to a Vim list"),
@@ -6996,47 +6996,47 @@ ConvertFromPySequence(PyObject *obj, typval_T *tv)
 	ret = -1;
     }
     Py_DECREF(lookup_dict);
-    return ret;
+    ပြန်ပေး ret;
 }
 
-    static int
+    static ကိန်းပြည့်
 ConvertFromPyObject(PyObject *obj, typval_T *tv)
 {
     PyObject	*lookup_dict;
-    int		ret;
+    ကိန်းပြည့်		ret;
 
-    if (!(lookup_dict = PyDict_New()))
-	return -1;
+    အကယ်၍ (!(lookup_dict = PyDict_New()))
+	ပြန်ပေး -1;
     ret = _ConvertFromPyObject(obj, tv, lookup_dict);
     Py_DECREF(lookup_dict);
-    return ret;
+    ပြန်ပေး ret;
 }
 
-    static int
+    static ကိန်းပြည့်
 _ConvertFromPyObject(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 {
-    if (PyType_IsSubtype(obj->ob_type, DictionaryTypePtr))
+    အကယ်၍ (PyType_IsSubtype(obj->ob_type, DictionaryTypePtr))
     {
 	tv->v_type = VAR_DICT;
 	tv->vval.v_dict = (((DictionaryObject *)(obj))->dict);
 	++tv->vval.v_dict->dv_refcount;
     }
-    else if (PyType_IsSubtype(obj->ob_type, ListTypePtr))
+    မဟုတ်ပါက အကယ်၍ (PyType_IsSubtype(obj->ob_type, ListTypePtr))
     {
 	tv->v_type = VAR_LIST;
 	tv->vval.v_list = (((ListObject *)(obj))->list);
 	++tv->vval.v_list->lv_refcount;
     }
-    else if (PyType_IsSubtype(obj->ob_type, TupleTypePtr))
+    မဟုတ်ပါက အကယ်၍ (PyType_IsSubtype(obj->ob_type, TupleTypePtr))
     {
 	tv->v_type = VAR_TUPLE;
 	tv->vval.v_tuple = (((TupleObject *)(obj))->tuple);
 	++tv->vval.v_tuple->tv_refcount;
     }
-    else if (PyType_IsSubtype(obj->ob_type, FunctionTypePtr))
+    မဟုတ်ပါက အကယ်၍ (PyType_IsSubtype(obj->ob_type, FunctionTypePtr))
     {
 	FunctionObject *func = (FunctionObject *) obj;
-	if (func->self != NULL || func->argv != NULL)
+	အကယ်၍ (func->self != NULL || func->argv != NULL)
 	{
 	    partial_T *pt = ALLOC_CLEAR_ONE(partial_T);
 
@@ -7044,189 +7044,189 @@ _ConvertFromPyObject(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 	    tv->vval.v_partial = pt;
 	    tv->v_type = VAR_PARTIAL;
 	}
-	else
+	မဟုတ်ပါက
 	{
-	    if (set_string_copy(func->name, tv) == -1)
-		return -1;
+	    အကယ်၍ (set_string_copy(func->name, tv) == -1)
+		ပြန်ပေး -1;
 
 	    tv->v_type = VAR_FUNC;
 	}
 	func_ref(func->name);
     }
-    else if (PyBytes_Check(obj))
+    မဟုတ်ပါက အကယ်၍ (PyBytes_Check(obj))
     {
 	char_u	*str;
 
-	if (PyBytes_AsStringAndSize(obj, (char **) &str, NULL) == -1)
-	    return -1;
-	if (str == NULL)
-	    return -1;
+	အကယ်၍ (PyBytes_AsStringAndSize(obj, (var_na **) &str, NULL) == -1)
+	    ပြန်ပေး -1;
+	အကယ်၍ (str == NULL)
+	    ပြန်ပေး -1;
 
-	if (set_string_copy(str, tv) == -1)
-	    return -1;
+	အကယ်၍ (set_string_copy(str, tv) == -1)
+	    ပြန်ပေး -1;
 
 	tv->v_type = VAR_STRING;
     }
-    else if (PyUnicode_Check(obj))
+    မဟုတ်ပါက အကယ်၍ (PyUnicode_Check(obj))
     {
 	PyObject	*bytes;
 	char_u	*str;
 
 	bytes = PyUnicode_AsEncodedString(obj, ENC_OPT, ERRORS_ENCODE_ARG);
-	if (bytes == NULL)
-	    return -1;
+	အကယ်၍ (bytes == NULL)
+	    ပြန်ပေး -1;
 
-	if (PyBytes_AsStringAndSize(bytes, (char **) &str, NULL) == -1)
-	    return -1;
-	if (str == NULL)
-	    return -1;
+	အကယ်၍ (PyBytes_AsStringAndSize(bytes, (var_na **) &str, NULL) == -1)
+	    ပြန်ပေး -1;
+	အကယ်၍ (str == NULL)
+	    ပြန်ပေး -1;
 
-	if (set_string_copy(str, tv))
+	အကယ်၍ (set_string_copy(str, tv))
 	{
 	    Py_XDECREF(bytes);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 	Py_XDECREF(bytes);
 
 	tv->v_type = VAR_STRING;
     }
-#if PY_MAJOR_VERSION < 3
-    else if (PyInt_Check(obj))
+#အကယ်၍ PY_MAJOR_VERSION < 3
+    မဟုတ်ပါက အကယ်၍ (PyInt_Check(obj))
     {
 	tv->v_type = VAR_NUMBER;
 	tv->vval.v_number = (varnumber_T) PyInt_AsLong(obj);
-	if (PyErr_Occurred())
-	    return -1;
+	အကယ်၍ (PyErr_Occurred())
+	    ပြန်ပေး -1;
     }
 #endif
-    else if (PyLong_Check(obj))
+    မဟုတ်ပါက အကယ်၍ (PyLong_Check(obj))
     {
 	tv->v_type = VAR_NUMBER;
 	tv->vval.v_number = (varnumber_T) PyLong_AsLong(obj);
-	if (PyErr_Occurred())
-	    return -1;
+	အကယ်၍ (PyErr_Occurred())
+	    ပြန်ပေး -1;
     }
-    else if (PyTuple_Check(obj))
-	return convert_dl(obj, tv, pytuple_to_tv, lookup_dict);
-    else if (PyDict_Check(obj))
-	return convert_dl(obj, tv, pydict_to_tv, lookup_dict);
-    else if (PyFloat_Check(obj))
+    မဟုတ်ပါက အကယ်၍ (PyTuple_Check(obj))
+	ပြန်ပေး convert_dl(obj, tv, pytuple_to_tv, lookup_dict);
+    မဟုတ်ပါက အကယ်၍ (PyDict_Check(obj))
+	ပြန်ပေး convert_dl(obj, tv, pydict_to_tv, lookup_dict);
+    မဟုတ်ပါက အကယ်၍ (PyFloat_Check(obj))
     {
 	tv->v_type = VAR_FLOAT;
 	tv->vval.v_float = (float_T) PyFloat_AsDouble(obj);
     }
-    else if (PyObject_HasAttrString(obj, "keys"))
-	return convert_dl(obj, tv, pymap_to_tv, lookup_dict);
+    မဟုတ်ပါက အကယ်၍ (PyObject_HasAttrString(obj, "keys"))
+	ပြန်ပေး convert_dl(obj, tv, pymap_to_tv, lookup_dict);
     // PyObject_GetIter can create built-in iterator for any sequence object
-    else if (PyIter_Check(obj) || PySequence_Check(obj))
-	return convert_dl(obj, tv, pyseq_to_tv, lookup_dict);
-    else if (PyMapping_Check(obj))
-	return convert_dl(obj, tv, pymap_to_tv, lookup_dict);
-    else if (PyNumber_Check(obj))
+    မဟုတ်ပါက အကယ်၍ (PyIter_Check(obj) || PySequence_Check(obj))
+	ပြန်ပေး convert_dl(obj, tv, pyseq_to_tv, lookup_dict);
+    မဟုတ်ပါက အကယ်၍ (PyMapping_Check(obj))
+	ပြန်ပေး convert_dl(obj, tv, pymap_to_tv, lookup_dict);
+    မဟုတ်ပါက အကယ်၍ (PyNumber_Check(obj))
     {
 	PyObject	*num;
 
-	if (!(num = PyNumber_Long(obj)))
-	    return -1;
+	အကယ်၍ (!(num = PyNumber_Long(obj)))
+	    ပြန်ပေး -1;
 
 	tv->v_type = VAR_NUMBER;
 	tv->vval.v_number = (varnumber_T) PyLong_AsLong(num);
 
 	Py_DECREF(num);
     }
-    else if (obj == Py_None)
+    မဟုတ်ပါက အကယ်၍ (obj == Py_None)
     {
 	tv->v_type = VAR_SPECIAL;
 	tv->vval.v_number = VVAL_NONE;
     }
-    else
+    မဟုတ်ပါက
     {
 	PyErr_FORMAT_TYPE(
 		N_("unable to convert %s to a Vim structure"),
 		obj);
-	return -1;
+	ပြန်ပေး -1;
     }
-    return 0;
+    ပြန်ပေး 0;
 }
 
     static PyObject *
 ConvertToPyObject(typval_T *tv)
 {
     typval_T *argv;
-    int i;
-    if (tv == NULL)
+    ကိန်းပြည့် i;
+    အကယ်၍ (tv == NULL)
     {
 	PyErr_SET_VIM(N_("internal error: NULL reference passed"));
-	return NULL;
+	ပြန်ပေး NULL;
     }
     switch (tv->v_type)
     {
-	case VAR_STRING:
-	    return PyBytes_FromString(tv->vval.v_string == NULL
-					    ? "" : (char *)tv->vval.v_string);
-	case VAR_NUMBER:
-	    return PyLong_FromLong((long) tv->vval.v_number);
-	case VAR_FLOAT:
-	    return PyFloat_FromDouble((double) tv->vval.v_float);
-	case VAR_LIST:
-	    return NEW_LIST(tv->vval.v_list);
-	case VAR_TUPLE:
-	    return NEW_TUPLE(tv->vval.v_tuple);
-	case VAR_DICT:
-	    return NEW_DICTIONARY(tv->vval.v_dict);
-	case VAR_FUNC:
-	    return NEW_FUNCTION(tv->vval.v_string == NULL
+	pak_sa VAR_STRING:
+	    ပြန်ပေး PyBytes_FromString(tv->vval.v_string == NULL
+					    ? "" : (var_na *)tv->vval.v_string);
+	pak_sa VAR_NUMBER:
+	    ပြန်ပေး PyLong_FromLong((long) tv->vval.v_number);
+	pak_sa VAR_FLOAT:
+	    ပြန်ပေး PyFloat_FromDouble((dviguu_na) tv->vval.v_float);
+	pak_sa VAR_LIST:
+	    ပြန်ပေး NEW_LIST(tv->vval.v_list);
+	pak_sa VAR_TUPLE:
+	    ပြန်ပေး NEW_TUPLE(tv->vval.v_tuple);
+	pak_sa VAR_DICT:
+	    ပြန်ပေး NEW_DICTIONARY(tv->vval.v_dict);
+	pak_sa VAR_FUNC:
+	    ပြန်ပေး NEW_FUNCTION(tv->vval.v_string == NULL
 					  ? (char_u *)"" : tv->vval.v_string,
 					  0, NULL, NULL, TRUE);
-	case VAR_PARTIAL:
-	    if (tv->vval.v_partial->pt_argc)
+	pak_sa VAR_PARTIAL:
+	    အကယ်၍ (tv->vval.v_partial->pt_argc)
 	    {
 		argv = PyMem_New(typval_T, (size_t)tv->vval.v_partial->pt_argc);
-		for (i = 0; i < tv->vval.v_partial->pt_argc; i++)
+		အတွက် (i = 0; i < tv->vval.v_partial->pt_argc; i++)
 		    copy_tv(&tv->vval.v_partial->pt_argv[i], &argv[i]);
 	    }
-	    else
+	    မဟုတ်ပါက
 		argv = NULL;
-	    if (tv->vval.v_partial->pt_dict != NULL)
+	    အကယ်၍ (tv->vval.v_partial->pt_dict != NULL)
 		tv->vval.v_partial->pt_dict->dv_refcount++;
-	    return NEW_FUNCTION(tv->vval.v_partial == NULL
+	    ပြန်ပေး NEW_FUNCTION(tv->vval.v_partial == NULL
 			     ? (char_u *)"" : partial_name(tv->vval.v_partial),
 				tv->vval.v_partial->pt_argc, argv,
 				tv->vval.v_partial->pt_dict,
 				tv->vval.v_partial->pt_auto);
-	case VAR_BLOB:
-	    return PyBytes_FromStringAndSize(
-		(char*) tv->vval.v_blob->bv_ga.ga_data,
+	pak_sa VAR_BLOB:
+	    ပြန်ပေး PyBytes_FromStringAndSize(
+		(var_na*) tv->vval.v_blob->bv_ga.ga_data,
 		(Py_ssize_t) tv->vval.v_blob->bv_ga.ga_len);
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	case VAR_CHANNEL:
-	case VAR_JOB:
-	case VAR_INSTR:
-	case VAR_CLASS:
-	case VAR_OBJECT:
-	case VAR_TYPEALIAS:
+	pak_sa VAR_UNKNOWN:
+	pak_sa VAR_ANY:
+	pak_sa VAR_VOID:
+	pak_sa VAR_CHANNEL:
+	pak_sa VAR_JOB:
+	pak_sa VAR_INSTR:
+	pak_sa VAR_CLASS:
+	pak_sa VAR_OBJECT:
+	pak_sa VAR_TYPEALIAS:
 	    Py_INCREF(Py_None);
-	    return Py_None;
-	case VAR_BOOL:
-	case VAR_SPECIAL:
+	    ပြန်ပေး Py_None;
+	pak_sa VAR_BOOL:
+	pak_sa VAR_SPECIAL:
 	    switch (tv->vval.v_number)
 	    {
-		case VVAL_FALSE: return ALWAYS_FALSE;
-		case VVAL_TRUE:  return ALWAYS_TRUE;
-		case VVAL_NONE:
-		case VVAL_NULL:  return ALWAYS_NONE;
+		pak_sa VVAL_FALSE: ပြန်ပေး ALWAYS_FALSE;
+		pak_sa VVAL_TRUE:  ပြန်ပေး ALWAYS_TRUE;
+		pak_sa VVAL_NONE:
+		pak_sa VVAL_NULL:  ပြန်ပေး ALWAYS_NONE;
 	    }
 	    PyErr_SET_VIM(N_("internal error: invalid value type"));
-	    return NULL;
+	    ပြန်ပေး NULL;
     }
-    return NULL;
+    ပြန်ပေး NULL;
 }
 
 DEFINE_PY_TYPE_OBJECT(CurrentType);
 
-typedef struct
+typedef sa_nracanaa
 {
     PyObject_HEAD
 } CurrentObject;
@@ -7241,11 +7241,11 @@ init_structs(void)
 {
     CLEAR_FIELD(OutputType);
     OutputType.tp_name = "vim.message";
-    OutputType.tp_basicsize = sizeof(OutputObject);
+    OutputType.tp_basicsize = parimaa_na(OutputObject);
     OutputType.tp_flags = Py_TPFLAGS_DEFAULT;
     OutputType.tp_doc = "vim message object";
     OutputType.tp_methods = OutputMethods;
-#if PY_MAJOR_VERSION >= 3
+#အကယ်၍ PY_MAJOR_VERSION >= 3
     OutputType.tp_getattro = OutputGetattro;
     OutputType.tp_setattro = OutputSetattro;
     OutputType.tp_alloc = call_PyType_GenericAlloc;
@@ -7256,7 +7256,7 @@ init_structs(void)
     // anyway and so in limited API we don't set it.
     OutputType.tp_base = &PyStdPrinter_Type;
 # endif
-#else
+#မဟုတ်ပါက
     OutputType.tp_getattr = OutputGetattr;
     OutputType.tp_setattr = OutputSetattr;
     // Disabled, because this causes a crash in test86
@@ -7265,7 +7265,7 @@ init_structs(void)
 
     CLEAR_FIELD(IterType);
     IterType.tp_name = "vim.iter";
-    IterType.tp_basicsize = sizeof(IterObject);
+    IterType.tp_basicsize = parimaa_na(IterObject);
     IterType.tp_flags = Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_GC;
     IterType.tp_doc = "generic iterator object";
     IterType.tp_iter = IterIter;
@@ -7276,7 +7276,7 @@ init_structs(void)
 
     CLEAR_FIELD(BufferType);
     BufferType.tp_name = "vim.buffer";
-    BufferType.tp_basicsize = sizeof(BufferObject);
+    BufferType.tp_basicsize = parimaa_na(BufferObject);
     BufferType.tp_dealloc = BufferDestructor;
     BufferType.tp_repr = BufferRepr;
     BufferType.tp_as_sequence = &BufferAsSeq;
@@ -7284,20 +7284,20 @@ init_structs(void)
     BufferType.tp_flags = Py_TPFLAGS_DEFAULT;
     BufferType.tp_doc = "vim buffer object";
     BufferType.tp_methods = BufferMethods;
-#if PY_MAJOR_VERSION >= 3
+#အကယ်၍ PY_MAJOR_VERSION >= 3
     BufferType.tp_getattro = BufferGetattro;
     BufferType.tp_setattro = BufferSetattro;
     BufferType.tp_alloc = call_PyType_GenericAlloc;
     BufferType.tp_new = call_PyType_GenericNew;
     BufferType.tp_free = call_PyObject_Free;
-#else
+#မဟုတ်ပါက
     BufferType.tp_getattr = BufferGetattr;
     BufferType.tp_setattr = BufferSetattr;
 #endif
 
     CLEAR_FIELD(WindowType);
     WindowType.tp_name = "vim.window";
-    WindowType.tp_basicsize = sizeof(WindowObject);
+    WindowType.tp_basicsize = parimaa_na(WindowObject);
     WindowType.tp_dealloc = WindowDestructor;
     WindowType.tp_repr = WindowRepr;
     WindowType.tp_flags = Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_GC;
@@ -7305,37 +7305,37 @@ init_structs(void)
     WindowType.tp_methods = WindowMethods;
     WindowType.tp_traverse = WindowTraverse;
     WindowType.tp_clear = WindowClear;
-#if PY_MAJOR_VERSION >= 3
+#အကယ်၍ PY_MAJOR_VERSION >= 3
     WindowType.tp_getattro = WindowGetattro;
     WindowType.tp_setattro = WindowSetattro;
     WindowType.tp_alloc = call_PyType_GenericAlloc;
     WindowType.tp_new = call_PyType_GenericNew;
     WindowType.tp_free = call_PyObject_Free;
-#else
+#မဟုတ်ပါက
     WindowType.tp_getattr = WindowGetattr;
     WindowType.tp_setattr = WindowSetattr;
 #endif
 
     CLEAR_FIELD(TabPageType);
     TabPageType.tp_name = "vim.tabpage";
-    TabPageType.tp_basicsize = sizeof(TabPageObject);
+    TabPageType.tp_basicsize = parimaa_na(TabPageObject);
     TabPageType.tp_dealloc = TabPageDestructor;
     TabPageType.tp_repr = TabPageRepr;
     TabPageType.tp_flags = Py_TPFLAGS_DEFAULT;
     TabPageType.tp_doc = "vim tab page object";
     TabPageType.tp_methods = TabPageMethods;
-#if PY_MAJOR_VERSION >= 3
+#အကယ်၍ PY_MAJOR_VERSION >= 3
     TabPageType.tp_getattro = TabPageGetattro;
     TabPageType.tp_alloc = call_PyType_GenericAlloc;
     TabPageType.tp_new = call_PyType_GenericNew;
     TabPageType.tp_free = call_PyObject_Free;
-#else
+#မဟုတ်ပါက
     TabPageType.tp_getattr = TabPageGetattr;
 #endif
 
     CLEAR_FIELD(BufMapType);
     BufMapType.tp_name = "vim.bufferlist";
-    BufMapType.tp_basicsize = sizeof(BufMapObject);
+    BufMapType.tp_basicsize = parimaa_na(BufMapObject);
     BufMapType.tp_as_mapping = &BufMapAsMapping;
     BufMapType.tp_flags = Py_TPFLAGS_DEFAULT;
     BufMapType.tp_iter = BufMapIter;
@@ -7343,7 +7343,7 @@ init_structs(void)
 
     CLEAR_FIELD(WinListType);
     WinListType.tp_name = "vim.windowlist";
-    WinListType.tp_basicsize = sizeof(WinListObject);
+    WinListType.tp_basicsize = parimaa_na(WinListObject);
     WinListType.tp_as_sequence = &WinListAsSeq;
     WinListType.tp_flags = Py_TPFLAGS_DEFAULT;
     WinListType.tp_doc = "vim window list";
@@ -7351,14 +7351,14 @@ init_structs(void)
 
     CLEAR_FIELD(TabListType);
     TabListType.tp_name = "vim.tabpagelist";
-    TabListType.tp_basicsize = sizeof(TabListObject);
+    TabListType.tp_basicsize = parimaa_na(TabListObject);
     TabListType.tp_as_sequence = &TabListAsSeq;
     TabListType.tp_flags = Py_TPFLAGS_DEFAULT;
     TabListType.tp_doc = "vim tab page list";
 
     CLEAR_FIELD(RangeType);
     RangeType.tp_name = "vim.range";
-    RangeType.tp_basicsize = sizeof(RangeObject);
+    RangeType.tp_basicsize = parimaa_na(RangeObject);
     RangeType.tp_dealloc = RangeDestructor;
     RangeType.tp_repr = RangeRepr;
     RangeType.tp_as_sequence = &RangeAsSeq;
@@ -7368,32 +7368,32 @@ init_structs(void)
     RangeType.tp_methods = RangeMethods;
     RangeType.tp_traverse = RangeTraverse;
     RangeType.tp_clear = RangeClear;
-#if PY_MAJOR_VERSION >= 3
+#အကယ်၍ PY_MAJOR_VERSION >= 3
     RangeType.tp_getattro = RangeGetattro;
     RangeType.tp_alloc = call_PyType_GenericAlloc;
     RangeType.tp_new = call_PyType_GenericNew;
     RangeType.tp_free = call_PyObject_Free;
-#else
+#မဟုတ်ပါက
     RangeType.tp_getattr = RangeGetattr;
 #endif
 
     CLEAR_FIELD(CurrentType);
     CurrentType.tp_name = "vim.currentdata";
-    CurrentType.tp_basicsize = sizeof(CurrentObject);
+    CurrentType.tp_basicsize = parimaa_na(CurrentObject);
     CurrentType.tp_flags = Py_TPFLAGS_DEFAULT;
     CurrentType.tp_doc = "vim current object";
     CurrentType.tp_methods = CurrentMethods;
-#if PY_MAJOR_VERSION >= 3
+#အကယ်၍ PY_MAJOR_VERSION >= 3
     CurrentType.tp_getattro = CurrentGetattro;
     CurrentType.tp_setattro = CurrentSetattro;
-#else
+#မဟုတ်ပါက
     CurrentType.tp_getattr = CurrentGetattr;
     CurrentType.tp_setattr = CurrentSetattr;
 #endif
 
     CLEAR_FIELD(DictionaryType);
     DictionaryType.tp_name = "vim.dictionary";
-    DictionaryType.tp_basicsize = sizeof(DictionaryObject);
+    DictionaryType.tp_basicsize = parimaa_na(DictionaryObject);
     DictionaryType.tp_dealloc = DictionaryDestructor;
     DictionaryType.tp_as_sequence = &DictionaryAsSeq;
     DictionaryType.tp_as_mapping = &DictionaryAsMapping;
@@ -7403,10 +7403,10 @@ init_structs(void)
     DictionaryType.tp_iter = DictionaryIter;
     DictionaryType.tp_new = DictionaryConstructor;
     DictionaryType.tp_alloc = PyType_GenericAlloc;
-#if PY_MAJOR_VERSION >= 3
+#အကယ်၍ PY_MAJOR_VERSION >= 3
     DictionaryType.tp_getattro = DictionaryGetattro;
     DictionaryType.tp_setattro = DictionarySetattro;
-#else
+#မဟုတ်ပါက
     DictionaryType.tp_getattr = DictionaryGetattr;
     DictionaryType.tp_setattr = DictionarySetattr;
 #endif
@@ -7414,7 +7414,7 @@ init_structs(void)
     CLEAR_FIELD(ListType);
     ListType.tp_name = "vim.list";
     ListType.tp_dealloc = ListDestructor;
-    ListType.tp_basicsize = sizeof(ListObject);
+    ListType.tp_basicsize = parimaa_na(ListObject);
     ListType.tp_as_sequence = &ListAsSeq;
     ListType.tp_as_mapping = &ListAsMapping;
     ListType.tp_flags = Py_TPFLAGS_DEFAULT|Py_TPFLAGS_BASETYPE;
@@ -7423,10 +7423,10 @@ init_structs(void)
     ListType.tp_iter = ListIter;
     ListType.tp_new = ListConstructor;
     ListType.tp_alloc = PyType_GenericAlloc;
-#if PY_MAJOR_VERSION >= 3
+#အကယ်၍ PY_MAJOR_VERSION >= 3
     ListType.tp_getattro = ListGetattro;
     ListType.tp_setattro = ListSetattro;
-#else
+#မဟုတ်ပါက
     ListType.tp_getattr = ListGetattr;
     ListType.tp_setattr = ListSetattr;
 #endif
@@ -7435,7 +7435,7 @@ init_structs(void)
     CLEAR_FIELD(TupleType);
     TupleType.tp_name = "vim.tuple";
     TupleType.tp_dealloc = TupleDestructor;
-    TupleType.tp_basicsize = sizeof(TupleObject);
+    TupleType.tp_basicsize = parimaa_na(TupleObject);
     TupleType.tp_as_sequence = &TupleAsSeq;
     TupleType.tp_as_mapping = &TupleAsMapping;
     TupleType.tp_flags = Py_TPFLAGS_DEFAULT|Py_TPFLAGS_BASETYPE;
@@ -7444,17 +7444,17 @@ init_structs(void)
     TupleType.tp_iter = TupleIter;
     TupleType.tp_new = TupleConstructor;
     TupleType.tp_alloc = PyType_GenericAlloc;
-#if PY_MAJOR_VERSION >= 3
+#အကယ်၍ PY_MAJOR_VERSION >= 3
     TupleType.tp_getattro = TupleGetattro;
     TupleType.tp_setattro = TupleSetattro;
-#else
+#မဟုတ်ပါက
     TupleType.tp_getattr = TupleGetattr;
     TupleType.tp_setattr = TupleSetattr;
 #endif
 
     CLEAR_FIELD(FunctionType);
     FunctionType.tp_name = "vim.function";
-    FunctionType.tp_basicsize = sizeof(FunctionObject);
+    FunctionType.tp_basicsize = parimaa_na(FunctionObject);
     FunctionType.tp_dealloc = FunctionDestructor;
     FunctionType.tp_call = FunctionCall;
     FunctionType.tp_flags = Py_TPFLAGS_DEFAULT|Py_TPFLAGS_BASETYPE;
@@ -7463,15 +7463,15 @@ init_structs(void)
     FunctionType.tp_repr = FunctionRepr;
     FunctionType.tp_new = FunctionConstructor;
     FunctionType.tp_alloc = PyType_GenericAlloc;
-#if PY_MAJOR_VERSION >= 3
+#အကယ်၍ PY_MAJOR_VERSION >= 3
     FunctionType.tp_getattro = FunctionGetattro;
-#else
+#မဟုတ်ပါက
     FunctionType.tp_getattr = FunctionGetattr;
 #endif
 
     CLEAR_FIELD(OptionsType);
     OptionsType.tp_name = "vim.options";
-    OptionsType.tp_basicsize = sizeof(OptionsObject);
+    OptionsType.tp_basicsize = parimaa_na(OptionsObject);
     OptionsType.tp_as_sequence = &OptionsAsSeq;
     OptionsType.tp_flags = Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_GC;
     OptionsType.tp_doc = "object for manipulating options";
@@ -7481,17 +7481,17 @@ init_structs(void)
     OptionsType.tp_traverse = OptionsTraverse;
     OptionsType.tp_clear = OptionsClear;
 
-#if PY_VERSION_HEX < 0x030700f0
+#အကယ်၍ PY_VERSION_HEX < 0x030700f0
     CLEAR_FIELD(LoaderType);
     LoaderType.tp_name = "vim.Loader";
-    LoaderType.tp_basicsize = sizeof(LoaderObject);
+    LoaderType.tp_basicsize = parimaa_na(LoaderObject);
     LoaderType.tp_flags = Py_TPFLAGS_DEFAULT;
     LoaderType.tp_doc = "vim message object";
     LoaderType.tp_methods = LoaderMethods;
     LoaderType.tp_dealloc = LoaderDestructor;
 #endif
 
-#if PY_MAJOR_VERSION >= 3
+#အကယ်၍ PY_MAJOR_VERSION >= 3
     CLEAR_FIELD(vimmodule);
     vimmodule.m_name = "vim";
     vimmodule.m_doc = "Vim Python interface\n";
@@ -7500,7 +7500,7 @@ init_structs(void)
 #endif
 }
 
-    static int
+    static ကိန်းပြည့်
 init_types(void)
 {
     PYTYPE_READY(IterType);
@@ -7518,7 +7518,7 @@ init_types(void)
     PYTYPE_READY(FunctionType);
     PYTYPE_READY(OptionsType);
     PYTYPE_READY(OutputType);
-#if PY_VERSION_HEX < 0x030700f0
+#အကယ်၍ PY_VERSION_HEX < 0x030700f0
     PYTYPE_READY(LoaderType);
 #endif
 
@@ -7534,7 +7534,7 @@ init_types(void)
     PyObject_FINISH_INIT_TYPE(TheCurrent, CurrentType);
     PyObject_FINISH_INIT_TYPE(TheTabPageList, TabListType);
 #endif
-    return 0;
+    ပြန်ပေး 0;
 }
 
 #ifdef USE_LIMITED_API
@@ -7556,44 +7556,44 @@ shutdown_types(void)
     PYTYPE_CLEANUP(FunctionType);
     PYTYPE_CLEANUP(OptionsType);
     PYTYPE_CLEANUP(OutputType);
-# if PY_VERSION_HEX < 0x030700f0
+# အကယ်၍ PY_VERSION_HEX < 0x030700f0
     PYTYPE_CLEANUP(LoaderType);
 # endif
 }
 #endif
 
-    static int
+    static ကိန်းပြည့်
 init_sys_path(void)
 {
     PyObject	*path;
     PyObject	*path_hook;
     PyObject	*path_hooks;
 
-    if (!(path_hook = PyObject_GetAttrString(vim_module, "path_hook")))
-	return -1;
+    အကယ်၍ (!(path_hook = PyObject_GetAttrString(vim_module, "path_hook")))
+	ပြန်ပေး -1;
 
-    if (!(path_hooks = PySys_GetObject("path_hooks")))
+    အကယ်၍ (!(path_hooks = PySys_GetObject("path_hooks")))
     {
 	PyErr_Clear();
 	path_hooks = PyList_New(1);
 	PyList_SET_ITEM(path_hooks, 0, path_hook);
-	if (PySys_SetObject("path_hooks", path_hooks))
+	အကယ်၍ (PySys_SetObject("path_hooks", path_hooks))
 	{
 	    Py_DECREF(path_hooks);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 	Py_DECREF(path_hooks);
     }
-    else if (PyList_Check(path_hooks))
+    မဟုတ်ပါက အကယ်၍ (PyList_Check(path_hooks))
     {
-	if (PyList_Append(path_hooks, path_hook))
+	အကယ်၍ (PyList_Append(path_hooks, path_hook))
 	{
 	    Py_DECREF(path_hook);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 	Py_DECREF(path_hook);
     }
-    else
+    မဟုတ်ပါက
     {
 	VimTryStart();
 	emsg(_("Failed to set path hook: sys.path_hooks is not a list\n"
@@ -7602,28 +7602,28 @@ init_sys_path(void)
 	       "- append vim.VIM_SPECIAL_PATH to sys.path\n"));
 	VimTryEnd(); // Discard the error
 	Py_DECREF(path_hook);
-	return 0;
+	ပြန်ပေး 0;
     }
 
-    if (!(path = PySys_GetObject("path")))
+    အကယ်၍ (!(path = PySys_GetObject("path")))
     {
 	PyErr_Clear();
 	path = PyList_New(1);
 	Py_INCREF(vim_special_path_object);
 	PyList_SET_ITEM(path, 0, vim_special_path_object);
-	if (PySys_SetObject("path", path))
+	အကယ်၍ (PySys_SetObject("path", path))
 	{
 	    Py_DECREF(path);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 	Py_DECREF(path);
     }
-    else if (PyList_Check(path))
+    မဟုတ်ပါက အကယ်၍ (PyList_Check(path))
     {
-	if (PyList_Append(path, vim_special_path_object))
-	    return -1;
+	အကယ်၍ (PyList_Append(path, vim_special_path_object))
+	    ပြန်ပေး -1;
     }
-    else
+    မဟုတ်ပါက
     {
 	VimTryStart();
 	emsg(_("Failed to set path: sys.path is not a list\n"
@@ -7631,12 +7631,12 @@ init_sys_path(void)
 	VimTryEnd(); // Discard the error
     }
 
-    return 0;
+    ပြန်ပေး 0;
 }
 
-static struct numeric_constant {
-    char	*name;
-    int		val;
+static sa_nracanaa numeric_constant {
+    var_na	*name;
+    ကိန်းပြည့်		val;
 } numeric_constants[] = {
     {"VAR_LOCKED",	VAR_LOCKED},
     {"VAR_FIXED",	VAR_FIXED},
@@ -7644,42 +7644,42 @@ static struct numeric_constant {
     {"VAR_DEF_SCOPE",	VAR_DEF_SCOPE},
 };
 
-struct object_constant {
-    char	*name;
+sa_nracanaa object_constant {
+    var_na	*name;
     PyObject	*valObject;
 };
 
 #define ADD_OBJECT(m, name, obj) \
-    if (PyModule_AddObject(m, name, obj)) \
-	return -1;
+    အကယ်၍ (PyModule_AddObject(m, name, obj)) \
+	ပြန်ပေး -1;
 
 #define ADD_CHECKED_OBJECT(m, name, obj) \
     { \
 	PyObject	*valObject = obj; \
-	if (!valObject) \
-	    return -1; \
+	အကယ်၍ (!valObject) \
+	    ပြန်ပေး -1; \
 	ADD_OBJECT(m, name, valObject); \
     }
 
-    static int
+    static ကိန်းပြည့်
 populate_module(PyObject *m)
 {
-    int		i;
+    ကိန်းပြည့်		i;
     PyObject	*other_module;
     PyObject	*attr;
     PyObject	*imp;
-#if PY_VERSION_HEX >= 0x030700f0
+#အကယ်၍ PY_VERSION_HEX >= 0x030700f0
     PyObject	*dict;
     PyObject	*cls;
 #endif
 
-    for (i = 0; i < (int)(sizeof(numeric_constants)
-					   / sizeof(struct numeric_constant));
+    အတွက် (i = 0; i < (ကိန်းပြည့်)(parimaa_na(numeric_constants)
+					   / parimaa_na(sa_nracanaa numeric_constant));
 	    ++i)
 	ADD_CHECKED_OBJECT(m, numeric_constants[i].name,
 		PyInt_FromLong(numeric_constants[i].val));
 
-    struct object_constant object_constants[] = {
+    sa_nracanaa object_constant object_constants[] = {
 	{"buffers",  (PyObject *)(void *)&TheBufferMap},
 	{"windows",  (PyObject *)(void *)&TheWindowList},
 	{"tabpages", (PyObject *)(void *)&TheTabPageList},
@@ -7694,13 +7694,13 @@ populate_module(PyObject *m)
 	{"Tuple",      (PyObject *)TupleTypePtr},
 	{"Function",   (PyObject *)FunctionTypePtr},
 	{"Options",    (PyObject *)OptionsTypePtr},
-#if PY_VERSION_HEX < 0x030700f0
+#အကယ်၍ PY_VERSION_HEX < 0x030700f0
 	{"_Loader",    (PyObject *)LoaderTypePtr},
 #endif
     };
 
-    for (i = 0; i < (int)(sizeof(object_constants)
-					    / sizeof(struct object_constant));
+    အတွက် (i = 0; i < (ကိန်းပြည့်)(parimaa_na(object_constants)
+					    / parimaa_na(sa_nracanaa object_constant));
 	    ++i)
     {
 	PyObject	*valObject;
@@ -7710,8 +7710,8 @@ populate_module(PyObject *m)
 	ADD_OBJECT(m, object_constants[i].name, valObject);
     }
 
-    if (!(VimError = PyErr_NewException("vim.error", NULL, NULL)))
-	return -1;
+    အကယ်၍ (!(VimError = PyErr_NewException("vim.error", NULL, NULL)))
+	ပြန်ပေး -1;
     ADD_OBJECT(m, "error", VimError);
 
     ADD_CHECKED_OBJECT(m, "vars",  NEW_DICTIONARY(get_globvar_dict()));
@@ -7719,93 +7719,93 @@ populate_module(PyObject *m)
     ADD_CHECKED_OBJECT(m, "options",
 	    OptionsNew(SREQ_GLOBAL, NULL, dummy_check, NULL));
 
-    if (!(other_module = PyImport_ImportModule("os")))
-	return -1;
+    အကယ်၍ (!(other_module = PyImport_ImportModule("os")))
+	ပြန်ပေး -1;
     ADD_OBJECT(m, "os", other_module);
 
-#if PY_MAJOR_VERSION >= 3
-    if (!(py_getcwd = PyObject_GetAttrString(other_module, "getcwd")))
-	return -1;
-#else
-    if (!(py_getcwd = PyObject_GetAttrString(other_module, "getcwdu")))
-	return -1;
+#အကယ်၍ PY_MAJOR_VERSION >= 3
+    အကယ်၍ (!(py_getcwd = PyObject_GetAttrString(other_module, "getcwd")))
+	ပြန်ပေး -1;
+#မဟုတ်ပါက
+    အကယ်၍ (!(py_getcwd = PyObject_GetAttrString(other_module, "getcwdu")))
+	ပြန်ပေး -1;
 #endif
     ADD_OBJECT(m, "_getcwd", py_getcwd)
 
-    if (!(py_chdir = PyObject_GetAttrString(other_module, "chdir")))
-	return -1;
+    အကယ်၍ (!(py_chdir = PyObject_GetAttrString(other_module, "chdir")))
+	ပြန်ပေး -1;
     ADD_OBJECT(m, "_chdir", py_chdir);
-    if (!(attr = PyObject_GetAttrString(m, "chdir")))
-	return -1;
-    if (PyObject_SetAttrString(other_module, "chdir", attr))
+    အကယ်၍ (!(attr = PyObject_GetAttrString(m, "chdir")))
+	ပြန်ပေး -1;
+    အကယ်၍ (PyObject_SetAttrString(other_module, "chdir", attr))
     {
 	Py_DECREF(attr);
-	return -1;
+	ပြန်ပေး -1;
     }
     Py_DECREF(attr);
 
-    if ((py_fchdir = PyObject_GetAttrString(other_module, "fchdir")))
+    အကယ်၍ ((py_fchdir = PyObject_GetAttrString(other_module, "fchdir")))
     {
 	ADD_OBJECT(m, "_fchdir", py_fchdir);
-	if (!(attr = PyObject_GetAttrString(m, "fchdir")))
-	    return -1;
-	if (PyObject_SetAttrString(other_module, "fchdir", attr))
+	အကယ်၍ (!(attr = PyObject_GetAttrString(m, "fchdir")))
+	    ပြန်ပေး -1;
+	အကယ်၍ (PyObject_SetAttrString(other_module, "fchdir", attr))
 	{
 	    Py_DECREF(attr);
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 	Py_DECREF(attr);
     }
-    else
+    မဟုတ်ပါက
 	PyErr_Clear();
 
-    if (!(vim_special_path_object = PyString_FromString(vim_special_path)))
-	return -1;
+    အကယ်၍ (!(vim_special_path_object = PyString_FromString(vim_special_path)))
+	ပြန်ပေး -1;
 
     ADD_OBJECT(m, "VIM_SPECIAL_PATH", vim_special_path_object);
 
-#if PY_VERSION_HEX >= 0x030700f0
-    if (!(imp = PyImport_ImportModule("importlib.machinery")))
-	return -1;
+#အကယ်၍ PY_VERSION_HEX >= 0x030700f0
+    အကယ်၍ (!(imp = PyImport_ImportModule("importlib.machinery")))
+	ပြန်ပေး -1;
 
     dict = PyModule_GetDict(imp);
 
-    if (!(cls = PyDict_GetItemString(dict, "PathFinder")))
+    အကယ်၍ (!(cls = PyDict_GetItemString(dict, "PathFinder")))
     {
 	Py_DECREF(imp);
-	return -1;
+	ပြန်ပေး -1;
     }
 
-    if (!(py_find_spec = PyObject_GetAttrString(cls, "find_spec")))
+    အကယ်၍ (!(py_find_spec = PyObject_GetAttrString(cls, "find_spec")))
     {
 	Py_DECREF(imp);
-	return -1;
+	ပြန်ပေး -1;
     }
 
-# if PY_VERSION_HEX < 0x30c00a7
+# အကယ်၍ PY_VERSION_HEX < 0x30c00a7
     // find_module has been removed as of Python 3.12.0a7
-    if ((py_find_module = PyObject_GetAttrString(cls, "find_module")))
+    အကယ်၍ ((py_find_module = PyObject_GetAttrString(cls, "find_module")))
 	ADD_OBJECT(m, "_find_module", py_find_module);
 # endif
 
     Py_DECREF(imp);
 
     ADD_OBJECT(m, "_find_spec", py_find_spec);
-#else
-    if (!(imp = PyImport_ImportModule("imp")))
-	return -1;
+#မဟုတ်ပါက
+    အကယ်၍ (!(imp = PyImport_ImportModule("imp")))
+	ပြန်ပေး -1;
 
-    if (!(py_find_module = PyObject_GetAttrString(imp, "find_module")))
+    အကယ်၍ (!(py_find_module = PyObject_GetAttrString(imp, "find_module")))
     {
 	Py_DECREF(imp);
-	return -1;
+	ပြန်ပေး -1;
     }
 
-    if (!(py_load_module = PyObject_GetAttrString(imp, "load_module")))
+    အကယ်၍ (!(py_load_module = PyObject_GetAttrString(imp, "load_module")))
     {
 	Py_DECREF(py_find_module);
 	Py_DECREF(imp);
-	return -1;
+	ပြန်ပေး -1;
     }
 
     Py_DECREF(imp);
@@ -7814,5 +7814,5 @@ populate_module(PyObject *m)
     ADD_OBJECT(m, "_load_module", py_load_module);
 #endif
 
-    return 0;
+    ပြန်ပေး 0;
 }

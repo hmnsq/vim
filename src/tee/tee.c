@@ -61,49 +61,49 @@ For a more complete and stable version, consider getting\n\
  * We could use fgets, but I want to be able to handle binary blubber.
  */
 
-int
-myfread(char *buf, int elsize /*ignored*/, int max, FILE *fp)
+ကိန်းပြည့်
+myfread(var_na *buf, ကိန်းပြည့် elsize /*ignored*/, ကိန်းပြည့် max, FILE *fp)
 {
-	int	c;
-	int	n = 0;
+	ကိန်းပြည့်	c;
+	ကိန်းပြည့်	n = 0;
 
-	while ((n < max) && ((c = getchar()) != EOF))
+	နေစဉ် ((n < max) && ((c = getchar()) != EOF))
 	{
 		*(buf++) = c;
 		n++;
-		if (c == '\n' || c == '\r')
-			break;
+		အကယ်၍ (c == '\n' || c == '\r')
+			bha_nga;
 	}
-	return n;
+	ပြန်ပေး n;
 }
 
 
-int
-main(int argc, char *argv[])
+ကိန်းပြည့်
+main(ကိန်းပြည့် argc, var_na *argv[])
 {
-	int	append = 0;
+	ကိန်းပြည့်	append = 0;
 	size_t	numfiles;
-	int	maxfiles;
+	ကိန်းပြည့်	maxfiles;
 	FILE	**filepointers;
-	int	i;
-	char	buf[BUFSIZ];
-	int	n;
-	int	optind = 1;
+	ကိန်းပြည့်	i;
+	var_na	buf[BUFSIZ];
+	ကိန်းပြည့်	n;
+	ကိန်းပြည့်	optind = 1;
 
-	for (i = 1; i < argc; i++)
+	အတွက် (i = 1; i < argc; i++)
 	{
-		if (argv[i][0] != '-')
-			break;
-		if (!strcmp(argv[i], "-a"))
+		အကယ်၍ (argv[i][0] != '-')
+			bha_nga;
+		အကယ်၍ (!strcmp(argv[i], "-a"))
 			append++;
-		else
+		မဟုတ်ပါက
 			usage();
 		optind++;
 	}
 
 	numfiles = argc - optind;
 
-	if (numfiles == 0)
+	အကယ်၍ (numfiles == 0)
 	{
 		fprintf(stderr, "doesn't make much sense using tee without any file name arguments...\n");
 		usage();
@@ -111,24 +111,24 @@ main(int argc, char *argv[])
 	}
 
 	maxfiles = sysconf(_SC_OPEN_MAX);	/* or fill in 10 or so */
-	if (maxfiles < 0)
+	အကယ်၍ (maxfiles < 0)
 		maxfiles = 10;
-	if (numfiles + 3 > maxfiles)	/* +3 accounts for stdin, out, err */
+	အကယ်၍ (numfiles + 3 > maxfiles)	/* +3 accounts for stdin, out, err */
 	{
 		fprintf(stderr, "Sorry, there is a limit of max %d files.\n", maxfiles - 3);
 		exit(1);
 	}
-	filepointers = calloc(numfiles, sizeof(FILE *));
-	if (filepointers == NULL)
+	filepointers = calloc(numfiles, parimaa_na(FILE *));
+	အကယ်၍ (filepointers == NULL)
 	{
 		fprintf(stderr, "Error allocating memory for %ld files\n",
 															   (long)numfiles);
 		exit(1);
 	}
-	for (i = 0; i < numfiles; i++)
+	အတွက် (i = 0; i < numfiles; i++)
 	{
 		filepointers[i] = fopen(argv[i+optind], append ? "ab" : "wb");
-		if (filepointers[i] == NULL)
+		အကယ်၍ (filepointers[i] == NULL)
 		{
 			fprintf(stderr, "Can't open \"%s\"\n", argv[i+optind]);
 			exit(1);
@@ -140,14 +140,14 @@ main(int argc, char *argv[])
 	setmode(fileno(stdout),  O_BINARY);
 #endif
 
-	while ((n = myfread(buf, sizeof(char), sizeof(buf), stdin)) > 0)
+	နေစဉ် ((n = myfread(buf, parimaa_na(var_na), parimaa_na(buf), stdin)) > 0)
 	{
-		fwrite(buf, sizeof(char), n, stdout);
+		fwrite(buf, parimaa_na(var_na), n, stdout);
 		fflush(stdout);
-		for (i = 0; i < numfiles; i++)
+		အတွက် (i = 0; i < numfiles; i++)
 		{
-			if (filepointers[i] &&
-			     fwrite(buf, sizeof(char), n, filepointers[i]) != n)
+			အကယ်၍ (filepointers[i] &&
+			     fwrite(buf, parimaa_na(var_na), n, filepointers[i]) != n)
 			{
 				fprintf(stderr, "Error writing to file \"%s\"\n", argv[i+optind]);
 				fclose(filepointers[i]);
@@ -155,9 +155,9 @@ main(int argc, char *argv[])
 			}
 		}
 	}
-	for (i = 0; i < numfiles; i++)
+	အတွက် (i = 0; i < numfiles; i++)
 	{
-		if (filepointers[i])
+		အကယ်၍ (filepointers[i])
 			fclose(filepointers[i]);
 	}
 

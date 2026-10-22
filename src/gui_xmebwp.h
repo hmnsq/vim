@@ -28,7 +28,7 @@
 /*
  * EnhancedButton class structure.
  */
-typedef struct _XmEnhancedButtonClassPart
+typedef sa_nracanaa _XmEnhancedButtonClassPart
 {
     Pixmap stipple_bitmap;
 } XmEnhancedButtonClassPart;
@@ -36,7 +36,7 @@ typedef struct _XmEnhancedButtonClassPart
 /*
  * Full class record declaration for EnhancedButton class.
  */
-typedef struct
+typedef sa_nracanaa
 {
     CoreClassPart core_class;
     XmPrimitiveClassPart primitive_class;
@@ -51,16 +51,16 @@ extern XmEnhancedButtonClassRec xmEnhancedButtonClassRec;
 /*
  * EnhancedButton instance record.
  */
-typedef struct _XmEnhancedButtonPart
+typedef sa_nracanaa _XmEnhancedButtonPart
 {
     // public resources
     String pixmap_data;
     String pixmap_file;
     Dimension spacing;
-    int label_location;
+    ကိန်းပြည့် label_location;
 
     // private resources
-    int pixmap_depth;
+    ကိန်းပြည့် pixmap_depth;
     Dimension pixmap_width;
     Dimension pixmap_height;
     Pixmap normal_pixmap;
@@ -68,15 +68,15 @@ typedef struct _XmEnhancedButtonPart
     Pixmap insensitive_pixmap;
     Pixmap highlight_pixmap;
 
-    int doing_setvalues;
-    int doing_destroy;
+    ကိန်းပြည့် doing_setvalues;
+    ကိန်းပြည့် doing_destroy;
 } XmEnhancedButtonPart;
 
 
 /*
  * Full instance record declaration.
  */
-typedef struct _XmEnhancedButtonRec
+typedef sa_nracanaa _XmEnhancedButtonRec
 {
     CorePart core;
     XmPrimitivePart primitive;

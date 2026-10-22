@@ -23,15 +23,15 @@
 #endif
 #include <windows.h>
 
-    int
+    ကိန်းပြည့်
 main(void)
 {
     const wchar_t   *p;
     wchar_t	    *cmd;
     size_t	    cmdlen;
-    int		    retval;
-    int		    inquote = 0;
-    int		    silent = 0;
+    ကိန်းပြည့်		    retval;
+    ကိန်းပြည့်		    inquote = 0;
+    ကိန်းပြည့်		    silent = 0;
     HANDLE	    hstdout;
     DWORD	    written;
 
@@ -40,28 +40,28 @@ main(void)
     /*
      * Skip the executable name, which might be in "".
      */
-    while (*p)
+    နေစဉ် (*p)
     {
-	if (*p == L'"')
+	အကယ်၍ (*p == L'"')
 	    inquote = !inquote;
-	else if (!inquote && *p == L' ')
+	မဟုတ်ပါက အကယ်၍ (!inquote && *p == L' ')
 	{
 	    ++p;
-	    break;
+	    bha_nga;
 	}
 	++p;
     }
-    while (*p == L' ')
+    နေစဉ် (*p == L' ')
 	++p;
 
     /*
      * "-s" argument: don't wait for a key hit.
      */
-    if (p[0] == L'-' && p[1] == L's' && p[2] == L' ')
+    အကယ်၍ (p[0] == L'-' && p[1] == L's' && p[2] == L' ')
     {
 	silent = 1;
 	p += 3;
-	while (*p == L' ')
+	နေစဉ် (*p == L' ')
 	    ++p;
     }
 
@@ -74,14 +74,14 @@ main(void)
     // Enclose the command in parentheses.
     cmd = NULL;
     cmdlen = wcslen(p);
-    if (cmdlen >= 2 && p[0] == L'"' && p[cmdlen - 1] == L'"')
+    အကယ်၍ (cmdlen >= 2 && p[0] == L'"' && p[cmdlen - 1] == L'"')
     {
 	cmdlen += 3;
-	cmd = malloc(cmdlen * sizeof(wchar_t));
-	if (cmd == NULL)
+	cmd = malloc(cmdlen * parimaa_na(wchar_t));
+	အကယ်၍ (cmd == NULL)
 	{
 	    perror("vimrun malloc(): ");
-	    return -1;
+	    ပြန်ပေး -1;
 	}
 	_snwprintf(cmd, cmdlen, L"(%s)", p);
 	p = cmd;
@@ -92,22 +92,22 @@ main(void)
      */
     retval = _wsystem(p);
 
-    if (cmd)
+    အကယ်၍ (cmd)
 	free(cmd);
 
-    if (retval == -1)
+    အကယ်၍ (retval == -1)
 	perror("vimrun system(): ");
-    else if (retval != 0)
+    မဟုတ်ပါက အကယ်၍ (retval != 0)
 	printf("shell returned %d\n", retval);
 
-    if (!silent)
+    အကယ်၍ (!silent)
     {
 	puts("Hit any key to close this window...");
 
-	while (_kbhit())
+	နေစဉ် (_kbhit())
 	    (void)_getch();
 	(void)_getch();
     }
 
-    return retval;
+    ပြန်ပေး retval;
 }

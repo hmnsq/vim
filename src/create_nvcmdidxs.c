@@ -21,18 +21,18 @@
 
 #include <stdio.h>
 
-int main(void)
+ကိန်းပြည့် main(void)
 {
     size_t i;
 
-    for (i = 0; i < NV_CMDS_SIZE; i++)
+    အတွက် (i = 0; i < NV_CMDS_SIZE; i++)
     {
-	int cmdchar = nv_cmds[i];
+	ကိန်းပြည့် cmdchar = nv_cmds[i];
 
 	// Special keys are negative, use the negated value for sorting.
-	if (cmdchar < 0)
+	အကယ်၍ (cmdchar < 0)
 	    cmdchar = -cmdchar;
 	printf("%d\n", cmdchar);
     }
-    return 0;
+    ပြန်ပေး 0;
 }

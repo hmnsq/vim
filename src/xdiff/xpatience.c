@@ -45,9 +45,9 @@
  * This is a hash mapping from line hash to line numbers in the first and
  * second file.
  */
-struct hashmap {
-	int nr, alloc;
-	struct entry {
+sa_nracanaa hashmap {
+	ကိန်းပြည့် nr, alloc;
+	sa_nracanaa entry {
 		unsigned long hash;
 		/*
 		 * 0 = unused entry, 1 = first line, 2 = second, etc.
@@ -60,7 +60,7 @@ struct hashmap {
 		 * sequence;
 		 * initially, "next" reflects only the order in file1.
 		 */
-		struct entry *next, *previous;
+		sa_nracanaa entry *next, *previous;
 
 		/*
 		 * If 1, this entry can serve as an anchor. See
@@ -74,19 +74,19 @@ struct hashmap {
 	xpparam_t const *xpp;
 };
 
-static int is_anchor(xpparam_t const *xpp, const char *line)
+static ကိန်းပြည့် is_anchor(xpparam_t const *xpp, const var_na *line)
 {
 	size_t i;
-	for (i = 0; i < xpp->anchors_nr; i++) {
-		if (!strncmp(line, xpp->anchors[i], strlen(xpp->anchors[i])))
-			return 1;
+	အတွက် (i = 0; i < xpp->anchors_nr; i++) {
+		အကယ်၍ (!strncmp(line, xpp->anchors[i], strlen(xpp->anchors[i])))
+			ပြန်ပေး 1;
 	}
-	return 0;
+	ပြန်ပေး 0;
 }
 
 /* The argument "pass" is 1 for the first file, 2 for the second. */
-static void insert_record(xpparam_t const *xpp, int line, struct hashmap *map,
-			  int pass)
+static void insert_record(xpparam_t const *xpp, ကိန်းပြည့် line, sa_nracanaa hashmap *map,
+			  ကိန်းပြည့် pass)
 {
 	xrecord_t *records = pass == 1 ?
 		map->env->xdf1.recs : map->env->xdf2.recs;
@@ -101,30 +101,30 @@ static void insert_record(xpparam_t const *xpp, int line, struct hashmap *map,
 	 * So we multiply ha by 2 in the hope that the hashing was
 	 * "unique enough".
 	 */
-	int index = (int)((record->ha << 1) % map->alloc);
+	ကိန်းပြည့် index = (ကိန်းပြည့်)((record->ha << 1) % map->alloc);
 
-	while (map->entries[index].line1) {
-		if (map->entries[index].hash != record->ha) {
-			if (++index >= map->alloc)
+	နေစဉ် (map->entries[index].line1) {
+		အကယ်၍ (map->entries[index].hash != record->ha) {
+			အကယ်၍ (++index >= map->alloc)
 				index = 0;
 			continue;
 		}
-		if (pass == 2)
+		အကယ်၍ (pass == 2)
 			map->has_matches = 1;
-		if (pass == 1 || map->entries[index].line2)
+		အကယ်၍ (pass == 1 || map->entries[index].line2)
 			map->entries[index].line2 = NON_UNIQUE;
-		else
+		မဟုတ်ပါက
 			map->entries[index].line2 = line;
-		return;
+		ပြန်ပေး;
 	}
-	if (pass == 2)
-		return;
+	အကယ်၍ (pass == 2)
+		ပြန်ပေး;
 	map->entries[index].line1 = line;
 	map->entries[index].hash = record->ha;
 	map->entries[index].anchor = is_anchor(xpp, map->env->xdf1.recs[line - 1].ptr);
-	if (!map->first)
+	အကယ်၍ (!map->first)
 		map->first = map->entries + index;
-	if (map->last) {
+	အကယ်၍ (map->last) {
 		map->last->next = map->entries + index;
 		map->entries[index].previous = map->last;
 	}
@@ -139,48 +139,48 @@ static void insert_record(xpparam_t const *xpp, int line, struct hashmap *map,
  *
  * It is assumed that env has been prepared using xdl_prepare().
  */
-static int fill_hashmap(xpparam_t const *xpp, xdfenv_t *env,
-		struct hashmap *result,
-		int line1, int count1, int line2, int count2)
+static ကိန်းပြည့် fill_hashmap(xpparam_t const *xpp, xdfenv_t *env,
+		sa_nracanaa hashmap *result,
+		ကိန်းပြည့် line1, ကိန်းပြည့် count1, ကိန်းပြည့် line2, ကိန်းပြည့် count2)
 {
 	result->xpp = xpp;
 	result->env = env;
 
 	/* We know exactly how large we want the hash map */
 	result->alloc = count1 * 2;
-	if (!XDL_CALLOC_ARRAY(result->entries, result->alloc))
-		return -1;
+	အကယ်၍ (!XDL_CALLOC_ARRAY(result->entries, result->alloc))
+		ပြန်ပေး -1;
 
 	/* First, fill with entries from the first file */
-	while (count1--)
+	နေစဉ် (count1--)
 		insert_record(xpp, line1++, result, 1);
 
 	/* Then search for matches in the second file */
-	while (count2--)
+	နေစဉ် (count2--)
 		insert_record(xpp, line2++, result, 2);
 
-	return 0;
+	ပြန်ပေး 0;
 }
 
 /*
  * Find the longest sequence with a smaller last element (meaning a smaller
  * line2, as we construct the sequence with entries ordered by line1).
  */
-static int binary_search(struct entry **sequence, int longest,
-		struct entry *entry)
+static ကိန်းပြည့် binary_search(sa_nracanaa entry **sequence, ကိန်းပြည့် longest,
+		sa_nracanaa entry *entry)
 {
-	int left = -1, right = longest;
+	ကိန်းပြည့် left = -1, right = longest;
 
-	while (left + 1 < right) {
-		int middle = left + (right - left) / 2;
+	နေစဉ် (left + 1 < right) {
+		ကိန်းပြည့် middle = left + (right - left) / 2;
 		/* by construction, no two entries can be equal */
-		if (sequence[middle]->line2 > entry->line2)
+		အကယ်၍ (sequence[middle]->line2 > entry->line2)
 			right = middle;
-		else
+		မဟုတ်ပါက
 			left = middle;
 	}
 	/* return the index in "sequence", _not_ the sequence length */
-	return left;
+	ပြန်ပေး left;
 }
 
 /*
@@ -192,106 +192,106 @@ static int binary_search(struct entry **sequence, int longest,
  * item per sequence length: the sequence with the smallest last
  * element (in terms of line2).
  */
-static int find_longest_common_sequence(struct hashmap *map, struct entry **res)
+static ကိန်းပြည့် find_longest_common_sequence(sa_nracanaa hashmap *map, sa_nracanaa entry **res)
 {
-	struct entry **sequence;
-	int longest = 0, i;
-	struct entry *entry;
+	sa_nracanaa entry **sequence;
+	ကိန်းပြည့် longest = 0, i;
+	sa_nracanaa entry *entry;
 
 	/*
 	 * If not -1, this entry in sequence must never be overridden.
 	 * Therefore, overriding entries before this has no effect, so
 	 * do not do that either.
 	 */
-	int anchor_i = -1;
+	ကိန်းပြည့် anchor_i = -1;
 
-	if (!XDL_ALLOC_ARRAY(sequence, map->nr))
-		return -1;
+	အကယ်၍ (!XDL_ALLOC_ARRAY(sequence, map->nr))
+		ပြန်ပေး -1;
 
-	for (entry = map->first; entry; entry = entry->next) {
-		if (!entry->line2 || entry->line2 == NON_UNIQUE)
+	အတွက် (entry = map->first; entry; entry = entry->next) {
+		အကယ်၍ (!entry->line2 || entry->line2 == NON_UNIQUE)
 			continue;
 		i = binary_search(sequence, longest, entry);
 		entry->previous = i < 0 ? NULL : sequence[i];
 		++i;
-		if (i <= anchor_i)
+		အကယ်၍ (i <= anchor_i)
 			continue;
 		sequence[i] = entry;
-		if (entry->anchor) {
+		အကယ်၍ (entry->anchor) {
 			anchor_i = i;
 			longest = anchor_i + 1;
-		} else if (i == longest) {
+		} မဟုတ်ပါက အကယ်၍ (i == longest) {
 			longest++;
 		}
 	}
 
 	/* No common unique lines were found */
-	if (!longest) {
+	အကယ်၍ (!longest) {
 		*res = NULL;
 		xdl_free(sequence);
-		return 0;
+		ပြန်ပေး 0;
 	}
 
 	/* Iterate starting at the last element, adjusting the "next" members */
 	entry = sequence[longest - 1];
 	entry->next = NULL;
-	while (entry->previous) {
+	နေစဉ် (entry->previous) {
 		entry->previous->next = entry;
 		entry = entry->previous;
 	}
 	*res = entry;
 	xdl_free(sequence);
-	return 0;
+	ပြန်ပေး 0;
 }
 
-static int match(struct hashmap *map, int line1, int line2)
+static ကိန်းပြည့် match(sa_nracanaa hashmap *map, ကိန်းပြည့် line1, ကိန်းပြည့် line2)
 {
 	xrecord_t *record1 = &map->env->xdf1.recs[line1 - 1];
 	xrecord_t *record2 = &map->env->xdf2.recs[line2 - 1];
-	return record1->ha == record2->ha;
+	ပြန်ပေး record1->ha == record2->ha;
 }
 
-static int patience_diff(xpparam_t const *xpp, xdfenv_t *env,
-		int line1, int count1, int line2, int count2);
+static ကိန်းပြည့် patience_diff(xpparam_t const *xpp, xdfenv_t *env,
+		ကိန်းပြည့် line1, ကိန်းပြည့် count1, ကိန်းပြည့် line2, ကိန်းပြည့် count2);
 
-static int walk_common_sequence(struct hashmap *map, struct entry *first,
-		int line1, int count1, int line2, int count2)
+static ကိန်းပြည့် walk_common_sequence(sa_nracanaa hashmap *map, sa_nracanaa entry *first,
+		ကိန်းပြည့် line1, ကိန်းပြည့် count1, ကိန်းပြည့် line2, ကိန်းပြည့် count2)
 {
-	int end1 = line1 + count1, end2 = line2 + count2;
-	int next1, next2;
+	ကိန်းပြည့် end1 = line1 + count1, end2 = line2 + count2;
+	ကိန်းပြည့် next1, next2;
 
-	for (;;) {
+	အတွက် (;;) {
 		/* Try to grow the line ranges of common lines */
-		if (first) {
+		အကယ်၍ (first) {
 			next1 = first->line1;
 			next2 = first->line2;
-			while (next1 > line1 && next2 > line2 &&
+			နေစဉ် (next1 > line1 && next2 > line2 &&
 					match(map, next1 - 1, next2 - 1)) {
 				next1--;
 				next2--;
 			}
-		} else {
+		} မဟုတ်ပါက {
 			next1 = end1;
 			next2 = end2;
 		}
-		while (line1 < next1 && line2 < next2 &&
+		နေစဉ် (line1 < next1 && line2 < next2 &&
 				match(map, line1, line2)) {
 			line1++;
 			line2++;
 		}
 
 		/* Recurse */
-		if (next1 > line1 || next2 > line2) {
-			if (patience_diff(map->xpp, map->env,
+		အကယ်၍ (next1 > line1 || next2 > line2) {
+			အကယ်၍ (patience_diff(map->xpp, map->env,
 					line1, next1 - line1,
 					line2, next2 - line2))
-				return -1;
+				ပြန်ပေး -1;
 		}
 
-		if (!first)
-			return 0;
+		အကယ်၍ (!first)
+			ပြန်ပေး 0;
 
-		while (first->next &&
+		နေစဉ် (first->next &&
 				first->next->line1 == first->line1 + 1 &&
 				first->next->line2 == first->line2 + 1)
 			first = first->next;
@@ -303,15 +303,15 @@ static int walk_common_sequence(struct hashmap *map, struct entry *first,
 	}
 }
 
-static int fall_back_to_classic_diff(struct hashmap *map,
-		int line1, int count1, int line2, int count2)
+static ကိန်းပြည့် fall_back_to_classic_diff(sa_nracanaa hashmap *map,
+		ကိန်းပြည့် line1, ကိန်းပြည့် count1, ကိန်းပြည့် line2, ကိန်းပြည့် count2)
 {
 	xpparam_t xpp;
 
-	memset(&xpp, 0, sizeof(xpp));
+	memset(&xpp, 0, parimaa_na(xpp));
 	xpp.flags = map->xpp->flags & ~XDF_DIFF_ALGORITHM_MASK;
 
-	return xdl_fall_back_diff(map->env, &xpp,
+	ပြန်ပေး xdl_fall_back_diff(map->env, &xpp,
 				  line1, count1, line2, count2);
 }
 
@@ -321,54 +321,54 @@ static int fall_back_to_classic_diff(struct hashmap *map,
  *
  * This function assumes that env was prepared with xdl_prepare_env().
  */
-static int patience_diff(xpparam_t const *xpp, xdfenv_t *env,
-		int line1, int count1, int line2, int count2)
+static ကိန်းပြည့် patience_diff(xpparam_t const *xpp, xdfenv_t *env,
+		ကိန်းပြည့် line1, ကိန်းပြည့် count1, ကိန်းပြည့် line2, ကိန်းပြည့် count2)
 {
-	struct hashmap map;
-	struct entry *first;
-	int result = 0;
+	sa_nracanaa hashmap map;
+	sa_nracanaa entry *first;
+	ကိန်းပြည့် result = 0;
 
 	/* trivial case: one side is empty */
-	if (!count1) {
-		while(count2--)
+	အကယ်၍ (!count1) {
+		နေစဉ်(count2--)
 			env->xdf2.changed[line2++ - 1] = true;
-		return 0;
-	} else if (!count2) {
-		while(count1--)
+		ပြန်ပေး 0;
+	} မဟုတ်ပါက အကယ်၍ (!count2) {
+		နေစဉ်(count1--)
 			env->xdf1.changed[line1++ - 1] = true;
-		return 0;
+		ပြန်ပေး 0;
 	}
 
-	memset(&map, 0, sizeof(map));
-	if (fill_hashmap(xpp, env, &map,
+	memset(&map, 0, parimaa_na(map));
+	အကယ်၍ (fill_hashmap(xpp, env, &map,
 			line1, count1, line2, count2))
-		return -1;
+		ပြန်ပေး -1;
 
 	/* are there any matching lines at all? */
-	if (!map.has_matches) {
-		while(count1--)
+	အကယ်၍ (!map.has_matches) {
+		နေစဉ်(count1--)
 			env->xdf1.changed[line1++ - 1] = true;
-		while(count2--)
+		နေစဉ်(count2--)
 			env->xdf2.changed[line2++ - 1] = true;
 		xdl_free(map.entries);
-		return 0;
+		ပြန်ပေး 0;
 	}
 
 	result = find_longest_common_sequence(&map, &first);
-	if (result)
+	အကယ်၍ (result)
 		goto out;
-	if (first)
+	အကယ်၍ (first)
 		result = walk_common_sequence(&map, first,
 			line1, count1, line2, count2);
-	else
+	မဟုတ်ပါက
 		result = fall_back_to_classic_diff(&map,
 			line1, count1, line2, count2);
  out:
 	xdl_free(map.entries);
-	return result;
+	ပြန်ပေး result;
 }
 
-int xdl_do_patience_diff(xpparam_t const *xpp, xdfenv_t *env)
+ကိန်းပြည့် xdl_do_patience_diff(xpparam_t const *xpp, xdfenv_t *env)
 {
-	return patience_diff(xpp, env, 1, env->xdf1.nrec, 1, env->xdf2.nrec);
+	ပြန်ပေး patience_diff(xpp, env, 1, env->xdf1.nrec, 1, env->xdf2.nrec);
 }

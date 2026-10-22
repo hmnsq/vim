@@ -25,33 +25,33 @@
  * These are referenced unconditionally from optiondefs.h function pointer
  * tables, but AmigaOS has no X11 input method framework.
  */
-    int
+    ကိန်းပြည့်
 im_get_status(void)
 {
-    return FALSE;
+    ပြန်ပေး FALSE;
 }
 
     void
-im_set_active(int active UNUSED)
+im_set_active(ကိန်းပြည့် active UNUSED)
 {
 }
 
-    int
-set_ref_in_im_funcs(int copyID UNUSED)
+    ကိန်းပြည့်
+set_ref_in_im_funcs(ကိန်းပြည့် copyID UNUSED)
 {
-    return 0;
+    ပြန်ပေး 0;
 }
 
-    char *
+    var_na *
 did_set_imactivatefunc(optset_T *args UNUSED)
 {
-    return NULL;
+    ပြန်ပေး NULL;
 }
 
-    char *
+    var_na *
 did_set_imstatusfunc(optset_T *args UNUSED)
 {
-    return NULL;
+    ပြန်ပေး NULL;
 }
 
 /*
@@ -59,12 +59,12 @@ did_set_imstatusfunc(optset_T *args UNUSED)
  * os_amiga.c provides most mch_* functions but mch_rmdir() was missing.
  * AmigaDOS DeleteFile() works for empty directories.
  */
-    int
+    ကိန်းပြည့်
 mch_rmdir(char_u *name)
 {
-    if (DeleteFile((STRPTR)name))
-	return 0;
-    return -1;
+    အကယ်၍ (DeleteFile((STRPTR)name))
+	ပြန်ပေး 0;
+    ပြန်ပေး -1;
 }
 
 /*
@@ -76,22 +76,22 @@ mch_rmdir(char_u *name)
 #include <pwd.h>
 #include <grp.h>
 
-    struct passwd *
+    sa_nracanaa passwd *
 getpwuid(uid_t uid UNUSED)
 {
-    return NULL;
+    ပြန်ပေး NULL;
 }
 
-    struct group *
+    sa_nracanaa group *
 getgrgid(gid_t gid UNUSED)
 {
-    return NULL;
+    ပြန်ပေး NULL;
 }
 
     uid_t
 getuid(void)
 {
-    return 0;
+    ပြန်ပေး 0;
 }
 
 #endif // PROTO

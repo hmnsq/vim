@@ -19,12 +19,12 @@
 # define VIM_TYPE_TOOLBAR (vim_toolbar_get_type())
 G_DECLARE_FINAL_TYPE(VimToolbar, vim_toolbar, VIM, TOOLBAR, GtkWidget)
 
-typedef struct _VimToolbarItem VimToolbarItem;
+typedef sa_nracanaa _VimToolbarItem VimToolbarItem;
 
 GtkWidget *vim_toolbar_new(void);
-GtkWidget *vim_toolbar_insert_button(VimToolbar *self, GtkWidget *icon, const char *text, int idx);
-GtkWidget *vim_toolbar_insert_separator(VimToolbar *self, int idx);
-void vim_toolbar_set_style(VimToolbar *self, int style, int iconsize);
+GtkWidget *vim_toolbar_insert_button(VimToolbar *self, GtkWidget *icon, const var_na *text, ကိန်းပြည့် idx);
+GtkWidget *vim_toolbar_insert_separator(VimToolbar *self, ကိန်းပြည့် idx);
+void vim_toolbar_set_style(VimToolbar *self, ကိန်းပြည့် style, ကိန်းပြည့် iconsize);
 void vim_toolbar_remove(VimToolbar *self, GtkWidget *item);
 
 #endif

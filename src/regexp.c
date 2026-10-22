@@ -22,7 +22,7 @@
 
 #ifdef FEAT_RELTIME
 static sig_atomic_t dummy_timeout_flag = 0;
-static volatile sig_atomic_t *timeout_flag = &dummy_timeout_flag;
+static ca_ncala sig_atomic_t *timeout_flag = &dummy_timeout_flag;
 #endif
 
 /*
@@ -30,28 +30,28 @@ static volatile sig_atomic_t *timeout_flag = &dummy_timeout_flag;
  * Magic characters are negative.  This separates them from literal characters
  * (possibly multi-byte).  Only ASCII characters can be Magic.
  */
-#define Magic(x)	((int)(x) - 256)
+#define Magic(x)	((ကိန်းပြည့်)(x) - 256)
 #define un_Magic(x)	((x) + 256)
 #define is_Magic(x)	((x) < 0)
 
-    static int
-no_Magic(int x)
+    static ကိန်းပြည့်
+no_Magic(ကိန်းပြည့် x)
 {
-    if (is_Magic(x))
-	return un_Magic(x);
-    return x;
+    အကယ်၍ (is_Magic(x))
+	ပြန်ပေး un_Magic(x);
+    ပြန်ပေး x;
 }
 
-    static int
-toggle_Magic(int x)
+    static ကိန်းပြည့်
+toggle_Magic(ကိန်းပြည့် x)
 {
-    if (is_Magic(x))
-	return un_Magic(x);
-    return Magic(x);
+    အကယ်၍ (is_Magic(x))
+	ပြန်ပေး un_Magic(x);
+    ပြန်ပေး Magic(x);
 }
 
-#if defined(FEAT_RELTIME)
-static int timeout_nesting = 0;
+#အကယ်၍ defined(FEAT_RELTIME)
+static ကိန်းပြည့် timeout_nesting = 0;
 
 /*
  * Start a timer that will cause the regexp to abort after "msec".
@@ -62,7 +62,7 @@ static int timeout_nesting = 0;
     void
 init_regexp_timeout(long msec)
 {
-    if (timeout_nesting == 0)
+    အကယ်၍ (timeout_nesting == 0)
 	timeout_flag = start_timeout(msec);
     ++timeout_nesting;
 }
@@ -70,9 +70,9 @@ init_regexp_timeout(long msec)
     void
 disable_regexp_timeout(void)
 {
-    if (timeout_nesting == 0)
+    အကယ်၍ (timeout_nesting == 0)
 	iemsg("disable_regexp_timeout() called without active timer");
-    else if (--timeout_nesting == 0)
+    မဟုတ်ပါက အကယ်၍ (--timeout_nesting == 0)
     {
 	stop_timeout();
 	timeout_flag = &dummy_timeout_flag;
@@ -80,7 +80,7 @@ disable_regexp_timeout(void)
 }
 #endif
 
-#if defined(FEAT_EVAL)
+#အကယ်၍ defined(FEAT_EVAL)
 # ifdef FEAT_RELTIME
 static sig_atomic_t *saved_timeout_flag;
 # endif
@@ -119,16 +119,16 @@ restore_timeout_for_debugging(void)
 /*
  * Utility definitions.
  */
-#define UCHARAT(p)	((int)*(char_u *)(p))
+#define UCHARAT(p)	((ကိန်းပြည့်)*(char_u *)(p))
 
 // Used for an error (down from) vim_regcomp(): give the error message, set
 // rc_did_emsg and return NULL
-#define EMSG_RET_NULL(m) return (emsg((m)), rc_did_emsg = TRUE, (void *)NULL)
-#define IEMSG_RET_NULL(m) return (iemsg((m)), rc_did_emsg = TRUE, (void *)NULL)
-#define EMSG_RET_FAIL(m) return (emsg((m)), rc_did_emsg = TRUE, FAIL)
-#define EMSG2_RET_NULL(m, c) return (semsg((const char *)(m), (c) ? "" : "\\"), rc_did_emsg = TRUE, (void *)NULL)
-#define EMSG3_RET_NULL(m, c, a) return (semsg((const char *)(m), (c) ? "" : "\\", (a)), rc_did_emsg = TRUE, (void *)NULL)
-#define EMSG2_RET_FAIL(m, c) return (semsg((const char *)(m), (c) ? "" : "\\"), rc_did_emsg = TRUE, FAIL)
+#define EMSG_RET_NULL(m) ပြန်ပေး (emsg((m)), rc_did_emsg = TRUE, (void *)NULL)
+#define IEMSG_RET_NULL(m) ပြန်ပေး (iemsg((m)), rc_did_emsg = TRUE, (void *)NULL)
+#define EMSG_RET_FAIL(m) ပြန်ပေး (emsg((m)), rc_did_emsg = TRUE, FAIL)
+#define EMSG2_RET_NULL(m, c) ပြန်ပေး (semsg((const var_na *)(m), (c) ? "" : "\\"), rc_did_emsg = TRUE, (void *)NULL)
+#define EMSG3_RET_NULL(m, c, a) ပြန်ပေး (semsg((const var_na *)(m), (c) ? "" : "\\", (a)), rc_did_emsg = TRUE, (void *)NULL)
+#define EMSG2_RET_FAIL(m, c) ပြန်ပေး (semsg((const var_na *)(m), (c) ? "" : "\\"), rc_did_emsg = TRUE, FAIL)
 #define EMSG_ONE_RET_NULL EMSG2_RET_NULL(_(e_invalid_item_in_str_brackets), reg_magic == MAGIC_ALL)
 
 
@@ -150,14 +150,14 @@ restore_timeout_for_debugging(void)
  * Return MULTI_ONE if c is a single "multi" operator.
  * Return MULTI_MULT if c is a multi "multi" operator.
  */
-    static int
-re_multi_type(int c)
+    static ကိန်းပြည့်
+re_multi_type(ကိန်းပြည့် c)
 {
-    if (c == Magic('@') || c == Magic('=') || c == Magic('?'))
-	return MULTI_ONE;
-    if (c == Magic('*') || c == Magic('+') || c == Magic('{'))
-	return MULTI_MULT;
-    return NOT_MULTI;
+    အကယ်၍ (c == Magic('@') || c == Magic('=') || c == Magic('?'))
+	ပြန်ပေး MULTI_ONE;
+    အကယ်၍ (c == Magic('*') || c == Magic('+') || c == Magic('{'))
+	ပြန်ပေး MULTI_MULT;
+    ပြန်ပေး NOT_MULTI;
 }
 
 static char_u		*reg_prev_sub = NULL;
@@ -185,20 +185,20 @@ static char_u REGEXP_ABBR[] = "nrtebdoxuU";
 /*
  * Translate '\x' to its control character, except "\n", which is Magic.
  */
-    static int
-backslash_trans(int c)
+    static ကိန်းပြည့်
+backslash_trans(ကိန်းပြည့် c)
 {
     switch (c)
     {
-	case 'r':   return CAR;
-	case 't':   return TAB;
-	case 'e':   return ESC;
-	case 'b':   return BS;
+	pak_sa 'r':   ပြန်ပေး CAR;
+	pak_sa 't':   ပြန်ပေး TAB;
+	pak_sa 'e':   ပြန်ပေး ESC;
+	pak_sa 'b':   ပြန်ပေး BS;
     }
-    return c;
+    ပြန်ပေး c;
 }
 
-enum
+ga_nanaa
 {
     CLASS_ALNUM = 0,
     CLASS_ALPHA,
@@ -227,7 +227,7 @@ enum
  * Returns one of the CLASS_ items. CLASS_NONE means that no item was
  * recognized.  Otherwise "pp" is advanced to after the item.
  */
-    static int
+    static ကိန်းပြည့်
 get_char_class(char_u **pp)
 {
     // must be sorted by the 'value' field because it is used by bsearch()!
@@ -255,7 +255,7 @@ get_char_class(char_u **pp)
     };
 
     // check that the value of "pp" has a chance of matching
-    if ((*pp)[1] == ':' && ASCII_ISLOWER((*pp)[2])
+    အကယ်၍ ((*pp)[1] == ':' && ASCII_ISLOWER((*pp)[2])
 			&& ASCII_ISLOWER((*pp)[3]) && ASCII_ISLOWER((*pp)[4]))
     {
 	keyvalue_T target;
@@ -268,20 +268,20 @@ get_char_class(char_u **pp)
 	target.value.string = *pp + 2;
 	target.value.length = 0;	// not used, see cmp_keyvalue_value_n()
 
-	if (last_entry != NULL && cmp_keyvalue_value_n(&target, last_entry) == 0)
+	အကယ်၍ (last_entry != NULL && cmp_keyvalue_value_n(&target, last_entry) == 0)
 	    entry = last_entry;
-	else
+	မဟုတ်ပါက
 	    entry = (keyvalue_T *)bsearch(&target, &char_class_tab,
 					ARRAY_LENGTH(char_class_tab),
-					sizeof(char_class_tab[0]), cmp_keyvalue_value_n);
-	if (entry != NULL)
+					parimaa_na(char_class_tab[0]), cmp_keyvalue_value_n);
+	အကယ်၍ (entry != NULL)
 	{
 	    last_entry = entry;
 	    *pp += entry->value.length + 2;
-	    return entry->key;
+	    ပြန်ပေး entry->key;
 	}
     }
-    return CLASS_NONE;
+    ပြန်ပေး CLASS_NONE;
 }
 
 /*
@@ -303,29 +303,29 @@ static short	class_tab[256];
     static void
 init_class_tab(void)
 {
-    int		i;
-    static int	done = FALSE;
+    ကိန်းပြည့်		i;
+    static ကိန်းပြည့်	done = FALSE;
 
-    if (done)
-	return;
+    အကယ်၍ (done)
+	ပြန်ပေး;
 
-    for (i = 0; i < 256; ++i)
+    အတွက် (i = 0; i < 256; ++i)
     {
-	if (i >= '0' && i <= '7')
+	အကယ်၍ (i >= '0' && i <= '7')
 	    class_tab[i] = RI_DIGIT + RI_HEX + RI_OCTAL + RI_WORD;
-	else if (i >= '8' && i <= '9')
+	မဟုတ်ပါက အကယ်၍ (i >= '8' && i <= '9')
 	    class_tab[i] = RI_DIGIT + RI_HEX + RI_WORD;
-	else if (i >= 'a' && i <= 'f')
+	မဟုတ်ပါက အကယ်၍ (i >= 'a' && i <= 'f')
 	    class_tab[i] = RI_HEX + RI_WORD + RI_HEAD + RI_ALPHA + RI_LOWER;
-	else if (i >= 'g' && i <= 'z')
+	မဟုတ်ပါက အကယ်၍ (i >= 'g' && i <= 'z')
 	    class_tab[i] = RI_WORD + RI_HEAD + RI_ALPHA + RI_LOWER;
-	else if (i >= 'A' && i <= 'F')
+	မဟုတ်ပါက အကယ်၍ (i >= 'A' && i <= 'F')
 	    class_tab[i] = RI_HEX + RI_WORD + RI_HEAD + RI_ALPHA + RI_UPPER;
-	else if (i >= 'G' && i <= 'Z')
+	မဟုတ်ပါက အကယ်၍ (i >= 'G' && i <= 'Z')
 	    class_tab[i] = RI_WORD + RI_HEAD + RI_ALPHA + RI_UPPER;
-	else if (i == '_')
+	မဟုတ်ပါက အကယ်၍ (i == '_')
 	    class_tab[i] = RI_WORD + RI_HEAD;
-	else
+	မဟုတ်ပါက
 	    class_tab[i] = 0;
     }
     class_tab[' '] |= RI_WHITE;
@@ -355,22 +355,22 @@ init_class_tab(void)
  */
 
 static char_u	*regparse;	// Input-scan pointer.
-static int	regnpar;	// () count.
-static int	wants_nfa;	// regex should use NFA engine
+static ကိန်းပြည့်	regnpar;	// () count.
+static ကိန်းပြည့်	wants_nfa;	// regex should use NFA engine
 #ifdef FEAT_SYN_HL
-static int	regnzpar;	// \z() count.
-static int	re_has_z;	// \z item detected
+static ကိန်းပြည့်	regnzpar;	// \z() count.
+static ကိန်းပြည့်	re_has_z;	// \z item detected
 #endif
 static unsigned	regflags;	// RF_ flags for prog
-#if defined(FEAT_SYN_HL)
-static int	had_eol;	// TRUE when EOL found by vim_regcomp()
+#အကယ်၍ defined(FEAT_SYN_HL)
+static ကိန်းပြည့်	had_eol;	// TRUE when EOL found by vim_regcomp()
 #endif
 
 static magic_T	reg_magic;	// magicness of the pattern
 
-static int	reg_string;	// matching with a string instead of a buffer
+static ကိန်းပြည့်	reg_string;	// matching with a string instead of a buffer
 				// line
-static int	reg_strict;	// "[abc" is illegal
+static ကိန်းပြည့်	reg_strict;	// "[abc" is illegal
 
 /*
  * META contains all characters that may be magic, except '^' and '$'.
@@ -394,13 +394,13 @@ static const char_u META_flags[] = {
     1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1
 };
 
-static int	curchr;		// currently parsed character
+static ကိန်းပြည့်	curchr;		// currently parsed character
 // Previous character.  Note: prevchr is sometimes -1 when we are not at the
 // start, eg in /[ ^I]^ the pattern was never found even if it existed,
 // because ^ was taken to be magic -- webb
-static int	prevchr;
-static int	prevprevchr;	// previous-previous character
-static int	nextchr;	// used for ungetchr()
+static ကိန်းပြည့်	prevchr;
+static ကိန်းပြည့်	prevprevchr;	// previous-previous character
+static ကိန်းပြည့်	nextchr;	// used for ungetchr()
 
 // arguments for reg()
 #define REG_NOPAREN	0	// toplevel reg()
@@ -411,34 +411,34 @@ static int	nextchr;	// used for ungetchr()
 // Limit recursive parsing of nested regexp atoms to avoid using up the C stack.
 #define REG_MAX_PAREN_DEPTH	1000
 
-typedef struct
+typedef sa_nracanaa
 {
     char_u	*regparse;
-    int		prevchr_len;
-    int		curchr;
-    int		prevchr;
-    int		prevprevchr;
-    int		nextchr;
-    int		at_start;
-    int		prev_at_start;
-    int		regnpar;
+    ကိန်းပြည့်		prevchr_len;
+    ကိန်းပြည့်		curchr;
+    ကိန်းပြည့်		prevchr;
+    ကိန်းပြည့်		prevprevchr;
+    ကိန်းပြည့်		nextchr;
+    ကိန်းပြည့်		at_start;
+    ကိန်းပြည့်		prev_at_start;
+    ကိန်းပြည့်		regnpar;
 } parse_state_T;
 
 static void	initchr(char_u *);
-static int	getchr(void);
+static ကိန်းပြည့်	getchr(void);
 static void	skipchr_keepstart(void);
-static int	peekchr(void);
+static ကိန်းပြည့်	peekchr(void);
 static void	skipchr(void);
 static void	ungetchr(void);
-static vimlong_T	gethexchrs(int maxinputlen);
+static vimlong_T	gethexchrs(ကိန်းပြည့် maxinputlen);
 static long	getoctchrs(void);
 static vimlong_T	getdecchrs(void);
-static int	coll_get_char(void);
-static int	prog_magic_wrong(void);
-static int	cstrncmp(char_u *s1, char_u *s2, int *n);
-static char_u	*cstrchr(char_u *, int);
-static int	re_mult_next(char *what);
-static int	reg_iswordc(int);
+static ကိန်းပြည့်	coll_get_char(void);
+static ကိန်းပြည့်	prog_magic_wrong(void);
+static ကိန်းပြည့်	cstrncmp(char_u *s1, char_u *s2, ကိန်းပြည့် *n);
+static char_u	*cstrchr(char_u *, ကိန်းပြည့်);
+static ကိန်းပြည့်	re_mult_next(var_na *what);
+static ကိန်းပြည့်	reg_iswordc(ကိန်းပြည့်);
 #ifdef FEAT_EVAL
 static void report_re_switch(char_u *pat);
 #endif
@@ -449,10 +449,10 @@ static regengine_T nfa_regengine;
 /*
  * Return TRUE if compiled regular expression "prog" can match a line break.
  */
-    int
+    ကိန်းပြည့်
 re_multiline(regprog_T *prog)
 {
-    return (prog->regflags & RF_HASNL);
+    ပြန်ပေး (prog->regflags & RF_HASNL);
 }
 
 /*
@@ -460,28 +460,28 @@ re_multiline(regprog_T *prog)
  * Returns a character representing the class. Zero means that no item was
  * recognized.  Otherwise "pp" is advanced to after the item.
  */
-    static int
+    static ကိန်းပြည့်
 get_equi_class(char_u **pp)
 {
-    int		c;
-    int		l = 1;
+    ကိန်းပြည့်		c;
+    ကိန်းပြည့်		l = 1;
     char_u	*p = *pp;
 
-    if (p[1] == '=' && p[2] != NUL)
+    အကယ်၍ (p[1] == '=' && p[2] != NUL)
     {
-	if (has_mbyte)
+	အကယ်၍ (has_mbyte)
 	    l = (*mb_ptr2len)(p + 2);
-	if (p[l + 2] == '=' && p[l + 3] == ']')
+	အကယ်၍ (p[l + 2] == '=' && p[l + 3] == ']')
 	{
-	    if (has_mbyte)
+	    အကယ်၍ (has_mbyte)
 		c = mb_ptr2char(p + 2);
-	    else
+	    မဟုတ်ပါက
 		c = p[2];
 	    *pp += l + 4;
-	    return c;
+	    ပြန်ပေး c;
 	}
     }
-    return 0;
+    ပြန်ပေး 0;
 }
 
 /*
@@ -490,32 +490,32 @@ get_equi_class(char_u **pp)
  * "pp" is advanced to after the item.
  * Currently only single characters are recognized!
  */
-    static int
+    static ကိန်းပြည့်
 get_coll_element(char_u **pp)
 {
-    int		c;
-    int		l = 1;
+    ကိန်းပြည့်		c;
+    ကိန်းပြည့်		l = 1;
     char_u	*p = *pp;
 
-    if (p[0] != NUL && p[1] == '.' && p[2] != NUL)
+    အကယ်၍ (p[0] != NUL && p[1] == '.' && p[2] != NUL)
     {
-	if (has_mbyte)
+	အကယ်၍ (has_mbyte)
 	    l = (*mb_ptr2len)(p + 2);
-	if (p[l + 2] == '.' && p[l + 3] == ']')
+	အကယ်၍ (p[l + 2] == '.' && p[l + 3] == ']')
 	{
-	    if (has_mbyte)
+	    အကယ်၍ (has_mbyte)
 		c = mb_ptr2char(p + 2);
-	    else
+	    မဟုတ်ပါက
 		c = p[2];
 	    *pp += l + 4;
-	    return c;
+	    ပြန်ပေး c;
 	}
     }
-    return 0;
+    ပြန်ပေး 0;
 }
 
-static int reg_cpo_lit; // 'cpoptions' contains 'l' flag
-static int reg_cpo_bsl; // 'cpoptions' contains '\' flag
+static ကိန်းပြည့် reg_cpo_lit; // 'cpoptions' contains 'l' flag
+static ကိန်းပြည့် reg_cpo_bsl; // 'cpoptions' contains '\' flag
 
     static void
 get_cpo_flags(void)
@@ -532,41 +532,41 @@ get_cpo_flags(void)
     static char_u *
 skip_anyof(char_u *p)
 {
-    int		l;
+    ကိန်းပြည့်		l;
 
-    if (*p == '^')	// Complement of range.
+    အကယ်၍ (*p == '^')	// Complement of range.
 	++p;
-    if (*p == ']' || *p == '-')
+    အကယ်၍ (*p == ']' || *p == '-')
 	++p;
-    while (*p != NUL && *p != ']')
+    နေစဉ် (*p != NUL && *p != ']')
     {
-	if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	အကယ်၍ (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 	    p += l;
-	else
-	    if (*p == '-')
+	မဟုတ်ပါက
+	    အကယ်၍ (*p == '-')
 	    {
 		++p;
-		if (*p != ']' && *p != NUL)
+		အကယ်၍ (*p != ']' && *p != NUL)
 		    MB_PTR_ADV(p);
 	    }
-	else if (*p == '\\'
+	မဟုတ်ပါက အကယ်၍ (*p == '\\'
 		&& !reg_cpo_bsl
 		&& (vim_strchr(REGEXP_INRANGE, p[1]) != NULL
 		    || (!reg_cpo_lit && vim_strchr(REGEXP_ABBR, p[1]) != NULL)))
 	    p += 2;
-	else if (*p == '[')
+	မဟုတ်ပါက အကယ်၍ (*p == '[')
 	{
-	    if (get_char_class(&p) == CLASS_NONE
+	    အကယ်၍ (get_char_class(&p) == CLASS_NONE
 		    && get_equi_class(&p) == 0
 		    && get_coll_element(&p) == 0
 		    && *p != NUL)
 		++p; // it is not a class name and not NUL
 	}
-	else
+	မဟုတ်ပါက
 	    ++p;
     }
 
-    return p;
+    ပြန်ပေး p;
 }
 
 /*
@@ -578,10 +578,10 @@ skip_anyof(char_u *p)
     char_u *
 skip_regexp(
     char_u	*startp,
-    int		delim,
-    int		magic)
+    ကိန်းပြည့်		delim,
+    ကိန်းပြည့်		magic)
 {
-    return skip_regexp_ex(startp, delim, magic, NULL, NULL, NULL);
+    ပြန်ပေး skip_regexp_ex(startp, delim, magic, NULL, NULL, NULL);
 }
 
 /*
@@ -591,17 +591,17 @@ skip_regexp(
     char_u *
 skip_regexp_err(
     char_u	*startp,
-    int		delim,
-    int		magic)
+    ကိန်းပြည့်		delim,
+    ကိန်းပြည့်		magic)
 {
     char_u *p = skip_regexp(startp, delim, magic);
 
-    if (*p != delim)
+    အကယ်၍ (*p != delim)
     {
 	semsg(_(e_missing_delimiter_after_search_pattern_str), startp);
-	return NULL;
+	ပြန်ပေး NULL;
     }
-    return p;
+    ပြန်ပေး p;
 }
 
 /*
@@ -615,75 +615,75 @@ skip_regexp_err(
     char_u *
 skip_regexp_ex(
     char_u	*startp,
-    int		dirc,
-    int		magic,
+    ကိန်းပြည့်		dirc,
+    ကိန်းပြည့်		magic,
     char_u	**newp,
-    int		*dropped,
+    ကိန်းပြည့်		*dropped,
     magic_T	*magic_val)
 {
     magic_T	mymagic;
     char_u	*p = startp;
     size_t	startplen = 0;
 
-    if (magic)
+    အကယ်၍ (magic)
 	mymagic = MAGIC_ON;
-    else
+    မဟုတ်ပါက
 	mymagic = MAGIC_OFF;
     get_cpo_flags();
 
-    for (; p[0] != NUL; MB_PTR_ADV(p))
+    အတွက် (; p[0] != NUL; MB_PTR_ADV(p))
     {
-	if (p[0] == dirc)	// found end of regexp
-	    break;
-	if ((p[0] == '[' && mymagic >= MAGIC_ON)
+	အကယ်၍ (p[0] == dirc)	// found end of regexp
+	    bha_nga;
+	အကယ်၍ ((p[0] == '[' && mymagic >= MAGIC_ON)
 		|| (p[0] == '\\' && p[1] == '[' && mymagic <= MAGIC_OFF))
 	{
 	    p = skip_anyof(p + 1);
-	    if (p[0] == NUL)
-		break;
+	    အကယ်၍ (p[0] == NUL)
+		bha_nga;
 	}
-	else if (p[0] == '\\' && p[1] != NUL)
+	မဟုတ်ပါက အကယ်၍ (p[0] == '\\' && p[1] != NUL)
 	{
-	    if (dirc == '?' && newp != NULL && p[1] == '?')
+	    အကယ်၍ (dirc == '?' && newp != NULL && p[1] == '?')
 	    {
 		// change "\?" to "?", make a copy first.
-		if (startplen == 0)
+		အကယ်၍ (startplen == 0)
 		    startplen = STRLEN(startp);
-		if (*newp == NULL)
+		အကယ်၍ (*newp == NULL)
 		{
 		    *newp = vim_strnsave(startp, startplen);
-		    if (*newp != NULL)
+		    အကယ်၍ (*newp != NULL)
 		    {
 			p = *newp + (p - startp);
 			startp = *newp;
 		    }
 		}
-		if (dropped != NULL)
+		အကယ်၍ (dropped != NULL)
 		    ++*dropped;
-		if (*newp != NULL)
+		အကယ်၍ (*newp != NULL)
 		    mch_memmove(p, p + 1, startplen - ((p + 1) - startp) + 1);
-		else
+		မဟုတ်ပါက
 		    ++p;
 	    }
-	    else
+	    မဟုတ်ပါက
 		++p;    // skip next character
-	    if (*p == 'v')
+	    အကယ်၍ (*p == 'v')
 		mymagic = MAGIC_ALL;
-	    else if (*p == 'V')
+	    မဟုတ်ပါက အကယ်၍ (*p == 'V')
 		mymagic = MAGIC_NONE;
 	}
     }
-    if (magic_val != NULL)
+    အကယ်၍ (magic_val != NULL)
 	*magic_val = mymagic;
-    return p;
+    ပြန်ပေး p;
 }
 
 /*
  * Functions for getting characters from the regexp input.
  */
-static int	prevchr_len;	// byte length of previous char
-static int	at_start;	// True when on the first character
-static int	prev_at_start;  // True when on the second character
+static ကိန်းပြည့်	prevchr_len;	// byte length of previous char
+static ကိန်းပြည့်	at_start;	// True when on the first character
+static ကိန်းပြည့်	prev_at_start;  // True when on the second character
 
 /*
  * Start parsing at "str".
@@ -737,54 +737,54 @@ restore_parse_state(parse_state_T *ps)
 /*
  * Get the next character without advancing.
  */
-    static int
+    static ကိန်းပြည့်
 peekchr(void)
 {
-    static int	after_slash = FALSE;
+    static ကိန်းပြည့်	after_slash = FALSE;
 
-    if (curchr != -1)
-	return curchr;
+    အကယ်၍ (curchr != -1)
+	ပြန်ပေး curchr;
 
     switch (curchr = regparse[0])
     {
-	case '.':
-	case '[':
-	case '~':
+	pak_sa '.':
+	pak_sa '[':
+	pak_sa '~':
 	    // magic when 'magic' is on
-	    if (reg_magic >= MAGIC_ON)
+	    အကယ်၍ (reg_magic >= MAGIC_ON)
 		curchr = Magic(curchr);
-	    break;
-	case '(':
-	case ')':
-	case '{':
-	case '%':
-	case '+':
-	case '=':
-	case '?':
-	case '@':
-	case '!':
-	case '&':
-	case '|':
-	case '<':
-	case '>':
-	case '#':	// future ext.
-	case '"':	// future ext.
-	case '\'':	// future ext.
-	case ',':	// future ext.
-	case '-':	// future ext.
-	case ':':	// future ext.
-	case ';':	// future ext.
-	case '`':	// future ext.
-	case '/':	// Can't be used in / command
+	    bha_nga;
+	pak_sa '(':
+	pak_sa ')':
+	pak_sa '{':
+	pak_sa '%':
+	pak_sa '+':
+	pak_sa '=':
+	pak_sa '?':
+	pak_sa '@':
+	pak_sa '!':
+	pak_sa '&':
+	pak_sa '|':
+	pak_sa '<':
+	pak_sa '>':
+	pak_sa '#':	// future ext.
+	pak_sa '"':	// future ext.
+	pak_sa '\'':	// future ext.
+	pak_sa ',':	// future ext.
+	pak_sa '-':	// future ext.
+	pak_sa ':':	// future ext.
+	pak_sa ';':	// future ext.
+	pak_sa '`':	// future ext.
+	pak_sa '/':	// Can't be used in / command
 			// magic only after "\v"
-	    if (reg_magic == MAGIC_ALL)
+	    အကယ်၍ (reg_magic == MAGIC_ALL)
 		curchr = Magic(curchr);
-	    break;
-	case '*':
+	    bha_nga;
+	pak_sa '*':
 	    // * is not magic as the very first character, eg "?*ptr", when
 	    // after '^', eg "/^*ptr" and when after "\(", "\|", "\&".  But
 	    // "\(\*" is not magic, thus must be magic if "after_slash"
-	    if (reg_magic >= MAGIC_ON
+	    အကယ်၍ (reg_magic >= MAGIC_ON
 		    && !at_start
 		    && !(prev_at_start && prevchr == Magic('^'))
 		    && (after_slash
@@ -792,11 +792,11 @@ peekchr(void)
 			    && prevchr != Magic('&')
 			    && prevchr != Magic('|'))))
 		curchr = Magic('*');
-	    break;
-	case '^':
+	    bha_nga;
+	pak_sa '^':
 	    // '^' is only magic as the very first character and if it's after
 	    // "\(", "\|", "\&' or "\n"
-	    if (reg_magic >= MAGIC_OFF
+	    အကယ်၍ (reg_magic >= MAGIC_OFF
 		    && (at_start
 			|| reg_magic == MAGIC_ALL
 			|| prevchr == Magic('(')
@@ -810,27 +810,27 @@ peekchr(void)
 		at_start = TRUE;
 		prev_at_start = FALSE;
 	    }
-	    break;
-	case '$':
+	    bha_nga;
+	pak_sa '$':
 	    // '$' is only magic as the very last char and if it's in front of
 	    // either "\|", "\)", "\&", or "\n"
-	    if (reg_magic >= MAGIC_OFF)
+	    အကယ်၍ (reg_magic >= MAGIC_OFF)
 	    {
 		char_u *p = regparse + 1;
-		int is_magic_all = (reg_magic == MAGIC_ALL);
+		ကိန်းပြည့် is_magic_all = (reg_magic == MAGIC_ALL);
 
 		// ignore \c \C \m \M \v \V and \Z after '$'
-		while (p[0] == '\\' && (p[1] == 'c' || p[1] == 'C'
+		နေစဉ် (p[0] == '\\' && (p[1] == 'c' || p[1] == 'C'
 			    || p[1] == 'm' || p[1] == 'M'
 			    || p[1] == 'v' || p[1] == 'V' || p[1] == 'Z'))
 		{
-		    if (p[1] == 'v')
+		    အကယ်၍ (p[1] == 'v')
 			is_magic_all = TRUE;
-		    else if (p[1] == 'm' || p[1] == 'M' || p[1] == 'V')
+		    မဟုတ်ပါက အကယ်၍ (p[1] == 'm' || p[1] == 'M' || p[1] == 'V')
 			is_magic_all = FALSE;
 		    p += 2;
 		}
-		if (p[0] == NUL
+		အကယ်၍ (p[0] == NUL
 			|| (p[0] == '\\'
 			    && (p[1] == '|' || p[1] == '&' || p[1] == ')'
 				|| p[1] == 'n'))
@@ -839,14 +839,14 @@ peekchr(void)
 			|| reg_magic == MAGIC_ALL)
 		    curchr = Magic('$');
 	    }
-	    break;
-	case '\\':
+	    bha_nga;
+	pak_sa '\\':
 	    {
-		int c = regparse[1];
+		ကိန်းပြည့် c = regparse[1];
 
-		if (c == NUL)
+		အကယ်၍ (c == NUL)
 		    curchr = '\\';	// trailing '\'
-		else if (c <= '~' && META_flags[c])
+		မဟုတ်ပါက အကယ်၍ (c <= '~' && META_flags[c])
 		{
 		    /*
 		     * META contains everything that may be magic sometimes,
@@ -865,37 +865,37 @@ peekchr(void)
 		    --after_slash;
 		    curchr = toggle_Magic(curchr);
 		}
-		else if (vim_strchr(REGEXP_ABBR, c))
+		မဟုတ်ပါက အကယ်၍ (vim_strchr(REGEXP_ABBR, c))
 		{
 		    /*
 		     * Handle abbreviations, like "\t" for TAB -- webb
 		     */
 		    curchr = backslash_trans(c);
 		}
-		else if (reg_magic == MAGIC_NONE && (c == '$' || c == '^'))
+		မဟုတ်ပါက အကယ်၍ (reg_magic == MAGIC_NONE && (c == '$' || c == '^'))
 		    curchr = toggle_Magic(c);
-		else
+		မဟုတ်ပါက
 		{
 		    /*
 		     * Next character can never be (made) magic?
 		     * Then backslashing it won't do anything.
 		     */
-		    if (has_mbyte && c >= 0x80)
+		    အကယ်၍ (has_mbyte && c >= 0x80)
 			curchr = (*mb_ptr2char)(regparse + 1);
-		    else
+		    မဟုတ်ပါက
 			curchr = c;
 		}
-		break;
+		bha_nga;
 	    }
 
 	default:
 	    // curchr already holds regparse[0]; only a multi-byte lead byte
 	    // needs decoding.
-	    if (has_mbyte && curchr >= 0x80)
+	    အကယ်၍ (has_mbyte && curchr >= 0x80)
 		curchr = (*mb_ptr2char)(regparse);
     }
 
-    return curchr;
+    ပြန်ပေး curchr;
 }
 
 /*
@@ -905,24 +905,24 @@ peekchr(void)
 skipchr(void)
 {
     // peekchr() eats a backslash, do the same here
-    if (*regparse == '\\')
+    အကယ်၍ (*regparse == '\\')
 	prevchr_len = 1;
-    else
+    မဟုတ်ပါက
 	prevchr_len = 0;
-    if (regparse[prevchr_len] != NUL)
+    အကယ်၍ (regparse[prevchr_len] != NUL)
     {
-	if (enc_utf8)
+	အကယ်၍ (enc_utf8)
 	{
 	    // Exclude composing chars that mb_ptr2len does include.  A byte
 	    // below 0x80 is always a single character.
-	    if (regparse[prevchr_len] < 0x80)
+	    အကယ်၍ (regparse[prevchr_len] < 0x80)
 		++prevchr_len;
-	    else
+	    မဟုတ်ပါက
 		prevchr_len += utf_ptr2len(regparse + prevchr_len);
 	}
-	else if (has_mbyte)
+	မဟုတ်ပါက အကယ်၍ (has_mbyte)
 	    prevchr_len += (*mb_ptr2len)(regparse + prevchr_len);
-	else
+	မဟုတ်ပါက
 	    ++prevchr_len;
     }
     regparse += prevchr_len;
@@ -941,9 +941,9 @@ skipchr(void)
     static void
 skipchr_keepstart(void)
 {
-    int as = prev_at_start;
-    int pr = prevchr;
-    int prpr = prevprevchr;
+    ကိန်းပြည့် as = prev_at_start;
+    ကိန်းပြည့် pr = prevchr;
+    ကိန်းပြည့် prpr = prevprevchr;
 
     skipchr();
     at_start = as;
@@ -955,13 +955,13 @@ skipchr_keepstart(void)
  * Get the next character from the pattern. We know about magic and such, so
  * therefore we need a lexical analyzer.
  */
-    static int
+    static ကိန်းပြည့်
 getchr(void)
 {
-    int chr = peekchr();
+    ကိန်းပြည့် chr = peekchr();
 
     skipchr();
-    return chr;
+    ပြန်ပေး chr;
 }
 
 /*
@@ -991,25 +991,25 @@ ungetchr(void)
  * 2 when reading a \%x20 sequence and 4 when reading a \%u20AC sequence.
  */
     static vimlong_T
-gethexchrs(int maxinputlen)
+gethexchrs(ကိန်းပြည့် maxinputlen)
 {
     long_u	nr = 0;
-    int		c;
-    int		i;
+    ကိန်းပြည့်		c;
+    ကိန်းပြည့်		i;
 
-    for (i = 0; i < maxinputlen; ++i)
+    အတွက် (i = 0; i < maxinputlen; ++i)
     {
 	c = regparse[0];
-	if (!vim_isxdigit(c))
-	    break;
+	အကယ်၍ (!vim_isxdigit(c))
+	    bha_nga;
 	nr <<= 4;
 	nr |= hex2nr(c);
 	++regparse;
     }
 
-    if (i == 0)
-	return -1;
-    return nr;
+    အကယ်၍ (i == 0)
+	ပြန်ပေး -1;
+    ပြန်ပေး nr;
 }
 
 /*
@@ -1020,23 +1020,23 @@ gethexchrs(int maxinputlen)
 getdecchrs(void)
 {
     long_u	nr = 0;
-    int		c;
-    int		i;
+    ကိန်းပြည့်		c;
+    ကိန်းပြည့်		i;
 
-    for (i = 0; ; ++i)
+    အတွက် (i = 0; ; ++i)
     {
 	c = regparse[0];
-	if (c < '0' || c > '9')
-	    break;
+	အကယ်၍ (c < '0' || c > '9')
+	    bha_nga;
 	nr *= 10;
 	nr += c - '0';
 	++regparse;
 	curchr = -1; // no longer valid
     }
 
-    if (i == 0)
-	return -1;
-    return nr;
+    အကယ်၍ (i == 0)
+	ပြန်ပေး -1;
+    ပြန်ပေး nr;
 }
 
 /*
@@ -1051,22 +1051,22 @@ getdecchrs(void)
 getoctchrs(void)
 {
     long_u	nr = 0;
-    int		c;
-    int		i;
+    ကိန်းပြည့်		c;
+    ကိန်းပြည့်		i;
 
-    for (i = 0; i < 3 && nr < 040; ++i)
+    အတွက် (i = 0; i < 3 && nr < 040; ++i)
     {
 	c = regparse[0];
-	if (c < '0' || c > '7')
-	    break;
+	အကယ်၍ (c < '0' || c > '7')
+	    bha_nga;
 	nr <<= 3;
 	nr |= hex2nr(c);
 	++regparse;
     }
 
-    if (i == 0)
-	return -1;
-    return (long)nr;
+    အကယ်၍ (i == 0)
+	ပြန်ပေး -1;
+    ပြန်ပေး (long)nr;
 }
 
 /*
@@ -1075,14 +1075,14 @@ getoctchrs(void)
  * Should end with 'end'.  If minval is missing, zero is default, if maxval is
  * missing, a very big number is the default.
  */
-    static int
+    static ကိန်းပြည့်
 read_limits(long *minval, long *maxval)
 {
-    int		reverse = FALSE;
+    ကိန်းပြည့်		reverse = FALSE;
     char_u	*first_char;
     long	tmp;
 
-    if (*regparse == '-')
+    အကယ်၍ (*regparse == '-')
     {
 	// Starts with '-', so reverse the range later
 	regparse++;
@@ -1090,20 +1090,20 @@ read_limits(long *minval, long *maxval)
     }
     first_char = regparse;
     *minval = getdigits(&regparse);
-    if (*regparse == ',')	    // There is a comma
+    အကယ်၍ (*regparse == ',')	    // There is a comma
     {
-	if (vim_isdigit(*++regparse))
+	အကယ်၍ (vim_isdigit(*++regparse))
 	    *maxval = getdigits(&regparse);
-	else
+	မဟုတ်ပါက
 	    *maxval = MAX_LIMIT;
     }
-    else if (VIM_ISDIGIT(*first_char))
+    မဟုတ်ပါက အကယ်၍ (VIM_ISDIGIT(*first_char))
 	*maxval = *minval;	    // It was \{n} or \{-n}
-    else
+    မဟုတ်ပါက
 	*maxval = MAX_LIMIT;	    // It was \{} or \{-}
-    if (*regparse == '\\')
+    အကယ်၍ (*regparse == '\\')
 	regparse++;	// Allow either \{...} or \{...\}
-    if (*regparse != '}')
+    အကယ်၍ (*regparse != '}')
 	EMSG2_RET_FAIL(_(e_syntax_error_in_str_curlies),
 						       reg_magic == MAGIC_ALL);
 
@@ -1111,14 +1111,14 @@ read_limits(long *minval, long *maxval)
      * Reverse the range if there was a '-', or make sure it is in the right
      * order otherwise.
      */
-    if ((!reverse && *minval > *maxval) || (reverse && *minval < *maxval))
+    အကယ်၍ ((!reverse && *minval > *maxval) || (reverse && *minval < *maxval))
     {
 	tmp = *minval;
 	*minval = *maxval;
 	*maxval = tmp;
     }
     skipchr();		// let's be friends with the lexer again
-    return OK;
+    ပြန်ပေး OK;
 }
 
 /*
@@ -1133,7 +1133,7 @@ static void	cleanup_subexpr(void);
 #ifdef FEAT_SYN_HL
 static void	cleanup_zsubexpr(void);
 #endif
-static int	match_with_backref(linenr_T start_lnum, colnr_T start_col, linenr_T end_lnum, colnr_T end_col, int *bytelen);
+static ကိန်းပြည့်	match_with_backref(linenr_T start_lnum, colnr_T start_col, linenr_T end_lnum, colnr_T end_col, ကိန်းပြည့် *bytelen);
 
 /*
  * Sometimes need to save a copy of a line.  Since alloc()/free() is very
@@ -1160,7 +1160,7 @@ static unsigned	reg_tofreelen;
  * reg_maxline		0			last line nr
  * reg_line_lbr		FALSE or TRUE		FALSE
  */
-typedef struct {
+typedef sa_nracanaa {
     regmatch_T		*reg_match;
     regmmatch_T		*reg_mmatch;
 
@@ -1173,80 +1173,80 @@ typedef struct {
     buf_T		*reg_buf;
     linenr_T		reg_firstlnum;
     linenr_T		reg_maxline;
-    int			reg_line_lbr;	// "\n" in string is line break
+    ကိန်းပြည့်			reg_line_lbr;	// "\n" in string is line break
 
     // The current match-position is stord in these variables:
     linenr_T	lnum;		// line number, relative to first line
     char_u	*line;		// start of current line
     char_u	*input;		// current input, points into "line"
 
-    int	need_clear_subexpr;	// subexpressions still need to be cleared
+    ကိန်းပြည့်	need_clear_subexpr;	// subexpressions still need to be cleared
 #ifdef FEAT_SYN_HL
-    int	need_clear_zsubexpr;	// extmatch subexpressions still need to be
+    ကိန်းပြည့်	need_clear_zsubexpr;	// extmatch subexpressions still need to be
 				// cleared
 #endif
 
     // Internal copy of 'ignorecase'.  It is set at each call to vim_regexec().
     // Normally it gets the value of "rm_ic" or "rmm_ic", but when the pattern
     // contains '\c' or '\C' the value is overruled.
-    int			reg_ic;
+    ကိန်းပြည့်			reg_ic;
 
     // Similar to "reg_ic", but only for 'combining' characters.  Set with \Z
     // flag in the regexp.  Defaults to false, always.
-    int			reg_icombine;
+    ကိန်းပြည့်			reg_icombine;
 
     // Copy of "rmm_maxcol": maximum column to search for a match.  Zero when
     // there is no maximum.
     colnr_T		reg_maxcol;
 
     // State for the NFA engine regexec.
-    int nfa_has_zend;	    // NFA regexp \ze operator encountered.
-    int nfa_has_backref;    // NFA regexp \1 .. \9 encountered.
-    int nfa_nsubexpr;	    // Number of sub expressions actually being used
+    ကိန်းပြည့် nfa_has_zend;	    // NFA regexp \ze operator encountered.
+    ကိန်းပြည့် nfa_has_backref;    // NFA regexp \1 .. \9 encountered.
+    ကိန်းပြည့် nfa_nsubexpr;	    // Number of sub expressions actually being used
 			    // during execution. 1 if only the whole match
 			    // (subexpr 0) is used.
     // listid is global, so that it increases on recursive calls to
     // nfa_regmatch(), which means we don't have to clear the lastlist field of
     // all the states.
-    int nfa_listid;
-    int nfa_alt_listid;
+    ကိန်းပြည့် nfa_listid;
+    ကိန်းပြည့် nfa_alt_listid;
 
 #ifdef FEAT_SYN_HL
-    int nfa_has_zsubexpr;   // NFA regexp has \z( ), set zsubexpr.
+    ကိန်းပြည့် nfa_has_zsubexpr;   // NFA regexp has \z( ), set zsubexpr.
 #endif
 } regexec_T;
 
 static regexec_T	rex;
-static int		rex_in_use = FALSE;
+static ကိန်းပြည့်		rex_in_use = FALSE;
 
 /*
  * Return TRUE if character 'c' is included in 'iskeyword' option for
  * "reg_buf" buffer.
  */
-    static int
-reg_iswordc(int c)
+    static ကိန်းပြည့်
+reg_iswordc(ကိန်းပြည့် c)
 {
-    return vim_iswordc_buf(c, rex.reg_buf);
+    ပြန်ပေး vim_iswordc_buf(c, rex.reg_buf);
 }
 
 #ifdef FEAT_EVAL
-static int can_f_submatch = FALSE;	// TRUE when submatch() can be used
+static ကိန်းပြည့် can_f_submatch = FALSE;	// TRUE when submatch() can be used
 
 // This struct is used for reg_submatch(). Needed for when the
 // substitution string is an expression that contains a call to substitute()
 // and submatch().
-typedef struct {
+typedef sa_nracanaa {
     regmatch_T	*sm_match;
     regmmatch_T	*sm_mmatch;
     linenr_T	sm_firstlnum;
     linenr_T	sm_maxline;
-    int		sm_line_lbr;
+    ကိန်းပြည့်		sm_line_lbr;
 } regsubmatch_T;
 
 static regsubmatch_T rsm;  // can only be used when can_f_submatch is TRUE
 #endif
 
-typedef enum
+typedef ga_nanaa
 {
     RGLF_LINE = 0x01,
     RGLF_LENGTH = 0x02
@@ -1270,18 +1270,18 @@ reg_getline_common(
     char_u		**line,
     colnr_T		*length)
 {
-    int get_line = flags & RGLF_LINE;
-    int get_length = flags & RGLF_LENGTH;
+    ကိန်းပြည့် get_line = flags & RGLF_LINE;
+    ကိန်းပြည့် get_length = flags & RGLF_LENGTH;
     linenr_T firstlnum;
     linenr_T maxline;
 
 #ifdef FEAT_EVAL
-    if (flags & RGLF_SUBMATCH)
+    အကယ်၍ (flags & RGLF_SUBMATCH)
     {
 	firstlnum = rsm.sm_firstlnum + lnum;
 	maxline = rsm.sm_maxline;
     }
-    else
+    မဟုတ်ပါက
 #endif
     {
 	firstlnum = rex.reg_firstlnum + lnum;
@@ -1290,30 +1290,30 @@ reg_getline_common(
 
     // when looking behind for a match/no-match lnum is negative. but we
     // can't go before line 1.
-    if (firstlnum < 1)
+    အကယ်၍ (firstlnum < 1)
     {
-	if (get_line)
+	အကယ်၍ (get_line)
 	    *line = NULL;
-	if (get_length)
+	အကယ်၍ (get_length)
 	    *length = 0;
 
-	return;
+	ပြန်ပေး;
     }
 
-    if (lnum > maxline)
+    အကယ်၍ (lnum > maxline)
     {
 	// must have matched the "\n" in the last line.
-	if (get_line)
+	အကယ်၍ (get_line)
 	    *line = (char_u *)"";
-	if (get_length)
+	အကယ်၍ (get_length)
 	    *length = 0;
 
-	return;
+	ပြန်ပေး;
     }
 
-    if (get_line)
+    အကယ်၍ (get_line)
 	*line = ml_get_buf(rex.reg_buf, firstlnum, FALSE);
-    if (get_length)
+    အကယ်၍ (get_length)
 	*length = ml_get_buf_len(rex.reg_buf, firstlnum);
 }
 
@@ -1327,7 +1327,7 @@ reg_getline(linenr_T lnum)
 
     reg_getline_common(lnum, RGLF_LINE, &line, NULL);
 
-    return line;
+    ပြန်ပေး line;
 }
 
 /*
@@ -1340,7 +1340,7 @@ reg_getline_len(linenr_T lnum)
 
     reg_getline_common(lnum, RGLF_LENGTH, NULL, &length);
 
-    return length;
+    ပြန်ပေး length;
 }
 
 #ifdef FEAT_SYN_HL
@@ -1363,9 +1363,9 @@ make_extmatch(void)
     reg_extmatch_T	*em;
 
     em = ALLOC_CLEAR_ONE(reg_extmatch_T);
-    if (em != NULL)
+    အကယ်၍ (em != NULL)
 	em->refcnt = 1;
-    return em;
+    ပြန်ပေး em;
 }
 
 /*
@@ -1374,9 +1374,9 @@ make_extmatch(void)
     reg_extmatch_T *
 ref_extmatch(reg_extmatch_T *em)
 {
-    if (em != NULL)
+    အကယ်၍ (em != NULL)
 	em->refcnt++;
-    return em;
+    ပြန်ပေး em;
 }
 
 /*
@@ -1386,11 +1386,11 @@ ref_extmatch(reg_extmatch_T *em)
     void
 unref_extmatch(reg_extmatch_T *em)
 {
-    int i;
+    ကိန်းပြည့် i;
 
-    if (em != NULL && --em->refcnt <= 0)
+    အကယ်၍ (em != NULL && --em->refcnt <= 0)
     {
-	for (i = 0; i < NSUBEXP; ++i)
+	အတွက် (i = 0; i < NSUBEXP; ++i)
 	    vim_free(em->matches[i]);
 	vim_free(em);
     }
@@ -1400,43 +1400,43 @@ unref_extmatch(reg_extmatch_T *em)
 /*
  * Get class of previous character.
  */
-    static int
+    static ကိန်းပြည့်
 reg_prev_class(void)
 {
-    if (rex.input > rex.line)
-	return mb_get_class_buf(rex.input - 1
+    အကယ်၍ (rex.input > rex.line)
+	ပြန်ပေး mb_get_class_buf(rex.input - 1
 		       - (*mb_head_off)(rex.line, rex.input - 1), rex.reg_buf);
-    return -1;
+    ပြန်ပေး -1;
 }
 
 /*
  * Return TRUE if the current rex.input position matches the Visual area.
  */
-    static int
+    static ကိန်းပြည့်
 reg_match_visual(void)
 {
     pos_T	top, bot;
     linenr_T    lnum;
     colnr_T	col;
     win_T	*wp = rex.reg_win == NULL ? curwin : rex.reg_win;
-    int		mode;
+    ကိန်းပြည့်		mode;
     colnr_T	start, end;
     colnr_T	start2, end2;
     colnr_T	cols;
     colnr_T	curswant;
 
     // Check if the buffer is the current buffer and not using a string.
-    if (rex.reg_buf != curbuf || VIsual.lnum == 0 || !REG_MULTI)
-	return FALSE;
+    အကယ်၍ (rex.reg_buf != curbuf || VIsual.lnum == 0 || !REG_MULTI)
+	ပြန်ပေး FALSE;
 
-    if (VIsual_active)
+    အကယ်၍ (VIsual_active)
     {
-	if (LT_POS(VIsual, wp->w_cursor))
+	အကယ်၍ (LT_POS(VIsual, wp->w_cursor))
 	{
 	    top = VIsual;
 	    bot = wp->w_cursor;
 	}
-	else
+	မဟုတ်ပါက
 	{
 	    top = wp->w_cursor;
 	    bot = VIsual;
@@ -1444,44 +1444,44 @@ reg_match_visual(void)
 	mode = VIsual_mode;
 	curswant = wp->w_curswant;
     }
-    else
+    မဟုတ်ပါက
     {
-	if (LT_POS(curbuf->b_visual.vi_start, curbuf->b_visual.vi_end))
+	အကယ်၍ (LT_POS(curbuf->b_visual.vi_start, curbuf->b_visual.vi_end))
 	{
 	    top = curbuf->b_visual.vi_start;
 	    bot = curbuf->b_visual.vi_end;
 	}
-	else
+	မဟုတ်ပါက
 	{
 	    top = curbuf->b_visual.vi_end;
 	    bot = curbuf->b_visual.vi_start;
 	}
 	// a substitute command may have removed some lines
-	if (bot.lnum > curbuf->b_ml.ml_line_count)
+	အကယ်၍ (bot.lnum > curbuf->b_ml.ml_line_count)
 	    bot.lnum = curbuf->b_ml.ml_line_count;
 	mode = curbuf->b_visual.vi_mode;
 	curswant = curbuf->b_visual.vi_curswant;
     }
     lnum = rex.lnum + rex.reg_firstlnum;
-    if (lnum < top.lnum || lnum > bot.lnum)
-	return FALSE;
+    အကယ်၍ (lnum < top.lnum || lnum > bot.lnum)
+	ပြန်ပေး FALSE;
 
     col = (colnr_T)(rex.input - rex.line);
-    if (mode == 'v')
+    အကယ်၍ (mode == 'v')
     {
-	if ((lnum == top.lnum && col < top.col)
+	အကယ်၍ ((lnum == top.lnum && col < top.col)
 		|| (lnum == bot.lnum && col >= bot.col + (*p_sel != 'e')))
-	    return FALSE;
+	    ပြန်ပေး FALSE;
     }
-    else if (mode == Ctrl_V)
+    မဟုတ်ပါက အကယ်၍ (mode == Ctrl_V)
     {
 	getvvcol(wp, &top, &start, NULL, &end, 0);
 	getvvcol(wp, &bot, &start2, NULL, &end2, 0);
-	if (start2 < start)
+	အကယ်၍ (start2 < start)
 	    start = start2;
-	if (end2 > end)
+	အကယ်၍ (end2 > end)
 	    end = end2;
-	if (top.col == MAXCOL || bot.col == MAXCOL || curswant == MAXCOL)
+	အကယ်၍ (top.col == MAXCOL || bot.col == MAXCOL || curswant == MAXCOL)
 	    end = MAXCOL;
 
 	// getvvcol() flushes rex.line, need to get it again
@@ -1489,32 +1489,32 @@ reg_match_visual(void)
 	rex.input = rex.line + col;
 
 	cols = win_linetabsize(wp, rex.reg_firstlnum + rex.lnum, rex.line, col);
-	if (cols < start || cols > end - (*p_sel == 'e'))
-	    return FALSE;
+	အကယ်၍ (cols < start || cols > end - (*p_sel == 'e'))
+	    ပြန်ပေး FALSE;
     }
-    return TRUE;
+    ပြန်ပေး TRUE;
 }
 
 /*
  * Check the regexp program for its magic number.
  * Return TRUE if it's wrong.
  */
-    static int
+    static ကိန်းပြည့်
 prog_magic_wrong(void)
 {
     regprog_T	*prog;
 
     prog = REG_MULTI ? rex.reg_mmatch->regprog : rex.reg_match->regprog;
-    if (prog->engine == &nfa_regengine)
+    အကယ်၍ (prog->engine == &nfa_regengine)
 	// For NFA matcher we don't check the magic
-	return FALSE;
+	ပြန်ပေး FALSE;
 
-    if (UCHARAT(((bt_regprog_T *)prog)->program) != REGMAGIC)
+    အကယ်၍ (UCHARAT(((bt_regprog_T *)prog)->program) != REGMAGIC)
     {
 	iemsg(e_corrupted_regexp_program);
-	return TRUE;
+	ပြန်ပေး TRUE;
     }
-    return FALSE;
+    ပြန်ပေး FALSE;
 }
 
 /*
@@ -1525,19 +1525,19 @@ prog_magic_wrong(void)
     static void
 cleanup_subexpr(void)
 {
-    if (!rex.need_clear_subexpr)
-	return;
+    အကယ်၍ (!rex.need_clear_subexpr)
+	ပြန်ပေး;
 
-    if (REG_MULTI)
+    အကယ်၍ (REG_MULTI)
     {
 	// Use 0xff to set lnum to -1
-	vim_memset(rex.reg_startpos, 0xff, sizeof(lpos_T) * NSUBEXP);
-	vim_memset(rex.reg_endpos, 0xff, sizeof(lpos_T) * NSUBEXP);
+	vim_memset(rex.reg_startpos, 0xff, parimaa_na(lpos_T) * NSUBEXP);
+	vim_memset(rex.reg_endpos, 0xff, parimaa_na(lpos_T) * NSUBEXP);
     }
-    else
+    မဟုတ်ပါက
     {
-	vim_memset(rex.reg_startp, 0, sizeof(char_u *) * NSUBEXP);
-	vim_memset(rex.reg_endp, 0, sizeof(char_u *) * NSUBEXP);
+	vim_memset(rex.reg_startp, 0, parimaa_na(char_u *) * NSUBEXP);
+	vim_memset(rex.reg_endp, 0, parimaa_na(char_u *) * NSUBEXP);
     }
     rex.need_clear_subexpr = FALSE;
 }
@@ -1546,19 +1546,19 @@ cleanup_subexpr(void)
     static void
 cleanup_zsubexpr(void)
 {
-    if (!rex.need_clear_zsubexpr)
-	return;
+    အကယ်၍ (!rex.need_clear_zsubexpr)
+	ပြန်ပေး;
 
-    if (REG_MULTI)
+    အကယ်၍ (REG_MULTI)
     {
 	// Use 0xff to set lnum to -1
-	vim_memset(reg_startzpos, 0xff, sizeof(lpos_T) * NSUBEXP);
-	vim_memset(reg_endzpos, 0xff, sizeof(lpos_T) * NSUBEXP);
+	vim_memset(reg_startzpos, 0xff, parimaa_na(lpos_T) * NSUBEXP);
+	vim_memset(reg_endzpos, 0xff, parimaa_na(lpos_T) * NSUBEXP);
     }
-    else
+    မဟုတ်ပါက
     {
-	vim_memset(reg_startzp, 0, sizeof(char_u *) * NSUBEXP);
-	vim_memset(reg_endzp, 0, sizeof(char_u *) * NSUBEXP);
+	vim_memset(reg_startzp, 0, parimaa_na(char_u *) * NSUBEXP);
+	vim_memset(reg_endzp, 0, parimaa_na(char_u *) * NSUBEXP);
     }
     rex.need_clear_zsubexpr = FALSE;
 }
@@ -1582,35 +1582,35 @@ reg_nextline(void)
  * last line.
  * Optional: ignore case if rex.reg_ic is set.
  */
-    static int
+    static ကိန်းပြည့်
 match_with_backref(
     linenr_T start_lnum,
     colnr_T  start_col,
     linenr_T end_lnum,
     colnr_T  end_col,
-    int	     *bytelen)
+    ကိန်းပြည့်	     *bytelen)
 {
     linenr_T	clnum = start_lnum;
     colnr_T	ccol = start_col;
-    int		len;
+    ကိန်းပြည့်		len;
     char_u	*p;
 
-    if (bytelen != NULL)
+    အကယ်၍ (bytelen != NULL)
 	*bytelen = 0;
-    for (;;)
+    အတွက် (;;)
     {
 	// Since getting one line may invalidate the other, need to make copy.
 	// Slow!
-	if (rex.line != reg_tofree)
+	အကယ်၍ (rex.line != reg_tofree)
 	{
-	    len = (int)STRLEN(rex.line);
-	    if (reg_tofree == NULL || len >= (int)reg_tofreelen)
+	    len = (ကိန်းပြည့်)STRLEN(rex.line);
+	    အကယ်၍ (reg_tofree == NULL || len >= (ကိန်းပြည့်)reg_tofreelen)
 	    {
 		len += 50;	// get some extra
 		vim_free(reg_tofree);
 		reg_tofree = alloc(len);
-		if (reg_tofree == NULL)
-		    return RA_FAIL; // out of memory!
+		အကယ်၍ (reg_tofree == NULL)
+		    ပြန်ပေး RA_FAIL; // out of memory!
 		reg_tofreelen = len;
 	    }
 	    STRCPY(reg_tofree, rex.line);
@@ -1620,55 +1620,55 @@ match_with_backref(
 
 	// Get the line to compare with.
 	p = reg_getline(clnum);
-	if (clnum == end_lnum)
+	အကယ်၍ (clnum == end_lnum)
 	    len = end_col - ccol;
-	else
-	    len = (int)reg_getline_len(clnum) - ccol;
+	မဟုတ်ပါက
+	    len = (ကိန်းပြည့်)reg_getline_len(clnum) - ccol;
 
 	// Use case-insensitive compare if rex.reg_ic is set
-	if ((!rex.reg_ic && cstrncmp(p + ccol, rex.input, &len) != 0)
+	အကယ်၍ ((!rex.reg_ic && cstrncmp(p + ccol, rex.input, &len) != 0)
 	    || (rex.reg_ic && MB_STRNICMP(p + ccol, rex.input, len) != 0))
-	    return RA_NOMATCH;  // doesn't match
-	if (bytelen != NULL)
+	    ပြန်ပေး RA_NOMATCH;  // doesn't match
+	အကယ်၍ (bytelen != NULL)
 	    *bytelen += len;
-	if (clnum == end_lnum)
-	    break;		// match and at end!
-	if (rex.lnum >= rex.reg_maxline)
-	    return RA_NOMATCH;  // text too short
+	အကယ်၍ (clnum == end_lnum)
+	    bha_nga;		// match and at end!
+	အကယ်၍ (rex.lnum >= rex.reg_maxline)
+	    ပြန်ပေး RA_NOMATCH;  // text too short
 
 	// Advance to next line.
 	reg_nextline();
-	if (bytelen != NULL)
+	အကယ်၍ (bytelen != NULL)
 	    *bytelen = 0;
 	++clnum;
 	ccol = 0;
-	if (got_int)
-	    return RA_FAIL;
+	အကယ်၍ (got_int)
+	    ပြန်ပေး RA_FAIL;
     }
 
     // found a match!  Note that rex.line may now point to a copy of the line,
     // that should not matter.
-    return RA_MATCH;
+    ပြန်ပေး RA_MATCH;
 }
 
 /*
  * Used in a place where no * or \+ can follow.
  */
-    static int
-re_mult_next(char *what)
+    static ကိန်းပြည့်
+re_mult_next(var_na *what)
 {
-    if (re_multi_type(peekchr()) == MULTI_MULT)
+    အကယ်၍ (re_multi_type(peekchr()) == MULTI_MULT)
     {
 	semsg(_(e_nfa_regexp_cannot_repeat_str), what);
 	rc_did_emsg = TRUE;
-	return FAIL;
+	ပြန်ပေး FAIL;
     }
-    return OK;
+    ပြန်ပေး OK;
 }
 
-typedef struct
+typedef sa_nracanaa
 {
-    int a, b, c;
+    ကိန်းပြည့် a, b, c;
 } decomp_T;
 
 
@@ -1726,18 +1726,18 @@ static decomp_T decomp_table[0xfb4f-0xfb20+1] =
 };
 
     static void
-mb_decompose(int c, int *c1, int *c2, int *c3)
+mb_decompose(ကိန်းပြည့် c, ကိန်းပြည့် *c1, ကိန်းပြည့် *c2, ကိန်းပြည့် *c3)
 {
     decomp_T d;
 
-    if (c >= 0xfb20 && c <= 0xfb4f)
+    အကယ်၍ (c >= 0xfb20 && c <= 0xfb4f)
     {
 	d = decomp_table[c - 0xfb20];
 	*c1 = d.a;
 	*c2 = d.b;
 	*c3 = d.c;
     }
-    else
+    မဟုတ်ပါက
     {
 	*c1 = c;
 	*c2 = 0;
@@ -1753,20 +1753,20 @@ mb_decompose(int c, int *c1, int *c2, int *c3)
  * or for utf8 when both utf codepoints are considered equal because of
  * case-folding but have different length (e.g. 's' and 'ſ')
  */
-    static int
-cstrncmp(char_u *s1, char_u *s2, int *n)
+    static ကိန်းပြည့်
+cstrncmp(char_u *s1, char_u *s2, ကိန်းပြည့် *n)
 {
-    int		result;
+    ကိန်းပြည့်		result;
 
-    if (!rex.reg_ic)
+    အကယ်၍ (!rex.reg_ic)
 	result = STRNCMP(s1, s2, *n);
-    else if (enc_utf8)
+    မဟုတ်ပါက အကယ်၍ (enc_utf8)
     {
 	char_u *p = s1;
-	int n2 = 0;
-	int n1 = *n;
+	ကိန်းပြည့် n2 = 0;
+	ကိန်းပြည့် n1 = *n;
 	// count the number of characters for byte-length of s1
-	while (n1 > 0 && *p != NUL)
+	နေစဉ် (n1 > 0 && *p != NUL)
 	{
 	    n1 -= mb_ptr2len(p);
 	    MB_PTR_ADV(p);
@@ -1774,133 +1774,133 @@ cstrncmp(char_u *s1, char_u *s2, int *n)
 	}
 	// count the number of bytes to advance the same number of chars for s2
 	p = s2;
-	while (n2-- > 0 && *p != NUL)
+	နေစဉ် (n2-- > 0 && *p != NUL)
 	    MB_PTR_ADV(p);
 
 	n2 = p - s2;
 
 	result = MB_STRNICMP2(s1, s2, *n, n2);
-	if (result == 0)
+	အကယ်၍ (result == 0)
 	    *n = n2;
     }
-    else
+    မဟုတ်ပါက
 	result = MB_STRNICMP(s1, s2, *n);
 
     // if it failed and it's utf8 and we want to combineignore:
-    if (result != 0 && enc_utf8 && rex.reg_icombine)
+    အကယ်၍ (result != 0 && enc_utf8 && rex.reg_icombine)
     {
 	char_u	*str1, *str2;
-	int	c1, c2, c11, c12;
-	int	junk;
+	ကိန်းပြည့်	c1, c2, c11, c12;
+	ကိန်းပြည့်	junk;
 
 	// we have to handle the strcmp ourselves, since it is necessary to
 	// deal with the composing characters by ignoring them:
 	str1 = s1;
 	str2 = s2;
 	c1 = c2 = 0;
-	while ((int)(str1 - s1) < *n)
+	နေစဉ် ((ကိန်းပြည့်)(str1 - s1) < *n)
 	{
 	    c1 = mb_ptr2char_adv(&str1);
 	    c2 = mb_ptr2char_adv(&str2);
 
 	    // Decompose the character if necessary, into 'base' characters.
 	    // Currently hard-coded for Hebrew, Arabic to be done...
-	    if (c1 != c2 && (!rex.reg_ic || utf_fold(c1) != utf_fold(c2)))
+	    အကယ်၍ (c1 != c2 && (!rex.reg_ic || utf_fold(c1) != utf_fold(c2)))
 	    {
 		// decomposition necessary?
 		mb_decompose(c1, &c11, &junk, &junk);
 		mb_decompose(c2, &c12, &junk, &junk);
 		c1 = c11;
 		c2 = c12;
-		if (c11 != c12
+		အကယ်၍ (c11 != c12
 			    && (!rex.reg_ic || utf_fold(c11) != utf_fold(c12)))
-		    break;
+		    bha_nga;
 	    }
 	}
 	result = c2 - c1;
-	if (result == 0)
-	    *n = (int)(str2 - s2);
+	အကယ်၍ (result == 0)
+	    *n = (ကိန်းပြည့်)(str2 - s2);
     }
 
-    return result;
+    ပြန်ပေး result;
 }
 
 /*
  * cstrchr: This function is used a lot for simple searches, keep it fast!
  */
     static char_u *
-cstrchr(char_u *s, int c)
+cstrchr(char_u *s, ကိန်းပြည့် c)
 {
     char_u	*p;
-    int		cc, lc;
+    ကိန်းပြည့်		cc, lc;
 
-    if (!rex.reg_ic || (!enc_utf8 && mb_char2len(c) > 1))
-	return vim_strchr(s, c);
+    အကယ်၍ (!rex.reg_ic || (!enc_utf8 && mb_char2len(c) > 1))
+	ပြန်ပေး vim_strchr(s, c);
 
     // tolower() and toupper() can be slow, comparing twice should be a lot
     // faster (esp. when using MS Visual C++!).
     // For UTF-8 need to use folded case.
-    if (enc_utf8 && c > 0x80)
+    အကယ်၍ (enc_utf8 && c > 0x80)
     {
 	cc = utf_fold(c);
 	lc = cc;
     }
-    else
-	if (MB_ISUPPER(c))
+    မဟုတ်ပါက
+	အကယ်၍ (MB_ISUPPER(c))
 	{
 	    cc = MB_TOLOWER(c);
 	    lc = cc;
 	}
-	else if (MB_ISLOWER(c))
+	မဟုတ်ပါက အကယ်၍ (MB_ISLOWER(c))
 	{
 	    cc = MB_TOUPPER(c);
 	    lc = c;
 	}
-	else
-	    return vim_strchr(s, c);
+	မဟုတ်ပါက
+	    ပြန်ပေး vim_strchr(s, c);
 
-    if (has_mbyte)
+    အကယ်၍ (has_mbyte)
     {
-	for (p = s; *p != NUL; p += (*mb_ptr2len)(p))
+	အတွက် (p = s; *p != NUL; p += (*mb_ptr2len)(p))
 	{
-	    int uc = utf_ptr2char(p);
-	    if (enc_utf8 && (c > 0x80 || uc > 0x80))
+	    ကိန်းပြည့် uc = utf_ptr2char(p);
+	    အကယ်၍ (enc_utf8 && (c > 0x80 || uc > 0x80))
 	    {
 		// Do not match an illegal byte.  E.g. 0xff matches 0xc3 0xbf,
 		// not 0xff.
 		// compare with lower case of the character
-		if ((uc < 0x80 || uc != *p) && utf_fold(uc) == lc)
-		    return p;
+		အကယ်၍ ((uc < 0x80 || uc != *p) && utf_fold(uc) == lc)
+		    ပြန်ပေး p;
 	    }
-	    else if (*p == c || *p == cc)
-		return p;
+	    မဟုတ်ပါက အကယ်၍ (*p == c || *p == cc)
+		ပြန်ပေး p;
 	}
     }
-    else
+    မဟုတ်ပါက
 	// Faster version for when there are no multi-byte characters.
-	for (p = s; *p != NUL; ++p)
-	    if (*p == c || *p == cc)
-		return p;
+	အတွက် (p = s; *p != NUL; ++p)
+	    အကယ်၍ (*p == c || *p == cc)
+		ပြန်ပေး p;
 
-    return NULL;
+    ပြန်ပေး NULL;
 }
 
 ////////////////////////////////////////////////////////////////
 //		      regsub stuff			      //
 ////////////////////////////////////////////////////////////////
 
-typedef void (*fptr_T)(int *, int);
+typedef void (*fptr_T)(ကိန်းပြည့် *, ကိန်းပြည့်);
 
-static int vim_regsub_both(char_u *source, typval_T *expr, char_u *dest, int destlen, int flags);
+static ကိန်းပြည့် vim_regsub_both(char_u *source, typval_T *expr, char_u *dest, ကိန်းပြည့် destlen, ကိန်းပြည့် flags);
 
     static void
-do_upper(int *d, int c)
+do_upper(ကိန်းပြည့် *d, ကိန်းပြည့် c)
 {
     *d = MB_TOUPPER(c);
 }
 
     static void
-do_lower(int *d, int c)
+do_lower(ကိန်းပြည့် *d, ကိန်းပြည့် c)
 {
     *d = MB_TOLOWER(c);
 }
@@ -1918,16 +1918,16 @@ do_lower(int *d, int c)
  * The tildes are parsed once before the first call to vim_regsub().
  */
     char_u *
-regtilde(char_u *source, int magic)
+regtilde(char_u *source, ကိန်းပြည့် magic)
 {
     char_u	*newsub = source;
     char_u	*p;
     size_t	newsublen = 0;
     char_u	tilde[3] = {'~', NUL, NUL};
     size_t	tildelen = 1;
-    int		error = FALSE;
+    ကိန်းပြည့်		error = FALSE;
 
-    if (!magic)
+    အကယ်၍ (!magic)
     {
 	tilde[0] = '\\';
 	tilde[1] = '~';
@@ -1935,40 +1935,40 @@ regtilde(char_u *source, int magic)
 	tildelen = 2;
     }
 
-    for (p = newsub; *p; ++p)
+    အတွက် (p = newsub; *p; ++p)
     {
-	if (STRNCMP(p, tilde, tildelen) == 0)
+	အကယ်၍ (STRNCMP(p, tilde, tildelen) == 0)
 	{
 	    size_t prefixlen = p - newsub;		// not including the tilde
 	    char_u *postfix = p + tildelen;
 	    size_t postfixlen;
 	    size_t tmpsublen;
 
-	    if (newsublen == 0)
+	    အကယ်၍ (newsublen == 0)
 		newsublen = STRLEN(newsub);
 	    newsublen -= tildelen;
 	    postfixlen = newsublen - prefixlen;
 	    tmpsublen = prefixlen + reg_prev_sublen + postfixlen;
 
-	    if (tmpsublen > 0 && reg_prev_sub != NULL)
+	    အကယ်၍ (tmpsublen > 0 && reg_prev_sub != NULL)
 	    {
 		char_u *tmpsub;
 
 		// Avoid making the text longer than MAXCOL, it will cause
 		// trouble at some point.
-		if (tmpsublen > MAXCOL)
+		အကယ်၍ (tmpsublen > MAXCOL)
 		{
 		    emsg(_(e_resulting_text_too_long));
 		    error = TRUE;
-		    break;
+		    bha_nga;
 		}
 
 		tmpsub = alloc(tmpsublen + 1);
-		if (tmpsub == NULL)
+		အကယ်၍ (tmpsub == NULL)
 		{
 		    emsg(_(e_out_of_memory));
 		    error = TRUE;
-		    break;
+		    bha_nga;
 		}
 
 		// copy prefix
@@ -1978,51 +1978,51 @@ regtilde(char_u *source, int magic)
 		// copy postfix
 		STRCPY(tmpsub + prefixlen + reg_prev_sublen, postfix);
 
-		if (newsub != source)	// allocated newsub before
+		အကယ်၍ (newsub != source)	// allocated newsub before
 		    vim_free(newsub);
 		newsub = tmpsub;
 		newsublen = tmpsublen;
 		p = newsub + prefixlen + reg_prev_sublen;
 	    }
-	    else
+	    မဟုတ်ပါက
 		mch_memmove(p, postfix, postfixlen + 1);	// remove the tilde (+1 for the NUL)
 
 	    --p;
 	}
-	else
+	မဟုတ်ပါက
 	{
-	    if (*p == '\\' && p[1])		// skip escaped characters
+	    အကယ်၍ (*p == '\\' && p[1])		// skip escaped characters
 		++p;
-	    if (has_mbyte)
+	    အကယ်၍ (has_mbyte)
 		p += (*mb_ptr2len)(p) - 1;
 	}
     }
 
-    if (error)
+    အကယ်၍ (error)
     {
-	if (newsub != source)
+	အကယ်၍ (newsub != source)
 	    vim_free(newsub);
-	return source;
+	ပြန်ပေး source;
     }
 
     // Store a copy of newsub  in reg_prev_sub.  It is always allocated,
     // because recursive calls may make the returned string invalid.
     // Only store it if there something to store.
     newsublen = p - newsub;
-    if (newsublen == 0)
+    အကယ်၍ (newsublen == 0)
 	VIM_CLEAR(reg_prev_sub);
-    else
+    မဟုတ်ပါက
     {
 	vim_free(reg_prev_sub);
 	reg_prev_sub = vim_strnsave(newsub, newsublen);
     }
 
-    if (reg_prev_sub == NULL)
+    အကယ်၍ (reg_prev_sub == NULL)
 	reg_prev_sublen = 0;
-    else
+    မဟုတ်ပါက
 	reg_prev_sublen = newsublen;
 
-    return newsub;
+    ပြန်ပေး newsub;
 }
 
 #ifdef FEAT_EVAL
@@ -2031,43 +2031,43 @@ regtilde(char_u *source, int magic)
  * Put the submatches in "argv[argskip]" which is a list passed into
  * call_func() by vim_regsub_both().
  */
-    static int
-fill_submatch_list(int argc UNUSED, typval_T *argv, int argskip, ufunc_T *fp)
+    static ကိန်းပြည့်
+fill_submatch_list(ကိန်းပြည့် argc UNUSED, typval_T *argv, ကိန်းပြည့် argskip, ufunc_T *fp)
 {
     listitem_T	*li;
-    int		i;
+    ကိန်းပြည့်		i;
     char_u	*s;
     typval_T	*listarg = argv + argskip;
 
-    if (!has_varargs(fp) && fp->uf_args.ga_len <= argskip)
+    အကယ်၍ (!has_varargs(fp) && fp->uf_args.ga_len <= argskip)
 	// called function doesn't take a submatches argument
-	return argskip;
+	ပြန်ပေး argskip;
 
     // Relies on sl_list to be the first item in staticList10_T.
     init_static_list((staticList10_T *)(listarg->vval.v_list));
 
     // There are always 10 list items in staticList10_T.
     li = listarg->vval.v_list->lv_first;
-    for (i = 0; i < 10; ++i)
+    အတွက် (i = 0; i < 10; ++i)
     {
 	s = rsm.sm_match->startp[i];
-	if (s == NULL || rsm.sm_match->endp[i] == NULL)
+	အကယ်၍ (s == NULL || rsm.sm_match->endp[i] == NULL)
 	    s = NULL;
-	else
+	မဟုတ်ပါက
 	    s = vim_strnsave(s, rsm.sm_match->endp[i] - s);
 	li->li_tv.v_type = VAR_STRING;
 	li->li_tv.vval.v_string = s;
 	li = li->li_next;
     }
-    return argskip + 1;
+    ပြန်ပေး argskip + 1;
 }
 
     static void
 clear_submatch_list(staticList10_T *sl)
 {
-    int i;
+    ကိန်းပြည့် i;
 
-    for (i = 0; i < 10; ++i)
+    အတွက် (i = 0; i < 10; ++i)
 	vim_free(sl->sl_items[i].li_tv.vval.v_string);
 }
 #endif
@@ -2091,20 +2091,20 @@ clear_submatch_list(staticList10_T *sl)
  *
  * Returns the size of the replacement, including terminating NUL.
  */
-    int
+    ကိန်းပြည့်
 vim_regsub(
     regmatch_T	*rmp,
     char_u	*source,
     typval_T	*expr,
     char_u	*dest,
-    int		destlen,
-    int		flags)
+    ကိန်းပြည့်		destlen,
+    ကိန်းပြည့်		flags)
 {
-    int		result;
+    ကိန်းပြည့်		result;
     regexec_T	rex_save;
-    int		rex_in_use_save = rex_in_use;
+    ကိန်းပြည့်		rex_in_use_save = rex_in_use;
 
-    if (rex_in_use)
+    အကယ်၍ (rex_in_use)
 	// Being called recursively, save the state.
 	rex_save = rex;
     rex_in_use = TRUE;
@@ -2117,26 +2117,26 @@ vim_regsub(
     result = vim_regsub_both(source, expr, dest, destlen, flags);
 
     rex_in_use = rex_in_use_save;
-    if (rex_in_use)
+    အကယ်၍ (rex_in_use)
 	rex = rex_save;
 
-    return result;
+    ပြန်ပေး result;
 }
 
-    int
+    ကိန်းပြည့်
 vim_regsub_multi(
     regmmatch_T	*rmp,
     linenr_T	lnum,
     char_u	*source,
     char_u	*dest,
-    int		destlen,
-    int		flags)
+    ကိန်းပြည့်		destlen,
+    ကိန်းပြည့်		flags)
 {
-    int		result;
+    ကိန်းပြည့်		result;
     regexec_T	rex_save;
-    int		rex_in_use_save = rex_in_use;
+    ကိန်းပြည့်		rex_in_use_save = rex_in_use;
 
-    if (rex_in_use)
+    အကယ်၍ (rex_in_use)
 	// Being called recursively, save the state.
 	rex_save = rex;
     rex_in_use = TRUE;
@@ -2150,66 +2150,66 @@ vim_regsub_multi(
     result = vim_regsub_both(source, NULL, dest, destlen, flags);
 
     rex_in_use = rex_in_use_save;
-    if (rex_in_use)
+    အကယ်၍ (rex_in_use)
 	rex = rex_save;
 
-    return result;
+    ပြန်ပေး result;
 }
 
-#if defined(FEAT_EVAL)
+#အကယ်၍ defined(FEAT_EVAL)
 // When nesting more than a couple levels it's probably a mistake.
 # define MAX_REGSUB_NESTING 4
 static char_u   *eval_result[MAX_REGSUB_NESTING] = {NULL, NULL, NULL, NULL};
 
-# if defined(EXITFREE)
+# အကယ်၍ defined(EXITFREE)
     void
 free_resub_eval_result(void)
 {
-    int i;
+    ကိန်းပြည့် i;
 
-    for (i = 0; i < MAX_REGSUB_NESTING; ++i)
+    အတွက် (i = 0; i < MAX_REGSUB_NESTING; ++i)
 	VIM_CLEAR(eval_result[i]);
 }
 # endif
 #endif
 
-    static int
+    static ကိန်းပြည့်
 vim_regsub_both(
     char_u	*source,
     typval_T	*expr,
     char_u	*dest,
-    int		destlen,
-    int		flags)
+    ကိန်းပြည့်		destlen,
+    ကိန်းပြည့်		flags)
 {
     char_u	*src;
     char_u	*dst;
     char_u	*s;
-    int		c;
-    int		cc;
-    int		no = -1;
+    ကိန်းပြည့်		c;
+    ကိန်းပြည့်		cc;
+    ကိန်းပြည့်		no = -1;
     fptr_T	func_all = (fptr_T)NULL;
     fptr_T	func_one = (fptr_T)NULL;
     linenr_T	clnum = 0;	// init for GCC
-    int		len = 0;	// init for GCC
+    ကိန်းပြည့်		len = 0;	// init for GCC
 #ifdef FEAT_EVAL
-    static int  nesting = 0;
-    int		nested;
+    static ကိန်းပြည့်  nesting = 0;
+    ကိန်းပြည့်		nested;
 #endif
-    int		copy = flags & REGSUB_COPY;
+    ကိန်းပြည့်		copy = flags & REGSUB_COPY;
 
     // Be paranoid...
-    if ((source == NULL && expr == NULL) || dest == NULL)
+    အကယ်၍ ((source == NULL && expr == NULL) || dest == NULL)
     {
 	iemsg(e_null_argument);
-	return 0;
+	ပြန်ပေး 0;
     }
-    if (prog_magic_wrong())
-	return 0;
+    အကယ်၍ (prog_magic_wrong())
+	ပြန်ပေး 0;
 #ifdef FEAT_EVAL
-    if (nesting == MAX_REGSUB_NESTING)
+    အကယ်၍ (nesting == MAX_REGSUB_NESTING)
     {
 	emsg(_(e_substitute_nesting_too_deep));
-	return 0;
+	ပြန်ပေး 0;
     }
     nested = nesting;
 #endif
@@ -2219,7 +2219,7 @@ vim_regsub_both(
     /*
      * When the substitute part starts with "\=" evaluate it as an expression.
      */
-    if (expr != NULL || (source[0] == '\\' && source[1] == '='))
+    အကယ်၍ (expr != NULL || (source[0] == '\\' && source[1] == '='))
     {
 #ifdef FEAT_EVAL
 	// To make sure that the length doesn't change between checking the
@@ -2227,13 +2227,13 @@ vim_regsub_both(
 	// resulting string is saved from the call with
 	// "flags & REGSUB_COPY" == 0 to the call with
 	// "flags & REGSUB_COPY" != 0.
-	if (copy)
+	အကယ်၍ (copy)
 	{
-	    if (eval_result[nested] != NULL)
+	    အကယ်၍ (eval_result[nested] != NULL)
 	    {
-		int eval_len = (int)STRLEN(eval_result[nested]);
+		ကိန်းပြည့် eval_len = (ကိန်းပြည့်)STRLEN(eval_result[nested]);
 
-		if (eval_len < destlen)
+		အကယ်၍ (eval_len < destlen)
 		{
 		    STRCPY(dest, eval_result[nested]);
 		    dst += eval_len;
@@ -2241,9 +2241,9 @@ vim_regsub_both(
 		}
 	    }
 	}
-	else
+	မဟုတ်ပါက
 	{
-	    int		    prev_can_f_submatch = can_f_submatch;
+	    ကိန်းပြည့်		    prev_can_f_submatch = can_f_submatch;
 	    regsubmatch_T   rsm_save;
 
 	    VIM_CLEAR(eval_result[nested]);
@@ -2251,7 +2251,7 @@ vim_regsub_both(
 	    // The expression may contain substitute(), which calls us
 	    // recursively.  Make sure submatch() gets the text from the first
 	    // level.
-	    if (can_f_submatch)
+	    အကယ်၍ (can_f_submatch)
 		rsm_save = rsm;
 	    can_f_submatch = TRUE;
 	    rsm.sm_match = rex.reg_match;
@@ -2265,7 +2265,7 @@ vim_regsub_both(
 	    // an array of eval results.
 	    ++nesting;
 
-	    if (expr != NULL)
+	    အကယ်၍ (expr != NULL)
 	    {
 		typval_T	argv[2];
 		char_u		buf[NUMBUFLEN];
@@ -2281,12 +2281,12 @@ vim_regsub_both(
 		CLEAR_FIELD(funcexe);
 		funcexe.fe_argv_func = fill_submatch_list;
 		funcexe.fe_evaluate = TRUE;
-		if (expr->v_type == VAR_FUNC)
+		အကယ်၍ (expr->v_type == VAR_FUNC)
 		{
 		    s = expr->vval.v_string;
 		    call_func(s, -1, &rettv, 1, argv, &funcexe);
 		}
-		else if (expr->v_type == VAR_PARTIAL)
+		မဟုတ်ပါက အကယ်၍ (expr->v_type == VAR_PARTIAL)
 		{
 		    partial_T   *partial = expr->vval.v_partial;
 
@@ -2294,44 +2294,44 @@ vim_regsub_both(
 		    funcexe.fe_partial = partial;
 		    call_func(s, -1, &rettv, 1, argv, &funcexe);
 		}
-		else if (expr->v_type == VAR_INSTR)
+		မဟုတ်ပါက အကယ်၍ (expr->v_type == VAR_INSTR)
 		{
 		    exe_typval_instr(expr, &rettv);
 		}
-		if (matchList.sl_list.lv_len > 0)
+		အကယ်၍ (matchList.sl_list.lv_len > 0)
 		    // fill_submatch_list() was called
 		    clear_submatch_list(&matchList);
 
-		if (rettv.v_type == VAR_UNKNOWN)
+		အကယ်၍ (rettv.v_type == VAR_UNKNOWN)
 		    // something failed, no need to report another error
 		    eval_result[nested] = NULL;
-		else
+		မဟုတ်ပါက
 		{
 		    eval_result[nested] = tv_get_string_buf_chk(&rettv, buf);
-		    if (eval_result[nested] != NULL)
+		    အကယ်၍ (eval_result[nested] != NULL)
 			eval_result[nested] = vim_strsave(eval_result[nested]);
 		}
 		clear_tv(&rettv);
 	    }
-	    else if (substitute_instr != NULL)
+	    မဟုတ်ပါက အကယ်၍ (substitute_instr != NULL)
 		// Execute instructions from ISN_SUBSTITUTE.
 		eval_result[nested] = exe_substitute_instr();
-	    else
+	    မဟုတ်ပါက
 		eval_result[nested] = eval_to_string(source + 2, TRUE, FALSE);
 	    --nesting;
 
-	    if (eval_result[nested] != NULL)
+	    အကယ်၍ (eval_result[nested] != NULL)
 	    {
-		int had_backslash = FALSE;
+		ကိန်းပြည့် had_backslash = FALSE;
 
-		for (s = eval_result[nested]; *s != NUL; MB_PTR_ADV(s))
+		အတွက် (s = eval_result[nested]; *s != NUL; MB_PTR_ADV(s))
 		{
 		    // Change NL to CR, so that it becomes a line break,
 		    // unless called from vim_regexec_nl().
 		    // Skip over a backslashed character.
-		    if (*s == NL && !rsm.sm_line_lbr)
+		    အကယ်၍ (*s == NL && !rsm.sm_line_lbr)
 			*s = CAR;
-		    else if (*s == '\\' && s[1] != NUL)
+		    မဟုတ်ပါက အကယ်၍ (*s == '\\' && s[1] != NUL)
 		    {
 			++s;
 			/* Change NL to CR here too, so that this works:
@@ -2340,16 +2340,16 @@ vim_regsub_both(
 			 *   def
 			 * Not when called from vim_regexec_nl().
 			 */
-			if (*s == NL && !rsm.sm_line_lbr)
+			အကယ်၍ (*s == NL && !rsm.sm_line_lbr)
 			    *s = CAR;
 			had_backslash = TRUE;
 		    }
 		}
-		if (had_backslash && (flags & REGSUB_BACKSLASH))
+		အကယ်၍ (had_backslash && (flags & REGSUB_BACKSLASH))
 		{
 		    // Backslashes will be consumed, need to double them.
 		    s = vim_strsave_escaped(eval_result[nested], (char_u *)"\\");
-		    if (s != NULL)
+		    အကယ်၍ (s != NULL)
 		    {
 			vim_free(eval_result[nested]);
 			eval_result[nested] = s;
@@ -2360,62 +2360,62 @@ vim_regsub_both(
 	    }
 
 	    can_f_submatch = prev_can_f_submatch;
-	    if (can_f_submatch)
+	    အကယ်၍ (can_f_submatch)
 		rsm = rsm_save;
 	}
 #endif
     }
-    else
-      while ((c = *src++) != NUL)
+    မဟုတ်ပါက
+      နေစဉ် ((c = *src++) != NUL)
       {
-	if (c == '&' && (flags & REGSUB_MAGIC))
+	အကယ်၍ (c == '&' && (flags & REGSUB_MAGIC))
 	    no = 0;
-	else if (c == '\\' && *src != NUL)
+	မဟုတ်ပါက အကယ်၍ (c == '\\' && *src != NUL)
 	{
-	    if (*src == '&' && !(flags & REGSUB_MAGIC))
+	    အကယ်၍ (*src == '&' && !(flags & REGSUB_MAGIC))
 	    {
 		++src;
 		no = 0;
 	    }
-	    else if ('0' <= *src && *src <= '9')
+	    မဟုတ်ပါက အကယ်၍ ('0' <= *src && *src <= '9')
 	    {
 		no = *src++ - '0';
 	    }
-	    else if (vim_strchr((char_u *)"uUlLeE", *src))
+	    မဟုတ်ပါက အကယ်၍ (vim_strchr((char_u *)"uUlLeE", *src))
 	    {
 		switch (*src++)
 		{
-		case 'u':   func_one = do_upper;
+		pak_sa 'u':   func_one = do_upper;
 			    continue;
-		case 'U':   func_all = do_upper;
+		pak_sa 'U':   func_all = do_upper;
 			    continue;
-		case 'l':   func_one = do_lower;
+		pak_sa 'l':   func_one = do_lower;
 			    continue;
-		case 'L':   func_all = do_lower;
+		pak_sa 'L':   func_all = do_lower;
 			    continue;
-		case 'e':
-		case 'E':   func_one = func_all = (fptr_T)NULL;
+		pak_sa 'e':
+		pak_sa 'E':   func_one = func_all = (fptr_T)NULL;
 			    continue;
 		}
 	    }
 	}
-	if (no < 0)	      // Ordinary character.
+	အကယ်၍ (no < 0)	      // Ordinary character.
 	{
-	    if (c == K_SPECIAL && src[0] != NUL && src[1] != NUL)
+	    အကယ်၍ (c == K_SPECIAL && src[0] != NUL && src[1] != NUL)
 	    {
 		// Copy a special key as-is.
-		if (copy)
+		အကယ်၍ (copy)
 		{
-		    if (dst + 3 > dest + destlen)
+		    အကယ်၍ (dst + 3 > dest + destlen)
 		    {
 			iemsg("vim_regsub_both(): not enough space");
-			return 0;
+			ပြန်ပေး 0;
 		    }
 		    *dst++ = c;
 		    *dst++ = *src++;
 		    *dst++ = *src++;
 		}
-		else
+		မဟုတ်ပါက
 		{
 		    dst += 3;
 		    src += 2;
@@ -2423,28 +2423,28 @@ vim_regsub_both(
 		continue;
 	    }
 
-	    if (c == '\\' && *src != NUL)
+	    အကယ်၍ (c == '\\' && *src != NUL)
 	    {
 		// Check for abbreviations -- webb
 		switch (*src)
 		{
-		    case 'r':	c = CAR;	++src;	break;
-		    case 'n':	c = NL;		++src;	break;
-		    case 't':	c = TAB;	++src;	break;
+		    pak_sa 'r':	c = CAR;	++src;	bha_nga;
+		    pak_sa 'n':	c = NL;		++src;	bha_nga;
+		    pak_sa 't':	c = TAB;	++src;	bha_nga;
 		 // Oh no!  \e already has meaning in subst pat :-(
 		 // case 'e':   c = ESC;	++src;	break;
-		    case 'b':	c = Ctrl_H;	++src;	break;
+		    pak_sa 'b':	c = Ctrl_H;	++src;	bha_nga;
 
 		    // If "backslash" is TRUE the backslash will be removed
 		    // later.  Used to insert a literal CR.
-		    default:	if (flags & REGSUB_BACKSLASH)
+		    default:	အကယ်၍ (flags & REGSUB_BACKSLASH)
 				{
-				    if (copy)
+				    အကယ်၍ (copy)
 				    {
-					if (dst + 1 > dest + destlen)
+					အကယ်၍ (dst + 1 > dest + destlen)
 					{
 					    iemsg("vim_regsub_both(): not enough space");
-					    return 0;
+					    ပြန်ပေး 0;
 					}
 					*dst = '\\';
 				    }
@@ -2453,49 +2453,49 @@ vim_regsub_both(
 				c = *src++;
 		}
 	    }
-	    else if (has_mbyte)
+	    မဟုတ်ပါက အကယ်၍ (has_mbyte)
 		c = mb_ptr2char(src - 1);
 
 	    // Write to buffer, if copy is set.
-	    if (func_one != (fptr_T)NULL)
+	    အကယ်၍ (func_one != (fptr_T)NULL)
 	    {
 		func_one(&cc, c);
 		func_one = NULL;
 	    }
-	    else if (func_all != (fptr_T)NULL)
+	    မဟုတ်ပါက အကယ်၍ (func_all != (fptr_T)NULL)
 		func_all(&cc, c);
-	    else // just copy
+	    မဟုတ်ပါက // just copy
 		cc = c;
 
-	    if (has_mbyte)
+	    အကယ်၍ (has_mbyte)
 	    {
-		int totlen = mb_ptr2len(src - 1);
-		int charlen = mb_char2len(cc);
+		ကိန်းပြည့် totlen = mb_ptr2len(src - 1);
+		ကိန်းပြည့် charlen = mb_char2len(cc);
 
-		if (copy)
+		အကယ်၍ (copy)
 		{
-		    if (dst + charlen > dest + destlen)
+		    အကယ်၍ (dst + charlen > dest + destlen)
 		    {
 			iemsg("vim_regsub_both(): not enough space");
-			return 0;
+			ပြန်ပေး 0;
 		    }
 		    mb_char2bytes(cc, dst);
 		}
 		dst += charlen - 1;
-		if (enc_utf8)
+		အကယ်၍ (enc_utf8)
 		{
-		    int clen = utf_ptr2len(src - 1);
+		    ကိန်းပြည့် clen = utf_ptr2len(src - 1);
 
 		    // If the character length is shorter than "totlen", there
 		    // are composing characters; copy them as-is.
-		    if (clen < totlen)
+		    အကယ်၍ (clen < totlen)
 		    {
-			if (copy)
+			အကယ်၍ (copy)
 			{
-			    if (dst + totlen - clen > dest + destlen)
+			    အကယ်၍ (dst + totlen - clen > dest + destlen)
 			    {
 				iemsg("vim_regsub_both(): not enough space");
-				return 0;
+				ပြန်ပေး 0;
 			    }
 			    mch_memmove(dst + 1, src - 1 + clen,
 						     (size_t)(totlen - clen));
@@ -2505,80 +2505,80 @@ vim_regsub_both(
 		}
 		src += totlen - 1;
 	    }
-	    else if (copy)
+	    မဟုတ်ပါက အကယ်၍ (copy)
 	    {
-		if (dst + 1 > dest + destlen)
+		အကယ်၍ (dst + 1 > dest + destlen)
 		{
 		    iemsg("vim_regsub_both(): not enough space");
-		    return 0;
+		    ပြန်ပေး 0;
 		}
 		*dst = cc;
 	    }
 	    dst++;
 	}
-	else
+	မဟုတ်ပါက
 	{
-	    if (REG_MULTI)
+	    အကယ်၍ (REG_MULTI)
 	    {
 		clnum = rex.reg_mmatch->startpos[no].lnum;
-		if (clnum < 0 || rex.reg_mmatch->endpos[no].lnum < 0)
+		အကယ်၍ (clnum < 0 || rex.reg_mmatch->endpos[no].lnum < 0)
 		    s = NULL;
-		else
+		မဟုတ်ပါက
 		{
 		    s = reg_getline(clnum) + rex.reg_mmatch->startpos[no].col;
-		    if (rex.reg_mmatch->endpos[no].lnum == clnum)
+		    အကယ်၍ (rex.reg_mmatch->endpos[no].lnum == clnum)
 			len = rex.reg_mmatch->endpos[no].col
 					    - rex.reg_mmatch->startpos[no].col;
-		    else
-			len = (int)reg_getline_len(clnum) - rex.reg_mmatch->startpos[no].col;
+		    မဟုတ်ပါက
+			len = (ကိန်းပြည့်)reg_getline_len(clnum) - rex.reg_mmatch->startpos[no].col;
 		}
 	    }
-	    else
+	    မဟုတ်ပါက
 	    {
 		s = rex.reg_match->startp[no];
-		if (rex.reg_match->endp[no] == NULL)
+		အကယ်၍ (rex.reg_match->endp[no] == NULL)
 		    s = NULL;
-		else
-		    len = (int)(rex.reg_match->endp[no] - s);
+		မဟုတ်ပါက
+		    len = (ကိန်းပြည့်)(rex.reg_match->endp[no] - s);
 	    }
-	    if (s != NULL)
+	    အကယ်၍ (s != NULL)
 	    {
-		for (;;)
+		အတွက် (;;)
 		{
-		    if (len == 0)
+		    အကယ်၍ (len == 0)
 		    {
-			if (REG_MULTI)
+			အကယ်၍ (REG_MULTI)
 			{
-			    if (rex.reg_mmatch->endpos[no].lnum == clnum)
-				break;
-			    if (copy)
+			    အကယ်၍ (rex.reg_mmatch->endpos[no].lnum == clnum)
+				bha_nga;
+			    အကယ်၍ (copy)
 			    {
-				if (dst + 1 > dest + destlen)
+				အကယ်၍ (dst + 1 > dest + destlen)
 				{
 				    iemsg("vim_regsub_both(): not enough space");
-				    return 0;
+				    ပြန်ပေး 0;
 				}
 				*dst = CAR;
 			    }
 			    ++dst;
 			    s = reg_getline(++clnum);
-			    if (rex.reg_mmatch->endpos[no].lnum == clnum)
+			    အကယ်၍ (rex.reg_mmatch->endpos[no].lnum == clnum)
 				len = rex.reg_mmatch->endpos[no].col;
-			    else
-				len = (int)reg_getline_len(clnum);
+			    မဟုတ်ပါက
+				len = (ကိန်းပြည့်)reg_getline_len(clnum);
 			}
-			else
-			    break;
+			မဟုတ်ပါက
+			    bha_nga;
 		    }
-		    else if (*s == NUL) // we hit NUL.
+		    မဟုတ်ပါက အကယ်၍ (*s == NUL) // we hit NUL.
 		    {
-			if (copy)
+			အကယ်၍ (copy)
 			    iemsg(e_damaged_match_string);
 			goto exit;
 		    }
-		    else
+		    မဟုတ်ပါက
 		    {
-			if ((flags & REGSUB_BACKSLASH)
+			အကယ်၍ ((flags & REGSUB_BACKSLASH)
 						  && (*s == CAR || *s == '\\'))
 			{
 			    /*
@@ -2587,67 +2587,67 @@ vim_regsub_both(
 			     * Number of backslashes will be halved later,
 			     * double them here.
 			     */
-			    if (copy)
+			    အကယ်၍ (copy)
 			    {
-				if (dst + 2 > dest + destlen)
+				အကယ်၍ (dst + 2 > dest + destlen)
 				{
 				    iemsg("vim_regsub_both(): not enough space");
-				    return 0;
+				    ပြန်ပေး 0;
 				}
 				dst[0] = '\\';
 				dst[1] = *s;
 			    }
 			    dst += 2;
 			}
-			else
+			မဟုတ်ပါက
 			{
-			    if (has_mbyte)
+			    အကယ်၍ (has_mbyte)
 				c = mb_ptr2char(s);
-			    else
+			    မဟုတ်ပါက
 				c = *s;
 
-			    if (func_one != (fptr_T)NULL)
+			    အကယ်၍ (func_one != (fptr_T)NULL)
 			    {
 				func_one(&cc, c);
 				func_one = NULL;
 			    }
-			    else if (func_all != (fptr_T)NULL)
+			    မဟုတ်ပါက အကယ်၍ (func_all != (fptr_T)NULL)
 				func_all(&cc, c);
-			    else // just copy
+			    မဟုတ်ပါက // just copy
 				cc = c;
 
-			    if (has_mbyte)
+			    အကယ်၍ (has_mbyte)
 			    {
-				int l;
-				int charlen;
+				ကိန်းပြည့် l;
+				ကိန်းပြည့် charlen;
 
 				// Copy composing characters separately, one
 				// at a time.
-				if (enc_utf8)
+				အကယ်၍ (enc_utf8)
 				    l = utf_ptr2len(s) - 1;
-				else
+				မဟုတ်ပါက
 				    l = mb_ptr2len(s) - 1;
 
 				s += l;
 				len -= l;
 				charlen = mb_char2len(cc);
-				if (copy)
+				အကယ်၍ (copy)
 				{
-				    if (dst + charlen > dest + destlen)
+				    အကယ်၍ (dst + charlen > dest + destlen)
 				    {
 					iemsg("vim_regsub_both(): not enough space");
-					return 0;
+					ပြန်ပေး 0;
 				    }
 				    mb_char2bytes(cc, dst);
 				}
 				dst += charlen - 1;
 			    }
-			    else if (copy)
+			    မဟုတ်ပါက အကယ်၍ (copy)
 			    {
-				if (dst + 1 > dest + destlen)
+				အကယ်၍ (dst + 1 > dest + destlen)
 				{
 				    iemsg("vim_regsub_both(): not enough space");
-				    return 0;
+				    ပြန်ပေး 0;
 				}
 				*dst = cc;
 			    }
@@ -2662,11 +2662,11 @@ vim_regsub_both(
 	    no = -1;
 	}
       }
-    if (copy)
+    အကယ်၍ (copy)
 	*dst = NUL;
 
 exit:
-    return (int)((dst - dest) + 1);
+    ပြန်ပေး (ကိန်းပြည့်)((dst - dest) + 1);
 }
 
 #ifdef FEAT_EVAL
@@ -2678,7 +2678,7 @@ reg_getline_submatch(linenr_T lnum)
 
     reg_getline_common(lnum, RGLF_LINE | RGLF_SUBMATCH, &line, NULL);
 
-    return line;
+    ပြန်ပေး line;
 }
 
     static colnr_T
@@ -2688,7 +2688,7 @@ reg_getline_submatch_len(linenr_T lnum)
 
     reg_getline_common(lnum, RGLF_LENGTH | RGLF_SUBMATCH, NULL, &length);
 
-    return length;
+    ပြန်ပေး length;
 }
 
 /*
@@ -2697,92 +2697,92 @@ reg_getline_submatch_len(linenr_T lnum)
  * Returns NULL when not in a ":s" command and for a non-existing submatch.
  */
     char_u *
-reg_submatch(int no)
+reg_submatch(ကိန်းပြည့် no)
 {
     char_u	*retval = NULL;
     char_u	*s;
-    int		len;
-    int		round;
+    ကိန်းပြည့်		len;
+    ကိန်းပြည့်		round;
     linenr_T	lnum;
 
-    if (!can_f_submatch || no < 0)
-	return NULL;
+    အကယ်၍ (!can_f_submatch || no < 0)
+	ပြန်ပေး NULL;
 
-    if (rsm.sm_match == NULL)
+    အကယ်၍ (rsm.sm_match == NULL)
     {
 	/*
 	 * First round: compute the length and allocate memory.
 	 * Second round: copy the text.
 	 */
-	for (round = 1; round <= 2; ++round)
+	အတွက် (round = 1; round <= 2; ++round)
 	{
 	    lnum = rsm.sm_mmatch->startpos[no].lnum;
-	    if (lnum < 0 || rsm.sm_mmatch->endpos[no].lnum < 0)
-		return NULL;
+	    အကယ်၍ (lnum < 0 || rsm.sm_mmatch->endpos[no].lnum < 0)
+		ပြန်ပေး NULL;
 
 	    s = reg_getline_submatch(lnum);
-	    if (s == NULL)  // anti-crash check, cannot happen?
-		break;
+	    အကယ်၍ (s == NULL)  // anti-crash check, cannot happen?
+		bha_nga;
 	    s += rsm.sm_mmatch->startpos[no].col;
-	    if (rsm.sm_mmatch->endpos[no].lnum == lnum)
+	    အကယ်၍ (rsm.sm_mmatch->endpos[no].lnum == lnum)
 	    {
 		// Within one line: take form start to end col.
 		len = rsm.sm_mmatch->endpos[no].col
 					  - rsm.sm_mmatch->startpos[no].col;
-		if (round == 2)
+		အကယ်၍ (round == 2)
 		    vim_strncpy(retval, s, len);
 		++len;
 	    }
-	    else
+	    မဟုတ်ပါက
 	    {
 		// Multiple lines: take start line from start col, middle
 		// lines completely and end line up to end col.
-		len = (int)reg_getline_submatch_len(lnum) - rsm.sm_mmatch->startpos[no].col;
-		if (round == 2)
+		len = (ကိန်းပြည့်)reg_getline_submatch_len(lnum) - rsm.sm_mmatch->startpos[no].col;
+		အကယ်၍ (round == 2)
 		{
 		    STRCPY(retval, s);
 		    retval[len] = '\n';
 		}
 		++len;
 		++lnum;
-		while (lnum < rsm.sm_mmatch->endpos[no].lnum)
+		နေစဉ် (lnum < rsm.sm_mmatch->endpos[no].lnum)
 		{
 		    s = reg_getline_submatch(lnum);
-		    if (round == 2)
+		    အကယ်၍ (round == 2)
 			STRCPY(retval + len, s);
-		    len += (int)reg_getline_submatch_len(lnum);
-		    if (round == 2)
+		    len += (ကိန်းပြည့်)reg_getline_submatch_len(lnum);
+		    အကယ်၍ (round == 2)
 			retval[len] = '\n';
 		    ++len;
 		    ++lnum;
 		}
-		if (round == 2)
+		အကယ်၍ (round == 2)
 		    STRNCPY(retval + len, reg_getline_submatch(lnum),
 					     rsm.sm_mmatch->endpos[no].col);
 		len += rsm.sm_mmatch->endpos[no].col;
-		if (round == 2)
+		အကယ်၍ (round == 2)
 		    retval[len] = NUL;
 		++len;
 	    }
 
-	    if (retval == NULL)
+	    အကယ်၍ (retval == NULL)
 	    {
 		retval = alloc(len);
-		if (retval == NULL)
-		    return NULL;
+		အကယ်၍ (retval == NULL)
+		    ပြန်ပေး NULL;
 	    }
 	}
     }
-    else
+    မဟုတ်ပါက
     {
 	s = rsm.sm_match->startp[no];
-	if (s == NULL || rsm.sm_match->endp[no] == NULL)
+	အကယ်၍ (s == NULL || rsm.sm_match->endp[no] == NULL)
 	    retval = NULL;
-	else
+	မဟုတ်ပါက
 	    retval = vim_strnsave(s, rsm.sm_match->endp[no] - s);
     }
 
-    return retval;
+    ပြန်ပေး retval;
 }
 
 /*
@@ -2793,77 +2793,77 @@ reg_submatch(int no)
  * command, for a non-existing submatch and for any error.
  */
     list_T *
-reg_submatch_list(int no)
+reg_submatch_list(ကိန်းပြည့် no)
 {
     char_u	*s;
     linenr_T	slnum;
     linenr_T	elnum;
     colnr_T	scol;
     colnr_T	ecol;
-    int		i;
+    ကိန်းပြည့်		i;
     list_T	*list;
-    int		error = FALSE;
+    ကိန်းပြည့်		error = FALSE;
 
-    if (!can_f_submatch || no < 0)
-	return NULL;
+    အကယ်၍ (!can_f_submatch || no < 0)
+	ပြန်ပေး NULL;
 
-    if (rsm.sm_match == NULL)
+    အကယ်၍ (rsm.sm_match == NULL)
     {
 	slnum = rsm.sm_mmatch->startpos[no].lnum;
 	elnum = rsm.sm_mmatch->endpos[no].lnum;
-	if (slnum < 0 || elnum < 0)
-	    return NULL;
+	အကယ်၍ (slnum < 0 || elnum < 0)
+	    ပြန်ပေး NULL;
 
 	scol = rsm.sm_mmatch->startpos[no].col;
 	ecol = rsm.sm_mmatch->endpos[no].col;
 
 	list = list_alloc();
-	if (list == NULL)
-	    return NULL;
+	အကယ်၍ (list == NULL)
+	    ပြန်ပေး NULL;
 
 	s = reg_getline_submatch(slnum) + scol;
-	if (slnum == elnum)
+	အကယ်၍ (slnum == elnum)
 	{
-	    if (list_append_string(list, s, ecol - scol) == FAIL)
+	    အကယ်၍ (list_append_string(list, s, ecol - scol) == FAIL)
 		error = TRUE;
 	}
-	else
+	မဟုတ်ပါက
 	{
-	    int max_lnum = elnum - slnum;
+	    ကိန်းပြည့် max_lnum = elnum - slnum;
 
-	    if (list_append_string(list, s, -1) == FAIL)
+	    အကယ်၍ (list_append_string(list, s, -1) == FAIL)
 		error = TRUE;
-	    for (i = 1; i < max_lnum; i++)
+	    အတွက် (i = 1; i < max_lnum; i++)
 	    {
 		s = reg_getline_submatch(slnum + i);
-		if (list_append_string(list, s, -1) == FAIL)
+		အကယ်၍ (list_append_string(list, s, -1) == FAIL)
 		    error = TRUE;
 	    }
 	    s = reg_getline_submatch(elnum);
-	    if (list_append_string(list, s, ecol) == FAIL)
+	    အကယ်၍ (list_append_string(list, s, ecol) == FAIL)
 		error = TRUE;
 	}
     }
-    else
+    မဟုတ်ပါက
     {
 	s = rsm.sm_match->startp[no];
-	if (s == NULL || rsm.sm_match->endp[no] == NULL)
-	    return NULL;
+	အကယ်၍ (s == NULL || rsm.sm_match->endp[no] == NULL)
+	    ပြန်ပေး NULL;
 	list = list_alloc();
-	if (list == NULL)
-	    return NULL;
-	if (list_append_string(list, s,
-				 (int)(rsm.sm_match->endp[no] - s)) == FAIL)
+	အကယ်၍ (list == NULL)
+	    ပြန်ပေး NULL;
+	အကယ်၍ (list_append_string(list, s,
+				 (ကိန်းပြည့်)(rsm.sm_match->endp[no] - s)) == FAIL)
 	    error = TRUE;
     }
 
-    if (error)
+    အကယ်၍ (error)
     {
 	list_free(list);
-	return NULL;
+	ပြန်ပေး NULL;
     }
     ++list->lv_refcount;
-    return list;
+    ပြန်ပေး list;
 }
 #endif
 
@@ -2905,98 +2905,98 @@ init_regexec_multi(
  * when the collection also matches a newline.  Returns -1 when the collection
  * is not a plain combination of the recognized ranges.
  */
-    static int
-get_char_class_bits(char_u *start, char_u *end, int *newl)
+    static ကိန်းပြည့်
+get_char_class_bits(char_u *start, char_u *end, ကိန်းပြည့် *newl)
 {
     char_u	*p = start;
-    int		config = 0;
+    ကိန်းပြည့်		config = 0;
 
     *newl = FALSE;
-    if (*end != ']')
-	return -1;
-    if (*p == '^')
+    အကယ်၍ (*end != ']')
+	ပြန်ပေး -1;
+    အကယ်၍ (*p == '^')
     {
 	config |= CLASS_not;
 	p++;
     }
 
-    while (p < end)
+    နေစဉ် (p < end)
     {
-	if (p + 2 < end && *(p + 1) == '-')
+	အကယ်၍ (p + 2 < end && *(p + 1) == '-')
 	{
 	    switch (*p)
 	    {
-		case '0':
-		    if (*(p + 2) == '9')
+		pak_sa '0':
+		    အကယ်၍ (*(p + 2) == '9')
 		    {
 			config |= CLASS_o9;
-			break;
+			bha_nga;
 		    }
-		    if (*(p + 2) == '7')
+		    အကယ်၍ (*(p + 2) == '7')
 		    {
 			config |= CLASS_o7;
-			break;
+			bha_nga;
 		    }
-		    return -1;
+		    ပြန်ပေး -1;
 
-		case 'a':
-		    if (*(p + 2) == 'z')
+		pak_sa 'a':
+		    အကယ်၍ (*(p + 2) == 'z')
 		    {
 			config |= CLASS_az;
-			break;
+			bha_nga;
 		    }
-		    if (*(p + 2) == 'f')
+		    အကယ်၍ (*(p + 2) == 'f')
 		    {
 			config |= CLASS_af;
-			break;
+			bha_nga;
 		    }
-		    return -1;
+		    ပြန်ပေး -1;
 
-		case 'A':
-		    if (*(p + 2) == 'Z')
+		pak_sa 'A':
+		    အကယ်၍ (*(p + 2) == 'Z')
 		    {
 			config |= CLASS_AZ;
-			break;
+			bha_nga;
 		    }
-		    if (*(p + 2) == 'F')
+		    အကယ်၍ (*(p + 2) == 'F')
 		    {
 			config |= CLASS_AF;
-			break;
+			bha_nga;
 		    }
-		    return -1;
+		    ပြန်ပေး -1;
 
 		default:
-		    return -1;
+		    ပြန်ပေး -1;
 	    }
 	    p += 3;
 	}
-	else if (p + 1 < end && *p == '\\' && *(p + 1) == 'n')
+	မဟုတ်ပါက အကယ်၍ (p + 1 < end && *p == '\\' && *(p + 1) == 'n')
 	{
 	    *newl = TRUE;
 	    p += 2;
 	}
-	else if (*p == '_')
+	မဟုတ်ပါက အကယ်၍ (*p == '_')
 	{
 	    config |= CLASS_underscore;
 	    p++;
 	}
-	else if (*p == '\n')
+	မဟုတ်ပါက အကယ်၍ (*p == '\n')
 	{
 	    *newl = TRUE;
 	    p++;
 	}
-	else
-	    return -1;
+	မဟုတ်ပါက
+	    ပြန်ပေး -1;
     } // while (p < end)
 
-    if (p != end)
-	return -1;
+    အကယ်၍ (p != end)
+	ပြန်ပေး -1;
 
     // U+017F and U+212A fold to ASCII 's' and 'k', missed by the class opcodes
-    if (enc_utf8 && (config & (CLASS_az | CLASS_AZ)))
-	return -1;
+    အကယ်၍ (enc_utf8 && (config & (CLASS_az | CLASS_AZ)))
+	ပြန်ပေး -1;
 
-    return config;
+    ပြန်ပေး config;
 }
 
 #include "regexp_bt.c"
@@ -3027,7 +3027,7 @@ static regengine_T nfa_regengine =
 
 // Which regexp engine to use? Needed for vim_regcomp().
 // Must match with 'regexpengine'.
-static int regexp_engine = 0;
+static ကိန်းပြည့် regexp_engine = 0;
 
 #ifdef DEBUG
 static const char_u regname[][30] = {
@@ -3044,20 +3044,20 @@ static const char_u regname[][30] = {
  * Returns NULL for an error.
  */
     regprog_T *
-vim_regcomp(char_u *expr_arg, int re_flags)
+vim_regcomp(char_u *expr_arg, ကိန်းပြည့် re_flags)
 {
     regprog_T   *prog = NULL;
     char_u	*expr = expr_arg;
-    int		called_emsg_before;
+    ကိန်းပြည့်		called_emsg_before;
 
     regexp_engine = p_re;
 
     // Check for prefix "\%#=", that sets the regexp engine
-    if (STRNCMP(expr, "\\%#=", 4) == 0)
+    အကယ်၍ (STRNCMP(expr, "\\%#=", 4) == 0)
     {
-	int newengine = expr[4] - '0';
+	ကိန်းပြည့် newengine = expr[4] - '0';
 
-	if (newengine == AUTOMATIC_ENGINE
+	အကယ်၍ (newengine == AUTOMATIC_ENGINE
 	    || newengine == BACKTRACKING_ENGINE
 	    || newengine == NFA_ENGINE)
 	{
@@ -3068,7 +3068,7 @@ vim_regcomp(char_u *expr_arg, int re_flags)
 					   regexp_engine, regname[newengine]);
 #endif
 	}
-	else
+	မဟုတ်ပါက
 	{
 	    emsg(_(e_percent_hash_can_only_be_followed_by_zero_one_two_automatic_engine_will_be_used));
 	    regexp_engine = AUTOMATIC_ENGINE;
@@ -3085,26 +3085,26 @@ vim_regcomp(char_u *expr_arg, int re_flags)
      * First try the NFA engine, unless backtracking was requested.
      */
     called_emsg_before = called_emsg;
-    if (regexp_engine != BACKTRACKING_ENGINE)
+    အကယ်၍ (regexp_engine != BACKTRACKING_ENGINE)
 	prog = nfa_regengine.regcomp(expr,
 		re_flags + (regexp_engine == AUTOMATIC_ENGINE ? RE_AUTO : 0));
-    else
+    မဟုတ်ပါက
 	prog = bt_regengine.regcomp(expr, re_flags);
 
     // Check for error compiling regexp with initial engine.
-    if (prog == NULL)
+    အကယ်၍ (prog == NULL)
     {
 #ifdef BT_REGEXP_DEBUG_LOG
-	if (regexp_engine == BACKTRACKING_ENGINE)   // debugging log for BT engine
+	အကယ်၍ (regexp_engine == BACKTRACKING_ENGINE)   // debugging log for BT engine
 	{
 	    FILE *f;
 	    f = fopen(BT_REGEXP_DEBUG_LOG_NAME, "a");
-	    if (f)
+	    အကယ်၍ (f)
 	    {
 		fprintf(f, "Syntax error in \"%s\"\n", expr);
 		fclose(f);
 	    }
-	    else
+	    မဟုတ်ပါက
 		semsg("(NFA) Could not open \"%s\" to write !!!",
 			BT_REGEXP_DEBUG_LOG_NAME);
 	}
@@ -3115,7 +3115,7 @@ vim_regcomp(char_u *expr_arg, int re_flags)
 	 * but are still valid patterns, thus a retry should work.
 	 * But don't try if an error message was given.
 	 */
-	if (regexp_engine == AUTOMATIC_ENGINE
+	အကယ်၍ (regexp_engine == AUTOMATIC_ENGINE
 					  && called_emsg == called_emsg_before)
 	{
 	    regexp_engine = BACKTRACKING_ENGINE;
@@ -3126,7 +3126,7 @@ vim_regcomp(char_u *expr_arg, int re_flags)
 	}
     }
 
-    if (prog != NULL)
+    အကယ်၍ (prog != NULL)
     {
 	// Store the info needed to call regcomp() again when the engine turns
 	// out to be very slow when executing it.
@@ -3134,7 +3134,7 @@ vim_regcomp(char_u *expr_arg, int re_flags)
 	prog->re_flags  = re_flags;
     }
 
-    return prog;
+    ပြန်ပေး prog;
 }
 
 /*
@@ -3143,11 +3143,11 @@ vim_regcomp(char_u *expr_arg, int re_flags)
     void
 vim_regfree(regprog_T *prog)
 {
-    if (prog != NULL)
+    အကယ်၍ (prog != NULL)
 	prog->engine->regfree(prog);
 }
 
-#if defined(EXITFREE)
+#အကယ်၍ defined(EXITFREE)
     void
 free_regexp_stuff(void)
 {
@@ -3168,24 +3168,24 @@ free_regexp_stuff(void)
     static void
 report_re_switch(char_u *pat)
 {
-    if (p_verbose > 0)
+    အကယ်၍ (p_verbose > 0)
     {
 	verbose_enter();
 	msg_puts(_("Switching to backtracking RE engine for pattern: "));
-	msg_puts((char *)pat);
+	msg_puts((var_na *)pat);
 	verbose_leave();
     }
 }
 #endif
 
-#if defined(FEAT_X11)
+#အကယ်၍ defined(FEAT_X11)
 /*
  * Return whether "prog" is currently being executed.
  */
-    int
+    ကိန်းပြည့်
 regprog_in_use(regprog_T *prog)
 {
-    return prog->re_in_use;
+    ပြန်ပေး prog->re_in_use;
 }
 #endif
 
@@ -3198,26 +3198,26 @@ regprog_in_use(regprog_T *prog)
  *
  * Return TRUE if there is a match, FALSE if not.
  */
-    static int
+    static ကိန်းပြည့်
 vim_regexec_string(
     regmatch_T	*rmp,
     char_u	*line,  // string to match against
     colnr_T	col,    // column to start looking for match
-    int		nl)
+    ကိန်းပြည့်		nl)
 {
-    int		result;
+    ကိန်းပြည့်		result;
     regexec_T	rex_save;
-    int		rex_in_use_save = rex_in_use;
+    ကိန်းပြည့်		rex_in_use_save = rex_in_use;
 
     // Cannot use the same prog recursively, it contains state.
-    if (rmp->regprog->re_in_use)
+    အကယ်၍ (rmp->regprog->re_in_use)
     {
 	emsg(_(e_cannot_use_pattern_recursively));
-	return FALSE;
+	ပြန်ပေး FALSE;
     }
     rmp->regprog->re_in_use = TRUE;
 
-    if (rex_in_use)
+    အကယ်၍ (rex_in_use)
 	// Being called recursively, save the state.
 	rex_save = rex;
     rex_in_use = TRUE;
@@ -3231,15 +3231,15 @@ vim_regexec_string(
     rmp->regprog->re_in_use = FALSE;
 
     // NFA engine aborted because it's very slow.
-    if (rmp->regprog->re_engine == AUTOMATIC_ENGINE
+    အကယ်၍ (rmp->regprog->re_engine == AUTOMATIC_ENGINE
 					       && result == NFA_TOO_EXPENSIVE)
     {
-	int    save_p_re = p_re;
-	int    re_flags = rmp->regprog->re_flags;
+	ကိန်းပြည့်    save_p_re = p_re;
+	ကိန်းပြည့်    re_flags = rmp->regprog->re_flags;
 	char_u *pat = vim_strsave(((nfa_regprog_T *)rmp->regprog)->pattern);
 
 	p_re = BACKTRACKING_ENGINE;
-	if (pat != NULL)
+	အကယ်၍ (pat != NULL)
 	{
 	    regprog_T *prev_prog = rmp->regprog;
 
@@ -3247,13 +3247,13 @@ vim_regexec_string(
 	    report_re_switch(pat);
 #endif
 	    rmp->regprog = vim_regcomp(pat, re_flags);
-	    if (rmp->regprog == NULL)
+	    အကယ်၍ (rmp->regprog == NULL)
 	    {
 		// Somehow compiling the pattern failed now, put back the
 		// previous one to avoid "regprog" becoming NULL.
 		rmp->regprog = prev_prog;
 	    }
-	    else
+	    မဟုတ်ပါက
 	    {
 		vim_regfree(prev_prog);
 		rmp->regprog->re_in_use = TRUE;
@@ -3267,32 +3267,32 @@ vim_regexec_string(
     }
 
     rex_in_use = rex_in_use_save;
-    if (rex_in_use)
+    အကယ်၍ (rex_in_use)
 	rex = rex_save;
 
-    return result > 0;
+    ပြန်ပေး result > 0;
 }
 
-#if defined(FEAT_SPELL) || defined(FEAT_EVAL) || defined(FEAT_X11)
+#အကယ်၍ defined(FEAT_SPELL) || defined(FEAT_EVAL) || defined(FEAT_X11)
 /*
  * Note: "*prog" may be freed and changed.
  * Return TRUE if there is a match, FALSE if not.
  */
-    int
+    ကိန်းပြည့်
 vim_regexec_prog(
     regprog_T	**prog,
-    int		ignore_case,
+    ကိန်းပြည့်		ignore_case,
     char_u	*line,
     colnr_T	col)
 {
-    int		r;
+    ကိန်းပြည့်		r;
     regmatch_T	regmatch;
 
     regmatch.regprog = *prog;
     regmatch.rm_ic = ignore_case;
     r = vim_regexec_string(&regmatch, line, col, FALSE);
     *prog = regmatch.regprog;
-    return r;
+    ပြန်ပေး r;
 }
 #endif
 
@@ -3300,10 +3300,10 @@ vim_regexec_prog(
  * Note: "rmp->regprog" may be freed and changed.
  * Return TRUE if there is a match, FALSE if not.
  */
-    int
+    ကိန်းပြည့်
 vim_regexec(regmatch_T *rmp, char_u *line, colnr_T col)
 {
-    return vim_regexec_string(rmp, line, col, FALSE);
+    ပြန်ပေး vim_regexec_string(rmp, line, col, FALSE);
 }
 
 /*
@@ -3311,10 +3311,10 @@ vim_regexec(regmatch_T *rmp, char_u *line, colnr_T col)
  * Note: "rmp->regprog" may be freed and changed.
  * Return TRUE if there is a match, FALSE if not.
  */
-    int
+    ကိန်းပြည့်
 vim_regexec_nl(regmatch_T *rmp, char_u *line, colnr_T col)
 {
-    return vim_regexec_string(rmp, line, col, TRUE);
+    ပြန်ပေး vim_regexec_string(rmp, line, col, TRUE);
 }
 
 /*
@@ -3333,21 +3333,21 @@ vim_regexec_multi(
     buf_T       *buf,		// buffer in which to search
     linenr_T	lnum,		// nr of line to start looking for match
     colnr_T	col,		// column to start looking for match
-    int		*timed_out)	// flag is set when timeout limit reached
+    ကိန်းပြည့်		*timed_out)	// flag is set when timeout limit reached
 {
-    int		result;
+    ကိန်းပြည့်		result;
     regexec_T	rex_save;
-    int		rex_in_use_save = rex_in_use;
+    ကိန်းပြည့်		rex_in_use_save = rex_in_use;
 
     // Cannot use the same prog recursively, it contains state.
-    if (rmp->regprog->re_in_use)
+    အကယ်၍ (rmp->regprog->re_in_use)
     {
 	emsg(_(e_cannot_use_pattern_recursively));
-	return FALSE;
+	ပြန်ပေး FALSE;
     }
     rmp->regprog->re_in_use = TRUE;
 
-    if (rex_in_use)
+    အကယ်၍ (rex_in_use)
 	// Being called recursively, save the state.
 	rex_save = rex;
     rex_in_use = TRUE;
@@ -3357,15 +3357,15 @@ vim_regexec_multi(
     rmp->regprog->re_in_use = FALSE;
 
     // NFA engine aborted because it's very slow.
-    if (rmp->regprog->re_engine == AUTOMATIC_ENGINE
+    အကယ်၍ (rmp->regprog->re_engine == AUTOMATIC_ENGINE
 					       && result == NFA_TOO_EXPENSIVE)
     {
-	int    save_p_re = p_re;
-	int    re_flags = rmp->regprog->re_flags;
+	ကိန်းပြည့်    save_p_re = p_re;
+	ကိန်းပြည့်    re_flags = rmp->regprog->re_flags;
 	char_u *pat = vim_strsave(((nfa_regprog_T *)rmp->regprog)->pattern);
 
 	p_re = BACKTRACKING_ENGINE;
-	if (pat != NULL)
+	အကယ်၍ (pat != NULL)
 	{
 	    regprog_T *prev_prog = rmp->regprog;
 
@@ -3381,13 +3381,13 @@ vim_regexec_multi(
 #ifdef FEAT_SYN_HL
 	    reg_do_extmatch = 0;
 #endif
-	    if (rmp->regprog == NULL)
+	    အကယ်၍ (rmp->regprog == NULL)
 	    {
 		// Somehow compiling the pattern failed now, put back the
 		// previous one to avoid "regprog" becoming NULL.
 		rmp->regprog = prev_prog;
 	    }
-	    else
+	    မဟုတ်ပါက
 	    {
 		vim_regfree(prev_prog);
 
@@ -3402,8 +3402,8 @@ vim_regexec_multi(
     }
 
     rex_in_use = rex_in_use_save;
-    if (rex_in_use)
+    အကယ်၍ (rex_in_use)
 	rex = rex_save;
 
-    return result <= 0 ? 0 : result;
+    ပြန်ပေး result <= 0 ? 0 : result;
 }

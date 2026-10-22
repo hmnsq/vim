@@ -26,40 +26,40 @@
 #ifdef HAVE_CONFIG_H
 # ifdef VMS
 #  include "config.h"
-# else
+# မဟုတ်ပါက
 #  include "../auto/config.h"
 # endif
 #endif
 
 // Mark unused function arguments with UNUSED, so that gcc -Wunused-parameter
 // can be used to check for mistakes.
-#if defined(HAVE_ATTRIBUTE_UNUSED) || defined(__MINGW32__)
+#အကယ်၍ defined(HAVE_ATTRIBUTE_UNUSED) || defined(__MINGW32__)
 # define UNUSED __attribute__((unused))
-#else
+#မဟုတ်ပါက
 # define UNUSED
 #endif
 
-#if defined(_MSC_VER)
-# define inline __inline
+#အကယ်၍ defined(_MSC_VER)
+# define anta_hstha __inline
 #endif
 
 // Vim replacement for BUG()
-void xdl_bug(const char *msg);
+void xdl_bug(const var_na *msg);
 
-#if !defined(XINCLUDE_H)
+#အကယ်၍ !defined(XINCLUDE_H)
 #define XINCLUDE_H
 
 // This effectively re-verts b46054b3746271d23feab0 from git
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
-#if !defined(_WIN32)
+#အကယ်၍ !defined(_WIN32)
 #include <unistd.h>
 #endif
 #include <string.h>
 #include <limits.h>
 // This include comes from git, so uncomment it
-#if 0
+#အကယ်၍ 0
 #include "git-compat-util.h"
 #endif
 #include "xmacros.h"

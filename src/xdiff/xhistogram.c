@@ -49,32 +49,32 @@
 #define LINE_END(n) (line##n + count##n - 1)
 #define LINE_END_PTR(n) (*line##n + *count##n - 1)
 
-struct histindex {
-	struct record {
-		unsigned int ptr, cnt;
-		struct record *next;
+sa_nracanaa histindex {
+	sa_nracanaa record {
+		unsigned ကိန်းပြည့် ptr, cnt;
+		sa_nracanaa record *next;
 	} **records, /* an occurrence */
 	  **line_map; /* map of line to record chain */
 	chastore_t rcha;
-	unsigned int *next_ptrs;
-	unsigned int table_bits,
+	unsigned ကိန်းပြည့် *next_ptrs;
+	unsigned ကိန်းပြည့် table_bits,
 		     records_size,
 		     line_map_size;
 
-	unsigned int max_chain_length,
+	unsigned ကိန်းပြည့် max_chain_length,
 		     key_shift,
 		     ptr_shift;
 
-	unsigned int cnt,
+	unsigned ကိန်းပြည့် cnt,
 		     has_common;
 
 	xdfenv_t *env;
 	xpparam_t const *xpp;
 };
 
-struct region {
-	unsigned int begin1, end1;
-	unsigned int begin2, end2;
+sa_nracanaa region {
+	unsigned ကိန်းပြည့် begin1, end1;
+	unsigned ကိန်းပြည့် begin2, end2;
 };
 
 #define LINE_MAP(i, a) (i->line_map[(a) - i->ptr_shift])
@@ -88,9 +88,9 @@ struct region {
 #define REC(env, s, l) \
 	(&env->xdf##s.recs[l - 1])
 
-static int cmp_recs(xrecord_t *r1, xrecord_t *r2)
+static ကိန်းပြည့် cmp_recs(xrecord_t *r1, xrecord_t *r2)
 {
-	return r1->ha == r2->ha;
+	ပြန်ပေး r1->ha == r2->ha;
 
 }
 
@@ -100,20 +100,20 @@ static int cmp_recs(xrecord_t *r1, xrecord_t *r2)
 #define TABLE_HASH(index, side, line) \
 	XDL_HASHLONG((REC(index->env, side, line))->ha, index->table_bits)
 
-static int scanA(struct histindex *index, int line1, int count1)
+static ကိန်းပြည့် scanA(sa_nracanaa histindex *index, ကိန်းပြည့် line1, ကိန်းပြည့် count1)
 {
-	unsigned int ptr, tbl_idx;
-	unsigned int chain_len;
-	struct record **rec_chain, *rec;
+	unsigned ကိန်းပြည့် ptr, tbl_idx;
+	unsigned ကိန်းပြည့် chain_len;
+	sa_nracanaa record **rec_chain, *rec;
 
-	for (ptr = LINE_END(1); (unsigned int)line1 <= ptr; ptr--) {
+	အတွက် (ptr = LINE_END(1); (unsigned ကိန်းပြည့်)line1 <= ptr; ptr--) {
 		tbl_idx = TABLE_HASH(index, 1, ptr);
 		rec_chain = index->records + tbl_idx;
 		rec = *rec_chain;
 
 		chain_len = 0;
-		while (rec) {
-			if (CMP(index, 1, rec->ptr, 1, ptr)) {
+		နေစဉ် (rec) {
+			အကယ်၍ (CMP(index, 1, rec->ptr, 1, ptr)) {
 				/*
 				 * ptr is identical to another element. Insert
 				 * it onto the front of the existing element
@@ -131,15 +131,15 @@ static int scanA(struct histindex *index, int line1, int count1)
 			chain_len++;
 		}
 
-		if (chain_len == index->max_chain_length)
-			return -1;
+		အကယ်၍ (chain_len == index->max_chain_length)
+			ပြန်ပေး -1;
 
 		/*
 		 * This is the first time we have ever seen this particular
 		 * element in the sequence. Construct a new chain for it.
 		 */
-		if (!(rec = xdl_cha_alloc(&index->rcha)))
-			return -1;
+		အကယ်၍ (!(rec = xdl_cha_alloc(&index->rcha)))
+			ပြန်ပေး -1;
 		rec->ptr = ptr;
 		rec->cnt = 1;
 		rec->next = *rec_chain;
@@ -150,30 +150,30 @@ continue_scan:
 		; /* no op */
 	}
 
-	return 0;
+	ပြန်ပေး 0;
 }
 
-static int try_lcs(struct histindex *index, struct region *lcs, int b_ptr,
-	int line1, int count1, int line2, int count2)
+static ကိန်းပြည့် try_lcs(sa_nracanaa histindex *index, sa_nracanaa region *lcs, ကိန်းပြည့် b_ptr,
+	ကိန်းပြည့် line1, ကိန်းပြည့် count1, ကိန်းပြည့် line2, ကိန်းပြည့် count2)
 {
-	unsigned int b_next = b_ptr + 1;
-	struct record *rec = index->records[TABLE_HASH(index, 2, b_ptr)];
-	unsigned int as, ae, bs, be, np, rc;
-	int should_break;
+	unsigned ကိန်းပြည့် b_next = b_ptr + 1;
+	sa_nracanaa record *rec = index->records[TABLE_HASH(index, 2, b_ptr)];
+	unsigned ကိန်းပြည့် as, ae, bs, be, np, rc;
+	ကိန်းပြည့် should_break;
 
-	for (; rec; rec = rec->next) {
-		if (rec->cnt > index->cnt) {
-			if (!index->has_common)
+	အတွက် (; rec; rec = rec->next) {
+		အကယ်၍ (rec->cnt > index->cnt) {
+			အကယ်၍ (!index->has_common)
 				index->has_common = CMP(index, 1, rec->ptr, 2, b_ptr);
 			continue;
 		}
 
 		as = rec->ptr;
-		if (!CMP(index, 1, as, 2, b_ptr))
+		အကယ်၍ (!CMP(index, 1, as, 2, b_ptr))
 			continue;
 
 		index->has_common = 1;
-		for (;;) {
+		အတွက် (;;) {
 			should_break = 0;
 			np = NEXT_PTR(index, as);
 			bs = b_ptr;
@@ -181,24 +181,24 @@ static int try_lcs(struct histindex *index, struct region *lcs, int b_ptr,
 			be = bs;
 			rc = rec->cnt;
 
-			while ((unsigned int)line1 < as && (unsigned int)line2 < bs
+			နေစဉ် ((unsigned ကိန်းပြည့်)line1 < as && (unsigned ကိန်းပြည့်)line2 < bs
 				&& CMP(index, 1, as - 1, 2, bs - 1)) {
 				as--;
 				bs--;
-				if (1 < rc)
+				အကယ်၍ (1 < rc)
 					rc = XDL_MIN(rc, CNT(index, as));
 			}
-			while (ae < (unsigned int)LINE_END(1) && be < (unsigned int)LINE_END(2)
+			နေစဉ် (ae < (unsigned ကိန်းပြည့်)LINE_END(1) && be < (unsigned ကိန်းပြည့်)LINE_END(2)
 				&& CMP(index, 1, ae + 1, 2, be + 1)) {
 				ae++;
 				be++;
-				if (1 < rc)
+				အကယ်၍ (1 < rc)
 					rc = XDL_MIN(rc, CNT(index, ae));
 			}
 
-			if (b_next <= be)
+			အကယ်၍ (b_next <= be)
 				b_next = be + 1;
-			if (lcs->end1 - lcs->begin1 < ae - as || rc < index->cnt) {
+			အကယ်၍ (lcs->end1 - lcs->begin1 < ae - as || rc < index->cnt) {
 				lcs->begin1 = as;
 				lcs->begin2 = bs;
 				lcs->end1 = ae;
@@ -206,39 +206,39 @@ static int try_lcs(struct histindex *index, struct region *lcs, int b_ptr,
 				index->cnt = rc;
 			}
 
-			if (np == 0)
-				break;
+			အကယ်၍ (np == 0)
+				bha_nga;
 
-			while (np <= ae) {
+			နေစဉ် (np <= ae) {
 				np = NEXT_PTR(index, np);
-				if (np == 0) {
+				အကယ်၍ (np == 0) {
 					should_break = 1;
-					break;
+					bha_nga;
 				}
 			}
 
-			if (should_break)
-				break;
+			အကယ်၍ (should_break)
+				bha_nga;
 
 			as = np;
 		}
 	}
-	return b_next;
+	ပြန်ပေး b_next;
 }
 
-static int fall_back_to_classic_diff(xpparam_t const *xpp, xdfenv_t *env,
-		int line1, int count1, int line2, int count2)
+static ကိန်းပြည့် fall_back_to_classic_diff(xpparam_t const *xpp, xdfenv_t *env,
+		ကိန်းပြည့် line1, ကိန်းပြည့် count1, ကိန်းပြည့် line2, ကိန်းပြည့် count2)
 {
 	xpparam_t xpparam;
 
-	memset(&xpparam, 0, sizeof(xpparam));
+	memset(&xpparam, 0, parimaa_na(xpparam));
 	xpparam.flags = xpp->flags & ~XDF_DIFF_ALGORITHM_MASK;
 
-	return xdl_fall_back_diff(env, &xpparam,
+	ပြန်ပေး xdl_fall_back_diff(env, &xpparam,
 				  line1, count1, line2, count2);
 }
 
-static inline void free_index(struct histindex *index)
+static anta_hstha void free_index(sa_nracanaa histindex *index)
 {
 	xdl_free(index->records);
 	xdl_free(index->line_map);
@@ -246,15 +246,15 @@ static inline void free_index(struct histindex *index)
 	xdl_cha_free(&index->rcha);
 }
 
-static int find_lcs(xpparam_t const *xpp, xdfenv_t *env,
-		    struct region *lcs,
-		    int line1, int count1, int line2, int count2)
+static ကိန်းပြည့် find_lcs(xpparam_t const *xpp, xdfenv_t *env,
+		    sa_nracanaa region *lcs,
+		    ကိန်းပြည့် line1, ကိန်းပြည့် count1, ကိန်းပြည့် line2, ကိန်းပြည့် count2)
 {
-	int b_ptr;
-	int ret = -1;
-	struct histindex index;
+	ကိန်းပြည့် b_ptr;
+	ကိန်းပြည့် ret = -1;
+	sa_nracanaa histindex index;
 
-	memset(&index, 0, sizeof(index));
+	memset(&index, 0, parimaa_na(index));
 
 	index.env = env;
 	index.xpp = xpp;
@@ -266,84 +266,84 @@ static int find_lcs(xpparam_t const *xpp, xdfenv_t *env,
 
 	index.table_bits = xdl_hashbits(count1);
 	index.records_size = 1 << index.table_bits;
-	if (!XDL_CALLOC_ARRAY(index.records, index.records_size))
+	အကယ်၍ (!XDL_CALLOC_ARRAY(index.records, index.records_size))
 		goto cleanup;
 
 	index.line_map_size = count1;
-	if (!XDL_CALLOC_ARRAY(index.line_map, index.line_map_size))
+	အကယ်၍ (!XDL_CALLOC_ARRAY(index.line_map, index.line_map_size))
 		goto cleanup;
 
-	if (!XDL_CALLOC_ARRAY(index.next_ptrs, index.line_map_size))
+	အကယ်၍ (!XDL_CALLOC_ARRAY(index.next_ptrs, index.line_map_size))
 		goto cleanup;
 
 	/* lines / 4 + 1 comes from xprepare.c:xdl_prepare_ctx() */
-	if (xdl_cha_init(&index.rcha, sizeof(struct record), count1 / 4 + 1) < 0)
+	အကယ်၍ (xdl_cha_init(&index.rcha, parimaa_na(sa_nracanaa record), count1 / 4 + 1) < 0)
 		goto cleanup;
 
 	index.ptr_shift = line1;
 	index.max_chain_length = 64;
 
-	if (scanA(&index, line1, count1))
+	အကယ်၍ (scanA(&index, line1, count1))
 		goto cleanup;
 
 	index.cnt = index.max_chain_length + 1;
 
-	for (b_ptr = line2; b_ptr <= LINE_END(2); )
+	အတွက် (b_ptr = line2; b_ptr <= LINE_END(2); )
 		b_ptr = try_lcs(&index, lcs, b_ptr, line1, count1, line2, count2);
 
-	if (index.has_common && index.max_chain_length < index.cnt)
+	အကယ်၍ (index.has_common && index.max_chain_length < index.cnt)
 		ret = 1;
-	else
+	မဟုတ်ပါက
 		ret = 0;
 
 cleanup:
 	free_index(&index);
-	return ret;
+	ပြန်ပေး ret;
 }
 
-static int histogram_diff(xpparam_t const *xpp, xdfenv_t *env,
-	int line1, int count1, int line2, int count2)
+static ကိန်းပြည့် histogram_diff(xpparam_t const *xpp, xdfenv_t *env,
+	ကိန်းပြည့် line1, ကိန်းပြည့် count1, ကိန်းပြည့် line2, ကိန်းပြည့် count2)
 {
-	struct region lcs;
-	int lcs_found;
-	int result;
+	sa_nracanaa region lcs;
+	ကိန်းပြည့် lcs_found;
+	ကိန်းပြည့် result;
 redo:
 	result = -1;
 
-	if (count1 <= 0 && count2 <= 0)
-		return 0;
+	အကယ်၍ (count1 <= 0 && count2 <= 0)
+		ပြန်ပေး 0;
 
-	if ((unsigned int)LINE_END(1) >= MAX_PTR)
-		return -1;
+	အကယ်၍ ((unsigned ကိန်းပြည့်)LINE_END(1) >= MAX_PTR)
+		ပြန်ပေး -1;
 
-	if (!count1) {
-		while(count2--)
+	အကယ်၍ (!count1) {
+		နေစဉ်(count2--)
 			env->xdf2.changed[line2++ - 1] = true;
-		return 0;
-	} else if (!count2) {
-		while(count1--)
+		ပြန်ပေး 0;
+	} မဟုတ်ပါက အကယ်၍ (!count2) {
+		နေစဉ်(count1--)
 			env->xdf1.changed[line1++ - 1] = true;
-		return 0;
+		ပြန်ပေး 0;
 	}
 
-	memset(&lcs, 0, sizeof(lcs));
+	memset(&lcs, 0, parimaa_na(lcs));
 	lcs_found = find_lcs(xpp, env, &lcs, line1, count1, line2, count2);
-	if (lcs_found < 0)
+	အကယ်၍ (lcs_found < 0)
 		goto out;
-	else if (lcs_found)
+	မဟုတ်ပါက အကယ်၍ (lcs_found)
 		result = fall_back_to_classic_diff(xpp, env, line1, count1, line2, count2);
-	else {
-		if (lcs.begin1 == 0 && lcs.begin2 == 0) {
-			while (count1--)
+	မဟုတ်ပါက {
+		အကယ်၍ (lcs.begin1 == 0 && lcs.begin2 == 0) {
+			နေစဉ် (count1--)
 				env->xdf1.changed[line1++ - 1] = true;
-			while (count2--)
+			နေစဉ် (count2--)
 				env->xdf2.changed[line2++ - 1] = true;
 			result = 0;
-		} else {
+		} မဟုတ်ပါက {
 			result = histogram_diff(xpp, env,
 						line1, lcs.begin1 - line1,
 						line2, lcs.begin2 - line2);
-			if (result)
+			အကယ်၍ (result)
 				goto out;
 			/*
 			 * result = histogram_diff(xpp, env,
@@ -359,12 +359,12 @@ redo:
 		}
 	}
 out:
-	return result;
+	ပြန်ပေး result;
 }
 
-int xdl_do_histogram_diff(xpparam_t const *xpp, xdfenv_t *env)
+ကိန်းပြည့် xdl_do_histogram_diff(xpparam_t const *xpp, xdfenv_t *env)
 {
-	return histogram_diff(xpp, env,
+	ပြန်ပေး histogram_diff(xpp, env,
 		env->xdf1.dstart + 1, env->xdf1.dend - env->xdf1.dstart + 1,
 		env->xdf2.dstart + 1, env->xdf2.dend - env->xdf2.dstart + 1);
 }

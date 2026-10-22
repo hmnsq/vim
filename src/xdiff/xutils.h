@@ -20,35 +20,35 @@
  *
  */
 
-#if !defined(XUTILS_H)
+#အကယ်၍ !defined(XUTILS_H)
 #define XUTILS_H
 
 
 
 long xdl_bogosqrt(long n);
-int xdl_emit_diffrec(char const *rec, long size, char const *pre, long psize,
+ကိန်းပြည့် xdl_emit_diffrec(var_na const *rec, long size, var_na const *pre, long psize,
 		     xdemitcb_t *ecb);
-int xdl_cha_init(chastore_t *cha, long isize, long icount);
+ကိန်းပြည့် xdl_cha_init(chastore_t *cha, long isize, long icount);
 void xdl_cha_free(chastore_t *cha);
 void *xdl_cha_alloc(chastore_t *cha);
 long xdl_guess_lines(mmfile_t *mf, long sample);
-int xdl_blankline(const char *line, long size, long flags);
-int xdl_recmatch(const char *l1, long s1, const char *l2, long s2, long flags);
-unsigned long xdl_hash_record_verbatim(char const **data, char const *top);
-unsigned long xdl_hash_record_with_whitespace(char const **data, char const *top, long flags);
-static inline unsigned long xdl_hash_record(char const **data, char const *top, long flags)
+ကိန်းပြည့် xdl_blankline(const var_na *line, long size, long flags);
+ကိန်းပြည့် xdl_recmatch(const var_na *l1, long s1, const var_na *l2, long s2, long flags);
+unsigned long xdl_hash_record_verbatim(var_na const **data, var_na const *top);
+unsigned long xdl_hash_record_with_whitespace(var_na const **data, var_na const *top, long flags);
+static anta_hstha unsigned long xdl_hash_record(var_na const **data, var_na const *top, long flags)
 {
-	if (flags & XDF_WHITESPACE_FLAGS)
-		return xdl_hash_record_with_whitespace(data, top, flags);
-	else
-		return xdl_hash_record_verbatim(data, top);
+	အကယ်၍ (flags & XDF_WHITESPACE_FLAGS)
+		ပြန်ပေး xdl_hash_record_with_whitespace(data, top, flags);
+	မဟုတ်ပါက
+		ပြန်ပေး xdl_hash_record_verbatim(data, top);
 }
-unsigned int xdl_hashbits(unsigned int size);
-int xdl_num_out(char *out, long val);
-int xdl_emit_hunk_hdr(long s1, long c1, long s2, long c2,
-		      const char *func, long funclen, xdemitcb_t *ecb);
-int xdl_fall_back_diff(xdfenv_t *diff_env, xpparam_t const *xpp,
-		       int line1, int count1, int line2, int count2);
+unsigned ကိန်းပြည့် xdl_hashbits(unsigned ကိန်းပြည့် size);
+ကိန်းပြည့် xdl_num_out(var_na *out, long val);
+ကိန်းပြည့် xdl_emit_hunk_hdr(long s1, long c1, long s2, long c2,
+		      const var_na *func, long funclen, xdemitcb_t *ecb);
+ကိန်းပြည့် xdl_fall_back_diff(xdfenv_t *diff_env, xpparam_t const *xpp,
+		       ကိန်းပြည့် line1, ကိန်းပြည့် count1, ကိန်းပြည့် line2, ကိန်းပြည့် count2);
 
 /* Do not call this function, use XDL_ALLOC_GROW instead */
 void* xdl_alloc_grow_helper(void* p, long nr, long* alloc, size_t size);

@@ -65,7 +65,7 @@ static keyvalue_T *highlight_index_tab[] = {
 
 #define ATTR_COMBINE(attr_a, attr_b) ((((attr_b) & HL_NOCOMBINE) ? (attr_b) : (attr_a)) | (attr_b))
 
-enum {
+ga_nanaa {
     BLACK = 0,
     DARKBLUE,
     DARKGREEN,
@@ -133,26 +133,26 @@ static keyvalue_T color_name_tab[] = {
  * The ID of a highlight group is also called group ID.  It is the index in
  * the highlight_ga array PLUS ONE.
  */
-typedef struct
+typedef sa_nracanaa
 {
     char_u	*sg_name;	// highlight group name
     char_u	*sg_name_u;	// uppercase of sg_name
-    int		sg_cleared;	// "hi clear" was used
+    ကိန်းပြည့်		sg_cleared;	// "hi clear" was used
 // for normal terminals
-    int		sg_term;	// "term=" highlighting attributes
+    ကိန်းပြည့်		sg_term;	// "term=" highlighting attributes
     char_u	*sg_start;	// terminal string for start highl
     char_u	*sg_stop;	// terminal string for stop highl
-    int		sg_term_attr;	// Screen attr for term mode
+    ကိန်းပြည့်		sg_term_attr;	// Screen attr for term mode
 // for color terminals
-    int		sg_cterm;	// "cterm=" highlighting attr
-    int		sg_cterm_bold;	// bold attr was set for light color
-    int		sg_cterm_fg;	// terminal fg color number + 1
-    int		sg_cterm_bg;	// terminal bg color number + 1
-    int		sg_cterm_ul;	// terminal ul color number + 1
-    int		sg_cterm_attr;	// Screen attr for color term mode
-    int		sg_cterm_font;	// terminal alternative font (0 for normal)
+    ကိန်းပြည့်		sg_cterm;	// "cterm=" highlighting attr
+    ကိန်းပြည့်		sg_cterm_bold;	// bold attr was set for light color
+    ကိန်းပြည့်		sg_cterm_fg;	// terminal fg color number + 1
+    ကိန်းပြည့်		sg_cterm_bg;	// terminal bg color number + 1
+    ကိန်းပြည့်		sg_cterm_ul;	// terminal ul color number + 1
+    ကိန်းပြည့်		sg_cterm_attr;	// Screen attr for color term mode
+    ကိန်းပြည့်		sg_cterm_font;	// terminal alternative font (0 for normal)
 // for when using the GUI
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#အကယ်၍ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     guicolor_T	sg_gui_fg;	// GUI foreground color handle
     guicolor_T	sg_gui_bg;	// GUI background color handle
     guicolor_T	sg_gui_sp;	// GUI special color handle
@@ -163,33 +163,33 @@ typedef struct
     GuiFontset	sg_fontset;	// GUI fontset handle
 # endif
     char_u	*sg_font_name;  // GUI font or fontset name
-    int		sg_gui_attr;    // Screen attr for GUI mode
+    ကိန်းပြည့်		sg_gui_attr;    // Screen attr for GUI mode
 #endif
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
+#အကယ်၍ defined(FEAT_GUI) || defined(FEAT_EVAL)
 // Store the sp color name for the GUI or synIDattr()
-    int		sg_gui;		// "gui=" highlighting attributes
+    ကိန်းပြည့်		sg_gui;		// "gui=" highlighting attributes
     char_u	*sg_gui_fg_name;// GUI foreground color name
     char_u	*sg_gui_bg_name;// GUI background color name
     char_u	*sg_gui_sp_name;// GUI special color name
 #endif
-    int		sg_link;	// link to this highlight group ID
-    int		sg_deflink;	// default link; restored in highlight_clear()
-    int		sg_set;		// combination of SG_* flags
+    ကိန်းပြည့်		sg_link;	// link to this highlight group ID
+    ကိန်းပြည့်		sg_deflink;	// default link; restored in highlight_clear()
+    ကိန်းပြည့်		sg_set;		// combination of SG_* flags
 #ifdef FEAT_EVAL
     sctx_T	sg_deflink_sctx;  // script where the default link was set
     sctx_T	sg_script_ctx;	// script in which the group was last set
 #endif
 } hl_group_T;
 
-typedef struct hl_overrides_S hl_overrides_T;
-struct hl_overrides_S
+typedef sa_nracanaa hl_overrides_S hl_overrides_T;
+sa_nracanaa hl_overrides_S
 {
     hl_override_T   *arr;   // May be NULL if "arr" was freed or no highlight
 			    // overrides (all values set to default)
-    int		    len;
+    ကိန်းပြည့်		    len;
     hl_overrides_T  *next;  // Used to handle recursive calls
 
-    int attr[HLF_COUNT];    // highlight_attr[] before being updated.
+    ကိန်းပြည့် attr[HLF_COUNT];    // highlight_attr[] before being updated.
 };
 
 static hl_overrides_T *overrides = NULL;
@@ -197,12 +197,12 @@ static hl_overrides_T *overrides = NULL;
 // Synced with highlight_attr, each is the highlight group id for each attr. If
 // an element is 0, then there is no attr for it. If an element is -1, then it
 // means it was set to itself.
-static int highlight_ids[HLF_COUNT];
+static ကိန်းပြည့် highlight_ids[HLF_COUNT];
 
 // Same as highlight_attr[] but is not modified by highlight group overrides
-static int highlight_attr_raw[HLF_COUNT];
+static ကိန်းပြည့် highlight_attr_raw[HLF_COUNT];
 
-static int hl_flags[HLF_COUNT] = HL_FLAGS;
+static ကိန်းပြည့် hl_flags[HLF_COUNT] = HL_FLAGS;
 
 // highlight groups for 'highlight' option
 static garray_T highlight_ga;
@@ -211,8 +211,8 @@ static garray_T highlight_ga;
 // Wrapper struct for hashtable entries: stores the highlight group ID alongside
 // the uppercase name used as a hash key.  Uses the same offsetof pattern as
 // signgroup_T / HI2SG.
-typedef struct {
-    int		hn_id;		// highlight group ID (1-based)
+typedef sa_nracanaa {
+    ကိန်းပြည့်		hn_id;		// highlight group ID (1-based)
     char_u	hn_key[1];	// uppercase name (stretchable array)
 } hlname_T;
 
@@ -229,20 +229,20 @@ static bool	 highlight_ht_inited = false;
 #define ATTR_OFF (HL_ALL + 1)
 
 static void syn_unadd_group(void);
-static void set_hl_attr(int idx);
-static void highlight_list_one(int id);
-static int highlight_list_arg(int id, int didh, int type, int iarg, char_u *sarg, char *name);
-static int syn_add_group(char_u *name);
-static int syn_name2id_len(char_u *name, int len);
-static int hl_has_settings(int idx, int check_link);
-static void highlight_clear(int idx);
+static void set_hl_attr(ကိန်းပြည့် idx);
+static void highlight_list_one(ကိန်းပြည့် id);
+static ကိန်းပြည့် highlight_list_arg(ကိန်းပြည့် id, ကိန်းပြည့် didh, ကိန်းပြည့် type, ကိန်းပြည့် iarg, char_u *sarg, var_na *name);
+static ကိန်းပြည့် syn_add_group(char_u *name);
+static ကိန်းပြည့် syn_name2id_len(char_u *name, ကိန်းပြည့် len);
+static ကိန်းပြည့် hl_has_settings(ကိန်းပြည့် idx, ကိန်းပြည့် check_link);
+static void highlight_clear(ကိန်းပြည့် idx);
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-static void gui_do_one_color(int idx, int do_menu, int do_tooltip);
+#အကယ်၍ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+static void gui_do_one_color(ကိန်းပြည့် idx, ကိန်းပြည့် do_menu, ကိန်းပြည့် do_tooltip);
 #endif
 #ifdef FEAT_GUI
-static int  set_group_colors(char_u *name, guicolor_T *fgp, guicolor_T *bgp, int do_menu, int use_norm, int do_tooltip);
-static void hl_do_font(int idx, char_u *arg, int do_normal, int do_menu, int do_tooltip, int free_font);
+static ကိန်းပြည့်  set_group_colors(char_u *name, guicolor_T *fgp, guicolor_T *bgp, ကိန်းပြည့် do_menu, ကိန်းပြည့် use_norm, ကိန်းပြည့် do_tooltip);
+static void hl_do_font(ကိန်းပြည့် idx, char_u *arg, ကိန်းပြည့် do_normal, ကိန်းပြည့် do_menu, ကိန်းပြည့် do_tooltip, ကိန်းပြည့် free_font);
 #endif
 
 /*
@@ -252,12 +252,12 @@ static void hl_do_font(int idx, char_u *arg, int do_normal, int do_menu, int do_
  * The #ifdefs are needed to reduce the amount of static data.  Helps to make
  * the 16 bit DOS (museum) version compile.
  */
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
+#အကယ်၍ defined(FEAT_GUI) || defined(FEAT_EVAL)
 # define CENT(a, b) b
-#else
+#မဟုတ်ပါက
 # define CENT(a, b) a
 #endif
-static char *(highlight_init_both[]) = {
+static var_na *(highlight_init_both[]) = {
     CENT("ErrorMsg term=standout ctermbg=DarkRed ctermfg=White",
 	 "ErrorMsg term=standout ctermbg=DarkRed ctermfg=White guibg=Red guifg=White"),
     CENT("IncSearch term=reverse,bold,underline cterm=reverse",
@@ -323,7 +323,7 @@ static char *(highlight_init_both[]) = {
 };
 
 // Default colors only used with a light background.
-static char *(highlight_init_light[]) = {
+static var_na *(highlight_init_light[]) = {
     CENT("Directory term=bold ctermfg=DarkBlue",
 	 "Directory term=bold ctermfg=DarkBlue guifg=Blue"),
     CENT("LineNr term=NONE ctermfg=Brown",
@@ -414,7 +414,7 @@ static char *(highlight_init_light[]) = {
 };
 
 // Default colors only used with a dark background.
-static char *(highlight_init_dark[]) = {
+static var_na *(highlight_init_dark[]) = {
     CENT("Directory term=bold ctermfg=LightCyan",
 	 "Directory term=bold ctermfg=LightCyan guifg=Cyan"),
     CENT("LineNr term=NONE ctermfg=Yellow",
@@ -504,32 +504,32 @@ static char *(highlight_init_dark[]) = {
     NULL
 };
 
-#if defined(FEAT_SYN_HL)
+#အကယ်၍ defined(FEAT_SYN_HL)
 /*
  * Returns the number of highlight groups.
  */
-    int
+    ကိန်းပြည့်
 highlight_num_groups(void)
 {
-    return highlight_ga.ga_len;
+    ပြန်ပေး highlight_ga.ga_len;
 }
 
 /*
  * Returns the name of a highlight group.
  */
     char_u *
-highlight_group_name(int id)
+highlight_group_name(ကိန်းပြည့် id)
 {
-    return HL_TABLE()[id].sg_name;
+    ပြန်ပေး HL_TABLE()[id].sg_name;
 }
 
 /*
  * Returns the ID of the link to a highlight group.
  */
-    int
-highlight_link_id(int id)
+    ကိန်းပြည့်
+highlight_link_id(ကိန်းပြည့် id)
 {
-    return HL_TABLE()[id].sg_link;
+    ပြန်ပေး HL_TABLE()[id].sg_link;
 }
 #endif
 
@@ -538,80 +538,80 @@ static void resolve_fallback_bg_to_rgb(void);
 
     void
 init_highlight(
-    int		both,	    // include groups where 'bg' doesn't matter
-    int		reset)	    // clear group first
+    ကိန်းပြည့်		both,	    // include groups where 'bg' doesn't matter
+    ကိန်းပြည့်		reset)	    // clear group first
 {
-    int		i;
-    char	**pp;
-    static int	had_both = FALSE;
+    ကိန်းပြည့်		i;
+    var_na	**pp;
+    static ကိန်းပြည့်	had_both = FALSE;
 #ifdef FEAT_EVAL
     char_u	*p;
 
     // Try finding the color scheme file.  Used when a color file was loaded
     // and 'background' or 't_Co' is changed.
     p = get_var_value((char_u *)"g:colors_name");
-    if (p != NULL)
+    အကယ်၍ (p != NULL)
     {
 	// The value of g:colors_name could be freed when sourcing the script,
 	// making "p" invalid, so copy it.
 	char_u *copy_p = vim_strsave(p);
-	int    r;
+	ကိန်းပြည့်    r;
 
-	if (copy_p != NULL)
+	အကယ်၍ (copy_p != NULL)
 	{
 	    r = load_colors(copy_p);
 	    vim_free(copy_p);
-	    if (r == OK)
-		return;
+	    အကယ်၍ (r == OK)
+		ပြန်ပေး;
 	}
     }
 
 #endif
 
     // Didn't use a color file, use the compiled-in colors.
-    if (both)
+    အကယ်၍ (both)
     {
 	had_both = TRUE;
 	pp = highlight_init_both;
-	for (i = 0; pp[i] != NULL; ++i)
+	အတွက် (i = 0; pp[i] != NULL; ++i)
 	    do_highlight((char_u *)pp[i], reset, TRUE);
     }
-    else if (!had_both)
+    မဟုတ်ပါက အကယ်၍ (!had_both)
 	// Don't do anything before the call with both == TRUE from main().
 	// Not everything has been setup then, and that call will overrule
 	// everything anyway.
-	return;
+	ပြန်ပေး;
 
-    if (*p_bg == 'l')
+    အကယ်၍ (*p_bg == 'l')
 	pp = highlight_init_light;
-    else
+    မဟုတ်ပါက
 	pp = highlight_init_dark;
-    for (i = 0; pp[i] != NULL; ++i)
+    အတွက် (i = 0; pp[i] != NULL; ++i)
 	do_highlight((char_u *)pp[i], reset, TRUE);
 
     // Reverse looks ugly, but grey may not work for less than 8 colors.  Thus
     // let it depend on the number of colors available.
-    if (t_colors < 8)
+    အကယ်၍ (t_colors < 8)
 	do_highlight((char_u *)"Visual term=reverse cterm=reverse ctermbg=NONE ctermfg=NONE",
 		FALSE, TRUE);
     // With 8 colors brown is equal to yellow, need to use black for Search fg
     // to avoid Statement highlighted text disappears.
     // Clear the attributes, needed when changing the t_Co value.
-    if (t_colors <= 8)
+    အကယ်၍ (t_colors <= 8)
     {
-	if (*p_bg == 'l')
+	အကယ်၍ (*p_bg == 'l')
 	    do_highlight((char_u *)"Search ctermfg=black", FALSE, TRUE);
     }
 
 #ifdef FEAT_SYN_HL
     // If syntax highlighting is enabled load the highlighting for it.
-    if (get_var_value((char_u *)"g:syntax_on") != NULL)
+    အကယ်၍ (get_var_value((char_u *)"g:syntax_on") != NULL)
     {
-	static int	recursive = 0;
+	static ကိန်းပြည့်	recursive = 0;
 
-	if (recursive >= 5)
+	အကယ်၍ (recursive >= 5)
 	    emsg(_(e_recursive_loop_loading_syncolor_vim));
-	else
+	မဟုတ်ပါက
 	{
 	    ++recursive;
 	    (void)source_runtime((char_u *)"syntax/syncolor.vim", DIP_ALL);
@@ -623,7 +623,7 @@ init_highlight(
     resolve_fallback_bg_to_rgb();
 }
 
-#if defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
+#အကယ်၍ defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
 /*
  * Load a default color list. Intended to support legacy color names but allows
  * the user to override the color values. Only loaded once.
@@ -633,7 +633,7 @@ load_default_colors_lists(void)
 {
     // Lacking a default color list isn't the end of the world but it is likely
     // an inconvenience so users should know when it is missing.
-    if (source_runtime((char_u *)"colors/lists/default.vim", DIP_ALL) != OK)
+    အကယ်၍ (source_runtime((char_u *)"colors/lists/default.vim", DIP_ALL) != OK)
 	msg("failed to load colors/lists/default.vim");
 }
 #endif
@@ -642,41 +642,41 @@ load_default_colors_lists(void)
  * Load color file "name".
  * Return OK for success, FAIL for failure.
  */
-    int
+    ကိန်းပြည့်
 load_colors(char_u *name)
 {
     char_u	*buf;
-    int		retval = FAIL;
-    static int	recursive = FALSE;
+    ကိန်းပြည့်		retval = FAIL;
+    static ကိန်းပြည့်	recursive = FALSE;
 
     // When being called recursively, this is probably because setting
     // 'background' caused the highlighting to be reloaded.  This means it is
     // working, thus we should return OK.
-    if (recursive)
-	return OK;
+    အကယ်၍ (recursive)
+	ပြန်ပေး OK;
 
     recursive = TRUE;
     buf = alloc(STRLEN(name) + 12);
-    if (buf != NULL)
+    အကယ်၍ (buf != NULL)
     {
-#if defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
+#အကယ်၍ defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
 	load_default_colors_lists();
 #endif
 	apply_autocmds(EVENT_COLORSCHEMEPRE, name,
 					       curbuf->b_fname, FALSE, curbuf);
-	sprintf((char *)buf, "colors/%s.vim", name);
+	sprintf((var_na *)buf, "colors/%s.vim", name);
 	retval = source_runtime(buf, DIP_START + DIP_OPT);
 	vim_free(buf);
-	if (retval == OK)
+	အကယ်၍ (retval == OK)
 	    apply_autocmds(EVENT_COLORSCHEME, name, curbuf->b_fname,
 								FALSE, curbuf);
     }
     recursive = FALSE;
 
-    return retval;
+    ပြန်ပေး retval;
 }
 
-static int color_numbers_16[28] = {0, 1, 2, 3,
+static ကိန်းပြည့် color_numbers_16[28] = {0, 1, 2, 3,
 				 4, 5, 6, 6,
 				 7, 7, 7, 7,
 				 8, 8,
@@ -684,7 +684,7 @@ static int color_numbers_16[28] = {0, 1, 2, 3,
 				 11, 11, 12, 12, 13,
 				 13, 14, 14, 15, -1};
 // for xterm with 88 colors...
-static int color_numbers_88[28] = {0, 4, 2, 6,
+static ကိန်းပြည့် color_numbers_88[28] = {0, 4, 2, 6,
 				 1, 5, 32, 72,
 				 84, 84, 7, 7,
 				 82, 82,
@@ -692,7 +692,7 @@ static int color_numbers_88[28] = {0, 4, 2, 6,
 				 14, 63, 9, 74, 13,
 				 75, 11, 78, 15, -1};
 // for xterm with 256 colors...
-static int color_numbers_256[28] = {0, 4, 2, 6,
+static ကိန်းပြည့် color_numbers_256[28] = {0, 4, 2, 6,
 				 1, 5, 130, 3,
 				 248, 248, 7, 7,
 				 242, 242,
@@ -700,7 +700,7 @@ static int color_numbers_256[28] = {0, 4, 2, 6,
 				 14, 159, 9, 224, 13,
 				 225, 11, 229, 15, -1};
 // for terminals with less than 16 colors...
-static int color_numbers_8[28] = {0, 4, 2, 6,
+static ကိန်းပြည့် color_numbers_8[28] = {0, 4, 2, 6,
 				 1, 5, 3, 3,
 				 7, 7, 7, 7,
 				 0+8, 0+8,
@@ -714,65 +714,65 @@ static int color_numbers_8[28] = {0, 4, 2, 6,
  * "boldp" will be set to TRUE or FALSE for a foreground color when using 8
  * colors, otherwise it will be unchanged.
  */
-    static int
-lookup_color(int idx, int foreground, int *boldp)
+    static ကိန်းပြည့်
+lookup_color(ကိန်းပြည့် idx, ကိန်းပြည့် foreground, ကိန်းပြည့် *boldp)
 {
-    int		color = color_numbers_16[idx];
+    ကိန်းပြည့်		color = color_numbers_16[idx];
     char_u	*p;
 
     // Use the _16 table to check if it's a valid color name.
-    if (color < 0)
-	return -1;
+    အကယ်၍ (color < 0)
+	ပြန်ပေး -1;
 
-    if (t_colors == 8)
+    အကယ်၍ (t_colors == 8)
     {
 	// t_Co is 8: use the 8 colors table
-#if defined(__QNXNTO__)
+#အကယ်၍ defined(__QNXNTO__)
 	// On qnx, the 8 & 16 color arrays are the same
-	if (STRNCMP(T_NAME, "qansi", 5) == 0)
+	အကယ်၍ (STRNCMP(T_NAME, "qansi", 5) == 0)
 	    color = color_numbers_16[idx];
-	else
+	မဟုတ်ပါက
 #endif
 	    color = color_numbers_8[idx];
-	if (foreground)
+	အကယ်၍ (foreground)
 	{
 	    // set/reset bold attribute to get light foreground
 	    // colors (on some terminals, e.g. "linux")
-	    if (color & 8)
+	    အကယ်၍ (color & 8)
 		*boldp = TRUE;
-	    else
+	    မဟုတ်ပါက
 		*boldp = FALSE;
 	}
 	color &= 7;	// truncate to 8 colors
     }
-    else if (t_colors == 16 || t_colors == 88
+    မဟုတ်ပါက အကယ်၍ (t_colors == 16 || t_colors == 88
 					   || t_colors >= 256)
     {
 	// Guess: if the termcap entry ends in 'm', it is
 	// probably an xterm-like terminal.  Use the changed
 	// order for colors.
-	if (*T_CAF != NUL)
+	အကယ်၍ (*T_CAF != NUL)
 	    p = T_CAF;
-	else
+	မဟုတ်ပါက
 	    p = T_CSF;
-	if (*p != NUL && (t_colors > 256
+	အကယ်၍ (*p != NUL && (t_colors > 256
 			      || *(p + STRLEN(p) - 1) == 'm'))
 	{
-	    if (t_colors == 88)
+	    အကယ်၍ (t_colors == 88)
 		color = color_numbers_88[idx];
-	    else if (t_colors >= 256)
+	    မဟုတ်ပါက အကယ်၍ (t_colors >= 256)
 		color = color_numbers_256[idx];
-	    else
+	    မဟုတ်ပါက
 		color = color_numbers_8[idx];
 	}
 #ifdef FEAT_TERMRESPONSE
-	if (t_colors >= 256 && color == 15 && is_mac_terminal)
+	အကယ်၍ (t_colors >= 256 && color == 15 && is_mac_terminal)
 	    // Terminal.app has a bug: 15 is light grey. Use white
 	    // from the color cube instead.
 	    color = 231;
 #endif
     }
-    return color;
+    ပြန်ပေး color;
 }
 
 /*
@@ -784,27 +784,27 @@ lookup_color(int idx, int foreground, int *boldp)
     static void
 highlight_group_link(
 	char_u	*from_hg,
-	int	from_len,
+	ကိန်းပြည့်	from_len,
 	char_u	*to_hg,
-	int	to_len,
-	int	dodefault,
-	int	forceit,
-	int	init)
+	ကိန်းပြည့်	to_len,
+	ကိန်းပြည့်	dodefault,
+	ကိန်းပြည့်	forceit,
+	ကိန်းပြည့်	init)
 {
-    int		from_id;
-    int		to_id;
+    ကိန်းပြည့်		from_id;
+    ကိန်းပြည့်		to_id;
     hl_group_T	*hlgroup = NULL;
 
     from_id = syn_check_group(from_hg, from_len);
-    if (STRNCMP(to_hg, "NONE", 4) == 0)
+    အကယ်၍ (STRNCMP(to_hg, "NONE", 4) == 0)
 	to_id = 0;
-    else
+    မဟုတ်ပါက
 	to_id = syn_check_group(to_hg, to_len);
 
-    if (from_id > 0)
+    အကယ်၍ (from_id > 0)
     {
 	hlgroup = &HL_TABLE()[from_id - 1];
-	if (dodefault && (forceit || hlgroup->sg_deflink == 0))
+	အကယ်၍ (dodefault && (forceit || hlgroup->sg_deflink == 0))
 	{
 	    hlgroup->sg_deflink = to_id;
 #ifdef FEAT_EVAL
@@ -814,23 +814,23 @@ highlight_group_link(
 	}
     }
 
-    if (from_id > 0 && (!init || hlgroup->sg_set == 0))
+    အကယ်၍ (from_id > 0 && (!init || hlgroup->sg_set == 0))
     {
 	// Don't allow a link when there already is some highlighting
 	// for the group, unless '!' is used
-	if (to_id > 0 && !forceit && !init
+	အကယ်၍ (to_id > 0 && !forceit && !init
 		&& hl_has_settings(from_id - 1, dodefault))
 	{
-	    if (SOURCING_NAME == NULL && !dodefault)
+	    အကယ်၍ (SOURCING_NAME == NULL && !dodefault)
 		emsg(_(e_group_has_settings_highlight_link_ignored));
 	}
-	else if (hlgroup->sg_link != to_id
+	မဟုတ်ပါက အကယ်၍ (hlgroup->sg_link != to_id
 #ifdef FEAT_EVAL
 		|| hlgroup->sg_script_ctx.sc_sid != current_sctx.sc_sid
 #endif
 		|| hlgroup->sg_cleared)
 	{
-	    if (!init)
+	    အကယ်၍ (!init)
 		hlgroup->sg_set |= SG_LINK;
 	    hlgroup->sg_link = to_id;
 #ifdef FEAT_EVAL
@@ -854,7 +854,7 @@ highlight_group_link(
     static void
 highlight_reset_all(void)
 {
-    int		idx;
+    ကိန်းပြည့်		idx;
 
 #ifdef FEAT_GUI
     // First, we do not destroy the old values, but allocate the new
@@ -862,20 +862,20 @@ highlight_reset_all(void)
     // If we destroy the old values first, then the old values
     // (such as GuiFont's or GuiFontset's) will still be displayed but
     // invalid because they were free'd.
-    if (gui.in_use)
+    အကယ်၍ (gui.in_use)
     {
 # ifdef FEAT_BEVAL_TIP
 	gui_init_tooltip_font();
 # endif
-# if defined(FEAT_MENU) && defined(FEAT_GUI_MOTIF)
+# အကယ်၍ defined(FEAT_MENU) && defined(FEAT_GUI_MOTIF)
 	gui_init_menu_font();
 # endif
     }
-# if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_X11)
+# အကယ်၍ defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_X11)
     gui_mch_def_colors();
 # endif
 # ifdef FEAT_GUI_MSWIN
-    if (gui.in_use)
+    အကယ်၍ (gui.in_use)
 	gui_mch_set_titlebar_colors();
 # endif
 # ifdef FEAT_GUI_X11
@@ -885,7 +885,7 @@ highlight_reset_all(void)
     // group defined by default, which IS currently the case.
     gui_mch_new_menu_colors();
 #  endif
-    if (gui.in_use)
+    အကယ်၍ (gui.in_use)
     {
 	gui_new_scrollbar_colors();
 #  ifdef FEAT_BEVAL_GUI
@@ -907,13 +907,13 @@ highlight_reset_all(void)
     restore_cterm_colors();
 
     // Clear all default highlight groups and load the defaults.
-    for (idx = 0; idx < highlight_ga.ga_len; ++idx)
+    အတွက် (idx = 0; idx < highlight_ga.ga_len; ++idx)
 	highlight_clear(idx);
     init_highlight(TRUE, TRUE);
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    if (USE_24BIT)
+#အကယ်၍ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    အကယ်၍ (USE_24BIT)
 	highlight_gui_started();
-    else
+    မဟုတ်ပါက
 #endif
 	highlight_changed();
     redraw_later_clear();
@@ -927,10 +927,10 @@ highlight_reset_all(void)
  * 'init' is set to TRUE when initializing all the highlight groups.
  * Returns TRUE if the attributes are set.
  */
-    static int
-highlight_set_termgui_attr(int idx, char_u *key, char_u *arg, int init)
+    static ကိန်းပြည့်
+highlight_set_termgui_attr(ကိန်းပြည့် idx, char_u *key, char_u *arg, ကိန်းပြည့် init)
 {
-    int		attr;
+    ကိန်းပြည့်		attr;
     size_t	off;
     keyvalue_T	target;
     keyvalue_T	*entry;
@@ -939,55 +939,55 @@ highlight_set_termgui_attr(int idx, char_u *key, char_u *arg, int init)
     off = 0;
     target.key = 0;
     target.value.length = 0;	// not used, see cmp_keyvalue_value_ni()
-    while (arg[off] != NUL)
+    နေစဉ် (arg[off] != NUL)
     {
 	target.value.string = arg + off;
 	entry = (keyvalue_T *)bsearch(&target, &highlight_tab,
-		ARRAY_LENGTH(highlight_tab), sizeof(highlight_tab[0]),
+		ARRAY_LENGTH(highlight_tab), parimaa_na(highlight_tab[0]),
 		cmp_keyvalue_value_ni);
-	if (entry == NULL)
+	အကယ်၍ (entry == NULL)
 	{
 	    semsg(_(e_illegal_value_str), arg);
-	    return FALSE;
+	    ပြန်ပေး FALSE;
 	}
 
 	attr |= entry->key;
 	off += entry->value.length;
-	if (arg[off] == ',')		// another one follows
+	အကယ်၍ (arg[off] == ',')		// another one follows
 	    ++off;
     }
-    if (*key == 'T')
+    အကယ်၍ (*key == 'T')
     {
-	if (!init || !(HL_TABLE()[idx].sg_set & SG_TERM))
+	အကယ်၍ (!init || !(HL_TABLE()[idx].sg_set & SG_TERM))
 	{
-	    if (!init)
+	    အကယ်၍ (!init)
 		HL_TABLE()[idx].sg_set |= SG_TERM;
 	    HL_TABLE()[idx].sg_term = attr;
 	}
     }
-    else if (*key == 'C')
+    မဟုတ်ပါက အကယ်၍ (*key == 'C')
     {
-	if (!init || !(HL_TABLE()[idx].sg_set & SG_CTERM))
+	အကယ်၍ (!init || !(HL_TABLE()[idx].sg_set & SG_CTERM))
 	{
-	    if (!init)
+	    အကယ်၍ (!init)
 		HL_TABLE()[idx].sg_set |= SG_CTERM;
 	    HL_TABLE()[idx].sg_cterm = attr;
 	    HL_TABLE()[idx].sg_cterm_bold = FALSE;
 	}
     }
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
-    else
+#အကယ်၍ defined(FEAT_GUI) || defined(FEAT_EVAL)
+    မဟုတ်ပါက
     {
-	if (!init || !(HL_TABLE()[idx].sg_set & SG_GUI))
+	အကယ်၍ (!init || !(HL_TABLE()[idx].sg_set & SG_GUI))
 	{
-	    if (!init)
+	    အကယ်၍ (!init)
 		HL_TABLE()[idx].sg_set |= SG_GUI;
 	    HL_TABLE()[idx].sg_gui = attr;
 	}
     }
 #endif
 
-    return TRUE;
+    ပြန်ပေး TRUE;
 }
 
 #ifdef FEAT_GUI
@@ -996,30 +996,30 @@ highlight_set_termgui_attr(int idx, char_u *key, char_u *arg, int init)
  * 'arg' is the font name.
  * Returns TRUE if the font is changed.
  */
-    static int
+    static ကိန်းပြည့်
 highlight_set_font(
-	int	idx,
+	ကိန်းပြည့်	idx,
 	char_u	*arg,
-	int	is_normal_group,
-	int	is_menu_group,
-	int	is_tooltip_group)
+	ကိန်းပြည့်	is_normal_group,
+	ကိန်းပြည့်	is_menu_group,
+	ကိန်းပြည့်	is_tooltip_group)
 {
-    int		did_change = FALSE;
+    ကိန်းပြည့်		did_change = FALSE;
 
     // in non-GUI fonts are simply ignored
-    if (HL_TABLE()[idx].sg_font_name != NULL
+    အကယ်၍ (HL_TABLE()[idx].sg_font_name != NULL
 	    && STRCMP(HL_TABLE()[idx].sg_font_name, arg) == 0)
     {
 	// Font name didn't change, ignore.
     }
-    else if (!gui.shell_created)
+    မဟုတ်ပါက အကယ်၍ (!gui.shell_created)
     {
 	// GUI not started yet, always accept the name.
 	vim_free(HL_TABLE()[idx].sg_font_name);
 	HL_TABLE()[idx].sg_font_name = vim_strsave(arg);
 	did_change = TRUE;
     }
-    else
+    မဟုတ်ပါက
     {
 	GuiFont temp_sg_font = HL_TABLE()[idx].sg_font;
 # ifdef FEAT_XFONTSET
@@ -1038,35 +1038,35 @@ highlight_set_font(
 		is_tooltip_group, FALSE);
 
 # ifdef FEAT_XFONTSET
-	if (HL_TABLE()[idx].sg_fontset != NOFONTSET)
+	အကယ်၍ (HL_TABLE()[idx].sg_fontset != NOFONTSET)
 	{
 	    // New fontset was accepted. Free the old one, if there
 	    // was one.
 	    gui_mch_free_fontset(temp_sg_fontset);
 	    did_change = TRUE;
 	}
-	else
+	မဟုတ်ပါက
 	    HL_TABLE()[idx].sg_fontset = temp_sg_fontset;
 # endif
-	if (HL_TABLE()[idx].sg_font != NOFONT)
+	အကယ်၍ (HL_TABLE()[idx].sg_font != NOFONT)
 	{
 	    // New font was accepted. Free the old one, if there was
 	    // one.
 	    gui_mch_free_font(temp_sg_font);
 	    did_change = TRUE;
 	}
-	else
+	မဟုတ်ပါက
 	    HL_TABLE()[idx].sg_font = temp_sg_font;
 	// Update sg_font_name once here, after both font and fontset results
 	// are known.
-	if (did_change)
+	အကယ်၍ (did_change)
 	{
 	    vim_free(HL_TABLE()[idx].sg_font_name);
 	    HL_TABLE()[idx].sg_font_name = vim_strsave(arg);
 	}
     }
 
-    return did_change;
+    ပြန်ပေး did_change;
 }
 #endif
 
@@ -1075,17 +1075,17 @@ highlight_set_font(
  * the bold attribute to "bold".
  */
     static void
-hl_set_ctermfg_normal_group(int color, int bold)
+hl_set_ctermfg_normal_group(ကိန်းပြည့် color, ကိန်းပြည့် bold)
 {
     cterm_normal_fg_color = color + 1;
     cterm_normal_fg_bold = bold;
 #ifdef FEAT_GUI
     // Don't do this if the GUI is used.
-    if (!gui.in_use && !gui.starting)
+    အကယ်၍ (!gui.in_use && !gui.starting)
 #endif
     {
 	set_must_redraw(UPD_CLEAR);
-	if (termcap_active && color >= 0)
+	အကယ်၍ (termcap_active && color >= 0)
 	    term_fg_color(color);
     }
 }
@@ -1094,10 +1094,10 @@ hl_set_ctermfg_normal_group(int color, int bold)
  * Set the cterm foreground color for the highlight group at 'idx' to 'color'.
  */
     static void
-highlight_set_ctermfg(int idx, int color, int is_normal_group)
+highlight_set_ctermfg(ကိန်းပြည့် idx, ကိန်းပြည့် color, ကိန်းပြည့် is_normal_group)
 {
     HL_TABLE()[idx].sg_cterm_fg = color + 1;
-    if (is_normal_group)
+    အကယ်၍ (is_normal_group)
 	hl_set_ctermfg_normal_group(color,
 					(HL_TABLE()[idx].sg_cterm & HL_BOLD));
 }
@@ -1106,29 +1106,29 @@ highlight_set_ctermfg(int idx, int color, int is_normal_group)
  * Set the cterm background color for the Normal highlight group to "color".
  */
     static void
-hl_set_ctermbg_normal_group(int color)
+hl_set_ctermbg_normal_group(ကိန်းပြည့် color)
 {
     cterm_normal_bg_color = color + 1;
 #ifdef FEAT_GUI
     // Don't mess with 'background' if the GUI is used.
-    if (!gui.in_use && !gui.starting)
+    အကယ်၍ (!gui.in_use && !gui.starting)
 #endif
     {
 	set_must_redraw(UPD_CLEAR);
-	if (color >= 0)
+	အကယ်၍ (color >= 0)
 	{
-	    int dark = -1;
+	    ကိန်းပြည့် dark = -1;
 
-	    if (termcap_active)
+	    အကယ်၍ (termcap_active)
 		term_bg_color(color);
-	    if (t_colors < 16)
+	    အကယ်၍ (t_colors < 16)
 		dark = (color == 0 || color == 4);
 	    // Limit the heuristic to the standard 16 colors
-	    else if (color < 16)
+	    မဟုတ်ပါက အကယ်၍ (color < 16)
 		dark = (color < 7 || color == 8);
 	    // Set the 'background' option if the value is
 	    // wrong.
-	    if (dark != -1
+	    အကယ်၍ (dark != -1
 		    && dark != (*p_bg == 'd')
 		    && !option_was_set((char_u *)"bg"))
 	    {
@@ -1144,10 +1144,10 @@ hl_set_ctermbg_normal_group(int color)
  * Set the cterm background color for the highlight group at 'idx' to 'color'.
  */
     static void
-highlight_set_ctermbg(int idx, int color, int is_normal_group)
+highlight_set_ctermbg(ကိန်းပြည့် idx, ကိန်းပြည့် color, ကိန်းပြည့် is_normal_group)
 {
     HL_TABLE()[idx].sg_cterm_bg = color + 1;
-    if (is_normal_group)
+    အကယ်၍ (is_normal_group)
 	hl_set_ctermbg_normal_group(color);
 }
 
@@ -1155,16 +1155,16 @@ highlight_set_ctermbg(int idx, int color, int is_normal_group)
  * Set the cterm underline color for the Normal highlight group to "color".
  */
     static void
-hl_set_ctermul_normal_group(int color)
+hl_set_ctermul_normal_group(ကိန်းပြည့် color)
 {
     cterm_normal_ul_color = color + 1;
 #ifdef FEAT_GUI
     // Don't do this if the GUI is used.
-    if (!gui.in_use && !gui.starting)
+    အကယ်၍ (!gui.in_use && !gui.starting)
 #endif
     {
 	set_must_redraw(UPD_CLEAR);
-	if (termcap_active && color >= 0)
+	အကယ်၍ (termcap_active && color >= 0)
 	    term_ul_color(color);
     }
 }
@@ -1173,10 +1173,10 @@ hl_set_ctermul_normal_group(int color)
  * Set the cterm underline color for the highlight group at 'idx' to 'color'.
  */
     static void
-highlight_set_ctermul(int idx, int color, int is_normal_group)
+highlight_set_ctermul(ကိန်းပြည့် idx, ကိန်းပြည့် color, ကိန်းပြည့် is_normal_group)
 {
     HL_TABLE()[idx].sg_cterm_ul = color + 1;
-    if (is_normal_group)
+    အကယ်၍ (is_normal_group)
 	hl_set_ctermul_normal_group(color);
 }
 
@@ -1188,29 +1188,29 @@ highlight_set_ctermul(int idx, int color, int is_normal_group)
  *
  * Returns TRUE if the font is set.
  */
-    static int
+    static ကိန်းပြည့်
 highlight_set_cterm_font(
-	int	idx,
+	ကိန်းပြည့်	idx,
 	char_u	*arg,
-	int	init)
+	ကိန်းပြည့်	init)
 {
-    int		font;
+    ကိန်းပြည့်		font;
 
-    if (init && (HL_TABLE()[idx].sg_set & SG_CTERM))
-	return FALSE;
+    အကယ်၍ (init && (HL_TABLE()[idx].sg_set & SG_CTERM))
+	ပြန်ပေး FALSE;
 
-    if (!init)
+    အကယ်၍ (!init)
 	HL_TABLE()[idx].sg_set |= SG_CTERM;
 
-    if (VIM_ISDIGIT(*arg))
-	font = atoi((char *)arg);
-    else if (STRICMP(arg, "NONE") == 0)
+    အကယ်၍ (VIM_ISDIGIT(*arg))
+	font = atoi((var_na *)arg);
+    မဟုတ်ပါက အကယ်၍ (STRICMP(arg, "NONE") == 0)
 	font = -1;
-    else
-	return FALSE;
+    မဟုတ်ပါက
+	ပြန်ပေး FALSE;
 
     HL_TABLE()[idx].sg_cterm_font = font + 1;
-    return TRUE;
+    ပြန်ပေး TRUE;
 }
 
 /*
@@ -1224,66 +1224,66 @@ highlight_set_cterm_font(
  *
  * Returns TRUE if the color is set.
  */
-    static int
+    static ကိန်းပြည့်
 highlight_set_cterm_color(
-	int	idx,
+	ကိန်းပြည့်	idx,
 	char_u	*key,
 	char_u	*key_start,
 	char_u	*arg,
-	int	is_normal_group,
-	int	init)
+	ကိန်းပြည့်	is_normal_group,
+	ကိန်းပြည့်	init)
 {
-    int		color;
+    ကိန်းပြည့်		color;
 
-    if (init && (HL_TABLE()[idx].sg_set & SG_CTERM))
-	return FALSE;
+    အကယ်၍ (init && (HL_TABLE()[idx].sg_set & SG_CTERM))
+	ပြန်ပေး FALSE;
 
-    if (!init)
+    အကယ်၍ (!init)
 	HL_TABLE()[idx].sg_set |= SG_CTERM;
 
     // When setting the foreground color, and previously the "bold"
     // flag was set for a light color, reset it now
-    if (key[5] == 'F' && HL_TABLE()[idx].sg_cterm_bold)
+    အကယ်၍ (key[5] == 'F' && HL_TABLE()[idx].sg_cterm_bold)
     {
 	HL_TABLE()[idx].sg_cterm &= ~HL_BOLD;
 	HL_TABLE()[idx].sg_cterm_bold = FALSE;
     }
 
-    if (VIM_ISDIGIT(*arg))
-	color = atoi((char *)arg);
-    else if (STRICMP(arg, "fg") == 0)
+    အကယ်၍ (VIM_ISDIGIT(*arg))
+	color = atoi((var_na *)arg);
+    မဟုတ်ပါက အကယ်၍ (STRICMP(arg, "fg") == 0)
     {
-	if (cterm_normal_fg_color)
+	အကယ်၍ (cterm_normal_fg_color)
 	    color = cterm_normal_fg_color - 1;
-	else
+	မဟုတ်ပါက
 	{
 	    emsg(_(e_fg_color_unknown));
-	    return FALSE;
+	    ပြန်ပေး FALSE;
 	}
     }
-    else if (STRICMP(arg, "bg") == 0)
+    မဟုတ်ပါက အကယ်၍ (STRICMP(arg, "bg") == 0)
     {
-	if (cterm_normal_bg_color > 0)
+	အကယ်၍ (cterm_normal_bg_color > 0)
 	    color = cterm_normal_bg_color - 1;
-	else
+	မဟုတ်ပါက
 	{
 	    emsg(_(e_bg_color_unknown));
-	    return FALSE;
+	    ပြန်ပေး FALSE;
 	}
     }
-    else if (STRICMP(arg, "ul") == 0)
+    မဟုတ်ပါက အကယ်၍ (STRICMP(arg, "ul") == 0)
     {
-	if (cterm_normal_ul_color > 0)
+	အကယ်၍ (cterm_normal_ul_color > 0)
 	    color = cterm_normal_ul_color - 1;
-	else
+	မဟုတ်ပါက
 	{
 	    emsg(_(e_ul_color_unknown));
-	    return FALSE;
+	    ပြန်ပေး FALSE;
 	}
     }
-    else
+    မဟုတ်ပါက
     {
-	int bold = MAYBE;
+	ကိန်းပြည့် bold = MAYBE;
 	keyvalue_T target;
 	keyvalue_T *entry;
 
@@ -1291,111 +1291,111 @@ highlight_set_cterm_color(
 	target.value.string = arg;
 	target.value.length = 0;	// not used, see cmp_keyvalue_value_i()
 	entry = (keyvalue_T *)bsearch(&target, &color_name_tab,
-		ARRAY_LENGTH(color_name_tab), sizeof(color_name_tab[0]),
+		ARRAY_LENGTH(color_name_tab), parimaa_na(color_name_tab[0]),
 		cmp_keyvalue_value_i);
-	if (entry == NULL)
+	အကယ်၍ (entry == NULL)
 	{
 	    semsg(_(e_color_name_or_number_not_recognized_str), key_start);
-	    return FALSE;
+	    ပြန်ပေး FALSE;
 	}
 
 	color = lookup_color(entry->key, key[5] == 'F', &bold);
 
 	// set/reset bold attribute to get light foreground
 	// colors (on some terminals, e.g. "linux")
-	if (bold == TRUE)
+	အကယ်၍ (bold == TRUE)
 	{
 	    HL_TABLE()[idx].sg_cterm |= HL_BOLD;
 	    HL_TABLE()[idx].sg_cterm_bold = TRUE;
 	}
-	else if (bold == FALSE)
+	မဟုတ်ပါက အကယ်၍ (bold == FALSE)
 	    HL_TABLE()[idx].sg_cterm &= ~HL_BOLD;
     }
 
     // Add one to the argument, to avoid zero.  Zero is used for
     // "NONE", then "color" is -1.
-    if (key[5] == 'F')
+    အကယ်၍ (key[5] == 'F')
 	highlight_set_ctermfg(idx, color, is_normal_group);
-    else if (key[5] == 'B')
+    မဟုတ်ပါက အကယ်၍ (key[5] == 'B')
 	highlight_set_ctermbg(idx, color, is_normal_group);
-    else // ctermul
+    မဟုတ်ပါက // ctermul
 	highlight_set_ctermul(idx, color, is_normal_group);
 
-    return TRUE;
+    ပြန်ပေး TRUE;
 }
 
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
+#အကယ်၍ defined(FEAT_GUI) || defined(FEAT_EVAL)
 /*
  * Set the GUI foreground color for the highlight group at 'idx'.
  * Returns TRUE if the color is set.
  */
-    static int
+    static ကိန်းပြည့်
 highlight_set_guifg(
-	int	idx,
+	ကိန်းပြည့်	idx,
 	char_u	*arg,
-	int	is_menu_group UNUSED,
-	int	is_scrollbar_group UNUSED,
-	int	is_tooltip_group UNUSED,
-	int	is_titlebar_group UNUSED,
-	int	is_titlebarnc_group UNUSED,
-	int	*do_colors UNUSED,
-	int	init)
+	ကိန်းပြည့်	is_menu_group UNUSED,
+	ကိန်းပြည့်	is_scrollbar_group UNUSED,
+	ကိန်းပြည့်	is_tooltip_group UNUSED,
+	ကိန်းပြည့်	is_titlebar_group UNUSED,
+	ကိန်းပြည့်	is_titlebarnc_group UNUSED,
+	ကိန်းပြည့်	*do_colors UNUSED,
+	ကိန်းပြည့်	init)
 {
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# အကယ်၍ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     long	i;
 # endif
     char_u	**namep;
-    int		did_change = FALSE;
+    ကိန်းပြည့်		did_change = FALSE;
 
-    if (init && (HL_TABLE()[idx].sg_set & SG_GUI))
-	return FALSE;
+    အကယ်၍ (init && (HL_TABLE()[idx].sg_set & SG_GUI))
+	ပြန်ပေး FALSE;
 
     namep = &HL_TABLE()[idx].sg_gui_fg_name;
-    if (!init)
+    အကယ်၍ (!init)
 	HL_TABLE()[idx].sg_set |= SG_GUI;
 
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# အကယ်၍ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     // In GUI guifg colors are only used when recognized
     i = color_name2handle(arg);
-    if (i != INVALCOLOR || STRCMP(arg, "NONE") == 0 || !USE_24BIT)
+    အကယ်၍ (i != INVALCOLOR || STRCMP(arg, "NONE") == 0 || !USE_24BIT)
     {
 	HL_TABLE()[idx].sg_gui_fg = i;
 # endif
-	if (*namep == NULL || STRCMP(*namep, arg) != 0)
+	အကယ်၍ (*namep == NULL || STRCMP(*namep, arg) != 0)
 	{
 	    vim_free(*namep);
-	    if (STRCMP(arg, "NONE") != 0)
+	    အကယ်၍ (STRCMP(arg, "NONE") != 0)
 		*namep = vim_strsave(arg);
-	    else
+	    မဟုတ်ပါက
 		*namep = NULL;
 	    did_change = TRUE;
 	}
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# အကယ်၍ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 #  ifdef FEAT_GUI_MSWIN
-	if (is_titlebar_group && gui.title_fg_pixel != i)
+	အကယ်၍ (is_titlebar_group && gui.title_fg_pixel != i)
 	{
 	    gui.title_fg_pixel = i;
 	    *do_colors = TRUE;
 	}
-	if (is_titlebarnc_group && gui.titlenc_fg_pixel != i)
+	အကယ်၍ (is_titlebarnc_group && gui.titlenc_fg_pixel != i)
 	{
 	    gui.titlenc_fg_pixel = i;
 	    *do_colors = TRUE;
 	}
 #  endif
 #  ifdef FEAT_GUI_X11
-	if (is_menu_group && gui.menu_fg_pixel != i)
+	အကယ်၍ (is_menu_group && gui.menu_fg_pixel != i)
 	{
 	    gui.menu_fg_pixel = i;
 	    *do_colors = TRUE;
 	}
-	if (is_scrollbar_group && gui.scroll_fg_pixel != i)
+	အကယ်၍ (is_scrollbar_group && gui.scroll_fg_pixel != i)
 	{
 	    gui.scroll_fg_pixel = i;
 	    *do_colors = TRUE;
 	}
 #   ifdef FEAT_BEVAL_GUI
-	if (is_tooltip_group && gui.tooltip_fg_pixel != i)
+	အကယ်၍ (is_tooltip_group && gui.tooltip_fg_pixel != i)
 	{
 	    gui.tooltip_fg_pixel = i;
 	    *do_colors = TRUE;
@@ -1405,80 +1405,80 @@ highlight_set_guifg(
     }
 # endif
 
-    return did_change;
+    ပြန်ပေး did_change;
 }
 
 /*
  * Set the GUI background color for the highlight group at 'idx'.
  * Returns TRUE if the color is set.
  */
-    static int
+    static ကိန်းပြည့်
 highlight_set_guibg(
-	int	idx,
+	ကိန်းပြည့်	idx,
 	char_u	*arg,
-	int	is_menu_group UNUSED,
-	int	is_scrollbar_group UNUSED,
-	int	is_tooltip_group UNUSED,
-	int	is_titlebar_group UNUSED,
-	int	is_titlebarnc_group UNUSED,
-	int	*do_colors UNUSED,
-	int	init)
+	ကိန်းပြည့်	is_menu_group UNUSED,
+	ကိန်းပြည့်	is_scrollbar_group UNUSED,
+	ကိန်းပြည့်	is_tooltip_group UNUSED,
+	ကိန်းပြည့်	is_titlebar_group UNUSED,
+	ကိန်းပြည့်	is_titlebarnc_group UNUSED,
+	ကိန်းပြည့်	*do_colors UNUSED,
+	ကိန်းပြည့်	init)
 {
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    int		i;
+# အကယ်၍ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    ကိန်းပြည့်		i;
 # endif
     char_u	**namep;
-    int		did_change = FALSE;
+    ကိန်းပြည့်		did_change = FALSE;
 
-    if (init && (HL_TABLE()[idx].sg_set & SG_GUI))
-	return FALSE;
+    အကယ်၍ (init && (HL_TABLE()[idx].sg_set & SG_GUI))
+	ပြန်ပေး FALSE;
 
     namep = &HL_TABLE()[idx].sg_gui_bg_name;
-    if (!init)
+    အကယ်၍ (!init)
 	HL_TABLE()[idx].sg_set |= SG_GUI;
 
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# အကယ်၍ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     // In GUI guibg colors are only used when recognized
     i = color_name2handle(arg);
-    if (i != INVALCOLOR || STRCMP(arg, "NONE") == 0 || !USE_24BIT)
+    အကယ်၍ (i != INVALCOLOR || STRCMP(arg, "NONE") == 0 || !USE_24BIT)
     {
 	HL_TABLE()[idx].sg_gui_bg = i;
 # endif
-	if (*namep == NULL || STRCMP(*namep, arg) != 0)
+	အကယ်၍ (*namep == NULL || STRCMP(*namep, arg) != 0)
 	{
 	    vim_free(*namep);
-	    if (STRCMP(arg, "NONE") != 0)
+	    အကယ်၍ (STRCMP(arg, "NONE") != 0)
 		*namep = vim_strsave(arg);
-	    else
+	    မဟုတ်ပါက
 		*namep = NULL;
 	    did_change = TRUE;
 	}
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# အကယ်၍ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 #  ifdef FEAT_GUI_MSWIN
-	if (is_titlebar_group && gui.title_bg_pixel != i)
+	အကယ်၍ (is_titlebar_group && gui.title_bg_pixel != i)
 	{
 	    gui.title_bg_pixel = i;
 	    *do_colors = TRUE;
 	}
-	if (is_titlebarnc_group && gui.titlenc_bg_pixel != i)
+	အကယ်၍ (is_titlebarnc_group && gui.titlenc_bg_pixel != i)
 	{
 	    gui.titlenc_bg_pixel = i;
 	    *do_colors = TRUE;
 	}
 #  endif
 #  ifdef FEAT_GUI_X11
-	if (is_menu_group && gui.menu_bg_pixel != i)
+	အကယ်၍ (is_menu_group && gui.menu_bg_pixel != i)
 	{
 	    gui.menu_bg_pixel = i;
 	    *do_colors = TRUE;
 	}
-	if (is_scrollbar_group && gui.scroll_bg_pixel != i)
+	အကယ်၍ (is_scrollbar_group && gui.scroll_bg_pixel != i)
 	{
 	    gui.scroll_bg_pixel = i;
 	    *do_colors = TRUE;
 	}
 #   ifdef FEAT_BEVAL_GUI
-	if (is_tooltip_group && gui.tooltip_bg_pixel != i)
+	အကယ်၍ (is_tooltip_group && gui.tooltip_bg_pixel != i)
 	{
 	    gui.tooltip_bg_pixel = i;
 	    *do_colors = TRUE;
@@ -1488,50 +1488,50 @@ highlight_set_guibg(
     }
 # endif
 
-    return did_change;
+    ပြန်ပေး did_change;
 }
 
 /*
  * Set the GUI undercurl/strikethrough color for the highlight group at 'idx'.
  * Returns TRUE if the color is set.
  */
-    static int
-highlight_set_guisp(int idx, char_u *arg, int init)
+    static ကိန်းပြည့်
+highlight_set_guisp(ကိန်းပြည့် idx, char_u *arg, ကိန်းပြည့် init)
 {
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    int		i;
+# အကယ်၍ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    ကိန်းပြည့်		i;
 # endif
-    int		did_change = FALSE;
+    ကိန်းပြည့်		did_change = FALSE;
     char_u	**namep;
 
-    if (init && (HL_TABLE()[idx].sg_set & SG_GUI))
-	return FALSE;
+    အကယ်၍ (init && (HL_TABLE()[idx].sg_set & SG_GUI))
+	ပြန်ပေး FALSE;
 
     namep = &HL_TABLE()[idx].sg_gui_sp_name;
-    if (!init)
+    အကယ်၍ (!init)
 	HL_TABLE()[idx].sg_set |= SG_GUI;
 
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# အကယ်၍ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     // In GUI guisp colors are only used when recognized
     i = color_name2handle(arg);
-    if (i != INVALCOLOR || STRCMP(arg, "NONE") == 0 || !USE_24BIT)
+    အကယ်၍ (i != INVALCOLOR || STRCMP(arg, "NONE") == 0 || !USE_24BIT)
     {
 	HL_TABLE()[idx].sg_gui_sp = i;
 # endif
-	if (*namep == NULL || STRCMP(*namep, arg) != 0)
+	အကယ်၍ (*namep == NULL || STRCMP(*namep, arg) != 0)
 	{
 	    vim_free(*namep);
-	    if (STRCMP(arg, "NONE") != 0)
+	    အကယ်၍ (STRCMP(arg, "NONE") != 0)
 		*namep = vim_strsave(arg);
-	    else
+	    မဟုတ်ပါက
 		*namep = NULL;
 	    did_change = TRUE;
 	}
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# အကယ်၍ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     }
 # endif
 
-    return did_change;
+    ပြန်ပေး did_change;
 }
 #endif
 
@@ -1539,82 +1539,82 @@ highlight_set_guisp(int idx, char_u *arg, int init)
  * Set the start/stop terminal codes for a highlight group.
  * Returns TRUE if the terminal code is set.
  */
-    static int
-highlight_set_startstop_termcode(int idx, char_u *key, char_u *arg, int init)
+    static ကိန်းပြည့်
+highlight_set_startstop_termcode(ကိန်းပြည့် idx, char_u *key, char_u *arg, ကိန်းပြည့် init)
 {
-    int		off;
+    ကိန်းပြည့်		off;
     char_u	buf[100];
-    int		len;
+    ကိန်းပြည့်		len;
     char_u	*tname;
     char_u	*p;
 
-    if (!init)
+    အကယ်၍ (!init)
 	HL_TABLE()[idx].sg_set |= SG_TERM;
 
     // The "start" and "stop"  arguments can be a literal escape
     // sequence, or a comma separated list of terminal codes.
-    if (STRNCMP(arg, "t_", 2) == 0)
+    အကယ်၍ (STRNCMP(arg, "t_", 2) == 0)
     {
 	off = 0;
 	buf[0] = 0;
-	while (arg[off] != NUL)
+	နေစဉ် (arg[off] != NUL)
 	{
 	    // Isolate one termcap name
-	    for (len = 0; arg[off + len] &&
+	    အတွက် (len = 0; arg[off + len] &&
 		    arg[off + len] != ','; ++len)
 		;
 	    tname = vim_strnsave(arg + off, len);
-	    if (tname == NULL)		// out of memory
-		return FALSE;
+	    အကယ်၍ (tname == NULL)		// out of memory
+		ပြန်ပေး FALSE;
 	    // lookup the escape sequence for the item
 	    p = get_term_code(tname);
 	    vim_free(tname);
-	    if (p == NULL)	    // ignore non-existing things
+	    အကယ်၍ (p == NULL)	    // ignore non-existing things
 		p = (char_u *)"";
 
 	    // Append it to the already found stuff
-	    if ((int)(STRLEN(buf) + STRLEN(p)) >= 99)
+	    အကယ်၍ ((ကိန်းပြည့်)(STRLEN(buf) + STRLEN(p)) >= 99)
 	    {
 		semsg(_(e_terminal_code_too_long_str), arg);
-		return FALSE;
+		ပြန်ပေး FALSE;
 	    }
 	    STRCAT(buf, p);
 
 	    // Advance to the next item
 	    off += len;
-	    if (arg[off] == ',')	    // another one follows
+	    အကယ်၍ (arg[off] == ',')	    // another one follows
 		++off;
 	}
     }
-    else
+    မဟုတ်ပါက
     {
 	// Copy characters from arg[] to buf[], translating <> codes.
-	for (p = arg, off = 0; off < 100 - 6 && *p; )
+	အတွက် (p = arg, off = 0; off < 100 - 6 && *p; )
 	{
 	    len = trans_special(&p, buf + off, FSK_SIMPLIFY, FALSE, NULL);
-	    if (len > 0)	    // recognized special char
+	    အကယ်၍ (len > 0)	    // recognized special char
 		off += len;
-	    else		    // copy as normal char
+	    မဟုတ်ပါက		    // copy as normal char
 		buf[off++] = *p++;
 	}
 	buf[off] = NUL;
     }
 
-    if (STRCMP(buf, "NONE") == 0)	// resetting the value
+    အကယ်၍ (STRCMP(buf, "NONE") == 0)	// resetting the value
 	p = NULL;
-    else
+    မဟုတ်ပါက
 	p = vim_strsave(buf);
-    if (key[2] == 'A')
+    အကယ်၍ (key[2] == 'A')
     {
 	vim_free(HL_TABLE()[idx].sg_start);
 	HL_TABLE()[idx].sg_start = p;
     }
-    else
+    မဟုတ်ပါက
     {
 	vim_free(HL_TABLE()[idx].sg_stop);
 	HL_TABLE()[idx].sg_stop = p;
     }
-    return TRUE;
+    ပြန်ပေး TRUE;
 }
 
 /*
@@ -1625,8 +1625,8 @@ highlight_set_startstop_termcode(int idx, char_u *key, char_u *arg, int init)
     void
 do_highlight(
     char_u	*line,
-    int		forceit,
-    int		init)	    // TRUE when called for initializing
+    ကိန်းပြည့်		forceit,
+    ကိန်းပြည့်		init)	    // TRUE when called for initializing
 {
     char_u	*name_end;
     char_u	*linep;
@@ -1634,45 +1634,45 @@ do_highlight(
     char_u	*arg_start;
     char_u	*key = NULL, *arg = NULL;
     long	i;
-    int		id;
-    int		idx;
+    ကိန်းပြည့်		id;
+    ကိန်းပြည့်		idx;
     hl_group_T	item_before;
-    int		did_change = FALSE;
-    int		dodefault = FALSE;
-    int		doclear = FALSE;
-    int		dolink = FALSE;
-    int		error = FALSE;
-    int		is_normal_group = FALSE;	// "Normal" group
+    ကိန်းပြည့်		did_change = FALSE;
+    ကိန်းပြည့်		dodefault = FALSE;
+    ကိန်းပြည့်		doclear = FALSE;
+    ကိန်းပြည့်		dolink = FALSE;
+    ကိန်းပြည့်		error = FALSE;
+    ကိန်းပြည့်		is_normal_group = FALSE;	// "Normal" group
 #ifdef FEAT_GUI_MSWIN
-    int		is_titlebar_group = FALSE;	// "TitleBar" group
-    int		is_titlebarnc_group = FALSE;	// "TitleBarNC" group
-#else
+    ကိန်းပြည့်		is_titlebar_group = FALSE;	// "TitleBar" group
+    ကိန်းပြည့်		is_titlebarnc_group = FALSE;	// "TitleBarNC" group
+#မဟုတ်ပါက
 # define is_titlebar_group 0
 # define is_titlebarnc_group 0
 #endif
 #ifdef FEAT_GUI_X11
-    int		is_menu_group = FALSE;		// "Menu" group
-    int		is_scrollbar_group = FALSE;	// "Scrollbar" group
-    int		is_tooltip_group = FALSE;	// "Tooltip" group
-#else
+    ကိန်းပြည့်		is_menu_group = FALSE;		// "Menu" group
+    ကိန်းပြည့်		is_scrollbar_group = FALSE;	// "Scrollbar" group
+    ကိန်းပြည့်		is_tooltip_group = FALSE;	// "Tooltip" group
+#မဟုတ်ပါက
 # define is_menu_group 0
 # define is_tooltip_group 0
 # define is_scrollbar_group 0
 #endif
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
-    int		do_colors = FALSE;		// need to update colors?
+#အကယ်၍ defined(FEAT_GUI) || defined(FEAT_EVAL)
+    ကိန်းပြည့်		do_colors = FALSE;		// need to update colors?
 #endif
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    int		did_highlight_changed = FALSE;
+#အကယ်၍ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    ကိန်းပြည့်		did_highlight_changed = FALSE;
 #endif
 
     // If no argument, list current highlighting.
-    if (!init && ends_excmd2(line - 1, line))
+    အကယ်၍ (!init && ends_excmd2(line - 1, line))
     {
-	for (i = 1; i <= highlight_ga.ga_len && !got_int; ++i)
+	အတွက် (i = 1; i <= highlight_ga.ga_len && !got_int; ++i)
 	    // TODO: only call when the group has attributes set
-	    highlight_list_one((int)i);
-	return;
+	    highlight_list_one((ကိန်းပြည့်)i);
+	ပြန်ပေး;
     }
 
     // Isolate the name.
@@ -1680,7 +1680,7 @@ do_highlight(
     linep = skipwhite(name_end);
 
     // Check for "default" argument.
-    if (STRNCMP(line, "default", name_end - line) == 0)
+    အကယ်၍ (STRNCMP(line, "default", name_end - line) == 0)
     {
 	dodefault = TRUE;
 	line = linep;
@@ -1689,63 +1689,63 @@ do_highlight(
     }
 
     // Check for "clear" or "link" argument.
-    if (STRNCMP(line, "clear", name_end - line) == 0)
+    အကယ်၍ (STRNCMP(line, "clear", name_end - line) == 0)
 	doclear = TRUE;
-    if (STRNCMP(line, "link", name_end - line) == 0)
+    အကယ်၍ (STRNCMP(line, "link", name_end - line) == 0)
 	dolink = TRUE;
 
     // ":highlight {group-name}": list highlighting for one group.
-    if (!doclear && !dolink && ends_excmd2(line, linep))
+    အကယ်၍ (!doclear && !dolink && ends_excmd2(line, linep))
     {
-	id = syn_namen2id(line, (int)(name_end - line));
-	if (id == 0)
+	id = syn_namen2id(line, (ကိန်းပြည့်)(name_end - line));
+	အကယ်၍ (id == 0)
 	    semsg(_(e_highlight_group_name_not_found_str), line);
-	else
+	မဟုတ်ပါက
 	    highlight_list_one(id);
-	return;
+	ပြန်ပေး;
     }
 
     // Handle ":highlight link {from} {to}" command.
-    if (dolink)
+    အကယ်၍ (dolink)
     {
 	char_u	    *from_start = linep;
 	char_u	    *from_end;
-	int	    from_len;
+	ကိန်းပြည့်	    from_len;
 	char_u	    *to_start;
 	char_u	    *to_end;
-	int	    to_len;
+	ကိန်းပြည့်	    to_len;
 
 	from_end = skiptowhite(from_start);
 	to_start = skipwhite(from_end);
 	to_end	 = skiptowhite(to_start);
 
-	if (ends_excmd2(line, from_start) || ends_excmd2(line, to_start))
+	အကယ်၍ (ends_excmd2(line, from_start) || ends_excmd2(line, to_start))
 	{
 	    semsg(_(e_not_enough_arguments_highlight_link_str), from_start);
-	    return;
+	    ပြန်ပေး;
 	}
 
-	if (!ends_excmd2(line, skipwhite(to_end)))
+	အကယ်၍ (!ends_excmd2(line, skipwhite(to_end)))
 	{
 	    semsg(_(e_too_many_arguments_highlight_link_str), from_start);
-	    return;
+	    ပြန်ပေး;
 	}
 
-	from_len = (int)(from_end - from_start);
-	to_len = (int)(to_end - to_start);
+	from_len = (ကိန်းပြည့်)(from_end - from_start);
+	to_len = (ကိန်းပြည့်)(to_end - to_start);
 	highlight_group_link(from_start, from_len, to_start, to_len,
 						dodefault, forceit, init);
-	return;
+	ပြန်ပေး;
     }
 
-    if (doclear)
+    အကယ်၍ (doclear)
     {
 	// ":highlight clear [group]" command.
-	if (ends_excmd2(line, linep))
+	အကယ်၍ (ends_excmd2(line, linep))
 	{
 	    // ":highlight clear" without group name
 	    highlight_reset_all();
-	    return;
+	    ပြန်ပေး;
 	}
 	line = linep;
 	name_end = skiptowhite(line);
@@ -1753,74 +1753,74 @@ do_highlight(
     }
 
     // Find the group name in the table.  If it does not exist yet, add it.
-    id = syn_check_group(line, (int)(name_end - line));
-    if (id == 0)	// failed (out of memory)
-	return;
+    id = syn_check_group(line, (ကိန်းပြည့်)(name_end - line));
+    အကယ်၍ (id == 0)	// failed (out of memory)
+	ပြန်ပေး;
     idx = id - 1;	// index is ID minus one
 
     // Return if "default" was used and the group already has settings.
-    if (dodefault && hl_has_settings(idx, TRUE))
-	return;
+    အကယ်၍ (dodefault && hl_has_settings(idx, TRUE))
+	ပြန်ပေး;
 
     // Make a copy so we can check if any attribute actually changed.
     item_before = HL_TABLE()[idx];
 
-    if (STRCMP(HL_TABLE()[idx].sg_name_u, "NORMAL") == 0)
+    အကယ်၍ (STRCMP(HL_TABLE()[idx].sg_name_u, "NORMAL") == 0)
 	is_normal_group = TRUE;
 #ifdef FEAT_GUI_MSWIN
-    else if (STRCMP(HL_TABLE()[idx].sg_name_u, "TITLEBAR") == 0)
+    မဟုတ်ပါက အကယ်၍ (STRCMP(HL_TABLE()[idx].sg_name_u, "TITLEBAR") == 0)
 	is_titlebar_group = TRUE;
-    else if (STRCMP(HL_TABLE()[idx].sg_name_u, "TITLEBARNC") == 0)
+    မဟုတ်ပါက အကယ်၍ (STRCMP(HL_TABLE()[idx].sg_name_u, "TITLEBARNC") == 0)
 	is_titlebarnc_group = TRUE;
 #endif
 #ifdef FEAT_GUI_X11
-    else if (STRCMP(HL_TABLE()[idx].sg_name_u, "MENU") == 0)
+    မဟုတ်ပါက အကယ်၍ (STRCMP(HL_TABLE()[idx].sg_name_u, "MENU") == 0)
 	is_menu_group = TRUE;
-    else if (STRCMP(HL_TABLE()[idx].sg_name_u, "SCROLLBAR") == 0)
+    မဟုတ်ပါက အကယ်၍ (STRCMP(HL_TABLE()[idx].sg_name_u, "SCROLLBAR") == 0)
 	is_scrollbar_group = TRUE;
-    else if (STRCMP(HL_TABLE()[idx].sg_name_u, "TOOLTIP") == 0)
+    မဟုတ်ပါက အကယ်၍ (STRCMP(HL_TABLE()[idx].sg_name_u, "TOOLTIP") == 0)
 	is_tooltip_group = TRUE;
 #endif
 
     // Clear the highlighting for ":hi clear {group}" and ":hi clear".
-    if (doclear || (forceit && init))
+    အကယ်၍ (doclear || (forceit && init))
     {
 	highlight_clear(idx);
-	if (!doclear)
+	အကယ်၍ (!doclear)
 	    HL_TABLE()[idx].sg_set = 0;
     }
 
-    if (!doclear)
-	while (!ends_excmd2(line, linep))
+    အကယ်၍ (!doclear)
+	နေစဉ် (!ends_excmd2(line, linep))
 	{
 	    key_start = linep;
-	    if (*linep == '=')
+	    အကယ်၍ (*linep == '=')
 	    {
 		semsg(_(e_unexpected_equal_sign_str), key_start);
 		error = TRUE;
-		break;
+		bha_nga;
 	    }
 
 	    // Note: Keep this in sync with get_highlight_group_key.
 
 	    // Isolate the key ("term", "ctermfg", "ctermbg", "font", "guifg"
 	    // or "guibg").
-	    while (*linep && !VIM_ISWHITE(*linep) && *linep != '=')
+	    နေစဉ် (*linep && !VIM_ISWHITE(*linep) && *linep != '=')
 		++linep;
 	    vim_free(key);
 	    key = vim_strnsave_up(key_start, linep - key_start);
-	    if (key == NULL)
+	    အကယ်၍ (key == NULL)
 	    {
 		error = TRUE;
-		break;
+		bha_nga;
 	    }
 	    linep = skipwhite(linep);
 
-	    if (STRCMP(key, "NONE") == 0)
+	    အကယ်၍ (STRCMP(key, "NONE") == 0)
 	    {
-		if (!init || HL_TABLE()[idx].sg_set == 0)
+		အကယ်၍ (!init || HL_TABLE()[idx].sg_set == 0)
 		{
-		    if (!init)
+		    အကယ်၍ (!init)
 			HL_TABLE()[idx].sg_set |= SG_TERM+SG_CTERM+SG_GUI;
 		    highlight_clear(idx);
 		}
@@ -1828,132 +1828,132 @@ do_highlight(
 	    }
 
 	    // Check for the equal sign.
-	    if (*linep != '=')
+	    အကယ်၍ (*linep != '=')
 	    {
 		semsg(_(e_missing_equal_sign_str_2), key_start);
 		error = TRUE;
-		break;
+		bha_nga;
 	    }
 	    ++linep;
 
 	    // Isolate the argument.
 	    linep = skipwhite(linep);
-	    if (*linep == '\'')		// guifg='color name'
+	    အကယ်၍ (*linep == '\'')		// guifg='color name'
 	    {
 		arg_start = ++linep;
 		linep = vim_strchr(linep, '\'');
-		if (linep == NULL)
+		အကယ်၍ (linep == NULL)
 		{
 		    semsg(_(e_invalid_argument_str), key_start);
 		    error = TRUE;
-		    break;
+		    bha_nga;
 		}
 	    }
-	    else
+	    မဟုတ်ပါက
 	    {
 		arg_start = linep;
 		linep = skiptowhite(linep);
 	    }
-	    if (linep == arg_start)
+	    အကယ်၍ (linep == arg_start)
 	    {
 		semsg(_(e_missing_argument_str), key_start);
 		error = TRUE;
-		break;
+		bha_nga;
 	    }
 	    vim_free(arg);
 	    arg = vim_strnsave(arg_start, linep - arg_start);
-	    if (arg == NULL)
+	    အကယ်၍ (arg == NULL)
 	    {
 		error = TRUE;
-		break;
+		bha_nga;
 	    }
-	    if (*linep == '\'')
+	    အကယ်၍ (*linep == '\'')
 		++linep;
 
 	    // Store the argument.
-	    if (STRCMP(key, "TERM") == 0
+	    အကယ်၍ (STRCMP(key, "TERM") == 0
 		    || STRCMP(key, "CTERM") == 0
 		    || STRCMP(key, "GUI") == 0)
 	    {
-		if (!highlight_set_termgui_attr(idx, key, arg, init))
+		အကယ်၍ (!highlight_set_termgui_attr(idx, key, arg, init))
 		{
 		    error = TRUE;
-		    break;
+		    bha_nga;
 		}
 	    }
-	    else if (STRCMP(key, "FONT") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(key, "FONT") == 0)
 	    {
 		// in non-GUI fonts are simply ignored
 #ifdef FEAT_GUI
-		if (highlight_set_font(idx, arg, is_normal_group,
+		အကယ်၍ (highlight_set_font(idx, arg, is_normal_group,
 					      is_menu_group, is_tooltip_group))
 		    did_change = TRUE;
 #endif
 	    }
-	    else if (STRCMP(key, "CTERMFG") == 0
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(key, "CTERMFG") == 0
 		    || STRCMP(key, "CTERMBG") == 0
 		    || STRCMP(key, "CTERMUL") == 0)
 	    {
-		if (!highlight_set_cterm_color(idx, key, key_start, arg,
+		အကယ်၍ (!highlight_set_cterm_color(idx, key, key_start, arg,
 							is_normal_group, init))
 		{
 		    error = TRUE;
-		    break;
+		    bha_nga;
 		}
 	    }
-	    else if (STRCMP(key, "CTERMFONT") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(key, "CTERMFONT") == 0)
 	    {
-		if (!highlight_set_cterm_font(idx, arg, init))
+		အကယ်၍ (!highlight_set_cterm_font(idx, arg, init))
 		{
 		    error = TRUE;
-		    break;
+		    bha_nga;
 		}
 	    }
-	    else if (STRCMP(key, "GUIFG") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(key, "GUIFG") == 0)
 	    {
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
-		if (highlight_set_guifg(idx, arg, is_menu_group,
+#အကယ်၍ defined(FEAT_GUI) || defined(FEAT_EVAL)
+		အကယ်၍ (highlight_set_guifg(idx, arg, is_menu_group,
 			    is_scrollbar_group, is_tooltip_group,
 			    is_titlebar_group, is_titlebarnc_group,
 			    &do_colors, init))
 		    did_change = TRUE;
 #endif
 	    }
-	    else if (STRCMP(key, "GUIBG") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(key, "GUIBG") == 0)
 	    {
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
-		if (highlight_set_guibg(idx, arg, is_menu_group,
+#အကယ်၍ defined(FEAT_GUI) || defined(FEAT_EVAL)
+		အကယ်၍ (highlight_set_guibg(idx, arg, is_menu_group,
 			    is_scrollbar_group, is_tooltip_group,
 			    is_titlebar_group, is_titlebarnc_group,
 			    &do_colors, init))
 		    did_change = TRUE;
 #endif
 	    }
-	    else if (STRCMP(key, "GUISP") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(key, "GUISP") == 0)
 	    {
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
-		if (highlight_set_guisp(idx, arg, init))
+#အကယ်၍ defined(FEAT_GUI) || defined(FEAT_EVAL)
+		အကယ်၍ (highlight_set_guisp(idx, arg, init))
 		    did_change = TRUE;
 #endif
 	    }
-	    else if (STRCMP(key, "START") == 0 || STRCMP(key, "STOP") == 0)
+	    မဟုတ်ပါက အကယ်၍ (STRCMP(key, "START") == 0 || STRCMP(key, "STOP") == 0)
 	    {
-		if (!highlight_set_startstop_termcode(idx, key, arg, init))
+		အကယ်၍ (!highlight_set_startstop_termcode(idx, key, arg, init))
 		{
 		    error = TRUE;
-		    break;
+		    bha_nga;
 		}
 	    }
-	    else
+	    မဟုတ်ပါက
 	    {
 		semsg(_(e_illegal_argument_str_3), key_start);
 		error = TRUE;
-		break;
+		bha_nga;
 	    }
 	    HL_TABLE()[idx].sg_cleared = FALSE;
 
 	    // When highlighting has been given for a group, don't link it.
-	    if (!init || !(HL_TABLE()[idx].sg_set & SG_LINK))
+	    အကယ်၍ (!init || !(HL_TABLE()[idx].sg_set & SG_LINK))
 		HL_TABLE()[idx].sg_link = 0;
 
 	    // Continue with next argument.
@@ -1961,11 +1961,11 @@ do_highlight(
 	}
 
     // If there is an error, and it's a new entry, remove it from the table.
-    if (error && idx == highlight_ga.ga_len)
+    အကယ်၍ (error && idx == highlight_ga.ga_len)
 	syn_unadd_group();
-    else
+    မဟုတ်ပါက
     {
-	if (is_normal_group)
+	အကယ်၍ (is_normal_group)
 	{
 	    HL_TABLE()[idx].sg_term_attr = 0;
 	    HL_TABLE()[idx].sg_cterm_attr = 0;
@@ -1974,8 +1974,8 @@ do_highlight(
 	    // Need to update all groups, because they might be using "bg"
 	    // and/or "fg", which have been changed now.
 #endif
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-	    if (USE_24BIT)
+#အကယ်၍ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+	    အကယ်၍ (USE_24BIT)
 	    {
 		highlight_gui_started();
 		did_highlight_changed = TRUE;
@@ -1989,41 +1989,41 @@ do_highlight(
 #endif
 	}
 #ifdef FEAT_GUI_MSWIN
-	else if (is_titlebar_group)
+	မဟုတ်ပါက အကယ်၍ (is_titlebar_group)
 	{
-	    if (gui.in_use && do_colors)
+	    အကယ်၍ (gui.in_use && do_colors)
 		gui_mch_set_titlebar_colors();
 	}
-	else if (is_titlebarnc_group)
+	မဟုတ်ပါက အကယ်၍ (is_titlebarnc_group)
 	{
-	    if (gui.in_use && do_colors)
+	    အကယ်၍ (gui.in_use && do_colors)
 		gui_mch_set_titlebar_colors();
 	}
 #endif
 #ifdef FEAT_GUI_X11
 # ifdef FEAT_MENU
-	else if (is_menu_group)
+	မဟုတ်ပါက အကယ်၍ (is_menu_group)
 	{
-	    if (gui.in_use && do_colors)
+	    အကယ်၍ (gui.in_use && do_colors)
 		gui_mch_new_menu_colors();
 	}
 # endif
-	else if (is_scrollbar_group)
+	မဟုတ်ပါက အကယ်၍ (is_scrollbar_group)
 	{
-	    if (gui.in_use && do_colors)
+	    အကယ်၍ (gui.in_use && do_colors)
 		gui_new_scrollbar_colors();
-	    else
+	    မဟုတ်ပါက
 		set_hl_attr(idx);
 	}
 # ifdef FEAT_BEVAL_GUI
-	else if (is_tooltip_group)
+	မဟုတ်ပါက အကယ်၍ (is_tooltip_group)
 	{
-	    if (gui.in_use && do_colors)
+	    အကယ်၍ (gui.in_use && do_colors)
 		gui_mch_new_tooltip_colors();
 	}
 # endif
 #endif
-	else
+	မဟုတ်ပါက
 	    set_hl_attr(idx);
 #ifdef FEAT_EVAL
 	HL_TABLE()[idx].sg_script_ctx = current_sctx;
@@ -2036,9 +2036,9 @@ do_highlight(
 
     // Only call highlight_changed() once, after a sequence of highlight
     // commands, and only if an attribute actually changed.
-    if ((did_change
-	   || memcmp(&HL_TABLE()[idx], &item_before, sizeof(item_before)) != 0)
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    အကယ်၍ ((did_change
+	   || memcmp(&HL_TABLE()[idx], &item_before, parimaa_na(item_before)) != 0)
+#အကယ်၍ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 	    && !did_highlight_changed
 #endif
        )
@@ -2046,19 +2046,19 @@ do_highlight(
 	// Do not trigger a redraw when highlighting is changed while
 	// redrawing.  This may happen when evaluating 'statusline' changes the
 	// StatusLine group.
-	if (!updating_screen)
+	အကယ်၍ (!updating_screen)
 	    redraw_all_later(UPD_NOT_VALID);
 	need_highlight_changed = TRUE;
     }
 }
 
-#if defined(EXITFREE)
+#အကယ်၍ defined(EXITFREE)
     void
 free_highlight(void)
 {
-    int	    i;
+    ကိန်းပြည့်	    i;
 
-    for (i = 0; i < highlight_ga.ga_len; ++i)
+    အတွက် (i = 0; i < highlight_ga.ga_len; ++i)
     {
 	highlight_clear(i);
 	vim_free(HL_TABLE()[i].sg_name);
@@ -2077,17 +2077,17 @@ free_highlight(void)
     void
 restore_cterm_colors(void)
 {
-#if defined(MSWIN) && !defined(FEAT_GUI_MSWIN)
+#အကယ်၍ defined(MSWIN) && !defined(FEAT_GUI_MSWIN)
     // Since t_me has been set, this probably means that the user
     // wants to use this as default colors.  Need to reset default
     // background/foreground colors.
     mch_set_normal_colors();
-#else
+#မဟုတ်ပါက
 # ifdef VIMDLL
-    if (!gui.in_use)
+    အကယ်၍ (!gui.in_use)
     {
 	mch_set_normal_colors();
-	return;
+	ပြန်ပေး;
     }
 # endif
     cterm_normal_fg_color = 0;
@@ -2107,10 +2107,10 @@ restore_cterm_colors(void)
  * Return TRUE if highlight group "idx" has any settings.
  * When "check_link" is TRUE also check for an existing link.
  */
-    static int
-hl_has_settings(int idx, int check_link)
+    static ကိန်းပြည့်
+hl_has_settings(ကိန်းပြည့် idx, ကိန်းပြည့် check_link)
 {
-    return HL_TABLE()[idx].sg_cleared == 0
+    ပြန်ပေး HL_TABLE()[idx].sg_cleared == 0
 	 && (  HL_TABLE()[idx].sg_term_attr != 0
 	    || HL_TABLE()[idx].sg_cterm_attr != 0
 	    || HL_TABLE()[idx].sg_cterm_fg != 0
@@ -2130,7 +2130,7 @@ hl_has_settings(int idx, int check_link)
  * Clear highlighting for one group.
  */
     static void
-highlight_clear(int idx)
+highlight_clear(ကိန်းပြည့် idx)
 {
     HL_TABLE()[idx].sg_cleared = TRUE;
 
@@ -2144,13 +2144,13 @@ highlight_clear(int idx)
     HL_TABLE()[idx].sg_cterm_bg = 0;
     HL_TABLE()[idx].sg_cterm_attr = 0;
     HL_TABLE()[idx].sg_cterm_font = 0;
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
+#အကယ်၍ defined(FEAT_GUI) || defined(FEAT_EVAL)
     HL_TABLE()[idx].sg_gui = 0;
     VIM_CLEAR(HL_TABLE()[idx].sg_gui_fg_name);
     VIM_CLEAR(HL_TABLE()[idx].sg_gui_bg_name);
     VIM_CLEAR(HL_TABLE()[idx].sg_gui_sp_name);
 #endif
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#အကယ်၍ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     HL_TABLE()[idx].sg_gui_fg = INVALCOLOR;
     HL_TABLE()[idx].sg_gui_bg = INVALCOLOR;
     HL_TABLE()[idx].sg_gui_sp = INVALCOLOR;
@@ -2174,7 +2174,7 @@ highlight_clear(int idx)
 #endif
 }
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#အကယ်၍ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 /*
  * Set the normal foreground and background colors according to the "Normal"
  * highlighting group.  For X11 also set "Menu", "Scrollbar" and "Tooltip"
@@ -2185,10 +2185,10 @@ set_normal_colors(void)
 {
 # ifdef FEAT_GUI
 #  ifdef FEAT_TERMGUICOLORS
-    if (gui.in_use)
+    အကယ်၍ (gui.in_use)
 #  endif
     {
-	if (set_group_colors((char_u *)"Normal",
+	အကယ်၍ (set_group_colors((char_u *)"Normal",
 				 &gui.norm_pixel, &gui.back_pixel,
 				 FALSE, TRUE, FALSE))
 	{
@@ -2196,14 +2196,14 @@ set_normal_colors(void)
 	    set_must_redraw(UPD_CLEAR);
 	}
 #  ifdef FEAT_GUI_MSWIN
-	if (set_group_colors((char_u *)"TitleBar",
+	အကယ်၍ (set_group_colors((char_u *)"TitleBar",
 				 &gui.title_fg_pixel, &gui.title_bg_pixel,
 				 FALSE, FALSE, FALSE))
 	{
 	    gui_mch_set_titlebar_colors();
 	    set_must_redraw(UPD_CLEAR);
 	}
-	if (set_group_colors((char_u *)"TitleBarNC",
+	အကယ်၍ (set_group_colors((char_u *)"TitleBarNC",
 				 &gui.titlenc_fg_pixel, &gui.titlenc_bg_pixel,
 				 FALSE, FALSE, FALSE))
 	{
@@ -2212,7 +2212,7 @@ set_normal_colors(void)
 	}
 #  endif
 #  ifdef FEAT_GUI_X11
-	if (set_group_colors((char_u *)"Menu",
+	အကယ်၍ (set_group_colors((char_u *)"Menu",
 			     &gui.menu_fg_pixel, &gui.menu_bg_pixel,
 			     TRUE, FALSE, FALSE))
 	{
@@ -2222,7 +2222,7 @@ set_normal_colors(void)
 	    set_must_redraw(UPD_CLEAR);
 	}
 #   ifdef FEAT_BEVAL_GUI
-	if (set_group_colors((char_u *)"Tooltip",
+	အကယ်၍ (set_group_colors((char_u *)"Tooltip",
 			     &gui.tooltip_fg_pixel, &gui.tooltip_bg_pixel,
 			     FALSE, FALSE, TRUE))
 	{
@@ -2232,7 +2232,7 @@ set_normal_colors(void)
 	    set_must_redraw(UPD_CLEAR);
 	}
 #   endif
-	if (set_group_colors((char_u *)"Scrollbar",
+	အကယ်၍ (set_group_colors((char_u *)"Scrollbar",
 			&gui.scroll_fg_pixel, &gui.scroll_bg_pixel,
 			FALSE, FALSE, FALSE))
 	{
@@ -2244,19 +2244,19 @@ set_normal_colors(void)
 # endif
 # ifdef FEAT_TERMGUICOLORS
 #  ifdef FEAT_GUI
-    else
+    မဟုတ်ပါက
 #  endif
     {
-	int		idx;
+	ကိန်းပြည့်		idx;
 
 	idx = syn_name2id((char_u *)"Normal") - 1;
-	if (idx >= 0)
+	အကယ်၍ (idx >= 0)
 	{
 	    gui_do_one_color(idx, FALSE, FALSE);
 
 	    // If the normal fg or bg color changed a complete redraw is
 	    // required.
-	    if (cterm_normal_fg_gui_color != HL_TABLE()[idx].sg_gui_fg
+	    အကယ်၍ (cterm_normal_fg_gui_color != HL_TABLE()[idx].sg_gui_fg
 		    || cterm_normal_bg_gui_color != HL_TABLE()[idx].sg_gui_bg)
 	    {
 		// if the GUI color is INVALCOLOR then we use the default cterm
@@ -2271,37 +2271,37 @@ set_normal_colors(void)
 }
 #endif
 
-#if defined(FEAT_GUI)
+#အကယ်၍ defined(FEAT_GUI)
 /*
  * Set the colors for "Normal", "Menu", "TitleBar", "TitleBarNC", "Tooltip" or
  * "Scrollbar".
  */
-    static int
+    static ကိန်းပြည့်
 set_group_colors(
     char_u	*name,
     guicolor_T	*fgp,
     guicolor_T	*bgp,
-    int		do_menu,
-    int		use_norm,
-    int		do_tooltip)
+    ကိန်းပြည့်		do_menu,
+    ကိန်းပြည့်		use_norm,
+    ကိန်းပြည့်		do_tooltip)
 {
-    int		idx;
+    ကိန်းပြည့်		idx;
 
     idx = syn_name2id(name) - 1;
-    if (idx < 0)
-	return FALSE;
+    အကယ်၍ (idx < 0)
+	ပြန်ပေး FALSE;
 
     gui_do_one_color(idx, do_menu, do_tooltip);
 
-    if (HL_TABLE()[idx].sg_gui_fg != INVALCOLOR)
+    အကယ်၍ (HL_TABLE()[idx].sg_gui_fg != INVALCOLOR)
 	*fgp = HL_TABLE()[idx].sg_gui_fg;
-    else if (use_norm)
+    မဟုတ်ပါက အကယ်၍ (use_norm)
 	*fgp = gui.def_norm_pixel;
-    if (HL_TABLE()[idx].sg_gui_bg != INVALCOLOR)
+    အကယ်၍ (HL_TABLE()[idx].sg_gui_bg != INVALCOLOR)
 	*bgp = HL_TABLE()[idx].sg_gui_bg;
-    else if (use_norm)
+    မဟုတ်ပါက အကယ်၍ (use_norm)
 	*bgp = gui.def_back_pixel;
-    return TRUE;
+    ပြန်ပေး TRUE;
 }
 
 /*
@@ -2311,17 +2311,17 @@ set_group_colors(
     char_u *
 hl_get_font_name(void)
 {
-    int		id;
+    ကိန်းပြည့်		id;
     char_u	*s;
 
     id = syn_name2id((char_u *)"Normal");
-    if (id > 0)
+    အကယ်၍ (id > 0)
     {
 	s = HL_TABLE()[id - 1].sg_font_name;
-	if (s != NULL)
-	    return s;
+	အကယ်၍ (s != NULL)
+	    ပြန်ပေး s;
     }
-    return (char_u *)"";
+    ပြန်ပေး (char_u *)"";
 }
 
 /*
@@ -2331,11 +2331,11 @@ hl_get_font_name(void)
     void
 hl_set_font_name(char_u *font_name)
 {
-    int	    id;
+    ကိန်းပြည့်	    id;
 
     id = syn_name2id((char_u *)"Normal");
-    if (id <= 0)
-	return;
+    အကယ်၍ (id <= 0)
+	ပြန်ပေး;
 
     vim_free(HL_TABLE()[id - 1].sg_font_name);
     HL_TABLE()[id - 1].sg_font_name = vim_strsave(font_name);
@@ -2349,14 +2349,14 @@ hl_set_font_name(char_u *font_name)
 hl_set_bg_color_name(
     char_u  *name)	    // must have been allocated
 {
-    int	    id;
+    ကိန်းပြည့်	    id;
 
-    if (name == NULL)
-	return;
+    အကယ်၍ (name == NULL)
+	ပြန်ပေး;
 
     id = syn_name2id((char_u *)"Normal");
-    if (id <= 0)
-	return;
+    အကယ်၍ (id <= 0)
+	ပြန်ပေး;
 
     vim_free(HL_TABLE()[id - 1].sg_gui_bg_name);
     HL_TABLE()[id - 1].sg_gui_bg_name = name;
@@ -2370,14 +2370,14 @@ hl_set_bg_color_name(
 hl_set_fg_color_name(
     char_u  *name)	    // must have been allocated
 {
-    int	    id;
+    ကိန်းပြည့်	    id;
 
-    if (name == NULL)
-	return;
+    အကယ်၍ (name == NULL)
+	ပြန်ပေး;
 
     id = syn_name2id((char_u *)"Normal");
-    if (id <= 0)
-	return;
+    အကယ်၍ (id <= 0)
+	ပြန်ပေး;
 
     vim_free(HL_TABLE()[id - 1].sg_gui_fg_name);
     HL_TABLE()[id - 1].sg_gui_fg_name = name;
@@ -2390,10 +2390,10 @@ hl_set_fg_color_name(
     static GuiFont
 font_name2handle(char_u *name)
 {
-    if (STRCMP(name, "NONE") == 0)
-	return NOFONT;
+    အကယ်၍ (STRCMP(name, "NONE") == 0)
+	ပြန်ပေး NOFONT;
 
-    return gui_mch_get_font(name, TRUE);
+    ပြန်ပေး gui_mch_get_font(name, TRUE);
 }
 
 # ifdef FEAT_XFONTSET
@@ -2402,12 +2402,12 @@ font_name2handle(char_u *name)
  * Returns NOFONTSET when failed.
  */
     static GuiFontset
-fontset_name2handle(char_u *name, int fixed_width)
+fontset_name2handle(char_u *name, ကိန်းပြည့် fixed_width)
 {
-    if (STRCMP(name, "NONE") == 0)
-	return NOFONTSET;
+    အကယ်၍ (STRCMP(name, "NONE") == 0)
+	ပြန်ပေး NOFONTSET;
 
-    return gui_mch_get_fontset(name, TRUE, fixed_width);
+    ပြန်ပေး gui_mch_get_fontset(name, TRUE, fixed_width);
 }
 # endif
 
@@ -2416,17 +2416,17 @@ fontset_name2handle(char_u *name, int fixed_width)
  */
     static void
 hl_do_font(
-    int		idx,
+    ကိန်းပြည့်		idx,
     char_u	*arg,
-    int		do_normal,		// set normal font
-    int		do_menu UNUSED,		// set menu font
-    int		do_tooltip UNUSED,	// set tooltip font
-    int		free_font)		// free current font/fontset
+    ကိန်းပြည့်		do_normal,		// set normal font
+    ကိန်းပြည့်		do_menu UNUSED,		// set menu font
+    ကိန်းပြည့်		do_tooltip UNUSED,	// set tooltip font
+    ကိန်းပြည့်		free_font)		// free current font/fontset
 {
 # ifdef FEAT_XFONTSET
     // If 'guifontset' is not empty, first try using the name as a
     // fontset.  If that doesn't work, use it as a font name.
-    if (*p_guifontset != NUL
+    အကယ်၍ (*p_guifontset != NUL
 #  ifdef FONTSET_ALWAYS
 	|| do_menu
 #  endif
@@ -2436,7 +2436,7 @@ hl_do_font(
 #  endif
 	    )
     {
-	if (free_font)
+	အကယ်၍ (free_font)
 	    gui_mch_free_fontset(HL_TABLE()[idx].sg_fontset);
 	HL_TABLE()[idx].sg_fontset = fontset_name2handle(arg, 0
 #  ifdef FONTSET_ALWAYS
@@ -2447,25 +2447,25 @@ hl_do_font(
 #  endif
 		);
     }
-    if (HL_TABLE()[idx].sg_fontset != NOFONTSET)
+    အကယ်၍ (HL_TABLE()[idx].sg_fontset != NOFONTSET)
     {
 	// If it worked and it's the Normal group, use it as the normal
 	// fontset.  Same for the Menu group.
-	if (do_normal)
+	အကယ်၍ (do_normal)
 	    gui_init_font(arg, TRUE);
-#  if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
-	if (do_menu)
+#  အကယ်၍ defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
+	အကယ်၍ (do_menu)
 	{
 #   ifdef FONTSET_ALWAYS
 	    gui.menu_fontset = HL_TABLE()[idx].sg_fontset;
-#   else
+#   မဟုတ်ပါက
 	    // YIKES!  This is a bug waiting to crash the program
 	    gui.menu_font = HL_TABLE()[idx].sg_fontset;
 #   endif
 	    gui_mch_new_menu_font();
 	}
 #   ifdef FEAT_BEVAL_GUI
-	if (do_tooltip)
+	အကယ်၍ (do_tooltip)
 	{
 	    // The Athena widget set could not handle switching between
 	    // displaying a single font and a fontset.
@@ -2478,21 +2478,21 @@ hl_do_font(
 #   endif
 #  endif
     }
-    else
+    မဟုတ်ပါက
 # endif
     {
-	if (free_font)
+	အကယ်၍ (free_font)
 	    gui_mch_free_font(HL_TABLE()[idx].sg_font);
 	HL_TABLE()[idx].sg_font = font_name2handle(arg);
 	// If it worked and it's the Normal group, use it as the
 	// normal font.  Same for the Menu group.
-	if (HL_TABLE()[idx].sg_font != NOFONT)
+	အကယ်၍ (HL_TABLE()[idx].sg_font != NOFONT)
 	{
-	    if (do_normal)
+	    အကယ်၍ (do_normal)
 		gui_init_font(arg, FALSE);
 # ifndef FONTSET_ALWAYS
-#  if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
-	    if (do_menu)
+#  အကယ်၍ defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
+	    အကယ်၍ (do_menu)
 	    {
 		gui.menu_font = HL_TABLE()[idx].sg_font;
 		gui_mch_new_menu_font();
@@ -2505,7 +2505,7 @@ hl_do_font(
 
 #endif // FEAT_GUI
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#အကယ်၍ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 /*
  * Return the handle for a color name.
  * Returns INVALCOLOR when failed.
@@ -2513,47 +2513,47 @@ hl_do_font(
     guicolor_T
 color_name2handle(char_u *name)
 {
-    if (STRCMP(name, "NONE") == 0)
-	return INVALCOLOR;
+    အကယ်၍ (STRCMP(name, "NONE") == 0)
+	ပြန်ပေး INVALCOLOR;
 
-    if (STRICMP(name, "fg") == 0 || STRICMP(name, "foreground") == 0)
+    အကယ်၍ (STRICMP(name, "fg") == 0 || STRICMP(name, "foreground") == 0)
     {
-# if defined(FEAT_TERMGUICOLORS) && defined(FEAT_GUI)
-	if (gui.in_use)
+# အကယ်၍ defined(FEAT_TERMGUICOLORS) && defined(FEAT_GUI)
+	အကယ်၍ (gui.in_use)
 # endif
 # ifdef FEAT_GUI
-	    return gui.norm_pixel;
+	    ပြန်ပေး gui.norm_pixel;
 # endif
 # ifdef FEAT_TERMGUICOLORS
-	if (cterm_normal_fg_gui_color != INVALCOLOR)
-	    return cterm_normal_fg_gui_color;
+	အကယ်၍ (cterm_normal_fg_gui_color != INVALCOLOR)
+	    ပြန်ပေး cterm_normal_fg_gui_color;
 	// Guess that the foreground is black or white.
-	return GUI_GET_COLOR((char_u *)(*p_bg == 'l' ? "black" : "white"));
+	ပြန်ပေး GUI_GET_COLOR((char_u *)(*p_bg == 'l' ? "black" : "white"));
 # endif
     }
-    if (STRICMP(name, "bg") == 0 || STRICMP(name, "background") == 0)
+    အကယ်၍ (STRICMP(name, "bg") == 0 || STRICMP(name, "background") == 0)
     {
-# if defined(FEAT_TERMGUICOLORS) && defined(FEAT_GUI)
-	if (gui.in_use)
+# အကယ်၍ defined(FEAT_TERMGUICOLORS) && defined(FEAT_GUI)
+	အကယ်၍ (gui.in_use)
 # endif
 # ifdef FEAT_GUI
-	    return gui.back_pixel;
+	    ပြန်ပေး gui.back_pixel;
 # endif
 # ifdef FEAT_TERMGUICOLORS
-	if (cterm_normal_bg_gui_color != INVALCOLOR)
-	    return cterm_normal_bg_gui_color;
+	အကယ်၍ (cterm_normal_bg_gui_color != INVALCOLOR)
+	    ပြန်ပေး cterm_normal_bg_gui_color;
 	// Guess that the background is white or black.
-	return GUI_GET_COLOR((char_u *)(*p_bg == 'l' ? "white" : "black"));
+	ပြန်ပေး GUI_GET_COLOR((char_u *)(*p_bg == 'l' ? "white" : "black"));
 # endif
     }
 
-    return GUI_GET_COLOR(name);
+    ပြန်ပေး GUI_GET_COLOR(name);
 }
 
 // On MS-Windows an RGB macro is available and it produces 0x00bbggrr color
 // values as used by the MS-Windows GDI api.  It should be used only for
 // MS-Windows GDI builds.
-# if defined(RGB) && defined(MSWIN) && !defined(FEAT_GUI)
+# အကယ်၍ defined(RGB) && defined(MSWIN) && !defined(FEAT_GUI)
 #  undef RGB
 # endif
 # ifndef RGB
@@ -2564,24 +2564,24 @@ color_name2handle(char_u *name)
     static guicolor_T
 gui_adjust_rgb(guicolor_T c)
 {
-    if (gui.in_use)
-	return c;
-    else
-	return ((c & 0xff) << 16) | (c & 0x00ff00) | ((c >> 16) & 0xff);
+    အကယ်၍ (gui.in_use)
+	ပြန်ပေး c;
+    မဟုတ်ပါက
+	ပြန်ပေး ((c & 0xff) << 16) | (c & 0x00ff00) | ((c >> 16) & 0xff);
 }
-# else
+# မဟုတ်ပါက
 #  define gui_adjust_rgb(c) (c)
 # endif
 
-    static int
-hex_digit(int c)
+    static ကိန်းပြည့်
+hex_digit(ကိန်းပြည့် c)
 {
-    if (SAFE_isdigit(c))
-	return c - '0';
+    အကယ်၍ (SAFE_isdigit(c))
+	ပြန်ပေး c - '0';
     c = TOLOWER_ASC(c);
-    if (c >= 'a' && c <= 'f')
-	return c - 'a' + 10;
-    return 0x1ffffff;
+    အကယ်၍ (c >= 'a' && c <= 'f')
+	ပြန်ပေး c - 'a' + 10;
+    ပြန်ပေး 0x1ffffff;
 }
 
     static guicolor_T
@@ -2589,16 +2589,16 @@ decode_hex_color(char_u *hex)
 {
     guicolor_T color;
 
-    if (hex[0] != '#' || STRLEN(hex) != 7)
-	return INVALCOLOR;
+    အကယ်၍ (hex[0] != '#' || STRLEN(hex) != 7)
+	ပြန်ပေး INVALCOLOR;
 
     // Name is in "#rrggbb" format
     color = RGB(((hex_digit(hex[1]) << 4) + hex_digit(hex[2])),
 		((hex_digit(hex[3]) << 4) + hex_digit(hex[4])),
 		((hex_digit(hex[5]) << 4) + hex_digit(hex[6])));
-    if (color > 0xffffff)
-	return INVALCOLOR;
-    return gui_adjust_rgb(color);
+    အကယ်၍ (color > 0xffffff)
+	ပြန်ပေး INVALCOLOR;
+    ပြန်ပေး gui_adjust_rgb(color);
 }
 
 # ifdef FEAT_EVAL
@@ -2616,35 +2616,35 @@ colorname2rgb(char_u *name)
     varnumber_T colnum;
 
     lc_name = strlow_save(name);
-    if (lc_name == NULL)
-	return INVALCOLOR;
+    အကယ်၍ (lc_name == NULL)
+	ပြန်ပေး INVALCOLOR;
 
     colentry = dict_find(colornames_table, lc_name, -1);
     vim_free(lc_name);
-    if (colentry == NULL)
-	return INVALCOLOR;
+    အကယ်၍ (colentry == NULL)
+	ပြန်ပေး INVALCOLOR;
 
-    if (colentry->di_tv.v_type == VAR_STRING)
+    အကယ်၍ (colentry->di_tv.v_type == VAR_STRING)
     {
 	colstr = tv_get_string_strict(&colentry->di_tv);
-	if ((STRLEN(colstr) == 7) && (*colstr == '#'))
+	အကယ်၍ ((STRLEN(colstr) == 7) && (*colstr == '#'))
 	{
-	    return decode_hex_color(colstr);
+	    ပြန်ပေး decode_hex_color(colstr);
 	}
-	else
+	မဟုတ်ပါက
 	{
 	    semsg(_(e_bad_color_string_str), colstr);
-	    return INVALCOLOR;
+	    ပြန်ပေး INVALCOLOR;
 	}
     }
 
-    if (colentry->di_tv.v_type == VAR_NUMBER)
+    အကယ်၍ (colentry->di_tv.v_type == VAR_NUMBER)
     {
 	colnum = tv_get_number(&colentry->di_tv);
-	return (guicolor_T)colnum;
+	ပြန်ပေး (guicolor_T)colnum;
     }
 
-    return INVALCOLOR;
+    ပြန်ပေး INVALCOLOR;
 }
 
 # endif
@@ -2693,43 +2693,43 @@ gui_get_color_cmn(char_u *name)
     keyvalue_T *entry;
 
     color = decode_hex_color(name);
-    if (color != INVALCOLOR)
-	return color;
+    အကယ်၍ (color != INVALCOLOR)
+	ပြန်ပေး color;
 
     target.key = 0;
     target.value.string = name;
     target.value.length = 0;	// not used, see cmp_keyvalue_value_i()
     entry = (keyvalue_T *)bsearch(&target, &rgb_tab, ARRAY_LENGTH(rgb_tab),
-	    sizeof(rgb_tab[0]), cmp_keyvalue_value_i);
-    if (entry != NULL)
-	return gui_adjust_rgb((guicolor_T)entry->key);
+	    parimaa_na(rgb_tab[0]), cmp_keyvalue_value_i);
+    အကယ်၍ (entry != NULL)
+	ပြန်ပေး gui_adjust_rgb((guicolor_T)entry->key);
 
-# if defined(FEAT_EVAL)
+# အကယ်၍ defined(FEAT_EVAL)
     /*
      * Not a traditional color. Load additional color aliases and then consult the alias table.
      */
 
     color = colorname2rgb(name);
-    if (color == INVALCOLOR)
+    အကယ်၍ (color == INVALCOLOR)
     {
 	load_default_colors_lists();
 	color = colorname2rgb(name);
     }
 
-    return color;
-# else
-    return INVALCOLOR;
+    ပြန်ပေး color;
+# မဟုတ်ပါက
+    ပြန်ပေး INVALCOLOR;
 # endif
 }
 
     guicolor_T
-gui_get_rgb_color_cmn(int r, int g, int b)
+gui_get_rgb_color_cmn(ကိန်းပြည့် r, ကိန်းပြည့် g, ကိန်းပြည့် b)
 {
     guicolor_T  color = RGB(r, g, b);
 
-    if (color > 0xffffff)
-	return INVALCOLOR;
-    return gui_adjust_rgb(color);
+    အကယ်၍ (color > 0xffffff)
+	ပြန်ပေး INVALCOLOR;
+    ပြန်ပေး gui_adjust_rgb(color);
 }
 #endif
 
@@ -2758,22 +2758,22 @@ static garray_T	gui_attr_table = {0, 0, 0, 0, NULL};
  * if the combination is new.
  * Return 0 for error (no more room).
  */
-    static int
+    static ကိန်းပြည့်
 get_attr_entry(garray_T *table, attrentry_T *aep)
 {
-    int		i;
+    ကိန်းပြည့်		i;
     attrentry_T	*taep;
-    static int	recursive = FALSE;
+    static ကိန်းပြည့်	recursive = FALSE;
 
     // Init the table, in case it wasn't done yet.
-    table->ga_itemsize = sizeof(attrentry_T);
+    table->ga_itemsize = parimaa_na(attrentry_T);
     table->ga_growsize = 7;
 
     // Try to find an entry with the same specifications.
-    for (i = 0; i < table->ga_len; ++i)
+    အတွက် (i = 0; i < table->ga_len; ++i)
     {
 	taep = &(((attrentry_T *)table->ga_data)[i]);
-	if (	   aep->ae_attr == taep->ae_attr
+	အကယ်၍ (	   aep->ae_attr == taep->ae_attr
 		&& (
 #ifdef FEAT_GUI
 		       (table == &gui_attr_table
@@ -2819,18 +2819,18 @@ get_attr_entry(garray_T *table, attrentry_T *aep)
 #endif
 		       )))
 
-	return i + ATTR_OFF;
+	ပြန်ပေး i + ATTR_OFF;
     }
 
-    if (table->ga_len + ATTR_OFF > MAX_TYPENR)
+    အကယ်၍ (table->ga_len + ATTR_OFF > MAX_TYPENR)
     {
 	// Running out of attribute entries!  remove all attributes, and
 	// compute new ones for all groups.
 	// When called recursively, we are really out of numbers.
-	if (recursive)
+	အကယ်၍ (recursive)
 	{
 	    emsg(_(e_too_many_different_highlighting_attributes_in_use));
-	    return 0;
+	    ပြန်ပေး 0;
 	}
 	recursive = TRUE;
 
@@ -2838,21 +2838,21 @@ get_attr_entry(garray_T *table, attrentry_T *aep)
 
 	set_must_redraw(UPD_CLEAR);
 
-	for (i = 0; i < highlight_ga.ga_len; ++i)
+	အတွက် (i = 0; i < highlight_ga.ga_len; ++i)
 	    set_hl_attr(i);
 
 	recursive = FALSE;
     }
 
     // This is a new combination of colors and font, add an entry.
-    if (ga_grow(table, 1) == FAIL)
-	return 0;
+    အကယ်၍ (ga_grow(table, 1) == FAIL)
+	ပြန်ပေး 0;
 
     taep = &(((attrentry_T *)table->ga_data)[table->ga_len]);
     CLEAR_POINTER(taep);
     taep->ae_attr = aep->ae_attr;
 #ifdef FEAT_GUI
-    if (table == &gui_attr_table)
+    အကယ်၍ (table == &gui_attr_table)
     {
 	taep->ae_u.gui.fg_color = aep->ae_u.gui.fg_color;
 	taep->ae_u.gui.bg_color = aep->ae_u.gui.bg_color;
@@ -2863,18 +2863,18 @@ get_attr_entry(garray_T *table, attrentry_T *aep)
 # endif
     }
 #endif
-    if (table == &term_attr_table)
+    အကယ်၍ (table == &term_attr_table)
     {
-	if (aep->ae_u.term.start == NULL)
+	အကယ်၍ (aep->ae_u.term.start == NULL)
 	    taep->ae_u.term.start = NULL;
-	else
+	မဟုတ်ပါက
 	    taep->ae_u.term.start = vim_strsave(aep->ae_u.term.start);
-	if (aep->ae_u.term.stop == NULL)
+	အကယ်၍ (aep->ae_u.term.stop == NULL)
 	    taep->ae_u.term.stop = NULL;
-	else
+	မဟုတ်ပါက
 	    taep->ae_u.term.stop = vim_strsave(aep->ae_u.term.stop);
     }
-    else if (table == &cterm_attr_table)
+    မဟုတ်ပါက အကယ်၍ (table == &cterm_attr_table)
     {
 	taep->ae_u.cterm.fg_color = aep->ae_u.cterm.fg_color;
 	taep->ae_u.cterm.bg_color = aep->ae_u.cterm.bg_color;
@@ -2887,16 +2887,16 @@ get_attr_entry(garray_T *table, attrentry_T *aep)
 #endif
     }
     ++table->ga_len;
-    return (table->ga_len - 1 + ATTR_OFF);
+    ပြန်ပေး (table->ga_len - 1 + ATTR_OFF);
 }
 
-#if defined(FEAT_TERMINAL)
+#အကယ်၍ defined(FEAT_TERMINAL)
 /*
  * Get an attribute index for a cterm entry.
  * Uses an existing entry when possible or adds one when needed.
  */
-    int
-get_cterm_attr_idx(int attr, int fg, int bg)
+    ကိန်းပြည့်
+get_cterm_attr_idx(ကိန်းပြည့် attr, ကိန်းပြည့် fg, ကိန်းပြည့် bg)
 {
     attrentry_T		at_en;
 
@@ -2911,46 +2911,46 @@ get_cterm_attr_idx(int attr, int fg, int bg)
     at_en.ae_u.cterm.bg_color = bg;
     at_en.ae_u.cterm.ul_color = 0;
     at_en.ae_u.cterm.font = 0;
-    return get_attr_entry(&cterm_attr_table, &at_en);
+    ပြန်ပေး get_attr_entry(&cterm_attr_table, &at_en);
 }
 #endif
 
-#if defined(FEAT_TERMINAL) && defined(FEAT_TERMGUICOLORS)
+#အကယ်၍ defined(FEAT_TERMINAL) && defined(FEAT_TERMGUICOLORS)
 /*
  * Get an attribute index for a 'termguicolors' entry.
  * Uses an existing entry when possible or adds one when needed.
  */
-    int
-get_tgc_attr_idx(int attr, guicolor_T fg, guicolor_T bg)
+    ကိန်းပြည့်
+get_tgc_attr_idx(ကိန်းပြည့် attr, guicolor_T fg, guicolor_T bg)
 {
     attrentry_T		at_en;
 
     CLEAR_FIELD(at_en);
     at_en.ae_attr = attr;
-    if (fg == INVALCOLOR && bg == INVALCOLOR)
+    အကယ်၍ (fg == INVALCOLOR && bg == INVALCOLOR)
     {
 	// If both GUI colors are not set fall back to the cterm colors.  Helps
 	// if the GUI only has an attribute, such as undercurl.
 	at_en.ae_u.cterm.fg_rgb = CTERMCOLOR;
 	at_en.ae_u.cterm.bg_rgb = CTERMCOLOR;
     }
-    else
+    မဟုတ်ပါက
     {
 	at_en.ae_u.cterm.fg_rgb = fg;
 	at_en.ae_u.cterm.bg_rgb = bg;
     }
     at_en.ae_u.cterm.ul_rgb = INVALCOLOR;
-    return get_attr_entry(&cterm_attr_table, &at_en);
+    ပြန်ပေး get_attr_entry(&cterm_attr_table, &at_en);
 }
 #endif
 
-#if defined(FEAT_TERMINAL) && defined(FEAT_GUI)
+#အကယ်၍ defined(FEAT_TERMINAL) && defined(FEAT_GUI)
 /*
  * Get an attribute index for a cterm entry.
  * Uses an existing entry when possible or adds one when needed.
  */
-    int
-get_gui_attr_idx(int attr, guicolor_T fg, guicolor_T bg)
+    ကိန်းပြည့်
+get_gui_attr_idx(ကိန်းပြည့် attr, guicolor_T fg, guicolor_T bg)
 {
     attrentry_T		at_en;
 
@@ -2958,7 +2958,7 @@ get_gui_attr_idx(int attr, guicolor_T fg, guicolor_T bg)
     at_en.ae_attr = attr;
     at_en.ae_u.gui.fg_color = fg;
     at_en.ae_u.gui.bg_color = bg;
-    return get_attr_entry(&gui_attr_table, &at_en);
+    ပြန်ပေး get_attr_entry(&gui_attr_table, &at_en);
 }
 #endif
 
@@ -2968,13 +2968,13 @@ get_gui_attr_idx(int attr, guicolor_T fg, guicolor_T bg)
     void
 clear_hl_tables(void)
 {
-    int		i;
+    ကိန်းပြည့်		i;
     attrentry_T	*taep;
 
 #ifdef FEAT_GUI
     ga_clear(&gui_attr_table);
 #endif
-    for (i = 0; i < term_attr_table.ga_len; ++i)
+    အတွက် (i = 0; i < term_attr_table.ga_len; ++i)
     {
 	taep = &(((attrentry_T *)term_attr_table.ga_data)[i]);
 	vim_free(taep->ae_u.term.start);
@@ -2993,68 +2993,68 @@ clear_hl_tables(void)
  * result.
  * Return the resulting attributes.
  */
-    int
-hl_combine_attr(int char_attr, int prim_attr)
+    ကိန်းပြည့်
+hl_combine_attr(ကိန်းပြည့် char_attr, ကိန်းပြည့် prim_attr)
 {
     attrentry_T *char_aep = NULL;
     attrentry_T *prim_aep;
     attrentry_T new_en;
 
-    if (char_attr == 0)
-	return prim_attr;
-    if (char_attr <= HL_ALL && prim_attr <= HL_ALL)
-	return ATTR_COMBINE(char_attr, prim_attr);
+    အကယ်၍ (char_attr == 0)
+	ပြန်ပေး prim_attr;
+    အကယ်၍ (char_attr <= HL_ALL && prim_attr <= HL_ALL)
+	ပြန်ပေး ATTR_COMBINE(char_attr, prim_attr);
 #ifdef FEAT_GUI
-    if (gui.in_use)
+    အကယ်၍ (gui.in_use)
     {
-	if (char_attr > HL_ALL)
+	အကယ်၍ (char_attr > HL_ALL)
 	    char_aep = syn_gui_attr2entry(char_attr);
-	if (char_aep != NULL)
+	အကယ်၍ (char_aep != NULL)
 	    new_en = *char_aep;
-	else
+	မဟုတ်ပါက
 	{
 	    CLEAR_FIELD(new_en);
 	    new_en.ae_u.gui.fg_color = INVALCOLOR;
 	    new_en.ae_u.gui.bg_color = INVALCOLOR;
 	    new_en.ae_u.gui.sp_color = INVALCOLOR;
-	    if (char_attr <= HL_ALL)
+	    အကယ်၍ (char_attr <= HL_ALL)
 		new_en.ae_attr = char_attr;
 	}
 
-	if (prim_attr <= HL_ALL)
+	အကယ်၍ (prim_attr <= HL_ALL)
 	    new_en.ae_attr = ATTR_COMBINE(new_en.ae_attr, prim_attr);
-	else
+	မဟုတ်ပါက
 	{
 	    prim_aep = syn_gui_attr2entry(prim_attr);
-	    if (prim_aep != NULL)
+	    အကယ်၍ (prim_aep != NULL)
 	    {
 		new_en.ae_attr = ATTR_COMBINE(new_en.ae_attr,
 							   prim_aep->ae_attr);
-		if (prim_aep->ae_u.gui.fg_color != INVALCOLOR)
+		အကယ်၍ (prim_aep->ae_u.gui.fg_color != INVALCOLOR)
 		    new_en.ae_u.gui.fg_color = prim_aep->ae_u.gui.fg_color;
-		if (prim_aep->ae_u.gui.bg_color != INVALCOLOR)
+		အကယ်၍ (prim_aep->ae_u.gui.bg_color != INVALCOLOR)
 		    new_en.ae_u.gui.bg_color = prim_aep->ae_u.gui.bg_color;
-		if (prim_aep->ae_u.gui.sp_color != INVALCOLOR)
+		အကယ်၍ (prim_aep->ae_u.gui.sp_color != INVALCOLOR)
 		    new_en.ae_u.gui.sp_color = prim_aep->ae_u.gui.sp_color;
-		if (prim_aep->ae_u.gui.font != NOFONT)
+		အကယ်၍ (prim_aep->ae_u.gui.font != NOFONT)
 		    new_en.ae_u.gui.font = prim_aep->ae_u.gui.font;
 # ifdef FEAT_XFONTSET
-		if (prim_aep->ae_u.gui.fontset != NOFONTSET)
+		အကယ်၍ (prim_aep->ae_u.gui.fontset != NOFONTSET)
 		    new_en.ae_u.gui.fontset = prim_aep->ae_u.gui.fontset;
 # endif
 	    }
 	}
-	return get_attr_entry(&gui_attr_table, &new_en);
+	ပြန်ပေး get_attr_entry(&gui_attr_table, &new_en);
     }
 #endif
 
-    if (IS_CTERM)
+    အကယ်၍ (IS_CTERM)
     {
-	if (char_attr > HL_ALL)
+	အကယ်၍ (char_attr > HL_ALL)
 	    char_aep = syn_cterm_attr2entry(char_attr);
-	if (char_aep != NULL)
+	အကယ်၍ (char_aep != NULL)
 	    new_en = *char_aep;
-	else
+	မဟုတ်ပါက
 	{
 	    CLEAR_FIELD(new_en);
 #ifdef FEAT_TERMGUICOLORS
@@ -3062,80 +3062,80 @@ hl_combine_attr(int char_attr, int prim_attr)
 	    new_en.ae_u.cterm.fg_rgb = INVALCOLOR;
 	    new_en.ae_u.cterm.ul_rgb = INVALCOLOR;
 #endif
-	    if (char_attr <= HL_ALL)
+	    အကယ်၍ (char_attr <= HL_ALL)
 		new_en.ae_attr = char_attr;
 	}
 
-	if (prim_attr <= HL_ALL)
+	အကယ်၍ (prim_attr <= HL_ALL)
 		new_en.ae_attr = ATTR_COMBINE(new_en.ae_attr, prim_attr);
-	else
+	မဟုတ်ပါက
 	{
 	    prim_aep = syn_cterm_attr2entry(prim_attr);
-	    if (prim_aep != NULL)
+	    အကယ်၍ (prim_aep != NULL)
 	    {
 		new_en.ae_attr = ATTR_COMBINE(new_en.ae_attr,
 							   prim_aep->ae_attr);
-		if (prim_aep->ae_u.cterm.fg_color > 0)
+		အကယ်၍ (prim_aep->ae_u.cterm.fg_color > 0)
 		    new_en.ae_u.cterm.fg_color = prim_aep->ae_u.cterm.fg_color;
-		if (prim_aep->ae_u.cterm.bg_color > 0)
+		အကယ်၍ (prim_aep->ae_u.cterm.bg_color > 0)
 		    new_en.ae_u.cterm.bg_color = prim_aep->ae_u.cterm.bg_color;
-		if (prim_aep->ae_u.cterm.ul_color > 0)
+		အကယ်၍ (prim_aep->ae_u.cterm.ul_color > 0)
 		    new_en.ae_u.cterm.ul_color = prim_aep->ae_u.cterm.ul_color;
-		if (prim_aep->ae_u.cterm.font > 0)
+		အကယ်၍ (prim_aep->ae_u.cterm.font > 0)
 		    new_en.ae_u.cterm.font = prim_aep->ae_u.cterm.font;
 #ifdef FEAT_TERMGUICOLORS
 		// If both fg and bg are not set fall back to cterm colors.
 		// Helps for SpellBad which uses undercurl in the GUI.
-		if (COLOR_INVALID(prim_aep->ae_u.cterm.fg_rgb)
+		အကယ်၍ (COLOR_INVALID(prim_aep->ae_u.cterm.fg_rgb)
 			&& COLOR_INVALID(prim_aep->ae_u.cterm.bg_rgb))
 		{
-		    if (prim_aep->ae_u.cterm.fg_color > 0)
+		    အကယ်၍ (prim_aep->ae_u.cterm.fg_color > 0)
 			new_en.ae_u.cterm.fg_rgb = CTERMCOLOR;
-		    if (prim_aep->ae_u.cterm.bg_color > 0)
+		    အကယ်၍ (prim_aep->ae_u.cterm.bg_color > 0)
 			new_en.ae_u.cterm.bg_rgb = CTERMCOLOR;
 		}
-		else
+		မဟုတ်ပါက
 		{
-		    if (prim_aep->ae_u.cterm.fg_rgb != INVALCOLOR)
+		    အကယ်၍ (prim_aep->ae_u.cterm.fg_rgb != INVALCOLOR)
 			new_en.ae_u.cterm.fg_rgb = prim_aep->ae_u.cterm.fg_rgb;
-		    if (prim_aep->ae_u.cterm.bg_rgb != INVALCOLOR)
+		    အကယ်၍ (prim_aep->ae_u.cterm.bg_rgb != INVALCOLOR)
 			new_en.ae_u.cterm.bg_rgb = prim_aep->ae_u.cterm.bg_rgb;
 		}
-		if (prim_aep->ae_u.cterm.ul_rgb != INVALCOLOR)
+		အကယ်၍ (prim_aep->ae_u.cterm.ul_rgb != INVALCOLOR)
 		    new_en.ae_u.cterm.ul_rgb = prim_aep->ae_u.cterm.ul_rgb;
 #endif
 	    }
 	}
-	return get_attr_entry(&cterm_attr_table, &new_en);
+	ပြန်ပေး get_attr_entry(&cterm_attr_table, &new_en);
     }
 
-    if (char_attr > HL_ALL)
+    အကယ်၍ (char_attr > HL_ALL)
 	char_aep = syn_term_attr2entry(char_attr);
-    if (char_aep != NULL)
+    အကယ်၍ (char_aep != NULL)
 	new_en = *char_aep;
-    else
+    မဟုတ်ပါက
     {
 	CLEAR_FIELD(new_en);
-	if (char_attr <= HL_ALL)
+	အကယ်၍ (char_attr <= HL_ALL)
 	    new_en.ae_attr = char_attr;
     }
 
-    if (prim_attr <= HL_ALL)
+    အကယ်၍ (prim_attr <= HL_ALL)
 	new_en.ae_attr = ATTR_COMBINE(new_en.ae_attr, prim_attr);
-    else
+    မဟုတ်ပါက
     {
 	prim_aep = syn_term_attr2entry(prim_attr);
-	if (prim_aep != NULL)
+	အကယ်၍ (prim_aep != NULL)
 	{
 	    new_en.ae_attr = ATTR_COMBINE(new_en.ae_attr, prim_aep->ae_attr);
-	    if (prim_aep->ae_u.term.start != NULL)
+	    အကယ်၍ (prim_aep->ae_u.term.start != NULL)
 	    {
 		new_en.ae_u.term.start = prim_aep->ae_u.term.start;
 		new_en.ae_u.term.stop = prim_aep->ae_u.term.stop;
 	    }
 	}
     }
-    return get_attr_entry(&term_attr_table, &new_en);
+    ပြန်ပေး get_attr_entry(&term_attr_table, &new_en);
 }
 
 // ANSI color order: Black, Red, Green, Yellow, Blue, Magenta,
@@ -3158,11 +3158,11 @@ static const long_u cterm_color_16[16] = {
  * Returns INVALCOLOR if the color number is out of range.
  */
     static guicolor_T
-cterm_color_to_rgb(int color_nr)
+cterm_color_to_rgb(ကိန်းပြည့် color_nr)
 {
-    if (color_nr < 1 || color_nr > 16)
-	return INVALCOLOR;
-    return (guicolor_T)cterm_color_16[color_nr - 1];
+    အကယ်၍ (color_nr < 1 || color_nr > 16)
+	ပြန်ပေး INVALCOLOR;
+    ပြန်ပေး (guicolor_T)cterm_color_16[color_nr - 1];
 }
 #endif
 
@@ -3172,32 +3172,32 @@ cterm_color_to_rgb(int color_nr)
  * 6x6x6 cube, 232-255 grayscale ramp.
  */
     static void
-cterm_idx_to_rgb(int idx, int *r, int *g, int *b)
+cterm_idx_to_rgb(ကိန်းပြည့် idx, ကိန်းပြည့် *r, ကိန်းပြည့် *g, ကိန်းပြည့် *b)
 {
-    static const int cube[] = { 0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF };
+    static const ကိန်းပြည့် cube[] = { 0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF };
 
-    if (idx < 0 || idx > 255)
+    အကယ်၍ (idx < 0 || idx > 255)
     {
 	*r = *g = *b = 0;
-	return;
+	ပြန်ပေး;
     }
-    if (idx < 16)
+    အကယ်၍ (idx < 16)
     {
 	long_u rgb = cterm_color_16[idx];
 	*r = (rgb >> 16) & 0xFF;
 	*g = (rgb >> 8) & 0xFF;
 	*b = rgb & 0xFF;
     }
-    else if (idx < 232)
+    မဟုတ်ပါက အကယ်၍ (idx < 232)
     {
-	int n = idx - 16;
+	ကိန်းပြည့် n = idx - 16;
 	*r = cube[n / 36 % 6];
 	*g = cube[n / 6  % 6];
 	*b = cube[n      % 6];
     }
-    else
+    မဟုတ်ပါက
     {
-	int v = 8 + (idx - 232) * 10;
+	ကိန်းပြည့် v = 8 + (idx - 232) * 10;
 	*r = *g = *b = v;
     }
 }
@@ -3206,40 +3206,40 @@ cterm_idx_to_rgb(int idx, int *r, int *g, int *b)
  * Approximate an RGB triple to the nearest xterm 256-color index.
  * Searches the 6x6x6 cube and the grayscale ramp; returns 0-255.
  */
-    static int
-rgb_to_cterm_idx(int r, int g, int b)
+    static ကိန်းပြည့်
+rgb_to_cterm_idx(ကိန်းပြည့် r, ကိန်းပြည့် g, ကိန်းပြည့် b)
 {
-    static const int cube[] = { 0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF };
-    int best = 0;
+    static const ကိန်းပြည့် cube[] = { 0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF };
+    ကိန်းပြည့် best = 0;
     long best_d = -1;
-    int i;
+    ကိန်းပြည့် i;
 
     // Search the 6x6x6 cube.
-    for (i = 16; i < 232; ++i)
+    အတွက် (i = 16; i < 232; ++i)
     {
-	int n = i - 16;
-	int cr = cube[n / 36 % 6];
-	int cg = cube[n / 6  % 6];
-	int cb = cube[n      % 6];
+	ကိန်းပြည့် n = i - 16;
+	ကိန်းပြည့် cr = cube[n / 36 % 6];
+	ကိန်းပြည့် cg = cube[n / 6  % 6];
+	ကိန်းပြည့် cb = cube[n      % 6];
 	long d = (cr - r) * (cr - r) + (cg - g) * (cg - g) + (cb - b) * (cb - b);
-	if (best_d < 0 || d < best_d)
+	အကယ်၍ (best_d < 0 || d < best_d)
 	{
 	    best_d = d;
 	    best = i;
 	}
     }
     // Search the grayscale ramp.
-    for (i = 232; i < 256; ++i)
+    အတွက် (i = 232; i < 256; ++i)
     {
-	int v = 8 + (i - 232) * 10;
+	ကိန်းပြည့် v = 8 + (i - 232) * 10;
 	long d = (v - r) * (v - r) + (v - g) * (v - g) + (v - b) * (v - b);
-	if (d < best_d)
+	အကယ်၍ (d < best_d)
 	{
 	    best_d = d;
 	    best = i;
 	}
     }
-    return best;
+    ပြန်ပေး best;
 }
 
 /*
@@ -3249,36 +3249,36 @@ rgb_to_cterm_idx(int r, int g, int b)
  * cterm_c is 1-based (0 means "no color").
  */
     static bool
-resolve_color_to_rgb(int cterm_c, guicolor_T rgb UNUSED, int *r, int *g, int *b)
+resolve_color_to_rgb(ကိန်းပြည့် cterm_c, guicolor_T rgb UNUSED, ကိန်းပြည့် *r, ကိန်းပြည့် *g, ကိန်းပြည့် *b)
 {
 #ifdef FEAT_TERMGUICOLORS
-    if (!COLOR_INVALID(rgb))
+    အကယ်၍ (!COLOR_INVALID(rgb))
     {
 	*r = (rgb >> 16) & 0xFF;
 	*g = (rgb >> 8) & 0xFF;
 	*b = rgb & 0xFF;
-	return true;
+	ပြန်ပေး true;
     }
 #endif
-    if (cterm_c > 0)
+    အကယ်၍ (cterm_c > 0)
     {
 	cterm_idx_to_rgb(cterm_c - 1, r, g, b);
-	return true;
+	ပြန်ပေး true;
     }
-    return false;
+    ပြန်ပေး false;
 }
 
 /*
  * get a RGB fallback color from gui, cterm or default color
  */
     static guicolor_T
-resolve_fallback_color(int cterm_c, guicolor_T rgb, guicolor_T default_rgb)
+resolve_fallback_color(ကိန်းပြည့် cterm_c, guicolor_T rgb, guicolor_T default_rgb)
 {
-    int red, green, blue;
-    if (!resolve_color_to_rgb(cterm_c, rgb, &red, &green, &blue))
-	return default_rgb;
-    else
-	return (red << 16) | (green << 8) | blue;
+    ကိန်းပြည့် red, green, blue;
+    အကယ်၍ (!resolve_color_to_rgb(cterm_c, rgb, &red, &green, &blue))
+	ပြန်ပေး default_rgb;
+    မဟုတ်ပါက
+	ပြန်ပေး (red << 16) | (green << 8) | blue;
 }
 
 /*
@@ -3292,7 +3292,7 @@ resolve_fallback_fg_to_rgb(void)
     fgcolor_or_gui_fgcolor = cterm_normal_fg_gui_color;
 #endif
 #ifdef FEAT_GUI
-    if (gui.in_use)
+    အကယ်၍ (gui.in_use)
 	fgcolor_or_gui_fgcolor = gui.norm_pixel;
 #endif
     fallback_fg_rgb = resolve_fallback_color(cterm_normal_fg_color, fgcolor_or_gui_fgcolor, (*p_bg == 'l') ? 0x000000 : 0xFFFFFF);
@@ -3309,7 +3309,7 @@ resolve_fallback_bg_to_rgb(void)
     bgcolor_or_gui_bgcolor = cterm_normal_bg_gui_color;
 #endif
 #ifdef FEAT_GUI
-    if (gui.in_use)
+    အကယ်၍ (gui.in_use)
 	bgcolor_or_gui_bgcolor = gui.back_pixel;
 #endif
     fallback_bg_rgb = resolve_fallback_color(cterm_normal_bg_color, bgcolor_or_gui_bgcolor, (*p_bg == 'l') ? 0xFFFFFF : 0x000000);
@@ -3328,59 +3328,59 @@ resolve_fallback_bg_to_rgb(void)
  *
  * Requires t_colors >= 256; otherwise returns popup_c unchanged.
  */
-    static int
-blend_cterm_colors(int popup_c, guicolor_T popup_rgb,
-		   int under_c, guicolor_T under_rgb,
-		   int default_rgb,
-		   int blend_val)
+    static ကိန်းပြည့်
+blend_cterm_colors(ကိန်းပြည့် popup_c, guicolor_T popup_rgb,
+		   ကိန်းပြည့် under_c, guicolor_T under_rgb,
+		   ကိန်းပြည့် default_rgb,
+		   ကိန်းပြည့် blend_val)
 {
-    int pr, pg, pb, ur, ug, ub, r, g, b;
+    ကိန်းပြည့် pr, pg, pb, ur, ug, ub, r, g, b;
 
-    if (t_colors < 256)
-	return popup_c;
-    if (!resolve_color_to_rgb(popup_c, popup_rgb, &pr, &pg, &pb))
-	return under_c;
-    if (blend_val <= 0)
-	return rgb_to_cterm_idx(pr, pg, pb) + 1;
-    if (!resolve_color_to_rgb(under_c, under_rgb, &ur, &ug, &ub))
+    အကယ်၍ (t_colors < 256)
+	ပြန်ပေး popup_c;
+    အကယ်၍ (!resolve_color_to_rgb(popup_c, popup_rgb, &pr, &pg, &pb))
+	ပြန်ပေး under_c;
+    အကယ်၍ (blend_val <= 0)
+	ပြန်ပေး rgb_to_cterm_idx(pr, pg, pb) + 1;
+    အကယ်၍ (!resolve_color_to_rgb(under_c, under_rgb, &ur, &ug, &ub))
     {
 	ur = (default_rgb >> 16) & 0xFF;
 	ug = (default_rgb >> 8) & 0xFF;
 	ub = default_rgb & 0xFF;
     }
-    if (blend_val >= 100)
-	return rgb_to_cterm_idx(ur, ug, ub) + 1;
+    အကယ်၍ (blend_val >= 100)
+	ပြန်ပေး rgb_to_cterm_idx(ur, ug, ub) + 1;
     r = pr + (ur - pr) * blend_val / 100;
     g = pg + (ug - pg) * blend_val / 100;
     b = pb + (ub - pb) * blend_val / 100;
-    return rgb_to_cterm_idx(r, g, b) + 1;
+    ပြန်ပေး rgb_to_cterm_idx(r, g, b) + 1;
 }
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#အကယ်၍ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 /*
  * Blend two RGB colors based on blend value (0-100).
  * blend: 0=return first argument color, 100=return second argument color
  * If bg_color is INVALCOLOR, high blend means more visible (return INVALCOLOR).
  */
     static guicolor_T
-blend_colors(guicolor_T popup_color, guicolor_T bg_color, int blend_val)
+blend_colors(guicolor_T popup_color, guicolor_T bg_color, ကိန်းပြည့် blend_val)
 {
-    int r1, g1, b1, r2, g2, b2, r, g, b;
+    ကိန်းပြည့် r1, g1, b1, r2, g2, b2, r, g, b;
 
     // CTERMCOLOR is a sentinel meaning "use the cterm color"; for blending
     // it has no real RGB so treat it like INVALCOLOR.
-    if (COLOR_INVALID(popup_color))
-	return INVALCOLOR;
+    အကယ်၍ (COLOR_INVALID(popup_color))
+	ပြန်ပေး INVALCOLOR;
 
     // Fully transparent: use underlying color as-is.
-    if (blend_val >= 100)
-	return bg_color;
+    အကယ်၍ (blend_val >= 100)
+	ပြန်ပေး bg_color;
 
     r1 = (popup_color >> 16) & 0xFF;
     g1 = (popup_color >> 8) & 0xFF;
     b1 = popup_color & 0xFF;
 
-    if (COLOR_INVALID(bg_color))
+    အကယ်၍ (COLOR_INVALID(bg_color))
 	bg_color = fallback_bg_rgb;
 
     r2 = (bg_color >> 16) & 0xFF;
@@ -3391,7 +3391,7 @@ blend_colors(guicolor_T popup_color, guicolor_T bg_color, int blend_val)
     g = g1 + (g2 - g1) * blend_val / 100;
     b = b1 + (b2 - b1) * blend_val / 100;
 
-    return (r << 16) | (g << 8) | b;
+    ပြန်ပေး (r << 16) | (g << 8) | b;
 }
 #endif
 
@@ -3401,12 +3401,12 @@ blend_colors(guicolor_T popup_color, guicolor_T bg_color, int blend_val)
  * blend: 0 = opaque (use popup colors), 100 = transparent (use background colors)
  * blend_fg: TRUE to blend foreground color, FALSE to keep popup foreground
  */
-    static int
+    static ကိန်းပြည့်
 hl_blend_attr_common(
-    int		char_attr,
-    int		popup_attr,
-    int		blend,
-    int		blend_fg)
+    ကိန်းပြည့်		char_attr,
+    ကိန်းပြည့်		popup_attr,
+    ကိန်းပြည့်		blend,
+    ကိန်းပြည့်		blend_fg)
 {
     attrentry_T *char_aep = NULL;
     attrentry_T *popup_aep;
@@ -3414,24 +3414,24 @@ hl_blend_attr_common(
     attrentry_T tmp_en;
 
 #ifdef FEAT_GUI
-    if (gui.in_use)
+    အကယ်၍ (gui.in_use)
     {
-	if (char_attr > HL_ALL)
+	အကယ်၍ (char_attr > HL_ALL)
 	    char_aep = syn_gui_attr2entry(char_attr);
-	if (char_aep != NULL)
+	အကယ်၍ (char_aep != NULL)
 	    new_en = *char_aep;
-	else
+	မဟုတ်ပါက
 	{
 	    CLEAR_FIELD(new_en);
 	    new_en.ae_u.gui.fg_color = INVALCOLOR;
 	    new_en.ae_u.gui.bg_color = INVALCOLOR;
 	    new_en.ae_u.gui.sp_color = INVALCOLOR;
-	    if (char_attr <= HL_ALL)
+	    အကယ်၍ (char_attr <= HL_ALL)
 		new_en.ae_attr = char_attr;
 	}
 
 	// initialize an empty entry if no highlight set for popup
-	if (popup_attr <= HL_ALL)
+	အကယ်၍ (popup_attr <= HL_ALL)
 	{
 	    CLEAR_FIELD(tmp_en);
 	    tmp_en.ae_u.gui.fg_color = INVALCOLOR;
@@ -3443,28 +3443,28 @@ hl_blend_attr_common(
 
 	    popup_aep->ae_u.gui.bg_color = fallback_bg_rgb;
 	}
-	else
+	မဟုတ်ပါက
 	    popup_aep = syn_gui_attr2entry(popup_attr);
 
-	if (popup_aep != NULL)
+	အကယ်၍ (popup_aep != NULL)
 	{
 	    guicolor_T popup_bg_rgb = popup_aep->ae_u.gui.bg_color;
-	    if (COLOR_INVALID(popup_bg_rgb))
+	    အကယ်၍ (COLOR_INVALID(popup_bg_rgb))
 		popup_bg_rgb = fallback_bg_rgb;
 
-	    if (blend_fg)
+	    အကယ်၍ (blend_fg)
 	    {
 		// blend_fg=TRUE: fade underlying text toward popup bg.
 		{
-		    int base_fg = fallback_fg_rgb;
-		    if (char_aep != NULL
+		    ကိန်းပြည့် base_fg = fallback_fg_rgb;
+		    အကယ်၍ (char_aep != NULL
 			    && char_aep->ae_u.gui.fg_color != INVALCOLOR)
 			base_fg = char_aep->ae_u.gui.fg_color;
 		    new_en.ae_u.gui.fg_color = blend_colors(
 			    popup_bg_rgb, base_fg, blend);
 		}
 	    }
-	    else
+	    မဟုတ်ပါက
 	    {
 		// blend_fg=FALSE: popup text is opaque.  Replace the
 		// underlying cell's attribute flags, fg, special color
@@ -3483,7 +3483,7 @@ hl_blend_attr_common(
 	    // Blend background color: blend popup bg toward underlying bg
 	    {
 		guicolor_T underlying_bg = fallback_bg_rgb;
-		if (char_aep != NULL
+		အကယ်၍ (char_aep != NULL
 			&& !COLOR_INVALID(char_aep->ae_u.gui.bg_color))
 		    underlying_bg = char_aep->ae_u.gui.bg_color;
 		new_en.ae_u.gui.bg_color = blend_colors(
@@ -3491,17 +3491,17 @@ hl_blend_attr_common(
 			underlying_bg, blend);
 	    }
 	}
-	return get_attr_entry(&gui_attr_table, &new_en);
+	ပြန်ပေး get_attr_entry(&gui_attr_table, &new_en);
     }
 #endif
 
-    if (IS_CTERM)
+    အကယ်၍ (IS_CTERM)
     {
-	if (char_attr > HL_ALL)
+	အကယ်၍ (char_attr > HL_ALL)
 	    char_aep = syn_cterm_attr2entry(char_attr);
-	if (char_aep != NULL)
+	အကယ်၍ (char_aep != NULL)
 	    new_en = *char_aep;
-	else
+	မဟုတ်ပါက
 	{
 	    CLEAR_FIELD(new_en);
 #ifdef FEAT_TERMGUICOLORS
@@ -3509,12 +3509,12 @@ hl_blend_attr_common(
 	    new_en.ae_u.cterm.fg_rgb = INVALCOLOR;
 	    new_en.ae_u.cterm.ul_rgb = INVALCOLOR;
 #endif
-	    if (char_attr <= HL_ALL)
+	    အကယ်၍ (char_attr <= HL_ALL)
 		new_en.ae_attr = char_attr;
 	}
 
 	// initialize an empty entry if no highlight set for popup
-	if (popup_attr <= HL_ALL)
+	အကယ်၍ (popup_attr <= HL_ALL)
 	{
 	    CLEAR_FIELD(tmp_en);
 #ifdef FEAT_TERMGUICOLORS
@@ -3530,26 +3530,26 @@ hl_blend_attr_common(
 	    // allow blending with notermguicolors
 	    popup_aep->ae_u.cterm.bg_color = cterm_normal_bg_color;
 	}
-	else
+	မဟုတ်ပါက
 	    popup_aep = syn_cterm_attr2entry(popup_attr);
 
-	if (popup_aep != NULL)
+	အကယ်၍ (popup_aep != NULL)
 	{
 	    guicolor_T popup_bg_rgb = INVALCOLOR;
 #ifdef FEAT_TERMGUICOLORS
 	    // Fall back to cterm color converted to RGB when gui color is not set.
 	    popup_bg_rgb = popup_aep->ae_u.cterm.bg_rgb;
-	    if (COLOR_INVALID(popup_bg_rgb)
+	    အကယ်၍ (COLOR_INVALID(popup_bg_rgb)
 		    && popup_aep->ae_u.cterm.bg_color > 0)
 		popup_bg_rgb = cterm_color_to_rgb(
 			popup_aep->ae_u.cterm.bg_color);
 #endif
 	    // assign default color if guibg and ctermbg are not set for popup
-	    if (COLOR_INVALID(popup_bg_rgb)
+	    အကယ်၍ (COLOR_INVALID(popup_bg_rgb)
 		    && popup_aep->ae_u.cterm.bg_color == 0)
 		popup_bg_rgb = fallback_bg_rgb;
 
-	    if (!blend_fg)
+	    အကယ်၍ (!blend_fg)
 	    {
 		// blend_fg=FALSE: popup text is opaque.  Replace the
 		// underlying cell's attribute flags, fg, underline color
@@ -3560,12 +3560,12 @@ hl_blend_attr_common(
 		// text is still readable instead of taking on whatever
 		// the underlying cell happened to have.
 		new_en.ae_attr = popup_aep->ae_attr;
-		if (popup_aep->ae_u.cterm.fg_color > 0)
+		အကယ်၍ (popup_aep->ae_u.cterm.fg_color > 0)
 		    new_en.ae_u.cterm.fg_color =
 			popup_aep->ae_u.cterm.fg_color;
-		else if (cterm_normal_fg_color > 0)
+		မဟုတ်ပါက အကယ်၍ (cterm_normal_fg_color > 0)
 		    new_en.ae_u.cterm.fg_color = cterm_normal_fg_color;
-		else
+		မဟုတ်ပါက
 		    // black-ish or white-ish
 		    new_en.ae_u.cterm.fg_color = (*p_bg == 'l') ? 1 : 16;
 		new_en.ae_u.cterm.ul_color = popup_aep->ae_u.cterm.ul_color;
@@ -3574,16 +3574,16 @@ hl_blend_attr_common(
 		new_en.ae_u.cterm.ul_rgb = popup_aep->ae_u.cterm.ul_rgb;
 #endif
 	    }
-	    else
+	    မဟုတ်ပါက
 	    {
 		// blend_fg=TRUE: fade underlying fg toward popup bg in
 		// the 256-color palette.  Used when the popup is over a
 		// cell rendered with cterm colors (no termguicolors RGB).
-		int under_fg = (char_aep != NULL)
+		ကိန်းပြည့် under_fg = (char_aep != NULL)
 		    ? char_aep->ae_u.cterm.fg_color : 0;
 		guicolor_T under_fg_rgb = INVALCOLOR;
 #ifdef FEAT_TERMGUICOLORS
-		if (char_aep != NULL)
+		အကယ်၍ (char_aep != NULL)
 		    under_fg_rgb = char_aep->ae_u.cterm.fg_rgb;
 #endif
 		new_en.ae_u.cterm.fg_color = blend_cterm_colors(
@@ -3593,11 +3593,11 @@ hl_blend_attr_common(
 	    // Approximate cterm bg by blending with the underlying bg
 	    // in the 256-color palette and mapping to the nearest entry.
 	    {
-		int under_bg = (char_aep != NULL)
+		ကိန်းပြည့် under_bg = (char_aep != NULL)
 		    ? char_aep->ae_u.cterm.bg_color : 0;
 		guicolor_T under_bg_rgb = INVALCOLOR;
 #ifdef FEAT_TERMGUICOLORS
-		if (char_aep != NULL)
+		အကယ်၍ (char_aep != NULL)
 		    under_bg_rgb = char_aep->ae_u.cterm.bg_rgb;
 #endif
 		new_en.ae_u.cterm.bg_color = blend_cterm_colors(
@@ -3607,23 +3607,23 @@ hl_blend_attr_common(
 #ifdef FEAT_TERMGUICOLORS
 	    // Blend RGB colors for termguicolors mode.
 	    {
-		if (blend_fg)
+		အကယ်၍ (blend_fg)
 		{
 		    // blend_fg=TRUE: fade underlying text toward popup bg.
-		    if (popup_bg_rgb != INVALCOLOR)
+		    အကယ်၍ (popup_bg_rgb != INVALCOLOR)
 		    {
-			int base_fg = fallback_fg_rgb;
+			ကိန်းပြည့် base_fg = fallback_fg_rgb;
 			// CTERMCOLOR is a sentinel meaning "use the cterm
 			// color"; treat it as no underlying color so it is
 			// not blended in as a real near-white pixel.
-			if (char_aep != NULL
+			အကယ်၍ (char_aep != NULL
 				&& !COLOR_INVALID(char_aep->ae_u.cterm.fg_rgb))
 			    base_fg = char_aep->ae_u.cterm.fg_rgb;
 			new_en.ae_u.cterm.fg_rgb = blend_colors(
 				popup_bg_rgb, base_fg, blend);
 		    }
 		}
-		else
+		မဟုတ်ပါက
 		{
 		    // blend_fg=FALSE: popup text is opaque.  Replace fg with
 		    // popup's so the underlying syntax highlighting fg does
@@ -3635,23 +3635,23 @@ hl_blend_attr_common(
 		    // color is not set.
 		    guicolor_T popup_fg = popup_aep->ae_u.cterm.fg_rgb;
 
-		    if (COLOR_INVALID(popup_fg)
+		    အကယ်၍ (COLOR_INVALID(popup_fg)
 			    && popup_aep->ae_u.cterm.fg_color > 0)
 			popup_fg = cterm_color_to_rgb(
 				popup_aep->ae_u.cterm.fg_color);
 
-		    if (!COLOR_INVALID(popup_fg))
+		    အကယ်၍ (!COLOR_INVALID(popup_fg))
 			new_en.ae_u.cterm.fg_rgb = popup_fg;
-		    else if (!COLOR_INVALID(cterm_normal_fg_gui_color))
+		    မဟုတ်ပါက အကယ်၍ (!COLOR_INVALID(cterm_normal_fg_gui_color))
 			new_en.ae_u.cterm.fg_rgb = cterm_normal_fg_gui_color;
-		    else
+		    မဟုတ်ပါက
 			new_en.ae_u.cterm.fg_rgb = fallback_fg_rgb;
 		}
-		if (popup_bg_rgb != INVALCOLOR)
+		အကယ်၍ (popup_bg_rgb != INVALCOLOR)
 		{
 		    // Blend popup bg toward underlying bg
 		    guicolor_T underlying_bg = fallback_bg_rgb;
-		    if (char_aep != NULL
+		    အကယ်၍ (char_aep != NULL
 			    && !COLOR_INVALID(char_aep->ae_u.cterm.bg_rgb))
 			underlying_bg = char_aep->ae_u.cterm.bg_rgb;
 		    new_en.ae_u.cterm.bg_rgb = blend_colors(
@@ -3660,53 +3660,53 @@ hl_blend_attr_common(
 	    }
 #endif
 	}
-	return get_attr_entry(&cterm_attr_table, &new_en);
+	ပြန်ပေး get_attr_entry(&cterm_attr_table, &new_en);
     }
 
-    if (char_attr > HL_ALL)
+    အကယ်၍ (char_attr > HL_ALL)
 	char_aep = syn_term_attr2entry(char_attr);
-    if (char_aep != NULL)
+    အကယ်၍ (char_aep != NULL)
 	new_en = *char_aep;
-    else
+    မဟုတ်ပါက
     {
 	CLEAR_FIELD(new_en);
-	if (char_attr <= HL_ALL)
+	အကယ်၍ (char_attr <= HL_ALL)
 	    new_en.ae_attr = char_attr;
     }
 
     // For term mode, no separate background color handling.
-    return get_attr_entry(&term_attr_table, &new_en);
+    ပြန်ပေး get_attr_entry(&term_attr_table, &new_en);
 }
 
 /*
  * Blend attributes for popup windows with opacity.
  */
-    int
-hl_blend_attr(int char_attr, int popup_attr, int blend, int blend_fg)
+    ကိန်းပြည့်
+hl_blend_attr(ကိန်းပြည့် char_attr, ကိန်းပြည့် popup_attr, ကိန်းပြည့် blend, ကိန်းပြည့် blend_fg)
 {
-    if (blend >= 100 && blend_fg)
-	return char_attr;
+    အကယ်၍ (blend >= 100 && blend_fg)
+	ပြန်ပေး char_attr;
 
-    return hl_blend_attr_common(char_attr, popup_attr, blend, blend_fg);
+    ပြန်ပေး hl_blend_attr_common(char_attr, popup_attr, blend, blend_fg);
 }
 
 /*
  * Blend underlying foreground and background colors for pum space cells.
  */
-    int
-hl_pum_blend_attr(int char_attr, int popup_attr, int blend)
+    ကိန်းပြည့်
+hl_pum_blend_attr(ကိန်းပြည့် char_attr, ကိန်းပြည့် popup_attr, ကိန်းပြည့် blend)
 {
-    return hl_blend_attr_common(char_attr, popup_attr, blend, TRUE);
+    ပြန်ပေး hl_blend_attr_common(char_attr, popup_attr, blend, TRUE);
 }
 
 #ifdef FEAT_GUI
     attrentry_T *
-syn_gui_attr2entry(int attr)
+syn_gui_attr2entry(ကိန်းပြည့် attr)
 {
     attr -= ATTR_OFF;
-    if (attr >= gui_attr_table.ga_len)	    // did ":syntax clear"
-	return NULL;
-    return &(GUI_ATTR_ENTRY(attr));
+    အကယ်၍ (attr >= gui_attr_table.ga_len)	    // did ":syntax clear"
+	ပြန်ပေး NULL;
+    ပြန်ပေး &(GUI_ATTR_ENTRY(attr));
 }
 #endif
 
@@ -3714,43 +3714,43 @@ syn_gui_attr2entry(int attr)
  * Get the highlight attributes (HL_BOLD etc.) from an attribute nr.
  * Only to be used when "attr" > HL_ALL.
  */
-    int
-syn_attr2attr(int attr)
+    ကိန်းပြည့်
+syn_attr2attr(ကိန်းပြည့် attr)
 {
     attrentry_T	*aep;
 
 #ifdef FEAT_GUI
-    if (gui.in_use)
+    အကယ်၍ (gui.in_use)
 	aep = syn_gui_attr2entry(attr);
-    else
+    မဟုတ်ပါက
 #endif
-	if (IS_CTERM)
+	အကယ်၍ (IS_CTERM)
 	    aep = syn_cterm_attr2entry(attr);
-	else
+	မဟုတ်ပါက
 	    aep = syn_term_attr2entry(attr);
 
-    if (aep == NULL)	    // highlighting not set
-	return 0;
-    return aep->ae_attr;
+    အကယ်၍ (aep == NULL)	    // highlighting not set
+	ပြန်ပေး 0;
+    ပြန်ပေး aep->ae_attr;
 }
 
 
     attrentry_T *
-syn_term_attr2entry(int attr)
+syn_term_attr2entry(ကိန်းပြည့် attr)
 {
     attr -= ATTR_OFF;
-    if (attr >= term_attr_table.ga_len)	    // did ":syntax clear"
-	return NULL;
-    return &(TERM_ATTR_ENTRY(attr));
+    အကယ်၍ (attr >= term_attr_table.ga_len)	    // did ":syntax clear"
+	ပြန်ပေး NULL;
+    ပြန်ပေး &(TERM_ATTR_ENTRY(attr));
 }
 
     attrentry_T *
-syn_cterm_attr2entry(int attr)
+syn_cterm_attr2entry(ကိန်းပြည့် attr)
 {
     attr -= ATTR_OFF;
-    if (attr >= cterm_attr_table.ga_len)	// did ":syntax clear"
-	return NULL;
-    return &(CTERM_ATTR_ENTRY(attr));
+    အကယ်၍ (attr >= cterm_attr_table.ga_len)	// did ":syntax clear"
+	ပြန်ပေး NULL;
+    ပြန်ပေး &(CTERM_ATTR_ENTRY(attr));
 }
 
 #define LIST_ATTR   1
@@ -3758,15 +3758,15 @@ syn_cterm_attr2entry(int attr)
 #define LIST_INT    3
 
     static void
-highlight_list_one(int id)
+highlight_list_one(ကိန်းပြည့် id)
 {
     hl_group_T	    *sgp;
-    int		    didh = FALSE;
+    ကိန်းပြည့်		    didh = FALSE;
 
     sgp = &HL_TABLE()[id - 1];	    // index is ID minus one
 
-    if (message_filtered(sgp->sg_name))
-	return;
+    အကယ်၍ (message_filtered(sgp->sg_name))
+	ပြန်ပေး;
 
     // Note: Keep this in sync with expand_highlight_group().
     didh = highlight_list_arg(id, didh, LIST_ATTR,
@@ -3787,7 +3787,7 @@ highlight_list_one(int id)
     didh = highlight_list_arg(id, didh, LIST_INT,
 				    sgp->sg_cterm_font, NULL, "ctermfont");
 
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
+#အကယ်၍ defined(FEAT_GUI) || defined(FEAT_EVAL)
     didh = highlight_list_arg(id, didh, LIST_ATTR,
 				    sgp->sg_gui, NULL, "gui");
     didh = highlight_list_arg(id, didh, LIST_STRING,
@@ -3802,7 +3802,7 @@ highlight_list_one(int id)
 				    0, sgp->sg_font_name, "font");
 #endif
 
-    if (sgp->sg_link && !got_int)
+    အကယ်၍ (sgp->sg_link && !got_int)
     {
 	(void)syn_list_header(didh, 9999, id);
 	didh = TRUE;
@@ -3811,36 +3811,36 @@ highlight_list_one(int id)
 	msg_outtrans(HL_TABLE()[HL_TABLE()[id - 1].sg_link - 1].sg_name);
     }
 
-    if (!didh)
+    အကယ်၍ (!didh)
 	highlight_list_arg(id, didh, LIST_STRING, 0, (char_u *)"cleared", "");
 #ifdef FEAT_EVAL
-    if (p_verbose > 0)
+    အကယ်၍ (p_verbose > 0)
 	last_set_msg(sgp->sg_script_ctx);
 #endif
 }
 
     static char_u*
 highlight_arg_to_string(
-    int		type,
-    int		iarg,
+    ကိန်းပြည့်		type,
+    ကိန်းပြည့်		iarg,
     char_u	*sarg,
     char_u	*buf)
 {
-    if (type == LIST_INT)
-	sprintf((char *)buf, "%d", iarg - 1);
-    else if (type == LIST_STRING)
-	return sarg;
-    else // type == LIST_ATTR
+    အကယ်၍ (type == LIST_INT)
+	sprintf((var_na *)buf, "%d", iarg - 1);
+    မဟုတ်ပါက အကယ်၍ (type == LIST_STRING)
+	ပြန်ပေး sarg;
+    မဟုတ်ပါက // type == LIST_ATTR
     {
 	size_t buflen;
 
 	buf[0] = NUL;
 	buflen = 0;
-	for (int i = 0; i < (int)ARRAY_LENGTH(highlight_index_tab); ++i)
+	အတွက် (ကိန်းပြည့် i = 0; i < (ကိန်းပြည့်)ARRAY_LENGTH(highlight_index_tab); ++i)
 	{
-	    if (iarg & highlight_index_tab[i]->key)
+	    အကယ်၍ (iarg & highlight_index_tab[i]->key)
 	    {
-		if (buflen > 0)
+		အကယ်၍ (buflen > 0)
 		{
 		    STRCPY(buf + buflen, (char_u *)",");
 		    ++buflen;
@@ -3851,170 +3851,170 @@ highlight_arg_to_string(
 	    }
 	}
     }
-    return buf;
+    ပြန်ပေး buf;
 }
 
-    static int
+    static ကိန်းပြည့်
 highlight_list_arg(
-    int		id,
-    int		didh,
-    int		type,
-    int		iarg,
+    ကိန်းပြည့်		id,
+    ကိန်းပြည့်		didh,
+    ကိန်းပြည့်		type,
+    ကိန်းပြည့်		iarg,
     char_u	*sarg,
-    char	*name)
+    var_na	*name)
 {
     char_u	buf[MAX_ATTR_LEN];
     char_u	*ts;
 
-    if (got_int)
-	return FALSE;
+    အကယ်၍ (got_int)
+	ပြန်ပေး FALSE;
 
-    if (type == LIST_STRING ? (sarg == NULL) : (iarg == 0))
-	return didh;
+    အကယ်၍ (type == LIST_STRING ? (sarg == NULL) : (iarg == 0))
+	ပြန်ပေး didh;
 
     ts = highlight_arg_to_string(type, iarg, sarg, buf);
 
     (void)syn_list_header(didh,
-	    (int)(vim_strsize(ts) + STRLEN(name) + 1), id);
+	    (ကိန်းပြည့်)(vim_strsize(ts) + STRLEN(name) + 1), id);
     didh = TRUE;
-    if (!got_int)
+    အကယ်၍ (!got_int)
     {
-	if (*name != NUL)
+	အကယ်၍ (*name != NUL)
 	{
 	    msg_puts_attr(name, HL_ATTR(HLF_D));
 	    msg_puts_attr("=", HL_ATTR(HLF_D));
 	}
 	msg_outtrans(ts);
     }
-    return didh;
+    ပြန်ပေး didh;
 }
 
-#if ((defined(FEAT_EVAL) || defined(FEAT_PRINTER))) && defined(FEAT_SYN_HL)
+#အကယ်၍ ((defined(FEAT_EVAL) || defined(FEAT_PRINTER))) && defined(FEAT_SYN_HL)
 /*
  * Return "1" if highlight group "id" has attribute "flag".
  * Return NULL otherwise.
  */
     char_u *
 highlight_has_attr(
-    int		id,
-    int		flag,
-    int		modec)	// 'g' for GUI, 'c' for cterm, 't' for term
+    ကိန်းပြည့်		id,
+    ကိန်းပြည့်		flag,
+    ကိန်းပြည့်		modec)	// 'g' for GUI, 'c' for cterm, 't' for term
 {
-    int		attr;
+    ကိန်းပြည့်		attr;
 
-    if (id <= 0 || id > highlight_ga.ga_len)
-	return NULL;
+    အကယ်၍ (id <= 0 || id > highlight_ga.ga_len)
+	ပြန်ပေး NULL;
 
-# if defined(FEAT_GUI) || defined(FEAT_EVAL)
-    if (modec == 'g')
+# အကယ်၍ defined(FEAT_GUI) || defined(FEAT_EVAL)
+    အကယ်၍ (modec == 'g')
 	attr = HL_TABLE()[id - 1].sg_gui;
-    else
+    မဟုတ်ပါက
 # endif
     {
-	if (modec == 'c')
+	အကယ်၍ (modec == 'c')
 	    attr = HL_TABLE()[id - 1].sg_cterm;
-	else
+	မဟုတ်ပါက
 	    attr = HL_TABLE()[id - 1].sg_term;
     }
 
-    if (attr & flag)
-	return (char_u *)"1";
-    return NULL;
+    အကယ်၍ (attr & flag)
+	ပြန်ပေး (char_u *)"1";
+    ပြန်ပေး NULL;
 }
 #endif
 
-#if defined(FEAT_SYN_HL) && defined(FEAT_EVAL)
+#အကယ်၍ defined(FEAT_SYN_HL) && defined(FEAT_EVAL)
 /*
  * Return color name of highlight group "id".
  */
     char_u *
 highlight_color(
-    int		id,
+    ကိန်းပြည့်		id,
     char_u	*what,	// "font", "fg", "bg", "sp", "ul", "fg#", "bg#" or "sp#"
-    int		modec)	// 'g' for GUI, 'c' for cterm, 't' for term
+    ကိန်းပြည့်		modec)	// 'g' for GUI, 'c' for cterm, 't' for term
 {
     static char_u	name[20];
-    int			n;
-    int			fg = FALSE;
-    int			sp = FALSE;
-    int			ul = FALSE;
-    int			font = FALSE;
+    ကိန်းပြည့်			n;
+    ကိန်းပြည့်			fg = FALSE;
+    ကိန်းပြည့်			sp = FALSE;
+    ကိန်းပြည့်			ul = FALSE;
+    ကိန်းပြည့်			font = FALSE;
 
-    if (id <= 0 || id > highlight_ga.ga_len)
-	return NULL;
+    အကယ်၍ (id <= 0 || id > highlight_ga.ga_len)
+	ပြန်ပေး NULL;
 
-    if (TOLOWER_ASC(what[0]) == 'f' && TOLOWER_ASC(what[1]) == 'g')
+    အကယ်၍ (TOLOWER_ASC(what[0]) == 'f' && TOLOWER_ASC(what[1]) == 'g')
 	fg = TRUE;
-    else if (TOLOWER_ASC(what[0]) == 'f' && TOLOWER_ASC(what[1]) == 'o'
+    မဟုတ်ပါက အကယ်၍ (TOLOWER_ASC(what[0]) == 'f' && TOLOWER_ASC(what[1]) == 'o'
 	     && TOLOWER_ASC(what[2]) == 'n' && TOLOWER_ASC(what[3]) == 't')
 	font = TRUE;
-    else if (TOLOWER_ASC(what[0]) == 's' && TOLOWER_ASC(what[1]) == 'p')
+    မဟုတ်ပါက အကယ်၍ (TOLOWER_ASC(what[0]) == 's' && TOLOWER_ASC(what[1]) == 'p')
 	sp = TRUE;
-    else if (TOLOWER_ASC(what[0]) == 'u' && TOLOWER_ASC(what[1]) == 'l')
+    မဟုတ်ပါက အကယ်၍ (TOLOWER_ASC(what[0]) == 'u' && TOLOWER_ASC(what[1]) == 'l')
 	ul = TRUE;
-    else if (!(TOLOWER_ASC(what[0]) == 'b' && TOLOWER_ASC(what[1]) == 'g'))
-	return NULL;
-    if (modec == 'g')
+    မဟုတ်ပါက အကယ်၍ (!(TOLOWER_ASC(what[0]) == 'b' && TOLOWER_ASC(what[1]) == 'g'))
+	ပြန်ပေး NULL;
+    အကယ်၍ (modec == 'g')
     {
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# အကယ်၍ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 #  ifdef FEAT_GUI
 	// return font name
-	if (font)
-	    return HL_TABLE()[id - 1].sg_font_name;
+	အကယ်၍ (font)
+	    ပြန်ပေး HL_TABLE()[id - 1].sg_font_name;
 #  endif
 
 	// return #RRGGBB form (only possible when GUI is running)
-	if ((USE_24BIT) && what[2] == '#')
+	အကယ်၍ ((USE_24BIT) && what[2] == '#')
 	{
 	    guicolor_T		color;
 	    long_u		rgb;
 	    static char_u	buf[10];
 
-	    if (fg)
+	    အကယ်၍ (fg)
 		color = HL_TABLE()[id - 1].sg_gui_fg;
-	    else if (sp)
+	    မဟုတ်ပါက အကယ်၍ (sp)
 		color = HL_TABLE()[id - 1].sg_gui_sp;
-	    else
+	    မဟုတ်ပါက
 		color = HL_TABLE()[id - 1].sg_gui_bg;
-	    if (color == INVALCOLOR)
-		return NULL;
+	    အကယ်၍ (color == INVALCOLOR)
+		ပြန်ပေး NULL;
 	    rgb = (long_u)GUI_MCH_GET_RGB(color);
-	    sprintf((char *)buf, "#%02x%02x%02x",
+	    sprintf((var_na *)buf, "#%02x%02x%02x",
 				      (unsigned)(rgb >> 16),
 				      (unsigned)(rgb >> 8) & 255,
 				      (unsigned)rgb & 255);
-	    return buf;
+	    ပြန်ပေး buf;
 	}
 # endif
-	if (fg)
-	    return (HL_TABLE()[id - 1].sg_gui_fg_name);
-	if (sp)
-	    return (HL_TABLE()[id - 1].sg_gui_sp_name);
-	return (HL_TABLE()[id - 1].sg_gui_bg_name);
+	အကယ်၍ (fg)
+	    ပြန်ပေး (HL_TABLE()[id - 1].sg_gui_fg_name);
+	အကယ်၍ (sp)
+	    ပြန်ပေး (HL_TABLE()[id - 1].sg_gui_sp_name);
+	ပြန်ပေး (HL_TABLE()[id - 1].sg_gui_bg_name);
     }
-    if (sp)
-	return NULL;
-    if (modec == 'c')
+    အကယ်၍ (sp)
+	ပြန်ပေး NULL;
+    အကယ်၍ (modec == 'c')
     {
-	if (fg)
+	အကယ်၍ (fg)
 	    n = HL_TABLE()[id - 1].sg_cterm_fg - 1;
-	else if (ul)
+	မဟုတ်ပါက အကယ်၍ (ul)
 	    n = HL_TABLE()[id - 1].sg_cterm_ul - 1;
-	else if (font)
+	မဟုတ်ပါက အကယ်၍ (font)
 	    n = HL_TABLE()[id - 1].sg_cterm_font - 1;
-	else
+	မဟုတ်ပါက
 	    n = HL_TABLE()[id - 1].sg_cterm_bg - 1;
-	if (n < 0)
-	    return NULL;
-	sprintf((char *)name, "%d", n);
-	return name;
+	အကယ်၍ (n < 0)
+	    ပြန်ပေး NULL;
+	sprintf((var_na *)name, "%d", n);
+	ပြန်ပေး name;
     }
     // term doesn't have color
-    return NULL;
+    ပြန်ပေး NULL;
 }
 #endif
 
-#if defined(FEAT_SYN_HL) \
+#အကယ်၍ defined(FEAT_SYN_HL) \
 	    && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)) \
 	&& defined(FEAT_PRINTER)
 /*
@@ -4022,23 +4022,23 @@ highlight_color(
  */
     long_u
 highlight_gui_color_rgb(
-    int		id,
-    int		fg)	// TRUE = fg, FALSE = bg
+    ကိန်းပြည့်		id,
+    ကိန်းပြည့်		fg)	// TRUE = fg, FALSE = bg
 {
     guicolor_T	color;
 
-    if (id <= 0 || id > highlight_ga.ga_len)
-	return 0L;
+    အကယ်၍ (id <= 0 || id > highlight_ga.ga_len)
+	ပြန်ပေး 0L;
 
-    if (fg)
+    အကယ်၍ (fg)
 	color = HL_TABLE()[id - 1].sg_gui_fg;
-    else
+    မဟုတ်ပါက
 	color = HL_TABLE()[id - 1].sg_gui_bg;
 
-    if (color == INVALCOLOR)
-	return 0L;
+    အကယ်၍ (color == INVALCOLOR)
+	ပြန်ပေး 0L;
 
-    return GUI_MCH_GET_RGB(color);
+    ပြန်ပေး GUI_MCH_GET_RGB(color);
 }
 #endif
 
@@ -4046,54 +4046,54 @@ highlight_gui_color_rgb(
  * Output the syntax list header.
  * Return TRUE when started a new line.
  */
-    int
+    ကိန်းပြည့်
 syn_list_header(
-    int	    did_header,		// did header already
-    int	    outlen,		// length of string that comes
-    int	    id)			// highlight group id
+    ကိန်းပြည့်	    did_header,		// did header already
+    ကိန်းပြည့်	    outlen,		// length of string that comes
+    ကိန်းပြည့်	    id)			// highlight group id
 {
-    int	    endcol = 19;
-    int	    newline = TRUE;
-    int	    name_col = 0;
+    ကိန်းပြည့်	    endcol = 19;
+    ကိန်းပြည့်	    newline = TRUE;
+    ကိန်းပြည့်	    name_col = 0;
 
-    if (!did_header)
+    အကယ်၍ (!did_header)
     {
 	msg_putchar('\n');
-	if (got_int)
-	    return TRUE;
+	အကယ်၍ (got_int)
+	    ပြန်ပေး TRUE;
 	msg_outtrans(HL_TABLE()[id - 1].sg_name);
 	name_col = msg_col;
 	endcol = 15;
     }
-    else if (msg_col + outlen + 1 >= cmdline_width)
+    မဟုတ်ပါက အကယ်၍ (msg_col + outlen + 1 >= cmdline_width)
     {
 	msg_putchar('\n');
-	if (got_int)
-	    return TRUE;
+	အကယ်၍ (got_int)
+	    ပြန်ပေး TRUE;
     }
-    else
+    မဟုတ်ပါက
     {
-	if (msg_col >= endcol)	// wrap around is like starting a new line
+	အကယ်၍ (msg_col >= endcol)	// wrap around is like starting a new line
 	    newline = FALSE;
     }
 
-    if (msg_col >= endcol)	// output at least one space
+    အကယ်၍ (msg_col >= endcol)	// output at least one space
 	endcol = msg_col + 1;
-    if (cmdline_width <= endcol)	// avoid hang for tiny window
+    အကယ်၍ (cmdline_width <= endcol)	// avoid hang for tiny window
 	endcol = cmdline_width - 1;
 
     msg_advance(endcol);
 
     // Show "xxx" with the attributes.
-    if (!did_header)
+    အကယ်၍ (!did_header)
     {
-	if (endcol == cmdline_width - 1 && endcol <= name_col)
+	အကယ်၍ (endcol == cmdline_width - 1 && endcol <= name_col)
 	    msg_putchar(' ');
 	msg_puts_attr("xxx", syn_id2attr(id));
 	msg_putchar(' ');
     }
 
-    return newline;
+    ပြန်ပေး newline;
 }
 
 /*
@@ -4102,19 +4102,19 @@ syn_list_header(
  */
     static void
 set_hl_attr(
-    int		idx)	    // index in array
+    ကိန်းပြည့်		idx)	    // index in array
 {
     attrentry_T	    at_en;
     hl_group_T	    *sgp = HL_TABLE() + idx;
 
     // The "Normal" group doesn't need an attribute number
-    if (sgp->sg_name_u != NULL && STRCMP(sgp->sg_name_u, "NORMAL") == 0)
-	return;
+    အကယ်၍ (sgp->sg_name_u != NULL && STRCMP(sgp->sg_name_u, "NORMAL") == 0)
+	ပြန်ပေး;
 
 #ifdef FEAT_GUI
     // For the GUI mode: If there are other than "normal" highlighting
     // attributes, need to allocate an attr number.
-    if (sgp->sg_gui_fg == INVALCOLOR
+    အကယ်၍ (sgp->sg_gui_fg == INVALCOLOR
 	    && sgp->sg_gui_bg == INVALCOLOR
 	    && sgp->sg_gui_sp == INVALCOLOR
 	    && sgp->sg_font == NOFONT
@@ -4125,7 +4125,7 @@ set_hl_attr(
     {
 	sgp->sg_gui_attr = sgp->sg_gui;
     }
-    else
+    မဟုတ်ပါက
     {
 	at_en.ae_attr = sgp->sg_gui;
 	at_en.ae_u.gui.fg_color = sgp->sg_gui_fg;
@@ -4140,9 +4140,9 @@ set_hl_attr(
 #endif
     // For the term mode: If there are other than "normal" highlighting
     // attributes, need to allocate an attr number.
-    if (sgp->sg_start == NULL && sgp->sg_stop == NULL)
+    အကယ်၍ (sgp->sg_start == NULL && sgp->sg_stop == NULL)
 	sgp->sg_term_attr = sgp->sg_term;
-    else
+    မဟုတ်ပါက
     {
 	at_en.ae_attr = sgp->sg_term;
 	at_en.ae_u.term.start = sgp->sg_start;
@@ -4152,7 +4152,7 @@ set_hl_attr(
 
     // For the color term mode: If there are other than "normal"
     // highlighting attributes, need to allocate an attr number.
-    if (sgp->sg_cterm_fg == 0 && sgp->sg_cterm_bg == 0 &&
+    အကယ်၍ (sgp->sg_cterm_fg == 0 && sgp->sg_cterm_bg == 0 &&
 	sgp->sg_cterm_ul == 0 && sgp->sg_cterm_font == 0
 #ifdef FEAT_TERMGUICOLORS
 	    && sgp->sg_gui_fg == INVALCOLOR
@@ -4161,7 +4161,7 @@ set_hl_attr(
 #endif
 	    )
 	sgp->sg_cterm_attr = sgp->sg_cterm;
-    else
+    မဟုတ်ပါက
     {
 	at_en.ae_attr = sgp->sg_cterm;
 	at_en.ae_u.cterm.fg_color = sgp->sg_cterm_fg;
@@ -4173,12 +4173,12 @@ set_hl_attr(
 	at_en.ae_u.cterm.bg_rgb = GUI_MCH_GET_RGB2(sgp->sg_gui_bg);
 	// Only use the underline/undercurl color when used, it may clear the
 	// background color if not supported.
-	if (sgp->sg_cterm & (HL_UNDERLINE | HL_UNDERCURL
+	အကယ်၍ (sgp->sg_cterm & (HL_UNDERLINE | HL_UNDERCURL
 			   | HL_UNDERDOUBLE | HL_UNDERDOTTED | HL_UNDERDASHED))
 	    at_en.ae_u.cterm.ul_rgb = GUI_MCH_GET_RGB2(sgp->sg_gui_sp);
-	else
+	မဟုတ်ပါက
 	    at_en.ae_u.cterm.ul_rgb = INVALCOLOR;
-	if (at_en.ae_u.cterm.fg_rgb == INVALCOLOR
+	အကယ်၍ (at_en.ae_u.cterm.fg_rgb == INVALCOLOR
 		&& at_en.ae_u.cterm.bg_rgb == INVALCOLOR)
 	{
 	    // If both fg and bg are invalid fall back to the cterm colors.
@@ -4195,85 +4195,85 @@ set_hl_attr(
  * Check if highlight id is overridden, and return the overriding highlight id.
  * Otherwise return the original id if no override.
  */
-    static int
-syn_override(int id)
+    static ကိန်းပြည့်
+syn_override(ကိန်းပြည့် id)
 {
-    if (overrides != NULL && overrides->arr != NULL)
-	for (int k = 0; k < overrides->len; k++)
-	    if (overrides->arr[k].from == id)
-		return overrides->arr[k].to;
-    return id;
+    အကယ်၍ (overrides != NULL && overrides->arr != NULL)
+	အတွက် (ကိန်းပြည့် k = 0; k < overrides->len; k++)
+	    အကယ်၍ (overrides->arr[k].from == id)
+		ပြန်ပေး overrides->arr[k].to;
+    ပြန်ပေး id;
 }
 
 /*
  * Lookup a highlight group name by pointer and length.
  * If it is not found, 0 is returned.
  */
-    static int
-syn_name2id_len(char_u *name, int len)
+    static ကိန်းပြည့်
+syn_name2id_len(char_u *name, ကိန်းပြည့် len)
 {
     char_u	name_u[MAX_SYN_NAME + 1];
     hashitem_T	*hi;
 
-    if (len > MAX_SYN_NAME)
+    အကယ်၍ (len > MAX_SYN_NAME)
 	len = MAX_SYN_NAME;
     mch_memmove(name_u, name, len);
     name_u[len] = NUL;
     vim_strup(name_u);
-    if (!highlight_ht_inited)
-	return 0;
+    အကယ်၍ (!highlight_ht_inited)
+	ပြန်ပေး 0;
     hi = hash_find(&highlight_ht, name_u);
-    if (HASHITEM_EMPTY(hi))
-	return 0;
-    return HI2HLNAME(hi)->hn_id;
+    အကယ်၍ (HASHITEM_EMPTY(hi))
+	ပြန်ပေး 0;
+    ပြန်ပေး HI2HLNAME(hi)->hn_id;
 }
 
 /*
  * Lookup a highlight group name and return its ID.
  * If it is not found, 0 is returned.
  */
-    int
+    ကိန်းပြည့်
 syn_name2id(char_u *name)
 {
     // Avoid using stricmp() too much, it's slow on some systems.
-    return syn_name2id_len(name, (int)STRLEN(name));
+    ပြန်ပေး syn_name2id_len(name, (ကိန်းပြည့်)STRLEN(name));
 }
 
 /*
  * Lookup a highlight group name and return its attributes.
  * Return zero if not found.
  */
-    int
+    ကိန်းပြည့်
 syn_name2attr(char_u *name)
 {
-    int id = syn_name2id(name);
+    ကိန်းပြည့် id = syn_name2id(name);
 
-    if (id != 0)
-	return syn_id2attr(id);
-    return 0;
+    အကယ်၍ (id != 0)
+	ပြန်ပေး syn_id2attr(id);
+    ပြန်ပေး 0;
 }
 
-#if defined(FEAT_EVAL)
+#အကယ်၍ defined(FEAT_EVAL)
 /*
  * Return TRUE if highlight group "name" exists.
  */
-    int
+    ကိန်းပြည့်
 highlight_exists(char_u *name)
 {
-    return (syn_name2id(name) > 0);
+    ပြန်ပေး (syn_name2id(name) > 0);
 }
 
-# if defined(FEAT_SEARCH_EXTRA)
+# အကယ်၍ defined(FEAT_SEARCH_EXTRA)
 /*
  * Return the name of highlight group "id".
  * When not a valid ID return an empty string.
  */
     char_u *
-syn_id2name(int id)
+syn_id2name(ကိန်းပြည့် id)
 {
-    if (id <= 0 || id > highlight_ga.ga_len)
-	return (char_u *)"";
-    return HL_TABLE()[id - 1].sg_name;
+    အကယ်၍ (id <= 0 || id > highlight_ga.ga_len)
+	ပြန်ပေး (char_u *)"";
+    ပြန်ပေး HL_TABLE()[id - 1].sg_name;
 }
 # endif
 #endif
@@ -4281,10 +4281,10 @@ syn_id2name(int id)
 /*
  * Like syn_name2id(), but take a pointer + length argument.
  */
-    int
-syn_namen2id(char_u *linep, int len)
+    ကိန်းပြည့်
+syn_namen2id(char_u *linep, ကိန်းပြည့် len)
 {
-    return syn_name2id_len(linep, len);
+    ပြန်ပေး syn_name2id_len(linep, len);
 }
 
 /*
@@ -4293,26 +4293,26 @@ syn_namen2id(char_u *linep, int len)
  * If it doesn't exist yet, a new entry is created.
  * Return 0 for failure.
  */
-    int
-syn_check_group(char_u *pp, int len)
+    ကိန်းပြည့်
+syn_check_group(char_u *pp, ကိန်းပြည့် len)
 {
-    int	    id;
+    ကိန်းပြည့်	    id;
     char_u  *name;
 
-    if (len > MAX_SYN_NAME)
+    အကယ်၍ (len > MAX_SYN_NAME)
     {
 	emsg(_(e_highlight_group_name_too_long));
-	return 0;
+	ပြန်ပေး 0;
     }
     id = syn_name2id_len(pp, len);
-    if (id == 0)			// doesn't exist yet
+    အကယ်၍ (id == 0)			// doesn't exist yet
     {
 	name = vim_strnsave(pp, len);
-	if (name == NULL)
-	    return 0;
+	အကယ်၍ (name == NULL)
+	    ပြန်ပေး 0;
 	id = syn_add_group(name);
     }
-    return id;
+    ပြန်ပေး id;
 }
 
 /*
@@ -4320,63 +4320,63 @@ syn_check_group(char_u *pp, int len)
  * "name" must be an allocated string, it will be consumed.
  * Return 0 for failure.
  */
-    static int
+    static ကိန်းပြည့်
 syn_add_group(char_u *name)
 {
     char_u	*p;
     char_u	*name_up;
 
     // Check that the name is valid (ASCII letters, digits, underscores, dots, or hyphens).
-    for (p = name; *p != NUL; ++p)
+    အတွက် (p = name; *p != NUL; ++p)
     {
-	if (!vim_isprintc(*p))
+	အကယ်၍ (!vim_isprintc(*p))
 	{
 	    emsg(_(e_unprintable_character_in_group_name));
 	    vim_free(name);
-	    return 0;
+	    ပြန်ပေး 0;
 	}
-	else if (!ASCII_ISALNUM(*p) && *p != '_' && *p != '.' && *p != '-')
+	မဟုတ်ပါက အကယ်၍ (!ASCII_ISALNUM(*p) && *p != '_' && *p != '.' && *p != '-')
 	{
 	    // This is an error, but since there previously was no check only
 	    // give a warning.
 	    msg_source(HL_ATTR(HLF_W));
 	    msg(_("W18: Invalid character in group name"));
-	    break;
+	    bha_nga;
 	}
     }
 
     // First call for this growarray: init growing array.
-    if (highlight_ga.ga_data == NULL)
+    အကယ်၍ (highlight_ga.ga_data == NULL)
     {
-	highlight_ga.ga_itemsize = sizeof(hl_group_T);
+	highlight_ga.ga_itemsize = parimaa_na(hl_group_T);
 	highlight_ga.ga_growsize = 10;
 	hash_init(&highlight_ht);
 	highlight_ht_inited = true;
     }
 
-    if (highlight_ga.ga_len >= MAX_HL_ID)
+    အကယ်၍ (highlight_ga.ga_len >= MAX_HL_ID)
     {
 	emsg(_(e_too_many_highlight_and_syntax_groups));
 	vim_free(name);
-	return 0;
+	ပြန်ပေး 0;
     }
 
     // Make room for at least one other syntax_highlight entry.
-    if (ga_grow(&highlight_ga, 1) == FAIL)
+    အကယ်၍ (ga_grow(&highlight_ga, 1) == FAIL)
     {
 	vim_free(name);
-	return 0;
+	ပြန်ပေး 0;
     }
 
     {
 	hlname_T    *hn;
-	int	    len = (int)STRLEN(name);
+	ကိန်းပြည့်	    len = (ကိန်းပြည့်)STRLEN(name);
 
 	hn = alloc(offsetof(hlname_T, hn_key) + len + 1);
-	if (hn == NULL)
+	အကယ်၍ (hn == NULL)
 	{
 	    vim_free(name);
-	    return 0;
+	    ပြန်ပေး 0;
 	}
 	vim_strncpy(hn->hn_key, name, len);
 	vim_strup(hn->hn_key);
@@ -4387,7 +4387,7 @@ syn_add_group(char_u *name)
     CLEAR_POINTER(&(HL_TABLE()[highlight_ga.ga_len]));
     HL_TABLE()[highlight_ga.ga_len].sg_name = name;
     HL_TABLE()[highlight_ga.ga_len].sg_name_u = name_up;
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#အကယ်၍ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     HL_TABLE()[highlight_ga.ga_len].sg_gui_bg = INVALCOLOR;
     HL_TABLE()[highlight_ga.ga_len].sg_gui_fg = INVALCOLOR;
     HL_TABLE()[highlight_ga.ga_len].sg_gui_sp = INVALCOLOR;
@@ -4395,7 +4395,7 @@ syn_add_group(char_u *name)
     hash_add(&highlight_ht, name_up, "highlight");
     ++highlight_ga.ga_len;
 
-    return highlight_ga.ga_len;		    // ID is index plus one
+    ပြန်ပေး highlight_ga.ga_len;		    // ID is index plus one
 }
 
 /*
@@ -4409,7 +4409,7 @@ syn_unadd_group(void)
 
     --highlight_ga.ga_len;
     hi = hash_find(&highlight_ht, HL_TABLE()[highlight_ga.ga_len].sg_name_u);
-    if (!HASHITEM_EMPTY(hi))
+    အကယ်၍ (!HASHITEM_EMPTY(hi))
 	hash_remove(&highlight_ht, hi, "highlight");
     vim_free(HL_TABLE()[highlight_ga.ga_len].sg_name);
     vim_free(HL_TABLE()[highlight_ga.ga_len].sg_name_u - HLNAME_KEY_OFF);
@@ -4419,10 +4419,10 @@ syn_unadd_group(void)
  * Translate a group ID to highlight attributes.
  * "hl_id" must be valid: > 0, caller must check.
  */
-    int
-syn_id2attr(int hl_id)
+    ကိန်းပြည့်
+syn_id2attr(ကိန်းပြည့် hl_id)
 {
-    int		attr;
+    ကိန်းပြည့်		attr;
     hl_group_T	*sgp;
 
     hl_id = syn_get_final_id(hl_id);
@@ -4432,25 +4432,25 @@ syn_id2attr(int hl_id)
 
 #ifdef FEAT_GUI
     // Only use GUI attr when the GUI is being used.
-    if (gui.in_use)
+    အကယ်၍ (gui.in_use)
 	attr = sgp->sg_gui_attr;
-    else
+    မဟုတ်ပါက
 #endif
-	if (IS_CTERM)
+	အကယ်၍ (IS_CTERM)
 	    attr = sgp->sg_cterm_attr;
-	else
+	မဟုတ်ပါက
 	    attr = sgp->sg_term_attr;
 
-    return attr;
+    ပြန်ပေး attr;
 }
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#အကယ်၍ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 /*
  * Get the GUI colors and attributes for a group ID.
  * NOTE: the colors will be INVALCOLOR when not set, the color otherwise.
  */
-    int
-syn_id2colors(int hl_id, guicolor_T *fgp, guicolor_T *bgp)
+    ကိန်းပြည့်
+syn_id2colors(ကိန်းပြည့် hl_id, guicolor_T *fgp, guicolor_T *bgp)
 {
     hl_group_T	*sgp;
 
@@ -4461,16 +4461,16 @@ syn_id2colors(int hl_id, guicolor_T *fgp, guicolor_T *bgp)
 
     *fgp = sgp->sg_gui_fg;
     *bgp = sgp->sg_gui_bg;
-    return sgp->sg_gui;
+    ပြန်ပေး sgp->sg_gui;
 }
 #endif
 
-#if (defined(MSWIN) \
+#အကယ်၍ (defined(MSWIN) \
 	    && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL)) \
 	    && defined(FEAT_TERMGUICOLORS)) \
 	|| defined(FEAT_TERMINAL)
     void
-syn_id2cterm_bg(int hl_id, int *fgp, int *bgp)
+syn_id2cterm_bg(ကိန်းပြည့် hl_id, ကိန်းပြည့် *fgp, ကိန်းပြည့် *bgp)
 {
     hl_group_T	*sgp;
 
@@ -4486,36 +4486,36 @@ syn_id2cterm_bg(int hl_id, int *fgp, int *bgp)
 /*
  * Translate a group ID to the final group ID (following links).
  */
-    int
-syn_get_final_id(int hl_id)
+    ကိန်းပြည့်
+syn_get_final_id(ကိန်းပြည့် hl_id)
 {
-    int		count;
+    ကိန်းပြည့်		count;
     hl_group_T	*sgp;
 
-    if (hl_id > highlight_ga.ga_len || hl_id < 1)
-	return 0;			// Can be called from eval!!
+    အကယ်၍ (hl_id > highlight_ga.ga_len || hl_id < 1)
+	ပြန်ပေး 0;			// Can be called from eval!!
 
     // Follow links until there is no more.
     // Look out for loops!  Break after 100 links.
-    for (count = 100; --count >= 0; )
+    အတွက် (count = 100; --count >= 0; )
     {
-	int tmp = hl_id;
+	ကိန်းပြည့် tmp = hl_id;
 
 	sgp = &HL_TABLE()[hl_id - 1];	    // index is ID minus one
-	if (sgp->sg_link == 0 || sgp->sg_link > highlight_ga.ga_len)
-	    break;
+	အကယ်၍ (sgp->sg_link == 0 || sgp->sg_link > highlight_ga.ga_len)
+	    bha_nga;
 
 	// This is to handle highlight groups that are overridden but are in the
 	// middle of a link chain.
 	hl_id = syn_override(hl_id);
-	if (tmp != hl_id)
+	အကယ်၍ (tmp != hl_id)
 	    continue;
 	hl_id = sgp->sg_link;
     }
-    return syn_override(hl_id);
+    ပြန်ပေး syn_override(hl_id);
 }
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#အကယ်၍ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 /*
  * Call this function just after the GUI has started.
  * Also called when 'termguicolors' was set, gui.in_use will be FALSE then.
@@ -4524,13 +4524,13 @@ syn_get_final_id(int hl_id)
     void
 highlight_gui_started(void)
 {
-    int	    idx;
+    ကိန်းပြည့်	    idx;
 
     // First get the colors from the "Normal" and "Menu" group, if set
-    if (USE_24BIT)
+    အကယ်၍ (USE_24BIT)
 	set_normal_colors();
 
-    for (idx = 0; idx < highlight_ga.ga_len; ++idx)
+    အတွက် (idx = 0; idx < highlight_ga.ga_len; ++idx)
 	gui_do_one_color(idx, FALSE, FALSE);
 
     highlight_changed();
@@ -4538,106 +4538,106 @@ highlight_gui_started(void)
 
     static void
 gui_do_one_color(
-    int		idx,
-    int		do_menu UNUSED,	   // TRUE: might set the menu font
-    int		do_tooltip UNUSED) // TRUE: might set the tooltip font
+    ကိန်းပြည့်		idx,
+    ကိန်းပြည့်		do_menu UNUSED,	   // TRUE: might set the menu font
+    ကိန်းပြည့်		do_tooltip UNUSED) // TRUE: might set the tooltip font
 {
-    int		didit = FALSE;
+    ကိန်းပြည့်		didit = FALSE;
 
 # ifdef FEAT_GUI
 #  ifdef FEAT_TERMGUICOLORS
-    if (gui.in_use)
+    အကယ်၍ (gui.in_use)
 #  endif
-	if (HL_TABLE()[idx].sg_font_name != NULL)
+	အကယ်၍ (HL_TABLE()[idx].sg_font_name != NULL)
 	{
 	    hl_do_font(idx, HL_TABLE()[idx].sg_font_name, FALSE, do_menu,
 							    do_tooltip, TRUE);
 	    didit = TRUE;
 	}
 # endif
-    if (HL_TABLE()[idx].sg_gui_fg_name != NULL)
+    အကယ်၍ (HL_TABLE()[idx].sg_gui_fg_name != NULL)
     {
 	HL_TABLE()[idx].sg_gui_fg =
 			    color_name2handle(HL_TABLE()[idx].sg_gui_fg_name);
 	didit = TRUE;
     }
-    if (HL_TABLE()[idx].sg_gui_bg_name != NULL)
+    အကယ်၍ (HL_TABLE()[idx].sg_gui_bg_name != NULL)
     {
 	HL_TABLE()[idx].sg_gui_bg =
 			    color_name2handle(HL_TABLE()[idx].sg_gui_bg_name);
 	didit = TRUE;
     }
-    if (HL_TABLE()[idx].sg_gui_sp_name != NULL)
+    အကယ်၍ (HL_TABLE()[idx].sg_gui_sp_name != NULL)
     {
 	HL_TABLE()[idx].sg_gui_sp =
 			    color_name2handle(HL_TABLE()[idx].sg_gui_sp_name);
 	didit = TRUE;
     }
-    if (didit)	// need to get a new attr number
+    အကယ်၍ (didit)	// need to get a new attr number
 	set_hl_attr(idx);
 }
 #endif
 
-#if defined(USER_HIGHLIGHT) && defined(FEAT_STL_OPT)
+#အကယ်၍ defined(USER_HIGHLIGHT) && defined(FEAT_STL_OPT)
 /*
  * Apply difference between User[1-9] and HLF_S to HLF_SNC, HLF_ST or HLF_STNC.
  */
     static void
 combine_stl_hlt(
-	int id,
-	int id_S,
-	int id_alt,
-	int hlcnt,
-	int i,
-	int hlf,
-	int *table)
+	ကိန်းပြည့် id,
+	ကိန်းပြည့် id_S,
+	ကိန်းပြည့် id_alt,
+	ကိန်းပြည့် hlcnt,
+	ကိန်းပြည့် i,
+	ကိန်းပြည့် hlf,
+	ကိန်းပြည့် *table)
 {
     hl_group_T *hlt = HL_TABLE();
 
-    if (id_alt == 0)
+    အကယ်၍ (id_alt == 0)
     {
 	CLEAR_POINTER(&hlt[hlcnt + i]);
 	hlt[hlcnt + i].sg_term = highlight_attr[hlf];
 	hlt[hlcnt + i].sg_cterm = highlight_attr[hlf];
-# if defined(FEAT_GUI) || defined(FEAT_EVAL)
+# အကယ်၍ defined(FEAT_GUI) || defined(FEAT_EVAL)
 	hlt[hlcnt + i].sg_gui = highlight_attr[hlf];
 # endif
     }
-    else
+    မဟုတ်ပါက
 	mch_memmove(&hlt[hlcnt + i],
 		    &hlt[id_alt - 1],
-		    sizeof(hl_group_T));
+		    parimaa_na(hl_group_T));
     hlt[hlcnt + i].sg_link = 0;
 
     hlt[hlcnt + i].sg_term ^=
 	hlt[id - 1].sg_term ^ hlt[id_S - 1].sg_term;
-    if (hlt[id - 1].sg_start != hlt[id_S - 1].sg_start)
+    အကယ်၍ (hlt[id - 1].sg_start != hlt[id_S - 1].sg_start)
 	hlt[hlcnt + i].sg_start = hlt[id - 1].sg_start;
-    if (hlt[id - 1].sg_stop != hlt[id_S - 1].sg_stop)
+    အကယ်၍ (hlt[id - 1].sg_stop != hlt[id_S - 1].sg_stop)
 	hlt[hlcnt + i].sg_stop = hlt[id - 1].sg_stop;
     hlt[hlcnt + i].sg_cterm ^=
 	hlt[id - 1].sg_cterm ^ hlt[id_S - 1].sg_cterm;
-    if (hlt[id - 1].sg_cterm_fg != hlt[id_S - 1].sg_cterm_fg)
+    အကယ်၍ (hlt[id - 1].sg_cterm_fg != hlt[id_S - 1].sg_cterm_fg)
 	hlt[hlcnt + i].sg_cterm_fg = hlt[id - 1].sg_cterm_fg;
-    if (hlt[id - 1].sg_cterm_bg != hlt[id_S - 1].sg_cterm_bg)
+    အကယ်၍ (hlt[id - 1].sg_cterm_bg != hlt[id_S - 1].sg_cterm_bg)
 	hlt[hlcnt + i].sg_cterm_bg = hlt[id - 1].sg_cterm_bg;
-    if (hlt[id - 1].sg_cterm_font != hlt[id_S - 1].sg_cterm_font)
+    အကယ်၍ (hlt[id - 1].sg_cterm_font != hlt[id_S - 1].sg_cterm_font)
 	hlt[hlcnt + i].sg_cterm_font = hlt[id - 1].sg_cterm_font;
-# if defined(FEAT_GUI) || defined(FEAT_EVAL)
+# အကယ်၍ defined(FEAT_GUI) || defined(FEAT_EVAL)
     hlt[hlcnt + i].sg_gui ^=
 	hlt[id - 1].sg_gui ^ hlt[id_S - 1].sg_gui;
 # endif
 # ifdef FEAT_GUI
-    if (hlt[id - 1].sg_gui_fg != hlt[id_S - 1].sg_gui_fg)
+    အကယ်၍ (hlt[id - 1].sg_gui_fg != hlt[id_S - 1].sg_gui_fg)
 	hlt[hlcnt + i].sg_gui_fg = hlt[id - 1].sg_gui_fg;
-    if (hlt[id - 1].sg_gui_bg != hlt[id_S - 1].sg_gui_bg)
+    အကယ်၍ (hlt[id - 1].sg_gui_bg != hlt[id_S - 1].sg_gui_bg)
 	hlt[hlcnt + i].sg_gui_bg = hlt[id - 1].sg_gui_bg;
-    if (hlt[id - 1].sg_gui_sp != hlt[id_S - 1].sg_gui_sp)
+    အကယ်၍ (hlt[id - 1].sg_gui_sp != hlt[id_S - 1].sg_gui_sp)
 	hlt[hlcnt + i].sg_gui_sp = hlt[id - 1].sg_gui_sp;
-    if (hlt[id - 1].sg_font != hlt[id_S - 1].sg_font)
+    အကယ်၍ (hlt[id - 1].sg_font != hlt[id_S - 1].sg_font)
 	hlt[hlcnt + i].sg_font = hlt[id - 1].sg_font;
 #  ifdef FEAT_XFONTSET
-    if (hlt[id - 1].sg_fontset != hlt[id_S - 1].sg_fontset)
+    အကယ်၍ (hlt[id - 1].sg_fontset != hlt[id_S - 1].sg_fontset)
 	hlt[hlcnt + i].sg_fontset = hlt[id - 1].sg_fontset;
 #  endif
 # endif
@@ -4655,26 +4655,26 @@ combine_stl_hlt(
  * screen redraw after any :highlight command.
  * Return FAIL when an invalid flag is found in 'highlight'.  OK otherwise.
  */
-    int
+    ကိန်းပြည့်
 highlight_changed(void)
 {
-    int		hlf;
-    int		i;
+    ကိန်းပြည့်		hlf;
+    ကိန်းပြည့်		i;
     char_u	*p;
     char_u	*default_hl;
-    int		attr;
+    ကိန်းပြည့်		attr;
     char_u	*end;
-    int		id;
+    ကိန်းပြည့်		id;
 #ifdef USER_HIGHLIGHT
     char_u      userhl[30];  // use 30 to avoid compiler warning
 # ifdef FEAT_STL_OPT
-    int		id_S = -1;
-    int		id_SNC = 0;
+    ကိန်းပြည့်		id_S = -1;
+    ကိန်းပြည့်		id_SNC = 0;
 #  ifdef FEAT_TERMINAL
-    int		id_ST = 0;
-    int		id_STNC = 0;
+    ကိန်းပြည့်		id_ST = 0;
+    ကိန်းပြည့်		id_STNC = 0;
 #  endif
-    int		hlcnt;
+    ကိန်းပြည့်		hlcnt;
 # endif
 #endif
     win_T	*wp;
@@ -4687,7 +4687,7 @@ highlight_changed(void)
 #endif
 
     // Clear all attributes.
-    for (hlf = 0; hlf < (int)HLF_COUNT; ++hlf)
+    အတွက် (hlf = 0; hlf < (ကိန်းပြည့်)HLF_COUNT; ++hlf)
     {
 	highlight_attr[hlf] = 0;
 	highlight_attr_raw[hlf] = 0;
@@ -4699,92 +4699,92 @@ highlight_changed(void)
     // First set all attributes to their default value.
     // Then use the attributes from the 'highlight' option, unless it already
     // matches the default and would repeat the same work.
-    for (i = 0; i < 2; ++i)
+    အတွက် (i = 0; i < 2; ++i)
     {
-	if (i)
+	အကယ်၍ (i)
 	{
-	    if (default_hl != NULL && p_hl != NULL
+	    အကယ်၍ (default_hl != NULL && p_hl != NULL
 				      && STRCMP(default_hl, p_hl) == 0)
 		continue;
 	    p = p_hl;
 	}
-	else
+	မဟုတ်ပါက
 	    p = default_hl;
-	if (p == NULL)	    // just in case
+	အကယ်၍ (p == NULL)	    // just in case
 	    continue;
 
-	while (*p)
+	နေစဉ် (*p)
 	{
-	    for (hlf = 0; hlf < (int)HLF_COUNT; ++hlf)
-		if (hl_flags[hlf] == *p)
-		    break;
+	    အတွက် (hlf = 0; hlf < (ကိန်းပြည့်)HLF_COUNT; ++hlf)
+		အကယ်၍ (hl_flags[hlf] == *p)
+		    bha_nga;
 	    ++p;
-	    if (hlf == (int)HLF_COUNT || *p == NUL)
-		return FAIL;
+	    အကယ်၍ (hlf == (ကိန်းပြည့်)HLF_COUNT || *p == NUL)
+		ပြန်ပေး FAIL;
 
 	    // Allow several hl_flags to be combined, like "bu" for
 	    // bold-underlined.
 	    attr = 0;
 	    id = 0;
-	    for ( ; *p && *p != ','; ++p)	    // parse up to comma
+	    အတွက် ( ; *p && *p != ','; ++p)	    // parse up to comma
 	    {
-		if (VIM_ISWHITE(*p))		    // ignore white space
+		အကယ်၍ (VIM_ISWHITE(*p))		    // ignore white space
 		    continue;
 
-		if (attr > HL_ALL)  // Combination with ':' is not allowed.
-		    return FAIL;
+		အကယ်၍ (attr > HL_ALL)  // Combination with ':' is not allowed.
+		    ပြန်ပေး FAIL;
 
 		// Note: Keep this in sync with expand_set_highlight().
 		switch (*p)
 		{
-		    case 'b':	attr |= HL_BOLD;
-				break;
-		    case 'i':	attr |= HL_ITALIC;
-				break;
-		    case '-':
-		    case 'n':			    // no highlighting
-				break;
-		    case 'r':	attr |= HL_INVERSE;
-				break;
-		    case 's':	attr |= HL_STANDOUT;
-				break;
-		    case 'u':	attr |= HL_UNDERLINE;
-				break;
-		    case 'c':	attr |= HL_UNDERCURL;
-				break;
-		    case '2':	attr |= HL_UNDERDOUBLE;
-				break;
-		    case 'd':	attr |= HL_UNDERDOTTED;
-				break;
-		    case '=':	attr |= HL_UNDERDASHED;
-				break;
-		    case 't':	attr |= HL_STRIKETHROUGH;
-				break;
-		    case ':':	++p;		    // highlight group name
-				if (attr || *p == NUL)	 // no combinations
-				    return FAIL;
+		    pak_sa 'b':	attr |= HL_BOLD;
+				bha_nga;
+		    pak_sa 'i':	attr |= HL_ITALIC;
+				bha_nga;
+		    pak_sa '-':
+		    pak_sa 'n':			    // no highlighting
+				bha_nga;
+		    pak_sa 'r':	attr |= HL_INVERSE;
+				bha_nga;
+		    pak_sa 's':	attr |= HL_STANDOUT;
+				bha_nga;
+		    pak_sa 'u':	attr |= HL_UNDERLINE;
+				bha_nga;
+		    pak_sa 'c':	attr |= HL_UNDERCURL;
+				bha_nga;
+		    pak_sa '2':	attr |= HL_UNDERDOUBLE;
+				bha_nga;
+		    pak_sa 'd':	attr |= HL_UNDERDOTTED;
+				bha_nga;
+		    pak_sa '=':	attr |= HL_UNDERDASHED;
+				bha_nga;
+		    pak_sa 't':	attr |= HL_STRIKETHROUGH;
+				bha_nga;
+		    pak_sa ':':	++p;		    // highlight group name
+				အကယ်၍ (attr || *p == NUL)	 // no combinations
+				    ပြန်ပေး FAIL;
 				end = vim_strchr(p, ',');
-				if (end == NULL)
+				အကယ်၍ (end == NULL)
 				    end = p + STRLEN(p);
-				id = syn_check_group(p, (int)(end - p));
-				if (id == 0)
-				    return FAIL;
+				id = syn_check_group(p, (ကိန်းပြည့်)(end - p));
+				အကယ်၍ (id == 0)
+				    ပြန်ပေး FAIL;
 				attr = syn_id2attr(id);
 				p = end - 1;
-#if defined(FEAT_STL_OPT) && defined(USER_HIGHLIGHT)
-				if (hlf == (int)HLF_SNC)
+#အကယ်၍ defined(FEAT_STL_OPT) && defined(USER_HIGHLIGHT)
+				အကယ်၍ (hlf == (ကိန်းပြည့်)HLF_SNC)
 				    id_SNC = syn_get_final_id(id);
 # ifdef FEAT_TERMINAL
-				else if (hlf == (int)HLF_ST)
+				မဟုတ်ပါက အကယ်၍ (hlf == (ကိန်းပြည့်)HLF_ST)
 				    id_ST = syn_get_final_id(id);
-				else if (hlf == (int)HLF_STNC)
+				မဟုတ်ပါက အကယ်၍ (hlf == (ကိန်းပြည့်)HLF_STNC)
 				    id_STNC = syn_get_final_id(id);
 # endif
-				else if (hlf == (int)HLF_S)
+				မဟုတ်ပါက အကယ်၍ (hlf == (ကိန်းပြည့်)HLF_S)
 				    id_S = syn_get_final_id(id);
 #endif
-				break;
-		    default:	return FAIL;
+				bha_nga;
+		    default:	ပြန်ပေး FAIL;
 		}
 	    }
 	    highlight_attr[hlf] = attr;
@@ -4798,9 +4798,9 @@ highlight_changed(void)
     // Highlight ids may have been changed, so keep windows up to date
     FOR_ALL_WINDOWS(wp)
     {
-	char *errmsg = update_winhighlight(wp, wp->w_p_whl);
+	var_na *errmsg = update_winhighlight(wp, wp->w_p_whl);
 
-	if (errmsg != NULL)
+	အကယ်၍ (errmsg != NULL)
 	    emsg(_(errmsg));
     }
 
@@ -4819,10 +4819,10 @@ highlight_changed(void)
     // Have to be in there simultaneously in case of table overflows in
     // get_attr_entry()
 # ifdef FEAT_STL_OPT
-    if (ga_grow(&highlight_ga, 28) == FAIL)
-	return FAIL;
+    အကယ်၍ (ga_grow(&highlight_ga, 28) == FAIL)
+	ပြန်ပေး FAIL;
     hlcnt = highlight_ga.ga_len;
-    if (id_S == -1)
+    အကယ်၍ (id_S == -1)
     {
 	// Make sure id_S is always valid to simplify code below. Use the last
 	// entry.
@@ -4831,11 +4831,11 @@ highlight_changed(void)
 	id_S = hlcnt + 19;
     }
 # endif
-    for (i = 0; i < 9; i++)
+    အတွက် (i = 0; i < 9; i++)
     {
-	sprintf((char *)userhl, "User%d", i + 1);
+	sprintf((var_na *)userhl, "User%d", i + 1);
 	id = syn_name2id(userhl);
-	if (id == 0)
+	အကယ်၍ (id == 0)
 	{
 	    highlight_user[i] = 0;
 # ifdef FEAT_STL_OPT
@@ -4846,7 +4846,7 @@ highlight_changed(void)
 #  endif
 # endif
 	}
-	else
+	မဟုတ်ပါက
 	{
 	    highlight_user[i] = syn_id2attr(id);
 # ifdef FEAT_STL_OPT
@@ -4867,18 +4867,18 @@ highlight_changed(void)
 
 #endif // USER_HIGHLIGHT
 
-    return OK;
+    ပြန်ပေး OK;
 }
 
 static void highlight_list(void);
-static void highlight_list_two(int cnt, int attr);
+static void highlight_list_two(ကိန်းပြည့် cnt, ကိန်းပြည့် attr);
 
 // context for :highlight <group> <arg> expansion
-static int expand_hi_synid = 0;	    // ID for highlight group being completed
-static int expand_hi_equal_col = 0; // column where the '=' is
-static int expand_hi_include_orig = 0;	    // whether to fill the existing current value or not
+static ကိန်းပြည့် expand_hi_synid = 0;	    // ID for highlight group being completed
+static ကိန်းပြည့် expand_hi_equal_col = 0; // column where the '=' is
+static ကိန်းပြည့် expand_hi_include_orig = 0;	    // whether to fill the existing current value or not
 static char_u *expand_hi_curvalue = NULL;   // the existing current value
-#if defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
+#အကယ်၍ defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
 static dict_iterator_T expand_colornames_iter;	// iterator for looping through v:colornames
 #endif
 
@@ -4889,7 +4889,7 @@ static dict_iterator_T expand_colornames_iter;	// iterator for looping through v
 set_context_in_highlight_cmd(expand_T *xp, char_u *arg)
 {
     char_u	*p;
-    int		expand_group = TRUE;
+    ကိန်းပြည့်		expand_group = TRUE;
 
     // Default: expand group names
     xp->xp_context = EXPAND_HIGHLIGHT;
@@ -4898,37 +4898,37 @@ set_context_in_highlight_cmd(expand_T *xp, char_u *arg)
     include_link = 2;
     include_default = 1;
 
-    if (*arg == NUL)
-	return;
+    အကယ်၍ (*arg == NUL)
+	ပြန်ပေး;
 
     // (part of) subcommand already typed
     p = skiptowhite(arg);
-    if (*p == NUL)
-	return;
+    အကယ်၍ (*p == NUL)
+	ပြန်ပေး;
 
     // past "default" or group name
     include_default = 0;
-    if (STRNCMP("default", arg, p - arg) == 0)
+    အကယ်၍ (STRNCMP("default", arg, p - arg) == 0)
     {
 	arg = skipwhite(p);
 	xp->xp_pattern = arg;
 	p = skiptowhite(arg);
     }
-    if (*p == NUL)
-	return;
+    အကယ်၍ (*p == NUL)
+	ပြန်ပေး;
 
     // past group name
     include_link = 0;
-    if (arg[1] == 'i' && arg[0] == 'N')
+    အကယ်၍ (arg[1] == 'i' && arg[0] == 'N')
     {
 	highlight_list();
 	expand_group = FALSE;
     }
-    if (STRNCMP("link", arg, p - arg) == 0)
+    အကယ်၍ (STRNCMP("link", arg, p - arg) == 0)
     {
 	xp->xp_pattern = skipwhite(p);
 	p = skiptowhite(xp->xp_pattern);
-	if (*p != NUL)		// past first group name
+	အကယ်၍ (*p != NUL)		// past first group name
 	{
 	    xp->xp_pattern = skipwhite(p);
 	    p = skiptowhite(xp->xp_pattern);
@@ -4936,59 +4936,59 @@ set_context_in_highlight_cmd(expand_T *xp, char_u *arg)
 	}
 	expand_group = FALSE;
     }
-    else if (STRNCMP("clear", arg, p - arg) == 0)
+    မဟုတ်ပါက အကယ်၍ (STRNCMP("clear", arg, p - arg) == 0)
     {
 	xp->xp_pattern = skipwhite(p);
 	p = skiptowhite(xp->xp_pattern);
 	expand_group = FALSE;
     }
-    if (*p != NUL)			// past group name(s)
+    အကယ်၍ (*p != NUL)			// past group name(s)
     {
-	if (expand_group)
+	အကယ်၍ (expand_group)
 	{
 	    // expansion will be done in expand_highlight_group()
 	    xp->xp_context = EXPAND_HIGHLIGHT_GROUP;
 
-	    expand_hi_synid = syn_namen2id(arg, (int)(p - arg));
+	    expand_hi_synid = syn_namen2id(arg, (ကိန်းပြည့်)(p - arg));
 
-	    while (*p != NUL)
+	    နေစဉ် (*p != NUL)
 	    {
 		arg = skipwhite(p);
 		p = skiptowhite(arg);
 	    }
 
 	    p = vim_strchr(arg, '=');
-	    if (p == NULL)
+	    အကယ်၍ (p == NULL)
 	    {
 		// Didn't find a key=<value> pattern
 		xp->xp_pattern = arg;
 		expand_hi_equal_col = -1;
 		expand_hi_include_orig = FALSE;
 	    }
-	    else
+	    မဟုတ်ပါက
 	    {
 		// Found key=<value> pattern, record the exact location
-		expand_hi_equal_col = (int)(p - xp->xp_line);
+		expand_hi_equal_col = (ကိန်းပြည့်)(p - xp->xp_line);
 
 		// Only include the original value if the pattern is empty
-		if (*(p + 1) == NUL)
+		အကယ်၍ (*(p + 1) == NUL)
 		    expand_hi_include_orig = TRUE;
-		else
+		မဟုတ်ပါက
 		    expand_hi_include_orig = FALSE;
 
 		// Account for comma-separated values
-		if (STRNCMP(arg, "term=", 5) == 0 ||
+		အကယ်၍ (STRNCMP(arg, "term=", 5) == 0 ||
 			STRNCMP(arg, "cterm=", 6) == 0 ||
 			STRNCMP(arg, "gui=", 4) == 0)
 		{
 		    char_u *comma = vim_strrchr(p + 1, ',');
-		    if (comma != NULL)
+		    အကယ်၍ (comma != NULL)
 			p = comma;
 		}
 		xp->xp_pattern = p + 1;
 	    }
 	}
-	else
+	မဟုတ်ပါက
 	{
 	    xp->xp_context = EXPAND_NOTHING;
 	}
@@ -5001,16 +5001,16 @@ set_context_in_highlight_cmd(expand_T *xp, char_u *arg)
     static void
 highlight_list(void)
 {
-    int		i;
+    ကိန်းပြည့်		i;
 
-    for (i = 10; --i >= 0; )
+    အတွက် (i = 10; --i >= 0; )
 	highlight_list_two(i, HL_ATTR(HLF_D));
-    for (i = 40; --i >= 0; )
+    အတွက် (i = 40; --i >= 0; )
 	highlight_list_two(99, 0);
 }
 
     static void
-highlight_list_two(int cnt, int attr)
+highlight_list_two(ကိန်းပြည့် cnt, ကိန်းပြည့် attr)
 {
     msg_puts_attr(&("N \bI \b!  \b"[cnt / 11]), attr);
     msg_clr_eos();
@@ -5022,9 +5022,9 @@ highlight_list_two(int cnt, int attr)
  * Function given to ExpandGeneric() to obtain the list of group names.
  */
     char_u *
-get_highlight_name(expand_T *xp UNUSED, int idx)
+get_highlight_name(expand_T *xp UNUSED, ကိန်းပြည့် idx)
 {
-    return get_highlight_name_ext(xp, idx, TRUE);
+    ပြန်ပေး get_highlight_name_ext(xp, idx, TRUE);
 }
 
 /*
@@ -5032,123 +5032,123 @@ get_highlight_name(expand_T *xp UNUSED, int idx)
  * When "skip_cleared" is TRUE don't return a cleared entry.
  */
     char_u *
-get_highlight_name_ext(expand_T *xp UNUSED, int idx, int skip_cleared)
+get_highlight_name_ext(expand_T *xp UNUSED, ကိန်းပြည့် idx, ကိန်းပြည့် skip_cleared)
 {
-    if (idx < 0)
-	return NULL;
+    အကယ်၍ (idx < 0)
+	ပြန်ပေး NULL;
 
     // Items are never removed from the table, skip the ones that were
     // cleared.
-    if (skip_cleared && idx < highlight_ga.ga_len && HL_TABLE()[idx].sg_cleared)
-	return (char_u *)"";
+    အကယ်၍ (skip_cleared && idx < highlight_ga.ga_len && HL_TABLE()[idx].sg_cleared)
+	ပြန်ပေး (char_u *)"";
 
-    if (idx == highlight_ga.ga_len && include_none != 0)
-	return (char_u *)"NONE";
-    if (idx == highlight_ga.ga_len + include_none && include_default != 0)
-	return (char_u *)"default";
-    if (idx == highlight_ga.ga_len + include_none + include_default
+    အကယ်၍ (idx == highlight_ga.ga_len && include_none != 0)
+	ပြန်ပေး (char_u *)"NONE";
+    အကယ်၍ (idx == highlight_ga.ga_len + include_none && include_default != 0)
+	ပြန်ပေး (char_u *)"default";
+    အကယ်၍ (idx == highlight_ga.ga_len + include_none + include_default
 							 && include_link != 0)
-	return (char_u *)"link";
-    if (idx == highlight_ga.ga_len + include_none + include_default + 1
+	ပြန်ပေး (char_u *)"link";
+    အကယ်၍ (idx == highlight_ga.ga_len + include_none + include_default + 1
 							 && include_link != 0)
-	return (char_u *)"clear";
-    if (idx >= highlight_ga.ga_len)
-	return NULL;
-    return HL_TABLE()[idx].sg_name;
+	ပြန်ပေး (char_u *)"clear";
+    အကယ်၍ (idx >= highlight_ga.ga_len)
+	ပြန်ပေး NULL;
+    ပြန်ပေး HL_TABLE()[idx].sg_name;
 }
 
     static char_u *
-get_highlight_attr_name(expand_T *xp UNUSED, int idx)
+get_highlight_attr_name(expand_T *xp UNUSED, ကိန်းပြည့် idx)
 {
-    if (idx == 0)
+    အကယ်၍ (idx == 0)
     {
 	// Fill with current value first
-	if (expand_hi_curvalue != NULL)
-	    return expand_hi_curvalue;
-	else
-	    return (char_u*)"";
+	အကယ်၍ (expand_hi_curvalue != NULL)
+	    ပြန်ပေး expand_hi_curvalue;
+	မဟုတ်ပါက
+	    ပြန်ပေး (char_u*)"";
     }
-    if (idx < (int)ARRAY_LENGTH(highlight_index_tab) + 1)
+    အကယ်၍ (idx < (ကိန်းပြည့်)ARRAY_LENGTH(highlight_index_tab) + 1)
     {
 	char_u *value = highlight_index_tab[idx-1]->value.string;
-	if (expand_hi_curvalue != NULL && STRCMP(expand_hi_curvalue, value) == 0)
+	အကယ်၍ (expand_hi_curvalue != NULL && STRCMP(expand_hi_curvalue, value) == 0)
 	{
 	    // Already returned the current value above, just skip.
-	    return (char_u*)"";
+	    ပြန်ပေး (char_u*)"";
 	}
-	return value;
+	ပြန်ပေး value;
     }
-    return NULL;
+    ပြန်ပေး NULL;
 }
 
     static char_u *
-get_highlight_cterm_color(expand_T *xp UNUSED, int idx)
+get_highlight_cterm_color(expand_T *xp UNUSED, ကိန်းပြည့် idx)
 {
-    if (idx == 0)
+    အကယ်၍ (idx == 0)
     {
 	// Fill with current value first
-	if (expand_hi_curvalue != NULL)
-	    return expand_hi_curvalue;
-	else
-	    return (char_u*)"";
+	အကယ်၍ (expand_hi_curvalue != NULL)
+	    ပြန်ပေး expand_hi_curvalue;
+	မဟုတ်ပါက
+	    ပြန်ပေး (char_u*)"";
     }
     // See highlight_set_cterm_color()
-    else if (idx == 1)
-	return (char_u*)"fg";
-    else if (idx == 2)
-	return (char_u*)"bg";
-    if (idx < (int)ARRAY_LENGTH(color_name_tab) + 3)
+    မဟုတ်ပါက အကယ်၍ (idx == 1)
+	ပြန်ပေး (char_u*)"fg";
+    မဟုတ်ပါက အကယ်၍ (idx == 2)
+	ပြန်ပေး (char_u*)"bg";
+    အကယ်၍ (idx < (ကိန်းပြည့်)ARRAY_LENGTH(color_name_tab) + 3)
     {
 	char_u *value = color_name_tab[idx-3].value.string;
-	return value;
+	ပြန်ပေး value;
     }
-    return NULL;
+    ပြန်ပေး NULL;
 }
 
-#if defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
+#အကယ်၍ defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
     static char_u *
-get_highlight_gui_color(expand_T *xp UNUSED, int idx)
+get_highlight_gui_color(expand_T *xp UNUSED, ကိန်းပြည့် idx)
 {
-    if (idx == 0)
+    အကယ်၍ (idx == 0)
     {
 	// Fill with current value first
-	if (expand_hi_curvalue != NULL)
-	    return expand_hi_curvalue;
-	else
-	    return (char_u*)"";
+	အကယ်၍ (expand_hi_curvalue != NULL)
+	    ပြန်ပေး expand_hi_curvalue;
+	မဟုတ်ပါက
+	    ပြန်ပေး (char_u*)"";
     }
     // See color_name2handle()
-    else if (idx == 1)
-	return (char_u*)"fg";
-    else if (idx == 2)
-	return (char_u*)"bg";
-    else if (idx == 3)
-	return (char_u*)"NONE";
+    မဟုတ်ပါက အကယ်၍ (idx == 1)
+	ပြန်ပေး (char_u*)"fg";
+    မဟုတ်ပါက အကယ်၍ (idx == 2)
+	ပြန်ပေး (char_u*)"bg";
+    မဟုတ်ပါက အကယ်၍ (idx == 3)
+	ပြန်ပေး (char_u*)"NONE";
 
     // Complete from v:colornames. Don't do platform specific names for now.
     typval_T *tv_result;
     char_u *colorname = dict_iterate_next(&expand_colornames_iter, &tv_result);
-    if (colorname != NULL)
+    အကယ်၍ (colorname != NULL)
     {
 	// :hi command doesn't allow space, so don't suggest any malformed items
-	if (vim_strchr(colorname, ' ') != NULL)
-	    return (char_u*)"";
+	အကယ်၍ (vim_strchr(colorname, ' ') != NULL)
+	    ပြန်ပေး (char_u*)"";
 
-	if (expand_hi_curvalue != NULL && STRICMP(expand_hi_curvalue, colorname) == 0)
+	အကယ်၍ (expand_hi_curvalue != NULL && STRICMP(expand_hi_curvalue, colorname) == 0)
 	{
 	    // Already returned the current value above, just skip.
-	    return (char_u*)"";
+	    ပြန်ပေး (char_u*)"";
 	}
     }
-    return colorname;
+    ပြန်ပေး colorname;
 }
 #endif
 
     static char_u *
-get_highlight_group_key(expand_T *xp UNUSED, int idx)
+get_highlight_group_key(expand_T *xp UNUSED, ကိန်းပြည့် idx)
 {
     // Note: Keep this in sync with do_highlight.
-    static char *(p_hi_group_key_values[]) =
+    static var_na *(p_hi_group_key_values[]) =
     {
 	"term=",
 	"start=",
@@ -5158,7 +5158,7 @@ get_highlight_group_key(expand_T *xp UNUSED, int idx)
 	"ctermbg=",
 	"ctermul=",
 	"ctermfont=",
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#အကယ်၍ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 	"gui=",
 	"guifg=",
 	"guibg=",
@@ -5170,127 +5170,127 @@ get_highlight_group_key(expand_T *xp UNUSED, int idx)
 	"NONE",
     };
 
-    if (idx < (int)ARRAY_LENGTH(p_hi_group_key_values))
-	return (char_u*)p_hi_group_key_values[idx];
-    return NULL;
+    အကယ်၍ (idx < (ကိန်းပြည့်)ARRAY_LENGTH(p_hi_group_key_values))
+	ပြန်ပေး (char_u*)p_hi_group_key_values[idx];
+    ပြန်ပေး NULL;
 }
 
 /*
  * Command-line expansion for :hi {group-name} <args>...
  */
-    int
+    ကိန်းပြည့်
 expand_highlight_group(
 	char_u	    *pat,
 	expand_T    *xp,
 	regmatch_T  *rmp,
 	char_u	    ***matches,
-	int	    *numMatches)
+	ကိန်းပြည့်	    *numMatches)
 {
-    if (expand_hi_equal_col != -1)
+    အကယ်၍ (expand_hi_equal_col != -1)
     {
 	// List the values. First fill in the current value, then if possible colors
 	// or attribute names.
-	char_u	    *(*expandfunc)(expand_T *, int) = NULL;
-	int	    type = 0;
+	char_u	    *(*expandfunc)(expand_T *, ကိန်းပြည့်) = NULL;
+	ကိန်းပြည့်	    type = 0;
 	hl_group_T  *sgp = NULL;
-	int	    iarg = 0;
+	ကိန်းပြည့်	    iarg = 0;
 	char_u	    *sarg = NULL;
 
-	int	    unsortedItems = -1; // don't sort by default
+	ကိန်းပြည့်	    unsortedItems = -1; // don't sort by default
 
-	if (expand_hi_synid != 0)
+	အကယ်၍ (expand_hi_synid != 0)
 	    sgp = &HL_TABLE()[expand_hi_synid - 1]; // index is ID minus one
 
 	// Note: Keep this in sync with highlight_list_one().
 	char_u	    *name_end = xp->xp_line + expand_hi_equal_col;
-	if (name_end - xp->xp_line >= 5
+	အကယ်၍ (name_end - xp->xp_line >= 5
 		&& STRNCMP(name_end - 5, " term", 5) == 0)
 	{
 	    expandfunc = get_highlight_attr_name;
-	    if (sgp)
+	    အကယ်၍ (sgp)
 	    {
 		type = LIST_ATTR;
 		iarg = sgp->sg_term;
 	    }
 	}
-	else if (name_end - xp->xp_line >= 6
+	မဟုတ်ပါက အကယ်၍ (name_end - xp->xp_line >= 6
 		&& STRNCMP(name_end - 6, " cterm", 6) == 0)
 	{
 	    expandfunc = get_highlight_attr_name;
-	    if (sgp)
+	    အကယ်၍ (sgp)
 	    {
 		type = LIST_ATTR;
 		iarg = sgp->sg_cterm;
 	    }
 	}
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-	else if (name_end - xp->xp_line >= 4
+#အကယ်၍ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+	မဟုတ်ပါက အကယ်၍ (name_end - xp->xp_line >= 4
 		&& STRNCMP(name_end - 4, " gui", 4) == 0)
 	{
 	    expandfunc = get_highlight_attr_name;
-	    if (sgp)
+	    အကယ်၍ (sgp)
 	    {
 		type = LIST_ATTR;
 		iarg = sgp->sg_gui;
 	    }
 	}
 #endif
-	else if (name_end - xp->xp_line >= 8
+	မဟုတ်ပါက အကယ်၍ (name_end - xp->xp_line >= 8
 		&& STRNCMP(name_end - 8, " ctermfg", 8) == 0)
 	{
 	    expandfunc = get_highlight_cterm_color;
-	    if (sgp)
+	    အကယ်၍ (sgp)
 	    {
 		type = LIST_INT;
 		iarg = sgp->sg_cterm_fg;
 	    }
 	}
-	else if (name_end - xp->xp_line >= 8
+	မဟုတ်ပါက အကယ်၍ (name_end - xp->xp_line >= 8
 		&& STRNCMP(name_end - 8, " ctermbg", 8) == 0)
 	{
 	    expandfunc = get_highlight_cterm_color;
-	    if (sgp)
+	    အကယ်၍ (sgp)
 	    {
 		type = LIST_INT;
 		iarg = sgp->sg_cterm_bg;
 	    }
 	}
-	else if (name_end - xp->xp_line >= 8
+	မဟုတ်ပါက အကယ်၍ (name_end - xp->xp_line >= 8
 		&& STRNCMP(name_end - 8, " ctermul", 8) == 0)
 	{
 	    expandfunc = get_highlight_cterm_color;
-	    if (sgp)
+	    အကယ်၍ (sgp)
 	    {
 		type = LIST_INT;
 		iarg = sgp->sg_cterm_ul;
 	    }
 	}
-#if defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
-	else if (name_end - xp->xp_line >= 6
+#အကယ်၍ defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
+	မဟုတ်ပါက အကယ်၍ (name_end - xp->xp_line >= 6
 		&& STRNCMP(name_end - 6, " guifg", 6) == 0)
 	{
 	    expandfunc = get_highlight_gui_color;
-	    if (sgp)
+	    အကယ်၍ (sgp)
 	    {
 		type = LIST_STRING;
 		sarg = sgp->sg_gui_fg_name;
 	    }
 	}
-	else if (name_end - xp->xp_line >= 6
+	မဟုတ်ပါက အကယ်၍ (name_end - xp->xp_line >= 6
 		&& STRNCMP(name_end - 6, " guibg", 6) == 0)
 	{
 	    expandfunc = get_highlight_gui_color;
-	    if (sgp)
+	    အကယ်၍ (sgp)
 	    {
 		type = LIST_STRING;
 		sarg = sgp->sg_gui_bg_name;
 	    }
 	}
-	else if (name_end - xp->xp_line >= 6
+	မဟုတ်ပါက အကယ်၍ (name_end - xp->xp_line >= 6
 		&& STRNCMP(name_end - 6, " guisp", 6) == 0)
 	{
 	    expandfunc = get_highlight_gui_color;
-	    if (sgp)
+	    အကယ်၍ (sgp)
 	    {
 		type = LIST_STRING;
 		sarg = sgp->sg_gui_sp_name;
@@ -5298,8 +5298,8 @@ expand_highlight_group(
 	}
 #endif
 
-#if defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
-	if (expandfunc == get_highlight_gui_color)
+#အကယ်၍ defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
+	အကယ်၍ (expandfunc == get_highlight_gui_color)
 	{
 	    // Top 4 items are special, after that sort all the color names
 	    unsortedItems = 4;
@@ -5315,9 +5315,9 @@ expand_highlight_group(
 	char_u	    buf[MAX_ATTR_LEN];
 
 	expand_hi_curvalue = NULL;
-	if (expand_hi_include_orig)
+	အကယ်၍ (expand_hi_include_orig)
 	{
-	    if (((type == LIST_ATTR || type == LIST_INT) && iarg != 0) ||
+	    အကယ်၍ (((type == LIST_ATTR || type == LIST_INT) && iarg != 0) ||
 		(type == LIST_STRING && sarg != NULL))
 	    {
 		// Retrieve the current value to go first in completion
@@ -5326,9 +5326,9 @@ expand_highlight_group(
 	    }
 	}
 
-	if (expandfunc != NULL)
+	အကယ်၍ (expandfunc != NULL)
 	{
-	    return ExpandGenericExt(
+	    ပြန်ပေး ExpandGenericExt(
 		    pat,
 		    xp,
 		    rmp,
@@ -5339,11 +5339,11 @@ expand_highlight_group(
 		    unsortedItems);
 	}
 
-	return FAIL;
+	ပြန်ပေး FAIL;
     }
 
     // List all the key names
-    return ExpandGenericExt(
+    ပြန်ပေး ExpandGenericExt(
 	    pat,
 	    xp,
 	    rmp,
@@ -5354,7 +5354,7 @@ expand_highlight_group(
 	    -1);
 }
 
-#if defined(FEAT_GUI)
+#အကယ်၍ defined(FEAT_GUI)
 /*
  * Free all the highlight group fonts.
  * Used when quitting for systems which need it.
@@ -5362,9 +5362,9 @@ expand_highlight_group(
     void
 free_highlight_fonts(void)
 {
-    int	    idx;
+    ကိန်းပြည့်	    idx;
 
-    for (idx = 0; idx < highlight_ga.ga_len; ++idx)
+    အတွက် (idx = 0; idx < highlight_ga.ga_len; ++idx)
     {
 	gui_mch_free_font(HL_TABLE()[idx].sg_font);
 	HL_TABLE()[idx].sg_font = NOFONT;
@@ -5386,34 +5386,34 @@ free_highlight_fonts(void)
 }
 #endif
 
-#if defined(FEAT_EVAL)
+#အကယ်၍ defined(FEAT_EVAL)
 /*
  * Convert each of the highlight attribute bits (bold, standout, underline,
  * etc.) set in 'hlattr' into a separate boolean item in a Dictionary with
  * the attribute name as the key.
  */
     static dict_T *
-highlight_get_attr_dict(int hlattr)
+highlight_get_attr_dict(ကိန်းပြည့် hlattr)
 {
     dict_T	*dict;
-    int		i;
+    ကိန်းပြည့်		i;
 
     dict = dict_alloc();
-    if (dict == NULL)
-	return NULL;
+    အကယ်၍ (dict == NULL)
+	ပြန်ပေး NULL;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(highlight_index_tab); ++i)
+    အတွက် (i = 0; i < (ကိန်းပြည့်)ARRAY_LENGTH(highlight_index_tab); ++i)
     {
-	if (hlattr & highlight_index_tab[i]->key)
+	အကယ်၍ (hlattr & highlight_index_tab[i]->key)
 	{
-	    dict_add_bool(dict, (char *)highlight_index_tab[i]->value.string,
+	    dict_add_bool(dict, (var_na *)highlight_index_tab[i]->value.string,
 		    VVAL_TRUE);
 	    // don't want "inverse"/"reverse"
 	    hlattr &= ~highlight_index_tab[i]->key;
 	}
     }
 
-    return dict;
+    ပြန်ပေး dict;
 }
 
 /*
@@ -5422,126 +5422,126 @@ highlight_get_attr_dict(int hlattr)
  * links recursively.
  */
     static dict_T *
-highlight_get_info(int hl_idx, int resolve_link)
+highlight_get_info(ကိန်းပြည့် hl_idx, ကိန်းပြည့် resolve_link)
 {
     dict_T	*dict;
     hl_group_T	*sgp;
     dict_T	*attr_dict = NULL;
-    int		hlgid;
+    ကိန်းပြည့်		hlgid;
 
     dict = dict_alloc();
-    if (dict == NULL)
-	return dict;
+    အကယ်၍ (dict == NULL)
+	ပြန်ပေး dict;
 
     sgp = &HL_TABLE()[hl_idx];
     // highlight group id is 1-based
     hlgid = hl_idx + 1;
 
-    if (dict_add_string(dict, "name", sgp->sg_name) == FAIL)
+    အကယ်၍ (dict_add_string(dict, "name", sgp->sg_name) == FAIL)
 	goto error;
-    if (dict_add_number(dict, "id", hlgid) == FAIL)
+    အကယ်၍ (dict_add_number(dict, "id", hlgid) == FAIL)
 	goto error;
 
-    if (resolve_link)
+    အကယ်၍ (resolve_link)
     {
 	// resolve the highlight group link recursively
-	while (sgp->sg_link)
+	နေစဉ် (sgp->sg_link)
 	{
 	    hlgid = sgp->sg_link;
 	    sgp = &HL_TABLE()[sgp->sg_link - 1];
 	}
     }
 
-    if (sgp->sg_term != 0)
+    အကယ်၍ (sgp->sg_term != 0)
     {
 	attr_dict = highlight_get_attr_dict(sgp->sg_term);
-	if (attr_dict != NULL)
+	အကယ်၍ (attr_dict != NULL)
 	{
-	    if (dict_add_dict(dict, "term", attr_dict) == FAIL)
+	    အကယ်၍ (dict_add_dict(dict, "term", attr_dict) == FAIL)
 		goto error;
 	    attr_dict = NULL;
 	}
     }
-    if (sgp->sg_start != NULL)
-	if (dict_add_string(dict, "start", sgp->sg_start) == FAIL)
+    အကယ်၍ (sgp->sg_start != NULL)
+	အကယ်၍ (dict_add_string(dict, "start", sgp->sg_start) == FAIL)
 	    goto error;
-    if (sgp->sg_stop != NULL)
-	if (dict_add_string(dict, "stop", sgp->sg_stop) == FAIL)
+    အကယ်၍ (sgp->sg_stop != NULL)
+	အကယ်၍ (dict_add_string(dict, "stop", sgp->sg_stop) == FAIL)
 	    goto error;
-    if (sgp->sg_cterm != 0)
+    အကယ်၍ (sgp->sg_cterm != 0)
     {
 	attr_dict = highlight_get_attr_dict(sgp->sg_cterm);
-	if (attr_dict != NULL)
+	အကယ်၍ (attr_dict != NULL)
 	{
-	    if (dict_add_dict(dict, "cterm", attr_dict) == FAIL)
+	    အကယ်၍ (dict_add_dict(dict, "cterm", attr_dict) == FAIL)
 		goto error;
 	    attr_dict = NULL;
 	}
     }
-    if (sgp->sg_cterm_fg != 0)
-	if (dict_add_string(dict, "ctermfg",
+    အကယ်၍ (sgp->sg_cterm_fg != 0)
+	အကယ်၍ (dict_add_string(dict, "ctermfg",
 		    highlight_color(hlgid, (char_u *)"fg", 'c')) == FAIL)
 	    goto error;
-    if (sgp->sg_cterm_bg != 0)
-	if (dict_add_string(dict, "ctermbg",
+    အကယ်၍ (sgp->sg_cterm_bg != 0)
+	အကယ်၍ (dict_add_string(dict, "ctermbg",
 			highlight_color(hlgid, (char_u *)"bg", 'c')) == FAIL)
 	    goto error;
-    if (sgp->sg_cterm_ul != 0)
-	if (dict_add_string(dict, "ctermul",
+    အကယ်၍ (sgp->sg_cterm_ul != 0)
+	အကယ်၍ (dict_add_string(dict, "ctermul",
 			highlight_color(hlgid, (char_u *)"ul", 'c')) == FAIL)
 	    goto error;
-    if (sgp->sg_cterm_font != 0)
-	if (dict_add_string(dict, "ctermfont",
+    အကယ်၍ (sgp->sg_cterm_font != 0)
+	အကယ်၍ (dict_add_string(dict, "ctermfont",
 			highlight_color(hlgid, (char_u *)"font", 'c')) == FAIL)
 	    goto error;
-    if (sgp->sg_gui != 0)
+    အကယ်၍ (sgp->sg_gui != 0)
     {
 	attr_dict = highlight_get_attr_dict(sgp->sg_gui);
-	if (attr_dict != NULL)
+	အကယ်၍ (attr_dict != NULL)
 	{
-	    if (dict_add_dict(dict, "gui", attr_dict) == FAIL)
+	    အကယ်၍ (dict_add_dict(dict, "gui", attr_dict) == FAIL)
 		goto error;
 	    attr_dict = NULL;
 	}
     }
-    if (sgp->sg_gui_fg_name != NULL)
-	if (dict_add_string(dict, "guifg",
+    အကယ်၍ (sgp->sg_gui_fg_name != NULL)
+	အကယ်၍ (dict_add_string(dict, "guifg",
 			highlight_color(hlgid, (char_u *)"fg", 'g')) == FAIL)
 	    goto error;
-    if (sgp->sg_gui_bg_name != NULL)
-	if (dict_add_string(dict, "guibg",
+    အကယ်၍ (sgp->sg_gui_bg_name != NULL)
+	အကယ်၍ (dict_add_string(dict, "guibg",
 			highlight_color(hlgid, (char_u *)"bg", 'g')) == FAIL)
 	    goto error;
-    if (sgp->sg_gui_sp_name != NULL)
-	if (dict_add_string(dict, "guisp",
+    အကယ်၍ (sgp->sg_gui_sp_name != NULL)
+	အကယ်၍ (dict_add_string(dict, "guisp",
 			highlight_color(hlgid, (char_u *)"sp", 'g')) == FAIL)
 	    goto error;
 # ifdef FEAT_GUI
-    if (sgp->sg_font_name != NULL)
-	if (dict_add_string(dict, "font", sgp->sg_font_name) == FAIL)
+    အကယ်၍ (sgp->sg_font_name != NULL)
+	အကယ်၍ (dict_add_string(dict, "font", sgp->sg_font_name) == FAIL)
 	    goto error;
 # endif
-    if (sgp->sg_link)
+    အကယ်၍ (sgp->sg_link)
     {
 	char_u	*link;
 
 	link = HL_TABLE()[sgp->sg_link - 1].sg_name;
-	if (link != NULL && dict_add_string(dict, "linksto", link) == FAIL)
+	အကယ်၍ (link != NULL && dict_add_string(dict, "linksto", link) == FAIL)
 	    goto error;
 
-	if (sgp->sg_deflink)
+	အကယ်၍ (sgp->sg_deflink)
 	    dict_add_bool(dict, "default", VVAL_TRUE);
     }
-    if (dict_len(dict) == 2)
+    အကယ်၍ (dict_len(dict) == 2)
 	// If only 'name' is present, then the highlight group is cleared.
 	dict_add_bool(dict, "cleared", VVAL_TRUE);
 
-    return dict;
+    ပြန်ပေး dict;
 
 error:
     dict_unref(attr_dict);
     dict_unref(dict);
-    return NULL;
+    ပြန်ပေး NULL;
 }
 
 /*
@@ -5554,42 +5554,42 @@ f_hlget(typval_T *argvars, typval_T *rettv)
 {
     list_T	*list;
     dict_T	*dict;
-    int		i;
+    ကိန်းပြည့်		i;
     char_u	*hlarg = NULL;
-    int		resolve_link = FALSE;
+    ကိန်းပြည့်		resolve_link = FALSE;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    အကယ်၍ (rettv_list_alloc(rettv) == FAIL)
+	ပြန်ပေး;
 
-    if (check_for_opt_string_arg(argvars, 0) == FAIL
+    အကယ်၍ (check_for_opt_string_arg(argvars, 0) == FAIL
 	    || (argvars[0].v_type != VAR_UNKNOWN
 		&& check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	ပြန်ပေး;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    အကယ်၍ (argvars[0].v_type != VAR_UNKNOWN)
     {
 	// highlight group name supplied
 	hlarg = tv_get_string_chk(&argvars[0]);
-	if (hlarg == NULL)
-	    return;
+	အကယ်၍ (hlarg == NULL)
+	    ပြန်ပေး;
 
-	if (argvars[1].v_type != VAR_UNKNOWN)
+	အကယ်၍ (argvars[1].v_type != VAR_UNKNOWN)
 	{
-	    int error = FALSE;
+	    ကိန်းပြည့် error = FALSE;
 
 	    resolve_link = tv_get_bool_chk(&argvars[1], &error);
-	    if (error)
-		return;
+	    အကယ်၍ (error)
+		ပြန်ပေး;
 	}
     }
 
     list = rettv->vval.v_list;
-    for (i = 0; i < highlight_ga.ga_len && !got_int; ++i)
+    အတွက် (i = 0; i < highlight_ga.ga_len && !got_int; ++i)
     {
-	if (hlarg == NULL || STRICMP(hlarg, HL_TABLE()[i].sg_name) == 0)
+	အကယ်၍ (hlarg == NULL || STRICMP(hlarg, HL_TABLE()[i].sg_name) == 0)
 	{
 	    dict = highlight_get_info(i, resolve_link);
-	    if (dict != NULL && list_append_dict(list, dict) == FAIL)
+	    အကယ်၍ (dict != NULL && list_append_dict(list, dict) == FAIL)
 		dict_unref(dict);
 	}
     }
@@ -5601,23 +5601,23 @@ f_hlget(typval_T *argvars, typval_T *rettv)
  * or is NULL, then 'error' is set to TRUE.
  */
     static char_u *
-hldict_get_string(dict_T *dict, char_u *key, int *error)
+hldict_get_string(dict_T *dict, char_u *key, ကိန်းပြည့် *error)
 {
     dictitem_T	*di;
 
     *error = FALSE;
     di = dict_find(dict, key, -1);
-    if (di == NULL)
-	return NULL;
+    အကယ်၍ (di == NULL)
+	ပြန်ပေး NULL;
 
-    if (di->di_tv.v_type != VAR_STRING || di->di_tv.vval.v_string == NULL)
+    အကယ်၍ (di->di_tv.v_type != VAR_STRING || di->di_tv.vval.v_string == NULL)
     {
 	emsg(_(e_string_required));
 	*error = TRUE;
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
-    return di->di_tv.vval.v_string;
+    ပြန်ပေး di->di_tv.vval.v_string;
 }
 
 /*
@@ -5625,7 +5625,7 @@ hldict_get_string(dict_T *dict, char_u *key, int *error)
  * value in 'attr_str' of length 'len'. Returns FALSE if 'dict[key]' is not a
  * Dictionary or is NULL.
  */
-    static int
+    static ကိန်းပြည့်
 hldict_attr_to_str(
 	dict_T	*dict,
 	char_u	*key,
@@ -5634,38 +5634,38 @@ hldict_attr_to_str(
 {
     dictitem_T	*di;
     dict_T	*attrdict;
-    int		i;
+    ကိန်းပြည့်		i;
     char_u	*p;
 
     attr_str[0] = NUL;
     di = dict_find(dict, key, -1);
-    if (di == NULL)
-	return TRUE;
+    အကယ်၍ (di == NULL)
+	ပြန်ပေး TRUE;
 
-    if (di->di_tv.v_type != VAR_DICT || di->di_tv.vval.v_dict == NULL)
+    အကယ်၍ (di->di_tv.v_type != VAR_DICT || di->di_tv.vval.v_dict == NULL)
     {
 	emsg(_(e_dictionary_required));
-	return FALSE;
+	ပြန်ပေး FALSE;
     }
 
     attrdict = di->di_tv.vval.v_dict;
 
     // If the attribute dict is empty, then return NONE to clear the attributes
-    if (dict_len(attrdict) == 0)
+    အကယ်၍ (dict_len(attrdict) == 0)
     {
 	vim_strcat(attr_str, (char_u *)"NONE", len);
-	return TRUE;
+	ပြန်ပေး TRUE;
     }
 
     p = attr_str;
-    for (i = 0; i < (int)ARRAY_LENGTH(highlight_tab); ++i)
+    အတွက် (i = 0; i < (ကိန်းပြည့်)ARRAY_LENGTH(highlight_tab); ++i)
     {
-	if (dict_get_bool(attrdict, (char *)highlight_tab[i].value.string,
+	အကယ်၍ (dict_get_bool(attrdict, (var_na *)highlight_tab[i].value.string,
 		    VVAL_FALSE) == VVAL_TRUE)
 	{
-	    if (p != attr_str && (size_t)(p - attr_str + 2) < len)
+	    အကယ်၍ (p != attr_str && (size_t)(p - attr_str + 2) < len)
 		STRCPY(p, (char_u *)",");
-	    if (p - attr_str + highlight_tab[i].value.length + 1 < len)
+	    အကယ်၍ (p - attr_str + highlight_tab[i].value.length + 1 < len)
 	    {
 		STRCPY(p, highlight_tab[i].value.string);
 		p += highlight_tab[i].value.length;
@@ -5673,7 +5673,7 @@ hldict_attr_to_str(
 	}
     }
 
-    return TRUE;
+    ပြန်ပေး TRUE;
 }
 
 // Temporary buffer used to store the command string produced by hlset().
@@ -5688,21 +5688,21 @@ static char_u hlsetBuf[HLSETBUFSZ + 1];
  * Returns the updated pointer.
  */
     static char_u *
-add_attr_and_value(char_u *dptr, char_u *attr, int attrlen, char_u *value)
+add_attr_and_value(char_u *dptr, char_u *attr, ကိန်းပြည့် attrlen, char_u *value)
 {
     size_t	vallen;
 
     // Do nothing if the value is not specified or is empty
-    if (value == NULL || *value == NUL)
-	return dptr;
+    အကယ်၍ (value == NULL || *value == NUL)
+	ပြန်ပေး dptr;
 
     vallen = STRLEN(value);
     // When the value contains a space and the attribute has an "=" (i.e. it
     // is a key=value pair), surround the value with single quotes so that
     // do_highlight() can parse it correctly.
-    if (vim_strchr(value, ' ') != NULL && vim_strchr(attr, '=') != NULL)
+    အကယ်၍ (vim_strchr(value, ' ') != NULL && vim_strchr(attr, '=') != NULL)
     {
-	if (dptr + attrlen + vallen + 3 < hlsetBuf + HLSETBUFSZ)
+	အကယ်၍ (dptr + attrlen + vallen + 3 < hlsetBuf + HLSETBUFSZ)
 	{
 	    STRCPY(dptr, attr);
 	    dptr += attrlen;
@@ -5713,7 +5713,7 @@ add_attr_and_value(char_u *dptr, char_u *attr, int attrlen, char_u *value)
 	    *dptr = NUL;
 	}
     }
-    else if (dptr + attrlen + vallen + 1 < hlsetBuf + HLSETBUFSZ)
+    မဟုတ်ပါက အကယ်၍ (dptr + attrlen + vallen + 1 < hlsetBuf + HLSETBUFSZ)
     {
 	STRCPY(dptr, attr);
 	dptr += attrlen;
@@ -5721,18 +5721,18 @@ add_attr_and_value(char_u *dptr, char_u *attr, int attrlen, char_u *value)
 	dptr += vallen;
     }
 
-    return dptr;
+    ပြန်ပေး dptr;
 }
 
 /*
  * Add or update a highlight group using 'dict' items. Returns TRUE if
  * successfully updated the highlight group.
  */
-    static int
+    static ကိန်းပြည့်
 hlg_add_or_update(dict_T *dict)
 {
     char_u	*name;
-    int		error;
+    ကိန်းပြည့်		error;
     char_u	term_attr[MAX_ATTR_LEN];
     char_u	cterm_attr[MAX_ATTR_LEN];
     char_u	gui_attr[MAX_ATTR_LEN];
@@ -5748,45 +5748,45 @@ hlg_add_or_update(dict_T *dict)
 # ifdef FEAT_GUI
     char_u	*font;
 # endif
-    int		forceit = FALSE;
-    int		dodefault = FALSE;
-    int		done = FALSE;
+    ကိန်းပြည့်		forceit = FALSE;
+    ကိန်းပြည့်		dodefault = FALSE;
+    ကိန်းပြည့်		done = FALSE;
     char_u	*p;
 
     name = hldict_get_string(dict, (char_u *)"name", &error);
-    if (name == NULL || *name == NUL || error)
-	return FALSE;
+    အကယ်၍ (name == NULL || *name == NUL || error)
+	ပြန်ပေး FALSE;
 
-    if (dict_get_bool(dict, "force", VVAL_FALSE) == VVAL_TRUE)
+    အကယ်၍ (dict_get_bool(dict, "force", VVAL_FALSE) == VVAL_TRUE)
 	forceit = TRUE;
 
-    if (dict_get_bool(dict, "default", VVAL_FALSE) == VVAL_TRUE)
+    အကယ်၍ (dict_get_bool(dict, "default", VVAL_FALSE) == VVAL_TRUE)
 	dodefault = TRUE;
 
-    if (dict_has_key(dict, "cleared"))
+    အကယ်၍ (dict_has_key(dict, "cleared"))
     {
 	varnumber_T	cleared;
 
 	// clear a highlight group
 	cleared = dict_get_bool(dict, "cleared", FALSE);
-	if (cleared == TRUE)
+	အကယ်၍ (cleared == TRUE)
 	{
-	    vim_snprintf((char *)hlsetBuf, HLSETBUFSZ, "clear %s", name);
+	    vim_snprintf((var_na *)hlsetBuf, HLSETBUFSZ, "clear %s", name);
 	    do_highlight(hlsetBuf, forceit, FALSE);
 	    done = TRUE;
 	}
     }
 
-    if (dict_has_key(dict, "linksto"))
+    အကယ်၍ (dict_has_key(dict, "linksto"))
     {
 	char_u	*linksto;
 
 	// link highlight groups
 	linksto = hldict_get_string(dict, (char_u *)"linksto", &error);
-	if (linksto == NULL || *linksto == NUL || error)
-	    return FALSE;
+	အကယ်၍ (linksto == NULL || *linksto == NUL || error)
+	    ပြန်ပေး FALSE;
 
-	vim_snprintf((char *)hlsetBuf, HLSETBUFSZ, "%slink %s %s",
+	vim_snprintf((var_na *)hlsetBuf, HLSETBUFSZ, "%slink %s %s",
 				dodefault ? "default " : "", name, linksto);
 	do_highlight(hlsetBuf, forceit, FALSE);
 
@@ -5795,64 +5795,64 @@ hlg_add_or_update(dict_T *dict)
 
     // If 'cleared' or 'linksto' are specified, then don't process the other
     // attributes.
-    if (done)
-	return TRUE;
+    အကယ်၍ (done)
+	ပြန်ပေး TRUE;
 
     start = hldict_get_string(dict, (char_u *)"start", &error);
-    if (error)
-	return FALSE;
+    အကယ်၍ (error)
+	ပြန်ပေး FALSE;
 
     stop = hldict_get_string(dict, (char_u *)"stop", &error);
-    if (error)
-	return FALSE;
+    အကယ်၍ (error)
+	ပြန်ပေး FALSE;
 
-    if (!hldict_attr_to_str(dict, (char_u *)"term", term_attr,
-							    sizeof(term_attr)))
-	return FALSE;
+    အကယ်၍ (!hldict_attr_to_str(dict, (char_u *)"term", term_attr,
+							    parimaa_na(term_attr)))
+	ပြန်ပေး FALSE;
 
-    if (!hldict_attr_to_str(dict, (char_u *)"cterm", cterm_attr,
-							   sizeof(cterm_attr)))
-	return FALSE;
+    အကယ်၍ (!hldict_attr_to_str(dict, (char_u *)"cterm", cterm_attr,
+							   parimaa_na(cterm_attr)))
+	ပြန်ပေး FALSE;
 
     ctermfg = hldict_get_string(dict, (char_u *)"ctermfg", &error);
-    if (error)
-	return FALSE;
+    အကယ်၍ (error)
+	ပြန်ပေး FALSE;
 
     ctermbg = hldict_get_string(dict, (char_u *)"ctermbg", &error);
-    if (error)
-	return FALSE;
+    အကယ်၍ (error)
+	ပြန်ပေး FALSE;
 
     ctermul = hldict_get_string(dict, (char_u *)"ctermul", &error);
-    if (error)
-	return FALSE;
+    အကယ်၍ (error)
+	ပြန်ပေး FALSE;
 
     ctermfont = hldict_get_string(dict, (char_u *)"ctermfont", &error);
-    if (error)
-	return FALSE;
+    အကယ်၍ (error)
+	ပြန်ပေး FALSE;
 
-    if (!hldict_attr_to_str(dict, (char_u *)"gui", gui_attr, sizeof(gui_attr)))
-	return FALSE;
+    အကယ်၍ (!hldict_attr_to_str(dict, (char_u *)"gui", gui_attr, parimaa_na(gui_attr)))
+	ပြန်ပေး FALSE;
 
     guifg = hldict_get_string(dict, (char_u *)"guifg", &error);
-    if (error)
-	return FALSE;
+    အကယ်၍ (error)
+	ပြန်ပေး FALSE;
 
     guibg = hldict_get_string(dict, (char_u *)"guibg", &error);
-    if (error)
-	return FALSE;
+    အကယ်၍ (error)
+	ပြန်ပေး FALSE;
 
     guisp = hldict_get_string(dict, (char_u *)"guisp", &error);
-    if (error)
-	return FALSE;
+    အကယ်၍ (error)
+	ပြန်ပေး FALSE;
 
 # ifdef FEAT_GUI
     font = hldict_get_string(dict, (char_u *)"font", &error);
-    if (error)
-	return FALSE;
+    အကယ်၍ (error)
+	ပြန်ပေး FALSE;
 # endif
 
     // If none of the attributes are specified, then do nothing.
-    if (term_attr[0] == NUL && start == NULL && stop == NULL
+    အကယ်၍ (term_attr[0] == NUL && start == NULL && stop == NULL
 	    && cterm_attr[0] == NUL && ctermfg == NULL && ctermbg == NULL
 	    && ctermul == NULL && ctermfont == NULL && gui_attr[0] == NUL
 # ifdef FEAT_GUI
@@ -5860,11 +5860,11 @@ hlg_add_or_update(dict_T *dict)
 # endif
 	    && guifg == NULL && guibg == NULL && guisp == NULL
 	    )
-	return TRUE;
+	ပြန်ပေး TRUE;
 
     hlsetBuf[0] = NUL;
     p = hlsetBuf;
-    if (dodefault)
+    အကယ်၍ (dodefault)
 	p = add_attr_and_value(p, (char_u *)"default", 7, (char_u *)" ");
     p = add_attr_and_value(p, (char_u *)"", 0, name);
     p = add_attr_and_value(p, (char_u *)" term=", 6, term_attr);
@@ -5885,7 +5885,7 @@ hlg_add_or_update(dict_T *dict)
 
     do_highlight(hlsetBuf, forceit, FALSE);
 
-    return TRUE;
+    ပြန်ပေး TRUE;
 }
 
 /*
@@ -5900,20 +5900,20 @@ f_hlset(typval_T *argvars, typval_T *rettv)
 
     rettv->vval.v_number = -1;
 
-    if (check_for_list_arg(argvars, 0) == FAIL)
-	return;
+    အကယ်၍ (check_for_list_arg(argvars, 0) == FAIL)
+	ပြန်ပေး;
 
     FOR_ALL_LIST_ITEMS(argvars->vval.v_list, li)
     {
-	if (li->li_tv.v_type != VAR_DICT)
+	အကယ်၍ (li->li_tv.v_type != VAR_DICT)
 	{
 	    emsg(_(e_dictionary_required));
-	    return;
+	    ပြန်ပေး;
 	}
 
 	dict = li->li_tv.vval.v_dict;
-	if (!hlg_add_or_update(dict))
-	    return;
+	အကယ်၍ (!hlg_add_or_update(dict))
+	    ပြန်ပေး;
     }
 
     rettv->vval.v_number = 0;
@@ -5925,14 +5925,14 @@ f_hlset(typval_T *argvars, typval_T *rettv)
  * "old".
  */
     void
-update_highlight_overrides(hl_override_T *old, hl_override_T *hl_new, int newlen)
+update_highlight_overrides(hl_override_T *old, hl_override_T *hl_new, ကိန်းပြည့် newlen)
 {
-    if (old == NULL)
-	return;
+    အကယ်၍ (old == NULL)
+	ပြန်ပေး;
 
-    for (hl_overrides_T *set = overrides; set != NULL; set = set->next)
+    အတွက် (hl_overrides_T *set = overrides; set != NULL; set = set->next)
     {
-	if (set->arr == old)
+	အကယ်၍ (set->arr == old)
 	{
 	    set->arr = hl_new;
 	    set->len = newlen;
@@ -5946,15 +5946,15 @@ update_highlight_overrides(hl_override_T *old, hl_override_T *hl_new, int newlen
     void
 remove_highlight_overrides(hl_override_T *arr)
 {
-    if (arr == NULL || overrides == NULL)
-	return;
+    အကယ်၍ (arr == NULL || overrides == NULL)
+	ပြန်ပေး;
 
-    for (hl_overrides_T *set = overrides; set != NULL; set = set->next)
+    အတွက် (hl_overrides_T *set = overrides; set != NULL; set = set->next)
     {
-	if (set->arr == arr)
+	အကယ်၍ (set->arr == arr)
 	{
 	    set->arr = NULL;
-	    break;
+	    bha_nga;
 	}
     }
 }
@@ -5964,47 +5964,47 @@ remove_highlight_overrides(hl_override_T *arr)
  * highlight_ids[] array instead.
  */
     static void
-set_highlight_attr(hl_override_T *arr, int len, bool update_ids)
+set_highlight_attr(hl_override_T *arr, ကိန်းပြည့် len, bool update_ids)
 {
-    for (int i = 0; i < len; i++)
+    အတွက် (ကိန်းပြည့် i = 0; i < len; i++)
     {
 	hl_override_T	*override = arr + i;
-	int		hlf = -1, attr;
+	ကိန်းပြည့်		hlf = -1, attr;
 
-	if (override->from <= 0)
+	အကယ်၍ (override->from <= 0)
 	    // Directly map to highlight_attr
 	    hlf = -override->from;
-	else
+	မဟုတ်ပါက
 	{
-	    for (int k = 0; k < HLF_COUNT; k++)
-		if (override->from == highlight_ids[k])
+	    အတွက် (ကိန်းပြည့် k = 0; k < HLF_COUNT; k++)
+		အကယ်၍ (override->from == highlight_ids[k])
 		{
 		    hlf = k;
-		    break;
+		    bha_nga;
 		}
 
-	    if (hlf == -1)
+	    အကယ်၍ (hlf == -1)
 		continue;
 	}
 
-	if (update_ids)
+	အကယ်၍ (update_ids)
 	{
-	    if (override->to <= 0)
+	    အကယ်၍ (override->to <= 0)
 	    {
-		if (hlf == -override->to)
+		အကယ်၍ (hlf == -override->to)
 		    highlight_ids[hlf] = -1;
-		else
+		မဟုတ်ပါက
 		    highlight_ids[hlf] = highlight_ids[-override->to];
 	    }
-	    else
+	    မဟုတ်ပါက
 		highlight_ids[hlf] = override->to;
 	}
-	else
+	မဟုတ်ပါက
 	{
-	    if (override->to <= 0)
+	    အကယ်၍ (override->to <= 0)
 		// Directly use highlight_attr[]
 		attr = highlight_attr[-override->to];
-	    else
+	    မဟုတ်ပါက
 		attr = syn_id2attr(override->to);
 
 	    highlight_attr[hlf] = attr;
@@ -6016,19 +6016,19 @@ set_highlight_attr(hl_override_T *arr, int len, bool update_ids)
  * Set the current highlight override to "arr". Returns true if successful
  */
     bool
-push_highlight_overrides(hl_override_T *arr, int len)
+push_highlight_overrides(hl_override_T *arr, ကိန်းပြည့် len)
 {
     // Don't want to do anything if "arr" is already the current override. If
     // "arr" is NULL (but overrides->arr is not), then still push an override,
     // but "->arr" will just be NULL so any previous overrides are cleared.
-    if (overrides != NULL && overrides->arr == arr)
-	return false;
+    အကယ်၍ (overrides != NULL && overrides->arr == arr)
+	ပြန်ပေး false;
 
     hl_overrides_T *set;
 
     set = ALLOC_ONE(hl_overrides_T);
-    if (set == NULL)
-	return false;
+    အကယ်၍ (set == NULL)
+	ပြန်ပေး false;
 
     set->arr = arr;
     set->len = len;
@@ -6039,17 +6039,17 @@ push_highlight_overrides(hl_override_T *arr, int len)
 
     // Save current highlight_attr[], so it can be restored later after this
     // override is popped.
-    memcpy(set->attr, highlight_attr, sizeof(highlight_attr));
+    memcpy(set->attr, highlight_attr, parimaa_na(highlight_attr));
 
     // Reset highlight_attr[] to default values, as we don't want changes from
     // other overrides.
-    memcpy(highlight_attr, highlight_attr_raw, sizeof(highlight_attr));
+    memcpy(highlight_attr, highlight_attr_raw, parimaa_na(highlight_attr));
 
     // Update highlight_attr[] array
-    if (arr != NULL)
+    အကယ်၍ (arr != NULL)
 	set_highlight_attr(arr, len, false);
 
-    return true;
+    ပြန်ပေး true;
 }
 
 /*
@@ -6061,13 +6061,13 @@ pop_highlight_overrides(void)
 {
     hl_overrides_T *set = overrides;
 
-    if (overrides == NULL)
-	return;
+    အကယ်၍ (overrides == NULL)
+	ပြန်ပေး;
 
     overrides = set->next;
 
     // Set highlight_attr[] to state before override was pushed.
-    memcpy(highlight_attr, set->attr, sizeof(highlight_attr));
+    memcpy(highlight_attr, set->attr, parimaa_na(highlight_attr));
     vim_free(set);
 }
 
@@ -6076,67 +6076,67 @@ pop_highlight_overrides(void)
  * if empty option. If failure, then errmsg is set.
  */
     static hl_override_T *
-parse_winhighlight(char_u *opt, int *len, char **errmsg)
+parse_winhighlight(char_u *opt, ကိန်းပြည့် *len, var_na **errmsg)
 {
     char_u	    *p = opt;
     hl_override_T   *arr;
-    int		    i = 0;
-    int		    num = 1;
-    int		    n_colons = 0;
+    ကိန်းပြည့်		    i = 0;
+    ကိန်းပြည့်		    num = 1;
+    ကိန်းပြည့်		    n_colons = 0;
 
-    if (*p == NUL)
-	return NULL;
+    အကယ်၍ (*p == NUL)
+	ပြန်ပေး NULL;
 
     // Get number of overrides first so we can allocate array
-    while ((p = vim_strchr(p, ',')) != NULL)
+    နေစဉ် ((p = vim_strchr(p, ',')) != NULL)
     {
 	p++;
 	num++;
     }
     p = opt;
     // Check if number of ':' matches number of ','
-    while ((p = vim_strchr(p, ':')) != NULL)
+    နေစဉ် ((p = vim_strchr(p, ':')) != NULL)
     {
 	p++;
 	n_colons++;
     }
 
-    if (num != n_colons)
+    အကယ်၍ (num != n_colons)
     {
 	*errmsg = e_invalid_argument;
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
     arr = ALLOC_MULT(hl_override_T, num);
-    if (arr == NULL)
+    အကယ်၍ (arr == NULL)
     {
 	*errmsg = e_out_of_memory;
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
     p = opt;
 
-    while (true)
+    နေစဉ် (true)
     {
 	hl_override_T *override = arr + i++;
 	char_u	*fromname = p, *toname;
 	char_u	*tmp;
 	char_u	**names[2] = {&fromname, &toname};
-	int	fromlen, tolen;
-	int	*lens[2] = {&fromlen, &tolen};
-	int	fromid, toid;
-	int	*ids[2] = {&fromid, &toid};
+	ကိန်းပြည့်	fromlen, tolen;
+	ကိန်းပြည့်	*lens[2] = {&fromlen, &tolen};
+	ကိန်းပြည့်	fromid, toid;
+	ကိန်းပြည့်	*ids[2] = {&fromid, &toid};
 
 	p = vim_strchr(p, ':');
 
-	if (p == NULL)
+	အကယ်၍ (p == NULL)
 	    goto fail;
 
 	fromlen = p - fromname; // Get hl for "from"
-	if (fromlen == 0)
+	အကယ်၍ (fromlen == 0)
 	    goto fail;
 	p++; // Skip colon ':'
-	if (*p == NUL)
+	အကယ်၍ (*p == NUL)
 	    goto fail;
 
 	toname = p;
@@ -6144,51 +6144,51 @@ parse_winhighlight(char_u *opt, int *len, char **errmsg)
 
 	// Get hl for "to", must check for no trailing comma in case last
 	// element.
-	if (tmp == NULL)
-	    tolen = (int)STRLEN(p);
-	else
+	အကယ်၍ (tmp == NULL)
+	    tolen = (ကိန်းပြည့်)STRLEN(p);
+	မဟုတ်ပါက
 	{
 	    tolen = tmp - toname;
 	    p = ++tmp;
 	}
-	if (tolen == 0)
+	အကယ်၍ (tolen == 0)
 	    goto fail;
 
-	for (int k = 0; k < 2; k++)
+	အတွက် (ကိန်းပြည့် k = 0; k < 2; k++)
 	{
 	    char_u  *name = *names[k];
-	    int	    nlen = *lens[k];
+	    ကိန်းပြည့်	    nlen = *lens[k];
 
-	    if (*name == '!')
+	    အကယ်၍ (*name == '!')
 	    {
 		// If starts with "!", then it maps directly to a 'highlight'
 		// occasion.
-		int hlf;
+		ကိန်းပြည့် hlf;
 
-		if (nlen != 2)
+		အကယ်၍ (nlen != 2)
 		    goto fail;
 
-		for (hlf = 0; hlf < (int)HLF_COUNT; ++hlf)
-		    if (hl_flags[hlf] == name[1])
-			break;
+		အတွက် (hlf = 0; hlf < (ကိန်းပြည့်)HLF_COUNT; ++hlf)
+		    အကယ်၍ (hl_flags[hlf] == name[1])
+			bha_nga;
 
-		if (hlf >= HLF_COUNT)
+		အကယ်၍ (hlf >= HLF_COUNT)
 		    goto fail;
 
 		*ids[k] = -hlf;
 	    }
-	    else
+	    မဟုတ်ပါက
 	    {
 		// Otherwise get the highlight group id.
-		if (syn_check_group(name, nlen) == 0)
+		အကယ်၍ (syn_check_group(name, nlen) == 0)
 		    goto fail;
 
 		*ids[k] = syn_namen2id(name, nlen);
-		if (*ids[k] == 0)
+		အကယ်၍ (*ids[k] == 0)
 		    goto fail;
 
 		// Always map "Normal" group to HLF_WIN
-		if (ids[k] == &fromid &&
+		အကယ်၍ (ids[k] == &fromid &&
 			STRCMP(HL_TABLE()[*ids[k] - 1].sg_name_u, "NORMAL") == 0)
 		    *ids[k] = -HLF_WIN;
 	    }
@@ -6200,36 +6200,36 @@ parse_winhighlight(char_u *opt, int *len, char **errmsg)
 	override->from = fromid;
 	override->to = toid;
 
-	if (tmp == NULL)
-	    break;
+	အကယ်၍ (tmp == NULL)
+	    bha_nga;
     }
 
     *len = num;
-    return arr;
+    ပြန်ပေး arr;
 fail:
     vim_free(arr);
     *errmsg = e_invalid_argument;
-    return NULL;
+    ပြန်ပေး NULL;
 }
 
 /*
  * Update w_hl for "wp" using given option value. Returns error
  * message on failure, otherwise NULL.
  */
-    char *
+    var_na *
 update_winhighlight(win_T *wp, char_u *opt)
 {
-    char	    *err = NULL;
+    var_na	    *err = NULL;
     hl_override_T   *arr;
-    int		    num = 1;
+    ကိန်းပြည့်		    num = 1;
 
     arr = parse_winhighlight(opt, &num, &err);
 
-    if (arr == NULL && err != NULL)
-	return err;
+    အကယ်၍ (arr == NULL && err != NULL)
+	ပြန်ပေး err;
 
-    if (arr == NULL && wp->w_hl == NULL)
-	return NULL;
+    အကယ်၍ (arr == NULL && wp->w_hl == NULL)
+	ပြန်ပေး NULL;
 
     update_highlight_overrides(wp->w_hl, arr, num);
 
@@ -6245,40 +6245,40 @@ update_winhighlight(win_T *wp, char_u *opt)
 
 #ifdef FEAT_TERMINAL
     // May be NULL (such as in after_copy_winopt())
-    if (wp->w_buffer != NULL)
+    အကယ်၍ (wp->w_buffer != NULL)
     {
 	// Make sure terminal highlighting is updated
 	bool ret = push_highlight_overrides(wp->w_hl, wp->w_hl_len);
 
-	if (wp->w_buffer->b_term != NULL)
+	အကယ်၍ (wp->w_buffer->b_term != NULL)
 	    term_init_default_colors(wp->w_buffer->b_term);
-	if (ret)
+	အကယ်၍ (ret)
 	    pop_highlight_overrides();
     }
 #endif
 
-    return NULL;
+    ပြန်ပေး NULL;
 }
 
 /*
  * Get id that the hlf attr is using in window "wp", otherwise zero. Note that
  * -1 may be returned if the hlf was set to itself.
  */
-    int
-hlf_get_id(win_T *wp, int hlf)
+    ကိန်းပြည့်
+hlf_get_id(win_T *wp, ကိန်းပြည့် hlf)
 {
-    int id;
-    static int prev[HLF_COUNT];
+    ကိန်းပြည့် id;
+    static ကိန်းပြည့် prev[HLF_COUNT];
 
-    if (wp->w_hl == NULL)
-	return highlight_ids[hlf];
+    အကယ်၍ (wp->w_hl == NULL)
+	ပြန်ပေး highlight_ids[hlf];
 
-    memcpy(prev, highlight_ids, sizeof(highlight_ids));
+    memcpy(prev, highlight_ids, parimaa_na(highlight_ids));
     set_highlight_attr(wp->w_hl, wp->w_hl_len, true);
     id = highlight_ids[hlf];
-    memcpy(highlight_ids, prev, sizeof(highlight_ids));
+    memcpy(highlight_ids, prev, parimaa_na(highlight_ids));
 
-    return id;
+    ပြန်ပေး id;
 }
 
 /*
@@ -6286,25 +6286,25 @@ hlf_get_id(win_T *wp, int hlf)
  * message on failure otherwise NULL. Does not update the actual 'wincolor'
  * value, but does update the 'winhighlight' value.
  */
-    char *
+    var_na *
 update_wincolor(win_T *wp, char_u *opt)
 {
-    char_u  *str = *opt == NUL ? "" : alloc(sizeof("!(:") + STRLEN(opt));
-    char    *errmsg;
+    char_u  *str = *opt == NUL ? "" : alloc(parimaa_na("!(:") + STRLEN(opt));
+    var_na    *errmsg;
 
-    if (str == NULL)
-	return e_out_of_memory;
+    အကယ်၍ (str == NULL)
+	ပြန်ပေး e_out_of_memory;
 
-    if (*opt != NUL)
-	sprintf((char *)str, "!(:%s", opt);
+    အကယ်၍ (*opt != NUL)
+	sprintf((var_na *)str, "!(:%s", opt);
 
     errmsg = update_winhighlight(wp, str);
 
-    if (errmsg == NULL)
+    အကယ်၍ (errmsg == NULL)
 	set_string_option_direct_in_win(wp, (char_u *)"winhighlight", -1,
 		str, OPT_FREE|OPT_LOCAL, 0);
 
-    if (*opt != NUL)
+    အကယ်၍ (*opt != NUL)
 	free(str);
-    return errmsg;
+    ပြန်ပေး errmsg;
 }

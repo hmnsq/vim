@@ -20,32 +20,32 @@
 
 // System classes
 
-struct BMenu;
-struct BMenuItem;
-struct BPictureButton;
+sa_nracanaa BMenu;
+sa_nracanaa BMenuItem;
+sa_nracanaa BPictureButton;
 
 // Our own Vim-related classes
 
-struct VimApp;
-struct VimFormView;
-struct VimTextAreaView;
-struct VimWindow;
-struct VimScrollBar;
+sa_nracanaa VimApp;
+sa_nracanaa VimFormView;
+sa_nracanaa VimTextAreaView;
+sa_nracanaa VimWindow;
+sa_nracanaa VimScrollBar;
 
 // Locking functions
 
-extern int vim_lock_screen();
+extern ကိန်းပြည့် vim_lock_screen();
 extern void vim_unlock_screen();
 
 #ifndef __cplusplus
 
-typedef struct BMenu BMenu;
-typedef struct BMenuItem BMenuItem;
-typedef struct BPictureButton BPictureButton;
-typedef struct VimWindow VimWindow;
-typedef struct VimFormView VimFormView;
-typedef struct VimTextAreaView VimTextAreaView;
-typedef struct VimApp VimApp;
-typedef struct VimScrollBar VimScrollBar;
+typedef sa_nracanaa BMenu BMenu;
+typedef sa_nracanaa BMenuItem BMenuItem;
+typedef sa_nracanaa BPictureButton BPictureButton;
+typedef sa_nracanaa VimWindow VimWindow;
+typedef sa_nracanaa VimFormView VimFormView;
+typedef sa_nracanaa VimTextAreaView VimTextAreaView;
+typedef sa_nracanaa VimApp VimApp;
+typedef sa_nracanaa VimScrollBar VimScrollBar;
 
 #endif

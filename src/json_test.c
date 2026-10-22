@@ -21,7 +21,7 @@
 // This file has to be included because the tested functions are static
 #include "json.c"
 
-#if defined(FEAT_EVAL)
+#အကယ်၍ defined(FEAT_EVAL)
 /*
  * Test json_find_end() with incomplete items.
  */
@@ -144,11 +144,11 @@ test_decode_find_end(void)
     assert(json_find_end(&reader, 0) == MAYBE);
 }
 
-    static int
+    static ကိန်းပြည့်
 fill_from_cookie(js_read_T *reader)
 {
     reader->js_buf = reader->js_cookie;
-    return TRUE;
+    ပြန်ပေး TRUE;
 }
 
 /*
@@ -191,14 +191,14 @@ test_fill_called_on_string(void)
 }
 #endif
 
-    int
+    ကိန်းပြည့်
 main(void)
 {
-#if defined(FEAT_EVAL)
+#အကယ်၍ defined(FEAT_EVAL)
     p_mfd = 100;
     test_decode_find_end();
     test_fill_called_on_find_end();
     test_fill_called_on_string();
 #endif
-    return 0;
+    ပြန်ပေး 0;
 }

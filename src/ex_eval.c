@@ -13,9 +13,9 @@
 
 #include "vim.h"
 
-#if defined(FEAT_EVAL)
+#အကယ်၍ defined(FEAT_EVAL)
 
-static char	*get_end_emsg(cstack_T *cstack);
+static var_na	*get_end_emsg(cstack_T *cstack);
 
 /*
  * Exception handling terms:
@@ -50,12 +50,12 @@ static char	*get_end_emsg(cstack_T *cstack);
  * is an error exception.)  -  The macros can be defined as expressions checking
  * for a variable that is allowed to be changed during execution of a script.
  */
-#if 0
+#အကယ်၍ 0
 // Expressions used for testing during the development phase.
 # define THROW_ON_ERROR		(!eval_to_number("$VIMNOERRTHROW"))
 # define THROW_ON_INTERRUPT	(!eval_to_number("$VIMNOINTTHROW"))
 # define THROW_TEST
-#else
+#မဟုတ်ပါက
 // Values used for the Vim release.
 # define THROW_ON_ERROR		TRUE
 # define THROW_ON_ERROR_TRUE
@@ -72,7 +72,7 @@ static char	*get_end_emsg(cstack_T *cstack);
  * error messages on parsing errors during the expression evaluation are given
  * (even if a try conditional is active).
  */
-static int cause_abort = FALSE;
+static ကိန်းပြည့် cause_abort = FALSE;
 
 /*
  * Return TRUE when immediately aborting on error, or when an interrupt
@@ -86,10 +86,10 @@ static int cause_abort = FALSE;
  * due to a parsing error, aborting() always returns the same value.
  * "got_int" is also set by calling interrupt().
  */
-    int
+    ကိန်းပြည့်
 aborting(void)
 {
-    return (did_emsg && force_abort) || got_int || did_throw;
+    ပြန်ပေး (did_emsg && force_abort) || got_int || did_throw;
 }
 
 /*
@@ -101,7 +101,7 @@ aborting(void)
     void
 update_force_abort(void)
 {
-    if (cause_abort)
+    အကယ်၍ (cause_abort)
 	force_abort = TRUE;
 }
 
@@ -111,10 +111,10 @@ update_force_abort(void)
  * execution of a failing subcommand as long as the error message has not been
  * displayed and actually caused the abortion.
  */
-    int
-should_abort(int retcode)
+    ကိန်းပြည့်
+should_abort(ကိန်းပြည့် retcode)
 {
-    return ((retcode == FAIL && trylevel != 0 && !emsg_silent) || aborting());
+    ပြန်ပေး ((retcode == FAIL && trylevel != 0 && !emsg_silent) || aborting());
 }
 
 /*
@@ -123,12 +123,12 @@ should_abort(int retcode)
  * to find finally clauses to be executed, and that some errors in skipped
  * commands are still reported.
  */
-    int
+    ကိန်းပြည့်
 aborted_in_try(void)
 {
     // This function is only called after an error.  In this case, "force_abort"
     // determines whether searching for finally clauses is necessary.
-    return force_abort;
+    ပြန်ပေး force_abort;
 }
 
 /*
@@ -140,11 +140,11 @@ aborted_in_try(void)
  * most specific one and used as the exception value.  The "severe" flag can be
  * set to TRUE, if a later but severer message should be used instead.
  */
-    int
+    ကိန်းပြည့်
 cause_errthrow(
     char_u	*mesg,
-    int		severe,
-    int		*ignore)
+    ကိန်းပြည့်		severe,
+    ကိန်းပြည့်		*ignore)
 {
     msglist_T	*elem;
     msglist_T	**plist;
@@ -155,8 +155,8 @@ cause_errthrow(
      * level.  Also when no exception can be thrown.  The message will be
      * displayed by emsg().
      */
-    if (suppress_errthrow)
-	return FALSE;
+    အကယ်၍ (suppress_errthrow)
+	ပြန်ပေး FALSE;
 
     /*
      * If emsg() has not been called previously, temporarily reset
@@ -167,7 +167,7 @@ cause_errthrow(
      * multiply, even when the expression is evaluated from a finally clause
      * that was activated due to an aborting error, interrupt, or exception.
      */
-    if (!did_emsg)
+    အကယ်၍ (!did_emsg)
     {
 	cause_abort = force_abort;
 	force_abort = FALSE;
@@ -181,8 +181,8 @@ cause_errthrow(
      * currently throwing an exception, do nothing.  The message text will
      * then be stored to v:errmsg by emsg() without displaying it.
      */
-    if (((trylevel == 0 && !cause_abort) || emsg_silent) && !did_throw)
-	return FALSE;
+    အကယ်၍ (((trylevel == 0 && !cause_abort) || emsg_silent) && !did_throw)
+	ပြန်ပေး FALSE;
 
     /*
      * Ignore an interrupt message when inside a try conditional or when an
@@ -191,10 +191,10 @@ cause_errthrow(
      * interrupt exception is catchable by the innermost try conditional and
      * not replaced by an interrupt message error exception.
      */
-    if (mesg == (char_u *)_(e_interrupted))
+    အကယ်၍ (mesg == (char_u *)_(e_interrupted))
     {
 	*ignore = TRUE;
-	return TRUE;
+	ပြန်ပေး TRUE;
     }
 
     /*
@@ -212,27 +212,27 @@ cause_errthrow(
      * exception currently being thrown to prevent it from being caught.  Just
      * execute finally clauses and terminate.
      */
-    if (did_throw)
+    အကယ်၍ (did_throw)
     {
 	// When discarding an interrupt exception, reset got_int to prevent the
 	// same interrupt being converted to an exception again and discarding
 	// the error exception we are about to throw here.
-	if (current_exception->type == ET_INTERRUPT)
+	အကယ်၍ (current_exception->type == ET_INTERRUPT)
 	    got_int = FALSE;
 	discard_current_exception();
     }
 
 #ifdef THROW_TEST
-    if (!THROW_ON_ERROR)
+    အကယ်၍ (!THROW_ON_ERROR)
     {
 	/*
 	 * Print error message immediately without searching for a matching
 	 * catch clause; just finally clauses are executed before the script
 	 * is terminated.
 	 */
-	return FALSE;
+	ပြန်ပေး FALSE;
     }
-    else
+    မဟုတ်ပါက
 #endif
     {
 	/*
@@ -245,46 +245,46 @@ cause_errthrow(
 	 * returned.  -  Throw only the first of several errors in a row, except
 	 * a severe error is following.
 	 */
-	if (msg_list != NULL)
+	အကယ်၍ (msg_list != NULL)
 	{
 	    plist = msg_list;
-	    while (*plist != NULL)
+	    နေစဉ် (*plist != NULL)
 		plist = &(*plist)->next;
 
 	    elem = ALLOC_CLEAR_ONE(msglist_T);
-	    if (elem == NULL)
+	    အကယ်၍ (elem == NULL)
 	    {
 		suppress_errthrow = TRUE;
 		emsg(_(e_out_of_memory));
 	    }
-	    else
+	    မဟုတ်ပါက
 	    {
-		elem->msg = (char *)vim_strsave(mesg);
-		if (elem->msg == NULL)
+		elem->msg = (var_na *)vim_strsave(mesg);
+		အကယ်၍ (elem->msg == NULL)
 		{
 		    vim_free(elem);
 		    suppress_errthrow = TRUE;
 		    emsg(_(e_out_of_memory));
 		}
-		else
+		မဟုတ်ပါက
 		{
 		    elem->next = NULL;
 		    elem->throw_msg = NULL;
 		    *plist = elem;
-		    if (plist == msg_list || severe)
+		    အကယ်၍ (plist == msg_list || severe)
 		    {
-			char	    *tmsg;
+			var_na	    *tmsg;
 
 			// Skip the extra "Vim " prefix for message "E457".
 			tmsg = elem->msg;
-			if (STRNCMP(tmsg, "Vim E", 5) == 0
+			အကယ်၍ (STRNCMP(tmsg, "Vim E", 5) == 0
 				&& VIM_ISDIGIT(tmsg[5])
 				&& VIM_ISDIGIT(tmsg[6])
 				&& VIM_ISDIGIT(tmsg[7])
 				&& tmsg[8] == ':'
 				&& tmsg[9] == ' ')
 			    (*msg_list)->throw_msg = &tmsg[4];
-			else
+			မဟုတ်ပါက
 			    (*msg_list)->throw_msg = tmsg;
 		    }
 
@@ -296,7 +296,7 @@ cause_errthrow(
 		}
 	    }
 	}
-	return TRUE;
+	ပြန်ပေး TRUE;
     }
 }
 
@@ -309,7 +309,7 @@ free_msglist(msglist_T *l)
     msglist_T  *messages, *next;
 
     messages = l;
-    while (messages != NULL)
+    နေစဉ် (messages != NULL)
     {
 	next = messages->next;
 	vim_free(messages->msg);
@@ -342,7 +342,7 @@ do_errthrow(cstack_T *cstack, char_u *cmdname)
      * Ensure that all commands in nested function calls and sourced files
      * are aborted immediately.
      */
-    if (cause_abort)
+    အကယ်၍ (cause_abort)
     {
 	cause_abort = FALSE;
 	force_abort = TRUE;
@@ -350,16 +350,16 @@ do_errthrow(cstack_T *cstack, char_u *cmdname)
 
     // If no exception is to be thrown or the conversion should be done after
     // returning to a previous invocation of do_one_cmd(), do nothing.
-    if (msg_list == NULL || *msg_list == NULL)
-	return;
+    အကယ်၍ (msg_list == NULL || *msg_list == NULL)
+	ပြန်ပေး;
 
-    if (throw_exception(*msg_list, ET_ERROR, cmdname) == FAIL)
+    အကယ်၍ (throw_exception(*msg_list, ET_ERROR, cmdname) == FAIL)
 	free_msglist(*msg_list);
-    else
+    မဟုတ်ပါက
     {
-	if (cstack != NULL)
+	အကယ်၍ (cstack != NULL)
 	    do_throw(cstack);
-	else
+	မဟုတ်ပါက
 	    need_rethrow = TRUE;
     }
     *msg_list = NULL;
@@ -370,28 +370,28 @@ do_errthrow(cstack_T *cstack, char_u *cmdname)
  * exception if appropriate.  Return TRUE if the current exception is discarded,
  * FALSE otherwise.
  */
-    int
+    ကိန်းပြည့်
 do_intthrow(cstack_T *cstack)
 {
     /*
      * If no interrupt occurred or no try conditional is active and no exception
      * is being thrown, do nothing (for compatibility of non-EH scripts).
      */
-    if (!got_int || (trylevel == 0 && !did_throw))
-	return FALSE;
+    အကယ်၍ (!got_int || (trylevel == 0 && !did_throw))
+	ပြန်ပေး FALSE;
 
 #ifdef THROW_TEST	// avoid warning for condition always true
-    if (!THROW_ON_INTERRUPT)
+    အကယ်၍ (!THROW_ON_INTERRUPT)
     {
 	/*
 	 * The interrupt aborts everything except for executing finally clauses.
 	 * Discard any user or error or interrupt exception currently being
 	 * thrown.
 	 */
-	if (did_throw)
+	အကယ်၍ (did_throw)
 	    discard_current_exception();
     }
-    else
+    မဟုတ်ပါက
 #endif
     {
 	/*
@@ -402,65 +402,65 @@ do_intthrow(cstack_T *cstack)
 	 * being thrown, do nothing.
 	 *
 	 */
-	if (did_throw)
+	အကယ်၍ (did_throw)
 	{
-	    if (current_exception->type == ET_INTERRUPT)
-		return FALSE;
+	    အကယ်၍ (current_exception->type == ET_INTERRUPT)
+		ပြန်ပေး FALSE;
 
 	    // An interrupt exception replaces any user or error exception.
 	    discard_current_exception();
 	}
-	if (throw_exception("Vim:Interrupt", ET_INTERRUPT, NULL) != FAIL)
+	အကယ်၍ (throw_exception("Vim:Interrupt", ET_INTERRUPT, NULL) != FAIL)
 	    do_throw(cstack);
     }
 
-    return TRUE;
+    ပြန်ပေး TRUE;
 }
 
 /*
  * Get an exception message that is to be stored in current_exception->value.
  */
-    char *
+    var_na *
 get_exception_string(
     void	*value,
     except_type_T type,
     char_u	*cmdname,
-    int		*should_free)
+    ကိန်းပြည့်		*should_free)
 {
-    char	*ret;
-    char	*mesg;
-    int		cmdlen;
-    char	*p, *val;
+    var_na	*ret;
+    var_na	*mesg;
+    ကိန်းပြည့်		cmdlen;
+    var_na	*p, *val;
 
-    if (type == ET_ERROR)
+    အကယ်၍ (type == ET_ERROR)
     {
 	*should_free = TRUE;
 	mesg = ((msglist_T *)value)->throw_msg;
-	if (cmdname != NULL && *cmdname != NUL)
+	အကယ်၍ (cmdname != NULL && *cmdname != NUL)
 	{
-	    cmdlen = (int)STRLEN(cmdname);
-	    ret = (char *)vim_strnsave((char_u *)"Vim(",
+	    cmdlen = (ကိန်းပြည့်)STRLEN(cmdname);
+	    ret = (var_na *)vim_strnsave((char_u *)"Vim(",
 						4 + cmdlen + 2 + STRLEN(mesg));
-	    if (ret == NULL)
-		return ret;
+	    အကယ်၍ (ret == NULL)
+		ပြန်ပေး ret;
 	    STRCPY(&ret[4], cmdname);
 	    STRCPY(&ret[4 + cmdlen], "):");
 	    val = ret + 4 + cmdlen + 2;
 	}
-	else
+	မဟုတ်ပါက
 	{
-	    ret = (char *)vim_strnsave((char_u *)"Vim:", 4 + STRLEN(mesg));
-	    if (ret == NULL)
-		return ret;
+	    ret = (var_na *)vim_strnsave((char_u *)"Vim:", 4 + STRLEN(mesg));
+	    အကယ်၍ (ret == NULL)
+		ပြန်ပေး ret;
 	    val = ret + 4;
 	}
 
 	// msg_add_fname may have been used to prefix the message with a file
 	// name in quotes.  In the exception value, put the file name in
 	// parentheses and move it to the end.
-	for (p = mesg; ; p++)
+	အတွက် (p = mesg; ; p++)
 	{
-	    if (*p == NUL
+	    အကယ်၍ (*p == NUL
 		    || (*p == 'E'
 			&& VIM_ISDIGIT(p[1])
 			&& (p[2] == ':'
@@ -469,32 +469,32 @@ get_exception_string(
 				    || (VIM_ISDIGIT(p[3])
 					&& p[4] == ':'))))))
 	    {
-		if (*p == NUL || p == mesg)
+		အကယ်၍ (*p == NUL || p == mesg)
 		    STRCAT(val, mesg);  // 'E123' missing or at beginning
-		else
+		မဟုတ်ပါက
 		{
 		    // '"filename" E123: message text'
-		    if (mesg[0] != '"' || p-2 < &mesg[1] ||
+		    အကယ်၍ (mesg[0] != '"' || p-2 < &mesg[1] ||
 			    p[-2] != '"' || p[-1] != ' ')
 			// "E123:" is part of the file name.
 			continue;
 
 		    STRCAT(val, p);
 		    p[-2] = NUL;
-		    sprintf((char *)(val + STRLEN(p)), " (%s)", &mesg[1]);
+		    sprintf((var_na *)(val + STRLEN(p)), " (%s)", &mesg[1]);
 		    p[-2] = '"';
 		}
-		break;
+		bha_nga;
 	    }
 	}
     }
-    else
+    မဟုတ်ပါက
     {
 	*should_free = FALSE;
 	ret = value;
     }
 
-    return ret;
+    ပြန်ပေး ret;
 }
 
 
@@ -504,20 +504,20 @@ get_exception_string(
  * user or interrupt exception, or points to a message list in case of an
  * error exception.
  */
-    int
+    ကိန်းပြည့်
 throw_exception(void *value, except_type_T type, char_u *cmdname)
 {
     except_T	*excp;
-    int		should_free;
+    ကိန်းပြည့်		should_free;
 
     /*
      * Disallow faking Interrupt or error exceptions as user exceptions.  They
      * would be treated differently from real interrupt or error exceptions
      * when no active try block is found, see do_cmdline().
      */
-    if (type == ET_USER)
+    အကယ်၍ (type == ET_USER)
     {
-	if (STRNCMP((char_u *)value, "Vim", 3) == 0
+	အကယ်၍ (STRNCMP((char_u *)value, "Vim", 3) == 0
 		&& (((char_u *)value)[3] == NUL || ((char_u *)value)[3] == ':'
 		    || ((char_u *)value)[3] == '('))
 	{
@@ -527,20 +527,20 @@ throw_exception(void *value, except_type_T type, char_u *cmdname)
     }
 
     excp = ALLOC_ONE(except_T);
-    if (excp == NULL)
+    အကယ်၍ (excp == NULL)
 	goto nomem;
 
-    if (type == ET_ERROR)
+    အကယ်၍ (type == ET_ERROR)
 	// Store the original message and prefix the exception value with
 	// "Vim:" or, if a command name is given, "Vim(cmdname):".
 	excp->messages = (msglist_T *)value;
 
     excp->value = get_exception_string(value, type, cmdname, &should_free);
-    if (excp->value == NULL && should_free)
+    အကယ်၍ (excp->value == NULL && should_free)
 	goto nomem;
 
     excp->type = type;
-    if (type == ET_ERROR && ((msglist_T *)value)->sfile != NULL)
+    အကယ်၍ (type == ET_ERROR && ((msglist_T *)value)->sfile != NULL)
     {
 	msglist_T *entry = (msglist_T *)value;
 
@@ -548,14 +548,14 @@ throw_exception(void *value, except_type_T type, char_u *cmdname)
 	entry->sfile = NULL;
 	excp->throw_lnum = entry->slnum;
     }
-    else
+    မဟုတ်ပါက
     {
 	excp->throw_name = estack_sfile(ESTACK_NONE);
-	if (excp->throw_name == NULL)
+	အကယ်၍ (excp->throw_name == NULL)
 	    excp->throw_name = vim_strsave((char_u *)"");
-	if (excp->throw_name == NULL)
+	အကယ်၍ (excp->throw_name == NULL)
 	{
-	    if (should_free)
+	    အကယ်၍ (should_free)
 		vim_free(excp->value);
 	    goto nomem;
 	}
@@ -563,35 +563,35 @@ throw_exception(void *value, except_type_T type, char_u *cmdname)
     }
 
     excp->stacktrace = stacktrace_create();
-    if (excp->stacktrace != NULL)
+    အကယ်၍ (excp->stacktrace != NULL)
 	excp->stacktrace->lv_refcount = 1;
 
-    if (p_verbose >= 13 || debug_break_level > 0)
+    အကယ်၍ (p_verbose >= 13 || debug_break_level > 0)
     {
-	int	save_msg_silent = msg_silent;
+	ကိန်းပြည့်	save_msg_silent = msg_silent;
 
-	if (debug_break_level > 0)
+	အကယ်၍ (debug_break_level > 0)
 	    msg_silent = FALSE;		// display messages
-	else
+	မဟုတ်ပါက
 	    verbose_enter();
 	++no_wait_return;
-	if (debug_break_level > 0 || *p_vfile == NUL)
+	အကယ်၍ (debug_break_level > 0 || *p_vfile == NUL)
 	    msg_scroll = TRUE;	    // always scroll up, don't overwrite
 
 	smsg(_("Exception thrown: %s"), excp->value);
 	msg_puts("\n");   // don't overwrite this either
 
-	if (debug_break_level > 0 || *p_vfile == NUL)
+	အကယ်၍ (debug_break_level > 0 || *p_vfile == NUL)
 	    cmdline_row = msg_row;
 	--no_wait_return;
-	if (debug_break_level > 0)
+	အကယ်၍ (debug_break_level > 0)
 	    msg_silent = save_msg_silent;
-	else
+	မဟုတ်ပါက
 	    verbose_leave();
     }
 
     current_exception = excp;
-    return OK;
+    ပြန်ပေး OK;
 
 nomem:
     vim_free(excp);
@@ -599,7 +599,7 @@ nomem:
     emsg(_(e_out_of_memory));
 fail:
     current_exception = NULL;
-    return FAIL;
+    ပြန်ပေး FAIL;
 }
 
 /*
@@ -607,48 +607,48 @@ fail:
  * caught and the catch clause has been ended normally.
  */
     static void
-discard_exception(except_T *excp, int was_finished)
+discard_exception(except_T *excp, ကိန်းပြည့် was_finished)
 {
     char_u		*saved_IObuff;
 
-    if (current_exception == excp)
+    အကယ်၍ (current_exception == excp)
 	current_exception = NULL;
-    if (excp == NULL)
+    အကယ်၍ (excp == NULL)
     {
 	internal_error("discard_exception()");
-	return;
+	ပြန်ပေး;
     }
 
-    if (p_verbose >= 13 || debug_break_level > 0)
+    အကယ်၍ (p_verbose >= 13 || debug_break_level > 0)
     {
-	int	save_msg_silent = msg_silent;
+	ကိန်းပြည့်	save_msg_silent = msg_silent;
 
 	saved_IObuff = vim_strsave(IObuff);
-	if (debug_break_level > 0)
+	အကယ်၍ (debug_break_level > 0)
 	    msg_silent = FALSE;		// display messages
-	else
+	မဟုတ်ပါက
 	    verbose_enter();
 	++no_wait_return;
-	if (debug_break_level > 0 || *p_vfile == NUL)
+	အကယ်၍ (debug_break_level > 0 || *p_vfile == NUL)
 	    msg_scroll = TRUE;	    // always scroll up, don't overwrite
 	smsg(was_finished
 		    ? _("Exception finished: %s")
 		    : _("Exception discarded: %s"),
 		excp->value);
 	msg_puts("\n");   // don't overwrite this either
-	if (debug_break_level > 0 || *p_vfile == NUL)
+	အကယ်၍ (debug_break_level > 0 || *p_vfile == NUL)
 	    cmdline_row = msg_row;
 	--no_wait_return;
-	if (debug_break_level > 0)
+	အကယ်၍ (debug_break_level > 0)
 	    msg_silent = save_msg_silent;
-	else
+	မဟုတ်ပါက
 	    verbose_leave();
 	STRCPY(IObuff, saved_IObuff);
 	vim_free(saved_IObuff);
     }
-    if (excp->type != ET_INTERRUPT)
+    အကယ်၍ (excp->type != ET_INTERRUPT)
 	vim_free(excp->value);
-    if (excp->type == ET_ERROR)
+    အကယ်၍ (excp->type == ET_ERROR)
 	free_msglist(excp->messages);
     vim_free(excp->throw_name);
     list_unref(excp->stacktrace);
@@ -661,7 +661,7 @@ discard_exception(except_T *excp, int was_finished)
     void
 discard_current_exception(void)
 {
-    if (current_exception != NULL)
+    အကယ်၍ (current_exception != NULL)
 	discard_exception(current_exception, FALSE);
     did_throw = FALSE;
     need_rethrow = FALSE;
@@ -677,42 +677,42 @@ catch_exception(except_T *excp)
     caught_stack = excp;
     set_vim_var_string(VV_EXCEPTION, (char_u *)excp->value, -1);
     set_vim_var_list(VV_STACKTRACE, excp->stacktrace);
-    if (*excp->throw_name != NUL)
+    အကယ်၍ (*excp->throw_name != NUL)
     {
 	size_t	IObufflen;
 
-	if (excp->throw_lnum != 0)
-	    IObufflen = vim_snprintf_safelen((char *)IObuff, IOSIZE, _("%s, line %ld"),
+	အကယ်၍ (excp->throw_lnum != 0)
+	    IObufflen = vim_snprintf_safelen((var_na *)IObuff, IOSIZE, _("%s, line %ld"),
 				    excp->throw_name, (long)excp->throw_lnum);
-	else
-	    IObufflen = vim_snprintf_safelen((char *)IObuff, IOSIZE, "%s", excp->throw_name);
-	set_vim_var_string(VV_THROWPOINT, IObuff, (int)IObufflen);
+	မဟုတ်ပါက
+	    IObufflen = vim_snprintf_safelen((var_na *)IObuff, IOSIZE, "%s", excp->throw_name);
+	set_vim_var_string(VV_THROWPOINT, IObuff, (ကိန်းပြည့်)IObufflen);
     }
-    else
+    မဟုတ်ပါက
 	// throw_name not set on an exception from a command that was typed.
 	set_vim_var_string(VV_THROWPOINT, NULL, -1);
 
-    if (p_verbose >= 13 || debug_break_level > 0)
+    အကယ်၍ (p_verbose >= 13 || debug_break_level > 0)
     {
-	int	save_msg_silent = msg_silent;
+	ကိန်းပြည့်	save_msg_silent = msg_silent;
 
-	if (debug_break_level > 0)
+	အကယ်၍ (debug_break_level > 0)
 	    msg_silent = FALSE;		// display messages
-	else
+	မဟုတ်ပါက
 	    verbose_enter();
 	++no_wait_return;
-	if (debug_break_level > 0 || *p_vfile == NUL)
+	အကယ်၍ (debug_break_level > 0 || *p_vfile == NUL)
 	    msg_scroll = TRUE;	    // always scroll up, don't overwrite
 
 	smsg(_("Exception caught: %s"), excp->value);
 	msg_puts("\n");   // don't overwrite this either
 
-	if (debug_break_level > 0 || *p_vfile == NUL)
+	အကယ်၍ (debug_break_level > 0 || *p_vfile == NUL)
 	    cmdline_row = msg_row;
 	--no_wait_return;
-	if (debug_break_level > 0)
+	အကယ်၍ (debug_break_level > 0)
 	    msg_silent = save_msg_silent;
-	else
+	မဟုတ်ပါက
 	    verbose_leave();
     }
 }
@@ -723,32 +723,32 @@ catch_exception(except_T *excp)
     void
 finish_exception(except_T *excp)
 {
-    if (excp != caught_stack)
+    အကယ်၍ (excp != caught_stack)
 	internal_error("finish_exception()");
     caught_stack = caught_stack->caught;
-    if (caught_stack != NULL)
+    အကယ်၍ (caught_stack != NULL)
     {
 	set_vim_var_string(VV_EXCEPTION, (char_u *)caught_stack->value, -1);
 	set_vim_var_list(VV_STACKTRACE, caught_stack->stacktrace);
-	if (*caught_stack->throw_name != NUL)
+	အကယ်၍ (*caught_stack->throw_name != NUL)
 	{
 	    size_t  IObufflen;
 
-	    if (caught_stack->throw_lnum != 0)
-		IObufflen = vim_snprintf_safelen((char *)IObuff, IOSIZE,
+	    အကယ်၍ (caught_stack->throw_lnum != 0)
+		IObufflen = vim_snprintf_safelen((var_na *)IObuff, IOSIZE,
 			_("%s, line %ld"), caught_stack->throw_name,
 			(long)caught_stack->throw_lnum);
-	    else
-		IObufflen = vim_snprintf_safelen((char *)IObuff, IOSIZE, "%s",
+	    မဟုတ်ပါက
+		IObufflen = vim_snprintf_safelen((var_na *)IObuff, IOSIZE, "%s",
 						    caught_stack->throw_name);
-	    set_vim_var_string(VV_THROWPOINT, IObuff, (int)IObufflen);
+	    set_vim_var_string(VV_THROWPOINT, IObuff, (ကိန်းပြည့်)IObufflen);
 	}
-	else
+	မဟုတ်ပါက
 	    // throw_name not set on an exception from a command that was
 	    // typed.
 	    set_vim_var_string(VV_THROWPOINT, NULL, -1);
     }
-    else
+    မဟုတ်ပါက
     {
 	set_vim_var_string(VV_EXCEPTION, NULL, -1);
 	set_vim_var_string(VV_THROWPOINT, NULL, -1);
@@ -779,7 +779,7 @@ exception_state_save(exception_state_T *estate)
 exception_state_restore(exception_state_T *estate)
 {
     // Handle any outstanding exceptions before restoring the state
-    if (did_throw)
+    အကယ်၍ (did_throw)
 	handle_did_throw();
     current_exception = estate->estate_current_exception;
     did_throw = estate->estate_did_throw;
@@ -816,64 +816,64 @@ exception_state_clear(void)
  * or the exception value for a pending exception.
  */
     static void
-report_pending(int action, int pending, void *value)
+report_pending(ကိန်းပြည့် action, ကိန်းပြည့် pending, void *value)
 {
-    char	*mesg;
-    char	*s;
-    int		save_msg_silent;
+    var_na	*mesg;
+    var_na	*s;
+    ကိန်းပြည့်		save_msg_silent;
 
 
     switch (action)
     {
-	case RP_MAKE:
+	pak_sa RP_MAKE:
 	    mesg = _("%s made pending");
-	    break;
-	case RP_RESUME:
+	    bha_nga;
+	pak_sa RP_RESUME:
 	    mesg = _("%s resumed");
-	    break;
+	    bha_nga;
 	// case RP_DISCARD:
 	default:
 	    mesg = _("%s discarded");
-	    break;
+	    bha_nga;
     }
 
     switch (pending)
     {
-	case CSTP_NONE:
-	    return;
+	pak_sa CSTP_NONE:
+	    ပြန်ပေး;
 
-	case CSTP_CONTINUE:
+	pak_sa CSTP_CONTINUE:
 	    s = ":continue";
-	    break;
-	case CSTP_BREAK:
+	    bha_nga;
+	pak_sa CSTP_BREAK:
 	    s = ":break";
-	    break;
-	case CSTP_FINISH:
+	    bha_nga;
+	pak_sa CSTP_FINISH:
 	    s = ":finish";
-	    break;
-	case CSTP_RETURN:
+	    bha_nga;
+	pak_sa CSTP_RETURN:
 	    // ":return" command producing value, allocated
-	    s = (char *)get_return_cmd(value);
-	    break;
+	    s = (var_na *)get_return_cmd(value);
+	    bha_nga;
 
 	default:
-	    if (pending & CSTP_THROW)
+	    အကယ်၍ (pending & CSTP_THROW)
 	    {
-		vim_snprintf((char *)IObuff, IOSIZE, mesg, _("Exception"));
-		mesg = (char *)vim_strnsave(IObuff, STRLEN(IObuff) + 4);
+		vim_snprintf((var_na *)IObuff, IOSIZE, mesg, _("Exception"));
+		mesg = (var_na *)vim_strnsave(IObuff, STRLEN(IObuff) + 4);
 		STRCAT(mesg, ": %s");
-		s = (char *)((except_T *)value)->value;
+		s = (var_na *)((except_T *)value)->value;
 	    }
-	    else if ((pending & CSTP_ERROR) && (pending & CSTP_INTERRUPT))
+	    မဟုတ်ပါက အကယ်၍ ((pending & CSTP_ERROR) && (pending & CSTP_INTERRUPT))
 		s = _("Error and interrupt");
-	    else if (pending & CSTP_ERROR)
+	    မဟုတ်ပါက အကယ်၍ (pending & CSTP_ERROR)
 		s = _("Error");
-	    else // if (pending & CSTP_INTERRUPT)
+	    မဟုတ်ပါက // if (pending & CSTP_INTERRUPT)
 		s = _("Interrupt");
     }
 
     save_msg_silent = msg_silent;
-    if (debug_break_level > 0)
+    အကယ်၍ (debug_break_level > 0)
 	msg_silent = FALSE;	// display messages
     ++no_wait_return;
     msg_scroll = TRUE;		// always scroll up, don't overwrite
@@ -881,12 +881,12 @@ report_pending(int action, int pending, void *value)
     msg_puts("\n");   // don't overwrite this either
     cmdline_row = msg_row;
     --no_wait_return;
-    if (debug_break_level > 0)
+    အကယ်၍ (debug_break_level > 0)
 	msg_silent = save_msg_silent;
 
-    if (pending == CSTP_RETURN)
+    အကယ်၍ (pending == CSTP_RETURN)
 	vim_free(s);
-    else if (pending & CSTP_THROW)
+    မဟုတ်ပါက အကယ်၍ (pending & CSTP_THROW)
 	vim_free(mesg);
 }
 
@@ -895,14 +895,14 @@ report_pending(int action, int pending, void *value)
  * the 'verbose' option or when debugging.
  */
     void
-report_make_pending(int pending, void *value)
+report_make_pending(ကိန်းပြည့် pending, void *value)
 {
-    if (p_verbose >= 14 || debug_break_level > 0)
+    အကယ်၍ (p_verbose >= 14 || debug_break_level > 0)
     {
-	if (debug_break_level <= 0)
+	အကယ်၍ (debug_break_level <= 0)
 	    verbose_enter();
 	report_pending(RP_MAKE, pending, value);
-	if (debug_break_level <= 0)
+	အကယ်၍ (debug_break_level <= 0)
 	    verbose_leave();
     }
 }
@@ -912,14 +912,14 @@ report_make_pending(int pending, void *value)
  * it if required by the 'verbose' option or when debugging.
  */
     static void
-report_resume_pending(int pending, void *value)
+report_resume_pending(ကိန်းပြည့် pending, void *value)
 {
-    if (p_verbose >= 14 || debug_break_level > 0)
+    အကယ်၍ (p_verbose >= 14 || debug_break_level > 0)
     {
-	if (debug_break_level <= 0)
+	အကယ်၍ (debug_break_level <= 0)
 	    verbose_enter();
 	report_pending(RP_RESUME, pending, value);
-	if (debug_break_level <= 0)
+	အကယ်၍ (debug_break_level <= 0)
 	    verbose_leave();
     }
 }
@@ -929,14 +929,14 @@ report_resume_pending(int pending, void *value)
  * by the 'verbose' option or when debugging.
  */
     static void
-report_discard_pending(int pending, void *value)
+report_discard_pending(ကိန်းပြည့် pending, void *value)
 {
-    if (p_verbose >= 14 || debug_break_level > 0)
+    အကယ်၍ (p_verbose >= 14 || debug_break_level > 0)
     {
-	if (debug_break_level <= 0)
+	အကယ်၍ (debug_break_level <= 0)
 	    verbose_enter();
 	report_pending(RP_DISCARD, pending, value);
-	if (debug_break_level <= 0)
+	အကယ်၍ (debug_break_level <= 0)
 	    verbose_leave();
     }
 }
@@ -945,45 +945,45 @@ report_discard_pending(int pending, void *value)
  * Return TRUE if "arg" is only a variable, register, environment variable,
  * option name or string.
  */
-    int
+    ကိန်းပြည့်
 cmd_is_name_only(char_u *arg)
 {
     char_u  *p = arg;
     char_u  *alias = NULL;
-    int	    name_only = FALSE;
+    ကိန်းပြည့်	    name_only = FALSE;
 
-    if (*p == '@')
+    အကယ်၍ (*p == '@')
     {
 	++p;
-	if (*p != NUL)
+	အကယ်၍ (*p != NUL)
 	    ++p;
     }
-    else if (*p == '\'' || *p == '"')
+    မဟုတ်ပါက အကယ်၍ (*p == '\'' || *p == '"')
     {
-	int	    r;
+	ကိန်းပြည့်	    r;
 
-	if (*p == '"')
+	အကယ်၍ (*p == '"')
 	    r = eval_string(&p, NULL, FALSE, FALSE);
-	else
+	မဟုတ်ပါက
 	    r = eval_lit_string(&p, NULL, FALSE, FALSE);
-	if (r == FAIL)
-	    return FALSE;
+	အကယ်၍ (r == FAIL)
+	    ပြန်ပေး FALSE;
     }
-    else
+    မဟုတ်ပါက
     {
-	if (*p == '&')
+	အကယ်၍ (*p == '&')
 	{
 	    ++p;
-	    if (STRNCMP("l:", p, 2) == 0 || STRNCMP("g:", p, 2) == 0)
+	    အကယ်၍ (STRNCMP("l:", p, 2) == 0 || STRNCMP("g:", p, 2) == 0)
 		p += 2;
 	}
-	else if (*p == '$')
+	မဟုတ်ပါက အကယ်၍ (*p == '$')
 	    ++p;
 	(void)get_name_len(&p, &alias, FALSE, FALSE);
     }
     name_only = ends_excmd2(arg, skipwhite(p));
     vim_free(alias);
-    return name_only;
+    ပြန်ပေး name_only;
 }
 
 /*
@@ -994,18 +994,18 @@ ex_eval(exarg_T *eap)
 {
     typval_T	tv;
     evalarg_T	evalarg;
-    int		name_only = FALSE;
+    ကိန်းပြည့်		name_only = FALSE;
     long	lnum = SOURCING_LNUM;
 
-    if (in_vim9script())
+    အကယ်၍ (in_vim9script())
 	name_only = cmd_is_name_only(eap->arg);
 
     fill_evalarg_from_eap(&evalarg, eap, eap->skip);
 
-    if (eval0(eap->arg, &tv, eap, &evalarg) == OK)
+    အကယ်၍ (eval0(eap->arg, &tv, eap, &evalarg) == OK)
     {
 	clear_tv(&tv);
-	if (in_vim9script() && name_only
+	အကယ်၍ (in_vim9script() && name_only
 		&& (evalarg.eval_tofree == NULL
 		    || ends_excmd2(evalarg.eval_tofree,
 					      skipwhite(evalarg.eval_tofree))))
@@ -1026,7 +1026,7 @@ ex_eval(exarg_T *eap)
 enter_block(cstack_T *cstack)
 {
     ++cstack->cs_idx;
-    if (in_vim9script() && current_sctx.sc_sid > 0)
+    အကယ်၍ (in_vim9script() && current_sctx.sc_sid > 0)
     {
 	scriptitem_T *si = SCRIPT_ITEM(current_sctx.sc_sid);
 
@@ -1034,7 +1034,7 @@ enter_block(cstack_T *cstack)
 	cstack->cs_block_id[cstack->cs_idx] = ++si->sn_last_block_id;
 	si->sn_current_block_id = si->sn_last_block_id;
     }
-    else
+    မဟုတ်ပါက
     {
 	// Just in case in_vim9script() does not return the same value when the
 	// block ends.
@@ -1046,14 +1046,14 @@ enter_block(cstack_T *cstack)
     static void
 leave_block(cstack_T *cstack)
 {
-    if (in_vim9script() && SCRIPT_ID_VALID(current_sctx.sc_sid))
+    အကယ်၍ (in_vim9script() && SCRIPT_ID_VALID(current_sctx.sc_sid))
     {
 	scriptitem_T	*si = SCRIPT_ITEM(current_sctx.sc_sid);
-	int		i;
-	int		func_defined =
+	ကိန်းပြည့်		i;
+	ကိန်းပြည့်		func_defined =
 			       cstack->cs_flags[cstack->cs_idx] & CSF_FUNC_DEF;
 
-	for (i = cstack->cs_script_var_len[cstack->cs_idx];
+	အတွက် (i = cstack->cs_script_var_len[cstack->cs_idx];
 					       i < si->sn_var_vals.ga_len; ++i)
 	{
 	    svar_T	*sv = ((svar_T *)si->sn_var_vals.ga_data) + i;
@@ -1061,16 +1061,16 @@ leave_block(cstack_T *cstack)
 	    // sv_name is set to NULL if it was already removed.  This happens
 	    // when it was defined in an inner block and no functions were
 	    // defined there.
-	    if (sv->sv_name != NULL)
+	    အကယ်၍ (sv->sv_name != NULL)
 		// Remove a variable declared inside the block, if it still
 		// exists, from sn_vars and move the value into sn_all_vars
 		// if "func_defined" is non-zero.
 		hide_script_var(si, i, func_defined);
 	}
 
-	if (cstack->cs_idx == 0)
+	အကယ်၍ (cstack->cs_idx == 0)
 	    si->sn_current_block_id = 0;
-	else
+	မဟုတ်ပါက
 	    si->sn_current_block_id = cstack->cs_block_id[cstack->cs_idx - 1];
     }
     --cstack->cs_idx;
@@ -1082,14 +1082,14 @@ leave_block(cstack_T *cstack)
     void
 ex_if(exarg_T *eap)
 {
-    int		error;
-    int		skip;
-    int		result;
+    ကိန်းပြည့်		error;
+    ကိန်းပြည့်		skip;
+    ကိန်းပြည့်		result;
     cstack_T	*cstack = eap->cstack;
 
-    if (cstack->cs_idx == CSTACK_LEN - 1)
+    အကယ်၍ (cstack->cs_idx == CSTACK_LEN - 1)
 	eap->errmsg = _(e_if_nesting_too_deep);
-    else
+    မဟုတ်ပါက
     {
 	enter_block(cstack);
 	cstack->cs_flags[cstack->cs_idx] = 0;
@@ -1103,12 +1103,12 @@ ex_if(exarg_T *eap)
 
 	result = eval_to_bool(eap->arg, &error, eap, skip, FALSE);
 
-	if (!skip && !error)
+	အကယ်၍ (!skip && !error)
 	{
-	    if (result)
+	    အကယ်၍ (result)
 		cstack->cs_flags[cstack->cs_idx] = CSF_ACTIVE | CSF_TRUE;
 	}
-	else
+	မဟုတ်ပါက
 	    // set TRUE, so this conditional will never get active
 	    cstack->cs_flags[cstack->cs_idx] = CSF_TRUE;
     }
@@ -1122,14 +1122,14 @@ ex_endif(exarg_T *eap)
 {
     cstack_T	*cstack = eap->cstack;
 
-    if (cmdmod_error(FALSE))
-	return;
+    အကယ်၍ (cmdmod_error(FALSE))
+	ပြန်ပေး;
     did_endif = TRUE;
-    if (cstack->cs_idx < 0
+    အကယ်၍ (cstack->cs_idx < 0
 	    || (cstack->cs_flags[cstack->cs_idx]
 				& (CSF_WHILE | CSF_FOR | CSF_TRY | CSF_BLOCK)))
 	eap->errmsg = _(e_endif_without_if);
-    else
+    မဟုတ်ပါက
     {
 	/*
 	 * When debugging or a breakpoint was encountered, display the debug
@@ -1140,7 +1140,7 @@ ex_endif(exarg_T *eap)
 	 * Doing this here prevents an exception for a parsing error being
 	 * discarded by throwing the interrupt exception later on.
 	 */
-	if (!(cstack->cs_flags[cstack->cs_idx] & CSF_TRUE)
+	အကယ်၍ (!(cstack->cs_flags[cstack->cs_idx] & CSF_TRUE)
 						    && dbg_check_skipped(eap))
 	    (void)do_intthrow(cstack);
 
@@ -1154,9 +1154,9 @@ ex_endif(exarg_T *eap)
     void
 ex_else(exarg_T *eap)
 {
-    int		error;
-    int		skip;
-    int		result;
+    ကိန်းပြည့်		error;
+    ကိန်းပြည့်		skip;
+    ကိန်းပြည့်		result;
     cstack_T	*cstack = eap->cstack;
 
     /*
@@ -1166,30 +1166,30 @@ ex_else(exarg_T *eap)
     skip = did_emsg || got_int || did_throw || (cstack->cs_idx > 0
 	    && !(cstack->cs_flags[cstack->cs_idx - 1] & CSF_ACTIVE));
 
-    if (cstack->cs_idx < 0
+    အကယ်၍ (cstack->cs_idx < 0
 	    || (cstack->cs_flags[cstack->cs_idx]
 				& (CSF_WHILE | CSF_FOR | CSF_TRY | CSF_BLOCK)))
     {
-	if (eap->cmdidx == CMD_else)
+	အကယ်၍ (eap->cmdidx == CMD_else)
 	{
 	    eap->errmsg = _(e_else_without_if);
-	    return;
+	    ပြန်ပေး;
 	}
 	eap->errmsg = _(e_elseif_without_if);
 	skip = TRUE;
     }
-    else if (cstack->cs_flags[cstack->cs_idx] & CSF_ELSE)
+    မဟုတ်ပါက အကယ်၍ (cstack->cs_flags[cstack->cs_idx] & CSF_ELSE)
     {
-	if (eap->cmdidx == CMD_else)
+	အကယ်၍ (eap->cmdidx == CMD_else)
 	{
 	    eap->errmsg = _(e_multiple_else);
-	    return;
+	    ပြန်ပေး;
 	}
 	eap->errmsg = _(e_elseif_after_else);
 	skip = TRUE;
     }
 
-    if (cstack->cs_idx >= 0)
+    အကယ်၍ (cstack->cs_idx >= 0)
     {
 	// Variables declared in the previous block can no longer be
 	// used.  Needs to be done before setting "cs_flags".
@@ -1198,13 +1198,13 @@ ex_else(exarg_T *eap)
     }
 
     // if skipping or the ":if" was TRUE, reset ACTIVE, otherwise set it
-    if (skip || cstack->cs_flags[cstack->cs_idx] & CSF_TRUE)
+    အကယ်၍ (skip || cstack->cs_flags[cstack->cs_idx] & CSF_TRUE)
     {
-	if (eap->errmsg == NULL)
+	အကယ်၍ (eap->errmsg == NULL)
 	    cstack->cs_flags[cstack->cs_idx] = CSF_TRUE;
 	skip = TRUE;	// don't evaluate an ":elseif"
     }
-    else
+    မဟုတ်ပါက
 	cstack->cs_flags[cstack->cs_idx] = CSF_ACTIVE;
 
     /*
@@ -1217,20 +1217,20 @@ ex_else(exarg_T *eap)
      * for a parsing errors is discarded when throwing the interrupt exception
      * later on.
      */
-    if (!skip && dbg_check_skipped(eap) && got_int)
+    အကယ်၍ (!skip && dbg_check_skipped(eap) && got_int)
     {
 	(void)do_intthrow(cstack);
 	skip = TRUE;
     }
 
-    if (eap->cmdidx == CMD_elseif)
+    အကယ်၍ (eap->cmdidx == CMD_elseif)
     {
 	// When skipping we ignore most errors, but a missing expression is
 	// wrong, perhaps it should have been "else".
 	// A double quote here is the start of a string, not a comment.
-	if (skip && *eap->arg != '"' && ends_excmd(*eap->arg))
+	အကယ်၍ (skip && *eap->arg != '"' && ends_excmd(*eap->arg))
 	    semsg(_(e_invalid_expression_str), eap->arg);
-	else
+	မဟုတ်ပါက
 	    result = eval_to_bool(eap->arg, &error, eap, skip, FALSE);
 
 	// When throwing error exceptions, we want to throw always the first
@@ -1238,18 +1238,18 @@ ex_else(exarg_T *eap)
 	// a conditional error was detected above and there is another failure
 	// when parsing the expression.  Since the skip flag is set in this
 	// case, the parsing error will be ignored by emsg().
-	if (!skip && !error)
+	အကယ်၍ (!skip && !error)
 	{
-	    if (result)
+	    အကယ်၍ (result)
 		cstack->cs_flags[cstack->cs_idx] = CSF_ACTIVE | CSF_TRUE;
-	    else
+	    မဟုတ်ပါက
 		cstack->cs_flags[cstack->cs_idx] = 0;
 	}
-	else if (eap->errmsg == NULL)
+	မဟုတ်ပါက အကယ်၍ (eap->errmsg == NULL)
 	    // set TRUE, so this conditional will never get active
 	    cstack->cs_flags[cstack->cs_idx] = CSF_TRUE;
     }
-    else
+    မဟုတ်ပါက
 	cstack->cs_flags[cstack->cs_idx] |= CSF_ELSE;
 }
 
@@ -1259,35 +1259,35 @@ ex_else(exarg_T *eap)
     void
 ex_while(exarg_T *eap)
 {
-    int		error;
-    int		skip;
-    int		result;
+    ကိန်းပြည့်		error;
+    ကိန်းပြည့်		skip;
+    ကိန်းပြည့်		result;
     cstack_T	*cstack = eap->cstack;
-    int		prev_cs_flags = 0;
+    ကိန်းပြည့်		prev_cs_flags = 0;
 
-    if (cstack->cs_idx == CSTACK_LEN - 1)
+    အကယ်၍ (cstack->cs_idx == CSTACK_LEN - 1)
 	eap->errmsg = _(e_while_for_nesting_too_deep);
-    else
+    မဟုတ်ပါက
     {
 	/*
 	 * The loop flag is set when we have jumped back from the matching
 	 * ":endwhile" or ":endfor".  When not set, need to initialise this
 	 * cstack entry.
 	 */
-	if ((cstack->cs_lflags & CSL_HAD_LOOP) == 0)
+	အကယ်၍ ((cstack->cs_lflags & CSL_HAD_LOOP) == 0)
 	{
 	    enter_block(cstack);
 	    ++cstack->cs_looplevel;
 	    cstack->cs_line[cstack->cs_idx] = -1;
 	}
-	else
+	မဟုတ်ပါက
 	{
-	    if (in_vim9script() && SCRIPT_ID_VALID(current_sctx.sc_sid))
+	    အကယ်၍ (in_vim9script() && SCRIPT_ID_VALID(current_sctx.sc_sid))
 	    {
 		scriptitem_T	*si = SCRIPT_ITEM(current_sctx.sc_sid);
-		int		i;
-		int		first;
-		int		func_defined = cstack->cs_flags[cstack->cs_idx]
+		ကိန်းပြည့်		i;
+		ကိန်းပြည့်		first;
+		ကိန်းပြည့်		func_defined = cstack->cs_flags[cstack->cs_idx]
 								& CSF_FUNC_DEF;
 
 		// Any variables defined in the previous round are no longer
@@ -1296,21 +1296,21 @@ ex_while(exarg_T *eap)
 		// Do this backwards, so that vars defined in a later round are
 		// found first.
 		first = cstack->cs_script_var_len[cstack->cs_idx];
-		if (eap->cmdidx == CMD_for)
+		အကယ်၍ (eap->cmdidx == CMD_for)
 		{
 		    forinfo_T	*fi = cstack->cs_forinfo[cstack->cs_idx];
 
 		    first += fi == NULL || fi->fi_varcount == 0
 							 ? 1 : fi->fi_varcount;
 		}
-		for (i = si->sn_var_vals.ga_len - 1; i >= first; --i)
+		အတွက် (i = si->sn_var_vals.ga_len - 1; i >= first; --i)
 		{
 		    svar_T	*sv = ((svar_T *)si->sn_var_vals.ga_data) + i;
 
 		    // sv_name is set to NULL if it was already removed.  This
 		    // happens when it was defined in an inner block and no
 		    // functions were defined there.
-		    if (sv->sv_name != NULL)
+		    အကယ်၍ (sv->sv_name != NULL)
 			// Remove a variable declared inside the block, if it
 			// still exists, from sn_vars.
 			hide_script_var(si, i, func_defined);
@@ -1333,14 +1333,14 @@ ex_while(exarg_T *eap)
 	 */
 	skip = did_emsg || got_int || did_throw || (cstack->cs_idx > 0
 		&& !(cstack->cs_flags[cstack->cs_idx - 1] & CSF_ACTIVE));
-	if (eap->cmdidx == CMD_while)
+	အကယ်၍ (eap->cmdidx == CMD_while)
 	{
 	    /*
 	     * ":while bool-expr"
 	     */
 	    result = eval_to_bool(eap->arg, &error, eap, skip, FALSE);
 	}
-	else
+	မဟုတ်ပါက
 	{
 	    forinfo_T	*fi;
 	    evalarg_T	evalarg;
@@ -1349,7 +1349,7 @@ ex_while(exarg_T *eap)
 	     * ":for var in list-expr"
 	     */
 	    fill_evalarg_from_eap(&evalarg, eap, skip);
-	    if ((cstack->cs_lflags & CSL_HAD_LOOP) != 0)
+	    အကယ်၍ ((cstack->cs_lflags & CSL_HAD_LOOP) != 0)
 	    {
 		// Jumping here from a ":continue" or ":endfor": use the
 		// previously evaluated list.
@@ -1359,7 +1359,7 @@ ex_while(exarg_T *eap)
 		// the "in expr" is not used, skip over it
 		skip_for_lines(fi, &evalarg);
 	    }
-	    else
+	    မဟုတ်ပါက
 	    {
 		long save_lnum = SOURCING_LNUM;
 
@@ -1372,20 +1372,20 @@ ex_while(exarg_T *eap)
 	    }
 
 	    // use the element at the start of the list and advance
-	    if (!error && fi != NULL && !skip)
+	    အကယ်၍ (!error && fi != NULL && !skip)
 		result = next_for_item(fi, eap->arg);
-	    else
+	    မဟုတ်ပါက
 		result = FALSE;
-	    if (fi != NULL)
+	    အကယ်၍ (fi != NULL)
 		// OR all the cs_flags together, if a function was defined in
 		// any round then the loop variable may have been used.
 		fi->fi_cs_flags |= prev_cs_flags;
 
-	    if (!result)
+	    အကယ်၍ (!result)
 	    {
 		// If a function was defined in any round then set the
 		// CSF_FUNC_DEF flag now, so that it's seen by leave_block().
-		if (fi != NULL && (fi->fi_cs_flags & CSF_FUNC_DEF))
+		အကယ်၍ (fi != NULL && (fi->fi_cs_flags & CSF_FUNC_DEF))
 		    cstack->cs_flags[cstack->cs_idx] |= CSF_FUNC_DEF;
 
 		free_for_info(fi);
@@ -1399,19 +1399,19 @@ ex_while(exarg_T *eap)
 	 * loop flag, so do_cmdline() will set the line number in cs_line[].
 	 * If executing the command a second time, clear the loop flag.
 	 */
-	if (!skip && !error && result)
+	အကယ်၍ (!skip && !error && result)
 	{
 	    cstack->cs_flags[cstack->cs_idx] |= (CSF_ACTIVE | CSF_TRUE);
 	    cstack->cs_lflags ^= CSL_HAD_LOOP;
 	}
-	else
+	မဟုတ်ပါက
 	{
 	    cstack->cs_lflags &= ~CSL_HAD_LOOP;
 	    // If the ":while" evaluates to FALSE or ":for" is past the end of
 	    // the list, show the debug prompt at the ":endwhile"/":endfor" as
 	    // if there was a ":break" in a ":while"/":for" evaluating to
 	    // TRUE.
-	    if (!skip && !error)
+	    အကယ်၍ (!skip && !error)
 		cstack->cs_flags[cstack->cs_idx] |= CSF_TRUE;
 	}
     }
@@ -1423,19 +1423,19 @@ ex_while(exarg_T *eap)
     void
 ex_continue(exarg_T *eap)
 {
-    int		idx;
+    ကိန်းပြည့်		idx;
     cstack_T	*cstack = eap->cstack;
 
-    if (cstack->cs_looplevel <= 0 || cstack->cs_idx < 0)
+    အကယ်၍ (cstack->cs_looplevel <= 0 || cstack->cs_idx < 0)
 	eap->errmsg = _(e_continue_without_while_or_for);
-    else
+    မဟုတ်ပါက
     {
 	// Try to find the matching ":while".  This might stop at a try
 	// conditional not in its finally clause (which is then to be executed
 	// next).  Therefore, inactivate all conditionals except the ":while"
 	// itself (if reached).
 	idx = cleanup_conditionals(cstack, CSF_WHILE | CSF_FOR, FALSE);
-	if (idx >= 0 && (cstack->cs_flags[idx] & (CSF_WHILE | CSF_FOR)))
+	အကယ်၍ (idx >= 0 && (cstack->cs_flags[idx] & (CSF_WHILE | CSF_FOR)))
 	{
 	    rewind_conditionals(cstack, idx, CSF_TRY, &cstack->cs_trylevel);
 
@@ -1445,7 +1445,7 @@ ex_continue(exarg_T *eap)
 	     */
 	    cstack->cs_lflags |= CSL_HAD_CONT;	// let do_cmdline() handle it
 	}
-	else
+	မဟုတ်ပါက
 	{
 	    // If a try conditional not in its finally clause is reached first,
 	    // make the ":continue" pending for execution at the ":endtry".
@@ -1461,19 +1461,19 @@ ex_continue(exarg_T *eap)
     void
 ex_break(exarg_T *eap)
 {
-    int		idx;
+    ကိန်းပြည့်		idx;
     cstack_T	*cstack = eap->cstack;
 
-    if (cstack->cs_looplevel <= 0 || cstack->cs_idx < 0)
+    အကယ်၍ (cstack->cs_looplevel <= 0 || cstack->cs_idx < 0)
 	eap->errmsg = _(e_break_without_while_or_for);
-    else
+    မဟုတ်ပါက
     {
 	// Inactivate conditionals until the matching ":while" or a try
 	// conditional not in its finally clause (which is then to be
 	// executed next) is found.  In the latter case, make the ":break"
 	// pending for execution at the ":endtry".
 	idx = cleanup_conditionals(cstack, CSF_WHILE | CSF_FOR, TRUE);
-	if (idx >= 0 && !(cstack->cs_flags[idx] & (CSF_WHILE | CSF_FOR)))
+	အကယ်၍ (idx >= 0 && !(cstack->cs_flags[idx] & (CSF_WHILE | CSF_FOR)))
 	{
 	    cstack->cs_pending[idx] = CSTP_BREAK;
 	    report_make_pending(CSTP_BREAK, NULL);
@@ -1488,58 +1488,58 @@ ex_break(exarg_T *eap)
 ex_endwhile(exarg_T *eap)
 {
     cstack_T	*cstack = eap->cstack;
-    int		idx;
-    char	*err;
-    int		csf;
-    int		fl;
+    ကိန်းပြည့်		idx;
+    var_na	*err;
+    ကိန်းပြည့်		csf;
+    ကိန်းပြည့်		fl;
 
-    if (cmdmod_error(TRUE))
-	return;
+    အကယ်၍ (cmdmod_error(TRUE))
+	ပြန်ပေး;
 
-    if (eap->cmdidx == CMD_endwhile)
+    အကယ်၍ (eap->cmdidx == CMD_endwhile)
     {
 	err = e_endwhile_without_while;
 	csf = CSF_WHILE;
     }
-    else
+    မဟုတ်ပါက
     {
 	err = e_endfor_without_for;
 	csf = CSF_FOR;
     }
 
-    if (cstack->cs_looplevel <= 0 || cstack->cs_idx < 0)
+    အကယ်၍ (cstack->cs_looplevel <= 0 || cstack->cs_idx < 0)
 	eap->errmsg = _(err);
-    else
+    မဟုတ်ပါက
     {
 	fl = cstack->cs_flags[cstack->cs_idx];
-	if (!(fl & csf))
+	အကယ်၍ (!(fl & csf))
 	{
 	    // If we are in a ":while" or ":for" but used the wrong endloop
 	    // command, do not rewind to the next enclosing ":for"/":while".
-	    if (fl & CSF_WHILE)
+	    အကယ်၍ (fl & CSF_WHILE)
 		eap->errmsg = _(e_using_endfor_with_while);
-	    else if (fl & CSF_FOR)
+	    မဟုတ်ပါက အကယ်၍ (fl & CSF_FOR)
 		eap->errmsg = _(e_using_endwhile_with_for);
 	}
-	if (!(fl & (CSF_WHILE | CSF_FOR)))
+	အကယ်၍ (!(fl & (CSF_WHILE | CSF_FOR)))
 	{
-	    if (!(fl & CSF_TRY))
+	    အကယ်၍ (!(fl & CSF_TRY))
 		eap->errmsg = _(e_missing_endif);
-	    else if (fl & CSF_FINALLY)
+	    မဟုတ်ပါက အကယ်၍ (fl & CSF_FINALLY)
 		eap->errmsg = _(e_missing_endtry);
 	    // Try to find the matching ":while" and report what's missing.
-	    for (idx = cstack->cs_idx; idx > 0; --idx)
+	    အတွက် (idx = cstack->cs_idx; idx > 0; --idx)
 	    {
 		fl =  cstack->cs_flags[idx];
-		if ((fl & CSF_TRY) && !(fl & CSF_FINALLY))
+		အကယ်၍ ((fl & CSF_TRY) && !(fl & CSF_FINALLY))
 		{
 		    // Give up at a try conditional not in its finally clause.
 		    // Ignore the ":endwhile"/":endfor".
 		    eap->errmsg = _(err);
-		    return;
+		    ပြန်ပေး;
 		}
-		if (fl & csf)
-		    break;
+		အကယ်၍ (fl & csf)
+		    bha_nga;
 	    }
 	    // Cleanup and rewind all contained (and unclosed) conditionals.
 	    (void)cleanup_conditionals(cstack, CSF_WHILE | CSF_FOR, FALSE);
@@ -1556,7 +1556,7 @@ ex_endwhile(exarg_T *eap)
 	 * prevents that an exception for a parsing error is discarded when
 	 * throwing the interrupt exception later on.
 	 */
-	else if (cstack->cs_flags[cstack->cs_idx] & CSF_TRUE
+	မဟုတ်ပါက အကယ်၍ (cstack->cs_flags[cstack->cs_idx] & CSF_TRUE
 		&& !(cstack->cs_flags[cstack->cs_idx] & CSF_ACTIVE)
 		&& dbg_check_skipped(eap))
 	    (void)do_intthrow(cstack);
@@ -1575,9 +1575,9 @@ ex_block(exarg_T *eap)
 {
     cstack_T	*cstack = eap->cstack;
 
-    if (cstack->cs_idx == CSTACK_LEN - 1)
+    အကယ်၍ (cstack->cs_idx == CSTACK_LEN - 1)
 	eap->errmsg = _(e_block_nesting_too_deep);
-    else
+    မဟုတ်ပါက
     {
 	enter_block(cstack);
 	cstack->cs_flags[cstack->cs_idx] = CSF_BLOCK | CSF_ACTIVE | CSF_TRUE;
@@ -1592,45 +1592,45 @@ ex_endblock(exarg_T *eap)
 {
     cstack_T	*cstack = eap->cstack;
 
-    if (cstack->cs_idx < 0
+    အကယ်၍ (cstack->cs_idx < 0
 	    || (cstack->cs_flags[cstack->cs_idx] & CSF_BLOCK) == 0)
 	eap->errmsg = _(e_endblock_without_block);
-    else
+    မဟုတ်ပါက
 	leave_block(cstack);
 }
 
-    int
+    ကိန်းပြည့်
 inside_block(exarg_T *eap)
 {
     cstack_T	*cstack = eap->cstack;
-    int		i;
+    ကိန်းပြည့်		i;
 
     // Control flow commands handle '|' themselves and must not be treated
     // as if inside a block even when they are - otherwise '|' separators
     // in "try | catch | endtry" etc. would not be recognized.
     switch (eap->cmdidx)
     {
-	case CMD_if:
-	case CMD_elseif:
-	case CMD_else:
-	case CMD_endif:
-	case CMD_while:
-	case CMD_endwhile:
-	case CMD_for:
-	case CMD_endfor:
-	case CMD_try:
-	case CMD_catch:
-	case CMD_finally:
-	case CMD_endtry:
-	    return FALSE;
+	pak_sa CMD_if:
+	pak_sa CMD_elseif:
+	pak_sa CMD_else:
+	pak_sa CMD_endif:
+	pak_sa CMD_while:
+	pak_sa CMD_endwhile:
+	pak_sa CMD_for:
+	pak_sa CMD_endfor:
+	pak_sa CMD_try:
+	pak_sa CMD_catch:
+	pak_sa CMD_finally:
+	pak_sa CMD_endtry:
+	    ပြန်ပေး FALSE;
 	default:
-	    break;
+	    bha_nga;
     }
 
-    for (i = 0; i <= cstack->cs_idx; ++i)
-	if (cstack->cs_flags[i] & CSF_BLOCK)
-	    return TRUE;
-    return FALSE;
+    အတွက် (i = 0; i <= cstack->cs_idx; ++i)
+	အကယ်၍ (cstack->cs_flags[i] & CSF_BLOCK)
+	    ပြန်ပေး TRUE;
+    ပြန်ပေး FALSE;
 }
 
 /*
@@ -1642,9 +1642,9 @@ ex_throw(exarg_T *eap)
     char_u	*arg = eap->arg;
     char_u	*value;
 
-    if (*arg != NUL && *arg != '|' && *arg != '\n')
+    အကယ်၍ (*arg != NUL && *arg != '|' && *arg != '\n')
 	value = eval_to_string_skip(arg, eap, eap->skip);
-    else
+    မဟုတ်ပါက
     {
 	emsg(_(e_argument_required));
 	value = NULL;
@@ -1652,11 +1652,11 @@ ex_throw(exarg_T *eap)
 
     // On error or when an exception is thrown during argument evaluation, do
     // not throw.
-    if (!eap->skip && value != NULL)
+    အကယ်၍ (!eap->skip && value != NULL)
     {
-	if (throw_exception(value, ET_USER, NULL) == FAIL)
+	အကယ်၍ (throw_exception(value, ET_USER, NULL) == FAIL)
 	    vim_free(value);
-	else
+	မဟုတ်ပါက
 	    do_throw(eap->cstack);
     }
 }
@@ -1669,8 +1669,8 @@ ex_throw(exarg_T *eap)
     void
 do_throw(cstack_T *cstack)
 {
-    int		idx;
-    int		inactivate_try = FALSE;
+    ကိန်းပြည့်		idx;
+    ကိန်းပြည့်		inactivate_try = FALSE;
 
     /*
      * Cleanup and inactivate up to the next surrounding try conditional that
@@ -1682,21 +1682,21 @@ do_throw(cstack_T *cstack)
      * the next surrounding try conditional.
      */
 #ifndef THROW_ON_ERROR_TRUE
-    if (did_emsg && !THROW_ON_ERROR)
+    အကယ်၍ (did_emsg && !THROW_ON_ERROR)
     {
 	inactivate_try = TRUE;
 	did_emsg = FALSE;
     }
 #endif
 #ifndef THROW_ON_INTERRUPT_TRUE
-    if (got_int && !THROW_ON_INTERRUPT)
+    အကယ်၍ (got_int && !THROW_ON_INTERRUPT)
     {
 	inactivate_try = TRUE;
 	got_int = FALSE;
     }
 #endif
     idx = cleanup_conditionals(cstack, 0, inactivate_try);
-    if (idx >= 0)
+    အကယ်၍ (idx >= 0)
     {
 	/*
 	 * If this try conditional is active and we are before its first
@@ -1711,11 +1711,11 @@ do_throw(cstack_T *cstack)
 	 * from a preceding throw of a user or error or interrupt exception to
 	 * the matching catch clause or the finally clause.
 	 */
-	if (!(cstack->cs_flags[idx] & CSF_CAUGHT))
+	အကယ်၍ (!(cstack->cs_flags[idx] & CSF_CAUGHT))
 	{
-	    if (cstack->cs_flags[idx] & CSF_ACTIVE)
+	    အကယ်၍ (cstack->cs_flags[idx] & CSF_ACTIVE)
 		cstack->cs_flags[idx] |= CSF_THROWN;
-	    else
+	    မဟုတ်ပါက
 		// THROWN may have already been set for a catchable exception
 		// that has been discarded.  Ensure it is reset for the new
 		// exception.
@@ -1724,20 +1724,20 @@ do_throw(cstack_T *cstack)
 	cstack->cs_flags[idx] &= ~CSF_ACTIVE;
 	cstack->cs_exception[idx] = current_exception;
     }
-#if 0
+#အကယ်၍ 0
     // TODO: Add optimization below.  Not yet done because of interface
     // problems to eval.c and ex_cmds2.c. (Servatius)
-    else
+    မဟုတ်ပါက
     {
 	/*
 	 * There are no catch clauses to check or finally clauses to execute.
 	 * End the current script or function.  The exception will be rethrown
 	 * in the caller.
 	 */
-	if (getline_equal(eap->getline, eap->cookie, get_func_line))
+	အကယ်၍ (getline_equal(eap->getline, eap->cookie, get_func_line))
 	    current_funccal->returned = TRUE;
 	elseif (eap->get_func_line == getsourceline)
-	    ((struct source_cookie *)eap->cookie)->finished = TRUE;
+	    ((sa_nracanaa source_cookie *)eap->cookie)->finished = TRUE;
     }
 #endif
 
@@ -1750,15 +1750,15 @@ do_throw(cstack_T *cstack)
     void
 ex_try(exarg_T *eap)
 {
-    int		skip;
+    ကိန်းပြည့်		skip;
     cstack_T	*cstack = eap->cstack;
 
-    if (cmdmod_error(FALSE))
-	return;
+    အကယ်၍ (cmdmod_error(FALSE))
+	ပြန်ပေး;
 
-    if (cstack->cs_idx == CSTACK_LEN - 1)
+    အကယ်၍ (cstack->cs_idx == CSTACK_LEN - 1)
 	eap->errmsg = _(e_try_nesting_too_deep);
-    else
+    မဟုတ်ပါက
     {
 	enter_block(cstack);
 	++cstack->cs_trylevel;
@@ -1772,7 +1772,7 @@ ex_try(exarg_T *eap)
 	skip = did_emsg || got_int || did_throw || (cstack->cs_idx > 0
 		&& !(cstack->cs_flags[cstack->cs_idx - 1] & CSF_ACTIVE));
 
-	if (!skip)
+	အကယ်၍ (!skip)
 	{
 	    // Set ACTIVE and TRUE.  TRUE means that the corresponding ":catch"
 	    // commands should check for a match if an exception is thrown and
@@ -1795,14 +1795,14 @@ ex_try(exarg_T *eap)
 	     * The effect is then just freeing the memory that was allocated
 	     * to save the value.
 	     */
-	    if (emsg_silent)
+	    အကယ်၍ (emsg_silent)
 	    {
 		eslist_T	*elem;
 
-		elem = ALLOC_ONE(struct eslist_elem);
-		if (elem == NULL)
+		elem = ALLOC_ONE(sa_nracanaa eslist_elem);
+		အကယ်၍ (elem == NULL)
 		    emsg(_(e_out_of_memory));
-		else
+		မဟုတ်ပါက
 		{
 		    elem->saved_emsg_silent = emsg_silent;
 		    elem->next = cstack->cs_emsg_silent_list;
@@ -1822,74 +1822,74 @@ ex_try(exarg_T *eap)
     void
 ex_catch(exarg_T *eap)
 {
-    int		idx = 0;
-    int		give_up = FALSE;
-    int		skip = FALSE;
-    int		caught = FALSE;
+    ကိန်းပြည့်		idx = 0;
+    ကိန်းပြည့်		give_up = FALSE;
+    ကိန်းပြည့်		skip = FALSE;
+    ကိန်းပြည့်		caught = FALSE;
     char_u	*end;
-    int		save_char = 0;
+    ကိန်းပြည့်		save_char = 0;
     char_u	*save_cpo;
     regmatch_T	regmatch;
-    int		prev_got_int;
+    ကိန်းပြည့်		prev_got_int;
     cstack_T	*cstack = eap->cstack;
     char_u	*pat;
 
-    if (cmdmod_error(FALSE))
-	return;
+    အကယ်၍ (cmdmod_error(FALSE))
+	ပြန်ပေး;
 
-    if (cstack->cs_trylevel <= 0 || cstack->cs_idx < 0)
+    အကယ်၍ (cstack->cs_trylevel <= 0 || cstack->cs_idx < 0)
     {
 	eap->errmsg = _(e_catch_without_try);
 	give_up = TRUE;
     }
-    else
+    မဟုတ်ပါက
     {
-	if (!(cstack->cs_flags[cstack->cs_idx] & CSF_TRY))
+	အကယ်၍ (!(cstack->cs_flags[cstack->cs_idx] & CSF_TRY))
 	{
 	    // Report what's missing if the matching ":try" is not in its
 	    // finally clause.
 	    eap->errmsg = get_end_emsg(cstack);
 	    skip = TRUE;
 	}
-	for (idx = cstack->cs_idx; idx > 0; --idx)
-	    if (cstack->cs_flags[idx] & CSF_TRY)
-		break;
-	if (cstack->cs_flags[idx] & CSF_TRY)
+	အတွက် (idx = cstack->cs_idx; idx > 0; --idx)
+	    အကယ်၍ (cstack->cs_flags[idx] & CSF_TRY)
+		bha_nga;
+	အကယ်၍ (cstack->cs_flags[idx] & CSF_TRY)
 	    cstack->cs_flags[idx] |= CSF_CATCH;
-	if (cstack->cs_flags[idx] & CSF_FINALLY)
+	အကယ်၍ (cstack->cs_flags[idx] & CSF_FINALLY)
 	{
 	    // Give up for a ":catch" after ":finally" and ignore it.
 	    // Just parse.
 	    eap->errmsg = _(e_catch_after_finally);
 	    give_up = TRUE;
 	}
-	else
+	မဟုတ်ပါက
 	    rewind_conditionals(cstack, idx, CSF_WHILE | CSF_FOR,
 						       &cstack->cs_looplevel);
     }
 
-    if (ends_excmd2(eap->cmd, eap->arg))   // no argument, catch all errors
+    အကယ်၍ (ends_excmd2(eap->cmd, eap->arg))   // no argument, catch all errors
     {
 	pat = (char_u *)".*";
 	end = NULL;
 	eap->nextcmd = find_nextcmd(eap->arg);
     }
-    else
+    မဟုတ်ပါက
     {
 	pat = eap->arg + 1;
 	end = skip_regexp_err(pat, *eap->arg, TRUE);
-	if (end == NULL)
+	အကယ်၍ (end == NULL)
 	    give_up = TRUE;
     }
 
-    if (!give_up)
+    အကယ်၍ (!give_up)
     {
 	/*
 	 * Don't do something when no exception has been thrown or when the
 	 * corresponding try block never got active (because of an inactive
 	 * surrounding conditional or after an error or interrupt or throw).
 	 */
-	if (!did_throw || !(cstack->cs_flags[idx] & CSF_TRUE))
+	အကယ်၍ (!did_throw || !(cstack->cs_flags[idx] & CSF_TRUE))
 	    skip = TRUE;
 
 	/*
@@ -1897,14 +1897,14 @@ ex_catch(exarg_T *eap)
 	 * a previous ":catch".  An exception that has replaced a discarded
 	 * exception is not checked (THROWN is not set then).
 	 */
-	if (!skip && (cstack->cs_flags[idx] & CSF_THROWN)
+	အကယ်၍ (!skip && (cstack->cs_flags[idx] & CSF_THROWN)
 		&& !(cstack->cs_flags[idx] & CSF_CAUGHT))
 	{
-	    if (end != NULL && *end != NUL
+	    အကယ်၍ (end != NULL && *end != NUL
 				      && !ends_excmd2(end, skipwhite(end + 1)))
 	    {
 		semsg(_(e_trailing_characters_str), end);
-		return;
+		ပြန်ပေး;
 	    }
 
 	    // When debugging or a breakpoint was encountered, display the
@@ -1914,11 +1914,11 @@ ex_catch(exarg_T *eap)
 	    // interrupt had occurred before the ":catch".  That is, discard
 	    // the original exception, replace it by an interrupt exception,
 	    // and don't catch it in this try block.
-	    if (!dbg_check_skipped(eap) || !do_intthrow(cstack))
+	    အကယ်၍ (!dbg_check_skipped(eap) || !do_intthrow(cstack))
 	    {
 		// Terminate the pattern and avoid the 'l' flag in 'cpoptions'
 		// while compiling it.
-		if (end != NULL)
+		အကယ်၍ (end != NULL)
 		{
 		    save_char = *end;
 		    *end = NUL;
@@ -1931,12 +1931,12 @@ ex_catch(exarg_T *eap)
 		regmatch.regprog = vim_regcomp(pat, RE_MAGIC + RE_STRING);
 		--emsg_off;
 		regmatch.rm_ic = FALSE;
-		if (end != NULL)
+		အကယ်၍ (end != NULL)
 		    *end = save_char;
 		p_cpo = save_cpo;
-		if (regmatch.regprog == NULL)
+		အကယ်၍ (regmatch.regprog == NULL)
 		    semsg(_(e_invalid_argument_str), pat);
-		else
+		မဟုတ်ပါက
 		{
 		    /*
 		     * Save the value of got_int and reset it.  We don't want
@@ -1953,7 +1953,7 @@ ex_catch(exarg_T *eap)
 	    }
 	}
 
-	if (caught)
+	အကယ်၍ (caught)
 	{
 	    // Make this ":catch" clause active and reset did_emsg, got_int,
 	    // and did_throw.  Put the exception on the caught stack.
@@ -1961,7 +1961,7 @@ ex_catch(exarg_T *eap)
 	    did_emsg = got_int = did_throw = FALSE;
 	    catch_exception((except_T *)cstack->cs_exception[idx]);
 
-	    if (cstack->cs_idx >= 0
+	    အကယ်၍ (cstack->cs_idx >= 0
 			       && (cstack->cs_flags[cstack->cs_idx] & CSF_TRY))
 	    {
 		// Variables declared in the previous block can no longer be
@@ -1975,10 +1975,10 @@ ex_catch(exarg_T *eap)
 	    // ":endtry" or when the catch clause is left by a ":continue",
 	    // ":break", ":return", ":finish", error, interrupt, or another
 	    // exception.
-	    if (cstack->cs_exception[cstack->cs_idx] != current_exception)
+	    အကယ်၍ (cstack->cs_exception[cstack->cs_idx] != current_exception)
 		internal_error("ex_catch()");
 	}
-	else
+	မဟုတ်ပါက
 	{
 	    /*
 	     * If there is a preceding catch clause and it caught the exception,
@@ -1994,7 +1994,7 @@ ex_catch(exarg_T *eap)
 	}
     }
 
-    if (end != NULL)
+    အကယ်၍ (end != NULL)
 	eap->nextcmd = find_nextcmd(end);
 }
 
@@ -2004,24 +2004,24 @@ ex_catch(exarg_T *eap)
     void
 ex_finally(exarg_T *eap)
 {
-    int		idx;
-    int		skip = FALSE;
-    int		pending = CSTP_NONE;
+    ကိန်းပြည့်		idx;
+    ကိန်းပြည့်		skip = FALSE;
+    ကိန်းပြည့်		pending = CSTP_NONE;
     cstack_T	*cstack = eap->cstack;
 
-    if (cmdmod_error(FALSE))
-	return;
+    အကယ်၍ (cmdmod_error(FALSE))
+	ပြန်ပေး;
 
-    for (idx = cstack->cs_idx; idx >= 0; --idx)
-	if (cstack->cs_flags[idx] & CSF_TRY)
-	    break;
-    if (cstack->cs_trylevel <= 0 || idx < 0)
+    အတွက် (idx = cstack->cs_idx; idx >= 0; --idx)
+	အကယ်၍ (cstack->cs_flags[idx] & CSF_TRY)
+	    bha_nga;
+    အကယ်၍ (cstack->cs_trylevel <= 0 || idx < 0)
     {
 	eap->errmsg = _(e_finally_without_try);
-	return;
+	ပြန်ပေး;
     }
 
-    if (!(cstack->cs_flags[cstack->cs_idx] & CSF_TRY))
+    အကယ်၍ (!(cstack->cs_flags[cstack->cs_idx] & CSF_TRY))
     {
 	eap->errmsg = get_end_emsg(cstack);
 	// Make this error pending, so that the commands in the following
@@ -2030,11 +2030,11 @@ ex_finally(exarg_T *eap)
 	pending = CSTP_ERROR;
     }
 
-    if (cstack->cs_flags[idx] & CSF_FINALLY)
+    အကယ်၍ (cstack->cs_flags[idx] & CSF_FINALLY)
     {
 	// Give up for a multiple ":finally" and ignore it.
 	eap->errmsg = _(e_multiple_finally);
-	return;
+	ပြန်ပေး;
     }
     rewind_conditionals(cstack, idx, CSF_WHILE | CSF_FOR,
 						   &cstack->cs_looplevel);
@@ -2049,12 +2049,12 @@ ex_finally(exarg_T *eap)
      */
     skip = !(cstack->cs_flags[cstack->cs_idx] & CSF_TRUE);
 
-    if (!skip)
+    အကယ်၍ (!skip)
     {
 	// When debugging or a breakpoint was encountered, display the
 	// debug prompt (if not already done).  The user then knows that the
 	// finally clause is executed.
-	if (dbg_check_skipped(eap))
+	အကယ်၍ (dbg_check_skipped(eap))
 	{
 	    // Handle a ">quit" debug command as if an interrupt had
 	    // occurred before the ":finally".  That is, discard the
@@ -2073,7 +2073,7 @@ ex_finally(exarg_T *eap)
 	 */
 	cleanup_conditionals(cstack, CSF_TRY, FALSE);
 
-	if (cstack->cs_idx >= 0
+	အကယ်၍ (cstack->cs_idx >= 0
 			   && (cstack->cs_flags[cstack->cs_idx] & CSF_TRY))
 	{
 	    // Variables declared in the previous block can no longer be
@@ -2097,17 +2097,17 @@ ex_finally(exarg_T *eap)
 	 * We must not set did_emsg here since that would suppress the
 	 * error message.
 	 */
-	if (pending == CSTP_ERROR || did_emsg || got_int || did_throw)
+	အကယ်၍ (pending == CSTP_ERROR || did_emsg || got_int || did_throw)
 	{
-	    if (cstack->cs_pending[cstack->cs_idx] == CSTP_RETURN)
+	    အကယ်၍ (cstack->cs_pending[cstack->cs_idx] == CSTP_RETURN)
 	    {
 		report_discard_pending(CSTP_RETURN,
 				       cstack->cs_rettv[cstack->cs_idx]);
 		discard_pending_return(cstack->cs_rettv[cstack->cs_idx]);
 	    }
-	    if (pending == CSTP_ERROR && !did_emsg)
+	    အကယ်၍ (pending == CSTP_ERROR && !did_emsg)
 		pending |= (THROW_ON_ERROR) ? CSTP_THROW : 0;
-	    else
+	    မဟုတ်ပါက
 		pending |= did_throw ? CSTP_THROW : 0;
 	    pending |= did_emsg  ? CSTP_ERROR     : 0;
 	    pending |= got_int   ? CSTP_INTERRUPT : 0;
@@ -2120,7 +2120,7 @@ ex_finally(exarg_T *eap)
 	    // exception.  When emsg() is called for a missing ":endif" or
 	    // a missing ":endwhile"/":endfor" detected here, the
 	    // exception will be discarded.
-	    if (did_throw && cstack->cs_exception[cstack->cs_idx]
+	    အကယ်၍ (did_throw && cstack->cs_exception[cstack->cs_idx]
 						     != current_exception)
 		internal_error("ex_finally()");
 	}
@@ -2142,23 +2142,23 @@ ex_finally(exarg_T *eap)
     void
 ex_endtry(exarg_T *eap)
 {
-    int		idx;
-    int		skip;
-    int		rethrow = FALSE;
-    int		pending = CSTP_NONE;
+    ကိန်းပြည့်		idx;
+    ကိန်းပြည့်		skip;
+    ကိန်းပြည့်		rethrow = FALSE;
+    ကိန်းပြည့်		pending = CSTP_NONE;
     void	*rettv = NULL;
     cstack_T	*cstack = eap->cstack;
 
-    if (cmdmod_error(FALSE))
-	return;
+    အကယ်၍ (cmdmod_error(FALSE))
+	ပြန်ပေး;
 
-    for (idx = cstack->cs_idx; idx >= 0; --idx)
-	if (cstack->cs_flags[idx] & CSF_TRY)
-	    break;
-    if (cstack->cs_trylevel <= 0 || idx < 0)
+    အတွက် (idx = cstack->cs_idx; idx >= 0; --idx)
+	အကယ်၍ (cstack->cs_flags[idx] & CSF_TRY)
+	    bha_nga;
+    အကယ်၍ (cstack->cs_trylevel <= 0 || idx < 0)
     {
 	eap->errmsg = _(e_endtry_without_try);
-	return;
+	ပြန်ပေး;
     }
 
     /*
@@ -2175,7 +2175,7 @@ ex_endtry(exarg_T *eap)
     skip = did_emsg || got_int || did_throw
 			     || !(cstack->cs_flags[cstack->cs_idx] & CSF_TRUE);
 
-    if (!(cstack->cs_flags[cstack->cs_idx] & CSF_TRY))
+    အကယ်၍ (!(cstack->cs_flags[cstack->cs_idx] & CSF_TRY))
     {
 	eap->errmsg = get_end_emsg(cstack);
 
@@ -2191,18 +2191,18 @@ ex_endtry(exarg_T *eap)
 	 * This does not affect the script termination due to the error
 	 * since "trylevel" is decremented after emsg() has been called.
 	 */
-	if (did_throw)
+	အကယ်၍ (did_throw)
 	    discard_current_exception();
 
 	// report eap->errmsg, also when there already was an error
 	did_emsg = FALSE;
     }
-    else
+    မဟုတ်ပါက
     {
 	idx = cstack->cs_idx;
 
 	// Check the flags only when not in a skipped block.
-	if (!skip && in_vim9script()
+	အကယ်၍ (!skip && in_vim9script()
 		     && (cstack->cs_flags[idx] & (CSF_CATCH|CSF_FINALLY)) == 0)
 	{
 	    // try/endtry without any catch or finally: give an error and
@@ -2216,7 +2216,7 @@ ex_endtry(exarg_T *eap)
 	 * a finally clause, we need to rethrow it after closing the try
 	 * conditional.
 	 */
-	if (did_throw && (cstack->cs_flags[idx] & CSF_TRUE)
+	အကယ်၍ (did_throw && (cstack->cs_flags[idx] & CSF_TRUE)
 		&& !(cstack->cs_flags[idx] & CSF_FINALLY))
 	    rethrow = TRUE;
     }
@@ -2228,21 +2228,21 @@ ex_endtry(exarg_T *eap)
     // on an interrupt or error not converted to an exception or when
     // a ":break", ":continue", ":return", or ":finish" is pending.  These
     // actions are carried out immediately.
-    if ((rethrow || (!skip && !(cstack->cs_flags[idx] & CSF_FINALLY)
+    အကယ်၍ ((rethrow || (!skip && !(cstack->cs_flags[idx] & CSF_FINALLY)
 		    && !cstack->cs_pending[idx]))
 	    && dbg_check_skipped(eap))
     {
 	// Handle a ">quit" debug command as if an interrupt had occurred
 	// before the ":endtry".  That is, throw an interrupt exception and
 	// set "skip" and "rethrow".
-	if (got_int)
+	အကယ်၍ (got_int)
 	{
 	    skip = TRUE;
 	    (void)do_intthrow(cstack);
 	    // The do_intthrow() call may have reset did_throw or
 	    // cstack->cs_pending[idx].
 	    rethrow = FALSE;
-	    if (did_throw && !(cstack->cs_flags[idx] & CSF_FINALLY))
+	    အကယ်၍ (did_throw && !(cstack->cs_flags[idx] & CSF_FINALLY))
 		rethrow = TRUE;
 	}
     }
@@ -2253,13 +2253,13 @@ ex_endtry(exarg_T *eap)
      * clause making an exception pending, we need to rethrow it.  Make it
      * the exception currently being thrown.
      */
-    if (!skip)
+    အကယ်၍ (!skip)
     {
 	pending = cstack->cs_pending[idx];
 	cstack->cs_pending[idx] = CSTP_NONE;
-	if (pending == CSTP_RETURN)
+	အကယ်၍ (pending == CSTP_RETURN)
 	    rettv = cstack->cs_rettv[idx];
-	else if (pending & CSTP_THROW)
+	မဟုတ်ပါက အကယ်၍ (pending & CSTP_THROW)
 	    current_exception = cstack->cs_exception[idx];
     }
 
@@ -2275,19 +2275,19 @@ ex_endtry(exarg_T *eap)
      */
     (void)cleanup_conditionals(cstack, CSF_TRY | CSF_SILENT, TRUE);
 
-    if (cstack->cs_idx >= 0 && (cstack->cs_flags[cstack->cs_idx] & CSF_TRY))
+    အကယ်၍ (cstack->cs_idx >= 0 && (cstack->cs_flags[cstack->cs_idx] & CSF_TRY))
 	leave_block(cstack);
     --cstack->cs_trylevel;
 
-    if (!skip)
+    အကယ်၍ (!skip)
     {
 	report_resume_pending(pending,
 		    (pending == CSTP_RETURN) ? rettv :
 		    (pending & CSTP_THROW) ? (void *)current_exception : NULL);
 	switch (pending)
 	{
-	    case CSTP_NONE:
-		break;
+	    pak_sa CSTP_NONE:
+		bha_nga;
 
 	    // Reactivate a pending ":continue", ":break", ":return",
 	    // ":finish" from the try block or a catch clause of this try
@@ -2296,18 +2296,18 @@ ex_endtry(exarg_T *eap)
 	    // or if the finally clause is present and executed a new error,
 	    // interrupt, throw, ":continue", ":break", ":return", or
 	    // ":finish".
-	    case CSTP_CONTINUE:
+	    pak_sa CSTP_CONTINUE:
 		ex_continue(eap);
-		break;
-	    case CSTP_BREAK:
+		bha_nga;
+	    pak_sa CSTP_BREAK:
 		ex_break(eap);
-		break;
-	    case CSTP_RETURN:
+		bha_nga;
+	    pak_sa CSTP_RETURN:
 		do_return(eap, FALSE, FALSE, rettv);
-		break;
-	    case CSTP_FINISH:
+		bha_nga;
+	    pak_sa CSTP_FINISH:
 		do_finish(eap, FALSE);
-		break;
+		bha_nga;
 
 	    // When the finally clause was entered due to an error,
 	    // interrupt or throw (as opposed to a ":continue", ":break",
@@ -2316,17 +2316,17 @@ ex_endtry(exarg_T *eap)
 	    // was a new error, interrupt, throw, ":continue", ":break",
 	    // ":return", or ":finish".  in the finally clause.
 	    default:
-		if (pending & CSTP_ERROR)
+		အကယ်၍ (pending & CSTP_ERROR)
 		    did_emsg = TRUE;
-		if (pending & CSTP_INTERRUPT)
+		အကယ်၍ (pending & CSTP_INTERRUPT)
 		    got_int = TRUE;
-		if (pending & CSTP_THROW)
+		အကယ်၍ (pending & CSTP_THROW)
 		    rethrow = TRUE;
-		break;
+		bha_nga;
 	}
     }
 
-    if (rethrow)
+    အကယ်၍ (rethrow)
 	// Rethrow the current exception (within this cstack).
 	do_throw(cstack);
 }
@@ -2355,14 +2355,14 @@ ex_endtry(exarg_T *eap)
     void
 enter_cleanup(cleanup_T *csp)
 {
-    int		pending = CSTP_NONE;
+    ကိန်းပြည့်		pending = CSTP_NONE;
 
     /*
      * Postpone did_emsg, got_int, did_throw.  The pending values will be
      * restored by leave_cleanup() except if there was an aborting error,
      * interrupt, or uncaught exception after this function ends.
      */
-    if (did_emsg || got_int || did_throw || need_rethrow)
+    အကယ်၍ (did_emsg || got_int || did_throw || need_rethrow)
     {
 	csp->pending = (did_emsg     ? CSTP_ERROR     : 0)
 		     | (got_int      ? CSTP_INTERRUPT : 0)
@@ -2375,15 +2375,15 @@ enter_cleanup(cleanup_T *csp)
 	// This is needed for the do_cmdline() call that is going to be made
 	// for autocommand execution.  We need not save *msg_list because
 	// there is an extra instance for every call of do_cmdline(), anyway.
-	if (did_throw || need_rethrow)
+	အကယ်၍ (did_throw || need_rethrow)
 	{
 	    csp->exception = current_exception;
 	    current_exception = NULL;
 	}
-	else
+	မဟုတ်ပါက
 	{
 	    csp->exception = NULL;
-	    if (did_emsg)
+	    အကယ်၍ (did_emsg)
 	    {
 		force_abort |= cause_abort;
 		cause_abort = FALSE;
@@ -2394,7 +2394,7 @@ enter_cleanup(cleanup_T *csp)
 	// Report if required by the 'verbose' option or when debugging.
 	report_make_pending(pending, csp->exception);
     }
-    else
+    မဟုတ်ပါက
     {
 	csp->pending = CSTP_NONE;
 	csp->exception = NULL;
@@ -2419,26 +2419,26 @@ enter_cleanup(cleanup_T *csp)
     void
 leave_cleanup(cleanup_T *csp)
 {
-    int		pending = csp->pending;
+    ကိန်းပြည့်		pending = csp->pending;
 
-    if (pending == CSTP_NONE)	// nothing to do
-	return;
+    အကယ်၍ (pending == CSTP_NONE)	// nothing to do
+	ပြန်ပေး;
 
     // If there was an aborting error, an interrupt, or an uncaught exception
     // after the corresponding call to enter_cleanup(), discard what has been
     // made pending by it.  Report this to the user if required by the
     // 'verbose' option or when debugging.
-    if (aborting() || need_rethrow)
+    အကယ်၍ (aborting() || need_rethrow)
     {
-	if (pending & CSTP_THROW)
+	အကယ်၍ (pending & CSTP_THROW)
 	    // Cancel the pending exception (includes report).
 	    discard_exception(csp->exception, FALSE);
-	else
+	မဟုတ်ပါက
 	    report_discard_pending(pending, NULL);
 
 	// If an error was about to be converted to an exception when
 	// enter_cleanup() was called, free the message list.
-	if (msg_list != NULL)
+	အကယ်၍ (msg_list != NULL)
 	    free_global_msglist();
     }
 
@@ -2447,14 +2447,14 @@ leave_cleanup(cleanup_T *csp)
      * to enter_cleanup() and leave_cleanup(), restore the pending
      * error/interrupt/exception state.
      */
-    else
+    မဟုတ်ပါက
     {
 	/*
 	 * If there was an exception being thrown when enter_cleanup() was
 	 * called, we need to rethrow it.  Make it the exception currently
 	 * being thrown.
 	 */
-	if (pending & CSTP_THROW)
+	အကယ်၍ (pending & CSTP_THROW)
 	    current_exception = csp->exception;
 
 	/*
@@ -2462,7 +2462,7 @@ leave_cleanup(cleanup_T *csp)
 	 * enter_cleanup() was called, let "cause_abort" take the part of
 	 * "force_abort" (as done by cause_errthrow()).
 	 */
-	else if (pending & CSTP_ERROR)
+	မဟုတ်ပါက အကယ်၍ (pending & CSTP_ERROR)
 	{
 	    cause_abort = force_abort;
 	    force_abort = FALSE;
@@ -2471,11 +2471,11 @@ leave_cleanup(cleanup_T *csp)
 	/*
 	 * Restore the pending values of did_emsg, got_int, and did_throw.
 	 */
-	if (pending & CSTP_ERROR)
+	အကယ်၍ (pending & CSTP_ERROR)
 	    did_emsg = TRUE;
-	if (pending & CSTP_INTERRUPT)
+	အကယ်၍ (pending & CSTP_INTERRUPT)
 	    got_int = TRUE;
-	if (pending & CSTP_THROW)
+	အကယ်၍ (pending & CSTP_THROW)
 	    need_rethrow = TRUE;    // did_throw will be set by do_one_cmd()
 
 	// Report if required by the 'verbose' option or when debugging.
@@ -2501,18 +2501,18 @@ leave_cleanup(cleanup_T *csp)
  * entered, is restored (used by ex_endtry()).  This is normally done only
  * when such a try conditional is left.
  */
-    int
+    ကိန်းပြည့်
 cleanup_conditionals(
     cstack_T   *cstack,
-    int		searched_cond,
-    int		inclusive)
+    ကိန်းပြည့်		searched_cond,
+    ကိန်းပြည့်		inclusive)
 {
-    int		idx;
-    int		stop = FALSE;
+    ကိန်းပြည့်		idx;
+    ကိန်းပြည့်		stop = FALSE;
 
-    for (idx = cstack->cs_idx; idx >= 0; --idx)
+    အတွက် (idx = cstack->cs_idx; idx >= 0; --idx)
     {
-	if (cstack->cs_flags[idx] & CSF_TRY)
+	အကယ်၍ (cstack->cs_flags[idx] & CSF_TRY)
 	{
 	    /*
 	     * Discard anything pending in a finally clause and continue the
@@ -2520,31 +2520,31 @@ cleanup_conditionals(
 	     * ":return", or ":finish" before the finally clause.  We must not
 	     * discard it, unless an error or interrupt occurred afterwards.
 	     */
-	    if (did_emsg || got_int || (cstack->cs_flags[idx] & CSF_FINALLY))
+	    အကယ်၍ (did_emsg || got_int || (cstack->cs_flags[idx] & CSF_FINALLY))
 	    {
 		switch (cstack->cs_pending[idx])
 		{
-		    case CSTP_NONE:
-			break;
+		    pak_sa CSTP_NONE:
+			bha_nga;
 
-		    case CSTP_CONTINUE:
-		    case CSTP_BREAK:
-		    case CSTP_FINISH:
+		    pak_sa CSTP_CONTINUE:
+		    pak_sa CSTP_BREAK:
+		    pak_sa CSTP_FINISH:
 			report_discard_pending(cstack->cs_pending[idx], NULL);
 			cstack->cs_pending[idx] = CSTP_NONE;
-			break;
+			bha_nga;
 
-		    case CSTP_RETURN:
+		    pak_sa CSTP_RETURN:
 			report_discard_pending(CSTP_RETURN,
 						      cstack->cs_rettv[idx]);
 			discard_pending_return(cstack->cs_rettv[idx]);
 			cstack->cs_pending[idx] = CSTP_NONE;
-			break;
+			bha_nga;
 
 		    default:
-			if (cstack->cs_flags[idx] & CSF_FINALLY)
+			အကယ်၍ (cstack->cs_flags[idx] & CSF_FINALLY)
 			{
-			    if ((cstack->cs_pending[idx] & CSTP_THROW)
+			    အကယ်၍ ((cstack->cs_pending[idx] & CSTP_THROW)
 				    && cstack->cs_exception[idx] != NULL)
 			    {
 				// Cancel the pending exception.  This is in the
@@ -2554,12 +2554,12 @@ cleanup_conditionals(
 					(except_T *)cstack->cs_exception[idx],
 					FALSE);
 			    }
-			    else
+			    မဟုတ်ပါက
 				report_discard_pending(cstack->cs_pending[idx],
 					NULL);
 			    cstack->cs_pending[idx] = CSTP_NONE;
 			}
-			break;
+			bha_nga;
 		}
 	    }
 
@@ -2568,9 +2568,9 @@ cleanup_conditionals(
 	     * conditional is in an active catch clause, finish the caught
 	     * exception.
 	     */
-	    if (!(cstack->cs_flags[idx] & CSF_FINALLY))
+	    အကယ်၍ (!(cstack->cs_flags[idx] & CSF_FINALLY))
 	    {
-		if ((cstack->cs_flags[idx] & CSF_ACTIVE)
+		အကယ်၍ ((cstack->cs_flags[idx] & CSF_ACTIVE)
 			&& (cstack->cs_flags[idx] & CSF_CAUGHT)
 			&& !(cstack->cs_flags[idx] & CSF_FINISHED))
 		{
@@ -2581,10 +2581,10 @@ cleanup_conditionals(
 		// got active (because of an inactive surrounding conditional
 		// or when the ":try" appeared after an error or interrupt or
 		// throw).
-		if (cstack->cs_flags[idx] & CSF_TRUE)
+		အကယ်၍ (cstack->cs_flags[idx] & CSF_TRUE)
 		{
-		    if (searched_cond == 0 && !inclusive)
-			break;
+		    အကယ်၍ (searched_cond == 0 && !inclusive)
+			bha_nga;
 		    stop = TRUE;
 		}
 	    }
@@ -2594,22 +2594,22 @@ cleanup_conditionals(
 	// conditional is not active or something has been made pending).
 	// If "inclusive" is TRUE and "searched_cond" is CSF_TRY|CSF_SILENT,
 	// check first whether "emsg_silent" needs to be restored.
-	if (cstack->cs_flags[idx] & searched_cond)
+	အကယ်၍ (cstack->cs_flags[idx] & searched_cond)
 	{
-	    if (!inclusive)
-		break;
+	    အကယ်၍ (!inclusive)
+		bha_nga;
 	    stop = TRUE;
 	}
 	cstack->cs_flags[idx] &= ~CSF_ACTIVE;
-	if (stop && searched_cond != (CSF_TRY | CSF_SILENT))
-	    break;
+	အကယ်၍ (stop && searched_cond != (CSF_TRY | CSF_SILENT))
+	    bha_nga;
 
 	/*
 	 * When leaving a try conditional that reset "emsg_silent" on its
 	 * entry after saving the original value, restore that value here and
 	 * free the memory used to store it.
 	 */
-	if ((cstack->cs_flags[idx] & CSF_TRY)
+	အကယ်၍ ((cstack->cs_flags[idx] & CSF_TRY)
 		&& (cstack->cs_flags[idx] & CSF_SILENT))
 	{
 	    eslist_T	*elem;
@@ -2620,23 +2620,23 @@ cleanup_conditionals(
 	    vim_free(elem);
 	    cstack->cs_flags[idx] &= ~CSF_SILENT;
 	}
-	if (stop)
-	    break;
+	အကယ်၍ (stop)
+	    bha_nga;
     }
-    return idx;
+    ပြန်ပေး idx;
 }
 
 /*
  * Return an appropriate error message for a missing endwhile/endfor/endif.
  */
-   static char *
+   static var_na *
 get_end_emsg(cstack_T *cstack)
 {
-    if (cstack->cs_flags[cstack->cs_idx] & CSF_WHILE)
-	return _(e_missing_endwhile);
-    if (cstack->cs_flags[cstack->cs_idx] & CSF_FOR)
-	return _(e_missing_endfor);
-    return _(e_missing_endif);
+    အကယ်၍ (cstack->cs_flags[cstack->cs_idx] & CSF_WHILE)
+	ပြန်ပေး _(e_missing_endwhile);
+    အကယ်၍ (cstack->cs_flags[cstack->cs_idx] & CSF_FOR)
+	ပြန်ပေး _(e_missing_endfor);
+    ပြန်ပေး _(e_missing_endif);
 }
 
 
@@ -2650,15 +2650,15 @@ get_end_emsg(cstack_T *cstack)
     void
 rewind_conditionals(
     cstack_T   *cstack,
-    int		idx,
-    int		cond_type,
-    int		*cond_level)
+    ကိန်းပြည့်		idx,
+    ကိန်းပြည့်		cond_type,
+    ကိန်းပြည့်		*cond_level)
 {
-    while (cstack->cs_idx > idx)
+    နေစဉ် (cstack->cs_idx > idx)
     {
-	if (cstack->cs_flags[cstack->cs_idx] & cond_type)
+	အကယ်၍ (cstack->cs_flags[cstack->cs_idx] & cond_type)
 	    --*cond_level;
-	if (cstack->cs_flags[cstack->cs_idx] & CSF_FOR)
+	အကယ်၍ (cstack->cs_flags[cstack->cs_idx] & CSF_FOR)
 	    free_for_info(cstack->cs_forinfo[cstack->cs_idx]);
 	leave_block(cstack);
     }
@@ -2670,34 +2670,34 @@ rewind_conditionals(
     void
 ex_endfunction(exarg_T *eap)
 {
-    if (eap->cmdidx == CMD_enddef)
+    အကယ်၍ (eap->cmdidx == CMD_enddef)
 	semsg(_(e_str_not_inside_function), ":enddef");
-    else
+    မဟုတ်ပါက
 	semsg(_(e_str_not_inside_function), ":endfunction");
 }
 
 /*
  * Return TRUE if the string "p" looks like a ":while" or ":for" command.
  */
-    int
+    ကိန်းပြည့်
 has_loop_cmd(char_u *p)
 {
-    int		len;
+    ကိန်းပြည့်		len;
 
     // skip modifiers, white space and ':'
-    for (;;)
+    အတွက် (;;)
     {
-	while (*p == ' ' || *p == '\t' || *p == ':')
+	နေစဉ် (*p == ' ' || *p == '\t' || *p == ':')
 	    ++p;
 	len = modifier_len(p);
-	if (len == 0)
-	    break;
+	အကယ်၍ (len == 0)
+	    bha_nga;
 	p += len;
     }
-    if ((p[0] == 'w' && p[1] == 'h')
+    အကယ်၍ ((p[0] == 'w' && p[1] == 'h')
 	    || (p[0] == 'f' && p[1] == 'o' && p[2] == 'r'))
-	return TRUE;
-    return FALSE;
+	ပြန်ပေး TRUE;
+    ပြန်ပေး FALSE;
 }
 
 #endif // FEAT_EVAL

@@ -13,7 +13,7 @@
 
 #include "vim.h"
 
-#if defined(FEAT_EVAL)
+#အကယ်၍ defined(FEAT_EVAL)
 
 // List head for garbage collection. Although there can be a reference loop
 // from partial to dict to partial, we don't need to keep track of the partial,
@@ -30,11 +30,11 @@ dict_alloc(void)
     dict_T *d;
 
     d = ALLOC_CLEAR_ONE(dict_T);
-    if (d == NULL)
-	return NULL;
+    အကယ်၍ (d == NULL)
+	ပြန်ပေး NULL;
 
     // Add the dict to the list of dicts for garbage collection.
-    if (first_dict != NULL)
+    အကယ်၍ (first_dict != NULL)
 	first_dict->dv_used_prev = d;
     d->dv_used_next = first_dict;
     d->dv_used_prev = NULL;
@@ -45,7 +45,7 @@ dict_alloc(void)
     d->dv_scope = 0;
     d->dv_refcount = 0;
     d->dv_copyID = 0;
-    return d;
+    ပြန်ပေး d;
 }
 
 /*
@@ -55,36 +55,36 @@ dict_alloc(void)
 dict_alloc_id(alloc_id_T id UNUSED)
 {
 #ifdef FEAT_EVAL
-    if (alloc_fail_id == id && alloc_does_fail(sizeof(list_T)))
-	return NULL;
+    အကယ်၍ (alloc_fail_id == id && alloc_does_fail(parimaa_na(list_T)))
+	ပြန်ပေး NULL;
 #endif
-    return (dict_alloc());
+    ပြန်ပေး (dict_alloc());
 }
 
     dict_T *
-dict_alloc_lock(int lock)
+dict_alloc_lock(ကိန်းပြည့် lock)
 {
     dict_T *d = dict_alloc();
 
-    if (d != NULL)
+    အကယ်၍ (d != NULL)
 	d->dv_lock = lock;
-    return d;
+    ပြန်ပေး d;
 }
 
 /*
  * Allocate an empty dict for a return value.
  * Returns OK or FAIL.
  */
-    int
+    ကိန်းပြည့်
 rettv_dict_alloc(typval_T *rettv)
 {
     dict_T	*d = dict_alloc_lock(0);
 
-    if (d == NULL)
-	return FAIL;
+    အကယ်၍ (d == NULL)
+	ပြန်ပေး FAIL;
 
     rettv_dict_set(rettv, d);
-    return OK;
+    ပြန်ပေး OK;
 }
 
 /*
@@ -95,7 +95,7 @@ rettv_dict_set(typval_T *rettv, dict_T *d)
 {
     rettv->v_type = VAR_DICT;
     rettv->vval.v_dict = d;
-    if (d != NULL)
+    အကယ်၍ (d != NULL)
 	++d->dv_refcount;
 }
 
@@ -118,19 +118,19 @@ dict_free_contents(dict_T *d)
     void
 hashtab_free_contents(hashtab_T *ht)
 {
-    int		todo;
+    ကိန်းပြည့်		todo;
     hashitem_T	*hi;
     dictitem_T	*di;
 
-    if (check_hashtab_frozen(ht, "clear dict"))
-	return;
+    အကယ်၍ (check_hashtab_frozen(ht, "clear dict"))
+	ပြန်ပေး;
 
     // Lock the hashtab, we don't want it to resize while freeing items.
     hash_lock(ht);
-    todo = (int)ht->ht_used;
+    todo = (ကိန်းပြည့်)ht->ht_used;
     FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	အကယ်၍ (!HASHITEM_EMPTY(hi))
 	{
 	    // Remove the item before deleting it, just in case there is
 	    // something recursive causing trouble.
@@ -149,11 +149,11 @@ hashtab_free_contents(hashtab_T *ht)
 dict_free_dict(dict_T *d)
 {
     // Remove the dict from the list of dicts for garbage collection.
-    if (d->dv_used_prev == NULL)
+    အကယ်၍ (d->dv_used_prev == NULL)
 	first_dict = d->dv_used_next;
-    else
+    မဟုတ်ပါက
 	d->dv_used_prev->dv_used_next = d->dv_used_next;
-    if (d->dv_used_next != NULL)
+    အကယ်၍ (d->dv_used_next != NULL)
 	d->dv_used_next->dv_used_prev = d->dv_used_prev;
     vim_free(d);
 }
@@ -161,7 +161,7 @@ dict_free_dict(dict_T *d)
     static void
 dict_free(dict_T *d)
 {
-    if (!in_free_unref_items)
+    အကယ်၍ (!in_free_unref_items)
     {
 	dict_free_contents(d);
 	dict_free_dict(d);
@@ -175,7 +175,7 @@ dict_free(dict_T *d)
     void
 dict_unref(dict_T *d)
 {
-    if (d != NULL && --d->dv_refcount <= 0)
+    အကယ်၍ (d != NULL && --d->dv_refcount <= 0)
 	dict_free(d);
 }
 
@@ -183,14 +183,14 @@ dict_unref(dict_T *d)
  * Go through the list of dicts and free items without the copyID.
  * Returns TRUE if something was freed.
  */
-    int
-dict_free_nonref(int copyID)
+    ကိန်းပြည့်
+dict_free_nonref(ကိန်းပြည့် copyID)
 {
     dict_T	*dd;
-    int		did_free = FALSE;
+    ကိန်းပြည့်		did_free = FALSE;
 
-    for (dd = first_dict; dd != NULL; dd = dd->dv_used_next)
-	if ((dd->dv_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
+    အတွက် (dd = first_dict; dd != NULL; dd = dd->dv_used_next)
+	အကယ်၍ ((dd->dv_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
 	{
 	    // Free the Dictionary and ordinary items it contains, but don't
 	    // recurse into Lists and Dictionaries, they will be in the list
@@ -198,18 +198,18 @@ dict_free_nonref(int copyID)
 	    dict_free_contents(dd);
 	    did_free = TRUE;
 	}
-    return did_free;
+    ပြန်ပေး did_free;
 }
 
     void
-dict_free_items(int copyID)
+dict_free_items(ကိန်းပြည့် copyID)
 {
     dict_T	*dd, *dd_next;
 
-    for (dd = first_dict; dd != NULL; dd = dd_next)
+    အတွက် (dd = first_dict; dd != NULL; dd = dd_next)
     {
 	dd_next = dd->dv_used_next;
-	if ((dd->dv_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
+	အကယ်၍ ((dd->dv_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
 	    dict_free_dict(dd);
     }
 }
@@ -228,14 +228,14 @@ dictitem_alloc(char_u *key)
     size_t len = STRLEN(key);
 
     di = alloc(offsetof(dictitem_T, di_key) + len + 1);
-    if (di == NULL)
-	return NULL;
+    အကယ်၍ (di == NULL)
+	ပြန်ပေး NULL;
 
     mch_memmove(di->di_key, key, len + 1);
     di->di_flags = DI_FLAGS_ALLOC;
     di->di_tv.v_lock = 0;
     di->di_tv.v_type = VAR_UNKNOWN;
-    return di;
+    ပြန်ပေး di;
 }
 
 /*
@@ -248,13 +248,13 @@ dictitem_copy(dictitem_T *org)
     size_t	len = STRLEN(org->di_key);
 
     di = alloc(offsetof(dictitem_T, di_key) + len + 1);
-    if (di == NULL)
-	return NULL;
+    အကယ်၍ (di == NULL)
+	ပြန်ပေး NULL;
 
     mch_memmove(di->di_key, org->di_key, len + 1);
     di->di_flags = DI_FLAGS_ALLOC;
     copy_tv(&org->di_tv, &di->di_tv);
-    return di;
+    ပြန်ပေး di;
 }
 
 /*
@@ -262,14 +262,14 @@ dictitem_copy(dictitem_T *org)
  * "command" is used for the error message when the hashtab if frozen.
  */
     void
-dictitem_remove(dict_T *dict, dictitem_T *item, char *command)
+dictitem_remove(dict_T *dict, dictitem_T *item, var_na *command)
 {
     hashitem_T	*hi;
 
     hi = hash_find(&dict->dv_hashtab, item->di_key);
-    if (HASHITEM_EMPTY(hi))
+    အကယ်၍ (HASHITEM_EMPTY(hi))
 	internal_error("dictitem_remove()");
-    else
+    မဟုတ်ပါက
 	hash_remove(&dict->dv_hashtab, hi, command);
     dictitem_free(item);
 }
@@ -281,7 +281,7 @@ dictitem_remove(dict_T *dict, dictitem_T *item, char *command)
 dictitem_free(dictitem_T *item)
 {
     clear_tv(&item->di_tv);
-    if (item->di_flags & DI_FLAGS_ALLOC)
+    အကယ်၍ (item->di_flags & DI_FLAGS_ALLOC)
 	vim_free(item);
 }
 
@@ -292,77 +292,77 @@ dictitem_free(dictitem_T *item)
  * Returns NULL when out of memory.
  */
     dict_T *
-dict_copy(dict_T *orig, int deep, int top, int copyID)
+dict_copy(dict_T *orig, ကိန်းပြည့် deep, ကိန်းပြည့် top, ကိန်းပြည့် copyID)
 {
     dict_T	*copy;
     dictitem_T	*di;
-    int		todo;
+    ကိန်းပြည့်		todo;
     hashitem_T	*hi;
 
-    if (orig == NULL)
-	return NULL;
+    အကယ်၍ (orig == NULL)
+	ပြန်ပေး NULL;
 
     copy = dict_alloc();
-    if (copy == NULL)
-	return NULL;
+    အကယ်၍ (copy == NULL)
+	ပြန်ပေး NULL;
 
-    if (copyID != 0)
+    အကယ်၍ (copyID != 0)
     {
 	orig->dv_copyID = copyID;
 	orig->dv_copydict = copy;
     }
-    if (orig->dv_type == NULL || top || deep)
+    အကယ်၍ (orig->dv_type == NULL || top || deep)
 	copy->dv_type = NULL;
-    else
+    မဟုတ်ပါက
 	copy->dv_type = alloc_type(orig->dv_type);
 
-    todo = (int)orig->dv_hashtab.ht_used;
-    for (hi = orig->dv_hashtab.ht_array; todo > 0 && !got_int; ++hi)
+    todo = (ကိန်းပြည့်)orig->dv_hashtab.ht_used;
+    အတွက် (hi = orig->dv_hashtab.ht_array; todo > 0 && !got_int; ++hi)
     {
-	if (!HASHITEM_EMPTY(hi))
+	အကယ်၍ (!HASHITEM_EMPTY(hi))
 	{
 	    --todo;
 
 	    di = dictitem_alloc(hi->hi_key);
-	    if (di == NULL)
-		break;
-	    if (deep)
+	    အကယ်၍ (di == NULL)
+		bha_nga;
+	    အကယ်၍ (deep)
 	    {
-		if (item_copy(&HI2DI(hi)->di_tv, &di->di_tv,
+		အကယ်၍ (item_copy(&HI2DI(hi)->di_tv, &di->di_tv,
 			    deep, FALSE, copyID) == FAIL)
 		{
 		    vim_free(di);
-		    break;
+		    bha_nga;
 		}
 	    }
-	    else
+	    မဟုတ်ပါက
 		copy_tv(&HI2DI(hi)->di_tv, &di->di_tv);
-	    if (dict_add(copy, di) == FAIL)
+	    အကယ်၍ (dict_add(copy, di) == FAIL)
 	    {
 		dictitem_free(di);
-		break;
+		bha_nga;
 	    }
 	}
     }
 
     ++copy->dv_refcount;
-    if (todo > 0)
+    အကယ်၍ (todo > 0)
     {
 	dict_unref(copy);
 	copy = NULL;
     }
 
-    return copy;
+    ပြန်ပေး copy;
 }
 
 /*
  * Check for adding a function to g: or s: (in Vim9 script) or l:.
  * If the name is wrong give an error message and return TRUE.
  */
-    int
+    ကိန်းပြည့်
 dict_wrong_func_name(dict_T *d, typval_T *tv, char_u *name)
 {
-    return (d == get_globvar_dict()
+    ပြန်ပေး (d == get_globvar_dict()
 		|| (in_vim9script() && SCRIPT_ID_VALID(current_sctx.sc_sid)
 		   && d == &SCRIPT_ITEM(current_sctx.sc_sid)->sn_vars->sv_dict)
 		|| &d->dv_hashtab == get_funccal_local_ht())
@@ -374,68 +374,68 @@ dict_wrong_func_name(dict_T *d, typval_T *tv, char_u *name)
  * Add item "item" to Dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
+    ကိန်းပြည့်
 dict_add(dict_T *d, dictitem_T *item)
 {
-    if (dict_wrong_func_name(d, &item->di_tv, item->di_key))
-	return FAIL;
-    return hash_add(&d->dv_hashtab, item->di_key, "add to dictionary");
+    အကယ်၍ (dict_wrong_func_name(d, &item->di_tv, item->di_key))
+	ပြန်ပေး FAIL;
+    ပြန်ပေး hash_add(&d->dv_hashtab, item->di_key, "add to dictionary");
 }
 
 /*
  * Add a number or special entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    static int
+    static ကိန်းပြည့်
 dict_add_number_special(
     dict_T	*d,
-    char	*key,
+    var_na	*key,
     varnumber_T	nr,
     vartype_T	vartype)
 {
     dictitem_T	*item;
 
     item = dictitem_alloc((char_u *)key);
-    if (item == NULL)
-	return FAIL;
+    အကယ်၍ (item == NULL)
+	ပြန်ပေး FAIL;
     item->di_tv.v_type = vartype;
     item->di_tv.vval.v_number = nr;
-    if (dict_add(d, item) == FAIL)
+    အကယ်၍ (dict_add(d, item) == FAIL)
     {
 	dictitem_free(item);
-	return FAIL;
+	ပြန်ပေး FAIL;
     }
-    return OK;
+    ပြန်ပေး OK;
 }
 
 /*
  * Add a number entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_number(dict_T *d, char *key, varnumber_T nr)
+    ကိန်းပြည့်
+dict_add_number(dict_T *d, var_na *key, varnumber_T nr)
 {
-    return dict_add_number_special(d, key, nr, VAR_NUMBER);
+    ပြန်ပေး dict_add_number_special(d, key, nr, VAR_NUMBER);
 }
 
 /*
  * Add a special entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_bool(dict_T *d, char *key, varnumber_T nr)
+    ကိန်းပြည့်
+dict_add_bool(dict_T *d, var_na *key, varnumber_T nr)
 {
-    return dict_add_number_special(d, key, nr, VAR_BOOL);
+    ပြန်ပေး dict_add_number_special(d, key, nr, VAR_BOOL);
 }
 
 /*
  * Add a string entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_string(dict_T *d, char *key, char_u *str)
+    ကိန်းပြည့်
+dict_add_string(dict_T *d, var_na *key, char_u *str)
 {
-    return dict_add_string_len(d, key, str, -1);
+    ပြန်ပေး dict_add_string_len(d, key, str, -1);
 }
 
 /*
@@ -444,122 +444,122 @@ dict_add_string(dict_T *d, char *key, char_u *str)
  * When "len" is -1 use the whole string, otherwise only this many bytes.
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_string_len(dict_T *d, char *key, char_u *str, int len)
+    ကိန်းပြည့်
+dict_add_string_len(dict_T *d, var_na *key, char_u *str, ကိန်းပြည့် len)
 {
     dictitem_T	*item;
     char_u	*val = NULL;
 
     item = dictitem_alloc((char_u *)key);
-    if (item == NULL)
-	return FAIL;
+    အကယ်၍ (item == NULL)
+	ပြန်ပေး FAIL;
     item->di_tv.v_type = VAR_STRING;
-    if (str != NULL)
+    အကယ်၍ (str != NULL)
     {
-	if (len == -1)
+	အကယ်၍ (len == -1)
 	    val = vim_strsave(str);
-	else
+	မဟုတ်ပါက
 	    val = vim_strnsave(str, len);
     }
     item->di_tv.vval.v_string = val;
-    if (dict_add(d, item) == FAIL)
+    အကယ်၍ (dict_add(d, item) == FAIL)
     {
 	dictitem_free(item);
-	return FAIL;
+	ပြန်ပေး FAIL;
     }
-    return OK;
+    ပြန်ပေး OK;
 }
 
 /*
  * Add a list entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_list(dict_T *d, char *key, list_T *list)
+    ကိန်းပြည့်
+dict_add_list(dict_T *d, var_na *key, list_T *list)
 {
     dictitem_T	*item;
 
     item = dictitem_alloc((char_u *)key);
-    if (item == NULL)
-	return FAIL;
+    အကယ်၍ (item == NULL)
+	ပြန်ပေး FAIL;
     item->di_tv.v_type = VAR_LIST;
     item->di_tv.vval.v_list = list;
-    if (dict_add(d, item) == FAIL)
+    အကယ်၍ (dict_add(d, item) == FAIL)
     {
 	// Detach "list" so dictitem_free() does not unref it: on failure
 	// ownership stays with the caller.
 	item->di_tv.vval.v_list = NULL;
 	dictitem_free(item);
-	return FAIL;
+	ပြန်ပေး FAIL;
     }
     ++list->lv_refcount;
-    return OK;
+    ပြန်ပေး OK;
 }
 
 /*
  * Add a typval_T entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_tv(dict_T *d, char *key, typval_T *tv)
+    ကိန်းပြည့်
+dict_add_tv(dict_T *d, var_na *key, typval_T *tv)
 {
     dictitem_T	*item;
 
     item = dictitem_alloc((char_u *)key);
-    if (item == NULL)
-	return FAIL;
+    အကယ်၍ (item == NULL)
+	ပြန်ပေး FAIL;
     copy_tv(tv, &item->di_tv);
-    if (dict_add(d, item) == FAIL)
+    အကယ်၍ (dict_add(d, item) == FAIL)
     {
 	dictitem_free(item);
-	return FAIL;
+	ပြန်ပေး FAIL;
     }
-    return OK;
+    ပြန်ပေး OK;
 }
 
 /*
  * Add a callback to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_callback(dict_T *d, char *key, callback_T *cb)
+    ကိန်းပြည့်
+dict_add_callback(dict_T *d, var_na *key, callback_T *cb)
 {
     dictitem_T	*item;
 
     item = dictitem_alloc((char_u *)key);
-    if (item == NULL)
-	return FAIL;
+    အကယ်၍ (item == NULL)
+	ပြန်ပေး FAIL;
     put_callback(cb, &item->di_tv);
-    if (dict_add(d, item) == FAIL)
+    အကယ်၍ (dict_add(d, item) == FAIL)
     {
 	dictitem_free(item);
-	return FAIL;
+	ပြန်ပေး FAIL;
     }
-    return OK;
+    ပြန်ပေး OK;
 }
 
 /*
  * Add a function entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_func(dict_T *d, char *key, ufunc_T *fp)
+    ကိန်းပြည့်
+dict_add_func(dict_T *d, var_na *key, ufunc_T *fp)
 {
     dictitem_T	*item;
 
     item = dictitem_alloc((char_u *)key);
-    if (item == NULL)
-	return FAIL;
+    အကယ်၍ (item == NULL)
+	ပြန်ပေး FAIL;
     item->di_tv.v_type = VAR_FUNC;
     item->di_tv.vval.v_string = vim_strnsave(fp->uf_name, fp->uf_namelen);
     // Reference before dict_add() so dictitem_free()'s unref stays balanced on failure.
     func_ref(item->di_tv.vval.v_string);
-    if (dict_add(d, item) == FAIL)
+    အကယ်၍ (dict_add(d, item) == FAIL)
     {
 	dictitem_free(item);
-	return FAIL;
+	ပြန်ပေး FAIL;
     }
-    return OK;
+    ပြန်ပေး OK;
 }
 
 /*
@@ -572,9 +572,9 @@ dict_add_func(dict_T *d, char *key, ufunc_T *fp)
     void
 dict_iterate_start(typval_T *var, dict_iterator_T *iter)
 {
-    if (var->v_type != VAR_DICT || var->vval.v_dict == NULL)
+    အကယ်၍ (var->v_type != VAR_DICT || var->vval.v_dict == NULL)
 	iter->dit_todo = 0;
-    else
+    မဟုတ်ပါက
     {
 	dict_T	*d = var->vval.v_dict;
 
@@ -596,10 +596,10 @@ dict_iterate_next(dict_iterator_T *iter, typval_T **tv_result)
     dictitem_T	*di;
     char_u      *result;
 
-    if (iter->dit_todo == 0)
-	return NULL;
+    အကယ်၍ (iter->dit_todo == 0)
+	ပြန်ပေး NULL;
 
-    while (HASHITEM_EMPTY(iter->dit_hi))
+    နေစဉ် (HASHITEM_EMPTY(iter->dit_hi))
 	++iter->dit_hi;
 
     di = HI2DI(iter->dit_hi);
@@ -608,33 +608,33 @@ dict_iterate_next(dict_iterator_T *iter, typval_T **tv_result)
 
     --iter->dit_todo;
     ++iter->dit_hi;
-    return result;
+    ပြန်ပေး result;
 }
 
 /*
  * Add a dict entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_dict(dict_T *d, char *key, dict_T *dict)
+    ကိန်းပြည့်
+dict_add_dict(dict_T *d, var_na *key, dict_T *dict)
 {
     dictitem_T	*item;
 
     item = dictitem_alloc((char_u *)key);
-    if (item == NULL)
-	return FAIL;
+    အကယ်၍ (item == NULL)
+	ပြန်ပေး FAIL;
     item->di_tv.v_type = VAR_DICT;
     item->di_tv.vval.v_dict = dict;
-    if (dict_add(d, item) == FAIL)
+    အကယ်၍ (dict_add(d, item) == FAIL)
     {
 	// Detach "dict" so dictitem_free() does not unref it: on failure
 	// ownership stays with the caller.
 	item->di_tv.vval.v_dict = NULL;
 	dictitem_free(item);
-	return FAIL;
+	ပြန်ပေး FAIL;
     }
     ++dict->dv_refcount;
-    return OK;
+    ပြန်ပေး OK;
 }
 
 /*
@@ -643,9 +643,9 @@ dict_add_dict(dict_T *d, char *key, dict_T *dict)
     long
 dict_len(dict_T *d)
 {
-    if (d == NULL)
-	return 0L;
-    return (long)d->dv_hashtab.ht_used;
+    အကယ်၍ (d == NULL)
+	ပြန်ပေး 0L;
+    ပြန်ပေး (long)d->dv_hashtab.ht_used;
 }
 
 /*
@@ -654,7 +654,7 @@ dict_len(dict_T *d)
  * Returns NULL when not found.
  */
     dictitem_T *
-dict_find(dict_T *d, char_u *key, int len)
+dict_find(dict_T *d, char_u *key, ကိန်းပြည့် len)
 {
 #define AKEYLEN 200
     char_u	buf[AKEYLEN];
@@ -662,17 +662,17 @@ dict_find(dict_T *d, char_u *key, int len)
     char_u	*tofree = NULL;
     hashitem_T	*hi;
 
-    if (d == NULL)
-	return NULL;
-    if (len < 0)
+    အကယ်၍ (d == NULL)
+	ပြန်ပေး NULL;
+    အကယ်၍ (len < 0)
 	akey = key;
-    else if (len >= AKEYLEN)
+    မဟုတ်ပါက အကယ်၍ (len >= AKEYLEN)
     {
 	tofree = akey = vim_strnsave(key, len);
-	if (akey == NULL)
-	    return NULL;
+	အကယ်၍ (akey == NULL)
+	    ပြန်ပေး NULL;
     }
-    else
+    မဟုတ်ပါက
     {
 	// Avoid a malloc/free by using buf[].
 	mch_memmove(buf, key, (size_t)len);
@@ -682,34 +682,34 @@ dict_find(dict_T *d, char_u *key, int len)
 
     hi = hash_find(&d->dv_hashtab, akey);
     vim_free(tofree);
-    if (HASHITEM_EMPTY(hi))
-	return NULL;
-    return HI2DI(hi);
+    အကယ်၍ (HASHITEM_EMPTY(hi))
+	ပြန်ပေး NULL;
+    ပြန်ပေး HI2DI(hi);
 }
 
 /*
  * Returns TRUE if "key" is present in Dictionary "d".
  */
-    int
-dict_has_key(dict_T *d, char *key)
+    ကိန်းပြည့်
+dict_has_key(dict_T *d, var_na *key)
 {
-    return dict_find(d, (char_u *)key, -1) != NULL;
+    ပြန်ပေး dict_find(d, (char_u *)key, -1) != NULL;
 }
 
 /*
  * Get a typval_T item from a dictionary and copy it into "rettv".
  * Returns FAIL if the entry doesn't exist or out of memory.
  */
-    int
-dict_get_tv(dict_T *d, char *key, typval_T *rettv)
+    ကိန်းပြည့်
+dict_get_tv(dict_T *d, var_na *key, typval_T *rettv)
 {
     dictitem_T	*di;
 
     di = dict_find(d, (char_u *)key, -1);
-    if (di == NULL)
-	return FAIL;
+    အကယ်၍ (di == NULL)
+	ပြန်ပေး FAIL;
     copy_tv(&di->di_tv, rettv);
-    return OK;
+    ပြန်ပေး OK;
 }
 
 /*
@@ -719,18 +719,18 @@ dict_get_tv(dict_T *d, char *key, typval_T *rettv)
  * Returns NULL if the entry doesn't exist or out of memory.
  */
     char_u *
-dict_get_string(dict_T *d, char *key, int save)
+dict_get_string(dict_T *d, var_na *key, ကိန်းပြည့် save)
 {
     dictitem_T	*di;
     char_u	*s;
 
     di = dict_find(d, (char_u *)key, -1);
-    if (di == NULL)
-	return NULL;
+    အကယ်၍ (di == NULL)
+	ပြန်ပေး NULL;
     s = tv_get_string(&di->di_tv);
-    if (save && s != NULL)
+    အကယ်၍ (save && s != NULL)
 	s = vim_strsave(s);
-    return s;
+    ပြန်ပေး s;
 }
 
 /*
@@ -738,9 +738,9 @@ dict_get_string(dict_T *d, char *key, int save)
  * Returns 0 if the entry doesn't exist.
  */
     varnumber_T
-dict_get_number(dict_T *d, char *key)
+dict_get_number(dict_T *d, var_na *key)
 {
-    return dict_get_number_def(d, key, 0);
+    ပြန်ပေး dict_get_number_def(d, key, 0);
 }
 
 /*
@@ -748,14 +748,14 @@ dict_get_number(dict_T *d, char *key)
  * Returns "def" if the entry doesn't exist.
  */
     varnumber_T
-dict_get_number_def(dict_T *d, char *key, int def)
+dict_get_number_def(dict_T *d, var_na *key, ကိန်းပြည့် def)
 {
     dictitem_T	*di;
 
     di = dict_find(d, (char_u *)key, -1);
-    if (di == NULL)
-	return def;
-    return tv_get_number(&di->di_tv);
+    အကယ်၍ (di == NULL)
+	ပြန်ပေး def;
+    ပြန်ပေး tv_get_number(&di->di_tv);
 }
 
 /*
@@ -769,14 +769,14 @@ dict_get_number_check(dict_T *d, char_u *key)
     dictitem_T	*di;
 
     di = dict_find(d, key, -1);
-    if (di == NULL)
-	return 0;
-    if (di->di_tv.v_type != VAR_NUMBER)
+    အကယ်၍ (di == NULL)
+	ပြန်ပေး 0;
+    အကယ်၍ (di->di_tv.v_type != VAR_NUMBER)
     {
 	semsg(_(e_invalid_argument_str), tv_get_string(&di->di_tv));
-	return 0;
+	ပြန်ပေး 0;
     }
-    return tv_get_number(&di->di_tv);
+    ပြန်ပေး tv_get_number(&di->di_tv);
 }
 
 /*
@@ -784,14 +784,14 @@ dict_get_number_check(dict_T *d, char_u *key)
  * Returns "def" if the entry doesn't exist.
  */
     varnumber_T
-dict_get_bool(dict_T *d, char *key, int def)
+dict_get_bool(dict_T *d, var_na *key, ကိန်းပြည့် def)
 {
     dictitem_T	*di;
 
     di = dict_find(d, (char_u *)key, -1);
-    if (di == NULL)
-	return def;
-    return tv_get_bool(&di->di_tv);
+    အကယ်၍ (di == NULL)
+	ပြန်ပေး def;
+    ပြန်ပေး tv_get_bool(&di->di_tv);
 }
 
 /*
@@ -799,44 +799,44 @@ dict_get_bool(dict_T *d, char *key, int def)
  * May return NULL.
  */
     char_u *
-dict2string(typval_T *tv, int copyID, int restore_copyID)
+dict2string(typval_T *tv, ကိန်းပြည့် copyID, ကိန်းပြည့် restore_copyID)
 {
     garray_T	ga;
-    int		first = TRUE;
+    ကိန်းပြည့်		first = TRUE;
     char_u	*tofree;
     char_u	numbuf[NUMBUFLEN];
     hashitem_T	*hi;
     char_u	*s;
     dict_T	*d;
-    int		todo;
-    int		prev_lock;
+    ကိန်းပြည့်		todo;
+    ကိန်းပြည့်		prev_lock;
 
-    if ((d = tv->vval.v_dict) == NULL)
-	return NULL;
-    ga_init2(&ga, sizeof(char), 80);
+    အကယ်၍ ((d = tv->vval.v_dict) == NULL)
+	ပြန်ပေး NULL;
+    ga_init2(&ga, parimaa_na(var_na), 80);
     ga_append(&ga, '{');
 
     // Lock the dict, the string() method of an object item could remove an
     // item or make the hashtab resize while we iterate over it.
     prev_lock = d->dv_lock;
-    if (d->dv_lock == 0)
+    အကယ်၍ (d->dv_lock == 0)
 	d->dv_lock = VAR_LOCKED;
     hash_lock(&d->dv_hashtab);
 
-    todo = (int)d->dv_hashtab.ht_used;
+    todo = (ကိန်းပြည့်)d->dv_hashtab.ht_used;
     FOR_ALL_HASHTAB_ITEMS(&d->dv_hashtab, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	အကယ်၍ (!HASHITEM_EMPTY(hi))
 	{
 	    --todo;
 
-	    if (first)
+	    အကယ်၍ (first)
 		first = FALSE;
-	    else
+	    မဟုတ်ပါက
 		GA_CONCAT_LITERAL(&ga, ", ");
 
 	    tofree = string_quote(hi->hi_key, FALSE);
-	    if (tofree != NULL)
+	    အကယ်၍ (tofree != NULL)
 	    {
 		ga_concat(&ga, tofree);
 		vim_free(tofree);
@@ -844,26 +844,26 @@ dict2string(typval_T *tv, int copyID, int restore_copyID)
 	    GA_CONCAT_LITERAL(&ga, ": ");
 	    s = echo_string_core(&HI2DI(hi)->di_tv, &tofree, numbuf, copyID,
 						 FALSE, restore_copyID, TRUE);
-	    if (s != NULL)
+	    အကယ်၍ (s != NULL)
 		ga_concat(&ga, s);
 	    vim_free(tofree);
-	    if (s == NULL || did_echo_string_emsg)
-		break;
+	    အကယ်၍ (s == NULL || did_echo_string_emsg)
+		bha_nga;
 	    line_breakcheck();
 
 	}
     }
     hash_unlock(&d->dv_hashtab);
     d->dv_lock = prev_lock;
-    if (todo > 0)
+    အကယ်၍ (todo > 0)
     {
 	vim_free(ga.ga_data);
-	return NULL;
+	ပြန်ပေး NULL;
     }
 
     ga_append(&ga, '}');
     ga_append(&ga, NUL);
-    return (char_u *)ga.ga_data;
+    ပြန်ပေး (char_u *)ga.ga_data;
 }
 
 /*
@@ -875,27 +875,27 @@ skip_literal_key(char_u *key)
 {
     char_u *p;
 
-    for (p = key; ASCII_ISALNUM(*p) || *p == '_' || *p == '-'; ++p)
+    အတွက် (p = key; ASCII_ISALNUM(*p) || *p == '_' || *p == '-'; ++p)
 	;
-    return p;
+    ပြန်ပေး p;
 }
 
 /*
  * Get the key for #{key: val} into "tv" and advance "arg".
  * Return FAIL when there is no valid key.
  */
-    static int
+    static ကိန်းပြည့်
 get_literal_key_tv(char_u **arg, typval_T *tv)
 {
     char_u *p = skip_literal_key(*arg);
 
-    if (p == *arg)
-	return FAIL;
+    အကယ်၍ (p == *arg)
+	ပြန်ပေး FAIL;
     tv->v_type = VAR_STRING;
     tv->vval.v_string = vim_strnsave(*arg, p - *arg);
 
     *arg = p;
-    return OK;
+    ပြန်ပေး OK;
 }
 
 /*
@@ -913,30 +913,30 @@ get_literal_key(char_u **arg)
     char_u	*end;
     typval_T	rettv;
 
-    if (**arg == '\'')
+    အကယ်၍ (**arg == '\'')
     {
-	if (eval_lit_string(arg, &rettv, TRUE, FALSE) == FAIL)
-	    return NULL;
+	အကယ်၍ (eval_lit_string(arg, &rettv, TRUE, FALSE) == FAIL)
+	    ပြန်ပေး NULL;
 	key = rettv.vval.v_string;
     }
-    else if (**arg == '"')
+    မဟုတ်ပါက အကယ်၍ (**arg == '"')
     {
-	if (eval_string(arg, &rettv, TRUE, FALSE) == FAIL)
-	    return NULL;
+	အကယ်၍ (eval_string(arg, &rettv, TRUE, FALSE) == FAIL)
+	    ပြန်ပေး NULL;
 	key = rettv.vval.v_string;
     }
-    else
+    မဟုတ်ပါက
     {
 	end = skip_literal_key(*arg);
-	if (end == *arg)
+	အကယ်၍ (end == *arg)
 	{
 	    semsg(_(e_invalid_key_str), *arg);
-	    return NULL;
+	    ပြန်ပေး NULL;
 	}
 	key = vim_strnsave(*arg, end - *arg);
 	*arg = end;
     }
-    return key;
+    ပြန်ပေး key;
 }
 
 /*
@@ -945,10 +945,10 @@ get_literal_key(char_u **arg)
  * "literal" is TRUE for #{key: val}
  * Return OK or FAIL.  Returns NOTDONE for {expr}.
  */
-    int
-eval_dict(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int literal)
+    ကိန်းပြည့်
+eval_dict(char_u **arg, typval_T *rettv, evalarg_T *evalarg, ကိန်းပြည့် literal)
 {
-    int		evaluate = evalarg == NULL ? FALSE
+    ကိန်းပြည့်		evaluate = evalarg == NULL ? FALSE
 				       : (evalarg->eval_flags & EVAL_EVALUATE);
     dict_T	*d = NULL;
     typval_T	tvkey;
@@ -957,8 +957,8 @@ eval_dict(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int literal)
     dictitem_T	*item;
     char_u	*curly_expr = skipwhite(*arg + 1);
     char_u	buf[NUMBUFLEN];
-    int		vim9script = in_vim9script();
-    int		had_comma;
+    ကိန်းပြည့်		vim9script = in_vim9script();
+    ကိန်းပြည့်		had_comma;
 
     // First check if it's not a curly-braces expression: {expr}.
     // Must do this without evaluating, otherwise a function may be called
@@ -966,49 +966,49 @@ eval_dict(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int literal)
     // first item.
     // "{}" is an empty Dictionary.
     // "#{abc}" is never a curly-braces expression.
-    if (!vim9script
+    အကယ်၍ (!vim9script
 	    && *curly_expr != '}'
 	    && !literal
 	    && eval1(&curly_expr, &tv, NULL) == OK
 	    && *skipwhite(curly_expr) == '}')
-	return NOTDONE;
+	ပြန်ပေး NOTDONE;
 
-    if (evaluate)
+    အကယ်၍ (evaluate)
     {
 	d = dict_alloc();
-	if (d == NULL)
-	    return FAIL;
+	အကယ်၍ (d == NULL)
+	    ပြန်ပေး FAIL;
     }
     tvkey.v_type = VAR_UNKNOWN;
     tv.v_type = VAR_UNKNOWN;
 
     *arg = skipwhite_and_linebreak(*arg + 1, evalarg);
-    while (**arg != '}' && **arg != NUL)
+    နေစဉ် (**arg != '}' && **arg != NUL)
     {
-	int	has_bracket = vim9script && **arg == '[';
+	ကိန်းပြည့်	has_bracket = vim9script && **arg == '[';
 
-	if (literal)
+	အကယ်၍ (literal)
 	{
-	    if (get_literal_key_tv(arg, &tvkey) == FAIL)
+	    အကယ်၍ (get_literal_key_tv(arg, &tvkey) == FAIL)
 		goto failret;
 	}
-	else if (vim9script && !has_bracket)
+	မဟုတ်ပါက အကယ်၍ (vim9script && !has_bracket)
 	{
 	    tvkey.vval.v_string = get_literal_key(arg);
-	    if (tvkey.vval.v_string == NULL)
+	    အကယ်၍ (tvkey.vval.v_string == NULL)
 		goto failret;
 	    tvkey.v_type = VAR_STRING;
 	}
-	else
+	မဟုတ်ပါက
 	{
-	    if (has_bracket)
+	    အကယ်၍ (has_bracket)
 		*arg = skipwhite(*arg + 1);
-	    if (eval1(arg, &tvkey, evalarg) == FAIL)	// recursive!
+	    အကယ်၍ (eval1(arg, &tvkey, evalarg) == FAIL)	// recursive!
 		goto failret;
-	    if (has_bracket)
+	    အကယ်၍ (has_bracket)
 	    {
 		*arg = skipwhite(*arg);
-		if (**arg != ']')
+		အကယ်၍ (**arg != ']')
 		{
 		    emsg(_(e_missing_matching_bracket_after_dict_key));
 		    clear_tv(&tvkey);
@@ -1020,33 +1020,33 @@ eval_dict(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int literal)
 
 	// the colon should come right after the key, but this wasn't checked
 	// previously, so only require it in Vim9 script.
-	if (!vim9script)
+	အကယ်၍ (!vim9script)
 	    *arg = skipwhite(*arg);
-	if (**arg != ':')
+	အကယ်၍ (**arg != ':')
 	{
-	    if (*skipwhite(*arg) == ':')
+	    အကယ်၍ (*skipwhite(*arg) == ':')
 		semsg(_(e_no_white_space_allowed_before_str_str), ":", *arg);
-	    else
+	    မဟုတ်ပါက
 		semsg(_(e_missing_colon_in_dictionary_str), *arg);
 	    clear_tv(&tvkey);
 	    goto failret;
 	}
-	if (evaluate)
+	အကယ်၍ (evaluate)
 	{
-	    if (tvkey.v_type == VAR_FLOAT)
+	    အကယ်၍ (tvkey.v_type == VAR_FLOAT)
 	    {
 		tvkey.vval.v_string = typval_tostring(&tvkey, TRUE);
 		tvkey.v_type = VAR_STRING;
 	    }
 	    key = tv_get_string_buf_chk(&tvkey, buf);
-	    if (key == NULL)
+	    အကယ်၍ (key == NULL)
 	    {
 		// "key" is NULL when tv_get_string_buf_chk() gave an errmsg
 		clear_tv(&tvkey);
 		goto failret;
 	    }
 	}
-	if (vim9script && (*arg)[1] != NUL && !VIM_ISWHITE((*arg)[1]))
+	အကယ်၍ (vim9script && (*arg)[1] != NUL && !VIM_ISWHITE((*arg)[1]))
 	{
 	    semsg(_(e_white_space_required_after_str_str), ":", *arg);
 	    clear_tv(&tvkey);
@@ -1054,21 +1054,21 @@ eval_dict(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int literal)
 	}
 
 	*arg = skipwhite_and_linebreak(*arg + 1, evalarg);
-	if (eval1(arg, &tv, evalarg) == FAIL)	// recursive!
+	အကယ်၍ (eval1(arg, &tv, evalarg) == FAIL)	// recursive!
 	{
 	    clear_tv(&tvkey);
 	    goto failret;
 	}
-	if (check_typval_is_value(&tv) == FAIL)
+	အကယ်၍ (check_typval_is_value(&tv) == FAIL)
 	{
 	    clear_tv(&tvkey);
 	    clear_tv(&tv);
 	    goto failret;
 	}
-	if (evaluate)
+	အကယ်၍ (evaluate)
 	{
 	    item = dict_find(d, key, -1);
-	    if (item != NULL)
+	    အကယ်၍ (item != NULL)
 	    {
 		semsg(_(e_duplicate_key_in_dictionary_str), key);
 		clear_tv(&tvkey);
@@ -1076,11 +1076,11 @@ eval_dict(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int literal)
 		goto failret;
 	    }
 	    item = dictitem_alloc(key);
-	    if (item != NULL)
+	    အကယ်၍ (item != NULL)
 	    {
 		item->di_tv = tv;
 		item->di_tv.v_lock = 0;
-		if (dict_add(d, item) == FAIL)
+		အကယ်၍ (dict_add(d, item) == FAIL)
 		    dictitem_free(item);
 	    }
 	}
@@ -1088,12 +1088,12 @@ eval_dict(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int literal)
 
 	// the comma should come right after the value, but this wasn't checked
 	// previously, so only require it in Vim9 script.
-	if (!vim9script)
+	အကယ်၍ (!vim9script)
 	    *arg = skipwhite(*arg);
 	had_comma = **arg == ',';
-	if (had_comma)
+	အကယ်၍ (had_comma)
 	{
-	    if (vim9script && !IS_WHITE_NL_OR_NUL((*arg)[1]))
+	    အကယ်၍ (vim9script && !IS_WHITE_NL_OR_NUL((*arg)[1]))
 	    {
 		semsg(_(e_white_space_required_after_str_str), ",", *arg);
 		goto failret;
@@ -1103,33 +1103,33 @@ eval_dict(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int literal)
 
 	// the "}" can be on the next line
 	*arg = skipwhite_and_linebreak(*arg, evalarg);
-	if (**arg == '}')
-	    break;
-	if (!had_comma)
+	အကယ်၍ (**arg == '}')
+	    bha_nga;
+	အကယ်၍ (!had_comma)
 	{
-	    if (**arg == ',')
+	    အကယ်၍ (**arg == ',')
 		semsg(_(e_no_white_space_allowed_before_str_str), ",", *arg);
-	    else
+	    မဟုတ်ပါက
 		semsg(_(e_missing_comma_in_dictionary_str), *arg);
 	    goto failret;
 	}
     }
 
-    if (**arg != '}')
+    အကယ်၍ (**arg != '}')
     {
-	if (evalarg != NULL)
+	အကယ်၍ (evalarg != NULL)
 	    semsg(_(e_missing_dict_end_str), *arg);
 failret:
-	if (d != NULL)
+	အကယ်၍ (d != NULL)
 	    dict_free(d);
-	return FAIL;
+	ပြန်ပေး FAIL;
     }
 
     *arg = *arg + 1;
-    if (evaluate)
+    အကယ်၍ (evaluate)
 	rettv_dict_set(rettv, d);
 
-    return OK;
+    ပြန်ပေး OK;
 }
 
 /*
@@ -1138,25 +1138,25 @@ failret:
  * On return, "*arg" points to the character after the Dict.
  * Return OK or FAIL.  Returns NOTDONE for {expr}.
  */
-    int
+    ကိန်းပြည့်
 eval_lit_dict(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 {
-    int		vim9script = in_vim9script();
-    int		ret = OK;
+    ကိန်းပြည့်		vim9script = in_vim9script();
+    ကိန်းပြည့်		ret = OK;
 
-    if (vim9script)
+    အကယ်၍ (vim9script)
     {
 	ret = vim9_bad_comment(*arg) ? FAIL : NOTDONE;
     }
-    else if ((*arg)[1] == '{')
+    မဟုတ်ပါက အကယ်၍ ((*arg)[1] == '{')
     {
 	++*arg;
 	ret = eval_dict(arg, rettv, evalarg, TRUE);
     }
-    else
+    မဟုတ်ပါက
 	ret = NOTDONE;
 
-    return ret;
+    ပြန်ပေး ret;
 }
 
 /*
@@ -1168,82 +1168,82 @@ eval_lit_dict(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
  * "func_name" is used for reporting where an error occurred.
  */
     void
-dict_extend(dict_T *d1, dict_T *d2, char_u *action, char *func_name)
+dict_extend(dict_T *d1, dict_T *d2, char_u *action, var_na *func_name)
 {
     dictitem_T	*di1;
-    int		todo;
+    ကိန်းပြည့်		todo;
     char_u	*arg_errmsg = (char_u *)N_("extend() argument");
     type_T	*type;
 
-    if (check_hashtab_frozen(&d1->dv_hashtab, "extend"))
-	return;
+    အကယ်၍ (check_hashtab_frozen(&d1->dv_hashtab, "extend"))
+	ပြန်ပေး;
 
-    if (*action == 'm')
+    အကယ်၍ (*action == 'm')
     {
-	if (check_hashtab_frozen(&d2->dv_hashtab, "extend"))
-	    return;
+	အကယ်၍ (check_hashtab_frozen(&d2->dv_hashtab, "extend"))
+	    ပြန်ပေး;
 	hash_lock(&d2->dv_hashtab);  // don't rehash on hash_remove()
     }
 
-    if (d1->dv_type != NULL && d1->dv_type->tt_member != NULL)
+    အကယ်၍ (d1->dv_type != NULL && d1->dv_type->tt_member != NULL)
 	type = d1->dv_type->tt_member;
-    else
+    မဟုတ်ပါက
 	type = NULL;
 
-    todo = (int)d2->dv_hashtab.ht_used;
+    todo = (ကိန်းပြည့်)d2->dv_hashtab.ht_used;
     hashitem_T *hi2;
     FOR_ALL_HASHTAB_ITEMS(&d2->dv_hashtab, hi2, todo)
     {
-	if (!HASHITEM_EMPTY(hi2))
+	အကယ်၍ (!HASHITEM_EMPTY(hi2))
 	{
 	    --todo;
 	    di1 = dict_find(d1, hi2->hi_key, -1);
 	    // Check the key to be valid when adding to any scope.
-	    if (d1->dv_scope != 0 && !valid_varname(hi2->hi_key, -1, TRUE))
-		break;
+	    အကယ်၍ (d1->dv_scope != 0 && !valid_varname(hi2->hi_key, -1, TRUE))
+		bha_nga;
 
-	    if (type != NULL
+	    အကယ်၍ (type != NULL
 		     && check_typval_arg_type(type, &HI2DI(hi2)->di_tv,
 							 func_name, 0) == FAIL)
-		break;
+		bha_nga;
 
-	    if (di1 == NULL)
+	    အကယ်၍ (di1 == NULL)
 	    {
-		if (*action == 'm')
+		အကယ်၍ (*action == 'm')
 		{
 		    // Cheap way to move a dict item from "d2" to "d1".
 		    // If dict_add() fails then "d2" won't be empty.
 		    di1 = HI2DI(hi2);
-		    if (dict_add(d1, di1) == OK)
+		    အကယ်၍ (dict_add(d1, di1) == OK)
 			hash_remove(&d2->dv_hashtab, hi2, "extend");
 		}
-		else
+		မဟုတ်ပါက
 		{
 		    di1 = dictitem_copy(HI2DI(hi2));
-		    if (di1 != NULL && dict_add(d1, di1) == FAIL)
+		    အကယ်၍ (di1 != NULL && dict_add(d1, di1) == FAIL)
 			dictitem_free(di1);
 		}
 	    }
-	    else if (*action == 'e')
+	    မဟုတ်ပါက အကယ်၍ (*action == 'e')
 	    {
 		semsg(_(e_key_already_exists_str), hi2->hi_key);
-		break;
+		bha_nga;
 	    }
-	    else if (*action == 'f' && HI2DI(hi2) != di1)
+	    မဟုတ်ပါက အကယ်၍ (*action == 'f' && HI2DI(hi2) != di1)
 	    {
-		if (value_check_lock(di1->di_tv.v_lock, arg_errmsg, TRUE)
+		အကယ်၍ (value_check_lock(di1->di_tv.v_lock, arg_errmsg, TRUE)
 			|| var_check_ro(di1->di_flags, arg_errmsg, TRUE))
-		    break;
+		    bha_nga;
 		// Disallow replacing a builtin function.
-		if (dict_wrong_func_name(d1, &HI2DI(hi2)->di_tv, hi2->hi_key))
-		    break;
+		အကယ်၍ (dict_wrong_func_name(d1, &HI2DI(hi2)->di_tv, hi2->hi_key))
+		    bha_nga;
 		clear_tv(&di1->di_tv);
 		copy_tv(&HI2DI(hi2)->di_tv, &di1->di_tv);
 	    }
 	}
     }
 
-    if (*action == 'm')
+    အကယ်၍ (*action == 'm')
 	hash_unlock(&d2->dv_hashtab);
 }
 
@@ -1253,46 +1253,46 @@ dict_extend(dict_T *d1, dict_T *d2, char_u *action, char *func_name)
     dictitem_T *
 dict_lookup(hashitem_T *hi)
 {
-    return HI2DI(hi);
+    ပြန်ပေး HI2DI(hi);
 }
 
 /*
  * Return TRUE when two dictionaries have exactly the same key/values.
  */
-    int
+    ကိန်းပြည့်
 dict_equal(
     dict_T	*d1,
     dict_T	*d2,
-    int		ic)	    // ignore case for strings
+    ကိန်းပြည့်		ic)	    // ignore case for strings
 {
     hashitem_T	*hi;
     dictitem_T	*item2;
-    int		todo;
+    ကိန်းပြည့်		todo;
 
-    if (d1 == d2)
-	return TRUE;
-    if (dict_len(d1) != dict_len(d2))
-	return FALSE;
-    if (dict_len(d1) == 0)
+    အကယ်၍ (d1 == d2)
+	ပြန်ပေး TRUE;
+    အကယ်၍ (dict_len(d1) != dict_len(d2))
+	ပြန်ပေး FALSE;
+    အကယ်၍ (dict_len(d1) == 0)
 	// empty and NULL dicts are considered equal
-	return TRUE;
-    if (d1 == NULL || d2 == NULL)
-	return FALSE;
+	ပြန်ပေး TRUE;
+    အကယ်၍ (d1 == NULL || d2 == NULL)
+	ပြန်ပေး FALSE;
 
-    todo = (int)d1->dv_hashtab.ht_used;
+    todo = (ကိန်းပြည့်)d1->dv_hashtab.ht_used;
     FOR_ALL_HASHTAB_ITEMS(&d1->dv_hashtab, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	အကယ်၍ (!HASHITEM_EMPTY(hi))
 	{
 	    item2 = dict_find(d2, hi->hi_key, -1);
-	    if (item2 == NULL)
-		return FALSE;
-	    if (!tv_equal(&HI2DI(hi)->di_tv, &item2->di_tv, ic))
-		return FALSE;
+	    အကယ်၍ (item2 == NULL)
+		ပြန်ပေး FALSE;
+	    အကယ်၍ (!tv_equal(&HI2DI(hi)->di_tv, &item2->di_tv, ic))
+		ပြန်ပေး FALSE;
 	    --todo;
 	}
     }
-    return TRUE;
+    ပြန်ပေး TRUE;
 }
 
 /*
@@ -1300,27 +1300,27 @@ dict_equal(
  * if "ic" is TRUE.
  */
     long
-dict_count(dict_T *d, typval_T *needle, int ic)
+dict_count(dict_T *d, typval_T *needle, ကိန်းပြည့် ic)
 {
-    int		todo;
+    ကိန်းပြည့်		todo;
     hashitem_T	*hi;
     long	n = 0;
 
-    if (d == NULL)
-	return 0;
+    အကယ်၍ (d == NULL)
+	ပြန်ပေး 0;
 
-    todo = (int)d->dv_hashtab.ht_used;
+    todo = (ကိန်းပြည့်)d->dv_hashtab.ht_used;
     FOR_ALL_HASHTAB_ITEMS(&d->dv_hashtab, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	အကယ်၍ (!HASHITEM_EMPTY(hi))
 	{
 	    --todo;
-	    if (tv_equal(&HI2DI(hi)->di_tv, needle, ic))
+	    အကယ်၍ (tv_equal(&HI2DI(hi)->di_tv, needle, ic))
 		++n;
 	}
     }
 
-    return n;
+    ပြန်ပေး n;
 }
 
 /*
@@ -1331,79 +1331,79 @@ dict_count(dict_T *d, typval_T *needle, int ic)
 dict_extend_func(
 	typval_T	*argvars,
 	type_T		*type,
-	char		*func_name,
+	var_na		*func_name,
 	char_u		*arg_errmsg,
-	int		is_new,
+	ကိန်းပြည့်		is_new,
 	typval_T	*rettv)
 {
     dict_T	*d1, *d2;
     char_u	*action;
-    int	i;
+    ကိန်းပြည့်	i;
 
     d1 = argvars[0].vval.v_dict;
-    if (d1 == NULL)
+    အကယ်၍ (d1 == NULL)
     {
 	emsg(_(e_cannot_extend_null_dict));
-	return;
+	ပြန်ပေး;
     }
 
-    if (!is_new && value_check_lock(d1->dv_lock, arg_errmsg, TRUE))
-	return;
+    အကယ်၍ (!is_new && value_check_lock(d1->dv_lock, arg_errmsg, TRUE))
+	ပြန်ပေး;
 
-    if (is_new)
+    အကယ်၍ (is_new)
     {
 	d1 = dict_copy(d1, FALSE, TRUE, get_copyID());
-	if (d1 == NULL)
-	    return;
+	အကယ်၍ (d1 == NULL)
+	    ပြန်ပေး;
     }
 
     d2 = argvars[1].vval.v_dict;
-    if (d2 == NULL)
+    အကယ်၍ (d2 == NULL)
 	goto theend;
 
     // Check the third argument.
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    အကယ်၍ (argvars[2].v_type != VAR_UNKNOWN)
     {
-	static char *(av[]) = {"keep", "force", "error"};
+	static var_na *(av[]) = {"keep", "force", "error"};
 
 	action = tv_get_string_chk(&argvars[2]);
-	if (action == NULL)
+	အကယ်၍ (action == NULL)
 	{
-	    if (is_new)
+	    အကယ်၍ (is_new)
 		dict_unref(d1);
-	    return;
+	    ပြန်ပေး;
 	}
-	for (i = 0; i < 3; ++i)
-	    if (STRCMP(action, av[i]) == 0)
-		break;
-	if (i == 3)
+	အတွက် (i = 0; i < 3; ++i)
+	    အကယ်၍ (STRCMP(action, av[i]) == 0)
+		bha_nga;
+	အကယ်၍ (i == 3)
 	{
-	    if (is_new)
+	    အကယ်၍ (is_new)
 		dict_unref(d1);
 	    semsg(_(e_invalid_argument_str), action);
-	    return;
+	    ပြန်ပေး;
 	}
     }
-    else
+    မဟုတ်ပါက
 	action = (char_u *)"force";
 
-    if (type != NULL && check_typval_arg_type(type, &argvars[1],
+    အကယ်၍ (type != NULL && check_typval_arg_type(type, &argvars[1],
 							 func_name, 2) == FAIL)
     {
-	if (is_new)
+	အကယ်၍ (is_new)
 	    dict_unref(d1);
-	return;
+	ပြန်ပေး;
     }
     dict_extend(d1, d2, action, func_name);
 
 theend:
-    if (is_new)
+    အကယ်၍ (is_new)
     {
 	rettv->v_type = VAR_DICT;
 	rettv->vval.v_dict = d1;
 	rettv->v_lock = FALSE;
     }
-    else
+    မဟုတ်ပါက
 	copy_tv(&argvars[0], rettv);
 }
 
@@ -1416,7 +1416,7 @@ dict_filter_map(
 	dict_T		*d,
 	filtermap_T	filtermap,
 	type_T		*argtype,
-	char		*func_name,
+	var_na		*func_name,
 	char_u		*arg_errmsg,
 	typval_T	*expr,
 	typval_T	*rettv)
@@ -1425,93 +1425,93 @@ dict_filter_map(
     hashtab_T	*ht;
     hashitem_T	*hi;
     dictitem_T	*di;
-    int		todo;
-    int		rem;
+    ကိန်းပြည့်		todo;
+    ကိန်းပြည့်		rem;
     typval_T	newtv;
     funccall_T	*fc;
 
-    if (filtermap == FILTERMAP_MAPNEW)
+    အကယ်၍ (filtermap == FILTERMAP_MAPNEW)
     {
 	rettv->v_type = VAR_DICT;
 	rettv->vval.v_dict = NULL;
     }
-    if (d == NULL
+    အကယ်၍ (d == NULL
 	  || (filtermap == FILTERMAP_FILTER
 			&& value_check_lock(d->dv_lock, arg_errmsg, TRUE)))
-	return;
+	ပြန်ပေး;
 
-    if (filtermap == FILTERMAP_MAPNEW)
+    အကယ်၍ (filtermap == FILTERMAP_MAPNEW)
     {
-	if (rettv_dict_alloc(rettv) == FAIL)
-	    return;
+	အကယ်၍ (rettv_dict_alloc(rettv) == FAIL)
+	    ပြန်ပေး;
 	d_ret = rettv->vval.v_dict;
     }
 
     // Create one funccall_T for all eval_expr_typval() calls.
     fc = eval_expr_get_funccal(expr, &newtv);
 
-    int prev_lock = d->dv_lock;
-    if (d->dv_lock == 0)
+    ကိန်းပြည့် prev_lock = d->dv_lock;
+    အကယ်၍ (d->dv_lock == 0)
 	d->dv_lock = VAR_LOCKED;
     ht = &d->dv_hashtab;
     hash_lock(ht);
-    todo = (int)ht->ht_used;
+    todo = (ကိန်းပြည့်)ht->ht_used;
     FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	အကယ်၍ (!HASHITEM_EMPTY(hi))
 	{
-	    int		r;
+	    ကိန်းပြည့်		r;
 
 	    --todo;
 	    di = HI2DI(hi);
-	    if (filtermap == FILTERMAP_MAP
+	    အကယ်၍ (filtermap == FILTERMAP_MAP
 		    && (value_check_lock(di->di_tv.v_lock,
 			    arg_errmsg, TRUE)
 			|| var_check_ro(di->di_flags,
 			    arg_errmsg, TRUE)))
-		break;
+		bha_nga;
 	    set_vim_var_string(VV_KEY, di->di_key, -1);
 	    r = filter_map_one(&di->di_tv, expr, filtermap, fc, &newtv, &rem);
 	    clear_tv(get_vim_var_tv(VV_KEY));
-	    if (r == FAIL || did_emsg)
+	    အကယ်၍ (r == FAIL || did_emsg)
 	    {
 		clear_tv(&newtv);
-		break;
+		bha_nga;
 	    }
-	    if (filtermap == FILTERMAP_MAP)
+	    အကယ်၍ (filtermap == FILTERMAP_MAP)
 	    {
-		if (argtype != NULL && check_typval_arg_type(
+		အကယ်၍ (argtype != NULL && check_typval_arg_type(
 			     argtype->tt_member, &newtv, func_name, 0) == FAIL)
 		{
 		    clear_tv(&newtv);
-		    break;
+		    bha_nga;
 		}
 		// map(): replace the dict item value
 		clear_tv(&di->di_tv);
 		newtv.v_lock = 0;
 		di->di_tv = newtv;
 	    }
-	    else if (filtermap == FILTERMAP_MAPNEW)
+	    မဟုတ်ပါက အကယ်၍ (filtermap == FILTERMAP_MAPNEW)
 	    {
 		// mapnew(): add the item value to the new dict
-		r = dict_add_tv(d_ret, (char *)di->di_key, &newtv);
+		r = dict_add_tv(d_ret, (var_na *)di->di_key, &newtv);
 		clear_tv(&newtv);
-		if (r == FAIL)
-		    break;
+		အကယ်၍ (r == FAIL)
+		    bha_nga;
 	    }
-	    else if (filtermap == FILTERMAP_FILTER && rem)
+	    မဟုတ်ပါက အကယ်၍ (filtermap == FILTERMAP_FILTER && rem)
 	    {
 		// filter(false): remove the item from the dict
-		if (var_check_fixed(di->di_flags, arg_errmsg, TRUE)
+		အကယ်၍ (var_check_fixed(di->di_flags, arg_errmsg, TRUE)
 			|| var_check_ro(di->di_flags, arg_errmsg, TRUE))
-		    break;
+		    bha_nga;
 		dictitem_remove(d, di, "filter");
 	    }
 	}
     }
     hash_unlock(ht);
     d->dv_lock = prev_lock;
-    if (fc != NULL)
+    အကယ်၍ (fc != NULL)
 	remove_funccal();
 }
 
@@ -1525,37 +1525,37 @@ dict_remove(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg)
     char_u	*key;
     dictitem_T	*di;
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    အကယ်၍ (argvars[2].v_type != VAR_UNKNOWN)
     {
 	semsg(_(e_too_many_arguments_for_function_str), "remove()");
-	return;
+	ပြန်ပေး;
     }
 
     d = argvars[0].vval.v_dict;
-    if (d == NULL || value_check_lock(d->dv_lock, arg_errmsg, TRUE))
-	return;
+    အကယ်၍ (d == NULL || value_check_lock(d->dv_lock, arg_errmsg, TRUE))
+	ပြန်ပေး;
 
     key = tv_get_string_chk(&argvars[1]);
-    if (key == NULL)
-	return;
+    အကယ်၍ (key == NULL)
+	ပြန်ပေး;
 
     di = dict_find(d, key, -1);
-    if (di == NULL)
+    အကယ်၍ (di == NULL)
     {
 	semsg(_(e_key_not_present_in_dictionary_str), key);
-	return;
+	ပြန်ပေး;
     }
 
-    if (var_check_fixed(di->di_flags, arg_errmsg, TRUE)
+    အကယ်၍ (var_check_fixed(di->di_flags, arg_errmsg, TRUE)
 	    || var_check_ro(di->di_flags, arg_errmsg, TRUE))
-	return;
+	ပြန်ပေး;
 
     *rettv = di->di_tv;
     init_tv(&di->di_tv);
     dictitem_remove(d, di, "remove()");
 }
 
-typedef enum {
+typedef ga_nanaa {
     DICT2LIST_KEYS,
     DICT2LIST_VALUES,
     DICT2LIST_ITEMS,
@@ -1573,73 +1573,73 @@ dict2list(typval_T *argvars, typval_T *rettv, dict2list_T what)
     hashitem_T	*hi;
     listitem_T	*li;
     dict_T	*d;
-    int		todo;
+    ကိန်းပြည့်		todo;
 
-    if (check_for_dict_arg(argvars, 0) == FAIL)
+    အကယ်၍ (check_for_dict_arg(argvars, 0) == FAIL)
     {
 	// invalid argument, return an empty list
 	(void)rettv_list_alloc(rettv);
-	return;
+	ပြန်ပေး;
     }
 
     // NULL dict behaves like an empty dict
     d = argvars[0].vval.v_dict;
-    todo = d == NULL ? 0 : (int)d->dv_hashtab.ht_used;
+    todo = d == NULL ? 0 : (ကိန်းပြည့်)d->dv_hashtab.ht_used;
 
     // The number of items is known, allocate the list and all its items in
     // one go for efficiency.
     l = list_alloc_with_items(todo);
-    if (l == NULL)
+    အကယ်၍ (l == NULL)
     {
 	(void)rettv_list_alloc(rettv);
-	return;
+	ပြန်ပေး;
     }
     rettv_list_set(rettv, l);
-    if (todo == 0)
+    အကယ်၍ (todo == 0)
 	// NULL or empty dict, return the empty list
-	return;
+	ပြန်ပေး;
 
     li = l->lv_first;
     FOR_ALL_HASHTAB_ITEMS(&d->dv_hashtab, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	အကယ်၍ (!HASHITEM_EMPTY(hi))
 	{
 	    --todo;
 	    di = HI2DI(hi);
 
-	    if (what == DICT2LIST_KEYS)
+	    အကယ်၍ (what == DICT2LIST_KEYS)
 	    {
 		// keys()
 		li->li_tv.v_type = VAR_STRING;
 		li->li_tv.v_lock = 0;
 		li->li_tv.vval.v_string = vim_strsave(di->di_key);
 	    }
-	    else if (what == DICT2LIST_VALUES)
+	    မဟုတ်ပါက အကယ်၍ (what == DICT2LIST_VALUES)
 	    {
 		// values()
 		copy_tv(&di->di_tv, &li->li_tv);
 	    }
-	    else
+	    မဟုတ်ပါက
 	    {
 		// items()
 		l2 = list_alloc_with_items(2);
 		li->li_tv.v_type = VAR_LIST;
 		li->li_tv.v_lock = 0;
 		li->li_tv.vval.v_list = l2;
-		if (l2 == NULL)
+		အကယ်၍ (l2 == NULL)
 		    goto alloc_failed;
 		++l2->lv_refcount;
 
 		l2->lv_first->li_tv.v_type = VAR_STRING;
 		l2->lv_first->li_tv.vval.v_string = vim_strsave(di->di_key);
-		if (l2->lv_first->li_tv.vval.v_string == NULL)
+		အကယ်၍ (l2->lv_first->li_tv.vval.v_string == NULL)
 		    goto alloc_failed;
 		copy_tv(&di->di_tv, &l2->lv_u.mat.lv_last->li_tv);
 	    }
 	    li = li->li_next;
 	}
     }
-    return;
+    ပြန်ပေး;
 
 alloc_failed:
     // On a memory allocation failure some of the pre-allocated items may be
@@ -1681,13 +1681,13 @@ f_values(typval_T *argvars, typval_T *rettv)
     void
 dict_set_items_ro(dict_T *di)
 {
-    int		todo = (int)di->dv_hashtab.ht_used;
+    ကိန်းပြည့်		todo = (ကိန်းပြည့်)di->dv_hashtab.ht_used;
     hashitem_T	*hi;
 
     // Set readonly
     FOR_ALL_HASHTAB_ITEMS(&di->dv_hashtab, hi, todo)
     {
-	if (HASHITEM_EMPTY(hi))
+	အကယ်၍ (HASHITEM_EMPTY(hi))
 	    continue;
 	--todo;
 	HI2DI(hi)->di_flags |= DI_FLAGS_RO | DI_FLAGS_FIX;
@@ -1700,19 +1700,19 @@ dict_set_items_ro(dict_T *di)
     void
 f_has_key(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    အကယ်၍ (in_vim9script()
 	    && (check_for_dict_arg(argvars, 0) == FAIL
 		|| check_for_string_or_number_arg(argvars, 1) == FAIL))
-	return;
+	ပြန်ပေး;
 
-    if (check_for_dict_arg(argvars, 0) == FAIL)
-	return;
+    အကယ်၍ (check_for_dict_arg(argvars, 0) == FAIL)
+	ပြန်ပေး;
 
-    if (argvars[0].vval.v_dict == NULL)
-	return;
+    အကယ်၍ (argvars[0].vval.v_dict == NULL)
+	ပြန်ပေး;
 
     rettv->vval.v_number = dict_has_key(argvars[0].vval.v_dict,
-				(char *)tv_get_string(&argvars[1]));
+				(var_na *)tv_get_string(&argvars[1]));
 }
 
 #endif // defined(FEAT_EVAL)

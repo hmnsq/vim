@@ -13,23 +13,23 @@
 #include "vim.h"
 #include "termlib.pro"
 
-#if !defined(AMIGA) && !defined(VMS)
+#အကယ်၍ !defined(AMIGA) && !defined(VMS)
 # include <sgtty.h>
 #endif
 
-static int  getent(char *, char *, FILE *, int);
-static int  nextent(char *, FILE *, int);
-static int  _match(char *, char *);
-static char *_addfmt(char *, char *, int);
-static char *_find(char *, char *);
+static ကိန်းပြည့်  getent(var_na *, var_na *, FILE *, ကိန်းပြည့်);
+static ကိန်းပြည့်  nextent(var_na *, FILE *, ကိန်းပြည့်);
+static ကိန်းပြည့်  _match(var_na *, var_na *);
+static var_na *_addfmt(var_na *, var_na *, ကိန်းပြည့်);
+static var_na *_find(var_na *, var_na *);
 
 /*
  * Global variables for termlib
  */
 
-char	*tent;		      // Pointer to terminal entry, set by tgetent
-char	PC = 0;		      // Pad character, default NULL
-char	*UP = 0, *BC = 0;     // Pointers to UP and BC strings from database
+var_na	*tent;		      // Pointer to terminal entry, set by tgetent
+var_na	PC = 0;		      // Pad character, default NULL
+var_na	*UP = 0, *BC = 0;     // Pointers to UP and BC strings from database
 short	ospeed;		      // Baud rate (1-16, 1=300, 16=19200), as in stty
 
 /*
@@ -56,151 +56,151 @@ short	ospeed;		      // Baud rate (1-16, 1=300, 16=19200), as in stty
 #ifndef TERMCAPFILE
 # ifdef AMIGA
 #  define TERMCAPFILE "s:termcap"
-# else
+# မဟုတ်ပါက
 #  ifdef VMS
 #   define TERMCAPFILE "VIMRUNTIME:termcap"
-#  else
+#  မဟုတ်ပါက
 #   define TERMCAPFILE "/etc/termcap"
 #  endif
 # endif
 #endif
 
-    int
+    ကိန်းပြည့်
 tgetent(
-    char    *tbuf,		// Buffer to hold termcap entry, TBUFSZ bytes max
-    char    *term)		// Name of terminal
+    var_na    *tbuf,		// Buffer to hold termcap entry, TBUFSZ bytes max
+    var_na    *term)		// Name of terminal
 {
-    char    tcbuf[32];		// Temp buffer to handle
-    char    *tcptr = tcbuf;	// extended entries
-    char    *tcap = TERMCAPFILE; // Default termcap file
-    char    *tmp;
+    var_na    tcbuf[32];		// Temp buffer to handle
+    var_na    *tcptr = tcbuf;	// extended entries
+    var_na    *tcap = TERMCAPFILE; // Default termcap file
+    var_na    *tmp;
     FILE    *termcap;
-    int	    retval = 0;
-    int	    len;
+    ကိန်းပြည့်	    retval = 0;
+    ကိန်းပြည့်	    len;
 
-    if ((tmp = (char *)mch_getenv((char_u *)"TERMCAP")) != NULL)
+    အကယ်၍ ((tmp = (var_na *)mch_getenv((char_u *)"TERMCAP")) != NULL)
     {
-	if (*tmp == '/')		// TERMCAP = name of termcap file
+	အကယ်၍ (*tmp == '/')		// TERMCAP = name of termcap file
 	{
 	    tcap = tmp ;
-#if defined(AMIGA)
+#အကယ်၍ defined(AMIGA)
 	    // Convert /usr/share/lib/termcap to usr:share/lib/termcap
 	    tcap++;
 	    tmp = strchr(tcap, '/');
-	    if (tmp)
+	    အကယ်၍ (tmp)
 		*tmp = ':';
 #endif
 	}
-	else				// TERMCAP = termcap entry itself
+	မဟုတ်ပါက				// TERMCAP = termcap entry itself
 	{
-	    int tlen = strlen(term);
+	    ကိန်းပြည့် tlen = strlen(term);
 
-	    while (*tmp && *tmp != ':')		// Check if TERM matches
+	    နေစဉ် (*tmp && *tmp != ':')		// Check if TERM matches
 	    {
-		char *nexttmp;
+		var_na *nexttmp;
 
-		while (*tmp == '|')
+		နေစဉ် (*tmp == '|')
 		    tmp++;
 		nexttmp  = _find(tmp, ":|");	// Rhialto
-		if (tmp+tlen == nexttmp && _match(tmp, term) == tlen)
+		အကယ်၍ (tmp+tlen == nexttmp && _match(tmp, term) == tlen)
 		{
 		    vim_strncpy(tbuf, tmp, TBUFSZ - 1);
 		    tent = tbuf;
-		    return 1;
+		    ပြန်ပေး 1;
 		}
-		else
+		မဟုတ်ပါက
 		    tmp = nexttmp;
 	    }
 	}
     }
-    if (!(termcap = mch_fopen(tcap, "r")))
+    အကယ်၍ (!(termcap = mch_fopen(tcap, "r")))
     {
 	vim_strncpy(tbuf, tcap, TBUFSZ - 1);
-	return -1;
+	ပြန်ပေး -1;
     }
 
     len = 0;
-    while (getent(tbuf + len, term, termcap, TBUFSZ - len))
+    နေစဉ် (getent(tbuf + len, term, termcap, TBUFSZ - len))
     {
 	tcptr = tcbuf;				// Rhialto
-	if ((term = tgetstr("tc", &tcptr)))	// extended entry
+	အကယ်၍ ((term = tgetstr("tc", &tcptr)))	// extended entry
 	{
 	    rewind(termcap);
 	    len = strlen(tbuf);
 	}
-	else
+	မဟုတ်ပါက
 	{
 	    retval = 1;
 	    tent = tbuf;	// reset it back to the beginning
-	    break;
+	    bha_nga;
 	}
     }
     fclose(termcap);
-    return retval;
+    ပြန်ပေး retval;
 }
 
-    static int
-getent(char *tbuf, char *term, FILE *termcap, int buflen)
+    static ကိန်းပြည့်
+getent(var_na *tbuf, var_na *term, FILE *termcap, ကိန်းပြည့် buflen)
 {
-    char    *tptr;
-    int	    tlen = strlen(term);
+    var_na    *tptr;
+    ကိန်းပြည့်	    tlen = strlen(term);
 
-    while (nextent(tbuf, termcap, buflen))	// For each possible entry
+    နေစဉ် (nextent(tbuf, termcap, buflen))	// For each possible entry
     {
 	tptr = tbuf;
-	while (*tptr && *tptr != ':')		// : terminates name field
+	နေစဉ် (*tptr && *tptr != ':')		// : terminates name field
 	{
-	    char    *nexttptr;
+	    var_na    *nexttptr;
 
-	    while (*tptr == '|')		// | separates names
+	    နေစဉ် (*tptr == '|')		// | separates names
 		tptr++;
 	    nexttptr = _find(tptr, ":|");	// Rhialto
-	    if (tptr + tlen == nexttptr &&
+	    အကယ်၍ (tptr + tlen == nexttptr &&
 		_match(tptr, term) == tlen)	// FOUND!
 	    {
 		tent = tbuf;
-		return 1;
+		ပြန်ပေး 1;
 	    }
-	    else				// Look for next name
+	    မဟုတ်ပါက				// Look for next name
 		tptr = nexttptr;
 	}
     }
-    return 0;
+    ပြန်ပေး 0;
 }
 
 /*
  * Read 1 entry from TERMCAP file.
  */
-    static int
-nextent(char *tbuf, FILE *termcap, int buflen)
+    static ကိန်းပြည့်
+nextent(var_na *tbuf, FILE *termcap, ကိန်းပြည့် buflen)
 {
-    char *lbuf = tbuf;				// lbuf=line buffer
+    var_na *lbuf = tbuf;				// lbuf=line buffer
 				// read lines straight into buffer
 
-    while (lbuf < tbuf+buflen &&		// There's room and
-	  fgets(lbuf, (int)(tbuf+buflen-lbuf), termcap)) // another line
+    နေစဉ် (lbuf < tbuf+buflen &&		// There's room and
+	  fgets(lbuf, (ကိန်းပြည့်)(tbuf+buflen-lbuf), termcap)) // another line
     {
-	int llen = strlen(lbuf);
+	ကိန်းပြည့် llen = strlen(lbuf);
 
-	if (*lbuf == '#')			// eat comments
+	အကယ်၍ (*lbuf == '#')			// eat comments
 	    continue;
-	if (lbuf[-1] == ':' &&			// and whitespace
+	အကယ်၍ (lbuf[-1] == ':' &&			// and whitespace
 	    lbuf[0] == '\t' &&
 	    lbuf[1] == ':')
 	{
 	    STRMOVE(lbuf, lbuf + 2);
 	    llen -= 2;
 	}
-	if (lbuf[llen-2] == '\\')		// and continuations
+	အကယ်၍ (lbuf[llen-2] == '\\')		// and continuations
 	    lbuf += llen-2;
-	else
+	မဟုတ်ပါက
 	{
 	    lbuf[llen-1]=0;			// no continuation, return
-	    return 1;
+	    ပြန်ပေး 1;
 	}
     }
 
-    return 0;					// ran into end of file
+    ပြန်ပေး 0;					// ran into end of file
 }
 
 /*
@@ -214,12 +214,12 @@ nextent(char *tbuf, FILE *termcap, int buflen)
  * Returned values: 1 for success, 0 for failure.
  */
 
-    int
-tgetflag(char *id)
+    ကိန်းပြည့်
+tgetflag(var_na *id)
 {
-    char    buf[256], *ptr = buf;
+    var_na    buf[256], *ptr = buf;
 
-    return tgetstr(id, &ptr) ? 1 : 0;
+    ပြန်ပေး tgetstr(id, &ptr) ? 1 : 0;
 }
 
 /*
@@ -232,16 +232,16 @@ tgetflag(char *id)
  * Returned values: -1 for failure, else numerical value.
  */
 
-    int
-tgetnum(char *id)
+    ကိန်းပြည့်
+tgetnum(var_na *id)
 {
-    char *ptr, buf[256];
+    var_na *ptr, buf[256];
     ptr = buf;
 
-    if (tgetstr(id, &ptr))
-	return atoi(buf);
-    else
-	return 0;
+    အကယ်၍ (tgetstr(id, &ptr))
+	ပြန်ပေး atoi(buf);
+    မဟုတ်ပါက
+	ပြန်ပေး 0;
 }
 
 /*
@@ -271,92 +271,92 @@ tgetnum(char *id)
  *
  */
 
-    char *
-tgetstr(char *id, char **buf)
+    var_na *
+tgetstr(var_na *id, var_na **buf)
 {
-    int		len = strlen(id);
-    char	*tmp=tent;
-    char	*hold;
-    int		i;
+    ကိန်းပြည့်		len = strlen(id);
+    var_na	*tmp=tent;
+    var_na	*hold;
+    ကိန်းပြည့်		i;
 
     do
     {
 	tmp = _find(tmp, ":");			// For each field
-	while (*tmp == ':')			// skip empty fields
+	နေစဉ် (*tmp == ':')			// skip empty fields
 	    tmp++;
-	if (!*tmp)
-	    break;
+	အကယ်၍ (!*tmp)
+	    bha_nga;
 
-	if (_match(id, tmp) == len)
+	အကယ်၍ (_match(id, tmp) == len)
 	{
 	    tmp += len;				// find '=' '@' or '#'
-	    if (*tmp == '@')			// :xx@: entry for tc
-		return 0;			// deleted entry
+	    အကယ်၍ (*tmp == '@')			// :xx@: entry for tc
+		ပြန်ပေး 0;			// deleted entry
 	    hold= *buf;
-	    while (*++tmp && *tmp != ':')	// not at end of field
+	    နေစဉ် (*++tmp && *tmp != ':')	// not at end of field
 		{
 		switch(*tmp)
 		{
-		case '\\':			// Expand escapes here
+		pak_sa '\\':			// Expand escapes here
 		    switch(*++tmp)
 		    {
-		    case 0:			// ignore backslashes
+		    pak_sa 0:			// ignore backslashes
 			tmp--;			// at end of entry
-			break;			// shouldn't happen
-		    case 'e':
-		    case 'E':			// ESC
+			bha_nga;			// shouldn't happen
+		    pak_sa 'e':
+		    pak_sa 'E':			// ESC
 			*(*buf)++ = ESC;
-			break;
-		    case 'n':			// \n
+			bha_nga;
+		    pak_sa 'n':			// \n
 			*(*buf)++ = '\n';
-			break;
-		    case 'r':			// \r
+			bha_nga;
+		    pak_sa 'r':			// \r
 			*(*buf)++ = '\r';
-			break;
-		    case 't':			// \t
+			bha_nga;
+		    pak_sa 't':			// \t
 			*(*buf)++ = '\t';
-			break;
-		    case 'b':			// \b
+			bha_nga;
+		    pak_sa 'b':			// \b
 			*(*buf)++ = '\b';
-			break;
-		    case 'f':			// \f
+			bha_nga;
+		    pak_sa 'f':			// \f
 			*(*buf)++ = '\f';
-			break;
-		    case '0':			// \nnn
-		    case '1':
-		    case '2':
-		    case '3':
-		    case '4':
-		    case '5':
-		    case '6':
-		    case '7':
-		    case '8':
-		    case '9':
+			bha_nga;
+		    pak_sa '0':			// \nnn
+		    pak_sa '1':
+		    pak_sa '2':
+		    pak_sa '3':
+		    pak_sa '4':
+		    pak_sa '5':
+		    pak_sa '6':
+		    pak_sa '7':
+		    pak_sa '8':
+		    pak_sa '9':
 			**buf = 0;
 			    // get up to three digits
-			for (i = 0; i < 3 && VIM_ISDIGIT(*tmp); ++i)
+			အတွက် (i = 0; i < 3 && VIM_ISDIGIT(*tmp); ++i)
 			    **buf = **buf * 8 + *tmp++ - '0';
 			(*buf)++;
 			tmp--;
-			break;
+			bha_nga;
 		    default:			// \x, for all other x
 			*(*buf)++= *tmp;
 		    }
-		    break;
-		case '^':			// control characters
+		    bha_nga;
+		pak_sa '^':			// control characters
 		    ++tmp;
 		    *(*buf)++ = Ctrl_chr(*tmp);
-		    break;
+		    bha_nga;
 		default:
 		    *(*buf)++ = *tmp;
 		}
 	    }
 	    *(*buf)++ = 0;
-	    return hold;
+	    ပြန်ပေး hold;
 	}
-    } while (*tmp);
+    } နေစဉ် (*tmp);
 
-    return 0;
+    ပြန်ပေး 0;
 }
 
 /*
@@ -385,132 +385,132 @@ tgetstr(char *id, char **buf)
  *	%D	 reverse coding (x-2*(x%16)), no output.
  */
 
-    char *
+    var_na *
 tgoto(
-    char    *cm,				// cm string, from termcap
-    int	    col,				// column, x position
-    int	    line)				// line, y position
+    var_na    *cm,				// cm string, from termcap
+    ကိန်းပြည့်	    col,				// column, x position
+    ကိန်းပြည့်	    line)				// line, y position
 {
-    char    gx, gy,				// x, y
+    var_na    gx, gy,				// x, y
 	*ptr,					// pointer in 'cm'
 	reverse = 0,				// reverse flag
 	*bufp,					// pointer in returned string
 	addup = 0,				// add upline
 	addbak = 0,				// add backup
 	c;
-    static char buffer[32];
+    static var_na buffer[32];
 
-    if (!cm)
-	return "OOPS";				// Kludge, but standard
+    အကယ်၍ (!cm)
+	ပြန်ပေး "OOPS";				// Kludge, but standard
 
     bufp = buffer;
     ptr = cm;
 
-    while (*ptr)
+    နေစဉ် (*ptr)
     {
-	if ((c = *ptr++) != '%')		// normal char
+	အကယ်၍ ((c = *ptr++) != '%')		// normal char
 	{
 	    *bufp++ = c;
 	}
-	else
+	မဟုတ်ပါက
 	{				// % escape
 	    switch(c = *ptr++)
 	    {
-	    case 'd':				// decimal
+	    pak_sa 'd':				// decimal
 		bufp = _addfmt(bufp, "%d", line);
 		line = col;
-		break;
-	    case '2':				// 2 digit decimal
+		bha_nga;
+	    pak_sa '2':				// 2 digit decimal
 		bufp = _addfmt(bufp, "%02d", line);
 		line = col;
-		break;
-	    case '3':				// 3 digit decimal
+		bha_nga;
+	    pak_sa '3':				// 3 digit decimal
 		bufp = _addfmt(bufp, "%03d", line);
 		line = col;
-		break;
-	    case '>':				// %>xy: if >x, add y
+		bha_nga;
+	    pak_sa '>':				// %>xy: if >x, add y
 		gx = *ptr++;
 		gy = *ptr++;
-		if (col>gx) col += gy;
-		if (line>gx) line += gy;
-		break;
-	    case '+':				// %+c: add c
+		အကယ်၍ (col>gx) col += gy;
+		အကယ်၍ (line>gx) line += gy;
+		bha_nga;
+	    pak_sa '+':				// %+c: add c
 		line += *ptr++;
-	    case '.':				// print x/y
-		if (line == '\t' ||		// these are
+	    pak_sa '.':				// print x/y
+		အကယ်၍ (line == '\t' ||		// these are
 		   line == '\n' ||		// chars that
 		   line == '\004' ||		// UNIX hates
 		   line == '\0')
 		{
 		    line++;			// so go to next pos
-		    if (reverse == (line == col))
+		    အကယ်၍ (reverse == (line == col))
 			addup=1;		// and mark UP
-		    else
+		    မဟုတ်ပါက
 			addbak=1;		// or BC
 		}
 		*bufp++=line;
 		line = col;
-		break;
-	    case 'r':				// r: reverse
+		bha_nga;
+	    pak_sa 'r':				// r: reverse
 		gx = line;
 		line = col;
 		col = gx;
 		reverse = 1;
-		break;
-	    case 'i':			// increment (1-origin screen)
+		bha_nga;
+	    pak_sa 'i':			// increment (1-origin screen)
 		col++;
 		line++;
-		break;
-	    case '%':				// %%=% literally
+		bha_nga;
+	    pak_sa '%':				// %%=% literally
 		*bufp++='%';
-		break;
-	    case 'n':				// magic DM2500 code
+		bha_nga;
+	    pak_sa 'n':				// magic DM2500 code
 		line ^= 0140;
 		col ^= 0140;
-		break;
-	    case 'B':				// bcd encoding
+		bha_nga;
+	    pak_sa 'B':				// bcd encoding
 		line = line/10<<4+line%10;
 		col = col/10<<4+col%10;
-		break;
-	    case 'D':				// magic Delta Data code
+		bha_nga;
+	    pak_sa 'D':				// magic Delta Data code
 		line = line-2*(line&15);
 		col = col-2*(col&15);
-		break;
+		bha_nga;
 	    default:				// Unknown escape
-		return "OOPS";
+		ပြန်ပေး "OOPS";
 	    }
 	}
     }
 
-    if (addup)					// add upline
-	if (UP)
+    အကယ်၍ (addup)					// add upline
+	အကယ်၍ (UP)
 	{
 	    ptr=UP;
-	    while (VIM_ISDIGIT(*ptr) || *ptr == '.')
+	    နေစဉ် (VIM_ISDIGIT(*ptr) || *ptr == '.')
 		ptr++;
-	    if (*ptr == '*')
+	    အကယ်၍ (*ptr == '*')
 		ptr++;
-	    while (*ptr)
+	    နေစဉ် (*ptr)
 		*bufp++ = *ptr++;
 	}
 
-    if (addbak)					// add backspace
-	if (BC)
+    အကယ်၍ (addbak)					// add backspace
+	အကယ်၍ (BC)
 	{
 	    ptr=BC;
-	    while (VIM_ISDIGIT(*ptr) || *ptr == '.')
+	    နေစဉ် (VIM_ISDIGIT(*ptr) || *ptr == '.')
 		ptr++;
-	    if (*ptr == '*')
+	    အကယ်၍ (*ptr == '*')
 		ptr++;
-	    while (*ptr)
+	    နေစဉ် (*ptr)
 		*bufp++ = *ptr++;
 	}
-	else
+	မဟုတ်ပါက
 	    *bufp++='\b';
 
     *bufp = 0;
 
-    return(buffer);
+    ပြန်ပေး(buffer);
 }
 
 /*
@@ -539,49 +539,49 @@ long _bauds[16]={
     600,    1200,   1800,   2400,
     4800,   9600,   19200,  19200 };
 
-    int
+    ကိန်းပြည့်
 tputs(
-    char *cp,				// string to print
-    int affcnt,				// Number of lines affected
-    void (*outc)(unsigned int))		// routine to output 1 character
+    var_na *cp,				// string to print
+    ကိန်းပြည့် affcnt,				// Number of lines affected
+    void (*outc)(unsigned ကိန်းပြည့်))		// routine to output 1 character
 {
     long    frac,			// 10^(#digits after decimal point)
 	counter,			// digits
-	atol(const char *);
+	atol(const var_na *);
 
-    if (VIM_ISDIGIT(*cp))
+    အကယ်၍ (VIM_ISDIGIT(*cp))
     {
 	counter = 0;
 	frac = 1000;
-	while (VIM_ISDIGIT(*cp))
+	နေစဉ် (VIM_ISDIGIT(*cp))
 	    counter = counter * 10L + (long)(*cp++ - '0');
-	if (*cp == '.')
-	    while (VIM_ISDIGIT(*++cp))
+	အကယ်၍ (*cp == '.')
+	    နေစဉ် (VIM_ISDIGIT(*++cp))
 	    {
 		counter = counter * 10L + (long)(*cp++ - '0');
 		frac = frac * 10;
 	    }
-	if (*cp!='*')			// multiply by affected lines
+	အကယ်၍ (*cp!='*')			// multiply by affected lines
 	{
-	    if (affcnt>1) affcnt = 1;
+	    အကယ်၍ (affcnt>1) affcnt = 1;
 	}
-	else
+	မဟုတ်ပါက
 	    cp++;
 
 	// Calculate number of characters for padding counter/frac ms delay
-	if (ospeed)
+	အကယ်၍ (ospeed)
 	    counter = (counter * _bauds[ospeed] * (long)affcnt) / frac;
 
-	while (*cp)			// output string
+	နေစဉ် (*cp)			// output string
 	    (*outc)(*cp++);
-	if (ospeed)
-	    while (counter--)		// followed by pad characters
+	အကယ်၍ (ospeed)
+	    နေစဉ် (counter--)		// followed by pad characters
 		(*outc)(PC);
     }
-    else
-	while (*cp)
+    မဟုတ်ပါက
+	နေစဉ် (*cp)
 	    (*outc)(*cp++);
-    return 0;
+    ပြန်ပေး 0;
 }
 
 /*
@@ -590,45 +590,45 @@ tputs(
  * Purpose: Utility routines for TERMLIB functions.
  * Returns length of text common to s1 and s2.
  */
-    static int
-_match(char *s1, char *s2)
+    static ကိန်းပြည့်
+_match(var_na *s1, var_na *s2)
 {
-    int i = 0;
+    ကိန်းပြည့် i = 0;
 
-    while (s1[i] && s1[i] == s2[i])
+    နေစဉ် (s1[i] && s1[i] == s2[i])
 	i++;
 
-    return i;
+    ပြန်ပေး i;
 }
 
 /*
  * finds next c in s that's a member of set, returns pointer
  */
-    static char *
-_find(char *s, char *set)
+    static var_na *
+_find(var_na *s, var_na *set)
 {
-    for (; *s; s++)
+    အတွက် (; *s; s++)
     {
-	char	*ptr = set;
+	var_na	*ptr = set;
 
-	while (*ptr && *s != *ptr)
+	နေစဉ် (*ptr && *s != *ptr)
 	    ptr++;
 
-	if (*ptr)
-	    return s;
+	အကယ်၍ (*ptr)
+	    ပြန်ပေး s;
     }
 
-    return s;
+    ပြန်ပေး s;
 }
 
 /*
  * add val to buf according to format fmt
  */
-    static char *
-_addfmt(char *buf, char *fmt, int val)
+    static var_na *
+_addfmt(var_na *buf, var_na *fmt, ကိန်းပြည့် val)
 {
     sprintf(buf, fmt, val);
-    while (*buf)
+    နေစဉ် (*buf)
 	buf++;
-    return buf;
+    ပြန်ပေး buf;
 }

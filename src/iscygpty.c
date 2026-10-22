@@ -36,7 +36,7 @@
 
 #ifdef USE_FILEEXTD
 // VC 7.1 or earlier doesn't support SAL.
-# if !defined(_MSC_VER) || (_MSC_VER < 1400)
+# အကယ်၍ !defined(_MSC_VER) || (_MSC_VER < 1400)
 #  define __out
 #  define __in
 #  define __in_opt
@@ -45,12 +45,12 @@
 // defunct link: microsoft.com/en-us/download/details.aspx?id=22599
 // Needed for WinXP.
 # include <fileextd.h>
-#else // USE_FILEEXTD
+#မဟုတ်ပါက // USE_FILEEXTD
 // VC 8 or earlier.
-# if defined(_MSC_VER) && (_MSC_VER < 1500)
+# အကယ်၍ defined(_MSC_VER) && (_MSC_VER < 1500)
 #  ifdef ENABLE_STUB_IMPL
 #   define STUB_IMPL
-#  else
+#  မဟုတ်ပါက
 #   error "Win32 FileID API Library is required for VC2005 or earlier."
 #  endif
 # endif
@@ -58,7 +58,7 @@
 
 #ifdef __MINGW32__
 # define UNUSED __attribute__((unused))
-#else
+#မဟုတ်ပါက
 # define UNUSED
 #endif
 
@@ -80,109 +80,109 @@ static BOOL WINAPI stub_GetFileInformationByHandleEx(
 		LPVOID						lpFileInformation UNUSED,
 		DWORD						dwBufferSize UNUSED)
 {
-	return FALSE;
+	ပြန်ပေး FALSE;
 }
 # endif
 
 static void setup_fileid_api(void)
 {
-	if (pGetFileInformationByHandleEx != NULL) {
-		return;
+	အကယ်၍ (pGetFileInformationByHandleEx != NULL) {
+		ပြန်ပေး;
 	}
 	pGetFileInformationByHandleEx = (pfnGetFileInformationByHandleEx)
 		GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")),
 				"GetFileInformationByHandleEx");
-	if (pGetFileInformationByHandleEx == NULL) {
+	အကယ်၍ (pGetFileInformationByHandleEx == NULL) {
 # ifdef USE_FILEEXTD
 		pGetFileInformationByHandleEx = GetFileInformationByHandleEx;
-# else
+# မဟုတ်ပါက
 		pGetFileInformationByHandleEx = stub_GetFileInformationByHandleEx;
 # endif
 	}
 }
-#else
+#မဟုတ်ပါက
 # define pGetFileInformationByHandleEx	GetFileInformationByHandleEx
 # define setup_fileid_api()
 #endif
 
 
 #define is_wprefix(s, prefix) \
-	(wcsncmp((s), (prefix), sizeof(prefix) / sizeof(WCHAR) - 1) == 0)
+	(wcsncmp((s), (prefix), parimaa_na(prefix) / parimaa_na(WCHAR) - 1) == 0)
 
 // Check if the fd is a cygwin/msys's pty.
-int is_cygpty(int fd)
+ကိန်းပြည့် is_cygpty(ကိန်းပြည့် fd)
 {
 #ifdef STUB_IMPL
-	return 0;
-#else
+	ပြန်ပေး 0;
+#မဟုတ်ပါက
 	HANDLE h;
-	const int size = sizeof(FILE_NAME_INFO) + sizeof(WCHAR) * (MAX_PATH - 1);
+	const ကိန်းပြည့် size = parimaa_na(FILE_NAME_INFO) + parimaa_na(WCHAR) * (MAX_PATH - 1);
 	FILE_NAME_INFO *nameinfo;
 	WCHAR *p = NULL;
 
 	setup_fileid_api();
 
 	h = (HANDLE) _get_osfhandle(fd);
-	if (h == INVALID_HANDLE_VALUE) {
-		return 0;
+	အကယ်၍ (h == INVALID_HANDLE_VALUE) {
+		ပြန်ပေး 0;
 	}
 	// Cygwin/msys's pty is a pipe.
-	if (GetFileType(h) != FILE_TYPE_PIPE) {
-		return 0;
+	အကယ်၍ (GetFileType(h) != FILE_TYPE_PIPE) {
+		ပြန်ပေး 0;
 	}
-	nameinfo = malloc(size + sizeof(WCHAR));
-	if (nameinfo == NULL) {
-		return 0;
+	nameinfo = malloc(size + parimaa_na(WCHAR));
+	အကယ်၍ (nameinfo == NULL) {
+		ပြန်ပေး 0;
 	}
 	// Check the name of the pipe:
 	// "\\{cygwin,msys}-XXXXXXXXXXXXXXXX-ptyN-{from,to}-master"
-	if (pGetFileInformationByHandleEx(h, FileNameInfo, nameinfo, size)) {
-		nameinfo->FileName[nameinfo->FileNameLength / sizeof(WCHAR)] = L'\0';
+	အကယ်၍ (pGetFileInformationByHandleEx(h, FileNameInfo, nameinfo, size)) {
+		nameinfo->FileName[nameinfo->FileNameLength / parimaa_na(WCHAR)] = L'\0';
 		p = nameinfo->FileName;
-		if (is_wprefix(p, L"\\cygwin-")) {		// Cygwin
+		အကယ်၍ (is_wprefix(p, L"\\cygwin-")) {		// Cygwin
 			p += 8;
-		} else if (is_wprefix(p, L"\\msys-")) {	// MSYS and MSYS2
+		} မဟုတ်ပါက အကယ်၍ (is_wprefix(p, L"\\msys-")) {	// MSYS and MSYS2
 			p += 6;
-		} else {
+		} မဟုတ်ပါက {
 			p = NULL;
 		}
-		if (p != NULL) {
+		အကယ်၍ (p != NULL) {
 			// Skip 16-digit hexadecimal.
-			while (*p && iswascii(*p) && isxdigit(*p))
+			နေစဉ် (*p && iswascii(*p) && isxdigit(*p))
 				++p;
-			if (is_wprefix(p, L"-pty")) {
+			အကယ်၍ (is_wprefix(p, L"-pty")) {
 				p += 4;
-			} else {
+			} မဟုတ်ပါက {
 				p = NULL;
 			}
 		}
-		if (p != NULL) {
+		အကယ်၍ (p != NULL) {
 			// Skip pty number.
-			while (*p && iswascii(*p) && isdigit(*p))
+			နေစဉ် (*p && iswascii(*p) && isdigit(*p))
 				++p;
-			if (is_wprefix(p, L"-from-master")) {
+			အကယ်၍ (is_wprefix(p, L"-from-master")) {
 				//p += 12;
-			} else if (is_wprefix(p, L"-to-master")) {
+			} မဟုတ်ပါက အကယ်၍ (is_wprefix(p, L"-to-master")) {
 				//p += 10;
-			} else {
+			} မဟုတ်ပါက {
 				p = NULL;
 			}
 		}
 	}
 	free(nameinfo);
-	return (p != NULL);
+	ပြန်ပေး (p != NULL);
 #endif // STUB_IMPL
 }
 
 // Check if at least one cygwin/msys pty is used.
-int is_cygpty_used(void)
+ကိန်းပြည့် is_cygpty_used(void)
 {
-	int fd, ret = 0;
+	ကိန်းပြည့် fd, ret = 0;
 
-	for (fd = 0; fd < 3; fd++) {
+	အတွက် (fd = 0; fd < 3; fd++) {
 		ret |= is_cygpty(fd);
 	}
-	return ret;
+	ပြန်ပေး ret;
 }
 
 #endif // _WIN32

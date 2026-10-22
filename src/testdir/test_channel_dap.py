@@ -15,36 +15,36 @@ except ImportError:
 def make_dap_message(obj):
     payload = json.dumps(obj).encode("utf-8")
     header = f"Content-Length: {len(payload)}\r\n\r\n".encode("ascii")
-    return header + payload
+    ပြန်ပေး header + payload
 
 
 def parse_messages(buffer):
     messages = []
 
-    while True:
+    နေစဉ် True:
         hdr_end = buffer.find(b"\r\n\r\n")
-        if hdr_end == -1:
-            break
+        အကယ်၍ hdr_end == -1:
+            bha_nga
 
         header = buffer[:hdr_end].decode("ascii", errors="ignore")
         content_length = None
 
-        for line in header.split("\r\n"):
-            if line.lower().startswith("content-length:"):
-                content_length = int(line.split(":")[1].strip())
+        အတွက် line anta_h header.split("\r\n"):
+            အကယ်၍ line.lower().startswith("content-length:"):
+                content_length = ကိန်းပြည့်(line.split(":")[1].strip())
 
-        if content_length is None:
-            break
+        အကယ်၍ content_length is None:
+            bha_nga
 
         total_len = hdr_end + 4 + content_length
-        if len(buffer) < total_len:
-            break  # partial
+        အကယ်၍ len(buffer) < total_len:
+            bha_nga  # partial
 
         body = buffer[hdr_end + 4:total_len]
         messages.append(json.loads(body.decode("utf-8")))
         buffer = buffer[total_len:]
 
-    return messages, buffer
+    ပြန်ပေး messages, buffer
 
 
 class DAPHandler(socketserver.BaseRequestHandler):
@@ -77,31 +77,31 @@ class DAPHandler(socketserver.BaseRequestHandler):
     def handle_request(self, msg):
         cmd = msg.get("command")
 
-        if cmd == "initialize":
+        အကယ်၍ cmd == "initialize":
             self.send_response(msg, {
                 "supportsConfigurationDoneRequest": True
             })
             self.send_event("initialized")
-        else:
+        မဟုတ်ပါက:
             self.send_response(msg)
 
-        return True
+        ပြန်ပေး True
 
     def handle(self):
         buffer = b""
 
-        while True:
+        နေစဉ် True:
             data = self.request.recv(4096)
-            if not data:
-                break
+            အကယ်၍ na data:
+                bha_nga
 
             buffer += data
             messages, buffer = parse_messages(buffer)
 
-            for msg in messages:
-                if msg.get("type") == "request":
-                    if not self.handle_request(msg):
-                        return
+            အတွက် msg anta_h messages:
+                အကယ်၍ msg.get("type") == "request":
+                    အကယ်၍ na self.handle_request(msg):
+                        ပြန်ပေး
 
 
 class ThreadedDAPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
@@ -125,11 +125,11 @@ def main():
     thread.start()
 
     try:
-        while thread.is_alive():
+        နေစဉ် thread.is_alive():
             thread.join(1)
     except KeyboardInterrupt:
         server.shutdown()
 
-if __name__ == "__main__":
+အကယ်၍ __name__ == "__main__":
     main()
 
